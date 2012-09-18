@@ -99,11 +99,10 @@ WRITE16_MEMBER(gradius3_state::cpuB_irqenable_w)
 		m_irqBmask = (data >> 8) & 0x07;
 }
 
-static INTERRUPT_GEN( cpuA_interrupt )
+INTERRUPT_GEN_MEMBER(gradius3_state::cpuA_interrupt)
 {
-	gradius3_state *state = device->machine().driver_data<gradius3_state>();
-	if (state->m_irqAen)
-		device->execute().set_input_line(2, HOLD_LINE);
+	if (m_irqAen)
+		device.execute().set_input_line(2, HOLD_LINE);
 }
 
 
@@ -317,7 +316,7 @@ static MACHINE_CONFIG_START( gradius3, gradius3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(gradius3_map)
-	MCFG_CPU_VBLANK_INT("screen", cpuA_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gradius3_state,  cpuA_interrupt)
 
 	MCFG_CPU_ADD("sub", M68000, 10000000)	/* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(gradius3_map2)

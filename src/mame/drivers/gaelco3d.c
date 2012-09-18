@@ -250,10 +250,10 @@ MACHINE_RESET_MEMBER(gaelco3d_state,gaelco3d2)
  *
  *************************************/
 
-static INTERRUPT_GEN( vblank_gen )
+INTERRUPT_GEN_MEMBER(gaelco3d_state::vblank_gen)
 {
-	gaelco3d_render(*device->machine().primary_screen);
-	device->execute().set_input_line(2, ASSERT_LINE);
+	gaelco3d_render(*machine().primary_screen);
+	device.execute().set_input_line(2, ASSERT_LINE);
 }
 
 
@@ -994,7 +994,7 @@ static MACHINE_CONFIG_START( gaelco3d, gaelco3d_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 15000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_gen)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco3d_state,  vblank_gen)
 
 	MCFG_CPU_ADD("tms", TMS32031, 60000000)
 	MCFG_TMS3203X_CONFIG(tms_config)
@@ -1047,7 +1047,7 @@ static MACHINE_CONFIG_DERIVED( gaelco3d2, gaelco3d )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68EC020, 25000000)
 	MCFG_CPU_PROGRAM_MAP(main020_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_gen)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco3d_state,  vblank_gen)
 
 	MCFG_CPU_MODIFY("tms")
 	MCFG_CPU_CLOCK(50000000)

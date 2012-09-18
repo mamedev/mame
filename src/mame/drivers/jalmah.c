@@ -1406,7 +1406,7 @@ void jalmah_state::machine_reset()
 static MACHINE_CONFIG_START( jalmah, jalmah_state )
 	MCFG_CPU_ADD("maincpu" , M68000, 12000000) /* 68000-8 */
 	MCFG_CPU_PROGRAM_MAP(jalmah)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", jalmah_state,  irq2_line_hold)
 
 	//M50747 MCU
 

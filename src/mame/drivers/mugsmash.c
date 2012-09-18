@@ -410,7 +410,7 @@ static MACHINE_CONFIG_START( mugsmash, mugsmash_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(mugsmash_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mugsmash_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* Guess */
 	MCFG_CPU_PROGRAM_MAP(mugsmash_sound_map)

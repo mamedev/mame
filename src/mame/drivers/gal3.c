@@ -627,15 +627,15 @@ static const c140_interface C140_interface =
 static MACHINE_CONFIG_START( gal3, gal3_state )
 	MCFG_CPU_ADD("cpumst", M68020, 49152000/2)
 	MCFG_CPU_PROGRAM_MAP(cpu_mst_map)
-	MCFG_CPU_VBLANK_INT("lscreen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("cpuslv", M68020, 49152000/2)
 	MCFG_CPU_PROGRAM_MAP(cpu_slv_map)
-	MCFG_CPU_VBLANK_INT("lscreen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("rs_cpu", M68000, 49152000/4)
 	MCFG_CPU_PROGRAM_MAP(rs_cpu_map)
-	MCFG_CPU_VBLANK_INT("lscreen", irq5_line_hold)	/// programmable via 148 IC
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq5_line_hold)	/// programmable via 148 IC
 
 	MCFG_CPU_ADD("sound_cpu", M68000, 12000000) // ??
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)

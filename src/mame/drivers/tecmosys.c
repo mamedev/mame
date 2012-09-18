@@ -455,7 +455,7 @@ void tecmosys_state::machine_start()
 static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmosys_state,  irq1_line_hold)
 	MCFG_WATCHDOG_VBLANK_INIT(400) // guess
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2 )

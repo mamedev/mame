@@ -1010,7 +1010,7 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(nmg5_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nmg5_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)		/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(nmg5_sound_map)

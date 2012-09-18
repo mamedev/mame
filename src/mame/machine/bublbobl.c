@@ -372,11 +372,11 @@ static TIMER_CALLBACK( bublbobl_m68705_irq_ack )
 	machine.device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
-INTERRUPT_GEN( bublbobl_m68705_interrupt )
+INTERRUPT_GEN_MEMBER(bublbobl_state::bublbobl_m68705_interrupt)
 {
-	device->execute().set_input_line(0, ASSERT_LINE);
+	device.execute().set_input_line(0, ASSERT_LINE);
 
-	device->machine().scheduler().timer_set(attotime::from_msec(1000/60), FUNC(bublbobl_m68705_irq_ack)); /* TODO: understand how this is ack'ed */
+	machine().scheduler().timer_set(attotime::from_msec(1000/60), FUNC(bublbobl_m68705_irq_ack)); /* TODO: understand how this is ack'ed */
 }
 
 

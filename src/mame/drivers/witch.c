@@ -239,6 +239,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_gfx1_tile_info);
 	virtual void video_start();
 	UINT32 screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(witch_main_interrupt);
+	INTERRUPT_GEN_MEMBER(witch_sub_interrupt);
 };
 
 
@@ -779,26 +781,26 @@ UINT32 witch_state::screen_update_witch(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-static INTERRUPT_GEN( witch_main_interrupt )
+INTERRUPT_GEN_MEMBER(witch_state::witch_main_interrupt)
 {
-	device->execute().set_input_line(0,ASSERT_LINE);
+	device.execute().set_input_line(0,ASSERT_LINE);
 }
 
-static INTERRUPT_GEN( witch_sub_interrupt )
+INTERRUPT_GEN_MEMBER(witch_state::witch_sub_interrupt)
 {
-	device->execute().set_input_line(0,ASSERT_LINE);
+	device.execute().set_input_line(0,ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( witch, witch_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(map_main)
-	MCFG_CPU_VBLANK_INT("screen", witch_main_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", witch_state,  witch_main_interrupt)
 
 	/* 2nd z80 */
 	MCFG_CPU_ADD("sub", Z80,8000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(map_sub)
-	MCFG_CPU_VBLANK_INT("screen", witch_sub_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", witch_state,  witch_sub_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

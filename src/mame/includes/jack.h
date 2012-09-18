@@ -57,4 +57,5 @@ public:
 	DECLARE_PALETTE_INIT(joinem);
 	UINT32 screen_update_jack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_joinem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(joinem_vblank_irq);
 };

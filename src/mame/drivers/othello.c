@@ -417,7 +417,7 @@ static MACHINE_CONFIG_START( othello, othello_state )
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", othello_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu",Z80,XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(audio_map)

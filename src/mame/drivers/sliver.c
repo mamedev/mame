@@ -473,7 +473,7 @@ static TIMER_DEVICE_CALLBACK ( obj_irq_cb )
 static MACHINE_CONFIG_START( sliver, sliver_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(sliver_map)
-	MCFG_CPU_VBLANK_INT("screen",irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sliver_state, irq4_line_hold)
 	MCFG_TIMER_ADD_PERIODIC("obj_actel", obj_irq_cb, attotime::from_hz(60)) /* unknown clock, causes "obj actel ready error" without this */
 	// irq 2 valid but not used?
 

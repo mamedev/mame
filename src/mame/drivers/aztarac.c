@@ -149,11 +149,11 @@ static MACHINE_CONFIG_START( aztarac, aztarac_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", aztarac_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 2000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(aztarac_snd_timed_irq, 100)
+	MCFG_CPU_PERIODIC_INT_DRIVER(aztarac_state, aztarac_snd_timed_irq,  100)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

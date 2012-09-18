@@ -105,10 +105,10 @@
  *
  *************************************/
 
-static INTERRUPT_GEN( capbowl_interrupt )
+INTERRUPT_GEN_MEMBER(capbowl_state::capbowl_interrupt)
 {
-	if (device->machine().root_device().ioport("SERVICE")->read() & 1)						/* get status of the F2 key */
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);	/* trigger self test */
+	if (machine().root_device().ioport("SERVICE")->read() & 1)						/* get status of the F2 key */
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);	/* trigger self test */
 }
 
 
@@ -361,7 +361,7 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809E, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(capbowl_map)
-	MCFG_CPU_VBLANK_INT("screen", capbowl_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", capbowl_state,  capbowl_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M6809E, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sound_map)

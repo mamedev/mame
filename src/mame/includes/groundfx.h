@@ -38,4 +38,5 @@ public:
 	DECLARE_DRIVER_INIT(groundfx);
 	virtual void video_start();
 	UINT32 screen_update_groundfx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(groundfx_interrupt);
 };

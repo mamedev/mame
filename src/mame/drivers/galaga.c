@@ -1637,20 +1637,18 @@ static const samples_interface battles_samples_interface =
 };
 
 
-static INTERRUPT_GEN( main_vblank_irq )
+INTERRUPT_GEN_MEMBER(galaga_state::main_vblank_irq)
 {
-	galaga_state *state = device->machine().driver_data<galaga_state>();
 
-	if(state->m_main_irq_mask)
-		device->execute().set_input_line(0, ASSERT_LINE);
+	if(m_main_irq_mask)
+		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-static INTERRUPT_GEN( sub_vblank_irq )
+INTERRUPT_GEN_MEMBER(galaga_state::sub_vblank_irq)
 {
-	galaga_state *state = device->machine().driver_data<galaga_state>();
 
-	if(state->m_sub_irq_mask)
-		device->execute().set_input_line(0, ASSERT_LINE);
+	if(m_sub_irq_mask)
+		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 const namco_06xx_config bosco_namco_06xx_0_intf =
@@ -1673,11 +1671,11 @@ static MACHINE_CONFIG_START( bosco, bosco_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(bosco_map)
-	MCFG_CPU_VBLANK_INT("screen", main_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaga_state,  main_vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(bosco_map)
-	MCFG_CPU_VBLANK_INT("screen", sub_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaga_state,  sub_vblank_irq)
 
 	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(bosco_map)
@@ -1733,11 +1731,11 @@ static MACHINE_CONFIG_START( galaga, galaga_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(galaga_map)
-	MCFG_CPU_VBLANK_INT("screen", main_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaga_state,  main_vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(galaga_map)
-	MCFG_CPU_VBLANK_INT("screen", sub_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaga_state,  sub_vblank_irq)
 
 	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(galaga_map)
@@ -1810,11 +1808,11 @@ static MACHINE_CONFIG_START( xevious, xevious_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(xevious_map)
-	MCFG_CPU_VBLANK_INT("screen", main_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaga_state,  main_vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80,MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(xevious_map)
-	MCFG_CPU_VBLANK_INT("screen", sub_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaga_state,  sub_vblank_irq)
 
 	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(xevious_map)
@@ -1873,7 +1871,7 @@ static MACHINE_CONFIG_DERIVED( battles, xevious )
 
 	MCFG_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(battles_mem4)
-	MCFG_CPU_VBLANK_INT("screen", battles_interrupt_4)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", xevious_state, battles_interrupt_4)
 
 	MCFG_TIMER_ADD("battles_nmi", battles_nmi_generate)
 
@@ -1899,11 +1897,11 @@ static MACHINE_CONFIG_START( digdug, digdug_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(digdug_map)
-	MCFG_CPU_VBLANK_INT("screen", main_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaga_state,  main_vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(digdug_map)
-	MCFG_CPU_VBLANK_INT("screen", sub_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaga_state,  sub_vblank_irq)
 
 	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(digdug_map)

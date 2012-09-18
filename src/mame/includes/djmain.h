@@ -54,6 +54,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vb_interrupt);
 };
 
 /*----------- defined in video/djmain.c -----------*/

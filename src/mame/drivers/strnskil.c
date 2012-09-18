@@ -356,7 +356,7 @@ static MACHINE_CONFIG_START( strnskil, strnskil_state )
 
 	MCFG_CPU_ADD("sub", Z80,8000000/2) /* 4.000MHz */
 	MCFG_CPU_PROGRAM_MAP(strnskil_map2)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(strnskil_state, irq0_line_hold, 2*60)
 
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))

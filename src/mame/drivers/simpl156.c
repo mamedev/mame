@@ -383,9 +383,9 @@ static GFXDECODE_START( simpl156 )
 
 GFXDECODE_END
 
-static INTERRUPT_GEN( simpl156_vbl_interrupt )
+INTERRUPT_GEN_MEMBER(simpl156_state::simpl156_vbl_interrupt)
 {
-	device->execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
+	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -425,7 +425,7 @@ static MACHINE_CONFIG_START( chainrec, simpl156_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000 /* /4 */)	/*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
 	MCFG_CPU_PROGRAM_MAP(chainrec_map)
-	MCFG_CPU_VBLANK_INT("screen", simpl156_vbl_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", simpl156_state,  simpl156_vbl_interrupt)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")  // 93C45
 

@@ -593,7 +593,7 @@ static MACHINE_CONFIG_START( burglarx, unico_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(burglarx_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
 
 	MCFG_MACHINE_RESET_OVERRIDE(unico_state,unico)
 
@@ -638,7 +638,7 @@ static MACHINE_CONFIG_START( zeropnt, unico_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(zeropnt_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
 
 	MCFG_MACHINE_RESET_OVERRIDE(unico_state,zeropt)
 
@@ -678,7 +678,7 @@ static MACHINE_CONFIG_START( zeropnt2, unico_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)
 	MCFG_CPU_PROGRAM_MAP(zeropnt2_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
 
 	MCFG_MACHINE_RESET_OVERRIDE(unico_state,zeropt)
 

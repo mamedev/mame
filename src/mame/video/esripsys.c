@@ -9,11 +9,10 @@
 #include "includes/esripsys.h"
 
 
-INTERRUPT_GEN( esripsys_vblank_irq )
+INTERRUPT_GEN_MEMBER(esripsys_state::esripsys_vblank_irq)
 {
-	esripsys_state *state = device->machine().driver_data<esripsys_state>();
-	device->machine().device("game_cpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-	state->m_frame_vbl = 0;
+	machine().device("game_cpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	m_frame_vbl = 0;
 }
 
 static TIMER_CALLBACK( hblank_start_callback )

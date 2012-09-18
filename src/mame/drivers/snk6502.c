@@ -740,17 +740,16 @@ GFXDECODE_END
  *
  *************************************/
 
-static INTERRUPT_GEN( satansat_interrupt )
+INTERRUPT_GEN_MEMBER(snk6502_state::satansat_interrupt)
 {
-	snk6502_state *state = device->machine().driver_data<snk6502_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
+	if(m_irq_mask)
+		device.execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
 }
 
-static INTERRUPT_GEN( snk6502_interrupt )
+INTERRUPT_GEN_MEMBER(snk6502_state::snk6502_interrupt)
 {
-	device->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
+	device.execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
 }
 
 
@@ -824,7 +823,7 @@ static MACHINE_CONFIG_START( sasuke, snk6502_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) // 700 kHz
 	MCFG_CPU_PROGRAM_MAP(sasuke_map)
-	MCFG_CPU_VBLANK_INT("screen",satansat_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk6502_state, satansat_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,sasuke)
 
@@ -897,7 +896,7 @@ static MACHINE_CONFIG_START( vanguard, snk6502_state )
 	//MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)   // 1.4 MHz
 	MCFG_CPU_ADD("maincpu", M6502, 930000)		// adjusted
 	MCFG_CPU_PROGRAM_MAP(vanguard_map)
-	MCFG_CPU_VBLANK_INT("screen",snk6502_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk6502_state, snk6502_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,vanguard)
 

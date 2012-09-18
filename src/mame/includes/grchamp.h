@@ -72,6 +72,8 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_grchamp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(grchamp_cpu0_interrupt);
+	INTERRUPT_GEN_MEMBER(grchamp_cpu1_interrupt);
 };
 
 /* Discrete Sound Input Nodes */

@@ -471,6 +471,11 @@ public:
 	UINT32 screen_update_jantouki_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_jantouki_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(sprtmtch_vblank_interrupt);
+	INTERRUPT_GEN_MEMBER(jantouki_vblank_interrupt);
+	INTERRUPT_GEN_MEMBER(jantouki_sound_vblank_interrupt);
+	INTERRUPT_GEN_MEMBER(yarunara_clock_interrupt);
+	INTERRUPT_GEN_MEMBER(mjelctrn_vblank_interrupt);
 };
 
 //----------- defined in drivers/dynax.c -----------

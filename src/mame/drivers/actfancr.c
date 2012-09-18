@@ -323,7 +323,7 @@ static MACHINE_CONFIG_START( actfancr, actfancr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",H6280,21477200/3) /* Should be accurate */
 	MCFG_CPU_PROGRAM_MAP(actfan_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold) /* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", actfancr_state,  irq0_line_hold) /* VBL */
 
 	MCFG_CPU_ADD("audiocpu",M6502, 1500000) /* Should be accurate */
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
@@ -373,7 +373,7 @@ static MACHINE_CONFIG_START( triothep, actfancr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",H6280,XTAL_21_4772MHz/3) /* XIN=21.4772Mhz, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(triothep_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold) /* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", actfancr_state,  irq0_line_hold) /* VBL */
 
 	MCFG_CPU_ADD("audiocpu",M6502, XTAL_12MHz/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)

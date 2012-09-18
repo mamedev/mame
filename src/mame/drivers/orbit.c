@@ -47,10 +47,10 @@ static TIMER_CALLBACK( irq_off )
 }
 
 
-static INTERRUPT_GEN( orbit_interrupt )
+INTERRUPT_GEN_MEMBER(orbit_state::orbit_interrupt)
 {
-	device->execute().set_input_line(0, ASSERT_LINE);
-	device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_vblank_end(), FUNC(irq_off));
+	device.execute().set_input_line(0, ASSERT_LINE);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_vblank_end(), FUNC(irq_off));
 }
 
 
@@ -299,7 +299,7 @@ static MACHINE_CONFIG_START( orbit, orbit_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLOCK / 16)
 	MCFG_CPU_PROGRAM_MAP(orbit_map)
-	MCFG_CPU_VBLANK_INT("screen", orbit_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", orbit_state,  orbit_interrupt)
 
 	MCFG_TIMER_ADD_SCANLINE("32v", nmi_32v, "screen", 0, 32)
 

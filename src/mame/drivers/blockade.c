@@ -58,15 +58,14 @@
 /* Need to check for a coin on the interrupt, */
 /* This will reset the cpu                    */
 
-static INTERRUPT_GEN( blockade_interrupt )
+INTERRUPT_GEN_MEMBER(blockade_state::blockade_interrupt)
 {
-	blockade_state *state = device->machine().driver_data<blockade_state>();
-	device->execute().resume(SUSPEND_ANY_REASON);
+	device.execute().resume(SUSPEND_ANY_REASON);
 
-	if ((state->ioport("IN0")->read() & 0x80) == 0)
+	if ((ioport("IN0")->read() & 0x80) == 0)
 	{
-		state->m_just_been_reset = 1;
-		device->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_just_been_reset = 1;
+		device.execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 
@@ -472,7 +471,7 @@ static MACHINE_CONFIG_START( blockade, blockade_state )
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/10)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT("screen", blockade_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", blockade_state,  blockade_interrupt)
 
 
 	/* video hardware */

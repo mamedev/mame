@@ -212,7 +212,7 @@ static MACHINE_CONFIG_FRAGMENT( redalert_audio_m37b )
 
 	MCFG_CPU_ADD("audiocpu", M6502, REDALERT_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(redalert_audio_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, REDALERT_AUDIO_CPU_IRQ_FREQ)
+	MCFG_CPU_PERIODIC_INT_DRIVER(redalert_state, irq0_line_hold,  REDALERT_AUDIO_CPU_IRQ_FREQ)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, REDALERT_AY8910_CLOCK)
 	MCFG_SOUND_CONFIG(redalert_ay8910_interface)
@@ -404,7 +404,7 @@ MACHINE_CONFIG_FRAGMENT( demoneye_audio )
 
 	MCFG_CPU_ADD("audiocpu", M6802, DEMONEYE_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(demoneye_audio_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, REDALERT_AUDIO_CPU_IRQ_FREQ)  /* guess */
+	MCFG_CPU_PERIODIC_INT_DRIVER(redalert_state, irq0_line_hold,  REDALERT_AUDIO_CPU_IRQ_FREQ)  /* guess */
 
 	MCFG_PIA6821_ADD("sndpia", demoneye_pia_intf)
 

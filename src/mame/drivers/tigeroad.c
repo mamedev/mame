@@ -520,7 +520,7 @@ static MACHINE_CONFIG_START( tigeroad, tigeroad_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tigeroad_state,  irq2_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -563,7 +563,7 @@ static MACHINE_CONFIG_DERIVED( toramich, tigeroad )
 	MCFG_CPU_ADD("sample", Z80, 3579545) /* ? */
 	MCFG_CPU_PROGRAM_MAP(sample_map)
 	MCFG_CPU_IO_MAP(sample_port_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4000)	/* ? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(tigeroad_state, irq0_line_hold, 4000)	/* ? */
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)

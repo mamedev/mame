@@ -868,7 +868,7 @@ static MACHINE_CONFIG_START( royalqn, nightgal_state )
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK / 8)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(royalqn_map)
 	MCFG_CPU_IO_MAP(royalqn_io)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nightgal_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", NSC8105, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(royalqn_nsc_map)
@@ -902,11 +902,11 @@ static MACHINE_CONFIG_DERIVED( sexygal, royalqn )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sexygal_map)
 	MCFG_CPU_IO_MAP(sexygal_io)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,244)//???
+	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 244)//???
 
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(sexygal_nsc_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nightgal_state,  irq0_line_hold)
 
 	MCFG_DEVICE_REMOVE("aysnd")
 
@@ -919,7 +919,7 @@ static MACHINE_CONFIG_DERIVED( ngalsumr, royalqn )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(royalqn_map)
 	MCFG_CPU_IO_MAP(royalqn_io)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,244)//???
+	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 244)//???
 MACHINE_CONFIG_END
 
 /*

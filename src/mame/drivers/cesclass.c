@@ -245,8 +245,8 @@ static MACHINE_CONFIG_START( cesclassic, cesclassic_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )
 	MCFG_CPU_PROGRAM_MAP(cesclassic_map)
-	MCFG_CPU_VBLANK_INT("l_lcd", irq2_line_assert)  // TODO: unknown sources
-	MCFG_CPU_PERIODIC_INT(irq3_line_assert,60*8)
+	MCFG_CPU_VBLANK_INT_DRIVER("l_lcd", cesclassic_state,  irq2_line_assert)  // TODO: unknown sources
+	MCFG_CPU_PERIODIC_INT_DRIVER(cesclassic_state, irq3_line_assert, 60*8)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

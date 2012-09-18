@@ -657,7 +657,7 @@ static MACHINE_CONFIG_START( sidearms, sidearms_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(sidearms_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(sidearms_sound_map)
@@ -700,7 +700,7 @@ static MACHINE_CONFIG_START( turtship, sidearms_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(turtship_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(sidearms_sound_map)
@@ -742,12 +742,12 @@ static MACHINE_CONFIG_START( whizz, sidearms_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(whizz_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(whizz_sound_map)
 	MCFG_CPU_IO_MAP(whizz_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 

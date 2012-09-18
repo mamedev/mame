@@ -110,6 +110,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vertigo_pit8254_lsb_w);
 	virtual void machine_start();
 	virtual void machine_reset();
+	INTERRUPT_GEN_MEMBER(vertigo_interrupt);
 };
 
 /*----------- defined in machine/vertigo.c -----------*/
@@ -117,8 +118,6 @@ public:
 void vertigo_update_irq(device_t *device);
 
 extern const struct pit8253_config vertigo_pit8254_config;
-
-INTERRUPT_GEN( vertigo_interrupt );
 
 /*----------- defined in video/vertigo.c -----------*/
 

@@ -193,7 +193,7 @@ static MACHINE_CONFIG_START( twins, twins_state )
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(twins_map)
 	MCFG_CPU_IO_MAP(twins_io)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", twins_state,  nmi_line_pulse)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -281,7 +281,7 @@ static MACHINE_CONFIG_START( twinsa, twins_state )
 	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(twins_map)
 	MCFG_CPU_IO_MAP(twinsa_io)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", twins_state,  nmi_line_pulse)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -190,7 +190,7 @@ static MACHINE_CONFIG_START( sspeedr, sspeedr_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_19_968MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sspeedr_map)
 	MCFG_CPU_IO_MAP(sspeedr_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sspeedr_state,  irq0_line_assert)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

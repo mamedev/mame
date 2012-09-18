@@ -52,4 +52,10 @@ public:
 	UINT32 screen_update_superpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_phozon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mappy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(superpac_main_vblank_irq);
+	INTERRUPT_GEN_MEMBER(pacnpal_main_vblank_irq);
+	INTERRUPT_GEN_MEMBER(phozon_main_vblank_irq);
+	INTERRUPT_GEN_MEMBER(mappy_main_vblank_irq);
+	INTERRUPT_GEN_MEMBER(sub_vblank_irq);
+	INTERRUPT_GEN_MEMBER(sub2_vblank_irq);
 };

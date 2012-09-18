@@ -260,19 +260,18 @@ static TIMER_CALLBACK( dmaend_callback )
 }
 
 
-static INTERRUPT_GEN( simpsons_irq )
+INTERRUPT_GEN_MEMBER(simpsons_state::simpsons_irq)
 {
-	simpsons_state *state = device->machine().driver_data<simpsons_state>();
 
-	if (k053246_is_irq_enabled(state->m_k053246))
+	if (k053246_is_irq_enabled(m_k053246))
 	{
-		simpsons_objdma(device->machine());
+		simpsons_objdma(machine());
 		// 32+256us delay at 8MHz dotclock; artificially shortened since actual V-blank length is unknown
-		device->machine().scheduler().timer_set(attotime::from_usec(30), FUNC(dmaend_callback));
+		machine().scheduler().timer_set(attotime::from_usec(30), FUNC(dmaend_callback));
 	}
 
-	if (k052109_is_irq_enabled(state->m_k052109))
-		device->execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
+	if (k052109_is_irq_enabled(m_k052109))
+		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 static const k052109_interface simpsons_k052109_intf =
@@ -309,7 +308,7 @@ static MACHINE_CONFIG_START( simpsons, simpsons_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8) /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", simpsons_irq)	/* IRQ triggered by the 052109, FIRQ by the sprite hardware */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", simpsons_state,  simpsons_irq)	/* IRQ triggered by the 052109, FIRQ by the sprite hardware */
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(z80_map)

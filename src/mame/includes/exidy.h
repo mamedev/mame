@@ -68,9 +68,9 @@ public:
 	virtual void video_start();
 	DECLARE_MACHINE_START(teetert);
 	UINT32 screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(exidy_vblank_interrupt);
 };
 
 /*----------- defined in video/exidy.c -----------*/
 
 void exidy_video_config(running_machine &machine, UINT8 _collision_mask, UINT8 _collision_invert, int _is_2bpp);
-INTERRUPT_GEN( exidy_vblank_interrupt );

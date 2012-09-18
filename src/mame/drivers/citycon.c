@@ -206,11 +206,11 @@ static MACHINE_CONFIG_START( citycon, citycon_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2048000)        /* 2.048 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(citycon_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", M6809, 640000)       /* 0.640 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-//  MCFG_CPU_VBLANK_INT("screen", irq0_line_hold) //actually unused, probably it was during development
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_hold) //actually unused, probably it was during development
 
 
 	/* video hardware */

@@ -412,11 +412,10 @@ TIMER_DEVICE_CALLBACK( changela_scanline )
 		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xcf);
 }
 
-static INTERRUPT_GEN( chl_mcu_irq )
+INTERRUPT_GEN_MEMBER(changela_state::chl_mcu_irq)
 {
-	changela_state *state = device->machine().driver_data<changela_state>();
 
-	generic_pulse_irq_line(state->m_mcu, 0, 1);
+	generic_pulse_irq_line(m_mcu->execute(), 0, 1);
 }
 
 void changela_state::machine_start()
@@ -508,7 +507,7 @@ static MACHINE_CONFIG_START( changela, changela_state )
 
 	MCFG_CPU_ADD("mcu", M68705,2500000)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_VBLANK_INT("screen",chl_mcu_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", changela_state, chl_mcu_irq)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -107,6 +107,7 @@ public:
 	DECLARE_READ8_MEMBER(controls_r);
 	virtual void machine_start();
 	virtual void machine_reset();
+	INTERRUPT_GEN_MEMBER(pachifev_vblank_irq);
 };
 
 WRITE8_MEMBER(pachifev_state::controls_w)
@@ -317,34 +318,33 @@ void pachifev_state::machine_reset()
 }
 
 
-static INTERRUPT_GEN( pachifev_vblank_irq )
+INTERRUPT_GEN_MEMBER(pachifev_state::pachifev_vblank_irq)
 {
     {
 		static const char *const inname[2] = { "PLUNGER_P1", "PLUNGER_P2" };
-        pachifev_state *state = device->machine().driver_data<pachifev_state>();
 
 		/* I wish I had found a better way to handle cocktail inputs, but I can't find a way to access internal RAM */
 		/* (bit 5 of 0xf0aa : 0 = player 1 and 1 = player 2 - bit 6 of 0xf0aa : 0 = upright and 1 = cocktail). */
 		/* All I found is that in main RAM, 0xe00f.b determines the player : 0x00 = player 1 and 0x01 = player 2. */
-		address_space *ramspace = device->memory().space(AS_PROGRAM);
+		address_space *ramspace = device.memory().space(AS_PROGRAM);
 		UINT8 player = 0;
 
-		if ((ramspace->read_byte(0xe00f) == 0x01) && ((state->ioport("DSW1")->read() & 0x08) == 0x00))
+		if ((ramspace->read_byte(0xe00f) == 0x01) && ((ioport("DSW1")->read() & 0x08) == 0x00))
 			player = 1;
 
-        int current_power=state->ioport(inname[player])->read() & 0x3f;
-        if(current_power != state->m_previous_power)
+        int current_power=ioport(inname[player])->read() & 0x3f;
+        if(current_power != m_previous_power)
         {
             popmessage    ("%d%%", (current_power * 100) / 0x3f);
         }
 
-        if( (!current_power) && (state->m_previous_power) )
+        if( (!current_power) && (m_previous_power) )
         {
-            state->m_input_power=state->m_previous_power;
-            state->m_cnt=NUM_PLUNGER_REPEATS;
+            m_input_power=m_previous_power;
+            m_cnt=NUM_PLUNGER_REPEATS;
         }
 
-        state->m_previous_power=current_power;
+        m_previous_power=current_power;
     }
 
 }
@@ -378,7 +378,7 @@ static MACHINE_CONFIG_START( pachifev, pachifev_state )
     MCFG_CPU_CONFIG(pachifev_processor_config)
     MCFG_CPU_PROGRAM_MAP(pachifev_map)
     MCFG_CPU_IO_MAP(pachifev_cru)
-    MCFG_CPU_VBLANK_INT("screen",pachifev_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pachifev_state, pachifev_vblank_irq)
 
 
     /* video hardware */

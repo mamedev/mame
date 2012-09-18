@@ -1282,7 +1282,7 @@ static MACHINE_CONFIG_DERIVED( norautp, noraut_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
 
@@ -1290,7 +1290,7 @@ static MACHINE_CONFIG_DERIVED( norautpl, noraut_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("discrete")
@@ -1303,7 +1303,7 @@ static MACHINE_CONFIG_DERIVED( norautxp, noraut_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(norautxp_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
 
@@ -1312,7 +1312,7 @@ static MACHINE_CONFIG_DERIVED( nortest1, noraut_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nortest1_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
 
@@ -1321,7 +1321,7 @@ static MACHINE_CONFIG_DERIVED( norautx4, noraut_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(norautx4_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
 
@@ -1331,7 +1331,7 @@ static MACHINE_CONFIG_DERIVED( norautx8, noraut_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(norautx8_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 #endif
 
@@ -1341,7 +1341,7 @@ static MACHINE_CONFIG_DERIVED( kimble, noraut_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(kimble_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("discrete")
@@ -1354,7 +1354,7 @@ static MACHINE_CONFIG_DERIVED( newhilop, noraut_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(newhilop_map)
 //  MCFG_CPU_IO_MAP(newhilop_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
 /********** 8080 based **********/

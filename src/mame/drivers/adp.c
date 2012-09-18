@@ -184,6 +184,7 @@ public:
 	DECLARE_MACHINE_RESET(skattv);
 	DECLARE_PALETTE_INIT(adp);
 	UINT32 screen_update_adp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	//INTERRUPT_GEN_MEMBER(adp_int);
 };
 
 
@@ -621,9 +622,9 @@ static INPUT_PORTS_START( skattv )
 INPUT_PORTS_END
 
 /*
-static INTERRUPT_GEN( adp_int )
+INTERRUPT_GEN_MEMBER(adp_state::adp_int)
 {
-    device->execute().set_input_line(1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
+    device.execute().set_input_line(1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
 }
 */
 static const ay8910_interface ay8910_config =
@@ -663,7 +664,7 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(quickjac_mem)
-//  MCFG_CPU_VBLANK_INT("screen", adp_int)
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", adp_state,  adp_int)
 
 	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
@@ -695,7 +696,7 @@ static MACHINE_CONFIG_START( skattv, adp_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(skattv_mem)
-//  MCFG_CPU_VBLANK_INT("screen", adp_int)
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", adp_state,  adp_int)
 
 	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)

@@ -1359,8 +1359,8 @@ static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
 	MCFG_CPU_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
 	MCFG_CPU_PROGRAM_MAP(sfbonus_map)
 	MCFG_CPU_IO_MAP(sfbonus_io)
-	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
-	//MCFG_CPU_PERIODIC_INT(nmi_line_pulse,100)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sfbonus_state, irq0_line_hold)
+	//MCFG_CPU_PERIODIC_INT_DRIVER(sfbonus_state, nmi_line_pulse, 100)
 
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

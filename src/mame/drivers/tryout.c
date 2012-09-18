@@ -192,7 +192,7 @@ static MACHINE_CONFIG_START( tryout, tryout_state )
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_cpu)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,1000) /* controls BGM tempo, 1000 is an hand-tuned value to match a side-by-side video */
+	MCFG_CPU_PERIODIC_INT_DRIVER(tryout_state, nmi_line_pulse, 1000) /* controls BGM tempo, 1000 is an hand-tuned value to match a side-by-side video */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

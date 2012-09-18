@@ -13,25 +13,25 @@
 #include "includes/asteroid.h"
 
 
-INTERRUPT_GEN( asteroid_interrupt )
+INTERRUPT_GEN_MEMBER(asteroid_state::asteroid_interrupt)
 {
 	/* Turn off interrupts if self-test is enabled */
-	if (!(device->machine().root_device().ioport("IN0")->read() & 0x80))
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (!(machine().root_device().ioport("IN0")->read() & 0x80))
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INTERRUPT_GEN( asterock_interrupt )
+INTERRUPT_GEN_MEMBER(asteroid_state::asterock_interrupt)
 {
 	/* Turn off interrupts if self-test is enabled */
-	if ((device->machine().root_device().ioport("IN0")->read() & 0x80))
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if ((machine().root_device().ioport("IN0")->read() & 0x80))
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INTERRUPT_GEN( llander_interrupt )
+INTERRUPT_GEN_MEMBER(asteroid_state::llander_interrupt)
 {
 	/* Turn off interrupts if self-test is enabled */
-	if (device->machine().root_device().ioport("IN0")->read() & 0x02)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (machine().root_device().ioport("IN0")->read() & 0x02)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(asteroid_state::asteroid_IN0_r)

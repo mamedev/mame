@@ -209,7 +209,7 @@ static MACHINE_CONFIG_START( hcastle, hcastle_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)	/* Derived from 24 MHz clock */
 	MCFG_CPU_PROGRAM_MAP(hcastle_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", hcastle_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(sound_map)

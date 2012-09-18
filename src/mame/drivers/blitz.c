@@ -794,7 +794,7 @@ static MACHINE_CONFIG_START( megadpkr, blitz_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(megadpkr_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz_state,  nmi_line_pulse)
 
 //  MCFG_CPU_ADD("mcu", M68705, CPU_CLOCK) /* unknown */
 //  MCFG_CPU_PROGRAM_MAP(mcu_map)

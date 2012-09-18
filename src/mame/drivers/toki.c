@@ -418,7 +418,7 @@ static MACHINE_CONFIG_START( toki, toki_state ) /* KOYO 20.000MHz near the cpu *
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_20MHz /2)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(toki_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toki_state,  irq1_line_hold)/* VBL */
 
 	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)	/* verifed on pcb */
 
@@ -448,7 +448,7 @@ static MACHINE_CONFIG_START( tokib, toki_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)	/* 10MHz causes bad slowdowns with monkey machine rd1, but is correct, 20Mhz XTAL */
 	MCFG_CPU_PROGRAM_MAP(tokib_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL (could be level1, same vector) */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toki_state,  irq6_line_hold)/* VBL (could be level1, same vector) */
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* verified with PCB */
 	MCFG_CPU_PROGRAM_MAP(tokib_audio_map)

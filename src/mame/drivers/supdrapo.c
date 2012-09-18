@@ -445,7 +445,7 @@ static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)	/* guess */
 	MCFG_CPU_PROGRAM_MAP(sdpoker_mem)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", supdrapo_state,  irq0_line_hold)
 
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

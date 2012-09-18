@@ -656,7 +656,7 @@ static MACHINE_CONFIG_START( vpoker, vpoker_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809,XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-//  MCFG_CPU_VBLANK_INT("screen",irq0_line_hold) //irq0 valid too
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vpoker_state, irq0_line_hold) //irq0 valid too
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

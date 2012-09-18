@@ -829,7 +829,7 @@ static MACHINE_CONFIG_START( superman, taitox_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(superman_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitox_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -872,7 +872,7 @@ static MACHINE_CONFIG_START( daisenpu, taitox_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(daisenpu_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitox_state,  irq2_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(daisenpu_sound_map)
@@ -912,7 +912,7 @@ static MACHINE_CONFIG_START( gigandes, taitox_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(gigandes_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitox_state,  irq2_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -954,7 +954,7 @@ static MACHINE_CONFIG_START( ballbros, taitox_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(ballbros_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitox_state,  irq2_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

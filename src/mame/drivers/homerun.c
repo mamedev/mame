@@ -387,7 +387,7 @@ static MACHINE_CONFIG_START( dynashot, homerun_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz/4)
 	MCFG_CPU_PROGRAM_MAP(homerun_memmap)
 	MCFG_CPU_IO_MAP(homerun_iomap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", homerun_state,  irq0_line_hold)
 
 
 	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
@@ -424,7 +424,7 @@ static MACHINE_CONFIG_DERIVED( ganjaja, dynashot )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60) // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(homerun_state, irq0_line_hold,  4*60) // ?
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("d7756", UPD7756, UPD7759_STANDARD_CLOCK)

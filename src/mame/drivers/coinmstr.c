@@ -1010,7 +1010,7 @@ static const mc6845_interface h46505_intf =
 static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
 	MCFG_CPU_ADD("maincpu",Z80,8000000) // ?
 	MCFG_CPU_PROGRAM_MAP(coinmstr_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", coinmstr_state,  irq0_line_hold)
 
 	MCFG_PIA6821_ADD("pia0", pia_0_intf)
 	MCFG_PIA6821_ADD("pia1", pia_1_intf)

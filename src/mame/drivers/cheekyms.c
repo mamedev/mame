@@ -115,12 +115,11 @@ void cheekyms_state::machine_start()
 	m_dac = machine().device<dac_device>("dac");
 }
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(cheekyms_state::vblank_irq)
 {
-	cheekyms_state *state = device->machine().driver_data<cheekyms_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if(m_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -130,7 +129,7 @@ static MACHINE_CONFIG_START( cheekyms, cheekyms_state )
 	MCFG_CPU_ADD("maincpu", Z80,5000000/2)  /* 2.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cheekyms_state,  vblank_irq)
 
 
 	/* video hardware */

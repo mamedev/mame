@@ -263,9 +263,9 @@ GFXDECODE_END
 
 /* Interrupt Generator */
 
-static INTERRUPT_GEN( dynduke_interrupt )
+INTERRUPT_GEN_MEMBER(dynduke_state::dynduke_interrupt)
 {
-	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);	// VBL
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);	// VBL
 }
 
 /* Machine Driver */
@@ -274,11 +274,11 @@ static MACHINE_CONFIG_START( dynduke, dynduke_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", V30, 16000000/2) // NEC V30-8 CPU
 	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_VBLANK_INT("screen", dynduke_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynduke_state,  dynduke_interrupt)
 
 	MCFG_CPU_ADD("slave", V30, 16000000/2) // NEC V30-8 CPU
 	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_CPU_VBLANK_INT("screen", dynduke_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynduke_state,  dynduke_interrupt)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 

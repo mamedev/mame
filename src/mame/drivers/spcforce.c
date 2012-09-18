@@ -253,12 +253,11 @@ static const sn76496_config psg_intf =
 };
 
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(spcforce_state::vblank_irq)
 {
-	spcforce_state *state = device->machine().driver_data<spcforce_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(3, HOLD_LINE);
+	if(m_irq_mask)
+		device.execute().set_input_line(3, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( spcforce, spcforce_state )
@@ -267,7 +266,7 @@ static MACHINE_CONFIG_START( spcforce, spcforce_state )
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
 	MCFG_CPU_ADD("maincpu", I8085A, 8000000 * 2)        /* 4.00 MHz??? */
 	MCFG_CPU_PROGRAM_MAP(spcforce_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spcforce_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", I8035, 6144000)		/* divisor ??? */
 	MCFG_CPU_PROGRAM_MAP(spcforce_sound_map)

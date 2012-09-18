@@ -317,7 +317,7 @@ static MACHINE_CONFIG_START( blktiger, blktiger_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(blktiger_map)
 	MCFG_CPU_IO_MAP(blktiger_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(blktiger_sound_map)
@@ -325,7 +325,7 @@ static MACHINE_CONFIG_START( blktiger, blktiger_state )
 	MCFG_CPU_ADD("mcu", I8751, XTAL_24MHz/4) /* ??? */
 	MCFG_CPU_PROGRAM_MAP(blktiger_mcu_map)
 	MCFG_CPU_IO_MAP(blktiger_mcu_io_map)
-	//MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
 
 
 	/* video hardware */

@@ -178,7 +178,7 @@ static MACHINE_CONFIG_START( kingpin, kingpin_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(kingpin_sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 1000) // unknown freq
+	MCFG_CPU_PERIODIC_INT_DRIVER(kingpin_state, irq0_line_hold,  1000) // unknown freq
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, kingpin_tms9928a_interface )

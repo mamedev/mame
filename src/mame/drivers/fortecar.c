@@ -690,7 +690,7 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)		 /* 3 MHz, measured */
 	MCFG_CPU_PROGRAM_MAP(fortecar_map)
 	MCFG_CPU_IO_MAP(fortecar_ports)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", fortecar_state,  nmi_line_pulse)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(200))	/* guess */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

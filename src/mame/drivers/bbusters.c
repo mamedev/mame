@@ -670,7 +670,7 @@ static MACHINE_CONFIG_START( bbusters, bbusters_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(bbusters_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbusters_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,4000000) /* Accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -710,7 +710,7 @@ static MACHINE_CONFIG_START( mechatt, bbusters_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(mechatt_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbusters_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,4000000) /* Accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

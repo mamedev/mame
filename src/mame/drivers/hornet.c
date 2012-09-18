@@ -993,7 +993,7 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MCFG_CPU_PROGRAM_MAP(hornet_map)
-	MCFG_CPU_PERIODIC_INT(irq1_line_assert, 1000)
+	MCFG_CPU_PERIODIC_INT_DRIVER(hornet_state, irq1_line_assert,  1000)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 64000000/4)	/* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)

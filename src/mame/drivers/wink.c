@@ -43,6 +43,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(wink_sound);
 };
 
 
@@ -329,10 +330,9 @@ static const ay8910_interface ay8912_interface =
 };
 
 //AY portA is fed by an input clock at 15625 Hz
-static INTERRUPT_GEN( wink_sound )
+INTERRUPT_GEN_MEMBER(wink_state::wink_sound)
 {
-	wink_state *state = device->machine().driver_data<wink_state>();
-	state->m_sound_flag ^= 0x80;
+	m_sound_flag ^= 0x80;
 }
 
 void wink_state::machine_reset()
@@ -345,12 +345,12 @@ static MACHINE_CONFIG_START( wink, wink_state )
 	MCFG_CPU_ADD("maincpu", Z80, 12000000 / 4)
 	MCFG_CPU_PROGRAM_MAP(wink_map)
 	MCFG_CPU_IO_MAP(wink_io)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wink_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 12000000 / 8)
 	MCFG_CPU_PROGRAM_MAP(wink_sound_map)
 	MCFG_CPU_IO_MAP(wink_sound_io)
-	MCFG_CPU_PERIODIC_INT(wink_sound, 15625)
+	MCFG_CPU_PERIODIC_INT_DRIVER(wink_state, wink_sound,  15625)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

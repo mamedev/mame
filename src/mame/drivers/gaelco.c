@@ -506,7 +506,7 @@ static MACHINE_CONFIG_START( bigkarnk, gaelco_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)	/* MC68000P10, 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(bigkarnk_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", M6809, 8867000/4)	/* 68B09, 2.21675 MHz? */
 	MCFG_CPU_PROGRAM_MAP(bigkarnk_snd_map)
@@ -542,7 +542,7 @@ static MACHINE_CONFIG_START( maniacsq, gaelco_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(maniacsq_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
 
 	/* video hardware */
@@ -570,7 +570,7 @@ static MACHINE_CONFIG_START( squash, gaelco_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* MC68000P12, 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(squash_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -600,7 +600,7 @@ static MACHINE_CONFIG_START( thoop, gaelco_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* MC68000P12, 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(thoop_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 

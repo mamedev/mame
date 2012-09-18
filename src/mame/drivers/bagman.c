@@ -462,12 +462,11 @@ static const tms5110_interface bagman_tms5110_interface =
 	DEVCB_NULL										/* rom clock - Only used to drive the data lines */
 };
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(bagman_state::vblank_irq)
 {
-	bagman_state *state = device->machine().driver_data<bagman_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if(m_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -477,7 +476,7 @@ static MACHINE_CONFIG_START( bagman, bagman_state )
 	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bagman_state,  vblank_irq)
 
 	MCFG_MACHINE_RESET_OVERRIDE(bagman_state,bagman)
 
@@ -513,7 +512,7 @@ static MACHINE_CONFIG_START( pickin, bagman_state )
 	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
 	MCFG_CPU_PROGRAM_MAP(pickin_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bagman_state,  vblank_irq)
 
 	MCFG_MACHINE_RESET_OVERRIDE(bagman_state,bagman)
 
@@ -565,7 +564,7 @@ static MACHINE_CONFIG_START( botanic, bagman_state )
 	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
 	MCFG_CPU_PROGRAM_MAP(pickin_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bagman_state,  vblank_irq)
 
 	MCFG_MACHINE_RESET_OVERRIDE(bagman_state,bagman)
 

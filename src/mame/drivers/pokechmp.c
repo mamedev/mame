@@ -206,11 +206,11 @@ static MACHINE_CONFIG_START( pokechmp, pokechmp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 4000000)
 	MCFG_CPU_PROGRAM_MAP(pokechmp_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pokechmp_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 4000000)
 	MCFG_CPU_PROGRAM_MAP(pokechmp_sound_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pokechmp_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

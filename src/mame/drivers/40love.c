@@ -1060,11 +1060,11 @@ static MACHINE_CONFIG_START( 40love, fortyl_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,8000000/2) /* OK */
 	MCFG_CPU_PROGRAM_MAP(40love_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", fortyl_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu",Z80,8000000/2) /* OK */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)	/* source/number of IRQs is unknown */
+	MCFG_CPU_PERIODIC_INT_DRIVER(fortyl_state, irq0_line_hold, 2*60)	/* source/number of IRQs is unknown */
 
 	MCFG_CPU_ADD("mcu",M68705,18432000/6) /* OK */
 	MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)
@@ -1116,11 +1116,11 @@ static MACHINE_CONFIG_START( undoukai, fortyl_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(undoukai_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", fortyl_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu",Z80,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)	/* source/number of IRQs is unknown */
+	MCFG_CPU_PERIODIC_INT_DRIVER(fortyl_state, irq0_line_hold, 2*60)	/* source/number of IRQs is unknown */
 
 //  MCFG_CPU_ADD("mcu",M68705,18432000/6)
 //  MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)

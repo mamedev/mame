@@ -1217,9 +1217,9 @@ void taitojc_state::machine_reset()
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static INTERRUPT_GEN( taitojc_vblank )
+INTERRUPT_GEN_MEMBER(taitojc_state::taitojc_vblank)
 {
-	device->execute().set_input_line_and_vector(2, HOLD_LINE, 130);
+	device.execute().set_input_line_and_vector(2, HOLD_LINE, 130);
 }
 
 static const tc0640fio_interface taitojc_io_intf =
@@ -1239,7 +1239,7 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(taitojc_map)
-	MCFG_CPU_VBLANK_INT("screen", taitojc_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitojc_state,  taitojc_vblank)
 
 	MCFG_CPU_ADD("sub", MC68HC11, 4000000) // MC68HC11M0
 	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)

@@ -992,16 +992,16 @@ static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", M6809, 49152000/32)
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
 
 	MCFG_CPU_ADD("cpu2", M6809, 49152000/32)
 	MCFG_CPU_PROGRAM_MAP(hopmappy_cpu2_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
 
 	MCFG_CPU_ADD("mcu", HD63701, 49152000/8)	/* or compatible 6808 with extra instructions */
 	MCFG_CPU_PROGRAM_MAP(hopmappy_mcu_map)
 	MCFG_CPU_IO_MAP(mcu_port_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* ??? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_hold)	/* ??? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(48000))	/* heavy interleaving needed to avoid hangs in rthunder */
 

@@ -117,6 +117,7 @@ public:
 	DECLARE_MACHINE_RESET(coh1001l);
 	DECLARE_MACHINE_RESET(coh1002v);
 	DECLARE_MACHINE_RESET(coh1002m);
+	INTERRUPT_GEN_MEMBER(qsound_interrupt);
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -719,9 +720,9 @@ WRITE8_MEMBER(zn_state::qsound_bankswitch_w)
 	membank( "bank10" )->set_base( memregion( "audiocpu" )->base() + 0x10000 + ( ( data & 0x0f ) * 0x4000 ) );
 }
 
-static INTERRUPT_GEN( qsound_interrupt )
+INTERRUPT_GEN_MEMBER(zn_state::qsound_interrupt)
 {
-	device->execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 WRITE32_MEMBER(zn_state::zn_qsound_w)
@@ -779,7 +780,7 @@ static MACHINE_CONFIG_DERIVED( coh1000c, zn1_1mb_vram )
 	MCFG_CPU_ADD( "audiocpu", Z80, 8000000 )  /* 8MHz ?? */
 	MCFG_CPU_PROGRAM_MAP( qsound_map)
 	MCFG_CPU_IO_MAP( qsound_portmap)
-	MCFG_CPU_PERIODIC_INT( qsound_interrupt, 60*4 ) /* 4 interrupts per frame ?? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt,  60*4) /* 4 interrupts per frame ?? */
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c )
 
@@ -793,7 +794,7 @@ static MACHINE_CONFIG_DERIVED( coh1002c, zn1_2mb_vram )
 	MCFG_CPU_ADD( "audiocpu", Z80, 8000000 )  /* 8MHz ?? */
 	MCFG_CPU_PROGRAM_MAP( qsound_map)
 	MCFG_CPU_IO_MAP( qsound_portmap)
-	MCFG_CPU_PERIODIC_INT( qsound_interrupt, 60*4 ) /* 4 interrupts per frame ?? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt,  60*4) /* 4 interrupts per frame ?? */
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c )
 
@@ -973,7 +974,7 @@ static MACHINE_CONFIG_DERIVED( coh3002c, zn2 )
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000 )	/* 8MHz ?? */
 	MCFG_CPU_PROGRAM_MAP( qsound_map)
 	MCFG_CPU_IO_MAP( qsound_portmap)
-	MCFG_CPU_PERIODIC_INT( qsound_interrupt, 60*4 ) /* 4 interrupts per frame ?? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt,  60*4) /* 4 interrupts per frame ?? */
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh3002c )
 

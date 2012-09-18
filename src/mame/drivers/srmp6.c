@@ -674,7 +674,7 @@ static MACHINE_CONFIG_START( srmp6, srmp6_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(srmp6_map)
-	MCFG_CPU_VBLANK_INT("screen",irq4_line_assert) // irq3 is a timer irq, but it's never enabled
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp6_state, irq4_line_assert) // irq3 is a timer irq, but it's never enabled
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

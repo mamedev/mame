@@ -53,15 +53,14 @@ WRITE16_MEMBER(asterix_state::control2_w)
 	}
 }
 
-static INTERRUPT_GEN( asterix_interrupt )
+INTERRUPT_GEN_MEMBER(asterix_state::asterix_interrupt)
 {
-	asterix_state *state = device->machine().driver_data<asterix_state>();
 
 	// global interrupt masking
-	if (!k056832_is_irq_enabled(state->m_k056832, 0))
+	if (!k056832_is_irq_enabled(m_k056832, 0))
 		return;
 
-	device->execute().set_input_line(5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */
+	device.execute().set_input_line(5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */
 }
 
 READ8_MEMBER(asterix_state::asterix_sound_r)
@@ -291,7 +290,7 @@ static MACHINE_CONFIG_START( asterix, asterix_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", asterix_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", asterix_state,  asterix_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)

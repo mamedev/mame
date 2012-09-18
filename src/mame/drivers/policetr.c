@@ -107,10 +107,10 @@ static TIMER_CALLBACK( irq5_gen )
 }
 
 
-static INTERRUPT_GEN( irq4_gen )
+INTERRUPT_GEN_MEMBER(policetr_state::irq4_gen)
 {
-	device->execute().set_input_line(R3000_IRQ4, ASSERT_LINE);
-	device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(0), FUNC(irq5_gen));
+	device.execute().set_input_line(R3000_IRQ4, ASSERT_LINE);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(irq5_gen));
 }
 
 
@@ -416,7 +416,7 @@ static MACHINE_CONFIG_START( policetr, policetr_state )
 	MCFG_CPU_ADD("maincpu", R3000BE, MASTER_CLOCK/2)
 	MCFG_CPU_CONFIG(r3000_config)
 	MCFG_CPU_PROGRAM_MAP(policetr_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_gen)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", policetr_state,  irq4_gen)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_policetr)
 

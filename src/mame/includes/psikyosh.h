@@ -66,4 +66,5 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_psikyosh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(psikyosh_interrupt);
 };

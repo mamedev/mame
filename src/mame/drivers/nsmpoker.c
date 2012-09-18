@@ -83,6 +83,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_nsmpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(nsmpoker_interrupt);
 };
 
 
@@ -145,9 +146,9 @@ void nsmpoker_state::palette_init()
 *  Read / Write Handlers  *
 **************************/
 
-static INTERRUPT_GEN( nsmpoker_interrupt )
+INTERRUPT_GEN_MEMBER(nsmpoker_state::nsmpoker_interrupt)
 {
-	device->execute().set_input_line_and_vector(0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
+	device.execute().set_input_line_and_vector(0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
 }
 
 //WRITE8_MEMBER(nsmpoker_state::debug_w)
@@ -398,7 +399,7 @@ static MACHINE_CONFIG_START( nsmpoker, nsmpoker_state )
 	MCFG_CPU_ADD("maincpu", TMS9995L, MASTER_CLOCK/2)	/* guess */
 	MCFG_CPU_PROGRAM_MAP(nsmpoker_map)
 	MCFG_CPU_IO_MAP(nsmpoker_portmap)
-	MCFG_CPU_VBLANK_INT("screen", nsmpoker_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nsmpoker_state,  nsmpoker_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

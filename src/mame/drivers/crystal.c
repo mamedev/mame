@@ -192,6 +192,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_crystal(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(crystal_interrupt);
 };
 
 static void IntReq( running_machine &machine, int num )
@@ -742,9 +743,9 @@ void crystal_state::screen_eof_crystal(screen_device &screen, bool state)
 	}
 }
 
-static INTERRUPT_GEN(crystal_interrupt)
+INTERRUPT_GEN_MEMBER(crystal_state::crystal_interrupt)
 {
-	IntReq(device->machine(), 24);		//VRender0 VBlank
+	IntReq(machine(), 24);		//VRender0 VBlank
 }
 
 static INPUT_PORTS_START(crystal)
@@ -841,7 +842,7 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 
 	MCFG_CPU_ADD("maincpu", SE3208, 43000000)
 	MCFG_CPU_PROGRAM_MAP(crystal_mem)
-	MCFG_CPU_VBLANK_INT("screen", crystal_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", crystal_state,  crystal_interrupt)
 
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

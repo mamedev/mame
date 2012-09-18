@@ -436,12 +436,12 @@ static MACHINE_CONFIG_START( galivan, galivan_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)		/* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(galivan_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galivan_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		/* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(galivan_state, irq0_line_hold,  XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START_OVERRIDE(galivan_state,galivan)
 	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,galivan)
@@ -478,12 +478,12 @@ static MACHINE_CONFIG_START( ninjemak, galivan_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)		/* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(ninjemak_map)
 	MCFG_CPU_IO_MAP(ninjemak_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galivan_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		/* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(galivan_state, irq0_line_hold,  XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START_OVERRIDE(galivan_state,ninjemak)
 	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,ninjemak)

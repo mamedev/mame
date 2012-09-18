@@ -171,12 +171,11 @@ READ16_MEMBER(rungun_state::sound_status_msb_r)
 	return 0;
 }
 
-static INTERRUPT_GEN(rng_interrupt)
+INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
 {
-	rungun_state *state = device->machine().driver_data<rungun_state>();
 
-	if (state->m_sysreg[0x0c / 2] & 0x09)
-		device->execute().set_input_line(M68K_IRQ_5, ASSERT_LINE);
+	if (m_sysreg[0x0c / 2] & 0x09)
+		device.execute().set_input_line(M68K_IRQ_5, ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
@@ -226,14 +225,13 @@ WRITE8_MEMBER(rungun_state::z80ctrl_w)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static INTERRUPT_GEN(audio_interrupt)
+INTERRUPT_GEN_MEMBER(rungun_state::audio_interrupt)
 {
-	rungun_state *state = device->machine().driver_data<rungun_state>();
 
-	if (state->m_z80_control & 0x80)
+	if (m_z80_control & 0x80)
 		return;
 
-	device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 /* sound (this should be split into audio/xexex.c or pregx.c or so someday) */
@@ -399,11 +397,11 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(rungun_map)
-	MCFG_CPU_VBLANK_INT("screen", rng_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", rungun_state,  rng_interrupt)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 10000000) // 8Mhz (10Mhz is much safer in self-test due to heavy sync)
 	MCFG_CPU_PROGRAM_MAP(rungun_sound_map)
-	MCFG_CPU_PERIODIC_INT(audio_interrupt, 480)
+	MCFG_CPU_PERIODIC_INT_DRIVER(rungun_state, audio_interrupt,  480)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // higher if sound stutters
 

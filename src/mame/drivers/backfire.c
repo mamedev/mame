@@ -81,6 +81,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_backfire_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_backfire_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
 };
 
 //UINT32 *backfire_180010, *backfire_188010;
@@ -432,9 +433,9 @@ static const ymz280b_interface ymz280b_intf =
 	sound_irq_gen
 };
 
-static INTERRUPT_GEN( deco32_vbl_interrupt )
+INTERRUPT_GEN_MEMBER(backfire_state::deco32_vbl_interrupt)
 {
-	device->execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
+	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -500,7 +501,7 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
 	MCFG_CPU_PROGRAM_MAP(backfire_map)
-	MCFG_CPU_VBLANK_INT("lscreen", deco32_vbl_interrupt)	/* or is it "rscreen?" */
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", backfire_state,  deco32_vbl_interrupt)	/* or is it "rscreen?" */
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 

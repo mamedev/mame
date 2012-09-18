@@ -354,11 +354,10 @@ static const tc0480scp_interface groundfx_tc0480scp_intf =
 	0		/* col_base */
 };
 
-static INTERRUPT_GEN( groundfx_interrupt )
+INTERRUPT_GEN_MEMBER(groundfx_state::groundfx_interrupt)
 {
-	groundfx_state *state = device->machine().driver_data<groundfx_state>();
-	state->m_frame_counter^=1;
-	device->execute().set_input_line(4, HOLD_LINE);
+	m_frame_counter^=1;
+	device.execute().set_input_line(4, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( groundfx, groundfx_state )
@@ -366,7 +365,7 @@ static MACHINE_CONFIG_START( groundfx, groundfx_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(groundfx_map)
-	MCFG_CPU_VBLANK_INT("screen", groundfx_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", groundfx_state,  groundfx_interrupt)
 
 	MCFG_EEPROM_ADD("eeprom", groundfx_eeprom_interface)
 

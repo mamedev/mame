@@ -320,7 +320,7 @@ static MACHINE_CONFIG_START( mirage, miragemi_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
 	MCFG_CPU_PROGRAM_MAP(mirage_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", miragemi_state,  irq6_line_hold)
 
 
 	/* video hardware */

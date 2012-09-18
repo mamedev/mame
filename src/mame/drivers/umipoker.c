@@ -662,12 +662,12 @@ static MACHINE_CONFIG_START( umipoker, umipoker_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,16000000) // TMP68HC000-16
 	MCFG_CPU_PROGRAM_MAP(umipoker_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", umipoker_state,  irq6_line_assert)
 
 	MCFG_CPU_ADD("audiocpu",Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(umipoker_audio_map)
 	MCFG_CPU_IO_MAP(umipoker_audio_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 120)	// ? controls ym3812 music tempo
+	MCFG_CPU_PERIODIC_INT_DRIVER(umipoker_state, irq0_line_hold,  120)	// ? controls ym3812 music tempo
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

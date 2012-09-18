@@ -320,6 +320,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(system_h1);
 };
 
 
@@ -1137,9 +1138,9 @@ INPUT_PORTS_END
 
 
 // IRQs 4, 6 (& 8?) are valid on SH-2
-static INTERRUPT_GEN( system_h1 )
+INTERRUPT_GEN_MEMBER(coolridr_state::system_h1)
 {
-	device->execute().set_input_line(4, HOLD_LINE);
+	device.execute().set_input_line(4, HOLD_LINE);
 }
 
 //IRQs 10,12 and 14 are valid on SH-1 instead
@@ -1165,7 +1166,7 @@ void coolridr_state::machine_reset()
 static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_CPU_ADD("maincpu", SH2, 28000000)	// 28 mhz
 	MCFG_CPU_PROGRAM_MAP(system_h1_map)
-	MCFG_CPU_VBLANK_INT("screen",system_h1)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", coolridr_state, system_h1)
 
 	MCFG_CPU_ADD("soundcpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(system_h1_sound_map)

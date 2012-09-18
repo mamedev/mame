@@ -201,7 +201,7 @@ static MACHINE_CONFIG_START( tattack, tattack_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000 / 2)	/* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(mem)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tattack_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

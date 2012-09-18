@@ -55,6 +55,7 @@ public:
 	DECLARE_DRIVER_INIT(wcvol95);
 	virtual void video_start();
 	UINT32 screen_update_wcvol95(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
 };
 
 
@@ -313,9 +314,9 @@ static const ymz280b_interface ymz280b_intf =
 	sound_irq_gen
 };
 
-static INTERRUPT_GEN( deco32_vbl_interrupt )
+INTERRUPT_GEN_MEMBER(deco156_state::deco32_vbl_interrupt)
 {
-	device->execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
+	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
 
 static int deco156_bank_callback(const int bank)
@@ -354,7 +355,7 @@ static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
 	MCFG_CPU_PROGRAM_MAP(hvysmsh_map)
-	MCFG_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -391,7 +392,7 @@ static MACHINE_CONFIG_START( wcvol95, deco156_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
 	MCFG_CPU_PROGRAM_MAP(wcvol95_map)
-	MCFG_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 

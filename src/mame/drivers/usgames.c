@@ -234,7 +234,7 @@ static MACHINE_CONFIG_START( usg32, usgames_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000) /* ?? */
 	MCFG_CPU_PROGRAM_MAP(usgames_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,5*60) /* ?? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(usgames_state, irq0_line_hold, 5*60) /* ?? */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

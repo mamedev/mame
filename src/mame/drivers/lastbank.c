@@ -459,7 +459,7 @@ static MACHINE_CONFIG_START( lastbank, lastbank_state )
 	MCFG_CPU_ADD("audiocpu",Z80,MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(lastbank_audio_map)
 	MCFG_CPU_IO_MAP(lastbank_audio_io)
-//  MCFG_CPU_PERIODIC_INT(nmi_line_pulse,60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(lastbank_state, nmi_line_pulse, 60)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 

@@ -18,11 +18,10 @@
 /* prototypes */
 static KONAMI_SETLINES_CALLBACK( surpratk_banking );
 
-static INTERRUPT_GEN( surpratk_interrupt )
+INTERRUPT_GEN_MEMBER(surpratk_state::surpratk_interrupt)
 {
-	surpratk_state *state = device->machine().driver_data<surpratk_state>();
-	if (k052109_is_irq_enabled(state->m_k052109))
-		device->execute().set_input_line(0, HOLD_LINE);
+	if (k052109_is_irq_enabled(m_k052109))
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(surpratk_state::bankedram_r)
@@ -230,7 +229,7 @@ static MACHINE_CONFIG_START( surpratk, surpratk_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)	/* 053248 */
 	MCFG_CPU_PROGRAM_MAP(surpratk_map)
-	MCFG_CPU_VBLANK_INT("screen", surpratk_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", surpratk_state,  surpratk_interrupt)
 
 
 	/* video hardware */

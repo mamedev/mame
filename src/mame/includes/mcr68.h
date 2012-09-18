@@ -98,6 +98,7 @@ public:
 	DECLARE_VIDEO_START(mcr68);
 	UINT32 screen_update_zwackery(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mcr68(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(mcr68_interrupt);
 };
 
 /*----------- defined in machine/mcr68.c -----------*/
@@ -105,5 +106,3 @@ public:
 extern const pia6821_interface zwackery_pia0_intf;
 extern const pia6821_interface zwackery_pia1_intf;
 extern const pia6821_interface zwackery_pia2_intf;
-
-INTERRUPT_GEN( mcr68_interrupt );

@@ -1329,7 +1329,7 @@ static MACHINE_CONFIG_START( tetrisp2, tetrisp2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(tetrisp2_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_WATCHDOG_VBLANK_INIT(8)	/* guess */
@@ -1361,7 +1361,7 @@ static MACHINE_CONFIG_START( nndmseal, tetrisp2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(nndmseal_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1391,7 +1391,7 @@ static MACHINE_CONFIG_START( rockn, tetrisp2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(rockn1_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1422,7 +1422,7 @@ static MACHINE_CONFIG_START( rockn2, tetrisp2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(rockn2_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1453,11 +1453,11 @@ static MACHINE_CONFIG_START( rocknms, tetrisp2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(rocknms_main_map)
-	MCFG_CPU_VBLANK_INT("lscreen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", tetrisp2_state,  irq2_line_hold)
 
 	MCFG_CPU_ADD("sub", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(rocknms_sub_map)
-	MCFG_CPU_VBLANK_INT("lscreen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", tetrisp2_state,  irq2_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1495,11 +1495,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( stepstag, stepstag_state )
 	MCFG_CPU_ADD("maincpu", M68000, 16000000 ) //??
 	MCFG_CPU_PROGRAM_MAP(stepstag_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold) // lev 4 triggered by system timer
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold) // lev 4 triggered by system timer
 
 	MCFG_CPU_ADD("sub", M68000, 16000000 ) //??
 	MCFG_CPU_PROGRAM_MAP(stepstag_sub_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold) // lev 6 triggered by main CPU
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq4_line_hold) // lev 6 triggered by main CPU
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

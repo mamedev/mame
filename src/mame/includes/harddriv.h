@@ -217,6 +217,7 @@ public:
 	DECLARE_MACHINE_START(harddriv);
 	DECLARE_MACHINE_RESET(harddriv);
 	DECLARE_VIDEO_START(harddriv);
+	INTERRUPT_GEN_MEMBER(hd68k_irq_gen);
 };
 
 
@@ -224,9 +225,6 @@ public:
 
 /* Driver/Multisync board */
 
-
-
-INTERRUPT_GEN( hd68k_irq_gen );
 DECLARE_WRITE16_HANDLER( hd68k_irq_ack_w );
 void hdgsp_irq_gen(device_t *device, int state);
 void hdmsp_irq_gen(device_t *device, int state);

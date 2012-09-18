@@ -58,4 +58,5 @@ public:
 	DECLARE_PALETTE_INIT(ringking);
 	UINT32 screen_update_kingofb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ringking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(kingofb_interrupt);
 };

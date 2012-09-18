@@ -760,27 +760,26 @@ GFXDECODE_END
  *
  *************************************/
 
-static INTERRUPT_GEN( deco16_interrupt )
+INTERRUPT_GEN_MEMBER(liberate_state::deco16_interrupt)
 {
-	liberate_state *state = device->machine().driver_data<liberate_state>();
-	int p = ~state->ioport("IN3")->read();
-	if ((p & 0x43) && !state->m_latch)
+	int p = ~ioport("IN3")->read();
+	if ((p & 0x43) && !m_latch)
 	{
-		device->execute().set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
-		state->m_latch = 1;
+		device.execute().set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
+		m_latch = 1;
 	}
 	else
 	{
 		if (!(p & 0x43))
-			state->m_latch = 0;
+			m_latch = 0;
 	}
 }
 
 #if 0
-static INTERRUPT_GEN( prosport_interrupt )
+INTERRUPT_GEN_MEMBER(liberate_state::prosport_interrupt)
 {
 	/* ??? */
-	device->execute().set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
+	device.execute().set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
 }
 #endif
 
@@ -823,11 +822,11 @@ static MACHINE_CONFIG_START( liberate, liberate_state )
 	MCFG_CPU_ADD("maincpu",DECO16, 2000000)
 	MCFG_CPU_PROGRAM_MAP(liberate_map)
 	MCFG_CPU_IO_MAP(deco16_io_map)
-	MCFG_CPU_VBLANK_INT("screen", deco16_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
 
 	MCFG_CPU_ADD("audiocpu",M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(liberate_sound_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,16*60) /* ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -863,7 +862,7 @@ static MACHINE_CONFIG_DERIVED( liberatb, liberate )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M6502, 2000000)
 	MCFG_CPU_PROGRAM_MAP(liberatb_map)
-	MCFG_CPU_VBLANK_INT("screen", deco16_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( boomrang, liberate )
@@ -902,11 +901,11 @@ static MACHINE_CONFIG_START( prosport, liberate_state )
 	MCFG_CPU_ADD("maincpu", DECO16, 2000000)
 	MCFG_CPU_PROGRAM_MAP(prosport_map)
 	MCFG_CPU_IO_MAP(deco16_io_map)
-	MCFG_CPU_VBLANK_INT("screen", deco16_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000/2)
 	MCFG_CPU_PROGRAM_MAP(liberate_sound_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,16*60) /* ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 

@@ -61,14 +61,13 @@
  *
  *************************************/
 
-static INTERRUPT_GEN( tutankhm_interrupt )
+INTERRUPT_GEN_MEMBER(tutankhm_state::tutankhm_interrupt)
 {
-	tutankhm_state *state = device->machine().driver_data<tutankhm_state>();
 
 	/* flip flops cause the interrupt to be signalled every other frame */
-	state->m_irq_toggle ^= 1;
-	if (state->m_irq_toggle && state->m_irq_enable)
-		device->execute().set_input_line(0, ASSERT_LINE);
+	m_irq_toggle ^= 1;
+	if (m_irq_toggle && m_irq_enable)
+		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -221,7 +220,7 @@ static MACHINE_CONFIG_START( tutankhm, tutankhm_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)	/* 1.5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", tutankhm_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tutankhm_state,  tutankhm_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(tutankhm_state,tutankhm)
 	MCFG_MACHINE_RESET_OVERRIDE(tutankhm_state,tutankhm)

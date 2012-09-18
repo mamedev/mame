@@ -502,11 +502,11 @@ static MACHINE_CONFIG_START( yunsung8, yunsung8_state )
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)			/* Z80B */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* No nmi routine */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", yunsung8_state,  irq0_line_hold)	/* No nmi routine */
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)			/* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* NMI caused by the MSM5205? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", yunsung8_state,  irq0_line_hold)	/* NMI caused by the MSM5205? */
 
 
 	/* video hardware */

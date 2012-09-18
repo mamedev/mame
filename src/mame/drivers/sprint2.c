@@ -66,10 +66,10 @@ static int service_mode(running_machine &machine)
 }
 
 
-static INTERRUPT_GEN( sprint2 )
+INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 {
-	sprint2_state *state = device->machine().driver_data<sprint2_state>();
-	device_t *discrete = device->machine().device("discrete");
+	sprint2_state *state = machine().driver_data<sprint2_state>();
+	device_t *discrete = machine().device("discrete");
 
 	/* handle steering wheels */
 
@@ -79,40 +79,40 @@ static INTERRUPT_GEN( sprint2 )
 
 		for (i = 0; i < 2; i++)
 		{
-			signed char delta = state->ioport(i ? "DIAL_P2" : "DIAL_P1")->read() - state->m_dial[i];
+			signed char delta = ioport(i ? "DIAL_P2" : "DIAL_P1")->read() - m_dial[i];
 
 			if (delta < 0)
 			{
-				state->m_steering[i] = 0x00;
+				m_steering[i] = 0x00;
 			}
 			if (delta > 0)
 			{
-				state->m_steering[i] = 0x40;
+				m_steering[i] = 0x40;
 			}
 
-			state->m_dial[i] += delta;
+			m_dial[i] += delta;
 
-			switch (device->machine().root_device().ioport(i ? "GEAR_P2" : "GEAR_P1")->read() & 15)
+			switch (machine().root_device().ioport(i ? "GEAR_P2" : "GEAR_P1")->read() & 15)
 			{
-			case 1: state->m_gear[i] = 1; break;
-			case 2: state->m_gear[i] = 2; break;
-			case 4: state->m_gear[i] = 3; break;
-			case 8: state->m_gear[i] = 4; break;
+			case 1: m_gear[i] = 1; break;
+			case 2: m_gear[i] = 2; break;
+			case 4: m_gear[i] = 3; break;
+			case 8: m_gear[i] = 4; break;
 			}
 		}
 	}
 
-	address_space &space = *device->machine().firstcpu->space(AS_PROGRAM);
-	discrete_sound_w(discrete, space, SPRINT2_MOTORSND1_DATA, state->m_video_ram[0x394] & 15);	// also DOMINOS_FREQ_DATA
-	discrete_sound_w(discrete, space, SPRINT2_MOTORSND2_DATA, state->m_video_ram[0x395] & 15);
-	discrete_sound_w(discrete, space, SPRINT2_CRASHSND_DATA, state->m_video_ram[0x396] & 15);	// also DOMINOS_AMP_DATA
+	address_space &space = *machine().firstcpu->space(AS_PROGRAM);
+	discrete_sound_w(discrete, space, SPRINT2_MOTORSND1_DATA, m_video_ram[0x394] & 15);	// also DOMINOS_FREQ_DATA
+	discrete_sound_w(discrete, space, SPRINT2_MOTORSND2_DATA, m_video_ram[0x395] & 15);
+	discrete_sound_w(discrete, space, SPRINT2_CRASHSND_DATA, m_video_ram[0x396] & 15);	// also DOMINOS_AMP_DATA
 
 	/* interrupts and watchdog are disabled during service mode */
 
-	device->machine().watchdog_enable(!service_mode(device->machine()));
+	machine().watchdog_enable(!service_mode(machine()));
 
-	if (!service_mode(device->machine()))
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (!service_mode(machine()))
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -499,7 +499,7 @@ static MACHINE_CONFIG_START( sprint2, sprint2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz / 16)
 	MCFG_CPU_PROGRAM_MAP(sprint2_map)
-	MCFG_CPU_VBLANK_INT("screen", sprint2)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sprint2_state,  sprint2)
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */

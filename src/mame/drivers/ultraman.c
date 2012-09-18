@@ -218,7 +218,7 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)		/* 12 MHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ultraman_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,24000000/6)	/* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

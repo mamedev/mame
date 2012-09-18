@@ -25,12 +25,11 @@ Dip locations and factory settings verified with manual
 #include "includes/contra.h"
 
 
-static INTERRUPT_GEN( contra_interrupt )
+INTERRUPT_GEN_MEMBER(contra_state::contra_interrupt)
 {
-	contra_state *state = device->machine().driver_data<contra_state>();
-	address_space &space = state->generic_space();
-	if (k007121_ctrlram_r(state->m_k007121_1, space, 7) & 0x02)
-		device->execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
+	address_space &space = generic_space();
+	if (k007121_ctrlram_r(m_k007121_1, space, 7) & 0x02)
+		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(contra_state::contra_bankswitch_w)
@@ -192,7 +191,7 @@ static MACHINE_CONFIG_START( contra, contra_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, XTAL_24MHz / 2 /* 3000000*4? */)
 	MCFG_CPU_PROGRAM_MAP(contra_map)
-	MCFG_CPU_VBLANK_INT("screen", contra_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", contra_state,  contra_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M6809, XTAL_24MHz/8) /* 3000000? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

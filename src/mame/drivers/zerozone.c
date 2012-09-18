@@ -169,7 +169,7 @@ static MACHINE_CONFIG_START( zerozone, zerozone_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", zerozone_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 1000000)	/* 1 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

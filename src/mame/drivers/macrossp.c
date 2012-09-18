@@ -623,7 +623,7 @@ static MACHINE_CONFIG_START( macrossp, macrossp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 50000000/2)	/* 25 MHz */
 	MCFG_CPU_PROGRAM_MAP(macrossp_map)
-	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold) // there are others ...
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", macrossp_state,  irq3_line_hold) // there are others ...
 
 	MCFG_CPU_ADD("audiocpu", M68000, 32000000/2)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(macrossp_sound_map)

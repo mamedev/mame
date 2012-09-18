@@ -564,7 +564,7 @@ static MACHINE_CONFIG_START( twincobr, twincobr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/4)		/* 7MHz - Main board Crystal is 28MHz */
 	MCFG_CPU_PROGRAM_MAP(main_program_map)
-	MCFG_CPU_VBLANK_INT("screen", twincobr_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", twincobr_state,  twincobr_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)			/* 3.5MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_program_map)

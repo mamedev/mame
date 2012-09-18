@@ -930,7 +930,7 @@ static MACHINE_CONFIG_START( turbo, turbo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(turbo_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
 
 	MCFG_I8255_ADD( "i8255_0", turbo_8255_intf_0 )
 	MCFG_I8255_ADD( "i8255_1", turbo_8255_intf_1 )
@@ -961,7 +961,7 @@ static MACHINE_CONFIG_START( subroc3d, turbo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(subroc3d_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
 
 	MCFG_I8255_ADD( "i8255_0", subroc3d_8255_intf_0 )
 	MCFG_I8255_ADD( "i8255_1", subroc3d_8255_intf_1 )
@@ -990,7 +990,7 @@ static MACHINE_CONFIG_START( buckrog, turbo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(buckrog_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("subcpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(buckrog_cpu2_map)

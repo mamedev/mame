@@ -1099,7 +1099,7 @@ static MACHINE_CONFIG_START( multfish, multfish_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)
 	MCFG_CPU_PROGRAM_MAP(multfish_map)
 	MCFG_CPU_IO_MAP(multfish_portmap)
-	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", multfish_state, irq0_line_hold)
 
 
 	/* video hardware */

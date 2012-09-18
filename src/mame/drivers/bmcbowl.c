@@ -503,7 +503,7 @@ void bmcbowl_state::machine_reset()
 static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_CPU_ADD("maincpu", M68000, 21477270/2 )
 	MCFG_CPU_PROGRAM_MAP(bmcbowl_mem)
-	MCFG_CPU_VBLANK_INT("screen",irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bmcbowl_state, irq2_line_hold)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

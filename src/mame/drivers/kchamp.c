@@ -340,11 +340,10 @@ GFXDECODE_END
 
 
 
-static INTERRUPT_GEN( kc_interrupt )
+INTERRUPT_GEN_MEMBER(kchamp_state::kc_interrupt)
 {
-	kchamp_state *state = device->machine().driver_data<kchamp_state>();
-	if (state->m_nmi_enable)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_enable)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void msmint( device_t *device )
@@ -375,11 +374,10 @@ static const msm5205_interface msm_interface =
 * 1 Player Version  *
 ********************/
 
-static INTERRUPT_GEN( sound_int )
+INTERRUPT_GEN_MEMBER(kchamp_state::sound_int)
 {
-	kchamp_state *state = device->machine().driver_data<kchamp_state>();
-	if (state->m_sound_nmi_enable)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_sound_nmi_enable)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -415,7 +413,7 @@ static MACHINE_CONFIG_START( kchampvs, kchamp_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kchampvs_map)
 	MCFG_CPU_IO_MAP(kchampvs_io_map)
-	MCFG_CPU_VBLANK_INT("screen", kc_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", kchamp_state,  kc_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kchampvs_sound_map)
@@ -460,12 +458,12 @@ static MACHINE_CONFIG_START( kchamp, kchamp_state )
 	MCFG_CPU_ADD("maincpu", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MCFG_CPU_PROGRAM_MAP(kchamp_map)
 	MCFG_CPU_IO_MAP(kchamp_io_map)
-	MCFG_CPU_VBLANK_INT("screen", kc_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", kchamp_state,  kc_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MCFG_CPU_PROGRAM_MAP(kchamp_sound_map)
 	MCFG_CPU_IO_MAP(kchamp_sound_io_map)
-	MCFG_CPU_PERIODIC_INT(sound_int, 125)	/* Hz */
+	MCFG_CPU_PERIODIC_INT_DRIVER(kchamp_state, sound_int,  125)	/* Hz */
 											/* irq's triggered from main cpu */
 											/* nmi's from 125 Hz clock */
 

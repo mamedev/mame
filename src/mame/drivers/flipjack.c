@@ -478,12 +478,12 @@ static MACHINE_CONFIG_START( flipjack, flipjack_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(flipjack_main_map)
 	MCFG_CPU_IO_MAP(flipjack_main_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", flipjack_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(flipjack_sound_map)
 	MCFG_CPU_IO_MAP(flipjack_sound_io_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", flipjack_state,  nmi_line_assert)
 
 	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 

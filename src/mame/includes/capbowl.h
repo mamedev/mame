@@ -41,4 +41,5 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_capbowl(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(capbowl_interrupt);
 };

@@ -761,11 +761,10 @@ WRITE8_MEMBER(slapfght_state::getstar_sh_intenable_w)
 
 
 /* Generate interrups only if they have been enabled */
-INTERRUPT_GEN( getstar_interrupt )
+INTERRUPT_GEN_MEMBER(slapfght_state::getstar_interrupt)
 {
-	slapfght_state *state = device->machine().driver_data<slapfght_state>();
-	if (state->m_getstar_sh_intenabled)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_getstar_sh_intenabled)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 #ifdef UNUSED_FUNCTION

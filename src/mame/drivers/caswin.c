@@ -305,7 +305,7 @@ static MACHINE_CONFIG_START( vvillage, caswin_state )
 	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(vvillage_mem)
 	MCFG_CPU_IO_MAP(vvillage_io)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold )
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", caswin_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

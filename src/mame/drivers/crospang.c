@@ -349,7 +349,7 @@ static MACHINE_CONFIG_START( crospang, crospang_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14318180)
 	MCFG_CPU_PROGRAM_MAP(crospang_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", crospang_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_CPU_PROGRAM_MAP(crospang_sound_map)

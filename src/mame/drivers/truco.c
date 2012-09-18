@@ -389,20 +389,19 @@ void truco_state::machine_reset()
 	m_battery_ram[0x020] = m_battery_ram[0x011];
 }
 
-static INTERRUPT_GEN( truco_interrupt )
+INTERRUPT_GEN_MEMBER(truco_state::truco_interrupt)
 {
-	truco_state *state = device->machine().driver_data<truco_state>();
 	/* coinup */
 
-	if ( state->ioport("COIN")->read() & 1 )
+	if ( ioport("COIN")->read() & 1 )
 	{
-		if ( state->m_trigger == 0 )
+		if ( m_trigger == 0 )
 		{
-			generic_pulse_irq_line(device, M6809_IRQ_LINE, 1);
-			state->m_trigger++;
+			generic_pulse_irq_line(device.execute(), M6809_IRQ_LINE, 1);
+			m_trigger++;
 		}
 	} else
-		state->m_trigger = 0;
+		m_trigger = 0;
 }
 
 
@@ -457,7 +456,7 @@ static MACHINE_CONFIG_START( truco, truco_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", truco_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", truco_state,  truco_interrupt)
     MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1.6))	/* 1.6 seconds */
 
 	MCFG_PIA6821_ADD("pia0", pia0_intf)

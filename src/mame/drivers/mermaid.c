@@ -439,12 +439,11 @@ static const msm5205_interface msm5205_config =
 };
 
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(mermaid_state::vblank_irq)
 {
-	mermaid_state *state = device->machine().driver_data<mermaid_state>();
 
-	if(state->m_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( mermaid, mermaid_state )
@@ -452,7 +451,7 @@ static MACHINE_CONFIG_START( mermaid, mermaid_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)	// ???
 	MCFG_CPU_PROGRAM_MAP(mermaid_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mermaid_state,  vblank_irq)
 
 
 	/* video hardware */

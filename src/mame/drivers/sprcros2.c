@@ -262,12 +262,11 @@ static TIMER_DEVICE_CALLBACK( sprcros2_m_interrupt )
 	}
 }
 
-static INTERRUPT_GEN( sprcros2_s_interrupt )
+INTERRUPT_GEN_MEMBER(sprcros2_state::sprcros2_s_interrupt)
 {
-	sprcros2_state *state = device->machine().driver_data<sprcros2_state>();
 
-	if(state->m_s_port3&0x01)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_s_port3&0x01)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 void sprcros2_state::machine_start()
@@ -288,7 +287,7 @@ static MACHINE_CONFIG_START( sprcros2, sprcros2_state )
 	MCFG_CPU_ADD("slave", Z80,10000000/2)
 	MCFG_CPU_PROGRAM_MAP(sprcros2_slave_map)
 	MCFG_CPU_IO_MAP(sprcros2_slave_io_map)
-	MCFG_CPU_PERIODIC_INT(sprcros2_s_interrupt,2*60)	//2 nmis
+	MCFG_CPU_PERIODIC_INT_DRIVER(sprcros2_state, sprcros2_s_interrupt, 2*60)	//2 nmis
 
 
 	/* video hardware */

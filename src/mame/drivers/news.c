@@ -130,7 +130,7 @@ static MACHINE_CONFIG_START( news, news_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(news_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", news_state,  irq0_line_hold)
 
 
 	/* video hardware */

@@ -46,10 +46,9 @@ WRITE8_MEMBER(tsamurai_state::nmi_enable_w)
 	m_nmi_enabled = data;
 }
 
-static INTERRUPT_GEN( samurai_interrupt )
+INTERRUPT_GEN_MEMBER(tsamurai_state::samurai_interrupt)
 {
-	tsamurai_state *state = device->machine().driver_data<tsamurai_state>();
-	if (state->m_nmi_enabled) device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_enabled) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(tsamurai_state::unknown_d803_r)
@@ -267,10 +266,9 @@ WRITE8_MEMBER(tsamurai_state::vsgongf_sound_nmi_enable_w)
 	m_vsgongf_sound_nmi_enabled = data;
 }
 
-static INTERRUPT_GEN( vsgongf_sound_interrupt )
+INTERRUPT_GEN_MEMBER(tsamurai_state::vsgongf_sound_interrupt)
 {
-	tsamurai_state *state = device->machine().driver_data<tsamurai_state>();
-	if (state->m_vsgongf_sound_nmi_enabled) device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_vsgongf_sound_nmi_enabled) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* what are these, protection of some kind? */
@@ -682,7 +680,7 @@ static MACHINE_CONFIG_START( tsamurai, tsamurai_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(z80_io_map)
-	MCFG_CPU_VBLANK_INT("screen", samurai_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  samurai_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sound1_map)
@@ -723,12 +721,12 @@ static MACHINE_CONFIG_START( vsgongf, tsamurai_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/8)
 	MCFG_CPU_PROGRAM_MAP(vsgongf_map)
-	MCFG_CPU_VBLANK_INT("screen", samurai_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  samurai_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sound_vsgongf_map)
 	MCFG_CPU_IO_MAP(vsgongf_audio_io_map)
-	MCFG_CPU_PERIODIC_INT(vsgongf_sound_interrupt,3*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(tsamurai_state, vsgongf_sound_interrupt, 3*60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -761,7 +759,7 @@ static MACHINE_CONFIG_START( m660, tsamurai_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/8)
 	MCFG_CPU_PROGRAM_MAP(m660_map)
 	MCFG_CPU_IO_MAP(z80_m660_io_map)
-	MCFG_CPU_VBLANK_INT("screen", samurai_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  samurai_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sound1_m660_map)
@@ -772,7 +770,7 @@ static MACHINE_CONFIG_START( m660, tsamurai_state )
 	MCFG_CPU_ADD("audio3", Z80, XTAL_24MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sound3_m660_map)
 	MCFG_CPU_IO_MAP(sound3_m660_io_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  nmi_line_pulse)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

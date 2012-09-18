@@ -999,7 +999,7 @@ static MACHINE_CONFIG_START( exidy440, exidy440_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(exidy440_map)
-	MCFG_CPU_VBLANK_INT("screen", exidy440_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", exidy440_state,  exidy440_vblank_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

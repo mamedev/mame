@@ -328,12 +328,11 @@ void popper_state::machine_reset()
 	m_gfx_bank = 0;
 }
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(popper_state::vblank_irq)
 {
-	popper_state *state = device->machine().driver_data<popper_state>();
 
-	if(state->m_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -342,11 +341,11 @@ static MACHINE_CONFIG_START( popper, popper_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,18432000/6)
 	MCFG_CPU_PROGRAM_MAP(popper_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", popper_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,18432000/12)
 	MCFG_CPU_PROGRAM_MAP(popper_sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)		//NMIs caused by the main CPU
+	MCFG_CPU_PERIODIC_INT_DRIVER(popper_state, irq0_line_hold, 4*60)		//NMIs caused by the main CPU
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1800))
 

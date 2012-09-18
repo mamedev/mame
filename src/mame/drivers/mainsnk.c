@@ -390,12 +390,12 @@ static MACHINE_CONFIG_START( mainsnk, mainsnk_state )
 
 	MCFG_CPU_ADD("maincpu", Z80, 3360000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mainsnk_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 244)
+	MCFG_CPU_PERIODIC_INT_DRIVER(mainsnk_state, irq0_line_hold,  244)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

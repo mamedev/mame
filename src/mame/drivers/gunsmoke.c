@@ -297,11 +297,11 @@ static MACHINE_CONFIG_START( gunsmoke, gunsmoke_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)	// 4 MHz
 	MCFG_CPU_PROGRAM_MAP(gunsmoke_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gunsmoke_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000)	// 3 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(gunsmoke_state, irq0_line_hold,  4*60)
 
 
 	/* video hardware */

@@ -273,7 +273,7 @@ static MACHINE_CONFIG_START( speedspn, speedspn_state )
 	MCFG_CPU_ADD("maincpu",Z80,6000000)		 /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(speedspn_map)
 	MCFG_CPU_IO_MAP(speedspn_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", speedspn_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,6000000)		 /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(speedspn_sound_map)

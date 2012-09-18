@@ -321,7 +321,7 @@ static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60) // unknown timing
+	MCFG_CPU_PERIODIC_INT_DRIVER(_4enraya_state, irq0_line_hold, 4*60) // unknown timing
 
 
 	/* video hardware */

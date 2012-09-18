@@ -591,14 +591,14 @@ READ8_MEMBER(system1_state::mcu_io_r)
 }
 
 
-static INTERRUPT_GEN( mcu_irq_assert )
+INTERRUPT_GEN_MEMBER(system1_state::mcu_irq_assert)
 {
 	/* toggle the INT0 line on the MCU */
-	device->execute().set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
-	device->execute().set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
+	device.execute().set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
+	device.execute().set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
 
 	/* boost interleave to ensure that the MCU can break the Z80 out of a HALT */
-	device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
 
 
@@ -2147,7 +2147,7 @@ static MACHINE_CONFIG_START( sys1ppi, system1_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)	/* not really, see notes above */
 	MCFG_CPU_PROGRAM_MAP(system1_map)
 	MCFG_CPU_IO_MAP(system1_ppi_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -2220,7 +2220,7 @@ static MACHINE_CONFIG_FRAGMENT( mcu )
 
 	MCFG_CPU_ADD("mcu", I8751, SOUND_CLOCK)
 	MCFG_CPU_IO_MAP(mcu_io_map)
-	MCFG_CPU_VBLANK_INT("screen", mcu_irq_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state,  mcu_irq_assert)
 
 	MCFG_TIMER_ADD_PERIODIC("mcu_t0", mcu_t0_callback, attotime::from_usec(2500))	/* ??? actual clock unknown */
 MACHINE_CONFIG_END

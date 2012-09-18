@@ -1624,12 +1624,12 @@ static MACHINE_CONFIG_START( hardhead, suna8_state )
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(hardhead_map)
 	MCFG_CPU_IO_MAP(hardhead_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)		/* No NMI */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)		/* No NMI */
 
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(hardhead_sound_map)
 	MCFG_CPU_IO_MAP(hardhead_sound_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)		/* No NMI */
+	MCFG_CPU_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60)		/* No NMI */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1689,11 +1689,11 @@ static MACHINE_CONFIG_START( rranger, suna8_state )
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
 	MCFG_CPU_PROGRAM_MAP(rranger_map)
 	MCFG_CPU_IO_MAP(rranger_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ & NMI ! */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)	/* IRQ & NMI ! */
 
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
 	MCFG_CPU_PROGRAM_MAP(rranger_sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)	/* NMI = retn */
+	MCFG_CPU_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60)	/* NMI = retn */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1763,7 +1763,7 @@ static MACHINE_CONFIG_START( brickzn, suna8_state )
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)		/* SUNA PROTECTION BLOCK */
 	MCFG_CPU_PROGRAM_MAP(brickzn_map)
 	MCFG_CPU_IO_MAP(brickzn_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	// nmi breaks ramtest but is needed!
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)	// nmi breaks ramtest but is needed!
 
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)	/* Z0840006PSC */
 	MCFG_CPU_PROGRAM_MAP(brickzn_sound_map)
@@ -1873,7 +1873,7 @@ static MACHINE_CONFIG_START( starfigh, suna8_state )
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
 	MCFG_CPU_PROGRAM_MAP(hardhead_sound_map)
 	MCFG_CPU_IO_MAP(hardhead_sound_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)	/* No NMI */
+	MCFG_CPU_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60)	/* No NMI */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1920,7 +1920,7 @@ static MACHINE_CONFIG_START( sparkman, suna8_state )
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)				/* ? */
 	MCFG_CPU_PROGRAM_MAP(hardhead_sound_map)
 	MCFG_CPU_IO_MAP(hardhead_sound_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)	/* No NMI */
+	MCFG_CPU_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60)	/* No NMI */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

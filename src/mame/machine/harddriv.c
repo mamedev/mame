@@ -113,11 +113,10 @@ static void hd68k_update_interrupts(running_machine &machine)
 }
 
 
-INTERRUPT_GEN( hd68k_irq_gen )
+INTERRUPT_GEN_MEMBER(harddriv_state::hd68k_irq_gen)
 {
-	harddriv_state *state = device->machine().driver_data<harddriv_state>();
-	state->m_irq_state = 1;
-	atarigen_update_interrupts(device->machine());
+	m_irq_state = 1;
+	atarigen_update_interrupts(machine());
 }
 
 

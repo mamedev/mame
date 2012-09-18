@@ -347,12 +347,11 @@ void bombjack_state::machine_reset()
 }
 
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(bombjack_state::vblank_irq)
 {
-	bombjack_state *state = device->machine().driver_data<bombjack_state>();
 
-	if(state->m_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( bombjack, bombjack_state )
@@ -360,12 +359,12 @@ static MACHINE_CONFIG_START( bombjack, bombjack_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)		/* Confirmed from PCB */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bombjack_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4)	/* Confirmed from PCB */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bombjack_state,  nmi_line_pulse)
 
 
 	/* video hardware */

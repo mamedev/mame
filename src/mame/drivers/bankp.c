@@ -289,12 +289,11 @@ void bankp_state::machine_reset()
 	m_priority = 0;
 }
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(bankp_state::vblank_irq)
 {
-	bankp_state *state = device->machine().driver_data<bankp_state>();
 
-	if(state->m_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( bankp, bankp_state )
@@ -303,7 +302,7 @@ static MACHINE_CONFIG_START( bankp, bankp_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(bankp_map)
 	MCFG_CPU_IO_MAP(bankp_io_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bankp_state,  vblank_irq)
 
 
 	/* video hardware */

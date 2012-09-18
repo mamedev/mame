@@ -446,11 +446,11 @@ static TIMER_CALLBACK( ataxx_interrupt_callback )
 }
 
 
-INTERRUPT_GEN( leland_master_interrupt )
+INTERRUPT_GEN_MEMBER(leland_state::leland_master_interrupt)
 {
 	/* check for coins here */
-	if ((device->machine().root_device().ioport("IN1")->read() & 0x0e) != 0x0e)
-		device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if ((machine().root_device().ioport("IN1")->read() & 0x0e) != 0x0e)
+		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 

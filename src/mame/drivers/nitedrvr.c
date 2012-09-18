@@ -139,7 +139,7 @@ static MACHINE_CONFIG_START( nitedrvr, nitedrvr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz/12) // 1 MHz
 	MCFG_CPU_PROGRAM_MAP(nitedrvr_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nitedrvr_state,  irq0_line_hold)
 	MCFG_WATCHDOG_VBLANK_INIT(3)
 
 

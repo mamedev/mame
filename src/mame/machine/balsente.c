@@ -556,9 +556,8 @@ WRITE8_MEMBER(balsente_state::balsente_m6850_sound_w)
  *
  *************************************/
 
-INTERRUPT_GEN( balsente_update_analog_inputs )
+INTERRUPT_GEN_MEMBER(balsente_state::balsente_update_analog_inputs)
 {
-	balsente_state *state = device->machine().driver_data<balsente_state>();
 	int i;
 	static const char *const analog[] = { "AN0", "AN1", "AN2", "AN3" };
 
@@ -567,7 +566,7 @@ INTERRUPT_GEN( balsente_update_analog_inputs )
 	/* ports are read once a frame, just at varying intervals. To get around this, we */
 	/* read all the analog inputs at VBLANK time and just return the cached values. */
 	for (i = 0; i < 4; i++)
-		state->m_analog_input_data[i] = device->machine().root_device().ioport(analog[i])->read();
+		m_analog_input_data[i] = machine().root_device().ioport(analog[i])->read();
 }
 
 

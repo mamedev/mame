@@ -263,7 +263,7 @@ static MACHINE_CONFIG_START( momoko, momoko_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)	/* 5.0MHz */
 	MCFG_CPU_PROGRAM_MAP(momoko_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", momoko_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 2500000)	/* 2.5MHz */
 	MCFG_CPU_PROGRAM_MAP(momoko_sound_map)

@@ -162,11 +162,10 @@ static TIMER_CALLBACK( clear_irq_cb )
 	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
-static INTERRUPT_GEN( assert_irq )
+INTERRUPT_GEN_MEMBER(mustache_state::assert_irq)
 {
-	mustache_state *state = device->machine().driver_data<mustache_state>();
-	device->execute().set_input_line(0, ASSERT_LINE);
-    state->m_clear_irq_timer->adjust(downcast<cpu_device *>(device)->cycles_to_attotime(14288));
+	device.execute().set_input_line(0, ASSERT_LINE);
+    m_clear_irq_timer->adjust(downcast<cpu_device *>(&device)->cycles_to_attotime(14288));
        /* Timing here is an educated GUESS, Z80 /INT must stay high so the irq
           fires no less than TWICE per frame, else game doesn't work right.
       6000000 / 56.747 = 105732.4616 cycles per frame, we'll call it A
@@ -188,7 +187,7 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_VBLANK_INT("screen", assert_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mustache_state,  assert_irq)
 
 	MCFG_CPU_ADD(CPUTAG_T5182,Z80, T5182_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(t5182_map)

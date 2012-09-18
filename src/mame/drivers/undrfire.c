@@ -697,11 +697,10 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static INTERRUPT_GEN( undrfire_interrupt )
+INTERRUPT_GEN_MEMBER(undrfire_state::undrfire_interrupt)
 {
-	undrfire_state *state = device->machine().driver_data<undrfire_state>();
-	state->m_frame_counter ^= 1;
-	device->execute().set_input_line(4, HOLD_LINE);
+	m_frame_counter ^= 1;
+	device.execute().set_input_line(4, HOLD_LINE);
 }
 
 static const tc0100scn_interface undrfire_tc0100scn_intf =
@@ -729,7 +728,7 @@ static MACHINE_CONFIG_START( undrfire, undrfire_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(undrfire_map)
-	MCFG_CPU_VBLANK_INT("screen", undrfire_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  undrfire_interrupt)
 
 	MCFG_EEPROM_ADD("eeprom", undrfire_eeprom_interface)
 
@@ -758,11 +757,11 @@ static MACHINE_CONFIG_START( cbombers, undrfire_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(cbombers_cpua_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(cbombers_cpub_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  irq4_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
 

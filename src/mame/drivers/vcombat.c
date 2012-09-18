@@ -582,7 +582,7 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_CONFIG_START( vcombat, vcombat_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)
 
 	/* The middle board i860 */
 	MCFG_CPU_ADD("vid_0", I860, XTAL_20MHz)
@@ -595,7 +595,7 @@ static MACHINE_CONFIG_START( vcombat, vcombat_state )
 	/* Sound CPU */
 	MCFG_CPU_ADD("soundcpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(irq1_line_hold, 15000)	/* Remove this if MC6845 is enabled */
+	MCFG_CPU_PERIODIC_INT_DRIVER(vcombat_state, irq1_line_hold,  15000)	/* Remove this if MC6845 is enabled */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_MACHINE_RESET_OVERRIDE(vcombat_state,vcombat)
@@ -630,7 +630,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( shadfgtr, vcombat_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)
 
 	/* The middle board i860 */
 	MCFG_CPU_ADD("vid_0", I860, XTAL_20MHz)

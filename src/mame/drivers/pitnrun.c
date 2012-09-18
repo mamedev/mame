@@ -70,10 +70,9 @@ K1000233A
 #include "includes/pitnrun.h"
 
 
-static INTERRUPT_GEN( pitnrun_nmi_source )
+INTERRUPT_GEN_MEMBER(pitnrun_state::pitnrun_nmi_source)
 {
-	pitnrun_state *state = device->machine().driver_data<pitnrun_state>();
-	if(state->m_nmi) device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(pitnrun_state::nmi_enable_w)
@@ -231,12 +230,12 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( pitnrun, pitnrun_state )
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)		/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_map)
-	MCFG_CPU_VBLANK_INT("screen", pitnrun_nmi_source)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pitnrun_state,  pitnrun_nmi_source)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz/2)			/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_sound_map)
 	MCFG_CPU_IO_MAP(pitnrun_sound_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pitnrun_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("mcu", M68705,XTAL_18_432MHz/6)		/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_mcu_map)

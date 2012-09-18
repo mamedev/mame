@@ -389,9 +389,9 @@ static I8257_INTERFACE( hb_dma )
  *
  *************************************/
 
-static INTERRUPT_GEN( s2650_interrupt )
+INTERRUPT_GEN_MEMBER(dkong_state::s2650_interrupt)
 {
-    device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
+    device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }
 
 /*************************************
@@ -1638,12 +1638,11 @@ static void braze_decrypt_rom(running_machine &machine, UINT8 *dest)
  *
  *************************************/
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(dkong_state::vblank_irq)
 {
-	dkong_state *state = device->machine().driver_data<dkong_state>();
 
-	if(state->m_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( dkong_base, dkong_state )
@@ -1651,7 +1650,7 @@ static MACHINE_CONFIG_START( dkong_base, dkong_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu", Z80, CLOCK_1H)
     MCFG_CPU_PROGRAM_MAP(dkong_map)
-    MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state,  vblank_irq)
 
     MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
     MCFG_MACHINE_RESET_OVERRIDE(dkong_state,dkong)
@@ -1715,7 +1714,7 @@ static MACHINE_CONFIG_START( dkong3, dkong_state )
     MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2) /* verified in schematics */
     MCFG_CPU_PROGRAM_MAP(dkong3_map)
     MCFG_CPU_IO_MAP(dkong3_io_map)
-    MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state,  vblank_irq)
 
     MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong3)
 
@@ -1774,7 +1773,7 @@ static MACHINE_CONFIG_DERIVED( s2650, dkong2b )
     MCFG_CPU_REPLACE("maincpu", S2650, CLOCK_1H / 2)    /* ??? */
     MCFG_CPU_PROGRAM_MAP(s2650_map)
     MCFG_CPU_IO_MAP(s2650_io_map)
-    MCFG_CPU_VBLANK_INT("screen", s2650_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state,  s2650_interrupt)
 
     MCFG_DEVICE_MODIFY("dma8257")
     MCFG_DEVICE_CONFIG(hb_dma)

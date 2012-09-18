@@ -292,7 +292,7 @@ static MACHINE_CONFIG_START( quantum, quantum_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT(irq1_line_hold, (double)MASTER_CLOCK / 4096 / 12)
+	MCFG_CPU_PERIODIC_INT_DRIVER(quantum_state, irq1_line_hold,  (double)MASTER_CLOCK / 4096 / 12)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

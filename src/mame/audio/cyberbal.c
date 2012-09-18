@@ -100,13 +100,12 @@ static void update_sound_68k_interrupts(running_machine &machine)
 }
 
 
-INTERRUPT_GEN( cyberbal_sound_68k_irq_gen )
+INTERRUPT_GEN_MEMBER(cyberbal_state::cyberbal_sound_68k_irq_gen)
 {
-	cyberbal_state *state = device->machine().driver_data<cyberbal_state>();
-	if (!state->m_fast_68k_int)
+	if (!m_fast_68k_int)
 	{
-		state->m_fast_68k_int = 1;
-		update_sound_68k_interrupts(device->machine());
+		m_fast_68k_int = 1;
+		update_sound_68k_interrupts(machine());
 	}
 }
 

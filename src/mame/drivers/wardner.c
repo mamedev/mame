@@ -391,7 +391,7 @@ static MACHINE_CONFIG_START( wardner, wardner_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)		/* 6MHz */
 	MCFG_CPU_PROGRAM_MAP(main_program_map)
 	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT("screen", wardner_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wardner_state,  wardner_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14MHz/4)		/* 3.5MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_program_map)

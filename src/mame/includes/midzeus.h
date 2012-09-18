@@ -58,6 +58,7 @@ public:
 	DECLARE_VIDEO_START(midzeus2);
 	UINT32 screen_update_midzeus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_midzeus2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(display_irq);
 };
 
 /*----------- defined in video/midzeus2.c -----------*/

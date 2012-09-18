@@ -362,7 +362,7 @@ static MACHINE_CONFIG_START( onetwo, onetwo_state )
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)
 	MCFG_CPU_IO_MAP(main_cpu_io)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", onetwo_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,MASTER_CLOCK)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_cpu)

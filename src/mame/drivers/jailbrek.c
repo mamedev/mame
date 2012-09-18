@@ -100,20 +100,18 @@ WRITE8_MEMBER(jailbrek_state::ctrl_w)
 	flip_screen_set(data & 0x08);
 }
 
-static INTERRUPT_GEN( jb_interrupt )
+INTERRUPT_GEN_MEMBER(jailbrek_state::jb_interrupt)
 {
-	jailbrek_state *state = device->machine().driver_data<jailbrek_state>();
 
-	if (state->m_irq_enable)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if (m_irq_enable)
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( jb_interrupt_nmi )
+INTERRUPT_GEN_MEMBER(jailbrek_state::jb_interrupt_nmi)
 {
-	jailbrek_state *state = device->machine().driver_data<jailbrek_state>();
 
-	if (state->m_nmi_enable)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_enable)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -271,8 +269,8 @@ static MACHINE_CONFIG_START( jailbrek, jailbrek_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/12)
 	MCFG_CPU_PROGRAM_MAP(jailbrek_map)
-	MCFG_CPU_VBLANK_INT("screen", jb_interrupt)
-	MCFG_CPU_PERIODIC_INT(jb_interrupt_nmi, 500) /* ? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", jailbrek_state,  jb_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(jailbrek_state, jb_interrupt_nmi,  500) /* ? */
 
 
 	/* video hardware */

@@ -29,6 +29,8 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_xxmissio(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(xxmissio_interrupt_m);
+	INTERRUPT_GEN_MEMBER(xxmissio_interrupt_s);
 };
 
 DECLARE_WRITE8_DEVICE_HANDLER( xxmissio_scroll_x_w );

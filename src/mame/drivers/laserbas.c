@@ -308,7 +308,7 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(laserbas_memory)
 	MCFG_CPU_IO_MAP(laserbas_io)
-	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", laserbas_state, irq0_line_hold)
 
 	MCFG_PIT8253_ADD("pit0", laserbas_pit8253_intf_0)
 	MCFG_PIT8253_ADD("pit1", laserbas_pit8253_intf_1)

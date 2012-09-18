@@ -347,6 +347,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(viper_vblank);
 };
 
 UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1925,10 +1926,10 @@ static const powerpc_config viper_ppc_cfg =
 	NULL
 };
 
-static INTERRUPT_GEN(viper_vblank)
+INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
 {
-	mpc8240_interrupt(device->machine(), MPC8240_IRQ0);
-	//mpc8240_interrupt(device->machine, MPC8240_IRQ3);
+	mpc8240_interrupt(machine(), MPC8240_IRQ0);
+	//mpc8240_interrupt(device.machine, MPC8240_IRQ3);
 }
 
 static void voodoo_vblank(device_t *device, int state)
@@ -1993,7 +1994,7 @@ static MACHINE_CONFIG_START( viper, viper_state )
 	MCFG_CPU_ADD("maincpu", MPC8240, 200000000)
 	MCFG_CPU_CONFIG(viper_ppc_cfg)
 	MCFG_CPU_PROGRAM_MAP(viper_map)
-	MCFG_CPU_VBLANK_INT("screen", viper_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", viper_state,  viper_vblank)
 
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)

@@ -365,11 +365,11 @@ static MACHINE_CONFIG_START( wc90b, wc90b_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(wc90b_map1)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(wc90b_map2)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sound_cpu)

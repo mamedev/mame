@@ -210,7 +210,7 @@ static MACHINE_CONFIG_START( prehisle, prehisle_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_18MHz/2)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(prehisle_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", prehisle_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(prehisle_sound_map)

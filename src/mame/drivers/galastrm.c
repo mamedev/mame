@@ -48,11 +48,10 @@ $305.b invincibility
 
 /*********************************************************************/
 
-static INTERRUPT_GEN( galastrm_interrupt )
+INTERRUPT_GEN_MEMBER(galastrm_state::galastrm_interrupt)
 {
-	galastrm_state *state = device->machine().driver_data<galastrm_state>();
-	state->m_frame_counter ^= 1;
-	device->execute().set_input_line(5, HOLD_LINE);
+	m_frame_counter ^= 1;
+	device.execute().set_input_line(5, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( galastrm_interrupt6 )
@@ -310,7 +309,7 @@ static MACHINE_CONFIG_START( galastrm, galastrm_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(galastrm_map)
-	MCFG_CPU_VBLANK_INT("screen", galastrm_interrupt) /* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galastrm_state,  galastrm_interrupt) /* VBL */
 
 	MCFG_EEPROM_ADD("eeprom", galastrm_eeprom_interface)
 

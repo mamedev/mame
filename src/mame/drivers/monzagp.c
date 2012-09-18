@@ -259,7 +259,7 @@ static MACHINE_CONFIG_START( monzagp, monzagp_state )
 	MCFG_CPU_ADD("maincpu", I8035, 12000000/32)	/* 400KHz ??? - Main board Crystal is 12MHz */
 	MCFG_CPU_PROGRAM_MAP(monzagp_map)
 	MCFG_CPU_IO_MAP(monzagp_io)
-	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", monzagp_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

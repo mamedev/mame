@@ -164,27 +164,24 @@ WRITE16_MEMBER(tmnt_state::k053244_word_noA1_w)
 		k053244_w(m_k053245, space, offset + 1, data & 0xff);
 }
 
-static INTERRUPT_GEN(cuebrick_interrupt)
+INTERRUPT_GEN_MEMBER(tmnt_state::cuebrick_interrupt)
 {
-	tmnt_state *state = device->machine().driver_data<tmnt_state>();
 
-	if (state->m_irq5_mask)
-		device->execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
+	if (m_irq5_mask)
+		device.execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( punkshot_interrupt )
+INTERRUPT_GEN_MEMBER(tmnt_state::punkshot_interrupt)
 {
-	tmnt_state *state = device->machine().driver_data<tmnt_state>();
 
-	if (k052109_is_irq_enabled(state->m_k052109))
+	if (k052109_is_irq_enabled(m_k052109))
 		irq4_line_hold(device);
 }
 
-static INTERRUPT_GEN( lgtnfght_interrupt )
+INTERRUPT_GEN_MEMBER(tmnt_state::lgtnfght_interrupt)
 {
-	tmnt_state *state = device->machine().driver_data<tmnt_state>();
 
-	if (k052109_is_irq_enabled(state->m_k052109))
+	if (k052109_is_irq_enabled(m_k052109))
 		irq5_line_hold(device);
 }
 
@@ -2242,12 +2239,11 @@ MACHINE_RESET_MEMBER(tmnt_state,common)
 }
 
 /* cuebrick, mia and tmnt */
-static INTERRUPT_GEN( tmnt_vblank_irq )
+INTERRUPT_GEN_MEMBER(tmnt_state::tmnt_vblank_irq)
 {
-	tmnt_state *state = device->machine().driver_data<tmnt_state>();
 
-	if(state->m_irq5_mask)
-		device->execute().set_input_line(5, HOLD_LINE);
+	if(m_irq5_mask)
+		device.execute().set_input_line(5, HOLD_LINE);
 }
 
 
@@ -2256,7 +2252,7 @@ static MACHINE_CONFIG_START( cuebrick, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(cuebrick_main_map)
-	MCFG_CPU_VBLANK_INT("screen",cuebrick_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, cuebrick_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -2294,7 +2290,7 @@ static MACHINE_CONFIG_START( mia, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(mia_main_map)
-	MCFG_CPU_VBLANK_INT("screen", tmnt_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  tmnt_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(mia_audio_map)
@@ -2346,7 +2342,7 @@ static MACHINE_CONFIG_START( tmnt, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(tmnt_main_map)
-	MCFG_CPU_VBLANK_INT("screen", tmnt_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  tmnt_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(tmnt_audio_map)
@@ -2398,7 +2394,7 @@ static MACHINE_CONFIG_START( punkshot, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(punkshot_main_map)
-	MCFG_CPU_VBLANK_INT("screen", punkshot_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  punkshot_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(punkshot_audio_map)
@@ -2440,7 +2436,7 @@ static MACHINE_CONFIG_START( lgtnfght, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(lgtnfght_main_map)
-	MCFG_CPU_VBLANK_INT("screen", lgtnfght_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  lgtnfght_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(lgtnfght_audio_map)
@@ -2484,7 +2480,7 @@ static MACHINE_CONFIG_START( blswhstl, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(blswhstl_main_map)
-	MCFG_CPU_VBLANK_INT("screen", punkshot_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  punkshot_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(ssriders_audio_map)
@@ -2550,7 +2546,7 @@ static MACHINE_CONFIG_START( glfgreat, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* Confirmed */
 	MCFG_CPU_PROGRAM_MAP(glfgreat_main_map)
-	MCFG_CPU_VBLANK_INT("screen", lgtnfght_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  lgtnfght_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(glfgreat_audio_map)
@@ -2613,7 +2609,7 @@ static MACHINE_CONFIG_START( prmrsocr, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* Confirmed */
 	MCFG_CPU_PROGRAM_MAP(prmrsocr_main_map)
-	MCFG_CPU_VBLANK_INT("screen", lgtnfght_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  lgtnfght_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(prmrsocr_audio_map)
@@ -2658,7 +2654,7 @@ static MACHINE_CONFIG_START( tmnt2, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(tmnt2_main_map)
-	MCFG_CPU_VBLANK_INT("screen", punkshot_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  punkshot_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)	/* 8 MHz; clock is correct, but there's 1 cycle wait for ROM/RAM */
 						/* access. Access speed of ROM/RAM used on the machine is 150ns, */
@@ -2709,7 +2705,7 @@ static MACHINE_CONFIG_START( ssriders, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(ssriders_main_map)
-	MCFG_CPU_VBLANK_INT("screen", punkshot_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  punkshot_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* ????? makes the ROM test sync */
 	MCFG_CPU_PROGRAM_MAP(ssriders_audio_map)
@@ -2756,7 +2752,7 @@ static MACHINE_CONFIG_START( sunsetbl, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(sunsetbl_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  irq4_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -2792,7 +2788,7 @@ static MACHINE_CONFIG_START( thndrx2, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(thndrx2_main_map)
-	MCFG_CPU_VBLANK_INT("screen", punkshot_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  punkshot_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(thndrx2_audio_map)

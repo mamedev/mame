@@ -229,7 +229,7 @@ static MACHINE_CONFIG_START( galspnbl, galspnbl_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)	/* 12 MHz ??? - Use value from Temco's Super Pinball Action - NEEDS VERIFICATION!! */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)/* also has vector for 6, but it does nothing */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galspnbl_state,  irq3_line_hold)/* also has vector for 6, but it does nothing */
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)	/* 4 MHz ??? - Use value from Temco's Super Pinball Action - NEEDS VERIFICATION!! */
 	MCFG_CPU_PROGRAM_MAP(audio_map)

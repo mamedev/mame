@@ -315,7 +315,7 @@ static MACHINE_CONFIG_START( goal92, goal92_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)
 	MCFG_CPU_PROGRAM_MAP(goal92_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold) /* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goal92_state,  irq6_line_hold) /* VBL */
 
 	MCFG_CPU_ADD("audiocpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(sound_cpu)

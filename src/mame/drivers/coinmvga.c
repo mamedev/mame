@@ -237,6 +237,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_coinmvga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
 
 
@@ -656,10 +657,10 @@ static const ymz280b_interface ymz280b_intf =
 	0	// irq ?
 };
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(coinmvga_state::vblank_irq)
 {
 	//printf("1\n");
-	device->execute().set_input_line(2, HOLD_LINE);
+	device.execute().set_input_line(2, HOLD_LINE);
 }
 
 
@@ -673,7 +674,7 @@ static MACHINE_CONFIG_START( coinmvga, coinmvga_state )
 	MCFG_CPU_ADD("maincpu", H83007, CPU_CLOCK)	/* xtal */
 	MCFG_CPU_PROGRAM_MAP(coinmvga_map)
 	MCFG_CPU_IO_MAP(coinmvga_io_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)	/* wrong, fix me */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", coinmvga_state,  vblank_irq)	/* wrong, fix me */
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 

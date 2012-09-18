@@ -263,6 +263,7 @@ public:
 	DECLARE_MACHINE_START(gticlub);
 	DECLARE_MACHINE_RESET(gticlub);
 	DECLARE_MACHINE_RESET(hangplt);
+	INTERRUPT_GEN_MEMBER(gticlub_vblank);
 };
 
 
@@ -694,9 +695,9 @@ INPUT_PORTS_END
     DMA0
 
 */
-static INTERRUPT_GEN( gticlub_vblank )
+INTERRUPT_GEN_MEMBER(gticlub_state::gticlub_vblank)
 {
-	device->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 
@@ -806,7 +807,7 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MCFG_CPU_PROGRAM_MAP(gticlub_map)
-	MCFG_CPU_VBLANK_INT("screen", gticlub_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gticlub_state,  gticlub_vblank)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 64000000/4)	/* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)

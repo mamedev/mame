@@ -271,11 +271,11 @@ static MACHINE_CONFIG_START( ksayakyu, ksayakyu_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/8) //divider is guessed
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ksayakyu_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, MAIN_CLOCK/8) //divider is guessed, controls DAC tempo
 	MCFG_CPU_PROGRAM_MAP(soundcpu_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,60) //guess, controls music tempo
+	MCFG_CPU_PERIODIC_INT_DRIVER(ksayakyu_state, irq0_line_hold, 60) //guess, controls music tempo
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 

@@ -79,10 +79,10 @@ void dcheese_signal_irq( running_machine &machine, int which )
 }
 
 
-static INTERRUPT_GEN( dcheese_vblank )
+INTERRUPT_GEN_MEMBER(dcheese_state::dcheese_vblank)
 {
 	logerror("---- VBLANK ----\n");
-	dcheese_signal_irq(device->machine(), 4);
+	dcheese_signal_irq(machine(), 4);
 }
 
 
@@ -409,11 +409,11 @@ static MACHINE_CONFIG_START( dcheese, dcheese_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_OSC)
 	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
-	MCFG_CPU_VBLANK_INT("screen", dcheese_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dcheese_state,  dcheese_vblank)
 
 	MCFG_CPU_ADD("audiocpu", M6809, SOUND_OSC/16)
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
-	MCFG_CPU_PERIODIC_INT(irq1_line_hold, 480)	/* accurate for fredmem */
+	MCFG_CPU_PERIODIC_INT_DRIVER(dcheese_state, irq1_line_hold,  480)	/* accurate for fredmem */
 
 
 	MCFG_EEPROM_93C46_ADD("eeprom")

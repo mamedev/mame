@@ -397,8 +397,8 @@ static const riot6532_interface tomcat_riot6532_intf =
 static MACHINE_CONFIG_START( tomcat, tomcat_state )
 	MCFG_CPU_ADD("maincpu", M68010, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tomcat_map)
-	MCFG_CPU_PERIODIC_INT(irq1_line_assert, 5*60)
-	//MCFG_CPU_PERIODIC_INT(irq1_line_assert, (double)XTAL_12MHz / 16 / 16 / 16 / 12)
+	MCFG_CPU_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert,  5*60)
+	//MCFG_CPU_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert,  (double)XTAL_12MHz / 16 / 16 / 16 / 12)
 
 	MCFG_CPU_ADD("dsp", TMS32010, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP( dsp_map)

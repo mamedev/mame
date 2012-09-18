@@ -375,7 +375,7 @@ static MACHINE_CONFIG_START( chaknpop, chaknpop_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz / 6)	/* Verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(chaknpop_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", chaknpop_state,  irq0_line_hold)
 
 
 	/* video hardware */

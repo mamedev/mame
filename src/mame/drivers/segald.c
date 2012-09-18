@@ -373,7 +373,7 @@ static MACHINE_CONFIG_START( astron, segald_state )
 	MCFG_CPU_ADD("maincpu", Z80, SCHEMATIC_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(mainmem)
 	MCFG_CPU_IO_MAP(mainport)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 1000.0/59.94)
+	MCFG_CPU_PERIODIC_INT_DRIVER(segald_state, nmi_line_pulse,  1000.0/59.94)
 
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")

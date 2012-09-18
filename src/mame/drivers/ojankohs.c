@@ -857,7 +857,7 @@ static MACHINE_CONFIG_START( ojankohs, ojankohs_state )
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(ojankohs_map)
 	MCFG_CPU_IO_MAP(ojankohs_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankohs)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -893,7 +893,7 @@ static MACHINE_CONFIG_START( ojankoy, ojankohs_state )
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(ojankoy_map)
 	MCFG_CPU_IO_MAP(ojankoy_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankoy)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -930,7 +930,7 @@ static MACHINE_CONFIG_START( ccasino, ojankohs_state )
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(ojankoy_map)
 	MCFG_CPU_IO_MAP(ccasino_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankohs)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -966,7 +966,7 @@ static MACHINE_CONFIG_START( ojankoc, ojankohs_state )
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)			/* 4.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(ojankoc_map)
 	MCFG_CPU_IO_MAP(ojankoc_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankoc)
 	MCFG_NVRAM_ADD_0FILL("nvram")

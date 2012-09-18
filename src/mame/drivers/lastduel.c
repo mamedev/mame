@@ -500,7 +500,7 @@ static MACHINE_CONFIG_START( lastduel, lastduel_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* Could be 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(lastduel_map)
-	MCFG_CPU_VBLANK_INT("screen",irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", lastduel_state, irq2_line_hold)
 	MCFG_TIMER_ADD_PERIODIC("timer_irq", lastduel_timer_cb, attotime::from_hz(120)) /* control reads?? */
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545) /* Accurate */
@@ -543,7 +543,7 @@ static MACHINE_CONFIG_START( madgear, lastduel_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* Accurate */
 	MCFG_CPU_PROGRAM_MAP(madgear_map)
-	MCFG_CPU_VBLANK_INT("screen",irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", lastduel_state, irq5_line_hold)
 	MCFG_TIMER_ADD_PERIODIC("timer_irq", madgear_timer_cb, attotime::from_hz(120)) /* control reads?? */
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */

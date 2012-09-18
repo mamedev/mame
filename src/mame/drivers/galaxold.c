@@ -2314,7 +2314,7 @@ static MACHINE_CONFIG_DERIVED( ozon1, galaxold_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ozon1_map)
 	MCFG_CPU_IO_MAP(ozon1_io_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  nmi_line_pulse)
 
 	MCFG_MACHINE_RESET(0)
 
@@ -2332,7 +2332,7 @@ static MACHINE_CONFIG_START( drivfrcg, galaxold_state )
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(drivfrcg)
 	MCFG_CPU_IO_MAP(drivfrcg_io)
-	MCFG_CPU_VBLANK_INT("screen", hunchbks_vh_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2384,12 +2384,11 @@ static MACHINE_CONFIG_DERIVED( hunchbkg, galaxold_base )
 	MCFG_FRAGMENT_ADD(galaxian_audio)
 MACHINE_CONFIG_END
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(galaxold_state::vblank_irq)
 {
-	galaxold_state *state = device->machine().driver_data<galaxold_state>();
 
-	if(state->m_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( harem, galaxold_base )
@@ -2397,7 +2396,7 @@ static MACHINE_CONFIG_DERIVED( harem, galaxold_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(harem_cpu1)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 1620000) //?
 	MCFG_CPU_PROGRAM_MAP(harem_cpu2)
@@ -2433,7 +2432,7 @@ static MACHINE_CONFIG_START( racknrol, galaxold_state )
 	MCFG_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(racknrol)
 	MCFG_CPU_IO_MAP(racknrol_io)
-	MCFG_CPU_VBLANK_INT("screen", hunchbks_vh_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
 
 	MCFG_GFXDECODE(galaxian)
 	MCFG_PALETTE_LENGTH(32)
@@ -2491,7 +2490,7 @@ static MACHINE_CONFIG_START( hexpoola, galaxold_state )
 	MCFG_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(racknrol)
 	MCFG_CPU_IO_MAP(hexpoola_io)
-	MCFG_CPU_VBLANK_INT("screen", hunchbks_vh_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
 
 	MCFG_GFXDECODE(galaxian)
 	MCFG_PALETTE_LENGTH(32)

@@ -1017,17 +1017,17 @@ static MACHINE_CONFIG_START( kingdrby, kingdrby_state )
 	MCFG_CPU_ADD("master", Z80, CLK_2)
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_CPU_IO_MAP(master_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", kingdrby_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("slave", Z80, CLK_2)
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_IO_MAP(slave_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", kingdrby_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("soundcpu", Z80, CLK_2)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,1000) /* guess, controls ay8910 tempo.*/
+	MCFG_CPU_PERIODIC_INT_DRIVER(kingdrby_state, irq0_line_hold, 1000) /* guess, controls ay8910 tempo.*/
 
 	MCFG_QUANTUM_PERFECT_CPU("master")
 

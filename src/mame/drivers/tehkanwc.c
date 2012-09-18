@@ -642,16 +642,16 @@ static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/4)	/* 18.432000 / 4 */
 	MCFG_CPU_PROGRAM_MAP(main_mem)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tehkanwc_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", Z80, 18432000/4)
 	MCFG_CPU_PROGRAM_MAP(sub_mem)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tehkanwc_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 18432000/4)
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 	MCFG_CPU_IO_MAP(sound_port)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tehkanwc_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
 

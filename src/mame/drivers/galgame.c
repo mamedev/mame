@@ -48,6 +48,7 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(galaxygame_irq);
 };
 
 /*************************************
@@ -301,13 +302,12 @@ static IRQ_CALLBACK(galaxygame_irq_callback)
 	return 0x40;
 }
 
-static INTERRUPT_GEN(galaxygame_irq)
+INTERRUPT_GEN_MEMBER(galaxygame_state::galaxygame_irq)
 {
-	galaxygame_state *state = device->machine().driver_data<galaxygame_state>();
-	if ( state->m_clk & 0x40 )
+	if ( m_clk & 0x40 )
 	{
-		device->execute().set_input_line(0, ASSERT_LINE);
-		state->m_interrupt = 1;
+		device.execute().set_input_line(0, ASSERT_LINE);
+		m_interrupt = 1;
 	}
 }
 
@@ -331,7 +331,7 @@ static MACHINE_CONFIG_START( galaxygame, galaxygame_state )
 	MCFG_CPU_ADD("maincpu", T11, 3000000 )
 	MCFG_CPU_PROGRAM_MAP(galaxygame_map)
 	MCFG_CPU_CONFIG(t11_data)
-	MCFG_CPU_PERIODIC_INT(galaxygame_irq,60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(galaxygame_state, galaxygame_irq, 60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

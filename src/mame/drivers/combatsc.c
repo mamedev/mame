@@ -735,7 +735,7 @@ static MACHINE_CONFIG_START( combatsc, combatsc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)	/* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(combatsc_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", combatsc_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,3579545)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(combatsc_sound_map)
@@ -785,11 +785,11 @@ static MACHINE_CONFIG_START( combatscb, combatsc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)	/* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(combatscb_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", combatsc_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,3579545)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(combatscb_sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,3800) // controls BGM tempo
+	MCFG_CPU_PERIODIC_INT_DRIVER(combatsc_state, irq0_line_hold, 3800) // controls BGM tempo
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 

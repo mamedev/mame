@@ -307,9 +307,8 @@ static TIMER_CALLBACK( namconb1_TriggerPOSIRQ )
 	machine.device("maincpu")->execute().set_input_line(state->m_namconb_cpureg[0x02] & 0xf, ASSERT_LINE);
 }
 
-static INTERRUPT_GEN( namconb1_interrupt )
+INTERRUPT_GEN_MEMBER(namconb1_state::namconb1_interrupt)
 {
-	namconb1_state *state = device->machine().driver_data<namconb1_state>();
 	/**
      * 400000 0x00
      * 400001 0x00
@@ -344,11 +343,11 @@ static INTERRUPT_GEN( namconb1_interrupt )
      * 40001e 0x00
      * 40001f 0x00
      */
-	int scanline = (state->m_generic_paletteram_32[0x1808/4]&0xffff)-32;
+	int scanline = (m_generic_paletteram_32[0x1808/4]&0xffff)-32;
 
-	if((!state->m_vblank_irq_active) && (state->m_namconb_cpureg[0x04] & 0xf0)) {
-		device->execute().set_input_line(state->m_namconb_cpureg[0x04] & 0xf, ASSERT_LINE);
-		state->m_vblank_irq_active = 1;
+	if((!m_vblank_irq_active) && (m_namconb_cpureg[0x04] & 0xf0)) {
+		device.execute().set_input_line(m_namconb_cpureg[0x04] & 0xf, ASSERT_LINE);
+		m_vblank_irq_active = 1;
 	}
 
 	if( scanline<0 )
@@ -357,7 +356,7 @@ static INTERRUPT_GEN( namconb1_interrupt )
 	}
 	if( scanline < NAMCONB1_VBSTART )
 	{
-		device->machine().scheduler().timer_set( device->machine().primary_screen->time_until_pos(scanline), FUNC(namconb1_TriggerPOSIRQ ), scanline);
+		machine().scheduler().timer_set( machine().primary_screen->time_until_pos(scanline), FUNC(namconb1_TriggerPOSIRQ ), scanline);
 	}
 } /* namconb1_interrupt */
 
@@ -370,9 +369,8 @@ static TIMER_CALLBACK( namconb2_TriggerPOSIRQ )
 	machine.device("maincpu")->execute().set_input_line(state->m_namconb_cpureg[0x02], ASSERT_LINE);
 }
 
-static INTERRUPT_GEN( namconb2_interrupt )
+INTERRUPT_GEN_MEMBER(namconb1_state::namconb2_interrupt)
 {
-	namconb1_state *state = device->machine().driver_data<namconb1_state>();
 	/**
      * f00000 0x01 // VBLANK irq level
      * f00001 0x00
@@ -402,18 +400,18 @@ static INTERRUPT_GEN( namconb2_interrupt )
      * f0001e 0x00
      * f0001f 0x01
      */
-	int scanline = (state->m_generic_paletteram_32[0x1808/4]&0xffff)-32;
+	int scanline = (m_generic_paletteram_32[0x1808/4]&0xffff)-32;
 
-	if((!state->m_vblank_irq_active) && state->m_namconb_cpureg[0x00]) {
-		device->execute().set_input_line(state->m_namconb_cpureg[0x00], ASSERT_LINE);
-		state->m_vblank_irq_active = 1;
+	if((!m_vblank_irq_active) && m_namconb_cpureg[0x00]) {
+		device.execute().set_input_line(m_namconb_cpureg[0x00], ASSERT_LINE);
+		m_vblank_irq_active = 1;
 	}
 
 	if( scanline<0 )
 		scanline = 0;
 
 	if( scanline < NAMCONB1_VBSTART )
-		device->machine().scheduler().timer_set( device->machine().primary_screen->time_until_pos(scanline), FUNC(namconb2_TriggerPOSIRQ ), scanline);
+		machine().scheduler().timer_set( machine().primary_screen->time_until_pos(scanline), FUNC(namconb2_TriggerPOSIRQ ), scanline);
 } /* namconb2_interrupt */
 
 static void namconb1_cpureg8_w(running_machine &machine, int reg, UINT8 data)
@@ -1009,7 +1007,7 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_START( namconb1, namconb1_state )
 	MCFG_CPU_ADD("maincpu", M68EC020,MASTER_CLOCK_HZ/2)
 	MCFG_CPU_PROGRAM_MAP(namconb1_am)
-	MCFG_CPU_VBLANK_INT("screen", namconb1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namconb1_state,  namconb1_interrupt)
 
 	MCFG_CPU_ADD("mcu", M37702, MASTER_CLOCK_HZ/3)
 	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
@@ -1041,7 +1039,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( namconb2, namconb1_state )
 	MCFG_CPU_ADD("maincpu", M68EC020,MASTER_CLOCK_HZ/2)
 	MCFG_CPU_PROGRAM_MAP(namconb2_am)
-	MCFG_CPU_VBLANK_INT("screen", namconb2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namconb1_state,  namconb2_interrupt)
 
 	MCFG_CPU_ADD("mcu", M37702, MASTER_CLOCK_HZ/3)
 	MCFG_CPU_PROGRAM_MAP(namcoc75_am)

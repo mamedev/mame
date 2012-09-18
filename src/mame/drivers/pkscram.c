@@ -303,7 +303,7 @@ static MACHINE_CONFIG_START( pkscramble, pkscram_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000 )
 	MCFG_CPU_PROGRAM_MAP(pkscramble_map)
-	//MCFG_CPU_VBLANK_INT("screen", irq1_line_hold) /* only valid irq */
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", pkscram_state,  irq1_line_hold) /* only valid irq */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

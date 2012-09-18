@@ -79,6 +79,7 @@ public:
 	DECLARE_WRITE8_MEMBER(m79amb_8002_w);
 	DECLARE_DRIVER_INIT(m79amb);
 	UINT32 screen_update_ramtek(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(m79amb_interrupt);
 };
 
 
@@ -202,9 +203,9 @@ static INPUT_PORTS_START( m79amb )
 INPUT_PORTS_END
 
 
-static INTERRUPT_GEN( m79amb_interrupt )
+INTERRUPT_GEN_MEMBER(m79amb_state::m79amb_interrupt)
 {
-	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);  /* RST 08h */
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);  /* RST 08h */
 }
 
 static MACHINE_CONFIG_START( m79amb, m79amb_state )
@@ -212,7 +213,7 @@ static MACHINE_CONFIG_START( m79amb, m79amb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_19_6608MHz / 10)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", m79amb_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", m79amb_state,  m79amb_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

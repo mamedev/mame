@@ -79,6 +79,7 @@ public:
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	virtual void video_start();
 	UINT32 screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(mcu_irq);
 };
 
 
@@ -527,20 +528,20 @@ UINT32 rbmk_state::screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-static INTERRUPT_GEN( mcu_irq )
+INTERRUPT_GEN_MEMBER(rbmk_state::mcu_irq)
 {
-	device->machine().device("mcu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("mcu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( rbmk, rbmk_state )
 	MCFG_CPU_ADD("maincpu", M68000, 22000000 /2)
 	MCFG_CPU_PROGRAM_MAP(rbmk_mem)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("mcu", AT89C4051, 22000000 / 4) // frequency isn't right
 	MCFG_CPU_PROGRAM_MAP(rbmk_mcu_mem)
 	MCFG_CPU_IO_MAP(rbmk_mcu_io)
-	MCFG_CPU_VBLANK_INT("screen", mcu_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  mcu_irq)
 
 	MCFG_GFXDECODE(rbmk)
 

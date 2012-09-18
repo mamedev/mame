@@ -58,6 +58,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(toratora_timer);
 };
 
 
@@ -150,23 +151,22 @@ WRITE_LINE_MEMBER(toratora_state::main_cpu_irq)
 }
 
 
-static INTERRUPT_GEN( toratora_timer )
+INTERRUPT_GEN_MEMBER(toratora_state::toratora_timer)
 {
-	toratora_state *state = device->machine().driver_data<toratora_state>();
-	state->m_timer++;	/* timer counting at 16 Hz */
+	m_timer++;	/* timer counting at 16 Hz */
 
 	/* also, when the timer overflows (16 seconds) watchdog would kick in */
-	if (state->m_timer & 0x100)
+	if (m_timer & 0x100)
 		popmessage("watchdog!");
 
-	if (state->m_last != (state->ioport("INPUT")->read() & 0x0f))
+	if (m_last != (ioport("INPUT")->read() & 0x0f))
 	{
-		state->m_last = state->ioport("INPUT")->read() & 0x0f;
-		generic_pulse_irq_line(device, 0, 1);
+		m_last = ioport("INPUT")->read() & 0x0f;
+		generic_pulse_irq_line(device.execute(), 0, 1);
 	}
-	state->m_pia_u1->set_a_input(device->machine().root_device().ioport("INPUT")->read() & 0x0f, 0);
-	state->m_pia_u1->ca1_w(device->machine().root_device().ioport("INPUT")->read() & 0x10);
-	state->m_pia_u1->ca2_w(device->machine().root_device().ioport("INPUT")->read() & 0x20);
+	m_pia_u1->set_a_input(machine().root_device().ioport("INPUT")->read() & 0x0f, 0);
+	m_pia_u1->ca1_w(machine().root_device().ioport("INPUT")->read() & 0x10);
+	m_pia_u1->ca2_w(machine().root_device().ioport("INPUT")->read() & 0x20);
 }
 
 READ8_MEMBER(toratora_state::timer_r)
@@ -449,7 +449,7 @@ static MACHINE_CONFIG_START( toratora, toratora_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800,500000)	/* ?????? game speed is entirely controlled by this */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT(toratora_timer,16)	/* timer counting at 16 Hz */
+	MCFG_CPU_PERIODIC_INT_DRIVER(toratora_state, toratora_timer, 16)	/* timer counting at 16 Hz */
 
 	MCFG_PIA6821_ADD("pia_u1", pia_u1_intf)
 	MCFG_PIA6821_ADD("pia_u2", pia_u2_intf)

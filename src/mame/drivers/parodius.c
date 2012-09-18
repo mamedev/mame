@@ -19,11 +19,10 @@
 static KONAMI_SETLINES_CALLBACK( parodius_banking );
 
 
-static INTERRUPT_GEN( parodius_interrupt )
+INTERRUPT_GEN_MEMBER(parodius_state::parodius_interrupt)
 {
-	parodius_state *state = device->machine().driver_data<parodius_state>();
-	if (k052109_is_irq_enabled(state->m_k052109))
-		device->execute().set_input_line(0, HOLD_LINE);
+	if (k052109_is_irq_enabled(m_k052109))
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(parodius_state::bankedram_r)
@@ -290,7 +289,7 @@ static MACHINE_CONFIG_START( parodius, parodius_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)		/* 053248 */
 	MCFG_CPU_PROGRAM_MAP(parodius_map)
-	MCFG_CPU_VBLANK_INT("screen", parodius_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", parodius_state,  parodius_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(parodius_sound_map)

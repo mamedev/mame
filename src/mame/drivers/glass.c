@@ -18,14 +18,13 @@ WRITE16_MEMBER(glass_state::clr_int_w)
 	m_cause_interrupt = 1;
 }
 
-static INTERRUPT_GEN( glass_interrupt )
+INTERRUPT_GEN_MEMBER(glass_state::glass_interrupt)
 {
-	glass_state *state = device->machine().driver_data<glass_state>();
 
-	if (state->m_cause_interrupt)
+	if (m_cause_interrupt)
 	{
-		device->execute().set_input_line(6, HOLD_LINE);
-		state->m_cause_interrupt = 0;
+		device.execute().set_input_line(6, HOLD_LINE);
+		m_cause_interrupt = 0;
 	}
 }
 
@@ -196,7 +195,7 @@ static MACHINE_CONFIG_START( glass, glass_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)		/* 12 MHz (M680000 P12) */
 	MCFG_CPU_PROGRAM_MAP(glass_map)
-	MCFG_CPU_VBLANK_INT("screen", glass_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", glass_state,  glass_interrupt)
 
 
 	/* video hardware */

@@ -216,9 +216,9 @@ GFXDECODE_END
 
 /* Interrupt Generator */
 
-static INTERRUPT_GEN( commando_interrupt )
+INTERRUPT_GEN_MEMBER(commando_state::commando_interrupt)
 {
-	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	// RST 10h - VBLANK
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	// RST 10h - VBLANK
 }
 
 /* Machine Driver */
@@ -247,11 +247,11 @@ static MACHINE_CONFIG_START( commando, commando_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, PHI_MAIN)	// ???
 	MCFG_CPU_PROGRAM_MAP(commando_map)
-	MCFG_CPU_VBLANK_INT("screen", commando_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", commando_state,  commando_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, PHI_B)	// 3 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(commando_state, irq0_line_hold,  4*60)
 
 
 	/* video hardware */

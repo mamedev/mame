@@ -218,7 +218,7 @@ static MACHINE_CONFIG_START( cardline, cardline_state )
 	MCFG_CPU_ADD("maincpu", I80C32,12000000)
 	MCFG_CPU_PROGRAM_MAP(mem_prg)
 	MCFG_CPU_IO_MAP(mem_io)
-	//MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", cardline_state,  irq1_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

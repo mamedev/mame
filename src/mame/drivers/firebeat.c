@@ -185,6 +185,7 @@ public:
 	DECLARE_VIDEO_START(firebeat);
 	UINT32 screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(firebeat_interrupt);
 };
 
 
@@ -1936,7 +1937,7 @@ static INPUT_PORTS_START(popn)
 
 INPUT_PORTS_END
 
-static INTERRUPT_GEN(firebeat_interrupt)
+INTERRUPT_GEN_MEMBER(firebeat_state::firebeat_interrupt)
 {
 	// IRQs
 	// IRQ 0: VBlank
@@ -1944,7 +1945,7 @@ static INTERRUPT_GEN(firebeat_interrupt)
 	// IRQ 2: Main board UART
 	// IRQ 4: ATAPI
 
-	device->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 MACHINE_RESET_MEMBER(firebeat_state,firebeat)
@@ -1973,7 +1974,7 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GCX, 66000000)
 	MCFG_CPU_PROGRAM_MAP(firebeat_map)
-	MCFG_CPU_VBLANK_INT("screen", firebeat_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", firebeat_state,  firebeat_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
 	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
@@ -2019,7 +2020,7 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GCX, 66000000)
 	MCFG_CPU_PROGRAM_MAP(firebeat_map)
-	MCFG_CPU_VBLANK_INT("lscreen", firebeat_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", firebeat_state,  firebeat_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
 	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)

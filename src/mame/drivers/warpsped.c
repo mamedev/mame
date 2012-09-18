@@ -308,7 +308,7 @@ static MACHINE_CONFIG_START( warpspeed, warpspeed_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz/2)
 	MCFG_CPU_PROGRAM_MAP(warpspeed_map)
 	MCFG_CPU_IO_MAP(warpspeed_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpspeed_state,  irq0_line_hold)
 
 	/* video hardware */
 

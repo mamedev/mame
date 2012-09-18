@@ -982,20 +982,18 @@ static const ay8910_interface bootleg_ay8910_interface_2 =
 	DEVCB_NULL
 };
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(superqix_state::vblank_irq)
 {
-	superqix_state *state = device->machine().driver_data<superqix_state>();
 
-	if(state->m_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static INTERRUPT_GEN( sqix_timer_irq )
+INTERRUPT_GEN_MEMBER(superqix_state::sqix_timer_irq)
 {
-	superqix_state *state = device->machine().driver_data<superqix_state>();
 
-	if (state->m_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -1004,7 +1002,7 @@ static MACHINE_CONFIG_START( pbillian, superqix_state )
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(pbillian_port_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", superqix_state,  vblank_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(superqix_state,pbillian)
 
@@ -1035,7 +1033,7 @@ static MACHINE_CONFIG_START( hotsmash, superqix_state )
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(hotsmash_port_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", superqix_state,  vblank_irq)
 
 	MCFG_CPU_ADD("mcu", M68705, 4000000) /* ???? */
 	MCFG_CPU_PROGRAM_MAP(m68705_map)
@@ -1071,7 +1069,7 @@ static MACHINE_CONFIG_START( sqix, superqix_state )
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(sqix_port_map)
-	MCFG_CPU_PERIODIC_INT(sqix_timer_irq, 4*60) /* ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(superqix_state, sqix_timer_irq,  4*60) /* ??? */
 
 	MCFG_CPU_ADD("mcu", I8751, 12000000/3)	/* ??? */
 	MCFG_CPU_IO_MAP(bootleg_mcu_io_map)
@@ -1119,7 +1117,7 @@ static MACHINE_CONFIG_START( sqixbl, superqix_state )
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(sqix_port_map)
-	MCFG_CPU_PERIODIC_INT(sqix_timer_irq, 4*60) /* ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(superqix_state, sqix_timer_irq,  4*60) /* ??? */
 
 	MCFG_MACHINE_START_OVERRIDE(superqix_state,superqix)
 

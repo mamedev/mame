@@ -752,10 +752,9 @@ READ32_MEMBER(micro3d_state::micro3d_pipe_r)
 	return m_pipe_data;
 }
 
-INTERRUPT_GEN( micro3d_vblank )
+INTERRUPT_GEN_MEMBER(micro3d_state::micro3d_vblank)
 {
-//  mc68901_int_gen(device->machine(), GPIP7);
-	micro3d_state *state = device->machine().driver_data<micro3d_state>();
+//  mc68901_int_gen(machine(), GPIP7);
 
-	state->m_display_buffer = state->m_drawing_buffer ^ 1;
+	m_display_buffer = m_drawing_buffer ^ 1;
 }

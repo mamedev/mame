@@ -232,7 +232,7 @@ static MACHINE_CONFIG_START( exedexes, exedexes_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000)	/* 3 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(exedexes_state, irq0_line_hold, 4*60)
 
 
 	/* video hardware */

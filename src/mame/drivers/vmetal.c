@@ -484,7 +484,7 @@ static MACHINE_CONFIG_START( varia, vmetal_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(varia_program_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold) // also level 3
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vmetal_state,  irq1_line_hold) // also level 3
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

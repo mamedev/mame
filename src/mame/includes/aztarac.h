@@ -27,7 +27,5 @@ public:
 	DECLARE_WRITE8_MEMBER(aztarac_snd_status_w);
 	virtual void machine_reset();
 	virtual void video_start();
+	INTERRUPT_GEN_MEMBER(aztarac_snd_timed_irq);
 };
-
-/*----------- defined in audio/aztarac.c -----------*/
-INTERRUPT_GEN( aztarac_snd_timed_irq );

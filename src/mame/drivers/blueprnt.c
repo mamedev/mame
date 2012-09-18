@@ -296,11 +296,11 @@ static MACHINE_CONFIG_START( blueprnt, blueprnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 7000000/2)	// 3.5 MHz
 	MCFG_CPU_PROGRAM_MAP(blueprnt_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", blueprnt_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 10000000/2/2/2)	// 1.25 MHz (2H)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60)	// IRQs connected to 32V
+	MCFG_CPU_PERIODIC_INT_DRIVER(blueprnt_state, irq0_line_hold,  4*60)	// IRQs connected to 32V
 									// NMIs are caused by the main CPU
 
 

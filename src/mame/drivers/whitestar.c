@@ -49,6 +49,7 @@ public:
 	DECLARE_DRIVER_INIT(whitestar);
 	virtual void machine_reset();
 	virtual void palette_init();
+	INTERRUPT_GEN_MEMBER(whitestar_firq_interrupt);
 };
 
 static INPUT_PORTS_START( whitestar )
@@ -182,9 +183,9 @@ DRIVER_INIT_MEMBER(whitestar_state,whitestar)
 }
 
 // the appropriate device is passed in, so we can share this routine
-static INTERRUPT_GEN( whitestar_firq_interrupt )
+INTERRUPT_GEN_MEMBER(whitestar_state::whitestar_firq_interrupt)
 {
-	device->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 #define DMD_CHUNK_SIZE 10
@@ -271,11 +272,11 @@ static MACHINE_CONFIG_START( whitestar, whitestar_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(whitestar_map)
-	MCFG_CPU_PERIODIC_INT(whitestar_firq_interrupt, 976) // value taken from PinMAME
+	MCFG_CPU_PERIODIC_INT_DRIVER(whitestar_state, whitestar_firq_interrupt,  976) // value taken from PinMAME
 
     MCFG_CPU_ADD("dmdcpu", M6809, (8000000/4))
 	MCFG_CPU_PROGRAM_MAP(whitestar_dmd_map)
-	MCFG_CPU_PERIODIC_INT(whitestar_firq_interrupt, 80) // value taken from PinMAME
+	MCFG_CPU_PERIODIC_INT_DRIVER(whitestar_state, whitestar_firq_interrupt,  80) // value taken from PinMAME
 
 
 	/* sound hardware */

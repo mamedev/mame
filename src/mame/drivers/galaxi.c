@@ -406,7 +406,7 @@ static MACHINE_CONFIG_START( galaxi, galaxi_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)	// ?
 	MCFG_CPU_PROGRAM_MAP(galaxi_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxi_state,  irq4_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

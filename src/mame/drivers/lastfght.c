@@ -125,6 +125,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_lastfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(unknown_interrupt);
 };
 
 
@@ -527,11 +528,10 @@ INPUT_PORTS_END
                                 Machine Drivers
 ***************************************************************************/
 
-static INTERRUPT_GEN( unknown_interrupt )
+INTERRUPT_GEN_MEMBER(lastfght_state::unknown_interrupt)
 {
-	lastfght_state *state = device->machine().driver_data<lastfght_state>();
 
-	state->m_maincpu->set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
+	m_maincpu->set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
 void lastfght_state::machine_start()
@@ -581,8 +581,8 @@ static MACHINE_CONFIG_START( lastfght, lastfght_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83044, 32000000/2)
 	MCFG_CPU_PROGRAM_MAP( lastfght_map)
-	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
-	MCFG_CPU_PERIODIC_INT(unknown_interrupt,60)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", lastfght_state, irq0_line_hold)
+	MCFG_CPU_PERIODIC_INT_DRIVER(lastfght_state, unknown_interrupt, 60)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

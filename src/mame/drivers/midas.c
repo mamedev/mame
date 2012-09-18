@@ -701,7 +701,7 @@ static MACHINE_CONFIG_START( livequiz, midas_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(livequiz_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", midas_state,  irq1_line_hold)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -730,7 +730,7 @@ static MACHINE_CONFIG_START( hammer, midas_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(hammer_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", midas_state,  irq1_line_hold)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 

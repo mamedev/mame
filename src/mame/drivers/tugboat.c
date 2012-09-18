@@ -333,7 +333,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( tugboat, tugboat_state )
 	MCFG_CPU_ADD("maincpu", M6502, 2000000)	/* 2 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tugboat_state,  nmi_line_pulse)
 
 
 	MCFG_PIA6821_ADD("pia0", pia0_intf)

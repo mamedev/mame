@@ -965,7 +965,7 @@ static MACHINE_CONFIG_START( zwackery, mcr68_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 7652400)	/* should be XTAL_16MHz/2 */
 	MCFG_CPU_PROGRAM_MAP(zwackery_map)
-	MCFG_CPU_VBLANK_INT("screen", mcr68_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mcr68_state,  mcr68_interrupt)
 
 //  MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_MACHINE_START_OVERRIDE(mcr68_state,zwackery)
@@ -1000,7 +1000,7 @@ static MACHINE_CONFIG_START( mcr68, mcr68_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 7723800)
 	MCFG_CPU_PROGRAM_MAP(mcr68_map)
-	MCFG_CPU_VBLANK_INT("screen", mcr68_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mcr68_state,  mcr68_interrupt)
 
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_MACHINE_START_OVERRIDE(mcr68_state,mcr68)

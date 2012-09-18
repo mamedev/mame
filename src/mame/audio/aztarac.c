@@ -43,11 +43,10 @@ WRITE8_MEMBER(aztarac_state::aztarac_snd_status_w)
     m_sound_status &= ~0x10;
 }
 
-INTERRUPT_GEN( aztarac_snd_timed_irq )
+INTERRUPT_GEN_MEMBER(aztarac_state::aztarac_snd_timed_irq)
 {
-	aztarac_state *state = device->machine().driver_data<aztarac_state>();
-    state->m_sound_status ^= 0x10;
+    m_sound_status ^= 0x10;
 
-    if (state->m_sound_status & 0x10)
-        device->execute().set_input_line(0,HOLD_LINE);
+    if (m_sound_status & 0x10)
+        device.execute().set_input_line(0,HOLD_LINE);
 }

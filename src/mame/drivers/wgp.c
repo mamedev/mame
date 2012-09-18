@@ -472,10 +472,10 @@ static TIMER_CALLBACK( wgp_cpub_interrupt6 )
 /* FWIW offset of 10000,10500 on ints can get CPUB obeying the
    first CPUA command the same frame; probably not necessary */
 
-static INTERRUPT_GEN( wgp_cpub_interrupt )
+INTERRUPT_GEN_MEMBER(wgp_state::wgp_cpub_interrupt)
 {
-	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000-500), FUNC(wgp_cpub_interrupt6));
-	device->execute().set_input_line(4, HOLD_LINE);
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000-500), FUNC(wgp_cpub_interrupt6));
+	device.execute().set_input_line(4, HOLD_LINE);
 }
 
 
@@ -994,14 +994,14 @@ static MACHINE_CONFIG_START( wgp, wgp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wgp_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 
 	MCFG_CPU_ADD("sub", M68000, 12000000)	/* 12 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_VBLANK_INT("screen", wgp_cpub_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wgp_state,  wgp_cpub_interrupt)
 
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))

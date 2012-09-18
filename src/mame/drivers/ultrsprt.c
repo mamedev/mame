@@ -36,6 +36,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(analog_ctrl_r);
 	virtual void machine_start();
 	UINT32 screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(ultrsprt_vblank);
 };
 
 
@@ -203,9 +204,9 @@ static INPUT_PORTS_START( ultrsprt )
 INPUT_PORTS_END
 
 
-static INTERRUPT_GEN( ultrsprt_vblank )
+INTERRUPT_GEN_MEMBER(ultrsprt_state::ultrsprt_vblank)
 {
-	device->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+	device.execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 static void sound_irq_callback(running_machine &machine, int irq)
@@ -227,11 +228,11 @@ static MACHINE_CONFIG_START( ultrsprt, ultrsprt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, 25000000)		/* PowerPC 403GA 25MHz */
 	MCFG_CPU_PROGRAM_MAP(ultrsprt_map)
-	MCFG_CPU_VBLANK_INT("screen", ultrsprt_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ultrsprt_state,  ultrsprt_vblank)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 8000000)		/* Not sure about the frequency */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(irq5_line_hold, 1)	// ???
+	MCFG_CPU_PERIODIC_INT_DRIVER(ultrsprt_state, irq5_line_hold,  1)	// ???
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 

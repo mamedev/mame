@@ -39,12 +39,11 @@ static const UINT8 toaplan1_credits_for_coin[TOAPLAN1_REGION_OTHER+1][2][4] =
 };
 
 
-INTERRUPT_GEN( toaplan1_interrupt )
+INTERRUPT_GEN_MEMBER(toaplan1_state::toaplan1_interrupt)
 {
-	toaplan1_state *state = device->machine().driver_data<toaplan1_state>();
 
-	if (state->m_intenable)
-		device->execute().set_input_line(4, HOLD_LINE);
+	if (m_intenable)
+		device.execute().set_input_line(4, HOLD_LINE);
 }
 
 WRITE16_MEMBER(toaplan1_state::toaplan1_intenable_w)

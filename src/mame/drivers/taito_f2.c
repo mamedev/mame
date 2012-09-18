@@ -578,10 +578,10 @@ static TIMER_CALLBACK( taitof2_interrupt6 )
 	state->m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( taitof2_interrupt )
+INTERRUPT_GEN_MEMBER(taitof2_state::taitof2_interrupt)
 {
-	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(500), FUNC(taitof2_interrupt6));
-	device->execute().set_input_line(5, HOLD_LINE);
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), FUNC(taitof2_interrupt6));
+	device.execute().set_input_line(5, HOLD_LINE);
 }
 
 
@@ -3040,7 +3040,7 @@ static MACHINE_CONFIG_START( taito_f2, taitof2_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 24000000/2)	/* 12 MHz */
-	MCFG_CPU_VBLANK_INT("screen", taitof2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitof2_state,  taitof2_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 24000000/6)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -3598,7 +3598,7 @@ static MACHINE_CONFIG_START( cameltrya, taitof2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)	/* verified on pcb  */
 	MCFG_CPU_PROGRAM_MAP(cameltry_map)
-	MCFG_CPU_VBLANK_INT("screen", taitof2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitof2_state,  taitof2_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80,24000000/4)	/* verifed on pcb */
 	MCFG_CPU_PROGRAM_MAP(cameltrya_sound_map)
@@ -3647,7 +3647,7 @@ static MACHINE_CONFIG_START( driveout, taitof2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)	/* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(driveout_map)
-	MCFG_CPU_VBLANK_INT("screen", taitof2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitof2_state,  taitof2_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80,24000000/6)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(driveout_sound_map)

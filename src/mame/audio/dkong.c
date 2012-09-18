@@ -1466,11 +1466,11 @@ MACHINE_CONFIG_FRAGMENT( dkong3_audio )
 
 	MCFG_CPU_ADD("n2a03a", N2A03,N2A03_DEFAULTCLOCK)
 	MCFG_CPU_PROGRAM_MAP(dkong3_sound1_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("n2a03b", N2A03,N2A03_DEFAULTCLOCK)
 	MCFG_CPU_PROGRAM_MAP(dkong3_sound2_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state,  nmi_line_pulse)
 
 	/* sound latches */
 	MCFG_LATCH8_ADD( "latch1")

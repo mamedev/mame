@@ -329,6 +329,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
 	virtual void machine_start();
 	virtual void machine_reset();
+	INTERRUPT_GEN_MEMBER(nss_vblank_irq);
 };
 
 
@@ -814,12 +815,10 @@ static MACHINE_CONFIG_START( snes, nss_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static INTERRUPT_GEN ( nss_vblank_irq )
+INTERRUPT_GEN_MEMBER(nss_state::nss_vblank_irq)
 {
-	nss_state *state = device->machine().driver_data<nss_state>();
-
-	if(state->m_nmi_enable)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_enable)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 void nss_state::machine_reset()
@@ -845,7 +844,7 @@ static MACHINE_CONFIG_DERIVED( nss, snes )
 	MCFG_CPU_ADD("bios", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(bios_map)
 	MCFG_CPU_IO_MAP(bios_io_map)
-	MCFG_CPU_VBLANK_INT("screen", nss_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nss_state,  nss_vblank_irq)
 
 	MCFG_M50458_ADD("m50458",m50458_intf,4000000) /* TODO: correct clock */
 	MCFG_S3520CF_ADD("s3520cf") /* RTC */

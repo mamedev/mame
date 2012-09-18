@@ -41,21 +41,19 @@ WRITE8_MEMBER(munchmo_state::mnchmobl_nmi_enable_w)
 }
 
 /* trusted thru schematics, NMI and IRQ triggers at vblank, at the same time (!) */
-static INTERRUPT_GEN( mnchmobl_vblank_irq )
+INTERRUPT_GEN_MEMBER(munchmo_state::mnchmobl_vblank_irq)
 {
-	munchmo_state *state = device->machine().driver_data<munchmo_state>();
 
-	if (state->m_nmi_enable)
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
-	state->m_maincpu->set_input_line(0, HOLD_LINE);
+	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( mnchmobl_sound_irq )
+INTERRUPT_GEN_MEMBER(munchmo_state::mnchmobl_sound_irq)
 {
-	//munchmo_state *state = device->machine().driver_data<munchmo_state>();
 
-	device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(munchmo_state::mnchmobl_soundlatch_w)
@@ -330,11 +328,11 @@ static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_15MHz/4) /* ? */
 	MCFG_CPU_PROGRAM_MAP(mnchmobl_map)
-	MCFG_CPU_VBLANK_INT("screen", mnchmobl_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", munchmo_state,  mnchmobl_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_15MHz/4) /* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT("screen", mnchmobl_sound_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", munchmo_state,  mnchmobl_sound_irq)
 
 
 	/* video hardware */

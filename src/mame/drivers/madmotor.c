@@ -250,7 +250,7 @@ static MACHINE_CONFIG_START( madmotor, madmotor_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* Custom chip 59, 24 MHz crystal */
 	MCFG_CPU_PROGRAM_MAP(madmotor_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", madmotor_state,  irq6_line_hold)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", H6280, 8053000/2) /* Custom chip 45, Crystal near CPU is 8.053 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

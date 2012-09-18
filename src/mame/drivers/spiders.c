@@ -269,19 +269,19 @@ static const pia6821_interface pia_1_intf =
 	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq)		/* IRQB */
 };
 
-static INTERRUPT_GEN( update_pia_1 )
+INTERRUPT_GEN_MEMBER(spiders_state::update_pia_1)
 {
-	pia6821_device *pia1 = device->machine().device<pia6821_device>("pia1");
+	pia6821_device *pia1 = machine().device<pia6821_device>("pia1");
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA1 (COIN1) */
-	pia1->ca1_w(device->machine().root_device().ioport("IN0")->read() & 0x02);
+	pia1->ca1_w(machine().root_device().ioport("IN0")->read() & 0x02);
 
 	/* CA2 - copy of PA0 (SERVICE1) */
-	pia1->ca2_w(device->machine().root_device().ioport("IN0")->read() & 0x01);
+	pia1->ca2_w(machine().root_device().ioport("IN0")->read() & 0x01);
 
 	/* CB1 - (crosshatch) */
-	pia1->cb1_w(device->machine().root_device().ioport("XHATCH")->read());
+	pia1->cb1_w(machine().root_device().ioport("XHATCH")->read());
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -693,7 +693,7 @@ static MACHINE_CONFIG_START( spiders, spiders_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2800000)
 	MCFG_CPU_PROGRAM_MAP(spiders_main_map)
-	MCFG_CPU_PERIODIC_INT(update_pia_1, 25)
+	MCFG_CPU_PERIODIC_INT_DRIVER(spiders_state, update_pia_1,  25)
 
 	MCFG_CPU_ADD("audiocpu", M6802, 3000000)
 	MCFG_CPU_PROGRAM_MAP(spiders_audio_map)

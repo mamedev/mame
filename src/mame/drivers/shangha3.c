@@ -471,7 +471,7 @@ static MACHINE_CONFIG_START( shangha3, shangha3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(shangha3_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_hold)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -504,7 +504,7 @@ static MACHINE_CONFIG_START( heberpop, shangha3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(heberpop_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 6000000)	/* 6 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(heberpop_sound_map)
@@ -542,7 +542,7 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(blocken_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 6000000)	/* 6 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(heberpop_sound_map)

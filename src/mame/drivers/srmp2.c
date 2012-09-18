@@ -1165,8 +1165,8 @@ static MACHINE_CONFIG_START( srmp2, srmp2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)				/* 8.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(srmp2_map)
-	MCFG_CPU_VBLANK_INT("screen",irq4_line_assert)
-	MCFG_CPU_PERIODIC_INT(irq2_line_assert,15*60)		/* Interrupt times is not understood */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp2_state, irq4_line_assert)
+	MCFG_CPU_PERIODIC_INT_DRIVER(srmp2_state, irq2_line_assert, 15*60)		/* Interrupt times is not understood */
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp2)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1207,7 +1207,7 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 	//      4000000,                /* 4.00 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(srmp3_map)
 	MCFG_CPU_IO_MAP(srmp3_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp2_state,  irq0_line_assert)
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp3)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1255,8 +1255,8 @@ static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)				/* 8.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(mjyuugi_map)
-	MCFG_CPU_VBLANK_INT("screen",irq4_line_assert)
-	MCFG_CPU_PERIODIC_INT(irq2_line_assert,15*60)		/* Interrupt times is not understood */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp2_state, irq4_line_assert)
+	MCFG_CPU_PERIODIC_INT_DRIVER(srmp2_state, irq2_line_assert, 15*60)		/* Interrupt times is not understood */
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp2)
 

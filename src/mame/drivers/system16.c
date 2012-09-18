@@ -100,9 +100,9 @@
 #define SHADOW_COLORS_MULTIPLIER 2
 
 
-static INTERRUPT_GEN( sys16_interrupt )
+INTERRUPT_GEN_MEMBER(segas1x_bootleg_state::sys16_interrupt)
 {
-	device->execute().set_input_line(4, HOLD_LINE); /* Interrupt vector 4, used by VBlank */
+	device.execute().set_input_line(4, HOLD_LINE); /* Interrupt vector 4, used by VBlank */
 }
 
 
@@ -2015,7 +2015,7 @@ static MACHINE_CONFIG_START( system16, segas1x_bootleg_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_VBLANK_INT("screen", sys16_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  sys16_interrupt)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -2165,7 +2165,7 @@ static MACHINE_CONFIG_START( goldnaxeb1, segas1x_bootleg_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(goldnaxeb1_map)
-	MCFG_CPU_VBLANK_INT("screen", sys16_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  sys16_interrupt)
 
 
 	/* video hardware */
@@ -2295,7 +2295,7 @@ static MACHINE_CONFIG_START( system18, segas1x_bootleg_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(sound_18_map)

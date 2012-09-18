@@ -64,4 +64,7 @@ public:
 	UINT32 screen_update_tceptor_3d_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_tceptor_3d_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_tceptor(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(m6809_vb_interrupt);
+	INTERRUPT_GEN_MEMBER(m68k_vb_interrupt);
+	INTERRUPT_GEN_MEMBER(mcu_vb_interrupt);
 };

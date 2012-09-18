@@ -114,6 +114,7 @@ public:
 	DECLARE_MACHINE_RESET(dlair);
 	DECLARE_PALETTE_INIT(dleuro);
 	UINT32 screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_callback);
 };
 
 
@@ -277,13 +278,13 @@ MACHINE_RESET_MEMBER(dlair_state,dlair)
  *
  *************************************/
 
-static INTERRUPT_GEN( vblank_callback )
+INTERRUPT_GEN_MEMBER(dlair_state::vblank_callback)
 {
 	/* also update the speaker on the European version */
-	beep_device *beep = device->machine().device<beep_device>("beep");
+	beep_device *beep = machine().device<beep_device>("beep");
 	if (beep != NULL)
 	{
-		z80ctc_device *ctc = device->machine().device<z80ctc_device>("ctc");
+		z80ctc_device *ctc = machine().device<z80ctc_device>("ctc");
 		beep_set_state(beep, 1);
 		beep_set_frequency(beep, ATTOSECONDS_TO_HZ(ctc->period(0).attoseconds));
 	}
@@ -723,8 +724,8 @@ static MACHINE_CONFIG_START( dlair_base, dlair_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
 	MCFG_CPU_PROGRAM_MAP(dlus_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_callback)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, (double)MASTER_CLOCK_US/8/16/16/16/16)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dlair_state,  vblank_callback)
+	MCFG_CPU_PERIODIC_INT_DRIVER(dlair_state, irq0_line_hold,  (double)MASTER_CLOCK_US/8/16/16/16/16)
 
 	MCFG_MACHINE_START_OVERRIDE(dlair_state,dlair)
 	MCFG_MACHINE_RESET_OVERRIDE(dlair_state,dlair)
@@ -761,7 +762,7 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 	MCFG_CPU_CONFIG(dleuro_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(dleuro_map)
 	MCFG_CPU_IO_MAP(dleuro_io_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_callback)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dlair_state,  vblank_callback)
 
 	MCFG_Z80CTC_ADD("ctc", MASTER_CLOCK_EURO/4 /* same as "maincpu" */, ctc_intf)
 	MCFG_Z80SIO_ADD("sio", MASTER_CLOCK_EURO/4 /* same as "maincpu" */, sio_intf)

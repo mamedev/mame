@@ -212,19 +212,18 @@ MACHINE_RESET_MEMBER(mcr68_state,zwackery)
  *
  *************************************/
 
-INTERRUPT_GEN( mcr68_interrupt )
+INTERRUPT_GEN_MEMBER(mcr68_state::mcr68_interrupt)
 {
-	mcr68_state *state = device->machine().driver_data<mcr68_state>();
 	/* update the 6840 VBLANK clock */
-	if (!state->m_m6840_state[0].timer_active)
-		subtract_from_counter(device->machine(), 0, 1);
+	if (!m_m6840_state[0].timer_active)
+		subtract_from_counter(machine(), 0, 1);
 
 	logerror("--- VBLANK ---\n");
 
 	/* also set a timer to generate the 493 signal at a specific time before the next VBLANK */
 	/* the timing of this is crucial for Blasted and Tri-Sports, which check the timing of */
 	/* VBLANK and 493 using counter 2 */
-	device->machine().scheduler().timer_set(attotime::from_hz(30) - state->m_timing_factor, state->m_v493_callback, state->m_v493_callback_name);
+	machine().scheduler().timer_set(attotime::from_hz(30) - m_timing_factor, m_v493_callback, m_v493_callback_name);
 }
 
 

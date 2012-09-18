@@ -991,7 +991,7 @@ static MACHINE_CONFIG_START( jangou, jangou_state )
 	MCFG_CPU_ADD("cpu0", Z80, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(cpu0_map)
 	MCFG_CPU_IO_MAP(cpu0_io)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", jangou_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("cpu1", Z80, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)

@@ -605,7 +605,7 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 	MCFG_CPU_ADD("maincpu", Z80,10000000/2)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(chinsan_map)
 	MCFG_CPU_IO_MAP(chinsan_io)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", chinsan_state,  irq0_line_hold)
 
 
 	/* video hardware */

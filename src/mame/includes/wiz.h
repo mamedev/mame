@@ -51,4 +51,6 @@ public:
 	UINT32 screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_stinger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_kungfut(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(wiz_vblank_interrupt);
+	INTERRUPT_GEN_MEMBER(wiz_sound_interrupt);
 };

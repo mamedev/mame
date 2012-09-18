@@ -140,6 +140,10 @@ public:
 	UINT32 screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_blswhstl(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(cuebrick_interrupt);
+	INTERRUPT_GEN_MEMBER(punkshot_interrupt);
+	INTERRUPT_GEN_MEMBER(lgtnfght_interrupt);
+	INTERRUPT_GEN_MEMBER(tmnt_vblank_irq);
 };
 
 

@@ -284,7 +284,7 @@ static MACHINE_CONFIG_START( d9final, d9final_state )
 	MCFG_CPU_ADD("maincpu", Z80, 24000000/4)/* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(d9final_map)
 	MCFG_CPU_IO_MAP(d9final_io)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", d9final_state,  irq0_line_hold)
 
 
 	/* video hardware */

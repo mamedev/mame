@@ -112,6 +112,7 @@ public:
 	DECLARE_DRIVER_INIT(decode);
 	virtual void machine_start();
 	virtual void machine_reset();
+	INTERRUPT_GEN_MEMBER(timer_irq);
 };
 
 
@@ -185,13 +186,12 @@ WRITE8_MEMBER(bfmsys85_state::watchdog_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-static INTERRUPT_GEN( timer_irq )
+INTERRUPT_GEN_MEMBER(bfmsys85_state::timer_irq)
 {
-	bfmsys85_state *state = device->machine().driver_data<bfmsys85_state>();
-	if ( state->m_is_timer_enabled )
+	if ( m_is_timer_enabled )
 	{
-		state->m_irq_status = 0x01 |0x02; //0xff;
-		generic_pulse_irq_line(device, M6809_IRQ_LINE, 1);
+		m_irq_status = 0x01 |0x02; //0xff;
+		generic_pulse_irq_line(device.execute(), M6809_IRQ_LINE, 1);
 	}
 }
 
@@ -418,7 +418,7 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_START( bfmsys85, bfmsys85_state )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap)						// setup read and write memorymap
-	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )				// generate 1000 IRQ's per second
+	MCFG_CPU_PERIODIC_INT_DRIVER(bfmsys85_state, timer_irq,  1000)				// generate 1000 IRQ's per second
 	MCFG_MSC1937_ADD("vfd",0,RIGHT_TO_LEFT)
 
 	MCFG_ACIA6850_ADD("acia6850_0", m6809_acia_if)

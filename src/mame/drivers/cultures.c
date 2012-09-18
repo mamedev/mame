@@ -57,6 +57,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(cultures_interrupt);
 };
 
 
@@ -362,11 +363,10 @@ static GFXDECODE_START( culture )
 	GFXDECODE_ENTRY("gfx3", 0, gfxlayout, 0x1000, 0x10 )
 GFXDECODE_END
 
-static INTERRUPT_GEN( cultures_interrupt )
+INTERRUPT_GEN_MEMBER(cultures_state::cultures_interrupt)
 {
-	cultures_state *state = device->machine().driver_data<cultures_state>();
-	if (state->m_irq_enable)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if (m_irq_enable)
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 void cultures_state::machine_start()
@@ -398,7 +398,7 @@ static MACHINE_CONFIG_START( cultures, cultures_state )
 	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
 	MCFG_CPU_PROGRAM_MAP(cultures_map)
 	MCFG_CPU_IO_MAP(cultures_io_map)
-	MCFG_CPU_VBLANK_INT("screen", cultures_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cultures_state,  cultures_interrupt)
 
 
 	/* video hardware */

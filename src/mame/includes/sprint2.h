@@ -66,6 +66,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_sprint2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sprint2(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(sprint2);
 };
 
 /*----------- defined in audio/sprint2.c -----------*/

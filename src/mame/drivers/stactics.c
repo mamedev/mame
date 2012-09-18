@@ -151,13 +151,12 @@ WRITE8_MEMBER(stactics_state::stactics_coin_lockout_w)
  *
  *************************************/
 
-static INTERRUPT_GEN( stactics_interrupt )
+INTERRUPT_GEN_MEMBER(stactics_state::stactics_interrupt)
 {
-	stactics_state *state = device->machine().driver_data<stactics_state>();
 
-	move_motor(device->machine(), state);
+	move_motor(machine(), this);
 
-    device->execute().set_input_line(0, HOLD_LINE);
+    device.execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -303,7 +302,7 @@ static MACHINE_CONFIG_START( stactics, stactics_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 1933560)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", stactics_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", stactics_state,  stactics_interrupt)
 
 
 	/* video hardware */

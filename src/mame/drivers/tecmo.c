@@ -633,7 +633,7 @@ static MACHINE_CONFIG_START( rygar, tecmo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rygar_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmo_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("soundcpu", Z80, XTAL_4MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rygar_sound_map)
@@ -692,7 +692,7 @@ static MACHINE_CONFIG_START( backfirt, tecmo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)
 	MCFG_CPU_PROGRAM_MAP(rygar_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmo_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("soundcpu", Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(rygar_sound_map)

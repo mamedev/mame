@@ -647,7 +647,7 @@ static MACHINE_CONFIG_START( ltcasino, ltcasino_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,2000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(ltcasino_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ltcasino_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

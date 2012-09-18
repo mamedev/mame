@@ -343,7 +343,7 @@ static MACHINE_CONFIG_START( supbtime, supbtime_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
 	MCFG_CPU_PROGRAM_MAP(supbtime_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", supbtime_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8)	/* Custom chip 45, audio section crystal is 32.220 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -384,7 +384,7 @@ static MACHINE_CONFIG_START( chinatwn, supbtime_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
 	MCFG_CPU_PROGRAM_MAP(chinatwn_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", supbtime_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8) /* Custom chip 45, audio section crystal is 32.220 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

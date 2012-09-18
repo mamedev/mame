@@ -316,7 +316,7 @@ static MACHINE_CONFIG_START( mole, mole_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 4000000) // ???
 	MCFG_CPU_PROGRAM_MAP(mole_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mole_state,  irq0_line_hold)
 
 
 	/* video hardware */

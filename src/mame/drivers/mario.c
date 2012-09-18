@@ -323,12 +323,11 @@ GFXDECODE_END
  *
  *************************************/
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(mario_state::vblank_irq)
 {
-	mario_state *state = device->machine().driver_data<mario_state>();
 
-	if(state->m_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( mario_base, mario_state )
@@ -337,7 +336,7 @@ static MACHINE_CONFIG_START( mario_base, mario_state )
 	MCFG_CPU_ADD("maincpu", Z80, Z80_CLOCK)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mario_map)
 	MCFG_CPU_IO_MAP(mario_io_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mario_state,  vblank_irq)
 
 	/* devices */
 	MCFG_Z80DMA_ADD("z80dma", Z80_CLOCK, mario_dma)

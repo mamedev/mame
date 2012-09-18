@@ -218,6 +218,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(magicard_irq);
 };
 
 
@@ -708,18 +709,18 @@ void magicard_state::machine_reset()
 *************************/
 
 /*Probably there's a mask somewhere if it REALLY uses irqs at all...irq vectors dynamically changes after some time.*/
-static INTERRUPT_GEN( magicard_irq )
+INTERRUPT_GEN_MEMBER(magicard_state::magicard_irq)
 {
-	if(device->machine().input().code_pressed(KEYCODE_Z)) //vblank?
-		device->execute().set_input_line_and_vector(1, HOLD_LINE,0xe4/4);
-	if(device->machine().input().code_pressed(KEYCODE_X)) //uart irq
-		device->execute().set_input_line_and_vector(1, HOLD_LINE,0xf0/4);
+	if(machine().input().code_pressed(KEYCODE_Z)) //vblank?
+		device.execute().set_input_line_and_vector(1, HOLD_LINE,0xe4/4);
+	if(machine().input().code_pressed(KEYCODE_X)) //uart irq
+		device.execute().set_input_line_and_vector(1, HOLD_LINE,0xf0/4);
 }
 
 static MACHINE_CONFIG_START( magicard, magicard_state )
 	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)	/* SCC-68070 CCA84 datasheet */
 	MCFG_CPU_PROGRAM_MAP(magicard_mem)
-	MCFG_CPU_VBLANK_INT("screen", magicard_irq) /* no interrupts? (it erases the vectors..) */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", magicard_state,  magicard_irq) /* no interrupts? (it erases the vectors..) */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

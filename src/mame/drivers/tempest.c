@@ -588,7 +588,7 @@ static MACHINE_CONFIG_START( tempest, tempest_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_assert, (double)MASTER_CLOCK / 4096 / 12)
+	MCFG_CPU_PERIODIC_INT_DRIVER(tempest_state, irq0_line_assert,  (double)MASTER_CLOCK / 4096 / 12)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 256))
 
 	MCFG_ATARIVGEAROM_ADD("earom")

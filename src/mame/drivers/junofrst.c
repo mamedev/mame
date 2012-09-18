@@ -118,6 +118,7 @@ public:
 	DECLARE_DRIVER_INIT(junofrst);
 	DECLARE_MACHINE_START(junofrst);
 	DECLARE_MACHINE_RESET(junofrst);
+	INTERRUPT_GEN_MEMBER(junofrst_30hz_irq);
 };
 
 
@@ -418,14 +419,13 @@ MACHINE_RESET_MEMBER(junofrst_state,junofrst)
 	m_blitterdata[3] = 0;
 }
 
-static INTERRUPT_GEN( junofrst_30hz_irq )
+INTERRUPT_GEN_MEMBER(junofrst_state::junofrst_30hz_irq)
 {
-	junofrst_state *state = device->machine().driver_data<junofrst_state>();
 
 	/* flip flops cause the interrupt to be signalled every other frame */
-	state->m_irq_toggle ^= 1;
-	if (state->m_irq_toggle && state->m_irq_enable)
-		device->execute().set_input_line(0, ASSERT_LINE);
+	m_irq_toggle ^= 1;
+	if (m_irq_toggle && m_irq_enable)
+		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( junofrst, junofrst_state )
@@ -433,7 +433,7 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1500000)			/* 1.5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", junofrst_30hz_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", junofrst_state,  junofrst_30hz_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318000/8)	/* 1.78975 MHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)

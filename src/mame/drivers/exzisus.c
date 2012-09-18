@@ -274,15 +274,15 @@ static MACHINE_CONFIG_START( exzisus, exzisus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpua", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(cpua_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("cpub", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(cpub_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("cpuc", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(cpuc_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)

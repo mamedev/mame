@@ -109,6 +109,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_reel_4_tile_info);
 	virtual void video_start();
 	UINT32 screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(skylncr_vblank_interrupt);
 };
 
 
@@ -695,10 +696,9 @@ static const ay8910_interface ay8910_config =
 
 
 // It runs in IM 0, thus needs an opcode on the data bus
-static INTERRUPT_GEN( skylncr_vblank_interrupt )
+INTERRUPT_GEN_MEMBER(skylncr_state::skylncr_vblank_interrupt)
 {
-	skylncr_state *state = device->machine().driver_data<skylncr_state>();
-	if (state->m_nmi_enable) device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_enable) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -712,7 +712,7 @@ static MACHINE_CONFIG_START( skylncr, skylncr_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(mem_map_skylncr)
 	MCFG_CPU_IO_MAP(io_map_skylncr)
-	MCFG_CPU_VBLANK_INT("screen", skylncr_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", skylncr_state,  skylncr_vblank_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

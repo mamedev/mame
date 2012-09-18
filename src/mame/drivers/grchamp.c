@@ -90,21 +90,19 @@ void grchamp_state::machine_reset()
  *
  *************************************/
 
-static INTERRUPT_GEN( grchamp_cpu0_interrupt )
+INTERRUPT_GEN_MEMBER(grchamp_state::grchamp_cpu0_interrupt)
 {
-	grchamp_state *state = device->machine().driver_data<grchamp_state>();
 
-	if (state->m_cpu0_out[0] & 0x01)
-		device->execute().set_input_line(0, ASSERT_LINE);
+	if (m_cpu0_out[0] & 0x01)
+		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 
-static INTERRUPT_GEN( grchamp_cpu1_interrupt )
+INTERRUPT_GEN_MEMBER(grchamp_state::grchamp_cpu1_interrupt)
 {
-	grchamp_state *state = device->machine().driver_data<grchamp_state>();
 
-	if (state->m_cpu1_out[4] & 0x01)
-		device->execute().set_input_line(0, ASSERT_LINE);
+	if (m_cpu1_out[4] & 0x01)
+		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -671,18 +669,18 @@ static MACHINE_CONFIG_START( grchamp, grchamp_state )
 	MCFG_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT("screen", grchamp_cpu0_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", grchamp_state,  grchamp_cpu0_interrupt)
 
 	/* GAME BOARD */
 	MCFG_CPU_ADD("sub", Z80, PIXEL_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_IO_MAP(sub_portmap)
-	MCFG_CPU_VBLANK_INT("screen", grchamp_cpu1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", grchamp_state,  grchamp_cpu1_interrupt)
 
 	/* SOUND BOARD */
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, (double)SOUND_CLOCK/4/16/16/10/16)
+	MCFG_CPU_PERIODIC_INT_DRIVER(grchamp_state, irq0_line_hold,  (double)SOUND_CLOCK/4/16/16/10/16)
 
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))

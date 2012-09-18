@@ -555,7 +555,7 @@ static MACHINE_CONFIG_START( atarifb, atarifb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 750000)
 	MCFG_CPU_PROGRAM_MAP(atarifb_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(atarifb_state, irq0_line_hold, 4*60)
 
 
 	/* video hardware */

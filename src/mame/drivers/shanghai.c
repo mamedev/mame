@@ -39,6 +39,7 @@ public:
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(shanghai);
 	UINT32 screen_update_shanghai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(shanghai_interrupt);
 };
 
 
@@ -124,9 +125,9 @@ UINT32 shanghai_state::screen_update_shanghai(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-static INTERRUPT_GEN( shanghai_interrupt )
+INTERRUPT_GEN_MEMBER(shanghai_state::shanghai_interrupt)
 {
-	device->execute().set_input_line_and_vector(0,HOLD_LINE,0x80);
+	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x80);
 }
 
 WRITE16_MEMBER(shanghai_state::shanghai_coin_w)
@@ -446,7 +447,7 @@ static MACHINE_CONFIG_START( shanghai, shanghai_state )
 	MCFG_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(shanghai_map)
 	MCFG_CPU_IO_MAP(shanghai_portmap)
-	MCFG_CPU_VBLANK_INT("screen", shanghai_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state,  shanghai_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -479,7 +480,7 @@ static MACHINE_CONFIG_START( shangha2, shanghai_state )
 	MCFG_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(shangha2_map)
 	MCFG_CPU_IO_MAP(shangha2_portmap)
-	MCFG_CPU_VBLANK_INT("screen", shanghai_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state,  shanghai_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -510,7 +511,7 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(kothello_map)
-	MCFG_CPU_VBLANK_INT("screen", shanghai_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state,  shanghai_interrupt)
 
 	SEIBU3A_SOUND_SYSTEM_CPU(14318180/4)
 

@@ -828,7 +828,7 @@ static MACHINE_CONFIG_START( uballoon, suna16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(uballoon_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna16_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(uballoon_sound_map)
@@ -878,7 +878,7 @@ static MACHINE_CONFIG_START( sunaq, suna16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 24000000/4)
 	MCFG_CPU_PROGRAM_MAP(sunaq_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna16_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 14318000/4)
 	MCFG_CPU_PROGRAM_MAP(sunaq_sound_map)

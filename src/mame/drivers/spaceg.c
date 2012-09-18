@@ -428,7 +428,7 @@ static MACHINE_CONFIG_START( spaceg, spaceg_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,2500000)		 /* 2.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(spaceg_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)	/* 60 Hz NMIs (verified) */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spaceg_state,  nmi_line_pulse)	/* 60 Hz NMIs (verified) */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -257,9 +257,9 @@ static const ay8910_interface ay8910_config =
 	DEVCB_DRIVER_MEMBER(kncljoe_state,unused_w)
 };
 
-static INTERRUPT_GEN (sound_nmi)
+INTERRUPT_GEN_MEMBER(kncljoe_state::sound_nmi)
 {
-	device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 void kncljoe_state::machine_start()
@@ -289,12 +289,12 @@ static MACHINE_CONFIG_START( kncljoe, kncljoe_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", kncljoe_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("soundcpu", M6803, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(sound_nmi, (double)3970) //measured 3.970 kHz
+	MCFG_CPU_PERIODIC_INT_DRIVER(kncljoe_state, sound_nmi,  (double)3970) //measured 3.970 kHz
 
 
 	/* video hardware */

@@ -918,14 +918,14 @@ static MACHINE_CONFIG_START( darius, darius_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)	/* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(darius_map)
-	MCFG_CPU_VBLANK_INT("lscreen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", darius_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)	/* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(darius_sound_map)
 
 	MCFG_CPU_ADD("cpub", M68000,16000000/2)	/* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(darius_cpub_map)
-	MCFG_CPU_VBLANK_INT("lscreen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", darius_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("adpcm", Z80,8000000/2) /* 4 MHz ? */	/* ADPCM player using MSM5205 */
 	MCFG_CPU_PROGRAM_MAP(darius_sound2_map)

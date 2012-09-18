@@ -471,7 +471,7 @@ static MACHINE_CONFIG_START( chance32, chance32_state )
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
 	MCFG_CPU_PROGRAM_MAP(chance32_map)
 	MCFG_CPU_IO_MAP(chance32_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", chance32_state,  irq0_line_hold)
 
 
 	/* video hardware */

@@ -248,7 +248,7 @@ static MACHINE_CONFIG_START( wrally, wrally_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz/2)		/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(wrally_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wrally_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("mcu", DS5002FP, XTAL_24MHz/2)	/* verified on pcb */
 	MCFG_CPU_CONFIG(dallas_config)

@@ -355,12 +355,11 @@ void crbaloon_state::machine_reset()
  *
  *************************************/
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(crbaloon_state::vblank_irq)
 {
-	crbaloon_state *state = device->machine().driver_data<crbaloon_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if(m_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -370,7 +369,7 @@ static MACHINE_CONFIG_START( crbaloon, crbaloon_state )
 	MCFG_CPU_ADD("maincpu", Z80, CRBALOON_MASTER_XTAL / 3)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", crbaloon_state,  vblank_irq)
 
 
 	/* video hardware */

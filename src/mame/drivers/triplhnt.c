@@ -311,7 +311,7 @@ static MACHINE_CONFIG_START( triplhnt, triplhnt_state )
 /* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 800000)
 	MCFG_CPU_PROGRAM_MAP(triplhnt_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", triplhnt_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

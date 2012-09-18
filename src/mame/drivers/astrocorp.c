@@ -475,7 +475,7 @@ static MACHINE_CONFIG_START( showhand, astrocorp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(showhand_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", astrocorp_state,  irq4_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_EEPROM_93C46_ADD("eeprom")

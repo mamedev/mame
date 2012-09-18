@@ -696,7 +696,7 @@ static MACHINE_CONFIG_START( bwidow, bwidow_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(bwidow_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_assert, (double)MASTER_CLOCK / 4096 / 12)
+	MCFG_CPU_PERIODIC_INT_DRIVER(bwidow_state, irq0_line_assert,  (double)MASTER_CLOCK / 4096 / 12)
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 

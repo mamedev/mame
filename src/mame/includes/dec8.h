@@ -130,6 +130,8 @@ public:
 	UINT32 screen_update_srdarwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_cobracom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_dec8(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(gondo_interrupt);
+	INTERRUPT_GEN_MEMBER(oscar_interrupt);
 };
 
 /*----------- defined in video/dec8.c -----------*/

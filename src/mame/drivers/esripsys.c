@@ -699,7 +699,7 @@ static const esrip_config rip_config =
 static MACHINE_CONFIG_START( esripsys, esripsys_state )
 	MCFG_CPU_ADD("game_cpu", M6809E, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(game_cpu_map)
-	MCFG_CPU_VBLANK_INT("screen", esripsys_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", esripsys_state,  esripsys_vblank_irq)
 
 	MCFG_CPU_ADD("frame_cpu", M6809E, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(frame_cpu_map)

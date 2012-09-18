@@ -55,8 +55,8 @@ Known Issues:
 
 
 
-#define CPUA_IRQ_ENABLE (state->m_CPUA_register & 0x20)
-#define CPUB_IRQ_ENABLE (state->m_CPUB_register & 0x02)
+#define CPUA_IRQ_ENABLE (m_CPUA_register & 0x20)
+#define CPUB_IRQ_ENABLE (m_CPUB_register & 0x02)
 
 
 
@@ -685,16 +685,14 @@ static const k007232_interface k007232_config =
 
 /* Interrupt Generators */
 
-static INTERRUPT_GEN( CPUA_interrupt )
+INTERRUPT_GEN_MEMBER(twin16_state::CPUA_interrupt)
 {
-	twin16_state *state = device->machine().driver_data<twin16_state>();
-	if (CPUA_IRQ_ENABLE) device->execute().set_input_line(5, HOLD_LINE);
+	if (CPUA_IRQ_ENABLE) device.execute().set_input_line(5, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( CPUB_interrupt )
+INTERRUPT_GEN_MEMBER(twin16_state::CPUB_interrupt)
 {
-	twin16_state *state = device->machine().driver_data<twin16_state>();
-	if (CPUB_IRQ_ENABLE) device->execute().set_input_line(5, HOLD_LINE);
+	if (CPUB_IRQ_ENABLE) device.execute().set_input_line(5, HOLD_LINE);
 }
 
 /* Machine Drivers */
@@ -722,11 +720,11 @@ static MACHINE_CONFIG_START( twin16, twin16_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", CPUA_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", twin16_state,  CPUA_interrupt)
 
 	MCFG_CPU_ADD("sub", M68000, XTAL_18_432MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_VBLANK_INT("screen", CPUB_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", twin16_state,  CPUB_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -780,7 +778,7 @@ static MACHINE_CONFIG_START( fround, twin16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(fround_map)
-	MCFG_CPU_VBLANK_INT("screen", CPUA_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", twin16_state,  CPUA_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(sound_map)

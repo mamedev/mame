@@ -107,13 +107,13 @@
  *
  *************************************/
 
-static INTERRUPT_GEN( redalert_vblank_interrupt )
+INTERRUPT_GEN_MEMBER(redalert_state::redalert_vblank_interrupt)
 {
-	if( device->machine().root_device().ioport("COIN")->read() )
+	if( machine().root_device().ioport("COIN")->read() )
 		/* the service coin as conntected to the CPU's RDY pin as well */
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
-	device->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	device.execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -390,7 +390,7 @@ static MACHINE_CONFIG_START( redalert, redalert_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(redalert_main_map)
-	MCFG_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(redalert_video)
@@ -404,7 +404,7 @@ static MACHINE_CONFIG_START( ww3, redalert_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(ww3_main_map)
-	MCFG_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(ww3_video)
@@ -418,7 +418,7 @@ static MACHINE_CONFIG_START( panther, redalert_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(panther_main_map)
-	MCFG_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(panther_video)
@@ -432,7 +432,7 @@ static MACHINE_CONFIG_START( demoneye, redalert_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(demoneye_main_map)
-	MCFG_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(demoneye_video)

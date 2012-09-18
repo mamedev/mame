@@ -138,6 +138,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_rabbit_tilemap3_tile_info);
 	virtual void video_start();
 	UINT32 screen_update_rabbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(rabbit_vblank_interrupt);
 };
 
 
@@ -869,16 +870,15 @@ GFXDECODE_END
 
   */
 
-static INTERRUPT_GEN( rabbit_vblank_interrupt )
+INTERRUPT_GEN_MEMBER(rabbit_state::rabbit_vblank_interrupt)
 {
-	rabbit_state *state = device->machine().driver_data<rabbit_state>();
-	device->machine().device("maincpu")->execute().set_input_line(state->m_vblirqlevel, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(m_vblirqlevel, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( rabbit, rabbit_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_24MHz)
 	MCFG_CPU_PROGRAM_MAP(rabbit_map)
-	MCFG_CPU_VBLANK_INT("screen", rabbit_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", rabbit_state,  rabbit_vblank_interrupt)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 

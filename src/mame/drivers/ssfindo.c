@@ -247,6 +247,7 @@ public:
 	DECLARE_DRIVER_INIT(tetfight);
 	virtual void machine_reset();
 	UINT32 screen_update_ssfindo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(ssfindo_interrupt);
 };
 
 
@@ -330,13 +331,12 @@ static void PS7500_startTimer1(running_machine &machine)
 		state->m_PS7500timer1->adjust(attotime::from_usec(val ), 0, attotime::from_usec(val ));
 }
 
-static INTERRUPT_GEN( ssfindo_interrupt )
+INTERRUPT_GEN_MEMBER(ssfindo_state::ssfindo_interrupt)
 {
-	ssfindo_state *state = device->machine().driver_data<ssfindo_state>();
-	state->m_PS7500_IO[IRQSTA]|=0x08;
-		if(state->m_PS7500_IO[IRQMSKA]&0x08)
+	m_PS7500_IO[IRQSTA]|=0x08;
+		if(m_PS7500_IO[IRQMSKA]&0x08)
 		{
-			generic_pulse_irq_line(device, ARM7_IRQ_LINE, 1);
+			generic_pulse_irq_line(device.execute(), ARM7_IRQ_LINE, 1);
 		}
 }
 
@@ -757,7 +757,7 @@ static MACHINE_CONFIG_START( ssfindo, ssfindo_state )
 	MCFG_CPU_ADD("maincpu", ARM7, 54000000) // guess...
 	MCFG_CPU_PROGRAM_MAP(ssfindo_map)
 
-	MCFG_CPU_VBLANK_INT("screen", ssfindo_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ssfindo_state,  ssfindo_interrupt)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -142,4 +142,5 @@ public:
 	void screen_eof_taitof2_partial_buffer_delayed_thundfox(screen_device &screen, bool state);
 	void screen_eof_taitof2_full_buffer_delayed(screen_device &screen, bool state);
 	void screen_eof_taitof2_partial_buffer_delayed_qzchikyu(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(taitof2_interrupt);
 };

@@ -499,7 +499,7 @@ static MACHINE_CONFIG_START( mjsister, mjsister_state )
 	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 6.000 MHz */
 	MCFG_CPU_PROGRAM_MAP(mjsister_map)
 	MCFG_CPU_IO_MAP(mjsister_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(mjsister_state, irq0_line_hold, 2*60)
 
 
 	/* video hardware */

@@ -221,7 +221,7 @@ static MACHINE_CONFIG_START( cchance, cchance_state )
 
 	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cchance_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(cchance_state,cchance)
 	MCFG_MACHINE_RESET_OVERRIDE(cchance_state,cchance)

@@ -333,7 +333,7 @@ static MACHINE_CONFIG_START( buster, buster_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_3_579545MHz)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(mainmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", buster_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

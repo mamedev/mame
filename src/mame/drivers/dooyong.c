@@ -865,7 +865,7 @@ static MACHINE_CONFIG_START( lastday, dooyong_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(lastday_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(lastday_sound_map)
@@ -908,7 +908,7 @@ static MACHINE_CONFIG_START( gulfstrm, dooyong_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(gulfstrm_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(lastday_sound_map)
@@ -941,7 +941,7 @@ static MACHINE_CONFIG_START( pollux, dooyong_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(pollux_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(pollux_sound_map)
@@ -974,7 +974,7 @@ static MACHINE_CONFIG_START( bluehawk, dooyong_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(bluehawk_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
@@ -1006,7 +1006,7 @@ static MACHINE_CONFIG_START( flytiger, dooyong_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(flytiger_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
@@ -1038,7 +1038,7 @@ static MACHINE_CONFIG_START( primella, dooyong_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(primella_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)

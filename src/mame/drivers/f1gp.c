@@ -451,11 +451,11 @@ static MACHINE_CONFIG_START( f1gp, f1gp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(f1gp_cpu1_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("sub", M68000,XTAL_20MHz/2)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(f1gp_cpu2_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_20MHz/4)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -497,11 +497,11 @@ static MACHINE_CONFIG_START( f1gpb, f1gp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,10000000)	/* 10 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(f1gpb_cpu1_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("sub", M68000,10000000)	/* 10 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(f1gpb_cpu2_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
 	/* NO sound CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */

@@ -452,7 +452,7 @@ static MACHINE_CONFIG_START( olibochu, olibochu_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ?? */
 	MCFG_CPU_PROGRAM_MAP(olibochu_sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,60) //???
+	MCFG_CPU_PERIODIC_INT_DRIVER(olibochu_state, irq0_line_hold, 60) //???
 
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
 

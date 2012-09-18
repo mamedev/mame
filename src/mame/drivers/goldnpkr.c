@@ -3574,7 +3574,7 @@ static MACHINE_CONFIG_START( goldnpkr_base, goldnpkr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(goldnpkr_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldnpkr_state,  nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

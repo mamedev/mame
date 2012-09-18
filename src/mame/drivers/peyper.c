@@ -537,7 +537,7 @@ static MACHINE_CONFIG_START( peyper, peyper_state )
 	MCFG_CPU_ADD("maincpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(peyper_map)
 	MCFG_CPU_IO_MAP(peyper_io)
-    MCFG_CPU_PERIODIC_INT(irq0_line_hold, 1250 * 2)
+	MCFG_CPU_PERIODIC_INT_DRIVER(peyper_state, irq0_line_hold,  1250 * 2)
 
 
     /* video hardware */

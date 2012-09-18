@@ -162,6 +162,10 @@ public:
 	DECLARE_VIDEO_START(blzntrnd);
 	DECLARE_VIDEO_START(gstrik2);
 	UINT32 screen_update_metro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(metro_vblank_interrupt);
+	INTERRUPT_GEN_MEMBER(metro_periodic_interrupt);
+	INTERRUPT_GEN_MEMBER(karatour_interrupt);
+	INTERRUPT_GEN_MEMBER(puzzlet_interrupt);
 };
 
 

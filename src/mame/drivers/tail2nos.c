@@ -238,7 +238,7 @@ static MACHINE_CONFIG_START( tail2nos, tail2nos_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_20MHz/2)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tail2nos_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_20MHz/4)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

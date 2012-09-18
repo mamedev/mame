@@ -302,6 +302,7 @@ public:
 	DECLARE_MACHINE_RESET(awp_init);
 	DECLARE_MACHINE_START(sc2dmd);
 	DECLARE_MACHINE_RESET(dm01_init);
+	INTERRUPT_GEN_MEMBER(timer_irq);
 };
 
 
@@ -503,17 +504,16 @@ WRITE8_MEMBER(bfm_sc2_state::bankswitch_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-static INTERRUPT_GEN( timer_irq )
+INTERRUPT_GEN_MEMBER(bfm_sc2_state::timer_irq)
 {
-	bfm_sc2_state *state = device->machine().driver_data<bfm_sc2_state>();
-	state->m_timercnt++;
+	m_timercnt++;
 
-	if ( state->m_is_timer_enabled )
+	if ( m_is_timer_enabled )
 	{
-		state->m_irq_timer_stat = 0x01;
-		state->m_irq_status     = 0x02;
+		m_irq_timer_stat = 0x01;
+		m_irq_status     = 0x02;
 
-		generic_pulse_irq_line(device, M6809_IRQ_LINE, 1);
+		generic_pulse_irq_line(device.execute(), M6809_IRQ_LINE, 1);
 	}
 }
 
@@ -2157,7 +2157,7 @@ static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(960))									// needed for serial communication !!
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )	// 6809 CPU at 2 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap_vid)					// setup scorpion2 board memorymap
-	MCFG_CPU_PERIODIC_INT(timer_irq, 1000)				// generate 1000 IRQ's per second
+	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_state, timer_irq,  1000)				// generate 1000 IRQ's per second
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
 	MCFG_BFMBD1_ADD("vfd0",0)
@@ -3705,7 +3705,7 @@ static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(bfm_sc2_state,awp_init)
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(sc2_basemap)
-	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )
+	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_state, timer_irq,  1000)
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
 	MCFG_BFMBD1_ADD("vfd0",0)
@@ -3739,7 +3739,7 @@ static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(960))									// needed for serial communication !!
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(sc2_basemap)
-	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )
+	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_state, timer_irq,  1000)
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

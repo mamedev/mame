@@ -68,6 +68,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_carpolo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_carpolo(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(carpolo_timer_interrupt);
 };
 
 
@@ -82,8 +83,6 @@ WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2s_1_q_cb );
 WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2s_2_q_cb );
 WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2u_1_q_cb );
 WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2u_2_q_cb );
-
-INTERRUPT_GEN( carpolo_timer_interrupt );
 
 void carpolo_generate_car_car_interrupt(running_machine &machine, int car1, int car2);
 void carpolo_generate_ball_screen_interrupt(running_machine &machine, UINT8 cause);

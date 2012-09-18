@@ -73,4 +73,6 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_polygonet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(polygonet_interrupt);
+	INTERRUPT_GEN_MEMBER(audio_interrupt);
 };

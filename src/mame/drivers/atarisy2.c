@@ -259,13 +259,12 @@ MACHINE_RESET_MEMBER(atarisy2_state,atarisy2)
  *
  *************************************/
 
-static INTERRUPT_GEN( vblank_int )
+INTERRUPT_GEN_MEMBER(atarisy2_state::vblank_int)
 {
-	atarisy2_state *state = device->machine().driver_data<atarisy2_state>();
 
 	/* clock the VBLANK through */
-	if (state->m_interrupt_enable & 8)
-		atarigen_video_int_gen(device);
+	if (m_interrupt_enable & 8)
+		atarigen_video_int_gen(&device);
 }
 
 
@@ -1262,7 +1261,7 @@ static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 	MCFG_CPU_ADD("maincpu", T11, MASTER_CLOCK/2)
 	MCFG_CPU_CONFIG(t11_data)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_int)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", atarisy2_state,  vblank_int)
 
 	MCFG_CPU_ADD("soundcpu", M6502, SOUND_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)

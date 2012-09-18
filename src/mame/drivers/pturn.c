@@ -118,6 +118,8 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_pturn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(pturn_sub_intgen);
+	INTERRUPT_GEN_MEMBER(pturn_main_intgen);
 };
 
 
@@ -459,21 +461,19 @@ static INPUT_PORTS_START( pturn )
 	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
 INPUT_PORTS_END
 
-static INTERRUPT_GEN( pturn_sub_intgen )
+INTERRUPT_GEN_MEMBER(pturn_state::pturn_sub_intgen)
 {
-	pturn_state *state = device->machine().driver_data<pturn_state>();
-	if(state->m_nmi_sub)
+	if(m_nmi_sub)
 	{
-		device->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+		device.execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
-static INTERRUPT_GEN( pturn_main_intgen )
+INTERRUPT_GEN_MEMBER(pturn_state::pturn_main_intgen)
 {
-	pturn_state *state = device->machine().driver_data<pturn_state>();
-	if (state->m_nmi_main)
+	if (m_nmi_main)
 	{
-		device->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+		device.execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -486,11 +486,11 @@ void pturn_state::machine_reset()
 static MACHINE_CONFIG_START( pturn, pturn_state )
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/3)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", pturn_main_intgen)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pturn_state,  pturn_main_intgen)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 12000000/3)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_PERIODIC_INT(pturn_sub_intgen,3*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(pturn_state, pturn_sub_intgen, 3*60)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)

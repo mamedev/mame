@@ -197,6 +197,8 @@ public:
 	virtual void palette_init();
 	DECLARE_PALETTE_INIT(mjderngr);
 	UINT32 screen_update_royalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(suzume_irq);
+	INTERRUPT_GEN_MEMBER(mjtensin_interrupt);
 };
 
 
@@ -3169,7 +3171,7 @@ static MACHINE_CONFIG_START( royalmah, royalmah_state )
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)        /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(royalmah_map)
 	MCFG_CPU_IO_MAP(royalmah_iomap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3200,7 +3202,7 @@ static MACHINE_CONFIG_DERIVED( janoh, royalmah )
 	MCFG_CPU_ADD("sub", Z80, 4000000)        /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(janoh_sub_map)
 	MCFG_CPU_IO_MAP(janoh_sub_iomap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jansou, royalmah )
@@ -3211,7 +3213,7 @@ static MACHINE_CONFIG_DERIVED( jansou, royalmah )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4.000 MHz */
 	MCFG_CPU_PROGRAM_MAP(jansou_sub_map)
 	MCFG_CPU_IO_MAP(jansou_sub_iomap)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4000000/512)
+	MCFG_CPU_PERIODIC_INT_DRIVER(royalmah_state, irq0_line_hold, 4000000/512)
 
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -3246,17 +3248,16 @@ static MACHINE_CONFIG_DERIVED( ippatsu, dondenmj )
 	MCFG_CPU_IO_MAP(ippatsu_iomap)
 MACHINE_CONFIG_END
 
-static INTERRUPT_GEN( suzume_irq )
+INTERRUPT_GEN_MEMBER(royalmah_state::suzume_irq)
 {
-	royalmah_state *state = device->machine().driver_data<royalmah_state>();
-	if ( state->m_suzume_bank & 0x40 )
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if ( m_suzume_bank & 0x40 )
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( suzume, dondenmj )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(suzume_iomap)
-	MCFG_CPU_VBLANK_INT("screen", suzume_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  suzume_irq)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tontonb, dondenmj )
@@ -3332,7 +3333,7 @@ static MACHINE_CONFIG_DERIVED( mjifb, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 8000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(mjifb_map)
 	MCFG_CPU_IO_MAP(mjifb_iomap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
@@ -3343,18 +3344,17 @@ static MACHINE_CONFIG_DERIVED( mjdejavu, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 8000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(mjdejavu_map)
 	MCFG_CPU_IO_MAP(mjifb_iomap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 MACHINE_CONFIG_END
 
 
-static INTERRUPT_GEN( mjtensin_interrupt )
+INTERRUPT_GEN_MEMBER(royalmah_state::mjtensin_interrupt)
 {
-	royalmah_state *state = device->machine().driver_data<royalmah_state>();
 
-	state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);	// vblank
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);	// vblank
 }
 
 WRITE_LINE_MEMBER(royalmah_state::mjtensin_rtc_irq)
@@ -3373,7 +3373,7 @@ static MACHINE_CONFIG_DERIVED( mjtensin, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 12000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(mjtensin_map)
 	MCFG_CPU_IO_MAP(mjtensin_iomap)
-	MCFG_CPU_VBLANK_INT("screen", mjtensin_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  mjtensin_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
@@ -3386,7 +3386,7 @@ static MACHINE_CONFIG_DERIVED( cafetime, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 12000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(cafetime_map)
 	MCFG_CPU_IO_MAP(cafetime_iomap)
-	MCFG_CPU_VBLANK_INT("screen", mjtensin_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  mjtensin_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
@@ -3399,7 +3399,7 @@ static MACHINE_CONFIG_DERIVED( mjvegasa, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, XTAL_8MHz)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(mjvegasa_map)
 	MCFG_CPU_IO_MAP(mjvegasa_iomap)
-	MCFG_CPU_VBLANK_INT("screen", mjtensin_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  mjtensin_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)

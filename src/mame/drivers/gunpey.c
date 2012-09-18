@@ -95,6 +95,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_gunpey(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(gunpey_interrupt);
 };
 
 
@@ -355,9 +356,9 @@ void gunpey_state::palette_init()
 
 }
 
-static INTERRUPT_GEN( gunpey_interrupt )
+INTERRUPT_GEN_MEMBER(gunpey_state::gunpey_interrupt)
 {
-	device->execute().set_input_line_and_vector(0,HOLD_LINE,0x200/4);
+	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x200/4);
 }
 
 /***************************************************************************************/
@@ -367,7 +368,7 @@ static MACHINE_CONFIG_START( gunpey, gunpey_state )
 	MCFG_CPU_ADD("maincpu", V30, 57242400 / 4)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT("screen", gunpey_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gunpey_state,  gunpey_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -561,9 +561,9 @@ static TIMER_DEVICE_CALLBACK( airbustr_scanline )
 }
 
 /* Sub Z80 uses IM2 too, but 0xff irq routine just contains an irq ack in it */
-static INTERRUPT_GEN( slave_interrupt )
+INTERRUPT_GEN_MEMBER(airbustr_state::slave_interrupt)
 {
-	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd);
 }
 
 /* Machine Initialization */
@@ -630,12 +630,12 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 	MCFG_CPU_ADD("slave", Z80, 6000000)	// ???
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_IO_MAP(slave_io_map)
-	MCFG_CPU_VBLANK_INT("screen", slave_interrupt) /* nmi signal from master cpu */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", airbustr_state,  slave_interrupt) /* nmi signal from master cpu */
 
 	MCFG_CPU_ADD("audiocpu", Z80, 6000000)	// ???
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)		// nmi are caused by sub cpu writing a sound command
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", airbustr_state,  irq0_line_hold)		// nmi are caused by sub cpu writing a sound command
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	// Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches

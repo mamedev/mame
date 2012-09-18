@@ -2736,7 +2736,7 @@ static MACHINE_CONFIG_START( sys903, calomega_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)	/* confirmed */
 	MCFG_CPU_PROGRAM_MAP(sys903_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", calomega_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

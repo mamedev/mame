@@ -109,6 +109,7 @@ public:
 	UINT32 screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);	
 	void screen_eof_captaven(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
 };
 
 class dragngun_state : public deco32_state

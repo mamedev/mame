@@ -26,12 +26,11 @@
 #include "includes/konamipt.h"
 #include "includes/spy.h"
 
-static INTERRUPT_GEN( spy_interrupt )
+INTERRUPT_GEN_MEMBER(spy_state::spy_interrupt)
 {
-	spy_state *state = device->machine().driver_data<spy_state>();
 
-	if (k052109_is_irq_enabled(state->m_k052109))
-		device->execute().set_input_line(0, HOLD_LINE);
+	if (k052109_is_irq_enabled(m_k052109))
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(spy_state::spy_bankedram1_r)
@@ -532,7 +531,7 @@ static MACHINE_CONFIG_START( spy, spy_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 3000000) /* ? */
 	MCFG_CPU_PROGRAM_MAP(spy_map)
-	MCFG_CPU_VBLANK_INT("screen", spy_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spy_state,  spy_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(spy_sound_map)

@@ -477,15 +477,15 @@ static MACHINE_CONFIG_START( mexico86, mexico86_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
 	MCFG_CPU_PROGRAM_MAP(mexico86_sound_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mexico86_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("mcu", M68705, 4000000) /* xtal is 4MHz, divided by 4 internally */
 	MCFG_CPU_PROGRAM_MAP(mexico86_m68705_map)
-	MCFG_CPU_VBLANK_INT("screen",mexico86_m68705_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mexico86_state, mexico86_m68705_interrupt)
 
 	MCFG_CPU_ADD("sub", Z80, 8000000/2)      /* 4 MHz, Uses 8Mhz OSC */
 	MCFG_CPU_PROGRAM_MAP(mexico86_sub_cpu_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mexico86_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
 
@@ -532,7 +532,7 @@ static MACHINE_CONFIG_DERIVED( kikikai, knightb )
 	/* basic machine hardware */
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT("screen", kikikai_interrupt) // IRQs should be triggered by the MCU, but we don't have it
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mexico86_state,  kikikai_interrupt) // IRQs should be triggered by the MCU, but we don't have it
 
 	MCFG_DEVICE_REMOVE("mcu")	// we don't have code for the MC6801U4
 

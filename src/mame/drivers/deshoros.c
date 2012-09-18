@@ -261,7 +261,7 @@ static MACHINE_CONFIG_START( destiny, destiny_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_4MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 60) // timer irq controls update speed, frequency needs to be determined yet (2MHz through three 74LS390)
+	MCFG_CPU_PERIODIC_INT_DRIVER(destiny_state, irq0_line_hold,  60) // timer irq controls update speed, frequency needs to be determined yet (2MHz through three 74LS390)
 
 	/* video hardware (dummy) */
 	MCFG_SCREEN_ADD("screen", RASTER)

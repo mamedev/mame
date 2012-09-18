@@ -515,7 +515,7 @@ static MACHINE_CONFIG_START( suprgolf, suprgolf_state )
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/2) /* guess */
 	MCFG_CPU_PROGRAM_MAP(suprgolf_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", suprgolf_state,  irq0_line_hold)
 
 
 

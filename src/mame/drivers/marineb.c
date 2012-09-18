@@ -523,20 +523,18 @@ static GFXDECODE_START( hopprobo )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, marineb_big_spritelayout,    0, 64 )
 GFXDECODE_END
 
-static INTERRUPT_GEN( marineb_vblank_irq )
+INTERRUPT_GEN_MEMBER(marineb_state::marineb_vblank_irq)
 {
-	marineb_state *state = device->machine().driver_data<marineb_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_irq_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static INTERRUPT_GEN( wanted_vblank_irq )
+INTERRUPT_GEN_MEMBER(marineb_state::wanted_vblank_irq)
 {
-	marineb_state *state = device->machine().driver_data<marineb_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if(m_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -546,7 +544,7 @@ static MACHINE_CONFIG_START( marineb, marineb_state )
 	MCFG_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(marineb_map)
 	MCFG_CPU_IO_MAP(marineb_io_map)
-	MCFG_CPU_VBLANK_INT("screen", marineb_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", marineb_state,  marineb_vblank_irq)
 
 
 	/* video hardware */
@@ -606,7 +604,7 @@ static MACHINE_CONFIG_DERIVED( wanted, marineb )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(wanted_io_map)
-	MCFG_CPU_VBLANK_INT("screen", wanted_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", marineb_state,  wanted_vblank_irq)
 
 	/* video hardware */
 	MCFG_GFXDECODE(wanted)

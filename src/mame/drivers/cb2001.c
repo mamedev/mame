@@ -72,6 +72,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
 
 
@@ -737,9 +738,9 @@ static INPUT_PORTS_START( cb2001 )
 
 INPUT_PORTS_END
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(cb2001_state::vblank_irq)
 {
-	generic_pulse_irq_line(device, NEC_INPUT_LINE_INTP0, 1);
+	generic_pulse_irq_line(device.execute(), NEC_INPUT_LINE_INTP0, 1);
 }
 
 static const gfx_layout cb2001_layout =
@@ -836,7 +837,7 @@ static MACHINE_CONFIG_START( cb2001, cb2001_state )
 	MCFG_CPU_CONFIG(cb2001_config)
 	MCFG_CPU_PROGRAM_MAP(cb2001_map)
 	MCFG_CPU_IO_MAP(cb2001_io)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cb2001_state,  vblank_irq)
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )

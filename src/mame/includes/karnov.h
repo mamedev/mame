@@ -58,6 +58,7 @@ public:
 	DECLARE_VIDEO_START(karnov);
 	DECLARE_VIDEO_START(wndrplnt);
 	UINT32 screen_update_karnov(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(karnov_interrupt);
 };
 
 enum {

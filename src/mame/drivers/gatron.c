@@ -448,7 +448,7 @@ static MACHINE_CONFIG_START( gat, gatron_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/24)	/* 666.66 kHz, guess */
 	MCFG_CPU_PROGRAM_MAP(gat_map)
 	MCFG_CPU_IO_MAP(gat_portmap)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gatron_state,  nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

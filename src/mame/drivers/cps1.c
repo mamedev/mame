@@ -326,11 +326,11 @@ WRITE16_MEMBER(cps_state::cpsq_coinctrl2_w)
     }
 }
 
-INTERRUPT_GEN( cps1_interrupt )
+INTERRUPT_GEN_MEMBER(cps_state::cps1_interrupt)
 {
 	/* Strider also has a IRQ4 handler. It is input port related, but the game */
 	/* works without it. It is the *only* CPS1 game to have that. */
-	device->execute().set_input_line(2, HOLD_LINE);
+	device.execute().set_input_line(2, HOLD_LINE);
 }
 
 /********************************************************************
@@ -341,9 +341,9 @@ INTERRUPT_GEN( cps1_interrupt )
 ********************************************************************/
 
 
-static INTERRUPT_GEN( cps1_qsound_interrupt )
+INTERRUPT_GEN_MEMBER(cps_state::cps1_qsound_interrupt)
 {
-	device->execute().set_input_line(2, HOLD_LINE);
+	device.execute().set_input_line(2, HOLD_LINE);
 }
 
 
@@ -3054,7 +3054,7 @@ static MACHINE_CONFIG_START( cps1_10MHz, cps_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz )	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", cps1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  cps1_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
@@ -3109,11 +3109,11 @@ static MACHINE_CONFIG_DERIVED( qsound, cps1_12MHz )
 
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_12MHz )	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(qsound_main_map)
-	MCFG_CPU_VBLANK_INT("screen", cps1_qsound_interrupt)  /* ??? interrupts per frame */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  cps1_qsound_interrupt)  /* ??? interrupts per frame */
 
 	MCFG_CPU_REPLACE("audiocpu", Z80, XTAL_8MHz)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(qsound_sub_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 250)	/* ?? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(cps_state, irq0_line_hold,  250)	/* ?? */
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state,qsound)
 
@@ -3138,7 +3138,7 @@ static MACHINE_CONFIG_START( cpspicb, cps_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", cps1_qsound_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  cps1_qsound_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", PIC16C57, 12000000)
 	MCFG_DEVICE_DISABLE() /* no valid dumps .. */
@@ -3212,7 +3212,7 @@ static MACHINE_CONFIG_START( sf2mdt, cps_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", cps1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  cps1_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(sf2mdt_z80map)
@@ -3296,7 +3296,7 @@ static MACHINE_CONFIG_START( knightsb, cps_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 24000000 / 2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", cps1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  cps1_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 29821000 / 8)
 	MCFG_CPU_PROGRAM_MAP(sf2mdt_z80map)

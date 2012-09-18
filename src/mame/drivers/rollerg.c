@@ -277,7 +277,7 @@ static MACHINE_CONFIG_START( rollerg, rollerg_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)		/* ? */
 	MCFG_CPU_PROGRAM_MAP(rollerg_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", rollerg_state,  irq0_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(rollerg_sound_map)

@@ -272,7 +272,7 @@ static MACHINE_CONFIG_START( deniam16b, deniam_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)	/* 12.5Mhz verified */
 	MCFG_CPU_PROGRAM_MAP(deniam16b_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_25MHz/4)	/* 6.25Mhz verified */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -308,7 +308,7 @@ static MACHINE_CONFIG_START( deniam16c, deniam_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)	/* 12.5Mhz verified */
 	MCFG_CPU_PROGRAM_MAP(deniam16c_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
 
 
 	/* video hardware */

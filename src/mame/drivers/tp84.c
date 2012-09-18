@@ -278,12 +278,11 @@ static GFXDECODE_START( tp84 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 64*4*8, 16*8 )
 GFXDECODE_END
 
-static INTERRUPT_GEN( sub_vblank_irq )
+INTERRUPT_GEN_MEMBER(tp84_state::sub_vblank_irq)
 {
-	tp84_state *state = device->machine().driver_data<tp84_state>();
 
-	if(state->m_sub_irq_mask)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if(m_sub_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -309,11 +308,11 @@ static MACHINE_CONFIG_START( tp84, tp84_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1",M6809, XTAL_18_432MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(tp84_cpu1_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tp84_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_VBLANK_INT("screen", sub_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tp84_state,  sub_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(audio_map)

@@ -227,21 +227,20 @@ MACHINE_RESET_MEMBER(badlands_state,badlands)
  *
  *************************************/
 
-static INTERRUPT_GEN( vblank_int )
+INTERRUPT_GEN_MEMBER(badlands_state::vblank_int)
 {
-	badlands_state *state = device->machine().driver_data<badlands_state>();
-	int pedal_state = state->ioport("PEDALS")->read();
+	int pedal_state = ioport("PEDALS")->read();
 	int i;
 
 	/* update the pedals once per frame */
 	for (i = 0; i < 2; i++)
 	{
-		state->m_pedal_value[i]--;
+		m_pedal_value[i]--;
 		if (pedal_state & (1 << i))
-			state->m_pedal_value[i]++;
+			m_pedal_value[i]++;
 	}
 
-	atarigen_video_int_gen(device);
+	atarigen_video_int_gen(&device);
 }
 
 
@@ -502,7 +501,7 @@ static MACHINE_CONFIG_START( badlands, badlands_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_int)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", badlands_state,  vblank_int)
 
 	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
@@ -708,7 +707,7 @@ static MACHINE_CONFIG_START( badlandsb, badlands_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/4)	/* Divisor estimated */
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_int)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", badlands_state,  vblank_int)
 
 //  MCFG_CPU_ADD("audiocpu", Z80, XTAL_20MHz/12)    /* Divisor estimated */
 //  MCFG_CPU_PROGRAM_MAP(bootleg_soundmap)

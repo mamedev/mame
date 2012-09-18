@@ -223,16 +223,15 @@ Custom: GX61A01
 #include "sound/dac.h"
 #include "sound/2203intf.h"
 
-static INTERRUPT_GEN( homedata_irq )
+INTERRUPT_GEN_MEMBER(homedata_state::homedata_irq)
 {
-	homedata_state *state = device->machine().driver_data<homedata_state>();
-	state->m_vblank = 1;
-	device->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+	m_vblank = 1;
+	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( upd7807_irq )
+INTERRUPT_GEN_MEMBER(homedata_state::upd7807_irq)
 {
-	device->execute().set_input_line(UPD7810_INTF1, HOLD_LINE);
+	device.execute().set_input_line(UPD7810_INTF1, HOLD_LINE);
 }
 
 
@@ -1246,7 +1245,7 @@ static MACHINE_CONFIG_START( mrokumei, homedata_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
 	MCFG_CPU_PROGRAM_MAP(mrokumei_map)
-	MCFG_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq)	/* also triggered by the blitter */
 
 	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4MHz ? */
 	MCFG_CPU_PROGRAM_MAP(mrokumei_sound_map)
@@ -1312,13 +1311,13 @@ static MACHINE_CONFIG_START( reikaids, homedata_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
 	MCFG_CPU_PROGRAM_MAP(reikaids_map)
-	MCFG_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq)	/* also triggered by the blitter */
 
 	MCFG_CPU_ADD("audiocpu", UPD7807, 8000000)	/* ??? MHz (max speed for the 7807 is 12MHz) */
 	MCFG_CPU_CONFIG(upd_config)
 	MCFG_CPU_PROGRAM_MAP(reikaids_upd7807_map)
 	MCFG_CPU_IO_MAP(reikaids_upd7807_io_map)
-	MCFG_CPU_VBLANK_INT("screen", upd7807_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))	// very high interleave required to sync for startup tests
 
@@ -1362,13 +1361,13 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
 	MCFG_CPU_PROGRAM_MAP(pteacher_map)
-	MCFG_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq)	/* also triggered by the blitter */
 
 	MCFG_CPU_ADD("audiocpu", UPD7807, 9000000)	/* 9MHz ? */
 	MCFG_CPU_CONFIG(upd_config)
 	MCFG_CPU_PROGRAM_MAP(pteacher_upd7807_map)
 	MCFG_CPU_IO_MAP(pteacher_upd7807_io_map)
-	MCFG_CPU_VBLANK_INT("screen", upd7807_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	// should be enough
 

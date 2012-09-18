@@ -422,21 +422,19 @@ static const namco_interface namco_config =
 	0					/* stereo */
 };
 
-static INTERRUPT_GEN( main_vblank_irq )
+INTERRUPT_GEN_MEMBER(skykid_state::main_vblank_irq)
 {
-	skykid_state *state = device->machine().driver_data<skykid_state>();
 
-	if(state->m_main_irq_mask)
-		device->execute().set_input_line(0, ASSERT_LINE);
+	if(m_main_irq_mask)
+		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 
-static INTERRUPT_GEN( mcu_vblank_irq )
+INTERRUPT_GEN_MEMBER(skykid_state::mcu_vblank_irq)
 {
-	skykid_state *state = device->machine().driver_data<skykid_state>();
 
-	if(state->m_mcu_irq_mask)
-		device->execute().set_input_line(0, ASSERT_LINE);
+	if(m_mcu_irq_mask)
+		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -445,12 +443,12 @@ static MACHINE_CONFIG_START( skykid, skykid_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,49152000/32)
 	MCFG_CPU_PROGRAM_MAP(skykid_map)
-	MCFG_CPU_VBLANK_INT("screen", main_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", skykid_state,  main_vblank_irq)
 
 	MCFG_CPU_ADD("mcu", HD63701,49152000/8)	/* or compatible 6808 with extra instructions */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_port_map)
-	MCFG_CPU_VBLANK_INT("screen", mcu_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", skykid_state,  mcu_vblank_irq)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* we need heavy synch */
 

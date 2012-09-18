@@ -37,6 +37,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_photon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(pk8000_interrupt);
 };
 
 
@@ -185,9 +186,9 @@ static INPUT_PORTS_START( photon )
 	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static INTERRUPT_GEN( pk8000_interrupt )
+INTERRUPT_GEN_MEMBER(photon_state::pk8000_interrupt)
 {
-	device->execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 static IRQ_CALLBACK(pk8000_irq_callback)
@@ -217,7 +218,7 @@ static MACHINE_CONFIG_START( photon, photon_state )
     MCFG_CPU_ADD("maincpu",I8080, 1780000)
     MCFG_CPU_PROGRAM_MAP(pk8000_mem)
     MCFG_CPU_IO_MAP(pk8000_io)
-    MCFG_CPU_VBLANK_INT("screen", pk8000_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", photon_state,  pk8000_interrupt)
 
 
     /* video hardware */

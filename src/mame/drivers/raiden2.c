@@ -1006,9 +1006,9 @@ UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_ind16 
  *
  *************************************/
 
-static INTERRUPT_GEN( raiden2_interrupt )
+INTERRUPT_GEN_MEMBER(raiden2_state::raiden2_interrupt)
 {
-	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0/4);	/* VBL */
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0/4);	/* VBL */
 }
 
 
@@ -1825,7 +1825,7 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,XTAL_32MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(raiden2_mem)
-	MCFG_CPU_VBLANK_INT("screen", raiden2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden2_state,  raiden2_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,raiden2)
 
@@ -1881,7 +1881,7 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,XTAL_32MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(zeroteam_mem)
-	MCFG_CPU_VBLANK_INT("screen", raiden2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden2_state,  raiden2_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,zeroteam)
 

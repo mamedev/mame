@@ -71,6 +71,7 @@ public:
 	DECLARE_WRITE16_MEMBER(mahjong_panel_w);
 	DECLARE_WRITE16_MEMBER(sengokmj_out_w);
 	DECLARE_READ16_MEMBER(sengokmj_system_r);
+	INTERRUPT_GEN_MEMBER(sengokmj_interrupt);
 };
 
 
@@ -288,9 +289,9 @@ static GFXDECODE_START( sengokmj )
 	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout, 0x700, 0x10 ) /* Text */
 GFXDECODE_END
 
-static INTERRUPT_GEN( sengokmj_interrupt )
+INTERRUPT_GEN_MEMBER(sengokmj_state::sengokmj_interrupt)
 {
-	device->execute().set_input_line_and_vector(0,HOLD_LINE,0xc8/4);
+	device.execute().set_input_line_and_vector(0,HOLD_LINE,0xc8/4);
 }
 
 static MACHINE_CONFIG_START( sengokmj, sengokmj_state )
@@ -299,7 +300,7 @@ static MACHINE_CONFIG_START( sengokmj, sengokmj_state )
 	MCFG_CPU_ADD("maincpu", V30, 16000000/2) /* V30-8 */
 	MCFG_CPU_PROGRAM_MAP(sengokmj_map)
 	MCFG_CPU_IO_MAP(sengokmj_io_map)
-	MCFG_CPU_VBLANK_INT("screen", sengokmj_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sengokmj_state,  sengokmj_interrupt)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 

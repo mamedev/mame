@@ -479,6 +479,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_mastboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(mastboy_interrupt);
 };
 
 
@@ -693,12 +694,11 @@ WRITE8_MEMBER(mastboy_state::mastboy_irq0_ack_w)
 		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
-static INTERRUPT_GEN( mastboy_interrupt )
+INTERRUPT_GEN_MEMBER(mastboy_state::mastboy_interrupt)
 {
-	mastboy_state *state = device->machine().driver_data<mastboy_state>();
-	if ((state->m_irq0_ack & 1) == 1)
+	if ((m_irq0_ack & 1) == 1)
 	{
-		device->execute().set_input_line(0, ASSERT_LINE);
+		device.execute().set_input_line(0, ASSERT_LINE);
 	}
 }
 
@@ -888,7 +888,7 @@ static MACHINE_CONFIG_START( mastboy, mastboy_state )
 	MCFG_CPU_ADD("maincpu", Z180, 12000000/2)	/* HD647180X0CP6-1M1R */
 	MCFG_CPU_PROGRAM_MAP(mastboy_map)
 	MCFG_CPU_IO_MAP(mastboy_io_map)
-	MCFG_CPU_VBLANK_INT("screen", mastboy_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mastboy_state,  mastboy_interrupt)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

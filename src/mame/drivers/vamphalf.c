@@ -985,7 +985,7 @@ static QS1000_INTERFACE( qs1000_intf )
 static MACHINE_CONFIG_START( common, vamphalf_state )
 	MCFG_CPU_ADD("maincpu", E116T, 50000000)	/* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -1045,7 +1045,7 @@ static MACHINE_CONFIG_DERIVED( misncrft, common )
 	MCFG_CPU_REPLACE("maincpu", GMS30C2116, 50000000)	/* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_map)
 	MCFG_CPU_IO_MAP(misncrft_io)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	MCFG_FRAGMENT_ADD(sound_qs1000)
 MACHINE_CONFIG_END
@@ -1076,7 +1076,7 @@ static MACHINE_CONFIG_DERIVED( mrdig, common )
 	MCFG_CPU_PROGRAM_MAP(common_map)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mrdig_io)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	MCFG_FRAGMENT_ADD(sound_ym_oki)
 MACHINE_CONFIG_END
@@ -1085,7 +1085,7 @@ static MACHINE_CONFIG_DERIVED( wyvernwg, common )
 	MCFG_CPU_REPLACE("maincpu", E132T, 50000000)	/* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
 	MCFG_CPU_IO_MAP(wyvernwg_io)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	MCFG_FRAGMENT_ADD(sound_qs1000)
 MACHINE_CONFIG_END
@@ -1094,7 +1094,7 @@ static MACHINE_CONFIG_DERIVED( finalgdr, common )
 	MCFG_CPU_REPLACE("maincpu", E132T, 50000000)	/* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
 	MCFG_CPU_IO_MAP(finalgdr_io)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1105,7 +1105,7 @@ static MACHINE_CONFIG_DERIVED( mrkicker, common )
 	MCFG_CPU_REPLACE("maincpu", E132T, 50000000)	/* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
 	MCFG_CPU_IO_MAP(mrkicker_io)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1116,7 +1116,7 @@ static MACHINE_CONFIG_START( aoh, vamphalf_state )
 	MCFG_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(aoh_map)
 	MCFG_CPU_IO_MAP(aoh_io)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 

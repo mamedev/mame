@@ -7484,7 +7484,7 @@ static MACHINE_CONFIG_START( tndrcade, seta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(tndrcade_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
 
 	MCFG_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(tndrcade_sub_map)
@@ -7534,7 +7534,7 @@ static MACHINE_CONFIG_START( twineagl, seta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(downtown_map)
-	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
 	MCFG_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(twineagl_sub_map)
@@ -7637,7 +7637,7 @@ static MACHINE_CONFIG_START( usclssic, seta_state )
 
 	MCFG_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(calibr50_sub_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* NMI caused by main cpu when writing to the sound latch */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq0_line_hold)	/* NMI caused by main cpu when writing to the sound latch */
 
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
 
@@ -7685,7 +7685,7 @@ static MACHINE_CONFIG_START( calibr50, seta_state )
 
 	MCFG_CPU_ADD("sub", M65C02, XTAL_16MHz/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(calibr50_sub_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)	/* IRQ: 4/frame
+	MCFG_CPU_PERIODIC_INT_DRIVER(seta_state, irq0_line_hold, 4*60)	/* IRQ: 4/frame
                                NMI: when the 68k writes the sound latch */
 
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
@@ -7724,7 +7724,7 @@ static MACHINE_CONFIG_START( metafox, seta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(downtown_map)
-	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
 	MCFG_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(metafox_sub_map)
@@ -7877,7 +7877,7 @@ static MACHINE_CONFIG_START( blockcar, seta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(blockcar_map)
-	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
@@ -8151,9 +8151,9 @@ MACHINE_CONFIG_END
                                 Gundhara
 ***************************************************************************/
 #if __uPD71054_TIMER
-static INTERRUPT_GEN( wrofaero_interrupt )
+INTERRUPT_GEN_MEMBER(seta_state::wrofaero_interrupt)
 {
-	device->execute().set_input_line(2, HOLD_LINE );
+	device.execute().set_input_line(2, HOLD_LINE );
 }
 
 MACHINE_START_MEMBER(seta_state,wrofaero){ uPD71054_timer_init(machine()); }
@@ -8290,7 +8290,7 @@ static MACHINE_CONFIG_START( kamenrid, seta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(kamenrid_map)
-	MCFG_CPU_VBLANK_INT("screen", wrofaero_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
 
 #if	__uPD71054_TIMER
 	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
@@ -8442,7 +8442,7 @@ static MACHINE_CONFIG_START( madshark, seta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(madshark_map)
-	MCFG_CPU_VBLANK_INT("screen", wrofaero_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
 
 #if	__uPD71054_TIMER
 	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
@@ -8484,7 +8484,7 @@ static MACHINE_CONFIG_START( magspeed, seta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(magspeed_map)
-	MCFG_CPU_VBLANK_INT("screen", wrofaero_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
 
 #if	__uPD71054_TIMER
 	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
@@ -8527,7 +8527,7 @@ static MACHINE_CONFIG_START( msgundam, seta_state )
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(msgundam_map)
 #if	__uPD71054_TIMER
-	MCFG_CPU_VBLANK_INT("screen", wrofaero_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
 #else
 	MCFG_TIMER_ADD_SCANLINE("scantimer", seta_interrupt_2_and_4, "screen", 0, 1)
 #endif	// __uPD71054_TIMER
@@ -8609,7 +8609,7 @@ static MACHINE_CONFIG_START( triplfun, seta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(triplfun_map)
-	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
@@ -8643,7 +8643,7 @@ static MACHINE_CONFIG_START( kiwame, seta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(kiwame_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)/* lev 1-7 are the same. WARNING:
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)/* lev 1-7 are the same. WARNING:
                                    the interrupt table is written to. */
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -8722,7 +8722,7 @@ static MACHINE_CONFIG_START( thunderl, seta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(thunderl_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
@@ -8772,7 +8772,7 @@ static MACHINE_CONFIG_DERIVED( thunderlbl, thunderl )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(thunderlbl_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 10000000/2)
 	MCFG_CPU_PROGRAM_MAP(thunderlbl_sound_map)
@@ -8790,7 +8790,7 @@ static MACHINE_CONFIG_START( wiggie, seta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(wiggie_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(wiggie_sound_map)
@@ -8827,7 +8827,7 @@ static MACHINE_CONFIG_START( wits, seta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(thunderl_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
@@ -8863,7 +8863,7 @@ static MACHINE_CONFIG_START( umanclub, seta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(umanclub_map)
-	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
@@ -8945,7 +8945,7 @@ static MACHINE_CONFIG_START( wrofaero, seta_state )
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(wrofaero_map)
 #if	__uPD71054_TIMER
-	MCFG_CPU_VBLANK_INT("screen", wrofaero_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
 #else
 	MCFG_TIMER_ADD_SCANLINE("scantimer", seta_interrupt_2_and_4, "screen", 0, 1)
 #endif	// __uPD71054_TIMER
@@ -8995,7 +8995,7 @@ static MACHINE_CONFIG_START( zingzip, seta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(wrofaero_map)
-	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 

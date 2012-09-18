@@ -523,22 +523,22 @@ static TIMER_CALLBACK( interrupt_callback )
 }
 
 #if 0
-static INTERRUPT_GEN( m11_interrupt )
+INTERRUPT_GEN_MEMBER(m10_state::m11_interrupt)
 {
-	device->execute().set_input_line(0, ASSERT_LINE);
-	//device->machine().scheduler().timer_set(machine.primary_screen->time_until_pos(IREMM10_VBEND), FUNC(interrupt_callback), -1);
+	device.execute().set_input_line(0, ASSERT_LINE);
+	//machine().scheduler().timer_set(machine.primary_screen->time_until_pos(IREMM10_VBEND), FUNC(interrupt_callback), -1);
 }
 
-static INTERRUPT_GEN( m10_interrupt )
+INTERRUPT_GEN_MEMBER(m10_state::m10_interrupt)
 {
-	device->execute().set_input_line(0, ASSERT_LINE);
+	device.execute().set_input_line(0, ASSERT_LINE);
 }
 #endif
 
-static INTERRUPT_GEN( m15_interrupt )
+INTERRUPT_GEN_MEMBER(m10_state::m15_interrupt)
 {
-	device->execute().set_input_line(0, ASSERT_LINE);
-	device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(IREMM10_VBSTART + 1, 80), FUNC(interrupt_callback), -1);
+	device.execute().set_input_line(0, ASSERT_LINE);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(IREMM10_VBSTART + 1, 80), FUNC(interrupt_callback), -1);
 }
 
 /*************************************
@@ -832,7 +832,7 @@ static MACHINE_CONFIG_START( m10, m10_state )
 	MCFG_MACHINE_START_OVERRIDE(m10_state,m10)
 	MCFG_MACHINE_RESET_OVERRIDE(m10_state,m10)
 
-	//MCFG_CPU_VBLANK_INT("screen", m10_interrupt)
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", m10_state,  m10_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -863,7 +863,7 @@ static MACHINE_CONFIG_DERIVED( m11, m10 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(m11_main)
-	//MCFG_CPU_VBLANK_INT("screen", m11_interrupt)
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", m10_state,  m11_interrupt)
 
 	/* sound hardware */
 MACHINE_CONFIG_END
@@ -877,7 +877,7 @@ static MACHINE_CONFIG_START( m15, m10_state )
 	MCFG_MACHINE_START_OVERRIDE(m10_state,m10)
 	MCFG_MACHINE_RESET_OVERRIDE(m10_state,m10)
 
-	MCFG_CPU_VBLANK_INT("screen", m15_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", m10_state,  m15_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

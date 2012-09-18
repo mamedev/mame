@@ -178,10 +178,10 @@ static TIMER_CALLBACK( slapshot_interrupt6 )
 }
 
 
-static INTERRUPT_GEN( slapshot_interrupt )
+INTERRUPT_GEN_MEMBER(slapshot_state::slapshot_interrupt)
 {
-	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(slapshot_interrupt6));
-	device->execute().set_input_line(5, HOLD_LINE);
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), FUNC(slapshot_interrupt6));
+	device.execute().set_input_line(5, HOLD_LINE);
 }
 
 
@@ -543,7 +543,7 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
 	MCFG_CPU_PROGRAM_MAP(slapshot_map)
-	MCFG_CPU_VBLANK_INT("screen", slapshot_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapshot_state,  slapshot_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80,32000000/8)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
@@ -589,7 +589,7 @@ static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
 	MCFG_CPU_PROGRAM_MAP(opwolf3_map)
-	MCFG_CPU_VBLANK_INT("screen", slapshot_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapshot_state,  slapshot_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80,32000000/8)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)

@@ -179,10 +179,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbatt_state )
 	AM_RANGE(0x2000, 0xffff) AM_READNOP //anything else might be left-over for a diagnostic ROM or something related to the discrete sound HW
 ADDRESS_MAP_END
 
-static INTERRUPT_GEN( tankbatt_interrupt )
+INTERRUPT_GEN_MEMBER(tankbatt_state::tankbatt_interrupt)
 {
-	tankbatt_state *state = device->machine().driver_data<tankbatt_state>();
-	if (state->m_nmi_enable) device->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+	if (m_nmi_enable) device.execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 }
 
 INPUT_CHANGED_MEMBER(tankbatt_state::coin_inserted)
@@ -287,7 +286,7 @@ static MACHINE_CONFIG_START( tankbatt, tankbatt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)	/* 1 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", tankbatt_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tankbatt_state,  tankbatt_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

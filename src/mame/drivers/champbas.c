@@ -604,12 +604,11 @@ MACHINE_RESET_MEMBER(champbas_state,champbas)
 	m_gfx_bank = 0;	// talbot has only 1 bank
 }
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(champbas_state::vblank_irq)
 {
-	champbas_state *state = device->machine().driver_data<champbas_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(0, ASSERT_LINE);
+	if(m_irq_mask)
+		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -618,7 +617,7 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(talbot_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state,  vblank_irq)
 
 	/* MCU */
 	MCFG_CPU_ADD(CPUTAG_MCU, ALPHA8201, XTAL_18_432MHz/6/8)
@@ -654,7 +653,7 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 	/* main cpu */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_main_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state,  vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_sub_map)
@@ -705,12 +704,12 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6 )
 	MCFG_CPU_PROGRAM_MAP(exctsccr_main_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4 )
 	MCFG_CPU_PROGRAM_MAP(exctsccr_sub_map)
 	MCFG_CPU_IO_MAP(exctsccr_sound_io_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 4000) /* 4 kHz, updates the dac */
+	MCFG_CPU_PERIODIC_INT_DRIVER(champbas_state, nmi_line_pulse,  4000) /* 4 kHz, updates the dac */
 
 	/* MCU */
 	MCFG_CPU_ADD(CPUTAG_MCU, ALPHA8301, XTAL_18_432MHz/6/8)		/* Actually 8302 */
@@ -762,7 +761,7 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(exctsccrb_main_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state,  vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_sub_map)

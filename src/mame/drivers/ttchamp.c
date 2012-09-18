@@ -85,6 +85,7 @@ public:
 
 	virtual void video_start();
 	UINT32 screen_update_ttchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(ttchamp_irq);
 };
 
 
@@ -269,9 +270,9 @@ static INPUT_PORTS_START(ttchamp)
 INPUT_PORTS_END
 
 
-static INTERRUPT_GEN( ttchamp_irq ) /* right? */
+INTERRUPT_GEN_MEMBER(ttchamp_state::ttchamp_irq)/* right? */
 {
-	device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( ttchamp, ttchamp_state )
@@ -279,7 +280,7 @@ static MACHINE_CONFIG_START( ttchamp, ttchamp_state )
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(ttchamp_map)
 	MCFG_CPU_IO_MAP(ttchamp_io)
-	MCFG_CPU_VBLANK_INT("screen", ttchamp_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ttchamp_state,  ttchamp_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

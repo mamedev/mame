@@ -77,6 +77,7 @@ public:
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_DRIVER_INIT(penta);
 	DECLARE_DRIVER_INIT(pengo);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
 
 
@@ -369,12 +370,11 @@ static const namco_interface namco_config =
  *
  *************************************/
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(pengo_state::vblank_irq)
 {
-	pengo_state *state = device->machine().driver_data<pengo_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if(m_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -383,7 +383,7 @@ static MACHINE_CONFIG_START( pengo, pengo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(pengo_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pengo_state,  vblank_irq)
 
 	/* video hardware */
 	MCFG_GFXDECODE(pengo)

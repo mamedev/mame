@@ -385,7 +385,7 @@ static MACHINE_CONFIG_START( tapatune, tapatune_state )
 	MCFG_CPU_ADD("soundcpu", Z80, 24000000/6 )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_assert, 183)
+	MCFG_CPU_PERIODIC_INT_DRIVER(tapatune_state, irq0_line_assert,  183)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -158,6 +158,7 @@ public:
 	virtual void video_start();
 	DECLARE_MACHINE_RESET(drivedge);
 	UINT32 screen_update_itech32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(generate_int1);
 };
 
 /*----------- defined in drivers/itech32.c -----------*/

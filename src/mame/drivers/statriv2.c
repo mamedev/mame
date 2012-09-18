@@ -110,6 +110,7 @@ public:
 	virtual void palette_init();
 	DECLARE_VIDEO_START(vertical);
 	UINT32 screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
 };
 
 
@@ -209,17 +210,16 @@ UINT32 statriv2_state::screen_update_statriv2(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-static INTERRUPT_GEN( statriv2_interrupt )
+INTERRUPT_GEN_MEMBER(statriv2_state::statriv2_interrupt)
 {
-	statriv2_state *state = device->machine().driver_data<statriv2_state>();
-	UINT8 new_coin = state->ioport("COIN")->read();
+	UINT8 new_coin = ioport("COIN")->read();
 
 	/* check the coin inputs once per frame */
-	state->m_latched_coin |= new_coin & (new_coin ^ state->m_last_coin);
-	state->m_last_coin = new_coin;
+	m_latched_coin |= new_coin & (new_coin ^ m_last_coin);
+	m_last_coin = new_coin;
 
-	device->execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
-	device->execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
+	device.execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
+	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 }
 
 
@@ -602,7 +602,7 @@ static MACHINE_CONFIG_START( statriv2, statriv2_state )
     MCFG_CPU_ADD("maincpu", I8085A, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(statriv2_map)
 	MCFG_CPU_IO_MAP(statriv2_io_map)
-	MCFG_CPU_VBLANK_INT("screen", statriv2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", statriv2_state,  statriv2_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

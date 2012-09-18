@@ -598,7 +598,7 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 
 	MCFG_CPU_ADD("sndcpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(kongamaud_map)
-	MCFG_CPU_PERIODIC_INT(irq2_line_hold, 480)
+	MCFG_CPU_PERIODIC_INT_DRIVER(kongambl_state, irq2_line_hold,  480)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 

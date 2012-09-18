@@ -288,7 +288,7 @@ static MACHINE_CONFIG_START( vroulet, vroulet_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)	//???
 	MCFG_CPU_PROGRAM_MAP(vroulet_map)
 	MCFG_CPU_IO_MAP(vroulet_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vroulet_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

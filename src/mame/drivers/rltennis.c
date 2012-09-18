@@ -147,12 +147,11 @@ static TIMER_CALLBACK( sample_player )
 	state->m_timer->adjust(attotime::from_hz( RLT_TIMER_FREQ ));
 }
 
-static INTERRUPT_GEN(  rltennis_interrupt )
+INTERRUPT_GEN_MEMBER(rltennis_state::rltennis_interrupt)
 {
-	rltennis_state *state = device->machine().driver_data<rltennis_state>();
-	++state->m_unk_counter; /* frame counter? verify */
-	device->execute().set_input_line(4, HOLD_LINE);
-	device->execute().set_input_line(1, HOLD_LINE); /* hack, to avoid dead loop */
+	++m_unk_counter; /* frame counter? verify */
+	device.execute().set_input_line(4, HOLD_LINE);
+	device.execute().set_input_line(1, HOLD_LINE); /* hack, to avoid dead loop */
 }
 
 void rltennis_state::machine_start()
@@ -185,7 +184,7 @@ static MACHINE_CONFIG_START( rltennis, rltennis_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, RLT_XTAL/2) /* 68000P8  ??? */
 	MCFG_CPU_PROGRAM_MAP(rltennis_main)
-	MCFG_CPU_VBLANK_INT("screen", rltennis_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", rltennis_state,  rltennis_interrupt)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( RLT_REFRESH_RATE )

@@ -143,6 +143,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_looping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(looping_interrupt);
 };
 
 
@@ -333,9 +334,9 @@ void looping_state::machine_start()
  *
  *************************************/
 
-static INTERRUPT_GEN( looping_interrupt )
+INTERRUPT_GEN_MEMBER(looping_state::looping_interrupt)
 {
-	device->execute().set_input_line_and_vector(0, ASSERT_LINE, 4);
+	device.execute().set_input_line_and_vector(0, ASSERT_LINE, 4);
 }
 
 
@@ -642,7 +643,7 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	MCFG_CPU_ADD("maincpu", TMS9995L, MAIN_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(looping_map)
 	MCFG_CPU_IO_MAP(looping_io_map)
-	MCFG_CPU_VBLANK_INT("screen", looping_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", looping_state,  looping_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", TMS9980L, SOUND_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(looping_sound_map)

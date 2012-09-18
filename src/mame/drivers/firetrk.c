@@ -47,13 +47,12 @@ INPUT_CHANGED_MEMBER(firetrk_state::gear_changed)
 }
 
 
-static INTERRUPT_GEN( firetrk_interrupt )
+INTERRUPT_GEN_MEMBER(firetrk_state::firetrk_interrupt)
 {
-	firetrk_state *state = device->machine().driver_data<firetrk_state>();
 
 	/* NMI interrupts are disabled during service mode in firetrk and montecar */
-	if (!state->m_in_service_mode)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (!m_in_service_mode)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -876,7 +875,7 @@ static MACHINE_CONFIG_START( firetrk, firetrk_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLOCK/12)	/* 750Khz during service mode */
 	MCFG_CPU_PROGRAM_MAP(firetrk_map)
-	MCFG_CPU_VBLANK_INT("screen", firetrk_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", firetrk_state,  firetrk_interrupt)
 	MCFG_WATCHDOG_VBLANK_INIT(5)
 
 

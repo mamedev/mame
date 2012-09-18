@@ -455,6 +455,8 @@ public:
 	DECLARE_READ8_MEMBER(test8_r);
 	virtual void video_start();
 	UINT32 screen_update_bingor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+	INTERRUPT_GEN_MEMBER(unk_irq);
 };
 
 
@@ -587,15 +589,15 @@ static INPUT_PORTS_START( bingor )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(bingor_state::vblank_irq)
 {
-//  device->execute().set_input_line_and_vector(0,HOLD_LINE,0x08/4); // reads i/o 0x200 and puts the result in ram, pic irq?
-	device->execute().set_input_line_and_vector(0,HOLD_LINE,0x4c/4); // ?
+//  device.execute().set_input_line_and_vector(0,HOLD_LINE,0x08/4); // reads i/o 0x200 and puts the result in ram, pic irq?
+	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x4c/4); // ?
 }
 
-static INTERRUPT_GEN( unk_irq )
+INTERRUPT_GEN_MEMBER(bingor_state::unk_irq)
 {
-	device->execute().set_input_line_and_vector(0,HOLD_LINE,0x48/4); // ?
+	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x48/4); // ?
 }
 
 
@@ -619,9 +621,9 @@ static MACHINE_CONFIG_START( bingor, bingor_state )
 	MCFG_CPU_ADD("maincpu", I80186, 14000000 ) //?? Mhz
 	MCFG_CPU_PROGRAM_MAP(bingor_map)
 	MCFG_CPU_IO_MAP(bingor_io)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 30)
-	MCFG_CPU_PERIODIC_INT(unk_irq, 30)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bingor_state,  vblank_irq)
+	MCFG_CPU_PERIODIC_INT_DRIVER(bingor_state, nmi_line_pulse,  30)
+	MCFG_CPU_PERIODIC_INT_DRIVER(bingor_state, unk_irq,  30)
 
 	MCFG_CPU_ADD("pic", PIC16C57, 12000000) //?? Mhz
 	MCFG_CPU_IO_MAP(pic_io_map)

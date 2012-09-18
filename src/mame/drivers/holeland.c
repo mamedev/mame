@@ -280,7 +280,7 @@ static MACHINE_CONFIG_START( holeland, holeland_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(holeland_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", holeland_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -348,7 +348,7 @@ static MACHINE_CONFIG_START( crzrally, holeland_state )
 	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)        /* 5 MHz */
 	MCFG_CPU_PROGRAM_MAP(crzrally_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", holeland_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

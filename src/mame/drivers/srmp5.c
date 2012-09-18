@@ -559,12 +559,12 @@ static MACHINE_CONFIG_START( srmp5, srmp5_state )
 	MCFG_CPU_ADD("maincpu",Z80,8000000)
 	MCFG_CPU_PROGRAM_MAP(st0016_mem)
 	MCFG_CPU_IO_MAP(st0016_io)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp5_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", R3000LE, 25000000)
 	MCFG_CPU_CONFIG(r3000_config)
 	MCFG_CPU_PROGRAM_MAP(srmp5_mem)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp5_state,  irq4_line_assert)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

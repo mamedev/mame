@@ -362,7 +362,7 @@ static MACHINE_CONFIG_START( bionicc, bionicc_state )
      * schematics indicate that nmi_line is set on  M680000 access with AB1=1
      * and IOCS=0 (active low), see pages A-1/10, A-4/10 in schematics
      */
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,4*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(bionicc_state, nmi_line_pulse, 4*60)
 
 
 	/* video hardware */

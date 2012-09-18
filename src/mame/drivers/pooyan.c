@@ -24,12 +24,11 @@
  *
  *************************************/
 
-static INTERRUPT_GEN( pooyan_interrupt )
+INTERRUPT_GEN_MEMBER(pooyan_state::pooyan_interrupt)
 {
-	pooyan_state *state = device->machine().driver_data<pooyan_state>();
 
-	if (state->m_irq_enable)
-		device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (m_irq_enable)
+		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -193,7 +192,7 @@ static MACHINE_CONFIG_START( pooyan, pooyan_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", pooyan_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pooyan_state,  pooyan_interrupt)
 
 
 	/* video hardware */

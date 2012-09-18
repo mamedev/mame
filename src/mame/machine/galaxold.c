@@ -413,9 +413,9 @@ DRIVER_INIT_MEMBER(galaxold_state,4in1)
 	state_save_register_global(machine(), m__4in1_bank);
 }
 
-INTERRUPT_GEN( hunchbks_vh_interrupt )
+INTERRUPT_GEN_MEMBER(galaxold_state::hunchbks_vh_interrupt)
 {
-	generic_pulse_irq_line_and_vector(device,0,0x03,1);
+	generic_pulse_irq_line_and_vector(device.execute(),0,0x03,1);
 }
 
 DRIVER_INIT_MEMBER(galaxold_state,ladybugg)

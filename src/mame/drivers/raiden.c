@@ -237,9 +237,9 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static INTERRUPT_GEN( raiden_interrupt )
+INTERRUPT_GEN_MEMBER(raiden_state::raiden_interrupt)
 {
-	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);	/* VBL */
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);	/* VBL */
 }
 
 static MACHINE_CONFIG_START( raiden, raiden_state )
@@ -247,11 +247,11 @@ static MACHINE_CONFIG_START( raiden, raiden_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", raiden_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden_state,  raiden_interrupt)
 
 	MCFG_CPU_ADD("sub", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_VBLANK_INT("screen", raiden_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden_state,  raiden_interrupt)
 
 	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4) /* verified on pcb */
 

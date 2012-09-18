@@ -752,7 +752,7 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 	MCFG_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(limenko_map)
 	MCFG_CPU_IO_MAP(limenko_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -780,7 +780,7 @@ static MACHINE_CONFIG_START( spotty, limenko_state )
 	MCFG_CPU_ADD("maincpu", GMS30C2232, 20000000)	/* 20 MHz, no internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(spotty_map)
 	MCFG_CPU_IO_MAP(spotty_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", AT89C4051, 4000000)	/* 4 MHz */
 	MCFG_CPU_IO_MAP(spotty_sound_io_map)

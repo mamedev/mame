@@ -768,18 +768,18 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000 )		/* 12 MHz ??? (guess) */
 	MCFG_CPU_PROGRAM_MAP(mlanding_mem)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mlanding_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("sub", M68000, 12000000 )		/* 12 MHz ??? (guess) */
 	MCFG_CPU_PROGRAM_MAP(mlanding_sub_mem)
-	MCFG_CPU_PERIODIC_INT(irq6_line_hold,7*60) /* ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(mlanding_state, irq6_line_hold, 7*60) /* ??? */
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000 )		/* 4 MHz ??? (guess) */
 	MCFG_CPU_PROGRAM_MAP(mlanding_z80_mem)
 
 	MCFG_CPU_ADD("z80sub", Z80, 4000000 )		/* 4 MHz ??? (guess) */
 	MCFG_CPU_PROGRAM_MAP(mlanding_z80_sub_mem)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mlanding_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("dsp", TMS32025,12000000)			/* 12 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(DSP_map_program)

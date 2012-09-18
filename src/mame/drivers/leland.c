@@ -737,7 +737,7 @@ static MACHINE_CONFIG_START( leland, leland_state )
 	MCFG_CPU_ADD("master", Z80, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(master_map_program)
 	MCFG_CPU_IO_MAP(master_map_io)
-	MCFG_CPU_VBLANK_INT("screen", leland_master_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", leland_state,  leland_master_interrupt)
 
 	MCFG_CPU_ADD("slave", Z80, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(slave_small_map_program)

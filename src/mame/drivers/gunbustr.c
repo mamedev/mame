@@ -57,10 +57,10 @@ static TIMER_CALLBACK( gunbustr_interrupt5 )
 	machine.device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( gunbustr_interrupt )
+INTERRUPT_GEN_MEMBER(gunbustr_state::gunbustr_interrupt)
 {
-	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000-500), FUNC(gunbustr_interrupt5));
-	device->execute().set_input_line(4, HOLD_LINE);
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000-500), FUNC(gunbustr_interrupt5));
+	device.execute().set_input_line(4, HOLD_LINE);
 }
 
 WRITE32_MEMBER(gunbustr_state::gunbustr_palette_w)
@@ -305,7 +305,7 @@ static MACHINE_CONFIG_START( gunbustr, gunbustr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(gunbustr_map)
-	MCFG_CPU_VBLANK_INT("screen", gunbustr_interrupt) /* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gunbustr_state,  gunbustr_interrupt) /* VBL */
 
 	MCFG_EEPROM_ADD("eeprom", gunbustr_eeprom_interface)
 

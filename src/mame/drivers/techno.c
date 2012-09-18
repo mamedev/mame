@@ -49,6 +49,8 @@ protected:
 private:
 	bool m_digwait;
 	UINT8 m_keyrow;
+public:	
+	INTERRUPT_GEN_MEMBER(techno_intgen);
 };
 
 
@@ -230,15 +232,14 @@ static INPUT_PORTS_START( techno )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix top left target middle") PORT_CODE(KEYCODE_EQUALS)
 INPUT_PORTS_END
 
-static INTERRUPT_GEN( techno_intgen )
+INTERRUPT_GEN_MEMBER(techno_state::techno_intgen)
 {
-	techno_state *state = device->machine().driver_data<techno_state>();
 	// vectors change per int: 88-8F, 98-9F)
-	if ((state->m_vector & 7) == 7)
-		state->m_vector = (state->m_vector ^ 0x10) & 0x97;
-	state->m_vector++;
+	if ((m_vector & 7) == 7)
+		m_vector = (m_vector ^ 0x10) & 0x97;
+	m_vector++;
 	// core doesn't support clearing of irq via hardware
-	generic_pulse_irq_line_and_vector(device, 1, state->m_vector, 1);
+	generic_pulse_irq_line_and_vector(device.execute(), 1, m_vector, 1);
 }
 
 void techno_state::machine_reset()
@@ -251,7 +252,7 @@ static MACHINE_CONFIG_START( techno, techno_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, TECHNO_MAINCLK)
 	MCFG_CPU_PROGRAM_MAP(techno_map)
-	MCFG_CPU_PERIODIC_INT(techno_intgen, TECHNO_MAINCLK/256) // 31250Hz
+	MCFG_CPU_PERIODIC_INT_DRIVER(techno_state, techno_intgen,  TECHNO_MAINCLK/256) // 31250Hz
 	//MCFG_CPU_ADD("cpu2", TMS7000, 4000000)
 	//MCFG_CPU_PROGRAM_MAP(techno_sub_map)
 

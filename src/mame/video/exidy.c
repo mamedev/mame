@@ -65,15 +65,14 @@ INLINE void latch_condition(running_machine &machine, int collision)
 }
 
 
-INTERRUPT_GEN( exidy_vblank_interrupt )
+INTERRUPT_GEN_MEMBER(exidy_state::exidy_vblank_interrupt)
 {
-	exidy_state *state = device->machine().driver_data<exidy_state>();
 	/* latch the current condition */
-	latch_condition(device->machine(), 0);
-	state->m_int_condition &= ~0x80;
+	latch_condition(machine(), 0);
+	m_int_condition &= ~0x80;
 
 	/* set the IRQ line */
-	device->execute().set_input_line(0, ASSERT_LINE);
+	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 

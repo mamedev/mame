@@ -60,7 +60,7 @@ static MACHINE_CONFIG_START( atronic, atronic_state )
 	MCFG_CPU_ADD("maincpu", Z180, 6000000)
 	MCFG_CPU_PROGRAM_MAP(atronic_map)
 	MCFG_CPU_IO_MAP(atronic_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", atronic_state,  irq0_line_hold)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

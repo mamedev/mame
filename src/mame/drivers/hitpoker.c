@@ -82,6 +82,7 @@ public:
 	DECLARE_DRIVER_INIT(hitpoker);
 	virtual void video_start();
 	UINT32 screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(hitpoker_irq);
 };
 
 
@@ -485,9 +486,9 @@ static const hc11_config hitpoker_config =
 	0x01	//INIT defaults to 0x01
 };
 
-static INTERRUPT_GEN( hitpoker_irq )
+INTERRUPT_GEN_MEMBER(hitpoker_state::hitpoker_irq)
 {
-	device->execute().set_input_line(MC68HC11_IRQ_LINE, HOLD_LINE);
+	device.execute().set_input_line(MC68HC11_IRQ_LINE, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( hitpoker, hitpoker_state )
@@ -495,7 +496,7 @@ static MACHINE_CONFIG_START( hitpoker, hitpoker_state )
 	MCFG_CPU_PROGRAM_MAP(hitpoker_map)
 	MCFG_CPU_IO_MAP(hitpoker_io)
 	MCFG_CPU_CONFIG(hitpoker_config)
-	MCFG_CPU_VBLANK_INT("screen", hitpoker_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", hitpoker_state,  hitpoker_irq)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

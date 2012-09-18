@@ -214,7 +214,7 @@ static MACHINE_CONFIG_START( victory, victory_state )
 	MCFG_CPU_ADD("maincpu", Z80, VICTORY_MAIN_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT("screen", victory_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", victory_state,  victory_vblank_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

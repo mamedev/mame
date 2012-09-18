@@ -60,6 +60,7 @@ public:
 	DECLARE_VIDEO_START(stactics);
 	DECLARE_PALETTE_INIT(stactics);
 	UINT32 screen_update_stactics(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(stactics_interrupt);
 };
 /*----------- defined in video/stactics.c -----------*/
 MACHINE_CONFIG_EXTERN( stactics_video );

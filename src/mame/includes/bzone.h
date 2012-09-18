@@ -26,6 +26,7 @@ public:
 	DECLARE_DRIVER_INIT(bradley);
 	virtual void machine_start();
 	DECLARE_MACHINE_START(redbaron);
+	INTERRUPT_GEN_MEMBER(bzone_interrupt);
 };
 
 

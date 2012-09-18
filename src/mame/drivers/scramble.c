@@ -1533,7 +1533,7 @@ static MACHINE_CONFIG_DERIVED( hunchbks, scramble )
 	MCFG_CPU_REPLACE("maincpu", S2650, 18432000/6)
 	MCFG_CPU_PROGRAM_MAP(hunchbks_map)
 	MCFG_CPU_IO_MAP(hunchbks_readport)
-	MCFG_CPU_VBLANK_INT("screen", hunchbks_vh_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", scramble_state,  hunchbks_vh_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))

@@ -135,7 +135,7 @@ static MACHINE_CONFIG_START( rcorsair, rcorsair_state )
 
 	MCFG_CPU_ADD("maincpu", I8085A,8000000)		 /* Sound CPU? */
 	MCFG_CPU_PROGRAM_MAP(rcorsair_map)
-//  MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", rcorsair_state,  irq0_line_hold)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -480,7 +480,7 @@ static MACHINE_CONFIG_START( champbwl, champbwl_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 16000000/4) /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(champbwl_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbwl_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -544,7 +544,7 @@ static MACHINE_CONFIG_START( doraemon, champbwl_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/4)
 	MCFG_CPU_PROGRAM_MAP(doraemon)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbwl_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)

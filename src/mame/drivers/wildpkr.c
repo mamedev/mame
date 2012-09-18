@@ -276,7 +276,7 @@ static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(wildpkr_map)
-//  MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)   //guess
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wildpkr_state,  irq1_line_hold)   //guess
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)

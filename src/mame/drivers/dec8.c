@@ -1955,22 +1955,20 @@ static const msm5205_interface msm5205_config =
 
 /******************************************************************************/
 
-static INTERRUPT_GEN( gondo_interrupt )
+INTERRUPT_GEN_MEMBER(dec8_state::gondo_interrupt)
 {
-	dec8_state *state = device->machine().driver_data<dec8_state>();
-	if (state->m_nmi_enable)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); /* VBL */
+	if (m_nmi_enable)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); /* VBL */
 }
 
 /* Coins generate NMI's */
-static INTERRUPT_GEN( oscar_interrupt )
+INTERRUPT_GEN_MEMBER(dec8_state::oscar_interrupt)
 {
-	dec8_state *state = device->machine().driver_data<dec8_state>();
-	if ((state->ioport("IN2")->read() & 0x7) == 0x7) state->m_latch = 1;
-	if (state->m_latch && (state->ioport("IN2")->read() & 0x7) != 0x7)
+	if ((ioport("IN2")->read() & 0x7) == 0x7) m_latch = 1;
+	if (m_latch && (ioport("IN2")->read() & 0x7) != 0x7)
 	{
-		state->m_latch = 0;
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_latch = 0;
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -2128,7 +2126,7 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP */
 	MCFG_CPU_PROGRAM_MAP(gondo_map)
-	MCFG_CPU_VBLANK_INT("screen", gondo_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  gondo_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(oscar_s_map)
@@ -2176,7 +2174,7 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP */
 	MCFG_CPU_PROGRAM_MAP(garyoret_map)
-	MCFG_CPU_VBLANK_INT("screen", gondo_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  gondo_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(oscar_s_map)
@@ -2224,7 +2222,7 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)
 	MCFG_CPU_PROGRAM_MAP(meikyuh_map)
-	MCFG_CPU_VBLANK_INT("screen", gondo_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  gondo_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
@@ -2279,7 +2277,7 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 
 	MCFG_CPU_ADD("sub", M6809, XTAL_12MHz/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(csilver_sub_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(csilver_s_map)
@@ -2328,7 +2326,7 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, XTAL_12MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(oscar_map)
-	MCFG_CPU_VBLANK_INT("screen", oscar_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  oscar_interrupt)
 
 	MCFG_CPU_ADD("sub", HD6309, XTAL_12MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(oscar_sub_map)
@@ -2379,7 +2377,7 @@ static MACHINE_CONFIG_START( srdarwin, dec8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,2000000)  /* MC68A09EP */
 	MCFG_CPU_PROGRAM_MAP(srdarwin_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
@@ -2420,7 +2418,7 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(cobra_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(dec8_s_map)

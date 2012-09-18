@@ -244,11 +244,11 @@ static MACHINE_CONFIG_START( sonson, sonson_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,12000000/6)	/* 2 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sonson_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", M6809,12000000/6)	/* 2 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)	/* FIRQs are triggered by the main CPU */
+	MCFG_CPU_PERIODIC_INT_DRIVER(sonson_state, irq0_line_hold, 4*60)	/* FIRQs are triggered by the main CPU */
 
 
 	/* video hardware */

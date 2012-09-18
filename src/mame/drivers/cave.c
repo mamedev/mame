@@ -135,10 +135,9 @@ static TIMER_DEVICE_CALLBACK( cave_vblank_start )
 }
 
 /* Called once/frame to generate the VBLANK interrupt */
-static INTERRUPT_GEN( cave_interrupt )
+INTERRUPT_GEN_MEMBER(cave_state::cave_interrupt)
 {
-	cave_state *state = device->machine().driver_data<cave_state>();
-	state->m_int_timer->adjust(attotime::from_usec(17376 - state->m_time_vblank_irq));
+	m_int_timer->adjust(attotime::from_usec(17376 - m_time_vblank_irq));
 }
 
 /* Called by the YMZ280B to set the IRQ state */
@@ -1854,7 +1853,7 @@ static MACHINE_CONFIG_START( dfeveron, cave_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(dfeveron_map)
-	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
@@ -1896,7 +1895,7 @@ static MACHINE_CONFIG_START( ddonpach, cave_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(ddonpach_map)
-	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
@@ -1942,7 +1941,7 @@ static MACHINE_CONFIG_START( donpachi, cave_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(donpachi_map)
-	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
@@ -1988,7 +1987,7 @@ static MACHINE_CONFIG_START( esprade, cave_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(esprade_map)
-	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
@@ -2029,7 +2028,7 @@ static MACHINE_CONFIG_START( gaia, cave_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(gaia_map)
-	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
@@ -2069,7 +2068,7 @@ static MACHINE_CONFIG_START( guwange, cave_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(guwange_map)
-	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
@@ -2109,7 +2108,7 @@ static MACHINE_CONFIG_START( hotdogst, cave_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(hotdogst_map)
-	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(hotdogst_sound_map)
@@ -2165,7 +2164,7 @@ static MACHINE_CONFIG_START( korokoro, cave_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(korokoro_map)
-	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
@@ -2213,7 +2212,7 @@ static MACHINE_CONFIG_START( mazinger, cave_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(mazinger_map)
-	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz) // Bidirectional communication
 	MCFG_CPU_PROGRAM_MAP(mazinger_sound_map)
@@ -2271,7 +2270,7 @@ static MACHINE_CONFIG_START( metmqstr, cave_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(metmqstr_map)
-	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(metmqstr_sound_map)
@@ -2330,7 +2329,7 @@ static MACHINE_CONFIG_START( pacslot, cave_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(pacslot_map)
-	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
@@ -2384,7 +2383,7 @@ static MACHINE_CONFIG_START( pwrinst2, cave_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(pwrinst2_map)
-	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_16MHz / 2)	/* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(pwrinst2_sound_map)
@@ -2445,7 +2444,7 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(sailormn_map)
-	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz) // Bidirectional Communication
 	MCFG_CPU_PROGRAM_MAP(sailormn_sound_map)
@@ -2503,7 +2502,7 @@ static MACHINE_CONFIG_START( tjumpman, cave_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tjumpman_map)
-	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
@@ -2547,7 +2546,7 @@ static MACHINE_CONFIG_START( uopoko, cave_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(uopoko_map)
-	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")

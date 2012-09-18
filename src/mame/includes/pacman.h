@@ -136,6 +136,9 @@ public:
 	DECLARE_VIDEO_START(jrpacman);
 	UINT32 screen_update_pacman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_s2650games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+	INTERRUPT_GEN_MEMBER(vblank_nmi);
+	INTERRUPT_GEN_MEMBER(s2650_interrupt);
 };
 
 /*----------- defined in machine/pacplus.c -----------*/

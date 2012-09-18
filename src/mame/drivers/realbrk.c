@@ -746,10 +746,10 @@ GFXDECODE_END
                         Billiard Academy Real Break
 ***************************************************************************/
 
-static INTERRUPT_GEN( realbrk_interrupt )
+INTERRUPT_GEN_MEMBER(realbrk_state::realbrk_interrupt)
 {
 	/* VBlank is connected to INT1 (external interrupts pin 1) */
-	tmp68301_external_interrupt_1(device->machine());
+	tmp68301_external_interrupt_1(machine());
 }
 
 static MACHINE_CONFIG_START( realbrk, realbrk_state )
@@ -757,7 +757,7 @@ static MACHINE_CONFIG_START( realbrk, realbrk_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_32MHz / 2)			/* !! TMP68301 !! */
 	MCFG_CPU_PROGRAM_MAP(realbrk_mem)
-	MCFG_CPU_VBLANK_INT("screen", realbrk_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", realbrk_state,  realbrk_interrupt)
 
 	MCFG_MACHINE_START( tmp68301 )
 	MCFG_MACHINE_RESET( tmp68301 )

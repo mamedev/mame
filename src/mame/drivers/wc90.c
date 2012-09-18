@@ -310,11 +310,11 @@ static MACHINE_CONFIG_START( wc90, wc90_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz)		/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(wc90_map_1)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_8MHz)		/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(wc90_map_2)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

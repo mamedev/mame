@@ -74,6 +74,8 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(superwng_nmi_interrupt);
+	INTERRUPT_GEN_MEMBER(superwng_sound_nmi_assert);
 };
 
 TILE_GET_INFO_MEMBER(superwng_state::get_bg_tile_info)
@@ -204,11 +206,10 @@ WRITE8_MEMBER(superwng_state::superwng_nmi_enable_w)
 	m_nmi_enable = data;
 }
 
-static INTERRUPT_GEN( superwng_nmi_interrupt )
+INTERRUPT_GEN_MEMBER(superwng_state::superwng_nmi_interrupt)
 {
-	superwng_state *state = device->machine().driver_data<superwng_state>();
 
-	if (BIT(state->m_nmi_enable, 0))
+	if (BIT(m_nmi_enable, 0))
 		nmi_line_pulse(device);
 }
 
@@ -229,11 +230,10 @@ WRITE8_MEMBER(superwng_state::superwng_sound_nmi_clear_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static INTERRUPT_GEN( superwng_sound_nmi_assert )
+INTERRUPT_GEN_MEMBER(superwng_state::superwng_sound_nmi_assert)
 {
-	superwng_state *state = device->machine().driver_data<superwng_state>();
-	if (BIT(state->m_nmi_enable, 0))
-		device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (BIT(m_nmi_enable, 0))
+		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(superwng_state::superwng_bg_vram_w)
@@ -466,11 +466,11 @@ static MACHINE_CONFIG_START( superwng, superwng_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(superwng_map)
-	MCFG_CPU_VBLANK_INT("screen", superwng_nmi_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", superwng_state,  superwng_nmi_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(superwng_sound_map)
-	MCFG_CPU_PERIODIC_INT(superwng_sound_nmi_assert, 4*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(superwng_state, superwng_sound_nmi_assert,  4*60)
 
 
 	/* video hardware */

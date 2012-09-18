@@ -395,10 +395,10 @@ static TIMER_CALLBACK( f3_interrupt3 )
 	machine.device("maincpu")->execute().set_input_line(3, HOLD_LINE);	// some signal from video hardware?
 }
 
-static INTERRUPT_GEN( f3_interrupt2 )
+INTERRUPT_GEN_MEMBER(taito_f3_state::f3_interrupt2)
 {
-	device->execute().set_input_line(2, HOLD_LINE);	// vblank
-	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(10000), FUNC(f3_interrupt3));
+	device.execute().set_input_line(2, HOLD_LINE);	// vblank
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), FUNC(f3_interrupt3));
 }
 
 static SOUND_RESET( f3 )
@@ -429,7 +429,7 @@ static MACHINE_CONFIG_START( f3, taito_f3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(f3_map)
-	MCFG_CPU_VBLANK_INT("screen", f3_interrupt2)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taito_f3_state,  f3_interrupt2)
 
 	MCFG_MACHINE_START_OVERRIDE(taito_f3_state,f3)
 
@@ -523,7 +523,7 @@ static MACHINE_CONFIG_START( bubsympb, taito_f3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(f3_map)
-	MCFG_CPU_VBLANK_INT("screen", f3_interrupt2)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taito_f3_state,  f3_interrupt2)
 
 	MCFG_MACHINE_START_OVERRIDE(taito_f3_state,f3)
 

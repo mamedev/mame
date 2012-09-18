@@ -53,6 +53,8 @@ protected:
 
 	virtual void video_start();
 	virtual void palette_init();
+public:	
+	INTERRUPT_GEN_MEMBER(kontest_interrupt);
 };
 
 
@@ -240,11 +242,10 @@ static const sn76496_config psg_intf =
 
 ***************************************************************************/
 
-static INTERRUPT_GEN( kontest_interrupt )
+INTERRUPT_GEN_MEMBER(kontest_state::kontest_interrupt)
 {
-	kontest_state *state = device->machine().driver_data<kontest_state>();
-	if (state->m_control & 8)
-		device->execute().set_input_line(0, ASSERT_LINE);
+	if (m_control & 8)
+		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 void kontest_state::machine_start()
@@ -264,7 +265,7 @@ static MACHINE_CONFIG_START( kontest, kontest_state )
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(kontest_map)
 	MCFG_CPU_IO_MAP(kontest_io)
-	MCFG_CPU_VBLANK_INT("screen", kontest_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", kontest_state,  kontest_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

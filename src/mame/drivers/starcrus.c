@@ -140,7 +140,7 @@ static MACHINE_CONFIG_START( starcrus, starcrus_state )
 	MCFG_CPU_ADD("maincpu", I8080,9750000/9)  /* 8224 chip is a divide by 9 */
 	MCFG_CPU_PROGRAM_MAP(starcrus_map)
 	MCFG_CPU_IO_MAP(starcrus_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", starcrus_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

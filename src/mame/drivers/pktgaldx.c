@@ -328,7 +328,7 @@ static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
 	MCFG_CPU_PROGRAM_MAP(pktgaldx_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pktgaldx_state,  irq6_line_hold)
 
 
 	/* video hardware */
@@ -367,7 +367,7 @@ static MACHINE_CONFIG_START( pktgaldb, pktgaldx_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(pktgaldb_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pktgaldx_state,  irq6_line_hold)
 
 
 	/* video hardware */

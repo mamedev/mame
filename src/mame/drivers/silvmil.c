@@ -318,7 +318,7 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(silvmil_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", silvmil_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4_096MHz) // 4.096MHz or 3.579545MHz - Need to verify
 	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)

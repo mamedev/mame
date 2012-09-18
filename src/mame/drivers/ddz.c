@@ -25,6 +25,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_ddz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_ddz(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(ddz_interrupt);
 };
 
 
@@ -47,7 +48,7 @@ void ddz_state::screen_eof_ddz(screen_device &screen, bool state)
 
 }
 
-static INTERRUPT_GEN(ddz_interrupt)
+INTERRUPT_GEN_MEMBER(ddz_state::ddz_interrupt)
 {
 //  IntReq(24);     //VRender0 VBlank
 }
@@ -66,7 +67,7 @@ static const vr0_interface vr0_config =
 static MACHINE_CONFIG_START( ddz, ddz_state )
 	MCFG_CPU_ADD("maincpu", SE3208, 43000000)
 	MCFG_CPU_PROGRAM_MAP(ddz_mem)
-	MCFG_CPU_VBLANK_INT("screen", ddz_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddz_state,  ddz_interrupt)
 
 	//MCFG_MACHINE_RESET_OVERRIDE(ddz_state,ddz)
 

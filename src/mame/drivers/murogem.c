@@ -247,7 +247,7 @@ static MACHINE_CONFIG_START( murogem, murogem_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, 8000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(murogem_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", murogem_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

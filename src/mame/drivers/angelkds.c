@@ -602,7 +602,7 @@ static MACHINE_CONFIG_START( angelkds, angelkds_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", angelkds_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(sub_map)

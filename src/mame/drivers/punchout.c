@@ -928,12 +928,11 @@ void punchout_state::machine_reset()
 	memset(m_rp5c01_mem, 0, sizeof(m_rp5c01_mem));
 }
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(punchout_state::vblank_irq)
 {
-	punchout_state *state = device->machine().driver_data<punchout_state>();
 
-	if(state->m_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -944,11 +943,11 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_CPU_ADD("maincpu", Z80, 8000000/2)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(punchout_map)
 	MCFG_CPU_IO_MAP(punchout_io_map)
-	MCFG_CPU_VBLANK_INT("top", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", N2A03, N2A03_DEFAULTCLOCK)
 	MCFG_CPU_PROGRAM_MAP(punchout_sound_map)
-	MCFG_CPU_VBLANK_INT("top", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state,  nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

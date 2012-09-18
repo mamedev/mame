@@ -339,13 +339,13 @@ static MACHINE_CONFIG_START( unclepoo, poo_state )
 	MCFG_CPU_ADD("maincpu", Z80,18000000/6)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(unclepoo_main_map)
 	MCFG_CPU_IO_MAP(unclepoo_main_portmap)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,256) // ??? controls game speed
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", poo_state,  nmi_line_pulse)
+	MCFG_CPU_PERIODIC_INT_DRIVER(poo_state, irq0_line_hold, 256) // ??? controls game speed
 
 	MCFG_CPU_ADD("subcpu", Z80,18000000/12)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(unclepoo_sub_map)
 	MCFG_CPU_IO_MAP(unclepoo_sub_portmap)
-//  MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", poo_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

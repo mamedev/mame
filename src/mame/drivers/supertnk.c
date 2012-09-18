@@ -126,6 +126,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_supertnk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(supertnk_interrupt);
 };
 
 
@@ -167,10 +168,10 @@ WRITE8_MEMBER(supertnk_state::supertnk_bankswitch_1_w)
  *
  *************************************/
 
-static INTERRUPT_GEN( supertnk_interrupt )
+INTERRUPT_GEN_MEMBER(supertnk_state::supertnk_interrupt)
 {
 	/* On a TMS9980, a 6 on the interrupt bus means a level 4 interrupt */
-	device->execute().set_input_line_and_vector(0, ASSERT_LINE, 6);
+	device.execute().set_input_line_and_vector(0, ASSERT_LINE, 6);
 }
 
 
@@ -429,7 +430,7 @@ static MACHINE_CONFIG_START( supertnk, supertnk_state )
 	MCFG_CPU_ADD("maincpu", TMS9980L, 2598750) /* ? to which frequency is the 20.79 Mhz crystal mapped down? */
 	MCFG_CPU_PROGRAM_MAP(supertnk_map)
 	MCFG_CPU_IO_MAP(supertnk_io_map)
-	MCFG_CPU_VBLANK_INT("screen", supertnk_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", supertnk_state,  supertnk_interrupt)
 
 
 	/* video hardware */

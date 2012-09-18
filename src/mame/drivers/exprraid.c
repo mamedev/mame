@@ -446,23 +446,22 @@ static const ym3526_interface ym3526_config =
 };
 
 #if 0
-static INTERRUPT_GEN( exprraid_interrupt )
+INTERRUPT_GEN_MEMBER(exprraid_state::exprraid_interrupt)
 {
-	exprraid_state *state = device->machine().driver_data<exprraid_state>();
 
-	if ((~state->ioport("IN2")->read()) & 0xc0)
+	if ((~ioport("IN2")->read()) & 0xc0)
 	{
-		if (state->m_coin == 0)
+		if (m_coin == 0)
 		{
-			state->m_coin = 1;
-			//device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-			device->execute().set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
+			m_coin = 1;
+			//device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			device.execute().set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
 		}
 	}
 	else
 	{
-		device->execute().set_input_line(DECO16_IRQ_LINE, CLEAR_LINE);
-		state->m_coin = 0;
+		device.execute().set_input_line(DECO16_IRQ_LINE, CLEAR_LINE);
+		m_coin = 0;
 	}
 }
 #endif

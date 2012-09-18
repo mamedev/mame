@@ -125,4 +125,6 @@ public:
 	UINT32 screen_update_pteacher(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mirderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_homedata(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(homedata_irq);
+	INTERRUPT_GEN_MEMBER(upd7807_irq);
 };

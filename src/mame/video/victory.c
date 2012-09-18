@@ -80,12 +80,11 @@ static void victory_update_irq(running_machine &machine)
 }
 
 
-INTERRUPT_GEN( victory_vblank_interrupt )
+INTERRUPT_GEN_MEMBER(victory_state::victory_vblank_interrupt)
 {
-	victory_state *state = device->machine().driver_data<victory_state>();
-	state->m_vblank_irq = 1;
+	m_vblank_irq = 1;
 
-	victory_update_irq(device->machine());
+	victory_update_irq(machine());
 }
 
 

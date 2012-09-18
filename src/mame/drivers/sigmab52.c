@@ -150,6 +150,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_jwildb52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(timer_irq);
 };
 
 
@@ -536,9 +537,9 @@ INPUT_PORTS_END
 *   Interrupts Gen (to fix)   *
 ******************************/
 
-static INTERRUPT_GEN( timer_irq )
+INTERRUPT_GEN_MEMBER(sigmab52_state::timer_irq)
 {
-	generic_pulse_irq_line(device, M6809_IRQ_LINE, 1);
+	generic_pulse_irq_line(device.execute(), M6809_IRQ_LINE, 1);
 }
 
 
@@ -591,13 +592,13 @@ static MACHINE_CONFIG_START( jwildb52, sigmab52_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/9)	/* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(jwildb52_map)
-	MCFG_CPU_VBLANK_INT("screen", timer_irq)	/* Fix me */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sigmab52_state,  timer_irq)	/* Fix me */
 
 #if 0
 	MCFG_CPU_ADD("audiocpu", M6809, MAIN_CLOCK/9)	/* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_prog_map)
 	//temporary teh same int as for main cpu
-	MCFG_CPU_PERIODIC_INT(timer_irq, 1000)			/* Fix me */
+	MCFG_CPU_PERIODIC_INT_DRIVER(sigmab52_state, timer_irq,  1000)			/* Fix me */
 #endif
 
 

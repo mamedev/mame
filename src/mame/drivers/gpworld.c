@@ -72,6 +72,7 @@ public:
 	DECLARE_DRIVER_INIT(gpworld);
 	virtual void machine_start();
 	UINT32 screen_update_gpworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_callback_gpworld);
 };
 
 
@@ -429,20 +430,19 @@ static TIMER_CALLBACK( irq_stop )
 	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
-static INTERRUPT_GEN( vblank_callback_gpworld )
+INTERRUPT_GEN_MEMBER(gpworld_state::vblank_callback_gpworld)
 {
-	gpworld_state *state = device->machine().driver_data<gpworld_state>();
 	/* Do an NMI if the enabled bit is set */
-	if (state->m_nmi_enable)
+	if (m_nmi_enable)
 	{
-		state->m_laserdisc->data_w(state->m_ldp_write_latch);
-		state->m_ldp_read_latch = state->m_laserdisc->status_r();
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_laserdisc->data_w(m_ldp_write_latch);
+		m_ldp_read_latch = m_laserdisc->status_r();
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	/* The time the IRQ line stays high is set just long enough to happen after the NMI - hacky? */
-	device->execute().set_input_line(0, ASSERT_LINE);
-	device->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(irq_stop));
+	device.execute().set_input_line(0, ASSERT_LINE);
+	machine().scheduler().timer_set(attotime::from_usec(100), FUNC(irq_stop));
 }
 
 static const gfx_layout gpworld_tile_layout =
@@ -467,7 +467,7 @@ static MACHINE_CONFIG_START( gpworld, gpworld_state )
 	MCFG_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mainmem)
 	MCFG_CPU_IO_MAP(mainport)
-	MCFG_CPU_VBLANK_INT("screen", vblank_callback_gpworld)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gpworld_state,  vblank_callback_gpworld)
 
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")

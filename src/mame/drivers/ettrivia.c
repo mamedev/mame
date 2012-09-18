@@ -61,6 +61,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_ettrivia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(ettrivia_interrupt);
 };
 
 
@@ -289,19 +290,19 @@ static const ay8910_interface ay8912_interface_3 =
 };
 
 
-static INTERRUPT_GEN( ettrivia_interrupt )
+INTERRUPT_GEN_MEMBER(ettrivia_state::ettrivia_interrupt)
 {
-	if( device->machine().root_device().ioport("COIN")->read() & 0x01 )
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if( machine().root_device().ioport("COIN")->read() & 0x01 )
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
-		device->execute().set_input_line(0, HOLD_LINE);
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( ettrivia, ettrivia_state )
 	MCFG_CPU_ADD("maincpu", Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT("screen", ettrivia_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ettrivia_state,  ettrivia_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

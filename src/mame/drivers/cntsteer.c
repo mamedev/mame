@@ -92,6 +92,7 @@ public:
 	DECLARE_PALETTE_INIT(zerotrgt);
 	UINT32 screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(sound_interrupt);
 };
 
 
@@ -595,11 +596,10 @@ WRITE8_MEMBER(cntsteer_state::nmimask_w)
 	m_nmimask = data & 0x80;
 }
 
-static INTERRUPT_GEN ( sound_interrupt )
+INTERRUPT_GEN_MEMBER(cntsteer_state::sound_interrupt)
 {
-	cntsteer_state *state = device->machine().driver_data<cntsteer_state>();
-	if (!state->m_nmimask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (!m_nmimask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cntsteer_state )
@@ -883,15 +883,15 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)		 /* ? */
 	MCFG_CPU_PROGRAM_MAP(cntsteer_cpu1_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
 	MCFG_CPU_ADD("subcpu", M6809, 2000000)		 /* ? */
 	MCFG_CPU_PROGRAM_MAP(cntsteer_cpu2_map)
-//  MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)        /* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(sound_interrupt, 480)
+	MCFG_CPU_PERIODIC_INT_DRIVER(cntsteer_state, sound_interrupt,  480)
 
 	MCFG_MACHINE_START_OVERRIDE(cntsteer_state,cntsteer)
 	MCFG_MACHINE_RESET_OVERRIDE(cntsteer_state,cntsteer)
@@ -930,15 +930,15 @@ static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)		 /* ? */
 	MCFG_CPU_PROGRAM_MAP(gekitsui_cpu1_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
 	MCFG_CPU_ADD("subcpu", M6809, 2000000)		 /* ? */
 	MCFG_CPU_PROGRAM_MAP(gekitsui_cpu2_map)
-//  MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)		/* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(sound_interrupt, 480)
+	MCFG_CPU_PERIODIC_INT_DRIVER(cntsteer_state, sound_interrupt,  480)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

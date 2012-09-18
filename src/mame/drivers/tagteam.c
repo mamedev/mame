@@ -195,12 +195,11 @@ static GFXDECODE_START( tagteam )
 GFXDECODE_END
 
 
-static INTERRUPT_GEN( sound_timer_irq )
+INTERRUPT_GEN_MEMBER(tagteam_state::sound_timer_irq)
 {
-	tagteam_state *state = device->machine().driver_data<tagteam_state>();
 
-	if(state->m_sound_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_sound_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -209,11 +208,11 @@ static MACHINE_CONFIG_START( tagteam, tagteam_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_assert,272/16*57) // connected to bit 4 of vcount (basically once every 16 scanlines)
+	MCFG_CPU_PERIODIC_INT_DRIVER(tagteam_state, irq0_line_assert, 272/16*57) // connected to bit 4 of vcount (basically once every 16 scanlines)
 
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz/2/6) // daughterboard gets 12mhz/2 from mainboard, but how it's divided further is a guess
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(sound_timer_irq,272/16*57) // same source as maincpu irq
+	MCFG_CPU_PERIODIC_INT_DRIVER(tagteam_state, sound_timer_irq, 272/16*57) // same source as maincpu irq
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

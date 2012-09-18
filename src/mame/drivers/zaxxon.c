@@ -297,12 +297,11 @@ INPUT_CHANGED_MEMBER(zaxxon_state::service_switch)
 }
 
 
-static INTERRUPT_GEN( vblank_int )
+INTERRUPT_GEN_MEMBER(zaxxon_state::vblank_int)
 {
-	zaxxon_state *state = device->machine().driver_data<zaxxon_state>();
 
-	if (state->m_int_enabled)
-		device->execute().set_input_line(0, ASSERT_LINE);
+	if (m_int_enabled)
+		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -962,7 +961,7 @@ static MACHINE_CONFIG_START( root, zaxxon_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_int)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaxxon_state,  vblank_int)
 
 
 	MCFG_I8255A_ADD( "ppi8255", zaxxon_ppi_intf )
@@ -1026,7 +1025,7 @@ static MACHINE_CONFIG_DERIVED( congo, root )
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(congo_sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, (double)SOUND_CLOCK/16/16/16/4)
+	MCFG_CPU_PERIODIC_INT_DRIVER(zaxxon_state, irq0_line_hold,  (double)SOUND_CLOCK/16/16/16/4)
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(512)

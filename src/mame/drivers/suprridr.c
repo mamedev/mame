@@ -99,11 +99,10 @@ WRITE8_MEMBER(suprridr_state::nmi_enable_w)
 }
 
 
-static INTERRUPT_GEN( main_nmi_gen )
+INTERRUPT_GEN_MEMBER(suprridr_state::main_nmi_gen)
 {
-	suprridr_state *state = device->machine().driver_data<suprridr_state>();
-	if (state->m_nmi_enable)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_enable)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -360,7 +359,7 @@ static MACHINE_CONFIG_START( suprridr, suprridr_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_49_152MHz/16)		/* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT("screen", main_nmi_gen)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", suprridr_state,  main_nmi_gen)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 10000000/4)		/* 2.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

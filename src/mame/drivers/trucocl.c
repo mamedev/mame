@@ -122,12 +122,11 @@ static GFXDECODE_START( trucocl )
 	GFXDECODE_ENTRY( "gfx1", 0x10000, tilelayout,      0, 2 )
 GFXDECODE_END
 
-static INTERRUPT_GEN( trucocl_interrupt )
+INTERRUPT_GEN_MEMBER(trucocl_state::trucocl_interrupt)
 {
-	trucocl_state *state = device->machine().driver_data<trucocl_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if(m_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
 
 }
 
@@ -135,7 +134,7 @@ static MACHINE_CONFIG_START( trucocl, trucocl_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", trucocl_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", trucocl_state,  trucocl_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

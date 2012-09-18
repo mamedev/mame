@@ -257,9 +257,9 @@ static ADDRESS_MAP_START( snd_io, AS_IO, 8, fitfight_state )
 		AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_READ(snd_portc_r) AM_WRITE(snd_portc_w)
 ADDRESS_MAP_END
 
-static INTERRUPT_GEN( snd_irq )
+INTERRUPT_GEN_MEMBER(fitfight_state::snd_irq)
 {
-	device->execute().set_input_line(UPD7810_INTF2, HOLD_LINE);
+	device.execute().set_input_line(UPD7810_INTF2, HOLD_LINE);
 }
 
 static const UPD7810_CONFIG sound_cpu_config =
@@ -735,13 +735,13 @@ static MACHINE_CONFIG_START( fitfight, fitfight_state )
 
 	MCFG_CPU_ADD("maincpu",M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(fitfight_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MCFG_CPU_CONFIG(sound_cpu_config)
 	MCFG_CPU_PROGRAM_MAP(snd_mem)
 	MCFG_CPU_IO_MAP(snd_io)
-	MCFG_CPU_VBLANK_INT("screen", snd_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", fitfight_state,  snd_irq)
 
 
 	MCFG_GFXDECODE(fitfight)
@@ -766,7 +766,7 @@ static MACHINE_CONFIG_START( bbprot, fitfight_state )
 
 	MCFG_CPU_ADD("maincpu",M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(bbprot_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
 
 
 	MCFG_GFXDECODE(prot)

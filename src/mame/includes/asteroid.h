@@ -29,15 +29,10 @@ public:
 	DECLARE_DRIVER_INIT(asterock);
 	DECLARE_DRIVER_INIT(asteroidb);
 	virtual void machine_reset();
+	INTERRUPT_GEN_MEMBER(asteroid_interrupt);
+	INTERRUPT_GEN_MEMBER(asterock_interrupt);
+	INTERRUPT_GEN_MEMBER(llander_interrupt);
 };
-
-
-/*----------- defined in machine/asteroid.c -----------*/
-
-INTERRUPT_GEN( asteroid_interrupt );
-INTERRUPT_GEN( asterock_interrupt );
-INTERRUPT_GEN( llander_interrupt );
-
 
 /*----------- defined in audio/asteroid.c -----------*/
 

@@ -83,14 +83,14 @@ public:
 	DECLARE_WRITE8_MEMBER(kungfur_adpcm2_w);
 	virtual void machine_start();
 	virtual void machine_reset();
+	INTERRUPT_GEN_MEMBER(kungfur_irq);
 };
 
 
-static INTERRUPT_GEN( kungfur_irq )
+INTERRUPT_GEN_MEMBER(kungfur_state::kungfur_irq)
 {
-	kungfur_state *state = device->machine().driver_data<kungfur_state>();
-	if (state->m_control & 0x10)
-		device->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	if (m_control & 0x10)
+		device.execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -317,7 +317,7 @@ static MACHINE_CONFIG_START( kungfur, kungfur_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 8000000/2)	// 4MHz?
 	MCFG_CPU_PROGRAM_MAP(kungfur_map)
-	MCFG_CPU_PERIODIC_INT(kungfur_irq, 975)		// close approximation
+	MCFG_CPU_PERIODIC_INT_DRIVER(kungfur_state, kungfur_irq,  975)		// close approximation
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )

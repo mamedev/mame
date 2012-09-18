@@ -65,13 +65,13 @@ static TIMER_CALLBACK( gcpinbal_interrupt3 )
 }
 #endif
 
-static INTERRUPT_GEN( gcpinbal_interrupt )
+INTERRUPT_GEN_MEMBER(gcpinbal_state::gcpinbal_interrupt)
 {
 	/* Unsure of actual sequence */
 
-	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(500), FUNC(gcpinbal_interrupt1));
-//  device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(1000), FUNC(gcpinbal_interrupt3));
-	device->execute().set_input_line(4, HOLD_LINE);
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), FUNC(gcpinbal_interrupt1));
+//  machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(1000), FUNC(gcpinbal_interrupt3));
+	device.execute().set_input_line(4, HOLD_LINE);
 }
 
 
@@ -439,7 +439,7 @@ static MACHINE_CONFIG_START( gcpinbal, gcpinbal_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)	/* 16 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(gcpinbal_map)
-	MCFG_CPU_VBLANK_INT("screen", gcpinbal_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gcpinbal_state,  gcpinbal_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

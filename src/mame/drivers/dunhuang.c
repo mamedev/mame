@@ -819,7 +819,7 @@ static MACHINE_CONFIG_START( dunhuang, dunhuang_state )
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
 	MCFG_CPU_PROGRAM_MAP(dunhuang_map)
 	MCFG_CPU_IO_MAP(dunhuang_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dunhuang_state,  irq0_line_hold)
 
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(5))

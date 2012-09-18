@@ -349,7 +349,7 @@ static MACHINE_CONFIG_START( spbactn, spbactn_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(spbactn_map)
-	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(spbactn_sound_map)

@@ -497,9 +497,9 @@ static void toaplan2_vblank_irq(running_machine &machine, int irq_line)
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0xe6), FUNC(toaplan2_raise_irq), irq_line);
 }
 
-static INTERRUPT_GEN( toaplan2_vblank_irq1 ) { toaplan2_vblank_irq(device->machine(), 1); }
-static INTERRUPT_GEN( toaplan2_vblank_irq2 ) { toaplan2_vblank_irq(device->machine(), 2); }
-static INTERRUPT_GEN( toaplan2_vblank_irq4 ) { toaplan2_vblank_irq(device->machine(), 4); }
+INTERRUPT_GEN_MEMBER(toaplan2_state::toaplan2_vblank_irq1){ toaplan2_vblank_irq(machine(), 1); }
+INTERRUPT_GEN_MEMBER(toaplan2_state::toaplan2_vblank_irq2){ toaplan2_vblank_irq(machine(), 2); }
+INTERRUPT_GEN_MEMBER(toaplan2_state::toaplan2_vblank_irq4){ toaplan2_vblank_irq(machine(), 4); }
 
 
 READ16_MEMBER(toaplan2_state::video_count_r)
@@ -1018,9 +1018,9 @@ WRITE16_MEMBER(toaplan2_state::bbakraid_eeprom_w)
 }
 
 
-static INTERRUPT_GEN( bbakraid_snd_interrupt )
+INTERRUPT_GEN_MEMBER(toaplan2_state::bbakraid_snd_interrupt)
 {
-	device->execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -3028,7 +3028,7 @@ static MACHINE_CONFIG_START( tekipaki, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(tekipaki_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
 #ifdef USE_HD64x180
 	MCFG_CPU_ADD("audiocpu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
@@ -3069,7 +3069,7 @@ static MACHINE_CONFIG_START( ghox, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(ghox_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
 #ifdef USE_HD64x180
 	MCFG_CPU_ADD("audiocpu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
@@ -3160,7 +3160,7 @@ static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_25MHz/2)			/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(dogyuun_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_25MHz/2)			/* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(v25_mem)
@@ -3203,7 +3203,7 @@ static MACHINE_CONFIG_START( kbash, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* 16MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(kbash_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
 	/* ROM based v25 */
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_16MHz)			/* NEC V25 type Toaplan marked CPU ??? */
@@ -3246,7 +3246,7 @@ static MACHINE_CONFIG_START( kbash2, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* 16MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(kbash2_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3283,7 +3283,7 @@ static MACHINE_CONFIG_START( truxton2, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(truxton2_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq2)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq2)
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3332,7 +3332,7 @@ static MACHINE_CONFIG_START( pipibibs, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pipibibs_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_27MHz/8)			/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pipibibs_sound_z80_mem)
@@ -3373,7 +3373,7 @@ static MACHINE_CONFIG_START( pipibibsbl, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(pipibibi_bootleg_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_27MHz/8)			/* ??? 3.37MHz */
 	MCFG_CPU_PROGRAM_MAP(pipibibs_sound_z80_mem)
@@ -3453,7 +3453,7 @@ static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(fixeight_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_16MHz)			/* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(fixeight_v25_mem)
@@ -3497,7 +3497,7 @@ static MACHINE_CONFIG_START( fixeightbl, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(fixeightbl_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq2)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq2)
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3532,7 +3532,7 @@ static MACHINE_CONFIG_START( vfive, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(vfive_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_20MHz/2)	/* Verified on pcb, NEC V25 type Toaplan mark scratched out */
 	MCFG_CPU_PROGRAM_MAP(vfive_v25_mem)
@@ -3571,7 +3571,7 @@ static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)			/* 16MHz , 32MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(batsugun_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_32MHz/2)			/* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(v25_mem)
@@ -3613,7 +3613,7 @@ static MACHINE_CONFIG_START( snowbro2, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(snowbro2_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3650,7 +3650,7 @@ static MACHINE_CONFIG_START( mahoudai, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(mahoudai_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(raizing_sound_z80_mem)
@@ -3693,7 +3693,7 @@ static MACHINE_CONFIG_START( shippumd, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(shippumd_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(raizing_sound_z80_mem)
@@ -3747,7 +3747,7 @@ static MACHINE_CONFIG_START( bgaregga, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(bgaregga_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(bgaregga_sound_z80_mem)
@@ -3796,7 +3796,7 @@ static MACHINE_CONFIG_START( batrider, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(batrider_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq2)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq2)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(batrider_sound_z80_mem)
@@ -3844,12 +3844,12 @@ static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(bbakraid_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq1)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/6)		/* 5.3333MHz , 32MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(bbakraid_sound_z80_mem)
 	MCFG_CPU_IO_MAP(bbakraid_sound_z80_port)
-	MCFG_CPU_PERIODIC_INT(bbakraid_snd_interrupt, 448)
+	MCFG_CPU_PERIODIC_INT_DRIVER(toaplan2_state, bbakraid_snd_interrupt,  448)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 

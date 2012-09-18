@@ -70,6 +70,7 @@ public:
 	DECLARE_VIDEO_START(common);
 	UINT32 screen_update_gameplan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_leprechn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(trvquest_interrupt);
 };
 
 /*----------- defined in video/gameplan.c -----------*/

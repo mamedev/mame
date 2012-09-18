@@ -134,6 +134,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_sub(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(subm_sound_irq);
 };
 
 void sub_state::video_start()
@@ -418,12 +419,11 @@ void sub_state::palette_init()
 }
 
 
-static INTERRUPT_GEN( subm_sound_irq )
+INTERRUPT_GEN_MEMBER(sub_state::subm_sound_irq)
 {
-	sub_state *state = device->machine().driver_data<sub_state>();
 
-	if(state->m_nmi_en)
-		device->machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_en)
+		machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( sub, sub_state )
@@ -432,12 +432,12 @@ static MACHINE_CONFIG_START( sub, sub_state )
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(subm_map)
 	MCFG_CPU_IO_MAP(subm_io)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sub_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("soundcpu", Z80,MASTER_CLOCK/6)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(subm_sound_map)
 	MCFG_CPU_IO_MAP(subm_sound_io)
-	MCFG_CPU_PERIODIC_INT(subm_sound_irq, 120) //???
+	MCFG_CPU_PERIODIC_INT_DRIVER(sub_state, subm_sound_irq,  120) //???
 
 
 	/* video hardware */

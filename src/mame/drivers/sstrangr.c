@@ -197,7 +197,7 @@ static MACHINE_CONFIG_START( sstrangr, sstrangr_state )
 	MCFG_CPU_ADD("maincpu",I8080,1996800)	/* clock is a guess, taken from mw8080bw */
 	MCFG_CPU_PROGRAM_MAP(sstrangr_map)
 	MCFG_CPU_IO_MAP(sstrangr_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(sstrangr_state, irq0_line_hold, 2*60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -1684,7 +1684,7 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8) // 1.5mhz
 	MCFG_CPU_PROGRAM_MAP(aristmk4_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", aristmk4_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_TIMER_ADD_PERIODIC("power_fail", aristmk4_pf,attotime::from_hz(1)) // not real but required to simulate power failure to access robot test. How else can we do this ?
@@ -1727,7 +1727,7 @@ static MACHINE_CONFIG_DERIVED( aristmk4_poker, aristmk4 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aristmk4_poker_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", aristmk4_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
 /* same as Aristocrat Mark-IV HW color offset 7 */

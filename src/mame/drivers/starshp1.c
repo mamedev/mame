@@ -14,10 +14,10 @@ Atari Starship 1 driver
 
 
 
-static INTERRUPT_GEN( starshp1_interrupt )
+INTERRUPT_GEN_MEMBER(starshp1_state::starshp1_interrupt)
 {
-	if ((device->machine().root_device().ioport("SYSTEM")->read() & 0x90) != 0x90)
-		generic_pulse_irq_line(device, 0, 1);
+	if ((machine().root_device().ioport("SYSTEM")->read() & 0x90) != 0x90)
+		generic_pulse_irq_line(device.execute(), 0, 1);
 }
 
 
@@ -299,7 +299,7 @@ static MACHINE_CONFIG_START( starshp1, starshp1_state )
 
 	MCFG_CPU_ADD("maincpu", M6502, STARSHP1_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(starshp1_map)
-	MCFG_CPU_VBLANK_INT("screen", starshp1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", starshp1_state,  starshp1_interrupt)
 
 	/* video hardware */
 

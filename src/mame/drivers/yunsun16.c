@@ -590,7 +590,7 @@ static MACHINE_CONFIG_START( magicbub, yunsun16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", yunsun16_state,  irq2_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -632,7 +632,7 @@ static MACHINE_CONFIG_START( shocking, yunsun16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", yunsun16_state,  irq2_line_hold)
 
 
 	/* video hardware */

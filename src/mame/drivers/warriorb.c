@@ -546,7 +546,7 @@ static MACHINE_CONFIG_START( darius2d, warriorb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? (Might well be 16!) */
 	MCFG_CPU_PROGRAM_MAP(darius2d_map)
-	MCFG_CPU_VBLANK_INT("lscreen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", warriorb_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
@@ -609,7 +609,7 @@ static MACHINE_CONFIG_START( warriorb, warriorb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(warriorb_map)
-	MCFG_CPU_VBLANK_INT("lscreen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", warriorb_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)

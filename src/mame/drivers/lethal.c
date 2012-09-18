@@ -203,12 +203,11 @@ WRITE8_MEMBER(lethal_state::control2_w)
 	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
 }
 
-static INTERRUPT_GEN(lethalen_interrupt)
+INTERRUPT_GEN_MEMBER(lethal_state::lethalen_interrupt)
 {
-	lethal_state *state = device->machine().driver_data<lethal_state>();
 
-	if (k056832_is_irq_enabled(state->m_k056832, 0))
-		device->execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
+	if (k056832_is_irq_enabled(m_k056832, 0))
+		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(lethal_state::sound_cmd_w)
@@ -645,7 +644,7 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK/2)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(le_main)
-	MCFG_CPU_VBLANK_INT("screen", lethalen_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", lethal_state,  lethalen_interrupt)
 
 	MCFG_CPU_ADD("soundcpu", Z80, MAIN_CLOCK/4)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(le_sound)

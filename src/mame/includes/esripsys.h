@@ -93,9 +93,9 @@ public:
 	DECLARE_DRIVER_INIT(esripsys);
 	virtual void video_start();
 	UINT32 screen_update_esripsys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(esripsys_vblank_irq);
 };
 
 
 /*----------- defined in video/esripsys.c -----------*/
-INTERRUPT_GEN( esripsys_vblank_irq );
 int esripsys_draw(running_machine &machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank);

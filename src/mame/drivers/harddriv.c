@@ -1326,7 +1326,7 @@ static MACHINE_CONFIG_START( driver_nomsp, harddriv_state )
 	MCFG_CPU_ADD("maincpu", M68010, HARDDRIV_MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(driver_68k_map)
 	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
-	MCFG_CPU_PERIODIC_INT(hd68k_irq_gen, (double)HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
+	MCFG_CPU_PERIODIC_INT_DRIVER(harddriv_state, hd68k_irq_gen,  (double)HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
 
 	MCFG_CPU_ADD("gsp", TMS34010, HARDDRIV_GSP_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(driver_gsp_map)

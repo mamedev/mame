@@ -901,12 +901,11 @@ WRITE8_MEMBER(lucky74_state::lamps_b_w)
 *    Interrupts Gen     *
 ************************/
 
-static INTERRUPT_GEN( nmi_interrupt )
+INTERRUPT_GEN_MEMBER(lucky74_state::nmi_interrupt)
 {
-	lucky74_state *state = device->machine().driver_data<lucky74_state>();
-	if ((state->m_ym2149_portb & 0x10) == 0)	/* ym2149 portB bit 4 trigger the NMI */
+	if ((m_ym2149_portb & 0x10) == 0)	/* ym2149 portB bit 4 trigger the NMI */
 	{
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -1361,7 +1360,7 @@ static MACHINE_CONFIG_START( lucky74, lucky74_state )
 	MCFG_CPU_ADD("maincpu", Z80, C_06B49P_CLKOUT_03)	/* 3 MHz. */
 	MCFG_CPU_PROGRAM_MAP(lucky74_map)
 	MCFG_CPU_IO_MAP(lucky74_portmap)
-	MCFG_CPU_VBLANK_INT("screen", nmi_interrupt)	/* 60 Hz. measured */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", lucky74_state,  nmi_interrupt)	/* 60 Hz. measured */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

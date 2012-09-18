@@ -680,29 +680,27 @@ void namcos2_adjust_posirq_timer( running_machine &machine, int scanline )
 	namcos2_posirq_timer->adjust(machine.primary_screen->time_until_pos(scanline, 80), scanline);
 }
 
-INTERRUPT_GEN( namcos2_68k_master_vblank )
+INTERRUPT_GEN_MEMBER(namcos2_shared_state::namcos2_68k_master_vblank)
 {
-	namcos2_shared_state *state = device->machine().driver_data<namcos2_shared_state>();
-	if (!state->is_system21()) namcos2_adjust_posirq_timer(device->machine(), GetPosIRQScanline(device->machine()));
-	device->execute().set_input_line(namcos2_68k_master_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
+	if (!is_system21()) namcos2_adjust_posirq_timer(machine(), GetPosIRQScanline(machine()));
+	device.execute().set_input_line(namcos2_68k_master_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
 }
 
-INTERRUPT_GEN( namcos2_68k_slave_vblank )
+INTERRUPT_GEN_MEMBER(namcos2_shared_state::namcos2_68k_slave_vblank)
 {
-	namcos2_shared_state *state = device->machine().driver_data<namcos2_shared_state>();
-	if (!state->is_system21()) namcos2_adjust_posirq_timer(device->machine(), GetPosIRQScanline(device->machine()));
-	device->execute().set_input_line(namcos2_68k_slave_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
+	if (!is_system21()) namcos2_adjust_posirq_timer(machine(), GetPosIRQScanline(machine()));
+	device.execute().set_input_line(namcos2_68k_slave_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
 }
 
-INTERRUPT_GEN( namcos2_68k_gpu_vblank )
+INTERRUPT_GEN_MEMBER(namcos2_shared_state::namcos2_68k_gpu_vblank)
 {
 	/* only used by namcos21 */
-	int scanline = GetPosIRQScanline(device->machine());
+	int scanline = GetPosIRQScanline(machine());
 	scanline = 0x50+0x89; /* HACK for Winning Run */
 
 	//printf( "namcos2_68k_gpu_vblank(%d)\n",namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] );
-	namcos2_adjust_posirq_timer(device->machine(), scanline);
-	device->execute().set_input_line(namcos2_68k_gpu_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
+	namcos2_adjust_posirq_timer(machine(), scanline);
+	device.execute().set_input_line(namcos2_68k_gpu_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
 }
 
 /**************************************************************/

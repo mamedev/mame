@@ -814,12 +814,12 @@ static MACHINE_CONFIG_START( sraider, ladybug_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sraider_cpu1_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ladybug_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sraider_cpu2_map)
 	MCFG_CPU_IO_MAP(sraider_cpu2_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ladybug_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ladybug_state,sraider)
 	MCFG_MACHINE_RESET_OVERRIDE(ladybug_state,sraider)

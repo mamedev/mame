@@ -74,7 +74,7 @@ hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
 
 
 
-#define DISABLE_VB_INT	(!(state->m_v_ctrl & 0x8000))
+#define DISABLE_VB_INT	(!(m_v_ctrl & 0x8000))
 
 
 
@@ -396,19 +396,18 @@ WRITE32_MEMBER(djmain_state::unknownc02000_w)
  *
  *************************************/
 
-static INTERRUPT_GEN( vb_interrupt )
+INTERRUPT_GEN_MEMBER(djmain_state::vb_interrupt)
 {
-	djmain_state *state = device->machine().driver_data<djmain_state>();
-	state->m_pending_vb_int = 0;
+	m_pending_vb_int = 0;
 
 	if (DISABLE_VB_INT)
 	{
-		state->m_pending_vb_int = 1;
+		m_pending_vb_int = 1;
 		return;
 	}
 
 	//logerror("V-Blank interrupt\n");
-	device->execute().set_input_line(M68K_IRQ_4, HOLD_LINE);
+	device.execute().set_input_line(M68K_IRQ_4, HOLD_LINE);
 }
 
 
@@ -1460,7 +1459,7 @@ static MACHINE_CONFIG_START( djmain, djmain_state )
 	//MCFG_CPU_ADD("maincpu", M68EC020, 18432000/2)    /*  9.216 MHz!? */
 	MCFG_CPU_ADD("maincpu", M68EC020, 32000000/4)	/*  8.000 MHz!? */
 	MCFG_CPU_PROGRAM_MAP(memory_map)
-	MCFG_CPU_VBLANK_INT("screen", vb_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", djmain_state,  vb_interrupt)
 
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)

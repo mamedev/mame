@@ -709,7 +709,7 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000 / 2)		/* 12 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(airsys_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoair_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,8000000 / 2)			/* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

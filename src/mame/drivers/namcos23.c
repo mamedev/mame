@@ -1435,6 +1435,7 @@ public:
 	DECLARE_VIDEO_START(ss23);
 	DECLARE_MACHINE_RESET(gmen);
 	UINT32 screen_update_ss23(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(s23_interrupt);
 };
 
 
@@ -2432,14 +2433,13 @@ UINT32 namcos23_state::screen_update_ss23(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-static INTERRUPT_GEN(s23_interrupt)
+INTERRUPT_GEN_MEMBER(namcos23_state::s23_interrupt)
 {
-	namcos23_state *state = device->machine().driver_data<namcos23_state>();
-	render_t &render = state->m_render;
+	render_t &render = m_render;
 
-	if(!state->m_ctl_vbl_active) {
-		state->m_ctl_vbl_active = true;
-		device->execute().set_input_line(MIPS3_IRQ0, ASSERT_LINE);
+	if(!m_ctl_vbl_active) {
+		m_ctl_vbl_active = true;
+		device.execute().set_input_line(MIPS3_IRQ0, ASSERT_LINE);
 	}
 
 	render.cur = !render.cur;
@@ -3148,12 +3148,12 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
 	MCFG_CPU_CONFIG(r4650_config)
 	MCFG_CPU_PROGRAM_MAP(gorgon_map)
-	MCFG_CPU_VBLANK_INT("screen", s23_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  s23_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", H83002, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
 	MCFG_CPU_IO_MAP( s23h8iomap )
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  irq1_line_pulse)
 
 	MCFG_CPU_ADD("ioboard", H83334, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( gorgoniobrdmap )
@@ -3193,12 +3193,12 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
 	MCFG_CPU_CONFIG(r4650_config)
 	MCFG_CPU_PROGRAM_MAP(ss23_map)
-	MCFG_CPU_VBLANK_INT("screen", s23_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  s23_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", H83002, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
 	MCFG_CPU_IO_MAP( s23h8iomap )
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  irq1_line_pulse)
 
 	MCFG_CPU_ADD("ioboard", H83334, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
@@ -3238,12 +3238,12 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*5)
 	MCFG_CPU_CONFIG(r4650_config)
 	MCFG_CPU_PROGRAM_MAP(ss23_map)
-	MCFG_CPU_VBLANK_INT("screen", s23_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  s23_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", H83002, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
 	MCFG_CPU_IO_MAP( s23h8noiobmap )
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  irq1_line_pulse)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 

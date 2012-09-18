@@ -262,7 +262,7 @@ static MACHINE_CONFIG_START( 1942, _1942_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)	/* 3 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(_1942_state, irq0_line_hold, 4*60)
 
 
 	/* video hardware */

@@ -134,7 +134,7 @@ static MACHINE_CONFIG_START( tgtpanic, tgtpanic_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(prg_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 20) /* Unverified */
+	MCFG_CPU_PERIODIC_INT_DRIVER(tgtpanic_state, irq0_line_hold,  20) /* Unverified */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

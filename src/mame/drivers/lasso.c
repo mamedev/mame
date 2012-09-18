@@ -511,7 +511,7 @@ static MACHINE_CONFIG_START( base, lasso_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 11289000/16)	/* guess */
 	MCFG_CPU_PROGRAM_MAP(lasso_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", lasso_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 600000)
 	MCFG_CPU_PROGRAM_MAP(lasso_audio_map)
@@ -597,7 +597,7 @@ static MACHINE_CONFIG_DERIVED( pinbo, base )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M6502, XTAL_18MHz/24)
 	MCFG_CPU_PROGRAM_MAP(pinbo_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", lasso_state,  irq0_line_hold)
 
 	MCFG_CPU_REPLACE("audiocpu", Z80, XTAL_18MHz/6)
 	MCFG_CPU_PROGRAM_MAP(pinbo_audio_map)

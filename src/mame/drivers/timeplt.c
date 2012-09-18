@@ -59,12 +59,11 @@
  *
  *************************************/
 
-static INTERRUPT_GEN( timeplt_interrupt )
+INTERRUPT_GEN_MEMBER(timeplt_state::timeplt_interrupt)
 {
-	timeplt_state *state = device->machine().driver_data<timeplt_state>();
 
-	if (state->m_nmi_enable)
-		device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (m_nmi_enable)
+		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -470,7 +469,7 @@ static MACHINE_CONFIG_START( timeplt, timeplt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)	/* not confirmed, but common for Konami games of the era */
 	MCFG_CPU_PROGRAM_MAP(timeplt_main_map)
-	MCFG_CPU_VBLANK_INT("screen", timeplt_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", timeplt_state,  timeplt_interrupt)
 
 
 	/* video hardware */
@@ -496,7 +495,7 @@ static MACHINE_CONFIG_DERIVED( psurge, timeplt )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psurge_main_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", timeplt_state,  nmi_line_pulse)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bikkuric, timeplt )

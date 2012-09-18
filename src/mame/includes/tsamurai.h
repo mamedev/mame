@@ -59,4 +59,6 @@ public:
 	DECLARE_VIDEO_START(vsgongf);
 	UINT32 screen_update_tsamurai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_vsgongf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(samurai_interrupt);
+	INTERRUPT_GEN_MEMBER(vsgongf_sound_interrupt);
 };

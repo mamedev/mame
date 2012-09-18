@@ -73,4 +73,15 @@ public:
 	UINT32 screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_taitob(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(rastansaga2_interrupt);
+	INTERRUPT_GEN_MEMBER(crimec_interrupt);
+	INTERRUPT_GEN_MEMBER(hitice_interrupt);
+	INTERRUPT_GEN_MEMBER(rambo3_interrupt);
+	INTERRUPT_GEN_MEMBER(pbobble_interrupt);
+	INTERRUPT_GEN_MEMBER(viofight_interrupt);
+	INTERRUPT_GEN_MEMBER(masterw_interrupt);
+	INTERRUPT_GEN_MEMBER(silentd_interrupt);
+	INTERRUPT_GEN_MEMBER(selfeena_interrupt);
+	INTERRUPT_GEN_MEMBER(sbm_interrupt);
+	INTERRUPT_GEN_MEMBER(realpunc_interrupt);
 };

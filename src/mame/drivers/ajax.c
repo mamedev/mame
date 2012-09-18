@@ -210,7 +210,7 @@ static MACHINE_CONFIG_START( ajax, ajax_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)	/* 12/4 MHz*/
 	MCFG_CPU_PROGRAM_MAP(ajax_main_map)
-	MCFG_CPU_VBLANK_INT("screen", ajax_interrupt)	/* IRQs triggered by the 051960 */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ajax_state,  ajax_interrupt)	/* IRQs triggered by the 051960 */
 
 	MCFG_CPU_ADD("sub", M6809, 3000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(ajax_sub_map)

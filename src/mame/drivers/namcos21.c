@@ -1489,20 +1489,20 @@ MACHINE_START_MEMBER(namcos21_state,namcos21)
 static MACHINE_CONFIG_START( namcos21, namcos21_state )
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_CPU_PROGRAM_MAP(namcos21_68k_master)
-	MCFG_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  namcos2_68k_master_vblank)
 
 	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
 	MCFG_CPU_PROGRAM_MAP(namcos21_68k_slave)
-	MCFG_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  namcos2_68k_slave_vblank)
 
 	MCFG_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
 	MCFG_CPU_PROGRAM_MAP(am_sound_winrun)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
-	MCFG_CPU_PERIODIC_INT(irq1_line_hold,120)
+	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
 
 	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */
 	MCFG_CPU_PROGRAM_MAP(am_mcu_winrun)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("dspmaster", TMS32025,24000000) /* 24 MHz? overclocked */
 	MCFG_CPU_PROGRAM_MAP(master_dsp_program)
@@ -1549,20 +1549,20 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_CPU_PROGRAM_MAP(driveyes_68k_master)
-	MCFG_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  namcos2_68k_master_vblank)
 
 	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
 	MCFG_CPU_PROGRAM_MAP(driveyes_68k_slave)
-	MCFG_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  namcos2_68k_slave_vblank)
 
 	MCFG_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
 	MCFG_CPU_PROGRAM_MAP(am_sound_winrun)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
-	MCFG_CPU_PERIODIC_INT(irq1_line_hold,120)
+	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
 
 	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */
 	MCFG_CPU_PROGRAM_MAP(am_mcu_winrun)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("dsp", TMS32025,24000000*2) /* 24 MHz? overclocked */
 	MCFG_CPU_PROGRAM_MAP(winrun_dsp_program)
@@ -1604,20 +1604,20 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( winrun, namcos21_state )
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_CPU_PROGRAM_MAP(am_master_winrun)
-	MCFG_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  namcos2_68k_master_vblank)
 
 	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
 	MCFG_CPU_PROGRAM_MAP(am_slave_winrun)
-	MCFG_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  namcos2_68k_slave_vblank)
 
 	MCFG_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
 	MCFG_CPU_PROGRAM_MAP(am_sound_winrun)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
-	MCFG_CPU_PERIODIC_INT(irq1_line_hold,120)
+	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
 
 	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */
 	MCFG_CPU_PROGRAM_MAP(am_mcu_winrun)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("dsp", TMS32025,24000000) /* 24 MHz? overclocked */
 	MCFG_CPU_PROGRAM_MAP(winrun_dsp_program)
@@ -1626,7 +1626,7 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 
 	MCFG_CPU_ADD("gpu", M68000,12288000) /* graphics coprocessor */
 	MCFG_CPU_PROGRAM_MAP(am_gpu_winrun)
-	MCFG_CPU_VBLANK_INT("screen", namcos2_68k_gpu_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  namcos2_68k_gpu_vblank)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 

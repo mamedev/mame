@@ -506,11 +506,11 @@ static MACHINE_CONFIG_START( dassault, dassault_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2)	/* 14MHz - Accurate */
 	MCFG_CPU_PROGRAM_MAP(dassault_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("sub", M68000, XTAL_28MHz/2)	/* 14MHz - Accurate */
 	MCFG_CPU_PROGRAM_MAP(dassault_sub_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/8)	/* Accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

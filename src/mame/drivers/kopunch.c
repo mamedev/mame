@@ -8,10 +8,10 @@
 #include "cpu/i8085/i8085.h"
 #include "includes/kopunch.h"
 
-static INTERRUPT_GEN( kopunch_interrupt )
+INTERRUPT_GEN_MEMBER(kopunch_state::kopunch_interrupt)
 {
-	device->execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
-	device->execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
+	device.execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
+	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 }
 
 READ8_MEMBER(kopunch_state::kopunch_in_r)
@@ -189,7 +189,7 @@ static MACHINE_CONFIG_START( kopunch, kopunch_state )
 	MCFG_CPU_ADD("maincpu", I8085A, 4000000)	/* 4 MHz ???? Uses SIM, must be 8085 */
 	MCFG_CPU_PROGRAM_MAP(kopunch_map)
 	MCFG_CPU_IO_MAP(kopunch_io_map)
-	MCFG_CPU_VBLANK_INT("screen",kopunch_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", kopunch_state, kopunch_interrupt)
 
 
 	/* video hardware */

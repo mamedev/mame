@@ -14,21 +14,19 @@
 static const int toaplan_port_type[2] = { 0x7800c, 0x5c };
 
 
-INTERRUPT_GEN( twincobr_interrupt )
+INTERRUPT_GEN_MEMBER(twincobr_state::twincobr_interrupt)
 {
-	twincobr_state *state = device->machine().driver_data<twincobr_state>();
-	if (state->m_intenable) {
-		state->m_intenable = 0;
-		device->execute().set_input_line(M68K_IRQ_4, HOLD_LINE);
+	if (m_intenable) {
+		m_intenable = 0;
+		device.execute().set_input_line(M68K_IRQ_4, HOLD_LINE);
 	}
 }
 
-INTERRUPT_GEN( wardner_interrupt )
+INTERRUPT_GEN_MEMBER(twincobr_state::wardner_interrupt)
 {
-	twincobr_state *state = device->machine().driver_data<twincobr_state>();
-	if (state->m_intenable) {
-		state->m_intenable = 0;
-		device->execute().set_input_line(0, HOLD_LINE);
+	if (m_intenable) {
+		m_intenable = 0;
+		device.execute().set_input_line(0, HOLD_LINE);
 	}
 }
 

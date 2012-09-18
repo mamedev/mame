@@ -88,12 +88,11 @@ void senjyo_state::machine_reset()
 	m_int_delay_kludge = 10;
 }
 
-static INTERRUPT_GEN( senjyo_interrupt )
+INTERRUPT_GEN_MEMBER(senjyo_state::senjyo_interrupt)
 {
-	senjyo_state *state = device->machine().driver_data<senjyo_state>();
 
-	if (state->m_int_delay_kludge == 0) device->execute().set_input_line(0, HOLD_LINE);
-	else state->m_int_delay_kludge--;
+	if (m_int_delay_kludge == 0) device.execute().set_input_line(0, HOLD_LINE);
+	else m_int_delay_kludge--;
 }
 
 WRITE8_MEMBER(senjyo_state::flip_screen_w)
@@ -572,7 +571,7 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(senjyo_map)
-	MCFG_CPU_VBLANK_INT("screen", senjyo_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", senjyo_state,  senjyo_interrupt)
 
 	MCFG_CPU_ADD("sub", Z80, 2000000)	/* 2 MHz? */
 	MCFG_CPU_CONFIG(senjyo_daisy_chain)

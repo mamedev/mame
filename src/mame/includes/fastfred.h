@@ -63,6 +63,8 @@ public:
 	DECLARE_VIDEO_START(imago);
 	UINT32 screen_update_fastfred(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 };
 
 /*----------- defined in video/fastfred.c -----------*/

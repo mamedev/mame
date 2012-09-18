@@ -191,7 +191,7 @@ static MACHINE_CONFIG_START( stlforce, stlforce_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 15000000)
 	MCFG_CPU_PROGRAM_MAP(stlforce_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", stlforce_state,  irq4_line_hold)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 

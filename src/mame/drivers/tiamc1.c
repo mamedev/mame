@@ -224,7 +224,7 @@ static MACHINE_CONFIG_START( tiamc1, tiamc1_state )
 	MCFG_CPU_PROGRAM_MAP(tiamc1_map)
 	MCFG_CPU_IO_MAP(tiamc1_io_map)
 
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tiamc1_state,  irq1_line_hold)
 
 
 	/* video hardware */

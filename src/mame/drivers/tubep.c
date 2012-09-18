@@ -942,7 +942,7 @@ static MACHINE_CONFIG_DERIVED( tubepb, tubep )
 
 	MCFG_CPU_REPLACE("mcu", M6802,6000000) /* ? MHz Xtal */
 	MCFG_CPU_PROGRAM_MAP(nsc_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tubep_state,  nmi_line_pulse)
 MACHINE_CONFIG_END
 
 

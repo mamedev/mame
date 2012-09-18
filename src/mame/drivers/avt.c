@@ -445,6 +445,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(avt_vblank_irq);
 };
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
@@ -881,11 +882,10 @@ static const ay8910_interface ay8910_config =
 *********************************************/
 
 /* IM 2 */
-static INTERRUPT_GEN( avt_vblank_irq )
+INTERRUPT_GEN_MEMBER(avt_state::avt_vblank_irq)
 {
-	avt_state *state = device->machine().driver_data<avt_state>();
 
-	state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x06);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x06);
 }
 
 static MACHINE_CONFIG_START( avt, avt_state )
@@ -894,7 +894,7 @@ static MACHINE_CONFIG_START( avt, avt_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)	/* guess */
 	MCFG_CPU_PROGRAM_MAP(avt_map)
 	MCFG_CPU_IO_MAP(avt_portmap)
-	MCFG_CPU_VBLANK_INT("screen", avt_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", avt_state,  avt_vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -40,6 +40,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(acefruit_vblank);
 };
 
 
@@ -83,11 +84,10 @@ void acefruit_state::video_start()
 	m_refresh_timer = machine().scheduler().timer_alloc(FUNC(acefruit_refresh));
 }
 
-static INTERRUPT_GEN( acefruit_vblank )
+INTERRUPT_GEN_MEMBER(acefruit_state::acefruit_vblank)
 {
-	acefruit_state *state = device->machine().driver_data<acefruit_state>();
-	device->execute().set_input_line(0, HOLD_LINE );
-	state->m_refresh_timer->adjust( attotime::zero );
+	device.execute().set_input_line(0, HOLD_LINE );
+	m_refresh_timer->adjust( attotime::zero );
 }
 
 UINT32 acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -584,7 +584,7 @@ static MACHINE_CONFIG_START( acefruit, acefruit_state )
 	MCFG_CPU_PROGRAM_MAP(acefruit_map)
 	MCFG_CPU_IO_MAP(acefruit_io)
 	MCFG_GFXDECODE(acefruit)
-	MCFG_CPU_VBLANK_INT("screen", acefruit_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

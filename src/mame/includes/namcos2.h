@@ -178,6 +178,9 @@ public:
 	// general
 	void zdrawgfxzoom(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
 	void zdrawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
+	INTERRUPT_GEN_MEMBER(namcos2_68k_master_vblank);
+	INTERRUPT_GEN_MEMBER(namcos2_68k_slave_vblank);
+	INTERRUPT_GEN_MEMBER(namcos2_68k_gpu_vblank);
 };
 
 class namcos2_state : public namcos2_shared_state
@@ -333,15 +336,12 @@ DECLARE_WRITE16_HANDLER( namcos2_68k_key_w );
 
 DECLARE_WRITE16_HANDLER( namcos2_68k_master_C148_w );
 DECLARE_READ16_HANDLER( namcos2_68k_master_C148_r );
-INTERRUPT_GEN( namcos2_68k_master_vblank );
 
 DECLARE_WRITE16_HANDLER( namcos2_68k_slave_C148_w );
 DECLARE_READ16_HANDLER( namcos2_68k_slave_C148_r );
-INTERRUPT_GEN( namcos2_68k_slave_vblank );
 
 DECLARE_WRITE16_HANDLER( namcos2_68k_gpu_C148_w );
 DECLARE_READ16_HANDLER( namcos2_68k_gpu_C148_r );
-INTERRUPT_GEN( namcos2_68k_gpu_vblank );
 
 void namcos2_adjust_posirq_timer( running_machine &machine, int scanline );
 

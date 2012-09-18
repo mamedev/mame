@@ -1789,9 +1789,9 @@ static const eeprom_interface eeprom_intf =
 	1				/* reset_delay */
 };
 
-static INTERRUPT_GEN( spi_interrupt )
+INTERRUPT_GEN_MEMBER(seibuspi_state::spi_interrupt)
 {
-	device->execute().set_input_line(0, ASSERT_LINE );
+	device.execute().set_input_line(0, ASSERT_LINE );
 }
 
 static IRQ_CALLBACK(spi_irq_callback)
@@ -1847,7 +1847,7 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, 50000000/2)	/* Intel 386DX, 25MHz */
 	MCFG_CPU_PROGRAM_MAP(spi_map)
-	MCFG_CPU_VBLANK_INT("screen", spi_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state,  spi_interrupt)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 28636360/4)
 	MCFG_CPU_PROGRAM_MAP(spisound_map)
@@ -2193,7 +2193,7 @@ static MACHINE_CONFIG_START( seibu386, seibuspi_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, 40000000)	/* AMD 386DX, 40MHz */
 	MCFG_CPU_PROGRAM_MAP(seibu386_map)
-	MCFG_CPU_VBLANK_INT("screen", spi_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state,  spi_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state,seibu386)
 
@@ -2246,7 +2246,7 @@ static MACHINE_CONFIG_START( sys386f2, seibuspi_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, 25000000)	/* 25mhz */
 	MCFG_CPU_PROGRAM_MAP(sys386f2_map)
-	MCFG_CPU_VBLANK_INT("screen", spi_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state,  spi_interrupt)
 
 	/* no z80? */
 

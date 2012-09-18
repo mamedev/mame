@@ -2181,15 +2181,14 @@ WRITE32_MEMBER(namcos22_state::namcos22s_system_controller_w)
 00008bf0: sys[0x00] := 0x04 // vblank
 00008bf8: sys[0x08] := 0xff // ?
 */
-static INTERRUPT_GEN( namcos22s_interrupt )
+INTERRUPT_GEN_MEMBER(namcos22_state::namcos22s_interrupt)
 {
-	namcos22_state *state = device->machine().driver_data<namcos22_state>();
 
-	if (nthbyte(state->m_system_controller, 0x00) & 7)
+	if (nthbyte(m_system_controller, 0x00) & 7)
 	{
 		// vblank irq
-		state->m_irq_state |= 1;
-		device->execute().set_input_line(nthbyte(state->m_system_controller, 0x00) & 7, ASSERT_LINE);
+		m_irq_state |= 1;
+		device.execute().set_input_line(nthbyte(m_system_controller, 0x00) & 7, ASSERT_LINE);
 	}
 }
 
@@ -2343,33 +2342,32 @@ Cyber Commando:
 
     move.b  #$34, $40000004.l
 */
-static INTERRUPT_GEN( namcos22_interrupt )
+INTERRUPT_GEN_MEMBER(namcos22_state::namcos22_interrupt)
 {
-	namcos22_state *state = device->machine().driver_data<namcos22_state>();
 
-	switch( state->m_gametype )
+	switch( m_gametype )
 	{
 		case NAMCOS22_RIDGE_RACER:
 		case NAMCOS22_RIDGE_RACER2:
 		case NAMCOS22_RAVE_RACER:
 		case NAMCOS22_ACE_DRIVER:
 		case NAMCOS22_VICTORY_LAP:
-			HandleDrivingIO(device->machine());
+			HandleDrivingIO(machine());
 			break;
 
 		case NAMCOS22_CYBER_COMMANDO:
-			HandleCyberCommandoIO(device->machine());
+			HandleCyberCommandoIO(machine());
 			break;
 
 		default:
 			break;
 	}
 
-	if (nthbyte(state->m_system_controller, 0x04) & 7)
+	if (nthbyte(m_system_controller, 0x04) & 7)
 	{
 		// vblank irq
-		state->m_irq_state |= 1;
-		device->execute().set_input_line(nthbyte(state->m_system_controller, 0x04) & 7, ASSERT_LINE);
+		m_irq_state |= 1;
+		device.execute().set_input_line(nthbyte(m_system_controller, 0x04) & 7, ASSERT_LINE);
 	}
 }
 
@@ -2945,7 +2943,7 @@ void namcos22_state::machine_reset()
 static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 	MCFG_CPU_ADD("maincpu", M68EC020,SS22_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(namcos22s_am)
-	MCFG_CPU_VBLANK_INT("screen", namcos22s_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos22_state,  namcos22s_interrupt)
 
 	MCFG_CPU_ADD("master", TMS32025,SS22_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(master_dsp_program)
@@ -3196,7 +3194,7 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_START( namcos22, namcos22_state )
 	MCFG_CPU_ADD("maincpu", M68020,SS22_MASTER_CLOCK/2) /* 25 MHz? */
 	MCFG_CPU_PROGRAM_MAP(namcos22_am)
-	MCFG_CPU_VBLANK_INT("screen", namcos22_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos22_state,  namcos22_interrupt)
 
 	MCFG_CPU_ADD("master", TMS32025,SS22_MASTER_CLOCK) /* ? */
 	MCFG_CPU_PROGRAM_MAP(master_dsp_program)

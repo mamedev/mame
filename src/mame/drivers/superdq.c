@@ -52,6 +52,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_superdq(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(superdq_vblank);
 };
 
 TILE_GET_INFO_MEMBER(superdq_state::get_tile_info)
@@ -131,20 +132,19 @@ void superdq_state::machine_reset()
 	m_color_bank = 0;
 }
 
-static INTERRUPT_GEN( superdq_vblank )
+INTERRUPT_GEN_MEMBER(superdq_state::superdq_vblank)
 {
-	superdq_state *state = device->machine().driver_data<superdq_state>();
 
 	/* status is read when the STATUS line from the laserdisc
        toggles (600usec after the vblank). We could set up a
        timer to do that, but this works as well */
-	state->m_ld_in_latch = state->m_laserdisc->status_r();
+	m_ld_in_latch = m_laserdisc->status_r();
 
 	/* command is written when the COMMAND line from the laserdisc
        toggles (680usec after the vblank). We could set up a
        timer to do that, but this works as well */
-	state->m_laserdisc->data_w(state->m_ld_out_latch);
-	device->execute().set_input_line(0, ASSERT_LINE);
+	m_laserdisc->data_w(m_ld_out_latch);
+	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(superdq_state::superdq_videoram_w)
@@ -345,7 +345,7 @@ static MACHINE_CONFIG_START( superdq, superdq_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(superdq_map)
 	MCFG_CPU_IO_MAP(superdq_io)
-	MCFG_CPU_VBLANK_INT("screen", superdq_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", superdq_state,  superdq_vblank)
 
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")

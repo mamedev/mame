@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START( spool99, spool99_state )
 
 	MCFG_CPU_ADD("maincpu", Z80, 24000000/8)
 	MCFG_CPU_PROGRAM_MAP(spool99_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spool99_state,  irq0_line_hold)
 
 	MCFG_GFXDECODE(spool99)
 

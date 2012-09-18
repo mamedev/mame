@@ -385,7 +385,7 @@ static MACHINE_CONFIG_START( 4roses, _4roses_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz, guess */
 	MCFG_CPU_PROGRAM_MAP(4roses_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", _4roses_state,  nmi_line_pulse)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 

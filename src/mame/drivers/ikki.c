@@ -264,7 +264,7 @@ static MACHINE_CONFIG_START( ikki, ikki_state )
 
 	MCFG_CPU_ADD("sub", Z80,8000000/2) /* 4.000MHz */
 	MCFG_CPU_PROGRAM_MAP(ikki_cpu2)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(ikki_state, irq0_line_hold, 2*60)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 

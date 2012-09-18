@@ -157,6 +157,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_ddealer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(ddealer_interrupt);
 };
 
 
@@ -618,17 +619,17 @@ void ddealer_state::machine_reset()
 	m_coin_input = 0;
 }
 
-static INTERRUPT_GEN( ddealer_interrupt )
+INTERRUPT_GEN_MEMBER(ddealer_state::ddealer_interrupt)
 {
-	device->execute().set_input_line(4, HOLD_LINE);
+	device.execute().set_input_line(4, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( ddealer, ddealer_state )
 
 	MCFG_CPU_ADD("maincpu" , M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(ddealer)
-	MCFG_CPU_VBLANK_INT("screen", ddealer_interrupt)
-	MCFG_CPU_PERIODIC_INT(irq1_line_hold, 90)//guess,controls music tempo,112 is way too fast
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddealer_state,  ddealer_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(ddealer_state, irq1_line_hold,  90)//guess,controls music tempo,112 is way too fast
 
 	// M50747 or NMK-110 8131 MCU
 

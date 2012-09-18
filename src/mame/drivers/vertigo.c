@@ -125,7 +125,7 @@ static MACHINE_CONFIG_START( vertigo, vertigo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(vertigo_map)
-	MCFG_CPU_PERIODIC_INT(vertigo_interrupt,60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(vertigo_state, vertigo_interrupt, 60)
 
 	MCFG_FRAGMENT_ADD(exidy440_audio)
 

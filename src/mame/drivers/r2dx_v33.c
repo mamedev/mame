@@ -71,6 +71,7 @@ public:
 	tilemap_t *m_tx_tilemap;
 	virtual void video_start();
 	UINT32 screen_update_rdx_v33(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
 };
 
 
@@ -509,9 +510,9 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000 )
 ADDRESS_MAP_END
 
-static INTERRUPT_GEN( rdx_v33_interrupt )
+INTERRUPT_GEN_MEMBER(r2dx_v33_state::rdx_v33_interrupt)
 {
-	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0/4);	/* VBL */
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0/4);	/* VBL */
 }
 
 static const gfx_layout rdx_v33_charlayout =
@@ -692,7 +693,7 @@ static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33, 32000000/2 ) // ?
 	MCFG_CPU_PROGRAM_MAP(rdx_v33_map)
-	MCFG_CPU_VBLANK_INT("screen", rdx_v33_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
 
 	//MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,rdx_v33)
 
@@ -722,7 +723,7 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33,XTAL_32MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(nzerotea_map)
-	MCFG_CPU_VBLANK_INT("screen", rdx_v33_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
 
 	MCFG_MACHINE_RESET(seibu_sound)
 

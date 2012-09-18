@@ -79,6 +79,7 @@ public:
 	DECLARE_DRIVER_INIT(feversoc);
 	virtual void video_start();
 	UINT32 screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(feversoc_irq);
 };
 
 
@@ -246,9 +247,9 @@ static INPUT_PORTS_START( feversoc )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INTERRUPT_GEN( feversoc_irq )
+INTERRUPT_GEN_MEMBER(feversoc_state::feversoc_irq)
 {
-	device->machine().device("maincpu")->execute().set_input_line(8, HOLD_LINE );
+	machine().device("maincpu")->execute().set_input_line(8, HOLD_LINE );
 }
 
 static MACHINE_CONFIG_START( feversoc, feversoc_state )
@@ -256,7 +257,7 @@ static MACHINE_CONFIG_START( feversoc, feversoc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",SH2,MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(feversoc_map)
-	MCFG_CPU_VBLANK_INT("screen",feversoc_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", feversoc_state, feversoc_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -300,12 +300,11 @@ static TIMER_CALLBACK( gp2_timer_callback )
 		machine.device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 }
 
-static INTERRUPT_GEN(qdrmfgp2_interrupt)
+INTERRUPT_GEN_MEMBER(qdrmfgp_state::qdrmfgp2_interrupt)
 {
-	qdrmfgp_state *state = device->machine().driver_data<qdrmfgp_state>();
 	/* trigger V-blank interrupt */
-	if (state->m_control & 0x0008)
-		device->execute().set_input_line(4, HOLD_LINE);
+	if (m_control & 0x0008)
+		device.execute().set_input_line(4, HOLD_LINE);
 }
 
 static void gp2_ide_interrupt(device_t *device, int state)
@@ -718,7 +717,7 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)	/*  16.000 MHz */
 	MCFG_CPU_PROGRAM_MAP(qdrmfgp2_map)
-	MCFG_CPU_VBLANK_INT("screen", qdrmfgp2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", qdrmfgp_state,  qdrmfgp2_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 	MCFG_NVRAM_ADD_1FILL("nvram")

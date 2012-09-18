@@ -842,7 +842,7 @@ static MACHINE_CONFIG_START( vega, vega_state )
 	MCFG_CPU_ADD("maincpu", I8035, 4000000)
 	MCFG_CPU_PROGRAM_MAP(vega_map)
 	MCFG_CPU_IO_MAP(vega_io_map)
-	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vega_state, irq0_line_hold)
 
 
 

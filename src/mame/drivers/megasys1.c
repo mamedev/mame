@@ -292,9 +292,9 @@ ADDRESS_MAP_END
                             [ Main CPU - System D ]
 ***************************************************************************/
 
-static INTERRUPT_GEN( megasys1D_irq )
+INTERRUPT_GEN_MEMBER(megasys1_state::megasys1D_irq)
 {
-	device->execute().set_input_line(2, HOLD_LINE);
+	device.execute().set_input_line(2, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16, megasys1_state )
@@ -1603,7 +1603,7 @@ static MACHINE_CONFIG_START( system_D, megasys1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_D_CPU_CLOCK)	/* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(megasys1D_map)
-	MCFG_CPU_VBLANK_INT("screen", megasys1D_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", megasys1_state,  megasys1D_irq)
 
 	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
 

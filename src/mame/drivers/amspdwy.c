@@ -275,7 +275,7 @@ static MACHINE_CONFIG_START( amspdwy, amspdwy_state )
 	MCFG_CPU_ADD("maincpu", Z80,3000000)
 	MCFG_CPU_PROGRAM_MAP(amspdwy_map)
 	MCFG_CPU_IO_MAP(amspdwy_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ: 60Hz, NMI: retn */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", amspdwy_state,  irq0_line_hold)	/* IRQ: 60Hz, NMI: retn */
 
 	MCFG_CPU_ADD("audiocpu", Z80,3000000)	/* Can't be disabled: the YM2151 timers must work */
 	MCFG_CPU_PROGRAM_MAP(amspdwy_sound_map)

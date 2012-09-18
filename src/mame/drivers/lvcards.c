@@ -465,7 +465,7 @@ static MACHINE_CONFIG_START( lvcards, lvcards_state )
 
 	MCFG_CPU_PROGRAM_MAP(lvcards_map)
 	MCFG_CPU_IO_MAP(lvcards_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", lvcards_state,  irq0_line_hold)
 
 	// video hardware
 

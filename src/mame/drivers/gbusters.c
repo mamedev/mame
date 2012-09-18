@@ -19,12 +19,11 @@
 /* prototypes */
 static KONAMI_SETLINES_CALLBACK( gbusters_banking );
 
-static INTERRUPT_GEN( gbusters_interrupt )
+INTERRUPT_GEN_MEMBER(gbusters_state::gbusters_interrupt)
 {
-	gbusters_state *state = device->machine().driver_data<gbusters_state>();
 
-	if (k052109_is_irq_enabled(state->m_k052109))
-		device->execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
+	if (k052109_is_irq_enabled(m_k052109))
+		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 READ8_MEMBER(gbusters_state::bankedram_r)
@@ -303,7 +302,7 @@ static MACHINE_CONFIG_START( gbusters, gbusters_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)	/* Konami custom 052526 */
 	MCFG_CPU_PROGRAM_MAP(gbusters_map)
-	MCFG_CPU_VBLANK_INT("screen", gbusters_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gbusters_state,  gbusters_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)		/* ? */
 	MCFG_CPU_PROGRAM_MAP(gbusters_sound_map)

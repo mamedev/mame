@@ -328,20 +328,18 @@ static GFXDECODE_START( retofinv )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     64*16+256*2,  64 )
 GFXDECODE_END
 
-static INTERRUPT_GEN( main_vblank_irq )
+INTERRUPT_GEN_MEMBER(retofinv_state::main_vblank_irq)
 {
-	retofinv_state *state = device->machine().driver_data<retofinv_state>();
 
-	if(state->m_main_irq_mask)
-		device->execute().set_input_line(0, ASSERT_LINE);
+	if(m_main_irq_mask)
+		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-static INTERRUPT_GEN( sub_vblank_irq )
+INTERRUPT_GEN_MEMBER(retofinv_state::sub_vblank_irq)
 {
-	retofinv_state *state = device->machine().driver_data<retofinv_state>();
 
-	if(state->m_sub_irq_mask)
-		device->execute().set_input_line(0, ASSERT_LINE);
+	if(m_sub_irq_mask)
+		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -367,15 +365,15 @@ static MACHINE_CONFIG_START( retofinv, retofinv_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", main_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", retofinv_state,  main_vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, 18432000/6)	/* 3.072 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_VBLANK_INT("screen", sub_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", retofinv_state,  sub_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 18432000/6)	/* 3.072 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,2*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(retofinv_state, nmi_line_pulse, 2*60)
 
 	MCFG_CPU_ADD("68705", M68705,18432000/6)	/* 3.072 MHz? */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)

@@ -721,6 +721,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_cobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(cobra_vblank);
 };
 
 void cobra_renderer::render_color_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
@@ -3187,14 +3188,13 @@ static void ide_interrupt(device_t *device, int state)
 }
 
 
-static INTERRUPT_GEN( cobra_vblank )
+INTERRUPT_GEN_MEMBER(cobra_state::cobra_vblank)
 {
-	cobra_state *cobra = device->machine().driver_data<cobra_state>();
 
-	if (cobra->m_vblank_enable & 0x80)
+	if (m_vblank_enable & 0x80)
 	{
-		device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		cobra->m_gfx_unk_flag = 0x80;
+		device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_gfx_unk_flag = 0x80;
 	}
 }
 
@@ -3236,7 +3236,7 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_CPU_ADD("maincpu", PPC603, 100000000)		/* 603EV, 100? MHz */
 	MCFG_CPU_CONFIG(main_ppc_cfg)
 	MCFG_CPU_PROGRAM_MAP(cobra_main_map)
-	MCFG_CPU_VBLANK_INT("screen", cobra_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cobra_state,  cobra_vblank)
 
 	MCFG_CPU_ADD("subcpu", PPC403GA, 32000000)		/* 403GA, 33? MHz */
 	MCFG_CPU_PROGRAM_MAP(cobra_sub_map)

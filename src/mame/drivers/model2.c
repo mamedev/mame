@@ -2111,7 +2111,7 @@ static MACHINE_CONFIG_DERIVED( srallyc, model2a )
 	MCFG_CPU_ADD("drivecpu", Z80, 16000000/4) //???
 	MCFG_CPU_PROGRAM_MAP(drive_map)
 	MCFG_CPU_IO_MAP(drive_io_map)
-//  MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", model2_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
 static const sharc_config sharc_cfg =

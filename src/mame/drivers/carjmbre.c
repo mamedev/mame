@@ -190,12 +190,11 @@ void carjmbre_state::machine_reset()
 	m_bgcolor = 0;
 }
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(carjmbre_state::vblank_irq)
 {
-	carjmbre_state *state = device->machine().driver_data<carjmbre_state>();
 
-	if(state->m_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( carjmbre, carjmbre_state )
@@ -203,13 +202,13 @@ static MACHINE_CONFIG_START( carjmbre, carjmbre_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(carjmbre_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", carjmbre_state,  vblank_irq)
 
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6/2)
 	MCFG_CPU_PROGRAM_MAP(carjmbre_sound_map)
 	MCFG_CPU_IO_MAP(carjmbre_sound_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", carjmbre_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

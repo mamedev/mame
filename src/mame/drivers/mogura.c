@@ -204,7 +204,7 @@ static MACHINE_CONFIG_START( mogura, mogura_state )
 	MCFG_CPU_ADD("maincpu", Z80,3000000)		 /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(mogura_map)
 	MCFG_CPU_IO_MAP(mogura_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mogura_state,  irq0_line_hold)
 
 
 	MCFG_GFXDECODE(mogura)

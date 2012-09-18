@@ -458,8 +458,8 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_42MHz/4)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_CPU_PROGRAM_MAP(popobear_mem)
 	// levels 2,3,5 look interesting
-	//MCFG_CPU_VBLANK_INT("screen",irq5_line_assert)
-	//MCFG_CPU_PERIODIC_INT(irq2_line_assert,120)
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", popobear_state, irq5_line_assert)
+	//MCFG_CPU_PERIODIC_INT_DRIVER(popobear_state, irq2_line_assert, 120)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", popobear_irq, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

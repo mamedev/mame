@@ -302,7 +302,7 @@ static MACHINE_CONFIG_START( wallc, wallc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 12288000 / 4)	/* 3.072 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(wallc_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wallc_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

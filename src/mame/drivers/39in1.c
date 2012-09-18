@@ -75,6 +75,7 @@ public:
 	DECLARE_DRIVER_INIT(39in1);
 	virtual void machine_start();
 	UINT32 screen_update_39in1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(pxa255_vblank_start);
 };
 
 
@@ -1353,7 +1354,7 @@ WRITE32_MEMBER(_39in1_state::pxa255_lcd_w)
 	}
 }
 
-static INTERRUPT_GEN( pxa255_vblank_start )
+INTERRUPT_GEN_MEMBER(_39in1_state::pxa255_vblank_start)
 {
 }
 
@@ -1591,7 +1592,7 @@ static MACHINE_CONFIG_START( 39in1, _39in1_state )
 
 	MCFG_CPU_ADD("maincpu", PXA255, 200000000)
 	MCFG_CPU_PROGRAM_MAP(39in1_map)
-	MCFG_CPU_VBLANK_INT("screen", pxa255_vblank_start)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", _39in1_state,  pxa255_vblank_start)
 
 	MCFG_PALETTE_LENGTH(32768)
 

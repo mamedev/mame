@@ -22,11 +22,11 @@ void subs_state::machine_reset()
 /***************************************************************************
 subs_interrupt
 ***************************************************************************/
-INTERRUPT_GEN( subs_interrupt )
+INTERRUPT_GEN_MEMBER(subs_state::subs_interrupt)
 {
 	/* only do NMI interrupt if not in TEST mode */
-	if ((device->machine().root_device().ioport("IN1")->read() & 0x40)==0x40)
-		device->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+	if ((machine().root_device().ioport("IN1")->read() & 0x40)==0x40)
+		device.execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 }
 
 /***************************************************************************

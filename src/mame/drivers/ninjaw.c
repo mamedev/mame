@@ -843,14 +843,14 @@ static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)	/* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(ninjaw_master_map)
-	MCFG_CPU_VBLANK_INT("lscreen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)	/* 16/4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(ninjaw_sound_map)
 
 	MCFG_CPU_ADD("sub", M68000,16000000/2)	/* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(ninjaw_slave_map)
-	MCFG_CPU_VBLANK_INT("lscreen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* CPU slices */
 
@@ -923,14 +923,14 @@ static MACHINE_CONFIG_START( darius2, ninjaw_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)	/* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(darius2_master_map)
-	MCFG_CPU_VBLANK_INT("lscreen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(ninjaw_sound_map)
 
 	MCFG_CPU_ADD("sub", M68000,16000000/2)	/* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(darius2_slave_map)
-	MCFG_CPU_VBLANK_INT("lscreen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* CPU slices */
 

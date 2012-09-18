@@ -806,7 +806,7 @@ static MACHINE_CONFIG_START( base, exidy_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, EXIDY_CPU_CLOCK)
-	MCFG_CPU_VBLANK_INT("screen", exidy_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", exidy_state,  exidy_vblank_interrupt)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -878,7 +878,7 @@ static MACHINE_CONFIG_DERIVED( teetert, venture )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,10*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(exidy_state, nmi_line_pulse, 10*60)
 
 	MCFG_MACHINE_START_OVERRIDE(exidy_state, teetert )
 

@@ -1179,12 +1179,12 @@ static MACHINE_CONFIG_START( terraf, armedf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(terraf_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
@@ -1224,12 +1224,12 @@ static MACHINE_CONFIG_START( terrafb, armedf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(terraf_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)	// ?
 
 	MCFG_CPU_ADD("extra", Z80, XTAL_8MHz/2)			// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(terrafb_extraz80_map)
@@ -1272,12 +1272,12 @@ static MACHINE_CONFIG_START( kozure, armedf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(kozure_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
@@ -1316,12 +1316,12 @@ static MACHINE_CONFIG_START( armedf, armedf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(armedf_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
@@ -1360,12 +1360,12 @@ static MACHINE_CONFIG_START( cclimbr2, armedf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
@@ -1404,12 +1404,12 @@ static MACHINE_CONFIG_START( legion, armedf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(legion_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
@@ -1448,12 +1448,12 @@ static MACHINE_CONFIG_START( legiono, armedf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(legiono_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
@@ -1505,12 +1505,12 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// verified
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START_OVERRIDE(bigfghtr_state,bigfghtr)
 	MCFG_MACHINE_RESET_OVERRIDE(bigfghtr_state,bigfghtr)

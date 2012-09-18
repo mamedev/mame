@@ -30,12 +30,11 @@
 /* prototypes */
 static KONAMI_SETLINES_CALLBACK( blockhl_banking );
 
-static INTERRUPT_GEN( blockhl_interrupt )
+INTERRUPT_GEN_MEMBER(blockhl_state::blockhl_interrupt)
 {
-	blockhl_state *state = device->machine().driver_data<blockhl_state>();
 
-	if (k052109_is_irq_enabled(state->m_k052109) && state->m_rombank == 0)	/* kludge to prevent crashes */
-		device->execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
+	if (k052109_is_irq_enabled(m_k052109) && m_rombank == 0)	/* kludge to prevent crashes */
+		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 READ8_MEMBER(blockhl_state::bankedram_r)
@@ -215,7 +214,7 @@ static MACHINE_CONFIG_START( blockhl, blockhl_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI,3000000)		/* Konami custom 052526 */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", blockhl_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", blockhl_state,  blockhl_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(audio_map)

@@ -277,7 +277,7 @@ static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(cbasebal_map)
 	MCFG_CPU_IO_MAP(cbasebal_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* ??? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cbasebal_state,  irq0_line_hold)	/* ??? */
 
 
 	MCFG_EEPROM_ADD("eeprom", cbasebal_eeprom_intf)

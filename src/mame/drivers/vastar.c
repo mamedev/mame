@@ -289,12 +289,11 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(vastar_state::vblank_irq)
 {
-	vastar_state *state = device->machine().driver_data<vastar_state>();
 
-	if(state->m_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( vastar, vastar_state )
@@ -303,12 +302,12 @@ static MACHINE_CONFIG_START( vastar, vastar_state )
 	MCFG_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_port_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vastar_state,  vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, 3072000)	/* 3.072 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(cpu2_port_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)	/* ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(vastar_state, irq0_line_hold, 4*60)	/* ??? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - seems enough to ensure proper */
 						/* synchronization of the CPUs */

@@ -1099,9 +1099,9 @@ MACHINE_CONFIG_END
                         Hot Chase Hardware Definitions
 ***************************************************************************/
 
-static INTERRUPT_GEN( hotchase_sound_timer )
+INTERRUPT_GEN_MEMBER(wecleman_state::hotchase_sound_timer)
 {
-	generic_pulse_irq_line(device, M6809_FIRQ_LINE, 1);
+	generic_pulse_irq_line(device.execute(), M6809_FIRQ_LINE, 1);
 }
 
 static const k051316_interface hotchase_k051316_intf_0 =
@@ -1146,7 +1146,7 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 
 	MCFG_CPU_ADD("audiocpu", M6809, 3579545 / 2)	/* 3.579/2 MHz - PCB is drawn in one set's readme */
 	MCFG_CPU_PROGRAM_MAP(hotchase_sound_map)
-	MCFG_CPU_PERIODIC_INT( hotchase_sound_timer, 496 )
+	MCFG_CPU_PERIODIC_INT_DRIVER(wecleman_state, hotchase_sound_timer,  496)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

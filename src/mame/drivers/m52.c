@@ -396,7 +396,7 @@ static MACHINE_CONFIG_START( m52, m52_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", m52_state,  irq0_line_hold)
 
 
 	/* video hardware */

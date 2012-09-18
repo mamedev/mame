@@ -348,7 +348,7 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)	/* 16.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(inufuku_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", inufuku_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 32000000/4)		/* 8.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(inufuku_sound_map)

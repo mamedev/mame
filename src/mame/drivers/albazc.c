@@ -271,7 +271,7 @@ static MACHINE_CONFIG_START( hanaroku, albazc_state )
 
 	MCFG_CPU_ADD("maincpu", Z80,6000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(hanaroku_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", albazc_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

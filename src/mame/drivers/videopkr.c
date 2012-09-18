@@ -1237,7 +1237,7 @@ static MACHINE_CONFIG_START( videopkr, videopkr_state )
 	MCFG_CPU_PROGRAM_MAP(i8039_map)
 	MCFG_CPU_IO_MAP(i8039_io_port)
 
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", videopkr_state,  irq0_line_assert)
 
 	MCFG_CPU_ADD("soundcpu", I8039, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(i8039_sound_mem)

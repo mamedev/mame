@@ -154,9 +154,9 @@ READ32_MEMBER(polygonet_state::psac_rom_r)
 /* irq 3 is network.  don't generate if you don't emulate the network h/w! */
 /* irq 5 is vblank */
 /* irq 7 does nothing (it jsrs to a rts and then rte) */
-static INTERRUPT_GEN(polygonet_interrupt)
+INTERRUPT_GEN_MEMBER(polygonet_state::polygonet_interrupt)
 {
-	device->execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
+	device.execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
 /* sound CPU communications */
@@ -555,9 +555,9 @@ WRITE8_MEMBER(polygonet_state::sound_bankswitch_w)
 	reset_sound_region(machine());
 }
 
-static INTERRUPT_GEN(audio_interrupt)
+INTERRUPT_GEN_MEMBER(polygonet_state::audio_interrupt)
 {
-	device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, polygonet_state )
@@ -622,7 +622,7 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", polygonet_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", polygonet_state,  polygonet_interrupt)
 
 	MCFG_CPU_ADD("dsp", DSP56156, 40000000)		/* xtal is 40.0 MHz, DSP has an internal divide-by-2 */
 	MCFG_CPU_PROGRAM_MAP(dsp_program_map)
@@ -630,7 +630,7 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 
 	MCFG_CPU_ADD("soundcpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(audio_interrupt, 480)
+	MCFG_CPU_PERIODIC_INT_DRIVER(polygonet_state, audio_interrupt,  480)
 
 
 	MCFG_GFXDECODE(plygonet)

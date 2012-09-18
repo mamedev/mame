@@ -129,6 +129,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
 
 
@@ -493,15 +494,14 @@ static TIMER_DEVICE_CALLBACK ( imolagp_nmi_cb )
 	}
 }
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(imolagp_state::vblank_irq)
 {
-	imolagp_state *state = device->machine().driver_data<imolagp_state>();
 
 #ifdef HLE_COM
-	memcpy(&state->m_slave_workram[0x80], state->m_mComData, state->m_mComCount);
-	state->m_mComCount = 0;
+	memcpy(&m_slave_workram[0x80], m_mComData, m_mComCount);
+	m_mComCount = 0;
 #endif
-	device->execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, HOLD_LINE);
 } /* master_interrupt */
 
 
@@ -556,13 +556,13 @@ static MACHINE_CONFIG_START( imolagp, imolagp_state )
 	MCFG_CPU_ADD("maincpu", Z80,8000000) /* ? */
 	MCFG_CPU_PROGRAM_MAP(imolagp_master)
 	MCFG_CPU_IO_MAP(readport_master)
-	MCFG_CPU_VBLANK_INT("screen",vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", imolagp_state, vblank_irq)
 	MCFG_TIMER_ADD_PERIODIC("pot_irq", imolagp_nmi_cb, attotime::from_hz(60*3))
 
 	MCFG_CPU_ADD("slave", Z80,8000000) /* ? */
 	MCFG_CPU_PROGRAM_MAP(imolagp_slave)
 	MCFG_CPU_IO_MAP(readport_slave)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", imolagp_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

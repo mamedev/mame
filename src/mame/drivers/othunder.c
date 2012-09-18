@@ -273,12 +273,11 @@ WRITE16_MEMBER(othunder_state::irq_ack_w)
 	update_irq(machine());
 }
 
-static INTERRUPT_GEN( vblank_interrupt )
+INTERRUPT_GEN_MEMBER(othunder_state::vblank_interrupt)
 {
-	othunder_state *state = device->machine().driver_data<othunder_state>();
 
-	state->m_vblank_irq = 1;
-	update_irq(device->machine());
+	m_vblank_irq = 1;
+	update_irq(machine());
 }
 
 static TIMER_CALLBACK( ad_interrupt )
@@ -710,7 +709,7 @@ static MACHINE_CONFIG_START( othunder, othunder_state )
 //  MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )   /* 12 MHz */
 	MCFG_CPU_ADD("maincpu", M68000, 13000000 )	/* fixes garbage graphics on startup */
 	MCFG_CPU_PROGRAM_MAP(othunder_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", othunder_state,  vblank_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80,16000000/4 )	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)

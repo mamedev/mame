@@ -67,6 +67,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(cmmb_irq);
 };
 
 
@@ -301,11 +302,11 @@ static GFXDECODE_START( cmmb )
 	GFXDECODE_ENTRY( "gfx", 0, spritelayout,   0x10, 4 )
 GFXDECODE_END
 
-static INTERRUPT_GEN( cmmb_irq )
+INTERRUPT_GEN_MEMBER(cmmb_state::cmmb_irq)
 {
-	//if(device->machine().input().code_pressed_once(KEYCODE_Z))
-	//if(device->machine().input().code_pressed(KEYCODE_Z))
-//      device->execute().set_input_line(0, HOLD_LINE);
+	//if(machine().input().code_pressed_once(KEYCODE_Z))
+	//if(machine().input().code_pressed(KEYCODE_Z))
+//      device.execute().set_input_line(0, HOLD_LINE);
 }
 
 void cmmb_state::machine_reset()
@@ -317,7 +318,7 @@ static MACHINE_CONFIG_START( cmmb, cmmb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, XTAL_72_576MHz/5) // Unknown clock, but chip rated for 14MHz
 	MCFG_CPU_PROGRAM_MAP(cmmb_map)
-	MCFG_CPU_VBLANK_INT("screen",cmmb_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cmmb_state, cmmb_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

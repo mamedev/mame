@@ -178,6 +178,8 @@ public:
 	DECLARE_VIDEO_START(dambustr);
 	UINT32 screen_update_galaxold(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_dambustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+	INTERRUPT_GEN_MEMBER(hunchbks_vh_interrupt);
 };
 
 /*----------- defined in video/galaxold.c -----------*/
@@ -192,7 +194,5 @@ WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_2_q_callback );
 WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_1_callback );
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w
-
-INTERRUPT_GEN( hunchbks_vh_interrupt );
 
 #endif

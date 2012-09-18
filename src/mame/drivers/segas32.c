@@ -569,14 +569,13 @@ static TIMER_CALLBACK( end_of_vblank_int )
 }
 
 
-static INTERRUPT_GEN( start_of_vblank_int )
+INTERRUPT_GEN_MEMBER(segas32_state::start_of_vblank_int)
 {
-	segas32_state *state = device->machine().driver_data<segas32_state>();
-	signal_v60_irq(device->machine(), MAIN_IRQ_VBSTART);
-	system32_set_vblank(device->machine(), 1);
-	device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(0), FUNC(end_of_vblank_int));
-	if (state->m_system32_prot_vblank)
-		(*state->m_system32_prot_vblank)(device);
+	signal_v60_irq(machine(), MAIN_IRQ_VBSTART);
+	system32_set_vblank(machine(), 1);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(end_of_vblank_int));
+	if (m_system32_prot_vblank)
+		(*m_system32_prot_vblank)(&device);
 }
 
 
@@ -2193,7 +2192,7 @@ static MACHINE_CONFIG_START( system32, segas32_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V60, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(system32_map)
-	MCFG_CPU_VBLANK_INT("screen", start_of_vblank_int)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas32_state,  start_of_vblank_int)
 
 	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(system32_sound_map)
@@ -2252,7 +2251,7 @@ static MACHINE_CONFIG_START( multi32, segas32_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V70, MULTI32_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(multi32_map)
-	MCFG_CPU_VBLANK_INT("lscreen", start_of_vblank_int)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", segas32_state,  start_of_vblank_int)
 
 	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(multi32_sound_map)

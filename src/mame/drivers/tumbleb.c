@@ -439,11 +439,10 @@ static void tumbleb2_playmusic( device_t *device )
 }
 
 
-static INTERRUPT_GEN( tumbleb2_interrupt )
+INTERRUPT_GEN_MEMBER(tumbleb_state::tumbleb2_interrupt)
 {
-	tumbleb_state *state = device->machine().driver_data<tumbleb_state>();
-	device->execute().set_input_line(6, HOLD_LINE);
-	tumbleb2_playmusic(state->m_oki);
+	device.execute().set_input_line(6, HOLD_LINE);
+	tumbleb2_playmusic(m_oki);
 }
 
 static const int tumbleb_sound_lookup[256] = {
@@ -1977,7 +1976,7 @@ static MACHINE_CONFIG_START( tumblepb, tumbleb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
 	MCFG_CPU_PROGRAM_MAP(tumblepopb_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
@@ -2012,7 +2011,7 @@ static MACHINE_CONFIG_START( tumbleb2, tumbleb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
 	MCFG_CPU_PROGRAM_MAP(tumblepopb_main_map)
-	MCFG_CPU_VBLANK_INT("screen", tumbleb2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tumbleb_state,  tumbleb2_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
@@ -2046,7 +2045,7 @@ static MACHINE_CONFIG_START( jumpkids, tumbleb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(jumpkids_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
 
 	/* z80? */
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000/2)
@@ -2084,7 +2083,7 @@ static MACHINE_CONFIG_START( fncywld, tumbleb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(fncywld_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
@@ -2151,7 +2150,7 @@ static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 15000000) /* verified */
 	MCFG_CPU_PROGRAM_MAP(htchctch_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 15000000/4) /* verified on dquizgo */
 	MCFG_CPU_PROGRAM_MAP(semicom_sound_map)
@@ -2244,7 +2243,7 @@ static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000) /* 14mhz should be correct, but lots of sprite flicker later in game */
 	MCFG_CPU_PROGRAM_MAP(suprtrio_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(suprtrio_sound_map)
@@ -2282,7 +2281,7 @@ static MACHINE_CONFIG_START( pangpang, tumbleb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
 	MCFG_CPU_PROGRAM_MAP(pangpang_main_map)
-	MCFG_CPU_VBLANK_INT("screen", tumbleb2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tumbleb_state,  tumbleb2_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)

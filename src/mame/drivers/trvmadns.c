@@ -347,7 +347,7 @@ static MACHINE_CONFIG_START( trvmadns, trvmadns_state )
 	MCFG_CPU_ADD("maincpu", Z80,10000000/2) // ?
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", trvmadns_state,  nmi_line_pulse)
 
 
 	/* video hardware */

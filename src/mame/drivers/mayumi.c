@@ -46,6 +46,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_mayumi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(mayumi_interrupt);
 };
 
 
@@ -86,12 +87,11 @@ UINT32 mayumi_state::screen_update_mayumi(screen_device &screen, bitmap_ind16 &b
  *
  *************************************/
 
-static INTERRUPT_GEN( mayumi_interrupt )
+INTERRUPT_GEN_MEMBER(mayumi_state::mayumi_interrupt)
 {
-	mayumi_state *state = device->machine().driver_data<mayumi_state>();
 
-	if (state->m_int_enable)
-		 device->execute().set_input_line(0, HOLD_LINE);
+	if (m_int_enable)
+		 device.execute().set_input_line(0, HOLD_LINE);
 }
 
 /*************************************
@@ -399,7 +399,7 @@ static MACHINE_CONFIG_START( mayumi, mayumi_state )
 	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 5.000 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(mayumi_map)
 	MCFG_CPU_IO_MAP(mayumi_io_map)
-	MCFG_CPU_VBLANK_INT("screen", mayumi_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mayumi_state,  mayumi_interrupt)
 
 
 	MCFG_I8255_ADD( "i8255", mayumi_i8255_intf )

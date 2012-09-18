@@ -229,7 +229,7 @@ static MACHINE_CONFIG_START( stadhero, stadhero_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", stadhero_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL_24MHz/16)
 	MCFG_CPU_PROGRAM_MAP(audio_map)

@@ -38,6 +38,7 @@ public:
 	DECLARE_DRIVER_INIT(ertictac);
 	virtual void machine_start();
 	virtual void machine_reset();
+	INTERRUPT_GEN_MEMBER(ertictac_podule_irq);
 };
 
 
@@ -208,9 +209,9 @@ void ertictac_state::machine_reset()
 	archimedes_reset(machine());
 }
 
-static INTERRUPT_GEN( ertictac_podule_irq )
+INTERRUPT_GEN_MEMBER(ertictac_state::ertictac_podule_irq)
 {
-	archimedes_request_irq_b(device->machine(), ARCHIMEDES_IRQB_PODULE_IRQ);
+	archimedes_request_irq_b(machine(), ARCHIMEDES_IRQB_PODULE_IRQ);
 }
 
 /* TODO: Are we sure that this HW have I2C device? */
@@ -226,7 +227,7 @@ static MACHINE_CONFIG_START( ertictac, ertictac_state )
 
 	MCFG_CPU_ADD("maincpu", ARM, XTAL_24MHz/3) /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
 	MCFG_CPU_PROGRAM_MAP(ertictac_map)
-	MCFG_CPU_PERIODIC_INT(ertictac_podule_irq,60) // FIXME: timing of this
+	MCFG_CPU_PERIODIC_INT_DRIVER(ertictac_state, ertictac_podule_irq, 60) // FIXME: timing of this
 
 
 	MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)

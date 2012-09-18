@@ -88,11 +88,10 @@ static TIMER_DEVICE_CALLBACK( espial_scanline )
 }
 
 
-INTERRUPT_GEN( espial_sound_nmi_gen )
+INTERRUPT_GEN_MEMBER(espial_state::espial_sound_nmi_gen)
 {
-	espial_state *state = device->machine().driver_data<espial_state>();
 
-	if (state->m_sound_nmi_enabled)
+	if (m_sound_nmi_enabled)
 		nmi_line_pulse(device);
 }
 
@@ -328,7 +327,7 @@ static MACHINE_CONFIG_START( espial, espial_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3072000)	/* 2 MHz?????? */
 	MCFG_CPU_PROGRAM_MAP(espial_sound_map)
 	MCFG_CPU_IO_MAP(espial_sound_io_map)
-	MCFG_CPU_PERIODIC_INT(espial_sound_nmi_gen,4*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(espial_state, espial_sound_nmi_gen, 4*60)
 
 
 	/* video hardware */

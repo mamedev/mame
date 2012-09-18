@@ -67,6 +67,7 @@ public:
 	DECLARE_WRITE16_MEMBER(goodejan_gfxbank_w);
 	DECLARE_READ16_MEMBER(mahjong_panel_r);
 	DECLARE_WRITE16_MEMBER(mahjong_panel_w);
+	INTERRUPT_GEN_MEMBER(goodejan_irq);
 };
 
 
@@ -329,9 +330,9 @@ static GFXDECODE_START( goodejan )
 	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout, 0x100, 0x10 ) /* Text */
 GFXDECODE_END
 
-static INTERRUPT_GEN( goodejan_irq )
+INTERRUPT_GEN_MEMBER(goodejan_state::goodejan_irq)
 {
-	device->execute().set_input_line_and_vector(0,HOLD_LINE,0x208/4);
+	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x208/4);
 /* vector 0x00c is just a reti */
 }
 
@@ -341,7 +342,7 @@ static MACHINE_CONFIG_START( goodejan, goodejan_state )
 	MCFG_CPU_ADD("maincpu", V30, GOODEJAN_MHZ2/2)
 	MCFG_CPU_PROGRAM_MAP(goodejan_map)
 	MCFG_CPU_IO_MAP(goodejan_io_map)
-	MCFG_CPU_VBLANK_INT("screen",goodejan_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goodejan_state, goodejan_irq)
 
 	SEIBU_SOUND_SYSTEM_CPU(GOODEJAN_MHZ1/2)
 

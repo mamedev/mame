@@ -106,6 +106,8 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(ddayjlc_interrupt);
+	INTERRUPT_GEN_MEMBER(ddayjlc_snd_interrupt);
 };
 
 
@@ -435,18 +437,16 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static INTERRUPT_GEN( ddayjlc_interrupt )
+INTERRUPT_GEN_MEMBER(ddayjlc_state::ddayjlc_interrupt)
 {
-	ddayjlc_state *state = device->machine().driver_data<ddayjlc_state>();
-	if(state->m_main_nmi_enable)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_main_nmi_enable)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static INTERRUPT_GEN( ddayjlc_snd_interrupt )
+INTERRUPT_GEN_MEMBER(ddayjlc_state::ddayjlc_snd_interrupt)
 {
-	ddayjlc_state *state = device->machine().driver_data<ddayjlc_state>();
-	if(state->m_sound_nmi_enable)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_sound_nmi_enable)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -518,11 +518,11 @@ static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/3)
 	MCFG_CPU_PROGRAM_MAP(main_cpu)
-	MCFG_CPU_VBLANK_INT("screen", ddayjlc_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddayjlc_state,  ddayjlc_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 12000000/4)
 	MCFG_CPU_PROGRAM_MAP(sound_cpu)
-	MCFG_CPU_VBLANK_INT("screen", ddayjlc_snd_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddayjlc_state,  ddayjlc_snd_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

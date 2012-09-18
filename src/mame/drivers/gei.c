@@ -134,6 +134,7 @@ public:
 	DECLARE_DRIVER_INIT(setbank);
 	virtual void palette_init();
 	DECLARE_PALETTE_INIT(quizvid);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
 
 
@@ -1105,19 +1106,18 @@ static I8255A_INTERFACE( findout_ppi8255_1_intf )
 };
 
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(gei_state::vblank_irq)
 {
-	gei_state *state = device->machine().driver_data<gei_state>();
 
-	if(state->m_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static MACHINE_CONFIG_START( getrivia, gei_state )
 	MCFG_CPU_ADD("maincpu",Z80,4000000) /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(getrivia_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gei_state,  vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

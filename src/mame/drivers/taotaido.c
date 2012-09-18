@@ -332,7 +332,7 @@ static const ym2610_interface ym2610_config =
 static MACHINE_CONFIG_START( taotaido, taotaido_state )
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taotaido_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,20000000/4) // ??
 	MCFG_CPU_PROGRAM_MAP(sound_map)

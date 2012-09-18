@@ -163,6 +163,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(irq0_start);
 };
 
 
@@ -281,10 +282,10 @@ static TIMER_CALLBACK( irq0_stop )
 }
 
 
-static INTERRUPT_GEN( irq0_start )
+INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
 {
-	device->execute().set_input_line(0, ASSERT_LINE);
-	device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(irq0_stop));
+	device.execute().set_input_line(0, ASSERT_LINE);
+	machine().scheduler().timer_set(attotime::from_usec(50), FUNC(irq0_stop));
 }
 
 
@@ -675,7 +676,7 @@ static MACHINE_CONFIG_START( kinst, kinst_state )
 	MCFG_CPU_ADD("maincpu", R4600LE, MASTER_CLOCK*2)
 	MCFG_CPU_CONFIG(r4600_config)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_start)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", kinst_state,  irq0_start)
 
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)

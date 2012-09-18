@@ -157,7 +157,7 @@ static MACHINE_CONFIG_START( maniacsq, gaelco2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 26000000/2)		/* 13 MHz? */
 	MCFG_CPU_PROGRAM_MAP(maniacsq_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -531,7 +531,7 @@ static MACHINE_CONFIG_START( alighunt, gaelco2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 24000000/2)			/* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(alighunt_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -773,7 +773,7 @@ static MACHINE_CONFIG_START( touchgo, gaelco2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)			/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(touchgo_map)
-	MCFG_CPU_VBLANK_INT("lscreen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -965,7 +965,7 @@ static MACHINE_CONFIG_START( snowboar, gaelco2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 30000000/2)			/* 15 MHz */
 	MCFG_CPU_PROGRAM_MAP(snowboar_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	MCFG_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
 
@@ -1206,7 +1206,7 @@ static MACHINE_CONFIG_START( wrally2, gaelco2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 26000000/2)			/* 13 MHz */
 	MCFG_CPU_PROGRAM_MAP(wrally2_map)
-	MCFG_CPU_VBLANK_INT("lscreen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
 
 	MCFG_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
 

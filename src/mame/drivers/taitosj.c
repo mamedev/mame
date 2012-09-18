@@ -1791,7 +1791,7 @@ static MACHINE_CONFIG_START( nomcu, taitosj_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,8000000/2)      /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(taitosj_main_nomcu_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitosj_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,6000000/2)    /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(taitosj_audio_map)
@@ -1799,7 +1799,7 @@ static MACHINE_CONFIG_START( nomcu, taitosj_state )
 			/* - no interrupts synced with vblank */
 			/* - NMI triggered by the main CPU */
 			/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
+	MCFG_CPU_PERIODIC_INT_DRIVER(taitosj_state, irq0_line_hold,  (double)6000000/(4*16*16*10*16))
 
 
 	/* video hardware */

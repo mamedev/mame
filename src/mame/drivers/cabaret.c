@@ -56,6 +56,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_cabaret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(cabaret_interrupt);
 };
 
 
@@ -324,11 +325,10 @@ void cabaret_state::machine_reset()
 	m_nmi_enable		=	0;
 }
 
-static INTERRUPT_GEN( cabaret_interrupt )
+INTERRUPT_GEN_MEMBER(cabaret_state::cabaret_interrupt)
 {
-	cabaret_state *state = device->machine().driver_data<cabaret_state>();
-	 if (state->m_nmi_enable & 0x80)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	 if (m_nmi_enable & 0x80)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( cabaret, cabaret_state )
@@ -336,7 +336,7 @@ static MACHINE_CONFIG_START( cabaret, cabaret_state )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(cabaret_map)
 	MCFG_CPU_IO_MAP(cabaret_portmap)
-	MCFG_CPU_VBLANK_INT("screen",cabaret_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cabaret_state, cabaret_interrupt)
 
 
 	/* video hardware */

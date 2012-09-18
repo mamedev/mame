@@ -176,12 +176,11 @@ static GFXDECODE_START( sbasketb )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16*16 )
 GFXDECODE_END
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(sbasketb_state::vblank_irq)
 {
-	sbasketb_state *state = device->machine().driver_data<sbasketb_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if(m_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 //-------------------------------------------------
@@ -199,7 +198,7 @@ static MACHINE_CONFIG_START( sbasketb, sbasketb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1400000)        /* 1.400 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sbasketb_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sbasketb_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz / 4)	/* 3.5795 MHz */
 	MCFG_CPU_PROGRAM_MAP(sbasketb_sound_map)

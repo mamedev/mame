@@ -256,6 +256,8 @@ public:
 	DECLARE_VIDEO_START(common);
 	UINT32 screen_update_namcos22s(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(namcos22s_interrupt);
+	INTERRUPT_GEN_MEMBER(namcos22_interrupt);
 };
 
 /*----------- defined in video/namcos22.c -----------*/

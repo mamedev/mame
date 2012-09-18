@@ -480,7 +480,7 @@ static MACHINE_CONFIG_START( jokrwild, jokrwild_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)	/* guess */
 	MCFG_CPU_PROGRAM_MAP(jokrwild_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", jokrwild_state,  nmi_line_pulse)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 

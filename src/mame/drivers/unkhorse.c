@@ -40,6 +40,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(horse_timer_out);
 	virtual void palette_init();
 	UINT32 screen_update_horse(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(horse_interrupt);
 };
 
 
@@ -191,10 +192,10 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static INTERRUPT_GEN( horse_interrupt )
+INTERRUPT_GEN_MEMBER(horse_state::horse_interrupt)
 {
-	device->execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
-	device->execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
+	device.execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
+	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 }
 
 static MACHINE_CONFIG_START( horse, horse_state )
@@ -202,7 +203,7 @@ static MACHINE_CONFIG_START( horse, horse_state )
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(horse_map)
 	MCFG_CPU_IO_MAP(horse_io_map)
-	MCFG_CPU_VBLANK_INT("screen", horse_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", horse_state,  horse_interrupt)
 
 	MCFG_I8155_ADD("i8155", XTAL_12MHz / 2, i8155_intf)
 

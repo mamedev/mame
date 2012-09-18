@@ -87,7 +87,7 @@ UINT32 mpu4plasma_state::screen_update_mpu4plasma(screen_device &screen, bitmap_
 MACHINE_CONFIG_DERIVED_CLASS( mpu4plasma    , mod2, mpu4plasma_state )
 	MCFG_CPU_ADD("plasmacpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(mpu4plasma_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mpu4plasma_state,  irq4_line_hold)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

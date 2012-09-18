@@ -241,7 +241,7 @@ static MACHINE_CONFIG_START( bogeyman, bogeyman_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6502, 1500000)	/* Verified */
 	MCFG_CPU_PROGRAM_MAP(bogeyman_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 16*60) // Controls sound
+	MCFG_CPU_PERIODIC_INT_DRIVER(bogeyman_state, irq0_line_hold,  16*60) // Controls sound
 
 
 	// video hardware

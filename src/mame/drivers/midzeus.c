@@ -111,10 +111,10 @@ static TIMER_CALLBACK( display_irq_off )
 	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
-static INTERRUPT_GEN( display_irq )
+INTERRUPT_GEN_MEMBER(midzeus_state::display_irq)
 {
-	device->execute().set_input_line(0, ASSERT_LINE);
-	device->machine().scheduler().timer_set(attotime::from_hz(30000000), FUNC(display_irq_off));
+	device.execute().set_input_line(0, ASSERT_LINE);
+	machine().scheduler().timer_set(attotime::from_hz(30000000), FUNC(display_irq_off));
 }
 
 
@@ -1091,7 +1091,7 @@ static MACHINE_CONFIG_START( midzeus, midzeus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(zeus_map)
-	MCFG_CPU_VBLANK_INT("screen", display_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", midzeus_state,  display_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(midzeus_state,midzeus)
 	MCFG_MACHINE_RESET_OVERRIDE(midzeus_state,midzeus)
@@ -1131,7 +1131,7 @@ static MACHINE_CONFIG_START( midzeus2, midzeus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(zeus2_map)
-	MCFG_CPU_VBLANK_INT("screen", display_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", midzeus_state,  display_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(midzeus_state,midzeus)
 	MCFG_MACHINE_RESET_OVERRIDE(midzeus_state,midzeus)

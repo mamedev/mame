@@ -23,12 +23,11 @@
 /* prototypes */
 static KONAMI_SETLINES_CALLBACK( crimfght_banking );
 
-static INTERRUPT_GEN( crimfght_interrupt )
+INTERRUPT_GEN_MEMBER(crimfght_state::crimfght_interrupt)
 {
-	crimfght_state *state = device->machine().driver_data<crimfght_state>();
 
-	if (k051960_is_irq_enabled(state->m_k051960))
-		device->execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
+	if (k051960_is_irq_enabled(m_k051960))
+		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(crimfght_state::crimfght_coin_w)
@@ -282,7 +281,7 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)		/* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(crimfght_map)
-	MCFG_CPU_VBLANK_INT("screen", crimfght_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", crimfght_state,  crimfght_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) 	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(crimfght_sound_map)

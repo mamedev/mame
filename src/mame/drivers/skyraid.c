@@ -220,7 +220,7 @@ static MACHINE_CONFIG_START( skyraid, skyraid_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 12)
 	MCFG_CPU_PROGRAM_MAP(skyraid_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", skyraid_state,  irq0_line_hold)
 	MCFG_WATCHDOG_VBLANK_INIT(4)
 
 	/* video hardware */

@@ -191,9 +191,9 @@ READ32_MEMBER(psikyo4_state::ps4_eeprom_r)
 	return 0x00;
 }
 
-static INTERRUPT_GEN(psikyosh_interrupt)
+INTERRUPT_GEN_MEMBER(psikyo4_state::psikyosh_interrupt)
 {
-	device->execute().set_input_line(4, HOLD_LINE);
+	device.execute().set_input_line(4, HOLD_LINE);
 }
 
 CUSTOM_INPUT_MEMBER(psikyo4_state::system_port_r)
@@ -681,7 +681,7 @@ static MACHINE_CONFIG_START( ps4big, psikyo4_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(ps4_map)
-	MCFG_CPU_VBLANK_INT("lscreen", psikyosh_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", psikyo4_state,  psikyosh_interrupt)
 
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C56)

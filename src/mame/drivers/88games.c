@@ -22,11 +22,10 @@
  *
  *************************************/
 
-static INTERRUPT_GEN( k88games_interrupt )
+INTERRUPT_GEN_MEMBER(_88games_state::k88games_interrupt)
 {
-	_88games_state *state = device->machine().driver_data<_88games_state>();
 
-	if (k052109_is_irq_enabled(state->m_k052109))
+	if (k052109_is_irq_enabled(m_k052109))
 		irq0_line_hold(device);
 }
 
@@ -370,7 +369,7 @@ static MACHINE_CONFIG_START( 88games, _88games_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000) /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", k88games_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", _88games_state,  k88games_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(sound_map)

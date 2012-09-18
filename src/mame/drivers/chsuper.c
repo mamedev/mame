@@ -203,7 +203,7 @@ static MACHINE_CONFIG_START( chsuper, chsuper_state )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(chsuper_prg_map)
 	MCFG_CPU_IO_MAP(chsuper_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", chsuper_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

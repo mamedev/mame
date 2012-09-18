@@ -464,8 +464,8 @@ static const ym2610_interface ym2610_config =
 static MACHINE_CONFIG_START( neoprint, neoprint_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(neoprint_map)
-//  MCFG_CPU_PERIODIC_INT(irq3_line_hold,45) /* camera / printer irq, unknown timing */
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold) // lv1,2,3 valid?
+	MCFG_CPU_PERIODIC_INT_DRIVER(neoprint_state, irq3_line_hold, 45) /* camera / printer irq, unknown timing */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", neoprint_state,  irq2_line_hold) // lv1,2,3 valid?
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(neoprint_audio_map)
@@ -504,8 +504,8 @@ MACHINE_RESET_MEMBER(neoprint_state,nprsp)
 static MACHINE_CONFIG_START( nprsp, neoprint_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(nprsp_map)
-//  MCFG_CPU_PERIODIC_INT(irq3_line_hold,45) /* camera / printer irq, unknown timing */
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold) // lv1,2,3 valid?
+	MCFG_CPU_PERIODIC_INT_DRIVER(neoprint_state, irq3_line_hold, 45) /* camera / printer irq, unknown timing */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", neoprint_state,  irq2_line_hold) // lv1,2,3 valid?
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(neoprint_audio_map)

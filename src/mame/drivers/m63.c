@@ -184,6 +184,8 @@ public:
 	DECLARE_VIDEO_START(m63);
 	DECLARE_PALETTE_INIT(m63);
 	UINT32 screen_update_m63(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(snd_irq);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
 
 
@@ -718,10 +720,9 @@ static const samples_interface fghtbskt_samples_interface =
 	fghtbskt_sh_start
 };
 
-static INTERRUPT_GEN( snd_irq )
+INTERRUPT_GEN_MEMBER(m63_state::snd_irq)
 {
-	m63_state *state = device->machine().driver_data<m63_state>();
-	state->m_sound_irq = 1;
+	m_sound_irq = 1;
 }
 
 MACHINE_START_MEMBER(m63_state,m63)
@@ -755,12 +756,11 @@ MACHINE_RESET_MEMBER(m63_state,m63)
 }
 
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(m63_state::vblank_irq)
 {
-	m63_state *state = device->machine().driver_data<m63_state>();
 
-	if(state->m_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( m63, m63_state )
@@ -768,12 +768,12 @@ static MACHINE_CONFIG_START( m63, m63_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_12MHz/4)     /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(m63_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
 
 	MCFG_CPU_ADD("soundcpu",I8039,XTAL_12MHz/4)	/* ????? */
 	MCFG_CPU_PROGRAM_MAP(i8039_map)
 	MCFG_CPU_IO_MAP(i8039_port_map)
-	MCFG_CPU_PERIODIC_INT(snd_irq, 60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60)
 
 	MCFG_MACHINE_START_OVERRIDE(m63_state,m63)
 	MCFG_MACHINE_RESET_OVERRIDE(m63_state,m63)
@@ -804,7 +804,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( atomboy, m63 )
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PERIODIC_INT(snd_irq, 60/2)
+	MCFG_CPU_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( fghtbskt, m63_state )
@@ -812,12 +812,12 @@ static MACHINE_CONFIG_START( fghtbskt, m63_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)     /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(fghtbskt_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
 
 	MCFG_CPU_ADD("soundcpu", I8039,XTAL_12MHz/4)	/* ????? */
 	MCFG_CPU_PROGRAM_MAP(i8039_map)
 	MCFG_CPU_IO_MAP(i8039_port_map)
-	MCFG_CPU_PERIODIC_INT(snd_irq, 60/2)
+	MCFG_CPU_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
 
 	MCFG_MACHINE_START_OVERRIDE(m63_state,m63)
 	MCFG_MACHINE_RESET_OVERRIDE(m63_state,m63)

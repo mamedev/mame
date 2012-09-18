@@ -315,8 +315,8 @@ static MACHINE_CONFIG_START( invqix, invqix_state )
 	MCFG_CPU_ADD("maincpu", H8S2394, XTAL_20MHz)
 	MCFG_CPU_PROGRAM_MAP(invqix_prg_map)
 	MCFG_CPU_IO_MAP(invqix_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 60)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", invqix_state,  irq1_line_hold)
+	MCFG_CPU_PERIODIC_INT_DRIVER(invqix_state, irq0_line_hold,  60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -267,7 +267,7 @@ static MACHINE_CONFIG_START( mosaic, mosaic_state )
 	MCFG_CPU_ADD("maincpu", Z180, 7000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(mosaic_map)
 	MCFG_CPU_IO_MAP(mosaic_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mosaic_state,  irq0_line_hold)
 
 
 	/* video hardware */

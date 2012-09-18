@@ -1202,7 +1202,7 @@ static MACHINE_CONFIG_START( balsente, balsente_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_20MHz/16) /* xtal verified but not speed */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
-	MCFG_CPU_VBLANK_INT("screen", balsente_update_analog_inputs)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", balsente_state,  balsente_update_analog_inputs)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2) /* xtal verified but not speed */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)

@@ -200,7 +200,7 @@ static MACHINE_CONFIG_START( hanaawas, hanaawas_state )
 	MCFG_CPU_ADD("maincpu", Z80,18432000/6)	/* 3.072 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(hanaawas_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", hanaawas_state,  irq0_line_hold)
 
 
 	/* video hardware */

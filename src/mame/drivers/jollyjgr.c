@@ -141,6 +141,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_jollyjgr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_fspider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(jollyjgr_interrupt);
 };
 
 
@@ -621,11 +622,10 @@ GFXDECODE_END
  *
  *************************************/
 
-static INTERRUPT_GEN( jollyjgr_interrupt )
+INTERRUPT_GEN_MEMBER(jollyjgr_state::jollyjgr_interrupt)
 {
-	jollyjgr_state *state = device->machine().driver_data<jollyjgr_state>();
-	if(state->m_nmi_enable)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_enable)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -654,7 +654,7 @@ static MACHINE_CONFIG_START( jollyjgr, jollyjgr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3579545)		 /* 3,579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(jollyjgr_map)
-	MCFG_CPU_VBLANK_INT("screen", jollyjgr_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", jollyjgr_state,  jollyjgr_interrupt)
 
 
 	/* video hardware */

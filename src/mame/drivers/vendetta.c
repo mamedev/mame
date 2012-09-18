@@ -404,11 +404,10 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static INTERRUPT_GEN( vendetta_irq )
+INTERRUPT_GEN_MEMBER(vendetta_state::vendetta_irq)
 {
-	vendetta_state *state = device->machine().driver_data<vendetta_state>();
-	if (state->m_irq_enabled)
-		device->execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
+	if (m_irq_enabled)
+		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 static const k052109_interface vendetta_k052109_intf =
@@ -504,7 +503,7 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)	/* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", vendetta_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vendetta_state,  vendetta_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)	/* verified with PCB */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

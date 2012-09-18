@@ -333,11 +333,11 @@ static MACHINE_CONFIG_START( cloak, cloak_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)		/* 1 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(cloak_state, irq0_line_hold,  4*60)
 
 	MCFG_CPU_ADD("slave", M6502, 1250000)		/* 1.25 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 2*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(cloak_state, irq0_line_hold,  2*60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1000))
 

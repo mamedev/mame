@@ -177,6 +177,7 @@ public:
 	DECLARE_MACHINE_RESET(sammymdl);
 	UINT32 screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sammymdl(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(gegege_vblank_interrupt);
 };
 
 
@@ -1690,16 +1691,16 @@ const eeprom_interface eeprom_intf =
 	7				// reset_delay (otherwise gegege will hang when saving settings)
 };
 
-static INTERRUPT_GEN( gegege_vblank_interrupt )
+INTERRUPT_GEN_MEMBER(sigmab98_state::gegege_vblank_interrupt)
 {
-	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x5a);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x5a);
 }
 
 static MACHINE_CONFIG_START( gegege, sigmab98_state )
 	MCFG_CPU_ADD("maincpu", Z80, 10000000)	// !! TAXAN KY-80, clock @X1? !!
 	MCFG_CPU_PROGRAM_MAP(gegege_mem_map)
 	MCFG_CPU_IO_MAP(gegege_io_map)
-	MCFG_CPU_VBLANK_INT("screen", gegege_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sigmab98_state,  gegege_vblank_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)

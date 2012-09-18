@@ -265,12 +265,11 @@ static ADDRESS_MAP_START( nd1h8iomap, AS_IO, 8, namcond1_state )
 	AM_RANGE(H8_ADC_0_L, H8_ADC_3_H) AM_NOP // MCU reads these, but the games have no analog controls
 ADDRESS_MAP_END
 
-static INTERRUPT_GEN( mcu_interrupt )
+INTERRUPT_GEN_MEMBER(namcond1_state::mcu_interrupt)
 {
-	namcond1_state *state = device->machine().driver_data<namcond1_state>();
-	if( state->m_h8_irq5_enabled )
+	if( m_h8_irq5_enabled )
 	{
-		generic_pulse_irq_line(device, H8_IRQ5, 1);
+		generic_pulse_irq_line(device.execute(), H8_IRQ5, 1);
 	}
 }
 
@@ -286,7 +285,7 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_49_152MHz/4)
 	MCFG_CPU_PROGRAM_MAP(namcond1_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
 
 	// I've disabled this for now, I don't think it's correct, it breaks ncv2 'game options' in test
 	// mode (and could also be responsible for the random resets?)
@@ -298,7 +297,7 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	MCFG_CPU_ADD("mcu", H83002, XTAL_49_152MHz/3 )
 	MCFG_CPU_PROGRAM_MAP( nd1h8rwmap)
 	MCFG_CPU_IO_MAP( nd1h8iomap)
-	MCFG_CPU_VBLANK_INT("screen", mcu_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  mcu_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

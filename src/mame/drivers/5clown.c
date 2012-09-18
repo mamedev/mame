@@ -1065,7 +1065,7 @@ static MACHINE_CONFIG_START( fclown, _5clown_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)	/* guess, seems ok */
 	MCFG_CPU_PROGRAM_MAP(fclown_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", _5clown_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("audiocpu", M6502, MASTER_CLOCK/8)	/* guess, seems ok */
 	MCFG_CPU_PROGRAM_MAP(fcaudio_map)

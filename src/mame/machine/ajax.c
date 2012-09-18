@@ -225,10 +225,9 @@ void ajax_state::machine_reset()
 	m_firq_enable = 0;
 }
 
-INTERRUPT_GEN( ajax_interrupt )
+INTERRUPT_GEN_MEMBER(ajax_state::ajax_interrupt)
 {
-	ajax_state *state = device->machine().driver_data<ajax_state>();
 
-	if (k051960_is_irq_enabled(state->m_k051960))
-		device->execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
+	if (k051960_is_irq_enabled(m_k051960))
+		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }

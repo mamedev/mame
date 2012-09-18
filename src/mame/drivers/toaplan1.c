@@ -1532,7 +1532,7 @@ static MACHINE_CONFIG_START( rallybik, toaplan1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(rallybik_main_map)
-	MCFG_CPU_VBLANK_INT("screen", toaplan1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
@@ -1569,7 +1569,7 @@ static MACHINE_CONFIG_START( truxton, toaplan1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(truxton_main_map)
-	MCFG_CPU_VBLANK_INT("screen", toaplan1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
@@ -1606,7 +1606,7 @@ static MACHINE_CONFIG_START( hellfire, toaplan1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(hellfire_main_map)
-	MCFG_CPU_VBLANK_INT("screen", toaplan1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
@@ -1643,7 +1643,7 @@ static MACHINE_CONFIG_START( zerowing, toaplan1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(zerowing_main_map)
-	MCFG_CPU_VBLANK_INT("screen", toaplan1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
@@ -1680,7 +1680,7 @@ static MACHINE_CONFIG_START( demonwld, toaplan1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(demonwld_main_map)
-	MCFG_CPU_VBLANK_INT("screen", toaplan1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
@@ -1721,7 +1721,7 @@ static MACHINE_CONFIG_START( samesame, toaplan1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(samesame_main_map)
-	MCFG_CPU_VBLANK_INT("screen", toaplan1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z180, XTAL_28MHz/8)	/* HD647180XOFS6 CPU */
 	MCFG_CPU_PROGRAM_MAP(hd647180_mem_map)
@@ -1756,7 +1756,7 @@ static MACHINE_CONFIG_START( outzone, toaplan1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(outzone_main_map)
-	MCFG_CPU_VBLANK_INT("screen", toaplan1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
@@ -1793,7 +1793,7 @@ static MACHINE_CONFIG_START( vimana, toaplan1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(vimana_main_map)
-	MCFG_CPU_VBLANK_INT("screen", toaplan1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z180, XTAL_28MHz/8)	/* HD647180XOFS6 CPU */
 	MCFG_CPU_PROGRAM_MAP(hd647180_mem_map)

@@ -347,9 +347,9 @@ READ32_MEMBER(psikyosh_state::psh_eeprom_r)
 	return 0;
 }
 
-static INTERRUPT_GEN(psikyosh_interrupt)
+INTERRUPT_GEN_MEMBER(psikyosh_state::psikyosh_interrupt)
 {
-	device->execute().set_input_line(4, ASSERT_LINE);
+	device.execute().set_input_line(4, ASSERT_LINE);
 }
 
 // VBL handler writes 0x00 on entry, 0xc0 on exit
@@ -808,7 +808,7 @@ static MACHINE_CONFIG_START( psikyo3v1, psikyosh_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(ps3v1_map)
-	MCFG_CPU_VBLANK_INT("screen", psikyosh_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", psikyosh_state,  psikyosh_interrupt)
 
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C56)

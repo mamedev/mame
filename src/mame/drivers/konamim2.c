@@ -250,6 +250,7 @@ public:
 	DECLARE_DRIVER_INIT(m2);
 	virtual void video_start();
 	UINT32 screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(m2);
 };
 
 
@@ -1150,20 +1151,19 @@ static const powerpc_config ppc602_config =
 	NULL
 };
 
-static INTERRUPT_GEN(m2)
+INTERRUPT_GEN_MEMBER(konamim2_state::m2)
 {
-	konamim2_state *state = device->machine().driver_data<konamim2_state>();
-	if (state->m_irq_enable & 0x800000)
+	if (m_irq_enable & 0x800000)
 	{
-		state->m_irq_active |= 0x800000;
+		m_irq_active |= 0x800000;
 	}
 
-	/*if (state->m_irq_enable & 0x8)
+	/*if (m_irq_enable & 0x8)
     {
-        state->m_irq_active |= 0x8;
+        m_irq_active |= 0x8;
     }*/
 
-	device->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( m2, konamim2_state )
@@ -1172,7 +1172,7 @@ static MACHINE_CONFIG_START( m2, konamim2_state )
 	MCFG_CPU_ADD("maincpu", PPC602, 66000000)	/* actually PPC602, 66MHz */
 	MCFG_CPU_CONFIG(ppc602_config)
 	MCFG_CPU_PROGRAM_MAP(m2_main)
-	MCFG_CPU_VBLANK_INT("screen", m2)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", konamim2_state,  m2)
 
 	MCFG_CPU_ADD("sub", PPC602, 66000000)	/* actually PPC602, 66MHz */
 	MCFG_CPU_CONFIG(ppc602_config)

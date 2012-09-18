@@ -59,6 +59,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_spoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(spoker_interrupt);
 };
 
 WRITE8_MEMBER(spoker_state::bg_tile_w)
@@ -519,11 +520,10 @@ void spoker_state::machine_reset()
 	m_video_enable	=	1;
 }
 
-static INTERRUPT_GEN( spoker_interrupt )
+INTERRUPT_GEN_MEMBER(spoker_state::spoker_interrupt)
 {
-//  spoker_state *state = device->machine().driver_data<spoker_state>();
 
-	device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( spoker, spoker_state )
@@ -532,7 +532,7 @@ static MACHINE_CONFIG_START( spoker, spoker_state )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(spoker_map)
 	MCFG_CPU_IO_MAP(spoker_portmap)
-	MCFG_CPU_VBLANK_INT("screen",spoker_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spoker_state, spoker_interrupt)
 
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -564,8 +564,8 @@ static MACHINE_CONFIG_DERIVED( 3super8, spoker )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spoker_map)
 	MCFG_CPU_IO_MAP(3super8_portmap)
-	MCFG_CPU_VBLANK_INT("screen",spoker_interrupt)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,120) // this signal comes from the PIC
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spoker_state, spoker_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(spoker_state, irq0_line_hold, 120) // this signal comes from the PIC
 
 	MCFG_GFXDECODE(3super8)
 

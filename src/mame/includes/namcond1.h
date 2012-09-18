@@ -27,4 +27,5 @@ public:
 	DECLARE_WRITE16_MEMBER(namcond1_cuskey_w);
 	virtual void machine_start();
 	virtual void machine_reset();
+	INTERRUPT_GEN_MEMBER(mcu_interrupt);
 };

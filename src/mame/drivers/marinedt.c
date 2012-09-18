@@ -673,7 +673,7 @@ static MACHINE_CONFIG_START( marinedt, marinedt_state )
 	MCFG_CPU_ADD("maincpu", Z80,10000000/4)
 	MCFG_CPU_PROGRAM_MAP(marinedt_map)
 	MCFG_CPU_IO_MAP(marinedt_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", marinedt_state,  irq0_line_hold)
 
 
 	/* video hardware */

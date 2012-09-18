@@ -369,16 +369,16 @@ static MACHINE_CONFIG_START( taxidriv, taxidriv_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)	/* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", Z80,4000000)	/* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* ??? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)	/* ??? */
 
 	MCFG_CPU_ADD("audiocpu", Z80,4000000)	/* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(cpu3_map)
 	MCFG_CPU_IO_MAP(cpu3_port_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* ??? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)	/* ??? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */

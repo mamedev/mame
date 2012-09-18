@@ -344,7 +344,7 @@ static MACHINE_CONFIG_START( konamigq, konamigq_state )
 
 	MCFG_CPU_ADD( "soundcpu", M68000, 8000000 )
 	MCFG_CPU_PROGRAM_MAP( konamigq_sound_map)
-	MCFG_CPU_PERIODIC_INT( irq2_line_hold, 480 )
+	MCFG_CPU_PERIODIC_INT_DRIVER(konamigq_state, irq2_line_hold,  480)
 
 	MCFG_MACHINE_START_OVERRIDE(konamigq_state, konamigq )
 	MCFG_MACHINE_RESET_OVERRIDE(konamigq_state, konamigq )

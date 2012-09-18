@@ -325,7 +325,7 @@ static MACHINE_CONFIG_START( speedatk, speedatk_state )
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/2) //divider is unknown
 	MCFG_CPU_PROGRAM_MAP(speedatk_mem)
 	MCFG_CPU_IO_MAP(speedatk_io)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", speedatk_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_VBLANK_INIT(8) // timing is unknown
 

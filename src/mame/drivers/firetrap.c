@@ -581,12 +581,11 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B		/* 7.8125kHz          */
 };
 
-static INTERRUPT_GEN( firetrap_irq )
+INTERRUPT_GEN_MEMBER(firetrap_state::firetrap_irq)
 {
-	firetrap_state *state = device->machine().driver_data<firetrap_state>();
 
-	if (state->m_nmi_enable)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_enable)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -643,7 +642,7 @@ static MACHINE_CONFIG_START( firetrap, firetrap_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)		// 6 MHz
 	MCFG_CPU_PROGRAM_MAP(firetrap_map)
-	MCFG_CPU_VBLANK_INT("screen",firetrap_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", firetrap_state, firetrap_irq)
 
 	MCFG_CPU_ADD("audiocpu", M6502, FIRETRAP_XTAL/8)	// 1.5 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -679,7 +678,7 @@ static MACHINE_CONFIG_START( firetrapbl, firetrap_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)		// 6 MHz
 	MCFG_CPU_PROGRAM_MAP(firetrap_bootleg_map)
-	MCFG_CPU_VBLANK_INT("screen", firetrap_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", firetrap_state,  firetrap_irq)
 
 	MCFG_CPU_ADD("audiocpu", M6502, FIRETRAP_XTAL/8)	// 1.5 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_map)

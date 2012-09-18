@@ -317,12 +317,11 @@ void tankbust_state::machine_reset()
 	m_variable_data = 0x11;
 }
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(tankbust_state::vblank_irq)
 {
-	tankbust_state *state = device->machine().driver_data<tankbust_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if(m_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( tankbust, tankbust_state )
@@ -330,7 +329,7 @@ static MACHINE_CONFIG_START( tankbust, tankbust_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2)	/* Verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tankbust_state,  vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_14_31818MHz/4)		/* Verified on PCB */
 //  MCFG_CPU_ADD("sub", Z80, XTAL_14_31818MHz/3)        /* Accurate to audio recording, but apparently incorrect clock */

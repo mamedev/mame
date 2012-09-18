@@ -143,21 +143,20 @@ WRITE8_MEMBER(skydiver_state::skydiver_nmion_w)
 }
 
 
-static INTERRUPT_GEN( skydiver_interrupt )
+INTERRUPT_GEN_MEMBER(skydiver_state::skydiver_interrupt)
 {
-	skydiver_state *state = device->machine().driver_data<skydiver_state>();
-	device_t *discrete = device->machine().device("discrete");
+	device_t *discrete = machine().device("discrete");
 
 	/* Convert range data to divide value and write to sound */
-	address_space &space = *device->machine().firstcpu->space(AS_PROGRAM);
-	discrete_sound_w(discrete, space, SKYDIVER_RANGE_DATA, (0x01 << (~state->m_videoram[0x394] & 0x07)) & 0xff);	// Range 0-2
+	address_space &space = *machine().firstcpu->space(AS_PROGRAM);
+	discrete_sound_w(discrete, space, SKYDIVER_RANGE_DATA, (0x01 << (~m_videoram[0x394] & 0x07)) & 0xff);	// Range 0-2
 
-	discrete_sound_w(discrete, space, SKYDIVER_RANGE3_EN,  state->m_videoram[0x394] & 0x08);		// Range 3 - note disable
-	discrete_sound_w(discrete, space, SKYDIVER_NOTE_DATA, ~state->m_videoram[0x395] & 0xff);		// Note - freq
-	discrete_sound_w(discrete, space, SKYDIVER_NOISE_DATA,  state->m_videoram[0x396] & 0x0f);	// NAM - Noise Amplitude
+	discrete_sound_w(discrete, space, SKYDIVER_RANGE3_EN,  m_videoram[0x394] & 0x08);		// Range 3 - note disable
+	discrete_sound_w(discrete, space, SKYDIVER_NOTE_DATA, ~m_videoram[0x395] & 0xff);		// Note - freq
+	discrete_sound_w(discrete, space, SKYDIVER_NOISE_DATA,  m_videoram[0x396] & 0x0f);	// NAM - Noise Amplitude
 
-	if (state->m_nmion)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmion)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -378,7 +377,7 @@ static MACHINE_CONFIG_START( skydiver, skydiver_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800,MASTER_CLOCK/16)	   /* ???? */
 	MCFG_CPU_PROGRAM_MAP(skydiver_map)
-	MCFG_CPU_PERIODIC_INT(skydiver_interrupt, 5*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(skydiver_state, skydiver_interrupt,  5*60)
 	MCFG_WATCHDOG_VBLANK_INIT(8)	// 128V clocks the same as VBLANK
 
 

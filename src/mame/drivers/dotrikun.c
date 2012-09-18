@@ -155,7 +155,7 @@ static MACHINE_CONFIG_START( dotrikun, dotrikun_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)		 /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(dotrikun_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dotrikun_state,  irq0_line_hold)
 
 
 	/* video hardware */

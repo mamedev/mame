@@ -150,15 +150,14 @@ static void mcu_simulate( running_machine &machine )
 }
 
 
-INTERRUPT_GEN( kikikai_interrupt )
+INTERRUPT_GEN_MEMBER(mexico86_state::kikikai_interrupt)
 {
-	mexico86_state *state = device->machine().driver_data<mexico86_state>();
 
-	if (state->m_mcu_running)
-		mcu_simulate(device->machine());
+	if (m_mcu_running)
+		mcu_simulate(machine());
 
-	device->execute().set_input_line_vector(0, state->m_protection_ram[0]);
-	device->execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line_vector(0, m_protection_ram[0]);
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -218,9 +217,9 @@ static void kiki_clogic(running_machine &machine, int address, int latch)
 
 ***************************************************************************/
 
-INTERRUPT_GEN( mexico86_m68705_interrupt )
+INTERRUPT_GEN_MEMBER(mexico86_state::mexico86_m68705_interrupt)
 {
-	device->execute().set_input_line(0, ASSERT_LINE);
+	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 

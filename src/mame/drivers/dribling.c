@@ -38,11 +38,10 @@
  *
  *************************************/
 
-static INTERRUPT_GEN( dribling_irq_gen )
+INTERRUPT_GEN_MEMBER(dribling_state::dribling_irq_gen)
 {
-	dribling_state *state = device->machine().driver_data<dribling_state>();
-	if (state->m_di)
-		device->execute().set_input_line(0, ASSERT_LINE);
+	if (m_di)
+		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -305,7 +304,7 @@ static MACHINE_CONFIG_START( dribling, dribling_state )
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)
 	MCFG_CPU_PROGRAM_MAP(dribling_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT("screen", dribling_irq_gen)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dribling_state,  dribling_irq_gen)
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )

@@ -111,6 +111,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_sandscrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sandscrp(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(sandscrp_interrupt);
 };
 
 
@@ -160,11 +161,10 @@ static void update_irq_state(running_machine &machine)
 
 
 /* Called once/frame to generate the VBLANK interrupt */
-static INTERRUPT_GEN( sandscrp_interrupt )
+INTERRUPT_GEN_MEMBER(sandscrp_state::sandscrp_interrupt)
 {
-	sandscrp_state *state = device->machine().driver_data<sandscrp_state>();
-	state->m_vblank_irq = 1;
-	update_irq_state(device->machine());
+	m_vblank_irq = 1;
+	update_irq_state(machine());
 }
 
 
@@ -500,7 +500,7 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)	/* TMP68HC000N-12 */
 	MCFG_CPU_PROGRAM_MAP(sandscrp)
-	MCFG_CPU_VBLANK_INT("screen", sandscrp_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sandscrp_state,  sandscrp_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80,4000000)	/* Z8400AB1, Reads the DSWs: it can't be disabled */
 	MCFG_CPU_PROGRAM_MAP(sandscrp_soundmem)

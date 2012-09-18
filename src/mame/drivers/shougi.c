@@ -112,6 +112,7 @@ public:
 	DECLARE_READ8_MEMBER(dummy_r);
 	virtual void palette_init();
 	UINT32 screen_update_shougi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(shougi_vblank_nmi);
 };
 
 
@@ -273,15 +274,14 @@ WRITE8_MEMBER(shougi_state::nmi_enable_w)
 	m_nmi_enabled = 1; /* enable NMIs */
 }
 
-static INTERRUPT_GEN( shougi_vblank_nmi )
+INTERRUPT_GEN_MEMBER(shougi_state::shougi_vblank_nmi)
 {
-	shougi_state *state = device->machine().driver_data<shougi_state>();
 
-	if ( state->m_nmi_enabled == 1 )
+	if ( m_nmi_enabled == 1 )
 	{
 		/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
-		device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		device->machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -405,7 +405,7 @@ static MACHINE_CONFIG_START( shougi, shougi_state )
 
 	MCFG_CPU_ADD("maincpu", Z80,10000000/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", shougi_vblank_nmi)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", shougi_state,  shougi_vblank_nmi)
 
 	MCFG_CPU_ADD("sub", Z80,10000000/4)
 	MCFG_CPU_PROGRAM_MAP(sub_map)

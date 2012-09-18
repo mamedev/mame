@@ -143,12 +143,11 @@ public:
 	void screen_eof_rallybik(screen_device &screen, bool state);
 	void screen_eof_toaplan1(screen_device &screen, bool state);
 	void screen_eof_samesame(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(toaplan1_interrupt);
 };
 
 
 /*----------- defined in machine/toaplan1.c -----------*/
-
-INTERRUPT_GEN( toaplan1_interrupt );
 void toaplan1_driver_savestate(running_machine &machine);
 void demonwld_driver_savestate(running_machine &machine);
 void vimana_driver_savestate(running_machine &machine);

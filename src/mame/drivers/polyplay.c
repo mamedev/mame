@@ -118,24 +118,23 @@ void polyplay_state::machine_reset()
 }
 
 
-static INTERRUPT_GEN( periodic_interrupt )
+INTERRUPT_GEN_MEMBER(polyplay_state::periodic_interrupt)
 {
-	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x4e);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x4e);
 }
 
 
-static INTERRUPT_GEN( coin_interrupt )
+INTERRUPT_GEN_MEMBER(polyplay_state::coin_interrupt)
 {
-	polyplay_state *state = device->machine().driver_data<polyplay_state>();
 
-	if (state->ioport("INPUT")->read() & 0x80)
-		state->m_last = 0;
+	if (ioport("INPUT")->read() & 0x80)
+		m_last = 0;
 	else
 	{
-		if (state->m_last == 0)    /* coin inserted */
-			device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x50);
+		if (m_last == 0)    /* coin inserted */
+			device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x50);
 
-		state->m_last = 1;
+		m_last = 1;
 	}
 }
 
@@ -273,8 +272,8 @@ static MACHINE_CONFIG_START( polyplay, polyplay_state )
 	MCFG_CPU_ADD("maincpu", Z80, 9830400/4)
 	MCFG_CPU_PROGRAM_MAP(polyplay_map)
 	MCFG_CPU_IO_MAP(polyplay_io_map)
-	MCFG_CPU_PERIODIC_INT(periodic_interrupt,75)
-	MCFG_CPU_VBLANK_INT("screen", coin_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(polyplay_state, periodic_interrupt, 75)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", polyplay_state,  coin_interrupt)
 
 
 	MCFG_TIMER_ADD("timer", polyplay_timer_callback)

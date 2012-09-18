@@ -307,14 +307,13 @@ GFXDECODE_END
  *
  *************************************/
 
-static INTERRUPT_GEN( jackal_interrupt )
+INTERRUPT_GEN_MEMBER(jackal_state::jackal_interrupt)
 {
-	jackal_state *state = device->machine().driver_data<jackal_state>();
 
-	if (state->m_irq_enable)
+	if (m_irq_enable)
 	{
-		device->execute().set_input_line(0, HOLD_LINE);
-		state->m_slavecpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().set_input_line(0, HOLD_LINE);
+		m_slavecpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -358,7 +357,7 @@ static MACHINE_CONFIG_START( jackal, jackal_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master", M6809, MASTER_CLOCK/12) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_VBLANK_INT("screen", jackal_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", jackal_state,  jackal_interrupt)
 
 	MCFG_CPU_ADD("slave", M6809, MASTER_CLOCK/12) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(slave_map)

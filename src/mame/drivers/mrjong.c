@@ -201,7 +201,7 @@ static MACHINE_CONFIG_START( mrjong, mrjong_state )
 	MCFG_CPU_ADD("maincpu", Z80,15468000/6)	/* 2.578 MHz?? */
 	MCFG_CPU_PROGRAM_MAP(mrjong_map)
 	MCFG_CPU_IO_MAP(mrjong_io_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mrjong_state,  nmi_line_pulse)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -437,11 +437,10 @@ static TIMER_DEVICE_CALLBACK( thedeep_interrupt )
 	}
 }
 
-static INTERRUPT_GEN( thedeep_mcu_irq )
+INTERRUPT_GEN_MEMBER(thedeep_state::thedeep_mcu_irq)
 {
-	thedeep_state *state = device->machine().driver_data<thedeep_state>();
 
-	state->m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
+	m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( thedeep, thedeep_state )
@@ -458,7 +457,7 @@ static MACHINE_CONFIG_START( thedeep, thedeep_state )
 	/* MCU is a i8751 running at 8Mhz (8mhz xtal)*/
 	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
 	MCFG_CPU_IO_MAP(mcu_io_map)
-	MCFG_CPU_VBLANK_INT("screen",thedeep_mcu_irq ) // unknown source, but presumably vblank
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", thedeep_state, thedeep_mcu_irq) // unknown source, but presumably vblank
 	MCFG_DEVICE_DISABLE()
 
 

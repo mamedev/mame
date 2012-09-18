@@ -31,6 +31,7 @@ public:
 	DECLARE_VIDEO_START(badlands);
 	DECLARE_MACHINE_RESET(badlandsb);
 	UINT32 screen_update_badlands(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_int);
 };
 
 /*----------- defined in video/badlands.c -----------*/

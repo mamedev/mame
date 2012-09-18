@@ -213,13 +213,13 @@ public:
 	UINT32 screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_kodb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_cps1(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(cps1_interrupt);
+	INTERRUPT_GEN_MEMBER(cps1_qsound_interrupt);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/
 
 ADDRESS_MAP_EXTERN( qsound_sub_map, 8 );
-
-INTERRUPT_GEN( cps1_interrupt );
 
 GFXDECODE_EXTERN( cps1 );
 

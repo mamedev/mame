@@ -173,6 +173,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
 	DECLARE_DRIVER_INIT(ssingles);
 	virtual void video_start();
+	INTERRUPT_GEN_MEMBER(atamanot_irq);
 };
 
 //fake palette
@@ -568,7 +569,7 @@ static MACHINE_CONFIG_START( ssingles, ssingles_state )
 	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(ssingles_map)
 	MCFG_CPU_IO_MAP(ssingles_io_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ssingles_state,  nmi_line_pulse)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
@@ -592,7 +593,7 @@ static MACHINE_CONFIG_START( ssingles, ssingles_state )
 
 MACHINE_CONFIG_END
 
-static INTERRUPT_GEN( atamanot_irq )
+INTERRUPT_GEN_MEMBER(ssingles_state::atamanot_irq)
 {
 	// ...
 }
@@ -601,7 +602,7 @@ static MACHINE_CONFIG_DERIVED( atamanot, ssingles )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(atamanot_map)
 	MCFG_CPU_IO_MAP(atamanot_io_map)
-	MCFG_CPU_VBLANK_INT("screen", atamanot_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ssingles_state,  atamanot_irq)
 
 	MCFG_DEVICE_REMOVE("crtc")
 

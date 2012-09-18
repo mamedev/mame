@@ -235,8 +235,8 @@ static MACHINE_CONFIG_START( xyonix, xyonix_state )
 	MCFG_CPU_ADD("maincpu", Z80,16000000 / 4)		 /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
-	MCFG_CPU_PERIODIC_INT(irq0_line_assert,4*60)	/* ?? controls music tempo */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", xyonix_state,  nmi_line_pulse)
+	MCFG_CPU_PERIODIC_INT_DRIVER(xyonix_state, irq0_line_assert, 4*60)	/* ?? controls music tempo */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

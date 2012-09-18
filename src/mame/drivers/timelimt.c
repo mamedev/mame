@@ -214,11 +214,10 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static INTERRUPT_GEN( timelimt_irq )
+INTERRUPT_GEN_MEMBER(timelimt_state::timelimt_irq)
 {
-	timelimt_state *state = device->machine().driver_data<timelimt_state>();
-	if ( state->m_nmi_enabled )
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if ( m_nmi_enabled )
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /***************************************************************************/
@@ -229,12 +228,12 @@ static MACHINE_CONFIG_START( timelimt, timelimt_state )
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)	/* 5.000 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT("screen", timelimt_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", timelimt_state,  timelimt_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,18432000/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold) /* ? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", timelimt_state,  irq0_line_hold) /* ? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
 

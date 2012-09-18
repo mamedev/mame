@@ -69,4 +69,5 @@ public:
 	virtual void video_start();
 	DECLARE_VIDEO_START(wgp2);
 	UINT32 screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(wgp_cpub_interrupt);
 };

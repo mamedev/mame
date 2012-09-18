@@ -99,33 +99,31 @@ static TIMER_CALLBACK( namcoio_run )
 	}
 }
 
-static INTERRUPT_GEN( toypop_main_vblank_irq )
+INTERRUPT_GEN_MEMBER(toypop_state::toypop_main_vblank_irq)
 {
-	toypop_state *state = device->machine().driver_data<toypop_state>();
-	device_t *namcoio_0 = device->machine().device("58xx");
-	device_t *namcoio_1 = device->machine().device("56xx_1");
-	device_t *namcoio_2 = device->machine().device("56xx_2");
+	device_t *namcoio_0 = machine().device("58xx");
+	device_t *namcoio_1 = machine().device("56xx_1");
+	device_t *namcoio_2 = machine().device("56xx_2");
 
-	if(state->m_main_irq_mask)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if(m_main_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_0))		/* give the cpu a tiny bit of time to write the command before processing it */
-		device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run));
+		machine().scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run));
 
 	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
-		device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run), 1);
+		machine().scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run), 1);
 
 	if (!namcoio_read_reset_line(namcoio_2))		/* give the cpu a tiny bit of time to write the command before processing it */
-		device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run), 2);
+		machine().scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run), 2);
 
 }
 
-static INTERRUPT_GEN( toypop_sound_timer_irq )
+INTERRUPT_GEN_MEMBER(toypop_state::toypop_sound_timer_irq)
 {
-	toypop_state *state = device->machine().driver_data<toypop_state>();
 
-	if(state->m_sound_irq_mask)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if(m_sound_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(toypop_state::toypop_sound_clear_w)
@@ -160,11 +158,10 @@ void toypop_state::machine_reset()
 	m_interrupt_enable_68k = 0;
 }
 
-static INTERRUPT_GEN( toypop_m68000_interrupt )
+INTERRUPT_GEN_MEMBER(toypop_state::toypop_m68000_interrupt)
 {
-	toypop_state *state = device->machine().driver_data<toypop_state>();
-	if (state->m_interrupt_enable_68k)
-		device->execute().set_input_line(6, HOLD_LINE);
+	if (m_interrupt_enable_68k)
+		device.execute().set_input_line(6, HOLD_LINE);
 }
 
 WRITE16_MEMBER(toypop_state::toypop_m68000_interrupt_enable_w)
@@ -549,15 +546,15 @@ static MACHINE_CONFIG_START( liblrabl, toypop_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1536000)	/* 1.536 MHz (measured on Libble Rabble board) */
 	MCFG_CPU_PROGRAM_MAP(liblrabl_map)
-	MCFG_CPU_VBLANK_INT("screen", toypop_main_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toypop_state,  toypop_main_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", M6809, 1536000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT("screen", toypop_sound_timer_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toypop_state,  toypop_sound_timer_irq)
 
 	MCFG_CPU_ADD("sub", M68000, 6144000)	/* 6.144 MHz (measured on Libble Rabble board) */
 	MCFG_CPU_PROGRAM_MAP(m68k_map)
-	MCFG_CPU_VBLANK_INT("screen", toypop_m68000_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toypop_state,  toypop_m68000_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */

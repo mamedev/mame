@@ -18,18 +18,16 @@
 #include "includes/ddribble.h"
 
 
-static INTERRUPT_GEN( ddribble_interrupt_0 )
+INTERRUPT_GEN_MEMBER(ddribble_state::ddribble_interrupt_0)
 {
-	ddribble_state *state = device->machine().driver_data<ddribble_state>();
-	if (state->m_int_enable_0)
-		device->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+	if (m_int_enable_0)
+		device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( ddribble_interrupt_1 )
+INTERRUPT_GEN_MEMBER(ddribble_state::ddribble_interrupt_1)
 {
-	ddribble_state *state = device->machine().driver_data<ddribble_state>();
-	if (state->m_int_enable_1)
-		device->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+	if (m_int_enable_1)
+		device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 
@@ -282,11 +280,11 @@ static MACHINE_CONFIG_START( ddribble, ddribble_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu0_map)
-	MCFG_CPU_VBLANK_INT("screen", ddribble_interrupt_0)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddribble_state,  ddribble_interrupt_0)
 
 	MCFG_CPU_ADD("cpu1", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
-	MCFG_CPU_VBLANK_INT("screen", ddribble_interrupt_1)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddribble_state,  ddribble_interrupt_1)
 
 	MCFG_CPU_ADD("cpu2", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)

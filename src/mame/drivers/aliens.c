@@ -19,12 +19,11 @@ Preliminary driver by:
 /* prototypes */
 static KONAMI_SETLINES_CALLBACK( aliens_banking );
 
-static INTERRUPT_GEN( aliens_interrupt )
+INTERRUPT_GEN_MEMBER(aliens_state::aliens_interrupt)
 {
-	aliens_state *state = device->machine().driver_data<aliens_state>();
 
-	if (k051960_is_irq_enabled(state->m_k051960))
-		device->execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
+	if (k051960_is_irq_enabled(m_k051960))
+		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 READ8_MEMBER(aliens_state::bankedram_r)
@@ -256,7 +255,7 @@ static MACHINE_CONFIG_START( aliens, aliens_state )
 
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)		/* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(aliens_map)
-	MCFG_CPU_VBLANK_INT("screen", aliens_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", aliens_state,  aliens_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) 	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(aliens_sound_map)

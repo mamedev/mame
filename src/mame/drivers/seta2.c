@@ -2006,15 +2006,15 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static INTERRUPT_GEN( seta2_interrupt )
+INTERRUPT_GEN_MEMBER(seta2_state::seta2_interrupt)
 {
 	/* VBlank is connected to INT0 (external interrupts pin 0) */
-	tmp68301_external_interrupt_0(device->machine());
+	tmp68301_external_interrupt_0(machine());
 }
 
-static INTERRUPT_GEN( samshoot_interrupt )
+INTERRUPT_GEN_MEMBER(seta2_state::samshoot_interrupt)
 {
-	tmp68301_external_interrupt_2(device->machine());	// to do: hook up x1-10 interrupts
+	tmp68301_external_interrupt_2(machine());	// to do: hook up x1-10 interrupts
 }
 
 static const x1_010_interface x1_010_sound_intf =
@@ -2025,7 +2025,7 @@ static const x1_010_interface x1_010_sound_intf =
 static MACHINE_CONFIG_START( seta2, seta2_state )
 	MCFG_CPU_ADD("maincpu", M68301, XTAL_50MHz/3)	// !! TMP68301 !!
 	MCFG_CPU_PROGRAM_MAP(mj4simai_map)
-	MCFG_CPU_VBLANK_INT("screen", seta2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
 
 	MCFG_MACHINE_START( tmp68301 )
 	MCFG_MACHINE_RESET( tmp68301 )
@@ -2148,7 +2148,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( samshoot, seta2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(samshoot_map)
-	MCFG_CPU_PERIODIC_INT(samshoot_interrupt,60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(seta2_state, samshoot_interrupt, 60)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2174,32 +2174,31 @@ static TIMER_DEVICE_CALLBACK( funcube_interrupt )
 		state->m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( funcube_sub_timer_irq )
+INTERRUPT_GEN_MEMBER(seta2_state::funcube_sub_timer_irq)
 {
-	seta2_state *state = device->machine().driver_data<seta2_state>();
 
-	if ( state->m_funcube_serial_count )
+	if ( m_funcube_serial_count )
 	{
-		device->execute().set_input_line(H8_SCI_1_RX, HOLD_LINE);
+		device.execute().set_input_line(H8_SCI_1_RX, HOLD_LINE);
 	}
 	else
 	{
-		UINT8 press   = device->machine().root_device().ioport("TOUCH_PRESS")->read();
-		UINT8 release = state->m_funcube_press && !press;
+		UINT8 press   = machine().root_device().ioport("TOUCH_PRESS")->read();
+		UINT8 release = m_funcube_press && !press;
 
 		if ( press || release )
 		{
-			state->m_funcube_serial_fifo[0] = press ? 0xfe : 0xfd;
-			state->m_funcube_serial_fifo[1] = device->machine().root_device().ioport("TOUCH_X")->read();
-			state->m_funcube_serial_fifo[2] = device->machine().root_device().ioport("TOUCH_Y")->read();
-			state->m_funcube_serial_fifo[3] = 0xff;
-			state->m_funcube_serial_count = 4;
+			m_funcube_serial_fifo[0] = press ? 0xfe : 0xfd;
+			m_funcube_serial_fifo[1] = machine().root_device().ioport("TOUCH_X")->read();
+			m_funcube_serial_fifo[2] = machine().root_device().ioport("TOUCH_Y")->read();
+			m_funcube_serial_fifo[3] = 0xff;
+			m_funcube_serial_count = 4;
 		}
 
-		state->m_funcube_press = press;
+		m_funcube_press = press;
 	}
 
-	device->execute().set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
+	device.execute().set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
 MACHINE_RESET_MEMBER(seta2_state,funcube)
@@ -2219,7 +2218,7 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 	MCFG_CPU_ADD("sub", H83007, FUNCUBE_SUB_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(funcube_sub_map)
 	MCFG_CPU_IO_MAP(funcube_sub_io)
-	MCFG_CPU_PERIODIC_INT(funcube_sub_timer_irq, 60*10 )
+	MCFG_CPU_PERIODIC_INT_DRIVER(seta2_state, funcube_sub_timer_irq,  60*10)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2271,7 +2270,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( namcostr, seta2_state )
 	MCFG_CPU_ADD("maincpu", M68301, XTAL_50MHz/3)	// !! TMP68301 !!
 	MCFG_CPU_PROGRAM_MAP(namcostr_map)
-	MCFG_CPU_VBLANK_INT("screen", seta2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
 
 	MCFG_MACHINE_START( tmp68301 )
 	MCFG_MACHINE_RESET( tmp68301 )

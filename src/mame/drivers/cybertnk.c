@@ -834,11 +834,11 @@ static const y8950_interface y8950_config = {
 static MACHINE_CONFIG_START( cybertnk, cybertnk_state )
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_20MHz/2)
 	MCFG_CPU_PROGRAM_MAP(master_mem)
-	MCFG_CPU_VBLANK_INT("lscreen", irq1_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq1_line_assert)
 
 	MCFG_CPU_ADD("slave", M68000,XTAL_20MHz/2)
 	MCFG_CPU_PROGRAM_MAP(slave_mem)
-	MCFG_CPU_VBLANK_INT("lscreen", irq3_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq3_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_mem)

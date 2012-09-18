@@ -452,7 +452,7 @@ static MACHINE_CONFIG_START( destroyr, destroyr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_12_096MHz / 16)
 	MCFG_CPU_PROGRAM_MAP(destroyr_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_assert, 4*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(destroyr_state, irq0_line_assert,  4*60)
 
 
 	/* video hardware */

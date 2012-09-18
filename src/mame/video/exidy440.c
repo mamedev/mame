@@ -233,12 +233,11 @@ static void exidy440_update_firq(running_machine &machine)
 }
 
 
-INTERRUPT_GEN( exidy440_vblank_interrupt )
+INTERRUPT_GEN_MEMBER(exidy440_state::exidy440_vblank_interrupt)
 {
-	exidy440_state *state = device->machine().driver_data<exidy440_state>();
 	/* set the FIRQ line on a VBLANK */
-	state->m_firq_vblank = 1;
-	exidy440_update_firq(device->machine());
+	m_firq_vblank = 1;
+	exidy440_update_firq(machine());
 }
 
 

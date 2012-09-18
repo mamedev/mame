@@ -263,7 +263,7 @@ static MACHINE_CONFIG_START( lemmings, lemmings_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
 	MCFG_CPU_PROGRAM_MAP(lemmings_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", lemmings_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", M6809,32220000/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)

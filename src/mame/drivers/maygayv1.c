@@ -243,6 +243,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_maygayv1(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(vsync_interrupt);
 };
 
 
@@ -1025,18 +1026,17 @@ void maygayv1_state::machine_reset()
 }
 
 
-static INTERRUPT_GEN( vsync_interrupt )
+INTERRUPT_GEN_MEMBER(maygayv1_state::vsync_interrupt)
 {
-	maygayv1_state *state = device->machine().driver_data<maygayv1_state>();
-	if (state->m_vsync_latch_preset)
-		device->machine().device("maincpu")->execute().set_input_line(3, ASSERT_LINE);
+	if (m_vsync_latch_preset)
+		machine().device("maincpu")->execute().set_input_line(3, ASSERT_LINE);
 }
 
 
 static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", vsync_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", maygayv1_state,  vsync_interrupt)
 
 	MCFG_CPU_ADD("soundcpu", I8052, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sound_prg)

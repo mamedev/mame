@@ -166,9 +166,9 @@ TODO:
 static void omegaf_io_protection_reset(running_machine &machine);
 
 
-static INTERRUPT_GEN( ninjakd2_interrupt )
+INTERRUPT_GEN_MEMBER(ninjakd2_state::ninjakd2_interrupt)
 {
-	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h */
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h */
 }
 
 
@@ -939,7 +939,7 @@ static MACHINE_CONFIG_START( ninjakd2, ninjakd2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK_12/2)		/* verified */
 	MCFG_CPU_PROGRAM_MAP(ninjakd2_main_cpu)
-	MCFG_CPU_VBLANK_INT("screen", ninjakd2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ninjakd2_state,  ninjakd2_interrupt)
 
 	MCFG_CPU_ADD("soundcpu", Z80, MAIN_CLOCK_5)		/* verified */
 	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)

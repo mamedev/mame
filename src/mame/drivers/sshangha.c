@@ -395,7 +395,7 @@ static MACHINE_CONFIG_START( sshangha, sshangha_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
 	MCFG_CPU_PROGRAM_MAP(sshangha_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sshangha_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)
 	MCFG_CPU_PROGRAM_MAP(sshangha_sound_map)

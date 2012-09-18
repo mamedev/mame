@@ -849,9 +849,9 @@ static const ym2151_interface ym2151_config =
 	DEVCB_LINE(sound_irq)
 };
 
-static INTERRUPT_GEN( roundup5_interrupt )
+INTERRUPT_GEN_MEMBER(tatsumi_state::roundup5_interrupt)
 {
-	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);	/* VBL */
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);	/* VBL */
 }
 
 static void apache3_68000_reset(device_t *device)
@@ -873,18 +873,18 @@ static MACHINE_CONFIG_START( apache3, tatsumi_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
 	MCFG_CPU_PROGRAM_MAP(apache3_v30_map)
-	MCFG_CPU_VBLANK_INT("screen", roundup5_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tatsumi_state,  roundup5_interrupt)
 
 	MCFG_CPU_ADD("sub", M68000, CLOCK_2 / 4)
 	MCFG_CPU_PROGRAM_MAP(apache3_68000_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tatsumi_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", V20, CLOCK_1 / 2)
 	MCFG_CPU_PROGRAM_MAP(apache3_v20_map)
 
 	MCFG_CPU_ADD("sub2", Z80, CLOCK_2 / 8)
 	MCFG_CPU_PROGRAM_MAP(apache3_z80_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tatsumi_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -918,7 +918,7 @@ static MACHINE_CONFIG_START( roundup5, tatsumi_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
 	MCFG_CPU_PROGRAM_MAP(roundup5_v30_map)
-	MCFG_CPU_VBLANK_INT("screen", roundup5_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tatsumi_state,  roundup5_interrupt)
 
 	MCFG_CPU_ADD("sub", M68000, CLOCK_2 / 4)
 	MCFG_CPU_PROGRAM_MAP(roundup5_68000_map)
@@ -959,11 +959,11 @@ static MACHINE_CONFIG_START( cyclwarr, tatsumi_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
 	MCFG_CPU_PROGRAM_MAP(cyclwarr_68000a_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tatsumi_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("sub", M68000, CLOCK_2 / 4)
 	MCFG_CPU_PROGRAM_MAP(cyclwarr_68000b_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tatsumi_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, CLOCK_1 / 4)
 	MCFG_CPU_PROGRAM_MAP(cyclwarr_z80_map)
@@ -1001,11 +1001,11 @@ static MACHINE_CONFIG_START( bigfight, tatsumi_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
 	MCFG_CPU_PROGRAM_MAP(bigfight_68000a_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tatsumi_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("sub", M68000, CLOCK_2 / 4)
 	MCFG_CPU_PROGRAM_MAP(bigfight_68000b_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tatsumi_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, CLOCK_1 / 4)
 	MCFG_CPU_PROGRAM_MAP(cyclwarr_z80_map)

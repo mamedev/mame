@@ -279,7 +279,7 @@ static MACHINE_CONFIG_START( roul, roul_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(roul_map)
 	MCFG_CPU_IO_MAP(roul_cpu_io_map)
-	MCFG_CPU_VBLANK_INT("screen",nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", roul_state, nmi_line_pulse)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)

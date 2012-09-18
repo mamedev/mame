@@ -415,7 +415,7 @@ static MACHINE_CONFIG_START( flyball, flyball_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(flyball_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", flyball_state,  nmi_line_pulse)
 
 
 	/* video hardware */

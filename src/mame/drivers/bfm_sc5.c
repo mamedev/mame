@@ -33,6 +33,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 public:
 	DECLARE_DRIVER_INIT(sc5);
+	INTERRUPT_GEN_MEMBER(sc5_fake_timer_int);
 };
 
 
@@ -45,16 +46,16 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START(  sc5 )
 INPUT_PORTS_END
 
-static INTERRUPT_GEN( sc5_fake_timer_int )
+INTERRUPT_GEN_MEMBER(sc5_state::sc5_fake_timer_int)
 {
 	// this should be coming from the Timer / SIM modules of the Coldfire
-	device->machine().device("maincpu")->execute().set_input_line_and_vector(5, HOLD_LINE, 0x8c);
+	machine().device("maincpu")->execute().set_input_line_and_vector(5, HOLD_LINE, 0x8c);
 }
 
 static MACHINE_CONFIG_START( sc5, sc5_state )
 	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
 	MCFG_CPU_PROGRAM_MAP(sc5_map)
-	MCFG_CPU_PERIODIC_INT(sc5_fake_timer_int,1000)
+	MCFG_CPU_PERIODIC_INT_DRIVER(sc5_state, sc5_fake_timer_int, 1000)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */

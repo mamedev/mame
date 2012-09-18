@@ -222,7 +222,7 @@ static MACHINE_CONFIG_START( pcktgal, pcktgal_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 2000000)
 	MCFG_CPU_PROGRAM_MAP(pcktgal_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pcktgal_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(pcktgal_sound_map)

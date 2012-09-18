@@ -357,7 +357,7 @@ static MACHINE_CONFIG_START( mrflea, mrflea_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(mrflea_master_map)
 	MCFG_CPU_IO_MAP(mrflea_master_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold) /* NMI resets the game */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mrflea_state,  irq0_line_hold) /* NMI resets the game */
 
 	MCFG_CPU_ADD("sub", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(mrflea_slave_map)

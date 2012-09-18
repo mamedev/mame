@@ -331,7 +331,7 @@ static MACHINE_CONFIG_START( clayshoo, clayshoo_state )
 	MCFG_CPU_ADD("maincpu", Z80,5068000/4)		/* 5.068/4 Mhz (divider is a guess) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", clayshoo_state,  irq0_line_hold)
 
 
 	/* video hardware */

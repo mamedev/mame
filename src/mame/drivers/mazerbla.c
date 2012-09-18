@@ -145,6 +145,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_mazerbla(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_test_vcu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(sound_interrupt);
 };
 
 
@@ -1421,9 +1422,9 @@ static IRQ_CALLBACK(irq_callback)
 }
 
 /* frequency is 14.318 MHz/16/16/16/16 */
-static INTERRUPT_GEN( sound_interrupt )
+INTERRUPT_GEN_MEMBER(mazerbla_state::sound_interrupt)
 {
-	device->execute().set_input_line(0, ASSERT_LINE);
+	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -1516,7 +1517,7 @@ static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
 	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK)	/* 4 MHz, NMI, IM1 INT */
 	MCFG_CPU_PROGRAM_MAP(mazerbla_cpu2_map)
 	MCFG_CPU_IO_MAP(mazerbla_cpu2_io_map)
-//  MCFG_CPU_PERIODIC_INT(irq0_line_hold, 400 ) /* frequency in Hz */
+	MCFG_CPU_PERIODIC_INT_DRIVER(mazerbla_state, irq0_line_hold,  400) /* frequency in Hz */
 
 	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK)	/* 4 MHz, no  NMI, IM1 INT */
 	MCFG_CPU_PROGRAM_MAP(mazerbla_cpu3_map)
@@ -1525,7 +1526,7 @@ static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
     and cleared on ANY port access.
     but handled differently for now
     */
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mazerbla_state,  irq0_line_hold)
 
 	/* synchronization forced on the fly */
 
@@ -1553,7 +1554,7 @@ static MACHINE_CONFIG_START( greatgun, mazerbla_state )
 
 	MCFG_CPU_ADD("sub", Z80, SOUND_CLOCK / 4)	/* 3.579500 MHz, NMI - caused by sound command write, periodic INT */
 	MCFG_CPU_PROGRAM_MAP(greatgun_sound_map)
-	MCFG_CPU_PERIODIC_INT(sound_interrupt, (double)14318180/16/16/16/16 )
+	MCFG_CPU_PERIODIC_INT_DRIVER(mazerbla_state, sound_interrupt,  (double)14318180/16/16/16/16 )
 
 	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK)	/* 4 MHz, no  NMI, IM1 INT */
 	MCFG_CPU_PROGRAM_MAP(mazerbla_cpu3_map)
@@ -1562,7 +1563,7 @@ static MACHINE_CONFIG_START( greatgun, mazerbla_state )
     and cleared on ANY port access.
     but handled differently for now
     */
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mazerbla_state,  irq0_line_hold)
 
 
 	/* video hardware */

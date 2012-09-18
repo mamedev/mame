@@ -31,11 +31,10 @@ Notes:
 #include "includes/konamipt.h"
 #include "includes/mainevt.h"
 
-static INTERRUPT_GEN( mainevt_interrupt )
+INTERRUPT_GEN_MEMBER(mainevt_state::mainevt_interrupt)
 {
-	mainevt_state *state = device->machine().driver_data<mainevt_state>();
 
-	if (k052109_is_irq_enabled(state->m_k052109))
+	if (k052109_is_irq_enabled(m_k052109))
 		irq0_line_hold(device);
 }
 
@@ -44,11 +43,10 @@ WRITE8_MEMBER(mainevt_state::dv_nmienable_w)
 	m_nmi_enable = data;
 }
 
-static INTERRUPT_GEN( dv_interrupt )
+INTERRUPT_GEN_MEMBER(mainevt_state::dv_interrupt)
 {
-	mainevt_state *state = device->machine().driver_data<mainevt_state>();
 
-	if (state->m_nmi_enable)
+	if (m_nmi_enable)
 		nmi_line_pulse(device);
 }
 
@@ -433,20 +431,18 @@ void mainevt_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-static INTERRUPT_GEN( mainevt_sound_timer_irq )
+INTERRUPT_GEN_MEMBER(mainevt_state::mainevt_sound_timer_irq)
 {
-	mainevt_state *state = device->machine().driver_data<mainevt_state>();
 
-	if(state->m_sound_irq_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_sound_irq_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static INTERRUPT_GEN( devstors_sound_timer_irq )
+INTERRUPT_GEN_MEMBER(mainevt_state::devstors_sound_timer_irq)
 {
-	mainevt_state *state = device->machine().driver_data<mainevt_state>();
 
-	if(state->m_sound_irq_mask)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if(m_sound_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( mainevt, mainevt_state )
@@ -454,11 +450,11 @@ static MACHINE_CONFIG_START( mainevt, mainevt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)	/* ?? */
 	MCFG_CPU_PROGRAM_MAP(mainevt_map)
-	MCFG_CPU_VBLANK_INT("screen", mainevt_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mainevt_state,  mainevt_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(mainevt_sound_map)
-	MCFG_CPU_PERIODIC_INT(mainevt_sound_timer_irq,8*60)	/* ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(mainevt_state, mainevt_sound_timer_irq, 8*60)	/* ??? */
 
 
 	/* video hardware */
@@ -512,11 +508,11 @@ static MACHINE_CONFIG_START( devstors, mainevt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)	/* ?? */
 	MCFG_CPU_PROGRAM_MAP(devstors_map)
-	MCFG_CPU_VBLANK_INT("screen", dv_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mainevt_state,  dv_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(devstors_sound_map)
-	MCFG_CPU_PERIODIC_INT(devstors_sound_timer_irq,4*60) /* ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(mainevt_state, devstors_sound_timer_irq, 4*60) /* ??? */
 
 
 	/* video hardware */

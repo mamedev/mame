@@ -726,7 +726,7 @@ static MACHINE_CONFIG_START( fcrash, cps_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(fcrash_map)
-	MCFG_CPU_VBLANK_INT("screen", cps1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  cps1_interrupt)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 24000000/6) /* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -777,7 +777,7 @@ static MACHINE_CONFIG_START( kodb, cps_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(kodb_map)
-	MCFG_CPU_VBLANK_INT("screen", cps1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  cps1_interrupt)
 
 //  MCFG_CPU_ADD("soundcpu", Z80, 3579545)
 //  MCFG_CPU_PROGRAM_MAP(sub_map)
@@ -933,7 +933,7 @@ static MACHINE_CONFIG_START( sgyxz, cps_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(kodb_map)
-	MCFG_CPU_VBLANK_INT("screen", cps1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  cps1_interrupt)
 
 //  MCFG_CPU_ADD("soundcpu", Z80, 3579545)
 //  MCFG_CPU_PROGRAM_MAP(sub_map)

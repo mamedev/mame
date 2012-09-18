@@ -454,6 +454,7 @@ public:
 	DECLARE_PALETTE_INIT(amaticmg2);
 	UINT32 screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(amaticmg2_irq);
 };
 
 
@@ -866,7 +867,7 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)		/* WRONG! */
 	MCFG_CPU_PROGRAM_MAP(amaticmg_map)
 	MCFG_CPU_IO_MAP(amaticmg_portmap)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse) // no NMI mask?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", amaticmg_state,  nmi_line_pulse) // no NMI mask?
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -903,12 +904,11 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 MACHINE_CONFIG_END
 
 
-static INTERRUPT_GEN( amaticmg2_irq )
+INTERRUPT_GEN_MEMBER(amaticmg_state::amaticmg2_irq)
 {
-	amaticmg_state *state = device->machine().driver_data<amaticmg_state>();
 
-	if(state->m_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -916,7 +916,7 @@ static MACHINE_CONFIG_DERIVED( amaticmg2, amaticmg )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(amaticmg2_portmap)
-	MCFG_CPU_VBLANK_INT("screen", amaticmg2_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", amaticmg_state,  amaticmg2_irq)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)

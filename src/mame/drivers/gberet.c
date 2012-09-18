@@ -462,8 +462,8 @@ static MACHINE_CONFIG_START( gberetb, gberet_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz/4) // divider guessed
 	MCFG_CPU_PROGRAM_MAP(gberetb_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
-	MCFG_CPU_PERIODIC_INT(nmi_line_assert, XTAL_20MHz/0x8000) // divider guessed
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gberet_state,  irq0_line_assert)
+	MCFG_CPU_PERIODIC_INT_DRIVER(gberet_state, nmi_line_assert,  XTAL_20MHz/0x8000) // divider guessed
 
 	MCFG_MACHINE_START_OVERRIDE(gberet_state,gberet)
 	MCFG_MACHINE_RESET_OVERRIDE(gberet_state,gberet)

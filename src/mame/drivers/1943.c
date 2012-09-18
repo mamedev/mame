@@ -257,11 +257,11 @@ static MACHINE_CONFIG_START( 1943, _1943_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(c1943_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", _1943_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/8)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(_1943_state, irq0_line_hold,  4*60)
 
 
 	// video hardware

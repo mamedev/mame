@@ -611,7 +611,7 @@ static MACHINE_CONFIG_START( enigma2, enigma2_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(engima2_audio_cpu_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,8*52)
+	MCFG_CPU_PERIODIC_INT_DRIVER(enigma2_state, irq0_line_hold, 8*52)
 
 
 	/* video hardware */
@@ -637,7 +637,7 @@ static MACHINE_CONFIG_START( enigma2a, enigma2_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(engima2_audio_cpu_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,8*52)
+	MCFG_CPU_PERIODIC_INT_DRIVER(enigma2_state, irq0_line_hold, 8*52)
 
 
 	/* video hardware */

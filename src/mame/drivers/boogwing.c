@@ -343,7 +343,7 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)	/* DE102 */
 	MCFG_CPU_PROGRAM_MAP(boogwing_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", boogwing_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", H6280,32220000/4)
 	MCFG_CPU_PROGRAM_MAP(audio_map)

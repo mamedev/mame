@@ -519,7 +519,7 @@ static MACHINE_CONFIG_START( jantotsu, jantotsu_state )
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(jantotsu_map)
 	MCFG_CPU_IO_MAP(jantotsu_io)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", jantotsu_state,  nmi_line_pulse)
 
 
 	/* video hardware */

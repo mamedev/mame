@@ -142,6 +142,7 @@ public:
 	DECLARE_VIDEO_START(ataxx);
 	UINT32 screen_update_leland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ataxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(leland_master_interrupt);
 };
 
 
@@ -152,20 +153,6 @@ public:
 #define SERIAL_TYPE_ADD_XOR		2
 #define SERIAL_TYPE_ENCRYPT		3
 #define SERIAL_TYPE_ENCRYPT_XOR	4
-
-
-
-
-
-
-
-
-
-
-
-
-
-INTERRUPT_GEN( leland_master_interrupt );
 
 void cerberus_bankswitch(running_machine &machine);
 void mayhem_bankswitch(running_machine &machine);

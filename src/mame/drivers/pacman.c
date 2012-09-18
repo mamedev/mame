@@ -399,20 +399,18 @@ MACHINE_RESET_MEMBER(pacman_state,superabc)
  *
  *************************************/
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(pacman_state::vblank_irq)
 {
-	pacman_state *state = device->machine().driver_data<pacman_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if(m_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( vblank_nmi )
+INTERRUPT_GEN_MEMBER(pacman_state::vblank_nmi)
 {
-	pacman_state *state = device->machine().driver_data<pacman_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_irq_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(pacman_state::irq_mask_w)
@@ -694,9 +692,9 @@ READ8_MEMBER(pacman_state::bigbucks_question_r)
  *
  ************************************/
 
-static INTERRUPT_GEN( s2650_interrupt )
+INTERRUPT_GEN_MEMBER(pacman_state::s2650_interrupt)
 {
-	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }
 
 WRITE8_MEMBER(pacman_state::porky_banking_w)
@@ -3294,7 +3292,7 @@ static MACHINE_CONFIG_START( pacman, pacman_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(pacman_map)
 	MCFG_CPU_IO_MAP(writeport)
-	MCFG_CPU_VBLANK_INT("screen",vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state, vblank_irq)
 	MCFG_WATCHDOG_VBLANK_INIT(16)
 
 	/* video hardware */
@@ -3375,7 +3373,7 @@ static MACHINE_CONFIG_DERIVED( dremshpr, pacman )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dremshpr_map)
 	MCFG_CPU_IO_MAP(dremshpr_portmap)
-	MCFG_CPU_VBLANK_INT("screen", vblank_nmi)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state,  vblank_nmi)
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("namco", AY8910, 14318000/8)
@@ -3413,7 +3411,7 @@ static MACHINE_CONFIG_DERIVED( vanvan, pacman )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dremshpr_map)
 	MCFG_CPU_IO_MAP(vanvan_portmap)
-	MCFG_CPU_VBLANK_INT("screen", vblank_nmi)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state,  vblank_nmi)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -3435,7 +3433,7 @@ static MACHINE_CONFIG_DERIVED( bigbucks, pacman )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bigbucks_map)
 	MCFG_CPU_IO_MAP(bigbucks_portmap)
-	MCFG_CPU_PERIODIC_INT(vblank_irq,20*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(pacman_state, vblank_irq, 20*60)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
@@ -3448,7 +3446,7 @@ static MACHINE_CONFIG_DERIVED( s2650games, pacman )
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/6/2)	/* 2H */
 	MCFG_CPU_PROGRAM_MAP(s2650games_map)
-	MCFG_CPU_VBLANK_INT("screen", s2650_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state,  s2650_interrupt)
 
 	MCFG_GFXDECODE(s2650games)
 
@@ -3496,7 +3494,7 @@ static MACHINE_CONFIG_DERIVED( rocktrv2, pacman )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rocktrv2_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state,  irq0_line_hold)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
@@ -3509,7 +3507,7 @@ static MACHINE_CONFIG_DERIVED( mschamp, pacman )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mschamp_map)
 	MCFG_CPU_IO_MAP(mschamp_portmap)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state,  vblank_irq)
 
 	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,mschamp)
 MACHINE_CONFIG_END

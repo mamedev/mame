@@ -459,12 +459,12 @@ static MACHINE_CONFIG_START( tbowl, tbowl_state )
 	/* CPU on Board '6206B' */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
 	MCFG_CPU_PROGRAM_MAP(6206B_map)
-	MCFG_CPU_VBLANK_INT("lscreen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", tbowl_state,  irq0_line_hold)
 
 	/* CPU on Board '6206C' */
 	MCFG_CPU_ADD("sub", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
 	MCFG_CPU_PROGRAM_MAP(6206C_map)
-	MCFG_CPU_VBLANK_INT("lscreen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", tbowl_state,  irq0_line_hold)
 
 	/* CPU on Board '6206A' */
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* Actual Z80 */

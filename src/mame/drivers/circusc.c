@@ -345,12 +345,11 @@ static DISCRETE_SOUND_START( circusc )
 
 DISCRETE_SOUND_END
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(circusc_state::vblank_irq)
 {
-	circusc_state *state = device->machine().driver_data<circusc_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if(m_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( circusc, circusc_state )
@@ -358,7 +357,7 @@ static MACHINE_CONFIG_START( circusc, circusc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2048000)        /* 2 MHz? */
 	MCFG_CPU_PROGRAM_MAP(circusc_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", circusc_state,  vblank_irq)
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)

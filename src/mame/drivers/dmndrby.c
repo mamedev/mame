@@ -81,6 +81,8 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_dderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(dderby_irq);
+	INTERRUPT_GEN_MEMBER(dderby_timer_irq);
 };
 
 
@@ -498,22 +500,22 @@ void dmndrby_state::palette_init()
 }
 
 /*Main Z80 is IM 0,HW-latched irqs. */
-static INTERRUPT_GEN( dderby_irq )
+INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_irq)
 {
-	device->machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
+	machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
 }
 
-static INTERRUPT_GEN( dderby_timer_irq )
+INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_timer_irq)
 {
-	device->machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* RST 08h */
+	machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* RST 08h */
 }
 
 static MACHINE_CONFIG_START( dderby, dmndrby_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_VBLANK_INT("screen", dderby_irq)
-	MCFG_CPU_PERIODIC_INT(dderby_timer_irq, 244/2)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dmndrby_state,  dderby_irq)
+	MCFG_CPU_PERIODIC_INT_DRIVER(dmndrby_state, dderby_timer_irq,  244/2)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* verified on schematics */
 	MCFG_CPU_PROGRAM_MAP(dderby_sound_map)

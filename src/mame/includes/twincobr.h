@@ -105,13 +105,12 @@ public:
 	DECLARE_VIDEO_START(toaplan0);
 	DECLARE_MACHINE_RESET(wardner);
 	UINT32 screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(twincobr_interrupt);
+	INTERRUPT_GEN_MEMBER(wardner_interrupt);
 };
 
 
 /*----------- defined in machine/twincobr.c -----------*/
-
-INTERRUPT_GEN( twincobr_interrupt );
-INTERRUPT_GEN( wardner_interrupt );
 extern void twincobr_driver_savestate(running_machine &machine);
 
 /*----------- defined in video/twincobr.c -----------*/

@@ -700,20 +700,18 @@ void wiz_state::machine_reset()
 	m_dsc0 = m_dsc1 = 1;
 }
 
-static INTERRUPT_GEN( wiz_vblank_interrupt )
+INTERRUPT_GEN_MEMBER(wiz_state::wiz_vblank_interrupt)
 {
-	wiz_state *state = device->machine().driver_data<wiz_state>();
 
-	if(state->m_main_nmi_mask & 1)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_main_nmi_mask & 1)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static INTERRUPT_GEN( wiz_sound_interrupt )
+INTERRUPT_GEN_MEMBER(wiz_state::wiz_sound_interrupt)
 {
-	wiz_state *state = device->machine().driver_data<wiz_state>();
 
-	if(state->m_sound_nmi_mask & 1)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_sound_nmi_mask & 1)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -722,11 +720,11 @@ static MACHINE_CONFIG_START( wiz, wiz_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", wiz_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wiz_state,  wiz_vblank_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(wiz_sound_interrupt,4*60)	/* ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(wiz_state, wiz_sound_interrupt, 4*60)	/* ??? */
 
 
 	/* video hardware */

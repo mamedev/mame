@@ -293,144 +293,143 @@ WRITE16_MEMBER(kickgoal_state::actionhw_snd_w)
 }
 
 
-static INTERRUPT_GEN( kickgoal_interrupt )
+INTERRUPT_GEN_MEMBER(kickgoal_state::kickgoal_interrupt)
 {
-	kickgoal_state *state = device->machine().driver_data<kickgoal_state>();
 
-	if ((state->m_adpcm->read_status() & 0x08) == 0)
+	if ((m_adpcm->read_status() & 0x08) == 0)
 	{
-		switch(state->m_melody_loop)
+		switch(m_melody_loop)
 		{
-			case 0x060:	state->m_melody_loop = 0x061; break;
-			case 0x061:	state->m_melody_loop = 0x062; break;
-			case 0x062:	state->m_melody_loop = 0x060; break;
+			case 0x060:	m_melody_loop = 0x061; break;
+			case 0x061:	m_melody_loop = 0x062; break;
+			case 0x062:	m_melody_loop = 0x060; break;
 
-			case 0x065:	state->m_melody_loop = 0x165; break;
-			case 0x165:	state->m_melody_loop = 0x265; break;
-			case 0x265:	state->m_melody_loop = 0x365; break;
-			case 0x365:	state->m_melody_loop = 0x066; break;
-			case 0x066:	state->m_melody_loop = 0x067; break;
-			case 0x067:	state->m_melody_loop = 0x068; break;
-			case 0x068:	state->m_melody_loop = 0x065; break;
+			case 0x065:	m_melody_loop = 0x165; break;
+			case 0x165:	m_melody_loop = 0x265; break;
+			case 0x265:	m_melody_loop = 0x365; break;
+			case 0x365:	m_melody_loop = 0x066; break;
+			case 0x066:	m_melody_loop = 0x067; break;
+			case 0x067:	m_melody_loop = 0x068; break;
+			case 0x068:	m_melody_loop = 0x065; break;
 
-			case 0x063:	state->m_melody_loop = 0x063; break;
-			case 0x064:	state->m_melody_loop = 0x064; break;
-			case 0x069:	state->m_melody_loop = 0x069; break;
-			case 0x06a:	state->m_melody_loop = 0x06a; break;
-			case 0x06b:	state->m_melody_loop = 0x06b; break;
-			case 0x06c:	state->m_melody_loop = 0x06c; break;
+			case 0x063:	m_melody_loop = 0x063; break;
+			case 0x064:	m_melody_loop = 0x064; break;
+			case 0x069:	m_melody_loop = 0x069; break;
+			case 0x06a:	m_melody_loop = 0x06a; break;
+			case 0x06b:	m_melody_loop = 0x06b; break;
+			case 0x06c:	m_melody_loop = 0x06c; break;
 
-			default:	state->m_melody_loop = 0x00; break;
+			default:	m_melody_loop = 0x00; break;
 		}
 
-		if (state->m_melody_loop)
+		if (m_melody_loop)
 		{
-//          logerror("Changing to sample %02x\n", state->m_melody_loop);
-			state->m_adpcm->write_command((0x80 | state->m_melody_loop) & 0xff);
-			state->m_adpcm->write_command(0x81);
+//          logerror("Changing to sample %02x\n", m_melody_loop);
+			m_adpcm->write_command((0x80 | m_melody_loop) & 0xff);
+			m_adpcm->write_command(0x81);
 		}
 	}
-	if (device->machine().input().code_pressed_once(KEYCODE_PGUP))
+	if (machine().input().code_pressed_once(KEYCODE_PGUP))
 	{
-		if (state->m_m6295_key_delay >= (0x60 * oki_time_base))
+		if (m_m6295_key_delay >= (0x60 * oki_time_base))
 		{
-			state->m_m6295_bank += 0x01;
-			state->m_m6295_bank &= 0x03;
-			if (state->m_m6295_bank == 0x03)
-				state->m_m6295_bank = 0x00;
-			popmessage("Changing Bank to %02x", state->m_m6295_bank);
-			state->m_adpcm->set_bank_base(((state->m_m6295_bank) * 0x40000));
+			m_m6295_bank += 0x01;
+			m_m6295_bank &= 0x03;
+			if (m_m6295_bank == 0x03)
+				m_m6295_bank = 0x00;
+			popmessage("Changing Bank to %02x", m_m6295_bank);
+			m_adpcm->set_bank_base(((m_m6295_bank) * 0x40000));
 
-			if (state->m_m6295_key_delay == 0xffff)
-				state->m_m6295_key_delay = 0x00;
+			if (m_m6295_key_delay == 0xffff)
+				m_m6295_key_delay = 0x00;
 			else
-				state->m_m6295_key_delay = (0x30 * oki_time_base);
+				m_m6295_key_delay = (0x30 * oki_time_base);
 		}
 		else
-			state->m_m6295_key_delay += (0x01 * oki_time_base);
+			m_m6295_key_delay += (0x01 * oki_time_base);
 	}
-	else if (device->machine().input().code_pressed_once(KEYCODE_PGDN))
+	else if (machine().input().code_pressed_once(KEYCODE_PGDN))
 	{
-		if (state->m_m6295_key_delay >= (0x60 * oki_time_base))
+		if (m_m6295_key_delay >= (0x60 * oki_time_base))
 		{
-			state->m_m6295_bank -= 0x01;
-			state->m_m6295_bank &= 0x03;
-			if (state->m_m6295_bank == 0x03)
-				state->m_m6295_bank = 0x02;
-			popmessage("Changing Bank to %02x", state->m_m6295_bank);
-			state->m_adpcm->set_bank_base(((state->m_m6295_bank) * 0x40000));
+			m_m6295_bank -= 0x01;
+			m_m6295_bank &= 0x03;
+			if (m_m6295_bank == 0x03)
+				m_m6295_bank = 0x02;
+			popmessage("Changing Bank to %02x", m_m6295_bank);
+			m_adpcm->set_bank_base(((m_m6295_bank) * 0x40000));
 
-			if (state->m_m6295_key_delay == 0xffff)
-				state->m_m6295_key_delay = 0x00;
+			if (m_m6295_key_delay == 0xffff)
+				m_m6295_key_delay = 0x00;
 			else
-				state->m_m6295_key_delay = (0x30 * oki_time_base);
+				m_m6295_key_delay = (0x30 * oki_time_base);
 		}
 		else
-			state->m_m6295_key_delay += (0x01 * oki_time_base);
+			m_m6295_key_delay += (0x01 * oki_time_base);
 	}
-	else if (device->machine().input().code_pressed_once(KEYCODE_INSERT))
+	else if (machine().input().code_pressed_once(KEYCODE_INSERT))
 	{
-		if (state->m_m6295_key_delay >= (0x60 * oki_time_base))
+		if (m_m6295_key_delay >= (0x60 * oki_time_base))
 		{
-			state->m_m6295_comm += 1;
-			state->m_m6295_comm &= 0x7f;
-			if (state->m_m6295_comm == 0x00) { state->m_adpcm->set_bank_base((0 * 0x40000)); state->m_m6295_bank = 0; }
-			if (state->m_m6295_comm == 0x60) { state->m_adpcm->set_bank_base((0 * 0x40000)); state->m_m6295_bank = 0; }
-			if (state->m_m6295_comm == 0x65) { state->m_adpcm->set_bank_base((1 * 0x40000)); state->m_m6295_bank = 1; }
-			if (state->m_m6295_comm == 0x69) { state->m_adpcm->set_bank_base((2 * 0x40000)); state->m_m6295_bank = 2; }
-			if (state->m_m6295_comm == 0x70) { state->m_adpcm->set_bank_base((1 * 0x40000)); state->m_m6295_bank = 1; }
-			popmessage("Sound test command %02x on Bank %02x", state->m_m6295_comm, state->m_m6295_bank);
+			m_m6295_comm += 1;
+			m_m6295_comm &= 0x7f;
+			if (m_m6295_comm == 0x00) { m_adpcm->set_bank_base((0 * 0x40000)); m_m6295_bank = 0; }
+			if (m_m6295_comm == 0x60) { m_adpcm->set_bank_base((0 * 0x40000)); m_m6295_bank = 0; }
+			if (m_m6295_comm == 0x65) { m_adpcm->set_bank_base((1 * 0x40000)); m_m6295_bank = 1; }
+			if (m_m6295_comm == 0x69) { m_adpcm->set_bank_base((2 * 0x40000)); m_m6295_bank = 2; }
+			if (m_m6295_comm == 0x70) { m_adpcm->set_bank_base((1 * 0x40000)); m_m6295_bank = 1; }
+			popmessage("Sound test command %02x on Bank %02x", m_m6295_comm, m_m6295_bank);
 
-			if (state->m_m6295_key_delay == 0xffff)
-				state->m_m6295_key_delay = 0x00;
+			if (m_m6295_key_delay == 0xffff)
+				m_m6295_key_delay = 0x00;
 			else
-				state->m_m6295_key_delay = (0x5d * oki_time_base);
+				m_m6295_key_delay = (0x5d * oki_time_base);
 		}
 		else
-			state->m_m6295_key_delay += (0x01 * oki_time_base);
+			m_m6295_key_delay += (0x01 * oki_time_base);
 	}
-	else if (device->machine().input().code_pressed_once(KEYCODE_DEL))
+	else if (machine().input().code_pressed_once(KEYCODE_DEL))
 	{
-		if (state->m_m6295_key_delay >= (0x60 * oki_time_base))
+		if (m_m6295_key_delay >= (0x60 * oki_time_base))
 		{
-			state->m_m6295_comm -= 1;
-			state->m_m6295_comm &= 0x7f;
-			if (state->m_m6295_comm == 0x2b) { state->m_adpcm->set_bank_base((0 * 0x40000)); state->m_m6295_bank = 0; }
-			if (state->m_m6295_comm == 0x64) { state->m_adpcm->set_bank_base((0 * 0x40000)); state->m_m6295_bank = 0; }
-			if (state->m_m6295_comm == 0x68) { state->m_adpcm->set_bank_base((1 * 0x40000)); state->m_m6295_bank = 1; }
-			if (state->m_m6295_comm == 0x6c) { state->m_adpcm->set_bank_base((2 * 0x40000)); state->m_m6295_bank = 2; }
-			if (state->m_m6295_comm == 0x76) { state->m_adpcm->set_bank_base((1 * 0x40000)); state->m_m6295_bank = 1; }
-			popmessage("Sound test command %02x on Bank %02x", state->m_m6295_comm, state->m_m6295_bank);
+			m_m6295_comm -= 1;
+			m_m6295_comm &= 0x7f;
+			if (m_m6295_comm == 0x2b) { m_adpcm->set_bank_base((0 * 0x40000)); m_m6295_bank = 0; }
+			if (m_m6295_comm == 0x64) { m_adpcm->set_bank_base((0 * 0x40000)); m_m6295_bank = 0; }
+			if (m_m6295_comm == 0x68) { m_adpcm->set_bank_base((1 * 0x40000)); m_m6295_bank = 1; }
+			if (m_m6295_comm == 0x6c) { m_adpcm->set_bank_base((2 * 0x40000)); m_m6295_bank = 2; }
+			if (m_m6295_comm == 0x76) { m_adpcm->set_bank_base((1 * 0x40000)); m_m6295_bank = 1; }
+			popmessage("Sound test command %02x on Bank %02x", m_m6295_comm, m_m6295_bank);
 
-			if (state->m_m6295_key_delay == 0xffff)
-				state->m_m6295_key_delay = 0x00;
+			if (m_m6295_key_delay == 0xffff)
+				m_m6295_key_delay = 0x00;
 			else
-				state->m_m6295_key_delay = (0x5d * oki_time_base);
+				m_m6295_key_delay = (0x5d * oki_time_base);
 		}
 		else
-			state->m_m6295_key_delay += (0x01 * oki_time_base);
+			m_m6295_key_delay += (0x01 * oki_time_base);
 	}
-	else if (device->machine().input().code_pressed_once(KEYCODE_Z))
+	else if (machine().input().code_pressed_once(KEYCODE_Z))
 	{
-		if (state->m_m6295_key_delay >= (0x80 * oki_time_base))
+		if (m_m6295_key_delay >= (0x80 * oki_time_base))
 		{
-			state->m_adpcm->write_command(0x78);
-			state->m_adpcm->write_command(0x80 | state->m_m6295_comm);
-			state->m_adpcm->write_command(0x11);
+			m_adpcm->write_command(0x78);
+			m_adpcm->write_command(0x80 | m_m6295_comm);
+			m_adpcm->write_command(0x11);
 
-			popmessage("Playing sound %02x on Bank %02x", state->m_m6295_comm, state->m_m6295_bank);
+			popmessage("Playing sound %02x on Bank %02x", m_m6295_comm, m_m6295_bank);
 
-			if (state->m_m6295_key_delay == 0xffff)
-				state->m_m6295_key_delay = 0x00;
+			if (m_m6295_key_delay == 0xffff)
+				m_m6295_key_delay = 0x00;
 			else
-				state->m_m6295_key_delay = (0x60 * oki_time_base);
+				m_m6295_key_delay = (0x60 * oki_time_base);
 		}
 		else
-			state->m_m6295_key_delay += (0x01 * oki_time_base);
-//      logerror("Sending %02x to the sound CPU\n", state->m_m6295_comm);
+			m_m6295_key_delay += (0x01 * oki_time_base);
+//      logerror("Sending %02x to the sound CPU\n", m_m6295_comm);
 	}
 	else
-		state->m_m6295_key_delay = 0xffff;
+		m_m6295_key_delay = 0xffff;
 }
 
 
@@ -648,8 +647,8 @@ static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(kickgoal_program_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
-	MCFG_CPU_PERIODIC_INT(kickgoal_interrupt, 240)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
+	MCFG_CPU_PERIODIC_INT_DRIVER(kickgoal_state, kickgoal_interrupt,  240)
 
 	MCFG_CPU_ADD("audiocpu", PIC16C57, 12000000/4)	/* 3MHz ? */
 	MCFG_DEVICE_DISABLE()	/* Disables since the internal rom isn't dumped */
@@ -684,7 +683,7 @@ static MACHINE_CONFIG_START( actionhw, kickgoal_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kickgoal_program_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_12MHz/3)	/* verified on pcb */
 	MCFG_DEVICE_DISABLE() /* Disables since the internal rom isn't dumped */

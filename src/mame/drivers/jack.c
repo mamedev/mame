@@ -813,7 +813,7 @@ static MACHINE_CONFIG_START( jack, jack_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18000000/6)	/* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(jack_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold) /* jack needs 1 or its too fast */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", jack_state,  irq0_line_hold) /* jack needs 1 or its too fast */
 
 	MCFG_CPU_ADD("audiocpu", Z80,18000000/12)	/* 1.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -844,14 +844,14 @@ static MACHINE_CONFIG_DERIVED( tripool, jack )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60) /* tripool needs 2 or the palette is broken */
+	MCFG_CPU_PERIODIC_INT_DRIVER(jack_state, irq0_line_hold, 2*60) /* tripool needs 2 or the palette is broken */
 MACHINE_CONFIG_END
 
-static INTERRUPT_GEN( joinem_vblank_irq )
+INTERRUPT_GEN_MEMBER(jack_state::joinem_vblank_irq)
 {
 	 /* TODO: looks hackish to me ... */
-	if (!(device->machine().root_device().ioport("IN2")->read() & 0x80))
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (!(machine().root_device().ioport("IN2")->read() & 0x80))
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( joinem, jack )
@@ -859,8 +859,8 @@ static MACHINE_CONFIG_DERIVED( joinem, jack )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(joinem_map)
-	MCFG_CPU_VBLANK_INT("screen",joinem_vblank_irq)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", jack_state, joinem_vblank_irq)
+	MCFG_CPU_PERIODIC_INT_DRIVER(jack_state, irq0_line_hold, 2*60)
 
 	MCFG_GFXDECODE(joinem)
 	MCFG_PALETTE_LENGTH(0x100)
@@ -879,7 +879,7 @@ static MACHINE_CONFIG_DERIVED( loverboy, jack )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(joinem_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", jack_state,  nmi_line_pulse)
 
 	MCFG_GFXDECODE(joinem)
 	MCFG_PALETTE_LENGTH(0x100)

@@ -301,7 +301,7 @@ static MACHINE_CONFIG_START( travrusa, travrusa_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", travrusa_state,  irq0_line_hold)
 
 
 	/* video hardware */

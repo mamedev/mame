@@ -59,6 +59,7 @@ public:
 	virtual void video_reset();
 	DECLARE_MACHINE_RESET(airrace);
 	UINT32 screen_update_atarisy4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_int);
 };
 
 
@@ -516,10 +517,10 @@ READ16_MEMBER(atarisy4_state::gpu_r)
 	return res;
 }
 
-static INTERRUPT_GEN( vblank_int )
+INTERRUPT_GEN_MEMBER(atarisy4_state::vblank_int)
 {
 	if (gpu.mcr & 0x08)
-		device->machine().device("maincpu")->execute().set_input_line(6, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(6, ASSERT_LINE);
 }
 
 
@@ -730,7 +731,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( atarisy4, atarisy4_state )
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_int)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", atarisy4_state,  vblank_int)
 
 	MCFG_CPU_ADD("dsp0", TMS32010, 16000000)
 	MCFG_CPU_PROGRAM_MAP(dsp0_map)

@@ -438,26 +438,24 @@ TO DO :
  *
  *************************************/
 
-static INTERRUPT_GEN( interrupt_gen )
+INTERRUPT_GEN_MEMBER(galaxian_state::interrupt_gen)
 {
-	galaxian_state *state = device->machine().driver_data<galaxian_state>();
 	/* interrupt line is clocked at VBLANK */
 	/* a flip-flop at 6F is held in the preset state based on the NMI ON signal */
-	if (state->m_irq_enabled)
-		device->execute().set_input_line(state->m_irq_line, ASSERT_LINE);
+	if (m_irq_enabled)
+		device.execute().set_input_line(m_irq_line, ASSERT_LINE);
 }
 
-static INTERRUPT_GEN( fakechange_interrupt_gen )
+INTERRUPT_GEN_MEMBER(galaxian_state::fakechange_interrupt_gen)
 {
-	galaxian_state *state = device->machine().driver_data<galaxian_state>();
 	interrupt_gen(device);
 
-	if (state->ioport("FAKE_SELECT")->read_safe(0x00))
+	if (ioport("FAKE_SELECT")->read_safe(0x00))
 	{
-		state->m_tenspot_current_game++;
-		state->m_tenspot_current_game%=10;
-		state->tenspot_set_game_bank(device->machine(), state->m_tenspot_current_game, 1);
-		device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_tenspot_current_game++;
+		m_tenspot_current_game%=10;
+		tenspot_set_game_bank(machine(), m_tenspot_current_game, 1);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 
@@ -2084,7 +2082,7 @@ static MACHINE_CONFIG_START( galaxian_base, galaxian_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, GALAXIAN_PIXEL_CLOCK/3/2)
 	MCFG_CPU_PROGRAM_MAP(galaxian_map)
-	MCFG_CPU_VBLANK_INT("screen", interrupt_gen)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxian_state,  interrupt_gen)
 
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
@@ -2180,7 +2178,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( tenspot, galaxian )
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT("screen", fakechange_interrupt_gen)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxian_state,  fakechange_interrupt_gen)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("selectcpu", Z80, GALAXIAN_PIXEL_CLOCK/3/2) // ?? mhz
@@ -2260,7 +2258,7 @@ static MACHINE_CONFIG_DERIVED( checkman, mooncrst )
 	MCFG_CPU_ADD("audiocpu", Z80, 1620000)	/* 1.62 MHz */
 	MCFG_CPU_PROGRAM_MAP(checkman_sound_map)
 	MCFG_CPU_IO_MAP(checkman_sound_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* NMIs are triggered by the main CPU */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxian_state,  irq0_line_hold)	/* NMIs are triggered by the main CPU */
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("aysnd", AY8910, 1789750)

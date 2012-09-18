@@ -78,15 +78,14 @@ WRITE8_MEMBER(battlane_state::battlane_cpu_command_w)
 	m_subcpu->set_input_line(M6809_IRQ_LINE, data & 0x02 ? CLEAR_LINE : HOLD_LINE);
 }
 
-static INTERRUPT_GEN( battlane_cpu1_interrupt )
+INTERRUPT_GEN_MEMBER(battlane_state::battlane_cpu1_interrupt)
 {
-	battlane_state *state = device->machine().driver_data<battlane_state>();
 
 	/* See note in battlane_cpu_command_w */
-	if (~state->m_cpu_control & 0x08)
+	if (~m_cpu_control & 0x08)
 	{
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		state->m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -289,7 +288,7 @@ static MACHINE_CONFIG_START( battlane, battlane_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(battlane_map)
-	MCFG_CPU_VBLANK_INT("screen", battlane_cpu1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", battlane_state,  battlane_cpu1_interrupt)
 
 	MCFG_CPU_ADD("sub", M6809, 1500000)        /* 1.5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(battlane_map)

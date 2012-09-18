@@ -481,7 +481,7 @@ static MACHINE_CONFIG_START( macs, macs_state )
 	MCFG_CPU_PROGRAM_MAP(macs_mem)
 	MCFG_CPU_IO_MAP(macs_io)
 
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", macs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_RESET_OVERRIDE(macs_state,macs)
 

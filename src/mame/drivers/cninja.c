@@ -906,7 +906,7 @@ static MACHINE_CONFIG_START( cninja, cninja_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(cninja_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cninja_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", H6280,32220000/8)	/* Accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -958,7 +958,7 @@ static MACHINE_CONFIG_START( stoneage, cninja_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(cninja_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cninja_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(stoneage_s_map)
@@ -1010,7 +1010,7 @@ static MACHINE_CONFIG_START( cninjabl, cninja_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(cninjabl_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cninja_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(stoneage_s_map)
@@ -1053,7 +1053,7 @@ static MACHINE_CONFIG_START( edrandy, cninja_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(edrandy_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cninja_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", H6280,32220000/8)	/* Accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -1105,7 +1105,7 @@ static MACHINE_CONFIG_START( robocop2, cninja_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
 	MCFG_CPU_PROGRAM_MAP(robocop2_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cninja_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", H6280,32220000/8)	/* Accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -1160,7 +1160,7 @@ static MACHINE_CONFIG_START( mutantf, cninja_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
 	MCFG_CPU_PROGRAM_MAP(mutantf_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cninja_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", H6280,32220000/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map_mutantf)

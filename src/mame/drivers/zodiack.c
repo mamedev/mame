@@ -115,11 +115,10 @@ static TIMER_DEVICE_CALLBACK( zodiack_scanline )
 		timer.machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( zodiack_sound_nmi_gen )
+INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_sound_nmi_gen)
 {
-	zodiack_state *state = device->machine().driver_data<zodiack_state>();
 
-	if (state->m_sound_nmi_enabled)
+	if (m_sound_nmi_enabled)
 		nmi_line_pulse(device);
 }
 
@@ -565,7 +564,7 @@ static MACHINE_CONFIG_START( zodiack, zodiack_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)	/* 1.78975 MHz??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_PERIODIC_INT(zodiack_sound_nmi_gen,8*60)	/* IRQs are triggered by the main CPU */
+	MCFG_CPU_PERIODIC_INT_DRIVER(zodiack_state, zodiack_sound_nmi_gen, 8*60)	/* IRQs are triggered by the main CPU */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

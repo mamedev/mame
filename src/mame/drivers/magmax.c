@@ -347,7 +347,7 @@ static MACHINE_CONFIG_START( magmax, magmax_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(magmax_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", magmax_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_20MHz/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(magmax_sound_map)

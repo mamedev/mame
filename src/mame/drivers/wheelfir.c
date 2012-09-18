@@ -817,7 +817,7 @@ static MACHINE_CONFIG_START( wheelfir, wheelfir_state )
 
 	MCFG_CPU_ADD("subcpu", M68000, 32000000/2)
 	MCFG_CPU_PROGRAM_MAP(wheelfir_sub)
-	//MCFG_CPU_PERIODIC_INT(irq1_line_hold,256*60)
+	//MCFG_CPU_PERIODIC_INT_DRIVER(wheelfir_state, irq1_line_hold, 256*60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 

@@ -496,20 +496,18 @@ void gyruss_state::machine_start()
 	save_item(NAME(m_slave_irq_mask));
 }
 
-static INTERRUPT_GEN( master_vblank_irq )
+INTERRUPT_GEN_MEMBER(gyruss_state::master_vblank_irq)
 {
-	gyruss_state *state = device->machine().driver_data<gyruss_state>();
 
-	if (state->m_master_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_master_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static INTERRUPT_GEN( slave_vblank_irq )
+INTERRUPT_GEN_MEMBER(gyruss_state::slave_vblank_irq)
 {
-	gyruss_state *state = device->machine().driver_data<gyruss_state>();
 
-	if (state->m_slave_irq_mask)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if (m_slave_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( gyruss, gyruss_state )
@@ -517,11 +515,11 @@ static MACHINE_CONFIG_START( gyruss, gyruss_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_cpu1_map)
-	MCFG_CPU_VBLANK_INT("screen", master_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gyruss_state,  master_vblank_irq)
 
 	MCFG_CPU_ADD("sub", M6809, MASTER_CLOCK/12)		/* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_cpu2_map)
-	MCFG_CPU_VBLANK_INT("screen", slave_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gyruss_state,  slave_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(audio_cpu1_map)

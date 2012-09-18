@@ -39,6 +39,7 @@ public:
 	DECLARE_MACHINE_START(missb2);
 	DECLARE_MACHINE_RESET(missb2);
 	UINT32 screen_update_missb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(missb2_interrupt);
 };
 
 
@@ -428,9 +429,9 @@ static const ym3526_interface ym3526_config =
 
 /* Interrupt Generator */
 
-static INTERRUPT_GEN( missb2_interrupt )
+INTERRUPT_GEN_MEMBER(missb2_state::missb2_interrupt)
 {
-	device->execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 /* Machine Driver */
@@ -462,16 +463,16 @@ static MACHINE_CONFIG_START( missb2, missb2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)	// 6 MHz
 	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("slave", Z80, MAIN_XTAL/4)	// 6 MHz
 	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)	// 3 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-//  MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
-	MCFG_CPU_VBLANK_INT("screen", missb2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  missb2_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 

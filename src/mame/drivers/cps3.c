@@ -2243,17 +2243,17 @@ static INPUT_PORTS_START( cps3_jojo)
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static INTERRUPT_GEN(cps3_vbl_interrupt)
+INTERRUPT_GEN_MEMBER(cps3_state::cps3_vbl_interrupt)
 {
-	device->execute().set_input_line(12, ASSERT_LINE);
+	device.execute().set_input_line(12, ASSERT_LINE);
 }
 
-static INTERRUPT_GEN(cps3_other_interrupt)
+INTERRUPT_GEN_MEMBER(cps3_state::cps3_other_interrupt)
 {
 	// this seems to need to be periodic (see the life bar portraits in sfiii2
 	// but also triggered on certain dma events (or warzard locks up in attract)
 	// what is the REAL source of IRQ10??
-	device->execute().set_input_line(10, ASSERT_LINE);
+	device.execute().set_input_line(10, ASSERT_LINE);
 }
 
 
@@ -2494,8 +2494,8 @@ static MACHINE_CONFIG_START( cps3, cps3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the intenral multiplier to 4x (this should probably be handled in the core..)
 	MCFG_CPU_PROGRAM_MAP(cps3_map)
-	MCFG_CPU_VBLANK_INT("screen", cps3_vbl_interrupt)
-	MCFG_CPU_PERIODIC_INT(cps3_other_interrupt,80) /* ?source? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps3_state,  cps3_vbl_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(cps3_state, cps3_other_interrupt, 80) /* ?source? */
 	MCFG_CPU_CONFIG(sh2_conf_cps3)
 
 	MCFG_SCSIBUS_ADD("scsi")

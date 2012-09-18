@@ -343,7 +343,7 @@ static MACHINE_CONFIG_START( powerins, powerins_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(powerins_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", powerins_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 6000000) /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(powerins_sound_map)
@@ -407,7 +407,7 @@ static MACHINE_CONFIG_DERIVED( powerinb, powerins )
 
 	MCFG_CPU_MODIFY("soundcpu") /* 6 MHz */
 	MCFG_CPU_IO_MAP(powerinb_sound_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 120)	// YM2203 rate is at 150??
+	MCFG_CPU_PERIODIC_INT_DRIVER(powerins_state, irq0_line_hold,  120)	// YM2203 rate is at 150??
 
 	MCFG_DEVICE_REMOVE("ym2203")	// Sound code talks to one, but it's not fitted on the board
 MACHINE_CONFIG_END

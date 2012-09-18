@@ -91,7 +91,7 @@ static MACHINE_CONFIG_START( segajw, segajw_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,8000000) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(segajw_map)
-	MCFG_CPU_VBLANK_INT("screen",irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", segajw_state, irq4_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

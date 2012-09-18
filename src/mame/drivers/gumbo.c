@@ -231,7 +231,7 @@ static MACHINE_CONFIG_START( gumbo, gumbo_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 14318180 /2)	 // or 10mhz? ?
 	MCFG_CPU_PROGRAM_MAP(gumbo_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold) // all the same
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gumbo_state,  irq1_line_hold) // all the same
 
 	MCFG_GFXDECODE(gumbo)
 

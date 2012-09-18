@@ -22,4 +22,6 @@ public:
 	DECLARE_WRITE8_MEMBER(wiping_flipscreen_w);
 	virtual void palette_init();
 	UINT32 screen_update_wiping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 };

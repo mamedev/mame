@@ -725,33 +725,32 @@ GFXDECODE_END
  *
  *************************************/
 
-static INTERRUPT_GEN( karnov_interrupt )
+INTERRUPT_GEN_MEMBER(karnov_state::karnov_interrupt)
 {
-	karnov_state *state = device->machine().driver_data<karnov_state>();
-	UINT8 port = state->ioport("FAKE")->read();
+	UINT8 port = ioport("FAKE")->read();
 
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
-	if (port == state->m_coin_mask)
-		state->m_latch = 1;
+	if (port == m_coin_mask)
+		m_latch = 1;
 
-	if (port != state->m_coin_mask && state->m_latch)
+	if (port != m_coin_mask && m_latch)
 	{
-		if (state->m_i8751_needs_ack)
+		if (m_i8751_needs_ack)
 		{
 			/* i8751 is busy - queue the command */
-			state->m_i8751_coin_pending = port | 0x8000;
+			m_i8751_coin_pending = port | 0x8000;
 		}
 		else
 		{
-			state->m_i8751_return = port | 0x8000;
-			device->execute().set_input_line(6, HOLD_LINE);
-			state->m_i8751_needs_ack = 1;
+			m_i8751_return = port | 0x8000;
+			device.execute().set_input_line(6, HOLD_LINE);
+			m_i8751_needs_ack = 1;
 		}
 
-		state->m_latch = 0;
+		m_latch = 0;
 	}
 
-	device->execute().set_input_line(7, HOLD_LINE);	/* VBL */
+	device.execute().set_input_line(7, HOLD_LINE);	/* VBL */
 }
 
 static const ym3526_interface ym3526_config =
@@ -806,7 +805,7 @@ static MACHINE_CONFIG_START( karnov, karnov_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(karnov_map)
-	MCFG_CPU_VBLANK_INT("screen", karnov_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", karnov_state,  karnov_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)	/* Accurate */
 	MCFG_CPU_PROGRAM_MAP(karnov_sound_map)
@@ -847,7 +846,7 @@ static MACHINE_CONFIG_START( wndrplnt, karnov_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(karnov_map)
-	MCFG_CPU_VBLANK_INT("screen", karnov_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", karnov_state,  karnov_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)	/* Accurate */
 	MCFG_CPU_PROGRAM_MAP(karnov_sound_map)

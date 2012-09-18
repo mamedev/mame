@@ -360,7 +360,7 @@ static MACHINE_CONFIG_START( arabian, arabian_state )
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_OSC/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", arabian_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("mcu", MB8841, MAIN_OSC/3/2)
 	MCFG_CPU_IO_MAP(mcu_io_map)

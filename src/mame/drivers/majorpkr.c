@@ -1032,7 +1032,7 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)	/* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(map)
 	MCFG_CPU_IO_MAP(portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", majorpkr_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

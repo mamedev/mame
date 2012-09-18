@@ -414,11 +414,11 @@ void itech32_update_interrupts(running_machine &machine, int vint, int xint, int
 }
 
 
-static INTERRUPT_GEN( generate_int1 )
+INTERRUPT_GEN_MEMBER(itech32_state::generate_int1)
 {
 	/* signal the NMI */
-	itech32_update_interrupts(device->machine(), 1, -1, -1);
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", device->machine().primary_screen->vpos());
+	itech32_update_interrupts(machine(), 1, -1, -1);
+	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", machine().primary_screen->vpos());
 }
 
 
@@ -1671,7 +1671,7 @@ static MACHINE_CONFIG_START( timekill, itech32_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(timekill_map)
-	MCFG_CPU_VBLANK_INT("screen", generate_int1)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech32_state,  generate_int1)
 
 	MCFG_CPU_ADD("soundcpu", M6809, SOUND_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -1739,11 +1739,11 @@ static MACHINE_CONFIG_DERIVED( sftm, bloodstm )
 
 	MCFG_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(itech020_map)
-	MCFG_CPU_VBLANK_INT("screen", generate_int1)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech32_state,  generate_int1)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(sound_020_map)
-	MCFG_CPU_PERIODIC_INT(irq1_line_assert,4*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(itech32_state, irq1_line_assert, 4*60)
 
 	/* via */
 	MCFG_DEVICE_REMOVE("via6522_0")

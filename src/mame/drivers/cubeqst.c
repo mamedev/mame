@@ -57,6 +57,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank);
 };
 
 
@@ -192,15 +193,14 @@ READ16_MEMBER(cubeqst_state::line_r)
 	return machine().primary_screen->vpos();
 }
 
-static INTERRUPT_GEN( vblank )
+INTERRUPT_GEN_MEMBER(cubeqst_state::vblank)
 {
-	cubeqst_state *state = device->machine().driver_data<cubeqst_state>();
-	int int_level = state->m_video_field == 0 ? 5 : 6;
+	int int_level = m_video_field == 0 ? 5 : 6;
 
-	device->execute().set_input_line(int_level, HOLD_LINE);
+	device.execute().set_input_line(int_level, HOLD_LINE);
 
 	/* Update the laserdisc */
-	state->m_video_field ^= 1;
+	m_video_field ^= 1;
 }
 
 
@@ -513,7 +513,7 @@ static const cubeqst_lin_config lin_config =
 static MACHINE_CONFIG_START( cubeqst, cubeqst_state )
 	MCFG_CPU_ADD("main_cpu", M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(m68k_program_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cubeqst_state,  vblank)
 
 	MCFG_CPU_ADD("rotate_cpu", CQUESTROT, XTAL_10MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(rotate_map)

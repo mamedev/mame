@@ -565,7 +565,7 @@ static MACHINE_CONFIG_START( gstream, gstream_state )
 	MCFG_CPU_ADD("maincpu", E132XT, 16000000*4)	/* 4x internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(gstream_32bit_map)
 	MCFG_CPU_IO_MAP(gstream_io)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
 
 
 	MCFG_NVRAM_ADD_1FILL("nvram")

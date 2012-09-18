@@ -147,6 +147,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	virtual void machine_start();
 	UINT32 screen_update_rblaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(sound_interrupt);
 };
 
 static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 *spriteram, UINT16 tile_bank )
@@ -295,10 +296,9 @@ WRITE8_MEMBER(deco_ld_state::nmimask_w)
 }
 #endif
 
-static INTERRUPT_GEN ( sound_interrupt )
+INTERRUPT_GEN_MEMBER(deco_ld_state::sound_interrupt)
 {
-	deco_ld_state *state = device->machine().driver_data<deco_ld_state>();
-	if (!state->m_nmimask) device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (!m_nmimask) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -459,11 +459,11 @@ static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6502,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(rblaster_map)
-	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco_ld_state, irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu",M6502,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(rblaster_sound_map)
-	MCFG_CPU_PERIODIC_INT(sound_interrupt, 640)
+	MCFG_CPU_PERIODIC_INT_DRIVER(deco_ld_state, sound_interrupt,  640)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

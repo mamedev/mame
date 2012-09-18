@@ -365,7 +365,7 @@ static MACHINE_CONFIG_START( koikoi, koikoi_state )
 	MCFG_CPU_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)	/* ?? */
 	MCFG_CPU_PROGRAM_MAP(koikoi_map)
 	MCFG_CPU_IO_MAP(koikoi_io_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", koikoi_state,  nmi_line_pulse)
 
 
 	/* video hardware */

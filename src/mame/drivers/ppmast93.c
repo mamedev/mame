@@ -366,12 +366,12 @@ static MACHINE_CONFIG_START( ppmast93, ppmast93_state )
 	MCFG_CPU_ADD("maincpu", Z80,5000000)		 /* 5 MHz */
 	MCFG_CPU_PROGRAM_MAP(ppmast93_cpu1_map)
 	MCFG_CPU_IO_MAP(ppmast93_cpu1_io)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ppmast93_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", Z80,5000000)		 /* 5 MHz */
 	MCFG_CPU_PROGRAM_MAP(ppmast93_cpu2_map)
 	MCFG_CPU_IO_MAP(ppmast93_cpu2_io)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,8000)
+	MCFG_CPU_PERIODIC_INT_DRIVER(ppmast93_state, irq0_line_hold, 8000)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

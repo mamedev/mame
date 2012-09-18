@@ -442,12 +442,12 @@ static MACHINE_CONFIG_START( calorie, calorie_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(calorie_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,3000000)		 /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(calorie_sound_map)
 	MCFG_CPU_IO_MAP(calorie_sound_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 64)
+	MCFG_CPU_PERIODIC_INT_DRIVER(calorie_state, irq0_line_hold,  64)
 
 
 	/* video hardware */

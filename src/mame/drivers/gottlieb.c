@@ -657,21 +657,20 @@ static TIMER_CALLBACK( nmi_clear )
 }
 
 
-static INTERRUPT_GEN( gottlieb_interrupt )
+INTERRUPT_GEN_MEMBER(gottlieb_state::gottlieb_interrupt)
 {
-	gottlieb_state *state = device->machine().driver_data<gottlieb_state>();
 	/* assert the NMI and set a timer to clear it at the first visible line */
-	device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(0), FUNC(nmi_clear));
+	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(nmi_clear));
 
 	/* if we have a laserdisc, update it */
-	if (state->m_laserdisc != NULL)
+	if (m_laserdisc != NULL)
 	{
 		/* set the "disc ready" bit, which basically indicates whether or not we have a proper video frame */
-		if (!state->m_laserdisc->video_active())
-			state->m_laserdisc_status &= ~0x20;
+		if (!m_laserdisc->video_active())
+			m_laserdisc_status &= ~0x20;
 		else
-			state->m_laserdisc_status |= 0x20;
+			m_laserdisc_status |= 0x20;
 	}
 }
 
@@ -1711,7 +1710,7 @@ static MACHINE_CONFIG_START( gottlieb_core, gottlieb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, CPU_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(gottlieb_map)
-	MCFG_CPU_VBLANK_INT("screen", gottlieb_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gottlieb_state,  gottlieb_interrupt)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 	MCFG_WATCHDOG_VBLANK_INIT(16)

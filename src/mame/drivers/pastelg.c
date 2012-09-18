@@ -410,7 +410,7 @@ static MACHINE_CONFIG_START( pastelg, pastelg_state )
 	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)	/* unknown divider, galds definitely relies on this for correct voice pitch */
 	MCFG_CPU_PROGRAM_MAP(pastelg_map)
 	MCFG_CPU_IO_MAP(pastelg_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert) // nmiclock not written, chip is 1411M1 instead of 1413M3
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pastelg_state,  irq0_line_assert) // nmiclock not written, chip is 1411M1 instead of 1413M3
 
 	MCFG_MACHINE_RESET(nb1413m3)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -466,7 +466,7 @@ static MACHINE_CONFIG_START( threeds, pastelg_state )
 	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)	/* unknown divider, galds definitely relies on this for correct voice pitch */
 	MCFG_CPU_PROGRAM_MAP(pastelg_map)
 	MCFG_CPU_IO_MAP(threeds_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pastelg_state,  irq0_line_assert)
 
 	MCFG_MACHINE_RESET(nb1413m3)
 	MCFG_NVRAM_ADD_0FILL("nvram")

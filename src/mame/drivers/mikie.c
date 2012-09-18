@@ -264,12 +264,11 @@ void mikie_state::machine_reset()
 	m_last_irq = 0;
 }
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(mikie_state::vblank_irq)
 {
-	mikie_state *state = device->machine().driver_data<mikie_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if(m_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( mikie, mikie_state )
@@ -277,7 +276,7 @@ static MACHINE_CONFIG_START( mikie, mikie_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, OSC/12)
 	MCFG_CPU_PROGRAM_MAP(mikie_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mikie_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, CLK)
 	MCFG_CPU_PROGRAM_MAP(sound_map)

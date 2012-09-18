@@ -337,18 +337,18 @@ static TIMER_CALLBACK( topspeed_cpub_interrupt6 )
 }
 
 
-static INTERRUPT_GEN( topspeed_interrupt )
+INTERRUPT_GEN_MEMBER(topspeed_state::topspeed_interrupt)
 {
 	/* Unsure how many int6's per frame */
-	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(topspeed_interrupt6));
-	device->execute().set_input_line(5, HOLD_LINE);
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), FUNC(topspeed_interrupt6));
+	device.execute().set_input_line(5, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( topspeed_cpub_interrupt )
+INTERRUPT_GEN_MEMBER(topspeed_state::topspeed_cpub_interrupt)
 {
 	/* Unsure how many int6's per frame */
-	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(topspeed_cpub_interrupt6));
-	device->execute().set_input_line(5, HOLD_LINE);
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), FUNC(topspeed_cpub_interrupt6));
+	device.execute().set_input_line(5, HOLD_LINE);
 }
 
 
@@ -751,14 +751,14 @@ static MACHINE_CONFIG_START( topspeed, topspeed_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(topspeed_map)
-	MCFG_CPU_VBLANK_INT("screen", topspeed_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", topspeed_state,  topspeed_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(z80_map)
 
 	MCFG_CPU_ADD("subcpu", M68000, 12000000)	/* 12 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(topspeed_cpub_map)
-	MCFG_CPU_VBLANK_INT("screen", topspeed_cpub_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", topspeed_state,  topspeed_cpub_interrupt)
 
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", topspeed_io_intf)

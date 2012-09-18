@@ -764,7 +764,7 @@ static MACHINE_CONFIG_START( shadoww, gaiden_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 18432000/2)	/* 9.216 MHz */
 	MCFG_CPU_PROGRAM_MAP(gaiden_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -820,7 +820,7 @@ static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000/2)	/* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(drgnbowl_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 12000000/2)	/* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(drgnbowl_sound_map)
@@ -936,7 +936,7 @@ static MACHINE_CONFIG_START( mastninj, gaiden_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz? */
 	MCFG_CPU_PROGRAM_MAP(mastninj_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* ?? MHz */
 	MCFG_CPU_PROGRAM_MAP(mastninj_sound_map)

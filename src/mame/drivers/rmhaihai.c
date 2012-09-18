@@ -469,7 +469,7 @@ static MACHINE_CONFIG_START( rmhaihai, rmhaihai_state )
 	MCFG_CPU_ADD("maincpu",Z80,20000000/4)	/* 5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(rmhaihai_map)
 	MCFG_CPU_IO_MAP(rmhaihai_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", rmhaihai_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

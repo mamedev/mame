@@ -177,6 +177,7 @@ public:
 	UINT32 screen_update_buggybjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_tx1(screen_device &screen, bool state);
 	void screen_eof_buggyboy(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(z80_irq);
 };
 
 /*----------- defined in audio/tx1.c -----------*/

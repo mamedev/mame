@@ -601,7 +601,7 @@ static MACHINE_CONFIG_START( route16, route16_state )
 	MCFG_CPU_ADD("cpu1", Z80, 2500000)	/* 10MHz / 4 = 2.5MHz */
 	MCFG_CPU_PROGRAM_MAP(route16_cpu1_map)
 	MCFG_CPU_IO_MAP(cpu1_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", route16_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("cpu2", Z80, 2500000)	/* 10MHz / 4 = 2.5MHz */
 	MCFG_CPU_PROGRAM_MAP(route16_cpu2_map)
@@ -667,7 +667,7 @@ static MACHINE_CONFIG_DERIVED( spacecho, speakres )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,48*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(route16_state, irq0_line_hold, 48*60)
 MACHINE_CONFIG_END
 
 

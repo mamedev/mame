@@ -99,6 +99,8 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_segag80r(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(segag80r_vblank_start);
+	INTERRUPT_GEN_MEMBER(sindbadm_vblank_start);
 };
 
 
@@ -116,6 +118,3 @@ MACHINE_CONFIG_EXTERN( monsterb_sound_board );
 #define G80_BACKGROUND_MONSTERB		2
 #define G80_BACKGROUND_PIGNEWT		3
 #define G80_BACKGROUND_SINDBADM		4
-
-INTERRUPT_GEN( segag80r_vblank_start );
-INTERRUPT_GEN( sindbadm_vblank_start );

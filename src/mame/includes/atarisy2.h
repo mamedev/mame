@@ -79,6 +79,7 @@ public:
 	DECLARE_MACHINE_RESET(atarisy2);
 	DECLARE_VIDEO_START(atarisy2);
 	UINT32 screen_update_atarisy2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_int);
 };
 
 

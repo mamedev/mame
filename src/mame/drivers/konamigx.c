@@ -633,10 +633,10 @@ static void dmastart_callback(int data)
 }
 
 
-static INTERRUPT_GEN(konamigx_vbinterrupt)
+INTERRUPT_GEN_MEMBER(konamigx_state::konamigx_vbinterrupt)
 {
 	// lift idle suspension
-	if (resume_trigger && suspension_active) { suspension_active = 0; device->machine().scheduler().trigger(resume_trigger); }
+	if (resume_trigger && suspension_active) { suspension_active = 0; machine().scheduler().trigger(resume_trigger); }
 
 	// IRQ 1 is the main 60hz vblank interrupt
 	if (gx_syncen & 0x20)
@@ -646,7 +646,7 @@ static INTERRUPT_GEN(konamigx_vbinterrupt)
 		if ((konamigx_wrport1_1 & 0x81) == 0x81 || (gx_syncen & 1))
 		{
 			gx_syncen &= ~1;
-			device->execute().set_input_line(1, HOLD_LINE);
+			device.execute().set_input_line(1, HOLD_LINE);
 		}
 	}
 
@@ -1251,9 +1251,9 @@ WRITE16_MEMBER(konamigx_state::sndcomm68k_w)
 	sndto020[offset] = data;
 }
 
-static INTERRUPT_GEN(tms_sync)
+INTERRUPT_GEN_MEMBER(konamigx_state::tms_sync)
 {
-	downcast<tms57002_device *>(device)->sync();
+	downcast<tms57002_device *>(&device)->sync();
 }
 
 READ16_MEMBER(konamigx_state::tms57002_data_word_r)
@@ -1761,15 +1761,15 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 24000000)
 	MCFG_CPU_PROGRAM_MAP(gx_type2_map)
-	MCFG_CPU_VBLANK_INT("screen", konamigx_vbinterrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", konamigx_state,  konamigx_vbinterrupt)
 
 	MCFG_CPU_ADD("soundcpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(gxsndmap)
-	MCFG_CPU_PERIODIC_INT(irq2_line_hold, 480)
+	MCFG_CPU_PERIODIC_INT_DRIVER(konamigx_state, irq2_line_hold,  480)
 
 	MCFG_CPU_ADD("dasp", TMS57002, 12500000)
 	MCFG_CPU_DATA_MAP(gxtmsmap)
-	MCFG_CPU_PERIODIC_INT(tms_sync, 48000)
+	MCFG_CPU_PERIODIC_INT_DRIVER(konamigx_state, tms_sync,  48000)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 

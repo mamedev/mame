@@ -207,6 +207,7 @@ public:
 	DECLARE_VIDEO_START(jetwave);
 	UINT32 screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(zr107_vblank);
 };
 
 
@@ -716,9 +717,9 @@ static const k056230_interface zr107_k056230_intf =
     DMA0
 
 */
-static INTERRUPT_GEN( zr107_vblank )
+INTERRUPT_GEN_MEMBER(zr107_state::zr107_vblank)
 {
-	device->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 void zr107_state::machine_reset()
@@ -731,7 +732,7 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MCFG_CPU_PROGRAM_MAP(zr107_map)
-	MCFG_CPU_VBLANK_INT("screen", zr107_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", zr107_state,  zr107_vblank)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 64000000/8)	/* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
@@ -787,7 +788,7 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MCFG_CPU_PROGRAM_MAP(jetwave_map)
-	MCFG_CPU_VBLANK_INT("screen", zr107_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", zr107_state,  zr107_vblank)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 64000000/8)	/* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)

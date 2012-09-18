@@ -263,7 +263,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( pirates, pirates_state )
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz */
 	MCFG_CPU_PROGRAM_MAP(pirates_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pirates_state,  irq1_line_hold)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 

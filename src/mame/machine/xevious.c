@@ -182,8 +182,8 @@ READ8_HANDLER( battles_input_port_r )
 }
 
 
-INTERRUPT_GEN( battles_interrupt_4 )
+INTERRUPT_GEN_MEMBER(xevious_state::battles_interrupt_4)
 {
-	device->execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 

@@ -692,14 +692,13 @@ void paradise_state::machine_reset()
 
 }
 
-static INTERRUPT_GEN(paradise_irq)
+INTERRUPT_GEN_MEMBER(paradise_state::paradise_irq)
 {
-	paradise_state *state = device->machine().driver_data<paradise_state>();
 
-	if (state->irq_count<300)
-		state->irq_count++;
+	if (irq_count<300)
+		irq_count++;
 	else
-		device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( paradise, paradise_state )
@@ -708,7 +707,7 @@ static MACHINE_CONFIG_START( paradise, paradise_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)			/* Z8400B - 6mhz Verified */
 	MCFG_CPU_PROGRAM_MAP(paradise_map)
 	MCFG_CPU_IO_MAP(paradise_io_map)
-	MCFG_CPU_PERIODIC_INT(paradise_irq,4*54)	/* No nmi routine, timing is confirmed (i.e. three timing irqs for each vblank irq */
+	MCFG_CPU_PERIODIC_INT_DRIVER(paradise_state, paradise_irq, 4*54)	/* No nmi routine, timing is confirmed (i.e. three timing irqs for each vblank irq */
 
 
 	/* video hardware */

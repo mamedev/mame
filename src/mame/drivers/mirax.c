@@ -130,6 +130,7 @@ public:
 	DECLARE_DRIVER_INIT(mirax);
 	virtual void palette_init();
 	UINT32 screen_update_mirax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(mirax_vblank_irq);
 };
 
 
@@ -444,21 +445,20 @@ static GFXDECODE_START( mirax )
 GFXDECODE_END
 
 
-static INTERRUPT_GEN( mirax_vblank_irq )
+INTERRUPT_GEN_MEMBER(mirax_state::mirax_vblank_irq)
 {
-	mirax_state *state = device->machine().driver_data<mirax_state>();
-	if(state->m_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( mirax, mirax_state )
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/4) // ceramic potted module, encrypted z80
 	MCFG_CPU_PROGRAM_MAP(mirax_main_map)
-	MCFG_CPU_VBLANK_INT("screen",mirax_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mirax_state, mirax_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 12000000/4)
 	MCFG_CPU_PROGRAM_MAP(mirax_sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(mirax_state, irq0_line_hold,  4*60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -216,7 +216,7 @@ static MACHINE_CONFIG_START( poolshrk, poolshrk_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 11055000 / 8) /* ? */
 	MCFG_CPU_PROGRAM_MAP(poolshrk_cpu_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", poolshrk_state,  irq0_line_assert)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

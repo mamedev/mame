@@ -105,6 +105,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
 };
 
 
@@ -152,10 +153,10 @@ void jubilee_state::palette_init()
 *  Read / Write Handlers  *
 **************************/
 
-static INTERRUPT_GEN( jubileep_interrupt )
+INTERRUPT_GEN_MEMBER(jubilee_state::jubileep_interrupt)
 {
 	/* doesn't seems to work properly. need to set level1 interrupts */
-	device->execute().set_input_line_and_vector(0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
+	device.execute().set_input_line_and_vector(0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
 }
 
 
@@ -417,7 +418,7 @@ static MACHINE_CONFIG_START( jubileep, jubilee_state )
 	MCFG_CPU_ADD("maincpu", TMS9980L, MASTER_CLOCK/2)	/* guess */
 	MCFG_CPU_PROGRAM_MAP(jubileep_map)
 	MCFG_CPU_IO_MAP(jubileep_cru_map)
-	MCFG_CPU_VBLANK_INT("screen", jubileep_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", jubilee_state,  jubileep_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

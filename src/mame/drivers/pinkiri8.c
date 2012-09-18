@@ -1132,7 +1132,7 @@ static MACHINE_CONFIG_START( pinkiri8, pinkiri8_state )
 	MCFG_CPU_ADD("maincpu",Z180,16000000)
 	MCFG_CPU_PROGRAM_MAP(pinkiri8_map)
 	MCFG_CPU_IO_MAP(pinkiri8_io)
-	MCFG_CPU_VBLANK_INT("screen",nmi_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pinkiri8_state, nmi_line_assert)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

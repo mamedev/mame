@@ -491,7 +491,7 @@ static MACHINE_CONFIG_START( omegrace, omegrace_state )
 	MCFG_CPU_ADD("maincpu", Z80,12000000/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,250)
+	MCFG_CPU_PERIODIC_INT_DRIVER(omegrace_state, irq0_line_hold, 250)
 
 	/* audio CPU */
 	/* XTAL101 Crystal @ 12mhz */
@@ -500,7 +500,7 @@ static MACHINE_CONFIG_START( omegrace, omegrace_state )
 	MCFG_CPU_ADD("audiocpu", Z80,12000000/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_port)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,250)
+	MCFG_CPU_PERIODIC_INT_DRIVER(omegrace_state, nmi_line_pulse, 250)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

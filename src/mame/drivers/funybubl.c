@@ -221,7 +221,7 @@ static MACHINE_CONFIG_START( funybubl, funybubl_state )
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz?? */
 	MCFG_CPU_PROGRAM_MAP(funybubl_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", funybubl_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)		 /* 4 MHz?? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

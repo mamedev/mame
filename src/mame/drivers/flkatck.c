@@ -20,12 +20,11 @@
 #include "includes/flkatck.h"
 
 
-static INTERRUPT_GEN( flkatck_interrupt )
+INTERRUPT_GEN_MEMBER(flkatck_state::flkatck_interrupt)
 {
-	flkatck_state *state = device->machine().driver_data<flkatck_state>();
 
-	if (state->m_irq_enabled)
-		device->execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
+	if (m_irq_enabled)
+		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(flkatck_state::flkatck_bankswitch_w)
@@ -222,7 +221,7 @@ static MACHINE_CONFIG_START( flkatck, flkatck_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
 	MCFG_CPU_PROGRAM_MAP(flkatck_map)
-	MCFG_CPU_VBLANK_INT("screen", flkatck_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", flkatck_state,  flkatck_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80,3579545)	/* NEC D780C-1, 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(flkatck_sound_map)

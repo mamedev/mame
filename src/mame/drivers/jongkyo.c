@@ -494,7 +494,7 @@ static MACHINE_CONFIG_START( jongkyo, jongkyo_state )
 	MCFG_CPU_ADD("maincpu", Z80,JONGKYO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(jongkyo_memmap)
 	MCFG_CPU_IO_MAP(jongkyo_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", jongkyo_state,  irq0_line_hold)
 
 
 	/* video hardware */

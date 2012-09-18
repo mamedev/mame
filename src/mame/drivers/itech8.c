@@ -610,13 +610,13 @@ static TIMER_CALLBACK( irq_off )
 }
 
 
-static INTERRUPT_GEN( generate_nmi )
+INTERRUPT_GEN_MEMBER(itech8_state::generate_nmi)
 {
 	/* signal the NMI */
-	itech8_update_interrupts(device->machine(), 1, -1, -1);
-	device->machine().scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off));
+	itech8_update_interrupts(machine(), 1, -1, -1);
+	machine().scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off));
 
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", device->machine().primary_screen->vpos());
+	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", machine().primary_screen->vpos());
 }
 
 
@@ -1685,7 +1685,7 @@ static MACHINE_CONFIG_START( itech8_core_lo, itech8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, CLOCK_8MHz/4)
 	MCFG_CPU_PROGRAM_MAP(tmslo_map)
-	MCFG_CPU_VBLANK_INT("screen", generate_nmi)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech8_state,  generate_nmi)
 
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
@@ -1920,7 +1920,7 @@ static MACHINE_CONFIG_DERIVED( rimrockn, itech8_core_hi )
 
 	MCFG_CPU_REPLACE("maincpu", HD6309, CLOCK_12MHz)
 	MCFG_CPU_PROGRAM_MAP(tmshi_map)
-	MCFG_CPU_VBLANK_INT("screen", generate_nmi)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech8_state,  generate_nmi)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1936,7 +1936,7 @@ static MACHINE_CONFIG_DERIVED( ninclown, itech8_core_hi )
 
 	MCFG_CPU_REPLACE("maincpu", M68000, CLOCK_12MHz)
 	MCFG_CPU_PROGRAM_MAP(ninclown_map)
-	MCFG_CPU_VBLANK_INT("screen", generate_nmi)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech8_state,  generate_nmi)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

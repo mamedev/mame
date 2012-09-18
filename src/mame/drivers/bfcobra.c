@@ -300,6 +300,8 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(timer_irq);
+	INTERRUPT_GEN_MEMBER(vblank_gen);
 };
 
 
@@ -1762,28 +1764,27 @@ DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 }
 
 /* TODO */
-static INTERRUPT_GEN( timer_irq )
+INTERRUPT_GEN_MEMBER(bfcobra_state::timer_irq)
 {
-	generic_pulse_irq_line(device, M6809_IRQ_LINE, 1);
+	generic_pulse_irq_line(device.execute(), M6809_IRQ_LINE, 1);
 }
 
 /* TODO */
-static INTERRUPT_GEN( vblank_gen )
+INTERRUPT_GEN_MEMBER(bfcobra_state::vblank_gen)
 {
-	bfcobra_state *state = device->machine().driver_data<bfcobra_state>();
-	state->m_vblank_irq = 1;
-	update_irqs(device->machine());
+	m_vblank_irq = 1;
+	update_irqs(machine());
 }
 
 static MACHINE_CONFIG_START( bfcobra, bfcobra_state )
 	MCFG_CPU_ADD("maincpu", Z80, Z80_XTAL)
 	MCFG_CPU_PROGRAM_MAP(z80_prog_map)
 	MCFG_CPU_IO_MAP(z80_io_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_gen)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bfcobra_state,  vblank_gen)
 
 	MCFG_CPU_ADD("audiocpu", M6809, M6809_XTAL)
 	MCFG_CPU_PROGRAM_MAP(m6809_prog_map)
-	MCFG_CPU_PERIODIC_INT(timer_irq, 1000)
+	MCFG_CPU_PERIODIC_INT_DRIVER(bfcobra_state, timer_irq,  1000)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

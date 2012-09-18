@@ -45,6 +45,10 @@ public:
 	DECLARE_VIDEO_START(dv);
 	UINT32 screen_update_mainevt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_dv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(mainevt_interrupt);
+	INTERRUPT_GEN_MEMBER(dv_interrupt);
+	INTERRUPT_GEN_MEMBER(mainevt_sound_timer_irq);
+	INTERRUPT_GEN_MEMBER(devstors_sound_timer_irq);
 };
 
 /*----------- defined in video/mainevt.c -----------*/

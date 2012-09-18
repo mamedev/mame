@@ -236,10 +236,10 @@ static TIMER_CALLBACK( cadash_interrupt5 )
 	state->m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( cadash_interrupt )
+INTERRUPT_GEN_MEMBER(asuka_state::cadash_interrupt)
 {
-	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(500), FUNC(cadash_interrupt5));
-	device->execute().set_input_line(4, HOLD_LINE);  /* interrupt vector 4 */
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), FUNC(cadash_interrupt5));
+	device.execute().set_input_line(4, HOLD_LINE);  /* interrupt vector 4 */
 }
 
 
@@ -896,7 +896,7 @@ static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* checked on PCB */
 	MCFG_CPU_PROGRAM_MAP(bonzeadv_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", asuka_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,4000000)    /* sound CPU, also required for test mode */
 	MCFG_CPU_PROGRAM_MAP(bonzeadv_z80_map)
@@ -937,7 +937,7 @@ static MACHINE_CONFIG_START( asuka, asuka_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(asuka_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", asuka_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(z80_map)
@@ -983,7 +983,7 @@ static MACHINE_CONFIG_START( cadash, asuka_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)	/* 68000p12 running at 16Mhz, verified on pcb  */
 	MCFG_CPU_PROGRAM_MAP(cadash_map)
-	MCFG_CPU_VBLANK_INT("screen", cadash_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", asuka_state,  cadash_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cadash_z80_map)
@@ -1029,7 +1029,7 @@ static MACHINE_CONFIG_START( mofflott, asuka_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(asuka_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", asuka_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(z80_map)
@@ -1075,7 +1075,7 @@ static MACHINE_CONFIG_START( galmedes, asuka_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(asuka_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", asuka_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(cadash_z80_map)
@@ -1117,7 +1117,7 @@ static MACHINE_CONFIG_START( eto, asuka_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(eto_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", asuka_state,  irq5_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(cadash_z80_map)

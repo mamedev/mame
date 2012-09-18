@@ -76,11 +76,10 @@ WRITE8_MEMBER(freekick_state::nmi_enable_w)
 	m_nmi_en = data & 1;
 }
 
-static INTERRUPT_GEN( freekick_irqgen )
+INTERRUPT_GEN_MEMBER(freekick_state::freekick_irqgen)
 {
-	freekick_state *state = device->machine().driver_data<freekick_state>();
-	if (state->m_nmi_en)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_en)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(freekick_state::oigas_5_w)
@@ -632,8 +631,8 @@ static MACHINE_CONFIG_START( base, freekick_state )
 
 	MCFG_CPU_ADD("maincpu",Z80, 18432000/6)	//confirmed
 	MCFG_CPU_PROGRAM_MAP(pbillrd_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 50*3) //??
-	MCFG_CPU_VBLANK_INT("screen", freekick_irqgen)
+	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold,  50*3) //??
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 
 	MCFG_GFXDECODE(freekick)
 

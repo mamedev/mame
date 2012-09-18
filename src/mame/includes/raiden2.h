@@ -149,6 +149,7 @@ public:
 	DECLARE_MACHINE_RESET(xsedae);
 	DECLARE_MACHINE_RESET(raidendx);
 	UINT32 screen_update_raiden2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(raiden2_interrupt);
 };
 
 /*----------- defined in machine/r2crypt.c -----------*/

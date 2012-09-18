@@ -152,9 +152,9 @@ static TIMER_DEVICE_CALLBACK(mchamp_interrupt)
 		state->m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 }
 
-static INTERRUPT_GEN(ddd_interrupt)
+INTERRUPT_GEN_MEMBER(mystwarr_state::ddd_interrupt)
 {
-	device->execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
+	device.execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
 
@@ -990,7 +990,7 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 
 	MCFG_CPU_ADD("soundcpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(mystwarr_sound_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 480)
+	MCFG_CPU_PERIODIC_INT_DRIVER(mystwarr_state, nmi_line_pulse,  480)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
@@ -1083,7 +1083,7 @@ static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dadandrn_map)
-	MCFG_CPU_VBLANK_INT("screen", ddd_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mystwarr_state,  ddd_interrupt)
 	MCFG_DEVICE_REMOVE("scantimer")
 
 	MCFG_DEVICE_REMOVE("k053252")
@@ -1109,7 +1109,7 @@ static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gaiapols_map)
-	MCFG_CPU_VBLANK_INT("screen", ddd_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mystwarr_state,  ddd_interrupt)
 	MCFG_DEVICE_REMOVE("scantimer")
 
 	MCFG_DEVICE_REMOVE("k053252")

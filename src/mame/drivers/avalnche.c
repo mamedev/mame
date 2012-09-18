@@ -248,7 +248,7 @@ static MACHINE_CONFIG_START( avalnche, avalnche_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,MASTER_CLOCK/16)	   /* clock input is the "2H" signal divided by two */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,8*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(avalnche_state, nmi_line_pulse, 8*60)
 
 
 	/* video hardware */

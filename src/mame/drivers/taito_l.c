@@ -1851,7 +1851,7 @@ static MACHINE_CONFIG_START( fhawk, taitol_state )
 
 	MCFG_CPU_ADD("slave", Z80, XTAL_12MHz/3)		/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(fhawk_2_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,3*60) /* fixes slow down problems */
+	MCFG_CPU_PERIODIC_INT_DRIVER(taitol_state, irq0_line_hold, 3*60) /* fixes slow down problems */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -1943,7 +1943,7 @@ static MACHINE_CONFIG_START( kurikint, taitol_state )
 
 	MCFG_CPU_ADD("audiocpu",  Z80, XTAL_12MHz/3)		/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kurikint_2_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitol_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -2081,8 +2081,8 @@ static MACHINE_CONFIG_START( evilston, taitol_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)		/* not verified */
 	MCFG_CPU_PROGRAM_MAP(evilston_2_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,60)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitol_state,  irq0_line_hold)
+	MCFG_CPU_PERIODIC_INT_DRIVER(taitol_state, nmi_line_pulse, 60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

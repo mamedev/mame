@@ -43,6 +43,8 @@ public:
 	DECLARE_READ8_MEMBER(ld_r);
 	virtual void video_start();
 	UINT32 screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+	INTERRUPT_GEN_MEMBER(ld_irq);
 };
 
 
@@ -134,14 +136,14 @@ static INPUT_PORTS_START( timetrv )
 	// 0x80 eeprom read bit
 INPUT_PORTS_END
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(timetrv_state::vblank_irq)
 {
-	device->execute().set_input_line_and_vector(0,HOLD_LINE,0x20/4); //vblank bit flag clear
+	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x20/4); //vblank bit flag clear
 }
 
-static INTERRUPT_GEN( ld_irq )
+INTERRUPT_GEN_MEMBER(timetrv_state::ld_irq)
 {
-	device->execute().set_input_line_and_vector(0,HOLD_LINE,0x48/4); //ld irq
+	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x48/4); //ld irq
 }
 
 static MACHINE_CONFIG_START( timetrv, timetrv_state )
@@ -150,8 +152,8 @@ static MACHINE_CONFIG_START( timetrv, timetrv_state )
 	MCFG_CPU_ADD("maincpu",I80188,20000000) //???
 	MCFG_CPU_PROGRAM_MAP(timetrv_map)
 	MCFG_CPU_IO_MAP(timetrv_io)
-	MCFG_CPU_VBLANK_INT("screen",vblank_irq)
-	MCFG_CPU_PERIODIC_INT(ld_irq,60) //remove from here
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", timetrv_state, vblank_irq)
+	MCFG_CPU_PERIODIC_INT_DRIVER(timetrv_state, ld_irq, 60) //remove from here
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

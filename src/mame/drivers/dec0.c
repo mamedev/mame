@@ -1403,7 +1403,7 @@ static MACHINE_CONFIG_START( automat, dec0_automat_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(automat_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000)// ?
 	MCFG_CPU_PROGRAM_MAP(automat_s_map)
@@ -1456,7 +1456,7 @@ static MACHINE_CONFIG_START( secretab, dec0_automat_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
 	MCFG_CPU_PROGRAM_MAP(secretab_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000)// ?
 	MCFG_CPU_PROGRAM_MAP(automat_s_map)
@@ -1510,7 +1510,7 @@ static MACHINE_CONFIG_DERIVED( hbarrel, dec0_base_sound )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(dec0_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_assert)/* VBL, level 5 interrupts from i8751 */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_assert)/* VBL, level 5 interrupts from i8751 */
 
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
@@ -1533,7 +1533,7 @@ static MACHINE_CONFIG_DERIVED( baddudes, dec0_base_sound )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(dec0_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_assert)/* VBL, level 5 interrupts from i8751 */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_assert)/* VBL, level 5 interrupts from i8751 */
 
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
@@ -1553,7 +1553,7 @@ static MACHINE_CONFIG_DERIVED( birdtry, dec0_base_sound )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(dec0_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_assert)/* VBL, level 5 interrupts from i8751 */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_assert)/* VBL, level 5 interrupts from i8751 */
 
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
@@ -1573,7 +1573,7 @@ static MACHINE_CONFIG_DERIVED( robocop, dec0_base_sound )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(dec0_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_assert)/* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_assert)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
@@ -1598,7 +1598,7 @@ static MACHINE_CONFIG_DERIVED( robocopb, dec0_base_sound )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(dec0_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_assert)/* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_assert)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
@@ -1618,7 +1618,7 @@ static MACHINE_CONFIG_DERIVED( hippodrm, dec0_base_sound )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(dec0_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_assert)/* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_assert)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
@@ -1649,7 +1649,7 @@ static MACHINE_CONFIG_DERIVED( slyspy, dec0_base_sound_alt )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
 	MCFG_CPU_PROGRAM_MAP(slyspy_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold) /* VBL, apparently it auto-acks */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold) /* VBL, apparently it auto-acks */
 
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL_12MHz/2/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(slyspy_s_map)
@@ -1676,7 +1676,7 @@ static MACHINE_CONFIG_DERIVED( midres, dec0_base_sound_alt )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
 	MCFG_CPU_PROGRAM_MAP(midres_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL_24MHz/4/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(midres_s_map)

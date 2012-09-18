@@ -175,6 +175,7 @@ public:
 	DECLARE_DRIVER_INIT(rou029);
 	DECLARE_DRIVER_INIT(nocrypt);
 	virtual void machine_reset();
+	INTERRUPT_GEN_MEMBER(timer_irq);
 };
 
 #define VFD_RESET  0x20
@@ -213,17 +214,16 @@ WRITE8_MEMBER(bfm_sc1_state::bankswitch_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-static INTERRUPT_GEN( timer_irq )
+INTERRUPT_GEN_MEMBER(bfm_sc1_state::timer_irq)
 {
-	bfm_sc1_state *state = device->machine().driver_data<bfm_sc1_state>();
 
-	if ( state->m_is_timer_enabled )
+	if ( m_is_timer_enabled )
 	{
-		state->m_irq_status = 0x01 |0x02; //0xff;
+		m_irq_status = 0x01 |0x02; //0xff;
 
-	    state->m_sc1_Inputs[2] = state->ioport("STROBE0")->read();
+	    m_sc1_Inputs[2] = ioport("STROBE0")->read();
 
-		generic_pulse_irq_line(device->machine().device("maincpu"), M6809_IRQ_LINE, 1);
+		generic_pulse_irq_line(device.execute(), M6809_IRQ_LINE, 1);
 	}
 }
 
@@ -1095,7 +1095,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( scorpion1, bfm_sc1_state )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
 	MCFG_CPU_PROGRAM_MAP(sc1_base)						// setup read and write memorymap
-	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )				// generate 1000 IRQ's per second
+	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc1_state, timer_irq,  1000)				// generate 1000 IRQ's per second
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
 	MCFG_BFMBD1_ADD("vfd0",0)

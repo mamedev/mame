@@ -263,7 +263,7 @@ static MACHINE_CONFIG_START( darkseal, darkseal_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000) /* Custom chip 59 */
 	MCFG_CPU_PROGRAM_MAP(darkseal_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", darkseal_state,  irq6_line_hold)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

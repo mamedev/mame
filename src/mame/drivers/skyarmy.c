@@ -54,6 +54,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_skyarmy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(skyarmy_nmi_source);
 };
 
 WRITE8_MEMBER(skyarmy_state::skyarmy_flip_screen_x_w)
@@ -155,11 +156,10 @@ UINT32 skyarmy_state::screen_update_skyarmy(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static INTERRUPT_GEN( skyarmy_nmi_source )
+INTERRUPT_GEN_MEMBER(skyarmy_state::skyarmy_nmi_source)
 {
-	skyarmy_state *state = device->machine().driver_data<skyarmy_state>();
 
-	if(state->m_nmi) device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -284,8 +284,8 @@ static MACHINE_CONFIG_START( skyarmy, skyarmy_state )
 	MCFG_CPU_ADD("maincpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(skyarmy_map)
 	MCFG_CPU_IO_MAP(skyarmy_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
-	MCFG_CPU_PERIODIC_INT(skyarmy_nmi_source,650)	/* Hz */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", skyarmy_state,  irq0_line_hold)
+	MCFG_CPU_PERIODIC_INT_DRIVER(skyarmy_state, skyarmy_nmi_source, 650)	/* Hz */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -187,20 +187,18 @@ WRITE16_MEMBER(metro_state::metro_irq_cause_w)
 	update_irq_state(machine());
 }
 
-static INTERRUPT_GEN( metro_vblank_interrupt )
+INTERRUPT_GEN_MEMBER(metro_state::metro_vblank_interrupt)
 {
-	metro_state *state = device->machine().driver_data<metro_state>();
 
-	state->m_requested_int[state->m_vblank_bit] = 1;
-	update_irq_state(device->machine());
+	m_requested_int[m_vblank_bit] = 1;
+	update_irq_state(machine());
 }
 
-static INTERRUPT_GEN( metro_periodic_interrupt )
+INTERRUPT_GEN_MEMBER(metro_state::metro_periodic_interrupt)
 {
-	metro_state *state = device->machine().driver_data<metro_state>();
 
-	state->m_requested_int[4] = 1;
-	update_irq_state(device->machine());
+	m_requested_int[4] = 1;
+	update_irq_state(machine());
 }
 
 static TIMER_CALLBACK( karatour_irq_callback )
@@ -210,17 +208,16 @@ static TIMER_CALLBACK( karatour_irq_callback )
 }
 
 /* lev 2-7 (lev 1 seems sound related) */
-static INTERRUPT_GEN( karatour_interrupt )
+INTERRUPT_GEN_MEMBER(metro_state::karatour_interrupt)
 {
-	metro_state *state = device->machine().driver_data<metro_state>();
 
-	state->m_requested_int[state->m_vblank_bit] = 1;
+	m_requested_int[m_vblank_bit] = 1;
 
 	/* write to scroll registers, the duration is a guess */
-	device->machine().scheduler().timer_set(attotime::from_usec(2500), FUNC(karatour_irq_callback));
-	state->m_requested_int[5] = 1;
+	machine().scheduler().timer_set(attotime::from_usec(2500), FUNC(karatour_irq_callback));
+	m_requested_int[5] = 1;
 
-	update_irq_state(device->machine());
+	update_irq_state(machine());
 }
 
 static TIMER_CALLBACK( mouja_irq_callback )
@@ -238,14 +235,13 @@ WRITE16_MEMBER(metro_state::mouja_irq_timer_ctrl_w)
 	m_mouja_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(freq));
 }
 
-static INTERRUPT_GEN( puzzlet_interrupt )
+INTERRUPT_GEN_MEMBER(metro_state::puzzlet_interrupt)
 {
-	metro_state *state = device->machine().driver_data<metro_state>();
 
-	state->m_requested_int[state->m_vblank_bit] = 1;
-	update_irq_state(device->machine());
+	m_requested_int[m_vblank_bit] = 1;
+	update_irq_state(machine());
 
-	state->m_maincpu->set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
+	m_maincpu->set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
 static void ymf278b_interrupt( device_t *device, int active )
@@ -3421,8 +3417,8 @@ static MACHINE_CONFIG_START( balcube, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(balcube_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
 	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
@@ -3455,8 +3451,8 @@ static MACHINE_CONFIG_START( daitoa, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(daitoa_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
 	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
@@ -3489,8 +3485,8 @@ static MACHINE_CONFIG_START( msgogo, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(msgogo_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt) // timing is off, shaking sprites in intro
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt) // timing is off, shaking sprites in intro
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  60) // ?
 
 	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
 	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
@@ -3523,8 +3519,8 @@ static MACHINE_CONFIG_START( bangball, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(bangball_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  60) // ?
 
 	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
 	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
@@ -3557,8 +3553,8 @@ static MACHINE_CONFIG_START( batlbubl, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(batlbubl_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  60) // ?
 
 	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
 	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
@@ -3590,8 +3586,8 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(daitorid_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_12MHz)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -3633,8 +3629,8 @@ static MACHINE_CONFIG_START( dharma, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(dharma_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -3675,8 +3671,8 @@ static MACHINE_CONFIG_START( karatour, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(karatour_map)
-	MCFG_CPU_VBLANK_INT("screen", karatour_interrupt)
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -3717,8 +3713,8 @@ static MACHINE_CONFIG_START( 3kokushi, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(kokushi_map)
-	MCFG_CPU_VBLANK_INT("screen", karatour_interrupt)
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -3759,8 +3755,8 @@ static MACHINE_CONFIG_START( lastfort, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(lastfort_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -3800,8 +3796,8 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(lastforg_map)
-	MCFG_CPU_VBLANK_INT("screen", karatour_interrupt)
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -3841,7 +3837,7 @@ static MACHINE_CONFIG_START( dokyusei, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(dokyusei_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
 	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
@@ -3876,7 +3872,7 @@ static MACHINE_CONFIG_START( dokyusp, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(dokyusp_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
 	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
@@ -3913,7 +3909,7 @@ static MACHINE_CONFIG_START( gakusai, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(gakusai_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
 	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
@@ -3950,7 +3946,7 @@ static MACHINE_CONFIG_START( gakusai2, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(gakusai2_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
 	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
@@ -3987,8 +3983,8 @@ static MACHINE_CONFIG_START( pangpoms, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(pangpoms_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -4029,8 +4025,8 @@ static MACHINE_CONFIG_START( poitto, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(poitto_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -4071,8 +4067,8 @@ static MACHINE_CONFIG_START( pururun, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)		/* Not confirmed */
 	MCFG_CPU_PROGRAM_MAP(pururun_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)		/* Not confiremd */
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -4114,8 +4110,8 @@ static MACHINE_CONFIG_START( skyalert, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(skyalert_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -4156,8 +4152,8 @@ static MACHINE_CONFIG_START( toride2g, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(toride2g_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
@@ -4198,7 +4194,7 @@ static MACHINE_CONFIG_START( mouja, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(mouja_map)
-	MCFG_CPU_VBLANK_INT("screen", metro_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
 	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
@@ -4238,8 +4234,8 @@ static MACHINE_CONFIG_START( blzntrnd, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_map)
-	MCFG_CPU_VBLANK_INT("screen", karatour_interrupt)
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_sound_map)
@@ -4286,8 +4282,8 @@ static MACHINE_CONFIG_START( gstrik2, metro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_map)
-	MCFG_CPU_VBLANK_INT("screen", karatour_interrupt)
-	MCFG_CPU_PERIODIC_INT(metro_periodic_interrupt, 8*60) // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_sound_map)
@@ -4329,7 +4325,7 @@ static MACHINE_CONFIG_START( puzzlet, metro_state )
 	MCFG_CPU_ADD("maincpu", H83007, XTAL_20MHz)	// H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
 	MCFG_CPU_PROGRAM_MAP(puzzlet_map)
 	MCFG_CPU_IO_MAP(puzzlet_io_map)
-	MCFG_CPU_VBLANK_INT("screen", puzzlet_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  puzzlet_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
 	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)

@@ -180,12 +180,11 @@ static GFXDECODE_START( ssozumo )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 8*8, 2 )
 GFXDECODE_END
 
-static INTERRUPT_GEN( sound_timer_irq )
+INTERRUPT_GEN_MEMBER(ssozumo_state::sound_timer_irq)
 {
-	ssozumo_state *state = device->machine().driver_data<ssozumo_state>();
 
-	if(state->m_sound_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_sound_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( ssozumo, ssozumo_state )
@@ -193,11 +192,11 @@ static MACHINE_CONFIG_START( ssozumo, ssozumo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1200000)	/* 1.2 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(ssozumo_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ssozumo_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 975000) 		/* 975 kHz ?? */
 	MCFG_CPU_PROGRAM_MAP(ssozumo_sound_map)
-	MCFG_CPU_PERIODIC_INT(sound_timer_irq,272/16*57) // guess, assume to be the same as tagteam
+	MCFG_CPU_PERIODIC_INT_DRIVER(ssozumo_state, sound_timer_irq, 272/16*57) // guess, assume to be the same as tagteam
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

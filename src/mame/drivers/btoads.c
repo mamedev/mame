@@ -327,7 +327,7 @@ static MACHINE_CONFIG_START( btoads, btoads_state )
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_assert, 183)
+	MCFG_CPU_PERIODIC_INT_DRIVER(btoads_state, irq0_line_assert,  183)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

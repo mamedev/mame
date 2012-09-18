@@ -114,6 +114,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void video_reset();
+	INTERRUPT_GEN_MEMBER(micro3d_vblank);
 };
 
 struct micro3d_vtx
@@ -162,5 +163,3 @@ extern const device_type MICRO3D;
 /*----------- defined in video/micro3d.c -----------*/
 void micro3d_tms_interrupt(device_t *device, int state);
 void micro3d_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);
-
-INTERRUPT_GEN( micro3d_vblank );

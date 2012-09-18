@@ -388,12 +388,11 @@ static const ay8910_interface ay8910_config =
 	DEVCB_DRIVER_MEMBER(seicross_state,friskyt_portB_w)
 };
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(seicross_state::vblank_irq)
 {
-	seicross_state *state = device->machine().driver_data<seicross_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(0, HOLD_LINE);
+	if(m_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
 
 }
 
@@ -404,7 +403,7 @@ static MACHINE_CONFIG_START( nvram, seicross_state )
 	MCFG_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seicross_state,  vblank_irq)
 
 	MCFG_CPU_ADD("mcu", NSC8105, 3072000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(mcu_nvram_map)

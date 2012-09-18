@@ -1214,7 +1214,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( sflush, mw8080bw_root, _8080bw_state )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu",M6800,1500000) // ?
 	MCFG_CPU_PROGRAM_MAP(sflush_map)
-	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", _8080bw_state, irq0_line_hold)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,mw8080bw)
 
 	/* add shifter */
@@ -1363,15 +1363,14 @@ MACHINE_CONFIG_END
 /*                                                     */
 /*******************************************************/
 
-static INTERRUPT_GEN( polaris_interrupt )
+INTERRUPT_GEN_MEMBER(_8080bw_state::polaris_interrupt)
 {
-	_8080bw_state *state = device->machine().driver_data<_8080bw_state>();
-	state->m_polaris_cloud_speed++;
+	m_polaris_cloud_speed++;
 
-	if (state->m_polaris_cloud_speed >= 4)	/* every 4 frames - this was verified against real machine */
+	if (m_polaris_cloud_speed >= 4)	/* every 4 frames - this was verified against real machine */
 	{
-		state->m_polaris_cloud_speed = 0;
-		state->m_polaris_cloud_pos++;
+		m_polaris_cloud_speed = 0;
+		m_polaris_cloud_pos++;
 	}
 }
 
@@ -1461,7 +1460,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( polaris, mw8080bw_root, _8080bw_state )
 	MCFG_CPU_PROGRAM_MAP(schaser_map)
 	MCFG_CPU_IO_MAP(polaris_io_map)
 	MCFG_WATCHDOG_VBLANK_INIT(255)
-	MCFG_CPU_VBLANK_INT("screen", polaris_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", _8080bw_state,  polaris_interrupt)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,polaris)
 
 	/* add shifter */
@@ -2074,7 +2073,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( darthvdr, mw8080bw_root, _8080bw_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(darthvdr_map)
 	MCFG_CPU_IO_MAP(darthvdr_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", _8080bw_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,darthvdr)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,darthvdr)

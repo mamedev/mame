@@ -656,16 +656,15 @@ static GFXDECODE_START( playch10 )
 	GFXDECODE_ENTRY( "gfx1", 0, bios_charlayout,   0,  32 )
 GFXDECODE_END
 
-static INTERRUPT_GEN( playch10_interrupt ) {
-	playch10_state *state = device->machine().driver_data<playch10_state>();
+INTERRUPT_GEN_MEMBER(playch10_state::playch10_interrupt){
 
 	/* LS161A, Sheet 1 - bottom left of Z80 */
-	if ( !state->m_pc10_dog_di && !state->m_pc10_nmi_enable ) {
-		device->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE );
+	if ( !m_pc10_dog_di && !m_pc10_nmi_enable ) {
+		device.execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE );
 	}
 
-	else if ( state->m_pc10_nmi_enable )
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	else if ( m_pc10_nmi_enable )
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const nes_interface nes_config =
@@ -679,7 +678,7 @@ static MACHINE_CONFIG_START( playch10, playch10_state )
 	MCFG_CPU_ADD("maincpu", Z80, 8000000/2)	// 4 MHz
 	MCFG_CPU_PROGRAM_MAP(bios_map)
 	MCFG_CPU_IO_MAP(bios_io_map)
-	MCFG_CPU_VBLANK_INT("top", playch10_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("top", playch10_state,  playch10_interrupt)
 
 	MCFG_CPU_ADD("cart", N2A03, N2A03_DEFAULTCLOCK)
 	MCFG_CPU_PROGRAM_MAP(cart_map)

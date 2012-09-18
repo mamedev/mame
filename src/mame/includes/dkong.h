@@ -256,6 +256,8 @@ public:
 	UINT32 screen_update_dkong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_pestplce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_spclforc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(s2650_interrupt);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
 
 /*----------- defined in audio/dkong.c -----------*/

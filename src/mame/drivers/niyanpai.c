@@ -926,9 +926,9 @@ static INPUT_PORTS_START( zokumahj )	// I don't have manual for this game.
 INPUT_PORTS_END
 
 
-static INTERRUPT_GEN( niyanpai_interrupt )
+INTERRUPT_GEN_MEMBER(niyanpai_state::niyanpai_interrupt)
 {
-	device->execute().set_input_line_and_vector(1, HOLD_LINE,0x100/4);
+	device.execute().set_input_line_and_vector(1, HOLD_LINE,0x100/4);
 }
 
 static const z80_daisy_config daisy_chain_sound[] =
@@ -943,7 +943,7 @@ static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12288000/2)	/* TMP68301, 6.144 MHz */
 	MCFG_CPU_PROGRAM_MAP(niyanpai_map)
-	MCFG_CPU_VBLANK_INT("screen", niyanpai_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", niyanpai_state,  niyanpai_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)					/* TMPZ84C011, 8.00 MHz */
 	MCFG_CPU_CONFIG(daisy_chain_sound)

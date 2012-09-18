@@ -5857,7 +5857,7 @@ static MACHINE_CONFIG_START( goldstar, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(goldstar_map)
 	MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -5891,7 +5891,7 @@ static MACHINE_CONFIG_START( goldstbl, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(goldstar_map)
 	MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -5924,7 +5924,7 @@ static MACHINE_CONFIG_START( moonlght, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(goldstar_map)
 	MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6018,7 +6018,7 @@ static MACHINE_CONFIG_START( chrygld, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(ncb3_map)
 	MCFG_CPU_IO_MAP(ncb3_readwriteport)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
 	/* 3x 8255 */
 	MCFG_I8255A_ADD( "ppi8255_0", ncb3_ppi8255_0_intf )
@@ -6060,7 +6060,7 @@ static MACHINE_CONFIG_START( cb3c, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(ncb3_map)
 	MCFG_CPU_IO_MAP(ncb3_readwriteport)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
 	/* 3x 8255 */
 	MCFG_I8255A_ADD( "ppi8255_0", ncb3_ppi8255_0_intf )
@@ -6101,7 +6101,7 @@ static MACHINE_CONFIG_START( ncb3, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(ncb3_map)
 	MCFG_CPU_IO_MAP(ncb3_readwriteport)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
 	/* 3x 8255 */
 	MCFG_I8255A_ADD( "ppi8255_0", ncb3_ppi8255_0_intf )
@@ -6143,7 +6143,7 @@ static MACHINE_CONFIG_START( cm, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cm_map)
 	MCFG_CPU_IO_MAP(cm_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
 	/* 2x 8255 */
 	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
@@ -6183,7 +6183,7 @@ static MACHINE_CONFIG_START( cmnobmp, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cm_map)
 	MCFG_CPU_IO_MAP(cm_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
 	/* 2x 8255 */
 	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
@@ -6218,7 +6218,7 @@ static MACHINE_CONFIG_START( cmast91, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cm_map)
 	MCFG_CPU_IO_MAP(cmast91_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
 	/* 2x 8255 */
 	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
@@ -6246,12 +6246,11 @@ static MACHINE_CONFIG_START( cmast91, goldstar_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static INTERRUPT_GEN( lucky8_irq )
+INTERRUPT_GEN_MEMBER(goldstar_state::lucky8_irq)
 {
-	goldstar_state *state = device->machine().driver_data<goldstar_state>();
 
-	if(state->m_lucky8_nmi_enable)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_lucky8_nmi_enable)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( lucky8, goldstar_state )
@@ -6260,7 +6259,7 @@ static MACHINE_CONFIG_START( lucky8, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(lucky8_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT("screen", lucky8_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  lucky8_irq)
 
 	/* 3x 8255 */
 	MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
@@ -6300,7 +6299,7 @@ static MACHINE_CONFIG_START( bingowng, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(lucky8_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT("screen", lucky8_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  lucky8_irq)
 
 	/* 3x 8255 */
 	MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
@@ -6340,7 +6339,7 @@ static MACHINE_CONFIG_START( bingownga, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(lucky8_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT("screen", lucky8_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  lucky8_irq)
 
 	/* 3x 8255 */
 	MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
@@ -6397,7 +6396,7 @@ static MACHINE_CONFIG_START( magodds, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(magodds_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT("screen", lucky8_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  lucky8_irq)
 
 	/* 3x 8255 */
 	MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
@@ -6438,7 +6437,7 @@ static MACHINE_CONFIG_START( kkotnoli, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(kkotnoli_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
 
 
 	/* 3x 8255 */
@@ -6476,7 +6475,7 @@ static MACHINE_CONFIG_START( ladylinr, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(ladylinr_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
 
 	/* 2x 8255 */
 	MCFG_I8255A_ADD( "ppi8255_0", ladylinr_ppi8255_0_intf )
@@ -6516,7 +6515,7 @@ static MACHINE_CONFIG_START( wcat3, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(wcat3_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
 
 	/* 3x 8255 */
 	MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
@@ -6559,7 +6558,7 @@ static MACHINE_CONFIG_START( amcoe1, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cm_map)
 	MCFG_CPU_IO_MAP(amcoe1_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
 	/* 2x 8255 */
 	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
@@ -6598,7 +6597,7 @@ static MACHINE_CONFIG_START( amcoe1a, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cm_map)
 	MCFG_CPU_IO_MAP(amcoe1_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
 	/* 2x 8255 */
 	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
@@ -6637,7 +6636,7 @@ static MACHINE_CONFIG_START( amcoe2, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cm_map)
 	MCFG_CPU_IO_MAP(amcoe2_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
 	/* 2x 8255 */
 	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
@@ -6671,7 +6670,7 @@ static MACHINE_CONFIG_START( nfm, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(nfm_map)
 	MCFG_CPU_IO_MAP(amcoe2_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
 	/* 2x 8255 */
 	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )
@@ -6705,8 +6704,8 @@ static MACHINE_CONFIG_START( unkch, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(unkch_map)
 	MCFG_CPU_IO_MAP(unkch_portmap)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
-	//MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -6750,7 +6749,7 @@ static MACHINE_CONFIG_START( pkrmast, goldstar_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cm_map)
 	MCFG_CPU_IO_MAP(cm_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
 	/* 2x 8255 */
 	MCFG_I8255A_ADD( "ppi8255_0", cm_ppi8255_0_intf )

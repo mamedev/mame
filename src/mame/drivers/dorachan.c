@@ -243,7 +243,7 @@ static MACHINE_CONFIG_START( dorachan, dorachan_state )
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)
 	MCFG_CPU_PROGRAM_MAP(dorachan_map)
 	MCFG_CPU_IO_MAP(dorachan_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(dorachan_state, irq0_line_hold, 2*60)
 
 
 	/* video hardware */

@@ -121,7 +121,7 @@ static MACHINE_CONFIG_START( gomoku, gomoku_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/12)		 /* 1.536 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(gomoku_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gomoku_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -244,10 +244,10 @@ MACHINE_START_MEMBER(bzone_state,redbaron)
  *
  *************************************/
 
-static INTERRUPT_GEN( bzone_interrupt )
+INTERRUPT_GEN_MEMBER(bzone_state::bzone_interrupt)
 {
-	if (device->machine().root_device().ioport("IN0")->read() & 0x10)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (machine().root_device().ioport("IN0")->read() & 0x10)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -553,7 +553,7 @@ static MACHINE_CONFIG_START( bzone_base, bzone_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(bzone_map)
-	MCFG_CPU_PERIODIC_INT(bzone_interrupt, (double)BZONE_MASTER_CLOCK / 4096 / 12)
+	MCFG_CPU_PERIODIC_INT_DRIVER(bzone_state, bzone_interrupt,  (double)BZONE_MASTER_CLOCK / 4096 / 12)
 
 
 	/* video hardware */
@@ -584,7 +584,7 @@ static MACHINE_CONFIG_DERIVED( redbaron, bzone_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(redbaron_map)
-	MCFG_CPU_PERIODIC_INT(bzone_interrupt, (double)BZONE_MASTER_CLOCK / 4096 / 12)
+	MCFG_CPU_PERIODIC_INT_DRIVER(bzone_state, bzone_interrupt,  (double)BZONE_MASTER_CLOCK / 4096 / 12)
 
 	MCFG_MACHINE_START_OVERRIDE(bzone_state,redbaron)
 

@@ -67,6 +67,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_PALETTE_INIT(zodiack);
+	INTERRUPT_GEN_MEMBER(zodiack_sound_nmi_gen);
 };
 
 class percuss_state : public zodiack_state

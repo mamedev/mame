@@ -440,7 +440,7 @@ static MACHINE_CONFIG_START( cyberbal, cyberbal_state )
 
 	MCFG_CPU_ADD("dac", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sound_68k_map)
-	MCFG_CPU_PERIODIC_INT(cyberbal_sound_68k_irq_gen, 10000)
+	MCFG_CPU_PERIODIC_INT_DRIVER(cyberbal_state, cyberbal_sound_68k_irq_gen,  10000)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 

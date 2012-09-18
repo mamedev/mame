@@ -257,7 +257,7 @@ static MACHINE_CONFIG_START( k3, k3_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(k3_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", k3_state,  irq4_line_hold)
 
 
 	MCFG_GFXDECODE(1945kiii)

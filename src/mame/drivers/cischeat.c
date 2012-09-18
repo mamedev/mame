@@ -1564,15 +1564,15 @@ static MACHINE_CONFIG_START( bigrun, cischeat_state )
 
 	MCFG_CPU_ADD("cpu2", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(bigrun_map2)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("cpu3", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(bigrun_map3)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("soundcpu", M68000, 6000000)
 	MCFG_CPU_PROGRAM_MAP(bigrun_sound_map)
-	MCFG_CPU_PERIODIC_INT(irq4_line_hold,16*30)
+	MCFG_CPU_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 

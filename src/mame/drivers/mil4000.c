@@ -372,7 +372,7 @@ static MACHINE_CONFIG_START( mil4000, mil4000_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000 )	// ?
 	MCFG_CPU_PROGRAM_MAP(mil4000_map)
 	// irq 2/4/5 point to the same place, others invalid
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

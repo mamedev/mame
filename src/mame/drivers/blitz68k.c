@@ -1715,7 +1715,7 @@ static RAMDAC_INTERFACE( ramdac_intf )
 static MACHINE_CONFIG_START( ilpag, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, 11059200 )	// ?
 	MCFG_CPU_PROGRAM_MAP(ilpag_map)
-	MCFG_CPU_VBLANK_INT("screen",irq4_line_hold) //3 & 6 used, mcu comms?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state, irq4_line_hold) //3 & 6 used, mcu comms?
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1779,7 +1779,7 @@ static TIMER_DEVICE_CALLBACK( steaser_mcu_sim )
 static MACHINE_CONFIG_DERIVED( steaser, ilpag )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(steaser_map)
-	MCFG_CPU_VBLANK_INT("screen",irq5_line_hold) //3, 4 & 6 used, mcu comms?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state, irq5_line_hold) //3, 4 & 6 used, mcu comms?
 
 	MCFG_TIMER_ADD_PERIODIC("coinsim", steaser_mcu_sim, attotime::from_hz(10000)) // not real, but for simulating the MCU
 MACHINE_CONFIG_END
@@ -1815,7 +1815,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( bankrob, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(bankrob_map)
-	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)	// protection prevents correct irq frequency by crtc
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)	// protection prevents correct irq frequency by crtc
 	// irq 2 reads from MCUs
 
 	// MC68HC705C8P (MCU1)
@@ -1847,7 +1847,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( bankroba, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz )
 	MCFG_CPU_PROGRAM_MAP(bankroba_map)
-	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)	// protection prevents correct irq frequency by crtc
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq5_line_hold)	// protection prevents correct irq frequency by crtc
 	// irq 3,4 read from MCUs
 
 	// MC68HC705C8P (MCU)
@@ -1906,7 +1906,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( dualgame, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz )
 	MCFG_CPU_PROGRAM_MAP(dualgame_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold) // lev 2 = MCUs, lev 3 = vblank
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq2_line_hold) // lev 2 = MCUs, lev 3 = vblank
 
 	// MC68HC705C8P (MCU1)
 
@@ -1937,7 +1937,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( hermit, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22_1184MHz/2 )
 	MCFG_CPU_PROGRAM_MAP(hermit_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)	// protection prevents correct irq frequency by crtc
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq1_line_hold)	// protection prevents correct irq frequency by crtc
 
 	// MC68HC705C8P (MCU)
 
@@ -1966,7 +1966,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( maxidbl, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(maxidbl_map)
-	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)	// protection prevents correct irq frequency by crtc
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)	// protection prevents correct irq frequency by crtc
 	// irq 2 reads from MCUs
 
 	// MC68HC705C8P (MCU1)

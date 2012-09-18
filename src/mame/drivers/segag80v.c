@@ -898,7 +898,7 @@ static MACHINE_CONFIG_START( g80v_base, segag80v_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80v_state,  irq0_line_hold)
 
 
 	/* video hardware */

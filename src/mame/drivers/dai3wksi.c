@@ -591,7 +591,7 @@ static MACHINE_CONFIG_START( dai3wksi, dai3wksi_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dai3wksi_state,  irq0_line_hold)
 
 
 	/* video hardware */

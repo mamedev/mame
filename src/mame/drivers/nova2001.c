@@ -683,7 +683,7 @@ static MACHINE_CONFIG_START( nova2001, nova2001_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)	// 3 MHz verified on schematics
 	MCFG_CPU_PROGRAM_MAP(nova2001_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -715,11 +715,11 @@ static MACHINE_CONFIG_START( ninjakun, nova2001_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)	// 3 MHz
 	MCFG_CPU_PROGRAM_MAP(ninjakun_cpu1_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", Z80, MAIN_CLOCK/4)	// 3 MHz
 	MCFG_CPU_PROGRAM_MAP(ninjakun_cpu2_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60) /* ? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(nova2001_state, irq0_line_hold, 4*60) /* ? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame */
 
@@ -756,7 +756,7 @@ static MACHINE_CONFIG_START( pkunwar, nova2001_state )
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)	// 3 MHz
 	MCFG_CPU_PROGRAM_MAP(pkunwar_map)
 	MCFG_CPU_IO_MAP(pkunwar_io)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -789,11 +789,11 @@ static MACHINE_CONFIG_START( raiders5, nova2001_state )
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)	// 3 MHz
 	MCFG_CPU_PROGRAM_MAP(raiders5_cpu1_map)
 	MCFG_CPU_IO_MAP(raiders5_io)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", Z80, MAIN_CLOCK/4)	// 3 MHz
 	MCFG_CPU_PROGRAM_MAP(raiders5_cpu2_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)	/* ? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(nova2001_state, irq0_line_hold, 4*60)	/* ? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(24000))
 

@@ -179,7 +179,7 @@ static MACHINE_CONFIG_START( subs, subs_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,12096000/16)		/* clock input is the "4H" signal */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT(subs_interrupt,4*57)
+	MCFG_CPU_PERIODIC_INT_DRIVER(subs_state, subs_interrupt, 4*57)
 
 
 	/* video hardware */

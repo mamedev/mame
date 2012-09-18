@@ -59,6 +59,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tilemap_tile_info);
 	virtual void video_start();
 	UINT32 screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(igs_majhong_interrupt);
 };
 
 
@@ -357,9 +358,9 @@ static GFXDECODE_START( igs_m027 )
 GFXDECODE_END
 
 
-static INTERRUPT_GEN( igs_majhong_interrupt )
+INTERRUPT_GEN_MEMBER(igs_m027_state::igs_majhong_interrupt)
 {
-	generic_pulse_irq_line(device, ARM7_FIRQ_LINE, 1);
+	generic_pulse_irq_line(device.execute(), ARM7_FIRQ_LINE, 1);
 }
 
 
@@ -368,7 +369,7 @@ static MACHINE_CONFIG_START( igs_majhong, igs_m027_state )
 
 	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)
 
-	MCFG_CPU_VBLANK_INT("screen", igs_majhong_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs_m027_state,  igs_majhong_interrupt)
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_GFXDECODE(igs_m027)

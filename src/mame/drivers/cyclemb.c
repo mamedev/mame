@@ -907,7 +907,7 @@ static MACHINE_CONFIG_START( cyclemb, cyclemb_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/3) // Z8400BPS
 	MCFG_CPU_PROGRAM_MAP(cyclemb_map)
 	MCFG_CPU_IO_MAP(cyclemb_io)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cyclemb_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18MHz/6)
 	MCFG_CPU_PROGRAM_MAP(cyclemb_sound_map)

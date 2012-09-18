@@ -318,7 +318,7 @@ static MACHINE_CONFIG_START( aquarium, aquarium_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // clock not verified on pcb
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", aquarium_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/6) // clock not verified on pcb
 	MCFG_CPU_PROGRAM_MAP(snd_map)

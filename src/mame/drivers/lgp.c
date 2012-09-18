@@ -87,6 +87,7 @@ public:
 	DECLARE_DRIVER_INIT(lgp);
 	virtual void machine_start();
 	UINT32 screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_callback_lgp);
 };
 
 
@@ -336,15 +337,14 @@ static TIMER_CALLBACK( irq_stop )
 	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
-static INTERRUPT_GEN( vblank_callback_lgp )
+INTERRUPT_GEN_MEMBER(lgp_state::vblank_callback_lgp)
 {
-	lgp_state *state = device->machine().driver_data<lgp_state>();
 	// NMI
-	//device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	//device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	// IRQ
-	device->execute().set_input_line(0, ASSERT_LINE);
-	state->m_irq_timer->adjust(attotime::from_usec(50));
+	device.execute().set_input_line(0, ASSERT_LINE);
+	m_irq_timer->adjust(attotime::from_usec(50));
 }
 
 
@@ -360,7 +360,7 @@ static MACHINE_CONFIG_START( lgp, lgp_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_PCB_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_program_map)
 	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT("screen", vblank_callback_lgp)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", lgp_state,  vblank_callback_lgp)
 
 	/* sound cpu */
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_PCB_CLOCK)

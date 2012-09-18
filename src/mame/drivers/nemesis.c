@@ -56,20 +56,18 @@ So this is the correct behavior of real hardware, not an emulation bug.
 #include "includes/konamipt.h"
 
 
-static INTERRUPT_GEN( nemesis_interrupt )
+INTERRUPT_GEN_MEMBER(nemesis_state::nemesis_interrupt)
 {
-	nemesis_state *state = device->machine().driver_data<nemesis_state>();
 
-	if (state->m_irq_on)
-		device->execute().set_input_line(1, HOLD_LINE);
+	if (m_irq_on)
+		device.execute().set_input_line(1, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( blkpnthr_interrupt )
+INTERRUPT_GEN_MEMBER(nemesis_state::blkpnthr_interrupt)
 {
-	nemesis_state *state = device->machine().driver_data<nemesis_state>();
 
-	if (state->m_irq_on)
-		device->execute().set_input_line(2, HOLD_LINE);
+	if (m_irq_on)
+		device.execute().set_input_line(2, HOLD_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( konamigt_interrupt )
@@ -1558,7 +1556,7 @@ static MACHINE_CONFIG_START( nemesis, nemesis_state )
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
 //          14318180/2, /* From schematics, should be accurate */
 	MCFG_CPU_PROGRAM_MAP(nemesis_map)
-	MCFG_CPU_VBLANK_INT("screen", nemesis_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nemesis_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4) /* From schematics, should be accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)	/* fixed */
@@ -1604,7 +1602,7 @@ static MACHINE_CONFIG_START( gx400, nemesis_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)	/* interrupts are triggered by the main CPU */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nmi_line_pulse)	/* interrupts are triggered by the main CPU */
 
 
 	/* video hardware */
@@ -1686,7 +1684,7 @@ static MACHINE_CONFIG_START( rf2_gx400, nemesis_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)	/* interrupts are triggered by the main CPU */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nmi_line_pulse)	/* interrupts are triggered by the main CPU */
 
 
 	/* video hardware */
@@ -1725,7 +1723,7 @@ static MACHINE_CONFIG_START( salamand, nemesis_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)       /* 9.216MHz */
 	MCFG_CPU_PROGRAM_MAP(salamand_map)
-	MCFG_CPU_VBLANK_INT("screen", nemesis_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nemesis_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)         /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(sal_sound_map)
@@ -1771,7 +1769,7 @@ static MACHINE_CONFIG_START( blkpnthr, nemesis_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
 	MCFG_CPU_PROGRAM_MAP(blkpnthr_map)
-	MCFG_CPU_VBLANK_INT("screen", blkpnthr_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  blkpnthr_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(blkpnthr_sound_map)
@@ -1813,7 +1811,7 @@ static MACHINE_CONFIG_START( citybomb, nemesis_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
 	MCFG_CPU_PROGRAM_MAP(citybomb_map)
-	MCFG_CPU_VBLANK_INT("screen", nemesis_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nemesis_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(city_sound_map)
@@ -1859,7 +1857,7 @@ static MACHINE_CONFIG_START( nyanpani, nemesis_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
 	MCFG_CPU_PROGRAM_MAP(nyanpani_map)
-	MCFG_CPU_VBLANK_INT("screen", nemesis_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nemesis_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(city_sound_map)
@@ -2655,7 +2653,7 @@ static MACHINE_CONFIG_START( bubsys, nemesis_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)	/* interrupts are triggered by the main CPU */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nmi_line_pulse)	/* interrupts are triggered by the main CPU */
 
 
 	/* video hardware */

@@ -397,7 +397,7 @@ static MACHINE_CONFIG_START( drgnmst, drgnmst_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* Confirmed */
 	MCFG_CPU_PROGRAM_MAP(drgnmst_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", drgnmst_state,  irq2_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", PIC16C55, 32000000/8)	/* Confirmed */
 	/* Program and Data Maps are internal to the MCU */

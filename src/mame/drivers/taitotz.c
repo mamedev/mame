@@ -525,6 +525,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_taitotz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(taitotz_vbi);
 };
 
 
@@ -2445,9 +2446,9 @@ void taitotz_state::machine_start()
 }
 
 
-static INTERRUPT_GEN( taitotz_vbi )
+INTERRUPT_GEN_MEMBER(taitotz_state::taitotz_vbi)
 {
-	device->machine().device("iocpu")->execute().set_input_line(TLCS900_INT3, ASSERT_LINE);
+	machine().device("iocpu")->execute().set_input_line(TLCS900_INT3, ASSERT_LINE);
 }
 
 static void ide_interrupt(device_t *device, int state)
@@ -2487,7 +2488,7 @@ static MACHINE_CONFIG_START( taitotz, taitotz_state )
 	MCFG_CPU_ADD("iocpu", TMP95C063, 25000000)
 	MCFG_CPU_CONFIG(taitotz_tlcs900_interface)
 	MCFG_CPU_PROGRAM_MAP(tlcs900h_mem)
-	MCFG_CPU_VBLANK_INT("screen", taitotz_vbi)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitotz_state,  taitotz_vbi)
 
 	/* MN1020819DA sound CPU */
 

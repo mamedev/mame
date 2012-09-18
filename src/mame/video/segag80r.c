@@ -39,20 +39,19 @@ static void vblank_latch_set(running_machine &machine)
 }
 
 
-INTERRUPT_GEN( segag80r_vblank_start )
+INTERRUPT_GEN_MEMBER(segag80r_state::segag80r_vblank_start)
 {
-	segag80r_state *state = device->machine().driver_data<segag80r_state>();
-	vblank_latch_set(device->machine());
+	vblank_latch_set(machine());
 
 	/* if interrupts are enabled, clock one */
-	if (state->m_video_control & 0x04)
+	if (m_video_control & 0x04)
 		irq0_line_hold(device);
 }
 
 
-INTERRUPT_GEN( sindbadm_vblank_start )
+INTERRUPT_GEN_MEMBER(segag80r_state::sindbadm_vblank_start)
 {
-	vblank_latch_set(device->machine());
+	vblank_latch_set(machine());
 
 	/* interrupts appear to always be enabled, but they have a manual */
 	/* acknowledge rather than an automatic ack; they are also not masked */

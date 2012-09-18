@@ -324,7 +324,7 @@ static MACHINE_CONFIG_START( pzletime, pzletime_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,10000000)
 	MCFG_CPU_PROGRAM_MAP(pzletime_map)
-	MCFG_CPU_VBLANK_INT("screen",irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pzletime_state, irq4_line_hold)
 
 
 	/* video hardware */

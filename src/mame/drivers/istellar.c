@@ -54,6 +54,7 @@ public:
 	virtual void machine_start();
 	virtual void palette_init();
 	UINT32 screen_update_istellar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_callback_istellar);
 };
 
 
@@ -316,13 +317,13 @@ static GFXDECODE_START( istellar )
 	GFXDECODE_ENTRY( "gfx1", 0, istellar_gfx_layout, 0x0, 0x20 )
 GFXDECODE_END
 
-static INTERRUPT_GEN( vblank_callback_istellar )
+INTERRUPT_GEN_MEMBER(istellar_state::vblank_callback_istellar)
 {
 	/* Interrupt presumably comes from VBlank */
-	device->execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, HOLD_LINE);
 
 	/* Interrupt presumably comes from the LDP's status strobe */
-	device->machine().device("sub")->execute().set_input_line(0, ASSERT_LINE);
+	machine().device("sub")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -332,7 +333,7 @@ static MACHINE_CONFIG_START( istellar, istellar_state )
 	MCFG_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(z80_0_mem)
 	MCFG_CPU_IO_MAP(z80_0_io)
-	MCFG_CPU_VBLANK_INT("screen", vblank_callback_istellar)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", istellar_state,  vblank_callback_istellar)
 
 	/* sound cpu */
 	MCFG_CPU_ADD("audiocpu", Z80, GUESSED_CLOCK)

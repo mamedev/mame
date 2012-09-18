@@ -63,6 +63,8 @@ public:
 	DECLARE_VIDEO_START(twin16);
 	UINT32 screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_twin16(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(CPUA_interrupt);
+	INTERRUPT_GEN_MEMBER(CPUB_interrupt);
 };
 
 /*----------- defined in drivers/twin16.c -----------*/

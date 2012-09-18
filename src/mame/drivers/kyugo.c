@@ -523,12 +523,11 @@ void kyugo_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(kyugo_state::vblank_irq)
 {
-	kyugo_state *state = device->machine().driver_data<kyugo_state>();
 
-	if(state->m_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -538,12 +537,12 @@ static MACHINE_CONFIG_START( gyrodine, kyugo_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kyugo_main_map)
 	MCFG_CPU_IO_MAP(kyugo_main_portmap)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", kyugo_state,  vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(gyrodine_sub_map)
 	MCFG_CPU_IO_MAP(gyrodine_sub_portmap)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(kyugo_state, irq0_line_hold, 4*60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

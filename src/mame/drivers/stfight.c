@@ -436,11 +436,11 @@ static MACHINE_CONFIG_START( stfight, stfight_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3000000)	/* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
-	MCFG_CPU_VBLANK_INT("screen", stfight_vb_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", stfight_state,  stfight_vb_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000)	/* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,120)
+	MCFG_CPU_PERIODIC_INT_DRIVER(stfight_state, irq0_line_hold, 120)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 

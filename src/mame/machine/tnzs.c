@@ -614,29 +614,28 @@ WRITE8_MEMBER(tnzs_state::tnzs_mcu_w)
 	}
 }
 
-INTERRUPT_GEN( arknoid2_interrupt )
+INTERRUPT_GEN_MEMBER(tnzs_state::arknoid2_interrupt)
 {
-	tnzs_state *state = device->machine().driver_data<tnzs_state>();
 	int coin;
 
-	switch (state->m_mcu_type)
+	switch (m_mcu_type)
 	{
 		case MCU_ARKANOID:
 		case MCU_EXTRMATN:
 		case MCU_DRTOPPEL:
 		case MCU_PLUMPOP:
 			coin  = 0;
-			coin |= ((state->ioport("COIN1")->read() & 1) << 0);
-			coin |= ((state->ioport("COIN2")->read() & 1) << 1);
-			coin |= ((state->ioport("IN2")->read() & 3) << 2);
+			coin |= ((ioport("COIN1")->read() & 1) << 0);
+			coin |= ((ioport("COIN2")->read() & 1) << 1);
+			coin |= ((ioport("IN2")->read() & 3) << 2);
 			coin ^= 0x0c;
-			mcu_handle_coins(device->machine(), coin);
+			mcu_handle_coins(machine(), coin);
 			break;
 		default:
 			break;
 	}
 
-	device->execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 MACHINE_RESET_MEMBER(tnzs_state,tnzs)

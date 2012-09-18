@@ -38,6 +38,7 @@ public:
 	DECLARE_DRIVER_INIT(jackpool);
 	virtual void video_start();
 	UINT32 screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
 };
 
 
@@ -248,16 +249,16 @@ GFXDECODE_END
 
 
 /*irq 2 used for communication stuff.3 is just a rte*/
-static INTERRUPT_GEN( jackpool_interrupt )
+INTERRUPT_GEN_MEMBER(jackpool_state::jackpool_interrupt)
 {
-	device->execute().set_input_line(1, HOLD_LINE);
+	device.execute().set_input_line(1, HOLD_LINE);
 }
 
 
 static MACHINE_CONFIG_START( jackpool, jackpool_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) // ?
 	MCFG_CPU_PROGRAM_MAP(jackpool_mem)
-	MCFG_CPU_VBLANK_INT("screen",jackpool_interrupt)  // ?
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", jackpool_state, jackpool_interrupt)  // ?
 
 	MCFG_GFXDECODE(jackpool)
 

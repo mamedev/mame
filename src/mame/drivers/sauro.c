@@ -367,16 +367,16 @@ static GFXDECODE_START( trckydoc )
 	GFXDECODE_ENTRY( "gfx2", 0, trckydoc_spritelayout, 0, 64 )
 GFXDECODE_END
 
-static INTERRUPT_GEN( sauro_interrupt )
+INTERRUPT_GEN_MEMBER(sauro_state::sauro_interrupt)
 {
-	device->execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( tecfri, sauro_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz/4)       /* verified on pcb */
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sauro_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -419,7 +419,7 @@ static MACHINE_CONFIG_DERIVED( sauro, tecfri )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	// 4 MHz?
 	MCFG_CPU_PROGRAM_MAP(sauro_sound_map)
-	MCFG_CPU_PERIODIC_INT(sauro_interrupt, 8*60) // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(sauro_state, sauro_interrupt,  8*60) // ?
 
 	MCFG_GFXDECODE(sauro)
 

@@ -195,7 +195,7 @@ static MACHINE_CONFIG_START( gotya, gotya_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,18432000/6)	/* 3.072 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(gotya_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gotya_state,  irq0_line_hold)
 
 
 	/* video hardware */

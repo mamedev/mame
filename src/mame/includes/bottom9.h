@@ -47,6 +47,8 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_bottom9(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(bottom9_interrupt);
+	INTERRUPT_GEN_MEMBER(bottom9_sound_interrupt);
 };
 
 /*----------- defined in video/bottom9.c -----------*/

@@ -394,11 +394,11 @@ static MACHINE_CONFIG_START( buggychl, buggychl_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz??? */
 	MCFG_CPU_PROGRAM_MAP(buggychl_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", buggychl_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,60*60)	/* irq is timed, tied to the cpu clock and not to vblank */
+	MCFG_CPU_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, 60*60)	/* irq is timed, tied to the cpu clock and not to vblank */
 							/* nmi is caused by the main cpu */
 
 	MCFG_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */

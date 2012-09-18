@@ -87,6 +87,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_progolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(progolf_interrupt);
 };
 
 
@@ -370,7 +371,7 @@ GFXDECODE_END
 
 
 //#ifdef UNUSED_FUNCTION
-static INTERRUPT_GEN( progolf_interrupt )
+INTERRUPT_GEN_MEMBER(progolf_state::progolf_interrupt)
 {
 }
 //#endif
@@ -423,7 +424,7 @@ static MACHINE_CONFIG_START( progolf, progolf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)
-	MCFG_CPU_VBLANK_INT("screen", progolf_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", progolf_state,  progolf_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 500000)
 	MCFG_CPU_PROGRAM_MAP(sound_cpu)

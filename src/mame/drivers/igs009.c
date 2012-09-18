@@ -90,6 +90,7 @@ public:
 	virtual void video_start();
 	DECLARE_VIDEO_START(gp98);
 	UINT32 screen_update_jingbell(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(jingbell_interrupt);
 };
 
 
@@ -733,11 +734,10 @@ void igs009_state::machine_reset()
 	m_video_enable	=	1;
 }
 
-static INTERRUPT_GEN( jingbell_interrupt )
+INTERRUPT_GEN_MEMBER(igs009_state::jingbell_interrupt)
 {
-	igs009_state *state = device->machine().driver_data<igs009_state>();
-	 if (state->m_nmi_enable & 0x80)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	 if (m_nmi_enable & 0x80)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( jingbell, igs009_state )
@@ -745,7 +745,7 @@ static MACHINE_CONFIG_START( jingbell, igs009_state )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(jingbell_map)
 	MCFG_CPU_IO_MAP(jingbell_portmap)
-	MCFG_CPU_VBLANK_INT("screen",jingbell_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs009_state, jingbell_interrupt)
 
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

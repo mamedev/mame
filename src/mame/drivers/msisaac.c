@@ -478,11 +478,11 @@ static MACHINE_CONFIG_START( msisaac, msisaac_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(msisaac_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(msisaac_sound_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* source of IRQs is unknown */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)	/* source of IRQs is unknown */
 
 #ifdef USE_MCU
 	MCFG_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */

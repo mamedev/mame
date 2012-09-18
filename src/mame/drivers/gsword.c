@@ -247,12 +247,11 @@ MACHINE_RESET_MEMBER(gsword_state,josvolly)
 	josvolly_8741_reset();
 }
 
-static INTERRUPT_GEN( gsword_snd_interrupt )
+INTERRUPT_GEN_MEMBER(gsword_state::gsword_snd_interrupt)
 {
-	gsword_state *state = device->machine().driver_data<gsword_state>();
 
-	if(state->m_nmi_enable)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_enable)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(gsword_state::gsword_nmi_set_w)
@@ -661,12 +660,12 @@ static MACHINE_CONFIG_START( gsword, gsword_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/6) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_IO_MAP(cpu1_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gsword_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_18MHz/6) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(cpu2_io_map)
-	MCFG_CPU_PERIODIC_INT(gsword_snd_interrupt,4*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(gsword_state, gsword_snd_interrupt, 4*60)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18MHz/6) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu3_map)
@@ -714,12 +713,12 @@ static MACHINE_CONFIG_START( josvolly, gsword_state )
 	MCFG_CPU_ADD("maincpu", Z80, 18000000/6) /* ? */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_IO_MAP(josvolly_cpu1_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(gsword_state, irq0_line_hold, 2*60)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 12000000/4) /* ? */
 	MCFG_CPU_PROGRAM_MAP(josvolly_cpu2_map)
 	MCFG_CPU_IO_MAP(josvolly_cpu2_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gsword_state,  irq0_line_hold)
 
 	MCFG_MACHINE_RESET_OVERRIDE(gsword_state,josvolly)
 

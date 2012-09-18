@@ -302,6 +302,7 @@ public:
 	virtual void video_start();
 	DECLARE_VIDEO_START(screwloo);
 	UINT32 screen_update_gottlieb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(gottlieb_interrupt);
 };
 
 /*----------- defined in video/gottlieb.c -----------*/

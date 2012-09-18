@@ -48,11 +48,10 @@
 #include "includes/battlex.h"
 
 
-static INTERRUPT_GEN( battlex_interrupt )
+INTERRUPT_GEN_MEMBER(battlex_state::battlex_interrupt)
 {
-	battlex_state *state = device->machine().driver_data<battlex_state>();
-	state->m_in0_b4 = 1;
-	device->execute().set_input_line(0, ASSERT_LINE);
+	m_in0_b4 = 1;
+	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 CUSTOM_INPUT_MEMBER(battlex_state::battlex_in0_b4_r)
@@ -250,7 +249,7 @@ static MACHINE_CONFIG_START( battlex, battlex_state )
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_10MHz/4 )		// ?
 	MCFG_CPU_PROGRAM_MAP(battlex_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_PERIODIC_INT(battlex_interrupt,400)	/* controls game speed? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(battlex_state, battlex_interrupt, 400)	/* controls game speed? */
 
 
 	/* video hardware */

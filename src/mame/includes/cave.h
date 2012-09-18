@@ -201,6 +201,7 @@ public:
 	DECLARE_VIDEO_START(sailormn_3_layers);
 	DECLARE_PALETTE_INIT(sailormn);
 	UINT32 screen_update_cave(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(cave_interrupt);
 };
 
 /*----------- defined in video/cave.c -----------*/

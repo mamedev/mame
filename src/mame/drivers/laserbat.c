@@ -646,17 +646,16 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static INTERRUPT_GEN( laserbat_interrupt )
+INTERRUPT_GEN_MEMBER(laserbat_state::laserbat_interrupt)
 {
-	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x0a);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x0a);
 }
 
-static INTERRUPT_GEN( zaccaria_cb1_toggle )
+INTERRUPT_GEN_MEMBER(laserbat_state::zaccaria_cb1_toggle)
 {
-	laserbat_state *state = device->machine().driver_data<laserbat_state>();
 
-	state->m_pia->cb1_w(state->m_cb1_toggle & 1);
-	state->m_cb1_toggle ^= 1;
+	m_pia->cb1_w(m_cb1_toggle & 1);
+	m_cb1_toggle ^= 1;
 }
 
 
@@ -750,7 +749,7 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 	MCFG_CPU_ADD("maincpu", S2650, 14318180/4) // ???
 	MCFG_CPU_PROGRAM_MAP(laserbat_map)
 	MCFG_CPU_IO_MAP(laserbat_io_map)
-	MCFG_CPU_VBLANK_INT("screen", laserbat_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", laserbat_state,  laserbat_interrupt)
 
 
 	/* video hardware */
@@ -788,11 +787,11 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 	MCFG_CPU_ADD("maincpu", S2650, 14318000/4)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(laserbat_map)
 	MCFG_CPU_IO_MAP(catnmous_io_map)
-	MCFG_CPU_VBLANK_INT("screen", laserbat_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", laserbat_state,  laserbat_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M6802,3580000) /* ? */
 	MCFG_CPU_PROGRAM_MAP(catnmous_sound_map)
-	MCFG_CPU_PERIODIC_INT(zaccaria_cb1_toggle, (double)3580000/4096)
+	MCFG_CPU_PERIODIC_INT_DRIVER(laserbat_state, zaccaria_cb1_toggle,  (double)3580000/4096)
 
 	MCFG_PIA6821_ADD("pia", pia_intf)
 

@@ -226,12 +226,12 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
  *
  *************************************/
 
-static INTERRUPT_GEN( cvs_main_cpu_interrupt )
+INTERRUPT_GEN_MEMBER(cvs_state::cvs_main_cpu_interrupt)
 {
-	device->execute().set_input_line_vector(0, 0x03);
-	generic_pulse_irq_line(device, 0, 1);
+	device.execute().set_input_line_vector(0, 0x03);
+	generic_pulse_irq_line(device.execute(), 0, 1);
 
-	cvs_scroll_stars(device->machine());
+	cvs_scroll_stars(machine());
 }
 
 
@@ -1042,7 +1042,7 @@ static MACHINE_CONFIG_START( cvs, cvs_state )
 	MCFG_CPU_ADD("maincpu", S2650, 894886.25)
 	MCFG_CPU_PROGRAM_MAP(cvs_main_cpu_map)
 	MCFG_CPU_IO_MAP(cvs_main_cpu_io_map)
-	MCFG_CPU_VBLANK_INT("screen", cvs_main_cpu_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cvs_state,  cvs_main_cpu_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", S2650, 894886.25)
 	MCFG_CPU_PROGRAM_MAP(cvs_dac_cpu_map)

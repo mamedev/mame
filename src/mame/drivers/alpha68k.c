@@ -1955,14 +1955,14 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
 	MCFG_CPU_PROGRAM_MAP(kyros_map)
-	MCFG_CPU_VBLANK_INT("screen",irq1_line_hold)
-	MCFG_CPU_PERIODIC_INT(irq2_line_hold,60) // MCU irq
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
+	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60) // MCU irq
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(sstingry_sound_map)
 	MCFG_CPU_IO_MAP(kyros_sound_portmap)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 2*60)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 4000)
+	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq0_line_hold,  2*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, nmi_line_pulse,  4000)
 
 	MCFG_CPU_ADD("mcu", I8748, 9263750)		/* 9.263750 MHz oscillator, divided by 3*5 internally */
 //  MCFG_CPU_PROGRAM_MAP(i8748_map)
@@ -2005,14 +2005,14 @@ static MACHINE_CONFIG_START( kyros, alpha68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)	/* Verified on bootleg PCB */
 	MCFG_CPU_PROGRAM_MAP(kyros_map)
-	MCFG_CPU_VBLANK_INT("screen",irq1_line_hold)
-	MCFG_CPU_PERIODIC_INT(irq2_line_hold,60) // MCU irq
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
+	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60) // MCU irq
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)	/* Verified on bootleg PCB */
 	MCFG_CPU_PROGRAM_MAP(kyros_sound_map)
 	MCFG_CPU_IO_MAP(kyros_sound_portmap)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 2*60)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 4000)
+	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq0_line_hold,  2*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, nmi_line_pulse,  4000)
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
@@ -2051,13 +2051,13 @@ static MACHINE_CONFIG_START( jongbou, alpha68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(kyros_map)
-	MCFG_CPU_VBLANK_INT("screen",irq1_line_hold)
-	MCFG_CPU_PERIODIC_INT(irq2_line_hold,60*16) // MCU irq
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
+	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60*16) // MCU irq
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(jongbou_sound_map)
 	MCFG_CPU_IO_MAP(jongbou_sound_portmap)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 160*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq0_line_hold,  160*60)
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
@@ -2088,7 +2088,7 @@ static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
 	MCFG_CPU_PROGRAM_MAP(alpha68k_I_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state,  irq1_line_hold)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // 4Mhz seems to yield the correct tone
 	MCFG_CPU_PROGRAM_MAP(alpha68k_I_s_map)
@@ -2117,12 +2117,11 @@ static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static INTERRUPT_GEN( alpha68k_sound_nmi )
+INTERRUPT_GEN_MEMBER(alpha68k_state::alpha68k_sound_nmi)
 {
-	alpha68k_state *state = device->machine().driver_data<alpha68k_state>();
 
-	if(state->m_sound_nmi_mask)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_sound_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( alpha68k_II, alpha68k_state )
@@ -2130,12 +2129,12 @@ static MACHINE_CONFIG_START( alpha68k_II, alpha68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* Correct */
 	MCFG_CPU_PROGRAM_MAP(alpha68k_II_map)
-	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state,  irq3_line_hold)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545*2) /* Unlikely but needed to stop nested NMI's */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(alpha68k_sound_nmi, 7500)
+	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi,  7500)
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_II)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_II)
@@ -2169,8 +2168,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( btlfieldb, alpha68k_II )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT("screen",irq1_line_hold)
-	MCFG_CPU_PERIODIC_INT(irq2_line_hold,60*4) // MCU irq
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
+	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60*4) // MCU irq
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( alpha68k_II_gm, alpha68k_state )
@@ -2178,13 +2177,13 @@ static MACHINE_CONFIG_START( alpha68k_II_gm, alpha68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(alpha68k_II_map)
-	MCFG_CPU_VBLANK_INT("screen",irq1_line_hold)
-	MCFG_CPU_PERIODIC_INT(irq2_line_hold,60*3) // MCU irq
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
+	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60*3) // MCU irq
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000*2) // TODO: fix this
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(alpha68k_sound_nmi, 7500)
+	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi,  7500)
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_II)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_II)
@@ -2222,12 +2221,12 @@ static MACHINE_CONFIG_START( alpha68k_V, alpha68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* ? */
 	MCFG_CPU_PROGRAM_MAP(alpha68k_V_map)
-	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state,  irq3_line_hold)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", Z80, /*3579545*/3579545*2) /* Unlikely but needed to stop nested NMI's */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(alpha68k_sound_nmi, 8500)
+	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi,  8500)
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_V)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_V)
@@ -2264,12 +2263,12 @@ static MACHINE_CONFIG_START( alpha68k_V_sb, alpha68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* ? */
 	MCFG_CPU_PROGRAM_MAP(alpha68k_V_map)
-	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state,  irq3_line_hold)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", Z80, /*3579545*/3579545*2) /* Unlikely but needed to stop nested NMI's */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT(alpha68k_sound_nmi, 8500)
+	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi,  8500)
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_V)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_V)
@@ -2306,7 +2305,7 @@ static MACHINE_CONFIG_START( tnextspc, alpha68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 9000000) /* Confirmed 18 MHz/2 */
 	MCFG_CPU_PROGRAM_MAP(tnextspc_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state,  irq1_line_hold)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(tnextspc_sound_map)

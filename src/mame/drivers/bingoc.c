@@ -146,13 +146,13 @@ static MACHINE_CONFIG_START( bingoc, bingoc_state )
 
 	MCFG_CPU_ADD("maincpu", M68000,8000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bingoc_state,  irq2_line_hold)
 
 	MCFG_CPU_ADD("soundcpu", Z80,4000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io)
 #if SOUND_TEST
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bingoc_state,  nmi_line_pulse)
 #endif
 
 	/* video hardware */

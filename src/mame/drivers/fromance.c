@@ -1004,7 +1004,7 @@ static MACHINE_CONFIG_START( nekkyoku, fromance_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(nekkyoku_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(nekkyoku_sub_map)
@@ -1042,7 +1042,7 @@ static MACHINE_CONFIG_START( idolmj, fromance_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(fromance_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(fromance_sub_map)
@@ -1080,7 +1080,7 @@ static MACHINE_CONFIG_START( fromance, fromance_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(fromance_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(fromance_sub_map)

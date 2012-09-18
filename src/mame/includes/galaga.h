@@ -58,6 +58,8 @@ public:
 	DECLARE_PALETTE_INIT(galaga);
 	UINT32 screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_galaga(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(main_vblank_irq);
+	INTERRUPT_GEN_MEMBER(sub_vblank_irq);
 };
 
 class xevious_state : public galaga_state
@@ -93,6 +95,7 @@ public:
 	DECLARE_PALETTE_INIT(battles);
 	DECLARE_MACHINE_RESET(battles);
 	UINT32 screen_update_xevious(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(battles_interrupt_4);
 };
 
 
@@ -202,8 +205,6 @@ DECLARE_WRITE8_HANDLER( battles_customio3_w );
 DECLARE_WRITE8_HANDLER( battles_customio_data3_w );
 DECLARE_WRITE8_HANDLER( battles_CPU4_coin_w );
 DECLARE_WRITE8_HANDLER( battles_noise_sound_w );
-
-INTERRUPT_GEN( battles_interrupt_4 );
 
 /*----------- defined in video/digdug.c -----------*/
 

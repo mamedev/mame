@@ -63,6 +63,8 @@ public:
 	DECLARE_DRIVER_INIT(drill);
 	DECLARE_MACHINE_START(drill);
 	DECLARE_MACHINE_RESET(drill);
+	INTERRUPT_GEN_MEMBER(drill_vblank_irq);
+	//INTERRUPT_GEN_MEMBER(drill_device_irq);
 };
 
 
@@ -399,15 +401,15 @@ static GFXDECODE_START( 2mindril )
 GFXDECODE_END
 
 
-static INTERRUPT_GEN( drill_vblank_irq )
+INTERRUPT_GEN_MEMBER(_2mindril_state::drill_vblank_irq)
 {
-	device->execute().set_input_line(4, ASSERT_LINE);
+	device.execute().set_input_line(4, ASSERT_LINE);
 }
 
 #if 0
-static INTERRUPT_GEN( drill_device_irq )
+INTERRUPT_GEN_MEMBER(_2mindril_state::drill_device_irq)
 {
-	device->execute().set_input_line(5, ASSERT_LINE);
+	device.execute().set_input_line(5, ASSERT_LINE);
 }
 #endif
 
@@ -445,8 +447,8 @@ static MACHINE_CONFIG_START( drill, _2mindril_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000 )
 	MCFG_CPU_PROGRAM_MAP(drill_map)
-	MCFG_CPU_VBLANK_INT("screen", drill_vblank_irq)
-	//MCFG_CPU_PERIODIC_INT(drill_device_irq,60)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", _2mindril_state,  drill_vblank_irq)
+	//MCFG_CPU_PERIODIC_INT_DRIVER(_2mindril_state, drill_device_irq, 60)
 	MCFG_GFXDECODE(2mindril)
 
 	MCFG_MACHINE_START_OVERRIDE(_2mindril_state,drill)

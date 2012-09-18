@@ -838,7 +838,7 @@ static MACHINE_CONFIG_START( sf, sf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ? (xtal is 16MHz) */
 	MCFG_CPU_PROGRAM_MAP(sf_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sf_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)	/* ? xtal is 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -848,7 +848,7 @@ static MACHINE_CONFIG_START( sf, sf_state )
 	MCFG_CPU_ADD("audio2", Z80, 3579545)	/* ? xtal is 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(sound2_map)
 	MCFG_CPU_IO_MAP(sound2_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,8000)
+	MCFG_CPU_PERIODIC_INT_DRIVER(sf_state, irq0_line_hold, 8000)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -902,7 +902,7 @@ static MACHINE_CONFIG_DERIVED( sfp, sf )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sf_state,  irq6_line_hold)
 MACHINE_CONFIG_END
 
 

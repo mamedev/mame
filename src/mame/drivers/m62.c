@@ -957,7 +957,7 @@ static MACHINE_CONFIG_START( ldrun, m62_state )
 	MCFG_CPU_ADD("maincpu", Z80, 24000000/6)
 	MCFG_CPU_PROGRAM_MAP(ldrun_map)
 	MCFG_CPU_IO_MAP(kungfum_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", m62_state,  irq0_line_hold)
 
 
 	/* video hardware */

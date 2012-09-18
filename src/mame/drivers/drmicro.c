@@ -23,12 +23,11 @@ Quite similar to Appoooh
  *
  *************************************/
 
-static INTERRUPT_GEN( drmicro_interrupt )
+INTERRUPT_GEN_MEMBER(drmicro_state::drmicro_interrupt)
 {
-	drmicro_state *state = device->machine().driver_data<drmicro_state>();
 
-	if (state->m_nmi_enable)
-		 device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_enable)
+		 device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(drmicro_state::nmi_enable_w)
@@ -263,7 +262,7 @@ static MACHINE_CONFIG_START( drmicro, drmicro_state )
 	MCFG_CPU_ADD("maincpu", Z80,MCLK/6)	/* 3.072MHz? */
 	MCFG_CPU_PROGRAM_MAP(drmicro_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT("screen", drmicro_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", drmicro_state,  drmicro_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

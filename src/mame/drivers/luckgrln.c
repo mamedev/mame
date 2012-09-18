@@ -151,6 +151,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel4_tile_info);
 	virtual void video_start();
 	UINT32 screen_update_luckgrln(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(luckgrln_irq);
 };
 
 
@@ -986,18 +987,17 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static INTERRUPT_GEN( luckgrln_irq )
+INTERRUPT_GEN_MEMBER(luckgrln_state::luckgrln_irq)
 {
-	luckgrln_state *state = device->machine().driver_data<luckgrln_state>();
-	if(state->m_nmi_enable)
-		device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_enable)
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( luckgrln, luckgrln_state )
 	MCFG_CPU_ADD("maincpu", Z180,8000000)
 	MCFG_CPU_PROGRAM_MAP(mainmap)
 	MCFG_CPU_IO_MAP(portmap)
-	MCFG_CPU_VBLANK_INT("screen", luckgrln_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", luckgrln_state,  luckgrln_irq)
 
 	MCFG_MC6845_ADD("crtc", H46505, 6000000/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 

@@ -202,27 +202,26 @@ READ8_MEMBER(carpolo_state::carpolo_interrupt_cause_r)
 }
 
 
-INTERRUPT_GEN( carpolo_timer_interrupt )
+INTERRUPT_GEN_MEMBER(carpolo_state::carpolo_timer_interrupt)
 {
-	carpolo_state *state = device->machine().driver_data<carpolo_state>();
 	UINT8 port_value;
 	int player;
 
 
 	/* cause the timer interrupt */
-	ttl74148_input_line_w(state->m_ttl74148_3s, PRI0_PRIORTITY_LINE, 0);
-	state->m_priority_0_extension = TIMER_EXTRA_BITS;
+	ttl74148_input_line_w(m_ttl74148_3s, PRI0_PRIORTITY_LINE, 0);
+	m_priority_0_extension = TIMER_EXTRA_BITS;
 
-	ttl74148_update(state->m_ttl74148_3s);
+	ttl74148_update(m_ttl74148_3s);
 
 
 	/* check the coins here as well - they drive the clock of the flip-flops */
-	port_value = state->ioport("IN0")->read();
+	port_value = ioport("IN0")->read();
 
-	state->m_ttl7474_2s_1->clock_w((port_value & 0x01) >> 0);
-	state->m_ttl7474_2s_2->clock_w((port_value & 0x02) >> 1);
-	state->m_ttl7474_2u_1->clock_w((port_value & 0x04) >> 2);
-	state->m_ttl7474_2u_2->clock_w((port_value & 0x08) >> 3);
+	m_ttl7474_2s_1->clock_w((port_value & 0x01) >> 0);
+	m_ttl7474_2s_2->clock_w((port_value & 0x02) >> 1);
+	m_ttl7474_2u_1->clock_w((port_value & 0x04) >> 2);
+	m_ttl7474_2u_2->clock_w((port_value & 0x08) >> 3);
 
 	/* read the steering controls */
 	for (player = 0; player < 4; player++)
@@ -234,20 +233,20 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 		switch (player)
 		{
 			default:
-			case 0:	movement_flip_flop = state->m_ttl7474_1f_1;	dir_flip_flop = state->m_ttl7474_1f_2;	break;
-			case 1:	movement_flip_flop = state->m_ttl7474_1d_1;	dir_flip_flop = state->m_ttl7474_1d_2;	break;
-			case 2:	movement_flip_flop = state->m_ttl7474_1c_1;	dir_flip_flop = state->m_ttl7474_1c_2;	break;
-			case 3:	movement_flip_flop = state->m_ttl7474_1a_1;	dir_flip_flop = state->m_ttl7474_1a_2;	break;
+			case 0:	movement_flip_flop = m_ttl7474_1f_1;	dir_flip_flop = m_ttl7474_1f_2;	break;
+			case 1:	movement_flip_flop = m_ttl7474_1d_1;	dir_flip_flop = m_ttl7474_1d_2;	break;
+			case 2:	movement_flip_flop = m_ttl7474_1c_1;	dir_flip_flop = m_ttl7474_1c_2;	break;
+			case 3:	movement_flip_flop = m_ttl7474_1a_1;	dir_flip_flop = m_ttl7474_1a_2;	break;
 		}
 
-		port_value = device->machine().root_device().ioport(portnames[player])->read();
+		port_value = machine().root_device().ioport(portnames[player])->read();
 
-		if (port_value != state->m_last_wheel_value[player])
+		if (port_value != m_last_wheel_value[player])
 		{
 			/* set the movement direction */
-			dir_flip_flop->d_w(((port_value - state->m_last_wheel_value[player]) & 0x80) ? 1 : 0);
+			dir_flip_flop->d_w(((port_value - m_last_wheel_value[player]) & 0x80) ? 1 : 0);
 
-			state->m_last_wheel_value[player] = port_value;
+			m_last_wheel_value[player] = port_value;
 		}
 
 		/* as the wheel moves, both flip-flops are clocked */
@@ -258,7 +257,7 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 
 
 	/* finally read the accelerator pedals */
-	port_value = device->machine().root_device().ioport("PEDALS")->read();
+	port_value = machine().root_device().ioport("PEDALS")->read();
 
 	for (player = 0; player < 4; player++)
 	{
@@ -266,24 +265,24 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
            how much, resulting in only two different possible levels */
 		if (port_value & 0x01)
 		{
-			ttl74153_input_line_w(state->m_ttl74153_1k, 0, player, 1);
-			ttl74153_input_line_w(state->m_ttl74153_1k, 1, player, 0);
+			ttl74153_input_line_w(m_ttl74153_1k, 0, player, 1);
+			ttl74153_input_line_w(m_ttl74153_1k, 1, player, 0);
 		}
 		else if (port_value & 0x02)
 		{
-			ttl74153_input_line_w(state->m_ttl74153_1k, 0, player, 1);
-			ttl74153_input_line_w(state->m_ttl74153_1k, 1, player, 1);
+			ttl74153_input_line_w(m_ttl74153_1k, 0, player, 1);
+			ttl74153_input_line_w(m_ttl74153_1k, 1, player, 1);
 		}
 		else
 		{
-			ttl74153_input_line_w(state->m_ttl74153_1k, 0, player, 0);
+			ttl74153_input_line_w(m_ttl74153_1k, 0, player, 0);
 			/* the other line is irrelevant */
 		}
 
 		port_value >>= 2;
 	}
 
-	ttl74153_update(state->m_ttl74153_1k);
+	ttl74153_update(m_ttl74153_1k);
 }
 
 // FIXME: Remove trampolines

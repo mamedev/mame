@@ -243,7 +243,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( portrait, portrait_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)     /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(portrait_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", portrait_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", I8039, 3120000)  /* ? */
 	MCFG_CPU_PROGRAM_MAP(portrait_sound_map)

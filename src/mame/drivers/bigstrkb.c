@@ -198,7 +198,7 @@ static MACHINE_CONFIG_START( bigstrkb, bigstrkb_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(bigstrkb_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bigstrkb_state,  irq6_line_hold)
 
 	MCFG_GFXDECODE(bigstrkb)
 

@@ -380,7 +380,7 @@ static MACHINE_CONFIG_START( yumefuda, albazg_state )
 	MCFG_CPU_ADD("maincpu", Z80 , MASTER_CLOCK/2) /* xtal is 12 Mhz, unknown divider*/
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", albazg_state,  irq0_line_hold)
 
 
 	MCFG_EEPROM_93C46_ADD("eeprom")

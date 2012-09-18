@@ -657,7 +657,7 @@ static const ym3812_interface lordgun_ym3812_interface =
 static MACHINE_CONFIG_START( lordgun, lordgun_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(lordgun_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("soundcpu", Z80, XTAL_20MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(lordgun_soundmem_map)
@@ -699,7 +699,7 @@ static const ymf278b_interface ymf278b_config =
 static MACHINE_CONFIG_START( aliencha, lordgun_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(aliencha_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("soundcpu", Z80, XTAL_20MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(lordgun_soundmem_map)

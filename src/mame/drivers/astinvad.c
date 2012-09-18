@@ -625,7 +625,7 @@ static MACHINE_CONFIG_START( spaceint, astinvad_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)        /* a guess */
 	MCFG_CPU_PROGRAM_MAP(spaceint_map)
 	MCFG_CPU_IO_MAP(spaceint_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", astinvad_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(astinvad_state,spaceint)
 	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state,spaceint)

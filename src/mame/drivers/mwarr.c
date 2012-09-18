@@ -558,7 +558,7 @@ static MACHINE_CONFIG_START( mwarr, mwarr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mwarr_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mwarr_state,  irq4_line_hold)
 
 
 	/* video hardware */
