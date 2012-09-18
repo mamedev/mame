@@ -532,7 +532,7 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 
 	case 0x3b30:
 	case 0x3bb0: { // 3bb0 0004 007f 0038 - 0f9c 0b9c 0b9c 0b9c 0b9c 0b9c 0b9c 099c
-		/* TODO: these are actually internally loaded */
+		/* TODO: these are actually internally loaded via 0x130e command */
 		int dx = space.read_dword(cop_regs[1]+4) - space.read_dword(cop_regs[0]+4);
 		int dy = space.read_dword(cop_regs[1]+8) - space.read_dword(cop_regs[0]+8);
 
@@ -546,16 +546,34 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 	}
 
 	case 0x42c2: { // 42c2 0005 fcdd 0040 - 0f9a 0b9a 0b9c 0b9c 0b9c 029c 0000 0000
-		int div = space.read_word(cop_regs[0]+0x36);
+		/* TODO: these are actually internally loaded via 0x130e command */
+		int dx = space.read_dword(cop_regs[1]+4) - space.read_dword(cop_regs[0]+4);
+		int dy = space.read_dword(cop_regs[1]+8) - space.read_dword(cop_regs[0]+8);
+		int div = space.read_word(cop_regs[0]+(0x36));
 		int res;
+		int cop_dist_raw;
+
 		if(!div)
 		{
 			printf("divide by zero?\n");
 			div = 1;
 		}
-		res = space.read_word(cop_regs[0]+(0x38)) / div;
-		res <<= cop_scale + 2; /* TODO: check this */
-		space.write_word(cop_regs[0]+0x38, res);
+
+		/* TODO: calculation of this one should occur at 0x3b30/0x3bb0 I *think* */
+		/* TODO: recheck if cop_scale still masks at 3 with this command */
+		dx >>= 11 + cop_scale;
+		dy >>= 11 + cop_scale;
+		cop_dist_raw = sqrt((double)(dx*dx+dy*dy));
+
+		res = cop_dist_raw;
+		res /= div;
+
+		cop_dist = (1 << (5 - cop_scale)) / div;
+
+		/* TODO: bits 5-6-15 */
+		cop_status = 7;
+
+		space.write_word(cop_regs[0]+(0x38), res);
 		break;
 	}
 
