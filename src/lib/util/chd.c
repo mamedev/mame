@@ -540,11 +540,8 @@ chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbyte
 		return CHDERR_ALREADY_OPEN;
 
 	// set the header parameters
-	m_version = HEADER_VERSION;
 	m_logicalbytes = logicalbytes;
-	m_metaoffset = 0;
 	m_hunkbytes = hunkbytes;
-	m_hunkcount = (m_logicalbytes + m_hunkbytes - 1) / m_hunkbytes;
 	m_unitbytes = unitbytes;
 	memcpy(m_compression, compression, sizeof(m_compression));
 	m_parent = NULL;
@@ -568,11 +565,8 @@ chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbyte
 		return CHDERR_ALREADY_OPEN;
 
 	// set the header parameters
-	m_version = HEADER_VERSION;
 	m_logicalbytes = logicalbytes;
-	m_metaoffset = 0;
 	m_hunkbytes = hunkbytes;
-	m_hunkcount = (m_logicalbytes + m_hunkbytes - 1) / m_hunkbytes;
 	m_unitbytes = parent.unit_bytes();
 	memcpy(m_compression, compression, sizeof(m_compression));
 	m_parent = &parent;
@@ -1475,8 +1469,7 @@ void chd_file::parse_v3_header(UINT8 *rawheader, sha1_t &parentsha1)
 
 	// extract parent SHA-1
 	UINT32 flags = be_read(&rawheader[16], 4);
-	if ((flags & 2) && m_allow_writes)
-		throw CHDERR_FILE_NOT_WRITEABLE;
+	m_allow_writes = (flags & 2) == 0;
 
 	// determine compression
 	switch (be_read(&rawheader[20], 4))
@@ -1529,8 +1522,7 @@ void chd_file::parse_v4_header(UINT8 *rawheader, sha1_t &parentsha1)
 
 	// extract parent SHA-1
 	UINT32 flags = be_read(&rawheader[16], 4);
-	if ((flags & 2) && m_allow_writes)
-		throw CHDERR_FILE_NOT_WRITEABLE;
+	m_allow_writes = (flags & 2) == 0;
 
 	// determine compression
 	switch (be_read(&rawheader[20], 4))
@@ -1589,8 +1581,7 @@ void chd_file::parse_v5_header(UINT8 *rawheader, sha1_t &parentsha1)
 	m_compression[2] = be_read(&rawheader[24], 4);
 	m_compression[3] = be_read(&rawheader[28], 4);
 
-	if (compressed() && m_allow_writes)
-		throw CHDERR_FILE_NOT_WRITEABLE;
+	m_allow_writes = !compressed();
 
 	// describe the format
 	m_mapoffset_offset = 40;
@@ -1942,6 +1933,9 @@ chd_error chd_file::create_common()
 	// wrap in try for proper error handling
 	try
 	{
+		m_version = HEADER_VERSION;
+		m_metaoffset = 0;
+
 		// if we have a parent, it must be V3 or later
 		if (m_parent != NULL && m_parent->version() < 3)
 			throw CHDERR_UNSUPPORTED_VERSION;
@@ -1951,10 +1945,6 @@ chd_error chd_file::create_common()
 			throw CHDERR_INVALID_PARAMETER;
 		if (m_parent != NULL && m_unitbytes != m_parent->unit_bytes())
 			throw CHDERR_INVALID_PARAMETER;
-
-		// writes are obviously permitted; reads only if uncompressed
-		m_allow_writes = true;
-		m_allow_reads = !compressed();
 
 		// verify the compression types
 		bool found_zero = false;
@@ -1970,7 +1960,6 @@ chd_error chd_file::create_common()
 		}
 
 		// create our V5 header
-		assert(m_version == HEADER_VERSION);
 		UINT8 rawheader[V5_HEADER_SIZE];
 		memcpy(&rawheader[0], "MComprHD", 8);
 		be_write(&rawheader[8], V5_HEADER_SIZE, 4);
@@ -1994,6 +1983,10 @@ chd_error chd_file::create_common()
 		// parse it back out to set up fields appropriately
 		sha1_t parentsha1;
 		parse_v5_header(rawheader, parentsha1);
+
+		// writes are obviously permitted; reads only if uncompressed
+		m_allow_writes = true;
+		m_allow_reads = !compressed();
 
 		// write out the map (if not compressed)
 		if (!compressed())
@@ -2039,9 +2032,8 @@ chd_error chd_file::open_common(bool writeable)
 	// wrap in try for proper error handling
 	try
 	{
-		// reads are always permitted; writes possibly as well
+		// reads are always permitted
 		m_allow_reads = true;
-		m_allow_writes = writeable;
 
 		// read the raw header
 		UINT8 rawheader[MAX_HEADER_SIZE];
@@ -2053,7 +2045,7 @@ chd_error chd_file::open_common(bool writeable)
 
 		// only allow writes to the most recent version
 		m_version = be_read(&rawheader[12], 4);
-		if (m_allow_writes && m_version < HEADER_VERSION)
+		if (writeable && m_version < HEADER_VERSION)
 			throw CHDERR_UNSUPPORTED_VERSION;
 
 		// read the header if we support it
@@ -2066,6 +2058,9 @@ chd_error chd_file::open_common(bool writeable)
 			default:	throw CHDERR_UNSUPPORTED_VERSION;
 		}
 
+		if (writeable && !m_allow_writes)
+			throw CHDERR_FILE_NOT_WRITEABLE;
+
 		// make sure we have a parent if we need one (and don't if we don't)
 		if (parentsha1 != sha1_t::null)
 		{
@@ -2074,7 +2069,7 @@ chd_error chd_file::open_common(bool writeable)
 			else if (m_parent->sha1() != parentsha1)
 				throw CHDERR_INVALID_PARENT;
 		}
-		else if (parentsha1 == sha1_t::null && m_parent != NULL)
+		else if (m_parent != NULL)
 			throw CHDERR_INVALID_PARAMETER;
 
 		// finish opening the file
