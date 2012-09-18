@@ -780,7 +780,7 @@ UINT32 supracan_state::screen_update_supracan(screen_device &screen, bitmap_ind1
 			m_sprite_final_bitmap.fill(0x00, visarea);
 			bitmap.fill(0x80, visarea);
 
-			draw_sprites(screen.machine(), m_sprite_final_bitmap, visarea);
+			draw_sprites(machine(), m_sprite_final_bitmap, visarea);
 		}
 	}
 	else
@@ -789,7 +789,7 @@ UINT32 supracan_state::screen_update_supracan(screen_device &screen, bitmap_ind1
 		m_sprite_final_bitmap.fill(0x00, cliprect);
 		bitmap.fill(0x80, cliprect);
 
-		draw_sprites(screen.machine(), m_sprite_final_bitmap, cliprect);
+		draw_sprites(machine(), m_sprite_final_bitmap, cliprect);
 	}
 
 
@@ -829,9 +829,9 @@ UINT32 supracan_state::screen_update_supracan(screen_device &screen, bitmap_ind1
 			if (priority==pri)
 			{
 //            tilemap_num = layer;
-				which_tilemap_size = get_tilemap_dimensions(screen.machine(), xsize, ysize, layer);
+				which_tilemap_size = get_tilemap_dimensions(machine(), xsize, ysize, layer);
 				bitmap_ind16 &src_bitmap = m_tilemap_sizes[layer][which_tilemap_size]->pixmap();
-				int gfx_region = supracan_tilemap_get_region(screen.machine(), layer);
+				int gfx_region = supracan_tilemap_get_region(machine(), layer);
 				int transmask = 0xff;
 
 				switch (gfx_region)
@@ -953,12 +953,12 @@ UINT32 supracan_state::screen_update_supracan(screen_device &screen, bitmap_ind1
 
 
 								if (m_vram[m_roz_unk_base0/2 + y]) // incxx = 0, no draw?
-									supracan_suprnova_draw_roz(screen.machine(), bitmap, clip, m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
+									supracan_suprnova_draw_roz(machine(), bitmap, clip, m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
 							}
 						}
 						else
 						{
-							supracan_suprnova_draw_roz(screen.machine(), bitmap, cliprect, m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
+							supracan_suprnova_draw_roz(machine(), bitmap, cliprect, m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
 						}
 					}
 				}

@@ -95,7 +95,7 @@ UINT32 ambush_state::screen_update_ambush(screen_device &screen, bitmap_ind16 &b
 	bitmap.fill(0, cliprect);
 
 	/* Draw the characters */
-	draw_chars(screen.machine(), bitmap, cliprect, 0x00);
+	draw_chars(machine(), bitmap, cliprect, 0x00);
 
 	/* Draw the sprites. */
 	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
@@ -146,13 +146,13 @@ UINT32 ambush_state::screen_update_ambush(screen_device &screen, bitmap_ind16 &b
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[gfx],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[gfx],
 				code, col | ((*m_colorbank & 0x03) << 4),
 				flipx, flipy,
 				sx,sy,0);
 	}
 
 	/* Draw the foreground priority characters over the sprites */
-	draw_chars(screen.machine(), bitmap, cliprect, 0x10);
+	draw_chars(machine(), bitmap, cliprect, 0x10);
 	return 0;
 }

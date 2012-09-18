@@ -209,7 +209,7 @@ UINT32 othunder_state::screen_update_othunder(screen_device &screen, bitmap_ind1
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap.fill(0, cliprect);
@@ -221,7 +221,7 @@ UINT32 othunder_state::screen_update_othunder(screen_device &screen, bitmap_ind1
 	/* Sprites can be under/over the layer below text layer */
 	{
 		static const int primasks[2] = {0xf0, 0xfc};
-		draw_sprites(screen.machine(), bitmap, cliprect, primasks, 3);
+		draw_sprites(machine(), bitmap, cliprect, primasks, 3);
 	}
 
 	return 0;

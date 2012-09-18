@@ -129,7 +129,7 @@ void galpanic_state::screen_eof_galpanic(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		device_t *pandora = screen.machine().device("pandora");
+		device_t *pandora = machine().device("pandora");
 		pandora_eof(pandora);
 	}
 }

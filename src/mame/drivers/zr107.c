@@ -222,9 +222,9 @@ VIDEO_START_MEMBER(zr107_state,jetwave)
 
 UINT32 zr107_state::screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	device_t *k001604 = screen.machine().device("k001604");
+	device_t *k001604 = machine().device("k001604");
 
-	bitmap.fill(screen.machine().pens[0], cliprect);
+	bitmap.fill(machine().pens[0], cliprect);
 
 	K001005_draw(bitmap, cliprect);
 
@@ -233,7 +233,7 @@ UINT32 zr107_state::screen_update_jetwave(screen_device &screen, bitmap_rgb32 &b
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 
-	sharc_set_flag_input(screen.machine().device("dsp"), 1, ASSERT_LINE);
+	sharc_set_flag_input(machine().device("dsp"), 1, ASSERT_LINE);
 	return 0;
 }
 
@@ -274,8 +274,8 @@ VIDEO_START_MEMBER(zr107_state,zr107)
 
 UINT32 zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	device_t *k056832 = screen.machine().device("k056832");
-	bitmap.fill(screen.machine().pens[0], cliprect);
+	device_t *k056832 = machine().device("k056832");
+	bitmap.fill(machine().pens[0], cliprect);
 
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 1, 0, 0);
 	K001005_draw(bitmap, cliprect);
@@ -284,7 +284,7 @@ UINT32 zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &bit
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 
-	sharc_set_flag_input(screen.machine().device("dsp"), 1, ASSERT_LINE);
+	sharc_set_flag_input(machine().device("dsp"), 1, ASSERT_LINE);
 	return 0;
 }
 

@@ -290,9 +290,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 stfight_state::screen_update_stfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(screen.machine());
+	set_pens(machine());
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	bitmap.fill(0, cliprect);	/* in case m_bg_tilemap is disabled */
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
@@ -300,7 +300,7 @@ UINT32 stfight_state::screen_update_stfight(screen_device &screen, bitmap_ind16 
 
 	/* Draw sprites (may be obscured by foreground layer) */
 	if (m_vh_latch_ram[0x07] & 0x40)
-		draw_sprites(screen.machine(), bitmap,cliprect);
+		draw_sprites(machine(), bitmap,cliprect);
 
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;

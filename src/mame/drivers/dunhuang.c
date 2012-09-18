@@ -164,16 +164,16 @@ UINT32 dunhuang_state::screen_update_dunhuang(screen_device &screen, bitmap_ind1
 	int layers_ctrl = -1;
 
 #if DUNHUANG_DEBUG
-if (screen.machine().input().code_pressed(KEYCODE_Z))
+if (machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
-	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	switch (m_layers)
 	{

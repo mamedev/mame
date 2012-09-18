@@ -363,17 +363,17 @@ UINT32 tmaster_state::screen_update_tmaster(screen_device &screen, bitmap_ind16 
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (screen.machine().input().code_pressed(KEYCODE_Z))
+	if (machine().input().code_pressed(KEYCODE_Z))
 	{
 		int mask = 0;
-		if (screen.machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
-		if (screen.machine().input().code_pressed(KEYCODE_W))	mask |= 2;
+		if (machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
+		if (machine().input().code_pressed(KEYCODE_W))	mask |= 2;
 		if (mask != 0) layers_ctrl &= mask;
 	}
 #endif
 
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (layers_ctrl & 1)	copybitmap_trans(bitmap, m_bitmap[0][(m_regs[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
 	if (layers_ctrl & 2)	copybitmap_trans(bitmap, m_bitmap[1][(m_regs[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);

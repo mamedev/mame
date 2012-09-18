@@ -96,7 +96,7 @@ static void jack_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, c
 UINT32 jack_state::screen_update_jack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	jack_draw_sprites(screen.machine(), bitmap, cliprect);
+	jack_draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -179,6 +179,6 @@ static void joinem_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 UINT32 jack_state::screen_update_joinem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	joinem_draw_sprites(screen.machine(), bitmap, cliprect);
+	joinem_draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }

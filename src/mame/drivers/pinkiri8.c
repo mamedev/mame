@@ -205,7 +205,7 @@ ronjan
 UINT32 pinkiri8_state::screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int col_bank;
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 
 	/* update palette */
 	for (int pen = 0; pen < 0x800 ; pen++)
@@ -214,14 +214,14 @@ UINT32 pinkiri8_state::screen_update_pinkiri8(screen_device &screen, bitmap_ind1
 		int r = (val & 0x001f) >> 0;
 		int g = (val & 0x03e0) >> 5;
 		int b = (val & 0x7c00) >> 10;
-		palette_set_color_rgb(screen.machine(), pen, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(machine(), pen, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 
 	int game_type_hack = 0;
 
-	if (!strcmp(screen.machine().system().name,"janshi")) game_type_hack = 1;
+	if (!strcmp(machine().system().name,"janshi")) game_type_hack = 1;
 
-	if ( screen.machine().input().code_pressed_once(KEYCODE_W) )
+	if ( machine().input().code_pressed_once(KEYCODE_W) )
 	{
 		int i;
 		int count2;
@@ -251,7 +251,7 @@ UINT32 pinkiri8_state::screen_update_pinkiri8(screen_device &screen, bitmap_ind1
 	//popmessage("%02x",m_janshi_crtc_regs[0x0a]);
 	col_bank = (m_janshi_crtc_regs[0x0a] & 0x40) >> 6;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	/* FIXME: color is a bit of a mystery */
 	{
@@ -325,7 +325,7 @@ UINT32 pinkiri8_state::screen_update_pinkiri8(screen_device &screen, bitmap_ind1
 
 			if (bit)
 			{
-				//col = screen.machine().rand();
+				//col = machine().rand();
 				width = 2;
 			}
 			else

@@ -94,7 +94,7 @@ UINT32 fp6000_state::screen_update_fp6000(screen_device &screen, bitmap_ind16 &b
 				int dot = (m_gvram[count] >> (12-xi*4)) & 0xf;
 
 				if(y < 400 && x*4+xi < 640) /* TODO: safety check */
-					bitmap.pix16(y, x*4+xi) = screen.machine().pens[dot];
+					bitmap.pix16(y, x*4+xi) = machine().pens[dot];
 			}
 
 			count++;
@@ -117,7 +117,7 @@ UINT32 fp6000_state::screen_update_fp6000(screen_device &screen, bitmap_ind16 &b
 
 					if(pen != -1)
 						if(y*mc6845_tile_height < 400 && x*8+xi < 640) /* TODO: safety check */
-							bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = screen.machine().pens[pen];
+							bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = machine().pens[pen];
 				}
 			}
 		}
@@ -132,7 +132,7 @@ UINT32 fp6000_state::screen_update_fp6000(screen_device &screen, bitmap_ind16 &b
 			{
 				x = mc6845_cursor_addr % mc6845_h_display;
 				y = mc6845_cursor_addr / mc6845_h_display;
-				bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = screen.machine().pens[7];
+				bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = machine().pens[7];
 			}
 		}
 	}

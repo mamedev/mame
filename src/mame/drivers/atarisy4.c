@@ -182,8 +182,8 @@ UINT32 atarisy4_state::screen_update_atarisy4(screen_device &screen, bitmap_rgb3
 		{
 			UINT16 data = *src++;
 
-			*dest++ = screen.machine().pens[data & 0xff];
-			*dest++ = screen.machine().pens[data >> 8];
+			*dest++ = machine().pens[data & 0xff];
+			*dest++ = machine().pens[data >> 8];
 		}
 	}
 	return 0;

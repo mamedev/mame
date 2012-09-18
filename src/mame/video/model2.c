@@ -2721,10 +2721,10 @@ UINT32 model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &b
 {
 	logerror("--- frame ---\n");
 
-	bitmap.fill(screen.machine().pens[0], cliprect);
+	bitmap.fill(machine().pens[0], cliprect);
 	m_sys24_bitmap.fill(0, cliprect);
 
-	segas24_tile *tile = screen.machine().device<segas24_tile>("tile");
+	segas24_tile *tile = machine().device<segas24_tile>("tile");
 	tile->draw(m_sys24_bitmap, cliprect, 7, 0, 0);
 	tile->draw(m_sys24_bitmap, cliprect, 6, 0, 0);
 	tile->draw(m_sys24_bitmap, cliprect, 5, 0, 0);

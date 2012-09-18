@@ -210,7 +210,7 @@ UINT32 mpoker_state::screen_update_mpoker(screen_device &screen, bitmap_ind16 &b
 {
 	int y,x;
 	int count;
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 
 	count = 0;
 	for (y=0;y<32;y++)

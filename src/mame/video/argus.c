@@ -1156,45 +1156,45 @@ static void butasan_log_vram(running_machine &machine)
 
 UINT32 argus_state::screen_update_argus(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bg_setting(screen.machine());
+	bg_setting(machine());
 
 	/* scroll BG0 and render tile at proper position */
-	argus_bg0_scroll_handle(screen.machine());
+	argus_bg0_scroll_handle(machine());
 
 	m_bg0_tilemap->draw(bitmap, cliprect, 0, 0);
-	argus_draw_sprites(screen.machine(), bitmap, cliprect, 0);
+	argus_draw_sprites(machine(), bitmap, cliprect, 0);
 	if (m_bg_status & 1)	/* Backgound enable */
 		m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
-	argus_draw_sprites(screen.machine(), bitmap, cliprect, 1);
+	argus_draw_sprites(machine(), bitmap, cliprect, 1);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 UINT32 argus_state::screen_update_valtric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bg_setting(screen.machine());
+	bg_setting(machine());
 
 	if (m_bg_status & 1)	/* Backgound enable */
 		valtric_draw_mosaic(screen, bitmap, cliprect);
 	else
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	valtric_draw_sprites(screen.machine(), bitmap, cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
+	valtric_draw_sprites(machine(), bitmap, cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 UINT32 argus_state::screen_update_butasan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bg_setting(screen.machine());
+	bg_setting(machine());
 
 	if (m_bg_status & 1)	/* Backgound enable */
 		m_bg0_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 	if (m_butasan_bg1_status & 1) m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
-	butasan_draw_sprites(screen.machine(), bitmap, cliprect);
+	butasan_draw_sprites(machine(), bitmap, cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	butasan_log_vram(screen.machine());
+	butasan_log_vram(machine());
 	return 0;
 }

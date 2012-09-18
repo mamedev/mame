@@ -101,7 +101,7 @@ UINT32 lgp_state::screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap,
 	int charx, chary;
 
 	/* make color 0 transparent */
-	palette_set_color(screen.machine(), 0, MAKE_ARGB(0,0,0,0));
+	palette_set_color(machine(), 0, MAKE_ARGB(0,0,0,0));
 
 	/* clear */
 	bitmap.fill(0, cliprect);
@@ -115,7 +115,7 @@ UINT32 lgp_state::screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap,
 
 			/* Somewhere there's a flag that offsets the tilemap by 0x100*x */
 			/* Palette is likely set somewhere as well (tile_control_ram?) */
-			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[0],
 					m_tile_ram[current_screen_character],
 					0,
 					0, 0, charx*8, chary*8, 0);

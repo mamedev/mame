@@ -447,9 +447,9 @@ static void supernova_draw_b( running_machine &machine, bitmap_ind16 &bitmap, bi
 UINT32 skns_state::screen_update_skns(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 
-	palette_update(screen.machine());
+	palette_update(machine());
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 	m_tilemap_bitmap_lower.fill(0);
 	m_tilemap_bitmapflags_lower.fill(0);
 	m_tilemap_bitmap_higher.fill(0);
@@ -466,8 +466,8 @@ UINT32 skns_state::screen_update_skns(screen_device &screen, bitmap_rgb32 &bitma
 		//popmessage("pri %d %d\n", supernova_pri_a, supernova_pri_b);
 
 		/*if (!supernova_pri_b) { */
-		supernova_draw_b(screen.machine(), m_tilemap_bitmap_lower, m_tilemap_bitmapflags_lower, cliprect,tran);// tran = 1;
-		supernova_draw_a(screen.machine(), m_tilemap_bitmap_higher,m_tilemap_bitmapflags_higher,cliprect,tran);// tran = 1;
+		supernova_draw_b(machine(), m_tilemap_bitmap_lower, m_tilemap_bitmapflags_lower, cliprect,tran);// tran = 1;
+		supernova_draw_a(machine(), m_tilemap_bitmap_higher,m_tilemap_bitmapflags_higher,cliprect,tran);// tran = 1;
 
 		{
 			int x,y;
@@ -476,7 +476,7 @@ UINT32 skns_state::screen_update_skns(screen_device &screen, bitmap_rgb32 &bitma
 			UINT32* dst;
 			UINT16 pri, pri2, pri3;
 			UINT16 bgpri;
-			const pen_t *clut = &screen.machine().pens[0];
+			const pen_t *clut = &machine().pens[0];
 //          int drawpri;
 
 
@@ -621,7 +621,7 @@ UINT32 skns_state::screen_update_skns(screen_device &screen, bitmap_rgb32 &bitma
 	m_sprite_bitmap.fill(0x0000, cliprect);
 
 	if (m_alt_enable_sprites)
-		m_spritegen->skns_draw_sprites(screen.machine(), m_sprite_bitmap, cliprect, m_spriteram, m_spriteram.bytes(), screen.machine().root_device().memregion("gfx1")->base(), screen.machine().root_device().memregion ("gfx1")->bytes(), m_spc_regs );
+		m_spritegen->skns_draw_sprites(machine(), m_sprite_bitmap, cliprect, m_spriteram, m_spriteram.bytes(), machine().root_device().memregion("gfx1")->base(), machine().root_device().memregion ("gfx1")->bytes(), m_spc_regs );
 
 
 	return 0;

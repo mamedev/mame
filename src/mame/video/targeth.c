@@ -139,7 +139,7 @@ UINT32 targeth_state::screen_update_targeth(screen_device &screen, bitmap_ind16 
 
 	m_pant[1]->draw(bitmap, cliprect, 0,0);
 	m_pant[0]->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap,cliprect);
+	draw_sprites(machine(), bitmap,cliprect);
 
 	return 0;
 }

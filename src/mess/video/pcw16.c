@@ -156,7 +156,7 @@ static void pcw16_vh_decode_mode2(pcw16_state *state, bitmap_ind16 &bitmap, int 
 ***************************************************************************/
 UINT32 pcw16_state::screen_update_pcw16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *ram = screen.machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 	unsigned char *pScanLine = (unsigned char *)ram + 0x0fc00;	//0x03c00;  //0x020FC00;
 
 	int y;

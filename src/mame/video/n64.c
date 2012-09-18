@@ -3849,7 +3849,7 @@ void n64_state::video_start()
 
 UINT32 n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	n64_periphs *n64 = screen.machine().device<n64_periphs>("rcp");
+	n64_periphs *n64 = machine().device<n64_periphs>("rcp");
     m_rdp->visarea = screen.visible_area();
 
 	//UINT16 *frame_buffer = (UINT16*)&rdram[(n64->vi_origin & 0xffffff) >> 2];

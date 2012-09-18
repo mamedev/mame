@@ -242,7 +242,7 @@ UINT32 ironhors_state::screen_update_ironhors(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->set_scrollx(row, m_scroll[row]);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -352,7 +352,7 @@ UINT32 ironhors_state::screen_update_farwest(screen_device &screen, bitmap_ind16
 		m_bg_tilemap->set_scrollx(row, m_scroll[row]);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	farwest_draw_sprites(screen.machine(), bitmap, cliprect);
+	farwest_draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }
 

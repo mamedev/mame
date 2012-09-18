@@ -64,7 +64,7 @@ UINT32 tutankhm_state::screen_update_tutankhm(screen_device &screen, bitmap_rgb3
 	pen_t pens[NUM_PENS];
 	int x, y;
 
-	get_pens(screen.machine(), pens);
+	get_pens(machine(), pens);
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{

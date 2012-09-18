@@ -535,7 +535,7 @@ void bnstars_state::video_start()
 UINT32 bnstars_state::screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	bitmap.fill(0, cliprect);	/* bg color */
 
@@ -544,14 +544,14 @@ UINT32 bnstars_state::screen_update_bnstars_left(screen_device &screen, bitmap_i
 	m_ms32_bg_tilemap[0]->set_scrolly(0, m_ms32_bg0_scroll[0x0c/4] + m_ms32_bg0_scroll[0x14/4] );
 	m_ms32_bg_tilemap[0]->draw(bitmap, cliprect, 0,1);
 
-	draw_roz(screen.machine(),bitmap,cliprect,2,0);
+	draw_roz(machine(),bitmap,cliprect,2,0);
 
 	m_ms32_tx_tilemap[0]->set_scrollx(0, m_ms32_tx0_scroll[0x00/4] + m_ms32_tx0_scroll[0x08/4] + 0x18);
 	m_ms32_tx_tilemap[0]->set_scrolly(0, m_ms32_tx0_scroll[0x0c/4] + m_ms32_tx0_scroll[0x14/4]);
 	m_ms32_tx_tilemap[0]->draw(bitmap, cliprect, 0,4);
 
 
-	draw_sprites(screen.machine(),bitmap,cliprect, m_ms32_spram, 0x20000, 0);
+	draw_sprites(machine(),bitmap,cliprect, m_ms32_spram, 0x20000, 0);
 
 	return 0;
 }
@@ -559,7 +559,7 @@ UINT32 bnstars_state::screen_update_bnstars_left(screen_device &screen, bitmap_i
 UINT32 bnstars_state::screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	bitmap.fill(0x8000+0, cliprect);	/* bg color */
 
@@ -568,13 +568,13 @@ UINT32 bnstars_state::screen_update_bnstars_right(screen_device &screen, bitmap_
 	m_ms32_bg_tilemap[1]->set_scrolly(0, m_ms32_bg1_scroll[0x0c/4] + m_ms32_bg1_scroll[0x14/4] );
 	m_ms32_bg_tilemap[1]->draw(bitmap, cliprect, 0,1);
 
-	draw_roz(screen.machine(),bitmap,cliprect,2,1);
+	draw_roz(machine(),bitmap,cliprect,2,1);
 
 	m_ms32_tx_tilemap[1]->set_scrollx(0, m_ms32_tx1_scroll[0x00/4] + m_ms32_tx1_scroll[0x08/4] + 0x18);
 	m_ms32_tx_tilemap[1]->set_scrolly(0, m_ms32_tx1_scroll[0x0c/4] + m_ms32_tx1_scroll[0x14/4]);
 	m_ms32_tx_tilemap[1]->draw(bitmap, cliprect, 0,4);
 
-	draw_sprites(screen.machine(),bitmap,cliprect, m_ms32_spram+(0x20000/4), 0x20000, 4);
+	draw_sprites(machine(),bitmap,cliprect, m_ms32_spram+(0x20000/4), 0x20000, 4);
 
 	return 0;
 }

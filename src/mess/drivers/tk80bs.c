@@ -273,7 +273,7 @@ UINT32 tk80bs_state::screen_update_tk80bs(screen_device &screen, bitmap_ind16 &b
 		{
 			int tile = m_p_videoram[count++];
 
-			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], tile, 0, 0, 0, x*8, y*8);
+			drawgfx_opaque(bitmap, cliprect, machine().gfx[0], tile, 0, 0, 0, x*8, y*8);
 		}
 	}
 

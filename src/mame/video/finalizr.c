@@ -94,8 +94,8 @@ UINT32 finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind1
 
 	/* Draw the sprites. */
 	{
-		gfx_element *gfx1 = screen.machine().gfx[1];
-		gfx_element *gfx2 = screen.machine().gfx[2];
+		gfx_element *gfx1 = machine().gfx[1];
+		gfx_element *gfx2 = machine().gfx[2];
 
 		UINT8 *sr = m_spriterambank ? m_spriteram_2 : m_spriteram;
 

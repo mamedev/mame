@@ -188,11 +188,11 @@ UINT32 slapfght_state::screen_update_perfrman(screen_device &screen, bitmap_ind1
 	}
 
 	m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-	draw_sprites(screen.machine(), bitmap,cliprect,0);
+	draw_sprites(machine(), bitmap,cliprect,0);
 	m_pf1_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap,cliprect,0x80);
+	draw_sprites(machine(), bitmap,cliprect,0x80);
 
-	slapfght_log_vram(screen.machine());
+	slapfght_log_vram(machine());
 	return 0;
 }
 
@@ -202,7 +202,7 @@ UINT32 slapfght_state::screen_update_slapfight(screen_device &screen, bitmap_ind
 	UINT8 *buffered_spriteram = m_spriteram->buffer();
 	int offs;
 
-	screen.machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	if (m_flipscreen) {
 		m_fix_tilemap->set_scrollx(0,296);
 		m_pf1_tilemap->set_scrollx(0,(*m_slapfight_scrollx_lo + 256 * *m_slapfight_scrollx_hi)+296 );
@@ -222,13 +222,13 @@ UINT32 slapfght_state::screen_update_slapfight(screen_device &screen, bitmap_ind
 	for (offs = 0;offs < m_spriteram->bytes();offs += 4)
 	{
 		if (m_flipscreen)
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 				buffered_spriteram[offs] + ((buffered_spriteram[offs+2] & 0xc0) << 2),
 				(buffered_spriteram[offs+2] & 0x1e) >> 1,
 				1,1,
 				288-(buffered_spriteram[offs+1] + ((buffered_spriteram[offs+2] & 0x01) << 8)) +18,240-buffered_spriteram[offs+3],0);
 		else
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 				buffered_spriteram[offs] + ((buffered_spriteram[offs+2] & 0xc0) << 2),
 				(buffered_spriteram[offs+2] & 0x1e) >> 1,
 				0,0,
@@ -237,6 +237,6 @@ UINT32 slapfght_state::screen_update_slapfight(screen_device &screen, bitmap_ind
 
 	m_fix_tilemap->draw(bitmap, cliprect, 0,0);
 
-	slapfght_log_vram(screen.machine());
+	slapfght_log_vram(machine());
 	return 0;
 }

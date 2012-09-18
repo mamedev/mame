@@ -124,7 +124,7 @@ void bigstrkb_state::video_start()
 UINT32 bigstrkb_state::screen_update_bigstrkb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-//  bitmap.fill(get_black_pen(screen.machine()), cliprect);
+//  bitmap.fill(get_black_pen(machine()), cliprect);
 
 	m_tilemap2->set_scrollx(0, m_vidreg1[0]+(256-14));
 	m_tilemap2->set_scrolly(0, m_vidreg2[0]);
@@ -135,7 +135,7 @@ UINT32 bigstrkb_state::screen_update_bigstrkb(screen_device &screen, bitmap_ind1
 	m_tilemap2->draw(bitmap, cliprect, 0,0);
 	m_tilemap3->draw(bitmap, cliprect, 0,0);
 
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	draw_sprites(machine(),bitmap,cliprect);
 	m_tilemap->draw(bitmap, cliprect, 0,0);
 
 //  popmessage ("Regs %08x %08x %08x %08x",bsb_vidreg2[0],bsb_vidreg2[1],bsb_vidreg2[2],bsb_vidreg2[3]);

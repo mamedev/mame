@@ -1814,36 +1814,36 @@ UINT32 towns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 	if(!(m_video.towns_video_reg[1] & 0x01))
 	{
-		if(!screen.machine().input().code_pressed(KEYCODE_Q))
+		if(!machine().input().code_pressed(KEYCODE_Q))
 		{
 			if((m_video.towns_layer_ctrl & 0x03) != 0)
-				towns_crtc_draw_layer(screen.machine(),bitmap,&m_video.towns_crtc_layerscr[1],1);
+				towns_crtc_draw_layer(machine(),bitmap,&m_video.towns_crtc_layerscr[1],1);
 		}
-		if(!screen.machine().input().code_pressed(KEYCODE_W))
+		if(!machine().input().code_pressed(KEYCODE_W))
 		{
 			if((m_video.towns_layer_ctrl & 0x0c) != 0)
-				towns_crtc_draw_layer(screen.machine(),bitmap,&m_video.towns_crtc_layerscr[0],0);
+				towns_crtc_draw_layer(machine(),bitmap,&m_video.towns_crtc_layerscr[0],0);
 		}
 	}
 	else
 	{
-		if(!screen.machine().input().code_pressed(KEYCODE_Q))
+		if(!machine().input().code_pressed(KEYCODE_Q))
 		{
 			if((m_video.towns_layer_ctrl & 0x0c) != 0)
-				towns_crtc_draw_layer(screen.machine(),bitmap,&m_video.towns_crtc_layerscr[0],0);
+				towns_crtc_draw_layer(machine(),bitmap,&m_video.towns_crtc_layerscr[0],0);
 		}
-		if(!screen.machine().input().code_pressed(KEYCODE_W))
+		if(!machine().input().code_pressed(KEYCODE_W))
 		{
 			if((m_video.towns_layer_ctrl & 0x03) != 0)
-				towns_crtc_draw_layer(screen.machine(),bitmap,&m_video.towns_crtc_layerscr[1],1);
+				towns_crtc_draw_layer(machine(),bitmap,&m_video.towns_crtc_layerscr[1],1);
 		}
 	}
 
 #if 0
 #ifdef SPR_DEBUG
-	if(screen.machine().input().code_pressed(KEYCODE_O))
+	if(machine().input().code_pressed(KEYCODE_O))
 		pshift+=0x80;
-	if(screen.machine().input().code_pressed(KEYCODE_I))
+	if(machine().input().code_pressed(KEYCODE_I))
 		pshift-=0x80;
 	popmessage("Pixel shift = %08x",pshift);
 #endif

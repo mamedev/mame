@@ -202,10 +202,10 @@ UINT32 lsasquad_state::screen_update_lsasquad(screen_device &screen, bitmap_ind1
 {
 	bitmap.fill(511, cliprect);
 
-	draw_layer(screen.machine(), bitmap, cliprect, m_scrollram + 0x000);
-	draw_layer(screen.machine(), bitmap, cliprect, m_scrollram + 0x080);
-	draw_sprites(screen.machine(), bitmap, cliprect);
-	draw_layer(screen.machine(), bitmap, cliprect, m_scrollram + 0x100);
+	draw_layer(machine(), bitmap, cliprect, m_scrollram + 0x000);
+	draw_layer(machine(), bitmap, cliprect, m_scrollram + 0x080);
+	draw_sprites(machine(), bitmap, cliprect);
+	draw_layer(machine(), bitmap, cliprect, m_scrollram + 0x100);
 	return 0;
 }
 
@@ -213,8 +213,8 @@ UINT32 lsasquad_state::screen_update_lsasquad(screen_device &screen, bitmap_ind1
 UINT32 lsasquad_state::screen_update_daikaiju(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(511, cliprect);
-	drawbg(screen.machine(), bitmap, cliprect, 0); // bottom
-	draw_sprites(screen.machine(), bitmap, cliprect);
-	drawbg(screen.machine(), bitmap, cliprect, 1);	// top = palette $d ?
+	drawbg(machine(), bitmap, cliprect, 0); // bottom
+	draw_sprites(machine(), bitmap, cliprect);
+	drawbg(machine(), bitmap, cliprect, 1);	// top = palette $d ?
 	return 0;
 }

@@ -284,7 +284,7 @@ UINT32 cntsteer_state::screen_update_zerotrgt(screen_device &screen, bitmap_ind1
 {
 
 	if (m_disable_roz)
-		bitmap.fill(screen.machine().pens[8 * m_bg_color_bank], cliprect);
+		bitmap.fill(machine().pens[8 * m_bg_color_bank], cliprect);
 	else
 	{
 		int p1, p2, p3, p4;
@@ -324,7 +324,7 @@ UINT32 cntsteer_state::screen_update_zerotrgt(screen_device &screen, bitmap_ind1
 						0, 0);
 	}
 
-	zerotrgt_draw_sprites(screen.machine(), bitmap, cliprect);
+	zerotrgt_draw_sprites(machine(), bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -334,7 +334,7 @@ UINT32 cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_ind1
 {
 
 	if (m_disable_roz)
-		bitmap.fill(screen.machine().pens[8 * m_bg_color_bank], cliprect);
+		bitmap.fill(machine().pens[8 * m_bg_color_bank], cliprect);
 	else
 	{
 		int p1, p2, p3, p4;
@@ -372,7 +372,7 @@ UINT32 cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_ind1
 						0, 0);
 	}
 
-	cntsteer_draw_sprites(screen.machine(), bitmap, cliprect);
+	cntsteer_draw_sprites(machine(), bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;

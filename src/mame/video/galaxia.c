@@ -111,12 +111,12 @@ UINT32 galaxia_state::screen_update_galaxia(screen_device &screen, bitmap_ind16 
 {
 	int x, y;
 
-	bitmap_ind16 &s2636_0_bitmap = s2636_update(screen.machine().device("s2636_0"), cliprect);
-	bitmap_ind16 &s2636_1_bitmap = s2636_update(screen.machine().device("s2636_1"), cliprect);
-	bitmap_ind16 &s2636_2_bitmap = s2636_update(screen.machine().device("s2636_2"), cliprect);
+	bitmap_ind16 &s2636_0_bitmap = s2636_update(machine().device("s2636_0"), cliprect);
+	bitmap_ind16 &s2636_1_bitmap = s2636_update(machine().device("s2636_1"), cliprect);
+	bitmap_ind16 &s2636_2_bitmap = s2636_update(machine().device("s2636_2"), cliprect);
 
 	bitmap.fill(0, cliprect);
-	cvs_update_stars(screen.machine(), bitmap, cliprect, STAR_PEN, 1);
+	cvs_update_stars(machine(), bitmap, cliprect, STAR_PEN, 1);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -177,10 +177,10 @@ UINT32 galaxia_state::screen_update_astrowar(screen_device &screen, bitmap_ind16
 	// astrowar has only one S2636
 	int x, y;
 
-	bitmap_ind16 &s2636_0_bitmap = s2636_update(screen.machine().device("s2636_0"), cliprect);
+	bitmap_ind16 &s2636_0_bitmap = s2636_update(machine().device("s2636_0"), cliprect);
 
 	bitmap.fill(0, cliprect);
-	cvs_update_stars(screen.machine(), bitmap, cliprect, STAR_PEN, 1);
+	cvs_update_stars(machine(), bitmap, cliprect, STAR_PEN, 1);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	copybitmap(m_temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 

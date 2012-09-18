@@ -644,11 +644,11 @@ UINT32 namcona1_state::screen_update_namcona1(screen_device &screen, bitmap_ind1
 			/* palette updates are delayed when graphics are disabled */
 			for( which=0; which<0x1000; which++ )
 			{
-				UpdatePalette(screen.machine(), which );
+				UpdatePalette(machine(), which );
 			}
 			m_palette_is_dirty = 0;
 		}
-		UpdateGfx(screen.machine());
+		UpdateGfx(machine());
 		for( which=0; which<NAMCONA1_NUM_TILEMAPS; which++ )
 		{
 			int tilemap_color = m_vreg[0xb0/2+(which&3)]&0xf;
@@ -668,7 +668,7 @@ UINT32 namcona1_state::screen_update_namcona1(screen_device &screen, bitmap_ind1
 			}
 		}
 
-		screen.machine().priority_bitmap.fill(0, cliprect );
+		machine().priority_bitmap.fill(0, cliprect );
 
 		bitmap.fill(0xff, cliprect ); /* background color? */
 
@@ -687,12 +687,12 @@ UINT32 namcona1_state::screen_update_namcona1(screen_device &screen, bitmap_ind1
 				}
 				if( pri == priority )
 				{
-					draw_background(screen.machine(),bitmap,cliprect,which,priority);
+					draw_background(machine(),bitmap,cliprect,which,priority);
 				}
 			} /* next tilemap */
 		} /* next priority level */
 
-		draw_sprites(screen.machine(),bitmap,cliprect);
+		draw_sprites(machine(),bitmap,cliprect);
 	} /* gfx enabled */
 	return 0;
 }

@@ -239,20 +239,20 @@ UINT32 bking_state::screen_update_bking(screen_device &screen, bitmap_ind16 &bit
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the balls */
-	drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2],
+	drawgfx_transpen(bitmap, cliprect, machine().gfx[2],
 		m_ball1_pic,
 		m_palette_bank,
 		0, 0,
 		m_xld1, m_yld1, 0);
 
-	drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[3],
+	drawgfx_transpen(bitmap, cliprect, machine().gfx[3],
 		m_ball2_pic,
 		m_palette_bank,
 		0, 0,
 		m_xld2, m_yld2, 0);
 
 	/* draw the crow */
-	drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
+	drawgfx_transpen(bitmap, cliprect, machine().gfx[1],
 		m_crow_pic,
 		m_palette_bank,
 		m_crow_flip, m_crow_flip,
@@ -278,7 +278,7 @@ void bking_state::screen_eof_bking(screen_device &screen, bool state)
 			xld = m_xld1;
 			yld = m_yld1;
 
-			drawgfx_opaque(m_tmp_bitmap2, rect, screen.machine().gfx[2],
+			drawgfx_opaque(m_tmp_bitmap2, rect, machine().gfx[2],
 				m_ball1_pic,
 				0,
 				0, 0,
@@ -292,7 +292,7 @@ void bking_state::screen_eof_bking(screen_device &screen, bool state)
 			xld = m_xld2;
 			yld = m_yld2;
 
-			drawgfx_opaque(m_tmp_bitmap2, rect, screen.machine().gfx[3],
+			drawgfx_opaque(m_tmp_bitmap2, rect, machine().gfx[3],
 				m_ball2_pic,
 				0,
 				0, 0,
@@ -311,7 +311,7 @@ void bking_state::screen_eof_bking(screen_device &screen, bool state)
 
 		if (latch != 0)
 		{
-			const UINT8* MASK = screen.machine().root_device().memregion("user1")->base() + 8 * m_hit;
+			const UINT8* MASK = machine().root_device().memregion("user1")->base() + 8 * m_hit;
 
 			int x;
 			int y;

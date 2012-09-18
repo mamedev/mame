@@ -446,7 +446,7 @@ static void glyph_print(running_machine &machine, bitmap_rgb32 &bitmap, INT32 x,
 UINT32 ssem_state::screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 line = 0;
-	device_t *ssem_cpu = screen.machine().device("maincpu");
+	device_t *ssem_cpu = machine().device("maincpu");
 	UINT32 accum = ssem_cpu->state().state_int(SSEM_A);
 	UINT32 bit = 0;
 	UINT32 word = 0;
@@ -461,11 +461,11 @@ UINT32 ssem_state::screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitma
 		{
 			if(word & (1 << (31 - bit)))
 			{
-				glyph_print(screen.machine(), bitmap, bit << 3, line << 3, "%c", line == m_store_line ? 4 : 2);
+				glyph_print(machine(), bitmap, bit << 3, line << 3, "%c", line == m_store_line ? 4 : 2);
 			}
 			else
 			{
-				glyph_print(screen.machine(), bitmap, bit << 3, line << 3, "%c", line == m_store_line ? 3 : 1);
+				glyph_print(machine(), bitmap, bit << 3, line << 3, "%c", line == m_store_line ? 3 : 1);
 			}
 		}
 	}
@@ -474,11 +474,11 @@ UINT32 ssem_state::screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitma
 	{
 		if(accum & (1 << bit))
 		{
-			glyph_print(screen.machine(), bitmap, bit << 3, 264, "%c", 2);
+			glyph_print(machine(), bitmap, bit << 3, 264, "%c", 2);
 		}
 		else
 		{
-			glyph_print(screen.machine(), bitmap, bit << 3, 264, "%c", 1);
+			glyph_print(machine(), bitmap, bit << 3, 264, "%c", 1);
 		}
 	}
 
@@ -486,7 +486,7 @@ UINT32 ssem_state::screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitma
 				   (m_store[(m_store_line << 2) | 1] << 16) |
 				   (m_store[(m_store_line << 2) | 2] <<  8) |
 				   (m_store[(m_store_line << 2) | 3] <<  0));
-	glyph_print(screen.machine(), bitmap, 0, 272, "LINE:%02d  VALUE:%08x  HALT:%d", m_store_line, word, ssem_cpu->state().state_int(SSEM_HALT));
+	glyph_print(machine(), bitmap, 0, 272, "LINE:%02d  VALUE:%08x  HALT:%d", m_store_line, word, ssem_cpu->state().state_int(SSEM_HALT));
 	return 0;
 }
 

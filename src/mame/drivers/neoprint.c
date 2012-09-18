@@ -115,8 +115,8 @@ UINT32 neoprint_state::screen_update_neoprint(screen_device &screen, bitmap_ind1
 {
 	bitmap.fill(0, cliprect);
 
-	draw_layer(screen.machine(),bitmap,cliprect,1,2);
-	draw_layer(screen.machine(),bitmap,cliprect,0,2);
+	draw_layer(machine(),bitmap,cliprect,1,2);
+	draw_layer(machine(),bitmap,cliprect,0,2);
 
 	return 0;
 }
@@ -125,9 +125,9 @@ UINT32 neoprint_state::screen_update_nprsp(screen_device &screen, bitmap_ind16 &
 {
 	bitmap.fill(0, cliprect);
 
-	draw_layer(screen.machine(),bitmap,cliprect,1,0);
-	draw_layer(screen.machine(),bitmap,cliprect,2,0);
-	draw_layer(screen.machine(),bitmap,cliprect,0,0);
+	draw_layer(machine(),bitmap,cliprect,1,0);
+	draw_layer(machine(),bitmap,cliprect,2,0);
+	draw_layer(machine(),bitmap,cliprect,0,0);
 
 	return 0;
 }

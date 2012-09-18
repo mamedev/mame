@@ -161,19 +161,19 @@ UINT32 quizpun2_state::screen_update_quizpun2(screen_device &screen, bitmap_ind1
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (screen.machine().input().code_pressed(KEYCODE_Z))
+	if (machine().input().code_pressed(KEYCODE_Z))
 	{
 		int msk = 0;
-		if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-		if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+		if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+		if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
 
 	if (layers_ctrl & 1)	m_bg_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	else					bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	else					bitmap.fill(get_black_pen(machine()), cliprect);
 
-bitmap.fill(get_black_pen(screen.machine()), cliprect);
+bitmap.fill(get_black_pen(machine()), cliprect);
 	if (layers_ctrl & 2)	m_fg_tmap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;

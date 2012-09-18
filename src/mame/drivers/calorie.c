@@ -192,12 +192,12 @@ UINT32 calorie_state::screen_update_calorie(screen_device &screen, bitmap_ind16 
 		if (m_sprites[x + 1] & 0x10)
 		{
 			 /* 32x32 sprites */
-			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[3], tileno | 0x40, color, flipx, flipy, xpos, ypos - 31, 0);
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[3], tileno | 0x40, color, flipx, flipy, xpos, ypos - 31, 0);
 		}
 		else
 		{
 			/* 16x16 sprites */
-			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], tileno, color, flipx, flipy, xpos, ypos - 15, 0);
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[2], tileno, color, flipx, flipy, xpos, ypos - 15, 0);
 		}
 	}
 	return 0;

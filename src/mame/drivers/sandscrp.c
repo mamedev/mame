@@ -117,12 +117,12 @@ public:
 
 UINT32 sandscrp_state::screen_update_sandscrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *pandora = screen.machine().device("pandora");
+	device_t *pandora = machine().device("pandora");
 	bitmap.fill(0, cliprect);
 
 	int i;
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	m_view2_0->kaneko16_prepare(bitmap, cliprect);
 
@@ -173,9 +173,9 @@ void sandscrp_state::screen_eof_sandscrp(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		device_t *pandora = screen.machine().device("pandora");
+		device_t *pandora = machine().device("pandora");
 		m_sprite_irq = 1;
-		update_irq_state(screen.machine());
+		update_irq_state(machine());
 		pandora_eof(pandora);
 	}
 }

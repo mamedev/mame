@@ -21,7 +21,7 @@ UINT32 copsnrob_state::screen_update_copsnrob(screen_device &screen, bitmap_ind1
 		sx = 31 - (offs % 32);
 		sy = offs / 32;
 
-		drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],
+		drawgfx_opaque(bitmap,cliprect,machine().gfx[0],
 				m_videoram[offs] & 0x3f,0,
 				0,0,
 				8*sx,8*sy);
@@ -30,25 +30,25 @@ UINT32 copsnrob_state::screen_update_copsnrob(screen_device &screen, bitmap_ind1
 
 	/* Draw the cars. Positioning was based on a screen shot */
 	if (m_cary[0])
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				m_carimage[0],0,
 				1,0,
 				0xe4,256 - m_cary[0],0);
 
 	if (m_cary[1])
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				m_carimage[1],0,
 				1,0,
 				0xc4,256 - m_cary[1],0);
 
 	if (m_cary[2])
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				m_carimage[2],0,
 				0,0,
 				0x24,256 - m_cary[2],0);
 
 	if (m_cary[3])
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				m_carimage[3],0,
 				0,0,
 				0x04,256 - m_cary[3],0);
@@ -77,7 +77,7 @@ UINT32 copsnrob_state::screen_update_copsnrob(screen_device &screen, bitmap_ind1
 			{
 				/* We've hit a truck's back end, so draw the truck.  The front
                    end may be off the top of the screen, but we don't care. */
-				drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[2],
+				drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 						0,0,
 						0,0,
 						0x80,256 - (y + 31),0);
@@ -89,7 +89,7 @@ UINT32 copsnrob_state::screen_update_copsnrob(screen_device &screen, bitmap_ind1
 			{
 				/* We missed a truck's back end (it was off the bottom of the
                    screen) but have hit its front end, so draw the truck. */
-				drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[2],
+				drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 						0,0,
 						0,0,
 						0x80,256 - y,0);

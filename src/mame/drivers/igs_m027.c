@@ -185,7 +185,7 @@ void igs_m027_state::video_start()
 UINT32 igs_m027_state::screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//??????????
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	//??????
 	m_igs_bg_tilemap->draw(bitmap, cliprect, 0,0);

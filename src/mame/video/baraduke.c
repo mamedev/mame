@@ -311,9 +311,9 @@ UINT32 baraduke_state::screen_update_baraduke(screen_device &screen, bitmap_ind1
 	/* flip screen is embedded in the sprite control registers */
 	/* can't use flip_screen_set() because the visible area is asymmetrical */
 	flip_screen_set_no_update(spriteram[0x07f6] & 0x01);
-	screen.machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
-	set_scroll(screen.machine(), 0);
-	set_scroll(screen.machine(), 1);
+	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	set_scroll(machine(), 0);
+	set_scroll(machine(), 1);
 
 	if (((m_xscroll[0] & 0x0e00) >> 9) == 6)
 		back = 1;
@@ -321,9 +321,9 @@ UINT32 baraduke_state::screen_update_baraduke(screen_device &screen, bitmap_ind1
 		back = 0;
 
 	m_bg_tilemap[back]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-	draw_sprites(screen.machine(), bitmap,cliprect,0);
+	draw_sprites(machine(), bitmap,cliprect,0);
 	m_bg_tilemap[back ^ 1]->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap,cliprect,1);
+	draw_sprites(machine(), bitmap,cliprect,1);
 
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;

@@ -199,7 +199,7 @@ void expro02_state::palette_init()
 
 UINT32 expro02_state::screen_update_galsnew(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//  kaneko16_fill_bitmap(screen.machine(),bitmap,cliprect);
+//  kaneko16_fill_bitmap(machine(),bitmap,cliprect);
 	int y,x;
 	int count;
 
@@ -238,7 +238,7 @@ UINT32 expro02_state::screen_update_galsnew(screen_device &screen, bitmap_ind16 
 
 	int i;
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	m_view2_0->kaneko16_prepare(bitmap, cliprect);
 
@@ -247,7 +247,7 @@ UINT32 expro02_state::screen_update_galsnew(screen_device &screen, bitmap_ind16 
 		m_view2_0->render_tilemap_chip(bitmap,cliprect,i);
 	}
 
-	m_kaneko_spr->kaneko16_render_sprites(screen.machine(),bitmap,cliprect, m_spriteram, m_spriteram.bytes());
+	m_kaneko_spr->kaneko16_render_sprites(machine(),bitmap,cliprect, m_spriteram, m_spriteram.bytes());
 	return 0;
 }
 

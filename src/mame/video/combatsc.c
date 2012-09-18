@@ -397,9 +397,9 @@ UINT32 combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_ind1
 {
 	int i;
 
-	set_pens(screen.machine());
+	set_pens(machine());
 
-	address_space &space = screen.machine().driver_data()->generic_space();
+	address_space &space = machine().driver_data()->generic_space();
 	if (k007121_ctrlram_r(m_k007121_1, space, 1) & 0x02)
 	{
 		m_bg_tilemap[0]->set_scroll_rows(32);
@@ -427,7 +427,7 @@ UINT32 combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_ind1
 	m_bg_tilemap[0]->set_scrolly(0, k007121_ctrlram_r(m_k007121_1, space, 2));
 	m_bg_tilemap[1]->set_scrolly(0, k007121_ctrlram_r(m_k007121_2, space, 2));
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	if (m_priority == 0)
 	{
@@ -437,8 +437,8 @@ UINT32 combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_ind1
 		m_bg_tilemap[0]->draw(bitmap, cliprect, 1, 2);
 
 		/* we use the priority buffer so sprites are drawn front to back */
-		draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram[1], 1, 0x0f00);
-		draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram[0], 0, 0x4444);
+		draw_sprites(machine(), bitmap, cliprect, m_spriteram[1], 1, 0x0f00);
+		draw_sprites(machine(), bitmap, cliprect, m_spriteram[0], 0, 0x4444);
 	}
 	else
 	{
@@ -448,8 +448,8 @@ UINT32 combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_ind1
 		m_bg_tilemap[1]->draw(bitmap, cliprect, 0, 8);
 
 		/* we use the priority buffer so sprites are drawn front to back */
-		draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram[1], 1, 0x0f00);
-		draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram[0], 0, 0x4444);
+		draw_sprites(machine(), bitmap, cliprect, m_spriteram[1], 1, 0x0f00);
+		draw_sprites(machine(), bitmap, cliprect, m_spriteram[0], 0, 0x4444);
 	}
 
 	if (k007121_ctrlram_r(m_k007121_1, space, 1) & 0x08)
@@ -555,7 +555,7 @@ UINT32 combatsc_state::screen_update_combatscb(screen_device &screen, bitmap_ind
 {
 	int i;
 
-	set_pens(screen.machine());
+	set_pens(machine());
 
 	for (i = 0; i < 32; i++)
 	{
@@ -568,16 +568,16 @@ UINT32 combatsc_state::screen_update_combatscb(screen_device &screen, bitmap_ind
 	if (m_priority == 0)
 	{
 		m_bg_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		bootleg_draw_sprites(screen.machine(), bitmap,cliprect, m_page[0], 0);
+		bootleg_draw_sprites(machine(), bitmap,cliprect, m_page[0], 0);
 		m_bg_tilemap[0]->draw(bitmap, cliprect, 0 ,0);
-		bootleg_draw_sprites(screen.machine(), bitmap,cliprect, m_page[1], 1);
+		bootleg_draw_sprites(machine(), bitmap,cliprect, m_page[1], 1);
 	}
 	else
 	{
 		m_bg_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		bootleg_draw_sprites(screen.machine(), bitmap,cliprect, m_page[0], 0);
+		bootleg_draw_sprites(machine(), bitmap,cliprect, m_page[0], 0);
 		m_bg_tilemap[1]->draw(bitmap, cliprect, 0, 0);
-		bootleg_draw_sprites(screen.machine(), bitmap,cliprect, m_page[1], 1);
+		bootleg_draw_sprites(machine(), bitmap,cliprect, m_page[1], 1);
 	}
 
 	m_textlayer->draw(bitmap, cliprect, 0, 0);

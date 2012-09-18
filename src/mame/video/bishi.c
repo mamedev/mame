@@ -61,7 +61,7 @@ UINT32 bishi_state::screen_update_bishi(screen_device &screen, bitmap_rgb32 &bit
 
 	konami_sortlayers4(layers, layerpri);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	for (i = 0; i < 4; i++)
 	{

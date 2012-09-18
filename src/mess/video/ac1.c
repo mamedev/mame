@@ -29,14 +29,14 @@ void ac1_state::video_start()
 UINT32 ac1_state::screen_update_ac1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
-	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	for(y = 0; y < 16; y++ )
 	{
 		for(x = 0; x < 64; x++ )
 		{
 			int code = space.read_byte(AC1_VIDEO_MEMORY + x + y*64);
-			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0],  code , 0, 0,0, 63*6-x*6,15*8-y*8);
+			drawgfx_opaque(bitmap, cliprect, machine().gfx[0],  code , 0, 0,0, 63*6-x*6,15*8-y*8);
 		}
 	}
 	return 0;
@@ -45,14 +45,14 @@ UINT32 ac1_state::screen_update_ac1(screen_device &screen, bitmap_ind16 &bitmap,
 UINT32 ac1_state::screen_update_ac1_32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
-	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	for(y = 0; y < 32; y++ )
 	{
 		for(x = 0; x < 64; x++ )
 		{
 			int code = space.read_byte(AC1_VIDEO_MEMORY + x + y*64);
-			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0],  code , 0, 0,0, 63*6-x*6,31*8-y*8);
+			drawgfx_opaque(bitmap, cliprect, machine().gfx[0],  code , 0, 0,0, 63*6-x*6,31*8-y*8);
 		}
 	}
 	return 0;

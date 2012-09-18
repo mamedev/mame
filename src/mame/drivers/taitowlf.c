@@ -89,9 +89,9 @@ public:
 UINT32 taitowlf_state::screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
-	const UINT8 *blit_ram = screen.machine().root_device().memregion("user5")->base();
+	const UINT8 *blit_ram = machine().root_device().memregion("user5")->base();
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	count = (0);
 
@@ -104,7 +104,7 @@ UINT32 taitowlf_state::screen_update_taitowlf(screen_device &screen, bitmap_rgb3
 			color = (blit_ram[count] & 0xff);
 
 			if(cliprect.contains(x+0, y))
-				bitmap.pix32(y, x+0) = screen.machine().pens[color];
+				bitmap.pix32(y, x+0) = machine().pens[color];
 
 			count++;
 		}

@@ -152,7 +152,7 @@ UINT32 flipjack_state::screen_update_flipjack(screen_device &screen, bitmap_rgb3
 {
 	int x,y,count;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	// draw playfield
 	if (m_layer & 2)
@@ -179,7 +179,7 @@ UINT32 flipjack_state::screen_update_flipjack(screen_device &screen, bitmap_rgb3
 						color = ((pen_r >> (7-xi)) & 1)<<0;
 						color|= ((pen_g >> (7-xi)) & 1)<<1;
 						color|= ((pen_b >> (7-xi)) & 1)<<2;
-						bitmap.pix32(y, x+xi) = screen.machine().pens[color+0x80];
+						bitmap.pix32(y, x+xi) = machine().pens[color+0x80];
 					}
 				}
 
@@ -193,7 +193,7 @@ UINT32 flipjack_state::screen_update_flipjack(screen_device &screen, bitmap_rgb3
 	{
 		for (x=0;x<32;x++)
 		{
-			gfx_element *gfx = screen.machine().gfx[0];
+			gfx_element *gfx = machine().gfx[0];
 			int tile = m_bank << 8 | m_vram[x+y*0x100];
 			int color = m_cram[x+y*0x100] & 0x3f;
 
@@ -221,7 +221,7 @@ UINT32 flipjack_state::screen_update_flipjack(screen_device &screen, bitmap_rgb3
 					{
 						color = ((pen >> (7-xi)) & 1) ? 0x87 : 0;
 						if(color)
-							bitmap.pix32(y, x+xi) = screen.machine().pens[color];
+							bitmap.pix32(y, x+xi) = machine().pens[color];
 					}
 				}
 

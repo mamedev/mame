@@ -118,15 +118,15 @@ UINT32 fitfight_state::screen_update_fitfight(screen_device &screen, bitmap_ind1
 	vblank = (m_fof_700000[0] & 0x8000);
 
 	if (vblank > 0)
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 	else {
-//      if (screen.machine().input().code_pressed(KEYCODE_Q))
+//      if (machine().input().code_pressed(KEYCODE_Q))
 //          scrollbak = ((m_fof_a00000[0] & 0xff00) >> 5) - ((m_fof_700000[0] & 0x0038) >> 3);
-//      else if (screen.machine().input().code_pressed(KEYCODE_W))
+//      else if (machine().input().code_pressed(KEYCODE_W))
 //          scrollbak = ((m_fof_a00000[0] & 0xff00) >> 5) + ((m_fof_700000[0] & 0x01c0) >> 6);
-//      else if (screen.machine().input().code_pressed(KEYCODE_E))
+//      else if (machine().input().code_pressed(KEYCODE_E))
 //          scrollbak = ((m_fof_a00000[0] & 0xff00) >> 5) - ((m_fof_700000[0] & 0x01c0) >> 6);
-//      else if (screen.machine().input().code_pressed(KEYCODE_R))
+//      else if (machine().input().code_pressed(KEYCODE_R))
 //          scrollbak = ((m_fof_a00000[0] & 0xff00) >> 5) + ((m_fof_700000[0] & 0x0038) >> 3);
 //      else
 		scrollbak = ((m_fof_a00000[0] & 0xffe0) >> 5);
@@ -134,24 +134,24 @@ UINT32 fitfight_state::screen_update_fitfight(screen_device &screen, bitmap_ind1
 		m_fof_bak_tilemap->set_scrolly(0, m_fof_a00000[0] & 0xff);
 		m_fof_bak_tilemap->draw(bitmap, cliprect, 0, 0);
 
-		draw_sprites(screen.machine(), bitmap, cliprect, 0);
+		draw_sprites(machine(), bitmap, cliprect, 0);
 
-//      if (screen.machine().input().code_pressed(KEYCODE_A))
+//      if (machine().input().code_pressed(KEYCODE_A))
 //          scrollmid = ((m_fof_900000[0] & 0xff00) >> 5) - ((m_fof_700000[0] & 0x01c0) >> 6);
-//      else if (screen.machine().input().code_pressed(KEYCODE_S))
+//      else if (machine().input().code_pressed(KEYCODE_S))
 //          scrollmid = ((m_fof_900000[0] & 0xff00) >> 5) + ((m_fof_700000[0] & 0x0038) >> 3);
-//      else if (screen.machine().input().code_pressed(KEYCODE_D))
+//      else if (machine().input().code_pressed(KEYCODE_D))
 //          scrollmid = ((m_fof_900000[0] & 0xff00) >> 5) - ((m_fof_700000[0] & 0x0038) >> 3);
-//      else if (screen.machine().input().code_pressed(KEYCODE_F))
+//      else if (machine().input().code_pressed(KEYCODE_F))
 //          scrollmid = ((m_fof_900000[0] & 0xff00) >> 5) + ((m_fof_700000[0] & 0x01c0) >> 6);
 //      else
 		scrollmid = ((m_fof_900000[0] & 0xffe0) >> 5);
 		m_fof_mid_tilemap->set_scrollx(0, scrollmid );
 		m_fof_mid_tilemap->set_scrolly(0, m_fof_900000[0] & 0xff);
-//      if (!screen.machine().input().code_pressed(KEYCODE_F))
+//      if (!machine().input().code_pressed(KEYCODE_F))
 		m_fof_mid_tilemap->draw(bitmap, cliprect, 0, 0);
 
-		draw_sprites(screen.machine(), bitmap, cliprect, 1);
+		draw_sprites(machine(), bitmap, cliprect, 1);
 
 		m_fof_txt_tilemap->draw(bitmap, cliprect, 0, 0);
 	}

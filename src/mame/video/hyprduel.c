@@ -694,9 +694,9 @@ UINT32 hyprduel_state::screen_update_hyprduel(screen_device &screen, bitmap_ind1
 
 		if (dirty)
 		{
-			dirty_tiles(screen.machine(), 0, m_vram_0);
-			dirty_tiles(screen.machine(), 1, m_vram_1);
-			dirty_tiles(screen.machine(), 2, m_vram_2);
+			dirty_tiles(machine(), 0, m_vram_0);
+			dirty_tiles(machine(), 1, m_vram_1);
+			dirty_tiles(machine(), 2, m_vram_2);
 		}
 	}
 
@@ -704,7 +704,7 @@ UINT32 hyprduel_state::screen_update_hyprduel(screen_device &screen, bitmap_ind1
 	m_sprite_yoffs = m_videoregs[0x04 / 2] - screen.height() / 2 - m_sprite_yoffs_sub;
 
 	/* The background color is selected by a register */
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill((m_videoregs[0x12 / 2] & 0x0fff) + 0x1000, cliprect);
 
 	/*  Screen Control Register:
@@ -723,12 +723,12 @@ UINT32 hyprduel_state::screen_update_hyprduel(screen_device &screen, bitmap_ind1
 	flip_screen_set(screenctrl & 1);
 
 #if 0
-if (screen.machine().input().code_pressed(KEYCODE_Z))
+if (machine().input().code_pressed(KEYCODE_Z))
 {	int msk = 0;
-	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 0x01;
-	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 0x02;
-	if (screen.machine().input().code_pressed(KEYCODE_E))	msk |= 0x04;
-	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 0x08;
+	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 0x01;
+	if (machine().input().code_pressed(KEYCODE_W))	msk |= 0x02;
+	if (machine().input().code_pressed(KEYCODE_E))	msk |= 0x04;
+	if (machine().input().code_pressed(KEYCODE_A))	msk |= 0x08;
 	if (msk != 0)
 	{
 		bitmap.fill(0, cliprect);
@@ -743,10 +743,10 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 #endif
 
 	for (pri = 3; pri >= 0; pri--)
-		draw_layers(screen.machine(), bitmap, cliprect, pri, layers_ctrl);
+		draw_layers(machine(), bitmap, cliprect, pri, layers_ctrl);
 
 	if (layers_ctrl & 0x08)
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 
 	return 0;
 }

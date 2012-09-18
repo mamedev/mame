@@ -46,16 +46,16 @@ UINT32 fgoal_state::screen_update_fgoal(screen_device &screen, bitmap_ind16 &bit
 
 	/* draw color overlay foreground and background */
 
-	if (m_fgoal_player == 1 && (screen.machine().root_device().ioport("IN1")->read() & 0x40))
+	if (m_fgoal_player == 1 && (machine().root_device().ioport("IN1")->read() & 0x40))
 	{
-		drawgfxzoom_opaque(m_fgbitmap, cliprect, screen.machine().gfx[0],
+		drawgfxzoom_opaque(m_fgbitmap, cliprect, machine().gfx[0],
 			0, (m_fgoal_player << 2) | m_current_color,
 			1, 1,
 			0, 16,
 			0x40000,
 			0x40000);
 
-		drawgfxzoom_opaque(m_bgbitmap, cliprect, screen.machine().gfx[1],
+		drawgfxzoom_opaque(m_bgbitmap, cliprect, machine().gfx[1],
 			0, 0,
 			1, 1,
 			0, 16,
@@ -64,14 +64,14 @@ UINT32 fgoal_state::screen_update_fgoal(screen_device &screen, bitmap_ind16 &bit
 	}
 	else
 	{
-		drawgfxzoom_opaque(m_fgbitmap, cliprect, screen.machine().gfx[0],
+		drawgfxzoom_opaque(m_fgbitmap, cliprect, machine().gfx[0],
 			0, (m_fgoal_player << 2) | m_current_color,
 			0, 0,
 			0, 0,
 			0x40000,
 			0x40000);
 
-		drawgfxzoom_opaque(m_bgbitmap, cliprect, screen.machine().gfx[1],
+		drawgfxzoom_opaque(m_bgbitmap, cliprect, machine().gfx[1],
 			0, 0,
 			0, 0,
 			0, 0,

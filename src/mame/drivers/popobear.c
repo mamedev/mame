@@ -264,11 +264,11 @@ UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind1
 
 	//popmessage("%04x",m_vregs[0/2]);
 
-	draw_layer(screen.machine(),bitmap,cliprect,3);
-	draw_layer(screen.machine(),bitmap,cliprect,2);
-	draw_layer(screen.machine(),bitmap,cliprect,1);
-	draw_layer(screen.machine(),bitmap,cliprect,0);
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	draw_layer(machine(),bitmap,cliprect,3);
+	draw_layer(machine(),bitmap,cliprect,2);
+	draw_layer(machine(),bitmap,cliprect,1);
+	draw_layer(machine(),bitmap,cliprect,0);
+	draw_sprites(machine(),bitmap,cliprect);
 
 	return 0;
 }

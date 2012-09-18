@@ -279,12 +279,12 @@ UINT32 pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 &b
 			if ( tile < 0xe0 )
 			{
 				tile += ( m_io_regs[7] * 8 );
-				drawgfx_opaque( bitmap, cliprect, screen.machine().gfx[0], tile, 0, 0, 0, x*8, y*8 );
+				drawgfx_opaque( bitmap, cliprect, machine().gfx[0], tile, 0, 0, 0, x*8, y*8 );
 			}
 			else
 			{
 				tile -= 0xe0;
-				drawgfx_opaque( bitmap, cliprect, screen.machine().gfx[1], tile, 0, 0, 0, x*8, y*8 );
+				drawgfx_opaque( bitmap, cliprect, machine().gfx[1], tile, 0, 0, 0, x*8, y*8 );
 			}
 		}
 	}

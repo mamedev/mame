@@ -926,18 +926,18 @@ UINT32 lockon_state::screen_update_lockon(screen_device &screen, bitmap_ind16 &b
 	/* If screen output is disabled, fill with black */
 	if (!BIT(m_ctrl_reg, 7))
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
 	/* Scan out the frame buffer in rotated order */
-	rotate_draw(screen.machine(), bitmap, cliprect);
+	rotate_draw(machine(), bitmap, cliprect);
 
 	/* Draw the character tilemap */
 	m_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* Draw the HUD */
-	hud_draw(screen.machine(), bitmap, cliprect);
+	hud_draw(machine(), bitmap, cliprect);
 
 	return 0;
 }
@@ -954,8 +954,8 @@ void lockon_state::screen_eof_lockon(screen_device &screen, bool state)
 		m_back_buffer = tmp;
 
 		/* Draw the frame buffer layers */
-		scene_draw(screen.machine());
-		ground_draw(screen.machine());
-		objects_draw(screen.machine());
+		scene_draw(machine());
+		ground_draw(machine());
+		objects_draw(machine());
 	}
 }

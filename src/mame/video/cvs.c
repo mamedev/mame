@@ -144,7 +144,7 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 	offs_t offs;
 	int scroll[8];
 
-	set_pens(screen.machine());
+	set_pens(machine());
 
 	/* draw the background */
 	for (offs = 0; offs < 0x0400; offs++)
@@ -158,7 +158,7 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 
 		int gfxnum = (code < ram_based_char_start_indices[m_character_banking_mode]) ? 0 : 1;
 
-		drawgfx_opaque(m_background_bitmap, m_background_bitmap.cliprect(), screen.machine().gfx[gfxnum],
+		drawgfx_opaque(m_background_bitmap, m_background_bitmap.cliprect(), machine().gfx[gfxnum],
 				code, color,
 				0, 0,
 				x, y);
@@ -174,7 +174,7 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 				collision_color = 0x102;
 		}
 
-		drawgfx_opaque(m_collision_background, m_collision_background.cliprect(), screen.machine().gfx[gfxnum],
+		drawgfx_opaque(m_collision_background, m_collision_background.cliprect(), machine().gfx[gfxnum],
 				code, collision_color,
 				0, 0,
 				x, y);
@@ -216,7 +216,7 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 					m_collision_register |= 0x08;
 
 				/* Bullet/Background Collision */
-				if (colortable_entry_get_value(screen.machine().colortable, m_scrolled_collision_background.pix16(offs, bx)))
+				if (colortable_entry_get_value(machine().colortable, m_scrolled_collision_background.pix16(offs, bx)))
 					m_collision_register |= 0x80;
 
 				bitmap.pix16(offs, bx) = BULLET_STAR_PEN;
@@ -251,7 +251,7 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x04;
 
 					/* S2636 vs. background collision detection */
-					if (colortable_entry_get_value(screen.machine().colortable, m_scrolled_collision_background.pix16(y, x)))
+					if (colortable_entry_get_value(machine().colortable, m_scrolled_collision_background.pix16(y, x)))
 					{
 						if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x10;
 						if (S2636_IS_PIXEL_DRAWN(pixel1)) m_collision_register |= 0x20;
@@ -264,7 +264,7 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 
 	/* stars circuit */
 	if (m_stars_on)
-		cvs_update_stars(screen.machine(), bitmap, cliprect, BULLET_STAR_PEN, 0);
+		cvs_update_stars(machine(), bitmap, cliprect, BULLET_STAR_PEN, 0);
 
 	return 0;
 }

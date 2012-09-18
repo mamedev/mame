@@ -549,7 +549,7 @@ static void nomnlnd_draw_background( screen_device &screen, bitmap_ind16 &bitmap
 UINT32 cosmic_state::screen_update_cosmicg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	draw_bitmap(screen.machine(), bitmap, cliprect);
+	draw_bitmap(machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -557,8 +557,8 @@ UINT32 cosmic_state::screen_update_cosmicg(screen_device &screen, bitmap_ind16 &
 UINT32 cosmic_state::screen_update_panic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	draw_bitmap(screen.machine(), bitmap, cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0x07, 1);
+	draw_bitmap(machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect, 0x07, 1);
 	return 0;
 }
 
@@ -567,8 +567,8 @@ UINT32 cosmic_state::screen_update_cosmica(screen_device &screen, bitmap_ind16 &
 {
 	bitmap.fill(0, cliprect);
 	cosmica_draw_starfield(screen, bitmap, cliprect);
-	draw_bitmap(screen.machine(), bitmap, cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0x0f, 0);
+	draw_bitmap(machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect, 0x0f, 0);
 	return 0;
 }
 
@@ -576,8 +576,8 @@ UINT32 cosmic_state::screen_update_cosmica(screen_device &screen, bitmap_ind16 &
 UINT32 cosmic_state::screen_update_magspot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	draw_bitmap(screen.machine(), bitmap, cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0x07, 0);
+	draw_bitmap(machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect, 0x07, 0);
 	return 0;
 }
 
@@ -588,10 +588,10 @@ UINT32 cosmic_state::screen_update_devzone(screen_device &screen, bitmap_ind16 &
 	bitmap.fill(0, cliprect);
 
 	if (m_background_enable)
-		devzone_draw_grid(screen.machine(), bitmap, cliprect);
+		devzone_draw_grid(machine(), bitmap, cliprect);
 
-	draw_bitmap(screen.machine(), bitmap, cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0x07, 0);
+	draw_bitmap(machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect, 0x07, 0);
 	return 0;
 }
 
@@ -603,8 +603,8 @@ UINT32 cosmic_state::screen_update_nomnlnd(screen_device &screen, bitmap_ind16 &
        have the highest priority */
 
 	bitmap.fill(0, cliprect);
-	draw_bitmap(screen.machine(), bitmap, cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0x07, 0);
+	draw_bitmap(machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect, 0x07, 0);
 
 	if (m_background_enable)
 		nomnlnd_draw_background(screen, bitmap, cliprect);

@@ -48,7 +48,7 @@ UINT32 kaneko16_state::screen_update_common(screen_device &screen, bitmap_ind16 
 {
 	int i;
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	if (m_view2_0) m_view2_0->kaneko16_prepare(bitmap, cliprect);
 	if (m_view2_1) m_view2_1->kaneko16_prepare(bitmap, cliprect);
@@ -68,13 +68,13 @@ UINT32 kaneko16_state::screen_update_common(screen_device &screen, bitmap_ind16 
 
 UINT32 kaneko16_state::screen_update_kaneko16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	kaneko16_fill_bitmap(screen.machine(),bitmap,cliprect);
+	kaneko16_fill_bitmap(machine(),bitmap,cliprect);
 
 	// if the display is disabled, do nothing?
 	if (!m_disp_enable) return 0;
 
 	SCREEN_UPDATE16_CALL_MEMBER(common);
-	m_kaneko_spr->kaneko16_render_sprites(screen.machine(),bitmap,cliprect, m_spriteram, m_spriteram.bytes());
+	m_kaneko_spr->kaneko16_render_sprites(machine(),bitmap,cliprect, m_spriteram, m_spriteram.bytes());
 	return 0;
 }
 
@@ -192,12 +192,12 @@ static void kaneko16_render_15bpp_bitmap(running_machine &machine, bitmap_ind16 
 UINT32 kaneko16_berlwall_state::screen_update_berlwall(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// berlwall uses a 15bpp bitmap as a bg, not a solid fill
-	kaneko16_render_15bpp_bitmap(screen.machine(),bitmap,cliprect);
+	kaneko16_render_15bpp_bitmap(machine(),bitmap,cliprect);
 
 	// if the display is disabled, do nothing?
 	if (!m_disp_enable) return 0;
 
 	SCREEN_UPDATE16_CALL_MEMBER(common);
-	m_kaneko_spr->kaneko16_render_sprites(screen.machine(),bitmap,cliprect, m_spriteram, m_spriteram.bytes());
+	m_kaneko_spr->kaneko16_render_sprites(machine(),bitmap,cliprect, m_spriteram, m_spriteram.bytes());
 	return 0;
 }

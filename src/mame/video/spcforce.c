@@ -39,7 +39,7 @@ UINT32 spcforce_state::screen_update_spcforce(screen_device &screen, bitmap_ind1
 			sy = 248 - sy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				code, col,
 				flip, flip,
 				sx, sy,0);

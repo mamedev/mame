@@ -415,11 +415,11 @@ void magicard_state::video_start()
 
 UINT32 magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	magicard_state *state = screen.machine().driver_data<magicard_state>();
+	magicard_state *state = machine().driver_data<magicard_state>();
 	int x,y;
 	UINT32 count;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect); //TODO
+	bitmap.fill(get_black_pen(machine()), cliprect); //TODO
 
 	if(!(SCC_DE_VREG)) //display enable
 		return 0;
@@ -437,22 +437,22 @@ UINT32 magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb3
 				color = ((m_magicram[count]) & 0x000f)>>0;
 
 				if(cliprect.contains((x*4)+3, y))
-					bitmap.pix32(y, (x*4)+3) = screen.machine().pens[color];
+					bitmap.pix32(y, (x*4)+3) = machine().pens[color];
 
 				color = ((m_magicram[count]) & 0x00f0)>>4;
 
 				if(cliprect.contains((x*4)+2, y))
-					bitmap.pix32(y, (x*4)+2) = screen.machine().pens[color];
+					bitmap.pix32(y, (x*4)+2) = machine().pens[color];
 
 				color = ((m_magicram[count]) & 0x0f00)>>8;
 
 				if(cliprect.contains((x*4)+1, y))
-					bitmap.pix32(y, (x*4)+1) = screen.machine().pens[color];
+					bitmap.pix32(y, (x*4)+1) = machine().pens[color];
 
 				color = ((m_magicram[count]) & 0xf000)>>12;
 
 				if(cliprect.contains((x*4)+0, y))
-					bitmap.pix32(y, (x*4)+0) = screen.machine().pens[color];
+					bitmap.pix32(y, (x*4)+0) = machine().pens[color];
 
 				count++;
 			}
@@ -469,12 +469,12 @@ UINT32 magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb3
 				color = ((m_magicram[count]) & 0x00ff)>>0;
 
 				if(cliprect.contains((x*2)+1, y))
-					bitmap.pix32(y, (x*2)+1) = screen.machine().pens[color];
+					bitmap.pix32(y, (x*2)+1) = machine().pens[color];
 
 				color = ((m_magicram[count]) & 0xff00)>>8;
 
 				if(cliprect.contains((x*2)+0, y))
-					bitmap.pix32(y, (x*2)+0) = screen.machine().pens[color];
+					bitmap.pix32(y, (x*2)+0) = machine().pens[color];
 
 				count++;
 			}

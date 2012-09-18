@@ -222,7 +222,7 @@ UINT32 docastle_state::screen_update_docastle(screen_device &screen, bitmap_ind1
 {
 
 	m_do_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	m_do_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

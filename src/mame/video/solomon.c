@@ -104,6 +104,6 @@ UINT32 solomon_state::screen_update_solomon(screen_device &screen, bitmap_ind16 
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }

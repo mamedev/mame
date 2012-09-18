@@ -248,8 +248,8 @@ UINT32 n8080_state::screen_update_sheriff(screen_device &screen, bitmap_ind16 &b
 
 UINT32 n8080_state::screen_update_helifire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int SUN_BRIGHTNESS = screen.machine().root_device().ioport("POT0")->read();
-	int SEA_BRIGHTNESS = screen.machine().root_device().ioport("POT1")->read();
+	int SUN_BRIGHTNESS = machine().root_device().ioport("POT0")->read();
+	int SEA_BRIGHTNESS = machine().root_device().ioport("POT1")->read();
 
 	static const int wave[8] = { 0, 1, 2, 2, 2, 1, 0, 0 };
 
@@ -336,7 +336,7 @@ UINT32 n8080_state::screen_update_helifire(screen_device &screen, bitmap_ind16 &
 
 		/* next line */
 
-		helifire_next_line(screen.machine());
+		helifire_next_line(machine());
 	}
 
 	m_helifire_mv = saved_mv;
@@ -350,7 +350,7 @@ void n8080_state::screen_eof_helifire(screen_device &screen, bool state)
 	// falling edge
 	if (!state)
 	{
-		int n = (screen.machine().primary_screen->frame_number() >> 1) % sizeof m_helifire_LSFR;
+		int n = (machine().primary_screen->frame_number() >> 1) % sizeof m_helifire_LSFR;
 
 		int i;
 
@@ -367,13 +367,13 @@ void n8080_state::screen_eof_helifire(screen_device &screen, bool state)
 					G |= B;
 				}
 
-				if (screen.machine().primary_screen->frame_number() & 0x04)
+				if (machine().primary_screen->frame_number() & 0x04)
 				{
 					R |= G;
 				}
 			}
 
-			palette_set_color_rgb(screen.machine(),i,
+			palette_set_color_rgb(machine(),i,
 				R ? 255 : 0,
 				G ? 255 : 0,
 				B ? 255 : 0);
@@ -381,7 +381,7 @@ void n8080_state::screen_eof_helifire(screen_device &screen, bool state)
 
 		for (i = 0; i < 256; i++)
 		{
-			helifire_next_line(screen.machine());
+			helifire_next_line(machine());
 		}
 	}
 }

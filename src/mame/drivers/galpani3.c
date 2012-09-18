@@ -195,7 +195,7 @@ UINT32 galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb3
 	UINT16* src1;
 	UINT32* dst;
 	UINT16 pixdata1;
-	const pen_t *paldata = screen.machine().pens;
+	const pen_t *paldata = machine().pens;
 
 	bitmap.fill(0x0000, cliprect);
 
@@ -259,7 +259,7 @@ UINT32 galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb3
 						UINT16 pen = dat1+0x4000;
 						UINT32 pal = paldata[pen];
 
-						if (gp3_is_alpha_pen(screen.machine(), pen))
+						if (gp3_is_alpha_pen(machine(), pen))
 						{
 							int r,g,b;
 							r = (pal & 0x00ff0000)>>16;
@@ -287,7 +287,7 @@ UINT32 galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb3
 						UINT16 pen = dat2+0x4100;
 						UINT32 pal = paldata[pen];
 
-						if (gp3_is_alpha_pen(screen.machine(), pen))
+						if (gp3_is_alpha_pen(machine(), pen))
 						{
 							int r,g,b;
 							r = (pal & 0x00ff0000)>>16;
@@ -319,20 +319,20 @@ UINT32 galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb3
 				/*
                 else if (pridat==0x2f) // area outside of the girl
                 {
-                    //dst[0] = screen.machine().rand()&0x3fff;
+                    //dst[0] = machine().rand()&0x3fff;
                 }
 
                 else if (pridat==0x00) // the initial line / box that gets drawn
                 {
-                    //dst[0] = screen.machine().rand()&0x3fff;
+                    //dst[0] = machine().rand()&0x3fff;
                 }
                 else if (pridat==0x30) // during the 'gals boxes' on the intro
                 {
-                    //dst[0] = screen.machine().rand()&0x3fff;
+                    //dst[0] = machine().rand()&0x3fff;
                 }
                 else if (pridat==0x0c) // 'nice' at end of level
                 {
-                    //dst[0] = screen.machine().rand()&0x3fff;
+                    //dst[0] = machine().rand()&0x3fff;
                 }
                 else
                 {
@@ -346,7 +346,7 @@ UINT32 galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb3
 
 	m_sprite_bitmap_1.fill(0x0000, cliprect);
 
-	m_spritegen->skns_draw_sprites(screen.machine(), m_sprite_bitmap_1, cliprect, &m_spriteram32[0], 0x4000, screen.machine().root_device().memregion("gfx1")->base(), screen.machine().root_device().memregion ("gfx1")->bytes(), m_spc_regs );
+	m_spritegen->skns_draw_sprites(machine(), m_sprite_bitmap_1, cliprect, &m_spriteram32[0], 0x4000, machine().root_device().memregion("gfx1")->base(), machine().root_device().memregion ("gfx1")->bytes(), m_spc_regs );
 
 	// ignoring priority bits for now..
 	for (y=0;y<240;y++)

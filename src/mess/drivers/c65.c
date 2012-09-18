@@ -234,7 +234,7 @@ static CBM_IEC_INTERFACE( cbm_iec_intf )
 
 UINT32 c65_state::screen_update_c65(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *vic3 = screen.machine().device("vic3");
+	device_t *vic3 = machine().device("vic3");
 
 	vic3_video_update(vic3, bitmap, cliprect);
 	return 0;

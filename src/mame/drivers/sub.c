@@ -142,8 +142,8 @@ void sub_state::video_start()
 
 UINT32 sub_state::screen_update_sub(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = screen.machine().gfx[0];
-	gfx_element *gfx_1 = screen.machine().gfx[1];
+	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx_1 = machine().gfx[1];
 	int y,x;
 	int count = 0;
 

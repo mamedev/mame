@@ -519,12 +519,12 @@ UINT32 nbmj8891_state::screen_update_nbmj8891(screen_device &screen, bitmap_ind1
 		m_screen_refresh = 0;
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
-				update_pixel0(screen.machine(), x, y);
+				update_pixel0(machine(), x, y);
 
 		if (m_gfxdraw_mode)
 			for (y = 0; y < height; y++)
 				for (x = 0; x < width; x++)
-					update_pixel1(screen.machine(), x, y);
+					update_pixel1(machine(), x, y);
 	}
 
 	if (m_dispflag)

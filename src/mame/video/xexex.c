@@ -79,7 +79,7 @@ UINT32 xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bit
 	k054338_update_all_shadows(m_k054338, 0);
 	k054338_fill_backcolor(m_k054338, bitmap, 0);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	for (plane = 0; plane < 4; plane++)
 	{

@@ -460,10 +460,10 @@ UINT32 champbwl_state::screen_update_champbwl(screen_device &screen, bitmap_ind1
 {
 	bitmap.fill(0x1f0, cliprect);
 
-	screen.machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
-	screen.machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x1, -0x1 );
+	machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
+	machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x1, -0x1 );
 
-	screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(), bitmap, cliprect, 0x800, 1 );
+	machine().device<seta001_device>("spritegen")->seta001_draw_sprites(machine(), bitmap, cliprect, 0x800, 1 );
 	return 0;
 }
 
@@ -471,7 +471,7 @@ void champbwl_state::screen_eof_champbwl(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)
-		screen.machine().device<seta001_device>("spritegen")->tnzs_eof();
+		machine().device<seta001_device>("spritegen")->tnzs_eof();
 }
 
 
@@ -519,10 +519,10 @@ UINT32 champbwl_state::screen_update_doraemon(screen_device &screen, bitmap_ind1
 {
 	bitmap.fill(0x1f0, cliprect);
 
-	screen.machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x00, 0x01 );
-	screen.machine().device<seta001_device>("spritegen")->set_fg_yoffsets( 0x00, 0x10 );
+	machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x00, 0x01 );
+	machine().device<seta001_device>("spritegen")->set_fg_yoffsets( 0x00, 0x10 );
 
-	screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(), bitmap, cliprect, 0x800, 1 );
+	machine().device<seta001_device>("spritegen")->seta001_draw_sprites(machine(), bitmap, cliprect, 0x800, 1 );
 	return 0;
 }
 
@@ -530,7 +530,7 @@ void champbwl_state::screen_eof_doraemon(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)
-		screen.machine().device<seta001_device>("spritegen")->setac_eof();
+		machine().device<seta001_device>("spritegen")->setac_eof();
 }
 
 MACHINE_START_MEMBER(champbwl_state,doraemon)

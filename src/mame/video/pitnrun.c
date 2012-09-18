@@ -213,21 +213,21 @@ UINT32 pitnrun_state::screen_update_pitnrun(screen_device &screen, bitmap_ind16 
 	rectangle myclip=cliprect;
 
 #ifdef MAME_DEBUG
-	if (screen.machine().input().code_pressed_once(KEYCODE_Q))
+	if (machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		UINT8 *ROM = memregion("maincpu")->base();
 		ROM[0x84f6]=0; /* lap 0 - normal */
 	}
 
-	if (screen.machine().input().code_pressed_once(KEYCODE_W))
+	if (machine().input().code_pressed_once(KEYCODE_W))
 	{
-		UINT8 *ROM = screen.machine().root_device().memregion("maincpu")->base();
+		UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 		ROM[0x84f6]=6; /* lap 6 = spotlight */
 	}
 
-	if (screen.machine().input().code_pressed_once(KEYCODE_E))
+	if (machine().input().code_pressed_once(KEYCODE_E))
 	{
-		UINT8 *ROM = screen.machine().root_device().memregion("maincpu")->base();
+		UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 		ROM[0x84f6]=2; /* lap 3 (trial 2)= lightnings */
 		ROM[0x8102]=1;
 	}
@@ -254,7 +254,7 @@ UINT32 pitnrun_state::screen_update_pitnrun(screen_device &screen, bitmap_ind16 
 		m_bg->draw(bitmap, myclip, 0,0);
 	}
 
-	draw_sprites(screen.machine(),bitmap,myclip);
+	draw_sprites(machine(),bitmap,myclip);
 
 	if(m_ha&4)
 		copybitmap_trans(bitmap,*m_tmp_bitmap[m_ha&3],flip_screen_x(),flip_screen_y(),dx,dy,myclip, 1);

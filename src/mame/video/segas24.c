@@ -27,11 +27,11 @@ UINT32 segas24_state::screen_update_system24(screen_device &screen, bitmap_ind16
 {
 
 	if(vmixer->get_reg(13) & 1) {
-		bitmap.fill(get_black_pen(screen.machine()));
+		bitmap.fill(get_black_pen(machine()));
 		return 0;
 	}
 
-	screen.machine().priority_bitmap.fill(0);
+	machine().priority_bitmap.fill(0);
 	bitmap.fill(0, cliprect);
 
 	std::vector<int> order;

@@ -108,8 +108,8 @@ UINT32 nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind1
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
 			UINT32 srcpix = *src++;
-			*dst++ = screen.machine().pens[srcpix & 0xf];
-			*dst++ = screen.machine().pens[(srcpix >> 4) & 0xf];
+			*dst++ = machine().pens[srcpix & 0xf];
+			*dst++ = machine().pens[(srcpix >> 4) & 0xf];
 		}
 	}
 

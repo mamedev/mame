@@ -304,9 +304,9 @@ UINT32 battlera_state::screen_update_battlera(screen_device &screen, bitmap_ind1
 	int offs,code,scrollx,scrolly,mx,my;
 
 	/* if any tiles changed, redraw the VRAM */
-	if (screen.machine().gfx[0]->dirtyseq() != m_tile_dirtyseq)
+	if (machine().gfx[0]->dirtyseq() != m_tile_dirtyseq)
 	{
-		m_tile_dirtyseq = screen.machine().gfx[0]->dirtyseq();
+		m_tile_dirtyseq = machine().gfx[0]->dirtyseq();
 		memset(m_vram_dirty, 1, 0x1000);
 	}
 
@@ -321,17 +321,17 @@ UINT32 battlera_state::screen_update_battlera(screen_device &screen, bitmap_ind1
 		/* If this tile was changed OR tilemap was changed, redraw */
 		if (m_vram_dirty[offs/2]) {
 			m_vram_dirty[offs/2]=0;
-			drawgfx_opaque(*m_tile_bitmap,m_tile_bitmap->cliprect(),screen.machine().gfx[0],
+			drawgfx_opaque(*m_tile_bitmap,m_tile_bitmap->cliprect(),machine().gfx[0],
 					code,
 					m_HuC6270_vram[offs] >> 4,
 					0,0,
 					8*mx,8*my);
-			drawgfx_opaque(*m_front_bitmap,m_tile_bitmap->cliprect(),screen.machine().gfx[2],
+			drawgfx_opaque(*m_front_bitmap,m_tile_bitmap->cliprect(),machine().gfx[2],
 					0,
 					0,	/* fill the spot with pen 256 */
 					0,0,
 					8*mx,8*my);
-			drawgfx_transmask(*m_front_bitmap,m_tile_bitmap->cliprect(),screen.machine().gfx[0],
+			drawgfx_transmask(*m_front_bitmap,m_tile_bitmap->cliprect(),machine().gfx[0],
 					code,
 					m_HuC6270_vram[offs] >> 4,
 					0,0,
@@ -348,13 +348,13 @@ UINT32 battlera_state::screen_update_battlera(screen_device &screen, bitmap_ind1
 	/* Todo:  Background enable (not used anyway) */
 
 	/* Render low priority sprites, if enabled */
-	if (m_sb_enable) draw_sprites(screen.machine(),bitmap,cliprect,0);
+	if (m_sb_enable) draw_sprites(machine(),bitmap,cliprect,0);
 
 	/* Render background over sprites */
 	copyscrollbitmap_trans(bitmap,*m_front_bitmap,1,&scrollx,1,&scrolly,cliprect,256);
 
 	/* Render high priority sprites, if enabled */
-	if (m_sb_enable) draw_sprites(screen.machine(),bitmap,cliprect,1);
+	if (m_sb_enable) draw_sprites(machine(),bitmap,cliprect,1);
 
 	return 0;
 }

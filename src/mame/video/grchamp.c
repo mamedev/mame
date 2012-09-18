@@ -357,8 +357,8 @@ UINT32 grchamp_state::screen_update_grchamp(screen_device &screen, bitmap_rgb32 
 		MAKE_RGB(RGB_MAX,RGB_MAX,RGB_MAX)
 	};
 
-	const UINT8 *amedata = screen.machine().root_device().memregion("gfx5")->base();
-	const UINT8 *headdata = screen.machine().root_device().memregion("gfx6")->base();
+	const UINT8 *amedata = machine().root_device().memregion("gfx5")->base();
+	const UINT8 *headdata = machine().root_device().memregion("gfx6")->base();
 	const UINT8 *pldata = memregion("gfx7")->base();
 	bitmap_ind16 &lpixmap = m_left_tilemap->pixmap();
 	bitmap_ind16 &rpixmap = m_right_tilemap->pixmap();
@@ -399,7 +399,7 @@ UINT32 grchamp_state::screen_update_grchamp(screen_device &screen, bitmap_rgb32 
 		UINT8 objdata[256];
 
 		/* draw the objects for this scanline */
-		draw_objects(screen.machine(), this, y, objdata);
+		draw_objects(machine(), this, y, objdata);
 
 		/* iterate over columns */
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)

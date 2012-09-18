@@ -186,7 +186,7 @@ UINT32 sslam_state::screen_update_sslam(screen_device &screen, bitmap_ind16 &bit
 
 	if (!(m_regs[6] & 1))
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
@@ -215,7 +215,7 @@ UINT32 sslam_state::screen_update_sslam(screen_device &screen, bitmap_ind16 &bit
 		m_md_tilemap->draw(bitmap, cliprect, 0,0);
 	}
 
-	draw_sprites(screen.machine(), bitmap,cliprect);
+	draw_sprites(machine(), bitmap,cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
@@ -225,7 +225,7 @@ UINT32 sslam_state::screen_update_powerbls(screen_device &screen, bitmap_ind16 &
 
 	if (!(m_regs[6] & 1))
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
@@ -233,6 +233,6 @@ UINT32 sslam_state::screen_update_powerbls(screen_device &screen, bitmap_ind16 &
 	m_bg_tilemap->set_scrolly(0, m_regs[1]-240);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap,cliprect);
+	draw_sprites(machine(), bitmap,cliprect);
 	return 0;
 }

@@ -228,12 +228,12 @@ UINT32 cps_state::screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitm
 	layercontrol = m_cps_b_regs[0x20 / 2];
 
 	/* Get video memory base registers */
-	cps1_get_video_base(screen.machine());
+	cps1_get_video_base(machine());
 
 	/* Build palette */
-	fcrash_build_palette(screen.machine());
+	fcrash_build_palette(machine());
 
-	fcrash_update_transmasks(screen.machine());
+	fcrash_update_transmasks(machine());
 
 	m_bg_tilemap[0]->set_scrollx(0, m_scroll1x - 62);
 	m_bg_tilemap[0]->set_scrolly(0, m_scroll1y);
@@ -270,28 +270,28 @@ UINT32 cps_state::screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitm
 	/* Blank screen */
 	bitmap.fill(0xbff, cliprect);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	l0 = (layercontrol >> 0x06) & 03;
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;
 	l3 = (layercontrol >> 0x0c) & 03;
 
-	fcrash_render_layer(screen.machine(), bitmap, cliprect, l0, 0);
+	fcrash_render_layer(machine(), bitmap, cliprect, l0, 0);
 
 	if (l1 == 0)
-		fcrash_render_high_layer(screen.machine(), bitmap, cliprect, l0);
+		fcrash_render_high_layer(machine(), bitmap, cliprect, l0);
 
-	fcrash_render_layer(screen.machine(), bitmap, cliprect, l1, 0);
+	fcrash_render_layer(machine(), bitmap, cliprect, l1, 0);
 
 	if (l2 == 0)
-		fcrash_render_high_layer(screen.machine(), bitmap, cliprect, l1);
+		fcrash_render_high_layer(machine(), bitmap, cliprect, l1);
 
-	fcrash_render_layer(screen.machine(), bitmap, cliprect, l2, 0);
+	fcrash_render_layer(machine(), bitmap, cliprect, l2, 0);
 
 	if (l3 == 0)
-		fcrash_render_high_layer(screen.machine(), bitmap, cliprect, l2);
+		fcrash_render_high_layer(machine(), bitmap, cliprect, l2);
 
-	fcrash_render_layer(screen.machine(), bitmap, cliprect, l3, 0);
+	fcrash_render_layer(machine(), bitmap, cliprect, l3, 0);
 
 	return 0;
 }
@@ -307,12 +307,12 @@ UINT32 cps_state::screen_update_kodb(screen_device &screen, bitmap_ind16 &bitmap
 	layercontrol = m_cps_b_regs[0x20 / 2];
 
 	/* Get video memory base registers */
-	cps1_get_video_base(screen.machine());
+	cps1_get_video_base(machine());
 
 	/* Build palette */
-	fcrash_build_palette(screen.machine());
+	fcrash_build_palette(machine());
 
-	fcrash_update_transmasks(screen.machine());
+	fcrash_update_transmasks(machine());
 
 	m_bg_tilemap[0]->set_scrollx(0, m_scroll1x);
 	m_bg_tilemap[0]->set_scrolly(0, m_scroll1y);
@@ -350,28 +350,28 @@ UINT32 cps_state::screen_update_kodb(screen_device &screen, bitmap_ind16 &bitmap
 	/* Blank screen */
 	bitmap.fill(0xbff, cliprect);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	l0 = (layercontrol >> 0x06) & 03;
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;
 	l3 = (layercontrol >> 0x0c) & 03;
 
-	fcrash_render_layer(screen.machine(), bitmap, cliprect, l0, 0);
+	fcrash_render_layer(machine(), bitmap, cliprect, l0, 0);
 
 	if (l1 == 0)
-		fcrash_render_high_layer(screen.machine(), bitmap, cliprect, l0);
+		fcrash_render_high_layer(machine(), bitmap, cliprect, l0);
 
-	fcrash_render_layer(screen.machine(), bitmap, cliprect, l1, 0);
+	fcrash_render_layer(machine(), bitmap, cliprect, l1, 0);
 
 	if (l2 == 0)
-		fcrash_render_high_layer(screen.machine(), bitmap, cliprect, l1);
+		fcrash_render_high_layer(machine(), bitmap, cliprect, l1);
 
-	fcrash_render_layer(screen.machine(), bitmap, cliprect, l2, 0);
+	fcrash_render_layer(machine(), bitmap, cliprect, l2, 0);
 
 	if (l3 == 0)
-		fcrash_render_high_layer(screen.machine(), bitmap, cliprect, l2);
+		fcrash_render_high_layer(machine(), bitmap, cliprect, l2);
 
-	fcrash_render_layer(screen.machine(), bitmap, cliprect, l3, 0);
+	fcrash_render_layer(machine(), bitmap, cliprect, l3, 0);
 
 	return 0;
 }

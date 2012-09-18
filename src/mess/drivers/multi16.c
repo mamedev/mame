@@ -75,7 +75,7 @@ UINT32 multi16_state::screen_update_multi16(screen_device &screen, bitmap_ind16 
 				int dot = (BITSWAP16(m_p_vram[count],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-xi)) & 0x1;
 
 				if(screen.visible_area().contains(x*16+xi, y))
-					bitmap.pix16(y, x*16+xi) = screen.machine().pens[dot];
+					bitmap.pix16(y, x*16+xi) = machine().pens[dot];
 			}
 
 			count++;

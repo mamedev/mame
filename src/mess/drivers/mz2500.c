@@ -634,11 +634,11 @@ static void draw_cg_screen(running_machine &machine, bitmap_ind16 &bitmap,const 
 
 UINT32 mz2500_state::screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(screen.machine().pens[0], cliprect); //TODO: correct?
+	bitmap.fill(machine().pens[0], cliprect); //TODO: correct?
 
-	draw_cg_screen(screen.machine(),bitmap,cliprect,0);
-	draw_tv_screen(screen.machine(),bitmap,cliprect);
-	draw_cg_screen(screen.machine(),bitmap,cliprect,1);
+	draw_cg_screen(machine(),bitmap,cliprect,0);
+	draw_tv_screen(machine(),bitmap,cliprect);
+	draw_cg_screen(machine(),bitmap,cliprect,1);
 	//  popmessage("%02x (%02x %02x) (%02x %02x) (%02x %02x) (%02x %02x)",m_cg_reg[0x0f],m_cg_reg[0x10],m_cg_reg[0x11],m_cg_reg[0x12],m_cg_reg[0x13],m_cg_reg[0x14],m_cg_reg[0x15],m_cg_reg[0x16],m_cg_reg[0x17]);
 	//  popmessage("%02x",m_text_reg[0x0f]);
 

@@ -96,7 +96,7 @@ UINT32 pc100_state::screen_update_pc100(screen_device &screen, bitmap_ind16 &bit
 					dot |= pen[pen_i]<<pen_i;
 
 				if(y < 512 && x*16+xi < 768) /* TODO: safety check */
-					bitmap.pix16(y, x*16+xi) = screen.machine().pens[dot];
+					bitmap.pix16(y, x*16+xi) = machine().pens[dot];
 			}
 
 			count++;

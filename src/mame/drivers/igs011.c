@@ -255,17 +255,17 @@ UINT32 igs011_state::screen_update_igs011(screen_device &screen, bitmap_ind16 &b
 	UINT16 *pri_ram;
 
 #ifdef MAME_DEBUG
-	if (screen.machine().input().code_pressed(KEYCODE_Z))
+	if (machine().input().code_pressed(KEYCODE_Z))
 	{
 		int mask = 0;
-		if (screen.machine().input().code_pressed(KEYCODE_Q))	mask |= 0x01;
-		if (screen.machine().input().code_pressed(KEYCODE_W))	mask |= 0x02;
-		if (screen.machine().input().code_pressed(KEYCODE_E))	mask |= 0x04;
-		if (screen.machine().input().code_pressed(KEYCODE_R))	mask |= 0x08;
-		if (screen.machine().input().code_pressed(KEYCODE_A))	mask |= 0x10;
-		if (screen.machine().input().code_pressed(KEYCODE_S))	mask |= 0x20;
-		if (screen.machine().input().code_pressed(KEYCODE_D))	mask |= 0x40;
-		if (screen.machine().input().code_pressed(KEYCODE_F))	mask |= 0x80;
+		if (machine().input().code_pressed(KEYCODE_Q))	mask |= 0x01;
+		if (machine().input().code_pressed(KEYCODE_W))	mask |= 0x02;
+		if (machine().input().code_pressed(KEYCODE_E))	mask |= 0x04;
+		if (machine().input().code_pressed(KEYCODE_R))	mask |= 0x08;
+		if (machine().input().code_pressed(KEYCODE_A))	mask |= 0x10;
+		if (machine().input().code_pressed(KEYCODE_S))	mask |= 0x20;
+		if (machine().input().code_pressed(KEYCODE_D))	mask |= 0x40;
+		if (machine().input().code_pressed(KEYCODE_F))	mask |= 0x80;
 		if (mask)	layer_enable &= mask;
 	}
 #endif
@@ -294,7 +294,7 @@ UINT32 igs011_state::screen_update_igs011(screen_device &screen, bitmap_ind16 &b
 
 #ifdef MAME_DEBUG
 			if ((layer_enable != -1) && (pri_addr == 0xff))
-				bitmap.pix16(y, x) = get_black_pen(screen.machine());
+				bitmap.pix16(y, x) = get_black_pen(machine());
 			else
 #endif
 				bitmap.pix16(y, x) = m_layer[l][scr_addr] | (l << 8);

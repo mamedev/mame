@@ -640,7 +640,7 @@ WRITE8_MEMBER(bbc_state::bbc_6845_w)
 UINT32 bbc_state::screen_update_bbc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-    mc6845_device *mc6845 = screen.machine().device<mc6845_device>("mc6845");
+    mc6845_device *mc6845 = machine().device<mc6845_device>("mc6845");
     mc6845->update( bitmap, cliprect);
 
     return 0;
@@ -665,7 +665,7 @@ UINT32 bbc_state::screen_update_bbc(screen_device &screen, bitmap_ind16 &bitmap,
     while((m_BBC_VSync)&&(c<60000))
     {
         // Clock the 6845
-        m6845_clock(screen.machine());
+        m6845_clock(machine());
         c++;
     }
 
@@ -674,13 +674,13 @@ UINT32 bbc_state::screen_update_bbc(screen_device &screen, bitmap_ind16 &bitmap,
     // or until a timeout (this catches the 6845 with silly register values that would not give a VSYNC signal)
     while((!m_BBC_VSync)&&(c<60000))
     {
-        if ((m_y_screen_pos>=cliprect.min_y) && (m_y_screen_pos<=cliprect.max_y)) (m_draw_function)(screen.machine());
+        if ((m_y_screen_pos>=cliprect.min_y) && (m_y_screen_pos<=cliprect.max_y)) (m_draw_function)(machine());
 
         // and check the cursor
         if (m_VideoULA_CR) BBC_Clock_CR(this);
 
         // Clock the 6845
-        m6845_clock(screen.machine());
+        m6845_clock(machine());
         c++;
     }
 

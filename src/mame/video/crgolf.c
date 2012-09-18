@@ -115,7 +115,7 @@ UINT32 crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_rgb32 &b
 	offs_t offs;
 	pen_t pens[NUM_PENS];
 
-	get_pens(screen.machine(), pens);
+	get_pens(machine(), pens);
 
 	/* for each byte in the video RAM */
 	for (offs = 0; offs < VIDEORAM_SIZE / 3; offs++)

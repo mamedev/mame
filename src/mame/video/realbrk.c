@@ -494,20 +494,20 @@ UINT32 realbrk_state::screen_update_realbrk(screen_device &screen, bitmap_ind16 
 	m_tilemap_1->set_scrollx(0, m_vregs[0x6/2]);
 
 #ifdef MAME_DEBUG
-if ( screen.machine().input().code_pressed(KEYCODE_Z) )
+if ( machine().input().code_pressed(KEYCODE_Z) )
 {
 	int msk = 0;
-	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (screen.machine().input().code_pressed(KEYCODE_E))	msk |= 4;
-	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 8;
+	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_E))	msk |= 4;
+	if (machine().input().code_pressed(KEYCODE_A))	msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
 
 	if (m_disable_video)
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 	else
@@ -516,7 +516,7 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) )
 	if (layers_ctrl & 2)	m_tilemap_1->draw(bitmap, cliprect, 0,0);
 	if (layers_ctrl & 1)	m_tilemap_0->draw(bitmap, cliprect, 0,0);
 
-	if (layers_ctrl & 8)	draw_sprites(screen.machine(),bitmap,cliprect);
+	if (layers_ctrl & 8)	draw_sprites(machine(),bitmap,cliprect);
 
 	if (layers_ctrl & 4)	m_tilemap_2->draw(bitmap, cliprect, 0,0);
 
@@ -564,20 +564,20 @@ UINT32 realbrk_state::screen_update_dai2kaku(screen_device &screen, bitmap_ind16
 	m_tilemap_1->set_scrolly(0, bgy1 );
 
 #ifdef MAME_DEBUG
-if ( screen.machine().input().code_pressed(KEYCODE_Z) )
+if ( machine().input().code_pressed(KEYCODE_Z) )
 {
 	int msk = 0;
-	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (screen.machine().input().code_pressed(KEYCODE_E))	msk |= 4;
-	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 8;
+	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_E))	msk |= 4;
+	if (machine().input().code_pressed(KEYCODE_A))	msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
 
 	if (m_disable_video)
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 	else
@@ -586,7 +586,7 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) )
 
 
 	// spr 0
-	if (layers_ctrl & 8)	dai2kaku_draw_sprites(screen.machine(),bitmap,cliprect,2);
+	if (layers_ctrl & 8)	dai2kaku_draw_sprites(machine(),bitmap,cliprect,2);
 
 	// bglow
 	if( m_vregs[8/2] & (0x8000)){
@@ -596,7 +596,7 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) )
 	}
 
 	// spr 1
-	if (layers_ctrl & 8)	dai2kaku_draw_sprites(screen.machine(),bitmap,cliprect,1);
+	if (layers_ctrl & 8)	dai2kaku_draw_sprites(machine(),bitmap,cliprect,1);
 
 	// bghigh
 	if( m_vregs[8/2] & (0x8000)){
@@ -606,7 +606,7 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) )
 	}
 
 	// spr 2
-	if (layers_ctrl & 8)	dai2kaku_draw_sprites(screen.machine(),bitmap,cliprect,0);
+	if (layers_ctrl & 8)	dai2kaku_draw_sprites(machine(),bitmap,cliprect,0);
 
 	// fix
 	if (layers_ctrl & 4)	m_tilemap_2->draw(bitmap, cliprect, 0,0);

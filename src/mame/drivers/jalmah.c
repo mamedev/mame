@@ -442,7 +442,7 @@ UINT32 jalmah_state::screen_update_jalmah(screen_device &screen, bitmap_ind16 &b
 {
 	UINT16 *jm_scrollram = m_jm_scrollram;
 	UINT8 cur_prin;
-	jalmah_priority_system(screen.machine());
+	jalmah_priority_system(machine());
 
 	m_sc0_tilemap_0->set_scrollx(0, jm_scrollram[0] & 0xfff);
 	m_sc0_tilemap_1->set_scrollx(0, jm_scrollram[0] & 0x7ff);
@@ -485,14 +485,14 @@ UINT32 jalmah_state::screen_update_jalmah(screen_device &screen, bitmap_ind16 &b
 	m_sc3_tilemap_2->set_scrolly(0, jm_scrollram[7] & 0x1ff);
 	m_sc3_tilemap_3->set_scrolly(0, jm_scrollram[7] & 0x3ff);
 
-	bitmap.fill(screen.machine().pens[0xff], cliprect); //selectable by a ram address?
+	bitmap.fill(machine().pens[0xff], cliprect); //selectable by a ram address?
 
 	for(cur_prin=1;cur_prin<=0x8;cur_prin<<=1)
 	{
-		if(cur_prin==m_sc0_prin) { draw_sc0_layer(screen.machine(),bitmap,cliprect); }
-		if(cur_prin==m_sc1_prin) { draw_sc1_layer(screen.machine(),bitmap,cliprect); }
-		if(cur_prin==m_sc2_prin) { draw_sc2_layer(screen.machine(),bitmap,cliprect); }
-		if(cur_prin==m_sc3_prin) { draw_sc3_layer(screen.machine(),bitmap,cliprect); }
+		if(cur_prin==m_sc0_prin) { draw_sc0_layer(machine(),bitmap,cliprect); }
+		if(cur_prin==m_sc1_prin) { draw_sc1_layer(machine(),bitmap,cliprect); }
+		if(cur_prin==m_sc2_prin) { draw_sc2_layer(machine(),bitmap,cliprect); }
+		if(cur_prin==m_sc3_prin) { draw_sc3_layer(machine(),bitmap,cliprect); }
 	}
 
 	return 0;
@@ -507,7 +507,7 @@ UINT32 jalmah_state::screen_update_urashima(screen_device &screen, bitmap_ind16 
 	m_sc0_tilemap_0->set_scrolly(0, jm_scrollram[4]);
 	m_sc3_tilemap_0->set_scrolly(0, jm_scrollram[7]);
 
-	bitmap.fill(screen.machine().pens[0x1ff], cliprect);//selectable by a ram address?
+	bitmap.fill(machine().pens[0x1ff], cliprect);//selectable by a ram address?
 	if(m_jm_vregs[0] & 1) { m_sc0_tilemap_0->draw(bitmap, cliprect, 0,0); }
 	if(m_jm_vregs[3] & 1) { m_sc3_tilemap_0->draw(bitmap, cliprect, 0,0); }
 	return 0;

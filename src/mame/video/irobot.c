@@ -363,7 +363,7 @@ UINT32 irobot_state::screen_update_irobot(screen_device &screen, bitmap_ind16 &b
 			int code = videoram[offs] & 0x3f;
 			int color = ((videoram[offs] & 0xc0) >> 6) | (m_alphamap >> 3);
 
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 					code, color,
 					0,0,
 					8*x,8*y,0);

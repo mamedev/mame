@@ -129,8 +129,8 @@ void hp48_state::palette_init()
 
 UINT32 hp48_state::screen_update_hp48(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	hp48_state *state = screen.machine().driver_data<hp48_state>();
-	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	hp48_state *state = machine().driver_data<hp48_state>();
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int x, y, xp, i, addr;
 	int display       = HP48_IO_4(0) >> 3;           /* 1=on, 0=off */
 	int left_margin   = HP48_IO_4(0) & 7;            /* 0..7 pixels for main bitmap */
@@ -142,7 +142,7 @@ UINT32 hp48_state::screen_update_hp48(screen_device &screen, bitmap_ind16 &bitma
 	int menu_start    = HP48_IO_20(0x30) & ~1;       /* menu bitmap address */
 	int fg = contrast + 2;
 
-	LOG(( "%f hp48 video_update called: ", screen.machine().time().as_double()));
+	LOG(( "%f hp48 video_update called: ", machine().time().as_double()));
 
 	if ( !display || refresh )
 	{

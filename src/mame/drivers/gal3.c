@@ -201,10 +201,10 @@ UINT32 gal3_state::screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitma
 	static int pivot = 15;
 	int pri;
 
-	update_palette(screen.machine());
+	update_palette(machine());
 
-	if( screen.machine().input().code_pressed_once(KEYCODE_H)&&(pivot<15) )	pivot+=1;
-	if( screen.machine().input().code_pressed_once(KEYCODE_J)&&(pivot>0) )	pivot-=1;
+	if( machine().input().code_pressed_once(KEYCODE_H)&&(pivot<15) )	pivot+=1;
+	if( machine().input().code_pressed_once(KEYCODE_J)&&(pivot>0) )	pivot-=1;
 
 	for( pri=0; pri<pivot; pri++ )
 	{

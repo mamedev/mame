@@ -247,9 +247,9 @@ UINT32 zaccaria_state::screen_update_zaccaria(screen_device &screen, bitmap_ind1
 
 	// 3 layers of sprites, each with their own palette and priorities
 	// Not perfect yet, does spriteram(1) layer have a priority bit somewhere?
-	draw_sprites(screen.machine(),bitmap,cliprect,m_spriteram2,2,1);
-	draw_sprites(screen.machine(),bitmap,cliprect,m_spriteram,1,0);
-	draw_sprites(screen.machine(),bitmap,cliprect,m_spriteram2+0x20,0,1);
+	draw_sprites(machine(),bitmap,cliprect,m_spriteram2,2,1);
+	draw_sprites(machine(),bitmap,cliprect,m_spriteram,1,0);
+	draw_sprites(machine(),bitmap,cliprect,m_spriteram2+0x20,0,1);
 
 	return 0;
 }

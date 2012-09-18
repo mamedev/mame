@@ -126,8 +126,8 @@ static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, con
 
 UINT32 karnov_state::screen_update_karnov(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(screen.machine(), bitmap, cliprect);
-	screen.machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram->buffer(), 0x800, 0);
+	draw_background(machine(), bitmap, cliprect);
+	machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(machine(), bitmap, cliprect, m_spriteram->buffer(), 0x800, 0);
 	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

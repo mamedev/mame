@@ -512,17 +512,17 @@ void taito_f3_state::screen_eof_f3(screen_device &screen, bool state)
 	{
 		if (m_sprite_lag==2)
 		{
-			if (screen.machine().video().skip_this_frame() == 0)
+			if (machine().video().skip_this_frame() == 0)
 			{
-				get_sprite_info(screen.machine(), m_spriteram16_buffered);
+				get_sprite_info(machine(), m_spriteram16_buffered);
 			}
 			memcpy(m_spriteram16_buffered,m_spriteram,0x10000);
 		}
 		else if (m_sprite_lag==1)
 		{
-			if (screen.machine().video().skip_this_frame() == 0)
+			if (machine().video().skip_this_frame() == 0)
 			{
-				get_sprite_info(screen.machine(), m_spriteram);
+				get_sprite_info(machine(), m_spriteram);
 			}
 		}
 	}
@@ -3153,7 +3153,7 @@ UINT32 taito_f3_state::screen_update_f3(screen_device &screen, bitmap_rgb32 &bit
 	UINT32 sy_fix[5],sx_fix[5];
 
 	m_f3_skip_this_frame=0;
-	screen.machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* Setup scroll */
 	sy_fix[0]=((m_f3_control_0[4]&0xffff)<< 9) + (1<<16);
@@ -3190,25 +3190,25 @@ UINT32 taito_f3_state::screen_update_f3(screen_device &screen, bitmap_rgb32 &bit
 
 	/* sprites */
 	if (m_sprite_lag==0)
-		get_sprite_info(screen.machine(), m_spriteram);
+		get_sprite_info(machine(), m_spriteram);
 
 	/* Update sprite buffer */
-	draw_sprites(screen.machine(), bitmap,cliprect);
+	draw_sprites(machine(), bitmap,cliprect);
 
 	/* Parse sprite, alpha & clipping parts of lineram */
 	get_spritealphaclip_info(this);
 
 	/* Parse playfield effects */
-	get_line_ram_info(screen.machine(), m_pf1_tilemap,sx_fix[0],sy_fix[0],0,m_f3_pf_data_1);
-	get_line_ram_info(screen.machine(), m_pf2_tilemap,sx_fix[1],sy_fix[1],1,m_f3_pf_data_2);
-	get_line_ram_info(screen.machine(), m_pf3_tilemap,sx_fix[2],sy_fix[2],2,m_f3_pf_data_3);
-	get_line_ram_info(screen.machine(), m_pf4_tilemap,sx_fix[3],sy_fix[3],3,m_f3_pf_data_4);
-	get_vram_info(screen.machine(), m_vram_layer,m_pixel_layer,sx_fix[4],sy_fix[4]);
+	get_line_ram_info(machine(), m_pf1_tilemap,sx_fix[0],sy_fix[0],0,m_f3_pf_data_1);
+	get_line_ram_info(machine(), m_pf2_tilemap,sx_fix[1],sy_fix[1],1,m_f3_pf_data_2);
+	get_line_ram_info(machine(), m_pf3_tilemap,sx_fix[2],sy_fix[2],2,m_f3_pf_data_3);
+	get_line_ram_info(machine(), m_pf4_tilemap,sx_fix[3],sy_fix[3],3,m_f3_pf_data_4);
+	get_vram_info(machine(), m_vram_layer,m_pixel_layer,sx_fix[4],sy_fix[4]);
 
 	/* Draw final framebuffer */
-	scanline_draw(screen.machine(), bitmap,cliprect);
+	scanline_draw(machine(), bitmap,cliprect);
 
 	if (VERBOSE)
-		print_debug_info(screen.machine(), bitmap);
+		print_debug_info(machine(), bitmap);
 	return 0;
 }

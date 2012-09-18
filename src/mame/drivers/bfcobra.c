@@ -412,13 +412,13 @@ UINT32 bfcobra_state::screen_update_bfcobra(screen_device &screen, bitmap_rgb32 
 
 			if ( ( m_videomode & 0x81 ) == 1 || (m_videomode & 0x80 && pen & 0x80) )
 			{
-				*dest++ = screen.machine().pens[hirescol[pen & 0x0f]];
-				*dest++ = screen.machine().pens[hirescol[(pen >> 4) & 0x0f]];
+				*dest++ = machine().pens[hirescol[pen & 0x0f]];
+				*dest++ = machine().pens[hirescol[(pen >> 4) & 0x0f]];
 			}
 			else
 			{
-				*dest++ = screen.machine().pens[lorescol[pen]];
-				*dest++ = screen.machine().pens[lorescol[pen]];
+				*dest++ = machine().pens[lorescol[pen]];
+				*dest++ = machine().pens[lorescol[pen]];
 			}
 		}
 	}

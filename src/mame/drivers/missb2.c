@@ -66,7 +66,7 @@ UINT32 missb2_state::screen_update_missb2(screen_device &screen, bitmap_ind16 &b
 	//popmessage("%02x",(*m_bgvram) & 0x1f);
 	for (bg_offs = ((*m_bgvram) << 4); bg_offs < (((*m_bgvram) << 4) | 0xf); bg_offs++)
 	{
-		drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[1],
+		drawgfx_opaque(bitmap,cliprect,machine().gfx[1],
 				bg_offs,
 				1,
 				0,0,
@@ -76,7 +76,7 @@ UINT32 missb2_state::screen_update_missb2(screen_device &screen, bitmap_ind16 &b
 
 	sx = 0;
 
-	prom = screen.machine().root_device().memregion("proms")->base();
+	prom = machine().root_device().memregion("proms")->base();
 	for (offs = 0; offs < m_objectram.bytes(); offs += 4)
 	{
 		/* skip empty sprites */
@@ -126,7 +126,7 @@ UINT32 missb2_state::screen_update_missb2(screen_device &screen, bitmap_ind16 &b
 					flipy = !flipy;
 				}
 
-				drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
+				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 						code,
 						0,
 						flipx,flipy,

@@ -1134,7 +1134,7 @@ UINT32 toaplan1_state::screen_update_rallybik(screen_device &screen, bitmap_ind1
 {
 	int priority;
 
-	toaplan1_log_vram(screen.machine());
+	toaplan1_log_vram(machine());
 
 	bitmap.fill(0x120, cliprect);
 
@@ -1147,7 +1147,7 @@ UINT32 toaplan1_state::screen_update_rallybik(screen_device &screen, bitmap_ind1
 		m_pf3_tilemap->draw(bitmap, cliprect, priority, 0);
 		m_pf2_tilemap->draw(bitmap, cliprect, priority, 0);
 		m_pf1_tilemap->draw(bitmap, cliprect, priority, 0);
-		rallybik_draw_sprites(screen.machine(), bitmap,cliprect,priority << 8);
+		rallybik_draw_sprites(machine(), bitmap,cliprect,priority << 8);
 	}
 
 	return 0;
@@ -1157,9 +1157,9 @@ UINT32 toaplan1_state::screen_update_toaplan1(screen_device &screen, bitmap_ind1
 {
 	int priority;
 
-	toaplan1_log_vram(screen.machine());
+	toaplan1_log_vram(machine());
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0x120, cliprect);
 
 // it's really correct?
@@ -1174,7 +1174,7 @@ UINT32 toaplan1_state::screen_update_toaplan1(screen_device &screen, bitmap_ind1
 		m_pf1_tilemap->draw(bitmap, cliprect, priority, priority, 0);
 	}
 
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -1213,6 +1213,6 @@ void toaplan1_state::screen_eof_samesame(screen_device &screen, bool state)
 
 		memcpy(m_buffered_spriteram, m_spriteram, m_spriteram.bytes());
 		memcpy(m_buffered_spritesizeram16, m_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
-		screen.machine().device("maincpu")->execute().set_input_line(M68K_IRQ_2, HOLD_LINE);	/* Frame done */
+		machine().device("maincpu")->execute().set_input_line(M68K_IRQ_2, HOLD_LINE);	/* Frame done */
 	}
 }

@@ -62,7 +62,7 @@ UINT32 rollerg_state::screen_update_rollerg(screen_device &screen, bitmap_ind16 
 {
 	int bg_colorbase = 16;
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
 	k051316_zoom_draw(m_k051316, bitmap, cliprect, 0, 1);
 	k053245_sprites_draw(m_k053244, bitmap, cliprect);

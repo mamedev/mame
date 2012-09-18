@@ -87,8 +87,8 @@ void mz2000_state::video_start()
 
 UINT32 mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *tvram = screen.machine().root_device().memregion("tvram")->base();
-	UINT8 *gvram = screen.machine().root_device().memregion("gvram")->base();
+	UINT8 *tvram = machine().root_device().memregion("tvram")->base();
+	UINT8 *gvram = machine().root_device().memregion("gvram")->base();
 	UINT8 *gfx_data = memregion("chargen")->base();
 	int x,y,xi,yi;
 	UINT8 x_size;
@@ -108,8 +108,8 @@ UINT32 mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 &b
 				pen |= ((gvram[count+0xc000] >> (xi)) & 1) ? 4 : 0; //G
 				pen &= m_gvram_mask;
 
-				bitmap.pix16(y*2+0, x+xi) = screen.machine().pens[pen];
-				bitmap.pix16(y*2+1, x+xi) = screen.machine().pens[pen];
+				bitmap.pix16(y*2+0, x+xi) = machine().pens[pen];
+				bitmap.pix16(y*2+1, x+xi) = machine().pens[pen];
 			}
 			count++;
 		}
@@ -149,27 +149,27 @@ UINT32 mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 &b
 						{
 							if(m_width80 == 0)
 							{
-								bitmap.pix16(res_y, res_x*2+0) = screen.machine().pens[pen];
-								bitmap.pix16(res_y, res_x*2+1) = screen.machine().pens[pen];
+								bitmap.pix16(res_y, res_x*2+0) = machine().pens[pen];
+								bitmap.pix16(res_y, res_x*2+1) = machine().pens[pen];
 							}
 							else
 							{
-								bitmap.pix16(res_y, res_x) = screen.machine().pens[pen];
+								bitmap.pix16(res_y, res_x) = machine().pens[pen];
 							}
 						}
 						else
 						{
 							if(m_width80 == 0)
 							{
-								bitmap.pix16(res_y*2+0, res_x*2+0) = screen.machine().pens[pen];
-								bitmap.pix16(res_y*2+0, res_x*2+1) = screen.machine().pens[pen];
-								bitmap.pix16(res_y*2+1, res_x*2+0) = screen.machine().pens[pen];
-								bitmap.pix16(res_y*2+1, res_x*2+1) = screen.machine().pens[pen];
+								bitmap.pix16(res_y*2+0, res_x*2+0) = machine().pens[pen];
+								bitmap.pix16(res_y*2+0, res_x*2+1) = machine().pens[pen];
+								bitmap.pix16(res_y*2+1, res_x*2+0) = machine().pens[pen];
+								bitmap.pix16(res_y*2+1, res_x*2+1) = machine().pens[pen];
 							}
 							else
 							{
-								bitmap.pix16(res_y*2+0, res_x) = screen.machine().pens[pen];
-								bitmap.pix16(res_y*2+1, res_x) = screen.machine().pens[pen];
+								bitmap.pix16(res_y*2+0, res_x) = machine().pens[pen];
+								bitmap.pix16(res_y*2+1, res_x) = machine().pens[pen];
 							}
 						}
 					}

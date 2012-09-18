@@ -175,7 +175,7 @@ UINT32 kickgoal_state::screen_update_kickgoal(screen_device &screen, bitmap_ind1
 	m_bg2tm->draw(bitmap, cliprect, 0, 0);
 	m_bgtm->draw(bitmap, cliprect, 0, 0);
 
-	kickgoal_draw_sprites(screen.machine(), bitmap, cliprect);
+	kickgoal_draw_sprites(machine(), bitmap, cliprect);
 
 	m_fgtm->draw(bitmap, cliprect, 0, 0);
 

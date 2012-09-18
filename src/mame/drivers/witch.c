@@ -774,7 +774,7 @@ UINT32 witch_state::screen_update_witch(screen_device &screen, bitmap_ind16 &bit
 
 	m_gfx1_tilemap->draw(bitmap, cliprect, 0,0);
 	m_gfx0a_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	m_gfx0b_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

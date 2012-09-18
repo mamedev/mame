@@ -222,7 +222,7 @@ UINT32 suna16_state::screen_update_suna16(screen_device &screen, bitmap_ind16 &b
 
 	/* Suna Quiz indicates the background is the last pen */
 	bitmap.fill(0xff, cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram, 0);
+	draw_sprites(machine(), bitmap, cliprect, m_spriteram, 0);
 	return 0;
 }
 
@@ -231,17 +231,17 @@ UINT32 suna16_state::screen_update_bestbest(screen_device &screen, bitmap_ind16 
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-if (screen.machine().input().code_pressed(KEYCODE_Z))
+if (machine().input().code_pressed(KEYCODE_Z))
 {	int msk = 0;
-	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
 
 	/* Suna Quiz indicates the background is the last pen */
 	bitmap.fill(0xff, cliprect);
-	if (layers_ctrl & 1)	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram,  0);
-	if (layers_ctrl & 2)	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram2, 1);
+	if (layers_ctrl & 1)	draw_sprites(machine(), bitmap, cliprect, m_spriteram,  0);
+	if (layers_ctrl & 2)	draw_sprites(machine(), bitmap, cliprect, m_spriteram2, 1);
 	return 0;
 }

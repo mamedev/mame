@@ -245,7 +245,7 @@ UINT32 kingofb_state::screen_update_kingofb(screen_device &screen, bitmap_ind16 
 
 	m_bg_tilemap->set_scrolly(0, -(*m_scroll_y));
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	kingofb_draw_sprites(screen.machine(), bitmap, cliprect);
+	kingofb_draw_sprites(machine(), bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -304,7 +304,7 @@ UINT32 kingofb_state::screen_update_ringking(screen_device &screen, bitmap_ind16
 
 	m_bg_tilemap->set_scrolly(0, -(*m_scroll_y));
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	ringking_draw_sprites(screen.machine(), bitmap, cliprect);
+	ringking_draw_sprites(machine(), bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

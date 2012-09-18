@@ -146,7 +146,7 @@ UINT32 citycon_state::screen_update_citycon(screen_device &screen, bitmap_ind16 
 		int i;
 
 		for (i = 0; i < 4; i++)
-			changecolor_RRRRGGGGBBBBxxxx(screen.machine(), 640 + 4 * offs + i, 512 + 4 * indx + i);
+			changecolor_RRRRGGGGBBBBxxxx(machine(), 640 + 4 * offs + i, 512 + 4 * indx + i);
 	}
 
 
@@ -157,6 +157,6 @@ UINT32 citycon_state::screen_update_citycon(screen_device &screen, bitmap_ind16 
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }

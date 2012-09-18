@@ -136,7 +136,7 @@ void silkroad_state::video_start()
 
 UINT32 silkroad_state::screen_update_silkroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0x7c0, cliprect);
 
 	m_fg_tilemap->set_scrollx(0, ((m_regs[0] & 0xffff0000) >> 16) );
@@ -151,7 +151,7 @@ UINT32 silkroad_state::screen_update_silkroad(screen_device &screen, bitmap_ind1
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	m_fg2_tilemap->draw(bitmap, cliprect, 0,1);
 	m_fg3_tilemap->draw(bitmap, cliprect, 0,2);
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	draw_sprites(machine(),bitmap,cliprect);
 
 	if (0)
 	{

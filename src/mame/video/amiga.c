@@ -1005,7 +1005,7 @@ UINT32 amiga_state::screen_update_amiga(screen_device &screen, bitmap_ind16 &bit
 
 	/* render each scanline in the visible region */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-		amiga_render_scanline(screen.machine(), bitmap, y);
+		amiga_render_scanline(machine(), bitmap, y);
 
 	return 0;
 }

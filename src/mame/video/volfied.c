@@ -125,8 +125,8 @@ static void refresh_pixel_layer( running_machine &machine, bitmap_ind16 &bitmap 
 UINT32 volfied_state::screen_update_volfied(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
-	refresh_pixel_layer(screen.machine(), bitmap);
+	machine().priority_bitmap.fill(0, cliprect);
+	refresh_pixel_layer(machine(), bitmap);
 	pc090oj_draw_sprites(m_pc090oj, bitmap, cliprect, 0);
 	return 0;
 }

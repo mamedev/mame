@@ -21,7 +21,7 @@ to switch between 8*8 tiles and 16*16 tiles.
 
 UINT32 tumblep_state::screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = screen.machine().driver_data()->generic_space();
+	address_space &space = machine().driver_data()->generic_space();
 	UINT16 flip = deco16ic_pf_control_r(m_deco_tilegen1, space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
@@ -32,6 +32,6 @@ UINT32 tumblep_state::screen_update_tumblep(screen_device &screen, bitmap_ind16 
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
 }

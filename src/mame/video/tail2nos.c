@@ -177,7 +177,7 @@ UINT32 tail2nos_state::screen_update_tail2nos(screen_device &screen, bitmap_ind1
 	if (m_video_enable)
 	{
 		k051316_zoom_draw(m_k051316, bitmap, cliprect, 0, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else

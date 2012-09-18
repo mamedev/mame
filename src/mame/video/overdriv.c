@@ -59,7 +59,7 @@ UINT32 overdriv_state::screen_update_overdriv(screen_device &screen, bitmap_ind1
 	m_zoom_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI3);
 	m_zoom_colorbase[0] = k053251_get_palette_index(m_k053251, K053251_CI4);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	k051316_zoom_draw(m_k051316_1, bitmap, cliprect, 0, 0);
 	k051316_zoom_draw(m_k051316_2, bitmap, cliprect, 0, 1);

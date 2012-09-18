@@ -282,9 +282,9 @@ UINT32 snk68_state::screen_update_pow(screen_device &screen, bitmap_ind16 &bitma
 	bitmap.fill(0x7ff, cliprect);
 
 	/* This appears to be the correct priority order */
-	draw_sprites(screen.machine(), bitmap, cliprect, 2);
-	draw_sprites(screen.machine(), bitmap, cliprect, 3);
-	draw_sprites(screen.machine(), bitmap, cliprect, 1);
+	draw_sprites(machine(), bitmap, cliprect, 2);
+	draw_sprites(machine(), bitmap, cliprect, 3);
+	draw_sprites(machine(), bitmap, cliprect, 1);
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;

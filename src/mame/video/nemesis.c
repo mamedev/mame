@@ -417,7 +417,7 @@ UINT32 nemesis_state::screen_update_nemesis(screen_device &screen, bitmap_ind16 
 	int offs;
 	rectangle clip;
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
 	clip.min_x = 0;
@@ -462,7 +462,7 @@ UINT32 nemesis_state::screen_update_nemesis(screen_device &screen, bitmap_ind16 
 		}
 	}
 
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	draw_sprites(machine(),bitmap,cliprect);
 
 	return 0;
 }

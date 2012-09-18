@@ -526,7 +526,7 @@ UINT32 gstream_state::screen_update_gstream(screen_device &screen, bitmap_ind16 
 		if (x & 0x8000) x -= 0x10000;
 		if (y & 0x8000) y -= 0x10000;
 
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],code,col,0,0,x-2,y,0);
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],code,col,0,0,x-2,y,0);
 	}
 
 	return 0;

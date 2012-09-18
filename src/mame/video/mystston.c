@@ -252,16 +252,16 @@ VIDEO_RESET_MEMBER(mystston_state,mystston)
 UINT32 mystston_state::screen_update_mystston(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	int flip = (*m_video_control & 0x80) ^ ((screen.machine().root_device().ioport("DSW1")->read() & 0x20) << 2);
+	int flip = (*m_video_control & 0x80) ^ ((machine().root_device().ioport("DSW1")->read() & 0x20) << 2);
 
-	set_palette(screen.machine(), this);
+	set_palette(machine(), this);
 
-	screen.machine().tilemap().mark_all_dirty();
+	machine().tilemap().mark_all_dirty();
 	m_bg_tilemap->set_scrolly(0, *m_scroll);
-	screen.machine().tilemap().set_flip_all(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	machine().tilemap().set_flip_all(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, cliprect, screen.machine().gfx[2], flip);
+	draw_sprites(bitmap, cliprect, machine().gfx[2], flip);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;

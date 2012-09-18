@@ -207,7 +207,7 @@ void rainbow_state::machine_reset()
 
 UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *devconf = screen.machine().device("vt100_video");
+	device_t *devconf = machine().device("vt100_video");
 	rainbow_video_update( devconf, bitmap, cliprect);
 	return 0;
 }

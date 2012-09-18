@@ -64,14 +64,14 @@ UINT32 cardline_state::screen_update_cardline(screen_device &screen, bitmap_ind1
 			int index=y*64+x;
 			if(m_video&1)
 			{
-				DRAW_TILE(screen.machine(),0,0);
-				DRAW_TILE(screen.machine(),0x800,1);
+				DRAW_TILE(machine(),0,0);
+				DRAW_TILE(machine(),0x800,1);
 			}
 
 			if(m_video&2)
 			{
-				DRAW_TILE(screen.machine(),0x1000,0);
-				DRAW_TILE(screen.machine(),0x1800,1);
+				DRAW_TILE(machine(),0x1000,0);
+				DRAW_TILE(machine(),0x1800,1);
 			}
 		}
 	}

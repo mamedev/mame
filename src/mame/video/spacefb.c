@@ -396,7 +396,7 @@ static void draw_objects(running_machine &machine, bitmap_rgb32 &bitmap, const r
 
 UINT32 spacefb_state::screen_update_spacefb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	draw_objects(screen.machine(), bitmap, cliprect);
+	draw_objects(machine(), bitmap, cliprect);
 	draw_starfield(screen, bitmap, cliprect);
 
 	return 0;

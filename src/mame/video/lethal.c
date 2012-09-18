@@ -104,7 +104,7 @@ UINT32 lethal_state::screen_update_lethalen(screen_device &screen, bitmap_ind16 
 {
 
 	bitmap.fill(7168, cliprect);
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 3, K056832_DRAW_FLAG_MIRROR, 1);
 	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 2);

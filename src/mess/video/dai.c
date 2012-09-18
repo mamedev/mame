@@ -57,7 +57,7 @@ void dai_state::video_start()
 
 UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i, j, k, l;
 
 	UINT8* char_rom = memregion("gfx1")->base();

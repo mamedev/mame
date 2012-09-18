@@ -81,7 +81,7 @@ UINT32 arcadecl_state::screen_update_arcadecl(screen_device &screen, bitmap_ind1
 {
 
 	/* draw the playfield */
-	arcadecl_bitmap_render(screen.machine(), bitmap, cliprect);
+	arcadecl_bitmap_render(machine(), bitmap, cliprect);
 
 	/* draw and merge the MO */
 	if (m_has_mo)

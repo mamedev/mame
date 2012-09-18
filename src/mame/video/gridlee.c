@@ -131,7 +131,7 @@ WRITE8_MEMBER(gridlee_state::gridlee_palette_select_w)
 
 UINT32 gridlee_state::screen_update_gridlee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pens = &screen.machine().pens[m_palettebank_vis * 32];
+	const pen_t *pens = &machine().pens[m_palettebank_vis * 32];
 	UINT8 *gfx;
 	int x, y, i;
 
@@ -156,7 +156,7 @@ UINT32 gridlee_state::screen_update_gridlee(screen_device &screen, bitmap_ind16 
 	}
 
 	/* draw the sprite images */
-	gfx = screen.machine().root_device().memregion("gfx1")->base();
+	gfx = machine().root_device().memregion("gfx1")->base();
 	for (i = 0; i < 32; i++)
 	{
 		UINT8 *sprite = m_spriteram + i * 4;

@@ -38,7 +38,7 @@ UINT32 intrscti_state::screen_update_intrscti(screen_device &screen, bitmap_ind1
 	int y,x;
 	int count;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	count = 0;
 	for (y=0;y<32;y++)
@@ -47,7 +47,7 @@ UINT32 intrscti_state::screen_update_intrscti(screen_device &screen, bitmap_ind1
 		{
 			int dat;
 			dat = m_vram[count];
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],dat/*+0x100*/,0,0,0,x*8,y*8,0);
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[0],dat/*+0x100*/,0,0,0,x*8,y*8,0);
 			count++;
 		}
 	}
@@ -59,7 +59,7 @@ UINT32 intrscti_state::screen_update_intrscti(screen_device &screen, bitmap_ind1
 		{
 			int dat;
 			dat = m_vram[count];
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],dat+0x100,0,0,0,x*8,y*8,0);
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[0],dat+0x100,0,0,0,x*8,y*8,0);
 			count++;
 		}
 	}

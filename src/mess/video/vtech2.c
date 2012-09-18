@@ -142,7 +142,7 @@ UINT32 vtech2_state::screen_update_laser(screen_device &screen, bitmap_ind16 &bi
 					sy = BORDER_V/2 + y;
 					sx = BORDER_H/2 + x * 8;
 					code = videoram[offs];
-					drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[2],code,color,0,0,sx,sy);
+					drawgfx_opaque(bitmap,cliprect,machine().gfx[2],code,color,0,0,sx,sy);
 				}
 			}
 			break;
@@ -162,7 +162,7 @@ UINT32 vtech2_state::screen_update_laser(screen_device &screen, bitmap_ind16 &bi
 					sx = BORDER_H/2 + x * 16;
 					code = videoram[offs];
 					color = videoram[offs+1];
-					drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[3],code,color,0,0,sx,sy);
+					drawgfx_opaque(bitmap,cliprect,machine().gfx[3],code,color,0,0,sx,sy);
 				}
 			}
 			break;
@@ -181,7 +181,7 @@ UINT32 vtech2_state::screen_update_laser(screen_device &screen, bitmap_ind16 &bi
 					sy = BORDER_V/2 + y;
 					sx = BORDER_H/2 + x * 8;
 					code = videoram[offs];
-					drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[5],code,0,0,0,sx,sy);
+					drawgfx_opaque(bitmap,cliprect,machine().gfx[5],code,0,0,0,sx,sy);
 				}
 			}
 			break;
@@ -201,7 +201,7 @@ UINT32 vtech2_state::screen_update_laser(screen_device &screen, bitmap_ind16 &bi
 					sy = BORDER_V/2 + y * 2;
 					sx = BORDER_H/2 + x * 8;
 					code = videoram[offs];
-					drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[6],code,0,0,0,sx,sy);
+					drawgfx_opaque(bitmap,cliprect,machine().gfx[6],code,0,0,0,sx,sy);
 				}
 			}
 			break;
@@ -220,7 +220,7 @@ UINT32 vtech2_state::screen_update_laser(screen_device &screen, bitmap_ind16 &bi
 					sy = BORDER_V/2 + y;
 					sx = BORDER_H/2 + x * 16;
 					code = videoram[offs];
-					drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[3],code,color,0,0,sx,sy);
+					drawgfx_opaque(bitmap,cliprect,machine().gfx[3],code,color,0,0,sx,sy);
 				}
 			}
 			break;
@@ -240,7 +240,7 @@ UINT32 vtech2_state::screen_update_laser(screen_device &screen, bitmap_ind16 &bi
 					sx = BORDER_H/2 + x * 32;
 					code = videoram[offs];
 					color = videoram[offs+1];
-					drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[4],code,color,0,0,sx,sy);
+					drawgfx_opaque(bitmap,cliprect,machine().gfx[4],code,color,0,0,sx,sy);
 				}
 			}
 			break;
@@ -261,7 +261,7 @@ UINT32 vtech2_state::screen_update_laser(screen_device &screen, bitmap_ind16 &bi
 					sy = BORDER_V/2 + y * 8;
 					sx = BORDER_H/2 + x * 8;
 					code = videoram[0x3800+offs];
-					drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],code,color,0,0,sx,sy);
+					drawgfx_opaque(bitmap,cliprect,machine().gfx[0],code,color,0,0,sx,sy);
 				}
 			}
 		}
@@ -278,7 +278,7 @@ UINT32 vtech2_state::screen_update_laser(screen_device &screen, bitmap_ind16 &bi
 					sx = BORDER_H/2 + x * 16;
 					code = videoram[0x3800+offs];
 					color = videoram[0x3801+offs];
-					drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[1],code,color,0,0,sx,sy);
+					drawgfx_opaque(bitmap,cliprect,machine().gfx[1],code,color,0,0,sx,sy);
 				}
 			}
 		}

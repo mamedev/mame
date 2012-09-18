@@ -520,10 +520,10 @@ UINT32 twin16_state::screen_update_twin16(screen_device &screen, bitmap_ind16 &b
 	if (m_video_register&TWIN16_SCREEN_FLIPX) text_flip|=TILEMAP_FLIPX;
 	if (m_video_register&TWIN16_SCREEN_FLIPY) text_flip|=TILEMAP_FLIPY;
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
-	draw_layer( screen.machine(), bitmap, 1 );
-	draw_layer( screen.machine(), bitmap, 0 );
-	draw_sprites( screen.machine(), bitmap );
+	machine().priority_bitmap.fill(0, cliprect);
+	draw_layer( machine(), bitmap, 1 );
+	draw_layer( machine(), bitmap, 0 );
+	draw_sprites( machine(), bitmap );
 
 	if (text_flip) m_text_tilemap->set_flip(text_flip);
 	m_text_tilemap->draw(bitmap, cliprect, 0, 0);
@@ -535,10 +535,10 @@ void twin16_state::screen_eof_twin16(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		twin16_set_sprite_timer(screen.machine());
+		twin16_set_sprite_timer(machine());
 
-		if (twin16_spriteram_process_enable(screen.machine())) {
-			if (m_need_process_spriteram) twin16_spriteram_process(screen.machine());
+		if (twin16_spriteram_process_enable(machine())) {
+			if (m_need_process_spriteram) twin16_spriteram_process(machine());
 			m_need_process_spriteram = 1;
 
 			/* if the sprite preprocessor is used, sprite ram is copied to an external buffer first,

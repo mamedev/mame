@@ -350,11 +350,11 @@ UINT32 dmndrby_state::screen_update_dderby(screen_device &screen, bitmap_ind16 &
 {
 	int x,y,count;
 	int off,scrolly;
-	gfx_element *gfx = screen.machine().gfx[0];
-	gfx_element *sprites = screen.machine().gfx[1];
-	gfx_element *track = screen.machine().gfx[2];
+	gfx_element *gfx = machine().gfx[0];
+	gfx_element *sprites = machine().gfx[1];
+	gfx_element *track = machine().gfx[2];
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 
 /* Draw racetrack

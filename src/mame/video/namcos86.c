@@ -356,15 +356,15 @@ UINT32 namcos86_state::screen_update_namcos86(screen_device &screen, bitmap_ind1
 	/* flip screen is embedded in the sprite control registers */
 	/* can't use flip_screen_set() because the visible area is asymmetrical */
 	flip_screen_set_no_update(m_spriteram[0x07f6] & 1);
-	screen.machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	set_scroll(screen.machine(), 0);
-	set_scroll(screen.machine(), 1);
-	set_scroll(screen.machine(), 2);
-	set_scroll(screen.machine(), 3);
+	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	set_scroll(machine(), 0);
+	set_scroll(machine(), 1);
+	set_scroll(machine(), 2);
+	set_scroll(machine(), 3);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
-	bitmap.fill(screen.machine().gfx[0]->colorbase() + 8*m_backcolor+7, cliprect);
+	bitmap.fill(machine().gfx[0]->colorbase() + 8*m_backcolor+7, cliprect);
 
 	for (layer = 0;layer < 8;layer++)
 	{
@@ -377,7 +377,7 @@ UINT32 namcos86_state::screen_update_namcos86(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	draw_sprites(machine(),bitmap,cliprect);
 	return 0;
 }
 

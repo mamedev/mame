@@ -77,7 +77,7 @@ UINT32 aliens_state::screen_update_aliens(screen_device &screen, bitmap_ind16 &b
 
 	k052109_tilemap_update(m_k052109);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(m_layer_colorbase[1] * 16, cliprect);
 
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, 0, 1);

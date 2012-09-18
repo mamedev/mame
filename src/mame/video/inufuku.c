@@ -229,8 +229,8 @@ UINT32 inufuku_state::screen_update_inufuku(screen_device &screen, bitmap_ind16 
 {
 	int i;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	screen.machine().priority_bitmap.fill(0);
+	bitmap.fill(get_black_pen(machine()), cliprect);
+	machine().priority_bitmap.fill(0);
 
 	if (m_bg_raster)
 	{
@@ -250,6 +250,6 @@ UINT32 inufuku_state::screen_update_inufuku(screen_device &screen, bitmap_ind16 
 	m_tx_tilemap->set_scrolly(0, m_tx_scrolly);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }

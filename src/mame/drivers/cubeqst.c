@@ -127,8 +127,8 @@ UINT32 cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb32 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		int i;
-		int num_entries = cubeqcpu_get_ptr_ram_val(screen.machine().device("line_cpu"), y);
-		UINT32 *stk_ram = cubeqcpu_get_stack_ram(screen.machine().device("line_cpu"));
+		int num_entries = cubeqcpu_get_ptr_ram_val(machine().device("line_cpu"), y);
+		UINT32 *stk_ram = cubeqcpu_get_stack_ram(machine().device("line_cpu"));
 		UINT32 *dest = &bitmap.pix32(y);
 		UINT32 pen;
 

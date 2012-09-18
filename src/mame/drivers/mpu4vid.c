@@ -517,7 +517,7 @@ UINT32 mpu4vid_state::screen_update_mpu4_vid(screen_device &screen, bitmap_rgb32
 
 	bitmap.fill(0, cliprect);
 
-	m_scn2674->scn2574_draw(screen.machine(), bitmap, cliprect, m_vid_mainram );
+	m_scn2674->scn2574_draw(machine(), bitmap, cliprect, m_vid_mainram );
 
 	return 0;
 }

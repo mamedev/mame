@@ -247,7 +247,7 @@ UINT32 williams_state::screen_update_williams2(screen_device &screen, bitmap_rgb
 
 	/* fetch the relevant pens */
 	for (x = 1; x < 16; x++)
-		pens[x] = palette_get_color(screen.machine(), m_williams2_fg_color * 16 + x);
+		pens[x] = palette_get_color(machine(), m_williams2_fg_color * 16 + x);
 
 	/* loop over rows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)

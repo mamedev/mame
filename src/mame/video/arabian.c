@@ -367,7 +367,7 @@ WRITE8_MEMBER(arabian_state::arabian_videoram_w)
 
 UINT32 arabian_state::screen_update_arabian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pens = &screen.machine().pens[(m_video_control >> 3) << 8];
+	const pen_t *pens = &machine().pens[(m_video_control >> 3) << 8];
 	int y;
 
 	/* render the screen from the bitmap */

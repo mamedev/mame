@@ -76,15 +76,15 @@ void super80_state::screen_eof_super80m(screen_device &screen, bool state)
 	if (state)
 	{
 		/* if we chose another palette or colour mode, enable it */
-		UINT8 chosen_palette = (screen.machine().root_device().ioport("CONFIG")->read() & 0x60)>>5;				// read colour dipswitches
+		UINT8 chosen_palette = (machine().root_device().ioport("CONFIG")->read() & 0x60)>>5;				// read colour dipswitches
 
 		if (chosen_palette != m_current_palette)						// any changes?
 		{
 			m_current_palette = chosen_palette;					// save new palette
 			if (!m_current_palette)
-				palette_set_colors_rgb(screen.machine(), super80_comp_palette);		// composite colour
+				palette_set_colors_rgb(machine(), super80_comp_palette);		// composite colour
 			else
-				palette_set_colors_rgb(screen.machine(), super80_rgb_palette);		// rgb and b&w
+				palette_set_colors_rgb(machine(), super80_rgb_palette);		// rgb and b&w
 		}
 	}
 }
@@ -97,7 +97,7 @@ UINT32 super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 
 
 	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
 
-	if ((m_shared & 4) || (!(screen.machine().root_device().ioport("CONFIG")->read() & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((m_shared & 4) || (!(machine().root_device().ioport("CONFIG")->read() & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -138,7 +138,7 @@ UINT32 super80_state::screen_update_super80d(screen_device &screen, bitmap_ind16
 
 	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
 
-	if ((m_shared & 4) || (!(screen.machine().root_device().ioport("CONFIG")->read() & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((m_shared & 4) || (!(machine().root_device().ioport("CONFIG")->read() & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -179,7 +179,7 @@ UINT32 super80_state::screen_update_super80e(screen_device &screen, bitmap_ind16
 
 	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
 
-	if ((m_shared & 4) || (!(screen.machine().root_device().ioport("CONFIG")->read() & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((m_shared & 4) || (!(machine().root_device().ioport("CONFIG")->read() & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -216,7 +216,7 @@ UINT32 super80_state::screen_update_super80m(screen_device &screen, bitmap_ind16
 {
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=m_vidpg,x;
-	UINT8 col, bg=0, fg=0, options=screen.machine().root_device().ioport("CONFIG")->read();
+	UINT8 col, bg=0, fg=0, options=machine().root_device().ioport("CONFIG")->read();
 	UINT8 *RAM = memregion("maincpu")->base();
 
 	/* get selected character generator */
@@ -384,7 +384,7 @@ UINT32 super80_state::screen_update_super80v(screen_device &screen, bitmap_rgb32
 	m_framecnt++;
 	m_speed = m_mc6845_reg[10]&0x20, m_flash = m_mc6845_reg[10]&0x40; // cursor modes
 	m_cursor = (m_mc6845_reg[14]<<8) | m_mc6845_reg[15]; // get cursor position
-	m_s_options=screen.machine().root_device().ioport("CONFIG")->read();
+	m_s_options=machine().root_device().ioport("CONFIG")->read();
 	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
 	m_6845->screen_update(screen, bitmap, cliprect);
 	return 0;

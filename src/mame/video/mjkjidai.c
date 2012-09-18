@@ -128,11 +128,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 UINT32 mjkjidai_state::screen_update_mjkjidai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (!m_display_enable)
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 	else
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-		draw_sprites(screen.machine(), bitmap,cliprect);
+		draw_sprites(machine(), bitmap,cliprect);
 	}
 	return 0;
 }

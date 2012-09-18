@@ -1285,7 +1285,7 @@ UINT32 taitotz_state::screen_update_taitotz(screen_device &screen, bitmap_rgb32 
 
 	bitmap.fill(0x000000, cliprect);
 	m_renderer->set_fb(&bitmap);
-	m_renderer->render_displaylist(screen.machine(), cliprect);
+	m_renderer->render_displaylist(machine(), cliprect);
 
 
 	UINT16 *screen_src = (UINT16*)&m_screen_ram[m_scr_base];

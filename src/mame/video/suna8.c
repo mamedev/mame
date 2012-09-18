@@ -434,16 +434,16 @@ UINT32 suna8_state::screen_update_suna8(screen_device &screen, bitmap_ind16 &bit
 
 #ifdef MAME_DEBUG
 #if TILEMAPS
-	if (screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input().code_pressed(KEYCODE_X))
+	if (machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed(KEYCODE_X))
 	{
 		int max_tiles = memregion("gfx1")->bytes() / (0x400 * 0x20);
 
-		if (screen.machine().input().code_pressed_once(KEYCODE_Q))	{ m_page--;	screen.machine().tilemap().mark_all_dirty();	}
-		if (screen.machine().input().code_pressed_once(KEYCODE_W))	{ m_page++;	screen.machine().tilemap().mark_all_dirty();	}
-		if (screen.machine().input().code_pressed_once(KEYCODE_E))	{ m_tiles--;	screen.machine().tilemap().mark_all_dirty();	}
-		if (screen.machine().input().code_pressed_once(KEYCODE_R))	{ m_tiles++;	screen.machine().tilemap().mark_all_dirty();	}
-		if (screen.machine().input().code_pressed_once(KEYCODE_A))	{ m_trombank--;	screen.machine().tilemap().mark_all_dirty();	}
-		if (screen.machine().input().code_pressed_once(KEYCODE_S))	{ m_trombank++;	screen.machine().tilemap().mark_all_dirty();	}
+		if (machine().input().code_pressed_once(KEYCODE_Q))	{ m_page--;	machine().tilemap().mark_all_dirty();	}
+		if (machine().input().code_pressed_once(KEYCODE_W))	{ m_page++;	machine().tilemap().mark_all_dirty();	}
+		if (machine().input().code_pressed_once(KEYCODE_E))	{ m_tiles--;	machine().tilemap().mark_all_dirty();	}
+		if (machine().input().code_pressed_once(KEYCODE_R))	{ m_tiles++;	machine().tilemap().mark_all_dirty();	}
+		if (machine().input().code_pressed_once(KEYCODE_A))	{ m_trombank--;	machine().tilemap().mark_all_dirty();	}
+		if (machine().input().code_pressed_once(KEYCODE_S))	{ m_trombank++;	machine().tilemap().mark_all_dirty();	}
 
 		m_rombank  &= 0xf;
 		m_page  &= (m_text_dim > 0)?3:7;
@@ -463,8 +463,8 @@ UINT32 suna8_state::screen_update_suna8(screen_device &screen, bitmap_ind16 &bit
 #endif
 #endif
 	{
-		draw_normal_sprites(screen.machine() ,bitmap,cliprect);
-		draw_text_sprites(screen.machine(), bitmap,cliprect);
+		draw_normal_sprites(machine() ,bitmap,cliprect);
+		draw_text_sprites(machine(), bitmap,cliprect);
 	}
 	return 0;
 }

@@ -468,7 +468,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap_bg, bitm
 
 UINT32 tecmo16_state::screen_update_tecmo16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	m_tile_bitmap_bg.fill(0x300, cliprect);
 	m_tile_bitmap_fg.fill(0, cliprect);
@@ -483,9 +483,9 @@ UINT32 tecmo16_state::screen_update_tecmo16(screen_device &screen, bitmap_rgb32 
 	m_tx_tilemap->draw(m_tile_bitmap_fg, cliprect, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	draw_sprites(screen.machine(), m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect);
+	draw_sprites(machine(), m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(screen.machine(), bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);
+	blendbitmaps(machine(), bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);
 	return 0;
 }

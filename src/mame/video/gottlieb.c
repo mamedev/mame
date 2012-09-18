@@ -246,10 +246,10 @@ UINT32 gottlieb_state::screen_update_gottlieb(screen_device &screen, bitmap_rgb3
 	if (!m_background_priority)
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	else
-		bitmap.fill(screen.machine().pens[0], cliprect);
+		bitmap.fill(machine().pens[0], cliprect);
 
 	/* draw the sprites */
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 
 	/* if the background has higher priority, render it now */
 	if (m_background_priority)

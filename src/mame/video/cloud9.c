@@ -245,7 +245,7 @@ UINT32 cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 &b
 {
 	UINT8 *spriteaddr = m_spriteram;
 	int flip = m_video_control[5] ? 0xff : 0x00;	/* PLAYER2 */
-	pen_t black = get_black_pen(screen.machine());
+	pen_t black = get_black_pen(machine());
 	int x, y, offs;
 
 	/* draw the sprites */
@@ -260,9 +260,9 @@ UINT32 cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 &b
 			int which = spriteaddr[offs + 0x20];
 			int color = 0;
 
-			drawgfx_transpen(m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, xflip, yflip, x, y, 0);
+			drawgfx_transpen(m_spritebitmap, cliprect, machine().gfx[0], which, color, xflip, yflip, x, y, 0);
 			if (x >= 256 - 16)
-				drawgfx_transpen(m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, xflip, yflip, x - 256, y, 0);
+				drawgfx_transpen(m_spritebitmap, cliprect, machine().gfx[0], which, color, xflip, yflip, x - 256, y, 0);
 		}
 
 	/* draw the bitmap to the screen, looping over Y */

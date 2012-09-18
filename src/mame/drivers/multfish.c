@@ -285,7 +285,7 @@ UINT32 multfish_state::screen_update_multfish(screen_device &screen, bitmap_ind1
 {
 	int i;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (!m_disp_enable) return 0;
 

@@ -57,7 +57,7 @@ UINT32 polyplay_state::screen_update_polyplay(screen_device &screen, bitmap_ind1
 		int sy = offs >> 6 << 3;
 		UINT8 code = videoram[offs];
 
-		drawgfx_opaque(bitmap,cliprect, screen.machine().gfx[(code >> 7) & 0x01],
+		drawgfx_opaque(bitmap,cliprect, machine().gfx[(code >> 7) & 0x01],
 				code, 0, 0, 0, sx, sy);
 	}
 

@@ -166,7 +166,7 @@ static void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_eleme
 UINT32 gamecstl_state::screen_update_gamecstl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i, j;
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 	UINT32 *cga = m_cga_ram;
 	int index = 0;
 

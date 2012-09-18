@@ -170,7 +170,7 @@ UINT32 mbc200_state::screen_update_mbc200(screen_device &screen, bitmap_ind16 &b
 					dot = (m_vram[count] >> (7-xi)) & 1;
 
 					if(y*4+yi < 400 && x*8+xi < 640) /* TODO: safety check */
-						bitmap.pix16(y*4+yi, x*8+xi) = screen.machine().pens[dot];
+						bitmap.pix16(y*4+yi, x*8+xi) = machine().pens[dot];
 				}
 
 				count++;

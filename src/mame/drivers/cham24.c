@@ -306,7 +306,7 @@ void cham24_state::video_start()
 UINT32 cham24_state::screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* render the ppu */
-	ppu2c0x_device *ppu = screen.machine().device<ppu2c0x_device>("ppu");
+	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
 	ppu->render(bitmap, 0, 0, 0, 0);
 	return 0;
 }

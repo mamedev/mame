@@ -463,8 +463,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 UINT32 zaxxon_state::screen_update_zaxxon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	draw_background(screen.machine(), bitmap, cliprect, TRUE);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0x140, 0x180);
+	draw_background(machine(), bitmap, cliprect, TRUE);
+	draw_sprites(machine(), bitmap, cliprect, 0x140, 0x180);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -473,8 +473,8 @@ UINT32 zaxxon_state::screen_update_zaxxon(screen_device &screen, bitmap_ind16 &b
 UINT32 zaxxon_state::screen_update_futspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	draw_background(screen.machine(), bitmap, cliprect, TRUE);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0x180, 0x180);
+	draw_background(machine(), bitmap, cliprect, TRUE);
+	draw_sprites(machine(), bitmap, cliprect, 0x180, 0x180);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -483,8 +483,8 @@ UINT32 zaxxon_state::screen_update_futspy(screen_device &screen, bitmap_ind16 &b
 UINT32 zaxxon_state::screen_update_razmataz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	draw_background(screen.machine(), bitmap, cliprect, FALSE);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0x140, 0x180);
+	draw_background(machine(), bitmap, cliprect, FALSE);
+	draw_sprites(machine(), bitmap, cliprect, 0x140, 0x180);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -493,8 +493,8 @@ UINT32 zaxxon_state::screen_update_razmataz(screen_device &screen, bitmap_ind16 
 UINT32 zaxxon_state::screen_update_congo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	draw_background(screen.machine(), bitmap, cliprect, TRUE);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0x280, 0x180);
+	draw_background(machine(), bitmap, cliprect, TRUE);
+	draw_sprites(machine(), bitmap, cliprect, 0x280, 0x180);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

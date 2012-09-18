@@ -461,7 +461,7 @@ UINT32 ninjakd2_state::screen_update_ninjakd2(screen_device &screen, bitmap_ind1
 {
 	// updating sprites here instead than in screen_eof avoids a palette glitch
 	// at the end of the "rainbow sky" screens.
-	update_sprites(screen.machine());
+	update_sprites(machine());
 	m_sprites_updated = 1;
 
 	bitmap.fill(0, cliprect);
@@ -477,7 +477,7 @@ UINT32 ninjakd2_state::screen_update_ninjakd2(screen_device &screen, bitmap_ind1
 
 UINT32 ninjakd2_state::screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	update_sprites(screen.machine());
+	update_sprites(machine());
 	m_sprites_updated = 1;
 
 	bitmap.fill(0, cliprect);
@@ -497,7 +497,7 @@ UINT32 ninjakd2_state::screen_update_robokid(screen_device &screen, bitmap_ind16
 
 UINT32 ninjakd2_state::screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	update_sprites(screen.machine());
+	update_sprites(machine());
 	m_sprites_updated = 1;
 
 	bitmap.fill(0, cliprect);
@@ -522,7 +522,7 @@ void ninjakd2_state::screen_eof_ninjakd2(screen_device &screen, bool state)
 	if (state)
 	{
 		if (!m_sprites_updated)
-			update_sprites(screen.machine());
+			update_sprites(machine());
 
 		m_sprites_updated = 0;
 	}

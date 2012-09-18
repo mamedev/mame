@@ -21,7 +21,7 @@ UINT32 b2m_state::screen_update_b2m(screen_device &screen, bitmap_ind16 &bitmap,
 	UINT8 code2;
 	UINT8 col;
 	int y, x, b;
-	UINT8 *ram = screen.machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
 	for (x = 0; x < 48; x++)
 	{

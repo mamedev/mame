@@ -149,12 +149,12 @@ UINT32 hotblock_state::screen_update_hotblock(screen_device &screen, bitmap_ind1
 	int i;
 	static const int xxx = 320, yyy = 204;
 
-	bitmap.fill(get_black_pen(screen.machine()));
+	bitmap.fill(get_black_pen(machine()));
 
 	for (i = 0; i < 256; i++)
 	{
 		int dat = (m_pal[i * 2 + 1] << 8) | m_pal[i * 2];
-		palette_set_color_rgb(screen.machine(), i, pal5bit(dat >> 0), pal5bit(dat >> 5), pal5bit(dat >> 10));
+		palette_set_color_rgb(machine(), i, pal5bit(dat >> 0), pal5bit(dat >> 5), pal5bit(dat >> 10));
 	}
 
 	count = 0;

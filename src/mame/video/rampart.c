@@ -79,7 +79,7 @@ UINT32 rampart_state::screen_update_rampart(screen_device &screen, bitmap_ind16 
 	int x, y, r;
 
 	/* draw the playfield */
-	rampart_bitmap_render(screen.machine(), bitmap, cliprect);
+	rampart_bitmap_render(machine(), bitmap, cliprect);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);

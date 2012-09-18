@@ -102,12 +102,12 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 {
 	int x,y,yi;
 	UINT16 count;
-	UINT8 *vram = screen.machine().root_device().memregion("vram")->base();
-	UINT8 *attr = screen.machine().root_device().memregion("attr")->base();
+	UINT8 *vram = machine().root_device().memregion("vram")->base();
+	UINT8 *attr = machine().root_device().memregion("attr")->base();
 	UINT8 *gram = memregion("fbuf")->base();
 	int x_width;
 
-	bitmap.fill(screen.machine().pens[m_backdrop_pen], cliprect);
+	bitmap.fill(machine().pens[m_backdrop_pen], cliprect);
 
 	x_width = (m_display_reg & 0x80) ? 2 : 4;
 
@@ -125,23 +125,23 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 				/* todo: clean this up! */
 				if(x_width == 2)
 				{
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = screen.machine().pens[color];
+					bitmap.pix16(y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = machine().pens[color];
 				}
 				else
 				{
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = screen.machine().pens[color];
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = screen.machine().pens[color];
+					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = machine().pens[color];
+					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = machine().pens[color];
 				}
 
 				color = (gram[count] & 0x0f) >> 0;
 				if(x_width == 2)
 				{
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = screen.machine().pens[color];
+					bitmap.pix16(y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = machine().pens[color];
 				}
 				else
 				{
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = screen.machine().pens[color];
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = screen.machine().pens[color];
+					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = machine().pens[color];
+					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = machine().pens[color];
 				}
 
 				count++;
@@ -181,20 +181,20 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 				case 3: bk_pen = (color ^ 0xf); break; //complementary
 			}
 
-			if(blink && screen.machine().primary_screen->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
+			if(blink && machine().primary_screen->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
 				color = bk_pen;
 
 			for(yi=0;yi<8;yi++)
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					UINT8 *gfx_data = screen.machine().root_device().memregion("pcg")->base();
+					UINT8 *gfx_data = machine().root_device().memregion("pcg")->base();
 					int pen;
 
 					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? (color+m_pal_mode) : bk_pen;
 
 					if(pen != -1)
-						bitmap.pix16(y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = screen.machine().pens[pen];
+						bitmap.pix16(y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = machine().pens[pen];
 				}
 			}
 
@@ -208,8 +208,8 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(screen.machine().primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(screen.machine().primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+					case 0x40: if(machine().primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(machine().primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
 				}
 
 				if(cursor_on)
@@ -218,7 +218,7 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = screen.machine().pens[0x7];
+							bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = machine().pens[0x7];
 						}
 					}
 				}

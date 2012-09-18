@@ -353,7 +353,7 @@ UINT32 exerion_state::screen_update_exerion(screen_device &screen, bitmap_ind16 
 	int sx, sy, offs, i;
 
 	/* draw background */
-	draw_background(screen.machine(), bitmap, cliprect);
+	draw_background(machine(), bitmap, cliprect);
 
 	/* draw sprites */
 	for (i = 0; i < m_spriteram.bytes(); i += 4)
@@ -370,7 +370,7 @@ UINT32 exerion_state::screen_update_exerion(screen_device &screen, bitmap_ind16 
 		int code2 = code;
 
 		int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (m_sprite_palette * 16);
-		gfx_element *gfx = doubled ? screen.machine().gfx[2] : screen.machine().gfx[1];
+		gfx_element *gfx = doubled ? machine().gfx[2] : machine().gfx[1];
 
 		if (m_cocktail_flip)
 		{
@@ -389,11 +389,11 @@ UINT32 exerion_state::screen_update_exerion(screen_device &screen, bitmap_ind16 
 				code &= ~0x10, code2 |= 0x10;
 
 			drawgfx_transmask(bitmap, cliprect, gfx, code2, color, xflip, yflip, x, y + gfx->height(),
-			        colortable_get_transpen_mask(screen.machine().colortable, gfx, color, 0x10));
+			        colortable_get_transpen_mask(machine().colortable, gfx, color, 0x10));
 		}
 
 		drawgfx_transmask(bitmap, cliprect, gfx, code, color, xflip, yflip, x, y,
-			    colortable_get_transpen_mask(screen.machine().colortable, gfx, color, 0x10));
+			    colortable_get_transpen_mask(machine().colortable, gfx, color, 0x10));
 
 		if (doubled) i += 4;
 	}
@@ -406,7 +406,7 @@ UINT32 exerion_state::screen_update_exerion(screen_device &screen, bitmap_ind16 
 			int y = m_cocktail_flip ? (31*8 - 8*sy) : 8*sy;
 
 			offs = sx + sy * 64;
-			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[0],
 				m_videoram[offs] + 256 * m_char_bank,
 				((m_videoram[offs] & 0xf0) >> 4) + m_char_palette * 16,
 				m_cocktail_flip, m_cocktail_flip, x, y, 0);

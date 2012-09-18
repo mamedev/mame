@@ -607,7 +607,7 @@ UINT32 itech8_state::screen_update_itech8_2layer(screen_device &screen, bitmap_r
 	struct tms34061_display &tms_state = m_tms_state;
 	UINT32 page_offset;
 	int x, y;
-	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
+	const rgb_t *pens = tlc34076_get_pens(machine().device("tlc34076"));
 
 	/* first get the current display state */
 	tms34061_get_display_state(&tms_state);
@@ -615,7 +615,7 @@ UINT32 itech8_state::screen_update_itech8_2layer(screen_device &screen, bitmap_r
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
@@ -651,7 +651,7 @@ UINT32 itech8_state::screen_update_itech8_grmatch(screen_device &screen, bitmap_
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
@@ -692,7 +692,7 @@ UINT32 itech8_state::screen_update_itech8_2page(screen_device &screen, bitmap_rg
 	struct tms34061_display &tms_state = m_tms_state;
 	UINT32 page_offset;
 	int x, y;
-	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
+	const rgb_t *pens = tlc34076_get_pens(machine().device("tlc34076"));
 
 	/* first get the current display state */
 	tms34061_get_display_state(&tms_state);
@@ -700,7 +700,7 @@ UINT32 itech8_state::screen_update_itech8_2page(screen_device &screen, bitmap_rg
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
@@ -724,7 +724,7 @@ UINT32 itech8_state::screen_update_itech8_2page_large(screen_device &screen, bit
 	struct tms34061_display &tms_state = m_tms_state;
 	UINT32 page_offset;
 	int x, y;
-	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
+	const rgb_t *pens = tlc34076_get_pens(machine().device("tlc34076"));
 
 	/* first get the current display state */
 	tms34061_get_display_state(&tms_state);
@@ -732,7 +732,7 @@ UINT32 itech8_state::screen_update_itech8_2page_large(screen_device &screen, bit
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 

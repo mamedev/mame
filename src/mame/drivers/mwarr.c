@@ -485,7 +485,7 @@ UINT32 mwarr_state::screen_update_mwarr(screen_device &screen, bitmap_ind16 &bit
 {
 	int i;
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	if (BIT(m_vidattrram[6], 0))
 	{
@@ -531,7 +531,7 @@ UINT32 mwarr_state::screen_update_mwarr(screen_device &screen, bitmap_ind16 &bit
 	m_mlow_tilemap->draw(bitmap, cliprect, 0, 0x02);
 	m_mhigh_tilemap->draw(bitmap, cliprect, 0, 0x04);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0x10);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }
 

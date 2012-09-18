@@ -366,7 +366,7 @@ UINT32 goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_ind1
 {
 	int i;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (!(m_cm_enable_reg &0x01))
 		return 0;
@@ -393,9 +393,9 @@ UINT32 goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_ind1
 
 	if (m_cm_enable_reg &0x04)
 	{
-		if (screen.machine().root_device().memregion("user1")->base())
+		if (machine().root_device().memregion("user1")->base())
 		{
-			gfx_element *gfx = screen.machine().gfx[2];
+			gfx_element *gfx = machine().gfx[2];
 			int girlyscroll = (INT8)((m_cm_girl_scroll & 0xf0));
 			int girlxscroll = (INT8)((m_cm_girl_scroll & 0x0f)<<4);
 
@@ -416,7 +416,7 @@ UINT32 goldstar_state::screen_update_bingowng(screen_device &screen, bitmap_ind1
 {
 	int i;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (!(m_cm_enable_reg &0x01))
 		return 0;
@@ -435,9 +435,9 @@ UINT32 goldstar_state::screen_update_bingowng(screen_device &screen, bitmap_ind1
 
 	if (m_cm_enable_reg &0x04)
 	{
-		if (screen.machine().root_device().memregion("user1")->base())
+		if (machine().root_device().memregion("user1")->base())
 		{
-			gfx_element *gfx = screen.machine().gfx[2];
+			gfx_element *gfx = machine().gfx[2];
 			int girlyscroll = (INT8)((m_cm_girl_scroll & 0xf0));
 			int girlxscroll = (INT8)((m_cm_girl_scroll & 0x0f)<<4);
 
@@ -458,7 +458,7 @@ UINT32 goldstar_state::screen_update_magical(screen_device &screen, bitmap_ind16
 {
 	int i;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (!(m_cm_enable_reg &0x01))
 		return 0;
@@ -516,7 +516,7 @@ UINT32 goldstar_state::screen_update_unkch(screen_device &screen, bitmap_ind16 &
 {
 	int i;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (!(m_cm_enable_reg &0x01))
 		return 0;
@@ -569,7 +569,7 @@ UINT32 goldstar_state::screen_update_cmast91(screen_device &screen, bitmap_ind16
 {
 	int i;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (!(m_cm_enable_reg &0x01))
 		return 0;
@@ -604,7 +604,7 @@ UINT32 goldstar_state::screen_update_amcoe1a(screen_device &screen, bitmap_ind16
 {
 	int i;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (!(m_cm_enable_reg &0x01))
 		return 0;

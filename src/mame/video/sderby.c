@@ -105,7 +105,7 @@ UINT32 sderby_state::screen_update_sderby(screen_device &screen, bitmap_ind16 &b
 {
 
 	m_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap,cliprect,0);
+	draw_sprites(machine(), bitmap,cliprect,0);
 	m_md_tilemap->draw(bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
@@ -116,7 +116,7 @@ UINT32 sderby_state::screen_update_pmroulet(screen_device &screen, bitmap_ind16 
 
 	m_tilemap->draw(bitmap, cliprect, 0,0);
 	m_md_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap,cliprect,0);
+	draw_sprites(machine(), bitmap,cliprect,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

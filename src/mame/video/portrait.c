@@ -203,6 +203,6 @@ UINT32 portrait_state::screen_update_portrait(screen_device &screen, bitmap_ind1
 	m_background->draw(bitmap, cliprect_scroll, 0, 0);
 	m_foreground->draw(bitmap, cliprect_scroll, 0, 0);
 
-	draw_sprites(screen.machine(), bitmap,cliprect);
+	draw_sprites(machine(), bitmap,cliprect);
 	return 0;
 }

@@ -201,7 +201,7 @@ void igspoker_state::video_start()
 
 UINT32 igspoker_state::screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	// FIX: CSK227IT must have some way to disable background, or wrong gfx?
 	if (m_bg_enable) m_bg_tilemap->draw(bitmap, cliprect, 0, 0);

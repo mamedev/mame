@@ -169,7 +169,7 @@ UINT32 jantotsu_state::screen_update_jantotsu(screen_device &screen, bitmap_rgb3
 					color |= (((m_bitmap[count + pen_i*0x2000]) >> (7 - i)) & 1) << pen_i;
 
 				if (cliprect.contains(x + i, y))
-					bitmap.pix32(y, x + i) = screen.machine().pens[color];
+					bitmap.pix32(y, x + i) = machine().pens[color];
 			}
 
 			count++;

@@ -121,20 +121,20 @@ UINT32 backfire_state::screen_update_backfire_left(screen_device &screen, bitmap
 	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);
 	deco16ic_pf_update(m_deco_tilegen2, m_pf3_rowscroll, m_pf4_rowscroll);
 
-	screen.machine().priority_bitmap.fill(0);
+	machine().priority_bitmap.fill(0);
 	bitmap.fill(0x100, cliprect);
 
 	if (m_left_priority[0] == 0)
 	{
 		deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 1);
 		deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2);
-		screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram_1, 0x800);
+		machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram_1, 0x800);
 	}
 	else if (m_left_priority[0] == 2)
 	{
 		deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2);
 		deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 4);
-		screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram_1, 0x800);
+		machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram_1, 0x800);
 	}
 	else
 		popmessage( "unknown left priority %08x", m_left_priority[0]);
@@ -153,20 +153,20 @@ UINT32 backfire_state::screen_update_backfire_right(screen_device &screen, bitma
 	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);
 	deco16ic_pf_update(m_deco_tilegen2, m_pf3_rowscroll, m_pf4_rowscroll);
 
-	screen.machine().priority_bitmap.fill(0);
+	machine().priority_bitmap.fill(0);
 	bitmap.fill(0x500, cliprect);
 
 	if (m_right_priority[0] == 0)
 	{
 		deco16ic_tilemap_2_draw(m_deco_tilegen2, bitmap, cliprect, 0, 1);
 		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2);
-		screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_spriteram_2, 0x800);
+		machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_spriteram_2, 0x800);
 	}
 	else if (m_right_priority[0] == 2)
 	{
 		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2);
 		deco16ic_tilemap_2_draw(m_deco_tilegen2, bitmap, cliprect, 0, 4);
-		screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_spriteram_2, 0x800);
+		machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_spriteram_2, 0x800);
 	}
 	else
 		popmessage( "unknown right priority %08x", m_right_priority[0]);

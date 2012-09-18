@@ -498,7 +498,7 @@ UINT32 mastboy_state::screen_update_mastboy(screen_device &screen, bitmap_ind16 
 	{
 		int coldat = m_colram[i+1] |  (m_colram[i+0]<<8);
 
-		palette_set_color_rgb(screen.machine(),i/2,pal4bit(coldat>>8),pal4bit(coldat>>12),pal4bit(coldat>>4));
+		palette_set_color_rgb(machine(),i/2,pal4bit(coldat>>8),pal4bit(coldat>>12),pal4bit(coldat>>4));
 	}
 
 	for (y=0;y<32;y++)
@@ -512,12 +512,12 @@ UINT32 mastboy_state::screen_update_mastboy(screen_device &screen, bitmap_ind16 
 
 			if (tileno&0x800)
 			{
-				gfx = screen.machine().gfx[1];
+				gfx = machine().gfx[1];
 				tileno &=0x7ff;
 			}
 			else
 			{
-				gfx = screen.machine().gfx[0];
+				gfx = machine().gfx[0];
 			}
 
 

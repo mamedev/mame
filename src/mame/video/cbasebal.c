@@ -177,7 +177,7 @@ UINT32 cbasebal_state::screen_update_cbasebal(screen_device &screen, bitmap_ind1
 		bitmap.fill(768, cliprect);
 
 	if (m_obj_on)
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 
 	if (m_text_on)
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);

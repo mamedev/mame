@@ -159,9 +159,9 @@ UINT32 tehkanwc_state::screen_update_tehkanwc(screen_device &screen, bitmap_ind1
 	m_bg_tilemap->set_scrollx(0, m_scroll_x[0] + 256 * m_scroll_x[1]);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 1, 0);
-	gridiron_draw_led(screen.machine(), bitmap, cliprect, m_led0, 0);
-	gridiron_draw_led(screen.machine(), bitmap, cliprect, m_led1, 1);
+	gridiron_draw_led(machine(), bitmap, cliprect, m_led0, 0);
+	gridiron_draw_led(machine(), bitmap, cliprect, m_led1, 1);
 	return 0;
 }

@@ -115,7 +115,7 @@ VIDEO_START_MEMBER(playch10_state,playch10_hboard)
 
 UINT32 playch10_state::screen_update_playch10_single(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ppu2c0x_device *ppu = screen.machine().device<ppu2c0x_device>("ppu");
+	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
 
 	rectangle top_monitor = screen.visible_area();
 
@@ -143,7 +143,7 @@ UINT32 playch10_state::screen_update_playch10_single(screen_device &screen, bitm
 
 UINT32 playch10_state::screen_update_playch10_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	ppu2c0x_device *ppu = screen.machine().device<ppu2c0x_device>("ppu");
+	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
 
 	/* Single Monitor version */
 	if (m_pc10_bios != 1)

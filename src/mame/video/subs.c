@@ -43,7 +43,7 @@ UINT32 subs_state::screen_update_subs_left(screen_device &screen, bitmap_ind16 &
 	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	device_t *discrete = screen.machine().device("discrete");
+	device_t *discrete = machine().device("discrete");
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
@@ -76,11 +76,11 @@ UINT32 subs_state::screen_update_subs_left(screen_device &screen, bitmap_ind16 &
 
 		/* draw the left screen */
 		if ((left_enable || left_sonar_window) && (!right_sonar_window))
-			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],
+			drawgfx_opaque(bitmap,cliprect,machine().gfx[0],
 					charcode, 1,
 					0,0,sx,sy);
 		else
-			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],
+			drawgfx_opaque(bitmap,cliprect,machine().gfx[0],
 					0, 1,
 					0,0,sx,sy);
 	}
@@ -106,14 +106,14 @@ UINT32 subs_state::screen_update_subs_left(screen_device &screen, bitmap_ind16 &
 
 		/* left screen - special check for drawing right screen's sub */
 		if ((offs!=0) || (sub_enable))
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					charcode + 32 * prom_set,
 					0,
 					0,0,sx,sy,0);
 	}
 
 	/* Update sound */
-	address_space &space = screen.machine().driver_data()->generic_space();
+	address_space &space = machine().driver_data()->generic_space();
 	discrete_sound_w(discrete, space, SUBS_LAUNCH_DATA, spriteram[5] & 0x0f);	// Launch data
 	discrete_sound_w(discrete, space, SUBS_CRASH_DATA, spriteram[5] >> 4);		// Crash/explode data
 	return 0;
@@ -156,11 +156,11 @@ UINT32 subs_state::screen_update_subs_right(screen_device &screen, bitmap_ind16 
 
 		/* draw the right screen */
 		if ((right_enable || right_sonar_window) && (!left_sonar_window))
-			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],
+			drawgfx_opaque(bitmap,cliprect,machine().gfx[0],
 					charcode, 0,
 					0,0,sx,sy);
 		else
-			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],
+			drawgfx_opaque(bitmap,cliprect,machine().gfx[0],
 					0, 0,
 					0,0,sx,sy);
 	}
@@ -185,7 +185,7 @@ UINT32 subs_state::screen_update_subs_right(screen_device &screen, bitmap_ind16 
 		charcode = (charcode >> 3) & 0x1F;
 
 		if ((offs!=1) || (sub_enable))
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					charcode + 32 * prom_set,
 					0,
 					0,0,sx,sy,0);

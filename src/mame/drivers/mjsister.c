@@ -139,8 +139,8 @@ UINT32 mjsister_state::screen_update_mjsister(screen_device &screen, bitmap_ind1
 
 		for (offs = 0; offs < 0x8000; offs++)
 		{
-			mjsister_plot0(screen.machine(), offs, m_videoram0[offs]);
-			mjsister_plot1(screen.machine(), offs, m_videoram1[offs]);
+			mjsister_plot0(machine(), offs, m_videoram0[offs]);
+			mjsister_plot1(machine(), offs, m_videoram1[offs]);
 		}
 		m_screen_redraw = 0;
 	}
@@ -155,7 +155,7 @@ UINT32 mjsister_state::screen_update_mjsister(screen_device &screen, bitmap_ind1
 		copybitmap_trans(bitmap, *m_tmpbitmap1, flip, flip, 2, 0, cliprect, 0);
 	}
 	else
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 	return 0;
 }
 

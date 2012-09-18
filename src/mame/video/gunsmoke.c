@@ -177,10 +177,10 @@ UINT32 gunsmoke_state::screen_update_gunsmoke(screen_device &screen, bitmap_ind1
 	if (m_bgon)
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (m_objon)
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 
 	if (m_chon)
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);

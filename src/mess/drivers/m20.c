@@ -112,7 +112,7 @@ UINT32 m20_state::screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap,
 	UINT8 pen;
 	UINT32 count;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	count = (0);
 
@@ -125,7 +125,7 @@ UINT32 m20_state::screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap,
 				pen = (m_p_videoram[count]) >> (15 - i) & 1;
 
 				if (screen.visible_area().contains(x + i, y))
-					bitmap.pix32(y, x + i) = screen.machine().pens[pen];
+					bitmap.pix32(y, x + i) = machine().pens[pen];
 			}
 
 			count++;

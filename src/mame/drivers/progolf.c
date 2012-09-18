@@ -118,9 +118,9 @@ UINT32 progolf_state::screen_update_progolf(screen_device &screen, bitmap_ind16 
 			{
 				int tile = videoram[count];
 
-				drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tile,1,0,0,(256-x*8)+scroll,y*8);
+				drawgfx_opaque(bitmap,cliprect,machine().gfx[0],tile,1,0,0,(256-x*8)+scroll,y*8);
 				/* wrap-around */
-				drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tile,1,0,0,(256-x*8)+scroll-1024,y*8);
+				drawgfx_opaque(bitmap,cliprect,machine().gfx[0],tile,1,0,0,(256-x*8)+scroll-1024,y*8);
 
 				count++;
 			}
@@ -142,7 +142,7 @@ UINT32 progolf_state::screen_update_progolf(screen_device &screen, bitmap_ind16 
 						color = m_fg_fb[(xi+yi*8)+count*0x40];
 
 						if(color != 0 && cliprect.contains(x+yi, 256-y+xi))
-							bitmap.pix16(x+yi, 256-y+xi) = screen.machine().pens[(color & 0x7)];
+							bitmap.pix16(x+yi, 256-y+xi) = machine().pens[(color & 0x7)];
 					}
 				}
 

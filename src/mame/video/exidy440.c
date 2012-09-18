@@ -433,8 +433,8 @@ UINT32 exidy440_state::screen_update_exidy440(screen_device &screen, bitmap_ind1
 	{
 		int i;
 
-		int beamx = ((screen.machine().root_device().ioport("AN0")->read() & 0xff) * (HBSTART - HBEND)) >> 8;
-		int beamy = ((screen.machine().root_device().ioport("AN1")->read() & 0xff) * (VBSTART - VBEND)) >> 8;
+		int beamx = ((machine().root_device().ioport("AN0")->read() & 0xff) * (HBSTART - HBEND)) >> 8;
+		int beamy = ((machine().root_device().ioport("AN1")->read() & 0xff) * (VBSTART - VBEND)) >> 8;
 
 		/* The timing of this FIRQ is very important. The games look for an FIRQ
             and then wait about 650 cycles, clear the old FIRQ, and wait a
@@ -446,7 +446,7 @@ UINT32 exidy440_state::screen_update_exidy440(screen_device &screen, bitmap_ind1
 		attotime time = screen.time_until_pos(beamy, beamx) - increment * 6;
 		for (i = 0; i <= 12; i++)
 		{
-			screen.machine().scheduler().timer_set(time, FUNC(beam_firq_callback), beamx);
+			machine().scheduler().timer_set(time, FUNC(beam_firq_callback), beamx);
 			time += increment;
 		}
 	}

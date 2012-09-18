@@ -1444,15 +1444,15 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 	// press in sams64_2 attract mode for a nice debug screen from the game
 	// not sure how functional it is, and it doesn't appear to test everything (rowscroll modes etc.)
 	// but it could be useful
-	if ( screen.machine().input().code_pressed_once(KEYCODE_L) )
+	if ( machine().input().code_pressed_once(KEYCODE_L) )
 	{
-		address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 		space.write_byte(0x2f27c8, 0x2);
 	}
 #endif
 
-	bitmap.fill(hng64_tcram[0x50/4] & 0x10000 ? get_black_pen(screen.machine()) : screen.machine().pens[0], cliprect); //FIXME: Is the register correct? check with HW tests
-	screen.machine().priority_bitmap.fill(0x00, cliprect);
+	bitmap.fill(hng64_tcram[0x50/4] & 0x10000 ? get_black_pen(machine()) : machine().pens[0], cliprect); //FIXME: Is the register correct? check with HW tests
+	machine().priority_bitmap.fill(0x00, cliprect);
 
 	if (m_screen_dis)
 		return 0;
@@ -1522,10 +1522,10 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 	//hng64_mark_all_tiles_dirty(this, 2);
 	//hng64_mark_all_tiles_dirty(this, 3);
 
-	hng64_drawtilemap(screen.machine(),bitmap,cliprect, 3);
-	hng64_drawtilemap(screen.machine(),bitmap,cliprect, 2);
-	hng64_drawtilemap(screen.machine(),bitmap,cliprect, 1);
-	hng64_drawtilemap(screen.machine(),bitmap,cliprect, 0);
+	hng64_drawtilemap(machine(),bitmap,cliprect, 3);
+	hng64_drawtilemap(machine(),bitmap,cliprect, 2);
+	hng64_drawtilemap(machine(),bitmap,cliprect, 1);
+	hng64_drawtilemap(machine(),bitmap,cliprect, 0);
 
 	// 3d really shouldn't be last, but you don't see some cool stuff right now if it's put before sprites.
 	{
@@ -1549,10 +1549,10 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 		//printf("NEW FRAME!\n");   /* Debug - ajg */
 	}
 
-	draw_sprites(screen.machine(), bitmap,cliprect);
+	draw_sprites(machine(), bitmap,cliprect);
 
 	if(0)
-		transition_control(screen.machine(), bitmap, cliprect);
+		transition_control(machine(), bitmap, cliprect);
 
 	if (0)
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
@@ -1612,22 +1612,22 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 		hng64_tcram[0x58/4],
 		hng64_tcram[0x5c/4]);
 
-	if ( screen.machine().input().code_pressed_once(KEYCODE_T) )
+	if ( machine().input().code_pressed_once(KEYCODE_T) )
 	{
 		m_additive_tilemap_debug ^= 1;
 		popmessage("blend changed %02x", m_additive_tilemap_debug);
 	}
-	if ( screen.machine().input().code_pressed_once(KEYCODE_Y) )
+	if ( machine().input().code_pressed_once(KEYCODE_Y) )
 	{
 		m_additive_tilemap_debug ^= 2;
 		popmessage("blend changed %02x", m_additive_tilemap_debug);
 	}
-	if ( screen.machine().input().code_pressed_once(KEYCODE_U) )
+	if ( machine().input().code_pressed_once(KEYCODE_U) )
 	{
 		m_additive_tilemap_debug ^= 4;
 		popmessage("blend changed %02x", m_additive_tilemap_debug);
 	}
-	if ( screen.machine().input().code_pressed_once(KEYCODE_I) )
+	if ( machine().input().code_pressed_once(KEYCODE_I) )
 	{
 		m_additive_tilemap_debug ^= 8;
 		popmessage("blend changed %02x", m_additive_tilemap_debug);
@@ -1640,7 +1640,7 @@ void hng64_state::screen_eof_hng64(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)
-		clear3d(screen.machine());
+		clear3d(machine());
 }
 
 void hng64_state::video_start()

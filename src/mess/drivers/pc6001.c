@@ -508,7 +508,7 @@ static void pc6001_screen_draw(running_machine &machine, bitmap_ind16 &bitmap,co
 
 UINT32 pc6001_state::screen_update_pc6001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pc6001_screen_draw(screen.machine(),bitmap,cliprect,1);
+	pc6001_screen_draw(machine(),bitmap,cliprect,1);
 
 	return 0;
 }
@@ -551,9 +551,9 @@ UINT32 pc6001_state::screen_update_pc6001m2(screen_device &screen, bitmap_ind16 
 					color |= ((pen[1] & 2) << 2);
 
 					if (cliprect.contains((x+i)*2+0, y))
-						bitmap.pix16(y, (x+i)*2+0) = screen.machine().pens[color];
+						bitmap.pix16(y, (x+i)*2+0) = machine().pens[color];
 					if (cliprect.contains((x+i)*2+1, y))
-						bitmap.pix16(y, (x+i)*2+1) = screen.machine().pens[color];
+						bitmap.pix16(y, (x+i)*2+1) = machine().pens[color];
 				}
 
 				count++;
@@ -599,7 +599,7 @@ UINT32 pc6001_state::screen_update_pc6001m2(screen_device &screen, bitmap_ind16 
 					}
 
 					if (cliprect.contains(x+i, y))
-						bitmap.pix16(y, (x+i)) = screen.machine().pens[color];
+						bitmap.pix16(y, (x+i)) = machine().pens[color];
 				}
 
 				count++;
@@ -610,7 +610,7 @@ UINT32 pc6001_state::screen_update_pc6001m2(screen_device &screen, bitmap_ind16 
 	else if(m_exgfx_text_mode)
 	{
 		int xi,yi,pen,fgcol,bgcol,color;
-		UINT8 *gfx_data = screen.machine().root_device().memregion("gfx1")->base();
+		UINT8 *gfx_data = machine().root_device().memregion("gfx1")->base();
 
 		for(y=0;y<20;y++)
 		{
@@ -639,7 +639,7 @@ UINT32 pc6001_state::screen_update_pc6001m2(screen_device &screen, bitmap_ind16 
 						color = pen ? fgcol : bgcol;
 
 						if (cliprect.contains(x*8+xi, y*12+yi))
-							bitmap.pix16(((y*12+yi)), (x*8+xi)) = screen.machine().pens[color];
+							bitmap.pix16(((y*12+yi)), (x*8+xi)) = machine().pens[color];
 					}
 				}
 			}
@@ -648,7 +648,7 @@ UINT32 pc6001_state::screen_update_pc6001m2(screen_device &screen, bitmap_ind16 
 	else
 	{
 		attr = m_video_ram[0];
-		pc6001_screen_draw(screen.machine(),bitmap,cliprect,0);
+		pc6001_screen_draw(machine(),bitmap,cliprect,0);
 	}
 
 	return 0;
@@ -683,7 +683,7 @@ UINT32 pc6001_state::screen_update_pc6001sr(screen_device &screen, bitmap_ind16 
 						color = pen ? fgcol : bgcol;
 
 						if (cliprect.contains(x*8+xi, y*12+yi))
-							bitmap.pix16(((y*12+yi)), (x*8+xi)) = screen.machine().pens[color];
+							bitmap.pix16(((y*12+yi)), (x*8+xi)) = machine().pens[color];
 					}
 				}
 			}
@@ -702,42 +702,42 @@ UINT32 pc6001_state::screen_update_pc6001sr(screen_device &screen, bitmap_ind16 
 				color = m_video_ram[count] & 0x0f;
 
 				if (cliprect.contains(x+0, y+0))
-					bitmap.pix16((y+0), (x+0)) = screen.machine().pens[color+0x10];
+					bitmap.pix16((y+0), (x+0)) = machine().pens[color+0x10];
 
 				color = (m_video_ram[count] & 0xf0) >> 4;
 
 				if (cliprect.contains(x+1, y+0))
-					bitmap.pix16((y+0), (x+1)) = screen.machine().pens[color+0x10];
+					bitmap.pix16((y+0), (x+1)) = machine().pens[color+0x10];
 
 				color = m_video_ram[count+1] & 0x0f;
 
 				if (cliprect.contains(x+2, y+0))
-					bitmap.pix16((y+0), (x+2)) = screen.machine().pens[color+0x10];
+					bitmap.pix16((y+0), (x+2)) = machine().pens[color+0x10];
 
 				color = (m_video_ram[count+1] & 0xf0) >> 4;
 
 				if (cliprect.contains(x+3, y+0))
-					bitmap.pix16((y+0), (x+3)) = screen.machine().pens[color+0x10];
+					bitmap.pix16((y+0), (x+3)) = machine().pens[color+0x10];
 
 				color = m_video_ram[count+2] & 0x0f;
 
 				if (cliprect.contains(x+0, y+1))
-					bitmap.pix16((y+1), (x+0)) = screen.machine().pens[color+0x10];
+					bitmap.pix16((y+1), (x+0)) = machine().pens[color+0x10];
 
 				color = (m_video_ram[count+2] & 0xf0) >> 4;
 
 				if (cliprect.contains(x+1, y+1))
-					bitmap.pix16((y+1), (x+1)) = screen.machine().pens[color+0x10];
+					bitmap.pix16((y+1), (x+1)) = machine().pens[color+0x10];
 
 				color = m_video_ram[count+3] & 0x0f;
 
 				if (cliprect.contains(x+2, y+1))
-					bitmap.pix16((y+1), (x+2)) = screen.machine().pens[color+0x10];
+					bitmap.pix16((y+1), (x+2)) = machine().pens[color+0x10];
 
 				color = (m_video_ram[count+3] & 0xf0) >> 4;
 
 				if (cliprect.contains(x+3, y+1))
-					bitmap.pix16((y+1), (x+3)) = screen.machine().pens[color+0x10];
+					bitmap.pix16((y+1), (x+3)) = machine().pens[color+0x10];
 
 
 				count+=4;

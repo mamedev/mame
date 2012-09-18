@@ -74,13 +74,13 @@ void spectrum_state::screen_eof_spectrum(screen_device &screen, bool state)
 
 		/* Empty event buffer for undisplayed frames noting the last border
            colour (in case colours are not changed in the next frame). */
-		NumItems = spectrum_EventList_NumEvents(screen.machine());
+		NumItems = spectrum_EventList_NumEvents(machine());
 		if (NumItems)
 		{
-			pItem = spectrum_EventList_GetFirstItem(screen.machine());
-			spectrum_border_set_last_color ( screen.machine(), pItem[NumItems-1].Event_Data );
-			spectrum_EventList_Reset(screen.machine());
-			spectrum_EventList_SetOffsetStartTime ( screen.machine(), screen.machine().firstcpu->attotime_to_cycles(screen.scan_period() * screen.vpos()) );
+			pItem = spectrum_EventList_GetFirstItem(machine());
+			spectrum_border_set_last_color ( machine(), pItem[NumItems-1].Event_Data );
+			spectrum_EventList_Reset(machine());
+			spectrum_EventList_SetOffsetStartTime ( machine(), machine().firstcpu->attotime_to_cycles(screen.scan_period() * screen.vpos()) );
 			logerror ("Event log reset in callback fn.\n");
 		}
 	}
@@ -159,7 +159,7 @@ UINT32 spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	spectrum_border_draw(screen.machine(), bitmap, full_refresh,
+	spectrum_border_draw(machine(), bitmap, full_refresh,
 		SPEC_TOP_BORDER, SPEC_DISPLAY_YSIZE, SPEC_BOTTOM_BORDER,
 		SPEC_LEFT_BORDER, SPEC_DISPLAY_XSIZE, SPEC_RIGHT_BORDER,
 		SPEC_LEFT_BORDER_CYCLES, SPEC_DISPLAY_XSIZE_CYCLES,

@@ -186,7 +186,7 @@ UINT32 drgnmst_state::screen_update_drgnmst(screen_device &screen, bitmap_ind16 
 
 	}
 
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	draw_sprites(machine(),bitmap,cliprect);
 
 //  popmessage ("x %04x x %04x x %04x x %04x x %04x", m_vidregs2[0], m_vidregs[12], m_vidregs[13], m_vidregs[14], m_vidregs[15]);
 //  popmessage ("x %04x x %04x y %04x y %04x z %04x z %04x",m_vidregs[0],m_vidregs[1],m_vidregs[2],m_vidregs[3],m_vidregs[4],m_vidregs[5]);

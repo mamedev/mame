@@ -272,8 +272,8 @@ void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangl
 
 UINT32 toypop_state::screen_update_toypop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(screen.machine(), bitmap);
+	draw_background(machine(), bitmap);
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram);
+	draw_sprites(machine(), bitmap, cliprect, m_spriteram);
 	return 0;
 }

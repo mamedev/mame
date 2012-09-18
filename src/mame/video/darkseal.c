@@ -62,9 +62,9 @@ void darkseal_state::video_start()
 
 UINT32 darkseal_state::screen_update_darkseal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen.machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf1_rowscroll);
 	deco16ic_pf_update(m_deco_tilegen2, m_pf3_rowscroll, m_pf3_rowscroll);
@@ -73,7 +73,7 @@ UINT32 darkseal_state::screen_update_darkseal(screen_device &screen, bitmap_ind1
 	deco16ic_tilemap_2_draw(m_deco_tilegen2, bitmap, cliprect, 0, 0);
 
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
+	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 
 	return 0;

@@ -105,15 +105,15 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 triplhnt_state::screen_update_triplhnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *discrete = screen.machine().device("discrete");
+	device_t *discrete = machine().device("discrete");
 
 	m_bg_tilemap->mark_all_dirty();
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 
-	address_space &space = screen.machine().driver_data()->generic_space();
+	address_space &space = machine().driver_data()->generic_space();
 	discrete_sound_w(discrete, space, TRIPLHNT_BEAR_ROAR_DATA, m_playfield_ram[0xfa] & 15);
 	discrete_sound_w(discrete, space, TRIPLHNT_SHOT_DATA, m_playfield_ram[0xfc] & 15);
 	return 0;

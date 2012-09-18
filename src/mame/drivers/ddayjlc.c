@@ -406,7 +406,7 @@ UINT32 ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind16 
 
 		code = (code & 0x7f) | ((flags & 0x30) << 3);
 
-		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0], code, color, xflip, yflip, x, y, 0);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[0], code, color, xflip, yflip, x, y, 0);
 	}
 
 	{
@@ -417,9 +417,9 @@ UINT32 ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind16 
 			{
 				c = m_videoram[y * 32 + x];
 				if (x > 1 && x < 30)
-					drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1], c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
+					drawgfx_transpen(bitmap, cliprect, machine().gfx[1], c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
 				else
-					drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[1], c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8);
+					drawgfx_opaque(bitmap, cliprect, machine().gfx[1], c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8);
 			}
 	}
 	return 0;

@@ -282,8 +282,8 @@ UINT32 senjyo_state::screen_update_senjyo(screen_device &screen, bitmap_ind16 &b
 
 
 	/* two colors for the radar dots (verified on the real board) */
-	palette_set_color(screen.machine(),512,MAKE_RGB(0xff,0x00,0x00));	/* red for enemies */
-	palette_set_color(screen.machine(),513,MAKE_RGB(0xff,0xff,0x00));	/* yellow for player */
+	palette_set_color(machine(),512,MAKE_RGB(0xff,0x00,0x00));	/* red for enemies */
+	palette_set_color(machine(),513,MAKE_RGB(0xff,0xff,0x00));	/* yellow for player */
 
 	{
 		int flip = flip_screen();
@@ -319,16 +319,16 @@ UINT32 senjyo_state::screen_update_senjyo(screen_device &screen, bitmap_ind16 &b
 		m_bg3_tilemap->set_scrolly(0, scrolly);
 	}
 
-	draw_bgbitmap(screen.machine(), bitmap, cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0);
+	draw_bgbitmap(machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect, 0);
 	m_bg3_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect, 1);
+	draw_sprites(machine(), bitmap, cliprect, 1);
 	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect, 2);
+	draw_sprites(machine(), bitmap, cliprect, 2);
 	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect, 3);
+	draw_sprites(machine(), bitmap, cliprect, 3);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_radar(screen.machine(), bitmap, cliprect);
+	draw_radar(machine(), bitmap, cliprect);
 
 #if 0
 {

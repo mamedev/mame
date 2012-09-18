@@ -386,7 +386,7 @@ UINT32 stactics_state::screen_update_stactics(screen_device &screen, bitmap_ind1
 
 	update_beam(this);
 	draw_background(this, bitmap, cliprect);
-	update_artwork(screen.machine(), this);
+	update_artwork(machine(), this);
 
 	m_frame_count = (m_frame_count + 1) & 0x0f;
 

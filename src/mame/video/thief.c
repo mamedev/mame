@@ -105,9 +105,9 @@ UINT32 thief_state::screen_update_thief(screen_device &screen, bitmap_ind16 &bit
 	int flipscreen = m_video_control&1;
 	const UINT8 *source = videoram;
 
-	if (tms9927_screen_reset(screen.machine().device("tms")))
+	if (tms9927_screen_reset(machine().device("tms")))
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 

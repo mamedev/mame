@@ -247,9 +247,9 @@ void sspeedr_state::video_start()
 
 UINT32 sspeedr_state::screen_update_sspeedr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_track(screen.machine(), bitmap);
-	draw_drones(screen.machine(), bitmap, cliprect);
-	draw_driver(screen.machine(), bitmap, cliprect);
+	draw_track(machine(), bitmap);
+	draw_drones(machine(), bitmap, cliprect);
+	draw_driver(machine(), bitmap, cliprect);
 	return 0;
 }
 

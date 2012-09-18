@@ -109,7 +109,7 @@ UINT32 chinsan_state::screen_update_chinsan(screen_device &screen, bitmap_ind16 
 			int tileno, colour;
 			tileno = m_video[count] | (m_video[count + 0x800] << 8);
 			colour = m_video[count + 0x1000] >> 3;
-			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tileno,colour,0,0,x*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,machine().gfx[0],tileno,colour,0,0,x*8,y*8);
 			count++;
 		}
 	}

@@ -169,7 +169,7 @@ UINT32 ti99_2_state::screen_update_ti99_2(screen_device &screen, bitmap_ind16 &b
 	for (i = 0; i < 768; i++)
 	{
 		/* Is the char code masked or not ??? */
-		drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], videoram[i] & 0x7F, 0,
+		drawgfx_opaque(bitmap, cliprect, machine().gfx[0], videoram[i] & 0x7F, 0,
 			0, 0, sx, sy);
 
 		sx += 8;

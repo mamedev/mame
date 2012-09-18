@@ -495,18 +495,18 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 twincobr_state::screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	twincobr_log_vram(screen.machine());
+	twincobr_log_vram(machine());
 
-	if (m_wardner_sprite_hack) wardner_sprite_priority_hack(screen.machine());
+	if (m_wardner_sprite_hack) wardner_sprite_priority_hack(machine());
 
 	bitmap.fill(0, cliprect);
 
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-	draw_sprites(screen.machine(), bitmap,cliprect,0x0400);
+	draw_sprites(machine(), bitmap,cliprect,0x0400);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap,cliprect,0x0800);
+	draw_sprites(machine(), bitmap,cliprect,0x0800);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap,cliprect,0x0c00);
+	draw_sprites(machine(), bitmap,cliprect,0x0c00);
 	return 0;
 }
 

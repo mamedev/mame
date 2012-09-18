@@ -962,33 +962,33 @@ VIDEO_START_MEMBER(raiden2_state,raiden2)
 
 UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	//if (!screen.machine().input().code_pressed(KEYCODE_Q))
+	//if (!machine().input().code_pressed(KEYCODE_Q))
 	{
 		if (!(raiden2_tilemap_enable & 1))
 			background_layer->draw(bitmap, cliprect, 0, 0);
 	}
 
-	//if (!screen.machine().input().code_pressed(KEYCODE_W))
+	//if (!machine().input().code_pressed(KEYCODE_W))
 	{
 		if (!(raiden2_tilemap_enable & 2))
 			midground_layer->draw(bitmap, cliprect, 0, 0);
 	}
 
-	//if (!screen.machine().input().code_pressed(KEYCODE_E))
+	//if (!machine().input().code_pressed(KEYCODE_E))
 	{
 		if (!(raiden2_tilemap_enable & 4))
 			foreground_layer->draw(bitmap, cliprect, 0, 0);
 	}
 
-	//if (!screen.machine().input().code_pressed(KEYCODE_S))
+	//if (!machine().input().code_pressed(KEYCODE_S))
 	{
 		//if (!(raiden2_tilemap_enable & 0x10))
-			draw_sprites(screen.machine(), bitmap, cliprect, 0);
+			draw_sprites(machine(), bitmap, cliprect, 0);
 	}
 
-	//if (!screen.machine().input().code_pressed(KEYCODE_A))
+	//if (!machine().input().code_pressed(KEYCODE_A))
 	{
 		if (!(raiden2_tilemap_enable & 8))
 			text_layer->draw(bitmap, cliprect, 0, 0);

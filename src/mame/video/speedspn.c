@@ -90,7 +90,7 @@ UINT32 speedspn_state::screen_update_speedspn(screen_device &screen, bitmap_ind1
 {
 	if (m_display_disable)
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
@@ -104,6 +104,6 @@ UINT32 speedspn_state::screen_update_speedspn(screen_device &screen, bitmap_ind1
 #endif
 	m_tilemap->set_scrollx(0, 0x100); // verify
 	m_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap,cliprect);
+	draw_sprites(machine(), bitmap,cliprect);
 	return 0;
 }

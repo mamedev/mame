@@ -417,9 +417,9 @@ UINT32 astrof_state::screen_update_astrof(screen_device &screen, bitmap_rgb32 &b
 {
 	pen_t pens[ASTROF_NUM_PENS];
 
-	astrof_get_pens(screen.machine(), pens);
+	astrof_get_pens(machine(), pens);
 
-	video_update_common(screen.machine(), bitmap, cliprect, pens);
+	video_update_common(machine(), bitmap, cliprect, pens);
 
 	return 0;
 }
@@ -429,9 +429,9 @@ UINT32 astrof_state::screen_update_tomahawk(screen_device &screen, bitmap_rgb32 
 {
 	pen_t pens[TOMAHAWK_NUM_PENS];
 
-	tomahawk_get_pens(screen.machine(), pens);
+	tomahawk_get_pens(machine(), pens);
 
-	video_update_common(screen.machine(), bitmap, cliprect, pens);
+	video_update_common(machine(), bitmap, cliprect, pens);
 
 	return 0;
 }

@@ -94,7 +94,7 @@ UINT32 battlex_state::screen_update_battlex(screen_device &screen, bitmap_ind16 
 
 	m_bg_tilemap->set_scrollx(0, m_scroll_lsb | (m_scroll_msb << 8));
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 
 	return 0;
 }

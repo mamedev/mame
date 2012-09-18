@@ -308,10 +308,10 @@ UINT32 bwing_state::screen_update_bwing(screen_device &screen, bitmap_ind16 &bit
 		m_bgmap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 
 	// draw low priority sprites
-	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram, 0);
+	draw_sprites(machine(), bitmap, cliprect, m_spriteram, 0);
 
 	// draw foreground
 	if (!(m_mapmask & 2))
@@ -325,7 +325,7 @@ UINT32 bwing_state::screen_update_bwing(screen_device &screen, bitmap_ind16 &bit
 	}
 
 	// draw high priority sprites
-	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram, 1);
+	draw_sprites(machine(), bitmap, cliprect, m_spriteram, 1);
 
 	// draw text layer
 //  if (m_mapmask & 4)

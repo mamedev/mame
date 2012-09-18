@@ -266,15 +266,15 @@ UINT32 hnayayoi_state::screen_update_hnayayoi(screen_device &screen, bitmap_ind1
 
 	if (m_total_pixmaps == 4)
 	{
-		draw_layer_interleaved(screen.machine(), bitmap, cliprect, 3, 2, col1, 0);
-		draw_layer_interleaved(screen.machine(), bitmap, cliprect, 1, 0, col0, 1);
+		draw_layer_interleaved(machine(), bitmap, cliprect, 3, 2, col1, 0);
+		draw_layer_interleaved(machine(), bitmap, cliprect, 1, 0, col0, 1);
 	}
 	else	/* total_pixmaps == 8 */
 	{
-		draw_layer_interleaved(screen.machine(), bitmap, cliprect, 7, 6, col3, 0);
-		draw_layer_interleaved(screen.machine(), bitmap, cliprect, 5, 4, col2, 1);
-		draw_layer_interleaved(screen.machine(), bitmap, cliprect, 3, 2, col1, 1);
-		draw_layer_interleaved(screen.machine(), bitmap, cliprect, 1, 0, col0, 1);
+		draw_layer_interleaved(machine(), bitmap, cliprect, 7, 6, col3, 0);
+		draw_layer_interleaved(machine(), bitmap, cliprect, 5, 4, col2, 1);
+		draw_layer_interleaved(machine(), bitmap, cliprect, 3, 2, col1, 1);
+		draw_layer_interleaved(machine(), bitmap, cliprect, 1, 0, col0, 1);
 	}
 	return 0;
 }

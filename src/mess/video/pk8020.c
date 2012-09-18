@@ -19,7 +19,7 @@ UINT32 pk8020_state::screen_update_pk8020(screen_device &screen, bitmap_ind16 &b
 {
 	int y, x, b, j;
 	UINT8 *gfx = memregion("gfx1")->base();
-	UINT8 *ram = screen.machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
 	for (y = 0; y < 16; y++)
 	{

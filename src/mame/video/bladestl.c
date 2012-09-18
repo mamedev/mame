@@ -79,12 +79,12 @@ void bladestl_sprite_callback( running_machine &machine, int *code,int *color )
 
 UINT32 bladestl_state::screen_update_bladestl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(screen.machine());
+	set_pens(machine());
 
 	k007342_tilemap_update(m_k007342);
 
 	k007342_tilemap_draw(m_k007342, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE ,0);
-	k007420_sprites_draw(m_k007420, bitmap, cliprect, screen.machine().gfx[1]);
+	k007420_sprites_draw(m_k007420, bitmap, cliprect, machine().gfx[1]);
 	k007342_tilemap_draw(m_k007342, bitmap, cliprect, 1, 1 | TILEMAP_DRAW_OPAQUE ,0);
 	k007342_tilemap_draw(m_k007342, bitmap, cliprect, 0, 0 ,0);
 	k007342_tilemap_draw(m_k007342, bitmap, cliprect, 0, 1 ,0);

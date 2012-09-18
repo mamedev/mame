@@ -247,13 +247,13 @@ UINT32 tryout_state::screen_update_tryout(screen_device &screen, bitmap_ind16 &b
 	if(!(m_gfx_control[0] & 0x8)) // screen disable
 	{
 		/* TODO: Color might be different, needs a video from an original pcb. */
-		bitmap.fill(screen.machine().pens[0x10], cliprect);
+		bitmap.fill(machine().pens[0x10], cliprect);
 	}
 	else
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
-		draw_sprites(screen.machine(), bitmap,cliprect);
+		draw_sprites(machine(), bitmap,cliprect);
 	}
 
 //  popmessage("%02x %02x %02x %02x",m_gfx_control[0],m_gfx_control[1],m_gfx_control[2],scrollx);

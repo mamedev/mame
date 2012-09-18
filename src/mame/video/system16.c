@@ -615,7 +615,7 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen, 
 	int offset_bg0x = 187;
 	int offset_bg0y = 0;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	// start the sprites drawing
 	m_sprites->draw_async(cliprect);
@@ -664,7 +664,7 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen, 
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-//          UINT8 *pri = &screen.machine().priority_bitmap.pix(y);
+//          UINT8 *pri = &machine().priority_bitmap.pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
@@ -677,7 +677,7 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen, 
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? screen.machine().total_colors()*2 : screen.machine().total_colors();
+							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? machine().total_colors()*2 : machine().total_colors();
 
 						// otherwise, just add in sprite palette base
 						else
@@ -703,7 +703,7 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_device 
 	int offset_bg0x = 5;
 	int offset_bg0y = 32;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	// start the sprites drawing
 	m_sprites->draw_async(cliprect);
@@ -735,7 +735,7 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_device 
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-//          UINT8 *pri = &screen.machine().priority_bitmap.pix(y);
+//          UINT8 *pri = &machine().priority_bitmap.pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
@@ -748,7 +748,7 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_device 
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? screen.machine().total_colors()*2 : screen.machine().total_colors();
+							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? machine().total_colors()*2 : machine().total_colors();
 
 						// otherwise, just add in sprite palette base
 						else
@@ -777,9 +777,9 @@ UINT32 segas1x_bootleg_state::screen_update_system16(screen_device &screen, bitm
 	// start the sprites drawing
 	m_sprites->draw_async(cliprect);
 
-	update_page(screen.machine());
+	update_page(machine());
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	m_background->set_scrollx(0, -320 - m_bg_scrollx);
 	m_background->set_scrolly(0, -256 + m_bg_scrolly + m_back_yscroll);
@@ -805,7 +805,7 @@ UINT32 segas1x_bootleg_state::screen_update_system16(screen_device &screen, bitm
 
 	m_text_layer->draw(bitmap, cliprect, 0, 0xf);
 
-	//draw_sprites(screen.machine(), bitmap, cliprect,0);
+	//draw_sprites(machine(), bitmap, cliprect,0);
 
 
 	// mix in sprites
@@ -815,7 +815,7 @@ UINT32 segas1x_bootleg_state::screen_update_system16(screen_device &screen, bitm
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-//          UINT8 *pri = &screen.machine().priority_bitmap.pix(y);
+//          UINT8 *pri = &machine().priority_bitmap.pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
@@ -828,7 +828,7 @@ UINT32 segas1x_bootleg_state::screen_update_system16(screen_device &screen, bitm
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? screen.machine().total_colors()*2 : screen.machine().total_colors();
+							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? machine().total_colors()*2 : machine().total_colors();
 
 						// otherwise, just add in sprite palette base
 						else
@@ -847,16 +847,16 @@ UINT32 segas1x_bootleg_state::screen_update_system18old(screen_device &screen, b
 
 	if (!m_refreshenable)
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
 	// start the sprites drawing
 	m_sprites->draw_async(cliprect);
 
-	update_page(screen.machine());
+	update_page(machine());
 
-	screen.machine().priority_bitmap.fill(0);
+	machine().priority_bitmap.fill(0);
 
 	bitmap.fill(0, cliprect);
 
@@ -879,7 +879,7 @@ UINT32 segas1x_bootleg_state::screen_update_system18old(screen_device &screen, b
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-//          UINT8 *pri = &screen.machine().priority_bitmap.pix(y);
+//          UINT8 *pri = &machine().priority_bitmap.pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
@@ -892,7 +892,7 @@ UINT32 segas1x_bootleg_state::screen_update_system18old(screen_device &screen, b
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? screen.machine().total_colors()*2 : screen.machine().total_colors();
+							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? machine().total_colors()*2 : machine().total_colors();
 
 						// otherwise, just add in sprite palette base
 						else

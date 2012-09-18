@@ -72,7 +72,7 @@ UINT32 route16_state::screen_update_route16(screen_device &screen, bitmap_rgb32 
 {
 	offs_t offs;
 
-	UINT8 *color_prom1 = &screen.machine().root_device().memregion("proms")->base()[0x000];
+	UINT8 *color_prom1 = &machine().root_device().memregion("proms")->base()[0x000];
 	UINT8 *color_prom2 = &memregion("proms")->base()[0x100];
 
 	for (offs = 0; offs < m_videoram1.bytes(); offs++)
@@ -176,11 +176,11 @@ static int video_update_stratvox_ttmahjng(running_machine &machine, bitmap_rgb32
 
 UINT32 route16_state::screen_update_stratvox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return video_update_stratvox_ttmahjng(screen.machine(), bitmap, cliprect, route16_make_pen);
+	return video_update_stratvox_ttmahjng(machine(), bitmap, cliprect, route16_make_pen);
 }
 
 
 UINT32 route16_state::screen_update_ttmahjng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return video_update_stratvox_ttmahjng(screen.machine(), bitmap, cliprect, ttmajng_make_pen);
+	return video_update_stratvox_ttmahjng(machine(), bitmap, cliprect, ttmajng_make_pen);
 }

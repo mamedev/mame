@@ -151,13 +151,13 @@ UINT32 suprslam_state::screen_update_suprslam(screen_device &screen, bitmap_ind1
 {
 	m_screen_tilemap->set_scrollx(0, m_screen_vregs[0x04/2] );
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 	k053936_zoom_draw(m_k053936, bitmap, cliprect, m_bg_tilemap, 0, 0, 1);
 	if(!(m_spr_ctrl[0] & 8))
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 	m_screen_tilemap->draw(bitmap, cliprect, 0, 0);
 	if(m_spr_ctrl[0] & 8)
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }
 

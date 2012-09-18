@@ -135,7 +135,7 @@ UINT32 dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind16 
 		{
 			drawgfx_opaque(bitmap,
 					cliprect,
-					screen.machine().gfx[1],
+					machine().gfx[1],
 					m_bgram[index] + 256 * (m_bgram[index + 1] & 0xf),
 					m_bgram[index + 1] >> 4,
 					0, 0,
@@ -150,7 +150,7 @@ UINT32 dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind16 
 		{
 			drawgfx_transpen(	bitmap,
 					cliprect,
-					screen.machine().gfx[0],
+					machine().gfx[0],
 					m_videoram[(y * 32 + x) * 2 + 1] + (m_videoram[(y * 32 + x) * 2] & 7) * 256,
 					(m_videoram[(y * 32 + x) * 2] >> 3),
 					0, 0,
@@ -158,7 +158,7 @@ UINT32 dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind16 
 		}
 	}
 
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 
 	return 0;
 }

@@ -170,21 +170,21 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 UINT32 shootout_state::screen_update_shootout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	m_background->draw(bitmap, cliprect, 0,0);
 	m_foreground->draw(bitmap, cliprect, 0,1);
-	draw_sprites(screen.machine(), bitmap,cliprect,3/*bank bits */);
+	draw_sprites(machine(), bitmap,cliprect,3/*bank bits */);
 	return 0;
 }
 
 UINT32 shootout_state::screen_update_shootouj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	m_background->draw(bitmap, cliprect, 0,0);
 	m_foreground->draw(bitmap, cliprect, 0,1);
-	draw_sprites(screen.machine(), bitmap,cliprect,2/*bank bits*/);
+	draw_sprites(machine(), bitmap,cliprect,2/*bank bits*/);
 	return 0;
 }

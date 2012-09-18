@@ -244,14 +244,14 @@ UINT32 ginganin_state::screen_update_ginganin(screen_device &screen, bitmap_ind1
 	int layers_ctrl1 = m_layers_ctrl;
 
 #ifdef MAME_DEBUG
-if (screen.machine().input().code_pressed(KEYCODE_Z))
+if (machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
 
-	if (screen.machine().input().code_pressed(KEYCODE_Q)) { msk |= 0xfff1;}
-	if (screen.machine().input().code_pressed(KEYCODE_W)) { msk |= 0xfff2;}
-	if (screen.machine().input().code_pressed(KEYCODE_E)) { msk |= 0xfff4;}
-	if (screen.machine().input().code_pressed(KEYCODE_A))	{ msk |= 0xfff8;}
+	if (machine().input().code_pressed(KEYCODE_Q)) { msk |= 0xfff1;}
+	if (machine().input().code_pressed(KEYCODE_W)) { msk |= 0xfff2;}
+	if (machine().input().code_pressed(KEYCODE_E)) { msk |= 0xfff4;}
+	if (machine().input().code_pressed(KEYCODE_A))	{ msk |= 0xfff8;}
 	if (msk != 0) layers_ctrl1 &= msk;
 
 #define SETSCROLL \
@@ -261,11 +261,11 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 	m_fg_tilemap->set_scrolly(0, m_posy); \
 	popmessage("B>%04X:%04X F>%04X:%04X",m_posx%(BG_NX*16),m_posy%(BG_NY*16),m_posx%(FG_NX*16),m_posy%(FG_NY*16));
 
-	if (screen.machine().input().code_pressed(KEYCODE_L))	{ m_posx +=8; SETSCROLL }
-	if (screen.machine().input().code_pressed(KEYCODE_J))	{ m_posx -=8; SETSCROLL }
-	if (screen.machine().input().code_pressed(KEYCODE_K))	{ m_posy +=8; SETSCROLL }
-	if (screen.machine().input().code_pressed(KEYCODE_I))	{ m_posy -=8; SETSCROLL }
-	if (screen.machine().input().code_pressed(KEYCODE_H))	{ m_posx = m_posy = 0;	SETSCROLL }
+	if (machine().input().code_pressed(KEYCODE_L))	{ m_posx +=8; SETSCROLL }
+	if (machine().input().code_pressed(KEYCODE_J))	{ m_posx -=8; SETSCROLL }
+	if (machine().input().code_pressed(KEYCODE_K))	{ m_posy +=8; SETSCROLL }
+	if (machine().input().code_pressed(KEYCODE_I))	{ m_posy -=8; SETSCROLL }
+	if (machine().input().code_pressed(KEYCODE_H))	{ m_posx = m_posy = 0;	SETSCROLL }
 
 }
 #endif
@@ -279,7 +279,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 	if (layers_ctrl1 & 2)
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	if (layers_ctrl1 & 8)
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 	if (layers_ctrl1 & 4)
 		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 

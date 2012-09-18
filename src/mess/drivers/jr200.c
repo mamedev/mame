@@ -158,12 +158,12 @@ UINT32 jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &bit
 					}
 					else // tile mode
 					{
-						gfx_data = screen.machine().root_device().memregion(attr & 0x40 ? "pcg" : "gfx_ram")->base();
+						gfx_data = machine().root_device().memregion(attr & 0x40 ? "pcg" : "gfx_ram")->base();
 
 						pen = (gfx_data[(tile*8)+yi]>>(7-xi) & 1) ? (attr & 0x7) : ((attr & 0x38) >> 3);
 					}
 
-					bitmap.pix16(y*8+yi+16, x*8+xi+16) = screen.machine().pens[pen];
+					bitmap.pix16(y*8+yi+16, x*8+xi+16) = machine().pens[pen];
 				}
 			}
 		}

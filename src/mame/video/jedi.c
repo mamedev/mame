@@ -334,8 +334,8 @@ UINT32 jedi_state::screen_update_jedi(screen_device &screen, bitmap_rgb32 &bitma
 	{
 		/* draw the background/text layers, followed by the sprites
            - it needs to be done in this order*/
-		draw_background_and_text(screen.machine(), this, bitmap, cliprect);
-		draw_sprites(screen.machine(), this, bitmap, cliprect);
+		draw_background_and_text(machine(), this, bitmap, cliprect);
+		draw_sprites(machine(), this, bitmap, cliprect);
 		do_pen_lookup(this, bitmap, cliprect);
 	}
 

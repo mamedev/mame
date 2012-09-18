@@ -311,7 +311,7 @@ UINT32 maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_ind1
 	/* If screen output is disabled, fill with black */
 	if (!(VREG(VCR0) & VCR0_DEN))
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
@@ -453,7 +453,7 @@ void maygayv1_state::screen_eof_maygayv1(screen_device &screen, bool state)
 			for (i = 0; i < 16; ++i)
 			{
 				UINT16 entry = *palbase++;
-				palette_set_color_rgb(screen.machine(), entry & 0xf, pal4bit(entry >> 12), pal4bit(entry >> 8), pal4bit(entry >> 4));
+				palette_set_color_rgb(machine(), entry & 0xf, pal4bit(entry >> 12), pal4bit(entry >> 8), pal4bit(entry >> 4));
 			}
 		}
 	}

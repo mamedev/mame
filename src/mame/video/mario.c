@@ -206,18 +206,18 @@ UINT32 mario_state::screen_update_mario(screen_device &screen, bitmap_ind16 &bit
 {
 	int t;
 
-	t = screen.machine().root_device().ioport("MONITOR")->read();
+	t = machine().root_device().ioport("MONITOR")->read();
 	if (t != m_monitor)
 	{
 		m_monitor = t;
-		screen.machine().tilemap().mark_all_dirty();
+		machine().tilemap().mark_all_dirty();
 	}
 
 	m_bg_tilemap->set_scrollx(0, m_flip ? (HTOTAL-HBSTART) : 0);
 	m_bg_tilemap->set_scrolly(0, m_gfx_scroll - (m_flip ? 8 : 0));
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 
 	return 0;
 }

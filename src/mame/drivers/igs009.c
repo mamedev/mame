@@ -287,12 +287,12 @@ UINT32 igs009_state::screen_update_jingbell(screen_device &screen, bitmap_ind16 
 	int layers_ctrl = m_video_enable ? -1 : 0;
 
 #ifdef MAME_DEBUG
-	if (screen.machine().input().code_pressed(KEYCODE_Z))
+	if (machine().input().code_pressed(KEYCODE_Z))
 	{
 		int mask = 0;
-		if (screen.machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
-		if (screen.machine().input().code_pressed(KEYCODE_W))	mask |= 2;
-		if (screen.machine().input().code_pressed(KEYCODE_A))	mask |= 4;
+		if (machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
+		if (machine().input().code_pressed(KEYCODE_W))	mask |= 2;
+		if (machine().input().code_pressed(KEYCODE_A))	mask |= 4;
 		if (mask != 0) layers_ctrl &= mask;
 	}
 #endif
@@ -323,7 +323,7 @@ UINT32 igs009_state::screen_update_jingbell(screen_device &screen, bitmap_ind16 
 			/* draw top of screen */
 			clip.set(visarea.min_x, visarea.max_x, startclipmin, startclipmin+2);
 
-			bitmap.fill(screen.machine().pens[rowenable], clip);
+			bitmap.fill(machine().pens[rowenable], clip);
 
 			if (rowenable==0)
 			{ // 0 and 1 are the same? or is there a global switchoff?
@@ -347,7 +347,7 @@ UINT32 igs009_state::screen_update_jingbell(screen_device &screen, bitmap_ind16 
 		}
 
 	}
-	else					bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	else					bitmap.fill(get_black_pen(machine()), cliprect);
 
 
 	if (layers_ctrl & 2)	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);

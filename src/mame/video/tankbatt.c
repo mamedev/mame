@@ -102,6 +102,6 @@ static void draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const r
 UINT32 tankbatt_state::screen_update_tankbatt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_bullets(screen.machine(), bitmap, cliprect);
+	draw_bullets(machine(), bitmap, cliprect);
 	return 0;
 }

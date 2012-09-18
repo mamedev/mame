@@ -521,17 +521,17 @@ UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind1
 	int scrollx, scrolly_l, scrolly_r;
 	rectangle clip;
 
-	if (0xc0 != (screen.machine().root_device().ioport("IN2")->read() & 0xc0))  /* coin slots assert an NMI */
+	if (0xc0 != (machine().root_device().ioport("IN2")->read() & 0xc0))  /* coin slots assert an NMI */
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	if (0 == (m_watchdog_flip & 0x04))
-		screen.machine().watchdog_reset();
+		machine().watchdog_reset();
 	else if (m_watchdog_count-- > 0)
-		screen.machine().watchdog_reset();
+		machine().watchdog_reset();
 
 #ifdef MAME_DEBUG
 	{
-		if (screen.machine().input().code_pressed_once(KEYCODE_I))
+		if (machine().input().code_pressed_once(KEYCODE_I))
 			m_showmsg ^= 1;
 		if (m_showmsg)
 			popmessage("mode:$%02x cm:$%02x ccb:$%02x h:$%02x vl:$%02x vr:$%02x ph:$%02x pv:$%02x ch:$%02x cv:$%02x",
@@ -587,13 +587,13 @@ UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind1
 
 	if (m_mode_set & 0x20)
 	{
-		draw_object(screen.machine(), bitmap, cliprect);
-		draw_center(screen.machine(), bitmap, cliprect);
+		draw_object(machine(), bitmap, cliprect);
+		draw_center(machine(), bitmap, cliprect);
 	}
 	else
 	{
-		draw_object(screen.machine(), bitmap, cliprect);
-		draw_center(screen.machine(), bitmap, cliprect);
+		draw_object(machine(), bitmap, cliprect);
+		draw_center(machine(), bitmap, cliprect);
 		if (m_mode_set & 0x08)	/* bkg_ena on ? */
 		{
 			clip = m_bg_tilemap_l_clip;
@@ -606,7 +606,7 @@ UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind1
 		}
 	}
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect, (m_color_center_bot >> 1) & 1, 0, 0, m_fgvideoram, 0x20);
-	draw_missiles(screen.machine(), bitmap, cliprect, 1, 0, m_colorram, 0x20);
+	draw_sprites(machine(), bitmap, cliprect, (m_color_center_bot >> 1) & 1, 0, 0, m_fgvideoram, 0x20);
+	draw_missiles(machine(), bitmap, cliprect, 1, 0, m_colorram, 0x20);
 	return 0;
 }

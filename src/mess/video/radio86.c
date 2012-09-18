@@ -109,7 +109,7 @@ I8275_DISPLAY_PIXELS(partner_display_pixels)
 
 UINT32 radio86_state::screen_update_radio86(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *devconf = screen.machine().device("i8275");
+	device_t *devconf = machine().device("i8275");
 	i8275_update( devconf, bitmap, cliprect);
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;

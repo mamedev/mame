@@ -384,11 +384,11 @@ UINT32 mediagx_state::screen_update_mediagx(screen_device &screen, bitmap_rgb32 
 {
 	bitmap.fill(0, cliprect);
 
-	draw_framebuffer(screen.machine(), bitmap, cliprect);
+	draw_framebuffer(machine(), bitmap, cliprect);
 
 	if (m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)	// don't show MDA text screen on 16-bit mode. this is basically a hack
 	{
-		draw_cga(screen.machine(), bitmap, cliprect);
+		draw_cga(machine(), bitmap, cliprect);
 	}
 	return 0;
 }

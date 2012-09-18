@@ -223,7 +223,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap)
 UINT32 retofinv_state::screen_update_retofinv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap);
+	draw_sprites(machine(), bitmap);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

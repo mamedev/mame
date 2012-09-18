@@ -28,7 +28,7 @@ void simpl156_state::video_start()
 UINT32 simpl156_state::screen_update_simpl156(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	screen.machine().priority_bitmap.fill(0);
+	machine().priority_bitmap.fill(0);
 
 	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);
 
@@ -40,6 +40,6 @@ UINT32 simpl156_state::screen_update_simpl156(screen_device &screen, bitmap_ind1
 	//FIXME: flip_screen_x should not be written!
 	flip_screen_set_no_update(1);
 
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x1400/4); // 0x1400/4 seems right for charlien (doesn't initialize any more RAM, so will draw a garbage 0 with more)
+	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x1400/4); // 0x1400/4 seems right for charlien (doesn't initialize any more RAM, so will draw a garbage 0 with more)
 	return 0;
 }

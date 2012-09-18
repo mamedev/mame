@@ -178,14 +178,14 @@ WRITE8_MEMBER(labyrunr_state::labyrunr_vram2_w)
 
 UINT32 labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = screen.machine().driver_data()->generic_space();
+	address_space &space = machine().driver_data()->generic_space();
 	UINT8 ctrl_0 = k007121_ctrlram_r(m_k007121, space, 0);
 	rectangle finalclip0, finalclip1;
 
-	set_pens(screen.machine());
+	set_pens(machine());
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (~k007121_ctrlram_r(m_k007121, space, 3) & 0x20)
 	{
@@ -210,7 +210,7 @@ UINT32 labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_ind1
 		}
 
 		m_layer0->draw(bitmap, finalclip0, TILEMAP_DRAW_OPAQUE, 0);
-		k007121_sprites_draw(m_k007121, bitmap, cliprect, screen.machine().gfx[0], screen.machine().colortable, m_spriteram,(k007121_ctrlram_r(m_k007121, space, 6) & 0x30) * 2, 40,0,(k007121_ctrlram_r(m_k007121, space, 3) & 0x40) >> 5);
+		k007121_sprites_draw(m_k007121, bitmap, cliprect, machine().gfx[0], machine().colortable, m_spriteram,(k007121_ctrlram_r(m_k007121, space, 6) & 0x30) * 2, 40,0,(k007121_ctrlram_r(m_k007121, space, 3) & 0x40) >> 5);
 		/* we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites */
 		m_layer1->draw(bitmap, finalclip1, TILEMAP_DRAW_OPAQUE, 0);
 	}
@@ -280,7 +280,7 @@ UINT32 labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_ind1
 		if(use_clip3[1])
 			m_layer1->draw(bitmap, finalclip3, 0, 1);
 
-		k007121_sprites_draw(m_k007121, bitmap, cliprect, screen.machine().gfx[0], screen.machine().colortable, m_spriteram, (k007121_ctrlram_r(m_k007121, space, 6) & 0x30) * 2,40,0,(k007121_ctrlram_r(m_k007121, space, 3) & 0x40) >> 5);
+		k007121_sprites_draw(m_k007121, bitmap, cliprect, machine().gfx[0], machine().colortable, m_spriteram, (k007121_ctrlram_r(m_k007121, space, 6) & 0x30) * 2,40,0,(k007121_ctrlram_r(m_k007121, space, 3) & 0x40) >> 5);
 	}
 	return 0;
 }

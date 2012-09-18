@@ -382,7 +382,7 @@ UINT32 macrossp_state::screen_update_macrossp(screen_device &screen, bitmap_rgb3
 {
 	int layers[3],layerpri[3];
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	layers[0] = 0;
 	layerpri[0] = (m_scra_videoregs[0] & 0x0000c000) >> 14;
@@ -393,13 +393,13 @@ UINT32 macrossp_state::screen_update_macrossp(screen_device &screen, bitmap_rgb3
 
 	sortlayers(layers, layerpri);
 
-	draw_layer(screen.machine(), bitmap, cliprect, layers[0]);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0);
-	draw_layer(screen.machine(), bitmap, cliprect, layers[1]);
-	draw_sprites(screen.machine(), bitmap, cliprect, 1);
-	draw_layer(screen.machine(), bitmap, cliprect, layers[2]);
-	draw_sprites(screen.machine(), bitmap, cliprect, 2);
-	draw_sprites(screen.machine(), bitmap, cliprect, 3);
+	draw_layer(machine(), bitmap, cliprect, layers[0]);
+	draw_sprites(machine(), bitmap, cliprect, 0);
+	draw_layer(machine(), bitmap, cliprect, layers[1]);
+	draw_sprites(machine(), bitmap, cliprect, 1);
+	draw_layer(machine(), bitmap, cliprect, layers[2]);
+	draw_sprites(machine(), bitmap, cliprect, 2);
+	draw_sprites(machine(), bitmap, cliprect, 3);
 	m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 
 #if 0

@@ -990,10 +990,10 @@ static void redhawki_video_update(running_machine &machine, bitmap_ind16 &bitmap
 	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,0);
 }
 
-UINT32 nmk16_state::screen_update_afega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){	video_update(screen.machine(),bitmap,cliprect, 1, -0x100,+0x000, 0x0001);	return 0; }
-UINT32 nmk16_state::screen_update_bubl2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){	video_update(screen.machine(),bitmap,cliprect, 0, -0x100,+0x000, 0x0001);	return 0; }	// no flipscreen support, I really would confirmation from the schematics
-UINT32 nmk16_state::screen_update_redhawkb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){	video_update(screen.machine(),bitmap,cliprect, 0, +0x000,+0x100, 0x0001);	return 0; }
-UINT32 nmk16_state::screen_update_redhawki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){	redhawki_video_update(screen.machine(),bitmap,cliprect); return 0;} // strange scroll regs
+UINT32 nmk16_state::screen_update_afega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){	video_update(machine(),bitmap,cliprect, 1, -0x100,+0x000, 0x0001);	return 0; }
+UINT32 nmk16_state::screen_update_bubl2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){	video_update(machine(),bitmap,cliprect, 0, -0x100,+0x000, 0x0001);	return 0; }	// no flipscreen support, I really would confirmation from the schematics
+UINT32 nmk16_state::screen_update_redhawkb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){	video_update(machine(),bitmap,cliprect, 0, +0x000,+0x100, 0x0001);	return 0; }
+UINT32 nmk16_state::screen_update_redhawki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){	redhawki_video_update(machine(),bitmap,cliprect); return 0;} // strange scroll regs
 
 UINT32 nmk16_state::screen_update_firehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -1002,10 +1002,10 @@ UINT32 nmk16_state::screen_update_firehawk(screen_device &screen, bitmap_ind16 &
 
 	m_bg_tilemap0->draw(bitmap, cliprect, 0,0);
 
-	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,3);
-	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,2);
-	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,1);
-	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,0);
+	nmk16_draw_sprites_flipsupported(machine(), bitmap,cliprect,3);
+	nmk16_draw_sprites_flipsupported(machine(), bitmap,cliprect,2);
+	nmk16_draw_sprites_flipsupported(machine(), bitmap,cliprect,1);
+	nmk16_draw_sprites_flipsupported(machine(), bitmap,cliprect,0);
 
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;

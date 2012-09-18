@@ -208,7 +208,7 @@ UINT32 tsamurai_state::screen_update_tsamurai(screen_device &screen, bitmap_ind1
     */
 	bitmap.fill(m_bgcolor, cliprect);
 	m_background->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap,cliprect);
+	draw_sprites(machine(), bitmap,cliprect);
 	m_foreground->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
@@ -250,8 +250,8 @@ VIDEO_START_MEMBER(tsamurai_state,vsgongf)
 UINT32 tsamurai_state::screen_update_vsgongf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	#ifdef MAME_DEBUG
-	if( screen.machine().input().code_pressed( KEYCODE_Q ) ){
-		while( screen.machine().input().code_pressed( KEYCODE_Q ) ){
+	if( machine().input().code_pressed( KEYCODE_Q ) ){
+		while( machine().input().code_pressed( KEYCODE_Q ) ){
 			m_key_count++;
 			m_vsgongf_color = m_key_count;
 			m_foreground ->mark_all_dirty();
@@ -260,6 +260,6 @@ UINT32 tsamurai_state::screen_update_vsgongf(screen_device &screen, bitmap_ind16
 	#endif
 
 	m_foreground->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	draw_sprites(machine(),bitmap,cliprect);
 	return 0;
 }

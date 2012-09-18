@@ -433,7 +433,7 @@ void slapshot_state::screen_eof_taito_no_buffer(screen_device &screen, bool stat
 	if (state)
 	{
 
-		taito_update_sprites_active_area(screen.machine());
+		taito_update_sprites_active_area(machine());
 
 		m_prepare_sprites = 1;
 	}
@@ -458,45 +458,45 @@ a bg layer given priority over some sprites.
 
 UINT32 slapshot_state::screen_update_slapshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = screen.machine().driver_data()->generic_space();
+	address_space &space = machine().driver_data()->generic_space();
 	UINT8 layer[5];
 	UINT8 tilepri[5];
 	UINT8 spritepri[4];
 	UINT16 priority;
 
 #ifdef MAME_DEBUG
-	if (screen.machine().input().code_pressed_once (KEYCODE_Z))
+	if (machine().input().code_pressed_once (KEYCODE_Z))
 	{
 		m_dislayer[0] ^= 1;
 		popmessage("bg0: %01x",m_dislayer[0]);
 	}
 
-	if (screen.machine().input().code_pressed_once (KEYCODE_X))
+	if (machine().input().code_pressed_once (KEYCODE_X))
 	{
 		m_dislayer[1] ^= 1;
 		popmessage("bg1: %01x",m_dislayer[1]);
 	}
 
-	if (screen.machine().input().code_pressed_once (KEYCODE_C))
+	if (machine().input().code_pressed_once (KEYCODE_C))
 	{
 		m_dislayer[2] ^= 1;
 		popmessage("bg2: %01x",m_dislayer[2]);
 	}
 
-	if (screen.machine().input().code_pressed_once (KEYCODE_V))
+	if (machine().input().code_pressed_once (KEYCODE_V))
 	{
 		m_dislayer[3] ^= 1;
 		popmessage("bg3: %01x",m_dislayer[3]);
 	}
 
-	if (screen.machine().input().code_pressed_once (KEYCODE_B))
+	if (machine().input().code_pressed_once (KEYCODE_B))
 	{
 		m_dislayer[4] ^= 1;
 		popmessage("text: %01x",m_dislayer[4]);
 	}
 #endif
 
-	taito_handle_sprite_buffering(screen.machine());
+	taito_handle_sprite_buffering(machine());
 
 	tc0480scp_tilemap_update(m_tc0480scp);
 
@@ -521,7 +521,7 @@ UINT32 slapshot_state::screen_update_slapshot(screen_device &screen, bitmap_ind1
 	spritepri[2] = tc0360pri_r(m_tc0360pri, space, 7) & 0x0f;
 	spritepri[3] = tc0360pri_r(m_tc0360pri, space, 7) >> 4;
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
 #ifdef MAME_DEBUG
@@ -556,7 +556,7 @@ UINT32 slapshot_state::screen_update_slapshot(screen_device &screen, bitmap_ind1
 			if (spritepri[i] < tilepri[(layer[3])]) primasks[i] |= 0xff00;
 		}
 
-		draw_sprites(screen.machine(),bitmap,cliprect,primasks,0);
+		draw_sprites(machine(),bitmap,cliprect,primasks,0);
 	}
 
 	/*

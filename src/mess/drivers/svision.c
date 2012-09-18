@@ -352,7 +352,7 @@ PALETTE_INIT_MEMBER(svision_state,svisionp)
 
 UINT32 svision_state::screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	svision_state *state = screen.machine().driver_data<svision_state>();
+	svision_state *state = machine().driver_data<svision_state>();
 	int x, y, i, j=XPOS/4+YPOS*0x30;
 	UINT8 *videoram = m_videoram;
 
@@ -384,7 +384,7 @@ UINT32 svision_state::screen_update_svision(screen_device &screen, bitmap_ind16 
 
 UINT32 svision_state::screen_update_tvlink(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	svision_state *state = screen.machine().driver_data<svision_state>();
+	svision_state *state = machine().driver_data<svision_state>();
 	int x, y, i, j = XPOS/4+YPOS*0x30;
 	UINT8 *videoram = m_videoram;
 
@@ -409,7 +409,7 @@ UINT32 svision_state::screen_update_tvlink(screen_device &screen, bitmap_rgb32 &
 	}
 	else
 	{
-		bitmap.plot_box(3, 0, 162, 159, screen.machine().pens[PALETTE_START]);
+		bitmap.plot_box(3, 0, 162, 159, machine().pens[PALETTE_START]);
 	}
 	return 0;
 }

@@ -235,19 +235,19 @@ UINT32 paradise_state::screen_update_paradise(screen_device &screen, bitmap_ind1
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-if (screen.machine().input().code_pressed(KEYCODE_Z))
+if (machine().input().code_pressed(KEYCODE_Z))
 {
 	int mask = 0;
-	if (screen.machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
-	if (screen.machine().input().code_pressed(KEYCODE_W))	mask |= 2;
-	if (screen.machine().input().code_pressed(KEYCODE_E))	mask |= 4;
-	if (screen.machine().input().code_pressed(KEYCODE_R))	mask |= 8;
-	if (screen.machine().input().code_pressed(KEYCODE_A))	mask |= 16;
+	if (machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))	mask |= 2;
+	if (machine().input().code_pressed(KEYCODE_E))	mask |= 4;
+	if (machine().input().code_pressed(KEYCODE_R))	mask |= 8;
+	if (machine().input().code_pressed(KEYCODE_A))	mask |= 16;
 	if (mask != 0) layers_ctrl &= mask;
 }
 #endif
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (!(m_priority & 4))	/* Screen blanking */
 		return 0;
@@ -283,20 +283,20 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 UINT32 paradise_state::screen_update_torus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (!(m_priority & 2))	/* Screen blanking */
 		return 0;
 
 	if (m_priority & 1)
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 
 	m_tilemap_1->draw(bitmap, cliprect, 0,0);
 
 	if (m_priority & 4)
 	{
 		if (!(m_priority & 1))
-			draw_sprites(screen.machine(), bitmap, cliprect);
+			draw_sprites(machine(), bitmap, cliprect);
 
 		m_tilemap_2->draw(bitmap, cliprect, 0, 0);
 	}
@@ -305,7 +305,7 @@ UINT32 paradise_state::screen_update_torus(screen_device &screen, bitmap_ind16 &
 		m_tilemap_2->draw(bitmap, cliprect, 0, 0);
 
 		if (!(m_priority & 1))
-			draw_sprites(screen.machine(), bitmap,cliprect);
+			draw_sprites(machine(), bitmap,cliprect);
 	}
 	return 0;
 }
@@ -314,10 +314,10 @@ UINT32 paradise_state::screen_update_torus(screen_device &screen, bitmap_ind16 &
 UINT32 paradise_state::screen_update_madball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 	m_tilemap_0->draw(bitmap, cliprect, 0, 0);
 	m_tilemap_1->draw(bitmap, cliprect, 0, 0);
 	m_tilemap_2->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }

@@ -354,12 +354,12 @@ static void punchout_copy_bot_palette(running_machine &machine, int bank)
 UINT32 punchout_state::screen_update_punchout_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	punchout_copy_top_palette(screen.machine(), BIT(*m_palettebank,1));
+	punchout_copy_top_palette(machine(), BIT(*m_palettebank,1));
 
 	m_bg_top_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (m_spr1_ctrlram[7] & 1)	/* display in top monitor */
-		draw_big_sprite(screen.machine(), bitmap, cliprect, 0);
+		draw_big_sprite(machine(), bitmap, cliprect, 0);
 
 	return 0;
 }
@@ -368,7 +368,7 @@ UINT32 punchout_state::screen_update_punchout_bottom(screen_device &screen, bitm
 {
 	int offs;
 
-	punchout_copy_bot_palette(screen.machine(), BIT(*m_palettebank,0));
+	punchout_copy_bot_palette(machine(), BIT(*m_palettebank,0));
 
 	/* copy the character mapped graphics */
 	for (offs = 0;offs < 32;offs++)
@@ -377,8 +377,8 @@ UINT32 punchout_state::screen_update_punchout_bottom(screen_device &screen, bitm
 	m_bg_bot_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (m_spr1_ctrlram[7] & 2)	/* display in bottom monitor */
-		draw_big_sprite(screen.machine(), bitmap, cliprect, 1);
-	drawbs2(screen.machine(), bitmap, cliprect);
+		draw_big_sprite(machine(), bitmap, cliprect, 1);
+	drawbs2(machine(), bitmap, cliprect);
 
 	return 0;
 }
@@ -387,12 +387,12 @@ UINT32 punchout_state::screen_update_punchout_bottom(screen_device &screen, bitm
 UINT32 punchout_state::screen_update_armwrest_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	punchout_copy_top_palette(screen.machine(), BIT(*m_palettebank,1));
+	punchout_copy_top_palette(machine(), BIT(*m_palettebank,1));
 
 	m_bg_top_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (m_spr1_ctrlram[7] & 1)	/* display in top monitor */
-		armwrest_draw_big_sprite(screen.machine(), bitmap, cliprect, 0);
+		armwrest_draw_big_sprite(machine(), bitmap, cliprect, 0);
 
 	return 0;
 }
@@ -400,13 +400,13 @@ UINT32 punchout_state::screen_update_armwrest_top(screen_device &screen, bitmap_
 UINT32 punchout_state::screen_update_armwrest_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	punchout_copy_bot_palette(screen.machine(), BIT(*m_palettebank,0));
+	punchout_copy_bot_palette(machine(), BIT(*m_palettebank,0));
 
 	m_bg_bot_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (m_spr1_ctrlram[7] & 2)	/* display in bottom monitor */
-		armwrest_draw_big_sprite(screen.machine(), bitmap, cliprect, 1);
-	drawbs2(screen.machine(), bitmap, cliprect);
+		armwrest_draw_big_sprite(machine(), bitmap, cliprect, 1);
+	drawbs2(machine(), bitmap, cliprect);
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 

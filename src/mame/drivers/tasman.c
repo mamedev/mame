@@ -58,7 +58,7 @@ VIDEO_START_MEMBER(kongambl_state,kongambl)
 UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	#if CUSTOM_DRAW
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 	UINT32 count;
 
 	count = 0;
@@ -69,7 +69,7 @@ UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind1
 		{
 			UINT32 tile = m_vram[count] & 0xffff;
 
-			if(screen.machine().primary_screen->visible_area().contains(x*8, y*8))
+			if(machine().primary_screen->visible_area().contains(x*8, y*8))
 				drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
 
 			count++;
@@ -84,7 +84,7 @@ UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind1
 		{
 			UINT32 tile = m_vram[count] & 0xffff;
 
-			if(screen.machine().primary_screen->visible_area().contains(x*8, y*8))
+			if(machine().primary_screen->visible_area().contains(x*8, y*8))
 				drawgfx_transpen(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8,0);
 
 			count++;
@@ -93,10 +93,10 @@ UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind1
 
 
 	#else
-	device_t *k056832 = screen.machine().device("k056832");
+	device_t *k056832 = machine().device("k056832");
 
 	bitmap.fill(0, cliprect);
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 3, 0, 0);
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 2, 0, 0);

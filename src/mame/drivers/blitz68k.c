@@ -218,7 +218,7 @@ UINT32 blitz68k_state::screen_update_blitz68k(screen_device &screen, bitmap_rgb3
 	{
 		for(x = 0; x < 512; x++)
 		{
-			bitmap.pix32(y, x) = screen.machine().pens[*src++];
+			bitmap.pix32(y, x) = machine().pens[*src++];
 		}
 	}
 
@@ -239,10 +239,10 @@ UINT32 blitz68k_state::screen_update_blitz68k_noblit(screen_device &screen, bitm
 		for(x = 0; x < 512; )
 		{
 			UINT16 pen = *src++;
-			bitmap.pix32(y, x++) = screen.machine().pens[(pen >>  8) & 0xf];
-			bitmap.pix32(y, x++) = screen.machine().pens[(pen >> 12) & 0xf];
-			bitmap.pix32(y, x++) = screen.machine().pens[(pen >>  0) & 0xf];
-			bitmap.pix32(y, x++) = screen.machine().pens[(pen >>  4) & 0xf];
+			bitmap.pix32(y, x++) = machine().pens[(pen >>  8) & 0xf];
+			bitmap.pix32(y, x++) = machine().pens[(pen >> 12) & 0xf];
+			bitmap.pix32(y, x++) = machine().pens[(pen >>  0) & 0xf];
+			bitmap.pix32(y, x++) = machine().pens[(pen >>  4) & 0xf];
 		}
 	}
 

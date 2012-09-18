@@ -1093,11 +1093,11 @@ UINT32 victory_state::screen_update_victory(screen_device &screen, bitmap_ind16 
 	int x, y;
 
 	/* copy the palette from palette RAM */
-	set_palette(screen.machine());
+	set_palette(machine());
 
 	/* update the foreground & background */
-	update_foreground(screen.machine());
-	update_background(screen.machine());
+	update_foreground(machine());
+	update_background(machine());
 
 	/* blend the bitmaps and do collision detection */
 	for (y = 0; y < 256; y++)
@@ -1114,7 +1114,7 @@ UINT32 victory_state::screen_update_victory(screen_device &screen, bitmap_ind16 
 			int bpix = bg[(x + m_scrollx) & 255];
 			scanline[x] = bpix | (fpix << 3);
 			if (fpix && (bpix & bgcollmask) && count++ < 128)
-				screen.machine().scheduler().timer_set(screen.time_until_pos(y, x), FUNC(bgcoll_irq_callback), x | (y << 8));
+				machine().scheduler().timer_set(screen.time_until_pos(y, x), FUNC(bgcoll_irq_callback), x | (y << 8));
 		}
 	}
 

@@ -90,7 +90,7 @@ UINT32 mouser_state::screen_update_mouser(screen_device &screen, bitmap_ind16 &b
 		/* Note: this is _not_ dependant on flipping */
 		color_offs = offs % 32 + ((256 + 8 * (offs / 32) - spriteram[offs % 32] )% 256) / 8 * 32;
 
-		drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],
+		drawgfx_opaque(bitmap,cliprect,machine().gfx[0],
 				m_videoram[offs] | (m_colorram[color_offs] >> 5) * 256 | ((m_colorram[color_offs] >> 4) & 1) * 512,
 				m_colorram[color_offs]%16,
 				flip_screen_x(),flip_screen_y(),
@@ -121,7 +121,7 @@ UINT32 mouser_state::screen_update_mouser(screen_device &screen, bitmap_ind16 &b
 		}
 
 		if (BIT(spriteram[offs + 1], 4))
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1+((spriteram[offs+1]&0x20)>>5)],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1+((spriteram[offs+1]&0x20)>>5)],
 					spriteram[offs]&0x3f,
 					spriteram[offs+1]%16,
 					flipx,flipy,
@@ -150,7 +150,7 @@ UINT32 mouser_state::screen_update_mouser(screen_device &screen, bitmap_ind16 &b
 		}
 
 		if (BIT(spriteram[offs + 1], 4))
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1+((spriteram[offs+1]&0x20)>>5)],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1+((spriteram[offs+1]&0x20)>>5)],
 					spriteram[offs]&0x3f,
 					spriteram[offs+1]%16,
 					flipx,flipy,

@@ -222,9 +222,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 mirax_state::screen_update_mirax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_tilemap(screen.machine(),bitmap,cliprect,1);
-	draw_sprites(screen.machine(),bitmap,cliprect);
-	draw_tilemap(screen.machine(),bitmap,cliprect,0);
+	draw_tilemap(machine(),bitmap,cliprect,1);
+	draw_sprites(machine(),bitmap,cliprect);
+	draw_tilemap(machine(),bitmap,cliprect,0);
 	return 0;
 }
 

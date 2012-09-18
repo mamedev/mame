@@ -74,7 +74,7 @@ UINT32 sprint4_state::screen_update_sprint4(screen_device &screen, bitmap_ind16 
 		if (i & 1)
 			bank = 32;
 
-		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1],
 			(code >> 3) | bank,
 			(attr & 0x80) ? 4 : i,
 			0, 0,
@@ -95,7 +95,7 @@ void sprint4_state::screen_eof_sprint4(screen_device &screen, bool state)
 
 		/* check for sprite-playfield collisions */
 
-		device_t *discrete = screen.machine().device("discrete");
+		device_t *discrete = machine().device("discrete");
 
 		for (i = 0; i < 4; i++)
 		{
@@ -112,17 +112,17 @@ void sprint4_state::screen_eof_sprint4(screen_device &screen, bool state)
 
 			rect.min_x = horz - 15;
 			rect.min_y = vert - 15;
-			rect.max_x = horz - 15 + screen.machine().gfx[1]->width() - 1;
-			rect.max_y = vert - 15 + screen.machine().gfx[1]->height() - 1;
+			rect.max_x = horz - 15 + machine().gfx[1]->width() - 1;
+			rect.max_y = vert - 15 + machine().gfx[1]->height() - 1;
 
-			rect &= screen.machine().primary_screen->visible_area();
+			rect &= machine().primary_screen->visible_area();
 
 			m_playfield->draw(m_helper, rect, 0, 0);
 
 			if (i & 1)
 				bank = 32;
 
-			drawgfx_transpen(m_helper, rect, screen.machine().gfx[1],
+			drawgfx_transpen(m_helper, rect, machine().gfx[1],
 				(code >> 3) | bank,
 				4,
 				0, 0,
@@ -131,13 +131,13 @@ void sprint4_state::screen_eof_sprint4(screen_device &screen, bool state)
 
 			for (y = rect.min_y; y <= rect.max_y; y++)
 				for (x = rect.min_x; x <= rect.max_x; x++)
-					if (colortable_entry_get_value(screen.machine().colortable, m_helper.pix16(y, x)) != 0)
+					if (colortable_entry_get_value(machine().colortable, m_helper.pix16(y, x)) != 0)
 						m_collision[i] = 1;
 		}
 
 		/* update sound status */
 
-		address_space &space = screen.machine().driver_data()->generic_space();
+		address_space &space = machine().driver_data()->generic_space();
 		discrete_sound_w(discrete, space, SPRINT4_MOTOR_DATA_1, videoram[0x391] & 15);
 		discrete_sound_w(discrete, space, SPRINT4_MOTOR_DATA_2, videoram[0x393] & 15);
 		discrete_sound_w(discrete, space, SPRINT4_MOTOR_DATA_3, videoram[0x395] & 15);

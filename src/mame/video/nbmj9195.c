@@ -454,10 +454,10 @@ UINT32 nbmj9195_state::screen_update_nbmj9195(screen_device &screen, bitmap_ind1
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
 			{
-				update_pixel(screen.machine(), 0, x, y);
+				update_pixel(machine(), 0, x, y);
 
 				if (m_gfxdraw_mode)
-					update_pixel(screen.machine(), 1, x, y);
+					update_pixel(machine(), 1, x, y);
 			}
 	}
 

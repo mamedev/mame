@@ -257,7 +257,7 @@ UINT32 chaknpop_state::screen_update_chaknpop(screen_device &screen, bitmap_ind1
 {
 
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
-	draw_bitmap(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
+	draw_bitmap(machine(), bitmap, cliprect);
 	return 0;
 }

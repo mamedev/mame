@@ -200,7 +200,7 @@ UINT32 tiamc1_state::screen_update_tiamc1(screen_device &screen, bitmap_ind16 &b
 		m_bg_tilemap1->draw(bitmap, cliprect, 0, 0);
 
 
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 
 	return 0;
 }

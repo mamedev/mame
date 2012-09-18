@@ -246,7 +246,7 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const 
 
 UINT32 ddribble_state::screen_update_ddribble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(screen.machine());
+	set_pens(machine());
 
 	m_fg_tilemap->set_flip((m_vregs[0][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	m_bg_tilemap->set_flip((m_vregs[1][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -258,8 +258,8 @@ UINT32 ddribble_state::screen_update_ddribble(screen_device &screen, bitmap_ind1
 	m_bg_tilemap->set_scrolly(0, m_vregs[1][0]);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram_1, 0x07d, 2, m_vregs[0][4] & 0x08);
-	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram_2, 0x140, 3, m_vregs[1][4] & 0x08);
+	draw_sprites(machine(), bitmap, cliprect, m_spriteram_1, 0x07d, 2, m_vregs[0][4] & 0x08);
+	draw_sprites(machine(), bitmap, cliprect, m_spriteram_2, 0x140, 3, m_vregs[1][4] & 0x08);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -335,7 +335,7 @@ e3 -> c6
 UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int count,x,y;
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	count = 0x0000;
 
@@ -356,7 +356,7 @@ UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &b
 					tile += m_videobank*0x2000;
 
 
-					drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tile,colour,0,0,x*8,y*8);
+					drawgfx_opaque(bitmap,cliprect,machine().gfx[0],tile,colour,0,0,x*8,y*8);
 
 					count++;
 				}
@@ -422,7 +422,7 @@ UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &b
 				tile += 0x1000;
 			}
 
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],tile,colour,0,0,x*8,y*8,0);
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[0],tile,colour,0,0,x*8,y*8,0);
 			count++;
 		}
 	}

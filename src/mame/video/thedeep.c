@@ -219,10 +219,10 @@ UINT32 thedeep_state::screen_update_thedeep(screen_device &screen, bitmap_ind16 
 		m_tilemap_0->set_scrolly(x, y + scrolly);
 	}
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	m_tilemap_0->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap,cliprect);
+	draw_sprites(machine(), bitmap,cliprect);
 	m_tilemap_1->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

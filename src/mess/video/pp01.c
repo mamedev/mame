@@ -20,7 +20,7 @@ UINT32 pp01_state::screen_update_pp01(screen_device &screen, bitmap_ind16 &bitma
 	UINT8 code_r,code_g,code_b;
 	UINT8 col;
 	int y, x, b;
-	UINT8 *ram = screen.machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
 	for (y = 0; y < 256; y++)
 	{

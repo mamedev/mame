@@ -157,7 +157,7 @@ UINT32 astrocorp_state::screen_update_astrocorp(screen_device &screen, bitmap_in
 	if (m_screen_enable & 1)
 		copybitmap(bitmap, m_bitmap, 0,0,0,0, cliprect);
 	else
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 
 	return 0;
 }

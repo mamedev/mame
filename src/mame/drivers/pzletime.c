@@ -97,7 +97,7 @@ UINT32 pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_ind1
 	int count;
 	int y, x;
 
-	bitmap.fill(screen.machine().pens[0], cliprect); //bg pen
+	bitmap.fill(machine().pens[0], cliprect); //bg pen
 
 	m_txt_tilemap->set_scrolly(0, m_tilemap_regs[0] - 3);
 	m_txt_tilemap->set_scrollx(0, m_tilemap_regs[1]);
@@ -139,7 +139,7 @@ UINT32 pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_ind1
 
 			// is spriteram[offs + 0] & 0x200 flipy? it's always set
 
-			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1], spr_offs, colour, 0, 1, sx, sy, 0);
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[1], spr_offs, colour, 0, 1, sx, sy, 0);
 		}
 	}
 

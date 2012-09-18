@@ -58,7 +58,7 @@ UINT32 poker72_state::screen_update_poker72(screen_device &screen, bitmap_ind16 
 
 			tile|= m_tile_bank << 12;
 
-			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tile,color,fx,fy,x*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,machine().gfx[0],tile,color,fx,fy,x*8,y*8);
 
 			count+=2;
 		}

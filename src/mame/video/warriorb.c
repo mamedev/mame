@@ -115,5 +115,5 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 	return 0;
 }
 
-UINT32 warriorb_state::screen_update_warriorb_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 40 * 8 * 0, screen.machine().driver_data<warriorb_state>()->m_tc0100scn_1); }
-UINT32 warriorb_state::screen_update_warriorb_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 40 * 8 * 1, screen.machine().driver_data<warriorb_state>()->m_tc0100scn_2); }
+UINT32 warriorb_state::screen_update_warriorb_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 40 * 8 * 0, machine().driver_data<warriorb_state>()->m_tc0100scn_1); }
+UINT32 warriorb_state::screen_update_warriorb_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 40 * 8 * 1, machine().driver_data<warriorb_state>()->m_tc0100scn_2); }

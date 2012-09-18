@@ -400,7 +400,7 @@ static UINT32 turbo_get_sprite_bits(const UINT8 *sprite_gfxdata, UINT8 road, spr
 UINT32 turbo_state::screen_update_turbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap_ind16 &fgpixmap = m_fg_tilemap->pixmap();
-	const UINT8 *road_gfxdata = screen.machine().root_device().memregion("gfx3")->base();
+	const UINT8 *road_gfxdata = machine().root_device().memregion("gfx3")->base();
 	const UINT8 *prom_base = memregion("proms")->base();
 	const UINT8 *pr1114 = prom_base + 0x000;
 	const UINT8 *pr1115 = prom_base + 0x020;
@@ -429,7 +429,7 @@ UINT32 turbo_state::screen_update_turbo(screen_device &screen, bitmap_ind16 &bit
 
 		/* compute the sprite information; we use y-1 since this info was computed during HBLANK */
 		/* on the previous scanline */
-		turbo_prepare_sprites(screen.machine(), this, y, &sprinfo);
+		turbo_prepare_sprites(machine(), this, y, &sprinfo);
 
 		/* loop over columns */
 		for (x = 0; x <= cliprect.max_x; x += TURBO_X_SCALE)
@@ -769,7 +769,7 @@ UINT32 turbo_state::screen_update_subroc3d(screen_device &screen, bitmap_ind16 &
 
 		/* compute the sprite information; we use y-1 since this info was computed during HBLANK */
 		/* on the previous scanline */
-		subroc3d_prepare_sprites(screen.machine(), this, y, &sprinfo);
+		subroc3d_prepare_sprites(machine(), this, y, &sprinfo);
 
 		/* loop over columns */
 		for (x = 0; x <= cliprect.max_x; x += TURBO_X_SCALE)
@@ -971,7 +971,7 @@ static UINT32 buckrog_get_sprite_bits(const UINT8 *sprite_gfxdata, sprite_info *
 UINT32 turbo_state::screen_update_buckrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap_ind16 &fgpixmap = m_fg_tilemap->pixmap();
-	const UINT8 *bgcolor = screen.machine().root_device().memregion("gfx3")->base();
+	const UINT8 *bgcolor = machine().root_device().memregion("gfx3")->base();
 	const UINT8 *prom_base = memregion("proms")->base();
 	const UINT8 *pr5194 = prom_base + 0x000;
 	const UINT8 *pr5198 = prom_base + 0x500;
@@ -987,7 +987,7 @@ UINT32 turbo_state::screen_update_buckrog(screen_device &screen, bitmap_ind16 &b
 
 		/* compute the sprite information; we use y-1 since this info was computed during HBLANK */
 		/* on the previous scanline */
-		buckrog_prepare_sprites(screen.machine(), this, y, &sprinfo);
+		buckrog_prepare_sprites(machine(), this, y, &sprinfo);
 
 		/* loop over columns */
 		for (x = 0; x <= cliprect.max_x; x += TURBO_X_SCALE)

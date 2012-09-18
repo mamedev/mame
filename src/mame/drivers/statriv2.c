@@ -194,8 +194,8 @@ WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
 
 UINT32 statriv2_state::screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (tms9927_screen_reset(screen.machine().device("tms")))
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	if (tms9927_screen_reset(machine().device("tms")))
+		bitmap.fill(get_black_pen(machine()), cliprect);
 	else
 		m_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;

@@ -280,13 +280,13 @@ static void exctsccr_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 UINT32 champbas_state::screen_update_champbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	champbas_draw_sprites(screen.machine(), bitmap, cliprect);
+	champbas_draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }
 
 UINT32 champbas_state::screen_update_exctsccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	exctsccr_draw_sprites(screen.machine(), bitmap, cliprect);
+	exctsccr_draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }

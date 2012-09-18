@@ -262,7 +262,7 @@ UINT32 z100_state::screen_update_z100(screen_device &screen, bitmap_ind16 &bitma
 						dot = m_display_mask;
 
 					if(y*mc6845_tile_height+yi < 216 && x*8+xi < 640) /* TODO: safety check */
-						bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = screen.machine().pens[dot];
+						bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = machine().pens[dot];
 				}
 			}
 		}

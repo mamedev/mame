@@ -412,8 +412,8 @@ UINT32 _20pacgal_state::screen_update_20pacgal(screen_device &screen, bitmap_rgb
 	bitmap.fill(0, cliprect);
 	draw_stars(this, bitmap,cliprect);
 	draw_chars(this, bitmap);
-	draw_sprites(screen.machine(),this, bitmap);
-	do_pen_lookup(screen.machine(), this, bitmap, cliprect);
+	draw_sprites(machine(),this, bitmap);
+	do_pen_lookup(machine(), this, bitmap, cliprect);
 
 	return 0;
 }

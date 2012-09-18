@@ -534,7 +534,7 @@ UINT32 tceptor_state::screen_update_tceptor_2d(screen_device &screen, bitmap_ind
 	{
 		m_c45_road->draw(bitmap, cliprect, pri * 2);
 		m_c45_road->draw(bitmap, cliprect, pri * 2 + 1);
-		draw_sprites(screen.machine(), bitmap, cliprect, pri);
+		draw_sprites(machine(), bitmap, cliprect, pri);
 	}
 
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);

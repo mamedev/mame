@@ -223,7 +223,7 @@ UINT32 sf_state::screen_update_sf(screen_device &screen, bitmap_ind16 &bitmap, c
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (m_sf_active & 0x80)
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;

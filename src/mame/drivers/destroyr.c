@@ -82,7 +82,7 @@ UINT32 destroyr_state::screen_update_destroyr(screen_device &screen, bitmap_ind1
 				continue;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], num, 0, flipx, 0, horz, 16 * i, 0);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[2], num, 0, flipx, 0, horz, 16 * i, 0);
 	}
 
 	/* draw alpha numerics */
@@ -92,7 +92,7 @@ UINT32 destroyr_state::screen_update_destroyr(screen_device &screen, bitmap_ind1
 		{
 			int num = m_alpha_num_ram[32 * i + j];
 
-			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0], num, 0, 0, 0, 8 * j, 8 * i, 0);
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[0], num, 0, 0, 0, 8 * j, 8 * i, 0);
 		}
 	}
 
@@ -103,13 +103,13 @@ UINT32 destroyr_state::screen_update_destroyr(screen_device &screen, bitmap_ind1
 		int horz = 256 - m_minor_obj_ram[i + 2];
 		int vert = 256 - m_minor_obj_ram[i + 4];
 
-		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1], num, 0, 0, 0, horz, vert, 0);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1], num, 0, 0, 0, horz, vert, 0);
 	}
 
 	/* draw waves */
 	for (i = 0; i < 4; i++)
 	{
-		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[3], m_wavemod ? 1 : 0, 0, 0, 0, 64 * i, 0x4e, 0);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[3], m_wavemod ? 1 : 0, 0, 0, 0, 64 * i, 0x4e, 0);
 	}
 
 	/* draw cursor */

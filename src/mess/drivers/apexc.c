@@ -598,26 +598,26 @@ UINT32 apexc_state::screen_update_apexc(screen_device &screen, bitmap_ind16 &bit
 	char the_char;
 
 	bitmap.fill(0, /*machine().visible_area*/panel_window);
-	apexc_draw_string(screen.machine(), bitmap, "power", 8, 0, 0);
-	apexc_draw_string(screen.machine(), bitmap, "running", 8, 8, 0);
-	apexc_draw_string(screen.machine(), bitmap, "data :", 0, 24, 0);
+	apexc_draw_string(machine(), bitmap, "power", 8, 0, 0);
+	apexc_draw_string(machine(), bitmap, "running", 8, 8, 0);
+	apexc_draw_string(machine(), bitmap, "data :", 0, 24, 0);
 
 	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, teletyper_window);
 
 
 	apexc_draw_led(bitmap, 0, 0, 1);
 
-	apexc_draw_led(bitmap, 0, 8, screen.machine().device("maincpu")->state().state_int(APEXC_STATE));
+	apexc_draw_led(bitmap, 0, 8, machine().device("maincpu")->state().state_int(APEXC_STATE));
 
 	for (i=0; i<32; i++)
 	{
 		apexc_draw_led(bitmap, i*8, 32, (m_panel_data_reg << i) & 0x80000000UL);
 		the_char = '0' + ((i + 1) % 10);
-		apexc_draw_char(screen.machine(), bitmap, the_char, i*8, 40, 0);
+		apexc_draw_char(machine(), bitmap, the_char, i*8, 40, 0);
 		if (((i + 1) % 10) == 0)
 		{
 			the_char = '0' + ((i + 1) / 10);
-			apexc_draw_char(screen.machine(), bitmap, the_char, i*8, 48, 0);
+			apexc_draw_char(machine(), bitmap, the_char, i*8, 48, 0);
 		}
 	}
 	return 0;

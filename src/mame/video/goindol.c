@@ -125,7 +125,7 @@ UINT32 goindol_state::screen_update_goindol(screen_device &screen, bitmap_ind16 
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect, 1, m_spriteram);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0, m_spriteram2);
+	draw_sprites(machine(), bitmap, cliprect, 1, m_spriteram);
+	draw_sprites(machine(), bitmap, cliprect, 0, m_spriteram2);
 	return 0;
 }

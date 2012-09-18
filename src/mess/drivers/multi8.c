@@ -148,7 +148,7 @@ UINT32 multi8_state::screen_update_multi8(screen_device &screen, bitmap_ind16 &b
 				else
 					color = (pen_b) | (pen_r << 1) | (pen_g << 2);
 
-				multi8_draw_pixel(screen.machine(),bitmap, y, x*8+xi,m_pen_clut[color], 0);
+				multi8_draw_pixel(machine(),bitmap, y, x*8+xi,m_pen_clut[color], 0);
 			}
 			count++;
 		}
@@ -176,11 +176,11 @@ UINT32 multi8_state::screen_update_multi8(screen_device &screen, bitmap_ind16 &b
 						pen = (m_p_chargen[tile*8+yi] >> (7-xi) & 1) ? color : 0;
 
 					if(pen)
-						multi8_draw_pixel(screen.machine(),bitmap, y*mc6845_tile_height+yi, x*8+xi, pen, (m_display_reg & 0x40) == 0x00);
+						multi8_draw_pixel(machine(),bitmap, y*mc6845_tile_height+yi, x*8+xi, pen, (m_display_reg & 0x40) == 0x00);
 				}
 			}
 
-			//drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], tile,color >> 5, 0, 0, x*8, y*8);
+			//drawgfx_opaque(bitmap, cliprect, machine().gfx[0], tile,color >> 5, 0, 0, x*8, y*8);
 
 			// draw cursor
 			if(mc6845_cursor_addr+0xc000 == count)
@@ -192,8 +192,8 @@ UINT32 multi8_state::screen_update_multi8(screen_device &screen, bitmap_ind16 &b
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(screen.machine().primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(screen.machine().primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+					case 0x40: if(machine().primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(machine().primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
 				}
 
 				if(cursor_on)
@@ -201,7 +201,7 @@ UINT32 multi8_state::screen_update_multi8(screen_device &screen, bitmap_ind16 &b
 					for (yc=0; yc<(mc6845_tile_height-(mc6845_cursor_y_start & 7)); yc++)
 					{
 						for (xc=0; xc<8; xc++)
-							multi8_draw_pixel(screen.machine(),bitmap, y*mc6845_tile_height+yc, x*8+xc,0x07,(m_display_reg & 0x40) == 0x00);
+							multi8_draw_pixel(machine(),bitmap, y*mc6845_tile_height+yc, x*8+xc,0x07,(m_display_reg & 0x40) == 0x00);
 
 					}
 				}

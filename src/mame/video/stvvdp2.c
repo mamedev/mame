@@ -6638,39 +6638,39 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 
 UINT32 saturn_state::screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	saturn_state *state = screen.machine().driver_data<saturn_state>();
+	saturn_state *state = machine().driver_data<saturn_state>();
 
-	stv_vdp2_fade_effects(screen.machine());
+	stv_vdp2_fade_effects(machine());
 
-	stv_vdp2_draw_back(screen.machine(), m_tmpbitmap,cliprect);
+	stv_vdp2_draw_back(machine(), m_tmpbitmap,cliprect);
 
 	#if DEBUG_MODE
-	if(screen.machine().input().code_pressed_once(KEYCODE_T))
+	if(machine().input().code_pressed_once(KEYCODE_T))
 	{
 		vdpdebug.l_en^=1;
 		popmessage("NBG3 %sabled",vdpdebug.l_en & 1 ? "en" : "dis");
 	}
-	if(screen.machine().input().code_pressed_once(KEYCODE_Y))
+	if(machine().input().code_pressed_once(KEYCODE_Y))
 	{
 		vdpdebug.l_en^=2;
 		popmessage("NBG2 %sabled",vdpdebug.l_en & 2 ? "en" : "dis");
 	}
-	if(screen.machine().input().code_pressed_once(KEYCODE_U))
+	if(machine().input().code_pressed_once(KEYCODE_U))
 	{
 		vdpdebug.l_en^=4;
 		popmessage("NBG1 %sabled",vdpdebug.l_en & 4 ? "en" : "dis");
 	}
-	if(screen.machine().input().code_pressed_once(KEYCODE_I))
+	if(machine().input().code_pressed_once(KEYCODE_I))
 	{
 		vdpdebug.l_en^=8;
 		popmessage("NBG0 %sabled",vdpdebug.l_en & 8 ? "en" : "dis");
 	}
-	if(screen.machine().input().code_pressed_once(KEYCODE_K))
+	if(machine().input().code_pressed_once(KEYCODE_K))
 	{
 		vdpdebug.l_en^=0x10;
 		popmessage("RBG0 %sabled",vdpdebug.l_en & 0x10 ? "en" : "dis");
 	}
-	if(screen.machine().input().code_pressed_once(KEYCODE_O))
+	if(machine().input().code_pressed_once(KEYCODE_O))
 	{
 		vdpdebug.l_en^=0x20;
 		popmessage("SPRITE %sabled",vdpdebug.l_en & 0x20 ? "en" : "dis");
@@ -6688,12 +6688,12 @@ UINT32 saturn_state::screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 
 		/*If a plane has a priority value of zero it isn't shown at all.*/
 		for(pri=1;pri<8;pri++)
 		{
-			if (vdpdebug.l_en & 1)    { if(pri==STV_VDP2_N3PRIN) stv_vdp2_draw_NBG3(screen.machine(), m_tmpbitmap,cliprect); }
-			if (vdpdebug.l_en & 2)    { if(pri==STV_VDP2_N2PRIN) stv_vdp2_draw_NBG2(screen.machine(), m_tmpbitmap,cliprect); }
-			if (vdpdebug.l_en & 4)    { if(pri==STV_VDP2_N1PRIN) stv_vdp2_draw_NBG1(screen.machine(), m_tmpbitmap,cliprect); }
-			if (vdpdebug.l_en & 8)    { if(pri==STV_VDP2_N0PRIN) stv_vdp2_draw_NBG0(screen.machine(), m_tmpbitmap,cliprect); }
-			if (vdpdebug.l_en & 0x10) { if(pri==STV_VDP2_R0PRIN) stv_vdp2_draw_RBG0(screen.machine(), m_tmpbitmap,cliprect); }
-			if (vdpdebug.l_en & 0x20) { draw_sprites(screen.machine(),m_tmpbitmap,cliprect,pri); }
+			if (vdpdebug.l_en & 1)    { if(pri==STV_VDP2_N3PRIN) stv_vdp2_draw_NBG3(machine(), m_tmpbitmap,cliprect); }
+			if (vdpdebug.l_en & 2)    { if(pri==STV_VDP2_N2PRIN) stv_vdp2_draw_NBG2(machine(), m_tmpbitmap,cliprect); }
+			if (vdpdebug.l_en & 4)    { if(pri==STV_VDP2_N1PRIN) stv_vdp2_draw_NBG1(machine(), m_tmpbitmap,cliprect); }
+			if (vdpdebug.l_en & 8)    { if(pri==STV_VDP2_N0PRIN) stv_vdp2_draw_NBG0(machine(), m_tmpbitmap,cliprect); }
+			if (vdpdebug.l_en & 0x10) { if(pri==STV_VDP2_R0PRIN) stv_vdp2_draw_RBG0(machine(), m_tmpbitmap,cliprect); }
+			if (vdpdebug.l_en & 0x20) { draw_sprites(machine(),m_tmpbitmap,cliprect,pri); }
 		}
 	}
 
@@ -6704,51 +6704,51 @@ UINT32 saturn_state::screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 
     ,STV_VDP2_N1ZMXI,STV_VDP2_N1ZMXD
     ,STV_VDP2_N1ZMYI,STV_VDP2_N1ZMYD);*/
 
-	if ( screen.machine().input().code_pressed_once(KEYCODE_W) )
+	if ( machine().input().code_pressed_once(KEYCODE_W) )
 	{
 		int tilecode;
 
 		for (tilecode = 0;tilecode<0x8000;tilecode++)
 		{
-			screen.machine().gfx[0]->mark_dirty(tilecode);
+			machine().gfx[0]->mark_dirty(tilecode);
 		}
 
 		for (tilecode = 0;tilecode<0x2000;tilecode++)
 		{
-			screen.machine().gfx[1]->mark_dirty(tilecode);
+			machine().gfx[1]->mark_dirty(tilecode);
 		}
 
 		for (tilecode = 0;tilecode<0x4000;tilecode++)
 		{
-			screen.machine().gfx[2]->mark_dirty(tilecode);
+			machine().gfx[2]->mark_dirty(tilecode);
 		}
 
 		for (tilecode = 0;tilecode<0x1000;tilecode++)
 		{
-			screen.machine().gfx[3]->mark_dirty(tilecode);
+			machine().gfx[3]->mark_dirty(tilecode);
 		}
 
 		/* vdp 1 ... doesn't have to be tile based */
 
 		for (tilecode = 0;tilecode<0x8000;tilecode++)
 		{
-			screen.machine().gfx[4]->mark_dirty(tilecode);
+			machine().gfx[4]->mark_dirty(tilecode);
 		}
 		for (tilecode = 0;tilecode<0x2000;tilecode++)
 		{
-			screen.machine().gfx[5]->mark_dirty(tilecode);
+			machine().gfx[5]->mark_dirty(tilecode);
 		}
 		for (tilecode = 0;tilecode<0x4000;tilecode++)
 		{
-			screen.machine().gfx[6]->mark_dirty(tilecode);
+			machine().gfx[6]->mark_dirty(tilecode);
 		}
 		for (tilecode = 0;tilecode<0x1000;tilecode++)
 		{
-			screen.machine().gfx[7]->mark_dirty(tilecode);
+			machine().gfx[7]->mark_dirty(tilecode);
 		}
 	}
 
-	if ( screen.machine().input().code_pressed_once(KEYCODE_N) )
+	if ( machine().input().code_pressed_once(KEYCODE_N) )
 	{
 		FILE *fp;
 
@@ -6760,7 +6760,7 @@ UINT32 saturn_state::screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 
 		}
 	}
 
-	if ( screen.machine().input().code_pressed_once(KEYCODE_M) )
+	if ( machine().input().code_pressed_once(KEYCODE_M) )
 	{
 		FILE *fp;
 
@@ -7190,16 +7190,16 @@ static void vdp2_palette_entry(running_machine &machine, int *r, int *g, int *b,
 
 UINT32 saturn_state::screen_update_saturn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	saturn_state *state = screen.machine().driver_data<saturn_state>();
+	saturn_state *state = machine().driver_data<saturn_state>();
 	static UINT8 disclaimer;
 
-	vdp2_draw_back(screen.machine(),bitmap,cliprect);
+	vdp2_draw_back(machine(),bitmap,cliprect);
 
 	if(STV_VDP2_DISP)
 	{
-		copy_plane(screen.machine(),3);
+		copy_plane(machine(),3);
 
-		draw_normal_screen(screen.machine(),bitmap,cliprect,3);
+		draw_normal_screen(machine(),bitmap,cliprect,3);
 	}
 
 	if(disclaimer == 0)

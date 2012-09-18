@@ -151,14 +151,14 @@ UINT32 cheekyms_state::screen_update_cheekyms(screen_device &screen, bitmap_ind1
 	int scrolly = ((*m_port_80 >> 3) & 0x07);
 	int flip = *m_port_80 & 0x80;
 
-	screen.machine().tilemap().mark_all_dirty();
-	screen.machine().tilemap().set_flip_all(flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	machine().tilemap().mark_all_dirty();
+	machine().tilemap().set_flip_all(flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	bitmap.fill(0, cliprect);
 	m_bitmap_buffer->fill(0, cliprect);
 
 	/* sprites go under the playfield */
-	draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().gfx[1], flip);
+	draw_sprites(machine(), bitmap, cliprect, machine().gfx[1], flip);
 
 	/* draw the tilemap to a temp bitmap */
 	m_cm_tilemap->draw(*m_bitmap_buffer, cliprect, 0, 0);

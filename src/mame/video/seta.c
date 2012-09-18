@@ -826,10 +826,10 @@ static void draw_tilemap_palette_effect(running_machine &machine, bitmap_ind16 &
 /* For games without tilemaps */
 UINT32 seta_state::screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(screen.machine());
+	set_pens(machine());
 	bitmap.fill(0x1f0, cliprect);
 
-	screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,0x1000, 1);
+	machine().device<seta001_device>("spritegen")->seta001_draw_sprites(machine(),bitmap,cliprect,0x1000, 1);
 	return 0;
 }
 
@@ -1053,8 +1053,8 @@ UINT32 seta_state::screen_update_setaroul(screen_device &screen, bitmap_ind16 &b
 {
 	bitmap.fill(0x0, cliprect);
 
-	screen.machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
-	screen.machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x1, -0x1 );
+	machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
+	machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x1, -0x1 );
 
 	seta_layers_update(screen, bitmap, cliprect, 0x800, 1 );
 
@@ -1065,21 +1065,21 @@ void seta_state::screen_eof_setaroul(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)
-		screen.machine().device<seta001_device>("spritegen")->tnzs_eof();
+		machine().device<seta001_device>("spritegen")->tnzs_eof();
 }
 
 
 
 UINT32 seta_state::screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(screen.machine());
+	set_pens(machine());
 	return SCREEN_UPDATE16_CALL_MEMBER(seta_layers);
 }
 
 
 UINT32 seta_state::screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	usclssic_set_pens(screen.machine());
+	usclssic_set_pens(machine());
 	return SCREEN_UPDATE16_CALL_MEMBER(seta_layers);
 }
 

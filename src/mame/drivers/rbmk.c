@@ -508,7 +508,7 @@ UINT32 rbmk_state::screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitma
 		for (x=0;x<64;x++)
 		{
 			int tile = m_gms_vidram2[count+0x600];
-			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],(tile&0xfff)+((m_tilebank&0x10)>>4)*0x1000,tile>>12,0,0,x*8,y*32);
+			drawgfx_opaque(bitmap,cliprect,machine().gfx[0],(tile&0xfff)+((m_tilebank&0x10)>>4)*0x1000,tile>>12,0,0,x*8,y*32);
 			count++;
 		}
 	}
@@ -520,7 +520,7 @@ UINT32 rbmk_state::screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitma
 		for (x=0;x<64;x++)
 		{
 			int tile = m_gms_vidram[count];
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],(tile&0xfff)+((m_tilebank>>1)&3)*0x1000,tile>>12,0,0,x*8,y*8,0);
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],(tile&0xfff)+((m_tilebank>>1)&3)*0x1000,tile>>12,0,0,x*8,y*8,0);
 			count++;
 		}
 	}

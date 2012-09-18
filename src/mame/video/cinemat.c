@@ -212,7 +212,7 @@ UINT32 cinemat_state::screen_update_cinemat(screen_device &screen, bitmap_rgb32 
 	SCREEN_UPDATE32_CALL(vector);
 	vector_clear_list();
 
-	ccpu_wdt_timer_trigger(screen.machine().device("maincpu"));
+	ccpu_wdt_timer_trigger(machine().device("maincpu"));
 
 	return 0;
 }
@@ -227,7 +227,7 @@ UINT32 cinemat_state::screen_update_cinemat(screen_device &screen, bitmap_rgb32 
 
 UINT32 cinemat_state::screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int sw_option = screen.machine().root_device().ioport("INPUTS")->read();
+	int sw_option = machine().root_device().ioport("INPUTS")->read();
 
 	SCREEN_UPDATE32_CALL_MEMBER(cinemat);
 

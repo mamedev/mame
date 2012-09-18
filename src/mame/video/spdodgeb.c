@@ -208,6 +208,6 @@ UINT32 spdodgeb_state::screen_update_spdodgeb(screen_device &screen, bitmap_ind1
 {
 	m_bg_tilemap->set_scrollx(0,m_lastscroll+5);
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap,cliprect);
+	draw_sprites(machine(), bitmap,cliprect);
 	return 0;
 }

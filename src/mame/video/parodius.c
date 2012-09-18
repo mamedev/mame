@@ -66,7 +66,7 @@ UINT32 parodius_state::screen_update_parodius(screen_device &screen, bitmap_ind1
 
 	konami_sortlayers3(layer, m_layerpri);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[0], 0,1);
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[1], 0,2);

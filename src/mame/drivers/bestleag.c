@@ -185,7 +185,7 @@ UINT32 bestleag_state::screen_update_bestleag(screen_device &screen, bitmap_ind1
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	draw_sprites(machine(),bitmap,cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
@@ -201,7 +201,7 @@ UINT32 bestleag_state::screen_update_bestleaw(screen_device &screen, bitmap_ind1
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	draw_sprites(machine(),bitmap,cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

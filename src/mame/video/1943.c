@@ -258,16 +258,16 @@ UINT32 _1943_state::screen_update_1943(screen_device &screen, bitmap_ind16 &bitm
 	if (m_bg2_on)
 		m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (m_obj_on)
-		draw_sprites(screen.machine(), bitmap, cliprect, 0);
+		draw_sprites(machine(), bitmap, cliprect, 0);
 
 	if (m_bg1_on)
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (m_obj_on)
-		draw_sprites(screen.machine(), bitmap, cliprect, 1);
+		draw_sprites(machine(), bitmap, cliprect, 1);
 
 	if (m_char_on)
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);

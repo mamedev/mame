@@ -130,9 +130,9 @@ UINT32 spbactn_state::screen_update_spbactn(screen_device &screen, bitmap_rgb32 
 
 		color = ((attr & 0x00f0) >> 4) | 0x80;
 
-		drawgfx_transpen_raw(m_tile_bitmap_bg, cliprect, screen.machine().gfx[1],
+		drawgfx_transpen_raw(m_tile_bitmap_bg, cliprect, machine().gfx[1],
 					code,
-					screen.machine().gfx[1]->colorbase() + color * screen.machine().gfx[1]->granularity(),
+					machine().gfx[1]->colorbase() + color * machine().gfx[1]->granularity(),
 					0, 0,
 					16 * sx, 8 * sy,
 					(UINT32)-1);
@@ -145,7 +145,7 @@ UINT32 spbactn_state::screen_update_spbactn(screen_device &screen, bitmap_rgb32 
 		}
 	}
 
-	if (draw_sprites(screen.machine(), m_tile_bitmap_bg, cliprect, 0))
+	if (draw_sprites(machine(), m_tile_bitmap_bg, cliprect, 0))
 	{
 		/* kludge: draw table bg gfx again if priority 0 sprites are enabled */
 		for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
@@ -157,9 +157,9 @@ UINT32 spbactn_state::screen_update_spbactn(screen_device &screen, bitmap_rgb32 
 
 			color = ((attr & 0x00f0) >> 4) | 0x80;
 
-			drawgfx_transpen_raw(m_tile_bitmap_bg, cliprect, screen.machine().gfx[1],
+			drawgfx_transpen_raw(m_tile_bitmap_bg, cliprect, machine().gfx[1],
 					code,
-					screen.machine().gfx[1]->colorbase() + color * screen.machine().gfx[1]->granularity(),
+					machine().gfx[1]->colorbase() + color * machine().gfx[1]->granularity(),
 					0, 0,
 					16 * sx, 8 * sy,
 					0);
@@ -173,7 +173,7 @@ UINT32 spbactn_state::screen_update_spbactn(screen_device &screen, bitmap_rgb32 
 		}
 	}
 
-	draw_sprites(screen.machine(), m_tile_bitmap_bg, cliprect, 1);
+	draw_sprites(machine(), m_tile_bitmap_bg, cliprect, 1);
 
 	/* draw table fg gfx */
 	for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
@@ -191,9 +191,9 @@ UINT32 spbactn_state::screen_update_spbactn(screen_device &screen, bitmap_rgb32 
 		else
 			color |= 0x0080;
 
-		drawgfx_transpen_raw(m_tile_bitmap_fg, cliprect, screen.machine().gfx[0],
+		drawgfx_transpen_raw(m_tile_bitmap_fg, cliprect, machine().gfx[0],
 					code,
-					screen.machine().gfx[0]->colorbase() + color * screen.machine().gfx[0]->granularity(),
+					machine().gfx[0]->colorbase() + color * machine().gfx[0]->granularity(),
 					0, 0,
 					16 * sx, 8 * sy,
 					0);
@@ -206,10 +206,10 @@ UINT32 spbactn_state::screen_update_spbactn(screen_device &screen, bitmap_rgb32 
 		}
 	}
 
-	draw_sprites(screen.machine(), m_tile_bitmap_fg, cliprect, 2);
-	draw_sprites(screen.machine(), m_tile_bitmap_fg, cliprect, 3);
+	draw_sprites(machine(), m_tile_bitmap_fg, cliprect, 2);
+	draw_sprites(machine(), m_tile_bitmap_fg, cliprect, 3);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(screen.machine(), bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, cliprect);
+	blendbitmaps(machine(), bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, cliprect);
 	return 0;
 }

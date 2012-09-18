@@ -206,7 +206,7 @@ UINT32 circusc_state::screen_update_circusc(screen_device &screen, bitmap_ind16 
 
 	bitmap.fill(0, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

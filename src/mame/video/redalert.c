@@ -188,7 +188,7 @@ UINT32 redalert_state::screen_update_redalert(screen_device &screen, bitmap_rgb3
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
-	get_pens(screen.machine(), pens);
+	get_pens(machine(), pens);
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
@@ -260,7 +260,7 @@ UINT32 redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rgb3
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
-	get_pens(screen.machine(), pens);
+	get_pens(machine(), pens);
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
@@ -334,7 +334,7 @@ UINT32 redalert_state::screen_update_panther(screen_device &screen, bitmap_rgb32
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
-	get_panther_pens(screen.machine(), pens);
+	get_panther_pens(machine(), pens);
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{

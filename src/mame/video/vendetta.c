@@ -72,7 +72,7 @@ UINT32 vendetta_state::screen_update_vendetta(screen_device &screen, bitmap_ind1
 
 	konami_sortlayers3(layer, m_layerpri);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[1], 0, 2);
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[2], 0, 4);

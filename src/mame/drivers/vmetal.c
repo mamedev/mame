@@ -460,8 +460,8 @@ VIDEO_START_MEMBER(vmetal_state,varia)
 UINT32 vmetal_state::screen_update_varia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	m_mid2tilemap->set_scrollx(0, m_vmetal_videoregs[0x06a/2]-64 /*+ m_vmetal_videoregs[0x066/2]*/);
 	m_mid1tilemap->set_scrollx(0, m_vmetal_videoregs[0x07a/2]-64 /*+ m_vmetal_videoregs[0x076/2]*/);
@@ -473,7 +473,7 @@ UINT32 vmetal_state::screen_update_varia(screen_device &screen, bitmap_ind16 &bi
 
 	m_mid1tilemap->draw(bitmap, cliprect, 0, 0);
 	m_mid2tilemap->draw(bitmap, cliprect, 0, 0);
-	metro_draw_sprites(screen.machine(), bitmap, cliprect);
+	metro_draw_sprites(machine(), bitmap, cliprect);
 	m_texttilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

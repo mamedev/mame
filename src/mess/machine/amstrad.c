@@ -2422,7 +2422,7 @@ void amstrad_state::screen_eof_amstrad(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		cpc_multiface2_device* mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(screen.machine(),"multiface2"));
+		cpc_multiface2_device* mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(machine(),"multiface2"));
 
 		if(mface2 != NULL)
 		{

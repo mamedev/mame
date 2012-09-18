@@ -651,7 +651,7 @@ static void SetVidReg( address_space &space, UINT16 reg, UINT16 val )
 
 UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int DoFlip;
 
 	UINT32 B0 = 0x0;
@@ -716,7 +716,7 @@ void crystal_state::screen_eof_crystal(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 		UINT16 head, tail;
 		int DoFlip = 0;
 

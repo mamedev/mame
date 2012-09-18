@@ -208,7 +208,7 @@ static void draw_one_sprite(running_machine &machine, bitmap_ind16 &bitmap, cons
 
 UINT32 balsente_state::screen_update_balsente(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pens = &screen.machine().pens[m_palettebank_vis * 256];
+	const pen_t *pens = &machine().pens[m_palettebank_vis * 256];
 	int y, i;
 
 	/* draw scanlines from the VRAM directly */
@@ -217,7 +217,7 @@ UINT32 balsente_state::screen_update_balsente(screen_device &screen, bitmap_ind1
 
 	/* draw the sprite images */
 	for (i = 0; i < 40; i++)
-		draw_one_sprite(screen.machine(), bitmap, cliprect, &m_spriteram[(0xe0 + i * 4) & 0xff]);
+		draw_one_sprite(machine(), bitmap, cliprect, &m_spriteram[(0xe0 + i * 4) & 0xff]);
 
 	return 0;
 }

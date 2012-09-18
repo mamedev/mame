@@ -1186,23 +1186,23 @@ UINT32 tx1_state::screen_update_tx1_left(screen_device &screen, bitmap_ind16 &bi
 
 	memset(m_obj_bmp, 0, 768*240);
 
-	tx1_draw_char(screen.machine(), m_chr_bmp);
-	tx1_draw_road(screen.machine(), m_rod_bmp);
-	tx1_draw_objects(screen.machine(), m_obj_bmp);
+	tx1_draw_char(machine(), m_chr_bmp);
+	tx1_draw_road(machine(), m_rod_bmp);
+	tx1_draw_objects(machine(), m_obj_bmp);
 
-	tx1_combine_layers(screen.machine(), bitmap, 0);
+	tx1_combine_layers(machine(), bitmap, 0);
 	return 0;
 }
 
 UINT32 tx1_state::screen_update_tx1_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tx1_combine_layers(screen.machine(), bitmap, 1);
+	tx1_combine_layers(machine(), bitmap, 1);
 	return 0;
 }
 
 UINT32 tx1_state::screen_update_tx1_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tx1_combine_layers(screen.machine(), bitmap, 2);
+	tx1_combine_layers(machine(), bitmap, 2);
 	return 0;
 }
 
@@ -3042,23 +3042,23 @@ UINT32 tx1_state::screen_update_buggyboy_left(screen_device &screen, bitmap_ind1
 	memset(m_obj_bmp, 0, 768*240);
 	memset(m_rod_bmp, 0, 768*240);
 
-	buggyboy_draw_char(screen.machine(), m_chr_bmp, 1);
-	buggyboy_draw_road(screen.machine(), m_rod_bmp);
-	buggyboy_draw_objs(screen.machine(), m_obj_bmp, 1);
+	buggyboy_draw_char(machine(), m_chr_bmp, 1);
+	buggyboy_draw_road(machine(), m_rod_bmp);
+	buggyboy_draw_objs(machine(), m_obj_bmp, 1);
 
-	bb_combine_layers(screen.machine(), bitmap, 0);
+	bb_combine_layers(machine(), bitmap, 0);
 	return 0;
 }
 
 UINT32 tx1_state::screen_update_buggyboy_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bb_combine_layers(screen.machine(), bitmap, 1);
+	bb_combine_layers(machine(), bitmap, 1);
 	return 0;
 }
 
 UINT32 tx1_state::screen_update_buggyboy_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bb_combine_layers(screen.machine(), bitmap, 2);
+	bb_combine_layers(machine(), bitmap, 2);
 	return 0;
 }
 
@@ -3066,10 +3066,10 @@ UINT32 tx1_state::screen_update_buggybjr(screen_device &screen, bitmap_ind16 &bi
 {
 	memset(m_obj_bmp, 0, 256*240);
 
-	buggyboy_draw_char(screen.machine(), m_chr_bmp, 0);
-	buggybjr_draw_road(screen.machine(), m_rod_bmp, 0);
-	buggyboy_draw_objs(screen.machine(), m_obj_bmp, 0);
+	buggyboy_draw_char(machine(), m_chr_bmp, 0);
+	buggybjr_draw_road(machine(), m_rod_bmp, 0);
+	buggyboy_draw_objs(machine(), m_obj_bmp, 0);
 
-	bb_combine_layers(screen.machine(), bitmap, -1);
+	bb_combine_layers(machine(), bitmap, -1);
 	return 0;
 }

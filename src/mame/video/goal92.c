@@ -159,21 +159,21 @@ UINT32 goal92_state::screen_update_goal92(screen_device &screen, bitmap_ind16 &b
 		m_fg_layer->set_scrolly(0, m_scrollram[3] + 8);
 	}
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	m_bg_layer->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect, 2);
+	draw_sprites(machine(), bitmap, cliprect, 2);
 
 	if (!(m_fg_bank & 0xff))
-		draw_sprites(screen.machine(), bitmap, cliprect, 1);
+		draw_sprites(machine(), bitmap, cliprect, 1);
 
 	m_fg_layer->draw(bitmap, cliprect, 0, 0);
 
 	if(m_fg_bank & 0xff)
-		draw_sprites(screen.machine(), bitmap, cliprect, 1);
+		draw_sprites(machine(), bitmap, cliprect, 1);
 
-	draw_sprites(screen.machine(), bitmap, cliprect, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect, 3);
+	draw_sprites(machine(), bitmap, cliprect, 0);
+	draw_sprites(machine(), bitmap, cliprect, 3);
 	m_tx_layer->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

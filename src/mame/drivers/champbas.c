@@ -103,7 +103,7 @@ void champbas_state::screen_eof_champbas(screen_device &screen, bool state)
 		m_watchdog_count++;
 
 		if (m_watchdog_count == 0x10)
-			screen.machine().schedule_soft_reset();
+			machine().schedule_soft_reset();
 	}
 }
 

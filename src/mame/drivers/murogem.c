@@ -217,7 +217,7 @@ UINT32 murogem_state::screen_update_murogem(screen_device &screen, bitmap_ind16 
 			int tileno = m_videoram[count]&0x3f;
 			int attr = m_videoram[count+0x400]&0x0f;
 
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],tileno,attr,0,0,xx*8,yy*8,0);
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[0],tileno,attr,0,0,xx*8,yy*8,0);
 
 			count++;
 

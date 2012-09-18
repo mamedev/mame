@@ -396,7 +396,7 @@ UINT32 nbmj8900_state::screen_update_nbmj8900(screen_device &screen, bitmap_ind1
 		{
 			for (x = 0; x < m_screen_width; x++)
 			{
-				update_pixel0(screen.machine(), x, y);
+				update_pixel0(machine(), x, y);
 			}
 		}
 		if (m_gfxdraw_mode)
@@ -405,7 +405,7 @@ UINT32 nbmj8900_state::screen_update_nbmj8900(screen_device &screen, bitmap_ind1
 			{
 				for (x = 0; x < m_screen_width; x++)
 				{
-					update_pixel1(screen.machine(), x, y);
+					update_pixel1(machine(), x, y);
 				}
 			}
 		}

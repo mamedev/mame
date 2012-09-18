@@ -601,13 +601,13 @@ UINT32 taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind1
 
 	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 0, 0, 0);
 
-	draw_sprites(screen.machine(), bitmap, cliprect, 0);
+	draw_sprites(machine(), bitmap, cliprect, 0);
 
 	copybitmap_trans(bitmap, *m_framebuffer[1], 0, 0, 0, 0, cliprect, 0);
 
 	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 1, 0, 0);
 
-	draw_sprites(screen.machine(), bitmap, cliprect, 1);
+	draw_sprites(machine(), bitmap, cliprect, 1);
 
 	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 2, 0, 0);
 

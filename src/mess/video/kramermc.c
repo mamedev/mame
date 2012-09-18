@@ -30,14 +30,14 @@ void kramermc_state::video_start()
 UINT32 kramermc_state::screen_update_kramermc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
-	address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	for(y = 0; y < 16; y++ )
 	{
 		for(x = 0; x < 64; x++ )
 		{
 			int code = space.read_byte(KRAMERMC_VIDEO_MEMORY + x + y*64);
-			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0],  code , 0, 0,0, x*8,y*8);
+			drawgfx_opaque(bitmap, cliprect, machine().gfx[0],  code , 0, 0,0, x*8,y*8);
 		}
 	}
 	return 0;

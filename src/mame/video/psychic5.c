@@ -411,11 +411,11 @@ static void draw_background(running_machine &machine, bitmap_rgb32 &bitmap, cons
 
 UINT32 psychic5_state::screen_update_psychic5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 	if (m_bg_status & 1)	/* Backgound enable */
-		draw_background(screen.machine(), bitmap, cliprect);
+		draw_background(machine(), bitmap, cliprect);
 	if (!(m_title_screen & 1))
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -425,8 +425,8 @@ UINT32 psychic5_state::screen_update_bombsa(screen_device &screen, bitmap_rgb32 
 	if (m_bg_status & 1)	/* Backgound enable */
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
-		bitmap.fill(screen.machine().pens[0x0ff], cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+		bitmap.fill(machine().pens[0x0ff], cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

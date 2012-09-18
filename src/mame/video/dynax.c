@@ -1243,10 +1243,10 @@ UINT32 dynax_state::screen_update_hanamai(screen_device &screen, bitmap_ind16 &b
 	int layers_ctrl = ~m_layer_enable;
 	int lay[4];
 
-	if (debug_viewer(screen.machine(), bitmap, cliprect))
+	if (debug_viewer(machine(), bitmap, cliprect))
 		return 0;
 
-	layers_ctrl &= debug_mask(screen.machine());
+	layers_ctrl &= debug_mask(machine());
 
 	bitmap.fill((m_blit_backpen & 0xff) + (m_blit_palbank & 1) * 256, cliprect);
 
@@ -1265,10 +1265,10 @@ UINT32 dynax_state::screen_update_hanamai(screen_device &screen, bitmap_ind16 &b
 		case 0x15:	lay[0] = 0; lay[1] = 2; lay[2] = 3; lay[3] = 1; break;
 	}
 
-	if (BIT(layers_ctrl, lay[0]))   hanamai_copylayer(screen.machine(), bitmap, cliprect, lay[0]);
-	if (BIT(layers_ctrl, lay[1]))   hanamai_copylayer(screen.machine(), bitmap, cliprect, lay[1]);
-	if (BIT(layers_ctrl, lay[2]))   hanamai_copylayer(screen.machine(), bitmap, cliprect, lay[2]);
-	if (BIT(layers_ctrl, lay[3]))   hanamai_copylayer(screen.machine(), bitmap, cliprect, lay[3]);
+	if (BIT(layers_ctrl, lay[0]))   hanamai_copylayer(machine(), bitmap, cliprect, lay[0]);
+	if (BIT(layers_ctrl, lay[1]))   hanamai_copylayer(machine(), bitmap, cliprect, lay[1]);
+	if (BIT(layers_ctrl, lay[2]))   hanamai_copylayer(machine(), bitmap, cliprect, lay[2]);
+	if (BIT(layers_ctrl, lay[3]))   hanamai_copylayer(machine(), bitmap, cliprect, lay[3]);
 	return 0;
 }
 
@@ -1279,10 +1279,10 @@ UINT32 dynax_state::screen_update_hnoridur(screen_device &screen, bitmap_ind16 &
 	int lay[4];
 	int pri;
 
-	if (debug_viewer(screen.machine(), bitmap, cliprect))
+	if (debug_viewer(machine(), bitmap, cliprect))
 		return 0;
 
-	layers_ctrl &= debug_mask(screen.machine());
+	layers_ctrl &= debug_mask(machine());
 
 	bitmap.fill((m_blit_backpen & 0xff) + (m_blit_palbank & 0x0f) * 256, cliprect);
 
@@ -1300,10 +1300,10 @@ UINT32 dynax_state::screen_update_hnoridur(screen_device &screen, bitmap_ind16 &
 	lay[2] = (pri >>  4) & 3;
 	lay[3] = (pri >>  0) & 3;
 
-	if (BIT(layers_ctrl, lay[0]))   hanamai_copylayer(screen.machine(), bitmap, cliprect, lay[0]);
-	if (BIT(layers_ctrl, lay[1]))   hanamai_copylayer(screen.machine(), bitmap, cliprect, lay[1]);
-	if (BIT(layers_ctrl, lay[2]))   hanamai_copylayer(screen.machine(), bitmap, cliprect, lay[2]);
-	if (BIT(layers_ctrl, lay[3]))   hanamai_copylayer(screen.machine(), bitmap, cliprect, lay[3]);
+	if (BIT(layers_ctrl, lay[0]))   hanamai_copylayer(machine(), bitmap, cliprect, lay[0]);
+	if (BIT(layers_ctrl, lay[1]))   hanamai_copylayer(machine(), bitmap, cliprect, lay[1]);
+	if (BIT(layers_ctrl, lay[2]))   hanamai_copylayer(machine(), bitmap, cliprect, lay[2]);
+	if (BIT(layers_ctrl, lay[3]))   hanamai_copylayer(machine(), bitmap, cliprect, lay[3]);
 
 	return 0;
 }
@@ -1313,16 +1313,16 @@ UINT32 dynax_state::screen_update_sprtmtch(screen_device &screen, bitmap_ind16 &
 {
 	int layers_ctrl = ~m_layer_enable;
 
-	if (debug_viewer(screen.machine(),bitmap,cliprect))
+	if (debug_viewer(machine(),bitmap,cliprect))
 		return 0;
 
-	layers_ctrl &= debug_mask(screen.machine());
+	layers_ctrl &= debug_mask(machine());
 
 	bitmap.fill((m_blit_backpen & 0xff) + (m_blit_palbank & 1) * 256, cliprect);
 
-	if (BIT(layers_ctrl, 0))   hanamai_copylayer(screen.machine(), bitmap, cliprect, 0);
-	if (BIT(layers_ctrl, 1))   hanamai_copylayer(screen.machine(), bitmap, cliprect, 1);
-	if (BIT(layers_ctrl, 2))   hanamai_copylayer(screen.machine(), bitmap, cliprect, 2);
+	if (BIT(layers_ctrl, 0))   hanamai_copylayer(machine(), bitmap, cliprect, 0);
+	if (BIT(layers_ctrl, 1))   hanamai_copylayer(machine(), bitmap, cliprect, 1);
+	if (BIT(layers_ctrl, 2))   hanamai_copylayer(machine(), bitmap, cliprect, 2);
 	return 0;
 }
 
@@ -1330,17 +1330,17 @@ UINT32 dynax_state::screen_update_jantouki_top(screen_device &screen, bitmap_ind
 {
 	int layers_ctrl = m_layer_enable;
 
-	if (debug_viewer(screen.machine(), bitmap, cliprect))
+	if (debug_viewer(machine(), bitmap, cliprect))
 		return 0;
 
-	layers_ctrl &= debug_mask(screen.machine());
+	layers_ctrl &= debug_mask(machine());
 
 	bitmap.fill((m_blit_backpen & 0xff) + (m_blit_palbank & 1) * 256, cliprect);
 
-//  if (BIT(layers_ctrl, 0))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 3, 0);
-	if (BIT(layers_ctrl, 1))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 2, 0);
-	if (BIT(layers_ctrl, 2))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 1, 0);
-	if (BIT(layers_ctrl, 3))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 0, 0);
+//  if (BIT(layers_ctrl, 0))   jantouki_copylayer(machine(), bitmap, cliprect, 3, 0);
+	if (BIT(layers_ctrl, 1))   jantouki_copylayer(machine(), bitmap, cliprect, 2, 0);
+	if (BIT(layers_ctrl, 2))   jantouki_copylayer(machine(), bitmap, cliprect, 1, 0);
+	if (BIT(layers_ctrl, 3))   jantouki_copylayer(machine(), bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -1348,18 +1348,18 @@ UINT32 dynax_state::screen_update_jantouki_bottom(screen_device &screen, bitmap_
 {
 	int layers_ctrl = m_layer_enable;
 
-	if (debug_viewer(screen.machine(), bitmap, cliprect))
+	if (debug_viewer(machine(), bitmap, cliprect))
 		return 0;
 
-	layers_ctrl &= debug_mask(screen.machine());
+	layers_ctrl &= debug_mask(machine());
 
 	bitmap.fill((m_blit_backpen & 0xff) + (m_blit_palbank & 1) * 256, cliprect);
 
-	if (BIT(layers_ctrl, 0))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 3, 0);
-	if (BIT(layers_ctrl, 4))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 7, 0);
-	if (BIT(layers_ctrl, 5))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 6, 0);
-	if (BIT(layers_ctrl, 6))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 5, 0);
-	if (BIT(layers_ctrl, 7))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 4, 0);
+	if (BIT(layers_ctrl, 0))   jantouki_copylayer(machine(), bitmap, cliprect, 3, 0);
+	if (BIT(layers_ctrl, 4))   jantouki_copylayer(machine(), bitmap, cliprect, 7, 0);
+	if (BIT(layers_ctrl, 5))   jantouki_copylayer(machine(), bitmap, cliprect, 6, 0);
+	if (BIT(layers_ctrl, 6))   jantouki_copylayer(machine(), bitmap, cliprect, 5, 0);
+	if (BIT(layers_ctrl, 7))   jantouki_copylayer(machine(), bitmap, cliprect, 4, 0);
 	return 0;
 }
 
@@ -1368,15 +1368,15 @@ UINT32 dynax_state::screen_update_mjdialq2(screen_device &screen, bitmap_ind16 &
 {
 	int layers_ctrl = ~m_layer_enable;
 
-	if (debug_viewer(screen.machine(), bitmap, cliprect))
+	if (debug_viewer(machine(), bitmap, cliprect))
 		return 0;
 
-	layers_ctrl &= debug_mask(screen.machine());
+	layers_ctrl &= debug_mask(machine());
 
 	bitmap.fill((m_blit_backpen & 0xff) + (m_blit_palbank & 1) * 256, cliprect);
 
-	if (BIT(layers_ctrl, 0))   mjdialq2_copylayer(screen.machine(), bitmap, cliprect, 0);
-	if (BIT(layers_ctrl, 1))   mjdialq2_copylayer(screen.machine(), bitmap, cliprect, 1);
+	if (BIT(layers_ctrl, 0))   mjdialq2_copylayer(machine(), bitmap, cliprect, 0);
+	if (BIT(layers_ctrl, 1))   mjdialq2_copylayer(machine(), bitmap, cliprect, 1);
 	return 0;
 }
 
@@ -1397,7 +1397,7 @@ UINT32 dynax_state::screen_update_htengoku(screen_device &screen, bitmap_ind16 &
 	for (layer = 0; layer < 4; layer++)
 	{
 		bitmap.fill(0, cliprect);
-		hanamai_copylayer(screen.machine(), bitmap, cliprect, layer);
+		hanamai_copylayer(machine(), bitmap, cliprect, layer);
 
 		for (y = 0; y < 256; y++)
 			for (x = 0; x < 512; x++)

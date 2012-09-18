@@ -239,38 +239,38 @@ UINT32 mazerbla_state::screen_update_test_vcu(screen_device &screen, bitmap_ind1
 
 	m_tmpbitmaps[0].fill(color_base);
 
-	if (screen.machine().input().code_pressed_once(KEYCODE_1))	/* plane 1 */
+	if (machine().input().code_pressed_once(KEYCODE_1))	/* plane 1 */
 		planes_enabled[0] ^= 1;
 
-	if (screen.machine().input().code_pressed_once(KEYCODE_2))	/* plane 2 */
+	if (machine().input().code_pressed_once(KEYCODE_2))	/* plane 2 */
 		planes_enabled[1] ^= 1;
 
-	if (screen.machine().input().code_pressed_once(KEYCODE_3))	/* plane 3 */
+	if (machine().input().code_pressed_once(KEYCODE_3))	/* plane 3 */
 		planes_enabled[2] ^= 1;
 
-	if (screen.machine().input().code_pressed_once(KEYCODE_4))	/* plane 4 */
+	if (machine().input().code_pressed_once(KEYCODE_4))	/* plane 4 */
 		planes_enabled[3] ^= 1;
 
-	if (screen.machine().input().code_pressed_once(KEYCODE_I))	/* show/hide debug info */
+	if (machine().input().code_pressed_once(KEYCODE_I))	/* show/hide debug info */
 		m_dbg_info = !m_dbg_info;
 
-	if (screen.machine().input().code_pressed_once(KEYCODE_G))	/* enable gfx area handling */
+	if (machine().input().code_pressed_once(KEYCODE_G))	/* enable gfx area handling */
 		m_dbg_gfx_e = !m_dbg_gfx_e;
 
-	if (screen.machine().input().code_pressed_once(KEYCODE_C))	/* enable color area handling */
+	if (machine().input().code_pressed_once(KEYCODE_C))	/* enable color area handling */
 		m_dbg_clr_e = !m_dbg_clr_e;
 
-	if (screen.machine().input().code_pressed_once(KEYCODE_V))	/* draw only when vbank==dbg_vbank */
+	if (machine().input().code_pressed_once(KEYCODE_V))	/* draw only when vbank==dbg_vbank */
 		m_dbg_vbank ^= 1;
 
-	if (screen.machine().input().code_pressed_once(KEYCODE_L))	/* showlookup ram */
+	if (machine().input().code_pressed_once(KEYCODE_L))	/* showlookup ram */
 		m_dbg_lookup = (m_dbg_lookup + 1) % 5;	//0,1,2,3, 4-off
 
 
 	if (m_dbg_info)
 	{
 		sprintf(buf,"I-info, G-gfx, C-color, V-vbank, 1-4 enable planes");
-		ui_draw_text(buf, 10, 0 * ui_get_line_height(screen.machine()));
+		ui_draw_text(buf, 10, 0 * ui_get_line_height(machine()));
 
 		sprintf(buf,"g:%1i c:%1i v:%1i vbk=%1i  planes=%1i%1i%1i%1i  ", m_dbg_gfx_e&1, m_dbg_clr_e&1, m_dbg_vbank, vbank&1,
 			planes_enabled[0],
@@ -278,7 +278,7 @@ UINT32 mazerbla_state::screen_update_test_vcu(screen_device &screen, bitmap_ind1
 			planes_enabled[2],
 			planes_enabled[3] );
 
-		ui_draw_text(buf, 10, 1 * ui_get_line_height(screen.machine()));
+		ui_draw_text(buf, 10, 1 * ui_get_line_height(machine()));
 
 		if (m_dbg_lookup!=4)
 		{
@@ -293,7 +293,7 @@ UINT32 mazerbla_state::screen_update_test_vcu(screen_device &screen, bitmap_ind1
 				{
 					sprintf(buf + strlen(buf), "%02x ", lookup_ram[lookup_offs + x + y * 16]);
 				}
-				ui_draw_text(buf, 0, (2 + y) * ui_get_line_height(screen.machine()));
+				ui_draw_text(buf, 0, (2 + y) * ui_get_line_height(machine()));
 			}
 		}
 	}

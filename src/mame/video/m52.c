@@ -360,13 +360,13 @@ UINT32 m52_state::screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap,
 	if (!(m_bgcontrol & 0x20))
 	{
 		if (!(m_bgcontrol & 0x10))
-			draw_background(screen.machine(), bitmap, cliprect, m_bg2xpos, m_bg2ypos, 2); /* distant mountains */
+			draw_background(machine(), bitmap, cliprect, m_bg2xpos, m_bg2ypos, 2); /* distant mountains */
 
 		if (!(m_bgcontrol & 0x02))
-			draw_background(screen.machine(), bitmap, cliprect, m_bg1xpos, m_bg1ypos, 3); /* hills */
+			draw_background(machine(), bitmap, cliprect, m_bg1xpos, m_bg1ypos, 3); /* hills */
 
 		if (!(m_bgcontrol & 0x04))
-			draw_background(screen.machine(), bitmap, cliprect, m_bg1xpos, m_bg1ypos, 4); /* cityscape */
+			draw_background(machine(), bitmap, cliprect, m_bg1xpos, m_bg1ypos, 4); /* cityscape */
 	}
 
 	m_bg_tilemap->set_flip(flip_screen() ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -413,9 +413,9 @@ UINT32 m52_state::screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap,
 		clip = cliprect;
 #endif
 
-		drawgfx_transmask(bitmap, clip, screen.machine().gfx[1],
+		drawgfx_transmask(bitmap, clip, machine().gfx[1],
 			code, color, flipx, flipy, sx, sy,
-			colortable_get_transpen_mask(screen.machine().colortable, screen.machine().gfx[1], color, 512 + 32));
+			colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 512 + 32));
 	}
 	return 0;
 }

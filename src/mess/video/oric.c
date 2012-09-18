@@ -182,10 +182,10 @@ UINT32 oric_state::screen_update_oric(screen_device &screen, bitmap_ind16 &bitma
 		int x = 0;
 
 		/* foreground colour white */
-		oric_vh_update_attribute(screen.machine(),7);
+		oric_vh_update_attribute(machine(),7);
 		/* background colour black */
-		oric_vh_update_attribute(screen.machine(),(1<<3));
-		oric_vh_update_attribute(screen.machine(),(1<<4));
+		oric_vh_update_attribute(machine(),(1<<3));
+		oric_vh_update_attribute(machine(),(1<<4));
 
 		for (byte_offset=0; byte_offset<40; byte_offset++)
 		{
@@ -213,12 +213,12 @@ UINT32 oric_state::screen_update_oric(screen_device &screen, bitmap_ind16 &bitma
 			}
 
 			/* fetch data */
-			c = RAM ? RAM[read_addr] : screen.machine().device("maincpu")->memory().space(AS_PROGRAM)->read_byte(read_addr);
+			c = RAM ? RAM[read_addr] : machine().device("maincpu")->memory().space(AS_PROGRAM)->read_byte(read_addr);
 
 			/* if bits 6 and 5 are zero, the byte contains a serial attribute */
 			if ((c & ((1 << 6) | (1 << 5))) == 0)
 			{
-				oric_vh_update_attribute(screen.machine(), c);
+				oric_vh_update_attribute(machine(), c);
 
 				/* display background colour when attribute has been found */
 				oric_vh_render_6pixels(bitmap, x, y, m_vh_state.active_foreground_colour, m_vh_state.active_background_colour, 0, (c & 0x080));

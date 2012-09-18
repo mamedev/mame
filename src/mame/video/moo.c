@@ -110,7 +110,7 @@ UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap,
 	k054338_update_all_shadows(m_k054338, 0);
 	k054338_fill_backcolor(m_k054338, bitmap, 0);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	if (m_layerpri[0] < k053251_get_priority(m_k053251, K053251_CI1))	/* bucky hides back layer behind background */
 		k056832_tilemap_draw(m_k056832, bitmap, cliprect, layers[0], 0, 1);

@@ -175,14 +175,14 @@ UINT32 ikki_state::screen_update_ikki(screen_device &screen, bitmap_ind16 &bitma
 		bank = (color & 0xe0) << 3;
 		color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
-		drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],
+		drawgfx_opaque(bitmap,cliprect,machine().gfx[0],
 			m_videoram[offs * 2 + 1] + bank,
 			color,
 			m_flipscreen,m_flipscreen,
 			x,y);
 	}
 
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 
 	/* mask sprites */
 
@@ -210,7 +210,7 @@ UINT32 ikki_state::screen_update_ikki(screen_device &screen, bitmap_ind16 &bitma
 			bank = (color & 0xe0) << 3;
 			color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
-			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],
+			drawgfx_opaque(bitmap,cliprect,machine().gfx[0],
 				m_videoram[offs * 2 + 1] + bank,
 				color,
 				m_flipscreen,m_flipscreen,

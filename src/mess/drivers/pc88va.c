@@ -447,8 +447,8 @@ UINT32 pc88va_state::screen_update_pc88va(screen_device &screen, bitmap_rgb32 &b
 			{
 				switch(cur_pri_lv & 3) // (palette color mode)
 				{
-					case 0: draw_text(screen.machine(),bitmap,cliprect); break;
-					case 1: if(m_tsp.spr_on) { draw_sprites(screen.machine(),bitmap,cliprect); } break;
+					case 0: draw_text(machine(),bitmap,cliprect); break;
+					case 1: if(m_tsp.spr_on) { draw_sprites(machine(),bitmap,cliprect); } break;
 					case 2: /* A = graphic 0 */ break;
 					case 3: /* B = graphic 1 */ break;
 				}

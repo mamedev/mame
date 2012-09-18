@@ -128,7 +128,7 @@ UINT32 kchamp_state::screen_update_kchamp(screen_device &screen, bitmap_ind16 &b
 {
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	kchamp_draw_sprites(screen.machine(), bitmap, cliprect);
+	kchamp_draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -136,6 +136,6 @@ UINT32 kchamp_state::screen_update_kchampvs(screen_device &screen, bitmap_ind16 
 {
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	kchampvs_draw_sprites(screen.machine(), bitmap, cliprect);
+	kchampvs_draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }

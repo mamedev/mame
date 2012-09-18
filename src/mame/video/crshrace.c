@@ -183,7 +183,7 @@ UINT32 crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_ind1
 
 	if (m_gfxctrl & 0x04)	/* display disable? */
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
@@ -192,15 +192,15 @@ UINT32 crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_ind1
 	switch (m_gfxctrl & 0xfb)
 	{
 		case 0x00:	/* high score screen */
-			draw_sprites(screen.machine(), bitmap, cliprect);
-			draw_bg(screen.machine(), bitmap, cliprect);
-			draw_fg(screen.machine(), bitmap, cliprect);
+			draw_sprites(machine(), bitmap, cliprect);
+			draw_bg(machine(), bitmap, cliprect);
+			draw_fg(machine(), bitmap, cliprect);
 			break;
 		case 0x01:
 		case 0x02:
-			draw_bg(screen.machine(), bitmap, cliprect);
-			draw_fg(screen.machine(), bitmap, cliprect);
-			draw_sprites(screen.machine(), bitmap, cliprect);
+			draw_bg(machine(), bitmap, cliprect);
+			draw_fg(machine(), bitmap, cliprect);
+			draw_sprites(machine(), bitmap, cliprect);
 			break;
 		default:
 			popmessage("gfxctrl = %02x", m_gfxctrl);

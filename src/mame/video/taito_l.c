@@ -297,7 +297,7 @@ UINT32 taitol_state::screen_update_taitol(screen_device &screen, bitmap_ind16 &b
 
 	if (m_cur_ctrl & 0x20)	/* display enable */
 	{
-		screen.machine().priority_bitmap.fill(0, cliprect);
+		machine().priority_bitmap.fill(0, cliprect);
 
 		m_bg19_tilemap->draw(bitmap, cliprect, 0, 0);
 
@@ -306,12 +306,12 @@ UINT32 taitol_state::screen_update_taitol(screen_device &screen, bitmap_ind16 &b
 		else					/* split priority */
 			m_bg18_tilemap->draw(bitmap, cliprect, 0,1);
 
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 
 		m_ch1a_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
-		bitmap.fill(screen.machine().pens[0], cliprect);
+		bitmap.fill(machine().pens[0], cliprect);
 	return 0;
 }
 

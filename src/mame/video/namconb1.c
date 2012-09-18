@@ -146,9 +146,9 @@ UINT32 namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_ind1
 	/* intersect with master clip rectangle */
 	clip &= cliprect;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect );
+	bitmap.fill(get_black_pen(machine()), cliprect );
 
-	video_update_common( screen.machine(), bitmap, clip, 0 );
+	video_update_common( machine(), bitmap, clip, 0 );
 
 	return 0;
 }
@@ -183,14 +183,14 @@ UINT32 namconb1_state::screen_update_namconb2(screen_device &screen, bitmap_ind1
 	/* intersect with master clip rectangle */
 	clip &= cliprect;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect );
+	bitmap.fill(get_black_pen(machine()), cliprect );
 
 	if( memcmp(m_tilemap_tile_bank,m_tilebank32,sizeof(m_tilemap_tile_bank))!=0 )
 	{
 		namco_tilemap_invalidate();
 		memcpy(m_tilemap_tile_bank,m_tilebank32,sizeof(m_tilemap_tile_bank));
 	}
-	video_update_common( screen.machine(), bitmap, clip, 1 );
+	video_update_common( machine(), bitmap, clip, 1 );
 	return 0;
 }
 

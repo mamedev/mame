@@ -413,8 +413,8 @@ static void cgenie_refresh_tv_set(running_machine &machine, bitmap_ind16 &bitmap
 UINT32 cgenie_state::screen_update_cgenie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
     if( m_tv_mode )
-		cgenie_refresh_tv_set(screen.machine(), bitmap, cliprect);
+		cgenie_refresh_tv_set(machine(), bitmap, cliprect);
 	else
-		cgenie_refresh_monitor(screen.machine(), bitmap, cliprect);
+		cgenie_refresh_monitor(machine(), bitmap, cliprect);
 	return 0;
 }

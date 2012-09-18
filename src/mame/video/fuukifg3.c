@@ -355,11 +355,11 @@ UINT32 fuuki32_state::screen_update_fuuki32(screen_device &screen, bitmap_ind16 
 
 	/* The bg colour is the last pen i.e. 0x1fff */
 	bitmap.fill((0x800 * 4) - 1, cliprect);
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
-	fuuki32_draw_layer(screen.machine(), bitmap, cliprect, tm_back,   0, 1);
-	fuuki32_draw_layer(screen.machine(), bitmap, cliprect, tm_middle, 0, 2);
-	fuuki32_draw_layer(screen.machine(), bitmap, cliprect, tm_front,  0, 4);
+	fuuki32_draw_layer(machine(), bitmap, cliprect, tm_back,   0, 1);
+	fuuki32_draw_layer(machine(), bitmap, cliprect, tm_middle, 0, 2);
+	fuuki32_draw_layer(machine(), bitmap, cliprect, tm_front,  0, 4);
 
 	draw_sprites(screen, bitmap, cliprect);
 	return 0;

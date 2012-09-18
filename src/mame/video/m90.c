@@ -357,7 +357,7 @@ UINT32 m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap,
 		m_pf2_wide_layer->set_scrollx(0, m_video_control_data[3]+256-2 );
 	}
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	if (video_enable)
 	{
@@ -448,10 +448,10 @@ UINT32 m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap,
 			}
 		}
 
-		draw_sprites(screen.machine(),bitmap,cliprect);
+		draw_sprites(machine(),bitmap,cliprect);
 
 	} else {
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 	}
 
 	return 0;
@@ -460,8 +460,8 @@ UINT32 m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap,
 UINT32 m90_state::screen_update_bomblord(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
-	screen.machine().priority_bitmap.fill(0, cliprect);
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	/* Setup scrolling */
 	if (m_video_control_data[6]&0x20) {
@@ -504,15 +504,15 @@ UINT32 m90_state::screen_update_bomblord(screen_device &screen, bitmap_ind16 &bi
 		m_pf1_layer->draw(bitmap, cliprect, 1,1);
 	}
 
-	bomblord_draw_sprites(screen.machine(),bitmap,cliprect);
+	bomblord_draw_sprites(machine(),bitmap,cliprect);
 
 	return 0;
 }
 
 UINT32 m90_state::screen_update_dynablsb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen.machine().priority_bitmap.fill(0, cliprect);
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (!(m_video_data[0xf008/2] & 0x4000)) {
 		m_pf1_wide_layer->mark_all_dirty();
@@ -546,7 +546,7 @@ UINT32 m90_state::screen_update_dynablsb(screen_device &screen, bitmap_ind16 &bi
 		m_pf2_layer->draw(bitmap, cliprect, 1,1);
 	}
 
-	dynablsb_draw_sprites(screen.machine(),bitmap,cliprect);
+	dynablsb_draw_sprites(machine(),bitmap,cliprect);
 
 	return 0;
 }

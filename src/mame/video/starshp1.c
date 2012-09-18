@@ -352,23 +352,23 @@ static int circle_collision(starshp1_state *state, const rectangle &rect)
 
 UINT32 starshp1_state::screen_update_starshp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(this, screen.machine().colortable);
+	set_pens(this, machine().colortable);
 
 	bitmap.fill(0, cliprect);
 
 	if (m_starfield_kill == 0)
 		draw_starfield(this, bitmap);
 
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 
 	if (m_circle_kill == 0 && m_circle_mod != 0)
-		draw_circle(screen.machine(), bitmap);
+		draw_circle(machine(), bitmap);
 
 	if (m_attract == 0)
-		draw_spaceship(screen.machine(), bitmap, cliprect);
+		draw_spaceship(machine(), bitmap, cliprect);
 
 	if (m_circle_kill == 0 && m_circle_mod == 0)
-		draw_circle(screen.machine(), bitmap);
+		draw_circle(machine(), bitmap);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
@@ -385,19 +385,19 @@ void starshp1_state::screen_eof_starshp1(screen_device &screen, bool state)
 	if (state)
 	{
 		rectangle rect;
-		const rectangle &visarea = screen.machine().primary_screen->visible_area();
+		const rectangle &visarea = machine().primary_screen->visible_area();
 
 		rect.min_x = get_sprite_hpos(this, 13);
 		rect.min_y = get_sprite_vpos(this, 13);
-		rect.max_x = rect.min_x + screen.machine().gfx[1]->width() - 1;
-		rect.max_y = rect.min_y + screen.machine().gfx[1]->height() - 1;
+		rect.max_x = rect.min_x + machine().gfx[1]->width() - 1;
+		rect.max_y = rect.min_y + machine().gfx[1]->height() - 1;
 
 		rect &= m_helper.cliprect();
 
 		m_helper.fill(0, visarea);
 
 		if (m_attract == 0)
-			draw_spaceship(screen.machine(), m_helper, visarea);
+			draw_spaceship(machine(), m_helper, visarea);
 
 		if (circle_collision(this, visarea))
 			m_collision_latch |= 1;
@@ -405,10 +405,10 @@ void starshp1_state::screen_eof_starshp1(screen_device &screen, bool state)
 		if (circle_collision(this, rect))
 			m_collision_latch |= 2;
 
-		if (spaceship_collision(screen.machine(), m_helper, rect))
+		if (spaceship_collision(machine(), m_helper, rect))
 			m_collision_latch |= 4;
 
-		if (spaceship_collision(screen.machine(), m_helper, visarea))
+		if (spaceship_collision(machine(), m_helper, visarea))
 			m_collision_latch |= 8;
 	}
 }

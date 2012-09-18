@@ -527,17 +527,17 @@ WRITE16_MEMBER(gstriker_state::gsx_videoram3_w)
 
 UINT32 gstriker_state::screen_update_gstriker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	// Sandwitched screen/sprite0/score/sprite1. Surely wrong, probably
 	//  needs sprite orthogonality
-	MB60553_draw(screen.machine(), 0, bitmap,cliprect, 0);
+	MB60553_draw(machine(), 0, bitmap,cliprect, 0);
 
-	CG10103_draw(screen.machine(), 0, bitmap, cliprect, 0);
+	CG10103_draw(machine(), 0, bitmap, cliprect, 0);
 
 	VS920A_draw(this, 0, bitmap, cliprect, 0);
 
-	CG10103_draw(screen.machine(), 0, bitmap, cliprect, 1);
+	CG10103_draw(machine(), 0, bitmap, cliprect, 1);
 
 #if 0
 	popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",

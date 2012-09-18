@@ -1266,14 +1266,14 @@ UINT32 psikyosh_state::screen_update_psikyosh(screen_device &screen, bitmap_rgb3
 #ifdef DEBUG_KEYS
 	for (i = 0; i <= 7; i++)
 	{
-		if(screen.machine().input().code_pressed(pri_keys[i])) {
+		if(machine().input().code_pressed(pri_keys[i])) {
 			pri_debug = true;
 		}
 	}
-	if(screen.machine().input().code_pressed(KEYCODE_G)) {
+	if(machine().input().code_pressed(KEYCODE_G)) {
 		sprites = false;
 	}
-	if(screen.machine().input().code_pressed(KEYCODE_H)) {
+	if(machine().input().code_pressed(KEYCODE_H)) {
 		backgrounds = false;
 	}
 #endif
@@ -1288,18 +1288,18 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
 
 	m_z_bitmap.fill(0, cliprect); /* z-buffer */
 
-	psikyosh_prelineblend(screen.machine(), bitmap, cliprect); // fills screen
+	psikyosh_prelineblend(machine(), bitmap, cliprect); // fills screen
 	for (i = 0; i <= 7; i++)
 	{
-		if(!pri_debug || screen.machine().input().code_pressed(pri_keys[i]))
+		if(!pri_debug || machine().input().code_pressed(pri_keys[i]))
 		{
 			if(sprites) {
-				draw_sprites(screen.machine(), bitmap, cliprect, i); // When same priority bg's have higher pri
+				draw_sprites(machine(), bitmap, cliprect, i); // When same priority bg's have higher pri
 			}
 			if(backgrounds) {
-				draw_background(screen.machine(), bitmap, cliprect, i);
+				draw_background(machine(), bitmap, cliprect, i);
 			}
-			psikyosh_postlineblend(screen.machine(), bitmap, cliprect, i); // assume this has highest priority at same priority level
+			psikyosh_postlineblend(machine(), bitmap, cliprect, i); // assume this has highest priority at same priority level
 		}
 	}
 	return 0;

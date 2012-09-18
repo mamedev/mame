@@ -274,14 +274,14 @@ UINT32 vigilant_state::screen_update_kikcubic(screen_device &screen, bitmap_ind1
 		int color = (attributes & 0xF0) >> 4;
 		int tile_number = videoram[offs] | ((attributes & 0x0F) << 8);
 
-		drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],
+		drawgfx_opaque(bitmap,cliprect,machine().gfx[0],
 				tile_number,
 				color,
 				0,0,
 				sx,sy);
 	}
 
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	draw_sprites(machine(),bitmap,cliprect);
 	return 0;
 }
 
@@ -299,27 +299,27 @@ UINT32 vigilant_state::screen_update_vigilant(screen_device &screen, bitmap_ind1
 		g = (m_generic_paletteram_8[0x500 + 16 * m_rear_color + i] << 3) & 0xFF;
 		b = (m_generic_paletteram_8[0x600 + 16 * m_rear_color + i] << 3) & 0xFF;
 
-		palette_set_color(screen.machine(),512 + i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),512 + i,MAKE_RGB(r,g,b));
 
 		r = (m_generic_paletteram_8[0x400 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
 		g = (m_generic_paletteram_8[0x500 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
 		b = (m_generic_paletteram_8[0x600 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
 
-		palette_set_color(screen.machine(),512 + 16 + i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),512 + 16 + i,MAKE_RGB(r,g,b));
 	}
 
 	if (m_rear_disable)	 /* opaque foreground */
 	{
-		draw_foreground(screen.machine(),bitmap,cliprect,0,1);
-		draw_sprites(screen.machine(),bitmap,bottomvisiblearea);
-		draw_foreground(screen.machine(),bitmap,cliprect,1,0);
+		draw_foreground(machine(),bitmap,cliprect,0,1);
+		draw_sprites(machine(),bitmap,bottomvisiblearea);
+		draw_foreground(machine(),bitmap,cliprect,1,0);
 	}
 	else
 	{
-		draw_background(screen.machine(),bitmap,cliprect);
-		draw_foreground(screen.machine(),bitmap,cliprect,0,0);
-		draw_sprites(screen.machine(),bitmap,bottomvisiblearea);
-		draw_foreground(screen.machine(),bitmap,cliprect,1,0); // priority tiles
+		draw_background(machine(),bitmap,cliprect);
+		draw_foreground(machine(),bitmap,cliprect,0,0);
+		draw_sprites(machine(),bitmap,bottomvisiblearea);
+		draw_foreground(machine(),bitmap,cliprect,1,0); // priority tiles
 	}
 	return 0;
 }

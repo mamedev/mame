@@ -223,13 +223,13 @@ UINT32 naughtyb_state::screen_update_naughtyb(screen_device &screen, bitmap_ind1
 			}
 		}
 
-		drawgfx_opaque(tmpbitmap,tmpbitmap.cliprect(),screen.machine().gfx[0],
+		drawgfx_opaque(tmpbitmap,tmpbitmap.cliprect(),machine().gfx[0],
 				m_videoram2[offs] + 256 * m_bankreg,
 				(m_videoram2[offs] >> 5) + 8 * m_palreg,
 				m_cocktail,m_cocktail,
 				8*sx,8*sy);
 
-		drawgfx_transpen(tmpbitmap,tmpbitmap.cliprect(),screen.machine().gfx[1],
+		drawgfx_transpen(tmpbitmap,tmpbitmap.cliprect(),machine().gfx[1],
 				videoram[offs] + 256*m_bankreg,
 				(videoram[offs] >> 5) + 8 * m_palreg,
 				m_cocktail,m_cocktail,

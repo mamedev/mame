@@ -175,9 +175,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 atarifb_state::screen_update_atarifb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_playfield_and_alpha(screen.machine(), bitmap, cliprect, 0, 0);
+	draw_playfield_and_alpha(machine(), bitmap, cliprect, 0, 0);
 
-	draw_sprites(screen.machine(), bitmap, cliprect, 1, 0);
+	draw_sprites(machine(), bitmap, cliprect, 1, 0);
 
 	return 0;
 }
@@ -185,9 +185,9 @@ UINT32 atarifb_state::screen_update_atarifb(screen_device &screen, bitmap_ind16 
 
 UINT32 atarifb_state::screen_update_abaseb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_playfield_and_alpha(screen.machine(), bitmap, cliprect, -8, 0);
+	draw_playfield_and_alpha(machine(), bitmap, cliprect, -8, 0);
 
-	draw_sprites(screen.machine(), bitmap, cliprect, 1, 0);
+	draw_sprites(machine(), bitmap, cliprect, 1, 0);
 
 	return 0;
 }
@@ -195,9 +195,9 @@ UINT32 atarifb_state::screen_update_abaseb(screen_device &screen, bitmap_ind16 &
 
 UINT32 atarifb_state::screen_update_soccer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_playfield_and_alpha(screen.machine(), bitmap, cliprect, 0, 8);
+	draw_playfield_and_alpha(machine(), bitmap, cliprect, 0, 8);
 
-	draw_sprites(screen.machine(), bitmap, cliprect, 2, 1);
+	draw_sprites(machine(), bitmap, cliprect, 2, 1);
 
 	return 0;
 }

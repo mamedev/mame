@@ -77,7 +77,7 @@ UINT32 istellar_state::screen_update_istellar(screen_device &screen, bitmap_rgb3
 			int tile = m_tile_ram[x+y*32];
 			int attr = m_tile_control_ram[x+y*32];
 
-			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],tile,attr & 0x0f,0, 0, x*8, y*8, 0);
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[0],tile,attr & 0x0f,0, 0, x*8, y*8, 0);
 		}
 	}
 

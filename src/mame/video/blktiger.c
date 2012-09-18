@@ -227,7 +227,7 @@ UINT32 blktiger_state::screen_update_blktiger(screen_device &screen, bitmap_ind1
 		(m_screen_layout ? m_bg_tilemap8x4 : m_bg_tilemap4x8)->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 
 	if (m_objon)
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 
 	if (m_bgon)
 		(m_screen_layout ? m_bg_tilemap8x4 : m_bg_tilemap4x8)->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);

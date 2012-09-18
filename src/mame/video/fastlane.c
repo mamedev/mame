@@ -159,10 +159,10 @@ UINT32 fastlane_state::screen_update_fastlane(screen_device &screen, bitmap_ind1
 	finalclip0 &= cliprect;
 	finalclip1 &= cliprect;
 
-	set_pens(screen.machine());
+	set_pens(machine());
 
 	/* set scroll registers */
-	address_space &space = screen.machine().driver_data()->generic_space();
+	address_space &space = machine().driver_data()->generic_space();
 	xoffs = k007121_ctrlram_r(m_k007121, space, 0);
 	for (i = 0; i < 32; i++)
 		m_layer0->set_scrollx(i, m_k007121_regs[0x20 + i] + xoffs - 40);
@@ -170,7 +170,7 @@ UINT32 fastlane_state::screen_update_fastlane(screen_device &screen, bitmap_ind1
 	m_layer0->set_scrolly(0, k007121_ctrlram_r(m_k007121, space, 2));
 
 	m_layer0->draw(bitmap, finalclip0, 0, 0);
-	k007121_sprites_draw(m_k007121, bitmap, cliprect, screen.machine().gfx[0], screen.machine().colortable, m_spriteram, 0, 40, 0, (UINT32)-1);
+	k007121_sprites_draw(m_k007121, bitmap, cliprect, machine().gfx[0], machine().colortable, m_spriteram, 0, 40, 0, (UINT32)-1);
 	m_layer1->draw(bitmap, finalclip1, 0, 0);
 	return 0;
 }

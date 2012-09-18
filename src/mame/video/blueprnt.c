@@ -130,9 +130,9 @@ UINT32 blueprnt_state::screen_update_blueprnt(screen_device &screen, bitmap_ind1
 		for (i = 0; i < 32; i++)
 			m_bg_tilemap->set_scrolly(i, m_scrollram[30 - i]);
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
 	return 0;
 }

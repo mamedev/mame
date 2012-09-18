@@ -528,7 +528,7 @@ UINT32 laserbat_state::screen_update_laserbat(screen_device &screen, bitmap_ind1
 	}
 
 	if (m_sprite_enable)
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 		        m_sprite_code,
 				m_sprite_color,
 				0,0,

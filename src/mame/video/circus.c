@@ -111,8 +111,8 @@ static void circus_draw_fg( running_machine &machine, bitmap_ind16 &bitmap, cons
 UINT32 circus_state::screen_update_circus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	circus_draw_fg(screen.machine(), bitmap, cliprect);
-	draw_sprite_collision(screen.machine(), bitmap, cliprect);
+	circus_draw_fg(machine(), bitmap, cliprect);
+	draw_sprite_collision(machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -183,7 +183,7 @@ UINT32 circus_state::screen_update_robotbwl(screen_device &screen, bitmap_ind16 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	robotbwl_draw_scoreboard(bitmap, cliprect);
 	robotbwl_draw_bowling_alley(bitmap, cliprect);
-	robotbwl_draw_ball(screen.machine(), bitmap, cliprect);
+	robotbwl_draw_ball(machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -201,13 +201,13 @@ static void crash_draw_car( running_machine &machine, bitmap_ind16 &bitmap, cons
 UINT32 circus_state::screen_update_crash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	crash_draw_car(screen.machine(), bitmap, cliprect);
+	crash_draw_car(machine(), bitmap, cliprect);
 	return 0;
 }
 
 UINT32 circus_state::screen_update_ripcord(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprite_collision(screen.machine(), bitmap, cliprect);
+	draw_sprite_collision(machine(), bitmap, cliprect);
 	return 0;
 }

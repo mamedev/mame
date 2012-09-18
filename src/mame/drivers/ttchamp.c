@@ -104,7 +104,7 @@ UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 
 //  int i;
 	static const int xxx=320,yyy=204;
 
-	bitmap.fill(get_black_pen(screen.machine()));
+	bitmap.fill(get_black_pen(machine()));
 
 //  for (i=0;i<256;i++)
 //  {

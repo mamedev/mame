@@ -361,25 +361,25 @@ UINT32 model3_state::screen_update_model3(screen_device &screen, bitmap_ind16 &b
 	if( m_tick >= 5 ) {
 		m_tick = 0;
 
-		if( screen.machine().input().code_pressed(KEYCODE_Y) )
+		if( machine().input().code_pressed(KEYCODE_Y) )
 			m_debug_layer_disable ^= 0x1;
-		if( screen.machine().input().code_pressed(KEYCODE_U) )
+		if( machine().input().code_pressed(KEYCODE_U) )
 			m_debug_layer_disable ^= 0x2;
-		if( screen.machine().input().code_pressed(KEYCODE_I) )
+		if( machine().input().code_pressed(KEYCODE_I) )
 			m_debug_layer_disable ^= 0x4;
-		if( screen.machine().input().code_pressed(KEYCODE_O) )
+		if( machine().input().code_pressed(KEYCODE_O) )
 			m_debug_layer_disable ^= 0x8;
-		if( screen.machine().input().code_pressed(KEYCODE_T) )
+		if( machine().input().code_pressed(KEYCODE_T) )
 			m_debug_layer_disable ^= 0x10;
 	}
 
 	bitmap.fill(0, cliprect);
 
 	if (!(m_debug_layer_disable & 0x8))
-		draw_layer(screen.machine(), bitmap, cliprect, 3, (m_layer_enable >> 3) & 0x1);
+		draw_layer(machine(), bitmap, cliprect, 3, (m_layer_enable >> 3) & 0x1);
 
 	if (!(m_debug_layer_disable & 0x4))
-		draw_layer(screen.machine(), bitmap, cliprect, 2, (m_layer_enable >> 2) & 0x1);
+		draw_layer(machine(), bitmap, cliprect, 2, (m_layer_enable >> 2) & 0x1);
 
 	if( !(m_debug_layer_disable & 0x10) )
 	{
@@ -387,17 +387,17 @@ UINT32 model3_state::screen_update_model3(screen_device &screen, bitmap_ind16 &b
 		if(m_real3d_display_list) {
 			m_zbuffer.fill(0, cliprect);
 			m_bitmap3d.fill(0x8000, cliprect);
-			real3d_traverse_display_list(screen.machine());
+			real3d_traverse_display_list(machine());
 		}
 #endif
 		copybitmap_trans(bitmap, m_bitmap3d, 0, 0, 0, 0, cliprect, 0x8000);
 	}
 
 	if (!(m_debug_layer_disable & 0x2))
-		draw_layer(screen.machine(), bitmap, cliprect, 1, (m_layer_enable >> 1) & 0x1);
+		draw_layer(machine(), bitmap, cliprect, 1, (m_layer_enable >> 1) & 0x1);
 
 	if (!(m_debug_layer_disable & 0x1))
-		draw_layer(screen.machine(), bitmap, cliprect, 0, (m_layer_enable >> 0) & 0x1);
+		draw_layer(machine(), bitmap, cliprect, 0, (m_layer_enable >> 0) & 0x1);
 
 	//copy_screen(bitmap, cliprect);
 

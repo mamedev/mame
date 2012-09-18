@@ -510,7 +510,7 @@ void deco_mlc_state::screen_eof_mlc(screen_device &screen, bool state)
 UINT32 deco_mlc_state::screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 //  temp_bitmap->fill(0, cliprect);
-	bitmap.fill(screen.machine().pens[0], cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	bitmap.fill(machine().pens[0], cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
+	draw_sprites(machine(),bitmap,cliprect);
 	return 0;
 }

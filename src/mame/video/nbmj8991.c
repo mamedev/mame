@@ -304,14 +304,14 @@ UINT32 nbmj8991_state::screen_update_nbmj8991_type1(screen_device &screen, bitma
 
 	if (m_screen_refresh)
 	{
-		int width = screen.machine().primary_screen->width();
-		int height = screen.machine().primary_screen->height();
+		int width = machine().primary_screen->width();
+		int height = machine().primary_screen->height();
 
 		m_screen_refresh = 0;
 
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
-				update_pixel(screen.machine(), x, y);
+				update_pixel(machine(), x, y);
 	}
 
 	if (m_dispflag)
@@ -350,7 +350,7 @@ UINT32 nbmj8991_state::screen_update_nbmj8991_type2(screen_device &screen, bitma
 
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
-				update_pixel(screen.machine(), x, y);
+				update_pixel(machine(), x, y);
 	}
 
 	if (nb1413m3_inputport & 0x20)

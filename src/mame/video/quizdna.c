@@ -189,10 +189,10 @@ UINT32 quizdna_state::screen_update_quizdna(screen_device &screen, bitmap_ind16 
 	if (m_video_enable)
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 	return 0;
 }

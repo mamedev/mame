@@ -217,7 +217,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 hcastle_state::screen_update_hcastle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = screen.machine().driver_data()->generic_space();
+	address_space &space = machine().driver_data()->generic_space();
 
 	UINT8 ctrl_1_0 = k007121_ctrlram_r(m_k007121_1, space, 0);
 	UINT8 ctrl_1_1 = k007121_ctrlram_r(m_k007121_1, space, 1);
@@ -228,7 +228,7 @@ UINT32 hcastle_state::screen_update_hcastle(screen_device &screen, bitmap_ind16 
 	UINT8 ctrl_2_2 = k007121_ctrlram_r(m_k007121_2, space, 2);
 	UINT8 ctrl_2_3 = k007121_ctrlram_r(m_k007121_2, space, 3);
 
-	set_pens(screen.machine());
+	set_pens(machine());
 
 	m_pf1_bankbase = 0x0000;
 	m_pf2_bankbase = 0x4000 * ((m_gfx_bank & 2) >> 1);
@@ -257,16 +257,16 @@ UINT32 hcastle_state::screen_update_hcastle(screen_device &screen, bitmap_ind16 
 	if ((m_gfx_bank & 0x04) == 0)
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram->buffer(), 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram2->buffer(), 1);
+		draw_sprites(machine(), bitmap, cliprect, m_spriteram->buffer(), 0);
+		draw_sprites(machine(), bitmap, cliprect, m_spriteram2->buffer(), 1);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram->buffer(), 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram2->buffer(), 1);
+		draw_sprites(machine(), bitmap, cliprect, m_spriteram->buffer(), 0);
+		draw_sprites(machine(), bitmap, cliprect, m_spriteram2->buffer(), 1);
 	}
 	return 0;
 }

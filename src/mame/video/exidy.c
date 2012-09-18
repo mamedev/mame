@@ -359,17 +359,17 @@ static void check_collision(running_machine &machine)
 UINT32 exidy_state::screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* refresh the colors from the palette (static or dynamic) */
-	set_colors(screen.machine());
+	set_colors(machine());
 
 	/* update the background and draw it */
-	draw_background(screen.machine());
+	draw_background(machine());
 	copybitmap(bitmap, m_background_bitmap, 0, 0, 0, 0, cliprect);
 
 	/* draw the sprites */
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 
 	/* check for collision, this will set the appropriate bits in collision_mask */
-	check_collision(screen.machine());
+	check_collision(machine());
 
 	return 0;
 }

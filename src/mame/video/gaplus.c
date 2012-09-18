@@ -310,12 +310,12 @@ UINT32 gaplus_state::screen_update_gaplus(screen_device &screen, bitmap_ind16 &b
 
 	bitmap.fill(0, cliprect);
 
-	starfield_render(screen.machine(), bitmap);
+	starfield_render(machine(), bitmap);
 
 	/* draw the low priority characters */
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 
 	/* draw the high priority characters */
 	/* (I don't know if this feature is used by Gaplus, but it's shown in the schematics) */
@@ -332,8 +332,8 @@ void gaplus_state::screen_eof_gaplus(screen_device &screen, bool state)/* update
 		struct star *stars = m_stars;
 		int i;
 
-		int width = screen.machine().primary_screen->width();
-		int height = screen.machine().primary_screen->height();
+		int width = machine().primary_screen->width();
+		int height = machine().primary_screen->height();
 
 		/* check if we're running */
 		if ( ( m_starfield_control[0] & 1 ) == 0 )

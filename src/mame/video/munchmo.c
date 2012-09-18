@@ -150,8 +150,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 munchmo_state::screen_update_mnchmobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(screen.machine(), bitmap, cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect);
-	draw_status(screen.machine(), bitmap, cliprect);
+	draw_background(machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
+	draw_status(machine(), bitmap, cliprect);
 	return 0;
 }

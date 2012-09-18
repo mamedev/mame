@@ -422,9 +422,9 @@ UINT32 vii_state::screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	for(i = 0; i < 4; i++)
 	{
-		vii_blit_page(screen.machine(), bitmap, cliprect, i, 0x40 * m_video_regs[0x20], m_video_regs + 0x10);
-		vii_blit_page(screen.machine(), bitmap, cliprect, i, 0x40 * m_video_regs[0x21], m_video_regs + 0x16);
-		vii_blit_sprites(screen.machine(), bitmap, cliprect, i);
+		vii_blit_page(machine(), bitmap, cliprect, i, 0x40 * m_video_regs[0x20], m_video_regs + 0x10);
+		vii_blit_page(machine(), bitmap, cliprect, i, 0x40 * m_video_regs[0x21], m_video_regs + 0x16);
+		vii_blit_sprites(machine(), bitmap, cliprect, i);
 	}
 
 	for(y = 0; y < 240; y++)

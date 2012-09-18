@@ -204,7 +204,7 @@ UINT32 ssystem3_state::screen_update_ssystem3(screen_device &screen, bitmap_ind1
 	ssystem3_draw_led(bitmap, m_lcd.data[3]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '3');
 	ssystem3_draw_led(bitmap, m_lcd.data[4]&1?1:0, ssystem3_led_pos[4].x, ssystem3_led_pos[4].y, '4');
 
-	if (screen.machine().root_device().ioport("Configuration")->read()&1) { // playfield(optional device)
+	if (machine().root_device().ioport("Configuration")->read()&1) { // playfield(optional device)
 		static const int lcd_signs_on[]={
 			0, // empty
 			1, // bauer
@@ -221,7 +221,7 @@ UINT32 ssystem3_state::screen_update_ssystem3(screen_device &screen, bitmap_ind1
 				int figure, black;
 				int xp=263+x*22;
 				int yp=55+(y^7)*28;
-				ssystem3_playfield_getfigure(screen.machine(), x, y, &figure, &black);
+				ssystem3_playfield_getfigure(machine(), x, y, &figure, &black);
 				ssystem3_draw_led(bitmap, lcd_signs_on[figure]&1?1:0, xp, yp, '6');
 				ssystem3_draw_led(bitmap, lcd_signs_on[figure]&2?1:0, xp, yp, '8');
 				ssystem3_draw_led(bitmap, lcd_signs_on[figure]&4?1:0, xp, yp, '9');

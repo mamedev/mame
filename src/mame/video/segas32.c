@@ -2417,7 +2417,7 @@ UINT32 segas32_state::screen_update_system32(screen_device &screen, bitmap_rgb32
 	/* if the display is off, punt */
 	if (!m_system32_displayenable[0])
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
@@ -2428,12 +2428,12 @@ UINT32 segas32_state::screen_update_system32(screen_device &screen, bitmap_rgb32
 
 	/* debugging */
 #if QWERTY_LAYER_ENABLE
-	if (screen.machine().input().code_pressed(KEYCODE_Q)) enablemask = 0x01;
-	if (screen.machine().input().code_pressed(KEYCODE_W)) enablemask = 0x02;
-	if (screen.machine().input().code_pressed(KEYCODE_E)) enablemask = 0x04;
-	if (screen.machine().input().code_pressed(KEYCODE_R)) enablemask = 0x08;
-	if (screen.machine().input().code_pressed(KEYCODE_T)) enablemask = 0x10;
-	if (screen.machine().input().code_pressed(KEYCODE_Y)) enablemask = 0x20;
+	if (machine().input().code_pressed(KEYCODE_Q)) enablemask = 0x01;
+	if (machine().input().code_pressed(KEYCODE_W)) enablemask = 0x02;
+	if (machine().input().code_pressed(KEYCODE_E)) enablemask = 0x04;
+	if (machine().input().code_pressed(KEYCODE_R)) enablemask = 0x08;
+	if (machine().input().code_pressed(KEYCODE_T)) enablemask = 0x10;
+	if (machine().input().code_pressed(KEYCODE_Y)) enablemask = 0x20;
 #endif
 
 	/* do the mixing */
@@ -2441,7 +2441,7 @@ UINT32 segas32_state::screen_update_system32(screen_device &screen, bitmap_rgb32
 	mix_all_layers(this, 0, 0, bitmap, cliprect, enablemask);
 	g_profiler.stop();
 
-	if (LOG_SPRITES && screen.machine().input().code_pressed(KEYCODE_L))
+	if (LOG_SPRITES && machine().input().code_pressed(KEYCODE_L))
 	{
 		const rectangle &visarea = screen.visible_area();
 		FILE *f = fopen("sprite.txt", "w");

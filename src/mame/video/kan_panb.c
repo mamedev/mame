@@ -45,7 +45,7 @@ UINT32 snowbros_state::screen_update_honeydol(screen_device &screen, bitmap_ind1
 			sy = y;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				tile,
 				tilecolour,
 				flipx, flipy,
@@ -79,7 +79,7 @@ UINT32 snowbros_state::screen_update_honeydol(screen_device &screen, bitmap_ind1
 		tilecolour = (tilecolour&0x03f0) >> 4;
 		tilecolour ^=0x3f; // unusual, but correct..
 
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				tile,
 				tilecolour,
 				flipx, flipy,
@@ -134,7 +134,7 @@ UINT32 snowbros_state::screen_update_twinadv(screen_device &screen, bitmap_ind16
 		tilecolour = (tilecolour&0x00f0) >> 4;
 		tilecolour ^=0xf; // unusual, but correct..
 
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				tile,
 				tilecolour,
 				flipx, flipy,
@@ -149,7 +149,7 @@ UINT32 snowbros_state::screen_update_wintbob(screen_device &screen, bitmap_ind16
 	UINT16 *spriteram16 = m_bootleg_spriteram16;
 	int offs;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	for (offs = 0;offs < m_bootleg_spriteram16.bytes()/2;offs += 8)
 	{
@@ -176,7 +176,7 @@ UINT32 snowbros_state::screen_update_wintbob(screen_device &screen, bitmap_ind16
 
 		if ((xpos > -16) && (ypos > 0) && (xpos < 256) && (ypos < 240) && (disbl !=2))
 		{
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 					tilen,
 					colr,
 					flipx, flipy,
@@ -216,11 +216,11 @@ UINT32 snowbros_state::screen_update_snowbro3(screen_device &screen, bitmap_ind1
 
 	/* This clears & redraws the entire screen each pass */
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	for (offs = 0;offs < m_bootleg_spriteram16.bytes()/2;offs += 8)
 	{
-		gfx_element *gfx = screen.machine().gfx[0];
+		gfx_element *gfx = machine().gfx[0];
 		int dx = spriteram16[offs+4] & 0xff;
 		int dy = spriteram16[offs+5] & 0xff;
 		int tilecolour = spriteram16[offs+3];
@@ -260,7 +260,7 @@ UINT32 snowbros_state::screen_update_snowbro3(screen_device &screen, bitmap_ind1
 
 		if (offs < 0x800) /* i guess this is the right way */
 		{
-			gfx = screen.machine().gfx[1];
+			gfx = machine().gfx[1];
 			tilecolour = 0x10;
 		}
 

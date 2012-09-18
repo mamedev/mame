@@ -129,6 +129,6 @@ UINT32 ksayakyu_state::screen_update_ksayakyu(screen_device &screen, bitmap_ind1
 		m_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	m_textmap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }

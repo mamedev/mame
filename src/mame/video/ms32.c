@@ -366,7 +366,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 	int i;
 
 	for (i = 0;i < 0x10000;i++)	// colors 0x3000-0x3fff are not used
-		update_color(screen.machine(), i);
+		update_color(machine(), i);
 
 	scrollx = m_tx_scroll[0x00/4] + m_tx_scroll[0x08/4] + 0x18;
 	scrolly = m_tx_scroll[0x0c/4] + m_tx_scroll[0x14/4];
@@ -381,7 +381,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 	m_bg_tilemap_alt->set_scrolly(0, scrolly);
 
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 
 
@@ -393,7 +393,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 	m_temp_bitmap_sprites.fill(0, cliprect);
 	m_temp_bitmap_sprites_pri.fill(0, cliprect);
 
-	draw_sprites(screen.machine(), m_temp_bitmap_sprites, m_temp_bitmap_sprites_pri, cliprect, m_sprram_16, 0x20000, 0, m_reverse_sprite_order);
+	draw_sprites(machine(), m_temp_bitmap_sprites, m_temp_bitmap_sprites_pri, cliprect, m_sprram_16, 0x20000, 0, m_reverse_sprite_order);
 
 
 
@@ -416,7 +416,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 		rot_pri++;
 
 	if (rot_pri == 0)
-		draw_roz(screen.machine(), m_temp_bitmap_tilemaps, cliprect, 1 << 1);
+		draw_roz(machine(), m_temp_bitmap_tilemaps, cliprect, 1 << 1);
 	else if (scr_pri == 0)
 		if (m_tilemaplayoutcontrol&1)
 		{
@@ -430,7 +430,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 		m_tx_tilemap->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
 
 	if (rot_pri == 1)
-		draw_roz(screen.machine(), m_temp_bitmap_tilemaps, cliprect, 1 << 1);
+		draw_roz(machine(), m_temp_bitmap_tilemaps, cliprect, 1 << 1);
 	else if (scr_pri == 1)
 		if (m_tilemaplayoutcontrol&1)
 		{
@@ -444,7 +444,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 		m_tx_tilemap->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
 
 	if (rot_pri == 2)
-		draw_roz(screen.machine(), m_temp_bitmap_tilemaps, cliprect, 1 << 1);
+		draw_roz(machine(), m_temp_bitmap_tilemaps, cliprect, 1 << 1);
 	else if (scr_pri == 2)
 		if (m_tilemaplayoutcontrol&1)
 		{
@@ -465,7 +465,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 		int xx, yy;
 		int width = screen.width();
 		int height = screen.height();
-		const pen_t *paldata = screen.machine().pens;
+		const pen_t *paldata = machine().pens;
 
 		UINT16* srcptr_tile;
 		UINT8* srcptr_tilepri;
@@ -479,7 +479,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 		for (yy=0;yy<height;yy++)
 		{
 			srcptr_tile =     &m_temp_bitmap_tilemaps.pix16(yy);
-			srcptr_tilepri =  &screen.machine().priority_bitmap.pix8(yy);
+			srcptr_tilepri =  &machine().priority_bitmap.pix8(yy);
 			srcptr_spri =     &m_temp_bitmap_sprites.pix16(yy);
 			//srcptr_spripri =  &m_temp_bitmap_sprites_pri.pix8(yy);
 			dstptr_bitmap  =  &bitmap.pix32(yy);
@@ -568,7 +568,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 				}
 				else if (primask == 0xc0)
 				{
-					dstptr_bitmap[xx] = paldata[screen.machine().rand()&0xfff];
+					dstptr_bitmap[xx] = paldata[machine().rand()&0xfff];
 				}
 				else if (primask == 0xf0)
 				{
@@ -652,12 +652,12 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 					}
 					else if (src_tilepri==0x06)
 					{
-						//dstptr_bitmap[xx] = paldata[screen.machine().rand()&0xfff];
+						//dstptr_bitmap[xx] = paldata[machine().rand()&0xfff];
 						dstptr_bitmap[xx] = paldata[src_tile]; // assumed
 					}
 					else if (src_tilepri==0x07)
 					{
-						//dstptr_bitmap[xx] = paldata[screen.machine().rand()&0xfff];
+						//dstptr_bitmap[xx] = paldata[machine().rand()&0xfff];
 						dstptr_bitmap[xx] = paldata[src_tile]; // assumed
 					}
 				}

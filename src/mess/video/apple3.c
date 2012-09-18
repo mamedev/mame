@@ -369,28 +369,28 @@ UINT32 apple3_state::screen_update_apple3(screen_device &screen, bitmap_ind16 &b
 	{
 		case 0:
 		case VAR_VM0:
-			apple3_video_text40(screen.machine(),bitmap);
+			apple3_video_text40(machine(),bitmap);
 			break;
 
 		case VAR_VM1:
 		case VAR_VM1|VAR_VM0:
-			apple3_video_text80(screen.machine(),bitmap);
+			apple3_video_text80(machine(),bitmap);
 			break;
 
 		case VAR_VM3:
-			apple3_video_graphics_hgr(screen.machine(),bitmap);	/* hgr mode */
+			apple3_video_graphics_hgr(machine(),bitmap);	/* hgr mode */
 			break;
 
 		case VAR_VM3|VAR_VM0:
-			apple3_video_graphics_chgr(screen.machine(),bitmap);
+			apple3_video_graphics_chgr(machine(),bitmap);
 			break;
 
 		case VAR_VM3|VAR_VM1:
-			apple3_video_graphics_shgr(screen.machine(),bitmap);
+			apple3_video_graphics_shgr(machine(),bitmap);
 			break;
 
 		case VAR_VM3|VAR_VM1|VAR_VM0:
-			apple3_video_graphics_chires(screen.machine(),bitmap);
+			apple3_video_graphics_chires(machine(),bitmap);
 			break;
 	}
 	return 0;

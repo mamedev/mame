@@ -224,19 +224,19 @@ UINT32 blmbycar_state::screen_update_blmbycar(screen_device &screen, bitmap_ind1
 	m_tilemap_1->set_scrollx(0, m_scroll_1[1] + 5);
 
 #ifdef MAME_DEBUG
-if (screen.machine().input().code_pressed(KEYCODE_Z))
+if (machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
 
-	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-//  if (screen.machine().input().code_pressed(KEYCODE_E))    msk |= 4;
-	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 8;
+	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+//  if (machine().input().code_pressed(KEYCODE_E))    msk |= 4;
+	if (machine().input().code_pressed(KEYCODE_A))	msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	if (layers_ctrl & 1)
 		for (i = 0; i <= 1; i++)
@@ -249,7 +249,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 			m_tilemap_1->draw(bitmap, cliprect, i, i);
 
 	if (layers_ctrl & 8)
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 
 	return 0;
 }

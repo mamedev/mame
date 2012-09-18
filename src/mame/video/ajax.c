@@ -91,9 +91,9 @@ UINT32 ajax_state::screen_update_ajax(screen_device &screen, bitmap_ind16 &bitma
 
 	k052109_tilemap_update(m_k052109);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, 0, 1);
 	if (m_priority)
 	{

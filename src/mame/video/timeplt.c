@@ -208,7 +208,7 @@ UINT32 timeplt_state::screen_update_timeplt(screen_device &screen, bitmap_ind16 
 {
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
 	return 0;
 }

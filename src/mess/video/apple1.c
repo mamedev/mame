@@ -393,7 +393,7 @@ static void apple1_vh_cursor_blink (running_machine &machine)
 
 UINT32 apple1_state::screen_update_apple1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	apple1_vh_cursor_blink(screen.machine());
-	terminal_draw(screen.machine(), bitmap, cliprect, m_terminal);
+	apple1_vh_cursor_blink(machine());
+	terminal_draw(machine(), bitmap, cliprect, m_terminal);
 	return 0;
 }

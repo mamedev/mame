@@ -261,7 +261,7 @@ UINT32 ccastles_state::screen_update_ccastles(screen_device &screen, bitmap_ind1
 {
 	UINT8 *spriteaddr = &m_spriteram[m_video_control[7] * 0x100];	/* BUF1/BUF2 */
 	int flip = m_video_control[4] ? 0xff : 0x00;	/* PLAYER2 */
-	pen_t black = get_black_pen(screen.machine());
+	pen_t black = get_black_pen(machine());
 	int x, y, offs;
 
 	/* draw the sprites */
@@ -273,7 +273,7 @@ UINT32 ccastles_state::screen_update_ccastles(screen_device &screen, bitmap_ind1
 		int which = spriteaddr[offs];
 		int color = spriteaddr[offs + 2] >> 7;
 
-		drawgfx_transpen(m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, flip, flip, x, y, 7);
+		drawgfx_transpen(m_spritebitmap, cliprect, machine().gfx[0], which, color, flip, flip, x, y, 7);
 	}
 
 	/* draw the bitmap to the screen, looping over Y */

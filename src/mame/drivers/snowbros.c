@@ -84,7 +84,7 @@ WRITE16_MEMBER(snowbros_state::snowbros_flipscreen_w)
 
 UINT32 snowbros_state::screen_update_snowbros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *pandora = screen.machine().device("pandora");
+	device_t *pandora = machine().device("pandora");
 
 	/* This clears & redraws the entire screen each pass */
 	bitmap.fill(0xf0, cliprect);
@@ -98,7 +98,7 @@ void snowbros_state::screen_eof_snowbros(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		device_t *pandora = screen.machine().device("pandora");
+		device_t *pandora = machine().device("pandora");
 		pandora_eof(pandora);
 	}
 }

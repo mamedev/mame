@@ -192,7 +192,7 @@ UINT32 sprcros2_state::screen_update_sprcros2(screen_device &screen, bitmap_ind1
 {
 
 	m_bgtilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	m_fgtilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

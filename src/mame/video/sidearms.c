@@ -339,7 +339,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 UINT32 sidearms_state::screen_update_sidearms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	sidearms_draw_starfield(screen.machine(), bitmap);
+	sidearms_draw_starfield(machine(), bitmap);
 
 	m_bg_tilemap->set_scrollx(0, m_bg_scrollx[0] + (m_bg_scrollx[1] << 8 & 0xf00));
 	m_bg_tilemap->set_scrolly(0, m_bg_scrolly[0] + (m_bg_scrolly[1] << 8 & 0xf00));
@@ -348,7 +348,7 @@ UINT32 sidearms_state::screen_update_sidearms(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (m_objon)
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 
 	if (m_charon)
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);

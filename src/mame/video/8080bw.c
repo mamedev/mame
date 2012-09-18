@@ -133,10 +133,10 @@ UINT32 _8080bw_state::screen_update_invadpt2(screen_device &screen, bitmap_rgb32
 		UINT8 data = m_main_ram[offs];
 		UINT8 fore_color = m_screen_red ? 1 : color_map_base[color_address] & 0x07;
 
-		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(machine(), bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(screen.machine(), bitmap, pens, 0);
+	clear_extra_columns(machine(), bitmap, pens, 0);
 
 	return 0;
 }
@@ -165,10 +165,10 @@ UINT32 _8080bw_state::screen_update_ballbomb(screen_device &screen, bitmap_rgb32
 		UINT8 fore_color = m_screen_red ? 1 : color_map_base[color_address] & 0x07;
 
 		/* blue background */
-		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, 2);
+		set_8_pixels(machine(), bitmap, y, x, data, pens, fore_color, 2);
 	}
 
-	clear_extra_columns(screen.machine(), bitmap, pens, 2);
+	clear_extra_columns(machine(), bitmap, pens, 2);
 
 	return 0;
 }
@@ -205,10 +205,10 @@ UINT32 _8080bw_state::screen_update_schaser(screen_device &screen, bitmap_rgb32 
 			back_color = (((back_data & 0x0c) == 0x0c) && m_schaser_background_select) ? 4 : 2;
 		}
 
-		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, back_color);
+		set_8_pixels(machine(), bitmap, y, x, data, pens, fore_color, back_color);
 	}
 
-	clear_extra_columns(screen.machine(), bitmap, pens, m_schaser_background_disable ? 0 : 2);
+	clear_extra_columns(machine(), bitmap, pens, m_schaser_background_disable ? 0 : 2);
 
 	return 0;
 }
@@ -230,10 +230,10 @@ UINT32 _8080bw_state::screen_update_schasercv(screen_device &screen, bitmap_rgb3
 		UINT8 fore_color = m_colorram[offs & 0x1f9f] & 0x07;
 
 		/* blue background */
-		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, 2);
+		set_8_pixels(machine(), bitmap, y, x, data, pens, fore_color, 2);
 	}
 
-	clear_extra_columns(screen.machine(), bitmap, pens, 2);
+	clear_extra_columns(machine(), bitmap, pens, 2);
 
 	return 0;
 }
@@ -254,10 +254,10 @@ UINT32 _8080bw_state::screen_update_rollingc(screen_device &screen, bitmap_rgb32
 		UINT8 data = m_main_ram[offs];
 		UINT8 fore_color = m_colorram[offs & 0x1f1f] & 0x07;
 
-		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(machine(), bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(screen.machine(), bitmap, pens, 0);
+	clear_extra_columns(machine(), bitmap, pens, 0);
 
 	return 0;
 }
@@ -272,7 +272,7 @@ UINT32 _8080bw_state::screen_update_polaris(screen_device &screen, bitmap_rgb32 
 
 	invadpt2_get_pens(pens);
 
-	color_map_base = screen.machine().root_device().memregion("proms")->base();
+	color_map_base = machine().root_device().memregion("proms")->base();
 	cloud_gfx = memregion("user1")->base();
 
 	for (offs = 0; offs < m_main_ram.bytes(); offs++)
@@ -297,7 +297,7 @@ UINT32 _8080bw_state::screen_update_polaris(screen_device &screen, bitmap_rgb32 
 
 		if ((color_map_base[color_address] & 0x08) || (cloud_y >= 64))
 		{
-			set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, back_color);
+			set_8_pixels(machine(), bitmap, y, x, data, pens, fore_color, back_color);
 		}
 		else
 		{
@@ -320,7 +320,7 @@ UINT32 _8080bw_state::screen_update_polaris(screen_device &screen, bitmap_rgb32 
 					color = (cloud_gfx[cloud_gfx_offs] & bit) ? 7 : back_color;
 				}
 
-				set_pixel(screen.machine(), bitmap, y, x, pens, color);
+				set_pixel(machine(), bitmap, y, x, pens, color);
 
 				x = x + 1;
 				data = data >> 1;
@@ -328,7 +328,7 @@ UINT32 _8080bw_state::screen_update_polaris(screen_device &screen, bitmap_rgb32 
 		}
 	}
 
-	clear_extra_columns(screen.machine(), bitmap, pens, 6);
+	clear_extra_columns(machine(), bitmap, pens, 6);
 
 	return 0;
 }
@@ -349,10 +349,10 @@ UINT32 _8080bw_state::screen_update_lupin3(screen_device &screen, bitmap_rgb32 &
 		UINT8 data = m_main_ram[offs];
 		UINT8 fore_color = ~m_colorram[offs & 0x1f9f] & 0x07;
 
-		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(machine(), bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(screen.machine(), bitmap, pens, 0);
+	clear_extra_columns(machine(), bitmap, pens, 0);
 
 	return 0;
 }
@@ -375,10 +375,10 @@ UINT32 _8080bw_state::screen_update_cosmo(screen_device &screen, bitmap_rgb32 &b
 		UINT8 data = m_main_ram[offs];
 		UINT8 fore_color = m_colorram[color_address] & 0x07;
 
-		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(machine(), bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(screen.machine(), bitmap, pens, 0);
+	clear_extra_columns(machine(), bitmap, pens, 0);
 
 	return 0;
 }
@@ -406,10 +406,10 @@ UINT32 _8080bw_state::screen_update_indianbt(screen_device &screen, bitmap_rgb32
 		UINT8 data = m_main_ram[offs];
 		UINT8 fore_color = color_map_base[color_address] & 0x07;
 
-		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(machine(), bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(screen.machine(), bitmap, pens, 0);
+	clear_extra_columns(machine(), bitmap, pens, 0);
 
 	return 0;
 }
@@ -439,7 +439,7 @@ UINT32 _8080bw_state::screen_update_shuttlei(screen_device &screen, bitmap_rgb32
 		}
 	}
 
-	clear_extra_columns(screen.machine(), bitmap, pens, 0);
+	clear_extra_columns(machine(), bitmap, pens, 0);
 
 	return 0;
 }
@@ -460,10 +460,10 @@ UINT32 _8080bw_state::screen_update_sflush(screen_device &screen, bitmap_rgb32 &
 		UINT8 data = m_main_ram[offs];
 		UINT8 fore_color = m_colorram[offs & 0x1f9f] & 0x07;
 
-		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(machine(), bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(screen.machine(), bitmap, pens, 0);
+	clear_extra_columns(machine(), bitmap, pens, 0);
 
 	return 0;
 }

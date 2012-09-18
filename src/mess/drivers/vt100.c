@@ -319,7 +319,7 @@ INPUT_PORTS_END
 
 UINT32 vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *devconf = screen.machine().device("vt100_video");
+	device_t *devconf = machine().device("vt100_video");
 	vt_video_update( devconf, bitmap, cliprect);
 	return 0;
 }

@@ -335,17 +335,17 @@ UINT32 taitojc_state::screen_update_taitojc(screen_device &screen, bitmap_ind16 
 	bitmap.fill(0, cliprect);
 
 	// low priority objects
-	draw_object_bank(screen.machine(), bitmap, cliprect, 0, 0);
-	draw_object_bank(screen.machine(), bitmap, cliprect, 1, 0);
-	draw_object_bank(screen.machine(), bitmap, cliprect, 2, 0);
+	draw_object_bank(machine(), bitmap, cliprect, 0, 0);
+	draw_object_bank(machine(), bitmap, cliprect, 1, 0);
+	draw_object_bank(machine(), bitmap, cliprect, 2, 0);
 
 	// 3D layer
 	copybitmap_trans(bitmap, m_framebuffer, 0, 0, 0, 0, cliprect, 0);
 
 	// high priority objects
-	draw_object_bank(screen.machine(), bitmap, cliprect, 0, 1);
-	draw_object_bank(screen.machine(), bitmap, cliprect, 1, 1);
-	draw_object_bank(screen.machine(), bitmap, cliprect, 2, 1);
+	draw_object_bank(machine(), bitmap, cliprect, 0, 1);
+	draw_object_bank(machine(), bitmap, cliprect, 1, 1);
+	draw_object_bank(machine(), bitmap, cliprect, 2, 1);
 
 	// text layer
 	if (m_objlist[0xfc4/4] & 0x10000)

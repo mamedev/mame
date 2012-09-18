@@ -238,17 +238,17 @@ UINT32 darkhors_state::screen_update_darkhors(screen_device &screen, bitmap_ind1
 	int layers_ctrl = -1;
 
 #if DARKHORS_DEBUG
-	if (screen.machine().input().code_pressed(KEYCODE_Z))
+	if (machine().input().code_pressed(KEYCODE_Z))
 	{
 		int mask = 0;
-		if (screen.machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
-		if (screen.machine().input().code_pressed(KEYCODE_W))	mask |= 2;
-		if (screen.machine().input().code_pressed(KEYCODE_A))	mask |= 4;
+		if (machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
+		if (machine().input().code_pressed(KEYCODE_W))	mask |= 2;
+		if (machine().input().code_pressed(KEYCODE_A))	mask |= 4;
 		if (mask != 0) layers_ctrl &= mask;
 	}
 #endif
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	m_tmap->set_scrollx(0, (m_tmapscroll[0] >> 16) - 5);
 	m_tmap->set_scrolly(0, (m_tmapscroll[0] & 0xffff) - 0xff );
@@ -258,7 +258,7 @@ UINT32 darkhors_state::screen_update_darkhors(screen_device &screen, bitmap_ind1
 	m_tmap2->set_scrolly(0, (m_tmapscroll2[0] & 0xffff) - 0xff );
 	if (layers_ctrl & 2)	m_tmap2->draw(bitmap, cliprect, 0, 0);
 
-	if (layers_ctrl & 4)	draw_sprites(screen.machine(),bitmap,cliprect);
+	if (layers_ctrl & 4)	draw_sprites(machine(),bitmap,cliprect);
 
 #if DARKHORS_DEBUG
 #if 0
@@ -725,7 +725,7 @@ UINT32 darkhors_state::screen_update_jclub2(screen_device &screen, bitmap_ind16 
 {
 
 	// this isn't an st0020..
-	m_gdfs_st0020->st0020_draw_all(screen.machine(), bitmap, cliprect);
+	m_gdfs_st0020->st0020_draw_all(machine(), bitmap, cliprect);
 
 	return 0;
 }
@@ -788,7 +788,7 @@ VIDEO_START_MEMBER(darkhors_state,jclub2o)
 
 UINT32 darkhors_state::screen_update_jclub2o(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_gdfs_st0020->st0020_draw_all(screen.machine(), bitmap, cliprect);
+	m_gdfs_st0020->st0020_draw_all(machine(), bitmap, cliprect);
 	return 0;
 }
 

@@ -98,7 +98,7 @@ void suprgolf_state::video_start()
 UINT32 suprgolf_state::screen_update_suprgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count,color;
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	{
 		count = 0;
@@ -110,7 +110,7 @@ UINT32 suprgolf_state::screen_update_suprgolf(screen_device &screen, bitmap_ind1
 				color = m_bg_fb[count];
 
 				if(x <= cliprect.max_x && y <= cliprect.max_y)
-					bitmap.pix16(y, x) = screen.machine().pens[(color & 0x7ff)];
+					bitmap.pix16(y, x) = machine().pens[(color & 0x7ff)];
 
 				count++;
 			}
@@ -127,7 +127,7 @@ UINT32 suprgolf_state::screen_update_suprgolf(screen_device &screen, bitmap_ind1
 				color = m_fg_fb[count];
 
 				if(((m_fg_fb[count] & 0x0f) != 0x0f) && (x <= cliprect.max_x && y <= cliprect.max_y))
-					bitmap.pix16(y, x) = screen.machine().pens[(color & 0x7ff)];
+					bitmap.pix16(y, x) = machine().pens[(color & 0x7ff)];
 
 				count++;
 			}

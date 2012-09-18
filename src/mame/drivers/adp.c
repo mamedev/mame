@@ -227,7 +227,7 @@ UINT32 adp_state::screen_update_adp(screen_device &screen, bitmap_ind16 &bitmap,
 			b++;
 		}
 	}
-if (!screen.machine().input().code_pressed(KEYCODE_O)) // debug: toggle window
+if (!machine().input().code_pressed(KEYCODE_O)) // debug: toggle window
 	if ((hd63484_regs_r(m_hd63484, 0x06/2, 0xffff) & 0x0300) == 0x0300)
 	{
 		int sy = (hd63484_regs_r(m_hd63484, 0x94/2, 0xffff) & 0x0fff) - (hd63484_regs_r(m_hd63484, 0x88/2, 0xffff) >> 8);

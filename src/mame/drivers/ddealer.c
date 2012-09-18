@@ -281,24 +281,24 @@ UINT32 ddealer_state::screen_update_ddealer(screen_device &screen, bitmap_ind16 
 	{
 		if (m_vregs[0xcc / 2] & 0x80)
 		{
-			ddealer_draw_video_layer(screen.machine(), &m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
-			ddealer_draw_video_layer(screen.machine(), &m_vregs[0xcc / 2], m_right_fg_vram_top, m_right_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
+			ddealer_draw_video_layer(machine(), &m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
+			ddealer_draw_video_layer(machine(), &m_vregs[0xcc / 2], m_right_fg_vram_top, m_right_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
 		}
 		else
 		{
-			ddealer_draw_video_layer(screen.machine(), &m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
+			ddealer_draw_video_layer(machine(), &m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
 		}
 	}
 	else
 	{
 		if (m_vregs[0xcc / 2] & 0x80)
 		{
-			ddealer_draw_video_layer(screen.machine(), &m_vregs[0xcc / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
-			ddealer_draw_video_layer(screen.machine(), &m_vregs[0x1e0 / 2], m_right_fg_vram_top, m_right_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
+			ddealer_draw_video_layer(machine(), &m_vregs[0xcc / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
+			ddealer_draw_video_layer(machine(), &m_vregs[0x1e0 / 2], m_right_fg_vram_top, m_right_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
 		}
 		else
 		{
-			ddealer_draw_video_layer(screen.machine(), &m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
+			ddealer_draw_video_layer(machine(), &m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
 		}
 
 	}

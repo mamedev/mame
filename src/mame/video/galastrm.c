@@ -434,13 +434,13 @@ static void tc0610_rotate_draw(running_machine &machine, bitmap_ind16 &bitmap, b
 
 UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *tc0100scn = screen.machine().device("tc0100scn");
-	device_t *tc0480scp = screen.machine().device("tc0480scp");
+	device_t *tc0100scn = machine().device("tc0100scn");
+	device_t *tc0480scp = machine().device("tc0480scp");
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
 	UINT16 priority;
 	static const int primasks[4] = {0xfffc, 0xfff0, 0xff00, 0x0};
-	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = machine().priority_bitmap;
 
 	rectangle clip(0, screen.width() -1, 0, screen.height() -1);
 
@@ -468,17 +468,17 @@ UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind1
 #if 0
 	if (layer[0]==0 && layer[1]==3 && layer[2]==2 && layer[3]==1)
 	{
-		if (!screen.machine().input().code_pressed(KEYCODE_Z)) tc0480scp_tilemap_draw(tc0480scp, m_tmpbitmaps, clip, layer[0], 0, 1);
-		if (!screen.machine().input().code_pressed(KEYCODE_X)) tc0480scp_tilemap_draw(tc0480scp, m_tmpbitmaps, clip, layer[1], 0, 4);
-		if (!screen.machine().input().code_pressed(KEYCODE_C)) tc0480scp_tilemap_draw(tc0480scp, m_tmpbitmaps, clip, layer[2], 0, 4);
-		if (!screen.machine().input().code_pressed(KEYCODE_V)) tc0480scp_tilemap_draw(tc0480scp, m_tmpbitmaps, clip, layer[3], 0, 4);
+		if (!machine().input().code_pressed(KEYCODE_Z)) tc0480scp_tilemap_draw(tc0480scp, m_tmpbitmaps, clip, layer[0], 0, 1);
+		if (!machine().input().code_pressed(KEYCODE_X)) tc0480scp_tilemap_draw(tc0480scp, m_tmpbitmaps, clip, layer[1], 0, 4);
+		if (!machine().input().code_pressed(KEYCODE_C)) tc0480scp_tilemap_draw(tc0480scp, m_tmpbitmaps, clip, layer[2], 0, 4);
+		if (!machine().input().code_pressed(KEYCODE_V)) tc0480scp_tilemap_draw(tc0480scp, m_tmpbitmaps, clip, layer[3], 0, 4);
 	}
 	else
 	{
-		if (!screen.machine().input().code_pressed(KEYCODE_Z)) tc0480scp_tilemap_draw(tc0480scp, m_tmpbitmaps, clip, layer[0], 0, 1);
-		if (!screen.machine().input().code_pressed(KEYCODE_X)) tc0480scp_tilemap_draw(tc0480scp, m_tmpbitmaps, clip, layer[1], 0, 2);
-		if (!screen.machine().input().code_pressed(KEYCODE_C)) tc0480scp_tilemap_draw(tc0480scp, m_tmpbitmaps, clip, layer[2], 0, 4);
-		if (!screen.machine().input().code_pressed(KEYCODE_V)) tc0480scp_tilemap_draw(tc0480scp, m_tmpbitmaps, clip, layer[3], 0, 8);
+		if (!machine().input().code_pressed(KEYCODE_Z)) tc0480scp_tilemap_draw(tc0480scp, m_tmpbitmaps, clip, layer[0], 0, 1);
+		if (!machine().input().code_pressed(KEYCODE_X)) tc0480scp_tilemap_draw(tc0480scp, m_tmpbitmaps, clip, layer[1], 0, 2);
+		if (!machine().input().code_pressed(KEYCODE_C)) tc0480scp_tilemap_draw(tc0480scp, m_tmpbitmaps, clip, layer[2], 0, 4);
+		if (!machine().input().code_pressed(KEYCODE_V)) tc0480scp_tilemap_draw(tc0480scp, m_tmpbitmaps, clip, layer[3], 0, 8);
 	}
 
 	if (layer[0]==3 && layer[1]==0 && layer[2]==1 && layer[3]==2)
@@ -497,18 +497,18 @@ UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	draw_sprites_pre(screen.machine(), 42-X_OFFSET, -571+Y_OFFSET);
-	draw_sprites(screen.machine(),m_tmpbitmaps,clip,primasks,1);
+	draw_sprites_pre(machine(), 42-X_OFFSET, -571+Y_OFFSET);
+	draw_sprites(machine(),m_tmpbitmaps,clip,primasks,1);
 
 	copybitmap_trans(bitmap,m_polybitmap,0,0, 0,0,cliprect,0);
 	m_polybitmap->fill(0, clip);
-	tc0610_rotate_draw(screen.machine(),m_polybitmap,m_tmpbitmaps,cliprect);
+	tc0610_rotate_draw(machine(),m_polybitmap,m_tmpbitmaps,cliprect);
 
 	priority_bitmap.fill(0, cliprect);
-	draw_sprites(screen.machine(),bitmap,cliprect,primasks,0);
+	draw_sprites(machine(),bitmap,cliprect,primasks,0);
 
-	if (!screen.machine().input().code_pressed(KEYCODE_B)) tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);
-	if (!screen.machine().input().code_pressed(KEYCODE_M)) tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);
+	if (!machine().input().code_pressed(KEYCODE_B)) tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);
+	if (!machine().input().code_pressed(KEYCODE_M)) tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);
 
 
 
@@ -544,15 +544,15 @@ UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	draw_sprites_pre(screen.machine(), 42-X_OFFSET, -571+Y_OFFSET);
-	draw_sprites(screen.machine(),m_tmpbitmaps,clip,primasks,1);
+	draw_sprites_pre(machine(), 42-X_OFFSET, -571+Y_OFFSET);
+	draw_sprites(machine(),m_tmpbitmaps,clip,primasks,1);
 
 	copybitmap_trans(bitmap,m_polybitmap,0,0, 0,0,cliprect,0);
 	m_polybitmap.fill(0, clip);
-	tc0610_rotate_draw(screen.machine(),m_polybitmap,m_tmpbitmaps,cliprect);
+	tc0610_rotate_draw(machine(),m_polybitmap,m_tmpbitmaps,cliprect);
 
 	priority_bitmap.fill(0, cliprect);
-	draw_sprites(screen.machine(),bitmap,cliprect,primasks,0);
+	draw_sprites(machine(),bitmap,cliprect,primasks,0);
 
 	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);

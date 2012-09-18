@@ -237,11 +237,11 @@ UINT32 eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &bit
 
 	if (m_video_disable)
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
-	update_palette(screen.machine());
+	update_palette(machine());
 
 	/* draw the playfield */
 	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
@@ -391,11 +391,11 @@ UINT32 eprom_state::screen_update_guts(screen_device &screen, bitmap_ind16 &bitm
 
 	if (m_video_disable)
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
-	update_palette(screen.machine());
+	update_palette(machine());
 
 	/* draw the playfield */
 	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);

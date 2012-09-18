@@ -335,33 +335,33 @@ void coolridr_state::video_start()
 UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* planes seems to basically be at 0x8000 and 0x28000... */
-	gfx_element *gfx = screen.machine().gfx[2];
+	gfx_element *gfx = machine().gfx[2];
 	UINT32 count;
 	int y,x;
 
 
-	if(screen.machine().input().code_pressed(KEYCODE_Z))
+	if(machine().input().code_pressed(KEYCODE_Z))
 		m_test_offs+=4;
 
-	if(screen.machine().input().code_pressed(KEYCODE_X))
+	if(machine().input().code_pressed(KEYCODE_X))
 		m_test_offs-=4;
 
-	if(screen.machine().input().code_pressed(KEYCODE_C))
+	if(machine().input().code_pressed(KEYCODE_C))
 		m_test_offs+=0x40;
 
-	if(screen.machine().input().code_pressed(KEYCODE_V))
+	if(machine().input().code_pressed(KEYCODE_V))
 		m_test_offs-=0x40;
 
-	if(screen.machine().input().code_pressed(KEYCODE_B))
+	if(machine().input().code_pressed(KEYCODE_B))
 		m_test_offs+=0x400;
 
-	if(screen.machine().input().code_pressed(KEYCODE_N))
+	if(machine().input().code_pressed(KEYCODE_N))
 		m_test_offs-=0x400;
 
-	if(screen.machine().input().code_pressed_once(KEYCODE_A))
+	if(machine().input().code_pressed_once(KEYCODE_A))
 		m_color++;
 
-	if(screen.machine().input().code_pressed_once(KEYCODE_S))
+	if(machine().input().code_pressed_once(KEYCODE_S))
 		m_color--;
 
 	if(m_test_offs > 0x100000*4)

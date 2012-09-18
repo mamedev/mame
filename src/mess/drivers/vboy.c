@@ -488,7 +488,7 @@ UINT8 vboy_state::display_world(int num, bitmap_ind16 &bitmap, bool right, int &
 
 UINT32 vboy_state::screen_update_vboy_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(screen.machine().pens[m_vip_regs.BKCOL], cliprect);
+	bitmap.fill(machine().pens[m_vip_regs.BKCOL], cliprect);
 	int cur_spt;
 
 	if(!(m_vip_regs.DPCTRL & 2)) /* Don't bother if screen is off */
@@ -514,7 +514,7 @@ UINT32 vboy_state::screen_update_vboy_left(screen_device &screen, bitmap_ind16 &
 				yi = ((y & 0x3)*2);
 				pix = (pen >> yi) & 3;
 
-				bitmap.pix16(y, x) = screen.machine().pens[pix & 3];
+				bitmap.pix16(y, x) = machine().pens[pix & 3];
 			}
 		}
 	}
@@ -524,7 +524,7 @@ UINT32 vboy_state::screen_update_vboy_left(screen_device &screen, bitmap_ind16 &
 
 UINT32 vboy_state::screen_update_vboy_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(screen.machine().pens[m_vip_regs.BKCOL], cliprect);
+	bitmap.fill(machine().pens[m_vip_regs.BKCOL], cliprect);
 	int cur_spt;
 
 	if(!(m_vip_regs.DPCTRL & 2)) /* Don't bother if screen is off */

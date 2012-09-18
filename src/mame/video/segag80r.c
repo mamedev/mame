@@ -802,7 +802,7 @@ UINT32 segag80r_state::screen_update_segag80r(screen_device &screen, bitmap_ind1
 		/* background: none */
 		case G80_BACKGROUND_NONE:
 			memset(transparent_pens, 0, 16);
-			draw_videoram(screen.machine(), bitmap, cliprect, transparent_pens);
+			draw_videoram(machine(), bitmap, cliprect, transparent_pens);
 			break;
 
 		/* foreground: visible except where black */
@@ -810,32 +810,32 @@ UINT32 segag80r_state::screen_update_segag80r(screen_device &screen, bitmap_ind1
 		/* we draw the foreground first, then the background to do collision detection */
 		case G80_BACKGROUND_SPACEOD:
 			memset(transparent_pens, 0, 16);
-			draw_videoram(screen.machine(), bitmap, cliprect, transparent_pens);
-			draw_background_spaceod(screen.machine(), bitmap, cliprect);
+			draw_videoram(machine(), bitmap, cliprect, transparent_pens);
+			draw_background_spaceod(machine(), bitmap, cliprect);
 			break;
 
 		/* foreground: visible except for pen 0 (this disagrees with schematics) */
 		/* background: page-granular scrolling */
 		case G80_BACKGROUND_MONSTERB:
 			memset(transparent_pens, 1, 16);
-			draw_background_page_scroll(screen.machine(), bitmap, cliprect);
-			draw_videoram(screen.machine(), bitmap, cliprect, transparent_pens);
+			draw_background_page_scroll(machine(), bitmap, cliprect);
+			draw_videoram(machine(), bitmap, cliprect, transparent_pens);
 			break;
 
 		/* foreground: visible except for pen 0 */
 		/* background: full scrolling */
 		case G80_BACKGROUND_PIGNEWT:
 			memset(transparent_pens, 1, 16);
-			draw_background_full_scroll(screen.machine(), bitmap, cliprect);
-			draw_videoram(screen.machine(), bitmap, cliprect, transparent_pens);
+			draw_background_full_scroll(machine(), bitmap, cliprect);
+			draw_videoram(machine(), bitmap, cliprect, transparent_pens);
 			break;
 
 		/* foreground: visible except for pen 0 */
 		/* background: page-granular scrolling */
 		case G80_BACKGROUND_SINDBADM:
 			memset(transparent_pens, 1, 16);
-			draw_background_page_scroll(screen.machine(), bitmap, cliprect);
-			draw_videoram(screen.machine(), bitmap, cliprect, transparent_pens);
+			draw_background_page_scroll(machine(), bitmap, cliprect);
+			draw_videoram(machine(), bitmap, cliprect, transparent_pens);
 			break;
 	}
 	return 0;

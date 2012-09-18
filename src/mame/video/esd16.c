@@ -167,15 +167,15 @@ UINT32 esd16_state::screen_update_hedpanic(screen_device &screen, bitmap_ind16 &
 {
 	int layers_ctrl = -1;
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 #ifdef MAME_DEBUG
-if (screen.machine().input().code_pressed(KEYCODE_Z))
+if (machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
-	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 4;
+	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_A))	msk |= 4;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
@@ -218,7 +218,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 	}
 
-	if (layers_ctrl & 4) screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	if (layers_ctrl & 4) machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 
 //  popmessage("%04x %04x %04x %04x %04x",head_unknown1[0],head_layersize[0],head_unknown3[0],head_unknown4[0],head_unknown5[0]);
 	return 0;

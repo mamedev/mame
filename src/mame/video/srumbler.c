@@ -158,7 +158,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 UINT32 srumbler_state::screen_update_srumbler(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
-	draw_sprites(screen.machine(), bitmap,cliprect);
+	draw_sprites(machine(), bitmap,cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;

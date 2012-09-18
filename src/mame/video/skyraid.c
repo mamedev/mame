@@ -140,10 +140,10 @@ UINT32 skyraid_state::screen_update_skyraid(screen_device &screen, bitmap_ind16 
 	rectangle helper_clip = cliprect;
 	helper_clip &= m_helper.cliprect();
 
-	draw_terrain(screen.machine(), m_helper, helper_clip);
-	draw_sprites(screen.machine(), m_helper, helper_clip);
-	draw_missiles(screen.machine(), m_helper, helper_clip);
-	draw_trapezoid(screen.machine(), bitmap, m_helper);
-	draw_text(screen.machine(), bitmap, cliprect);
+	draw_terrain(machine(), m_helper, helper_clip);
+	draw_sprites(machine(), m_helper, helper_clip);
+	draw_missiles(machine(), m_helper, helper_clip);
+	draw_trapezoid(machine(), bitmap, m_helper);
+	draw_text(machine(), bitmap, cliprect);
 	return 0;
 }

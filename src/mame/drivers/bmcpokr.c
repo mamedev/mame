@@ -201,7 +201,7 @@ GFXDECODE_END
 
 UINT32 bmcpokr_state::screen_update_bmcpokr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 
 	int count = 0;
 	for (int y=0;y<32;y++)

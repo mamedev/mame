@@ -1756,11 +1756,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *
 UINT32 galaxold_state::screen_update_galaxold(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	(*m_draw_background)(screen.machine(), bitmap, cliprect);
+	(*m_draw_background)(machine(), bitmap, cliprect);
 
 	if (m_stars_on)
 	{
-		(*m_draw_stars)(screen.machine(), bitmap, cliprect);
+		(*m_draw_stars)(machine(), bitmap, cliprect);
 	}
 
 
@@ -1768,15 +1768,15 @@ UINT32 galaxold_state::screen_update_galaxold(screen_device &screen, bitmap_ind1
 
 	if (m_draw_bullets)
 	{
-		draw_bullets_common(screen.machine(), bitmap, cliprect);
+		draw_bullets_common(machine(), bitmap, cliprect);
 	}
 
 
-	draw_sprites(screen.machine(), bitmap, m_spriteram, m_spriteram.bytes());
+	draw_sprites(machine(), bitmap, m_spriteram, m_spriteram.bytes());
 
 	if (m_spriteram2_present)
 	{
-		draw_sprites(screen.machine(), bitmap, m_spriteram2, m_spriteram2.bytes());
+		draw_sprites(machine(), bitmap, m_spriteram2, m_spriteram2.bytes());
 	}
 	return 0;
 }
@@ -1787,11 +1787,11 @@ UINT32 galaxold_state::screen_update_dambustr(screen_device &screen, bitmap_ind1
 	int i, j;
 	UINT8 color;
 
-	(*m_draw_background)(screen.machine(), bitmap, cliprect);
+	(*m_draw_background)(machine(), bitmap, cliprect);
 
 	if (m_stars_on)
 	{
-		(*m_draw_stars)(screen.machine(), bitmap, cliprect);
+		(*m_draw_stars)(machine(), bitmap, cliprect);
 	}
 
 	/* save the background for drawing it again later, if background has priority over characters */
@@ -1801,15 +1801,15 @@ UINT32 galaxold_state::screen_update_dambustr(screen_device &screen, bitmap_ind1
 
 	if (m_draw_bullets)
 	{
-		draw_bullets_common(screen.machine(), bitmap, cliprect);
+		draw_bullets_common(machine(), bitmap, cliprect);
 	}
 
-	draw_sprites(screen.machine(), bitmap, m_spriteram, m_spriteram.bytes());
+	draw_sprites(machine(), bitmap, m_spriteram, m_spriteram.bytes());
 
 	if (m_dambustr_bg_priority)
 	{
 		/* draw the upper part of the background, as it has priority */
-		dambustr_draw_upper_background(screen.machine(), bitmap, cliprect);
+		dambustr_draw_upper_background(machine(), bitmap, cliprect);
 
 		/* only rows with color code > 3 are stronger than the background */
 		memset(m_dambustr_videoram2, 0x20, 0x0400);

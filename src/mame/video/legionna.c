@@ -421,8 +421,8 @@ UINT32 legionna_state::screen_update_legionna(screen_device &screen, bitmap_ind1
 	m_text_layer->set_scrollx(0,  0/*m_scrollram16[6]*/ );
 	m_text_layer->set_scrolly(0,  0/*m_scrollram16[7]*/ );
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);	/* wrong color? */
+	machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);	/* wrong color? */
 
 	/* m_layer_disable is a guess based on 'stage 1' screen in heatbrl  */
 
@@ -431,7 +431,7 @@ UINT32 legionna_state::screen_update_legionna(screen_device &screen, bitmap_ind1
 	if (!(m_layer_disable&0x0002)) m_background_layer->draw(bitmap, cliprect, 0, 1);
 	if (!(m_layer_disable&0x0001)) m_text_layer->draw(bitmap, cliprect, 0, 2);
 
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	draw_sprites(machine(),bitmap,cliprect);
 
 
 	return 0;
@@ -454,14 +454,14 @@ UINT32 legionna_state::screen_update_godzilla(screen_device &screen, bitmap_ind1
 
 
 	bitmap.fill(0x0200, cliprect);
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	if (!(m_layer_disable&0x0001)) m_background_layer->draw(bitmap, cliprect, 0,0);
 	if (!(m_layer_disable&0x0002)) m_midground_layer->draw(bitmap, cliprect, 0,0);
 	if (!(m_layer_disable&0x0004)) m_foreground_layer->draw(bitmap, cliprect, 0,1);
 	if (!(m_layer_disable&0x0008)) m_text_layer->draw(bitmap, cliprect, 0,2);
 
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	draw_sprites(machine(),bitmap,cliprect);
 
 	return 0;
 }
@@ -478,8 +478,8 @@ UINT32 legionna_state::screen_update_grainbow(screen_device &screen, bitmap_ind1
 	m_text_layer->set_scrollx(0,  0/*m_scrollram16[6]*/ );
 	m_text_layer->set_scrolly(0,  0/*m_scrollram16[7]*/ );
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	if(!(m_layer_disable & 1))
 		m_background_layer->draw(bitmap, cliprect, 0,1);
@@ -493,7 +493,7 @@ UINT32 legionna_state::screen_update_grainbow(screen_device &screen, bitmap_ind1
 	if(!(m_layer_disable & 8))
 		m_text_layer->draw(bitmap, cliprect, 0,8);
 
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	draw_sprites(machine(),bitmap,cliprect);
 
 	return 0;
 }

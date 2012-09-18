@@ -129,7 +129,7 @@ UINT32 dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap,
 
 	konami_sortlayers5(layer, m_layerpri);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	for (plane = 0; plane < 5; plane++)
 	{

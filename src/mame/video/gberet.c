@@ -167,7 +167,7 @@ UINT32 gberet_state::screen_update_gberet(screen_device &screen, bitmap_ind16 &b
 {
 
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
-	gberet_draw_sprites(screen.machine(), bitmap, cliprect);
+	gberet_draw_sprites(machine(), bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -220,7 +220,7 @@ static void gberetb_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 UINT32 gberet_state::screen_update_gberetb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
-	gberetb_draw_sprites(screen.machine(), bitmap, cliprect);
+	gberetb_draw_sprites(machine(), bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

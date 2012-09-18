@@ -331,7 +331,7 @@ void pk8000_state::video_start()
 
 UINT32 pk8000_state::screen_update_pk8000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return pk8000_video_update(screen, bitmap, cliprect, screen.machine().device<ram_device>(RAM_TAG)->pointer());
+	return pk8000_video_update(screen, bitmap, cliprect, machine().device<ram_device>(RAM_TAG)->pointer());
 }
 
 /* Machine driver */

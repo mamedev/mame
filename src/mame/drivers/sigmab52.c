@@ -168,16 +168,16 @@ void sigmab52_state::video_start()
 
 UINT32 sigmab52_state::screen_update_jwildb52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *hd63484 = screen.machine().device("hd63484");
+	device_t *hd63484 = machine().device("hd63484");
 
 	int x, y, b, src;
 
-	address_space &space = screen.machine().driver_data()->generic_space();
+	address_space &space = machine().driver_data()->generic_space();
 	b = ((hd63484_regs_r(hd63484, space, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(hd63484, space, 0xce/2, 0xffff);
 
 //save vram to file
 #if 0
-	if (screen.machine().input().code_pressed_once(KEYCODE_Q))
+	if (machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		FILE *p = fopen("vram.bin", "wb");
 		fwrite(&HD63484_ram[0], 1, 0x40000 * 4, p);
@@ -201,7 +201,7 @@ UINT32 sigmab52_state::screen_update_jwildb52(screen_device &screen, bitmap_ind1
 		}
 	}
 
-if (!screen.machine().input().code_pressed(KEYCODE_O))
+if (!machine().input().code_pressed(KEYCODE_O))
 	if ((hd63484_regs_r(hd63484, space, 0x06/2, 0xffff) & 0x0300) == 0x0300)
 	{
 		int sy = (hd63484_regs_r(hd63484, space, 0x94/2, 0xffff) & 0x0fff) - (hd63484_regs_r(hd63484, space, 0x88/2, 0xffff) >> 8);

@@ -28,7 +28,7 @@ UINT32 asuka_state::screen_update_asuka(screen_device &screen, bitmap_ind16 &bit
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap.fill(0, cliprect);
@@ -53,7 +53,7 @@ UINT32 asuka_state::screen_update_bonzeadv(screen_device &screen, bitmap_ind16 &
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap.fill(0, cliprect);

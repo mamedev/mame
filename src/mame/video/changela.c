@@ -727,7 +727,7 @@ UINT32 changela_state::screen_update_changela(screen_device &screen, bitmap_ind1
 	copybitmap_trans(bitmap, m_obj0_bitmap,  0, 0, 0, 0, cliprect, 0);
 	copybitmap_trans(bitmap, m_tree0_bitmap, 0, 0, 0, 0, cliprect, 0);
 	copybitmap_trans(bitmap, m_tree1_bitmap, 0, 0, 0, 0, cliprect, 0);
-	draw_obj1(screen.machine(), bitmap);
+	draw_obj1(machine(), bitmap);
 
 	return 0;
 }

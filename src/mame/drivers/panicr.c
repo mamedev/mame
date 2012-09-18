@@ -250,11 +250,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 UINT32 panicr_state::screen_update_panicr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 	m_txttilemap->mark_all_dirty();
 	m_bgtilemap->set_scrollx(0, m_scrollx);
 	m_bgtilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	draw_sprites(machine(),bitmap,cliprect);
 	m_txttilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;

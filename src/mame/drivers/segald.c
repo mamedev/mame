@@ -111,8 +111,8 @@ UINT32 segald_state::screen_update_astron(screen_device &screen, bitmap_rgb32 &b
 {
 	bitmap.fill(0, cliprect);
 
-	astron_draw_characters(screen.machine(), bitmap, cliprect);
-	astron_draw_sprites(screen.machine(), bitmap, cliprect);
+	astron_draw_characters(machine(), bitmap, cliprect);
+	astron_draw_sprites(machine(), bitmap, cliprect);
 
 	return 0;
 }

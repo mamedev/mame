@@ -238,11 +238,11 @@ UINT32 buggychl_state::screen_update_buggychl(screen_device &screen, bitmap_ind1
 		bitmap.fill(0, cliprect);
 
 	if (m_bg_on)
-		draw_bg(screen.machine(), bitmap, cliprect);
+		draw_bg(machine(), bitmap, cliprect);
 
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 
-	draw_fg(screen.machine(), bitmap, cliprect);
+	draw_fg(machine(), bitmap, cliprect);
 
 	return 0;
 }

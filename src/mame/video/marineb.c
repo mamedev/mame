@@ -173,7 +173,7 @@ UINT32 marineb_state::screen_update_marineb(screen_device &screen, bitmap_ind16 
 {
 	int offs;
 
-	set_tilemap_scrolly(screen.machine(), 24);
+	set_tilemap_scrolly(machine(), 24);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
@@ -211,7 +211,7 @@ UINT32 marineb_state::screen_update_marineb(screen_device &screen, bitmap_ind16 
 
 		if (!m_flipscreen_y)
 		{
-			sy = 256 - screen.machine().gfx[gfx]->width() - sy;
+			sy = 256 - machine().gfx[gfx]->width() - sy;
 			flipy = !flipy;
 		}
 
@@ -220,7 +220,7 @@ UINT32 marineb_state::screen_update_marineb(screen_device &screen, bitmap_ind16 
 			sx++;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[gfx],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[gfx],
 				code,
 				col,
 				flipx,flipy,
@@ -234,7 +234,7 @@ UINT32 marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 
 {
 	int offs, sx, sy, code, col, flipx, flipy;
 
-	set_tilemap_scrolly(screen.machine(), 26);
+	set_tilemap_scrolly(machine(), 26);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the small sprites */
@@ -253,7 +253,7 @@ UINT32 marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 
 
 		if (!m_flipscreen_y)
 		{
-			sy = 256 - screen.machine().gfx[1]->width() - sy;
+			sy = 256 - machine().gfx[1]->width() - sy;
 			flipy = !flipy;
 		}
 
@@ -262,7 +262,7 @@ UINT32 marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 
 			sx++;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				code >> 2,
 				col,
 				flipx,flipy,
@@ -280,7 +280,7 @@ UINT32 marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 
 
 	if (!m_flipscreen_y)
 	{
-		sy = 256 - screen.machine().gfx[2]->width() - sy;
+		sy = 256 - machine().gfx[2]->width() - sy;
 		flipy = !flipy;
 	}
 
@@ -291,7 +291,7 @@ UINT32 marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 
 
 	code >>= 4;
 
-	drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[2],
+	drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 			code,
 			col,
 			flipx,flipy,
@@ -299,7 +299,7 @@ UINT32 marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 
 
 	/* draw again for wrap around */
 
-	drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[2],
+	drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 			code,
 			col,
 			flipx,flipy,
@@ -312,7 +312,7 @@ UINT32 marineb_state::screen_update_springer(screen_device &screen, bitmap_ind16
 {
 	int offs;
 
-	set_tilemap_scrolly(screen.machine(), 0);
+	set_tilemap_scrolly(machine(), 0);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
@@ -348,7 +348,7 @@ UINT32 marineb_state::screen_update_springer(screen_device &screen, bitmap_ind16
 
 		if (!m_flipscreen_y)
 		{
-			sy = 256 - screen.machine().gfx[gfx]->width() - sy;
+			sy = 256 - machine().gfx[gfx]->width() - sy;
 			flipy = !flipy;
 		}
 
@@ -357,7 +357,7 @@ UINT32 marineb_state::screen_update_springer(screen_device &screen, bitmap_ind16
 			sx--;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[gfx],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[gfx],
 				code,
 				col,
 				flipx,flipy,
@@ -371,7 +371,7 @@ UINT32 marineb_state::screen_update_hoccer(screen_device &screen, bitmap_ind16 &
 {
 	int offs;
 
-	set_tilemap_scrolly(screen.machine(), 0);
+	set_tilemap_scrolly(machine(), 0);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
@@ -390,17 +390,17 @@ UINT32 marineb_state::screen_update_hoccer(screen_device &screen, bitmap_ind16 &
 
 		if (!m_flipscreen_y)
 		{
-			sy = 256 - screen.machine().gfx[1]->width() - sy;
+			sy = 256 - machine().gfx[1]->width() - sy;
 			flipy = !flipy;
 		}
 
 		if (m_flipscreen_x)
 		{
-			sx = 256 - screen.machine().gfx[1]->width() - sx;
+			sx = 256 - machine().gfx[1]->width() - sx;
 			flipx = !flipx;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				code >> 2,
 				col,
 				flipx,flipy,
@@ -414,7 +414,7 @@ UINT32 marineb_state::screen_update_hopprobo(screen_device &screen, bitmap_ind16
 {
 	int offs;
 
-	set_tilemap_scrolly(screen.machine(), 0);
+	set_tilemap_scrolly(machine(), 0);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
@@ -449,7 +449,7 @@ UINT32 marineb_state::screen_update_hopprobo(screen_device &screen, bitmap_ind16
 
 		if (!m_flipscreen_y)
 		{
-			sy = 256 - screen.machine().gfx[gfx]->width() - sy;
+			sy = 256 - machine().gfx[gfx]->width() - sy;
 			flipy = !flipy;
 		}
 
@@ -458,7 +458,7 @@ UINT32 marineb_state::screen_update_hopprobo(screen_device &screen, bitmap_ind16
 			sx--;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[gfx],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[gfx],
 				code,
 				col,
 				flipx,flipy,

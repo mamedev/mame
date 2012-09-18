@@ -344,12 +344,12 @@ UINT32 wc90_state::screen_update_wc90(screen_device &screen, bitmap_ind16 &bitma
 	m_tx_tilemap->set_scrollx(0,m_scroll0xlo[0] + 256 * m_scroll0xhi[0]);
 	m_tx_tilemap->set_scrolly(0,m_scroll0ylo[0] + 256 * m_scroll0yhi[0]);
 
-//  draw_sprites(screen.machine(), bitmap,cliprect, 3 );
+//  draw_sprites(machine(), bitmap,cliprect, 3 );
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap,cliprect, 2 );
+	draw_sprites(machine(), bitmap,cliprect, 2 );
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap,cliprect, 1 );
+	draw_sprites(machine(), bitmap,cliprect, 1 );
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap,cliprect, 0 );
+	draw_sprites(machine(), bitmap,cliprect, 0 );
 	return 0;
 }

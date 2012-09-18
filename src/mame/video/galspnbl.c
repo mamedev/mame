@@ -105,9 +105,9 @@ UINT32 galspnbl_state::screen_update_galspnbl(screen_device &screen, bitmap_ind1
 {
 	int offs;
 
-	draw_background(screen.machine(), bitmap, cliprect);
+	draw_background(machine(), bitmap, cliprect);
 
-	draw_sprites(screen.machine(), bitmap, cliprect, 0);
+	draw_sprites(machine(), bitmap, cliprect, 0);
 
 	for (offs = 0; offs < 0x1000 / 2; offs++)
 	{
@@ -122,7 +122,7 @@ UINT32 galspnbl_state::screen_update_galspnbl(screen_device &screen, bitmap_ind1
 		/* What is this? A priority/half transparency marker? */
 		if (!(attr & 0x0008))
 		{
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 					code,
 					color,
 					0,0,
@@ -131,6 +131,6 @@ UINT32 galspnbl_state::screen_update_galspnbl(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	draw_sprites(screen.machine(), bitmap, cliprect, 1);
+	draw_sprites(machine(), bitmap, cliprect, 1);
 	return 0;
 }

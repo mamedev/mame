@@ -547,9 +547,9 @@ UINT32 x1_state::screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 	bitmap.fill(MAKE_ARGB(0xff,0x00,0x00,0x00), cliprect);
 
-	draw_gfxbitmap(screen.machine(),bitmap,cliprect,m_scrn_reg.disp_bank,m_scrn_reg.pri);
-	draw_fgtilemap(screen.machine(),bitmap,cliprect);
-	draw_gfxbitmap(screen.machine(),bitmap,cliprect,m_scrn_reg.disp_bank,m_scrn_reg.pri^0xff);
+	draw_gfxbitmap(machine(),bitmap,cliprect,m_scrn_reg.disp_bank,m_scrn_reg.pri);
+	draw_fgtilemap(machine(),bitmap,cliprect);
+	draw_gfxbitmap(machine(),bitmap,cliprect,m_scrn_reg.disp_bank,m_scrn_reg.pri^0xff);
 
 	return 0;
 }

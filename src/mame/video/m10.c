@@ -150,7 +150,7 @@ UINT32 m10_state::screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap,
 		int y;
 
 		for (y = IREMM10_VBEND; y < IREMM10_VBSTART; y++)
-			plot_pixel_m10(screen.machine(), bitmap, 16, y, 1);
+			plot_pixel_m10(machine(), bitmap, 16, y, 1);
 	}
 
 	for (offs = m_videoram.bytes() - 1; offs >= 0; offs--)

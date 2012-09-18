@@ -190,13 +190,13 @@ UINT32 srmp6_state::screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bit
 
 #if 0
 	/* debug */
-	if(screen.machine().input().code_pressed_once(KEYCODE_Q))
+	if(machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		++xixi;
 		printf("%x\n",xixi);
 	}
 
-	if(screen.machine().input().code_pressed_once(KEYCODE_W))
+	if(machine().input().code_pressed_once(KEYCODE_W))
 	{
 		--xixi;
 		printf("%x\n",xixi);
@@ -273,7 +273,7 @@ UINT32 srmp6_state::screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bit
 						else
 							yb=y+(height-yw-1)*8+global_y;
 
-						drawgfx_alpha(bitmap,cliprect,screen.machine().gfx[0],tileno,global_pal,flip_x,flip_y,xb,yb,0,alpha);
+						drawgfx_alpha(bitmap,cliprect,machine().gfx[0],tileno,global_pal,flip_x,flip_y,xb,yb,0,alpha);
 						tileno++;
 					}
 				}
@@ -287,7 +287,7 @@ UINT32 srmp6_state::screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bit
 
 	memcpy(m_sprram_old, m_sprram, 0x80000);
 
-	if(screen.machine().input().code_pressed_once(KEYCODE_Q))
+	if(machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		FILE *p=fopen("tileram.bin","wb");
 		fwrite(m_tileram, 1, 0x100000*16, p);

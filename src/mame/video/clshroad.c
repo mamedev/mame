@@ -332,7 +332,7 @@ UINT32 clshroad_state::screen_update_clshroad(screen_device &screen, bitmap_ind1
 
 	m_tilemap_0a->draw(bitmap, cliprect, 0,0);	// Opaque
 	m_tilemap_0b->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	draw_sprites(machine(),bitmap,cliprect);
 	m_tilemap_1->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

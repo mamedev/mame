@@ -371,11 +371,11 @@ UINT32 namcos1_state::screen_update_namcos1(screen_device &screen, bitmap_ind16 
 	/* flip screen is embedded in the sprite control registers */
 	/* can't use flip_screen_set() because the visible area is asymmetrical */
 	flip_screen_set_no_update(m_spriteram[0x0ff6] & 1);
-	screen.machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 
 	/* background color */
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	/* berabohm uses asymmetrical visibility windows to iris on the character */
 	i = ((m_cus116[0] << 8) | m_cus116[1]) - 1;			// min x
@@ -414,7 +414,7 @@ UINT32 namcos1_state::screen_update_namcos1(screen_device &screen, bitmap_ind16 
 	}
 
 
-	screen.machine().priority_bitmap.fill(0, new_clip);
+	machine().priority_bitmap.fill(0, new_clip);
 
 	/* bit 0-2 priority */
 	/* bit 3   disable  */
@@ -427,7 +427,7 @@ UINT32 namcos1_state::screen_update_namcos1(screen_device &screen, bitmap_ind16 
 		}
 	}
 
-	draw_sprites(screen.machine(), bitmap, new_clip);
+	draw_sprites(machine(), bitmap, new_clip);
 	return 0;
 }
 

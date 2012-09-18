@@ -125,7 +125,7 @@ UINT32 quasar_state::screen_update_quasar(screen_device &screen, bitmap_ind16 &b
 				bitmap.pix16(y + oy, x + ox) = forecolor;
 
 		/* Main Screen */
-		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				code,
 				m_color_ram[offs] & 0x3f,
 				0,0,
@@ -135,7 +135,7 @@ UINT32 quasar_state::screen_update_quasar(screen_device &screen, bitmap_ind16 &b
 		/* background for Collision Detection (it can only hit certain items) */
 		if((m_color_ram[offs] & 7) == 0)
 		{
-			drawgfx_opaque(m_collision_background,cliprect,screen.machine().gfx[0],
+			drawgfx_opaque(m_collision_background,cliprect,machine().gfx[0],
 					code,
 					64,
 					0,0,
@@ -189,7 +189,7 @@ UINT32 quasar_state::screen_update_quasar(screen_device &screen, bitmap_ind16 &b
 					bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel);
 
 					/* S2636 vs. background collision detection */
-					if (colortable_entry_get_value(screen.machine().colortable, m_collision_background.pix16(y, x)))
+					if (colortable_entry_get_value(machine().colortable, m_collision_background.pix16(y, x)))
 					{
 						if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x01;
 						if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x02;

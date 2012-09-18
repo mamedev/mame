@@ -91,7 +91,7 @@ UINT32 xmen_state::screen_update_xmen(screen_device &screen, bitmap_ind16 &bitma
 
 	konami_sortlayers3(layer, m_layerpri);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	/* note the '+1' in the background color!!! */
 	bitmap.fill(16 * bg_colorbase + 1, cliprect);
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[0], 0, 1);
@@ -148,14 +148,14 @@ void xmen_state::screen_eof_xmen6p(screen_device &screen, bool state)
 		rectangle cliprect;
 		int offset;
 
-	//  const rectangle *visarea = screen.machine().primary_screen->visible_area();
+	//  const rectangle *visarea = machine().primary_screen->visible_area();
 	//  cliprect = *visarea;
 
 		cliprect.set(0, 64 * 8 - 1, 2 * 8, 30 * 8 - 1);
 
 
-		address_space &space = screen.machine().driver_data()->generic_space();
-		if (screen.machine().primary_screen->frame_number() & 0x01)
+		address_space &space = machine().driver_data()->generic_space();
+		if (machine().primary_screen->frame_number() & 0x01)
 		{
 
 			/* copy the desired spritelist to the chip */
@@ -212,7 +212,7 @@ void xmen_state::screen_eof_xmen6p(screen_device &screen, bool state)
 
 		konami_sortlayers3(layer, m_layerpri);
 
-		screen.machine().priority_bitmap.fill(0, cliprect);
+		machine().priority_bitmap.fill(0, cliprect);
 		/* note the '+1' in the background color!!! */
 		renderbitmap->fill(16 * bg_colorbase + 1, cliprect);
 		k052109_tilemap_draw(m_k052109, *renderbitmap, cliprect, layer[0], 0, 1);

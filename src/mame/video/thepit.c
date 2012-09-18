@@ -297,13 +297,13 @@ UINT32 thepit_state::screen_update_thepit(screen_device &screen, bitmap_ind16 &b
 	m_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* low priority sprites */
-	draw_sprites(screen.machine(), bitmap, cliprect, 0);
+	draw_sprites(machine(), bitmap, cliprect, 0);
 
 	/* high priority tiles */
 	m_solid_tilemap->draw(bitmap, cliprect, 1, 1);
 
 	/* high priority sprites */
-	draw_sprites(screen.machine(), bitmap, cliprect, 1);
+	draw_sprites(machine(), bitmap, cliprect, 1);
 
 	return 0;
 }

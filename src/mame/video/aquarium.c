@@ -163,7 +163,7 @@ UINT32 aquarium_state::screen_update_aquarium(screen_device &screen, bitmap_ind1
 	m_bak_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	draw_sprites(screen.machine(), bitmap, cliprect, 16);
+	draw_sprites(machine(), bitmap, cliprect, 16);
 
 	m_bak_tilemap->draw(bitmap, cliprect, 1, 0);
 	m_mid_tilemap->draw(bitmap, cliprect, 1, 0);

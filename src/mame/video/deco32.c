@@ -573,13 +573,13 @@ void dragngun_state::screen_eof_dragngun(screen_device &screen, bool state)
 
 UINT32 deco32_state::screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_deco_tilegen1 = screen.machine().device("tilegen1");
-	m_deco_tilegen2 = screen.machine().device("tilegen2");
+	m_deco_tilegen1 = machine().device("tilegen1");
+	m_deco_tilegen2 = machine().device("tilegen2");
 
-	screen.machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
-	bitmap.fill(screen.machine().pens[0x000], cliprect); // Palette index not confirmed
+	machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(machine().pens[0x000], cliprect); // Palette index not confirmed
 
 	deco16ic_set_pf1_8bpp_mode(m_deco_tilegen2, 1);
 
@@ -601,18 +601,18 @@ UINT32 deco32_state::screen_update_captaven(screen_device &screen, bitmap_ind16 
 
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 4);
 
-	screen.machine().device<decospr_device>("spritegen")->set_alt_format(true);
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram16_buffered, 0x400);
+	machine().device<decospr_device>("spritegen")->set_alt_format(true);
+	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram16_buffered, 0x400);
 
 	return 0;
 }
 
 UINT32 dragngun_state::screen_update_dragngun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_deco_tilegen1 = screen.machine().device("tilegen1");
-	m_deco_tilegen2 = screen.machine().device("tilegen2");
+	m_deco_tilegen1 = machine().device("tilegen1");
+	m_deco_tilegen2 = machine().device("tilegen2");
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);
 	deco16ic_pf_update(m_deco_tilegen2, m_pf3_rowscroll, m_pf4_rowscroll);
@@ -637,7 +637,7 @@ UINT32 dragngun_state::screen_update_dragngun(screen_device &screen, bitmap_rgb3
 	{
 		rectangle clip(cliprect.min_x, cliprect.max_x, 8, 247);
 
-		dragngun_draw_sprites(screen.machine(),bitmap,clip,m_spriteram->buffer());
+		dragngun_draw_sprites(machine(),bitmap,clip,m_spriteram->buffer());
 		deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, clip, 0, 0);
 
 	}
@@ -648,16 +648,16 @@ UINT32 dragngun_state::screen_update_dragngun(screen_device &screen, bitmap_rgb3
 
 UINT32 deco32_state::screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_deco_tilegen1 = screen.machine().device("tilegen1");
-	m_deco_tilegen2 = screen.machine().device("tilegen2");
+	m_deco_tilegen1 = machine().device("tilegen1");
+	m_deco_tilegen2 = machine().device("tilegen2");
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
-	bitmap.fill(screen.machine().pens[0x000], cliprect); // Palette index not confirmed
+	machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(machine().pens[0x000], cliprect); // Palette index not confirmed
 
 	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);
 	deco16ic_pf_update(m_deco_tilegen2, m_pf3_rowscroll, m_pf4_rowscroll);
 
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram16_buffered, 0x800, true);
+	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram16_buffered, 0x800, true);
 
 	/* Draw screen */
 	deco16ic_tilemap_2_draw(m_deco_tilegen2, bitmap, cliprect, 0, 1);
@@ -665,17 +665,17 @@ UINT32 deco32_state::screen_update_fghthist(screen_device &screen, bitmap_rgb32 
 	if(m_pri&1)
 	{
 		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2);
-		screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
+		machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
 		deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 4);
 	}
 	else
 	{
 		deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 2);
-		screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
+		machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
 		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 4);
 	}
 
-	screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 1024, 0x1ff);
+	machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 1024, 0x1ff);
 
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
@@ -825,8 +825,8 @@ static void mixDualAlphaSprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 UINT32 deco32_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int alphaTilemap=0;
-	m_deco_tilegen1 = screen.machine().device("tilegen1");
-	m_deco_tilegen2 = screen.machine().device("tilegen2");
+	m_deco_tilegen1 = machine().device("tilegen1");
+	m_deco_tilegen2 = machine().device("tilegen2");
 
 	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);
 	deco16ic_pf_update(m_deco_tilegen2, m_pf3_rowscroll, m_pf4_rowscroll);
@@ -836,18 +836,18 @@ UINT32 deco32_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 
 		alphaTilemap=1;
 
 	if (m_ace_ram_dirty)
-		updateAceRam(screen.machine());
+		updateAceRam(machine());
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
-	bitmap.fill(screen.machine().pens[0x200], cliprect);
+	bitmap.fill(machine().pens[0x200], cliprect);
 
 	/* Draw sprites to temporary bitmaps, saving alpha & priority info for later mixing */
-	screen.machine().device<decospr_device>("spritegen1")->set_pix_raw_shift(8);
-	screen.machine().device<decospr_device>("spritegen2")->set_pix_raw_shift(8);
+	machine().device<decospr_device>("spritegen1")->set_pix_raw_shift(8);
+	machine().device<decospr_device>("spritegen2")->set_pix_raw_shift(8);
 
-	screen.machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, m_spriteram16_buffered, 0x800, true);
-	screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_spriteram16_2_buffered, 0x800, true);
+	machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, m_spriteram16_buffered, 0x800, true);
+	machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_spriteram16_2_buffered, 0x800, true);
 
 
 	/* Render alpha-blended tilemap to separate buffer for proper mixing */
@@ -880,7 +880,7 @@ UINT32 deco32_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 
 		}
 	}
 
-	mixDualAlphaSprites(bitmap, cliprect, screen.machine().gfx[3], screen.machine().gfx[4], alphaTilemap);
+	mixDualAlphaSprites(bitmap, cliprect, machine().gfx[3], machine().gfx[4], alphaTilemap);
 
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;

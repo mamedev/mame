@@ -157,7 +157,7 @@ UINT32 bmcbowl_state::screen_update_bmcbowl(screen_device &screen, bitmap_ind16 
 */
 
 	int x,y,z,pixdat;
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	z=0;
 	for (y=0;y<230;y++)

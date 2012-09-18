@@ -77,7 +77,7 @@ UINT32 esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap,
 			//int blinkLine = (m_tile_control_ram[current_screen_character] & 0x40) >> 6;
 			//int blinkChar = (m_tile_control_ram[current_screen_character] & 0x80) >> 7;
 
-			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[0],
 					m_tile_ram[current_screen_character] + (0x100 * tileOffs),
 					palIndex,
 					0, 0, charx*8, chary*8, 0);

@@ -228,14 +228,14 @@ UINT32 dynduke_state::screen_update_dynduke(screen_device &screen, bitmap_ind16 
 	m_tx_layer->enable(m_txt_enable);
 
 
-	draw_background(screen.machine(), bitmap, cliprect,0x00);
-	draw_sprites(screen.machine(),bitmap,cliprect,0); // Untested: does anything use it? Could be behind background
-	draw_sprites(screen.machine(),bitmap,cliprect,1);
-	draw_background(screen.machine(), bitmap, cliprect,0x20);
+	draw_background(machine(), bitmap, cliprect,0x00);
+	draw_sprites(machine(),bitmap,cliprect,0); // Untested: does anything use it? Could be behind background
+	draw_sprites(machine(),bitmap,cliprect,1);
+	draw_background(machine(), bitmap, cliprect,0x20);
 
-	draw_sprites(screen.machine(),bitmap,cliprect,2);
+	draw_sprites(machine(),bitmap,cliprect,2);
 	m_fg_layer->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(),bitmap,cliprect,3);
+	draw_sprites(machine(),bitmap,cliprect,3);
 	m_tx_layer->draw(bitmap, cliprect, 0,0);
 
 	return 0;

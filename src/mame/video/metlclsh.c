@@ -249,7 +249,7 @@ UINT32 metlclsh_state::screen_update_metlclsh(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->set_scrollx(0, m_scrollx[1] + ((m_scrollx[0] & 0x02) << 7) );
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
-	draw_sprites(screen.machine(), bitmap, cliprect);			// sprites
+	draw_sprites(machine(), bitmap, cliprect);			// sprites
 	m_fg_tilemap->draw(bitmap, cliprect, 2, 0);	// high priority tiles of foreground
 
 //  popmessage("%02X", m_scrollx[0]);

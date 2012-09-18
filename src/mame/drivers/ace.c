@@ -99,19 +99,19 @@ UINT32 aceal_state::screen_update_ace(screen_device &screen, bitmap_ind16 &bitma
 	/* first of all, fill the screen with the background color */
 	bitmap.fill(0, cliprect);
 
-	drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[1],
+	drawgfx_opaque(bitmap, cliprect, machine().gfx[1],
 			0,
 			0,
 			0, 0,
 			m_objpos[0], m_objpos[1]);
 
-	drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[2],
+	drawgfx_opaque(bitmap, cliprect, machine().gfx[2],
 			0,
 			0,
 			0, 0,
 			m_objpos[2], m_objpos[3]);
 
-	drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[3],
+	drawgfx_opaque(bitmap, cliprect, machine().gfx[3],
 			0,
 			0,
 			0, 0,
@@ -120,7 +120,7 @@ UINT32 aceal_state::screen_update_ace(screen_device &screen, bitmap_ind16 &bitma
 	for (offs = 0; offs < 8; offs++)
 	{
 		drawgfx_opaque(bitmap,/* ?? */
-				cliprect, screen.machine().gfx[4],
+				cliprect, machine().gfx[4],
 				offs,
 				0,
 				0, 0,

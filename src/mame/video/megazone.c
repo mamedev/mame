@@ -133,7 +133,7 @@ UINT32 megazone_state::screen_update_megazone(screen_device &screen, bitmap_ind1
 			flipy = !flipy;
 		}
 
-		drawgfx_opaque(*m_tmpbitmap, m_tmpbitmap->cliprect(), screen.machine().gfx[1],
+		drawgfx_opaque(*m_tmpbitmap, m_tmpbitmap->cliprect(), machine().gfx[1],
 				((int)m_videoram[offs]) + ((m_colorram[offs] & (1 << 7) ? 256 : 0) ),
 				(m_colorram[offs] & 0x0f) + 0x10,
 				flipx,flipy,
@@ -180,12 +180,12 @@ UINT32 megazone_state::screen_update_megazone(screen_device &screen, bitmap_ind1
 			else
 				sx = sx + 32;
 
-			drawgfx_transmask(bitmap,cliprect,screen.machine().gfx[0],
+			drawgfx_transmask(bitmap,cliprect,machine().gfx[0],
 					spriteram[offs + 2],
 					color,
 					flipx,flipy,
 					sx,sy,
-					colortable_get_transpen_mask(screen.machine().colortable, screen.machine().gfx[0], color, 0));
+					colortable_get_transpen_mask(machine().colortable, machine().gfx[0], color, 0));
 		}
 	}
 
@@ -213,7 +213,7 @@ UINT32 megazone_state::screen_update_megazone(screen_device &screen, bitmap_ind1
 
 
 
-			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[1],
+			drawgfx_opaque(bitmap, cliprect, machine().gfx[1],
 					((int)m_videoram2[offs]) + ((m_colorram2[offs] & (1 << 7) ? 256 : 0) ),
 					(m_colorram2[offs] & 0x0f) + 0x10,
 					flipx,flipy,

@@ -196,11 +196,11 @@ UINT32 wrally_state::screen_update_wrally(screen_device &screen, bitmap_ind16 &b
 	m_pant[1]->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
 	m_pant[0]->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER0,0);
 
-	draw_sprites(screen.machine(),bitmap,cliprect,0);
+	draw_sprites(machine(),bitmap,cliprect,0);
 
 	m_pant[0]->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER1,0);
 
-	draw_sprites(screen.machine(),bitmap,cliprect,1);
+	draw_sprites(machine(),bitmap,cliprect,1);
 
 	return 0;
 }

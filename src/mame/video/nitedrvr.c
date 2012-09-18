@@ -73,6 +73,6 @@ UINT32 nitedrvr_state::screen_update_nitedrvr(screen_device &screen, bitmap_ind1
 {
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_roadway(screen.machine(), bitmap);
+	draw_roadway(machine(), bitmap);
 	return 0;
 }

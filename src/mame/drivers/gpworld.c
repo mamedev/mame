@@ -228,8 +228,8 @@ UINT32 gpworld_state::screen_update_gpworld(screen_device &screen, bitmap_rgb32 
 {
 	bitmap.fill(0, cliprect);
 
-	gpworld_draw_tiles(screen.machine(), bitmap, cliprect);
-	gpworld_draw_sprites(screen.machine(), bitmap, cliprect);
+	gpworld_draw_tiles(machine(), bitmap, cliprect);
+	gpworld_draw_sprites(machine(), bitmap, cliprect);
 
 	return 0;
 }

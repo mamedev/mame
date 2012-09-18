@@ -593,7 +593,7 @@ UINT32 itech8_state::screen_update_slikshot(screen_device &screen, bitmap_rgb32 
 		if (temp >=  0x90) temp =  0x90;
 		m_curx = temp;
 
-		compute_sensors(screen.machine());
+		compute_sensors(machine());
 //      popmessage("V=%02x,%02x  X=%02x", m_curvx, m_curvy, m_curx);
 		m_crosshair_vis = 0;
 	}

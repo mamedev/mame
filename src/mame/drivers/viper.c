@@ -351,7 +351,7 @@ public:
 
 UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	device_t *device = screen.machine().device("voodoo");
+	device_t *device = machine().device("voodoo");
 	return voodoo_update(device, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 

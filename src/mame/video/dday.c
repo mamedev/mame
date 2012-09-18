@@ -324,7 +324,7 @@ UINT32 dday_state::screen_update_dday(screen_device &screen, bitmap_ind16 &bitma
 				UINT16 src_pixel = m_main_bitmap.pix16(y, x);
 
 				if (sl_bitmap.pix16(y, x) == 0xff)
-					src_pixel += screen.machine().total_colors();
+					src_pixel += machine().total_colors();
 
 				bitmap.pix16(y, x) = src_pixel;
 			}

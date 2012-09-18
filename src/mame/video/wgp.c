@@ -645,25 +645,25 @@ UINT32 wgp_state::screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap,
 	UINT8 layer[3];
 
 #ifdef MAME_DEBUG
-	if (screen.machine().input().code_pressed_once (KEYCODE_V))
+	if (machine().input().code_pressed_once (KEYCODE_V))
 	{
 		m_dislayer[0] ^= 1;
 		popmessage("piv0: %01x",m_dislayer[0]);
 	}
 
-	if (screen.machine().input().code_pressed_once (KEYCODE_B))
+	if (machine().input().code_pressed_once (KEYCODE_B))
 	{
 		m_dislayer[1] ^= 1;
 		popmessage("piv1: %01x",m_dislayer[1]);
 	}
 
-	if (screen.machine().input().code_pressed_once (KEYCODE_N))
+	if (machine().input().code_pressed_once (KEYCODE_N))
 	{
 		m_dislayer[2] ^= 1;
 		popmessage("piv2: %01x",m_dislayer[2]);
 	}
 
-	if (screen.machine().input().code_pressed_once (KEYCODE_M))
+	if (machine().input().code_pressed_once (KEYCODE_M))
 	{
 		m_dislayer[3] ^= 1;
 		popmessage("TC0100SCN top bg layer: %01x",m_dislayer[3]);
@@ -695,19 +695,19 @@ UINT32 wgp_state::screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap,
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[0]] == 0)
 #endif
-	wgp_piv_layer_draw(screen.machine(), bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	wgp_piv_layer_draw(machine(), bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[1]] == 0)
 #endif
-	wgp_piv_layer_draw(screen.machine(), bitmap, cliprect, layer[1], 0, 2);
+	wgp_piv_layer_draw(machine(), bitmap, cliprect, layer[1], 0, 2);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[2]] == 0)
 #endif
-	wgp_piv_layer_draw(screen.machine(), bitmap, cliprect, layer[2], 0, 4);
+	wgp_piv_layer_draw(machine(), bitmap, cliprect, layer[2], 0, 4);
 
-	draw_sprites(screen.machine(), bitmap, cliprect, 16);
+	draw_sprites(machine(), bitmap, cliprect, 16);
 
 /* ... then here we should apply rotation from wgp_sate_ctrl[] to the bitmap before we draw the TC0100SCN layers on it */
 	layer[0] = tc0100scn_bottomlayer(m_tc0100scn);

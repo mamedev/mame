@@ -162,11 +162,11 @@ UINT32 raiden_state::screen_update_raiden(screen_device &screen, bitmap_ind16 &b
 	m_bg_layer->draw(bitmap, cliprect, 0,0);
 
 	/* Draw sprites underneath foreground */
-	draw_sprites(screen.machine(),bitmap,cliprect,0x40);
+	draw_sprites(machine(),bitmap,cliprect,0x40);
 	m_fg_layer->draw(bitmap, cliprect, 0,0);
 
 	/* Rest of sprites */
-	draw_sprites(screen.machine(),bitmap,cliprect,0x80);
+	draw_sprites(machine(),bitmap,cliprect,0x80);
 
 	/* Text layer */
 	m_tx_layer->draw(bitmap, cliprect, 0,0);

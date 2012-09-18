@@ -51,7 +51,7 @@ UINT32 mz_state::screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap
 	UINT8 *videoram = m_videoram;
 	int offs;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	for(offs = 0; offs < 40*25; offs++)
 	{
@@ -63,7 +63,7 @@ UINT32 mz_state::screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap
 		color = m_colorram[offs];
 		code = videoram[offs] | (color & 0x80) << 1;
 
-		drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], code, color, 0, 0, sx, sy);
+		drawgfx_opaque(bitmap, cliprect, machine().gfx[0], code, color, 0, 0, sx, sy);
 	}
 
 	return 0;
@@ -83,7 +83,7 @@ UINT32 mz_state::screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap
 {
 	UINT8 *videoram = m_videoram;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (m_mz700_mode)
 		return SCREEN_UPDATE16_CALL_MEMBER(mz700);

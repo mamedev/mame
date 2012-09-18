@@ -212,7 +212,7 @@ UINT32 chanbara_state::screen_update_chanbara(screen_device &screen, bitmap_ind1
 
 	m_bg2_tilemap->set_scrolly(0, m_scroll | (m_scrollhi << 8));
 	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

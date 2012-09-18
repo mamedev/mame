@@ -271,10 +271,10 @@ UINT32 rpunch_state::screen_update_rpunch(screen_device &screen, bitmap_ind16 &b
 	effbins = (m_bins > m_gins) ? m_gins : m_bins;
 
 	m_background[0]->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0, effbins);
+	draw_sprites(machine(), bitmap, cliprect, 0, effbins);
 	m_background[1]->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap, cliprect, effbins, m_gins);
+	draw_sprites(machine(), bitmap, cliprect, effbins, m_gins);
 	if (m_bitmapram)
-		draw_bitmap(screen.machine(), bitmap, cliprect);
+		draw_bitmap(machine(), bitmap, cliprect);
 	return 0;
 }

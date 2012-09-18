@@ -299,19 +299,19 @@ UINT32 bosco_state::screen_update_bosco(screen_device &screen, bitmap_ind16 &bit
 		fg_clip.min_x = 28*8;
 	}
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	draw_stars(screen.machine(),bitmap,cliprect,flip_screen());
+	bitmap.fill(get_black_pen(machine()), cliprect);
+	draw_stars(machine(),bitmap,cliprect,flip_screen());
 
 	m_bg_tilemap->draw(bitmap, bg_clip, 0,0);
 	m_fg_tilemap->draw(bitmap, fg_clip, 0,0);
 
-	draw_sprites(screen.machine(), bitmap,cliprect);
+	draw_sprites(machine(), bitmap,cliprect);
 
 	/* draw the high priority characters */
 	m_bg_tilemap->draw(bitmap, bg_clip, 1,0);
 	m_fg_tilemap->draw(bitmap, fg_clip, 1,0);
 
-	draw_bullets(screen.machine(), bitmap,cliprect);
+	draw_bullets(machine(), bitmap,cliprect);
 
 	return 0;
 }

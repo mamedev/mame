@@ -239,12 +239,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 UINT32 tecmo_state::screen_update_tecmo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0x100, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0,1);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,2);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,4);
 
-	draw_sprites(screen.machine(), bitmap,cliprect);
+	draw_sprites(machine(), bitmap,cliprect);
 	return 0;
 }

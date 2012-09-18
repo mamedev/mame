@@ -171,7 +171,7 @@ WRITE16_MEMBER(galaxygame_state::ke_w)
 
 UINT32 galaxygame_state::screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 	for (int i = 0; i < m_point_display_list_index; i++ )
 	{
 		bitmap.pix16(m_point_display_list[i].x >> 7, m_point_display_list[i].y >> 7) = 1;

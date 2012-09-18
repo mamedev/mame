@@ -584,7 +584,7 @@ UINT32 tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &bit
 	pen_t pen_base = 32; //change it later
 
 	UINT32 v;
-	UINT8 *text_gfx_base = screen.machine().root_device().memregion("gfx1")->base();
+	UINT8 *text_gfx_base = machine().root_device().memregion("gfx1")->base();
 	UINT8 *romBxx = memregion("user1")->base() + 0x2000*m_background_romsel;
 
 	/* logerror(" update: from DISP=%i y_min=%3i y_max=%3i\n", DISP_, cliprect.min_y, cliprect.max_y+1); */
@@ -738,7 +738,7 @@ UINT32 tubep_state::screen_update_rjammer(screen_device &screen, bitmap_ind16 &b
 	int DISP_ = m_DISP^1;
 
 	UINT32 v;
-	UINT8 *text_gfx_base = screen.machine().root_device().memregion("gfx1")->base();
+	UINT8 *text_gfx_base = machine().root_device().memregion("gfx1")->base();
 	UINT8 *rom13D  = memregion("user1")->base();
 	UINT8 *rom11BD = rom13D+0x1000;
 	UINT8 *rom19C  = rom13D+0x5000;

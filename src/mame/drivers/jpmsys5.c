@@ -233,7 +233,7 @@ UINT32 jpmsys5_state::screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32
 
 	if (state.blanked)
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
@@ -247,8 +247,8 @@ UINT32 jpmsys5_state::screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32
 			UINT8 pen = src[(x-cliprect.min_x)>>1];
 
 			/* Draw two 4-bit pixels */
-			*dest++ = screen.machine().pens[(pen >> 4) & 0xf];
-			*dest++ = screen.machine().pens[pen & 0xf];
+			*dest++ = machine().pens[(pen >> 4) & 0xf];
+			*dest++ = machine().pens[pen & 0xf];
 		}
 	}
 

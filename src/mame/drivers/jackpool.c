@@ -47,7 +47,7 @@ void jackpool_state::video_start()
 
 UINT32 jackpool_state::screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 	int count;// = 0x00000/2;
 
 	int y,x;

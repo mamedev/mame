@@ -222,7 +222,7 @@ UINT32 exedexes_state::screen_update_exedexes(screen_device &screen, bitmap_ind1
 	else
 		bitmap.fill(0, cliprect);
 
-	draw_sprites(screen.machine(), bitmap, cliprect, 1);
+	draw_sprites(machine(), bitmap, cliprect, 1);
 
 	if (m_sc1on)
 	{
@@ -231,7 +231,7 @@ UINT32 exedexes_state::screen_update_exedexes(screen_device &screen, bitmap_ind1
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 
-	draw_sprites(screen.machine(), bitmap, cliprect, 0);
+	draw_sprites(machine(), bitmap, cliprect, 0);
 
 	if (m_chon)
 		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);

@@ -124,7 +124,7 @@ UINT32 mpu4dealem_state::screen_update_dealem(screen_device &screen, bitmap_ind1
 		{
 			int tile = m_dealem_videoram[count + 0x1000] | (m_dealem_videoram[count] << 8);
 			count++;
-			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tile,0,0,0,x * 8,y * 8);
+			drawgfx_opaque(bitmap,cliprect,machine().gfx[0],tile,0,0,0,x * 8,y * 8);
 		}
 	}
 

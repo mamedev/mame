@@ -343,7 +343,7 @@ UINT32 nova2001_state::screen_update_nova2001(screen_device &screen, bitmap_ind1
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	nova2001_draw_sprites(screen.machine(), bitmap, cliprect);
+	nova2001_draw_sprites(machine(), bitmap, cliprect);
 
 	// according to the schematics, fg category 0 should be drawn behind sprites,
 	// but it doesn't look right that way
@@ -357,7 +357,7 @@ UINT32 nova2001_state::screen_update_pkunwar(screen_device &screen, bitmap_ind16
 {
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
-	pkunwar_draw_sprites(screen.machine(), bitmap, cliprect);
+	pkunwar_draw_sprites(machine(), bitmap, cliprect);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
 
@@ -370,7 +370,7 @@ UINT32 nova2001_state::screen_update_ninjakun(screen_device &screen, bitmap_ind1
 
 	m_fg_tilemap->draw(bitmap, cliprect, 1, 0);
 
-	nova2001_draw_sprites(screen.machine(), bitmap, cliprect);
+	nova2001_draw_sprites(machine(), bitmap, cliprect);
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
@@ -381,7 +381,7 @@ UINT32 nova2001_state::screen_update_raiders5(screen_device &screen, bitmap_ind1
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	pkunwar_draw_sprites(screen.machine(), bitmap, cliprect);
+	pkunwar_draw_sprites(machine(), bitmap, cliprect);
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 

@@ -224,9 +224,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 cloak_state::screen_update_cloak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(screen.machine());
+	set_pens(machine());
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_bitmap(screen.machine(), bitmap, cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_bitmap(machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }

@@ -373,7 +373,7 @@ INLINE void uBackgroundColour(running_machine &machine)
 
 UINT32 aristmk4_state::screen_update_aristmk4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 	int x,y;
 	int count = 0;
 	int color;
@@ -389,7 +389,7 @@ UINT32 aristmk4_state::screen_update_aristmk4(screen_device &screen, bitmap_ind1
 		color = ((m_mkiv_vram[count]) & 0xe0) >> 5;
 			tile = (m_mkiv_vram[count+1]|m_mkiv_vram[count]<<8) & 0x3ff;
 			bgtile = (m_mkiv_vram[count+1]|m_mkiv_vram[count]<<8) & 0xff; // first 256 tiles
-			uBackgroundColour(screen.machine());	// read sw7
+			uBackgroundColour(machine());	// read sw7
 			gfx->decode(bgtile);	// force the machine to update only the first 256 tiles.
 								// as we only update the background, not the entire display.
 			flipx = ((m_mkiv_vram[count]) & 0x04);

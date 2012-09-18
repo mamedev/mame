@@ -133,14 +133,14 @@ UINT32 darkmist_state::screen_update_darkmist(screen_device &screen, bitmap_ind1
 
 #define DM_GETSCROLL(n) (((m_scroll[(n)]<<1)&0xff) + ((m_scroll[(n)]&0x80)?1:0) +( ((m_scroll[(n)-1]<<4) | (m_scroll[(n)-1]<<12) )&0xff00))
 
-	set_pens(screen.machine());
+	set_pens(machine());
 
 	m_bgtilemap->set_scrollx(0, DM_GETSCROLL(0x2));
 	m_bgtilemap->set_scrolly(0, DM_GETSCROLL(0x6));
 	m_fgtilemap->set_scrollx(0, DM_GETSCROLL(0xa));
 	m_fgtilemap->set_scrolly(0, DM_GETSCROLL(0xe));
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if(m_hw & DISPLAY_BG)
 		m_bgtilemap->draw(bitmap, cliprect, 0,0);
@@ -175,13 +175,13 @@ UINT32 darkmist_state::screen_update_darkmist(screen_device &screen, bitmap_ind1
 			palette=((spriteram[i+1])>>1)&0xf;
 
 			if(spriteram[i+1]&0x1)
-				palette=screen.machine().rand()&15;
+				palette=machine().rand()&15;
 
 			palette+=32;
 
 			drawgfx_transpen(
 				bitmap,cliprect,
-				screen.machine().gfx[2],
+				machine().gfx[2],
 				tile,
 				palette,
 				fx,fy,

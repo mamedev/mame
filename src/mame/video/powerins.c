@@ -339,21 +339,21 @@ UINT32 powerins_state::screen_update_powerins(screen_device &screen, bitmap_ind1
 	m_tilemap_1->set_scrolly(0,  0x00);
 
 #ifdef MAME_DEBUG
-if (screen.machine().input().code_pressed(KEYCODE_Z))
+if (machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
 
-	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-//  if (screen.machine().input().code_pressed(KEYCODE_E))    msk |= 4;
-	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 8;
+	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+//  if (machine().input().code_pressed(KEYCODE_E))    msk |= 4;
+	if (machine().input().code_pressed(KEYCODE_A))	msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
 
 	if (layers_ctrl&1)		m_tilemap_0->draw(bitmap, cliprect, 0, 0);
 	else					bitmap.fill(0, cliprect);
-	if (layers_ctrl&8)		draw_sprites(screen.machine(),bitmap,cliprect);
+	if (layers_ctrl&8)		draw_sprites(machine(),bitmap,cliprect);
 	if (layers_ctrl&2)		m_tilemap_1->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

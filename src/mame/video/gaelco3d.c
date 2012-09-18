@@ -432,26 +432,26 @@ UINT32 gaelco3d_state::screen_update_gaelco3d(screen_device &screen, bitmap_ind1
 	int ret;
 
 /*
-    if (DISPLAY_TEXTURE && (screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input().code_pressed(KEYCODE_X)))
+    if (DISPLAY_TEXTURE && (machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed(KEYCODE_X)))
     {
         static int xv = 0, yv = 0x1000;
         UINT8 *base = m_texture;
         int length = m_texture_size;
 
-        if (screen.machine().input().code_pressed(KEYCODE_X))
+        if (machine().input().code_pressed(KEYCODE_X))
         {
             base = m_texmask;
             length = m_texmask_size;
         }
 
-        if (screen.machine().input().code_pressed(KEYCODE_LEFT) && xv >= 4)
+        if (machine().input().code_pressed(KEYCODE_LEFT) && xv >= 4)
             xv -= 4;
-        if (screen.machine().input().code_pressed(KEYCODE_RIGHT) && xv < 4096 - 4)
+        if (machine().input().code_pressed(KEYCODE_RIGHT) && xv < 4096 - 4)
             xv += 4;
 
-        if (screen.machine().input().code_pressed(KEYCODE_UP) && yv >= 4)
+        if (machine().input().code_pressed(KEYCODE_UP) && yv >= 4)
             yv -= 4;
-        if (screen.machine().input().code_pressed(KEYCODE_DOWN) && yv < 0x40000)
+        if (machine().input().code_pressed(KEYCODE_DOWN) && yv < 0x40000)
             yv += 4;
 
         for (y = cliprect.min_y; y <= cliprect.max_y; y++)

@@ -232,11 +232,11 @@ UINT32 bloodbro_state::screen_update_bloodbro(screen_device &screen, bitmap_ind1
 	m_fg_tilemap->set_scrollx(0,m_scroll[0x12]);
 	m_fg_tilemap->set_scrolly(0,m_scroll[0x13]);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,1);
-	bloodbro_draw_sprites(screen.machine(),bitmap,cliprect);
+	bloodbro_draw_sprites(machine(),bitmap,cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
@@ -248,11 +248,11 @@ UINT32 bloodbro_state::screen_update_weststry(screen_device &screen, bitmap_ind1
 //  m_fg_tilemap->set_scrollx(0,m_scroll[0x12]);
 //  m_fg_tilemap->set_scrolly(0,m_scroll[0x13]);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,1);
-	weststry_draw_sprites(screen.machine(),bitmap,cliprect);
+	weststry_draw_sprites(machine(),bitmap,cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
@@ -265,11 +265,11 @@ UINT32 bloodbro_state::screen_update_skysmash(screen_device &screen, bitmap_ind1
 	m_fg_tilemap->set_scrollx(0,m_scroll[0x0a]);
 	m_fg_tilemap->set_scrolly(0,m_scroll[0x0b]);	/* ? */
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,1);
-	bloodbro_draw_sprites(screen.machine(),bitmap,cliprect);
+	bloodbro_draw_sprites(machine(),bitmap,cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

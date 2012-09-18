@@ -43,7 +43,7 @@ void rgum_state::video_start()
 UINT32 rgum_state::screen_update_royalgum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 
 	count = 0;
 

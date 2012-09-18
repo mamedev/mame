@@ -190,7 +190,7 @@ UINT32 shangkid_state::screen_update_shangkid(screen_device &screen, bitmap_ind1
 	m_background->set_scrolly(0,m_videoreg[2]+0x10 );
 
 	m_background->draw(bitmap, cliprect, 0,0 );
-	shangkid_draw_sprites(screen.machine(), bitmap,cliprect );
+	shangkid_draw_sprites(machine(), bitmap,cliprect );
 	m_background->draw(bitmap, cliprect, 1,0 ); /* high priority tiles */
 	return 0;
 }
@@ -320,8 +320,8 @@ static void dynamski_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 
 UINT32 shangkid_state::screen_update_dynamski(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dynamski_draw_background(screen.machine(), bitmap,cliprect, 0 );
-	dynamski_draw_sprites(screen.machine(), bitmap,cliprect );
-	dynamski_draw_background(screen.machine(), bitmap,cliprect, 1 );
+	dynamski_draw_background(machine(), bitmap,cliprect, 0 );
+	dynamski_draw_sprites(machine(), bitmap,cliprect );
+	dynamski_draw_background(machine(), bitmap,cliprect, 1 );
 	return 0;
 }

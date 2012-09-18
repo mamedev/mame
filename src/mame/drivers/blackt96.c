@@ -232,9 +232,9 @@ UINT32 blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind1
 {
 	int count;
 	int x,y;
-	gfx_element *gfx = screen.machine().gfx[2];
+	gfx_element *gfx = machine().gfx[2];
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	int strip;
 	int page;
@@ -243,7 +243,7 @@ UINT32 blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind1
 	{
 		for (page = 7;page>0;page--)
 		{
-			draw_strip(screen.machine(), bitmap, cliprect, page, strip, 1);
+			draw_strip(machine(), bitmap, cliprect, page, strip, 1);
 		}
 	}
 
@@ -251,7 +251,7 @@ UINT32 blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind1
 	{
 		for (page = 7;page>0;page--)
 		{
-			draw_strip(screen.machine(), bitmap, cliprect, page, strip, 0);
+			draw_strip(machine(), bitmap, cliprect, page, strip, 0);
 		}
 	}
 

@@ -47,7 +47,7 @@ UINT32 nes_state::screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap,
 	if (m_disk_expansion && m_pcb_id == NO_BOARD)
 	{
 		// latch this input so it doesn't go at warp speed
-		if ((screen.machine().root_device().ioport("FLIPDISK")->read() & 0x01) && (!m_last_frame_flip))
+		if ((machine().root_device().ioport("FLIPDISK")->read() & 0x01) && (!m_last_frame_flip))
 		{
 			m_last_frame_flip = 1;
 			m_fds_current_side++;
@@ -60,7 +60,7 @@ UINT32 nes_state::screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap,
 				popmessage("Disk set to side %d", m_fds_current_side);
 		}
 
-		if (!(screen.machine().root_device().ioport("FLIPDISK")->read() & 0x01))
+		if (!(machine().root_device().ioport("FLIPDISK")->read() & 0x01))
 			m_last_frame_flip = 0;
 	}
 	return 0;

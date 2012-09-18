@@ -101,13 +101,13 @@ UINT32 runaway_state::screen_update_runaway(screen_device &screen, bitmap_ind16 
 
 		code |= (m_sprite_ram[i + 0x30] << 2) & 0x1c0;
 
-		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1],
 			code,
 			0,
 			flipx, flipy,
 			x, 240 - y, 0);
 
-		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1],
 			code,
 			0,
 			flipx, flipy,
@@ -135,13 +135,13 @@ UINT32 runaway_state::screen_update_qwak(screen_device &screen, bitmap_ind16 &bi
 
 		code |= (m_sprite_ram[i + 0x30] << 2) & 0x1c0;
 
-		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1],
 			code,
 			0,
 			flipx, flipy,
 			x, 240 - y, 0);
 
-		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1],
 			code,
 			0,
 			flipx, flipy,

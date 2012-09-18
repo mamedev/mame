@@ -361,23 +361,23 @@ static void draw_lasso( running_machine &machine, bitmap_ind16 &bitmap, const re
 
 UINT32 lasso_state::screen_update_lasso(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	palette_set_color(screen.machine(), 0, get_color(*m_back_color));
+	palette_set_color(machine(), 0, get_color(*m_back_color));
 	bitmap.fill(0, cliprect);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_lasso(screen.machine(), bitmap, cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0);
+	draw_lasso(machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect, 0);
 
 	return 0;
 }
 
 UINT32 lasso_state::screen_update_chameleo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	palette_set_color(screen.machine(), 0, get_color(*m_back_color));
+	palette_set_color(machine(), 0, get_color(*m_back_color));
 	bitmap.fill(0, cliprect);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0);
+	draw_sprites(machine(), bitmap, cliprect, 0);
 
 	return 0;
 }
@@ -385,8 +385,8 @@ UINT32 lasso_state::screen_update_chameleo(screen_device &screen, bitmap_ind16 &
 
 UINT32 lasso_state::screen_update_wwjgtin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	colortable_palette_set_color(screen.machine().colortable, 0, get_color(*m_back_color));
-	wwjgtin_set_last_four_colors(screen.machine(), screen.machine().colortable);
+	colortable_palette_set_color(machine().colortable, 0, get_color(*m_back_color));
+	wwjgtin_set_last_four_colors(machine(), machine().colortable);
 
 	m_track_tilemap->set_scrollx(0, m_track_scroll[0] + m_track_scroll[1] * 256);
 	m_track_tilemap->set_scrolly(0, m_track_scroll[2] + m_track_scroll[3] * 256);
@@ -394,9 +394,9 @@ UINT32 lasso_state::screen_update_wwjgtin(screen_device &screen, bitmap_ind16 &b
 	if (m_track_enable)
 		m_track_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 
-	draw_sprites(screen.machine(), bitmap, cliprect, 1);	// reverse order
+	draw_sprites(machine(), bitmap, cliprect, 1);	// reverse order
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;

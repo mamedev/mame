@@ -424,8 +424,8 @@ static void voodoo_vblank_1(device_t *device, int param)
 
 UINT32 hornet_state::screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	device_t *voodoo = screen.machine().device("voodoo0");
-	device_t *k037122 = screen.machine().device("k037122_1");
+	device_t *voodoo = machine().device("voodoo0");
+	device_t *k037122 = machine().device("k037122_1");
 
 	voodoo_update(voodoo, bitmap, cliprect);
 
@@ -440,8 +440,8 @@ UINT32 hornet_state::screen_update_hornet_2board(screen_device &screen, bitmap_r
 {
 	if (strcmp(screen.tag(), ":lscreen") == 0)
 	{
-		device_t *k037122 = screen.machine().device("k037122_1");
-		device_t *voodoo = screen.machine().device("voodoo0");
+		device_t *k037122 = machine().device("k037122_1");
+		device_t *voodoo = machine().device("voodoo0");
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
@@ -449,8 +449,8 @@ UINT32 hornet_state::screen_update_hornet_2board(screen_device &screen, bitmap_r
 	}
 	else if (strcmp(screen.tag(), ":rscreen") == 0)
 	{
-		device_t *k037122 = screen.machine().device("k037122_2");
-		device_t *voodoo = screen.machine().device("voodoo1");
+		device_t *k037122 = machine().device("k037122_2");
+		device_t *voodoo = machine().device("voodoo1");
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */

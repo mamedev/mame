@@ -1494,7 +1494,7 @@ UINT32 halleys_state::screen_update_halleys(screen_device &screen, bitmap_ind16 
 		bitmap.fill(m_bgcolor, cliprect);
 
 #ifdef MAME_DEBUG
-	if (screen.machine().root_device().ioport("DEBUG")->read()) copy_scroll_xp(bitmap, m_render_layer[3], *m_scrollx0, *m_scrolly0); // not used???
+	if (machine().root_device().ioport("DEBUG")->read()) copy_scroll_xp(bitmap, m_render_layer[3], *m_scrollx0, *m_scrolly0); // not used???
 #endif
 
 	copy_scroll_xp(bitmap, m_render_layer[2], *m_scrollx1, *m_scrolly1);
@@ -1504,7 +1504,7 @@ UINT32 halleys_state::screen_update_halleys(screen_device &screen, bitmap_ind16 
 	// HALF-HACK: apply RGB filter when the following conditions are met
 	i = m_io_ram[0xa0];
 	j = m_io_ram[0xa1];
-	if (m_io_ram[0x2b] && (i>0xc6 && i<0xfe) && (j==0xc0 || j==0xed)) filter_bitmap(screen.machine(), bitmap, i);
+	if (m_io_ram[0x2b] && (i>0xc6 && i<0xfe) && (j==0xc0 || j==0xed)) filter_bitmap(machine(), bitmap, i);
 	return 0;
 }
 

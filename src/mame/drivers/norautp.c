@@ -569,7 +569,7 @@ UINT32 norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 
 
 	count = 0;
 
-	bitmap.fill(screen.machine().pens[0], cliprect); //black pen
+	bitmap.fill(machine().pens[0], cliprect); //black pen
 
 	for(y = 0; y < 8; y++)
 	{
@@ -581,7 +581,7 @@ UINT32 norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 
 				int tile = m_np_vram[count] & 0x3f;
 				int colour = (m_np_vram[count] & 0xc0) >> 6;
 
-				drawgfx_opaque(bitmap,cliprect, screen.machine().gfx[1], tile, colour, 0, 0, (x * 32) + 8, y * 32);
+				drawgfx_opaque(bitmap,cliprect, machine().gfx[1], tile, colour, 0, 0, (x * 32) + 8, y * 32);
 
 				count+=2;
 			}
@@ -593,7 +593,7 @@ UINT32 norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 
 				int tile = m_np_vram[count] & 0x3f;
 				int colour = (m_np_vram[count] & 0xc0) >> 6;
 
-				drawgfx_opaque(bitmap,cliprect, screen.machine().gfx[0], tile, colour, 0, 0, x * 16, y * 32);
+				drawgfx_opaque(bitmap,cliprect, machine().gfx[0], tile, colour, 0, 0, x * 16, y * 32);
 
 				count++;
 			}

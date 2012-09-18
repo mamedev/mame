@@ -125,18 +125,18 @@ UINT32 hec2hrp_state::screen_update_hec2hrp(screen_device &screen, bitmap_ind16 
 		if (m_hector_flag_80c==0)
 			{
 				screen.set_visible_area(0, 243, 0, 227);
-				hector_hr( screen.machine(), bitmap , &videoram_HR[0], 227, 64);
+				hector_hr( machine(), bitmap , &videoram_HR[0], 227, 64);
 			}
 		else
 			{
 				screen.set_visible_area(0, 243*2, 0, 227);
-				hector_80c( screen.machine(), bitmap , &videoram_HR[0], 227, 64);
+				hector_80c( machine(), bitmap , &videoram_HR[0], 227, 64);
 			}
 		}
 	else
 		{
 			screen.set_visible_area(0, 113, 0, 75);
-			hector_hr( screen.machine(), bitmap, videoram,  77, 32);
+			hector_hr( machine(), bitmap, videoram,  77, 32);
 		}
 	return 0;
 }

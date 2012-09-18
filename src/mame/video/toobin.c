@@ -227,8 +227,8 @@ WRITE16_HANDLER( toobin_slip_w )
 
 UINT32 toobin_state::screen_update_toobin(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
-	const rgb_t *palette = palette_entry_list_adjusted(screen.machine().palette);
+	bitmap_ind8 &priority_bitmap = machine().priority_bitmap;
+	const rgb_t *palette = palette_entry_list_adjusted(machine().palette);
 	atarimo_rect_list rectlist;
 	bitmap_ind16 *mobitmap;
 	int x, y;

@@ -91,7 +91,7 @@ UINT32 pdp1_state::screen_update_pdp1(screen_device &screen, bitmap_ind16 &bitma
 	crt_update(m_crt, bitmap);
 	pdp1_draw_lightpen(this, bitmap);
 
-	pdp1_draw_panel(screen.machine(), m_panel_bitmap);
+	pdp1_draw_panel(machine(), m_panel_bitmap);
 	copybitmap(bitmap, m_panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);
 
 	copybitmap(bitmap, m_typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);

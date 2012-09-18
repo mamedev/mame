@@ -172,7 +172,7 @@ UINT32 capbowl_state::screen_update_capbowl(screen_device &screen, bitmap_rgb32 
 	/* if we're blanked, just fill with black */
 	if (state.blanked)
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 

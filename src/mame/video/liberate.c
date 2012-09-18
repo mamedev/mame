@@ -510,7 +510,7 @@ UINT32 liberate_state::screen_update_prosoccr(screen_device &screen, bitmap_ind1
 		m_back_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
-	prosoccr_draw_sprites(screen.machine(), bitmap, cliprect);
+	prosoccr_draw_sprites(machine(), bitmap, cliprect);
 
 	return 0;
 }
@@ -549,11 +549,11 @@ UINT32 liberate_state::screen_update_prosport(screen_device &screen, bitmap_ind1
 		my = (offs) % 32;
 		mx = (offs) / 32;
 
-		drawgfx_transpen(bitmap, cliprect,screen.machine().gfx[gfx_region],
+		drawgfx_transpen(bitmap, cliprect,machine().gfx[gfx_region],
 				tile, 1, 0, 0, 248 - 8 * mx, 8 * my, 0);
 	}
 
-	prosport_draw_sprites(screen.machine(), bitmap, cliprect);
+	prosport_draw_sprites(machine(), bitmap, cliprect);
 
 	return 0;
 }
@@ -568,11 +568,11 @@ UINT32 liberate_state::screen_update_boomrang(screen_device &screen, bitmap_ind1
 	else
 		m_back_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 
-	boomrang_draw_sprites(screen.machine(),bitmap,cliprect,8);
+	boomrang_draw_sprites(machine(),bitmap,cliprect,8);
 	if (!m_background_disable)
 		m_back_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 
-	boomrang_draw_sprites(screen.machine(), bitmap, cliprect, 0);
+	boomrang_draw_sprites(machine(), bitmap, cliprect, 0);
 	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -587,7 +587,7 @@ UINT32 liberate_state::screen_update_liberate(screen_device &screen, bitmap_ind1
 	else
 		m_back_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	liberate_draw_sprites(screen.machine(), bitmap, cliprect);
+	liberate_draw_sprites(machine(), bitmap, cliprect);
 	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

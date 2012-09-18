@@ -565,9 +565,9 @@ static void draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rec
 UINT32 galaga_state::screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	draw_stars(screen.machine(),bitmap,cliprect);
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
+	draw_stars(machine(),bitmap,cliprect);
+	draw_sprites(machine(),bitmap,cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

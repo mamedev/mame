@@ -206,7 +206,7 @@ UINT32 yunsun16_state::screen_update_yunsun16(screen_device &screen, bitmap_ind1
 
 	//popmessage("%04X", *m_priorityram);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	if ((*m_priorityram & 0x0c) == 4)
 	{
@@ -223,6 +223,6 @@ UINT32 yunsun16_state::screen_update_yunsun16(screen_device &screen, bitmap_ind1
 		m_tilemap_0->draw(bitmap, cliprect, 0, 2);
 	}
 
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }

@@ -142,19 +142,19 @@ UINT32 galpani2_state::screen_update_galpani2(screen_device &screen, bitmap_ind1
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-if (screen.machine().input().code_pressed(KEYCODE_Z))
+if (machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
-	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (screen.machine().input().code_pressed(KEYCODE_E))	msk |= 4;
-	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 8;
+	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_E))	msk |= 4;
+	if (machine().input().code_pressed(KEYCODE_A))	msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
 
 	bitmap.fill(0, cliprect);
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	if (layers_ctrl & 0x1)
 	{
@@ -189,6 +189,6 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 							   cliprect,0x4000 + 0);
 	}
 
-	if (layers_ctrl & 0x8) m_kaneko_spr->kaneko16_render_sprites(screen.machine(), bitmap, cliprect, m_spriteram, m_spriteram.bytes());
+	if (layers_ctrl & 0x8) m_kaneko_spr->kaneko16_render_sprites(machine(), bitmap, cliprect, m_spriteram, m_spriteram.bytes());
 	return 0;
 }

@@ -204,10 +204,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 UINT32 wiz_state::screen_update_kungfut(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_bgpen, cliprect);
-	draw_background(screen.machine(), bitmap, cliprect, 2 + m_char_bank[0] , 0);
-	draw_foreground(screen.machine(), bitmap, cliprect, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram2, 4);
-	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram  , 5);
+	draw_background(machine(), bitmap, cliprect, 2 + m_char_bank[0] , 0);
+	draw_foreground(machine(), bitmap, cliprect, 0);
+	draw_sprites(machine(), bitmap, cliprect, m_spriteram2, 4);
+	draw_sprites(machine(), bitmap, cliprect, m_spriteram  , 5);
 	return 0;
 }
 
@@ -216,8 +216,8 @@ UINT32 wiz_state::screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap,
 	int bank;
 
 	bitmap.fill(m_bgpen, cliprect);
-	draw_background(screen.machine(), bitmap, cliprect, 2 + ((m_char_bank[0] << 1) | m_char_bank[1]), 0);
-	draw_foreground(screen.machine(), bitmap, cliprect, 0);
+	draw_background(machine(), bitmap, cliprect, 2 + ((m_char_bank[0] << 1) | m_char_bank[1]), 0);
+	draw_foreground(machine(), bitmap, cliprect, 0);
 
 	const rectangle spritevisiblearea(2*8, 32*8-1, 2*8, 30*8-1);
 	const rectangle spritevisibleareaflipx(0*8, 30*8-1, 2*8, 30*8-1);
@@ -225,8 +225,8 @@ UINT32 wiz_state::screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap,
 
 	bank = 7 + *m_sprite_bank;
 
-	draw_sprites(screen.machine(), bitmap, visible_area, m_spriteram2, 6);
-	draw_sprites(screen.machine(), bitmap, visible_area, m_spriteram  , bank);
+	draw_sprites(machine(), bitmap, visible_area, m_spriteram2, 6);
+	draw_sprites(machine(), bitmap, visible_area, m_spriteram  , bank);
 	return 0;
 }
 
@@ -234,9 +234,9 @@ UINT32 wiz_state::screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap,
 UINT32 wiz_state::screen_update_stinger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_bgpen, cliprect);
-	draw_background(screen.machine(), bitmap, cliprect, 2 + m_char_bank[0], 1);
-	draw_foreground(screen.machine(), bitmap, cliprect, 1);
-	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram2, 4);
-	draw_sprites(screen.machine(), bitmap, cliprect, m_spriteram  , 5);
+	draw_background(machine(), bitmap, cliprect, 2 + m_char_bank[0], 1);
+	draw_foreground(machine(), bitmap, cliprect, 1);
+	draw_sprites(machine(), bitmap, cliprect, m_spriteram2, 4);
+	draw_sprites(machine(), bitmap, cliprect, m_spriteram  , 5);
 	return 0;
 }

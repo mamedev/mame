@@ -134,7 +134,7 @@ UINT32 interact_state::screen_update_interact(screen_device &screen, bitmap_ind1
 {
 	UINT8 *videoram = m_videoram;
 	screen.set_visible_area(0, 113, 0, 75);
-	hector_hr( screen.machine(), bitmap, videoram,  77, 32);
+	hector_hr( machine(), bitmap, videoram,  77, 32);
 	return 0;
 }
 

@@ -136,31 +136,31 @@ UINT32 lemmings_state::screen_update_lemmings(screen_device &screen, bitmap_rgb3
 	rect.max_y = cliprect.max_y;
 	rect.min_y = cliprect.min_y;
 
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_sprite_triple_buffer_1, 0x400, true);
-	screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_sprite_triple_buffer_0, 0x400, true);
+	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_sprite_triple_buffer_1, 0x400, true);
+	machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_sprite_triple_buffer_0, 0x400, true);
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x300, 0xff);
+	bitmap.fill(get_black_pen(machine()), cliprect);
+	machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x300, 0xff);
 
 	/* Pixel layer can be windowed in hardware (two player mode) */
 	if ((m_control_data[6] & 2) == 0)
 	{
-		lemmings_copy_bitmap(screen.machine(), bitmap, m_bitmap0, &x1, &y, cliprect);
+		lemmings_copy_bitmap(machine(), bitmap, m_bitmap0, &x1, &y, cliprect);
 	}
 	else
 	{
 		rect.max_x = 159;
 		rect.min_x = 0;
-		lemmings_copy_bitmap(screen.machine(), bitmap, m_bitmap0, &x0, &y, rect);
+		lemmings_copy_bitmap(machine(), bitmap, m_bitmap0, &x0, &y, rect);
 
 		rect.max_x = 319;
 		rect.min_x = 160;
-		lemmings_copy_bitmap(screen.machine(), bitmap, m_bitmap0, &x1, &y, rect);
+		lemmings_copy_bitmap(machine(), bitmap, m_bitmap0, &x1, &y, rect);
 	}
 
-	screen.machine().device<decospr_device>("spritegen2")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x200, 0xff);
-	screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x300, 0xff);
+	machine().device<decospr_device>("spritegen2")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x200, 0xff);
+	machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x300, 0xff);
 	m_vram_tilemap->draw(bitmap, cliprect, 0, 0);
-	screen.machine().device<decospr_device>("spritegen2")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x200, 0xff);
+	machine().device<decospr_device>("spritegen2")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x200, 0xff);
 	return 0;
 }

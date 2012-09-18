@@ -376,22 +376,22 @@ UINT32 pacland_state::screen_update_pacland(screen_device &screen, bitmap_ind16 
 	/* draw high priority sprite pixels, setting priority bitmap to non-zero
        wherever there is a high-priority pixel; note that we draw to the bitmap
        which is safe because the bg_tilemap draw will overwrite everything */
-	screen.machine().priority_bitmap.fill(0x00, cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0);
+	machine().priority_bitmap.fill(0x00, cliprect);
+	draw_sprites(machine(), bitmap, cliprect, 0);
 
 	/* draw background */
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw low priority fg tiles */
-	draw_fg(screen.machine(), bitmap, cliprect, 0);
+	draw_fg(machine(), bitmap, cliprect, 0);
 
 	/* draw sprites with regular transparency */
-	draw_sprites(screen.machine(), bitmap, cliprect, 1);
+	draw_sprites(machine(), bitmap, cliprect, 1);
 
 	/* draw high priority fg tiles */
-	draw_fg(screen.machine(), bitmap, cliprect, 1);
+	draw_fg(machine(), bitmap, cliprect, 1);
 
 	/* draw sprite pixels with colortable values >= 0xf0, which have priority over everything */
-	draw_sprites(screen.machine(), bitmap, cliprect, 2);
+	draw_sprites(machine(), bitmap, cliprect, 2);
 	return 0;
 }

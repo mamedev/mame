@@ -24,7 +24,7 @@ UINT32 orion_state::screen_update_orion128(screen_device &screen, bitmap_ind16 &
 	int part1addr = (3-((m_orion128_video_page & 3) | orionproshift)) * 0x4000;
 	int part2addr = part1addr + 0x10000;
 	int video_mode = m_orion128_video_mode & m_video_mode_mask;
-	UINT8 *ram = screen.machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
 	for (x = 0; x < m_orion128_video_width; x++)
 	{

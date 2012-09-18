@@ -850,8 +850,8 @@ static void drawCrt( running_machine &machine, bitmap_rgb32 &bitmap,const rectan
 
 UINT32 dwarfd_state::screen_update_dwarfd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	drawCrt(screen.machine(), bitmap, cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
+	drawCrt(machine(), bitmap, cliprect);
 	return 0;
 }
 

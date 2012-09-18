@@ -90,7 +90,7 @@ UINT32 nc_state::screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, c
     {
 		int by;
 		/* 64 bytes per line */
-		char *line_ptr = ((char*)screen.machine().device<ram_device>(RAM_TAG)->pointer()) + m_display_memory_start + (y<<6);
+		char *line_ptr = ((char*)machine().device<ram_device>(RAM_TAG)->pointer()) + m_display_memory_start + (y<<6);
 
 		x = 0;
 		for (by=0; by<width>>3; by++)

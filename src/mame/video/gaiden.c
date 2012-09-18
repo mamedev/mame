@@ -643,7 +643,7 @@ static void drgnbowl_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 
 UINT32 gaiden_state::screen_update_gaiden(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	m_tile_bitmap_bg.fill(0x200, cliprect);
 	m_tile_bitmap_fg.fill(0, cliprect);
@@ -658,17 +658,17 @@ UINT32 gaiden_state::screen_update_gaiden(screen_device &screen, bitmap_rgb32 &b
 	m_text_layer->draw(m_tile_bitmap_fg, cliprect, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	gaiden_draw_sprites(screen.machine(), m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect);
+	gaiden_draw_sprites(machine(), m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(screen.machine(), bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);
+	blendbitmaps(machine(), bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);
 	return 0;
 
 }
 
 UINT32 gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	m_tile_bitmap_bg.fill(0x200, cliprect);
 	m_tile_bitmap_fg.fill(0, cliprect);
@@ -683,20 +683,20 @@ UINT32 gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &bi
 	m_text_layer->draw(m_tile_bitmap_fg, cliprect, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	raiga_draw_sprites(screen.machine(), m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect);
+	raiga_draw_sprites(machine(), m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(screen.machine(), bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);
+	blendbitmaps(machine(), bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);
 	return 0;
 }
 
 UINT32 gaiden_state::screen_update_drgnbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	m_background->draw(bitmap, cliprect, 0, 1);
 	m_foreground->draw(bitmap, cliprect, 0, 2);
 	m_text_layer->draw(bitmap, cliprect, 0, 4);
-	drgnbowl_draw_sprites(screen.machine(), bitmap, cliprect);
+	drgnbowl_draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }

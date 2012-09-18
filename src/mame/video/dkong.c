@@ -955,7 +955,7 @@ VIDEO_START_MEMBER(dkong_state,dkong)
 UINT32 dkong_state::screen_update_dkong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	screen.machine().tilemap().set_flip_all(m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	machine().tilemap().set_flip_all(m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 	m_bg_tilemap->set_scrollx(0, m_flip ?  0 : 0);
 	m_bg_tilemap->set_scrolly(0, m_flip ? -8 : 0);
 
@@ -963,15 +963,15 @@ UINT32 dkong_state::screen_update_dkong(screen_device &screen, bitmap_ind16 &bit
 	{
 		case HARDWARE_TKG02:
 		case HARDWARE_TKG04:
-			check_palette(screen.machine());
+			check_palette(machine());
 			m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-			draw_sprites(screen.machine(), bitmap, cliprect, 0x40, 1);
+			draw_sprites(machine(), bitmap, cliprect, 0x40, 1);
 			break;
 		case HARDWARE_TRS01:
 		case HARDWARE_TRS02:
 			m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-			draw_sprites(screen.machine(), bitmap, cliprect, 0x40, 1);
-			radarscp_draw_background(screen.machine(), this, bitmap, cliprect);
+			draw_sprites(machine(), bitmap, cliprect, 0x40, 1);
+			radarscp_draw_background(machine(), this, bitmap, cliprect);
 			break;
 		default:
 			fatalerror("Invalid hardware type in dkong_video_update\n");
@@ -990,7 +990,7 @@ UINT32 dkong_state::screen_update_pestplce(screen_device &screen, bitmap_ind16 &
 	{
 		if (m_sprite_ram[offs])
 		{
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					m_sprite_ram[offs + 2],
 					(m_sprite_ram[offs + 1] & 0x0f) + 16 * m_palette_bank,
 					m_sprite_ram[offs + 1] & 0x80,m_sprite_ram[offs + 1] & 0x40,
@@ -1006,6 +1006,6 @@ UINT32 dkong_state::screen_update_spclforc(screen_device &screen, bitmap_ind16 &
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* it uses sprite_ram[offs + 2] & 0x10 for sprite bank */
-	draw_sprites(screen.machine(), bitmap, cliprect, 0x10, 3);
+	draw_sprites(machine(), bitmap, cliprect, 0x10, 3);
 	return 0;
 }

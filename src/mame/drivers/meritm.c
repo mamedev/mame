@@ -464,18 +464,18 @@ void meritm_state::video_start()
 
 UINT32 meritm_state::screen_update_meritm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if(screen.machine().input().code_pressed_once(KEYCODE_Q))
+	if(machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		m_layer0_enabled^=1;
 		popmessage("Layer 0 %sabled",m_layer0_enabled ? "en" : "dis");
 	}
-	if(screen.machine().input().code_pressed_once(KEYCODE_W))
+	if(machine().input().code_pressed_once(KEYCODE_W))
 	{
 		m_layer1_enabled^=1;
 		popmessage("Layer 1 %sabled",m_layer1_enabled ? "en" : "dis");
 	}
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if ( m_layer0_enabled )
 	{

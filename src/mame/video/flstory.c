@@ -208,9 +208,9 @@ UINT32 flstory_state::screen_update_flstory(screen_device &screen, bitmap_ind16 
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER1, 0);
 	m_bg_tilemap->draw(bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);
-	flstory_draw_sprites(screen.machine(), bitmap, cliprect, 0x00);
+	flstory_draw_sprites(machine(), bitmap, cliprect, 0x00);
 	m_bg_tilemap->draw(bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER0, 0);
-	flstory_draw_sprites(screen.machine(), bitmap, cliprect, 0x80);
+	flstory_draw_sprites(machine(), bitmap, cliprect, 0x80);
 	m_bg_tilemap->draw(bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }
@@ -263,7 +263,7 @@ static void victnine_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 UINT32 flstory_state::screen_update_victnine(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	victnine_draw_sprites(screen.machine(), bitmap, cliprect);
+	victnine_draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -271,9 +271,9 @@ UINT32 flstory_state::screen_update_rumba(screen_device &screen, bitmap_ind16 &b
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER1, 0);
 	m_bg_tilemap->draw(bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);
-	victnine_draw_sprites(screen.machine(), bitmap, cliprect);
+	victnine_draw_sprites(machine(), bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER0, 0);
-	victnine_draw_sprites(screen.machine(), bitmap, cliprect);
+	victnine_draw_sprites(machine(), bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

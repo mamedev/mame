@@ -141,7 +141,7 @@ UINT32 umipoker_state::screen_update_umipoker(screen_device &screen, bitmap_ind1
 	m_tilemap_2->set_scrolly(0, m_umipoker_scrolly[2]);
 	m_tilemap_3->set_scrolly(0, m_umipoker_scrolly[3]);
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	m_tilemap_0->draw(bitmap, cliprect, 0,0);
 	m_tilemap_1->draw(bitmap, cliprect, 0,0);

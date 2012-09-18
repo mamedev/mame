@@ -2658,7 +2658,7 @@ UINT32 dc_state::screen_update_dc(screen_device &screen, bitmap_rgb32 &bitmap, c
 //  int y,x;
 
 #if DEBUG_PALRAM
-	debug_paletteram(screen.machine());
+	debug_paletteram(machine());
 #endif
 
 	// copy our fake framebuffer bitmap (where things have been rendered) to the screen
@@ -2677,10 +2677,10 @@ UINT32 dc_state::screen_update_dc(screen_device &screen, bitmap_rgb32 &bitmap, c
 	bitmap.fill(MAKE_ARGB(0xff,vo_border_R,vo_border_G,vo_border_B), cliprect); //FIXME: Chroma bit?
 
 	if(!spg_blank_video)
-		pvr_drawframebuffer(screen.machine(),bitmap,cliprect);
+		pvr_drawframebuffer(machine(),bitmap,cliprect);
 
 	// update this here so we only do string lookup once per frame
-	debug_dip_status = screen.machine().root_device().ioport("MAMEDEBUG")->read();
+	debug_dip_status = machine().root_device().ioport("MAMEDEBUG")->read();
 
 	return 0;
 }

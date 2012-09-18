@@ -70,7 +70,7 @@ UINT32 thunderx_state::screen_update_scontra(screen_device &screen, bitmap_ind16
 
 	k052109_tilemap_update(m_k052109);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	/* The background color is always from layer 1 - but it's always black anyway */
 //  bitmap.fill(16 * m_layer_colorbase[1], cliprect);

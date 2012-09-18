@@ -295,11 +295,11 @@ UINT32 tmmjprd_state::screen_update_tmmjprd_left(screen_device &screen, bitmap_i
 {
 	UINT8* gfxroms = memregion("gfx2")->base();
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	ttmjprd_draw_tilemap( screen.machine(), bitmap, cliprect, m_tilemap_ram[3], m_tilemap_regs[3], gfxroms );
-	draw_sprites(screen.machine(),bitmap,cliprect, 1);
-	ttmjprd_draw_tilemap( screen.machine(), bitmap, cliprect, m_tilemap_ram[2], m_tilemap_regs[2], gfxroms );
+	ttmjprd_draw_tilemap( machine(), bitmap, cliprect, m_tilemap_ram[3], m_tilemap_regs[3], gfxroms );
+	draw_sprites(machine(),bitmap,cliprect, 1);
+	ttmjprd_draw_tilemap( machine(), bitmap, cliprect, m_tilemap_ram[2], m_tilemap_regs[2], gfxroms );
 
 	/*
     popmessage("%08x %08x %08x %08x %08x %08x",
@@ -329,11 +329,11 @@ UINT32 tmmjprd_state::screen_update_tmmjprd_right(screen_device &screen, bitmap_
 {
 	UINT8* gfxroms = memregion("gfx2")->base();
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	ttmjprd_draw_tilemap( screen.machine(), bitmap, cliprect, m_tilemap_ram[1], m_tilemap_regs[1], gfxroms );
-	draw_sprites(screen.machine(),bitmap,cliprect, 0);
-	ttmjprd_draw_tilemap( screen.machine(), bitmap, cliprect, m_tilemap_ram[0], m_tilemap_regs[0], gfxroms );
+	ttmjprd_draw_tilemap( machine(), bitmap, cliprect, m_tilemap_ram[1], m_tilemap_regs[1], gfxroms );
+	draw_sprites(machine(),bitmap,cliprect, 0);
+	ttmjprd_draw_tilemap( machine(), bitmap, cliprect, m_tilemap_ram[0], m_tilemap_regs[0], gfxroms );
 
 	return 0;
 }

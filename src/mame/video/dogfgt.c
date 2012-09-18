@@ -215,7 +215,7 @@ UINT32 dogfgt_state::screen_update_dogfgt(screen_device &screen, bitmap_ind16 &b
 
 	if (m_lastflip != flip_screen() || m_lastpixcolor != m_pixcolor)
 	{
-		address_space &space = *screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		m_lastflip = flip_screen();
 		m_lastpixcolor = m_pixcolor;
@@ -227,7 +227,7 @@ UINT32 dogfgt_state::screen_update_dogfgt(screen_device &screen, bitmap_ind16 &b
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 
 	copybitmap_trans(bitmap, m_pixbitmap, 0, 0, 0, 0, cliprect, PIXMAP_COLOR_BASE + 8 * m_pixcolor);
 	return 0;

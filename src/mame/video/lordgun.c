@@ -322,22 +322,22 @@ UINT32 lordgun_state::screen_update_lordgun(screen_device &screen, bitmap_ind16 
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (screen.machine().input().code_pressed(KEYCODE_Z))
+	if (machine().input().code_pressed(KEYCODE_Z))
 	{
 		int msk = 0;
 
-		if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-		if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-		if (screen.machine().input().code_pressed(KEYCODE_E))	msk |= 4;
-		if (screen.machine().input().code_pressed(KEYCODE_R))	msk |= 8;
-		if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 16;
+		if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+		if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+		if (machine().input().code_pressed(KEYCODE_E))	msk |= 4;
+		if (machine().input().code_pressed(KEYCODE_R))	msk |= 8;
+		if (machine().input().code_pressed(KEYCODE_A))	msk |= 16;
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
 
 	if (m_whitescreen)
 	{
-		bitmap.fill(get_white_pen(screen.machine()), cliprect);
+		bitmap.fill(get_white_pen(machine()), cliprect);
 		return 0;
 	}
 
@@ -373,7 +373,7 @@ UINT32 lordgun_state::screen_update_lordgun(screen_device &screen, bitmap_ind16 
 	if (layers_ctrl & 2)	m_tilemap[1]->draw(*m_bitmaps[1], cliprect, 0, 0);
 	if (layers_ctrl & 4)	m_tilemap[2]->draw(*m_bitmaps[2], cliprect, 0, 0);
 	if (layers_ctrl & 8)	m_tilemap[3]->draw(*m_bitmaps[3], cliprect, 0, 0);
-	if (layers_ctrl & 16)	draw_sprites(screen.machine(), *m_bitmaps[4], cliprect);
+	if (layers_ctrl & 16)	draw_sprites(machine(), *m_bitmaps[4], cliprect);
 
 	// copy to screen bitmap
 

@@ -94,7 +94,7 @@ UINT32 feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_ind1
 	UINT32 *spriteram32 = m_spriteram;
 	int offs,spr_offs,colour,sx,sy,h,w,dx,dy;
 
-	bitmap.fill(screen.machine().pens[0], cliprect); //black pen
+	bitmap.fill(machine().pens[0], cliprect); //black pen
 
 	for(offs=(0x2000/4)-2;offs>-1;offs-=2)
 	{
@@ -112,7 +112,7 @@ UINT32 feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_ind1
 
 		for(dx=0;dx<w;dx++)
 			for(dy=0;dy<h;dy++)
-				drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],spr_offs++,colour,0,0,(sx+dx*16),(sy+dy*16),0x3f);
+				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],spr_offs++,colour,0,0,(sx+dx*16),(sy+dy*16),0x3f);
 	}
 
 	return 0;

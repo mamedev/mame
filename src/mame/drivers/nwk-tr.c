@@ -276,10 +276,10 @@ static void voodoo_vblank_0(device_t *device, int param)
 
 UINT32 nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	device_t *voodoo = screen.machine().device("voodoo");
-	device_t *k001604 = screen.machine().device("k001604");
+	device_t *voodoo = machine().device("voodoo");
+	device_t *k001604 = machine().device("k001604");
 
-	bitmap.fill(screen.machine().pens[0], cliprect);
+	bitmap.fill(machine().pens[0], cliprect);
 
 	voodoo_update(voodoo, bitmap, cliprect);
 

@@ -130,14 +130,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 UINT32 psikyo4_state::screen_update_psikyo4_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x1000, cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0x0000);
+	draw_sprites(machine(), bitmap, cliprect, 0x0000);
 	return 0;
 }
 
 UINT32 psikyo4_state::screen_update_psikyo4_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x1001, cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0x2000);
+	draw_sprites(machine(), bitmap, cliprect, 0x2000);
 	return 0;
 }
 

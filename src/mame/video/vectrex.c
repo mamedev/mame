@@ -162,10 +162,10 @@ UINT32 vectrex_state::screen_update_vectrex(screen_device &screen, bitmap_rgb32 
 {
 	int i;
 
-	vectrex_configuration(screen.machine());
+	vectrex_configuration(machine());
 
 	/* start black */
-	vector_add_point(screen.machine(),
+	vector_add_point(machine(),
 					 m_points[m_display_start].x,
 					 m_points[m_display_start].y,
 					 m_points[m_display_start].col,
@@ -173,7 +173,7 @@ UINT32 vectrex_state::screen_update_vectrex(screen_device &screen, bitmap_rgb32 
 
 	for (i = m_display_start; i != m_display_end; i = (i + 1) % NVECT)
 	{
-		vector_add_point(screen.machine(),
+		vector_add_point(machine(),
 						 m_points[i].x,
 						 m_points[i].y,
 						 m_points[i].col,

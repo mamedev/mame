@@ -723,7 +723,7 @@ UINT32 metro_state::screen_update_metro(screen_device &screen, bitmap_ind16 &bit
 	m_sprite_yoffs = m_videoregs[0x04 / 2] - screen.height() / 2;
 
 	/* The background color is selected by a register */
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill((m_videoregs[0x12/2] & 0x0fff) + 0x1000, cliprect);
 
 	/*  Screen Control Register:
@@ -761,13 +761,13 @@ UINT32 metro_state::screen_update_metro(screen_device &screen, bitmap_ind16 &bit
 
 
 #ifdef MAME_DEBUG
-if (screen.machine().input().code_pressed(KEYCODE_Z))
+if (machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
-	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (screen.machine().input().code_pressed(KEYCODE_E))	msk |= 4;
-	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 8;
+	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_E))	msk |= 4;
+	if (machine().input().code_pressed(KEYCODE_A))	msk |= 8;
 	if (msk != 0)
 	{
 		bitmap.fill(0, cliprect);
@@ -785,9 +785,9 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 		k053936_zoom_draw(m_k053936, bitmap, cliprect, m_k053936_tilemap, 0, 0, 1);
 
 	for (pri = 3; pri >= 0; pri--)
-		draw_layers(screen.machine(), bitmap, cliprect, pri, layers_ctrl);
+		draw_layers(machine(), bitmap, cliprect, pri, layers_ctrl);
 
 	if (layers_ctrl & 0x08)
-		metro_draw_sprites(screen.machine(), bitmap, cliprect);
+		metro_draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }

@@ -184,7 +184,7 @@ UINT32 holeland_state::screen_update_holeland(screen_device &screen, bitmap_ind1
 {
 /*m_bg_tilemap->mark_all_dirty(); */
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	holeland_draw_sprites(screen.machine(), bitmap, cliprect);
+	holeland_draw_sprites(machine(), bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }
@@ -192,6 +192,6 @@ UINT32 holeland_state::screen_update_holeland(screen_device &screen, bitmap_ind1
 UINT32 holeland_state::screen_update_crzrally(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	crzrally_draw_sprites(screen.machine(), bitmap, cliprect);
+	crzrally_draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }

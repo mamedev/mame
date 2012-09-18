@@ -1792,7 +1792,7 @@ UINT32 snes_state::snes_screen_update( screen_device &screen, bitmap_rgb32 &bitm
 	/*NTSC SNES draw range is 1-225. */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		snes_refresh_scanline(screen.machine(), bitmap, y + 1);
+		snes_refresh_scanline(machine(), bitmap, y + 1);
 	}
 	return 0;
 }

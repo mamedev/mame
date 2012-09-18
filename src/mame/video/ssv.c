@@ -981,7 +981,7 @@ UINT32 ssv_state::screen_update_gdfs(screen_device &screen, bitmap_ind16 &bitmap
 	SCREEN_UPDATE16_CALL_MEMBER(ssv);
 
 	// draw zooming sprites
-	m_gdfs_st0020->st0020_draw_all(screen.machine(), bitmap, cliprect);
+	m_gdfs_st0020->st0020_draw_all(machine(), bitmap, cliprect);
 
 	m_gdfs_tmap->set_scrollx(0, m_gdfs_tmapscroll[0x0c/2]);
 	m_gdfs_tmap->set_scrolly(0, m_gdfs_tmapscroll[0x10/2]);
@@ -1039,9 +1039,9 @@ UINT32 ssv_state::screen_update_ssv(screen_device &screen, bitmap_ind16 &bitmap,
 	if (!m_enable_video)
 		return 0;
 
-	draw_layer(screen.machine(), bitmap, clip, 0);	// "background layer"
+	draw_layer(machine(), bitmap, clip, 0);	// "background layer"
 
-	draw_sprites(screen.machine(), bitmap, clip);	// sprites list
+	draw_sprites(machine(), bitmap, clip);	// sprites list
 
 
 	return 0;

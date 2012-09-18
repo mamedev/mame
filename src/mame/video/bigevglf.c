@@ -89,6 +89,6 @@ UINT32 bigevglf_state::screen_update_bigevglf(screen_device &screen, bitmap_ind1
 {
 
 	copybitmap(bitmap, m_tmp_bitmap[m_plane_visible], 0, 0, 0, 0, cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }

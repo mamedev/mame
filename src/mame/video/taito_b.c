@@ -367,7 +367,7 @@ g_profiler.stop();
 
 UINT32 taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = screen.machine().driver_data()->generic_space();
+	address_space &space = machine().driver_data()->generic_space();
 	UINT8 video_control = tc0180vcu_get_videoctrl(m_tc0180vcu, space, 0);
 
 	if ((video_control & 0x20) == 0)
@@ -379,7 +379,7 @@ UINT32 taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 &b
 	/* Draw playfields */
 	tc0180vcu_tilemap_draw(m_tc0180vcu, bitmap, cliprect, 0, 1);
 
-	draw_framebuffer(screen.machine(), bitmap, cliprect, 1);
+	draw_framebuffer(machine(), bitmap, cliprect, 1);
 
 	tc0180vcu_tilemap_draw(m_tc0180vcu, bitmap, cliprect, 1, 0);
 
@@ -392,7 +392,7 @@ UINT32 taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 &b
 		copyscrollbitmap_trans(bitmap, *m_pixel_bitmap, 1, &scrollx, 1, &scrolly, cliprect, m_b_fg_color_base * 16);
 	}
 
-	draw_framebuffer(screen.machine(), bitmap, cliprect, 0);
+	draw_framebuffer(machine(), bitmap, cliprect, 0);
 
 	tc0180vcu_tilemap_draw(m_tc0180vcu, bitmap, cliprect, 2, 0);
 
@@ -403,8 +403,8 @@ UINT32 taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 &b
 
 UINT32 taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = screen.machine().driver_data()->generic_space();
-	const rgb_t *palette = palette_entry_list_adjusted(screen.machine().palette);
+	address_space &space = machine().driver_data()->generic_space();
+	const rgb_t *palette = palette_entry_list_adjusted(machine().palette);
 	UINT8 video_control = tc0180vcu_get_videoctrl(m_tc0180vcu, space, 0);
 	int x, y;
 
@@ -418,12 +418,12 @@ UINT32 taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 
 	/* Draw the palettized playfields to an indexed bitmap */
 	tc0180vcu_tilemap_draw(m_tc0180vcu, *m_realpunc_bitmap, cliprect, 0, 1);
 
-	draw_framebuffer(screen.machine(), *m_realpunc_bitmap, cliprect, 1);
+	draw_framebuffer(machine(), *m_realpunc_bitmap, cliprect, 1);
 
 	tc0180vcu_tilemap_draw(m_tc0180vcu, *m_realpunc_bitmap, cliprect, 1, 0);
 
 	if (m_realpunc_video_ctrl & 0x0001)
-		draw_framebuffer(screen.machine(), *m_realpunc_bitmap, cliprect, 0);
+		draw_framebuffer(machine(), *m_realpunc_bitmap, cliprect, 0);
 
 	/* Copy the intermediate bitmap to the output bitmap, applying the palette */
 	for (y = 0; y <= cliprect.max_y; y++)
@@ -433,7 +433,7 @@ UINT32 taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 
 	/* Draw the 15bpp raw CRTC frame buffer directly to the output bitmap */
 	if (m_realpunc_video_ctrl & 0x0002)
 	{
-		device_t *hd63484 = screen.machine().device("hd63484");
+		device_t *hd63484 = machine().device("hd63484");
 
 		int base = (hd63484_regs_r(hd63484, space, 0xcc/2, 0xffff) << 16) + hd63484_regs_r(hd63484, space, 0xce/2, 0xffff);
 		int stride = hd63484_regs_r(hd63484, space, 0xca/2, 0xffff);
@@ -474,7 +474,7 @@ UINT32 taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 
 	m_realpunc_bitmap->fill(0, cliprect);
 
 	if (!(m_realpunc_video_ctrl & 0x0001))
-		draw_framebuffer(screen.machine(), *m_realpunc_bitmap, cliprect, 0);
+		draw_framebuffer(machine(), *m_realpunc_bitmap, cliprect, 0);
 
 	tc0180vcu_tilemap_draw(m_tc0180vcu, *m_realpunc_bitmap, cliprect, 2, 0);
 
@@ -498,12 +498,12 @@ void taitob_state::screen_eof_taitob(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		address_space &space = screen.machine().driver_data()->generic_space();
+		address_space &space = machine().driver_data()->generic_space();
 		UINT8 video_control = tc0180vcu_get_videoctrl(m_tc0180vcu, space, 0);
 		UINT8 framebuffer_page = tc0180vcu_get_fb_page(m_tc0180vcu, space, 0);
 
 		if (~video_control & 0x01)
-			m_framebuffer[framebuffer_page]->fill(0, screen.machine().primary_screen->visible_area());
+			m_framebuffer[framebuffer_page]->fill(0, machine().primary_screen->visible_area());
 
 		if (~video_control & 0x80)
 		{
@@ -511,6 +511,6 @@ void taitob_state::screen_eof_taitob(screen_device &screen, bool state)
 			tc0180vcu_set_fb_page(m_tc0180vcu, space, 0, framebuffer_page);
 		}
 
-		draw_sprites(screen.machine(), *m_framebuffer[framebuffer_page], screen.machine().primary_screen->visible_area());
+		draw_sprites(machine(), *m_framebuffer[framebuffer_page], machine().primary_screen->visible_area());
 	}
 }

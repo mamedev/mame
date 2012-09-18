@@ -897,33 +897,33 @@ UINT32 nmg5_state::screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitma
 
 	if (m_priority_reg == 0)
 	{
-		screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+		machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_bitmap(screen.machine(), bitmap);
+		draw_bitmap(machine(), bitmap);
 	}
 	else if (m_priority_reg == 1)
 	{
-		draw_bitmap(screen.machine(), bitmap);
-		screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+		draw_bitmap(machine(), bitmap);
+		machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else if (m_priority_reg == 2)
 	{
-		screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-		draw_bitmap(screen.machine(), bitmap);
+		machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+		draw_bitmap(machine(), bitmap);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else if (m_priority_reg == 3)
 	{
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-		screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-		draw_bitmap(screen.machine(), bitmap);
+		machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+		draw_bitmap(machine(), bitmap);
 	}
 	else if (m_priority_reg == 7)
 	{
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_bitmap(screen.machine(), bitmap);
-		screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+		draw_bitmap(machine(), bitmap);
+		machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	}
 	return 0;
 }

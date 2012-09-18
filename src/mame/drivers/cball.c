@@ -64,7 +64,7 @@ UINT32 cball_state::screen_update_cball(screen_device &screen, bitmap_ind16 &bit
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw sprite */
-	drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
+	drawgfx_transpen(bitmap, cliprect, machine().gfx[1],
 		m_video_ram[0x399] >> 4,
 		0,
 		0, 0,

@@ -299,7 +299,7 @@ UINT32 fastfred_state::screen_update_fastfred(screen_device &screen, bitmap_ind1
 {
 	bitmap.fill(*m_background_color, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 
 	return 0;
 }
@@ -364,9 +364,9 @@ VIDEO_START_MEMBER(fastfred_state,imago)
 UINT32 fastfred_state::screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_web_tilemap->draw(bitmap, cliprect, 0,0);
-	galaxold_draw_stars(screen.machine(), bitmap, cliprect);
+	galaxold_draw_stars(machine(), bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;

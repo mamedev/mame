@@ -260,7 +260,7 @@ UINT32 carrera_state::screen_update_carrera(screen_device &screen, bitmap_ind16 
 		{
 			int tile = m_tileram[count&0x7ff] | m_tileram[(count&0x7ff)+0x800]<<8;
 
-			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tile,0,0,0,x*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,machine().gfx[0],tile,0,0,0,x*8,y*8);
 			count++;
 		}
 	}

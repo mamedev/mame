@@ -2800,17 +2800,17 @@ UINT32 cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap
 	layercontrol = m_cps_b_regs[m_game_config->layer_control / 2];
 
 	/* Get video memory base registers */
-	cps1_get_video_base(screen.machine());
+	cps1_get_video_base(machine());
 
 	/* Find the offset of the last sprite in the sprite table */
-	cps1_find_last_sprite(screen.machine());
+	cps1_find_last_sprite(machine());
 
 	if (m_cps_version == 2)
 	{
-		cps2_find_last_sprite(screen.machine());
+		cps2_find_last_sprite(machine());
 	}
 
-	cps1_update_transmasks(screen.machine());
+	cps1_update_transmasks(machine());
 
 	m_bg_tilemap[0]->set_scrollx(0, m_scroll1x);
 	m_bg_tilemap[0]->set_scrolly(0, m_scroll1y);
@@ -2852,7 +2852,7 @@ UINT32 cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap
 		// Maybe Capcom changed the background handling due to the problems that
 		// it caused on several monitors (because the background extended into the
 		// blanking area instead of going black, causing the monitor to clip).
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 	}
 
 	cps1_render_stars(screen, bitmap, cliprect);
@@ -2862,26 +2862,26 @@ UINT32 cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;
 	l3 = (layercontrol >> 0x0c) & 03;
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	if (m_cps_version == 1)
 	{
-		cps1_render_layer(screen.machine(), bitmap, cliprect, l0, 0);
+		cps1_render_layer(machine(), bitmap, cliprect, l0, 0);
 
 		if (l1 == 0)
-			cps1_render_high_layer(screen.machine(), bitmap, cliprect, l0); /* prepare mask for sprites */
+			cps1_render_high_layer(machine(), bitmap, cliprect, l0); /* prepare mask for sprites */
 
-		cps1_render_layer(screen.machine(), bitmap, cliprect, l1, 0);
+		cps1_render_layer(machine(), bitmap, cliprect, l1, 0);
 
 		if (l2 == 0)
-			cps1_render_high_layer(screen.machine(), bitmap, cliprect, l1); /* prepare mask for sprites */
+			cps1_render_high_layer(machine(), bitmap, cliprect, l1); /* prepare mask for sprites */
 
-		cps1_render_layer(screen.machine(), bitmap, cliprect, l2, 0);
+		cps1_render_layer(machine(), bitmap, cliprect, l2, 0);
 
 		if (l3 == 0)
-			cps1_render_high_layer(screen.machine(), bitmap, cliprect, l2); /* prepare mask for sprites */
+			cps1_render_high_layer(machine(), bitmap, cliprect, l2); /* prepare mask for sprites */
 
-		cps1_render_layer(screen.machine(), bitmap, cliprect, l3, 0);
+		cps1_render_layer(machine(), bitmap, cliprect, l3, 0);
 	}
 	else
 	{
@@ -2893,15 +2893,15 @@ UINT32 cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap
 		l3pri = (m_pri_ctrl >> 4 * l3) & 0x0f;
 
 #if 0
-if (	(cps2_port(screen.machine(), CPS2_OBJ_BASE) != 0x7080 && cps2_port(screen.machine(), CPS2_OBJ_BASE) != 0x7000) ||
-		cps2_port(screen.machine(), CPS2_OBJ_UK1) != 0x807d ||
-		(cps2_port(screen.machine(), CPS2_OBJ_UK2) != 0x0000 && cps2_port(screen.machine(), CPS2_OBJ_UK2) != 0x1101 && cps2_port(screen.machine(), CPS2_OBJ_UK2) != 0x0001))
+if (	(cps2_port(machine(), CPS2_OBJ_BASE) != 0x7080 && cps2_port(machine(), CPS2_OBJ_BASE) != 0x7000) ||
+		cps2_port(machine(), CPS2_OBJ_UK1) != 0x807d ||
+		(cps2_port(machine(), CPS2_OBJ_UK2) != 0x0000 && cps2_port(machine(), CPS2_OBJ_UK2) != 0x1101 && cps2_port(machine(), CPS2_OBJ_UK2) != 0x0001))
 	popmessage("base %04x uk1 %04x uk2 %04x",
-			cps2_port(screen.machine(), CPS2_OBJ_BASE),
-			cps2_port(screen.machine(), CPS2_OBJ_UK1),
-			cps2_port(screen.machine(), CPS2_OBJ_UK2));
+			cps2_port(machine(), CPS2_OBJ_BASE),
+			cps2_port(machine(), CPS2_OBJ_UK1),
+			cps2_port(machine(), CPS2_OBJ_UK2));
 
-if (0 && screen.machine().input().code_pressed(KEYCODE_Z))
+if (0 && machine().input().code_pressed(KEYCODE_Z))
 	popmessage("order: %d (%d) %d (%d) %d (%d) %d (%d)",l0,l0pri,l1,l1pri,l2,l2pri,l3,l3pri);
 #endif
 
@@ -2932,10 +2932,10 @@ if (0 && screen.machine().input().code_pressed(KEYCODE_Z))
 			}
 		}
 
-		cps1_render_layer(screen.machine(), bitmap, cliprect, l0, 1);
-		cps1_render_layer(screen.machine(), bitmap, cliprect, l1, 2);
-		cps1_render_layer(screen.machine(), bitmap, cliprect, l2, 4);
-		cps2_render_sprites(screen.machine(), bitmap, cliprect, primasks);
+		cps1_render_layer(machine(), bitmap, cliprect, l0, 1);
+		cps1_render_layer(machine(), bitmap, cliprect, l1, 2);
+		cps1_render_layer(machine(), bitmap, cliprect, l2, 4);
+		cps2_render_sprites(machine(), bitmap, cliprect, primasks);
 	}
 
 	return 0;
@@ -2948,7 +2948,7 @@ void cps_state::screen_eof_cps1(screen_device &screen, bool state)
 	{
 
 		/* Get video memory base registers */
-		cps1_get_video_base(screen.machine());
+		cps1_get_video_base(machine());
 
 		if (m_cps_version == 1)
 		{

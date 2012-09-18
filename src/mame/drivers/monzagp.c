@@ -74,25 +74,25 @@ UINT32 monzagp_state::screen_update_monzagp(screen_device &screen, bitmap_ind16 
 {
 	int x,y;
 
-	if(screen.machine().input().code_pressed_once(KEYCODE_Z))
+	if(machine().input().code_pressed_once(KEYCODE_Z))
 		m_bank--;
 
-	if(screen.machine().input().code_pressed_once(KEYCODE_X))
+	if(machine().input().code_pressed_once(KEYCODE_X))
 		m_bank++;
 
-	if(screen.machine().input().code_pressed_once(KEYCODE_Q))
+	if(machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		m_screenw--;
 		printf("%x\n",m_screenw);
 	}
 
-	if(screen.machine().input().code_pressed_once(KEYCODE_W))
+	if(machine().input().code_pressed_once(KEYCODE_W))
 	{
 		m_screenw++;
 		printf("%x\n",m_screenw);
 	}
 
-	if(screen.machine().input().code_pressed_once(KEYCODE_A))
+	if(machine().input().code_pressed_once(KEYCODE_A))
 	{
 		FILE * p=fopen("vram.bin","wb");
 		fwrite(&m_vram[0],1,0x10000,p);
@@ -104,7 +104,7 @@ UINT32 monzagp_state::screen_update_monzagp(screen_device &screen, bitmap_ind16 
 	{
 		for(x=0;x<256;x++)
 		{
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[m_bank&1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[m_bank&1],
 				m_vram[y*m_screenw+x],
 				//(m_vram[y*m_screenw+x]&0x3f)+(m_bank>>1)*64,
 				0,

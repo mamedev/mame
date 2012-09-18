@@ -84,9 +84,9 @@ UINT32 namcofl_state::screen_update_namcofl(screen_device &screen, bitmap_ind16 
 {
 	int pri;
 
-	namcofl_install_palette(screen.machine());
+	namcofl_install_palette(machine());
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect );
+	bitmap.fill(get_black_pen(machine()), cliprect );
 
 	for( pri=0; pri<16; pri++ )
 	{

@@ -466,7 +466,7 @@ UINT32 rabbit_state::screen_update_rabbit(screen_device &screen, bitmap_ind16 &b
 {
 	int prilevel;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 //  popmessage("%08x %08x", m_viewregs0[0], m_viewregs0[1]);
 //  popmessage("%08x %08x %08x %08x %08x %08x", m_tilemap_regs[0][0],m_tilemap_regs[0][1],m_tilemap_regs[0][2],m_tilemap_regs[0][3],m_tilemap_regs[0][4],m_tilemap_regs[0][5]);
@@ -484,16 +484,16 @@ UINT32 rabbit_state::screen_update_rabbit(screen_device &screen, bitmap_ind16 &b
 	/* prio isnt certain but seems to work.. */
 	for (prilevel = 0xf; prilevel >0; prilevel--)
 	{
-		if (prilevel == ((m_tilemap_regs[3][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen.machine(),bitmap,cliprect, 3);
-		if (prilevel == ((m_tilemap_regs[2][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen.machine(),bitmap,cliprect, 2);
-		if (prilevel == ((m_tilemap_regs[1][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen.machine(),bitmap,cliprect, 1);
-		if (prilevel == ((m_tilemap_regs[0][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen.machine(),bitmap,cliprect, 0);
+		if (prilevel == ((m_tilemap_regs[3][0]&0x0f000000)>>24)) rabbit_drawtilemap(machine(),bitmap,cliprect, 3);
+		if (prilevel == ((m_tilemap_regs[2][0]&0x0f000000)>>24)) rabbit_drawtilemap(machine(),bitmap,cliprect, 2);
+		if (prilevel == ((m_tilemap_regs[1][0]&0x0f000000)>>24)) rabbit_drawtilemap(machine(),bitmap,cliprect, 1);
+		if (prilevel == ((m_tilemap_regs[0][0]&0x0f000000)>>24)) rabbit_drawtilemap(machine(),bitmap,cliprect, 0);
 
 		if (prilevel == 0x09) // should it be selectable?
 		{
-			rabbit_clearspritebitmap(screen.machine(),bitmap,cliprect);
-			draw_sprites(screen.machine(),bitmap,cliprect);  // render to bitmap
-			draw_sprite_bitmap(screen.machine(),bitmap,cliprect); // copy bitmap to screen
+			rabbit_clearspritebitmap(machine(),bitmap,cliprect);
+			draw_sprites(machine(),bitmap,cliprect);  // render to bitmap
+			draw_sprite_bitmap(machine(),bitmap,cliprect); // copy bitmap to screen
 		}
 	}
 	return 0;

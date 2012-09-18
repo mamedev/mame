@@ -466,7 +466,7 @@ UINT32 bingor_state::screen_update_bingor(screen_device &screen, bitmap_rgb32 &b
 {
 	int x,y,count;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	count = (0x2000/2);
 
@@ -479,22 +479,22 @@ UINT32 bingor_state::screen_update_bingor(screen_device &screen, bitmap_rgb32 &b
 			color = (m_blit_ram[count] & 0xf000)>>12;
 
 			if(cliprect.contains(x+3, y))
-				bitmap.pix32(y, x+3) = screen.machine().pens[color];
+				bitmap.pix32(y, x+3) = machine().pens[color];
 
 			color = (m_blit_ram[count] & 0x0f00)>>8;
 
 			if(cliprect.contains(x+2, y))
-				bitmap.pix32(y, x+2) = screen.machine().pens[color];
+				bitmap.pix32(y, x+2) = machine().pens[color];
 
 			color = (m_blit_ram[count] & 0x00f0)>>4;
 
 			if(cliprect.contains(x+1, y))
-				bitmap.pix32(y, x+1) = screen.machine().pens[color];
+				bitmap.pix32(y, x+1) = machine().pens[color];
 
 			color = (m_blit_ram[count] & 0x000f)>>0;
 
 			if(cliprect.contains(x+0, y))
-				bitmap.pix32(y, x+0) = screen.machine().pens[color];
+				bitmap.pix32(y, x+0) = machine().pens[color];
 
 			count++;
 		}

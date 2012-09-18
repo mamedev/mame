@@ -949,9 +949,9 @@ UINT32 snk_state::screen_update_marvins(screen_device &screen, bitmap_ind16 &bit
 	m_fg_tilemap->set_scrolly(0, m_fg_scrolly);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	marvins_draw_sprites(screen.machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, 0, m_sprite_split_point>>2);
+	marvins_draw_sprites(machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, 0, m_sprite_split_point>>2);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	marvins_draw_sprites(screen.machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, m_sprite_split_point>>2, 25);
+	marvins_draw_sprites(machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, m_sprite_split_point>>2, 25);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -965,7 +965,7 @@ UINT32 snk_state::screen_update_tnk3(screen_device &screen, bitmap_ind16 &bitmap
 	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	tnk3_draw_sprites(screen.machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly);
+	tnk3_draw_sprites(machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -980,9 +980,9 @@ UINT32 snk_state::screen_update_ikari(screen_device &screen, bitmap_ind16 &bitma
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	ikari_draw_sprites(screen.machine(), bitmap, cliprect,  0, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2 );
-	ikari_draw_sprites(screen.machine(), bitmap, cliprect,  0, m_sp32_scrollx, m_sp32_scrolly, m_spriteram,         3 );
-	ikari_draw_sprites(screen.machine(), bitmap, cliprect, 25, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2 );
+	ikari_draw_sprites(machine(), bitmap, cliprect,  0, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2 );
+	ikari_draw_sprites(machine(), bitmap, cliprect,  0, m_sp32_scrollx, m_sp32_scrolly, m_spriteram,         3 );
+	ikari_draw_sprites(machine(), bitmap, cliprect, 25, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2 );
 
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
@@ -997,9 +997,9 @@ UINT32 snk_state::screen_update_gwar(screen_device &screen, bitmap_ind16 &bitmap
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	tdfever_draw_sprites(screen.machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2, 0, 0, m_sprite_split_point );
-	tdfever_draw_sprites(screen.machine(), bitmap, cliprect, m_sp32_scrollx, m_sp32_scrolly, m_spriteram,         3, 0, 0, 32 );
-	tdfever_draw_sprites(screen.machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2, 0, m_sprite_split_point, 64 );
+	tdfever_draw_sprites(machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2, 0, 0, m_sprite_split_point );
+	tdfever_draw_sprites(machine(), bitmap, cliprect, m_sp32_scrollx, m_sp32_scrolly, m_spriteram,         3, 0, 0, 32 );
+	tdfever_draw_sprites(machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly, m_spriteram + 0x800, 2, 0, m_sprite_split_point, 64 );
 
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
@@ -1015,7 +1015,7 @@ UINT32 snk_state::screen_update_tdfever(screen_device &screen, bitmap_ind16 &bit
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	tdfever_draw_sprites(screen.machine(), bitmap, cliprect, m_sp32_scrollx, m_sp32_scrolly, m_spriteram, 2, 1, 0, 32 );
+	tdfever_draw_sprites(machine(), bitmap, cliprect, m_sp32_scrollx, m_sp32_scrolly, m_spriteram, 2, 1, 0, 32 );
 
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 

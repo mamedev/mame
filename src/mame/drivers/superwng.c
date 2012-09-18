@@ -152,7 +152,7 @@ UINT32 superwng_state::screen_update_superwng(screen_device &screen, bitmap_ind1
 		int sy = m_colorram_bg[i];
 		int color = m_colorram_bg[i + 1] & 0xf;
 
-		drawgfx_transpen(bitmap, cliprect,screen.machine().gfx[1],
+		drawgfx_transpen(bitmap, cliprect,machine().gfx[1],
 						code,
 						color,
 						flip, flip,

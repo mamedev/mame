@@ -66,7 +66,7 @@ UINT32 spy_state::screen_update_spy(screen_device &screen, bitmap_ind16 &bitmap,
 
 	k052109_tilemap_update(m_k052109);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	if (!m_video_enable)
 		bitmap.fill(16 * m_layer_colorbase[0], cliprect);

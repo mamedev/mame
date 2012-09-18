@@ -111,11 +111,11 @@ UINT32 dblewing_state::screen_update_dblewing(screen_device &screen, bitmap_ind1
 	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);
 
 	bitmap.fill(0, cliprect); /* not Confirmed */
-	screen.machine().priority_bitmap.fill(0);
+	machine().priority_bitmap.fill(0);
 
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2);
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 4);
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
 }
 

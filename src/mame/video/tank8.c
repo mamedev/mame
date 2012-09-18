@@ -176,11 +176,11 @@ static TIMER_CALLBACK( tank8_collision_callback )
 
 UINT32 tank8_state::screen_update_tank8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(this, screen.machine().colortable);
+	set_pens(this, machine().colortable);
 	m_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	draw_sprites(screen.machine(), bitmap, cliprect);
-	draw_bullets(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
+	draw_bullets(machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -192,15 +192,15 @@ void tank8_state::screen_eof_tank8(screen_device &screen, bool state)
 	{
 		int x;
 		int y;
-		const rectangle &visarea = screen.machine().primary_screen->visible_area();
+		const rectangle &visarea = machine().primary_screen->visible_area();
 
 		m_tilemap->draw(m_helper1, visarea, 0, 0);
 
 		m_helper2.fill(8, visarea);
 		m_helper3.fill(8, visarea);
 
-		draw_sprites(screen.machine(), m_helper2, visarea);
-		draw_bullets(screen.machine(), m_helper3, visarea);
+		draw_sprites(machine(), m_helper2, visarea);
+		draw_bullets(machine(), m_helper3, visarea);
 
 		for (y = visarea.min_y; y <= visarea.max_y; y++)
 		{
@@ -210,7 +210,7 @@ void tank8_state::screen_eof_tank8(screen_device &screen, bool state)
 			const UINT16* p2 = &m_helper2.pix16(y);
 			const UINT16* p3 = &m_helper3.pix16(y);
 
-			if (y % 2 != screen.machine().primary_screen->frame_number() % 2)
+			if (y % 2 != machine().primary_screen->frame_number() % 2)
 				continue; /* video display is interlaced */
 
 			for (x = visarea.min_x; x <= visarea.max_x; x++)
@@ -269,7 +269,7 @@ void tank8_state::screen_eof_tank8(screen_device &screen, bool state)
 						index |= 0x80; /* collision on right side */
 				}
 
-				screen.machine().scheduler().timer_set(screen.time_until_pos(y, x), FUNC(tank8_collision_callback), index);
+				machine().scheduler().timer_set(screen.time_until_pos(y, x), FUNC(tank8_collision_callback), index);
 
 				_state = 1;
 			}

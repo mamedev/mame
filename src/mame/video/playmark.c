@@ -496,12 +496,12 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const r
 UINT32 playmark_state::screen_update_bigtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	if (m_bg_enable)
-		draw_bitmap(screen.machine(), bitmap, cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect, 4);
+		draw_bitmap(machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect, 4);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -515,24 +515,24 @@ UINT32 playmark_state::screen_update_bigtwinb(screen_device &screen, bitmap_ind1
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-		bigtwinb_draw_sprites(screen.machine(), bitmap, cliprect, 4);
+		bigtwinb_draw_sprites(machine(), bitmap, cliprect, 4);
 		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 	return 0;
 }
 
 UINT32 playmark_state::screen_update_excelsr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 1);
 	if (m_bg_enable)
-		draw_bitmap(screen.machine(), bitmap, cliprect);
+		draw_bitmap(machine(), bitmap, cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
-	draw_sprites(screen.machine(), bitmap, cliprect, 2);
+	draw_sprites(machine(), bitmap, cliprect, 2);
 	return 0;
 }
 
@@ -553,11 +553,11 @@ UINT32 playmark_state::screen_update_wbeachvl(screen_device &screen, bitmap_ind1
 		m_fg_tilemap->set_scrollx(0, m_fgscrollx);
 	}
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
-	draw_sprites(screen.machine(), bitmap, cliprect, 0);
+	draw_sprites(machine(), bitmap, cliprect, 0);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -565,17 +565,17 @@ UINT32 playmark_state::screen_update_wbeachvl(screen_device &screen, bitmap_ind1
 UINT32 playmark_state::screen_update_hrdtimes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	// video enabled
 	if (m_scroll[6] & 1)
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
-		draw_sprites(screen.machine(), bitmap, cliprect, 2);
+		draw_sprites(machine(), bitmap, cliprect, 2);
 		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 	return 0;
 }

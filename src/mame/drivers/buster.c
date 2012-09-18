@@ -33,7 +33,7 @@ void buster_state::video_start()
 
 UINT32 buster_state::screen_update_buster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 	int count = 0x0000;
 
 	int y,x;

@@ -1099,7 +1099,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 
 void nv2a_renderer::vblank_callback(screen_device &screen, bool state)
 {
-	chihiro_state *chst=screen.machine().driver_data<chihiro_state>();
+	chihiro_state *chst=machine().driver_data<chihiro_state>();
 
 	printf("vblank_callback\n\r");
 	if (state == true)

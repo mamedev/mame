@@ -461,7 +461,7 @@ UINT32 berzerk_state::screen_update_berzerk(screen_device &screen, bitmap_rgb32 
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
-	get_pens(screen.machine(), pens);
+	get_pens(machine(), pens);
 
 	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{

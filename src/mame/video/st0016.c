@@ -586,16 +586,16 @@ static void draw_bgmap(running_machine &machine, bitmap_ind16 &bitmap,const rect
 
 void st0016_state::st0016_draw_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_bgmap(screen.machine(), bitmap,cliprect,0);
-	draw_sprites(screen.machine(), bitmap,cliprect);
-	draw_bgmap(screen.machine(), bitmap,cliprect,1);
+	draw_bgmap(machine(), bitmap,cliprect,0);
+	draw_sprites(machine(), bitmap,cliprect);
+	draw_bgmap(machine(), bitmap,cliprect,1);
 }
 
 UINT32 st0016_state::screen_update_st0016(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
 #ifdef MAME_DEBUG
-	if(screen.machine().input().code_pressed_once(KEYCODE_Z))
+	if(machine().input().code_pressed_once(KEYCODE_Z))
 	{
 		int h,j;
 		FILE *p=fopen("vram.bin","wb");

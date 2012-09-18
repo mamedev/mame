@@ -152,12 +152,12 @@ UINT32 highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rgb3
 			color = ((m_blit_ram[count]) & 0x00ff)>>0;
 
 			if(cliprect.contains((x*2)+0, y))
-				bitmap.pix32(y, (x*2)+0) = screen.machine().pens[color];
+				bitmap.pix32(y, (x*2)+0) = machine().pens[color];
 
 			color = ((m_blit_ram[count]) & 0xff00)>>8;
 
 			if(cliprect.contains((x*2)+1, y))
-				bitmap.pix32(y, (x*2)+1) = screen.machine().pens[color];
+				bitmap.pix32(y, (x*2)+1) = machine().pens[color];
 
 			count++;
 		}

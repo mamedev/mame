@@ -137,7 +137,7 @@ UINT32 drtomy_state::screen_update_drtomy(screen_device &screen, bitmap_ind16 &b
 
 	m_tilemap_bg->draw(bitmap, cliprect, 0, 0);
 	m_tilemap_fg->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }
 

@@ -220,7 +220,7 @@ UINT32 firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 
 	int sprite;
 	int gfxtop = screen.visible_area().min_y;
 
-	bitmap.fill(palette_get_color(screen.machine(), 256), cliprect);
+	bitmap.fill(palette_get_color(machine(), 256), cliprect);
 
 	for( sprite = 0; sprite < 32; sprite++ )
 	{
@@ -240,7 +240,7 @@ UINT32 firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 
 				int flipx = flags & 0x20;
 				int code = sprite_data[ 15 - row ] + ( 256 * ( ( flags >> 6 ) & 3 ) );
 
-				drawgfx_transpen( bitmap, cliprect, screen.machine().gfx[ 1 ], code, color, flipx, flipy, x + 8, gfxtop + 500 - y - ( row * 16 ), 0 );
+				drawgfx_transpen( bitmap, cliprect, machine().gfx[ 1 ], code, color, flipx, flipy, x + 8, gfxtop + 500 - y - ( row * 16 ), 0 );
 			}
 		}
 	}

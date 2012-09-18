@@ -2421,11 +2421,11 @@ VIDEO_START_MEMBER(namcos23_state,ss23)
 
 UINT32 namcos23_state::screen_update_ss23(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	render_run( screen.machine(), bitmap );
+	render_run( machine(), bitmap );
 
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 	gfx->mark_all_dirty();
 
 	m_bgtilemap->draw(bitmap, cliprect, 0/*flags*/, 0/*priority*/ ); /* opaque */

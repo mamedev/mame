@@ -605,7 +605,7 @@ UINT32 tmnt_state::screen_update_punkshot(screen_device &screen, bitmap_ind16 &b
 
 	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[0], TILEMAP_DRAW_OPAQUE, 1);
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[1], 0, 2);
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[2], 0, 4);
@@ -636,7 +636,7 @@ UINT32 tmnt_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16 &b
 
 	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[0], 0, 1);
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[1], 0, 2);
@@ -683,7 +683,7 @@ UINT32 tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 &b
 
 	/* not sure about the 053936 priority, but it seems to work */
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[0], 0, 1);
 
@@ -743,21 +743,21 @@ UINT32 tmnt_state::screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitm
 
 		// dim all colors before it
 		for (i = 0; i < cb; i++)
-			palette_set_pen_contrast(screen.machine(), i, brt);
+			palette_set_pen_contrast(machine(), i, brt);
 
 		// reset all colors in range
 		for (i = cb; i < ce; i++)
-			palette_set_pen_contrast(screen.machine(), i, 1.0);
+			palette_set_pen_contrast(machine(), i, 1.0);
 
 		// dim all colors after it
 		for (i = ce; i < 2048; i++)
-			palette_set_pen_contrast(screen.machine(), i, brt);
+			palette_set_pen_contrast(machine(), i, brt);
 
 		// toggle shadow/highlight
 		if (~m_dim_c & 0x10)
-			palette_set_shadow_mode(screen.machine(), 1);
+			palette_set_shadow_mode(machine(), 1);
 		else
-			palette_set_shadow_mode(screen.machine(), 0);
+			palette_set_shadow_mode(machine(), 0);
 	}
 
 	SCREEN_UPDATE16_CALL_MEMBER(lgtnfght);
@@ -786,7 +786,7 @@ UINT32 tmnt_state::screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bi
 
 	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[0], 0, 1);
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[1], 0, 2);

@@ -250,19 +250,19 @@ UINT32 gcpinbal_state::screen_update_gcpinbal(screen_device &screen, bitmap_ind1
 	UINT8 layer[3];
 
 #ifdef MAME_DEBUG
-	if (screen.machine().input().code_pressed_once(KEYCODE_V))
+	if (machine().input().code_pressed_once(KEYCODE_V))
 	{
 		m_dislayer[0] ^= 1;
 		popmessage("bg0: %01x", m_dislayer[0]);
 	}
 
-	if (screen.machine().input().code_pressed_once(KEYCODE_B))
+	if (machine().input().code_pressed_once(KEYCODE_B))
 	{
 		m_dislayer[1] ^= 1;
 		popmessage("bg1: %01x", m_dislayer[1]);
 	}
 
-	if (screen.machine().input().code_pressed_once(KEYCODE_N))
+	if (machine().input().code_pressed_once(KEYCODE_N))
 	{
 		m_dislayer[2] ^= 1;
 		popmessage("fg: %01x", m_dislayer[2]);
@@ -286,7 +286,7 @@ UINT32 gcpinbal_state::screen_update_gcpinbal(screen_device &screen, bitmap_ind1
 		m_tilemap[i]->set_scrolly(0, m_scrolly[i]);
 	}
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
 	layer[0] = 0;
@@ -310,7 +310,7 @@ UINT32 gcpinbal_state::screen_update_gcpinbal(screen_device &screen, bitmap_ind1
 	m_tilemap[layer[2]]->draw(bitmap, cliprect, 0, 4);
 
 
-	draw_sprites(screen.machine(), bitmap, cliprect, 16);
+	draw_sprites(machine(), bitmap, cliprect, 16);
 
 #if 0
 	{

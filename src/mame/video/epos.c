@@ -76,7 +76,7 @@ UINT32 epos_state::screen_update_epos(screen_device &screen, bitmap_rgb32 &bitma
 	pen_t pens[0x20];
 	offs_t offs;
 
-	get_pens(screen.machine(), pens);
+	get_pens(machine(), pens);
 
 	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{

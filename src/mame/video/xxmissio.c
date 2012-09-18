@@ -132,14 +132,14 @@ static void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_el
 
 UINT32 xxmissio_state::screen_update_xxmissio(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen.machine().tilemap().mark_all_dirty();
-	screen.machine().tilemap().set_flip_all(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	machine().tilemap().mark_all_dirty();
+	machine().tilemap().set_flip_all(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	m_bg_tilemap->set_scrollx(0, m_xscroll * 2);
 	m_bg_tilemap->set_scrolly(0, m_yscroll);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, cliprect, screen.machine().gfx[1]);
+	draw_sprites(bitmap, cliprect, machine().gfx[1]);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;

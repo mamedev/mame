@@ -132,7 +132,7 @@ UINT32 flkatck_state::screen_update_flkatck(screen_device &screen, bitmap_ind16 
 	rectangle clip[2];
 	const rectangle &visarea = screen.visible_area();
 
-	address_space &space = screen.machine().driver_data()->generic_space();
+	address_space &space = machine().driver_data()->generic_space();
 	if (m_flipscreen)
 	{
 		clip[0] = visarea;
@@ -165,7 +165,7 @@ UINT32 flkatck_state::screen_update_flkatck(screen_device &screen, bitmap_ind16 
 
 	/* draw the graphics */
 	m_k007121_tilemap[0]->draw(bitmap, clip[0], 0, 0);
-	k007121_sprites_draw(m_k007121, bitmap, cliprect, screen.machine().gfx[0], NULL, &m_k007121_ram[0x1000], 0, 40, 0, (UINT32)-1);
+	k007121_sprites_draw(m_k007121, bitmap, cliprect, machine().gfx[0], NULL, &m_k007121_ram[0x1000], 0, 40, 0, (UINT32)-1);
 	m_k007121_tilemap[1]->draw(bitmap, clip[1], 0, 0);
 	return 0;
 }

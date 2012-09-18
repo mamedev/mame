@@ -90,33 +90,33 @@ UINT32 itgambl2_state::screen_update_itgambl2(screen_device &screen, bitmap_rgb3
 	int x,y,count;
 	const UINT8 *blit_ram = memregion("gfx1")->base();
 
-	if(screen.machine().input().code_pressed(KEYCODE_Z))
+	if(machine().input().code_pressed(KEYCODE_Z))
 		m_test_x++;
 
-	if(screen.machine().input().code_pressed(KEYCODE_X))
+	if(machine().input().code_pressed(KEYCODE_X))
 		m_test_x--;
 
-	if(screen.machine().input().code_pressed(KEYCODE_A))
+	if(machine().input().code_pressed(KEYCODE_A))
 		m_test_y++;
 
-	if(screen.machine().input().code_pressed(KEYCODE_S))
+	if(machine().input().code_pressed(KEYCODE_S))
 		m_test_y--;
 
-	if(screen.machine().input().code_pressed(KEYCODE_Q))
+	if(machine().input().code_pressed(KEYCODE_Q))
 		m_start_offs+=0x200;
 
-	if(screen.machine().input().code_pressed(KEYCODE_W))
+	if(machine().input().code_pressed(KEYCODE_W))
 		m_start_offs-=0x200;
 
-	if(screen.machine().input().code_pressed(KEYCODE_E))
+	if(machine().input().code_pressed(KEYCODE_E))
 		m_start_offs++;
 
-	if(screen.machine().input().code_pressed(KEYCODE_R))
+	if(machine().input().code_pressed(KEYCODE_R))
 		m_start_offs--;
 
 	popmessage("%d %d %04x",m_test_x,m_test_y,m_start_offs);
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	count = (m_start_offs);
 
@@ -129,7 +129,7 @@ UINT32 itgambl2_state::screen_update_itgambl2(screen_device &screen, bitmap_rgb3
 			color = (blit_ram[count] & 0xff)>>0;
 
 			if(cliprect.contains(x, y))
-				bitmap.pix32(y, x) = screen.machine().pens[color];
+				bitmap.pix32(y, x) = machine().pens[color];
 
 			count++;
 		}

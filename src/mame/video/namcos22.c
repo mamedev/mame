@@ -2781,10 +2781,10 @@ VIDEO_START_MEMBER(namcos22_state,namcos22s)
 
 UINT32 namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UpdateVideoMixer(screen.machine());
-	UpdatePalette(screen.machine());
-	namcos22s_recalc_czram(screen.machine());
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	UpdateVideoMixer(machine());
+	UpdatePalette(machine());
+	namcos22s_recalc_czram(machine());
+	machine().priority_bitmap.fill(0, cliprect);
 
 	// background color
 	rgbint bg_color;
@@ -2799,16 +2799,16 @@ UINT32 namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb
 
 	// layers
 	UINT8 layer = nthbyte(m_gamma,0x1f);
-	if (layer&4) DrawCharacterLayer(screen.machine(), bitmap, cliprect);
-	if (layer&2) DrawSprites(screen.machine(), bitmap, cliprect);
-	if (layer&1) DrawPolygons(screen.machine(), bitmap);
-	RenderScene(screen.machine(), bitmap );
-	if (layer&4) namcos22s_mix_textlayer(screen.machine(), bitmap, cliprect, 6);
-	ApplyGamma(screen.machine(), bitmap);
+	if (layer&4) DrawCharacterLayer(machine(), bitmap, cliprect);
+	if (layer&2) DrawSprites(machine(), bitmap, cliprect);
+	if (layer&1) DrawPolygons(machine(), bitmap);
+	RenderScene(machine(), bitmap );
+	if (layer&4) namcos22s_mix_textlayer(machine(), bitmap, cliprect, 6);
+	ApplyGamma(machine(), bitmap);
 
 	// debug stuff
 #if ALLOW_MEMDUMP
-	if( screen.machine().input().code_pressed(KEYCODE_D) )
+	if( machine().input().code_pressed(KEYCODE_D) )
 	{
 		FILE *f = fopen( "dump.txt", "wb" );
 		if( f )
@@ -2852,7 +2852,7 @@ UINT32 namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb
 			//Dump(space, f,0xc00000, 0xc1ffff, "polygonram");
 			fclose( f );
 		}
-		while( screen.machine().input().code_pressed(KEYCODE_D) ){}
+		while( machine().input().code_pressed(KEYCODE_D) ){}
 	}
 #endif
 
@@ -2863,17 +2863,17 @@ UINT32 namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb
 
 UINT32 namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UpdateVideoMixer(screen.machine());
-	UpdatePalette(screen.machine());
-	screen.machine().priority_bitmap.fill(0, cliprect);
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	DrawPolygons(screen.machine(), bitmap);
-	RenderScene(screen.machine(), bitmap);
-	DrawCharacterLayer(screen.machine(), bitmap, cliprect);
-	ApplyGamma(screen.machine(), bitmap);
+	UpdateVideoMixer(machine());
+	UpdatePalette(machine());
+	machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
+	DrawPolygons(machine(), bitmap);
+	RenderScene(machine(), bitmap);
+	DrawCharacterLayer(machine(), bitmap, cliprect);
+	ApplyGamma(machine(), bitmap);
 
 #if ALLOW_MEMDUMP
-	if( screen.machine().input().code_pressed(KEYCODE_D) )
+	if( machine().input().code_pressed(KEYCODE_D) )
 	{
 		FILE *f = fopen( "dump.txt", "wb" );
 		if( f )
@@ -2887,7 +2887,7 @@ UINT32 namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb3
 			//Dump(space, f,0x70000000, 0x7001ffff, "polygonram");
 			fclose( f );
 		}
-		while( screen.machine().input().code_pressed(KEYCODE_D) ){}
+		while( machine().input().code_pressed(KEYCODE_D) ){}
 	}
 #endif
 

@@ -170,7 +170,7 @@ UINT32 namcos21_state::screen_update_namcos21(screen_device &screen, bitmap_ind1
 	UINT8 *videoram = m_videoram;
 	int pivot = 3;
 	int pri;
-	update_palette(screen.machine());
+	update_palette(machine());
 	bitmap.fill(0xff, cliprect );
 
 	if( m_gametype != NAMCOS21_WINRUN91 )
@@ -179,7 +179,7 @@ UINT32 namcos21_state::screen_update_namcos21(screen_device &screen, bitmap_ind1
 		c355_obj_draw(bitmap, cliprect, 14 );	//driver's eyes
 	}
 
-	CopyVisiblePolyFrameBuffer( screen.machine(), bitmap, cliprect, 0x7fc0, 0x7ffe );
+	CopyVisiblePolyFrameBuffer( machine(), bitmap, cliprect, 0x7fc0, 0x7ffe );
 
 	if( m_gametype != NAMCOS21_WINRUN91 )
 	{ /* draw low priority 2d sprites */
@@ -187,7 +187,7 @@ UINT32 namcos21_state::screen_update_namcos21(screen_device &screen, bitmap_ind1
 		c355_obj_draw(bitmap, cliprect, 1 );
 	}
 
-	CopyVisiblePolyFrameBuffer( screen.machine(), bitmap, cliprect, 0, 0x7fbf );
+	CopyVisiblePolyFrameBuffer( machine(), bitmap, cliprect, 0, 0x7fbf );
 
 
 	if( m_gametype != NAMCOS21_WINRUN91 )

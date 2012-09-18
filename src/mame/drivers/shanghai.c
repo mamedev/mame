@@ -78,10 +78,10 @@ void shanghai_state::video_start()
 
 UINT32 shanghai_state::screen_update_shanghai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *hd63484 = screen.machine().device("hd63484");
+	device_t *hd63484 = machine().device("hd63484");
 	int x, y, b, src;
 
-	address_space &space = screen.machine().driver_data()->generic_space();
+	address_space &space = machine().driver_data()->generic_space();
 	b = ((hd63484_regs_r(hd63484, space, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(hd63484, space, 0xce/2, 0xffff);
 	for (y = 0; y < 280; y++)
 	{

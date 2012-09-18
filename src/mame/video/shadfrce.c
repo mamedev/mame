@@ -153,18 +153,18 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 shadfrce_state::screen_update_shadfrce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	if (m_video_enable)
 	{
 		m_bg1tilemap->draw(bitmap, cliprect, 0,0);
 		m_bg0tilemap->draw(bitmap, cliprect, 0,1);
-		draw_sprites(screen.machine(), bitmap,cliprect);
+		draw_sprites(machine(), bitmap,cliprect);
 		m_fgtilemap->draw(bitmap, cliprect, 0,0);
 	}
 	else
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 	}
 
 	return 0;

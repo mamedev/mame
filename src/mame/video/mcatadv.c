@@ -202,8 +202,8 @@ UINT32 mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind16 
 {
 	int i;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	if (m_scroll1[2] != m_palette_bank1)
 	{
@@ -228,21 +228,21 @@ UINT32 mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind16 
 	for (i = 0; i <= 3; i++)
 	{
 	#ifdef MAME_DEBUG
-			if (!screen.machine().input().code_pressed(KEYCODE_Q))
+			if (!machine().input().code_pressed(KEYCODE_Q))
 	#endif
 			mcatadv_draw_tilemap_part(m_scroll1,  m_videoram1, i, m_tilemap1, bitmap, cliprect);
 
 	#ifdef MAME_DEBUG
-			if (!screen.machine().input().code_pressed(KEYCODE_W))
+			if (!machine().input().code_pressed(KEYCODE_W))
 	#endif
 				mcatadv_draw_tilemap_part(m_scroll2, m_videoram2, i, m_tilemap2, bitmap, cliprect);
 	}
 
 	g_profiler.start(PROFILER_USER1);
 #ifdef MAME_DEBUG
-	if (!screen.machine().input().code_pressed(KEYCODE_E))
+	if (!machine().input().code_pressed(KEYCODE_E))
 #endif
-		draw_sprites (screen.machine(), bitmap, cliprect);
+		draw_sprites (machine(), bitmap, cliprect);
 	g_profiler.stop();
 	return 0;
 }

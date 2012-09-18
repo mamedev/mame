@@ -179,17 +179,17 @@ UINT32 tp84_state::screen_update_tp84(screen_device &screen, bitmap_ind16 &bitma
 
 	if (cliprect.min_y == screen.visible_area().min_y)
 	{
-		screen.machine().tilemap().mark_all_dirty();
+		machine().tilemap().mark_all_dirty();
 
 		m_bg_tilemap->set_scrollx(0, *m_scroll_x);
 		m_bg_tilemap->set_scrolly(0, *m_scroll_y);
 
-		screen.machine().tilemap().set_flip_all(((*m_flipscreen_x & 0x01) ? TILEMAP_FLIPX : 0) |
+		machine().tilemap().set_flip_all(((*m_flipscreen_x & 0x01) ? TILEMAP_FLIPX : 0) |
 									   ((*m_flipscreen_y & 0x01) ? TILEMAP_FLIPY : 0));
 	}
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 
 	/* draw top status region */
 	clip.min_x = visarea.min_x;

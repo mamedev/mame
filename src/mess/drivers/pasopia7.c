@@ -309,16 +309,16 @@ UINT32 pasopia7_state::screen_update_pasopia7(screen_device &screen, bitmap_ind1
 {
 	int width;
 
-	bitmap.fill(screen.machine().pens[0], cliprect);
+	bitmap.fill(machine().pens[0], cliprect);
 
 	width = m_x_width ? 80 : 40;
 
 	if(m_gfx_mode)
-		draw_mixed_screen(screen.machine(),bitmap,cliprect,width);
+		draw_mixed_screen(machine(),bitmap,cliprect,width);
 	else
 	{
-		draw_cg4_screen(screen.machine(),bitmap,cliprect,width);
-		draw_tv_screen(screen.machine(),bitmap,cliprect,width);
+		draw_cg4_screen(machine(),bitmap,cliprect,width);
+		draw_tv_screen(machine(),bitmap,cliprect,width);
 	}
 
 	return 0;

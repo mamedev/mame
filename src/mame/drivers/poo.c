@@ -80,7 +80,7 @@ UINT32 poo_state::screen_update_unclepoo(screen_device &screen, bitmap_ind16 &bi
 {
 	int y,x;
 	int count;
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 
 	count = 0;
 

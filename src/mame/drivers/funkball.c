@@ -1137,7 +1137,7 @@ void funkball_state::machine_reset()
 
 UINT32 funkball_state::screen_update_funkball(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	voodoo_update(screen.machine().device("voodoo_0"), bitmap, cliprect);
+	voodoo_update(machine().device("voodoo_0"), bitmap, cliprect);
 	return 0;
 }
 

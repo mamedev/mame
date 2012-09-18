@@ -139,8 +139,8 @@ UINT32 tugboat_state::screen_update_tugboat(screen_device &screen, bitmap_ind16 
 	int startaddr1 = m_hd46505_1_reg[0x0c]*256 + m_hd46505_1_reg[0x0d];
 
 
-	draw_tilemap(screen.machine(), bitmap,cliprect,startaddr0,0,1,FALSE);
-	draw_tilemap(screen.machine(), bitmap,cliprect,startaddr1,2,3,TRUE);
+	draw_tilemap(machine(), bitmap,cliprect,startaddr0,0,1,FALSE);
+	draw_tilemap(machine(), bitmap,cliprect,startaddr1,2,3,TRUE);
 	return 0;
 }
 

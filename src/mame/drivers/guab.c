@@ -269,7 +269,7 @@ UINT32 guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bitma
 	/* If blanked, fill with black */
 	if (state.blanked)
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
@@ -283,8 +283,8 @@ UINT32 guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bitma
 			UINT8 pen = src[x >> 1];
 
 			/* Draw two 4-bit pixels */
-			*dest++ = screen.machine().pens[pen >> 4];
-			*dest++ = screen.machine().pens[pen & 0x0f];
+			*dest++ = machine().pens[pen >> 4];
+			*dest++ = machine().pens[pen & 0x0f];
 		}
 	}
 

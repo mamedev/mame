@@ -241,7 +241,7 @@ UINT32 nycaptor_state::screen_update_nycaptor(screen_device &screen, bitmap_ind1
 {
 
 #if NYCAPTOR_DEBUG
-	nycaptor_setmask(screen.machine());
+	nycaptor_setmask(machine());
 	if (m_mask & 0x1000)
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
@@ -252,46 +252,46 @@ UINT32 nycaptor_state::screen_update_nycaptor(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, 1);
-		draw_sprites(screen.machine(), bitmap, cliprect, 2);
-		draw_sprites(screen.machine(), bitmap, cliprect, 3);
-		draw_sprites(screen.machine(), bitmap, cliprect, 4);
-		draw_sprites(screen.machine(), bitmap, cliprect, 5);
-		draw_sprites(screen.machine(), bitmap, cliprect, 6);
-		draw_sprites(screen.machine(), bitmap, cliprect, 7);
+		draw_sprites(machine(), bitmap, cliprect, 0);
+		draw_sprites(machine(), bitmap, cliprect, 1);
+		draw_sprites(machine(), bitmap, cliprect, 2);
+		draw_sprites(machine(), bitmap, cliprect, 3);
+		draw_sprites(machine(), bitmap, cliprect, 4);
+		draw_sprites(machine(), bitmap, cliprect, 5);
+		draw_sprites(machine(), bitmap, cliprect, 6);
+		draw_sprites(machine(), bitmap, cliprect, 7);
 	}
 	else
 #endif
-	switch (nycaptor_spot(screen.machine()) & 3)
+	switch (nycaptor_spot(machine()) & 3)
 	{
 	case 0:
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, 6);
+		draw_sprites(machine(), bitmap, cliprect, 6);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, 3);
+		draw_sprites(machine(), bitmap, cliprect, 3);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, 2);
+		draw_sprites(machine(), bitmap, cliprect, 0);
+		draw_sprites(machine(), bitmap, cliprect, 2);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, 1);
+		draw_sprites(machine(), bitmap, cliprect, 1);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
 		break;
 
 	case 1:
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, 3);
+		draw_sprites(machine(), bitmap, cliprect, 3);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, 2);
+		draw_sprites(machine(), bitmap, cliprect, 2);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, 1);
+		draw_sprites(machine(), bitmap, cliprect, 1);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, 0);
+		draw_sprites(machine(), bitmap, cliprect, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
 		break;
@@ -300,20 +300,20 @@ UINT32 nycaptor_state::screen_update_nycaptor(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, 1);
+		draw_sprites(machine(), bitmap, cliprect, 1);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, 0);
+		draw_sprites(machine(), bitmap, cliprect, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
 		break;
 
 	case 3:
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, 1);
+		draw_sprites(machine(), bitmap, cliprect, 1);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, 0);
+		draw_sprites(machine(), bitmap, cliprect, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
 		break;

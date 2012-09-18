@@ -442,7 +442,7 @@ UINT32 centiped_state::screen_update_centiped(screen_device &screen, bitmap_ind1
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
 
-		drawgfx_transmask(bitmap, spriteclip, screen.machine().gfx[1], code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
+		drawgfx_transmask(bitmap, spriteclip, machine().gfx[1], code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
 	}
 	return 0;
 }
@@ -451,7 +451,7 @@ UINT32 centiped_state::screen_update_centiped(screen_device &screen, bitmap_ind1
 UINT32 centiped_state::screen_update_warlords(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *spriteram = m_spriteram;
-	int upright_mode = screen.machine().root_device().ioport("IN0")->read() & 0x80;
+	int upright_mode = machine().root_device().ioport("IN0")->read() & 0x80;
 	int offs;
 
 	/* if the cocktail/upright switch flipped, force refresh */
@@ -487,7 +487,7 @@ UINT32 centiped_state::screen_update_warlords(screen_device &screen, bitmap_ind1
 			flipx = !flipx;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1], code, color, flipx, flipy, x, y, 0);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, flipx, flipy, x, y, 0);
 	}
 	return 0;
 }
@@ -518,7 +518,7 @@ UINT32 centiped_state::screen_update_bullsdrt(screen_device &screen, bitmap_ind1
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
 
-		drawgfx_transpen(bitmap, spriteclip, screen.machine().gfx[1], code, color & 0x3f, 1, flipy, x, y, 0);
+		drawgfx_transpen(bitmap, spriteclip, machine().gfx[1], code, color & 0x3f, 1, flipy, x, y, 0);
 	}
 	return 0;
 }
@@ -555,7 +555,7 @@ UINT32 centiped_state::screen_update_milliped(screen_device &screen, bitmap_ind1
 			flipy = !flipy;
 		}
 
-		drawgfx_transmask(bitmap, spriteclip, screen.machine().gfx[1], code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
+		drawgfx_transmask(bitmap, spriteclip, machine().gfx[1], code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
 	}
 	return 0;
 }

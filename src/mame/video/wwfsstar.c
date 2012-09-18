@@ -222,7 +222,7 @@ UINT32 wwfsstar_state::screen_update_wwfsstar(screen_device &screen, bitmap_ind1
 	m_bg0_tilemap->set_scrollx(0, m_scrollx  );
 
 	m_bg0_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap,cliprect );
+	draw_sprites(machine(), bitmap,cliprect );
 	m_fg0_tilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;

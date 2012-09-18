@@ -103,8 +103,8 @@ UINT32 mlanding_state::screen_update_mlanding(screen_device &screen, bitmap_ind1
 		{
 			UINT16 srcpix = *src++;
 
-			*dst++ = screen.machine().pens[256+(srcpix & 0xff) + (m_pal_fg_bank & 1 ? 0x100 : 0x000)];
-			*dst++ = screen.machine().pens[256+(srcpix >> 8) + (m_pal_fg_bank & 1 ? 0x100 : 0x000)];
+			*dst++ = machine().pens[256+(srcpix & 0xff) + (m_pal_fg_bank & 1 ? 0x100 : 0x000)];
+			*dst++ = machine().pens[256+(srcpix >> 8) + (m_pal_fg_bank & 1 ? 0x100 : 0x000)];
 		}
 	}
 

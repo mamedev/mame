@@ -529,7 +529,7 @@ UINT32 psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 &b
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	flip_screen_set(~screen.machine().root_device().ioport("DSW")->read() & 0x00010000);		// hardwired to a DSW bit
+	flip_screen_set(~machine().root_device().ioport("DSW")->read() & 0x00010000);		// hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 
@@ -564,8 +564,8 @@ UINT32 psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 &b
 	/* For gfx banking for s1945jn/gunbird/btlkroad */
 	if (m_ka302c_banking)
 	{
-		psikyo_switch_banks(screen.machine(), 0, (layer0_ctrl & 0x400) >> 10);
-		psikyo_switch_banks(screen.machine(), 1, (layer1_ctrl & 0x400) >> 10);
+		psikyo_switch_banks(machine(), 0, (layer0_ctrl & 0x400) >> 10);
+		psikyo_switch_banks(machine(), 1, (layer1_ctrl & 0x400) >> 10);
 	}
 
 	switch ((layer0_ctrl & 0x00c0) >> 6)
@@ -664,9 +664,9 @@ UINT32 psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 &b
 	m_tilemap_1_size2->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
 	m_tilemap_1_size3->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	if (layers_ctrl & 1)
 		tmptilemap0->draw(bitmap, cliprect, layer0_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
@@ -675,7 +675,7 @@ UINT32 psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 &b
 		tmptilemap1->draw(bitmap, cliprect, layer1_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
 
 	if (layers_ctrl & 4)
-		draw_sprites(screen.machine(), bitmap, cliprect, (spr_ctrl & 4 ? 0 : 15));
+		draw_sprites(machine(), bitmap, cliprect, (spr_ctrl & 4 ? 0 : 15));
 
 	return 0;
 }
@@ -702,7 +702,7 @@ UINT32 psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitmap_
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	flip_screen_set(~screen.machine().root_device().ioport("DSW")->read() & 0x00010000);		// hardwired to a DSW bit
+	flip_screen_set(~machine().root_device().ioport("DSW")->read() & 0x00010000);		// hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 
@@ -737,8 +737,8 @@ UINT32 psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitmap_
 	/* For gfx banking for s1945jn/gunbird/btlkroad */
 	if (m_ka302c_banking)
 	{
-		psikyo_switch_banks(screen.machine(), 0, (layer0_ctrl & 0x400) >> 10);
-		psikyo_switch_banks(screen.machine(), 1, (layer1_ctrl & 0x400) >> 10);
+		psikyo_switch_banks(machine(), 0, (layer0_ctrl & 0x400) >> 10);
+		psikyo_switch_banks(machine(), 1, (layer1_ctrl & 0x400) >> 10);
 	}
 
 	switch ((layer0_ctrl & 0x00c0) >> 6)
@@ -837,9 +837,9 @@ UINT32 psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitmap_
 	m_tilemap_1_size2->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
 	m_tilemap_1_size3->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	if (layers_ctrl & 1)
 		tmptilemap0->draw(bitmap, cliprect, layer0_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
@@ -848,7 +848,7 @@ UINT32 psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitmap_
 		tmptilemap1->draw(bitmap, cliprect, layer1_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
 
 	if (layers_ctrl & 4)
-		draw_sprites_bootleg(screen.machine(), bitmap, cliprect, (spr_ctrl & 4 ? 0 : 15));
+		draw_sprites_bootleg(machine(), bitmap, cliprect, (spr_ctrl & 4 ? 0 : 15));
 
 	return 0;
 }

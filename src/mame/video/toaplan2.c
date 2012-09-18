@@ -293,13 +293,13 @@ UINT32 toaplan2_state::screen_update_toaplan2_dual(screen_device &screen, bitmap
 	{
 		bitmap.fill(0, cliprect);
 		m_custom_priority_bitmap.fill(0, cliprect);
-		m_vdp1->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
+		m_vdp1->gp9001_render_vdp(machine(), bitmap, cliprect);
 	}
 	if (m_vdp0)
 	{
 	//  bitmap.fill(0, cliprect);
 		m_custom_priority_bitmap.fill(0, cliprect);
-		m_vdp0->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
+		m_vdp0->gp9001_render_vdp(machine(), bitmap, cliprect);
 	}
 
 
@@ -318,13 +318,13 @@ UINT32 toaplan2_state::screen_update_toaplan2_mixed(screen_device &screen, bitma
 	{
 		bitmap.fill(0, cliprect);
 		m_custom_priority_bitmap.fill(0, cliprect);
-		m_vdp0->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
+		m_vdp0->gp9001_render_vdp(machine(), bitmap, cliprect);
 	}
 	if (m_vdp1)
 	{
 		m_secondary_render_bitmap.fill(0, cliprect);
 		m_custom_priority_bitmap.fill(0, cliprect);
-		m_vdp1->gp9001_render_vdp(screen.machine(), m_secondary_render_bitmap, cliprect);
+		m_vdp1->gp9001_render_vdp(machine(), m_secondary_render_bitmap, cliprect);
 	}
 
 
@@ -414,7 +414,7 @@ UINT32 toaplan2_state::screen_update_toaplan2(screen_device &screen, bitmap_ind1
 	{
 		bitmap.fill(0, cliprect);
 		m_custom_priority_bitmap.fill(0, cliprect);
-		m_vdp0->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
+		m_vdp0->gp9001_render_vdp(machine(), bitmap, cliprect);
 	}
 
 	return 0;

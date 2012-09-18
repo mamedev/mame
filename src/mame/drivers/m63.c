@@ -369,7 +369,7 @@ UINT32 m63_state::screen_update_m63(screen_device &screen, bitmap_ind16 &bitmap,
 		m_bg_tilemap->set_scrolly(col, m_scrollram[col * 8]);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

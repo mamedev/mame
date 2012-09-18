@@ -29,8 +29,8 @@ UINT32 ondra_state::screen_update_ondra(screen_device &screen, bitmap_ind16 &bit
 		{
 			for (y = 127; y >=0; y--)
 			{
-				code1 = screen.machine().device<ram_device>(RAM_TAG)->pointer()[0xd700 + Vaddr + 0x80];
-				code2 = screen.machine().device<ram_device>(RAM_TAG)->pointer()[0xd700 + Vaddr + 0x00];
+				code1 = machine().device<ram_device>(RAM_TAG)->pointer()[0xd700 + Vaddr + 0x80];
+				code2 = machine().device<ram_device>(RAM_TAG)->pointer()[0xd700 + Vaddr + 0x00];
 				for (b = 0; b < 8; b++)
 				{
 					bitmap.pix16(2*y, x*8+b) =  ((code1 << b) & 0x80) ? 1 : 0;

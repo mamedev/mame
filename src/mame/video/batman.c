@@ -192,7 +192,7 @@ void batman_scanline_update(screen_device &screen, int scanline)
 
 UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = machine().priority_bitmap;
 	atarimo_rect_list rectlist;
 	bitmap_ind16 *mobitmap;
 	int x, y, r;

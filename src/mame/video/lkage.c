@@ -209,13 +209,13 @@ UINT32 lkage_state::screen_update_lkage(screen_device &screen, bitmap_ind16 &bit
 	m_bg_tilemap->set_scrollx(0, m_scroll[4]);
 	m_bg_tilemap->set_scrolly(0, m_scroll[5]);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	if ((m_vreg[2] & 0xf0) == 0xf0)
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, (m_vreg[1] & 2) ? 2 : 4);
 		m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 	}
 	else
 	{

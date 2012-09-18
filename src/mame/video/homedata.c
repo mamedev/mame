@@ -808,7 +808,7 @@ UINT32 homedata_state::screen_update_mrokumei(screen_device &screen, bitmap_ind1
 	/* blank screen */
 	if (m_vreg[0x3] == 0xc1 && m_vreg[0x4] == 0xc0 && m_vreg[0x5] == 0xff)
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
@@ -816,7 +816,7 @@ UINT32 homedata_state::screen_update_mrokumei(screen_device &screen, bitmap_ind1
 	if (flags != m_flipscreen)
 	{
 		m_flipscreen = flags;
-		screen.machine().tilemap().mark_all_dirty();
+		machine().tilemap().mark_all_dirty();
 	}
 
 	switch (m_vreg[0x3])
@@ -866,11 +866,11 @@ UINT32 homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind1
 	if (flags != m_flipscreen)
 	{
 		m_flipscreen = flags;
-		screen.machine().tilemap().mark_all_dirty();
+		machine().tilemap().mark_all_dirty();
 	}
 
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	pri = (m_bank & 0x70) >> 4;
 	for (i = 0; i < 4; i++)
@@ -912,11 +912,11 @@ UINT32 homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind1
 	if (flags != m_flipscreen)
 	{
 		m_flipscreen = flags;
-		screen.machine().tilemap().mark_all_dirty();
+		machine().tilemap().mark_all_dirty();
 	}
 
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	pri = (m_blitter_bank & 0x70) >> 4;
 	for (i = 0; i < 4; i++)
@@ -933,7 +933,7 @@ UINT32 homedata_state::screen_update_pteacher(screen_device &screen, bitmap_ind1
 	/* blank screen */
 	if (m_vreg[0x3] == 0xc1 && m_vreg[0x4] == 0xc0 && m_vreg[0x5] == 0xff)
 	{
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
@@ -941,7 +941,7 @@ UINT32 homedata_state::screen_update_pteacher(screen_device &screen, bitmap_ind1
 	if (flags != m_flipscreen)
 	{
 		m_flipscreen = flags;
-		screen.machine().tilemap().mark_all_dirty();
+		machine().tilemap().mark_all_dirty();
 	}
 
 	/* bit 2 of blitter_bank stretches characters horizontally by 3/2,

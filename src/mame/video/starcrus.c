@@ -408,7 +408,7 @@ UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind1
 	/* Draw ship 1 */
 	drawgfx_transpen(bitmap,
 			cliprect,
-			screen.machine().gfx[8+((m_s1_sprite&0x04)>>2)],
+			machine().gfx[8+((m_s1_sprite&0x04)>>2)],
 			(m_s1_sprite&0x03)^0x03,
 			0,
 			(m_s1_sprite&0x08)>>3, (m_s1_sprite&0x10)>>4,
@@ -418,7 +418,7 @@ UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind1
 	/* Draw ship 2 */
 	drawgfx_transpen(bitmap,
 			cliprect,
-			screen.machine().gfx[10+((m_s2_sprite&0x04)>>2)],
+			machine().gfx[10+((m_s2_sprite&0x04)>>2)],
 			(m_s2_sprite&0x03)^0x03,
 			0,
 			(m_s2_sprite&0x08)>>3, (m_s2_sprite&0x10)>>4,
@@ -428,7 +428,7 @@ UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind1
 	/* Draw score/projectile 1 */
 	drawgfx_transpen(bitmap,
 			cliprect,
-			screen.machine().gfx[(m_p1_sprite&0x0c)>>2],
+			machine().gfx[(m_p1_sprite&0x0c)>>2],
 			(m_p1_sprite&0x03)^0x03,
 			0,
 			0,0,
@@ -438,7 +438,7 @@ UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind1
 	/* Draw score/projectile 2 */
 	drawgfx_transpen(bitmap,
 			cliprect,
-			screen.machine().gfx[4+((m_p2_sprite&0x0c)>>2)],
+			machine().gfx[4+((m_p2_sprite&0x0c)>>2)],
 			(m_p2_sprite&0x03)^0x03,
 			0,
 			0,0,
@@ -451,23 +451,23 @@ UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind1
 		m_collision_reg = 0x00;
 
 		/* Check for collisions between ship1 and ship2 */
-		if (collision_check_s1s2(screen.machine()))
+		if (collision_check_s1s2(machine()))
 		{
 			m_collision_reg |= 0x08;
 		}
 		/* Check for collisions between ship1 and projectiles */
-		if (collision_check_s1p1p2(screen.machine()))
+		if (collision_check_s1p1p2(machine()))
 		{
 			m_collision_reg |= 0x02;
 		}
 		/* Check for collisions between ship1 and projectiles */
-		if (collision_check_s2p1p2(screen.machine()))
+		if (collision_check_s2p1p2(machine()))
 		{
 			m_collision_reg |= 0x01;
 		}
 		/* Check for collisions between ship1 and projectiles */
 		/* Note: I don't think this is used by the game */
-		if (collision_check_p1p2(screen.machine()))
+		if (collision_check_p1p2(machine()))
 		{
 			m_collision_reg |= 0x04;
 		}

@@ -251,7 +251,7 @@ UINT32 popper_state::screen_update_popper(screen_device &screen, bitmap_ind16 &b
 	m_ol_p123_tilemap->draw(bitmap, finalclip, TILEMAP_DRAW_LAYER1, 0);
 	m_ol_p0_tilemap->draw(bitmap, finalclip, TILEMAP_DRAW_LAYER1, 0);
 
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 
 	m_p123_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	m_p0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);

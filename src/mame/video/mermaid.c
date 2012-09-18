@@ -226,7 +226,7 @@ UINT32 mermaid_state::screen_update_mermaid(screen_device &screen, bitmap_ind16 
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -257,7 +257,7 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		const rectangle &visarea = screen.machine().primary_screen->visible_area();
+		const rectangle &visarea = machine().primary_screen->visible_area();
 		UINT8 *spriteram = m_spriteram;
 
 		int offs, offs2;
@@ -302,8 +302,8 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 
 			rect.min_x = sx;
 			rect.min_y = sy;
-			rect.max_x = sx + screen.machine().gfx[1]->width() - 1;
-			rect.max_y = sy + screen.machine().gfx[1]->height() - 1;
+			rect.max_x = sx + machine().gfx[1]->width() - 1;
+			rect.max_y = sy + machine().gfx[1]->height() - 1;
 
 			rect &= visarea;
 
@@ -314,9 +314,9 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 
 			m_bg_tilemap->draw(m_helper, rect, 0, 0);
 
-			drawgfx_transpen(m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+			drawgfx_transpen(m_helper2, rect, machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
-			m_coll_bit2 |= collision_check(screen.machine(), rect);
+			m_coll_bit2 |= collision_check(machine(), rect);
 
 			// check collision sprite - foreground
 
@@ -325,9 +325,9 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 
 			m_fg_tilemap->draw(m_helper, rect, 0, 0);
 
-			drawgfx_transpen(m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+			drawgfx_transpen(m_helper2, rect, machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
-			m_coll_bit1 |= collision_check(screen.machine(), rect);
+			m_coll_bit1 |= collision_check(machine(), rect);
 
 			// check collision sprite - sprite
 
@@ -363,12 +363,12 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 						sy2 = 240 - sy2;
 					}
 
-					drawgfx_transpen(m_helper, rect, screen.machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+					drawgfx_transpen(m_helper, rect, machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
 				}
 
-			drawgfx_transpen(m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+			drawgfx_transpen(m_helper2, rect, machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
-			m_coll_bit0 |= collision_check(screen.machine(), rect);
+			m_coll_bit0 |= collision_check(machine(), rect);
 		}
 
 		// check for bit 3 (sprite-sprite)
@@ -405,8 +405,8 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 
 			rect.min_x = sx;
 			rect.min_y = sy;
-			rect.max_x = sx + screen.machine().gfx[1]->width() - 1;
-			rect.max_y = sy + screen.machine().gfx[1]->height() - 1;
+			rect.max_x = sx + machine().gfx[1]->width() - 1;
+			rect.max_y = sy + machine().gfx[1]->height() - 1;
 
 			rect &= visarea;
 
@@ -444,12 +444,12 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 						sy2 = 240 - sy2;
 					}
 
-					drawgfx_transpen(m_helper, rect, screen.machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+					drawgfx_transpen(m_helper, rect, machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
 				}
 
-			drawgfx_transpen(m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+			drawgfx_transpen(m_helper2, rect, machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
-			m_coll_bit3 |= collision_check(screen.machine(), rect);
+			m_coll_bit3 |= collision_check(machine(), rect);
 		}
 
 		// check for bit 6
@@ -486,8 +486,8 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 
 			rect.min_x = sx;
 			rect.min_y = sy;
-			rect.max_x = sx + screen.machine().gfx[1]->width() - 1;
-			rect.max_y = sy + screen.machine().gfx[1]->height() - 1;
+			rect.max_x = sx + machine().gfx[1]->width() - 1;
+			rect.max_y = sy + machine().gfx[1]->height() - 1;
 
 			rect &= visarea;
 
@@ -525,12 +525,12 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 						sy2 = 240 - sy2;
 					}
 
-					drawgfx_transpen(m_helper, rect, screen.machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+					drawgfx_transpen(m_helper, rect, machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
 				}
 
-			drawgfx_transpen(m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+			drawgfx_transpen(m_helper2, rect, machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
-			m_coll_bit6 |= collision_check(screen.machine(), rect);
+			m_coll_bit6 |= collision_check(machine(), rect);
 		}
 	}
 }

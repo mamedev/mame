@@ -643,7 +643,7 @@ UINT32 pgm_state::screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap,
 
 	bitmap.fill(0x3ff, cliprect); // ddp2 igs logo needs 0x3ff
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	m_bg_tilemap->set_scrolly(0, m_videoregs[0x2000/2]);
 
@@ -653,7 +653,7 @@ UINT32 pgm_state::screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap,
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 2);
 
-	draw_sprites(this, screen.machine(), bitmap, m_spritebufferram, screen.machine().priority_bitmap);
+	draw_sprites(this, machine(), bitmap, m_spritebufferram, machine().priority_bitmap);
 
 	m_tx_tilemap->set_scrolly(0, m_videoregs[0x5000/2]);
 	m_tx_tilemap->set_scrollx(0, m_videoregs[0x6000/2]); // Check

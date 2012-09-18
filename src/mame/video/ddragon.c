@@ -243,7 +243,7 @@ UINT32 ddragon_state::screen_update_ddragon(screen_device &screen, bitmap_ind16 
 	m_bg_tilemap->set_scrolly(0, scrolly);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

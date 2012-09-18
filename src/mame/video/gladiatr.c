@@ -243,7 +243,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 UINT32 gladiatr_state::screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(), bitmap,cliprect);
+	draw_sprites(machine(), bitmap,cliprect);
 
 	/* the fg layer just selects the upper palette bank on underlying pixels */
 	{
@@ -290,10 +290,10 @@ UINT32 gladiatr_state::screen_update_gladiatr(screen_device &screen, bitmap_ind1
 		m_fg_tilemap->set_scrolly(0, m_fg_scrolly);
 
 		m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-		draw_sprites(screen.machine(), bitmap,cliprect);
+		draw_sprites(machine(), bitmap,cliprect);
 		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	}
 	else
-		bitmap.fill(get_black_pen(screen.machine()), cliprect );
+		bitmap.fill(get_black_pen(machine()), cliprect );
 	return 0;
 }

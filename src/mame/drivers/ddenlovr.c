@@ -1307,7 +1307,7 @@ UINT32 dynax_state::screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &
 
 #if 0
 	static int base = 0x0;
-	const UINT8 *gfx = screen.machine().root_device().memregion("blitter")->base();
+	const UINT8 *gfx = machine().root_device().memregion("blitter")->base();
 	int next;
 	memset(m_ddenlovr_pixmap[0], 0, 512 * 512);
 	memset(m_ddenlovr_pixmap[1], 0, 512 * 512);
@@ -1318,38 +1318,38 @@ UINT32 dynax_state::screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &
 	m_ddenlovr_blit_pen_mode = 0;
 	m_ddenlovr_blit_y = 5;
 	m_ddenlovr_clip_ctrl = 0x0f;
-	next = blit_draw(screen.machine(), base, 0);
+	next = blit_draw(machine(), base, 0);
 	popmessage("GFX %06x", base);
-	if (screen.machine().input().code_pressed(KEYCODE_S)) base = next;
-	if (screen.machine().input().code_pressed_once(KEYCODE_X)) base = next;
-	if (screen.machine().input().code_pressed(KEYCODE_C)) { base--; while ((gfx[base] & 0xf0) != 0x30) base--; }
-	if (screen.machine().input().code_pressed(KEYCODE_V)) { base++; while ((gfx[base] & 0xf0) != 0x30) base++; }
-	if (screen.machine().input().code_pressed_once(KEYCODE_D)) { base--; while ((gfx[base] & 0xf0) != 0x30) base--; }
-	if (screen.machine().input().code_pressed_once(KEYCODE_F)) { base++; while ((gfx[base] & 0xf0) != 0x30) base++; }
+	if (machine().input().code_pressed(KEYCODE_S)) base = next;
+	if (machine().input().code_pressed_once(KEYCODE_X)) base = next;
+	if (machine().input().code_pressed(KEYCODE_C)) { base--; while ((gfx[base] & 0xf0) != 0x30) base--; }
+	if (machine().input().code_pressed(KEYCODE_V)) { base++; while ((gfx[base] & 0xf0) != 0x30) base++; }
+	if (machine().input().code_pressed_once(KEYCODE_D)) { base--; while ((gfx[base] & 0xf0) != 0x30) base--; }
+	if (machine().input().code_pressed_once(KEYCODE_F)) { base++; while ((gfx[base] & 0xf0) != 0x30) base++; }
 #endif
 
 	bitmap.fill(m_ddenlovr_bgcolor, cliprect);
 
 #ifdef MAME_DEBUG
-	if (screen.machine().input().code_pressed(KEYCODE_Z))
+	if (machine().input().code_pressed(KEYCODE_Z))
 	{
 		int mask, mask2;
 
 		mask = 0;
 
-		if (screen.machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
-		if (screen.machine().input().code_pressed(KEYCODE_W))	mask |= 2;
-		if (screen.machine().input().code_pressed(KEYCODE_E))	mask |= 4;
-		if (screen.machine().input().code_pressed(KEYCODE_R))	mask |= 8;
+		if (machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
+		if (machine().input().code_pressed(KEYCODE_W))	mask |= 2;
+		if (machine().input().code_pressed(KEYCODE_E))	mask |= 4;
+		if (machine().input().code_pressed(KEYCODE_R))	mask |= 8;
 
 		mask2 = 0;
 
 		if (m_extra_layers)
 		{
-			if (screen.machine().input().code_pressed(KEYCODE_A))	mask2 |= 1;
-			if (screen.machine().input().code_pressed(KEYCODE_S))	mask2 |= 2;
-			if (screen.machine().input().code_pressed(KEYCODE_D))	mask2 |= 4;
-			if (screen.machine().input().code_pressed(KEYCODE_F))	mask2 |= 8;
+			if (machine().input().code_pressed(KEYCODE_A))	mask2 |= 1;
+			if (machine().input().code_pressed(KEYCODE_S))	mask2 |= 2;
+			if (machine().input().code_pressed(KEYCODE_D))	mask2 |= 4;
+			if (machine().input().code_pressed(KEYCODE_F))	mask2 |= 8;
 		}
 
 		if (mask || mask2)
@@ -1368,10 +1368,10 @@ UINT32 dynax_state::screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &
 		pri = 0;
 	}
 
-	copylayer(screen.machine(), bitmap, cliprect, order[pri][0]);
-	copylayer(screen.machine(), bitmap, cliprect, order[pri][1]);
-	copylayer(screen.machine(), bitmap, cliprect, order[pri][2]);
-	copylayer(screen.machine(), bitmap, cliprect, order[pri][3]);
+	copylayer(machine(), bitmap, cliprect, order[pri][0]);
+	copylayer(machine(), bitmap, cliprect, order[pri][1]);
+	copylayer(machine(), bitmap, cliprect, order[pri][2]);
+	copylayer(machine(), bitmap, cliprect, order[pri][3]);
 
 	if (m_extra_layers)
 	{
@@ -1383,10 +1383,10 @@ UINT32 dynax_state::screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &
 			pri = 0;
 		}
 
-		copylayer(screen.machine(), bitmap, cliprect, order[pri][0] + 4);
-		copylayer(screen.machine(), bitmap, cliprect, order[pri][1] + 4);
-		copylayer(screen.machine(), bitmap, cliprect, order[pri][2] + 4);
-		copylayer(screen.machine(), bitmap, cliprect, order[pri][3] + 4);
+		copylayer(machine(), bitmap, cliprect, order[pri][0] + 4);
+		copylayer(machine(), bitmap, cliprect, order[pri][1] + 4);
+		copylayer(machine(), bitmap, cliprect, order[pri][2] + 4);
+		copylayer(machine(), bitmap, cliprect, order[pri][3] + 4);
 	}
 
 	m_ddenlovr_layer_enable = enab;

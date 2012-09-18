@@ -1073,8 +1073,8 @@ UINT32 sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind16 
 	globalyscroll += 8;
 	globalxscroll += 8;
 
-	bitmap.fill(screen.machine().pens[0], cliprect);
-	m_temp_reel_bitmap->fill(screen.machine().pens[0], cliprect);
+	bitmap.fill(machine().pens[0], cliprect);
+	m_temp_reel_bitmap->fill(machine().pens[0], cliprect);
 
 	/* render reels to bitmap */
 	sfbonus_draw_reel_layer(screen,*m_temp_reel_bitmap,cliprect,0);
@@ -1170,7 +1170,7 @@ UINT32 sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind16 
     m_1800_regs[7]);
 #endif
 
-	ipt = screen.machine().system().ipt;
+	ipt = machine().system().ipt;
 	if ((ipt == INPUT_PORTS_NAME(amcoe2_reels3)) || (ipt == INPUT_PORTS_NAME(amcoe2_reels4))
 		|| (ipt == INPUT_PORTS_NAME(amcoe2_poker)))
 	{

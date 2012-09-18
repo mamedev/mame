@@ -376,13 +376,13 @@ static void draw_shell(running_machine &machine,
 
 UINT32 tunhunt_state::screen_update_tunhunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(screen.machine());
+	set_pens(machine());
 
-	draw_box(screen.machine(), bitmap, cliprect);
+	draw_box(machine(), bitmap, cliprect);
 
-	draw_motion_object(screen.machine(), bitmap, cliprect);
+	draw_motion_object(machine(), bitmap, cliprect);
 
-	draw_shell(screen.machine(), bitmap, cliprect,
+	draw_shell(machine(), bitmap, cliprect,
 		m_workram[SHL0PC],	/* picture code */
 		m_workram[SHEL0H],	/* hposition */
 		m_workram[SHL0V],	/* vstart */
@@ -390,7 +390,7 @@ UINT32 tunhunt_state::screen_update_tunhunt(screen_device &screen, bitmap_ind16 
 		m_workram[SHL0ST],	/* vstretch */
 		m_control&0x08 ); /* hstretch */
 
-	draw_shell(screen.machine(), bitmap, cliprect,
+	draw_shell(machine(), bitmap, cliprect,
 		m_workram[SHL1PC],	/* picture code */
 		m_workram[SHEL1H],	/* hposition */
 		m_workram[SHL1V],	/* vstart */

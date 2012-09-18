@@ -2192,7 +2192,7 @@ UINT32 sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap
 
 	if (&screen != m_main_scr)
 	{
-		sscope = screen.machine().root_device().ioport("SEGASCOPE")->read_safe(0x00);
+		sscope = machine().root_device().ioport("SEGASCOPE")->read_safe(0x00);
 		if (!sscope)
 		{
 			occluded_view = 1;
@@ -2219,7 +2219,7 @@ UINT32 sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap
 		// save a copy of current bitmap for the binocular hack
 		if (sscope)
 		{
-			sscope_binocular_hack = screen.machine().root_device().ioport("SSCOPE_BINOCULAR")->read_safe(0x00);
+			sscope_binocular_hack = machine().root_device().ioport("SSCOPE_BINOCULAR")->read_safe(0x00);
 
 			if (&screen == m_left_lcd)
 			{
@@ -2239,7 +2239,7 @@ UINT32 sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap
 		// use the copied bitmap for the binocular hack
 		if (sscope)
 		{
-			sscope_binocular_hack = screen.machine().root_device().ioport("SSCOPE_BINOCULAR")->read_safe(0x00);
+			sscope_binocular_hack = machine().root_device().ioport("SSCOPE_BINOCULAR")->read_safe(0x00);
 
 			if (&screen == m_left_lcd)
 			{

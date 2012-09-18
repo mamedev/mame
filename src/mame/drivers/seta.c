@@ -1600,7 +1600,7 @@ void seta_state::screen_eof_seta_buffer_sprites(screen_device &screen, bool stat
 	// rising edge
 	if (state)
 	{
-		screen.machine().device<seta001_device>("spritegen")->setac_eof();
+		machine().device<seta001_device>("spritegen")->setac_eof();
 	}
 }
 

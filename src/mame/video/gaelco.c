@@ -191,7 +191,7 @@ UINT32 gaelco_state::screen_update_maniacsq(screen_device &screen, bitmap_ind16 
 	m_tilemap[1]->set_scrolly(0, m_vregs[2]);
 	m_tilemap[1]->set_scrollx(0, m_vregs[3]);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
 	m_tilemap[1]->draw(bitmap, cliprect, 3, 0);
@@ -206,7 +206,7 @@ UINT32 gaelco_state::screen_update_maniacsq(screen_device &screen, bitmap_ind16 
 	m_tilemap[1]->draw(bitmap, cliprect, 0, 4);
 	m_tilemap[0]->draw(bitmap, cliprect, 0, 4);
 
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -219,7 +219,7 @@ UINT32 gaelco_state::screen_update_bigkarnk(screen_device &screen, bitmap_ind16 
 	m_tilemap[1]->set_scrolly(0, m_vregs[2]);
 	m_tilemap[1]->set_scrollx(0, m_vregs[3]);
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
 	m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
@@ -246,6 +246,6 @@ UINT32 gaelco_state::screen_update_bigkarnk(screen_device &screen, bitmap_ind16 
 	m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 8);
 	m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 8);
 
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }

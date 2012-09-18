@@ -154,7 +154,7 @@ UINT32 silvmil_state::screen_update_silvmil(screen_device &screen, bitmap_ind16 
 
 	m_bg_layer->draw(bitmap, cliprect, 0, 0);
 	m_fg_layer->draw(bitmap, cliprect, 0, 0);
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
 }
 

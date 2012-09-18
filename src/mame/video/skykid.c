@@ -252,7 +252,7 @@ UINT32 skykid_state::screen_update_skykid(screen_device &screen, bitmap_ind16 &b
 		// draw low priority tiles
 		m_tx_tilemap->draw(bitmap, cliprect, pri, 0);
 
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 
 		// draw the other tiles
 		for (cat = 0; cat < 0xf; cat++)
@@ -260,7 +260,7 @@ UINT32 skykid_state::screen_update_skykid(screen_device &screen, bitmap_ind16 &b
 	}
 	else
 	{
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_sprites(machine(), bitmap, cliprect);
 		m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_ALL_CATEGORIES, 0);
 	}
 

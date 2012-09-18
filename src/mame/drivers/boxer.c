@@ -184,7 +184,7 @@ UINT32 boxer_state::screen_update_boxer(screen_device &screen, bitmap_ind16 &bit
 			UINT8 code = m_tile_ram[32 * i + j];
 
 			drawgfx_transpen(bitmap, cliprect,
-				screen.machine().gfx[2],
+				machine().gfx[2],
 				code,
 				0,
 				code & 0x40, code & 0x40,
@@ -193,7 +193,7 @@ UINT32 boxer_state::screen_update_boxer(screen_device &screen, bitmap_ind16 &bit
 		}
 	}
 
-	draw_boxer(screen.machine(), bitmap, cliprect);
+	draw_boxer(machine(), bitmap, cliprect);
 	return 0;
 }
 

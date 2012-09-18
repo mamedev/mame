@@ -59,7 +59,7 @@ WRITE8_MEMBER(dribling_state::dribling_colorram_w)
 
 UINT32 dribling_state::screen_update_dribling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *prombase = screen.machine().root_device().memregion("proms")->base();
+	UINT8 *prombase = machine().root_device().memregion("proms")->base();
 	UINT8 *gfxbase = memregion("gfx1")->base();
 	int x, y;
 

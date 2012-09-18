@@ -196,13 +196,13 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 
 UINT32 deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 	int y,x;
 
 	bitmap.fill(0, cliprect);
 
-	draw_sprites(screen.machine(), bitmap,cliprect,m_vram1,0x000);
-	draw_sprites(screen.machine(), bitmap,cliprect,m_vram0,0x100);
+	draw_sprites(machine(), bitmap,cliprect,m_vram1,0x000);
+	draw_sprites(machine(), bitmap,cliprect,m_vram0,0x100);
 
 	for (y=0;y<32;y++)
 	{

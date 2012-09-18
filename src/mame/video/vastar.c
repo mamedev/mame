@@ -202,14 +202,14 @@ UINT32 vastar_state::screen_update_vastar(screen_device &screen, bitmap_ind16 &b
 	{
 	case 0:
 		m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		draw_sprites(screen.machine(), bitmap,cliprect);
+		draw_sprites(machine(), bitmap,cliprect);
 		m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
 		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 
 	case 2:
 		m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		draw_sprites(screen.machine(), bitmap,cliprect);
+		draw_sprites(machine(), bitmap,cliprect);
 		m_bg1_tilemap->draw(bitmap, cliprect, 0,0);
 		m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
 		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
@@ -219,7 +219,7 @@ UINT32 vastar_state::screen_update_vastar(screen_device &screen, bitmap_ind16 &b
 		m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
 		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
-		draw_sprites(screen.machine(), bitmap,cliprect);
+		draw_sprites(machine(), bitmap,cliprect);
 		break;
 
 	default:

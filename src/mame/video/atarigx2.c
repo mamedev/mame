@@ -177,7 +177,7 @@ void atarigx2_scanline_update(screen_device &screen, int scanline)
 
 UINT32 atarigx2_state::screen_update_atarigx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = machine().priority_bitmap;
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);

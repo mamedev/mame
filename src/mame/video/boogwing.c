@@ -180,21 +180,21 @@ static void mix_boogwing(running_machine &machine, bitmap_rgb32 &bitmap, const r
 
 UINT32 boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = screen.machine().driver_data()->generic_space();
+	address_space &space = machine().driver_data()->generic_space();
 	UINT16 flip = deco16ic_pf_control_r(m_deco_tilegen1, space, 0, 0xffff);
 	UINT16 priority = decocomn_priority_r(m_decocomn, space, 0, 0xffff);
 
 	/* Draw sprite planes to bitmaps for later mixing */
-	screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);
-	screen.machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, true);
+	machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);
+	machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, true);
 
 	flip_screen_set(BIT(flip, 7));
 	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);
 	deco16ic_pf_update(m_deco_tilegen2, m_pf3_rowscroll, m_pf4_rowscroll);
 
 	/* Draw playfields */
-	bitmap.fill(screen.machine().pens[0x400], cliprect); /* pen not confirmed */
-	screen.machine().priority_bitmap.fill(0);
+	bitmap.fill(machine().pens[0x400], cliprect); /* pen not confirmed */
+	machine().priority_bitmap.fill(0);
 
 	// bit&0x8 is definitely some kind of palette effect
 	// bit&0x4 combines playfields
@@ -225,7 +225,7 @@ UINT32 boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rgb3
 		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 32);
 	}
 
-	mix_boogwing(screen.machine(), bitmap,cliprect);
+	mix_boogwing(machine(), bitmap,cliprect);
 
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;

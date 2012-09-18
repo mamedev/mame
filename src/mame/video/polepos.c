@@ -503,8 +503,8 @@ UINT32 polepos_state::screen_update_polepos(screen_device &screen, bitmap_ind16 
 	rectangle clip = cliprect;
 	clip.max_y = 127;
 	m_bg_tilemap->draw(bitmap, clip, 0,0);
-	draw_road(screen.machine(), bitmap);
-	draw_sprites(screen.machine(), bitmap,cliprect);
+	draw_road(machine(), bitmap);
+	draw_sprites(machine(), bitmap,cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

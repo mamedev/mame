@@ -2433,7 +2433,7 @@ UINT32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb3
 
 	if (gx_specialrozenable==3)
 	{
-		konamigx_mixer(screen.machine(), bitmap, cliprect, gx_psac_tilemap, GXSUB_8BPP,0,0,  0, 0, gx_rushingheroes_hack);
+		konamigx_mixer(machine(), bitmap, cliprect, gx_psac_tilemap, GXSUB_8BPP,0,0,  0, 0, gx_rushingheroes_hack);
 	}
 	// hack, draw the roz tilemap if W is held
 	// todo: fix so that it works with the mixer without crashing(!)
@@ -2448,11 +2448,11 @@ UINT32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb3
 		else K053936_0_zoom_draw(*type3_roz_temp_bitmap, temprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
 
 
-		konamigx_mixer(screen.machine(), bitmap, cliprect, 0, 0, 0, 0, 0, type3_roz_temp_bitmap, gx_rushingheroes_hack);
+		konamigx_mixer(machine(), bitmap, cliprect, 0, 0, 0, 0, 0, type3_roz_temp_bitmap, gx_rushingheroes_hack);
 	}
 	else
 	{
-		konamigx_mixer(screen.machine(), bitmap, cliprect, 0, 0, 0, 0, 0, 0, gx_rushingheroes_hack);
+		konamigx_mixer(machine(), bitmap, cliprect, 0, 0, 0, 0, 0, 0, gx_rushingheroes_hack);
 	}
 
 
@@ -2460,9 +2460,9 @@ UINT32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb3
 	/* Hack! draw type-1 roz layer here for testing purposes only */
 	if (gx_specialrozenable == 1)
 	{
-		const pen_t *paldata = screen.machine().pens;
+		const pen_t *paldata = machine().pens;
 
-		if ( screen.machine().input().code_pressed(KEYCODE_W) )
+		if ( machine().input().code_pressed(KEYCODE_W) )
 		{
 			int y,x;
 
@@ -2510,8 +2510,8 @@ UINT32 konamigx_state::screen_update_konamigx_left(screen_device &screen, bitmap
 			{
 				UINT32 coldat = m_generic_paletteram_32[offset];
 
-				set_color_555(screen.machine(), offset*2, 0, 5, 10,coldat >> 16);
-				set_color_555(screen.machine(), offset*2+1, 0, 5, 10,coldat & 0xffff);
+				set_color_555(machine(), offset*2, 0, 5, 10,coldat >> 16);
+				set_color_555(machine(), offset*2+1, 0, 5, 10,coldat & 0xffff);
 			}
 		}
 		else
@@ -2524,7 +2524,7 @@ UINT32 konamigx_state::screen_update_konamigx_left(screen_device &screen, bitmap
 				g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
 				b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 
-				palette_set_color(screen.machine(),offset,MAKE_RGB(r,g,b));
+				palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 			}
 		}
 
@@ -2557,8 +2557,8 @@ UINT32 konamigx_state::screen_update_konamigx_right(screen_device &screen, bitma
 			{
 				UINT32 coldat = m_subpaletteram32[offset];
 
-				set_color_555(screen.machine(), offset*2, 0, 5, 10,coldat >> 16);
-				set_color_555(screen.machine(), offset*2+1, 0, 5, 10,coldat & 0xffff);
+				set_color_555(machine(), offset*2, 0, 5, 10,coldat >> 16);
+				set_color_555(machine(), offset*2+1, 0, 5, 10,coldat & 0xffff);
 			}
 		}
 		else
@@ -2571,7 +2571,7 @@ UINT32 konamigx_state::screen_update_konamigx_right(screen_device &screen, bitma
 				g = (m_subpaletteram32[offset] >> 8) & 0xff;
 				b = (m_subpaletteram32[offset] >> 0) & 0xff;
 
-				palette_set_color(screen.machine(),offset,MAKE_RGB(r,g,b));
+				palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 			}
 		}
 

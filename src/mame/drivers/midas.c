@@ -190,18 +190,18 @@ UINT32 midas_state::screen_update_midas(screen_device &screen, bitmap_ind16 &bit
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if ( screen.machine().input().code_pressed(KEYCODE_Z) )
+	if ( machine().input().code_pressed(KEYCODE_Z) )
 	{
 		int msk = 0;
-		if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1 << 0;	// for m_tmap
-		if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 1 << 1;	// for sprites
+		if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1 << 0;	// for m_tmap
+		if (machine().input().code_pressed(KEYCODE_A))	msk |= 1 << 1;	// for sprites
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
 
 	bitmap.fill(4095, cliprect);
 
-	if (layers_ctrl & 2)	draw_sprites(screen.machine(), bitmap,cliprect);
+	if (layers_ctrl & 2)	draw_sprites(machine(), bitmap,cliprect);
 	if (layers_ctrl & 1)	m_tmap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;

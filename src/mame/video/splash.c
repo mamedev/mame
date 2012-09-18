@@ -261,10 +261,10 @@ UINT32 splash_state::screen_update_splash(screen_device &screen, bitmap_ind16 &b
 	m_bg_tilemap[0]->set_scrolly(0, m_vregs[0]);
 	m_bg_tilemap[1]->set_scrolly(0, m_vregs[1]);
 
-	draw_bitmap(screen.machine(), bitmap, cliprect);
+	draw_bitmap(machine(), bitmap, cliprect);
 
 	m_bg_tilemap[1]->draw(bitmap, cliprect, 0, 0);
-	splash_draw_sprites(screen.machine(), bitmap, cliprect);
+	splash_draw_sprites(machine(), bitmap, cliprect);
 	m_bg_tilemap[0]->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -276,11 +276,11 @@ UINT32 splash_state::screen_update_funystrp(screen_device &screen, bitmap_ind16 
 	m_bg_tilemap[0]->set_scrolly(0, m_vregs[0]);
 	m_bg_tilemap[1]->set_scrolly(0, m_vregs[1]);
 
-	draw_bitmap(screen.machine(), bitmap, cliprect);
+	draw_bitmap(machine(), bitmap, cliprect);
 
 	m_bg_tilemap[1]->draw(bitmap, cliprect, 0, 0);
 	/*Sprite chip is similar but not the same*/
-	funystrp_draw_sprites(screen.machine(), bitmap, cliprect);
+	funystrp_draw_sprites(machine(), bitmap, cliprect);
 	m_bg_tilemap[0]->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

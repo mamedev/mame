@@ -166,25 +166,25 @@ UINT32 cshooter_state::screen_update_cshooter(screen_device &screen, bitmap_ind1
 			{
 				int tile=0x30+((spriteram[i]>>2)&0x1f);
 
-				drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
+				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
 							spriteram[i+3],spriteram[i+2],3);
 
-				drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
+				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
 							spriteram[i+3]+8,spriteram[i+2],3);
 
-				drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
+				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
 							spriteram[i+3]+8,spriteram[i+2]+8,3);
 
-				drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
+				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,

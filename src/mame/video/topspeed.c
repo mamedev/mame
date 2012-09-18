@@ -114,31 +114,31 @@ UINT32 topspeed_state::screen_update_topspeed(screen_device &screen, bitmap_ind1
 	UINT8 layer[4];
 
 #ifdef MAME_DEBUG
-	if (screen.machine().input().code_pressed_once (KEYCODE_V))
+	if (machine().input().code_pressed_once (KEYCODE_V))
 	{
 		m_dislayer[0] ^= 1;
 		popmessage("bg: %01x", m_dislayer[0]);
 	}
 
-	if (screen.machine().input().code_pressed_once (KEYCODE_B))
+	if (machine().input().code_pressed_once (KEYCODE_B))
 	{
 		m_dislayer[1] ^= 1;
 		popmessage("fg: %01x", m_dislayer[1]);
 	}
 
-	if (screen.machine().input().code_pressed_once (KEYCODE_N))
+	if (machine().input().code_pressed_once (KEYCODE_N))
 	{
 		m_dislayer[2] ^= 1;
 		popmessage("bg2: %01x", m_dislayer[2]);
 	}
 
-	if (screen.machine().input().code_pressed_once (KEYCODE_M))
+	if (machine().input().code_pressed_once (KEYCODE_M))
 	{
 		m_dislayer[3] ^= 1;
 		popmessage("fg2: %01x", m_dislayer[3]);
 	}
 
-	if (screen.machine().input().code_pressed_once (KEYCODE_C))
+	if (machine().input().code_pressed_once (KEYCODE_C))
 	{
 		m_dislayer[4] ^= 1;
 		popmessage("sprites: %01x", m_dislayer[4]);
@@ -154,7 +154,7 @@ UINT32 topspeed_state::screen_update_topspeed(screen_device &screen, bitmap_ind1
 	layer[2] = 1;
 	layer[3] = 0;
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
 #ifdef MAME_DEBUG
@@ -181,6 +181,6 @@ UINT32 topspeed_state::screen_update_topspeed(screen_device &screen, bitmap_ind1
 	if (m_dislayer[4] == 0)
 #endif
 
-	draw_sprites(screen.machine(), bitmap,cliprect);
+	draw_sprites(machine(), bitmap,cliprect);
 	return 0;
 }

@@ -267,7 +267,7 @@ static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap,const re
 
 UINT32 dcon_state::screen_update_dcon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	/* Setup the tilemaps */
 	m_background_layer->set_scrollx(0, m_scroll_ram[0] );
@@ -286,14 +286,14 @@ UINT32 dcon_state::screen_update_dcon(screen_device &screen, bitmap_ind16 &bitma
 	m_foreground_layer->draw(bitmap, cliprect, 0,2);
 	m_text_layer->draw(bitmap, cliprect, 0,4);
 
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	draw_sprites(machine(),bitmap,cliprect);
 	return 0;
 }
 
 UINT32 dcon_state::screen_update_sdgndmps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
 	/* Gfx banking */
 	if (m_last_gfx_bank!=m_gfx_bank_select)
@@ -321,6 +321,6 @@ UINT32 dcon_state::screen_update_sdgndmps(screen_device &screen, bitmap_ind16 &b
 	m_foreground_layer->draw(bitmap, cliprect, 0,2);
 	m_text_layer->draw(bitmap, cliprect, 0,4);
 
-	draw_sprites(screen.machine(),bitmap,cliprect);
+	draw_sprites(machine(),bitmap,cliprect);
 	return 0;
 }

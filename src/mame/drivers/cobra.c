@@ -1000,7 +1000,7 @@ UINT32 cobra_state::screen_update_cobra(screen_device &screen, bitmap_rgb32 &bit
 
 	if (m_has_psac)
 	{
-		device_t *k001604 = screen.machine().device("k001604");
+		device_t *k001604 = machine().device("k001604");
 
 		k001604_draw_back_layer(k001604, bitmap, cliprect);
 		k001604_draw_front_layer(k001604, bitmap, cliprect);

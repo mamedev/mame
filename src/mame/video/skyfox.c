@@ -283,7 +283,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 UINT32 skyfox_state::screen_update_skyfox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(255, cliprect);	// the bg is black
-	draw_background(screen.machine(), bitmap, cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_background(machine(), bitmap, cliprect);
+	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }

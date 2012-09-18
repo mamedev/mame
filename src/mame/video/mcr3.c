@@ -278,7 +278,7 @@ UINT32 mcr3_state::screen_update_mcr3(screen_device &screen, bitmap_ind16 &bitma
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
-	mcr3_update_sprites(screen.machine(), bitmap, cliprect, 0x03, 0, 0, 0);
+	mcr3_update_sprites(machine(), bitmap, cliprect, 0x03, 0, 0, 0);
 	return 0;
 }
 
@@ -292,7 +292,7 @@ UINT32 mcr3_state::screen_update_spyhunt(screen_device &screen, bitmap_ind16 &bi
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
-	mcr3_update_sprites(screen.machine(), bitmap, cliprect, m_spyhunt_sprite_color_mask, 0, -12, 0);
+	mcr3_update_sprites(machine(), bitmap, cliprect, m_spyhunt_sprite_color_mask, 0, -12, 0);
 
 	/* render any characters on top */
 	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);

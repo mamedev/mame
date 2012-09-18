@@ -280,7 +280,7 @@ UINT32 toki_state::screen_update_toki(screen_device &screen, bitmap_ind16 &bitma
 		m_foreground_layer->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		m_background_layer->draw(bitmap, cliprect, 0,0);
 	}
-	toki_draw_sprites(screen.machine(), bitmap,cliprect);
+	toki_draw_sprites(machine(), bitmap,cliprect);
 	m_text_layer->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
@@ -302,7 +302,7 @@ UINT32 toki_state::screen_update_tokib(screen_device &screen, bitmap_ind16 &bitm
 		m_background_layer->draw(bitmap, cliprect, 0,0);
 	}
 
-	tokib_draw_sprites(screen.machine(), bitmap,cliprect);
+	tokib_draw_sprites(machine(), bitmap,cliprect);
 	m_text_layer->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

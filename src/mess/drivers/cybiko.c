@@ -301,7 +301,7 @@ void cybiko_state::palette_init()
 
 UINT32 cybiko_state::screen_update_cybiko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	hd66421_device *hd66421 = screen.machine().device<hd66421_device>( "hd66421" );
+	hd66421_device *hd66421 = machine().device<hd66421_device>( "hd66421" );
 	hd66421->update_screen(bitmap, cliprect);
 	return 0;
 }

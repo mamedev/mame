@@ -271,7 +271,7 @@ UINT32 angelkds_state::screen_update_angelkds(screen_device &screen, bitmap_ind1
 	if ((m_layer_ctrl & 0x80) == 0x00)
 		m_bgtop_tilemap->draw(bitmap, clip, 0, 0);
 
-	draw_sprites(screen.machine(), bitmap, clip, 0x80);
+	draw_sprites(machine(), bitmap, clip, 0x80);
 
 	if ((m_layer_ctrl & 0x20) == 0x00)
 		m_tx_tilemap->draw(bitmap, clip, 0, 0);
@@ -282,7 +282,7 @@ UINT32 angelkds_state::screen_update_angelkds(screen_device &screen, bitmap_ind1
 	if ((m_layer_ctrl & 0x40) == 0x00)
 		m_bgbot_tilemap->draw(bitmap, clip, 0, 0);
 
-	draw_sprites(screen.machine(), bitmap, clip, 0x40);
+	draw_sprites(machine(), bitmap, clip, 0x40);
 
 	if ((m_layer_ctrl & 0x20) == 0x00)
 		m_tx_tilemap->draw(bitmap, clip, 0, 0);

@@ -276,16 +276,16 @@ UINT32 appoooh_state::screen_update_appoooh(screen_device &screen, bitmap_ind16 
 	if (m_priority == 1)
 	{
 		/* sprite set #1 */
-		appoooh_draw_sprites(bitmap, cliprect, screen.machine().gfx[2], m_spriteram);
+		appoooh_draw_sprites(bitmap, cliprect, machine().gfx[2], m_spriteram);
 		/* sprite set #2 */
-		appoooh_draw_sprites(bitmap, cliprect, screen.machine().gfx[3], m_spriteram_2);
+		appoooh_draw_sprites(bitmap, cliprect, machine().gfx[3], m_spriteram_2);
 	}
 	else
 	{
 		/* sprite set #2 */
-		appoooh_draw_sprites(bitmap, cliprect, screen.machine().gfx[3], m_spriteram_2);
+		appoooh_draw_sprites(bitmap, cliprect, machine().gfx[3], m_spriteram_2);
 		/* sprite set #1 */
-		appoooh_draw_sprites(bitmap, cliprect, screen.machine().gfx[2], m_spriteram);
+		appoooh_draw_sprites(bitmap, cliprect, machine().gfx[2], m_spriteram);
 	}
 
 	if (m_priority != 0)	/* fg in front of sprites */
@@ -305,16 +305,16 @@ UINT32 appoooh_state::screen_update_robowres(screen_device &screen, bitmap_ind16
 	if (m_priority == 1)
 	{
 		/* sprite set #1 */
-		robowres_draw_sprites(bitmap, cliprect, screen.machine().gfx[2], m_spriteram);
+		robowres_draw_sprites(bitmap, cliprect, machine().gfx[2], m_spriteram);
 		/* sprite set #2 */
-		robowres_draw_sprites(bitmap, cliprect, screen.machine().gfx[3], m_spriteram_2);
+		robowres_draw_sprites(bitmap, cliprect, machine().gfx[3], m_spriteram_2);
 	}
 	else
 	{
 		/* sprite set #2 */
-		robowres_draw_sprites(bitmap, cliprect, screen.machine().gfx[3], m_spriteram_2);
+		robowres_draw_sprites(bitmap, cliprect, machine().gfx[3], m_spriteram_2);
 		/* sprite set #1 */
-		robowres_draw_sprites(bitmap, cliprect, screen.machine().gfx[2], m_spriteram);
+		robowres_draw_sprites(bitmap, cliprect, machine().gfx[2], m_spriteram);
 	}
 
 	if (m_priority != 0)	/* fg in front of sprites */

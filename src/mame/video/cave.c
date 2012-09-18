@@ -1532,7 +1532,7 @@ UINT32 cave_state::screen_update_cave(screen_device &screen, bitmap_ind16 &bitma
 	int pri, pri2, GFX;
 	int layers_ctrl = -1;
 
-	set_pens(screen.machine());
+	set_pens(machine());
 
 	m_blit.baseaddr = reinterpret_cast<UINT8 *>(bitmap.raw_pixptr(0));
 	m_blit.line_offset = bitmap.rowbytes();
@@ -1553,22 +1553,22 @@ UINT32 cave_state::screen_update_cave(screen_device &screen, bitmap_ind16 &bitma
 
 #ifdef MAME_DEBUG
 {
-	if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input().code_pressed(KEYCODE_X) || screen.machine().input().code_pressed(KEYCODE_C) ||
-    	 screen.machine().input().code_pressed(KEYCODE_V) || screen.machine().input().code_pressed(KEYCODE_B) )
+	if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed(KEYCODE_X) || machine().input().code_pressed(KEYCODE_C) ||
+    	 machine().input().code_pressed(KEYCODE_V) || machine().input().code_pressed(KEYCODE_B) )
 	{
 		int msk = 0, val = 0;
 
-		if (screen.machine().input().code_pressed(KEYCODE_X))	val = 1;	// priority 0 only
-		if (screen.machine().input().code_pressed(KEYCODE_C))	val = 2;	// ""       1
-		if (screen.machine().input().code_pressed(KEYCODE_V))	val = 4;	// ""       2
-		if (screen.machine().input().code_pressed(KEYCODE_B))	val = 8;	// ""       3
-		if (screen.machine().input().code_pressed(KEYCODE_Z))	val = 1|2|4|8;	// All of the above priorities
+		if (machine().input().code_pressed(KEYCODE_X))	val = 1;	// priority 0 only
+		if (machine().input().code_pressed(KEYCODE_C))	val = 2;	// ""       1
+		if (machine().input().code_pressed(KEYCODE_V))	val = 4;	// ""       2
+		if (machine().input().code_pressed(KEYCODE_B))	val = 8;	// ""       3
+		if (machine().input().code_pressed(KEYCODE_Z))	val = 1|2|4|8;	// All of the above priorities
 
-		if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= val <<  0;	// for layer 0
-		if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= val <<  4;	// for layer 1
-		if (screen.machine().input().code_pressed(KEYCODE_E))	msk |= val <<  8;	// for layer 2
-		if (screen.machine().input().code_pressed(KEYCODE_R))	msk |= val << 12;	// for layer 3
-		if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= val << 16;	// for sprites
+		if (machine().input().code_pressed(KEYCODE_Q))	msk |= val <<  0;	// for layer 0
+		if (machine().input().code_pressed(KEYCODE_W))	msk |= val <<  4;	// for layer 1
+		if (machine().input().code_pressed(KEYCODE_E))	msk |= val <<  8;	// for layer 2
+		if (machine().input().code_pressed(KEYCODE_R))	msk |= val << 12;	// for layer 3
+		if (machine().input().code_pressed(KEYCODE_A))	msk |= val << 16;	// for sprites
 		if (msk != 0) layers_ctrl &= msk;
 
 #if 1
@@ -1629,10 +1629,10 @@ UINT32 cave_state::screen_update_cave(screen_device &screen, bitmap_ind16 &bitma
 
 		for (pri2 = 0; pri2 <= 3; pri2++)	// priority of the whole layer
 		{
-			if (layers_ctrl & (1 << (pri +  0)))	cave_tilemap_draw(screen.machine(), bitmap, cliprect, pri, 0, pri2, 0);
-			if (layers_ctrl & (1 << (pri +  4)))	cave_tilemap_draw(screen.machine(), bitmap, cliprect, pri, 0, pri2, 1);
-			if (layers_ctrl & (1 << (pri +  8)))	cave_tilemap_draw(screen.machine(), bitmap, cliprect, pri, 0, pri2, 2);
-			if (layers_ctrl & (1 << (pri + 12)))	cave_tilemap_draw(screen.machine(), bitmap, cliprect, pri, 0, pri2, 3);
+			if (layers_ctrl & (1 << (pri +  0)))	cave_tilemap_draw(machine(), bitmap, cliprect, pri, 0, pri2, 0);
+			if (layers_ctrl & (1 << (pri +  4)))	cave_tilemap_draw(machine(), bitmap, cliprect, pri, 0, pri2, 1);
+			if (layers_ctrl & (1 << (pri +  8)))	cave_tilemap_draw(machine(), bitmap, cliprect, pri, 0, pri2, 2);
+			if (layers_ctrl & (1 << (pri + 12)))	cave_tilemap_draw(machine(), bitmap, cliprect, pri, 0, pri2, 3);
 		}
 	}
 	return 0;

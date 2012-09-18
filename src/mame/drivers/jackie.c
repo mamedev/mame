@@ -204,7 +204,7 @@ UINT32 jackie_state::screen_update_jackie(screen_device &screen, bitmap_ind16 &b
 	int startclipmin = 0;
 	const rectangle &visarea = screen.visible_area();
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	for (i=0;i < 0x40;i++)
 	{

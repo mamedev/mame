@@ -288,7 +288,7 @@ static void tecmosys_do_final_mix(running_machine &machine, bitmap_rgb32 &bitmap
 UINT32 tecmosys_state::screen_update_tecmosys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 
-	bitmap.fill(screen.machine().pens[0x4000], cliprect);
+	bitmap.fill(machine().pens[0x4000], cliprect);
 
 
 	m_bg0tilemap->set_scrolly(0, m_c80000regs[1]+16);
@@ -319,10 +319,10 @@ UINT32 tecmosys_state::screen_update_tecmosys(screen_device &screen, bitmap_rgb3
 	tecmosys_tilemap_copy_to_compose(this, 0xc000);
 
 
-	tecmosys_do_final_mix(screen.machine(), bitmap);
+	tecmosys_do_final_mix(machine(), bitmap);
 
 	// prepare sprites for NEXT frame - causes 1 frame palette errors, but prevents sprite lag in tkdensho, which is correct?
-	tecmosys_render_sprites_to_bitmap(screen.machine(), bitmap, m_880000regs[0x0], m_880000regs[0x1]);
+	tecmosys_render_sprites_to_bitmap(machine(), bitmap, m_880000regs[0x0], m_880000regs[0x1]);
 
 	return 0;
 }
