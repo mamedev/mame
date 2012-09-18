@@ -56,6 +56,7 @@ public:
 	virtual void palette_init();
 	DECLARE_VIDEO_START(pet_crtc);
 	UINT32 screen_update_pet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(pet_frame_interrupt);
 };
 
 /*----------- defined in video/pet.c -----------*/
@@ -81,9 +82,6 @@ extern const pia6821_interface pet_pia1;
 DECLARE_WRITE8_HANDLER(cbm8096_w);
 extern DECLARE_READ8_HANDLER(superpet_r);
 extern DECLARE_WRITE8_HANDLER(superpet_w);
-
-
-INTERRUPT_GEN( pet_frame_interrupt );
 
 MACHINE_CONFIG_EXTERN( pet_cartslot );
 MACHINE_CONFIG_EXTERN( pet4_cartslot );

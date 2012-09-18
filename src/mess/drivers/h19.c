@@ -397,7 +397,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_CPU_ADD("maincpu",Z80, H19_CLOCK) // From schematics
 	MCFG_CPU_PROGRAM_MAP(h19_mem)
 	MCFG_CPU_IO_MAP(h19_io)
-	//MCFG_DEVICE_PERIODIC_INT(irq0_line_hold, 50) // for testing, causes a keyboard scan
+	//MCFG_DEVICE_PERIODIC_INT_DRIVER(h19_state, irq0_line_hold,  50) // for testing, causes a keyboard scan
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

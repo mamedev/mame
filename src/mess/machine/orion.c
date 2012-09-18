@@ -365,12 +365,11 @@ MACHINE_RESET_MEMBER(orion_state,orionz80)
 	radio86_init_keyboard(machine());
 }
 
-INTERRUPT_GEN( orionz80_interrupt )
+INTERRUPT_GEN_MEMBER(orion_state::orionz80_interrupt)
 {
-	orion_state *state = device->machine().driver_data<orion_state>();
-	if ((state->m_orionz80_dispatcher & 0x40)==0x40)
+	if ((m_orionz80_dispatcher & 0x40)==0x40)
 	{
-		device->execute().set_input_line(0, HOLD_LINE);
+		device.execute().set_input_line(0, HOLD_LINE);
 	}
 }
 

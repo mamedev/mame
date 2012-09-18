@@ -691,9 +691,9 @@ ROM_END
 
 
 
-static INTERRUPT_GEN( bbcb_vsync )
+INTERRUPT_GEN_MEMBER(bbc_state::bbcb_vsync)
 {
-	via6522_device *via_0 = device->machine().device<via6522_device>("via6522_0");
+	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 	via_0->write_ca1(1);
 	via_0->write_ca1(0);
 }
@@ -841,8 +841,8 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 2000000)     	/* 2.00 MHz */
 	MCFG_CPU_PROGRAM_MAP( bbca_mem)
-	MCFG_CPU_VBLANK_INT("screen", bbcb_vsync)		/* screen refresh interrupts */
-	MCFG_CPU_PERIODIC_INT(bbcb_keyscan, 1000)		/* scan keyboard */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbc_state,  bbcb_vsync)		/* screen refresh interrupts */
+	MCFG_CPU_PERIODIC_INT_DRIVER(bbc_state, bbcb_keyscan,  1000)		/* scan keyboard */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbca )
@@ -933,8 +933,8 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, 2000000)        /* 2.00 MHz */
 	MCFG_CPU_PROGRAM_MAP( bbcm_mem)
-	MCFG_CPU_VBLANK_INT("screen", bbcb_vsync)				/* screen refresh interrupts */
-	MCFG_CPU_PERIODIC_INT(bbcm_keyscan, 1000)		/* scan keyboard */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbc_state,  bbcb_vsync)				/* screen refresh interrupts */
+	MCFG_CPU_PERIODIC_INT_DRIVER(bbc_state, bbcm_keyscan,  1000)		/* scan keyboard */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcm )

@@ -102,6 +102,7 @@ public:
 	DECLARE_DRIVER_INIT(sgi_ip2);
 	virtual void machine_start();
 	virtual void machine_reset();
+	INTERRUPT_GEN_MEMBER(sgi_ip2_vbl);
 };
 
 
@@ -367,7 +368,7 @@ static GENERIC_TERMINAL_INTERFACE( sgi_terminal_intf )
 };
 
 
-static INTERRUPT_GEN( sgi_ip2_vbl )
+INTERRUPT_GEN_MEMBER(sgi_ip2_state::sgi_ip2_vbl)
 {
 }
 
@@ -477,7 +478,7 @@ static MACHINE_CONFIG_START( sgi_ip2, sgi_ip2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020, 16000000)
 	MCFG_CPU_PROGRAM_MAP(sgi_ip2_map)
-	MCFG_CPU_VBLANK_INT(TERMINAL_TAG ":" TERMINAL_SCREEN_TAG, sgi_ip2_vbl)
+	MCFG_CPU_VBLANK_INT_DRIVER(TERMINAL_TAG ":" TERMINAL_SCREEN_TAG, sgi_ip2_state,  sgi_ip2_vbl)
 
 
 	/* video hardware */

@@ -102,6 +102,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_pc88va(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(pc88va_vrtc_irq);
 };
 
 
@@ -1562,9 +1563,9 @@ void pc88va_state::machine_reset()
 	machine().device("fdccpu")->execute().set_input_line_vector(0, 0);
 }
 
-static INTERRUPT_GEN( pc88va_vrtc_irq )
+INTERRUPT_GEN_MEMBER(pc88va_state::pc88va_vrtc_irq)
 {
-	pic8259_ir2_w(device->machine().device("pic8259_master"), 1);
+	pic8259_ir2_w(machine().device("pic8259_master"), 1);
 }
 
 /* Not sure if parameters are correct for pc88va (copied from x68k) */
@@ -1657,7 +1658,7 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_CPU_ADD("maincpu", V30, 8000000)        /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc88va_map)
 	MCFG_CPU_IO_MAP(pc88va_io_map)
-	MCFG_CPU_VBLANK_INT("screen",pc88va_vrtc_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc88va_state, pc88va_vrtc_irq)
 
 	MCFG_CPU_ADD("fdccpu", Z80, 8000000)        /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc88va_z80_map)

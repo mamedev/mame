@@ -245,6 +245,7 @@ public:
 	DECLARE_PALETTE_INIT(gbc);
 	DECLARE_MACHINE_START(gb_video);
 	DECLARE_MACHINE_START(gbc_video);
+	INTERRUPT_GEN_MEMBER(gb_scanline_interrupt);
 };
 
 
@@ -252,7 +253,6 @@ public:
 
 DEVICE_START(gb_cart);
 DEVICE_IMAGE_LOAD(gb_cart);
-INTERRUPT_GEN( gb_scanline_interrupt );
 void gb_timer_callback(lr35902_cpu_device *device, int cycles);
 
 

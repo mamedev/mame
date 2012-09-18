@@ -89,6 +89,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_ti990_10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(ti990_10_line_interrupt);
 };
 
 
@@ -106,12 +107,11 @@ void ti990_10_state::machine_reset()
 	ti990_hdc_init(machine(), ti990_set_int13);
 }
 
-static INTERRUPT_GEN( ti990_10_line_interrupt )
+INTERRUPT_GEN_MEMBER(ti990_10_state::ti990_10_line_interrupt)
 {
-	ti990_10_state *state = device->machine().driver_data<ti990_10_state>();
-	vdt911_keyboard(state->m_terminal);
+	vdt911_keyboard(m_terminal);
 
-	ti990_line_interrupt(device->machine());
+	ti990_line_interrupt(machine());
 }
 
 #ifdef UNUSED_FUNCTION
@@ -215,7 +215,7 @@ static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 	MCFG_CPU_CONFIG(reset_params)
 	MCFG_CPU_PROGRAM_MAP(ti990_10_memmap)
 	MCFG_CPU_IO_MAP(ti990_10_io)
-	MCFG_CPU_PERIODIC_INT(ti990_10_line_interrupt, 120/*or 100 in Europe*/)
+	MCFG_CPU_PERIODIC_INT_DRIVER(ti990_10_state, ti990_10_line_interrupt,  120/*or 100 in Europe*/)
 
 
 	/* video hardware - we emulate a single 911 vdt display */

@@ -262,7 +262,7 @@ static MACHINE_CONFIG_START( primoa32, primo_state )
 	MCFG_CPU_ADD( "maincpu", Z80, 2500000 )
 	MCFG_CPU_PROGRAM_MAP( primo32_mem)
 	MCFG_CPU_IO_MAP( primoa_port)
-	MCFG_CPU_VBLANK_INT("screen", primo_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", primo_state,  primo_vblank_interrupt)
 
 
 	/* video hardware */

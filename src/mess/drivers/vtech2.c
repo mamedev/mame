@@ -398,9 +398,9 @@ void vtech2_state::palette_init()
 		colortable_entry_set_value(machine().colortable, 512+i, i);
 }
 
-static INTERRUPT_GEN( vtech2_interrupt )
+INTERRUPT_GEN_MEMBER(vtech2_state::vtech2_interrupt)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 static const cassette_interface laser_cassette_interface =
@@ -430,7 +430,7 @@ static MACHINE_CONFIG_START( laser350, vtech2_state )
 	MCFG_CPU_ADD("maincpu", Z80, 3694700)        /* 3.694700 MHz */
 	MCFG_CPU_PROGRAM_MAP(vtech2_mem)
 	MCFG_CPU_IO_MAP(vtech2_io)
-	MCFG_CPU_VBLANK_INT("screen", vtech2_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vtech2_state,  vtech2_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 

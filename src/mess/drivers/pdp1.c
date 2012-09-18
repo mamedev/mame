@@ -1801,10 +1801,8 @@ static void pdp1_lightpen(running_machine &machine)
 /*
     Not a real interrupt - just handle keyboard input
 */
-INTERRUPT_GEN( pdp1_interrupt )
+INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 {
-	pdp1_state *state = device->machine().driver_data<pdp1_state>();
-	running_machine &machine = device->machine();
 	int control_keys;
 	int tw_keys;
 	int ta_keys;
@@ -1814,80 +1812,80 @@ INTERRUPT_GEN( pdp1_interrupt )
 	int ta_transitions;
 
 
-	device->state().set_state_int(PDP1_SS, device->machine().root_device().ioport("SENSE")->read());
+	device.state().set_state_int(PDP1_SS, machine().root_device().ioport("SENSE")->read());
 
 	/* read new state of control keys */
-	control_keys = state->ioport("CSW")->read();
+	control_keys = ioport("CSW")->read();
 
 	if (control_keys & pdp1_control)
 	{
 		/* compute transitions */
-		control_transitions = control_keys & (~ state->m_old_control_keys);
+		control_transitions = control_keys & (~ m_old_control_keys);
 
 		if (control_transitions & pdp1_extend)
 		{
-			device->state().set_state_int(PDP1_EXTEND_SW, ! device->state().state_int(PDP1_EXTEND_SW));
+			device.state().set_state_int(PDP1_EXTEND_SW, ! device.state().state_int(PDP1_EXTEND_SW));
 		}
 		if (control_transitions & pdp1_start_nobrk)
 		{
-			pdp1_pulse_start_clear(device);	/* pulse Start Clear line */
-			device->state().set_state_int(PDP1_EXD, device->state().state_int(PDP1_EXTEND_SW));
-			device->state().set_state_int(PDP1_SBM, (UINT64)0);
-			device->state().set_state_int(PDP1_OV, (UINT64)0);
-			device->state().set_state_int(PDP1_PC, device->state().state_int(PDP1_TA));
-			device->state().set_state_int(PDP1_RUN, 1);
+			pdp1_pulse_start_clear(&device);	/* pulse Start Clear line */
+			device.state().set_state_int(PDP1_EXD, device.state().state_int(PDP1_EXTEND_SW));
+			device.state().set_state_int(PDP1_SBM, (UINT64)0);
+			device.state().set_state_int(PDP1_OV, (UINT64)0);
+			device.state().set_state_int(PDP1_PC, device.state().state_int(PDP1_TA));
+			device.state().set_state_int(PDP1_RUN, 1);
 		}
 		if (control_transitions & pdp1_start_brk)
 		{
-			pdp1_pulse_start_clear(device);	/* pulse Start Clear line */
-			device->state().set_state_int(PDP1_EXD, device->state().state_int(PDP1_EXTEND_SW));
-			device->state().set_state_int(PDP1_SBM, 1);
-			device->state().set_state_int(PDP1_OV, (UINT64)0);
-			device->state().set_state_int(PDP1_PC, device->state().state_int(PDP1_TA));
-			device->state().set_state_int(PDP1_RUN, 1);
+			pdp1_pulse_start_clear(&device);	/* pulse Start Clear line */
+			device.state().set_state_int(PDP1_EXD, device.state().state_int(PDP1_EXTEND_SW));
+			device.state().set_state_int(PDP1_SBM, 1);
+			device.state().set_state_int(PDP1_OV, (UINT64)0);
+			device.state().set_state_int(PDP1_PC, device.state().state_int(PDP1_TA));
+			device.state().set_state_int(PDP1_RUN, 1);
 		}
 		if (control_transitions & pdp1_stop)
 		{
-			device->state().set_state_int(PDP1_RUN, (UINT64)0);
-			device->state().set_state_int(PDP1_RIM, (UINT64)0);	/* bug : we stop after reading an even-numbered word
+			device.state().set_state_int(PDP1_RUN, (UINT64)0);
+			device.state().set_state_int(PDP1_RIM, (UINT64)0);	/* bug : we stop after reading an even-numbered word
                                             (i.e. data), whereas a real pdp-1 stops after reading
                                             an odd-numbered word (i.e. dio instruciton) */
 		}
 		if (control_transitions & pdp1_continue)
 		{
-			device->state().set_state_int(PDP1_RUN, 1);
+			device.state().set_state_int(PDP1_RUN, 1);
 		}
 		if (control_transitions & pdp1_examine)
 		{
-			pdp1_pulse_start_clear(device);	/* pulse Start Clear line */
-			device->state().set_state_int(PDP1_PC, device->state().state_int(PDP1_TA));
-			device->state().set_state_int(PDP1_MA, device->state().state_int(PDP1_PC));
-			device->state().set_state_int(PDP1_IR, LAC);	/* this instruction is actually executed */
+			pdp1_pulse_start_clear(&device);	/* pulse Start Clear line */
+			device.state().set_state_int(PDP1_PC, device.state().state_int(PDP1_TA));
+			device.state().set_state_int(PDP1_MA, device.state().state_int(PDP1_PC));
+			device.state().set_state_int(PDP1_IR, LAC);	/* this instruction is actually executed */
 
-			device->state().set_state_int(PDP1_MB, (signed)device->memory().space(AS_PROGRAM)->read_dword(PDP1_MA<<2));
-			device->state().set_state_int(PDP1_AC, device->state().state_int(PDP1_MB));
+			device.state().set_state_int(PDP1_MB, (signed)device.memory().space(AS_PROGRAM)->read_dword(PDP1_MA<<2));
+			device.state().set_state_int(PDP1_AC, device.state().state_int(PDP1_MB));
 		}
 		if (control_transitions & pdp1_deposit)
 		{
-			pdp1_pulse_start_clear(device);	/* pulse Start Clear line */
-			device->state().set_state_int(PDP1_PC, device->state().state_int(PDP1_TA));
-			device->state().set_state_int(PDP1_MA, device->state().state_int(PDP1_PC));
-			device->state().set_state_int(PDP1_AC, device->state().state_int(PDP1_TW));
-			device->state().set_state_int(PDP1_IR, DAC);	/* this instruction is actually executed */
+			pdp1_pulse_start_clear(&device);	/* pulse Start Clear line */
+			device.state().set_state_int(PDP1_PC, device.state().state_int(PDP1_TA));
+			device.state().set_state_int(PDP1_MA, device.state().state_int(PDP1_PC));
+			device.state().set_state_int(PDP1_AC, device.state().state_int(PDP1_TW));
+			device.state().set_state_int(PDP1_IR, DAC);	/* this instruction is actually executed */
 
-			device->state().set_state_int(PDP1_MB, device->state().state_int(PDP1_AC));
-			device->memory().space(AS_PROGRAM)->write_dword(device->state().state_int(PDP1_MA)<<2, device->state().state_int(PDP1_MB));
+			device.state().set_state_int(PDP1_MB, device.state().state_int(PDP1_AC));
+			device.memory().space(AS_PROGRAM)->write_dword(device.state().state_int(PDP1_MA)<<2, device.state().state_int(PDP1_MB));
 		}
 		if (control_transitions & pdp1_read_in)
 		{	/* set cpu to read instructions from perforated tape */
-			pdp1_pulse_start_clear(device);	/* pulse Start Clear line */
-			device->state().set_state_int(PDP1_PC, (  device->state().state_int(PDP1_TA) & 0170000)
-										|  (device->state().state_int(PDP1_PC) & 0007777));	/* transfer ETA to EPC */
+			pdp1_pulse_start_clear(&device);	/* pulse Start Clear line */
+			device.state().set_state_int(PDP1_PC, (  device.state().state_int(PDP1_TA) & 0170000)
+										|  (device.state().state_int(PDP1_PC) & 0007777));	/* transfer ETA to EPC */
 			/*machine.device("maincpu")->state().set_state_int(PDP1_MA, machine.device("maincpu")->state().state_int(PDP1_PC));*/
-			device->state().set_state_int(PDP1_EXD, device->state().state_int(PDP1_EXTEND_SW));
-			device->state().set_state_int(PDP1_OV, (UINT64)0);		/* right??? */
-			device->state().set_state_int(PDP1_RUN, (UINT64)0);
-			device->state().set_state_int(PDP1_RIM, 1);
+			device.state().set_state_int(PDP1_EXD, device.state().state_int(PDP1_EXTEND_SW));
+			device.state().set_state_int(PDP1_OV, (UINT64)0);		/* right??? */
+			device.state().set_state_int(PDP1_RUN, (UINT64)0);
+			device.state().set_state_int(PDP1_RIM, 1);
 		}
 		if (control_transitions & pdp1_reader)
 		{
@@ -1897,53 +1895,53 @@ INTERRUPT_GEN( pdp1_interrupt )
 		}
 		if (control_transitions & pdp1_single_step)
 		{
-			device->state().set_state_int(PDP1_SNGL_STEP, ! device->state().state_int(PDP1_SNGL_STEP));
+			device.state().set_state_int(PDP1_SNGL_STEP, ! device.state().state_int(PDP1_SNGL_STEP));
 		}
 		if (control_transitions & pdp1_single_inst)
 		{
-			device->state().set_state_int(PDP1_SNGL_INST, ! device->state().state_int(PDP1_SNGL_INST));
+			device.state().set_state_int(PDP1_SNGL_INST, ! device.state().state_int(PDP1_SNGL_INST));
 		}
 
 		/* remember new state of control keys */
-		state->m_old_control_keys = control_keys;
+		m_old_control_keys = control_keys;
 
 
 		/* handle test word keys */
-		tw_keys = (machine.root_device().ioport("TWDMSB")->read() << 16) | machine.root_device().ioport("TWDLSB")->read();
+		tw_keys = (machine().root_device().ioport("TWDMSB")->read() << 16) | machine().root_device().ioport("TWDLSB")->read();
 
 		/* compute transitions */
-		tw_transitions = tw_keys & (~ state->m_old_tw_keys);
+		tw_transitions = tw_keys & (~ m_old_tw_keys);
 
 		if (tw_transitions)
-			device->state().set_state_int(PDP1_TW, device->state().state_int(PDP1_TW) ^ tw_transitions);
+			device.state().set_state_int(PDP1_TW, device.state().state_int(PDP1_TW) ^ tw_transitions);
 
 		/* remember new state of test word keys */
-		state->m_old_tw_keys = tw_keys;
+		m_old_tw_keys = tw_keys;
 
 
 		/* handle address keys */
-		ta_keys = machine.root_device().ioport("TSTADD")->read();
+		ta_keys = machine().root_device().ioport("TSTADD")->read();
 
 		/* compute transitions */
-		ta_transitions = ta_keys & (~ state->m_old_ta_keys);
+		ta_transitions = ta_keys & (~ m_old_ta_keys);
 
 		if (ta_transitions)
-			device->state().set_state_int(PDP1_TA, device->state().state_int(PDP1_TA) ^ ta_transitions);
+			device.state().set_state_int(PDP1_TA, device.state().state_int(PDP1_TA) ^ ta_transitions);
 
 		/* remember new state of test word keys */
-		state->m_old_ta_keys = ta_keys;
+		m_old_ta_keys = ta_keys;
 
 	}
 	else
 	{
-		state->m_old_control_keys = 0;
-		state->m_old_tw_keys = 0;
-		state->m_old_ta_keys = 0;
+		m_old_control_keys = 0;
+		m_old_tw_keys = 0;
+		m_old_ta_keys = 0;
 
-		pdp1_keyboard(machine);
+		pdp1_keyboard(machine());
 	}
 
-	pdp1_lightpen(machine);
+	pdp1_lightpen(machine());
 }
 
 
@@ -1954,7 +1952,7 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 	MCFG_CPU_ADD("maincpu", PDP1, 1000000/*the CPU core uses microsecond counts*/)
 	MCFG_CPU_CONFIG(pdp1_reset_param)
 	MCFG_CPU_PROGRAM_MAP(pdp1_map)
-	MCFG_CPU_VBLANK_INT("screen", pdp1_interrupt)	/* dummy interrupt: handles input */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pdp1_state,  pdp1_interrupt)	/* dummy interrupt: handles input */
 
 
 	/* video hardware (includes the control panel and typewriter output) */

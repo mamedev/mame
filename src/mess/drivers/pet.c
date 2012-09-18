@@ -659,7 +659,7 @@ static MACHINE_CONFIG_START( pet_general, pet_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_8MHz/8)
 	MCFG_CPU_PROGRAM_MAP(pet_mem)
-	MCFG_CPU_VBLANK_INT("screen", pet_frame_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pet_state,  pet_frame_interrupt)
 
 
     /* video hardware */
@@ -783,7 +783,7 @@ static MACHINE_CONFIG_DERIVED( superpet, pet80 )
 	/* m6809 cpu */
 	MCFG_CPU_ADD("m6809", M6809, 1000000)
 	MCFG_CPU_PROGRAM_MAP(superpet_m6809_mem)
-	MCFG_CPU_VBLANK_INT("screen", pet_frame_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pet_state,  pet_frame_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)

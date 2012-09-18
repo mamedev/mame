@@ -414,13 +414,12 @@ UINT32 svision_state::screen_update_tvlink(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-static INTERRUPT_GEN( svision_frame_int )
+INTERRUPT_GEN_MEMBER(svision_state::svision_frame_int)
 {
-	svision_state *state = device->machine().driver_data<svision_state>();
-	if (state->BANK&1)
-		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (BANK&1)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
-	svision_sound_decrement(state->m_sound);
+	svision_sound_decrement(m_sound);
 }
 
 DRIVER_INIT_MEMBER(svision_state,svision)
@@ -514,7 +513,7 @@ static MACHINE_CONFIG_START( svision, svision_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, 4000000)        /* ? stz used! speed? */
 	MCFG_CPU_PROGRAM_MAP(svision_mem)
-	MCFG_CPU_VBLANK_INT("screen", svision_frame_int)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", svision_state,  svision_frame_int)
 
 
 	/* video hardware */

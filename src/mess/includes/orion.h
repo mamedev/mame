@@ -63,15 +63,11 @@ public:
 	DECLARE_MACHINE_RESET(orionz80);
 	DECLARE_MACHINE_RESET(orionpro);
 	UINT32 screen_update_orion128(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(orionz80_interrupt);
 };
 
-
 /*----------- defined in machine/orion.c -----------*/
-
 extern const i8255_interface orion128_ppi8255_interface_1;
-
-extern INTERRUPT_GEN( orionz80_interrupt );
-
 
 #endif /* ORION_H_ */
 

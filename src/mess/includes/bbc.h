@@ -282,6 +282,9 @@ public:
 	DECLARE_MACHINE_RESET(bbcbp);
 	DECLARE_VIDEO_START(bbcbp);
 	UINT32 screen_update_bbc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(bbcb_vsync);
+	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
+	INTERRUPT_GEN_MEMBER(bbcm_keyscan);
 };
 
 
@@ -294,9 +297,6 @@ extern const mc6845_interface bbc_mc6845_intf;
 extern const via6522_interface bbcb_system_via;
 extern const via6522_interface bbcb_user_via;
 extern const wd17xx_interface bbc_wd17xx_interface;
-
-INTERRUPT_GEN( bbcb_keyscan );
-INTERRUPT_GEN( bbcm_keyscan );
 
 /* disc support */
 

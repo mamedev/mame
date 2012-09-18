@@ -562,7 +562,7 @@ static MACHINE_CONFIG_START( gb_common, gb_state )
 	MCFG_CPU_ADD("maincpu", LR35902, 4194304)			/* 4.194304 MHz */
 	MCFG_CPU_PROGRAM_MAP(gb_map)
 	MCFG_LR35902_CONFIG(dmg_cpu_reset)
-	MCFG_CPU_VBLANK_INT("screen", gb_scanline_interrupt)	/* 1 dummy int each frame */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gb_state,  gb_scanline_interrupt)	/* 1 dummy int each frame */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -659,7 +659,7 @@ static MACHINE_CONFIG_START( megaduck, gb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, 4194304)			/* 4.194304 MHz */
 	MCFG_CPU_PROGRAM_MAP( megaduck_map)
-	MCFG_CPU_VBLANK_INT("screen", gb_scanline_interrupt)	/* 1 int each scanline ! */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gb_state,  gb_scanline_interrupt)	/* 1 int each scanline ! */
 	MCFG_LR35902_CONFIG(megaduck_cpu_reset)
 
 	MCFG_SCREEN_ADD("screen", LCD)

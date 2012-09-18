@@ -357,12 +357,11 @@ const struct pic8259_interface b2m_pic8259_config =
 	DEVCB_NULL
 };
 
-INTERRUPT_GEN( b2m_vblank_interrupt )
+INTERRUPT_GEN_MEMBER(b2m_state::b2m_vblank_interrupt)
 {
-	b2m_state *state = device->machine().driver_data<b2m_state>();
-	state->m_vblank_state++;
-	if (state->m_vblank_state>1) state->m_vblank_state=0;
-	pic8259_ir0_w(state->m_pic, state->m_vblank_state);
+	m_vblank_state++;
+	if (m_vblank_state>1) m_vblank_state=0;
+	pic8259_ir0_w(m_pic, m_vblank_state);
 }
 
 void b2m_state::machine_reset()

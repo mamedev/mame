@@ -576,7 +576,7 @@ static MACHINE_CONFIG_START( geniusiq, geniusiq_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // The main crystal is at 32MHz, not sure whats the CPU freq
 	MCFG_CPU_PROGRAM_MAP(geniusiq_mem)
-	MCFG_CPU_PERIODIC_INT(irq6_line_hold, 125)	// the internal clock is increased by 1 sec every 125 interrupts
+	MCFG_CPU_PERIODIC_INT_DRIVER(geniusiq_state, irq6_line_hold,  125)	// the internal clock is increased by 1 sec every 125 interrupts
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

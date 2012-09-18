@@ -1129,29 +1129,28 @@ void c128_state::machine_reset()
 }
 
 
-INTERRUPT_GEN( c128_frame_interrupt )
+INTERRUPT_GEN_MEMBER(c128_state::c128_frame_interrupt)
 {
-	c128_state *state = device->machine().driver_data<c128_state>();
 	static const char *const c128ports[] = { "KP0", "KP1", "KP2" };
 	int i, value;
-	//device_t *vic2e = device->machine().device("vic2e");
-	//device_t *vdc8563 = device->machine().device("vdc8563");
+	//device_t *vic2e = machine().device("vic2e");
+	//device_t *vdc8563 = machine().device("vdc8563");
 
-	state->nmi();
+	nmi();
 
 	/* common keys input ports */
-	cbm_common_interrupt(device);
+	cbm_common_interrupt(&device);
 
 	/* Fix Me! Currently, neither left Shift nor Shift Lock work in c128, but reading the correspondent input produces a bug!
     Hence, we overwrite the actual reading as it never happens */
-	if ((device->machine().root_device().ioport("SPECIAL")->read() & 0x40))	//
+	if ((machine().root_device().ioport("SPECIAL")->read() & 0x40))	//
 		c64_keyline[1] |= 0x80;
 
 	/* c128 specific: keypad input ports */
 	for (i = 0; i < 3; i++)
 	{
 		value = 0xff;
-		value &= ~device->machine().root_device().ioport(c128ports[i])->read();
-		state->m_keyline[i] = value;
+		value &= ~machine().root_device().ioport(c128ports[i])->read();
+		m_keyline[i] = value;
 	}
 }

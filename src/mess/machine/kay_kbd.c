@@ -302,10 +302,9 @@ MACHINE_RESET_MEMBER(kaypro_state,kay_kbd)
  * also drives keyboard LEDs and
  * and handles autorepeating keys
  ******************************************************/
-INTERRUPT_GEN( kay_kbd_interrupt )
+INTERRUPT_GEN_MEMBER(kaypro_state::kay_kbd_interrupt)
 {
-	kaypro_state *state = device->machine().driver_data<kaypro_state>();
-	kay_kbd_t *kbd = state->m_kbd;
+	kay_kbd_t *kbd = m_kbd;
 	int mod, row, col, chg, newval;
 	UINT8 *keyrows = kbd->keyrows;
 
@@ -321,18 +320,18 @@ INTERRUPT_GEN( kay_kbd_interrupt )
 	}
 
 	row = 9;
-	newval = device->machine().root_device().ioport("ROW9")->read();
+	newval = machine().root_device().ioport("ROW9")->read();
 	chg = keyrows[row] ^ newval;
 
-	if (!chg) { newval = device->machine().root_device().ioport("ROW8")->read(); chg = keyrows[--row] ^ newval; }
-	if (!chg) { newval = device->machine().root_device().ioport("ROW7")->read(); chg = keyrows[--row] ^ newval; }
-	if (!chg) { newval = device->machine().root_device().ioport("ROW6")->read(); chg = keyrows[--row] ^ newval; }
-	if (!chg) { newval = device->machine().root_device().ioport("ROW5")->read(); chg = keyrows[--row] ^ newval; }
-	if (!chg) { newval = device->machine().root_device().ioport("ROW4")->read(); chg = keyrows[--row] ^ newval; }
-	if (!chg) { newval = device->machine().root_device().ioport("ROW3")->read(); chg = keyrows[--row] ^ newval; }
-	if (!chg) { newval = device->machine().root_device().ioport("ROW2")->read(); chg = keyrows[--row] ^ newval; }
-	if (!chg) { newval = device->machine().root_device().ioport("ROW1")->read(); chg = keyrows[--row] ^ newval; }
-	if (!chg) { newval = device->machine().root_device().ioport("ROW0")->read(); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = machine().root_device().ioport("ROW8")->read(); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = machine().root_device().ioport("ROW7")->read(); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = machine().root_device().ioport("ROW6")->read(); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = machine().root_device().ioport("ROW5")->read(); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = machine().root_device().ioport("ROW4")->read(); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = machine().root_device().ioport("ROW3")->read(); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = machine().root_device().ioport("ROW2")->read(); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = machine().root_device().ioport("ROW1")->read(); chg = keyrows[--row] ^ newval; }
+	if (!chg) { newval = machine().root_device().ioport("ROW0")->read(); chg = keyrows[--row] ^ newval; }
 	if (!chg) --row;
 
 	if (row >= 0)
@@ -343,7 +342,7 @@ INTERRUPT_GEN( kay_kbd_interrupt )
 		kbd->lastrow = row;
 		/* CapsLock LED */
 		if( row == 3 && chg == 0x80 )
-			set_led_status(device->machine(), 1, (kbd->keyrows[3] & 0x80) ? 0 : 1);
+			set_led_status(machine(), 1, (kbd->keyrows[3] & 0x80) ? 0 : 1);
 
 		if (newval & chg)	/* key(s) pressed ? */
 		{
@@ -376,11 +375,11 @@ INTERRUPT_GEN( kay_kbd_interrupt )
 			if( kbd->key )	/* normal key */
 			{
 				kbd->repeater = 30;
-				kay_kbd_in(device->machine(), kbd->key);
+				kay_kbd_in(machine(), kbd->key);
 			}
 			else
 			if( (row == 0) && (chg == 0x04) ) /* Ctrl-@ (NUL) */
-				kay_kbd_in(device->machine(), 0);
+				kay_kbd_in(machine(), 0);
 			keyrows[row] |= newval;
 		}
 		else
@@ -391,7 +390,7 @@ INTERRUPT_GEN( kay_kbd_interrupt )
 	}
 	else if ( kbd->key && (keyrows[kbd->lastrow] & kbd->mask) && kbd->repeat == 0 )
 	{
-		kay_kbd_in(device->machine(), kbd->key);
+		kay_kbd_in(machine(), kbd->key);
 	}
 }
 

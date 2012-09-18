@@ -87,6 +87,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(smc777_vblank_irq);
 };
 
 
@@ -1046,12 +1047,11 @@ static const floppy_interface smc777_floppy_interface =
 	NULL
 };
 
-static INTERRUPT_GEN( smc777_vblank_irq )
+INTERRUPT_GEN_MEMBER(smc777_state::smc777_vblank_irq)
 {
-	smc777_state *state = device->machine().driver_data<smc777_state>();
 
-	if(state->m_irq_mask)
-		device->execute().set_input_line(0,HOLD_LINE);
+	if(m_irq_mask)
+		device.execute().set_input_line(0,HOLD_LINE);
 }
 
 
@@ -1079,7 +1079,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
     MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK)
     MCFG_CPU_PROGRAM_MAP(smc777_mem)
     MCFG_CPU_IO_MAP(smc777_io)
-	MCFG_CPU_VBLANK_INT("screen",smc777_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", smc777_state, smc777_vblank_irq)
 
 
     /* video hardware */

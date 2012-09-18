@@ -733,28 +733,27 @@ B7 - Operates the SHIFT lock LED (Pin 16 keyboard connector)
 
 
 
-INTERRUPT_GEN( bbcb_keyscan )
+INTERRUPT_GEN_MEMBER(bbc_state::bbcb_keyscan)
 {
-	bbc_state *state = device->machine().driver_data<bbc_state>();
 	static const char *const colnames[] = {
 		"COL0", "COL1", "COL2", "COL3", "COL4",
 		"COL5", "COL6", "COL7", "COL8", "COL9"
 	};
-	via6522_device *via_0 = device->machine().device<via6522_device>("via6522_0");
+	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 
 	/* only do auto scan if keyboard is not enabled */
-	if (state->m_b3_keyboard == 1)
+	if (m_b3_keyboard == 1)
 	{
 		/* KBD IC1 4 bit addressable counter */
 		/* KBD IC3 4 to 10 line decoder */
 		/* keyboard not enabled so increment counter */
-		state->m_column = (state->m_column + 1) % 16;
-		if (state->m_column < 10)
+		m_column = (m_column + 1) % 16;
+		if (m_column < 10)
 		{
 			/* KBD IC4 8 input NAND gate */
 			/* set the value of via_system ca2, by checking for any keys
-                 being pressed on the selected state->m_column */
-			if ((device->machine().root_device().ioport(colnames[state->m_column])->read() | 0x01) != 0xff)
+                 being pressed on the selected m_column */
+			if ((machine().root_device().ioport(colnames[m_column])->read() | 0x01) != 0xff)
 			{
 				via_0->write_ca2(1);
 			}
@@ -772,30 +771,29 @@ INTERRUPT_GEN( bbcb_keyscan )
 }
 
 
-INTERRUPT_GEN( bbcm_keyscan )
+INTERRUPT_GEN_MEMBER(bbc_state::bbcm_keyscan)
 {
-	bbc_state *state = device->machine().driver_data<bbc_state>();
 	static const char *const colnames[] = {
 		"COL0", "COL1", "COL2", "COL3", "COL4",
 		"COL5", "COL6", "COL7", "COL8", "COL9"
 	};
-	via6522_device *via_0 = device->machine().device<via6522_device>("via6522_0");
+	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 
 	/* only do auto scan if keyboard is not enabled */
-	if (state->m_b3_keyboard == 1)
+	if (m_b3_keyboard == 1)
 	{
 		/* KBD IC1 4 bit addressable counter */
 		/* KBD IC3 4 to 10 line decoder */
 		/* keyboard not enabled so increment counter */
-		state->m_column = (state->m_column + 1) % 16;
+		m_column = (m_column + 1) % 16;
 
 		/* this IF should be removed as soon as the dip switches (keyboard keys) are set for the master */
-		if (state->m_column < 10)
+		if (m_column < 10)
 		{
 			/* KBD IC4 8 input NAND gate */
 			/* set the value of via_system ca2, by checking for any keys
-                 being pressed on the selected state->m_column */
-			if ((device->machine().root_device().ioport(colnames[state->m_column])->read() | 0x01) != 0xff)
+                 being pressed on the selected m_column */
+			if ((machine().root_device().ioport(colnames[m_column])->read() | 0x01) != 0xff)
 			{
 				via_0->write_ca2(1);
 			}

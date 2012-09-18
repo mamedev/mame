@@ -140,6 +140,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vii_vblank);
 };
 
 enum
@@ -1021,71 +1022,70 @@ void vii_state::machine_reset()
 {
 }
 
-static INTERRUPT_GEN( vii_vblank )
+INTERRUPT_GEN_MEMBER(vii_state::vii_vblank)
 {
-	vii_state *state = device->machine().driver_data<vii_state>();
-	UINT32 x = device->machine().rand() & 0x3ff;
-	UINT32 y = device->machine().rand() & 0x3ff;
-	UINT32 z = device->machine().rand() & 0x3ff;
+	UINT32 x = machine().rand() & 0x3ff;
+	UINT32 y = machine().rand() & 0x3ff;
+	UINT32 z = machine().rand() & 0x3ff;
 
 
-	state->m_controller_input[0] = state->ioport("P1")->read();
-	state->m_controller_input[1] = (UINT8)x;
-	state->m_controller_input[2] = (UINT8)y;
-	state->m_controller_input[3] = (UINT8)z;
-	state->m_controller_input[4] = 0;
+	m_controller_input[0] = ioport("P1")->read();
+	m_controller_input[1] = (UINT8)x;
+	m_controller_input[2] = (UINT8)y;
+	m_controller_input[3] = (UINT8)z;
+	m_controller_input[4] = 0;
 	x >>= 8;
 	y >>= 8;
 	z >>= 8;
-	state->m_controller_input[5] = (z << 4) | (y << 2) | x;
-	state->m_controller_input[6] = 0xff;
-	state->m_controller_input[7] = 0;
+	m_controller_input[5] = (z << 4) | (y << 2) | x;
+	m_controller_input[6] = 0xff;
+	m_controller_input[7] = 0;
 
-	state->m_uart_rx_count = 0;
+	m_uart_rx_count = 0;
 
-	state->VII_VIDEO_IRQ_STATUS = state->VII_VIDEO_IRQ_ENABLE & 1;
-	if(state->VII_VIDEO_IRQ_STATUS)
+	VII_VIDEO_IRQ_STATUS = VII_VIDEO_IRQ_ENABLE & 1;
+	if(VII_VIDEO_IRQ_STATUS)
 	{
-		verboselog(device->machine(), 0, "Video IRQ\n");
-		device->machine().device("maincpu")->execute().set_input_line(UNSP_IRQ0_LINE, ASSERT_LINE);
+		verboselog(machine(), 0, "Video IRQ\n");
+		machine().device("maincpu")->execute().set_input_line(UNSP_IRQ0_LINE, ASSERT_LINE);
 	}
 
 //  {
-//      verboselog(device->machine(), 0, "audio 1 IRQ\n");
-//      device->machine().device("maincpu")->execute().set_input_line(UNSP_IRQ1_LINE, ASSERT_LINE);
+//      verboselog(machine(), 0, "audio 1 IRQ\n");
+//      machine().device("maincpu")->execute().set_input_line(UNSP_IRQ1_LINE, ASSERT_LINE);
 //  }
-    if(state->m_io_regs[0x22] & state->m_io_regs[0x21] & 0x0c00)
+    if(m_io_regs[0x22] & m_io_regs[0x21] & 0x0c00)
 	{
-		verboselog(device->machine(), 0, "timerA, timer B IRQ\n");
-		device->machine().device("maincpu")->execute().set_input_line(UNSP_IRQ2_LINE, ASSERT_LINE);
+		verboselog(machine(), 0, "timerA, timer B IRQ\n");
+		machine().device("maincpu")->execute().set_input_line(UNSP_IRQ2_LINE, ASSERT_LINE);
 	}
 
-    //if(state->m_io_regs[0x22] & state->m_io_regs[0x21] & 0x2100)
+    //if(m_io_regs[0x22] & m_io_regs[0x21] & 0x2100)
 	// For now trigger always if any enabled
-	if(state->VII_CTLR_IRQ_ENABLE)
+	if(VII_CTLR_IRQ_ENABLE)
 	{
-		verboselog(device->machine(), 0, "UART, ADC IRQ\n");
-		device->machine().device("maincpu")->execute().set_input_line(UNSP_IRQ3_LINE, ASSERT_LINE);
+		verboselog(machine(), 0, "UART, ADC IRQ\n");
+		machine().device("maincpu")->execute().set_input_line(UNSP_IRQ3_LINE, ASSERT_LINE);
 	}
 //  {
-//      verboselog(device->machine(), 0, "audio 4 IRQ\n");
-//      device->machine().device("maincpu")->execute().set_input_line(UNSP_IRQ4_LINE, ASSERT_LINE);
+//      verboselog(machine(), 0, "audio 4 IRQ\n");
+//      machine().device("maincpu")->execute().set_input_line(UNSP_IRQ4_LINE, ASSERT_LINE);
 //  }
 
-    if(state->m_io_regs[0x22] & state->m_io_regs[0x21] & 0x1200)
+    if(m_io_regs[0x22] & m_io_regs[0x21] & 0x1200)
 	{
-		verboselog(device->machine(), 0, "External IRQ\n");
-		device->machine().device("maincpu")->execute().set_input_line(UNSP_IRQ5_LINE, ASSERT_LINE);
+		verboselog(machine(), 0, "External IRQ\n");
+		machine().device("maincpu")->execute().set_input_line(UNSP_IRQ5_LINE, ASSERT_LINE);
 	}
-    if(state->m_io_regs[0x22] & state->m_io_regs[0x21] & 0x0070)
+    if(m_io_regs[0x22] & m_io_regs[0x21] & 0x0070)
 	{
-		verboselog(device->machine(), 0, "1024Hz, 2048HZ, 4096HZ IRQ\n");
-		device->machine().device("maincpu")->execute().set_input_line(UNSP_IRQ6_LINE, ASSERT_LINE);
+		verboselog(machine(), 0, "1024Hz, 2048HZ, 4096HZ IRQ\n");
+		machine().device("maincpu")->execute().set_input_line(UNSP_IRQ6_LINE, ASSERT_LINE);
 	}
-    if(state->m_io_regs[0x22] & state->m_io_regs[0x21] & 0x008b)
+    if(m_io_regs[0x22] & m_io_regs[0x21] & 0x008b)
 	{
-		verboselog(device->machine(), 0, "TMB1, TMB2, 4Hz, key change IRQ\n");
-		device->machine().device("maincpu")->execute().set_input_line(UNSP_IRQ7_LINE, ASSERT_LINE);
+		verboselog(machine(), 0, "TMB1, TMB2, 4Hz, key change IRQ\n");
+		machine().device("maincpu")->execute().set_input_line(UNSP_IRQ7_LINE, ASSERT_LINE);
 	}
 
 }
@@ -1094,7 +1094,7 @@ static MACHINE_CONFIG_START( vii, vii_state )
 
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
-	MCFG_CPU_VBLANK_INT("screen", vii_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vii_state,  vii_vblank)
 
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
@@ -1116,7 +1116,7 @@ static MACHINE_CONFIG_START( vsmile, vii_state )
 
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
-	MCFG_CPU_VBLANK_INT("screen", vii_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vii_state,  vii_vblank)
 
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
@@ -1141,7 +1141,7 @@ static MACHINE_CONFIG_START( batman, vii_state )
 
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
-	MCFG_CPU_VBLANK_INT("screen", vii_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vii_state,  vii_vblank)
 
 
 	MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)

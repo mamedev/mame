@@ -1003,9 +1003,8 @@ void pk8020_state::machine_reset()
 	m_sound_level = 0;
 }
 
-INTERRUPT_GEN( pk8020_interrupt )
+INTERRUPT_GEN_MEMBER(pk8020_state::pk8020_interrupt)
 {
-	pk8020_state *state = device->machine().driver_data<pk8020_state>();
-	state->m_takt ^= 1;
-	pic8259_ir4_w(device->machine().device("pic8259"), 1);
+	m_takt ^= 1;
+	pic8259_ir4_w(machine().device("pic8259"), 1);
 }

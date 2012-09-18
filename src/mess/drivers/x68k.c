@@ -1895,22 +1895,22 @@ static WRITE_LINE_DEVICE_HANDLER( mfp_irq_callback )
 	drvstate->m_mfp_prev = state;
 }
 
-static INTERRUPT_GEN( x68k_vsync_irq )
+INTERRUPT_GEN_MEMBER(x68k_state::x68k_vsync_irq)
 {
 #if 0
 	x68k_state *state = machine.driver_data<x68k_state>();
-	if(state->m_mfp.ierb & 0x40)
+	if(m_mfp.ierb & 0x40)
 	{
-		state->m_mfp.isrb |= 0x40;
-		state->m_current_vector[6] = (state->m_mfp.vr & 0xf0) | 0x06;  // GPIP4 (V-DISP)
-		state->m_current_irq_line = 6;
+		m_mfp.isrb |= 0x40;
+		m_current_vector[6] = (m_mfp.vr & 0xf0) | 0x06;  // GPIP4 (V-DISP)
+		m_current_irq_line = 6;
 		mfp_timer_a_callback(0);  // Timer A is usually always in event count mode, and is tied to V-DISP
 		mfp_trigger_irq(MFP_IRQ_GPIP4);
 	}
-	if(state->m_crtc.height == 256)
-		machine.primary_screen->update_partial(256);//state->m_crtc.reg[4]/2);
+	if(m_crtc.height == 256)
+		machine.primary_screen->update_partial(256);//m_crtc.reg[4]/2);
 	else
-		machine.primary_screen->update_partial(512);//state->m_crtc.reg[4]);
+		machine.primary_screen->update_partial(512);//m_crtc.reg[4]);
 #endif
 }
 
@@ -2741,7 +2741,7 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(x68k_map)
-	MCFG_CPU_VBLANK_INT("screen", x68k_vsync_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", x68k_state,  x68k_vsync_irq)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(x68k_state, x68000 )

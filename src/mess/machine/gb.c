@@ -1892,7 +1892,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	return IMAGE_INIT_PASS;
 }
 
-INTERRUPT_GEN( gb_scanline_interrupt )
+INTERRUPT_GEN_MEMBER(gb_state::gb_scanline_interrupt)
 {
 }
 

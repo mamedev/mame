@@ -267,6 +267,7 @@ public:
 	DECLARE_VIDEO_START(x68000);
 	DECLARE_PALETTE_INIT(x68000);
 	UINT32 screen_update_x68000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(x68k_vsync_irq);
 };
 
 

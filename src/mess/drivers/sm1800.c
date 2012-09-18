@@ -45,6 +45,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_sm1800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(sm1800_vblank_interrupt);
 };
 
 static ADDRESS_MAP_START(sm1800_mem, AS_PROGRAM, 8, sm1800_state)
@@ -92,11 +93,10 @@ UINT32 sm1800_state::screen_update_sm1800(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-static INTERRUPT_GEN( sm1800_vblank_interrupt )
+INTERRUPT_GEN_MEMBER(sm1800_state::sm1800_vblank_interrupt)
 {
-	sm1800_state *state = device->machine().driver_data<sm1800_state>();
-	device->machine().device("maincpu")->execute().set_input_line(0, state->m_irq_state ?  HOLD_LINE : CLEAR_LINE);
-	state->m_irq_state ^= 1;
+	machine().device("maincpu")->execute().set_input_line(0, m_irq_state ?  HOLD_LINE : CLEAR_LINE);
+	m_irq_state ^= 1;
 }
 
 static I8275_DISPLAY_PIXELS(sm1800_display_pixels)
@@ -189,7 +189,7 @@ static MACHINE_CONFIG_START( sm1800, sm1800_state )
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(sm1800_mem)
 	MCFG_CPU_IO_MAP(sm1800_io)
-	MCFG_CPU_VBLANK_INT("screen", sm1800_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sm1800_state,  sm1800_vblank_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

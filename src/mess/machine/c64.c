@@ -840,10 +840,10 @@ MACHINE_START( c64 )
 		c64_bankswitch(machine, 1);
 }
 
-INTERRUPT_GEN( c64_frame_interrupt )
+INTERRUPT_GEN_MEMBER(legacy_c64_state::c64_frame_interrupt)
 {
-	c64_nmi(device->machine());
-	cbm_common_interrupt(device);
+	c64_nmi(machine());
+	cbm_common_interrupt(&device);
 }
 
 

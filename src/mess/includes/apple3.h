@@ -60,6 +60,7 @@ public:
 	DECLARE_MACHINE_RESET(apple3);
 	DECLARE_VIDEO_START(apple3);
 	UINT32 screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(apple3_interrupt);
 };
 
 
@@ -68,9 +69,6 @@ public:
 extern const applefdc_interface apple3_fdc_interface;
 extern const via6522_interface apple3_via_0_intf;
 extern const via6522_interface apple3_via_1_intf;
-
-
-INTERRUPT_GEN( apple3_interrupt );
 
 /*----------- defined in video/apple3.c -----------*/
 

@@ -32,11 +32,11 @@ public:
 	DECLARE_MACHINE_RESET(galaxy);
 	DECLARE_MACHINE_RESET(galaxyp);
 	UINT32 screen_update_galaxy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(galaxy_interrupt);
 };
 
 
 /*----------- defined in machine/galaxy.c -----------*/
-INTERRUPT_GEN( galaxy_interrupt );
 SNAPSHOT_LOAD( galaxy );
 
 /*----------- defined in video/galaxy.c -----------*/

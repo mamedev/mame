@@ -82,6 +82,7 @@ public:
 	DECLARE_DRIVER_INIT(pyl601);
 	virtual void machine_reset();
 	virtual void video_start();
+	INTERRUPT_GEN_MEMBER(pyl601_interrupt);
 };
 
 
@@ -515,11 +516,10 @@ DRIVER_INIT_MEMBER(pyl601_state,pyl601)
 	memset(machine().device<ram_device>(RAM_TAG)->pointer(), 0, 64 * 1024);
 }
 
-static INTERRUPT_GEN( pyl601_interrupt )
+INTERRUPT_GEN_MEMBER(pyl601_state::pyl601_interrupt)
 {
-	pyl601_state *state = device->machine().driver_data<pyl601_state>();
-	state->m_tick50_mark = 0x80;
-	device->execute().set_input_line(0, HOLD_LINE);
+	m_tick50_mark = 0x80;
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 static LEGACY_FLOPPY_OPTIONS_START(pyldin)
@@ -583,7 +583,7 @@ static MACHINE_CONFIG_START( pyl601, pyl601_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6800, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(pyl601_mem)
-	MCFG_CPU_VBLANK_INT("screen", pyl601_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pyl601_state,  pyl601_interrupt)
 
 
 	/* video hardware */

@@ -107,6 +107,8 @@ public:
 	// keyboard state
 	UINT8 m_port6529;
 	UINT8 m_keyline[10];
+	INTERRUPT_GEN_MEMBER(c16_raster_interrupt);
+	INTERRUPT_GEN_MEMBER(c16_frame_interrupt);
 };
 
 

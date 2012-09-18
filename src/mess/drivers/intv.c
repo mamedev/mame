@@ -801,17 +801,17 @@ static TIMER_CALLBACK(intv_interrupt2_complete)
 	machine.device("keyboard")->execute().set_input_line(0, CLEAR_LINE);
 }
 
-static INTERRUPT_GEN( intv_interrupt2 )
+INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt2)
 {
-	device->machine().device("keyboard")->execute().set_input_line(0, ASSERT_LINE);
-	device->machine().scheduler().timer_set(device->machine().device<cpu_device>("keyboard")->cycles_to_attotime(100), FUNC(intv_interrupt2_complete));
+	machine().device("keyboard")->execute().set_input_line(0, ASSERT_LINE);
+	machine().scheduler().timer_set(machine().device<cpu_device>("keyboard")->cycles_to_attotime(100), FUNC(intv_interrupt2_complete));
 }
 
 static MACHINE_CONFIG_START( intv, intv_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", CP1610, XTAL_3_579545MHz/4)        /* Colorburst/4 */
 	MCFG_CPU_PROGRAM_MAP(intv_mem)
-	MCFG_CPU_VBLANK_INT("screen", intv_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 
@@ -874,7 +874,7 @@ static MACHINE_CONFIG_DERIVED( intvkbd, intv )
 
 	MCFG_CPU_ADD("keyboard", M6502, XTAL_3_579545MHz/2)	/* Colorburst/2 */
 	MCFG_CPU_PROGRAM_MAP(intvkbd2_mem)
-	MCFG_CPU_VBLANK_INT("screen", intv_interrupt2)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt2)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

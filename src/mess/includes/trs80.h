@@ -122,14 +122,13 @@ public:
 	UINT32 screen_update_lnw80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_radionic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_meritum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(trs80_rtc_interrupt);
+	INTERRUPT_GEN_MEMBER(trs80_fdc_interrupt);
 };
 
 
 /*----------- defined in machine/trs80.c -----------*/
 
 extern const wd17xx_interface trs80_wd17xx_interface;
-
-INTERRUPT_GEN( trs80_rtc_interrupt );
-INTERRUPT_GEN( trs80_fdc_interrupt );
 
 #endif	/* TRS80_H_ */

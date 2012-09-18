@@ -498,7 +498,7 @@ static MACHINE_CONFIG_START( p500, cbmb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6509, VIC6567_CLOCK)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP(p500_mem)
-	//MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
+	//MCFG_CPU_PERIODIC_INT_DRIVER(cbmb_state, vic2_raster_irq,  VIC6567_HRETRACERATE)
 
 	MCFG_MACHINE_RESET_OVERRIDE(cbmb_state, cbmb )
 

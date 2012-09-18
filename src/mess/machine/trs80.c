@@ -624,25 +624,24 @@ WRITE8_MEMBER( trs80_state::trs80m4_ff_w )
  *
  *************************************/
 
-INTERRUPT_GEN( trs80_rtc_interrupt )
+INTERRUPT_GEN_MEMBER(trs80_state::trs80_rtc_interrupt)
 {
-	trs80_state *state = device->machine().driver_data<trs80_state>();
 /* This enables the processing of interrupts for the clock and the flashing cursor.
     The OS counts one tick for each interrupt. The Model I has 40 ticks per
     second, while the Model III/4 has 30. */
 
-	if (state->m_model4)	// Model 4
+	if (m_model4)	// Model 4
 	{
-		if (state->m_mask & IRQ_M4_RTC)
+		if (m_mask & IRQ_M4_RTC)
 		{
-			state->m_irq |= IRQ_M4_RTC;
-			device->execute().set_input_line(0, HOLD_LINE);
+			m_irq |= IRQ_M4_RTC;
+			device.execute().set_input_line(0, HOLD_LINE);
 		}
 	}
 	else		// Model 1
 	{
-		state->m_irq |= IRQ_M1_RTC;
-		device->execute().set_input_line(0, HOLD_LINE);
+		m_irq |= IRQ_M1_RTC;
+		device.execute().set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -664,9 +663,9 @@ static void trs80_fdc_interrupt_internal(running_machine &machine)
 	}
 }
 
-INTERRUPT_GEN( trs80_fdc_interrupt )	/* not used - should it be? */
+INTERRUPT_GEN_MEMBER(trs80_state::trs80_fdc_interrupt)/* not used - should it be? */
 {
-	trs80_fdc_interrupt_internal(device->machine());
+	trs80_fdc_interrupt_internal(machine());
 }
 
 static WRITE_LINE_DEVICE_HANDLER( trs80_fdc_intrq_w )

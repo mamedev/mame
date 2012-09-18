@@ -1023,19 +1023,18 @@ MACHINE_START_MEMBER(c65_state,c65)
 }
 
 
-INTERRUPT_GEN( c65_frame_interrupt )
+INTERRUPT_GEN_MEMBER(c65_state::c65_frame_interrupt)
 {
-	c65_state *state = device->machine().driver_data<c65_state>();
 	int value;
 
-	c65_nmi(device->machine());
+	c65_nmi(machine());
 
 	/* common keys input ports */
-	cbm_common_interrupt(device);
+	cbm_common_interrupt(&device);
 
 	/* c65 specific: function keys input ports */
 	value = 0xff;
 
-	value &= ~state->ioport("FUNCT")->read();
-	state->m_keyline = value;
+	value &= ~ioport("FUNCT")->read();
+	m_keyline = value;
 }

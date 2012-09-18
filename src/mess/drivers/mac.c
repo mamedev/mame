@@ -78,18 +78,17 @@
 // CA2: SCSI interrupt     = 0x01
 // CB1: ASC interrupt      = 0x10
 
-static INTERRUPT_GEN( mac_rbv_vbl )
+INTERRUPT_GEN_MEMBER(mac_state::mac_rbv_vbl)
 {
-	mac_state *mac = device->machine().driver_data<mac_state>();
 
-	mac->m_rbv_regs[2] &= ~0x40;	// set vblank signal
-	mac->m_rbv_vbltime = 10;
+	m_rbv_regs[2] &= ~0x40;	// set vblank signal
+	m_rbv_vbltime = 10;
 
 //  printf("RBV: raising VBL!\n");
 
-	if (mac->m_rbv_regs[0x12] & 0x40)
+	if (m_rbv_regs[0x12] & 0x40)
 	{
-		mac->rbv_recalc_irqs();
+		rbv_recalc_irqs();
 	}
 }
 
@@ -1110,7 +1109,7 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 
 	MCFG_CPU_REPLACE("maincpu", M68020HMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
-	MCFG_CPU_VBLANK_INT(MAC_SCREEN_NAME, mac_rbv_vbl)
+	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 
 	MCFG_PALETTE_LENGTH(256)
 
@@ -1147,7 +1146,7 @@ static MACHINE_CONFIG_DERIVED( maclc2, maclc )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
-	MCFG_CPU_VBLANK_INT(MAC_SCREEN_NAME, mac_rbv_vbl)
+	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -1164,7 +1163,7 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
-	MCFG_CPU_VBLANK_INT(MAC_SCREEN_NAME, mac_rbv_vbl)
+	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macsonora)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macsonora)
@@ -1193,7 +1192,7 @@ static MACHINE_CONFIG_DERIVED( maciivx, maclc )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C32M)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
-	MCFG_CPU_VBLANK_INT(MAC_SCREEN_NAME, mac_rbv_vbl)
+	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
@@ -1217,7 +1216,7 @@ static MACHINE_CONFIG_DERIVED( maciivi, maclc )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
-	MCFG_CPU_VBLANK_INT(MAC_SCREEN_NAME, mac_rbv_vbl)
+	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
@@ -1486,7 +1485,7 @@ static MACHINE_CONFIG_DERIVED( maciici, macii )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
-	MCFG_CPU_VBLANK_INT(MAC_SCREEN_NAME, mac_rbv_vbl)
+	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 
 	MCFG_PALETTE_LENGTH(256)
 
@@ -1515,7 +1514,7 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 20000000)
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
-	MCFG_CPU_VBLANK_INT(MAC_SCREEN_NAME, mac_rbv_vbl)
+	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 
 	MCFG_PALETTE_LENGTH(256)
 

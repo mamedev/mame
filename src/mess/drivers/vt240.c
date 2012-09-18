@@ -47,6 +47,7 @@ public:
 	required_shared_ptr<UINT8> m_video_ram;
 	DECLARE_DRIVER_INIT(vt240);
 	virtual void machine_reset();
+	INTERRUPT_GEN_MEMBER(vt240_irq);
 };
 
 /* TODO */
@@ -140,9 +141,9 @@ static UPD7220_INTERFACE( hgdc_intf )
 	DEVCB_NULL
 };
 
-static INTERRUPT_GEN( vt240_irq )
+INTERRUPT_GEN_MEMBER(vt240_state::vt240_irq)
 {
-	//device->execute().set_input_line(I8085_RST65_LINE, ASSERT_LINE);
+	//device.execute().set_input_line(I8085_RST65_LINE, ASSERT_LINE);
 }
 
 static const gfx_layout vt240_chars_8x8 =
@@ -165,7 +166,7 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(vt240_mem)
 	MCFG_CPU_IO_MAP(vt240_io)
-	MCFG_CPU_VBLANK_INT("screen",vt240_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vt240_state, vt240_irq)
 
 
 	/* video hardware */

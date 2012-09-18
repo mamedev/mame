@@ -204,7 +204,7 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
     MCFG_CPU_ADD("maincpu", I8080, 2000000)
     MCFG_CPU_PROGRAM_MAP(b2m_mem)
     MCFG_CPU_IO_MAP(b2m_io)
-    MCFG_CPU_VBLANK_INT("screen", b2m_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", b2m_state,  b2m_vblank_interrupt)
 
 
     /* video hardware */

@@ -349,10 +349,10 @@ void samcoupe_irq(device_t *device, UINT8 src)
 	state->m_status &= ~src;
 }
 
-static INTERRUPT_GEN( samcoupe_frame_interrupt )
+INTERRUPT_GEN_MEMBER(samcoupe_state::samcoupe_frame_interrupt)
 {
 	/* signal frame interrupt */
-	samcoupe_irq(device, SAM_FRAME_INT);
+	samcoupe_irq(&device, SAM_FRAME_INT);
 }
 
 
@@ -530,7 +530,7 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	MCFG_CPU_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1 / 4) /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(samcoupe_mem)
 	MCFG_CPU_IO_MAP(samcoupe_io)
-	MCFG_CPU_VBLANK_INT("screen", samcoupe_frame_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", samcoupe_state,  samcoupe_frame_interrupt)
 
 
     /* video hardware */

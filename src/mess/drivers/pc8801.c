@@ -451,6 +451,7 @@ public:
 	DECLARE_MACHINE_RESET(pc8801_clock_speed);
 	DECLARE_MACHINE_RESET(pc8801_dic);
 	DECLARE_MACHINE_RESET(pc8801_cdrom);
+	INTERRUPT_GEN_MEMBER(pc8801_vrtc_irq);
 };
 
 
@@ -2344,11 +2345,10 @@ static TIMER_DEVICE_CALLBACK( pc8801_rtc_irq )
 		pc8801_raise_irq(timer.machine(),1<<(2),1);
 }
 
-static INTERRUPT_GEN( pc8801_vrtc_irq )
+INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
 {
-	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-	if(state->m_vblank_irq_mask)
-		pc8801_raise_irq(device->machine(),1<<(1),1);
+	if(m_vblank_irq_mask)
+		pc8801_raise_irq(machine(),1<<(1),1);
 }
 
 #else
@@ -2411,14 +2411,13 @@ static TIMER_DEVICE_CALLBACK( pc8801_rtc_irq )
 	}
 }
 
-static INTERRUPT_GEN( pc8801_vrtc_irq )
+INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
 {
-	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-	if(state->m_vrtc_irq_mask && state->m_i8214_irq_level >= 2)
+	if(m_vrtc_irq_mask && m_i8214_irq_level >= 2)
 	{
-		state->m_vrtc_irq_latch = 1;
+		m_vrtc_irq_latch = 1;
 		//IRQ_LOG(("vrtc\n"));
-		device->execute().set_input_line(0,HOLD_LINE);
+		device.execute().set_input_line(0,HOLD_LINE);
 	}
 }
 #endif
@@ -2663,7 +2662,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)        /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc8801_mem)
 	MCFG_CPU_IO_MAP(pc8801_io)
-	MCFG_CPU_VBLANK_INT("screen", pc8801_vrtc_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc8801_state,  pc8801_vrtc_irq)
 
 	/* sub CPU(5 inch floppy drive) */
 	MCFG_CPU_ADD("fdccpu", Z80, MASTER_CLOCK)		/* 4 MHz */

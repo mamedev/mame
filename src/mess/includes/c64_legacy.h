@@ -90,6 +90,7 @@ public:
 	DECLARE_DRIVER_INIT( ultimax );
 	DECLARE_DRIVER_INIT( c64gs );
 	DECLARE_DRIVER_INIT( sx64 );
+	INTERRUPT_GEN_MEMBER(c64_frame_interrupt);
 };
 
 
@@ -105,7 +106,6 @@ DECLARE_WRITE8_HANDLER ( c64_colorram_write );
 
 MACHINE_START( c64 );
 MACHINE_RESET( c64 );
-INTERRUPT_GEN( c64_frame_interrupt );
 TIMER_CALLBACK( c64_tape_timer );
 
 /* private area */

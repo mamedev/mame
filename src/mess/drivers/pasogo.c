@@ -70,6 +70,7 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(pasogo_interrupt);
 };
 
 
@@ -449,7 +450,7 @@ UINT32 pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-static INTERRUPT_GEN( pasogo_interrupt )
+INTERRUPT_GEN_MEMBER(pasogo_state::pasogo_interrupt)
 {
 //  machine.device("maincpu")->execute().set_input_line(UPD7810_INTFE1, PULSE_LINE);
 }
@@ -504,7 +505,7 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_CPU_ADD("maincpu", I80188/*V30HL in vadem vg230*/, 10000000/*?*/)
 	MCFG_CPU_PROGRAM_MAP(pasogo_mem)
 	MCFG_CPU_IO_MAP( pasogo_io)
-	MCFG_CPU_VBLANK_INT("screen", pasogo_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pasogo_state,  pasogo_interrupt)
 //  MCFG_CPU_CONFIG(i86_address_mask)
 
 	MCFG_PIT8254_ADD( "pit8254", pc_pit8254_config )

@@ -373,12 +373,11 @@ INPUT_PORTS_END
 //  vic2_interface vic_intf
 //-------------------------------------------------
 
-static INTERRUPT_GEN( c64_frame_interrupt )
+INTERRUPT_GEN_MEMBER(c64_state::c64_frame_interrupt)
 {
-	c64_state *state = device->machine().driver_data<c64_state>();
 
-	state->check_interrupts();
-	cbm_common_interrupt(device);
+	check_interrupts();
+	cbm_common_interrupt(&device);
 }
 
 WRITE_LINE_MEMBER( c64_state::vic_irq_w )
@@ -991,7 +990,7 @@ static MACHINE_CONFIG_START( ntsc, c64_state )
 	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6567_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
 	MCFG_CPU_CONFIG(cpu_intf)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, c64_frame_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, c64_state,  c64_frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
@@ -1090,7 +1089,7 @@ static MACHINE_CONFIG_START( pal, c64_state )
 	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6569_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
 	MCFG_CPU_CONFIG(cpu_intf)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, c64_frame_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, c64_state,  c64_frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
@@ -1167,7 +1166,7 @@ static MACHINE_CONFIG_START( pal_gs, c64gs_state )
 	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6569_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
 	MCFG_CPU_CONFIG(c64gs_cpu_intf)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, c64_frame_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, c64_state,  c64_frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware

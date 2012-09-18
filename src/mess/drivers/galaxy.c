@@ -187,7 +187,7 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(galaxy_mem)
-	MCFG_CPU_VBLANK_INT("screen", galaxy_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 
@@ -223,7 +223,7 @@ static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(galaxyp_mem)
 	MCFG_CPU_IO_MAP(galaxyp_io)
-	MCFG_CPU_VBLANK_INT("screen", galaxy_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 

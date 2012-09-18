@@ -202,9 +202,9 @@ INPUT_PORTS_END
 //  vic2_interface vic_intf
 //-------------------------------------------------
 
-static INTERRUPT_GEN( vic10_frame_interrupt )
+INTERRUPT_GEN_MEMBER(vic10_state::vic10_frame_interrupt)
 {
-	cbm_common_interrupt(device);
+	cbm_common_interrupt(&device);
 }
 
 READ8_MEMBER( vic10_state::vic_lightpen_x_cb )
@@ -614,7 +614,7 @@ static MACHINE_CONFIG_START( vic10, vic10_state )
 	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6566_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vic10_mem)
 	MCFG_CPU_CONFIG(cpu_intf)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, vic10_frame_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, vic10_state,  vic10_frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware

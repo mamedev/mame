@@ -163,7 +163,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 //  MCFG_CPU_ADD("maincpu", Z80, 3000000)
 	MCFG_CPU_PROGRAM_MAP(vector06_mem)
 	MCFG_CPU_IO_MAP(vector06_io)
-	MCFG_CPU_VBLANK_INT("screen", vector06_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vector06_state,  vector06_interrupt)
 
 
 	/* video hardware */

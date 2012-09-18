@@ -421,93 +421,92 @@ static void store_key(running_machine &machine, int key)
     microtan_set_irq_line(machine);
 }
 
-INTERRUPT_GEN( microtan_interrupt )
+INTERRUPT_GEN_MEMBER(microtan_state::microtan_interrupt)
 {
-	microtan_state *state = device->machine().driver_data<microtan_state>();
     int mod, row, col, chg, newvar;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 
-    if( state->m_repeat )
+    if( m_repeat )
     {
-        if( !--state->m_repeat )
-            state->m_repeater = 4;
+        if( !--m_repeat )
+            m_repeater = 4;
     }
-    else if( state->m_repeater )
+    else if( m_repeater )
     {
-        state->m_repeat = state->m_repeater;
+        m_repeat = m_repeater;
     }
 
 
     row = 9;
-    newvar = device->machine().root_device().ioport("ROW8")->read();
-    chg = state->m_keyrows[--row] ^ newvar;
+    newvar = machine().root_device().ioport("ROW8")->read();
+    chg = m_keyrows[--row] ^ newvar;
 
 	while ( !chg && row > 0)
 	{
-		newvar = device->machine().root_device().ioport(keynames[row - 1])->read();
-		chg = state->m_keyrows[--row] ^ newvar;
+		newvar = machine().root_device().ioport(keynames[row - 1])->read();
+		chg = m_keyrows[--row] ^ newvar;
 	}
     if (!chg)
 		--row;
 
     if (row >= 0)
     {
-        state->m_repeater = 0x00;
-        state->m_mask = 0x00;
-        state->m_key = 0x00;
-        state->m_lastrow = row;
+        m_repeater = 0x00;
+        m_mask = 0x00;
+        m_key = 0x00;
+        m_lastrow = row;
         /* CapsLock LED */
 		if( row == 3 && chg == 0x80 )
-			set_led_status(device->machine(), 1, (state->m_keyrows[3] & 0x80) ? 0 : 1);
+			set_led_status(machine(), 1, (m_keyrows[3] & 0x80) ? 0 : 1);
 
         if (newvar & chg)  /* key(s) pressed ? */
         {
             mod = 0;
 
             /* Shift modifier */
-            if ( (state->m_keyrows[5] & 0x10) || (state->m_keyrows[6] & 0x80) )
+            if ( (m_keyrows[5] & 0x10) || (m_keyrows[6] & 0x80) )
                 mod |= 1;
 
             /* Control modifier */
-            if (state->m_keyrows[3] & 0x40)
+            if (m_keyrows[3] & 0x40)
                 mod |= 2;
 
             /* CapsLock modifier */
-            if (state->m_keyrows[3] & 0x80)
+            if (m_keyrows[3] & 0x80)
                 mod |= 4;
 
             /* find newvar key */
-            state->m_mask = 0x01;
+            m_mask = 0x01;
             for (col = 0; col < 8; col ++)
             {
-                if (chg & state->m_mask)
+                if (chg & m_mask)
                 {
-                    newvar &= state->m_mask;
-                    state->m_key = keyboard[mod][row][col];
+                    newvar &= m_mask;
+                    m_key = keyboard[mod][row][col];
                     break;
                 }
-                state->m_mask <<= 1;
+                m_mask <<= 1;
             }
-            if( state->m_key )   /* normal key */
+            if( m_key )   /* normal key */
             {
-                state->m_repeater = 30;
-                store_key(device->machine(), state->m_key);
+                m_repeater = 30;
+                store_key(machine(), m_key);
             }
             else
             if( (row == 0) && (chg == 0x04) ) /* Ctrl-@ (NUL) */
-                store_key(device->machine(), 0);
-            state->m_keyrows[row] |= newvar;
+                store_key(machine(), 0);
+            m_keyrows[row] |= newvar;
         }
         else
         {
-            state->m_keyrows[row] = newvar;
+            m_keyrows[row] = newvar;
         }
-        state->m_repeat = state->m_repeater;
+        m_repeat = m_repeater;
     }
     else
-    if ( state->m_key && (state->m_keyrows[state->m_lastrow] & state->m_mask) && state->m_repeat == 0 )
+    if ( m_key && (m_keyrows[m_lastrow] & m_mask) && m_repeat == 0 )
     {
-        store_key(device->machine(), state->m_key);
+        store_key(machine(), m_key);
     }
 }
 

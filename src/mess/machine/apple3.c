@@ -246,13 +246,13 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 	}
 }
 
-INTERRUPT_GEN( apple3_interrupt )
+INTERRUPT_GEN_MEMBER(apple3_state::apple3_interrupt)
 {
-	via6522_device *via_1 = device->machine().device<via6522_device>("via6522_1");
+	via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
 
-	via_1->write_ca2((AY3600_keydata_strobe_r(device->machine()) & 0x80) ? 1 : 0);
-	via_1->write_cb1(device->machine().primary_screen->vblank());
-	via_1->write_cb2(device->machine().primary_screen->vblank());
+	via_1->write_ca2((AY3600_keydata_strobe_r(machine()) & 0x80) ? 1 : 0);
+	via_1->write_cb1(machine().primary_screen->vblank());
+	via_1->write_cb2(machine().primary_screen->vblank());
 }
 
 

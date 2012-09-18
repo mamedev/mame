@@ -89,9 +89,9 @@ UINT32 gamecom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-static INTERRUPT_GEN( gamecom_interrupt )
+INTERRUPT_GEN_MEMBER(gamecom_state::gamecom_interrupt)
 {
-	device->machine().device("maincpu")->execute().set_input_line(LCDC_INT, ASSERT_LINE );
+	machine().device("maincpu")->execute().set_input_line(LCDC_INT, ASSERT_LINE );
 }
 
 static MACHINE_CONFIG_START( gamecom, gamecom_state )
@@ -99,7 +99,7 @@ static MACHINE_CONFIG_START( gamecom, gamecom_state )
 	MCFG_CPU_ADD( "maincpu", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
 	MCFG_CPU_PROGRAM_MAP( gamecom_mem_map)
 	MCFG_CPU_CONFIG( gamecom_cpu_config )
-	MCFG_CPU_VBLANK_INT("screen", gamecom_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gamecom_state,  gamecom_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

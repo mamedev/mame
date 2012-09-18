@@ -1086,22 +1086,21 @@ void lisa_state::machine_reset()
 	machine().device("maincpu")->reset();
 }
 
-INTERRUPT_GEN( lisa_interrupt )
+INTERRUPT_GEN_MEMBER(lisa_state::lisa_interrupt)
 {
-	lisa_state *state = device->machine().driver_data<lisa_state>();
-	if ((++state->m_frame_count) == 6)
+	if ((++m_frame_count) == 6)
 	{	/* increment clock every 1/10s */
-		state->m_frame_count = 0;
+		m_frame_count = 0;
 
-		if (state->m_clock_regs.clock_mode != clock_timer_disable)
+		if (m_clock_regs.clock_mode != clock_timer_disable)
 		{
-			if ((++state->m_clock_regs.tenths) == 10)
+			if ((++m_clock_regs.tenths) == 10)
 			{
-				state->m_clock_regs.tenths = 0;
+				m_clock_regs.tenths = 0;
 
-				if (state->m_clock_regs.clock_mode != timer_disable)
+				if (m_clock_regs.clock_mode != timer_disable)
 				{
-					if (state->m_clock_regs.alarm == 0)
+					if (m_clock_regs.alarm == 0)
 					{
 						/* generate reset (should cause a VIA interrupt...) */
 						static const UINT8 cmd[2] =
@@ -1109,61 +1108,61 @@ INTERRUPT_GEN( lisa_interrupt )
 							0x80,	/* RESET code */
 							0xFC	/* timer time-out */
 						};
-						COPS_queue_data(device->machine(), cmd, 2);
+						COPS_queue_data(machine(), cmd, 2);
 
-						state->m_clock_regs.alarm = 0xfffffL;
+						m_clock_regs.alarm = 0xfffffL;
 					}
 					else
 					{
-						state->m_clock_regs.alarm--;
+						m_clock_regs.alarm--;
 					}
 				}
 
-				if ((++state->m_clock_regs.seconds2) == 10)
+				if ((++m_clock_regs.seconds2) == 10)
 				{
-					state->m_clock_regs.seconds2 = 0;
+					m_clock_regs.seconds2 = 0;
 
-					if ((++state->m_clock_regs.seconds1) == 6)
+					if ((++m_clock_regs.seconds1) == 6)
 					{
-						state->m_clock_regs.seconds1 = 0;
+						m_clock_regs.seconds1 = 0;
 
-						if ((++state->m_clock_regs.minutes2) == 10)
+						if ((++m_clock_regs.minutes2) == 10)
 						{
-							state->m_clock_regs.minutes2 = 0;
+							m_clock_regs.minutes2 = 0;
 
-							if ((++state->m_clock_regs.minutes1) == 6)
+							if ((++m_clock_regs.minutes1) == 6)
 							{
-								state->m_clock_regs.minutes1 = 0;
+								m_clock_regs.minutes1 = 0;
 
-								if ((++state->m_clock_regs.hours2) == 10)
+								if ((++m_clock_regs.hours2) == 10)
 								{
-									state->m_clock_regs.hours2 = 0;
+									m_clock_regs.hours2 = 0;
 
-									state->m_clock_regs.hours1++;
+									m_clock_regs.hours1++;
 								}
 
-								if ((state->m_clock_regs.hours1*10 + state->m_clock_regs.hours2) == 24)
+								if ((m_clock_regs.hours1*10 + m_clock_regs.hours2) == 24)
 								{
-									state->m_clock_regs.hours1 = state->m_clock_regs.hours2 = 0;
+									m_clock_regs.hours1 = m_clock_regs.hours2 = 0;
 
-									if ((++state->m_clock_regs.days3) == 10)
+									if ((++m_clock_regs.days3) == 10)
 									{
-										state->m_clock_regs.days3 = 0;
+										m_clock_regs.days3 = 0;
 
-										if ((++state->m_clock_regs.days2) == 10)
+										if ((++m_clock_regs.days2) == 10)
 										{
-											state->m_clock_regs.days2 = 0;
+											m_clock_regs.days2 = 0;
 
-											state->m_clock_regs.days1++;
+											m_clock_regs.days1++;
 										}
 									}
 
-									if ((state->m_clock_regs.days1*100 + state->m_clock_regs.days2*10 + state->m_clock_regs.days3) ==
-										((state->m_clock_regs.years % 4) ? 366 : 367))
+									if ((m_clock_regs.days1*100 + m_clock_regs.days2*10 + m_clock_regs.days3) ==
+										((m_clock_regs.years % 4) ? 366 : 367))
 									{
-										state->m_clock_regs.days1 = state->m_clock_regs.days2 = state->m_clock_regs.days3 = 0;
+										m_clock_regs.days1 = m_clock_regs.days2 = m_clock_regs.days3 = 0;
 
-										state->m_clock_regs.years = (state->m_clock_regs.years + 1) & 0xf;
+										m_clock_regs.years = (m_clock_regs.years + 1) & 0xf;
 									}
 								}
 							}
@@ -1175,13 +1174,13 @@ INTERRUPT_GEN( lisa_interrupt )
 	}
 
 	/* set VBI */
-	if (state->m_VTMSK)
-		set_VTIR(device->machine(), 1);
+	if (m_VTMSK)
+		set_VTIR(machine(), 1);
 	else
-		set_VTIR(device->machine(), 0);
+		set_VTIR(machine(), 0);
 
 	/* do keyboard scan */
-	scan_keyboard(device->machine());
+	scan_keyboard(machine());
 }
 
 /*

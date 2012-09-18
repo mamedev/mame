@@ -56,7 +56,7 @@ static MACHINE_CONFIG_START( tim011,tim011_state )
 	MCFG_CPU_ADD("maincpu",Z180, XTAL_12_288MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tim011_mem)
 	MCFG_CPU_IO_MAP(tim011_io)
-	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tim011_state, irq0_line_hold)
 
 
 	/* video hardware */

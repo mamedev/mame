@@ -233,6 +233,8 @@ public:
 	UINT32 screen_update_pc6001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_pc6001m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(pc6001_interrupt);
+	INTERRUPT_GEN_MEMBER(pc6001sr_interrupt);
 };
 
 
@@ -1846,24 +1848,22 @@ INPUT_PORTS_END
 
 static UINT8 check_joy_press(running_machine &machine);
 
-static INTERRUPT_GEN( pc6001_interrupt )
+INTERRUPT_GEN_MEMBER(pc6001_state::pc6001_interrupt)
 {
-	pc6001_state *state = device->machine().driver_data<pc6001_state>();
-	state->m_cur_keycode = check_joy_press(device->machine());
+	m_cur_keycode = check_joy_press(machine());
 	if(IRQ_LOG) printf("Stick IRQ called 0x16\n");
-	state->m_irq_vector = 0x16;
-	device->execute().set_input_line(0, ASSERT_LINE);
+	m_irq_vector = 0x16;
+	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-static INTERRUPT_GEN( pc6001sr_interrupt )
+INTERRUPT_GEN_MEMBER(pc6001_state::pc6001sr_interrupt)
 {
-	pc6001_state *state = device->machine().driver_data<pc6001_state>();
-	state->m_kludge^= 1;
+	m_kludge^= 1;
 
-	state->m_cur_keycode = check_joy_press(device->machine());
+	m_cur_keycode = check_joy_press(machine());
 	if(IRQ_LOG) printf("VRTC IRQ called 0x16\n");
-	state->m_irq_vector = (state->m_kludge) ? 0x22 : 0x16;
-	device->execute().set_input_line(0, ASSERT_LINE);
+	m_irq_vector = (m_kludge) ? 0x22 : 0x16;
+	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 static IRQ_CALLBACK ( pc6001_irq_callback )
@@ -2326,7 +2326,7 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 	MCFG_CPU_ADD("maincpu",Z80, PC6001_MAIN_CLOCK / 2) // ~4 Mhz
 	MCFG_CPU_PROGRAM_MAP(pc6001_map)
 	MCFG_CPU_IO_MAP(pc6001_io)
-	MCFG_CPU_VBLANK_INT("screen", pc6001_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc6001_state,  pc6001_interrupt)
 
 //  MCFG_CPU_ADD("subcpu", I8049, 7987200)
 
@@ -2398,7 +2398,7 @@ static MACHINE_CONFIG_DERIVED( pc6601, pc6001m2 )
 	MCFG_CPU_REPLACE("maincpu", Z80, PC6001_MAIN_CLOCK / 2)
 	MCFG_CPU_PROGRAM_MAP(pc6001m2_map)
 	MCFG_CPU_IO_MAP(pc6601_io)
-	MCFG_CPU_VBLANK_INT("screen", pc6001_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc6001_state,  pc6001_interrupt)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc6001sr, pc6001m2 )
@@ -2412,7 +2412,7 @@ static MACHINE_CONFIG_DERIVED( pc6001sr, pc6001m2 )
 	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_3_579545MHz) //*Yes*, PC-6001 SR Z80 CPU is actually slower than older models
 	MCFG_CPU_PROGRAM_MAP(pc6001sr_map)
 	MCFG_CPU_IO_MAP(pc6001sr_io)
-	MCFG_CPU_VBLANK_INT("screen", pc6001sr_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc6001_state,  pc6001sr_interrupt)
 MACHINE_CONFIG_END
 
 /* ROM definition */

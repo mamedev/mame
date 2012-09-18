@@ -347,7 +347,7 @@ static MACHINE_CONFIG_START( bmjr, bmjr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6800, XTAL_4MHz/4) //unknown clock / divider
 	MCFG_CPU_PROGRAM_MAP(bmjr_mem)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bmjr_state,  irq0_line_hold)
 
 
 	/* video hardware */

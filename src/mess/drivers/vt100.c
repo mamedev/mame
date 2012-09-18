@@ -57,6 +57,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vt100_vertical_interrupt);
 };
 
 
@@ -379,11 +380,10 @@ static const vt_video_interface vt100_video_interface =
 	DEVCB_DRIVER_MEMBER(vt100_state, vt100_clear_video_interrupt)
 };
 
-static INTERRUPT_GEN( vt100_vertical_interrupt )
+INTERRUPT_GEN_MEMBER(vt100_state::vt100_vertical_interrupt)
 {
-	vt100_state *state = device->machine().driver_data<vt100_state>();
-	state->m_vertical_int = 1;
-	device->execute().set_input_line(0, HOLD_LINE);
+	m_vertical_int = 1;
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 /* F4 Character Displayer */
@@ -412,7 +412,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_24_8832MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(vt100_mem)
 	MCFG_CPU_IO_MAP(vt100_io)
-	MCFG_CPU_VBLANK_INT("screen", vt100_vertical_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vt100_state,  vt100_vertical_interrupt)
 
 
 	/* video hardware */

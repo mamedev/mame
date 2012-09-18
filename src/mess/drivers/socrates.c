@@ -128,6 +128,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(assert_irq);
 };
 
 
@@ -909,14 +910,13 @@ static TIMER_CALLBACK( clear_irq_cb )
 	state->m_vblankstate = 0;
 }
 
-static INTERRUPT_GEN( assert_irq )
+INTERRUPT_GEN_MEMBER(socrates_state::assert_irq)
 {
-	socrates_state *state = device->machine().driver_data<socrates_state>();
-	device->execute().set_input_line(0, ASSERT_LINE);
-	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(44), FUNC(clear_irq_cb));
+	device.execute().set_input_line(0, ASSERT_LINE);
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(44), FUNC(clear_irq_cb));
 // 44 is a complete and total guess, need to properly measure how many clocks/microseconds the int line is high for.
-	state->m_vblankstate = 1;
-	state->m_kbmcu_rscount = 0; // clear the mcu poke count
+	m_vblankstate = 1;
+	m_kbmcu_rscount = 0; // clear the mcu poke count
 }
 
 static MACHINE_CONFIG_START( socrates, socrates_state )
@@ -925,7 +925,7 @@ static MACHINE_CONFIG_START( socrates, socrates_state )
     MCFG_CPU_PROGRAM_MAP(z80_mem)
     MCFG_CPU_IO_MAP(z80_io)
     MCFG_QUANTUM_TIME(attotime::from_hz(60))
-    MCFG_CPU_VBLANK_INT("screen", assert_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
     //MCFG_MACHINE_START_OVERRIDE(socrates_state,socrates)
 
     /* video hardware */

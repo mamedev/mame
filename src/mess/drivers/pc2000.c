@@ -329,7 +329,7 @@ static MACHINE_CONFIG_START( pc2000, pc2000_state )
     MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) /* probably not accurate */
     MCFG_CPU_PROGRAM_MAP(pc2000_mem)
     MCFG_CPU_IO_MAP(pc2000_io)
-    MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc2000_state, irq0_line_hold)
 
     /* video hardware */
     MCFG_SCREEN_ADD("screen", LCD)

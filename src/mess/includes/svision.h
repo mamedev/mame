@@ -56,6 +56,7 @@ public:
 	DECLARE_MACHINE_RESET(tvlink);
 	UINT32 screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_tvlink(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(svision_frame_int);
 };
 
 

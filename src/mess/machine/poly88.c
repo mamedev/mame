@@ -216,11 +216,10 @@ void poly88_state::machine_reset()
 	machine().scheduler().timer_set(attotime::zero, FUNC(setup_machine_state));
 }
 
-INTERRUPT_GEN( poly88_interrupt )
+INTERRUPT_GEN_MEMBER(poly88_state::poly88_interrupt)
 {
-	poly88_state *state = device->machine().driver_data<poly88_state>();
-	state->m_int_vector = 0xf7;
-	device->execute().set_input_line(0, HOLD_LINE);
+	m_int_vector = 0xf7;
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( poly88_usart_rxready )

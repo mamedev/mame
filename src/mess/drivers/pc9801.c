@@ -415,6 +415,7 @@ public:
 	DECLARE_PALETTE_INIT(pc9801);
 	DECLARE_MACHINE_RESET(pc9801rs);
 	DECLARE_MACHINE_START(pc9821);
+	INTERRUPT_GEN_MEMBER(pc9801_vrtc_irq);
 };
 
 
@@ -2607,14 +2608,13 @@ MACHINE_START_MEMBER(pc9801_state,pc9821)
 	state_save_register_global_pointer(machine(), m_sdip, 24);
 }
 
-static INTERRUPT_GEN(pc9801_vrtc_irq)
+INTERRUPT_GEN_MEMBER(pc9801_state::pc9801_vrtc_irq)
 {
-	pc9801_state *state = device->machine().driver_data<pc9801_state>();
 	#if 0
-	address_space &space = *device->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	static UINT8 test;
 
-	if(device->machine().input().code_pressed_once(JOYCODE_BUTTON1))
+	if(machine().input().code_pressed_once(JOYCODE_BUTTON1))
 		test^=1;
 
 	if(test)
@@ -2624,13 +2624,13 @@ static INTERRUPT_GEN(pc9801_vrtc_irq)
 	}
 	#endif
 
-	if(state->m_vrtc_irq_mask)
+	if(m_vrtc_irq_mask)
 	{
-		pic8259_ir2_w(device->machine().device("pic8259_master"), 1);
-		state->m_vrtc_irq_mask = 0; // TODO: this irq auto-masks?
+		pic8259_ir2_w(machine().device("pic8259_master"), 1);
+		m_vrtc_irq_mask = 0; // TODO: this irq auto-masks?
 	}
 	else
-		pic8259_ir2_w(device->machine().device("pic8259_master"), 0);
+		pic8259_ir2_w(machine().device("pic8259_master"), 0);
 }
 
 
@@ -2639,7 +2639,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_CPU_ADD("maincpu", I8086, 5000000) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9801_map)
 	MCFG_CPU_IO_MAP(pc9801_io)
-	MCFG_CPU_VBLANK_INT("screen",pc9801_vrtc_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801f)
@@ -2694,7 +2694,7 @@ static MACHINE_CONFIG_DERIVED( pc9801vm, pc9801 )
 	MCFG_CPU_REPLACE("maincpu",V30,10000000)
 	MCFG_CPU_PROGRAM_MAP(pc9801_map)
 	MCFG_CPU_IO_MAP(pc9801_io)
-	MCFG_CPU_VBLANK_INT("screen",pc9801_vrtc_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
 MACHINE_CONFIG_END
 #endif
 
@@ -2702,7 +2702,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_CPU_ADD("maincpu", I386, 16000000)
 	MCFG_CPU_PROGRAM_MAP(pc9801rs_map)
 	MCFG_CPU_IO_MAP(pc9801rs_io)
-	MCFG_CPU_VBLANK_INT("screen",pc9801_vrtc_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801rs)
@@ -2755,14 +2755,14 @@ static MACHINE_CONFIG_DERIVED( pc9801ux, pc9801rs )
 	MCFG_CPU_CONFIG(i286_address_mask)
 	MCFG_CPU_PROGRAM_MAP(pc9801ux_map)
 	MCFG_CPU_IO_MAP(pc9801ux_io)
-	MCFG_CPU_VBLANK_INT("screen",pc9801_vrtc_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_CPU_ADD("maincpu", I486, 16000000)
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
-	MCFG_CPU_VBLANK_INT("screen",pc9801_vrtc_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801rs)
@@ -2812,7 +2812,7 @@ static MACHINE_CONFIG_DERIVED( pc9821v20, pc9821 )
 	MCFG_CPU_REPLACE("maincpu",PENTIUM,32000000) /* TODO: clock */
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
-	MCFG_CPU_VBLANK_INT("screen",pc9801_vrtc_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
 MACHINE_CONFIG_END
 
 /*

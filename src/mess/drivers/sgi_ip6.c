@@ -42,6 +42,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_sgi_ip6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(sgi_ip6_vbl);
 };
 
 
@@ -192,7 +193,7 @@ WRITE32_MEMBER(sgi_ip6_state::ip6_unk3_w)
 	verboselog(machine(), 0, "ip6_unk3_w: Unknown address: %08x = %08x & %08x\n", 0x1fb00000 + (offset << 2), data, mem_mask );
 }
 
-static INTERRUPT_GEN( sgi_ip6_vbl )
+INTERRUPT_GEN_MEMBER(sgi_ip6_state::sgi_ip6_vbl)
 {
 }
 
@@ -233,7 +234,7 @@ static MACHINE_CONFIG_START( sgi_ip6, sgi_ip6_state )
 	MCFG_CPU_ADD( "maincpu", R3000BE, 20000000 ) // FIXME: Should be R2000
 	MCFG_CPU_CONFIG( config )
 	MCFG_CPU_PROGRAM_MAP( sgi_ip6_map )
-	MCFG_CPU_VBLANK_INT("screen", sgi_ip6_vbl)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sgi_ip6_state,  sgi_ip6_vbl)
 
 
 	/* video hardware */

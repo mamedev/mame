@@ -105,9 +105,9 @@ static INPUT_PORTS_START( ondra )
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_ESC)
 INPUT_PORTS_END
 
-static INTERRUPT_GEN( ondra_interrupt )
+INTERRUPT_GEN_MEMBER(ondra_state::ondra_interrupt)
 {
-	device->execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 static const cassette_interface ondra_cassette_interface =
@@ -125,7 +125,7 @@ static MACHINE_CONFIG_START( ondra, ondra_state )
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)
 	MCFG_CPU_PROGRAM_MAP(ondra_mem)
 	MCFG_CPU_IO_MAP(ondra_io)
-	MCFG_CPU_VBLANK_INT("screen", ondra_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ondra_state,  ondra_interrupt)
 
 
     /* video hardware */

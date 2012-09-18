@@ -64,6 +64,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(pc100_vblank_irq);
 };
 
 void pc100_state::video_start()
@@ -342,9 +343,9 @@ void pc100_state::machine_reset()
 {
 }
 
-static INTERRUPT_GEN(pc100_vblank_irq)
+INTERRUPT_GEN_MEMBER(pc100_state::pc100_vblank_irq)
 {
-	pic8259_ir4_w(device->machine().device("pic8259"), 1);
+	pic8259_ir4_w(machine().device("pic8259"), 1);
 }
 
 static TIMER_DEVICE_CALLBACK( pc100_600hz_irq )
@@ -386,7 +387,7 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_CPU_ADD("maincpu", I8086, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pc100_map)
 	MCFG_CPU_IO_MAP(pc100_io)
-	MCFG_CPU_VBLANK_INT("screen",pc100_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc100_state, pc100_vblank_irq)
 
 
 	/* video hardware */

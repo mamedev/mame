@@ -122,12 +122,11 @@ WRITE8_MEMBER( vector06_state::vector06_8255_2_w )
 	m_ppi2->write(space, offset^3, data);
 }
 
-INTERRUPT_GEN( vector06_interrupt )
+INTERRUPT_GEN_MEMBER(vector06_state::vector06_interrupt)
 {
-	vector06_state *state = device->machine().driver_data<vector06_state>();
-	state->m_vblank_state++;
-	if (state->m_vblank_state>1) state->m_vblank_state=0;
-	device->execute().set_input_line(0,state->m_vblank_state ? HOLD_LINE : CLEAR_LINE);
+	m_vblank_state++;
+	if (m_vblank_state>1) m_vblank_state=0;
+	device.execute().set_input_line(0,m_vblank_state ? HOLD_LINE : CLEAR_LINE);
 
 }
 

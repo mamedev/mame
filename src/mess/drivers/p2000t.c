@@ -202,9 +202,9 @@ static INPUT_PORTS_START (p2000t)
 INPUT_PORTS_END
 
 
-static INTERRUPT_GEN( p2000_interrupt )
+INTERRUPT_GEN_MEMBER(p2000t_state::p2000_interrupt)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER( p2000t_state::videoram_r )
@@ -224,7 +224,7 @@ static MACHINE_CONFIG_START( p2000t, p2000t_state )
 	MCFG_CPU_ADD("maincpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(p2000t_mem)
 	MCFG_CPU_IO_MAP(p2000t_io)
-	MCFG_CPU_VBLANK_INT("screen", p2000_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", p2000t_state,  p2000_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -249,7 +249,7 @@ static MACHINE_CONFIG_START( p2000m, p2000t_state )
 	MCFG_CPU_ADD("maincpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(p2000m_mem)
 	MCFG_CPU_IO_MAP(p2000t_io)
-	MCFG_CPU_VBLANK_INT("screen", p2000_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", p2000t_state,  p2000_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */

@@ -45,9 +45,9 @@ WRITE8_MEMBER(galaxy_state::galaxy_latch_w)
   Interrupts
 ***************************************************************************/
 
-INTERRUPT_GEN( galaxy_interrupt )
+INTERRUPT_GEN_MEMBER(galaxy_state::galaxy_interrupt)
 {
-	device->execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 static IRQ_CALLBACK ( galaxy_irq_callback )

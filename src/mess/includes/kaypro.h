@@ -78,6 +78,7 @@ public:
 	UINT32 screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_kaypro2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(kay_kbd_interrupt);
 };
 
 
@@ -86,7 +87,6 @@ public:
 UINT8 kay_kbd_c_r( running_machine &machine );
 UINT8 kay_kbd_d_r( running_machine &machine );
 void kay_kbd_d_w( running_machine &machine, UINT8 data );
-INTERRUPT_GEN( kay_kbd_interrupt );
 
 INPUT_PORTS_EXTERN( kay_kbd );
 

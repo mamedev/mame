@@ -523,8 +523,8 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz/8)        /* 2,2168 MHz */
 	MCFG_CPU_PROGRAM_MAP(cgenie_mem)
 	MCFG_CPU_IO_MAP(cgenie_io)
-	MCFG_CPU_VBLANK_INT("screen", cgenie_frame_interrupt)
-	MCFG_CPU_PERIODIC_INT(cgenie_timer_interrupt, 40)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cgenie_state,  cgenie_frame_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(cgenie_state, cgenie_timer_interrupt,  40)
 	MCFG_QUANTUM_TIME(attotime::from_hz(240))
 
 

@@ -219,7 +219,7 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 750000)	// 750 kHz
 	MCFG_CPU_PROGRAM_MAP(microtan_map)
-	MCFG_CPU_VBLANK_INT("screen", microtan_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", microtan_state,  microtan_interrupt)
 
 
     /* video hardware - include overscan */

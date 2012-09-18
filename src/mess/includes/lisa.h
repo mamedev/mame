@@ -164,6 +164,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_lisa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(lisa_interrupt);
 };
 
 
@@ -173,8 +174,6 @@ extern const via6522_interface lisa_via6522_0_intf;
 extern const via6522_interface lisa_via6522_1_intf;
 
 extern NVRAM_HANDLER(lisa);
-
-INTERRUPT_GEN( lisa_interrupt );
 
 
 #endif /* LISA_H_ */

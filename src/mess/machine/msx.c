@@ -532,15 +532,14 @@ TIMER_DEVICE_CALLBACK( msx2_interrupt )
 	state->m_v9938->interrupt();
 }
 
-INTERRUPT_GEN( msx_interrupt )
+INTERRUPT_GEN_MEMBER(msx_state::msx_interrupt)
 {
-	msx_state *state = device->machine().driver_data<msx_state>();
 	int i;
 
 	for (i=0; i<2; i++)
 	{
-		state->m_mouse[i] = state->ioport(i ? "MOUSE1" : "MOUSE0")->read();
-		state->m_mouse_stat[i] = -1;
+		m_mouse[i] = ioport(i ? "MOUSE1" : "MOUSE0")->read();
+		m_mouse_stat[i] = -1;
 	}
 }
 

@@ -476,7 +476,7 @@ static MACHINE_CONFIG_START( rx78, rx78_state )
 	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK/7)	// unknown divider
 	MCFG_CPU_PROGRAM_MAP(rx78_mem)
 	MCFG_CPU_IO_MAP(rx78_io)
-	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", rx78_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

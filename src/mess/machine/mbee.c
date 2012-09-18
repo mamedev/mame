@@ -559,25 +559,24 @@ MACHINE_RESET_MEMBER(mbee_state,mbeett)
 	machine().scheduler().timer_set(attotime::from_usec(4), FUNC(mbee_reset));
 }
 
-INTERRUPT_GEN( mbee_interrupt )
+INTERRUPT_GEN_MEMBER(mbee_state::mbee_interrupt)
 {
 // Due to the uncertainly and hackage here, this is commented out for now - Robbbert - 05-Oct-2010
 #if 0
-	mbee_state *state = device->machine().driver_data<mbee_state>();
 
-	//address_space &space = *device->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	//address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/* The printer status connects to the pio ASTB pin, and the printer changing to not
         busy should signal an interrupt routine at B61C, (next line) but this doesn't work.
         The line below does what the interrupt should be doing. */
 	/* But it would break any program loaded to that area of memory, such as CP/M programs */
 
-	//state->m_z80pio->strobe_a(centronics_busy_r(state->m_printer)); /* signal int when not busy (L->H) */
-	//space.write_byte(0x109, centronics_busy_r(state->m_printer));
+	//m_z80pio->strobe_a(centronics_busy_r(m_printer)); /* signal int when not busy (L->H) */
+	//space.write_byte(0x109, centronics_busy_r(m_printer));
 
 
 	/* once per frame, pulse the PIO B bit 7 - it is in the schematic as an option,
     but need to find out what it does */
-	state->m_clock_pulse = 0x80;
+	m_clock_pulse = 0x80;
 	irq0_line_hold(device);
 
 #endif

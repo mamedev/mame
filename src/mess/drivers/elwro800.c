@@ -50,6 +50,7 @@ public:
 	DECLARE_READ8_MEMBER(elwro800jr_io_r);
 	DECLARE_WRITE8_MEMBER(elwro800jr_io_w);
 	DECLARE_MACHINE_RESET(elwro800);	
+	INTERRUPT_GEN_MEMBER(elwro800jr_interrupt);
 };
 
 
@@ -535,9 +536,9 @@ static const cassette_interface elwro800jr_cassette_interface =
 	NULL
 };
 
-static INTERRUPT_GEN( elwro800jr_interrupt )
+INTERRUPT_GEN_MEMBER(elwro800_state::elwro800jr_interrupt)
 {
-	device->execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 static const floppy_interface elwro800jr_floppy_interface =
@@ -578,7 +579,7 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 	MCFG_CPU_ADD("maincpu",Z80, 3500000)	/* 3.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(elwro800_mem)
 	MCFG_CPU_IO_MAP(elwro800_io)
-	MCFG_CPU_VBLANK_INT("screen", elwro800jr_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", elwro800_state,  elwro800jr_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(elwro800_state,elwro800)
 

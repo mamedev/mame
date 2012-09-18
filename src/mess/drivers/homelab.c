@@ -73,13 +73,13 @@ public:
 	DECLARE_VIDEO_START(brailab4);
 	UINT32 screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(homelab_frame);
 };
 
-static INTERRUPT_GEN( homelab_frame )
+INTERRUPT_GEN_MEMBER(homelab_state::homelab_frame)
 {
-	homelab_state *state = device->machine().driver_data<homelab_state>();
-	if (state->m_nmi)
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (m_nmi)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER( homelab_state::key_r ) // offset 27F-2FE
@@ -741,7 +741,7 @@ static MACHINE_CONFIG_START( homelab, homelab_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(homelab2_mem)
-	MCFG_CPU_VBLANK_INT("screen", homelab_frame)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", homelab_state,  homelab_frame)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

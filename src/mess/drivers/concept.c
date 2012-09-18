@@ -119,7 +119,7 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8182000)        /* 16.364 MHz / 2 */
 	MCFG_CPU_PROGRAM_MAP(concept_memmap)
-	MCFG_CPU_VBLANK_INT("screen", concept_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", concept_state,  concept_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

@@ -56,6 +56,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_concept(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(concept_interrupt);
 };
 
 
@@ -63,8 +64,5 @@ public:
 
 extern const via6522_interface concept_via6522_intf;
 extern const wd17xx_interface concept_wd17xx_interface;
-
-INTERRUPT_GEN( concept_interrupt );
-
 
 #endif /* CONCEPT_H_ */

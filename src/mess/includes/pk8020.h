@@ -45,6 +45,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_pk8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(pk8020_interrupt);
 };
 
 
@@ -54,6 +55,5 @@ extern const i8255_interface pk8020_ppi8255_interface_2;
 extern const i8255_interface pk8020_ppi8255_interface_3;
 extern const struct pit8253_config pk8020_pit8253_intf;
 extern const struct pic8259_interface pk8020_pic8259_config;
-extern INTERRUPT_GEN( pk8020_interrupt );
 
 #endif /* pk8020_H_ */

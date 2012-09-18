@@ -34,12 +34,12 @@ public:
 	virtual void machine_reset();
 	DECLARE_MACHINE_RESET(primob);
 	UINT32 screen_update_primo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(primo_vblank_interrupt);
 };
 
 
 /*----------- defined in machine/primo.c -----------*/
 
-extern INTERRUPT_GEN( primo_vblank_interrupt );
 extern SNAPSHOT_LOAD( primo );
 extern QUICKLOAD_LOAD( primo );
 

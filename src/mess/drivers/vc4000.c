@@ -392,7 +392,7 @@ static MACHINE_CONFIG_START( vc4000, vc4000_state )
 	MCFG_CPU_ADD("maincpu", S2650, 3546875/4)
 	MCFG_CPU_PROGRAM_MAP(vc4000_mem)
 	MCFG_CPU_IO_MAP(vc4000_io)
-	MCFG_CPU_PERIODIC_INT(vc4000_video_line, 312*53)	// GOLF needs this exact value
+	MCFG_CPU_PERIODIC_INT_DRIVER(vc4000_state, vc4000_video_line,  312*53)	// GOLF needs this exact value
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

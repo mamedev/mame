@@ -1069,7 +1069,7 @@ static MACHINE_CONFIG_START( msx, msx_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)		  /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(msx_memory_map)
 	MCFG_CPU_IO_MAP(msx_io_map)
-	MCFG_CPU_VBLANK_INT("screen", msx_interrupt)	/* Needed for mouse updates */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", msx_state,  msx_interrupt)	/* Needed for mouse updates */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(msx_state, msx )

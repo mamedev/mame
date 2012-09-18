@@ -66,7 +66,7 @@ static MACHINE_CONFIG_START( alphasmart, alphasmart_state )
 	MCFG_CPU_PROGRAM_MAP(alphasmart_mem)
 	MCFG_CPU_IO_MAP(alphasmart_io)
 	MCFG_CPU_CONFIG(alphasmart_hc11_config)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 50)
+	MCFG_CPU_PERIODIC_INT_DRIVER(alphasmart_state, irq0_line_hold,  50)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

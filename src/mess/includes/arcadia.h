@@ -81,7 +81,6 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(arcadia_video_line);
 };
-
-extern INTERRUPT_GEN( arcadia_video_line );
 #endif /* ARCADIA_H_ */

@@ -164,6 +164,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(mz2500_vbl);
 };
 
 
@@ -1821,13 +1822,12 @@ static GFXDECODE_START( mz2500 )
 	GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_3bpp, 0, 4)
 GFXDECODE_END
 
-static INTERRUPT_GEN( mz2500_vbl )
+INTERRUPT_GEN_MEMBER(mz2500_state::mz2500_vbl)
 {
-	mz2500_state *state = device->machine().driver_data<mz2500_state>();
-	if(state->m_irq_mask[0])
-		device->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_irq_vector[0]);
+	if(m_irq_mask[0])
+		device.execute().set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[0]);
 
-	state->m_cg_clear_flag = 0;
+	m_cg_clear_flag = 0;
 }
 
 static READ8_DEVICE_HANDLER( mz2500_porta_r )
@@ -2097,7 +2097,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
     MCFG_CPU_ADD("maincpu", Z80, 6000000)
     MCFG_CPU_PROGRAM_MAP(mz2500_map)
     MCFG_CPU_IO_MAP(mz2500_io)
-	MCFG_CPU_VBLANK_INT("screen", mz2500_vbl)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mz2500_state,  mz2500_vbl)
 
 
 	MCFG_I8255_ADD( "i8255_0", ppi8255_intf )

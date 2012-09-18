@@ -143,7 +143,7 @@ static MACHINE_CONFIG_START( interact, interact_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(interact_mem)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,50) /*  put on the I8080 irq in Hz*/
+	MCFG_CPU_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
 
 	MCFG_MACHINE_RESET_OVERRIDE(interact_state,interact)
 	MCFG_MACHINE_START_OVERRIDE(interact_state,interact)
@@ -184,7 +184,7 @@ static MACHINE_CONFIG_START( hector1, interact_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(interact_mem)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,50) /*  put on the I8080 irq in Hz*/
+	MCFG_CPU_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
 
 	MCFG_MACHINE_RESET_OVERRIDE(interact_state,interact)
 	MCFG_MACHINE_START_OVERRIDE(interact_state,interact)

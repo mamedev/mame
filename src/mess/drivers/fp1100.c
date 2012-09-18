@@ -115,6 +115,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	INTERRUPT_GEN_MEMBER(fp1100_vblank_irq);
 };
 
 void fp1100_state::video_start()
@@ -394,12 +395,11 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static INTERRUPT_GEN( fp1100_vblank_irq )
+INTERRUPT_GEN_MEMBER(fp1100_state::fp1100_vblank_irq)
 {
-	fp1100_state *state = device->machine().driver_data<fp1100_state>();
 
-	if(state->irq_mask & 0x10)
-		device->machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xf0);
+	if(irq_mask & 0x10)
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xf0);
 }
 
 static MACHINE_CONFIG_START( fp1100, fp1100_state )
@@ -407,7 +407,7 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(fp1100_map)
 	MCFG_CPU_IO_MAP(fp1100_io)
-	MCFG_CPU_VBLANK_INT("screen",fp1100_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", fp1100_state, fp1100_vblank_irq)
 
 	MCFG_CPU_ADD( "sub", UPD7801, XTAL_4MHz ) //unknown clock
 	MCFG_CPU_PROGRAM_MAP( fp1100_slave_map )

@@ -1787,18 +1787,17 @@ static TIMER_CALLBACK( towns_vblank_end )
 	state->m_video.towns_vblank_flag = 0;
 }
 
-INTERRUPT_GEN( towns_vsync_irq )
+INTERRUPT_GEN_MEMBER(towns_state::towns_vsync_irq)
 {
-	towns_state* state = device->machine().driver_data<towns_state>();
-	device_t* dev = state->m_pic_slave;
+	device_t* dev = m_pic_slave;
 	pic8259_ir3_w(dev, 1);  // IRQ11 = VSync
 	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set high\n");
-	state->m_video.towns_vblank_flag = 1;
-	device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_vblank_end(), FUNC(towns_vblank_end), 0, (void*)dev);
-	if(state->m_video.towns_tvram_enable)
+	m_video.towns_vblank_flag = 1;
+	machine().scheduler().timer_set(machine().primary_screen->time_until_vblank_end(), FUNC(towns_vblank_end), 0, (void*)dev);
+	if(m_video.towns_tvram_enable)
 		draw_text_layer(dev->machine());
-	if(state->m_video.towns_sprite_reg[1] & 0x80)
-		draw_sprites(dev->machine(),&state->m_video.towns_crtc_layerscr[1]);
+	if(m_video.towns_sprite_reg[1] & 0x80)
+		draw_sprites(dev->machine(),&m_video.towns_crtc_layerscr[1]);
 }
 
 void towns_state::video_start()

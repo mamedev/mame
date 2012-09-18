@@ -83,6 +83,7 @@ public:
 	int m_cia_irq;
 	int m_vic_irq;
 	int m_exp_irq;
+	INTERRUPT_GEN_MEMBER(vic10_frame_interrupt);
 };
 
 

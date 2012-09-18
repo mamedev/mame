@@ -243,6 +243,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	INTERRUPT_GEN_MEMBER(gamecom_interrupt);
 };
 
 

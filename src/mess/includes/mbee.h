@@ -141,6 +141,7 @@ public:
 	DECLARE_MACHINE_RESET(mbee256);
 	DECLARE_MACHINE_RESET(mbeett);
 	UINT32 screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(mbee_interrupt);
 };
 
 
@@ -149,7 +150,6 @@ public:
 extern const wd17xx_interface mbee_wd17xx_interface;
 extern const z80pio_interface mbee_z80pio_intf;
 
-INTERRUPT_GEN( mbee_interrupt );
 QUICKLOAD_LOAD( mbee );
 
 

@@ -71,6 +71,8 @@ public:
 	DECLARE_PALETTE_INIT(cgenie);
 	DECLARE_PALETTE_INIT(cgenienz);
 	UINT32 screen_update_cgenie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(cgenie_timer_interrupt);
+	INTERRUPT_GEN_MEMBER(cgenie_frame_interrupt);
 };
 
 
@@ -99,9 +101,6 @@ DECLARE_WRITE8_HANDLER ( cgenie_fontram_w );
 DECLARE_WRITE8_HANDLER ( cgenie_port_ff_w );
  DECLARE_READ8_HANDLER ( cgenie_port_ff_r );
 int cgenie_port_xx_r(int offset);
-
-INTERRUPT_GEN( cgenie_timer_interrupt );
-INTERRUPT_GEN( cgenie_frame_interrupt );
 
  DECLARE_READ8_HANDLER ( cgenie_status_r );
  DECLARE_READ8_HANDLER ( cgenie_track_r );

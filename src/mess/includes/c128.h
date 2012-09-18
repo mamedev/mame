@@ -220,12 +220,11 @@ public:
 	DECLARE_DRIVER_INIT(c128d);
 	DECLARE_DRIVER_INIT(c128);
 	DECLARE_DRIVER_INIT(c128d81);
+	INTERRUPT_GEN_MEMBER(c128_frame_interrupt);
 };
 
 
 /*----------- defined in machine/c128.c -----------*/
-
-extern INTERRUPT_GEN( c128_frame_interrupt );
 
 extern const mos6526_interface c128_cia1_intf, c128_cia2_intf;
 

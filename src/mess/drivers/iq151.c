@@ -95,6 +95,7 @@ public:
 	UINT8 m_cassette_data;
 	iq151cart_slot_device * m_carts[5];
 	DECLARE_DRIVER_INIT(iq151);
+	INTERRUPT_GEN_MEMBER(iq151_vblank_interrupt);
 };
 
 READ8_MEMBER(iq151_state::keyboard_row_r)
@@ -319,12 +320,11 @@ WRITE_LINE_MEMBER( iq151_state::pic_set_int_line )
 	m_maincpu->set_input_line(0, state ?  HOLD_LINE : CLEAR_LINE);
 }
 
-static INTERRUPT_GEN( iq151_vblank_interrupt )
+INTERRUPT_GEN_MEMBER(iq151_state::iq151_vblank_interrupt)
 {
-	iq151_state *state = device->machine().driver_data<iq151_state>();
 
-	pic8259_ir6_w(state->m_pic, state->m_vblank_irq_state & 1);
-	state->m_vblank_irq_state ^= 1;
+	pic8259_ir6_w(m_pic, m_vblank_irq_state & 1);
+	m_vblank_irq_state ^= 1;
 }
 
 static IRQ_CALLBACK(iq151_irq_callback)
@@ -435,7 +435,7 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(iq151_mem)
 	MCFG_CPU_IO_MAP(iq151_io)
-	MCFG_CPU_VBLANK_INT("screen", iq151_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", iq151_state,  iq151_vblank_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -205,9 +205,9 @@ UINT32 gmaster_state::screen_update_gmaster(screen_device &screen, bitmap_ind16 
 }
 
 
-static INTERRUPT_GEN( gmaster_interrupt )
+INTERRUPT_GEN_MEMBER(gmaster_state::gmaster_interrupt)
 {
-	device->machine().device("maincpu")->execute().set_input_line(UPD7810_INTFE1, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(UPD7810_INTFE1, ASSERT_LINE);
 }
 
 static const UPD7810_CONFIG config = {
@@ -221,7 +221,7 @@ static MACHINE_CONFIG_START( gmaster, gmaster_state )
 	MCFG_CPU_PROGRAM_MAP(gmaster_mem)
 	MCFG_CPU_IO_MAP( gmaster_io)
 	MCFG_CPU_CONFIG( config )
-	MCFG_CPU_VBLANK_INT("screen", gmaster_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gmaster_state,  gmaster_interrupt)
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)

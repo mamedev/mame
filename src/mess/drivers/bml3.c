@@ -113,6 +113,8 @@ protected:
 	virtual void palette_init();
 public:	
 	UINT32 screen_update_bml3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(bml3_irq);
+	INTERRUPT_GEN_MEMBER(bml3_timer_firq);
 };
 
 #define mc6845_h_char_total 	(m_crtc_vreg[0])
@@ -600,21 +602,20 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 }
 
 #if 0
-static INTERRUPT_GEN( bml3_irq )
+INTERRUPT_GEN_MEMBER(bml3_state::bml3_irq)
 {
-	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 #endif
 
 
-static INTERRUPT_GEN( bml3_timer_firq )
+INTERRUPT_GEN_MEMBER(bml3_state::bml3_timer_firq)
 {
-	bml3_state *state = device->machine().driver_data<bml3_state>();
 
-	if(!state->m_firq_mask)
+	if(!m_firq_mask)
 	{
-		state->m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
-		state->m_firq_status = 1;
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+		m_firq_status = 1;
 	}
 }
 
@@ -889,8 +890,8 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(bml3_mem)
-	MCFG_CPU_VBLANK_INT("screen", bml3_timer_firq )
-//  MCFG_CPU_PERIODIC_INT(bml3_firq,45)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bml3_state,  bml3_timer_firq)
+//	MCFG_CPU_PERIODIC_INT_DRIVER(bml3_state, bml3_firq, 45)
 
 //  MCFG_MACHINE_RESET_OVERRIDE(bml3_state,bml3)
 

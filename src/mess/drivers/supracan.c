@@ -201,6 +201,8 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_supracan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(supracan_irq);
+	INTERRUPT_GEN_MEMBER(supracan_sound_irq);
 };
 
 
@@ -1870,31 +1872,29 @@ static GFXDECODE_START( supracan )
 	GFXDECODE_ENTRY( "ram_gfx3",  0, supracan_gfx1bpp_alt,   0, 0x80 )
 GFXDECODE_END
 
-static INTERRUPT_GEN( supracan_irq )
+INTERRUPT_GEN_MEMBER(supracan_state::supracan_irq)
 {
 #if 0
-	supracan_state *state = (supracan_state *)device->machine().driver_data<supracan_state>();
 
-	if(state->m_irq_mask)
+	if(m_irq_mask)
 	{
-		device->execute().set_input_line(7, HOLD_LINE);
+		device.execute().set_input_line(7, HOLD_LINE);
 	}
 #endif
 }
 
-static INTERRUPT_GEN( supracan_sound_irq )
+INTERRUPT_GEN_MEMBER(supracan_state::supracan_sound_irq)
 {
-	supracan_state *state = (supracan_state *)device->machine().driver_data<supracan_state>();
 
-	state->m_sound_irq_source_reg |= 0x80;
+	m_sound_irq_source_reg |= 0x80;
 
-	if(state->m_sound_irq_enable_reg & state->m_sound_irq_source_reg)
+	if(m_sound_irq_enable_reg & m_sound_irq_source_reg)
 	{
-		device->machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);
+		machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);
 	}
 	else
 	{
-		device->machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE);
+		machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE);
 	}
 }
 
@@ -1902,11 +1902,11 @@ static MACHINE_CONFIG_START( supracan, supracan_state )
 
 	MCFG_CPU_ADD( "maincpu", M68000, XTAL_10_738635MHz )		/* Correct frequency unknown */
 	MCFG_CPU_PROGRAM_MAP( supracan_mem )
-	MCFG_CPU_VBLANK_INT("screen", supracan_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_irq)
 
 	MCFG_CPU_ADD( "soundcpu", M6502, XTAL_3_579545MHz )		/* TODO: Verify actual clock */
 	MCFG_CPU_PROGRAM_MAP( supracan_sound_mem )
-	MCFG_CPU_VBLANK_INT("screen", supracan_sound_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_sound_irq)
 
 #if !(SOUNDCPU_BOOT_HACK)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")

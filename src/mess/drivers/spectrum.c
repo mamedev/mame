@@ -660,9 +660,9 @@ static GFXDECODE_START( spectrum )
 GFXDECODE_END
 
 
-static INTERRUPT_GEN( spec_interrupt )
+INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 {
-	device->execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 static const cassette_interface spectrum_cassette_interface =
@@ -708,7 +708,7 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 	MCFG_CPU_ADD("maincpu", Z80, X1 / 4)        /* This is verified only for the ZX Spectum. Other clones are reported to have different clocks */
 	MCFG_CPU_PROGRAM_MAP(spectrum_mem)
 	MCFG_CPU_IO_MAP(spectrum_io)
-	MCFG_CPU_VBLANK_INT("screen", spec_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spectrum_state,  spec_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum )

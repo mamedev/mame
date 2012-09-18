@@ -671,29 +671,28 @@ static TIMER_CALLBACK(intv_btb_fill)
 	state->m_backtab_row += 1;
 }
 
-INTERRUPT_GEN( intv_interrupt )
+INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt)
 {
-	intv_state *state = device->machine().driver_data<intv_state>();
-	device->machine().device("maincpu")->execute().set_input_line(CP1610_INT_INTRM, ASSERT_LINE);
-	state->m_sr1_int_pending = 1;
-	state->m_bus_copy_mode = 1;
-	state->m_backtab_row = 0;
+	machine().device("maincpu")->execute().set_input_line(CP1610_INT_INTRM, ASSERT_LINE);
+	m_sr1_int_pending = 1;
+	m_bus_copy_mode = 1;
+	m_backtab_row = 0;
 	UINT8 row;
-	device->machine().device("maincpu")->execute().adjust_icount(-(12*STIC_ROW_BUSRQ+STIC_FRAME_BUSRQ)); // Account for stic cycle stealing
-	device->machine().scheduler().timer_set(device->machine().device<cpu_device>("maincpu")
+	machine().device("maincpu")->execute().adjust_icount(-(12*STIC_ROW_BUSRQ+STIC_FRAME_BUSRQ)); // Account for stic cycle stealing
+	machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")
 		->cycles_to_attotime(STIC_VBLANK_END), FUNC(intv_interrupt_complete));
 	for (row=0; row < STIC_BACKTAB_HEIGHT; row++)
 	{
-		device->machine().scheduler().timer_set(device->machine().device<cpu_device>("maincpu")
-			->cycles_to_attotime(STIC_FIRST_FETCH-STIC_FRAME_BUSRQ+STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*state->m_row_delay + (STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*STIC_CARD_HEIGHT - STIC_ROW_BUSRQ)*row), FUNC(intv_btb_fill));
+		machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")
+			->cycles_to_attotime(STIC_FIRST_FETCH-STIC_FRAME_BUSRQ+STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*m_row_delay + (STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*STIC_CARD_HEIGHT - STIC_ROW_BUSRQ)*row), FUNC(intv_btb_fill));
 	}
 
-	if (state->m_row_delay == 0)
+	if (m_row_delay == 0)
 	{
-		device->machine().device("maincpu")->execute().adjust_icount(-STIC_ROW_BUSRQ); // extra row fetch occurs if vertical delay == 0
+		machine().device("maincpu")->execute().adjust_icount(-STIC_ROW_BUSRQ); // extra row fetch occurs if vertical delay == 0
 	}
 
-	intv_stic_screenrefresh(device->machine());
+	intv_stic_screenrefresh(machine());
 }
 
 /* hand 0 == left, 1 == right, 2 == ECS hand controller 1, 3 == ECS hand controller 2 */

@@ -1329,14 +1329,13 @@ void newbrain_state::machine_reset()
 	timer_set(attotime::from_usec(get_reset_t()), TIMER_ID_RESET);
 }
 
-static INTERRUPT_GEN( newbrain_interrupt )
+INTERRUPT_GEN_MEMBER(newbrain_state::newbrain_interrupt)
 {
-	newbrain_state *state = device->machine().driver_data<newbrain_state>();
 
-	if (!(state->m_enrg1 & NEWBRAIN_ENRG1_CLK))
+	if (!(m_enrg1 & NEWBRAIN_ENRG1_CLK))
 	{
-		state->m_clkint = 0;
-		state->check_interrupt();
+		m_clkint = 0;
+		check_interrupt();
 	}
 }
 
@@ -1381,7 +1380,7 @@ static MACHINE_CONFIG_START( newbrain_a, newbrain_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/8)
 	MCFG_CPU_PROGRAM_MAP(newbrain_map)
 	MCFG_CPU_IO_MAP(newbrain_a_io_map)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, newbrain_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, newbrain_state,  newbrain_interrupt)
 
 	MCFG_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/N
 	MCFG_CPU_IO_MAP(newbrain_cop_io_map)

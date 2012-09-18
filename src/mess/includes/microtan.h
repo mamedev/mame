@@ -52,6 +52,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_microtan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(microtan_interrupt);
 };
 
 
@@ -62,7 +63,5 @@ extern const via6522_interface microtan_via6522_1;
 
 SNAPSHOT_LOAD( microtan );
 QUICKLOAD_LOAD( microtan_hexfile );
-
-INTERRUPT_GEN( microtan_interrupt );
 
 #endif /* MICROTAN_H_ */

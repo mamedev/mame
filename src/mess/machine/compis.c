@@ -1395,8 +1395,8 @@ void compis_state::machine_reset()
 /* Name: compis                                                            */
 /* Desc: Interrupt - Vertical Blanking Interrupt                           */
 /*-------------------------------------------------------------------------*/
-INTERRUPT_GEN( compis_vblank_int )
+INTERRUPT_GEN_MEMBER(compis_state::compis_vblank_int)
 {
 //  compis_gdc_vblank_int();
-	compis_keyb_update(device->machine());
+	compis_keyb_update(machine());
 }

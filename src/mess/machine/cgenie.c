@@ -411,13 +411,12 @@ int result = state->m_irq_status;
 	return result;
 }
 
-INTERRUPT_GEN( cgenie_timer_interrupt )
+INTERRUPT_GEN_MEMBER(cgenie_state::cgenie_timer_interrupt)
 {
-	cgenie_state *state = device->machine().driver_data<cgenie_state>();
-	if( (state->m_irq_status & IRQ_TIMER) == 0 )
+	if( (m_irq_status & IRQ_TIMER) == 0 )
 	{
-		state->m_irq_status |= IRQ_TIMER;
-		device->machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+		m_irq_status |= IRQ_TIMER;
+		machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -591,15 +590,14 @@ WRITE8_HANDLER( cgenie_fontram_w )
  *
  *************************************/
 
-INTERRUPT_GEN( cgenie_frame_interrupt )
+INTERRUPT_GEN_MEMBER(cgenie_state::cgenie_frame_interrupt)
 {
-	cgenie_state *state = device->machine().driver_data<cgenie_state>();
-	if( state->m_tv_mode != (device->machine().root_device().ioport("DSW0")->read() & 0x10) )
+	if( m_tv_mode != (machine().root_device().ioport("DSW0")->read() & 0x10) )
 	{
-		state->m_tv_mode = state->ioport("DSW0")->read() & 0x10;
+		m_tv_mode = ioport("DSW0")->read() & 0x10;
 		/* force setting of background color */
-		state->m_port_ff ^= FF_BGD0;
-		cgenie_port_ff_w(*device->machine().device("maincpu")->memory().space(AS_PROGRAM), 0, state->m_port_ff ^ FF_BGD0);
+		m_port_ff ^= FF_BGD0;
+		cgenie_port_ff_w(*machine().device("maincpu")->memory().space(AS_PROGRAM), 0, m_port_ff ^ FF_BGD0);
 	}
 }
 

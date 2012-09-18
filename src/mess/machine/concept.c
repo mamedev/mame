@@ -182,9 +182,9 @@ static void poll_keyboard(running_machine &machine)
 	}
 }
 
-INTERRUPT_GEN( concept_interrupt )
+INTERRUPT_GEN_MEMBER(concept_state::concept_interrupt)
 {
-	poll_keyboard(device->machine());
+	poll_keyboard(machine());
 }
 
 /*

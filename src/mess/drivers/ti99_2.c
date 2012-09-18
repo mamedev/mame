@@ -102,6 +102,7 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(ti99_2_vblank_interrupt);
 };
 
 
@@ -130,11 +131,10 @@ void ti99_2_state::machine_reset()
 		membank("bank1")->set_base((memregion("maincpu")->base()+0x4000));
 }
 
-static INTERRUPT_GEN( ti99_2_vblank_interrupt )
+INTERRUPT_GEN_MEMBER(ti99_2_state::ti99_2_vblank_interrupt)
 {
-	ti99_2_state *state = device->machine().driver_data<ti99_2_state>();
-	device->execute().set_input_line(1, state->m_irq_state);
-	state->m_irq_state = (state->m_irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
+	device.execute().set_input_line(1, m_irq_state);
+	m_irq_state = (m_irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
 }
 
 
@@ -380,7 +380,7 @@ static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
 	MCFG_CPU_CONFIG(ti99_2_processor_config)
 	MCFG_CPU_PROGRAM_MAP(ti99_2_memmap)
 	MCFG_CPU_IO_MAP(ti99_2_io)
-	MCFG_CPU_VBLANK_INT("screen", ti99_2_vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ti99_2_state,  ti99_2_vblank_interrupt)
 
 
 	/* video hardware */

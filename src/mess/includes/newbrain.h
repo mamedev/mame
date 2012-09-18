@@ -157,6 +157,7 @@ public:
 	int m_copstate;
 	int m_copbytes;
 	int m_copregint;
+	INTERRUPT_GEN_MEMBER(newbrain_interrupt);
 };
 
 class newbrain_eim_state : public newbrain_state

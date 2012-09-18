@@ -712,7 +712,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_CPU_PROGRAM_MAP(mbeeic_mem)
 	MCFG_CPU_IO_MAP(mbeeic_io)
 	MCFG_CPU_CONFIG(mbee_daisy_chain)
-	//MCFG_CPU_VBLANK_INT("screen", mbee_interrupt)
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", mbee_state,  mbee_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee )
 

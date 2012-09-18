@@ -261,6 +261,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_pdp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_pdp1(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(pdp1_interrupt);
 };
 
 /*----------- defined in video/pdp1.c -----------*/

@@ -145,12 +145,7 @@ public:
 
 /*----------- defined in machine/lynx.c -----------*/
 
-
-
-
 void lynx_timer_count_down(running_machine &machine, int nr);
-
-INTERRUPT_GEN( lynx_frame_int );
 
 /* These functions are also needed for the Quickload */
 int lynx_verify_cart (char *header, int kind);

@@ -613,59 +613,58 @@ static void arcadia_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap)
 	if (arcadia_sprite_collision(state,2,3)) state->m_reg.d.collision_sprite&=~0x20; //guess
 }
 
-INTERRUPT_GEN( arcadia_video_line )
+INTERRUPT_GEN_MEMBER(arcadia_state::arcadia_video_line)
 {
-	arcadia_state *state = device->machine().driver_data<arcadia_state>();
-	screen_device *screen = device->machine().first_screen();
+	screen_device *screen = machine().first_screen();
 	int width = screen->width();
 
-	if (state->m_ad_delay<=0)
-	state->m_ad_select=state->m_reg.d.pal[1]&0x40;
-	else state->m_ad_delay--;
+	if (m_ad_delay<=0)
+	m_ad_select=m_reg.d.pal[1]&0x40;
+	else m_ad_delay--;
 
-	state->m_line++;
-	state->m_line%=262;
+	m_line++;
+	m_line%=262;
 	// unbelievable, reflects only charline, but alien invaders uses it for
 	// alien scrolling
 
-	if (state->m_line<state->m_ypos)
+	if (m_line<m_ypos)
 	{
-		state->m_bitmap->plot_box(0, state->m_line, width, 1, (state->m_reg.d.pal[1])&7);
-		memset(state->m_bg[state->m_line], 0, sizeof(state->m_bg[0]));
+		m_bitmap->plot_box(0, m_line, width, 1, (m_reg.d.pal[1])&7);
+		memset(m_bg[m_line], 0, sizeof(m_bg[0]));
 	}
 	else
 	{
-		int h=state->m_doublescan?16:8;
+		int h=m_doublescan?16:8;
 
-		state->m_charline=(state->m_line-state->m_ypos)/h;
+		m_charline=(m_line-m_ypos)/h;
 
-		if (state->m_charline<13)
+		if (m_charline<13)
 		{
-			if (((state->m_line-state->m_ypos)&(h-1))==0)
+			if (((m_line-m_ypos)&(h-1))==0)
 			{
-				arcadia_vh_draw_line(device->machine(), *state->m_bitmap, state->m_charline*h+state->m_ypos,
-					state->m_reg.d.chars1[state->m_charline]);
+				arcadia_vh_draw_line(machine(), *m_bitmap, m_charline*h+m_ypos,
+					m_reg.d.chars1[m_charline]);
 			}
 		}
 		else
-		if (state->m_lines26 && (state->m_charline<26))
+		if (m_lines26 && (m_charline<26))
 		{
-			if (((state->m_line-state->m_ypos)&(h-1))==0)
+			if (((m_line-m_ypos)&(h-1))==0)
 			{
-				arcadia_vh_draw_line(device->machine(), *state->m_bitmap, state->m_charline*h+state->m_ypos,
-					state->m_reg.d.chars2[state->m_charline-13]);
+				arcadia_vh_draw_line(machine(), *m_bitmap, m_charline*h+m_ypos,
+					m_reg.d.chars2[m_charline-13]);
 			}
-		state->m_charline-=13;
+		m_charline-=13;
 		}
 		else
 		{
-			state->m_charline=0xd;
-			state->m_bitmap->plot_box(0, state->m_line, width, 1, (state->m_reg.d.pal[1])&7);
-			memset(state->m_bg[state->m_line], 0, sizeof(state->m_bg[0]));
+			m_charline=0xd;
+			m_bitmap->plot_box(0, m_line, width, 1, (m_reg.d.pal[1])&7);
+			memset(m_bg[m_line], 0, sizeof(m_bg[0]));
 		}
 	}
-	if (state->m_line==261)
-		arcadia_draw_sprites(device->machine(), *state->m_bitmap);
+	if (m_line==261)
+		arcadia_draw_sprites(machine(), *m_bitmap);
 }
 
 READ8_MEMBER( arcadia_state::arcadia_vsync_r )

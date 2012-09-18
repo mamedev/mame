@@ -573,76 +573,75 @@ INLINE void vc4000_draw_grid(running_machine &machine, UINT8 *collision)
 	}
 }
 
-INTERRUPT_GEN( vc4000_video_line )
+INTERRUPT_GEN_MEMBER(vc4000_state::vc4000_video_line)
 {
-	vc4000_state *state = device->machine().driver_data<vc4000_state>();
 	int x,y,i;
 	UINT8 collision[400]={0}; // better alloca or gcc feature of non constant long automatic arrays
-	const rectangle &visarea = device->machine().primary_screen->visible_area();
-	assert(ARRAY_LENGTH(collision) >= device->machine().primary_screen->width());
+	const rectangle &visarea = machine().primary_screen->visible_area();
+	assert(ARRAY_LENGTH(collision) >= machine().primary_screen->width());
 
-	state->m_video.line++;
-	if (state->m_irq_pause) state->m_irq_pause++;
-	if (state->m_video.line>311) state->m_video.line=0;
+	m_video.line++;
+	if (m_irq_pause) m_irq_pause++;
+	if (m_video.line>311) m_video.line=0;
 
-	if (state->m_video.line==0)
+	if (m_video.line==0)
 	{
-		state->m_video.background_collision=0;
-		state->m_video.sprite_collision=0;
-		state->m_video.reg.d.sprite_collision=0;
+		m_video.background_collision=0;
+		m_video.sprite_collision=0;
+		m_video.reg.d.sprite_collision=0;
 //      logerror("begin of frame\n");
 	}
 
-	if (state->m_irq_pause>10)
+	if (m_irq_pause>10)
 	{
-		device->machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
-		state->m_irq_pause = 0;
+		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+		m_irq_pause = 0;
 	}
 
-	if (state->m_video.line <= VC4000_END_LINE)
+	if (m_video.line <= VC4000_END_LINE)
 	{
-		vc4000_draw_grid(device->machine(), collision);
+		vc4000_draw_grid(machine(), collision);
 
 		/* init object colours */
-		for (i=visarea.min_x; i<visarea.max_x; i++) state->m_objects[i]=8;
+		for (i=visarea.min_x; i<visarea.max_x; i++) m_objects[i]=8;
 
 		/* calculate object colours and OR overlapping object colours */
-		vc4000_sprite_update(state, *state->m_bitmap, collision, &state->m_video.sprites[0]);
-		vc4000_sprite_update(state, *state->m_bitmap, collision, &state->m_video.sprites[1]);
-		vc4000_sprite_update(state, *state->m_bitmap, collision, &state->m_video.sprites[2]);
-		vc4000_sprite_update(state, *state->m_bitmap, collision, &state->m_video.sprites[3]);
+		vc4000_sprite_update(this, *m_bitmap, collision, &m_video.sprites[0]);
+		vc4000_sprite_update(this, *m_bitmap, collision, &m_video.sprites[1]);
+		vc4000_sprite_update(this, *m_bitmap, collision, &m_video.sprites[2]);
+		vc4000_sprite_update(this, *m_bitmap, collision, &m_video.sprites[3]);
 
 		for (i=visarea.min_x; i<visarea.max_x; i++)
 		{
-			state->m_video.sprite_collision|=state->m_sprite_collision[collision[i]];
-			state->m_video.background_collision|=state->m_background_collision[collision[i]];
+			m_video.sprite_collision|=m_sprite_collision[collision[i]];
+			m_video.background_collision|=m_background_collision[collision[i]];
 			/* display final object colours */
-			if (state->m_objects[i] < 8)
-					state->m_bitmap->pix16(state->m_video.line, i) = state->m_objects[i];
+			if (m_objects[i] < 8)
+					m_bitmap->pix16(m_video.line, i) = m_objects[i];
 		}
 
-		y = state->m_video.reg.d.score_control&1?200:20;
+		y = m_video.reg.d.score_control&1?200:20;
 
-		if ((state->m_video.line>=y)&&(state->m_video.line<y+20))
+		if ((m_video.line>=y)&&(m_video.line<y+20))
 		{
 			x = 60;
-			vc4000_draw_digit(state, *state->m_bitmap, x, y, state->m_video.reg.d.bcd[0]>>4, state->m_video.line-y);
-			vc4000_draw_digit(state, *state->m_bitmap, x+16, y, state->m_video.reg.d.bcd[0]&0xf, state->m_video.line-y);
-			if (state->m_video.reg.d.score_control&2)	x -= 16;
-			vc4000_draw_digit(state, *state->m_bitmap, x+48, y, state->m_video.reg.d.bcd[1]>>4, state->m_video.line-y);
-			vc4000_draw_digit(state, *state->m_bitmap, x+64, y, state->m_video.reg.d.bcd[1]&0xf, state->m_video.line-y);
+			vc4000_draw_digit(this, *m_bitmap, x, y, m_video.reg.d.bcd[0]>>4, m_video.line-y);
+			vc4000_draw_digit(this, *m_bitmap, x+16, y, m_video.reg.d.bcd[0]&0xf, m_video.line-y);
+			if (m_video.reg.d.score_control&2)	x -= 16;
+			vc4000_draw_digit(this, *m_bitmap, x+48, y, m_video.reg.d.bcd[1]>>4, m_video.line-y);
+			vc4000_draw_digit(this, *m_bitmap, x+64, y, m_video.reg.d.bcd[1]&0xf, m_video.line-y);
 		}
 	}
-	if (state->m_video.line==VC4000_END_LINE) state->m_video.reg.d.sprite_collision |=0x40;
+	if (m_video.line==VC4000_END_LINE) m_video.reg.d.sprite_collision |=0x40;
 
-	if (((state->m_video.line == VC4000_END_LINE) |
-		(state->m_video.sprites[3].finished_now) |
-		(state->m_video.sprites[2].finished_now) |
-		(state->m_video.sprites[1].finished_now) |
-		(state->m_video.sprites[0].finished_now)) && (!state->m_irq_pause))
+	if (((m_video.line == VC4000_END_LINE) |
+		(m_video.sprites[3].finished_now) |
+		(m_video.sprites[2].finished_now) |
+		(m_video.sprites[1].finished_now) |
+		(m_video.sprites[0].finished_now)) && (!m_irq_pause))
 		{
-			device->machine().device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 3);
-			state->m_irq_pause=1;
+			machine().device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 3);
+			m_irq_pause=1;
 		}
 }
 

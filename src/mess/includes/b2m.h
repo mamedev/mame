@@ -49,6 +49,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_b2m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(b2m_vblank_interrupt);
 };
 
 /*----------- defined in machine/b2m.c -----------*/
@@ -59,7 +60,5 @@ extern const struct pic8259_interface b2m_pic8259_config;
 extern const i8255_interface b2m_ppi8255_interface_1;
 extern const i8255_interface b2m_ppi8255_interface_2;
 extern const i8255_interface b2m_ppi8255_interface_3;
-
-extern INTERRUPT_GEN( b2m_vblank_interrupt );
 
 #endif

@@ -82,6 +82,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void palette_init();
+	INTERRUPT_GEN_MEMBER(samcoupe_frame_interrupt);
 };
 
 

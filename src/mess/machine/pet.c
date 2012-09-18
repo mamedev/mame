@@ -762,26 +762,25 @@ void pet_state::machine_reset()
 }
 
 
-INTERRUPT_GEN( pet_frame_interrupt )
+INTERRUPT_GEN_MEMBER(pet_state::pet_frame_interrupt)
 {
-	pet_state *state = device->machine().driver_data<pet_state>();
-	if (state->m_superpet)
+	if (m_superpet)
 	{
-		if (state->ioport("CFG")->read() & 0x04)
+		if (ioport("CFG")->read() & 0x04)
 		{
-			device->execute().set_input_line(INPUT_LINE_HALT, 1);
-			device->execute().set_input_line(INPUT_LINE_HALT, 0);
-			state->m_font |= 2;
+			device.execute().set_input_line(INPUT_LINE_HALT, 1);
+			device.execute().set_input_line(INPUT_LINE_HALT, 0);
+			m_font |= 2;
 		}
 		else
 		{
-			device->execute().set_input_line(INPUT_LINE_HALT, 0);
-			device->execute().set_input_line(INPUT_LINE_HALT, 1);
-			state->m_font &= ~2;
+			device.execute().set_input_line(INPUT_LINE_HALT, 0);
+			device.execute().set_input_line(INPUT_LINE_HALT, 1);
+			m_font &= ~2;
 		}
 	}
 
-	set_led_status (device->machine(),1, device->machine().root_device().ioport("SPECIAL")->read() & 0x80 ? 1 : 0);		/* Shift Lock */
+	set_led_status (machine(),1, machine().root_device().ioport("SPECIAL")->read() & 0x80 ? 1 : 0);		/* Shift Lock */
 }
 
 

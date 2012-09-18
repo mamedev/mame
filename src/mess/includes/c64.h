@@ -142,6 +142,7 @@ public:
 	int m_cass_rd;
 	int m_iec_srq;
 	DECLARE_DRIVER_INIT(c64pal);
+	INTERRUPT_GEN_MEMBER(c64_frame_interrupt);
 };
 
 

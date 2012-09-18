@@ -289,9 +289,9 @@ static const vic3_interface c65_vic3_pal_intf = {
 	c65_c64_mem_r
 };
 
-static INTERRUPT_GEN( vic3_raster_irq )
+INTERRUPT_GEN_MEMBER(c65_state::vic3_raster_irq)
 {
-	device_t *vic3 = device->machine().device("vic3");
+	device_t *vic3 = machine().device("vic3");
 
 	vic3_raster_interrupt_gen(vic3);
 }
@@ -306,8 +306,8 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M4510, 3500000)  /* or VIC6567_CLOCK, */
 	MCFG_CPU_PROGRAM_MAP(c65_mem)
-	MCFG_CPU_VBLANK_INT("screen", c65_frame_interrupt)
-	MCFG_CPU_PERIODIC_INT(vic3_raster_irq, VIC6567_HRETRACERATE)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", c65_state,  c65_frame_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(c65_state, vic3_raster_irq,  VIC6567_HRETRACERATE)
 
 	MCFG_MACHINE_START_OVERRIDE(c65_state, c65 )
 

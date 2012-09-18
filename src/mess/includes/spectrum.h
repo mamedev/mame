@@ -123,6 +123,7 @@ public:
 	UINT32 screen_update_tc2048(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ts2068(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_spectrum(screen_device &screen, bool state);
+	INTERRUPT_GEN_MEMBER(spec_interrupt);
 };
 
 

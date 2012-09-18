@@ -610,7 +610,7 @@ static MACHINE_CONFIG_DERIVED( model1, trs80 )		// model I, level II
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( model1_map)
 	MCFG_CPU_IO_MAP( model1_io)
-	MCFG_CPU_PERIODIC_INT(trs80_rtc_interrupt, 40)
+	MCFG_CPU_PERIODIC_INT_DRIVER(trs80_state, trs80_rtc_interrupt,  40)
 
 	/* devices */
 	MCFG_CASSETTE_MODIFY( CASSETTE_TAG, trs80l2_cassette_interface )
@@ -625,7 +625,7 @@ static MACHINE_CONFIG_DERIVED( model3, model1 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( model3_map)
 	MCFG_CPU_IO_MAP( model3_io)
-	MCFG_CPU_PERIODIC_INT(trs80_rtc_interrupt, 30)
+	MCFG_CPU_PERIODIC_INT_DRIVER(trs80_state, trs80_rtc_interrupt,  30)
 
 	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, trs80m4 )
 

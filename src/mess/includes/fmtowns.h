@@ -274,6 +274,8 @@ class towns_state : public driver_device
 	void poll_keyboard();
 	void mouse_timeout();
 	void wait_end();
+public:	
+	INTERRUPT_GEN_MEMBER(towns_vsync_irq);
 };
 
 class marty_state : public towns_state
@@ -285,9 +287,5 @@ class marty_state : public towns_state
 
 	virtual void driver_start();
 };
-
-INTERRUPT_GEN( towns_vsync_irq );
-//VIDEO_START( towns );
-//SCREEN_UPDATE_RGB32( towns );
 
 #endif /*FMTOWNS_H_*/

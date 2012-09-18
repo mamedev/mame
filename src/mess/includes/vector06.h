@@ -64,14 +64,12 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_vector06(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vector06_interrupt);
 };
 
 
 /*----------- defined in machine/vector06.c -----------*/
-
 extern const i8255_interface vector06_ppi8255_interface;
 extern const i8255_interface vector06_ppi8255_2_interface;
-
-extern INTERRUPT_GEN( vector06_interrupt );
 
 #endif /* VECTOR06_H_ */

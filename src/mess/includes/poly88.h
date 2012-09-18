@@ -34,14 +34,11 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_poly88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(poly88_interrupt);
 };
 
 
 /*----------- defined in machine/poly88.c -----------*/
-
-
-INTERRUPT_GEN( poly88_interrupt );
-
 extern const i8251_interface poly88_usart_interface;
 
 extern SNAPSHOT_LOAD( poly88 );

@@ -132,6 +132,7 @@ private:
 	virtual void machine_reset();
 public:	
 	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
 
 void rainbow_state::machine_start()
@@ -316,9 +317,9 @@ READ8_MEMBER( rainbow_state::read_video_ram_r )
 	return m_p_ram[offset];
 }
 
-static INTERRUPT_GEN( vblank_irq )
+INTERRUPT_GEN_MEMBER(rainbow_state::vblank_irq)
 {
-    device->execute().set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, 0x20);
+    device.execute().set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, 0x20);
 }
 
 WRITE8_MEMBER( rainbow_state::clear_video_interrupt )
@@ -463,7 +464,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_CPU_ADD("maincpu",I8088, XTAL_24_0734MHz / 5)
 	MCFG_CPU_PROGRAM_MAP(rainbow8088_map)
 	MCFG_CPU_IO_MAP(rainbow8088_io)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", rainbow_state,  vblank_irq)
 
 	MCFG_CPU_ADD("subcpu",Z80, XTAL_24_0734MHz / 6)
 	MCFG_CPU_PROGRAM_MAP(rainbowz80_mem)

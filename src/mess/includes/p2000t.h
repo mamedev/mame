@@ -44,6 +44,7 @@ public:
 	DECLARE_VIDEO_START(p2000m);
 	DECLARE_PALETTE_INIT(p2000m);
 	UINT32 screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(p2000_interrupt);
 };
 
 #endif /* P2000T_H_ */

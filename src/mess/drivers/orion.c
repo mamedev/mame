@@ -183,7 +183,7 @@ static MACHINE_CONFIG_START( orionz80, orion_state )
     MCFG_CPU_ADD("maincpu", Z80, 2500000)
     MCFG_CPU_PROGRAM_MAP(orionz80_mem)
     MCFG_CPU_IO_MAP(orionz80_io)
-    MCFG_CPU_VBLANK_INT("screen",orionz80_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", orion_state, orionz80_interrupt)
 
     MCFG_MACHINE_START_OVERRIDE(orion_state, orionz80 )
     MCFG_MACHINE_RESET_OVERRIDE(orion_state, orionz80 )

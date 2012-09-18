@@ -357,7 +357,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_CPU_ADD("maincpu", I80186, 8000000)	/* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(compis_mem)
 	MCFG_CPU_IO_MAP(compis_io)
-	MCFG_CPU_VBLANK_INT("screen", compis_vblank_int)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", compis_state,  compis_vblank_int)
 	MCFG_CPU_CONFIG(i86_address_mask)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -400,7 +400,7 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_CPU_ADD("maincpu", I80186, 8000000)	/* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(compis_mem)
 	MCFG_CPU_IO_MAP(compis_io)
-	MCFG_CPU_VBLANK_INT("screen", compis_vblank_int)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", compis_state,  compis_vblank_int)
 	MCFG_CPU_CONFIG(i86_address_mask)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(60))

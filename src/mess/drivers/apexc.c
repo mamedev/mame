@@ -32,6 +32,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(apexc_interrupt);
 };
 
 
@@ -395,10 +396,9 @@ INPUT_PORTS_END
 /*
     Not a real interrupt - just handle keyboard input
 */
-static INTERRUPT_GEN( apexc_interrupt )
+INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 {
-	apexc_state *state = device->machine().driver_data<apexc_state>();
-	address_space& space = *device->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 edit_keys;
 	int control_keys;
 
@@ -406,26 +406,26 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 
 	/* read new state of edit keys */
-	edit_keys = device->machine().root_device().ioport("data")->read();
+	edit_keys = machine().root_device().ioport("data")->read();
 
 	/* toggle data reg according to transitions */
-	state->m_panel_data_reg ^= edit_keys & (~state->m_old_edit_keys);
+	m_panel_data_reg ^= edit_keys & (~m_old_edit_keys);
 
 	/* remember new state of edit keys */
-	state->m_old_edit_keys = edit_keys;
+	m_old_edit_keys = edit_keys;
 
 
 	/* read new state of control keys */
-	control_keys = state->ioport("panel")->read();
+	control_keys = ioport("panel")->read();
 
 	/* compute transitions */
-	control_transitions = control_keys & (~state->m_old_control_keys);
+	control_transitions = control_keys & (~m_old_control_keys);
 
 	/* process commands */
 
 	if (control_transitions & panel_run)
 	{	/* toggle run/stop state */
-		device->state().set_state_int(APEXC_STATE, ! device->state().state_int(APEXC_STATE));
+		device.state().set_state_int(APEXC_STATE, ! device.state().state_int(APEXC_STATE));
 	}
 
 	while (control_transitions & (panel_CR | panel_A | panel_R | panel_ML | panel_HB))
@@ -467,10 +467,10 @@ static INTERRUPT_GEN( apexc_interrupt )
 			/* read/write register #reg_id */
 			if (control_keys & panel_write)
 				/* write reg */
-				device->state().set_state_int(reg_id, state->m_panel_data_reg);
+				device.state().set_state_int(reg_id, m_panel_data_reg);
 			else
 				/* read reg */
-				state->m_panel_data_reg = device->state().state_int(reg_id);
+				m_panel_data_reg = device.state().state_int(reg_id);
 		}
 	}
 
@@ -479,16 +479,16 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 		if (control_keys & panel_write) {
 			/* write memory */
-			space.write_dword(device->state().state_int(APEXC_ML_FULL)<<2, state->m_panel_data_reg);
+			space.write_dword(device.state().state_int(APEXC_ML_FULL)<<2, m_panel_data_reg);
 		}
 		else {
 			/* read memory */
-			state->m_panel_data_reg = space.read_dword(device->state().state_int(APEXC_ML_FULL)<<2);
+			m_panel_data_reg = space.read_dword(device.state().state_int(APEXC_ML_FULL)<<2);
 		}
 	}
 
 	/* remember new state of control keys */
-	state->m_old_control_keys = control_keys;
+	m_old_control_keys = control_keys;
 }
 
 /*
@@ -869,7 +869,7 @@ static MACHINE_CONFIG_START( apexc, apexc_state )
 	MCFG_CPU_PROGRAM_MAP(apexc_mem_map)
 	MCFG_CPU_IO_MAP(apexc_io_map)
 	/* dummy interrupt: handles the control panel */
-	MCFG_CPU_VBLANK_INT("screen", apexc_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", apexc_state,  apexc_interrupt)
 	/*MCFG_CPU_PERIODIC_INT(func, rate)*/
 
 
