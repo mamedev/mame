@@ -34,7 +34,7 @@ public:
 };
 
 // blind guess
-#define MAIN_CLOCK 2000000
+#define MAIN_CLOCK 6000000
 
 /* System with RAM at 0x0c00 */
 

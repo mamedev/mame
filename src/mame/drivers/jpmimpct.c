@@ -93,6 +93,7 @@
 #include "includes/jpmimpct.h"
 #include "machine/meters.h"
 #include "machine/nvram.h"
+#include "jpmimpct.lh"
 
 /*************************************
  *
@@ -1383,7 +1384,7 @@ static MACHINE_CONFIG_START( impctawp, jpmimpct_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_DEFAULT_LAYOUT(layout_awpvid16)
+	MCFG_DEFAULT_LAYOUT(layout_jpmimpct)
 MACHINE_CONFIG_END
 
 /*************************************

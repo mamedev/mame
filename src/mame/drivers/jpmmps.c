@@ -662,7 +662,7 @@ ROM_END
 
 ROM_START( j2hotpot )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "hpv7-1.p1", 0x0000, 0x2000, CRC(bb43d2fa) SHA1(23a3fd7cf49fb4540467dc695973f943c6d659c7) )
+	ROM_LOAD( "hpv7-1.p1", 0x0000, 0x2000, CRC(bb43d2fa) SHA1(23a3fd7cf49fb4540467dc695973f943c6d659c7) )//3gbp token, v7.1
 	ROM_LOAD( "hpv7-2.p2", 0x2000, 0x2000, CRC(a3e59d08) SHA1(1f9872cfdc80216972fe071603bafb7caaf81bc8) )
 	ROM_LOAD( "hpv7-3.p3", 0x4000, 0x2000, CRC(1413c369) SHA1(e6d72ab545c74ee3cf8645f8719a798caa4d0f88) )
 
@@ -740,7 +740,7 @@ ROM_END
 
 
 
-ROM_START( j2litean )
+ROM_START( j2litean )//MPS2
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lite_a_nudge_mk3_3_1.bin", 0x0000, 0x8000, CRC(2e4f176a) SHA1(c369ab233b4892a65fa885906bb52585c178aa1b) )
 	ROM_LOAD( "lite_a_nudge_mk3_3_2.bin", 0x8000, 0x8000, CRC(f427b39d) SHA1(24907b2c7936f178db183796543e338b7206c107) )
@@ -809,7 +809,7 @@ ROM_START( j2mongam )
 	ROM_LOAD( "mongam63.bin", 0x4000, 0x4000, CRC(4a8d11a0) SHA1(fe7e00cfb10d83d9f521cf6dcd27d51a561af916) )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	// something else?
+	// something else? TTX dumps this as the MPS set
 	ROM_LOAD( "moneygame3.1.bin", 0x0000, 0x2000, CRC(14734a7e) SHA1(84bcfaaa3f59d8ef2acefe399b48f258e507f20a) )
 	ROM_LOAD( "moneygame3.2.bin", 0x0000, 0x2000, CRC(6c7ce60c) SHA1(c775925efbb44963d57aea5719d9a3aba181ab71) )
 	ROM_LOAD( "moneygame3.3.bin", 0x0000, 0x4000, CRC(1303e942) SHA1(3e9436408375c7ca0f636f9eb92bec48e3d1d05c) )
@@ -1450,7 +1450,7 @@ ROM_END
 
 
 
-ROM_START( j2montrp )
+ROM_START( j2montrp )//PCP conversion of Bank Raid cabinet
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mtrap_p1.bin", 0x0000, 0x2000, CRC(8ae769ee) SHA1(ce738d817c040e3d2563c1a0af0f416aef12d465) )
 	ROM_LOAD( "mtrap_p2.bin", 0x2000, 0x2000, CRC(97861334) SHA1(05b63738884357ce91fb5dc9872ef3bc105b255c) )

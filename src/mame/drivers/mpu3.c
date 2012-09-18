@@ -93,6 +93,8 @@ TODO: - Distinguish door switches using manual
 #include "machine/roc10937.h"
 #include "machine/meters.h"
 
+#include "mpu3.lh"
+
 #ifdef MAME_DEBUG
 #define MPU3VERBOSE 1
 #else
@@ -916,7 +918,7 @@ static MACHINE_CONFIG_START( mpu3base, mpu3_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEFAULT_LAYOUT(layout_awpvid16)
+	MCFG_DEFAULT_LAYOUT(layout_mpu3)
 MACHINE_CONFIG_END
 
 

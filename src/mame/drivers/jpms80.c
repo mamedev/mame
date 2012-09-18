@@ -1,4 +1,4 @@
-/* JPM MPS1/2 Hardware
+/* JPM System 80 Hardware
 
   TMS9995 CPU
 
@@ -115,6 +115,12 @@ ROM_START( j80bac )
 	ROM_LOAD( "bankacoinp3.bin", 0x2000, 0x1000, CRC(0c3b2954) SHA1(4342a2a047496caf8569d4519dd8daad47e634e3) )
 ROM_END
 
+ROM_START( j80blbnk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "blankity-bank-p1.bin", 0x0000, 0x1000, CRC(8b2aeca6) SHA1(207db63d5130cb7a8eb9be41d116432f7b7728b0) )
+	ROM_LOAD( "blankity-bank-p2.bin", 0x1000, 0x1000, CRC(561262da) SHA1(d1f3e7815c5ea3ba7c26ed3b95a16c802f6af50f) )
+	ROM_LOAD( "blankity-bank-p3.bin", 0x2000, 0x1000, CRC(39925035) SHA1(0af8c8f8074c4873581250474d59d715178cded4) )
+ROM_END
 
 
 ROM_START( j80bounc )
@@ -296,6 +302,9 @@ GAME(198?, j80topsp	,0			,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Top 
 GAME(198?, j80topup	,0			,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Top Up (JPM) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j80tumbl	,0			,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Tumble (JPM) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j80wsprt	,0			,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Winsprint (JPM) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
+
+GAME(198?, j80blbnk	,0			,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "PCP","Blankity Bank (PCP) (SYSTEM80)",						GAME_IS_SKELETON_MECHANICAL )
+
 // these look like they're probably SYSTEM80, not 100% sure tho
 GAME(198?, j80alad	,0			,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Aladdin's Cave (PCP)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j80fortr	,0			,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Fortune Trail (JPM)",						GAME_IS_SKELETON_MECHANICAL )

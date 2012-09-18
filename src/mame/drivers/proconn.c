@@ -16,6 +16,8 @@
 #include "video/awpvid.h"
 #include "machine/roc10937.h"
 
+#include "proconn.lh"
+
 class proconn_state : public driver_device
 {
 public:
@@ -379,7 +381,7 @@ static MACHINE_CONFIG_START( proconn, proconn_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 
-	MCFG_DEFAULT_LAYOUT(layout_awpvid16)
+	MCFG_DEFAULT_LAYOUT(layout_proconn)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1000000) /* ?? Mhz */ // YM2149F on PC92?
 	MCFG_SOUND_CONFIG(ay8910_config)

@@ -99,7 +99,6 @@ Optional (on expansion card) (Viper)
 #include "machine/bfm_comn.h"
 #include "bfm_sc1.lh"
 
-
 class bfm_sc1_state : public driver_device
 {
 public:
@@ -1104,7 +1103,7 @@ static MACHINE_CONFIG_START( scorpion1, bfm_sc1_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_DEFAULT_LAYOUT(layout_awpvid14)
+	MCFG_DEFAULT_LAYOUT(layout_bfm_sc1)
 MACHINE_CONFIG_END
 
 /////////////////////////////////////////////////////////////////////////////////////

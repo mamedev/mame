@@ -2,9 +2,6 @@
 
     Bellfruit system85 driver, (under heavy construction !!!)
 
-    M.A.M.E Core Copyright Nicola Salmoria and the MAME Team,
-    used under license from http://mamedev.org
-
   ******************************************************************************************
 
 
@@ -68,6 +65,8 @@ ___________________________________________________________________________
 #include "machine/nvram.h"
 #include "machine/bfm_comn.h"
 
+#include "bfmsys85.lh"
+
 class bfmsys85_state : public driver_device
 {
 public:
@@ -114,11 +113,6 @@ public:
 	virtual void machine_reset();
 	INTERRUPT_GEN_MEMBER(timer_irq);
 };
-
-
-#define VFD_RESET  0x20
-#define VFD_CLOCK1 0x80
-#define VFD_DATA   0x40
 
 #define MASTER_CLOCK	(XTAL_4MHz)
 
@@ -262,17 +256,18 @@ READ8_MEMBER(bfmsys85_state::mmtr_r)
 
 WRITE8_MEMBER(bfmsys85_state::vfd_w)
 {
+//reset 0x20, clock 0x80, data 0x40
 
-	if (data & VFD_RESET)//inverted?
+	if (data & 0x20)//inverted?
 	{
-		if (m_alpha_clock != (data & VFD_CLOCK1))
+		if (m_alpha_clock != (data & 0x80))
 		{
 			if (m_alpha_clock)//rising edge
 			{
-				m_vfd->shift_data(data & VFD_DATA?1:0);
+				m_vfd->shift_data(data & 0x40?1:0);
 			}
 		}
-	m_alpha_clock = (data & VFD_CLOCK1);
+	m_alpha_clock = (data & 0x80);
 	}
 	else
 	{
@@ -429,7 +424,7 @@ static MACHINE_CONFIG_START( bfmsys85, bfmsys85_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")						// load/save nv RAM
 
-	MCFG_DEFAULT_LAYOUT(layout_awpvid16)
+	MCFG_DEFAULT_LAYOUT(layout_bfmsys85)
 MACHINE_CONFIG_END
 
 // input ports for system85 board /////////////////////////////////////////

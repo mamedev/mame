@@ -12,10 +12,10 @@
         * Monopoly Deluxe
 
     Known Issues:
-        * Artwork support is needed as the monitor bezel illuminates
-        to indicate progress through the games.
-        * Features used by the AWP games such as lamps, reels and
-        meters are not emulated.
+        * Some features used by the AWP games such as reels and meters 
+		are not emulated.
+		* Timing for reels, and other opto devices is controlled by the same clock
+		as the lamps, in a weird daisychain setup.
 
     AWP game notes:
       The byte at 0x81 of the EVEN 68k rom appears to be some kind of
@@ -40,6 +40,7 @@
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
 
+#include "jpmsys5.lh"
 
 enum state { IDLE, START, DATA, STOP1, STOP2 };
 
@@ -97,6 +98,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(a2_rx_r);
 	DECLARE_WRITE_LINE_MEMBER(a2_tx_w);
 	DECLARE_READ_LINE_MEMBER(a2_dcd_r);
+	DECLARE_READ16_MEMBER(mux_awp_r);
+	DECLARE_READ16_MEMBER(coins_awp_r);
 	void sys5_draw_lamps();
 	DECLARE_MACHINE_START(jpmsys5v);
 	DECLARE_MACHINE_RESET(jpmsys5v);
@@ -743,7 +746,36 @@ static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
 	MCFG_PTM6840_ADD("6840ptm", ptm_intf)
 MACHINE_CONFIG_END
 
+READ16_MEMBER(jpmsys5_state::mux_awp_r)
+{
+	static const char *const portnames[] = { "DSW", "DSW2", "ROTARY", "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4" };
 
+	if ((offset >0x7f) && (offset <0x8f))
+	{
+		return ioport(portnames[( (offset - 0x80) >>1)])->read();
+	}
+	else
+	{
+		return 0xffff;
+	}
+}
+
+READ16_MEMBER(jpmsys5_state::coins_awp_r)
+{
+	switch (offset)
+	{
+		case 2:
+		{
+			return ioport("COINS")->read() << 8;	
+		}
+		break;
+		default:
+		{
+			logerror("coins read offset: %x",offset);
+			return 0xffff;
+		}
+	}
+}
 
 static ADDRESS_MAP_START( 68000_awp_map, AS_PROGRAM, 16, jpmsys5_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
@@ -803,6 +835,28 @@ static INPUT_PORTS_START( popeye )
 	PORT_DIPSETTING(	0x40, "40%" )
 	PORT_DIPSETTING(	0xc0, "30%" )
 
+	PORT_START("DSW2")
+	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("ROTARY")//not everything has this hooked up, cna be used as a test switch internally
+	PORT_CONFNAME(0x0F, 0x0F, "Rotary Switch")
+	PORT_CONFSETTING(	0x0F, "0")
+	PORT_CONFSETTING(	0x0E, "1")
+	PORT_CONFSETTING(	0x0D, "2")
+	PORT_CONFSETTING(	0x0C, "3")
+	PORT_CONFSETTING(	0x0B, "4")
+	PORT_CONFSETTING(	0x0A, "5")
+	PORT_CONFSETTING(	0x09, "6")
+	PORT_CONFSETTING(	0x08, "7")
+	PORT_CONFSETTING(	0x06, "8")
+	PORT_CONFSETTING(	0x07, "9")
+	PORT_CONFSETTING(	0x05, "10")
+	PORT_CONFSETTING(	0x04, "11")
+	PORT_CONFSETTING(	0x03, "12")
+	PORT_CONFSETTING(	0x02, "13")
+	PORT_CONFSETTING(	0x01, "14")
+	PORT_CONFSETTING(	0x00, "15")
+		
 	PORT_START("DIRECT")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
@@ -830,6 +884,23 @@ static INPUT_PORTS_START( popeye )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("100p")
 	PORT_BIT( 0xc3, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_START("STROBE0")
+	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("STROBE1")
+	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("STROBE2")
+	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("STROBE3")
+	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("STROBE4")
+	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("STROBE5")
+	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNKNOWN)
 INPUT_PORTS_END
 
 /*************************************
@@ -880,7 +951,7 @@ static MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
 
 	/* 6840 PTM */
 	MCFG_PTM6840_ADD("6840ptm", ptm_intf)
-	MCFG_DEFAULT_LAYOUT(layout_awpvid16)
+	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
 MACHINE_CONFIG_END
 
 /*************************************

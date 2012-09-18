@@ -1982,9 +1982,7 @@ $(DRIVERS)/beaminv.o:	$(LAYOUT)/beaminv.lh
 $(DRIVERS)/bfm_sc1.o:	$(LAYOUT)/bfm_sc1.lh
 
 $(DRIVERS)/bfm_sc2.o:	$(LAYOUT)/bfm_sc2.lh \
-			$(LAYOUT)/awpdmd.lh \
-			$(LAYOUT)/awpvid14.lh \
-			$(LAYOUT)/awpvid16.lh \
+			$(LAYOUT)/sc2_dmd.lh \
 			$(LAYOUT)/drwho.lh \
 			$(LAYOUT)/gldncrwn.lh \
 			$(LAYOUT)/quintoon.lh \
@@ -2000,6 +1998,8 @@ $(DRIVERS)/bfm_sc4.o:	$(LAYOUT)/bfm_sc4.lh \
 
 $(DRIVERS)/bfm_sc4h.o:	$(LAYOUT)/bfm_sc4.lh \
 			$(LAYOUT)/sc4_dmd.lh
+
+$(DRIVERS)/bfmsys85.o:	$(LAYOUT)/bfmsys85.lh
 
 $(DRIVERS)/blockade.o:	$(LAYOUT)/blockade.lh
 
@@ -2075,9 +2075,9 @@ $(DRIVERS)/igspoker.o:	$(LAYOUT)/igspoker.lh
 
 $(DRIVERS)/jankenmn.o:	$(LAYOUT)/jankenmn.lh
 
-$(DRIVERS)/jpmimpct.o:	$(LAYOUT)/awpvid16.lh
+$(DRIVERS)/jpmimpct.o:	$(LAYOUT)/jpmimpct.lh
 
-$(DRIVERS)/jpmsys5.o:	$(LAYOUT)/awpvid16.lh
+$(DRIVERS)/jpmsys5.o:	$(LAYOUT)/jpmsys5.lh
 
 $(DRIVERS)/kas89.o:		$(LAYOUT)/kas89.lh
 
@@ -2098,11 +2098,15 @@ $(DRIVERS)/majorpkr.o:	$(LAYOUT)/majorpkr.lh
 
 $(DRIVERS)/maxaflex.o:	$(LAYOUT)/maxaflex.lh
 
+$(DRIVERS)/maygay1b.o:	$(LAYOUT)/maygay1b.lh
+
 $(DRIVERS)/mcr.o:		$(LAYOUT)/dpoker.lh
 
 $(DRIVERS)/mcr3.o:		$(LAYOUT)/turbotag.lh
 
 $(DRIVERS)/mpoker.o:	$(LAYOUT)/mpoker.lh
+
+$(DRIVERS)/mpu3.o:	$(LAYOUT)/mpu3.lh
 
 $(DRIVERS)/mpu4mod2sw.o:	$(LAYOUT)/connect4.lh \
 
@@ -2161,6 +2165,8 @@ $(DRIVERS)/peplus.o:	$(LAYOUT)/peplus.lh \
 
 $(DRIVERS)/polepos.o:	$(LAYOUT)/polepos.lh \
 			$(LAYOUT)/topracer.lh
+
+$(DRIVERS)/proconn.o:	$(LAYOUT)/proconn.lh
 
 $(DRIVERS)/qix.o:	$(LAYOUT)/elecyoyo.lh
 

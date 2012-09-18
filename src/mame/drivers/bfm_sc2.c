@@ -167,10 +167,8 @@ Adder hardware:
 
 /* fruit machines only */
 #include "video/bfm_dm01.h"
-#include "awpdmd.lh"
+#include "sc2_dmd.lh"
 #include "drwho.lh"
-#include "awpvid14.lh"
-#include "awpvid16.lh"
 #include "machine/bfm_comn.h"
 
 
@@ -3722,7 +3720,7 @@ static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
 	MCFG_NVRAM_HANDLER(bfm_sc2)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_awpvid14)
+	MCFG_DEFAULT_LAYOUT(layout_bfm_sc2)
 MACHINE_CONFIG_END
 
 
@@ -3754,7 +3752,7 @@ static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
 	MCFG_NVRAM_HANDLER(bfm_sc2)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_awpdmd)
+	MCFG_DEFAULT_LAYOUT(layout_sc2_dmd)
 	MCFG_CPU_ADD("matrix", M6809, 2000000 )				/* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
 	MCFG_CPU_PROGRAM_MAP(bfm_dm01_memmap)
 	MCFG_CPU_PERIODIC_INT(bfm_dm01_vbl, 1500 )			/* generate 1500 NMI's per second ?? what is the exact freq?? */

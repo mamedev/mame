@@ -11522,6 +11522,8 @@ j80topup	// Top Up (JPM)
 j80tumbl	// Tumble (JPM)
 j80wsprt	// Winsprint (JPM)
 
+j80blbnk	// Blankity Bank (PCP)
+
 // Close to System 80
 j80alad	// Aladdin's Cave (PCP)
 j80fortr	// Fortune Trail (JPM)
