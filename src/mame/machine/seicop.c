@@ -2463,8 +2463,11 @@ static WRITE16_HANDLER( generic_cop_w )
             */
 			if(COP_CMD(0xf9a,0xb9a,0xb9c,0xb9c,0xb9c,0x29c,0x000,0x000,5,0xfcdd))
 			{
+				int dy = r0;
+				int dx = r1;
 				int div = space.read_word(cop_register[0]+(0x36^2));
 				int res;
+				int cop_dist_raw;
 
 				if(!div)
 				{
@@ -2472,9 +2475,13 @@ static WRITE16_HANDLER( generic_cop_w )
 					div = 1;
 				}
 
-				/* TODO: not yet accurate (throws some bits away while converting) */
-				res = cop_dist;
-				res <<= 5 - cop_scale;
+				/* TODO: calculation of this one should occur at 0x3b30/0x3bb0 I *think* */
+				/* TODO: recheck if cop_scale still masks at 3 with this command */
+				dx >>= 11 + cop_scale;
+				dy >>= 11 + cop_scale;
+				cop_dist_raw = sqrt((double)(dx*dx+dy*dy));
+
+				res = cop_dist_raw;
 				res /= div;
 
 				cop_dist = (1 << (5 - cop_scale)) / div;
