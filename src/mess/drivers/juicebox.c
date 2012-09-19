@@ -59,6 +59,7 @@ public:
 	DECLARE_DRIVER_INIT(juicebox);
 	virtual void machine_start();
 	virtual void machine_reset();
+	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
 };
 
 /***************************************************************************
@@ -238,11 +239,9 @@ static WRITE16_DEVICE_HANDLER( s3c44b0_i2s_data_w )
 
 // ...
 
-static INPUT_CHANGED( port_changed )
+INPUT_CHANGED_MEMBER(juicebox_state::port_changed)
 {
-	running_machine &machine = field.machine();
-	juicebox_state *juicebox = machine.driver_data<juicebox_state>();
-	s3c44b0_request_eint( juicebox->s3c44b0, (FPTR)param);
+	s3c44b0_request_eint( s3c44b0, (FPTR)param);
 }
 
 // ...
@@ -322,11 +321,11 @@ MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( juicebox )
 	PORT_START( "PORTG" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED(port_changed, (void *)0) PORT_NAME("RETURN") PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CHANGED(port_changed, (void *)0) PORT_NAME("PLAY") PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CHANGED(port_changed, (void *)0) PORT_NAME("FORWARD") PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CHANGED(port_changed, (void *)0) PORT_NAME("REVERSE") PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CHANGED(port_changed, (void *)0) PORT_NAME("STAR") PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, (void *)0) PORT_NAME("RETURN") PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, (void *)0) PORT_NAME("PLAY") PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, (void *)0) PORT_NAME("FORWARD") PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, (void *)0) PORT_NAME("REVERSE") PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, (void *)0) PORT_NAME("STAR") PORT_PLAYER(1)
 INPUT_PORTS_END
 
 /***************************************************************************

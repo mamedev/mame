@@ -314,17 +314,15 @@ INPUT_PORTS_END
 
 
 /* Steph 2000-10-27 I remapped the 'Machine Name' Dip Switches (easier to understand) */
-static INPUT_CHANGED( cpc_monitor_changed )
+INPUT_CHANGED_MEMBER(amstrad_state::cpc_monitor_changed)
 {
-	running_machine &machine = field.machine();
-	amstrad_state *drvstate = machine.driver_data<amstrad_state>();
-	if ( (machine.root_device().ioport("green_display")->read()) & 0x01 )
+	if ( (machine().root_device().ioport("green_display")->read()) & 0x01 )
 	{
-		drvstate->PALETTE_INIT_CALL_MEMBER( amstrad_cpc_green );
+		PALETTE_INIT_CALL_MEMBER( amstrad_cpc_green );
 	}
 	else
 	{
-		drvstate->PALETTE_INIT_CALL_MEMBER( amstrad_cpc );
+		PALETTE_INIT_CALL_MEMBER( amstrad_cpc );
 	}
 }
 
@@ -386,7 +384,7 @@ As far as I know, the KC compact used HD6845S only.
 //  PORT_CONFSETTING(M6845_PERSONALITY_PREASIC, "Type 4 - Pre-ASIC")
 
 	PORT_START("green_display")
-	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED( cpc_monitor_changed, 0 )
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, amstrad_state,  cpc_monitor_changed, 0 )
 	PORT_CONFSETTING(0x00, "CTM640 Colour Monitor" )
 	PORT_CONFSETTING(0x01, "GT64 Green Monitor" )
 

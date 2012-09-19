@@ -22,6 +22,7 @@ public:
 	UINT8 m_store_line;
 	virtual void machine_reset();
 	UINT32 screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_INPUT_CHANGED_MEMBER(panel_check);
 };
 
 
@@ -81,124 +82,123 @@ enum
 	PANEL_HALT,
 };
 
-static INPUT_CHANGED( panel_check )
+INPUT_CHANGED_MEMBER(ssem_state::panel_check)
 {
-	ssem_state *state = field.machine().driver_data<ssem_state>();
-	UINT8 edit0_state = field.machine().root_device().ioport("EDIT0")->read();
-	UINT8 edit1_state = field.machine().root_device().ioport("EDIT1")->read();
-	UINT8 edit2_state = field.machine().root_device().ioport("EDIT2")->read();
-	UINT8 edit3_state = field.machine().root_device().ioport("EDIT3")->read();
-	UINT8 misc_state = field.machine().root_device().ioport("MISC")->read();
-	device_t *ssem_cpu = field.machine().device("maincpu");
+	UINT8 edit0_state = machine().root_device().ioport("EDIT0")->read();
+	UINT8 edit1_state = machine().root_device().ioport("EDIT1")->read();
+	UINT8 edit2_state = machine().root_device().ioport("EDIT2")->read();
+	UINT8 edit3_state = machine().root_device().ioport("EDIT3")->read();
+	UINT8 misc_state = machine().root_device().ioport("MISC")->read();
+	device_t *ssem_cpu = machine().device("maincpu");
 
 	switch( (int)(FPTR)param )
 	{
 		case PANEL_BIT0:
-			if(edit0_state & 0x01) state->m_store[(state->m_store_line << 2) | 0] ^= 0x80;
+			if(edit0_state & 0x01) m_store[(m_store_line << 2) | 0] ^= 0x80;
 			break;
 		case PANEL_BIT1:
-			if(edit0_state & 0x02) state->m_store[(state->m_store_line << 2) | 0] ^= 0x40;
+			if(edit0_state & 0x02) m_store[(m_store_line << 2) | 0] ^= 0x40;
 			break;
 		case PANEL_BIT2:
-			if(edit0_state & 0x04) state->m_store[(state->m_store_line << 2) | 0] ^= 0x20;
+			if(edit0_state & 0x04) m_store[(m_store_line << 2) | 0] ^= 0x20;
 			break;
 		case PANEL_BIT3:
-			if(edit0_state & 0x08) state->m_store[(state->m_store_line << 2) | 0] ^= 0x10;
+			if(edit0_state & 0x08) m_store[(m_store_line << 2) | 0] ^= 0x10;
 			break;
 		case PANEL_BIT4:
-			if(edit0_state & 0x10) state->m_store[(state->m_store_line << 2) | 0] ^= 0x08;
+			if(edit0_state & 0x10) m_store[(m_store_line << 2) | 0] ^= 0x08;
 			break;
 		case PANEL_BIT5:
-			if(edit0_state & 0x20) state->m_store[(state->m_store_line << 2) | 0] ^= 0x04;
+			if(edit0_state & 0x20) m_store[(m_store_line << 2) | 0] ^= 0x04;
 			break;
 		case PANEL_BIT6:
-			if(edit0_state & 0x40) state->m_store[(state->m_store_line << 2) | 0] ^= 0x02;
+			if(edit0_state & 0x40) m_store[(m_store_line << 2) | 0] ^= 0x02;
 			break;
 		case PANEL_BIT7:
-			if(edit0_state & 0x80) state->m_store[(state->m_store_line << 2) | 0] ^= 0x01;
+			if(edit0_state & 0x80) m_store[(m_store_line << 2) | 0] ^= 0x01;
 			break;
 		case PANEL_BIT8:
-			if(edit1_state & 0x01) state->m_store[(state->m_store_line << 2) | 1] ^= 0x80;
+			if(edit1_state & 0x01) m_store[(m_store_line << 2) | 1] ^= 0x80;
 			break;
 		case PANEL_BIT9:
-			if(edit1_state & 0x02) state->m_store[(state->m_store_line << 2) | 1] ^= 0x40;
+			if(edit1_state & 0x02) m_store[(m_store_line << 2) | 1] ^= 0x40;
 			break;
 		case PANEL_BIT10:
-			if(edit1_state & 0x04) state->m_store[(state->m_store_line << 2) | 1] ^= 0x20;
+			if(edit1_state & 0x04) m_store[(m_store_line << 2) | 1] ^= 0x20;
 			break;
 		case PANEL_BIT11:
-			if(edit1_state & 0x08) state->m_store[(state->m_store_line << 2) | 1] ^= 0x10;
+			if(edit1_state & 0x08) m_store[(m_store_line << 2) | 1] ^= 0x10;
 			break;
 		case PANEL_BIT12:
-			if(edit1_state & 0x10) state->m_store[(state->m_store_line << 2) | 1] ^= 0x08;
+			if(edit1_state & 0x10) m_store[(m_store_line << 2) | 1] ^= 0x08;
 			break;
 		case PANEL_BIT13:
-			if(edit1_state & 0x20) state->m_store[(state->m_store_line << 2) | 1] ^= 0x04;
+			if(edit1_state & 0x20) m_store[(m_store_line << 2) | 1] ^= 0x04;
 			break;
 		case PANEL_BIT14:
-			if(edit1_state & 0x40) state->m_store[(state->m_store_line << 2) | 1] ^= 0x02;
+			if(edit1_state & 0x40) m_store[(m_store_line << 2) | 1] ^= 0x02;
 			break;
 		case PANEL_BIT15:
-			if(edit1_state & 0x80) state->m_store[(state->m_store_line << 2) | 1] ^= 0x01;
+			if(edit1_state & 0x80) m_store[(m_store_line << 2) | 1] ^= 0x01;
 			break;
 		case PANEL_BIT16:
-			if(edit2_state & 0x01) state->m_store[(state->m_store_line << 2) | 2] ^= 0x80;
+			if(edit2_state & 0x01) m_store[(m_store_line << 2) | 2] ^= 0x80;
 			break;
 		case PANEL_BIT17:
-			if(edit2_state & 0x02) state->m_store[(state->m_store_line << 2) | 2] ^= 0x40;
+			if(edit2_state & 0x02) m_store[(m_store_line << 2) | 2] ^= 0x40;
 			break;
 		case PANEL_BIT18:
-			if(edit2_state & 0x04) state->m_store[(state->m_store_line << 2) | 2] ^= 0x20;
+			if(edit2_state & 0x04) m_store[(m_store_line << 2) | 2] ^= 0x20;
 			break;
 		case PANEL_BIT19:
-			if(edit2_state & 0x08) state->m_store[(state->m_store_line << 2) | 2] ^= 0x10;
+			if(edit2_state & 0x08) m_store[(m_store_line << 2) | 2] ^= 0x10;
 			break;
 		case PANEL_BIT20:
-			if(edit2_state & 0x10) state->m_store[(state->m_store_line << 2) | 2] ^= 0x08;
+			if(edit2_state & 0x10) m_store[(m_store_line << 2) | 2] ^= 0x08;
 			break;
 		case PANEL_BIT21:
-			if(edit2_state & 0x20) state->m_store[(state->m_store_line << 2) | 2] ^= 0x04;
+			if(edit2_state & 0x20) m_store[(m_store_line << 2) | 2] ^= 0x04;
 			break;
 		case PANEL_BIT22:
-			if(edit2_state & 0x40) state->m_store[(state->m_store_line << 2) | 2] ^= 0x02;
+			if(edit2_state & 0x40) m_store[(m_store_line << 2) | 2] ^= 0x02;
 			break;
 		case PANEL_BIT23:
-			if(edit2_state & 0x80) state->m_store[(state->m_store_line << 2) | 2] ^= 0x01;
+			if(edit2_state & 0x80) m_store[(m_store_line << 2) | 2] ^= 0x01;
 			break;
 		case PANEL_BIT24:
-			if(edit3_state & 0x01) state->m_store[(state->m_store_line << 2) | 3] ^= 0x80;
+			if(edit3_state & 0x01) m_store[(m_store_line << 2) | 3] ^= 0x80;
 			break;
 		case PANEL_BIT25:
-			if(edit3_state & 0x02) state->m_store[(state->m_store_line << 2) | 3] ^= 0x40;
+			if(edit3_state & 0x02) m_store[(m_store_line << 2) | 3] ^= 0x40;
 			break;
 		case PANEL_BIT26:
-			if(edit3_state & 0x04) state->m_store[(state->m_store_line << 2) | 3] ^= 0x20;
+			if(edit3_state & 0x04) m_store[(m_store_line << 2) | 3] ^= 0x20;
 			break;
 		case PANEL_BIT27:
-			if(edit3_state & 0x08) state->m_store[(state->m_store_line << 2) | 3] ^= 0x10;
+			if(edit3_state & 0x08) m_store[(m_store_line << 2) | 3] ^= 0x10;
 			break;
 		case PANEL_BIT28:
-			if(edit3_state & 0x10) state->m_store[(state->m_store_line << 2) | 3] ^= 0x08;
+			if(edit3_state & 0x10) m_store[(m_store_line << 2) | 3] ^= 0x08;
 			break;
 		case PANEL_BIT29:
-			if(edit3_state & 0x20) state->m_store[(state->m_store_line << 2) | 3] ^= 0x04;
+			if(edit3_state & 0x20) m_store[(m_store_line << 2) | 3] ^= 0x04;
 			break;
 		case PANEL_BIT30:
-			if(edit3_state & 0x40) state->m_store[(state->m_store_line << 2) | 3] ^= 0x02;
+			if(edit3_state & 0x40) m_store[(m_store_line << 2) | 3] ^= 0x02;
 			break;
 		case PANEL_BIT31:
-			if(edit3_state & 0x80) state->m_store[(state->m_store_line << 2) | 3] ^= 0x01;
+			if(edit3_state & 0x80) m_store[(m_store_line << 2) | 3] ^= 0x01;
 			break;
 		case PANEL_LNUP:
 			if(misc_state & 0x01)
 			{
-				state->m_store_line--;
+				m_store_line--;
 			}
 			break;
 		case PANEL_LNDN:
 			if(misc_state & 0x02)
 			{
-				state->m_store_line++;
+				m_store_line++;
 			}
 			break;
 		case PANEL_HALT:
@@ -212,49 +212,49 @@ static INPUT_CHANGED( panel_check )
 
 static INPUT_PORTS_START( ssem )
 	PORT_START("EDIT0")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 0")	 PORT_CODE(KEYCODE_1) PORT_CHANGED(panel_check, (void*)PANEL_BIT0)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 1")	 PORT_CODE(KEYCODE_2) PORT_CHANGED(panel_check, (void*)PANEL_BIT1)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 2")	 PORT_CODE(KEYCODE_3) PORT_CHANGED(panel_check, (void*)PANEL_BIT2)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 3")	 PORT_CODE(KEYCODE_4) PORT_CHANGED(panel_check, (void*)PANEL_BIT3)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 4")	 PORT_CODE(KEYCODE_5) PORT_CHANGED(panel_check, (void*)PANEL_BIT4)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 5")	 PORT_CODE(KEYCODE_6) PORT_CHANGED(panel_check, (void*)PANEL_BIT5)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 6")	 PORT_CODE(KEYCODE_7) PORT_CHANGED(panel_check, (void*)PANEL_BIT6)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 7")	 PORT_CODE(KEYCODE_8) PORT_CHANGED(panel_check, (void*)PANEL_BIT7)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 0")	 PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT0)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 1")	 PORT_CODE(KEYCODE_2) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT1)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 2")	 PORT_CODE(KEYCODE_3) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT2)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 3")	 PORT_CODE(KEYCODE_4) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT3)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 4")	 PORT_CODE(KEYCODE_5) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT4)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 5")	 PORT_CODE(KEYCODE_6) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT5)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 6")	 PORT_CODE(KEYCODE_7) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT6)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 7")	 PORT_CODE(KEYCODE_8) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT7)
 
 	PORT_START("EDIT1")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 8")	 PORT_CODE(KEYCODE_Q) PORT_CHANGED(panel_check, (void*)PANEL_BIT8)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 9")	 PORT_CODE(KEYCODE_W) PORT_CHANGED(panel_check, (void*)PANEL_BIT9)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 10")	PORT_CODE(KEYCODE_E) PORT_CHANGED(panel_check, (void*)PANEL_BIT10)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 11")	PORT_CODE(KEYCODE_R) PORT_CHANGED(panel_check, (void*)PANEL_BIT11)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 12")	PORT_CODE(KEYCODE_T) PORT_CHANGED(panel_check, (void*)PANEL_BIT12)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 13")	PORT_CODE(KEYCODE_Y) PORT_CHANGED(panel_check, (void*)PANEL_BIT13)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 14")	PORT_CODE(KEYCODE_U) PORT_CHANGED(panel_check, (void*)PANEL_BIT14)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 15")	PORT_CODE(KEYCODE_I) PORT_CHANGED(panel_check, (void*)PANEL_BIT15)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 8")	 PORT_CODE(KEYCODE_Q) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT8)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 9")	 PORT_CODE(KEYCODE_W) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT9)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 10")	PORT_CODE(KEYCODE_E) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT10)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 11")	PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT11)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 12")	PORT_CODE(KEYCODE_T) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT12)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 13")	PORT_CODE(KEYCODE_Y) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT13)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 14")	PORT_CODE(KEYCODE_U) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT14)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 15")	PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT15)
 
 	PORT_START("EDIT2")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 16")	PORT_CODE(KEYCODE_A) PORT_CHANGED(panel_check, (void*)PANEL_BIT16)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 17")	PORT_CODE(KEYCODE_S) PORT_CHANGED(panel_check, (void*)PANEL_BIT17)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 18")	PORT_CODE(KEYCODE_D) PORT_CHANGED(panel_check, (void*)PANEL_BIT18)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 19")	PORT_CODE(KEYCODE_F) PORT_CHANGED(panel_check, (void*)PANEL_BIT19)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 20")	PORT_CODE(KEYCODE_G) PORT_CHANGED(panel_check, (void*)PANEL_BIT20)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 21")	PORT_CODE(KEYCODE_H) PORT_CHANGED(panel_check, (void*)PANEL_BIT21)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 22")	PORT_CODE(KEYCODE_J) PORT_CHANGED(panel_check, (void*)PANEL_BIT22)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 23")	PORT_CODE(KEYCODE_K) PORT_CHANGED(panel_check, (void*)PANEL_BIT23)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 16")	PORT_CODE(KEYCODE_A) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT16)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 17")	PORT_CODE(KEYCODE_S) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT17)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 18")	PORT_CODE(KEYCODE_D) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT18)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 19")	PORT_CODE(KEYCODE_F) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT19)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 20")	PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT20)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 21")	PORT_CODE(KEYCODE_H) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT21)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 22")	PORT_CODE(KEYCODE_J) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT22)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 23")	PORT_CODE(KEYCODE_K) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT23)
 
 	PORT_START("EDIT3")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 24")	PORT_CODE(KEYCODE_Z) PORT_CHANGED(panel_check, (void*)PANEL_BIT24)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 25")	PORT_CODE(KEYCODE_X) PORT_CHANGED(panel_check, (void*)PANEL_BIT25)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 26")	PORT_CODE(KEYCODE_C) PORT_CHANGED(panel_check, (void*)PANEL_BIT26)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 27")	PORT_CODE(KEYCODE_V) PORT_CHANGED(panel_check, (void*)PANEL_BIT27)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 28")	PORT_CODE(KEYCODE_B) PORT_CHANGED(panel_check, (void*)PANEL_BIT28)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 29")	PORT_CODE(KEYCODE_N) PORT_CHANGED(panel_check, (void*)PANEL_BIT29)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 30")	PORT_CODE(KEYCODE_M) PORT_CHANGED(panel_check, (void*)PANEL_BIT30)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 31")	PORT_CODE(KEYCODE_COMMA) PORT_CHANGED(panel_check, (void*)PANEL_BIT31)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 24")	PORT_CODE(KEYCODE_Z) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT24)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 25")	PORT_CODE(KEYCODE_X) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT25)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 26")	PORT_CODE(KEYCODE_C) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT26)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 27")	PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT27)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 28")	PORT_CODE(KEYCODE_B) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT28)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 29")	PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT29)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 30")	PORT_CODE(KEYCODE_M) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT30)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bit 31")	PORT_CODE(KEYCODE_COMMA) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_BIT31)
 
 	PORT_START("MISC")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Line Up")   PORT_CODE(KEYCODE_UP)   PORT_CHANGED(panel_check, (void*)PANEL_LNUP)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Line Down") PORT_CODE(KEYCODE_DOWN) PORT_CHANGED(panel_check, (void*)PANEL_LNDN)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Halt") PORT_CHANGED(panel_check, (void*)PANEL_HALT)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Line Up")   PORT_CODE(KEYCODE_UP)   PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_LNUP)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Line Down") PORT_CODE(KEYCODE_DOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_LNDN)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Halt") PORT_CHANGED_MEMBER(DEVICE_SELF, ssem_state, panel_check, (void*)PANEL_HALT)
 		PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 

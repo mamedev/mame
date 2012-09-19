@@ -43,6 +43,8 @@ public:
 	UINT16 m_spim_data;
 	virtual void machine_start();
 	virtual void machine_reset();
+	DECLARE_INPUT_CHANGED_MEMBER(pen_check);
+	DECLARE_INPUT_CHANGED_MEMBER(button_check);
 };
 
 static offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
@@ -52,23 +54,21 @@ static offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, cons
     MACHINE HARDWARE
 ***************************************************************************/
 
-static INPUT_CHANGED( pen_check )
+INPUT_CHANGED_MEMBER(palm_state::pen_check)
 {
-	UINT8 button = field.machine().root_device().ioport("PENB")->read();
-	palm_state *state = field.machine().driver_data<palm_state>();
+	UINT8 button = machine().root_device().ioport("PENB")->read();
 
 	if(button)
-		mc68328_set_penirq_line(state->m_lsi, 1);
+		mc68328_set_penirq_line(m_lsi, 1);
 	else
-		mc68328_set_penirq_line(state->m_lsi, 0);
+		mc68328_set_penirq_line(m_lsi, 0);
 }
 
-static INPUT_CHANGED( button_check )
+INPUT_CHANGED_MEMBER(palm_state::button_check)
 {
-	UINT8 button_state = field.machine().root_device().ioport("PORTD")->read();
-	palm_state *state = field.machine().driver_data<palm_state>();
+	UINT8 button_state = machine().root_device().ioport("PORTD")->read();
 
-	mc68328_set_port_d_lines(state->m_lsi, button_state, (int)(FPTR)param);
+	mc68328_set_port_d_lines(m_lsi, button_state, (int)(FPTR)param);
 }
 
 static WRITE8_DEVICE_HANDLER( palm_port_f_out )
@@ -237,16 +237,16 @@ static INPUT_PORTS_START( palm )
 	PORT_BIT( 0xff, 0x50, IPT_LIGHTGUN_Y ) PORT_NAME("Pen Y") PORT_MINMAX(0, 0xa0) PORT_SENSITIVITY(50) PORT_CROSSHAIR(Y, 1.0, 0.0, 0)
 
 	PORT_START( "PENB" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED(pen_check, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, pen_check, NULL)
 
 	PORT_START( "PORTD" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Power") PORT_CODE(KEYCODE_D)   PORT_CHANGED(button_check, (void*)0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Up") PORT_CODE(KEYCODE_Y)	  PORT_CHANGED(button_check, (void*)1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Down") PORT_CODE(KEYCODE_H)	PORT_CHANGED(button_check, (void*)2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Button 1") PORT_CODE(KEYCODE_F)   PORT_CHANGED(button_check, (void*)3)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Button 2") PORT_CODE(KEYCODE_G)   PORT_CHANGED(button_check, (void*)4)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Button 3") PORT_CODE(KEYCODE_J)   PORT_CHANGED(button_check, (void*)5)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Button 4") PORT_CODE(KEYCODE_K)   PORT_CHANGED(button_check, (void*)6)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Power") PORT_CODE(KEYCODE_D)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, (void*)0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Up") PORT_CODE(KEYCODE_Y)	  PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, (void*)1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Down") PORT_CODE(KEYCODE_H)	PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, (void*)2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Button 1") PORT_CODE(KEYCODE_F)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, (void*)3)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Button 2") PORT_CODE(KEYCODE_G)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, (void*)4)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Button 3") PORT_CODE(KEYCODE_J)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, (void*)5)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Button 4") PORT_CODE(KEYCODE_K)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, (void*)6)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 

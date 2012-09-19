@@ -992,10 +992,9 @@ void coco_state::pia1_pb_changed(void)
 //  keyboard_changed
 //-------------------------------------------------
 
-INPUT_CHANGED(coco_state::keyboard_changed)
+INPUT_CHANGED_MEMBER(coco_state::coco_state::keyboard_changed)
 {
-	coco_state *state = field.machine().driver_data<coco_state>();
-	state->poll_keyboard();
+	poll_keyboard();
 }
 
 
@@ -1004,10 +1003,9 @@ INPUT_CHANGED(coco_state::keyboard_changed)
 //  joystick_mode_changed
 //-------------------------------------------------
 
-INPUT_CHANGED(coco_state::joystick_mode_changed)
+INPUT_CHANGED_MEMBER(coco_state::coco_state::joystick_mode_changed)
 {
-	coco_state *state = field.machine().driver_data<coco_state>();
-	state->poll_keyboard();
+	poll_keyboard();
 }
 
 

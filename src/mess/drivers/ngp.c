@@ -165,6 +165,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ngp_hblank_pin_w );
 	DECLARE_WRITE8_MEMBER( ngp_tlcs900_to3 );
 	UINT32 screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_INPUT_CHANGED_MEMBER(power_callback);
 };
 
 
@@ -552,14 +553,13 @@ static ADDRESS_MAP_START( z80_io, AS_IO, 8, ngp_state )
 ADDRESS_MAP_END
 
 
-static INPUT_CHANGED( power_callback )
+INPUT_CHANGED_MEMBER(ngp_state::power_callback)
 {
-	ngp_state *state = field.machine().driver_data<ngp_state>();
 
-	if ( state->m_io_reg[0x33] & 0x04 )
+	if ( m_io_reg[0x33] & 0x04 )
 	{
-		state->m_tlcs900->execute().set_input_line(TLCS900_NMI,
-			(field.machine().root_device().ioport("Power")->read() & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
+		m_tlcs900->execute().set_input_line(TLCS900_NMI,
+			(machine().root_device().ioport("Power")->read() & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 	}
 }
 
@@ -576,7 +576,7 @@ static INPUT_PORTS_START( ngp )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("Power")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("Power") PORT_CHANGED(power_callback, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("Power") PORT_CHANGED_MEMBER(DEVICE_SELF, ngp_state, power_callback, NULL)
 INPUT_PORTS_END
 
 

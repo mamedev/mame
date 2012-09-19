@@ -123,6 +123,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_INPUT_CHANGED_MEMBER(input_update);
 };
 
 
@@ -770,15 +771,15 @@ WRITE32_MEMBER(pockstat_state::ps_lcd_w)
 	}
 }
 
-static INPUT_CHANGED( input_update )
+INPUT_CHANGED_MEMBER(pockstat_state::input_update)
 {
-	UINT32 buttons = field.machine().root_device().ioport("BUTTONS")->read();
+	UINT32 buttons = machine().root_device().ioport("BUTTONS")->read();
 
-	ps_intc_set_interrupt_line(field.machine(), PS_INT_BTN_ACTION, (buttons &  1) ? 1 : 0);
-	ps_intc_set_interrupt_line(field.machine(), PS_INT_BTN_RIGHT,	(buttons &  2) ? 1 : 0);
-	ps_intc_set_interrupt_line(field.machine(), PS_INT_BTN_LEFT,	(buttons &  4) ? 1 : 0);
-	ps_intc_set_interrupt_line(field.machine(), PS_INT_BTN_DOWN,	(buttons &  8) ? 1 : 0);
-	ps_intc_set_interrupt_line(field.machine(), PS_INT_BTN_UP,	(buttons & 16) ? 1 : 0);
+	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_ACTION, (buttons &  1) ? 1 : 0);
+	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_RIGHT,	(buttons &  2) ? 1 : 0);
+	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_LEFT,	(buttons &  4) ? 1 : 0);
+	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_DOWN,	(buttons &  8) ? 1 : 0);
+	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_UP,	(buttons & 16) ? 1 : 0);
 }
 
 READ32_MEMBER(pockstat_state::ps_rombank_r)
@@ -861,11 +862,11 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( pockstat )
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1)		PORT_NAME("Action Button")	PORT_CHANGED(input_update, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_NAME("Right")			PORT_CHANGED(input_update, 0)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)	PORT_NAME("Left")			PORT_CHANGED(input_update, 0)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)	PORT_NAME("Down")			PORT_CHANGED(input_update, 0)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)	PORT_NAME("Up")				PORT_CHANGED(input_update, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1)		PORT_NAME("Action Button")	PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_NAME("Right")			PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)	PORT_NAME("Left")			PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)	PORT_NAME("Down")			PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)	PORT_NAME("Up")				PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 

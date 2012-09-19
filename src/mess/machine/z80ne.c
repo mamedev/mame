@@ -369,26 +369,25 @@ MACHINE_RESET_MEMBER(z80ne_state,z80netf)
 	reset_lx388(machine());
 }
 
-INPUT_CHANGED( z80ne_reset )
+INPUT_CHANGED_MEMBER(z80ne_state::z80ne_reset)
 {
 	UINT8 rst;
-	rst = field.machine().root_device().ioport("RST")->read();
+	rst = machine().root_device().ioport("RST")->read();
 
 	if ( ! BIT(rst, 0))
 	{
-		running_machine &machine = field.machine();
-		machine.schedule_soft_reset();
+		machine().schedule_soft_reset();
 	}
 }
 
-INPUT_CHANGED( z80ne_nmi )
+INPUT_CHANGED_MEMBER(z80ne_state::z80ne_nmi)
 {
 	UINT8 nmi;
-	nmi = field.machine().root_device().ioport("LX388_BRK")->read();
+	nmi = machine().root_device().ioport("LX388_BRK")->read();
 
 	if ( ! BIT(nmi, 0))
 	{
-		field.machine().device("z80ne")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("z80ne")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

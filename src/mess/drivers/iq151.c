@@ -96,6 +96,7 @@ public:
 	iq151cart_slot_device * m_carts[5];
 	DECLARE_DRIVER_INIT(iq151);
 	INTERRUPT_GEN_MEMBER(iq151_vblank_interrupt);
+	DECLARE_INPUT_CHANGED_MEMBER(iq151_break);
 };
 
 READ8_MEMBER(iq151_state::keyboard_row_r)
@@ -216,10 +217,9 @@ static ADDRESS_MAP_START(iq151_io, AS_IO, 8, iq151_state)
 ADDRESS_MAP_END
 
 
-static INPUT_CHANGED( iq151_break )
+INPUT_CHANGED_MEMBER(iq151_state::iq151_break)
 {
-	iq151_state *state = field.machine().driver_data<iq151_state>();
-	pic8259_ir5_w(state->m_pic, newval & 1);
+	pic8259_ir5_w(m_pic, newval & 1);
 }
 
 /* Input ports */
@@ -311,7 +311,7 @@ static INPUT_PORTS_START( iq151 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FB") PORT_CODE(KEYCODE_RCONTROL)		// Function B
 
 	PORT_START("BREAK")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_ESC)   PORT_CHANGED(iq151_break, 0)  PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_ESC)   PORT_CHANGED_MEMBER(DEVICE_SELF, iq151_state, iq151_break, 0)  PORT_CHAR(UCHAR_MAMEKEY(ESC))
 INPUT_PORTS_END
 
 

@@ -47,9 +47,9 @@ on modern keyboards. Hence, we move by default Up/Down/Left/Right to Cursor Keys
 use LEft/Right Ctrl/Alt keys for the remaining keys. Due to the unnatural emulated keyboard
 mappings, this is another situation where natural keyboard comes very handy!          */
 
-static INPUT_CHANGED( ef_w )
+INPUT_CHANGED_MEMBER(pecom_state::ef_w)
 {
-	field.machine().device(CDP1802_TAG)->execute().set_input_line((int)(FPTR)param, newval);
+	machine().device(CDP1802_TAG)->execute().set_input_line((int)(FPTR)param, newval);
 }
 
 static INPUT_PORTS_START( pecom )
@@ -158,10 +158,10 @@ static INPUT_PORTS_START( pecom )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Del") PORT_CODE(KEYCODE_TAB) PORT_CHAR(UCHAR_MAMEKEY(DEL))
 
 	PORT_START("CNT")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_2) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_2) PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, (void*)COSMAC_INPUT_LINE_EF1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF3)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_MINUS) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF4)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, (void*)COSMAC_INPUT_LINE_EF3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_MINUS) PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, (void*)COSMAC_INPUT_LINE_EF4)
 INPUT_PORTS_END
 
 static const cassette_interface pecom_cassette_interface =

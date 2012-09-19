@@ -258,9 +258,9 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /* the 'reset' key is directly tied to the reset line of the cpu */
-static INPUT_CHANGED( aquarius_reset )
+INPUT_CHANGED_MEMBER(aquarius_state::aquarius_reset)
 {
-	field.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( aquarius )
@@ -337,7 +337,7 @@ static INPUT_PORTS_START( aquarius )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RST") PORT_CODE(KEYCODE_F10) PORT_CHANGED(aquarius_reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RST") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, aquarius_state, aquarius_reset, 0)
 
 	PORT_START("LEFT")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )

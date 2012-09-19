@@ -29,6 +29,8 @@ class x1twin_state : public x1_state
 		: x1_state(mconfig, type, tag)
 	{ }
 	UINT32 screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
+	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
 };
 
 
@@ -106,30 +108,28 @@ static const mc6845_interface mc6845_intf =
  *
  *************************************/
 
-static INPUT_CHANGED( ipl_reset )
+INPUT_CHANGED_MEMBER(x1twin_state::ipl_reset)
 {
-	//address_space &space = *field.machine().device("x1_cpu")->memory().space(AS_PROGRAM);
-	x1twin_state *state = field.machine().driver_data<x1twin_state>();
+	//address_space &space = *machine().device("x1_cpu")->memory().space(AS_PROGRAM);
 
-	state->m_x1_cpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_x1_cpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 
-	state->m_ram_bank = 0x00;
-	if(state->m_is_turbo) { state->m_ex_bank = 0x10; }
+	m_ram_bank = 0x00;
+	if(m_is_turbo) { m_ex_bank = 0x10; }
 	//anything else?
 }
 
 /* Apparently most games doesn't support this (not even the Konami ones!), one that does is...177 :o */
-static INPUT_CHANGED( nmi_reset )
+INPUT_CHANGED_MEMBER(x1twin_state::nmi_reset)
 {
-	x1twin_state *state = field.machine().driver_data<x1twin_state>();
 
-	state->m_x1_cpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_x1_cpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 INPUT_PORTS_START( x1twin )
 	PORT_START("FP_SYS") //front panel buttons, hard-wired with the soft reset/NMI lines
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED(ipl_reset,0) PORT_NAME("IPL reset")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED(nmi_reset,0) PORT_NAME("NMI reset")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, x1twin_state, ipl_reset,0) PORT_NAME("IPL reset")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, x1twin_state, nmi_reset,0) PORT_NAME("NMI reset")
 
 	PORT_START("SOUND_SW") //FIXME: this is X1Turbo specific
 	PORT_DIPNAME( 0x80, 0x80, "OPM Sound Setting?" )

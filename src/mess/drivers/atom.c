@@ -205,7 +205,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-    INPUT_CHANGED( trigger_reset )
+    INPUT_CHANGED_MEMBER( trigger_reset )
 -------------------------------------------------*/
 
 INPUT_CHANGED_MEMBER( atom_state::trigger_reset )

@@ -183,7 +183,7 @@ machine_config_constructor abc77_device::device_mconfig_additions() const
 
 
 //-------------------------------------------------
-//  INPUT_CHANGED( keyboard_reset )
+//  INPUT_CHANGED_MEMBER( keyboard_reset )
 //-------------------------------------------------
 
 INPUT_CHANGED_MEMBER( abc77_device::keyboard_reset )

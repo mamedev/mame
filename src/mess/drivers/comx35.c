@@ -135,7 +135,7 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  INPUT_CHANGED( comx35_reset )
+//  INPUT_CHANGED_MEMBER( comx35_reset )
 //-------------------------------------------------
 
 INPUT_CHANGED_MEMBER( comx35_state::trigger_reset )

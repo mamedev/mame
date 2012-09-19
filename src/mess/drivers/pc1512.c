@@ -666,7 +666,7 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  INPUT_CHANGED( mouse_button_1_changed )
+//  INPUT_CHANGED_MEMBER( mouse_button_1_changed )
 //-------------------------------------------------
 
 INPUT_CHANGED_MEMBER( pc1512_state::mouse_button_1_changed )
@@ -676,7 +676,7 @@ INPUT_CHANGED_MEMBER( pc1512_state::mouse_button_1_changed )
 
 
 //-------------------------------------------------
-//  INPUT_CHANGED( mouse_button_2_changed )
+//  INPUT_CHANGED_MEMBER( mouse_button_2_changed )
 //-------------------------------------------------
 
 INPUT_CHANGED_MEMBER( pc1512_state::mouse_button_2_changed )
@@ -686,7 +686,7 @@ INPUT_CHANGED_MEMBER( pc1512_state::mouse_button_2_changed )
 
 
 //-------------------------------------------------
-//  INPUT_CHANGED( mouse_x_changed )
+//  INPUT_CHANGED_MEMBER( mouse_x_changed )
 //-------------------------------------------------
 
 INPUT_CHANGED_MEMBER( pc1512_state::mouse_x_changed )
@@ -699,7 +699,7 @@ INPUT_CHANGED_MEMBER( pc1512_state::mouse_x_changed )
 
 
 //-------------------------------------------------
-//  INPUT_CHANGED( mouse_y_changed )
+//  INPUT_CHANGED_MEMBER( mouse_y_changed )
 //-------------------------------------------------
 
 INPUT_CHANGED_MEMBER( pc1512_state::mouse_y_changed )

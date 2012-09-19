@@ -184,15 +184,14 @@ public:
 	UINT32 screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_INPUT_CHANGED_MEMBER(lgun1_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(lgun2_changed);
 };
 
 
 /*----------- defined in machine/sms.c -----------*/
 
 /* Function prototypes */
-
-INPUT_CHANGED( lgun1_changed );
-INPUT_CHANGED( lgun2_changed );
 
 WRITE_LINE_DEVICE_HANDLER( sms_pause_callback );
 WRITE_LINE_DEVICE_HANDLER( sms_store_int_callback );

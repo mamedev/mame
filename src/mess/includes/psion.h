@@ -85,6 +85,7 @@ public:
 	DECLARE_WRITE8_MEMBER( io_w );
 	DECLARE_READ8_MEMBER( io_r );
 	virtual void palette_init();
+	DECLARE_INPUT_CHANGED_MEMBER(psion_on);
 };
 
 // device type definition

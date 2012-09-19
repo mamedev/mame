@@ -116,8 +116,8 @@ public:
 	static const cassette_interface coco_cassette_interface;
 
 	/* driver update handlers */
-	static INPUT_CHANGED(keyboard_changed);
-	static INPUT_CHANGED(joystick_mode_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(keyboard_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(joystick_mode_changed);
 	static void bitbanger_callback(running_machine &machine, UINT8 bit);
 
 	/* IO */

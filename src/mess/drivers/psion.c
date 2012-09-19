@@ -222,9 +222,9 @@ READ8_MEMBER( psion_state::io_r )
 	return 0;
 }
 
-static INPUT_CHANGED( psion_on )
+INPUT_CHANGED_MEMBER(psion_state::psion_on)
 {
-	cpu_device *cpu = field.machine().device<cpu_device>("maincpu");
+	cpu_device *cpu = machine().device<cpu_device>("maincpu");
 
 	/* reset the CPU for resume from standby */
 	if (cpu->suspended(SUSPEND_REASON_HALT))
@@ -288,7 +288,7 @@ INPUT_PORTS_START( psion )
 		PORT_CONFSETTING( 0x01, "Low Battery" )
 
 	PORT_START("ON")
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON/CLEAR") PORT_CODE(KEYCODE_MINUS)  PORT_CHANGED(psion_on, 0)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON/CLEAR") PORT_CODE(KEYCODE_MINUS)  PORT_CHANGED_MEMBER(DEVICE_SELF, psion_state, psion_on, 0)
 
 	PORT_START("K1")
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MODE") PORT_CODE(KEYCODE_EQUALS)

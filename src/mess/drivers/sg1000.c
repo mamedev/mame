@@ -251,7 +251,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-    INPUT_CHANGED( trigger_nmi )
+    INPUT_CHANGED_MEMBER( trigger_nmi )
 -------------------------------------------------*/
 
 INPUT_CHANGED_MEMBER( sg1000_state::trigger_nmi )

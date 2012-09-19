@@ -123,6 +123,7 @@ public:
 	UINT8 m_led_time[6];
 	virtual void machine_start();
 	virtual void machine_reset();
+	DECLARE_INPUT_CHANGED_MEMBER(kim1_reset);
 };
 
 
@@ -140,10 +141,10 @@ static ADDRESS_MAP_START(kim1_map, AS_PROGRAM, 8, kim1_state)
 ADDRESS_MAP_END
 
 
-static INPUT_CHANGED( kim1_reset )
+INPUT_CHANGED_MEMBER(kim1_state::kim1_reset)
 {
 	if (newval == 0)
-		field.machine().firstcpu->reset();
+		machine().firstcpu->reset();
 }
 
 
@@ -181,7 +182,7 @@ static INPUT_PORTS_START( kim1 )
 	PORT_START("LINE3")			/* IN3 STEP and RESET keys, MODE switch */
 	PORT_BIT( 0x80, 0x00, IPT_UNUSED )
 	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("sw1: ST") PORT_CODE(KEYCODE_F7)
-	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("sw2: RS") PORT_CODE(KEYCODE_F3) PORT_CHANGED(kim1_reset, NULL)
+	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("sw2: RS") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, kim1_reset, NULL)
 	PORT_DIPNAME(0x10, 0x10, "sw3: SS") PORT_CODE(KEYCODE_NUMLOCK) PORT_TOGGLE
 	PORT_DIPSETTING( 0x00, "single step")
 	PORT_DIPSETTING( 0x10, "run")

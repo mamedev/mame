@@ -154,6 +154,7 @@ public:
 	DECLARE_READ8_MEMBER(ex800_gate7a_r);
 	DECLARE_WRITE8_MEMBER(ex800_gate7a_w);
 	virtual void machine_start();
+	DECLARE_INPUT_CHANGED_MEMBER(online_switch);
 };
 
 
@@ -192,13 +193,12 @@ public:
 
 
 /* The ON LINE switch is directly connected to the INT1 input of the CPU */
-static INPUT_CHANGED( online_switch )
+INPUT_CHANGED_MEMBER(ex800_state::online_switch)
 {
-	ex800_state *state = field.machine().driver_data<ex800_state>();
 	if (newval)
 	{
-		field.machine().device("maincpu")->execute().set_input_line(UPD7810_INTF1, state->m_irq_state);
-		state->m_irq_state = (state->m_irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
+		machine().device("maincpu")->execute().set_input_line(UPD7810_INTF1, m_irq_state);
+		m_irq_state = (m_irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
 	}
 }
 
@@ -356,7 +356,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( ex800 )
 	PORT_START("ONLISW")
 	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON LINE")   PORT_CODE(KEYCODE_F9) PORT_CHANGED(online_switch, NULL)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON LINE")   PORT_CODE(KEYCODE_F9) PORT_CHANGED_MEMBER(DEVICE_SELF, ex800_state, online_switch, NULL)
 
 	PORT_START("FEED")
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
