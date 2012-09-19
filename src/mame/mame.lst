@@ -6354,6 +6354,7 @@ asteroid2		// 035127-035145    (c) 1979
 asteroid1		// 035127-035145    no copyright notice
 asteroidb		// (bootleg)
 asterock		// Sidam bootleg    (c) 1979
+asterockv		// Videotron bootleg(c) 1979
 hyperspc		// Rumiano bootleg  (c) 1979
 meteorts		// VCC bootleg      (c) 1979
 meteorho		// Hoei? bootleg    (c) 1980
@@ -6391,7 +6392,7 @@ mhavocp			// 136025           (c) 1983
 mhavocrv		// (hack)
 alphaone		// (proto)          (c) 1983
 alphaonea		// (proto)          (c) 1983
-esb			// 136031           (c) 1985
+esb				// 136031           (c) 1985
 tomcat			// (proto)          (c) 1985
 
 // Atari "Centipede hardware" games
