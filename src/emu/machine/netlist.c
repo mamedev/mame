@@ -432,10 +432,10 @@ netlist_setup_t::~netlist_setup_t()
 {
 	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
 	{
-		remove_dev(entry->object()->name());
+		net_device_t *dev = entry->object();
+		global_free(dev);
 	}
 }
-
 
 net_device_t *netlist_setup_t::register_dev(net_device_t *dev)
 {
@@ -671,7 +671,7 @@ ATTR_COLD void net_core_device_t::register_subdevice(net_core_device_t &subdev)
 }
 
 // ----------------------------------------------------------------------------------------
-// net_dev_t
+// net_device_t
 // ----------------------------------------------------------------------------------------
 
 
@@ -935,7 +935,9 @@ void netlist_mame_device::device_stop()
 	m_setup->print_stats();
 
 	global_free(m_setup);
+	m_setup = NULL;
 	global_free(m_netlist);
+	m_netlist = NULL;
 }
 
 void netlist_mame_device::device_post_load()
