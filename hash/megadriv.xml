@@ -624,7 +624,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="837-8861" />
 			<dataarea name="rom" size="1048576">
-				<rom name="lrog453-eta.bin" size="1048576" crc="05dc3ffc" sha1="be80f96bee64bab159614d29f882442abef9de76" offset="000000" />
+				<rom name="lrog453-eta.bin" size="1048576" crc="05dc3ffc" sha1="be80f96bee64bab159614d29f882442abef9de76" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1269,9 +1269,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="landstlkf" cloneof="landstlk">
-		<description>Landstalker - Le Tresor du Roi Nole (Fra)</description>
+		<description>Landstalker - Le Trésor du Roi Nole (Fra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="Landstalker (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<feature name="pcb" value="171-6278A" />
@@ -2596,7 +2597,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="atptour">
-		<description>ATP Tour (Euro)</description>
+		<description>ATP Tour Championship Tennis (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -8267,7 +8268,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="fatalrew">
+	<software name="fatalrew" supported="no">
 		<description>Fatal Rewind (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
@@ -8278,7 +8279,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="killshow" cloneof="fatalrew">
+	<software name="killshow" cloneof="fatalrew" supported="no">
 		<description>The Killing Game Show (Jpn)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts Victor</publisher>
@@ -9144,10 +9145,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="globglad">
-		<description>Global Gladiators (Euro)</description>
+	<software name="mickmack">
+		<description>Mick &amp; Mack as the Global Gladiators (Euro)</description>
 		<year>1993</year>
 		<publisher>Virgin Games</publisher>
+		<info name="alt_title" value="Global Gladiators (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15237.bin" size="1048576" crc="5c218c6a" sha1="daf1ded2439c626c0fd227550be6563cd1b09612" offset="000000" loadflag="load16_word_swap" />
@@ -9155,7 +9157,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="mickmack" cloneof="globglad">
+	<software name="mickmacku" cloneof="mickmack">
 		<description>Mick &amp; Mack as the Global Gladiators (USA)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
@@ -9166,7 +9168,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="mickmackp" cloneof="globglad">
+	<software name="mickmackup" cloneof="mickmack">
 		<description>Mick &amp; Mack as the Global Gladiators (USA, Prototype)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
@@ -9890,7 +9892,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="hybridfp" cloneof="hybridf">
+	<software name="hybridfp" cloneof="hybridf" supported="no">
 		<description>The Hybrid Front (Jpn, Prototype)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -10283,12 +10285,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="jlps">
-		<description>J. League Pro Striker (Jpn, v1.3)</description>
+		<description>J. League Pro Striker '93 (Jpn, v1.3)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5526"/>
 		<info name="release" value="19930618"/>
-		<info name="alt_title" value="Jリーグ・オフィシャルTVゲームプロストライカー"/>
+		<info name="alt_title" value="Jリーグ・オフィシャルTVゲームプロストライカー ~ J.League Pro Striker (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
@@ -10301,12 +10303,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="jlpsa" cloneof="jlps">
-		<description>J. League Pro Striker (Jpn, v1.0)</description>
+		<description>J. League Pro Striker '93 (Jpn, v1.0)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5526"/>
 		<info name="release" value="19930618"/>
-		<info name="alt_title" value="Jリーグ・オフィシャルTVゲームプロストライカー"/>
+		<info name="alt_title" value="Jリーグ・オフィシャルTVゲームプロストライカー ~ J.League Pro Striker (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
@@ -10703,9 +10705,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="jordanb">
-		<description>Jordan Vs Bird (Euro, USA, v1.1)</description>
+		<description>Super One on One - Jordan Vs Bird (Euro, USA, v1.1)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="alt_title" value="Jordan Vs Bird (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="jordan vs bird (euro, usa) (v1.1).bin" size="524288" crc="4d3ddd7c" sha1="4c3c6696157a3629f10aa60626f504cd64c36a58" offset="000000" loadflag="load16_word_swap" />
@@ -10714,9 +10717,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="jordanb1" cloneof="jordanb">
-		<description>Jordan Vs Bird (Euro, USA)</description>
+		<description>Super One on One - Jordan Vs Bird (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="alt_title" value="Jordan Vs Bird (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="jordan vs bird (euro, usa).bin" size="524288" crc="22d77e6d" sha1="977430962510867b16c113cff1436cb75c0485ac" offset="000000" loadflag="load16_word_swap" />
@@ -10725,12 +10729,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="jordanbj" cloneof="jordanb">
-		<description>Jordan Vs Bird - One on One (Jpn)</description>
+		<description>Super One on One - Jordan Vs Bird (Jpn)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts Victor</publisher>
 		<info name="serial" value="EM20022"/>
 		<info name="release" value="19930924"/>
-		<info name="alt_title" value="ジョーダン VS バード ONE ON ONE"/>
+		<info name="alt_title" value="ジョーダン VS バード ONE ON ONE ~ Jordan Vs Bird - One on One (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="jordan vs bird - one on one (jpn).bin" size="524288" crc="8837e896" sha1="769d7ed746ccbec0bcbe271f81767ffcccd36cea" offset="000000" loadflag="load16_word_swap" />
@@ -10981,7 +10985,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="jparkrep9" cloneof="jparkre">
+	<software name="jparkrep9" cloneof="jparkre" supported="no">
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940620)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -10992,7 +10996,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="jparkrep8" cloneof="jparkre">
+	<software name="jparkrep8" cloneof="jparkre" supported="no">
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940622)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -11346,7 +11350,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="landstlkg" cloneof="landstlk">
-		<description>Landstalker - Die Schatze von Konig Nolo (Ger)</description>
+		<description>Landstalker - Die Schätze von König Nolo (Ger)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -11377,9 +11381,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="landstlku" cloneof="landstlk">
-		<description>Landstalker (USA)</description>
+		<description>Landstalker - The Treasures of King Nole (USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="Landstalker (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
@@ -11391,7 +11396,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="landstlkup" cloneof="landstlk">
-		<description>Landstalker (USA, Prototype)</description>
+		<description>Landstalker - Treasure of King Nole (USA, Prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -12248,7 +12253,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="markou" cloneof="marko">
-		<description>Marko's Magic Football (USA)</description>
+		<description>Marko (USA)</description>
 		<year>1994</year>
 		<publisher>Domark</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -12390,9 +12395,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="mazinsagu" cloneof="mazinwar">
-		<description>Mazin Saga - Mutant Fighter (USA)</description>
+		<description>Mazin Saga (USA)</description>
 		<year>1993</year>
 		<publisher>Vic Tokai</publisher>
+		<info name="alt_title" value="Mazin Saga - Mutant Fighter (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="mazin saga - mutant fighter (usa).bin" size="1048576" crc="1bd9fef1" sha1="5cb87bb4efc8fa8754e687b62d0fd858e624997d" offset="000000" loadflag="load16_word_swap" />
@@ -23604,7 +23610,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="kuuga" cloneof="vaportr">
-		<description>Kuuga - Operation Code 'Vapor Trail' (Jpn)</description>
+		<description>Kuuga - Operation Code "Vapor Trail" (Jpn)</description>
 		<year>1991</year>
 		<publisher>Riot</publisher>
 		<info name="serial" value="T-49043"/>
@@ -26523,7 +26529,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="kof98">
-		<description>The King of Fighters '98</description>
+		<description>K.O.F 98'</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26583,9 +26589,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="lionkin3">
-		<description>Shi Zi Wang 3 - The Lion King 3</description>
+		<description>Lion King 3</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="Shi Zi Wang 3 - The Lion King 3 (Box?)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="LIONK3" />
 			<dataarea name="rom" size="20971520">
@@ -26870,8 +26877,9 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- Invincibility and infinite lives on -->
 	<software name="lionkin2a" cloneof="lionkin2">
-		<description>Shi Zi Wang II - Lion King II (Pirate)</description>
+		<description>Shi Zi Wang II - Lion King II (Pirate, Hacked?)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26954,8 +26962,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="kof2k">
-		<description>K. O. F. 2000</description>
+	<software name="kof2k" cloneof="kof98">
+		<description>K.O.F 2000</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26969,6 +26977,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Lion King 3 (Alt?)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="Shi Zi Wang 3 - The Lion King 3 (Box?)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="LIONK3" />
 			<dataarea name="rom" size="20971520">
@@ -26978,9 +26987,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="lionkin3b" cloneof="lionkin3">
-		<description>The Lion King 3 (Alt 2?)</description>
+		<description>Lion King 3 (Alt 2?)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="Shi Zi Wang 3 - The Lion King 3 (Box?)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
 				<rom name="lion king 3 (unl).bin" size="2097152" crc="8e0555e4" sha1="dc34164d74d9b6542adef6838250793d023cd942" offset="00000" loadflag="load16_word_swap" />
@@ -27339,7 +27349,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="hpotter2" cloneof="globglad">
+	<software name="hpotter2" cloneof="mickmack">
 		<description>Harry Potter and the Chamber of Secrets (Rus)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -27505,7 +27515,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 <!-- What is the relation with Chinese Fighter? -->
 	<software name="lotrgs">
-		<description>Lord of the Rings (Rus)</description>
+		<description>Lord of the Rings - The Return of the King (Rus)</description>
 		<year>199?</year>
 		<publisher>Glorysun</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -27549,7 +27559,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="mario3">
-		<description>Mario 3 Vokrug Sveta (Rus)</description>
+		<description>Mario 3 - Vokrug Sveta (Rus)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Mario 3 Вокруг света"/>
@@ -27774,7 +27784,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="snezkoro" cloneof="globglad">
+	<software name="snezkoro" cloneof="mickmack">
 		<description>Snezhnaya Koroleva (Rus)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>

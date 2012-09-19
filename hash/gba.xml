@@ -8109,7 +8109,7 @@
 		</part>
 	</software>
 
-	<software name="stafy3a" cloneof="stafy">
+	<software name="stafy3a" cloneof="stafy3" supported="no">
 		<description>Densetsu no Stafy 3 (Jpn)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
@@ -8124,7 +8124,7 @@
 		</part>
 	</software>
 
-	<software name="stafy3">
+	<software name="stafy3" supported="no">
 		<description>Densetsu no Stafy 3 (Jpn, Rev. 1)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
@@ -18791,7 +18791,7 @@
 		</part>
 	</software>
 
-	<software name="spyronbg">
+	<software name="spyronbg" supported="partial">
 		<description>The Legend of Spyro - A New Beginning (Euro)</description>
 		<year>2006</year>
 		<publisher>Sierra Entertainment</publisher>
@@ -18804,7 +18804,7 @@
 		</part>
 	</software>
 
-	<software name="spyronbgu" cloneof="spyronbg">
+	<software name="spyronbgu" cloneof="spyronbg" supported="partial">
 		<description>The Legend of Spyro - A New Beginning (USA)</description>
 		<year>2006</year>
 		<publisher>Sierra Entertainment</publisher>
@@ -31877,7 +31877,7 @@
 		</part>
 	</software>
 
-	<software name="starskyh">
+	<software name="starskyh" supported="no">
 		<description>Starsky &amp; Hutch (Euro)</description>
 		<year>2003</year>
 		<publisher>Empire Entertainment</publisher>
@@ -31890,7 +31890,7 @@
 		</part>
 	</software>
 
-	<software name="starskyhup" cloneof="starskyh">
+	<software name="starskyhup" cloneof="starskyh" supported="no">
 		<description>Starsky &amp; Hutch (USA, Prototype)</description>
 		<year>2003</year>
 		<publisher>Empire Entertainment</publisher>
@@ -31901,7 +31901,7 @@
 		</part>
 	</software>
 
-	<software name="starskyhu" cloneof="starskyh">
+	<software name="starskyhu" cloneof="starskyh" supported="no">
 		<description>Starsky &amp; Hutch (USA)</description>
 		<year>2003</year>
 		<publisher>Empire Entertainment</publisher>
@@ -32145,7 +32145,7 @@
 		</part>
 	</software>
 
-	<software name="suitezc">
+	<software name="suitezc" supported="partial">
 		<description>The Suite Life of Zack &amp; Cody - Tipton Caper (USA)</description>
 		<year>2006</year>
 		<publisher>Buena Vista Games</publisher>
