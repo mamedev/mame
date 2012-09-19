@@ -175,7 +175,7 @@ WRITE8_MEMBER( p8k_state::p8k_port24_w )
 
 WRITE8_MEMBER( p8k_state::kbd_put )
 {
-	address_space &mem = *m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	m_term_data = data;
 	// This is a dreadful hack..
 	// simulate interrupt by saving current pc on
@@ -439,7 +439,7 @@ DRIVER_INIT_MEMBER(p8k_state,p8k)
 
 WRITE8_MEMBER( p8k_state::kbd_put_16 )
 {
-	address_space &mem = *m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	// keyboard int handler is at 0x0700
 	m_term_data = data;
 	// This is another dire hack..

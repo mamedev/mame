@@ -175,7 +175,7 @@ READ8_MEMBER( bigbord2_state::portd0_r )
 
 WRITE8_MEMBER( bigbord2_state::bigbord2_kbd_put )
 {
-	address_space &mem = *m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	if (data)
 	{
