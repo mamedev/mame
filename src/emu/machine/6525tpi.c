@@ -318,6 +318,12 @@ WRITE_LINE_DEVICE_HANDLER( tpi6525_i4_w )
 	}
 }
 
+WRITE_LINE_MEMBER( tpi6525_device::i0_w ) { tpi6525_i0_w(this, state); }
+WRITE_LINE_MEMBER( tpi6525_device::i1_w ) { tpi6525_i1_w(this, state); }
+WRITE_LINE_MEMBER( tpi6525_device::i2_w ) { tpi6525_i2_w(this, state); }
+WRITE_LINE_MEMBER( tpi6525_device::i3_w ) { tpi6525_i3_w(this, state); }
+WRITE_LINE_MEMBER( tpi6525_device::i4_w ) { tpi6525_i4_w(this, state); }
+
 
 READ8_DEVICE_HANDLER( tpi6525_porta_r )
 {
@@ -500,6 +506,11 @@ READ8_DEVICE_HANDLER( tpi6525_r )
 	return data;
 }
 
+READ8_MEMBER( tpi6525_device::read )
+{
+	return tpi6525_r(this, space, offset);
+}
+
 
 WRITE8_DEVICE_HANDLER( tpi6525_w )
 {
@@ -572,6 +583,11 @@ WRITE8_DEVICE_HANDLER( tpi6525_w )
 		/* tpi6525->air = data; */
 		break;
 	}
+}
+
+WRITE8_MEMBER( tpi6525_device::write )
+{
+	tpi6525_w(this, space, offset, data);
 }
 
 

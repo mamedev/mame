@@ -60,6 +60,7 @@
 #include "machine/c64_xl80.h"
 #include "machine/c64_zaxxon.h"
 #include "machine/c128_comal80.h"
+#include "machine/cbm2_std.h"
 #include "machine/c1541.h"
 #include "machine/c1551.h"
 #include "machine/c1571.h"
@@ -149,6 +150,7 @@ INPUT_PORTS_EXTERN( vic_special );
 
 
 
+SLOT_INTERFACE_EXTERN( cbm2_expansion_cards );
 SLOT_INTERFACE_EXTERN( cbm_datassette_devices );
 SLOT_INTERFACE_EXTERN( cbm_iec_devices );
 SLOT_INTERFACE_EXTERN( sx1541_iec_devices );

@@ -72,7 +72,7 @@ protected:
     virtual void device_start();
 
 	inline void parse_fusemap();
-	inline int get_product(int term);
+	inline bool get_product(int term);
 	inline void update_outputs();
 
     int m_inputs;

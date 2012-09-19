@@ -64,6 +64,16 @@ public:
 
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	DECLARE_WRITE_LINE_MEMBER( i0_w );
+	DECLARE_WRITE_LINE_MEMBER( i1_w );
+	DECLARE_WRITE_LINE_MEMBER( i2_w );
+	DECLARE_WRITE_LINE_MEMBER( i3_w );
+	DECLARE_WRITE_LINE_MEMBER( i4_w );
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();

@@ -146,33 +146,6 @@ static ADDRESS_MAP_START(cbmb_mem , AS_PROGRAM, 8, cbmb_state )
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_SHARE("kernal")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(p500_mem , AS_PROGRAM, 8, cbmb_state )
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0x20000, 0x2ffff) AM_READONLY AM_WRITENOP
-	AM_RANGE(0x30000, 0x7ffff) AM_RAM
-	AM_RANGE(0x80000, 0x8ffff) AM_READONLY AM_WRITENOP
-	AM_RANGE(0x90000, 0xf07ff) AM_RAM
-#if 0
-	AM_RANGE(0xf0800, 0xf0fff) AM_READ_LEGACY(SMH_ROM)
-#endif
-	AM_RANGE(0xf1000, 0xf1fff) AM_ROM	/* cartridges or ram */
-	AM_RANGE(0xf2000, 0xf3fff) AM_ROM	/* cartridges or ram */
-	AM_RANGE(0xf4000, 0xf5fff) AM_ROM
-	AM_RANGE(0xf6000, 0xf7fff) AM_ROM
-	AM_RANGE(0xf8000, 0xfbfff) AM_ROM AM_SHARE("basic")
-	AM_RANGE(0xfd000, 0xfd3ff) AM_RAM AM_SHARE("videoram")		/* videoram */
-	AM_RANGE(0xfd400, 0xfd7ff) AM_RAM_WRITE(cbmb_colorram_w) AM_SHARE("colorram")		/* colorram */
-	AM_RANGE(0xfd800, 0xfd8ff) AM_DEVREADWRITE("vic6567", mos6566_device, read, write)
-	/* disk units */
-	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREADWRITE("sid6581", sid6581_device, read, write)
-	/* db00 coprocessor */
-	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREADWRITE_LEGACY("cia", mos6526_r, mos6526_w)
-	/* dd00 acia */
-	AM_RANGE(0xfde00, 0xfdeff) AM_DEVREADWRITE_LEGACY("tpi6525_0", tpi6525_r, tpi6525_w)
-	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVREADWRITE_LEGACY("tpi6525_1", tpi6525_r, tpi6525_w)
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_SHARE("kernal")
-ADDRESS_MAP_END
-
 
 /*************************************
  *
@@ -311,61 +284,6 @@ static const mc6845_interface cbm700_crtc = {
 	NULL
 };
 
-/* p500 uses a VIC II chip */
-
-READ8_MEMBER( cbmb_state::vic_lightpen_x_cb )
-{
-	return ioport("LIGHTX")->read() & ~0x01;
-}
-
-READ8_MEMBER( cbmb_state::vic_lightpen_y_cb )
-{
-	return ioport("LIGHTY")->read() & ~0x01;
-}
-
-READ8_MEMBER( cbmb_state::vic_lightpen_button_cb )
-{
-	return ioport("OTHER")->read() & 0x04;
-}
-
-READ8_MEMBER( cbmb_state::vic_dma_read )
-{
-	if (offset >= 0x1000)
-		return m_videoram[offset & 0x3ff];
-	else
-		return m_chargen[offset & 0xfff];
-}
-
-READ8_MEMBER( cbmb_state::vic_dma_read_color )
-{
-	return m_colorram[offset & 0x3ff];
-}
-
-READ8_MEMBER( cbmb_state::vic_rdy_cb )
-{
-	return ioport("CTRLSEL")->read() & 0x08;
-}
-
-static ADDRESS_MAP_START( vic_videoram_map, AS_0, 8, cbmb_state )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_dma_read)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( vic_colorram_map, AS_1, 8, cbmb_state )
-	AM_RANGE(0x000, 0x3ff) AM_READ(vic_dma_read_color)
-ADDRESS_MAP_END
-
-static MOS6567_INTERFACE( vic_intf )
-{
-	"screen",
-	"maincpu",
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(cbmb_state, vic_lightpen_x_cb),
-	DEVCB_DRIVER_MEMBER(cbmb_state, vic_lightpen_y_cb),
-	DEVCB_DRIVER_MEMBER(cbmb_state, vic_lightpen_button_cb),
-	DEVCB_DRIVER_MEMBER(cbmb_state, vic_rdy_cb)
-};
-
 static const sid6581_interface sid_intf =
 {
 	DEVCB_NULL,
@@ -492,41 +410,6 @@ static MACHINE_CONFIG_DERIVED( bx256hp, cbm700 )
 
 //  MCFG_CPU_ADD("8088", I8088, /* ? */)
 MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_START( p500, cbmb_state )
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6509, VIC6567_CLOCK)        /* 7.8336 MHz */
-	MCFG_CPU_PROGRAM_MAP(p500_mem)
-	//MCFG_CPU_PERIODIC_INT_DRIVER(cbmb_state, vic2_raster_irq,  VIC6567_HRETRACERATE)
-
-	MCFG_MACHINE_RESET_OVERRIDE(cbmb_state, cbmb )
-
-	/* video hardware */
-	MCFG_MOS6567_ADD("vic6567", "screen", VIC6567_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sid6581", SID6581, 1000000)
-	MCFG_SOUND_CONFIG(sid_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-
-	/* cia */
-	MCFG_MOS6526R1_ADD("cia", VIC6567_CLOCK, 60, cbmb_cia)
-
-	/* tpi */
-	MCFG_TPI6525_ADD("tpi6525_0", cbmb_tpi_0_intf)
-	MCFG_TPI6525_ADD("tpi6525_1", cbmb_tpi_1_intf)
-
-	/* IEEE bus */
-	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8250")
-
-	MCFG_FRAGMENT_ADD(cbmb_cartslot)
-MACHINE_CONFIG_END
-
 
 
 /*************************************
@@ -678,26 +561,6 @@ ROM_START( cbm720se )
 	ROM_LOAD( "906114-05.bin", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
 ROM_END
 
-ROM_START( p500 )
-	ROM_REGION( 0x101000, "maincpu", 0 )
-	ROM_SYSTEM_BIOS(0, "default", "BASIC 4.0 new" )
-	ROMX_LOAD( "901236-02.bin", 0xf8000, 0x2000, CRC(c62ab16f) SHA1(f50240407bade901144f7e9f489fa9c607834eca), ROM_BIOS(1) )
-	ROMX_LOAD( "901235-02.bin", 0xfa000, 0x2000, CRC(20b7df33) SHA1(1b9a55f12f8cf025754d8029cc5324b474c35841), ROM_BIOS(1) )
-	ROMX_LOAD( "901234-02.bin", 0xfe000, 0x2000, CRC(f46bbd2b) SHA1(097197d4d08e0b82e0466a5f1fbd49a24f3d2523), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "old", "BASIC 4.0 old" )
-	ROMX_LOAD( "901236-01.bin", 0xf8000, 0x2000, CRC(33eb6aa2) SHA1(7e3497ae2edbb38c753bd31ed1bf3ae798c9a976), ROM_BIOS(2) )
-	ROMX_LOAD( "901235-01.bin", 0xfa000, 0x2000, CRC(18a27feb) SHA1(951b5370dd7db762b8504a141f9f26de345069bb), ROM_BIOS(2) )
-	ROMX_LOAD( "901234-01.bin", 0xfe000, 0x2000, CRC(67962025) SHA1(24b41b65c85bf30ab4e2911f677ce9843845b3b1), ROM_BIOS(2) )
-
-	ROM_LOAD( "901225-01.bin", 0x100000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
-
-	ROM_REGION( 0xf5, "pla1", 0 )
-	ROM_LOAD( "906114-02.bin", 0x00, 0xf5, CRC(6436b20b) SHA1(57ebebe771791288051afd1abe9b7500bd2df847) )
-
-	ROM_REGION( 0xf5, "pla2", 0 )
-	ROM_LOAD( "906114-03.bin", 0x00, 0xf5, CRC(668c073e) SHA1(1115858bb2dc91ea9e2016ba2e23ec94239358b4) )
-ROM_END
-
 
 /***************************************************************************
 
@@ -720,5 +583,3 @@ COMP( 1983, cbm720,   cbm610, 0,      cbm700pal, cbm700, cbmb_state,    cbm700, 
 COMP( 1983, cbm720se, cbm610, 0,      cbm700pal, cbm700, cbmb_state,    cbm700,    "Commodore Business Machines",  "CBM 720 (Sweden/Finland, 50Hz)",         GAME_NOT_WORKING )
 
 COMP( 1983,	bx256hp,  cbm610, 0,      bx256hp,   cbm700, cbmb_state,    cbm700,    "Commodore Business Machines",  "BX256-80HP (60Hz)",                      GAME_NOT_WORKING )
-
-COMP( 1983,	p500,     0,      0,      p500,      p500, cbmb_state,      p500,      "Commodore Business Machines",  "P500 (proto, a.k.a. B128-40 or Pet-II)", GAME_NOT_WORKING )

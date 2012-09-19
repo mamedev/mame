@@ -888,6 +888,9 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_DRIVERS)/cbmb.o		\
 	$(MESS_MACHINE)/cbmb.o		\
 	$(MESS_VIDEO)/cbmb.o		\
+	$(MESS_DRIVERS)/cbm2.o		\
+	$(MESS_MACHINE)/cbm2exp.o	\
+	$(MESS_MACHINE)/cbm2_std.o	\
 	$(MESS_DRIVERS)/c65.o		\
 	$(MESS_MACHINE)/c65.o		\
 	$(MESS_DRIVERS)/c128.o		\

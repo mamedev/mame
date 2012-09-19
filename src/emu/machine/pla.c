@@ -64,7 +64,7 @@ inline void pla_device::parse_fusemap()
 //  get_product -
 //-------------------------------------------------
 
-inline int pla_device::get_product(int term)
+inline bool pla_device::get_product(int term)
 {
 	UINT32 input_true = m_and_true[term] | m_i;
 	UINT32 input_comp = m_and_comp[term] | ~m_i;
