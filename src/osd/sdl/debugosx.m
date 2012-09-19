@@ -887,8 +887,8 @@ void console_create_window(running_machine &machine)
 
 @implementation MAMEDisassemblyView
 
-- (device_debug::breakpoint *)findBreakpointAtAddress:(offs_t)address inAddressSpace:(address_space *)space {
-	device_debug			*cpuinfo = space->device().debug();
+- (device_debug::breakpoint *)findBreakpointAtAddress:(offs_t)address inAddressSpace:(address_space &)space {
+	device_debug			*cpuinfo = space.device().debug();
 	device_debug::breakpoint	*bp;
 	for (bp = cpuinfo->breakpoint_first(); (bp != NULL) && (address != bp->address()); bp = bp->next()) {}
 	return bp;
@@ -1090,8 +1090,8 @@ void console_create_window(running_machine &machine)
 
 - (IBAction)debugToggleBreakpoint:(id)sender {
 	if (view->cursor_visible()) {
-		address_space *space = downcast<const debug_view_disasm_source *>(view->source())->space();
-		if (!useConsole || (debug_cpu_get_visible_cpu(*machine) == &space->device())) {
+		address_space &space = downcast<const debug_view_disasm_source *>(view->source())->space();
+		if (!useConsole || (debug_cpu_get_visible_cpu(*machine) == &space.device())) {
 			offs_t				address = downcast<debug_view_disasm *>(view)->selected_address();
 			device_debug::breakpoint *bp = [self findBreakpointAtAddress:address inAddressSpace:space];
 
@@ -1105,9 +1105,9 @@ void console_create_window(running_machine &machine)
 				debug_console_execute_command(*machine, [command UTF8String], 1);
 			} else {
 				if (bp == NULL)
-					space->device().debug()->breakpoint_set(address, NULL, NULL);
+					space.device().debug()->breakpoint_set(address, NULL, NULL);
 				else
-					space->device().debug()->breakpoint_clear(bp->index());
+					space.device().debug()->breakpoint_clear(bp->index());
 			}
 		}
 	}
@@ -1116,8 +1116,8 @@ void console_create_window(running_machine &machine)
 
 - (IBAction)debugToggleBreakpointEnable:(id)sender {
 	if (view->cursor_visible()) {
-		address_space *space = downcast<const debug_view_disasm_source *>(view->source())->space();
-		if (!useConsole || (debug_cpu_get_visible_cpu(*machine) == &space->device())) {
+		address_space &space = downcast<const debug_view_disasm_source *>(view->source())->space();
+		if (!useConsole || (debug_cpu_get_visible_cpu(*machine) == &space.device())) {
 			offs_t				address = downcast<debug_view_disasm *>(view)->selected_address();
 			device_debug::breakpoint *bp = [self findBreakpointAtAddress:address inAddressSpace:space];
 
@@ -1130,7 +1130,7 @@ void console_create_window(running_machine &machine)
 						command = [NSString stringWithFormat:@"bpenable %X", (unsigned)bp->index()];
 					debug_console_execute_command(*machine, [command UTF8String], 1);
 				} else {
-					space->device().debug()->breakpoint_enable(bp->index(), !bp->enabled());
+					space.device().debug()->breakpoint_enable(bp->index(), !bp->enabled());
 				}
 			}
 		}
@@ -1140,8 +1140,8 @@ void console_create_window(running_machine &machine)
 
 - (IBAction)debugRunToCursor:(id)sender {
 	if (view->cursor_visible()) {
-		address_space *space = downcast<const debug_view_disasm_source *>(view->source())->space();
-		if (debug_cpu_get_visible_cpu(*machine) == &space->device()) {
+		address_space &space = downcast<const debug_view_disasm_source *>(view->source())->space();
+		if (debug_cpu_get_visible_cpu(*machine) == &space.device()) {
 			offs_t address = downcast<debug_view_disasm *>(view)->selected_address();
 			if (useConsole) {
 				NSString *command = [NSString stringWithFormat:@"go 0x%lX", (unsigned long)address];
