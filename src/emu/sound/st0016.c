@@ -9,7 +9,7 @@
 #define VERBOSE (0)
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-struct st0016_state
+struct st0016_device_state
 {
 	sound_stream * stream;
 	UINT8 **sound_ram;
@@ -17,23 +17,23 @@ struct st0016_state
 	UINT8 regs[0x100];
 };
 
-INLINE st0016_state *get_safe_token(device_t *device)
+INLINE st0016_device_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ST0016);
-	return (st0016_state *)downcast<st0016_device *>(device)->token();
+	return (st0016_device_state *)downcast<st0016_device *>(device)->token();
 }
 
 
 READ8_DEVICE_HANDLER( st0016_snd_r )
 {
-	st0016_state *info = get_safe_token(device);
+	st0016_device_state *info = get_safe_token(device);
 	return info->regs[offset];
 }
 
 WRITE8_DEVICE_HANDLER( st0016_snd_w )
 {
-	st0016_state *info = get_safe_token(device);
+	st0016_device_state *info = get_safe_token(device);
 	int voice = offset/32;
 	int reg = offset & 0x1f;
 	int oldreg = info->regs[offset];
@@ -60,7 +60,7 @@ WRITE8_DEVICE_HANDLER( st0016_snd_w )
 
 static STREAM_UPDATE( st0016_update )
 {
-	st0016_state *info = (st0016_state *)param;
+	st0016_device_state *info = (st0016_device_state *)param;
 	UINT8 *sound_ram = *info->sound_ram;
 	int v, i, snum;
 	unsigned char *slot;
@@ -137,7 +137,7 @@ static STREAM_UPDATE( st0016_update )
 static DEVICE_START( st0016 )
 {
 	const st0016_interface *intf = (const st0016_interface *)device->static_config();
-	st0016_state *info = get_safe_token(device);
+	st0016_device_state *info = get_safe_token(device);
 
 	info->sound_ram = intf->p_soundram;
 
@@ -150,7 +150,7 @@ st0016_device::st0016_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, ST0016, "ST0016", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_clear(st0016_state);
+	m_token = global_alloc_clear(st0016_device_state);
 }
 
 //-------------------------------------------------
