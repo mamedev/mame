@@ -175,6 +175,7 @@ WRITE8_MEMBER( p8k_state::p8k_port24_w )
 
 WRITE8_MEMBER( p8k_state::kbd_put )
 {
+	address_space &mem = *m_maincpu->space(AS_PROGRAM);
 	m_term_data = data;
 	// This is a dreadful hack..
 	// simulate interrupt by saving current pc on
@@ -182,9 +183,9 @@ WRITE8_MEMBER( p8k_state::kbd_put )
 	UINT16 spreg = m_maincpu->state_int(Z80_SP);
 	UINT16 pcreg = m_maincpu->state_int(Z80_PC);
 	spreg--;
-	space.write_byte(spreg, pcreg >> 8);
+	mem.write_byte(spreg, pcreg >> 8);
 	spreg--;
-	space.write_byte(spreg, pcreg);
+	mem.write_byte(spreg, pcreg);
 	m_maincpu->set_state_int(Z80_SP, spreg);
 	m_maincpu->set_state_int(Z80_PC, 0x078A);
 }
@@ -438,13 +439,14 @@ DRIVER_INIT_MEMBER(p8k_state,p8k)
 
 WRITE8_MEMBER( p8k_state::kbd_put_16 )
 {
+	address_space &mem = *m_maincpu->space(AS_PROGRAM);
 	// keyboard int handler is at 0x0700
 	m_term_data = data;
 	// This is another dire hack..
-	UINT8 offs = space.read_byte(0x43a5);
+	UINT8 offs = mem.read_byte(0x43a5);
 	UINT16 addr = 0x41b0 + (UINT16) offs;
-	space.write_byte(addr, data);
-	space.write_byte(0x43a0, 1);
+	mem.write_byte(addr, data);
+	mem.write_byte(0x43a0, 1);
 }
 
 static GENERIC_TERMINAL_INTERFACE( terminal_intf_16 )

@@ -175,22 +175,24 @@ READ8_MEMBER( bigbord2_state::portd0_r )
 
 WRITE8_MEMBER( bigbord2_state::bigbord2_kbd_put )
 {
+	address_space &mem = *m_maincpu->space(AS_PROGRAM);
+
 	if (data)
 	{
 		m_term_data = data;
 		m_term_status = 8;
 		m_ctca->trg0(0);
 		m_ctca->trg0(1);
-		if (space.read_byte(0xf13d) == 0x4d)
+		if (mem.read_byte(0xf13d) == 0x4d)
 		{
 			// simulate interrupt by saving current pc on
 			// the stack and jumping to interrupt handler.
 			UINT16 spreg = m_maincpu->state_int(Z80_SP);
 			UINT16 pcreg = m_maincpu->state_int(Z80_PC);
 			spreg--;
-			space.write_byte(spreg, pcreg >> 8);
+			mem.write_byte(spreg, pcreg >> 8);
 			spreg--;
-			space.write_byte(spreg, pcreg);
+			mem.write_byte(spreg, pcreg);
 			m_maincpu->set_state_int(Z80_SP, spreg);
 			m_maincpu->set_state_int(Z80_PC, 0xF120);
 		}
