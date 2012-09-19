@@ -251,9 +251,6 @@ static INPUT_PORTS_START( amiga_common )
 
 	PORT_START("P1MOUSEY")
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(2)
-
-	PORT_INCLUDE( amiga_us_keyboard )
-
 INPUT_PORTS_END
 
 
@@ -427,6 +424,8 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 	MCFG_FLOPPY_DRIVE_ADD("fd1", amiga_floppies, 0,      0, amiga_fdc::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd2", amiga_floppies, 0,      0, amiga_fdc::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd3", amiga_floppies, 0,      0, amiga_fdc::floppy_formats)
+	
+	MCFG_AMIGA_KEYBOARD_ADD("kbd")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a1000n, ntsc )
@@ -629,9 +628,6 @@ DRIVER_INIT_MEMBER(amiga_state,amiga)
 
 	/* initialize cartridge (if present) */
 	amiga_cart_init(machine());
-
-	/* initialize keyboard */
-	amigakbd_init(machine());
 }
 
 #ifdef UNUSED_FUNCTION
@@ -661,9 +657,6 @@ DRIVER_INIT_MEMBER(apollo_state,amiga_ecs)
 
 	/* initialize Action Replay (if present) */
 	amiga_cart_init(machine());
-
-	/* initialize keyboard */
-	amigakbd_init(machine());
 }
 #endif
 
@@ -686,9 +679,6 @@ DRIVER_INIT_MEMBER(amiga_state,cdtv)
 	/* set up memory */
 	membank("bank1")->configure_entry(0, m_chip_ram);
 	membank("bank1")->configure_entry(1, machine().root_device().memregion("user1")->base());
-
-	/* initialize keyboard - in cdtv we can use a standard Amiga keyboard*/
-	amigakbd_init(machine());
 }
 
 

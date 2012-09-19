@@ -1401,7 +1401,6 @@ private:
 #define DECLARE_CUSTOM_INPUT_MEMBER(name)	ioport_value name(ioport_field &field, void *param)
 
 // macro for port write callback functions (PORT_CHANGED)
-#define INPUT_CHANGED(name)	void name(device_t &device, ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 #define INPUT_CHANGED_MEMBER(name)	void name(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 #define DECLARE_INPUT_CHANGED_MEMBER(name)	void name(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 
@@ -1567,9 +1566,6 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, a
 	configurer.field_set_dynamic_read(ioport_field_read_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)NULL), (void *)(_param));
 
 // write callbacks
-#define PORT_CHANGED(_callback, _param) \
-	configurer.field_set_dynamic_write(ioport_field_write_delegate(_callback, #_callback, DEVICE_SELF, (device_t *)NULL), (void *)(_param));
-
 #define PORT_CHANGED_MEMBER(_device, _class, _member, _param) \
 	configurer.field_set_dynamic_write(ioport_field_write_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)NULL), (void *)(_param));
 
