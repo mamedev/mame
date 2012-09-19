@@ -91,6 +91,7 @@ public:
 	DECLARE_MACHINE_START(neocd);
 	DECLARE_MACHINE_START(neogeo);
 	DECLARE_MACHINE_RESET(neogeo);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_memcard_status);
 
 };
 
@@ -430,14 +431,14 @@ WRITE16_MEMBER(ng_aes_state::save_ram_w)
 
 #define MEMCARD_SIZE	0x0800
 
-static CUSTOM_INPUT( get_memcard_status )
+CUSTOM_INPUT_MEMBER(ng_aes_state::get_memcard_status)
 {
 	/* D0 and D1 are memcard presence indicators, D2 indicates memcard
        write protect status (we are always write enabled) */
-	if(strcmp((char*)field.machine().system().name,"aes") != 0)
+	if(strcmp((char*)machine().system().name,"aes") != 0)
 		return 0x00;  // On the Neo Geo CD, the memory card is internal and therefore always present.
 	else
-		return (memcard_present(field.machine()) == -1) ? 0x07 : 0x00;
+		return (memcard_present(machine()) == -1) ? 0x07 : 0x00;
 }
 
 READ16_MEMBER(ng_aes_state::memcard_r)
@@ -1428,7 +1429,7 @@ static const ym2610_interface ym2610_config =
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("1P Select") PORT_CODE(KEYCODE_5) PORT_PLAYER(1)	\
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )									\
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("2P Select") PORT_CODE(KEYCODE_6) PORT_PLAYER(2)	\
-	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_memcard_status, NULL)			\
+	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ng_aes_state, get_memcard_status, NULL)			\
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )  /* Matrimelee expects this bit to be active high when on an AES */
 
 #define STANDARD_IN3																				\
