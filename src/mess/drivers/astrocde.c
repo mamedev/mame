@@ -13,8 +13,18 @@
 #include "imagedev/cartslot.h"
 #include "machine/ram.h"
 
-MACHINE_RESET( astrocde );
-void get_ram_expansion_settings(address_space &space, int &ram_expansion_installed, int &write_protect_on, int &expansion_ram_start, int &expansion_ram_end, int &shadow_ram_end);
+class astrocde_mess_state : public astrocde_state
+{
+public:
+	astrocde_mess_state(const machine_config &mconfig, device_type type, const char *tag)
+		: astrocde_state(mconfig, type, tag) 
+		{ }
+
+	void get_ram_expansion_settings(int &ram_expansion_installed, int &write_protect_on, int &expansion_ram_start, int &expansion_ram_end, int &shadow_ram_end);
+	DECLARE_MACHINE_RESET(astrocde);
+	DECLARE_INPUT_CHANGED_MEMBER(set_write_protect);
+};
+
 
 /*************************************
  *
@@ -76,24 +86,24 @@ void get_ram_expansion_settings(address_space &space, int &ram_expansion_install
  *
  *************************************/
 
-static ADDRESS_MAP_START( astrocade_mem, AS_PROGRAM, 8, astrocde_state )
+static ADDRESS_MAP_START( astrocade_mem, AS_PROGRAM, 8, astrocde_mess_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Star Fortress writes in here?? */
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("videoram") /* ASG */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( astrocade_io, AS_IO, 8, astrocde_state )
+static ADDRESS_MAP_START( astrocade_io, AS_IO, 8, astrocde_mess_state )
 	AM_RANGE(0x00, 0x1f) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
 ADDRESS_MAP_END
 
-static INPUT_CHANGED( set_write_protect )  // run when RAM expansion write protect switch is changed
+INPUT_CHANGED_MEMBER(astrocde_mess_state::set_write_protect)  // run when RAM expansion write protect switch is changed
 {
 	int ram_expansion_installed = 0, write_protect_on = 0, expansion_ram_start = 0, expansion_ram_end = 0, shadow_ram_end = 0;
-	address_space &space = *field.machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *expram = field.machine().device<ram_device>("ram_tag")->pointer();
+	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *expram = machine().device<ram_device>("ram_tag")->pointer();
 
-	get_ram_expansion_settings(space, ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference
+	get_ram_expansion_settings(ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference
 
     if (ram_expansion_installed == 1)
     {
@@ -225,7 +235,7 @@ static INPUT_PORTS_START( astrocde )
 	PORT_DIPSETTING(	0x20, "32KB Blue RAM Expansion")
 
 	PORT_START("PROTECT")  /* Write protect RAM */
-	PORT_DIPNAME( 0x01, 0x00, "Write Protect RAM") PORT_CHANGED(set_write_protect, 0)
+	PORT_DIPNAME( 0x01, 0x00, "Write Protect RAM") PORT_CHANGED_MEMBER(DEVICE_SELF, astrocde_mess_state, set_write_protect, 0)
 	PORT_DIPSETTING( 0x00, "Write Protect Off")
 	PORT_DIPSETTING( 0x01, "Write Protect On")
 INPUT_PORTS_END
@@ -237,13 +247,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( astrocde, astrocde_state )
+static MACHINE_CONFIG_START( astrocde, astrocde_mess_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)        /* 1.789 MHz */
 	MCFG_CPU_PROGRAM_MAP(astrocade_mem)
 	MCFG_CPU_IO_MAP(astrocade_io)
 
-	MCFG_MACHINE_RESET( astrocde )
+	MCFG_MACHINE_RESET_OVERRIDE(astrocde_mess_state, astrocde)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -307,14 +317,14 @@ DRIVER_INIT_MEMBER(astrocde_state,astrocde)
 	m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS;
 }
 
-MACHINE_RESET( astrocde )
+MACHINE_RESET_MEMBER(astrocde_mess_state, astrocde)
 {
     int ram_expansion_installed = 0, write_protect_on = 0, expansion_ram_start = 0, expansion_ram_end = 0, shadow_ram_end = 0;
-    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
-    UINT8 *expram = machine.device<ram_device>("ram_tag")->pointer();
+    address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+    UINT8 *expram = machine().device<ram_device>("ram_tag")->pointer();
     space.unmap_readwrite(0x5000, 0xffff);  // unmap any previously installed expansion RAM
 
-    get_ram_expansion_settings(space, ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference
+    get_ram_expansion_settings(ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference
 
     if (ram_expansion_installed == 1)
     {
@@ -331,16 +341,16 @@ MACHINE_RESET( astrocde )
      }
 }
 
-void get_ram_expansion_settings(address_space &space, int &ram_expansion_installed, int &write_protect_on, int &expansion_ram_start, int &expansion_ram_end, int &shadow_ram_end)
+void astrocde_mess_state::get_ram_expansion_settings(int &ram_expansion_installed, int &write_protect_on, int &expansion_ram_start, int &expansion_ram_end, int &shadow_ram_end)
 {
-    if (space.machine().root_device().ioport("PROTECT")->read() == 0x01)
+    if (machine().root_device().ioport("PROTECT")->read() == 0x01)
         write_protect_on = 1;
     else
         write_protect_on = 0;
 
     ram_expansion_installed = 1;
 
-    switch(space.machine().root_device().ioport("CFG")->read())  // check RAM expansion configuration and set address ranges
+    switch(machine().root_device().ioport("CFG")->read())  // check RAM expansion configuration and set address ranges
     {
         case 0x00:  // No RAM Expansion
              ram_expansion_installed = 0;

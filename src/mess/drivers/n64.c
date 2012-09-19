@@ -14,12 +14,24 @@
 #include "imagedev/cartslot.h"
 #include "includes/n64.h"
 
-static READ32_HANDLER( dd_null_r )
+class n64_mess_state : public n64_state
+{
+public:
+	n64_mess_state(const machine_config &mconfig, device_type type, const char *tag)
+		: n64_state(mconfig, type, tag) 
+		{ }
+
+	DECLARE_READ32_MEMBER(dd_null_r);
+	DECLARE_MACHINE_START(n64dd);
+	INTERRUPT_GEN_MEMBER(n64_reset_poll);
+};
+
+READ32_MEMBER(n64_mess_state::dd_null_r)
 {
 	return 0xffffffff;
 }
 
-static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32, n64_state )
+static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32, n64_mess_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_SHARE("rdram")					// RDRAM
 	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
 	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("rsp_dmem")					// RSP DMEM
@@ -32,14 +44,14 @@ static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32, n64_state )
 	AM_RANGE(0x04600000, 0x046fffff) AM_DEVREADWRITE("rcp", n64_periphs, pi_reg_r, pi_reg_w)	// Peripheral Interface
 	AM_RANGE(0x04700000, 0x047fffff) AM_DEVREADWRITE("rcp", n64_periphs, ri_reg_r, ri_reg_w)	// RDRAM Interface
 	AM_RANGE(0x04800000, 0x048fffff) AM_DEVREADWRITE("rcp", n64_periphs, si_reg_r, si_reg_w)	// Serial Interface
-	AM_RANGE(0x05000508, 0x0500050b) AM_READ_LEGACY(dd_null_r);
+	AM_RANGE(0x05000508, 0x0500050b) AM_READ(dd_null_r);
 	AM_RANGE(0x08000000, 0x0801ffff) AM_RAM AM_SHARE("sram")										// Cartridge SRAM
 	AM_RANGE(0x10000000, 0x13ffffff) AM_ROM AM_REGION("user2", 0)									// Cartridge
 	AM_RANGE(0x1fc00000, 0x1fc007bf) AM_ROM AM_REGION("user1", 0)									// PIF ROM
 	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE("rcp", n64_periphs, pif_ram_r, pif_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( n64dd_map, AS_PROGRAM, 32, n64_state )
+static ADDRESS_MAP_START( n64dd_map, AS_PROGRAM, 32, n64_mess_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_SHARE("rdram")				// RDRAM
 	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
 	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("rsp_dmem")					// RSP DMEM
@@ -60,7 +72,7 @@ static ADDRESS_MAP_START( n64dd_map, AS_PROGRAM, 32, n64_state )
 	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE("rcp", n64_periphs, pif_ram_r, pif_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rsp_map, AS_PROGRAM, 32, n64_state )
+static ADDRESS_MAP_START( rsp_map, AS_PROGRAM, 32, n64_mess_state )
 	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_SHARE("rsp_dmem")
 	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("rsp_imem")
 	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("rsp_dmem")
@@ -232,12 +244,11 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 	return IMAGE_INIT_PASS;
 }
 
-MACHINE_START( n64dd )
+MACHINE_START_MEMBER(n64_mess_state,n64dd)
 {
-	n64_state *state = machine.driver_data<n64_state>();
-	state->machine_start();
+	machine_start();
 
-	UINT8 *ipl = machine.root_device().memregion("ddipl")->base();
+	UINT8 *ipl = machine().root_device().memregion("ddipl")->base();
 
 	for (int i = 0; i < 0x400000; i += 4)
 	{
@@ -252,19 +263,19 @@ MACHINE_START( n64dd )
 	}
 }
 
-static INTERRUPT_GEN( n64_reset_poll )
+INTERRUPT_GEN_MEMBER(n64_mess_state::n64_reset_poll)
 {
-	n64_periphs *periphs = device->machine().device<n64_periphs>("rcp");
-	periphs->poll_reset_button((device->machine().root_device().ioport("RESET")->read() & 1) ? true : false);
+	n64_periphs *periphs = machine().device<n64_periphs>("rcp");
+	periphs->poll_reset_button((machine().root_device().ioport("RESET")->read() & 1) ? true : false);
 }
 
-static MACHINE_CONFIG_START( n64, n64_state )
+static MACHINE_CONFIG_START( n64, n64_mess_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, 93750000)
 	MCFG_CPU_CONFIG(config)
 	MCFG_CPU_PROGRAM_MAP(n64_map)
-	MCFG_CPU_VBLANK_INT("screen", n64_reset_poll)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", n64_mess_state, n64_reset_poll)
 
 	MCFG_CPU_ADD("rsp", RSP, 62500000)
 	MCFG_CPU_CONFIG(n64_rsp_config)
@@ -308,7 +319,7 @@ static MACHINE_CONFIG_DERIVED( n64dd, n64 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(n64dd_map)
 
-	MCFG_MACHINE_START( n64dd )
+	MCFG_MACHINE_START_OVERRIDE(n64_mess_state, n64dd)
 
 	MCFG_CARTSLOT_MODIFY("cart")
 	MCFG_CARTSLOT_NOT_MANDATORY
