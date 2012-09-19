@@ -51,7 +51,6 @@
 
 driver_device::driver_device(const machine_config &mconfig, device_type type, const char *tag)
 	: device_t(mconfig, type, "Driver Device", tag, NULL, 0),
-	  device_memory_interface(mconfig, *this),
 	  m_generic_paletteram_8(*this, "paletteram"),
 	  m_generic_paletteram2_8(*this, "paletteram2"),
 	  m_generic_paletteram_16(*this, "paletteram"),
@@ -59,7 +58,6 @@ driver_device::driver_device(const machine_config &mconfig, device_type type, co
 	  m_generic_paletteram_32(*this, "paletteram"),
 	  m_generic_paletteram2_32(*this, "paletteram2"),
 	  m_system(NULL),
-	  m_generic_space_config("generic", ENDIANNESS_LITTLE, 8, 8),
 	  m_latch_clear_value(0),
 	  m_flip_screen_x(0),
 	  m_flip_screen_y(0)
@@ -313,18 +311,6 @@ void driver_device::device_reset_after_children()
 	else
 		video_reset();
 }
-
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *driver_device::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == 0) ? &m_generic_space_config : NULL;
-}
-
 
 
 //**************************************************************************

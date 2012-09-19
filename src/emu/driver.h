@@ -166,8 +166,7 @@ typedef void   (*legacy_callback_func)(running_machine &machine);
 // ======================> driver_device
 
 // base class for machine driver-specific devices
-class driver_device : 	public device_t,
-						public device_memory_interface
+class driver_device : 	public device_t
 {
 public:
 	// construction/destruction
@@ -206,7 +205,7 @@ public:
 	void init_0() { }
 	
 	// memory helpers
-	address_space &generic_space() const { return *space(AS_PROGRAM); }
+	address_space &generic_space() const { return *machine().memory().first_space(); }
 
 	// generic interrupt generators
 	void generic_pulse_irq_line(device_execute_interface &exec, int irqline, int cycles);
@@ -404,9 +403,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset_after_children();
 
-	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
 	// internal helpers
 	inline UINT16 paletteram16_le(offs_t offset) const { return m_generic_paletteram_8[offset & ~1] | (m_generic_paletteram_8[offset |  1] << 8); }
 	inline UINT16 paletteram16_be(offs_t offset) const { return m_generic_paletteram_8[offset |  1] | (m_generic_paletteram_8[offset & ~1] << 8); }
@@ -432,9 +428,6 @@ private:
 	const game_driver *		m_system;					// pointer to the game driver
 	driver_callback_delegate m_callbacks[CB_COUNT];		// start/reset callbacks
 	legacy_callback_func	m_legacy_callbacks[CB_COUNT]; // legacy start/reset callbacks
-
-	// memory state
-	address_space_config	m_generic_space_config;
 
 	// generic audio
 	UINT16					m_latch_clear_value;
