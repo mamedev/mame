@@ -621,15 +621,23 @@ static void svga_vh_rgb8(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	int yi;
 	int xi;
 	UINT8 start_shift;
+	UINT16 line_length;
 
 	/* line compare is screen sensitive */
 	mask_comp = 0x3ff;
 	curr_addr = 0;
 
+	if(vga.crtc.dw)
+		line_length = vga.crtc.offset << 3;  // doubleword mode
+	else
+	{
+		line_length = vga.crtc.offset << 4;
+	}
+
 	start_shift = (!(vga.sequencer.data[4] & 0x08)) ? 2 : 0;
 
 	{
-		for (addr = VGA_START_ADDRESS << start_shift, line=0; line<LINES; line+=height, addr+=VGA_LINE_LENGTH, curr_addr+=VGA_LINE_LENGTH)
+		for (addr = VGA_START_ADDRESS << start_shift, line=0; line<LINES; line+=height, addr+=line_length, curr_addr+=line_length)
 		{
 			for(yi = 0;yi < height; yi++)
 			{
@@ -1214,7 +1222,6 @@ static UINT8 crtc_reg_read(UINT8 index)
 			printf("Unhandled CRTC reg r %02x\n",index);
 			break;
 	}
-
 	return res;
 }
 
