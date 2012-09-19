@@ -190,6 +190,20 @@ y8950_device::y8950_device(const machine_config &mconfig, const char *tag, devic
 
 void y8950_device::device_config_complete()
 {
+	// inherit a copy of the static data
+	const y8950_interface *intf = reinterpret_cast<const y8950_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<y8950_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_handler_cb, 0, sizeof(m_handler_cb));
+		memset(&m_keyboardread_cb, 0, sizeof(m_keyboardread_cb));
+		memset(&m_keyboardwrite_cb, 0, sizeof(m_keyboardwrite_cb));
+		memset(&m_portread_cb, 0, sizeof(m_portread_cb));
+		memset(&m_portwrite_cb, 0, sizeof(m_portwrite_cb));
+	}
 }
 
 //-------------------------------------------------
@@ -198,15 +212,11 @@ void y8950_device::device_config_complete()
 
 void y8950_device::device_start()
 {
-	const y8950_interface *intf = (const y8950_interface *)static_config();
-	if (intf != NULL)
-	{
-		m_handler.resolve(intf->handler_cb, *this);
-		m_keyboardread.resolve(intf->keyboardread_cb, *this);
-		m_keyboardwrite.resolve(intf->keyboardwrite_cb, *this);
-		m_portread.resolve(intf->portread_cb, *this);
-		m_portwrite.resolve(intf->portwrite_cb, *this);
-	}
+	m_handler.resolve(m_handler_cb, *this);
+	m_keyboardread.resolve(m_keyboardread_cb, *this);
+	m_keyboardwrite.resolve(m_keyboardwrite_cb, *this);
+	m_portread.resolve(m_portread_cb, *this);
+	m_portwrite.resolve(m_portwrite_cb, *this);
 
 	DEVICE_START_NAME( y8950 )(this);
 }

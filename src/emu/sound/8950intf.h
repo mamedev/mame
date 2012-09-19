@@ -7,11 +7,11 @@
 
 struct y8950_interface
 {
-	devcb_write_line handler_cb;
-	devcb_read8 keyboardread_cb;
-	devcb_write8 keyboardwrite_cb;
-	devcb_read8 portread_cb;
-	devcb_write8 portwrite_cb;
+	devcb_write_line m_handler_cb;
+	devcb_read8 m_keyboardread_cb;
+	devcb_write8 m_keyboardwrite_cb;
+	devcb_read8 m_portread_cb;
+	devcb_write8 m_portwrite_cb;
 };
 
 DECLARE_READ8_DEVICE_HANDLER( y8950_r );
@@ -23,7 +23,8 @@ DECLARE_WRITE8_DEVICE_HANDLER( y8950_control_port_w );
 DECLARE_WRITE8_DEVICE_HANDLER( y8950_write_port_w );
 
 class y8950_device : public device_t,
-                                  public device_sound_interface
+                     public device_sound_interface,
+					 public y8950_interface
 {
 public:
 	y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
