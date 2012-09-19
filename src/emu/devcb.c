@@ -434,7 +434,7 @@ UINT8 devcb_resolved_read8::from_port(offs_t offset, UINT8 mem_mask)
 
 UINT8 devcb_resolved_read8::from_read8space(offs_t offset, UINT8 mem_mask)
 {
-	return (*m_helper.read8_device)(m_object.device, m_object.device->machine().driver_data()->generic_space(), offset, 0xff);
+	return (*m_helper.read8_space)(*m_object.space, offset, 0xff);
 }
 
 
