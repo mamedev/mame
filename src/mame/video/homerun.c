@@ -10,6 +10,12 @@
 
 /**************************************************************************/
 
+CUSTOM_INPUT_MEMBER(homerun_state::homerun_sprite0_r)
+{
+	// sprite-0 vs background collision status, similar to NES
+	return (machine().primary_screen->vpos() > (m_spriteram[0] - 15)) ? 1 : 0;
+}
+
 WRITE8_MEMBER(homerun_state::homerun_scrollhi_w)
 {
 	// d0: scroll y high bit
@@ -113,7 +119,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int sx = spriteram[offs + 3];
-		int sy = spriteram[offs + 0] - 16;
+		int sy = spriteram[offs + 0] - 15;
 		int code = (spriteram[offs + 1]) | ((spriteram[offs + 2] & 0x8) << 5) | ((state->m_gfx_ctrl & 3) << 9);
 		int color = (spriteram[offs + 2] & 0x07) | 8;
 		int flipx = (spriteram[offs + 2] & 0x40) >> 6;

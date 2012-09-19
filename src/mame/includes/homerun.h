@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER(homerun_scrolly_w);
 	DECLARE_WRITE8_MEMBER(homerun_scrollx_w);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(homerun_40_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(homerun_sprite0_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(homerun_d7756_busy_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_d7756_busy_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_hopper_status_r);

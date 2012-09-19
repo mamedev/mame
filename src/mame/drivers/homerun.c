@@ -121,14 +121,6 @@ static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8, homerun_state )
 ADDRESS_MAP_END
 
 
-CUSTOM_INPUT_MEMBER(homerun_state::homerun_40_r)
-{
-	// screen split location is a guess, but works in homerun
-	UINT8 ret = (machine().primary_screen->vpos() > 116) ? 1 : 0;
-
-	return ret;
-}
-
 CUSTOM_INPUT_MEMBER(homerun_state::homerun_d7756_busy_r)
 {
 	return m_samples->playing(0) ? 0 : 1;
@@ -155,7 +147,7 @@ CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_hopper_status_r)
 static INPUT_PORTS_START( homerun )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_40_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, NULL)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_d7756_busy_r, NULL)
 	PORT_BIT( 0x37, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -192,8 +184,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dynashot )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_40_r, NULL)
-	PORT_BIT( 0xb7, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // doesn't have d7756
+	PORT_BIT( 0x37, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
@@ -229,8 +222,9 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, NULL)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_d7756_busy_r, NULL)
-	PORT_BIT( 0x76, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x36, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_NAME("P1 Up / Rock")
