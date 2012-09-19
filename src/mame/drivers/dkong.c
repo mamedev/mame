@@ -519,8 +519,8 @@ READ8_MEMBER(dkong_state::hb_dma_read_byte)
         fatalerror("hb_dma_read_byte - unmapped access for 0x%02x - bucket 0x%02x\n", offset, bucket);
 
     addr = ((bucket << 7) & 0x7c00) | (offset & 0x3ff);
-
-    return space.read_byte(addr);
+	address_space *prog_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+    return prog_space->read_byte(addr);
 }
 
 WRITE8_MEMBER(dkong_state::hb_dma_write_byte)
@@ -532,8 +532,8 @@ WRITE8_MEMBER(dkong_state::hb_dma_write_byte)
         fatalerror("hb_dma_read_byte - unmapped access for 0x%02x - bucket 0x%02x\n", offset, bucket);
 
     addr = ((bucket << 7) & 0x7c00) | (offset & 0x3ff);
-
-    space.write_byte(addr, data);
+	address_space *prog_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+    prog_space->write_byte(addr, data);
 }
 
 READ8_MEMBER(dkong_state::p8257_ctl_r)
