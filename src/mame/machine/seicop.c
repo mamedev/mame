@@ -1938,6 +1938,8 @@ static struct
 }cop_collision_info[2];
 static int r0, r1;
 
+static UINT16 cop_rom_addr_lo,cop_rom_addr_hi,cop_rom_addr_unk;
+
 /* RE from Seibu Cup Soccer bootleg */
 static const UINT8 fade_table(int v)
 {
@@ -2154,9 +2156,6 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x01c/2): cop_angle_compare = INT8(cop_mcu_ram[0x1c/2]);	break;
 		case (0x01e/2): cop_angle_mod_val = INT8(cop_mcu_ram[0x1e/2]); break;
 
-		case (0x08c/2): cop_sprite_dma_abs_y = (cop_mcu_ram[0x08c/2]); break;
-		case (0x08e/2): cop_sprite_dma_abs_x = (cop_mcu_ram[0x08e/2]); break;
-
 		/* BCD Protection */
 		case (0x020/2):
 		case (0x022/2):
@@ -2181,6 +2180,9 @@ static WRITE16_HANDLER( generic_cop_w )
 			fill_val = (cop_mcu_ram[0x028/2]) | (cop_mcu_ram[0x02a/2] << 16);
 			break;
 
+		/* max possible value returned by the RNG at 0x5a*, trusted */
+		case (0x02c/2): cop_rng_max_value = cop_mcu_ram[0x2c/2] & 0xff; break;
+
 		/* Command tables for 0x500 / 0x502 commands */
 		case (0x032/2): { copd2_set_tabledata(space.machine(), data); break; }
 		case (0x034/2): { copd2_set_tableoffset(space.machine(), data); break; }
@@ -2195,6 +2197,11 @@ static WRITE16_HANDLER( generic_cop_w )
             it's always setted up just before the 0x474 register
             */
 			break;
+
+		case (0x044/2): { cop_scale = data & 3; break; }
+		case (0x046/2): { cop_rom_addr_unk = data & 0xffff; break; }
+		case (0x048/2): { cop_rom_addr_lo = data & 0xffff; break; }
+		case (0x04a/2): { cop_rom_addr_hi = data & 0xffff; break; }
 
 		/* brightness control */
 		case (0x05a/2): pal_brightness_val = data & 0xff; break;
@@ -2252,14 +2259,8 @@ static WRITE16_HANDLER( generic_cop_w )
 			break;
 		}
 
-		/* max possible value returned by the RNG at 0x5a*, trusted */
-		case (0x02c/2): cop_rng_max_value = cop_mcu_ram[0x2c/2] & 0xff; break;
-
-		case (0x044/2):
-		{
-			cop_scale = data & 3;
-			break;
-		}
+		case (0x08c/2): cop_sprite_dma_abs_y = (cop_mcu_ram[0x08c/2]); break;
+		case (0x08e/2): cop_sprite_dma_abs_x = (cop_mcu_ram[0x08e/2]); break;
 
 		/* Registers */
 		case (0x0a0/2): { cop_register[0] = (cop_register[0]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
@@ -2750,6 +2751,47 @@ static WRITE16_HANDLER( generic_cop_w )
 				return;
 			}
 
+			//(cupsoc) 1c | 5 | b07f | e38e | 984 ac4 d82 ac2 39b b9a b9a a9a
+			if(COP_CMD(0x984,0xac4,0xd82,0xac2,0x39b,0xb9a,0xb9a,0xa9a,5,0xb07f))
+			{
+				int dy = space.read_dword(cop_register[2]+4) - space.read_dword(cop_register[0]+4);
+				int dx = space.read_dword(cop_register[2]+8) - space.read_dword(cop_register[0]+8);
+
+				cop_status = 7;
+				if(!dx) {
+					cop_status |= 0x8000;
+					cop_angle = 0;
+				} else {
+					cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
+					if(dx<0)
+						cop_angle += 0x80;
+				}
+
+				r0 = dy;
+				r1 = dx;
+
+				//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,cop_angle);
+
+				if(cop_mcu_ram[offset] & 0x80)
+					space.write_word(cop_register[0]+(0x34^2), cop_angle);
+				return;
+			}
+
+			//(cupsoc) 1a | 5 | fffb | d104 | ac2 9e0 0a2
+			/* controls player vs. player collision detection, 0xf105 controls player vs. ball */
+			if(COP_CMD(0xac2,0x9e0,0x0a2,0x000,0x000,0x000,0x000,0x000,5,0xfffb))
+			{
+				UINT8 *ROM = space.machine().root_device().memregion("maincpu")->base();
+				UINT32 rom_addr = (cop_rom_addr_hi << 16 | cop_rom_addr_lo) & ~1;
+				UINT16 rom_data = (ROM[rom_addr + 0]) | (ROM[rom_addr + 1]<<8);
+
+				/* writes to some unemulated COP registers, then puts the result in here, adding a parameter taken from ROM */
+				space.write_word(cop_register[0]+(0x44 + offset * 4), rom_data);
+
+				printf("%04x%04x %04x %04x\n",cop_rom_addr_hi,cop_rom_addr_lo,cop_rom_addr_unk,rom_data);
+				return;
+			}
+
 			printf("%04x\n",cop_mcu_ram[offset]);
 			break;
 		}
@@ -2952,6 +2994,7 @@ static WRITE16_HANDLER( generic_cop_w )
 						{
 							case 2:	xchg_flag = (vali > valj); break;
 							case 1: xchg_flag = (vali < valj); break;
+							case 0:	xchg_flag = 0; break; /* ??? */
 							default: xchg_flag = 0; printf("Warning: sort-DMA used with param %02x\n",cop_sort_param); break;
 						}
 
