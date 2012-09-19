@@ -8157,8 +8157,8 @@ ROM_END
 /* Atomiswave */
 GAME( 2001, awbios,   0,        aw2c,    aw2c, dc_state,  atomiswave, ROT0, "Sammy",                           "Atomiswave Bios", GAME_FLAGS|GAME_IS_BIOS_ROOT )
 
-GAME( 2002, maxspeed, awbios,   aw1c,    aw1w, dc_state,  atomiswave, ROT0, "Sammy",                           "Maximum Speed", GAME_FLAGS )
-GAME( 2002, sprtshot, awbios,   aw2c,    aw2c, dc_state,  atomiswave, ROT0, "Sammy USA",                       "Sports Shooting USA", GAME_FLAGS )
+GAME( 2003, maxspeed, awbios,   aw1c,    aw1w, dc_state,  atomiswave, ROT0, "Sammy",                           "Maximum Speed", GAME_FLAGS )
+GAME( 2003, sprtshot, awbios,   aw2c,    aw2c, dc_state,  atomiswave, ROT0, "Sammy USA",                       "Sports Shooting USA", GAME_FLAGS )
 GAME( 2003, ggx15,    awbios,   aw2c,    aw2c, dc_state,  atomiswave, ROT0, "Sammy / Arc System Works",        "Guilty Gear X ver. 1.5", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2003, demofist, awbios,   aw2c,    aw2c, dc_state,  atomiswave, ROT0, "Polygon Magic / Dimps",           "Demolish Fist", GAME_FLAGS )
 GAME( 2003, dolphin,  awbios,   aw2c,    aw2c, dc_state,  atomiswave, ROT0, "Sammy",                           "Dolphin Blue", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
