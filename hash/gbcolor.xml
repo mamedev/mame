@@ -9,7 +9,6 @@ To investigate:
 Undumped:
 - 102 Dalmatas Cachorros Al Rescate CGB-B99S-ESP
 - Army Men 2 CGB-BA2P-EUU
-- Army Men - Air Combat  CGB-BATP-EUR
 - Bionic Command CGB-AV4P-AUS
 - Caterpillar Construction Zone DMG-AR4P-EUU? [unclear pic]
 - Daffy Duck - Fowl Play DMG-AD7P-UKV
@@ -47,7 +46,6 @@ nointro guys also list the following
 - Mega Man Xtreme (Euro)
 - Moon Patrol &amp; Spy Hunter (Euro)
 - The New Adventures of Mary-Kate &amp; Ashley (Euro)
-- Razor Freestyle Scooter (Euro)
 
 Undumped GBC protos:
   - Jet Force Gemini
@@ -675,10 +673,10 @@ Undumped Pirates:
 
 	<software name="amenairc">
 		<!-- Notes: GBC only -->
-		<description>Army Men - Air Combat (USA)</description>
+		<description>Army Men - Air Combat (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>3DO</publisher>
-		<info name="serial" value="CGB-BATE-USA"/>
+		<info name="serial" value="CGB-BATE-USA, CGB-BATP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="army men - air combat (usa) (en,fr,de).bin" size="1048576" crc="b0d1de8c" sha1="4e1d964d31013e79ecae4a49dcd3777cc7e06af2" offset="000000" />
@@ -13866,6 +13864,19 @@ Undumped Pirates:
 	</software>
 
 	<software name="razorfs">
+		<!-- Notes: GBC only -->
+		<description>Freestyle Scooter (Euro)</description>
+		<year>2001</year>
+		<publisher>Crave Entertainment</publisher>
+		<info name="serial" value="CGB-BRZP-EUR"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="freestylesbrzp.bin" size="1048576" crc="ee79117d" sha1="cf6ae174584bbfb5ae30478841114443adc00245" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="razorfsu" cloneof="razorfs">
 		<!-- Notes: GBC only -->
 		<description>Razor Freestyle Scooter (USA)</description>
 		<year>2001</year>

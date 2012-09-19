@@ -31347,7 +31347,7 @@
 	</software>
 
 	<software name="spongbmv">
-		<description>The SpongeBob SquarePants Movie (Euro)</description>
+		<description>SpongeBob SquarePants - The Movie (Euro)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="AGB-BSNP-EUR"/>
@@ -31358,8 +31358,8 @@
 		</part>
 	</software>
 
-	<software name="spongbmvup" cloneof="spongbmv">
-		<description>The SpongeBob SquarePants Movie (USA, Prototype)</description>
+	<software name="spongbmvup" cloneof="spongbmv" supported="no">
+		<description>SpongeBob SquarePants - The Movie (USA, Prototype)</description>
 		<year>2004</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -31371,7 +31371,7 @@
 	</software>
 
 	<software name="spongbmvu" cloneof="spongbmv">
-		<description>The SpongeBob SquarePants Movie (USA)</description>
+		<description>SpongeBob SquarePants - The Movie (USA)</description>
 		<year>2004</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="AGB-BSNE-USA"/>

@@ -9906,7 +9906,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="hyokkohj">
+	<software name="hyokkohj" supported="partial">
 		<description>Hyokkori Hyoutan Jima - Daitouryou o Mezase! (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -10423,13 +10423,13 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="007shitou" cloneof="jb007">
-		<description>007 Shitou - The Duel (Jpn)</description>
+	<software name="jb007j" cloneof="jb007">
+		<description>James Bond 007 - The Duel (Jpn)</description>
 		<year>1993</year>
 		<publisher>Tengen</publisher>
 		<info name="serial" value="T-48073"/>
 		<info name="release" value="19930515"/>
-		<info name="alt_title" value="007 死闘 JAMES BOND THE DUEL"/>
+		<info name="alt_title" value="007 死闘 JAMES BOND THE DUEL ~ 007 Shitou - The Duel (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="007 shitou - the duel (jpn).bin" size="524288" crc="aeb4b262" sha1="7e0de7011a60a1462dc48594f3caa956ff942281" offset="000000" loadflag="load16_word_swap" />
@@ -13549,7 +13549,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="kujaku" cloneof="mystdef">
+	<software name="kujaku2" cloneof="mystdef">
 		<description>Kujaku Ou 2 - Geneijou (Jpn)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
@@ -14358,14 +14358,15 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- is this really a beta, or has it just an intro attached? -->
 	<software name="nbashowp" cloneof="nbashow">
-		<description>NBA Showdown '94 (USA, Prototype)</description>
+		<description>NBA Showdown '94 (USA, Prototype, Hacked)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
-				<rom name="nba showdown '94 (usa) (beta).bin" size="2097152" crc="6643a308" sha1="e804ca0f4da505056f0813f00df9b139248f59af" offset="000000" loadflag="load16_word_swap" />
+				<rom name="nba showdown '94 (usa) (beta).bin" size="2097152" crc="6643a308" sha1="e804ca0f4da505056f0813f00df9b139248f59af" offset="000000" status="baddump" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -27637,7 +27638,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nba2k" cloneof="nbaact95">
+	<software name="nba2k" cloneof="nbaact">
 		<description>NBA 2000 (Rus)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>

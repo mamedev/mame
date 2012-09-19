@@ -41,7 +41,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * 超光戦士 シャンゼリオン  - Chou Hikari Senshi Shanzerion (Sega - 1996xxxx - HPC-6038)
 * ハローキティのすてきなおたんじょうび  - Hello Kitty no Suteki nao Tanjoubi (Sega - 1997xxxx - HPC-6040)
 * よべばこたえる ドラえもん のびたとひみつどうぐをみつけよう! - Yobeba Kotaeru Doraemon - Nobita to Himitsu Douguwomitsukeyou! (Sega - ???? - HPC-6041)
-* ぬりえだいすき! ダンボのわくわくサーカス! - Nurie Daisuki! Dumbo no Wakuwaku Saakasu! (Sega - 1997xxxx - HPC-6044)
 * もしもしピコ セット だれがでるかな?もしもしピコで テレビとおしゃべり! <同梱> - Moshimoshi Pico Set with Darega Derukana? Moshimoshi Pico de Terebi Tooshaberi! (Sega - 1997xxxx - HPC-6046)
 * パケット2 ゆかいな仲間とゲームで数遊び  - Paketto 2 Yukai na Nakama to Game de Kazu Asobi (Sega - ???? - HPC-6048)
 * みんなでカラオケ! うたってピコ セット いっしょにうたおう すきなうた! <同梱> - Minna de Karaoke! Utatte Pico Set with Isshoni Utaou Sukinauta! (Sega - 1997xxxx - HPC-6049)
@@ -109,7 +108,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * おりょうりだいすき! キッチンピコ - Oryouri Daisuki! Kitchen Pico (Sega Toys - 20030718 - HPC-6132)
 * キキ＆ララ 星のかずあそび - Kiki & Lala: Hoshi no Kazu Asobi (Sega Toys - 20030912 - HPC-6133)
 * それいけ!アンパンマン はじめてあそぶピコソフト アンパンマンのいろ･かず･かたち ぬりえもできちゃうぞ! - Soreike! Anpanman Hajimete Asobu Pico Soft - Anpanman Noiro-Kazu-Katachi Nuriemo Dekichauzo! (Sega Toys - ???? - HPC-????)
-* ディズニープリンセス プリンセスになりたい! - Disney Princesses - Princesses ni Naritai (Sega Toys - 20031209 - HPC-6136)
 * くまのプーさん たのしいたしざんひきざん - Kuma no Pooh-san Tanoshii Tashizan Hikizan (Sega Toys - 20040311 - HPC-6137)
 * ディズニープリンセス アリエル - Disney Princesses - Ariel (Sega Toys - 20040426 - HPC-6138)
 * ディズニープリンセス 白雪姫 ～しらゆきひめ～ <Best> - Disney Princesses - Shirayukihime Best Selection (Sega Toys - 20040426 - HPC-6139)
@@ -471,6 +469,22 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
+	<software name="princess">
+		<description>Disney Princesses - Princesses ni Naritai! (Jpn)</description>
+		<year>2003</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6136" />
+		<info name="release" value="20031209"/>
+		<info name="alt_title" value="ディズニープリンセス プリンセスになりたい!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="epoxy block u1.ic1" size="2097152" crc="64b1906b" sha1="0d2f19d9d2d96faf97aafca82f2e05fe9fc1ace8" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- This same file had also been released as Prototype, but it just means it was a final build... -->
 	<software name="dolucky">
 		<description>Dolucky no Oekaki House (Jpn)</description>
@@ -556,6 +570,21 @@ Games for the MIXT BOOK PLAYER COPERA
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="saashuppatsuda! ken-chan to pepe no wanpaku drive (japan).bin" size="1048576" crc="1eb9b7f6" sha1="bed4ce255b139f0e71eb3197a058075e0c051aa1" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dumbo">
+		<description>Nurie Daisuki! Dumbo no Wakuwaku Saakasu! (Jpn)</description>
+		<year>1997</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6044" />
+		<info name="alt_title" value="ぬりえだいすき! ダンボのわくわくサーカス!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-19728 J37" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-19728 j37.ic1" size="1048576" crc="d86dc4dc" sha1="d0c490db4080e276de1b1b20d5137613a6b620c8" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2949,17 +2978,6 @@ Notice that most of these will become parent, when the dumps surface
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="????">
 				<rom name="Bakuryuu Sentai Abaranger (J).bin" size="????" crc="0bd73cf6" sha1="df12e28a2f1e49f51d2d8968d38993f2f93b648c" offset="000000" >
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dprinnari">
-		<description>Disney Princess - Princess ni Naritai! (Jpn)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Disney Princess - Princess ni Naritai! (J).bin" size="????" crc="64b1906b" sha1="0d2f19d9d2d96faf97aafca82f2e05fe9fc1ace8" offset="000000" >
 			</dataarea>
 		</part>
 	</software>
