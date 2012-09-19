@@ -120,7 +120,7 @@ static void palm_spim_exchange( device_t *device )
 
 void palm_state::machine_start()
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	space.install_read_bank (0x000000, machine().device<ram_device>(RAM_TAG)->size() - 1, machine().device<ram_device>(RAM_TAG)->size() - 1, 0, "bank1");
 	space.install_write_bank(0x000000, machine().device<ram_device>(RAM_TAG)->size() - 1, machine().device<ram_device>(RAM_TAG)->size() - 1, 0, "bank1");
 	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());

@@ -174,7 +174,7 @@ static DEVICE_START( akiko )
 	akiko_state *state = get_safe_token(device);
 
 	state->set_machine(machine);
-	state->m_space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	state->m_space = &machine.device("maincpu")->memory().space(AS_PROGRAM);
 	state->m_c2p_input_index = 0;
 	state->m_c2p_output_index = 0;
 

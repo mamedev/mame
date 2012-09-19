@@ -222,7 +222,7 @@ machine_config_constructor qs1000_device::device_mconfig_additions() const
 void qs1000_device::device_start()
 {
 	// Find our direct access
-	m_direct = &space()->direct();
+	m_direct = &space().direct();
 
 	// The QS1000 operates at 24MHz. Creating a stream at that rate
 	// would be overkill so we opt for a fraction of that rate which

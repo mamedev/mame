@@ -1717,7 +1717,7 @@ static CPU_RESET( se3208 )
 	memset(se3208_state,0,sizeof(se3208_state_t));
 	se3208_state->irq_callback = save_irqcallback;
 	se3208_state->device = device;
-	se3208_state->program = device->space(AS_PROGRAM);
+	se3208_state->program = &device->space(AS_PROGRAM);
 	se3208_state->direct = &se3208_state->program->direct();
 	se3208_state->PC=SE3208_Read32(se3208_state, 0);
 	se3208_state->SR=0;
@@ -1788,7 +1788,7 @@ static CPU_INIT( se3208 )
 
 	se3208_state->irq_callback = irqcallback;
 	se3208_state->device = device;
-	se3208_state->program = device->space(AS_PROGRAM);
+	se3208_state->program = &device->space(AS_PROGRAM);
 	se3208_state->direct = &se3208_state->program->direct();
 }
 

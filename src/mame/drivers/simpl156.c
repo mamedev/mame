@@ -1061,7 +1061,7 @@ READ32_MEMBER(simpl156_state::joemacr_speedup_r)
 
 DRIVER_INIT_MEMBER(simpl156_state,joemacr)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::joemacr_speedup_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::joemacr_speedup_r),this));
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1074,7 +1074,7 @@ READ32_MEMBER(simpl156_state::chainrec_speedup_r)
 
 DRIVER_INIT_MEMBER(simpl156_state,chainrec)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::chainrec_speedup_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::chainrec_speedup_r),this));
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1087,7 +1087,7 @@ READ32_MEMBER(simpl156_state::prtytime_speedup_r)
 
 DRIVER_INIT_MEMBER(simpl156_state,prtytime)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0201ae0, 0x0201ae3, read32_delegate(FUNC(simpl156_state::prtytime_speedup_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x0201ae0, 0x0201ae3, read32_delegate(FUNC(simpl156_state::prtytime_speedup_r),this));
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1101,7 +1101,7 @@ READ32_MEMBER(simpl156_state::charlien_speedup_r)
 
 DRIVER_INIT_MEMBER(simpl156_state,charlien)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::charlien_speedup_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::charlien_speedup_r),this));
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1114,7 +1114,7 @@ READ32_MEMBER(simpl156_state::osman_speedup_r)
 
 DRIVER_INIT_MEMBER(simpl156_state,osman)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::osman_speedup_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::osman_speedup_r),this));
 	DRIVER_INIT_CALL(simpl156);
 
 }

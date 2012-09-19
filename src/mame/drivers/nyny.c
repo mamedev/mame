@@ -228,7 +228,7 @@ WRITE8_MEMBER(nyny_state::pia_2_port_b_w)
 	m_star_enable = data & 0x10;
 
 	/* bits 5-7 go to the music board connector */
-	audio_2_command_w(*m_maincpu->space(AS_PROGRAM), 0, data & 0xe0);
+	audio_2_command_w(m_maincpu->space(AS_PROGRAM), 0, data & 0xe0);
 }
 
 

@@ -510,7 +510,7 @@ void kyugo_state::machine_start()
 
 void kyugo_state::machine_reset()
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	// must start with interrupts and sub CPU disabled
 	m_nmi_mask = 0;
 	kyugo_sub_cpu_control_w(space, 0, 0);
@@ -1368,7 +1368,7 @@ ROM_END
 DRIVER_INIT_MEMBER(kyugo_state,gyrodine)
 {
 	/* add watchdog */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(kyugo_state::watchdog_reset_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(kyugo_state::watchdog_reset_w),this));
 }
 
 
@@ -1376,10 +1376,10 @@ DRIVER_INIT_MEMBER(kyugo_state,srdmissn)
 {
 
 	/* shared RAM is mapped at 0xe000 as well  */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xe000, 0xe7ff, m_shared_ram);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0xe000, 0xe7ff, m_shared_ram);
 
 	/* extra RAM on sub CPU  */
-	machine().device("sub")->memory().space(AS_PROGRAM)->install_ram(0x8800, 0x8fff);
+	machine().device("sub")->memory().space(AS_PROGRAM).install_ram(0x8800, 0x8fff);
 }
 
 

@@ -196,8 +196,8 @@ DRIVER_INIT_MEMBER(pgm_028_025_state,olds)
 {
 	pgm_basic_init(machine());
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xdcb400, 0xdcb403, FUNC(olds_r), FUNC(olds_w));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x8178f4, 0x8178f5, FUNC(olds_prot_swap_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xdcb400, 0xdcb403, FUNC(olds_r), FUNC(olds_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x8178f4, 0x8178f5, FUNC(olds_prot_swap_r));
 
 	m_kb_cmd = 0;
 	m_kb_reg = 0;

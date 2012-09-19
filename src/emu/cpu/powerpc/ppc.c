@@ -963,7 +963,7 @@ static CPU_INIT( ppc403 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
-	ppc.program = device->space(AS_PROGRAM);
+	ppc.program = &device->space(AS_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 }
@@ -1009,7 +1009,7 @@ static CPU_INIT( ppc405 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
-	ppc.program = device->space(AS_PROGRAM);
+	ppc.program = &device->space(AS_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 }
@@ -1134,7 +1134,7 @@ static CPU_INIT( ppc603 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
-	ppc.program = device->space(AS_PROGRAM);
+	ppc.program = &device->space(AS_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 
@@ -1282,7 +1282,7 @@ static CPU_INIT( ppc602 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
-	ppc.program = device->space(AS_PROGRAM);
+	ppc.program = &device->space(AS_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 
@@ -1423,7 +1423,7 @@ static CPU_INIT( mpc8240 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
-	ppc.program = device->space(AS_PROGRAM);
+	ppc.program = &device->space(AS_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 
@@ -1549,7 +1549,7 @@ static CPU_INIT( ppc601 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
-	ppc.program = device->space(AS_PROGRAM);
+	ppc.program = &device->space(AS_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 
@@ -1679,7 +1679,7 @@ static CPU_INIT( ppc604 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
-	ppc.program = device->space(AS_PROGRAM);
+	ppc.program = &device->space(AS_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 

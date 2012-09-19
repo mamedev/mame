@@ -113,7 +113,7 @@ MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
 
 MACHINE_RESET_MEMBER(namcos2_shared_state,namcos2)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	mFinalLapProtCount = 0;
 	namcos2_mcu_analog_ctrl = 0;
 	namcos2_mcu_analog_data = 0xaa;

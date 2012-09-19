@@ -3388,7 +3388,7 @@ static CPU_INIT( cp1610 )
 	cpustate->intrm_pending = 0;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 
 	device->save_item(NAME(cpustate->r));
 	device->save_item(NAME(cpustate->flags));

@@ -1542,9 +1542,9 @@ static void hyperstone_init(legacy_cpu_device *device, device_irq_acknowledge_ca
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 	cpustate->timer = device->machine().scheduler().timer_alloc(FUNC(e132xs_timer_callback), (void *)device);
 	cpustate->clock_scale_mask = scale_mask;
 }
@@ -1650,9 +1650,9 @@ static CPU_RESET( hyperstone )
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->opcodexor = save_opcodexor;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 	cpustate->timer = save_timer;
 
 	cpustate->tr_clocks_per_tick = 2;

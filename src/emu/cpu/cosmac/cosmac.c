@@ -231,9 +231,9 @@ void cosmac_device::device_config_complete()
 void cosmac_device::device_start()
 {
 	// get our address spaces
-	m_program = space(AS_PROGRAM);
+	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
-	m_io = space(AS_IO);
+	m_io = &space(AS_IO);
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,		"GENPC",		m_pc).callimport().callexport().noshow();

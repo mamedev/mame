@@ -532,8 +532,8 @@ DRIVER_INIT_MEMBER(beathead_state,beathead)
 	atarijsa_init(machine(), "IN2", 0x0040);
 
 	/* prepare the speedups */
-	m_speedup_data = m_maincpu->space(AS_PROGRAM)->install_read_handler(0x00000ae8, 0x00000aeb, 0, 0, read32_delegate(FUNC(beathead_state::speedup_r), this));
-	m_movie_speedup_data = m_maincpu->space(AS_PROGRAM)->install_read_handler(0x00000804, 0x00000807, 0, 0, read32_delegate(FUNC(beathead_state::movie_speedup_r), this));
+	m_speedup_data = m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000ae8, 0x00000aeb, 0, 0, read32_delegate(FUNC(beathead_state::speedup_r), this));
+	m_movie_speedup_data = m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000804, 0x00000807, 0, 0, read32_delegate(FUNC(beathead_state::movie_speedup_r), this));
 }
 
 

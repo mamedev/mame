@@ -321,7 +321,7 @@ static const char *const nc_bankhandler_w[]={
 static void nc_refresh_memory_bank_config(running_machine &machine, int bank)
 {
 	nc_state *state = machine.driver_data<nc_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int mem_type;
 	int mem_bank;
 	char bank1[10];

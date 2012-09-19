@@ -5224,7 +5224,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(model2_state,genprot)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),this), write32_delegate(FUNC(model2_state::model2_prot_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),this), write32_delegate(FUNC(model2_state::model2_prot_w),this));
 	m_protstate = m_protpos = 0;
 }
 
@@ -5232,7 +5232,7 @@ DRIVER_INIT_MEMBER(model2_state,pltkids)
 {
 	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),this), write32_delegate(FUNC(model2_state::model2_prot_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),this), write32_delegate(FUNC(model2_state::model2_prot_w),this));
 	m_protstate = m_protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
@@ -5243,7 +5243,7 @@ DRIVER_INIT_MEMBER(model2_state,zerogun)
 {
 	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),this), write32_delegate(FUNC(model2_state::model2_prot_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),this), write32_delegate(FUNC(model2_state::model2_prot_w),this));
 	m_protstate = m_protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
@@ -5252,7 +5252,7 @@ DRIVER_INIT_MEMBER(model2_state,zerogun)
 
 DRIVER_INIT_MEMBER(model2_state,daytonam)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x240000, 0x24ffff, read32_delegate(FUNC(model2_state::maxx_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x240000, 0x24ffff, read32_delegate(FUNC(model2_state::maxx_r),this));
 }
 
 /* very crude support for let the game set itself into stand-alone mode */
@@ -5285,8 +5285,8 @@ DRIVER_INIT_MEMBER(model2_state,sgt24h)
 {
 	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),this), write32_delegate(FUNC(model2_state::model2_prot_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01a10000, 0x01a1ffff, read32_delegate(FUNC(model2_state::jaleco_network_r),this), write32_delegate(FUNC(model2_state::jaleco_network_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),this), write32_delegate(FUNC(model2_state::model2_prot_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x01a10000, 0x01a1ffff, read32_delegate(FUNC(model2_state::jaleco_network_r),this), write32_delegate(FUNC(model2_state::jaleco_network_w),this));
 
 	m_protstate = m_protpos = 0;
 
@@ -5296,7 +5296,7 @@ DRIVER_INIT_MEMBER(model2_state,sgt24h)
 
 DRIVER_INIT_MEMBER(model2_state,overrev)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01a10000, 0x01a1ffff, read32_delegate(FUNC(model2_state::jaleco_network_r),this), write32_delegate(FUNC(model2_state::jaleco_network_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x01a10000, 0x01a1ffff, read32_delegate(FUNC(model2_state::jaleco_network_r),this), write32_delegate(FUNC(model2_state::jaleco_network_w),this));
 
 	//TODO: cache patch?
 }
@@ -5306,7 +5306,7 @@ DRIVER_INIT_MEMBER(model2_state,doa)
 {
 	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),this), write32_delegate(FUNC(model2_state::model2_prot_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),this), write32_delegate(FUNC(model2_state::model2_prot_w),this));
 	m_protstate = m_protpos = 0;
 
 	ROM[0x630/4] = 0x08000004;
@@ -5315,12 +5315,12 @@ DRIVER_INIT_MEMBER(model2_state,doa)
 
 DRIVER_INIT_MEMBER(model2_state,rchase2)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x01c00008, 0x01c0000b, write32_delegate(FUNC(model2_state::rchase2_devices_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x01c00008, 0x01c0000b, write32_delegate(FUNC(model2_state::rchase2_devices_w),this));
 }
 
 DRIVER_INIT_MEMBER(model2_state,srallyc)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x01c00008, 0x01c0000b, write32_delegate(FUNC(model2_state::srallyc_devices_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x01c00008, 0x01c0000b, write32_delegate(FUNC(model2_state::srallyc_devices_w),this));
 }
 
 

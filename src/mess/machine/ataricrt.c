@@ -42,23 +42,23 @@ static void a800_setbank(running_machine &machine, int cart_mounted)
 	offs_t ram_top;
 	// take care of 0x0000-0x7fff: RAM or NOP
 	ram_top = MIN(machine.device<ram_device>(RAM_TAG)->size(), 0x8000) - 1;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, ram_top, "0000");
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_bank(0x0000, ram_top, "0000");
 	machine.root_device().membank("0000")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
 
 	// take care of 0x8000-0x9fff: A800 -> either right slot or RAM or NOP, others -> RAM or NOP
 	// is there anything in the right slot?
 	if (cart_mounted & RIGHT_CARTSLOT_MOUNTED)
 	{
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0x9fff, "8000");
+		machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x8000, 0x9fff, "8000");
 		machine.root_device().membank("8000")->set_base(machine.root_device().memregion("rslot")->base());
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x8000, 0x9fff);
+		machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x8000, 0x9fff);
 	}
 	else if (a800_cart_type != BBSB)
 	{
 		ram_top = MIN(machine.device<ram_device>(RAM_TAG)->size(), 0xa000) - 1;
 		if (ram_top > 0x8000)
 		{
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0x8000, ram_top, "8000");
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_bank(0x8000, ram_top, "8000");
 			machine.root_device().membank("8000")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
 		}
 	}
@@ -71,9 +71,9 @@ static void a800_setbank(running_machine &machine, int cart_mounted)
 		{
 			if (a800_cart_type == A800_16K)
 			{
-				machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0x9fff, "8000");
+				machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x8000, 0x9fff, "8000");
 				machine.root_device().membank("8000")->set_base(machine.root_device().memregion("lslot")->base());
-				machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x8000, 0x9fff);
+				machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x8000, 0x9fff);
 
 				memcpy(machine.root_device().memregion("maincpu")->base() + 0x10000, machine.root_device().memregion("lslot")->base() + 0x2000, 0x2000);
 			}
@@ -86,44 +86,44 @@ static void a800_setbank(running_machine &machine, int cart_mounted)
 		{
 			machine.root_device().membank("8000")->set_base(machine.root_device().memregion("lslot")->base());
 			machine.root_device().membank("a000")->set_base(machine.root_device().memregion("lslot")->base() + 0x2000);
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x8000, 0xbfff);
+			machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
 		}
 		else if (a800_cart_type == BBSB)
 		{
 			// this requires separate banking in 0x8000 & 0x9000!
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0x8fff, "8000");
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x9000, 0x9fff, "9000");
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x8000, 0x8fff, "8000");
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x9000, 0x9fff, "9000");
 			machine.root_device().membank("8000")->set_base(machine.root_device().memregion("lslot")->base() + 0x0000);
 			machine.root_device().membank("9000")->set_base(machine.root_device().memregion("lslot")->base() + 0x4000);
 			machine.root_device().membank("a000")->set_base(machine.root_device().memregion("lslot")->base() + 0x8000);
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xa000, 0xbfff);
+			machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
 		}
 		else if (a800_cart_type == OSS_034M)
 		{
 			// this requires separate banking in 0xa000 & 0xb000!
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xa000, 0xafff, "a000");
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xb000, 0xbfff, "b000");
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xa000, 0xafff, "a000");
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xb000, 0xbfff, "b000");
 			machine.root_device().membank("b000")->set_base(machine.root_device().memregion("lslot")->base() + 0x3000);
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xa000, 0xbfff);
+			machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
 		}
 		else if (a800_cart_type == OSS_M091)
 		{
 			// this requires separate banking in 0xa000 & 0xb000!
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xa000, 0xafff, "a000");
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xb000, 0xbfff, "b000");
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xa000, 0xafff, "a000");
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xb000, 0xbfff, "b000");
 			machine.root_device().membank("b000")->set_base(machine.root_device().memregion("lslot")->base());
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xa000, 0xbfff);
+			machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
 		}
 		else if (a800_cart_type == XEGS_32K)
 		{
 			machine.root_device().membank("8000")->set_base(machine.root_device().memregion("lslot")->base());
 			machine.root_device().membank("a000")->set_base(machine.root_device().memregion("lslot")->base() + 0x6000);
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x8000, 0xbfff);
+			machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
 		}
 		else
 		{
 			machine.root_device().membank("a000")->set_base(machine.root_device().memregion("lslot")->base());
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xa000, 0xbfff);
+			machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0xa000, 0xbfff);
 		}
 	}
 }
@@ -352,29 +352,29 @@ static void a800_setup_mappers(running_machine &machine, int type)
 		case PHOENIX_8K:	// as normal 8k cart, but it can be disabled by writing to 0xd500-0xdfff
 			break;
 		case XEGS_32K:
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd500, 0xd5ff, FUNC(x32_bank_w));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xd500, 0xd5ff, FUNC(x32_bank_w));
 			break;
 		case OSS_034M:
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd500, 0xd5ff, FUNC(oss_034m_w));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xd500, 0xd5ff, FUNC(oss_034m_w));
 			break;
 		case OSS_M091:
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd500, 0xd5ff, FUNC(oss_m091_w));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xd500, 0xd5ff, FUNC(oss_m091_w));
 			break;
 		case BBSB:
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0x8fff, FUNC(bbsb_bankl_w));
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x9000, 0x9fff, FUNC(bbsb_bankh_w));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x8000, 0x8fff, FUNC(bbsb_bankl_w));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x9000, 0x9fff, FUNC(bbsb_bankh_w));
 			break;
 		case WILLIAMS_64K:
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd500, 0xd50f, FUNC(w64_bank_w));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xd500, 0xd50f, FUNC(w64_bank_w));
 			break;
 		case DIAMOND_64K:
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd5d0, 0xd5df, FUNC(ex64_bank_w));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xd5d0, 0xd5df, FUNC(ex64_bank_w));
 			break;
 		case EXPRESS_64:
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd570, 0xd57f, FUNC(ex64_bank_w));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xd570, 0xd57f, FUNC(ex64_bank_w));
 			break;
 		case SPARTADOS_X:
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd5e0, 0xd5ef, FUNC(ex64_bank_w));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xd5e0, 0xd5ef, FUNC(ex64_bank_w));
 			break;
 		default:
 			break;
@@ -665,7 +665,7 @@ static WRITE8_HANDLER( xegs_bankswitch )
 
 MACHINE_START( xegs )
 {
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *cart = space.machine().root_device().memregion("user1")->base();
 	UINT8 *cpu  = space.machine().root_device().memregion("maincpu")->base();
 

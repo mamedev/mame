@@ -101,7 +101,7 @@ void fatfury2_install_protection( running_machine &machine )
 
 	/* the protection involves reading and writing addresses in the */
 	/* 0x2xxxxx range. There are several checks all around the code. */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x200000, 0x2fffff, FUNC(fatfury2_protection_16_r), FUNC(fatfury2_protection_16_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x200000, 0x2fffff, FUNC(fatfury2_protection_16_r), FUNC(fatfury2_protection_16_w));
 
 	state->m_fatfury2_prot_data = 0;
 
@@ -146,7 +146,7 @@ void install_kof98_protection( running_machine &machine )
 {
 	/* when 0x20aaaa contains 0x0090 (word) then 0x100 (normally the neogeo header) should return 0x00c200fd worked out using real hw */
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x20aaaa, 0x20aaab, FUNC(kof98_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x20aaaa, 0x20aaab, FUNC(kof98_prot_w));
 }
 
 
@@ -405,15 +405,15 @@ static void sma_install_random_read_handler( running_machine &machine, int addr1
 	neogeo_state *state = machine.driver_data<neogeo_state>();
 	state->save_item(NAME(state->m_neogeo_rng));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(addr1, addr1 + 1, FUNC(sma_random_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(addr2, addr2 + 1, FUNC(sma_random_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(addr1, addr1 + 1, FUNC(sma_random_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(addr2, addr2 + 1, FUNC(sma_random_r));
 }
 
 
 void kof99_install_protection( running_machine &machine )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x2ffff0, 0x2ffff1, FUNC(kof99_bankswitch_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x2fe446, 0x2fe447, FUNC(prot_9a37_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x2ffff0, 0x2ffff1, FUNC(kof99_bankswitch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x2fe446, 0x2fe447, FUNC(prot_9a37_r));
 
 	sma_install_random_read_handler(machine, 0x2ffff8, 0x2ffffa);
 }
@@ -421,8 +421,8 @@ void kof99_install_protection( running_machine &machine )
 
 void garou_install_protection( running_machine &machine )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x2fffc0, 0x2fffc1, FUNC(garou_bankswitch_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x2fe446, 0x2fe447, FUNC(prot_9a37_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x2fffc0, 0x2fffc1, FUNC(garou_bankswitch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x2fe446, 0x2fe447, FUNC(prot_9a37_r));
 
 	sma_install_random_read_handler(machine, 0x2fffcc, 0x2ffff0);
 }
@@ -430,8 +430,8 @@ void garou_install_protection( running_machine &machine )
 
 void garouh_install_protection( running_machine &machine )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x2fffc0, 0x2fffc1, FUNC(garouh_bankswitch_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x2fe446, 0x2fe447, FUNC(prot_9a37_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x2fffc0, 0x2fffc1, FUNC(garouh_bankswitch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x2fe446, 0x2fe447, FUNC(prot_9a37_r));
 
 	sma_install_random_read_handler(machine, 0x2fffcc, 0x2ffff0);
 }
@@ -439,8 +439,8 @@ void garouh_install_protection( running_machine &machine )
 
 void mslug3_install_protection( running_machine &machine )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x2fffe4, 0x2fffe5, FUNC(mslug3_bankswitch_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x2fe446, 0x2fe447, FUNC(prot_9a37_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x2fffe4, 0x2fffe5, FUNC(mslug3_bankswitch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x2fe446, 0x2fe447, FUNC(prot_9a37_r));
 
 //  sma_install_random_read_handler(machine, 0x2ffff8, 0x2ffffa);
 }
@@ -448,8 +448,8 @@ void mslug3_install_protection( running_machine &machine )
 
 void kof2000_install_protection( running_machine &machine )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x2fffec, 0x2fffed, FUNC(kof2000_bankswitch_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x2fe446, 0x2fe447, FUNC(prot_9a37_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x2fffec, 0x2fffed, FUNC(kof2000_bankswitch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x2fe446, 0x2fe447, FUNC(prot_9a37_r));
 
 	sma_install_random_read_handler(machine, 0x2fffd8, 0x2fffda);
 }
@@ -540,5 +540,5 @@ void install_pvc_protection( running_machine &machine )
 	state->m_pvc_cartridge_ram = auto_alloc_array(machine, UINT16, 0x2000 / 2);
 	state->save_pointer(NAME(state->m_pvc_cartridge_ram), 0x2000 / 2);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2fe000, 0x2fffff, FUNC(pvc_prot_r), FUNC(pvc_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x2fe000, 0x2fffff, FUNC(pvc_prot_r), FUNC(pvc_prot_w));
 }

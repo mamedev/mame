@@ -932,7 +932,7 @@ DRIVER_INIT_MEMBER(bagman_state,bagman)
 
 	/* Unmap video enable register, not available on earlier hardware revision(s)
        Bagman is supposed to have glitches during screen transitions */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xa003, 0xa003);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0xa003, 0xa003);
 	*m_video_enable = 1;
 }
 

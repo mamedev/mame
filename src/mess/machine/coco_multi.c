@@ -153,7 +153,7 @@ void coco_multipak_device::device_start()
 
 	// install $FF7F handler
 	write8_delegate wh = write8_delegate(FUNC(coco_multipak_device::ff7f_write), this);
-	machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM)->install_write_handler(0xFF7F, 0xFF7F, wh);
+	machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM).install_write_handler(0xFF7F, 0xFF7F, wh);
 
 	// initial state
 	m_select = 0xFF;

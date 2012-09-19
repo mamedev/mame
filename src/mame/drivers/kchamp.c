@@ -711,7 +711,7 @@ ROM_END
 
 static UINT8 *decrypt_code(running_machine &machine)
 {
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	int A;

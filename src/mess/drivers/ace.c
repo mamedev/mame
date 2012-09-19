@@ -590,21 +590,21 @@ static Z80PIO_INTERFACE( pio_intf )
 
 void ace_state::machine_start()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* configure RAM */
 	switch (m_ram->size())
 	{
 	case 1*1024:
-		program->unmap_readwrite(0x4000, 0xffff);
+		program.unmap_readwrite(0x4000, 0xffff);
 		break;
 
 	case 16*1024:
-		program->unmap_readwrite(0x8000, 0xffff);
+		program.unmap_readwrite(0x8000, 0xffff);
 		break;
 
 	case 32*1024:
-		program->unmap_readwrite(0xc000, 0xffff);
+		program.unmap_readwrite(0xc000, 0xffff);
 		break;
 	}
 }

@@ -407,12 +407,12 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 	/* bit 5 = select work RAM or palette */
 	if (lines & 0x20)
 	{
-		device->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x03ff, "bank3");
-		device->memory().space(AS_PROGRAM)->install_write_handler(0x0000, 0x03ff, write8_delegate(FUNC(crimfght_state::paletteram_xBBBBBGGGGGRRRRR_byte_be_w), state));
+		device->memory().space(AS_PROGRAM).install_read_bank(0x0000, 0x03ff, "bank3");
+		device->memory().space(AS_PROGRAM).install_write_handler(0x0000, 0x03ff, write8_delegate(FUNC(crimfght_state::paletteram_xBBBBBGGGGGRRRRR_byte_be_w), state));
 		state->membank("bank3")->set_base(state->m_generic_paletteram_8);
 	}
 	else
-		device->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x03ff, "bank1");								/* RAM */
+		device->memory().space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x03ff, "bank1");								/* RAM */
 
 	/* bit 6 = enable char ROM reading through the video RAM */
 	k052109_set_rmrd_line(state->m_k052109, (lines & 0x40) ? ASSERT_LINE : CLEAR_LINE);

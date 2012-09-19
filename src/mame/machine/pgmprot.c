@@ -150,8 +150,8 @@ DRIVER_INIT_MEMBER(pgm_asic3_state,orlegend)
 {
 	pgm_basic_init(machine());
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xC0400e, 0xC0400f, FUNC(pgm_asic3_r), FUNC(pgm_asic3_w));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xC04000, 0xC04001, FUNC(pgm_asic3_reg_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xC0400e, 0xC0400f, FUNC(pgm_asic3_r), FUNC(pgm_asic3_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xC04000, 0xC04001, FUNC(pgm_asic3_reg_w));
 
 	m_asic3_reg = 0;
 	m_asic3_latch[0] = 0;

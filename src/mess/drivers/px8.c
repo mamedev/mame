@@ -75,38 +75,38 @@ enum
 
 void px8_state::bankswitch()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 	UINT8 *ipl_rom = memregion(UPD70008_TAG)->base();
 
 	if (!m_bank0)
 	{
 		/* IPL ROM */
-		program->install_rom(0x0000, 0x7fff, ipl_rom);
+		program.install_rom(0x0000, 0x7fff, ipl_rom);
 	}
 	else
 	{
 		if (m_bk2)
 		{
 			/* D-RAM (L) */
-			program->install_ram(0x0000, 0x7fff, ram);
+			program.install_ram(0x0000, 0x7fff, ram);
 		}
 		else
 		{
 			/* OPTION ROM (L) */
-			program->unmap_readwrite(0x0000, 0x7fff);
+			program.unmap_readwrite(0x0000, 0x7fff);
 		}
 	}
 
 	if (m_bk2)
 	{
 		/* D-RAM (H) */
-		program->install_ram(0x8000, 0xffff, ram + 0x8000);
+		program.install_ram(0x8000, 0xffff, ram + 0x8000);
 	}
 	else
 	{
 		/* OPTION ROM (H) */
-		program->unmap_readwrite(0x8000, 0xffff);
+		program.unmap_readwrite(0x8000, 0xffff);
 	}
 }
 

@@ -2459,7 +2459,7 @@ void towns_state::driver_start()
 	m_towns_cd.read_timer = machine().scheduler().timer_alloc(FUNC(towns_cdrom_read_byte), (void*)machine().device("dma_1"));
 
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(towns_irq_callback);
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x100000,machine().device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,NULL);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x100000,machine().device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,NULL);
 
 }
 
@@ -2472,10 +2472,8 @@ void marty_state::driver_start()
 
 void towns_state::machine_reset()
 {
-	address_space *program;
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
-	program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	m_dma_1 = machine().device("dma_1");
 	m_dma_2 = machine().device("dma_2");
 	m_fdc = machine().device("fdc");
@@ -2496,7 +2494,7 @@ void towns_state::machine_reset()
 	m_towns_mainmem_enable = 0x00;
 	m_towns_system_port = 0x00;
 	m_towns_ram_enable = 0x00;
-	towns_update_video_banks(*program);
+	towns_update_video_banks(program);
 	m_towns_kb_status = 0x18;
 	m_towns_kb_irq1_enable = 0;
 	m_towns_pad_mask = 0x7f;

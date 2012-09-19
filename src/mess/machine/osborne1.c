@@ -426,7 +426,7 @@ static void osborne1_load_proc(device_image_interface &image)
 void osborne1_state::machine_reset()
 {
 	int drive;
-	address_space& space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/* Initialize memory configuration */
 	osborne1_bankswitch_w( space, 0x00, 0 );
 
@@ -524,7 +524,7 @@ int osborne1_daisy_device::z80daisy_irq_ack()
 	osborne1_state *state = machine().driver_data<osborne1_state>();
 	/* Enable ROM and I/O when IRQ is acknowledged */
 	UINT8 old_bankswitch = state->m_bankswitch;
-	address_space& space = *device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->osborne1_bankswitch_w( space, 0, 0 );
 	state->m_bankswitch = old_bankswitch;

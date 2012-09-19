@@ -44,7 +44,7 @@ static void b2m_set_bank(running_machine &machine,int bank)
 {
 	UINT8 *rom;
 	b2m_state *state =  machine.driver_data<b2m_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	space.install_write_bank(0x0000, 0x27ff, "bank1");

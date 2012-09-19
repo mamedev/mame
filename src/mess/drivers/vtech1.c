@@ -209,7 +209,7 @@ public:
 static SNAPSHOT_LOAD( vtech1 )
 {
 	vtech1_state *vtech1 = image.device().machine().driver_data<vtech1_state>();
-	address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 i, header[24];
 	UINT16 start, end, size;
 	char pgmname[18];
@@ -628,7 +628,7 @@ static READ8_DEVICE_HANDLER( vtech1_mc6847_videoram_r )
 
 DRIVER_INIT_MEMBER(vtech1_state,vtech1)
 {
-	address_space *prg = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &prg = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int id;
 
 	/* ram */
@@ -642,7 +642,7 @@ DRIVER_INIT_MEMBER(vtech1_state,vtech1)
 	if (m_ram_size == 18*1024 || m_ram_size == 22*1024 || m_ram_size == 32*1024)
 	{
 		offs_t base = 0x7800 + (m_ram_size - 0x4000);
-		prg->install_readwrite_bank(base, base + 0x3fff, "bank2");
+		prg.install_readwrite_bank(base, base + 0x3fff, "bank2");
 		membank("bank2")->set_base(m_ram + base - 0x7800);
 	}
 
@@ -650,11 +650,11 @@ DRIVER_INIT_MEMBER(vtech1_state,vtech1)
 	if (m_ram_size >= 66*1024)
 	{
 		/* install fixed first bank */
-		prg->install_readwrite_bank(0x8000, 0xbfff, "bank2");
+		prg.install_readwrite_bank(0x8000, 0xbfff, "bank2");
 		membank("bank2")->set_base(m_ram + 0x800);
 
 		/* install the others, dynamically banked in */
-		prg->install_readwrite_bank(0xc000, 0xffff, "bank3");
+		prg.install_readwrite_bank(0xc000, 0xffff, "bank3");
 		membank("bank3")->configure_entries(0, (m_ram_size - 0x4800) / 0x4000, m_ram + 0x4800, 0x4000);
 		membank("bank3")->set_entry(0);
 	}
@@ -681,7 +681,7 @@ DRIVER_INIT_MEMBER(vtech1_state,vtech1)
 
 DRIVER_INIT_MEMBER(vtech1_state,vtech1h)
 {
-	address_space *prg = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &prg = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	DRIVER_INIT_CALL(vtech1);
 
@@ -689,7 +689,7 @@ DRIVER_INIT_MEMBER(vtech1_state,vtech1h)
 	//m_videoram_size = 0x2000;
 	//m_videoram = auto_alloc_array(machine(), UINT8, m_videoram_size);
 
-	prg->install_readwrite_bank(0x7000, 0x77ff, "bank4");
+	prg.install_readwrite_bank(0x7000, 0x77ff, "bank4");
 	membank("bank4")->configure_entries(0, 4, m_videoram, 0x800);
 	membank("bank4")->set_entry(0);
 }

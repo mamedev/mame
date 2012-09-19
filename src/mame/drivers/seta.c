@@ -3176,7 +3176,7 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(seta_state,calibr50)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	sub_bankswitch_w(space, 0, 0);
 }
 
@@ -10721,10 +10721,10 @@ WRITE16_MEMBER(seta_state::twineagl_200100_w)
 DRIVER_INIT_MEMBER(seta_state,twineagl)
 {
 	/* debug? */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x800000, 0x8000ff, read16_delegate(FUNC(seta_state::twineagl_debug_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x800000, 0x8000ff, read16_delegate(FUNC(seta_state::twineagl_debug_r),this));
 
 	/* This allows 2 simultaneous players and the use of the "Copyright" Dip Switch. */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x200100, 0x20010f, read16_delegate(FUNC(seta_state::twineagl_200100_r),this), write16_delegate(FUNC(seta_state::twineagl_200100_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x200100, 0x20010f, read16_delegate(FUNC(seta_state::twineagl_200100_r),this), write16_delegate(FUNC(seta_state::twineagl_200100_w),this));
 }
 
 
@@ -10753,7 +10753,7 @@ WRITE16_MEMBER(seta_state::downtown_protection_w)
 
 DRIVER_INIT_MEMBER(seta_state,downtown)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x200000, 0x2001ff, read16_delegate(FUNC(seta_state::downtown_protection_r),this), write16_delegate(FUNC(seta_state::downtown_protection_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x200000, 0x2001ff, read16_delegate(FUNC(seta_state::downtown_protection_r),this), write16_delegate(FUNC(seta_state::downtown_protection_w),this));
 }
 
 
@@ -10773,7 +10773,7 @@ READ16_MEMBER(seta_state::arbalest_debug_r)
 
 DRIVER_INIT_MEMBER(seta_state,arbalest)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80000, 0x8000f, read16_delegate(FUNC(seta_state::arbalest_debug_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x80000, 0x8000f, read16_delegate(FUNC(seta_state::arbalest_debug_r),this));
 }
 
 
@@ -10782,7 +10782,7 @@ DRIVER_INIT_MEMBER(seta_state,metafox)
 	UINT16 *RAM = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
 	/* This game uses the 21c000-21ffff area for protection? */
-//  machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x21c000, 0x21ffff);
+//  machine().device("maincpu")->memory().space(AS_PROGRAM).nop_readwrite(0x21c000, 0x21ffff);
 
 	RAM[0x8ab1c/2] = 0x4e71;	// patch protection test: "cp error"
 	RAM[0x8ab1e/2] = 0x4e71;
@@ -10826,14 +10826,14 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 
 DRIVER_INIT_MEMBER(seta_state,eightfrc)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x500004, 0x500005);	// watchdog??
+	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_read(0x500004, 0x500005);	// watchdog??
 }
 
 
 DRIVER_INIT_MEMBER(seta_state,zombraid)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xf00002, 0xf00003, read16_delegate(FUNC(seta_state::zombraid_gun_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xf00000, 0xf00001, write16_delegate(FUNC(seta_state::zombraid_gun_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xf00002, 0xf00003, read16_delegate(FUNC(seta_state::zombraid_gun_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xf00000, 0xf00001, write16_delegate(FUNC(seta_state::zombraid_gun_w),this));
 }
 
 
@@ -10851,7 +10851,7 @@ DRIVER_INIT_MEMBER(seta_state,kiwame)
 
 DRIVER_INIT_MEMBER(seta_state,rezon)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x500006, 0x500007);	// irq ack?
+	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_read(0x500006, 0x500007);	// irq ack?
 }
 
 DRIVER_INIT_MEMBER(seta_state,wiggie)
@@ -10883,8 +10883,8 @@ DRIVER_INIT_MEMBER(seta_state,wiggie)
 	}
 
 	/* X1_010 is not used. */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x100000, 0x103fff);
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xB00008, 0xB00009, write16_delegate(FUNC(seta_state::wiggie_soundlatch_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_readwrite(0x100000, 0x103fff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xB00008, 0xB00009, write16_delegate(FUNC(seta_state::wiggie_soundlatch_w),this));
 
 }
 

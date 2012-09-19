@@ -167,8 +167,8 @@ void tms99xx_device::device_start()
 
 	// TODO: Restore state save feature
 
-	m_prgspace = space(AS_PROGRAM);						// dimemory.h
-	m_cru = space(AS_IO);
+	m_prgspace = &space(AS_PROGRAM);						// dimemory.h
+	m_cru = &space(AS_IO);
 
 	// Resolve our external connections
 	m_external_operation.resolve(conf->external_callback, *this);

@@ -8142,7 +8142,7 @@ DRIVER_INIT_MEMBER(cps_state,pzloop2)
 
 	save_item(NAME(m_readpaddle));
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x804000, 0x804001, FUNC(joy_or_paddle_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x804000, 0x804001, FUNC(joy_or_paddle_r));
 }
 
 static READ16_HANDLER( gigaman2_dummyqsound_r )
@@ -8176,7 +8176,7 @@ static void gigaman2_gfx_reorder(running_machine &machine)
 
 DRIVER_INIT_MEMBER(cps_state,gigaman2)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 	int length = memregion("maincpu")->bytes();
 
@@ -8187,7 +8187,7 @@ DRIVER_INIT_MEMBER(cps_state,gigaman2)
 	m_gigaman2_dummyqsound_ram = auto_alloc_array(machine(), UINT16, 0x20000 / 2);
 	save_pointer(NAME(m_gigaman2_dummyqsound_ram), 0x20000 / 2);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x618000, 0x619fff, FUNC(gigaman2_dummyqsound_r), FUNC(gigaman2_dummyqsound_w)); // no qsound..
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x618000, 0x619fff, FUNC(gigaman2_dummyqsound_r), FUNC(gigaman2_dummyqsound_w)); // no qsound..
 	space.set_decrypted_region(0x000000, (length) - 1, &rom[length/4]);
 	m68k_set_encrypted_opcode_range(machine().device("maincpu"), 0, length);
 }

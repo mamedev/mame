@@ -2038,7 +2038,7 @@ ROM_END
 
 static void decrypt_C10707_cpu(running_machine &machine, const char *cputag)
 {
-	address_space &space = *machine.device(cputag)->memory().space(AS_PROGRAM);
+	address_space &space = machine.device(cputag)->memory().space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *rom = machine.root_device().memregion(cputag)->base();
 	offs_t addr;
@@ -2068,7 +2068,7 @@ READ8_MEMBER(btime_state::wtennis_reset_hack_r)
 
 static void init_rom1(running_machine &machine)
 {
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
@@ -2136,7 +2136,7 @@ DRIVER_INIT_MEMBER(btime_state,cookrace)
 {
 	decrypt_C10707_cpu(machine(), "maincpu");
 
-	machine().device("audiocpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0200, 0x0fff, "bank10");
+	machine().device("audiocpu")->memory().space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
 	membank("bank10")->set_base(memregion("audiocpu")->base() + 0xe200);
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
@@ -2151,9 +2151,9 @@ DRIVER_INIT_MEMBER(btime_state,wtennis)
 {
 	decrypt_C10707_cpu(machine(), "maincpu");
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc15f, 0xc15f, read8_delegate(FUNC(btime_state::wtennis_reset_hack_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc15f, 0xc15f, read8_delegate(FUNC(btime_state::wtennis_reset_hack_r),this));
 
-	machine().device("audiocpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0200, 0x0fff, "bank10");
+	machine().device("audiocpu")->memory().space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
 	membank("bank10")->set_base(memregion("audiocpu")->base() + 0xe200);
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }

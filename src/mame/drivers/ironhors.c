@@ -436,7 +436,7 @@ static TIMER_DEVICE_CALLBACK( farwest_irq )
 READ8_MEMBER(ironhors_state::farwest_soundlatch_r)
 {
 
-	return soundlatch_byte_r(*m_soundcpu->space(AS_PROGRAM), 0);
+	return soundlatch_byte_r(m_soundcpu->space(AS_PROGRAM), 0);
 }
 
 static const ym2203_interface farwest_ym2203_config =

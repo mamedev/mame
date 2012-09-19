@@ -80,8 +80,8 @@ void necdsp_device::device_config_complete()
 void necdsp_device::device_start()
 {
 	// get our address spaces
-	m_program = space(AS_PROGRAM);
-	m_data = space(AS_DATA);
+	m_program = &space(AS_PROGRAM);
+	m_data = &space(AS_DATA);
 	m_direct = &m_program->direct();
 
 	// register our state for the debugger

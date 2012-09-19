@@ -2481,7 +2481,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cischeat_state,wildplt)
 {
-	machine().device("cpu1")->memory().space(AS_PROGRAM)->install_read_handler(0x080000, 0x087fff, read16_delegate(FUNC(cischeat_state::wildplt_vregs_r),this));
+	machine().device("cpu1")->memory().space(AS_PROGRAM).install_read_handler(0x080000, 0x087fff, read16_delegate(FUNC(cischeat_state::wildplt_vregs_r),this));
 
 	DRIVER_INIT_CALL(f1gpstar);
 }

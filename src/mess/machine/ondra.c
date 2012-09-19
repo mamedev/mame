@@ -42,19 +42,19 @@ static void ondra_update_banks(running_machine &machine)
 	ondra_state *state = machine.driver_data<ondra_state>();
 	UINT8 *mem = state->memregion("maincpu")->base();
 	if (state->m_bank1_status==0) {
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x3fff);
+		machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x0000, 0x3fff);
 		state->membank("bank1")->set_base(mem + 0x010000);
 	} else {
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x3fff, "bank1");
+		machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_bank(0x0000, 0x3fff, "bank1");
 		state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x0000);
 	}
 	state->membank("bank2")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x4000);
 	if (state->m_bank2_status==0) {
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xe000, 0xffff, "bank3");
+		machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_bank(0xe000, 0xffff, "bank3");
 		state->membank("bank3")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0xe000);
 	} else {
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xe000, 0xffff);
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler (0xe000, 0xffff, read8_delegate(FUNC(ondra_state::ondra_keyboard_r),state));
+		machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0xe000, 0xffff);
+		machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler (0xe000, 0xffff, read8_delegate(FUNC(ondra_state::ondra_keyboard_r),state));
 	}
 }
 

@@ -125,7 +125,7 @@ WRITE8_MEMBER(partner_state::partner_floppy_w){
 static void partner_iomap_bank(running_machine &machine,UINT8 *rom)
 {
 	partner_state *state = machine.driver_data<partner_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	switch(state->m_win_mem_page) {
 		case 2 :
 				// FDD
@@ -143,7 +143,7 @@ static void partner_iomap_bank(running_machine &machine,UINT8 *rom)
 static void partner_bank_switch(running_machine &machine)
 {
 	partner_state *state = machine.driver_data<partner_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = state->memregion("maincpu")->base();
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 

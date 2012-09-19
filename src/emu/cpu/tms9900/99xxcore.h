@@ -1294,8 +1294,8 @@ static CPU_INIT( tms99xx )
 	cpustate->irq_level = 16;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = &device->space(AS_PROGRAM);
+	cpustate->io = &device->space(AS_IO);
 
 #if (TMS99XX_MODEL == TMS9995_ID)
 	cpustate->timer = device->machine().scheduler().timer_alloc(FUNC(decrementer_callback), cpustate);

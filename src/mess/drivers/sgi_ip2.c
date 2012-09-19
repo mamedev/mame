@@ -433,7 +433,7 @@ static void duarta_tx(device_t *device, int channel, UINT8 data)
 {
 	device_t *devconf = device->machine().device(TERMINAL_TAG);
 	verboselog(device->machine(), 0, "duarta_tx: %02x\n", data);
-	dynamic_cast<generic_terminal_device *>(devconf)->write(*devconf->machine().memory().first_space(), 0, data);
+	dynamic_cast<generic_terminal_device *>(devconf)->write(devconf->machine().driver_data()->generic_space(), 0, data);
 }
 
 static const duart68681_config sgi_ip2_duart68681a_config =

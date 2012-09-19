@@ -65,16 +65,16 @@ public:
 
 READ8_MEMBER(pcfx_state::extio_r)
 {
-	address_space *io_space = m_maincpu->space(AS_IO);
+	address_space &io_space = m_maincpu->space(AS_IO);
 
-	return io_space->read_byte(offset);
+	return io_space.read_byte(offset);
 }
 
 WRITE8_MEMBER(pcfx_state::extio_w)
 {
-	address_space *io_space = m_maincpu->space(AS_IO);
+	address_space &io_space = m_maincpu->space(AS_IO);
 
-	io_space->write_byte(offset, data);
+	io_space.write_byte(offset, data);
 }
 
 static ADDRESS_MAP_START( pcfx_mem, AS_PROGRAM, 32, pcfx_state )

@@ -1269,7 +1269,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(taitox_state,kyustrkr)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x900000, 0x90000f, write16_delegate(FUNC(taitox_state::kyustrkr_input_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x900000, 0x90000f, write16_delegate(FUNC(taitox_state::kyustrkr_input_w),this));
 }
 
 

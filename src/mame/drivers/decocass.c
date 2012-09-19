@@ -1600,7 +1600,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(decocass_state,decocass)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
 	int A;
 
@@ -1638,8 +1638,8 @@ DRIVER_INIT_MEMBER(decocass_state,decocrom)
 		m_decrypted2[i] = swap_bits_5_6(rom[i]);
 
 	/* convert charram to a banked ROM */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0xafff, "bank1");
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x6000, 0xafff, FUNC(decocass_de0091_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x6000, 0xafff, "bank1");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x6000, 0xafff, FUNC(decocass_de0091_w));
 	membank("bank1")->configure_entry(0, m_charram);
 	membank("bank1")->configure_entry(1, memregion("user3")->base());
 	membank("bank1")->configure_decrypted_entry(0, &m_decrypted[0x6000]);
@@ -1647,7 +1647,7 @@ DRIVER_INIT_MEMBER(decocass_state,decocrom)
 	membank("bank1")->set_entry(0);
 
 	/* install the bank selector */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe900, 0xe900, FUNC(decocass_e900_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xe900, 0xe900, FUNC(decocass_e900_w));
 
 	save_pointer(NAME(m_decrypted2), romlength);
 }
@@ -1685,8 +1685,8 @@ DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
 	DRIVER_INIT_CALL(decocass);
 
 	/* install custom mahjong panel */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe413, 0xe413, FUNC(cdsteljn_mux_w));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe600, 0xe6ff, FUNC(cdsteljn_input_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xe413, 0xe413, FUNC(cdsteljn_mux_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xe600, 0xe6ff, FUNC(cdsteljn_input_r));
 }
 
 /* -- */ GAME( 1981, decocass,  0,        decocass, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "DECO Cassette System", GAME_IS_BIOS_ROOT )

@@ -211,7 +211,7 @@ static  READ8_HANDLER(spectrum_plus3_port_2ffd_r)
 void spectrum_plus3_update_memory(running_machine &machine)
 {
 	spectrum_state *state = machine.driver_data<spectrum_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (state->m_port_7ffd_data & 8)

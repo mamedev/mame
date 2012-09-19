@@ -1419,7 +1419,7 @@ if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed
 	if (msk != 0) m_active_layers &= msk;
 #if 1
 	{
-		address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		popmessage("Cmd: %04X Pos:%04X Lim:%04X Inp:%04X",
 							m_scudhamm_motor_command,

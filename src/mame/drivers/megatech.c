@@ -334,16 +334,16 @@ static WRITE8_HANDLER( bios_ctrl_w )
 static READ8_HANDLER( megatech_z80_read_68k_banked_data )
 {
 	mtech_state *state = space.machine().driver_data<mtech_state>();
-	address_space *space68k = space.machine().device<legacy_cpu_device>("maincpu")->space();
-	UINT8 ret = space68k->read_byte(state->m_mt_bank_addr + offset);
+	address_space &space68k = space.machine().device<legacy_cpu_device>("maincpu")->space();
+	UINT8 ret = space68k.read_byte(state->m_mt_bank_addr + offset);
 	return ret;
 }
 
 static WRITE8_HANDLER( megatech_z80_write_68k_banked_data )
 {
 	mtech_state *state = space.machine().driver_data<mtech_state>();
-	address_space *space68k = space.machine().device<legacy_cpu_device>("maincpu")->space();
-	space68k->write_byte(state->m_mt_bank_addr + offset,data);
+	address_space &space68k = space.machine().device<legacy_cpu_device>("maincpu")->space();
+	space68k.write_byte(state->m_mt_bank_addr + offset,data);
 }
 
 static void megatech_z80_bank_w(running_machine &machine, UINT16 data)

@@ -130,9 +130,9 @@ v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *ta
 void v30mz_cpu_device::device_start()
 {
 	m_irq_callback = static_standard_irq_callback;
-	m_program = space(AS_PROGRAM);
+	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
-	m_io = space(AS_IO);
+	m_io = &space(AS_IO);
 
 	save_item(NAME(m_regs.w));
 	save_item(NAME(m_sregs));

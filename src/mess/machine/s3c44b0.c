@@ -2001,7 +2001,7 @@ SCREEN_UPDATE_RGB32( s3c44b0 )
 DEVICE_START( s3c44b0 )
 {
 	running_machine &machine = device->machine();
-	address_space &space = *machine.device( "maincpu")->memory().space( AS_PROGRAM);
+	address_space &space = machine.device( "maincpu")->memory().space( AS_PROGRAM);
 	s3c44b0_t *s3c44b0 = get_token( device);
 	s3c44b0->iface = (const s3c44b0_interface *)device->static_config();
 	s3c44b0->space = &space;

@@ -974,7 +974,7 @@ DRIVER_INIT_MEMBER(m107_state,dsoccr94)
 	UINT8 *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x06, 0x07, write16_delegate(FUNC(m107_state::m107_bankswitch_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x06, 0x07, write16_delegate(FUNC(m107_state::m107_bankswitch_w),this));
 
 	m_irq_vectorbase = 0x80;
 	m_spritesystem = 0;

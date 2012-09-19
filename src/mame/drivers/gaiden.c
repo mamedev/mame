@@ -1495,8 +1495,8 @@ DRIVER_INIT_MEMBER(gaiden_state,wildfang)
 
 	m_prot = 0;
 	m_jumpcode = 0;
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x07a006, 0x07a007, read16_delegate(FUNC(gaiden_state::wildfang_protection_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07a804, 0x07a805, write16_delegate(FUNC(gaiden_state::wildfang_protection_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x07a006, 0x07a007, read16_delegate(FUNC(gaiden_state::wildfang_protection_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x07a804, 0x07a805, write16_delegate(FUNC(gaiden_state::wildfang_protection_w),this));
 }
 
 DRIVER_INIT_MEMBER(gaiden_state,raiga)
@@ -1507,8 +1507,8 @@ DRIVER_INIT_MEMBER(gaiden_state,raiga)
 
 	m_prot = 0;
 	m_jumpcode = 0;
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x07a006, 0x07a007, read16_delegate(FUNC(gaiden_state::raiga_protection_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07a804, 0x07a805, write16_delegate(FUNC(gaiden_state::raiga_protection_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x07a006, 0x07a007, read16_delegate(FUNC(gaiden_state::raiga_protection_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x07a804, 0x07a805, write16_delegate(FUNC(gaiden_state::raiga_protection_w),this));
 }
 
 static void descramble_drgnbowl_gfx(running_machine &machine)

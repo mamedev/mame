@@ -463,7 +463,7 @@ static TIMER_DEVICE_CALLBACK( polepos_scanline )
 
 MACHINE_RESET_MEMBER(polepos_state,polepos)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -1990,15 +1990,15 @@ ROM_END
 DRIVER_INIT_MEMBER(polepos_state,topracern)
 {
 	/* extra direct mapped inputs read */
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x02, 0x02, "STEER");
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x03, 0x03, "IN0");
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x04, 0x04, "DSWA");
+	machine().device("maincpu")->memory().space(AS_IO).install_read_port(0x02, 0x02, "STEER");
+	machine().device("maincpu")->memory().space(AS_IO).install_read_port(0x03, 0x03, "IN0");
+	machine().device("maincpu")->memory().space(AS_IO).install_read_port(0x04, 0x04, "DSWA");
 }
 
 DRIVER_INIT_MEMBER(polepos_state,polepos2)
 {
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
-	machine().device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x4000, 0x5fff, read16_delegate(FUNC(polepos_state::polepos2_ic25_r),this));
+	machine().device("sub")->memory().space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read16_delegate(FUNC(polepos_state::polepos2_ic25_r),this));
 }
 
 

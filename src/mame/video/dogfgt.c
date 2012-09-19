@@ -215,7 +215,7 @@ UINT32 dogfgt_state::screen_update_dogfgt(screen_device &screen, bitmap_ind16 &b
 
 	if (m_lastflip != flip_screen() || m_lastpixcolor != m_pixcolor)
 	{
-		address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		m_lastflip = flip_screen();
 		m_lastpixcolor = m_pixcolor;

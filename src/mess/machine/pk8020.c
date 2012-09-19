@@ -231,7 +231,7 @@ WRITE8_MEMBER(pk8020_state::devices_w)
 static void pk8020_set_bank(running_machine &machine,UINT8 data)
 {
 	pk8020_state *state = machine.driver_data<pk8020_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem = state->memregion("maincpu")->base();
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 

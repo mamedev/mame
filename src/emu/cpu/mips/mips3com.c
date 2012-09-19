@@ -81,7 +81,7 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, legacy
 	mips->cpu_clock = device->clock();
 	mips->irq_callback = irqcallback;
 	mips->device = device;
-	mips->program = device->space(AS_PROGRAM);
+	mips->program = &device->space(AS_PROGRAM);
 	mips->direct = &mips->program->direct();
 	mips->icache_size = config->icache;
 	mips->dcache_size = config->dcache;

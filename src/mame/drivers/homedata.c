@@ -1211,7 +1211,7 @@ MACHINE_RESET_MEMBER(homedata_state,homedata)
 
 MACHINE_RESET_MEMBER(homedata_state,pteacher)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	pteacher_upd7807_portc_w(space, 0, 0xff);
@@ -1227,7 +1227,7 @@ MACHINE_RESET_MEMBER(homedata_state,pteacher)
 
 MACHINE_RESET_MEMBER(homedata_state,reikaids)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	reikaids_upd7807_portc_w(space, 0, 0xff);
@@ -2016,15 +2016,15 @@ DRIVER_INIT_MEMBER(homedata_state,jogakuen)
 	/* it seems that Mahjong Jogakuen runs on the same board as the others,
        but with just these two addresses swapped. Instead of creating a new
        MachineDriver, I just fix them here. */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x8007, 0x8007, write8_delegate(FUNC(homedata_state::pteacher_blitter_bank_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x8005, 0x8005, write8_delegate(FUNC(homedata_state::pteacher_gfx_bank_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x8007, 0x8007, write8_delegate(FUNC(homedata_state::pteacher_blitter_bank_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x8005, 0x8005, write8_delegate(FUNC(homedata_state::pteacher_gfx_bank_w),this));
 }
 
 DRIVER_INIT_MEMBER(homedata_state,mjikaga)
 {
 	/* Mahjong Ikagadesuka is different as well. */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x7802, 0x7802, read8_delegate(FUNC(homedata_state::pteacher_snd_r),this));
-	machine().device("audiocpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0123, 0x0123, write8_delegate(FUNC(homedata_state::pteacher_snd_answer_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x7802, 0x7802, read8_delegate(FUNC(homedata_state::pteacher_snd_r),this));
+	machine().device("audiocpu")->memory().space(AS_PROGRAM).install_write_handler(0x0123, 0x0123, write8_delegate(FUNC(homedata_state::pteacher_snd_answer_w),this));
 }
 
 DRIVER_INIT_MEMBER(homedata_state,reikaids)

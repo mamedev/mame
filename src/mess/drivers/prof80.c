@@ -48,7 +48,7 @@
 
 void prof80_state::bankswitch()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 	UINT8 *rom = memregion(Z80_TAG)->base();
 	int bank;
@@ -62,27 +62,27 @@ void prof80_state::bankswitch()
 		switch (block)
 		{
 		case BLK_RAM1:
-			program->install_ram(start_addr, end_addr, ram + ((bank % 8) * 0x1000));
+			program.install_ram(start_addr, end_addr, ram + ((bank % 8) * 0x1000));
 			break;
 
 		case BLK_RAM2:
-			program->install_ram(start_addr, end_addr, ram + 0x8000 + ((bank % 8) * 0x1000));
+			program.install_ram(start_addr, end_addr, ram + 0x8000 + ((bank % 8) * 0x1000));
 			break;
 
 		case BLK_RAM3:
-			program->install_ram(start_addr, end_addr, ram + 0x10000 + ((bank % 8) * 0x1000));
+			program.install_ram(start_addr, end_addr, ram + 0x10000 + ((bank % 8) * 0x1000));
 			break;
 
 		case BLK_RAM4:
-			program->install_ram(start_addr, end_addr, ram + 0x18000 + ((bank % 8) * 0x1000));
+			program.install_ram(start_addr, end_addr, ram + 0x18000 + ((bank % 8) * 0x1000));
 			break;
 
 		case BLK_EPROM:
-			program->install_rom(start_addr, end_addr, rom + ((bank % 2) * 0x1000));
+			program.install_rom(start_addr, end_addr, rom + ((bank % 2) * 0x1000));
 			break;
 
 		default:
-			program->unmap_readwrite(start_addr, end_addr);
+			program.unmap_readwrite(start_addr, end_addr);
 		}
 
 		//logerror("Segment %u address %04x-%04x block %u\n", bank, start_addr, end_addr, block);

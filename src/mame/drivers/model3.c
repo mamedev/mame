@@ -1059,7 +1059,7 @@ WRITE64_MEMBER(model3_state::scsi_w)
 
 static UINT32 scsi_fetch(running_machine &machine, UINT32 dsp)
 {
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 result;
 	result = space.read_dword(dsp);
 	return FLIPENDIAN_INT32(result);
@@ -1159,7 +1159,7 @@ WRITE64_MEMBER(model3_state::real3d_dma_w)
 
 static void real3d_dma_callback(running_machine &machine, UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	switch(dst >> 24)
 	{
 		case 0x88:		/* Display List End Trigger */
@@ -5483,35 +5483,35 @@ DRIVER_INIT_MEMBER(model3_state,model3_10)
 {
 	interleave_vroms(machine());
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc0000000, 0xc00000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xc0000000, 0xc00000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc105_addr_r),this), write64_delegate(FUNC(model3_state::mpc105_addr_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc105_data_r),this), write64_delegate(FUNC(model3_state::mpc105_data_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc105_reg_r),this), write64_delegate(FUNC(model3_state::mpc105_reg_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc105_addr_r),this), write64_delegate(FUNC(model3_state::mpc105_addr_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc105_data_r),this), write64_delegate(FUNC(model3_state::mpc105_data_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc105_reg_r),this), write64_delegate(FUNC(model3_state::mpc105_reg_w),this));
 }
 
 DRIVER_INIT_MEMBER(model3_state,model3_15)
 {
 	interleave_vroms(machine());
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc105_addr_r),this), write64_delegate(FUNC(model3_state::mpc105_addr_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc105_data_r),this), write64_delegate(FUNC(model3_state::mpc105_data_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc105_reg_r),this), write64_delegate(FUNC(model3_state::mpc105_reg_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc105_addr_r),this), write64_delegate(FUNC(model3_state::mpc105_addr_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc105_data_r),this), write64_delegate(FUNC(model3_state::mpc105_data_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc105_reg_r),this), write64_delegate(FUNC(model3_state::mpc105_reg_w),this));
 }
 
 DRIVER_INIT_MEMBER(model3_state,model3_20)
 {
 	interleave_vroms(machine());
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc2000000, 0xc20000ff, read64_delegate(FUNC(model3_state::real3d_dma_r),this), write64_delegate(FUNC(model3_state::real3d_dma_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xc2000000, 0xc20000ff, read64_delegate(FUNC(model3_state::real3d_dma_r),this), write64_delegate(FUNC(model3_state::real3d_dma_w),this));
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),this), write64_delegate(FUNC(model3_state::mpc106_reg_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),this), write64_delegate(FUNC(model3_state::mpc106_reg_w),this));
 }
 
 DRIVER_INIT_MEMBER(model3_state,lostwsga)
@@ -5520,7 +5520,7 @@ DRIVER_INIT_MEMBER(model3_state,lostwsga)
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: there's an M68K device at 0xC0000000 - FF, maybe lightgun controls ? */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 
 	rom[0x7374f0/4] = 0x38840004;		/* This seems to be an actual bug in the original code */
 }
@@ -5531,7 +5531,7 @@ DRIVER_INIT_MEMBER(model3_state,scud)
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 
 	rom[(0x71275c^4)/4] = 0x60000000;
 	rom[(0x71277c^4)/4] = 0x60000000;
@@ -5543,7 +5543,7 @@ DRIVER_INIT_MEMBER(model3_state,scudplus)
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 
 	rom[(0x713724^4)/4] = 0x60000000;
 	rom[(0x713744^4)/4] = 0x60000000;
@@ -5560,7 +5560,7 @@ DRIVER_INIT_MEMBER(model3_state,scudplusa)
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 
 	//rom[(0x713724^4)/4] = 0x60000000; // Fix ME!!!! Needs to corrected for the non REV A version!!!!
 	//rom[(0x713744^4)/4] = 0x60000000;
@@ -5576,7 +5576,7 @@ DRIVER_INIT_MEMBER(model3_state,lemans24)
 	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_15);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 
 	rom[(0x73fe38^4)/4] = 0x38840004;		/* This seems to be an actual bug in the original code */
 
@@ -5607,15 +5607,15 @@ DRIVER_INIT_MEMBER(model3_state,vs215)
 	rom[(0x70e710^4)/4] = 0x60000000;
 
 	interleave_vroms(machine());
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),this), write64_delegate(FUNC(model3_state::mpc106_reg_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),this), write64_delegate(FUNC(model3_state::mpc106_reg_w),this));
 }
 
 DRIVER_INIT_MEMBER(model3_state,vs29815)
@@ -5626,15 +5626,15 @@ DRIVER_INIT_MEMBER(model3_state,vs29815)
 	rom[(0x60290c^4)/4] = 0x60000000;
 
 	interleave_vroms(machine());
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),this), write64_delegate(FUNC(model3_state::mpc106_reg_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),this), write64_delegate(FUNC(model3_state::mpc106_reg_w),this));
 }
 
 DRIVER_INIT_MEMBER(model3_state,bass)
@@ -5645,27 +5645,27 @@ DRIVER_INIT_MEMBER(model3_state,bass)
 	rom[(0x7999c8^4)/4] = 0x60000000;
 
 	interleave_vroms(machine());
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),this), write64_delegate(FUNC(model3_state::mpc106_reg_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),this), write64_delegate(FUNC(model3_state::mpc106_reg_w),this));
 }
 
 DRIVER_INIT_MEMBER(model3_state,getbass)
 {
 	interleave_vroms(machine());
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc105_addr_r),this), write64_delegate(FUNC(model3_state::mpc105_addr_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc105_data_r),this), write64_delegate(FUNC(model3_state::mpc105_data_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc105_reg_r),this), write64_delegate(FUNC(model3_state::mpc105_reg_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc105_addr_r),this), write64_delegate(FUNC(model3_state::mpc105_addr_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc105_data_r),this), write64_delegate(FUNC(model3_state::mpc105_data_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc105_reg_r),this), write64_delegate(FUNC(model3_state::mpc105_reg_w),this));
 }
 
 DRIVER_INIT_MEMBER(model3_state,vs2)
@@ -5735,7 +5735,7 @@ DRIVER_INIT_MEMBER(model3_state,harley)
 	DRIVER_INIT_CALL(model3_20);
 
 	m_network_ram = auto_alloc_array_clear(machine(), UINT64, 0x10000);
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),this), write64_delegate(FUNC(model3_state::network_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),this), write64_delegate(FUNC(model3_state::network_w),this));
 
 	rom[(0x50ecb4^4)/4] = 0x60000000;
 	rom[(0x50ecd4^4)/4] = 0x60000000;
@@ -5750,7 +5750,7 @@ DRIVER_INIT_MEMBER(model3_state,harleya)
 	DRIVER_INIT_CALL(model3_20);
 
 	m_network_ram = auto_alloc_array_clear(machine(), UINT64, 0x10000);
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),this), write64_delegate(FUNC(model3_state::network_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),this), write64_delegate(FUNC(model3_state::network_w),this));
 
 	rom[(0x50e8d4^4)/4] = 0x60000000;
 	rom[(0x50e8f4^4)/4] = 0x60000000;
@@ -5819,8 +5819,8 @@ DRIVER_INIT_MEMBER(model3_state,daytona2)
 	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc3800000, 0xc3800007, write64_delegate(FUNC(model3_state::daytona2_rombank_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xc3000000, 0xc37fffff, "bank2" );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64_delegate(FUNC(model3_state::daytona2_rombank_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xc3000000, 0xc37fffff, "bank2" );
 
 	//rom[(0x68468c^4)/4] = 0x60000000;
 	rom[(0x6063c4^4)/4] = 0x60000000;
@@ -5833,8 +5833,8 @@ DRIVER_INIT_MEMBER(model3_state,dayto2pe)
 	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc3800000, 0xc3800007, write64_delegate(FUNC(model3_state::daytona2_rombank_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xc3000000, 0xc37fffff, "bank2" );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64_delegate(FUNC(model3_state::daytona2_rombank_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xc3000000, 0xc37fffff, "bank2" );
 
 	rom[(0x606784^4)/4] = 0x60000000;
 	rom[(0x69a3fc^4)/4] = 0x60000000;		// jump to encrypted code

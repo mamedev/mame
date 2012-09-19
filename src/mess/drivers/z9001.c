@@ -145,7 +145,7 @@ WRITE_LINE_MEMBER( z9001_state::cass_w )
 static TIMER_DEVICE_CALLBACK( timer_callback )
 {
 	z9001_state *state = timer.machine().driver_data<z9001_state>();
-	state->m_maincpu->space(AS_PROGRAM)->write_byte(0x006a, 0);
+	state->m_maincpu->space(AS_PROGRAM).write_byte(0x006a, 0);
 }
 
 void z9001_state::machine_reset()
@@ -218,7 +218,7 @@ static const gfx_layout z9001_charlayout =
 
 WRITE8_MEMBER( z9001_state::kbd_put )
 {
-	m_maincpu->space(AS_PROGRAM)->write_byte(0x0025, data);
+	m_maincpu->space(AS_PROGRAM).write_byte(0x0025, data);
 }
 
 static ASCII_KEYBOARD_INTERFACE( keyboard_intf )

@@ -257,13 +257,13 @@ static const mc6845_interface apricot_mc6845_intf =
 
 DRIVER_INIT_MEMBER(apricot_state,apricot)
 {
-	address_space *prg = m_maincpu->space(AS_PROGRAM);
+	address_space &prg = m_maincpu->space(AS_PROGRAM);
 
 	UINT8 *ram = m_ram->pointer();
 	UINT32 ram_size = m_ram->size();
 
-	prg->unmap_readwrite(0x40000, 0xeffff);
-	prg->install_ram(0x00000, ram_size - 1, ram);
+	prg.unmap_readwrite(0x40000, 0xeffff);
+	prg.install_ram(0x00000, ram_size - 1, ram);
 
 	m_maincpu->set_irq_acknowledge_callback(apricot_irq_ack);
 

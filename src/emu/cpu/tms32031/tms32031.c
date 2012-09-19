@@ -368,7 +368,7 @@ inline void tms3203x_device::WMEM(offs_t addr, UINT32 data)
 void tms3203x_device::device_start()
 {
 	// find address spaces
-	m_program = space(AS_PROGRAM);
+	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 
 	// save state

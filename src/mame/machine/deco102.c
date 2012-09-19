@@ -50,7 +50,7 @@ static UINT16 decrypt(UINT16 data, int address, int select_xor)
 void deco102_decrypt_cpu(running_machine &machine, const char *cputag, int address_xor, int data_select_xor, int opcode_select_xor)
 {
 	int i;
-	address_space &space = *machine.device(cputag)->memory().space(AS_PROGRAM);
+	address_space &space = machine.device(cputag)->memory().space(AS_PROGRAM);
 	UINT16 *rom = (UINT16 *)machine.root_device().memregion(cputag)->base();
 	int size = machine.root_device().memregion(cputag)->bytes();
 	UINT16 *opcodes = auto_alloc_array(machine, UINT16, size / 2);

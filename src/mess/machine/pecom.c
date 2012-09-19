@@ -27,7 +27,7 @@ void pecom_state::machine_start()
 void pecom_state::machine_reset()
 {
 	UINT8 *rom = machine().root_device().memregion(CDP1802_TAG)->base();
-	address_space &space = *machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM);
+	address_space &space = machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 
 
 	space.unmap_write(0x0000, 0x3fff);
@@ -68,24 +68,24 @@ WRITE8_MEMBER(pecom_state::pecom_cdp1869_pageram_w)
 
 WRITE8_MEMBER(pecom_state::pecom_bank_w)
 {
-	address_space *space2 = machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM);
+	address_space &space2 = machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 	UINT8 *rom = memregion(CDP1802_TAG)->base();
-	machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x3fff, "bank1");
+	machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM).install_write_bank(0x0000, 0x3fff, "bank1");
 	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x0000);
 
 	if (data==2)
 	{
-		space2->install_read_handler (0xf000, 0xf7ff, read8_delegate(FUNC(pecom_state::pecom_cdp1869_charram_r),this));
-		space2->install_write_handler(0xf000, 0xf7ff, write8_delegate(FUNC(pecom_state::pecom_cdp1869_charram_w),this));
-		space2->install_read_handler (0xf800, 0xffff, read8_delegate(FUNC(pecom_state::pecom_cdp1869_pageram_r),this));
-		space2->install_write_handler(0xf800, 0xffff, write8_delegate(FUNC(pecom_state::pecom_cdp1869_pageram_w),this));
+		space2.install_read_handler (0xf000, 0xf7ff, read8_delegate(FUNC(pecom_state::pecom_cdp1869_charram_r),this));
+		space2.install_write_handler(0xf000, 0xf7ff, write8_delegate(FUNC(pecom_state::pecom_cdp1869_charram_w),this));
+		space2.install_read_handler (0xf800, 0xffff, read8_delegate(FUNC(pecom_state::pecom_cdp1869_pageram_r),this));
+		space2.install_write_handler(0xf800, 0xffff, write8_delegate(FUNC(pecom_state::pecom_cdp1869_pageram_w),this));
 	}
 	else
 	{
-		space2->unmap_write(0xf000, 0xf7ff);
-		space2->unmap_write(0xf800, 0xffff);
-		space2->install_read_bank (0xf000, 0xf7ff, "bank3");
-		space2->install_read_bank (0xf800, 0xffff, "bank4");
+		space2.unmap_write(0xf000, 0xf7ff);
+		space2.unmap_write(0xf800, 0xffff);
+		space2.install_read_bank (0xf000, 0xf7ff, "bank3");
+		space2.install_read_bank (0xf800, 0xffff, "bank4");
 		membank("bank3")->set_base(rom + 0xf000);
 		membank("bank4")->set_base(rom + 0xf800);
 	}

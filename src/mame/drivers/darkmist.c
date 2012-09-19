@@ -400,7 +400,7 @@ static void decrypt_snd(running_machine &machine)
 
 DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i, len;
 	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x10000);

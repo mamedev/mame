@@ -42,7 +42,7 @@ const address_space_config *huc6272_device::memory_space_config(address_spacenum
 
 inline UINT32 huc6272_device::read_dword(offs_t address)
 {
-	return space()->read_dword(address << 2);
+	return space().read_dword(address << 2);
 }
 
 
@@ -52,7 +52,7 @@ inline UINT32 huc6272_device::read_dword(offs_t address)
 
 inline void huc6272_device::write_dword(offs_t address, UINT32 data)
 {
-	space()->write_dword(address << 2, data);
+	space().write_dword(address << 2, data);
 }
 
 //**************************************************************************

@@ -139,7 +139,7 @@ void samcoupe_update_memory(address_space &space)
 
 WRITE8_MEMBER(samcoupe_state::samcoupe_ext_mem_w)
 {
-	address_space &space_program = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space_program = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (offset & 1)
 		m_hext = data;
@@ -160,7 +160,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_ext_mem_w)
 
 static READ8_DEVICE_HANDLER( samcoupe_rtc_r )
 {
-	address_space &spaceio = *device->machine().device("maincpu")->memory().space(AS_IO);
+	address_space &spaceio = device->machine().device("maincpu")->memory().space(AS_IO);
 	msm6242_device *rtc = dynamic_cast<msm6242_device*>(device);
 	return rtc->read(spaceio,offset >> 12);
 }
@@ -168,7 +168,7 @@ static READ8_DEVICE_HANDLER( samcoupe_rtc_r )
 
 static WRITE8_DEVICE_HANDLER( samcoupe_rtc_w )
 {
-	address_space &spaceio = *device->machine().device("maincpu")->memory().space(AS_IO);
+	address_space &spaceio = device->machine().device("maincpu")->memory().space(AS_IO);
 	msm6242_device *rtc = dynamic_cast<msm6242_device*>(device);
 	rtc->write(spaceio,offset >> 12, data);
 }
@@ -244,8 +244,8 @@ void samcoupe_state::machine_start()
 
 void samcoupe_state::machine_reset()
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
-	address_space &spaceio = *machine().device("maincpu")->memory().space(AS_IO);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &spaceio = machine().device("maincpu")->memory().space(AS_IO);
 
 	/* initialize state */
 	m_lmpr = 0x0f;      /* ROM0 paged in, ROM1 paged out RAM Banks */

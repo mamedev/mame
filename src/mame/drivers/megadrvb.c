@@ -664,8 +664,8 @@ DRIVER_INIT_MEMBER(md_boot_state,aladmdb)
 	#endif
 
 	// 220000 = writes to mcu? 330000 = reads?
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x220000, 0x220001, FUNC(aladmdb_w));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x330000, 0x330001, FUNC(aladmdb_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x220000, 0x220001, FUNC(aladmdb_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x330000, 0x330001, FUNC(aladmdb_r));
 
 	megadrive_6buttons_pad = 0;
 	DRIVER_INIT_CALL(megadrij);
@@ -714,7 +714,7 @@ DRIVER_INIT_MEMBER(md_boot_state,mk3mdb)
 	rom[0x07] = 0x02;
 	rom[0x06] = 0x10;
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x770070, 0x770075, FUNC(mk3mdb_dsw_r) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x770070, 0x770075, FUNC(mk3mdb_dsw_r) );
 
 	megadrive_6buttons_pad = 1;
 	DRIVER_INIT_CALL(megadriv);
@@ -722,13 +722,13 @@ DRIVER_INIT_MEMBER(md_boot_state,mk3mdb)
 
 DRIVER_INIT_MEMBER(md_boot_state,ssf2mdb)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xA130F0, 0xA130FF); // custom banking is disabled (!)
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x400000, 0x5fffff, "bank5");
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x400000, 0x5fffff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0xA130F0, 0xA130FF); // custom banking is disabled (!)
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x400000, 0x5fffff, "bank5");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x400000, 0x5fffff);
 
 	machine().root_device().membank("bank5")->set_base(machine().root_device().memregion( "maincpu" )->base() + 0x400000 );
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x770070, 0x770075, FUNC(ssf2mdb_dsw_r) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x770070, 0x770075, FUNC(ssf2mdb_dsw_r) );
 
 	megadrive_6buttons_pad = 1;
 	DRIVER_INIT_CALL(megadrij);
@@ -770,7 +770,7 @@ DRIVER_INIT_MEMBER(md_boot_state,srmdb)
 	rom[0x06] = 0xd2;
 	rom[0x07] = 0x00;
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x770070, 0x770075, FUNC(srmdb_dsw_r) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x770070, 0x770075, FUNC(srmdb_dsw_r) );
 
 	megadrive_6buttons_pad = 0;
 	DRIVER_INIT_CALL(megadriv);
@@ -778,11 +778,11 @@ DRIVER_INIT_MEMBER(md_boot_state,srmdb)
 
 DRIVER_INIT_MEMBER(md_cons_state,topshoot)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x200050, 0x200051, FUNC(topshoot_200051_r) );
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x200042, 0x200043, "IN0");
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x200044, 0x200045, "IN1");
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x200046, 0x200047, "IN2");
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x200048, 0x200049, "IN3");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x200050, 0x200051, FUNC(topshoot_200051_r) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x200042, 0x200043, "IN0");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x200044, 0x200045, "IN1");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x200046, 0x200047, "IN2");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x200048, 0x200049, "IN3");
 
 	megadrive_6buttons_pad = 0;
 	DRIVER_INIT_CALL(megadriv);

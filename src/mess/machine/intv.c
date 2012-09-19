@@ -410,7 +410,7 @@ static int intv_load_rom_file(device_image_interface &image)
 
 	UINT8 *memory = image.device().machine().root_device().memregion("maincpu")->base();
 	intv_state *state = image.device().machine().driver_data<intv_state>();
-	address_space *program = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &program = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	const char *filetype = image.filetype();
 
 	/* if it is in .rom format, we enter here */
@@ -504,7 +504,7 @@ static int intv_load_rom_file(device_image_interface &image)
 				start = (( ram & 0xf0 ) >> 4) * 0x1000;
 				size = ( ram & 0x0f ) * 0x800;
 
-				program->install_readwrite_handler(start, start + size,
+				program.install_readwrite_handler(start, start + size,
 					read16_delegate( FUNC( intv_state::intv_cart_ram8_r ), state),
 					write16_delegate( FUNC( intv_state::intv_cart_ram8_w ), state));
 			}
@@ -556,7 +556,7 @@ DEVICE_IMAGE_LOAD( intv_cart )
 		const char* region_name[] = {"4800", "5000", "6000", "7000", "9000", "A000", "C000", "D000", "F000"};
 		UINT8 *memory = image.device().machine().root_device().memregion("maincpu")->base();
 		intv_state *state = image.device().machine().driver_data<intv_state>();
-		address_space *program = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &program = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		UINT32 size=0;
 		UINT16 address = 0;
@@ -593,7 +593,7 @@ DEVICE_IMAGE_LOAD( intv_cart )
 		size = image.get_software_region_length("D000_RAM8");
 		if (size)
 		{
-			program->install_readwrite_handler(0xD000, 0xD000 + size,
+			program.install_readwrite_handler(0xD000, 0xD000 + size,
 				read16_delegate( FUNC( intv_state::intv_cart_ram8_r ), state),
 				write16_delegate( FUNC( intv_state::intv_cart_ram8_w ), state));
 		}
@@ -601,7 +601,7 @@ DEVICE_IMAGE_LOAD( intv_cart )
 		size = image.get_software_region_length("8800_RAM8");
 		if (size)
 		{
-			program->install_readwrite_handler(0x8800, 0x8800 + size,
+			program.install_readwrite_handler(0x8800, 0x8800 + size,
 				read16_delegate( FUNC( intv_state::intv_cart_ram8_r ), state),
 				write16_delegate( FUNC( intv_state::intv_cart_ram8_w ), state));
 		}

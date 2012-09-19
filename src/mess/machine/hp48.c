@@ -709,7 +709,7 @@ static void hp48_apply_modules(hp48_state *state)
 {
 	int i;
 	int nce2_enable = 1;
-	address_space& space = *state->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = state->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->m_io_addr = 0x100000;
 

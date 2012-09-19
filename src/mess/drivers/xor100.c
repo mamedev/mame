@@ -57,7 +57,7 @@ enum
 
 void xor100_state::bankswitch()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	int banks = m_ram->size() / 0x10000;
 
 	switch (m_mode)
@@ -65,16 +65,16 @@ void xor100_state::bankswitch()
 	case EPROM_0000:
 		if (m_bank < banks)
 		{
-			program->install_write_bank(0x0000, 0xffff, "bank1");
+			program.install_write_bank(0x0000, 0xffff, "bank1");
 			membank("bank1")->set_entry(1 + m_bank);
 		}
 		else
 		{
-			program->unmap_write(0x0000, 0xffff);
+			program.unmap_write(0x0000, 0xffff);
 		}
 
-		program->install_read_bank(0x0000, 0xf7ff, 0x07ff, 0, "bank2");
-		program->install_read_bank(0xf800, 0xffff, "bank3");
+		program.install_read_bank(0x0000, 0xf7ff, 0x07ff, 0, "bank2");
+		program.install_read_bank(0xf800, 0xffff, "bank3");
 		membank("bank2")->set_entry(0);
 		membank("bank3")->set_entry(0);
 		break;
@@ -82,36 +82,36 @@ void xor100_state::bankswitch()
 	case EPROM_F800:
 		if (m_bank < banks)
 		{
-			program->install_write_bank(0x0000, 0xffff, "bank1");
-			program->install_read_bank(0x0000, 0xf7ff, "bank2");
+			program.install_write_bank(0x0000, 0xffff, "bank1");
+			program.install_read_bank(0x0000, 0xf7ff, "bank2");
 			membank("bank1")->set_entry(1 + m_bank);
 			membank("bank2")->set_entry(1 + m_bank);
 		}
 		else
 		{
-			program->unmap_write(0x0000, 0xffff);
-			program->unmap_read(0x0000, 0xf7ff);
+			program.unmap_write(0x0000, 0xffff);
+			program.unmap_read(0x0000, 0xf7ff);
 		}
 
-		program->install_read_bank(0xf800, 0xffff, "bank3");
+		program.install_read_bank(0xf800, 0xffff, "bank3");
 		membank("bank3")->set_entry(0);
 		break;
 
 	case EPROM_OFF:
 		if (m_bank < banks)
 		{
-			program->install_write_bank(0x0000, 0xffff, "bank1");
-			program->install_read_bank(0x0000, 0xf7ff, "bank2");
-			program->install_read_bank(0xf800, 0xffff, "bank3");
+			program.install_write_bank(0x0000, 0xffff, "bank1");
+			program.install_read_bank(0x0000, 0xf7ff, "bank2");
+			program.install_read_bank(0xf800, 0xffff, "bank3");
 			membank("bank1")->set_entry(1 + m_bank);
 			membank("bank2")->set_entry(1 + m_bank);
 			membank("bank3")->set_entry(1 + m_bank);
 		}
 		else
 		{
-			program->unmap_write(0x0000, 0xffff);
-			program->unmap_read(0x0000, 0xf7ff);
-			program->unmap_read(0xf800, 0xffff);
+			program.unmap_write(0x0000, 0xffff);
+			program.unmap_read(0x0000, 0xf7ff);
+			program.unmap_read(0xf800, 0xffff);
 		}
 		break;
 	}

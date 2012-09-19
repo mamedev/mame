@@ -498,7 +498,7 @@ void atarigen_slapstic_init(device_t *device, offs_t base, offs_t mirror, int ch
 		slapstic_init(device->machine(), chipnum);
 
 		/* install the memory handlers */
-		state->m_slapstic = device->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(base, base + 0x7fff, 0, mirror, FUNC(atarigen_slapstic_r), FUNC(atarigen_slapstic_w));
+		state->m_slapstic = device->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(base, base + 0x7fff, 0, mirror, FUNC(atarigen_slapstic_r), FUNC(atarigen_slapstic_w));
 
 		/* allocate memory for a copy of bank 0 */
 		state->m_slapstic_bank0 = auto_alloc_array(device->machine(), UINT8, 0x2000);
@@ -511,7 +511,7 @@ void atarigen_slapstic_init(device_t *device, offs_t base, offs_t mirror, int ch
 		state->m_slapstic_base = base;
 		state->m_slapstic_mirror = mirror;
 
-		address_space &space = *downcast<cpu_device *>(device)->space(AS_PROGRAM);
+		address_space &space = device->memory().space(AS_PROGRAM);
 		space.set_direct_update_handler(direct_update_delegate(FUNC(atarigen_state::atarigen_slapstic_setdirect), state));
 	}
 }
@@ -764,7 +764,7 @@ static void update_6502_irq(running_machine &machine)
 static TIMER_CALLBACK( delayed_sound_reset )
 {
 	atarigen_state *state = machine.driver_data<atarigen_state>();
-	address_space &space = *state->m_sound_cpu->memory().space(AS_PROGRAM);
+	address_space &space = state->m_sound_cpu->memory().space(AS_PROGRAM);
 
 	/* unhalt and reset the sound CPU */
 	if (param == 0)
@@ -1125,7 +1125,7 @@ static void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newwor
 		/* scanline IRQ ack here */
 		case 0x1e:
 			/* hack: this should be a device */
-			atarigen_scanline_int_ack_w(*screen.machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
+			atarigen_scanline_int_ack_w(screen.machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
 			break;
 
 		/* log anything else */

@@ -2186,7 +2186,7 @@ DRIVER_INIT_MEMBER(m92_state,m92_bank)
 	UINT8 *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x20, 0x21, write16_delegate(FUNC(m92_state::m92_bankswitch_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x20, 0x21, write16_delegate(FUNC(m92_state::m92_bankswitch_w),this));
 
 	m_game_kludge = 0;
 	m_irq_vectorbase = 0x80;
@@ -2198,10 +2198,10 @@ DRIVER_INIT_MEMBER(m92_state,majtitl2)
 	UINT8 *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x20, 0x21, write16_delegate(FUNC(m92_state::m92_bankswitch_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x20, 0x21, write16_delegate(FUNC(m92_state::m92_bankswitch_w),this));
 
 	/* This game has an eeprom on the game board */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xf0000, 0xf3fff, read16_delegate(FUNC(m92_state::m92_eeprom_r),this), write16_delegate(FUNC(m92_state::m92_eeprom_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xf0000, 0xf3fff, read16_delegate(FUNC(m92_state::m92_eeprom_r),this), write16_delegate(FUNC(m92_state::m92_eeprom_w),this));
 
 	m_game_kludge = 2;
 	m_irq_vectorbase = 0x80;

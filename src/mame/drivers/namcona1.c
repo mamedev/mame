@@ -495,7 +495,7 @@ static int transfer_dword( running_machine &machine, UINT32 dest, UINT32 source 
 {
 	namcona1_state *state = machine.driver_data<namcona1_state>();
 	UINT16 data;
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if( source>=0x400000 && source<0xc00000 )
 	{

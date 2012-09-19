@@ -1006,9 +1006,9 @@ static void init_808x_common(legacy_cpu_device *device, device_irq_acknowledge_c
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	/* resolve callbacks */
 	cpustate->out_status_func.resolve(cpustate->config.out_status_func, *device);

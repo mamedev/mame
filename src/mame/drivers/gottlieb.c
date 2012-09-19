@@ -244,9 +244,9 @@ void gottlieb_state::machine_start()
 	if (m_laserdisc != NULL)
 	{
 		/* attach to the I/O ports */
-		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x05805, 0x05807, 0, 0x07f8, read8_delegate(FUNC(gottlieb_state::laserdisc_status_r),this));
-		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x05805, 0x05805, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::laserdisc_command_w),this));	/* command for the player */
-		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x05806, 0x05806, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::laserdisc_select_w),this));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x05805, 0x05807, 0, 0x07f8, read8_delegate(FUNC(gottlieb_state::laserdisc_status_r),this));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x05805, 0x05805, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::laserdisc_command_w),this));	/* command for the player */
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x05806, 0x05806, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::laserdisc_select_w),this));
 
 		/* allocate a timer for serial transmission, and one for philips code processing */
 		m_laserdisc_bit_timer = machine().scheduler().timer_alloc(FUNC(laserdisc_bit_callback));
@@ -2451,7 +2451,7 @@ DRIVER_INIT_MEMBER(gottlieb_state,romtiles)
 DRIVER_INIT_MEMBER(gottlieb_state,stooges)
 {
 	DRIVER_INIT_CALL(ramtiles);
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x05803, 0x05803, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::stooges_output_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x05803, 0x05803, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::stooges_output_w),this));
 }
 
 

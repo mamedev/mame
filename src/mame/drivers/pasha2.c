@@ -481,7 +481,7 @@ READ16_MEMBER(pasha2_state::pasha2_speedup_r)
 
 DRIVER_INIT_MEMBER(pasha2_state,pasha2)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x95744, 0x95747, read16_delegate(FUNC(pasha2_state::pasha2_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x95744, 0x95747, read16_delegate(FUNC(pasha2_state::pasha2_speedup_r), this));
 
 	membank("bank1")->set_base(memregion("user2")->base());
 }

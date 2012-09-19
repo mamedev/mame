@@ -751,7 +751,7 @@ static CPU_INIT( superfx )
 	superfx_update_speed(cpustate);
 
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 
 	if (device->static_config() != NULL)
 	{

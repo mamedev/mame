@@ -165,9 +165,9 @@ static CPU_INIT( i8086 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	/* set up the state table */
 	{
@@ -236,9 +236,9 @@ static CPU_RESET( i8086 )
 	memset(cpustate, 0, sizeof(*cpustate));
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	cpustate->sregs[CS] = 0xffff;
 	cpustate->base[CS] = SegBase(CS);

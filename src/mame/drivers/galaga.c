@@ -889,7 +889,7 @@ MACHINE_START_MEMBER(galaga_state,galaga)
 static void bosco_latch_reset(running_machine &machine)
 {
 	galaga_state *state = machine.driver_data<galaga_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -3312,7 +3312,7 @@ DRIVER_INIT_MEMBER(galaga_state,gatsbee)
 	DRIVER_INIT_CALL(galaga);
 
 	/* Gatsbee has a larger character ROM, we need a handler for banking */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1000, 0x1000, write8_delegate(FUNC(galaga_state::gatsbee_bank_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x1000, 0x1000, write8_delegate(FUNC(galaga_state::gatsbee_bank_w),this));
 }
 
 
@@ -3353,8 +3353,8 @@ DRIVER_INIT_MEMBER(xevious_state,xevios)
 DRIVER_INIT_MEMBER(xevious_state,battles)
 {
 	/* replace the Namco I/O handlers with interface to the 4th CPU */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x7000, 0x700f, FUNC(battles_customio_data0_r), FUNC(battles_customio_data0_w) );
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x7100, 0x7100, FUNC(battles_customio0_r), FUNC(battles_customio0_w) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x7000, 0x700f, FUNC(battles_customio_data0_r), FUNC(battles_customio_data0_w) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x7100, 0x7100, FUNC(battles_customio0_r), FUNC(battles_customio0_w) );
 
 	DRIVER_INIT_CALL(xevious);
 }

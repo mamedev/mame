@@ -1036,17 +1036,17 @@ WRITE16_MEMBER(igs011_state::igs011_prot_addr_w)
 
 //  m_prot2 = 0x00;
 
-	address_space *sp = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &sp = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
 
 	// Plug previous address range with ROM access
-	sp->install_rom(m_prot1_addr + 0, m_prot1_addr + 9, rom + m_prot1_addr);
+	sp.install_rom(m_prot1_addr + 0, m_prot1_addr + 9, rom + m_prot1_addr);
 
 	m_prot1_addr = (data << 4) ^ 0x8340;
 
 	// Add protection memory range
-	sp->install_write_handler(m_prot1_addr + 0, m_prot1_addr + 7, write16_delegate(FUNC(igs011_state::igs011_prot1_w), this));
-	sp->install_read_handler (m_prot1_addr + 8, m_prot1_addr + 9, read16_delegate(FUNC(igs011_state::igs011_prot1_r), this));
+	sp.install_write_handler(m_prot1_addr + 0, m_prot1_addr + 7, write16_delegate(FUNC(igs011_state::igs011_prot1_w), this));
+	sp.install_read_handler (m_prot1_addr + 8, m_prot1_addr + 9, read16_delegate(FUNC(igs011_state::igs011_prot1_r), this));
 }
 /*
 READ16_MEMBER(igs011_state::igs011_prot_fake_r)
@@ -1835,7 +1835,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21)
 
 	drgnwrld_type2_decrypt(machine());
 	drgnwrld_gfx_decrypt(machine());
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd4c0, 0xd4ff, read16_delegate(FUNC(igs011_state::drgnwrldv21_igs011_prot2_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16_delegate(FUNC(igs011_state::drgnwrldv21_igs011_prot2_r), this));
 /*
     // PROTECTION CHECKS
     // bp 32ee; bp 11ca8; bp 23d5e; bp 23fd0; bp 24170; bp 24348; bp 2454e; bp 246cc; bp 24922; bp 24b66; bp 24de2; bp 2502a; bp 25556; bp 269de; bp 2766a; bp 2a830
@@ -1975,7 +1975,7 @@ DRIVER_INIT_MEMBER(igs011_state,dbc)
 
 	dbc_decrypt(machine());
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x10600, 0x107ff, read16_delegate(FUNC(igs011_state::dbc_igs011_prot2_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x10600, 0x107ff, read16_delegate(FUNC(igs011_state::dbc_igs011_prot2_r), this));
 /*
     // PROTECTION CHECKS
     rom[0x04c42/2]  =   0x602e;     // 004C42: 6604         bne 4c48  (rom test error otherwise)
@@ -2005,7 +2005,7 @@ DRIVER_INIT_MEMBER(igs011_state,ryukobou)
 
 	ryukobou_decrypt(machine());
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x10600, 0x107ff, read16_delegate(FUNC(igs011_state::ryukobou_igs011_prot2_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x10600, 0x107ff, read16_delegate(FUNC(igs011_state::ryukobou_igs011_prot2_r), this));
 
 	// PROTECTION CHECKS
 //  rom[0x2df68/2]  =   0x4e75;     // 02DF68: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)

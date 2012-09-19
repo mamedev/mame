@@ -94,9 +94,9 @@ public:
     void set_port_a_z_mask(UINT8 data) { m_port_a_z_mask = data; }// see second note in .c
 
 	DECLARE_READ8_MEMBER( porta_r );
-    UINT8 porta_r() { return porta_r(*machine().memory().first_space(), 0); }
+    UINT8 porta_r() { return porta_r(machine().driver_data()->generic_space(), 0); }
     DECLARE_WRITE8_MEMBER( porta_w );
-    void porta_w(UINT8 data) { porta_w(*machine().memory().first_space(), 0, data); }
+    void porta_w(UINT8 data) { porta_w(machine().driver_data()->generic_space(), 0, data); }
     void set_a_input(UINT8 data, UINT8 z_mask);
     UINT8 a_output();
 
@@ -109,9 +109,9 @@ public:
     int ca2_output_z();
 
 	DECLARE_READ8_MEMBER( portb_r );
-    UINT8 portb_r() { return portb_r(*machine().memory().first_space(), 0); }
+    UINT8 portb_r() { return portb_r(machine().driver_data()->generic_space(), 0); }
     DECLARE_WRITE8_MEMBER( portb_w );
-    void portb_w(UINT8 data) { portb_w(*machine().memory().first_space(), 0, data); }
+    void portb_w(UINT8 data) { portb_w(machine().driver_data()->generic_space(), 0, data); }
     UINT8 b_output();
 
     DECLARE_READ_LINE_MEMBER( cb1_r );

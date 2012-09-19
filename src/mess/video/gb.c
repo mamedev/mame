@@ -1222,7 +1222,7 @@ void gb_video_reset( running_machine &machine, int mode )
 	gb_state *state = machine.driver_data<gb_state>();
 	int	i;
 	int vram_size = 0x2000;
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	emu_timer *old_timer = state->m_lcd.lcd_timer;
 
 	memset( &state->m_lcd, 0, sizeof(state->m_lcd) );
@@ -1332,7 +1332,7 @@ static void gbc_hdma(running_machine &machine, UINT16 length)
 {
 	gb_state *state = machine.driver_data<gb_state>();
 	UINT16 src, dst;
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	src = ((UINT16)HDMA1 << 8) | (HDMA2 & 0xF0);
 	dst = ((UINT16)(HDMA3 & 0x1F) << 8) | (HDMA4 & 0xF0);

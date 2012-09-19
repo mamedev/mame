@@ -566,12 +566,12 @@ int debug_command_parameter_cpu_space(running_machine &machine, const char *para
 		return FALSE;
 
 	/* fetch the space pointer */
-	result = cpu->memory().space(spacenum);
-	if (result == NULL)
+	if (!cpu->memory().has_space(spacenum))
 	{
 		debug_console_printf(machine, "No matching memory space found for CPU '%s'\n", cpu->tag());
 		return FALSE;
 	}
+	result = &cpu->memory().space(spacenum);
 	return TRUE;
 }
 

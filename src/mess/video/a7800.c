@@ -86,7 +86,7 @@ void a7800_state::video_start()
 static void maria_draw_scanline(running_machine &machine)
 {
 	a7800_state *state = machine.driver_data<a7800_state>();
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	unsigned int graph_adr,data_addr;
 	int width,hpos,pal,mode,ind;
 	unsigned int dl;
@@ -321,7 +321,7 @@ TIMER_DEVICE_CALLBACK( a7800_interrupt )
 	a7800_state *state = timer.machine().driver_data<a7800_state>();
 	int frame_scanline;
 	UINT8 *ROM = timer.machine().root_device().memregion("maincpu")->base();
-	address_space& space = *timer.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = timer.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->m_maria_scanline++;
 

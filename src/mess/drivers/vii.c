@@ -217,7 +217,7 @@ static void vii_set_pixel(vii_state *state, UINT32 offset, UINT16 rgb)
 static void vii_blit(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 xoff, UINT32 yoff, UINT32 attr, UINT32 ctrl, UINT32 bitmap_addr, UINT16 tile)
 {
 	vii_state *state = machine.driver_data<vii_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	UINT32 h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
 	UINT32 w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
@@ -293,7 +293,7 @@ static void vii_blit_page(running_machine &machine, bitmap_rgb32 &bitmap, const 
 	UINT32 tilemap = regs[4];
 	UINT32 palette_map = regs[5];
 	UINT32 h, w, hn, wn;
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if(!(ctrl & PAGE_ENABLE_MASK))
 	{
@@ -355,7 +355,7 @@ static void vii_blit_page(running_machine &machine, bitmap_rgb32 &bitmap, const 
 static void vii_blit_sprite(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 base_addr)
 {
 	vii_state *state = machine.driver_data<vii_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 tile, attr;
 	INT16 x, y;
 	UINT32 h, w;
@@ -445,14 +445,14 @@ UINT32 vii_state::screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap,
 
 void vii_state::vii_do_dma(UINT32 len)
 {
-	address_space *mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	UINT32 src = m_video_regs[0x70];
 	UINT32 dst = m_video_regs[0x71] + 0x2c00;
 	UINT32 j;
 
 	for(j = 0; j < len; j++)
 	{
-		mem->write_word((dst+j) << 1, mem->read_word((src+j) << 1));
+		mem.write_word((dst+j) << 1, mem.read_word((src+j) << 1));
 	}
 
 	m_video_regs[0x72] = 0;
@@ -616,14 +616,14 @@ void vii_state::vii_do_i2c()
 
 void vii_state::spg_do_dma(UINT32 len)
 {
-	address_space *mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	UINT32 src = ((m_io_regs[0x101] & 0x3f) << 16) | m_io_regs[0x100];
 	UINT32 dst = m_io_regs[0x103] & 0x3fff;
 	UINT32 j;
 
 	for(j = 0; j < len; j++)
-		mem->write_word((dst+j) << 1, mem->read_word((src+j) << 1));
+		mem.write_word((dst+j) << 1, mem.read_word((src+j) << 1));
 
 	m_io_regs[0x102] = 0;
 }

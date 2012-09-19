@@ -303,16 +303,16 @@ static UINT16 littlerb_data_read(running_machine &machine, UINT16 mem_mask)
 {
 	littlerb_state *state = machine.driver_data<littlerb_state>();
 	UINT32 addr = state->m_write_address >> 3; // almost surely raw addresses are actually shifted by 3
-	address_space *vdp_space = machine.device<littlerb_vdp_device>("littlerbvdp")->space();
+	address_space &vdp_space = machine.device<littlerb_vdp_device>("littlerbvdp")->space();
 
-	return vdp_space->read_word(addr, mem_mask);
+	return vdp_space.read_word(addr, mem_mask);
 }
 
 static void littlerb_data_write(running_machine &machine, UINT16 data, UINT16 mem_mask)
 {
 	littlerb_state *state = machine.driver_data<littlerb_state>();
 	UINT32 addr = state->m_write_address >> 3; // almost surely raw addresses are actually shifted by 3
-	address_space *vdp_space = machine.device<littlerb_vdp_device>("littlerbvdp")->space();
+	address_space &vdp_space = machine.device<littlerb_vdp_device>("littlerbvdp")->space();
 	int mode = state->m_vdp_writemode;
 
 
@@ -323,7 +323,7 @@ static void littlerb_data_write(running_machine &machine, UINT16 data, UINT16 me
 	}
 	else
 	{
-		vdp_space->write_word(addr, data, mem_mask);
+		vdp_space.write_word(addr, data, mem_mask);
 
 		// 2000 is used for palette writes which appears to be a RAMDAC, no auto-inc.
 		//  1ff80806 is our 'spritelist'
@@ -612,7 +612,7 @@ static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap, const re
 {
 	int x,y;
 	fulloffs >>= 3;
-	address_space *vdp_space = machine.device<littlerb_vdp_device>("littlerbvdp")->space();
+	address_space &vdp_space = machine.device<littlerb_vdp_device>("littlerbvdp")->space();
 
 	for (y=0;y<ysize;y++)
 	{
@@ -620,7 +620,7 @@ static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap, const re
 		{
 			int drawxpos, drawypos;
 			// the addresses provided are the same as the offsets as the vdp writes
-			UINT16 pix = vdp_space->read_byte(fulloffs);
+			UINT16 pix = vdp_space.read_byte(fulloffs);
 
 			drawxpos = xpos+x;
 			drawypos = ypos+y;

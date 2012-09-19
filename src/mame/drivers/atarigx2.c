@@ -2236,7 +2236,7 @@ DRIVER_INIT_MEMBER(atarigx2_state,rrreveng)
 
 	m_playfield_base = 0x000;
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xca0fc0, 0xca0fc3, read32_delegate(FUNC(atarigx2_state::rrreveng_prot_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xca0fc0, 0xca0fc3, read32_delegate(FUNC(atarigx2_state::rrreveng_prot_r),this));
 }
 
 

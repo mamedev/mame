@@ -10698,10 +10698,10 @@ DRIVER_INIT_MEMBER(cps_state,forgottn)
 
 	/* Forgotten Worlds has a NEC uPD4701AC on the B-board handling dial inputs from the CN-MOWS connector. */
 	/* The memory mapping is handled by PAL LWIO */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x800040, 0x800041, write16_delegate(FUNC(cps_state::forgottn_dial_0_reset_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x800048, 0x800049, write16_delegate(FUNC(cps_state::forgottn_dial_1_reset_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x800052, 0x800055, read16_delegate(FUNC(cps_state::forgottn_dial_0_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80005a, 0x80005d, read16_delegate(FUNC(cps_state::forgottn_dial_1_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x800040, 0x800041, write16_delegate(FUNC(cps_state::forgottn_dial_0_reset_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x800048, 0x800049, write16_delegate(FUNC(cps_state::forgottn_dial_1_reset_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x800052, 0x800055, read16_delegate(FUNC(cps_state::forgottn_dial_0_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x80005a, 0x80005d, read16_delegate(FUNC(cps_state::forgottn_dial_1_r),this));
 
 	save_item(NAME(m_dial));
 
@@ -10715,8 +10715,8 @@ DRIVER_INIT_MEMBER(cps_state,sf2ee)
 {
 	/* This specific revision of SF2 has the CPS-B custom mapped at a different address. */
 	/* The mapping is handled by the PAL IOB2 on the B-board */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->unmap_readwrite(0x800140, 0x80017f);
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x8001c0, 0x8001ff, read16_delegate(FUNC(cps_state::cps1_cps_b_r),this), write16_delegate(FUNC(cps_state::cps1_cps_b_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_readwrite(0x800140, 0x80017f);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x8001c0, 0x8001ff, read16_delegate(FUNC(cps_state::cps1_cps_b_r),this), write16_delegate(FUNC(cps_state::cps1_cps_b_w),this));
 
 	DRIVER_INIT_CALL(cps1);
 }
@@ -10724,7 +10724,7 @@ DRIVER_INIT_MEMBER(cps_state,sf2ee)
 DRIVER_INIT_MEMBER(cps_state,sf2thndr)
 {
 	/* This particular hack uses a modified B-board PAL which mirrors the CPS-B registers at an alternate address */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x8001c0, 0x8001ff, read16_delegate(FUNC(cps_state::cps1_cps_b_r),this), write16_delegate(FUNC(cps_state::cps1_cps_b_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x8001c0, 0x8001ff, read16_delegate(FUNC(cps_state::cps1_cps_b_r),this), write16_delegate(FUNC(cps_state::cps1_cps_b_w),this));
 
 	DRIVER_INIT_CALL(cps1);
 }
@@ -10732,7 +10732,7 @@ DRIVER_INIT_MEMBER(cps_state,sf2thndr)
 DRIVER_INIT_MEMBER(cps_state,sf2hack)
 {
 	/* some SF2 hacks have some inputs wired to the LSB instead of MSB */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x800018, 0x80001f, read16_delegate(FUNC(cps_state::cps1_hack_dsw_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x800018, 0x80001f, read16_delegate(FUNC(cps_state::cps1_hack_dsw_r),this));
 
 	DRIVER_INIT_CALL(cps1);
 }
@@ -10765,7 +10765,7 @@ DRIVER_INIT_MEMBER(cps_state,pang3b)
 {
 	/* Pang 3 is the only non-QSound game to have an EEPROM. */
 	/* It is mapped in the CPS-B address range so probably is on the C-board. */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_port(0x80017a, 0x80017b, "EEPROMIN", "EEPROMOUT");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_port(0x80017a, 0x80017b, "EEPROMIN", "EEPROMOUT");
 
 	DRIVER_INIT_CALL(cps1);
 }
@@ -10815,11 +10815,11 @@ DRIVER_INIT_MEMBER(cps_state,sf2mdt)
 		rom[i + 3] = rom[i + 6];
 		rom[i + 6] = tmp;
 	}
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x70c01a, 0x70c01b, read16_delegate(FUNC(cps_state::sf2mdt_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x70c01c, 0x70c01d, read16_delegate(FUNC(cps_state::sf2mdt_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x70c01e, 0x70c01f, read16_delegate(FUNC(cps_state::sf2mdt_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x70c010, 0x70c011, read16_delegate(FUNC(cps_state::sf2mdt_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x70c018, 0x70c019, read16_delegate(FUNC(cps_state::sf2mdt_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x70c01a, 0x70c01b, read16_delegate(FUNC(cps_state::sf2mdt_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x70c01c, 0x70c01d, read16_delegate(FUNC(cps_state::sf2mdt_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x70c01e, 0x70c01f, read16_delegate(FUNC(cps_state::sf2mdt_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x70c010, 0x70c011, read16_delegate(FUNC(cps_state::sf2mdt_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x70c018, 0x70c019, read16_delegate(FUNC(cps_state::sf2mdt_r),this));
 
 	DRIVER_INIT_CALL(cps1);
 }
@@ -10827,7 +10827,7 @@ DRIVER_INIT_MEMBER(cps_state,sf2mdt)
 DRIVER_INIT_MEMBER(cps_state,dinohunt)
 {
 	// is this shared with the new sound hw?
-	UINT8* ram = (UINT8*)machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xf18000, 0xf19fff);
+	UINT8* ram = (UINT8*)machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0xf18000, 0xf19fff);
 	memset(ram,0xff,0x2000);
 	DRIVER_INIT_CALL(cps1);
 }

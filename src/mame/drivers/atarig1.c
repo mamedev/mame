@@ -184,7 +184,7 @@ static void pitfightb_cheap_slapstic_init(running_machine &machine)
 	atarig1_state *state = machine.driver_data<atarig1_state>();
 
 	/* install a read handler */
-	state->m_bslapstic_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x038000, 0x03ffff, read16_delegate(FUNC(atarig1_state::pitfightb_cheap_slapstic_r),state));
+	state->m_bslapstic_base = machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x038000, 0x03ffff, read16_delegate(FUNC(atarig1_state::pitfightb_cheap_slapstic_r),state));
 
 	/* allocate memory for a copy of bank 0 */
 	state->m_bslapstic_bank0 = auto_alloc_array(machine, UINT8, 0x2000);

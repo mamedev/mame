@@ -506,7 +506,7 @@ WRITE32_MEMBER(deco32_state::tattass_prot_w)
 WRITE32_MEMBER(deco32_state::tattass_control_w)
 {
 	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-	address_space *eeprom_space = eeprom->space();
+	address_space &eeprom_space = eeprom->space();
 
 	/* Eprom in low byte */
 	if (mem_mask==0x000000ff) { /* Byte write to low byte only (different from word writing including low byte) */
@@ -556,7 +556,7 @@ WRITE32_MEMBER(deco32_state::tattass_control_w)
 				int d=m_readBitCount/8;
 				int m=7-(m_readBitCount%8);
 				int a=(m_byteAddr+d)%1024;
-				int b=eeprom_space->read_byte(a);
+				int b=eeprom_space.read_byte(a);
 
 				m_tattass_eprom_bit=(b>>m)&1;
 
@@ -573,7 +573,7 @@ WRITE32_MEMBER(deco32_state::tattass_control_w)
 					int b=(m_buffer[24]<<7)|(m_buffer[25]<<6)|(m_buffer[26]<<5)|(m_buffer[27]<<4)
 						|(m_buffer[28]<<3)|(m_buffer[29]<<2)|(m_buffer[30]<<1)|(m_buffer[31]<<0);
 
-					eeprom_space->write_byte(m_byteAddr, b);
+					eeprom_space.write_byte(m_byteAddr, b);
 				}
 				m_lastClock=data&0x20;
 				return;
@@ -588,7 +588,7 @@ WRITE32_MEMBER(deco32_state::tattass_control_w)
 
 				/* Check for read command */
 				if (m_buffer[0] && m_buffer[1]) {
-					m_tattass_eprom_bit=(eeprom_space->read_byte(m_byteAddr)>>7)&1;
+					m_tattass_eprom_bit=(eeprom_space.read_byte(m_byteAddr)>>7)&1;
 					m_readBitCount=1;
 					m_pendingCommand=1;
 				}

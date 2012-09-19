@@ -119,7 +119,7 @@ ADDRESS_MAP_END
 
 CUSTOM_INPUT_MEMBER(flstory_state::victnine_mcu_status_bit01_r)
 {
-	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	return (victnine_mcu_status_r(space, 0) & 3);
 }

@@ -886,7 +886,7 @@ void CDC_End_Transfer(running_machine& machine)
 
 void CDC_Do_DMA(running_machine& machine, int rate)
 {
-	address_space& space = *machine.device(":segacd:segacd_68k")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device(":segacd:segacd_68k")->memory().space(AS_PROGRAM);
 
 	UINT32 dstoffset, length;
 	UINT8 *dest;
@@ -2304,7 +2304,7 @@ READ16_HANDLER( segacd_stopwatch_timer_r )
 /* main CPU map set up in INIT */
 void segacd_init_main_cpu( running_machine& machine )
 {
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	
 	segacd_font_bits = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:segacd_font")->ptr());
 	segacd_backupram = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:backupram")->ptr());
@@ -2324,21 +2324,21 @@ void segacd_init_main_cpu( running_machine& machine )
 	segacd_wordram_mapped = 1;
 
 
-	space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x200000, 0x23ffff, FUNC(segacd_main_dataram_part1_r), FUNC(segacd_main_dataram_part1_w)); // RAM shared with sub
+	space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x200000, 0x23ffff, FUNC(segacd_main_dataram_part1_r), FUNC(segacd_main_dataram_part1_w)); // RAM shared with sub
 
-	space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12000, 0xa12001, FUNC(scd_a12000_halt_reset_r), FUNC(scd_a12000_halt_reset_w)); // sub-cpu control
-	space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12002, 0xa12003, FUNC(scd_a12002_memory_mode_r), FUNC(scd_a12002_memory_mode_w)); // memory mode / write protect
-	//space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12004, 0xa12005, FUNC(segacd_cdc_mode_address_r), FUNC(segacd_cdc_mode_address_w));
-	space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12006, 0xa12007, FUNC(scd_a12006_hint_register_r), FUNC(scd_a12006_hint_register_w)); // where HINT points on main CPU
-	//space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler     (0xa12008, 0xa12009, FUNC(cdc_data_main_r));
+	space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xa12000, 0xa12001, FUNC(scd_a12000_halt_reset_r), FUNC(scd_a12000_halt_reset_w)); // sub-cpu control
+	space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xa12002, 0xa12003, FUNC(scd_a12002_memory_mode_r), FUNC(scd_a12002_memory_mode_w)); // memory mode / write protect
+	//space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xa12004, 0xa12005, FUNC(segacd_cdc_mode_address_r), FUNC(segacd_cdc_mode_address_w));
+	space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xa12006, 0xa12007, FUNC(scd_a12006_hint_register_r), FUNC(scd_a12006_hint_register_w)); // where HINT points on main CPU
+	//space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler     (0xa12008, 0xa12009, FUNC(cdc_data_main_r));
 
 
-	space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa1200c, 0xa1200d, FUNC(segacd_stopwatch_timer_r), FUNC(segacd_stopwatch_timer_w)); // starblad
+	space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xa1200c, 0xa1200d, FUNC(segacd_stopwatch_timer_r), FUNC(segacd_stopwatch_timer_w)); // starblad
 
-	space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa1200e, 0xa1200f, FUNC(segacd_comms_flags_r), FUNC(segacd_comms_flags_maincpu_w)); // communication flags block
+	space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xa1200e, 0xa1200f, FUNC(segacd_comms_flags_r), FUNC(segacd_comms_flags_maincpu_w)); // communication flags block
 
-	space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12010, 0xa1201f, FUNC(segacd_comms_main_part1_r), FUNC(segacd_comms_main_part1_w));
-	space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12020, 0xa1202f, FUNC(segacd_comms_main_part2_r), FUNC(segacd_comms_main_part2_w));
+	space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xa12010, 0xa1201f, FUNC(segacd_comms_main_part1_r), FUNC(segacd_comms_main_part1_w));
+	space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xa12020, 0xa1202f, FUNC(segacd_comms_main_part2_r), FUNC(segacd_comms_main_part2_w));
 
 
 

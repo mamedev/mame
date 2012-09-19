@@ -365,7 +365,7 @@ const rom_entry *h63484_device::device_rom_region() const
 
 inline UINT8 h63484_device::readbyte(offs_t address)
 {
-	return space()->read_byte(address);
+	return space().read_byte(address);
 }
 
 
@@ -375,7 +375,7 @@ inline UINT8 h63484_device::readbyte(offs_t address)
 
 inline void h63484_device::writebyte(offs_t address, UINT8 data)
 {
-	space()->write_byte(address, data);
+	space().write_byte(address, data);
 }
 
 

@@ -757,11 +757,11 @@ void mm1_state::machine_start()
 
 void mm1_state::machine_reset()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	int i;
 
 	// reset LS259
-	for (i = 0; i < 8; i++) ls259_w(*program, i, 0);
+	for (i = 0; i < 8; i++) ls259_w(program, i, 0);
 
 	// set FDC ready
 	if (!ioport("T5")->read()) upd765_ready_w(m_fdc, 1);

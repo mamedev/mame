@@ -1259,7 +1259,7 @@ DRIVER_INIT_MEMBER(psikyosh_state,mjgtaste)
 {
 	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x03000000, 0x03000003, read32_delegate(FUNC(psikyosh_state::mjgtaste_input_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x03000000, 0x03000003, read32_delegate(FUNC(psikyosh_state::mjgtaste_input_r),this));
 }
 
 

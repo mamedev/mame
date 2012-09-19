@@ -518,7 +518,7 @@ static CPU_INIT( hd6309 )
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
 
-	m68_state->program = device->space(AS_PROGRAM);
+	m68_state->program = &device->space(AS_PROGRAM);
 	m68_state->direct = &m68_state->program->direct();
 
 	/* setup regtable */

@@ -1405,8 +1405,8 @@ static DEVICE_IMAGE_LOAD( vboy_cart )
 	{
 		state->m_nvptr = (UINT8 *)&state->m_vboy_sram;
 
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x06000000, 0x0600ffff, read32_delegate(FUNC(vboy_state::sram_r),state));
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x06000000, 0x0600ffff, write32_delegate(FUNC(vboy_state::sram_w),state));
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x06000000, 0x0600ffff, read32_delegate(FUNC(vboy_state::sram_r),state));
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x06000000, 0x0600ffff, write32_delegate(FUNC(vboy_state::sram_w),state));
 
 		image.battery_load(state->m_nvptr, 0x10000, 0x00);
 		state->m_nvimage = image;

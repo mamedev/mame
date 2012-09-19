@@ -74,7 +74,7 @@ void sam6883_device::device_start()
 
 	/* find the CPU */
 	m_cpu = machine().device<cpu_device>(config->m_cpu_tag);
-	m_cpu_space = m_cpu->space(config->m_cpu_space);
+	m_cpu_space = &m_cpu->space(config->m_cpu_space);
 
 	/* resolve callbacks */
 	m_res_input_func.resolve(config->m_input_func, *this);

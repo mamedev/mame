@@ -245,7 +245,7 @@ enum
 
 void adam_state::bankswitch()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 
 	switch (m_mioc & 0x03)
@@ -253,58 +253,58 @@ void adam_state::bankswitch()
 	case LO_SMARTWRITER:
 		if (BIT(m_adamnet, 1))
 		{
-			program->unmap_readwrite(0x0000, 0x5fff);
-			program->install_rom(0x6000, 0x7fff, memregion("wp")->base() + 0x8000);
+			program.unmap_readwrite(0x0000, 0x5fff);
+			program.install_rom(0x6000, 0x7fff, memregion("wp")->base() + 0x8000);
 		}
 		else
 		{
-			program->install_rom(0x0000, 0x7fff, memregion("wp")->base());
+			program.install_rom(0x0000, 0x7fff, memregion("wp")->base());
 		}
 		break;
 
 	case LO_INTERNAL_RAM:
-		program->install_ram(0x0000, 0x7fff, ram);
+		program.install_ram(0x0000, 0x7fff, ram);
 		break;
 
 	case LO_RAM_EXPANSION:
 		if (m_ram->size() > 64 * 1024)
-			program->install_ram(0x0000, 0x7fff, ram + 0x10000);
+			program.install_ram(0x0000, 0x7fff, ram + 0x10000);
 		else
-			program->unmap_readwrite(0x0000, 0x7fff);
+			program.unmap_readwrite(0x0000, 0x7fff);
 		break;
 
 	case LO_OS7_ROM_INTERNAL_RAM:
-		program->install_rom(0x0000, 0x1fff, memregion("os7")->base());
-		program->install_ram(0x2000, 0x7fff, ram + 0x2000);
+		program.install_rom(0x0000, 0x1fff, memregion("os7")->base());
+		program.install_ram(0x2000, 0x7fff, ram + 0x2000);
 		break;
 	}
 
 	switch ((m_mioc >> 2) & 0x03)
 	{
 	case HI_INTERNAL_RAM:
-		program->install_ram(0x8000, 0xffff, ram + 0x8000);
+		program.install_ram(0x8000, 0xffff, ram + 0x8000);
 		break;
 
 	case HI_ROM_EXPANSION:
-		program->install_rom(0x8000, 0xffff, memregion("xrom")->base());
+		program.install_rom(0x8000, 0xffff, memregion("xrom")->base());
 		break;
 
 	case HI_RAM_EXPANSION:
 		if (m_game)
 		{
-			program->install_rom(0x8000, 0xffff, memregion("cart")->base());
+			program.install_rom(0x8000, 0xffff, memregion("cart")->base());
 		}
 		else
 		{
 			if (m_ram->size() > 64 * 1024)
-				program->install_ram(0x8000, 0xffff, ram + 0x18000);
+				program.install_ram(0x8000, 0xffff, ram + 0x18000);
 			else
-				program->unmap_readwrite(0x8000, 0xffff);
+				program.unmap_readwrite(0x8000, 0xffff);
 		}
 		break;
 
 	case HI_CARTRIDGE_ROM:
-		program->install_rom(0x8000, 0xffff, memregion("cart")->base());
+		program.install_rom(0x8000, 0xffff, memregion("cart")->base());
 		break;
 	}
 }

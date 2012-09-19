@@ -125,7 +125,7 @@ static DEVICE_START( m72_audio )
 
 	state->samples = device->machine().root_device().memregion("samples")->base();
 	state->samples_size = device->machine().root_device().memregion("samples")->bytes();
-	state->space = device->machine().device("soundcpu")->memory().space(AS_IO);
+	state->space = &device->machine().device("soundcpu")->memory().space(AS_IO);
 	state->dac = device->machine().device<dac_device>("dac");
 
 	device->save_item(NAME(state->irqvector));

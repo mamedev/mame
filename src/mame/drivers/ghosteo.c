@@ -581,7 +581,7 @@ READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 
 void ghosteo_state::machine_reset()
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x4d000010, 0x4d000013,read32_delegate(FUNC(ghosteo_state::bballoon_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013,read32_delegate(FUNC(ghosteo_state::bballoon_speedup_r), this));
 	s3c2410 = machine().device("s3c2410");
 }
 

@@ -348,7 +348,7 @@ SNAPSHOT_LOAD( z1013 )
 		return IMAGE_INIT_FAIL;
 	}
 
-	memcpy (image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(startaddr),
+	memcpy (image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).get_read_ptr(startaddr),
 		 data+0x20, endaddr - startaddr + 1);
 
 	if (runaddr)

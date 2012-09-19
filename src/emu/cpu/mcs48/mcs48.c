@@ -858,10 +858,10 @@ static void mcs48_init(legacy_cpu_device *device, device_irq_acknowledge_callbac
 	cpustate->int_rom_size = romsize;
 	cpustate->feature_mask = feature_mask;
 
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->data = &device->space(AS_DATA);
+	cpustate->io = &device->space(AS_IO);
 
 	/* set up the state table */
 	{

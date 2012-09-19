@@ -231,7 +231,7 @@ void dsp32c_device::static_set_config(device_t &device, const dsp32_config &conf
 void dsp32c_device::device_start()
 {
 	// get our address spaces
-	m_program = space(AS_PROGRAM);
+	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 
 	// register our state for the debugger

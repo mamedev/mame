@@ -1325,7 +1325,7 @@ DRIVER_INIT_MEMBER(taitojc_state,taitojc)
 
 	m_has_dsp_hack = 1;
 
-	machine().device("dsp")->memory().space(AS_DATA)->install_readwrite_handler(0x7ff0, 0x7ff0, read16_delegate(FUNC(taitojc_state::taitojc_dsp_idle_skip_r),this), write16_delegate(FUNC(taitojc_state::dsp_idle_skip_w),this));
+	machine().device("dsp")->memory().space(AS_DATA).install_readwrite_handler(0x7ff0, 0x7ff0, read16_delegate(FUNC(taitojc_state::taitojc_dsp_idle_skip_r),this), write16_delegate(FUNC(taitojc_state::dsp_idle_skip_w),this));
 }
 
 DRIVER_INIT_MEMBER(taitojc_state,dendego2)
@@ -1333,7 +1333,7 @@ DRIVER_INIT_MEMBER(taitojc_state,dendego2)
 
 	DRIVER_INIT_CALL(taitojc);
 
-	machine().device("dsp")->memory().space(AS_DATA)->install_readwrite_handler(0x7ff0, 0x7ff0, read16_delegate(FUNC(taitojc_state::dendego2_dsp_idle_skip_r),this), write16_delegate(FUNC(taitojc_state::dsp_idle_skip_w),this));
+	machine().device("dsp")->memory().space(AS_DATA).install_readwrite_handler(0x7ff0, 0x7ff0, read16_delegate(FUNC(taitojc_state::dendego2_dsp_idle_skip_r),this), write16_delegate(FUNC(taitojc_state::dsp_idle_skip_w),this));
 }
 
 DRIVER_INIT_MEMBER(taitojc_state,dangcurv)

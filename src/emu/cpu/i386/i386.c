@@ -2882,9 +2882,9 @@ static CPU_INIT( i386 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	device->save_item(NAME(	cpustate->reg.d));
 	device->save_item(NAME(cpustate->sreg[ES].selector));
@@ -3006,9 +3006,9 @@ static CPU_RESET( i386 )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;
@@ -3497,9 +3497,9 @@ static CPU_RESET( i486 )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;
@@ -3604,9 +3604,9 @@ static CPU_RESET( pentium )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;
@@ -3727,9 +3727,9 @@ static CPU_RESET( mediagx )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;
@@ -3842,9 +3842,9 @@ static CPU_RESET( pentium_pro )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;
@@ -3938,9 +3938,9 @@ static CPU_RESET( pentium_mmx )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;
@@ -4034,9 +4034,9 @@ static CPU_RESET( pentium2 )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;
@@ -4130,9 +4130,9 @@ static CPU_RESET( pentium3 )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;
@@ -4226,9 +4226,9 @@ static CPU_RESET( pentium4 )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;

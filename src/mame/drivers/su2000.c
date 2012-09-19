@@ -260,7 +260,7 @@ static IRQ_CALLBACK( pc_irq_callback )
 
 void su2000_state::machine_start()
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	m_pit8254 = machine().device("pit8254");
 	m_pic8259_1 = machine().device("pic8259_1");
@@ -287,7 +287,7 @@ void su2000_state::machine_start()
 	kbdc8042_init(machine(), &at8042);
 
 	pc_vga_init(machine(), vga_setting, NULL);
-	pc_vga_io_init(machine(), *machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, *machine().device("maincpu")->memory().space(AS_IO), 0x0000);
+	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 void su2000_state::machine_reset()

@@ -339,7 +339,7 @@ GFXDECODE_END
 
 void crbaloon_state::machine_reset()
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_IO);
+	address_space &space = machine().device("maincpu")->memory().space(AS_IO);
 	device_t *discrete = machine().device("discrete");
 
 	pc3092_reset();

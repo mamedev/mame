@@ -44,7 +44,7 @@ static void CX4_op00_00(running_machine &machine)
 	offset = (cx4.ram[0x626] & 3) * 2;
 	srcptr = 0x220;
 
-	address_space &space = *machine.device<cpu_device>("maincpu")->space(AS_PROGRAM);
+	address_space &space = machine.device<cpu_device>("maincpu")->space(AS_PROGRAM);
 	for(i = cx4.ram[0x620]; i > 0 && sprcount > 0; i--, srcptr += 16)
 	{
 		UINT32 spraddr = CX4_readl(srcptr + 7);

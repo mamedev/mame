@@ -2868,10 +2868,10 @@ static CPU_RESET( common_sh4_reset )
 	sh4->ftcsr_read_callback = f;
 	sh4->irq_callback = save_irqcallback;
 	sh4->device = device;
-	sh4->internal = device->space(AS_PROGRAM);
-	sh4->program = device->space(AS_PROGRAM);
+	sh4->internal = &device->space(AS_PROGRAM);
+	sh4->program = &device->space(AS_PROGRAM);
 	sh4->direct = &sh4->program->direct();
-	sh4->io = device->space(AS_IO);
+	sh4->io = &device->space(AS_IO);
 
 	sh4->dma_timer[0] = tsaved[0];
 	sh4->dma_timer[1] = tsaved[1];
@@ -3216,9 +3216,9 @@ static CPU_INIT( sh4 )
 
 	sh4->irq_callback = irqcallback;
 	sh4->device = device;
-	sh4->internal = device->space(AS_PROGRAM);
-	sh4->program = device->space(AS_PROGRAM);
-	sh4->io = device->space(AS_IO);
+	sh4->internal = &device->space(AS_PROGRAM);
+	sh4->program = &device->space(AS_PROGRAM);
+	sh4->io = &device->space(AS_IO);
 	sh4_default_exception_priorities(sh4);
 	sh4->irln = 15;
 	sh4->test_irq = 0;

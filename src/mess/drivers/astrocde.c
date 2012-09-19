@@ -100,8 +100,13 @@ ADDRESS_MAP_END
 INPUT_CHANGED_MEMBER(astrocde_mess_state::set_write_protect)  // run when RAM expansion write protect switch is changed
 {
 	int ram_expansion_installed = 0, write_protect_on = 0, expansion_ram_start = 0, expansion_ram_end = 0, shadow_ram_end = 0;
+<<<<<<< .mine
+	address_space &space = field.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *expram = field.machine().device<ram_device>("ram_tag")->pointer();
+=======
 	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *expram = machine().device<ram_device>("ram_tag")->pointer();
+>>>>>>> .r18023
 
 	get_ram_expansion_settings(ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference
 
@@ -320,8 +325,13 @@ DRIVER_INIT_MEMBER(astrocde_state,astrocde)
 MACHINE_RESET_MEMBER(astrocde_mess_state, astrocde)
 {
     int ram_expansion_installed = 0, write_protect_on = 0, expansion_ram_start = 0, expansion_ram_end = 0, shadow_ram_end = 0;
+<<<<<<< .mine
+    address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    UINT8 *expram = machine.device<ram_device>("ram_tag")->pointer();
+=======
     address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
     UINT8 *expram = machine().device<ram_device>("ram_tag")->pointer();
+>>>>>>> .r18023
     space.unmap_readwrite(0x5000, 0xffff);  // unmap any previously installed expansion RAM
 
     get_ram_expansion_settings(ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference

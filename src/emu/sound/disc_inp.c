@@ -23,14 +23,14 @@
 READ8_DEVICE_HANDLER(discrete_sound_r)
 {
 	discrete_device *disc_device = downcast<discrete_device *>(device);
-	return	disc_device->read( *disc_device->machine().firstcpu->space(), offset, 0xff);
+	return	disc_device->read( disc_device->machine().firstcpu->space(), offset, 0xff);
 }
 
 
 WRITE8_DEVICE_HANDLER(discrete_sound_w)
 {
 	discrete_device *disc_device = downcast<discrete_device *>(device);
-	disc_device->write(*disc_device->machine().firstcpu->space(), offset, data, 0xff);
+	disc_device->write(disc_device->machine().firstcpu->space(), offset, data, 0xff);
 }
 
 /************************************************************************

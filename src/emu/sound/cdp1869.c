@@ -87,7 +87,7 @@ inline bool cdp1869_device::is_ntsc()
 
 inline UINT8 cdp1869_device::read_page_ram_byte(offs_t pma)
 {
-	return space()->read_byte(pma);
+	return space().read_byte(pma);
 }
 
 
@@ -98,7 +98,7 @@ inline UINT8 cdp1869_device::read_page_ram_byte(offs_t pma)
 
 inline void cdp1869_device::write_page_ram_byte(offs_t pma, UINT8 data)
 {
-	space()->write_byte(pma, data);
+	space().write_byte(pma, data);
 }
 
 

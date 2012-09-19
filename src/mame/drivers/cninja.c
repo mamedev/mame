@@ -2083,13 +2083,13 @@ static void cninja_patch( running_machine &machine )
 
 DRIVER_INIT_MEMBER(cninja_state,cninja)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1bc0a8, 0x1bc0a9, write16_delegate(FUNC(cninja_state::cninja_sound_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x1bc0a8, 0x1bc0a9, write16_delegate(FUNC(cninja_state::cninja_sound_w),this));
 	cninja_patch(machine());
 }
 
 DRIVER_INIT_MEMBER(cninja_state,stoneage)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1bc0a8, 0x1bc0a9, write16_delegate(FUNC(cninja_state::stoneage_sound_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x1bc0a8, 0x1bc0a9, write16_delegate(FUNC(cninja_state::stoneage_sound_w),this));
 }
 
 DRIVER_INIT_MEMBER(cninja_state,mutantf)

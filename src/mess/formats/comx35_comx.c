@@ -47,7 +47,7 @@ static void image_fread_memory(device_image_interface &image, UINT16 addr, UINT3
 
 QUICKLOAD_LOAD( comx35_comx )
 {
-	address_space *program = image.device().machine().firstcpu->space(AS_PROGRAM);
+	address_space &program = image.device().machine().firstcpu->space(AS_PROGRAM);
 
 	UINT8 header[16] = {0};
 	int size = image.length();
@@ -172,16 +172,16 @@ QUICKLOAD_LOAD( comx35_comx )
 			image.fread(header, 2);
 
 			array_length = pick_integer_be(header, 0, 2);
-			start_array = (program->read_byte(0x4295) << 8) | program->read_byte(0x4296);
+			start_array = (program.read_byte(0x4295) << 8) | program.read_byte(0x4296);
 			end_array = start_array + (size - 7);
 
-			program->write_byte(0x4299, end_array >> 8);
-			program->write_byte(0x429a, end_array & 0xff);
+			program.write_byte(0x4299, end_array >> 8);
+			program.write_byte(0x429a, end_array & 0xff);
 
 			start_string = start_array + array_length;
 
-			program->write_byte(0x4292, start_string >> 8);
-			program->write_byte(0x4293, start_string & 0xff);
+			program.write_byte(0x4292, start_string >> 8);
+			program.write_byte(0x4293, start_string & 0xff);
 
 			image_fread_memory(image, start_array, size);
 		}

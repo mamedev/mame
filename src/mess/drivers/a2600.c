@@ -783,7 +783,7 @@ DIRECT_UPDATE_MEMBER(a2600_state::modeF6_opbase)
 {
 	if ( ( address & 0x1FFF ) >= 0x1FF6 && ( address & 0x1FFF ) <= 0x1FF9 )
 	{
-		modeF6_switch_w(*machine().device("maincpu")->memory().space(AS_PROGRAM), ( address & 0x1FFF ) - 0x1FF6, 0 );
+		modeF6_switch_w(machine().device("maincpu")->memory().space(AS_PROGRAM), ( address & 0x1FFF ) - 0x1FF6, 0 );
 	}
 	return address;
 }
@@ -1129,7 +1129,7 @@ DIRECT_UPDATE_MEMBER(a2600_state::modeFE_opbase_handler)
 		m_bank_base[1] = memregion("user1")->base() + 0x1000 * ( ( address & 0x2000 ) ? 0 : 1 );
 		membank("bank1")->set_base(m_bank_base[1] );
 		/* and restore old opbase handler */
-		machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(m_FE_old_opbase_handler);
+		machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(m_FE_old_opbase_handler);
 	}
 	else
 	{
@@ -1142,7 +1142,7 @@ DIRECT_UPDATE_MEMBER(a2600_state::modeFE_opbase_handler)
 static void modeFE_switch(running_machine &machine,UINT16 offset, UINT8 data)
 {
 	a2600_state *state = machine.driver_data<a2600_state>();
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	/* Retrieve last byte read by the cpu (for this mapping scheme this
        should be the last byte that was on the data bus
     */
@@ -1290,7 +1290,7 @@ static void install_banks(running_machine &machine, int count, unsigned init)
 			"bank4",
 		};
 
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(
+		machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(
 			0x1000 + (i + 0) * 0x1000 / count - 0,
 			0x1000 + (i + 1) * 0x1000 / count - 1, handler[i]);
 
@@ -1732,7 +1732,7 @@ static void set_controller( running_machine &machine, const char *controller, un
 
 void a2600_state::machine_reset()
 {
-	address_space& space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int chip = 0xFF;
 	static const unsigned char snowwhite[] = { 0x10, 0xd0, 0xff, 0xff }; // Snow White Proto
 

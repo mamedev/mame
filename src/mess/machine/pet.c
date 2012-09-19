@@ -656,12 +656,12 @@ static void pet_common_driver_init( running_machine &machine )
 	state->m_superpet = 0;
 	state->m_cbm8096 = 0;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, machine.device<ram_device>(RAM_TAG)->size() - 1, "bank10");
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_bank(0x0000, machine.device<ram_device>(RAM_TAG)->size() - 1, "bank10");
 	state->membank("bank10")->set_base(state->m_memory);
 
 	if (machine.device<ram_device>(RAM_TAG)->size() < 0x8000)
 	{
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(machine.device<ram_device>(RAM_TAG)->size(), 0x7FFF);
+		machine.device("maincpu")->memory().space(AS_PROGRAM).nop_readwrite(machine.device<ram_device>(RAM_TAG)->size(), 0x7FFF);
 	}
 
 	/* 2114 poweron ? 64 x 0xff, 64x 0, and so on */
@@ -743,13 +743,13 @@ void pet_state::machine_reset()
 	{
 		if (machine().root_device().ioport("CFG")->read() & 0x08)
 		{
-			machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfff0, 0xfff0, FUNC(cbm8096_w));
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xfff0, 0xfff0, FUNC(cbm8096_w));
 		}
 		else
 		{
-			machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xfff0, 0xfff0);
+			machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0xfff0, 0xfff0);
 		}
-		cbm8096_w(*machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
+		cbm8096_w(machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
 	}
 
 //removed   cbm_drive_0_config (machine().root_device().ioport("CFG")->read() & 2 ? IEEE : 0, 8);

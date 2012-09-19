@@ -224,7 +224,7 @@ const char *running_machine::describe_context()
 	{
 		cpu_device *cpu = downcast<cpu_device *>(&executing->device());
 		if (cpu != NULL)
-			m_context.printf("'%s' (%s)", cpu->tag(), core_i64_format(cpu->pc(), cpu->space(AS_PROGRAM)->logaddrchars(), cpu->is_octal()));
+			m_context.printf("'%s' (%s)", cpu->tag(), core_i64_format(cpu->pc(), cpu->space(AS_PROGRAM).logaddrchars(), cpu->is_octal()));
 	}
 	else
 		m_context.cpy("(no context)");

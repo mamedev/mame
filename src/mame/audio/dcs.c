@@ -944,8 +944,8 @@ void dcs_init(running_machine &machine)
 
 	/* find the DCS CPU and the sound ROMs */
 	dcs.cpu = machine.device<adsp21xx_device>("dcs");
-	dcs.program = dcs.cpu->space(AS_PROGRAM);
-	dcs.data = dcs.cpu->space(AS_DATA);
+	dcs.program = &dcs.cpu->space(AS_PROGRAM);
+	dcs.data = &dcs.cpu->space(AS_DATA);
 	dcs.rev = 1;
 	dcs.channels = 1;
 	dcs.dmadac[0] = machine.device<dmadac_sound_device>("dac");
@@ -997,8 +997,8 @@ void dcs2_init(running_machine &machine, int dram_in_mb, offs_t polling_offset)
 		dcs.rev = 4;
 		soundbank_words = 0x800;
 	}
-	dcs.program = dcs.cpu->space(AS_PROGRAM);
-	dcs.data = dcs.cpu->space(AS_DATA);
+	dcs.program = &dcs.cpu->space(AS_PROGRAM);
+	dcs.data = &dcs.cpu->space(AS_DATA);
 	dcs.channels = 2;
 	dcs.dmadac[0] = machine.device<dmadac_sound_device>("dac1");
 	dcs.dmadac[1] = machine.device<dmadac_sound_device>("dac2");
@@ -1036,7 +1036,7 @@ void dcs2_init(running_machine &machine, int dram_in_mb, offs_t polling_offset)
 	/* install the speedup handler */
 	dcs.polling_offset = polling_offset;
 	if (polling_offset)
-		dcs.polling_base = dcs.cpu->space(AS_DATA)->install_legacy_readwrite_handler(dcs.polling_offset, dcs.polling_offset, FUNC(dcs_polling_r), FUNC(dcs_polling_w));
+		dcs.polling_base = dcs.cpu->space(AS_DATA).install_legacy_readwrite_handler(dcs.polling_offset, dcs.polling_offset, FUNC(dcs_polling_r), FUNC(dcs_polling_w));
 
 	/* allocate a watchdog timer for HLE transfers */
 	dcs.transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && dram_in_mb != 0);
@@ -1175,7 +1175,7 @@ static void sdrc_remap_memory(running_machine &machine)
 
 	/* reinstall the polling hotspot */
 	if (dcs.polling_offset)
-		dcs.polling_base = dcs.cpu->space(AS_DATA)->install_legacy_readwrite_handler(dcs.polling_offset, dcs.polling_offset, FUNC(dcs_polling_r), FUNC(dcs_polling_w));
+		dcs.polling_base = dcs.cpu->space(AS_DATA).install_legacy_readwrite_handler(dcs.polling_offset, dcs.polling_offset, FUNC(dcs_polling_r), FUNC(dcs_polling_w));
 }
 
 
@@ -2137,7 +2137,7 @@ static TIMER_CALLBACK( s1_ack_callback2 )
 		machine.scheduler().timer_set(attotime::from_usec(1), FUNC(s1_ack_callback2), param);
 		return;
 	}
-	output_latch_w(*dcs.cpu->space(AS_PROGRAM), 0, 0x000a, 0xffff);
+	output_latch_w(dcs.cpu->space(AS_PROGRAM), 0, 0x000a, 0xffff);
 }
 
 
@@ -2149,7 +2149,7 @@ static TIMER_CALLBACK( s1_ack_callback1 )
 		machine.scheduler().timer_set(attotime::from_usec(1), FUNC(s1_ack_callback1), param);
 		return;
 	}
-	output_latch_w(*dcs.cpu->space(AS_PROGRAM), 0, param, 0xffff);
+	output_latch_w(dcs.cpu->space(AS_PROGRAM), 0, param, 0xffff);
 
 	/* chain to the next word we need to write back */
 	machine.scheduler().timer_set(attotime::from_usec(1), FUNC(s1_ack_callback2));
@@ -2281,7 +2281,7 @@ static int preprocess_stage_1(running_machine &machine, UINT16 data)
 
 static TIMER_CALLBACK( s2_ack_callback )
 {
-	address_space &space = *dcs.cpu->space(AS_PROGRAM);
+	address_space &space = dcs.cpu->space(AS_PROGRAM);
 
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())

@@ -465,7 +465,7 @@ static void c64_bankswitch( running_machine &machine, int reset )
 			state->membank("bank1")->set_base(state->m_roml);
 			state->membank("bank3")->set_base(state->m_memory + 0xa000);
 			state->membank("bank4")->set_base(state->m_romh);
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xe000, 0xffff);
+			machine.device("maincpu")->memory().space(AS_PROGRAM).nop_write(0xe000, 0xffff);
 	}
 	else
 	{
@@ -589,8 +589,8 @@ WRITE8_DEVICE_HANDLER(c64_m6510_port_write)
 	if (!state->m_ultimax)
 		c64_bankswitch(device->machine(), 0);
 
-	state->m_memory[0x000] = device->memory().space(AS_PROGRAM)->read_byte(0);
-	state->m_memory[0x001] = device->memory().space(AS_PROGRAM)->read_byte(1);
+	state->m_memory[0x000] = device->memory().space(AS_PROGRAM).read_byte(0);
+	state->m_memory[0x001] = device->memory().space(AS_PROGRAM).read_byte(1);
 
 }
 
@@ -1260,13 +1260,13 @@ static int c64_crt_load( device_image_interface &image )
 ***************************************************************************/
 
 #define install_write_handler(_start, _end, _handler) \
-	image.device().machine().firstcpu->space(AS_PROGRAM)->install_legacy_write_handler(_start, _end, FUNC(_handler));
+	image.device().machine().firstcpu->space(AS_PROGRAM).install_legacy_write_handler(_start, _end, FUNC(_handler));
 
 #define install_io1_handler(_handler) \
-	image.device().machine().firstcpu->space(AS_PROGRAM)->install_legacy_write_handler(0xde00, 0xde00, 0, 0xff, FUNC(_handler));
+	image.device().machine().firstcpu->space(AS_PROGRAM).install_legacy_write_handler(0xde00, 0xde00, 0, 0xff, FUNC(_handler));
 
 #define install_io2_handler(_handler) \
-	image.device().machine().firstcpu->space(AS_PROGRAM)->install_legacy_write_handler(0xdf00, 0xdf00, 0, 0xff, FUNC(_handler));
+	image.device().machine().firstcpu->space(AS_PROGRAM).install_legacy_write_handler(0xdf00, 0xdf00, 0, 0xff, FUNC(_handler));
 
 #define allocate_cartridge_timer(_period, _func) \
 	legacy_c64_state *state = image.device().machine().driver_data<legacy_c64_state>(); \
@@ -1577,7 +1577,7 @@ static void load_super_explode_cartridge(device_image_interface &image)
 
 	map_cartridge_roml(image.device().machine(), 0x0000);
 
-	address_space &space = *image.device().machine().firstcpu->space(AS_PROGRAM);
+	address_space &space = image.device().machine().firstcpu->space(AS_PROGRAM);
 	space.install_legacy_read_handler(0xdf00, 0xdfff, FUNC(super_explode_r));
 
 	install_io2_handler(super_explode_bank_w);
@@ -1959,7 +1959,7 @@ static WRITE8_HANDLER( comal80_bank_w )
 static void setup_c64_custom_mappers(running_machine &machine)
 {
 	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
-	address_space &space = *machine.device( "maincpu")->memory().space( AS_PROGRAM );
+	address_space &space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 
 	switch (state->m_cart.mapper)
 	{

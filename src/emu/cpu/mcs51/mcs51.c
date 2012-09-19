@@ -2075,10 +2075,10 @@ static CPU_INIT( mcs51 )
 	mcs51_state->irq_callback = irqcallback;
 	mcs51_state->device = device;
 
-	mcs51_state->program = device->space(AS_PROGRAM);
+	mcs51_state->program = &device->space(AS_PROGRAM);
 	mcs51_state->direct = &mcs51_state->program->direct();
-	mcs51_state->data = device->space(AS_DATA);
-	mcs51_state->io = device->space(AS_IO);
+	mcs51_state->data = &device->space(AS_DATA);
+	mcs51_state->io = &device->space(AS_IO);
 
 	mcs51_state->features = FEATURE_NONE;
 	mcs51_state->ram_mask = 0x7F;			/* 128 bytes of ram */

@@ -59,7 +59,7 @@ void apple2_setup_memory(running_machine &machine, const apple2_memmap_config *c
 void apple2_update_memory(running_machine &machine)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i, bank;
 	char rbank[10], wbank[10];
 	int full_update = 0;

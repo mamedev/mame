@@ -143,40 +143,40 @@ static TIMER_DEVICE_CALLBACK( xerox820_keyboard_tick )
 
 void xerox820_state::bankswitch(int bank)
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 
 	if (bank)
 	{
 		/* ROM */
-		program->install_rom(0x0000, 0x0fff, memregion("monitor")->base());
-		program->unmap_readwrite(0x1000, 0x1fff);
-		program->install_ram(0x3000, 0x3fff, m_video_ram);
+		program.install_rom(0x0000, 0x0fff, memregion("monitor")->base());
+		program.unmap_readwrite(0x1000, 0x1fff);
+		program.install_ram(0x3000, 0x3fff, m_video_ram);
 	}
 	else
 	{
 		/* RAM */
-		program->install_ram(0x0000, 0x3fff, ram);
+		program.install_ram(0x0000, 0x3fff, ram);
 	}
 }
 
 void xerox820ii_state::bankswitch(int bank)
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 
 	if (bank)
 	{
 		/* ROM */
-		program->install_rom(0x0000, 0x17ff, memregion("monitor")->base());
-		program->unmap_readwrite(0x1800, 0x2fff);
-		program->install_ram(0x3000, 0x3fff, m_video_ram);
-		program->unmap_readwrite(0x4000, 0xbfff);
+		program.install_rom(0x0000, 0x17ff, memregion("monitor")->base());
+		program.unmap_readwrite(0x1800, 0x2fff);
+		program.install_ram(0x3000, 0x3fff, m_video_ram);
+		program.unmap_readwrite(0x4000, 0xbfff);
 	}
 	else
 	{
 		/* RAM */
-		program->install_ram(0x0000, 0xbfff, ram);
+		program.install_ram(0x0000, 0xbfff, ram);
 	}
 }
 

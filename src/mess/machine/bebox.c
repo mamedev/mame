@@ -201,7 +201,7 @@ READ64_HANDLER( bebox_crossproc_interrupts_r )
 	result = state->m_crossproc_interrupts;
 
 	/* return a different result depending on which CPU is accessing this handler */
-	if (&space != space.machine().device("ppc1")->memory().space(AS_PROGRAM))
+	if (&space != &space.machine().device("ppc1")->memory().space(AS_PROGRAM))
 		result |= 0x02000000;
 	else
 		result &= ~0x02000000;
@@ -955,7 +955,7 @@ void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, i
 					/* brutal ugly hack; at some point the PCI code should be handling this stuff */
 					if (state->m_scsi53c810_data[5] != 0xFFFFFFF0)
 					{
-						address_space &space = *device->machine().device("ppc1")->memory().space(AS_PROGRAM);
+						address_space &space = device->machine().device("ppc1")->memory().space(AS_PROGRAM);
 
 						addr = (state->m_scsi53c810_data[5] | 0xC0000000) & ~0xFF;
 						space.install_legacy_read_handler(addr, addr + 0xFF, FUNC(scsi53c810_r));
@@ -995,7 +995,7 @@ void bebox_state::machine_reset()
 	machine().device("ppc1")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	machine().device("ppc2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	memcpy(machine().device<fujitsu_29f016a_device>("flash")->space()->get_read_ptr(0),memregion("user1")->base(),0x200000);
+	memcpy(machine().device<fujitsu_29f016a_device>("flash")->space().get_read_ptr(0),memregion("user1")->base(),0x200000);
 }
 
 void bebox_state::machine_start()
@@ -1005,8 +1005,8 @@ void bebox_state::machine_start()
 
 DRIVER_INIT_MEMBER(bebox_state,bebox)
 {
-	address_space *space_0 = machine().device("ppc1")->memory().space(AS_PROGRAM);
-	address_space *space_1 = machine().device("ppc2")->memory().space(AS_PROGRAM);
+	address_space &space_0 = machine().device("ppc1")->memory().space(AS_PROGRAM);
+	address_space &space_1 = machine().device("ppc2")->memory().space(AS_PROGRAM);
 	offs_t vram_begin;
 	offs_t vram_end;
 
@@ -1014,8 +1014,8 @@ DRIVER_INIT_MEMBER(bebox_state,bebox)
 	membank("bank2")->set_base(machine().root_device().memregion("user2")->base());
 
 	/* install MESS managed RAM */
-	space_0->install_readwrite_bank(0, machine().device<ram_device>(RAM_TAG)->size() - 1, 0, 0x02000000, "bank3");
-	space_1->install_readwrite_bank(0, machine().device<ram_device>(RAM_TAG)->size() - 1, 0, 0x02000000, "bank3");
+	space_0.install_readwrite_bank(0, machine().device<ram_device>(RAM_TAG)->size() - 1, 0, 0x02000000, "bank3");
+	space_1.install_readwrite_bank(0, machine().device<ram_device>(RAM_TAG)->size() - 1, 0, 0x02000000, "bank3");
 	membank("bank3")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 
 	kbdc8042_init(machine(), &bebox_8042_interface);
@@ -1023,8 +1023,8 @@ DRIVER_INIT_MEMBER(bebox_state,bebox)
 	/* install VGA memory */
 	vram_begin = 0xC1000000;
 	vram_end = vram_begin + pc_vga_memory_size() - 1;
-	space_0->install_legacy_readwrite_handler(vram_begin, vram_end, FUNC(bebox_video_r), FUNC(bebox_video_w));
-	space_1->install_legacy_readwrite_handler(vram_begin, vram_end, FUNC(bebox_video_r), FUNC(bebox_video_w));
+	space_0.install_legacy_readwrite_handler(vram_begin, vram_end, FUNC(bebox_video_r), FUNC(bebox_video_w));
+	space_1.install_legacy_readwrite_handler(vram_begin, vram_end, FUNC(bebox_video_r), FUNC(bebox_video_w));
 
 	/* The following is a verrrry ugly hack put in to support NetBSD for
      * NetBSD.  When NetBSD/bebox it does most of its work on CPU #0 and then
@@ -1044,7 +1044,7 @@ DRIVER_INIT_MEMBER(bebox_state,bebox)
 			/* bcctr 0x14, 0 */
 			U64(0x4E80042000000000)
 		};
-		space_1->install_read_bank(0x9421FFF0, 0x9421FFFF, "bank1");
+		space_1.install_read_bank(0x9421FFF0, 0x9421FFFF, "bank1");
 		membank("bank1")->set_base(ops);
 	}
 }

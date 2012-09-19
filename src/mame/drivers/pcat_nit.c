@@ -427,7 +427,7 @@ DRIVER_INIT_MEMBER(pcat_nit_state,pcat_nit)
 	machine().device<nvram_device>("nvram")->set_base(m_banked_nvram, 0x2000);
 
 	pc_vga_init(machine(), vga_setting, NULL);
-	pc_vga_io_init(machine(), *machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, *machine().device("maincpu")->memory().space(AS_IO), 0x0000);
+	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 GAME( 1993, bonanza,    0,		   pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Bonanza (Revision 3)", GAME_NOT_WORKING|GAME_NO_SOUND )

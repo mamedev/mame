@@ -133,7 +133,7 @@ READ16_MEMBER(metro_state::metro_irq_cause_r)
 static void update_irq_state( running_machine &machine )
 {
 	metro_state *state = machine.driver_data<metro_state>();
-	address_space &space = *state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 
 	/*  Get the pending IRQs (only the enabled ones, e.g. where irq_enable is *0*)  */
 	UINT16 irq = state->metro_irq_cause_r(space, 0, 0xffff) & ~*state->m_irq_enable;
@@ -262,7 +262,7 @@ static void ymf278b_interrupt( device_t *device, int active )
 static int metro_io_callback( device_t *device, int ioline, int state )
 {
 	metro_state *driver_state = device->machine().driver_data<metro_state>();
-	address_space &space = *driver_state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = driver_state->m_maincpu->space(AS_PROGRAM);
 	UINT8 data = 0;
 
 	switch (ioline)
@@ -5941,7 +5941,7 @@ static void metro_common( running_machine &machine )
 
 DRIVER_INIT_MEMBER(metro_state,metro)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	metro_common(machine());
 
@@ -5968,7 +5968,7 @@ DRIVER_INIT_MEMBER(metro_state,karatour)
 
 DRIVER_INIT_MEMBER(metro_state,daitorid)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	metro_common(machine());
 

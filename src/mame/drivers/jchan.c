@@ -722,8 +722,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER( jchan_state, jchan )
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x403ffe, 0x403fff, write16_delegate(FUNC(jchan_state::main2sub_cmd_w),this));
-	machine().device("sub")->memory().space(AS_PROGRAM)->install_write_handler(0x400000, 0x400001, write16_delegate(FUNC(jchan_state::sub2main_cmd_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x403ffe, 0x403fff, write16_delegate(FUNC(jchan_state::main2sub_cmd_w),this));
+	machine().device("sub")->memory().space(AS_PROGRAM).install_write_handler(0x400000, 0x400001, write16_delegate(FUNC(jchan_state::sub2main_cmd_w),this));
 }
 
 

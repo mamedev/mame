@@ -984,8 +984,12 @@ inline device_t *device_t::siblingdevice(const char *tag) const
 	// leading caret implies the owner, just skip it
 	if (tag[0] == '^') tag++;
 
-	// query relative to the parent
-	return (m_owner != NULL) ? m_owner->subdevice(tag) : NULL;
+	// query relative to the parent, if we have one
+	if (m_owner != NULL)
+		return m_owner->subdevice(tag);
+	
+	// otherwise, it's NULL unless the tag is absolute
+	return (tag[0] == ':') ? subdevice(tag) : NULL;
 }
 
 

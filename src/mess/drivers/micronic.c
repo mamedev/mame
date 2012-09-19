@@ -164,12 +164,12 @@ WRITE8_MEMBER( micronic_state::bank_select_w )
 	if (data < 2)
 	{
 		membank("bank1")->set_entry(data);
-		m_maincpu->space(AS_PROGRAM)->unmap_write(0x0000, 0x7fff);
+		m_maincpu->space(AS_PROGRAM).unmap_write(0x0000, 0x7fff);
 	}
 	else
 	{
 		membank("bank1")->set_entry((data <= m_banks_num) ? data : m_banks_num);
-		m_maincpu->space(AS_PROGRAM)->install_write_bank(0x0000, 0x7fff, "bank1");
+		m_maincpu->space(AS_PROGRAM).install_write_bank(0x0000, 0x7fff, "bank1");
 	}
 }
 
@@ -342,7 +342,7 @@ void micronic_state::machine_start()
 void micronic_state::machine_reset()
 {
 	membank("bank1")->set_entry(0);
-	m_maincpu->space(AS_PROGRAM)->unmap_write(0x0000, 0x7fff);
+	m_maincpu->space(AS_PROGRAM).unmap_write(0x0000, 0x7fff);
 }
 
 

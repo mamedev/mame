@@ -148,7 +148,7 @@ const address_space_config *m50458_device::memory_space_config(address_spacenum 
 
 inline UINT16 m50458_device::read_word(offs_t address)
 {
-	return space()->read_word(address << 1);
+	return space().read_word(address << 1);
 }
 
 //-------------------------------------------------
@@ -157,7 +157,7 @@ inline UINT16 m50458_device::read_word(offs_t address)
 
 inline void m50458_device::write_word(offs_t address, UINT16 data)
 {
-	space()->write_word(address << 1, data);
+	space().write_word(address << 1, data);
 }
 
 

@@ -411,7 +411,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(cosmic_state::panic_coin_inserted)
 {
-	panic_sound_output_w(*machine().device("maincpu")->memory().space(AS_PROGRAM), 17, newval == 0);
+	panic_sound_output_w(machine().device("maincpu")->memory().space(AS_PROGRAM), 17, newval == 0);
 }
 
 static INPUT_PORTS_START( panic )
@@ -1538,17 +1538,17 @@ DRIVER_INIT_MEMBER(cosmic_state,cosmica)
 
 DRIVER_INIT_MEMBER(cosmic_state,devzone)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x4807, 0x4807,write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x4807, 0x4807,write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),this));
 }
 
 
 DRIVER_INIT_MEMBER(cosmic_state,nomnlnd)
 {
 	dac_device *dac = machine().device<dac_device>("dac");
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x5000, 0x5001, read8_delegate(FUNC(cosmic_state::nomnlnd_port_0_1_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x4800, 0x4800);
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x4807, 0x4807, write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x480a, 0x480a, write8_delegate(FUNC(dac_device::write_unsigned8),dac));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x5000, 0x5001, read8_delegate(FUNC(cosmic_state::nomnlnd_port_0_1_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x4800, 0x4800);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x4807, 0x4807, write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x480a, 0x480a, write8_delegate(FUNC(dac_device::write_unsigned8),dac));
 }
 
 DRIVER_INIT_MEMBER(cosmic_state,panic)

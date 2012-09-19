@@ -49,10 +49,10 @@ void tandy2k_state::speaker_update()
 
 READ8_MEMBER( tandy2k_state::videoram_r )
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	offs_t addr = (m_vram_base << 15) | (offset << 1);
-	UINT16 data = program->read_word(addr);
+	UINT16 data = program.read_word(addr);
 
 	// character
 	m_drb0->write(space, 0, data & 0xff);
@@ -319,12 +319,12 @@ UINT32 tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 static CRT9007_DRAW_SCANLINE( tandy2k_crt9007_display_pixels )
 {
     tandy2k_state *state = device->machine().driver_data<tandy2k_state>();
-    address_space *program = state->m_maincpu->space(AS_PROGRAM);
+    address_space &program = state->m_maincpu->space(AS_PROGRAM);
 
     for (int sx = 0; sx < x_count; sx++)
     {
         UINT32 videoram_addr = ((state->m_vram_base << 15) | (va << 1)) + sx;
-        UINT8 videoram_data = program->read_word(videoram_addr);
+        UINT8 videoram_data = program.read_word(videoram_addr);
         UINT16 charram_addr = (videoram_data << 4) | sl;
         UINT8 charram_data = state->m_char_ram[charram_addr] & 0xff;
 
@@ -670,11 +670,11 @@ static TANDY2K_KEYBOARD_INTERFACE( kb_intf )
 void tandy2k_state::machine_start()
 {
 	// memory banking
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 	int ram_size = m_ram->size();
 
-	program->install_ram(0x00000, ram_size - 1, ram);
+	program.install_ram(0x00000, ram_size - 1, ram);
 
 	// patch out i186 relocation register check
 	UINT8 *rom = memregion(I80186_TAG)->base();

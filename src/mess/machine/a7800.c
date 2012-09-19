@@ -72,7 +72,7 @@ const riot6532_interface a7800_r6532_interface =
 static void a7800_driver_init(running_machine &machine, int ispal, int lines)
 {
 	a7800_state *state = machine.driver_data<a7800_state>();
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	state->m_ROM = state->memregion("maincpu")->base();
 	state->m_ispal = ispal;
 	state->m_lines = lines;
@@ -107,7 +107,7 @@ DRIVER_INIT_MEMBER(a7800_state,a7800_pal)
 void a7800_state::machine_reset()
 {
 	UINT8 *memory;
-	address_space& space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	m_ctrl_lock = 0;
 	m_ctrl_reg = 0;

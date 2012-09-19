@@ -98,7 +98,7 @@ READ8_MEMBER(pc_state::ec1841_memboard_r)
 WRITE8_MEMBER(pc_state::ec1841_memboard_w)
 {
 	pc_state *st = space.machine().driver_data<pc_state>();
-	address_space *program = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &program = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
 	running_machine &machine = space.machine();
 	UINT8 current;
 
@@ -114,25 +114,25 @@ WRITE8_MEMBER(pc_state::ec1841_memboard_w)
 
 	if (BIT(current, 2) && !BIT(data, 2)) {
 		// disable read access
-		program->unmap_read(0, 0x7ffff);
+		program.unmap_read(0, 0x7ffff);
 		DBG_LOG(1,"ec1841_memboard_w",("unmap_read(%d)\n", offset));
 	}
 
 	if (BIT(current, 3) && !BIT(data, 3)) {
 		// disable write access
-		program->unmap_write(0, 0x7ffff);
+		program.unmap_write(0, 0x7ffff);
 		DBG_LOG(1,"ec1841_memboard_w",("unmap_write(%d)\n", offset));
 	}
 
 	if (!BIT(current, 2) && BIT(data, 2)) {
 		// enable read access
-		program->install_read_bank(0, 0x7ffff, "bank10");
+		program.install_read_bank(0, 0x7ffff, "bank10");
 		DBG_LOG(1,"ec1841_memboard_w",("map_read(%d)\n", offset));
 	}
 
 	if (!BIT(current, 3) && BIT(data, 3)) {
 		// enable write access
-		program->install_write_bank(0, 0x7ffff, "bank10");
+		program.install_write_bank(0, 0x7ffff, "bank10");
 		DBG_LOG(1,"ec1841_memboard_w",("map_write(%d)\n", offset));
 	}
 
@@ -1409,10 +1409,10 @@ static READ8_HANDLER( input_port_0_r ) { return space.machine().root_device().io
 
 DRIVER_INIT_MEMBER(pc_state,pc1640)
 {
-	address_space *io_space = machine().firstcpu->space( AS_IO );
+	address_space &io_space = machine().firstcpu->space( AS_IO );
 
-	io_space->install_legacy_read_handler(0x278, 0x27b, FUNC(pc1640_port278_r), 0xffff);
-	io_space->install_legacy_read_handler(0x4278, 0x427b, FUNC(pc1640_port4278_r), 0xffff);
+	io_space.install_legacy_read_handler(0x278, 0x27b, FUNC(pc1640_port278_r), 0xffff);
+	io_space.install_legacy_read_handler(0x4278, 0x427b, FUNC(pc1640_port4278_r), 0xffff);
 
 	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
@@ -1422,7 +1422,7 @@ DRIVER_INIT_MEMBER(pc_state,pc_vga)
 	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 
 	pc_vga_init(machine(), ::input_port_0_r, NULL);
-	pc_vga_io_init(machine(), *machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, *machine().device("maincpu")->memory().space(AS_IO), 0x0000);
+	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 static IRQ_CALLBACK(pc_irq_callback)

@@ -261,7 +261,7 @@ void amiga_machine_config(running_machine &machine, const amiga_machine_interfac
 static void amiga_m68k_reset(device_t *device)
 {
 	amiga_state *state = device->machine().driver_data<amiga_state>();
-	address_space &space = *device->memory().space(AS_PROGRAM);
+	address_space &space = device->memory().space(AS_PROGRAM);
 
 	logerror("Executed RESET at PC=%06x\n", space.device().safe_pc());
 
@@ -318,7 +318,7 @@ static TIMER_CALLBACK( scanline_callback )
 	if (scanline == 0)
 	{
 		/* signal VBLANK IRQ */
-		amiga_custom_w(*machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_VERTB, 0xffff);
+		amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_VERTB, 0xffff);
 
 		/* clock the first CIA TOD */
 		mos6526_tod_w(cia_0, 1);
@@ -939,7 +939,7 @@ static TIMER_CALLBACK( amiga_blitter_proc )
 	CUSTOM_REG(REG_DMACON) &= ~0x4000;
 
 	/* signal an interrupt */
-	amiga_custom_w(*machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_BLIT, 0xffff);
+	amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_BLIT, 0xffff);
 
 	/* reset the blitter timer */
 	state->m_blitter_timer->reset( );
@@ -1094,13 +1094,13 @@ WRITE16_HANDLER( amiga_cia_w )
 
 void amiga_cia_0_irq(device_t *device, int state)
 {
-	amiga_custom_w(*device->machine().device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
+	amiga_custom_w(device->machine().device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
 }
 
 
 void amiga_cia_1_irq(device_t *device, int state)
 {
-	amiga_custom_w(*device->machine().device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
+	amiga_custom_w(device->machine().device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
 }
 
 
@@ -1249,7 +1249,7 @@ static TIMER_CALLBACK( finish_serial_write )
 	CUSTOM_REG(REG_SERDATR) |= 0x3000;
 
 	/* signal an interrupt */
-	amiga_custom_w(*machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_TBE, 0xffff);
+	amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_TBE, 0xffff);
 }
 
 
@@ -1509,7 +1509,7 @@ WRITE16_HANDLER( amiga_custom_w )
 void amiga_serial_in_w(running_machine &machine, UINT16 data)
 {
 	amiga_state *state = machine.driver_data<amiga_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int mask = (CUSTOM_REG(REG_SERPER) & 0x8000) ? 0x1ff : 0xff;
 
 	/* copy the data to the low 8 bits of SERDATR and set RBF */

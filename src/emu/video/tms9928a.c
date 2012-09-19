@@ -619,7 +619,7 @@ void tms9928a_device::device_start()
 	m_irq_changed.resolve( m_out_int_line, *this );
 
 	// Video RAM is allocated as an own address space
-	m_vram_space = space(AS_DATA);
+	m_vram_space = &space(AS_DATA);
 
 	/* back bitmap */
 	m_tmpbmp.allocate(TMS9928A_TOTAL_HORZ, TMS9928A_TOTAL_VERT_PAL);

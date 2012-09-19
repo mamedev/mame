@@ -301,9 +301,9 @@ void exidy440_bank_select(running_machine &machine, UINT8 bank)
 	if (state->m_showdown_bank_data[0] != NULL)
 	{
 		if (bank == 0 && state->m_bank != 0)
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(exidy440_state::showdown_bank0_r),state));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(exidy440_state::showdown_bank0_r),state));
 		else if (bank != 0 && state->m_bank == 0)
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x7fff, "bank1");
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, "bank1");
 	}
 
 	/* select the bank and update the bank pointer */
@@ -1931,7 +1931,7 @@ DRIVER_INIT_MEMBER(exidy440_state,exidy440)
 DRIVER_INIT_MEMBER(exidy440_state,claypign)
 {
 	DRIVER_INIT_CALL(exidy440);
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x2ec0, 0x2ec3, read8_delegate(FUNC(exidy440_state::claypign_protection_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x2ec0, 0x2ec3, read8_delegate(FUNC(exidy440_state::claypign_protection_r),this));
 }
 
 
@@ -1940,11 +1940,11 @@ DRIVER_INIT_MEMBER(exidy440_state,topsecex)
 	DRIVER_INIT_CALL(exidy440);
 
 	/* extra input ports and scrolling */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x2ec5, 0x2ec5, read8_delegate(FUNC(exidy440_state::topsecex_input_port_5_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2ec6, 0x2ec6, "AN0");
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2ec7, 0x2ec7, "IN4");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x2ec5, 0x2ec5, read8_delegate(FUNC(exidy440_state::topsecex_input_port_5_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x2ec6, 0x2ec6, "AN0");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x2ec7, 0x2ec7, "IN4");
 
-	m_topsecex_yscroll = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x2ec1, 0x2ec1, write8_delegate(FUNC(exidy440_state::topsecex_yscroll_w),this));
+	m_topsecex_yscroll = machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x2ec1, 0x2ec1, write8_delegate(FUNC(exidy440_state::topsecex_yscroll_w),this));
 }
 
 

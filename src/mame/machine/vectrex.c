@@ -89,7 +89,7 @@ DEVICE_IMAGE_LOAD(vectrex_cart)
 	}
 
 	if (memcmp(mem + 0x06,"SRAM",4)) {
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x7fff);
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x0000, 0x7fff);
 	}
 
 	/* If VIA T2 starts, reset refresh timer.

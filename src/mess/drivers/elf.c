@@ -236,15 +236,15 @@ static CDP1861_INTERFACE( elf2_cdp1861_intf )
 
 void elf2_state::machine_start()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* initialize LED displays */
 	m_led_l->rbi_w(1);
 	m_led_h->rbi_w(1);
 
 	/* setup memory banking */
-	program->install_read_bank(0x0000, 0x00ff, "bank1");
-	program->install_write_handler(0x0000, 0x00ff, write8_delegate(FUNC(elf2_state::memory_w), this));
+	program.install_read_bank(0x0000, 0x00ff, "bank1");
+	program.install_write_handler(0x0000, 0x00ff, write8_delegate(FUNC(elf2_state::memory_w), this));
 	membank("bank1")->configure_entry(0, m_ram->pointer());
 	membank("bank1")->set_entry(0);
 

@@ -525,10 +525,10 @@ ROM_END
 DRIVER_INIT_MEMBER(rx78_state,rx78)
 {
 	UINT32 ram_size = machine().device<ram_device>(RAM_TAG)->size();
-	address_space *prg = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &prg = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	if(ram_size == 0x4000)
-		prg->unmap_readwrite(0x6000, 0xafff);
+		prg.unmap_readwrite(0x6000, 0xafff);
 }
 
 /* Driver */

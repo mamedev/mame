@@ -866,7 +866,7 @@ WRITE8_MEMBER(astrocde_state::astrocade_pattern_board_w)
 
 		case 6:		/* height of blit and initiator */
 			m_pattern_height = data;
-			execute_blit(*space.device().memory().space(AS_PROGRAM));
+			execute_blit(space.device().memory().space(AS_PROGRAM));
 			break;
 	}
 }

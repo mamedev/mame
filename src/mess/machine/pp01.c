@@ -85,7 +85,7 @@ static void pp01_set_memory(running_machine &machine,UINT8 block, UINT8 data)
 {
 	pp01_state *state = machine.driver_data<pp01_state>();
 	UINT8 *mem = state->memregion("maincpu")->base();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 startaddr = block*0x1000;
 	UINT16 endaddr   = ((block+1)*0x1000)-1;
 	UINT8  blocknum  = block + 1;

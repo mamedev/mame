@@ -396,7 +396,7 @@ static UINT8 read_uint8(UINT8 *pval, int pos, const UINT8* line, int linelen)
 
 DRIVER_INIT_MEMBER(galaxygame_state,galaxygame)
 {
-	address_space *main = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &main = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *code = machine().root_device().memregion("code")->base();
 
 	int filepos = 0, linepos, linelen;
@@ -426,20 +426,20 @@ DRIVER_INIT_MEMBER(galaxygame_state,galaxygame)
 			if ( (linelen >= 15+6) && (line[15] != ' ') )
 			{
 				read_uint16(&val, 15, line, linelen);
-				main->write_word(address, val, 0xffff);
+				main.write_word(address, val, 0xffff);
 				address += 2;
 
 				if ( (linelen >= 22+6) && (line[22] != ' ') )
 				{
 					read_uint16(&val, 22, line, linelen);
-					main->write_word(address, val, 0xffff);
+					main.write_word(address, val, 0xffff);
 					address += 2;
 				}
 
 				if ( (linelen >= 29+6) && (line[29] != ' ') )
 				{
 					read_uint16(&val, 29, line, linelen);
-					main->write_word(address, val, 0xffff);
+					main.write_word(address, val, 0xffff);
 					address += 2;
 				}
 
@@ -449,7 +449,7 @@ DRIVER_INIT_MEMBER(galaxygame_state,galaxygame)
 				if ( (linelen >= 18+3) && (line[18] != ' ') )
 				{
 					read_uint8(&val8, 18, line, linelen);
-					main->write_byte(address, val8);
+					main.write_byte(address, val8);
 					address += 1;
 				}
 			}
@@ -458,11 +458,11 @@ DRIVER_INIT_MEMBER(galaxygame_state,galaxygame)
 	}
 
 	// set startup code
-	main->write_word(0, 012700); /* MOV #0, R0 */
-	main->write_word(2, 0);
-	main->write_word(4, 0x8d00); /* MTPS R0 */
-	main->write_word(6, 000167); /* JMP 0500*/
-	main->write_word(8, 000500 - 10);
+	main.write_word(0, 012700); /* MOV #0, R0 */
+	main.write_word(2, 0);
+	main.write_word(4, 0x8d00); /* MTPS R0 */
+	main.write_word(6, 000167); /* JMP 0500*/
+	main.write_word(8, 000500 - 10);
 }
 
 GAME(1971, galgame, 0, galaxygame, galaxygame, galaxygame_state, galaxygame, ROT270, "Computer Recreations, Inc", "Galaxy Game", GAME_NO_SOUND_HW )

@@ -1629,7 +1629,7 @@ cxd8606cq_device::cxd8606cq_device(const machine_config &mconfig, const char *ta
 void psxcpu_device::device_start()
 {
 	// get our address spaces
-	m_program = space(AS_PROGRAM);
+	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 
 	save_item( NAME(m_op) );

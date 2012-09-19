@@ -612,7 +612,7 @@ WRITE16_MEMBER(ng_aes_state::main_cpu_bank_select_w)
 static void main_cpu_banking_init( running_machine &machine )
 {
 	ng_aes_state *state = machine.driver_data<ng_aes_state>();
-	address_space &mainspace = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &mainspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* create vector banks */
 	state->membank(NEOGEO_BANK_VECTORS)->configure_entry(0, machine.root_device().memregion("mainbios")->base());
@@ -753,7 +753,7 @@ static void audio_cpu_banking_init( running_machine &machine )
 	set_audio_cpu_banking(machine);
 
 	state->m_audio_cpu_rom_source_last = 0;
-	set_audio_cpu_rom_source(*machine.device("maincpu")->memory().space(AS_PROGRAM), 0);
+	set_audio_cpu_rom_source(machine.device("maincpu")->memory().space(AS_PROGRAM), 0);
 }
 
 
@@ -1149,7 +1149,7 @@ static void aes_postload(neogeo_state *state)
 	_set_main_cpu_bank_address(state->machine());
 	_set_main_cpu_vector_table_source(state->machine());
 	set_audio_cpu_banking(state->machine());
-	_set_audio_cpu_rom_source(*state->machine().device("maincpu")->memory().space(AS_PROGRAM));
+	_set_audio_cpu_rom_source(state->machine().device("maincpu")->memory().space(AS_PROGRAM));
 }
 
 static void common_machine_start(running_machine &machine)
@@ -1254,7 +1254,7 @@ MACHINE_START_MEMBER(ng_aes_state,neocd)
 MACHINE_RESET_MEMBER(ng_aes_state,neogeo)
 {
 	offs_t offs;
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* reset system control registers */
 	for (offs = 0; offs < 8; offs++)

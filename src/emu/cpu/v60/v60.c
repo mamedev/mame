@@ -353,9 +353,9 @@ static CPU_INIT( v60 )
 	cpustate->fetch_xor = BYTE_XOR_LE(0);
 	cpustate->start_pc = 0xfffff0;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 }
 
 static CPU_INIT( v70 )
@@ -369,9 +369,9 @@ static CPU_INIT( v70 )
 	cpustate->fetch_xor = BYTE4_XOR_LE(0);
 	cpustate->start_pc = 0xfffffff0;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 }
 
 static CPU_RESET( v60 )

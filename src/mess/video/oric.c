@@ -68,7 +68,7 @@ static void oric_vh_update_attribute(running_machine &machine, UINT8 c)
 	oric_state *state = machine.driver_data<oric_state>();
 	/* attribute */
 	UINT8 attribute = c & 0x03f;
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch ((attribute>>3) & 0x03)
 	{
@@ -213,7 +213,7 @@ UINT32 oric_state::screen_update_oric(screen_device &screen, bitmap_ind16 &bitma
 			}
 
 			/* fetch data */
-			c = RAM ? RAM[read_addr] : machine().device("maincpu")->memory().space(AS_PROGRAM)->read_byte(read_addr);
+			c = RAM ? RAM[read_addr] : machine().device("maincpu")->memory().space(AS_PROGRAM).read_byte(read_addr);
 
 			/* if bits 6 and 5 are zero, the byte contains a serial attribute */
 			if ((c & ((1 << 6) | (1 << 5))) == 0)

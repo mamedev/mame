@@ -1571,7 +1571,7 @@ DRIVER_INIT_MEMBER(mcr68_state,xenophob)
 	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* install control port handler */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::xenophobe_control_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::xenophobe_control_w),this));
 }
 
 
@@ -1583,9 +1583,9 @@ DRIVER_INIT_MEMBER(mcr68_state,spyhunt2)
 	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* analog port handling is a bit tricky */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::spyhunt2_control_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0d0000, 0x0dffff, read16_delegate(FUNC(mcr68_state::spyhunt2_port_0_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::spyhunt2_port_1_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::spyhunt2_control_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x0d0000, 0x0dffff, read16_delegate(FUNC(mcr68_state::spyhunt2_port_0_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::spyhunt2_port_1_r),this));
 }
 
 
@@ -1599,10 +1599,10 @@ DRIVER_INIT_MEMBER(mcr68_state,blasted)
 	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::blasted_control_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::blasted_control_w),this));
 
 	/* 6840 is mapped to the lower 8 bits */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x0a0000, 0x0a000f, read16_delegate(FUNC(mcr68_state::mcr68_6840_lower_r),this), write16_delegate(FUNC(mcr68_state::mcr68_6840_lower_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read16_delegate(FUNC(mcr68_state::mcr68_6840_lower_r),this), write16_delegate(FUNC(mcr68_state::mcr68_6840_lower_w),this));
 }
 
 DRIVER_INIT_MEMBER(mcr68_state,intlaser)
@@ -1613,7 +1613,7 @@ DRIVER_INIT_MEMBER(mcr68_state,intlaser)
 	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::blasted_control_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::blasted_control_w),this));
 
 }
 
@@ -1627,13 +1627,13 @@ DRIVER_INIT_MEMBER(mcr68_state,archrivl)
 	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::archrivl_control_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::archrivl_control_w),this));
 
 	/* 49-way joystick handling is a bit tricky */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::archrivl_port_1_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::archrivl_port_1_r),this));
 
 	/* 6840 is mapped to the lower 8 bits */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x0a0000, 0x0a000f, read16_delegate(FUNC(mcr68_state::mcr68_6840_lower_r),this), write16_delegate(FUNC(mcr68_state::mcr68_6840_lower_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read16_delegate(FUNC(mcr68_state::mcr68_6840_lower_r),this), write16_delegate(FUNC(mcr68_state::mcr68_6840_lower_w),this));
 }
 
 

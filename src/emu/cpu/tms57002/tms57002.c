@@ -787,8 +787,8 @@ void tms57002_device::execute_run()
 void tms57002_device::device_start()
 {
 	sti = S_IDLE;
-	program = space(AS_PROGRAM);
-	data    = space(AS_DATA);
+	program = &space(AS_PROGRAM);
+	data    = &space(AS_DATA);
 
 	state_add(STATE_GENPC,"GENPC", pc).noshow();
 

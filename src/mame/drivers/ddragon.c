@@ -2002,7 +2002,7 @@ DRIVER_INIT_MEMBER(ddragon_state,darktowr)
 	m_sound_irq = M6809_IRQ_LINE;
 	m_ym_irq = M6809_FIRQ_LINE;
 	m_technos_video_hw = 0;
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(ddragon_state::darktowr_bankswitch_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(ddragon_state::darktowr_bankswitch_w),this));
 }
 
 
@@ -2014,7 +2014,7 @@ DRIVER_INIT_MEMBER(ddragon_state,toffy)
 	m_sound_irq = M6809_IRQ_LINE;
 	m_ym_irq = M6809_FIRQ_LINE;
 	m_technos_video_hw = 0;
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(ddragon_state::toffy_bankswitch_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(ddragon_state::toffy_bankswitch_w),this));
 
 	/* the program rom has a simple bitswap encryption */
 	rom = memregion("maincpu")->base();

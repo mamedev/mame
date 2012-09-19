@@ -288,13 +288,13 @@ static serial_terminal_interface terminal_intf =
 
 void ob68k1a_state::machine_start()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	// configure RAM
 	switch (m_ram->size())
 	{
 	case 32*1024:
-		program->unmap_readwrite(0x008000, 0x01ffff);
+		program.unmap_readwrite(0x008000, 0x01ffff);
 		break;
 	}
 }
@@ -306,14 +306,14 @@ void ob68k1a_state::machine_start()
 
 void ob68k1a_state::machine_reset()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	// initialize COM8116
 //  m_dbrg->stt_w(program, 0, 0x01);
 //  m_dbrg->str_w(program, 0, 0x01);
 
 	// set reset vector
-	void *ram = program->get_write_ptr(0);
+	void *ram = program.get_write_ptr(0);
 	UINT8 *rom = memregion(MC68000L10_TAG)->base();
 
 	memcpy(ram, rom, 8);

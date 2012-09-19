@@ -679,7 +679,7 @@ static const ym2151_interface dynablsb_ym2151_config =
 
 INTERRUPT_GEN_MEMBER(m90_state::fake_nmi)
 {
-	address_space &space = *machine().firstcpu->space(AS_PROGRAM);
+	address_space &space = machine().firstcpu->space(AS_PROGRAM);
 	int sample = m72_sample_r(m_audio,space,0);
 	if (sample)
 		m72_sample_w(m_audio,space,0,sample);
@@ -687,7 +687,7 @@ INTERRUPT_GEN_MEMBER(m90_state::fake_nmi)
 
 INTERRUPT_GEN_MEMBER(m90_state::bomblord_fake_nmi)
 {
-	address_space &space = *machine().firstcpu->space(AS_PROGRAM);
+	address_space &space = machine().firstcpu->space(AS_PROGRAM);
 	int sample = m72_sample_r(m_audio,space,0);
 	if (sample != 0x80)
 		m72_sample_w(m_audio,space,0,sample);
@@ -1183,7 +1183,7 @@ ROM_END
 DRIVER_INIT_MEMBER(m90_state,quizf1)
 {
 	membank("bank1")->configure_entries(0, 16, memregion("user1")->base(), 0x10000);
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x04, 0x05, write16_delegate(FUNC(m90_state::quizf1_bankswitch_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x04, 0x05, write16_delegate(FUNC(m90_state::quizf1_bankswitch_w),this));
 }
 
 

@@ -676,7 +676,7 @@ DRIVER_INIT_MEMBER(cshooter_state,cshooter)
 
 DRIVER_INIT_MEMBER(cshooter_state,cshootere)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int A;
 	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);

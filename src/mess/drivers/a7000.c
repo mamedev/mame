@@ -602,7 +602,7 @@ static TIMER_CALLBACK( flyback_timer_callback )
 
 void a7000_state::viddma_transfer_start()
 {
-	address_space *mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	UINT32 src = m_viddma_addr_start;
 	UINT32 dst = 0;
 	UINT32 size = m_viddma_addr_end;
@@ -612,7 +612,7 @@ void a7000_state::viddma_transfer_start()
 	/* TODO: this should actually be a qword transfer */
 	for(dma_index = 0;dma_index < size;dma_index++)
 	{
-		vram[dst] = mem->read_byte(src);
+		vram[dst] = mem.read_byte(src);
 
 		src++;
 		dst++;

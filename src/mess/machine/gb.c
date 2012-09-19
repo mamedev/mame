@@ -119,8 +119,8 @@ static void gb_init_regs(running_machine &machine)
 	state->SIODATA = 0x00;
 	state->SIOCONT = 0x7E;
 
-	state->gb_io_w( *machine.device("maincpu")->memory().space(AS_PROGRAM ), 0x05, 0x00 );		/* TIMECNT */
-	state->gb_io_w( *machine.device("maincpu")->memory().space(AS_PROGRAM ), 0x06, 0x00 );		/* TIMEMOD */
+	state->gb_io_w( machine.device("maincpu")->memory().space(AS_PROGRAM ), 0x05, 0x00 );		/* TIMECNT */
+	state->gb_io_w( machine.device("maincpu")->memory().space(AS_PROGRAM ), 0x06, 0x00 );		/* TIMEMOD */
 }
 
 static void gb_rom16_0000( running_machine &machine, UINT8 *addr )
@@ -154,7 +154,7 @@ static void gb_rom8_6000( running_machine &machine, UINT8 *addr )
 static void gb_init(running_machine &machine)
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	address_space &space = *machine.device( "maincpu")->memory().space( AS_PROGRAM );
+	address_space &space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 
 	/* Initialize the memory banks */
 	state->m_MBC1Mode = 0;

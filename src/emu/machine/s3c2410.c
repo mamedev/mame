@@ -38,7 +38,7 @@ UINT32 s3c2410_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 DEVICE_START( s3c2410 )
 {
-	address_space &space = *device->machine().device( "maincpu")->memory().space( AS_PROGRAM);
+	address_space &space = device->machine().device( "maincpu")->memory().space( AS_PROGRAM);
 	DEVICE_START_CALL(s3c24xx);
 	space.install_legacy_readwrite_handler( *device, 0x48000000, 0x4800003b, FUNC(s3c24xx_memcon_r), FUNC(s3c24xx_memcon_w));
 	space.install_legacy_readwrite_handler( *device, 0x49000000, 0x4900005b, FUNC(s3c24xx_usb_host_r), FUNC(s3c24xx_usb_host_w));

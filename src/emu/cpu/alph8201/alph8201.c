@@ -668,7 +668,7 @@ static CPU_INIT( alpha8201 )
 	alpha8201_state *cpustate = get_safe_token(device);
 
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 
 	device->save_item(NAME(cpustate->RAM));

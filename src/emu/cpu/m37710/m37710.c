@@ -978,8 +978,8 @@ static CPU_INIT( m37710 )
 
 	INT_ACK = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = &device->space(AS_PROGRAM);
+	cpustate->io = &device->space(AS_IO);
 
 	cpustate->ICount = 0;
 

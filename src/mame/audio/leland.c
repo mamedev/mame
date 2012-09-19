@@ -385,7 +385,7 @@ static STREAM_UPDATE( leland_80186_dac_update )
 static STREAM_UPDATE( leland_80186_dma_update )
 {
 	leland_sound_state *state = get_safe_token(device);
-	address_space *dmaspace = (address_space *)param;
+	address_space &dmaspace = *(address_space *)param;
 	stream_sample_t *buffer = outputs[0];
 	int i, j;
 
@@ -434,7 +434,7 @@ static STREAM_UPDATE( leland_80186_dma_update )
 				/* sample-rate convert to the output frequency */
 				for (j = 0; j < samples && count > 0; j++)
 				{
-					buffer[j] += ((int)dmaspace->read_byte(source) - 0x80) * volume;
+					buffer[j] += ((int)dmaspace.read_byte(source) - 0x80) * volume;
 					frac += step;
 					source += frac >> 24;
 					count -= frac >> 24;
@@ -521,14 +521,14 @@ static DEVICE_START( common_sh_start )
 {
 	leland_sound_state *state = get_safe_token(device);
 	running_machine &machine = device->machine();
-	address_space *dmaspace = machine.device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &dmaspace = machine.device("audiocpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* determine which sound hardware is installed */
 	state->m_has_ym2151 = (device->machine().device("ymsnd") != NULL);
 
 	/* allocate separate streams for the DMA and non-DMA DACs */
-	state->m_dma_stream = device->machine().sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, (void *)dmaspace, leland_80186_dma_update);
+	state->m_dma_stream = device->machine().sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, (void *)&dmaspace, leland_80186_dma_update);
 	state->m_nondma_stream = device->machine().sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, NULL, leland_80186_dac_update);
 
 	/* if we have a 2151, install an externally driven DAC stream */
@@ -539,7 +539,7 @@ static DEVICE_START( common_sh_start )
 	}
 
 	/* create timers here so they stick around */
-	state->m_i80186.cpu = &dmaspace->device();
+	state->m_i80186.cpu = &dmaspace.device();
 	state->m_i80186.timer[0].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int), device);
 	state->m_i80186.timer[1].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int), device);
 	state->m_i80186.timer[2].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int), device);
@@ -1591,12 +1591,12 @@ static WRITE16_DEVICE_HANDLER( i80186_internal_port_w )
 			temp = (state->m_i80186.mem.peripheral & 0xffc0) << 4;
 			if (state->m_i80186.mem.middle_size & 0x0040)
 			{
-				state->m_i80186.cpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*device, temp, temp + 0x2ff, FUNC(peripheral_r), FUNC(peripheral_w));
+				state->m_i80186.cpu->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(*device, temp, temp + 0x2ff, FUNC(peripheral_r), FUNC(peripheral_w));
 			}
 			else
 			{
 				temp &= 0xffff;
-				state->m_i80186.cpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*device, temp, temp + 0x2ff, FUNC(peripheral_r), FUNC(peripheral_w));
+				state->m_i80186.cpu->memory().space(AS_IO).install_legacy_readwrite_handler(*device, temp, temp + 0x2ff, FUNC(peripheral_r), FUNC(peripheral_w));
 			}
 
 			/* we need to do this at a time when the 80186 context is swapped in */
@@ -1662,12 +1662,12 @@ static WRITE16_DEVICE_HANDLER( i80186_internal_port_w )
 			temp = (data & 0x0fff) << 8;
 			if (data & 0x1000)
 			{
-				state->m_i80186.cpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*device, temp, temp + 0xff, FUNC(i80186_internal_port_r), FUNC(i80186_internal_port_w));
+				state->m_i80186.cpu->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(*device, temp, temp + 0xff, FUNC(i80186_internal_port_r), FUNC(i80186_internal_port_w));
 			}
 			else
 			{
 				temp &= 0xffff;
-				state->m_i80186.cpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*device, temp, temp + 0xff, FUNC(i80186_internal_port_r), FUNC(i80186_internal_port_w));
+				state->m_i80186.cpu->memory().space(AS_IO).install_legacy_readwrite_handler(*device, temp, temp + 0xff, FUNC(i80186_internal_port_r), FUNC(i80186_internal_port_w));
 			}
 /*          popmessage("Sound CPU reset");*/
 			break;

@@ -26,7 +26,7 @@
 
 void mc1000_state::bankswitch()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* MC6845 video RAM */
 	membank("bank2")->set_entry(m_mc6845_bank);
@@ -34,11 +34,11 @@ void mc1000_state::bankswitch()
 	/* extended RAM */
 	if (m_ram->size() > 16*1024)
 	{
-		program->install_readwrite_bank(0x4000, 0x7fff, "bank3");
+		program.install_readwrite_bank(0x4000, 0x7fff, "bank3");
 	}
 	else
 	{
-		program->unmap_readwrite(0x4000, 0x7fff);
+		program.unmap_readwrite(0x4000, 0x7fff);
 	}
 
 	/* MC6847 video RAM */
@@ -46,16 +46,16 @@ void mc1000_state::bankswitch()
 	{
 		if (m_ram->size() > 16*1024)
 		{
-			program->install_readwrite_bank(0x8000, 0x97ff, "bank4");
+			program.install_readwrite_bank(0x8000, 0x97ff, "bank4");
 		}
 		else
 		{
-			program->unmap_readwrite(0x8000, 0x97ff);
+			program.unmap_readwrite(0x8000, 0x97ff);
 		}
 	}
 	else
 	{
-		program->install_readwrite_bank(0x8000, 0x97ff, "bank4");
+		program.install_readwrite_bank(0x8000, 0x97ff, "bank4");
 	}
 
 	membank("bank4")->set_entry(m_mc6847_bank);
@@ -63,11 +63,11 @@ void mc1000_state::bankswitch()
 	/* extended RAM */
 	if (m_ram->size() > 16*1024)
 	{
-		program->install_readwrite_bank(0x9800, 0xbfff, "bank5");
+		program.install_readwrite_bank(0x9800, 0xbfff, "bank5");
 	}
 	else
 	{
-		program->unmap_readwrite(0x9800, 0xbfff);
+		program.unmap_readwrite(0x9800, 0xbfff);
 	}
 }
 
@@ -323,19 +323,19 @@ static const ay8910_interface ay8910_intf =
 
 void mc1000_state::machine_start()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* setup memory banking */
 	UINT8 *rom = memregion(Z80_TAG)->base();
 
-	program->install_readwrite_bank(0x0000, 0x1fff, "bank1");
+	program.install_readwrite_bank(0x0000, 0x1fff, "bank1");
 	membank("bank1")->configure_entry(0, rom);
 	membank("bank1")->configure_entry(1, rom + 0xc000);
 	membank("bank1")->set_entry(1);
 
 	m_rom0000 = 1;
 
-	program->install_readwrite_bank(0x2000, 0x27ff, "bank2");
+	program.install_readwrite_bank(0x2000, 0x27ff, "bank2");
 	membank("bank2")->configure_entry(0, rom + 0x2000);
 	membank("bank2")->configure_entry(1, m_mc6845_video_ram);
 	membank("bank2")->set_entry(0);
@@ -499,7 +499,7 @@ DIRECT_UPDATE_MEMBER(mc1000_state::mc1000_direct_update_handler)
 DRIVER_INIT_MEMBER(mc1000_state,mc1000)
 {
 
-	machine().device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(mc1000_state::mc1000_direct_update_handler), this));
+	machine().device(Z80_TAG)->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(mc1000_state::mc1000_direct_update_handler), this));
 }
 
 /* System Drivers */

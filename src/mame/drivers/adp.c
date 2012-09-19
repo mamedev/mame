@@ -280,7 +280,7 @@ static void duart_tx( device_t *device, int channel, UINT8 data )
 	adp_state *state = device->machine().driver_data<adp_state>();
 	if (channel == 0)
 	{
-		state->m_microtouch->rx(*device->machine().memory().first_space(), 0, data);
+		state->m_microtouch->rx(device->machine().driver_data()->generic_space(), 0, data);
 	}
 }
 

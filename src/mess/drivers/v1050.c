@@ -126,19 +126,19 @@ void v1050_state::set_interrupt(UINT8 mask, int state)
 
 void v1050_state::bankswitch()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	int bank = (m_bank >> 1) & 0x03;
 
 	if (BIT(m_bank, 0))
 	{
-		program->install_readwrite_bank(0x0000, 0x1fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x1fff, "bank1");
 		membank("bank1")->set_entry(bank);
 	}
 	else
 	{
-		program->install_read_bank(0x0000, 0x1fff, "bank1");
-		program->unmap_write(0x0000, 0x1fff);
+		program.install_read_bank(0x0000, 0x1fff, "bank1");
+		program.unmap_write(0x0000, 0x1fff);
 		membank("bank1")->set_entry(3);
 	}
 
@@ -146,12 +146,12 @@ void v1050_state::bankswitch()
 
 	if (bank == 2)
 	{
-		program->unmap_readwrite(0x4000, 0xbfff);
+		program.unmap_readwrite(0x4000, 0xbfff);
 	}
 	else
 	{
-		program->install_readwrite_bank(0x4000, 0x7fff, "bank3");
-		program->install_readwrite_bank(0x8000, 0xbfff, "bank4");
+		program.install_readwrite_bank(0x4000, 0x7fff, "bank3");
+		program.install_readwrite_bank(0x8000, 0xbfff, "bank4");
 		membank("bank3")->set_entry(bank);
 		membank("bank4")->set_entry(bank);
 	}
@@ -702,7 +702,7 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pa_w )
 static WRITE8_DEVICE_HANDLER( misc_ppi_pb_w )
 {
 	centronics_device *centronics = device->machine().device<centronics_device>(CENTRONICS_TAG);
-	centronics->write( *device->machine().memory().first_space() , 0, ~data & 0xff);
+	centronics->write( device->machine().driver_data()->generic_space() , 0, ~data & 0xff);
 }
 
 static READ8_DEVICE_HANDLER( misc_ppi_pc_r )
@@ -1020,7 +1020,7 @@ static IRQ_CALLBACK( v1050_int_ack )
 
 void v1050_state::machine_start()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	// initialize SASI bus
 	m_sasibus->init_scsibus(256);
@@ -1042,17 +1042,17 @@ void v1050_state::machine_start()
 	membank("bank1")->configure_entry(2, ram + 0x1c000);
 	membank("bank1")->configure_entry(3, memregion(Z80_TAG)->base());
 
-	program->install_readwrite_bank(0x2000, 0x3fff, "bank2");
+	program.install_readwrite_bank(0x2000, 0x3fff, "bank2");
 	membank("bank2")->configure_entries(0, 2, ram + 0x2000, 0x10000);
 	membank("bank2")->configure_entry(2, ram + 0x1e000);
 
-	program->install_readwrite_bank(0x4000, 0x7fff, "bank3");
+	program.install_readwrite_bank(0x4000, 0x7fff, "bank3");
 	membank("bank3")->configure_entries(0, 2, ram + 0x4000, 0x10000);
 
-	program->install_readwrite_bank(0x8000, 0xbfff, "bank4");
+	program.install_readwrite_bank(0x8000, 0xbfff, "bank4");
 	membank("bank4")->configure_entries(0, 2, ram + 0x8000, 0x10000);
 
-	program->install_readwrite_bank(0xc000, 0xffff, "bank5");
+	program.install_readwrite_bank(0xc000, 0xffff, "bank5");
 	membank("bank5")->configure_entries(0, 3, ram + 0xc000, 0);
 
 	bankswitch();

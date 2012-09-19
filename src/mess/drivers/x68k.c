@@ -2622,7 +2622,7 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 
 MACHINE_START_MEMBER(x68k_state,x68000)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/*  Install RAM handlers  */
 	m_spriteram = (UINT16*)(*memregion("user1"));
 	space.install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_emptyram_r));
@@ -2652,7 +2652,7 @@ MACHINE_START_MEMBER(x68k_state,x68000)
 
 MACHINE_START_MEMBER(x68k_state,x68030)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/*  Install RAM handlers  */
 	m_spriteram = (UINT16*)(*memregion("user1"));
 	space.install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_r),0xffffffff);

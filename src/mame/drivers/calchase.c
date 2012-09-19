@@ -977,14 +977,14 @@ DRIVER_INIT_MEMBER(calchase_state,calchase)
 	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x20000/4);
 
 	pc_vga_init(machine(), vga_setting, NULL);
-	pc_svga_trident_io_init(machine(), *machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, *machine().device("maincpu")->memory().space(AS_IO), 0x0000);
+	pc_svga_trident_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, calchase_set_keyb_int);
 
 	intel82439tx_init(machine());
 
 	kbdc8042_init(machine(), &at8042);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x3f0b160, 0x3f0b163, read32_delegate(FUNC(calchase_state::calchase_idle_skip_r),this), write32_delegate(FUNC(calchase_state::calchase_idle_skip_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x3f0b160, 0x3f0b163, read32_delegate(FUNC(calchase_state::calchase_idle_skip_r),this), write32_delegate(FUNC(calchase_state::calchase_idle_skip_w),this));
 }
 
 ROM_START( calchase )

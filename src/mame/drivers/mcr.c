@@ -2800,17 +2800,17 @@ DRIVER_INIT_MEMBER(mcr_state,dpoker)
 	machine().device<midway_ssio_device>("ssio")->set_custom_input(0, 0x8e, read8_delegate(FUNC(mcr_state::dpoker_ip0_r),this));
 
 	// meter ram, is it battery backed?
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x8000, 0x81ff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x8000, 0x81ff);
 
 	// extra I/O
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x24, 0x24, "P24");
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x28, 0x28, "P28");
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x2c, 0x2c, "P2C");
+	machine().device("maincpu")->memory().space(AS_IO).install_read_port(0x24, 0x24, "P24");
+	machine().device("maincpu")->memory().space(AS_IO).install_read_port(0x28, 0x28, "P28");
+	machine().device("maincpu")->memory().space(AS_IO).install_read_port(0x2c, 0x2c, "P2C");
 
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x2c, 0x2c, write8_delegate(FUNC(mcr_state::dpoker_lamps1_w),this));
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x30, 0x30, write8_delegate(FUNC(mcr_state::dpoker_lamps2_w),this));
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x34, 0x34, write8_delegate(FUNC(mcr_state::dpoker_output_w),this));
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(mcr_state::dpoker_meters_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x2c, 0x2c, write8_delegate(FUNC(mcr_state::dpoker_lamps1_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x30, 0x30, write8_delegate(FUNC(mcr_state::dpoker_lamps2_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x34, 0x34, write8_delegate(FUNC(mcr_state::dpoker_output_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(mcr_state::dpoker_meters_w),this));
 
 	dpoker_coin_status = 0;
 	dpoker_output = 0;
@@ -2841,7 +2841,7 @@ DRIVER_INIT_MEMBER(mcr_state,twotiger)
 	mcr_init(machine(), 90010, 91399, 90913);
 
 	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::twotiger_op4_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe800, 0xefff, 0, 0x1000, read8_delegate(FUNC(mcr_state::twotiger_videoram_r),this), write8_delegate(FUNC(mcr_state::twotiger_videoram_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xe800, 0xefff, 0, 0x1000, read8_delegate(FUNC(mcr_state::twotiger_videoram_r),this), write8_delegate(FUNC(mcr_state::twotiger_videoram_w),this));
 }
 
 

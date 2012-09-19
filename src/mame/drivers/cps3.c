@@ -723,8 +723,8 @@ static void init_common(running_machine &machine, UINT32 key1, UINT32 key2, int 
 
 	state->m_0xc0000000_ram_decrypted = auto_alloc_array(machine, UINT32, 0x400/4);
 
-	address_space *main = machine.device<sh2_device>("maincpu")->space(AS_PROGRAM);
-	main->set_direct_update_handler(direct_update_delegate(FUNC(cps3_state::cps3_direct_handler), state));
+	address_space &main = machine.device<sh2_device>("maincpu")->space(AS_PROGRAM);
+	main.set_direct_update_handler(direct_update_delegate(FUNC(cps3_state::cps3_direct_handler), state));
 
 	// flash roms
 	astring tempstr;

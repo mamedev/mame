@@ -31,7 +31,7 @@
 static void msx_cpu_setbank (running_machine &machine, int page, UINT8 *mem)
 {
 	msx_state *state = machine.driver_data<msx_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	switch (page)
 	{
 	case 1:
@@ -379,9 +379,9 @@ MSX_SLOT_MAP(konami_scc)
 		msx_cpu_setbank (machine, 5, state->m_mem + state->m_banks[2] * 0x2000);
 		msx_cpu_setbank (machine, 6, state->m_mem + state->m_banks[3] * 0x2000);
 		if (state->m_cart.scc.active ) {
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x9800, 0x9fff, FUNC(konami_scc_bank5));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x9800, 0x9fff, FUNC(konami_scc_bank5));
 		} else {
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x9800, 0x9fff,"bank7");
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x9800, 0x9fff,"bank7");
 		}
 		break;
 	case 3:
@@ -393,7 +393,7 @@ MSX_SLOT_MAP(konami_scc)
 MSX_SLOT_WRITE(konami_scc)
 {
 	msx_state *drvstate = machine.driver_data<msx_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	if (addr >= 0x5000 && addr < 0x5800)
 	{
 		state->m_banks[0] = val & state->m_bank_mask;
@@ -1279,7 +1279,7 @@ static READ8_HANDLER (msx_diskrom_page2_r)
 MSX_SLOT_MAP(diskrom)
 {
 	msx_state *drvstate = machine.driver_data<msx_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	switch (page)
 	{
 	case 0:
@@ -1306,7 +1306,7 @@ MSX_SLOT_MAP(diskrom)
 MSX_SLOT_WRITE(diskrom)
 {
 	device_t *fdc = machine.device("wd179x");
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	if (addr >= 0xa000 && addr < 0xc000)
 	{
 		addr -= 0x4000;
@@ -1408,7 +1408,7 @@ static  READ8_HANDLER (msx_diskrom2_page2_r)
 MSX_SLOT_MAP(diskrom2)
 {
 	msx_state *drvstate = machine.driver_data<msx_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	switch (page)
 	{
 	case 0:
@@ -1434,7 +1434,7 @@ MSX_SLOT_MAP(diskrom2)
 MSX_SLOT_WRITE(diskrom2)
 {
 	device_t *fdc = machine.device("wd179x");
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	if (addr >= 0xa000 && addr < 0xc000)
 	{
 		addr -= 0x4000;
@@ -1685,7 +1685,7 @@ MSX_SLOT_MAP(fmpac)
 MSX_SLOT_WRITE(fmpac)
 {
 	msx_state *drvstate = machine.driver_data<msx_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i, data;
 
 	if (addr >= 0x4000 && addr < 0x6000 && state->m_cart.fmpac.sram_support)
@@ -2244,7 +2244,7 @@ static  READ8_HANDLER (soundcartridge_sccp)
 
 MSX_SLOT_MAP(soundcartridge)
 {
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	switch (page)
 	{
 	case 0:
@@ -2279,7 +2279,7 @@ MSX_SLOT_MAP(soundcartridge)
 MSX_SLOT_WRITE(soundcartridge)
 {
 	msx_state *drvstate = machine.driver_data<msx_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	if (addr < 0x4000)

@@ -1565,7 +1565,7 @@ static void remap_dynamic_addresses(running_machine &machine)
 
 	/* unmap everything we know about */
 	for (addr = 0; addr < state->m_dynamic_count; addr++)
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_readwrite(dynamic[addr].start, dynamic[addr].end);
+		machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_readwrite(dynamic[addr].start, dynamic[addr].end);
 
 	/* the build the list of stuff */
 	state->m_dynamic_count = 0;
@@ -1681,7 +1681,7 @@ static void remap_dynamic_addresses(running_machine &machine)
 
 	/* now remap everything */
 	if (LOG_DYNAMIC) logerror("remap_dynamic_addresses:\n");
-	address_space &space = *machine.device<cpu_device>("maincpu")->space(AS_PROGRAM);
+	address_space &space = machine.device<cpu_device>("maincpu")->space(AS_PROGRAM);
 	for (addr = 0; addr < state->m_dynamic_count; addr++)
 	{
 		if (LOG_DYNAMIC) logerror("  installing: %08X-%08X %s,%s\n", dynamic[addr].start, dynamic[addr].end, dynamic[addr].rdname, dynamic[addr].wrname);

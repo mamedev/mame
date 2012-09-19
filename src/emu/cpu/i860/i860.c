@@ -30,7 +30,7 @@ static CPU_INIT( i860 )
 {
 	i860_state_t *cpustate = get_safe_token(device);
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	reset_i860(cpustate);
 	i860_set_pin(device, DEC_PIN_BUS_HOLD, 0);
 	i860_set_pin(device, DEC_PIN_RESET, 0);

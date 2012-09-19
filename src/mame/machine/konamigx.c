@@ -443,7 +443,7 @@ void fantjour_dma_install(running_machine &machine)
 {
 	konamigx_state *state = machine.driver_data<konamigx_state>();
 	state_save_register_global_array(machine, fantjour_dma);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xdb0000, 0xdb001f, write32_delegate(FUNC(konamigx_state::fantjour_dma_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xdb0000, 0xdb001f, write32_delegate(FUNC(konamigx_state::fantjour_dma_w),state));
 	memset(fantjour_dma, 0, sizeof(fantjour_dma));
 }
 

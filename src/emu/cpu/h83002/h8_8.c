@@ -234,9 +234,9 @@ static CPU_INIT(h8bit)
 
 	h8->mode_8bit = 1;
 
-	h8->program = device->space(AS_PROGRAM);
+	h8->program = &device->space(AS_PROGRAM);
 	h8->direct = &h8->program->direct();
-	h8->io = device->space(AS_IO);
+	h8->io = &device->space(AS_IO);
 
 	h8->timer[0] = h8->device->machine().scheduler().timer_alloc(FUNC(h8_timer_0_cb), h8);
 	h8->timer[1] = h8->device->machine().scheduler().timer_alloc(FUNC(h8_timer_1_cb), h8);

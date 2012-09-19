@@ -422,7 +422,7 @@ READ16_MEMBER(dec0_state::slyspy_state_r)
 void slyspy_set_protection_map(running_machine& machine, int type)
 {
 	dec0_state *state = machine.driver_data<dec0_state>();
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	deco_bac06_device *tilegen1 = (deco_bac06_device*)state->m_tilegen1;
 	deco_bac06_device *tilegen2 = (deco_bac06_device*)state->m_tilegen2;
@@ -3043,10 +3043,10 @@ ROM_END
 
 DRIVER_INIT_MEMBER(dec0_state,midresb)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00180000, 0x0018000f, read16_delegate(FUNC(dec0_state::dec0_controls_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x001a0000, 0x001a000f, read16_delegate(FUNC(dec0_state::dec0_rotary_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00180000, 0x0018000f, read16_delegate(FUNC(dec0_state::dec0_controls_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x001a0000, 0x001a000f, read16_delegate(FUNC(dec0_state::dec0_rotary_r),this));
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00180014, 0x00180015, write16_delegate(FUNC(dec0_state::midres_sound_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x00180014, 0x00180015, write16_delegate(FUNC(dec0_state::midres_sound_w),this));
 }
 
 /******************************************************************************/

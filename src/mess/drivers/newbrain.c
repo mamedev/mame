@@ -55,18 +55,18 @@ void newbrain_state::check_interrupt()
 /* Bank Switching */
 
 #define memory_install_unmapped(program, bank, bank_start, bank_end) \
-	program->unmap_readwrite(bank_start, bank_end);
+	program.unmap_readwrite(bank_start, bank_end);
 
 #define memory_install_rom_helper(program, bank, bank_start, bank_end) \
-	program->install_read_bank(bank_start, bank_end, bank); \
-	program->unmap_write(bank_start, bank_end);
+	program.install_read_bank(bank_start, bank_end, bank); \
+	program.unmap_write(bank_start, bank_end);
 
 #define memory_install_ram_helper(program, bank, bank_start, bank_end) \
-	program->install_readwrite_bank(bank_start, bank_end, bank);
+	program.install_readwrite_bank(bank_start, bank_end, bank);
 
 void newbrain_eim_state::bankswitch()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	int bank;
 
 	for (bank = 1; bank < 9; bank++)
@@ -104,7 +104,7 @@ void newbrain_eim_state::bankswitch()
 
 void newbrain_state::bankswitch()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	int bank;
 
 	for (bank = 1; bank < 9; bank++)

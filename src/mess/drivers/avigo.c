@@ -158,7 +158,7 @@ static RP5C01_INTERFACE( rtc_intf )
 
 void avigo_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 {
-	address_space& space = *m_maincpu->space(AS_PROGRAM);
+	address_space& space = m_maincpu->space(AS_PROGRAM);
 	int &active_flash = (bank == 1 ? m_flash_at_0x4000 : m_flash_at_0x8000);
 	char bank_tag[6];
 
@@ -246,8 +246,8 @@ void avigo_state::machine_reset()
 	/* if is a cold start initialize flash contents */
 	if (!m_warm_start)
 	{
-		memcpy(m_flashes[0]->space()->get_read_ptr(0), memregion("bios")->base() + 0x000000, 0x100000);
-		memcpy(m_flashes[1]->space()->get_read_ptr(0), memregion("bios")->base() + 0x100000, 0x100000);
+		memcpy(m_flashes[0]->space().get_read_ptr(0), memregion("bios")->base() + 0x000000, 0x100000);
+		memcpy(m_flashes[1]->space().get_read_ptr(0), memregion("bios")->base() + 0x100000, 0x100000);
 	}
 
 	m_irq = 0;
@@ -293,9 +293,9 @@ void avigo_state::machine_start()
 	save_item(NAME(m_warm_start));
 
 	// save all flash contents
-	save_pointer(NAME((UINT8*)m_flashes[0]->space()->get_read_ptr(0)), 0x100000);
-	save_pointer(NAME((UINT8*)m_flashes[1]->space()->get_read_ptr(0)), 0x100000);
-	save_pointer(NAME((UINT8*)m_flashes[2]->space()->get_read_ptr(0)), 0x100000);
+	save_pointer(NAME((UINT8*)m_flashes[0]->space().get_read_ptr(0)), 0x100000);
+	save_pointer(NAME((UINT8*)m_flashes[1]->space().get_read_ptr(0)), 0x100000);
+	save_pointer(NAME((UINT8*)m_flashes[2]->space().get_read_ptr(0)), 0x100000);
 
 	// register postload callback
 	machine().save().register_postload(save_prepost_delegate(FUNC(avigo_state::postload), this));
@@ -830,7 +830,7 @@ static TIMER_DEVICE_CALLBACK( avigo_1hz_timer )
 static QUICKLOAD_LOAD(avigo)
 {
 	avigo_state *state = image.device().machine().driver_data<avigo_state>();
-	address_space* flash1 = state->m_flashes[1]->space(0);
+	address_space& flash1 = state->m_flashes[1]->space(0);
 	const char *systemname = image.device().machine().system().name;
 	UINT32 first_app_page = (0x50000>>14);
 	int app_page;
@@ -846,7 +846,7 @@ static QUICKLOAD_LOAD(avigo)
 
 		for (int offset=0; offset<0x4000; offset++)
 		{
-			if (flash1->read_byte((app_page<<14) + offset) != 0xff)
+			if (flash1.read_byte((app_page<<14) + offset) != 0xff)
 			{
 				empty_page = false;
 				break;
@@ -863,10 +863,10 @@ static QUICKLOAD_LOAD(avigo)
 		logerror("Application loaded at 0x%05x-0x%05x\n", app_page<<14, (app_page<<14) + (UINT32)image.length());
 
 		// copy app file into flash memory
-		image.fread((UINT8*)state->m_flashes[1]->space()->get_read_ptr(app_page<<14), image.length());
+		image.fread((UINT8*)state->m_flashes[1]->space().get_read_ptr(app_page<<14), image.length());
 
 		// update the application ID
-		flash1->write_byte((app_page<<14) + 0x1a5, 0x80 + (app_page - (first_app_page>>14)));
+		flash1.write_byte((app_page<<14) + 0x1a5, 0x80 + (app_page - (first_app_page>>14)));
 
 		// reset the CPU for allow at the Avigo OS to recognize the installed app
 		state->m_warm_start = 1;

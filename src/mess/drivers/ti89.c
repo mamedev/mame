@@ -445,15 +445,15 @@ void ti68k_state::machine_start()
 		m_hw_version = m_HW1;
 		m_initial_pc = ((rom[2]) << 16) | rom[3];
 
-		m_maincpu->space(AS_PROGRAM)->unmap_read(0x200000, 0x5fffff);
+		m_maincpu->space(AS_PROGRAM).unmap_read(0x200000, 0x5fffff);
 
 		if (m_initial_pc > 0x400000)
 		{
-			m_maincpu->space(AS_PROGRAM)->install_readwrite_handler(0x400000, 0x5fffff, 0, 0, read16_delegate(FUNC(ti68k_state::flash_r), this),write16_delegate(FUNC(ti68k_state::flash_w), this));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x5fffff, 0, 0, read16_delegate(FUNC(ti68k_state::flash_r), this),write16_delegate(FUNC(ti68k_state::flash_w), this));
 		}
         else
 		{
-			m_maincpu->space(AS_PROGRAM)->install_readwrite_handler(0x200000, 0x3fffff, 0, 0, read16_delegate(FUNC(ti68k_state::flash_r), this), write16_delegate(FUNC(ti68k_state::flash_w), this));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200000, 0x3fffff, 0, 0, read16_delegate(FUNC(ti68k_state::flash_r), this), write16_delegate(FUNC(ti68k_state::flash_w), this));
 		}
 	}
 
@@ -493,7 +493,7 @@ UINT32 ti68k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width / 8; x++)
 			{
-				UINT8 s_byte= m_maincpu->space(AS_PROGRAM)->read_byte(m_lcd_base + y * (width/8) + x);
+				UINT8 s_byte= m_maincpu->space(AS_PROGRAM).read_byte(m_lcd_base + y * (width/8) + x);
 				for (b = 0; b<8; b++)
 					bitmap.pix16(y, x * 8 + (7 - b)) = BIT(s_byte, b);
 			}

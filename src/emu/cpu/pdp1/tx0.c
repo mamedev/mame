@@ -135,7 +135,7 @@ static void tx0_init_common(legacy_cpu_device *device, device_irq_acknowledge_ca
 	cpustate->ir_mask = is_64kw ? 03 : 037;
 
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 }
 
 static CPU_INIT( tx0_64kw )

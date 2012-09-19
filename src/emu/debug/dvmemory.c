@@ -154,15 +154,14 @@ void debug_view_memory::enumerate_sources()
 	// first add all the devices' address spaces
 	memory_interface_iterator iter(machine().root_device());
 	for (device_memory_interface *memintf = iter.first(); memintf != NULL; memintf = iter.next())
-		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
-		{
-			address_space *space = memintf->space(spacenum);
-			if (space != NULL)
-			{
-				name.printf("%s '%s' %s space memory", memintf->device().name(), memintf->device().tag(), space->name());
-				m_source_list.append(*auto_alloc(machine(), debug_view_memory_source(name, *space)));
-			}
-		}
+		if (&memintf->device() != &machine().root_device())
+			for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
+				if (memintf->has_space(spacenum))
+				{
+					address_space &space = memintf->space(spacenum);
+					name.printf("%s '%s' %s space memory", memintf->device().name(), memintf->device().tag(), space.name());
+					m_source_list.append(*auto_alloc(machine(), debug_view_memory_source(name, space)));
+				}
 
 	// then add all the memory regions
 	for (memory_region *region = machine().memory().first_region(); region != NULL; region = region->next())

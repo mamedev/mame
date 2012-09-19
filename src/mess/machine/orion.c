@@ -268,7 +268,7 @@ static void orionz80_switch_bank(running_machine &machine)
 	orion_state *state = machine.driver_data<orion_state>();
 	UINT8 bank_select;
 	UINT8 segment_select;
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	bank_select = (state->m_orionz80_dispatcher & 0x0c) >> 2;
 	segment_select = state->m_orionz80_dispatcher & 0x03;
@@ -328,7 +328,7 @@ WRITE8_MEMBER(orion_state::orionz80_dispatcher_w)
 
 MACHINE_RESET_MEMBER(orion_state,orionz80)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	space.unmap_write(0x0000, 0x3fff);
 	space.install_write_bank(0x4000, 0xefff, "bank2");
@@ -412,7 +412,7 @@ WRITE8_MEMBER(orion_state::orionz80_io_w)
 static void orionpro_bank_switch(running_machine &machine)
 {
 	orion_state *state = machine.driver_data<orion_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int page = state->m_orionpro_page & 7; // we have only 8 pages
 	int is128 = (state->m_orionpro_dispatcher & 0x80) ? 1 : 0;
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();

@@ -961,9 +961,9 @@ void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_ackno
 	}
 	sh2->irq_callback = irqcallback;
 	sh2->device = device;
-	sh2->program = device->space(AS_PROGRAM);
+	sh2->program = &device->space(AS_PROGRAM);
 	sh2->direct = &sh2->program->direct();
-	sh2->internal = device->space(AS_PROGRAM);
+	sh2->internal = &device->space(AS_PROGRAM);
 
 	device->save_item(NAME(sh2->pc));
 	device->save_item(NAME(sh2->sr));

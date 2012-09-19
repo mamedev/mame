@@ -747,7 +747,7 @@ static int instruction_hook(device_t &device, offs_t curpc)
 	}
 
 	/* try all possible decodings at the current pc */
-	posscount = try_all_possibilities(*device.memory().space(AS_PROGRAM), curpc, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
+	posscount = try_all_possibilities(device.memory().space(AS_PROGRAM), curpc, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
 	if (keydirty)
 		fd1094_regenerate_key(device.machine());
 
@@ -1075,7 +1075,7 @@ static void execute_fdpc(running_machine &machine, int ref, int params, const ch
 
 static void execute_fdsearch(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space &space = *debug_cpu_get_visible_cpu(machine)->memory().space(AS_PROGRAM);
+	address_space &space = debug_cpu_get_visible_cpu(machine)->memory().space(AS_PROGRAM);
 	int pc = space.device().safe_pc();
 	int length, first = TRUE;
 	UINT8 instrdata[2];
@@ -1201,7 +1201,7 @@ static void execute_fdsearch(running_machine &machine, int ref, int params, cons
 
 static void execute_fddasm(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space &space = *debug_cpu_get_visible_cpu(machine)->memory().space(AS_PROGRAM);
+	address_space &space = debug_cpu_get_visible_cpu(machine)->memory().space(AS_PROGRAM);
 	int origstate = fd1094_set_state(keyregion, -1);
 	const char *filename;
 	int skipped = FALSE;

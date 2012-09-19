@@ -554,7 +554,7 @@ DRIVER_INIT_MEMBER(calorie_state,calorie)
 
 DRIVER_INIT_MEMBER(calorie_state,calorieb)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	space.set_decrypted_region(0x0000, 0x7fff, machine().root_device().memregion("maincpu")->base() + 0x10000);
 }
 

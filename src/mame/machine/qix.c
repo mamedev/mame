@@ -465,7 +465,7 @@ WRITE8_MEMBER(qix_state::qix_68705_portC_w)
 static TIMER_CALLBACK( pia_w_callback )
 {
 	pia6821_device *device = (pia6821_device *)ptr;
-	device->write(*device->machine().memory().first_space(), param >> 8, param & 0xff);
+	device->write(device->machine().driver_data()->generic_space(), param >> 8, param & 0xff);
 }
 
 
@@ -503,7 +503,7 @@ static WRITE8_DEVICE_HANDLER( qix_coinctl_w )
 	qix_state *state = device->machine().driver_data<qix_state>();
 
 	/* write to the sound chip */
-	state->m_sn1->write(*device->machine().device<legacy_cpu_device>("maincpu")->space(), 0, data);
+	state->m_sn1->write(device->machine().device<legacy_cpu_device>("maincpu")->space(), 0, data);
 
 	/* clock the ready line going back into CB1 */
 	pia6821_device *pia = downcast<pia6821_device *>(device);
@@ -517,7 +517,7 @@ static WRITE8_DEVICE_HANDLER( slither_76489_1_w )
 	qix_state *state = device->machine().driver_data<qix_state>();
 
 	/* write to the sound chip */
-	state->m_sn2->write(*device->machine().device<legacy_cpu_device>("maincpu")->space(), 0, data);
+	state->m_sn2->write(device->machine().device<legacy_cpu_device>("maincpu")->space(), 0, data);
 
 	/* clock the ready line going back into CB1 */
 	pia6821_device *pia = downcast<pia6821_device *>(device);

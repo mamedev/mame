@@ -317,7 +317,7 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT32 cap, int tb_d
 	ppc->cpu_clock = device->clock();
 	ppc->irq_callback = irqcallback;
 	ppc->device = device;
-	ppc->program = device->space(AS_PROGRAM);
+	ppc->program = &device->space(AS_PROGRAM);
 	ppc->direct = &ppc->program->direct();
 	ppc->system_clock = (config != NULL) ? config->bus_frequency : device->clock();
 	ppc->dcr_read_func = (config != NULL) ? config->dcr_read_func : NULL;

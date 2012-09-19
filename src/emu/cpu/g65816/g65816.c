@@ -338,7 +338,7 @@ static CPU_INIT( g65816 )
 
 	g65816_set_irq_callback(cpustate, irqcallback);
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->cpu_type = CPU_TYPE_G65816;
 
 	device->save_item(NAME(cpustate->a));

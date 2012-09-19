@@ -42,7 +42,7 @@ dsp16_device::dsp16_device(const machine_config &mconfig, const char *tag, devic
 void dsp16_device::device_start()
 {
 	// get our address spaces
-	m_program = space(AS_PROGRAM);
+	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 
 	save_item(NAME(m_pc));

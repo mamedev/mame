@@ -642,20 +642,20 @@ const cassette_interface sc3000_cassette_interface =
 
 void sg1000_state::install_cartridge(UINT8 *ptr, int size)
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	switch (size)
 	{
 	case 40 * 1024:
-		program->install_read_bank(0x8000, 0x9fff, "bank1");
-		program->unmap_write(0x8000, 0x9fff);
+		program.install_read_bank(0x8000, 0x9fff, "bank1");
+		program.unmap_write(0x8000, 0x9fff);
 		membank("bank1")->configure_entry(0, memregion(Z80_TAG)->base() + 0x8000);
 		membank("bank1")->set_entry(0);
 		break;
 
 	case 48 * 1024:
-		program->install_read_bank(0x8000, 0xbfff, "bank1");
-		program->unmap_write(0x8000, 0xbfff);
+		program.install_read_bank(0x8000, 0xbfff, "bank1");
+		program.unmap_write(0x8000, 0xbfff);
 		membank("bank1")->configure_entry(0, memregion(Z80_TAG)->base() + 0x8000);
 		membank("bank1")->set_entry(0);
 		break;
@@ -663,14 +663,14 @@ void sg1000_state::install_cartridge(UINT8 *ptr, int size)
 	default:
 		if (IS_CARTRIDGE_TV_DRAW(ptr))
 		{
-			program->install_write_handler(0x6000, 0x6000, 0, 0, write8_delegate(FUNC(sg1000_state::tvdraw_axis_w), this), 0);
-			program->install_read_handler(0x8000, 0x8000, 0, 0, read8_delegate(FUNC(sg1000_state::tvdraw_status_r), this), 0);
-			program->install_read_handler(0xa000, 0xa000, 0, 0, read8_delegate(FUNC(sg1000_state::tvdraw_data_r), this), 0);
-			program->nop_write(0xa000, 0xa000);
+			program.install_write_handler(0x6000, 0x6000, 0, 0, write8_delegate(FUNC(sg1000_state::tvdraw_axis_w), this), 0);
+			program.install_read_handler(0x8000, 0x8000, 0, 0, read8_delegate(FUNC(sg1000_state::tvdraw_status_r), this), 0);
+			program.install_read_handler(0xa000, 0xa000, 0, 0, read8_delegate(FUNC(sg1000_state::tvdraw_data_r), this), 0);
+			program.nop_write(0xa000, 0xa000);
 		}
 		else if (IS_CARTRIDGE_THE_CASTLE(ptr))
 		{
-			program->install_readwrite_bank(0x8000, 0x9fff, "bank1");
+			program.install_readwrite_bank(0x8000, 0x9fff, "bank1");
 		}
 		break;
 	}
@@ -684,7 +684,7 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 {
 	running_machine &machine = image.device().machine();
 	sg1000_state *state = machine.driver_data<sg1000_state>();
-	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
+	address_space &program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
 	UINT8 *ptr = state->memregion(Z80_TAG)->base();
 	UINT32 ram_size = 0x400;
 	bool install_2000_ram = false;
@@ -781,11 +781,11 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 
 	if ( install_2000_ram )
 	{
-		program->install_ram(0x2000, 0x3FFF);
+		program.install_ram(0x2000, 0x3FFF);
 	}
 
 	/* work RAM banking */
-	program->install_readwrite_bank(0xc000, 0xc000 + ram_size - 1, 0, 0x4000 - ram_size, "bank2");
+	program.install_readwrite_bank(0xc000, 0xc000 + ram_size - 1, 0, 0x4000 - ram_size, "bank2");
 
 	return IMAGE_INIT_PASS;
 }
@@ -825,25 +825,25 @@ static DEVICE_IMAGE_LOAD( omv_cart )
 
 void sc3000_state::install_cartridge(UINT8 *ptr, int size)
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* include SG-1000 mapping */
 	sg1000_state::install_cartridge(ptr, size);
 
 	if (IS_CARTRIDGE_BASIC_LEVEL_III(ptr))
 	{
-		program->install_readwrite_bank(0x8000, 0xbfff, "bank1");
-		program->install_readwrite_bank(0xc000, 0xffff, "bank2");
+		program.install_readwrite_bank(0x8000, 0xbfff, "bank1");
+		program.install_readwrite_bank(0xc000, 0xffff, "bank2");
 	}
 	else if (IS_CARTRIDGE_MUSIC_EDITOR(ptr))
 	{
-		program->install_readwrite_bank(0x8000, 0x9fff, "bank1");
-		program->install_readwrite_bank(0xc000, 0xc7ff, 0, 0x3800, "bank2");
+		program.install_readwrite_bank(0x8000, 0x9fff, "bank1");
+		program.install_readwrite_bank(0xc000, 0xc7ff, 0, 0x3800, "bank2");
 	}
 	else
 	{
 		/* regular cartridges */
-		program->install_readwrite_bank(0xc000, 0xc7ff, 0, 0x3800, "bank2");
+		program.install_readwrite_bank(0xc000, 0xc7ff, 0, 0x3800, "bank2");
 	}
 }
 

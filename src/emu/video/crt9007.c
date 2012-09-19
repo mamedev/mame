@@ -231,7 +231,7 @@ ADDRESS_MAP_END
 
 inline UINT8 crt9007_device::readbyte(offs_t address)
 {
-	return space()->read_byte(address);
+	return space().read_byte(address);
 }
 
 

@@ -1254,7 +1254,7 @@ static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 DRIVER_INIT_MEMBER(gaminator_state,gaminator)
 {
 	pc_vga_init(machine(), vga_setting, NULL);
-	pc_vga_gamtor_io_init(machine(), *machine().device("maincpu")->memory().space(AS_PROGRAM), 0x44000000, *machine().device("maincpu")->memory().space(AS_PROGRAM), 0x40000000);
+	pc_vga_gamtor_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0x44000000, machine().device("maincpu")->memory().space(AS_PROGRAM), 0x40000000);
 }
 
 

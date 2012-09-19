@@ -236,7 +236,7 @@ static TIMER_DEVICE_CALLBACK( alice32_scanline )
 
 DRIVER_INIT_MEMBER(mc10_state,mc10)
 {
-	address_space &prg = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &prg = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* initialize keyboard strobe */
 	m_keyboard_strobe = 0x00;

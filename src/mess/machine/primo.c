@@ -46,7 +46,7 @@ INTERRUPT_GEN_MEMBER(primo_state::primo_vblank_interrupt)
 static void primo_update_memory(running_machine &machine)
 {
 	primo_state *state = machine.driver_data<primo_state>();
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	switch (state->m_port_FD & 0x03)
 	{
 		case 0x00:	/* Original ROM */
@@ -300,7 +300,7 @@ static void primo_setup_pss (running_machine &machine, UINT8* snapshot_data, UIN
 	/* memory */
 
 	for (i=0; i<0xc000; i++)
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->write_byte( i+0x4000, snapshot_data[i+38]);
+		machine.device("maincpu")->memory().space(AS_PROGRAM).write_byte( i+0x4000, snapshot_data[i+38]);
 }
 
 SNAPSHOT_LOAD( primo )
@@ -346,7 +346,7 @@ static void primo_setup_pp (running_machine &machine,UINT8* quickload_data, UINT
 	start_addr = quickload_data[2] + quickload_data[3]*256;
 
 	for (i=4; i<quickload_size; i++)
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->write_byte(start_addr+i-4, quickload_data[i]);
+		machine.device("maincpu")->memory().space(AS_PROGRAM).write_byte(start_addr+i-4, quickload_data[i]);
 
 	machine.device("maincpu")->state().set_state_int(Z80_PC, start_addr);
 

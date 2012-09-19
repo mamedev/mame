@@ -1485,8 +1485,8 @@ READ8_HANDLER( sms_ioport_gg00_r )
 
 void init_extra_gg_ports(running_machine& machine, const char* tag)
 {
-	address_space *io = machine.device(tag)->memory().space(AS_IO);
-	io->install_legacy_read_handler     (0x00, 0x00, FUNC(sms_ioport_gg00_r));
+	address_space &io = machine.device(tag)->memory().space(AS_IO);
+	io.install_legacy_read_handler     (0x00, 0x00, FUNC(sms_ioport_gg00_r));
 }
 
 void init_smsgg(running_machine &machine)
@@ -1648,22 +1648,22 @@ static void megatech_set_genz80_as_sms_standard_ports(running_machine &machine, 
 {
 	/* INIT THE PORTS *********************************************************************************************/
 
-	address_space *io = machine.device(tag)->memory().space(AS_IO);
+	address_space &io = machine.device(tag)->memory().space(AS_IO);
 	device_t *sn = machine.device("snsnd");
 
-	io->install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_port_r), FUNC(z80_unmapped_port_w));
+	io.install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_port_r), FUNC(z80_unmapped_port_w));
 
-	io->install_legacy_read_handler      (0x7e, 0x7e, FUNC(md_sms_vdp_vcounter_r));
-	io->install_legacy_write_handler(*sn, 0x7e, 0x7f, FUNC(sn76496_w));
-	io->install_legacy_readwrite_handler (0xbe, 0xbe, FUNC(md_sms_vdp_data_r), FUNC(md_sms_vdp_data_w));
-	io->install_legacy_readwrite_handler (0xbf, 0xbf, FUNC(md_sms_vdp_ctrl_r), FUNC(md_sms_vdp_ctrl_w));
+	io.install_legacy_read_handler      (0x7e, 0x7e, FUNC(md_sms_vdp_vcounter_r));
+	io.install_legacy_write_handler(*sn, 0x7e, 0x7f, FUNC(sn76496_w));
+	io.install_legacy_readwrite_handler (0xbe, 0xbe, FUNC(md_sms_vdp_data_r), FUNC(md_sms_vdp_data_w));
+	io.install_legacy_readwrite_handler (0xbf, 0xbf, FUNC(md_sms_vdp_ctrl_r), FUNC(md_sms_vdp_ctrl_w));
 
-	io->install_legacy_read_handler      (0x10, 0x10, FUNC(megatech_sms_ioport_dd_r)); // super tetris
+	io.install_legacy_read_handler      (0x10, 0x10, FUNC(megatech_sms_ioport_dd_r)); // super tetris
 
-	io->install_legacy_read_handler      (0xdc, 0xdc, FUNC(megatech_sms_ioport_dc_r));
-	io->install_legacy_read_handler      (0xdd, 0xdd, FUNC(megatech_sms_ioport_dd_r));
-	io->install_legacy_read_handler      (0xde, 0xde, FUNC(megatech_sms_ioport_dd_r));
-	io->install_legacy_read_handler      (0xdf, 0xdf, FUNC(megatech_sms_ioport_dd_r)); // adams family
+	io.install_legacy_read_handler      (0xdc, 0xdc, FUNC(megatech_sms_ioport_dc_r));
+	io.install_legacy_read_handler      (0xdd, 0xdd, FUNC(megatech_sms_ioport_dd_r));
+	io.install_legacy_read_handler      (0xde, 0xde, FUNC(megatech_sms_ioport_dd_r));
+	io.install_legacy_read_handler      (0xdf, 0xdf, FUNC(megatech_sms_ioport_dd_r)); // adams family
 }
 
 void megatech_set_genz80_as_sms_standard_map(running_machine &machine, const char* tag, int mapper)
@@ -1671,16 +1671,16 @@ void megatech_set_genz80_as_sms_standard_map(running_machine &machine, const cha
 	/* INIT THE MEMMAP / BANKING *********************************************************************************/
 
 	/* catch any addresses that don't get mapped */
-	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_r), FUNC(z80_unmapped_w));
+	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_r), FUNC(z80_unmapped_w));
 
 	/* main ram area */
-	sms_mainram = (UINT8 *)machine.device(tag)->memory().space(AS_PROGRAM)->install_ram(0xc000, 0xdfff, 0, 0x2000);
+	sms_mainram = (UINT8 *)machine.device(tag)->memory().space(AS_PROGRAM).install_ram(0xc000, 0xdfff, 0, 0x2000);
 	memset(sms_mainram,0x00,0x2000);
 
 	megatech_set_genz80_as_sms_standard_ports(machine,  tag);
 
 	/* fixed rom bank area */
-	sms_rom = (UINT8 *)machine.device(tag)->memory().space(AS_PROGRAM)->install_rom(0x0000, 0xbfff, NULL);
+	sms_rom = (UINT8 *)machine.device(tag)->memory().space(AS_PROGRAM).install_rom(0x0000, 0xbfff, NULL);
 
 	memcpy(sms_rom, machine.root_device().memregion("maincpu")->base(), 0xc000);
 
@@ -1688,14 +1688,14 @@ void megatech_set_genz80_as_sms_standard_map(running_machine &machine, const cha
 	{
 
 
-		machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfffc, 0xffff, FUNC(mt_sms_standard_rom_bank_w));
+		machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_write_handler(0xfffc, 0xffff, FUNC(mt_sms_standard_rom_bank_w));
 
 	}
 	else if (mapper == MAPPER_CODEMASTERS )
 	{
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0000, 0x0000, FUNC(codemasters_rom_bank_0000_w));
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4000, 0x4000, FUNC(codemasters_rom_bank_4000_w));
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0x8000, FUNC(codemasters_rom_bank_8000_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x0000, 0x0000, FUNC(codemasters_rom_bank_0000_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x4000, 0x4000, FUNC(codemasters_rom_bank_4000_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x8000, 0x8000, FUNC(codemasters_rom_bank_8000_w));
 	}
 //  smsgg_backupram = NULL;
 }

@@ -89,7 +89,7 @@ ROM_END
 
 inline UINT8 sed1330_device::readbyte(offs_t address)
 {
-	return space()->read_byte(address);
+	return space().read_byte(address);
 }
 
 
@@ -99,7 +99,7 @@ inline UINT8 sed1330_device::readbyte(offs_t address)
 
 inline void sed1330_device::writebyte(offs_t address, UINT8 data)
 {
-	space()->write_byte(address, data);
+	space().write_byte(address, data);
 }
 
 

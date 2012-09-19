@@ -582,7 +582,7 @@ READ8_MEMBER(berzerk_state::berzerk_audio_r)
 
 static SOUND_RESET(berzerk)
 {
-	address_space &space = *machine.device("maincpu")->memory().space(AS_IO);
+	address_space &space = machine.device("maincpu")->memory().space(AS_IO);
 	berzerk_state *state = machine.driver_data<berzerk_state>();
 	/* clears the flip-flop controlling the volume and freq on the speech chip */
 	state->berzerk_audio_w(space, 4, 0x40);
@@ -1234,9 +1234,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(berzerk_state,moonwarp)
 {
-	address_space *io = machine().device("maincpu")->memory().space(AS_IO);
-	io->install_read_handler (0x48, 0x48, read8_delegate(FUNC(berzerk_state::moonwarp_p1_r), this));
-	io->install_read_handler (0x4a, 0x4a, read8_delegate(FUNC(berzerk_state::moonwarp_p2_r), this));
+	address_space &io = machine().device("maincpu")->memory().space(AS_IO);
+	io.install_read_handler (0x48, 0x48, read8_delegate(FUNC(berzerk_state::moonwarp_p1_r), this));
+	io.install_read_handler (0x4a, 0x4a, read8_delegate(FUNC(berzerk_state::moonwarp_p2_r), this));
 }
 
 /*************************************

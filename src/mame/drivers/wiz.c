@@ -1057,7 +1057,7 @@ DRIVER_INIT_MEMBER(wiz_state,stinger)
 		{ 5,3,7, 0x80 },
 		{ 5,7,3, 0x28 }
 	};
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	int size = machine().root_device().memregion("maincpu")->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, size);
@@ -1094,13 +1094,13 @@ DRIVER_INIT_MEMBER(wiz_state,stinger)
 
 DRIVER_INIT_MEMBER(wiz_state,scion)
 {
-	machine().device("audiocpu")->memory().space(AS_PROGRAM)->nop_write(0x4000, 0x4001);
+	machine().device("audiocpu")->memory().space(AS_PROGRAM).nop_write(0x4000, 0x4001);
 }
 
 
 DRIVER_INIT_MEMBER(wiz_state,wiz)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd400, 0xd400, read8_delegate(FUNC(wiz_state::wiz_protection_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd400, 0xd400, read8_delegate(FUNC(wiz_state::wiz_protection_r),this));
 }
 
 

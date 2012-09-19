@@ -1059,7 +1059,7 @@ void ti_rs232_pio_device::device_reset()
 		m_select_value = 0x74000;
 	}
 
-	m_space = machine().device("maincpu")->memory().space(AS_IO);
+	m_space = &machine().device("maincpu")->memory().space(AS_IO);
 	m_selected = false;
 
 	m_cru_base = (ioport("CRURS232")->read()==0)? 0x1300 : 0x1500;

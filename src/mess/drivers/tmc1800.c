@@ -167,14 +167,14 @@ WRITE8_MEMBER( nano_state::keylatch_w )
 
 void tmc2000_state::bankswitch()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 	UINT8 *rom = memregion(CDP1802_TAG)->base();
 
 	if (m_roc)
 	{
 		// monitor ROM
-		program->install_rom(0x0000, 0x01ff, 0, 0x7e00, rom);
+		program.install_rom(0x0000, 0x01ff, 0, 0x7e00, rom);
 	}
 	else
 	{
@@ -182,15 +182,15 @@ void tmc2000_state::bankswitch()
 		switch (m_ram->size())
 		{
 		case 4 * 1024:
-			program->install_ram(0x0000, 0x0fff, 0, 0x7000, ram);
+			program.install_ram(0x0000, 0x0fff, 0, 0x7000, ram);
 			break;
 
 		case 16 * 1024:
-			program->install_ram(0x0000, 0x3fff, 0, 0x4000, ram);
+			program.install_ram(0x0000, 0x3fff, 0, 0x4000, ram);
 			break;
 
 		case 32 * 1024:
-			program->install_ram(0x0000, 0x7fff, ram);
+			program.install_ram(0x0000, 0x7fff, ram);
 			break;
 		}
 	}
@@ -198,13 +198,13 @@ void tmc2000_state::bankswitch()
 	if (m_rac)
 	{
 		// color RAM
-		program->install_ram(0x8000, 0x81ff, 0, 0x7e00, m_colorram);
-		program->unmap_read(0x8000, 0x81ff, 0, 0x7e00);
+		program.install_ram(0x8000, 0x81ff, 0, 0x7e00, m_colorram);
+		program.unmap_read(0x8000, 0x81ff, 0, 0x7e00);
 	}
 	else
 	{
 		// monitor ROM
-		program->install_rom(0x8000, 0x81ff, 0, 0x7e00, rom);
+		program.install_rom(0x8000, 0x81ff, 0, 0x7e00, rom);
 	}
 }
 
@@ -220,9 +220,9 @@ WRITE8_MEMBER( tmc2000_state::bankswitch_w )
 WRITE8_MEMBER( nano_state::bankswitch_w )
 {
 	/* enable RAM */
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
-	program->install_ram(0x0000, 0x0fff, 0, 0x7000, ram);
+	program.install_ram(0x0000, 0x0fff, 0, 0x7000, ram);
 
 	/* write to CDP1864 tone latch */
 	m_cti->tone_latch_w(space, 0, data);
@@ -745,9 +745,9 @@ void nano_state::machine_reset()
 	m_cti->reset();
 
 	/* enable ROM */
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *rom = memregion(CDP1802_TAG)->base();
-	program->install_rom(0x0000, 0x01ff, 0, 0x7e00, rom);
+	program.install_rom(0x0000, 0x01ff, 0, 0x7e00, rom);
 }
 
 /* Machine Drivers */

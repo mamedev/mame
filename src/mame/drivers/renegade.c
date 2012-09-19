@@ -316,7 +316,7 @@ DRIVER_INIT_MEMBER(renegade_state,kuniokun)
 
 DRIVER_INIT_MEMBER(renegade_state,kuniokunb)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Remove the MCU handlers */
 	space.unmap_readwrite(0x3804, 0x3804);

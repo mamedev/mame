@@ -6477,7 +6477,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(dynax_state,mjreach)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x10060, 0x10060, write8_delegate(FUNC(dynax_state::yarunara_flipscreen_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x10060, 0x10060, write8_delegate(FUNC(dynax_state::yarunara_flipscreen_w),this));
 }
 
 /***************************************************************************

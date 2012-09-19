@@ -916,7 +916,7 @@ DRIVER_INIT_MEMBER(looping_state,looping)
 		rom[i] = BITSWAP8(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x7000, 0x7007, read8_delegate(FUNC(looping_state::protection_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x7000, 0x7007, read8_delegate(FUNC(looping_state::protection_r), this));
 }
 
 

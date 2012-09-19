@@ -721,8 +721,8 @@ DRIVER_INIT_MEMBER(eprom_state,eprom)
 	atarijsa_init(machine(), "260010", 0x0002);
 
 	/* install CPU synchronization handlers */
-	m_sync_data = machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x16cc00, 0x16cc01, read16_delegate(FUNC(eprom_state::sync_r),this), write16_delegate(FUNC(eprom_state::sync_w),this));
-	m_sync_data = machine().device("extra")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x16cc00, 0x16cc01, read16_delegate(FUNC(eprom_state::sync_r),this), write16_delegate(FUNC(eprom_state::sync_w),this));
+	m_sync_data = machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x16cc00, 0x16cc01, read16_delegate(FUNC(eprom_state::sync_r),this), write16_delegate(FUNC(eprom_state::sync_w),this));
+	m_sync_data = machine().device("extra")->memory().space(AS_PROGRAM).install_readwrite_handler(0x16cc00, 0x16cc01, read16_delegate(FUNC(eprom_state::sync_r),this), write16_delegate(FUNC(eprom_state::sync_w),this));
 }
 
 

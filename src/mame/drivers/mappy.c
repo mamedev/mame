@@ -717,7 +717,7 @@ WRITE8_MEMBER(mappy_state::mappy_latch_w)
 
 MACHINE_RESET_MEMBER(mappy_state,superpac)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -727,7 +727,7 @@ MACHINE_RESET_MEMBER(mappy_state,superpac)
 
 MACHINE_RESET_MEMBER(mappy_state,phozon)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -737,7 +737,7 @@ MACHINE_RESET_MEMBER(mappy_state,phozon)
 
 MACHINE_RESET_MEMBER(mappy_state,mappy)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -2258,13 +2258,13 @@ DRIVER_INIT_MEMBER(mappy_state,grobda)
        However, removing the 15XX from the board causes sound to disappear completely, so
        the DAC might be built-in after all.
       */
-	machine().device("sub")->memory().space(AS_PROGRAM)->install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(mappy_state::grobda_DAC_w),this));
+	machine().device("sub")->memory().space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(mappy_state::grobda_DAC_w),this));
 }
 
 DRIVER_INIT_MEMBER(mappy_state,digdug2)
 {
 	/* appears to not use the watchdog */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x8000, 0x8000);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x8000, 0x8000);
 }
 
 

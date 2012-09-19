@@ -327,12 +327,11 @@ UINT32 atvtrack_state::screen_update_atvtrack(screen_device &screen, bitmap_rgb3
 void atvtrack_state::machine_start()
 {
 	UINT8 *src, *dst;
-	address_space *as;
 
 	nandaddressstep = 0;
 	nandregion = machine().root_device().memregion("maincpu");
-	as = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	dst = (UINT8 *)(as->get_write_ptr(0x0c7f0000));
+	address_space &as = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	dst = (UINT8 *)(as.get_write_ptr(0x0c7f0000));
 	src = nandregion->base()+0x10;
 	// copy 0x10000 bytes from region "maincpu" offset 0x10 to 0x0c7f0000
 	memcpy(dst, src, 0x10000);
@@ -344,7 +343,7 @@ void atvtrack_state::machine_reset()
 	// The routine initializes the cpu, copies the boot program from the flash memories into the cpu sdram
 	// and finally executes it.
 	// Here there is the setup of the cpu, the boot program is copied in machine_start
-	address_space &as = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &as = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	// set cpu PC register to 0x0c7f0000
 	machine().device("maincpu")->state().set_pc(0x0c7f0000);
 	// set BCR2 to 1

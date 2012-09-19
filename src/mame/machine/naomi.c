@@ -192,8 +192,8 @@ static void create_pic_from_retdat(running_machine& machine)
 
 DRIVER_INIT_MEMBER(dc_state,naomi)
 {
-	//machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2ad238, 0xc2ad23f, FUNC(naomi_biose_idle_skip_r)); // rev e bios
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2b0600, 0xc2b0607, FUNC(naomi_biosh_idle_skip_r)); // rev h bios
+	//machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xc2ad238, 0xc2ad23f, FUNC(naomi_biose_idle_skip_r)); // rev e bios
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xc2b0600, 0xc2b0607, FUNC(naomi_biosh_idle_skip_r)); // rev h bios
 	jvsboard_type = JVSBD_DEFAULT;
 	actel_id = 0xffff;
 
@@ -202,7 +202,7 @@ DRIVER_INIT_MEMBER(dc_state,naomi)
 
 DRIVER_INIT_MEMBER(dc_state,naomi2)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2b0600, 0xc2b0607, FUNC(naomi2_biose_idle_skip_r)); // rev e bios
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xc2b0600, 0xc2b0607, FUNC(naomi2_biose_idle_skip_r)); // rev e bios
 	jvsboard_type = JVSBD_DEFAULT;
 	actel_id = 0xffff;
 
@@ -211,8 +211,8 @@ DRIVER_INIT_MEMBER(dc_state,naomi2)
 
 DRIVER_INIT_MEMBER(dc_state,naomi_mp)
 {
-	//machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2ad238, 0xc2ad23f, FUNC(naomi_biose_idle_skip_r)); // rev e bios
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2b0600, 0xc2b0607, FUNC(naomi_biosh_idle_skip_r)); // rev h bios
+	//machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xc2ad238, 0xc2ad23f, FUNC(naomi_biose_idle_skip_r)); // rev e bios
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xc2b0600, 0xc2b0607, FUNC(naomi_biosh_idle_skip_r)); // rev h bios
 	jvsboard_type = JVSBD_MAHJONG;
 	actel_id = 0xffff;
 
@@ -221,8 +221,8 @@ DRIVER_INIT_MEMBER(dc_state,naomi_mp)
 
 DRIVER_INIT_MEMBER(dc_state,naomigd)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2ad238, 0xc2ad23f, FUNC(naomi_biose_idle_skip_r)); // rev e bios
-	//machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2b0600, 0xc2b0607, FUNC(naomi_biosh_idle_skip_r)); // rev h bios
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xc2ad238, 0xc2ad23f, FUNC(naomi_biose_idle_skip_r)); // rev e bios
+	//machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xc2b0600, 0xc2b0607, FUNC(naomi_biosh_idle_skip_r)); // rev h bios
 	jvsboard_type = JVSBD_DEFAULT;
 	actel_id = 0xffff;
 
@@ -231,8 +231,8 @@ DRIVER_INIT_MEMBER(dc_state,naomigd)
 
 DRIVER_INIT_MEMBER(dc_state,naomigd_mp)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2ad238, 0xc2ad23f, FUNC(naomi_biose_idle_skip_r)); // rev e bios
-	//machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2b0600, 0xc2b0607, FUNC(naomi_biosh_idle_skip_r)); // rev h bios
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xc2ad238, 0xc2ad23f, FUNC(naomi_biose_idle_skip_r)); // rev e bios
+	//machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xc2b0600, 0xc2b0607, FUNC(naomi_biosh_idle_skip_r)); // rev h bios
 	jvsboard_type = JVSBD_MAHJONG;
 	actel_id = 0xffff;
 
@@ -250,7 +250,7 @@ static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
 
 DRIVER_INIT_MEMBER(dc_state,ggxxsla)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc1aae18, 0xc1aae1f, FUNC(naomigd_ggxxsla_idle_skip_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xc1aae18, 0xc1aae1f, FUNC(naomigd_ggxxsla_idle_skip_r));
 	DRIVER_INIT_CALL(naomigd);
 }
 
@@ -265,7 +265,7 @@ static READ64_HANDLER( naomigd_ggxx_idle_skip_r )
 
 DRIVER_INIT_MEMBER(dc_state,ggxx)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc1837b8, 0xc1837bf, FUNC(naomigd_ggxx_idle_skip_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xc1837b8, 0xc1837bf, FUNC(naomigd_ggxx_idle_skip_r));
 	DRIVER_INIT_CALL(naomigd);
 }
 
@@ -281,7 +281,7 @@ static READ64_HANDLER( naomigd_ggxxrl_idle_skip_r )
 
 DRIVER_INIT_MEMBER(dc_state,ggxxrl)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc18d6c8, 0xc18d6cf, FUNC(naomigd_ggxxrl_idle_skip_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xc18d6c8, 0xc18d6cf, FUNC(naomigd_ggxxrl_idle_skip_r));
 	DRIVER_INIT_CALL(naomigd);
 }
 
@@ -296,7 +296,7 @@ static READ64_HANDLER( naomigd_sfz3ugd_idle_skip_r )
 
 DRIVER_INIT_MEMBER(dc_state,sfz3ugd)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc5dc900, 0xc5dc907, FUNC(naomigd_sfz3ugd_idle_skip_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xc5dc900, 0xc5dc907, FUNC(naomigd_sfz3ugd_idle_skip_r));
 	DRIVER_INIT_CALL(naomigd);
 }
 
@@ -344,7 +344,7 @@ static READ64_HANDLER( hotd2_idle_skip_r )
 
 DRIVER_INIT_MEMBER(dc_state,hotd2)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xca25fb8, 0xca25fbf, FUNC(hotd2_idle_skip_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xca25fb8, 0xca25fbf, FUNC(hotd2_idle_skip_r));
 }
 
 // f355 PC=0xc065f7c RAM=0xc26dafc

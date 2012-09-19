@@ -339,7 +339,7 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 {
 	running_machine &machine = image.device().machine();
 	vc4000_state *state = machine.driver_data<vc4000_state>();
-	address_space *memspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &memspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -352,23 +352,23 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 
 	if (size > 0x1000)	/* 6k rom + 1k ram - Chess2 only */
 	{
-		memspace->install_read_bank(0x0800, 0x15ff, "bank1");	/* extra rom */
+		memspace.install_read_bank(0x0800, 0x15ff, "bank1");	/* extra rom */
 		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1000);
 
-		memspace->install_readwrite_bank(0x1800, 0x1bff, "bank2");	/* ram */
+		memspace.install_readwrite_bank(0x1800, 0x1bff, "bank2");	/* ram */
 		state->membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1800);
 	}
 	else if (size > 0x0800)	/* some 4k roms have 1k of mirrored ram */
 	{
-		memspace->install_read_bank(0x0800, 0x0fff, "bank1");	/* extra rom */
+		memspace.install_read_bank(0x0800, 0x0fff, "bank1");	/* extra rom */
 		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x0800);
 
-		memspace->install_readwrite_bank(0x1000, 0x15ff, 0, 0x800, "bank2"); /* ram */
+		memspace.install_readwrite_bank(0x1000, 0x15ff, 0, 0x800, "bank2"); /* ram */
 		state->membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1000);
 	}
 	else if (size == 0x0800)	/* 2k roms + 2k ram - Hobby Module(Radofin) and elektor TVGC*/
 	{
-		memspace->install_readwrite_bank(0x0800, 0x0fff, "bank1"); /* ram */
+		memspace.install_readwrite_bank(0x0800, 0x0fff, "bank1"); /* ram */
 		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x0800);
 	}
 
@@ -530,7 +530,7 @@ ROM_END
 
 QUICKLOAD_LOAD(vc4000)
 {
-	address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 	int quick_addr = 0x08c0;
 	int exec_addr;

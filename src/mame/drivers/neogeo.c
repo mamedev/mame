@@ -685,7 +685,7 @@ WRITE16_MEMBER(neogeo_state::main_cpu_bank_select_w)
 
 static void main_cpu_banking_init( running_machine &machine )
 {
-	address_space &mainspace = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &mainspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* create vector banks */
 	machine.root_device().membank(NEOGEO_BANK_VECTORS)->configure_entry(0, machine.root_device().memregion("mainbios")->base());
@@ -826,7 +826,7 @@ static void audio_cpu_banking_init( running_machine &machine )
 	set_audio_cpu_banking(machine);
 
 	state->m_audio_cpu_rom_source_last = 0;
-	set_audio_cpu_rom_source(*machine.device("maincpu")->memory().space(AS_PROGRAM), 0);
+	set_audio_cpu_rom_source(machine.device("maincpu")->memory().space(AS_PROGRAM), 0);
 }
 
 
@@ -982,7 +982,7 @@ static void neogeo_postload(running_machine &machine)
 	_set_main_cpu_bank_address(machine);
 	_set_main_cpu_vector_table_source(machine);
 	set_audio_cpu_banking(machine);
-	_set_audio_cpu_rom_source(*machine.device("maincpu")->memory().space(AS_PROGRAM));
+	_set_audio_cpu_rom_source(machine.device("maincpu")->memory().space(AS_PROGRAM));
 	set_outputs(machine);
 }
 
@@ -1050,7 +1050,7 @@ void neogeo_state::machine_start()
 void neogeo_state::machine_reset()
 {
 	offs_t offs;
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* reset system control registers */
 	for (offs = 0; offs < 8; offs++)
@@ -1336,7 +1336,7 @@ DEVICE_IMAGE_LOAD( neo_cartridge )
 		}
 
 		// setup cartridge ROM area
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x000080,0x0fffff,"cart_rom");
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x000080,0x0fffff,"cart_rom");
 		image.device().machine().root_device().membank("cart_rom")->set_base(&image.device().machine().root_device().memregion("maincpu")->base()[0x80]);
 
 		// handle possible protection

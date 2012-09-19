@@ -75,13 +75,12 @@ READ16_MEMBER(toaplan1_state::demonwld_dsp_r)
 {
 	/* DSP can read data from main CPU RAM via DSP IO port 1 */
 
-	address_space *mainspace;
 	UINT16 input_data = 0;
 
 	switch (m_main_ram_seg) {
-		case 0xc00000:	mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
-						input_data = mainspace->read_word(m_main_ram_seg + m_dsp_addr_w);
-						break;
+		case 0xc00000: {address_space &mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+						input_data = mainspace.read_word(m_main_ram_seg + m_dsp_addr_w);
+						break;}
 		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n", space.device().safe_pcbase(), m_main_ram_seg + m_dsp_addr_w);
 	}
 	logerror("DSP PC:%04x IO read %04x at %08x (port 1)\n", space.device().safe_pcbase(), input_data, m_main_ram_seg + m_dsp_addr_w);
@@ -90,15 +89,13 @@ READ16_MEMBER(toaplan1_state::demonwld_dsp_r)
 
 WRITE16_MEMBER(toaplan1_state::demonwld_dsp_w)
 {
-	address_space *mainspace;
-
 	/* Data written to main CPU RAM via DSP IO port 1 */
 	m_dsp_execute = 0;
 	switch (m_main_ram_seg) {
-		case 0xc00000:	if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
-						mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
-						mainspace->write_word(m_main_ram_seg + m_dsp_addr_w, data);
-						break;
+		case 0xc00000: {if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
+						address_space &mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+						mainspace.write_word(m_main_ram_seg + m_dsp_addr_w, data);
+						break;}
 		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n", space.device().safe_pcbase(), m_main_ram_seg + m_dsp_addr_w);
 	}
 	logerror("DSP PC:%04x IO write %04x at %08x (port 1)\n", space.device().safe_pcbase(), data, m_main_ram_seg + m_dsp_addr_w);

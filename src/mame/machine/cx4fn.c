@@ -101,7 +101,7 @@ static void CX4_C4DrawWireFrame(running_machine &machine)
 	UINT8 Color;
 	INT32 i;
 
-	address_space &space = *machine.device<cpu_device>("maincpu")->space(AS_PROGRAM);
+	address_space &space = machine.device<cpu_device>("maincpu")->space(AS_PROGRAM);
 	for(i = cx4.ram[0x0295]; i > 0; i--, line += 5)
 	{
 		if(space.read_byte(line) == 0xff &&

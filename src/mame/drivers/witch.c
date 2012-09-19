@@ -875,7 +875,7 @@ DRIVER_INIT_MEMBER(witch_state,witch)
 	UINT8 *ROM = (UINT8 *)memregion("maincpu")->base();
 	membank("bank1")->set_base(&ROM[0x10000+UNBANKED_SIZE]);
 
-	machine().device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), this));
+	machine().device("sub")->memory().space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), this));
 	m_bank = -1;
 }
 

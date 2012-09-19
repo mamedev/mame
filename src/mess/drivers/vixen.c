@@ -809,10 +809,10 @@ void vixen_state::machine_start()
 
 void vixen_state::machine_reset()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	program->install_read_bank(0x0000, 0xefff, 0xfff, 0, "bank1");
-	program->install_write_bank(0x0000, 0xefff, 0xfff, 0, "bank2");
+	program.install_read_bank(0x0000, 0xefff, 0xfff, 0, "bank1");
+	program.install_write_bank(0x0000, 0xefff, 0xfff, 0, "bank2");
 
 	membank("bank1")->set_entry(1);
 	membank("bank2")->set_entry(1);
@@ -910,10 +910,10 @@ DIRECT_UPDATE_MEMBER(vixen_state::vixen_direct_update_handler)
 	{
 		if (m_reset)
 		{
-			address_space *program = m_maincpu->space(AS_PROGRAM);
+			address_space &program = m_maincpu->space(AS_PROGRAM);
 
-			program->install_read_bank(0x0000, 0xefff, "bank1");
-			program->install_write_bank(0x0000, 0xefff, "bank2");
+			program.install_read_bank(0x0000, 0xefff, "bank1");
+			program.install_write_bank(0x0000, 0xefff, "bank2");
 
 			membank("bank1")->set_entry(0);
 			membank("bank2")->set_entry(0);
@@ -931,8 +931,8 @@ DIRECT_UPDATE_MEMBER(vixen_state::vixen_direct_update_handler)
 
 DRIVER_INIT_MEMBER(vixen_state,vixen)
 {
-	address_space *program = machine().device<cpu_device>(Z8400A_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate(FUNC(vixen_state::vixen_direct_update_handler), this));
+	address_space &program = machine().device<cpu_device>(Z8400A_TAG)->space(AS_PROGRAM);
+	program.set_direct_update_handler(direct_update_delegate(FUNC(vixen_state::vixen_direct_update_handler), this));
 }
 
 

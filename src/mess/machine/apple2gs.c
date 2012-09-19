@@ -1554,7 +1554,7 @@ static UINT8 apple2gs_xxCxxx_r(address_space &space, running_machine &machine, o
 	}
 	else if ((address & 0x000F00) == 0x000000)	// accessing C0xx?
 	{
-		result = state->apple2gs_c0xx_r(*machine.device("maincpu")->memory().space(AS_PROGRAM), address, 0);
+		result = state->apple2gs_c0xx_r(machine.device("maincpu")->memory().space(AS_PROGRAM), address, 0);
 	}
 	else
 	{
@@ -1646,7 +1646,7 @@ static void apple2gs_xxCxxx_w(address_space &space, running_machine &machine, of
 	}
 	else if ((address & 0x000F00) == 0x000000)
 	{
-		state->apple2gs_c0xx_w(*machine.device("maincpu")->memory().space(AS_PROGRAM), address, data, 0);
+		state->apple2gs_c0xx_w(machine.device("maincpu")->memory().space(AS_PROGRAM), address, data, 0);
 	}
 	else
 	{
@@ -1796,7 +1796,7 @@ static READ8_HANDLER(apple2gs_bank_echo_r)
 static void apple2gs_setup_memory(running_machine &machine)
 {
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	offs_t begin, end;
 	apple2_memmap_config cfg;
 

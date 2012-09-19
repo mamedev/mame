@@ -242,8 +242,8 @@ MACHINE_RESET_MEMBER(atarisy2_state,atarisy2)
 	atarigen_sound_io_reset(machine().device("soundcpu"));
 	atarigen_scanline_timer_reset(*machine().primary_screen, scanline_update, 64);
 
-	address_space *main = machine().device<t11_device>("maincpu")->space(AS_PROGRAM);
-	main->set_direct_update_handler(direct_update_delegate(FUNC(atarisy2_state::atarisy2_direct_handler), this));
+	address_space &main = machine().device<t11_device>("maincpu")->space(AS_PROGRAM);
+	main.set_direct_update_handler(direct_update_delegate(FUNC(atarisy2_state::atarisy2_direct_handler), this));
 
 	m_p2portwr_state = 0;
 	m_p2portrd_state = 0;
@@ -340,7 +340,7 @@ WRITE16_MEMBER(atarisy2_state::bankselect_w)
 
 static void bankselect_postload(running_machine &machine)
 {
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	atarisy2_state *state = machine.driver_data<atarisy2_state>();
 
 	state->bankselect_w(space, 0, state->m_bankselect[0], 0xffff);

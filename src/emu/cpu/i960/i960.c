@@ -2067,7 +2067,7 @@ static CPU_INIT( i960 )
 
 	i960->irq_cb = irqcallback;
 	i960->device = device;
-	i960->program = device->space(AS_PROGRAM);
+	i960->program = &device->space(AS_PROGRAM);
 	i960->direct = &i960->program->direct();
 
 	device->save_item(NAME(i960->PIP));

@@ -277,7 +277,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 {
 	popeye_state *state = machine.driver_data<popeye_state>();
 	int offs;
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (state->m_lastflip != state->flip_screen())
 	{

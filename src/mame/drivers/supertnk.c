@@ -288,7 +288,7 @@ UINT32 supertnk_state::screen_update_supertnk(screen_device &screen, bitmap_rgb3
 
 void supertnk_state::machine_reset()
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	supertnk_bankswitch_0_w(space, 0, 0);
 	supertnk_bankswitch_1_w(space, 0, 0);
 

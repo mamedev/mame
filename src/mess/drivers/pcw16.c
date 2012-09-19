@@ -369,7 +369,7 @@ READ8_MEMBER(pcw16_state::pcw16_no_mem_r)
 /*
 static void pcw16_set_bank_handlers(running_machine &machine, int bank, PCW16_RAM_TYPE type)
 {
-    address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
     pcw16_state *state = machine.driver_data<pcw16_state>();
     switch (type) {
     case PCW16_MEM_ROM:
@@ -441,7 +441,7 @@ static void pcw16_update_bank(running_machine &machine, int bank)
                 flashdev = machine.device<intelfsh8_device>("flash1");
             }
 
-            mem_ptr = (unsigned char *)flashdev->space()->get_read_ptr(0);
+            mem_ptr = (unsigned char *)flashdev->space().get_read_ptr(0);
         }
 
     }

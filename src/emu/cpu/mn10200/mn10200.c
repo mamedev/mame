@@ -274,8 +274,8 @@ static CPU_INIT(mn10200)
 	memset(cpustate, 0, sizeof(mn102_info));
 
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = &device->space(AS_PROGRAM);
+	cpustate->io = &device->space(AS_IO);
 
 	device->save_item(NAME(cpustate->pc));
 	device->save_item(NAME(cpustate->d));

@@ -418,12 +418,12 @@ WRITE8_MEMBER( mos8563_device::register_w )
 
 inline UINT8 mos8563_device::read_videoram(offs_t offset)
 {
-	return space(AS_0)->read_byte(offset);
+	return space(AS_0).read_byte(offset);
 }
 
 inline void mos8563_device::write_videoram(offs_t offset, UINT8 data)
 {
-	space(AS_0)->write_byte(offset, data);
+	space(AS_0).write_byte(offset, data);
 }
 
 

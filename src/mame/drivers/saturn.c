@@ -239,7 +239,7 @@ DMA TODO:
 static void scu_do_transfer(running_machine &machine,UINT8 event)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	for(i=0;i<3;i++)
@@ -2054,35 +2054,35 @@ MACHINE_RESET_MEMBER(saturn_state,saturn)
 
 	m_cart_type = ioport("CART_AREA")->read() & 7;
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x027fffff, FUNC(saturn_null_ram_r), FUNC(saturn_null_ram_w));
-	machine().device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x027fffff, FUNC(saturn_null_ram_r), FUNC(saturn_null_ram_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02400000, 0x027fffff, FUNC(saturn_null_ram_r), FUNC(saturn_null_ram_w));
+	machine().device("slave")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02400000, 0x027fffff, FUNC(saturn_null_ram_r), FUNC(saturn_null_ram_w));
 
 	if(m_cart_type == 5)
 	{
 		//  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
-		machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
-		machine().device("slave")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
+		machine().device("maincpu")->memory().space(AS_PROGRAM).nop_readwrite(0x02400000, 0x027fffff);
+		machine().device("slave")->memory().space(AS_PROGRAM).nop_readwrite(0x02400000, 0x027fffff);
 
-		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x0247ffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
-		machine().device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x0247ffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
-		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x0267ffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
-		machine().device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x0267ffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02400000, 0x0247ffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
+		machine().device("slave")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02400000, 0x0247ffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02600000, 0x0267ffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
+		machine().device("slave")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02600000, 0x0267ffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
 	}
 
 	if(m_cart_type == 6)
 	{
 		//  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
-		machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
-		machine().device("slave")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
+		machine().device("maincpu")->memory().space(AS_PROGRAM).nop_readwrite(0x02400000, 0x027fffff);
+		machine().device("slave")->memory().space(AS_PROGRAM).nop_readwrite(0x02400000, 0x027fffff);
 
-		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x025fffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
-		machine().device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x025fffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
-		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x027fffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
-		machine().device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x027fffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02400000, 0x025fffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
+		machine().device("slave")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02400000, 0x025fffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02600000, 0x027fffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
+		machine().device("slave")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02600000, 0x027fffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
 	}
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x04000000, 0x047fffff);
-	machine().device("slave")->memory().space(AS_PROGRAM)->nop_readwrite(0x04000000, 0x047fffff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_readwrite(0x04000000, 0x047fffff);
+	machine().device("slave")->memory().space(AS_PROGRAM).nop_readwrite(0x04000000, 0x047fffff);
 
 	if(m_cart_type > 0 && m_cart_type < 5)
 	{
@@ -2093,8 +2093,8 @@ MACHINE_RESET_MEMBER(saturn_state,saturn)
 		//mask = 0x7fffff >> 4-3 = 0x3fffff 16mbit
 		//mask = 0x7fffff >> 4-2 = 0x1fffff 8mbit
 		//mask = 0x7fffff >> 4-1 = 0x0fffff 4mbit
-		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x04000000, 0x04000000 | mask, FUNC(saturn_cs1_r), FUNC(saturn_cs1_w));
-		machine().device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x04000000, 0x04000000 | mask, FUNC(saturn_cs1_r), FUNC(saturn_cs1_w));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x04000000, 0x04000000 | mask, FUNC(saturn_cs1_r), FUNC(saturn_cs1_w));
+		machine().device("slave")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x04000000, 0x04000000 | mask, FUNC(saturn_cs1_r), FUNC(saturn_cs1_w));
 	}
 
 

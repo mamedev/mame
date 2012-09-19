@@ -237,7 +237,7 @@ INLINE void COPS_send_data_if_possible(running_machine &machine)
 {
 	lisa_state *state = machine.driver_data<lisa_state>();
 	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if ((! state->m_hold_COPS_data) && state->m_fifo_size && (! state->m_COPS_Ready))
 	{
@@ -427,7 +427,7 @@ static TIMER_CALLBACK(read_COPS_command)
 	lisa_state *state = machine.driver_data<lisa_state>();
 	int command;
 	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->m_COPS_Ready = 0;
 
@@ -1043,7 +1043,7 @@ void lisa_state::machine_reset()
 	m_rom_ptr = machine().root_device().memregion("maincpu")->base() + ROM_OFFSET;
 	m_videoROM_ptr = memregion("gfx1")->base();
 
-//  machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine()));
+//  machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine()));
 //  m68k_set_reset_callback(machine().device("maincpu"), /*lisa_reset_instr_callback*/NULL);
 
 	/* init MMU */

@@ -447,7 +447,7 @@ DEVICE_IMAGE_LOAD( to7_cartridge )
 
 static void to7_update_cart_bank(running_machine &machine)
 {
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int bank = 0;
 	if ( thom_cart_nb_banks )
 	{
@@ -772,7 +772,7 @@ static WRITE8_DEVICE_HANDLER( to7_io_portb_out )
 	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), data ));
 
 	/* set 8-bit data */
-	printer->write( *device->machine().memory().first_space(), 0, data);
+	printer->write( device->machine().driver_data()->generic_space(), 0, data);
 }
 
 
@@ -1487,7 +1487,7 @@ MACHINE_RESET ( to7 )
 
 MACHINE_START ( to7 )
 {
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8* mem = machine.root_device().memregion("maincpu")->base();
 	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
@@ -1568,7 +1568,7 @@ static READ8_DEVICE_HANDLER ( to770_sys_porta_in )
 static void to770_update_ram_bank(running_machine &machine)
 {
 	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 portb = sys_pia->port_b_z_mask();
 	int bank;
 
@@ -1992,7 +1992,7 @@ DEVICE_IMAGE_LOAD( mo5_cartridge )
 
 static void mo5_update_cart_bank(running_machine &machine)
 {
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int rom_is_ram = mo5_reg_cart & 4;
 	int bank = 0;
 	int bank_is_read_only = 0;
@@ -2394,7 +2394,7 @@ static UINT8 to9_soft_bank;
 
 static void to9_update_cart_bank(running_machine &machine)
 {
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int bank = 0;
 	int slot = ( mc6846_get_output_port(machine.device("mc6846")) >> 4 ) & 3; /* bits 4-5: ROM bank */
 
@@ -2510,7 +2510,7 @@ READ8_HANDLER ( to9_cartridge_r )
 static void to9_update_ram_bank (running_machine &machine)
 {
 	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 port = mc6846_get_output_port(machine.device("mc6846"));
 	UINT8 portb = sys_pia->port_b_z_mask();
 	UINT8 disk = ((port >> 2) & 1) | ((port >> 5) & 2); /* bits 6,2: RAM bank */
@@ -3049,7 +3049,7 @@ static READ8_DEVICE_HANDLER ( to9_sys_porta_in )
 static WRITE8_DEVICE_HANDLER ( to9_sys_porta_out )
 {
 	centronics_device *printer = device->machine().device<centronics_device>("centronics");
-	printer->write(*device->machine().memory().first_space(), 0, data & 0xfe);
+	printer->write(device->machine().driver_data()->generic_space(), 0, data & 0xfe);
 }
 
 
@@ -3573,7 +3573,7 @@ static void to8_update_floppy_bank_postload(running_machine *machine)
 static void to8_update_ram_bank (running_machine &machine)
 {
 	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 bank = 0;
 
 	if ( to8_reg_sys1 & 0x10 )
@@ -3637,7 +3637,7 @@ static void to8_update_ram_bank_postload(running_machine *machine)
 
 static void to8_update_cart_bank (running_machine &machine)
 {
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int bank = 0;
 	int bank_is_read_only = 0;
 
@@ -4498,7 +4498,7 @@ static void mo6_update_ram_bank_postload(running_machine *machine)
 static void mo6_update_cart_bank (running_machine &machine)
 {
 	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int b = (sys_pia->a_output() >> 5) & 1;
 	int bank = 0;
 	int bank_is_read_only = 0;
@@ -4760,7 +4760,7 @@ static WRITE8_DEVICE_HANDLER ( mo6_game_porta_out )
 	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), data ));
 
 	/* centronics data */
-	printer->write( *device->machine().memory().first_space(), 0, data);
+	printer->write( device->machine().driver_data()->generic_space(), 0, data);
 }
 
 

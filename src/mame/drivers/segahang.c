@@ -437,7 +437,7 @@ void segahang_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		// synchronize writes to the 8255 PPI
 		case TID_PPI_WRITE:
-			m_i8255_1->write(*m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
+			m_i8255_1->write(m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
 			break;
 	}
 }
@@ -1791,7 +1791,7 @@ DRIVER_INIT_MEMBER(segahang_state,endurobl)
 	UINT16 *decrypt = auto_alloc_array(machine(), UINT16, 0x40000/2);
 	memcpy(decrypt + 0x00000/2, rom + 0x30000/2, 0x10000);
 	memcpy(decrypt + 0x10000/2, rom + 0x10000/2, 0x20000);
-	m_maincpu->space(AS_PROGRAM)->set_decrypted_region(0x000000, 0x03ffff, decrypt);
+	m_maincpu->space(AS_PROGRAM).set_decrypted_region(0x000000, 0x03ffff, decrypt);
 }
 
 DRIVER_INIT_MEMBER(segahang_state,endurob2)
@@ -1802,7 +1802,7 @@ DRIVER_INIT_MEMBER(segahang_state,endurob2)
 	UINT16 *rom = reinterpret_cast<UINT16 *>(memregion("maincpu")->base());
 	UINT16 *decrypt = auto_alloc_array(machine(), UINT16, 0x40000/2);
 	memcpy(decrypt, rom, 0x30000);
-	m_maincpu->space(AS_PROGRAM)->set_decrypted_region(0x000000, 0x03ffff, decrypt);
+	m_maincpu->space(AS_PROGRAM).set_decrypted_region(0x000000, 0x03ffff, decrypt);
 }
 
 

@@ -171,7 +171,7 @@ void bsmt2000_device::device_start()
 	m_cpu = subdevice<tms32015_device>("bsmt2000");
 
 	// find our direct access
-	m_direct = &space()->direct();
+	m_direct = &space().direct();
 
 	// create the stream; BSMT typically runs at 24MHz and writes to a DAC, so
 	// in theory we should generate a 24MHz stream, but that's certainly overkill

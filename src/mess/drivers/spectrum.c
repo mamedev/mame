@@ -620,7 +620,7 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(spectrum_state,spectrum)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch (machine().device<ram_device>(RAM_TAG)->size())
 	{
@@ -633,7 +633,7 @@ DRIVER_INIT_MEMBER(spectrum_state,spectrum)
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	space.set_direct_update_handler(direct_update_delegate(FUNC(spectrum_state::spectrum_direct), this));
 

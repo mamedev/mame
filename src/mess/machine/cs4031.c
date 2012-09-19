@@ -126,7 +126,7 @@ void cs4031_device::device_start()
 		throw device_missing_dependencies();
 
 	device_t *cpu = machine().device(m_cputag);
-	m_space = cpu->memory().space(AS_PROGRAM);
+	m_space = &cpu->memory().space(AS_PROGRAM);
 	m_isa = machine().root_device().memregion(m_isatag)->base();
 	m_bios = machine().root_device().memregion(m_biostag)->base();
 

@@ -3730,8 +3730,8 @@ WRITE16_MEMBER(megasys1_state::megasys1A_mcu_hs_w)
 DRIVER_INIT_MEMBER(megasys1_state,astyanax)
 {
 	astyanax_rom_decode(machine(), "maincpu");
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),this));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,avspirit)
@@ -3743,8 +3743,8 @@ DRIVER_INIT_MEMBER(megasys1_state,avspirit)
 	m_ip_select_values[4] = 0x34;
 
 	// has twice less RAM
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->unmap_readwrite(0x060000, 0x06ffff);
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x070000, 0x07ffff, m_ram);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_readwrite(0x060000, 0x06ffff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x070000, 0x07ffff, m_ram);
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,bigstrik)
@@ -3806,8 +3806,8 @@ READ16_MEMBER(megasys1_state::edfbl_input_r)
 DRIVER_INIT_MEMBER(megasys1_state,edfbl)
 {
 	//device_t *oki1 = machine().device("oki1");
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::edfbl_input_r),this));
-	//machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*oki1, 0xe000e, 0xe000f, FUNC(soundlatch_byte_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::edfbl_input_r),this));
+	//machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(*oki1, 0xe000e, 0xe000f, FUNC(soundlatch_byte_w));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,hayaosi1)
@@ -3861,8 +3861,8 @@ DRIVER_INIT_MEMBER(megasys1_state,iganinju)
 	phantasm_rom_decode(machine(), "maincpu");
 
 	//ROM  = (UINT16 *) machine().root_device().memregion("maincpu")->base();
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x2f000, 0x2f009, write16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x2f000, 0x2f009, write16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_w),this));
 
 	//ROM[0x00006e/2] = 0x0420; // the only game that does
 								// not like lev 3 interrupts
@@ -3889,17 +3889,17 @@ DRIVER_INIT_MEMBER(megasys1_state,jitsupro)
 
 	jitsupro_gfx_unmangle(machine(), "gfx1");	// Gfx
 	jitsupro_gfx_unmangle(machine(), "gfx4");
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),this));
 
 	/* the sound code writes oki commands to both the lsb and msb */
-	machine().device("soundcpu")->memory().space(AS_PROGRAM)->install_write_handler(0xa0000, 0xa0003, write16_delegate(FUNC(megasys1_state::okim6295_both_1_w),this));
-	machine().device("soundcpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc0000, 0xc0003, write16_delegate(FUNC(megasys1_state::okim6295_both_2_w),this));
+	machine().device("soundcpu")->memory().space(AS_PROGRAM).install_write_handler(0xa0000, 0xa0003, write16_delegate(FUNC(megasys1_state::okim6295_both_1_w),this));
+	machine().device("soundcpu")->memory().space(AS_PROGRAM).install_write_handler(0xc0000, 0xc0003, write16_delegate(FUNC(megasys1_state::okim6295_both_2_w),this));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,peekaboo)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x100000, 0x100001, read16_delegate(FUNC(megasys1_state::protection_peekaboo_r),this), write16_delegate(FUNC(megasys1_state::protection_peekaboo_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x100000, 0x100001, read16_delegate(FUNC(megasys1_state::protection_peekaboo_r),this), write16_delegate(FUNC(megasys1_state::protection_peekaboo_w),this));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,phantasm)
@@ -3934,14 +3934,14 @@ DRIVER_INIT_MEMBER(megasys1_state,soldamj)
 {
 	astyanax_rom_decode(machine(), "maincpu");
 	/* Sprite RAM is mirrored */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(FUNC(megasys1_state::soldamj_spriteram16_r),this), write16_delegate(FUNC(megasys1_state::soldamj_spriteram16_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(FUNC(megasys1_state::soldamj_spriteram16_r),this), write16_delegate(FUNC(megasys1_state::soldamj_spriteram16_w),this));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,soldam)
 {
 	phantasm_rom_decode(machine(), "maincpu");
 	/* Sprite RAM is mirrored */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(FUNC(megasys1_state::soldamj_spriteram16_r),this), write16_delegate(FUNC(megasys1_state::soldamj_spriteram16_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(FUNC(megasys1_state::soldamj_spriteram16_r),this), write16_delegate(FUNC(megasys1_state::soldamj_spriteram16_w),this));
 }
 
 
@@ -3978,8 +3978,8 @@ WRITE16_MEMBER(megasys1_state::stdragon_mcu_hs_w)
 DRIVER_INIT_MEMBER(megasys1_state,stdragon)
 {
 	phantasm_rom_decode(machine(), "maincpu");
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),this));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,stdragona)
@@ -3988,8 +3988,8 @@ DRIVER_INIT_MEMBER(megasys1_state,stdragona)
 
 	stdragona_gfx_unmangle(machine(), "gfx1");
 	stdragona_gfx_unmangle(machine(), "gfx4");
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),this));
 }
 
 READ16_MEMBER(megasys1_state::monkelf_input_r)
@@ -4018,7 +4018,7 @@ DRIVER_INIT_MEMBER(megasys1_state,monkelf)
 	UINT16 *ROM = (UINT16*)memregion("maincpu")->base();
 	ROM[0x00744/2] = 0x4e71; // weird check, 0xe000e R is a port-based trap?
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::monkelf_input_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::monkelf_input_r),this));
 }
 
 /*************************************

@@ -703,7 +703,7 @@ static DEVICE_START( nesapu )
 	info->buffer_size+=info->samps_per_sync;
 
 	/* Initialize individual chips */
-	(info->APU.dpcm).memory = device->machine().device(intf->cpu_tag)->memory().space(AS_PROGRAM);
+	(info->APU.dpcm).memory = &device->machine().device(intf->cpu_tag)->memory().space(AS_PROGRAM);
 
 	info->stream = device->machine().sound().stream_alloc(*device, 0, 1, rate, info, nes_psg_update_sound);
 

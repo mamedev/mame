@@ -124,7 +124,7 @@ static CPU_INIT( sm8500 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	if ( device->static_config() != NULL ) {
 		cpustate->config.handle_dma = ((SM8500_CONFIG *)device->static_config())->handle_dma;
 		cpustate->config.handle_timers = ((SM8500_CONFIG *)device->static_config())->handle_timers;

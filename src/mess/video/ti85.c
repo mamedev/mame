@@ -149,7 +149,7 @@ void ti85_state::video_start()
 
 UINT32 ti85_state::screen_update_ti85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int x,y,b;
 	int brightnes;
 	int lcdmem;

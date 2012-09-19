@@ -336,7 +336,7 @@ void kc_d004_device::io_write(offs_t offset, UINT8 data)
 				if (data & 0x02)
 				{
 					for (int i=0; i<0xfc00; i++)
-						m_cpu->space(AS_PROGRAM)->write_byte(i, 0);
+						m_cpu->space(AS_PROGRAM).write_byte(i, 0);
 
 					m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 				}

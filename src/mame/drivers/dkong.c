@@ -519,8 +519,8 @@ READ8_MEMBER(dkong_state::hb_dma_read_byte)
         fatalerror("hb_dma_read_byte - unmapped access for 0x%02x - bucket 0x%02x\n", offset, bucket);
 
     addr = ((bucket << 7) & 0x7c00) | (offset & 0x3ff);
-	address_space *prog_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-    return prog_space->read_byte(addr);
+	address_space &prog_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+    return prog_space.read_byte(addr);
 }
 
 WRITE8_MEMBER(dkong_state::hb_dma_write_byte)
@@ -532,8 +532,8 @@ WRITE8_MEMBER(dkong_state::hb_dma_write_byte)
         fatalerror("hb_dma_read_byte - unmapped access for 0x%02x - bucket 0x%02x\n", offset, bucket);
 
     addr = ((bucket << 7) & 0x7c00) | (offset & 0x3ff);
-	address_space *prog_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-    prog_space->write_byte(addr, data);
+	address_space &prog_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+    prog_space.write_byte(addr, data);
 }
 
 READ8_MEMBER(dkong_state::p8257_ctl_r)
@@ -3097,7 +3097,7 @@ DRIVER_INIT_MEMBER(dkong_state,drakton)
             {7,1,4,0,3,6,2,5},
     };
 
-    machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1" );
+    machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1" );
 
     /* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -3119,7 +3119,7 @@ DRIVER_INIT_MEMBER(dkong_state,strtheat)
             {6,3,4,1,0,7,2,5},
     };
 
-    machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1" );
+    machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1" );
 
     /* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -3130,20 +3130,20 @@ DRIVER_INIT_MEMBER(dkong_state,strtheat)
     drakton_decrypt_rom(machine(), 0x88, 0x1c000, bs[3]);
 
     /* custom handlers supporting Joystick or Steering Wheel */
-    machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x7c00, 0x7c00, read8_delegate(FUNC(dkong_state::strtheat_inputport_0_r),this));
-    machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x7c80, 0x7c80, read8_delegate(FUNC(dkong_state::strtheat_inputport_1_r),this));
+    machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x7c00, 0x7c00, read8_delegate(FUNC(dkong_state::strtheat_inputport_0_r),this));
+    machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x7c80, 0x7c80, read8_delegate(FUNC(dkong_state::strtheat_inputport_1_r),this));
 }
 
 
 DRIVER_INIT_MEMBER(dkong_state,dkongx)
 {
 	UINT8 *decrypted;
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x5fff, "bank1" );
-    machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xffff, "bank2" );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x0000, 0x5fff, "bank1" );
+    machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x8000, 0xffff, "bank2" );
 
 	space.install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(dkong_state::braze_a15_w),this));
 

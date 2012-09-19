@@ -117,8 +117,8 @@ static CPU_INIT( lh5801 )
 	memset(cpustate, 0, sizeof(*cpustate));
 	cpustate->config = (const lh5801_cpu_core *) device->static_config();
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = &device->space(AS_PROGRAM);
+	cpustate->io = &device->space(AS_IO);
 	cpustate->direct = &cpustate->program->direct();
 }
 

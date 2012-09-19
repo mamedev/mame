@@ -805,13 +805,13 @@ DRIVER_INIT_MEMBER(exprraid_state,exprraid)
 
 DRIVER_INIT_MEMBER(exprraid_state,wexpressb2)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3800, 0x3800, read8_delegate(FUNC(exprraid_state::vblank_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x3800, 0x3800, read8_delegate(FUNC(exprraid_state::vblank_r),this));
 	exprraid_gfx_expand(machine());
 }
 
 DRIVER_INIT_MEMBER(exprraid_state,wexpressb3)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xFFC0, 0xFFC0, read8_delegate(FUNC(exprraid_state::vblank_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xFFC0, 0xFFC0, read8_delegate(FUNC(exprraid_state::vblank_r),this));
 	exprraid_gfx_expand(machine());
 }
 

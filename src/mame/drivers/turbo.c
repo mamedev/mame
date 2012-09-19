@@ -567,7 +567,7 @@ READ8_MEMBER(turbo_state::buckrog_port_3_r)
 static TIMER_CALLBACK( delayed_i8255_w )
 {
 	turbo_state *state = machine.driver_data<turbo_state>();
-	state->m_i8255_0->write(*state->m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
+	state->m_i8255_0->write(state->m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
 }
 
 

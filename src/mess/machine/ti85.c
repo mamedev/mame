@@ -60,7 +60,7 @@ static void update_ti85_memory (running_machine &machine)
 static void update_ti83p_memory (running_machine &machine)
 {
 	ti85_state *state = machine.driver_data<ti85_state>();
-	address_space &space = *state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 
 	if (state->m_ti8x_memory_page_1 & 0x40)
 	{
@@ -84,7 +84,7 @@ static void update_ti83p_memory (running_machine &machine)
 static void update_ti86_memory (running_machine &machine)
 {
 	ti85_state *state = machine.driver_data<ti85_state>();
-	address_space &space = *state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 
 	if (state->m_ti8x_memory_page_1 & 0x40)
 	{
@@ -112,7 +112,7 @@ static void update_ti86_memory (running_machine &machine)
 
 void ti85_state::machine_start()
 {
-	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_bios = memregion("bios")->base();
 
 	m_timer_interrupt_mask = 0;
@@ -149,7 +149,7 @@ MACHINE_RESET_MEMBER(ti85_state,ti85)
 
 MACHINE_START_MEMBER(ti85_state,ti83p)
 {
-	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_bios = memregion("bios")->base();
 
 	m_timer_interrupt_mask = 0;
@@ -187,7 +187,7 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 
 MACHINE_START_MEMBER(ti85_state,ti86)
 {
-	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_bios = memregion("bios")->base();
 
 	m_timer_interrupt_mask = 0;
@@ -608,7 +608,7 @@ static void ti8x_snapshot_setup_registers (running_machine &machine, UINT8 * dat
 static void ti85_setup_snapshot (running_machine &machine, UINT8 * data)
 {
 	ti85_state *state = machine.driver_data<ti85_state>();
-	address_space &space = *state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 	int i;
 	unsigned char lo,hi;
 	unsigned char * hdw = data + 0x8000 + 0x94;

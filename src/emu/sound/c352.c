@@ -461,7 +461,7 @@ void c352_device::device_start()
 	double u = 10.0;
 
 	// find our direct access
-	m_direct = &space()->direct();
+	m_direct = &space().direct();
 
 	m_sample_rate_base = clock() / 288;
 

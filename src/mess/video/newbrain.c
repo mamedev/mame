@@ -15,7 +15,7 @@ void newbrain_state::video_start()
 
 void newbrain_state::screen_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	int y, sx;
 	int columns = (m_tvctl & NEWBRAIN_VIDEO_80L) ? 80 : 40;
@@ -36,7 +36,7 @@ void newbrain_state::screen_update(bitmap_rgb32 &bitmap, const rectangle &clipre
 		{
 			int bit;
 
-			UINT8 videoram_data = program->read_byte(videoram_addr + sx);
+			UINT8 videoram_data = program.read_byte(videoram_addr + sx);
 			UINT8 charrom_data;
 
 			if (gr)

@@ -400,7 +400,7 @@ static int gp9001_videoram16_r(gp9001vdp_device *vdp, offs_t offset)
 {
 	int offs = vdp->gp9001_voffs;
 	vdp->gp9001_voffs++;
-	return vdp->space()->read_word(offs*2);
+	return vdp->space().read_word(offs*2);
 }
 
 
@@ -408,7 +408,7 @@ static void gp9001_videoram16_w(gp9001vdp_device *vdp, offs_t offset, UINT16 dat
 {
 	int offs = vdp->gp9001_voffs;
 	vdp->gp9001_voffs++;
-	vdp->space()->write_word(offs*2, data, mem_mask);
+	vdp->space().write_word(offs*2, data, mem_mask);
 }
 
 static WRITE16_DEVICE_HANDLER( gp9001_devvoffs_w )

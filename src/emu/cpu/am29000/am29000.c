@@ -154,11 +154,11 @@ static CPU_INIT( am29000 )
 {
 	am29000_state *am29000 = get_safe_token(device);
 
-	am29000->program = device->space(AS_PROGRAM);
+	am29000->program = &device->space(AS_PROGRAM);
 	am29000->direct = &am29000->program->direct();
-	am29000->data = device->space(AS_DATA);
+	am29000->data = &device->space(AS_DATA);
 	am29000->datadirect = &am29000->data->direct();
-	am29000->io = device->space(AS_IO);
+	am29000->io = &device->space(AS_IO);
 	am29000->cfg = (PRL_AM29000 | PRL_REV_D) << CFG_PRL_SHIFT;
 
 	/* Register state for saving */

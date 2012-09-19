@@ -180,7 +180,7 @@ private:
 
 	// CPU parameters
 	cpu_device &		m_cpudevice;				// CPU device object
-	address_space *		m_program;					// program address space for this CPU
+	address_space &		m_program;					// program address space for this CPU
 	offs_t				m_pageshift;				// shift to convert address to a page index
 
 	// opcode descriptor arrays

@@ -80,7 +80,7 @@ MACHINE_RESET_MEMBER(atarigt_state,atarigt)
 
 static void cage_irq_callback(running_machine &machine, int reason)
 {
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (reason)
 		atarigen_sound_int_gen(machine.device("maincpu"));
@@ -1274,7 +1274,7 @@ DRIVER_INIT_MEMBER(atarigt_state,tmek)
 	m_protection_w = tmek_protection_w;
 
 	/* temp hack */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xd72000, 0xd75fff, write32_delegate(FUNC(atarigt_state::tmek_pf_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xd72000, 0xd75fff, write32_delegate(FUNC(atarigt_state::tmek_pf_w),this));
 }
 
 

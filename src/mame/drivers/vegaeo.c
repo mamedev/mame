@@ -356,7 +356,7 @@ DRIVER_INIT_MEMBER(vegaeo_state,vegaeo)
 {
 
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	machine().device("qs1000:cpu")->memory().space(AS_IO)->install_read_bank(0x0100, 0xffff, "bank");
+	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
 	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
 
 	init_eolith_speedup(machine());

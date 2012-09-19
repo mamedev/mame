@@ -427,7 +427,7 @@ WRITE8_MEMBER( segas16a_state::n7751_rom_offset_w )
 WRITE8_DEVICE_HANDLER( segas16a_state::static_n7751_rom_offset_w )
 {
 	segas16a_state *state = device->machine().driver_data<segas16a_state>();
-	state->n7751_rom_offset_w(*state->m_maincpu->space(AS_PROGRAM), offset, data);
+	state->n7751_rom_offset_w(state->m_maincpu->space(AS_PROGRAM), offset, data);
 }
 
 
@@ -539,11 +539,11 @@ WRITE8_MEMBER( segas16a_state::mcu_io_w )
 		case 0:
 			// access main work RAM
 			if (offset >= 0x4000 && offset < 0x8000)
-				m_maincpu->space(AS_PROGRAM)->write_byte(0xc70001 ^ (offset & 0x3fff), data);
+				m_maincpu->space(AS_PROGRAM).write_byte(0xc70001 ^ (offset & 0x3fff), data);
 
 			// access misc I/O space
 			else if (offset >= 0x8000 && offset < 0xc000)
-				m_maincpu->space(AS_PROGRAM)->write_byte(0xc40001 ^ (offset & 0x3fff), data);
+				m_maincpu->space(AS_PROGRAM).write_byte(0xc40001 ^ (offset & 0x3fff), data);
 			else
 				logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n", m_mcu->pc(), m_mcu_control, offset, data);
 			break;
@@ -551,14 +551,14 @@ WRITE8_MEMBER( segas16a_state::mcu_io_w )
 		// access text RAM
 		case 1:
 			if (offset >= 0x8000 && offset < 0x9000)
-				m_maincpu->space(AS_PROGRAM)->write_byte(0x410001 ^ (offset & 0xfff), data);
+				m_maincpu->space(AS_PROGRAM).write_byte(0x410001 ^ (offset & 0xfff), data);
 			else
 				logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n", m_mcu->pc(), m_mcu_control, offset, data);
 			break;
 
 		// access palette RAM
 		case 3:
-			m_maincpu->space(AS_PROGRAM)->write_byte(0x840001 ^ offset, data);
+			m_maincpu->space(AS_PROGRAM).write_byte(0x840001 ^ offset, data);
 			break;
 
 		// access ROMs - fall through to logging
@@ -590,24 +590,24 @@ READ8_MEMBER( segas16a_state::mcu_io_r )
 
 			// access main work RAM
 			else if (offset >= 0x4000 && offset < 0x8000)
-				return m_maincpu->space(AS_PROGRAM)->read_byte(0xc70001 ^ (offset & 0x3fff));
+				return m_maincpu->space(AS_PROGRAM).read_byte(0xc70001 ^ (offset & 0x3fff));
 
 			// access misc I/O space
 			else if (offset >= 0x8000 && offset < 0xc000)
-				return m_maincpu->space(AS_PROGRAM)->read_byte(0xc40001 ^ (offset & 0x3fff));
+				return m_maincpu->space(AS_PROGRAM).read_byte(0xc40001 ^ (offset & 0x3fff));
 			logerror("%03X: MCU movx read mode %02X offset %04X\n", m_mcu->pc(), m_mcu_control, offset);
 			return 0xff;
 
 		// access text RAM
 		case 1:
 			if (offset >= 0x8000 && offset < 0x9000)
-				return m_maincpu->space(AS_PROGRAM)->read_byte(0x410001 ^ (offset & 0xfff));
+				return m_maincpu->space(AS_PROGRAM).read_byte(0x410001 ^ (offset & 0xfff));
 			logerror("%03X: MCU movx read mode %02X offset %04X\n", m_mcu->pc(), m_mcu_control, offset);
 			return 0xff;
 
 		// access palette RAM
 		case 3:
-			return m_maincpu->space(AS_PROGRAM)->read_byte(0x840001 ^ offset);
+			return m_maincpu->space(AS_PROGRAM).read_byte(0x840001 ^ offset);
 
 		// access ROMs
 		case 5:
@@ -695,7 +695,7 @@ void segas16a_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		// synchronize writes to the 8255 PPI
 		case TID_PPI_WRITE:
-			m_i8255->write(*m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
+			m_i8255->write(m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
 			break;
 	}
 }
@@ -767,7 +767,7 @@ void segas16a_state::quartet_i8751_sim()
 	m_maincpu->set_input_line(4, HOLD_LINE);
 
 	// X scroll values
-	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	segaic16_textram_0_w(space, 0xff8/2, m_workram[0x0d14/2], 0xffff);
 	segaic16_textram_0_w(space, 0xffa/2, m_workram[0x0d18/2], 0xffff);
 

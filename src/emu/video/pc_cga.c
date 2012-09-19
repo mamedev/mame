@@ -329,8 +329,8 @@ static int internal_pc_cga_video_start(running_machine &machine)
 static VIDEO_START( pc_cga )
 {
 	int buswidth;
-	address_space &space = *machine.firstcpu->space(AS_PROGRAM);
-	address_space *spaceio = machine.firstcpu->space(AS_IO);
+	address_space &space = machine.firstcpu->space(AS_PROGRAM);
+	address_space &spaceio = machine.firstcpu->space(AS_IO);
 
 	space.install_readwrite_bank(0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
 	buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
@@ -357,7 +357,7 @@ static VIDEO_START( pc_cga )
 			fatalerror("CGA: Bus width %d not supported\n", buswidth);
 			break;
 	}
-	spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_cga8_r), FUNC(pc_cga8_w), mask );
+	spaceio.install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_cga8_r), FUNC(pc_cga8_w), mask );
 	internal_pc_cga_video_start(machine);
 	cga.videoram_size = 0x4000;
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x4000);
@@ -370,8 +370,8 @@ static VIDEO_START( pc_cga )
 static VIDEO_START( pc_cga32k )
 {
 	int buswidth;
-	address_space &space = *machine.firstcpu->space(AS_PROGRAM);
-	address_space *spaceio = machine.firstcpu->space(AS_IO);
+	address_space &space = machine.firstcpu->space(AS_PROGRAM);
+	address_space &spaceio = machine.firstcpu->space(AS_IO);
 
 
 	space.install_readwrite_bank(0xb8000, 0xbffff, "bank11" );
@@ -399,7 +399,7 @@ static VIDEO_START( pc_cga32k )
 			fatalerror("CGA: Bus width %d not supported\n", buswidth);
 			break;
 	}
-	spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_cga8_r), FUNC(pc_cga8_w), mask );
+	spaceio.install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_cga8_r), FUNC(pc_cga8_w), mask );
 
 	internal_pc_cga_video_start(machine);
 
@@ -1202,7 +1202,7 @@ static WRITE8_HANDLER( pc_cga8_w )
 		// Not sure if some all CGA cards have ability to upload char definition
 		// The original CGA card had a char rom
 		UINT8 buswidth = space.machine().firstcpu->space_config(AS_PROGRAM)->m_databus_width;
-		address_space *space_prg = space.machine().firstcpu->space(AS_PROGRAM);
+		address_space &space_prg = space.machine().firstcpu->space(AS_PROGRAM);
 		cga.p3df = data;
 		if (data & 1) {
 			UINT64 mask = 0;
@@ -1228,12 +1228,12 @@ static WRITE8_HANDLER( pc_cga8_w )
 					fatalerror("CGA: Bus width %d not supported\n", buswidth);
 					break;
 			}
-			space_prg->install_legacy_readwrite_handler(0xb8000, 0xb9fff, FUNC(char_ram_r),FUNC(char_ram_w), mask );
+			space_prg.install_legacy_readwrite_handler(0xb8000, 0xb9fff, FUNC(char_ram_r),FUNC(char_ram_w), mask );
 		} else {
 			if (cga.videoram_size== 0x4000) {
-				space_prg->install_readwrite_bank(0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
+				space_prg.install_readwrite_bank(0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
 			} else {
-				space_prg->install_readwrite_bank(0xb8000, 0xbffff, "bank11" );
+				space_prg.install_readwrite_bank(0xb8000, 0xbffff, "bank11" );
 			}
 		}
 		break;
@@ -1635,14 +1635,14 @@ static VIDEO_START( pc1512 )
 	cga.videoram_size = 0x10000;
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x10000 );
 
-	address_space &space = *machine.firstcpu->space( AS_PROGRAM );
-	address_space *io_space = machine.firstcpu->space( AS_IO );
+	address_space &space = machine.firstcpu->space( AS_PROGRAM );
+	address_space &io_space = machine.firstcpu->space( AS_IO );
 
 	space.install_read_bank( 0xb8000, 0xbbfff, 0, 0x0C000, "bank1" );
 	machine.root_device().membank("bank1")->set_base(cga.videoram + videoram_offset[0]);
 	space.install_legacy_write_handler( 0xb8000, 0xbbfff, 0, 0x0C000, FUNC(pc1512_videoram_w), 0xffff);
 
-	io_space->install_legacy_readwrite_handler( 0x3d0, 0x3df, FUNC(pc1512_r), FUNC(pc1512_w), 0xffff);
+	io_space.install_legacy_readwrite_handler( 0x3d0, 0x3df, FUNC(pc1512_r), FUNC(pc1512_w), 0xffff);
 
 }
 

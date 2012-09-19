@@ -1201,7 +1201,7 @@ READ16_MEMBER(highvdeo_state::ciclone_status_r)
 
 DRIVER_INIT_MEMBER(highvdeo_state,ciclone)
 {
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x0030, 0x0033, read16_delegate(FUNC(highvdeo_state::ciclone_status_r), this));
+	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x0030, 0x0033, read16_delegate(FUNC(highvdeo_state::ciclone_status_r), this));
 }
 
 /*
@@ -1271,7 +1271,7 @@ WRITE16_MEMBER(highvdeo_state::fashion_output_w)
 
 DRIVER_INIT_MEMBER(highvdeo_state,fashion)
 {
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x0002, 0x0003, write16_delegate(FUNC(highvdeo_state::fashion_output_w), this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x0002, 0x0003, write16_delegate(FUNC(highvdeo_state::fashion_output_w), this));
 }
 
 GAMEL( 2000, tour4000,  0,      tv_vcf,   tv_vcf, driver_device,   0,       ROT0,  "High Video", "Tour 4000",         0, layout_fashion )

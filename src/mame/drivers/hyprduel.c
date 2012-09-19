@@ -803,10 +803,10 @@ DRIVER_INIT_MEMBER(hyprduel_state,hyprduel)
 	m_int_num = 0x02;
 
 	/* cpu synchronization (severe timings) */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc0040e, 0xc00411, write16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger1_w),this));
-	machine().device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0xc00408, 0xc00409, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger1_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc00408, 0xc00409, write16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_w),this));
-	machine().device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0xfff34c, 0xfff34d, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc0040e, 0xc00411, write16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger1_w),this));
+	machine().device("sub")->memory().space(AS_PROGRAM).install_read_handler(0xc00408, 0xc00409, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger1_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc00408, 0xc00409, write16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_w),this));
+	machine().device("sub")->memory().space(AS_PROGRAM).install_read_handler(0xfff34c, 0xfff34d, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_r),this));
 }
 
 DRIVER_INIT_MEMBER(hyprduel_state,magerror)

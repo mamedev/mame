@@ -538,7 +538,7 @@ WRITE8_MEMBER( i8155_device::io_w )
 
 READ8_MEMBER( i8155_device::memory_r )
 {
-	return this->space()->read_byte(offset);
+	return this->space().read_byte(offset);
 }
 
 
@@ -548,7 +548,7 @@ READ8_MEMBER( i8155_device::memory_r )
 
 WRITE8_MEMBER( i8155_device::memory_w )
 {
-	this->space()->write_byte(offset, data);
+	this->space().write_byte(offset, data);
 }
 
 

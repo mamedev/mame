@@ -256,8 +256,8 @@ static const struct bank_info_entry bank_info[] =
 static void UpdateBanks(running_machine &machine, int first, int last)
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	address_space *space_0 = machine.device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
-	address_space *space_1 = machine.device(DMACPU_TAG)->memory().space(AS_PROGRAM);
+	address_space &space_0 = machine.device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+	address_space &space_1 = machine.device(DMACPU_TAG)->memory().space(AS_PROGRAM);
 	int		            Page;
 	UINT8		        *readbank;
 	int		            bank_start;
@@ -265,7 +265,7 @@ static void UpdateBanks(running_machine &machine, int first, int last)
 	int		            MapPage;
 	char                page_num[10];
 
-	LOG_BANK_UPDATE(("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,space_0->device().safe_pc()));
+	LOG_BANK_UPDATE(("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,space_0.device().safe_pc()));
 	for(Page=first;Page<=last;Page++)
 	{
 		sprintf(page_num,"bank%d",Page+1);
@@ -295,8 +295,8 @@ static void UpdateBanks(running_machine &machine, int first, int last)
 				readbank = &machine.device<ram_device>(RAM_TAG)->pointer()[(MapPage*RamPageSize)-256];
 				logerror("Error RAM in Last page !\n");
 			}
-			space_0->install_legacy_write_handler(bank_start, bank_end,bank_info[Page].func,bank_info[Page].name);
-			space_1->install_legacy_write_handler(bank_start, bank_end,bank_info[Page].func,bank_info[Page].name);
+			space_0.install_legacy_write_handler(bank_start, bank_end,bank_info[Page].func,bank_info[Page].name);
+			space_1.install_legacy_write_handler(bank_start, bank_end,bank_info[Page].func,bank_info[Page].name);
 		}
 		else					// Block is rom, or undefined
 		{
@@ -310,8 +310,8 @@ static void UpdateBanks(running_machine &machine, int first, int last)
 			else
 				readbank=state->m_system_rom;
 
-			space_0->unmap_write(bank_start, bank_end);
-			space_1->unmap_write(bank_start, bank_end);
+			space_0.unmap_write(bank_start, bank_end);
+			space_1.unmap_write(bank_start, bank_end);
 		}
 
 		state->m_PageRegs[state->m_TaskReg][Page].memory=readbank;

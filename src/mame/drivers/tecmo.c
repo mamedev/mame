@@ -1141,9 +1141,9 @@ DRIVER_INIT_MEMBER(tecmo_state,backfirt)
 	m_video_type = 2;
 
 	/* no MSM */
-	machine().device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xc000, 0xc000);
-	machine().device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xc400, 0xc400);
-	machine().device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xc800);
+	machine().device("soundcpu")->memory().space(AS_PROGRAM).nop_write(0xc000, 0xc000);
+	machine().device("soundcpu")->memory().space(AS_PROGRAM).nop_write(0xc400, 0xc400);
+	machine().device("soundcpu")->memory().space(AS_PROGRAM).nop_write(0xc800, 0xc800);
 }
 
 

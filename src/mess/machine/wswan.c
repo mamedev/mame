@@ -223,7 +223,7 @@ MACHINE_START_MEMBER(wswan_state,wscolor)
 
 void wswan_state::machine_reset()
 {
-	address_space &space = *machine().device( "maincpu")->memory().space( AS_PROGRAM );
+	address_space &space = machine().device( "maincpu")->memory().space( AS_PROGRAM );
 
 	/* Intialize ports */
 	memcpy( m_ws_portram, ws_portram_init, 256 );
@@ -354,10 +354,10 @@ READ8_MEMBER( wswan_state::wswan_port_r )
 
 WRITE8_MEMBER( wswan_state::wswan_port_w )
 {
-	address_space *mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	wswan_state *state = machine().driver_data<wswan_state>();
 	UINT8 input;
-	logerror( "PC=%X: port write %02X <- %02X\n", mem->device().safe_pc(), offset, data );
+	logerror( "PC=%X: port write %02X <- %02X\n", mem.device().safe_pc(), offset, data );
 	switch( offset )
 	{
 		case 0x00:	/* Display control
@@ -676,7 +676,7 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 				length = m_ws_portram[0x46] + (m_ws_portram[0x47] << 8);
 				for( ; length > 0; length-- )
 				{
-					mem->write_byte(dst, mem->read_byte(src ) );
+					mem.write_byte(dst, mem.read_byte(src ) );
 					src++;
 					dst++;
 				}
@@ -1251,7 +1251,7 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 				m_ws_portram[0xcb] = m_rtc.year;
 				break;
 			default:
-				logerror( "%X: Unknown RTC command (%X) requested\n", mem->device().safe_pc(), data );
+				logerror( "%X: Unknown RTC command (%X) requested\n", mem.device().safe_pc(), data );
 			}
 			break;
 		case 0xcb:	/* RTC Data */
@@ -1350,7 +1350,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 	else
 		size = image.get_software_region_length("rom");
 
-	state->m_ws_ram = (UINT8*) image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(0);
+	state->m_ws_ram = (UINT8*) image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).get_read_ptr(0);
 	memset(state->m_ws_ram, 0, 0xffff);
 	state->m_ROMBanks = size / 65536;
 
@@ -1459,7 +1459,7 @@ static TIMER_CALLBACK(wswan_scanline_interrupt)
 	/* Handle Sound DMA */
 	if ( ( state->m_sound_dma.enable & 0x88 ) == 0x80 )
 	{
-		address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM );
+		address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM );
 		/* TODO: Output sound DMA byte */
 		state->wswan_port_w( space, 0x89, space.read_byte(state->m_sound_dma.source ) );
 		state->m_sound_dma.size--;

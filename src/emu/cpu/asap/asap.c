@@ -211,7 +211,7 @@ asap_device::asap_device(const machine_config &mconfig, const char *tag, device_
 void asap_device::device_start()
 {
 	// get our address spaces
-	m_program = space(AS_PROGRAM);
+	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 
 	// register our state for the debugger

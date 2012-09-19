@@ -1469,7 +1469,7 @@ DRIVER_INIT_MEMBER(ninjakd2_state,ninjakd2)
 
 DRIVER_INIT_MEMBER(ninjakd2_state,bootleg)
 {
-	address_space &space = *machine().device("soundcpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("soundcpu")->memory().space(AS_PROGRAM);
 	space.set_decrypted_region(0x0000, 0x7fff, machine().root_device().memregion("soundcpu")->base() + 0x10000);
 
 	gfx_unscramble(machine());

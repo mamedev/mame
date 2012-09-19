@@ -951,14 +951,14 @@ ROM_END
 
 DRIVER_INIT_MEMBER(asteroid_state,asteroidb)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2000, 0x2000, "IN0");
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2003, 0x2003, "HS");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x2000, 0x2000, "IN0");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x2003, 0x2003, "HS");
 }
 
 
 DRIVER_INIT_MEMBER(asteroid_state,asterock)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x2000, 0x2007, read8_delegate(FUNC(asteroid_state::asterock_IN0_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x2000, 0x2007, read8_delegate(FUNC(asteroid_state::asterock_IN0_r),this));
 }
 
 

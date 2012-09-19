@@ -1118,7 +1118,7 @@ DRIVER_INIT_MEMBER(limenko_state,common)
 {
 
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	machine().device("qs1000:cpu")->memory().space(AS_IO)->install_read_bank(0x0100, 0xffff, "bank");
+	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
 	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
 
 	m_spriteram_bit = 1;
@@ -1126,21 +1126,21 @@ DRIVER_INIT_MEMBER(limenko_state,common)
 
 DRIVER_INIT_MEMBER(limenko_state,dynabomb)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xe2784, 0xe2787, read32_delegate(FUNC(limenko_state::dynabomb_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xe2784, 0xe2787, read32_delegate(FUNC(limenko_state::dynabomb_speedup_r), this));
 
 	DRIVER_INIT_CALL(common);
 }
 
 DRIVER_INIT_MEMBER(limenko_state,legendoh)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x32ab0, 0x32ab3, read32_delegate(FUNC(limenko_state::legendoh_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x32ab0, 0x32ab3, read32_delegate(FUNC(limenko_state::legendoh_speedup_r), this));
 
 	DRIVER_INIT_CALL(common);
 }
 
 DRIVER_INIT_MEMBER(limenko_state,sb2003)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x135800, 0x135803, read32_delegate(FUNC(limenko_state::sb2003_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x135800, 0x135803, read32_delegate(FUNC(limenko_state::sb2003_speedup_r), this));
 
 	DRIVER_INIT_CALL(common);
 }
@@ -1161,7 +1161,7 @@ DRIVER_INIT_MEMBER(limenko_state,spotty)
 		dst[x+2] = (src[x+1]&0x0f) >> 0;
 	}
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x6626c, 0x6626f, read32_delegate(FUNC(limenko_state::spotty_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x6626c, 0x6626f, read32_delegate(FUNC(limenko_state::spotty_speedup_r), this));
 
 	m_spriteram_bit = 1;
 }

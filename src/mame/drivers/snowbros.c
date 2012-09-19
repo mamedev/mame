@@ -2342,7 +2342,7 @@ DRIVER_INIT_MEMBER(snowbros_state,moremorp)
 //      m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 
 	/* explicit check in the code */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::moremorp_0a_read),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::moremorp_0a_read),this));
 }
 
 
@@ -2741,7 +2741,7 @@ DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 		memcpy(src,buffer,len);
 		auto_free(machine(), buffer);
 	}
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_4in1_02_read),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_4in1_02_read),this));
 }
 
 DRIVER_INIT_MEMBER(snowbros_state,snowbro3)
@@ -2768,7 +2768,7 @@ READ16_MEMBER(snowbros_state::_3in1_read)
 
 DRIVER_INIT_MEMBER(snowbros_state,3in1semi)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_3in1_read),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_3in1_read),this));
 }
 
 READ16_MEMBER(snowbros_state::cookbib3_read)
@@ -2778,7 +2778,7 @@ READ16_MEMBER(snowbros_state::cookbib3_read)
 
 DRIVER_INIT_MEMBER(snowbros_state,cookbib3)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::cookbib3_read),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::cookbib3_read),this));
 }
 
 DRIVER_INIT_MEMBER(snowbros_state,pzlbreak)

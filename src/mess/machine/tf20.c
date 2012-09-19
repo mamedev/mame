@@ -72,10 +72,10 @@ static TIMER_DEVICE_CALLBACK( serial_clock )
 static READ8_HANDLER( tf20_rom_disable )
 {
 	tf20_state *tf20 = get_safe_token(space.device().owner());
-	address_space *prg = space.device().memory().space(AS_PROGRAM);
+	address_space &prg = space.device().memory().space(AS_PROGRAM);
 
 	/* switch in ram */
-	prg->install_ram(0x0000, 0x7fff, tf20->ram->pointer());
+	prg.install_ram(0x0000, 0x7fff, tf20->ram->pointer());
 
 	return 0xff;
 }
@@ -327,7 +327,7 @@ static DEVICE_START( tf20 )
 {
 	tf20_state *tf20 = get_safe_token(device);
 	device_t *cpu = device->subdevice("tf20");
-	address_space *prg = cpu->memory().space(AS_PROGRAM);
+	address_space &prg = cpu->memory().space(AS_PROGRAM);
 
 	cpu->execute().set_irq_acknowledge_callback(tf20_irq_ack);
 
@@ -345,16 +345,16 @@ static DEVICE_START( tf20 )
 	tf20->floppy_1 = device->subdevice(FLOPPY_1);
 
 	/* enable second half of ram */
-	prg->install_ram(0x8000, 0xffff, tf20->ram->pointer() + 0x8000);
+	prg.install_ram(0x8000, 0xffff, tf20->ram->pointer() + 0x8000);
 }
 
 static DEVICE_RESET( tf20 )
 {
 	device_t *cpu = device->subdevice("tf20");
-	address_space *prg = cpu->memory().space(AS_PROGRAM);
+	address_space &prg = cpu->memory().space(AS_PROGRAM);
 
 	/* enable rom */
-	prg->install_rom(0x0000, 0x07ff, 0, 0x7800, cpu->region()->base());
+	prg.install_rom(0x0000, 0x07ff, 0, 0x7800, cpu->region()->base());
 }
 
 const device_type TF20 = &device_creator<tf20_device>;

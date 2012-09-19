@@ -729,11 +729,8 @@ static void drq_callback(running_machine &machine, int which)
 {
 	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 	struct dma_state *dma = &state->m_i186.dma[which];
-	address_space *memory_space   = machine.device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
-	address_space *io_space       = machine.device(MAINCPU_TAG)->memory().space(AS_IO);
-
-    address_space *src_space;
-    address_space *dest_space;
+	address_space &memory_space   = machine.device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+	address_space &io_space       = machine.device(MAINCPU_TAG)->memory().space(AS_IO);
 
     UINT16  dma_word;
     UINT8   dma_byte;
@@ -750,27 +747,20 @@ static void drq_callback(running_machine &machine, int which)
         return;
     }
 
-    if(dma->control & DEST_MIO)
-        dest_space=memory_space;
-    else
-        dest_space=io_space;
-
-    if(dma->control & SRC_MIO)
-        src_space=memory_space;
-    else
-        src_space=io_space;
+	address_space &dest_space = (dma->control & DEST_MIO) ? memory_space : io_space;
+    address_space &src_space = (dma->control & SRC_MIO) ? memory_space : io_space;
 
     // Do the transfer
     if(dma->control & BYTE_WORD)
     {
-        dma_word=src_space->read_word(dma->source);
-        dest_space->write_word(dma->dest,dma_word);
+        dma_word=src_space.read_word(dma->source);
+        dest_space.write_word(dma->dest,dma_word);
         incdec_size=2;
     }
     else
     {
-        dma_byte=src_space->read_byte(dma->source);
-        dest_space->write_byte(dma->dest,dma_byte);
+        dma_byte=src_space.read_byte(dma->source);
+        dest_space.write_byte(dma->dest,dma_byte);
         incdec_size=1;
     }
 
@@ -1232,14 +1222,14 @@ WRITE16_MEMBER(rmnimbus_state::nimbus_i186_internal_port_w)
 			temp = (data16 & 0x0fff) << 8;
 			if (data16 & 0x1000)
 			{
-				machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM)->install_read_handler(temp, temp + 0xff, read16_delegate(FUNC(rmnimbus_state::nimbus_i186_internal_port_r),this));
-				machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM)->install_write_handler(temp, temp + 0xff, write16_delegate(FUNC(rmnimbus_state::nimbus_i186_internal_port_w),this));
+				machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM).install_read_handler(temp, temp + 0xff, read16_delegate(FUNC(rmnimbus_state::nimbus_i186_internal_port_r),this));
+				machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM).install_write_handler(temp, temp + 0xff, write16_delegate(FUNC(rmnimbus_state::nimbus_i186_internal_port_w),this));
 			}
 			else
 			{
 				temp &= 0xffff;
-				machine().device(MAINCPU_TAG)->memory().space(AS_IO)->install_read_handler(temp, temp + 0xff, read16_delegate(FUNC(rmnimbus_state::nimbus_i186_internal_port_r),this));
-				machine().device(MAINCPU_TAG)->memory().space(AS_IO)->install_write_handler(temp, temp + 0xff, write16_delegate(FUNC(rmnimbus_state::nimbus_i186_internal_port_w),this));
+				machine().device(MAINCPU_TAG)->memory().space(AS_IO).install_read_handler(temp, temp + 0xff, read16_delegate(FUNC(rmnimbus_state::nimbus_i186_internal_port_r),this));
+				machine().device(MAINCPU_TAG)->memory().space(AS_IO).install_write_handler(temp, temp + 0xff, write16_delegate(FUNC(rmnimbus_state::nimbus_i186_internal_port_w),this));
 			}
 			break;
 
@@ -1346,7 +1336,7 @@ static void nimbus_debug(running_machine &machine, int ref, int params, const ch
 static int instruction_hook(device_t &device, offs_t curpc)
 {
 	rmnimbus_state	*state = device.machine().driver_data<rmnimbus_state>();
-    address_space	&space = *device.memory().space(AS_PROGRAM);
+    address_space	&space = device.memory().space(AS_PROGRAM);
     UINT8           *addr_ptr;
 
     addr_ptr = (UINT8*)space.get_read_ptr(curpc);
@@ -1725,7 +1715,7 @@ static void *get_dssi_ptr(address_space &space, UINT16   ds, UINT16 si)
 
 static void decode_dssi_generic(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-	address_space &space = *device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+	address_space &space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
     UINT16  *params;
 	int		count;
 
@@ -1743,7 +1733,7 @@ static void decode_dssi_generic(device_t *device,UINT16  ds, UINT16 si, UINT8 ra
 
 static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-    address_space &space = *device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+    address_space &space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
 
     UINT16          *addr_ptr;
     t_area_params   *area_params;
@@ -1796,7 +1786,7 @@ static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si, UINT
 
 static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-    address_space &space = *device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+    address_space &space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
 
     UINT8       			*char_ptr;
     t_plot_string_params	*plot_string_params;
@@ -1825,7 +1815,7 @@ static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UIN
 
 static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-    address_space &space = *device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+    address_space &space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
     UINT16  *new_colours;
     int     colour;
     new_colours=(UINT16  *)get_dssi_ptr(space,ds,si);
@@ -1842,7 +1832,7 @@ static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si, UI
 
 static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-    address_space &space = *device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+    address_space &space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
     UINT16  *params;
     params=(UINT16  *)get_dssi_ptr(space,ds,si);
 
@@ -1856,7 +1846,7 @@ static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si, UIN
 
 static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-    address_space &space = *device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+    address_space &space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
     UINT16  *params;
     int     param_no;
 
@@ -1992,7 +1982,7 @@ static const nimbus_blocks ramblocks[] =
 static void nimbus_bank_memory(running_machine &machine)
 {
 	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-    address_space &space = *machine.device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
+    address_space &space = machine.device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
     int     ramsize = machine.device<ram_device>(RAM_TAG)->size();
     int     ramblock = 0;
     int     blockno;

@@ -514,7 +514,7 @@ DRIVER_INIT_MEMBER(microtan_state,microtan)
 {
     UINT8 *dst = memregion("gfx2")->base();
     int i;
-    address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+    address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
     for (i = 0; i < 256; i++)
     {

@@ -254,7 +254,7 @@ void ti99_datamux_device::device_reset(void)
 	m_ready.resolve(conf->ready, *this);
 
 	m_cpu = machine().device("maincpu");
-	m_space = m_cpu->memory().space(AS_PROGRAM);
+	m_space = &m_cpu->memory().space(AS_PROGRAM);
 
 	m_devices.reset(); // clear the list
 	m_use32k = (ioport("RAM")->read()==1);

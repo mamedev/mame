@@ -117,7 +117,7 @@ inline void lr35902_cpu_device::mem_write_word( UINT16 addr, UINT16 data )
 void lr35902_cpu_device::device_start()
 {
 	m_device = this;
-	m_program = this->space(AS_PROGRAM);
+	m_program = &space(AS_PROGRAM);
 
 	save_item(NAME(m_A));
 	save_item(NAME(m_F));

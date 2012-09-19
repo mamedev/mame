@@ -398,7 +398,7 @@ INPUT_PORTS_END
 */
 INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 {
-	address_space& space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 edit_keys;
 	int control_keys;
 

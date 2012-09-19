@@ -253,9 +253,9 @@ void fd1089_base_device::device_start()
 	decrypt(0x000000, romsize, m_plaintext, m_decrypted_opcodes, rombase);
 
 	// mark the ROM region as decrypted, pointing to the opcodes (if it is mapped)
-	address_space *program = space(AS_PROGRAM);
-	if (program->get_read_ptr(0) != NULL)
-		program->set_decrypted_region(0x000000, romsize - 1, m_decrypted_opcodes);
+	address_space &program = space(AS_PROGRAM);
+	if (program.get_read_ptr(0) != NULL)
+		program.set_decrypted_region(0x000000, romsize - 1, m_decrypted_opcodes);
 }
 
 

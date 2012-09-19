@@ -67,12 +67,12 @@ static void mem_map_banks(running_machine &machine)
 	{
 		case 0:
 			// BIOS
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1" );
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1" );
 			state->membank("bank1")->set_base(state->memregion("maincpu")->base());
 			break;
 
 		default:
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0x0000, 0x3fff);
+			machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_read(0x0000, 0x3fff);
 			break;
 	}
 
@@ -81,22 +81,22 @@ static void mem_map_banks(running_machine &machine)
 	{
 		case 0:
 			// BIOS
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x5fff, "bank21" );
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0x7fff, "bank22" );
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x4000, 0x5fff, "bank21" );
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x6000, 0x7fff, "bank22" );
 			state->membank("bank21")->set_base(machine.root_device().memregion("maincpu")->base() + 0x4000);
 			state->membank("bank22")->set_base(machine.root_device().memregion("maincpu")->base() + 0x4000 + 0x2000);
 			break;
 
 		case 1:
 			// game
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x5fff, "bank21" );
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0x7fff, "bank22" );
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x4000, 0x5fff, "bank21" );
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x6000, 0x7fff, "bank22" );
 			state->membank("bank21")->set_base(machine.root_device().memregion("game")->base() + state->m_mem_banks[0]*0x2000);
 			state->membank("bank22")->set_base(machine.root_device().memregion("game")->base() + state->m_mem_banks[1]*0x2000);
 			break;
 
 		default:
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0x4000, 0x7fff);
+			machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_read(0x4000, 0x7fff);
 			break;
 	}
 
@@ -105,14 +105,14 @@ static void mem_map_banks(running_machine &machine)
 	{
 		case 1:
 			// game
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0x9fff, "bank31" );
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xa000, 0xbfff, "bank32" );
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x8000, 0x9fff, "bank31" );
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xa000, 0xbfff, "bank32" );
 			state->membank("bank31")->set_base(machine.root_device().memregion("game")->base() + state->m_mem_banks[2]*0x2000);
 			state->membank("bank32")->set_base(machine.root_device().memregion("game")->base() + state->m_mem_banks[3]*0x2000);
 			break;
 
 		default:
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0x8000, 0xbfff);
+			machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_read(0x8000, 0xbfff);
 			break;
 	}
 
@@ -121,12 +121,12 @@ static void mem_map_banks(running_machine &machine)
 	{
 		case 3:
 			// RAM
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xc000, 0xffff, "bank4" );
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xc000, 0xffff, "bank4" );
 			state->membank("bank4")->set_base(state->m_main_mem);
 			break;
 
 		default:
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0xc000, 0xffff);
+			machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_read(0xc000, 0xffff);
 			break;
 	}
 }

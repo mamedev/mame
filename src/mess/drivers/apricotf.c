@@ -32,7 +32,7 @@
 
 UINT32 f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	int lines = m_200_256 ? 200 : 256;
 
 	for (int y = 0; y < lines; y++)
@@ -41,7 +41,7 @@ UINT32 f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 		for (int sx = 0; sx < 80; sx++)
 		{
-			UINT16 data = program->read_word(addr);
+			UINT16 data = program.read_word(addr);
 
 			if (m_40_80)
 			{

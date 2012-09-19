@@ -797,7 +797,7 @@ DRIVER_INIT_MEMBER(igs017_state,starzan)
 	starzan_decrypt(data, size, false);	// data
 	starzan_decrypt(code, size, true);	// opcodes
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->set_decrypted_region(0x00000, 0x3ffff, code);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).set_decrypted_region(0x00000, 0x3ffff, code);
 
 	mgcs_flip_sprites(machine());
 }
@@ -3393,7 +3393,7 @@ MACHINE_CONFIG_END
 MACHINE_RESET_MEMBER(igs017_state,lhzb2a)
 {
 	MACHINE_RESET_CALL_MEMBER( mgcs );
-	lhzb2a_input_addr_w(*m_maincpu->space(AS_PROGRAM), 0, 0xf0);
+	lhzb2a_input_addr_w(m_maincpu->space(AS_PROGRAM), 0, 0xf0);
 }
 
 static MACHINE_CONFIG_START( lhzb2a, igs017_state )

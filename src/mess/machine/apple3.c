@@ -327,7 +327,7 @@ static void apple3_update_memory(running_machine &machine)
 	apple3_state *state = machine.driver_data<apple3_state>();
 	UINT16 bank;
 	UINT8 page;
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (LOG_MEMORY)
 	{
@@ -734,5 +734,5 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	m_via_1_irq = 0;
 	apple3_update_memory(machine());
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(apple3_state::apple3_opbase), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(apple3_state::apple3_opbase), this));
 }

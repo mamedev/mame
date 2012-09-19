@@ -114,7 +114,7 @@ static CPU_INIT( unsp )
     memset(unsp->r, 0, sizeof(UINT16) * UNSP_GPR_COUNT);
 
     unsp->device = device;
-    unsp->program = device->space(AS_PROGRAM);
+    unsp->program = &device->space(AS_PROGRAM);
 }
 
 static CPU_RESET( unsp )

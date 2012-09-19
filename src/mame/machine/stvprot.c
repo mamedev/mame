@@ -162,7 +162,7 @@ static WRITE32_HANDLER ( twcup98_prot_w )
 
 void install_twcup98_protection(running_machine &machine)
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(twcup98_prot_r), FUNC(twcup98_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(twcup98_prot_r), FUNC(twcup98_prot_w));
 }
 
 /**************************
@@ -227,7 +227,7 @@ static WRITE32_HANDLER ( sss_prot_w )
 
 void install_sss_protection(running_machine &machine)
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(sss_prot_r), FUNC(sss_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(sss_prot_r), FUNC(sss_prot_w));
 }
 
 /*************************************
@@ -292,7 +292,7 @@ static WRITE32_HANDLER ( rsgun_prot_w )
 
 void install_rsgun_protection(running_machine &machine)
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(rsgun_prot_r), FUNC(rsgun_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(rsgun_prot_r), FUNC(rsgun_prot_w));
 }
 
 /*************************
@@ -387,7 +387,7 @@ static WRITE32_HANDLER ( elandore_prot_w )
 
 void install_elandore_protection(running_machine &machine)
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(elandore_prot_r), FUNC(elandore_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(elandore_prot_r), FUNC(elandore_prot_w));
 }
 
 /*************************
@@ -471,7 +471,7 @@ static WRITE32_HANDLER ( ffreveng_prot_w )
 
 void install_ffreveng_protection(running_machine &machine)
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(ffreveng_prot_r), FUNC(ffreveng_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(ffreveng_prot_r), FUNC(ffreveng_prot_w));
 }
 
 /************************
@@ -511,7 +511,7 @@ static WRITE32_HANDLER(astrass_prot_w)
 void install_astrass_protection(running_machine &machine)
 {
 	ctrl_index = -1;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(astrass_prot_r), FUNC(astrass_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(astrass_prot_r), FUNC(astrass_prot_w));
 }
 
 /**************************
@@ -698,9 +698,9 @@ void install_decathlt_protection(running_machine &machine)
 	decathlt_prot_uploadmode = 0;
 	decathlt_prot_uploadoffset = 0;
 	decathlt_part = 1;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x37FFFF0, 0x37FFFFF, FUNC(decathlt_prot_r), FUNC(decathlt_prot1_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x37FFFF0, 0x37FFFFF, FUNC(decathlt_prot_r), FUNC(decathlt_prot1_w));
 	/* It accesses the device at this address too, with different tables, for the game textures, should it just act like a mirror, or a secondary device? */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x27FFFF0, 0x27FFFFF, FUNC(decathlt_prot_r), FUNC(decathlt_prot2_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x27FFFF0, 0x27FFFFF, FUNC(decathlt_prot_r), FUNC(decathlt_prot2_w));
 }
 
 void stv_register_protection_savestates(running_machine &machine)

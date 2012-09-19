@@ -414,7 +414,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15106_w )
 
 READ16_MEMBER( sega_32x_device::_32x_dreq_common_r )
 {
-	address_space* _68kspace = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& _68kspace = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch (offset)
 	{
@@ -430,7 +430,7 @@ READ16_MEMBER( sega_32x_device::_32x_dreq_common_r )
 			return m_dreq_size;
 
 		case 0x0a/2: // a15112 / 4012
-			if (&space == _68kspace)
+			if (&space == &_68kspace)
 			{
 				printf("attempting to READ FIFO with 68k!\n");
 				return 0xffff;
@@ -485,13 +485,13 @@ READ16_MEMBER( sega_32x_device::_32x_dreq_common_r )
 
 WRITE16_MEMBER( sega_32x_device::_32x_dreq_common_w )
 {
-	address_space* _68kspace = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& _68kspace = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch (offset)
 	{
 		case 0x00/2: // a15108 / 4008
 		case 0x02/2: // a1510a / 400a
-			if (&space != _68kspace)
+			if (&space != &_68kspace)
 			{
 				printf("attempting to WRITE DREQ SRC with SH2!\n");
 				return;
@@ -506,7 +506,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_dreq_common_w )
 
 		case 0x04/2: // a1510c / 400c
 		case 0x06/2: // a1510e / 400e
-			if (&space != _68kspace)
+			if (&space != &_68kspace)
 			{
 				printf("attempting to WRITE DREQ DST with SH2!\n");
 				return;
@@ -520,7 +520,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_dreq_common_w )
 			break;
 
 		case 0x08/2: // a15110 / 4010
-			if (&space != _68kspace)
+			if (&space != &_68kspace)
 			{
 				printf("attempting to WRITE DREQ SIZE with SH2!\n");
 				return;
@@ -534,7 +534,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_dreq_common_w )
 			break;
 
 		case 0x0a/2: // a15112 / 4012 - FIFO Write (68k only!)
-			if (&space != _68kspace)
+			if (&space != &_68kspace)
 			{
 				printf("attempting to WRITE FIFO with SH2!\n");
 				return;
@@ -688,14 +688,14 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15100_w )
 
 
 
-			space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x000070, 0x000073, read16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_w),this)); // h interrupt vector
+			space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000070, 0x000073, read16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_w),this)); // h interrupt vector
 		}
 		else
 		{
 			m_32x_adapter_enabled = 0;
 
 			space.install_rom(0x0000000, 0x03fffff, space.machine().root_device().memregion("gamecart")->base());
-			space.machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x000070, 0x000073, read16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_w),this)); // h interrupt vector
+			space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000070, 0x000073, read16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_w),this)); // h interrupt vector
 		}
 	}
 
@@ -1063,15 +1063,15 @@ WRITE16_MEMBER( sega_32x_device::_32x_common_vdp_regs_w )
 {
 	// what happens if the z80 accesses it, what authorization do we use? which address space do we get?? the z80 *can* write here and to the framebuffer via the window
 
-	address_space* _68kspace = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& _68kspace = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	if (&space!= _68kspace)
+	if (&space!= &_68kspace)
 	{
 		if (m_32x_access_auth!=1)
 			return;
 	}
 
-	if (&space== _68kspace)
+	if (&space== &_68kspace)
 	{
 		if (m_32x_access_auth!=0)
 			return;
@@ -1889,24 +1889,24 @@ void sega_32x_device::device_reset()
 
 	if (m_32x_adapter_enabled == 0)
 	{
-		machine().device(":maincpu")->memory().space(AS_PROGRAM)->install_rom(0x0000000, 0x03fffff, machine().root_device().memregion(":gamecart")->base());
-		machine().device(":maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x000070, 0x000073, read16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_w),this)); // h interrupt vector
+		machine().device(":maincpu")->memory().space(AS_PROGRAM).install_rom(0x0000000, 0x03fffff, machine().root_device().memregion(":gamecart")->base());
+		machine().device(":maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000070, 0x000073, read16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_w),this)); // h interrupt vector
 	};
 
 
 	m_a15100_reg = 0x0000;
-	machine().device(":maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa15100, 0xa15101, read16_delegate(FUNC(sega_32x_device::_32x_68k_a15100_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_a15100_w),this)); // framebuffer control regs
-	machine().device(":maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa15102, 0xa15103, read16_delegate(FUNC(sega_32x_device::_32x_68k_a15102_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_a15102_w),this)); // send irq to sh2
-	machine().device(":maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa15104, 0xa15105, read16_delegate(FUNC(sega_32x_device::_32x_68k_a15104_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_a15104_w),this)); // 68k BANK rom set
-	machine().device(":maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa15106, 0xa15107, read16_delegate(FUNC(sega_32x_device::_32x_68k_a15106_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_a15106_w),this)); // dreq stuff
-	machine().device(":maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa15108, 0xa15113, read16_delegate(FUNC(sega_32x_device::_32x_dreq_common_r),this), write16_delegate(FUNC(sega_32x_device::_32x_dreq_common_w),this)); // dreq src / dst / length /fifo
+	machine().device(":maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa15100, 0xa15101, read16_delegate(FUNC(sega_32x_device::_32x_68k_a15100_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_a15100_w),this)); // framebuffer control regs
+	machine().device(":maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa15102, 0xa15103, read16_delegate(FUNC(sega_32x_device::_32x_68k_a15102_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_a15102_w),this)); // send irq to sh2
+	machine().device(":maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa15104, 0xa15105, read16_delegate(FUNC(sega_32x_device::_32x_68k_a15104_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_a15104_w),this)); // 68k BANK rom set
+	machine().device(":maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa15106, 0xa15107, read16_delegate(FUNC(sega_32x_device::_32x_68k_a15106_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_a15106_w),this)); // dreq stuff
+	machine().device(":maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa15108, 0xa15113, read16_delegate(FUNC(sega_32x_device::_32x_dreq_common_r),this), write16_delegate(FUNC(sega_32x_device::_32x_dreq_common_w),this)); // dreq src / dst / length /fifo
 
-	machine().device(":maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa1511a, 0xa1511b, read16_delegate(FUNC(sega_32x_device::_32x_68k_a1511a_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_a1511a_w),this)); // SEGA TV
+	machine().device(":maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa1511a, 0xa1511b, read16_delegate(FUNC(sega_32x_device::_32x_68k_a1511a_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_a1511a_w),this)); // SEGA TV
 
-	machine().device(":maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa15120, 0xa1512f, read16_delegate(FUNC(sega_32x_device::_32x_68k_m_commsram_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_m_commsram_w),this)); // comms reg 0-7
-	machine().device(":maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xa15130, 0xa1513f, read16_delegate(FUNC(sega_32x_device::_32x_pwm_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_pwm_w),this));
+	machine().device(":maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa15120, 0xa1512f, read16_delegate(FUNC(sega_32x_device::_32x_68k_m_commsram_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_m_commsram_w),this)); // comms reg 0-7
+	machine().device(":maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa15130, 0xa1513f, read16_delegate(FUNC(sega_32x_device::_32x_pwm_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_pwm_w),this));
 
-	machine().device(":maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0a130ec, 0x0a130ef, read16_delegate(FUNC(sega_32x_device::_32x_68k_MARS_r),this)); // system ID
+	machine().device(":maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x0a130ec, 0x0a130ef, read16_delegate(FUNC(sega_32x_device::_32x_68k_MARS_r),this)); // system ID
 
 
 

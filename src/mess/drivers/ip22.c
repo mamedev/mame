@@ -1261,7 +1261,7 @@ static void dump_chain(address_space &space, UINT32 ch_base)
 static void scsi_irq(running_machine &machine, int state)
 {
 	ip22_state *drvstate = machine.driver_data<ip22_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (state)
 	{

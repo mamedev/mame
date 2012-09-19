@@ -261,7 +261,7 @@ static STREAM_UPDATE( svision_update )
 			}
 			else
 			{
-				sample = device->machine().device("maincpu")->memory().space(AS_PROGRAM)->read_byte(addr);
+				sample = device->machine().device("maincpu")->memory().space(AS_PROGRAM).read_byte(addr);
 			}
 			if (((unsigned)state->dma.pos) & 1)
 				s = (sample & 0xf);

@@ -66,7 +66,7 @@ WRITE16_MEMBER(tatsumi_state::apache3_z80_ctrl_w)
 
 READ16_MEMBER(tatsumi_state::apache3_v30_v20_r)
 {
-	address_space *targetspace = machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &targetspace = machine().device("audiocpu")->memory().space(AS_PROGRAM);
 
 	/* Each V20 byte maps to a V30 word */
 	if ((m_control_word & 0xe0) == 0xe0)
@@ -77,12 +77,12 @@ READ16_MEMBER(tatsumi_state::apache3_v30_v20_r)
 		offset += 0x00000; // main ram
 	else
 		logerror("%08x: unmapped read z80 rom %08x\n", space.device().safe_pc(), offset);
-	return 0xff00 | targetspace->read_byte(offset);
+	return 0xff00 | targetspace.read_byte(offset);
 }
 
 WRITE16_MEMBER(tatsumi_state::apache3_v30_v20_w)
 {
-	address_space *targetspace = machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &targetspace = machine().device("audiocpu")->memory().space(AS_PROGRAM);
 
 	if ((m_control_word & 0xe0) != 0x80)
 		logerror("%08x: write unmapped v30 rom %08x\n", space.device().safe_pc(), offset);
@@ -90,7 +90,7 @@ WRITE16_MEMBER(tatsumi_state::apache3_v30_v20_w)
 	/* Only 8 bits of the V30 data bus are connected - ignore writes to the other half */
 	if (ACCESSING_BITS_0_7)
 	{
-		targetspace->write_byte(offset, data & 0xff);
+		targetspace.write_byte(offset, data & 0xff);
 	}
 }
 
@@ -142,18 +142,18 @@ WRITE16_MEMBER(tatsumi_state::apache3_rotate_w)
 
 READ16_MEMBER(tatsumi_state::roundup_v30_z80_r)
 {
-	address_space *targetspace = machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &targetspace = machine().device("audiocpu")->memory().space(AS_PROGRAM);
 
 	/* Each Z80 byte maps to a V30 word */
 	if (m_control_word & 0x20)
 		offset += 0x8000; /* Upper half */
 
-	return 0xff00 | targetspace->read_byte(offset);
+	return 0xff00 | targetspace.read_byte(offset);
 }
 
 WRITE16_MEMBER(tatsumi_state::roundup_v30_z80_w)
 {
-	address_space *targetspace = machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &targetspace = machine().device("audiocpu")->memory().space(AS_PROGRAM);
 
 	/* Only 8 bits of the V30 data bus are connected - ignore writes to the other half */
 	if (ACCESSING_BITS_0_7)
@@ -161,7 +161,7 @@ WRITE16_MEMBER(tatsumi_state::roundup_v30_z80_w)
 		if (m_control_word & 0x20)
 			offset += 0x8000; /* Upper half of Z80 address &space */
 
-		targetspace->write_byte(offset, data & 0xff);
+		targetspace.write_byte(offset, data & 0xff);
 	}
 }
 

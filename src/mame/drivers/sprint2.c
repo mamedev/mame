@@ -102,7 +102,7 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 		}
 	}
 
-	address_space &space = *machine().firstcpu->space(AS_PROGRAM);
+	address_space &space = machine().firstcpu->space(AS_PROGRAM);
 	discrete_sound_w(discrete, space, SPRINT2_MOTORSND1_DATA, m_video_ram[0x394] & 15);	// also DOMINOS_FREQ_DATA
 	discrete_sound_w(discrete, space, SPRINT2_MOTORSND2_DATA, m_video_ram[0x395] & 15);
 	discrete_sound_w(discrete, space, SPRINT2_CRASHSND_DATA, m_video_ram[0x396] & 15);	// also DOMINOS_AMP_DATA

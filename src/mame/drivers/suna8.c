@@ -81,7 +81,7 @@ DRIVER_INIT_MEMBER(suna8_state,hardhead)
 /* Non encrypted bootleg */
 DRIVER_INIT_MEMBER(suna8_state,hardhedb)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	space.set_decrypted_region(0x0000, 0x7fff, machine().root_device().memregion("maincpu")->base() + 0x48000);
 	machine().root_device().membank("bank1")->configure_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
@@ -92,7 +92,7 @@ DRIVER_INIT_MEMBER(suna8_state,hardhedb)
 
 static UINT8 *brickzn_decrypt(running_machine &machine)
 {
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8	*RAM	=	machine.root_device().memregion("maincpu")->base();
 	size_t	size	=	machine.root_device().memregion("maincpu")->bytes();
 	UINT8   *decrypt = auto_alloc_array(machine, UINT8, size);
@@ -222,7 +222,7 @@ DRIVER_INIT_MEMBER(suna8_state,brickznv4)
 
 DRIVER_INIT_MEMBER(suna8_state,hardhea2)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8	*RAM	=	machine().root_device().memregion("maincpu")->base();
 	size_t	size	=	machine().root_device().memregion("maincpu")->bytes();
 	UINT8   *decrypt =	auto_alloc_array(machine(), UINT8, size);
@@ -309,7 +309,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 
 DRIVER_INIT_MEMBER(suna8_state,starfigh)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8	*RAM	=	machine().root_device().memregion("maincpu")->base();
 	size_t	size	=	machine().root_device().memregion("maincpu")->bytes();
 	UINT8   *decrypt =	auto_alloc_array(machine(), UINT8, size);
@@ -377,7 +377,7 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 
 DRIVER_INIT_MEMBER(suna8_state,sparkman)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8	*RAM	=	machine().root_device().memregion("maincpu")->base();
 	size_t	size	=	machine().root_device().memregion("maincpu")->bytes();
 	UINT8   *decrypt =	auto_alloc_array(machine(), UINT8, size);
@@ -1832,7 +1832,7 @@ static TIMER_DEVICE_CALLBACK( hardhea2_interrupt )
 
 MACHINE_RESET_MEMBER(suna8_state,hardhea2)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	hardhea2_rambank_0_w(space,0,0);
 }
 

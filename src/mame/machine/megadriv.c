@@ -800,15 +800,15 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 //   z80 area of the 68k if games misbehave
 static READ8_HANDLER( z80_read_68k_banked_data )
 {
-	address_space *space68k = space.machine().device<legacy_cpu_device>("maincpu")->space();
-	UINT8 ret = space68k->read_byte(genz80.z80_bank_addr+offset);
+	address_space &space68k = space.machine().device<legacy_cpu_device>("maincpu")->space();
+	UINT8 ret = space68k.read_byte(genz80.z80_bank_addr+offset);
 	return ret;
 }
 
 static WRITE8_HANDLER( z80_write_68k_banked_data )
 {
-	address_space *space68k = space.machine().device<legacy_cpu_device>("maincpu")->space();
-	space68k->write_byte(genz80.z80_bank_addr+offset,data);
+	address_space &space68k = space.machine().device<legacy_cpu_device>("maincpu")->space();
+	space68k.write_byte(genz80.z80_bank_addr+offset,data);
 }
 
 
@@ -1511,24 +1511,24 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine &machine, const
 	device_t *ym = machine.device("ymsnd");
 
 	/* INIT THE PORTS *********************************************************************************************/
-	machine.device(tag)->memory().space(AS_IO)->install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_port_r), FUNC(z80_unmapped_port_w));
+	machine.device(tag)->memory().space(AS_IO).install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_port_r), FUNC(z80_unmapped_port_w));
 
 	/* catch any addresses that don't get mapped */
-	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_r), FUNC(z80_unmapped_w));
+	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_r), FUNC(z80_unmapped_w));
 
 
-	machine.device(tag)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x1fff, "bank1");
+	machine.device(tag)->memory().space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x1fff, "bank1");
 	machine.root_device().membank("bank1")->set_base(genz80.z80_prgram );
 
-	machine.device(tag)->memory().space(AS_PROGRAM)->install_ram(0x0000, 0x1fff, genz80.z80_prgram);
+	machine.device(tag)->memory().space(AS_PROGRAM).install_ram(0x0000, 0x1fff, genz80.z80_prgram);
 
 
-	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*ym, 0x4000, 0x4003, FUNC(ym2612_r), FUNC(ym2612_w));
-	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_write_handler    (0x6000, 0x6000, FUNC(megadriv_z80_z80_bank_w));
-	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_write_handler    (0x6001, 0x6001, FUNC(megadriv_z80_z80_bank_w));
-	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_read_handler     (0x6100, 0x7eff, FUNC(megadriv_z80_unmapped_read));
-	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x7f00, 0x7fff, FUNC(megadriv_z80_vdp_read), FUNC(megadriv_z80_vdp_write));
-	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x8000, 0xffff, FUNC(z80_read_68k_banked_data), FUNC(z80_write_68k_banked_data));
+	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(*ym, 0x4000, 0x4003, FUNC(ym2612_r), FUNC(ym2612_w));
+	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_write_handler    (0x6000, 0x6000, FUNC(megadriv_z80_z80_bank_w));
+	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_write_handler    (0x6001, 0x6001, FUNC(megadriv_z80_z80_bank_w));
+	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_read_handler     (0x6100, 0x7eff, FUNC(megadriv_z80_unmapped_read));
+	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x7f00, 0x7fff, FUNC(megadriv_z80_vdp_read), FUNC(megadriv_z80_vdp_write));
+	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x8000, 0xffff, FUNC(z80_read_68k_banked_data), FUNC(z80_write_68k_banked_data));
 }
 
 

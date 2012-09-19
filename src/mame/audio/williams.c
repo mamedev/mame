@@ -129,7 +129,7 @@ WRITE_LINE_MEMBER(williams_cvsd_sound_device::reset_write)
 	// going high halts the CPU
 	if (state)
 	{
-		bank_select_w(*m_cpu->space(), 0, 0);
+		bank_select_w(m_cpu->space(), 0, 0);
 		device_reset();
 		m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
@@ -404,8 +404,8 @@ WRITE_LINE_MEMBER(williams_narc_sound_device::reset_write)
 	// going high halts the CPU
 	if (state)
 	{
-		master_bank_select_w(*m_cpu0->space(), 0, 0);
-		slave_bank_select_w(*m_cpu1->space(), 0, 0);
+		master_bank_select_w(m_cpu0->space(), 0, 0);
+		slave_bank_select_w(m_cpu1->space(), 0, 0);
 		device_reset();
 		m_cpu0->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		m_cpu1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -772,7 +772,7 @@ WRITE_LINE_MEMBER(williams_adpcm_sound_device::reset_write)
 	// going high halts the CPU
 	if (state)
 	{
-		bank_select_w(*m_cpu->space(), 0, 0);
+		bank_select_w(m_cpu->space(), 0, 0);
 		device_reset();
 		m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}

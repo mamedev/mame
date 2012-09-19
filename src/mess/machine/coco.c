@@ -236,24 +236,24 @@ UINT8 coco_state::floating_bus_read(void)
 	UINT8 byte;
 
 	// set up the ability to read address spaces
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	// get the previous and current PC
 	UINT16 prev_pc = m_maincpu->pcbase();
 	UINT16 pc = m_maincpu->pc();
 
 	// get the byte; and skip over header bytes
-	byte = program->read_byte(prev_pc);
+	byte = program.read_byte(prev_pc);
 	if ((byte == 0x10) || (byte == 0x11))
-		byte = program->read_byte(++prev_pc);
+		byte = program.read_byte(++prev_pc);
 
 	// check to see if the opcode specifies the indexed addressing mode, and the secondary byte
 	// specifies no-offset
 	bool is_nooffset_indexed = (((byte & 0xF0) == 0x60) || ((byte & 0xF0) == 0xA0) || ((byte & 0xF0) == 0xE0))
-		&& ((program->read_byte(prev_pc + 1) & 0xBF) == 0x84);
+		&& ((program.read_byte(prev_pc + 1) & 0xBF) == 0x84);
 
 	// finally read the byte
-	return program->read_byte(is_nooffset_indexed ? pc : 0xFFFF);
+	return program.read_byte(is_nooffset_indexed ? pc : 0xFFFF);
 }
 
 

@@ -113,7 +113,7 @@ DRIVER_INIT_MEMBER(a310_state,a310)
 {
 	UINT32 ram_size = machine().device<ram_device>(RAM_TAG)->size();
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x02000000, 0x02000000+(ram_size-1), read32_delegate(FUNC(a310_state::a310_psy_wram_r), this), write32_delegate(FUNC(a310_state::a310_psy_wram_w), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler( 0x02000000, 0x02000000+(ram_size-1), read32_delegate(FUNC(a310_state::a310_psy_wram_r), this), write32_delegate(FUNC(a310_state::a310_psy_wram_w), this));
 
 	archimedes_driver_init(machine());
 }

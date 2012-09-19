@@ -1290,7 +1290,7 @@ ROM_END
 static void treahunt_decode( running_machine &machine )
 {
 	int A;
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x4000);
 	int data;
@@ -1399,10 +1399,10 @@ DRIVER_INIT_MEMBER(jack_state,striv)
 	}
 
 	// Set-up the weirdest questions read ever done
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc000, 0xcfff, read8_delegate(FUNC(jack_state::striv_question_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc000, 0xcfff, read8_delegate(FUNC(jack_state::striv_question_r),this));
 
 	// Nop out unused sprites writes
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xb000, 0xb0ff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0xb000, 0xb0ff);
 
 	m_timer_rate = 128;
 }

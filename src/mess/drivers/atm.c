@@ -120,7 +120,7 @@ ADDRESS_MAP_END
 MACHINE_RESET_MEMBER(atm_state,atm)
 {
 	UINT8 *messram = machine().device<ram_device>(RAM_TAG)->pointer();
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *beta = machine().device(BETA_DISK_TAG);
 
 	space.install_read_bank(0x0000, 0x3fff, "bank1");

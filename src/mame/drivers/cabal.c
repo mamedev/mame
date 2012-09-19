@@ -848,7 +848,7 @@ ROM_END
 
 static void seibu_sound_bootleg(running_machine &machine,const char *cpu,int length)
 {
-	address_space &space = *machine.device(cpu)->memory().space(AS_PROGRAM);
+	address_space &space = machine.device(cpu)->memory().space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length);
 	UINT8 *rom = machine.root_device().memregion(cpu)->base();
 

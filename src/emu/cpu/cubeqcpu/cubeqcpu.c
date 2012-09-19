@@ -282,7 +282,7 @@ static CPU_INIT( cquestsnd )
 	cpustate->sound_data = (UINT16*)device->machine().root_device().memregion(_config->sound_data_region)->base();
 
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 
 	/* Allocate RAM shared with 68000 */
@@ -350,7 +350,7 @@ static CPU_INIT( cquestrot )
 
 	cpustate->device = device;
 	cpustate->lindevice = device->machine().device<legacy_cpu_device>(rotconfig->lin_cpu_tag);
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 
 	cquestrot_state_register(device);
@@ -429,7 +429,7 @@ static CPU_INIT( cquestlin )
 
 	cpustate->device = device;
 	cpustate->rotdevice = device->machine().device<legacy_cpu_device>(linconfig->rot_cpu_tag);
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 
 	cquestlin_state_register(device);

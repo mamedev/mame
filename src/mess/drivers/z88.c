@@ -67,8 +67,8 @@ void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 		// install read bank
 		if (m_bank_type[bank] != Z88_BANK_ROM)
 		{
-			m_maincpu->space(AS_PROGRAM)->install_read_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
-			m_maincpu->space(AS_PROGRAM)->unmap_write(bank<<14, (bank<<14) + 0x3fff);
+			m_maincpu->space(AS_PROGRAM).install_read_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
+			m_maincpu->space(AS_PROGRAM).unmap_write(bank<<14, (bank<<14) + 0x3fff);
 			m_bank_type[bank] = Z88_BANK_ROM;
 		}
 
@@ -81,7 +81,7 @@ void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 			// install readwrite bank
 			if (m_bank_type[bank] != Z88_BANK_RAM)
 			{
-				m_maincpu->space(AS_PROGRAM)->install_readwrite_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
+				m_maincpu->space(AS_PROGRAM).install_readwrite_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
 				m_bank_type[bank] = Z88_BANK_RAM;
 			}
 
@@ -92,7 +92,7 @@ void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 		{
 			if (m_bank_type[bank] != Z88_BANK_UNMAP)
 			{
-				m_maincpu->space(AS_PROGRAM)->unmap_readwrite(bank<<14, (bank<<14) + 0x3fff);
+				m_maincpu->space(AS_PROGRAM).unmap_readwrite(bank<<14, (bank<<14) + 0x3fff);
 				m_bank_type[bank] = Z88_BANK_UNMAP;
 			}
 		}
@@ -107,16 +107,16 @@ void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 			switch (bank)
 			{
 				case 0:
-					m_maincpu->space(AS_PROGRAM)->install_readwrite_handler(0x0000, 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank0_cart_r), this), write8_delegate(FUNC(z88_state::bank0_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank0_cart_r), this), write8_delegate(FUNC(z88_state::bank0_cart_w), this));
 					break;
 				case 1:
-					m_maincpu->space(AS_PROGRAM)->install_readwrite_handler(0x4000, 0x7fff, 0, 0, read8_delegate(FUNC(z88_state::bank1_cart_r), this), write8_delegate(FUNC(z88_state::bank1_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x7fff, 0, 0, read8_delegate(FUNC(z88_state::bank1_cart_r), this), write8_delegate(FUNC(z88_state::bank1_cart_w), this));
 					break;
 				case 2:
-					m_maincpu->space(AS_PROGRAM)->install_readwrite_handler(0x8000, 0xbfff, 0, 0, read8_delegate(FUNC(z88_state::bank2_cart_r), this), write8_delegate(FUNC(z88_state::bank2_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, 0, 0, read8_delegate(FUNC(z88_state::bank2_cart_r), this), write8_delegate(FUNC(z88_state::bank2_cart_w), this));
 					break;
 				case 3:
-					m_maincpu->space(AS_PROGRAM)->install_readwrite_handler(0xc000, 0xffff, 0, 0, read8_delegate(FUNC(z88_state::bank3_cart_r), this), write8_delegate(FUNC(z88_state::bank3_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xffff, 0, 0, read8_delegate(FUNC(z88_state::bank3_cart_r), this), write8_delegate(FUNC(z88_state::bank3_cart_w), this));
 					break;
 			}
 
@@ -128,13 +128,13 @@ void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 	// override setting for lower 8k of bank 0
 	if (bank == 0)
 	{
-		m_maincpu->space(AS_PROGRAM)->install_read_bank(0, 0x1fff, "bank1");
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0, 0x1fff, "bank1");
 
 		// enable RAM
 		if (rams)
-			m_maincpu->space(AS_PROGRAM)->install_write_bank(0, 0x1fff, "bank1");
+			m_maincpu->space(AS_PROGRAM).install_write_bank(0, 0x1fff, "bank1");
 		else
-			m_maincpu->space(AS_PROGRAM)->unmap_write(0, 0x1fff);
+			m_maincpu->space(AS_PROGRAM).unmap_write(0, 0x1fff);
 
 		membank("bank1")->set_entry(rams & 1);
 	}

@@ -84,7 +84,7 @@ READ8_HANDLER( indiana_vga_setting )
 DRIVER_INIT_MEMBER(indiana_state,indiana)
 {
 	pc_vga_init(machine(), indiana_vga_setting, NULL);
-	pc_vga_io_init(machine(), *machine().device("maincpu")->memory().space(AS_PROGRAM), 0x7f7a0000, *machine().device("maincpu")->memory().space(AS_PROGRAM), 0x7f600000);
+	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0x7f7a0000, machine().device("maincpu")->memory().space(AS_PROGRAM), 0x7f600000);
 }
 
 /* ROM definition */

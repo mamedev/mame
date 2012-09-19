@@ -438,18 +438,18 @@ WRITE8_MEMBER( portfolio_state::counter_w )
 
 WRITE8_MEMBER( portfolio_state::ncc1_w )
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	if (BIT(data, 0))
 	{
 		// system ROM
 		UINT8 *rom = memregion(M80C88A_TAG)->base();
-		program->install_rom(0xc0000, 0xdffff, rom);
+		program.install_rom(0xc0000, 0xdffff, rom);
 	}
 	else
 	{
 		// credit card memory
-		program->unmap_readwrite(0xc0000, 0xdffff);
+		program.unmap_readwrite(0xc0000, 0xdffff);
 	}
 
 	//logerror("NCC %02x\n", data);
@@ -763,7 +763,7 @@ static DEVICE_IMAGE_LOAD( portfolio_cart )
 
 void portfolio_state::machine_start()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* set CPU interrupt vector callback */
 	m_maincpu->set_irq_acknowledge_callback(portfolio_int_ack);
@@ -772,11 +772,11 @@ void portfolio_state::machine_start()
 	switch (machine().device<ram_device>(RAM_TAG)->size())
 	{
 	case 128 * 1024:
-		program->unmap_readwrite(0x1f000, 0x9efff);
+		program.unmap_readwrite(0x1f000, 0x9efff);
 		break;
 
 	case 384 * 1024:
-		program->unmap_readwrite(0x5f000, 0x9efff);
+		program.unmap_readwrite(0x5f000, 0x9efff);
 		break;
 	}
 
@@ -801,22 +801,22 @@ void portfolio_state::machine_start()
 
 void portfolio_state::machine_reset()
 {
-	address_space *io = m_maincpu->space(AS_IO);
+	address_space &io = m_maincpu->space(AS_IO);
 
 	// peripherals
 	m_pid = ioport("PERIPHERAL")->read();
 
-	io->unmap_readwrite(0x8070, 0x807b);
-	io->unmap_readwrite(0x807d, 0x807e);
+	io.unmap_readwrite(0x8070, 0x807b);
+	io.unmap_readwrite(0x807d, 0x807e);
 
 	switch (m_pid)
 	{
 	case PID_SERIAL:
-		io->install_readwrite_handler(0x8070, 0x8077, read8_delegate(FUNC(ins8250_device::ins8250_r), (ins8250_device*)m_uart), write8_delegate(FUNC(ins8250_device::ins8250_w), (ins8250_device*)m_uart));
+		io.install_readwrite_handler(0x8070, 0x8077, read8_delegate(FUNC(ins8250_device::ins8250_r), (ins8250_device*)m_uart), write8_delegate(FUNC(ins8250_device::ins8250_w), (ins8250_device*)m_uart));
 		break;
 
 	case PID_PARALLEL:
-		io->install_readwrite_handler(0x8078, 0x807b, read8_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi), write8_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi));
+		io.install_readwrite_handler(0x8078, 0x807b, read8_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi), write8_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi));
 		break;
 	}
 }

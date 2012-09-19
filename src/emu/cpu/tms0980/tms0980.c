@@ -503,8 +503,8 @@ static void cpu_init_tms_common( legacy_cpu_device *device, const UINT32* decode
 	cpustate->pc_size = pc_size;
 	cpustate->byte_size = byte_size;
 
-	cpustate->program = device->space( AS_PROGRAM );
-	cpustate->data = device->space( AS_PROGRAM );
+	cpustate->program = &device->space( AS_PROGRAM );
+	cpustate->data = &device->space( AS_PROGRAM );
 
 	device->save_item( NAME(cpustate->prev_pc) );
 	device->save_item( NAME(cpustate->prev_pa) );

@@ -339,7 +339,7 @@ WRITE8_MEMBER(mbc55x_state::mbc55x_kb_usart_w)
 static void set_ram_size(running_machine &machine)
 {
 	mbc55x_state	*state		= machine.driver_data<mbc55x_state>();
-	address_space	&space		= *machine.device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
+	address_space	&space		= machine.device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
 	int 			ramsize 	= state->m_ram->size();
 	int 			nobanks		= ramsize / RAM_BANK_SIZE;
 	char			bank[10];
@@ -434,7 +434,7 @@ static void mbc55x_debug(running_machine &machine, int ref, int params, const ch
 static int instruction_hook(device_t &device, offs_t curpc)
 {
 	mbc55x_state	*state = device.machine().driver_data<mbc55x_state>();
-	address_space	&space = *device.memory().space(AS_PROGRAM);
+	address_space	&space = device.memory().space(AS_PROGRAM);
 	UINT8		   *addr_ptr;
 
 	addr_ptr = (UINT8*)space.get_read_ptr(curpc);

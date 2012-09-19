@@ -1491,7 +1491,7 @@ static SOUND_RESET( qb3_sound )
 {
 	cinemat_state *state = machine.driver_data<cinemat_state>();
 	SOUND_RESET_CALL(demon_sound);
-	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x04, 0x04, write8_delegate(FUNC(cinemat_state::qb3_sound_w),state));
+	machine.device("maincpu")->memory().space(AS_IO).install_write_handler(0x04, 0x04, write8_delegate(FUNC(cinemat_state::qb3_sound_w),state));
 
 	/* this patch prevents the sound ROM from eating itself when command $0A is sent */
 	/* on a cube rotate */

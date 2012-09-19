@@ -311,7 +311,7 @@ static CPU_INIT( r3000 )
 
 	r3000->irq_callback = irqcallback;
 	r3000->device = device;
-	r3000->program = device->space(AS_PROGRAM);
+	r3000->program = &device->space(AS_PROGRAM);
 	r3000->direct = &r3000->program->direct();
 }
 

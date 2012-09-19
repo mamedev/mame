@@ -155,7 +155,7 @@ void safarir_state::palette_init()
 TILE_GET_INFO_MEMBER(safarir_state::get_bg_tile_info)
 {
 	int color;
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 code = ram_r(space,tile_index | 0x400);
 
 	if (code & 0x80)
@@ -177,7 +177,7 @@ TILE_GET_INFO_MEMBER(safarir_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(safarir_state::get_fg_tile_info)
 {
 	int color, flags;
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 code = ram_r(space,tile_index);
 
 	if (code & 0x80)

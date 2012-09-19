@@ -187,7 +187,7 @@ cpc_dkspeech_device::cpc_dkspeech_device(const machine_config &mconfig, const ch
 void cpc_ssa1_device::device_start()
 {
 	device_t* cpu = machine().device("maincpu");
-	address_space& space = *cpu->memory().space(AS_IO);
+	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
 	m_rom = memregion("sp0256")->base();
@@ -201,7 +201,7 @@ void cpc_ssa1_device::device_start()
 void cpc_dkspeech_device::device_start()
 {
 	device_t* cpu = machine().device("maincpu");
-	address_space& space = *cpu->memory().space(AS_IO);
+	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
 	m_rom = memregion("sp0256")->base();

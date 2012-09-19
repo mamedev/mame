@@ -10122,7 +10122,7 @@ DRIVER_INIT_MEMBER(dynax_state,rongrong)
        version of the game might be a bootleg with the protection
        patched. (both sets need this)
      */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x60d4, 0x60d4);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_read(0x60d4, 0x60d4);
 }
 
 /***************************************************************************
@@ -11387,7 +11387,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(dynax_state,momotaro)
 {
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0xe0, 0xe0, read8_delegate(FUNC(dynax_state::momotaro_protection_r),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0xe0, 0xe0, read8_delegate(FUNC(dynax_state::momotaro_protection_r),this));
 }
 
 GAME( 1992, mmpanic,   0,        mmpanic,   mmpanic, driver_device,  0,        ROT0, "Nakanihon / East Technology (Taito license)", "Monkey Mole Panic (USA)",                                         GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

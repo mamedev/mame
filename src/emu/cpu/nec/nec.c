@@ -367,9 +367,9 @@ static void nec_init(legacy_cpu_device *device, device_irq_acknowledge_callback 
 
 	nec_state->irq_callback = irqcallback;
 	nec_state->device = device;
-	nec_state->program = device->space(AS_PROGRAM);
+	nec_state->program = &device->space(AS_PROGRAM);
 	nec_state->direct = &nec_state->program->direct();
-	nec_state->io = device->space(AS_IO);
+	nec_state->io = &device->space(AS_IO);
 }
 
 

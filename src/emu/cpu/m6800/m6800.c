@@ -1046,10 +1046,10 @@ static CPU_INIT( m6800 )
 {
 	m6800_state *cpustate = get_safe_token(device);
 
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->data = &device->space(AS_DATA);
+	cpustate->io = &device->space(AS_IO);
 
 	//  cpustate->subtype   = SUBTYPE_M6800;
 	cpustate->insn = m6800_insn;
@@ -1199,10 +1199,10 @@ static CPU_INIT( m6801 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->data = &device->space(AS_DATA);
+	cpustate->io = &device->space(AS_IO);
 
 	cpustate->clock = device->clock() / 4;
 	cpustate->sci_timer = device->machine().scheduler().timer_alloc(FUNC(sci_tick), cpustate);
@@ -1234,10 +1234,10 @@ static CPU_INIT( m6802 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->data = &device->space(AS_DATA);
+	cpustate->io = &device->space(AS_IO);
 
 	state_register(cpustate, "m6802");
 }
@@ -1254,10 +1254,10 @@ static CPU_INIT( m6803 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->data = &device->space(AS_DATA);
+	cpustate->io = &device->space(AS_IO);
 
 	cpustate->clock = device->clock() / 4;
 	cpustate->sci_timer = device->machine().scheduler().timer_alloc(FUNC(sci_tick), cpustate);
@@ -1296,10 +1296,10 @@ static CPU_INIT( m6808 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->data = &device->space(AS_DATA);
+	cpustate->io = &device->space(AS_IO);
 
 	state_register(cpustate, "m6808");
 }
@@ -1317,10 +1317,10 @@ static CPU_INIT( hd6301 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->data = &device->space(AS_DATA);
+	cpustate->io = &device->space(AS_IO);
 
 	cpustate->clock = device->clock() / 4;
 	cpustate->sci_timer = device->machine().scheduler().timer_alloc(FUNC(sci_tick), cpustate);
@@ -1342,10 +1342,10 @@ static CPU_INIT( hd63701 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->data = &device->space(AS_DATA);
+	cpustate->io = &device->space(AS_IO);
 
 	cpustate->clock = device->clock() / 4;
 	cpustate->sci_timer = device->machine().scheduler().timer_alloc(FUNC(sci_tick), cpustate);
@@ -1377,10 +1377,10 @@ static CPU_INIT( nsc8105 )
 	//  cpustate->subtype = SUBTYPE_NSC8105;
 	cpustate->device = device;
 
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->data = &device->space(AS_DATA);
+	cpustate->io = &device->space(AS_IO);
 
 	cpustate->insn = nsc8105_insn;
 	cpustate->cycles = cycles_nsc8105;

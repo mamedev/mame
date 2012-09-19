@@ -306,7 +306,7 @@ SNAPSHOT_LOAD(sorcerer)
 {
 	device_t *cpu = image.device().machine().device("maincpu");
 	UINT8 *RAM = image.device().machine().root_device().memregion(cpu->tag())->base();
-	address_space &space = *cpu->memory().space(AS_PROGRAM);
+	address_space &space = cpu->memory().space(AS_PROGRAM);
 	UINT8 header[28];
 	unsigned char s_byte;
 
@@ -360,7 +360,7 @@ void sorcerer_state::machine_start()
 
 	UINT16 endmem = 0xbfff;
 
-	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* configure RAM */
 	switch (m_ram->size())
 	{
@@ -387,7 +387,7 @@ MACHINE_START_MEMBER(sorcerer_state,sorcererd)
 
 	UINT16 endmem = 0xbbff;
 
-	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* configure RAM */
 	switch (m_ram->size())
 	{
@@ -407,7 +407,7 @@ MACHINE_START_MEMBER(sorcerer_state,sorcererd)
 
 void sorcerer_state::machine_reset()
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Initialize cassette interface */
 	m_cass_data.output.length = 0;

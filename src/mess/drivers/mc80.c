@@ -137,13 +137,13 @@ INPUT_PORTS_END
 static TIMER_DEVICE_CALLBACK( mc8020_kbd )
 {
 	device_t *cpu = timer.machine().device( "maincpu" );
-	address_space *mem = cpu->memory().space(AS_PROGRAM);
+	address_space &mem = cpu->memory().space(AS_PROGRAM);
 	char kbdrow[6];
 	UINT8 i;
 	for (i = 1; i < 8; i++)
 	{
 		sprintf(kbdrow,"X%X", i);
-		mem->write_word(0xd20+i, timer.machine().root_device().ioport(kbdrow)->read());
+		mem.write_word(0xd20+i, timer.machine().root_device().ioport(kbdrow)->read());
 	}
 }
 

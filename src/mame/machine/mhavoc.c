@@ -82,7 +82,7 @@ void mhavoc_state::machine_start()
 
 void mhavoc_state::machine_reset()
 {
-	address_space &space = *machine().device("alpha")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("alpha")->memory().space(AS_PROGRAM);
 	m_has_gamma_cpu = (machine().device("gamma") != NULL);
 
 	membank("bank1")->configure_entry(0, m_zram0);
@@ -324,6 +324,6 @@ DRIVER_INIT_MEMBER(mhavoc_state,mhavocrv)
 {
 	/* install the speech support that was only optionally stuffed for use */
 	/* in the Return to Vax hack */
-	machine().device("gamma")->memory().space(AS_PROGRAM)->install_write_handler(0x5800, 0x5800, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_data_w),this));
-	machine().device("gamma")->memory().space(AS_PROGRAM)->install_write_handler(0x5900, 0x5900, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_strobe_w),this));
+	machine().device("gamma")->memory().space(AS_PROGRAM).install_write_handler(0x5800, 0x5800, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_data_w),this));
+	machine().device("gamma")->memory().space(AS_PROGRAM).install_write_handler(0x5900, 0x5900, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_strobe_w),this));
 }

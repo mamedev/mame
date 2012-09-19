@@ -30,15 +30,15 @@
 
 void super6_state::bankswitch()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 	UINT8 *rom = memregion(Z80_TAG)->base();
 
 	// power on jump
-	if (!BIT(m_bank0, 6)) {	program->install_rom(0x0000, 0x07ff, 0, 0xf800, rom); return; }
+	if (!BIT(m_bank0, 6)) {	program.install_rom(0x0000, 0x07ff, 0, 0xf800, rom); return; }
 
 	// first 64KB of memory
-	program->install_ram(0x0000, 0xffff, ram);
+	program.install_ram(0x0000, 0xffff, ram);
 
 	// second 64KB of memory
 	int map = (m_bank1 >> 4) & 0x07;
@@ -46,49 +46,49 @@ void super6_state::bankswitch()
 	switch (map)
 	{
 	case 0:
-		if (BIT(m_bank1, 0)) program->install_ram(0x0000, 0x3fff, ram + 0x10000);
-		if (BIT(m_bank1, 1)) program->install_ram(0x4000, 0x7fff, ram + 0x14000);
-		if (BIT(m_bank1, 2)) program->install_ram(0x8000, 0xbfff, ram + 0x18000);
-		if (BIT(m_bank1, 3)) program->install_ram(0xc000, 0xffff, ram + 0x1c000);
+		if (BIT(m_bank1, 0)) program.install_ram(0x0000, 0x3fff, ram + 0x10000);
+		if (BIT(m_bank1, 1)) program.install_ram(0x4000, 0x7fff, ram + 0x14000);
+		if (BIT(m_bank1, 2)) program.install_ram(0x8000, 0xbfff, ram + 0x18000);
+		if (BIT(m_bank1, 3)) program.install_ram(0xc000, 0xffff, ram + 0x1c000);
 		break;
 
 	case 1:
-		if (BIT(m_bank1, 0)) program->install_ram(0x0000, 0x3fff, ram + 0x10000);
-		if (BIT(m_bank1, 1)) program->install_ram(0x4000, 0x7fff, ram + 0x14000);
-		if (BIT(m_bank1, 2)) program->install_ram(0x8000, 0xbfff, ram + 0x18000);
-		if (BIT(m_bank1, 3)) program->install_ram(0xc000, 0xffff, ram + 0x0000);
+		if (BIT(m_bank1, 0)) program.install_ram(0x0000, 0x3fff, ram + 0x10000);
+		if (BIT(m_bank1, 1)) program.install_ram(0x4000, 0x7fff, ram + 0x14000);
+		if (BIT(m_bank1, 2)) program.install_ram(0x8000, 0xbfff, ram + 0x18000);
+		if (BIT(m_bank1, 3)) program.install_ram(0xc000, 0xffff, ram + 0x0000);
 		break;
 
 	case 2:
-		if (BIT(m_bank1, 0)) program->install_ram(0x0000, 0x3fff, ram + 0x10000);
-		if (BIT(m_bank1, 1)) program->install_ram(0x4000, 0x7fff, ram + 0x14000);
-		if (BIT(m_bank1, 2)) program->install_ram(0x8000, 0xbfff, ram + 0x4000);
-		if (BIT(m_bank1, 3)) program->install_ram(0xc000, 0xffff, ram + 0x1c000);
+		if (BIT(m_bank1, 0)) program.install_ram(0x0000, 0x3fff, ram + 0x10000);
+		if (BIT(m_bank1, 1)) program.install_ram(0x4000, 0x7fff, ram + 0x14000);
+		if (BIT(m_bank1, 2)) program.install_ram(0x8000, 0xbfff, ram + 0x4000);
+		if (BIT(m_bank1, 3)) program.install_ram(0xc000, 0xffff, ram + 0x1c000);
 		break;
 
 	case 3:
-		if (BIT(m_bank1, 0)) program->install_ram(0x0000, 0x3fff, ram + 0x10000);
-		if (BIT(m_bank1, 1)) program->install_ram(0x4000, 0x7fff, ram + 0x14000);
-		if (BIT(m_bank1, 2)) program->install_ram(0x8000, 0xbfff, ram + 0x0000);
-		if (BIT(m_bank1, 3)) program->install_ram(0xc000, 0xffff, ram + 0x4000);
+		if (BIT(m_bank1, 0)) program.install_ram(0x0000, 0x3fff, ram + 0x10000);
+		if (BIT(m_bank1, 1)) program.install_ram(0x4000, 0x7fff, ram + 0x14000);
+		if (BIT(m_bank1, 2)) program.install_ram(0x8000, 0xbfff, ram + 0x0000);
+		if (BIT(m_bank1, 3)) program.install_ram(0xc000, 0xffff, ram + 0x4000);
 		break;
 
 	case 4:
-		if (BIT(m_bank1, 0)) program->install_ram(0x0000, 0x3fff, ram + 0xc000);
-		if (BIT(m_bank1, 1)) program->install_ram(0x4000, 0x7fff, ram + 0x14000);
-		if (BIT(m_bank1, 2)) program->install_ram(0x8000, 0xbfff, ram + 0x18000);
-		if (BIT(m_bank1, 3)) program->install_ram(0xc000, 0xffff, ram + 0x1c000);
+		if (BIT(m_bank1, 0)) program.install_ram(0x0000, 0x3fff, ram + 0xc000);
+		if (BIT(m_bank1, 1)) program.install_ram(0x4000, 0x7fff, ram + 0x14000);
+		if (BIT(m_bank1, 2)) program.install_ram(0x8000, 0xbfff, ram + 0x18000);
+		if (BIT(m_bank1, 3)) program.install_ram(0xc000, 0xffff, ram + 0x1c000);
 		break;
 	}
 
 	// bank 0 overrides
-	if (BIT(m_bank0, 0)) program->install_ram(0x0000, 0x3fff, ram + 0x0000);
-	if (BIT(m_bank0, 1)) program->install_ram(0x4000, 0x7fff, ram + 0x4000);
-	if (BIT(m_bank0, 2)) program->install_ram(0x8000, 0xbfff, ram + 0x8000);
-	if (BIT(m_bank0, 3)) program->install_ram(0xc000, 0xffff, ram + 0xc000);
+	if (BIT(m_bank0, 0)) program.install_ram(0x0000, 0x3fff, ram + 0x0000);
+	if (BIT(m_bank0, 1)) program.install_ram(0x4000, 0x7fff, ram + 0x4000);
+	if (BIT(m_bank0, 2)) program.install_ram(0x8000, 0xbfff, ram + 0x8000);
+	if (BIT(m_bank0, 3)) program.install_ram(0xc000, 0xffff, ram + 0xc000);
 
 	// PROM enabled
-	if (!BIT(m_bank0, 5)) program->install_rom(0xf000, 0xf7ff, 0, 0x800, rom);
+	if (!BIT(m_bank0, 5)) program.install_rom(0xf000, 0xf7ff, 0, 0x800, rom);
 }
 
 

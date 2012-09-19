@@ -217,9 +217,9 @@ static CPU_INIT(h8)
 
 	h8->mode_8bit = 0;
 
-	h8->program = device->space(AS_PROGRAM);
+	h8->program = &device->space(AS_PROGRAM);
 	h8->direct = &h8->program->direct();
-	h8->io = device->space(AS_IO);
+	h8->io = &device->space(AS_IO);
 
 	device->save_item(NAME(h8->h8err));
 	device->save_item(NAME(h8->regs));

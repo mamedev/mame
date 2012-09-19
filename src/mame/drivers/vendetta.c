@@ -164,7 +164,7 @@ WRITE8_MEMBER(vendetta_state::vendetta_K052109_w)
 static void vendetta_video_banking( running_machine &machine, int select )
 {
 	vendetta_state *state = machine.driver_data<vendetta_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (select & 1)
 	{

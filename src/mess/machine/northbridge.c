@@ -24,7 +24,7 @@ northbridge_device::northbridge_device(const machine_config &mconfig, device_typ
 
 void northbridge_device::device_start()
 {
-	address_space& space = *machine().device(":maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine().device(":maincpu")->memory().space(AS_PROGRAM);
 
 	machine().root_device().membank("bank10")->set_base(m_ram->pointer());
 

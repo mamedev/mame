@@ -1363,7 +1363,7 @@ READ8_MEMBER(jangou_state::jngolady_rng_r)
 
 DRIVER_INIT_MEMBER(jangou_state,jngolady)
 {
-	machine().device("nsc")->memory().space(AS_PROGRAM)->install_read_handler(0x08, 0x08, read8_delegate(FUNC(jangou_state::jngolady_rng_r),this) );
+	machine().device("nsc")->memory().space(AS_PROGRAM).install_read_handler(0x08, 0x08, read8_delegate(FUNC(jangou_state::jngolady_rng_r),this) );
 }
 
 DRIVER_INIT_MEMBER(jangou_state,luckygrl)

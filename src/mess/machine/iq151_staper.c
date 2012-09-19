@@ -93,7 +93,7 @@ void iq151_staper_device::device_timer(emu_timer &timer, device_timer_id id, int
 
 void iq151_staper_device::io_read(offs_t offset, UINT8 &data)
 {
-	address_space& space = *machine().device("maincpu")->memory().space(AS_IO);
+	address_space& space = machine().device("maincpu")->memory().space(AS_IO);
 
 	if (offset >= 0xf8 && offset < 0xfc)
 		data = m_ppi->read(space, offset & 0x03);
@@ -105,7 +105,7 @@ void iq151_staper_device::io_read(offs_t offset, UINT8 &data)
 
 void iq151_staper_device::io_write(offs_t offset, UINT8 data)
 {
-	address_space& space = *machine().device("maincpu")->memory().space(AS_IO);
+	address_space& space = machine().device("maincpu")->memory().space(AS_IO);
 
 	if (offset >= 0xf8 && offset < 0xfc)
 		m_ppi->write(space, offset & 0x03, data);

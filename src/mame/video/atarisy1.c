@@ -384,7 +384,7 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
 
 TIMER_DEVICE_CALLBACK( atarisy1_int3off_callback )
 {
-	address_space &space = *timer.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = timer.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* clear the state */
 	atarigen_scanline_int_ack_w(space, 0, 0, 0xffff);

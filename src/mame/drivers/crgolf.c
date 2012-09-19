@@ -614,7 +614,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(crgolf_state,crgolfhi)
 {
-	machine().device("audiocpu")->memory().space(AS_PROGRAM)->install_write_handler(0xa000, 0xa003, write8_delegate(FUNC(crgolf_state::crgolfhi_sample_w),this));
+	machine().device("audiocpu")->memory().space(AS_PROGRAM).install_write_handler(0xa000, 0xa003, write8_delegate(FUNC(crgolf_state::crgolfhi_sample_w),this));
 }
 
 

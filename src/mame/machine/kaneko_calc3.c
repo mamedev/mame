@@ -1243,7 +1243,7 @@ UINT8 kaneko_calc3_device::shift_bits(UINT8 dat, int bits)
 int kaneko_calc3_device::calc3_decompress_table(running_machine& machine, int tabnum, UINT8* dstram, int dstoffset)
 {
 	calc3_t &calc3 = m_calc3;
-	address_space &space = *machine.device(":maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device(":maincpu")->memory().space(AS_PROGRAM);
 	UINT8* datarom = memregion(":calc3_rom")->base();
 
 	UINT8 numregions;
@@ -1344,11 +1344,11 @@ int kaneko_calc3_device::calc3_decompress_table(running_machine& machine, int ta
 					//printf("save to eeprom\n");
 
 					{
-						address_space *eeprom_space = space.machine().device<eeprom_device>(":eeprom")->space();
+						address_space &eeprom_space = space.machine().device<eeprom_device>(":eeprom")->space();
 
 						for (i=0;i<0x80;i++)
 						{
-							eeprom_space->write_byte(i, space.read_byte(calc3.eeprom_addr+0x200000+i));
+							eeprom_space.write_byte(i, space.read_byte(calc3.eeprom_addr+0x200000+i));
 						}
 
 					}
@@ -1633,7 +1633,7 @@ void kaneko_calc3_device::calc3_mcu_run(running_machine &machine)
 	calc3_t &calc3 = m_calc3;
 	UINT16 mcu_command;
 	int i;
-	address_space &space = *machine.device(":maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device(":maincpu")->memory().space(AS_PROGRAM);
 
 	if ( calc3.mcu_status != (1|2|4|8) )	return;
 
@@ -1689,11 +1689,11 @@ void kaneko_calc3_device::calc3_mcu_run(running_machine &machine)
 			}
 #endif
 			{
-				address_space *eeprom_space = space.machine().device<eeprom_device>(":eeprom")->space();
+				address_space &eeprom_space = space.machine().device<eeprom_device>(":eeprom")->space();
 
 				for (i=0;i<0x80;i++)
 				{
-					space.write_byte(calc3.eeprom_addr+0x200000+i, eeprom_space->read_byte(i));
+					space.write_byte(calc3.eeprom_addr+0x200000+i, eeprom_space.read_byte(i));
 				}
 
 			}

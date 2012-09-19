@@ -221,7 +221,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_a_func )
 	{
 		/* if psg not selected, write to printer */
 		centronics_device *centronics = device->machine().device<centronics_device>("centronics");
-		centronics->write(*device->machine().memory().first_space(), 0, data);
+		centronics->write(device->machine().driver_data()->generic_space(), 0, data);
 	}
 }
 
@@ -427,7 +427,7 @@ static void oric_install_apple2_interface(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
 	device_t *fdc = machine.device("fdc");
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (state->m_is_telestrat)
 		return;
@@ -446,7 +446,7 @@ static void oric_enable_memory(running_machine &machine, int low, int high, int 
 {
 	oric_state *state = machine.driver_data<oric_state>();
 	int i;
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (state->m_is_telestrat)
 		return;
@@ -551,7 +551,7 @@ static void oric_install_apple2_v2_interface(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
 	device_t *fdc = machine.device("fdc");
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	space.install_read_handler(0x0300, 0x030f, read8_delegate(FUNC(oric_state::oric_IO_r),state));
 	space.install_legacy_read_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_r));
@@ -755,7 +755,7 @@ WRITE8_MEMBER(oric_state::oric_jasmin_w)
 static void oric_install_jasmin_interface(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	/* romdis */
 	state->m_port_3fb_w = 1;
 	oric_jasmin_set_mem_0x0c000(machine);
@@ -978,7 +978,7 @@ WRITE8_MEMBER(oric_state::oric_microdisc_w)
 static void oric_install_microdisc_interface(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	space.install_read_handler(0x0300, 0x030f, read8_delegate(FUNC(oric_state::oric_IO_r),state));
 	space.install_read_handler(0x0310, 0x031f, read8_delegate(FUNC(oric_state::oric_microdisc_r),state));
@@ -1064,7 +1064,7 @@ void oric_state::machine_start()
 void oric_state::machine_reset()
 {
 	int disc_interface_id = machine().root_device().ioport("FLOPPY")->read() & 0x07;
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	if (m_is_telestrat)
 		return;
 
@@ -1246,7 +1246,7 @@ CB2
 static void telestrat_refresh_mem(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	telestrat_mem_block *mem_block = &state->m_telestrat_blocks[state->m_telestrat_bank_selection];
 

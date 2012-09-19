@@ -188,7 +188,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type2_state,kov2)
 	kov2_latch_init(machine());
 
 	// we only have a HK internal ROM dumped for now, allow us to override that for debugging purposes.
-	machine().device("prot")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x48000138, 0x4800013b, FUNC(kov2_arm_region_w));
+	machine().device("prot")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x48000138, 0x4800013b, FUNC(kov2_arm_region_w));
 }
 
 
@@ -222,7 +222,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type2_state,kov2p)
 	mem8[0x1FFFFD] = 0x99;
 
 	// we only have a HK internal ROM dumped for now, allow us to override that for debugging purposes.
-	machine().device("prot")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x48000138, 0x4800013b, FUNC(kov2_arm_region_w));
+	machine().device("prot")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x48000138, 0x4800013b, FUNC(kov2_arm_region_w));
 }
 
 static WRITE32_HANDLER( martmast_arm_region_w )
@@ -242,7 +242,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type2_state,martmast)
 	kov2_latch_init(machine());
 
 	// we only have a USA / CHINA internal ROMs dumped for now, allow us to override that for debugging purposes.
-	machine().device("prot")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x48000138, 0x4800013b, FUNC(martmast_arm_region_w));
+	machine().device("prot")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x48000138, 0x4800013b, FUNC(martmast_arm_region_w));
 }
 
 
@@ -297,10 +297,10 @@ DRIVER_INIT_MEMBER(pgm_arm_type2_state,ddp2)
 	kov2_latch_init(machine());
 
 	// we only have a Japan internal ROM dumped for now, allow us to override that for debugging purposes.
-	machine().device("prot")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x48000000, 0x48000003, FUNC(ddp2_arm_region_w));
+	machine().device("prot")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x48000000, 0x48000003, FUNC(ddp2_arm_region_w));
 
-	machine().device("prot")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1800300c, 0x1800300f, FUNC(ddp2_speedup_r));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80ee54, 0x80ee55, FUNC(ddp2_main_speedup_r));
+	machine().device("prot")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x1800300c, 0x1800300f, FUNC(ddp2_speedup_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x80ee54, 0x80ee55, FUNC(ddp2_main_speedup_r));
 }
 
 

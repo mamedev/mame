@@ -72,7 +72,7 @@ static TIMER_DEVICE_CALLBACK( pc8401a_keyboard_tick )
 
 void pc8401a_state::bankswitch(UINT8 data)
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	int rombank = data & 0x03;
 	int ram0000 = (data >> 2) & 0x03;
@@ -84,26 +84,26 @@ void pc8401a_state::bankswitch(UINT8 data)
 		if (rombank < 3)
 		{
 			/* internal ROM */
-			program->install_read_bank(0x0000, 0x7fff, "bank1");
-			program->unmap_write(0x0000, 0x7fff);
+			program.install_read_bank(0x0000, 0x7fff, "bank1");
+			program.unmap_write(0x0000, 0x7fff);
 			membank("bank1")->set_entry(rombank);
 		}
 		else
 		{
 			/* ROM cartridge */
-			program->unmap_readwrite(0x0000, 0x7fff);
+			program.unmap_readwrite(0x0000, 0x7fff);
 		}
 		//logerror("0x0000-0x7fff = ROM %u\n", rombank);
 		break;
 
 	case 1: /* RAM 0000H to 7FFFH */
-		program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x7fff, "bank1");
 		membank("bank1")->set_entry(4);
 		//logerror("0x0000-0x7fff = RAM 0-7fff\n");
 		break;
 
 	case 2:	/* RAM 8000H to FFFFH */
-		program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x7fff, "bank1");
 		membank("bank1")->set_entry(5);
 		//logerror("0x0000-0x7fff = RAM 8000-ffff\n");
 		break;
@@ -116,19 +116,19 @@ void pc8401a_state::bankswitch(UINT8 data)
 	switch (ram8000)
 	{
 	case 0: /* cell addresses 0000H to 3FFFH */
-		program->install_readwrite_bank(0x8000, 0xbfff, "bank3");
+		program.install_readwrite_bank(0x8000, 0xbfff, "bank3");
 		membank("bank3")->set_entry(0);
 		//logerror("0x8000-0xbfff = RAM 0-3fff\n");
 		break;
 
 	case 1: /* cell addresses 4000H to 7FFFH */
-		program->install_readwrite_bank(0x8000, 0xbfff, "bank3");
+		program.install_readwrite_bank(0x8000, 0xbfff, "bank3");
 		membank("bank3")->set_entry(1);
 		//logerror("0x8000-0xbfff = RAM 4000-7fff\n");
 		break;
 
 	case 2: /* cell addresses 8000H to BFFFH */
-		program->install_readwrite_bank(0x8000, 0xbfff, "bank3");
+		program.install_readwrite_bank(0x8000, 0xbfff, "bank3");
 		membank("bank3")->set_entry(2);
 		//logerror("0x8000-0xbfff = RAM 8000-bfff\n");
 		break;
@@ -136,12 +136,12 @@ void pc8401a_state::bankswitch(UINT8 data)
 	case 3: /* RAM cartridge */
 		if (m_ram->size() > 64)
 		{
-			program->install_readwrite_bank(0x8000, 0xbfff, "bank3");
+			program.install_readwrite_bank(0x8000, 0xbfff, "bank3");
 			membank("bank3")->set_entry(3); // TODO or 4
 		}
 		else
 		{
-			program->unmap_readwrite(0x8000, 0xbfff);
+			program.unmap_readwrite(0x8000, 0xbfff);
 		}
 		//logerror("0x8000-0xbfff = RAM cartridge\n");
 		break;
@@ -150,15 +150,15 @@ void pc8401a_state::bankswitch(UINT8 data)
 	if (BIT(data, 6))
 	{
 		/* CRT video RAM */
-		program->install_readwrite_bank(0xc000, 0xdfff, "bank4");
-		program->unmap_readwrite(0xe000, 0xe7ff);
+		program.install_readwrite_bank(0xc000, 0xdfff, "bank4");
+		program.unmap_readwrite(0xe000, 0xe7ff);
 		membank("bank4")->set_entry(1);
 		//logerror("0xc000-0xdfff = video RAM\n");
 	}
 	else
 	{
 		/* RAM */
-		program->install_readwrite_bank(0xc000, 0xe7ff, "bank4");
+		program.install_readwrite_bank(0xc000, 0xe7ff, "bank4");
 		membank("bank4")->set_entry(0);
 		//logerror("0xc000-0e7fff = RAM c000-e7fff\n");
 	}

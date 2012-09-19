@@ -138,7 +138,7 @@ ROM_END
 static QUICKLOAD_LOAD( lynx )
 {
 	device_t *cpu = image.device().machine().device("maincpu");
-	address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *data = NULL;
 	UINT8 *rom = image.device().machine().root_device().memregion("maincpu")->base();
 	UINT8 header[10]; // 80 08 dw Start dw Len B S 9 3

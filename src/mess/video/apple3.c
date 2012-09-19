@@ -40,7 +40,7 @@ static const UINT32 text_map[] =
 void apple3_write_charmem(running_machine &machine)
 {
 	apple3_state *state = machine.driver_data<apple3_state>();
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	static const UINT32 screen_hole_map[] =
 	{
 		0x478, 0x4f8, 0x578, 0x5f8, 0x678, 0x6f8, 0x778, 0x7f8

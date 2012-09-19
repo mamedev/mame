@@ -513,7 +513,7 @@ static CPU_INIT( scmp )
 
 	cpustate->device = device;
 
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 
 	/* resolve callbacks */

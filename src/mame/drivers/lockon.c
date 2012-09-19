@@ -63,34 +63,34 @@ WRITE16_MEMBER(lockon_state::adrst_w)
 
 READ16_MEMBER(lockon_state::main_gnd_r)
 {
-	address_space *gndspace = m_ground->memory().space(AS_PROGRAM);
-	return gndspace->read_word(V30_GND_ADDR | offset * 2);
+	address_space &gndspace = m_ground->memory().space(AS_PROGRAM);
+	return gndspace.read_word(V30_GND_ADDR | offset * 2);
 }
 
 WRITE16_MEMBER(lockon_state::main_gnd_w)
 {
-	address_space *gndspace = m_ground->memory().space(AS_PROGRAM);
+	address_space &gndspace = m_ground->memory().space(AS_PROGRAM);
 
 	if (ACCESSING_BITS_0_7)
-		gndspace->write_byte(V30_GND_ADDR | (offset * 2 + 0), data);
+		gndspace.write_byte(V30_GND_ADDR | (offset * 2 + 0), data);
 	if (ACCESSING_BITS_8_15)
-		gndspace->write_byte(V30_GND_ADDR | (offset * 2 + 1), data >> 8);
+		gndspace.write_byte(V30_GND_ADDR | (offset * 2 + 1), data >> 8);
 }
 
 READ16_MEMBER(lockon_state::main_obj_r)
 {
-	address_space *objspace = m_object->memory().space(AS_PROGRAM);
-	return objspace->read_word(V30_OBJ_ADDR | offset * 2);
+	address_space &objspace = m_object->memory().space(AS_PROGRAM);
+	return objspace.read_word(V30_OBJ_ADDR | offset * 2);
 }
 
 WRITE16_MEMBER(lockon_state::main_obj_w)
 {
-	address_space *objspace =m_object->memory().space(AS_PROGRAM);
+	address_space &objspace =m_object->memory().space(AS_PROGRAM);
 
 	if (ACCESSING_BITS_0_7)
-		objspace->write_byte(V30_OBJ_ADDR | (offset * 2 + 0), data);
+		objspace.write_byte(V30_OBJ_ADDR | (offset * 2 + 0), data);
 	if (ACCESSING_BITS_8_15)
-		objspace->write_byte(V30_OBJ_ADDR | (offset * 2 + 1), data >> 8);
+		objspace.write_byte(V30_OBJ_ADDR | (offset * 2 + 1), data >> 8);
 }
 
 WRITE16_MEMBER(lockon_state::tst_w)
@@ -98,31 +98,31 @@ WRITE16_MEMBER(lockon_state::tst_w)
 
 	if (offset < 0x800)
 	{
-		address_space *gndspace = m_ground->memory().space(AS_PROGRAM);
-		address_space *objspace = m_object->memory().space(AS_PROGRAM);
+		address_space &gndspace = m_ground->memory().space(AS_PROGRAM);
+		address_space &objspace = m_object->memory().space(AS_PROGRAM);
 
 		if (ACCESSING_BITS_0_7)
-			gndspace->write_byte(V30_GND_ADDR | (offset * 2 + 0), data);
+			gndspace.write_byte(V30_GND_ADDR | (offset * 2 + 0), data);
 		if (ACCESSING_BITS_8_15)
-			gndspace->write_byte(V30_GND_ADDR | (offset * 2 + 1), data >> 8);
+			gndspace.write_byte(V30_GND_ADDR | (offset * 2 + 1), data >> 8);
 
 		if (ACCESSING_BITS_0_7)
-			objspace->write_byte(V30_OBJ_ADDR | (offset * 2 + 0), data);
+			objspace.write_byte(V30_OBJ_ADDR | (offset * 2 + 0), data);
 		if (ACCESSING_BITS_8_15)
-			objspace->write_byte(V30_OBJ_ADDR | (offset * 2 + 1), data >> 8);
+			objspace.write_byte(V30_OBJ_ADDR | (offset * 2 + 1), data >> 8);
 	}
 }
 
 READ16_MEMBER(lockon_state::main_z80_r)
 {
-	address_space *sndspace = m_audiocpu->space(AS_PROGRAM);
-	return 0xff00 | sndspace->read_byte(offset);
+	address_space &sndspace = m_audiocpu->space(AS_PROGRAM);
+	return 0xff00 | sndspace.read_byte(offset);
 }
 
 WRITE16_MEMBER(lockon_state::main_z80_w)
 {
-	address_space *sndspace = m_audiocpu->space(AS_PROGRAM);
-	sndspace->write_byte(offset, data);
+	address_space &sndspace = m_audiocpu->space(AS_PROGRAM);
+	sndspace.write_byte(offset, data);
 }
 
 WRITE16_MEMBER(lockon_state::inten_w)

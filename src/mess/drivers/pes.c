@@ -114,7 +114,7 @@ static int data_to_i8031(device_t *device)
 static void data_from_i8031(device_t *device, int data)
 {
 	pes_state *state = device->machine().driver_data<pes_state>();
-	state->m_terminal->write(*device->machine().memory().first_space(),0,data);
+	state->m_terminal->write(device->machine().driver_data()->generic_space(),0,data);
 #ifdef DEBUG_SERIAL_CB
 	fprintf(stderr,"callback: output from i8031/pes to pc/terminal: %02X\n",data);
 #endif

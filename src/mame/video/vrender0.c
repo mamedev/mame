@@ -402,7 +402,7 @@ static const _DrawTemplate DrawTile[]=
 int vrender0_ProcessPacket(device_t *device, UINT32 PacketPtr, UINT16 *Dest, UINT8 *TEXTURE)
 {
 	vr0video_state *vr0 = get_safe_token(device);
-	address_space &space = *vr0->cpu->memory().space(AS_PROGRAM);
+	address_space &space = vr0->cpu->memory().space(AS_PROGRAM);
 	UINT32 Dx = Packet(1) & 0x3ff;
 	UINT32 Dy = Packet(2) & 0x1ff;
 	UINT32 Endx = Packet(3) & 0x3ff;

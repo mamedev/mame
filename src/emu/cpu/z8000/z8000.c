@@ -478,9 +478,9 @@ static CPU_INIT( z8001 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	/* already initialized? */
 	if(z8000_exec == NULL)
@@ -493,9 +493,9 @@ static CPU_INIT( z8002 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	/* already initialized? */
 	if(z8000_exec == NULL)
@@ -510,9 +510,9 @@ static CPU_RESET( z8001 )
 	memset(cpustate, 0, sizeof(*cpustate));
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 	cpustate->fcw = RDMEM_W(cpustate,  2); /* get reset cpustate->fcw */
 	if(cpustate->fcw & F_SEG)
 	{
@@ -532,9 +532,9 @@ static CPU_RESET( z8002 )
 	memset(cpustate, 0, sizeof(*cpustate));
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 	cpustate->fcw = RDMEM_W(cpustate,  2); /* get reset cpustate->fcw */
 	cpustate->pc = RDMEM_W(cpustate,  4); /* get reset cpustate->pc  */
 }

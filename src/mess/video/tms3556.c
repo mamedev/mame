@@ -54,7 +54,7 @@ const address_space_config *tms3556_device::memory_space_config(address_spacenum
 
 inline UINT8 tms3556_device::readbyte(offs_t address)
 {
-	return space()->read_byte(address);
+	return space().read_byte(address);
 }
 
 
@@ -64,7 +64,7 @@ inline UINT8 tms3556_device::readbyte(offs_t address)
 
 inline void tms3556_device::writebyte(offs_t address, UINT8 data)
 {
-	space()->write_byte(address, data);
+	space().write_byte(address, data);
 }
 
 

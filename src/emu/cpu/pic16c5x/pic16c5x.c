@@ -727,10 +727,10 @@ static CPU_INIT( pic16c5x )
 	pic16c5x_state *cpustate = get_safe_token(device);
 
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->data = &device->space(AS_DATA);
+	cpustate->io = &device->space(AS_IO);
 
 	/* ensure the internal ram pointers are set before get_info is called */
 	update_internalram_ptr(cpustate);

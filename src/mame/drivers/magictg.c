@@ -753,7 +753,6 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 
 			if (data > 0)
 			{
-				address_space* addr_space;
 				UINT8* adsp_rom = (UINT8*)space.machine().root_device().memregion("adsp")->base();
 
 				UINT32 page = (m_adsp_regs.bdma_control >> 8) & 0xff;
@@ -762,10 +761,7 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 
 				UINT32 src_addr = (page << 14) | m_adsp_regs.bdma_external_addr;
 
-				if (type == 0)
-					addr_space = m_adsp->space(AS_PROGRAM);
-				else
-					addr_space = m_adsp->space(AS_DATA);
+				address_space &addr_space = m_adsp->space((type == 0) ? AS_PROGRAM : AS_DATA);
 
 				if (dir == 0)
 				{
@@ -777,7 +773,7 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 											 (adsp_rom[src_addr + 1] << 8) |
 											 (adsp_rom[src_addr + 2]);
 
-							addr_space->write_dword(m_adsp_regs.bdma_internal_addr * 4, src_word);
+							addr_space.write_dword(m_adsp_regs.bdma_internal_addr * 4, src_word);
 
 							src_addr += 3;
 							m_adsp_regs.bdma_internal_addr ++;
@@ -786,7 +782,7 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 						{
 							UINT32 src_word =(adsp_rom[src_addr + 0] << 8) | adsp_rom[src_addr + 1];
 
-							addr_space->write_dword(m_adsp_regs.bdma_internal_addr * 2, src_word);
+							addr_space.write_dword(m_adsp_regs.bdma_internal_addr * 2, src_word);
 
 							src_addr += 2;
 							m_adsp_regs.bdma_internal_addr ++;

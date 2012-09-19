@@ -154,7 +154,7 @@ static void dma_exec(running_machine &machine, FPTR ch)
 	int ctrl;
 	int srcadd, dstadd;
 	UINT32 src, dst;
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	gba_state *state = machine.driver_data<gba_state>();
 
 	src = state->m_dma_src[ch];
@@ -3061,13 +3061,13 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 
 		if (cart_size <= (16 * 1024 * 1024))
 		{
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd000000, 0xdffffff, read32_delegate(FUNC(gba_state::eeprom_r),state));
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xd000000, 0xdffffff, write32_delegate(FUNC(gba_state::eeprom_w),state));
+			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd000000, 0xdffffff, read32_delegate(FUNC(gba_state::eeprom_r),state));
+			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xd000000, 0xdffffff, write32_delegate(FUNC(gba_state::eeprom_w),state));
 		}
 		else
 		{
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xdffff00, 0xdffffff, read32_delegate(FUNC(gba_state::eeprom_r),state));
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xdffff00, 0xdffffff, write32_delegate(FUNC(gba_state::eeprom_w),state));
+			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xdffff00, 0xdffffff, read32_delegate(FUNC(gba_state::eeprom_r),state));
+			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xdffff00, 0xdffffff, write32_delegate(FUNC(gba_state::eeprom_w),state));
 		}
 	}
 
@@ -3076,8 +3076,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		state->m_nvptr = (UINT8 *)&state->m_gba_sram;
 		state->m_nvsize = 0x10000;
 
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xe000000, 0xe00ffff, read32_delegate(FUNC(gba_state::sram_r),state));
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe000000, 0xe00ffff, write32_delegate(FUNC(gba_state::sram_w),state));
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xe000000, 0xe00ffff, read32_delegate(FUNC(gba_state::sram_r),state));
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xe000000, 0xe00ffff, write32_delegate(FUNC(gba_state::sram_w),state));
 	}
 
 	if (chip & GBA_CHIP_FLASH_1M)
@@ -3087,8 +3087,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		state->m_flash_size = 0x20000;
 		state->m_flash_mask = 0x1ffff/4;
 
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xe000000, 0xe01ffff, read32_delegate(FUNC(gba_state::flash_r),state));
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe000000, 0xe01ffff, write32_delegate(FUNC(gba_state::flash_w),state));
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xe000000, 0xe01ffff, read32_delegate(FUNC(gba_state::flash_r),state));
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xe000000, 0xe01ffff, write32_delegate(FUNC(gba_state::flash_w),state));
 	}
 
 	if ((chip & GBA_CHIP_FLASH) || (chip & GBA_CHIP_FLASH_512))
@@ -3098,8 +3098,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		state->m_flash_size = 0x10000;
 		state->m_flash_mask = 0xffff/4;
 
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xe000000, 0xe00ffff, read32_delegate(FUNC(gba_state::flash_r),state));
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe000000, 0xe00ffff, write32_delegate(FUNC(gba_state::flash_w),state));
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xe000000, 0xe00ffff, read32_delegate(FUNC(gba_state::flash_r),state));
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xe000000, 0xe00ffff, write32_delegate(FUNC(gba_state::flash_w),state));
 	}
 
 	if (chip & GBA_CHIP_RTC)
@@ -3204,7 +3204,7 @@ DIRECT_UPDATE_MEMBER(gba_state::gba_direct)
 
 DRIVER_INIT_MEMBER(gba_state,gbadv)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(gba_state::gba_direct), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(gba_state::gba_direct), this));
 }
 
 /*    YEAR  NAME PARENT COMPAT MACHINE INPUT   INIT   COMPANY     FULLNAME */

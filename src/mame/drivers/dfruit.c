@@ -136,14 +136,14 @@ WRITE8_MEMBER(dfruit_state::dfruit_ram_bank_w)
 
 UINT8 dfruit_state::ram_bank_r(UINT16 offset, UINT8 bank_num)
 {
-	address_space *vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
-	return vdp_space->read_byte(offset + (m_ram_bank[bank_num]) * 0x1000);;
+	address_space &vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
+	return vdp_space.read_byte(offset + (m_ram_bank[bank_num]) * 0x1000);;
 }
 
 void dfruit_state::ram_bank_w(UINT16 offset, UINT8 data, UINT8 bank_num)
 {
-	address_space *vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
-	vdp_space->write_byte(offset + (m_ram_bank[bank_num]) * 0x1000,data);;
+	address_space &vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
+	vdp_space.write_byte(offset + (m_ram_bank[bank_num]) * 0x1000,data);;
 }
 
 READ8_MEMBER(dfruit_state::dfruit_ram_0_r) { return ram_bank_r(offset, 0); }

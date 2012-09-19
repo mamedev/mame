@@ -316,8 +316,8 @@ static CPU_INIT( hcd62121 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = &device->space(AS_PROGRAM);
+	cpustate->io = &device->space(AS_IO);
 }
 
 

@@ -3838,7 +3838,7 @@ DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, shogwarr )
 DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
 {
 	// sample banking is different on brap boys for the music, why? GALs / PALs ?
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe00000, 0xe00001, write16_delegate(FUNC(kaneko16_shogwarr_state::brapboys_oki_bank_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xe00000, 0xe00001, write16_delegate(FUNC(kaneko16_shogwarr_state::brapboys_oki_bank_w),this));
 
 	// default sample banks
 	kaneko16_common_oki_bank_w(machine(), "bank10", "oki1", 0, 0x30000, 0x10000);

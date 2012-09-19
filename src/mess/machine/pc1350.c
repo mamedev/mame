@@ -99,7 +99,7 @@ static TIMER_CALLBACK(pc1350_power_up)
 MACHINE_START( pc1350 )
 {
 	pc1350_state *state = machine.driver_data<pc1350_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->m_power = 1;
 	machine.scheduler().timer_set(attotime::from_seconds(1), FUNC(pc1350_power_up));

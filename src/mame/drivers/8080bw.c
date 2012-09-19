@@ -2532,7 +2532,7 @@ WRITE8_MEMBER(_8080bw_state::invmulti_bank_w)
 MACHINE_RESET_MEMBER(_8080bw_state,invmulti)
 {
 
-	invmulti_bank_w(*m_maincpu->space(AS_PROGRAM), 0, 0);
+	invmulti_bank_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 
 	MACHINE_RESET_CALL_MEMBER(mw8080bw);
 }

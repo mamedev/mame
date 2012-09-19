@@ -281,7 +281,7 @@ static CPU_INIT( rsp )
 
 	rsp->irq_callback = irqcallback;
 	rsp->device = device;
-	rsp->program = device->space(AS_PROGRAM);
+	rsp->program = &device->space(AS_PROGRAM);
 	rsp->direct = &rsp->program->direct();
 
 #if 1

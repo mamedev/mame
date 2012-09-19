@@ -172,17 +172,17 @@ READ8_MEMBER(lviv_state::lviv_io_r)
 
 WRITE8_MEMBER(lviv_state::lviv_io_w)
 {
-	address_space *cpuspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &cpuspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	if (m_startup_mem_map)
 	{
 		UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
 		m_startup_mem_map = 0;
 
-		cpuspace->install_write_bank(0x0000, 0x3fff, "bank1");
-		cpuspace->install_write_bank(0x4000, 0x7fff, "bank2");
-		cpuspace->install_write_bank(0x8000, 0xbfff, "bank3");
-		cpuspace->unmap_write(0xC000, 0xffff);
+		cpuspace.install_write_bank(0x0000, 0x3fff, "bank1");
+		cpuspace.install_write_bank(0x4000, 0x7fff, "bank2");
+		cpuspace.install_write_bank(0x8000, 0xbfff, "bank3");
+		cpuspace.unmap_write(0xC000, 0xffff);
 
 		membank("bank1")->set_base(ram);
 		membank("bank2")->set_base(ram + 0x4000);
@@ -232,7 +232,7 @@ I8255A_INTERFACE( lviv_ppi8255_interface_1 )
 
 void lviv_state::machine_reset()
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem;
 
 	space.set_direct_update_handler(direct_update_delegate(FUNC(lviv_state::lviv_directoverride), this));

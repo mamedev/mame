@@ -140,7 +140,7 @@ void ef9345_device::device_start()
 	m_busy_timer = timer_alloc(BUSY_TIMER);
 	m_blink_timer = timer_alloc(BLINKING_TIMER);
 
-	m_videoram = space(0);
+	m_videoram = &space(0);
 	m_charset = region();
 
 	m_screen_out.allocate(496, m_screen->height());

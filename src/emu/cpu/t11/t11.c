@@ -264,7 +264,7 @@ static CPU_INIT( t11 )
 	cpustate->initial_pc = initial_pc[setup->mode >> 13];
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 
 	device->save_item(NAME(cpustate->ppc.w.l));

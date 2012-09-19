@@ -1806,7 +1806,7 @@ void hng64_state::machine_reset()
 
 	KL5C80_virtual_mem_sync(this);
 
-	address_space &space = *machine().device<z80_device>("comm")->space(AS_PROGRAM);
+	address_space &space = machine().device<z80_device>("comm")->space(AS_PROGRAM);
 	space.set_direct_update_handler(direct_update_delegate(FUNC(hng64_state::KL5C80_direct_handler), this));
 
 	machine().device("comm")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip

@@ -361,8 +361,8 @@ static void h6280_decrypt(running_machine &machine, const char *cputag)
 DRIVER_INIT_MEMBER(dec0_state,hippodrm)
 {
 	UINT8 *RAM = machine().root_device().memregion("sub")->base();
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::hippodrm_68000_share_r),this), write16_delegate(FUNC(dec0_state::hippodrm_68000_share_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xffc800, 0xffcfff, write16_delegate(FUNC(dec0_state::sprite_mirror_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::hippodrm_68000_share_r),this), write16_delegate(FUNC(dec0_state::hippodrm_68000_share_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xffc800, 0xffcfff, write16_delegate(FUNC(dec0_state::sprite_mirror_w),this));
 
 	h6280_decrypt(machine(), "sub");
 
@@ -386,7 +386,7 @@ DRIVER_INIT_MEMBER(dec0_state,slyspy)
 
 DRIVER_INIT_MEMBER(dec0_state,robocop)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::robocop_68000_share_r),this), write16_delegate(FUNC(dec0_state::robocop_68000_share_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::robocop_68000_share_r),this), write16_delegate(FUNC(dec0_state::robocop_68000_share_w),this));
 }
 
 DRIVER_INIT_MEMBER(dec0_state,baddudes)

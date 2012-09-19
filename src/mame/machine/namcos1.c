@@ -672,7 +672,7 @@ static void set_bank(running_machine &machine, int banknum, const bankhandler *h
 		"bank9", "bank10", "bank11", "bank12", "bank13", "bank14", "bank15", "bank16"
 	};
 	static const char *const cputags[] = { "maincpu", "sub" };
-	address_space &space = *machine.device(cputags[(banknum >> 3) & 1])->memory().space(AS_PROGRAM);
+	address_space &space = machine.device(cputags[(banknum >> 3) & 1])->memory().space(AS_PROGRAM);
 	int bankstart = (banknum & 7) * 0x2000;
 
 	/* for BANK handlers , memory direct and OP-code base */
@@ -1216,7 +1216,7 @@ DRIVER_INIT_MEMBER(namcos1_state,tankfrc4)
 	};
 	namcos1_driver_init(machine(), &tankfrce_specific);
 
-	machine().device("mcu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1400, 0x1401, FUNC(faceoff_inputs_r));
+	machine().device("mcu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x1400, 0x1401, FUNC(faceoff_inputs_r));
 }
 
 /*******************************************************************************
@@ -1307,7 +1307,7 @@ static READ8_HANDLER( quester_paddle_r )
 DRIVER_INIT_MEMBER(namcos1_state,quester)
 {
 	namcos1_driver_init(machine(), NULL);
-	machine().device("mcu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1400, 0x1401, FUNC(quester_paddle_r));
+	machine().device("mcu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x1400, 0x1401, FUNC(quester_paddle_r));
 }
 
 
@@ -1396,7 +1396,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 DRIVER_INIT_MEMBER(namcos1_state,berabohm)
 {
 	namcos1_driver_init(machine(), NULL);
-	machine().device("mcu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1400, 0x1401, FUNC(berabohm_buttons_r));
+	machine().device("mcu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x1400, 0x1401, FUNC(berabohm_buttons_r));
 }
 
 
@@ -1466,5 +1466,5 @@ static READ8_HANDLER( faceoff_inputs_r )
 DRIVER_INIT_MEMBER(namcos1_state,faceoff)
 {
 	namcos1_driver_init(machine(), NULL);
-	machine().device("mcu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1400, 0x1401, FUNC(faceoff_inputs_r));
+	machine().device("mcu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x1400, 0x1401, FUNC(faceoff_inputs_r));
 }

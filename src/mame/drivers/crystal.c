@@ -198,7 +198,7 @@ public:
 static void IntReq( running_machine &machine, int num )
 {
 	crystal_state *state = machine.driver_data<crystal_state>();
-	address_space &space = *state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 	UINT32 IntEn = space.read_dword(0x01800c08);
 	UINT32 IntPend = space.read_dword(0x01800c0c);
 	if (IntEn & (1 << num))
@@ -276,7 +276,7 @@ WRITE32_MEMBER(crystal_state::IntAck_w)
 static IRQ_CALLBACK( icallback )
 {
 	crystal_state *state = device->machine().driver_data<crystal_state>();
-	address_space &space = *device->memory().space(AS_PROGRAM);
+	address_space &space = device->memory().space(AS_PROGRAM);
 	UINT32 IntPend = space.read_dword(0x01800c0c);
 	int i;
 
@@ -652,7 +652,7 @@ static void SetVidReg( address_space &space, UINT16 reg, UINT16 val )
 
 UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int DoFlip;
 
 	UINT32 B0 = 0x0;
@@ -717,7 +717,7 @@ void crystal_state::screen_eof_crystal(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 		UINT16 head, tail;
 		int DoFlip = 0;
 

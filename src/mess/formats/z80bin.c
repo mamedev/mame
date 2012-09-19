@@ -68,7 +68,7 @@ static int z80bin_load_file(device_image_interface *image, const char *file_type
 			image->message("%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
 			return IMAGE_INIT_FAIL;
 		}
-		image->device().machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte(j, data);
+		image->device().machine().device("maincpu")->memory().space(AS_PROGRAM).write_byte(j, data);
 	}
 
 	return IMAGE_INIT_PASS;
@@ -122,7 +122,7 @@ QUICKLOAD_LOAD( mbee_z80bin )
 		autorun = image.device().machine().root_device().ioport("CONFIG")->read_safe(0xFF) & 1;
 
 		device_t *cpu = image.device().machine().device("maincpu");
-		address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		space.write_word(0xa6, execute_address);			/* fix the EXEC command */
 
@@ -158,7 +158,7 @@ QUICKLOAD_LOAD( sorcerer )
 		/* check to see if autorun is on (I hate how this works) */
 		autorun = image.device().machine().root_device().ioport("CONFIG")->read_safe(0xFF) & 1;
 
-		address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space.read_byte(0xdffa) != 0xc3))
 			return IMAGE_INIT_FAIL;		/* can't run a program if the cartridge isn't in */

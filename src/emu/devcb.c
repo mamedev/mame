@@ -144,11 +144,9 @@ address_space &devcb_resolver::resolve_space(int index, const char *tag, device_
 		throw emu_fatalerror("Device '%s' (requested by %s '%s') has no memory interface", tag, current.name(), current.tag());
 
 	// set the real target and function, then prime a delegate
-	address_space *result = memory->space(index);
-	if (result == NULL)
+	if (!memory->has_space(index))
 		throw emu_fatalerror("Unable to find device '%s' space %d (requested by %s '%s')", tag, index, current.name(), current.tag());
-
-	return *result;
+	return memory->space(index);
 }
 
 

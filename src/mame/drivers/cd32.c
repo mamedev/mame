@@ -1438,7 +1438,7 @@ static void serial_w(running_machine &machine, UINT16 data)
 	cd32_state *state = machine.driver_data<cd32_state>();
 	UINT8 data8 = data & 0xff;
 	if ( data8 != 0x00 )
-		state->m_microtouch->rx(*machine.memory().first_space(), 0, data8);
+		state->m_microtouch->rx(machine.driver_data()->generic_space(), 0, data8);
 }
 
 WRITE8_MEMBER (cd32_state::microtouch_tx)

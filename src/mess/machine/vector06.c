@@ -169,7 +169,7 @@ void vector06_state::machine_start()
 
 void vector06_state::machine_reset()
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(vector06_irq_callback);
 	space.install_read_bank (0x0000, 0x7fff, "bank1");

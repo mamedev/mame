@@ -51,9 +51,9 @@ i8008_device::i8008_device(const machine_config &mconfig, const char *tag, devic
 void i8008_device::device_start()
 {
 	// find address spaces
-	m_program = space(AS_PROGRAM);
+	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
-	m_io = space(AS_IO);
+	m_io = &space(AS_IO);
 
 	// save state
 	save_item(NAME(m_PC));

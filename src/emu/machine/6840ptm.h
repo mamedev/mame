@@ -61,9 +61,9 @@ public:
 	int ext_clock(int counter) const { return m_external_clock[counter]; }	// get clock frequency
 
 	DECLARE_WRITE8_MEMBER( write );
-	void write(offs_t offset, UINT8 data) { write(*machine().memory().first_space(), offset, data); }
+	void write(offs_t offset, UINT8 data) { write(machine().driver_data()->generic_space(), offset, data); }
 	DECLARE_READ8_MEMBER( read );
-	UINT8 read(offs_t offset) { return read(*machine().memory().first_space(), offset); }
+	UINT8 read(offs_t offset) { return read(machine().driver_data()->generic_space(), offset); }
 
 	void set_gate(int idx, int state);
 	DECLARE_WRITE_LINE_MEMBER( set_g1 );

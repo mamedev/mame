@@ -156,13 +156,13 @@ DRIVER_INIT_MEMBER(scramble_state,scramble_ppi)
 
 DRIVER_INIT_MEMBER(scramble_state,scobra)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xa803, 0xa803, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xa803, 0xa803, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
 }
 
 #ifdef UNUSED_FUNCTION
 DRIVER_INIT_MEMBER(scramble_state,atlantis)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x6803, 0x6803, FUNC(scrambold_background_enable_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x6803, 0x6803, FUNC(scrambold_background_enable_w));
 }
 
 DRIVER_INIT_MEMBER(scramble_state,scramble)
@@ -173,14 +173,14 @@ DRIVER_INIT_MEMBER(scramble_state,scramble)
 
 DRIVER_INIT_MEMBER(scramble_state,stratgyx)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xb000, 0xb000, write8_delegate(FUNC(scramble_state::scrambold_background_green_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xb002, 0xb002, write8_delegate(FUNC(scramble_state::scrambold_background_blue_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xb00a, 0xb00a, write8_delegate(FUNC(scramble_state::scrambold_background_red_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xb000, 0xb000, write8_delegate(FUNC(scramble_state::scrambold_background_green_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xb002, 0xb002, write8_delegate(FUNC(scramble_state::scrambold_background_blue_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xb00a, 0xb00a, write8_delegate(FUNC(scramble_state::scrambold_background_red_w),this));
 }
 
 DRIVER_INIT_MEMBER(scramble_state,tazmani2)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xb002, 0xb002, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xb002, 0xb002, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
 }
 
 DRIVER_INIT_MEMBER(scramble_state,ckongs)
@@ -190,15 +190,15 @@ DRIVER_INIT_MEMBER(scramble_state,ckongs)
 DRIVER_INIT_MEMBER(scramble_state,mariner)
 {
 	/* extra ROM */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5800, 0x67ff, "bank1");
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x5800, 0x67ff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x5800, 0x67ff, "bank1");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x5800, 0x67ff);
 	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x5800);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x9008, 0x9008, FUNC(mariner_protection_2_r));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xb401, 0xb401, FUNC(mariner_protection_1_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x9008, 0x9008, FUNC(mariner_protection_2_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xb401, 0xb401, FUNC(mariner_protection_1_r));
 
 	/* ??? (it's NOT a background enable) */
-	/*machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x6803, 0x6803);*/
+	/*machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x6803, 0x6803);*/
 }
 
 #ifdef UNUSED_FUNCTION
@@ -276,15 +276,15 @@ DRIVER_INIT_MEMBER(scramble_state,cavelon)
 	UINT8 *ROM = memregion("maincpu")->base();
 
 	/* banked ROM */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1");
 	membank("bank1")->configure_entries(0, 2, &ROM[0x00000], 0x10000);
 	cavelon_banksw(machine());
 
 	/* A15 switches memory banks */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x8000, 0xffff, FUNC(cavelon_banksw_r), FUNC(cavelon_banksw_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x8000, 0xffff, FUNC(cavelon_banksw_r), FUNC(cavelon_banksw_w));
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x2000, 0x2000);	/* ??? */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x3800, 0x3801);  /* looks suspicously like
+	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x2000, 0x2000);	/* ??? */
+	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x3800, 0x3801);  /* looks suspicously like
                                                                an AY8910, but not sure */
 	state_save_register_global(machine(), m_cavelon_bank);
 }
@@ -293,7 +293,7 @@ DRIVER_INIT_MEMBER(scramble_state,cavelon)
 
 DRIVER_INIT_MEMBER(scramble_state,darkplnt)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xb00a, 0xb00a, write8_delegate(FUNC(scramble_state::darkplnt_bullet_color_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xb00a, 0xb00a, write8_delegate(FUNC(scramble_state::darkplnt_bullet_color_w),this));
 }
 
 DRIVER_INIT_MEMBER(scramble_state,mimonkey)
@@ -328,17 +328,17 @@ DRIVER_INIT_MEMBER(scramble_state,mimonkey)
 		ROM[A] = ROM[A] ^ xortable[line][col];
 		ctr++;
 	}
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xa804, 0xa804, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xa804, 0xa804, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
 }
 
 DRIVER_INIT_MEMBER(scramble_state,mimonsco)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xa804, 0xa804, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xa804, 0xa804, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
 }
 
 DRIVER_INIT_MEMBER(scramble_state,mimonscr)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x6804, 0x6804, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x6804, 0x6804, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
 }
 
 

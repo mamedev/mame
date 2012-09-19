@@ -121,21 +121,21 @@ static void elwro800jr_mmu_w(running_machine &machine, UINT8 data)
 	{
 		// rom BAS0
 		state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x0000); /* BAS0 ROM */
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x0000, 0x1fff);
+		machine.device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x0000, 0x1fff);
 		state->m_ram_at_0000 = 0;
 	}
 	else if (!BIT(cs,4))
 	{
 		// rom BOOT
 		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x4000); /* BOOT ROM */
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x0000, 0x1fff);
+		machine.device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x0000, 0x1fff);
 		state->m_ram_at_0000 = 0;
 	}
 	else
 	{
 		// RAM
 		state->membank("bank1")->set_base(messram);
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x1fff, "bank1");
+		machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_bank(0x0000, 0x1fff, "bank1");
 		state->m_ram_at_0000 = 1;
 	}
 
@@ -143,12 +143,12 @@ static void elwro800jr_mmu_w(running_machine &machine, UINT8 data)
 	if (!BIT(cs,1))
 	{
 		state->membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x2000);	/* BAS1 ROM */
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x2000, 0x3fff);
+		machine.device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x2000, 0x3fff);
 	}
 	else
 	{
 		state->membank("bank2")->set_base(messram + 0x2000); /* RAM */
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x2000, 0x3fff, "bank2");
+		machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_bank(0x2000, 0x3fff, "bank2");
 	}
 
 	if (BIT(ls175,2))
@@ -524,7 +524,7 @@ MACHINE_RESET_MEMBER(elwro800_state,elwro800)
 	// this is a reset of ls175 in mmu
 	elwro800jr_mmu_w(machine(), 0);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(elwro800_state::elwro800_direct_handler), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(elwro800_state::elwro800_direct_handler), this));
 }
 
 static const cassette_interface elwro800jr_cassette_interface =

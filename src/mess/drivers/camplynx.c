@@ -130,8 +130,8 @@ WRITE8_MEMBER( camplynx_state::lynx48k_bank_w )
 WRITE8_MEMBER( camplynx_state::lynx128k_bank_w )
 {
 	/* get address space */
-	address_space *mem = m_maincpu->space(AS_PROGRAM);
-	UINT8 *base = mem->machine().root_device().memregion("maincpu")->base();
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
+	UINT8 *base = mem.machine().root_device().memregion("maincpu")->base();
 
 	/* Set read banks */
 	UINT8 bank = data & 0x0f;
@@ -330,25 +330,25 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(camplynx_state,lynx128k)
 {
-	address_space *mem = m_maincpu->space(AS_PROGRAM);
-	mem->install_read_bank (0x0000, 0x1fff, "bank1");
-	mem->install_read_bank (0x2000, 0x3fff, "bank2");
-	mem->install_read_bank (0x4000, 0x5fff, "bank3");
-	mem->install_read_bank (0x6000, 0x7fff, "bank4");
-	mem->install_read_bank (0x8000, 0x9fff, "bank5");
-	mem->install_read_bank (0xa000, 0xbfff, "bank6");
-	mem->install_read_bank (0xc000, 0xdfff, "bank7");
-	mem->install_read_bank (0xe000, 0xffff, "bank8");
-	mem->install_write_bank (0x0000, 0x1fff, "bank11");
-	mem->install_write_bank (0x2000, 0x3fff, "bank12");
-	mem->install_write_bank (0x4000, 0x5fff, "bank13");
-	mem->install_write_bank (0x6000, 0x7fff, "bank14");
-	mem->install_write_bank (0x8000, 0x9fff, "bank15");
-	mem->install_write_bank (0xa000, 0xbfff, "bank16");
-	mem->install_write_bank (0xc000, 0xdfff, "bank17");
-	mem->install_write_bank (0xe000, 0xffff, "bank18");
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
+	mem.install_read_bank (0x0000, 0x1fff, "bank1");
+	mem.install_read_bank (0x2000, 0x3fff, "bank2");
+	mem.install_read_bank (0x4000, 0x5fff, "bank3");
+	mem.install_read_bank (0x6000, 0x7fff, "bank4");
+	mem.install_read_bank (0x8000, 0x9fff, "bank5");
+	mem.install_read_bank (0xa000, 0xbfff, "bank6");
+	mem.install_read_bank (0xc000, 0xdfff, "bank7");
+	mem.install_read_bank (0xe000, 0xffff, "bank8");
+	mem.install_write_bank (0x0000, 0x1fff, "bank11");
+	mem.install_write_bank (0x2000, 0x3fff, "bank12");
+	mem.install_write_bank (0x4000, 0x5fff, "bank13");
+	mem.install_write_bank (0x6000, 0x7fff, "bank14");
+	mem.install_write_bank (0x8000, 0x9fff, "bank15");
+	mem.install_write_bank (0xa000, 0xbfff, "bank16");
+	mem.install_write_bank (0xc000, 0xdfff, "bank17");
+	mem.install_write_bank (0xe000, 0xffff, "bank18");
 
-	lynx128k_bank_w(*mem, 0, 0);
+	lynx128k_bank_w(mem, 0, 0);
 }
 
 WRITE8_MEMBER( camplynx_state::lynx128k_irq )

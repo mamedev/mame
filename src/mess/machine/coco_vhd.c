@@ -106,7 +106,7 @@ void coco_vhd_image_device::device_start()
 {
 	m_status = VHDSTATUS_NO_VHD_ATTACHED;
 	m_cpu = machine().device<cpu_device>(MAINCPU_TAG);
-	m_cpu_space = m_cpu->space(AS_PROGRAM);
+	m_cpu_space = &m_cpu->space(AS_PROGRAM);
 }
 
 

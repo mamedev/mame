@@ -4432,7 +4432,7 @@ DRIVER_INIT_MEMBER(maygay1b_state,m1)
 	UINT8 *okirom = machine().root_device().memregion( "msm6376" )->base();
 
 	if (!okirom) {
-		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x2420, 0x2421, write8_delegate(FUNC(maygay1b_state::m1ab_no_oki_w), this));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x2420, 0x2421, write8_delegate(FUNC(maygay1b_state::m1ab_no_oki_w), this));
 	}
 	// print out the rom id / header info to give us some hints
 	// note this isn't always correct, alley cat has 'Calpsyo' still in the ident string?

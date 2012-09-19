@@ -76,7 +76,7 @@ INLINE amiga_audio *get_safe_token( device_t *device )
 
 static TIMER_CALLBACK( signal_irq )
 {
-	amiga_custom_w(*machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | (0x80 << param), 0xffff);
+	amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | (0x80 << param), 0xffff);
 }
 
 

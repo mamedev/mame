@@ -82,7 +82,7 @@ static void check_interrupts( running_machine &machine )
 		return;
 
 	/* otherwise, generate the IRQ */
-	amiga_custom_w(*machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
+	amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 }
 
 static TIMER_CALLBACK(dmac_dma_proc)
@@ -389,14 +389,14 @@ static WRITE16_HANDLER( amiga_dmac_w )
 
 static void	dmac_install(running_machine &machine, offs_t base)
 {
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	space.install_legacy_read_handler(base, base + 0xFFFF, FUNC(amiga_dmac_r));
 	space.install_legacy_write_handler(base, base + 0xFFFF, FUNC(amiga_dmac_w));
 }
 
 static void	dmac_uninstall(running_machine &machine, offs_t base)
 {
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	space.unmap_readwrite(base, base + 0xFFFF);
 }
 
@@ -457,7 +457,7 @@ static TIMER_CALLBACK(tp6525_delayed_irq)
 
 	if ( (CUSTOM_REG(REG_INTREQ) & INTENA_PORTS) == 0 )
 	{
-		amiga_custom_w(*machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
+		amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 	}
 	else
 	{
@@ -474,7 +474,7 @@ static void amigacd_tpi6525_irq_trampoline(device_t *device, int level)
 	{
 		if ( (CUSTOM_REG(REG_INTREQ) & INTENA_PORTS) == 0 )
 		{
-			amiga_custom_w(*device->machine().device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
+			amiga_custom_w(device->machine().device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 		}
 		else
 		{

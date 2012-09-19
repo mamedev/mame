@@ -237,17 +237,17 @@ static COSMAC_INTERFACE( cosmac_intf )
 
 void tmc600_state::machine_start()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* configure RAM */
 	switch (m_ram->size())
 	{
 	case 8*1024:
-		program->unmap_readwrite(0x8000, 0xbfff);
+		program.unmap_readwrite(0x8000, 0xbfff);
 		break;
 
 	case 16*1024:
-		program->unmap_readwrite(0xa000, 0xbfff);
+		program.unmap_readwrite(0xa000, 0xbfff);
 		break;
 	}
 

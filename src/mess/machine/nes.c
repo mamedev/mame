@@ -36,7 +36,7 @@ static void fds_irq(device_t *device, int scanline, int vblank, int blanked);
 static void init_nes_core( running_machine &machine )
 {
 	nes_state *state = machine.driver_data<nes_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	static const char *const bank_names[] = { "bank1", "bank2", "bank3", "bank4" };
 	int prg_banks = (state->m_prg_chunks == 1) ? (2 * 2) : (state->m_prg_chunks * 2);
 	int i;
@@ -48,8 +48,8 @@ static void init_nes_core( running_machine &machine )
 	/* Brutal hack put in as a consequence of the new memory system; we really need to fix the NES code */
 	space.install_readwrite_bank(0x0000, 0x07ff, 0, 0x1800, "bank10");
 
-	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0, 0x1fff, FUNC(nes_chr_r), FUNC(nes_chr_w));
-	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(nes_nt_r), FUNC(nes_nt_w));
+	machine.device("ppu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0, 0x1fff, FUNC(nes_chr_r), FUNC(nes_chr_w));
+	machine.device("ppu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(nes_nt_r), FUNC(nes_nt_w));
 
 	state->membank("bank10")->set_base(state->m_rom);
 
@@ -193,7 +193,7 @@ static void init_nes_core( running_machine &machine )
 	}
 
 	if (state->m_pcb_id == WAIXING_SH2)
-		machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0, 0x1fff, FUNC(waixing_sh2_chr_r));
+		machine.device("ppu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0, 0x1fff, FUNC(waixing_sh2_chr_r));
 }
 
 // to be probably removed (it does nothing since a long time)

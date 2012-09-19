@@ -2074,7 +2074,7 @@ MACHINE_START_MEMBER(bbc_state,bbcbp)
 {
 	m_mc6850_clock = 0;
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcbp_direct_handler), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcbp_direct_handler), this));
 
 	/* bank 6 is the paged ROMs     from b000 to bfff */
 	membank("bank6")->configure_entries(0, 16, memregion("user1")->base() + 0x3000, 1<<14);
@@ -2100,14 +2100,14 @@ MACHINE_START_MEMBER(bbc_state,bbcm)
 {
 	m_mc6850_clock = 0;
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcm_direct_handler), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcm_direct_handler), this));
 
 	/* bank 5 is the paged ROMs     from 9000 to bfff */
 	membank("bank5")->configure_entries(0, 16, machine().root_device().memregion("user1")->base()+0x01000, 1<<14);
 
 	/* Set ROM/IO bank to point to rom */
 	membank( "bank8" )->set_base( memregion("user1")->base()+0x43c00);
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xFC00, 0xFEFF, "bank8");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xFC00, 0xFEFF, "bank8");
 }
 
 MACHINE_RESET_MEMBER(bbc_state,bbcm)

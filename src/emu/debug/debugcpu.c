@@ -1155,7 +1155,6 @@ static UINT64 expression_read_memory(void *param, const char *name, expression_s
 	running_machine &machine = *(running_machine *)param;
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
 	device_t *device = NULL;
-	address_space *space;
 
 	switch (spacenum)
 	{
@@ -1167,9 +1166,11 @@ static UINT64 expression_read_memory(void *param, const char *name, expression_s
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
-			if (space != NULL)
-				result = debug_read_memory(*space, space->address_to_byte(address), size, true);
+			if (device->memory().has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
+			{
+				address_space &space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
+				result = debug_read_memory(space, space.address_to_byte(address), size, true);
+			}
 			break;
 
 		case EXPSPACE_PROGRAM_PHYSICAL:
@@ -1180,9 +1181,11 @@ static UINT64 expression_read_memory(void *param, const char *name, expression_s
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
-			if (space != NULL)
-				result = debug_read_memory(*space, space->address_to_byte(address), size, false);
+			if (device->memory().has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
+			{
+				address_space &space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
+				result = debug_read_memory(space, space.address_to_byte(address), size, false);
+			}
 			break;
 
 		case EXPSPACE_OPCODE:
@@ -1191,7 +1194,7 @@ static UINT64 expression_read_memory(void *param, const char *name, expression_s
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			result = expression_read_program_direct(*device->memory().space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
+			result = expression_read_program_direct(device->memory().space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
 			break;
 
 		case EXPSPACE_REGION:
@@ -1321,7 +1324,6 @@ static void expression_write_memory(void *param, const char *name, expression_sp
 {
 	running_machine &machine = *(running_machine *)param;
 	device_t *device = NULL;
-	address_space *space;
 
 	switch (spacenum)
 	{
@@ -1333,9 +1335,11 @@ static void expression_write_memory(void *param, const char *name, expression_sp
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
-			if (space != NULL)
-				debug_write_memory(*space, space->address_to_byte(address), data, size, true);
+			if (device->memory().has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
+			{
+				address_space &space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
+				debug_write_memory(space, space.address_to_byte(address), data, size, true);
+			}
 			break;
 
 		case EXPSPACE_PROGRAM_PHYSICAL:
@@ -1346,9 +1350,11 @@ static void expression_write_memory(void *param, const char *name, expression_sp
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
-			if (space != NULL)
-				debug_write_memory(*space, space->address_to_byte(address), data, size, false);
+			if (device->memory().has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
+			{
+				address_space &space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
+				debug_write_memory(space, space.address_to_byte(address), data, size, false);
+			}
 			break;
 
 		case EXPSPACE_OPCODE:
@@ -1357,7 +1363,7 @@ static void expression_write_memory(void *param, const char *name, expression_sp
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			expression_write_program_direct(*device->memory().space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
+			expression_write_program_direct(device->memory().space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
 			break;
 
 		case EXPSPACE_REGION:
@@ -1515,7 +1521,7 @@ static expression_error::error_code expression_validate(void *param, const char 
 			}
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			if (device->memory().space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_LOGICAL)) == NULL)
+			if (!device->memory().has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_LOGICAL)))
 				return expression_error::NO_SUCH_MEMORY_SPACE;
 			break;
 
@@ -1531,7 +1537,7 @@ static expression_error::error_code expression_validate(void *param, const char 
 			}
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			if (device->memory().space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_PHYSICAL)) == NULL)
+			if (!device->memory().has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_PHYSICAL)))
 				return expression_error::NO_SUCH_MEMORY_SPACE;
 			break;
 
@@ -1545,7 +1551,7 @@ static expression_error::error_code expression_validate(void *param, const char 
 			}
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			if (device->memory().space(AS_PROGRAM) == NULL)
+			if (!device->memory().has_space(AS_PROGRAM))
 				return expression_error::NO_SUCH_MEMORY_SPACE;
 			break;
 
@@ -1674,12 +1680,12 @@ device_debug::device_debug(device_t &device)
 		// add entries to enable/disable unmap reporting for each space
 		if (m_memory != NULL)
 		{
-			if (m_memory->space(AS_PROGRAM) != NULL)
-				m_symtable.add("logunmap", (void *)m_memory->space(AS_PROGRAM), get_logunmap, set_logunmap);
-			if (m_memory->space(AS_DATA) != NULL)
-				m_symtable.add("logunmapd", (void *)m_memory->space(AS_DATA), get_logunmap, set_logunmap);
-			if (m_memory->space(AS_IO) != NULL)
-				m_symtable.add("logunmapi", (void *)m_memory->space(AS_IO), get_logunmap, set_logunmap);
+			if (m_memory->has_space(AS_PROGRAM))
+				m_symtable.add("logunmap", (void *)&m_memory->space(AS_PROGRAM), get_logunmap, set_logunmap);
+			if (m_memory->has_space(AS_DATA))
+				m_symtable.add("logunmapd", (void *)&m_memory->space(AS_DATA), get_logunmap, set_logunmap);
+			if (m_memory->has_space(AS_IO))
+				m_symtable.add("logunmapi", (void *)&m_memory->space(AS_IO), get_logunmap, set_logunmap);
 		}
 
 		// add all registers into it
@@ -2039,7 +2045,7 @@ offs_t device_debug::disassemble(char *buffer, offs_t pc, const UINT8 *oprom, co
 #ifdef MAME_DEBUG
 if (m_memory != NULL && m_disasm != NULL)
 {
-	address_space &space = *m_memory->space(AS_PROGRAM);
+	address_space &space = m_memory->space(AS_PROGRAM);
 	int bytes = space.address_to_byte(result & DASMFLAG_LENGTHMASK);
 	assert(bytes >= m_disasm->min_opcode_bytes());
 	assert(bytes <= m_disasm->max_opcode_bytes());
@@ -2467,8 +2473,8 @@ void device_debug::hotspot_track(int numspots, int threshhold)
 	}
 
 	// update the watchpoint flags to include us
-	if (m_memory != NULL && m_memory->space(AS_PROGRAM) != NULL)
-		watchpoint_update_flags(*m_memory->space(AS_PROGRAM));
+	if (m_memory != NULL && m_memory->has_space(AS_PROGRAM))
+		watchpoint_update_flags(m_memory->space(AS_PROGRAM));
 }
 
 
@@ -2666,7 +2672,7 @@ UINT32 device_debug::compute_opcode_crc32(offs_t address) const
 		return 0;
 
 	// no program interface, just fail
-	address_space &space = *m_memory->space(AS_PROGRAM);
+	address_space &space = m_memory->space(AS_PROGRAM);
 
 	// zero out the buffers
 	UINT8 opbuf[64], argbuf[64];
@@ -3016,7 +3022,7 @@ UINT32 device_debug::dasm_wrapped(astring &buffer, offs_t pc)
 	assert(m_memory != NULL && m_disasm != NULL);
 
 	// determine the adjusted PC
-	address_space &space = *m_memory->space(AS_PROGRAM);
+	address_space &space = m_memory->space(AS_PROGRAM);
 	offs_t pcbyte = space.address_to_byte(pc) & space.bytemask();
 
 	// fetch the bytes up to the maximum

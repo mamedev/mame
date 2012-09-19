@@ -795,9 +795,9 @@ static CPU_INIT( s2650 )
 
 	s2650c->irq_callback = irqcallback;
 	s2650c->device = device;
-	s2650c->program = device->space(AS_PROGRAM);
+	s2650c->program = &device->space(AS_PROGRAM);
 	s2650c->direct = &s2650c->program->direct();
-	s2650c->io = device->space(AS_IO);
+	s2650c->io = &device->space(AS_IO);
 
 	device->save_item(NAME(s2650c->ppc));
 	device->save_item(NAME(s2650c->page));
@@ -828,9 +828,9 @@ static CPU_RESET( s2650 )
 	memset(s2650c->ras, 0, sizeof(s2650c->ras));
 
 	s2650c->device = device;
-	s2650c->program = device->space(AS_PROGRAM);
+	s2650c->program = &device->space(AS_PROGRAM);
 	s2650c->direct = &s2650c->program->direct();
-	s2650c->io = device->space(AS_IO);
+	s2650c->io = &device->space(AS_IO);
 	s2650c->psl = COM | WC;
 	/* force write */
 	s2650c->psu = 0xff;

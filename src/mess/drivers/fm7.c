@@ -824,7 +824,7 @@ READ8_MEMBER(fm7_state::fm77av_boot_mode_r)
 static void fm7_update_psg(running_machine &machine)
 {
 	fm7_state *state = machine.driver_data<fm7_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if(state->m_type == SYS_FM7)
 	{
@@ -1963,7 +1963,7 @@ void fm7_state::machine_reset()
 	}
 	if(m_type == SYS_FM77AV || m_type == SYS_FM77AV40EX || m_type == SYS_FM11)
 	{
-		fm7_mmr_refresh(*machine().device("maincpu")->memory().space(AS_PROGRAM));
+		fm7_mmr_refresh(machine().device("maincpu")->memory().space(AS_PROGRAM));
 	}
 	if(m_type == SYS_FM11)
 	{

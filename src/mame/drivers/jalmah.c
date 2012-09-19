@@ -730,7 +730,7 @@ WRITE16_MEMBER(jalmah_state::urashima_dma_w)
 static void daireika_palette_dma(running_machine &machine, UINT16 val)
 {
 	//jalmah_state *state = machine.driver_data<jalmah_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 index_1, index_2, src_addr, tmp_addr;
 	/*a0=301c0+jm_shared_ram[0x540/2] & 0xf00 */
 	/*a1=88000*/
@@ -2421,44 +2421,44 @@ READ16_MEMBER(jalmah_state::suchipi_mcu_r)
 
 DRIVER_INIT_MEMBER(jalmah_state,urashima)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::urashima_mcu_r), this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::urashima_mcu_w), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::urashima_mcu_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::urashima_mcu_w), this));
 
 	m_mcu_prg = 0x12;
 }
 
 DRIVER_INIT_MEMBER(jalmah_state,daireika)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::daireika_mcu_r), this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::daireika_mcu_w), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::daireika_mcu_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::daireika_mcu_w), this));
 
 	m_mcu_prg = 0x11;
 }
 
 DRIVER_INIT_MEMBER(jalmah_state,mjzoomin)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::mjzoomin_mcu_r), this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::mjzoomin_mcu_w), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::mjzoomin_mcu_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::mjzoomin_mcu_w), this));
 
 	m_mcu_prg = 0x13;
 }
 
 DRIVER_INIT_MEMBER(jalmah_state,kakumei)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::kakumei_mcu_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::kakumei_mcu_r), this));
 	m_mcu_prg = 0x21;
 }
 
 DRIVER_INIT_MEMBER(jalmah_state,kakumei2)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::kakumei_mcu_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::kakumei_mcu_r), this));
 
 	m_mcu_prg = 0x22;
 }
 
 DRIVER_INIT_MEMBER(jalmah_state,suchipi)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::suchipi_mcu_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::suchipi_mcu_r), this));
 
 	m_mcu_prg = 0x23;
 }

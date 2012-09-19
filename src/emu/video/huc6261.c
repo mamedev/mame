@@ -96,7 +96,7 @@ void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			g_profiler.start( PROFILER_VIDEO );
 			/* Get next pixel information */
-			m_pixel_data = m_huc6270_b->next_pixel( *machine().memory().first_space(), 0, 0xffff );
+			m_pixel_data = m_huc6270_b->next_pixel( machine().driver_data()->generic_space(), 0, 0xffff );
 			g_profiler.stop();
 		}
 

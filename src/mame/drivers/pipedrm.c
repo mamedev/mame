@@ -877,14 +877,14 @@ DRIVER_INIT_MEMBER(fromance_state,pipedrm)
 
 	/* sprite RAM lives at the end of palette RAM */
 	m_spriteram.set_target(&m_generic_paletteram_8[0xc00], 0x400);
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xcc00, 0xcfff, m_spriteram);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0xcc00, 0xcfff, m_spriteram);
 }
 
 
 DRIVER_INIT_MEMBER(fromance_state,hatris)
 {
-	machine().device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x20, 0x20, FUNC(sound_command_nonmi_w));
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x21, 0x21, write8_delegate(FUNC(fromance_state::fromance_gfxreg_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_legacy_write_handler(0x20, 0x20, FUNC(sound_command_nonmi_w));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x21, 0x21, write8_delegate(FUNC(fromance_state::fromance_gfxreg_w),this));
 }
 
 

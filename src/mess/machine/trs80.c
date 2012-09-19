@@ -216,7 +216,7 @@ WRITE8_MEMBER( trs80_state::trs80m4_84_w )
     d0 Select bit 0 */
 
 	/* get address space instead of io space */
-	address_space *mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	UINT8 *base = memregion("maincpu")->base();
 
 	m_mode = (m_mode & 0x73) | (data & 0x8c);
@@ -255,9 +255,9 @@ WRITE8_MEMBER( trs80_state::trs80m4_84_w )
 			membank("bank17")->set_base(base + 0x14000);
 			membank("bank18")->set_base(base + 0x1f400);
 			membank("bank19")->set_base(base + 0x1f800);
-			mem->install_readwrite_handler (0x37e8, 0x37e9, read8_delegate(FUNC(trs80_state::trs80_printer_r), this), write8_delegate(FUNC(trs80_state::trs80_printer_w), this));	/* 3 & 13 */
-			mem->install_read_handler (0x3800, 0x3bff, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));	/* 5 */
-			mem->install_readwrite_handler (0x3c00, 0x3fff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));	/* 6 & 16 */
+			mem.install_readwrite_handler (0x37e8, 0x37e9, read8_delegate(FUNC(trs80_state::trs80_printer_r), this), write8_delegate(FUNC(trs80_state::trs80_printer_w), this));	/* 3 & 13 */
+			mem.install_read_handler (0x3800, 0x3bff, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));	/* 5 */
+			mem.install_readwrite_handler (0x3c00, 0x3fff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));	/* 6 & 16 */
 			break;
 
 		case 1:	/* write-only ram backs up the rom */
@@ -292,8 +292,8 @@ WRITE8_MEMBER( trs80_state::trs80m4_84_w )
 			membank("bank17")->set_base(base + 0x14000);
 			membank("bank18")->set_base(base + 0x1f400);
 			membank("bank19")->set_base(base + 0x1f800);
-			mem->install_read_handler (0x3800, 0x3bff, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));	/* 5 */
-			mem->install_readwrite_handler (0x3c00, 0x3fff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));	/* 6 & 16 */
+			mem.install_read_handler (0x3800, 0x3bff, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));	/* 5 */
+			mem.install_readwrite_handler (0x3c00, 0x3fff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));	/* 6 & 16 */
 			break;
 
 		case 2:	/* keyboard and video are moved to high memory, and the rest is ram */
@@ -312,8 +312,8 @@ WRITE8_MEMBER( trs80_state::trs80m4_84_w )
 			membank("bank16")->set_base(base + 0x13c00);
 			membank("bank17")->set_base(base + 0x14000);
 			membank("bank18")->set_base(base + 0x0a000);
-			mem->install_read_handler (0xf400, 0xf7ff, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));	/* 8 */
-			mem->install_readwrite_handler (0xf800, 0xffff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));	/* 9 & 19 */
+			mem.install_read_handler (0xf400, 0xf7ff, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));	/* 8 */
+			mem.install_readwrite_handler (0xf800, 0xffff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));	/* 9 & 19 */
 			m_model4++;
 			break;
 
@@ -561,29 +561,29 @@ WRITE8_MEMBER( trs80_state::lnw80_fe_w )
     d0 inverse video (entire screen) */
 
 	/* get address space instead of io space */
-	address_space *mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	m_mode = (m_mode & 0x87) | ((data & 0x0f) << 3);
 
 	if (data & 8)
 	{
-		mem->unmap_readwrite (0x0000, 0x3fff);
-		mem->install_readwrite_handler (0x0000, 0x3fff, read8_delegate(FUNC(trs80_state::trs80_gfxram_r), this), write8_delegate(FUNC(trs80_state::trs80_gfxram_w), this));
+		mem.unmap_readwrite (0x0000, 0x3fff);
+		mem.install_readwrite_handler (0x0000, 0x3fff, read8_delegate(FUNC(trs80_state::trs80_gfxram_r), this), write8_delegate(FUNC(trs80_state::trs80_gfxram_w), this));
 	}
 	else
 	{
-		mem->unmap_readwrite (0x0000, 0x3fff);
-		mem->install_read_bank (0x0000, 0x2fff, "bank1");
+		mem.unmap_readwrite (0x0000, 0x3fff);
+		mem.install_read_bank (0x0000, 0x2fff, "bank1");
 		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
-		mem->install_readwrite_handler (0x37e0, 0x37e3, read8_delegate(FUNC(trs80_state::trs80_irq_status_r), this), write8_delegate(FUNC(trs80_state::trs80_motor_w), this));
-		mem->install_readwrite_handler (0x37e8, 0x37eb, read8_delegate(FUNC(trs80_state::trs80_printer_r), this), write8_delegate(FUNC(trs80_state::trs80_printer_w), this));
-		mem->install_read_handler (0x37ec, 0x37ec, read8_delegate(FUNC(trs80_state::trs80_wd179x_r), this));
-		mem->install_legacy_write_handler (*m_fdc, 0x37ec, 0x37ec, FUNC(wd17xx_command_w));
-		mem->install_legacy_readwrite_handler (*m_fdc, 0x37ed, 0x37ed, FUNC(wd17xx_track_r), FUNC(wd17xx_track_w));
-		mem->install_legacy_readwrite_handler (*m_fdc, 0x37ee, 0x37ee, FUNC(wd17xx_sector_r), FUNC(wd17xx_sector_w));
-		mem->install_legacy_readwrite_handler (*m_fdc, 0x37ef, 0x37ef, FUNC(wd17xx_data_r), FUNC(wd17xx_data_w));
-		mem->install_read_handler (0x3800, 0x38ff, 0, 0x0300, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));
-		mem->install_readwrite_handler (0x3c00, 0x3fff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));
+		mem.install_readwrite_handler (0x37e0, 0x37e3, read8_delegate(FUNC(trs80_state::trs80_irq_status_r), this), write8_delegate(FUNC(trs80_state::trs80_motor_w), this));
+		mem.install_readwrite_handler (0x37e8, 0x37eb, read8_delegate(FUNC(trs80_state::trs80_printer_r), this), write8_delegate(FUNC(trs80_state::trs80_printer_w), this));
+		mem.install_read_handler (0x37ec, 0x37ec, read8_delegate(FUNC(trs80_state::trs80_wd179x_r), this));
+		mem.install_legacy_write_handler (*m_fdc, 0x37ec, 0x37ec, FUNC(wd17xx_command_w));
+		mem.install_legacy_readwrite_handler (*m_fdc, 0x37ed, 0x37ed, FUNC(wd17xx_track_r), FUNC(wd17xx_track_w));
+		mem.install_legacy_readwrite_handler (*m_fdc, 0x37ee, 0x37ee, FUNC(wd17xx_sector_r), FUNC(wd17xx_sector_w));
+		mem.install_legacy_readwrite_handler (*m_fdc, 0x37ef, 0x37ef, FUNC(wd17xx_data_r), FUNC(wd17xx_data_w));
+		mem.install_read_handler (0x3800, 0x38ff, 0, 0x0300, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));
+		mem.install_readwrite_handler (0x3c00, 0x3fff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));
 	}
 }
 
@@ -863,35 +863,35 @@ void trs80_state::machine_reset()
 
 MACHINE_RESET_MEMBER(trs80_state,trs80m4)
 {
-	address_space *mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	m_cassette_data = 0;
 
-	mem->install_read_bank (0x0000, 0x0fff, "bank1");
-	mem->install_read_bank (0x1000, 0x37e7, "bank2");
-	mem->install_read_bank (0x37e8, 0x37e9, "bank3");
-	mem->install_read_bank (0x37ea, 0x37ff, "bank4");
-	mem->install_read_bank (0x3800, 0x3bff, "bank5");
-	mem->install_read_bank (0x3c00, 0x3fff, "bank6");
-	mem->install_read_bank (0x4000, 0xf3ff, "bank7");
-	mem->install_read_bank (0xf400, 0xf7ff, "bank8");
-	mem->install_read_bank (0xf800, 0xffff, "bank9");
+	mem.install_read_bank (0x0000, 0x0fff, "bank1");
+	mem.install_read_bank (0x1000, 0x37e7, "bank2");
+	mem.install_read_bank (0x37e8, 0x37e9, "bank3");
+	mem.install_read_bank (0x37ea, 0x37ff, "bank4");
+	mem.install_read_bank (0x3800, 0x3bff, "bank5");
+	mem.install_read_bank (0x3c00, 0x3fff, "bank6");
+	mem.install_read_bank (0x4000, 0xf3ff, "bank7");
+	mem.install_read_bank (0xf400, 0xf7ff, "bank8");
+	mem.install_read_bank (0xf800, 0xffff, "bank9");
 
-	mem->install_write_bank (0x0000, 0x0fff, "bank11");
-	mem->install_write_bank (0x1000, 0x37e7, "bank12");
-	mem->install_write_bank (0x37e8, 0x37e9, "bank13");
-	mem->install_write_bank (0x37ea, 0x37ff, "bank14");
-	mem->install_write_bank (0x3800, 0x3bff, "bank15");
-	mem->install_write_bank (0x3c00, 0x3fff, "bank16");
-	mem->install_write_bank (0x4000, 0xf3ff, "bank17");
-	mem->install_write_bank (0xf400, 0xf7ff, "bank18");
-	mem->install_write_bank (0xf800, 0xffff, "bank19");
-	trs80m4p_9c_w(*mem, 0, 1);	/* Enable the ROM */
-	trs80m4_84_w(*mem, 0, 0);	/* switch in devices at power-on */
+	mem.install_write_bank (0x0000, 0x0fff, "bank11");
+	mem.install_write_bank (0x1000, 0x37e7, "bank12");
+	mem.install_write_bank (0x37e8, 0x37e9, "bank13");
+	mem.install_write_bank (0x37ea, 0x37ff, "bank14");
+	mem.install_write_bank (0x3800, 0x3bff, "bank15");
+	mem.install_write_bank (0x3c00, 0x3fff, "bank16");
+	mem.install_write_bank (0x4000, 0xf3ff, "bank17");
+	mem.install_write_bank (0xf400, 0xf7ff, "bank18");
+	mem.install_write_bank (0xf800, 0xffff, "bank19");
+	trs80m4p_9c_w(mem, 0, 1);	/* Enable the ROM */
+	trs80m4_84_w(mem, 0, 0);	/* switch in devices at power-on */
 }
 
 MACHINE_RESET_MEMBER(trs80_state,lnw80)
 {
-	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_cassette_data = 0;
 	m_reg_load = 1;
 	lnw80_fe_w(space, 0, 0);

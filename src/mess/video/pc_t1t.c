@@ -922,8 +922,8 @@ static WRITE_LINE_DEVICE_HANDLER( pcjr_vsync_changed )
 static VIDEO_START( pc_t1t )
 {
 	int buswidth;
-	address_space &space = *machine.firstcpu->space(AS_PROGRAM);
-	address_space *spaceio = machine.firstcpu->space(AS_IO);
+	address_space &space = machine.firstcpu->space(AS_PROGRAM);
+	address_space &spaceio = machine.firstcpu->space(AS_IO);
 
 	pcjr.chr_gen = machine.root_device().memregion("gfx1")->base();
 	pcjr.update_row = NULL;
@@ -935,12 +935,12 @@ static VIDEO_START( pc_t1t )
 	{
 		case 8:
 			space.install_legacy_readwrite_handler(0xb8000, 0xbffff, FUNC(pc_t1t_videoram_r), FUNC(pc_t1t_videoram_w) );
-			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_T1T_r),FUNC(pc_T1T_w) );
+			spaceio.install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_T1T_r),FUNC(pc_T1T_w) );
 			break;
 
 		case 16:
 			space.install_legacy_readwrite_handler(0xb8000, 0xbffff, FUNC(pc_t1t_videoram_r), FUNC(pc_t1t_videoram_w), 0xffff );
-			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_T1T_r),FUNC(pc_T1T_w), 0xffff );
+			spaceio.install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_T1T_r),FUNC(pc_T1T_w), 0xffff );
 			break;
 
 		default:
@@ -953,7 +953,7 @@ static VIDEO_START( pc_t1t )
 static VIDEO_START( pc_pcjr )
 {
 	int buswidth;
-	address_space *spaceio = machine.firstcpu->space(AS_IO);
+	address_space &spaceio = machine.firstcpu->space(AS_IO);
 
 	pcjr.chr_gen = machine.root_device().memregion("gfx1")->base();
 	pcjr.update_row = NULL;
@@ -965,7 +965,7 @@ static VIDEO_START( pc_pcjr )
 	switch(buswidth)
 	{
 		case 8:
-			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_T1T_r),FUNC(pc_pcjr_w) );
+			spaceio.install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_T1T_r),FUNC(pc_pcjr_w) );
 			break;
 
 		default:

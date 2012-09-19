@@ -1522,7 +1522,7 @@ static void zaxxonj_decode(running_machine &machine, const char *cputag)
 	};
 
 	int A;
-	address_space &space = *machine.device(cputag)->memory().space(AS_PROGRAM);
+	address_space &space = machine.device(cputag)->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine.root_device().memregion(cputag)->base();
 	int size = machine.root_device().memregion(cputag)->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, size);
@@ -1582,17 +1582,17 @@ DRIVER_INIT_MEMBER(zaxxon_state,futspy)
 
 DRIVER_INIT_MEMBER(zaxxon_state,razmataz)
 {
-	address_space *pgmspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &pgmspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	nprinces_decode(machine(), "maincpu");
 
 	/* additional input ports are wired */
-	pgmspace->install_read_port(0xc004, 0xc004, 0, 0x18f3, "SW04");
-	pgmspace->install_read_port(0xc008, 0xc008, 0, 0x18f3, "SW08");
-	pgmspace->install_read_port(0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
+	pgmspace.install_read_port(0xc004, 0xc004, 0, 0x18f3, "SW04");
+	pgmspace.install_read_port(0xc008, 0xc008, 0, 0x18f3, "SW08");
+	pgmspace.install_read_port(0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
 
 	/* unknown behavior expected here */
-	pgmspace->install_read_handler(0xc80a, 0xc80a, read8_delegate(FUNC(zaxxon_state::razmataz_counter_r),this));
+	pgmspace.install_read_handler(0xc80a, 0xc80a, read8_delegate(FUNC(zaxxon_state::razmataz_counter_r),this));
 
 	/* additional state saving */
 	save_item(NAME(m_razmataz_dial_pos));

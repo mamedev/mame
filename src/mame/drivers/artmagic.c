@@ -1164,7 +1164,7 @@ DRIVER_INIT_MEMBER(artmagic_state,ultennis)
 	m_protection_handler = ultennis_protection;
 
 	/* additional (protection?) hack */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x300000, 0x300001, read16_delegate(FUNC(artmagic_state::ultennis_hack_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(FUNC(artmagic_state::ultennis_hack_r),this));
 }
 
 

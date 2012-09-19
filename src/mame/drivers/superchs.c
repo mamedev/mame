@@ -453,8 +453,8 @@ READ16_MEMBER(superchs_state::sub_cycle_r)
 DRIVER_INIT_MEMBER(superchs_state,superchs)
 {
 	/* Speedup handlers */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x100000, 0x100003, read32_delegate(FUNC(superchs_state::main_cycle_r),this));
-	machine().device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x80000a, 0x80000b, read16_delegate(FUNC(superchs_state::sub_cycle_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x100000, 0x100003, read32_delegate(FUNC(superchs_state::main_cycle_r),this));
+	machine().device("sub")->memory().space(AS_PROGRAM).install_read_handler(0x80000a, 0x80000b, read16_delegate(FUNC(superchs_state::sub_cycle_r),this));
 }
 
 GAMEL( 1992, superchs,         0, superchs, superchs, superchs_state, superchs, ROT0, "Taito America Corporation", "Super Chase - Criminal Termination (US)", 0, layout_superchs )

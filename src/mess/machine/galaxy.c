@@ -155,7 +155,7 @@ SNAPSHOT_LOAD( galaxy )
 
 DRIVER_INIT_MEMBER(galaxy_state,galaxy)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	space.install_readwrite_bank( 0x2800, 0x2800 + machine().device<ram_device>(RAM_TAG)->size() - 1, "bank1");
 	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 
@@ -171,7 +171,7 @@ DRIVER_INIT_MEMBER(galaxy_state,galaxy)
 
 MACHINE_RESET_MEMBER(galaxy_state,galaxy)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* ROM 2 enable/disable */
 	if (machine().root_device().ioport("ROM2")->read()) {
@@ -196,7 +196,7 @@ DRIVER_INIT_MEMBER(galaxy_state,galaxyp)
 MACHINE_RESET_MEMBER(galaxy_state,galaxyp)
 {
 	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(galaxy_irq_callback);
 

@@ -826,7 +826,7 @@ WRITE8_DEVICE_HANDLER(apollo_ptm_w) {
  ***************************************************************************/
 
 static DEVICE_RESET( apollo_rtc ) {
-	address_space &space = *device->machine().device(MAINCPU)->memory().space(AS_PROGRAM);
+	address_space &space = device->machine().device(MAINCPU)->memory().space(AS_PROGRAM);
 	apollo_state *state = device->machine().driver_data<apollo_state>();
 	UINT8 year = state->apollo_rtc_r(space, 9);
 
@@ -872,7 +872,7 @@ READ8_MEMBER(apollo_state::apollo_rtc_r)
 static TIMER_CALLBACK( apollo_rtc_timer )
 {
 	apollo_state *state = machine.driver_data<apollo_state>();
-	address_space &space = *machine.device(MAINCPU)->memory().space(AS_PROGRAM);
+	address_space &space = machine.device(MAINCPU)->memory().space(AS_PROGRAM);
 
 	// FIXME: reading register 0x0c will clear all interrupt flags
 	if ((state->apollo_rtc_r(space, 0x0c) & 0x80))

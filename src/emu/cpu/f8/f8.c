@@ -1619,9 +1619,9 @@ static CPU_RESET( f8 )
 	memset(cpustate, 0, sizeof(f8_Regs));
 	cpustate->irq_callback = save_callback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->iospace = device->space(AS_IO);
+	cpustate->iospace = &device->space(AS_IO);
 	cpustate->w&=~I;
 
 	/* save PC0 to PC1 and reset PC0 */
@@ -1967,9 +1967,9 @@ static CPU_INIT( f8 )
 	f8_Regs *cpustate = get_safe_token(device);
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->iospace = device->space(AS_IO);
+	cpustate->iospace = &device->space(AS_IO);
 
 	device->save_item(NAME(cpustate->pc0));
 	device->save_item(NAME(cpustate->pc1));

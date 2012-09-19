@@ -1860,7 +1860,7 @@ void segac2_state::segac2_common_init(running_machine& machine, int (*func)(int 
 	genvdp_use_cram = 0;
 
 	if (upd != NULL)
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*upd, 0x880000, 0x880001, 0, 0x13fefe, FUNC(segac2_upd7759_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(*upd, 0x880000, 0x880001, 0, 0x13fefe, FUNC(segac2_upd7759_w));
 }
 
 
@@ -2117,7 +2117,7 @@ DRIVER_INIT_MEMBER(segac2_state,tfrceacb)
 {
 	/* disable the palette bank switching from the protection chip */
 	segac2_common_init(machine(), NULL);
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x800000, 0x800001);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x800000, 0x800001);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,borench)
@@ -2204,36 +2204,36 @@ DRIVER_INIT_MEMBER(segac2_state,pclub)
 {
 	segac2_common_init(machine(), prot_func_pclub);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
 }
 
 DRIVER_INIT_MEMBER(segac2_state,pclubjv2)
 {
 	segac2_common_init(machine(), prot_func_pclubjv2);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
 }
 
 DRIVER_INIT_MEMBER(segac2_state,pclubjv4)
 {
 	segac2_common_init(machine(), prot_func_pclubjv4);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
 }
 
 DRIVER_INIT_MEMBER(segac2_state,pclubjv5)
 {
 	segac2_common_init(machine(), prot_func_pclubjv5);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
 }
 
 

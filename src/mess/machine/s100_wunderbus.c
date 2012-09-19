@@ -415,15 +415,15 @@ UINT8 s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 			break;
 
 		case 1:
-			data = m_ace1->ins8250_r(*machine().memory().first_space(), offset & 0x07);
+			data = m_ace1->ins8250_r(machine().driver_data()->generic_space(), offset & 0x07);
 			break;
 
 		case 2:
-			data = m_ace2->ins8250_r(*machine().memory().first_space(), offset & 0x07);
+			data = m_ace2->ins8250_r(machine().driver_data()->generic_space(), offset & 0x07);
 			break;
 
 		case 3:
-			data = m_ace3->ins8250_r(*machine().memory().first_space(), offset & 0x07);
+			data = m_ace3->ins8250_r(machine().driver_data()->generic_space(), offset & 0x07);
 			break;
 		}
 	}
@@ -538,15 +538,15 @@ void s100_wunderbus_device::s100_sout_w(address_space &space, offs_t offset, UIN
 			break;
 
 		case 1:
-			m_ace1->ins8250_w(*machine().memory().first_space(), offset & 0x07, data);
+			m_ace1->ins8250_w(machine().driver_data()->generic_space(), offset & 0x07, data);
 			break;
 
 		case 2:
-			m_ace2->ins8250_w(*machine().memory().first_space(), offset & 0x07, data);
+			m_ace2->ins8250_w(machine().driver_data()->generic_space(), offset & 0x07, data);
 			break;
 
 		case 3:
-			m_ace3->ins8250_w(*machine().memory().first_space(), offset & 0x07, data);
+			m_ace3->ins8250_w(machine().driver_data()->generic_space(), offset & 0x07, data);
 			break;
 		}
 	}

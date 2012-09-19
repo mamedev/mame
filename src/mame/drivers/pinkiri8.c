@@ -453,15 +453,16 @@ WRITE8_MEMBER(pinkiri8_state::pinkiri8_vram_w)
 			break;
 
 		case 3:
-
-			address_space *vdp_space = machine().device<janshi_vdp_device>("janshivdp")->space();
+		{
+			address_space &vdp_space = machine().device<janshi_vdp_device>("janshivdp")->space();
 
 			if (LOG_VRAM) printf("%02x ", data);
 			m_prev_writes++;
 			m_vram_addr++;
 
-			vdp_space->write_byte(m_vram_addr, data);
+			vdp_space.write_byte(m_vram_addr, data);
 			break;
+		}
 	}
 }
 
@@ -1250,9 +1251,9 @@ READ8_MEMBER(pinkiri8_state::ronjan_patched_prot_r)
 
 DRIVER_INIT_MEMBER(pinkiri8_state,ronjan)
 {
-	machine().device("maincpu")->memory().space(AS_IO)->install_readwrite_handler(0x90, 0x90, read8_delegate(FUNC(pinkiri8_state::ronjan_prot_r), this), write8_delegate(FUNC(pinkiri8_state::ronjan_prot_w), this));
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x66, 0x66, read8_delegate(FUNC(pinkiri8_state::ronjan_prot_status_r), this));
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x9f, 0x9f, read8_delegate(FUNC(pinkiri8_state::ronjan_patched_prot_r), this));
+	machine().device("maincpu")->memory().space(AS_IO).install_readwrite_handler(0x90, 0x90, read8_delegate(FUNC(pinkiri8_state::ronjan_prot_r), this), write8_delegate(FUNC(pinkiri8_state::ronjan_prot_w), this));
+	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x66, 0x66, read8_delegate(FUNC(pinkiri8_state::ronjan_prot_status_r), this));
+	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x9f, 0x9f, read8_delegate(FUNC(pinkiri8_state::ronjan_patched_prot_r), this));
 }
 
 GAME( 1992,  janshi,    0,   pinkiri8, janshi, driver_device,    0,      ROT0, "Eagle",         "Janshi",          GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

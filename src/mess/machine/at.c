@@ -316,7 +316,7 @@ WRITE8_MEMBER( at_state::at_portb_w )
 static void init_at_common(running_machine &machine)
 {
 	at_state *state = machine.driver_data<at_state>();
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	// The CS4031 chipset does this itself
 	if (machine.device("cs4031") == NULL)

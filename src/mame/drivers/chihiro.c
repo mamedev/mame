@@ -448,7 +448,7 @@ public:
 		memset(pmc,0,sizeof(pmc));
 		memset(ramin,0,sizeof(ramin));
 		computedilated();
-		video_memory=(UINT32 *)machine.firstcpu->space()->get_read_ptr(0xf0000000);
+		video_memory=(UINT32 *)machine.firstcpu->space().get_read_ptr(0xf0000000);
 		fb.allocate(640,480);
 		objectdata=&(object_data_alloc());
 		objectdata->data=this;
@@ -717,7 +717,7 @@ static void jamtable_disasm(running_machine &machine, address_space &space,UINT3
 
 static void jamtable_disasm_command(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space &space=*machine.firstcpu->space();
+	address_space &space=machine.firstcpu->space();
 	UINT64	addr,size;
 
 	if (params < 2)
@@ -731,7 +731,7 @@ static void jamtable_disasm_command(running_machine &machine, int ref, int param
 
 static void dump_string_command(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space &space=*machine.firstcpu->space();
+	address_space &space=machine.firstcpu->space();
 	UINT64	addr;
 	offs_t address;
 	UINT32 length,maximumlength;
@@ -770,7 +770,7 @@ static void dump_string_command(running_machine &machine, int ref, int params, c
 
 static void dump_process_command(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space &space=*machine.firstcpu->space();
+	address_space &space=machine.firstcpu->space();
 	UINT64 addr;
 	offs_t address;
 
@@ -796,7 +796,7 @@ static void dump_process_command(running_machine &machine, int ref, int params, 
 
 static void dump_list_command(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space &space=*machine.firstcpu->space();
+	address_space &space=machine.firstcpu->space();
 	UINT64 addr,offs,start,old;
 	offs_t address,offset;
 
@@ -1365,8 +1365,8 @@ static const char *const usbregnames[]={
 READ32_MEMBER( chihiro_state::usbctrl_r )
 {
 	if (offset == 0) { /* hack needed until usb (and jvs) is implemented */
-		chihiro_devs.pic8259_1->machine().firstcpu->space(0)->write_byte(0x6a79f,0x01);
-		chihiro_devs.pic8259_1->machine().firstcpu->space(0)->write_byte(0x6a7a0,0x00);
+		chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x6a79f,0x01);
+		chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x6a7a0,0x00);
 	}
 #ifdef LOG_OHCI
 	if (offset >= 0x54/4)
@@ -1689,10 +1689,10 @@ int chihiro_state::smbus_eeprom(int command,int rw,int data)
 		// hack to avoid hanging if eeprom contents are not correct
 		// this would need dumping the serial eeprom on the xbox board
 		if (command == 0) {
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b744,0x90);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b745,0x90);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b766,0xc9);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0)->write_byte(0x3b767,0xc3);
+			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x3b744,0x90);
+			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x3b745,0x90);
+			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x3b766,0xc9);
+			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x3b767,0xc3);
 		}
 		data = dummyeeprom[command]+dummyeeprom[command+1]*256;
 		logerror("eeprom: %d %d %d\n",command,rw,data);

@@ -651,7 +651,7 @@ WRITE8_MEMBER(pc88va_state::idp_command_w)
 
 static void tsp_sprite_enable(running_machine &machine, UINT32 spr_offset, UINT8 sw_bit)
 {
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	space.write_word(spr_offset, space.read_word(spr_offset) & ~0x200);
 	space.write_word(spr_offset, space.read_word(spr_offset) | (sw_bit & 0x200));

@@ -178,9 +178,9 @@ static WRITE16_HANDLER( kof10th_bankswitch_w )
 
 void install_kof10th_protection ( running_machine &machine )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x2fe000, 0x2fffff, FUNC(kof10th_RAMB_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x200000, 0x23ffff, FUNC(kof10th_custom_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x240000, 0x2fffff, FUNC(kof10th_bankswitch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x2fe000, 0x2fffff, FUNC(kof10th_RAMB_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x200000, 0x23ffff, FUNC(kof10th_custom_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x240000, 0x2fffff, FUNC(kof10th_bankswitch_w));
 }
 
 void decrypt_kof10th(running_machine &machine)
@@ -485,7 +485,7 @@ void patch_cthd2003( running_machine &machine )
 	UINT16 *mem16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	/* special ROM banking handler */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x2ffff0, 0x2fffff, FUNC(cthd2003_bankswitch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x2ffff0, 0x2fffff, FUNC(cthd2003_bankswitch_w));
 
 	// theres still a problem on the character select screen but it seems to be related to cpu core timing issues,
 	// overclocking the 68k prevents it.
@@ -729,7 +729,7 @@ static WRITE16_HANDLER ( ms5plus_bankswitch_w )
 void install_ms5plus_protection(running_machine &machine)
 {
 	// special ROM banking handler / additional protection
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2ffff0, 0x2fffff,FUNC(mslug5_prot_r), FUNC(ms5plus_bankswitch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x2ffff0, 0x2fffff,FUNC(mslug5_prot_r), FUNC(ms5plus_bankswitch_w));
 }
 
 
@@ -972,7 +972,7 @@ void kf2k3bl_px_decrypt( running_machine &machine )
 
 void kf2k3bl_install_protection(running_machine &machine)
 {
-    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2fe000, 0x2fffff, FUNC(kof2003_r), FUNC(kof2003_w) );
+    machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x2fe000, 0x2fffff, FUNC(kof2003_r), FUNC(kof2003_w) );
 }
 
 
@@ -1000,7 +1000,7 @@ void kf2k3pl_px_decrypt( running_machine &machine )
 
 void kf2k3pl_install_protection(running_machine &machine)
 {
-    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2fe000, 0x2fffff, FUNC(kof2003_r), FUNC(kof2003p_w) );
+    machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x2fe000, 0x2fffff, FUNC(kof2003_r), FUNC(kof2003p_w) );
 }
 
 
@@ -1031,7 +1031,7 @@ void kf2k3upl_px_decrypt( running_machine &machine )
 
 void kf2k3upl_install_protection(running_machine &machine)
 {
-    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2fe000, 0x2fffff, FUNC(kof2003_r), FUNC(kof2003_w) );
+    machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x2fe000, 0x2fffff, FUNC(kof2003_r), FUNC(kof2003_w) );
 }
 
 

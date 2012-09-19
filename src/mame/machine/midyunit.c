@@ -297,20 +297,20 @@ static void init_generic(running_machine &machine, int bpp, int sound, int prot_
 	switch (sound)
 	{
 		case SOUND_CVSD_SMALL:
-			machine.device("cvsd:cpu")->memory().space(AS_PROGRAM)->install_write_handler(prot_start, prot_end, write8_delegate(FUNC(midyunit_state::cvsd_protection_w),state));
+			machine.device("cvsd:cpu")->memory().space(AS_PROGRAM).install_write_handler(prot_start, prot_end, write8_delegate(FUNC(midyunit_state::cvsd_protection_w),state));
 			state->m_cvsd_protection_base = machine.root_device().memregion("cvsd:cpu")->base() + 0x10000 + (prot_start - 0x8000);
 			break;
 
 		case SOUND_CVSD:
-			machine.device("cvsd:cpu")->memory().space(AS_PROGRAM)->install_ram(prot_start, prot_end);
+			machine.device("cvsd:cpu")->memory().space(AS_PROGRAM).install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_ADPCM:
-			machine.device("adpcm:cpu")->memory().space(AS_PROGRAM)->install_ram(prot_start, prot_end);
+			machine.device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_NARC:
-			machine.device("narcsnd:cpu0")->memory().space(AS_PROGRAM)->install_ram(prot_start, prot_end);
+			machine.device("narcsnd:cpu0")->memory().space(AS_PROGRAM).install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_YAWDIM:
@@ -478,7 +478,7 @@ READ16_MEMBER(midyunit_state::mkturbo_prot_r)
 DRIVER_INIT_MEMBER(midyunit_state,mkyturbo)
 {
 	/* protection */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfffff400, 0xfffff40f, read16_delegate(FUNC(midyunit_state::mkturbo_prot_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xfffff400, 0xfffff40f, read16_delegate(FUNC(midyunit_state::mkturbo_prot_r),this));
 
 	DRIVER_INIT_CALL(mkyunit);
 }
@@ -500,12 +500,12 @@ static void term2_init_common(running_machine &machine, write16_delegate hack_w)
 	init_generic(machine, 6, SOUND_ADPCM, 0xfa8d, 0xfa9c);
 
 	/* special inputs */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x01c00000, 0x01c0005f, read16_delegate(FUNC(midyunit_state::term2_input_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x01e00000, 0x01e0001f, write16_delegate(FUNC(midyunit_state::term2_sound_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x01c00000, 0x01c0005f, read16_delegate(FUNC(midyunit_state::term2_input_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x01e00000, 0x01e0001f, write16_delegate(FUNC(midyunit_state::term2_sound_w),state));
 
 	/* HACK: this prevents the freeze on the movies */
 	/* until we figure whats causing it, this is better than nothing */
-	state->m_t2_hack_mem = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x010aa0e0, 0x010aa0ff, hack_w);
+	state->m_t2_hack_mem = machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x010aa0e0, 0x010aa0ff, hack_w);
 }
 
 DRIVER_INIT_MEMBER(midyunit_state,term2)    { term2_init_common(machine(), write16_delegate(FUNC(midyunit_state::term2_hack_w),this)); }

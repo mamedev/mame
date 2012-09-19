@@ -345,7 +345,7 @@ static CPU_RESET( arm )
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->endian = save_endian;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 
 	/* start up in SVC mode with interrupts disabled. */
@@ -528,7 +528,7 @@ static CPU_INIT( arm )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->endian = ENDIANNESS_LITTLE;
 
 	device->save_item(NAME(cpustate->sArmRegister));
@@ -544,7 +544,7 @@ static CPU_INIT( arm_be )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->endian = ENDIANNESS_BIG;
 
 	device->save_item(NAME(cpustate->sArmRegister));

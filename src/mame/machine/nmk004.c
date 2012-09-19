@@ -311,7 +311,7 @@ static void effects_update(int channel)
 static void fm_update(int channel)
 {
 	struct fm_control *fm = &NMK004_state.fm_control[channel];
-	address_space &space = *NMK004_state.machine().firstcpu->space(AS_PROGRAM);
+	address_space &space = NMK004_state.machine().firstcpu->space(AS_PROGRAM);
 
 	// advance the timers
 	if (fm->timer1)
@@ -595,7 +595,7 @@ static void fm_voices_update(void)
 	};
 	int channel,i;
 
-	address_space &space = *NMK004_state.machine().firstcpu->space(AS_PROGRAM);
+	address_space &space = NMK004_state.machine().firstcpu->space(AS_PROGRAM);
 	for (channel = 0; channel < 3;channel++)
 	{
 		struct fm_control *fm1 = &NMK004_state.fm_control[channel];
@@ -684,7 +684,7 @@ static void fm_voices_update(void)
 static void psg_update(int channel)
 {
 	struct psg_control *psg = &NMK004_state.psg_control[channel];
-	address_space &space = *NMK004_state.machine().firstcpu->space(AS_PROGRAM);
+	address_space &space = NMK004_state.machine().firstcpu->space(AS_PROGRAM);
 
 	// advance the timers
 	if (psg->note_timer)
@@ -1003,7 +1003,7 @@ void NMK004_irq(device_t *device, int irq)
 {
 	if (irq)
 	{
-		address_space &space = *NMK004_state.machine().firstcpu->space(AS_PROGRAM);
+		address_space &space = NMK004_state.machine().firstcpu->space(AS_PROGRAM);
 		int status = ym2203_status_port_r(device,space,0);
 
 		if (status & 1)	// timer A expired
@@ -1039,7 +1039,7 @@ static TIMER_CALLBACK( real_nmk004_init )
 
 	NMK004_state.rom = machine.root_device().memregion("audiocpu")->base();
 
-	address_space &space = *NMK004_state.machine().firstcpu->space(AS_PROGRAM);
+	address_space &space = NMK004_state.machine().firstcpu->space(AS_PROGRAM);
 	ym2203_control_port_w(NMK004_state.ymdevice, space, 0, 0x2f);
 
 	i = 0;

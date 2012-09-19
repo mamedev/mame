@@ -614,7 +614,7 @@ void v99x8_device::device_start()
 	m_size_old = -1;
 
 	// Video RAM is allocated as an own address space
-	m_vram_space = space(AS_DATA);
+	m_vram_space = &space(AS_DATA);
 
 	// allocate VRAM
 	assert(m_vram_size > 0);

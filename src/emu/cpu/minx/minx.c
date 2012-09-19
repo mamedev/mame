@@ -119,7 +119,7 @@ static CPU_INIT( minx )
 	minx_state *minx = get_safe_token(device);
 	minx->irq_callback = irqcallback;
 	minx->device = device;
-	minx->program = device->space(AS_PROGRAM);
+	minx->program = &device->space(AS_PROGRAM);
 	if ( device->static_config() != NULL )
 	{
 	}

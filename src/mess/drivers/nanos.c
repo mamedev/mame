@@ -439,7 +439,7 @@ void nanos_state::machine_start()
 
 void nanos_state::machine_reset()
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	space.install_write_bank(0x0000, 0x0fff, "bank3");
 	space.install_write_bank(0x1000, 0xffff, "bank2");

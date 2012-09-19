@@ -67,14 +67,14 @@ void st_state::flush_dma_fifo()
 	if (m_fdc_fifo_empty[m_fdc_fifo_sel]) return;
 
 	if (m_fdc_dmabytes) {
-		address_space *program = m_maincpu->space(AS_PROGRAM);
+		address_space &program = m_maincpu->space(AS_PROGRAM);
 		for (int i = 0; i < 8; i++) {
 			UINT16 data = m_fdc_fifo[m_fdc_fifo_sel][i];
 
 			if (LOG) logerror("Flushing DMA FIFO %u data %04x to address %06x\n", m_fdc_fifo_sel, data, m_dma_base);
 
 			if(m_dma_base >= 8)
-				program->write_word(m_dma_base, data);
+				program.write_word(m_dma_base, data);
 			m_dma_base += 2;
 		}
 		m_fdc_dmabytes -= 16;
@@ -98,9 +98,9 @@ void st_state::flush_dma_fifo()
 void st_state::fill_dma_fifo()
 {
 	if (m_fdc_dmabytes) {
-		address_space *program = m_maincpu->space(AS_PROGRAM);
+		address_space &program = m_maincpu->space(AS_PROGRAM);
 		for (int i = 0; i < 8; i++) {
-			UINT16 data = program->read_word(m_dma_base);
+			UINT16 data = program.read_word(m_dma_base);
 
 			if (LOG) logerror("Filling DMA FIFO %u with data %04x from memory address %06x\n", m_fdc_fifo_sel, data, m_dma_base);
 
@@ -2142,24 +2142,24 @@ static IRQ_CALLBACK( atarist_int_ack )
 
 void st_state::configure_memory()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	switch (m_ram->size())
 	{
 	case 256 * 1024:
-		program->unmap_readwrite(0x040000, 0x3fffff);
+		program.unmap_readwrite(0x040000, 0x3fffff);
 		break;
 
 	case 512 * 1024:
-		program->unmap_readwrite(0x080000, 0x3fffff);
+		program.unmap_readwrite(0x080000, 0x3fffff);
 		break;
 
 	case 1024 * 1024:
-		program->unmap_readwrite(0x100000, 0x3fffff);
+		program.unmap_readwrite(0x100000, 0x3fffff);
 		break;
 
 	case 2048 * 1024:
-		program->unmap_readwrite(0x200000, 0x3fffff);
+		program.unmap_readwrite(0x200000, 0x3fffff);
 		break;
 	}
 }
@@ -2292,12 +2292,12 @@ void megaste_state::machine_start()
 void stbook_state::machine_start()
 {
 	/* configure RAM banking */
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	switch (m_ram->size())
 	{
 	case 1024 * 1024:
-		program->unmap_readwrite(0x100000, 0x3fffff);
+		program.unmap_readwrite(0x100000, 0x3fffff);
 		break;
 	}
 

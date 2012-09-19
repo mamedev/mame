@@ -712,7 +712,7 @@ void fd1094_device::device_start()
 
 	// if address 0 is mapped to ROM, assume this is a state memory mapping and
 	// use the internal state change callback
-	if (space(AS_PROGRAM)->get_read_ptr(0) != NULL)
+	if (space(AS_PROGRAM).get_read_ptr(0) != NULL)
 		m_state_change = state_change_delegate(FUNC(fd1094_device::default_state_change), this);
 
 	// determine length and configure our cache
@@ -961,7 +961,7 @@ void fd1094_device::decrypt(offs_t baseaddr, UINT32 size, const UINT16 *srcptr, 
 
 void fd1094_device::default_state_change(UINT8 state)
 {
-	space(AS_PROGRAM)->set_decrypted_region(0x000000, m_srcbytes - 1, m_cache.decrypted_opcodes(state));
+	space(AS_PROGRAM).set_decrypted_region(0x000000, m_srcbytes - 1, m_cache.decrypted_opcodes(state));
 }
 
 

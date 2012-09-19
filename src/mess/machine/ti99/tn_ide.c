@@ -136,18 +136,18 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 			case 0:		/* RTC RAM */
 				if (addr & 0x80)
 					/* RTC RAM page register */
-					reply = m_rtc->xram_r(*machine().memory().first_space(),(addr & 0x1f) | 0x20);
+					reply = m_rtc->xram_r(machine().driver_data()->generic_space(),(addr & 0x1f) | 0x20);
 				else
 					/* RTC RAM read */
-					reply = m_rtc->xram_r(*machine().memory().first_space(),addr);
+					reply = m_rtc->xram_r(machine().driver_data()->generic_space(),addr);
 				break;
 			case 1:		/* RTC registers */
 				if (addr & 0x10)
 					/* register data */
-					reply = m_rtc->rtc_r(*machine().memory().first_space(),1);
+					reply = m_rtc->rtc_r(machine().driver_data()->generic_space(),1);
 				else
 					/* register select */
-					reply = m_rtc->rtc_r(*machine().memory().first_space(),0);
+					reply = m_rtc->rtc_r(machine().driver_data()->generic_space(),0);
 				break;
 			case 2:		/* IDE registers set 1 (CS1Fx) */
 				if (m_tms9995_mode ? (!(addr & 1)) : (addr & 1))
@@ -205,18 +205,18 @@ WRITE8_MEMBER(nouspikel_ide_interface_device::write)
 			case 0:		/* RTC RAM */
 				if (addr & 0x80)
 					/* RTC RAM page register */
-					m_rtc->xram_w(*machine().memory().first_space(),(addr & 0x1f) | 0x20, data);
+					m_rtc->xram_w(machine().driver_data()->generic_space(),(addr & 0x1f) | 0x20, data);
 				else
 					/* RTC RAM write */
-					m_rtc->xram_w(*machine().memory().first_space(),addr, data);
+					m_rtc->xram_w(machine().driver_data()->generic_space(),addr, data);
 				break;
 			case 1:		/* RTC registers */
 				if (addr & 0x10)
 					/* register data */
-					m_rtc->rtc_w(*machine().memory().first_space(),1, data);
+					m_rtc->rtc_w(machine().driver_data()->generic_space(),1, data);
 				else
 					/* register select */
-					m_rtc->rtc_w(*machine().memory().first_space(),0, data);
+					m_rtc->rtc_w(machine().driver_data()->generic_space(),0, data);
 				break;
 			case 2:		/* IDE registers set 1 (CS1Fx) */
 /*

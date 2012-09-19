@@ -674,7 +674,7 @@ static ACIA6850_INTERFACE( osi470_acia_intf )
 
 void sb2m600_state::machine_start()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* configure RAM banking */
 	membank("bank1")->configure_entry(0, memregion(M6502_TAG)->base());
@@ -683,12 +683,12 @@ void sb2m600_state::machine_start()
 	switch (m_ram->size())
 	{
 	case 4*1024:
-		program->install_readwrite_bank(0x0000, 0x0fff, "bank1");
-		program->unmap_readwrite(0x1000, 0x1fff);
+		program.install_readwrite_bank(0x0000, 0x0fff, "bank1");
+		program.unmap_readwrite(0x1000, 0x1fff);
 		break;
 
 	case 8*1024:
-		program->install_readwrite_bank(0x0000, 0x1fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x1fff, "bank1");
 		break;
 	}
 
@@ -699,7 +699,7 @@ void sb2m600_state::machine_start()
 
 void c1p_state::machine_start()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* configure RAM banking */
 	membank("bank1")->configure_entry(0, memregion(M6502_TAG)->base());
@@ -708,12 +708,12 @@ void c1p_state::machine_start()
 	switch (m_ram->size())
 	{
 	case 8*1024:
-		program->install_readwrite_bank(0x0000, 0x1fff, "bank1");
-		program->unmap_readwrite(0x2000, 0x4fff);
+		program.install_readwrite_bank(0x0000, 0x1fff, "bank1");
+		program.unmap_readwrite(0x2000, 0x4fff);
 		break;
 
 	case 20*1024:
-		program->install_readwrite_bank(0x0000, 0x4fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x4fff, "bank1");
 		break;
 	}
 

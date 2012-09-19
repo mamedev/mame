@@ -237,7 +237,7 @@ inline UINT8 mos7360_device::read_ram(offs_t offset)
 	int rom = m_rom;
 	m_rom = 0;
 
-	m_last_data = space(AS_0)->read_byte(offset);
+	m_last_data = space(AS_0).read_byte(offset);
 
 	m_rom = rom;
 
@@ -249,7 +249,7 @@ inline UINT8 mos7360_device::read_rom(offs_t offset)
 	int rom = m_rom;
 	m_rom = 1;
 
-	m_last_data = space(AS_0)->read_byte(offset);
+	m_last_data = space(AS_0).read_byte(offset);
 
 	m_rom = rom;
 

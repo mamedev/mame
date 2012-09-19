@@ -20,7 +20,7 @@ UINT32 irisha_state::screen_update_irisha(screen_device &screen, bitmap_ind16 &b
 	UINT8 code1; //, code2;
 	UINT8 col;
 	int y, x, b;
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	// draw image
 	for (y = 0; y < 200; y++)

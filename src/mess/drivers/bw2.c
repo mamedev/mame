@@ -51,7 +51,7 @@ void bw2_state::bankswitch(UINT8 data)
 
     */
 
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	int max_ram_bank = 0;
 
@@ -87,11 +87,11 @@ void bw2_state::bankswitch(UINT8 data)
 	switch (m_bank)
 	{
 	case BANK_RAM1:
-		program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x7fff, "bank1");
 		break;
 
 	case BANK_VRAM:
-		program->install_readwrite_bank(0x0000, 0x3fff, 0, 0x4000, "bank1");
+		program.install_readwrite_bank(0x0000, 0x3fff, 0, 0x4000, "bank1");
 		break;
 
 	case BANK_RAM2:
@@ -101,17 +101,17 @@ void bw2_state::bankswitch(UINT8 data)
 	case BANK_RAM6:
 		if (m_bank > max_ram_bank)
 		{
-			program->unmap_readwrite(0x0000, 0x7fff);
+			program.unmap_readwrite(0x0000, 0x7fff);
 		}
 		else
 		{
-			program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
+			program.install_readwrite_bank(0x0000, 0x7fff, "bank1");
 		}
 		break;
 
 	case BANK_ROM:
-		program->install_read_bank(0x0000, 0x7fff, "bank1");
-		program->unmap_write(0x0000, 0x7fff);
+		program.install_read_bank(0x0000, 0x7fff, "bank1");
+		program.unmap_write(0x0000, 0x7fff);
 		break;
 	}
 
@@ -133,7 +133,7 @@ void bw2_state::ramcard_bankswitch(UINT8 data)
 
     */
 
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	int max_ram_bank = BANK_RAM1;
 
@@ -164,11 +164,11 @@ void bw2_state::ramcard_bankswitch(UINT8 data)
 	{
 	case BANK_RAM1:
 	case BANK_RAMCARD_RAM:
-		program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x7fff, "bank1");
 		break;
 
 	case BANK_VRAM:
-		program->install_readwrite_bank(0x0000, 0x3fff, 0, 0x4000, "bank1");
+		program.install_readwrite_bank(0x0000, 0x3fff, 0, 0x4000, "bank1");
 		break;
 
 	case BANK_RAM3:
@@ -176,22 +176,22 @@ void bw2_state::ramcard_bankswitch(UINT8 data)
 	case BANK_RAM6:
 		if (m_bank > max_ram_bank)
 		{
-			program->unmap_readwrite(0x0000, 0x7fff);
+			program.unmap_readwrite(0x0000, 0x7fff);
 		}
 		else
 		{
-			program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
+			program.install_readwrite_bank(0x0000, 0x7fff, "bank1");
 		}
 		break;
 
 	case BANK_RAMCARD_ROM:
-		program->install_read_bank(0x0000, 0x3fff, 0, 0x4000, "bank1");
-		program->unmap_write(0x0000, 0x3fff, 0, 0x4000);
+		program.install_read_bank(0x0000, 0x3fff, 0, 0x4000, "bank1");
+		program.unmap_write(0x0000, 0x3fff, 0, 0x4000);
 		break;
 
 	case BANK_ROM:
-		program->install_read_bank(0x0000, 0x7fff, "bank1");
-		program->unmap_write(0x0000, 0x7fff);
+		program.install_read_bank(0x0000, 0x7fff, "bank1");
+		program.unmap_write(0x0000, 0x7fff);
 		break;
 	}
 
@@ -200,18 +200,18 @@ void bw2_state::ramcard_bankswitch(UINT8 data)
 
 WRITE8_MEMBER( bw2_state::ramcard_bank_w )
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	UINT8 ramcard_bank = data & 0x0f;
 	UINT32 bank_offset = ramcard_bank * 0x8000;
 
 	if ((get_ramdisk_size() == 256) && (ramcard_bank > 7))
 	{
-		program->unmap_readwrite(0x0000, 0x7fff);
+		program.unmap_readwrite(0x0000, 0x7fff);
 	}
 	else
 	{
-		program->install_readwrite_bank(0x0000, 0x7fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x7fff, "bank1");
 	}
 
 	membank("bank1")->configure_entry(BANK_RAMCARD_RAM, m_ramcard_ram + bank_offset);
@@ -638,7 +638,7 @@ void bw2_state::machine_start()
 
 void bw2_state::machine_reset()
 {
-	address_space *io = machine().device(Z80_TAG)->memory().space(AS_IO);
+	address_space &io = machine().device(Z80_TAG)->memory().space(AS_IO);
 
 	if (get_ramdisk_size() > 0)
 	{
@@ -649,7 +649,7 @@ void bw2_state::machine_reset()
 		membank("bank1")->configure_entry(BANK_RAMCARD_RAM, m_ramcard_ram);
 		membank("bank1")->configure_entry(BANK_RAM6, m_ram->pointer() + 0x18000);
 
-		io->install_write_handler(0x30, 0x30, 0, 0x0f, write8_delegate(FUNC(bw2_state::ramcard_bank_w), this), 0);
+		io.install_write_handler(0x30, 0x30, 0, 0x0f, write8_delegate(FUNC(bw2_state::ramcard_bank_w), this), 0);
 	}
 	else
 	{
@@ -657,7 +657,7 @@ void bw2_state::machine_reset()
 
 		membank("bank1")->configure_entries(BANK_RAM2, 5, m_ram->pointer() + 0x8000, 0x8000);
 
-		io->unmap_write(0x30, 0x30, 0, 0x0f);
+		io.unmap_write(0x30, 0x30, 0, 0x0f);
 	}
 
 	membank("bank1")->set_entry(BANK_ROM);

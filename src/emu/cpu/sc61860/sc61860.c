@@ -105,7 +105,7 @@ static CPU_INIT( sc61860 )
 	cpustate->config = (sc61860_cpu_core *) device->static_config();
 	device->machine().scheduler().timer_pulse(attotime::from_hz(500), FUNC(sc61860_2ms_tick), 0, cpustate);
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 }
 

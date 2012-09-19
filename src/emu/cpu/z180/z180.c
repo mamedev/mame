@@ -2212,9 +2212,9 @@ static CPU_RESET( z180 )
 	cpustate->irq_state[2] = CLEAR_LINE;
 	cpustate->after_EI = 0;
 	cpustate->ea = 0;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->iospace = device->space(AS_IO);
+	cpustate->iospace = &device->space(AS_IO);
 	cpustate->device = device;
 
 	memcpy(cpustate->cc, (UINT8 *)cc_default, sizeof(cpustate->cc));

@@ -118,7 +118,7 @@ void okim6295_device::static_set_pin7(device_t &device, int pin7)
 void okim6295_device::device_start()
 {
 	// find our direct access
-	m_direct = &space()->direct();
+	m_direct = &space().direct();
 
 	// create the stream
 	int divisor = m_pin7_state ? 132 : 165;
@@ -220,7 +220,7 @@ void okim6295_device::set_bank_base(offs_t base, bool bDontUpdateStream)
 	if (!m_bank_installed && base != 0)
 	{
 		// override our memory map with a bank
-		space()->install_read_bank(0x00000, 0x3ffff, tag());
+		space().install_read_bank(0x00000, 0x3ffff, tag());
 		m_bank_installed = true;
 	}
 

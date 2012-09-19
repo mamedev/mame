@@ -96,12 +96,12 @@ WRITE8_MEMBER(attckufo_state::attckufo_io_w)
 
 READ8_MEMBER(attckufo_state::vic_videoram_r)
 {
-	return m_maincpu->space(AS_PROGRAM)->read_byte(offset);
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
 READ8_MEMBER(attckufo_state::vic_colorram_r)
 {
-	return m_maincpu->space(AS_PROGRAM)->read_byte(offset + 0x400);
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset + 0x400);
 }
 
 static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, attckufo_state )

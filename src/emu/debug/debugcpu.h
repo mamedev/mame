@@ -146,7 +146,7 @@ public:
 
 	// commonly-used pass-throughs
 	offs_t pc() const { return (m_state != NULL) ? m_state->pc() : 0; }
-	int logaddrchars(address_spacenum spacenum = AS_0) const { return (m_memory != NULL && m_memory->space(spacenum) != NULL) ? m_memory->space(spacenum)->logaddrchars() : 8; }
+	int logaddrchars(address_spacenum spacenum = AS_0) const { return (m_memory != NULL && m_memory->has_space(spacenum)) ? m_memory->space(spacenum).logaddrchars() : 8; }
 	int min_opcode_bytes() const { return (m_disasm != NULL) ? m_disasm->max_opcode_bytes() : 1; }
 	int max_opcode_bytes() const { return (m_disasm != NULL) ? m_disasm->max_opcode_bytes() : 1; }
 

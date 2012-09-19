@@ -1259,14 +1259,14 @@ DRIVER_INIT_MEMBER(paradise_state,paradise)
 DRIVER_INIT_MEMBER(paradise_state,tgtball)
 {
 	m_sprite_inc = 4;
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x2001, 0x2001, write8_delegate(FUNC(paradise_state::tgtball_flipscreen_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x2001, 0x2001, write8_delegate(FUNC(paradise_state::tgtball_flipscreen_w),this));
 
 }
 
 DRIVER_INIT_MEMBER(paradise_state,torus)
 {
 	m_sprite_inc = 4;
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x2070, 0x2070, write8_delegate(FUNC(paradise_state::torus_coin_counter_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x2070, 0x2070, write8_delegate(FUNC(paradise_state::torus_coin_counter_w),this));
 }
 
 

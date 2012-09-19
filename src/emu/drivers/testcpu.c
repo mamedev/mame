@@ -123,7 +123,7 @@ public:
 	virtual void machine_start()
 	{
 		// find the CPU's address space
-		m_space = m_cpu->space(AS_PROGRAM);
+		m_space = &m_cpu->space(AS_PROGRAM);
 
 		// configure DRC in the most compatible mode
 		ppcdrc_set_options(m_cpu, PPCDRC_COMPATIBLE_OPTIONS);

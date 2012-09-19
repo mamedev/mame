@@ -44,7 +44,7 @@ READ8_MEMBER( zx_state::zx_ram_r )
 
 DRIVER_INIT_MEMBER(zx_state,zx)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	space.install_read_bank(0x4000, 0x4000 + machine().device<ram_device>(RAM_TAG)->size() - 1, "bank1");
 	space.install_write_handler(0x4000, 0x4000 + machine().device<ram_device>(RAM_TAG)->size() - 1, write8_delegate(FUNC(zx_state::zx_ram_w),this));
@@ -74,19 +74,19 @@ DIRECT_UPDATE_MEMBER(zx_state::pow3000_setdirect)
 
 void zx_state::machine_reset()
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(zx_state::zx_setdirect), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(zx_state::zx_setdirect), this));
 	m_tape_bit = 0x80;
 }
 
 MACHINE_RESET_MEMBER(zx_state,pow3000)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(zx_state::pow3000_setdirect), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(zx_state::pow3000_setdirect), this));
 	m_tape_bit = 0x80;
 }
 
 MACHINE_RESET_MEMBER(zx_state,pc8300)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(zx_state::pc8300_setdirect), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(zx_state::pc8300_setdirect), this));
 	m_tape_bit = 0x80;
 }
 
@@ -354,7 +354,7 @@ WRITE8_MEMBER( zx_state::zx80_io_w )
 
 WRITE8_MEMBER( zx_state::zx81_io_w )
 {
-	address_space *mem = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &mem = machine().device("maincpu")->memory().space(AS_PROGRAM);
 /* port F5 = unknown, pc8300/pow3000/lambda only
     F6 = unknown, pc8300/pow3000/lambda only
     FB = write data to printer, not emulated
@@ -385,7 +385,7 @@ WRITE8_MEMBER( zx_state::zx81_io_w )
 		zx_ula_bkgnd(1);
 		if (m_ula_frame_vsync == 2)
 		{
-			mem->device().execute().spin_until_time(machine().primary_screen->time_until_pos(height - 1, 0));
+			mem.device().execute().spin_until_time(machine().primary_screen->time_until_pos(height - 1, 0));
 			m_ula_scanline_count = height - 1;
 			logerror ("S: %d B: %d\n", machine().primary_screen->vpos(), machine().primary_screen->hpos());
 		}

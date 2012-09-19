@@ -166,7 +166,7 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 
 QUICKLOAD_LOAD( cd2650 )
 {
-	address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 	int quick_addr = 0x440;
 	int exec_addr;

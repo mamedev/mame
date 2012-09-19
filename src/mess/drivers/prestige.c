@@ -121,7 +121,7 @@ READ8_MEMBER( prestige_state::bankswitch_r )
 
 WRITE8_MEMBER( prestige_state::bankswitch_w )
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	switch (offset)
 	{
@@ -159,26 +159,26 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 		{
 			//cartridge memory is writable
 			if (data & 0x08)
-				program->install_readwrite_bank(0x4000, 0x7fff, "bank2");
+				program.install_readwrite_bank(0x4000, 0x7fff, "bank2");
 			else
-				program->unmap_write(0x4000, 0x7fff);
+				program.unmap_write(0x4000, 0x7fff);
 
 			if (data & 0x04)
-				program->install_readwrite_bank(0x8000, 0xbfff, "bank3");
+				program.install_readwrite_bank(0x8000, 0xbfff, "bank3");
 			else
-				program->unmap_write(0x8000, 0xbfff);
+				program.unmap_write(0x8000, 0xbfff);
 
-			program->install_readwrite_bank(0xc000, 0xdfff, "bank4");
+			program.install_readwrite_bank(0xc000, 0xdfff, "bank4");
 		}
 		else
 		{
 			//cartridge memory is read-only
 			if (data & 0x02)
-				program->unmap_write(0xc000, 0xdfff);
+				program.unmap_write(0xc000, 0xdfff);
 			else
-				program->install_readwrite_bank(0xc000, 0xdfff, "bank4");
+				program.install_readwrite_bank(0xc000, 0xdfff, "bank4");
 
-			program->unmap_write(0x4000, 0xbfff);
+			program.unmap_write(0x4000, 0xbfff);
 		}
 		break;
 	case 6:

@@ -287,7 +287,7 @@ void i82439tx_device::device_start()
 	device_t *cpu = machine().device(m_cputag);
 	assert(cpu != NULL);
 
-	m_space = cpu->memory().space(AS_PROGRAM);
+	m_space = &cpu->memory().space(AS_PROGRAM);
 
 	/* get rom region */
 	m_rom = machine().root_device().memregion(m_rom_region)->base();

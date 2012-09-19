@@ -496,7 +496,7 @@ READ8_MEMBER( sega315_5124_device::vram_read )
 	if ( !space.debugger_access() )
 	{
 		/* Load read buffer */
-		m_buffer = this->space()->read_byte(m_addr & 0x3fff);
+		m_buffer = this->space().read_byte(m_addr & 0x3fff);
 
 		/* Bump internal addthis->ress register */
 		m_addr += 1;
@@ -543,7 +543,7 @@ WRITE8_MEMBER( sega315_5124_device::vram_write )
 		case 0x00:
 		case 0x01:
 		case 0x02:
-			this->space()->write_byte(m_addr & 0x3fff, data);
+			this->space().write_byte(m_addr & 0x3fff, data);
 			break;
 
 		case 0x03:
@@ -582,7 +582,7 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 		switch (m_addrmode)
 		{
 		case 0:		/* VRAM reading mode */
-			m_buffer = this->space()->read_byte(m_addr & 0x3fff);
+			m_buffer = this->space().read_byte(m_addr & 0x3fff);
 			m_addr += 1;
 			break;
 
@@ -691,7 +691,7 @@ void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_s
 		y_scroll = ((m_reg[0x00] & 0x80) && (tile_column > 23)) ? 0 : m_reg9copy;
 
 		tile_line = ((tile_column + x_scroll_start_column) & 0x1f) * 2;
-		tile_data = space()->read_word(name_table_address + ((((line + y_scroll) % scroll_mod) >> 3) << 6) + tile_line);
+		tile_data = space().read_word(name_table_address + ((((line + y_scroll) % scroll_mod) >> 3) << 6) + tile_line);
 
 		tile_selected = (tile_data & 0x01ff);
 		priority_select = tile_data & PRIORITY_BIT;
@@ -703,10 +703,10 @@ void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_s
 		if (vert_selected)
 			tile_line = 0x07 - tile_line;
 
-		bit_plane_0 = space()->read_byte(((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x00);
-		bit_plane_1 = space()->read_byte(((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x01);
-		bit_plane_2 = space()->read_byte(((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x02);
-		bit_plane_3 = space()->read_byte(((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x03);
+		bit_plane_0 = space().read_byte(((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x00);
+		bit_plane_1 = space().read_byte(((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x01);
+		bit_plane_2 = space().read_byte(((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x02);
+		bit_plane_3 = space().read_byte(((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x03);
 
 		for (pixel_x = 0; pixel_x < 8 ; pixel_x++)
 		{
@@ -765,9 +765,9 @@ void sega315_5124_device::select_sprites( int pixel_plot_y, int line )
 		if (m_reg[0x01] & 0x01)                         /* Check if MAG is set */
 			m_sprite_height = m_sprite_height * 2;
 
-		for (sprite_index = 0; (sprite_index < 32 * 4) && (space()->read_byte( m_sprite_base + sprite_index ) != 0xd0) && (m_sprite_count < max_sprites + 1); sprite_index += 4)
+		for (sprite_index = 0; (sprite_index < 32 * 4) && (space().read_byte( m_sprite_base + sprite_index ) != 0xd0) && (m_sprite_count < max_sprites + 1); sprite_index += 4)
 		{
-			int sprite_y = space()->read_byte( m_sprite_base + sprite_index ) + 1;
+			int sprite_y = space().read_byte( m_sprite_base + sprite_index ) + 1;
 
 			if (sprite_y > 240)
 			{
@@ -794,9 +794,9 @@ void sega315_5124_device::select_sprites( int pixel_plot_y, int line )
 		m_sprite_height = (m_reg[0x01] & 0x02) ? 16 : 8;
 		m_sprite_zoom = (m_reg[0x01] & 0x01) ? 2 : 1;
 
-		for (sprite_index = 0; (sprite_index < 64) && (space()->read_byte(m_sprite_base + sprite_index ) != 0xd0 || m_y_pixels != 192) && (m_sprite_count < max_sprites + 1); sprite_index++)
+		for (sprite_index = 0; (sprite_index < 64) && (space().read_byte(m_sprite_base + sprite_index ) != 0xd0 || m_y_pixels != 192) && (m_sprite_count < max_sprites + 1); sprite_index++)
 		{
-			int sprite_y = space()->read_byte( m_sprite_base + sprite_index ) + 1; /* sprite y position starts at line 1 */
+			int sprite_y = space().read_byte( m_sprite_base + sprite_index ) + 1; /* sprite y position starts at line 1 */
 
 			if (sprite_y > 240)
 			{
@@ -844,9 +844,9 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 	for (int sprite_buffer_index = m_sprite_count - 1; sprite_buffer_index >= 0; sprite_buffer_index--)
 	{
 		int sprite_index = m_selected_sprite[sprite_buffer_index];
-		int sprite_y = space()->read_byte( m_sprite_base + sprite_index ) + 1; /* sprite y position starts at line 1 */
-		int sprite_x = space()->read_byte( m_sprite_base + 0x80 + (sprite_index << 1) );
-		int sprite_tile_selected = space()->read_byte( m_sprite_base + 0x81 + (sprite_index << 1) );
+		int sprite_y = space().read_byte( m_sprite_base + sprite_index ) + 1; /* sprite y position starts at line 1 */
+		int sprite_x = space().read_byte( m_sprite_base + 0x80 + (sprite_index << 1) );
+		int sprite_tile_selected = space().read_byte( m_sprite_base + 0x81 + (sprite_index << 1) );
 
 		if (sprite_y > 240)
 		{
@@ -875,10 +875,10 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 			sprite_tile_selected += 1;
 		}
 
-		UINT8 bit_plane_0 = space()->read_byte(((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x00);
-		UINT8 bit_plane_1 = space()->read_byte(((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x01);
-		UINT8 bit_plane_2 = space()->read_byte(((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x02);
-		UINT8 bit_plane_3 = space()->read_byte(((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x03);
+		UINT8 bit_plane_0 = space().read_byte(((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x00);
+		UINT8 bit_plane_1 = space().read_byte(((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x01);
+		UINT8 bit_plane_2 = space().read_byte(((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x02);
+		UINT8 bit_plane_3 = space().read_byte(((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x03);
 
 		for (int pixel_x = 0; pixel_x < 8 ; pixel_x++)
 		{
@@ -1002,9 +1002,9 @@ void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int pixel
 	for (int sprite_buffer_index = m_sprite_count - 1; sprite_buffer_index >= 0; sprite_buffer_index--)
 	{
 		int sprite_index = m_selected_sprite[sprite_buffer_index];
-		int sprite_y = space()->read_byte( m_sprite_base + sprite_index ) + 1;
-		int sprite_x = space()->read_byte( m_sprite_base + sprite_index + 1 );
-		UINT8 flags = space()->read_byte( m_sprite_base + sprite_index + 3 );
+		int sprite_y = space().read_byte( m_sprite_base + sprite_index ) + 1;
+		int sprite_x = space().read_byte( m_sprite_base + sprite_index + 1 );
+		UINT8 flags = space().read_byte( m_sprite_base + sprite_index + 3 );
 		int pen_selected = m_palette_offset + ( flags & 0x0f );
 
 		if (sprite_y > 240)
@@ -1013,7 +1013,7 @@ void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int pixel
 		if (flags & 0x80)
 			sprite_x -= 32;
 
-		int sprite_tile_selected = space()->read_byte( m_sprite_base + sprite_index + 2 );
+		int sprite_tile_selected = space().read_byte( m_sprite_base + sprite_index + 2 );
 		int sprite_line = line - sprite_y;
 
 		if (m_reg[0x01] & 0x01)
@@ -1030,7 +1030,7 @@ void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int pixel
 			}
 		}
 
-		UINT8 pattern = space()->read_byte( sprite_pattern_base + sprite_tile_selected * 8 + sprite_line );
+		UINT8 pattern = space().read_byte( sprite_pattern_base + sprite_tile_selected * 8 + sprite_line );
 
 		for (int pixel_x = 0; pixel_x < 8; pixel_x++)
 		{
@@ -1099,7 +1099,7 @@ void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int pixel
 		if (m_reg[0x01] & 0x02)
 		{
 			sprite_tile_selected += 2;
-			pattern = space()->read_byte( sprite_pattern_base + sprite_tile_selected * 8 + sprite_line );
+			pattern = space().read_byte( sprite_pattern_base + sprite_tile_selected * 8 + sprite_line );
 			sprite_x += (m_reg[0x01] & 0x01 ? 16 : 8);
 
 			for (int pixel_x = 0; pixel_x < 8; pixel_x++)
@@ -1191,12 +1191,12 @@ void sega315_5124_device::draw_scanline_mode2( int *line_buffer, int line )
 
 	for (tile_column = 0; tile_column < 32; tile_column++)
 	{
-		UINT8 name = space()->read_byte( name_table_base + tile_column );
+		UINT8 name = space().read_byte( name_table_base + tile_column );
 		UINT8 pattern;
 		UINT8 colors;
 
-		pattern = space()->read_byte(pattern_base + (((pattern_offset + name) & pattern_mask) * 8) + (line & 0x07) );
-		colors = space()->read_byte(color_base + (((pattern_offset + name) & color_mask) * 8) + (line & 0x07) );
+		pattern = space().read_byte(pattern_base + (((pattern_offset + name) & pattern_mask) * 8) + (line & 0x07) );
+		colors = space().read_byte(color_base + (((pattern_offset + name) & color_mask) * 8) + (line & 0x07) );
 
 		for (pixel_x = 0; pixel_x < 8; pixel_x++)
 		{
@@ -1237,12 +1237,12 @@ void sega315_5124_device::draw_scanline_mode0( int *line_buffer, int line )
 
 	for (tile_column = 0; tile_column < 32; tile_column++)
 	{
-		UINT8 name = space()->read_byte( name_base + tile_column );
+		UINT8 name = space().read_byte( name_base + tile_column );
 		UINT8 pattern;
 		UINT8 colors;
 
-		pattern = space()->read_byte( pattern_base + (name * 8) + (line & 0x07) );
-		colors = space()->read_byte( color_base + ( name >> 3 ) );
+		pattern = space().read_byte( pattern_base + (name * 8) + (line & 0x07) );
+		colors = space().read_byte( color_base + ( name >> 3 ) );
 
 		for (pixel_x = 0; pixel_x < 8; pixel_x++)
 		{

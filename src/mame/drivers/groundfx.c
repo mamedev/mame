@@ -456,7 +456,7 @@ DRIVER_INIT_MEMBER(groundfx_state,groundfx)
 	int data;
 
 	/* Speedup handlers */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x20b574, 0x20b577, read32_delegate(FUNC(groundfx_state::irq_speedup_r_groundfx),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20b574, 0x20b577, read32_delegate(FUNC(groundfx_state::irq_speedup_r_groundfx),this));
 
 	/* make piv tile GFX format suitable for gfxdecode */
 	offset = size/2;

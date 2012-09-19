@@ -219,7 +219,7 @@ READ8_MEMBER( a5105_state::a5105_memsel_r )
 
 WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 {
-	address_space *prog = m_maincpu->space( AS_PROGRAM );
+	address_space &prog = m_maincpu->space( AS_PROGRAM );
 
 	if (m_memsel[0] != ((data & 0x03) >> 0))
 	{
@@ -229,15 +229,15 @@ WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 		{
 		case 0:
 			membank("bank1")->set_base(m_rom_base);
-			prog->install_read_bank(0x0000, 0x3fff, "bank1");
-			prog->unmap_write(0x0000, 0x3fff);
+			prog.install_read_bank(0x0000, 0x3fff, "bank1");
+			prog.unmap_write(0x0000, 0x3fff);
 			break;
 		case 2:
 			membank("bank1")->set_base(m_ram_base);
-			prog->install_readwrite_bank(0x0000, 0x3fff, "bank1");
+			prog.install_readwrite_bank(0x0000, 0x3fff, "bank1");
 			break;
 		default:
-			prog->unmap_readwrite(0x0000, 0x3fff);
+			prog.unmap_readwrite(0x0000, 0x3fff);
 			break;
 		}
 	}
@@ -250,20 +250,20 @@ WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 		{
 		case 0:
 			membank("bank2")->set_base(m_rom_base + 0x4000);
-			prog->install_read_bank(0x4000, 0x7fff, "bank2");
-			prog->unmap_write(0x4000, 0x4000);
+			prog.install_read_bank(0x4000, 0x7fff, "bank2");
+			prog.unmap_write(0x4000, 0x4000);
 			break;
 		case 1:
 			membank("bank2")->set_base(machine().root_device().memregion("k5651")->base());
-			prog->install_read_bank(0x4000, 0x7fff, "bank2");
-			prog->unmap_write(0x4000, 0x4000);
+			prog.install_read_bank(0x4000, 0x7fff, "bank2");
+			prog.unmap_write(0x4000, 0x4000);
 			break;
 		case 2:
 			membank("bank2")->set_base(m_ram_base + 0x4000);
-			prog->install_readwrite_bank(0x4000, 0x7fff, "bank2");
+			prog.install_readwrite_bank(0x4000, 0x7fff, "bank2");
 			break;
 		default:
-			prog->unmap_readwrite(0x4000, 0x7fff);
+			prog.unmap_readwrite(0x4000, 0x7fff);
 			break;
 		}
 	}
@@ -276,15 +276,15 @@ WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 		{
 		case 0:
 			membank("bank3")->set_base(m_rom_base + 0x8000);
-			prog->install_read_bank(0x8000, 0xbfff, "bank3");
-			prog->unmap_write(0x8000, 0xbfff);
+			prog.install_read_bank(0x8000, 0xbfff, "bank3");
+			prog.unmap_write(0x8000, 0xbfff);
 			break;
 		case 2:
 			membank("bank3")->set_base(m_ram_base + 0x8000);
-			prog->install_readwrite_bank(0x8000, 0xbfff, "bank3");
+			prog.install_readwrite_bank(0x8000, 0xbfff, "bank3");
 			break;
 		default:
-			prog->unmap_readwrite(0x8000, 0xbfff);
+			prog.unmap_readwrite(0x8000, 0xbfff);
 			break;
 		}
 	}
@@ -297,10 +297,10 @@ WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 		{
 		case 2:
 			membank("bank4")->set_base(m_ram_base + 0xc000);
-			prog->install_readwrite_bank(0xc000, 0xffff, "bank4");
+			prog.install_readwrite_bank(0xc000, 0xffff, "bank4");
 			break;
 		default:
-			prog->unmap_readwrite(0xc000, 0xffff);
+			prog.unmap_readwrite(0xc000, 0xffff);
 			break;
 		}
 	}
@@ -454,7 +454,7 @@ INPUT_PORTS_END
 
 void a5105_state::machine_reset()
 {
-	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	a5105_ab_w(space, 0, 9); // turn motor off
 	beep_set_frequency(m_beep, 500);
 

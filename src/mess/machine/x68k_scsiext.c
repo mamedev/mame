@@ -68,7 +68,7 @@ void x68k_scsiext_device::device_start()
 	device_t* cpu = machine().device("maincpu");
 	UINT8* ROM;
 	astring temp;
-	address_space& space = *cpu->memory().space(AS_PROGRAM);
+	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<x68k_expansion_slot_device *>(owner());
 	space.install_read_bank(0xea0020,0xea1fff,0,0,"scsi_ext");
 	space.unmap_write(0xea0020,0xea1fff,0,0);

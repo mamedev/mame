@@ -143,7 +143,7 @@ static const UINT8 apple1_control_keymap[] =
 
 DRIVER_INIT_MEMBER(apple1_state,apple1)
 {
-	address_space& space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/* Set up the handlers for MESS's dynamically-sized RAM. */
 	space.install_readwrite_bank(0x0000, machine().device<ram_device>(RAM_TAG)->size() - 1, "bank1");
 	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
@@ -255,7 +255,7 @@ SNAPSHOT_LOAD(apple1)
 	for (addr = start_addr, snapptr = snapbuf + SNAP_HEADER_LEN;
 		 addr <= end_addr;
 		 addr++, snapptr++)
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte(addr, *snapptr);
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).write_byte(addr, *snapptr);
 
 
 	return IMAGE_INIT_PASS;

@@ -140,7 +140,7 @@ static void arm7_core_reset(legacy_cpu_device *device)
     memset(cpustate, 0, sizeof(arm_state));
     cpustate->irq_callback = save_irqcallback;
     cpustate->device = device;
-    cpustate->program = device->space(AS_PROGRAM);
+    cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->endian = ENDIANNESS_LITTLE;
 	cpustate->direct = &cpustate->program->direct();
 

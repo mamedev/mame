@@ -192,17 +192,17 @@ READ8_MEMBER( abc802_state::pling_r )
 
 void abc800_state::bankswitch()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	if (m_fetch_charram)
 	{
 		// HR video RAM selected
-		program->install_ram(0x0000, 0x3fff, m_video_ram);
+		program.install_ram(0x0000, 0x3fff, m_video_ram);
 	}
 	else
 	{
 		// BASIC ROM selected
-		program->install_rom(0x0000, 0x3fff, memregion(Z80_TAG)->base());
+		program.install_rom(0x0000, 0x3fff, memregion(Z80_TAG)->base());
 	}
 }
 
@@ -213,18 +213,18 @@ void abc800_state::bankswitch()
 
 void abc802_state::bankswitch()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	if (m_lrs)
 	{
 		// ROM and video RAM selected
-		program->install_rom(0x0000, 0x77ff, memregion(Z80_TAG)->base());
-		program->install_ram(0x7800, 0x7fff, m_char_ram);
+		program.install_rom(0x0000, 0x77ff, memregion(Z80_TAG)->base());
+		program.install_ram(0x7800, 0x7fff, m_char_ram);
 	}
 	else
 	{
 		// low RAM selected
-		program->install_ram(0x0000, 0x7fff, m_ram->pointer());
+		program.install_ram(0x0000, 0x7fff, m_ram->pointer());
 	}
 }
 
@@ -235,7 +235,7 @@ void abc802_state::bankswitch()
 
 void abc806_state::bankswitch()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	UINT32 videoram_mask = m_ram->size() - (32 * 1024) - 1;
 	int bank;
 	char bank_name[10];
@@ -256,7 +256,7 @@ void abc806_state::bankswitch()
 			sprintf(bank_name,"bank%d",bank);
 			//logerror("%04x-%04x: Video RAM %04x (32K)\n", start_addr, end_addr, videoram_offset);
 
-			program->install_readwrite_bank(start_addr, end_addr, bank_name);
+			program.install_readwrite_bank(start_addr, end_addr, bank_name);
 			membank(bank_name)->configure_entry(1, m_video_ram + videoram_offset);
 			membank(bank_name)->set_entry(1);
 		}
@@ -270,7 +270,7 @@ void abc806_state::bankswitch()
 			sprintf(bank_name,"bank%d",bank);
 			//logerror("%04x-%04x: Work RAM (32K)\n", start_addr, end_addr);
 
-			program->install_readwrite_bank(start_addr, end_addr, bank_name);
+			program.install_readwrite_bank(start_addr, end_addr, bank_name);
 			membank(bank_name)->set_entry(0);
 		}
 	}
@@ -290,7 +290,7 @@ void abc806_state::bankswitch()
 				// map to video RAM
 				//logerror("%04x-%04x: Video RAM %04x (4K)\n", start_addr, end_addr, videoram_offset);
 
-				program->install_readwrite_bank(start_addr, end_addr, bank_name);
+				program.install_readwrite_bank(start_addr, end_addr, bank_name);
 				membank(bank_name)->configure_entry(1, m_video_ram + videoram_offset);
 				membank(bank_name)->set_entry(1);
 			}
@@ -304,8 +304,8 @@ void abc806_state::bankswitch()
 					// ROM
 					//logerror("%04x-%04x: ROM (4K)\n", start_addr, end_addr);
 
-					program->install_read_bank(start_addr, end_addr, bank_name);
-					program->unmap_write(start_addr, end_addr);
+					program.install_read_bank(start_addr, end_addr, bank_name);
+					program.unmap_write(start_addr, end_addr);
 					membank(bank_name)->set_entry(0);
 					break;
 
@@ -313,9 +313,9 @@ void abc806_state::bankswitch()
 					// ROM/char RAM
 					//logerror("%04x-%04x: ROM (4K)\n", start_addr, end_addr);
 
-					program->install_read_bank(0x7000, 0x77ff, bank_name);
-					program->unmap_write(0x7000, 0x77ff);
-					program->install_readwrite_handler(0x7800, 0x7fff, 0, 0, read8_delegate(FUNC(abc806_state::charram_r),this), write8_delegate(FUNC(abc806_state::charram_w),this));
+					program.install_read_bank(0x7000, 0x77ff, bank_name);
+					program.unmap_write(0x7000, 0x77ff);
+					program.install_readwrite_handler(0x7800, 0x7fff, 0, 0, read8_delegate(FUNC(abc806_state::charram_r),this), write8_delegate(FUNC(abc806_state::charram_w),this));
 					membank(bank_name)->set_entry(0);
 					break;
 
@@ -323,7 +323,7 @@ void abc806_state::bankswitch()
 					// work RAM
 					//logerror("%04x-%04x: Work RAM (4K)\n", start_addr, end_addr);
 
-					program->install_readwrite_bank(start_addr, end_addr, bank_name);
+					program.install_readwrite_bank(start_addr, end_addr, bank_name);
 					membank(bank_name)->set_entry(0);
 					break;
 				}
@@ -349,12 +349,12 @@ void abc806_state::bankswitch()
 
 			if (start_addr == 0x7000)
 			{
-				program->install_readwrite_bank(0x7000, 0x77ff, bank_name);
-				program->install_readwrite_handler(0x7800, 0x7fff, 0, 0, read8_delegate(FUNC(abc806_state::charram_r), this), write8_delegate(FUNC(abc806_state::charram_w), this));
+				program.install_readwrite_bank(0x7000, 0x77ff, bank_name);
+				program.install_readwrite_handler(0x7800, 0x7fff, 0, 0, read8_delegate(FUNC(abc806_state::charram_r), this), write8_delegate(FUNC(abc806_state::charram_w), this));
 			}
 			else
 			{
-				program->install_readwrite_bank(start_addr, end_addr, bank_name);
+				program.install_readwrite_bank(start_addr, end_addr, bank_name);
 			}
 
 			membank(bank_name)->configure_entry(1, m_video_ram + videoram_offset);
@@ -1498,7 +1498,7 @@ DIRECT_UPDATE_MEMBER( abc800c_state::direct_update_handler )
 
 DRIVER_INIT_MEMBER(abc800c_state,driver_init)
 {
-	m_maincpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(abc800c_state::direct_update_handler), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(abc800c_state::direct_update_handler), this));
 }
 
 
@@ -1532,7 +1532,7 @@ DIRECT_UPDATE_MEMBER( abc800m_state::direct_update_handler )
 
 DRIVER_INIT_MEMBER(abc800m_state,driver_init)
 {
-	m_maincpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(abc800m_state::direct_update_handler), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(abc800m_state::direct_update_handler), this));
 }
 
 
@@ -1556,7 +1556,7 @@ DIRECT_UPDATE_MEMBER( abc802_state::direct_update_handler )
 
 DRIVER_INIT_MEMBER(abc802_state,driver_init)
 {
-	m_maincpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(abc802_state::direct_update_handler), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(abc802_state::direct_update_handler), this));
 }
 
 
@@ -1590,7 +1590,7 @@ DIRECT_UPDATE_MEMBER( abc806_state::direct_update_handler )
 
 DRIVER_INIT_MEMBER(abc806_state,driver_init)
 {
-	m_maincpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(abc806_state::direct_update_handler), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(abc806_state::direct_update_handler), this));
 }
 
 

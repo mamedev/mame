@@ -1676,10 +1676,10 @@ static CPU_INIT( tms32025 )
 	cpustate->intRAM = auto_alloc_array(device->machine(), UINT16, 0x800);
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->data = &device->space(AS_DATA);
+	cpustate->io = &device->space(AS_IO);
 
 	device->save_item(NAME(cpustate->PC));
 	device->save_item(NAME(cpustate->STR0));

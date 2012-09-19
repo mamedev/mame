@@ -89,7 +89,7 @@ VIDEO_START_MEMBER(blstroid_state,blstroid)
 
 static TIMER_CALLBACK( irq_off )
 {
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* clear the interrupt */
 	atarigen_scanline_int_ack_w(space, 0, 0, 0xffff);

@@ -1068,7 +1068,7 @@ DRIVER_INIT_MEMBER(ladybug_state,dorodon)
 	/* decode the opcodes */
 
 	offs_t i;
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x6000);
 	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	UINT8 *table = machine().root_device().memregion("user1")->base();

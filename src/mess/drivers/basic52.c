@@ -80,7 +80,7 @@ INPUT_PORTS_END
 static void to_term(device_t *device, int data )
 {
 	basic52_state *state = device->machine().driver_data<basic52_state>();
-	address_space &space = *device->memory().space(AS_PROGRAM);
+	address_space &space = device->memory().space(AS_PROGRAM);
 	state->m_terminal->write(space, 0, data);
 }
 

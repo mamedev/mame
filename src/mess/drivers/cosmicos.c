@@ -252,22 +252,22 @@ INPUT_CHANGED_MEMBER( cosmicos_state::clear_data )
 
 void cosmicos_state::set_ram_mode()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 
 	if (m_ram_disable)
 	{
-		program->unmap_readwrite(0xff00, 0xffff);
+		program.unmap_readwrite(0xff00, 0xffff);
 	}
 	else
 	{
 		if (m_ram_protect)
 		{
-			program->install_rom(0xff00, 0xffff, ram);
+			program.install_rom(0xff00, 0xffff, ram);
 		}
 		else
 		{
-			program->install_ram(0xff00, 0xffff, ram);
+			program.install_ram(0xff00, 0xffff, ram);
 		}
 	}
 }
@@ -486,7 +486,7 @@ static COSMAC_INTERFACE( cosmicos_config )
 
 void cosmicos_state::machine_start()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* initialize LED display */
 	m_led->rbi_w(1);
@@ -495,11 +495,11 @@ void cosmicos_state::machine_start()
 	switch (m_ram->size())
 	{
 	case 256:
-		program->unmap_readwrite(0x0000, 0xbfff);
+		program.unmap_readwrite(0x0000, 0xbfff);
 		break;
 
 	case 4*1024:
-		program->unmap_readwrite(0x1000, 0xbfff);
+		program.unmap_readwrite(0x1000, 0xbfff);
 		break;
 	}
 
@@ -622,9 +622,9 @@ DIRECT_UPDATE_MEMBER(cosmicos_state::cosmicos_direct_update_handler)
 
 DRIVER_INIT_MEMBER(cosmicos_state,cosmicos)
 {
-	address_space *program = machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM);
+	address_space &program = machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 
-	program->set_direct_update_handler(direct_update_delegate(FUNC(cosmicos_state::cosmicos_direct_update_handler), this));
+	program.set_direct_update_handler(direct_update_delegate(FUNC(cosmicos_state::cosmicos_direct_update_handler), this));
 }
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME    FLAGS */

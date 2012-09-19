@@ -513,12 +513,12 @@ static WRITE16_DEVICE_HANDLER( p8k_16_pio_w )
 
 static READ16_DEVICE_HANDLER( p8k_16_ctc_r )
 {
-	return (UINT16)downcast<z80ctc_device *>(device)->read(*device->machine().memory().first_space(),(offset & 0x06) >> 1);
+	return (UINT16)downcast<z80ctc_device *>(device)->read(device->machine().driver_data()->generic_space(),(offset & 0x06) >> 1);
 }
 
 static WRITE16_DEVICE_HANDLER( p8k_16_ctc_w )
 {
-	downcast<z80ctc_device *>(device)->write(*device->machine().memory().first_space(), (offset & 0x06) >> 1, (UINT8)(data & 0xff));
+	downcast<z80ctc_device *>(device)->write(device->machine().driver_data()->generic_space(), (offset & 0x06) >> 1, (UINT8)(data & 0xff));
 }
 
 READ16_MEMBER( p8k_state::portff82_r )

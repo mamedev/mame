@@ -4573,8 +4573,8 @@ DRIVER_INIT_MEMBER(nmk16_state,bjtwin)
 READ16_MEMBER(nmk16_state::vandykeb_r){ return 0x0000; }
 DRIVER_INIT_MEMBER(nmk16_state,vandykeb)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x08000e, 0x08000f, read16_delegate(FUNC(nmk16_state::vandykeb_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x08001e, 0x08001f);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x08000e, 0x08000f, read16_delegate(FUNC(nmk16_state::vandykeb_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x08001e, 0x08001f);
 }
 
 

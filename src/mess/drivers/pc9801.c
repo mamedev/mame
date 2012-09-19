@@ -2611,7 +2611,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9821)
 INTERRUPT_GEN_MEMBER(pc9801_state::pc9801_vrtc_irq)
 {
 	#if 0
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	static UINT8 test;
 
 	if(machine().input().code_pressed_once(JOYCODE_BUTTON1))

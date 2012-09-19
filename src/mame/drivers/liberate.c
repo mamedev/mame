@@ -69,9 +69,9 @@ WRITE8_MEMBER(liberate_state::deco16_bank_w)
 	m_bank = data;
 
 	if (m_bank)
-		m_maincpu->space(AS_PROGRAM)->install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::deco16_io_r),this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::deco16_io_r),this));
 	else
-		m_maincpu->space(AS_PROGRAM)->install_read_bank(0x8000, 0x800f, "bank1");
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0x800f, "bank1");
 }
 
 READ8_MEMBER(liberate_state::prosoccr_bank_r)
@@ -174,9 +174,9 @@ WRITE8_MEMBER(liberate_state::prosoccr_io_bank_w)
 	m_bank = data & 1;
 
 	if (m_bank)
-		m_maincpu->space(AS_PROGRAM)->install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::deco16_io_r),this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::deco16_io_r),this));
 	else
-		m_maincpu->space(AS_PROGRAM)->install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::prosoccr_charram_r),this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::prosoccr_charram_r),this));
 
 }
 
@@ -1345,7 +1345,7 @@ ROM_END
 
 static void sound_cpu_decrypt(running_machine &machine)
 {
-	address_space &space = *machine.device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("audiocpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = machine.root_device().memregion("audiocpu")->base();
 	int i;
@@ -1373,13 +1373,13 @@ DRIVER_INIT_MEMBER(liberate_state,yellowcb)
 {
 	DRIVER_INIT_CALL(prosport);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xa000, 0xa000, "IN0");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0xa000, 0xa000, "IN0");
 }
 
 DRIVER_INIT_MEMBER(liberate_state,liberate)
 {
 	int A;
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
 	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 

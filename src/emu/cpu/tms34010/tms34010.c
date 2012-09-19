@@ -626,7 +626,7 @@ static CPU_INIT( tms34010 )
 	tms->config = configdata;
 	tms->irq_callback = irqcallback;
 	tms->device = device;
-	tms->program = device->space(AS_PROGRAM);
+	tms->program = &device->space(AS_PROGRAM);
 	tms->direct = &tms->program->direct();
 	tms->screen = downcast<screen_device *>(device->machine().device(configdata->screen_tag));
 
@@ -688,7 +688,7 @@ static CPU_RESET( tms34010 )
 	tms->irq_callback = save_irqcallback;
 	tms->scantimer = save_scantimer;
 	tms->device = device;
-	tms->program = device->space(AS_PROGRAM);
+	tms->program = &device->space(AS_PROGRAM);
 	tms->direct = &tms->program->direct();
 
 	/* fetch the initial PC and reset the state */
@@ -699,7 +699,7 @@ static CPU_RESET( tms34010 )
 	/* the first time we are run */
 	tms->reset_deferred = tms->config->halt_on_reset;
 	if (tms->config->halt_on_reset)
-		tms34010_io_register_w(*device->space(AS_PROGRAM), REG_HSTCTLH, 0x8000, 0xffff);
+		tms34010_io_register_w(device->space(AS_PROGRAM), REG_HSTCTLH, 0x8000, 0xffff);
 }
 
 
@@ -1630,7 +1630,7 @@ void tms34010_host_w(device_t *cpu, int reg, int data)
 		case TMS34010_HOST_CONTROL:
 		{
 			tms->external_host_access = TRUE;
-			address_space &space = *tms->device->space(AS_PROGRAM);
+			address_space &space = tms->device->space(AS_PROGRAM);
 			tms34010_io_register_w(space, REG_HSTCTLH, data & 0xff00, 0xffff);
 			tms34010_io_register_w(space, REG_HSTCTLL, data & 0x00ff, 0xffff);
 			tms->external_host_access = FALSE;

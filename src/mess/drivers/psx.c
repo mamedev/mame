@@ -431,7 +431,7 @@ DIRECT_UPDATE_MEMBER(psx1_state::psx_setopbase)
 	{
 		device_t *cpu = machine().device("maincpu");
 
-		machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(psx1_state::psx_default), this));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(psx1_state::psx_default), this));
 
 		if( load_psxexe( cpu, m_exe_buffer, m_exe_size ) ||
 			load_cpe( cpu, m_exe_buffer, m_exe_size ) ||
@@ -455,7 +455,7 @@ DIRECT_UPDATE_MEMBER(psx1_state::psx_setopbase)
 static QUICKLOAD_LOAD( psx_exe_load )
 {
 	psx1_state *state = image.device().machine().driver_data<psx1_state>();
-	address_space &space = *image.device().machine().device( "maincpu")->memory().space( AS_PROGRAM );
+	address_space &space = image.device().machine().device( "maincpu")->memory().space( AS_PROGRAM );
 
 	state->m_exe_size = 0;
 	state->m_exe_buffer = (UINT8*)malloc( quickload_size );

@@ -62,7 +62,7 @@ static void drgwld2_common_init(running_machine &machine)
     select and after failing in the 2nd stage (probably there are other checks
     out there).
     */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd80000, 0xd80003, FUNC(dw2_d80000_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xd80000, 0xd80003, FUNC(dw2_d80000_r));
 }
 
 DRIVER_INIT_MEMBER(pgm_state,drgw2)

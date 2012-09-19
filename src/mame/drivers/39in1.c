@@ -280,7 +280,7 @@ static void pxa255_dma_load_descriptor_and_start(running_machine& machine, int c
 
 	// Load the next descriptor
 
-	address_space &space = *machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+	address_space &space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
 	dma_regs->dsadr[channel] = space.read_dword(dma_regs->ddadr[channel] + 0x4);
 	dma_regs->dtadr[channel] = space.read_dword(dma_regs->ddadr[channel] + 0x8);
 	dma_regs->dcmd[channel]  = space.read_dword(dma_regs->ddadr[channel] + 0xc);
@@ -320,7 +320,7 @@ static TIMER_CALLBACK( pxa255_dma_dma_end )
 	UINT16 temp16;
 	UINT32 temp32;
 
-	address_space &space = *machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+	address_space &space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
 	switch(param)
 	{
 		case 3:
@@ -1113,7 +1113,7 @@ static void pxa255_lcd_dma_kickoff(running_machine& machine, int channel)
 
 		if(lcd_regs->dma[channel].ldcmd & PXA255_LDCMD_PAL)
 		{
-			address_space &space = *machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+			address_space &space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
 			int length = lcd_regs->dma[channel].ldcmd & 0x000fffff;
 			int index = 0;
 			for(index = 0; index < length; index += 2)
@@ -1125,7 +1125,7 @@ static void pxa255_lcd_dma_kickoff(running_machine& machine, int channel)
 		}
 		else
 		{
-			address_space &space = *machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+			address_space &space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
 			int length = lcd_regs->dma[channel].ldcmd & 0x000fffff;
 			int index = 0;
 			for(index = 0; index < length; index++)
@@ -1145,7 +1145,7 @@ static void pxa255_lcd_check_load_next_branch(running_machine& machine, int chan
 	{
 		verboselog( machine, 4, "pxa255_lcd_check_load_next_branch: Taking branch\n" );
 		lcd_regs->fbr[channel] &= ~1;
-		address_space &space = *machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+		address_space &space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
 		//lcd_regs->fbr[channel] = (space.read_dword(lcd_regs->fbr[channel] & 0xfffffff0) & 0xfffffff0) | (lcd_regs->fbr[channel] & 0x00000003);
 		//printf( "%08x\n", lcd_regs->fbr[channel] );
 		pxa255_lcd_load_dma_descriptor(space, lcd_regs->fbr[channel] & 0xfffffff0, 0);
@@ -1466,7 +1466,7 @@ DRIVER_INIT_MEMBER(_39in1_state,39in1)
 	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
 	m_eeprom = machine().device<eeprom_device>("eeprom");
 
-	address_space &space = *machine().device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+	address_space &space = machine().device<pxa255_device>("maincpu")->space(AS_PROGRAM);
 	space.install_read_handler (0xa0151648, 0xa015164b, read32_delegate(FUNC(_39in1_state::prot_cheater_r), this));
 }
 

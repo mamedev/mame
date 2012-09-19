@@ -165,9 +165,9 @@ static CPU_INIT( tms7000 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	memset(cpustate->pf, 0, 0x100);
 	memset(cpustate->rf, 0, 0x80);

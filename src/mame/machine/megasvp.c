@@ -354,13 +354,13 @@ void svp_init(running_machine &machine)
 
 	/* SVP stuff */
 	state->m_dram = auto_alloc_array(machine, UINT8, 0x20000);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x300000, 0x31ffff, state->m_dram);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15000, 0xa150ff, FUNC(svp_68k_io_r), FUNC(svp_68k_io_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x300000, 0x31ffff, state->m_dram);
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xa15000, 0xa150ff, FUNC(svp_68k_io_r), FUNC(svp_68k_io_w));
 	// "cell arrange" 1 and 2
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x390000, 0x39ffff, FUNC(svp_68k_cell1_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3a0000, 0x3affff, FUNC(svp_68k_cell2_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x390000, 0x39ffff, FUNC(svp_68k_cell1_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x3a0000, 0x3affff, FUNC(svp_68k_cell2_r));
 
-	machine.device("svp")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x438, 0x438, FUNC(svp_speedup_r));
+	machine.device("svp")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x438, 0x438, FUNC(svp_speedup_r));
 
 	state->m_iram = auto_alloc_array(machine, UINT8, 0x800);
 	state->membank("bank3")->set_base(state->m_iram);

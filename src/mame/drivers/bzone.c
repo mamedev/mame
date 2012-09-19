@@ -876,7 +876,7 @@ WRITE8_MEMBER(bzone_state::analog_select_w)
 
 DRIVER_INIT_MEMBER(bzone_state,bradley)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	space.install_ram(0x400, 0x7ff);
 	space.install_read_port(0x1808, 0x1808, "1808");
 	space.install_read_port(0x1809, 0x1809, "1809");

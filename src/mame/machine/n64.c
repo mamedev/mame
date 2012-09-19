@@ -75,7 +75,7 @@ void n64_periphs::device_reset()
 
 	maincpu = machine().device("maincpu");
 	rspcpu = machine().device("rsp");
-	mem_map = maincpu->memory().space(AS_PROGRAM);
+	mem_map = &maincpu->memory().space(AS_PROGRAM);
 
 	mi_version = 0x01010101;
 	mi_interrupt = 0;

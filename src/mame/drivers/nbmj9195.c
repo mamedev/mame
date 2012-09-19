@@ -636,7 +636,7 @@ static Z80CTC_INTERFACE( ctc_intf_audio )
 
 void nbmj9195_state::machine_reset()
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	// initialize TMPZ84C011 PIO
@@ -649,7 +649,7 @@ void nbmj9195_state::machine_reset()
 
 DRIVER_INIT_MEMBER(nbmj9195_state,nbmj9195)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ROM = memregion("audiocpu")->base();
 
 	// sound program patch

@@ -2471,7 +2471,7 @@ READ16_MEMBER(vamphalf_state::boonggab_speedup_r)
 
 DRIVER_INIT_MEMBER(vamphalf_state,vamphalf)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0004a840, 0x0004a843, read16_delegate(FUNC(vamphalf_state::vamphalf_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x0004a840, 0x0004a843, read16_delegate(FUNC(vamphalf_state::vamphalf_speedup_r), this));
 
 	m_palshift = 0;
 	m_flip_bit = 0x80;
@@ -2479,7 +2479,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,vamphalf)
 
 DRIVER_INIT_MEMBER(vamphalf_state,vamphafk)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0004a6d0, 0x0004a6d3, read16_delegate(FUNC(vamphalf_state::vamphafk_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x0004a6d0, 0x0004a6d3, read16_delegate(FUNC(vamphalf_state::vamphafk_speedup_r), this));
 
 	m_palshift = 0;
 	m_flip_bit = 0x80;
@@ -2487,19 +2487,19 @@ DRIVER_INIT_MEMBER(vamphalf_state,vamphafk)
 
 DRIVER_INIT_MEMBER(vamphalf_state,misncrft)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00072eb4, 0x00072eb7, read16_delegate(FUNC(vamphalf_state::misncrft_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00072eb4, 0x00072eb7, read16_delegate(FUNC(vamphalf_state::misncrft_speedup_r), this));
 
 	m_palshift = 0;
 	m_flip_bit = 1;
 
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
-	machine().device("qs1000:cpu")->memory().space(AS_IO)->install_read_bank(0x0100, 0xffff, "data");
+	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "data");
 	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
 }
 
 DRIVER_INIT_MEMBER(vamphalf_state,coolmini)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x000d2e80, 0x000d2e83, read16_delegate(FUNC(vamphalf_state::coolmini_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x000d2e80, 0x000d2e83, read16_delegate(FUNC(vamphalf_state::coolmini_speedup_r), this));
 
 	m_palshift = 0;
 	m_flip_bit = 1;
@@ -2507,7 +2507,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,coolmini)
 
 DRIVER_INIT_MEMBER(vamphalf_state,suplup)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0011605c, 0x0011605f, read16_delegate(FUNC(vamphalf_state::suplup_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x0011605c, 0x0011605f, read16_delegate(FUNC(vamphalf_state::suplup_speedup_r), this));
 
 	m_palshift = 8;
 	/* no flipscreen */
@@ -2515,7 +2515,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,suplup)
 
 DRIVER_INIT_MEMBER(vamphalf_state,luplup)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00115e84, 0x00115e87, read16_delegate(FUNC(vamphalf_state::luplup_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00115e84, 0x00115e87, read16_delegate(FUNC(vamphalf_state::luplup_speedup_r), this));
 
 	m_palshift = 8;
 	/* no flipscreen */
@@ -2523,7 +2523,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,luplup)
 
 DRIVER_INIT_MEMBER(vamphalf_state,luplup29)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00113f08, 0x00113f0b, read16_delegate(FUNC(vamphalf_state::luplup29_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00113f08, 0x00113f0b, read16_delegate(FUNC(vamphalf_state::luplup29_speedup_r), this));
 
 	m_palshift = 8;
 	/* no flipscreen */
@@ -2531,7 +2531,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,luplup29)
 
 DRIVER_INIT_MEMBER(vamphalf_state,puzlbang)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00113ecc, 0x00113ecf, read16_delegate(FUNC(vamphalf_state::puzlbang_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00113ecc, 0x00113ecf, read16_delegate(FUNC(vamphalf_state::puzlbang_speedup_r), this));
 
 	m_palshift = 8;
 	/* no flipscreen */
@@ -2539,8 +2539,8 @@ DRIVER_INIT_MEMBER(vamphalf_state,puzlbang)
 
 DRIVER_INIT_MEMBER(vamphalf_state,wyvernwg)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00b56fc, 0x00b56ff, read32_delegate(FUNC(vamphalf_state::wyvernwg_speedup_r), this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00b74f8, 0x00b74fb, read32_delegate(FUNC(vamphalf_state::wyvernwga_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00b56fc, 0x00b56ff, read32_delegate(FUNC(vamphalf_state::wyvernwg_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00b74f8, 0x00b74fb, read32_delegate(FUNC(vamphalf_state::wyvernwga_speedup_r), this));
 
 	m_palshift = 0;
 	m_flip_bit = 1;
@@ -2550,7 +2550,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,wyvernwg)
 	m_semicom_prot_data[1] = 1;
 
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
-	machine().device("qs1000:cpu")->memory().space(AS_IO)->install_read_bank(0x0100, 0xffff, "data");
+	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "data");
 	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
 }
 
@@ -2558,7 +2558,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
 {
 	m_finalgdr_backupram_bank = 1;
 	m_finalgdr_backupram = auto_alloc_array(machine(), UINT8, 0x80*0x100);
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x005e874, 0x005e877, read32_delegate(FUNC(vamphalf_state::finalgdr_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x005e874, 0x005e877, read32_delegate(FUNC(vamphalf_state::finalgdr_speedup_r), this));
 	machine().device<nvram_device>("nvram")->set_base(m_finalgdr_backupram, 0x80*0x100);
 
 	m_palshift = 0;
@@ -2574,7 +2574,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,mrkicker)
 	// backup ram isn't used
 	m_finalgdr_backupram_bank = 1;
 	m_finalgdr_backupram = auto_alloc_array(machine(), UINT8, 0x80*0x100);
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00701a4, 0x00701a7, read32_delegate(FUNC(vamphalf_state::mrkicker_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00701a4, 0x00701a7, read32_delegate(FUNC(vamphalf_state::mrkicker_speedup_r), this));
 	machine().device<nvram_device>("nvram")->set_base(m_finalgdr_backupram, 0x80*0x100);
 
 	m_palshift = 0;
@@ -2587,7 +2587,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,mrkicker)
 
 DRIVER_INIT_MEMBER(vamphalf_state,dquizgo2)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00cde70, 0x00cde73, read16_delegate(FUNC(vamphalf_state::dquizgo2_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00cde70, 0x00cde73, read16_delegate(FUNC(vamphalf_state::dquizgo2_speedup_r), this));
 
 	m_palshift = 0;
 	m_flip_bit = 1;
@@ -2595,7 +2595,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,dquizgo2)
 
 DRIVER_INIT_MEMBER(vamphalf_state,dtfamily)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xcc2a8, 0xcc2a9, read16_delegate(FUNC(vamphalf_state::dtfamily_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xcc2a8, 0xcc2a9, read16_delegate(FUNC(vamphalf_state::dtfamily_speedup_r), this));
 
 	m_palshift = 0;
 	m_flip_bit = 1;
@@ -2604,7 +2604,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,dtfamily)
 
 DRIVER_INIT_MEMBER(vamphalf_state,toyland)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x780d8, 0x780d9, read16_delegate(FUNC(vamphalf_state::toyland_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x780d8, 0x780d9, read16_delegate(FUNC(vamphalf_state::toyland_speedup_r), this));
 
 	m_palshift = 0;
 	m_flip_bit = 1;
@@ -2612,7 +2612,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,toyland)
 
 DRIVER_INIT_MEMBER(vamphalf_state,aoh)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x028a09c, 0x028a09f, read32_delegate(FUNC(vamphalf_state::aoh_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x028a09c, 0x028a09f, read32_delegate(FUNC(vamphalf_state::aoh_speedup_r), this));
 
 	m_palshift = 0;
 	/* no flipscreen */
@@ -2620,16 +2620,16 @@ DRIVER_INIT_MEMBER(vamphalf_state,aoh)
 
 DRIVER_INIT_MEMBER(vamphalf_state,jmpbreak)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00906fc, 0x00906ff, read16_delegate(FUNC(vamphalf_state::jmpbreak_speedup_r), this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe0000000, 0xe0000003, write16_delegate(FUNC(vamphalf_state::jmpbreak_flipscreen_w), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00906fc, 0x00906ff, read16_delegate(FUNC(vamphalf_state::jmpbreak_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16_delegate(FUNC(vamphalf_state::jmpbreak_flipscreen_w), this));
 
 	m_palshift = 0;
 }
 
 DRIVER_INIT_MEMBER(vamphalf_state,mrdig)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00a99c, 0x00a99f, read16_delegate(FUNC(vamphalf_state::mrdig_speedup_r), this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe0000000, 0xe0000003, write16_delegate(FUNC(vamphalf_state::jmpbreak_flipscreen_w), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00a99c, 0x00a99f, read16_delegate(FUNC(vamphalf_state::mrdig_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16_delegate(FUNC(vamphalf_state::jmpbreak_flipscreen_w), this));
 
 	m_palshift = 0;
 }
@@ -2637,7 +2637,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,mrdig)
 
 DRIVER_INIT_MEMBER(vamphalf_state,boonggab)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x000f1b7c, 0x000f1b7f, read16_delegate(FUNC(vamphalf_state::boonggab_speedup_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x000f1b7c, 0x000f1b7f, read16_delegate(FUNC(vamphalf_state::boonggab_speedup_r), this));
 
 	m_palshift = 0;
 	m_has_extra_gfx = 1;

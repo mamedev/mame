@@ -231,13 +231,13 @@ WRITE16_MEMBER(harddriv_state::hdsnd68k_320ram_w)
 
 READ16_MEMBER(harddriv_state::hdsnd68k_320ports_r)
 {
-	return m_sounddsp->space(AS_IO)->read_word((offset & 7) << 1);
+	return m_sounddsp->space(AS_IO).read_word((offset & 7) << 1);
 }
 
 
 WRITE16_MEMBER(harddriv_state::hdsnd68k_320ports_w)
 {
-	m_sounddsp->space(AS_IO)->write_word((offset & 7) << 1, data);
+	m_sounddsp->space(AS_IO).write_word((offset & 7) << 1, data);
 }
 
 

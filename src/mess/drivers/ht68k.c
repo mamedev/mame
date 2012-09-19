@@ -97,7 +97,7 @@ static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 static void duart_tx(device_t *device, int channel, UINT8 data)
 {
 	ht68k_state *state = device->machine().driver_data<ht68k_state>();
-	state->m_terminal->write(*device->machine().memory().first_space(), 0, data);
+	state->m_terminal->write(device->machine().driver_data()->generic_space(), 0, data);
 }
 
 static UINT8 duart_input(device_t *device)

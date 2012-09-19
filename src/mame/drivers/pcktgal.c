@@ -411,7 +411,7 @@ ROM_END
 DRIVER_INIT_MEMBER(pcktgal_state,deco222)
 {
 	int A;
-	address_space &space = *machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("audiocpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
 	UINT8 *rom = machine().root_device().memregion("audiocpu")->base();
 

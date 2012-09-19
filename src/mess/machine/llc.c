@@ -152,7 +152,7 @@ DRIVER_INIT_MEMBER(llc_state,llc2)
 
 MACHINE_RESET_MEMBER(llc_state,llc2)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	space.unmap_write(0x0000, 0x3fff);
 	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
@@ -170,34 +170,34 @@ MACHINE_RESET_MEMBER(llc_state,llc2)
 
 WRITE8_MEMBER(llc_state::llc2_rom_disable_w)
 {
-	address_space *mem_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &mem_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
-	mem_space->install_write_bank(0x0000, 0xbfff, "bank1");
+	mem_space.install_write_bank(0x0000, 0xbfff, "bank1");
 	membank("bank1")->set_base(ram);
 
-	mem_space->install_write_bank(0x4000, 0x5fff, "bank2");
+	mem_space.install_write_bank(0x4000, 0x5fff, "bank2");
 	membank("bank2")->set_base(ram + 0x4000);
 
-	mem_space->install_write_bank(0x6000, 0xbfff, "bank3");
+	mem_space.install_write_bank(0x6000, 0xbfff, "bank3");
 	membank("bank3")->set_base(ram + 0x6000);
 
-	mem_space->install_write_bank(0xc000, 0xffff, "bank4");
+	mem_space.install_write_bank(0xc000, 0xffff, "bank4");
 	membank("bank4")->set_base(ram + 0xc000);
 
 }
 
 WRITE8_MEMBER(llc_state::llc2_basic_enable_w)
 {
-	address_space *mem_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &mem_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	if (data & 0x02)
 	{
-		mem_space->unmap_write(0x4000, 0x5fff);
+		mem_space.unmap_write(0x4000, 0x5fff);
 		membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base() + 0x10000);
 	}
 	else
 	{
-		mem_space->install_write_bank(0x4000, 0x5fff, "bank2");
+		mem_space.install_write_bank(0x4000, 0x5fff, "bank2");
 		membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x4000);
 	}
 

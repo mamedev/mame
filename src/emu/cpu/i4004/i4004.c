@@ -462,10 +462,10 @@ static CPU_INIT( i4004 )
 
 	cpustate->device = device;
 
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->data = &device->space(AS_DATA);
+	cpustate->io = &device->space(AS_IO);
 
 	device->save_item(NAME(cpustate->PC));
 	device->save_item(NAME(cpustate->A));

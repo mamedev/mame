@@ -1369,7 +1369,7 @@ void segas16b_state::altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoff
 	m_maincpu->set_input_line(4, HOLD_LINE);
 
 	// set tile banks
-	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	rom_5704_bank_w(space, 1, m_workram[0x3094/2] & 0x00ff, 0x00ff);
 
 	// process any new sound data
@@ -1414,7 +1414,7 @@ void segas16b_state::ddux_i8751_sim()
 	UINT16 temp = m_workram[0x0bd0/2];
 	if ((temp & 0xff00) != 0x0000)
 	{
-		address_space &space = *m_maincpu->space(AS_PROGRAM);
+		address_space &space = m_maincpu->space(AS_PROGRAM);
 		m_mapper->write(space, 0x03, temp >> 8);
 		m_workram[0x0bd0/2] = temp & 0x00ff;
 	}
@@ -1444,7 +1444,7 @@ void segas16b_state::goldnaxe_i8751_sim()
 	UINT16 temp = m_workram[0x2cfc/2];
 	if ((temp & 0xff00) != 0x0000)
 	{
-		address_space &space = *m_maincpu->space(AS_PROGRAM);
+		address_space &space = m_maincpu->space(AS_PROGRAM);
 		m_mapper->write(space, 0x03, temp >> 8);
 		m_workram[0x2cfc/2] = temp & 0x00ff;
 	}
@@ -1471,7 +1471,7 @@ void segas16b_state::tturf_i8751_sim()
 	temp = m_workram[0x01d0/2];
 	if ((temp & 0xff00) != 0x0000)
 	{
-		address_space &space = *m_maincpu->space(AS_PROGRAM);
+		address_space &space = m_maincpu->space(AS_PROGRAM);
 		m_mapper->write(space, 0x03, temp);
 		m_workram[0x01d0/2] = temp & 0x00ff;
 	}
@@ -1497,7 +1497,7 @@ void segas16b_state::wb3_i8751_sim()
 	UINT16 temp = m_workram[0x0008/2];
 	if ((temp & 0x00ff) != 0x0000)
 	{
-		address_space &space = *m_maincpu->space(AS_PROGRAM);
+		address_space &space = m_maincpu->space(AS_PROGRAM);
 		m_mapper->write(space, 0x03, temp >> 8);
 		m_workram[0x0008/2] = temp & 0xff00;
 	}

@@ -417,7 +417,7 @@ static void init_common(int isdsp, legacy_cpu_device *device, device_irq_acknowl
 
 	jaguar->irq_callback = irqcallback;
 	jaguar->device = device;
-	jaguar->program = device->space(AS_PROGRAM);
+	jaguar->program = &device->space(AS_PROGRAM);
 	jaguar->direct = &jaguar->program->direct();
 	if (configdata != NULL)
 		jaguar->cpu_interrupt = configdata->cpu_int_callback;

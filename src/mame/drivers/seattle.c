@@ -1403,7 +1403,7 @@ static void voodoo_stall(device_t *device, int stall)
 		for (which = 0; which < 4; which++)
 			if (state->m_galileo.dma_stalled_on_voodoo[which])
 			{
-				address_space &space = *device->machine().device("maincpu")->memory().space(AS_PROGRAM);
+				address_space &space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 				if (LOG_DMA) logerror("Resuming DMA%d on voodoo\n", which);
 
 				/* mark this DMA as no longer stalled */
@@ -1420,7 +1420,7 @@ static void voodoo_stall(device_t *device, int stall)
 			/* if the CPU had a pending write, do it now */
 			if (state->m_cpu_stalled_on_voodoo)
 			{
-				address_space &space = *device->machine().firstcpu->space(AS_PROGRAM);
+				address_space &space = device->machine().firstcpu->space(AS_PROGRAM);
 				voodoo_w(device, space, state->m_cpu_stalled_offset, state->m_cpu_stalled_data, state->m_cpu_stalled_mem_mask);
 			}
 			state->m_cpu_stalled_on_voodoo = FALSE;
@@ -1588,7 +1588,7 @@ READ32_MEMBER(seattle_state::widget_r)
 			break;
 
 		case WREG_ANALOG:
-			result = analog_port_r(*machine().device("maincpu")->memory().space(AS_PROGRAM), 0, mem_mask);
+			result = analog_port_r(machine().device("maincpu")->memory().space(AS_PROGRAM), 0, mem_mask);
 			break;
 
 		case WREG_ETHER_DATA:
@@ -1620,7 +1620,7 @@ WRITE32_MEMBER(seattle_state::widget_w)
 			break;
 
 		case WREG_ANALOG:
-			analog_port_w(*machine().device("maincpu")->memory().space(AS_PROGRAM), 0, data, mem_mask);
+			analog_port_w(machine().device("maincpu")->memory().space(AS_PROGRAM), 0, data, mem_mask);
 			break;
 
 		case WREG_ETHER_DATA:
@@ -2873,20 +2873,20 @@ static void init_common(running_machine &machine, int ioasic, int serialnum, int
 	{
 		case PHOENIX_CONFIG:
 			/* original Phoenix board only has 4MB of RAM */
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_readwrite(0x00400000, 0x007fffff);
+			machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_readwrite(0x00400000, 0x007fffff);
 			break;
 
 		case SEATTLE_WIDGET_CONFIG:
 			/* set up the widget board */
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x16c00000, 0x16c0001f, read32_delegate(FUNC(seattle_state::widget_r),state), write32_delegate(FUNC(seattle_state::widget_w),state));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x16c00000, 0x16c0001f, read32_delegate(FUNC(seattle_state::widget_r),state), write32_delegate(FUNC(seattle_state::widget_w),state));
 			break;
 
 		case FLAGSTAFF_CONFIG:
 			/* set up the analog inputs */
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x14000000, 0x14000003, read32_delegate(FUNC(seattle_state::analog_port_r),state), write32_delegate(FUNC(seattle_state::analog_port_w),state));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x14000000, 0x14000003, read32_delegate(FUNC(seattle_state::analog_port_r),state), write32_delegate(FUNC(seattle_state::analog_port_w),state));
 
 			/* set up the ethernet controller */
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x16c00000, 0x16c0003f, read32_delegate(FUNC(seattle_state::ethernet_r),state), write32_delegate(FUNC(seattle_state::ethernet_w),state));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x16c00000, 0x16c0003f, read32_delegate(FUNC(seattle_state::ethernet_r),state), write32_delegate(FUNC(seattle_state::ethernet_w),state));
 			break;
 	}
 }
@@ -3014,7 +3014,7 @@ DRIVER_INIT_MEMBER(seattle_state,carnevil)
 	init_common(machine(), MIDWAY_IOASIC_CARNEVIL, 469/* 469 or 486 or 528 */, 80, SEATTLE_CONFIG);
 
 	/* set up the gun */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x16800000, 0x1680001f, read32_delegate(FUNC(seattle_state::carnevil_gun_r),this), write32_delegate(FUNC(seattle_state::carnevil_gun_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x16800000, 0x1680001f, read32_delegate(FUNC(seattle_state::carnevil_gun_r),this), write32_delegate(FUNC(seattle_state::carnevil_gun_w),this));
 
 	/* speedups */
 	mips3drc_add_hotspot(machine().device("maincpu"), 0x8015176C, 0x3C03801A, 250);		/* confirmed */

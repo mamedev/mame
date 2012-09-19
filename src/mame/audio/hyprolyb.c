@@ -24,7 +24,7 @@ static DEVICE_START( hyprolyb_adpcm )
 {
 	hyprolyb_adpcm_state *state = get_safe_token(device);
 
-	state->m_space = device->machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	state->m_space = &device->machine().device("audiocpu")->memory().space(AS_PROGRAM);
 	state->m_msm = device->machine().device("msm");
 	device->save_item(NAME(state->m_adpcm_ready));	// only bootlegs
 	device->save_item(NAME(state->m_adpcm_busy));

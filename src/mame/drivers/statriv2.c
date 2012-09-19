@@ -1128,8 +1128,8 @@ WRITE8_MEMBER(statriv2_state::laserdisc_io_w)
 
 DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
 {
-	address_space *iospace = machine().device("maincpu")->memory().space(AS_IO);
-	iospace->install_readwrite_handler(0x28, 0x2b, read8_delegate(FUNC(statriv2_state::laserdisc_io_r), this), write8_delegate(FUNC(statriv2_state::laserdisc_io_w), this));
+	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
+	iospace.install_readwrite_handler(0x28, 0x2b, read8_delegate(FUNC(statriv2_state::laserdisc_io_r), this), write8_delegate(FUNC(statriv2_state::laserdisc_io_w), this));
 }
 
 

@@ -197,29 +197,29 @@ static WRITE8_DEVICE_HANDLER( sym1_via0_b_w )
  */
 static WRITE8_DEVICE_HANDLER( sym1_via2_a_w )
 {
-	address_space *cpu0space = device->machine().device( "maincpu")->memory().space( AS_PROGRAM );
+	address_space &cpu0space = device->machine().device( "maincpu")->memory().space( AS_PROGRAM );
 
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
 	if ((device->machine().root_device().ioport("WP")->read() & 0x01) && !(data & 0x01)) {
-		cpu0space->nop_write(0xa600, 0xa67f);
+		cpu0space.nop_write(0xa600, 0xa67f);
 	} else {
-		cpu0space->install_write_bank(0xa600, 0xa67f, "bank5");
+		cpu0space.install_write_bank(0xa600, 0xa67f, "bank5");
 	}
 	if ((device->machine().root_device().ioport("WP")->read() & 0x02) && !(data & 0x02)) {
-		cpu0space->nop_write(0x0400, 0x07ff);
+		cpu0space.nop_write(0x0400, 0x07ff);
 	} else {
-		cpu0space->install_write_bank(0x0400, 0x07ff, "bank2");
+		cpu0space.install_write_bank(0x0400, 0x07ff, "bank2");
 	}
 	if ((device->machine().root_device().ioport("WP")->read() & 0x04) && !(data & 0x04)) {
-		cpu0space->nop_write(0x0800, 0x0bff);
+		cpu0space.nop_write(0x0800, 0x0bff);
 	} else {
-		cpu0space->install_write_bank(0x0800, 0x0bff, "bank3");
+		cpu0space.install_write_bank(0x0800, 0x0bff, "bank3");
 	}
 	if ((device->machine().root_device().ioport("WP")->read() & 0x08) && !(data & 0x08)) {
-		cpu0space->nop_write(0x0c00, 0x0fff);
+		cpu0space.nop_write(0x0c00, 0x0fff);
 	} else {
-		cpu0space->install_write_bank(0x0c00, 0x0fff, "bank4");
+		cpu0space.install_write_bank(0x0c00, 0x0fff, "bank4");
 	}
 }
 
@@ -289,7 +289,7 @@ DRIVER_INIT_MEMBER(sym1_state,sym1)
 	/* wipe expansion memory banks that are not installed */
 	if (machine().device<ram_device>(RAM_TAG)->size() < 4*1024)
 	{
-		machine().device( "maincpu")->memory().space( AS_PROGRAM )->nop_readwrite(
+		machine().device( "maincpu")->memory().space( AS_PROGRAM ).nop_readwrite(
 			machine().device<ram_device>(RAM_TAG)->size(), 0x0fff);
 	}
 
@@ -302,8 +302,8 @@ void sym1_state::machine_reset()
 {
 	/* make 0xf800 to 0xffff point to the last half of the monitor ROM
        so that the CPU can find its reset vectors */
-	machine().device( "maincpu")->memory().space( AS_PROGRAM )->install_read_bank(0xf800, 0xffff, "bank1");
-	machine().device( "maincpu")->memory().space( AS_PROGRAM )->nop_write(0xf800, 0xffff);
+	machine().device( "maincpu")->memory().space( AS_PROGRAM ).install_read_bank(0xf800, 0xffff, "bank1");
+	machine().device( "maincpu")->memory().space( AS_PROGRAM ).nop_write(0xf800, 0xffff);
 	membank("bank1")->set_base(m_monitor + 0x800);
 	machine().device("maincpu")->reset();
 }

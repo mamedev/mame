@@ -617,13 +617,13 @@ static const z80_daisy_config m5_daisy_chain[] =
 
 void m5_state::machine_start()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	// configure RAM
 	switch (m_ram->size())
 	{
 	case 4*1024:
-		program->unmap_readwrite(0x8000, 0xffff);
+		program.unmap_readwrite(0x8000, 0xffff);
 		break;
 
 	case 36*1024:

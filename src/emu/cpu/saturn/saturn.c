@@ -114,7 +114,7 @@ static CPU_INIT( saturn )
 	cpustate->config = (saturn_cpu_core *) device->static_config();
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 
 	device->save_item(NAME(cpustate->reg[R0]));

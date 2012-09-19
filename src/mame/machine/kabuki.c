@@ -161,7 +161,7 @@ static void kabuki_decode(UINT8 *src,UINT8 *dest_op,UINT8 *dest_data,
 
 static void mitchell_decode(running_machine &machine, int swap_key1,int swap_key2,int addr_key,int xor_key)
 {
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, machine.root_device().memregion("maincpu")->bytes());
 	int numbanks = (machine.root_device().memregion("maincpu")->bytes() - 0x10000) / 0x4000;
@@ -202,7 +202,7 @@ void block_decode(running_machine &machine)    { mitchell_decode(machine,0x02461
 
 static void cps1_decode(running_machine &machine,int swap_key1,int swap_key2,int addr_key,int xor_key)
 {
-	address_space &space = *machine.device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("audiocpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 	UINT8 *rom = machine.root_device().memregion("audiocpu")->base();
 

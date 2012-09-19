@@ -2069,7 +2069,7 @@ static TIMER_DEVICE_CALLBACK(cassette_callback)
 static TIMER_DEVICE_CALLBACK(keyboard_callback)
 {
 	pc6001_state *state = timer.machine().driver_data<pc6001_state>();
-	address_space &space = *timer.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = timer.machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 key1 = timer.machine().root_device().ioport("key1")->read();
 	UINT32 key2 = timer.machine().root_device().ioport("key2")->read();
 	UINT32 key3 = timer.machine().root_device().ioport("key3")->read();

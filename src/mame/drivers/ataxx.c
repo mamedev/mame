@@ -711,7 +711,7 @@ DRIVER_INIT_MEMBER(leland_state,ataxx)
 	leland_rotate_memory(machine(), "slave");
 
 	/* set up additional input ports */
-	machine().device("master")->memory().space(AS_IO)->install_read_handler(0x00, 0x03, read8_delegate(FUNC(leland_state::ataxx_trackball_r),this));
+	machine().device("master")->memory().space(AS_IO).install_read_handler(0x00, 0x03, read8_delegate(FUNC(leland_state::ataxx_trackball_r),this));
 }
 
 
@@ -721,7 +721,7 @@ DRIVER_INIT_MEMBER(leland_state,ataxxj)
 	leland_rotate_memory(machine(), "slave");
 
 	/* set up additional input ports */
-	machine().device("master")->memory().space(AS_IO)->install_read_handler(0x00, 0x03, read8_delegate(FUNC(leland_state::ataxx_trackball_r),this));
+	machine().device("master")->memory().space(AS_IO).install_read_handler(0x00, 0x03, read8_delegate(FUNC(leland_state::ataxx_trackball_r),this));
 }
 
 
@@ -731,9 +731,9 @@ DRIVER_INIT_MEMBER(leland_state,wsf)
 	leland_rotate_memory(machine(), "slave");
 
 	/* set up additional input ports */
-	machine().device("master")->memory().space(AS_IO)->install_read_port(0x0d, 0x0d, "P1_P2");
-	machine().device("master")->memory().space(AS_IO)->install_read_port(0x0e, 0x0e, "P3_P4");
-	machine().device("master")->memory().space(AS_IO)->install_read_port(0x0f, 0x0f, "BUTTONS");
+	machine().device("master")->memory().space(AS_IO).install_read_port(0x0d, 0x0d, "P1_P2");
+	machine().device("master")->memory().space(AS_IO).install_read_port(0x0e, 0x0e, "P3_P4");
+	machine().device("master")->memory().space(AS_IO).install_read_port(0x0f, 0x0f, "BUTTONS");
 }
 
 
@@ -743,14 +743,14 @@ DRIVER_INIT_MEMBER(leland_state,indyheat)
 	leland_rotate_memory(machine(), "slave");
 
 	/* set up additional input ports */
-	machine().device("master")->memory().space(AS_IO)->install_read_handler(0x00, 0x02, read8_delegate(FUNC(leland_state::indyheat_wheel_r),this));
-	machine().device("master")->memory().space(AS_IO)->install_read_handler(0x08, 0x0b, read8_delegate(FUNC(leland_state::indyheat_analog_r),this));
-	machine().device("master")->memory().space(AS_IO)->install_read_port(0x0d, 0x0d, "P1");
-	machine().device("master")->memory().space(AS_IO)->install_read_port(0x0e, 0x0e, "P2");
-	machine().device("master")->memory().space(AS_IO)->install_read_port(0x0f, 0x0f, "P3");
+	machine().device("master")->memory().space(AS_IO).install_read_handler(0x00, 0x02, read8_delegate(FUNC(leland_state::indyheat_wheel_r),this));
+	machine().device("master")->memory().space(AS_IO).install_read_handler(0x08, 0x0b, read8_delegate(FUNC(leland_state::indyheat_analog_r),this));
+	machine().device("master")->memory().space(AS_IO).install_read_port(0x0d, 0x0d, "P1");
+	machine().device("master")->memory().space(AS_IO).install_read_port(0x0e, 0x0e, "P2");
+	machine().device("master")->memory().space(AS_IO).install_read_port(0x0f, 0x0f, "P3");
 
 	/* set up additional output ports */
-	machine().device("master")->memory().space(AS_IO)->install_write_handler(0x08, 0x0b, write8_delegate(FUNC(leland_state::indyheat_analog_w),this));
+	machine().device("master")->memory().space(AS_IO).install_write_handler(0x08, 0x0b, write8_delegate(FUNC(leland_state::indyheat_analog_w),this));
 }
 
 
@@ -760,9 +760,9 @@ DRIVER_INIT_MEMBER(leland_state,brutforc)
 	leland_rotate_memory(machine(), "slave");
 
 	/* set up additional input ports */
-	machine().device("master")->memory().space(AS_IO)->install_read_port(0x0d, 0x0d, "P2");
-	machine().device("master")->memory().space(AS_IO)->install_read_port(0x0e, 0x0e, "P1");
-	machine().device("master")->memory().space(AS_IO)->install_read_port(0x0f, 0x0f, "P3");
+	machine().device("master")->memory().space(AS_IO).install_read_port(0x0d, 0x0d, "P2");
+	machine().device("master")->memory().space(AS_IO).install_read_port(0x0e, 0x0e, "P1");
+	machine().device("master")->memory().space(AS_IO).install_read_port(0x0f, 0x0f, "P3");
 }
 
 
@@ -772,12 +772,12 @@ DRIVER_INIT_MEMBER(leland_state,asylum)
 	leland_rotate_memory(machine(), "slave");
 
 	/* asylum appears to have some extra RAM for the slave CPU */
-	machine().device("slave")->memory().space(AS_PROGRAM)->install_ram(0xf000, 0xfffb);
+	machine().device("slave")->memory().space(AS_PROGRAM).install_ram(0xf000, 0xfffb);
 
 	/* set up additional input ports */
-	machine().device("master")->memory().space(AS_IO)->install_read_port(0x0d, 0x0d, "P2");
-	machine().device("master")->memory().space(AS_IO)->install_read_port(0x0e, 0x0e, "P1");
-	machine().device("master")->memory().space(AS_IO)->install_read_port(0x0f, 0x0f, "P3");
+	machine().device("master")->memory().space(AS_IO).install_read_port(0x0d, 0x0d, "P2");
+	machine().device("master")->memory().space(AS_IO).install_read_port(0x0e, 0x0e, "P1");
+	machine().device("master")->memory().space(AS_IO).install_read_port(0x0f, 0x0f, "P3");
 }
 
 

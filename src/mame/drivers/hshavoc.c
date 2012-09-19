@@ -218,7 +218,7 @@ DRIVER_INIT_MEMBER(md_cons_state,hshavoc)
 */
 
 	{
-		address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 		space.nop_write(0x200000, 0x201fff);
 	}
 

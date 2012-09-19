@@ -703,7 +703,7 @@ static void lynx_blitter(running_machine &machine)
 
 	int i; int colors;
 
-	state->m_blitter.mem = (UINT8*)machine.device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(0x0000);
+	state->m_blitter.mem = (UINT8*)machine.device("maincpu")->memory().space(AS_PROGRAM).get_read_ptr(0x0000);
 
 	state->m_blitter.busy = 1; // blitter working
 	state->m_blitter.memory_accesses = 0;
@@ -1927,7 +1927,7 @@ WRITE8_MEMBER(lynx_state::lynx_memory_config_w)
 static void lynx_reset(running_machine &machine)
 {
 	lynx_state *state = machine.driver_data<lynx_state>();
-	state->lynx_memory_config_w(*machine.device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
+	state->lynx_memory_config_w(machine.device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
 
 	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	machine.device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, CLEAR_LINE);
@@ -1959,7 +1959,7 @@ static void lynx_reset(running_machine &machine)
 
 static void lynx_postload(lynx_state *state)
 {
-	state->lynx_memory_config_w( *state->machine().device("maincpu")->memory().space(AS_PROGRAM), 0, state->m_memory_config);
+	state->lynx_memory_config_w( state->machine().device("maincpu")->memory().space(AS_PROGRAM), 0, state->m_memory_config);
 }
 
 void lynx_state::machine_start()

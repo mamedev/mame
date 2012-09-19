@@ -123,7 +123,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 	// single byte or word transfer
 	device_t* device = (device_t*)ptr;
 	upd71071_t* dmac = get_safe_token(device);
-	address_space& space = *device->machine().device(dmac->intf->cputag)->memory().space(AS_PROGRAM);
+	address_space& space = device->machine().device(dmac->intf->cputag)->memory().space(AS_PROGRAM);
 	int channel = param;
 	UINT16 data = 0;  // data to transfer
 

@@ -117,7 +117,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_tick )
 
 void tek4051_state::bankswitch(UINT8 data)
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	//int d = data & 0x07;
 	int lbs = (data >> 3) & 0x07;
@@ -125,19 +125,19 @@ void tek4051_state::bankswitch(UINT8 data)
 	switch (lbs)
 	{
 	case LBS_RBC:
-		program->install_rom(0x8800, 0xa7ff, memregion(MC6800_TAG)->base() + 0x800);
+		program.install_rom(0x8800, 0xa7ff, memregion(MC6800_TAG)->base() + 0x800);
 		break;
 
 	case LBS_BSOFL:
-		program->install_rom(0x8800, 0xa7ff, memregion("020_0147_00")->base());
+		program.install_rom(0x8800, 0xa7ff, memregion("020_0147_00")->base());
 		break;
 
 	case LBS_BSCOM:
-		program->install_rom(0x8800, 0xa7ff, memregion("672_0799_08")->base());
+		program.install_rom(0x8800, 0xa7ff, memregion("672_0799_08")->base());
 		break;
 
 	default:
-		program->unmap_readwrite(0x8800, 0xa7ff);
+		program.unmap_readwrite(0x8800, 0xa7ff);
 	}
 }
 
@@ -1167,21 +1167,21 @@ static IEEE488_INTERFACE( ieee488_intf )
 
 void tek4051_state::machine_start()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	// configure RAM
 	switch (m_ram->size())
 	{
 	case 8*1024:
-		program->unmap_readwrite(0x2000, 0x7fff);
+		program.unmap_readwrite(0x2000, 0x7fff);
 		break;
 
 	case 16*1024:
-		program->unmap_readwrite(0x4000, 0x7fff);
+		program.unmap_readwrite(0x4000, 0x7fff);
 		break;
 
 	case 24*1024:
-		program->unmap_readwrite(0x6000, 0x7fff);
+		program.unmap_readwrite(0x6000, 0x7fff);
 		break;
 	}
 

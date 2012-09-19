@@ -1937,7 +1937,7 @@ static Z80DMA_INTERFACE( x1_dma )
 
 INPUT_CHANGED_MEMBER(x1_state::ipl_reset)
 {
-	//address_space &space = *machine().device("x1_cpu")->memory().space(AS_PROGRAM);
+	//address_space &space = machine().device("x1_cpu")->memory().space(AS_PROGRAM);
 
 	m_x1_cpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 
@@ -2404,7 +2404,7 @@ static IRQ_CALLBACK(x1_irq_callback)
 TIMER_DEVICE_CALLBACK(x1_keyboard_callback)
 {
 	x1_state *state = timer.machine().driver_data<x1_state>();
-	address_space &space = *timer.machine().device("x1_cpu")->memory().space(AS_PROGRAM);
+	address_space &space = timer.machine().device("x1_cpu")->memory().space(AS_PROGRAM);
 	UINT32 key1 = timer.machine().root_device().ioport("key1")->read();
 	UINT32 key2 = timer.machine().root_device().ioport("key2")->read();
 	UINT32 key3 = timer.machine().root_device().ioport("key3")->read();

@@ -110,7 +110,7 @@ static const mc6845_interface mc6845_intf =
 
 INPUT_CHANGED_MEMBER(x1twin_state::ipl_reset)
 {
-	//address_space &space = *machine().device("x1_cpu")->memory().space(AS_PROGRAM);
+	//address_space &space = machine().device("x1_cpu")->memory().space(AS_PROGRAM);
 
 	m_x1_cpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 

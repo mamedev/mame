@@ -800,8 +800,8 @@ static CPU_INIT( apexc )
 	apexc_state *cpustate = get_safe_token(device);
 
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = &device->space(AS_PROGRAM);
+	cpustate->io = &device->space(AS_IO);
 
 	device->save_item(NAME(cpustate->a));
 	device->save_item(NAME(cpustate->r));

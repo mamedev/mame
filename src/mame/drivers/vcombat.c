@@ -448,10 +448,10 @@ DRIVER_INIT_MEMBER(vcombat_state,vcombat)
 	UINT8 *ROM = memregion("maincpu")->base();
 
 	/* The two i860s execute out of RAM */
-	address_space &v0space = *machine().device<i860_device>("vid_0")->space(AS_PROGRAM);
+	address_space &v0space = machine().device<i860_device>("vid_0")->space(AS_PROGRAM);
 	v0space.set_direct_update_handler(direct_update_delegate(FUNC(vcombat_state::vcombat_vid_0_direct_handler), this));
 
-	address_space &v1space = *machine().device<i860_device>("vid_1")->space(AS_PROGRAM);
+	address_space &v1space = machine().device<i860_device>("vid_1")->space(AS_PROGRAM);
 	v1space.set_direct_update_handler(direct_update_delegate(FUNC(vcombat_state::vcombat_vid_1_direct_handler), this));
 
 	/* Allocate the 68000 framebuffers */
@@ -495,7 +495,7 @@ DRIVER_INIT_MEMBER(vcombat_state,shadfgtr)
 	m_i860_framebuffer[1][1] = NULL;
 
 	/* The i860 executes out of RAM */
-	address_space &space = *machine().device<i860_device>("vid_0")->space(AS_PROGRAM);
+	address_space &space = machine().device<i860_device>("vid_0")->space(AS_PROGRAM);
 	space.set_direct_update_handler(direct_update_delegate(FUNC(vcombat_state::vcombat_vid_0_direct_handler), this));
 }
 

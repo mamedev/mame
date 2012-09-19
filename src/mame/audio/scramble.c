@@ -127,7 +127,7 @@ READ8_DEVICE_HANDLER( hotshock_soundlatch_r )
 {
 	driver_device *drvstate = space.machine().driver_data<driver_device>();
 	space.machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
-	return drvstate->soundlatch_byte_r(*space.machine().device("audiocpu")->memory().space(AS_PROGRAM),0);
+	return drvstate->soundlatch_byte_r(space.machine().device("audiocpu")->memory().space(AS_PROGRAM),0);
 }
 
 static void filter_w(device_t *device, int data)

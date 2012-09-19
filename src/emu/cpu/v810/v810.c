@@ -1254,9 +1254,9 @@ static CPU_INIT( v810 )
 	cpustate->nmi_line = CLEAR_LINE;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	device->save_item(NAME(cpustate->reg));
 	device->save_item(NAME(cpustate->irq_line));

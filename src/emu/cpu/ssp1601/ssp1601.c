@@ -528,9 +528,9 @@ static CPU_INIT( ssp1601 )
 	memset(ssp1601_state, 0, sizeof(ssp1601_state_t));
 	ssp1601_state->gr[0].w.h = 0xffff; // constant reg
 	ssp1601_state->device = device;
-	ssp1601_state->program = device->space(AS_PROGRAM);
+	ssp1601_state->program = &device->space(AS_PROGRAM);
 	ssp1601_state->direct = &ssp1601_state->program->direct();
-	ssp1601_state->io = device->space(AS_IO);
+	ssp1601_state->io = &device->space(AS_IO);
 
 }
 

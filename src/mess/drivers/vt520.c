@@ -53,7 +53,7 @@ INPUT_PORTS_END
 
 void vt520_state::machine_reset()
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
 	space.unmap_write(0x0000, 0xffff);
 	membank("bank1")->set_base(rom + 0x70000);

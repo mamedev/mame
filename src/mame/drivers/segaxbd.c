@@ -3256,7 +3256,7 @@ DRIVER_INIT_MEMBER(segaxbd_state,loffire)
 	m_adc_reverse[1] = m_adc_reverse[3] = true;
 
 	// install sync hack on core shared memory
-	m_loffire_sync = m_maincpu->space(AS_PROGRAM)->install_write_handler(0x29c000, 0x29c011, write16_delegate(FUNC(segaxbd_state::loffire_sync0_w), this));
+	m_loffire_sync = m_maincpu->space(AS_PROGRAM).install_write_handler(0x29c000, 0x29c011, write16_delegate(FUNC(segaxbd_state::loffire_sync0_w), this));
 }
 
 DRIVER_INIT_MEMBER(segaxbd_state,smgp)
@@ -3266,7 +3266,7 @@ DRIVER_INIT_MEMBER(segaxbd_state,smgp)
 	m_iochip_custom_io_w[0][1] = iowrite_delegate(FUNC(segaxbd_state::smgp_iochip0_motor_w), this);
 
 	// map /EXCS space
-	m_maincpu->space(AS_PROGRAM)->install_readwrite_handler(0x2f0000, 0x2f3fff, read16_delegate(FUNC(segaxbd_state::smgp_excs_r), this), write16_delegate(FUNC(segaxbd_state::smgp_excs_w), this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2f0000, 0x2f3fff, read16_delegate(FUNC(segaxbd_state::smgp_excs_r), this), write16_delegate(FUNC(segaxbd_state::smgp_excs_w), this));
 }
 
 DRIVER_INIT_MEMBER(segaxbd_state,rascot)
@@ -3281,7 +3281,7 @@ DRIVER_INIT_MEMBER(segaxbd_state,rascot)
 	rom[0x606/2] = 0x4e71;
 
 	// map /EXCS space
-	m_maincpu->space(AS_PROGRAM)->install_readwrite_handler(0x0f0000, 0x0f3fff, read16_delegate(FUNC(segaxbd_state::rascot_excs_r), this), write16_delegate(FUNC(segaxbd_state::rascot_excs_w), this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0f0000, 0x0f3fff, read16_delegate(FUNC(segaxbd_state::rascot_excs_r), this), write16_delegate(FUNC(segaxbd_state::rascot_excs_w), this));
 }
 
 DRIVER_INIT_MEMBER(segaxbd_state,gprider)

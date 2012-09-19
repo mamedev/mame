@@ -264,7 +264,7 @@ static CPU_INIT( esrip )
 	cpustate->ipt_ram = auto_alloc_array(device->machine(), UINT16, IPT_RAM_SIZE/2);
 
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 
 	/* Create the instruction decode lookup table */

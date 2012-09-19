@@ -355,7 +355,7 @@ UINT32 cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap,
 
 static TIMER_CALLBACK( swyft_reset )
 {
-	memset(machine.device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(0xe2341), 0xff, 1);
+	memset(machine.device("maincpu")->memory().space(AS_PROGRAM).get_read_ptr(0xe2341), 0xff, 1);
 }
 
 MACHINE_START_MEMBER(cat_state,swyft)

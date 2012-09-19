@@ -96,7 +96,7 @@ okim9810_device::okim9810_device(const machine_config &mconfig, const char *tag,
 void okim9810_device::device_start()
 {
 	// find our direct access
-	m_direct = &space()->direct();
+	m_direct = &space().direct();
 
 	// create the stream
 	//int divisor = m_pin7 ? 132 : 165;

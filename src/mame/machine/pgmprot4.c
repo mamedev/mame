@@ -373,7 +373,7 @@ DRIVER_INIT_MEMBER(pgm_022_025_state,killbld)
 	pgm_basic_init(machine());
 	pgm_killbld_decrypt(machine());
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xd40000, 0xd40003, FUNC(killbld_igs025_prot_r), FUNC(killbld_igs025_prot_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xd40000, 0xd40003, FUNC(killbld_igs025_prot_r), FUNC(killbld_igs025_prot_w));
 
 	m_kb_cmd = 0;
 	m_kb_reg = 0;
@@ -536,7 +536,7 @@ DRIVER_INIT_MEMBER(pgm_022_025_state,drgw3)
         }
     }
 */
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xDA5610, 0xDA5613, FUNC(drgw3_igs025_prot_r), FUNC(drgw3_igs025_prot_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xDA5610, 0xDA5613, FUNC(drgw3_igs025_prot_r), FUNC(drgw3_igs025_prot_w));
 
 	pgm_dw3_decrypt(machine());
 }

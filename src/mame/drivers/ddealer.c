@@ -677,7 +677,7 @@ READ16_MEMBER(ddealer_state::ddealer_mcu_r)
 
 DRIVER_INIT_MEMBER(ddealer_state,ddealer)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfe01c, 0xfe01d, read16_delegate(FUNC(ddealer_state::ddealer_mcu_r), this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xfe01c, 0xfe01d, read16_delegate(FUNC(ddealer_state::ddealer_mcu_r), this));
 }
 
 ROM_START( ddealer )

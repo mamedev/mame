@@ -738,7 +738,7 @@ DRIVER_INIT_MEMBER(deco_mlc_state,avengrgs)
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x32dc);
 
 	m_mainCpuIsArm = 0;
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x01089a0, 0x01089a3, read32_delegate(FUNC(deco_mlc_state::avengrgs_speedup_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x01089a0, 0x01089a3, read32_delegate(FUNC(deco_mlc_state::avengrgs_speedup_r),this));
 	descramble_sound(machine());
 }
 

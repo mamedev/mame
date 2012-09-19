@@ -343,8 +343,8 @@ DRIVER_INIT_MEMBER(saturn_state,stv)
 	sh2drc_set_options(machine().device("maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 	sh2drc_set_options(machine().device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(saturn_state::stv_ioga_r32),this), write32_delegate(FUNC(saturn_state::stv_ioga_w32),this));
-	machine().device("slave")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(saturn_state::stv_ioga_r32),this), write32_delegate(FUNC(saturn_state::stv_ioga_w32),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(saturn_state::stv_ioga_r32),this), write32_delegate(FUNC(saturn_state::stv_ioga_w32),this));
+	machine().device("slave")->memory().space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(saturn_state::stv_ioga_r32),this), write32_delegate(FUNC(saturn_state::stv_ioga_w32),this));
 
 	m_vdp2.pal = 0;
 }
@@ -352,8 +352,8 @@ DRIVER_INIT_MEMBER(saturn_state,stv)
 DRIVER_INIT_MEMBER(saturn_state,critcrsh)
 {
 	DRIVER_INIT_CALL(stv);
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(saturn_state::critcrsh_ioga_r32),this), write32_delegate(FUNC(saturn_state::stv_ioga_w32),this));
-	machine().device("slave")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(saturn_state::critcrsh_ioga_r32),this), write32_delegate(FUNC(saturn_state::stv_ioga_w32),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(saturn_state::critcrsh_ioga_r32),this), write32_delegate(FUNC(saturn_state::stv_ioga_w32),this));
+	machine().device("slave")->memory().space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(saturn_state::critcrsh_ioga_r32),this), write32_delegate(FUNC(saturn_state::stv_ioga_w32),this));
 }
 
 /*
@@ -390,11 +390,11 @@ DRIVER_INIT_MEMBER(saturn_state,magzun)
 
 	DRIVER_INIT_CALL(stv);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(saturn_state::magzun_ioga_r32),this), write32_delegate(FUNC(saturn_state::magzun_ioga_w32),this));
-	machine().device("slave")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(saturn_state::magzun_ioga_r32),this), write32_delegate(FUNC(saturn_state::magzun_ioga_w32),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(saturn_state::magzun_ioga_r32),this), write32_delegate(FUNC(saturn_state::magzun_ioga_w32),this));
+	machine().device("slave")->memory().space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(saturn_state::magzun_ioga_r32),this), write32_delegate(FUNC(saturn_state::magzun_ioga_w32),this));
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x608e830, 0x608e833, read32_delegate(FUNC(saturn_state::magzun_hef_hack_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x60ff3b4, 0x60ff3b7, read32_delegate(FUNC(saturn_state::magzun_rx_hack_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x608e830, 0x608e833, read32_delegate(FUNC(saturn_state::magzun_hef_hack_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x60ff3b4, 0x60ff3b7, read32_delegate(FUNC(saturn_state::magzun_rx_hack_r),this));
 
 	/* Program ROM patches, don't understand how to avoid these two checks ... */
 	{
@@ -410,8 +410,8 @@ DRIVER_INIT_MEMBER(saturn_state,magzun)
 DRIVER_INIT_MEMBER(saturn_state,stvmp)
 {
 	DRIVER_INIT_CALL(stv);
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(saturn_state::stvmp_ioga_r32),this), write32_delegate(FUNC(saturn_state::stvmp_ioga_w32),this));
-	machine().device("slave")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(saturn_state::stvmp_ioga_r32),this), write32_delegate(FUNC(saturn_state::stvmp_ioga_w32),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(saturn_state::stvmp_ioga_r32),this), write32_delegate(FUNC(saturn_state::stvmp_ioga_w32),this));
+	machine().device("slave")->memory().space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(saturn_state::stvmp_ioga_r32),this), write32_delegate(FUNC(saturn_state::stvmp_ioga_w32),this));
 }
 
 
@@ -663,7 +663,7 @@ DRIVER_INIT_MEMBER(saturn_state,astrass)
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x60011ba);
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x605b9da);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x06000770, 0x06000773, read32_delegate(FUNC(saturn_state::astrass_hack_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x06000770, 0x06000773, read32_delegate(FUNC(saturn_state::astrass_hack_r),this));
 
 	install_astrass_protection(machine());
 

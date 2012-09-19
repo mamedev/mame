@@ -3743,8 +3743,8 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 			switch (gameDefs[i].special)
 	{
 				case 1:	// LE2 guns
-					machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd44000, 0xd44003, read32_delegate(FUNC(konamigx_state::le2_gun_H_r),this));
-					machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd44004, 0xd44007, read32_delegate(FUNC(konamigx_state::le2_gun_V_r),this));
+					machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd44000, 0xd44003, read32_delegate(FUNC(konamigx_state::le2_gun_H_r),this));
+					machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd44004, 0xd44007, read32_delegate(FUNC(konamigx_state::le2_gun_V_r),this));
 					break;
 
 				case 2:	// tkmmpzdm hack
@@ -3780,7 +3780,7 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 					break;
 
 				case 7:	// install type 4 Xilinx protection for non-type 3/4 games
-		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xcc0000, 0xcc0007, write32_delegate(FUNC(konamigx_state::type4_prot_w),this));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xcc0000, 0xcc0007, write32_delegate(FUNC(konamigx_state::type4_prot_w),this));
 					break;
 
 				case 8: // tbyahhoo
@@ -3800,14 +3800,14 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 	switch (readback)
 	{
 		case BPP5:
-			machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd4a000, 0xd4a00f, read32_delegate(FUNC(konamigx_state::gx5bppspr_r),this));
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd4a000, 0xd4a00f, read32_delegate(FUNC(konamigx_state::gx5bppspr_r),this));
 		break;
 
 		case BPP66:
-			machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd00000, 0xd01fff, FUNC(K056832_6bpp_rom_long_r));
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xd00000, 0xd01fff, FUNC(K056832_6bpp_rom_long_r));
 
 		case BPP6:
-			machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd4a000, 0xd4a00f, read32_delegate(FUNC(konamigx_state::gx6bppspr_r),this));
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd4a000, 0xd4a00f, read32_delegate(FUNC(konamigx_state::gx6bppspr_r),this));
 		break;
 	}
 

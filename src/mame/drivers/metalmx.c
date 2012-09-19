@@ -443,19 +443,19 @@ READ32_MEMBER(metalmx_state::dsp32c_2_r)
 
 WRITE32_MEMBER(metalmx_state::host_gsp_w)
 {
-	address_space *gsp_space = machine().device("gsp")->memory().space(AS_PROGRAM);
+	address_space &gsp_space = machine().device("gsp")->memory().space(AS_PROGRAM);
 
-	gsp_space->write_word((0xc0000000 + (offset << 5) + 0x10) / 8, data);
-	gsp_space->write_word((0xc0000000 + (offset << 5))/ 8 , data >> 16);
+	gsp_space.write_word((0xc0000000 + (offset << 5) + 0x10) / 8, data);
+	gsp_space.write_word((0xc0000000 + (offset << 5))/ 8 , data >> 16);
 }
 
 READ32_MEMBER(metalmx_state::host_gsp_r)
 {
-	address_space *gsp_space = machine().device("gsp")->memory().space(AS_PROGRAM);
+	address_space &gsp_space = machine().device("gsp")->memory().space(AS_PROGRAM);
 	UINT32 val;
 
-	val  = gsp_space->read_word((0xc0000000 + (offset << 5) + 0x10) / 8);
-	val |= gsp_space->read_word((0xc0000000 + (offset << 5)) / 8) << 16;
+	val  = gsp_space.read_word((0xc0000000 + (offset << 5) + 0x10) / 8);
+	val |= gsp_space.read_word((0xc0000000 + (offset << 5)) / 8) << 16;
 	return val;
 }
 

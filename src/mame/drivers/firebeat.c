@@ -2220,9 +2220,9 @@ static void init_lights(running_machine &machine, write32_space_func out1, const
 	if(!out2) out2 = lamp_output2_w, out2name = "lamp_output2_w";
 	if(!out3) out3 = lamp_output3_w, out3name = "lamp_output3_w";
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x7d000804, 0x7d000807, out1, out1name);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x7d000320, 0x7d000323, out2, out2name);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x7d000324, 0x7d000327, out3, out3name);
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x7d000804, 0x7d000807, out1, out1name);
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x7d000320, 0x7d000323, out2, out2name);
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x7d000324, 0x7d000327, out3, out3name);
 }
 
 static void init_firebeat(running_machine &machine)

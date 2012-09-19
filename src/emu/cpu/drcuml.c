@@ -121,11 +121,11 @@ drcbe_interface::drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_
 	device_memory_interface *memory;
 	if (device.interface(memory))
 		for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_space); spacenum++)
-		{
-			m_space[spacenum] = memory->space(spacenum);
-			if (m_space[spacenum] != NULL)
+			if (memory->has_space(spacenum))
+			{
+				m_space[spacenum] = &memory->space(spacenum);
 				m_space[spacenum]->accessors(m_accessors[spacenum]);
-		}
+			}
 }
 
 

@@ -422,8 +422,8 @@ DRIVER_INIT_MEMBER(deadang_state,ghunter)
 	seibu_adpcm_decrypt(machine(), "adpcm1");
 	seibu_adpcm_decrypt(machine(), "adpcm2");
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80000, 0x80001, read16_delegate(FUNC(deadang_state::ghunter_trackball_low_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xb0000, 0xb0001, read16_delegate(FUNC(deadang_state::ghunter_trackball_high_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x80000, 0x80001, read16_delegate(FUNC(deadang_state::ghunter_trackball_low_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xb0000, 0xb0001, read16_delegate(FUNC(deadang_state::ghunter_trackball_high_r),this));
 }
 
 /* Game Drivers */

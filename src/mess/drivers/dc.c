@@ -65,14 +65,14 @@ DRIVER_INIT_MEMBER(dc_state,dc)
 
 DRIVER_INIT_MEMBER(dc_state,dcus)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2303b0, 0xc2303b7, FUNC(dcus_idle_skip_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xc2303b0, 0xc2303b7, FUNC(dcus_idle_skip_r));
 
 	DRIVER_INIT_CALL(dc);
 }
 
 DRIVER_INIT_MEMBER(dc_state,dcjp)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2302f8, 0xc2302ff, FUNC(dcjp_idle_skip_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xc2302f8, 0xc2302ff, FUNC(dcjp_idle_skip_r));
 
 	DRIVER_INIT_CALL(dc);
 }

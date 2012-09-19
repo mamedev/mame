@@ -1588,12 +1588,12 @@ static void iot_dcc(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	{
 		if ((state->m_parallel_drum.wfb >= 1) && (state->m_parallel_drum.wfb <= 22))
 		{
-			drum_write(state, state->m_parallel_drum.wfb-1, dc, (signed)device->machine().device("maincpu")->memory().space(AS_PROGRAM)->read_dword(state->m_parallel_drum.wcl<<2));
+			drum_write(state, state->m_parallel_drum.wfb-1, dc, (signed)device->machine().device("maincpu")->memory().space(AS_PROGRAM).read_dword(state->m_parallel_drum.wcl<<2));
 		}
 
 		if ((state->m_parallel_drum.rfb >= 1) && (state->m_parallel_drum.rfb <= 22))
 		{
-			device->machine().device("maincpu")->memory().space(AS_PROGRAM)->write_dword(state->m_parallel_drum.wcl<<2, drum_read(state, state->m_parallel_drum.rfb-1, dc));
+			device->machine().device("maincpu")->memory().space(AS_PROGRAM).write_dword(state->m_parallel_drum.wcl<<2, drum_read(state, state->m_parallel_drum.rfb-1, dc));
 		}
 
 		state->m_parallel_drum.wc = (state->m_parallel_drum.wc+1) & 07777;
@@ -1862,7 +1862,7 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 			device.state().set_state_int(PDP1_MA, device.state().state_int(PDP1_PC));
 			device.state().set_state_int(PDP1_IR, LAC);	/* this instruction is actually executed */
 
-			device.state().set_state_int(PDP1_MB, (signed)device.memory().space(AS_PROGRAM)->read_dword(PDP1_MA<<2));
+			device.state().set_state_int(PDP1_MB, (signed)device.memory().space(AS_PROGRAM).read_dword(PDP1_MA<<2));
 			device.state().set_state_int(PDP1_AC, device.state().state_int(PDP1_MB));
 		}
 		if (control_transitions & pdp1_deposit)
@@ -1874,7 +1874,7 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 			device.state().set_state_int(PDP1_IR, DAC);	/* this instruction is actually executed */
 
 			device.state().set_state_int(PDP1_MB, device.state().state_int(PDP1_AC));
-			device.memory().space(AS_PROGRAM)->write_dword(device.state().state_int(PDP1_MA)<<2, device.state().state_int(PDP1_MB));
+			device.memory().space(AS_PROGRAM).write_dword(device.state().state_int(PDP1_MA)<<2, device.state().state_int(PDP1_MB));
 		}
 		if (control_transitions & pdp1_read_in)
 		{	/* set cpu to read instructions from perforated tape */

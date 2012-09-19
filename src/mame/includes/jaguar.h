@@ -251,7 +251,7 @@ protected:
 	int effective_hvalue(int value);
 	bool adjust_object_timer(int vc);
 	void update_cpu_irq();
-	UINT8 *memory_base(UINT32 offset) { return reinterpret_cast<UINT8 *>(m_gpu->space(AS_PROGRAM)->get_read_ptr(offset)); }
+	UINT8 *memory_base(UINT32 offset) { return reinterpret_cast<UINT8 *>(m_gpu->space(AS_PROGRAM).get_read_ptr(offset)); }
 	void blitter_run();
 	void scanline_update(int param);
 	void set_palette(UINT16 vmode);

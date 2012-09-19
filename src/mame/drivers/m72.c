@@ -352,21 +352,21 @@ READ8_MEMBER(m72_state::m72_snd_cpu_sample_r)
 
 DRIVER_INIT_MEMBER(m72_state,m72_8751)
 {
-	address_space *program = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	address_space *io = machine().device("maincpu")->memory().space(AS_IO);
-	address_space *sndio = machine().device("soundcpu")->memory().space(AS_IO);
+	address_space &program = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &io = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &sndio = machine().device("soundcpu")->memory().space(AS_IO);
 
 	m_protection_ram = auto_alloc_array(machine(), UINT16, 0x10000/2);
-	program->install_read_bank(0xb0000, 0xbffff, "bank1");
-	program->install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::m72_main_mcu_w),this));
+	program.install_read_bank(0xb0000, 0xbffff, "bank1");
+	program.install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::m72_main_mcu_w),this));
 	membank("bank1")->set_base(m_protection_ram);
 
-	//io->install_legacy_write_handler(0xc0, 0xc1, FUNC(loht_sample_trigger_w));
-	io->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::m72_main_mcu_sound_w),this));
+	//io.install_legacy_write_handler(0xc0, 0xc1, FUNC(loht_sample_trigger_w));
+	io.install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::m72_main_mcu_sound_w),this));
 
 	/* sound cpu */
-	sndio->install_write_handler(0x82, 0x82, 0xff, 0, write8_delegate(FUNC(m72_state::m72_snd_cpu_sample_w),this));
-	sndio->install_read_handler (0x84, 0x84, 0xff, 0, read8_delegate(FUNC(m72_state::m72_snd_cpu_sample_r),this));
+	sndio.install_write_handler(0x82, 0x82, 0xff, 0, write8_delegate(FUNC(m72_state::m72_snd_cpu_sample_w),this));
+	sndio.install_read_handler (0x84, 0x84, 0xff, 0, read8_delegate(FUNC(m72_state::m72_snd_cpu_sample_r),this));
 
 	/* lohtb2 */
 #if 0
@@ -717,41 +717,41 @@ static void install_protection_handler(running_machine &machine, const UINT8 *co
 	state->m_protection_ram = auto_alloc_array(machine, UINT16, 0x1000/2);
 	state->m_protection_code = code;
 	state->m_protection_crc =  crc;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xb0000, 0xb0fff, "bank1");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xb0ffa, 0xb0ffb, read16_delegate(FUNC(m72_state::protection_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::protection_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xb0000, 0xb0fff, "bank1");
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xb0ffa, 0xb0ffb, read16_delegate(FUNC(m72_state::protection_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::protection_w),state));
 	state->membank("bank1")->set_base(state->m_protection_ram);
 }
 
 DRIVER_INIT_MEMBER(m72_state,bchopper)
 {
 	install_protection_handler(machine(), bchopper_code,bchopper_crc);
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::bchopper_sample_trigger_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::bchopper_sample_trigger_w),this));
 }
 
 DRIVER_INIT_MEMBER(m72_state,mrheli)
 {
 	install_protection_handler(machine(), bchopper_code,mrheli_crc);
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::bchopper_sample_trigger_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::bchopper_sample_trigger_w),this));
 }
 
 DRIVER_INIT_MEMBER(m72_state,nspirit)
 {
 	install_protection_handler(machine(), nspirit_code,nspirit_crc);
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::nspirit_sample_trigger_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::nspirit_sample_trigger_w),this));
 }
 
 DRIVER_INIT_MEMBER(m72_state,imgfight)
 {
 	install_protection_handler(machine(), imgfight_code,imgfightj_crc);
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::imgfight_sample_trigger_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::imgfight_sample_trigger_w),this));
 }
 
 DRIVER_INIT_MEMBER(m72_state,loht)
 {
 	install_protection_handler(machine(), loht_code,loht_crc);
 
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::loht_sample_trigger_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::loht_sample_trigger_w),this));
 
 	/* since we skip the startup tests, clear video RAM to prevent garbage on title screen */
 	memset(m_videoram2,0,0x4000);
@@ -760,30 +760,30 @@ DRIVER_INIT_MEMBER(m72_state,loht)
 DRIVER_INIT_MEMBER(m72_state,xmultiplm72)
 {
 	install_protection_handler(machine(), xmultiplm72_code,xmultiplm72_crc);
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::xmultiplm72_sample_trigger_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::xmultiplm72_sample_trigger_w),this));
 }
 
 DRIVER_INIT_MEMBER(m72_state,dbreedm72)
 {
 	install_protection_handler(machine(), dbreedm72_code,dbreedm72_crc);
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dbreedm72_sample_trigger_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dbreedm72_sample_trigger_w),this));
 }
 
 DRIVER_INIT_MEMBER(m72_state,airduel)
 {
 	install_protection_handler(machine(), airduel_code,airduel_crc);
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::airduel_sample_trigger_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::airduel_sample_trigger_w),this));
 }
 
 DRIVER_INIT_MEMBER(m72_state,dkgenm72)
 {
 	install_protection_handler(machine(), dkgenm72_code,dkgenm72_crc);
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dkgenm72_sample_trigger_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dkgenm72_sample_trigger_w),this));
 }
 
 DRIVER_INIT_MEMBER(m72_state,gallop)
 {
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::gallop_sample_trigger_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::gallop_sample_trigger_w),this));
 }
 
 

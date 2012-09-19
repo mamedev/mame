@@ -1184,7 +1184,7 @@ DRIVER_INIT_MEMBER(coolpool_state,amerdart)
 DRIVER_INIT_MEMBER(coolpool_state,coolpool)
 {
 
-	machine().device("dsp")->memory().space(AS_IO)->install_read_handler(0x07, 0x07, read16_delegate(FUNC(coolpool_state::coolpool_input_r),this));
+	machine().device("dsp")->memory().space(AS_IO).install_read_handler(0x07, 0x07, read16_delegate(FUNC(coolpool_state::coolpool_input_r),this));
 
 	register_state_save(machine());
 }

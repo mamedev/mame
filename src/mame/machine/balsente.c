@@ -137,7 +137,7 @@ void balsente_state::machine_start()
 
 void balsente_state::machine_reset()
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int numbanks;
 
 	/* reset counters; counter 2's gate is tied high */

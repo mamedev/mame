@@ -212,7 +212,7 @@ static void mac_install_memory(running_machine &machine, offs_t memory_begin, of
 	offs_t memory_size, void *memory_data, int is_rom, const char *bank)
 {
 	mac_state *state = machine.driver_data<mac_state>();
-	address_space& space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	offs_t memory_mask;
 
 	memory_size = MIN(memory_size, (memory_end + 1 - memory_begin));
@@ -410,7 +410,7 @@ void mac_state::v8_resize()
 	}
 	else
 	{
-		address_space& space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 		UINT32 onboard_amt, simm_amt, simm_size;
 		static const UINT32 simm_sizes[4] = { 0, 2*1024*1024, 4*1024*1024, 8*1024*1024 };
 
@@ -501,13 +501,13 @@ void mac_state::set_memory_overlay(int overlay)
 		}
 		else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_IIVX) || (m_model == MODEL_MAC_IIFX))
 		{
-			address_space& space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+			address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 			space.unmap_write(0x000000, 0x9fffff, 0x9fffff, 0);
 			mac_install_memory(machine(), 0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
 		else if ((m_model == MODEL_MAC_PB140) || (m_model == MODEL_MAC_PB160) || ((m_model >= MODEL_MAC_PBDUO_210) && (m_model <= MODEL_MAC_PBDUO_270c)))
 		{
-			address_space& space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+			address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 			space.unmap_write(0x000000, 0xffffff, 0xffffff, 0);
 			mac_install_memory(machine(), 0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
@@ -1814,7 +1814,7 @@ void mac_state::machine_reset()
 
 	if (m_model >= MODEL_MAC_POWERMAC_6100 && m_model <= MODEL_MAC_POWERMAC_8100)
 	{
-		m_awacs->set_dma_base(*m_maincpu->space(AS_PROGRAM), 0x10000, 0x12000);
+		m_awacs->set_dma_base(m_maincpu->space(AS_PROGRAM), 0x10000, 0x12000);
 	}
 
 	// start 60.15 Hz timer for most systems
@@ -2099,7 +2099,7 @@ static void mac_driver_init(running_machine &machine, model_t model)
 	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || (model == MODEL_MAC_LC_III_PLUS) || ((mac->m_model >= MODEL_MAC_II) && (mac->m_model <= MODEL_MAC_SE30)) ||
 	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100) || (model == MODEL_MAC_PB140) || (model == MODEL_MAC_PB160) || (model == MODEL_MAC_PBDUO_210) || (model >= MODEL_MAC_QUADRA_700 && model <= MODEL_MAC_QUADRA_800))
 	{
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(mac_state::overlay_opbaseoverride), mac));
+		machine.device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(mac_state::overlay_opbaseoverride), mac));
 	}
 
 	/* setup keyboard */

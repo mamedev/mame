@@ -1053,8 +1053,8 @@ READ16_MEMBER( compis_state::compis_i186_internal_port_r )
 
 WRITE16_MEMBER( compis_state::compis_i186_internal_port_w )
 {
-	address_space *mem = m_maincpu->space(AS_PROGRAM);
-	address_space *io = m_maincpu->space(AS_IO);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
+	address_space &io = m_maincpu->space(AS_IO);
 	int temp, which, data16 = data;
 
 	switch (offset)
@@ -1275,14 +1275,14 @@ WRITE16_MEMBER( compis_state::compis_i186_internal_port_w )
 			temp = (data16 & 0x0fff) << 8;
 			if (data16 & 0x1000)
 			{
-				mem->install_read_handler(temp, temp + 0xff, read16_delegate(FUNC(compis_state::compis_i186_internal_port_r), this));
-				mem->install_write_handler(temp, temp + 0xff, write16_delegate(FUNC(compis_state::compis_i186_internal_port_w), this));
+				mem.install_read_handler(temp, temp + 0xff, read16_delegate(FUNC(compis_state::compis_i186_internal_port_r), this));
+				mem.install_write_handler(temp, temp + 0xff, write16_delegate(FUNC(compis_state::compis_i186_internal_port_w), this));
 			}
 			else
 			{
 				temp &= 0xffff;
-				io->install_read_handler(temp, temp + 0xff, read16_delegate(FUNC(compis_state::compis_i186_internal_port_r), this));
-				io->install_write_handler(temp, temp + 0xff, write16_delegate(FUNC(compis_state::compis_i186_internal_port_w), this));
+				io.install_read_handler(temp, temp + 0xff, read16_delegate(FUNC(compis_state::compis_i186_internal_port_r), this));
+				io.install_write_handler(temp, temp + 0xff, write16_delegate(FUNC(compis_state::compis_i186_internal_port_w), this));
 			}
 /*          popmessage("Sound CPU reset");*/
 			break;

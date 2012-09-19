@@ -3151,7 +3151,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,kyros)
 
 DRIVER_INIT_MEMBER(alpha68k_state,jongbou)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0c0000, 0x0c0001, read16_delegate(FUNC(alpha68k_state::jongbou_inputs_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x0c0000, 0x0c0001, read16_delegate(FUNC(alpha68k_state::jongbou_inputs_r),this));
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x00ff;
 	m_coin_id = 0x23 | (0x24 << 8);

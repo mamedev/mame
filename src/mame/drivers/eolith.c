@@ -1481,15 +1481,15 @@ DRIVER_INIT_MEMBER(eolith_state,hidctch2)
 
 DRIVER_INIT_MEMBER(eolith_state,hidctch3)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xfc200000, 0xfc200003); // this generates pens vibration
+	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0xfc200000, 0xfc200003); // this generates pens vibration
 
 	// It is not clear why the first reads are needed too
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfce00000, 0xfce00003, read32_delegate(FUNC(eolith_state::hidctch3_pen1_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfce80000, 0xfce80003, read32_delegate(FUNC(eolith_state::hidctch3_pen1_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xfce00000, 0xfce00003, read32_delegate(FUNC(eolith_state::hidctch3_pen1_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xfce80000, 0xfce80003, read32_delegate(FUNC(eolith_state::hidctch3_pen1_r),this));
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfcf00000, 0xfcf00003, read32_delegate(FUNC(eolith_state::hidctch3_pen2_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfcf80000, 0xfcf80003, read32_delegate(FUNC(eolith_state::hidctch3_pen2_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xfcf00000, 0xfcf00003, read32_delegate(FUNC(eolith_state::hidctch3_pen2_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xfcf80000, 0xfcf80003, read32_delegate(FUNC(eolith_state::hidctch3_pen2_r),this));
 
 	DRIVER_INIT_CALL(eolith);
 }

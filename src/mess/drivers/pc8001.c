@@ -456,16 +456,16 @@ WRITE8_MEMBER( pc8001_state::dma_mem_w )
 
 READ8_MEMBER( pc8001_state::dma_io_r )
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	return program->read_byte(offset);
+	return program.read_byte(offset);
 }
 
 WRITE8_MEMBER( pc8001_state::dma_io_w )
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	program->write_byte(offset, data);
+	program.write_byte(offset, data);
 }
 
 static I8257_INTERFACE( dmac_intf )
@@ -491,7 +491,7 @@ static UPD1990A_INTERFACE( rtc_intf )
 
 void pc8001_state::machine_start()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* initialize RTC */
 	m_rtc->cs_w(1);
@@ -504,31 +504,31 @@ void pc8001_state::machine_start()
 	UINT8 *ram = m_ram->pointer();
 
 	membank("bank1")->configure_entry(1, memregion("n80")->base());
-	program->install_read_bank(0x0000, 0x5fff, "bank1");
-	program->unmap_write(0x0000, 0x5fff);
+	program.install_read_bank(0x0000, 0x5fff, "bank1");
+	program.unmap_write(0x0000, 0x5fff);
 
 	switch (m_ram->size())
 	{
 	case 16*1024:
 		membank("bank3")->configure_entry(0, ram);
-		program->unmap_readwrite(0x6000, 0xbfff);
-		program->unmap_readwrite(0x8000, 0xbfff);
-		program->install_readwrite_bank(0xc000, 0xffff, "bank3");
+		program.unmap_readwrite(0x6000, 0xbfff);
+		program.unmap_readwrite(0x8000, 0xbfff);
+		program.install_readwrite_bank(0xc000, 0xffff, "bank3");
 		break;
 
 	case 32*1024:
 		membank("bank3")->configure_entry(0, ram);
-		program->unmap_readwrite(0x6000, 0xbfff);
-		program->install_readwrite_bank(0x8000, 0xffff, "bank3");
+		program.unmap_readwrite(0x6000, 0xbfff);
+		program.install_readwrite_bank(0x8000, 0xffff, "bank3");
 		break;
 
 	case 64*1024:
 		membank("bank1")->configure_entry(0, ram);
 		membank("bank2")->configure_entry(0, ram + 0x6000);
 		membank("bank3")->configure_entry(0, ram + 0x8000);
-		program->install_readwrite_bank(0x0000, 0x5fff, "bank1");
-		program->install_readwrite_bank(0x6000, 0xbfff, "bank2");
-		program->install_readwrite_bank(0x8000, 0xffff, "bank3");
+		program.install_readwrite_bank(0x0000, 0x5fff, "bank1");
+		program.install_readwrite_bank(0x6000, 0xbfff, "bank2");
+		program.install_readwrite_bank(0x8000, 0xffff, "bank3");
 		membank("bank2")->set_entry(0);
 		break;
 	}

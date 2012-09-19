@@ -220,7 +220,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	/* Check for Street fighter 2 */
 	if (size == PCE_ROM_MAXSIZE)
 	{
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x01ff0, 0x01ff3, write8_delegate(FUNC(pce_state::pce_sf2_banking_w),state));
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x01ff0, 0x01ff3, write8_delegate(FUNC(pce_state::pce_sf2_banking_w),state));
 	}
 
 	/* Check for Populous */
@@ -228,7 +228,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	{
 		state->m_cartridge_ram = auto_alloc_array(image.device().machine(), UINT8, 0x8000);
 		state->membank("bank2")->set_base(state->m_cartridge_ram);
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x080000, 0x087FFF, write8_delegate(FUNC(pce_state::pce_cartridge_ram_w),state));
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x080000, 0x087FFF, write8_delegate(FUNC(pce_state::pce_cartridge_ram_w),state));
 	}
 
 	/* Check for CD system card */
@@ -243,8 +243,8 @@ DEVICE_IMAGE_LOAD(pce_cart)
 		{
 			state->m_cartridge_ram = auto_alloc_array(image.device().machine(), UINT8, 0x30000);
 			state->membank("bank4")->set_base(state->m_cartridge_ram);
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0D0000, 0x0FFFFF, write8_delegate(FUNC(pce_state::pce_cartridge_ram_w),state));
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x080000, 0x087FFF, read8_delegate(FUNC(pce_state::pce_cd_acard_wram_r),state),write8_delegate(FUNC(pce_state::pce_cd_acard_wram_w),state));
+			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x0D0000, 0x0FFFFF, write8_delegate(FUNC(pce_state::pce_cartridge_ram_w),state));
+			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087FFF, read8_delegate(FUNC(pce_state::pce_cd_acard_wram_r),state),write8_delegate(FUNC(pce_state::pce_cd_acard_wram_w),state));
 		}
 	}
 	return 0;

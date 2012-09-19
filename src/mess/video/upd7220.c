@@ -212,7 +212,7 @@ void upd7220_device::device_config_complete()
 
 inline UINT8 upd7220_device::readbyte(offs_t address)
 {
-	return space()->read_byte(address);
+	return space().read_byte(address);
 }
 
 
@@ -222,7 +222,7 @@ inline UINT8 upd7220_device::readbyte(offs_t address)
 
 inline void upd7220_device::writebyte(offs_t address, UINT8 data)
 {
-	space()->write_byte(address, data);
+	space().write_byte(address, data);
 }
 
 

@@ -204,7 +204,7 @@ void sega_genesis_vdp_device::device_start()
 	irq4_on_timer = machine().scheduler().timer_alloc(FUNC(irq4_on_timer_callback), (void*)this);
 	megadriv_render_timer = machine().scheduler().timer_alloc(FUNC(megadriv_render_timer_callback), (void*)this);
 
-	m_space68k = machine().device<legacy_cpu_device>(":maincpu")->space();
+	m_space68k = &machine().device<legacy_cpu_device>(":maincpu")->space();
 	m_cpu68k = machine().device<legacy_cpu_device>(":maincpu");
 }
 

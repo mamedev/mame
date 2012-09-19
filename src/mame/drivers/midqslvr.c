@@ -253,7 +253,7 @@ static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int functi
 
 static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
-	address_space &space = *busdevice->machine().firstcpu->space( AS_PROGRAM );
+	address_space &space = busdevice->machine().firstcpu->space( AS_PROGRAM );
 	midqslvr_state *state = busdevice->machine().driver_data<midqslvr_state>();
 
 	function &= 3;
@@ -672,7 +672,7 @@ void midqslvr_state::machine_start()
 
 	kbdc8042_init(machine(), &at8042);
 	pc_vga_init(machine(), vga_setting, NULL);
-	pc_vga_io_init(machine(), *machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, *machine().device("maincpu")->memory().space(AS_IO), 0x0000);
+	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 void midqslvr_state::machine_reset()

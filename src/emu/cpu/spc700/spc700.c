@@ -1286,7 +1286,7 @@ static CPU_INIT( spc700 )
 
 	INT_ACK = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 }
 
 

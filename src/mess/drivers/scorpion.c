@@ -326,7 +326,7 @@ MACHINE_RESET_MEMBER(scorpion_state,scorpion)
 {
 	UINT8 *messram = machine().device<ram_device>(RAM_TAG)->pointer();
 	device_t *beta = machine().device(BETA_DISK_TAG);
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	m_ram_0000 = NULL;
 	space.install_read_bank(0x0000, 0x3fff, "bank1");

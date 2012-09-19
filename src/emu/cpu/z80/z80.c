@@ -3477,9 +3477,9 @@ static CPU_INIT( z80 )
 		z80->daisy.init(device, (const z80_daisy_config *)device->static_config());
 	z80->irq_callback = irqcallback;
 	z80->device = device;
-	z80->program = device->space(AS_PROGRAM);
+	z80->program = &device->space(AS_PROGRAM);
 	z80->direct = &z80->program->direct();
-	z80->io = device->space(AS_IO);
+	z80->io = &device->space(AS_IO);
 	z80->IX = z80->IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	z80->F = ZF;			/* Zero flag is set */
 

@@ -257,7 +257,7 @@ WRITE8_MEMBER(poly88_state::poly88_intr_w)
 
 SNAPSHOT_LOAD( poly88 )
 {
-	address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8* data= auto_alloc_array(image.device().machine(), UINT8, snapshot_size);
 	UINT16 recordNum;
 	UINT16 recordLen;

@@ -518,7 +518,7 @@ void missile_state::machine_start()
 	m_flipscreen = 0;
 
 	/* set up an opcode base handler since we use mapped handlers for RAM */
-	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.set_direct_update_handler(direct_update_delegate(FUNC(missile_state::missile_direct_handler), this));
 
 	/* create a timer to speed/slow the CPU */
@@ -731,7 +731,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 	else if (offset < 0x4800)
 	{
 		pokey_device *pokey_dev = downcast<pokey_device *>(machine().device("pokey"));
-		pokey_dev->write(*machine().firstcpu->space(), offset, data, 0xff);
+		pokey_dev->write(machine().firstcpu->space(), offset, data, 0xff);
 	}
 
 	/* OUT0 */
@@ -794,7 +794,7 @@ READ8_MEMBER(missile_state::missile_r)
 	else if (offset < 0x4800)
 	{
 		pokey_device *pokey_dev = downcast<pokey_device *>(machine().device("pokey"));
-		result = pokey_dev->read(*machine().firstcpu->space(), offset & 0x0f, 0xff);
+		result = pokey_dev->read(machine().firstcpu->space(), offset & 0x0f, 0xff);
 	}
 
 	/* IN0 */

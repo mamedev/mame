@@ -872,10 +872,10 @@ static void cop400_init(legacy_cpu_device *device, UINT8 g_mask, UINT8 d_mask, U
 
 	/* find address spaces */
 
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->data = &device->space(AS_DATA);
+	cpustate->io = &device->space(AS_IO);
 
 	/* set output pin masks */
 

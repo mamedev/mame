@@ -503,7 +503,7 @@ ROM_END
 DRIVER_INIT_MEMBER(progolf_state,progolf)
 {
 	int A;
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	UINT8* decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
 
@@ -517,7 +517,7 @@ DRIVER_INIT_MEMBER(progolf_state,progolf)
 DRIVER_INIT_MEMBER(progolf_state,progolfa)
 {
 	int A;
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	UINT8* decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
 

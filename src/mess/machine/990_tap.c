@@ -306,7 +306,7 @@ static void cmd_read_binary_forward(device_t *device)
 		/* DMA */
 		for (i=0; i<bytes_read; i+=2)
 		{
-			device->machine().device("maincpu")->memory().space(AS_PROGRAM)->write_word(dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
+			device->machine().device("maincpu")->memory().space(AS_PROGRAM).write_word(dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
 			dma_address = (dma_address + 2) & 0x1ffffe;
 		}
 

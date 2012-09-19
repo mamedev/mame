@@ -174,7 +174,7 @@ UINT32 mstation_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 void mstation_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 {
-	address_space* program = m_maincpu->space(AS_PROGRAM);
+	address_space& program = m_maincpu->space(AS_PROGRAM);
 	int &active_flash = (bank == 1 ? m_flash_at_0x4000 : m_flash_at_0x8000);
 	char bank_tag[6];
 
@@ -185,9 +185,9 @@ void mstation_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 			if (active_flash < 0)
 			{
 				if (bank == 1)
-					program->install_readwrite_handler(0x4000, 0x7fff, 0, 0, read8_delegate(FUNC(mstation_state::flash_0x4000_read_handler), this), write8_delegate(FUNC(mstation_state::flash_0x4000_write_handler), this));
+					program.install_readwrite_handler(0x4000, 0x7fff, 0, 0, read8_delegate(FUNC(mstation_state::flash_0x4000_read_handler), this), write8_delegate(FUNC(mstation_state::flash_0x4000_write_handler), this));
 				else
-					program->install_readwrite_handler(0x8000, 0xbfff, 0, 0, read8_delegate(FUNC(mstation_state::flash_0x8000_read_handler), this), write8_delegate(FUNC(mstation_state::flash_0x8000_write_handler), this));
+					program.install_readwrite_handler(0x8000, 0xbfff, 0, 0, read8_delegate(FUNC(mstation_state::flash_0x8000_read_handler), this), write8_delegate(FUNC(mstation_state::flash_0x8000_write_handler), this));
 			}
 
 			active_flash = chip_select ? 1 : 0;
@@ -195,20 +195,20 @@ void mstation_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 		case 1: // banked RAM
 			sprintf(bank_tag,"bank%d", bank);
 			membank(bank_tag)->set_base(m_ram_base + (((bank == 1 ? m_bank1[0] : m_bank2[0]) & 0x07)<<14));
-			program->install_readwrite_bank (bank * 0x4000, bank * 0x4000 + 0x3fff, bank_tag);
+			program.install_readwrite_bank (bank * 0x4000, bank * 0x4000 + 0x3fff, bank_tag);
 			active_flash = -1;
 			break;
 		case 2:	// left LCD panel
-			program->install_readwrite_handler(bank * 0x4000, bank * 0x4000 + 0x3fff, 0, 0, read8_delegate(FUNC(mstation_state::lcd_left_r), this), write8_delegate(FUNC(mstation_state::lcd_left_w), this));
+			program.install_readwrite_handler(bank * 0x4000, bank * 0x4000 + 0x3fff, 0, 0, read8_delegate(FUNC(mstation_state::lcd_left_r), this), write8_delegate(FUNC(mstation_state::lcd_left_w), this));
 			active_flash = -1;
 			break;
 		case 4:	// right LCD panel
-			program->install_readwrite_handler(bank * 0x4000, bank * 0x4000 + 0x3fff, 0, 0, read8_delegate(FUNC(mstation_state::lcd_right_r), this), write8_delegate(FUNC(mstation_state::lcd_right_w), this));
+			program.install_readwrite_handler(bank * 0x4000, bank * 0x4000 + 0x3fff, 0, 0, read8_delegate(FUNC(mstation_state::lcd_right_r), this), write8_delegate(FUNC(mstation_state::lcd_right_w), this));
 			active_flash = -1;
 			break;
 		default:
 			logerror("Unknown chip %02x mapped at %04x - %04x\n", chip_select, bank * 0x4000, bank * 0x4000 + 0x3fff);
-			program->unmap_readwrite(bank * 0x4000, bank * 0x4000 + 0x3fff);
+			program.unmap_readwrite(bank * 0x4000, bank * 0x4000 + 0x3fff);
 			active_flash = -1;
 			break;
 	}

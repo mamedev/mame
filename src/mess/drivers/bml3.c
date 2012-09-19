@@ -637,16 +637,16 @@ void bml3_state::machine_start()
 
 void bml3_state::machine_reset()
 {
-	address_space *mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	/* defaults */
-	mem->install_rom(0xa000, 0xfeff,mem->machine().root_device().memregion("maincpu")->base() + 0xa000);
-	mem->install_rom(0xfff0, 0xffff,mem->machine().root_device().memregion("maincpu")->base() + 0xfff0);
-	mem->install_write_handler(0xa000, 0xbfff, 0, 0,write8_delegate(FUNC(bml3_state::bml3_a000_w), this),0);
-	mem->install_write_handler(0xc000, 0xdfff, 0, 0,write8_delegate(FUNC(bml3_state::bml3_c000_w), this),0);
-	mem->install_write_handler(0xe000, 0xefff, 0, 0,write8_delegate(FUNC(bml3_state::bml3_e000_w), this),0);
-	mem->install_write_handler(0xf000, 0xfeff, 0, 0,write8_delegate(FUNC(bml3_state::bml3_f000_w), this),0);
-	mem->install_write_handler(0xfff0, 0xffff, 0, 0,write8_delegate(FUNC(bml3_state::bml3_fff0_w), this),0);
+	mem.install_rom(0xa000, 0xfeff,mem.machine().root_device().memregion("maincpu")->base() + 0xa000);
+	mem.install_rom(0xfff0, 0xffff,mem.machine().root_device().memregion("maincpu")->base() + 0xfff0);
+	mem.install_write_handler(0xa000, 0xbfff, 0, 0,write8_delegate(FUNC(bml3_state::bml3_a000_w), this),0);
+	mem.install_write_handler(0xc000, 0xdfff, 0, 0,write8_delegate(FUNC(bml3_state::bml3_c000_w), this),0);
+	mem.install_write_handler(0xe000, 0xefff, 0, 0,write8_delegate(FUNC(bml3_state::bml3_e000_w), this),0);
+	mem.install_write_handler(0xf000, 0xfeff, 0, 0,write8_delegate(FUNC(bml3_state::bml3_f000_w), this),0);
+	mem.install_write_handler(0xfff0, 0xffff, 0, 0,write8_delegate(FUNC(bml3_state::bml3_fff0_w), this),0);
 
 	m_firq_mask = -1; // disable firq
 }
@@ -701,7 +701,7 @@ const mc6843_interface bml3_6843_if = { NULL };
 
 WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 {
-	address_space *mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	/* ROM banking:
     -0-- --0- 0xa000 - 0xbfff ROM R RAM W
     -1-- --0- 0xa000 - 0xbfff RAM R/W
@@ -721,15 +721,15 @@ WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 	{
 		if(data & 0x40)
 		{
-			mem->install_readwrite_handler(0xa000, 0xbfff, 0, 0,
+			mem.install_readwrite_handler(0xa000, 0xbfff, 0, 0,
 				read8_delegate(FUNC(bml3_state::bml3_a000_r), this),
 				write8_delegate(FUNC(bml3_state::bml3_a000_w), this), 0);
 		}
 		else
 		{
-			mem->install_rom(0xa000, 0xbfff,
-				mem->machine().root_device().memregion("maincpu")->base() + 0xa000);
-			mem->install_write_handler(0xa000, 0xbfff, 0, 0,
+			mem.install_rom(0xa000, 0xbfff,
+				mem.machine().root_device().memregion("maincpu")->base() + 0xa000);
+			mem.install_write_handler(0xa000, 0xbfff, 0, 0,
 				write8_delegate(FUNC(bml3_state::bml3_a000_w), this),
 				0);
 		}
@@ -739,15 +739,15 @@ WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 	{
 		if(data & 0x40)
 		{
-			mem->install_readwrite_handler(0xc000, 0xdfff, 0, 0,
+			mem.install_readwrite_handler(0xc000, 0xdfff, 0, 0,
 				read8_delegate(FUNC(bml3_state::bml3_c000_r), this),
 				write8_delegate(FUNC(bml3_state::bml3_c000_w), this), 0);
 		}
 		else
 		{
-			mem->install_rom(0xc000, 0xdfff,
-				mem->machine().root_device().memregion("maincpu")->base() + 0xc000);
-			mem->install_write_handler(0xc000, 0xdfff, 0, 0,
+			mem.install_rom(0xc000, 0xdfff,
+				mem.machine().root_device().memregion("maincpu")->base() + 0xc000);
+			mem.install_write_handler(0xc000, 0xdfff, 0, 0,
 				write8_delegate(FUNC(bml3_state::bml3_c000_w), this),
 				0);
 		}
@@ -757,15 +757,15 @@ WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 	{
 		if(data & 0x80)
 		{
-			mem->install_readwrite_handler(0xe000, 0xefff, 0, 0,
+			mem.install_readwrite_handler(0xe000, 0xefff, 0, 0,
 				read8_delegate(FUNC(bml3_state::bml3_e000_r), this),
 				write8_delegate(FUNC(bml3_state::bml3_e000_w), this), 0);
 		}
 		else
 		{
-			mem->install_rom(0xe000, 0xefff,
-				mem->machine().root_device().memregion("maincpu")->base() + 0xe000);
-			mem->install_write_handler(0xe000, 0xefff, 0, 0,
+			mem.install_rom(0xe000, 0xefff,
+				mem.machine().root_device().memregion("maincpu")->base() + 0xe000);
+			mem.install_write_handler(0xe000, 0xefff, 0, 0,
 				write8_delegate(FUNC(bml3_state::bml3_e000_w), this),
 				0);
 		}
@@ -773,30 +773,30 @@ WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 
 	if(data & 1)
 	{
-		mem->install_readwrite_handler(0xf000, 0xfeff, 0, 0,
+		mem.install_readwrite_handler(0xf000, 0xfeff, 0, 0,
 			read8_delegate(FUNC(bml3_state::bml3_f000_r), this),
 			write8_delegate(FUNC(bml3_state::bml3_f000_w), this), 0);
 	}
 	else
 	{
-		mem->install_rom(0xf000, 0xfeff,
-			mem->machine().root_device().memregion("maincpu")->base() + 0xf000);
-		mem->install_write_handler(0xf000, 0xfeff, 0, 0,
+		mem.install_rom(0xf000, 0xfeff,
+			mem.machine().root_device().memregion("maincpu")->base() + 0xf000);
+		mem.install_write_handler(0xf000, 0xfeff, 0, 0,
 			write8_delegate(FUNC(bml3_state::bml3_f000_w), this),
 			0);
 	}
 
 	if(data & 2)
 	{
-		mem->install_readwrite_handler(0xfff0, 0xffff, 0, 0,
+		mem.install_readwrite_handler(0xfff0, 0xffff, 0, 0,
 			read8_delegate(FUNC(bml3_state::bml3_fff0_r), this),
 			write8_delegate(FUNC(bml3_state::bml3_fff0_w), this), 0);
 	}
 	else
 	{
-		mem->install_rom(0xfff0, 0xffff,
-			mem->machine().root_device().memregion("maincpu")->base() + 0xfff0);
-		mem->install_write_handler(0xfff0, 0xffff, 0, 0,
+		mem.install_rom(0xfff0, 0xffff,
+			mem.machine().root_device().memregion("maincpu")->base() + 0xfff0);
+		mem.install_write_handler(0xfff0, 0xffff, 0, 0,
 			write8_delegate(FUNC(bml3_state::bml3_fff0_w), this),
 			0);
 	}

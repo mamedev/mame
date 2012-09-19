@@ -479,7 +479,7 @@ static CPU_INIT( m6805 )
 	state_register(cpustate, "m6805", device);
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 }
 
@@ -493,7 +493,7 @@ static CPU_RESET( m6805 )
 	cpustate->iCount=50000;		/* Used to be global */
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 
 	/* Force CPU sub-type and relevant masks */

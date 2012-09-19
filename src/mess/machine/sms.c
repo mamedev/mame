@@ -1940,7 +1940,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 	m_main_scr = machine().device("screen");
 	m_left_lcd = machine().device("left_lcd");
 	m_right_lcd = machine().device("right_lcd");
-	m_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	m_space = &machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
 	machine().scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
@@ -1948,7 +1948,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 
 MACHINE_RESET_MEMBER(sms_state,sms)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	m_ctrl_reg = 0xff;
 	if (m_has_fm)

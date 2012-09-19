@@ -2104,7 +2104,7 @@ ROM_END
 
 static void bootleg_decode( running_machine &machine )
 {
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	space.set_decrypted_region(0x0000, 0x7fff, machine.root_device().memregion("maincpu")->base() + 0x50000);
 	machine.root_device().membank("bank1")->configure_decrypted_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x60000, 0x4000);
 }
@@ -2203,8 +2203,8 @@ DRIVER_INIT_MEMBER(mitchell_state,mgakuen)
 {
 	m_input_type = 1;
 	configure_banks(machine());
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x03, 0x03, "DSW0");
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x04, 0x04, "DSW1");
+	machine().device("maincpu")->memory().space(AS_IO).install_read_port(0x03, 0x03, "DSW0");
+	machine().device("maincpu")->memory().space(AS_IO).install_read_port(0x04, 0x04, "DSW1");
 }
 DRIVER_INIT_MEMBER(mitchell_state,mgakuen2)
 {

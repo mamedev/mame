@@ -445,10 +445,10 @@ UINT16 adsp2181_device::idma_data_r()
 void adsp21xx_device::device_start()
 {
 	// get our address spaces
-	m_program = space(AS_PROGRAM);
+	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
-	m_data = space(AS_DATA);
-	m_io = space(AS_IO);
+	m_data = &space(AS_DATA);
+	m_io = has_space(AS_IO) ? &space(AS_IO) : NULL;
 
 	// "core"
 	save_item(NAME(m_core.ax0.u));

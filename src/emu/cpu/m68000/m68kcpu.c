@@ -898,7 +898,7 @@ static CPU_INIT( m68k )
 	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	m68k->device = device;
-	m68k->program = device->space(AS_PROGRAM);
+	m68k->program = &device->space(AS_PROGRAM);
 	m68k->int_ack_callback = irqcallback;
 
 	/* disable all MMUs */
@@ -2065,7 +2065,7 @@ static CPU_INIT( m68307 )
 	m68k->m68307SERIAL->reset();
 	m68k->m68307TIMER->reset();
 
-	m68k->internal = device->space(AS_PROGRAM);
+	m68k->internal = &device->space(AS_PROGRAM);
 	m68k->m68307_base = 0xbfff;
 	m68k->m68307_scrhigh = 0x0007;
 	m68k->m68307_scrlow = 0xf010;
@@ -2862,7 +2862,7 @@ static CPU_INIT( m68340 )
 
 	m68k->m68340_base = 0x00000000;
 
-	m68k->internal = device->space(AS_PROGRAM);
+	m68k->internal = &device->space(AS_PROGRAM);
 
 	define_state(device);
 }

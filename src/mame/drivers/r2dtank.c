@@ -417,7 +417,7 @@ static const mc6845_interface mc6845_intf =
 WRITE8_MEMBER(r2dtank_state::pia_comp_w)
 {
 	device_t *device = machine().device("pia_main");
-	downcast<pia6821_device *>(device)->write(*machine().memory().first_space(), offset, ~data);
+	downcast<pia6821_device *>(device)->write(machine().driver_data()->generic_space(), offset, ~data);
 }
 
 

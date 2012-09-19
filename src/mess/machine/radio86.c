@@ -168,12 +168,12 @@ READ8_MEMBER(radio86_state::radio_cpu_state_r)
 
 READ8_MEMBER(radio86_state::radio_io_r)
 {
-	return machine().device("maincpu")->memory().space(AS_PROGRAM)->read_byte((offset << 8) + offset);
+	return machine().device("maincpu")->memory().space(AS_PROGRAM).read_byte((offset << 8) + offset);
 }
 
 WRITE8_MEMBER(radio86_state::radio_io_w)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte((offset << 8) + offset,data);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).write_byte((offset << 8) + offset,data);
 }
 
 MACHINE_RESET_MEMBER(radio86_state,radio86)

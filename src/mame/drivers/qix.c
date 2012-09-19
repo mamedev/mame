@@ -1256,8 +1256,8 @@ static int kram3_decrypt(int address, int value)
 
 DRIVER_INIT_MEMBER(qix_state,kram3)
 {
-	address_space *mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	address_space *videospace = machine().device("videocpu")->memory().space(AS_PROGRAM);
+	address_space &mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &videospace = machine().device("videocpu")->memory().space(AS_PROGRAM);
 	//const UINT8 *patch;
 	UINT8 *rom, *decrypted;
 	int i;
@@ -1281,7 +1281,7 @@ DRIVER_INIT_MEMBER(qix_state,kram3)
 	rom = machine().root_device().memregion("maincpu")->base();
 	decrypted = auto_alloc_array(machine(), UINT8, 0x6000);
 
-	mainspace->set_decrypted_region(0xa000, 0xffff, decrypted);
+	mainspace.set_decrypted_region(0xa000, 0xffff, decrypted);
 
 	memcpy(decrypted,&rom[0xa000],0x6000);
 	for (i = 0xa000; i < 0x10000; ++i)
@@ -1294,7 +1294,7 @@ DRIVER_INIT_MEMBER(qix_state,kram3)
 	rom = machine().root_device().memregion("videocpu")->base();
 	decrypted = auto_alloc_array(machine(), UINT8, 0x6000);
 
-	videospace->set_decrypted_region(0xa000, 0xffff, decrypted);
+	videospace.set_decrypted_region(0xa000, 0xffff, decrypted);
 
 	memcpy(decrypted,&rom[0xa000],0x6000);
 	for (i = 0xa000; i < 0x10000; ++i)

@@ -92,7 +92,7 @@ static const serial_terminal_interface terminal_intf =
 
 QUICKLOAD_LOAD( pipbug )
 {
-	address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 	int quick_addr = 0x0440;
 	int exec_addr;

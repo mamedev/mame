@@ -248,7 +248,7 @@ void es5503_device::device_start()
 	int osc;
 
 	// find our direct access
-	m_direct = &space()->direct();
+	m_direct = &space().direct();
 
 	rege0 = 0xff;
 

@@ -326,10 +326,10 @@ INTERRUPT_GEN_MEMBER(pachifev_state::pachifev_vblank_irq)
 		/* I wish I had found a better way to handle cocktail inputs, but I can't find a way to access internal RAM */
 		/* (bit 5 of 0xf0aa : 0 = player 1 and 1 = player 2 - bit 6 of 0xf0aa : 0 = upright and 1 = cocktail). */
 		/* All I found is that in main RAM, 0xe00f.b determines the player : 0x00 = player 1 and 0x01 = player 2. */
-		address_space *ramspace = device.memory().space(AS_PROGRAM);
+		address_space &ramspace = device.memory().space(AS_PROGRAM);
 		UINT8 player = 0;
 
-		if ((ramspace->read_byte(0xe00f) == 0x01) && ((ioport("DSW1")->read() & 0x08) == 0x00))
+		if ((ramspace.read_byte(0xe00f) == 0x01) && ((ioport("DSW1")->read() & 0x08) == 0x00))
 			player = 1;
 
         int current_power=ioport(inname[player])->read() & 0x3f;

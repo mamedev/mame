@@ -606,7 +606,7 @@ static void common_decrypt(running_machine &machine)
 DRIVER_INIT_MEMBER(raiden_state,raidena)
 {
 #ifdef SYNC_HACK
-	machine().device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4008, 0x4009, FUNC(sub_cpu_spin_r));
+	machine().device("sub")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x4008, 0x4009, FUNC(sub_cpu_spin_r));
 #endif
 }
 

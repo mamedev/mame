@@ -417,7 +417,7 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 
 WRITE_LINE_MEMBER( bigbord2_state::frame )
 {
-	address_space &space = *m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	static UINT8 framecnt;
 	framecnt++;
 

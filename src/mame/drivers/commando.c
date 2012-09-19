@@ -511,7 +511,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(commando_state,commando)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0xc000);
 	int A;
@@ -531,7 +531,7 @@ DRIVER_INIT_MEMBER(commando_state,commando)
 
 DRIVER_INIT_MEMBER(commando_state,spaceinv)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0xc000);
 	int A;

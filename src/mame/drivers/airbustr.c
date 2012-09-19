@@ -783,7 +783,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(airbustr_state,airbustr)
 {
-	machine().device("master")->memory().space(AS_PROGRAM)->install_read_handler(0xe000, 0xefff, read8_delegate(FUNC(airbustr_state::devram_r),this)); // protection device lives here
+	machine().device("master")->memory().space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8_delegate(FUNC(airbustr_state::devram_r),this)); // protection device lives here
 }
 
 

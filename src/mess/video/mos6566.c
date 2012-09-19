@@ -280,14 +280,14 @@ inline void mos6566_device::vic2_clear_interrupt( int mask )
 
 inline UINT8 mos6566_device::read_videoram(offs_t offset)
 {
-	m_last_data = space(AS_0)->read_byte(offset & 0x3fff);
+	m_last_data = space(AS_0).read_byte(offset & 0x3fff);
 
 	return m_last_data;
 }
 
 inline UINT8 mos6566_device::read_colorram(offs_t offset)
 {
-	return space(AS_1)->read_byte(offset & 0x3ff);
+	return space(AS_1).read_byte(offset & 0x3ff);
 }
 
 // Idle access

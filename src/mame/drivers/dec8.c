@@ -71,7 +71,7 @@ void dec8_state::screen_eof_dec8(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 		dec8_mxc06_karn_buffer_spriteram_w(space, 0, 0);
 	}
 }
@@ -3524,7 +3524,7 @@ DRIVER_INIT_MEMBER(dec8_state,dec8)
 /* Ghostbusters, Darwin, Oscar use a "Deco 222" custom 6502 for sound. */
 DRIVER_INIT_MEMBER(dec8_state,deco222)
 {
-	address_space &space = *machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("audiocpu")->memory().space(AS_PROGRAM);
 	int A;
 	UINT8 *decrypt;
 	UINT8 *rom;

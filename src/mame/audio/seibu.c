@@ -104,7 +104,7 @@ static UINT8 decrypt_opcode(int a,int src)
 
 void seibu_sound_decrypt(running_machine &machine,const char *cpu,int length)
 {
-	address_space &space = *machine.device(cpu)->memory().space(AS_PROGRAM);
+	address_space &space = machine.device(cpu)->memory().space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length);
 	UINT8 *rom = machine.root_device().memregion(cpu)->base();
 	int i;

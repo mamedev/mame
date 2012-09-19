@@ -141,7 +141,7 @@ static CPU_INIT( m6509 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->space = device->space(AS_PROGRAM);
+	cpustate->space = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->space->direct();
 
 	if ( intf )

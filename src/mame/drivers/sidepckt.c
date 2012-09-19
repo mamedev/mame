@@ -502,14 +502,14 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sidepckt_state,sidepckt)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3014, 0x3014, read8_delegate(FUNC(sidepckt_state::sidepckt_i8751_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x3018, 0x3018, write8_delegate(FUNC(sidepckt_state::sidepckt_i8751_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x3014, 0x3014, read8_delegate(FUNC(sidepckt_state::sidepckt_i8751_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x3018, 0x3018, write8_delegate(FUNC(sidepckt_state::sidepckt_i8751_w),this));
 }
 
 DRIVER_INIT_MEMBER(sidepckt_state,sidepctj)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3014, 0x3014, read8_delegate(FUNC(sidepckt_state::sidepckt_i8751_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x3018, 0x3018, write8_delegate(FUNC(sidepckt_state::sidepctj_i8751_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x3014, 0x3014, read8_delegate(FUNC(sidepckt_state::sidepckt_i8751_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x3018, 0x3018, write8_delegate(FUNC(sidepckt_state::sidepctj_i8751_w),this));
 }
 
 

@@ -228,7 +228,7 @@ void ts2068_update_memory(running_machine &machine)
 {
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	unsigned char *ChosenROM, *ExROM;
 	const timex_cart_t *timex_cart = timex_cart_data();
 	int timex_cart_type = timex_cart->type;

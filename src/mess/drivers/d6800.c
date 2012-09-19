@@ -320,7 +320,7 @@ static const cassette_interface d6800_cassette_interface =
 
 static QUICKLOAD_LOAD( d6800 )
 {
-	address_space &space = *image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 	int quick_addr = 0x0200;
 	int exec_addr = 0xc000;

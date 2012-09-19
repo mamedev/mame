@@ -1739,12 +1739,12 @@ ROM_END
 
 DRIVER_INIT_MEMBER(slapfght_state,tigerh)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerh_mcu_r),this), write8_delegate(FUNC(slapfght_state::tigerh_mcu_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerh_mcu_r),this), write8_delegate(FUNC(slapfght_state::tigerh_mcu_w),this));
 }
 
 DRIVER_INIT_MEMBER(slapfght_state,tigerhb)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerhb_e803_r),this), write8_delegate(FUNC(slapfght_state::tigerhb_e803_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerhb_e803_r),this), write8_delegate(FUNC(slapfght_state::tigerhb_e803_w),this));
 }
 
 
@@ -1805,8 +1805,8 @@ READ8_MEMBER(slapfght_state::gtstarb1_port_0_read)
 static void getstar_init( running_machine &machine )
 {
 	slapfght_state *state = machine.driver_data<slapfght_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::getstar_e803_r),state), write8_delegate(FUNC(slapfght_state::getstar_e803_w),state));
-	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_port_00_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::getstar_e803_r),state), write8_delegate(FUNC(slapfght_state::getstar_e803_w),state));
+	machine.device("maincpu")->memory().space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_port_00_r),state));
 }
 
 DRIVER_INIT_MEMBER(slapfght_state,getstar)
@@ -1829,7 +1829,7 @@ DRIVER_INIT_MEMBER(slapfght_state,gtstarb1)
 	getstar_init(machine());
 
 	/* specific handlers for this bootleg */
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x0, 0x0, read8_delegate(FUNC(slapfght_state::gtstarb1_port_0_read),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x0, 0x0, read8_delegate(FUNC(slapfght_state::gtstarb1_port_0_read),this));
 	/* requires this or it gets stuck with 'rom test' on screen */
 	/* it is possible the program roms are slighly corrupt like the gfx roms, or
        that the bootleg simply shouldn't execute the code due to the modified roms */
@@ -1845,13 +1845,13 @@ DRIVER_INIT_MEMBER(slapfght_state,gtstarb2)
 
 DRIVER_INIT_MEMBER(slapfght_state,slapfigh)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::slapfight_mcu_r),this), write8_delegate(FUNC(slapfght_state::slapfight_mcu_w),this));
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_mcu_status_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::slapfight_mcu_r),this), write8_delegate(FUNC(slapfght_state::slapfight_mcu_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_mcu_status_r),this));
 }
 
 DRIVER_INIT_MEMBER(slapfght_state,perfrman)
 {
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::perfrman_port_00_r),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::perfrman_port_00_r),this));
 }
 
 /*  ( YEAR  NAME        PARENT    MACHINE     INPUT     INIT      MONITOR  COMPANY    FULLNAME     FLAGS ) */

@@ -234,7 +234,7 @@ READ8_MEMBER(pcw_state::pcw_keyboard_data_r)
 static void pcw_update_read_memory_block(running_machine &machine, int block, int bank)
 {
 	pcw_state *state = machine.driver_data<pcw_state>();
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	char block_name[10];
 
 	sprintf(block_name,"bank%d",block+1);

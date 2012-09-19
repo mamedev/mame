@@ -5444,7 +5444,7 @@ static void install_c74_speedup(running_machine &machine)
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	if (MCU_SPEEDUP)
-		state->m_mcu->space(AS_PROGRAM)->install_readwrite_handler(0x80, 0x81, read16_delegate(FUNC(namcos22_state::mcuc74_speedup_r),state), write16_delegate(FUNC(namcos22_state::mcu_speedup_w),state));
+		state->m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x80, 0x81, read16_delegate(FUNC(namcos22_state::mcuc74_speedup_r),state), write16_delegate(FUNC(namcos22_state::mcu_speedup_w),state));
 }
 
 static void install_130_speedup(running_machine &machine)
@@ -5452,7 +5452,7 @@ static void install_130_speedup(running_machine &machine)
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	// install speedup cheat for 1.30 MCU BIOS
 	if (MCU_SPEEDUP)
-		state->m_mcu->space(AS_PROGRAM)->install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos22_state::mcu130_speedup_r),state), write16_delegate(FUNC(namcos22_state::mcu_speedup_w),state));
+		state->m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos22_state::mcu130_speedup_r),state), write16_delegate(FUNC(namcos22_state::mcu_speedup_w),state));
 }
 
 static void install_141_speedup(running_machine &machine)
@@ -5460,7 +5460,7 @@ static void install_141_speedup(running_machine &machine)
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	// install speedup cheat for 1.41 MCU BIOS
 	if (MCU_SPEEDUP)
-		state->m_mcu->space(AS_PROGRAM)->install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos22_state::mcu141_speedup_r),state), write16_delegate(FUNC(namcos22_state::mcu_speedup_w),state));
+		state->m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos22_state::mcu141_speedup_r),state), write16_delegate(FUNC(namcos22_state::mcu_speedup_w),state));
 }
 
 static void namcos22_init( running_machine &machine, int game_type )
@@ -5483,8 +5483,8 @@ static void alpine_init_common( running_machine &machine, int game_type )
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22_init(machine, game_type);
 
-	state->m_mcu->space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::alpineracer_mcu_adc_r),state));
-	state->m_mcu->space(AS_IO)->install_write_handler(M37710_PORT5, M37710_PORT5, write8_delegate(FUNC(namcos22_state::alpine_mcu_port5_w),state));
+	state->m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::alpineracer_mcu_adc_r),state));
+	state->m_mcu->space(AS_IO).install_write_handler(M37710_PORT5, M37710_PORT5, write8_delegate(FUNC(namcos22_state::alpine_mcu_port5_w),state));
 
 	state->m_motor_timer = machine.scheduler().timer_alloc(FUNC(alpine_steplock_callback));
 	state->m_motor_timer->reset();
@@ -5513,8 +5513,8 @@ DRIVER_INIT_MEMBER(namcos22_state,alpinesa)
 {
 	alpine_init_common(machine(), NAMCOS22_ALPINE_SURFER);
 
-	m_maincpu->space(AS_PROGRAM)->install_read_handler (0x200000, 0x200003, read32_delegate(FUNC(namcos22_state::alpinesa_prot_r),this));
-	m_maincpu->space(AS_PROGRAM)->install_write_handler(0x300000, 0x300003, write32_delegate(FUNC(namcos22_state::alpinesa_prot_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler (0x200000, 0x200003, read32_delegate(FUNC(namcos22_state::alpinesa_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write32_delegate(FUNC(namcos22_state::alpinesa_prot_w),this));
 	install_141_speedup(machine());
 
 	m_keycus_id = 0x01a9;
@@ -5525,7 +5525,7 @@ DRIVER_INIT_MEMBER(namcos22_state,airco22)
 	namcos22_init(machine(), NAMCOS22_AIR_COMBAT22);
 
 	// S22-BIOS ver1.20 namco all rights reserved 94/12/21
-	m_mcu->space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::airco22_mcu_adc_r),this));
+	m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::airco22_mcu_adc_r),this));
 }
 
 DRIVER_INIT_MEMBER(namcos22_state,propcycl)
@@ -5548,8 +5548,8 @@ DRIVER_INIT_MEMBER(namcos22_state,propcycl)
 //   pROM[0x22296/4] |= 0x00004e75;
 
 	namcos22_init(machine(), NAMCOS22_PROP_CYCLE);
-	m_mcu->space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::propcycle_mcu_adc_r),this));
-	m_mcu->space(AS_IO)->install_write_handler(M37710_PORT5, M37710_PORT5, write8_delegate(FUNC(namcos22_state::propcycle_mcu_port5_w),this));
+	m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::propcycle_mcu_adc_r),this));
+	m_mcu->space(AS_IO).install_write_handler(M37710_PORT5, M37710_PORT5, write8_delegate(FUNC(namcos22_state::propcycle_mcu_port5_w),this));
 	install_141_speedup(machine());
 }
 
@@ -5609,7 +5609,7 @@ DRIVER_INIT_MEMBER(namcos22_state,cybrcyc)
 {
 	namcos22_init(machine(), NAMCOS22_CYBER_CYCLES);
 
-	m_mcu->space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::cybrcycc_mcu_adc_r),this));
+	m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::cybrcycc_mcu_adc_r),this));
 	install_130_speedup(machine());
 
 	m_keycus_id = 0x0387;
@@ -5626,7 +5626,7 @@ DRIVER_INIT_MEMBER(namcos22_state,tokyowar)
 {
 	namcos22_init(machine(), NAMCOS22_TOKYO_WARS);
 
-	m_mcu->space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::tokyowar_mcu_adc_r),this));
+	m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::tokyowar_mcu_adc_r),this));
 	install_141_speedup(machine());
 
 	m_keycus_id = 0x01a8;
@@ -5635,7 +5635,7 @@ DRIVER_INIT_MEMBER(namcos22_state,tokyowar)
 DRIVER_INIT_MEMBER(namcos22_state,aquajet)
 {
 	namcos22_init(machine(), NAMCOS22_AQUA_JET);
-	m_mcu->space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::aquajet_mcu_adc_r),this));
+	m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::aquajet_mcu_adc_r),this));
 	install_141_speedup(machine());
 }
 
@@ -5643,7 +5643,7 @@ DRIVER_INIT_MEMBER(namcos22_state,dirtdash)
 {
 	namcos22_init(machine(), NAMCOS22_DIRT_DASH);
 
-	m_mcu->space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::cybrcycc_mcu_adc_r),this));
+	m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::cybrcycc_mcu_adc_r),this));
 	install_141_speedup(machine());
 
 	m_keycus_id = 0x01a2;

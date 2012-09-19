@@ -223,9 +223,9 @@ static CPU_INIT( tms )
 	tms32051_state *cpustate = get_safe_token(device);
 
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = device->space(AS_DATA);
+	cpustate->data = &device->space(AS_DATA);
 
 	cpustate->pcstack_ptr = 0;
 }

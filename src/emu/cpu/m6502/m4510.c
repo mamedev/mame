@@ -191,7 +191,7 @@ static CPU_INIT( m4510 )
 	cpustate->interrupt_inhibit = 0;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->space = device->space(AS_PROGRAM);
+	cpustate->space = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->space->direct();
 
 	if ( intf )

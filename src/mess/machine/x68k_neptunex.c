@@ -47,7 +47,7 @@ void x68k_neptune_device::device_start()
 	device_t* cpu = machine().device("maincpu");
 	char mac[7];
 	UINT32 num = rand();
-	address_space& space = *cpu->memory().space(AS_PROGRAM);
+	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<x68k_expansion_slot_device *>(owner());
 	memset(m_prom, 0x57, 16);
 	sprintf(mac+2, "\x1b%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);

@@ -143,10 +143,10 @@ static CPU_INIT( mb88 )
 
 	cpustate->irqcallback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->data = &device->space(AS_DATA);
+	cpustate->io = &device->space(AS_IO);
 
 	cpustate->serial = device->machine().scheduler().timer_alloc(FUNC(serial_timer), (void *)device);
 

@@ -270,7 +270,7 @@ static void c65_dma_port_w( running_machine &machine, int offset, int value )
 	PAIR pair, src, dst, len;
 	UINT8 cmd, fill;
 	int i;
-	address_space &space = *machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch (offset & 3)
 	{
@@ -793,13 +793,13 @@ void c65_bankswitch_interface( running_machine &machine, int value )
 		{
 			state->membank("bank8")->set_base(state->m_colorram + 0x400);
 			state->membank("bank9")->set_base(state->m_colorram + 0x400);
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0dc00, 0x0dfff, "bank8");
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0dc00, 0x0dfff, "bank9");
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x0dc00, 0x0dfff, "bank8");
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_bank(0x0dc00, 0x0dfff, "bank9");
 		}
 		else
 		{
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0dc00, 0x0dfff, FUNC(c65_read_io_dc00));
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0dc00, 0x0dfff, FUNC(c65_write_io_dc00));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x0dc00, 0x0dfff, FUNC(c65_read_io_dc00));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x0dc00, 0x0dfff, FUNC(c65_write_io_dc00));
 		}
 	}
 
@@ -869,18 +869,18 @@ void c65_bankswitch( running_machine &machine )
 
 		if (state->m_io_dc00_on)
 		{
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0dc00, 0x0dfff, FUNC(c65_read_io_dc00));
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0dc00, 0x0dfff, FUNC(c65_write_io_dc00));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x0dc00, 0x0dfff, FUNC(c65_read_io_dc00));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x0dc00, 0x0dfff, FUNC(c65_write_io_dc00));
 		}
 		else
 		{
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0dc00, 0x0dfff, "bank8");
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0dc00, 0x0dfff, "bank9");
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x0dc00, 0x0dfff, "bank8");
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_bank(0x0dc00, 0x0dfff, "bank9");
 			state->membank("bank8")->set_base(state->m_colorram + 0x400);
 			state->membank("bank9")->set_base(state->m_colorram + 0x400);
 		}
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0d000, 0x0d7ff, FUNC(c65_read_io));
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0d000, 0x0d7ff, FUNC(c65_write_io));
+		machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x0d000, 0x0d7ff, FUNC(c65_read_io));
+		machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x0d000, 0x0d7ff, FUNC(c65_write_io));
 	}
 	else
 	{
@@ -900,8 +900,8 @@ void c65_bankswitch( running_machine &machine )
 			state->membank("bank6")->set_base(state->m_memory + 0xd800);
 			state->membank("bank8")->set_base(state->m_memory + 0xdc00);
 		}
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0d000, 0x0d7ff, "bank4");
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0d000, 0x0d7ff, "bank5");
+		machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x0d000, 0x0d7ff, "bank4");
+		machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_bank(0x0d000, 0x0d7ff, "bank5");
 	}
 
 	if (!state->m_game && state->m_exrom)

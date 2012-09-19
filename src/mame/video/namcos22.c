@@ -2813,7 +2813,7 @@ UINT32 namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb
 		FILE *f = fopen( "dump.txt", "wb" );
 		if( f )
 		{
-			address_space &space = *m_maincpu->space(AS_PROGRAM);
+			address_space &space = m_maincpu->space(AS_PROGRAM);
 
 			if (1) // czram
 			{
@@ -2878,7 +2878,7 @@ UINT32 namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb3
 		FILE *f = fopen( "dump.txt", "wb" );
 		if( f )
 		{
-			address_space &space = *m_maincpu->space(AS_PROGRAM);
+			address_space &space = m_maincpu->space(AS_PROGRAM);
 
 			//Dump(space, f,0x90000000, 0x90000003, "led?" );
 			Dump(space, f,0x90010000, 0x90017fff, "cz_ram");

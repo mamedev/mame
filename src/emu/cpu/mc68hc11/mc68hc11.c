@@ -446,9 +446,9 @@ static CPU_INIT( hc11 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = &device->space(AS_IO);
 
 	device->save_item(NAME(cpustate->pc));
 	device->save_item(NAME(cpustate->ix));

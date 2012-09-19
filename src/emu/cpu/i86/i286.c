@@ -310,8 +310,8 @@ static CPU_INIT( i80286 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = &device->space(AS_PROGRAM);
+	cpustate->io = &device->space(AS_IO);
 	cpustate->direct = &cpustate->program->direct();
 
 	/* If a reset parameter is given, take it as pointer to an address mask */

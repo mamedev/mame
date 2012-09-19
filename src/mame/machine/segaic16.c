@@ -541,7 +541,7 @@ void sega_315_5195_mapper_device::device_start()
 	}
 
 	// find the address space that is to be mapped
-	m_space = m_cpu->space(AS_PROGRAM);
+	m_space = &m_cpu->space(AS_PROGRAM);
 	if (m_space == NULL)
 		throw emu_fatalerror("Unable to find program address space on device '%s'", m_cputag);
 

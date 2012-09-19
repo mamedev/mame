@@ -44,20 +44,20 @@ WRITE8_MEMBER( tiki100_state::gfxram_w )
 
 void tiki100_state::bankswitch()
 {
-	address_space *program = m_maincpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	if (m_vire)
 	{
 		if (!m_rome)
 		{
 			/* reserved */
-			program->unmap_readwrite(0x0000, 0xffff);
+			program.unmap_readwrite(0x0000, 0xffff);
 		}
 		else
 		{
 			/* GFXRAM, GFXRAM, RAM */
-			program->install_readwrite_handler(0x0000, 0x7fff, read8_delegate(FUNC(tiki100_state::gfxram_r), this), write8_delegate(FUNC(tiki100_state::gfxram_w), this));
-			program->install_readwrite_bank(0x8000, 0xffff, "bank3");
+			program.install_readwrite_handler(0x0000, 0x7fff, read8_delegate(FUNC(tiki100_state::gfxram_r), this), write8_delegate(FUNC(tiki100_state::gfxram_w), this));
+			program.install_readwrite_bank(0x8000, 0xffff, "bank3");
 
 			membank("bank1")->set_entry(BANK_VIDEO_RAM);
 			membank("bank2")->set_entry(BANK_VIDEO_RAM);
@@ -69,10 +69,10 @@ void tiki100_state::bankswitch()
 		if (!m_rome)
 		{
 			/* ROM, RAM, RAM */
-			program->install_read_bank(0x0000, 0x3fff, "bank1");
-			program->unmap_write(0x0000, 0x3fff);
-			program->install_readwrite_bank(0x4000, 0x7fff, "bank2");
-			program->install_readwrite_bank(0x8000, 0xffff, "bank3");
+			program.install_read_bank(0x0000, 0x3fff, "bank1");
+			program.unmap_write(0x0000, 0x3fff);
+			program.install_readwrite_bank(0x4000, 0x7fff, "bank2");
+			program.install_readwrite_bank(0x8000, 0xffff, "bank3");
 
 			membank("bank1")->set_entry(BANK_ROM);
 			membank("bank2")->set_entry(BANK_RAM);
@@ -81,9 +81,9 @@ void tiki100_state::bankswitch()
 		else
 		{
 			/* RAM, RAM, RAM */
-			program->install_readwrite_bank(0x0000, 0x3fff, "bank1");
-			program->install_readwrite_bank(0x4000, 0x7fff, "bank2");
-			program->install_readwrite_bank(0x8000, 0xffff, "bank3");
+			program.install_readwrite_bank(0x0000, 0x3fff, "bank1");
+			program.install_readwrite_bank(0x4000, 0x7fff, "bank2");
+			program.install_readwrite_bank(0x8000, 0xffff, "bank3");
 
 			membank("bank1")->set_entry(BANK_RAM);
 			membank("bank2")->set_entry(BANK_RAM);

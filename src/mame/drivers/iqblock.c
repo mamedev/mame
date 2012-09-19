@@ -443,7 +443,7 @@ DRIVER_INIT_MEMBER(iqblock_state,iqblock)
 	m_generic_paletteram2_8.set_target(rom + 0x12800, 0x800);
 	m_fgvideoram = rom + 0x16800;
 	m_bgvideoram = rom + 0x17000;
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe26, 0xfe26, write8_delegate(FUNC(iqblock_state::iqblock_prot_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xfe26, 0xfe26, write8_delegate(FUNC(iqblock_state::iqblock_prot_w),this));
 	m_video_type=1;
 }
 
@@ -465,7 +465,7 @@ DRIVER_INIT_MEMBER(iqblock_state,grndtour)
 	m_generic_paletteram2_8.set_target(rom + 0x12800, 0x800);
 	m_fgvideoram = rom + 0x16800;
 	m_bgvideoram = rom + 0x17000;
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe39, 0xfe39, write8_delegate(FUNC(iqblock_state::grndtour_prot_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xfe39, 0xfe39, write8_delegate(FUNC(iqblock_state::grndtour_prot_w),this));
 	m_video_type=0;
 }
 

@@ -108,7 +108,7 @@ static WRITE8_DEVICE_HANDLER( enterprise_dave_reg_write )
 	case 0x11:
 	case 0x12:
 	case 0x13:
-		enterprise_update_memory_page(*device->machine().device("maincpu")->memory().space(AS_PROGRAM), offset - 0x0f, data);
+		enterprise_update_memory_page(device->machine().device("maincpu")->memory().space(AS_PROGRAM), offset - 0x0f, data);
 		break;
 
 	case 0x15:

@@ -528,7 +528,7 @@ static void install_rom_capsule(address_space &space, int size, const char *regi
 /* bank register */
 WRITE8_MEMBER(px4_state::px4_bankr_w)
 {
-	address_space &space_program = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space_program = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (VERBOSE)
 		logerror("%s: px4_bankr_w (0x%02x)\n", machine().describe_context(), data);

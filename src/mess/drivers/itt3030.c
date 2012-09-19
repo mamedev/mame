@@ -57,7 +57,7 @@ READ8_MEMBER(itt3030_state::unk2_r)
 
 UINT32 itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = *machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	for(int y = 0; y < 24; y++ )
 	{
