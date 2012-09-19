@@ -2354,6 +2354,8 @@ MACHINE_CONFIG_DERIVED_CLASS( modelr, invaders, _8080bw_state )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(modelr_io_map)
+	
+	MCFG_WATCHDOG_TIME_INIT(attotime::never)
 
 MACHINE_CONFIG_END
 
@@ -2596,16 +2598,28 @@ ROM_START( invadrmr )
 	ROM_LOAD( "sv06.1g",     0x1c00, 0x0400, CRC(2c68e0b4) SHA1(a5e5357120102ad32792bf3ef6362f45b7ba7070) )
 ROM_END
 
-ROM_START( modelr )
+
+ROM_START( claybust )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "251.bin",       0x0000, 0x0400, CRC(f27a8c1e) SHA1(510debd1ac2c0986f99c217e3078208a39d7837c) )
-	ROM_LOAD( "252.bin",       0x0400, 0x0400, CRC(d53b8f91) SHA1(56919f4c88fb3b5c23b5365f0866698bfceb2762) )
-	ROM_LOAD( "253.bin",       0x0800, 0x0400, CRC(9ef35c6c) SHA1(95bda3e2cdd50f7ac989c581481bad5f1ef2992f) )
-	ROM_LOAD( "254.bin",       0x0c00, 0x0400, CRC(ba5b562d) SHA1(47819d7e5ef3700e700a5f2faa9537bc2199561c) )
-	ROM_LOAD( "255.bin",       0x1000, 0x0400, CRC(00ea8293) SHA1(9c921fa4bafc36fc16a3f5f8588887342936d433) )
-	ROM_LOAD( "256.bin",       0x1400, 0x0400, CRC(e271150c) SHA1(36d0c0c1335036b4a994e8a38904adcf74161c59) )
-	ROM_LOAD( "257.bin",       0x1800, 0x0400, CRC(0da5d9ad) SHA1(c87c6ab248bfd2b75f070343a8f7fcbaed13f4e3) )
-	ROM_LOAD( "258.bin",       0x1c00, 0x0400, CRC(471d4052) SHA1(c8ccda2eba44c2ab49f5fc2874fe70c2bdae35d3) )
+	ROM_LOAD( "mr0.a1",       0x0000, 0x0400, CRC(90810582) SHA1(a5c3655bae6f92a3cd0eae3a5a3c25e414d4fdf0) )
+	ROM_LOAD( "mr1.a2",       0x0400, 0x0400, CRC(5ce6fb0e) SHA1(19fa3fbc0dd7e0fa4fffc005ded5a814c3b48f2d) )
+	ROM_LOAD( "mr2.a4",       0x0800, 0x0400, CRC(d4c1d523) SHA1(1a4785095caa8200d7e1d8d53a93c8e298f52c65) )
+	ROM_LOAD( "mr3.a5",       0x0c00, 0x0400, CRC(1ca00825) SHA1(74633a4903a51f1eebdd09679597dbe86db2e001) )
+	ROM_LOAD( "mr4.a6",       0x1000, 0x0400, CRC(09a21120) SHA1(e976d2c173c649e51b032bc5dad54f006864155c) )
+	ROM_LOAD( "mr5.a8",       0x1400, 0x0400, CRC(92cd4da8) SHA1(217e00012a52c479bf0b0cf37ce556387755740d) )
+ROM_END
+
+
+ROM_START( gunchamp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "251.bin",      0x0000, 0x0400, CRC(f27a8c1e) SHA1(510debd1ac2c0986f99c217e3078208a39d7837c) )
+	ROM_LOAD( "252.bin",      0x0400, 0x0400, CRC(d53b8f91) SHA1(56919f4c88fb3b5c23b5365f0866698bfceb2762) )
+	ROM_LOAD( "253.bin",      0x0800, 0x0400, CRC(9ef35c6c) SHA1(95bda3e2cdd50f7ac989c581481bad5f1ef2992f) )
+	ROM_LOAD( "254.bin",      0x0c00, 0x0400, CRC(ba5b562d) SHA1(47819d7e5ef3700e700a5f2faa9537bc2199561c) )
+	ROM_LOAD( "255.bin",      0x1000, 0x0400, CRC(00ea8293) SHA1(9c921fa4bafc36fc16a3f5f8588887342936d433) )
+	ROM_LOAD( "256.bin",      0x1400, 0x0400, CRC(e271150c) SHA1(36d0c0c1335036b4a994e8a38904adcf74161c59) )
+	ROM_LOAD( "257.bin",      0x1800, 0x0400, CRC(0da5d9ad) SHA1(c87c6ab248bfd2b75f070343a8f7fcbaed13f4e3) )
+	ROM_LOAD( "258.bin",      0x1c00, 0x0400, CRC(471d4052) SHA1(c8ccda2eba44c2ab49f5fc2874fe70c2bdae35d3) )
 ROM_END
 
 
@@ -3773,7 +3787,8 @@ GAME( 1979, yosakdon, 0,        yosakdon, yosakdon, driver_device, 0, ROT270, "W
 GAME( 1979, yosakdona,yosakdon, yosakdon, yosakdon, driver_device, 0, ROT270, "Wing", "Yosaku To Donbei (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* bootleg? */
 GAMEL(1979, shuttlei, 0,        shuttlei, shuttlei, driver_device, 0, ROT270, "Omori Electric Co., Ltd.", "Shuttle Invader", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL, layout_shuttlei )
 GAMEL(1979, skylove,  0,        shuttlei, skylove, driver_device,  0, ROT270, "Omori Electric Co., Ltd.", "Sky Love", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL, layout_shuttlei )
-GAME (19??, modelr,   0,        modelr,   invadrmr, driver_device, 0, ROT0,   "Model Racing", "unknown Model Racing gun game", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // no titlescreen
+GAME (1978, claybust, 0,        modelr,   invadrmr, driver_device, 0, ROT0,   "Model Racing", "Claybuster", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // no titlescreen, Claybuster according to flyers
+GAME (1980, gunchamp, 0,        modelr,   invadrmr, driver_device, 0, ROT0,   "Model Racing", "Gun Champ", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // no titlescreen, but very likely this is Gun Champ
 
 GAME( 2002, invmulti,    0,        invmulti, invmulti, _8080bw_state, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (M8.03D)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 2002, invmultim3a, invmulti, invmulti, invmulti, _8080bw_state, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (M8.03A)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
