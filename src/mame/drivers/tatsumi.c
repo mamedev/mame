@@ -165,11 +165,21 @@ WRITE16_MEMBER(tatsumi_state::cyclwarr_cpu_bb_w)
 	COMBINE_DATA(&m_cyclwarr_cpub_ram[offset]);
 }
 
-READ16_MEMBER(tatsumi_state::cyclwarr_palette_r){ return m_generic_paletteram_16[offset]; }
-READ16_MEMBER(tatsumi_state::cyclwarr_sprite_r){
-	return m_spriteram[offset]; }
-WRITE16_MEMBER(tatsumi_state::cyclwarr_sprite_w){
-	COMBINE_DATA(&m_spriteram[offset]); }
+READ16_MEMBER(tatsumi_state::cyclwarr_palette_r)
+{
+	return m_generic_paletteram_16[offset];
+}
+
+READ16_MEMBER(tatsumi_state::cyclwarr_sprite_r)
+{
+	return m_spriteram[offset];
+}
+
+WRITE16_MEMBER(tatsumi_state::cyclwarr_sprite_w)
+{
+	COMBINE_DATA(&m_spriteram[offset]);
+}
+
 WRITE16_MEMBER(tatsumi_state::bigfight_a20000_w)
 {
 	COMBINE_DATA(&m_bigfight_a20000[offset]);
