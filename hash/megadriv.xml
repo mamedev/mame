@@ -1534,13 +1534,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="aresshmd">
-		<!-- Alt. Title: A Ressha de Ikou MD (Box) -->
 		<description>A Ressha de Ikou MD - Take the "A" Train (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4532"/>
 		<info name="release" value="19920410"/>
-		<info name="alt_title" value="A列車で行こうMD"/>
+		<info name="alt_title" value="A列車で行こうMD ~ A Ressha de Ikou MD (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
@@ -2086,13 +2085,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="alexkiddj" cloneof="alexkidd">
-		<!-- Alt. Title: Alex Kidd - Tenkuu Majou (Box) -->
 		<description>Alex Kidd in the Enchanted Castle (Jpn)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4004"/>
 		<info name="release" value="19890210 "/>
-		<info name="alt_title" value="アレックスキッド 天空魔城"/>
+		<info name="alt_title" value="アレックスキッド 天空魔城 ~ Alex Kidd - Tenkuu Majou (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="alex kidd - tenkuu majou (jpn).bin" size="262144" crc="8a5ed856" sha1="0bd83099edd3938a0f127ed399cb01046e36ac32" offset="000000" loadflag="load16_word_swap" />
@@ -4327,10 +4325,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="cal50">
-		<!-- Alt. Title: Caliber.50 (Box) -->
 		<description>Cal.50 - Caliber Fifty (USA)</description>
 		<year>1991</year>
 		<publisher>Mentrix Software</publisher>
+		<info name="alt_title" value="Caliber.50 (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="caliber .50 (usa).bin" size="1048576" crc="44f4fa05" sha1="a68f3b9350a3a05850c17d157b56de88556cd26a" offset="000000" loadflag="load16_word_swap" />
@@ -11519,10 +11517,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="galahad">
-		<!-- Alt. Title: The Legend of Galahad (Euro Box) -->
 		<description>Galahad (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="alt_title" value="The Legend of Galahad (Euro Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="gal01.bin" size="1048576" crc="679557bc" sha1="3368af01da1f3f9e0ea7c80783170aeb08f5c24d" offset="000000" loadflag="load16_word_swap" />
@@ -13056,7 +13054,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="mmprp4" cloneof="mmpr">
-		<description>Mighty Morphin Power Rangers (Prototype, 19940804)</description>
+		<description>Mighty Morphin Power Rangers (USA, Prototype, 19940804)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -13067,7 +13065,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="mmprp3" cloneof="mmpr">
-		<description>Mighty Morphin Power Rangers (Prototype, 19940808)</description>
+		<description>Mighty Morphin Power Rangers (USA, Prototype, 19940808)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -13144,7 +13142,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="mmprtmp4" cloneof="mmprtm">
-		<description>Mighty Morphin Power Rangers - The Movie (Prototype, 19950713)</description>
+		<description>Mighty Morphin Power Rangers - The Movie (USA, Prototype, 19950713)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -13155,7 +13153,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="mmprtmp3" cloneof="mmprtm">
-		<description>Mighty Morphin Power Rangers - The Movie (Prototype, 19950717)</description>
+		<description>Mighty Morphin Power Rangers - The Movie (USA, Prototype, 19950717)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -13166,7 +13164,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="mmprtmp2" cloneof="mmprtm">
-		<description>Mighty Morphin Power Rangers - The Movie (Prototype, 19950722)</description>
+		<description>Mighty Morphin Power Rangers - The Movie (USA, Prototype, 19950722)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -13177,7 +13175,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="mmprtmp1" cloneof="mmprtm">
-		<description>Mighty Morphin Power Rangers - The Movie (Prototype, 19950724)</description>
+		<description>Mighty Morphin Power Rangers - The Movie (USA, Prototype, 19950724)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -13662,10 +13660,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="nbaact">
-		<!-- Alt. Title: NBA Action '94 (Box) -->
 		<description>NBA Action (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="NBA Action '94 (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
@@ -13676,7 +13674,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nbaactp3" cloneof="nbaact">
+	<software name="nbaactp3" cloneof="nbaact" supported="no">
 		<description>NBA Action (Prototype, 19940104)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -13701,8 +13699,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nbaactp1" cloneof="nbaact">
-		<description>NBA Action (Prototype, 19940127, broken - C08 missing)</description>
+	<software name="nbaactp1" cloneof="nbaact" supported="no">
+		<description>NBA Action (Prototype, 19940127, Broken - C08 missing)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -13716,10 +13714,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="nbaact95">
-		<!-- Alt. Title: NBA Action '95 Starring David Robinson (Box) -->
 		<description>NBA Action '95 (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="NBA Action '95 Starring David Robinson (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
@@ -13730,7 +13728,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nbaact95p23" cloneof="nbaact95">
+	<software name="nbaact95p23" cloneof="nbaact95" supported="no">
 		<description>NBA Action '95 (Prototype, 19941202-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -13744,7 +13742,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nbaact95p22" cloneof="nbaact95">
+	<software name="nbaact95p22" cloneof="nbaact95" supported="no">
 		<description>NBA Action '95 (Prototype, 19941209)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -13758,7 +13756,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nbaact95p21" cloneof="nbaact95">
+	<software name="nbaact95p21" cloneof="nbaact95" supported="no">
 		<description>NBA Action '95 (Prototype, 19941215)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -13814,7 +13812,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nbaact95p17" cloneof="nbaact95">
+	<software name="nbaact95p17" cloneof="nbaact95" supported="no">
 		<description>NBA Action '95 (Prototype, 19941230)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -13885,7 +13883,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nbaact95p15" cloneof="nbaact95">
+	<software name="nbaact95p15" cloneof="nbaact95" supported="no">
 		<description>NBA Action '95 (Prototype, 19950103)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -13899,7 +13897,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nbaact95p14" cloneof="nbaact95">
+	<software name="nbaact95p14" cloneof="nbaact95" supported="no">
 		<description>NBA Action '95 (Prototype, 19950108)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -13913,7 +13911,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nbaact95p13" cloneof="nbaact95">
+	<software name="nbaact95p13" cloneof="nbaact95" supported="no">
 		<description>NBA Action '95 (Prototype, 19950112)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -14502,7 +14500,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nfl95p19" cloneof="nfl95">
+	<software name="nfl95p19" cloneof="nfl95" supported="no">
 		<description>NFL '95 (Prototype, 19940810)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -14546,7 +14544,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nfl95p15" cloneof="nfl95">
+	<software name="nfl95p15" cloneof="nfl95" supported="no">
 		<description>NFL '95 (Prototype, 19940817)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -14568,7 +14566,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nfl95p13" cloneof="nfl95">
+	<software name="nfl95p13" cloneof="nfl95" supported="no">
 		<description>NFL '95 (Prototype, 19940830)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -14579,7 +14577,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nfl95p12" cloneof="nfl95">
+	<software name="nfl95p12" cloneof="nfl95" supported="no">
 		<description>NFL '95 (Prototype, 19940831)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -14590,7 +14588,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nfl95p11" cloneof="nfl95">
+	<software name="nfl95p11" cloneof="nfl95" supported="no">
 		<description>NFL '95 (Prototype, 19940901)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -14604,7 +14602,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nfl95p10" cloneof="nfl95">
+	<software name="nfl95p10" cloneof="nfl95" supported="no">
 		<description>NFL '95 (Prototype, 19940902)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -14618,7 +14616,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nfl95p09" cloneof="nfl95">
+	<software name="nfl95p09" cloneof="nfl95" supported="no">
 		<description>NFL '95 (Prototype, 19940904)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -14632,7 +14630,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nfl95p08" cloneof="nfl95">
+	<software name="nfl95p08" cloneof="nfl95" supported="no">
 		<description>NFL '95 (Prototype, 19940905-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -14646,7 +14644,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nfl95p07" cloneof="nfl95">
+	<software name="nfl95p07" cloneof="nfl95" supported="no">
 		<description>NFL '95 (Prototype, 19940905)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -14660,7 +14658,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nfl95p06" cloneof="nfl95">
+	<software name="nfl95p06" cloneof="nfl95" supported="no">
 		<description>NFL '95 (Prototype, 19940906)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -14674,7 +14672,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nfl95p05" cloneof="nfl95">
+	<software name="nfl95p05" cloneof="nfl95" supported="no">
 		<description>NFL '95 (Prototype, 19940907)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -14688,7 +14686,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nfl95p04" cloneof="nfl95">
+	<software name="nfl95p04" cloneof="nfl95" supported="no">
 		<description>NFL '95 (Prototype, 19940908)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -14702,7 +14700,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nfl95p03" cloneof="nfl95">
+	<software name="nfl95p03" cloneof="nfl95" supported="no">
 		<description>NFL '95 (Prototype, 19940909)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -14770,7 +14768,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="nfl94j" cloneof="nfl94">
-		<description>NFL Football '94 (Jpn)</description>
+		<description>NFL Football '94 Starring Joe Montana (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5535"/>
@@ -15352,7 +15350,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="olympgldu1" cloneof="olympgld">
+	<software name="olympgldu1" cloneof="olympgld" supported="no">
 		<description>Olympic Gold (USA, Alt)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
@@ -15930,10 +15928,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="pele2">
-		<!-- Alt. Title: Pele II - World Tournament Soccer (USA Box) -->
 		<description>Pelé's World Tournament Soccer (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>Accolade</publisher>
+		<info name="alt_title" value="Pelé II - World Tournament Soccer (USA Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
@@ -16270,9 +16268,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="pstar4">
-		<description>Phantasy Star IV (USA)</description>
+		<description>Phantasy Star - The End of the Millennium (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="Phantasy Star IV (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
@@ -16301,7 +16300,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="pstar4p3" cloneof="pstar4">
-		<description>Phantasy Star IV (Prototype, 19940815)</description>
+		<description>Phantasy Star - The End of the Millennium (Prototype, 19940815)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -16315,7 +16314,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="pstar4p4" cloneof="pstar4">
-		<description>Phantasy Star IV (Prototype, 19940608)</description>
+		<description>Phantasy Star - The End of the Millennium (Prototype, 19940608)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -16329,7 +16328,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="pstar4p5" cloneof="pstar4">
-		<description>Phantasy Star IV (Prototype, 19940530)</description>
+		<description>Phantasy Star - The End of the Millennium (Prototype, 19940530)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -16342,8 +16341,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="pstar4p1" cloneof="pstar4">
-		<description>Phantasy Star IV (Prototype, 19941107)</description>
+	<software name="pstar4p1" cloneof="pstar4" supported="no">
+		<description>Phantasy Star - The End of the Millennium (Prototype, 19941107)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -16357,7 +16356,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="pstar4p2" cloneof="pstar4">
-		<description>Phantasy Star IV (Prototype, 19941027)</description>
+		<description>Phantasy Star - The End of the Millennium (Prototype, 19941027)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -16592,7 +16591,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="pokemona" cloneof="pokemon">
+	<software name="pokemona" cloneof="pokemon" supported="no">
 		<description>Pocket Monsters (Alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -17482,9 +17481,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="renstim">
-		<description>The Ren &amp; Stimpy Show Presents Stimpy's Invention (Euro)</description>
+		<description>Stimpy's Invention Starring Starring Ren Hoëk &amp; Stimpy (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="The Ren &amp; Stimpy Show Presents Stimpy's Invention (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="ren &amp; stimpy show presents stimpy's invention, the (euro).bin" size="1048576" crc="c276c220" sha1="34d520d8a835e386c26793f216b1dc8f78d8f67a" offset="000000" loadflag="load16_word_swap" />
@@ -17493,9 +17493,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="renstimu" cloneof="renstim">
-		<description>The Ren &amp; Stimpy Show Presents Stimpy's Invention (USA)</description>
+		<description>Stimpy's Invention Starring Starring Ren Hoëk &amp; Stimpy (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="The Ren &amp; Stimpy Show Presents Stimpy's Invention (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="ren &amp; stimpy show presents stimpy's invention, the (usa).bin" size="1048576" crc="d9503ba5" sha1="29788359cc3311107e82f275868e908314d3d426" offset="000000" loadflag="load16_word_swap" />
@@ -17504,7 +17505,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="renstimup" cloneof="renstim">
-		<description>The Ren &amp; Stimpy Show Presents Stimpy's Invention (USA, Prototype)</description>
+		<description>Stimpy's Invention Starring Starring Ren Hoëk &amp; Stimpy (USA, Prototype)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -17666,7 +17667,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="rsbtp1" cloneof="rsbt">
+	<software name="rsbtp1" cloneof="rsbt" supported="no">
 		<description>Richard Scarry's Busytown (Prototype, 19940826)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -17876,9 +17877,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="rrash3">
 		<!-- the same checksum is shared by the Beta 3 prototype (19950106), released by drx, i.e. the proto is actually final -->
-		<description>Road 3 Rash (Euro, USA)</description>
+		<description>Road 3 Rash - Tour de Force (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="alt_title" value="Road 3 Rash (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="rr3b3.bin" size="2097152" crc="15785956" sha1="b2324833bf81223a9626a6060cafc203dd203468" offset="000000" loadflag="load16_word_swap" />
@@ -17887,7 +17889,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="rrash3p" cloneof="rrash3">
-		<description>Road 3 Rash (USA, Prototype)</description>
+		<description>Road 3 Rash - World Warriors (USA, Prototype)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -18340,7 +18342,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sanguo">
+	<software name="sanguo" cloneof="sangoret">
 		<description>San Guo Zhi Lie Zhuan - Luan Shi Qun Ying (Chi)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18509,7 +18511,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sensiblep" cloneof="sensible">
+	<software name="sensiblep" cloneof="sensible" supported="no">
 		<description>Sensible Soccer (Prototype)</description>
 		<year>1993</year>
 		<publisher>Renegade</publisher>
@@ -18524,10 +18526,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="sensibie">
-		<!-- Alt. Title: International Sensible Soccer - Limited Edition: World Champions (Box) -->
 		<description>Sensible Soccer - International Edition (Euro)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
+		<info name="alt_title" value="International Sensible Soccer - Limited Edition: World Champions (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
@@ -18538,7 +18540,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sesame">
+	<software name="sesame" supported="no">
 		<description>Sesame Street Counting Cafe (USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
@@ -18653,7 +18655,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="shadowrnp4" cloneof="shadowrn">
-		<description>Shadowrun (Prototype, 19931228)</description>
+		<description>Shadowrun (USA, Prototype, 19931228)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -18667,7 +18669,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="shadowrnp3" cloneof="shadowrn">
-		<description>Shadowrun (Prototype, 19931231)</description>
+		<description>Shadowrun (USA, Prototype, 19931231)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -18681,7 +18683,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="shadowrnp2" cloneof="shadowrn">
-		<description>Shadowrun (Prototype, 19940125-C)</description>
+		<description>Shadowrun (USA, Prototype, 19940125-C)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -18695,7 +18697,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="shadowrnp1" cloneof="shadowrn">
-		<description>Shadowrun (Prototype, 19940125)</description>
+		<description>Shadowrun (USA, Prototype, 19940125)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -18851,7 +18853,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="shinfrc2p2" cloneof="shinfrc2">
-		<description>Shining Force II (Prototype, 19940404)</description>
+		<description>Shining Force II (USA, Prototype, 19940404)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -18865,7 +18867,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="shinfrc2p1" cloneof="shinfrc2">
-		<description>Shining Force II (Prototype, 19940607)</description>
+		<description>Shining Force II (USA, Prototype, 19940607)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -19544,7 +19546,9 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2621440">
-				<rom name="sonic &amp; knuckles + sonic the hedgehog (world).bin" size="2621440" crc="e01f6ed5" sha1="a3084262f5af481df1a5c5ab03c4862551a53c91" offset="000000" loadflag="load16_word_swap" />
+				<!-- rom name="sonic &amp; knuckles + sonic the hedgehog (world).bin" size="2621440" crc="e01f6ed5" sha1="a3084262f5af481df1a5c5ab03c4862551a53c91" offset="000000" loadflag="load16_word_swap" /-->
+				<rom name="sonic &amp; knuckles (world).bin" size="2097152" crc="0658f691" sha1="88d6499d874dcb5721ff58d76fe1b9af811192e3" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13913.ic1" size="524288" crc="f9394e97" sha1="6ddb7de1e17e7f6cdb88927bd906352030daa194" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19554,8 +19558,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="3407872">
-				<rom name="sonic &amp; knuckles + sonic the hedgehog 2 (world).bin" size="3407872" crc="2ac1e7c6" sha1="6cd0537a3aee0e012bb86d5837ddff9342595004" offset="000000" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="3145728">
+                <!-- This also contained 0x40000 of garbage (?) data at the end... investigate... -->
+				<!-- rom name="sonic &amp; knuckles + sonic the hedgehog 2 (world).bin" size="3407872" crc="2ac1e7c6" sha1="6cd0537a3aee0e012bb86d5837ddff9342595004" offset="000000" loadflag="load16_word_swap" /-->
+				<rom name="sonic &amp; knuckles (world).bin" size="2097152" crc="0658f691" sha1="88d6499d874dcb5721ff58d76fe1b9af811192e3" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15000a.bin" size="1048576" crc="7b905383" sha1="8bca5dcef1af3e00098666fd892dc1c2a76333f9" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19577,7 +19584,9 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="sonic &amp; knuckles + sonic the hedgehog 3 (world).bin" size="4194304" crc="63522553" sha1="cfbf98c36c776677290a872547ac47c53d2761d6" offset="000000" loadflag="load16_word_swap" />
+				<!-- rom name="sonic &amp; knuckles + sonic the hedgehog 3 (world).bin" size="4194304" crc="63522553" sha1="cfbf98c36c776677290a872547ac47c53d2761d6" offset="000000" loadflag="load16_word_swap" /-->
+				<rom name="sonic &amp; knuckles (world).bin" size="2097152" crc="0658f691" sha1="88d6499d874dcb5721ff58d76fe1b9af811192e3" offset="000000" loadflag="load16_word_swap" />
+				<rom name="sonic the hedgehog 3 (usa).bin" size="2097152" crc="9bc192ce" sha1="75e9c4705259d84112b3e697a6c00a0813d47d71" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19742,7 +19751,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sonicjam">
+	<software name="sonicjam" supported="no">
 		<description>Sonic Jam 6</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -19753,7 +19762,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sonicjam1" cloneof="sonicjam">
+	<software name="sonicjam1" cloneof="sonicjam" supported="no">
 		<description>Sonic Jam 6 (Alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -20132,12 +20141,12 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="sparkstrj" cloneof="sparkstr">
-		<description>Sparkster - Rocket Knight Adventures 2 (Jpn)</description>
+		<description>Sparkster (Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-95103"/>
 		<info name="release" value="19940923"/>
-		<info name="alt_title" value="スパークスター ロケットナイトアドベンチャーズ2"/>
+		<info name="alt_title" value="スパークスター ロケットナイトアドベンチャーズ2 ~ Sparkster - Rocket Knight Adventures 2 (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="sparkster - rocket knight adventures 2 (jpn).bin" size="1048576" crc="914ec662" sha1="49e813e108751d502bfb242551b40121c71c5442" offset="000000" loadflag="load16_word_swap" />
@@ -20215,13 +20224,12 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="spidking">
-		<!-- Alt. Title: Spiderman (Box) -->
 		<description>Spider-Man vs. the Kingpin (World)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4058 (JPN)"/>
 		<info name="release" value="19911018 (JPN)"/>
-		<info name="alt_title" value="スパイダーマン"/>
+		<info name="alt_title" value="スパイダーマン ~ Spiderman (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-14027.bin" size="524288" crc="70ab775f" sha1="250f7a7301a028450eef2f2a9dcec91f99ecccbd" offset="000000" loadflag="load16_word_swap" />
@@ -20323,7 +20331,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sportg">
+	<software name="sportg" cloneof="wcs2">
 		<description>Sport Games (Bra)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -21527,8 +21535,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="smw" cloneof="smb">
-		<description>Super Mario World</description>
+	<software name="smba" cloneof="smb">
+		<description>Super Mario World ~ Super Mario Bros. (Pirate, Alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -21538,8 +21546,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="smwa" cloneof="smb">
-		<description>Super Mario World (Pirate)</description>
+	<software name="smbb" cloneof="smb">
+		<description>Super Mario World ~ Super Mario Bros. (Pirate, Alt 2)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -21892,6 +21900,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Sylvester &amp; Tweety in Cagey Capers (Euro)</description>
 		<year>1994</year>
 		<publisher>Time Warner Interactive</publisher>
+		<info name="alt_title" value="Titi &amp; Grosminet dans une Aventure Infernale (French Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="sylvester &amp; tweety in cagey capers (euro).bin" size="2097152" crc="89fc54ce" sha1="bf50d0afe82966907671a46060d27b7b5d92a752" offset="000000" loadflag="load16_word_swap" />
@@ -26383,7 +26392,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="segachnla" cloneof="segachnl">
+	<software name="segachnla" cloneof="segachnl" supported="no">
 		<description>Sega Channel (General Instrument) (USA)</description>
 		<year>199?</year>
 		<publisher>Scientific Atlanta</publisher>
@@ -26759,7 +26768,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="smb">
-		<description>Super Mario Bros.</description>
+		<description>Super Mario World ~ Super Mario Bros. (Pirate)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26783,11 +26792,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="redcliffa" cloneof="redcliff">
-		<description>The Battle of Red Cliffs - Romance of the Three Kingdoms (Fixed?)</description>
+		<description>The Battle of Red Cliffs - Romance of the Three Kingdoms (Hacked out Protection?)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb_type" value="REDCLIFF" />
 			<dataarea name="rom" size="2097152">
 				<rom name="the battle of red cliffs (unl).bin" size="2097152" crc="63eca090" sha1="648c04365610084d76c9a2b1b0b07031ca84897d" offset="00000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -27023,7 +27031,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="sonicjam2" cloneof="sonicjam">
-		<description>Sonic Jam 6 (Alt 2)</description>
+		<description>Sonic Jam 6 (Hacked?)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
