@@ -27,41 +27,17 @@
 
 static const UINT8 laser_fdc_wrprot[2] = {0x80, 0x80};
 
-/* write to banked memory (handle memory mapped i/o and videoram) */
-static void mwa_bank(running_machine &machine, int bank, int offs, int data);
+/* wrappers for bank #1 to #4 */
+WRITE8_MEMBER(vtech2_state::mwa_bank1 ) { mwa_bank(0,offset,data); }
+WRITE8_MEMBER(vtech2_state::mwa_bank2 ) { mwa_bank(1,offset,data); }
+WRITE8_MEMBER(vtech2_state::mwa_bank3 ) { mwa_bank(2,offset,data); }
+WRITE8_MEMBER(vtech2_state::mwa_bank4 ) { mwa_bank(3,offset,data); }
 
 /* wrappers for bank #1 to #4 */
-static WRITE8_HANDLER ( mwa_bank1 ) { mwa_bank(space.machine(), 0,offset,data); }
-static WRITE8_HANDLER ( mwa_bank2 ) { mwa_bank(space.machine(), 1,offset,data); }
-static WRITE8_HANDLER ( mwa_bank3 ) { mwa_bank(space.machine(), 2,offset,data); }
-static WRITE8_HANDLER ( mwa_bank4 ) { mwa_bank(space.machine(), 3,offset,data); }
-
-/* read from banked memory (handle memory mapped i/o) */
-static int mra_bank(running_machine &machine, int bank, int offs);
-
-/* wrappers for bank #1 to #4 */
-static READ8_HANDLER ( mra_bank1 ) { return mra_bank(space.machine(),0,offset); }
-static READ8_HANDLER ( mra_bank2 ) { return mra_bank(space.machine(),1,offset); }
-static READ8_HANDLER ( mra_bank3 ) { return mra_bank(space.machine(),2,offset); }
-static READ8_HANDLER ( mra_bank4 ) { return mra_bank(space.machine(),3,offset); }
-
-/* read banked memory (handle memory mapped i/o) */
-static const struct { read8_space_func func; const char *name; }  mra_bank_soft[4] =
-{
-    { FUNC(mra_bank1) },  /* mapped in 0000-3fff */
-    { FUNC(mra_bank2) },  /* mapped in 4000-7fff */
-    { FUNC(mra_bank3) },  /* mapped in 8000-bfff */
-    { FUNC(mra_bank4) }   /* mapped in c000-ffff */
-};
-
-/* write banked memory (handle memory mapped i/o and videoram) */
-static const struct { write8_space_func func; const char *name; }  mwa_bank_soft[4] =
-{
-    { FUNC(mwa_bank1) },  /* mapped in 0000-3fff */
-    { FUNC(mwa_bank2) },  /* mapped in 4000-7fff */
-    { FUNC(mwa_bank3) },  /* mapped in 8000-bfff */
-    { FUNC(mwa_bank4) }   /* mapped in c000-ffff */
-};
+READ8_MEMBER(vtech2_state::mra_bank1 ) { return mra_bank(0,offset); }
+READ8_MEMBER(vtech2_state::mra_bank2 ) { return mra_bank(1,offset); }
+READ8_MEMBER(vtech2_state::mra_bank3 ) { return mra_bank(2,offset); }
+READ8_MEMBER(vtech2_state::mra_bank4 ) { return mra_bank(3,offset); }
 
 /* read banked memory (plain ROM/RAM) */
 static const char *const mra_bank_hard[4] =
@@ -155,8 +131,23 @@ WRITE8_MEMBER(vtech2_state::laser_bank_select_w)
         /* memory mapped I/O bank selected? */
 		if (data == 2)
 		{
-			machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(offset * 0x4000, offset * 0x4000 + 0x3fff, mra_bank_soft[offset].func, mra_bank_soft[offset].name);
-			machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(offset * 0x4000, offset * 0x4000 + 0x3fff, mwa_bank_soft[offset].func, mwa_bank_soft[offset].name);
+			static read8_delegate mra_bank_soft[] =
+			{
+				read8_delegate(FUNC(vtech2_state::mra_bank1), this),
+				read8_delegate(FUNC(vtech2_state::mra_bank2), this),
+				read8_delegate(FUNC(vtech2_state::mra_bank3), this),
+				read8_delegate(FUNC(vtech2_state::mra_bank4), this),
+			};
+
+			static write8_delegate mwa_bank_soft[] =
+			{
+				write8_delegate(FUNC(vtech2_state::mwa_bank1), this),
+				write8_delegate(FUNC(vtech2_state::mwa_bank2), this),
+				write8_delegate(FUNC(vtech2_state::mwa_bank3), this),
+				write8_delegate(FUNC(vtech2_state::mwa_bank4), this),
+			};
+		
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(offset * 0x4000, offset * 0x4000 + 0x3fff, mra_bank_soft[offset], mwa_bank_soft[offset]);
 		}
 		else
 		{
@@ -200,9 +191,8 @@ static cassette_image_device *vtech2_cassette_image(running_machine &machine)
  * 1    column 1
  * 0    column 0
  ************************************************/
-static int mra_bank(running_machine &machine, int bank, int offs)
+int vtech2_state::mra_bank(int bank, int offs)
 {
-	vtech2_state *state = machine.driver_data<vtech2_state>();
     int level, data = 0xff;
 
     /* Laser 500/700 only: keyboard rows A through D */
@@ -210,34 +200,34 @@ static int mra_bank(running_machine &machine, int bank, int offs)
 	{
 		if( (offs & 0x0300) == 0x0000 ) /* keyboard row A */
 		{
-			if( machine.root_device().ioport("ROWA")->read() != state->m_row_a )
+			if( machine().root_device().ioport("ROWA")->read() != m_row_a )
 			{
-				state->m_row_a = machine.root_device().ioport("ROWA")->read();
-				data &= state->m_row_a;
+				m_row_a = machine().root_device().ioport("ROWA")->read();
+				data &= m_row_a;
 			}
 		}
 		if( (offs & 0x0300) == 0x0100 ) /* keyboard row B */
 		{
-			if( machine.root_device().ioport("ROWB")->read() != state->m_row_b )
+			if( machine().root_device().ioport("ROWB")->read() != m_row_b )
 			{
-				state->m_row_b = machine.root_device().ioport("ROWB")->read();
-				data &= state->m_row_b;
+				m_row_b = machine().root_device().ioport("ROWB")->read();
+				data &= m_row_b;
 			}
 		}
 		if( (offs & 0x0300) == 0x0200 ) /* keyboard row C */
 		{
-			if( machine.root_device().ioport("ROWC")->read() != state->m_row_c )
+			if( machine().root_device().ioport("ROWC")->read() != m_row_c )
 			{
-				state->m_row_c = machine.root_device().ioport("ROWC")->read();
-				data &= state->m_row_c;
+				m_row_c = machine().root_device().ioport("ROWC")->read();
+				data &= m_row_c;
 			}
 		}
 		if( (offs & 0x0300) == 0x0300 ) /* keyboard row D */
 		{
-			if( machine.root_device().ioport("ROWD")->read() != state->m_row_d )
+			if( machine().root_device().ioport("ROWD")->read() != m_row_d )
 			{
-				state->m_row_d = machine.root_device().ioport("ROWD")->read();
-				data &= state->m_row_d;
+				m_row_d = machine().root_device().ioport("ROWD")->read();
+				data &= m_row_d;
 			}
 		}
 	}
@@ -245,32 +235,32 @@ static int mra_bank(running_machine &machine, int bank, int offs)
 	{
 		/* All Lasers keyboard rows 0 through 7 */
         if( !(offs & 0x01) )
-			data &= machine.root_device().ioport("ROW0")->read();
+			data &= machine().root_device().ioport("ROW0")->read();
 		if( !(offs & 0x02) )
-			data &= machine.root_device().ioport("ROW1")->read();
+			data &= machine().root_device().ioport("ROW1")->read();
 		if( !(offs & 0x04) )
-			data &= machine.root_device().ioport("ROW2")->read();
+			data &= machine().root_device().ioport("ROW2")->read();
 		if( !(offs & 0x08) )
-			data &= machine.root_device().ioport("ROW3")->read();
+			data &= machine().root_device().ioport("ROW3")->read();
 		if( !(offs & 0x10) )
-			data &= machine.root_device().ioport("ROW4")->read();
+			data &= machine().root_device().ioport("ROW4")->read();
 		if( !(offs & 0x20) )
-			data &= machine.root_device().ioport("ROW5")->read();
+			data &= machine().root_device().ioport("ROW5")->read();
 		if( !(offs & 0x40) )
-			data &= machine.root_device().ioport("ROW6")->read();
+			data &= machine().root_device().ioport("ROW6")->read();
 		if( !(offs & 0x80) )
-			data &= machine.root_device().ioport("ROW7")->read();
+			data &= machine().root_device().ioport("ROW7")->read();
 	}
 
     /* what's bit 7 good for? tape input maybe? */
-	level = (vtech2_cassette_image(machine))->input() * 65536.0;
-	if( level < state->m_level_old - 511 )
-		state->m_cassette_bit = 0x00;
-	if( level > state->m_level_old + 511 )
-		state->m_cassette_bit = 0x80;
-	state->m_level_old = level;
+	level = (vtech2_cassette_image(machine()))->input() * 65536.0;
+	if( level < m_level_old - 511 )
+		m_cassette_bit = 0x00;
+	if( level > m_level_old + 511 )
+		m_cassette_bit = 0x80;
+	m_level_old = level;
 
-	data &= ~state->m_cassette_bit;
+	data &= ~m_cassette_bit;
     // logerror("bank #%d keyboard_r [$%04X] $%02X\n", bank, offs, data);
 
     return data;
@@ -287,25 +277,24 @@ static int mra_bank(running_machine &machine, int bank, int offs)
  * 1    cassette out (LSB)
  * 0    speaker A
  ************************************************/
-static void mwa_bank(running_machine &machine, int bank, int offs, int data)
+void vtech2_state::mwa_bank(int bank, int offs, int data)
 {
-	vtech2_state *state = machine.driver_data<vtech2_state>();
-	device_t *speaker = machine.device(SPEAKER_TAG);
-	offs += 0x4000 * state->m_laser_bank[bank];
-    switch (state->m_laser_bank[bank])
+	device_t *speaker = machine().device(SPEAKER_TAG);
+	offs += 0x4000 * m_laser_bank[bank];
+    switch (m_laser_bank[bank])
     {
     case  0:    /* ROM lower 16K */
     case  1:    /* ROM upper 16K */
 		logerror("bank #%d write to ROM [$%05X] $%02X\n", bank+1, offs, data);
         break;
     case  2:    /* memory mapped output */
-        if (data != state->m_laser_latch)
+        if (data != m_laser_latch)
         {
             logerror("bank #%d write to I/O [$%05X] $%02X\n", bank+1, offs, data);
             /* Toggle between graphics and text modes? */
-			if ((data ^ state->m_laser_latch) & 0x01)
+			if ((data ^ m_laser_latch) & 0x01)
 				speaker_level_w(speaker, data & 1);
-            state->m_laser_latch = data;
+            m_laser_latch = data;
         }
         break;
     case 12:    /* ext. ROM #1 */
@@ -315,11 +304,11 @@ static void mwa_bank(running_machine &machine, int bank, int offs, int data)
 		logerror("bank #%d write to ROM [$%05X] $%02X\n", bank+1, offs, data);
         break;
     default:    /* RAM */
-        if( state->m_laser_bank[bank] == state->m_laser_video_bank && state->m_mem[offs] != data )
+        if( m_laser_bank[bank] == m_laser_video_bank && m_mem[offs] != data )
 		{
 			logerror("bank #%d write to videoram [$%05X] $%02X\n", bank+1, offs, data);
 		}
-        state->m_mem[offs] = data;
+        m_mem[offs] = data;
         break;
     }
 }
