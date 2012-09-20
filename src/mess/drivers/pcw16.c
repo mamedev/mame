@@ -165,7 +165,7 @@ WRITE8_MEMBER(pcw16_state::pcw16_palette_w)
 	m_colour_palette[offset & 0x0f] = data & 31;
 }
 
-
+/*
 static const char *const pcw16_write_handler_dram[4] =
 {
 	"bank5",
@@ -181,13 +181,13 @@ static const char *const pcw16_read_handler_dram[4] =
 	"bank3",
 	"bank4"
 };
-/*******************************************/
 
 
-/* PCW16 Flash interface */
-/* PCW16 can have two 1mb flash chips */
 
-/* read flash0 */
+// PCW16 Flash interface
+// PCW16 can have two 1mb flash chips 
+
+// read flash0 
 static int pcw16_flash0_bank_handler_r(running_machine &machine, int bank, int offset)
 {
 	pcw16_state *state = machine.driver_data<pcw16_state>();
@@ -196,7 +196,7 @@ static int pcw16_flash0_bank_handler_r(running_machine &machine, int bank, int o
 	return flash->read(flash_offset);
 }
 
-/* read flash1 */
+// read flash1 
 static int pcw16_flash1_bank_handler_r(running_machine &machine, int bank, int offset)
 {
 	pcw16_state *state = machine.driver_data<pcw16_state>();
@@ -206,7 +206,7 @@ static int pcw16_flash1_bank_handler_r(running_machine &machine, int bank, int o
 	return flash->read(flash_offset);
 }
 
-/* flash 0 */
+// flash 0 
 static  READ8_HANDLER(pcw16_flash0_bank_handler0_r)
 {
 	return pcw16_flash0_bank_handler_r(space.machine(),0, offset);
@@ -227,7 +227,7 @@ static  READ8_HANDLER(pcw16_flash0_bank_handler3_r)
 	return pcw16_flash0_bank_handler_r(space.machine(),3, offset);
 }
 
-/* flash 1 */
+// flash 1 
 static  READ8_HANDLER(pcw16_flash1_bank_handler0_r)
 {
 	return pcw16_flash1_bank_handler_r(space.machine(),0, offset);
@@ -264,7 +264,7 @@ static const struct { read8_space_func func; const char *name; } pcw16_flash1_ba
 	{ FUNC(pcw16_flash1_bank_handler3_r) }
 };
 
-/* write flash0 */
+// write flash0 
 static void pcw16_flash0_bank_handler_w(running_machine &machine, int bank, int offset, int data)
 {
 	pcw16_state *state = machine.driver_data<pcw16_state>();
@@ -275,7 +275,7 @@ static void pcw16_flash0_bank_handler_w(running_machine &machine, int bank, int 
 	flash->write(flash_offset, data);
 }
 
-/* read flash1 */
+// read flash1 
 static void pcw16_flash1_bank_handler_w(running_machine &machine, int bank, int offset, int data)
 {
 	pcw16_state *state = machine.driver_data<pcw16_state>();
@@ -286,7 +286,7 @@ static void pcw16_flash1_bank_handler_w(running_machine &machine, int bank, int 
 	flash->write(flash_offset,data);
 }
 
-/* flash 0 */
+// flash 0 
 static WRITE8_HANDLER(pcw16_flash0_bank_handler0_w)
 {
 	pcw16_flash0_bank_handler_w(space.machine(),0, offset, data);
@@ -309,7 +309,7 @@ static WRITE8_HANDLER(pcw16_flash0_bank_handler3_w)
 }
 
 
-/* flash 1 */
+// flash 1 
 static WRITE8_HANDLER(pcw16_flash1_bank_handler0_w)
 {
 	pcw16_flash1_bank_handler_w(space.machine(),0, offset, data);
@@ -349,15 +349,15 @@ static const struct { write8_space_func func; const char *name; } pcw16_flash1_b
 
 enum PCW16_RAM_TYPE
 {
-	/* rom which is really first block of flash0 */
+	// rom which is really first block of flash0 
 	PCW16_MEM_ROM,
-	/* flash 0 */
+	// flash 0 
 	PCW16_MEM_FLASH_1,
-	/* flash 1 i.e. unexpanded pcw16 */
+	// flash 1 i.e. unexpanded pcw16 
 	PCW16_MEM_FLASH_2,
-	/* dram */
+	// dram 
 	PCW16_MEM_DRAM,
-	/* no mem. i.e. unexpanded pcw16 */
+	// no mem. i.e. unexpanded pcw16 
 	PCW16_MEM_NONE
 };
 
@@ -366,7 +366,7 @@ READ8_MEMBER(pcw16_state::pcw16_no_mem_r)
 	return 0x0ff;
 }
 
-/*
+
 static void pcw16_set_bank_handlers(running_machine &machine, int bank, PCW16_RAM_TYPE type)
 {
     address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
@@ -486,18 +486,18 @@ static void pcw16_update_bank(running_machine &machine, int bank)
         pcw16_set_bank_handlers(machine, bank, PCW16_MEM_DRAM);
     }
 }
-*/
 
-/* update memory h/w */
+
+// update memory h/w 
 static void pcw16_update_memory(running_machine &machine)
 {
-//  pcw16_update_bank(machine, 0);
-//  pcw16_update_bank(machine, 1);
-//  pcw16_update_bank(machine, 2);
-//  pcw16_update_bank(machine, 3);
+  pcw16_update_bank(machine, 0);
+  pcw16_update_bank(machine, 1);
+  pcw16_update_bank(machine, 2);
+  pcw16_update_bank(machine, 3);
 
 }
-
+*/
 UINT8 pcw16_state::read_bank_data(UINT8 type, UINT16 offset)
 {
 	if(type & 0x80) // DRAM
@@ -623,7 +623,7 @@ WRITE8_MEMBER(pcw16_state::pcw16_bankhw_w)
 
 	m_banks[offset] = data;
 
-	pcw16_update_memory(machine());
+	//pcw16_update_memory(machine());
 }
 
 WRITE8_MEMBER(pcw16_state::pcw16_video_control_w)

@@ -49,7 +49,6 @@ public:
 	int m_colour_palette[16];
 	int m_video_control;
 	DECLARE_WRITE8_MEMBER(pcw16_palette_w);
-	DECLARE_READ8_MEMBER(pcw16_no_mem_r);
 	DECLARE_READ8_MEMBER(pcw16_bankhw_r);
 	DECLARE_WRITE8_MEMBER(pcw16_bankhw_w);
 	DECLARE_WRITE8_MEMBER(pcw16_video_control_w);
