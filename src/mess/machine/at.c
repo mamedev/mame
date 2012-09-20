@@ -163,23 +163,25 @@ WRITE_LINE_MEMBER( at_state::pc_dma_hrq_changed )
 
 READ8_MEMBER(at_state::pc_dma_read_byte)
 {
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
 		return 0xff;
 	UINT8 result;
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16) & 0xFF0000;
 
-	result = space.read_byte(page_offset + offset);
+	result = prog_space.read_byte(page_offset + offset);
 	return result;
 }
 
 
 WRITE8_MEMBER(at_state::pc_dma_write_byte)
 {
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
 		return;
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16) & 0xFF0000;
 
-	space.write_byte(page_offset + offset, data);
+	prog_space.write_byte(page_offset + offset, data);
 }
 
 
