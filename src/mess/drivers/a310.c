@@ -65,37 +65,39 @@
 #include "machine/ram.h"
 
 
-class a310_state : public driver_device
+class a310_state : public archimedes_state
 {
 public:
 	a310_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: archimedes_state(mconfig, type, tag),
 		  m_physram(*this, "physicalram") { }
 
 	required_shared_ptr<UINT32> m_physram;
 
 	DECLARE_READ32_MEMBER(a310_psy_wram_r);
 	DECLARE_WRITE32_MEMBER(a310_psy_wram_w);
+	DECLARE_WRITE_LINE_MEMBER(a310_wd177x_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(a310_wd177x_drq_w);
 	DECLARE_DRIVER_INIT(a310);
 	virtual void machine_start();
 	virtual void machine_reset();
 };
 
 
-static WRITE_LINE_DEVICE_HANDLER( a310_wd177x_intrq_w )
+WRITE_LINE_MEMBER(a310_state::a310_wd177x_intrq_w)
 {
 	if (state)
-		archimedes_request_fiq(device->machine(), ARCHIMEDES_FIQ_FLOPPY);
+		archimedes_request_fiq(ARCHIMEDES_FIQ_FLOPPY);
 	else
-		archimedes_clear_fiq(device->machine(), ARCHIMEDES_FIQ_FLOPPY);
+		archimedes_clear_fiq(ARCHIMEDES_FIQ_FLOPPY);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( a310_wd177x_drq_w )
+WRITE_LINE_MEMBER(a310_state::a310_wd177x_drq_w)
 {
 	if (state)
-		archimedes_request_fiq(device->machine(), ARCHIMEDES_FIQ_FLOPPY_DRQ);
+		archimedes_request_fiq(ARCHIMEDES_FIQ_FLOPPY_DRQ);
 	else
-		archimedes_clear_fiq(device->machine(), ARCHIMEDES_FIQ_FLOPPY_DRQ);
+		archimedes_clear_fiq(ARCHIMEDES_FIQ_FLOPPY_DRQ);
 }
 
 READ32_MEMBER(a310_state::a310_psy_wram_r)
@@ -115,12 +117,12 @@ DRIVER_INIT_MEMBER(a310_state,a310)
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler( 0x02000000, 0x02000000+(ram_size-1), read32_delegate(FUNC(a310_state::a310_psy_wram_r), this), write32_delegate(FUNC(a310_state::a310_psy_wram_w), this));
 
-	archimedes_driver_init(machine());
+	archimedes_driver_init();
 }
 
 void a310_state::machine_start()
 {
-	archimedes_init(machine());
+	archimedes_init();
 
 	// reset the DAC to centerline
 	//machine().device<dac_device>("dac")->write_signed8(0x80);
@@ -128,16 +130,16 @@ void a310_state::machine_start()
 
 void a310_state::machine_reset()
 {
-	archimedes_reset(machine());
+	archimedes_reset();
 }
 
 static ADDRESS_MAP_START( a310_mem, AS_PROGRAM, 32, a310_state )
-	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE_LEGACY(archimedes_memc_logical_r, archimedes_memc_logical_w)
+	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_SHARE("physicalram") /* physical RAM - 16 MB for now, should be 512k for the A310 */
-	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE_LEGACY(archimedes_ioc_r, archimedes_ioc_w)
-	AM_RANGE(0x03400000, 0x035fffff) AM_READWRITE_LEGACY(archimedes_vidc_r, archimedes_vidc_w)
-	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE_LEGACY(archimedes_memc_r, archimedes_memc_w)
-	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE_LEGACY(archimedes_memc_page_w)
+	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
+	AM_RANGE(0x03400000, 0x035fffff) AM_READWRITE(archimedes_vidc_r, archimedes_vidc_w)
+	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
+	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_memc_page_w)
 ADDRESS_MAP_END
 
 
@@ -255,8 +257,8 @@ INPUT_PORTS_END
 static const wd17xx_interface a310_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE(a310_wd177x_intrq_w),
-	DEVCB_LINE(a310_wd177x_drq_w),
+	DEVCB_DRIVER_LINE_MEMBER(a310_state, a310_wd177x_intrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(a310_state, a310_wd177x_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
@@ -279,11 +281,9 @@ static MACHINE_CONFIG_START( a310, a310_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(1280, 1024) //TODO: default screen size
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 1280 - 1, 0*16, 1024 - 1)
-	MCFG_SCREEN_UPDATE_STATIC(archimds_vidc)
+	MCFG_SCREEN_UPDATE_DRIVER(archimedes_state, screen_update)
 
 	MCFG_PALETTE_LENGTH(32768)
-
-	MCFG_VIDEO_START(archimds_vidc)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")

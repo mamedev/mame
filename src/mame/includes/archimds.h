@@ -34,36 +34,73 @@
 #define ARCHIMEDES_FIQ_PODULE        (0x40)
 #define ARCHIMEDES_FIQ_FORCE         (0x80)
 
-/*----------- defined in machine/archimds.c -----------*/
+class archimedes_state : public driver_device
+{
+public:
+	archimedes_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
-void archimedes_init(running_machine &machine);			// call at MACHINE_INIT
-void archimedes_reset(running_machine &machine);		// call at MACHINE_RESET
-void archimedes_driver_init(running_machine &machine);		// call at DRIVER_INIT
+	void archimedes_init();
+	void archimedes_reset();
+	void archimedes_driver_init();
 
-void archimedes_request_irq_a(running_machine &machine, int mask);
-void archimedes_request_irq_b(running_machine &machine, int mask);
-void archimedes_request_fiq(running_machine &machine, int mask);
-void archimedes_clear_irq_a(running_machine &machine, int mask);
-void archimedes_clear_irq_b(running_machine &machine, int mask);
-void archimedes_clear_fiq(running_machine &machine, int mask);
+	void archimedes_request_irq_a(int mask);
+	void archimedes_request_irq_b(int mask);
+	void archimedes_request_fiq(int mask);
+	void archimedes_clear_irq_a(int mask);
+	void archimedes_clear_irq_b(int mask);
+	void archimedes_clear_fiq(int mask);
 
-extern DECLARE_READ32_HANDLER(aristmk5_drame_memc_logical_r);
-extern DECLARE_READ32_HANDLER(archimedes_memc_logical_r);
-extern DECLARE_WRITE32_HANDLER(archimedes_memc_logical_w);
-extern DECLARE_READ32_HANDLER(archimedes_memc_r);
-extern DECLARE_WRITE32_HANDLER(archimedes_memc_w);
-extern DECLARE_WRITE32_HANDLER(archimedes_memc_page_w);
-extern DECLARE_READ32_HANDLER(archimedes_ioc_r);
-extern DECLARE_WRITE32_HANDLER(archimedes_ioc_w);
-extern DECLARE_READ32_HANDLER(archimedes_vidc_r);
-extern DECLARE_WRITE32_HANDLER(archimedes_vidc_w);
+	DECLARE_READ32_MEMBER(aristmk5_drame_memc_logical_r);
+	DECLARE_READ32_MEMBER(archimedes_memc_logical_r);
+	DECLARE_WRITE32_MEMBER(archimedes_memc_logical_w);
+	DECLARE_READ32_MEMBER(archimedes_memc_r);
+	DECLARE_WRITE32_MEMBER(archimedes_memc_w);
+	DECLARE_WRITE32_MEMBER(archimedes_memc_page_w);
+	DECLARE_READ32_MEMBER(archimedes_ioc_r);
+	DECLARE_WRITE32_MEMBER(archimedes_ioc_w);
+	DECLARE_READ32_MEMBER(archimedes_vidc_r);
+	DECLARE_WRITE32_MEMBER(archimedes_vidc_w);
 
-extern UINT8 i2c_clk;
-extern INT16 memc_pages[0x2000];	// the logical RAM area is 32 megs, and the smallest page size is 4k
-extern UINT32 vidc_regs[256];
-extern UINT8 ioc_regs[0x80/4];
-extern UINT8 vidc_bpp_mode;
-extern UINT8 vidc_interlace;
+	UINT8 m_i2c_clk;
+	INT16 m_memc_pages[0x2000];	// the logical RAM area is 32 megs, and the smallest page size is 4k
+	UINT32 m_vidc_regs[256];
+	UINT8 m_ioc_regs[0x80/4];
+	UINT8 m_vidc_bpp_mode;
+	UINT8 m_vidc_interlace;
+		
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+private:
+
+	static const device_timer_id TIMER_VBLANK = 0;
+	static const device_timer_id TIMER_VIDEO = 1;
+	static const device_timer_id TIMER_AUDIO = 2;
+	static const device_timer_id TIMER_IOC = 3;
+	
+	void vidc_vblank();
+	void vidc_video_tick();
+	void vidc_audio_tick();
+	void ioc_timer(int param);
+	
+	void vidc_dynamic_res_change();	
+	void latch_timer_cnt(int tmr);
+	void a310_set_timer(int tmr);
+	READ32_MEMBER(ioc_ctrl_r);
+	WRITE32_MEMBER(ioc_ctrl_w);
+
+	UINT32 *m_archimedes_memc_physmem;
+	UINT32 m_memc_pagesize;
+	int m_memc_latchrom;
+	UINT32 m_ioc_timercnt[4], m_ioc_timerout[4];
+	UINT32 m_vidc_vidstart, m_vidc_vidend, m_vidc_vidinit, m_vidc_vidcur;
+	UINT32 m_vidc_sndstart, m_vidc_sndend, m_vidc_sndcur;
+	UINT8 m_video_dma_on,m_audio_dma_on;
+	UINT8 m_vidc_pixel_clk;
+	UINT8 m_vidc_stereo_reg[8];
+	emu_timer *m_timer[4], *m_snd_timer, *m_vid_timer;
+	emu_timer *m_vbl_timer;	
+};
 
 /* IOC registers */
 
@@ -100,12 +137,6 @@ extern UINT8 vidc_interlace;
 #define T3_LATCH_HI 0x74/4
 #define T3_GO		0x78/4
 #define T3_LATCH	0x7c/4
-
-
-/*----------- defined in video/archimds.c -----------*/
-
-extern VIDEO_START( archimds_vidc );
-extern SCREEN_UPDATE_RGB32( archimds_vidc );
 
 #define VIDC_HCR		0x80
 #define VIDC_HSWR		0x84

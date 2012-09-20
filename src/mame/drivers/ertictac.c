@@ -28,11 +28,11 @@ PCB has a single OSC at 24MHz
 #include "machine/i2cmem.h"
 
 
-class ertictac_state : public driver_device
+class ertictac_state : public archimedes_state
 {
 public:
 	ertictac_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: archimedes_state(mconfig, type, tag) { }
 
 	DECLARE_READ32_MEMBER(ertictac_podule_r);
 	DECLARE_DRIVER_INIT(ertictac);
@@ -44,7 +44,7 @@ public:
 
 READ32_MEMBER(ertictac_state::ertictac_podule_r)
 {
-	ioc_regs[IRQ_STATUS_B] &= ~ARCHIMEDES_IRQB_PODULE_IRQ;
+	m_ioc_regs[IRQ_STATUS_B] &= ~ARCHIMEDES_IRQB_PODULE_IRQ;
 
 	switch(offset)
 	{
@@ -59,16 +59,16 @@ READ32_MEMBER(ertictac_state::ertictac_podule_r)
 }
 
 static ADDRESS_MAP_START( ertictac_map, AS_PROGRAM, 32, ertictac_state )
-	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE_LEGACY(archimedes_memc_logical_r, archimedes_memc_logical_w)
+	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_SHARE("physicalram") /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
 	AM_RANGE(0x03340000, 0x0334001f) AM_READ(ertictac_podule_r)
 	AM_RANGE(0x033c0000, 0x033c001f) AM_READ(ertictac_podule_r)
 
-	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE_LEGACY(archimedes_ioc_r, archimedes_ioc_w)
-	AM_RANGE(0x03400000, 0x035fffff) AM_READWRITE_LEGACY(archimedes_vidc_r, archimedes_vidc_w)
-	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE_LEGACY(archimedes_memc_r, archimedes_memc_w)
-	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE_LEGACY(archimedes_memc_page_w)
+	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
+	AM_RANGE(0x03400000, 0x035fffff) AM_READWRITE(archimedes_vidc_r, archimedes_vidc_w)
+	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
+	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_memc_page_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ertictac )
@@ -193,12 +193,12 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(ertictac_state,ertictac)
 {
-	archimedes_driver_init(machine());
+	archimedes_driver_init();
 }
 
 void ertictac_state::machine_start()
 {
-	archimedes_init(machine());
+	archimedes_init();
 
 	// reset the DAC to centerline
 	//machine().device<dac_device>("dac")->write_signed8(0x80);
@@ -206,12 +206,12 @@ void ertictac_state::machine_start()
 
 void ertictac_state::machine_reset()
 {
-	archimedes_reset(machine());
+	archimedes_reset();
 }
 
 INTERRUPT_GEN_MEMBER(ertictac_state::ertictac_podule_irq)
 {
-	archimedes_request_irq_b(machine(), ARCHIMEDES_IRQB_PODULE_IRQ);
+	archimedes_request_irq_b(ARCHIMEDES_IRQB_PODULE_IRQ);
 }
 
 /* TODO: Are we sure that this HW have I2C device? */
@@ -237,11 +237,9 @@ static MACHINE_CONFIG_START( ertictac, ertictac_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(1280, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1280-1, 0, 1024-1)
-	MCFG_SCREEN_UPDATE_STATIC(archimds_vidc)
+	MCFG_SCREEN_UPDATE_DRIVER(archimedes_state, screen_update)
 
 	MCFG_PALETTE_LENGTH(0x200)
-
-	MCFG_VIDEO_START(archimds_vidc)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DAC_ADD("dac0")

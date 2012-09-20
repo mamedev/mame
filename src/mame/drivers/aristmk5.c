@@ -64,11 +64,11 @@
 //#include "machine/i2cmem.h"
 
 
-class aristmk5_state : public driver_device
+class aristmk5_state : public archimedes_state
 {
 public:
 	aristmk5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: archimedes_state(mconfig, type, tag) { }
 
 	emu_timer *m_mk5_2KHz_timer;
 	emu_timer *m_mk5_VSYNC_timer;
@@ -89,7 +89,7 @@ public:
 static TIMER_CALLBACK( mk5_VSYNC_callback )
 {
 	aristmk5_state *state = machine.driver_data<aristmk5_state>();
-    ioc_regs[IRQ_STATUS_A] |= 0x08; //turn vsync bit on
+    state->m_ioc_regs[IRQ_STATUS_A] |= 0x08; //turn vsync bit on
 	state->m_mk5_VSYNC_timer->adjust(attotime::never);
 }
 
@@ -131,7 +131,7 @@ WRITE32_MEMBER(aristmk5_state::Ns5w48)
     */
 
 
-	ioc_regs[IRQ_STATUS_A] &= ~0x08;
+	m_ioc_regs[IRQ_STATUS_A] &= ~0x08;
 
 	/*          bit 1              bit 0 */
 	if((data &~(0x02)) && (data & (0x01))) // external video crystal is enabled. 25 mhz
@@ -155,7 +155,7 @@ WRITE32_MEMBER(aristmk5_state::Ns5w48)
 static TIMER_CALLBACK( mk5_2KHz_callback )
 {
 	aristmk5_state *state = machine.driver_data<aristmk5_state>();
-	ioc_regs[IRQ_STATUS_A] |= 0x01;
+	state->m_ioc_regs[IRQ_STATUS_A] |= 0x01;
 	state->m_mk5_2KHz_timer->adjust(attotime::never);
 
 }
@@ -183,7 +183,7 @@ READ32_MEMBER(aristmk5_state::Ns5x58)
 
 	// reset 2KHz timer
     m_mk5_2KHz_timer->adjust(attotime::from_hz(1953.125));
-    ioc_regs[IRQ_STATUS_A] &= ~0x01;
+    m_ioc_regs[IRQ_STATUS_A] &= ~0x01;
     machine().device("maincpu")->execute().set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
 	return 0xffffffff;
 }
@@ -202,11 +202,11 @@ READ32_MEMBER(aristmk5_state::mk5_ioc_r)
 		int vert_pos;
 
 		vert_pos = machine().primary_screen->vpos();
-		m_flyback = (vert_pos <= vidc_regs[VIDC_VDSR] || vert_pos >= vidc_regs[VIDC_VDER]) ? 0x80 : 0x00;
+		m_flyback = (vert_pos <= m_vidc_regs[VIDC_VDSR] || vert_pos >= m_vidc_regs[VIDC_VDER]) ? 0x80 : 0x00;
 
 		//i2c_data = (i2cmem_sda_read(machine().device("i2cmem")) & 1);
 
-		return (m_flyback) | (ioc_regs[CONTROL] & 0x7c) | (1<<1) | 1;
+		return (m_flyback) | (m_ioc_regs[CONTROL] & 0x7c) | (1<<1) | 1;
 	}
 
 	return archimedes_ioc_r(space,offset,mem_mask);
@@ -224,7 +224,7 @@ WRITE32_MEMBER(aristmk5_state::mk5_ioc_w)
 	{
 		if(((ioc_addr == 0x20) || (ioc_addr == 0x30)) && (offset & 0x1f) == 0)
 		{
-			ioc_regs[CONTROL] = data & 0x7c;
+			m_ioc_regs[CONTROL] = data & 0x7c;
 			return;
 		}
 		else
@@ -298,7 +298,7 @@ WRITE32_MEMBER(aristmk5_state::sram_banksel_w)
 
 /* U.S games have no dram emulator enabled */
 static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
-	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE_LEGACY(archimedes_memc_logical_r, archimedes_memc_logical_w)
+	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_SHARE("physicalram") /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
 	/* MK-5 overrides */
@@ -317,14 +317,14 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 
 	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE(mk5_ioc_r, mk5_ioc_w)
 	AM_RANGE(0x03320000, 0x0333ffff) AM_RAMBANK("sram_bank_nz") // AM_BASE_SIZE_GENERIC(nvram) // nvram 32kbytes x 3 NZ
-	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE_LEGACY(archimedes_vidc_w)
-	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE_LEGACY(archimedes_memc_r, archimedes_memc_w)
-	AM_RANGE(0x03800000, 0x039fffff) AM_WRITE_LEGACY(archimedes_memc_page_w)
+	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_vidc_w)
+	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
+	AM_RANGE(0x03800000, 0x039fffff) AM_WRITE(archimedes_memc_page_w)
 ADDRESS_MAP_END
 
 /* with dram emulator enabled */
 static ADDRESS_MAP_START( aristmk5_drame_map, AS_PROGRAM, 32, aristmk5_state )
-	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE_LEGACY(aristmk5_drame_memc_logical_r, archimedes_memc_logical_w)
+	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(aristmk5_drame_memc_logical_r, archimedes_memc_logical_w)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_SHARE("physicalram") /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
 	/* MK-5 overrides */
@@ -344,9 +344,9 @@ static ADDRESS_MAP_START( aristmk5_drame_map, AS_PROGRAM, 32, aristmk5_state )
 
 	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE(mk5_ioc_r, mk5_ioc_w)
 	AM_RANGE(0x03320000, 0x0333ffff) AM_RAMBANK("sram_bank_nz") // AM_BASE_SIZE_GENERIC(nvram) // nvram 32kbytes x 3 NZ
-	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE_LEGACY(archimedes_vidc_w)
-	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE_LEGACY(archimedes_memc_r, archimedes_memc_w)
-	AM_RANGE(0x03800000, 0x039fffff) AM_WRITE_LEGACY(archimedes_memc_page_w)
+	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_vidc_w)
+	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
+	AM_RANGE(0x03800000, 0x039fffff) AM_WRITE(archimedes_memc_page_w)
 ADDRESS_MAP_END
 
 
@@ -365,7 +365,7 @@ DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
 	UINT8 *SRAM    = machine().root_device().memregion("sram")->base();
 	UINT8 *SRAM_NZ = machine().root_device().memregion("sram")->base();
 
-	archimedes_driver_init(machine());
+	archimedes_driver_init();
 
 	machine().root_device().membank("sram_bank")->configure_entries(0, 4,    &SRAM[0],    0x20000);
 	machine().root_device().membank("sram_bank_nz")->configure_entries(0, 4, &SRAM_NZ[0], 0x20000);
@@ -374,7 +374,7 @@ DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
 
 void aristmk5_state::machine_start()
 {
-	archimedes_init(machine());
+	archimedes_init();
 
 	// reset the DAC to centerline
 	//machine().device<dac_device>("dac")->write_signed8(0x80);
@@ -385,11 +385,11 @@ void aristmk5_state::machine_start()
 
 void aristmk5_state::machine_reset()
 {
-	archimedes_reset(machine());
+	archimedes_reset();
 	m_mk5_2KHz_timer->adjust(attotime::from_hz(1953.125)); // 8MHz / 4096
 	m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // default bit 1 & bit 2 == 0
 
-	ioc_regs[IRQ_STATUS_B] |= 0x40; //hack, set keyboard irq empty to be ON
+	m_ioc_regs[IRQ_STATUS_B] |= 0x40; //hack, set keyboard irq empty to be ON
 
 	/* load the roms according to what the operator wants */
 	{
@@ -435,7 +435,7 @@ static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_SCREEN_UPDATE_STATIC(archimds_vidc)
+	MCFG_SCREEN_UPDATE_DRIVER(archimedes_state, screen_update)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DAC_ADD("dac0")
@@ -478,8 +478,7 @@ static MACHINE_CONFIG_START( aristmk5_usa, aristmk5_state )
 
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_VIDEO_START(archimds_vidc)
-	MCFG_SCREEN_UPDATE_STATIC(archimds_vidc)
+	MCFG_SCREEN_UPDATE_DRIVER(archimedes_state, screen_update)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DAC_ADD("dac0")
