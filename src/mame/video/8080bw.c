@@ -15,7 +15,6 @@
 
 MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_vh)
 {
-
 	save_item(NAME(m_c8080bw_flip_screen));
 	save_item(NAME(m_color_map));
 	save_item(NAME(m_screen_red));

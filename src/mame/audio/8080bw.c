@@ -16,7 +16,6 @@
 
 MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_sh)
 {
-
 	m_speaker = machine().device("speaker");
 
 	save_item(NAME(m_port_1_last_extra));
@@ -820,7 +819,7 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_1_w)
 			/* disable effect - stops at end of low cycle */
 			if (!m_schaser_effect_555_is_low)
 			{
-				m_schaser_effect_555_time_remain = m_schaser_effect_555_timer->remaining();
+				m_schaser_effect_555_time_remain = m_schaser_effect_555_timer->time_left();
             		m_schaser_effect_555_time_remain_savable = m_schaser_effect_555_time_remain.as_double();
 				m_schaser_effect_555_timer->adjust(attotime::never);
 			}
@@ -870,11 +869,12 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_2_w)
 }
 
 
-static TIMER_CALLBACK( schaser_effect_555_cb )
+TIMER_DEVICE_CALLBACK( schaser_effect_555_cb )
 {
-	_8080bw_state *state = machine.driver_data<_8080bw_state>();
+	_8080bw_state *state = timer.machine().driver_data<_8080bw_state>();
 	int effect = param;
 	attotime new_time;
+
 	/* Toggle 555 output */
 	state->m_schaser_effect_555_is_low = !state->m_schaser_effect_555_is_low;
 	state->m_schaser_effect_555_time_remain = attotime::zero;
@@ -905,9 +905,6 @@ static void schaser_reinit_555_time_remain(_8080bw_state *state)
 
 MACHINE_START_MEMBER(_8080bw_state,schaser_sh)
 {
-
-	m_schaser_effect_555_timer = machine().scheduler().timer_alloc(FUNC(schaser_effect_555_cb));
-
 	save_item(NAME(m_schaser_explosion));
 	save_item(NAME(m_schaser_effect_555_is_low));
 	save_item(NAME(m_schaser_effect_555_time_remain_savable));
@@ -1042,7 +1039,6 @@ WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_2_w)
 
 WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_1_w)
 {
-
 	/* bit 2 = 2nd speedup
        bit 3 = 1st speedup
        Death is a stream of ff's with some fe's thrown in */
@@ -1057,7 +1053,6 @@ WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_1_w)
 
 WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_2_w)
 {
-
 	speaker_level_w(m_speaker, (data & 0x01) ? 1 : 0);		/* End-of-Level */
 
 	machine().sound().system_enable(data & 0x10);

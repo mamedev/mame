@@ -14,26 +14,34 @@ class _8080bw_state : public mw8080bw_state
 {
 public:
 	_8080bw_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mw8080bw_state(mconfig, type, tag) { }
+		: mw8080bw_state(mconfig, type, tag),
+		m_schaser_effect_555_timer(*this, "schaser_sh_555")
+	{ }
 
-	/* misc game specific */
-	emu_timer   *m_schaser_effect_555_timer;
-	attotime    m_schaser_effect_555_time_remain;
-	INT32       m_schaser_effect_555_time_remain_savable;
-	int         m_schaser_effect_555_is_low;
-	int         m_schaser_explosion;
-	int         m_schaser_last_effect;
-	UINT8       m_polaris_cloud_speed;
-	UINT8       m_polaris_cloud_pos;
-	UINT8       m_schaser_background_disable;
-	UINT8       m_schaser_background_select;
-	UINT8       m_c8080bw_flip_screen;
-	UINT8       m_color_map;
-	UINT8       m_screen_red;
+	/* devices/memory pointers */
+	optional_device<timer_device> m_schaser_effect_555_timer;
 
 	device_t *m_speaker;
 
+
+	/* misc game specific */
+	UINT8 m_c8080bw_flip_screen;
+	UINT8 m_color_map;
+	UINT8 m_screen_red;
+
+	attotime m_schaser_effect_555_time_remain;
+	INT32 m_schaser_effect_555_time_remain_savable;
+	int m_schaser_effect_555_is_low;
+	int m_schaser_explosion;
+	int m_schaser_last_effect;
+	UINT8 m_polaris_cloud_speed;
+	UINT8 m_polaris_cloud_pos;
+	UINT8 m_schaser_background_disable;
+	UINT8 m_schaser_background_select;
+
+
 	DECLARE_CUSTOM_INPUT_MEMBER(sflush_80_r);
+
 	DECLARE_READ8_MEMBER(indianbt_r);
 	DECLARE_WRITE8_MEMBER(steelwkr_sh_port_3_w);
 	DECLARE_WRITE8_MEMBER(invadpt2_sh_port_1_w);
@@ -61,8 +69,10 @@ public:
 	DECLARE_READ8_MEMBER(invmulti_eeprom_r);
 	DECLARE_WRITE8_MEMBER(invmulti_eeprom_w);
 	DECLARE_WRITE8_MEMBER(invmulti_bank_w);
+
 	DECLARE_DRIVER_INIT(invmulti);
 	DECLARE_DRIVER_INIT(vortex);
+
 	DECLARE_MACHINE_START(extra_8080bw);
 	DECLARE_MACHINE_START(schaser);
 	DECLARE_MACHINE_RESET(schaser);
@@ -74,6 +84,7 @@ public:
 	DECLARE_MACHINE_START(extra_8080bw_vh);
 	DECLARE_MACHINE_START(schaser_sh);
 	DECLARE_MACHINE_RESET(schaser_sh);
+
 	UINT32 screen_update_invadpt2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_cosmo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_rollingc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -85,6 +96,7 @@ public:
 	UINT32 screen_update_polaris(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ballbomb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_shuttlei(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	INTERRUPT_GEN_MEMBER(polaris_interrupt);
 };
 
@@ -102,3 +114,4 @@ DISCRETE_SOUND_EXTERN( polaris );
 
 extern const sn76477_interface schaser_sn76477_interface;
 DISCRETE_SOUND_EXTERN( schaser );
+TIMER_DEVICE_CALLBACK( schaser_effect_555_cb );

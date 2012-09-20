@@ -1067,6 +1067,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( schaser, mw8080bw_root, _8080bw_state )
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,schaser)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,schaser)
 
+	MCFG_TIMER_ADD("schaser_sh_555", schaser_effect_555_cb)
+
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
 
