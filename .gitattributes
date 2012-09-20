@@ -7740,6 +7740,10 @@ src/tools/src2html.c svneol=native#text/plain
 src/tools/srcclean.c svneol=native#text/plain
 src/tools/tools.mak svneol=native#text/plain
 src/tools/unidasm.c svneol=native#text/plain
+src/ume/osd/windows/ume.ico -text
+src/ume/osd/windows/ume.man svneol=CRLF#text/plain eol=crlf
+src/ume/osd/windows/ume.rc svneol=native#text/plain
+src/ume/osd/windows/windows.mak svneol=native#text/plain
 src/ume/ume.c svneol=native#text/plain
 src/ume/ume.lst svneol=native#text/plain
 src/ume/ume.mak svneol=native#text/plain

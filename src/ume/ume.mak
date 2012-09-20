@@ -14,7 +14,8 @@ CFLAGS += \
 	-I$(SRC)/mess/osd \
 	-I$(SRC)/mess/osd/$(OSD)
 
-OBJDIRS += $(OBJ)/ume
+UMEOBJ = $(OBJ)/ume
+OBJDIRS += $(UMEOBJS)
 
 $(DRIVLISTSRC): $(SRC)/mame/mame.lst $(SRC)/mess/mess.lst
 

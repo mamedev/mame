@@ -18,6 +18,7 @@ typedef unsigned char UINT8;
 #define ARRAY_LENGTH(x)		(sizeof(x) / sizeof(x[0]))
 #define BUILD_MAME		(0)
 #define BUILD_MESS			(1)
+#define BUILD_UME			(2)
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -172,7 +173,7 @@ static int parse_version(char *str, int *version_major, int *version_minor, int 
 //============================================================
 static int usage(char *me)
 {
-	fprintf(stderr, "Usage: %s [-b windows|winui|mess] <filename>\n", me);
+	fprintf(stderr, "Usage: %s [-b mame|mess|ume] <filename>\n", me);
 	return 1;
 }
 
@@ -204,6 +205,8 @@ int main(int argc, char *argv[])
 				build = BUILD_MAME;
 			else if (!strcmp(p,"mess"))
 				build = BUILD_MESS;
+			else if (!strcmp(p,"ume"))
+				build = BUILD_UME;
 			else
 				return usage(argv[0]);
 		}
@@ -262,6 +265,17 @@ int main(int argc, char *argv[])
 		v.internal_name = "MESS";
 		v.original_filename = "MESS";
 		v.product_name = "MESS";
+	}
+	else if (build == BUILD_UME)
+	{
+		// UME
+		v.author = "MAME and MESS Team";
+		v.comments = "Universal Machine Emulator";
+		v.company_name = "MAME and MESS Team";
+		v.file_description = "Universal Machine Emulator";
+		v.internal_name = "UME";
+		v.original_filename = "UME";
+		v.product_name = "UME";
 	}
 	else
 	{
