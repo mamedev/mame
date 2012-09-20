@@ -88,6 +88,7 @@ const options_entry cli_options::s_option_entries[] =
 	{ CLICOMMAND_LISTSLOTS ";lslot",    "0",       OPTION_COMMAND,    "list available slots and slot devices" },
 	{ CLICOMMAND_LISTMEDIA ";lm",       "0",       OPTION_COMMAND,    "list available media for the system" },
 	{ CLICOMMAND_LISTSOFTWARE ";lsoft", "0",       OPTION_COMMAND,    "list known software for the system" },
+	{ CLICOMMAND_VERIFYSOFTWARE ";vsoft", "0",     OPTION_COMMAND,    "verify known software for the system" },
 	{ CLICOMMAND_GETSOFTLIST ";glist",  "0",       OPTION_COMMAND,    "retrieve software list by name" },
 	{ NULL }
 };
@@ -1282,6 +1283,122 @@ void cli_frontend::listsoftware(const char *gamename)
 
 
 /*-------------------------------------------------
+	verifysoftware - verify roms from the software
+    list of the specified driver(s)
+-------------------------------------------------*/
+void cli_frontend::verifysoftware(const char *gamename)
+{
+	int_map list_map;
+
+	int correct = 0;
+	int incorrect = 0;
+	int notfound = 0;
+	int matched = 0;
+	int nrlists = 0;
+
+	// determine which drivers to process; return an error if none found
+	driver_enumerator drivlist(m_options, gamename);
+	if (drivlist.count() == 0)
+	{
+		throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+	}
+
+	media_auditor auditor(drivlist);
+	while (drivlist.next())
+	{
+		matched++;
+
+		software_list_device_iterator iter(drivlist.config().root_device());
+		for (const software_list_device *swlist = iter.first(); swlist != NULL; swlist = iter.next())
+		{
+			if (swlist->list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
+			{
+				software_list *list = software_list_open(m_options, swlist->list_name(), FALSE, NULL);
+
+				if ( list )
+				{
+					/* Verify if we have encountered this list before */
+					if (list_map.add(swlist->list_name(), 0, false) != TMERR_DUPLICATE)
+					{
+						nrlists++;
+
+						// Get the actual software list contents
+						software_list_parse( list, NULL, NULL );
+
+						for ( software_info *swinfo = software_list_find( list, "*", NULL ); swinfo != NULL; swinfo = software_list_find( list, "*", swinfo ) )
+						{
+							media_auditor::summary summary = auditor.audit_software(swlist->list_name(), swinfo, AUDIT_VALIDATE_FAST);
+
+							// if not found, count that and leave it at that
+							if (summary == media_auditor::NOTFOUND)
+							{
+								notfound++;
+							}
+							// else display information about what we discovered
+							else if(summary != media_auditor::NONE_NEEDED)
+							{
+								// output the summary of the audit
+								astring summary_string;
+								auditor.summarize(swinfo->shortname,&summary_string);
+								mame_printf_info("%s", summary_string.cstr());
+
+								// display information about what we discovered
+								mame_printf_info("romset %s:%s ", swlist->list_name(), swinfo->shortname);
+
+								// switch off of the result
+								switch (summary)
+								{
+									case media_auditor::INCORRECT:
+										mame_printf_info("is bad\n");
+										incorrect++;
+										break;
+
+									case media_auditor::CORRECT:
+										mame_printf_info("is good\n");
+										correct++;
+										break;
+
+									case media_auditor::BEST_AVAILABLE:
+										mame_printf_info("is best available\n");
+										correct++;
+										break;
+
+									default:
+										break;
+								}
+							}
+						}
+					}
+
+					software_list_close( list );
+				}
+			}
+		}
+	}
+
+	// clear out any cached files
+	zip_file_cache_clear();
+
+	// return an error if none found
+	if (matched == 0)
+		throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+
+	// if we didn't get anything at all, display a generic end message
+	if (matched > 0 && correct == 0 && incorrect == 0)
+	{
+		throw emu_fatalerror(MAMERR_MISSING_FILES, "romset \"%s\" has no software entries defined!\n", gamename);
+	}
+	// otherwise, print a summary
+	else
+	{
+		if (incorrect > 0)
+			throw emu_fatalerror(MAMERR_MISSING_FILES, "%d romsets found in %d software lists, %d were OK.\n", correct + incorrect, nrlists, correct);
+		mame_printf_info("%d romsets found in %d software lists, %d romsets were OK.\n", correct, nrlists, correct);
+	}
+
+}
+
+/*-------------------------------------------------
     getsoftlist - retrieve software list by name
 -------------------------------------------------*/
 
@@ -1423,6 +1540,7 @@ void cli_frontend::execute_commands(const char *exename)
 		{ CLICOMMAND_VERIFYSAMPLES,	&cli_frontend::verifysamples },
 		{ CLICOMMAND_LISTMEDIA,		&cli_frontend::listmedia },
 		{ CLICOMMAND_LISTSOFTWARE,  &cli_frontend::listsoftware },
+		{ CLICOMMAND_VERIFYSOFTWARE,	&cli_frontend::verifysoftware },
 		{ CLICOMMAND_ROMIDENT,		&cli_frontend::romident },
 		{ CLICOMMAND_GETSOFTLIST,   &cli_frontend::getsoftlist },
 	};

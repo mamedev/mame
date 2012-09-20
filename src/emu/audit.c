@@ -207,6 +207,72 @@ media_auditor::summary media_auditor::audit_device(device_t *device, const char 
 
 
 //-------------------------------------------------
+//  audit_software
+//-------------------------------------------------
+media_auditor::summary media_auditor::audit_software(const char *list_name, software_info *swinfo, const char *validation)
+{
+	// start fresh
+	m_record_list.reset();
+
+	// store validation for later
+	m_validation = validation;
+
+	astring combinedpath(swinfo->shortname, ";", list_name, PATH_SEPARATOR, swinfo->shortname);
+	m_searchpath = combinedpath;
+
+	int found = 0;
+	int required = 0;
+
+	// now iterate over software parts
+	for ( software_part *part = software_find_part( swinfo, NULL, NULL ); part != NULL; part = software_part_next( part ) )
+	{
+		// now iterate over regions
+		for ( const rom_entry *region = part->romdata; region; region = rom_next_region( region ) )
+		{
+			// now iterate over rom definitions
+			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+			{
+				hash_collection hashes(ROM_GETHASHDATA(rom));
+
+				// count the number of files with hashes
+				if (!hashes.flag(hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
+				{
+					required++;
+				}
+
+				// audit a file
+				audit_record *record = NULL;
+				if (ROMREGION_ISROMDATA(region))
+				{
+					record = audit_one_rom(rom);
+				}
+				// audit a disk
+				else if (ROMREGION_ISDISKDATA(region))
+				{
+					record = audit_one_disk(rom);
+				}
+
+				// count the number of files that are found.
+				if (record != NULL && (record->status() == audit_record::STATUS_GOOD || record->status() == audit_record::STATUS_FOUND_INVALID))
+				{
+					found++;
+				}
+			}
+		}
+	}
+
+	if (found == 0 && required > 0)
+	{
+		m_record_list.reset();
+		return NOTFOUND;
+	}
+
+	// return a summary
+	return summarize(list_name);
+}
+
+
+//-------------------------------------------------
 //  audit_samples - validate the samples for the
 //  currently-enumerated driver
 //-------------------------------------------------

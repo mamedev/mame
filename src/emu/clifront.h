@@ -75,6 +75,7 @@
 #define CLICOMMAND_LISTSLOTS			"listslots"
 #define CLICOMMAND_LISTMEDIA			"listmedia"		// needed by MESS
 #define CLICOMMAND_LISTSOFTWARE			"listsoftware"
+#define CLICOMMAND_VERIFYSOFTWARE		"verifysoftware"
 #define CLICOMMAND_GETSOFTLIST			"getsoftlist"
 
 
@@ -120,6 +121,7 @@ public:
 	void listslots(const char *gamename = "*");
 	void listmedia(const char *gamename = "*");
 	void listsoftware(const char *gamename = "*");
+	void verifysoftware(const char *gamename = "*");
 	void verifyroms(const char *gamename = "*");
 	void verifysamples(const char *gamename = "*");
 	void romident(const char *filename);
