@@ -58,7 +58,7 @@ isa8_svga_cirrus_device::isa8_svga_cirrus_device(const machine_config &mconfig, 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-static READ8_HANDLER( input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+READ8_MEMBER(isa8_svga_cirrus_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
 
 void isa8_svga_cirrus_device::device_start()
 {
@@ -66,7 +66,7 @@ void isa8_svga_cirrus_device::device_start()
 
 	video_start_vga( machine() );
 
-	pc_vga_init(machine(), input_port_0_r, NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(isa8_svga_cirrus_device::input_port_0_r),this), NULL);
 
 	int i;
 	for (i = 0; i < 0x100; i++)

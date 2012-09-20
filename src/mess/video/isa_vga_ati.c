@@ -61,7 +61,7 @@ isa16_vga_gfxultra_device::isa16_vga_gfxultra_device(const machine_config &mconf
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-static READ8_HANDLER( input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+READ8_MEMBER(isa16_vga_gfxultra_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
 
 void isa16_vga_gfxultra_device::device_start()
 {
@@ -69,7 +69,7 @@ void isa16_vga_gfxultra_device::device_start()
 
 	video_start_vga( machine() );
 
-	pc_vga_init(machine(), input_port_0_r, NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(isa16_vga_gfxultra_device::input_port_0_r),this), NULL);
 
 	int i;
 	for (i = 0; i < 0x100; i++)

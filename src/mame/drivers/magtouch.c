@@ -100,6 +100,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(at_com_interrupt_1);
 	DECLARE_DRIVER_INIT(magtouch);
 	virtual void machine_start();
+	DECLARE_READ8_MEMBER(vga_setting);
 };
 
 
@@ -196,7 +197,7 @@ static void magtouch_set_keyb_int(running_machine &machine, int state)
 	pic8259_ir1_w(machine.device("pic8259_1"), state);
 }
 
-static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
+READ8_MEMBER( magtouch_state::vga_setting ) { return 0xff; } // hard-code to color
 
 void magtouch_state::machine_start()
 {
@@ -248,7 +249,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(magtouch_state,magtouch)
 {
-	pc_vga_init(machine(), vga_setting, NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(magtouch_state::vga_setting),this), NULL);
 	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 

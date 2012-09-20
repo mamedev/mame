@@ -81,6 +81,7 @@ public:
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	virtual void machine_start();
 	virtual void machine_reset();
+	DECLARE_READ8_MEMBER(vga_setting);
 };
 
 
@@ -169,7 +170,7 @@ static void ide_interrupt(device_t *device, int state)
  *
  *************************************************************/
 
-static READ8_HANDLER( vga_setting )
+READ8_MEMBER(su2000_state::vga_setting )
 {
 	/* TODO */
 	return 0xff;
@@ -286,7 +287,7 @@ void su2000_state::machine_start()
 
 	kbdc8042_init(machine(), &at8042);
 
-	pc_vga_init(machine(), vga_setting, NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(su2000_state::vga_setting),this), NULL);
 	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 

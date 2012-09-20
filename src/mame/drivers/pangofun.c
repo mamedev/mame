@@ -107,6 +107,7 @@ public:
 
 	DECLARE_DRIVER_INIT(pangofun);
 	virtual void machine_start();
+	DECLARE_READ8_MEMBER(vga_setting);
 };
 
 
@@ -164,7 +165,7 @@ static void pangofun_set_keyb_int(running_machine &machine, int state)
 	pic8259_ir1_w(machine.device("pic8259_1"), state);
 }
 
-static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
+READ8_MEMBER(pangofun_state::vga_setting ) { return 0xff; } // hard-code to color
 
 static void set_gate_a20(running_machine &machine, int a20)
 {
@@ -243,7 +244,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(pangofun_state,pangofun)
 {
-	pc_vga_init(machine(), vga_setting, NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(pangofun_state::vga_setting),this), NULL);
 	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 

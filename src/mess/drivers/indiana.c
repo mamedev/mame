@@ -22,6 +22,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 	DECLARE_DRIVER_INIT(indiana);
 	virtual void machine_reset();
+	DECLARE_READ8_MEMBER(indiana_vga_setting);
 };
 
 
@@ -76,14 +77,14 @@ static MACHINE_CONFIG_START( indiana, indiana_state )
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 MACHINE_CONFIG_END
 
-READ8_HANDLER( indiana_vga_setting )
+READ8_MEMBER(indiana_state::indiana_vga_setting)
 {
 	return 0xff;	// TODO
 }
 
 DRIVER_INIT_MEMBER(indiana_state,indiana)
 {
-	pc_vga_init(machine(), indiana_vga_setting, NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(indiana_state::indiana_vga_setting),this), NULL);
 	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0x7f7a0000, machine().device("maincpu")->memory().space(AS_PROGRAM), 0x7f600000);
 }
 

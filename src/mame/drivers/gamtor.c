@@ -35,6 +35,7 @@ public:
 		: driver_device(mconfig, type, tag){ }
 	DECLARE_WRITE32_MEMBER(gamtor_unk_w);
 	DECLARE_DRIVER_INIT(gaminator);
+	DECLARE_READ8_MEMBER(vga_setting);
 };
 
 WRITE32_MEMBER(gaminator_state::gamtor_unk_w)
@@ -1248,12 +1249,12 @@ ROM_START( llcharma )
 	ROM_LOAD( "llc_92_5.6-0", 0x0000, 0x2000000, CRC(c8c2a5d3) SHA1(ec23eff63871cc515ec58a894446d4d639d864e4) )
 ROM_END
 
-static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
+READ8_MEMBER(gaminator_state::vga_setting ) { return 0xff; } // hard-code to color
 
 
 DRIVER_INIT_MEMBER(gaminator_state,gaminator)
 {
-	pc_vga_init(machine(), vga_setting, NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(gaminator_state::vga_setting),this), NULL);
 	pc_vga_gamtor_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0x44000000, machine().device("maincpu")->memory().space(AS_PROGRAM), 0x40000000);
 }
 

@@ -53,6 +53,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out2_changed);
 	DECLARE_DRIVER_INIT(photoply);
 	virtual void machine_start();
+	DECLARE_READ8_MEMBER(vga_setting);
 };
 
 
@@ -335,7 +336,7 @@ static GFXDECODE_START( photoply )
 	//there's also a 8x16 entry (just after the 8x8)
 GFXDECODE_END
 
-static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
+READ8_MEMBER(photoply_state::vga_setting ) { return 0xff; } // hard-code to color
 
 static MACHINE_CONFIG_START( photoply, photoply_state )
 	/* basic machine hardware */
@@ -377,7 +378,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(photoply_state,photoply)
 {
-	pc_vga_init(machine(), vga_setting, NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(photoply_state::vga_setting),this), NULL);
 	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 

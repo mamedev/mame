@@ -162,7 +162,7 @@ const struct pc_svga_interface cirrus_svga_interface =
 
 void cirrus_device::device_start()
 {
-	pc_vga_init(machine(), NULL, &cirrus_svga_interface);
+	pc_vga_init(machine(), read8_delegate(), &cirrus_svga_interface);
 	pc_vga_io_init(machine(), machine().device("ppc1")->memory().space(AS_PROGRAM), 0xC00A0000, machine().device("ppc1")->memory().space(AS_PROGRAM), 0x80000000);
 }
 

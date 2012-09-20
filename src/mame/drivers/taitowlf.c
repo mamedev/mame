@@ -83,6 +83,7 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_READ8_MEMBER(vga_setting);
 };
 
 #if !ENABLE_VGA
@@ -696,7 +697,7 @@ static void taitowlf_set_keyb_int(running_machine &machine, int state)
 }
 
 #if ENABLE_VGA
-static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
+READ8_MEMBER(taitowlf_state::vga_setting ) { return 0xff; } // hard-code to color
 #endif
 
 DRIVER_INIT_MEMBER(taitowlf_state,taitowlf)
@@ -709,7 +710,7 @@ DRIVER_INIT_MEMBER(taitowlf_state,taitowlf)
 
 	kbdc8042_init(machine(), &at8042);
 	#if ENABLE_VGA
-	pc_vga_init(machine(), vga_setting, NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(taitowlf_state::vga_setting),this), NULL);
 	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 	#endif
 }

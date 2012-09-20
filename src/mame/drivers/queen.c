@@ -636,7 +636,7 @@ static void ide_interrupt(device_t *device, int state)
 	pic8259_ir6_w(drvstate->m_pic8259_2, state);
 }
 
-static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
+READ8_MEMBER(queen_state::vga_setting ) { return 0xff; } // hard-code to color
 
 void queen_state::machine_start()
 {
@@ -655,7 +655,7 @@ void queen_state::machine_start()
 	intel82439tx_init(machine());
 
 	kbdc8042_init(machine(), &at8042);
-	pc_vga_init(machine(), ::vga_setting, NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(queen_state::vga_setting),this), NULL);
 	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 

@@ -69,6 +69,7 @@ public:
 	DECLARE_DRIVER_INIT(voyager);
 	virtual void machine_start();
 	virtual void machine_reset();
+	DECLARE_READ8_MEMBER(vga_setting);
 };
 
 
@@ -650,7 +651,7 @@ static IRQ_CALLBACK(irq_callback)
 	return pic8259_acknowledge( state->m_pic8259_1);
 }
 
-static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
+READ8_MEMBER(voyager_state::vga_setting ) { return 0xff; } // hard-code to color
 
 void voyager_state::machine_start()
 {
@@ -800,7 +801,7 @@ DRIVER_INIT_MEMBER(voyager_state,voyager)
 {
 	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x20000/4);
 
-	pc_vga_init(machine(), vga_setting, NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(voyager_state::vga_setting),this), NULL);
 	pc_svga_trident_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, voyager_set_keyb_int);
 

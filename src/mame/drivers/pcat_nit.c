@@ -112,6 +112,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(at_com_interrupt_1);
 	DECLARE_DRIVER_INIT(pcat_nit);
 	virtual void machine_start();
+	DECLARE_READ8_MEMBER(vga_setting);
 };
 
 WRITE_LINE_MEMBER(pcat_nit_state::microtouch_out)
@@ -227,7 +228,7 @@ static void streetg2_set_keyb_int(running_machine &machine, int state)
 	pic8259_ir1_w(machine.device("pic8259_1"), state);
 }
 
-static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
+READ8_MEMBER(pcat_nit_state::vga_setting ) { return 0xff; } // hard-code to color
 
 void pcat_nit_state::machine_start()
 {
@@ -426,7 +427,7 @@ DRIVER_INIT_MEMBER(pcat_nit_state,pcat_nit)
 	m_banked_nvram = auto_alloc_array(machine(), UINT8, 0x2000);
 	machine().device<nvram_device>("nvram")->set_base(m_banked_nvram, 0x2000);
 
-	pc_vga_init(machine(), vga_setting, NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(pcat_nit_state::vga_setting),this), NULL);
 	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 

@@ -54,7 +54,7 @@
 
 static struct
 {
-	read8_space_func read_dipswitch;
+	read8_delegate read_dipswitch;
 	struct pc_svga_interface svga_intf;
 
 	UINT8 *memory;
@@ -1614,19 +1614,19 @@ READ8_HANDLER( vga_port_03c0_r )
 			switch ((vga.miscellaneous_output>>2)&3)
 			{
 				case 3:
-					if (vga.read_dipswitch && vga.read_dipswitch(space, 0, mem_mask) & 0x01)
+					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch(space, 0, mem_mask) & 0x01)
 						data |= 0x10;
 					break;
 				case 2:
-					if (vga.read_dipswitch && vga.read_dipswitch(space, 0, mem_mask) & 0x02)
+					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch(space, 0, mem_mask) & 0x02)
 						data |= 0x10;
 					break;
 				case 1:
-					if (vga.read_dipswitch && vga.read_dipswitch(space, 0, mem_mask) & 0x04)
+					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch(space, 0, mem_mask) & 0x04)
 						data |= 0x10;
 					break;
 				case 0:
-					if (vga.read_dipswitch && vga.read_dipswitch(space, 0, mem_mask) & 0x08)
+					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch(space, 0, mem_mask) & 0x08)
 						data |= 0x10;
 					break;
 			}
@@ -2017,7 +2017,7 @@ WRITE8_HANDLER(vga_mem_w)
 	}
 }
 
-void pc_vga_init(running_machine &machine, read8_space_func read_dipswitch, const struct pc_svga_interface *svga_intf)
+void pc_vga_init(running_machine &machine, read8_delegate read_dipswitch, const struct pc_svga_interface *svga_intf)
 {
 	memset(&vga, 0, sizeof(vga));
 
