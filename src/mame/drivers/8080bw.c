@@ -2216,7 +2216,7 @@ DRIVER_INIT_MEMBER(_8080bw_state,vortex)
 
 
 
-/* unknown gun game by Model Racing, possibly Gun Champ?
+/* unlabeled gun game by Model Racing, almost certainly Gun Champ
 
 BOARD 1:
  _________________________________________________________________________________________________________________________________
@@ -2336,28 +2336,139 @@ BOARD 2:
 |                               P           R           S            T             U         V            W          X            |
 |_________________________________________________________________________________________________________________________________|
 
+
+Claybuster is probably the same hardware
+
 */
 
+TIMER_DEVICE_CALLBACK( claybust_gun_callback )
+{
+	_8080bw_state *state = timer.machine().driver_data<_8080bw_state>();
+	
+	// reset gun latch
+	state->m_claybust_gun_pos = 0;
+}
 
-// the invaders shifter stuff doesn't seem correct for this, if i hook up the count_w the gfx are corrupt, otherwise they're incorrectly offset?
-// might need custom implementation
+CUSTOM_INPUT_MEMBER(_8080bw_state::claybust_gun_on_r)
+{
+	return (m_claybust_gun_pos != 0) ? 1 : 0;
+}
 
-static ADDRESS_MAP_START( modelr_io_map, AS_IO, 8, _8080bw_state )
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
-//  AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r)
-//  AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(watchdog_reset_w)
+INPUT_CHANGED_MEMBER(_8080bw_state::claybust_gun_trigger)
+{
+	if (newval)
+	{
+		/*
+			The game registers a valid shot after the gun trigger is pressed.
+			It latches the gun position and then compares it with VRAM contents: 1 byte/8 pixels, 0 means miss.
+			IN1 d0 probably indicates if the latch is ready or not (glitches happen otherwise)
+
+			in   $06
+			cpi  $04
+			rc
+			mov  h,a
+			in   $02
+			mov  l,a
+			lxi  d,$1ffe  <-- this is where the +2 comes from
+			dad  d
+			out  $00
+			mov  a,m
+			ana  a
+			rz
+		*/
+		UINT8 gunx = ioport("GUNX")->read_safe(0x00);
+		UINT8 guny = ioport("GUNY")->read_safe(0x20);
+		m_claybust_gun_pos = ((gunx >> 3) | (guny << 5)) + 2;
+		m_claybust_gun_on->adjust(attotime::from_msec(250)); // timing is a guess
+	}
+}
+
+READ8_MEMBER(_8080bw_state::claybust_gun_lo_r)
+{
+	return m_claybust_gun_pos & 0xff;
+}
+
+READ8_MEMBER(_8080bw_state::claybust_gun_hi_r)
+{
+	return m_claybust_gun_pos >> 8;
+}
+
+static ADDRESS_MAP_START( claybust_io_map, AS_IO, 8, _8080bw_state )
+	//AM_RANGE(0x00, 0x00) AM_WRITENOP // ?
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
+	AM_RANGE(0x02, 0x02) AM_READ(claybust_gun_lo_r) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r) //AM_WRITENOP // port3 write looks sound-related
+	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
+	//AM_RANGE(0x05, 0x05) AM_WRITENOP // ?
+	AM_RANGE(0x06, 0x06) AM_READ(claybust_gun_hi_r)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED_CLASS( modelr, invaders, _8080bw_state )
+
+static INPUT_PORTS_START( claybust )
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, _8080bw_state, claybust_gun_on_r, NULL)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_IMPULSE(2) PORT_CHANGED_MEMBER(DEVICE_SELF, _8080bw_state, claybust_gun_trigger, NULL)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
+
+	PORT_DIPNAME( 0x10, 0x10, "Shots" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START( "GUNX" )
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_MINMAX(0x00, 0xff) PORT_CROSSHAIR(X, 1.0 - (MW8080BW_HPIXCOUNT-256)/256.0, (MW8080BW_HPIXCOUNT-256)/256.0, 0) PORT_SENSITIVITY(56) PORT_KEYDELTA(5)
+	PORT_START( "GUNY" )
+	PORT_BIT( 0xff, 0xa0, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x20, 0xff) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(64) PORT_KEYDELTA(5)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gunchamp )
+	PORT_INCLUDE( claybust )
+	
+	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xe0, 0x40, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+INPUT_PORTS_END
+
+
+MACHINE_START_MEMBER(_8080bw_state, claybust)
+{
+	m_claybust_gun_pos = 0;
+	save_item(NAME(m_claybust_gun_pos));
+
+	MACHINE_START_CALL_MEMBER(mw8080bw);
+}
+
+MACHINE_CONFIG_DERIVED_CLASS( claybust, invaders, _8080bw_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(modelr_io_map)
-	
-	MCFG_WATCHDOG_TIME_INIT(attotime::never)
+	MCFG_CPU_IO_MAP(claybust_io_map)
+
+	MCFG_TIMER_ADD("claybust_gun", claybust_gun_callback)
+
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, claybust) 
+
+	/* sound hardware */
+	// TODO: discrete sound
 
 MACHINE_CONFIG_END
 
@@ -2365,8 +2476,7 @@ MACHINE_CONFIG_END
 
 /* Taito Galactica / Space Missile
 This game was officially only distributed in Brazil.
-Not much information is avaliable. It is speculated that the original is "Space Missile", whose manufacturer was sued by Taito in Japan.
-Release date is unknown, maybe even before Galaxian?!
+Regarding release data, not much information is available online.
 
 ROM dump came from a collection of old 5 1/4 disks (Apple II) that used to be in the possession of an arcade operator in the early 80s.
 
@@ -2533,7 +2643,6 @@ WRITE8_MEMBER(_8080bw_state::invmulti_bank_w)
 
 MACHINE_RESET_MEMBER(_8080bw_state,invmulti)
 {
-
 	invmulti_bank_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 
 	MACHINE_RESET_CALL_MEMBER(mw8080bw);
@@ -3789,8 +3898,8 @@ GAME( 1979, yosakdon, 0,        yosakdon, yosakdon, driver_device, 0, ROT270, "W
 GAME( 1979, yosakdona,yosakdon, yosakdon, yosakdon, driver_device, 0, ROT270, "Wing", "Yosaku To Donbei (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* bootleg? */
 GAMEL(1979, shuttlei, 0,        shuttlei, shuttlei, driver_device, 0, ROT270, "Omori Electric Co., Ltd.", "Shuttle Invader", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL, layout_shuttlei )
 GAMEL(1979, skylove,  0,        shuttlei, skylove, driver_device,  0, ROT270, "Omori Electric Co., Ltd.", "Sky Love", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL, layout_shuttlei )
-GAME (1978, claybust, 0,        modelr,   invadrmr, driver_device, 0, ROT0,   "Model Racing", "Claybuster", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // no titlescreen, Claybuster according to flyers
-GAME (1980, gunchamp, 0,        modelr,   invadrmr, driver_device, 0, ROT0,   "Model Racing", "Gun Champ", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // no titlescreen, but very likely this is Gun Champ
+GAME (1978, claybust, 0,        claybust, claybust, driver_device, 0, ROT0,   "Model Racing", "Claybuster", GAME_SUPPORTS_SAVE | GAME_NO_SOUND ) // no titlescreen, Claybuster according to flyers
+GAME (1980, gunchamp, 0,        claybust, gunchamp, driver_device, 0, ROT0,   "Model Racing", "Gun Champ", GAME_SUPPORTS_SAVE | GAME_NO_SOUND ) // no titlescreen, but very likely this is Gun Champ
 
 GAME( 2002, invmulti,    0,        invmulti, invmulti, _8080bw_state, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (M8.03D)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 2002, invmultim3a, invmulti, invmulti, invmulti, _8080bw_state, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (M8.03A)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

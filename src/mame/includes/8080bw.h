@@ -15,11 +15,13 @@ class _8080bw_state : public mw8080bw_state
 public:
 	_8080bw_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mw8080bw_state(mconfig, type, tag),
-		m_schaser_effect_555_timer(*this, "schaser_sh_555")
+		m_schaser_effect_555_timer(*this, "schaser_sh_555"),
+		m_claybust_gun_on(*this, "claybust_gun")
 	{ }
 
 	/* devices/memory pointers */
 	optional_device<timer_device> m_schaser_effect_555_timer;
+	optional_device<timer_device> m_claybust_gun_on;
 
 	device_t *m_speaker;
 
@@ -38,9 +40,12 @@ public:
 	UINT8 m_polaris_cloud_pos;
 	UINT8 m_schaser_background_disable;
 	UINT8 m_schaser_background_select;
+	UINT16 m_claybust_gun_pos;
 
 
 	DECLARE_CUSTOM_INPUT_MEMBER(sflush_80_r);
+	DECLARE_INPUT_CHANGED_MEMBER(claybust_gun_trigger);
+	DECLARE_CUSTOM_INPUT_MEMBER(claybust_gun_on_r);
 
 	DECLARE_READ8_MEMBER(indianbt_r);
 	DECLARE_WRITE8_MEMBER(steelwkr_sh_port_3_w);
@@ -66,6 +71,8 @@ public:
 	DECLARE_WRITE8_MEMBER(yosakdon_sh_port_2_w);
 	DECLARE_WRITE8_MEMBER(shuttlei_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(shuttlei_sh_port_2_w);
+	DECLARE_READ8_MEMBER(claybust_gun_lo_r);
+	DECLARE_READ8_MEMBER(claybust_gun_hi_r);
 	DECLARE_READ8_MEMBER(invmulti_eeprom_r);
 	DECLARE_WRITE8_MEMBER(invmulti_eeprom_w);
 	DECLARE_WRITE8_MEMBER(invmulti_bank_w);
@@ -84,6 +91,7 @@ public:
 	DECLARE_MACHINE_START(extra_8080bw_vh);
 	DECLARE_MACHINE_START(schaser_sh);
 	DECLARE_MACHINE_RESET(schaser_sh);
+	DECLARE_MACHINE_START(claybust);
 
 	UINT32 screen_update_invadpt2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_cosmo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
