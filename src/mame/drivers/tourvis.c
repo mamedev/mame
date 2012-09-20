@@ -187,18 +187,17 @@ I can't tell ATM if units are seconds (even if values in tables seem very relate
 #include "machine/i8155.h"
 
 
-class tourvision_state : public driver_device
+class tourvision_state : public pce_common_state
 {
 public:
 	tourvision_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: pce_common_state(mconfig, type, tag) { }
 
 	DECLARE_WRITE8_MEMBER(tourvision_8085_d000_w);
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_a_w);
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_b_w);
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_c_w);
 	DECLARE_WRITE_LINE_MEMBER(tourvision_timer_out);
-	DECLARE_DRIVER_INIT(tourvision);
 };
 
 
@@ -285,7 +284,7 @@ static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, tourvision_state )
 	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE_LEGACY(vce_r, vce_w )
 	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE_LEGACY("c6280", c6280_r, c6280_w )
 	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE_LEGACY(h6280_timer_r, h6280_timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE_LEGACY(pce_joystick_r, pce_joystick_w )
+	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE(pce_joystick_r, pce_joystick_w )
 	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE_LEGACY(h6280_irq_status_r, h6280_irq_status_w )
 ADDRESS_MAP_END
 
@@ -513,18 +512,12 @@ ROM_START(tvsvball)
 	TOURVISION_BIOS
 ROM_END
 
-
-DRIVER_INIT_MEMBER(tourvision_state,tourvision)
-{
-	init_pce();
-}
-
-GAME( 19??, tourvis,  0,       tourvision, tourvision, tourvision_state, tourvision, ROT0, "bootleg (Tourvision)", "Tourvision PCE bootleg", GAME_IS_BIOS_ROOT | GAME_NOT_WORKING )
-GAME( 1988, tvlegaxe, tourvis, tourvision, tourvision, tourvision_state, tourvision, ROT0, "bootleg (Tourvision) / Victor Musical Industries, Inc.", "Makyo Densetsu - The Legenary Axe (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1989, tvusapb,  tourvis, tourvision, tourvision, tourvision_state, tourvision, ROT0, "bootleg (Tourvision) / Aicom", "USA Pro Basketball (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1989, tvdunexp, tourvis, tourvision, tourvision, tourvision_state, tourvision, ROT0, "bootleg (Tourvision) / Hudson / Atlus", "Dungeon Explorer (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1990, tvthbld,  tourvis, tourvision, tourvision, tourvision_state, tourvision, ROT0, "bootleg (Tourvision) / Sega / NEC Avenue", "Thunder Blade (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1990, tvrs2,    tourvis, tourvision, tourvision, tourvision_state, tourvision, ROT0, "bootleg (Tourvision) / Taito", "Rastan Saga II (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1990, tvsvball, tourvis, tourvision, tourvision, tourvision_state, tourvision, ROT0, "bootleg (Tourvision) / Video System", "Super Volley ball (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1991, tvpwlg4,  tourvis, tourvision, tourvision, tourvision_state, tourvision, ROT0, "bootleg (Tourvision) / Hudson", "Power League IV (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1991, tvsci,    tourvis, tourvision, tourvision, tourvision_state, tourvision, ROT0, "bootleg (Tourvision) / Taito", "Special Criminal Investigation (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 19??, tourvis,  0,       tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision)", "Tourvision PCE bootleg", GAME_IS_BIOS_ROOT | GAME_NOT_WORKING )
+GAME( 1988, tvlegaxe, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Victor Musical Industries, Inc.", "Makyo Densetsu - The Legenary Axe (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1989, tvusapb,  tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Aicom", "USA Pro Basketball (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1989, tvdunexp, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson / Atlus", "Dungeon Explorer (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1990, tvthbld,  tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Sega / NEC Avenue", "Thunder Blade (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1990, tvrs2,    tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Taito", "Rastan Saga II (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1990, tvsvball, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Video System", "Super Volley ball (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, tvpwlg4,  tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson", "Power League IV (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, tvsci,    tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Taito", "Special Criminal Investigation (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

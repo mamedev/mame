@@ -11,23 +11,21 @@
 
 #define	PCE_MAIN_CLOCK		21477270
 
-DECLARE_WRITE8_HANDLER ( pce_joystick_w );
- DECLARE_READ8_HANDLER ( pce_joystick_r );
-
-#define TG_16_JOY_SIG		0x00
-#define PCE_JOY_SIG			0x40
-#define NO_CD_SIG			0x80
-#define CD_SIG				0x00
-/* these might be used to indicate something, but they always seem to return 1 */
-#define CONST_SIG			0x30
-
-struct pce_struct
+class pce_common_state : public driver_device
 {
-	UINT8 io_port_options; /*driver-specific options for the PCE*/
-};
-extern struct pce_struct pce;
-void init_pce();
-MACHINE_RESET( pce );
+public:
+	pce_common_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
-void pce_set_joystick_readinputport_callback( UINT8 (*joy_read)(running_machine &));
+	DECLARE_WRITE8_MEMBER(pce_joystick_w);
+	DECLARE_READ8_MEMBER(pce_joystick_r);		
+	
+	DECLARE_DRIVER_INIT(pce_common);
+	
+	virtual UINT8 joy_read();
+private:
+	UINT8 m_io_port_options; 	/*driver-specific options for the PCE*/
+	int m_joystick_port_select; /* internal index of joystick ports */
+	int m_joystick_data_select; /* which nibble of joystick data we want */
+};
 #endif

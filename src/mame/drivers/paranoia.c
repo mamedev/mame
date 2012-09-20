@@ -43,11 +43,11 @@ HuC6280A (Hudson)
 #include "sound/c6280.h"
 
 
-class paranoia_state : public driver_device
+class paranoia_state : public pce_common_state
 {
 public:
 	paranoia_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: pce_common_state(mconfig, type, tag) { }
 
 	DECLARE_WRITE8_MEMBER(paranoia_8085_d000_w);
 	DECLARE_READ8_MEMBER(paranoia_z80_io_01_r);
@@ -58,7 +58,6 @@ public:
 	DECLARE_WRITE8_MEMBER(paranoia_i8155_b_w);
 	DECLARE_WRITE8_MEMBER(paranoia_i8155_c_w);
 	DECLARE_WRITE_LINE_MEMBER(paranoia_i8155_timer_out);
-	DECLARE_DRIVER_INIT(paranoia);
 };
 
 
@@ -81,7 +80,7 @@ static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, paranoia_state )
 	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE_LEGACY(vce_r, vce_w )
 	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE_LEGACY("c6280", c6280_r, c6280_w )
 	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE_LEGACY(h6280_timer_r, h6280_timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE_LEGACY(pce_joystick_r, pce_joystick_w )
+	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE(pce_joystick_r, pce_joystick_w )
 	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE_LEGACY(h6280_irq_status_r, h6280_irq_status_w )
 ADDRESS_MAP_END
 
@@ -228,9 +227,4 @@ ROM_START(paranoia)
 	ROM_LOAD( "4.352", 0x18000, 0x8000, CRC(11297fed) SHA1(17a294e65ba1c4806307602dee4c7c627ad1fcfd) )
 ROM_END
 
-DRIVER_INIT_MEMBER(paranoia_state,paranoia)
-{
-	init_pce();
-}
-
-GAME( 1990, paranoia, 0, paranoia, paranoia, paranoia_state, paranoia, ROT0, "Naxat Soft", "Paranoia", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1990, paranoia, 0, paranoia, paranoia, pce_common_state, pce_common, ROT0, "Naxat Soft", "Paranoia", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

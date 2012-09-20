@@ -99,17 +99,17 @@ Alien Crush & Pac_Land: dumps made from PC-Engine dumps of JP versions
 #include "sound/discrete.h"
 
 
-class uapce_state : public driver_device
+class uapce_state : public pce_common_state
 {
 public:
 	uapce_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: pce_common_state(mconfig, type, tag) { }
 
 	UINT8 m_jamma_if_control_latch;
 	DECLARE_WRITE8_MEMBER(jamma_if_control_latch_w);
 	DECLARE_READ8_MEMBER(jamma_if_control_latch_r);
 	DECLARE_READ8_MEMBER(jamma_if_read_dsw);
-	DECLARE_DRIVER_INIT(uapce);
+	virtual UINT8 joy_read();
 	virtual void machine_reset();
 };
 
@@ -213,22 +213,20 @@ READ8_MEMBER(uapce_state::jamma_if_read_dsw)
 	return dsw_val & 1;
 }
 
-static UINT8 jamma_if_read_joystick( running_machine &machine )
+UINT8 uapce_state::joy_read()
 {
-	uapce_state *state = machine.driver_data<uapce_state>();
-	if ( state->m_jamma_if_control_latch & 0x10 )
+	if ( m_jamma_if_control_latch & 0x10 )
 	{
-		return state->ioport("JOY" )->read();
+		return ioport("JOY" )->read();
 	}
 	else
 	{
-		return machine.root_device().ioport("JOY" )->read() | 0x08;
+		return machine().root_device().ioport("JOY" )->read() | 0x08;
 	}
 }
 
 void uapce_state::machine_reset()
 {
-	pce_set_joystick_readinputport_callback( jamma_if_read_joystick );
 	m_jamma_if_control_latch = 0;
 }
 
@@ -290,7 +288,7 @@ static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, uapce_state )
 	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE_LEGACY(vce_r, vce_w )
 	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE_LEGACY("c6280", c6280_r, c6280_w )
 	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE_LEGACY(h6280_timer_r, h6280_timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE_LEGACY(pce_joystick_r, pce_joystick_w )
+	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE(pce_joystick_r, pce_joystick_w )
 	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE_LEGACY(h6280_irq_status_r, h6280_irq_status_w )
 ADDRESS_MAP_END
 
@@ -374,12 +372,7 @@ ROM_START(paclandp)
 	ROM_LOAD( "u1.bin", 0x0000, 0x800, CRC(f5e538a9) SHA1(19ac9525c9ad6bea1789cc9e63cdb7fe949867d9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(uapce_state,uapce)
-{
-	init_pce();
-}
-
-GAME( 1989, blazlaz, 0, uapce, uapce, uapce_state, uapce, ROT0, "Hudson Soft", "Blazing Lazers", GAME_IMPERFECT_SOUND )
-GAME( 1989, keith,   0, uapce, uapce, uapce_state, uapce, ROT0, "Hudson Soft", "Keith Courage In Alpha Zones", GAME_IMPERFECT_SOUND )
-GAME( 1989, aliencr, 0, uapce, uapce, uapce_state, uapce, ROT0, "Hudson Soft", "Alien Crush", GAME_IMPERFECT_SOUND )
-GAME( 1989, paclandp,0, uapce, uapce, uapce_state, uapce, ROT0, "Namco", "Pac-Land (United Amusements PC Engine)", GAME_IMPERFECT_SOUND )
+GAME( 1989, blazlaz, 0, uapce, uapce, pce_common_state, pce_common, ROT0, "Hudson Soft", "Blazing Lazers", GAME_IMPERFECT_SOUND )
+GAME( 1989, keith,   0, uapce, uapce, pce_common_state, pce_common, ROT0, "Hudson Soft", "Keith Courage In Alpha Zones", GAME_IMPERFECT_SOUND )
+GAME( 1989, aliencr, 0, uapce, uapce, pce_common_state, pce_common, ROT0, "Hudson Soft", "Alien Crush", GAME_IMPERFECT_SOUND )
+GAME( 1989, paclandp,0, uapce, uapce, pce_common_state, pce_common, ROT0, "Namco", "Pac-Land (United Amusements PC Engine)", GAME_IMPERFECT_SOUND )

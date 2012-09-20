@@ -18,7 +18,6 @@
 #include "video/vdc.h"
 //#include "cpu/h6280/h6280.h"
 //#include "sound/c6280.h"
-#include "machine/pcecommn.h"
 
 #include "rendlay.h"
 
@@ -37,6 +36,7 @@ class x1twin_state : public x1_state
 #define X1_MAIN_CLOCK XTAL_16MHz
 #define VDP_CLOCK  XTAL_42_9545MHz
 #define MCU_CLOCK  XTAL_6MHz
+#define	PCE_MAIN_CLOCK		VDP_CLOCK / 2
 
 UINT32 x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {

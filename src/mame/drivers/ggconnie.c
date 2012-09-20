@@ -23,15 +23,14 @@
 #include "sound/c6280.h"
 
 
-class ggconnie_state : public driver_device
+class ggconnie_state : public pce_common_state
 {
 public:
 	ggconnie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: pce_common_state(mconfig, type, tag) { }
 
 	DECLARE_WRITE8_MEMBER(lamp_w);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_DRIVER_INIT(ggconnie);
+	DECLARE_WRITE8_MEMBER(output_w);	
 };
 
 
@@ -193,9 +192,4 @@ ROM_START(ggconnie)
 	ROM_LOAD( "adpcm_u31.bin", 0x0000, 0x80000, CRC(de514c2b) SHA1(da73aa825d73646f556f6d4dbb46f43acf7c3357) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ggconnie_state,ggconnie)
-{
-	init_pce();
-}
-
-GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, ggconnie, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1996, ggconnie, 0, ggconnie, ggconnie, pce_common_state, pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", GAME_NO_SOUND | GAME_NOT_WORKING )
