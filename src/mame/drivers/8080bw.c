@@ -2359,7 +2359,7 @@ INPUT_CHANGED_MEMBER(_8080bw_state::claybust_gun_trigger)
 	if (newval)
 	{
 		/*
-			The game registers a valid shot after the gun trigger is pressed.
+			The game registers a valid shot after the gun trigger is pressed, and IN1 d0 is high.
 			It latches the gun position and then compares it with VRAM contents: 1 byte/8 pixels, 0 means miss.
 			IN1 d0 probably indicates if the latch is ready or not (glitches happen otherwise)
 
