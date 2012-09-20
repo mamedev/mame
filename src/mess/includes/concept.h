@@ -23,10 +23,10 @@ enum
 
 struct expansion_slot_t
 {
-	read8_space_func reg_read;
-	write8_space_func reg_write;
-	read8_space_func rom_read;
-	write8_space_func rom_write;
+	read8_delegate reg_read;
+	write8_delegate reg_write;
+	read8_delegate rom_read;
+	write8_delegate rom_write;
 };
 
 
@@ -50,13 +50,25 @@ public:
 	expansion_slot_t m_expansion_slots[4];
 	DECLARE_READ16_MEMBER(concept_io_r);
 	DECLARE_WRITE16_MEMBER(concept_io_w);
-	DECLARE_WRITE8_MEMBER(concept_fdc_reg_w);
-	DECLARE_READ8_MEMBER(concept_hdc_reg_r);
-	DECLARE_WRITE8_MEMBER(concept_hdc_reg_w);
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_concept(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(concept_interrupt);
+	
+	void install_expansion_slot(int slot,
+		read8_delegate reg_read, write8_delegate reg_write,
+		read8_delegate rom_read, write8_delegate rom_write);
+	
+	void concept_fdc_init(int slot);
+	void concept_hdc_init(int slot);
+
+	DECLARE_READ8_MEMBER(concept_fdc_reg_r);
+	DECLARE_WRITE8_MEMBER(concept_fdc_reg_w);
+	DECLARE_READ8_MEMBER(concept_fdc_rom_r);
+
+	DECLARE_READ8_MEMBER(concept_hdc_reg_r);
+	DECLARE_WRITE8_MEMBER(concept_hdc_reg_w);
+	DECLARE_READ8_MEMBER(concept_hdc_rom_r);	
 };
 
 

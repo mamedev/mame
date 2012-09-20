@@ -62,9 +62,6 @@ const via6522_interface concept_via6522_intf =
 
 /* Expansion slots */
 
-static void concept_fdc_init(running_machine &machine, int slot);
-static void concept_hdc_init(running_machine &machine, int slot);
-
 void concept_state::machine_start()
 {
 	/* initialize int state */
@@ -80,19 +77,18 @@ void concept_state::machine_start()
 	/* initialize expansion slots */
 	memset(m_expansion_slots, 0, sizeof(m_expansion_slots));
 
-	concept_hdc_init(machine(), 1);	/* Flat cable Hard Disk Controller in Slot 2 */
-	concept_fdc_init(machine(), 2);	/* Floppy Disk Controller in Slot 3 */
+	concept_hdc_init(1);	/* Flat cable Hard Disk Controller in Slot 2 */
+	concept_fdc_init(2);	/* Floppy Disk Controller in Slot 3 */
 }
 
-static void install_expansion_slot(running_machine &machine, int slot,
-	read8_space_func reg_read, write8_space_func reg_write,
-	read8_space_func rom_read, write8_space_func rom_write)
+void concept_state::install_expansion_slot( int slot,
+	read8_delegate reg_read, write8_delegate reg_write,
+	read8_delegate rom_read, write8_delegate rom_write)
 {
-	concept_state *state = machine.driver_data<concept_state>();
-	state->m_expansion_slots[slot].reg_read = reg_read;
-	state->m_expansion_slots[slot].reg_write = reg_write;
-	state->m_expansion_slots[slot].rom_read = rom_read;
-	state->m_expansion_slots[slot].rom_write = rom_write;
+	m_expansion_slots[slot].reg_read = reg_read;
+	m_expansion_slots[slot].reg_write = reg_write;
+	m_expansion_slots[slot].rom_read = rom_read;
+	m_expansion_slots[slot].rom_write = rom_write;
 }
 
 void concept_state::video_start()
@@ -274,7 +270,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 			/* IO4 registers */
 			{
 				int slot = ((offset >> 4) & 7) - 1;
-				if (m_expansion_slots[slot].reg_read)
+				if (!m_expansion_slots[slot].reg_read.isnull())
 					return m_expansion_slots[slot].reg_read(space, offset & 0xf, mem_mask);
 			}
 			break;
@@ -297,7 +293,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 		{
 			int slot = ((offset >> 8) & 7) - 1;
 			LOG(("concept_io_r: Slot ROM memory accessed for slot %d at address 0x03%4.4x\n", slot, offset << 1));
-			if (m_expansion_slots[slot].rom_read)
+			if (!m_expansion_slots[slot].rom_read.isnull())
 				return m_expansion_slots[slot].rom_read(space, offset & 0xff, mem_mask);
 		}
 		break;
@@ -416,7 +412,7 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 				int slot = ((offset >> 4) & 7) - 1;
 				LOG(("concept_io_w: Slot I/O register written for slot %d at address 0x03%4.4x, data: 0x%4.4x\n",
 					slot, offset << 1, data));
-				if (m_expansion_slots[slot].reg_write)
+				if (!m_expansion_slots[slot].reg_write.isnull())
 					m_expansion_slots[slot].reg_write(space, offset & 0xf, data, mem_mask);
 			}
 			break;
@@ -439,7 +435,7 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 		{
 			int slot = ((offset >> 8) & 7) - 1;
 			LOG(("concept_io_w: Slot ROM memory written to for slot %d at address 0x03%4.4x, data: 0x%4.4x\n", slot, offset << 1, data));
-			if (m_expansion_slots[slot].rom_write)
+			if (!m_expansion_slots[slot].rom_write.isnull())
 				m_expansion_slots[slot].rom_write(space, offset & 0xff, data, mem_mask);
 		}
 		break;
@@ -547,17 +543,12 @@ enum
 };
 
 
-static  DECLARE_READ8_HANDLER(concept_fdc_reg_r);
-static DECLARE_WRITE8_HANDLER(concept_fdc_reg_w);
-static  DECLARE_READ8_HANDLER(concept_fdc_rom_r);
-
-static void concept_fdc_init(running_machine &machine, int slot)
+void concept_state::concept_fdc_init(int slot)
 {
-	concept_state *state = machine.driver_data<concept_state>();
-	state->m_fdc_local_status = 0;
-	state->m_fdc_local_command = 0;
+	m_fdc_local_status = 0;
+	m_fdc_local_command = 0;
 
-	install_expansion_slot(machine, slot, concept_fdc_reg_r, concept_fdc_reg_w, concept_fdc_rom_r, NULL);
+	install_expansion_slot(slot, read8_delegate(FUNC(concept_state::concept_fdc_reg_r),this), write8_delegate(FUNC(concept_state::concept_fdc_reg_w),this), read8_delegate(FUNC(concept_state::concept_fdc_rom_r),this), write8_delegate());
 }
 
 static WRITE_LINE_DEVICE_HANDLER( concept_fdc_intrq_w )
@@ -586,15 +577,14 @@ const wd17xx_interface concept_wd17xx_interface =
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
-static  READ8_HANDLER(concept_fdc_reg_r)
+READ8_MEMBER(concept_state::concept_fdc_reg_r)
 {
-	concept_state *state = space.machine().driver_data<concept_state>();
-	device_t *fdc = space.machine().device("wd179x");
+	device_t *fdc = machine().device("wd179x");
 	switch (offset)
 	{
 	case 0:
 		/* local Status reg */
-		return state->m_fdc_local_status;
+		return m_fdc_local_status;
 
 	case 8:
 		/* FDC STATUS REG */
@@ -616,16 +606,15 @@ static  READ8_HANDLER(concept_fdc_reg_r)
 	return 0;
 }
 
-static WRITE8_HANDLER(concept_fdc_reg_w)
+WRITE8_MEMBER(concept_state::concept_fdc_reg_w)
 {
-	concept_state *state = space.machine().driver_data<concept_state>();
 	int current_drive;
-	device_t *fdc = space.machine().device("wd179x");
+	device_t *fdc = machine().device("wd179x");
 	switch (offset)
 	{
 	case 0:
 		/* local command reg */
-		state->m_fdc_local_command = data;
+		m_fdc_local_command = data;
 
 		wd17xx_set_side(fdc,(data & LC_FLPSD1_mask) != 0);
 		current_drive = ((data >> LC_DE0_bit) & 1) | ((data >> (LC_DE1_bit-1)) & 2);
@@ -634,7 +623,7 @@ static WRITE8_HANDLER(concept_fdc_reg_w)
 		// floppy_drive_set_motor_state(floppy_get_device(machine,  current_drive), (data & LC_MOTOROF_mask) == 0 ? 1 : 0);
 		/*flp_8in = (data & LC_FLP8IN_mask) != 0;*/
 		wd17xx_dden_w(fdc, BIT(data, 7));
-		floppy_drive_set_ready_state(floppy_get_device(space.machine(), current_drive), 1, 0);
+		floppy_drive_set_ready_state(floppy_get_device(machine(), current_drive), 1, 0);
 		break;
 
 	case 8:
@@ -659,7 +648,7 @@ static WRITE8_HANDLER(concept_fdc_reg_w)
 	}
 }
 
-static  READ8_HANDLER(concept_fdc_rom_r)
+READ8_MEMBER(concept_state::concept_fdc_rom_r)
 {
 	static const UINT8 data[] = "CORVUS01";
 	return (offset < 8) ? data[offset] : 0;
@@ -669,24 +658,20 @@ static  READ8_HANDLER(concept_fdc_rom_r)
  *  Concept Hard Disk Controller (hdc)
  */
 
-static  DECLARE_READ8_HANDLER(concept_hdc_reg_r);
-static DECLARE_WRITE8_HANDLER(concept_hdc_reg_w);
-static  DECLARE_READ8_HANDLER(concept_hdc_rom_r);
-
 /*
  *  Hook up the Register and ROM R/W routines into the Slot I/O Space
  */
 
-static void concept_hdc_init(running_machine &machine, int slot)
+void concept_state::concept_hdc_init(int slot)
 {
-	if(corvus_hdc_init(machine))
-		install_expansion_slot(machine, slot, concept_hdc_reg_r, concept_hdc_reg_w, concept_hdc_rom_r, NULL);
+	if(corvus_hdc_init(machine()))
+		install_expansion_slot(slot, read8_delegate(FUNC(concept_state::concept_hdc_reg_r),this), write8_delegate(FUNC(concept_state::concept_hdc_reg_w),this), read8_delegate(FUNC(concept_state::concept_hdc_rom_r),this), write8_delegate());
 }
 
 /*
  *  Handle reads against the Hard Disk Controller's onboard registers
  */
-static READ8_HANDLER(concept_hdc_reg_r)
+READ8_MEMBER(concept_state::concept_hdc_reg_r)
 {
 	switch (offset)
 	{
@@ -705,7 +690,7 @@ static READ8_HANDLER(concept_hdc_reg_r)
 /*
  *  Handle writes against the Hard Disk Controller's onboard registers
  */
-static WRITE8_HANDLER(concept_hdc_reg_w)
+WRITE8_MEMBER(concept_state::concept_hdc_reg_w)
 {
 	switch (offset)
 	{
@@ -719,7 +704,7 @@ static WRITE8_HANDLER(concept_hdc_reg_w)
 /*
  *  Handle reads agsint the Hard Disk Controller's onboard ROM
  */
-static  READ8_HANDLER(concept_hdc_rom_r)
+READ8_MEMBER(concept_state::concept_hdc_rom_r)
 {
 	static const UINT8 data[8] = { 0xa9, 0x20, 0xa9, 0x00, 0xa9, 0x03, 0xa9, 0x3c };			/* Same as Apple II */
 	return (offset < 8) ? data[offset] : 0;
