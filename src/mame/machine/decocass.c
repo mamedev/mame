@@ -213,7 +213,7 @@ static void decocass_fno( running_machine &machine, offs_t offset, UINT8 data )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
 	/* 8041ENA/ and is this a FNO write (function number)? */
-	if (0 == (m_i8041_p2 & 0x01))
+	if (0 == (state->m_i8041_p2 & 0x01))
 	{
 		switch (data)
 		{
