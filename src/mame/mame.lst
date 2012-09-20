@@ -3767,11 +3767,11 @@ clbowl			// (c) 1989 Incredible Technologies
 bowlrama		// (c) 1991 P & P Marketing
 wfortune		// (c) 1989 GameTek
 wfortunea		// (c) 1989 GameTek
-grmatch			// (c) 1989 GameTek
+grmatch			// (c) 1989 Yankee Game Technology
 stratab			// (c) 1990 Strata/Incredible Technologies
 stratab1		// (c) 1990 Strata/Incredible Technologies
 sstrike			// (c) 1990 Strata/Incredible Technologies
-gtg			// (c) 1990 Strata/Incredible Technologies
+gtg				// (c) 1990 Strata/Incredible Technologies
 gtgt			// (c) 1990 Strata/Incredible Technologies
 gtgt1			// (c) 1990 Strata/Incredible Technologies
 hstennis		// (c) 1990 Strata/Incredible Technologies
@@ -4442,7 +4442,7 @@ f1en			// 1991.?? F-1 Exhaust Note (World)
 arabfgt			// 1992.?? Arabian Fight (World)
 arabfgtu		// 1992.03 Arabian Fight (US)
 arabfgtj		// 1992.03 Arabian Fight (Japan)
-arescue			// 1992.03 Air Rescur (US)
+arescue			// 1992.03 Air Rescue (US)
 				// 1992.04 Air Rescue (Japan)
 ga2				// 1992.?? Golden Axe II (World)
 ga2u			// 1992.09 Golden Axe II (US)
@@ -7691,13 +7691,13 @@ intrepidb		// bootleg
 zaryavos		// (c) 1983 Nova Games of Canada (prototype)
 timelimt		// (c) 1983 Chuo Co. Ltd
 progress		// (c) 1984 Chuo Co. Ltd
-koroleva		// (c) 1988 Terminal
 rtriv			// (c) 198? Romar
 
 // TIA-MC1 hardware games
 konek			// (c) 1988 Terminal
 sosterm			// (c) 1988 Terminal
 bilyard			// (c) 1988 Terminal
+koroleva		// (c) 1988 Terminal
 
 // Photon hardware games
 phtetris
@@ -7853,7 +7853,7 @@ ejsakura		// (c) 1999 Seibu Kaihatsu
 ejsakura12		// (c) 1999 Seibu Kaihatsu
 
 // Seibu System SH2B games
-feversoc		// (c) 2000
+feversoc		// (c) 2004
 
 // Tad games (Tad games run on Seibu hardware)
 cabal			// (c) 1988 Tad + Fabtek license
@@ -9483,7 +9483,7 @@ gtsersb			// (c) 1985 Greyhound Electronics
 sextriv1		// (c) 1985 Kinky Kit and Game Co.
 sextriv2		// (c) 1985 Kinky Kit and Game Co.
 geimulti		// (c) 1992 Grayhound Electronics
-sprtauth		// (c) 1982 Classic Games
+sprtauth		// (c) 1992 Classic Games
 suprpokr		// (c) 1986 Grayhound Electronics
 suprpokra		// (c) 1986 Grayhound Electronics
 suprpokrb		// (c) 1986 Grayhound Electronics
@@ -9491,7 +9491,7 @@ sshot			// (c) 1979 Model Racing
 dribling		// (c) 1983 Model Racing
 driblingo		// (c) 1983 Olympia
 driblingbr		// bootleg
-ace			// [1976 Allied Leisure]
+ace				// [1976 Allied Leisure]
 clayshoo		// [1979 Allied Leisure]
 pirates			// (c) 1994 NIX
 genix			// (c) 199? NIX
@@ -10163,7 +10163,7 @@ discoboy		// (c) 1993 Soft Art Co.
 pangofun		// (c) 1995 InfoCube
 2mindril		// (c) 1993 Taito
 koikoi			// (c) 1983 Kiwako
-good			// (c) 1983 Kiwako
+good			// (c) 1998
 filetto			// (c) 1990 Novamatic
 quizo			// (c) 1985 Seoul Coin Corp.
 quizoa			// (c) 1985 Seoul Coin Corp.
