@@ -2786,7 +2786,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				UINT16 rom_data = (ROM[rom_addr + 0]) | (ROM[rom_addr + 1]<<8);
 
 				/* writes to some unemulated COP registers, then puts the result in here, adding a parameter taken from ROM */
-				space.write_word(cop_register[0]+(0x44 + offset * 4), rom_data);
+				//space.write_word(cop_register[0]+(0x44 + offset * 4), rom_data);
 
 				printf("%04x%04x %04x %04x\n",cop_rom_addr_hi,cop_rom_addr_lo,cop_rom_addr_unk,rom_data);
 				return;
