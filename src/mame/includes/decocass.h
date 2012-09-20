@@ -1,5 +1,3 @@
-#include "devlegcy.h"
-
 #ifdef MAME_DEBUG
 #define LOGLEVEL  5
 #else
@@ -7,39 +5,17 @@
 #endif
 #define LOG(n,x)  do { if (LOGLEVEL >= n) logerror x; } while (0)
 
-
-class decocass_tape_device : public device_t
-{
-public:
-	decocass_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~decocass_tape_device() { global_free(m_token); }
-
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-private:
-	// internal state
-	void *m_token;
-};
-
-extern const device_type DECOCASS_TAPE;
-
-
-#define MCFG_DECOCASS_TAPE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, DECOCASS_TAPE, 0)
-
-
-
+#include "machine/decocass_tape.h"
 
 class decocass_state : public driver_device
 {
 public:
 	decocass_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu"),
+		  m_audiocpu(*this, "audiocpu"),
+		  m_mcu(*this, "mcu"),
+	      m_cassette(*this, "cassette"),
 		  m_rambase(*this, "rambase"),
 		  m_charram(*this, "charram"),
 		  m_fgvideoram(*this, "fgvideoram"),
@@ -47,6 +23,12 @@ public:
 		  m_tileram(*this, "tileram"),
 		  m_objectram(*this, "objectram"),
 		  m_paletteram(*this, "paletteram") { }
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_mcu;
+	required_device<decocass_tape_device> m_cassette;
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_rambase;
@@ -102,8 +84,8 @@ public:
 	int       m_i8041_p2_read_latch;
 
 	/* dongles-related */
-	read8_space_func    m_dongle_r;
-	write8_space_func   m_dongle_w;
+	read8_delegate    m_dongle_r;
+	write8_delegate   m_dongle_w;
 
 	/* dongle type #1 */
 	UINT32    m_type1_inmap;
@@ -130,11 +112,6 @@ public:
 	/* DS Telejan */
 	UINT8     m_mux_data;
 
-	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
-	device_t *m_mcu;
-	device_t *m_cassette;
 	DECLARE_DRIVER_INIT(decocass);
 	DECLARE_DRIVER_INIT(decocrom);
 	DECLARE_DRIVER_INIT(cdsteljn);
@@ -181,101 +158,97 @@ public:
 	DECLARE_MACHINE_RESET(cbdash);
 	DECLARE_MACHINE_RESET(cflyball);
 	UINT32 screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE8_MEMBER(decocass_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(decocass_sound_command_w);
+	DECLARE_READ8_MEMBER(decocass_sound_data_r);
+	DECLARE_READ8_MEMBER(decocass_sound_ack_r);
+	DECLARE_WRITE8_MEMBER(decocass_sound_data_w);
+	DECLARE_READ8_MEMBER(decocass_sound_command_r);
+	DECLARE_WRITE8_MEMBER(decocass_sound_nmi_enable_w);
+	DECLARE_READ8_MEMBER(decocass_sound_nmi_enable_r);
+	DECLARE_READ8_MEMBER(decocass_sound_data_ack_reset_r);
+	DECLARE_WRITE8_MEMBER(decocass_sound_data_ack_reset_w);
+	DECLARE_WRITE8_MEMBER(decocass_nmi_reset_w);
+	DECLARE_WRITE8_MEMBER(decocass_quadrature_decoder_reset_w);
+	DECLARE_WRITE8_MEMBER(decocass_adc_w);
+	DECLARE_READ8_MEMBER(decocass_input_r);
+
+	DECLARE_WRITE8_MEMBER(decocass_reset_w);
+
+	DECLARE_READ8_MEMBER(decocass_e5xx_r);
+	DECLARE_WRITE8_MEMBER(decocass_e5xx_w);
+	DECLARE_WRITE8_MEMBER(decocass_de0091_w);
+	DECLARE_WRITE8_MEMBER(decocass_e900_w);
+
+
+	DECLARE_WRITE8_MEMBER(i8041_p1_w);
+	DECLARE_READ8_MEMBER(i8041_p1_r);
+	DECLARE_WRITE8_MEMBER(i8041_p2_w);
+	DECLARE_READ8_MEMBER(i8041_p2_r);
+
+	void decocass_machine_state_save_init();
+
+	DECLARE_WRITE8_MEMBER(decocass_paletteram_w);
+	DECLARE_WRITE8_MEMBER(decocass_charram_w);
+	DECLARE_WRITE8_MEMBER(decocass_fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(decocass_colorram_w);
+	DECLARE_WRITE8_MEMBER(decocass_bgvideoram_w);
+	DECLARE_WRITE8_MEMBER(decocass_tileram_w);
+	DECLARE_WRITE8_MEMBER(decocass_objectram_w);
+
+	DECLARE_WRITE8_MEMBER(decocass_watchdog_count_w);
+	DECLARE_WRITE8_MEMBER(decocass_watchdog_flip_w);
+	DECLARE_WRITE8_MEMBER(decocass_color_missiles_w);
+	DECLARE_WRITE8_MEMBER(decocass_mode_set_w);
+	DECLARE_WRITE8_MEMBER(decocass_color_center_bot_w);
+	DECLARE_WRITE8_MEMBER(decocass_back_h_shift_w);
+	DECLARE_WRITE8_MEMBER(decocass_back_vl_shift_w);
+	DECLARE_WRITE8_MEMBER(decocass_back_vr_shift_w);
+	DECLARE_WRITE8_MEMBER(decocass_part_h_shift_w);
+	DECLARE_WRITE8_MEMBER(decocass_part_v_shift_w);
+	DECLARE_WRITE8_MEMBER(decocass_center_h_shift_space_w);
+	DECLARE_WRITE8_MEMBER(decocass_center_v_shift_w);
+
+	void decocass_video_state_save_init();
+	
+	DECLARE_WRITE8_MEMBER(ram_w);
+	DECLARE_WRITE8_MEMBER(charram_w);
+	DECLARE_WRITE8_MEMBER(fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(fgcolorram_w);
+	DECLARE_WRITE8_MEMBER(tileram_w);
+	DECLARE_WRITE8_MEMBER(objectram_w);
+	DECLARE_WRITE8_MEMBER(mirrorvideoram_w);
+	DECLARE_WRITE8_MEMBER(mirrorcolorram_w);
+	DECLARE_READ8_MEMBER(mirrorvideoram_r);
+	DECLARE_READ8_MEMBER(mirrorcolorram_r);
+	DECLARE_READ8_MEMBER(cdsteljn_input_r);
+	DECLARE_WRITE8_MEMBER(cdsteljn_mux_w);
+private:
+	DECLARE_READ8_MEMBER(decocass_type1_latch_26_pass_3_inv_2_r);
+	DECLARE_READ8_MEMBER(decocass_type1_pass_136_r);
+	DECLARE_READ8_MEMBER(decocass_type1_latch_27_pass_3_inv_2_r);
+	DECLARE_READ8_MEMBER(decocass_type1_latch_26_pass_5_inv_2_r);
+	DECLARE_READ8_MEMBER(decocass_type1_latch_16_pass_3_inv_1_r);
+	DECLARE_READ8_MEMBER(decocass_type2_r);
+	DECLARE_WRITE8_MEMBER(decocass_type2_w);
+	DECLARE_READ8_MEMBER(decocass_type3_r);
+	DECLARE_WRITE8_MEMBER(decocass_type3_w);
+	DECLARE_READ8_MEMBER(decocass_type4_r);
+	DECLARE_WRITE8_MEMBER(decocass_type4_w);
+	DECLARE_READ8_MEMBER(decocass_type5_r);
+	DECLARE_WRITE8_MEMBER(decocass_type5_w);
+	DECLARE_READ8_MEMBER(decocass_nodong_r);
+	
+	void draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_center(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void mark_bg_tile_dirty(offs_t offset);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int color,
+					int sprite_y_adjust, int sprite_y_adjust_flip_screen,
+					UINT8 *sprite_ram, int interleave);
+					
+	void draw_missiles(bitmap_ind16 &bitmap, const rectangle &cliprect,
+					int missile_y_adjust, int missile_y_adjust_flip_screen,
+					UINT8 *missile_ram, int interleave);							
 };
 
-
-
-DECLARE_WRITE8_HANDLER( decocass_coin_counter_w );
-DECLARE_WRITE8_HANDLER( decocass_sound_command_w );
-DECLARE_READ8_HANDLER( decocass_sound_data_r );
-DECLARE_READ8_HANDLER( decocass_sound_ack_r );
-DECLARE_WRITE8_HANDLER( decocass_sound_data_w );
-DECLARE_READ8_HANDLER( decocass_sound_command_r );
-TIMER_DEVICE_CALLBACK( decocass_audio_nmi_gen );
-DECLARE_WRITE8_HANDLER( decocass_sound_nmi_enable_w );
-DECLARE_READ8_HANDLER( decocass_sound_nmi_enable_r );
-DECLARE_READ8_HANDLER( decocass_sound_data_ack_reset_r );
-DECLARE_WRITE8_HANDLER( decocass_sound_data_ack_reset_w );
-DECLARE_WRITE8_HANDLER( decocass_nmi_reset_w );
-DECLARE_WRITE8_HANDLER( decocass_quadrature_decoder_reset_w );
-DECLARE_WRITE8_HANDLER( decocass_adc_w );
-DECLARE_READ8_HANDLER( decocass_input_r );
-
-DECLARE_WRITE8_HANDLER( decocass_reset_w );
-
-DECLARE_READ8_HANDLER( decocass_e5xx_r );
-DECLARE_WRITE8_HANDLER( decocass_e5xx_w );
-DECLARE_WRITE8_HANDLER( decocass_de0091_w );
-DECLARE_WRITE8_HANDLER( decocass_e900_w );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-DECLARE_WRITE8_HANDLER( i8041_p1_w );
-DECLARE_READ8_HANDLER( i8041_p1_r );
-DECLARE_WRITE8_HANDLER( i8041_p2_w );
-DECLARE_READ8_HANDLER( i8041_p2_r );
-
-void decocass_machine_state_save_init(running_machine &machine);
-
-
-/*----------- defined in video/decocass.c -----------*/
-
-DECLARE_WRITE8_HANDLER( decocass_paletteram_w );
-DECLARE_WRITE8_HANDLER( decocass_charram_w );
-DECLARE_WRITE8_HANDLER( decocass_fgvideoram_w );
-DECLARE_WRITE8_HANDLER( decocass_colorram_w );
-DECLARE_WRITE8_HANDLER( decocass_bgvideoram_w );
-DECLARE_WRITE8_HANDLER( decocass_tileram_w );
-DECLARE_WRITE8_HANDLER( decocass_objectram_w );
-
-DECLARE_WRITE8_HANDLER( decocass_watchdog_count_w );
-DECLARE_WRITE8_HANDLER( decocass_watchdog_flip_w );
-DECLARE_WRITE8_HANDLER( decocass_color_missiles_w );
-DECLARE_WRITE8_HANDLER( decocass_mode_set_w );
-DECLARE_WRITE8_HANDLER( decocass_color_center_bot_w );
-DECLARE_WRITE8_HANDLER( decocass_back_h_shift_w );
-DECLARE_WRITE8_HANDLER( decocass_back_vl_shift_w );
-DECLARE_WRITE8_HANDLER( decocass_back_vr_shift_w );
-DECLARE_WRITE8_HANDLER( decocass_part_h_shift_w );
-DECLARE_WRITE8_HANDLER( decocass_part_v_shift_w );
-DECLARE_WRITE8_HANDLER( decocass_center_h_shift_space_w );
-DECLARE_WRITE8_HANDLER( decocass_center_v_shift_w );
-
-
-
-
-void decocass_video_state_save_init(running_machine &machine);
+TIMER_DEVICE_CALLBACK(decocass_audio_nmi_gen);
