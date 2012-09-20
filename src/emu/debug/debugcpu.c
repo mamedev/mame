@@ -1181,9 +1181,9 @@ static UINT64 expression_read_memory(void *param, const char *name, expression_s
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			if (device->memory().has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
+			if (device->memory().has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
 			{
-				address_space &space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
+				address_space &space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
 				result = debug_read_memory(space, space.address_to_byte(address), size, false);
 			}
 			break;
@@ -1350,9 +1350,9 @@ static void expression_write_memory(void *param, const char *name, expression_sp
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			if (device->memory().has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
+			if (device->memory().has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
 			{
-				address_space &space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
+				address_space &space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
 				debug_write_memory(space, space.address_to_byte(address), data, size, false);
 			}
 			break;
