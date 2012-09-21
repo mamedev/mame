@@ -866,6 +866,36 @@ static INPUT_PORTS_START( cbm2 )
 INPUT_PORTS_END
 
 
+//-------------------------------------------------
+//  INPUT_PORTS( cbm2hu )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( cbm2hu )
+	PORT_INCLUDE(cbm2)
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( cbm2sw )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( cbm2sw )
+	PORT_INCLUDE(cbm2)
+
+	PORT_MODIFY("PA0")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(0x00F6) PORT_CHAR(0x00D6)
+
+	PORT_MODIFY("PA1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00E5) PORT_CHAR(0x00C5)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00E4) PORT_CHAR(0x00C4)
+
+	PORT_MODIFY("PA2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT" \xCF\x80") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(UCHAR_MAMEKEY(TILDE)) PORT_CHAR(0x03c0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('\'') PORT_CHAR('"')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR(';') PORT_CHAR(':')
+INPUT_PORTS_END
+
+
 
 //**************************************************************************
 //  DEVICE CONFIGURATION
@@ -2166,12 +2196,12 @@ COMP( 1983,	b128,		p500,	0,		b128,		cbm2,	driver_device,		0,		"Commodore Busines
 COMP( 1983,	b256,		p500,	0,		b256,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256 (NTSC)",						GAME_NOT_WORKING )
 COMP( 1983,	cbm610,		p500,	0,		cbm610,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 610 (PAL)",					GAME_NOT_WORKING )
 COMP( 1983,	cbm620,		p500,	0,		cbm620,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 620 (PAL)",					GAME_NOT_WORKING )
-COMP( 1983,	cbm620hu,	p500,	0,		cbm620,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 620 (Hungary)",				GAME_NOT_WORKING )
+COMP( 1983,	cbm620hu,	p500,	0,		cbm620,		cbm2hu,	driver_device,		0,		"Commodore Business Machines",	"CBM 620 (Hungary)",				GAME_NOT_WORKING )
 
 COMP( 1983,	b128hp,		p500,	0,		b128hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B128-80HP (NTSC)",					GAME_NOT_WORKING )
 COMP( 1983,	b256hp,		p500,	0,		b256hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256-80HP (NTSC)",					GAME_NOT_WORKING )
 COMP( 1983,	bx256hp,	p500,	0,		bx256hp,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"BX256-80HP (NTSC)",				GAME_NOT_WORKING )
 COMP( 1983,	cbm710,		p500,	0,		cbm710,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 710 (PAL)",					GAME_NOT_WORKING )
 COMP( 1983,	cbm720,		p500,	0,		cbm720,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 720 (PAL)",					GAME_NOT_WORKING )
-COMP( 1983,	cbm720sw,	p500,	0,		cbm720,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 720 (Sweden/Finland)",			GAME_NOT_WORKING )
+COMP( 1983,	cbm720sw,	p500,	0,		cbm720,		cbm2sw,	driver_device,		0,		"Commodore Business Machines",	"CBM 720 (Sweden/Finland)",			GAME_NOT_WORKING )
 COMP( 1983,	cbm730,		p500,	0,		cbm730,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 730 (PAL)",					GAME_NOT_WORKING )
