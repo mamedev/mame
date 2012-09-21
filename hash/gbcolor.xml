@@ -14656,10 +14656,10 @@ Undumped Pirates:
 
 	<software name="sf2049">
 		<!-- Notes: GBC only -->
-		<description>San Francisco Rush 2049 (USA)</description>
+		<description>San Francisco Rush 2049 (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="CGB-ASXE-USA"/>
+		<info name="serial" value="CGB-ASXE-USA, CGB-ASXP-EUU"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="san francisco rush 2049 (usa).bin" size="1048576" crc="ef368f16" sha1="b783b770e6680745dcc0b599199a4429957c874e" offset="000000" />

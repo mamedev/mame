@@ -4,7 +4,6 @@
     UNDUMPED / TO BE REDUMPED LIST
 
     2IN1 (COSMIC SPACEHEAD FANTASTIC DIZZY)	PAL
-    2IN1 (PSYCHIC PINBALL MICRO MACHINES)	PAL
     ADVANCED DAISENRYAKU			JAPAN		we have Rev A, Rev 0 needed (does it exist?)
     ARNOLD PALMER TOURNAMENT GOLF		PAL
     AWESOME POSSUM				JAPAN
@@ -1419,14 +1418,50 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<software name="psycho">
+		<description>Psycho Pinball (Euro, 199410)</description>
+		<year>1994</year>
+		<publisher>Codemasters</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="mdppf821.bin" size="2097152" crc="32dd8351" sha1="928f46ca87886c6e72d10f7c9db29b09e483bc49" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="psycho1" cloneof="psycho">
 		<description>Psycho Pinball (Euro, 199409)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="SR16V4-0" />
-			<dataarea name="rom" size="1572864">
-				<rom name="mdpp021f.bin" size="1572864" crc="11e9c3f2" sha1="2ea7befb7e52334111385667030ceb647157a397" offset="000000" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mdpp021f.bin" size="2097152" crc="1ab8f1a1" sha1="810688f1ffb736ae1790803e1c6804caaa24c15a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="micromac">
+		<description>Micro Machines (Euro, USA)</description>
+		<year>1993</year>
+		<publisher>Codemasters</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mdmmacd3.bin" size="524288" crc="50081a0b" sha1="56a8844c376f2e79e92cf128681fa3fef81c36d6" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- 2IN1 (PSYCHO PINBALL MICRO MACHINE) contain the rom from set "psycho" and set "micromac" -->
+	<!-- The real cart switches game on reset, but we currently don't support this -->
+	<software name="2psymmac" supported="no">
+		<description>2 in 1 - Psycho Pinball &amp; Micro Machines (Euro)</description>
+		<year>1993</year>
+		<publisher>Codemasters</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2621440">
+				<rom name="mdppf821.bin" size="2097152" crc="32dd8351" sha1="928f46ca87886c6e72d10f7c9db29b09e483bc49" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mdmm_acd3.bin" size="524288" crc="50081a0b" sha1="56a8844c376f2e79e92cf128681fa3fef81c36d6" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -12857,17 +12892,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="micromac">
-		<description>Micro Machines (Euro, USA)</description>
-		<year>1993</year>
-		<publisher>Codemasters</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mdmm_acd3.bin" size="524288" crc="50081a0b" sha1="56a8844c376f2e79e92cf128681fa3fef81c36d6" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="micromaca" cloneof="micromac">
 		<description>Micro Machines (Euro, USA, Alt)</description>
 		<year>1993</year>
@@ -16919,17 +16943,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="psycho">
-		<description>Psycho Pinball (Euro, 199410)</description>
-		<year>1994</year>
-		<publisher>Codemasters</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="psycho pinball (euro) (october 1994).bin" size="1572864" crc="d704784b" sha1="699db175ab8a6abdd941b8a3d81cf203e01053f5" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="puggsy">
 		<description>Puggsy (Euro)</description>
 		<year>1993</year>
@@ -19403,18 +19416,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="ソニック&amp;ナックルズ"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="sonic &amp; knuckles (world).bin" size="2097152" crc="0658f691" sha1="88d6499d874dcb5721ff58d76fe1b9af811192e3" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="skp12" cloneof="sk">
-		<description>Sonic &amp; Knuckles (Prototype 0525, 19940525, 15.28)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="sonic &amp; knuckles (prototype 0525 - may 25, 1994, 15.28).bin" size="4194304" crc="8e8dadd0" sha1="5f2c4dc4e739d562e9f0525361ba83f3e0551e21" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16910-u.ic1" size="2097152" crc="0658f691" sha1="88d6499d874dcb5721ff58d76fe1b9af811192e3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19485,7 +19487,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="skp11" cloneof="sk">
+<!-- These are just dumps of the mpr-16911-s.ic2 lock-on chip. should be matched with the SK data above to get proper sets to be locked on Sonic 2... -->
+	<software name="skp11" cloneof="sk" supported="no">
 		<description>Sonic &amp; Knuckles (Prototype 0606, 19940605, 22.25, S2K chip)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -19496,7 +19499,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="skp09" cloneof="sk">
+	<software name="skp09" cloneof="sk" supported="no">
 		<description>Sonic &amp; Knuckles (Prototype 0608, 19940608, 03.35, S2K chip)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -19507,7 +19510,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="skp07" cloneof="sk">
+	<software name="skp07" cloneof="sk" supported="no">
 		<description>Sonic &amp; Knuckles (Prototype 0610, 19940610, 03.11, S2K chip)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -19518,7 +19521,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="skp05" cloneof="sk">
+	<software name="skp05" cloneof="sk" supported="no">
 		<description>Sonic &amp; Knuckles (Prototype 0612, 19940612, 18.18, S2K chip)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -19529,7 +19532,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="skp03" cloneof="sk">
+	<software name="skp03" cloneof="sk" supported="no">
 		<description>Sonic &amp; Knuckles (Prototype 0618, 19940618, 9.07, S2K chip)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -19547,7 +19550,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2621440">
 				<!-- rom name="sonic &amp; knuckles + sonic the hedgehog (world).bin" size="2621440" crc="e01f6ed5" sha1="a3084262f5af481df1a5c5ab03c4862551a53c91" offset="000000" loadflag="load16_word_swap" /-->
-				<rom name="sonic &amp; knuckles (world).bin" size="2097152" crc="0658f691" sha1="88d6499d874dcb5721ff58d76fe1b9af811192e3" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16910-u.ic1" size="2097152" crc="0658f691" sha1="88d6499d874dcb5721ff58d76fe1b9af811192e3" offset="000000" loadflag="load16_word_swap" />
 				<rom name="mpr-13913.ic1" size="524288" crc="f9394e97" sha1="6ddb7de1e17e7f6cdb88927bd906352030daa194" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -19558,10 +19561,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="3145728">
-                <!-- This also contained 0x40000 of garbage (?) data at the end... investigate... -->
+			<dataarea name="rom" size="3407872">
 				<!-- rom name="sonic &amp; knuckles + sonic the hedgehog 2 (world).bin" size="3407872" crc="2ac1e7c6" sha1="6cd0537a3aee0e012bb86d5837ddff9342595004" offset="000000" loadflag="load16_word_swap" /-->
-				<rom name="sonic &amp; knuckles (world).bin" size="2097152" crc="0658f691" sha1="88d6499d874dcb5721ff58d76fe1b9af811192e3" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16910-u.ic1" size="2097152" crc="0658f691" sha1="88d6499d874dcb5721ff58d76fe1b9af811192e3" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16911-s.ic2" size="262144" crc="4dcfd55c" sha1="70429f1d80503a0632f603bf762fe0bbaa881d22" offset="0x300000" loadflag="load16_word_swap" />
 				<rom name="mpr-15000a.bin" size="1048576" crc="7b905383" sha1="8bca5dcef1af3e00098666fd892dc1c2a76333f9" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -19585,8 +19588,19 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="4194304">
 				<!-- rom name="sonic &amp; knuckles + sonic the hedgehog 3 (world).bin" size="4194304" crc="63522553" sha1="cfbf98c36c776677290a872547ac47c53d2761d6" offset="000000" loadflag="load16_word_swap" /-->
-				<rom name="sonic &amp; knuckles (world).bin" size="2097152" crc="0658f691" sha1="88d6499d874dcb5721ff58d76fe1b9af811192e3" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16910-u.ic1" size="2097152" crc="0658f691" sha1="88d6499d874dcb5721ff58d76fe1b9af811192e3" offset="000000" loadflag="load16_word_swap" />
 				<rom name="sonic the hedgehog 3 (usa).bin" size="2097152" crc="9bc192ce" sha1="75e9c4705259d84112b3e697a6c00a0813d47d71" offset="0x200000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skp12" cloneof="sk">
+		<description>Sonic &amp; Knuckles (Prototype 0525, 19940525, 15.28)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="sonic &amp; knuckles (prototype 0525 - may 25, 1994, 15.28).bin" size="4194304" crc="8e8dadd0" sha1="5f2c4dc4e739d562e9f0525361ba83f3e0551e21" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -21071,7 +21085,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sor3up09" cloneof="sor3">
+	<software name="sor3up09" cloneof="sor3" supported="no">
 		<description>Streets of Rage 3 (Prototype, 19940317)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
