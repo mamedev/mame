@@ -20,7 +20,7 @@ If MY_CPU_LE_UNALIGN is not defined, we don't know about these properties of pla
 #define MY_CPU_AMD64
 #endif
 
-#if defined(MY_CPU_AMD64) || defined(_M_IA64)
+#ifdef PTR64
 #define MY_CPU_64BIT
 #endif
 
@@ -52,7 +52,7 @@ If MY_CPU_LE_UNALIGN is not defined, we don't know about these properties of pla
 #define MY_CPU_LE
 #endif
 
-#if defined(__BIG_ENDIAN__) || defined(__m68k__) ||  defined(__ARMEB__) || defined(__MIPSEB__)
+#ifdef BIGENDIAN
 #define MY_CPU_BE
 #endif
 

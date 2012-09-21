@@ -6,10 +6,7 @@
 
 #define kCrcPoly 0xEDB88320
 
-#ifdef MY_CPU_X86_OR_AMD64
-  #define CRC_NUM_TABLES 8
-  UInt32 MY_FAST_CALL CrcUpdateT8(UInt32 v, const void *data, size_t size, const UInt32 *table);
-#elif defined(MY_CPU_LE)
+#if defined(MY_CPU_LE)
   #define CRC_NUM_TABLES 4
 #else
   #define CRC_NUM_TABLES 5
