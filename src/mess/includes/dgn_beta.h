@@ -144,6 +144,23 @@ public:
 	int m_DrawInterlace;
 	virtual void machine_start();
 	virtual void palette_init();
+	WRITE8_MEMBER(dgnbeta_ram_b0_w);
+	WRITE8_MEMBER(dgnbeta_ram_b1_w);
+	WRITE8_MEMBER(dgnbeta_ram_b2_w);
+	WRITE8_MEMBER(dgnbeta_ram_b3_w);
+	WRITE8_MEMBER(dgnbeta_ram_b4_w);
+	WRITE8_MEMBER(dgnbeta_ram_b5_w);
+	WRITE8_MEMBER(dgnbeta_ram_b6_w);
+	WRITE8_MEMBER(dgnbeta_ram_b7_w);
+	WRITE8_MEMBER(dgnbeta_ram_b8_w);
+	WRITE8_MEMBER(dgnbeta_ram_b9_w);
+	WRITE8_MEMBER(dgnbeta_ram_bA_w);
+	WRITE8_MEMBER(dgnbeta_ram_bB_w);
+	WRITE8_MEMBER(dgnbeta_ram_bC_w);
+	WRITE8_MEMBER(dgnbeta_ram_bD_w);
+	WRITE8_MEMBER(dgnbeta_ram_bE_w);
+	WRITE8_MEMBER(dgnbeta_ram_bF_w);
+	WRITE8_MEMBER(dgnbeta_ram_bG_w);
 };
 
 

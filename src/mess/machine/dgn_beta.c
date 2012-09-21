@@ -71,27 +71,6 @@
 #include "debug/debugcon.h"
 #include "machine/ram.h"
 
-
-// Ram banking handlers.
-static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b0_w );
-static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b1_w );
-static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b2_w );
-static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b3_w );
-static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b4_w );
-static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b5_w );
-static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b6_w );
-static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b7_w );
-static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b8_w );
-static DECLARE_WRITE8_HANDLER( dgnbeta_ram_b9_w );
-static DECLARE_WRITE8_HANDLER( dgnbeta_ram_bA_w );
-static DECLARE_WRITE8_HANDLER( dgnbeta_ram_bB_w );
-static DECLARE_WRITE8_HANDLER( dgnbeta_ram_bC_w );
-static DECLARE_WRITE8_HANDLER( dgnbeta_ram_bD_w );
-static DECLARE_WRITE8_HANDLER( dgnbeta_ram_bE_w );
-static DECLARE_WRITE8_HANDLER( dgnbeta_ram_bF_w );
-static DECLARE_WRITE8_HANDLER( dgnbeta_ram_bG_w );
-
-
 #define VERBOSE 0
 
 
@@ -209,31 +188,30 @@ const pia6821_interface dgnbeta_pia_intf[] =
 // Info for bank switcher
 struct bank_info_entry
 {
-	write8_space_func func;	// Pointer to write handler
-	const char *name;
+	write8_delegate func;	// Pointer to write handler
 	offs_t start;		// Offset of start of block
 	offs_t end;		// offset of end of block
 };
 
 static const struct bank_info_entry bank_info[] =
 {
-	{ FUNC(dgnbeta_ram_b0_w), 0x0000, 0x0fff },
-	{ FUNC(dgnbeta_ram_b1_w), 0x1000, 0x1fff },
-	{ FUNC(dgnbeta_ram_b2_w), 0x2000, 0x2fff },
-	{ FUNC(dgnbeta_ram_b3_w), 0x3000, 0x3fff },
-	{ FUNC(dgnbeta_ram_b4_w), 0x4000, 0x4fff },
-	{ FUNC(dgnbeta_ram_b5_w), 0x5000, 0x5fff },
-	{ FUNC(dgnbeta_ram_b6_w), 0x6000, 0x6fff },
-	{ FUNC(dgnbeta_ram_b7_w), 0x7000, 0x7fff },
-	{ FUNC(dgnbeta_ram_b8_w), 0x8000, 0x8fff },
-	{ FUNC(dgnbeta_ram_b9_w), 0x9000, 0x9fff },
-	{ FUNC(dgnbeta_ram_bA_w), 0xA000, 0xAfff },
-	{ FUNC(dgnbeta_ram_bB_w), 0xB000, 0xBfff },
-	{ FUNC(dgnbeta_ram_bC_w), 0xC000, 0xCfff },
-	{ FUNC(dgnbeta_ram_bD_w), 0xD000, 0xDfff },
-	{ FUNC(dgnbeta_ram_bE_w), 0xE000, 0xEfff },
-	{ FUNC(dgnbeta_ram_bF_w), 0xF000, 0xFBff },
-	{ FUNC(dgnbeta_ram_bG_w), 0xFF00, 0xFfff }
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b0_w),(dgn_beta_state*)0), 0x0000, 0x0fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b1_w),(dgn_beta_state*)0), 0x1000, 0x1fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b2_w),(dgn_beta_state*)0), 0x2000, 0x2fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b3_w),(dgn_beta_state*)0), 0x3000, 0x3fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b4_w),(dgn_beta_state*)0), 0x4000, 0x4fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b5_w),(dgn_beta_state*)0), 0x5000, 0x5fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b6_w),(dgn_beta_state*)0), 0x6000, 0x6fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b7_w),(dgn_beta_state*)0), 0x7000, 0x7fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b8_w),(dgn_beta_state*)0), 0x8000, 0x8fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b9_w),(dgn_beta_state*)0), 0x9000, 0x9fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bA_w),(dgn_beta_state*)0), 0xA000, 0xAfff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bB_w),(dgn_beta_state*)0), 0xB000, 0xBfff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bC_w),(dgn_beta_state*)0), 0xC000, 0xCfff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bD_w),(dgn_beta_state*)0), 0xD000, 0xDfff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bE_w),(dgn_beta_state*)0), 0xE000, 0xEfff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bF_w),(dgn_beta_state*)0), 0xF000, 0xFBff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bG_w),(dgn_beta_state*)0), 0xFF00, 0xFfff }
 };
 
 #define is_last_page(page)  (((page==LastPage) || (page==LastPage+1)) ? 1 : 0)
@@ -295,8 +273,10 @@ static void UpdateBanks(running_machine &machine, int first, int last)
 				readbank = &machine.device<ram_device>(RAM_TAG)->pointer()[(MapPage*RamPageSize)-256];
 				logerror("Error RAM in Last page !\n");
 			}
-			space_0.install_legacy_write_handler(bank_start, bank_end,bank_info[Page].func,bank_info[Page].name);
-			space_1.install_legacy_write_handler(bank_start, bank_end,bank_info[Page].func,bank_info[Page].name);
+			write8_delegate func = bank_info[Page].func;
+			if (!func.isnull()) func.late_bind(*state);
+			space_0.install_write_handler(bank_start, bank_end,bank_info[Page].func);
+			space_1.install_write_handler(bank_start, bank_end,bank_info[Page].func);
 		}
 		else					// Block is rom, or undefined
 		{
@@ -397,89 +377,89 @@ static void dgn_beta_bank_memory(running_machine &machine, int offset, int data,
 	state->m_PageRegs[state->m_TaskReg][bank].memory[offset]=data;
 }
 
-static WRITE8_HANDLER( dgnbeta_ram_b0_w )
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b0_w )
 {
-	dgn_beta_bank_memory(space.machine(),offset,data,0);
+	dgn_beta_bank_memory(machine(),offset,data,0);
 }
 
-static WRITE8_HANDLER( dgnbeta_ram_b1_w )
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b1_w )
 {
-	dgn_beta_bank_memory(space.machine(),offset,data,1);
+	dgn_beta_bank_memory(machine(),offset,data,1);
 }
 
-static WRITE8_HANDLER( dgnbeta_ram_b2_w )
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b2_w )
 {
-	dgn_beta_bank_memory(space.machine(),offset,data,2);
+	dgn_beta_bank_memory(machine(),offset,data,2);
 }
 
-static WRITE8_HANDLER( dgnbeta_ram_b3_w )
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b3_w )
 {
-	dgn_beta_bank_memory(space.machine(),offset,data,3);
+	dgn_beta_bank_memory(machine(),offset,data,3);
 }
 
-static WRITE8_HANDLER( dgnbeta_ram_b4_w )
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b4_w )
 {
-	dgn_beta_bank_memory(space.machine(),offset,data,4);
+	dgn_beta_bank_memory(machine(),offset,data,4);
 }
 
-static WRITE8_HANDLER( dgnbeta_ram_b5_w )
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b5_w )
 {
-	dgn_beta_bank_memory(space.machine(),offset,data,5);
+	dgn_beta_bank_memory(machine(),offset,data,5);
 }
 
-static WRITE8_HANDLER( dgnbeta_ram_b6_w )
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b6_w )
 {
-	dgn_beta_bank_memory(space.machine(),offset,data,6);
+	dgn_beta_bank_memory(machine(),offset,data,6);
 }
 
-static WRITE8_HANDLER( dgnbeta_ram_b7_w )
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b7_w )
 {
-	dgn_beta_bank_memory(space.machine(),offset,data,7);
+	dgn_beta_bank_memory(machine(),offset,data,7);
 }
 
-static WRITE8_HANDLER( dgnbeta_ram_b8_w )
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b8_w )
 {
-	dgn_beta_bank_memory(space.machine(),offset,data,8);
+	dgn_beta_bank_memory(machine(),offset,data,8);
 }
 
-static WRITE8_HANDLER( dgnbeta_ram_b9_w )
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b9_w )
 {
-	dgn_beta_bank_memory(space.machine(),offset,data,9);
+	dgn_beta_bank_memory(machine(),offset,data,9);
 }
 
-static WRITE8_HANDLER( dgnbeta_ram_bA_w )
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bA_w )
 {
-	dgn_beta_bank_memory(space.machine(),offset,data,10);
+	dgn_beta_bank_memory(machine(),offset,data,10);
 }
 
-static WRITE8_HANDLER( dgnbeta_ram_bB_w )
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bB_w )
 {
-	dgn_beta_bank_memory(space.machine(),offset,data,11);
+	dgn_beta_bank_memory(machine(),offset,data,11);
 }
 
-static WRITE8_HANDLER( dgnbeta_ram_bC_w )
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bC_w )
 {
-	dgn_beta_bank_memory(space.machine(),offset,data,12);
+	dgn_beta_bank_memory(machine(),offset,data,12);
 }
 
-static WRITE8_HANDLER( dgnbeta_ram_bD_w )
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bD_w )
 {
-	dgn_beta_bank_memory(space.machine(),offset,data,13);
+	dgn_beta_bank_memory(machine(),offset,data,13);
 }
 
-static WRITE8_HANDLER( dgnbeta_ram_bE_w )
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bE_w )
 {
-	dgn_beta_bank_memory(space.machine(),offset,data,14);
+	dgn_beta_bank_memory(machine(),offset,data,14);
 }
 
-static WRITE8_HANDLER( dgnbeta_ram_bF_w )
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bF_w )
 {
-	dgn_beta_bank_memory(space.machine(),offset,data,15);
+	dgn_beta_bank_memory(machine(),offset,data,15);
 }
 
-static WRITE8_HANDLER( dgnbeta_ram_bG_w )
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bG_w )
 {
-	dgn_beta_bank_memory(space.machine(),offset,data,16);
+	dgn_beta_bank_memory(machine(),offset,data,16);
 }
 
 /*
