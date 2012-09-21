@@ -349,7 +349,7 @@ UINT32 osbexec_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 static READ8_DEVICE_HANDLER( osbexec_pia0_a_r )
 {
-	osbexec_state *state = device->machine().driver_data<osbexec_state>();
+	osbexec_state *state = space.machine().driver_data<osbexec_state>();
 
 	return state->m_pia0_porta;
 }
@@ -357,19 +357,19 @@ static READ8_DEVICE_HANDLER( osbexec_pia0_a_r )
 
 static WRITE8_DEVICE_HANDLER( osbexec_pia0_a_w )
 {
-	osbexec_state *state = device->machine().driver_data<osbexec_state>();
+	osbexec_state *state = space.machine().driver_data<osbexec_state>();
 
 	logerror("osbexec_pia0_a_w: %02x\n", data );
 
 	state->m_pia0_porta = data;
 
-	state->set_banks(device->machine());
+	state->set_banks(space.machine());
 }
 
 
 static READ8_DEVICE_HANDLER( osbexec_pia0_b_r )
 {
-	osbexec_state *state = device->machine().driver_data<osbexec_state>();
+	osbexec_state *state = space.machine().driver_data<osbexec_state>();
 
 	return state->m_pia0_portb;
 }
@@ -377,7 +377,7 @@ static READ8_DEVICE_HANDLER( osbexec_pia0_b_r )
 
 static WRITE8_DEVICE_HANDLER( osbexec_pia0_b_w )
 {
-	osbexec_state *state = device->machine().driver_data<osbexec_state>();
+	osbexec_state *state = space.machine().driver_data<osbexec_state>();
 
 	state->m_pia0_portb = data;
 

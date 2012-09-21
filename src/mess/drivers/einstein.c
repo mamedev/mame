@@ -240,23 +240,23 @@ READ8_MEMBER(einstein_state::einstein_keyboard_data_read)
 
 static WRITE8_DEVICE_HANDLER( einstein_drsel_w )
 {
-	einstein_state *einstein = device->machine().driver_data<einstein_state>();
+	einstein_state *einstein = space.machine().driver_data<einstein_state>();
 	if(VERBOSE_DISK)
-		logerror("%s: einstein_drsel_w %02x\n", device->machine().describe_context(), data);
+		logerror("%s: einstein_drsel_w %02x\n", space.machine().describe_context(), data);
 
 	/* bit 0 to 3 select the drive */
 	static const char *names[] = { "fd0", "fd1", "fd2", "fd3" };
 	floppy_image_device *floppy = 0;
 	for(int i=0; i<4; i++) {
 		if(BIT(data, i)) {
-			floppy_connector *con = device->machine().device<floppy_connector>(names[i]);
+			floppy_connector *con = space.machine().device<floppy_connector>(names[i]);
 			if(con)
 				floppy = con->get_device();
 		}
 	}
 
 	/* double sided drive connected? */
-	if (device->machine().root_device().ioport("config")->read() & data)
+	if (space.machine().root_device().ioport("config")->read() & data)
 	{
 		/* bit 4 selects the side then */
 		//floppy->ss_w(BIT(data, 4));

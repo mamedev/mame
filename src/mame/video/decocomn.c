@@ -46,7 +46,7 @@ WRITE16_DEVICE_HANDLER( decocomn_nonbuffered_palette_w )
 {
 	int r,g,b;
 
-	driver_device *state = device->machine().driver_data();
+	driver_device *state = space.machine().driver_data();
 	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 	if (offset&1) offset--;
 
@@ -54,14 +54,14 @@ WRITE16_DEVICE_HANDLER( decocomn_nonbuffered_palette_w )
 	g = (state->m_generic_paletteram_16[offset + 1] >> 8) & 0xff;
 	r = (state->m_generic_paletteram_16[offset + 1] >> 0) & 0xff;
 
-	palette_set_color(device->machine(), offset / 2, MAKE_RGB(r,g,b));
+	palette_set_color(space.machine(), offset / 2, MAKE_RGB(r,g,b));
 }
 
 WRITE16_DEVICE_HANDLER( decocomn_buffered_palette_w )
 {
 	decocomn_state *decocomn = get_safe_token(device);
 
-	driver_device *state = device->machine().driver_data();
+	driver_device *state = space.machine().driver_data();
 	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 
 	decocomn->dirty_palette[offset / 2] = 1;
@@ -70,8 +70,8 @@ WRITE16_DEVICE_HANDLER( decocomn_buffered_palette_w )
 WRITE16_DEVICE_HANDLER( decocomn_palette_dma_w )
 {
 	decocomn_state *decocomn = get_safe_token(device);
-	driver_device *state = device->machine().driver_data();
-	const int m = device->machine().total_colors();
+	driver_device *state = space.machine().driver_data();
+	const int m = space.machine().total_colors();
 	int r, g, b, i;
 
 	for (i = 0; i < m; i++)
@@ -84,7 +84,7 @@ WRITE16_DEVICE_HANDLER( decocomn_palette_dma_w )
 			g = (state->m_generic_paletteram_16[i * 2 + 1] >> 8) & 0xff;
 			r = (state->m_generic_paletteram_16[i * 2 + 1] >> 0) & 0xff;
 
-			palette_set_color(device->machine(), i, MAKE_RGB(r,g,b));
+			palette_set_color(space.machine(), i, MAKE_RGB(r,g,b));
 		}
 	}
 }

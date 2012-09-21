@@ -426,7 +426,7 @@ READ8_MEMBER(phoenix_state::survival_input_port_0_r)
 
 READ8_DEVICE_HANDLER( survival_protection_r )
 {
-	phoenix_state *state = device->machine().driver_data<phoenix_state>();
+	phoenix_state *state = space.machine().driver_data<phoenix_state>();
 	return state->m_survival_protection_value;
 }
 

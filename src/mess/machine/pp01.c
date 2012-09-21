@@ -187,24 +187,24 @@ const struct pit8253_config pp01_pit8253_intf =
 
 static READ8_DEVICE_HANDLER (pp01_8255_porta_r )
 {
-	pp01_state *state = device->machine().driver_data<pp01_state>();
+	pp01_state *state = space.machine().driver_data<pp01_state>();
 	return state->m_video_scroll;
 }
 static WRITE8_DEVICE_HANDLER (pp01_8255_porta_w )
 {
-	pp01_state *state = device->machine().driver_data<pp01_state>();
+	pp01_state *state = space.machine().driver_data<pp01_state>();
 	state->m_video_scroll = data;
 }
 
 static READ8_DEVICE_HANDLER (pp01_8255_portb_r )
 {
-	pp01_state *state = device->machine().driver_data<pp01_state>();
+	pp01_state *state = space.machine().driver_data<pp01_state>();
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
 		"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF"
 	};
 
-	return (device->machine().root_device().ioport(keynames[state->m_key_line])->read() & 0x3F) | (device->machine().root_device().ioport("LINEALL")->read() & 0xC0);
+	return (space.machine().root_device().ioport(keynames[state->m_key_line])->read() & 0x3F) | (space.machine().root_device().ioport("LINEALL")->read() & 0xC0);
 }
 static WRITE8_DEVICE_HANDLER (pp01_8255_portb_w )
 {
@@ -214,7 +214,7 @@ static WRITE8_DEVICE_HANDLER (pp01_8255_portb_w )
 
 static WRITE8_DEVICE_HANDLER (pp01_8255_portc_w )
 {
-	pp01_state *state = device->machine().driver_data<pp01_state>();
+	pp01_state *state = space.machine().driver_data<pp01_state>();
 	state->m_key_line = data & 0x0f;
 }
 

@@ -221,7 +221,7 @@ static WRITE8_HANDLER( saiyugoub1_adpcm_rom_addr_w )
 
 static WRITE8_DEVICE_HANDLER( saiyugoub1_adpcm_control_w )
 {
-	ddragon_state *state = device->machine().driver_data<ddragon_state>();
+	ddragon_state *state = space.machine().driver_data<ddragon_state>();
 
 	/* i8748 Port 2 write */
 	UINT8 *saiyugoub1_adpcm_rom = state->memregion("adpcm")->base();
@@ -275,7 +275,7 @@ static WRITE8_DEVICE_HANDLER( saiyugoub1_m5205_clk_w )
 
 	/* Actually, T0 output clk mode is not supported by the i8048 core */
 #if 0
-	ddragon_state *state = device->machine().driver_data<ddragon_state>();
+	ddragon_state *state = space.machine().driver_data<ddragon_state>();
 
 	state->m_m5205_clk++;
 	if (state->m_m5205_clk == 8)

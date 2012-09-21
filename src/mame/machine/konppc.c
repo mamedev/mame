@@ -443,7 +443,7 @@ WRITE32_DEVICE_HANDLER(nwk_fifo_0_w)
 {
 	if (nwk_device_sel[0] & 0x01)
 	{
-		nwk_fifo_w(device->machine(), 0, data);
+		nwk_fifo_w(space.machine(), 0, data);
 	}
 	else if (nwk_device_sel[0] & 0x02)
 	{
@@ -460,7 +460,7 @@ WRITE32_DEVICE_HANDLER(nwk_fifo_1_w)
 {
 	if (nwk_device_sel[1] & 0x01)
 	{
-		nwk_fifo_w(device->machine(), 1, data);
+		nwk_fifo_w(space.machine(), 1, data);
 	}
 	else if (nwk_device_sel[1] & 0x02)
 	{
@@ -501,7 +501,7 @@ WRITE32_DEVICE_HANDLER(nwk_voodoo_0_w)
 {
 	if (nwk_device_sel[0] & 0x01)
 	{
-		nwk_fifo_w(device->machine(), 0, data);
+		nwk_fifo_w(space.machine(), 0, data);
 	}
 	else if (nwk_device_sel[0] & 0x02)
 	{
@@ -518,7 +518,7 @@ WRITE32_DEVICE_HANDLER(nwk_voodoo_1_w)
 {
 	if (nwk_device_sel[1] & 0x01)
 	{
-		nwk_fifo_w(device->machine(), 1, data);
+		nwk_fifo_w(space.machine(), 1, data);
 	}
 	else if (nwk_device_sel[1] & 0x02)
 	{

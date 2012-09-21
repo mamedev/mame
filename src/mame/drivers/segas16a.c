@@ -426,7 +426,7 @@ WRITE8_MEMBER( segas16a_state::n7751_rom_offset_w )
 
 WRITE8_DEVICE_HANDLER( segas16a_state::static_n7751_rom_offset_w )
 {
-	segas16a_state *state = device->machine().driver_data<segas16a_state>();
+	segas16a_state *state = space.machine().driver_data<segas16a_state>();
 	state->n7751_rom_offset_w(state->m_maincpu->space(AS_PROGRAM), offset, data);
 }
 

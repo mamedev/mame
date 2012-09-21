@@ -701,8 +701,8 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pa_w )
 
 static WRITE8_DEVICE_HANDLER( misc_ppi_pb_w )
 {
-	centronics_device *centronics = device->machine().device<centronics_device>(CENTRONICS_TAG);
-	centronics->write( device->machine().driver_data()->generic_space() , 0, ~data & 0xff);
+	centronics_device *centronics = space.machine().device<centronics_device>(CENTRONICS_TAG);
+	centronics->write( space.machine().driver_data()->generic_space() , 0, ~data & 0xff);
 }
 
 static READ8_DEVICE_HANDLER( misc_ppi_pc_r )
@@ -723,7 +723,7 @@ static READ8_DEVICE_HANDLER( misc_ppi_pc_r )
     */
 
 	UINT8 data = 0;
-	centronics_device *centronics = device->machine().device<centronics_device>(CENTRONICS_TAG);
+	centronics_device *centronics = space.machine().device<centronics_device>(CENTRONICS_TAG);
 	data |= centronics->not_busy_r() << 4;
 	data |= centronics->pe_r() << 5;
 

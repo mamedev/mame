@@ -163,7 +163,7 @@ static cassette_image_device *cassette_device_image(running_machine &machine)
  **************************************************************/
 static READ8_DEVICE_HANDLER (via_0_in_a )
 {
-    int data = device->machine().root_device().ioport("JOY")->read();
+    int data = space.machine().root_device().ioport("JOY")->read();
     LOG(("microtan_via_0_in_a %02X\n", data));
     return data;
 }
@@ -212,7 +212,7 @@ static WRITE8_DEVICE_HANDLER (via_0_out_b )
 {
     LOG(("microtan_via_0_out_b %02X\n", data));
     /* bit #7 is the cassette output signal */
-    cassette_device_image(device->machine())->output(data & 0x80 ? +1.0 : -1.0);
+    cassette_device_image(space.machine())->output(data & 0x80 ? +1.0 : -1.0);
 }
 
 static WRITE8_DEVICE_HANDLER ( via_0_out_ca2 )

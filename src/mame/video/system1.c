@@ -277,7 +277,7 @@ WRITE8_MEMBER(system1_state::system1_videoram_w)
 
 WRITE8_DEVICE_HANDLER( system1_videoram_bank_w )
 {
-	system1_state *state = device->machine().driver_data<system1_state>();
+	system1_state *state = space.machine().driver_data<system1_state>();
 	state->m_videoram_bank = data;
 }
 

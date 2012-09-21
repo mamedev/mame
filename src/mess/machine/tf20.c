@@ -94,11 +94,11 @@ static TIMER_CALLBACK( tf20_upd765_tc_reset )
 
 static READ8_DEVICE_HANDLER( tf20_upd765_tc_r )
 {
-	logerror("%s: tf20_upd765_tc_r\n", device->machine().describe_context());
+	logerror("%s: tf20_upd765_tc_r\n", space.machine().describe_context());
 
 	/* toggle tc on read */
 	upd765_tc_w(device, ASSERT_LINE);
-	device->machine().scheduler().timer_set(attotime::zero, FUNC(tf20_upd765_tc_reset), 0, device);
+	space.machine().scheduler().timer_set(attotime::zero, FUNC(tf20_upd765_tc_reset), 0, device);
 
 	return 0xff;
 }

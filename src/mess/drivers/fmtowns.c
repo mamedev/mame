@@ -2555,7 +2555,7 @@ static const struct pit8253_config towns_pit8253_config_2 =
 
 static READ8_DEVICE_HANDLER( get_slave_ack )
 {
-	towns_state* state = device->machine().driver_data<towns_state>();
+	towns_state* state = space.machine().driver_data<towns_state>();
 	if (offset==7) { // IRQ = 7
 		return pic8259_acknowledge(state->m_pic_slave);
 	}

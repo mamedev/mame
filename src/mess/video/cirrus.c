@@ -229,5 +229,5 @@ void cirrus_device::pci_write(pci_bus_device *pcibus, int function, int offset, 
 WRITE8_DEVICE_HANDLER( cirrus_42E8_w )
 {
 	if (data & 0x80)
-		pc_vga_reset(device->machine());
+		pc_vga_reset(space.machine());
 }

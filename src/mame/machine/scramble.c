@@ -51,13 +51,13 @@ CUSTOM_INPUT_MEMBER(scramble_state::darkplnt_custom_r)
 
 WRITE8_DEVICE_HANDLER( scramble_protection_w )
 {
-	scramble_state *state = device->machine().driver_data<scramble_state>();
+	scramble_state *state = space.machine().driver_data<scramble_state>();
 	state->m_xb = data;
 }
 
 READ8_DEVICE_HANDLER( scramble_protection_r )
 {
-	switch (device->machine().device("maincpu")->safe_pc())
+	switch (space.machine().device("maincpu")->safe_pc())
 	{
 	case 0x00a8: return 0xf0;
 	case 0x00be: return 0xb0;
@@ -68,7 +68,7 @@ READ8_DEVICE_HANDLER( scramble_protection_r )
 	case 0x1ca2: return 0x00;  /* I don't think it's checked */
 	case 0x1d7e: return 0xb0;
 	default:
-		logerror("%s: read protection\n",device->machine().describe_context());
+		logerror("%s: read protection\n",space.machine().describe_context());
 		return 0;
 	}
 }

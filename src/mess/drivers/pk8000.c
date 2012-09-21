@@ -102,30 +102,30 @@ static void pk8000_set_bank(running_machine &machine,UINT8 data)
 }
 static WRITE8_DEVICE_HANDLER(pk8000_80_porta_w)
 {
-	pk8000_set_bank(device->machine(),data);
+	pk8000_set_bank(space.machine(),data);
 }
 
 static READ8_DEVICE_HANDLER(pk8000_80_portb_r)
 {
-	pk8000_state *state = device->machine().driver_data<pk8000_state>();
+	pk8000_state *state = space.machine().driver_data<pk8000_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 	if(state->m_keyboard_line>9) {
 		return 0xff;
 	}
-	return device->machine().root_device().ioport(keynames[state->m_keyboard_line])->read();
+	return space.machine().root_device().ioport(keynames[state->m_keyboard_line])->read();
 }
 
 static WRITE8_DEVICE_HANDLER(pk8000_80_portc_w)
 {
-	pk8000_state *state = device->machine().driver_data<pk8000_state>();
+	pk8000_state *state = space.machine().driver_data<pk8000_state>();
 	state->m_keyboard_line = data & 0x0f;
 
-	speaker_level_w(device->machine().device(SPEAKER_TAG), BIT(data,7));
+	speaker_level_w(space.machine().device(SPEAKER_TAG), BIT(data,7));
 
-	cassette_device_image(device->machine())->change_state(
+	cassette_device_image(space.machine())->change_state(
 						(BIT(data,4)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 						CASSETTE_MASK_MOTOR);
-	cassette_device_image(device->machine())->output((BIT(data,6)) ? +1.0 : 0.0);
+	cassette_device_image(space.machine())->output((BIT(data,6)) ? +1.0 : 0.0);
 }
 
 static I8255_INTERFACE( pk8000_ppi8255_interface_1 )

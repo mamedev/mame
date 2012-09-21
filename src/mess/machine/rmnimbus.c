@@ -2217,7 +2217,7 @@ static READ16_DEVICE_HANDLER( sio_serial_receive )
 {
     if(offset==0)
     {
-        return keyboard_queue_read(device->machine());
+        return keyboard_queue_read(space.machine());
     }
     else
         return -1;

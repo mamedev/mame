@@ -417,7 +417,7 @@ static const i8251_interface terminal_8251_intf =
 
 static READ8_DEVICE_HANDLER( i8255_pc_r )
 {
-	centronics_device *centronics = device->machine().device<centronics_device>("centronics");
+	centronics_device *centronics = space.machine().device<centronics_device>("centronics");
 	/*
 
         bit     description

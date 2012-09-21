@@ -233,7 +233,7 @@ WRITE32_MEMBER(juicebox_state::juicebox_nand_w)
 
 static WRITE16_DEVICE_HANDLER( s3c44b0_i2s_data_w )
 {
-	juicebox_state *juicebox = device->machine().driver_data<juicebox_state>();
+	juicebox_state *juicebox = space.machine().driver_data<juicebox_state>();
 	juicebox->dac->write_signed16(data ^ 0x8000);
 }
 

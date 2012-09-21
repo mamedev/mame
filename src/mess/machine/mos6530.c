@@ -177,7 +177,7 @@ WRITE8_DEVICE_HANDLER( mos6530_w )
 	if (offset & 0x04)
 	{
 		static const UINT8 timershift[4] = { 0, 3, 6, 10 };
-		attotime curtime = device->machine().time();
+		attotime curtime = space.machine().time();
 		INT64 target;
 
 		/* A0-A1 contain the timer divisor */
@@ -225,7 +225,7 @@ WRITE8_DEVICE_HANDLER( mos6530_w )
 			if (!port->out_port_func.isnull())
 				port->out_port_func(0, data);
 			else
-				logerror("6530MIOT chip %s: Port %c is being written to but has no handler.  PC: %08X - %02X\n", device->tag(), 'A' + (offset & 1), device->machine().firstcpu->pc(), data);
+				logerror("6530MIOT chip %s: Port %c is being written to but has no handler.  PC: %08X - %02X\n", device->tag(), 'A' + (offset & 1), space.machine().firstcpu->pc(), data);
 		}
 	}
 }
@@ -287,7 +287,7 @@ READ8_DEVICE_HANDLER( mos6530_r )
 				port->in = port->in_port_func(0);
 			}
 			else
-				logerror("6530MIOT chip %s: Port %c is being read but has no handler.  PC: %08X\n", device->tag(), 'A' + (offset & 1), device->machine().firstcpu->pc());
+				logerror("6530MIOT chip %s: Port %c is being read but has no handler.  PC: %08X\n", device->tag(), 'A' + (offset & 1), space.machine().firstcpu->pc());
 
 			/* apply the DDR to the result */
 			val = (out & port->ddr) | (port->in & ~port->ddr);

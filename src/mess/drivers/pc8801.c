@@ -1820,16 +1820,16 @@ ADDRESS_MAP_END
 
 static READ8_DEVICE_HANDLER( cpu_8255_c_r )
 {
-	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-//  device->machine().scheduler().synchronize(); // force resync
+	pc8801_state *state = space.machine().driver_data<pc8801_state>();
+//  space.machine().scheduler().synchronize(); // force resync
 
 	return state->m_i8255_1_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
 {
-	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-//  device->machine().scheduler().synchronize(); // force resync
+	pc8801_state *state = space.machine().driver_data<pc8801_state>();
+//  space.machine().scheduler().synchronize(); // force resync
 
 	state->m_i8255_0_pc = data;
 }
@@ -1847,16 +1847,16 @@ static I8255A_INTERFACE( master_fdd_intf )
 
 static READ8_DEVICE_HANDLER( fdc_8255_c_r )
 {
-	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-//  device->machine().scheduler().synchronize(); // force resync
+	pc8801_state *state = space.machine().driver_data<pc8801_state>();
+//  space.machine().scheduler().synchronize(); // force resync
 
 	return state->m_i8255_0_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( fdc_8255_c_w )
 {
-	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-//  device->machine().scheduler().synchronize(); // force resync
+	pc8801_state *state = space.machine().driver_data<pc8801_state>();
+//  space.machine().scheduler().synchronize(); // force resync
 
 	state->m_i8255_1_pc = data;
 }
@@ -2569,9 +2569,9 @@ static const struct upd765_interface pc8801_upd765_interface =
 
 static READ8_DEVICE_HANDLER( opn_porta_r )
 {
-	pc8801_state *state = device->machine().driver_data<pc8801_state>();
+	pc8801_state *state = space.machine().driver_data<pc8801_state>();
 
-	if(device->machine().root_device().ioport("BOARD_CONFIG")->read() & 2)
+	if(space.machine().root_device().ioport("BOARD_CONFIG")->read() & 2)
 	{
 		UINT8 shift,res;
 
@@ -2583,7 +2583,7 @@ static READ8_DEVICE_HANDLER( opn_porta_r )
 		return ((res >> shift) & 0x0f) | 0xf0;
 	}
 
-	return device->machine().root_device().ioport("OPN_PA")->read();
+	return space.machine().root_device().ioport("OPN_PA")->read();
 }
 static READ8_DEVICE_HANDLER( opn_portb_r ) { return device->machine().root_device().ioport("OPN_PB")->read(); }
 

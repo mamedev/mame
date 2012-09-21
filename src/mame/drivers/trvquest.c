@@ -50,7 +50,7 @@ static READ8_HANDLER( trvquest_question_r )
 
 static WRITE8_DEVICE_HANDLER( trvquest_coin_w )
 {
-	coin_counter_w(device->machine(), 0, ~data & 1);
+	coin_counter_w(space.machine(), 0, ~data & 1);
 }
 
 static WRITE8_DEVICE_HANDLER( trvquest_misc_w )

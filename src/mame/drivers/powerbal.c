@@ -36,7 +36,7 @@ static WRITE16_DEVICE_HANDLER( magicstk_coin_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(device->machine(), 0, data & 0x20);
+		coin_counter_w(space.machine(), 0, data & 0x20);
 
 		eeprom_device *eeprom = downcast<eeprom_device *>(device);
 		eeprom->set_cs_line((data & 8) ? CLEAR_LINE : ASSERT_LINE);
@@ -70,7 +70,7 @@ static WRITE16_DEVICE_HANDLER( oki_banking )
 	{
 		int addr = 0x40000 * ((data & 3) - 1);
 
-		if (addr < device->machine().root_device().memregion("oki")->bytes())
+		if (addr < space.machine().root_device().memregion("oki")->bytes())
 			downcast<okim6295_device *>(device)->set_bank_base(addr);
 	}
 }

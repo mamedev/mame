@@ -507,7 +507,7 @@ WRITE8_MEMBER(apollo_state::apollo_dma_write_word){
 
 static READ8_DEVICE_HANDLER( apollo_dma8237_ctape_dack_r ) {
 
-	UINT8 data = sc499_dack_r(&device->machine());
+	UINT8 data = sc499_dack_r(&space.machine());
 	DLOG2(("dma ctape dack read %02x",data));
 
 	// hack for DN3000: select appropriate DMA channel No.
@@ -518,7 +518,7 @@ static READ8_DEVICE_HANDLER( apollo_dma8237_ctape_dack_r ) {
 
 static WRITE8_DEVICE_HANDLER( apollo_dma8237_ctape_dack_w ) {
 	DLOG2(("dma ctape dack write %02x", data));
-	sc499_dack_w(&device->machine(), data);
+	sc499_dack_w(&space.machine(), data);
 
 	// hack for DN3000: select appropriate DMA channel No.
 	// Note: too late for this byte, but next bytes will be ok
@@ -526,7 +526,7 @@ static WRITE8_DEVICE_HANDLER( apollo_dma8237_ctape_dack_w ) {
 }
 
 static READ8_DEVICE_HANDLER( apollo_dma8237_fdc_dack_r ) {
-	UINT8 data = pc_fdc_dack_r(device->machine(), space);
+	UINT8 data = pc_fdc_dack_r(space.machine(), space);
 	//  DLOG2(("dma fdc dack read %02x",data));
 
 	// hack for DN3000: select appropriate DMA channel No.
@@ -537,7 +537,7 @@ static READ8_DEVICE_HANDLER( apollo_dma8237_fdc_dack_r ) {
 
 static WRITE8_DEVICE_HANDLER( apollo_dma8237_fdc_dack_w ) {
 	// DLOG2(("dma fdc dack write %02x", data));
-	pc_fdc_dack_w(device->machine(), space, data);
+	pc_fdc_dack_w(space.machine(), space, data);
 
 	// hack for DN3000: select appropriate DMA channel No.
 	// Note: too late for this byte, but next bytes will be ok

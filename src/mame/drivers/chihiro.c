@@ -1559,7 +1559,7 @@ static WRITE_LINE_DEVICE_HANDLER( chihiro_pic8259_1_set_int_line )
 
 static READ8_DEVICE_HANDLER( get_slave_ack )
 {
-	chihiro_state *chst=device->machine().driver_data<chihiro_state>();
+	chihiro_state *chst=space.machine().driver_data<chihiro_state>();
 	if (offset==2) { // IRQ = 2
 		return pic8259_acknowledge(chst->chihiro_devs.pic8259_2);
 	}

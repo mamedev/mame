@@ -356,7 +356,7 @@ WRITE8_MEMBER(carpolo_state::carpolo_timer_interrupt_clear_w)
 
 static WRITE8_DEVICE_HANDLER( pia_0_port_a_w )
 {
-	carpolo_state *state = device->machine().driver_data<carpolo_state>();
+	carpolo_state *state = space.machine().driver_data<carpolo_state>();
 	/* bit 0 - Coin counter
        bit 1 - Player 4 crash sound
        bit 2 - Player 3 crash sound
@@ -366,7 +366,7 @@ static WRITE8_DEVICE_HANDLER( pia_0_port_a_w )
        bit 6 - Player 1 crash sound
        bit 7 - Ball hit pulse sound */
 
-	coin_counter_w(device->machine(), 0, data & 0x01);
+	coin_counter_w(space.machine(), 0, data & 0x01);
 
 
 	state->m_ttl7474_1f_1->clear_w((data & 0x08) >> 3);
@@ -378,7 +378,7 @@ static WRITE8_DEVICE_HANDLER( pia_0_port_a_w )
 
 static WRITE8_DEVICE_HANDLER( pia_0_port_b_w )
 {
-	carpolo_state *state = device->machine().driver_data<carpolo_state>();
+	carpolo_state *state = space.machine().driver_data<carpolo_state>();
 	/* bit 0 - Strobe speed bits sound
        bit 1 - Speed bit 0 sound
        bit 2 - Speed bit 1 sound
@@ -394,7 +394,7 @@ static WRITE8_DEVICE_HANDLER( pia_0_port_b_w )
 
 static READ8_DEVICE_HANDLER( pia_0_port_b_r )
 {
-	carpolo_state *state = device->machine().driver_data<carpolo_state>();
+	carpolo_state *state = space.machine().driver_data<carpolo_state>();
 	/* bit 4 - Pedal bit 0
        bit 5 - Pedal bit 1 */
 
@@ -405,7 +405,7 @@ static READ8_DEVICE_HANDLER( pia_0_port_b_r )
 
 static READ8_DEVICE_HANDLER( pia_1_port_a_r )
 {
-	carpolo_state *state = device->machine().driver_data<carpolo_state>();
+	carpolo_state *state = space.machine().driver_data<carpolo_state>();
 	UINT8 ret;
 
 	/* bit 0 - Player 4 steering input (left or right)
@@ -429,7 +429,7 @@ static READ8_DEVICE_HANDLER( pia_1_port_a_r )
 
 static READ8_DEVICE_HANDLER( pia_1_port_b_r )
 {
-	carpolo_state *state = device->machine().driver_data<carpolo_state>();
+	carpolo_state *state = space.machine().driver_data<carpolo_state>();
 	UINT8 ret;
 
 	/* bit 4 - Player 4 steering input (wheel moving or stopped)

@@ -848,13 +848,13 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 
 static READ8_DEVICE_HANDLER(pk8020_porta_r)
 {
-	pk8020_state *state = device->machine().driver_data<pk8020_state>();
+	pk8020_state *state = space.machine().driver_data<pk8020_state>();
 	return 0xf0 | (state->m_takt <<1) | (state->m_text_attr)<<3;
 }
 
 static WRITE8_DEVICE_HANDLER(pk8020_portc_w)
 {
-	pk8020_state *state = device->machine().driver_data<pk8020_state>();
+	pk8020_state *state = space.machine().driver_data<pk8020_state>();
 	state->m_video_page_access =(data>>6) & 3;
 	state->m_attr = (data >> 4) & 3;
 	state->m_wide = (data >> 3) & 1;
@@ -867,35 +867,35 @@ static WRITE8_DEVICE_HANDLER(pk8020_portc_w)
 
 static WRITE8_DEVICE_HANDLER(pk8020_portb_w)
 {
-	device_t *fdc = device->machine().device("wd1793");
+	device_t *fdc = space.machine().device("wd1793");
 	// Turn all motors off
-	floppy_mon_w(floppy_get_device(device->machine(), 0), 1);
-	floppy_mon_w(floppy_get_device(device->machine(), 1), 1);
-	floppy_mon_w(floppy_get_device(device->machine(), 2), 1);
-	floppy_mon_w(floppy_get_device(device->machine(), 3), 1);
+	floppy_mon_w(floppy_get_device(space.machine(), 0), 1);
+	floppy_mon_w(floppy_get_device(space.machine(), 1), 1);
+	floppy_mon_w(floppy_get_device(space.machine(), 2), 1);
+	floppy_mon_w(floppy_get_device(space.machine(), 3), 1);
 	wd17xx_set_side(fdc,BIT(data,4));
 	if (BIT(data,0)) {
 		wd17xx_set_drive(fdc,0);
-		floppy_mon_w(floppy_get_device(device->machine(), 0), 0);
-		floppy_drive_set_ready_state(floppy_get_device(device->machine(), 0), 1, 1);
+		floppy_mon_w(floppy_get_device(space.machine(), 0), 0);
+		floppy_drive_set_ready_state(floppy_get_device(space.machine(), 0), 1, 1);
 	} else if (BIT(data,1)) {
 		wd17xx_set_drive(fdc,1);
-		floppy_mon_w(floppy_get_device(device->machine(), 1), 0);
-		floppy_drive_set_ready_state(floppy_get_device(device->machine(), 1), 1, 1);
+		floppy_mon_w(floppy_get_device(space.machine(), 1), 0);
+		floppy_drive_set_ready_state(floppy_get_device(space.machine(), 1), 1, 1);
 	} else if (BIT(data,2)) {
 		wd17xx_set_drive(fdc,2);
-		floppy_mon_w(floppy_get_device(device->machine(), 2), 0);
-		floppy_drive_set_ready_state(floppy_get_device(device->machine(), 2), 1, 1);
+		floppy_mon_w(floppy_get_device(space.machine(), 2), 0);
+		floppy_drive_set_ready_state(floppy_get_device(space.machine(), 2), 1, 1);
 	} else if (BIT(data,3)) {
 		wd17xx_set_drive(fdc,3);
-		floppy_mon_w(floppy_get_device(device->machine(), 3), 0);
-		floppy_drive_set_ready_state(floppy_get_device(device->machine(), 3), 1, 1);
+		floppy_mon_w(floppy_get_device(space.machine(), 3), 0);
+		floppy_drive_set_ready_state(floppy_get_device(space.machine(), 3), 1, 1);
 	}
 }
 
 static READ8_DEVICE_HANDLER(pk8020_portc_r)
 {
-	pk8020_state *state = device->machine().driver_data<pk8020_state>();
+	pk8020_state *state = space.machine().driver_data<pk8020_state>();
 	return state->m_portc_data;
 }
 
@@ -912,8 +912,8 @@ I8255A_INTERFACE( pk8020_ppi8255_interface_1 )
 
 static WRITE8_DEVICE_HANDLER(pk8020_2_portc_w)
 {
-	pk8020_state *state = device->machine().driver_data<pk8020_state>();
-	device_t *speaker = device->machine().device(SPEAKER_TAG);
+	pk8020_state *state = space.machine().driver_data<pk8020_state>();
+	device_t *speaker = space.machine().device(SPEAKER_TAG);
 
 	state->m_sound_gate = BIT(data,3);
 

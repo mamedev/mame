@@ -270,7 +270,7 @@ UINT32 dm7000_state::screen_update_dm7000(screen_device &screen, bitmap_ind16 &b
 
 static READ32_DEVICE_HANDLER( dcr_r )
 {
-	dm7000_state *state = device->machine().driver_data<dm7000_state>();
+	dm7000_state *state = space.machine().driver_data<dm7000_state>();
 	mame_printf_debug("DCR %03X read\n", offset);
 	if(offset>=1024) {printf("get %04X\n", offset); return 0;} else
 	switch(offset) {
@@ -285,7 +285,7 @@ static READ32_DEVICE_HANDLER( dcr_r )
 static WRITE32_DEVICE_HANDLER( dcr_w )
 {
 	mame_printf_debug("DCR %03X write = %08X\n", offset, data);
-	dm7000_state *state = device->machine().driver_data<dm7000_state>();
+	dm7000_state *state = space.machine().driver_data<dm7000_state>();
 	if(offset>=1024) {printf("get %04X\n", offset); } else
 	state->dcr[offset] = data;
 }

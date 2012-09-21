@@ -118,8 +118,8 @@ WRITE8_MEMBER(leland_state::leland_scroll_w)
 
 WRITE8_DEVICE_HANDLER( leland_gfx_port_w )
 {
-	leland_state *state = device->machine().driver_data<leland_state>();
-	device->machine().primary_screen->update_partial(device->machine().primary_screen->vpos());
+	leland_state *state = space.machine().driver_data<leland_state>();
+	space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
 	state->m_gfxbank = data;
 }
 

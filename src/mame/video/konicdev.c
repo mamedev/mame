@@ -1376,7 +1376,7 @@ WRITE8_DEVICE_HANDLER( k007121_ctrl_w )
 	case 6:
 		/* palette bank change */
 		if ((k007121->ctrlram[offset] & 0x30) != (data & 0x30))
-			device->machine().tilemap().mark_all_dirty();
+			space.machine().tilemap().mark_all_dirty();
 		break;
 	case 7:
 		k007121->flipscreen = data & 0x08;
@@ -1702,7 +1702,7 @@ WRITE8_DEVICE_HANDLER( k007342_vreg_w )
 			break;
 		case 0x01:  /* used for banking in Rock'n'Rage */
 			if (data != k007342->regs[1])
-				device->machine().tilemap().mark_all_dirty();
+				space.machine().tilemap().mark_all_dirty();
 		case 0x02:
 			k007342->scrollx[0] = (k007342->scrollx[0] & 0xff) | ((data & 0x01) << 8);
 			k007342->scrollx[1] = (k007342->scrollx[1] & 0xff) | ((data & 0x02) << 7);
@@ -2314,14 +2314,14 @@ READ8_DEVICE_HANDLER( k052109_r )
 	if (k052109->has_extra_video_ram)
 		code |= color << 8;	/* kludge for X-Men */
 	else
-		k052109->callback(device->machine(), 0, bank, &code, &color, &flags, &priority);
+		k052109->callback(space.machine(), 0, bank, &code, &color, &flags, &priority);
 
 		addr = (code << 5) + (offset & 0x1f);
-		addr &= device->machine().root_device().memregion(k052109->memory_region)->bytes() - 1;
+		addr &= space.machine().root_device().memregion(k052109->memory_region)->bytes() - 1;
 
 //      logerror("%04x: off = %04x sub = %02x (bnk = %x) adr = %06x\n", space.device().safe_pc(), offset, k052109->romsubbank, bank, addr);
 
-		return device->machine().root_device().memregion(k052109->memory_region)->base()[addr];
+		return space.machine().root_device().memregion(k052109->memory_region)->base()[addr];
 	}
 }
 
@@ -3572,7 +3572,7 @@ INLINE void k053245_update_buffer( device_t *device )
 READ8_DEVICE_HANDLER( k053244_r )
 {
 	k05324x_state *k053244 = k05324x_get_safe_token(device);
-	running_machine &machine = device->machine();
+	running_machine &machine = space.machine();
 
 	if ((k053244->regs[5] & 0x10) && offset >= 0x0c && offset < 0x10)
 	{
@@ -3612,7 +3612,7 @@ WRITE8_DEVICE_HANDLER( k053244_w )
 //          popmessage("053244 reg 05 = %02x",data);
 		/* bit 2 = unknown, Parodius uses it */
 		/* bit 5 = unknown, Rollergames uses it */
-//      logerror("%s: write %02x to 053244 address 5\n", device->machine().describe_context(), data);
+//      logerror("%s: write %02x to 053244 address 5\n", space.machine().describe_context(), data);
 		break;
 
 	case 0x06:
@@ -4474,9 +4474,9 @@ WRITE8_DEVICE_HANDLER( k053247_w )
 READ16_DEVICE_HANDLER( k055673_rom_word_r )	// 5bpp
 {
 	k053247_state *k053246 = k053247_get_safe_token(device);
-	UINT8 *ROM8 = (UINT8 *)device->machine().root_device().memregion(k053246->memory_region)->base();
-	UINT16 *ROM = (UINT16 *)device->machine().root_device().memregion(k053246->memory_region)->base();
-	int size4 = (device->machine().root_device().memregion(k053246->memory_region)->bytes() / (1024 * 1024)) / 5;
+	UINT8 *ROM8 = (UINT8 *)space.machine().root_device().memregion(k053246->memory_region)->base();
+	UINT16 *ROM = (UINT16 *)space.machine().root_device().memregion(k053246->memory_region)->base();
+	int size4 = (space.machine().root_device().memregion(k053246->memory_region)->bytes() / (1024 * 1024)) / 5;
 	int romofs;
 
 	size4 *= 4 * 1024 * 1024;	// get offset to 5th bit
@@ -4513,7 +4513,7 @@ READ16_DEVICE_HANDLER( k055673_rom_word_r )	// 5bpp
 READ16_DEVICE_HANDLER( k055673_GX6bpp_rom_word_r )
 {
 	k053247_state *k053246 = k053247_get_safe_token(device);
-	UINT16 *ROM = (UINT16 *)device->machine().root_device().memregion(k053246->memory_region)->base();
+	UINT16 *ROM = (UINT16 *)space.machine().root_device().memregion(k053246->memory_region)->base();
 	int romofs;
 
 	romofs = k053246->kx46_regs[6] << 16 | k053246->kx46_regs[7] << 8 | k053246->kx46_regs[4];
@@ -4553,10 +4553,10 @@ READ8_DEVICE_HANDLER( k053246_r )
 		int addr;
 
 		addr = (k053246->kx46_regs[6] << 17) | (k053246->kx46_regs[7] << 9) | (k053246->kx46_regs[4] << 1) | ((offset & 1) ^ 1);
-		addr &= device->machine().root_device().memregion(k053246->memory_region)->bytes() - 1;
+		addr &= space.machine().root_device().memregion(k053246->memory_region)->bytes() - 1;
 //      if (VERBOSE)
 //          popmessage("%04x: offset %02x addr %06x", space.device().safe_pc(), offset, addr);
-		return device->machine().root_device().memregion(k053246->memory_region)->base()[addr];
+		return space.machine().root_device().memregion(k053246->memory_region)->base()[addr];
 	}
 	else
 	{
@@ -5438,15 +5438,15 @@ READ8_DEVICE_HANDLER( k051316_rom_r )
 		int addr = offset + (k051316->ctrlram[0x0c] << 11) + (k051316->ctrlram[0x0d] << 19);
 		if (k051316->bpp <= 4)
 			addr /= 2;
-		addr &= device->machine().root_device().memregion(k051316->memory_region)->bytes() - 1;
+		addr &= space.machine().root_device().memregion(k051316->memory_region)->bytes() - 1;
 
-		//  popmessage("%s: offset %04x addr %04x", device->machine().describe_context(), offset, addr);
+		//  popmessage("%s: offset %04x addr %04x", space.machine().describe_context(), offset, addr);
 
-		return device->machine().root_device().memregion(k051316->memory_region)->base()[addr];
+		return space.machine().root_device().memregion(k051316->memory_region)->base()[addr];
 	}
 	else
 	{
-		//logerror("%s: read 051316 ROM offset %04x but reg 0x0c bit 0 not clear\n", device->machine().describe_context(), offset);
+		//logerror("%s: read 051316 ROM offset %04x but reg 0x0c bit 0 not clear\n", space.machine().describe_context(), offset);
 		return 0;
 	}
 }
@@ -5455,7 +5455,7 @@ WRITE8_DEVICE_HANDLER( k051316_ctrl_w )
 {
 	k051316_state *k051316= k051316_get_safe_token(device);
 	k051316->ctrlram[offset] = data;
-	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", device->machine().describe_context(), data, offset);
+	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", space.machine().describe_context(), data, offset);
 }
 
 // a few games (ajax, rollerg, ultraman, etc.) can enable and disable wraparound after start
@@ -6002,7 +6002,7 @@ WRITE8_DEVICE_HANDLER( k053251_w )
 			}
 
 			if (!k053251->tilemaps_set)
-				device->machine().tilemap().mark_all_dirty();
+				space.machine().tilemap().mark_all_dirty();
 		}
 		else if (offset == 10)
 		{
@@ -6018,7 +6018,7 @@ WRITE8_DEVICE_HANDLER( k053251_w )
 			}
 
 			if (!k053251->tilemaps_set)
-				device->machine().tilemap().mark_all_dirty();
+				space.machine().tilemap().mark_all_dirty();
 		}
 	}
 }
@@ -6888,7 +6888,7 @@ READ16_DEVICE_HANDLER( k056832_rom_word_r )
 	int addr = 0x2000 * k056832->cur_gfx_banks + 2 * offset;
 
 	if (!k056832->rombase)
-		k056832->rombase = device->machine().root_device().memregion(k056832->memory_region)->base();
+		k056832->rombase = space.machine().root_device().memregion(k056832->memory_region)->base();
 
 	return k056832->rombase[addr + 1] | (k056832->rombase[addr] << 8);
 }
@@ -6902,7 +6902,7 @@ READ16_DEVICE_HANDLER( k056832_mw_rom_word_r )
 	int addr;
 
 	if (!k056832->rombase)
-		k056832->rombase = device->machine().root_device().memregion(k056832->memory_region)->base();
+		k056832->rombase = space.machine().root_device().memregion(k056832->memory_region)->base();
 
 	if (k056832->regsb[2] & 0x8)
 	{
@@ -6965,7 +6965,7 @@ READ16_DEVICE_HANDLER( k056832_bishi_rom_word_r )
 	int addr = 0x4000 * k056832->cur_gfx_banks + offset;
 
 	if (!k056832->rombase)
-		k056832->rombase = device->machine().root_device().memregion(k056832->memory_region)->base();
+		k056832->rombase = space.machine().root_device().memregion(k056832->memory_region)->base();
 
 	return k056832->rombase[addr + 2] | (k056832->rombase[addr] << 8);
 }
@@ -6976,7 +6976,7 @@ READ16_DEVICE_HANDLER( k056832_rom_word_8000_r )
 	int addr = 0x8000 * k056832->cur_gfx_banks + 2 * offset;
 
 	if (!k056832->rombase)
-		k056832->rombase = device->machine().root_device().memregion(k056832->memory_region)->base();
+		k056832->rombase = space.machine().root_device().memregion(k056832->memory_region)->base();
 
 	return k056832->rombase[addr + 2] | (k056832->rombase[addr] << 8);
 }
@@ -6987,7 +6987,7 @@ READ16_DEVICE_HANDLER( k056832_old_rom_word_r )
 	int addr = 0x2000 * k056832->cur_gfx_banks + 2 * offset;
 
 	if (!k056832->rombase)
-		k056832->rombase = device->machine().root_device().memregion(k056832->memory_region)->base();
+		k056832->rombase = space.machine().root_device().memregion(k056832->memory_region)->base();
 
 	return k056832->rombase[addr + 1] | (k056832->rombase[addr] << 8);
 }
@@ -9009,7 +9009,7 @@ READ32_DEVICE_HANDLER( k001006_r )
 		{
 			case 0x0b:		// CG Board ROM read
 			{
-				UINT16 *rom = (UINT16*)device->machine().root_device().memregion(k001006->gfx_region)->base();
+				UINT16 *rom = (UINT16*)space.machine().root_device().memregion(k001006->gfx_region)->base();
 				return rom[k001006->addr / 2] << 16;
 			}
 			case 0x0d:		// Palette RAM read
@@ -10380,8 +10380,8 @@ READ32_DEVICE_HANDLER( k001604_reg_r )
 
 	switch (offset)
 	{
-		case 0x54/4:	return device->machine().rand() << 16;
-		case 0x5c/4:	return device->machine().rand() << 16 | device->machine().rand();
+		case 0x54/4:	return space.machine().rand() << 16;
+		case 0x5c/4:	return space.machine().rand() << 16 | space.machine().rand();
 	}
 
 	return k001604->reg[offset];
@@ -10457,8 +10457,8 @@ WRITE32_DEVICE_HANDLER( k001604_char_w )
 
 	COMBINE_DATA(k001604->char_ram + addr);
 
-	device->machine().gfx[k001604->gfx_index[0]]->mark_dirty(addr / 32);
-	device->machine().gfx[k001604->gfx_index[1]]->mark_dirty(addr / 128);
+	space.machine().gfx[k001604->gfx_index[0]]->mark_dirty(addr / 32);
+	space.machine().gfx[k001604->gfx_index[1]]->mark_dirty(addr / 128);
 }
 
 WRITE32_DEVICE_HANDLER( k001604_reg_w )
@@ -10750,7 +10750,7 @@ WRITE32_DEVICE_HANDLER( k037122_char_w )
 	UINT32 addr = offset + (bank * (0x40000/4));
 
 	COMBINE_DATA(k037122->char_ram + addr);
-	device->machine().gfx[k037122->gfx_index]->mark_dirty(addr / 32);
+	space.machine().gfx[k037122->gfx_index]->mark_dirty(addr / 32);
 }
 
 READ32_DEVICE_HANDLER( k037122_reg_r )

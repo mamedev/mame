@@ -613,7 +613,7 @@ WRITE8_MEMBER(z80ne_state::lx385_ctrl_w)
 
 READ8_DEVICE_HANDLER( lx388_mc6847_videoram_r )
 {
-	z80ne_state *state = device->machine().driver_data<z80ne_state>();
+	z80ne_state *state = space.machine().driver_data<z80ne_state>();
 	if (offset == ~0) return 0xff;
 
 	UINT8 *videoram = state->m_videoram;
@@ -652,7 +652,7 @@ READ8_MEMBER(z80ne_state::lx388_read_field_sync)
 
 WRITE8_DEVICE_HANDLER(lx390_motor_w)
 {
-	z80ne_state *state = device->machine().driver_data<z80ne_state>();
+	z80ne_state *state = space.machine().driver_data<z80ne_state>();
 	/* Selection of drive and parameters
      A write also causes the selected drive motor to turn on for about 3 seconds.
      When the motor turns off, the drive is deselected.
@@ -700,11 +700,11 @@ WRITE8_DEVICE_HANDLER(lx390_motor_w)
 
 READ8_DEVICE_HANDLER(lx390_reset_bank)
 {
-	z80ne_state *state = device->machine().driver_data<z80ne_state>();
+	z80ne_state *state = space.machine().driver_data<z80ne_state>();
 	offs_t pc;
 
 	/* if PC is not in range, we are under integrated debugger control, DON'T SWAP */
-	pc = device->machine().device("z80ne")->safe_pc();
+	pc = space.machine().device("z80ne")->safe_pc();
 	if((pc >= 0xf000) && (pc <=0xffff))
 	{
 		LOG(("lx390_reset_bank, reset memory bank 1\n"));
@@ -755,7 +755,7 @@ READ8_DEVICE_HANDLER(lx390_fdc_r)
 
 WRITE8_DEVICE_HANDLER(lx390_fdc_w)
 {
-	z80ne_state *state = device->machine().driver_data<z80ne_state>();
+	z80ne_state *state = space.machine().driver_data<z80ne_state>();
 	UINT8 d;
 
 	d = data;

@@ -76,7 +76,7 @@ static WRITE16_HANDLER( amiga_clock_w )
 
 static READ8_DEVICE_HANDLER( amiga_cia_1_porta_r )
 {
-	centronics_device *centronics = device->machine().device<centronics_device>("centronics");
+	centronics_device *centronics = space.machine().device<centronics_device>("centronics");
 	UINT8 result = 0;
 
 	/* centronics status is stored in PA0 to PA2 */
@@ -523,21 +523,21 @@ MACHINE_CONFIG_END
 
 static READ8_DEVICE_HANDLER( amiga_cia_0_portA_r )
 {
-	UINT8 ret = device->machine().root_device().ioport("CIA0PORTA")->read() & 0xc0;	/* Gameport 1 and 0 buttons */
-	ret |= device->machine().device<amiga_fdc>("fdc")->ciaapra_r();
+	UINT8 ret = space.machine().root_device().ioport("CIA0PORTA")->read() & 0xc0;	/* Gameport 1 and 0 buttons */
+	ret |= space.machine().device<amiga_fdc>("fdc")->ciaapra_r();
 	return ret;
 }
 
 
 static READ8_DEVICE_HANDLER( amiga_cia_0_cdtv_portA_r )
 {
-	return device->machine().root_device().ioport("CIA0PORTA")->read() & 0xc0;	/* Gameport 1 and 0 buttons */
+	return space.machine().root_device().ioport("CIA0PORTA")->read() & 0xc0;	/* Gameport 1 and 0 buttons */
 }
 
 
 static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 {
-	amiga_state *state = device->machine().driver_data<amiga_state>();
+	amiga_state *state = space.machine().driver_data<amiga_state>();
 	/* switch banks as appropriate */
 	state->membank("bank1")->set_entry(data & 1);
 
@@ -550,17 +550,17 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 		}
 
 		/* overlay disabled, map RAM on 0x000000 */
-		device->machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_bank(0x000000, state->m_chip_ram.bytes() - 1, 0, mirror_mask, "bank1");
+		space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_bank(0x000000, state->m_chip_ram.bytes() - 1, 0, mirror_mask, "bank1");
 
 		/* if there is a cart region, check for cart overlay */
-		if (device->machine().root_device().memregion("user2")->base() != NULL)
-			amiga_cart_check_overlay(device->machine());
+		if (space.machine().root_device().memregion("user2")->base() != NULL)
+			amiga_cart_check_overlay(space.machine());
 	}
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		device->machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x000000, state->m_chip_ram.bytes() - 1);
+		space.machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x000000, state->m_chip_ram.bytes() - 1);
 
-	set_led_status( device->machine(), 0, ( data & 2 ) ? 0 : 1 ); /* bit 2 = Power Led on Amiga */
+	set_led_status( space.machine(), 0, ( data & 2 ) ? 0 : 1 ); /* bit 2 = Power Led on Amiga */
 	output_set_value("power_led", ( data & 2 ) ? 0 : 1);
 }
 

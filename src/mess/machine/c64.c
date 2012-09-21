@@ -80,21 +80,21 @@ static void c64_nmi( running_machine &machine )
 
 static READ8_DEVICE_HANDLER( c64_cia0_port_a_r )
 {
-	UINT8 cia0portb = mos6526_pb_r(device->machine().device("cia_0"), space, 0);
+	UINT8 cia0portb = mos6526_pb_r(space.machine().device("cia_0"), space, 0);
 
 	return cbm_common_cia0_port_a_r(device, cia0portb);
 }
 
 static READ8_DEVICE_HANDLER( c64_cia0_port_b_r )
 {
-	UINT8 cia0porta = mos6526_pa_r(device->machine().device("cia_0"), space, 0);
+	UINT8 cia0porta = mos6526_pa_r(space.machine().device("cia_0"), space, 0);
 
 	return cbm_common_cia0_port_b_r(device, cia0porta);
 }
 
 static WRITE8_DEVICE_HANDLER( c64_cia0_port_b_w )
 {
-	device_t *vic2 = device->machine().device("vic2");
+	device_t *vic2 = space.machine().device("vic2");
 	vic2_lightpen_write(vic2, data & 0x10);
 }
 
@@ -177,7 +177,7 @@ const mos6526_interface c64_pal_cia0 =
  */
 static READ8_DEVICE_HANDLER( c64_cia1_port_a_r )
 {
-	legacy_c64_state *state = device->machine().driver_data<legacy_c64_state>();
+	legacy_c64_state *state = space.machine().driver_data<legacy_c64_state>();
 
 	UINT8 value = 0xff;
 
@@ -192,7 +192,7 @@ static READ8_DEVICE_HANDLER( c64_cia1_port_a_r )
 
 static WRITE8_DEVICE_HANDLER( c64_cia1_port_a_w )
 {
-	legacy_c64_state *state = device->machine().driver_data<legacy_c64_state>();
+	legacy_c64_state *state = space.machine().driver_data<legacy_c64_state>();
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
 
 	state->m_iec->clk_w(!(data & 0x10));
@@ -545,7 +545,7 @@ static void c64_bankswitch( running_machine &machine, int reset )
 
 WRITE8_DEVICE_HANDLER(c64_m6510_port_write)
 {
-	legacy_c64_state *state = device->machine().driver_data<legacy_c64_state>();
+	legacy_c64_state *state = space.machine().driver_data<legacy_c64_state>();
 
 	UINT8 direction = offset; // HACK ALERT!
 
@@ -568,26 +568,26 @@ WRITE8_DEVICE_HANDLER(c64_m6510_port_write)
 	{
 		if (direction & 0x08)
 		{
-			device->machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+			space.machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 		}
 
 		if (direction & 0x20)
 		{
 			if(!(data & 0x20))
 			{
-				device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+				space.machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 				state->m_datasette_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
 			}
 			else
 			{
-				device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+				space.machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 				state->m_datasette_timer->reset();
 			}
 		}
 	}
 
 	if (!state->m_ultimax)
-		c64_bankswitch(device->machine(), 0);
+		c64_bankswitch(space.machine(), 0);
 
 	state->m_memory[0x000] = device->memory().space(AS_PROGRAM).read_byte(0);
 	state->m_memory[0x001] = device->memory().space(AS_PROGRAM).read_byte(1);
@@ -596,12 +596,12 @@ WRITE8_DEVICE_HANDLER(c64_m6510_port_write)
 
 READ8_DEVICE_HANDLER(c64_m6510_port_read)
 {
-	legacy_c64_state *state = device->machine().driver_data<legacy_c64_state>();
+	legacy_c64_state *state = space.machine().driver_data<legacy_c64_state>();
 	UINT8 data = state->m_port_data;
 
 	if (state->m_tape_on)
 	{
-		if ((device->machine().device<cassette_image_device>(CASSETTE_TAG)->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+		if ((space.machine().device<cassette_image_device>(CASSETTE_TAG)->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 			data &= ~0x10;
 		else
 			data |=  0x10;

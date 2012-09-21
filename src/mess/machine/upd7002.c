@@ -152,10 +152,10 @@ WRITE8_DEVICE_HANDLER ( uPD7002_w )
 		if (uPD7002->status & 0x08)
 		{
 			// 12 bit conversion takes 10ms
-			device->machine().scheduler().timer_set(attotime::from_msec(10), FUNC(uPD7002_conversioncomplete), uPD7002->conversion_counter, (void *)device);
+			space.machine().scheduler().timer_set(attotime::from_msec(10), FUNC(uPD7002_conversioncomplete), uPD7002->conversion_counter, (void *)device);
 		} else {
 			// 8 bit conversion takes 4ms
-			device->machine().scheduler().timer_set(attotime::from_msec(4), FUNC(uPD7002_conversioncomplete), uPD7002->conversion_counter, (void *)device);
+			space.machine().scheduler().timer_set(attotime::from_msec(4), FUNC(uPD7002_conversioncomplete), uPD7002->conversion_counter, (void *)device);
 		}
 		break;
 

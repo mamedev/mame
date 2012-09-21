@@ -114,7 +114,7 @@ READ8_DEVICE_HANDLER( megadriv_68k_YM2612_read)
 	}
 	else
 	{
-		logerror("%s: 68000 attempting to access YM2612 (read) without bus\n", device->machine().describe_context());
+		logerror("%s: 68000 attempting to access YM2612 (read) without bus\n", space.machine().describe_context());
 		return 0;
 	}
 
@@ -131,7 +131,7 @@ WRITE8_DEVICE_HANDLER( megadriv_68k_YM2612_write)
 	}
 	else
 	{
-		logerror("%s: 68000 attempting to access YM2612 (write) without bus\n", device->machine().describe_context());
+		logerror("%s: 68000 attempting to access YM2612 (write) without bus\n", space.machine().describe_context());
 	}
 }
 

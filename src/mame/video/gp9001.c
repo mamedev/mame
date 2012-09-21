@@ -434,7 +434,7 @@ static WRITE16_DEVICE_HANDLER( gp9001_devvideoram16_w )
 
 static READ16_DEVICE_HANDLER( gp9001_vdpstatus_r )
 {
-	return ((device->machine().primary_screen->vpos() + 15) % 262) >= 245;
+	return ((space.machine().primary_screen->vpos() + 15) % 262) >= 245;
 }
 
 static WRITE16_DEVICE_HANDLER( gp9001_scroll_reg_select_w )

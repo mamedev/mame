@@ -311,7 +311,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 static WRITE16_DEVICE_HANDLER( serial_transmit )
 {
-	proconn_state *state = device->machine().driver_data<proconn_state>();
+	proconn_state *state = space.machine().driver_data<proconn_state>();
 
 //Don't like the look of this, should be a clock somewhere
 //  if (offset == 0)

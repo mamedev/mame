@@ -172,7 +172,7 @@ WRITE8_DEVICE_HANDLER( vt_video_dc011_w )
 
 WRITE8_DEVICE_HANDLER( vt_video_brightness_w )
 {
-	//palette_set_color_rgb(device->machine(), 1, data, data, data);
+	//palette_set_color_rgb(space.machine(), 1, data, data, data);
 }
 
 static void vt_video_display_char(device_t *device,bitmap_ind16 &bitmap, UINT8 code,

@@ -681,20 +681,20 @@ static void init_COPS(running_machine &machine)
 */
 static WRITE8_DEVICE_HANDLER(COPS_via_out_a)
 {
-	lisa_state *state = device->machine().driver_data<lisa_state>();
+	lisa_state *state = space.machine().driver_data<lisa_state>();
 //    printf("VIA A = %02x\n", data);
     state->m_COPS_command = data;
 }
 
 static WRITE8_DEVICE_HANDLER(COPS_via_out_ca2)
 {
-	lisa_state *state = device->machine().driver_data<lisa_state>();
+	lisa_state *state = space.machine().driver_data<lisa_state>();
 	state->m_hold_COPS_data = data;
 
 	/*logerror("COPS CA2 line state : %d\n", val);*/
 
 	/*logerror("COPS_via_out_ca2 : trying to send data to VIA\n");*/
-	COPS_send_data_if_possible(device->machine());
+	COPS_send_data_if_possible(space.machine());
 }
 
 /*
@@ -713,7 +713,7 @@ static WRITE8_DEVICE_HANDLER(COPS_via_out_ca2)
 */
 static READ8_DEVICE_HANDLER(COPS_via_in_b)
 {
-	lisa_state *state = device->machine().driver_data<lisa_state>();
+	lisa_state *state = space.machine().driver_data<lisa_state>();
 	int val = 0;
 
 	if (state->m_COPS_Ready)
@@ -727,8 +727,8 @@ static READ8_DEVICE_HANDLER(COPS_via_in_b)
 
 static WRITE8_DEVICE_HANDLER(COPS_via_out_b)
 {
-	lisa_state *state = device->machine().driver_data<lisa_state>();
-	via6522_device *via_0 = device->machine().device<via6522_device>("via6522_0");
+	lisa_state *state = space.machine().driver_data<lisa_state>();
+	via6522_device *via_0 = space.machine().device<via6522_device>("via6522_0");
 
 	/* pull-up */
 	data |= (~ via_0->read(space,VIA_DDRA)) & 0x01;
@@ -738,7 +738,7 @@ static WRITE8_DEVICE_HANDLER(COPS_via_out_b)
 		if (state->m_COPS_force_unplug)
 		{
 			state->m_COPS_force_unplug = 0;
-			plug_keyboard(device->machine());
+			plug_keyboard(space.machine());
 		}
 	}
 	else
@@ -746,7 +746,7 @@ static WRITE8_DEVICE_HANDLER(COPS_via_out_b)
 		if (! state->m_COPS_force_unplug)
 		{
 			state->m_COPS_force_unplug = 1;
-			unplug_keyboard(device->machine());
+			unplug_keyboard(space.machine());
 			//reset_COPS(state);
 		}
 	}
@@ -754,7 +754,7 @@ static WRITE8_DEVICE_HANDLER(COPS_via_out_b)
 
 static WRITE8_DEVICE_HANDLER(COPS_via_out_cb2)
 {
-	device_t *speaker = device->machine().device(SPEAKER_TAG);
+	device_t *speaker = space.machine().device(SPEAKER_TAG);
 	speaker_level_w(speaker, data);
 }
 
@@ -790,7 +790,7 @@ static void COPS_via_irq_func(device_t *device, int val)
 */
 static READ8_DEVICE_HANDLER(parallel_via_in_b)
 {
-	lisa_state *state = device->machine().driver_data<lisa_state>();
+	lisa_state *state = space.machine().driver_data<lisa_state>();
 	int val = 0;
 
 	if (state->m_DISK_DIAG)

@@ -41,7 +41,7 @@ static TIMER_CALLBACK( counter_fired_callback );
 
 static READ8_DEVICE_HANDLER( zwackery_port_1_r )
 {
-	UINT8 ret = device->machine().root_device().ioport("IN1")->read();
+	UINT8 ret = space.machine().root_device().ioport("IN1")->read();
 
 	downcast<pia6821_device *>(device)->set_port_a_z_mask(ret);
 
@@ -51,7 +51,7 @@ static READ8_DEVICE_HANDLER( zwackery_port_1_r )
 
 static READ8_DEVICE_HANDLER( zwackery_port_3_r )
 {
-	UINT8 ret = device->machine().root_device().ioport("IN3")->read();
+	UINT8 ret = space.machine().root_device().ioport("IN3")->read();
 
 	downcast<pia6821_device *>(device)->set_port_a_z_mask(ret);
 
@@ -270,7 +270,7 @@ static TIMER_CALLBACK( mcr68_493_callback )
 WRITE8_DEVICE_HANDLER( zwackery_pia0_w )
 {
 	/* bit 7 is the watchdog */
-	if (!(data & 0x80)) device->machine().watchdog_reset();
+	if (!(data & 0x80)) space.machine().watchdog_reset();
 
 	/* bits 5 and 6 control hflip/vflip */
 	/* bits 3 and 4 control coin counters? */
@@ -280,7 +280,7 @@ WRITE8_DEVICE_HANDLER( zwackery_pia0_w )
 
 WRITE8_DEVICE_HANDLER( zwackery_pia1_w )
 {
-	mcr68_state *state = device->machine().driver_data<mcr68_state>();
+	mcr68_state *state = space.machine().driver_data<mcr68_state>();
 	state->m_zwackery_sound_data = (data >> 4) & 0x0f;
 }
 

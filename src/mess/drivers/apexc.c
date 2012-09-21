@@ -283,7 +283,7 @@ static WRITE8_DEVICE_HANDLER(tape_write)
 	if (image->exists())
 		image->fwrite(& data5, 1);
 
-	apexc_teletyper_putchar(device->machine(), data & 0x1f);	/* display on screen */
+	apexc_teletyper_putchar(space.machine(), data & 0x1f);	/* display on screen */
 }
 
 /*

@@ -454,7 +454,7 @@ static WRITE8_DEVICE_HANDLER(dave_sound_w)
 			count++;
 
 
-			dave->Period[channel_index] = ((STEP  * device->machine().sample_rate())/125000) * count;
+			dave->Period[channel_index] = ((STEP  * space.machine().sample_rate())/125000) * count;
 
 		}
 		break;

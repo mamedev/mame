@@ -2508,17 +2508,17 @@ static void update_psg(running_machine &machine)
 /* Read/Write 8255 PPI port A (connected to AY-3-8912 databus) */
 READ8_DEVICE_HANDLER ( amstrad_ppi_porta_r )
 {
-	amstrad_state *state = device->machine().driver_data<amstrad_state>();
-	update_psg(device->machine());
+	amstrad_state *state = space.machine().driver_data<amstrad_state>();
+	update_psg(space.machine());
 	return state->m_ppi_port_inputs[amstrad_ppi_PortA];
 }
 
 
 WRITE8_DEVICE_HANDLER ( amstrad_ppi_porta_w )
 {
-	amstrad_state *state = device->machine().driver_data<amstrad_state>();
+	amstrad_state *state = space.machine().driver_data<amstrad_state>();
 	state->m_ppi_port_outputs[amstrad_ppi_PortA] = data;
-	update_psg(device->machine());
+	update_psg(space.machine());
 }
 
 
@@ -2550,7 +2550,7 @@ Note:
 
 READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 {
-	amstrad_state *state = device->machine().driver_data<amstrad_state>();
+	amstrad_state *state = space.machine().driver_data<amstrad_state>();
 	int data = 0;
 /* Set b7 with cassette tape input */
 	if(state->m_system_type != SYSTEM_GX4000)
@@ -2582,7 +2582,7 @@ READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 
 logerror("amstrad_ppi_portb_r\n");
 	/* Schedule a write to PC2 */
-	device->machine().scheduler().timer_set( attotime::zero, FUNC(amstrad_pc2_low));
+	space.machine().scheduler().timer_set( attotime::zero, FUNC(amstrad_pc2_low));
 
 	return data;
 }
@@ -2604,7 +2604,7 @@ Bit Description  Usage
 
 WRITE8_DEVICE_HANDLER ( amstrad_ppi_portc_w )
 {
-	amstrad_state *state = device->machine().driver_data<amstrad_state>();
+	amstrad_state *state = space.machine().driver_data<amstrad_state>();
 	int changed_data;
 
 	state->m_previous_ppi_portc_w = state->m_ppi_port_outputs[amstrad_ppi_PortC];
@@ -2620,7 +2620,7 @@ WRITE8_DEVICE_HANDLER ( amstrad_ppi_portc_w )
 	state->m_aleste_rtc_function = data & 0x07;
 
 	/* Perform PSG function */
-	update_psg(device->machine());
+	update_psg(space.machine());
 
 	/* b5 Cassette Write data */
 	if(state->m_system_type != SYSTEM_GX4000)

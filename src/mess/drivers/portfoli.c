@@ -658,7 +658,7 @@ void portfolio_state::palette_init()
 static READ8_DEVICE_HANDLER( hd61830_rd_r )
 {
 	UINT16 address = ((offset & 0xff) << 3) | ((offset >> 12) & 0x07);
-	UINT8 data = device->machine().root_device().memregion(HD61830_TAG)->base()[address];
+	UINT8 data = space.machine().root_device().memregion(HD61830_TAG)->base()[address];
 
 	return data;
 }

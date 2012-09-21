@@ -242,13 +242,13 @@ READ8_DEVICE_HANDLER( kaypro_sio_r )
 	else
 	if (offset == 1)
 //      return z80sio_d_r(device, 1);
-		return kay_kbd_d_r(device->machine());
+		return kay_kbd_d_r(space.machine());
 	else
 	if (offset == 2)
 		return dynamic_cast<z80sio_device*>(device)->control_read(0);
 	else
 //      return z80sio_c_r(device, 1);
-		return kay_kbd_c_r(device->machine());
+		return kay_kbd_c_r(space.machine());
 }
 
 WRITE8_DEVICE_HANDLER( kaypro_sio_w )
@@ -258,7 +258,7 @@ WRITE8_DEVICE_HANDLER( kaypro_sio_w )
 	else
 	if (offset == 1)
 //      z80sio_d_w(device, 1, data);
-		kay_kbd_d_w(device->machine(), data);
+		kay_kbd_d_w(space.machine(), data);
 	else
 	if (offset == 2)
 		dynamic_cast<z80sio_device*>(device)->control_write(0, data);

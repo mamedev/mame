@@ -229,7 +229,7 @@ static const char *const keynames[] = {
 
 static READ8_DEVICE_HANDLER(jr100_via_read_b)
 {
-	jr100_state *state = device->machine().driver_data<jr100_state>();
+	jr100_state *state = space.machine().driver_data<jr100_state>();
 	UINT8 val = 0x1f;
 	if (keynames[state->m_keyboard_line]) {
 		val = state->ioport(keynames[state->m_keyboard_line])->read();
@@ -239,13 +239,13 @@ static READ8_DEVICE_HANDLER(jr100_via_read_b)
 
 static WRITE8_DEVICE_HANDLER(jr100_via_write_a )
 {
-	jr100_state *state = device->machine().driver_data<jr100_state>();
+	jr100_state *state = space.machine().driver_data<jr100_state>();
 	state->m_keyboard_line = data & 0x0f;
 }
 
 static WRITE8_DEVICE_HANDLER(jr100_via_write_b )
 {
-	jr100_state *state = device->machine().driver_data<jr100_state>();
+	jr100_state *state = space.machine().driver_data<jr100_state>();
 	state->m_use_pcg = (data & 0x20) ? TRUE : FALSE;
 	state->m_speaker = data>>7;
 }

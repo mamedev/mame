@@ -135,11 +135,11 @@ READ8_DEVICE_HANDLER( namco_06xx_data_r )
 	UINT8 result = 0xff;
 	int devnum;
 
-	LOG(("%s: 06XX '%s' read offset %d\n",device->machine().describe_context(),device->tag(),offset));
+	LOG(("%s: 06XX '%s' read offset %d\n",space.machine().describe_context(),device->tag(),offset));
 
 	if (!(state->m_control & 0x10))
 	{
-		logerror("%s: 06XX '%s' read in write mode %02x\n",device->machine().describe_context(),device->tag(),state->m_control);
+		logerror("%s: 06XX '%s' read in write mode %02x\n",space.machine().describe_context(),device->tag(),state->m_control);
 		return 0;
 	}
 
@@ -156,11 +156,11 @@ WRITE8_DEVICE_HANDLER( namco_06xx_data_w )
 	namco_06xx_state *state = get_safe_token(device);
 	int devnum;
 
-	LOG(("%s: 06XX '%s' write offset %d = %02x\n",device->machine().describe_context(),device->tag(),offset,data));
+	LOG(("%s: 06XX '%s' write offset %d = %02x\n",space.machine().describe_context(),device->tag(),offset,data));
 
 	if (state->m_control & 0x10)
 	{
-		logerror("%s: 06XX '%s' write in read mode %02x\n",device->machine().describe_context(),device->tag(),state->m_control);
+		logerror("%s: 06XX '%s' write in read mode %02x\n",space.machine().describe_context(),device->tag(),state->m_control);
 		return;
 	}
 
@@ -173,7 +173,7 @@ WRITE8_DEVICE_HANDLER( namco_06xx_data_w )
 READ8_DEVICE_HANDLER( namco_06xx_ctrl_r )
 {
 	namco_06xx_state *state = get_safe_token(device);
-	LOG(("%s: 06XX '%s' ctrl_r\n",device->machine().describe_context(),device->tag()));
+	LOG(("%s: 06XX '%s' ctrl_r\n",space.machine().describe_context(),device->tag()));
 	return state->m_control;
 }
 
@@ -182,7 +182,7 @@ WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w )
 	namco_06xx_state *state = get_safe_token(device);
 	int devnum;
 
-	LOG(("%s: 06XX '%s' control %02x\n",device->machine().describe_context(),device->tag(),data));
+	LOG(("%s: 06XX '%s' control %02x\n",space.machine().describe_context(),device->tag(),data));
 
 	state->m_control = data;
 

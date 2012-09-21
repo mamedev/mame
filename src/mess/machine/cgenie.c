@@ -604,13 +604,13 @@ INTERRUPT_GEN_MEMBER(cgenie_state::cgenie_frame_interrupt)
 
 READ8_DEVICE_HANDLER( cgenie_sh_control_port_r )
 {
-	cgenie_state *state = device->machine().driver_data<cgenie_state>();
+	cgenie_state *state = space.machine().driver_data<cgenie_state>();
 	return state->m_control_port;
 }
 
 WRITE8_DEVICE_HANDLER( cgenie_sh_control_port_w )
 {
-	cgenie_state *state = device->machine().driver_data<cgenie_state>();
+	cgenie_state *state = space.machine().driver_data<cgenie_state>();
 	state->m_control_port = data;
 	ay8910_address_w(device, space, offset, data);
 }

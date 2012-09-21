@@ -560,7 +560,7 @@ INPUT_PORTS_END
 ******************************************************************************/
 static WRITE8_DEVICE_HANDLER( digel804_serial_put )
 {
-	digel804_state *state = device->machine().driver_data<digel804_state>();
+	digel804_state *state = space.machine().driver_data<digel804_state>();
 	state->m_acia->receive_character(data);
 }
 

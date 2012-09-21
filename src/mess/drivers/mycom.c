@@ -420,7 +420,7 @@ WRITE8_MEMBER( mycom_state::mycom_0a_w )
 
 static WRITE8_DEVICE_HANDLER( mycom_rtc_w )
 {
-	mycom_state *state = device->machine().driver_data<mycom_state>();
+	mycom_state *state = space.machine().driver_data<mycom_state>();
 
 	state->m_rtc->address_w(data & 0x0f);
 

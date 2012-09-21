@@ -136,7 +136,7 @@ WRITE8_MEMBER(oric_state::oric_psg_porta_write)
 /* this port is also used to read printer data */
 static READ8_DEVICE_HANDLER ( oric_via_in_a_func )
 {
-	oric_state *state = device->machine().driver_data<oric_state>();
+	oric_state *state = space.machine().driver_data<oric_state>();
 
 	/*logerror("port a read\r\n"); */
 
@@ -157,10 +157,10 @@ static READ8_DEVICE_HANDLER ( oric_via_in_a_func )
 
 static READ8_DEVICE_HANDLER ( oric_via_in_b_func )
 {
-	oric_state *state = device->machine().driver_data<oric_state>();
+	oric_state *state = space.machine().driver_data<oric_state>();
 	int data;
 
-	oric_keyboard_sense_refresh(device->machine());
+	oric_keyboard_sense_refresh(space.machine());
 
 	data = state->m_key_sense_bit;
 	data |= state->m_keyboard_line & 0x07;
@@ -211,7 +211,7 @@ static void oric_psg_connection_refresh(address_space &space)
 
 static WRITE8_DEVICE_HANDLER ( oric_via_out_a_func )
 {
-	oric_state *state = device->machine().driver_data<oric_state>();
+	oric_state *state = space.machine().driver_data<oric_state>();
 	state->m_via_port_a_data = data;
 
 	oric_psg_connection_refresh(space);
@@ -220,8 +220,8 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_a_func )
 	if (state->m_psg_control==0)
 	{
 		/* if psg not selected, write to printer */
-		centronics_device *centronics = device->machine().device<centronics_device>("centronics");
-		centronics->write(device->machine().driver_data()->generic_space(), 0, data);
+		centronics_device *centronics = space.machine().device<centronics_device>("centronics");
+		centronics->write(space.machine().driver_data()->generic_space(), 0, data);
 	}
 }
 
@@ -283,20 +283,20 @@ static TIMER_CALLBACK(oric_refresh_tape)
 
 static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 {
-	oric_state *state = device->machine().driver_data<oric_state>();
-	centronics_device *centronics = device->machine().device<centronics_device>("centronics");
+	oric_state *state = space.machine().driver_data<oric_state>();
+	centronics_device *centronics = space.machine().device<centronics_device>("centronics");
 
 	/* KEYBOARD */
 	state->m_keyboard_line = data & 0x07;
 
 	/* CASSETTE */
 	/* cassette motor control */
-	cassette_device_image(device->machine())->change_state(
+	cassette_device_image(space.machine())->change_state(
 		(data & 0x40) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MOTOR_DISABLED);
 
 	/* cassette data out */
-	cassette_device_image(device->machine())->output((data & (1<<7)) ? -1.0 : +1.0);
+	cassette_device_image(space.machine())->output((data & (1<<7)) ? -1.0 : +1.0);
 
 	/* centronics STROBE is connected to PB4 */
 	centronics->strobe_w(BIT(data, 4));
@@ -308,19 +308,19 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 
 static READ8_DEVICE_HANDLER ( oric_via_in_ca2_func )
 {
-	oric_state *state = device->machine().driver_data<oric_state>();
+	oric_state *state = space.machine().driver_data<oric_state>();
 	return state->m_psg_control & 1;
 }
 
 static READ8_DEVICE_HANDLER ( oric_via_in_cb2_func )
 {
-	oric_state *state = device->machine().driver_data<oric_state>();
+	oric_state *state = space.machine().driver_data<oric_state>();
 	return (state->m_psg_control>>1) & 1;
 }
 
 static WRITE8_DEVICE_HANDLER ( oric_via_out_ca2_func )
 {
-	oric_state *state = device->machine().driver_data<oric_state>();
+	oric_state *state = space.machine().driver_data<oric_state>();
 	state->m_psg_control &=~1;
 
 	if (data)
@@ -331,7 +331,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_ca2_func )
 
 static WRITE8_DEVICE_HANDLER ( oric_via_out_cb2_func )
 {
-	oric_state *state = device->machine().driver_data<oric_state>();
+	oric_state *state = space.machine().driver_data<oric_state>();
 	state->m_psg_control &=~2;
 
 	if (data)
@@ -1280,7 +1280,7 @@ static void telestrat_refresh_mem(running_machine &machine)
 
 static READ8_DEVICE_HANDLER(telestrat_via2_in_a_func)
 {
-	oric_state *state = device->machine().driver_data<oric_state>();
+	oric_state *state = space.machine().driver_data<oric_state>();
 	//logerror("via 2 - port a %02x\n",state->m_telestrat_via2_port_a_data);
 	return state->m_telestrat_via2_port_a_data;
 }
@@ -1288,7 +1288,7 @@ static READ8_DEVICE_HANDLER(telestrat_via2_in_a_func)
 
 static WRITE8_DEVICE_HANDLER(telestrat_via2_out_a_func)
 {
-	oric_state *state = device->machine().driver_data<oric_state>();
+	oric_state *state = space.machine().driver_data<oric_state>();
 	//logerror("via 2 - port a w: %02x\n",data);
 
 	state->m_telestrat_via2_port_a_data = data;
@@ -1297,13 +1297,13 @@ static WRITE8_DEVICE_HANDLER(telestrat_via2_out_a_func)
 	{
 		state->m_telestrat_bank_selection = data & 0x07;
 
-		telestrat_refresh_mem(device->machine());
+		telestrat_refresh_mem(space.machine());
 	}
 }
 
 static READ8_DEVICE_HANDLER(telestrat_via2_in_b_func)
 {
-	oric_state *state = device->machine().driver_data<oric_state>();
+	oric_state *state = space.machine().driver_data<oric_state>();
 	unsigned char data = 0x01f;
 
 	/* left joystick selected? */
@@ -1315,7 +1315,7 @@ static READ8_DEVICE_HANDLER(telestrat_via2_in_b_func)
 	/* right joystick selected? */
 	if (state->m_telestrat_via2_port_b_data & (1<<7))
 	{
-		data &= device->machine().root_device().ioport("JOY1")->read();
+		data &= space.machine().root_device().ioport("JOY1")->read();
 	}
 
 	data |= state->m_telestrat_via2_port_b_data & ((1<<7) | (1<<6) | (1<<5));
@@ -1325,7 +1325,7 @@ static READ8_DEVICE_HANDLER(telestrat_via2_in_b_func)
 
 static WRITE8_DEVICE_HANDLER(telestrat_via2_out_b_func)
 {
-	oric_state *state = device->machine().driver_data<oric_state>();
+	oric_state *state = space.machine().driver_data<oric_state>();
 	state->m_telestrat_via2_port_b_data = data;
 }
 

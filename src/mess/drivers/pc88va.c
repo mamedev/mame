@@ -1398,14 +1398,14 @@ GFXDECODE_END
 
 static READ8_DEVICE_HANDLER( cpu_8255_c_r )
 {
-	pc88va_state *state = device->machine().driver_data<pc88va_state>();
+	pc88va_state *state = space.machine().driver_data<pc88va_state>();
 
 	return state->m_i8255_1_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
 {
-	pc88va_state *state = device->machine().driver_data<pc88va_state>();
+	pc88va_state *state = space.machine().driver_data<pc88va_state>();
 
 	state->m_i8255_0_pc = data;
 }
@@ -1422,14 +1422,14 @@ static I8255A_INTERFACE( master_fdd_intf )
 
 static READ8_DEVICE_HANDLER( fdc_8255_c_r )
 {
-	pc88va_state *state = device->machine().driver_data<pc88va_state>();
+	pc88va_state *state = space.machine().driver_data<pc88va_state>();
 
 	return state->m_i8255_0_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( fdc_8255_c_w )
 {
-	pc88va_state *state = device->machine().driver_data<pc88va_state>();
+	pc88va_state *state = space.machine().driver_data<pc88va_state>();
 
 	state->m_i8255_1_pc = data;
 }
@@ -1448,11 +1448,11 @@ static READ8_DEVICE_HANDLER( r232_ctrl_porta_r )
 {
 	UINT8 sw5, sw4, sw3, sw2,speed_sw;
 
-	speed_sw = (device->machine().root_device().ioport("SPEED_SW")->read() & 1) ? 0x20 : 0x00;
-	sw5 = (device->machine().root_device().ioport("DSW")->read() & 0x10);
-	sw4 = (device->machine().root_device().ioport("DSW")->read() & 0x08);
-	sw3 = (device->machine().root_device().ioport("DSW")->read() & 0x04);
-	sw2 = (device->machine().root_device().ioport("DSW")->read() & 0x02);
+	speed_sw = (space.machine().root_device().ioport("SPEED_SW")->read() & 1) ? 0x20 : 0x00;
+	sw5 = (space.machine().root_device().ioport("DSW")->read() & 0x10);
+	sw4 = (space.machine().root_device().ioport("DSW")->read() & 0x08);
+	sw3 = (space.machine().root_device().ioport("DSW")->read() & 0x04);
+	sw2 = (space.machine().root_device().ioport("DSW")->read() & 0x02);
 
 	return 0xc1 | sw5 | sw4 | sw3 | sw2 | speed_sw;
 }
@@ -1461,7 +1461,7 @@ static READ8_DEVICE_HANDLER( r232_ctrl_portb_r )
 {
 	UINT8 xsw1;
 
-	xsw1 = (device->machine().root_device().ioport("DSW")->read() & 1) ? 0 : 8;
+	xsw1 = (space.machine().root_device().ioport("DSW")->read() & 1) ? 0 : 8;
 
 	return 0xf7 | xsw1;
 }
@@ -1510,7 +1510,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc88va_pic_irq )
 static READ8_DEVICE_HANDLER( get_slave_ack )
 {
 	if (offset==7) { // IRQ = 7
-		return pic8259_acknowledge(device->machine().device( "pic8259_slave"));
+		return pic8259_acknowledge(space.machine().device( "pic8259_slave"));
 	}
 	return 0x00;
 }

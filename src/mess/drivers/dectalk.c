@@ -719,7 +719,7 @@ DRIVER_INIT_MEMBER(dectalk_state,dectalk)
 
 static WRITE8_DEVICE_HANDLER( dectalk_kbd_put )
 {
-	duart68681_rx_data(device->machine().device("duart68681"), 1, data);
+	duart68681_rx_data(space.machine().device("duart68681"), 1, data);
 }
 
 static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )

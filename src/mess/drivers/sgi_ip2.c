@@ -359,7 +359,7 @@ WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_stklmt_w)
 
 static WRITE8_DEVICE_HANDLER( sgi_kbd_put )
 {
-	duart68681_rx_data(device->machine().device("duart68681a"), 1, data);
+	duart68681_rx_data(space.machine().device("duart68681a"), 1, data);
 }
 
 static GENERIC_TERMINAL_INTERFACE( sgi_terminal_intf )

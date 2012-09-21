@@ -223,24 +223,24 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 
 static WRITE8_DEVICE_HANDLER(a2bus_irq_w)
 {
-    apple2_state *a2 = device->machine().driver_data<apple2_state>();
+    apple2_state *a2 = space.machine().driver_data<apple2_state>();
 
     a2->m_maincpu->set_input_line(M6502_IRQ_LINE, data);
 }
 
 static WRITE8_DEVICE_HANDLER(a2bus_nmi_w)
 {
-    apple2_state *a2 = device->machine().driver_data<apple2_state>();
+    apple2_state *a2 = space.machine().driver_data<apple2_state>();
 
     a2->m_maincpu->set_input_line(INPUT_LINE_NMI, data);
 }
 
 static WRITE8_DEVICE_HANDLER(a2bus_inh_w)
 {
-    apple2_state *a2 = device->machine().driver_data<apple2_state>();
+    apple2_state *a2 = space.machine().driver_data<apple2_state>();
 
     a2->m_inh_slot = data;
-    apple2_update_memory(device->machine());
+    apple2_update_memory(space.machine());
 }
 
 /***************************************************************************

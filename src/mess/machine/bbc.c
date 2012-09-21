@@ -908,7 +908,7 @@ static void MC146818_set(address_space &space)
 
 static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_porta )
 {
-	bbc_state *state = device->machine().driver_data<bbc_state>();
+	bbc_state *state = space.machine().driver_data<bbc_state>();
 	//logerror("SYSTEM write porta %d\n",data);
 
 	state->m_via_system_porta = data;
@@ -928,7 +928,7 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_porta )
 
 static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 {
-	bbc_state *state = device->machine().driver_data<bbc_state>();
+	bbc_state *state = space.machine().driver_data<bbc_state>();
 	int bit, value;
 	bit = data & 0x07;
 	value = (data >> 3) & 0x01;
@@ -1127,7 +1127,7 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 
 static READ8_DEVICE_HANDLER( bbcb_via_system_read_porta )
 {
-	bbc_state *state = device->machine().driver_data<bbc_state>();
+	bbc_state *state = space.machine().driver_data<bbc_state>();
 	//logerror("SYSTEM read porta %d\n",state->m_via_system_porta);
 	return state->m_via_system_porta;
 }
@@ -1158,7 +1158,7 @@ static READ8_DEVICE_HANDLER( bbcb_via_system_read_portb )
 
 	//logerror("SYSTEM read portb %d\n",0xf | input_port(machine, "IN0")|(TMSint<<6)|(TMSrdy<<7));
 
-	return (0xf | device->machine().root_device().ioport("IN0")->read()|(TMSint<<6)|(TMSrdy<<7));
+	return (0xf | space.machine().root_device().ioport("IN0")->read()|(TMSint<<6)|(TMSrdy<<7));
 }
 
 
@@ -1172,7 +1172,7 @@ static READ8_DEVICE_HANDLER( bbcb_via_system_read_ca1 )
 /* joystick EOC */
 static READ8_DEVICE_HANDLER( bbcb_via_system_read_cb1 )
 {
-	return uPD7002_EOC_r(device->machine().device("upd7002"),space,0);
+	return uPD7002_EOC_r(space.machine().device("upd7002"),space,0);
 }
 
 
@@ -1233,7 +1233,7 @@ static READ8_DEVICE_HANDLER( bbcb_via_user_read_portb )
 
 static WRITE8_DEVICE_HANDLER( bbcb_via_user_write_portb )
 {
-	bbc_state *state = device->machine().driver_data<bbc_state>();
+	bbc_state *state = space.machine().driver_data<bbc_state>();
 	state->m_userport = data;
 }
 

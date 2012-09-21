@@ -472,26 +472,26 @@ static READ8_DEVICE_HANDLER(apple3_via_1_in_b) { return ~0; }
 
 static WRITE8_DEVICE_HANDLER(apple3_via_0_out_a)
 {
-	apple3_state *state = device->machine().driver_data<apple3_state>();
-	apple3_via_out(device->machine(), &state->m_via_0_a, data);
+	apple3_state *state = space.machine().driver_data<apple3_state>();
+	apple3_via_out(space.machine(), &state->m_via_0_a, data);
 }
 
 static WRITE8_DEVICE_HANDLER(apple3_via_0_out_b)
 {
-	apple3_state *state = device->machine().driver_data<apple3_state>();
-	apple3_via_out(device->machine(), &state->m_via_0_b, data);
+	apple3_state *state = space.machine().driver_data<apple3_state>();
+	apple3_via_out(space.machine(), &state->m_via_0_b, data);
 }
 
 static WRITE8_DEVICE_HANDLER(apple3_via_1_out_a)
 {
-	apple3_state *state = device->machine().driver_data<apple3_state>();
-	apple3_via_out(device->machine(), &state->m_via_1_a, data);
+	apple3_state *state = space.machine().driver_data<apple3_state>();
+	apple3_via_out(space.machine(), &state->m_via_1_a, data);
 }
 
 static WRITE8_DEVICE_HANDLER(apple3_via_1_out_b)
 {
-	apple3_state *state = device->machine().driver_data<apple3_state>();
-	apple3_via_out(device->machine(), &state->m_via_1_b, data);
+	apple3_state *state = space.machine().driver_data<apple3_state>();
+	apple3_via_out(space.machine(), &state->m_via_1_b, data);
 }
 
 static void apple2_via_1_irq_func(device_t *device, int state)

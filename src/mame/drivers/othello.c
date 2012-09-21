@@ -252,7 +252,7 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 {
-	othello_state *state = device->machine().driver_data<othello_state>();
+	othello_state *state = space.machine().driver_data<othello_state>();
 
 	/* P4 - address lines 0-3 */
 	/* P5 - address lines 4-7 */

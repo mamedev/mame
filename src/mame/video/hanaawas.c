@@ -81,11 +81,11 @@ WRITE8_MEMBER(hanaawas_state::hanaawas_colorram_w)
 WRITE8_DEVICE_HANDLER( hanaawas_portB_w )
 {
 	/* bit 7 is flip screen */
-	hanaawas_state *state = device->machine().driver_data<hanaawas_state>();
+	hanaawas_state *state = space.machine().driver_data<hanaawas_state>();
 	if (state->flip_screen() != (~data & 0x80))
 	{
 		state->flip_screen_set(~data & 0x80);
-		device->machine().tilemap().mark_all_dirty();
+		space.machine().tilemap().mark_all_dirty();
 	}
 }
 

@@ -165,7 +165,7 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
 /* handle writes to the UPD7759 */
 static WRITE16_DEVICE_HANDLER( segac2_upd7759_w )
 {
-	segac2_state *state = device->machine().driver_data<segac2_state>();
+	segac2_state *state = space.machine().driver_data<segac2_state>();
 
 	/* make sure we have a UPD chip */
 	if (!state->m_sound_banks)

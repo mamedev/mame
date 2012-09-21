@@ -201,7 +201,7 @@ WRITE8_MEMBER(esripsys_state::fdt_w)
 
 static READ16_DEVICE_HANDLER( fdt_rip_r )
 {
-	esripsys_state *state = device->machine().driver_data<esripsys_state>();
+	esripsys_state *state = space.machine().driver_data<esripsys_state>();
 	offset = (offset & 0x7ff) << 1;
 
 	if (!state->m_fasel)
@@ -212,7 +212,7 @@ static READ16_DEVICE_HANDLER( fdt_rip_r )
 
 static WRITE16_DEVICE_HANDLER( fdt_rip_w )
 {
-	esripsys_state *state = device->machine().driver_data<esripsys_state>();
+	esripsys_state *state = space.machine().driver_data<esripsys_state>();
 	offset = (offset & 0x7ff) << 1;
 
 	if (!state->m_fasel)

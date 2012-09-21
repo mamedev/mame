@@ -148,11 +148,11 @@ static READ8_DEVICE_HANDLER ( svi318_ppi_port_a_r )
 {
 	int data = 0x0f;
 
-	if ((device->machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0038)
+	if ((space.machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0038)
 		data |= 0x80;
-	if (!svi318_cassette_present(device->machine(), 0))
+	if (!svi318_cassette_present(space.machine(), 0))
 		data |= 0x40;
-	data |= device->machine().root_device().ioport("BUTTONS")->read() & 0x30;
+	data |= space.machine().root_device().ioport("BUTTONS")->read() & 0x30;
 
 	return data;
 }
@@ -172,7 +172,7 @@ static READ8_DEVICE_HANDLER ( svi318_ppi_port_a_r )
 
 static READ8_DEVICE_HANDLER ( svi318_ppi_port_b_r )
 {
-	svi318_state *state = device->machine().driver_data<svi318_state>();
+	svi318_state *state = space.machine().driver_data<svi318_state>();
 	int row;
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5",
@@ -181,7 +181,7 @@ static READ8_DEVICE_HANDLER ( svi318_ppi_port_b_r )
 
 	row = state->m_svi.keyboard_row;
 	if (row <= 10)
-		return device->machine().root_device().ioport(keynames[row])->read();
+		return space.machine().root_device().ioport(keynames[row])->read();
 
 	return 0xff;
 }
@@ -201,25 +201,25 @@ static READ8_DEVICE_HANDLER ( svi318_ppi_port_b_r )
 
 static WRITE8_DEVICE_HANDLER ( svi318_ppi_port_c_w )
 {
-	svi318_state *state = device->machine().driver_data<svi318_state>();
+	svi318_state *state = space.machine().driver_data<svi318_state>();
 	int val;
 
 	/* key click */
 	val = (data & 0x80) ? 0x3e : 0;
 	val += (data & 0x40) ? 0x3e : 0;
-	device->machine().device<dac_device>("dac")->write_signed8(val);
+	space.machine().device<dac_device>("dac")->write_signed8(val);
 
 	/* cassette motor on/off */
-	if (svi318_cassette_present(device->machine(), 0))
+	if (svi318_cassette_present(space.machine(), 0))
 	{
 
-			device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(
+			space.machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(
 			(data & 0x10) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,
 			CASSETTE_MOTOR_DISABLED);
 	}
 
 	/* cassette signal write */
-	device->machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x20) ? -1.0 : +1.0);
+	space.machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x20) ? -1.0 : +1.0);
 
 	state->m_svi.keyboard_row = data & 0x0F;
 }

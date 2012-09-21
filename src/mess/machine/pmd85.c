@@ -261,22 +261,22 @@ static  READ8_DEVICE_HANDLER ( pmd85_ppi_0_portc_r )
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_0_porta_w )
 {
-	pmd85_state *state = device->machine().driver_data<pmd85_state>();
+	pmd85_state *state = space.machine().driver_data<pmd85_state>();
 	state->m_ppi_port_outputs[0][0] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_0_portb_w )
 {
-	pmd85_state *state = device->machine().driver_data<pmd85_state>();
+	pmd85_state *state = space.machine().driver_data<pmd85_state>();
 	state->m_ppi_port_outputs[0][1] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_0_portc_w )
 {
-	pmd85_state *state = device->machine().driver_data<pmd85_state>();
+	pmd85_state *state = space.machine().driver_data<pmd85_state>();
 	state->m_ppi_port_outputs[0][2] = data;
-	set_led_status(device->machine(), PMD85_LED_2, (data & 0x08) ? 1 : 0);
-	set_led_status(device->machine(), PMD85_LED_3, (data & 0x04) ? 1 : 0);
+	set_led_status(space.machine(), PMD85_LED_2, (data & 0x08) ? 1 : 0);
+	set_led_status(space.machine(), PMD85_LED_3, (data & 0x04) ? 1 : 0);
 }
 
 /*******************************************************************************
@@ -309,10 +309,10 @@ static  READ8_DEVICE_HANDLER ( mato_ppi_0_portc_r )
 
 static WRITE8_DEVICE_HANDLER ( mato_ppi_0_portc_w )
 {
-	pmd85_state *state = device->machine().driver_data<pmd85_state>();
+	pmd85_state *state = space.machine().driver_data<pmd85_state>();
 	state->m_ppi_port_outputs[0][2] = data;
-	set_led_status(device->machine(), PMD85_LED_2, BIT(data, 3));
-	set_led_status(device->machine(), PMD85_LED_3, BIT(data, 2));
+	set_led_status(space.machine(), PMD85_LED_2, BIT(data, 3));
+	set_led_status(space.machine(), PMD85_LED_3, BIT(data, 2));
 }
 
 /*******************************************************************************
@@ -340,19 +340,19 @@ static READ8_DEVICE_HANDLER ( pmd85_ppi_1_portc_r )
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_1_porta_w )
 {
-	pmd85_state *state = device->machine().driver_data<pmd85_state>();
+	pmd85_state *state = space.machine().driver_data<pmd85_state>();
 	state->m_ppi_port_outputs[1][0] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_1_portb_w )
 {
-	pmd85_state *state = device->machine().driver_data<pmd85_state>();
+	pmd85_state *state = space.machine().driver_data<pmd85_state>();
 	state->m_ppi_port_outputs[1][1] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_1_portc_w )
 {
-	pmd85_state *state = device->machine().driver_data<pmd85_state>();
+	pmd85_state *state = space.machine().driver_data<pmd85_state>();
 	state->m_ppi_port_outputs[1][2] = data;
 }
 
@@ -385,19 +385,19 @@ static READ8_DEVICE_HANDLER ( pmd85_ppi_2_portc_r )
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_2_porta_w )
 {
-	pmd85_state *state = device->machine().driver_data<pmd85_state>();
+	pmd85_state *state = space.machine().driver_data<pmd85_state>();
 	state->m_ppi_port_outputs[2][0] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_2_portb_w )
 {
-	pmd85_state *state = device->machine().driver_data<pmd85_state>();
+	pmd85_state *state = space.machine().driver_data<pmd85_state>();
 	state->m_ppi_port_outputs[2][1] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_2_portc_w )
 {
-	pmd85_state *state = device->machine().driver_data<pmd85_state>();
+	pmd85_state *state = space.machine().driver_data<pmd85_state>();
 	state->m_ppi_port_outputs[2][2] = data;
 }
 
@@ -458,7 +458,7 @@ const struct pit8253_config pmd85_pit8253_interface =
 
 static READ8_DEVICE_HANDLER ( pmd85_ppi_3_porta_r )
 {
-	pmd85_state *state = device->machine().driver_data<pmd85_state>();
+	pmd85_state *state = space.machine().driver_data<pmd85_state>();
 	if (state->memregion("user1")->base() != NULL)
 		return state->memregion("user1")->base()[state->m_ppi_port_outputs[3][1] | (state->m_ppi_port_outputs[3][2] << 8)];
 	else
@@ -477,19 +477,19 @@ static READ8_DEVICE_HANDLER ( pmd85_ppi_3_portc_r )
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_3_porta_w )
 {
-	pmd85_state *state = device->machine().driver_data<pmd85_state>();
+	pmd85_state *state = space.machine().driver_data<pmd85_state>();
 	state->m_ppi_port_outputs[3][0] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_3_portb_w )
 {
-	pmd85_state *state = device->machine().driver_data<pmd85_state>();
+	pmd85_state *state = space.machine().driver_data<pmd85_state>();
 	state->m_ppi_port_outputs[3][1] = data;
 }
 
 static WRITE8_DEVICE_HANDLER ( pmd85_ppi_3_portc_w )
 {
-	pmd85_state *state = device->machine().driver_data<pmd85_state>();
+	pmd85_state *state = space.machine().driver_data<pmd85_state>();
 	state->m_ppi_port_outputs[3][2] = data;
 }
 

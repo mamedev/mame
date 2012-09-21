@@ -2207,7 +2207,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc9801_master_set_int_line )
 static READ8_DEVICE_HANDLER( get_slave_ack )
 {
 	if (offset==7) { // IRQ = 7
-		return	pic8259_acknowledge( device->machine().device( "pic8259_slave" ));
+		return	pic8259_acknowledge( space.machine().device( "pic8259_slave" ));
 	}
 	return 0x00;
 }
@@ -2348,7 +2348,7 @@ static READ8_DEVICE_HANDLER( ppi_prn_portb_r ) { return device->machine().root_d
 
 static WRITE8_DEVICE_HANDLER( ppi_sys_portc_w )
 {
-	beep_set_state(device->machine().device(BEEPER_TAG),!(data & 0x08));
+	beep_set_state(space.machine().device(BEEPER_TAG),!(data & 0x08));
 }
 
 static I8255A_INTERFACE( ppi_system_intf )
@@ -2378,17 +2378,17 @@ static READ8_DEVICE_HANDLER( ppi_fdd_porta_r )
 
 static READ8_DEVICE_HANDLER( ppi_fdd_portb_r )
 {
-	return 0xff; //upd765_status_r(device->machine().device("upd765_2dd"),space, 0);
+	return 0xff; //upd765_status_r(space.machine().device("upd765_2dd"),space, 0);
 }
 
 static READ8_DEVICE_HANDLER( ppi_fdd_portc_r )
 {
-	return 0xff; //upd765_data_r(device->machine().device("upd765_2dd"),space, 0);
+	return 0xff; //upd765_data_r(space.machine().device("upd765_2dd"),space, 0);
 }
 
 static WRITE8_DEVICE_HANDLER( ppi_fdd_portc_w )
 {
-	//upd765_data_w(device->machine().device("upd765_2dd"),space, 0,data);
+	//upd765_data_w(space.machine().device("upd765_2dd"),space, 0,data);
 }
 
 static I8255A_INTERFACE( ppi_fdd_intf )

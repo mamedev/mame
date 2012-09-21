@@ -158,14 +158,14 @@ static WRITE_LINE_DEVICE_HANDLER( dleuro_interrupt )
 
 static WRITE16_DEVICE_HANDLER( serial_transmit )
 {
-	dlair_state *state = device->machine().driver_data<dlair_state>();
+	dlair_state *state = space.machine().driver_data<dlair_state>();
 	state->laserdisc_data_w(data);
 }
 
 
 static READ16_DEVICE_HANDLER( serial_receive )
 {
-	dlair_state *state = device->machine().driver_data<dlair_state>();
+	dlair_state *state = space.machine().driver_data<dlair_state>();
 	/* if we still have data to send, do it now */
 	if (offset == 0 && state->laserdisc_data_available_r() == ASSERT_LINE)
 		return state->laserdisc_data_r();

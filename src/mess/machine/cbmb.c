@@ -59,7 +59,7 @@ static TIMER_CALLBACK( cbmb_frame_interrupt );
  */
 READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r )
 {
-	cbmb_state *state = device->machine().driver_data<cbmb_state>();
+	cbmb_state *state = space.machine().driver_data<cbmb_state>();
 	UINT8 data = 0;
 
 	if (state->m_ieee->nrfd_r())
@@ -85,7 +85,7 @@ READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r )
 
 WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_a_w )
 {
-	cbmb_state *state = device->machine().driver_data<cbmb_state>();
+	cbmb_state *state = space.machine().driver_data<cbmb_state>();
 
 	state->m_ieee->nrfd_w(BIT(data, 7));
 	state->m_ieee->ndac_w(BIT(data, 6));
@@ -97,7 +97,7 @@ WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_a_w )
 
 READ8_DEVICE_HANDLER( cbmb_tpi0_port_b_r )
 {
-	cbmb_state *state = device->machine().driver_data<cbmb_state>();
+	cbmb_state *state = space.machine().driver_data<cbmb_state>();
 	UINT8 data = 0;
 
 	if (state->m_ieee->srq_r())
@@ -111,7 +111,7 @@ READ8_DEVICE_HANDLER( cbmb_tpi0_port_b_r )
 
 WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_b_w )
 {
-	cbmb_state *state = device->machine().driver_data<cbmb_state>();
+	cbmb_state *state = space.machine().driver_data<cbmb_state>();
 
 	state->m_ieee->srq_w(BIT(data, 1));
 	state->m_ieee->ifc_w(BIT(data, 0));
@@ -131,40 +131,40 @@ WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_b_w )
   port a7..a0 b7..b0 keyboard input */
 WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_a )
 {
-	cbmb_state *state = device->machine().driver_data<cbmb_state>();
+	cbmb_state *state = space.machine().driver_data<cbmb_state>();
 	state->m_keyline_a = data;
 }
 
 WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_b )
 {
-	cbmb_state *state = device->machine().driver_data<cbmb_state>();
+	cbmb_state *state = space.machine().driver_data<cbmb_state>();
 	state->m_keyline_b = data;
 }
 
 WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_c )
 {
-	cbmb_state *state = device->machine().driver_data<cbmb_state>();
+	cbmb_state *state = space.machine().driver_data<cbmb_state>();
 	state->m_keyline_c = data;
 }
 
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_a )
 {
-	cbmb_state *state = device->machine().driver_data<cbmb_state>();
+	cbmb_state *state = space.machine().driver_data<cbmb_state>();
 	int data = 0;
 	if (!(state->m_keyline_c & 0x01))
-		data |= device->machine().root_device().ioport("ROW0")->read();
+		data |= space.machine().root_device().ioport("ROW0")->read();
 
 	if (!(state->m_keyline_c & 0x02))
-		data |= device->machine().root_device().ioport("ROW2")->read();
+		data |= space.machine().root_device().ioport("ROW2")->read();
 
 	if (!(state->m_keyline_c & 0x04))
-		data |= device->machine().root_device().ioport("ROW4")->read();
+		data |= space.machine().root_device().ioport("ROW4")->read();
 
 	if (!(state->m_keyline_c & 0x08))
-		data |= device->machine().root_device().ioport("ROW6")->read();
+		data |= space.machine().root_device().ioport("ROW6")->read();
 
 	if (!(state->m_keyline_c & 0x10))
-		data |= device->machine().root_device().ioport("ROW8")->read();
+		data |= space.machine().root_device().ioport("ROW8")->read();
 
 	if (!(state->m_keyline_c & 0x20))
 		data |= state->ioport("ROW10")->read();
@@ -174,22 +174,22 @@ READ8_DEVICE_HANDLER( cbmb_keyboard_line_a )
 
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_b )
 {
-	cbmb_state *state = device->machine().driver_data<cbmb_state>();
+	cbmb_state *state = space.machine().driver_data<cbmb_state>();
 	int data = 0;
 	if (!(state->m_keyline_c & 0x01))
-		data |= device->machine().root_device().ioport("ROW1")->read();
+		data |= space.machine().root_device().ioport("ROW1")->read();
 
 	if (!(state->m_keyline_c & 0x02))
-		data |= device->machine().root_device().ioport("ROW3")->read();
+		data |= space.machine().root_device().ioport("ROW3")->read();
 
 	if (!(state->m_keyline_c & 0x04))
-		data |= device->machine().root_device().ioport("ROW5")->read();
+		data |= space.machine().root_device().ioport("ROW5")->read();
 
 	if (!(state->m_keyline_c & 0x08))
-		data |= device->machine().root_device().ioport("ROW7")->read();
+		data |= space.machine().root_device().ioport("ROW7")->read();
 
 	if (!(state->m_keyline_c & 0x10))
-		data |= device->machine().root_device().ioport("ROW9")->read() | ((device->machine().root_device().ioport("SPECIAL")->read() & 0x04) ? 1 : 0 );
+		data |= space.machine().root_device().ioport("ROW9")->read() | ((space.machine().root_device().ioport("SPECIAL")->read() & 0x04) ? 1 : 0 );
 
 	if (!(state->m_keyline_c & 0x20))
 		data |= state->ioport("ROW11")->read();
@@ -200,28 +200,28 @@ READ8_DEVICE_HANDLER( cbmb_keyboard_line_b )
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_c )
 {
 	int data = 0;
-	cbmb_state *state = device->machine().driver_data<cbmb_state>();
-	if ((device->machine().root_device().ioport("ROW0")->read() & ~state->m_keyline_a) ||
-				(device->machine().root_device().ioport("ROW1")->read() & ~state->m_keyline_b))
+	cbmb_state *state = space.machine().driver_data<cbmb_state>();
+	if ((space.machine().root_device().ioport("ROW0")->read() & ~state->m_keyline_a) ||
+				(space.machine().root_device().ioport("ROW1")->read() & ~state->m_keyline_b))
 		 data |= 0x01;
 
-	if ((device->machine().root_device().ioport("ROW2")->read() & ~state->m_keyline_a) ||
-				(device->machine().root_device().ioport("ROW3")->read() & ~state->m_keyline_b))
+	if ((space.machine().root_device().ioport("ROW2")->read() & ~state->m_keyline_a) ||
+				(space.machine().root_device().ioport("ROW3")->read() & ~state->m_keyline_b))
 		 data |= 0x02;
 
-	if ((device->machine().root_device().ioport("ROW4")->read() & ~state->m_keyline_a) ||
-				(device->machine().root_device().ioport("ROW5")->read() & ~state->m_keyline_b))
+	if ((space.machine().root_device().ioport("ROW4")->read() & ~state->m_keyline_a) ||
+				(space.machine().root_device().ioport("ROW5")->read() & ~state->m_keyline_b))
 		 data |= 0x04;
 
-	if ((device->machine().root_device().ioport("ROW6")->read() & ~state->m_keyline_a) ||
-				(device->machine().root_device().ioport("ROW7")->read() & ~state->m_keyline_b))
+	if ((space.machine().root_device().ioport("ROW6")->read() & ~state->m_keyline_a) ||
+				(space.machine().root_device().ioport("ROW7")->read() & ~state->m_keyline_b))
 		 data |= 0x08;
 
-	if ((device->machine().root_device().ioport("ROW8")->read() & ~state->m_keyline_a) ||
-				((device->machine().root_device().ioport("ROW9")->read() | ((device->machine().root_device().ioport("SPECIAL")->read() & 0x04) ? 1 : 0)) & ~state->m_keyline_b))
+	if ((space.machine().root_device().ioport("ROW8")->read() & ~state->m_keyline_a) ||
+				((space.machine().root_device().ioport("ROW9")->read() | ((space.machine().root_device().ioport("SPECIAL")->read() & 0x04) ? 1 : 0)) & ~state->m_keyline_b))
 		 data |= 0x10;
 
-	if ((device->machine().root_device().ioport("ROW10")->read() & ~state->m_keyline_a) ||
+	if ((space.machine().root_device().ioport("ROW10")->read() & ~state->m_keyline_a) ||
 				(state->ioport("ROW11")->read() & ~state->m_keyline_b))
 		 data |= 0x20;
 

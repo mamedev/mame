@@ -100,7 +100,7 @@ WRITE8_DEVICE_HANDLER( namco_51xx_write )
 
 	data &= 0x07;
 
-	LOG(("%s: custom 51XX write %02x\n",device->machine().describe_context(),data));
+	LOG(("%s: custom 51XX write %02x\n",space.machine().describe_context(),data));
 
 	if (state->m_coincred_mode)
 	{
@@ -130,9 +130,9 @@ WRITE8_DEVICE_HANDLER( namco_51xx_write )
 					static int namcoio_51XX_kludge = 0;
 
 					/* Only compute namcoio_51XX_kludge when gamedrv changes */
-					if (namcoio_51XX_driver != &device->machine().system())
+					if (namcoio_51XX_driver != &space.machine().system())
 					{
-						namcoio_51XX_driver = &device->machine().system();
+						namcoio_51XX_driver = &space.machine().system();
 						if (strcmp(namcoio_51XX_driver->name, "xevious") == 0 ||
 							strcmp(namcoio_51XX_driver->parent, "xevious") == 0)
 							namcoio_51XX_kludge = 1;
@@ -198,7 +198,7 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 {
 	namco_51xx_state *state = get_safe_token(device);
 
-	LOG(("%s: custom 51XX read\n",device->machine().describe_context()));
+	LOG(("%s: custom 51XX read\n",space.machine().describe_context()));
 
 	if (state->m_mode == 0)	/* switch mode */
 	{
@@ -265,7 +265,7 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 
 					if (state->m_mode == 1)
 					{
-						int on = (device->machine().primary_screen->frame_number() & 0x10) >> 4;
+						int on = (space.machine().primary_screen->frame_number() & 0x10) >> 4;
 
 						if (state->m_credits >= 2)
 							WRITE_PORT(state,0,0x0c | 3*on);	// lamps

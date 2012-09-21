@@ -130,14 +130,14 @@ Notes (couriersud)
 
 static WRITE8_DEVICE_HANDLER( ic8j1_output_changed )
 {
-	m10_state *state = device->machine().driver_data<m10_state>();
-	LOG(("ic8j1: %d %d\n", data, device->machine().primary_screen->vpos()));
+	m10_state *state = space.machine().driver_data<m10_state>();
+	LOG(("ic8j1: %d %d\n", data, space.machine().primary_screen->vpos()));
 	state->m_maincpu->set_input_line(0, !data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( ic8j2_output_changed )
 {
-	m10_state *state = device->machine().driver_data<m10_state>();
+	m10_state *state = space.machine().driver_data<m10_state>();
 
 	/* written from /Q to A with slight delight */
 	LOG(("ic8j2: %d\n", data));

@@ -330,7 +330,7 @@ WRITE8_MEMBER( bml3_state::bml3_psg_latch_w)
 
 static READ8_DEVICE_HANDLER( bml3_ym2203_r )
 {
-	bml3_state *state = device->machine().driver_data<bml3_state>();
+	bml3_state *state = space.machine().driver_data<bml3_state>();
 	UINT8 dev_offs = ((state->m_psg_latch & 3) != 3);
 
 	return ym2203_r(device,space, dev_offs);
@@ -338,7 +338,7 @@ static READ8_DEVICE_HANDLER( bml3_ym2203_r )
 
 static WRITE8_DEVICE_HANDLER( bml3_ym2203_w )
 {
-	bml3_state *state = device->machine().driver_data<bml3_state>();
+	bml3_state *state = space.machine().driver_data<bml3_state>();
 	UINT8 dev_offs = ((state->m_psg_latch & 3) != 3);
 
 	ym2203_w(device,space, dev_offs,data);

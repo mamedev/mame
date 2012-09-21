@@ -374,7 +374,7 @@ static const pia6821_interface pia_4_intf =
 
 static WRITE8_DEVICE_HANDLER( ic60_74123_output_changed)
 {
-	pia6821_device *pia2 = device->machine().device<pia6821_device>("pia2");
+	pia6821_device *pia2 = space.machine().device<pia6821_device>("pia2");
 	pia2->ca1_w(data);
 }
 

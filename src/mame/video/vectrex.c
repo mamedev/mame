@@ -323,7 +323,7 @@ static void vectrex_multiplexer(running_machine &machine, int mux)
 
 static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 {
-	vectrex_state *state = device->machine().driver_data<vectrex_state>();
+	vectrex_state *state = space.machine().driver_data<vectrex_state>();
 	if (!(data & 0x80))
 	{
 		/* RAMP is active */
@@ -362,7 +362,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 						+(double)(state->m_pen_y - state->m_y_int) * (state->m_pen_y - state->m_y_int);
 					d2 = b2 - ab * ab / a2;
 					if (d2 < 2e10 && state->m_analog[A_Z] * state->m_blank > 0)
-						state->m_lp_t->adjust(attotime::from_double(ab / a2 / (device->machine().device("maincpu")->unscaled_clock() * INT_PER_CLOCK)));
+						state->m_lp_t->adjust(attotime::from_double(ab / a2 / (space.machine().device("maincpu")->unscaled_clock() * INT_PER_CLOCK)));
 				}
 			}
 		}
@@ -370,7 +370,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 		if (!(data & 0x1) && (state->m_via_out[PORTB] & 0x1))
 		{
 			/* MUX has been enabled */
-			device->machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), FUNC(update_signal));
+			space.machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), FUNC(update_signal));
 		}
 	}
 	else
@@ -387,7 +387,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 	/* Cartridge bank-switching */
 	if (state->m_64k_cart && ((data ^ state->m_via_out[PORTB]) & 0x40))
 	{
-		device_t &root_device = device->machine().root_device();
+		device_t &root_device = space.machine().root_device();
 
 		root_device.membank("bank1")->set_base(root_device.memregion("maincpu")->base() + ((data & 0x40) ? 0x10000 : 0x0000));
 	}
@@ -395,7 +395,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 	/* Sound */
 	if (data & 0x10)
 	{
-		device_t *ay8912 = device->machine().device("ay8912");
+		device_t *ay8912 = space.machine().device("ay8912");
 
 		if (data & 0x08) /* BC1 (do we select a reg or write it ?) */
 			ay8910_address_w(ay8912, space, 0, state->m_via_out[PORTA]);
@@ -404,35 +404,35 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 	}
 
 	if (!(data & 0x1) && (state->m_via_out[PORTB] & 0x1))
-		vectrex_multiplexer (device->machine(), (data >> 1) & 0x3);
+		vectrex_multiplexer (space.machine(), (data >> 1) & 0x3);
 
 	state->m_via_out[PORTB] = data;
-	device->machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), FUNC(update_signal), data & 0x80, &state->m_ramp);
+	space.machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), FUNC(update_signal), data & 0x80, &state->m_ramp);
 }
 
 
 static WRITE8_DEVICE_HANDLER(v_via_pa_w)
 {
-	vectrex_state *state = device->machine().driver_data<vectrex_state>();
+	vectrex_state *state = space.machine().driver_data<vectrex_state>();
 	/* DAC output always goes to Y integrator */
 	state->m_via_out[PORTA] = data;
-	device->machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), FUNC(update_signal), data, &state->m_analog[A_Y]);
+	space.machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), FUNC(update_signal), data, &state->m_analog[A_Y]);
 
 	if (!(state->m_via_out[PORTB] & 0x1))
-		vectrex_multiplexer (device->machine(), (state->m_via_out[PORTB] >> 1) & 0x3);
+		vectrex_multiplexer (space.machine(), (state->m_via_out[PORTB] >> 1) & 0x3);
 }
 
 
 static WRITE8_DEVICE_HANDLER(v_via_ca2_w)
 {
 	if (data == 0)
-		device->machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), FUNC(vectrex_zero_integrators));
+		space.machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), FUNC(vectrex_zero_integrators));
 }
 
 
 static WRITE8_DEVICE_HANDLER(v_via_cb2_w)
 {
-	vectrex_state *state = device->machine().driver_data<vectrex_state>();
+	vectrex_state *state = space.machine().driver_data<vectrex_state>();
 	int dx, dy;
 
 	if (state->m_cb2 != data)
@@ -451,11 +451,11 @@ static WRITE8_DEVICE_HANDLER(v_via_cb2_w)
 				dx = abs(state->m_pen_x - state->m_x_int);
 				dy = abs(state->m_pen_y - state->m_y_int);
 				if (dx < 500000 && dy < 500000 && data > 0)
-					device->machine().scheduler().timer_set(attotime::zero, FUNC(lightpen_trigger));
+					space.machine().scheduler().timer_set(attotime::zero, FUNC(lightpen_trigger));
 			}
 		}
 
-		device->machine().scheduler().timer_set(attotime::zero, FUNC(update_signal), data, &state->m_blank);
+		space.machine().scheduler().timer_set(attotime::zero, FUNC(update_signal), data, &state->m_blank);
 		state->m_cb2 = data;
 	}
 }

@@ -73,7 +73,7 @@ INPUT_CHANGED_MEMBER(palm_state::button_check)
 
 static WRITE8_DEVICE_HANDLER( palm_port_f_out )
 {
-	palm_state *state = device->machine().driver_data<palm_state>();
+	palm_state *state = space.machine().driver_data<palm_state>();
 	state->m_port_f_latch = data;
 }
 
@@ -84,19 +84,19 @@ static READ8_DEVICE_HANDLER( palm_port_c_in )
 
 static READ8_DEVICE_HANDLER( palm_port_f_in )
 {
-	palm_state *state = device->machine().driver_data<palm_state>();
+	palm_state *state = space.machine().driver_data<palm_state>();
 	return state->m_port_f_latch;
 }
 
 static WRITE16_DEVICE_HANDLER( palm_spim_out )
 {
-	palm_state *state = device->machine().driver_data<palm_state>();
+	palm_state *state = space.machine().driver_data<palm_state>();
 	state->m_spim_data = data;
 }
 
 static READ16_DEVICE_HANDLER( palm_spim_in )
 {
-	palm_state *state = device->machine().driver_data<palm_state>();
+	palm_state *state = space.machine().driver_data<palm_state>();
 	return state->m_spim_data;
 }
 
@@ -159,7 +159,7 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( palm_dac_transition )
 {
-	palm_state *state = device->machine().driver_data<palm_state>();
+	palm_state *state = space.machine().driver_data<palm_state>();
 	state->m_dac->write_unsigned8(0x7f * data );
 }
 

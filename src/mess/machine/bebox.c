@@ -481,7 +481,7 @@ static WRITE_LINE_DEVICE_HANDLER( bebox_pic8259_slave_set_int_line )
 
 static READ8_DEVICE_HANDLER( get_slave_ack )
 {
-	bebox_state *state = device->machine().driver_data<bebox_state>();
+	bebox_state *state = space.machine().driver_data<bebox_state>();
 	if (offset==2) { // IRQ = 2
 		return pic8259_acknowledge(state->m_devices.pic8259_slave);
 	}
@@ -696,12 +696,12 @@ static WRITE8_HANDLER( bebox_dma_write_byte )
 
 
 static READ8_DEVICE_HANDLER( bebox_dma8237_fdc_dack_r ) {
-	return pc_fdc_dack_r(device->machine(),space);
+	return pc_fdc_dack_r(space.machine(),space);
 }
 
 
 static WRITE8_DEVICE_HANDLER( bebox_dma8237_fdc_dack_w ) {
-	pc_fdc_dack_w( device->machine(), space, data );
+	pc_fdc_dack_w( space.machine(), space, data );
 }
 
 

@@ -236,7 +236,7 @@ void ms0515_state::palette_init()
 
 static WRITE8_DEVICE_HANDLER(ms0515_portc_w)
 {
-	ms0515_state *state = device->machine().driver_data<ms0515_state>();
+	ms0515_state *state = space.machine().driver_data<ms0515_state>();
 	state->m_sysreg = data;
 }
 I8255A_INTERFACE( ms0515_ppi8255_interface_1 )

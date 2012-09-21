@@ -308,7 +308,7 @@ UINT32 nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 static READ8_DEVICE_HANDLER (nanos_port_a_r)
 {
-	nanos_state *state = device->machine().driver_data<nanos_state>();
+	nanos_state *state = space.machine().driver_data<nanos_state>();
 	UINT8 retVal;
 	if (state->m_key_command==0)  {
 		return state->m_key_pressed;
@@ -327,12 +327,12 @@ static READ8_DEVICE_HANDLER (nanos_port_b_r)
 
 static WRITE8_DEVICE_HANDLER (nanos_port_b_w)
 {
-	nanos_state *state = device->machine().driver_data<nanos_state>();
+	nanos_state *state = space.machine().driver_data<nanos_state>();
 	state->m_key_command = BIT(data,1);
 	if (BIT(data,7)) {
 		state->membank("bank1")->set_base(state->memregion("maincpu")->base());
 	} else {
-		state->membank("bank1")->set_base(device->machine().device<ram_device>(RAM_TAG)->pointer());
+		state->membank("bank1")->set_base(space.machine().device<ram_device>(RAM_TAG)->pointer());
 	}
 }
 

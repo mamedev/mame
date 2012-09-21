@@ -72,16 +72,16 @@ static void c65_nmi( running_machine &machine )
 
 static READ8_DEVICE_HANDLER( c65_cia0_port_a_r )
 {
-	UINT8 cia0portb = mos6526_pb_r(device->machine().device("cia_0"), space, 0);
+	UINT8 cia0portb = mos6526_pb_r(space.machine().device("cia_0"), space, 0);
 
 	return cbm_common_cia0_port_a_r(device, cia0portb);
 }
 
 static READ8_DEVICE_HANDLER( c65_cia0_port_b_r )
 {
-	c65_state *state = device->machine().driver_data<c65_state>();
+	c65_state *state = space.machine().driver_data<c65_state>();
 	UINT8 value = 0xff;
-	UINT8 cia0porta = mos6526_pa_r(device->machine().device("cia_0"), space, 0);
+	UINT8 cia0porta = mos6526_pa_r(space.machine().device("cia_0"), space, 0);
 
 	value &= cbm_common_cia0_port_b_r(device, cia0porta);
 
@@ -94,7 +94,7 @@ static READ8_DEVICE_HANDLER( c65_cia0_port_b_r )
 static WRITE8_DEVICE_HANDLER( c65_cia0_port_b_w )
 {
 //  was there lightpen support in c65 video chip?
-//  device_t *vic3 = device->machine().device("vic3");
+//  device_t *vic3 = space.machine().device("vic3");
 //  vic3_lightpen_write(vic3, data & 0x10);
 }
 
@@ -167,7 +167,7 @@ const mos6526_interface c65_cia0 =
  */
 static READ8_DEVICE_HANDLER( c65_cia1_port_a_r )
 {
-	c65_state *state = device->machine().driver_data<c65_state>();
+	c65_state *state = space.machine().driver_data<c65_state>();
 	UINT8 value = 0xff;
 
 	if (!state->m_iec->clk_r())
@@ -181,7 +181,7 @@ static READ8_DEVICE_HANDLER( c65_cia1_port_a_r )
 
 static WRITE8_DEVICE_HANDLER( c65_cia1_port_a_w )
 {
-	c65_state *state = device->machine().driver_data<c65_state>();
+	c65_state *state = space.machine().driver_data<c65_state>();
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
 
 	state->m_iec->atn_w(!BIT(data, 3));

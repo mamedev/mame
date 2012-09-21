@@ -943,12 +943,12 @@ READ8_MEMBER(fm7_state::fm7_fmirq_r)
 
 static READ8_DEVICE_HANDLER( fm77av_joy_1_r )
 {
-	return device->machine().root_device().ioport("joy1")->read();
+	return space.machine().root_device().ioport("joy1")->read();
 }
 
 static READ8_DEVICE_HANDLER( fm77av_joy_2_r )
 {
-	return device->machine().root_device().ioport("joy2")->read();
+	return space.machine().root_device().ioport("joy2")->read();
 }
 
 READ8_MEMBER(fm7_state::fm7_unknown_r)

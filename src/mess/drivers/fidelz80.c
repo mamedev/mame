@@ -943,7 +943,7 @@ READ8_MEMBER(fidelz80_state::rand_r)
 
 static WRITE8_DEVICE_HANDLER( digit_w )
 {
-	fidelz80_state *state = device->machine().driver_data<fidelz80_state>();
+	fidelz80_state *state = space.machine().driver_data<fidelz80_state>();
 
 	if (state->m_digit_line_status[offset])
 		return;

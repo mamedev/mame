@@ -88,23 +88,23 @@ static READ_LINE_DEVICE_HANDLER( b_via_0_ca2_r )
 
 static READ8_DEVICE_HANDLER( b_via_0_pa_r )
 {
-	beezer_state *state = device->machine().driver_data<beezer_state>();
+	beezer_state *state = space.machine().driver_data<beezer_state>();
 	return (state->m_banklatch&0x38)<<2; // return X,Y,Z bits TODO: the Z bit connects somewhere else... where?
 }
 
 static READ8_DEVICE_HANDLER( b_via_0_pb_r )
 {
-	beezer_state *state = device->machine().driver_data<beezer_state>();
+	beezer_state *state = space.machine().driver_data<beezer_state>();
 	return state->m_pbus;
 }
 
 static WRITE8_DEVICE_HANDLER( b_via_0_pa_w )
 {
-	beezer_state *state = device->machine().driver_data<beezer_state>();
+	beezer_state *state = space.machine().driver_data<beezer_state>();
 	if ((data & 0x08) == 0)
-		device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
 	if ((data & 0x04) == 0)
 	{
@@ -128,30 +128,30 @@ static WRITE8_DEVICE_HANDLER( b_via_0_pa_w )
 
 static WRITE8_DEVICE_HANDLER( b_via_0_pb_w )
 {
-	beezer_state *state = device->machine().driver_data<beezer_state>();
+	beezer_state *state = space.machine().driver_data<beezer_state>();
 	state->m_pbus = data;
 }
 
 static READ8_DEVICE_HANDLER( b_via_1_pa_r )
 {
-	beezer_state *state = device->machine().driver_data<beezer_state>();
+	beezer_state *state = space.machine().driver_data<beezer_state>();
 	return state->m_pbus;
 }
 
 static READ8_DEVICE_HANDLER( b_via_1_pb_r )
 {
-	return 0x1F | (beezer_noise_r(device->machine().device("custom"), space, 0)?0x40:0);
+	return 0x1F | (beezer_noise_r(space.machine().device("custom"), space, 0)?0x40:0);
 }
 
 static WRITE8_DEVICE_HANDLER( b_via_1_pa_w )
 {
-	beezer_state *state = device->machine().driver_data<beezer_state>();
+	beezer_state *state = space.machine().driver_data<beezer_state>();
 	state->m_pbus = data;
 }
 
 static WRITE8_DEVICE_HANDLER( b_via_1_pb_w )
 {
-	beezer_timer1_w(device->machine().device("custom"), space, 0, data&0x80);
+	beezer_timer1_w(space.machine().device("custom"), space, 0, data&0x80);
 	//if ((data&0x1f) != 0x01)
 	//  popmessage("via1 pb low write of 0x%02x is not supported! contact mamedev!", data&0x1f);
 }

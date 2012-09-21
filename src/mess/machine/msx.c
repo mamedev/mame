@@ -625,26 +625,26 @@ WRITE8_MEMBER(msx_state::msx_psg_port_b_w)
 
 WRITE8_DEVICE_HANDLER( msx_printer_strobe_w )
 {
-	device->machine().device<centronics_device>("centronics")->strobe_w(BIT(data, 1));
+	space.machine().device<centronics_device>("centronics")->strobe_w(BIT(data, 1));
 }
 
 WRITE8_DEVICE_HANDLER( msx_printer_data_w )
 {
-	if (device->machine().root_device().ioport("DSW")->read() & 0x80)
+	if (space.machine().root_device().ioport("DSW")->read() & 0x80)
 		/* SIMPL emulation */
-		device->machine().device<dac_device>("dac")->write_signed8(data);
+		space.machine().device<dac_device>("dac")->write_signed8(data);
 	else
-		device->machine().device<centronics_device>("centronics")->write(device->machine().driver_data()->generic_space(), 0, data);
+		space.machine().device<centronics_device>("centronics")->write(space.machine().driver_data()->generic_space(), 0, data);
 }
 
 READ8_DEVICE_HANDLER( msx_printer_status_r )
 {
 	UINT8 result = 0xfd;
 
-	if (device->machine().root_device().ioport("DSW")->read() & 0x80)
+	if (space.machine().root_device().ioport("DSW")->read() & 0x80)
 		return 0xff;
 
-	result |= device->machine().device<centronics_device>("centronics")->busy_r() << 1;
+	result |= space.machine().device<centronics_device>("centronics")->busy_r() << 1;
 
 	return result;
 }

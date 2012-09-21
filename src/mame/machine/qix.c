@@ -346,7 +346,7 @@ READ8_MEMBER(qix_state::qix_video_firq_ack_r)
 
 READ8_DEVICE_HANDLER( qixmcu_coin_r )
 {
-	qix_state *state = device->machine().driver_data<qix_state>();
+	qix_state *state = space.machine().driver_data<qix_state>();
 
 	logerror("6809:qixmcu_coin_r = %02X\n", state->m_68705_port_out[0]);
 	return state->m_68705_port_out[0];
@@ -355,7 +355,7 @@ READ8_DEVICE_HANDLER( qixmcu_coin_r )
 
 static WRITE8_DEVICE_HANDLER( qixmcu_coin_w )
 {
-	qix_state *state = device->machine().driver_data<qix_state>();
+	qix_state *state = space.machine().driver_data<qix_state>();
 
 	logerror("6809:qixmcu_coin_w = %02X\n", data);
 	/* this is a callback called by pia6821_device::write(), so I don't need to synchronize */
@@ -366,18 +366,18 @@ static WRITE8_DEVICE_HANDLER( qixmcu_coin_w )
 
 static WRITE8_DEVICE_HANDLER( qixmcu_coinctrl_w )
 {
-	qix_state *state = device->machine().driver_data<qix_state>();
+	qix_state *state = space.machine().driver_data<qix_state>();
 
 	/* if (!(data & 0x04)) */
 	if (data & 0x04)
 	{
-		device->machine().device("mcu")->execute().set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
+		space.machine().device("mcu")->execute().set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 		/* temporarily boost the interleave to sync things up */
 		/* note: I'm using 50 because 30 is not enough for space dungeon at game over */
-		device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
+		space.machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 	}
 	else
-		device->machine().device("mcu")->execute().set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+		space.machine().device("mcu")->execute().set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 
 	/* this is a callback called by pia6821_device::write(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_w() */
@@ -473,7 +473,7 @@ WRITE8_DEVICE_HANDLER( qix_pia_w )
 {
 	/* make all the CPUs synchronize, and only AFTER that write the command to the PIA */
 	/* otherwise the 68705 will miss commands */
-	device->machine().scheduler().synchronize(FUNC(pia_w_callback), data | (offset << 8), (void *)downcast<pia6821_device *>(device));
+	space.machine().scheduler().synchronize(FUNC(pia_w_callback), data | (offset << 8), (void *)downcast<pia6821_device *>(device));
 }
 
 
@@ -486,8 +486,8 @@ WRITE8_DEVICE_HANDLER( qix_pia_w )
 
 static WRITE8_DEVICE_HANDLER( qix_coinctl_w )
 {
-	coin_lockout_w(device->machine(), 0, (~data >> 2) & 1);
-	coin_counter_w(device->machine(), 0, (data >> 1) & 1);
+	coin_lockout_w(space.machine(), 0, (~data >> 2) & 1);
+	coin_counter_w(space.machine(), 0, (data >> 1) & 1);
 }
 
 
@@ -500,10 +500,10 @@ static WRITE8_DEVICE_HANDLER( qix_coinctl_w )
 
  static WRITE8_DEVICE_HANDLER( slither_76489_0_w )
 {
-	qix_state *state = device->machine().driver_data<qix_state>();
+	qix_state *state = space.machine().driver_data<qix_state>();
 
 	/* write to the sound chip */
-	state->m_sn1->write(device->machine().device<legacy_cpu_device>("maincpu")->space(), 0, data);
+	state->m_sn1->write(space.machine().device<legacy_cpu_device>("maincpu")->space(), 0, data);
 
 	/* clock the ready line going back into CB1 */
 	pia6821_device *pia = downcast<pia6821_device *>(device);
@@ -514,10 +514,10 @@ static WRITE8_DEVICE_HANDLER( qix_coinctl_w )
 
 static WRITE8_DEVICE_HANDLER( slither_76489_1_w )
 {
-	qix_state *state = device->machine().driver_data<qix_state>();
+	qix_state *state = space.machine().driver_data<qix_state>();
 
 	/* write to the sound chip */
-	state->m_sn2->write(device->machine().device<legacy_cpu_device>("maincpu")->space(), 0, data);
+	state->m_sn2->write(space.machine().device<legacy_cpu_device>("maincpu")->space(), 0, data);
 
 	/* clock the ready line going back into CB1 */
 	pia6821_device *pia = downcast<pia6821_device *>(device);
@@ -535,7 +535,7 @@ static WRITE8_DEVICE_HANDLER( slither_76489_1_w )
 
 static READ8_DEVICE_HANDLER( slither_trak_lr_r )
 {
-	qix_state *state = device->machine().driver_data<qix_state>();
+	qix_state *state = space.machine().driver_data<qix_state>();
 
 	return state->ioport(state->m_flip ? "AN3" : "AN1")->read();
 }
@@ -543,7 +543,7 @@ static READ8_DEVICE_HANDLER( slither_trak_lr_r )
 
 static READ8_DEVICE_HANDLER( slither_trak_ud_r )
 {
-	qix_state *state = device->machine().driver_data<qix_state>();
+	qix_state *state = space.machine().driver_data<qix_state>();
 
 	return state->ioport(state->m_flip ? "AN2" : "AN0")->read();
 }

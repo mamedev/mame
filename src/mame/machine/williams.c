@@ -561,12 +561,12 @@ static TIMER_CALLBACK( williams_deferred_snd_cmd_w )
 WRITE8_DEVICE_HANDLER( williams_snd_cmd_w )
 {
 	/* the high two bits are set externally, and should be 1 */
-	device->machine().scheduler().synchronize(FUNC(williams_deferred_snd_cmd_w), data | 0xc0);
+	space.machine().scheduler().synchronize(FUNC(williams_deferred_snd_cmd_w), data | 0xc0);
 }
 
 WRITE8_DEVICE_HANDLER( playball_snd_cmd_w )
 {
-	device->machine().scheduler().synchronize(FUNC(williams_deferred_snd_cmd_w), data);
+	space.machine().scheduler().synchronize(FUNC(williams_deferred_snd_cmd_w), data);
 }
 
 static TIMER_CALLBACK( blaster_deferred_snd_cmd_w )
@@ -582,7 +582,7 @@ static TIMER_CALLBACK( blaster_deferred_snd_cmd_w )
 
 WRITE8_DEVICE_HANDLER( blaster_snd_cmd_w )
 {
-	device->machine().scheduler().synchronize(FUNC(blaster_deferred_snd_cmd_w), data);
+	space.machine().scheduler().synchronize(FUNC(blaster_deferred_snd_cmd_w), data);
 }
 
 
@@ -595,7 +595,7 @@ static TIMER_CALLBACK( williams2_deferred_snd_cmd_w )
 
 static WRITE8_DEVICE_HANDLER( williams2_snd_cmd_w )
 {
-	device->machine().scheduler().synchronize(FUNC(williams2_deferred_snd_cmd_w), data);
+	space.machine().scheduler().synchronize(FUNC(williams2_deferred_snd_cmd_w), data);
 }
 
 
@@ -608,7 +608,7 @@ static WRITE8_DEVICE_HANDLER( williams2_snd_cmd_w )
 
 WRITE8_DEVICE_HANDLER( williams_port_select_w )
 {
-	williams_state *state = device->machine().driver_data<williams_state>();
+	williams_state *state = space.machine().driver_data<williams_state>();
 	state->m_port_select = data;
 }
 
@@ -650,13 +650,13 @@ CUSTOM_INPUT_MEMBER(williams_state::williams_mux_r)
 READ8_DEVICE_HANDLER( williams_49way_port_0_r )
 {
 	static const UINT8 translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
-	return (translate49[device->machine().root_device().ioport("49WAYX")->read() >> 4] << 4) | translate49[device->machine().root_device().ioport("49WAYY")->read() >> 4];
+	return (translate49[space.machine().root_device().ioport("49WAYX")->read() >> 4] << 4) | translate49[space.machine().root_device().ioport("49WAYY")->read() >> 4];
 }
 
 
 READ8_DEVICE_HANDLER( williams_input_port_49way_0_5_r )
 {
-	williams_state *state = device->machine().driver_data<williams_state>();
+	williams_state *state = space.machine().driver_data<williams_state>();
 	if (state->m_port_select)
 		return williams_49way_port_0_r(device, space, 0);
 	else
@@ -927,7 +927,7 @@ WRITE8_MEMBER(williams_state::blaster_bank_select_w)
 
 static WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w )
 {
-	coin_lockout_global_w(device->machine(), data & 1); /* bit 5 of PIC control port A */
+	coin_lockout_global_w(space.machine(), data & 1); /* bit 5 of PIC control port A */
 }
 
 
@@ -941,7 +941,7 @@ static WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w )
 static READ8_DEVICE_HANDLER( tshoot_input_port_0_3_r )
 {
 	/* merge in the gun inputs with the standard data */
-	int data = device->machine().root_device().ioport("IN0")->read();
+	int data = space.machine().root_device().ioport("IN0")->read();
 	int gun = (data & 0x3f) ^ ((data & 0x3f) >> 1);
 	return (data & 0xc0) | gun;
 
@@ -953,7 +953,7 @@ static READ8_DEVICE_HANDLER( tshoot_input_port_0_3_r )
 static WRITE8_DEVICE_HANDLER( tshoot_maxvol_w )
 {
 	/* something to do with the sound volume */
-	logerror("tshoot maxvol = %d (%s)\n", data, device->machine().describe_context());
+	logerror("tshoot maxvol = %d (%s)\n", data, space.machine().describe_context());
 }
 
 
@@ -1000,16 +1000,16 @@ static TIMER_CALLBACK( joust2_deferred_snd_cmd_w )
 
 static WRITE8_DEVICE_HANDLER( joust2_pia_3_cb1_w )
 {
-	joust2_state *state = device->machine().driver_data<joust2_state>();
+	joust2_state *state = space.machine().driver_data<joust2_state>();
 	state->m_joust2_current_sound_data = (state->m_joust2_current_sound_data & ~0x100) | ((data << 8) & 0x100);
-	state->m_cvsd_sound->write(device->machine().driver_data()->generic_space(), 0, state->m_joust2_current_sound_data);
+	state->m_cvsd_sound->write(space.machine().driver_data()->generic_space(), 0, state->m_joust2_current_sound_data);
 }
 
 
 static WRITE8_DEVICE_HANDLER( joust2_snd_cmd_w )
 {
-	joust2_state *state = device->machine().driver_data<joust2_state>();
+	joust2_state *state = space.machine().driver_data<joust2_state>();
 	state->m_joust2_current_sound_data = (state->m_joust2_current_sound_data & ~0xff) | (data & 0xff);
-	state->m_cvsd_sound->write(device->machine().driver_data()->generic_space(), 0, state->m_joust2_current_sound_data);
-	device->machine().scheduler().synchronize(FUNC(joust2_deferred_snd_cmd_w), state->m_joust2_current_sound_data);
+	state->m_cvsd_sound->write(space.machine().driver_data()->generic_space(), 0, state->m_joust2_current_sound_data);
+	space.machine().scheduler().synchronize(FUNC(joust2_deferred_snd_cmd_w), state->m_joust2_current_sound_data);
 }

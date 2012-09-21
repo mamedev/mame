@@ -1253,13 +1253,13 @@ WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 
 static READ8_DEVICE_HANDLER( mz2500_wd17xx_r )
 {
-	mz2500_state *state = device->machine().driver_data<mz2500_state>();
+	mz2500_state *state = space.machine().driver_data<mz2500_state>();
 	return wd17xx_r(device, space, offset) ^ state->m_fdc_reverse;
 }
 
 static WRITE8_DEVICE_HANDLER( mz2500_wd17xx_w )
 {
-	mz2500_state *state = device->machine().driver_data<mz2500_state>();
+	mz2500_state *state = space.machine().driver_data<mz2500_state>();
 	wd17xx_w(device, space, offset, data ^ state->m_fdc_reverse);
 }
 
@@ -1841,7 +1841,7 @@ static READ8_DEVICE_HANDLER( mz2500_portb_r )
 {
 	UINT8 vblank_bit;
 
-	vblank_bit = device->machine().primary_screen->vblank() ? 0 : 1; //Guess: NOBO wants this bit to be high/low
+	vblank_bit = space.machine().primary_screen->vblank() ? 0 : 1; //Guess: NOBO wants this bit to be high/low
 
 	return 0xfe | vblank_bit;
 }
@@ -1865,7 +1865,7 @@ static WRITE8_DEVICE_HANDLER( mz2500_portb_w )
 
 static WRITE8_DEVICE_HANDLER( mz2500_portc_w )
 {
-	mz2500_state *state = device->machine().driver_data<mz2500_state>();
+	mz2500_state *state = space.machine().driver_data<mz2500_state>();
 	/*
     ---- x--- 0->1 transition = IPL reset
     ---- -x-- beeper state
@@ -1877,7 +1877,7 @@ static WRITE8_DEVICE_HANDLER( mz2500_portc_w )
 	{
 		mz2500_reset(state, WRAM_RESET);
 		/* correct? */
-		device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		space.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	/* bit 2 is speaker */
@@ -1888,7 +1888,7 @@ static WRITE8_DEVICE_HANDLER( mz2500_portc_w )
 
 	state->m_old_portc = data;
 
-	beep_set_state(device->machine().device(BEEPER_TAG),data & 0x04);
+	beep_set_state(space.machine().device(BEEPER_TAG),data & 0x04);
 
 	if(data & ~0x0e)
 		logerror("PPI PORTC W %02x\n",data & ~0x0e);
@@ -1906,14 +1906,14 @@ static I8255_INTERFACE( ppi8255_intf )
 
 static WRITE8_DEVICE_HANDLER( mz2500_pio1_porta_w )
 {
-	mz2500_state *state = device->machine().driver_data<mz2500_state>();
+	mz2500_state *state = space.machine().driver_data<mz2500_state>();
 //  printf("%02x\n",data);
 
 	if(state->m_prev_col_val != ((data & 0x20) >> 5))
 	{
 		state->m_text_col_size = ((data & 0x20) >> 5);
 		state->m_prev_col_val = state->m_text_col_size;
-		mz2500_reconfigure_screen(device->machine());
+		mz2500_reconfigure_screen(space.machine());
 	}
 	state->m_key_mux = data & 0x1f;
 }
@@ -1921,7 +1921,7 @@ static WRITE8_DEVICE_HANDLER( mz2500_pio1_porta_w )
 
 static READ8_DEVICE_HANDLER( mz2500_pio1_porta_r )
 {
-	mz2500_state *state = device->machine().driver_data<mz2500_state>();
+	mz2500_state *state = space.machine().driver_data<mz2500_state>();
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 	                                        "KEY4", "KEY5", "KEY6", "KEY7",
 	                                        "KEY8", "KEY9", "KEYA", "KEYB",
@@ -1933,22 +1933,22 @@ static READ8_DEVICE_HANDLER( mz2500_pio1_porta_r )
 
 		res = 0xff;
 		for(i=0;i<0xe;i++)
-			res &= device->machine().root_device().ioport(keynames[i])->read();
+			res &= space.machine().root_device().ioport(keynames[i])->read();
 
 		state->m_pio_latchb = res;
 
 		return res;
 	}
 
-	state->m_pio_latchb = device->machine().root_device().ioport(keynames[state->m_key_mux & 0xf])->read();
+	state->m_pio_latchb = space.machine().root_device().ioport(keynames[state->m_key_mux & 0xf])->read();
 
-	return device->machine().root_device().ioport(keynames[state->m_key_mux & 0xf])->read();
+	return space.machine().root_device().ioport(keynames[state->m_key_mux & 0xf])->read();
 }
 
 #if 0
 static READ8_DEVICE_HANDLER( mz2500_pio1_portb_r )
 {
-	mz2500_state *state = device->machine().driver_data<mz2500_state>();
+	mz2500_state *state = space.machine().driver_data<mz2500_state>();
 	return state->m_pio_latchb;
 }
 #endif
@@ -1967,13 +1967,13 @@ static Z80PIO_INTERFACE( mz2500_pio1_intf )
 
 static READ8_DEVICE_HANDLER( opn_porta_r )
 {
-	mz2500_state *state = device->machine().driver_data<mz2500_state>();
+	mz2500_state *state = space.machine().driver_data<mz2500_state>();
 	return state->m_ym_porta;
 }
 
 static WRITE8_DEVICE_HANDLER( opn_porta_w )
 {
-	mz2500_state *state = device->machine().driver_data<mz2500_state>();
+	mz2500_state *state = space.machine().driver_data<mz2500_state>();
 	/*
     ---- x--- mouse select
     ---- -x-- palette bit (16/4096 colors)

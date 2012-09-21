@@ -13,7 +13,7 @@
 
 static READ8_DEVICE_HANDLER (ac1_port_b_r)
 {
-	ac1_state *state = device->machine().driver_data<ac1_state>();
+	ac1_state *state = space.machine().driver_data<ac1_state>();
 	UINT8 data = 0x7f;
 
 	if (state->m_cassette->input() > 0.03)
@@ -26,13 +26,13 @@ static READ8_DEVICE_HANDLER (ac1_port_b_r)
 
 static READ8_DEVICE_HANDLER (ac1_port_a_r)
 {
-	UINT8 line0 = device->machine().root_device().ioport("LINE0")->read();
-	UINT8 line1 = device->machine().root_device().ioport("LINE1")->read();
-	UINT8 line2 = device->machine().root_device().ioport("LINE2")->read();
-	UINT8 line3 = device->machine().root_device().ioport("LINE3")->read();
-	UINT8 line4 = device->machine().root_device().ioport("LINE4")->read();
-	UINT8 line5 = device->machine().root_device().ioport("LINE5")->read();
-	UINT8 line6 = device->machine().root_device().ioport("LINE6")->read();
+	UINT8 line0 = space.machine().root_device().ioport("LINE0")->read();
+	UINT8 line1 = space.machine().root_device().ioport("LINE1")->read();
+	UINT8 line2 = space.machine().root_device().ioport("LINE2")->read();
+	UINT8 line3 = space.machine().root_device().ioport("LINE3")->read();
+	UINT8 line4 = space.machine().root_device().ioport("LINE4")->read();
+	UINT8 line5 = space.machine().root_device().ioport("LINE5")->read();
+	UINT8 line6 = space.machine().root_device().ioport("LINE6")->read();
 
 	UINT8 SH    = BNOT(BIT(line6,0));
 	UINT8 CTRL  = BNOT(BIT(line6,1));
@@ -94,7 +94,7 @@ static WRITE8_DEVICE_HANDLER (ac1_port_b_w)
         7       cassette in
 
     */
-	ac1_state *state = device->machine().driver_data<ac1_state>();
+	ac1_state *state = space.machine().driver_data<ac1_state>();
 	state->m_cassette->output((data & 0x40) ? -1.0 : +1.0);
 }
 

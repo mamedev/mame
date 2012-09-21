@@ -116,7 +116,7 @@ UINT32 gameplan_state::screen_update_leprechn(screen_device &screen, bitmap_rgb3
 
 static WRITE8_DEVICE_HANDLER( video_data_w )
 {
-	gameplan_state *state = device->machine().driver_data<gameplan_state>();
+	gameplan_state *state = space.machine().driver_data<gameplan_state>();
 
 	state->m_video_data = data;
 }
@@ -124,7 +124,7 @@ static WRITE8_DEVICE_HANDLER( video_data_w )
 
 static WRITE8_DEVICE_HANDLER( gameplan_video_command_w )
 {
-	gameplan_state *state = device->machine().driver_data<gameplan_state>();
+	gameplan_state *state = space.machine().driver_data<gameplan_state>();
 
 	state->m_video_command = data & 0x07;
 }
@@ -132,7 +132,7 @@ static WRITE8_DEVICE_HANDLER( gameplan_video_command_w )
 
 static WRITE8_DEVICE_HANDLER( leprechn_video_command_w )
 {
-	gameplan_state *state = device->machine().driver_data<gameplan_state>();
+	gameplan_state *state = space.machine().driver_data<gameplan_state>();
 
 	state->m_video_command = (data >> 3) & 0x07;
 }

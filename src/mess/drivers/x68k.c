@@ -868,8 +868,8 @@ static UINT8 xpd1lr_r(device_t* device, int port)
 // Judging from the XM6 source code, PPI ports A and B are joystick inputs
 static READ8_DEVICE_HANDLER( ppi_port_a_r )
 {
-	x68k_state *state = device->machine().driver_data<x68k_state>();
-	int ctrl = device->machine().root_device().ioport("ctrltype")->read() & 0x0f;
+	x68k_state *state = space.machine().driver_data<x68k_state>();
+	int ctrl = space.machine().root_device().ioport("ctrltype")->read() & 0x0f;
 
 	switch(ctrl)
 	{
@@ -891,8 +891,8 @@ static READ8_DEVICE_HANDLER( ppi_port_a_r )
 
 static READ8_DEVICE_HANDLER( ppi_port_b_r )
 {
-	x68k_state *state = device->machine().driver_data<x68k_state>();
-	int ctrl = device->machine().root_device().ioport("ctrltype")->read() & 0xf0;
+	x68k_state *state = space.machine().driver_data<x68k_state>();
+	int ctrl = space.machine().root_device().ioport("ctrltype")->read() & 0xf0;
 
 	switch(ctrl)
 	{
@@ -914,7 +914,7 @@ static READ8_DEVICE_HANDLER( ppi_port_b_r )
 
 static READ8_DEVICE_HANDLER( ppi_port_c_r )
 {
-	x68k_state *state = device->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	return state->m_ppi_port[2];
 }
 
@@ -928,16 +928,16 @@ static READ8_DEVICE_HANDLER( ppi_port_c_r )
 */
 static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 {
-	x68k_state *state = device->machine().driver_data<x68k_state>();
+	x68k_state *state = space.machine().driver_data<x68k_state>();
 	// ADPCM / Joystick control
-	device_t *oki = device->machine().device("okim6258");
+	device_t *oki = space.machine().device("okim6258");
 
 	state->m_ppi_port[2] = data;
 	if((data & 0x0f) != (state->m_ppi_prev & 0x0f))
 	{
 		state->m_adpcm.pan = data & 0x03;
 		state->m_adpcm.rate = data & 0x0c;
-		x68k_set_adpcm(device->machine());
+		x68k_set_adpcm(space.machine());
 		okim6258_set_divider(oki, (data >> 2) & 3);
 	}
 
@@ -947,7 +947,7 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 	if((state->m_ppi_prev & 0x10) == 0x00 && (data & 0x10) == 0x10)
 	{
 		state->m_mdctrl.seq1++;
-		state->m_mdctrl.io_timeout1->adjust(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+		state->m_mdctrl.io_timeout1->adjust(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 	}
 
 	state->m_joy.joy2_enable = data & 0x20;
@@ -955,7 +955,7 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 	if((state->m_ppi_prev & 0x20) == 0x00 && (data & 0x20) == 0x20)
 	{
 		state->m_mdctrl.seq2++;
-		state->m_mdctrl.io_timeout2->adjust(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+		state->m_mdctrl.io_timeout2->adjust(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 	}
 	state->m_ppi_prev = data;
 
@@ -1141,16 +1141,16 @@ static READ16_HANDLER( x68k_fm_r )
 
 static WRITE8_DEVICE_HANDLER( x68k_ct_w )
 {
-	x68k_state *state = device->machine().driver_data<x68k_state>();
-	device_t *fdc = device->machine().device("upd72065");
-	device_t *okim = device->machine().device("okim6258");
+	x68k_state *state = space.machine().driver_data<x68k_state>();
+	device_t *fdc = space.machine().device("upd72065");
+	device_t *okim = space.machine().device("okim6258");
 
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
 	// CT2 - 1 = Set ready state of FDC
 	upd765_ready_w(fdc,data & 0x01);
 	state->m_adpcm.clock = data & 0x02;
-	x68k_set_adpcm(device->machine());
+	x68k_set_adpcm(space.machine());
 	okim6258_set_clock(okim, data & 0x02 ? 4000000 : 8000000);
 }
 

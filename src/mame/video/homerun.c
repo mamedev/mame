@@ -37,11 +37,11 @@ WRITE8_MEMBER(homerun_state::homerun_scrollx_w)
 
 WRITE8_DEVICE_HANDLER(homerun_banking_w)
 {
-	homerun_state *state = device->machine().driver_data<homerun_state>();
+	homerun_state *state = space.machine().driver_data<homerun_state>();
 
 	// games do mid-screen gfx bank switching
-	int vpos = device->machine().primary_screen->vpos();
-	device->machine().primary_screen->update_partial(vpos);
+	int vpos = space.machine().primary_screen->vpos();
+	space.machine().primary_screen->update_partial(vpos);
 
 	// d0-d1: gfx bank
 	// d2-d4: ?

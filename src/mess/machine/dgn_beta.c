@@ -565,7 +565,7 @@ static WRITE8_DEVICE_HANDLER(d_pia0_pa_w)
 
 static READ8_DEVICE_HANDLER(d_pia0_pb_r)
 {
-	dgn_beta_state *state = device->machine().driver_data<dgn_beta_state>();
+	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
 	int RetVal;
 	int Idx;
 	int Selected;
@@ -586,7 +586,7 @@ static READ8_DEVICE_HANDLER(d_pia0_pb_r)
 	{
 		for(Idx=0; Idx<NoKeyrows; Idx++)
 		{
-			state->m_Keyboard[Idx] = device->machine().root_device().ioport(keynames[Idx])->read();
+			state->m_Keyboard[Idx] = space.machine().root_device().ioport(keynames[Idx])->read();
 
 			if(state->m_Keyboard[Idx] != 0x7F)
 				state->m_KAny_next = 1;
@@ -607,7 +607,7 @@ static READ8_DEVICE_HANDLER(d_pia0_pb_r)
 
 static WRITE8_DEVICE_HANDLER(d_pia0_pb_w)
 {
-	dgn_beta_state *state = device->machine().driver_data<dgn_beta_state>();
+	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
 	int	InClkState;
 	//int   OutClkState;
 
@@ -635,7 +635,7 @@ static WRITE8_DEVICE_HANDLER(d_pia0_pb_w)
 
 static WRITE8_DEVICE_HANDLER(d_pia0_cb2_w)
 {
-	dgn_beta_state *state = device->machine().driver_data<dgn_beta_state>();
+	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
 	int	RowNo;
 	LOG_KEYBOARD(("\nCB2 Write\n"));
 
@@ -650,7 +650,7 @@ static WRITE8_DEVICE_HANDLER(d_pia0_cb2_w)
 		state->m_RowShifter = (state->m_RowShifter<<1) | ((state->m_d_pia0_pb_last & KOutDat)>>4);
 		state->m_RowShifter &= 0x3FF;
 		LOG_KEYBOARD(("Rowshifter=$%02X Keyrow=$%02X\n",state->m_RowShifter,state->m_Keyrow));
-		if (VERBOSE) debug_console_printf(device->machine(), "rowshifter clocked, value=%3X, RowNo=%d, Keyrow=%2X\n",state->m_RowShifter,RowNo,state->m_Keyrow);
+		if (VERBOSE) debug_console_printf(space.machine(), "rowshifter clocked, value=%3X, RowNo=%d, Keyrow=%2X\n",state->m_RowShifter,RowNo,state->m_Keyrow);
 	}
 
 	state->m_d_pia0_cb2_last=data;
@@ -684,9 +684,9 @@ static READ8_DEVICE_HANDLER(d_pia1_pa_r)
 
 static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 {
-	dgn_beta_state *state = device->machine().driver_data<dgn_beta_state>();
+	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
 	int	HALT_DMA;
-	device_t *fdc = device->machine().device(FDC_TAG);
+	device_t *fdc = space.machine().device(FDC_TAG);
 
 	/* Only play with halt line if halt bit changed since last write */
 	if((data & 0x80) != state->m_d_pia1_pa_last)
@@ -698,11 +698,11 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 			HALT_DMA = CLEAR_LINE;
 
 		LOG_HALT(("DMA_CPU HALT=%d\n", HALT_DMA));
-		device->machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_HALT, HALT_DMA);
+		space.machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_HALT, HALT_DMA);
 
 		/* CPU un-halted let it run ! */
 		if (HALT_DMA == CLEAR_LINE)
-			device->machine().device(MAINCPU_TAG)->execute().yield();
+			space.machine().device(MAINCPU_TAG)->execute().yield();
 
 		state->m_d_pia1_pa_last = data & 0x80;
 	}
@@ -722,7 +722,7 @@ static READ8_DEVICE_HANDLER(d_pia1_pb_r)
 
 static WRITE8_DEVICE_HANDLER(d_pia1_pb_w)
 {
-	dgn_beta_state *state = device->machine().driver_data<dgn_beta_state>();
+	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
 	int	HALT_CPU;
 
 	/* Only play with halt line if halt bit changed since last write */
@@ -735,13 +735,13 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pb_w)
 			HALT_CPU = ASSERT_LINE;
 
 		LOG_HALT(("MAIN_CPU HALT=%d\n", HALT_CPU));
-		device->machine().device(MAINCPU_TAG)->execute().set_input_line(INPUT_LINE_HALT, HALT_CPU);
+		space.machine().device(MAINCPU_TAG)->execute().set_input_line(INPUT_LINE_HALT, HALT_CPU);
 
 		state->m_d_pia1_pb_last = data & 0x02;
 
 		/* CPU un-halted let it run ! */
 		if (HALT_CPU == CLEAR_LINE)
-			device->machine().device(DMACPU_TAG)->execute().yield();
+			space.machine().device(DMACPU_TAG)->execute().yield();
 	}
 }
 
@@ -771,7 +771,7 @@ static READ8_DEVICE_HANDLER(d_pia2_pa_r)
 
 static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
 {
-	dgn_beta_state *state = device->machine().driver_data<dgn_beta_state>();
+	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
 	int OldTask;
 	int OldEnableMap;
 	int NMI;
@@ -787,13 +787,13 @@ static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
 		LOG_INTS(("cpu1 NMI : %d\n", NMI));
 		if(!NMI)
 		{
-			device->machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+			space.machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 			logerror("device_yield()\n");
-			device->machine().device(DMACPU_TAG)->execute().yield();	/* Let DMA CPU run */
+			space.machine().device(DMACPU_TAG)->execute().yield();	/* Let DMA CPU run */
 		}
 		else
 		{
-			device->machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+			space.machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		}
 
 		state->m_DMA_NMI_LAST = NMI;	/* Save it for next time */
@@ -821,7 +821,7 @@ static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
 		else
 			state->m_TaskReg = NoPagingTask;
 
-		UpdateBanks(device->machine(), 0, IOPage + 1);
+		UpdateBanks(space.machine(), 0, IOPage + 1);
 	}
 	else
 	{
@@ -829,7 +829,7 @@ static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
 		if ((state->m_PIATaskReg != OldTask) && (state->m_EnableMapRegs))
 		{
 			state->m_TaskReg = state->m_PIATaskReg;
-			UpdateBanks(device->machine(), 0, IOPage + 1);
+			UpdateBanks(space.machine(), 0, IOPage + 1);
 		}
 	}
 	LOG_TASK(("TaskReg=$%02X PIATaskReg=$%02X\n", state->m_TaskReg, state->m_PIATaskReg));
@@ -843,7 +843,7 @@ static READ8_DEVICE_HANDLER(d_pia2_pb_r)
 static WRITE8_DEVICE_HANDLER(d_pia2_pb_w)
 {
 	/* Update top video address lines */
-	dgnbeta_vid_set_gctrl(device->machine(), data);
+	dgnbeta_vid_set_gctrl(space.machine(), data);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( d_pia2_irq_a )

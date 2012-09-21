@@ -176,13 +176,13 @@ static void elwro800jr_mmu_w(running_machine &machine, UINT8 data)
 
 static READ8_DEVICE_HANDLER(i8255_port_c_r)
 {
-	centronics_device *centronics = device->machine().device<centronics_device>("centronics");
+	centronics_device *centronics = space.machine().device<centronics_device>("centronics");
 	return (centronics->ack_r() << 2);
 }
 
 static WRITE8_DEVICE_HANDLER(i8255_port_c_w)
 {
-	centronics_device *centronics = device->machine().device<centronics_device>("centronics");
+	centronics_device *centronics = space.machine().device<centronics_device>("centronics");
 	centronics->strobe_w((data >> 7) & 0x01);
 }
 

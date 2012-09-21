@@ -51,7 +51,7 @@ static void mac_via_irq(device_t *device, int state)
 
 static READ8_DEVICE_HANDLER(mac_via_in_a)
 {
-//  macpci_state *mac = device->machine().driver_data<macpci_state>();
+//  macpci_state *mac = space.machine().driver_data<macpci_state>();
 
 //    printf("VIA1 IN_A (PC %x)\n", mac->m_maincpu->pc());
 
@@ -61,7 +61,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 static READ8_DEVICE_HANDLER(mac_via_in_b)
 {
 	int val = 0;
-	macpci_state *mac = device->machine().driver_data<macpci_state>();
+	macpci_state *mac = space.machine().driver_data<macpci_state>();
 
     val |= mac->m_cuda->get_treq()<<3;
 
@@ -72,14 +72,14 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 {
-//  macpci_state *mac = device->machine().driver_data<macpci_state>();
+//  macpci_state *mac = space.machine().driver_data<macpci_state>();
 
 //    printf("VIA1 OUT A: %02x (PC %x)\n", data, mac->m_maincpu->pc());
 }
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 {
-	macpci_state *mac = device->machine().driver_data<macpci_state>();
+	macpci_state *mac = space.machine().driver_data<macpci_state>();
 
 //    printf("VIA1 OUT B: %02x (PC %x)\n", data, mac->m_maincpu->pc());
 
@@ -125,7 +125,7 @@ WRITE16_MEMBER ( macpci_state::mac_via_w )
 static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)
 {
 	UINT8 ret;
-	macpci_state *mac = device->machine().driver_data<macpci_state>();
+	macpci_state *mac = space.machine().driver_data<macpci_state>();
 
     ret = mac->m_cuda->get_via_data();
     #if LOG_ADB
@@ -137,7 +137,7 @@ static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)
 
 static WRITE8_DEVICE_HANDLER(mac_adb_via_out_cb2)
 {
-	macpci_state *mac = device->machine().driver_data<macpci_state>();
+	macpci_state *mac = space.machine().driver_data<macpci_state>();
 
     mac->m_cuda->set_via_data(data & 1);
 }

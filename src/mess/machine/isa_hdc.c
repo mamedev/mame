@@ -796,7 +796,7 @@ static READ8_DEVICE_HANDLER(pc_HDC_r )
 	}
 
 	if (LOG_HDC_CALL)
-		logerror("pc_HDC_r(): pc=%06X offs=%d result=0x%02x\n", device->machine().firstcpu->pc(), offset, data);
+		logerror("pc_HDC_r(): pc=%06X offs=%d result=0x%02x\n", space.machine().firstcpu->pc(), offset, data);
 
 	return data;
 }
@@ -805,7 +805,7 @@ static WRITE8_DEVICE_HANDLER( pc_HDC_w )
 {
 	isa8_hdc_device	*hdc  = downcast<isa8_hdc_device *>(device);
 	if (LOG_HDC_CALL)
-		logerror("pc_HDC_w(): pc=%06X offs=%d data=0x%02x\n", device->machine().firstcpu->pc(), offset, data);
+		logerror("pc_HDC_w(): pc=%06X offs=%d data=0x%02x\n", space.machine().firstcpu->pc(), offset, data);
 
 	switch( offset )
 	{

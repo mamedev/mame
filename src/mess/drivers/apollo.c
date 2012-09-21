@@ -1158,7 +1158,7 @@ INPUT_PORTS_END
 static WRITE8_DEVICE_HANDLER( apollo_kbd_putchar ) {
 	// put keyboard character to the keyboard sio
 //  DLOG1(("apollo_kbd_putchar: 0x%02x", data));
-	apollo_sio_rx_data(device->machine().device(APOLLO_SIO_TAG), 0, data);
+	apollo_sio_rx_data(space.machine().device(APOLLO_SIO_TAG), 0, data);
 }
 
 static READ8_DEVICE_HANDLER( apollo_kbd_has_beeper ) {
@@ -1181,7 +1181,7 @@ static WRITE8_DEVICE_HANDLER( terminal_kbd_putchar ) {
 	// FIXME: as of mess0145u1, terminal.c will append a null character after each input character
 	if (data != 0)
 	{
-		apollo_sio_rx_data(device->machine().device(APOLLO_SIO_TAG), 1, data);
+		apollo_sio_rx_data(space.machine().device(APOLLO_SIO_TAG), 1, data);
 	}
 }
 

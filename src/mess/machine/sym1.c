@@ -82,14 +82,14 @@ static TIMER_CALLBACK( led_refresh )
 
 static READ8_DEVICE_HANDLER(sym1_riot_a_r)
 {
-	sym1_state *state = device->machine().driver_data<sym1_state>();
+	sym1_state *state = space.machine().driver_data<sym1_state>();
 	int data = 0x7f;
 
 	/* scan keypad rows */
-	if (!(state->m_riot_port_a & 0x80)) data &= device->machine().root_device().ioport("ROW-0")->read();
-	if (!(state->m_riot_port_b & 0x01)) data &= device->machine().root_device().ioport("ROW-1")->read();
-	if (!(state->m_riot_port_b & 0x02)) data &= device->machine().root_device().ioport("ROW-2")->read();
-	if (!(state->m_riot_port_b & 0x04)) data &= device->machine().root_device().ioport("ROW-3")->read();
+	if (!(state->m_riot_port_a & 0x80)) data &= space.machine().root_device().ioport("ROW-0")->read();
+	if (!(state->m_riot_port_b & 0x01)) data &= space.machine().root_device().ioport("ROW-1")->read();
+	if (!(state->m_riot_port_b & 0x02)) data &= space.machine().root_device().ioport("ROW-2")->read();
+	if (!(state->m_riot_port_b & 0x04)) data &= space.machine().root_device().ioport("ROW-3")->read();
 
 	/* determine column */
 	if ( ((state->m_riot_port_a ^ 0xff) & (state->ioport("ROW-0")->read() ^ 0xff)) & 0x7f )
@@ -101,14 +101,14 @@ static READ8_DEVICE_HANDLER(sym1_riot_a_r)
 
 static READ8_DEVICE_HANDLER(sym1_riot_b_r)
 {
-	sym1_state *state = device->machine().driver_data<sym1_state>();
+	sym1_state *state = space.machine().driver_data<sym1_state>();
 	int data = 0xff;
 
 	/* determine column */
-	if ( ((state->m_riot_port_a ^ 0xff) & (device->machine().root_device().ioport("ROW-1")->read() ^ 0xff)) & 0x7f )
+	if ( ((state->m_riot_port_a ^ 0xff) & (space.machine().root_device().ioport("ROW-1")->read() ^ 0xff)) & 0x7f )
 		data &= ~0x01;
 
-	if ( ((state->m_riot_port_a ^ 0xff) & (device->machine().root_device().ioport("ROW-2")->read() ^ 0xff)) & 0x3f )
+	if ( ((state->m_riot_port_a ^ 0xff) & (space.machine().root_device().ioport("ROW-2")->read() ^ 0xff)) & 0x3f )
 		data &= ~0x02;
 
 	if ( ((state->m_riot_port_a ^ 0xff) & (state->ioport("ROW-3")->read() ^ 0xff)) & 0x1f )
@@ -122,8 +122,8 @@ static READ8_DEVICE_HANDLER(sym1_riot_b_r)
 
 static WRITE8_DEVICE_HANDLER(sym1_riot_a_w)
 {
-	sym1_state *state = device->machine().driver_data<sym1_state>();
-	logerror("%x: riot_a_w 0x%02x\n", device->machine().device("maincpu") ->safe_pc( ), data);
+	sym1_state *state = space.machine().driver_data<sym1_state>();
+	logerror("%x: riot_a_w 0x%02x\n", space.machine().device("maincpu") ->safe_pc( ), data);
 
 	/* save for later use */
 	state->m_riot_port_a = data;
@@ -132,14 +132,14 @@ static WRITE8_DEVICE_HANDLER(sym1_riot_a_w)
 
 static WRITE8_DEVICE_HANDLER(sym1_riot_b_w)
 {
-	sym1_state *state = device->machine().driver_data<sym1_state>();
-	logerror("%x: riot_b_w 0x%02x\n", device->machine().device("maincpu") ->safe_pc( ), data);
+	sym1_state *state = space.machine().driver_data<sym1_state>();
+	logerror("%x: riot_b_w 0x%02x\n", space.machine().device("maincpu") ->safe_pc( ), data);
 
 	/* save for later use */
 	state->m_riot_port_b = data;
 
 	/* first 4 pins are connected to the 74145 */
-	device->machine().device<ttl74145_device>("ttl74145")->write(data & 0x0f);
+	space.machine().device<ttl74145_device>("ttl74145")->write(data & 0x0f);
 }
 
 
@@ -186,7 +186,7 @@ static READ8_DEVICE_HANDLER( sym1_via0_b_r )
 
 static WRITE8_DEVICE_HANDLER( sym1_via0_b_w )
 {
-	logerror("%s: via0_b_w 0x%02x\n", device->machine().describe_context(), data);
+	logerror("%s: via0_b_w 0x%02x\n", space.machine().describe_context(), data);
 }
 
 
@@ -197,26 +197,26 @@ static WRITE8_DEVICE_HANDLER( sym1_via0_b_w )
  */
 static WRITE8_DEVICE_HANDLER( sym1_via2_a_w )
 {
-	address_space &cpu0space = device->machine().device( "maincpu")->memory().space( AS_PROGRAM );
+	address_space &cpu0space = space.machine().device( "maincpu")->memory().space( AS_PROGRAM );
 
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
-	if ((device->machine().root_device().ioport("WP")->read() & 0x01) && !(data & 0x01)) {
+	if ((space.machine().root_device().ioport("WP")->read() & 0x01) && !(data & 0x01)) {
 		cpu0space.nop_write(0xa600, 0xa67f);
 	} else {
 		cpu0space.install_write_bank(0xa600, 0xa67f, "bank5");
 	}
-	if ((device->machine().root_device().ioport("WP")->read() & 0x02) && !(data & 0x02)) {
+	if ((space.machine().root_device().ioport("WP")->read() & 0x02) && !(data & 0x02)) {
 		cpu0space.nop_write(0x0400, 0x07ff);
 	} else {
 		cpu0space.install_write_bank(0x0400, 0x07ff, "bank2");
 	}
-	if ((device->machine().root_device().ioport("WP")->read() & 0x04) && !(data & 0x04)) {
+	if ((space.machine().root_device().ioport("WP")->read() & 0x04) && !(data & 0x04)) {
 		cpu0space.nop_write(0x0800, 0x0bff);
 	} else {
 		cpu0space.install_write_bank(0x0800, 0x0bff, "bank3");
 	}
-	if ((device->machine().root_device().ioport("WP")->read() & 0x08) && !(data & 0x08)) {
+	if ((space.machine().root_device().ioport("WP")->read() & 0x08) && !(data & 0x08)) {
 		cpu0space.nop_write(0x0c00, 0x0fff);
 	} else {
 		cpu0space.install_write_bank(0x0c00, 0x0fff, "bank4");

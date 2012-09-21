@@ -147,12 +147,12 @@ static void to7_set_cassette ( running_machine &machine, int data )
 
 static WRITE8_DEVICE_HANDLER ( to7_set_cassette_motor )
 {
-	cassette_image_device* img = thom_cassette_img(device->machine());
+	cassette_image_device* img = thom_cassette_img(space.machine());
 	cassette_state state =  img->get_state();
 	double pos = img->get_position();
 
 	LOG (( "$%04x %f to7_set_cassette_motor: cassette motor %s bitpos=%i\n",
-	       device->machine().device("maincpu")->safe_pcbase(), img->machine().time().as_double(), data ? "off" : "on",
+	       space.machine().device("maincpu")->safe_pcbase(), img->machine().time().as_double(), data ? "off" : "on",
 	       (int) (pos / TO7_BIT_LENGTH) ));
 
 	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED && !data && pos > 0.3 )
@@ -223,12 +223,12 @@ static void mo5_set_cassette ( running_machine &machine, int data )
 
 static WRITE8_DEVICE_HANDLER ( mo5_set_cassette_motor )
 {
-	cassette_image_device* img = thom_cassette_img(device->machine());
+	cassette_image_device* img = thom_cassette_img(space.machine());
 	cassette_state state = img->get_state();
 	double pos = img->get_position();
 
 	LOG (( "$%04x %f mo5_set_cassette_motor: cassette motor %s hbitpos=%i\n",
-	       device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), data ? "off" : "on",
+	       space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data ? "off" : "on",
 	       (int) (pos / MO5_HBIT_LENGTH) ));
 
 	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED &&  !data && pos > 0.3 )
@@ -507,9 +507,9 @@ READ8_HANDLER ( to7_cartridge_r )
 
 static WRITE8_DEVICE_HANDLER ( to7_timer_port_out )
 {
-	thom_set_mode_point( device->machine(), data & 1 );          /* bit 0: video bank switch */
-	thom_set_caps_led( device->machine(), (data & 8) ? 1 : 0 ) ; /* bit 3: keyboard led */
-	thom_set_border_color( device->machine(),
+	thom_set_mode_point( space.machine(), data & 1 );          /* bit 0: video bank switch */
+	thom_set_caps_led( space.machine(), (data & 8) ? 1 : 0 ) ; /* bit 3: keyboard led */
+	thom_set_border_color( space.machine(),
 			       ((data & 0x10) ? 1 : 0) |           /* bits 4-6: border color */
 			       ((data & 0x20) ? 2 : 0) |
 			       ((data & 0x40) ? 4 : 0) );
@@ -519,15 +519,15 @@ static WRITE8_DEVICE_HANDLER ( to7_timer_port_out )
 
 static WRITE8_DEVICE_HANDLER ( to7_timer_cp2_out )
 {
-	device->machine().device<dac_device>("buzzer")->write_unsigned8(data ? 0x80 : 0); /* 1-bit buzzer */
+	space.machine().device<dac_device>("buzzer")->write_unsigned8(data ? 0x80 : 0); /* 1-bit buzzer */
 }
 
 
 
 static READ8_DEVICE_HANDLER ( to7_timer_port_in )
 {
-	int lightpen = (device->machine().root_device().ioport("lightpen_button")->read() & 1) ? 2 : 0;
-	int cass = to7_get_cassette(device->machine()) ? 0x80 : 0;
+	int lightpen = (space.machine().root_device().ioport("lightpen_button")->read() & 1) ? 2 : 0;
+	int cass = to7_get_cassette(space.machine()) ? 0x80 : 0;
 	return lightpen | cass;
 }
 
@@ -536,7 +536,7 @@ static READ8_DEVICE_HANDLER ( to7_timer_port_in )
 static WRITE8_DEVICE_HANDLER ( to7_timer_tco_out )
 {
 	/* 1-bit cassette output */
-	to7_set_cassette( device->machine(), data );
+	to7_set_cassette( space.machine(), data );
 }
 
 
@@ -617,7 +617,7 @@ static READ8_DEVICE_HANDLER ( to7_sys_porta_in )
 	if ( to7_lightpen )
 	{
 		/* lightpen hi */
-		return to7_lightpen_gpl( device->machine(), TO7_LIGHTPEN_DECAL, to7_lightpen_step ) >> 8;
+		return to7_lightpen_gpl( space.machine(), TO7_LIGHTPEN_DECAL, to7_lightpen_step ) >> 8;
 	}
 	else
 	{
@@ -633,7 +633,7 @@ static READ8_DEVICE_HANDLER ( to7_sys_porta_in )
 		for ( i = 0; i < 8; i++ )
 		{
 			if ( ! (keyline & (1 << i)) )
-				val &= device->machine().root_device().ioport(keynames[i])->read();
+				val &= space.machine().root_device().ioport(keynames[i])->read();
 		}
 		return val;
 	}
@@ -644,7 +644,7 @@ static READ8_DEVICE_HANDLER ( to7_sys_porta_in )
 static READ8_DEVICE_HANDLER ( to7_sys_portb_in )
 {
 	/* lightpen low */
-	return to7_lightpen_gpl( device->machine(), TO7_LIGHTPEN_DECAL, to7_lightpen_step ) & 0xff;
+	return to7_lightpen_gpl( space.machine(), TO7_LIGHTPEN_DECAL, to7_lightpen_step ) & 0xff;
 }
 
 
@@ -767,21 +767,21 @@ READ8_MEMBER( to7_io_line_device::porta_in )
 
 static WRITE8_DEVICE_HANDLER( to7_io_portb_out )
 {
-	centronics_device *printer = device->machine().device<centronics_device>("centronics");
+	centronics_device *printer = space.machine().device<centronics_device>("centronics");
 
-	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), data ));
+	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data ));
 
 	/* set 8-bit data */
-	printer->write( device->machine().driver_data()->generic_space(), 0, data);
+	printer->write( space.machine().driver_data()->generic_space(), 0, data);
 }
 
 
 
 static WRITE8_DEVICE_HANDLER( to7_io_cb2_out )
 {
-	centronics_device *printer = device->machine().device<centronics_device>("centronics");
+	centronics_device *printer = space.machine().device<centronics_device>("centronics");
 
-	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), data ));
+	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data ));
 
 	/* send STROBE to printer */
 	printer->strobe_w(data);
@@ -1037,16 +1037,16 @@ static void to7_game_sound_update ( running_machine &machine )
 static READ8_DEVICE_HANDLER ( to7_game_porta_in )
 {
 	UINT8 data;
-	if ( device->machine().root_device().ioport("config")->read() & 1 )
+	if ( space.machine().root_device().ioport("config")->read() & 1 )
 	{
 		/* mouse */
-		data = to7_get_mouse_signal(device->machine()) & 0x0c;             /* XB, YB */
-		data |= device->machine().root_device().ioport("mouse_button")->read() & 3; /* buttons */
+		data = to7_get_mouse_signal(space.machine()) & 0x0c;             /* XB, YB */
+		data |= space.machine().root_device().ioport("mouse_button")->read() & 3; /* buttons */
 	}
 	else
 	{
 		/* joystick */
-		data = device->machine().root_device().ioport("game_port_directions")->read();
+		data = space.machine().root_device().ioport("game_port_directions")->read();
 		/* bit 0=0 => P1 up      bit 4=0 => P2 up
            bit 1=0 => P1 down    bit 5=0 => P2 down
            bit 2=0 => P1 left    bit 6=0 => P2 left
@@ -1078,10 +1078,10 @@ static READ8_DEVICE_HANDLER ( to7_game_porta_in )
 static READ8_DEVICE_HANDLER ( to7_game_portb_in )
 {
 	UINT8 data;
-	if ( device->machine().root_device().ioport("config")->read() & 1 )
+	if ( space.machine().root_device().ioport("config")->read() & 1 )
 	{
 		/* mouse */
-		UINT8 mouse =  to7_get_mouse_signal(device->machine());
+		UINT8 mouse =  to7_get_mouse_signal(space.machine());
 		data = 0;
 		if ( mouse & 1 )
 			data |= 0x04; /* XA */
@@ -1095,7 +1095,7 @@ static READ8_DEVICE_HANDLER ( to7_game_portb_in )
 		/* bits 2-3: action buttons B (0=pressed) */
 		/* bits 4-5: unused (ouput) */
 		/* bits 0-1: unknown! */
-		data = device->machine().root_device().ioport("game_port_buttons")->read();
+		data = space.machine().root_device().ioport("game_port_buttons")->read();
 	}
 	return data;
 }
@@ -1106,7 +1106,7 @@ static WRITE8_DEVICE_HANDLER ( to7_game_portb_out )
 {
 	/* 6-bit DAC sound */
 	to7_game_sound = data & 0x3f;
-	to7_game_sound_update(device->machine());
+	to7_game_sound_update(space.machine());
 }
 
 
@@ -1546,7 +1546,7 @@ MACHINE_START ( to7 )
 static WRITE8_DEVICE_HANDLER ( to770_sys_cb2_out )
 {
 	/* video overlay: black pixels are transparent and show TV image underneath */
-	LOG(( "$%04x to770_sys_cb2_out: video overlay %i\n", device->machine().device("maincpu")->safe_pcbase(), data ));
+	LOG(( "$%04x to770_sys_cb2_out: video overlay %i\n", space.machine().device("maincpu")->safe_pcbase(), data ));
 }
 
 
@@ -1560,7 +1560,7 @@ static READ8_DEVICE_HANDLER ( to770_sys_porta_in )
 	};
 	int keyline = downcast<pia6821_device *>(device)->b_output() & 7;
 
-	return device->machine().root_device().ioport(keynames[7 - keyline])->read();
+	return space.machine().root_device().ioport(keynames[7 - keyline])->read();
 }
 
 
@@ -1620,7 +1620,7 @@ static void to770_update_ram_bank_postload(running_machine *machine)
 
 static WRITE8_DEVICE_HANDLER ( to770_sys_portb_out )
 {
-	to770_update_ram_bank(device->machine());
+	to770_update_ram_bank(space.machine());
 }
 
 
@@ -1649,9 +1649,9 @@ const pia6821_interface to770_pia6821_sys =
 
 static WRITE8_DEVICE_HANDLER ( to770_timer_port_out )
 {
-	thom_set_mode_point( device->machine(), data & 1 );          /* bit 0: video bank switch */
-	thom_set_caps_led( device->machine(), (data & 8) ? 1 : 0 ) ; /* bit 3: keyboard led */
-	thom_set_border_color( device->machine(),
+	thom_set_mode_point( space.machine(), data & 1 );          /* bit 0: video bank switch */
+	thom_set_caps_led( space.machine(), (data & 8) ? 1 : 0 ) ; /* bit 3: keyboard led */
+	thom_set_border_color( space.machine(),
 			       ((data & 0x10) ? 1 : 0) |          /* 4-bit border color */
 			       ((data & 0x20) ? 2 : 0) |
 			       ((data & 0x40) ? 4 : 0) |
@@ -1840,9 +1840,9 @@ static void mo5_init_timer(running_machine &machine)
 
 static WRITE8_DEVICE_HANDLER ( mo5_sys_porta_out )
 {
-	thom_set_mode_point( device->machine(), data & 1 );		/* bit 0: video bank switch */
-	thom_set_border_color( device->machine(), (data >> 1) & 15 );	/* bit 1-4: border color */
-	mo5_set_cassette( device->machine(), (data & 0x40) ? 1 : 0 );	/* bit 6: cassette output */
+	thom_set_mode_point( space.machine(), data & 1 );		/* bit 0: video bank switch */
+	thom_set_border_color( space.machine(), (data >> 1) & 15 );	/* bit 1-4: border color */
+	mo5_set_cassette( space.machine(), (data & 0x40) ? 1 : 0 );	/* bit 6: cassette output */
 }
 
 
@@ -1850,8 +1850,8 @@ static WRITE8_DEVICE_HANDLER ( mo5_sys_porta_out )
 static READ8_DEVICE_HANDLER ( mo5_sys_porta_in )
 {
 	return
-		(mo5_get_cassette(device->machine()) ? 0x80 : 0) |     /* bit 7: cassette input */
-		((device->machine().root_device().ioport("lightpen_button")->read() & 1) ? 0x20 : 0)
+		(mo5_get_cassette(space.machine()) ? 0x80 : 0) |     /* bit 7: cassette input */
+		((space.machine().root_device().ioport("lightpen_button")->read() & 1) ? 0x20 : 0)
 		/* bit 5: lightpen button */;
 }
 
@@ -1859,7 +1859,7 @@ static READ8_DEVICE_HANDLER ( mo5_sys_porta_in )
 
 static WRITE8_DEVICE_HANDLER ( mo5_sys_portb_out )
 {
-	device->machine().device<dac_device>("buzzer")->write_unsigned8((data & 1) ? 0x80 : 0); /* 1-bit buzzer */
+	space.machine().device<dac_device>("buzzer")->write_unsigned8((data & 1) ? 0x80 : 0); /* 1-bit buzzer */
 }
 
 
@@ -1874,7 +1874,7 @@ static READ8_DEVICE_HANDLER ( mo5_sys_portb_in )
 		"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7"
 	};
 
-	return ( device->machine().root_device().ioport(keynames[lin])->read() & (1 << col) ) ? 0x80 : 0;
+	return ( space.machine().root_device().ioport(keynames[lin])->read() & (1 << col) ) ? 0x80 : 0;
 }
 
 
@@ -3037,7 +3037,7 @@ static void to9_kbd_init ( running_machine &machine )
 
 static READ8_DEVICE_HANDLER ( to9_sys_porta_in )
 {
-	UINT8 ktest = to9_kbd_ktest(device->machine());
+	UINT8 ktest = to9_kbd_ktest(space.machine());
 
 	LOG_KBD(( "to9_sys_porta_in: ktest=%i\n", ktest ));
 
@@ -3048,20 +3048,20 @@ static READ8_DEVICE_HANDLER ( to9_sys_porta_in )
 
 static WRITE8_DEVICE_HANDLER ( to9_sys_porta_out )
 {
-	centronics_device *printer = device->machine().device<centronics_device>("centronics");
-	printer->write(device->machine().driver_data()->generic_space(), 0, data & 0xfe);
+	centronics_device *printer = space.machine().device<centronics_device>("centronics");
+	printer->write(space.machine().driver_data()->generic_space(), 0, data & 0xfe);
 }
 
 
 
 static WRITE8_DEVICE_HANDLER ( to9_sys_portb_out )
 {
-	centronics_device *printer = device->machine().device<centronics_device>("centronics");
+	centronics_device *printer = space.machine().device<centronics_device>("centronics");
 
 	printer->d0_w(BIT(data, 0));
 	printer->strobe_w(BIT(data, 1));
 
-	to9_update_ram_bank(device->machine());
+	to9_update_ram_bank(space.machine());
 
 	if ( data & 4 ) /* bit 2: video overlay (TODO) */
 		LOG(( "to9_sys_portb_out: video overlay not handled\n" ));
@@ -3095,9 +3095,9 @@ const pia6821_interface to9_pia6821_sys =
 
 static WRITE8_DEVICE_HANDLER ( to9_timer_port_out )
 {
-	thom_set_mode_point( device->machine(), data & 1 ); /* bit 0: video bank */
-	to9_update_ram_bank(device->machine());
-	to9_update_cart_bank(device->machine());
+	thom_set_mode_point( space.machine(), data & 1 ); /* bit 0: video bank */
+	to9_update_ram_bank(space.machine());
+	to9_update_cart_bank(space.machine());
 }
 
 
@@ -4073,9 +4073,9 @@ WRITE8_HANDLER ( to8_vreg_w )
 
 static READ8_DEVICE_HANDLER ( to8_sys_porta_in )
 {
-	int ktest = to8_kbd_ktest (device->machine());
+	int ktest = to8_kbd_ktest (space.machine());
 
-	LOG_KBD(( "$%04x %f: to8_sys_porta_in ktest=%i\n", device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), ktest ));
+	LOG_KBD(( "$%04x %f: to8_sys_porta_in ktest=%i\n", space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), ktest ));
 
 	return ktest;
 }
@@ -4084,12 +4084,12 @@ static READ8_DEVICE_HANDLER ( to8_sys_porta_in )
 
 static WRITE8_DEVICE_HANDLER ( to8_sys_portb_out )
 {
-	centronics_device *printer = device->machine().device<centronics_device>("centronics");
+	centronics_device *printer = space.machine().device<centronics_device>("centronics");
 
 	printer->d0_w(BIT(data, 0));
 	printer->strobe_w(BIT(data, 1));
 
-	to8_update_ram_bank(device->machine());
+	to8_update_ram_bank(space.machine());
 
 	if ( data & 4 ) /* bit 2: video overlay (TODO) */
 		LOG(( "to8_sys_portb_out: video overlay not handled\n" ));
@@ -4121,9 +4121,9 @@ const pia6821_interface to8_pia6821_sys =
 
 static READ8_DEVICE_HANDLER ( to8_timer_port_in )
 {
-	centronics_device *printer = device->machine().device<centronics_device>("centronics");
-	int lightpen = (device->machine().root_device().ioport("lightpen_button")->read() & 1) ? 2 : 0;
-	int cass = to7_get_cassette(device->machine()) ? 0x80 : 0;
+	centronics_device *printer = space.machine().device<centronics_device>("centronics");
+	int lightpen = (space.machine().root_device().ioport("lightpen_button")->read() & 1) ? 2 : 0;
+	int cass = to7_get_cassette(space.machine()) ? 0x80 : 0;
 	int dtr = printer->busy_r() << 6;
 	int lock = to8_kbd_caps ? 0 : 8; /* undocumented! */
 	return lightpen | cass | dtr | lock;
@@ -4135,12 +4135,12 @@ static WRITE8_DEVICE_HANDLER ( to8_timer_port_out )
 {
 	int ack = (data & 0x20) ? 1 : 0;       /* bit 5: keyboard ACK */
 	to8_bios_bank = (data & 0x10) ? 1 : 0; /* bit 4: BIOS bank*/
-	thom_set_mode_point( device->machine(), data & 1 );       /* bit 0: video bank switch */
-	device->machine().root_device().membank( TO8_BIOS_BANK )->set_entry( to8_bios_bank );
+	thom_set_mode_point( space.machine(), data & 1 );       /* bit 0: video bank switch */
+	space.machine().root_device().membank( TO8_BIOS_BANK )->set_entry( to8_bios_bank );
 	to8_soft_select = (data & 0x04) ? 1 : 0; /* bit 2: internal ROM select */
-	to8_update_floppy_bank(device->machine());
-	to8_update_cart_bank(device->machine());
-	to8_kbd_set_ack(device->machine(), ack);
+	to8_update_floppy_bank(space.machine());
+	to8_update_cart_bank(space.machine());
+	to8_kbd_set_ack(space.machine(), ack);
 }
 
 
@@ -4149,7 +4149,7 @@ static WRITE8_DEVICE_HANDLER ( to8_timer_cp2_out )
 {
 	/* mute */
 	to7_game_mute = data;
-	to7_game_sound_update(device->machine());
+	to7_game_sound_update(space.machine());
 }
 
 
@@ -4322,9 +4322,9 @@ const pia6821_interface to9p_pia6821_sys =
 
 static READ8_DEVICE_HANDLER ( to9p_timer_port_in )
 {
-	centronics_device *printer = device->machine().device<centronics_device>("centronics");
-	int lightpen = (device->machine().root_device().ioport("lightpen_button")->read() & 1) ? 2 : 0;
-	int cass = to7_get_cassette(device->machine()) ? 0x80 : 0;
+	centronics_device *printer = space.machine().device<centronics_device>("centronics");
+	int lightpen = (space.machine().root_device().ioport("lightpen_button")->read() & 1) ? 2 : 0;
+	int cass = to7_get_cassette(space.machine()) ? 0x80 : 0;
 	int dtr = printer->busy_r() << 6;
 	return lightpen | cass | dtr;
 }
@@ -4334,11 +4334,11 @@ static READ8_DEVICE_HANDLER ( to9p_timer_port_in )
 static WRITE8_DEVICE_HANDLER ( to9p_timer_port_out )
 {
 	int bios_bank = (data & 0x10) ? 1 : 0; /* bit 4: BIOS bank */
-	thom_set_mode_point( device->machine(), data & 1 );       /* bit 0: video bank switch */
-	device->machine().root_device().membank( TO8_BIOS_BANK )->set_entry( bios_bank );
+	thom_set_mode_point( space.machine(), data & 1 );       /* bit 0: video bank switch */
+	space.machine().root_device().membank( TO8_BIOS_BANK )->set_entry( bios_bank );
 	to8_soft_select = (data & 0x04) ? 1 : 0; /* bit 2: internal ROM select */
-	to8_update_floppy_bank(device->machine());
-	to8_update_cart_bank(device->machine());
+	to8_update_floppy_bank(space.machine());
+	to8_update_cart_bank(space.machine());
 }
 
 
@@ -4755,21 +4755,21 @@ const centronics_interface mo6_centronics_config =
 
 static WRITE8_DEVICE_HANDLER ( mo6_game_porta_out )
 {
-	centronics_device *printer = device->machine().device<centronics_device>("centronics");
+	centronics_device *printer = space.machine().device<centronics_device>("centronics");
 
-	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), data ));
+	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data ));
 
 	/* centronics data */
-	printer->write( device->machine().driver_data()->generic_space(), 0, data);
+	printer->write( space.machine().driver_data()->generic_space(), 0, data);
 }
 
 
 
 static WRITE8_DEVICE_HANDLER ( mo6_game_cb2_out )
 {
-	centronics_device *printer = device->machine().device<centronics_device>("centronics");
+	centronics_device *printer = space.machine().device<centronics_device>("centronics");
 
-	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), data ));
+	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data ));
 
 	/* centronics strobe */
 	printer->strobe_w(data);
@@ -4847,9 +4847,9 @@ static void mo6_game_reset ( running_machine &machine )
 static READ8_DEVICE_HANDLER ( mo6_sys_porta_in )
 {
 	return
-		(mo5_get_cassette(device->machine()) ? 0x80 : 0) |     /* bit 7: cassette input */
+		(mo5_get_cassette(space.machine()) ? 0x80 : 0) |     /* bit 7: cassette input */
 		8 |                                   /* bit 3: kbd-line float up to 1 */
-		((device->machine().root_device().ioport("lightpen_button")->read() & 1) ? 2 : 0);
+		((space.machine().root_device().ioport("lightpen_button")->read() & 1) ? 2 : 0);
 	/* bit 1: lightpen button */;
 }
 
@@ -4871,7 +4871,7 @@ static READ8_DEVICE_HANDLER ( mo6_sys_portb_in )
 		lin = 8;     /* A bit 3: 9-th kbd line select */
 
 	return
-		( device->machine().root_device().ioport(keynames[lin])->read() & (1 << col) ) ?  0x80 : 0;
+		( space.machine().root_device().ioport(keynames[lin])->read() & (1 << col) ) ?  0x80 : 0;
 	/* bit 7: key up */
 }
 
@@ -4879,19 +4879,19 @@ static READ8_DEVICE_HANDLER ( mo6_sys_portb_in )
 
 static WRITE8_DEVICE_HANDLER ( mo6_sys_porta_out )
 {
-	thom_set_mode_point( device->machine(),data & 1 );				/* bit 0: video bank switch */
+	thom_set_mode_point( space.machine(),data & 1 );				/* bit 0: video bank switch */
 	to7_game_mute = data & 4;						/* bit 2: sound mute */
-	thom_set_caps_led( device->machine(),(data & 16) ? 0 : 1 ) ;		/* bit 4: keyboard led */
-	mo5_set_cassette( device->machine(), (data & 0x40) ? 1 : 0 );		/* bit 6: cassette output */
-	mo6_update_cart_bank(device->machine());					/* bit 5: rom bank */
-	to7_game_sound_update(device->machine());
+	thom_set_caps_led( space.machine(),(data & 16) ? 0 : 1 ) ;		/* bit 4: keyboard led */
+	mo5_set_cassette( space.machine(), (data & 0x40) ? 1 : 0 );		/* bit 6: cassette output */
+	mo6_update_cart_bank(space.machine());					/* bit 5: rom bank */
+	to7_game_sound_update(space.machine());
 }
 
 
 
 static WRITE8_DEVICE_HANDLER ( mo6_sys_portb_out )
 {
-	device->machine().device<dac_device>("buzzer")->write_unsigned8((data & 1) ? 0x80 : 0); /* bit 0: buzzer */
+	space.machine().device<dac_device>("buzzer")->write_unsigned8((data & 1) ? 0x80 : 0); /* bit 0: buzzer */
 }
 
 
@@ -5279,7 +5279,7 @@ static READ8_DEVICE_HANDLER ( mo5nr_sys_portb_in )
 		"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7"
 	};
 
-	return ( device->machine().root_device().ioport(keynames[lin])->read() & (1 << col) ) ? 0x80 : 0;
+	return ( space.machine().root_device().ioport(keynames[lin])->read() & (1 << col) ) ? 0x80 : 0;
 	/* bit 7: key up */
 }
 
@@ -5288,11 +5288,11 @@ static READ8_DEVICE_HANDLER ( mo5nr_sys_portb_in )
 static WRITE8_DEVICE_HANDLER ( mo5nr_sys_porta_out )
 {
 	/* no keyboard LED */
-	thom_set_mode_point( device->machine(), data & 1 );			/* bit 0: video bank switch */
+	thom_set_mode_point( space.machine(), data & 1 );			/* bit 0: video bank switch */
 	to7_game_mute = data & 4;						/* bit 2: sound mute */
-	mo5_set_cassette( device->machine(), (data & 0x40) ? 1 : 0 );		/* bit 6: cassette output */
-	mo6_update_cart_bank(device->machine());					/* bit 5: rom bank */
-	to7_game_sound_update(device->machine());
+	mo5_set_cassette( space.machine(), (data & 0x40) ? 1 : 0 );		/* bit 6: cassette output */
+	mo6_update_cart_bank(space.machine());					/* bit 5: rom bank */
+	to7_game_sound_update(space.machine());
 }
 
 

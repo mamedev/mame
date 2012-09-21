@@ -2226,7 +2226,7 @@ int vic2e_k2_r( device_t *device )
 WRITE8_DEVICE_HANDLER( vic2_port_w )
 {
 	vic2_state *vic2 = get_safe_token(device);
-	running_machine &machine = device->machine();
+	running_machine &machine = space.machine();
 
 	DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
 	offset &= 0x3f;
@@ -2451,7 +2451,7 @@ WRITE8_DEVICE_HANDLER( vic2_port_w )
 READ8_DEVICE_HANDLER( vic2_port_r )
 {
 	vic2_state *vic2 = get_safe_token(device);
-	running_machine &machine = device->machine();
+	running_machine &machine = space.machine();
 	int val = 0;
 
 	offset &= 0x3f;

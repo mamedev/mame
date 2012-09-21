@@ -82,7 +82,7 @@ void svision_sound_decrement(device_t *device)
 WRITE8_DEVICE_HANDLER( svision_sounddma_w )
 {
 	svision_sound_state *state = get_safe_token(device);
-	logerror("%.6f svision snddma write %04x %02x\n", device->machine().time().as_double(),offset+0x18,data);
+	logerror("%.6f svision snddma write %04x %02x\n", space.machine().time().as_double(),offset+0x18,data);
 	state->dma.reg[offset] = data;
 	switch (offset)
 	{
@@ -94,7 +94,7 @@ WRITE8_DEVICE_HANDLER( svision_sounddma_w )
 			state->dma.size = (data ? data : 0x100) * 32;
 			break;
 		case 3:
-			state->dma.step = device->machine().device("maincpu")->unscaled_clock() / (256.0 * device->machine().sample_rate() * (1 + (data & 3)));
+			state->dma.step = space.machine().device("maincpu")->unscaled_clock() / (256.0 * space.machine().sample_rate() * (1 + (data & 3)));
 			state->dma.right = data & 4;
 			state->dma.left = data & 8;
 			state->dma.ca14to16 = ((data & 0x70) >> 4) << 14;
@@ -118,7 +118,7 @@ WRITE8_DEVICE_HANDLER( svision_noise_w )
 	{
 		case 0:
 			state->noise.volume=data&0xf;
-			state->noise.step= device->machine().device("maincpu")->unscaled_clock() / (256.0*device->machine().sample_rate()*(1+(data>>4)));
+			state->noise.step= space.machine().device("maincpu")->unscaled_clock() / (256.0*space.machine().sample_rate()*(1+(data>>4)));
 			break;
 		case 1:
 			state->noise.count = data + 1;

@@ -113,25 +113,25 @@ static int s3c2440_core_pin_r( device_t *device, int pin)
 
 static WRITE8_DEVICE_HANDLER( s3c2440_nand_command_w )
 {
-	mini2440_state *state = device->machine().driver_data<mini2440_state>();
+	mini2440_state *state = space.machine().driver_data<mini2440_state>();
 	state->m_nand->command_w(data);
 }
 
 static WRITE8_DEVICE_HANDLER( s3c2440_nand_address_w )
 {
-	mini2440_state *state = device->machine().driver_data<mini2440_state>();
+	mini2440_state *state = space.machine().driver_data<mini2440_state>();
 	state->m_nand->address_w(data);
 }
 
 static READ8_DEVICE_HANDLER( s3c2440_nand_data_r )
 {
-	mini2440_state *state = device->machine().driver_data<mini2440_state>();
+	mini2440_state *state = space.machine().driver_data<mini2440_state>();
 	return state->m_nand->data_r();
 }
 
 static WRITE8_DEVICE_HANDLER( s3c2440_nand_data_w )
 {
-	mini2440_state *state = device->machine().driver_data<mini2440_state>();
+	mini2440_state *state = space.machine().driver_data<mini2440_state>();
 	state->m_nand->data_w(data);
 }
 
@@ -139,7 +139,7 @@ static WRITE8_DEVICE_HANDLER( s3c2440_nand_data_w )
 
 static WRITE16_DEVICE_HANDLER( s3c2440_i2s_data_w )
 {
-	mini2440_state *state = device->machine().driver_data<mini2440_state>();
+	mini2440_state *state = space.machine().driver_data<mini2440_state>();
 	state->m_dac[offset]->write_signed16(data + 0x8000);
 }
 
@@ -150,10 +150,10 @@ static READ32_DEVICE_HANDLER( s3c2440_adc_data_r )
 	UINT32 data = 0;
 	switch (offset)
 	{
-		case 2 + 0 : data = device->machine().root_device().ioport( "PENX")->read(); break;
-		case 2 + 1 : data = 915 - device->machine().root_device().ioport( "PENY")->read() + 90; break;
+		case 2 + 0 : data = space.machine().root_device().ioport( "PENX")->read(); break;
+		case 2 + 1 : data = 915 - space.machine().root_device().ioport( "PENY")->read() + 90; break;
 	}
-	verboselog( device->machine(), 5,  "s3c2440_adc_data_r %08X\n", data);
+	verboselog( space.machine(), 5,  "s3c2440_adc_data_r %08X\n", data);
 	return data;
 }
 

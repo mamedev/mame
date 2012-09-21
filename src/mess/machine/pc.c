@@ -200,7 +200,7 @@ WRITE8_MEMBER(pc_state::pc_dma_write_byte)
 
 static READ8_DEVICE_HANDLER( pc_dma8237_fdc_dack_r )
 {
-	return pc_fdc_dack_r(device->machine(), space);
+	return pc_fdc_dack_r(space.machine(), space);
 }
 
 
@@ -212,7 +212,7 @@ static READ8_DEVICE_HANDLER( pc_dma8237_hdc_dack_r )
 
 static WRITE8_DEVICE_HANDLER( pc_dma8237_fdc_dack_w )
 {
-	pc_fdc_dack_w( device->machine(), space, data );
+	pc_fdc_dack_w( space.machine(), space, data );
 }
 
 
@@ -223,7 +223,7 @@ static WRITE8_DEVICE_HANDLER( pc_dma8237_hdc_dack_w )
 
 static WRITE8_DEVICE_HANDLER( pc_dma8237_0_dack_w )
 {
-	pc_state *st = device->machine().driver_data<pc_state>();
+	pc_state *st = space.machine().driver_data<pc_state>();
 	st->m_u73_q2 = 0;
 	i8237_dreq0_w( st->m_dma8237, st->m_u73_q2 );
 }
@@ -757,8 +757,8 @@ WRITE_LINE_MEMBER( pc_state::keyboard_data_w )
 static READ8_DEVICE_HANDLER (ibm5160_ppi_porta_r)
 {
 	int data = 0xFF;
-	running_machine &machine = device->machine();
-	pc_state *st = device->machine().driver_data<pc_state>();
+	running_machine &machine = space.machine();
+	pc_state *st = space.machine().driver_data<pc_state>();
 
 	/* KB port A */
 	if (st->m_ppi_keyboard_clear)
@@ -772,7 +772,7 @@ static READ8_DEVICE_HANDLER (ibm5160_ppi_porta_r)
          *      01 - color 40x25
          * 6-7  The number of floppy disk drives
          */
-		data = device->machine().root_device().ioport("DSW0")->read();
+		data = space.machine().root_device().ioport("DSW0")->read();
 	}
 	else
 	{
@@ -785,10 +785,10 @@ static READ8_DEVICE_HANDLER (ibm5160_ppi_porta_r)
 
 static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 {
-	pc_state *st = device->machine().driver_data<pc_state>();
+	pc_state *st = space.machine().driver_data<pc_state>();
 	int timer2_output = pit8253_get_output( st->m_pit8253, 2 );
 	int data=0xff;
-	running_machine &machine = device->machine();
+	running_machine &machine = space.machine();
 
 	data&=~0x80; // no parity error
 	data&=~0x40; // no error on expansion board
@@ -797,13 +797,13 @@ static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 	if (st->m_ppi_portc_switch_high)
 	{
 		/* read hi nibble of S2 */
-		data = (data & 0xf0) | ((device->machine().root_device().ioport("DSW0")->read() >> 4) & 0x0f);
+		data = (data & 0xf0) | ((space.machine().root_device().ioport("DSW0")->read() >> 4) & 0x0f);
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
 	}
 	else
 	{
 		/* read lo nibble of S2 */
-		data = (data & 0xf0) | (device->machine().root_device().ioport("DSW0")->read() & 0x0f);
+		data = (data & 0xf0) | (space.machine().root_device().ioport("DSW0")->read() & 0x0f);
 		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
 	}
 
@@ -819,7 +819,7 @@ static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 
 static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 {
-	pc_state *st = device->machine().driver_data<pc_state>();
+	pc_state *st = space.machine().driver_data<pc_state>();
 
 	/* PPI controller port B*/
 	st->m_ppi_portb = data;
@@ -827,7 +827,7 @@ static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 	st->m_ppi_keyboard_clear = data & 0x80;
 	st->m_ppi_keyb_clock = data & 0x40;
 	pit8253_gate2_w(st->m_pit8253, BIT(data, 0));
-	pc_speaker_set_spkrdata( device->machine(), data & 0x02 );
+	pc_speaker_set_spkrdata( space.machine(), data & 0x02 );
 
 	st->m_ppi_clock_signal = ( st->m_ppi_keyb_clock ) ? 1 : 0;
 	st->m_pc_kbdc->clock_write_from_mb(st->m_ppi_clock_signal);
@@ -856,8 +856,8 @@ I8255_INTERFACE( ibm5160_ppi8255_interface )
 static READ8_DEVICE_HANDLER (pc_ppi_porta_r)
 {
 	int data = 0xFF;
-	running_machine &machine = device->machine();
-	pc_state *st = device->machine().driver_data<pc_state>();
+	running_machine &machine = space.machine();
+	pc_state *st = space.machine().driver_data<pc_state>();
 
 	/* KB port A */
 	if (st->m_ppi_keyboard_clear)
@@ -871,7 +871,7 @@ static READ8_DEVICE_HANDLER (pc_ppi_porta_r)
          *      01 - color 40x25
          * 6-7  The number of floppy disk drives
          */
-		data = device->machine().root_device().ioport("DSW0")->read();
+		data = space.machine().root_device().ioport("DSW0")->read();
 	}
 	else
 	{
@@ -884,14 +884,14 @@ static READ8_DEVICE_HANDLER (pc_ppi_porta_r)
 
 static WRITE8_DEVICE_HANDLER( pc_ppi_portb_w )
 {
-	pc_state *st = device->machine().driver_data<pc_state>();
+	pc_state *st = space.machine().driver_data<pc_state>();
 	/* PPI controller port B*/
 	st->m_ppi_portb = data;
 	st->m_ppi_portc_switch_high = data & 0x08;
 	st->m_ppi_keyboard_clear = data & 0x80;
 	st->m_ppi_keyb_clock = data & 0x40;
 	pit8253_gate2_w(st->m_pit8253, BIT(data, 0));
-	pc_speaker_set_spkrdata( device->machine(), data & 0x02 );
+	pc_speaker_set_spkrdata( space.machine(), data & 0x02 );
 	pc_keyb_set_clock( st->m_ppi_keyb_clock );
 
 	if ( st->m_ppi_keyboard_clear )
@@ -959,7 +959,7 @@ static TIMER_CALLBACK( mc1502_keyb_signal_callback )
 
 static READ8_DEVICE_HANDLER ( mc1502_ppi_porta_r )
 {
-	running_machine &machine = device->machine();
+	running_machine &machine = space.machine();
 
 	DBG_LOG(1,"mc1502_ppi_porta_r",("= %02X\n", mc1502_keyb.latch));
 	return mc1502_keyb.latch;
@@ -967,8 +967,8 @@ static READ8_DEVICE_HANDLER ( mc1502_ppi_porta_r )
 
 static WRITE8_DEVICE_HANDLER ( mc1502_ppi_porta_w )
 {
-	pc_state *st = device->machine().driver_data<pc_state>();
-	running_machine &machine = device->machine();
+	pc_state *st = space.machine().driver_data<pc_state>();
+	running_machine &machine = space.machine();
 
 	DBG_LOG(1,"mc1502_ppi_porta_w",("( %02X )\n", data));
 	mc1502_keyb.latch = data;
@@ -979,22 +979,22 @@ static WRITE8_DEVICE_HANDLER ( mc1502_ppi_porta_w )
 
 static WRITE8_DEVICE_HANDLER ( mc1502_ppi_portb_w )
 {
-	pc_state *st = device->machine().driver_data<pc_state>();
-	running_machine &machine = device->machine();
+	pc_state *st = space.machine().driver_data<pc_state>();
+	running_machine &machine = space.machine();
 
 	DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
 	st->m_ppi_portb = data;
-	pit8253_gate2_w(device->machine().device("pit8253"), BIT(data, 0));
-	pc_speaker_set_spkrdata( device->machine(), data & 0x02 );
+	pit8253_gate2_w(space.machine().device("pit8253"), BIT(data, 0));
+	pc_speaker_set_spkrdata( space.machine(), data & 0x02 );
 }
 
 static READ8_DEVICE_HANDLER ( mc1502_ppi_portc_r )
 {
-	running_machine &machine = device->machine();
-	pc_state *st = device->machine().driver_data<pc_state>();
-	int timer2_output = pit8253_get_output( device->machine().device("pit8253"), 2 );
+	running_machine &machine = space.machine();
+	pc_state *st = space.machine().driver_data<pc_state>();
+	int timer2_output = pit8253_get_output( space.machine().device("pit8253"), 2 );
 	int data = 0xff;
-	double tap_val = (device->machine().device<cassette_image_device>(CASSETTE_TAG)->input());
+	double tap_val = (space.machine().device<cassette_image_device>(CASSETTE_TAG)->input());
 
 //  0x80 -- serial RxD
 //  0x40 -- CASS IN, also loops back T2OUT (gated by CASWR)
@@ -1011,7 +1011,7 @@ static READ8_DEVICE_HANDLER ( mc1502_ppi_portc_r )
 
 static READ8_DEVICE_HANDLER ( mc1502_kppi_porta_r )
 {
-	running_machine &machine = device->machine();
+	running_machine &machine = space.machine();
 	UINT8 key = 0;
 
 	if (mc1502_keyb.mask & 0x0001) { key |= machine.root_device().ioport("Y1")->read(); }
@@ -1033,7 +1033,7 @@ static READ8_DEVICE_HANDLER ( mc1502_kppi_porta_r )
 
 static WRITE8_DEVICE_HANDLER ( mc1502_kppi_portb_w )
 {
-	running_machine &machine = device->machine();
+	running_machine &machine = space.machine();
 
 	mc1502_keyb.mask &= ~255;
 	mc1502_keyb.mask |= data ^ 255;
@@ -1046,7 +1046,7 @@ static WRITE8_DEVICE_HANDLER ( mc1502_kppi_portb_w )
 
 static WRITE8_DEVICE_HANDLER ( mc1502_kppi_portc_w )
 {
-	running_machine &machine = device->machine();
+	running_machine &machine = space.machine();
 
 	mc1502_keyb.mask &= ~(7 << 8);
 	mc1502_keyb.mask |= ((data ^ 7) & 7) << 8;
@@ -1056,14 +1056,14 @@ static WRITE8_DEVICE_HANDLER ( mc1502_kppi_portc_w )
 
 static WRITE8_DEVICE_HANDLER ( pcjr_ppi_portb_w )
 {
-	pc_state *st = device->machine().driver_data<pc_state>();
+	pc_state *st = space.machine().driver_data<pc_state>();
 	/* KB controller port B */
 	st->m_ppi_portb = data;
 	st->m_ppi_portc_switch_high = data & 0x08;
-	pit8253_gate2_w(device->machine().device("pit8253"), BIT(data, 0));
-	pc_speaker_set_spkrdata( device->machine(), data & 0x02 );
+	pit8253_gate2_w(space.machine().device("pit8253"), BIT(data, 0));
+	pc_speaker_set_spkrdata( space.machine(), data & 0x02 );
 
-	device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+	space.machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 }
 
 
@@ -1073,7 +1073,7 @@ static WRITE8_DEVICE_HANDLER ( pcjr_ppi_portb_w )
 static READ8_DEVICE_HANDLER (pcjr_ppi_porta_r )
 {
 	int data;
-	running_machine &machine = device->machine();
+	running_machine &machine = space.machine();
 
 	data = 0xff;
 	PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
@@ -1094,18 +1094,18 @@ static READ8_DEVICE_HANDLER (pcjr_ppi_porta_r )
  */
 static READ8_DEVICE_HANDLER ( pcjr_ppi_portc_r )
 {
-	pc_state *st = device->machine().driver_data<pc_state>();
-	int timer2_output = pit8253_get_output( device->machine().device("pit8253"), 2 );
+	pc_state *st = space.machine().driver_data<pc_state>();
+	int timer2_output = pit8253_get_output( space.machine().device("pit8253"), 2 );
 	int data=0xff;
 
 	data&=~0x80;
 	data &= ~0x04;		/* floppy drive installed */
-	if ( device->machine().device<ram_device>(RAM_TAG)->size() > 64 * 1024 )	/* more than 64KB ram installed */
+	if ( space.machine().device<ram_device>(RAM_TAG)->size() > 64 * 1024 )	/* more than 64KB ram installed */
 		data &= ~0x08;
 	data = ( data & ~0x01 ) | ( pcjr_keyb.latch ? 0x01: 0x00 );
 	if ( ! ( st->m_ppi_portb & 0x08 ) )
 	{
-		double tap_val = (device->machine().device<cassette_image_device>(CASSETTE_TAG)->input());
+		double tap_val = (space.machine().device<cassette_image_device>(CASSETTE_TAG)->input());
 
 		if ( tap_val < 0 )
 		{
@@ -1265,8 +1265,8 @@ READ8_DEVICE_HANDLER( mc1502_wd17xx_drq_r )
 	data = wd17xx_drq_r(device);
 	if (!data && !wd17xx_intrq_r(device)) {
 		/* fake cpu halt by resetting PC one insn back */
-		newpc = device->machine().firstcpu->pc();
-		device->machine().firstcpu->set_pc( newpc - 1 );
+		newpc = space.machine().firstcpu->pc();
+		space.machine().firstcpu->set_pc( newpc - 1 );
 	}
 
 	return data;

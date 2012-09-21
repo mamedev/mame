@@ -835,11 +835,11 @@ void dc_state::machine_reset()
 
 READ64_DEVICE_HANDLER( dc_aica_reg_r )
 {
-	//  dc_state *state = device->machine().driver_data<dc_state>();
+	//  dc_state *state = space.machine().driver_data<dc_state>();
 	//int reg;
 	UINT64 shift;
 
-	/*reg = */decode_reg32_64(device->machine(), offset, mem_mask, &shift);
+	/*reg = */decode_reg32_64(space.machine(), offset, mem_mask, &shift);
 
 //  mame_printf_verbose("AICA REG: [%08x] read %" I64FMT "x, mask %" I64FMT "x\n", 0x700000+reg*4, (UINT64)offset, mem_mask);
 
@@ -848,12 +848,12 @@ READ64_DEVICE_HANDLER( dc_aica_reg_r )
 
 WRITE64_DEVICE_HANDLER( dc_aica_reg_w )
 {
-	//  dc_state *state = device->machine().driver_data<dc_state>();
+	//  dc_state *state = space.machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
 
-	reg = decode_reg32_64(device->machine(), offset, mem_mask, &shift);
+	reg = decode_reg32_64(space.machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 
 	if (reg == (0x2c00/4))
@@ -861,12 +861,12 @@ WRITE64_DEVICE_HANDLER( dc_aica_reg_w )
 		if (dat & 1)
 		{
 			/* halt the ARM7 */
-			device->machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			space.machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		}
 		else
 		{
 			/* it's alive ! */
-			device->machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			space.machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		}
     }
 

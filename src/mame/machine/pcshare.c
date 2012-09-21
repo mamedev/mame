@@ -267,7 +267,7 @@ static WRITE_LINE_DEVICE_HANDLER( pic8259_1_set_int_line )
 static READ8_DEVICE_HANDLER( get_slave_ack )
 {
 	if (offset==2) { // IRQ = 2
-		return pic8259_acknowledge(device->machine().device("pic8259_2"));
+		return pic8259_acknowledge(space.machine().device("pic8259_2"));
 	}
 	return 0x00;
 }

@@ -223,7 +223,7 @@ static void namco_50xx_irq_set(device_t *device)
 
 WRITE8_DEVICE_HANDLER( namco_50xx_write )
 {
-	device->machine().scheduler().synchronize(FUNC(namco_50xx_latch_callback), data, (void *)device);
+	space.machine().scheduler().synchronize(FUNC(namco_50xx_latch_callback), data, (void *)device);
 
 	namco_50xx_irq_set(device);
 }

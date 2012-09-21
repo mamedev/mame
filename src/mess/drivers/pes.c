@@ -67,7 +67,7 @@ Address map:
 /* Devices */
 static WRITE8_DEVICE_HANDLER( pes_kbd_input )
 {
-	pes_state *state = device->machine().driver_data<pes_state>();
+	pes_state *state = space.machine().driver_data<pes_state>();
 #ifdef DEBUG_FIFO
 	fprintf(stderr,"keyboard input: %c, ", data);
 #endif
@@ -87,8 +87,8 @@ static WRITE8_DEVICE_HANDLER( pes_kbd_input )
 	fprintf(stderr,"kb input fifo fullness: %d\n",(state->m_infifo_head_ptr-state->m_infifo_tail_ptr)&0x1F);
 #endif
 	// todo: following two should be set so clear happens after one cpu cycle
-	device->machine().device("maincpu")->execute().set_input_line(MCS51_RX_LINE, ASSERT_LINE);
-	device->machine().device("maincpu")->execute().set_input_line(MCS51_RX_LINE, CLEAR_LINE);
+	space.machine().device("maincpu")->execute().set_input_line(MCS51_RX_LINE, ASSERT_LINE);
+	space.machine().device("maincpu")->execute().set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 }
 
 static GENERIC_TERMINAL_INTERFACE( pes_terminal_intf )

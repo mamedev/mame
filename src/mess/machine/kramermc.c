@@ -19,15 +19,15 @@ static READ8_DEVICE_HANDLER (kramermc_port_a_r)
 
 static READ8_DEVICE_HANDLER (kramermc_port_b_r)
 {
-	kramermc_state *state = device->machine().driver_data<kramermc_state>();
+	kramermc_state *state = space.machine().driver_data<kramermc_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
-	return device->machine().root_device().ioport(keynames[state->m_key_row])->read();
+	return space.machine().root_device().ioport(keynames[state->m_key_row])->read();
 }
 
 static WRITE8_DEVICE_HANDLER (kramermc_port_a_w)
 {
-	kramermc_state *state = device->machine().driver_data<kramermc_state>();
+	kramermc_state *state = space.machine().driver_data<kramermc_state>();
 	state->m_key_row = ((data >> 1) & 0x07);
 }
 

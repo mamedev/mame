@@ -384,7 +384,7 @@ static TIMER_CALLBACK(apple1_kbd_strobe_end)
 *****************************************************************************/
 static READ8_DEVICE_HANDLER( apple1_pia0_kbdin )
 {
-	apple1_state *state = device->machine().driver_data<apple1_state>();
+	apple1_state *state = space.machine().driver_data<apple1_state>();
 	/* Bit 7 of the keyboard input is permanently wired high.  This is
        what the ROM Monitor software expects. */
 	return state->m_kbd_data | 0x80;
@@ -393,7 +393,7 @@ static READ8_DEVICE_HANDLER( apple1_pia0_kbdin )
 static WRITE8_DEVICE_HANDLER( apple1_pia0_dspout )
 {
 	/* Send an ASCII character to the video hardware. */
-	apple1_vh_dsp_w(device->machine(), data);
+	apple1_vh_dsp_w(space.machine(), data);
 }
 
 static WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal )
@@ -413,7 +413,7 @@ static WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal )
        write.  Thus the write delay depends on the cursor position and
        where the display is in the refresh cycle. */
 	if (!data)
-		device->machine().scheduler().timer_set(apple1_vh_dsp_time_to_ready(device->machine()), FUNC(apple1_dsp_ready_start));
+		space.machine().scheduler().timer_set(apple1_vh_dsp_time_to_ready(space.machine()), FUNC(apple1_dsp_ready_start));
 }
 
 static TIMER_CALLBACK(apple1_dsp_ready_start)

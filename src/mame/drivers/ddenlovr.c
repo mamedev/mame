@@ -1524,7 +1524,7 @@ static WRITE16_DEVICE_HANDLER( ddenlovr_oki_bank_w )
 
 static WRITE16_DEVICE_HANDLER( quiz365_oki_bank1_w )
 {
-	dynax_state *state = device->machine().driver_data<dynax_state>();
+	dynax_state *state = space.machine().driver_data<dynax_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1536,7 +1536,7 @@ static WRITE16_DEVICE_HANDLER( quiz365_oki_bank1_w )
 
 static WRITE16_DEVICE_HANDLER( quiz365_oki_bank2_w )
 {
-	dynax_state *state = device->machine().driver_data<dynax_state>();
+	dynax_state *state = space.machine().driver_data<dynax_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1561,7 +1561,7 @@ READ16_MEMBER(dynax_state::unk16_r)
 
 static WRITE8_DEVICE_HANDLER( ddenlovr_select_w )
 {
-	dynax_state *state = device->machine().driver_data<dynax_state>();
+	dynax_state *state = space.machine().driver_data<dynax_state>();
 	state->m_dsw_sel = data;
 }
 
@@ -1598,13 +1598,13 @@ READ8_MEMBER(dynax_state::rongrong_input2_r)
 
 static READ8_DEVICE_HANDLER( quiz365_input_r )
 {
-	dynax_state *state = device->machine().driver_data<dynax_state>();
+	dynax_state *state = space.machine().driver_data<dynax_state>();
 
 	if (!BIT(state->m_dsw_sel, 0))	return state->ioport("DSW1")->read();
 	if (!BIT(state->m_dsw_sel, 1))	return state->ioport("DSW2")->read();
 	if (!BIT(state->m_dsw_sel, 2))	return state->ioport("DSW3")->read();
-	if (!BIT(state->m_dsw_sel, 3))	return 0xff;//device->machine().rand();
-	if (!BIT(state->m_dsw_sel, 4))	return 0xff;//device->machine().rand();
+	if (!BIT(state->m_dsw_sel, 3))	return 0xff;//space.machine().rand();
+	if (!BIT(state->m_dsw_sel, 4))	return 0xff;//space.machine().rand();
 	return 0xff;
 }
 
@@ -2812,7 +2812,7 @@ ADDRESS_MAP_END
 
 static READ8_DEVICE_HANDLER( hginga_dsw_r )
 {
-	dynax_state *state = device->machine().driver_data<dynax_state>();
+	dynax_state *state = space.machine().driver_data<dynax_state>();
 
 	if (!BIT(state->m_dsw_sel, 0))   return state->ioport("DSW4")->read();
 	if (!BIT(state->m_dsw_sel, 1))   return state->ioport("DSW3")->read();
@@ -2820,7 +2820,7 @@ static READ8_DEVICE_HANDLER( hginga_dsw_r )
 	if (!BIT(state->m_dsw_sel, 3))   return state->ioport("DSW1")->read();
 	if (!BIT(state->m_dsw_sel, 4))   return state->ioport("DSW5")->read();
 
-	logerror("%s: warning, unknown bits read, ddenlovr_select = %02x\n", device->machine().describe_context(), state->m_dsw_sel);
+	logerror("%s: warning, unknown bits read, ddenlovr_select = %02x\n", space.machine().describe_context(), state->m_dsw_sel);
 	return 0xff;
 }
 
@@ -3657,7 +3657,7 @@ WRITE8_MEMBER(dynax_state::seljan2_palette_w)
 
 static READ8_DEVICE_HANDLER( seljan2_dsw_r )
 {
-	dynax_state *state = device->machine().driver_data<dynax_state>();
+	dynax_state *state = space.machine().driver_data<dynax_state>();
 
 	if (!BIT(state->m_dsw_sel, 0))   return state->ioport("DSW1")->read();
 	if (!BIT(state->m_dsw_sel, 1))   return state->ioport("DSW2")->read();
@@ -3665,7 +3665,7 @@ static READ8_DEVICE_HANDLER( seljan2_dsw_r )
 	if (!BIT(state->m_dsw_sel, 3))   return state->ioport("DSW4")->read();
 	if (!BIT(state->m_dsw_sel, 4))   return state->ioport("DSWTOP")->read();
 
-	logerror("%s: warning, unknown bits read, ddenlovr_select = %02x\n", device->machine().describe_context(), state->m_dsw_sel);
+	logerror("%s: warning, unknown bits read, ddenlovr_select = %02x\n", space.machine().describe_context(), state->m_dsw_sel);
 	return 0xff;
 }
 

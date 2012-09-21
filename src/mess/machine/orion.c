@@ -29,20 +29,20 @@
 
 static READ8_DEVICE_HANDLER (orion_romdisk_porta_r )
 {
-	orion_state *state = device->machine().driver_data<orion_state>();
+	orion_state *state = space.machine().driver_data<orion_state>();
 	UINT8 *romdisk = state->memregion("maincpu")->base() + 0x10000;
 	return romdisk[state->m_romdisk_msb*256+state->m_romdisk_lsb];
 }
 
 static WRITE8_DEVICE_HANDLER (orion_romdisk_portb_w )
 {
-	orion_state *state = device->machine().driver_data<orion_state>();
+	orion_state *state = space.machine().driver_data<orion_state>();
 	state->m_romdisk_lsb = data;
 }
 
 static WRITE8_DEVICE_HANDLER (orion_romdisk_portc_w )
 {
-	orion_state *state = device->machine().driver_data<orion_state>();
+	orion_state *state = space.machine().driver_data<orion_state>();
 	state->m_romdisk_msb = data;
 }
 

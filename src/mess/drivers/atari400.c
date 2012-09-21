@@ -909,13 +909,13 @@ static WRITE8_DEVICE_HANDLER(a1200xl_pia_pb_w) { a1200xl_mmu(device->machine(), 
 static WRITE8_DEVICE_HANDLER(a800xl_pia_pb_w)
 {
 	if (downcast<pia6821_device *>(device)->port_b_z_mask() != 0xff)
-		a800xl_mmu(device->machine(), data);
+		a800xl_mmu(space.machine(), data);
 }
 
 static WRITE8_DEVICE_HANDLER(xegs_pia_pb_w)
 {
 	if (downcast<pia6821_device *>(device)->port_b_z_mask() != 0xff)
-		xegs_mmu(device->machine(), data);
+		xegs_mmu(space.machine(), data);
 }
 
 static const pokey_interface atari_pokey_interface =

@@ -76,7 +76,7 @@ WRITE8_MEMBER(redalert_state::redalert_audio_command_w)
 
 static WRITE8_DEVICE_HANDLER( redalert_AY8910_w )
 {
-	redalert_state *state = device->machine().driver_data<redalert_state>();
+	redalert_state *state = space.machine().driver_data<redalert_state>();
 	/* BC2 is connected to a pull-up resistor, so BC2=1 always */
 	switch (data & 0x03)
 	{

@@ -1281,12 +1281,12 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 		break;
 
 	case 0x19:
-		vic3_clear_interrupt(device->machine(), data & 0x0f, vic3);
+		vic3_clear_interrupt(space.machine(), data & 0x0f, vic3);
 		break;
 
 	case 0x1a:							/* irq mask */
 		vic3->reg[offset] = data;
-		vic3_set_interrupt(device->machine(), 0, vic3);	// beamrider needs this
+		vic3_set_interrupt(space.machine(), 0, vic3);	// beamrider needs this
 		break;
 
 	case 0x11:
@@ -1380,7 +1380,7 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 		if (vic3->port_changed!=NULL) {
 			DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
 			vic3->reg[offset] = data;
-			vic3->port_changed(device->machine(), data);
+			vic3->port_changed(space.machine(), data);
 		}
 		break;
 	case 0x31:
@@ -1460,13 +1460,13 @@ READ8_DEVICE_HANDLER( vic3_port_r )
 	case 0x1e:							/* sprite to sprite collision detect */
 		val = vic3->reg[offset];
 		vic3->reg[offset] = 0;
-		vic3_clear_interrupt(device->machine(), 4, vic3);
+		vic3_clear_interrupt(space.machine(), 4, vic3);
 		break;
 
 	case 0x1f:							/* sprite to background collision detect */
 		val = vic3->reg[offset];
 		vic3->reg[offset] = 0;
-		vic3_clear_interrupt(device->machine(), 2, vic3);
+		vic3_clear_interrupt(space.machine(), 2, vic3);
 		break;
 
 	case 0x20:

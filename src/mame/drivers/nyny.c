@@ -264,7 +264,7 @@ static const pia6821_interface pia_2_intf =
 
 static WRITE8_DEVICE_HANDLER( ic48_1_74123_output_changed )
 {
-	nyny_state *state = device->machine().driver_data<nyny_state>();
+	nyny_state *state = space.machine().driver_data<nyny_state>();
 	state->m_pia2->ca1_w(data);
 }
 

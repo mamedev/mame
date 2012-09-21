@@ -14,7 +14,7 @@ WRITE8_MEMBER( super80_state::pio_port_a_w )
 
 static READ8_DEVICE_HANDLER( pio_port_b_r ) // cannot be modernised yet as super80 hangs at start
 {
-	super80_state *state = device->machine().driver_data<super80_state>();
+	super80_state *state = space.machine().driver_data<super80_state>();
 	char kbdrow[6];
 	UINT8 i;
 	UINT8 data = 0xff;

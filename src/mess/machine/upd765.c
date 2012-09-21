@@ -803,7 +803,7 @@ READ8_DEVICE_HANDLER( upd765_status_r )
 {
 	upd765_t *fdc = get_safe_token(device);
 	if (LOG_EXTRA)
-		logerror("%s: upd765_status_r: %02x\n", device->machine().describe_context(), fdc->FDC_main);
+		logerror("%s: upd765_status_r: %02x\n", space.machine().describe_context(), fdc->FDC_main);
 	return fdc->FDC_main;
 }
 

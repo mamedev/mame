@@ -267,25 +267,25 @@ READ8_MEMBER(samcoupe_state::samcoupe_attributes_r)
 
 static READ8_DEVICE_HANDLER( samcoupe_lpt1_busy_r )
 {
-	centronics_device *centronics = device->machine().device<centronics_device>("lpt1");
+	centronics_device *centronics = space.machine().device<centronics_device>("lpt1");
 	return centronics->busy_r();
 }
 
 static WRITE8_DEVICE_HANDLER( samcoupe_lpt1_strobe_w )
 {
-	centronics_device *centronics = device->machine().device<centronics_device>("lpt1");
+	centronics_device *centronics = space.machine().device<centronics_device>("lpt1");
 	centronics->strobe_w(data);
 }
 
 static READ8_DEVICE_HANDLER( samcoupe_lpt2_busy_r )
 {
-	centronics_device *centronics = device->machine().device<centronics_device>("lpt2");
+	centronics_device *centronics = space.machine().device<centronics_device>("lpt2");
 	return centronics->busy_r();
 }
 
 static WRITE8_DEVICE_HANDLER( samcoupe_lpt2_strobe_w )
 {
-	centronics_device *centronics = device->machine().device<centronics_device>("lpt2");
+	centronics_device *centronics = space.machine().device<centronics_device>("lpt2");
 	centronics->strobe_w(data);
 }
 

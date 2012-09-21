@@ -231,8 +231,8 @@ static const ay8910_interface ay8910_2_interface =
 
 static WRITE8_DEVICE_HANDLER( ttl74123_output_changed )
 {
-	r2dtank_state *state = device->machine().driver_data<r2dtank_state>();
-	pia6821_device *pia = device->machine().device<pia6821_device>("pia_main");
+	r2dtank_state *state = space.machine().driver_data<r2dtank_state>();
+	pia6821_device *pia = space.machine().device<pia6821_device>("pia_main");
 	pia->ca1_w(data);
 	state->m_ttl74123_output = data;
 }

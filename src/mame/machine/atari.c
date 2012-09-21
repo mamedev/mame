@@ -64,12 +64,12 @@ void atari_interrupt_cb(pokey_device *device, int mask)
 
 READ8_DEVICE_HANDLER(atari_pia_pa_r)
 {
-	return device->machine().root_device().ioport("djoy_0_1")->read_safe(0);
+	return space.machine().root_device().ioport("djoy_0_1")->read_safe(0);
 }
 
 READ8_DEVICE_HANDLER(atari_pia_pb_r)
 {
-	return device->machine().root_device().ioport("djoy_2_3")->read_safe(0);
+	return space.machine().root_device().ioport("djoy_2_3")->read_safe(0);
 }
 
 WRITE8_DEVICE_HANDLER(a600xl_pia_pb_w) { a600xl_mmu(device->machine(), data); }

@@ -69,28 +69,28 @@ WRITE8_DEVICE_HANDLER( wswan_sound_port_w )
 
 	switch( offset ) {
 	case 0x80:				/* Audio 1 freq (lo) */
-		wswan_ch_set_freq(device->machine(), &state->audio1, (state->audio1.freq & 0xff00) | data);
+		wswan_ch_set_freq(space.machine(), &state->audio1, (state->audio1.freq & 0xff00) | data);
 		break;
 	case 0x81:				/* Audio 1 freq (hi) */
-		wswan_ch_set_freq(device->machine(), &state->audio1, (data << 8 ) | (state->audio1.freq & 0x00ff));
+		wswan_ch_set_freq(space.machine(), &state->audio1, (data << 8 ) | (state->audio1.freq & 0x00ff));
 		break;
 	case 0x82:				/* Audio 2 freq (lo) */
-		wswan_ch_set_freq(device->machine(), &state->audio2, (state->audio2.freq & 0xff00) | data);
+		wswan_ch_set_freq(space.machine(), &state->audio2, (state->audio2.freq & 0xff00) | data);
 		break;
 	case 0x83:				/* Audio 2 freq (hi) */
-		wswan_ch_set_freq(device->machine(), &state->audio2, (data << 8 ) | (state->audio2.freq & 0x00ff));
+		wswan_ch_set_freq(space.machine(), &state->audio2, (data << 8 ) | (state->audio2.freq & 0x00ff));
 		break;
 	case 0x84:				/* Audio 3 freq (lo) */
-		wswan_ch_set_freq(device->machine(), &state->audio3, (state->audio3.freq & 0xff00) | data);
+		wswan_ch_set_freq(space.machine(), &state->audio3, (state->audio3.freq & 0xff00) | data);
 		break;
 	case 0x85:				/* Audio 3 freq (hi) */
-		wswan_ch_set_freq(device->machine(), &state->audio3, (data << 8) | (state->audio3.freq & 0x00ff));
+		wswan_ch_set_freq(space.machine(), &state->audio3, (data << 8) | (state->audio3.freq & 0x00ff));
 		break;
 	case 0x86:				/* Audio 4 freq (lo) */
-		wswan_ch_set_freq(device->machine(), &state->audio4, (state->audio4.freq & 0xff00) | data);
+		wswan_ch_set_freq(space.machine(), &state->audio4, (state->audio4.freq & 0xff00) | data);
 		break;
 	case 0x87:				/* Audio 4 freq (hi) */
-		wswan_ch_set_freq(device->machine(), &state->audio4, (data << 8) | (state->audio4.freq & 0x00ff));
+		wswan_ch_set_freq(space.machine(), &state->audio4, (data << 8) | (state->audio4.freq & 0x00ff));
 		break;
 	case 0x88:				/* Audio 1 volume */
 		state->audio1.vol_left = ( data & 0xF0 ) >> 4;
@@ -113,7 +113,7 @@ WRITE8_DEVICE_HANDLER( wswan_sound_port_w )
 		state->sweep_step = (INT8)data;
 		break;
 	case 0x8D:				/* Sweep time */
-		state->sweep_time = device->machine().sample_rate() / ( 3072000 / ( 8192 * (data + 1) ) );
+		state->sweep_time = space.machine().sample_rate() / ( 3072000 / ( 8192 * (data + 1) ) );
 		break;
 	case 0x8E:				/* Noise control */
 		state->noise_type = data & 0x07;

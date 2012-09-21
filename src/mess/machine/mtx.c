@@ -29,7 +29,7 @@
 
 READ8_DEVICE_HANDLER( mtx_strobe_r )
 {
-	centronics_device *centronics = device->machine().device<centronics_device>(CENTRONICS_TAG);
+	centronics_device *centronics = space.machine().device<centronics_device>(CENTRONICS_TAG);
 	/* set STROBE low */
 	centronics->strobe_w(FALSE);
 
@@ -116,7 +116,7 @@ WRITE8_MEMBER(mtx_state::mtx_bankswitch_w)
 
 READ8_DEVICE_HANDLER( mtx_sound_strobe_r )
 {
-	mtx_state *state = device->machine().driver_data<mtx_state>();
+	mtx_state *state = space.machine().driver_data<mtx_state>();
 
 	sn76496_w(device, space, 0, state->m_sound_latch);
 
@@ -148,7 +148,7 @@ WRITE8_DEVICE_HANDLER( mtx_cst_w )
 
 READ8_DEVICE_HANDLER( mtx_prt_r )
 {
-	centronics_device *centronics = device->machine().device<centronics_device>(CENTRONICS_TAG);
+	centronics_device *centronics = space.machine().device<centronics_device>(CENTRONICS_TAG);
 
 	/*
 

@@ -223,7 +223,7 @@ static READ8_DEVICE_HANDLER(via_in_b)
 {
 	UINT8 status;
 
-	status = ((device->machine().root_device().ioport("DSW0")->read() & 0x80) >> 1) | ((device->machine().root_device().ioport("DSW0")->read() & 0x40) << 1);
+	status = ((space.machine().root_device().ioport("DSW0")->read() & 0x80) >> 1) | ((space.machine().root_device().ioport("DSW0")->read() & 0x40) << 1);
 	LOG(("via_in_b: VIA port B (DIP switches, Video, Comm Rate) - status: 0x%2.2x\n", status));
 	return status;
 }

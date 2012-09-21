@@ -212,7 +212,7 @@ void stfight_adpcm_int(device_t *device)
 
 WRITE8_DEVICE_HANDLER( stfight_adpcm_control_w )
 {
-	stfight_state *state = device->machine().driver_data<stfight_state>();
+	stfight_state *state = space.machine().driver_data<stfight_state>();
     if( data < 0x08 )
     {
         state->m_adpcm_data_offs = sampleLimits[data];

@@ -47,7 +47,7 @@
 */
 static READ8_DEVICE_HANDLER( pia0_pa_r )
 {
-	pet_state *state = device->machine().driver_data<pet_state>();
+	pet_state *state = space.machine().driver_data<pet_state>();
 	/*
 
         bit     description
@@ -69,10 +69,10 @@ static READ8_DEVICE_HANDLER( pia0_pa_r )
 	data |= state->m_keyline_select;
 
 	/* #1 cassette switch */
-	data |= ((device->machine().device<cassette_image_device>(CASSETTE_TAG)->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 4;
+	data |= ((space.machine().device<cassette_image_device>(CASSETTE_TAG)->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 4;
 
 	/* #2 cassette switch */
-	data |= ((device->machine().device<cassette_image_device>(CASSETTE2_TAG)->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 5;
+	data |= ((space.machine().device<cassette_image_device>(CASSETTE2_TAG)->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 5;
 
 	/* end or identify in */
 	data |= state->m_ieee->eoi_r() << 6;
@@ -85,7 +85,7 @@ static READ8_DEVICE_HANDLER( pia0_pa_r )
 
 static WRITE8_DEVICE_HANDLER( pia0_pa_w )
 {
-	pet_state *state = device->machine().driver_data<pet_state>();
+	pet_state *state = space.machine().driver_data<pet_state>();
 	/*
 
         bit     description
@@ -108,7 +108,7 @@ static WRITE8_DEVICE_HANDLER( pia0_pa_w )
 /* Keyboard reading/handling for regular keyboard */
 static READ8_DEVICE_HANDLER( kin_r )
 {
-	pet_state *state = device->machine().driver_data<pet_state>();
+	pet_state *state = space.machine().driver_data<pet_state>();
 	/*
 
         bit     description
@@ -132,9 +132,9 @@ static READ8_DEVICE_HANDLER( kin_r )
 
 	if (state->m_keyline_select < 10)
 	{
-		data = device->machine().root_device().ioport(keynames[state->m_keyline_select])->read();
+		data = space.machine().root_device().ioport(keynames[state->m_keyline_select])->read();
 		/* Check for left-shift lock */
-		if ((state->m_keyline_select == 8) && (device->machine().root_device().ioport("SPECIAL")->read() & 0x80))
+		if ((state->m_keyline_select == 8) && (space.machine().root_device().ioport("SPECIAL")->read() & 0x80))
 			data &= 0xfe;
 	}
 	return data;
@@ -144,7 +144,7 @@ static READ8_DEVICE_HANDLER( kin_r )
 static READ8_DEVICE_HANDLER( petb_kin_r )
 {
 	UINT8 data = 0xff;
-	pet_state *state = device->machine().driver_data<pet_state>();
+	pet_state *state = space.machine().driver_data<pet_state>();
 	static const char *const keynames[] = {
 		"ROW0", "ROW1", "ROW2", "ROW3", "ROW4",
 		"ROW5", "ROW6", "ROW7", "ROW8", "ROW9"
@@ -152,18 +152,18 @@ static READ8_DEVICE_HANDLER( petb_kin_r )
 
 	if (state->m_keyline_select < 10)
 	{
-		data = device->machine().root_device().ioport(keynames[state->m_keyline_select])->read();
+		data = space.machine().root_device().ioport(keynames[state->m_keyline_select])->read();
 		/* Check for left-shift lock */
 		/* 2008-05 FP: For some reason, superpet read it in the opposite way!! */
 		/* While waiting for confirmation from docs, we add a workaround here. */
 		if (state->m_superpet)
 		{
-			if ((state->m_keyline_select == 6) && !(device->machine().root_device().ioport("SPECIAL")->read() & 0x80))
+			if ((state->m_keyline_select == 6) && !(space.machine().root_device().ioport("SPECIAL")->read() & 0x80))
 				data &= 0xfe;
 		}
 		else
 		{
-			if ((state->m_keyline_select == 6) && (device->machine().root_device().ioport("SPECIAL")->read() & 0x80))
+			if ((state->m_keyline_select == 6) && (space.machine().root_device().ioport("SPECIAL")->read() & 0x80))
 				data &= 0xfe;
 		}
 	}
@@ -173,20 +173,20 @@ static READ8_DEVICE_HANDLER( petb_kin_r )
 static READ8_DEVICE_HANDLER( cass1_r )
 {
 	// cassette 1 read
-	return (device->machine().device<cassette_image_device>(CASSETTE_TAG)->input() > +0.0) ? 1 : 0;
+	return (space.machine().device<cassette_image_device>(CASSETTE_TAG)->input() > +0.0) ? 1 : 0;
 }
 
 static WRITE8_DEVICE_HANDLER( cass1_motor_w )
 {
-	pet_state *state = device->machine().driver_data<pet_state>();
+	pet_state *state = space.machine().driver_data<pet_state>();
 	if (!data)
 	{
-		device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		space.machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		state->m_datasette1_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
-		device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+		space.machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
 		state->m_datasette1_timer->reset();
 	}
 }
@@ -302,7 +302,7 @@ static READ8_DEVICE_HANDLER( via_pb_r )
 
     */
 
-	pet_state *state = device->machine().driver_data<pet_state>();
+	pet_state *state = space.machine().driver_data<pet_state>();
 	UINT8 data = 0;
 
 	/* not data accepted in */
@@ -342,7 +342,7 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 
     */
 
-	pet_state *state = device->machine().driver_data<pet_state>();
+	pet_state *state = space.machine().driver_data<pet_state>();
 
 	/* not ready for data out */
 	state->m_ieee->nrfd_w(BIT(data, 1));
@@ -351,18 +351,18 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 	state->m_ieee->atn_w(BIT(data, 2));
 
 	/* cassette write */
-	device->machine().device<cassette_image_device>(CASSETTE_TAG)->output(BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
-	device->machine().device<cassette_image_device>(CASSETTE2_TAG)->output(BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	space.machine().device<cassette_image_device>(CASSETTE_TAG)->output(BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	space.machine().device<cassette_image_device>(CASSETTE2_TAG)->output(BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 
 	/* #2 cassette motor */
 	if (BIT(data, 4))
 	{
-		device->machine().device<cassette_image_device>(CASSETTE2_TAG)->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		space.machine().device<cassette_image_device>(CASSETTE2_TAG)->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		state->m_datasette2_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
-		device->machine().device<cassette_image_device>(CASSETTE2_TAG)->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		space.machine().device<cassette_image_device>(CASSETTE2_TAG)->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		state->m_datasette2_timer->reset();
 	}
 }

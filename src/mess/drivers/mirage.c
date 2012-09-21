@@ -165,7 +165,7 @@ static WRITE8_DEVICE_HANDLER( mirage_via_write_porta )
 static WRITE8_DEVICE_HANDLER( mirage_via_write_portb )
 {
 	int bank = 0;
-    mirage_state *state = device->machine().driver_data<mirage_state>();
+    mirage_state *state = space.machine().driver_data<mirage_state>();
 
 	// handle sound RAM bank switching
 	bank = (data & 2) ? (64*1024) : 0;

@@ -226,7 +226,7 @@ static WRITE8_DEVICE_HANDLER( pc_fdc_dor_w )
 	int selected_drive;
 	int floppy_count;
 
-	floppy_count = floppy_get_count(device->machine());
+	floppy_count = floppy_get_count(space.machine());
 
 	if (floppy_count > (fdc->digital_output_register & 0x03))
 		floppy_drive_set_ready_state(get_floppy_subdevice(device, fdc->digital_output_register & 0x03), 1, 0);
@@ -359,7 +359,7 @@ static READ8_DEVICE_HANDLER ( pc_fdc_r )
 			data = upd765_data_r(fdc->m_upd765, space, offset);
 			break;
 		case 6: /* FDC reserved */
-			hdd = device->machine().device(":board3:ide:ide");
+			hdd = space.machine().device(":board3:ide:ide");
 			if (hdd)
 				data = ide_controller16_r(hdd, space, 0x3f6/2, 0x00ff);
 			break;
@@ -371,7 +371,7 @@ static READ8_DEVICE_HANDLER ( pc_fdc_r )
     }
 
 	if (LOG_FDC)
-		logerror("pc_fdc_r(): pc=0x%08x offset=%d result=0x%02X\n", (unsigned) device->machine().firstcpu->pc(), offset, data);
+		logerror("pc_fdc_r(): pc=0x%08x offset=%d result=0x%02X\n", (unsigned) space.machine().firstcpu->pc(), offset, data);
 	return data;
 }
 
@@ -382,8 +382,8 @@ static WRITE8_DEVICE_HANDLER ( pc_fdc_w )
 	isa8_fdc_device	*fdc  = downcast<isa8_fdc_device *>(device);
 
 	if (LOG_FDC)
-		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) device->machine().firstcpu->pc(), offset, data);
-	pc_fdc_check_data_rate(fdc,device->machine());  // check every time a command may start
+		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) space.machine().firstcpu->pc(), offset, data);
+	pc_fdc_check_data_rate(fdc,space.machine());  // check every time a command may start
 	device_t *hdd = NULL;
 
 	switch(offset)
@@ -405,7 +405,7 @@ static WRITE8_DEVICE_HANDLER ( pc_fdc_w )
 			break;
 		case 6:
 			/* FDC reserved */
-			hdd = device->machine().device(":board3:ide:ide");
+			hdd = space.machine().device(":board3:ide:ide");
 			if (hdd)
 				ide_controller16_w(hdd, space, 0x3f6/2, data, 0x00ff);
 			break;

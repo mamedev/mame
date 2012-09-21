@@ -738,14 +738,14 @@ static void kbd_shift_out(running_machine &machine, int data)
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_cb2)
 {
-	mac_state *mac = device->machine().driver_data<mac_state>();
+	mac_state *mac = space.machine().driver_data<mac_state>();
 
 	if (mac->m_kbd_comm == FALSE && data == 0)
 	{
 		/* Mac pulls CB2 down to initiate communication */
 		mac->m_kbd_comm = TRUE;
 		mac->m_kbd_receive = TRUE;
-		device->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(kbd_clock));
+		space.machine().scheduler().timer_set(attotime::from_usec(100), FUNC(kbd_clock));
 	}
 	if (mac->m_kbd_comm == TRUE && mac->m_kbd_receive == TRUE)
 	{
@@ -1179,7 +1179,7 @@ WRITE16_MEMBER ( mac_state::mac_iwm_w )
 static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)
 {
 	UINT8 ret;
-	mac_state *mac = device->machine().driver_data<mac_state>();
+	mac_state *mac = space.machine().driver_data<mac_state>();
 
     if (ADB_IS_EGRET)
     {
@@ -1208,7 +1208,7 @@ static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)
 
 static WRITE8_DEVICE_HANDLER(mac_adb_via_out_cb2)
 {
-	mac_state *mac = device->machine().driver_data<mac_state>();
+	mac_state *mac = space.machine().driver_data<mac_state>();
 
 //        printf("VIA OUT CB2 = %x\n", data);
     if (ADB_IS_EGRET)
@@ -1264,9 +1264,9 @@ static WRITE8_DEVICE_HANDLER(mac_adb_via_out_cb2)
 
 static READ8_DEVICE_HANDLER(mac_via_in_a)
 {
-	mac_state *mac = device->machine().driver_data<mac_state>();
+	mac_state *mac = space.machine().driver_data<mac_state>();
 
-//  printf("VIA1 IN_A (PC %x)\n", device->machine().device("maincpu")->safe_pc());
+//  printf("VIA1 IN_A (PC %x)\n", space.machine().device("maincpu")->safe_pc());
 
 	switch (mac->m_model)
 	{
@@ -1332,7 +1332,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 static READ8_DEVICE_HANDLER(mac_via_in_b)
 {
 	int val = 0;
-	mac_state *mac = device->machine().driver_data<mac_state>();
+	mac_state *mac = space.machine().driver_data<mac_state>();
 
 	// portable/PB100 is pretty different
 	if (mac->m_model >= MODEL_MAC_PORTABLE && mac->m_model <= MODEL_MAC_PB100)
@@ -1343,7 +1343,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 	else
 	{
 		/* video beam in display (! VBLANK && ! HBLANK basically) */
-		if (device->machine().primary_screen->vpos() >= MAC_V_VIS)
+		if (space.machine().primary_screen->vpos() >= MAC_V_VIS)
 			val |= 0x40;
 
 		if (ADB_IS_BITBANG)
@@ -1369,25 +1369,25 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 				val |= 0x20;
 			if (mac->m_mouse_bit_x)	/* Mouse X2 */
 				val |= 0x10;
-			if ((device->machine().root_device().ioport("MOUSE0")->read() & 0x01) == 0)
+			if ((space.machine().root_device().ioport("MOUSE0")->read() & 0x01) == 0)
 				val |= 0x08;
 		}
 		if (mac->m_rtc_data_out)
 			val |= 1;
 	}
 
-//  printf("VIA1 IN_B = %02x (PC %x)\n", val, device->machine().device("maincpu")->safe_pc());
+//  printf("VIA1 IN_B = %02x (PC %x)\n", val, space.machine().device("maincpu")->safe_pc());
 
 	return val;
 }
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 {
-	device_t *sound = device->machine().device("custom");
-	device_t *fdc = device->machine().device("fdc");
-	mac_state *mac = device->machine().driver_data<mac_state>();
+	device_t *sound = space.machine().device("custom");
+	device_t *fdc = space.machine().device("fdc");
+	mac_state *mac = space.machine().driver_data<mac_state>();
 
-//  printf("VIA1 OUT A: %02x (PC %x)\n", data, device->machine().device("maincpu")->safe_pc());
+//  printf("VIA1 OUT A: %02x (PC %x)\n", data, space.machine().device("maincpu")->safe_pc());
 
 	if (ADB_IS_PM_VIA1)
 	{
@@ -1427,15 +1427,15 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 {
-	device_t *sound = device->machine().device("custom");
+	device_t *sound = space.machine().device("custom");
 	int new_rtc_rTCClk;
-	mac_state *mac = device->machine().driver_data<mac_state>();
+	mac_state *mac = space.machine().driver_data<mac_state>();
 
-//  printf("VIA1 OUT B: %02x (PC %x)\n", data, device->machine().device("maincpu")->safe_pc());
+//  printf("VIA1 OUT B: %02x (PC %x)\n", data, space.machine().device("maincpu")->safe_pc());
 
 	if (ADB_IS_PM_VIA1)
 	{
-		device_t *fdc = device->machine().device("fdc");
+		device_t *fdc = space.machine().device("fdc");
 
 		sony_set_sel_line(fdc,(data & 0x20) >> 5);
 		mac->m_drive_select = ((data & 0x10) >> 4);
@@ -1632,7 +1632,7 @@ WRITE16_MEMBER ( mac_state::mac_via2_w )
 static READ8_DEVICE_HANDLER(mac_via2_in_a)
 {
 	UINT8 result;
-	mac_state *mac = device->machine().driver_data<mac_state>();
+	mac_state *mac = space.machine().driver_data<mac_state>();
 
 	if (ADB_IS_PM_VIA2)
 	{
@@ -1652,9 +1652,9 @@ static READ8_DEVICE_HANDLER(mac_via2_in_a)
 
 static READ8_DEVICE_HANDLER(mac_via2_in_b)
 {
-	mac_state *mac =device->machine().driver_data<mac_state>();
+	mac_state *mac =space.machine().driver_data<mac_state>();
 
-//  logerror("VIA2 IN B (PC %x)\n", device->machine().device("maincpu")->safe_pc());
+//  logerror("VIA2 IN B (PC %x)\n", space.machine().device("maincpu")->safe_pc());
 
 	if (ADB_IS_PM_VIA2)
 	{
@@ -1683,9 +1683,9 @@ static READ8_DEVICE_HANDLER(mac_via2_in_b)
 
 static WRITE8_DEVICE_HANDLER(mac_via2_out_a)
 {
-	mac_state *mac = device->machine().driver_data<mac_state>();
+	mac_state *mac = space.machine().driver_data<mac_state>();
 
-//  logerror("VIA2 OUT A: %02x (PC %x)\n", data, device->machine().device("maincpu")->safe_pc());
+//  logerror("VIA2 OUT A: %02x (PC %x)\n", data, space.machine().device("maincpu")->safe_pc());
 	if (ADB_IS_PM_VIA2)
 	{
 		mac->m_pm_data_send = data;
@@ -1695,9 +1695,9 @@ static WRITE8_DEVICE_HANDLER(mac_via2_out_a)
 
 static WRITE8_DEVICE_HANDLER(mac_via2_out_b)
 {
-	mac_state *mac = device->machine().driver_data<mac_state>();
+	mac_state *mac = space.machine().driver_data<mac_state>();
 
-//  logerror("VIA2 OUT B: %02x (PC %x)\n", data, device->machine().device("maincpu")->safe_pc());
+//  logerror("VIA2 OUT B: %02x (PC %x)\n", data, space.machine().device("maincpu")->safe_pc());
 
 	if (ADB_IS_PM_VIA2)
 	{

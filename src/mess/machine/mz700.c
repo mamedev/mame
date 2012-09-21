@@ -442,7 +442,7 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
 	for(i=0;i<10;i++)
 	{
 		if(key_line & (1 << i))
-			res |= device->machine().root_device().ioport(keynames[i])->read();
+			res |= space.machine().root_device().ioport(keynames[i])->read();
 	}
 
     return res;
@@ -456,8 +456,8 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
  */
 static READ8_DEVICE_HANDLER( pio_port_c_r )
 {
-	cassette_image_device *cas = device->machine().device<cassette_image_device>(CASSETTE_TAG);
-	mz_state *mz = device->machine().driver_data<mz_state>();
+	cassette_image_device *cas = space.machine().device<cassette_image_device>(CASSETTE_TAG);
+	mz_state *mz = space.machine().driver_data<mz_state>();
 	UINT8 data = 0;
 
 	/* note: this is actually connected to Q output of the motor-control flip-flop (see below) */
@@ -468,9 +468,9 @@ static READ8_DEVICE_HANDLER( pio_port_c_r )
 		data |= 0x20;       /* set the RDATA status */
 
 	data |= mz->m_cursor_timer << 6;
-	data |= device->machine().primary_screen->vblank() << 7;
+	data |= space.machine().primary_screen->vblank() << 7;
 
-	LOG(2,"mz700_pio_port_c_r",("%02X\n", data),device->machine());
+	LOG(2,"mz700_pio_port_c_r",("%02X\n", data),space.machine());
 
 	return data;
 }
@@ -478,9 +478,9 @@ static READ8_DEVICE_HANDLER( pio_port_c_r )
 
 static WRITE8_DEVICE_HANDLER( pio_port_a_w )
 {
-	timer_device *timer = device->machine().device<timer_device>("cursor");
+	timer_device *timer = space.machine().device<timer_device>("cursor");
 
-	LOG(2,"mz700_pio_port_a_w",("%02X\n", data),device->machine());
+	LOG(2,"mz700_pio_port_a_w",("%02X\n", data),space.machine());
 
 	/* the ls145 is connected to PA0-PA3 */
 	dynamic_cast<ttl74145_device *>(device)->write(data & 0x07);
@@ -499,7 +499,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_c_w )
      * bit 0 out    unused
      */
 
-//  UINT8 state = cassette_get_state(device->machine().device<cassette_image_device>(CASSETTE_TAG));
+//  UINT8 state = cassette_get_state(space.machine().device<cassette_image_device>(CASSETTE_TAG));
 //  UINT8 action = ((~pio_port_c_output & 8) & (data & 8));     /* detect low-to-high transition */
 
 	/* The motor control circuit consists of a resistor, capacitor, invertor, nand-gate, and D flip-flop.
@@ -512,15 +512,15 @@ static WRITE8_DEVICE_HANDLER( pio_port_c_w )
         If you load from the command-line or the software-picker, type in L <enter> immediately. */
 #if 0
 
-		device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(
+		space.machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(
 		((data & 0x08) && mz700_motor_on) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MOTOR_DISABLED);
 
 #endif
 
-	LOG(2,"mz700_pio_port_c_w",("%02X\n", data),device->machine());
+	LOG(2,"mz700_pio_port_c_w",("%02X\n", data),space.machine());
 
-	device->machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x02) ? +1.0 : -1.0);
+	space.machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x02) ? +1.0 : -1.0);
 }
 
 
@@ -545,19 +545,19 @@ static void mz800_z80pio_irq(device_t *device, int which)
 
 static READ8_DEVICE_HANDLER( mz800_z80pio_port_a_r )
 {
-	centronics_device *centronics = device->machine().device<centronics_device>("centronics");
+	centronics_device *centronics = space.machine().device<centronics_device>("centronics");
 	UINT8 result = 0;
 
 	result |= centronics->busy_r();
 	result |= centronics->pe_r() << 1;
-	result |= device->machine().primary_screen->hblank() << 5;
+	result |= space.machine().primary_screen->hblank() << 5;
 
 	return result;
 }
 
 static WRITE8_DEVICE_HANDLER( mz800_z80pio_port_a_w )
 {
-	centronics_device *centronics = device->machine().device<centronics_device>("centronics");
+	centronics_device *centronics = space.machine().device<centronics_device>("centronics");
 
 	centronics->init_prime_w(BIT(data, 6));
 	centronics->strobe_w(BIT(data, 7));

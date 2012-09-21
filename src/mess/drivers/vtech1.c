@@ -482,14 +482,14 @@ static const floppy_interface vtech1_floppy_interface =
 
 static READ8_DEVICE_HANDLER( vtech1_printer_r )
 {
-	centronics_device *centronics = device->machine().device<centronics_device>("centronics");
+	centronics_device *centronics = space.machine().device<centronics_device>("centronics");
 	return 0xfe | centronics->busy_r();
 }
 
 /* TODO: figure out how this really works */
 static WRITE8_DEVICE_HANDLER( vtech1_strobe_w )
 {
-	centronics_device *centronics = device->machine().device<centronics_device>("centronics");
+	centronics_device *centronics = space.machine().device<centronics_device>("centronics");
 	centronics->strobe_w(TRUE);
 	centronics->strobe_w(FALSE);
 }
@@ -613,7 +613,7 @@ WRITE8_MEMBER(vtech1_state::vtech1_video_bank_w)
 
 static READ8_DEVICE_HANDLER( vtech1_mc6847_videoram_r )
 {
-	vtech1_state *vtech1 = device->machine().driver_data<vtech1_state>();
+	vtech1_state *vtech1 = space.machine().driver_data<vtech1_state>();
 	if (offset == ~0) return 0xff;
 	vtech1->m_mc6847->inv_w(BIT(vtech1->m_videoram[offset], 6));
 	vtech1->m_mc6847->as_w(BIT(vtech1->m_videoram[offset], 7));

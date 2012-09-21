@@ -821,15 +821,15 @@ void ataxx_init_eeprom(running_machine &machine, const UINT16 *data)
 
 READ8_DEVICE_HANDLER( ataxx_eeprom_r )
 {
-	int port = device->machine().root_device().ioport("IN2")->read();
-	if (LOG_EEPROM) logerror("%s:EE read\n", device->machine().describe_context());
+	int port = space.machine().root_device().ioport("IN2")->read();
+	if (LOG_EEPROM) logerror("%s:EE read\n", space.machine().describe_context());
 	return port;
 }
 
 
 WRITE8_DEVICE_HANDLER( ataxx_eeprom_w )
 {
-	if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", device->machine().describe_context(),
+	if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", space.machine().describe_context(),
 			(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
 	eeprom->write_bit     ((data & 0x10) >> 4);
@@ -1306,14 +1306,14 @@ READ8_MEMBER(leland_state::ataxx_paletteram_and_misc_r)
 
 READ8_DEVICE_HANDLER( leland_sound_port_r )
 {
-	leland_state *state = device->machine().driver_data<leland_state>();
+	leland_state *state = space.machine().driver_data<leland_state>();
 	return state->m_gfx_control;
 }
 
 
 WRITE8_DEVICE_HANDLER( leland_sound_port_w )
 {
-	leland_state *state = device->machine().driver_data<leland_state>();
+	leland_state *state = space.machine().driver_data<leland_state>();
 	/* update the graphics banking */
 	leland_gfx_port_w(device, space, 0, data);
 
@@ -1324,9 +1324,9 @@ WRITE8_DEVICE_HANDLER( leland_sound_port_w )
 	/* some bankswitching occurs here */
 	if (LOG_BANKSWITCHING_M)
 		if ((state->m_sound_port_bank ^ data) & 0x24)
-			logerror("%s:sound_port_bank = %02X\n", device->machine().describe_context(), data & 0x24);
+			logerror("%s:sound_port_bank = %02X\n", space.machine().describe_context(), data & 0x24);
 	state->m_sound_port_bank = data & 0x24;
-	(*state->m_update_master_bank)(device->machine());
+	(*state->m_update_master_bank)(space.machine());
 }
 
 

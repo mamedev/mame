@@ -1490,7 +1490,7 @@ WRITE16_DEVICE_HANDLER( tc0080vco_word_w )
 
 	if (offset < 0x1000 / 2)
 	{
-		device->machine().gfx[tc0080vco->tx_gfx]->mark_dirty(offset / 8);
+		space.machine().gfx[tc0080vco->tx_gfx]->mark_dirty(offset / 8);
 #if 0
 		if (!tc0080vco->has_tx)
 		{
@@ -1521,7 +1521,7 @@ WRITE16_DEVICE_HANDLER( tc0080vco_word_w )
 
 	else if (offset < 0x11000 / 2)
 	{
-		device->machine().gfx[tc0080vco->tx_gfx]->mark_dirty((offset - 0x10000 / 2) / 8);
+		space.machine().gfx[tc0080vco->tx_gfx]->mark_dirty((offset - 0x10000 / 2) / 8);
 #if 0
 		if (!tc0080vco->has_tx)
 		{
@@ -2246,7 +2246,7 @@ WRITE16_DEVICE_HANDLER( tc0100scn_word_w )
 		else if (offset < 0x3000)
 			tc0100scn->tilemap[2][0]->mark_tile_dirty((offset & 0x0fff));
 		else if (offset < 0x3800)
-			device->machine().gfx[tc0100scn->tx_gfx]->mark_dirty((offset - 0x3000) / 8);
+			space.machine().gfx[tc0100scn->tx_gfx]->mark_dirty((offset - 0x3000) / 8);
 		else if (offset >= 0x4000 && offset < 0x6000)
 			tc0100scn->tilemap[1][0]->mark_tile_dirty((offset & 0x1fff) / 2);
 	}
@@ -2257,7 +2257,7 @@ WRITE16_DEVICE_HANDLER( tc0100scn_word_w )
 		else if (offset >= 0x4000 && offset < 0x8000)
 			tc0100scn->tilemap[1][1]->mark_tile_dirty((offset & 0x3fff) / 2);
 		else if (offset >= 0x8800 && offset < 0x9000)
-			device->machine().gfx[tc0100scn->tx_gfx]->mark_dirty((offset - 0x8800) / 8);
+			space.machine().gfx[tc0100scn->tx_gfx]->mark_dirty((offset - 0x8800) / 8);
 		else if (offset >= 0x9000)
 			tc0100scn->tilemap[2][1]->mark_tile_dirty((offset & 0x0fff));
 	}
@@ -2319,7 +2319,7 @@ WRITE16_DEVICE_HANDLER( tc0100scn_ctrl_word_w )
 				tc0100scn_dirty_tilemaps(device);
 
 				/* reset the pointer to the text characters (and dirty them all) */
-				device->machine().gfx[tc0100scn->tx_gfx]->set_source((UINT8 *)tc0100scn->char_ram);
+				space.machine().gfx[tc0100scn->tx_gfx]->set_source((UINT8 *)tc0100scn->char_ram);
 			}
 
 			break;
@@ -3126,7 +3126,7 @@ WRITE16_DEVICE_HANDLER( tc0480scp_word_w )
 		}
 		else if (offset <= 0x7fff)
 		{
-			device->machine().gfx[tc0480scp->tx_gfx]->mark_dirty((offset - 0x7000) / 16);
+			space.machine().gfx[tc0480scp->tx_gfx]->mark_dirty((offset - 0x7000) / 16);
 		}
 	}
 	else
@@ -3144,7 +3144,7 @@ WRITE16_DEVICE_HANDLER( tc0480scp_word_w )
 		}
 		else if (offset <= 0x7fff)
 		{
-			device->machine().gfx[tc0480scp->tx_gfx]->mark_dirty((offset - 0x7000) / 16);
+			space.machine().gfx[tc0480scp->tx_gfx]->mark_dirty((offset - 0x7000) / 16);
 		}
 	}
 }
@@ -4859,7 +4859,7 @@ WRITE16_DEVICE_HANDLER( tc0110pcr_word_w )
 
 		case 1:
 			tc0110pcr->ram[tc0110pcr->addr] = data & 0xffff;
-			palette_set_color_rgb(device->machine(), tc0110pcr->addr, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+			palette_set_color_rgb(space.machine(), tc0110pcr->addr, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 			break;
 
 		default:
@@ -4882,7 +4882,7 @@ WRITE16_DEVICE_HANDLER( tc0110pcr_step1_word_w )
 
 		case 1:
 			tc0110pcr->ram[tc0110pcr->addr] = data & 0xffff;
-			palette_set_color_rgb(device->machine(), tc0110pcr->addr + (tc0110pcr->pal_offs << 12), pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+			palette_set_color_rgb(space.machine(), tc0110pcr->addr + (tc0110pcr->pal_offs << 12), pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 			break;
 
 		default:
@@ -4907,7 +4907,7 @@ WRITE16_DEVICE_HANDLER( tc0110pcr_step1_rbswap_word_w )
 
 		case 1:
 			tc0110pcr->ram[tc0110pcr->addr] = data & 0xffff;
-			palette_set_color_rgb(device->machine(), tc0110pcr->addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+			palette_set_color_rgb(space.machine(), tc0110pcr->addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 			break;
 
 		default:
@@ -4932,7 +4932,7 @@ WRITE16_DEVICE_HANDLER( tc0110pcr_step1_4bpg_word_w )
 
 		case 1:
 			tc0110pcr->ram[tc0110pcr->addr] = data & 0xffff;
-			palette_set_color_rgb(device->machine(), tc0110pcr->addr, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
+			palette_set_color_rgb(space.machine(), tc0110pcr->addr, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
 			break;
 
 		default:

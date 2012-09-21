@@ -100,7 +100,7 @@ static void enterprise_update_memory_page(address_space &space, offs_t page, int
 /* EP specific handling of dave register write */
 static WRITE8_DEVICE_HANDLER( enterprise_dave_reg_write )
 {
-	ep_state *ep = device->machine().driver_data<ep_state>();
+	ep_state *ep = space.machine().driver_data<ep_state>();
 
 	switch (offset)
 	{
@@ -108,7 +108,7 @@ static WRITE8_DEVICE_HANDLER( enterprise_dave_reg_write )
 	case 0x11:
 	case 0x12:
 	case 0x13:
-		enterprise_update_memory_page(device->machine().device("maincpu")->memory().space(AS_PROGRAM), offset - 0x0f, data);
+		enterprise_update_memory_page(space.machine().device("maincpu")->memory().space(AS_PROGRAM), offset - 0x0f, data);
 		break;
 
 	case 0x15:
@@ -126,19 +126,19 @@ static READ8_DEVICE_HANDLER( enterprise_dave_reg_read )
 		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9"
 	};
 
-	ep_state *ep = device->machine().driver_data<ep_state>();
+	ep_state *ep = space.machine().driver_data<ep_state>();
 
 	switch (offset)
 	{
 		case 0x015:
 			/* read keyboard line */
-			dave_set_reg(device, 0x015, device->machine().root_device().ioport(keynames[ep->keyboard_line])->read());
+			dave_set_reg(device, 0x015, space.machine().root_device().ioport(keynames[ep->keyboard_line])->read());
 			break;
 
 		case 0x016:
 		{
 			int ExternalJoystickInputs;
-			int ExternalJoystickPortInput = device->machine().root_device().ioport("JOY1")->read();
+			int ExternalJoystickPortInput = space.machine().root_device().ioport("JOY1")->read();
 
 			if (ep->keyboard_line <= 4)
 			{

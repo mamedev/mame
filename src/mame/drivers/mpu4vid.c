@@ -425,8 +425,8 @@ static WRITE8_DEVICE_HANDLER( vid_o1_callback )
 
 	if (data)
 	{
-		acia6850_device *acia_0 = device->machine().device<acia6850_device>("acia6850_0");
-		acia6850_device *acia_1 = device->machine().device<acia6850_device>("acia6850_1");
+		acia6850_device *acia_0 = space.machine().device<acia6850_device>("acia6850_0");
+		acia6850_device *acia_1 = space.machine().device<acia6850_device>("acia6850_1");
 		acia_0->tx_clock_in();
 		acia_0->rx_clock_in();
 		acia_1->tx_clock_in();
@@ -720,7 +720,7 @@ READ16_HANDLER( bt471_r )
 
 static READ8_DEVICE_HANDLER( pia_ic5_porta_track_r )
 {
-	mpu4vid_state *state = device->machine().driver_data<mpu4vid_state>();
+	mpu4vid_state *state = space.machine().driver_data<mpu4vid_state>();
 	/* The SWP trackball interface connects a standard trackball to the AUX1 port on the MPU4
     mainboard. As per usual, they've taken the cheap route here, reading and processing the
     raw quadrature signal from the encoder wheels for a 4 bit interface, rather than use any
@@ -729,7 +729,7 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_track_r )
     We invert the X and Y data at source due to the use of Schmitt triggers in the interface, which
     clean up the pulses and flip the active phase.*/
 
-	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",device->machine().describe_context()));
+	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",space.machine().describe_context()));
 
 
 	UINT8 data = state->ioport("AUX1")->read();

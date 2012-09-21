@@ -295,7 +295,7 @@ WRITE8_DEVICE_HANDLER( micropolis_data_w )
 	else
 	{
 		if (VERBOSE)
-			logerror("%s: micropolis_data_w $%02X\n", device->machine().describe_context(), data);
+			logerror("%s: micropolis_data_w $%02X\n", space.machine().describe_context(), data);
 	}
 	w->data = data;
 }

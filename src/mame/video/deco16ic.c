@@ -571,7 +571,7 @@ READ16_DEVICE_HANDLER( deco16ic_pf2_data_r )
 WRITE16_DEVICE_HANDLER( deco16ic_pf_control_w )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
-	device->machine().primary_screen->update_partial(device->machine().primary_screen->vpos());
+	space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
 
 	COMBINE_DATA(&deco16ic->pf12_control[offset]);
 }

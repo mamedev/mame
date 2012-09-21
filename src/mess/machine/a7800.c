@@ -40,17 +40,17 @@
 
 static READ8_DEVICE_HANDLER( riot_joystick_r )
 {
-	return device->machine().root_device().ioport("joysticks")->read();
+	return space.machine().root_device().ioport("joysticks")->read();
 }
 
 static READ8_DEVICE_HANDLER( riot_console_button_r )
 {
-	return device->machine().root_device().ioport("console_buttons")->read();
+	return space.machine().root_device().ioport("console_buttons")->read();
 }
 
 static WRITE8_DEVICE_HANDLER( riot_button_pullup_w )
 {
-	a7800_state *state = device->machine().driver_data<a7800_state>();
+	a7800_state *state = space.machine().driver_data<a7800_state>();
 	state->m_p1_one_button = data & 0x04; // pin 6 of the controller port is held high by the riot chip when reading two-button controllers (from schematic)
 	state->m_p2_one_button = data & 0x10;
 }

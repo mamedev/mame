@@ -683,7 +683,7 @@ UINT32 n64_periphs::sp_reg_r(UINT32 offset)
 
 READ32_DEVICE_HANDLER( n64_sp_reg_r )
 {
-	return device->machine().device<n64_periphs>("rcp")->sp_reg_r(offset);
+	return space.machine().device<n64_periphs>("rcp")->sp_reg_r(offset);
 }
 
 void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
@@ -896,7 +896,7 @@ void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
 
 WRITE32_DEVICE_HANDLER( n64_sp_reg_w )
 {
-	device->machine().device<n64_periphs>("rcp")->sp_reg_w(offset, data, mem_mask);
+	space.machine().device<n64_periphs>("rcp")->sp_reg_w(offset, data, mem_mask);
 }
 
 // RDP Interface
@@ -908,8 +908,8 @@ void dp_full_sync(running_machine &machine)
 
 READ32_DEVICE_HANDLER( n64_dp_reg_r )
 {
-	n64_state *state = device->machine().driver_data<n64_state>();
-	n64_periphs *periphs = device->machine().device<n64_periphs>("rcp");
+	n64_state *state = space.machine().driver_data<n64_state>();
+	n64_periphs *periphs = space.machine().device<n64_periphs>("rcp");
 	UINT32 ret = 0;
 	switch (offset)
 	{
@@ -944,16 +944,16 @@ READ32_DEVICE_HANDLER( n64_dp_reg_r )
 			break;
 	}
 
-	//printf("%08x dp_reg_r %08x = %08x\n", (UINT32)device->machine().device("rsp")->state().state_int(RSP_PC), offset, ret); fflush(stdout);
+	//printf("%08x dp_reg_r %08x = %08x\n", (UINT32)space.machine().device("rsp")->state().state_int(RSP_PC), offset, ret); fflush(stdout);
 	return ret;
 }
 
 WRITE32_DEVICE_HANDLER( n64_dp_reg_w )
 {
-	n64_state *state = device->machine().driver_data<n64_state>();
-	n64_periphs *periphs = device->machine().device<n64_periphs>("rcp");
+	n64_state *state = space.machine().driver_data<n64_state>();
+	n64_periphs *periphs = space.machine().device<n64_periphs>("rcp");
 
-	//printf("%08x dp_reg_w %08x %08x %08x\n", (UINT32)device->machine().device("rsp")->state().state_int(RSP_PC), offset, data, mem_mask); fflush(stdout);
+	//printf("%08x dp_reg_w %08x %08x %08x\n", (UINT32)space.machine().device("rsp")->state().state_int(RSP_PC), offset, data, mem_mask); fflush(stdout);
 	switch (offset)
 	{
 		case 0x00/4:		// DP_START_REG

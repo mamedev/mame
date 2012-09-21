@@ -86,7 +86,7 @@ static WRITE_LINE_DEVICE_HANDLER( display_enable_changed )
 
 WRITE8_DEVICE_HANDLER( qix_flip_screen_w )
 {
-	qix_state *state = device->machine().driver_data<qix_state>();
+	qix_state *state = space.machine().driver_data<qix_state>();
 
 	state->m_flip = data;
 }

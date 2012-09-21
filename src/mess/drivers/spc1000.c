@@ -100,7 +100,7 @@ READ8_MEMBER(spc1000_state::spc1000_keyboard_r){
 
 static WRITE8_DEVICE_HANDLER(spc1000_gmode_w)
 {
-	spc1000_state *state = device->machine().driver_data<spc1000_state>();
+	spc1000_state *state = space.machine().driver_data<spc1000_state>();
 	state->m_GMODE = data;
 
 	// state->m_GMODE layout: CSS|NA|PS2|PS1|~A/G|GM0|GM1|NA
@@ -113,7 +113,7 @@ static WRITE8_DEVICE_HANDLER(spc1000_gmode_w)
 
 static READ8_DEVICE_HANDLER(spc1000_gmode_r)
 {
-	spc1000_state *state = device->machine().driver_data<spc1000_state>();
+	spc1000_state *state = space.machine().driver_data<spc1000_state>();
 	return state->m_GMODE;
 }
 
@@ -244,7 +244,7 @@ void spc1000_state::machine_reset()
 
 static READ8_DEVICE_HANDLER( spc1000_mc6847_videoram_r )
 {
-	spc1000_state *state = device->machine().driver_data<spc1000_state>();
+	spc1000_state *state = space.machine().driver_data<spc1000_state>();
 	if (offset == ~0) return 0xff;
 
 	// state->m_GMODE layout: CSS|NA|PS2|PS1|~A/G|GM0|GM1|NA

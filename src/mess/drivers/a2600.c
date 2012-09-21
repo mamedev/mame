@@ -1177,8 +1177,8 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER(switch_A_w)
 {
-	a2600_state *state = device->machine().driver_data<a2600_state>();
-	running_machine &machine = device->machine();
+	a2600_state *state = space.machine().driver_data<a2600_state>();
+	running_machine &machine = space.machine();
 
 	/* Left controller port */
 	if ( machine.root_device().ioport("CONTROLLERS")->read() / CATEGORY_SELECT == 0x03 )
@@ -1201,7 +1201,7 @@ static WRITE8_DEVICE_HANDLER(switch_A_w)
 static READ8_DEVICE_HANDLER( switch_A_r )
 {
 	static const UINT8 driving_lookup[4] = { 0x00, 0x02, 0x03, 0x01 };
-	running_machine &machine = device->machine();
+	running_machine &machine = space.machine();
 	UINT8 val = 0;
 
 	/* Left controller port PINs 1-4 ( 4321 ) */
@@ -1261,7 +1261,7 @@ static WRITE_LINE_DEVICE_HANDLER( irq_callback )
 
 static READ8_DEVICE_HANDLER( riot_input_port_8_r )
 {
-	return device->machine().root_device().ioport("SWB")->read();
+	return space.machine().root_device().ioport("SWB")->read();
 }
 
 static const riot6532_interface r6532_interface =

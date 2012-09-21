@@ -1839,14 +1839,14 @@ WRITE8_DEVICE_HANDLER( leland_80186_control_w )
 	}
 
 	/* /RESET */
-	device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, data & 0x80  ? CLEAR_LINE : ASSERT_LINE);
+	space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, data & 0x80  ? CLEAR_LINE : ASSERT_LINE);
 
 	/* /NMI */
 /*  If the master CPU doesn't get a response by the time it's ready to send
     the next command, it uses an NMI to force the issue; unfortunately, this
     seems to really screw up the sound system. It turns out it's better to
     just wait for the original interrupt to occur naturally */
-/*  device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, data & 0x40  ? CLEAR_LINE : ASSERT_LINE);*/
+/*  space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, data & 0x40  ? CLEAR_LINE : ASSERT_LINE);*/
 
 	/* INT0 */
 	if (data & 0x20)
@@ -1894,7 +1894,7 @@ static TIMER_CALLBACK( command_lo_sync )
 
 WRITE8_DEVICE_HANDLER( leland_80186_command_lo_w )
 {
-	device->machine().scheduler().synchronize(FUNC(command_lo_sync), data, device);
+	space.machine().scheduler().synchronize(FUNC(command_lo_sync), data, device);
 }
 
 
@@ -1957,7 +1957,7 @@ READ8_DEVICE_HANDLER( leland_80186_response_r )
 	if (LOG_COMM) logerror("%04X:Read sound response latch = %02X\n", pc, state->m_sound_response);
 
 	/* synchronize the response */
-	device->machine().scheduler().synchronize(FUNC(delayed_response_r), pc + 2, device);
+	space.machine().scheduler().synchronize(FUNC(delayed_response_r), pc + 2, device);
 	return state->m_sound_response;
 }
 
@@ -2204,7 +2204,7 @@ static READ16_DEVICE_HANDLER( peripheral_r )
 			if (!state->m_has_ym2151)
 				return pit8254_r(device, space, offset | 0x40, mem_mask);
 			else
-				return ym2151_r(device->machine().device("ymsnd"), space, offset);
+				return ym2151_r(space.machine().device("ymsnd"), space, offset);
 
 		case 4:
 			if (state->m_is_redline)
@@ -2241,7 +2241,7 @@ static WRITE16_DEVICE_HANDLER( peripheral_w )
 			if (!state->m_has_ym2151)
 				pit8254_w(device, space, offset | 0x40, data, mem_mask);
 			else
-				ym2151_w(device->machine().device("ymsnd"), space, offset, data);
+				ym2151_w(space.machine().device("ymsnd"), space, offset, data);
 			break;
 
 		case 4:
