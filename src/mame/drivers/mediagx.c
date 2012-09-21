@@ -186,6 +186,18 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_mediagx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_READ32_MEMBER(speedup0_r); 	
+	DECLARE_READ32_MEMBER(speedup1_r); 	
+	DECLARE_READ32_MEMBER(speedup2_r); 	
+	DECLARE_READ32_MEMBER(speedup3_r); 	
+	DECLARE_READ32_MEMBER(speedup4_r); 	
+	DECLARE_READ32_MEMBER(speedup5_r); 	
+	DECLARE_READ32_MEMBER(speedup6_r); 	
+	DECLARE_READ32_MEMBER(speedup7_r); 	
+	DECLARE_READ32_MEMBER(speedup8_r); 	
+	DECLARE_READ32_MEMBER(speedup9_r); 	
+	DECLARE_READ32_MEMBER(speedup10_r);	
+	DECLARE_READ32_MEMBER(speedup11_r);	
 };
 
 // Display controller registers
@@ -1271,24 +1283,24 @@ INLINE UINT32 generic_speedup(address_space &space, int idx)
 	return state->m_main_ram[state->m_speedup_table[idx].offset/4];
 }
 
-static READ32_HANDLER( speedup0_r ) { return generic_speedup(space, 0); }
-static READ32_HANDLER( speedup1_r ) { return generic_speedup(space, 1); }
-static READ32_HANDLER( speedup2_r ) { return generic_speedup(space, 2); }
-static READ32_HANDLER( speedup3_r ) { return generic_speedup(space, 3); }
-static READ32_HANDLER( speedup4_r ) { return generic_speedup(space, 4); }
-static READ32_HANDLER( speedup5_r ) { return generic_speedup(space, 5); }
-static READ32_HANDLER( speedup6_r ) { return generic_speedup(space, 6); }
-static READ32_HANDLER( speedup7_r ) { return generic_speedup(space, 7); }
-static READ32_HANDLER( speedup8_r ) { return generic_speedup(space, 8); }
-static READ32_HANDLER( speedup9_r ) { return generic_speedup(space, 9); }
-static READ32_HANDLER( speedup10_r ) { return generic_speedup(space, 10); }
-static READ32_HANDLER( speedup11_r ) { return generic_speedup(space, 11); }
+READ32_MEMBER(mediagx_state::speedup0_r) { return generic_speedup(space, 0); }
+READ32_MEMBER(mediagx_state::speedup1_r) { return generic_speedup(space, 1); }
+READ32_MEMBER(mediagx_state::speedup2_r) { return generic_speedup(space, 2); }
+READ32_MEMBER(mediagx_state::speedup3_r) { return generic_speedup(space, 3); }
+READ32_MEMBER(mediagx_state::speedup4_r) { return generic_speedup(space, 4); }
+READ32_MEMBER(mediagx_state::speedup5_r) { return generic_speedup(space, 5); }
+READ32_MEMBER(mediagx_state::speedup6_r) { return generic_speedup(space, 6); }
+READ32_MEMBER(mediagx_state::speedup7_r) { return generic_speedup(space, 7); }
+READ32_MEMBER(mediagx_state::speedup8_r) { return generic_speedup(space, 8); }
+READ32_MEMBER(mediagx_state::speedup9_r) { return generic_speedup(space, 9); }
+READ32_MEMBER(mediagx_state::speedup10_r) { return generic_speedup(space, 10); }
+READ32_MEMBER(mediagx_state::speedup11_r) { return generic_speedup(space, 11); }
 
-static const struct { read32_space_func func; const char *name; } speedup_handlers[] =
+static const struct { read32_delegate func; } speedup_handlers[] =
 {
-	{ FUNC(speedup0_r) },	{ FUNC(speedup1_r) },	{ FUNC(speedup2_r) },	{ FUNC(speedup3_r) },
-	{ FUNC(speedup4_r) },	{ FUNC(speedup5_r) },	{ FUNC(speedup6_r) },	{ FUNC(speedup7_r) },
-	{ FUNC(speedup8_r) },	{ FUNC(speedup9_r) },	{ FUNC(speedup10_r) },	{ FUNC(speedup11_r) }
+	{ read32_delegate(FUNC(mediagx_state::speedup0_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup1_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup2_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup3_r),(mediagx_state*)0) },
+	{ read32_delegate(FUNC(mediagx_state::speedup4_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup5_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup6_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup7_r),(mediagx_state*)0) },
+	{ read32_delegate(FUNC(mediagx_state::speedup8_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup9_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup10_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup11_r),(mediagx_state*)0) }
 };
 
 #ifdef MAME_DEBUG
@@ -1312,8 +1324,11 @@ static void install_speedups(running_machine &machine, const speedup_entry *entr
 	state->m_speedup_table = entries;
 	state->m_speedup_count = count;
 
-	for (i = 0; i < count; i++)
-		machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(entries[i].offset, entries[i].offset + 3, speedup_handlers[i].func, speedup_handlers[i].name);
+	for (i = 0; i < count; i++) {
+		read32_delegate func = speedup_handlers[i].func;
+		func.late_bind(*state);
+		machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(entries[i].offset, entries[i].offset + 3, func);
+	}
 
 #ifdef MAME_DEBUG
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(report_speedups), &machine));
