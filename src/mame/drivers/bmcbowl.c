@@ -103,8 +103,11 @@ Main board:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
+
+#define NVRAM_HACK
 
 
 class bmcbowl_state : public driver_device
@@ -112,7 +115,7 @@ class bmcbowl_state : public driver_device
 public:
 	bmcbowl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_stats_ram(*this, "stats_ram", 16),
+		m_stats_ram(*this, "nvram", 16),
 		m_vid1(*this, "vid1"),
 		m_vid2(*this, "vid2"){ }
 
@@ -142,8 +145,6 @@ public:
 
 
 
-
-#define NVRAM_HACK
 
 void bmcbowl_state::video_start()
 {
@@ -311,31 +312,16 @@ static void init_stats(bmcbowl_state *state, const UINT8 *table, int table_len, 
 }
 #endif
 
-static NVRAM_HANDLER( bmcbowl )
+void bmcbowl_state::machine_reset()
 {
-	bmcbowl_state *state = machine.driver_data<bmcbowl_state>();
-	int i;
-
-	if (read_or_write)
-		file->write(state->m_stats_ram, state->m_stats_ram.bytes());
-	else
-
 #ifdef NVRAM_HACK
-	for (i = 0; i < state->m_stats_ram.bytes(); i++)
-		state->m_stats_ram[i] = 0xff;
+	for (int i = 0; i < m_stats_ram.bytes(); i++)
+		m_stats_ram[i] = 0xff;
 
-	init_stats(state,bmc_nv1,ARRAY_LENGTH(bmc_nv1),0);
-	init_stats(state,bmc_nv2,ARRAY_LENGTH(bmc_nv2),0x3b0);
-	init_stats(state,bmc_nv3,ARRAY_LENGTH(bmc_nv3),0xfe2);
-#else
-	if (file)
-		file->read(state->m_stats_ram, state->m_stats_ram.bytes());
-	else
-
-		for (i = 0; i < state->m_stats_ram.bytes(); i++)
-			state->m_stats_ram[i] = 0xff;
+	init_stats(this,bmc_nv1,ARRAY_LENGTH(bmc_nv1),0);
+	init_stats(this,bmc_nv2,ARRAY_LENGTH(bmc_nv2),0x3b0);
+	init_stats(this,bmc_nv3,ARRAY_LENGTH(bmc_nv3),0xfe2);
 #endif
-
 }
 
 static ADDRESS_MAP_START( bmcbowl_mem, AS_PROGRAM, 16, bmcbowl_state )
@@ -355,7 +341,7 @@ static ADDRESS_MAP_START( bmcbowl_mem, AS_PROGRAM, 16, bmcbowl_state )
 	AM_RANGE(0x092800, 0x092803) AM_DEVWRITE8_LEGACY("aysnd", ay8910_data_address_w, 0xff00)
 	AM_RANGE(0x092802, 0x092803) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0xff00)
 	AM_RANGE(0x093802, 0x093803) AM_READ_PORT("IN0")
-	AM_RANGE(0x095000, 0x095fff) AM_RAM AM_SHARE("stats_ram") /* 8 bit */
+	AM_RANGE(0x095000, 0x095fff) AM_RAM AM_SHARE("nvram") /* 8 bit */
 	AM_RANGE(0x097000, 0x097001) AM_READNOP
 	AM_RANGE(0x140000, 0x1bffff) AM_ROM
 	AM_RANGE(0x1c0000, 0x1effff) AM_RAM AM_SHARE("vid1")
@@ -496,10 +482,6 @@ static const via6522_interface via_interface =
 	/*irq                  */ DEVCB_DRIVER_MEMBER(bmcbowl_state,via_irq)
 };
 
-void bmcbowl_state::machine_reset()
-{
-}
-
 static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_CPU_ADD("maincpu", M68000, 21477270/2 )
 	MCFG_CPU_PROGRAM_MAP(bmcbowl_mem)
@@ -514,8 +496,7 @@ static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-
-	MCFG_NVRAM_HANDLER(bmcbowl)
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

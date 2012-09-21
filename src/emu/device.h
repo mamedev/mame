@@ -438,7 +438,7 @@ public:
 };
 
 
-// ======================> memregion_finder
+// ======================> memory_region_finder
 
 // device finder template
 template<bool _Required>

@@ -129,6 +129,7 @@ better notes (complete chip lists) for each board still needed
 #include "includes/namcos2.h"
 #include "cpu/tms32025/tms32025.h"
 #include "includes/namcoic.h"
+#include "machine/nvram.h"
 #include "sound/c140.h"
 #include "rendlay.h"
 
@@ -138,12 +139,10 @@ class gal3_state : public namcos2_shared_state
 public:
 	gal3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: namcos2_shared_state(mconfig, type, tag) ,
-		m_nvmem(*this, "nvmem"),
 		m_rso_shared_ram(*this, "rso_shared_ram"){ }
 
 	UINT32 *m_mpSharedRAM0;
 	//UINT32 *m_mpSharedRAM1;
-	required_shared_ptr<UINT32> m_nvmem;
 	UINT16 m_namcos21_video_enable;
 	required_shared_ptr<UINT16> m_rso_shared_ram;
 	UINT32 m_led_mst;
@@ -244,42 +243,6 @@ UINT32 gal3_state::screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitma
 	popmessage("LED_MST:  %s\nLED_SLV:  %s\n2D Layer: 0-%d (Press H for +, J for -)\n", mst, slv, pivot);
 
 	return 0;
-}
-
-
-static NVRAM_HANDLER( gal3 )
-{
-	gal3_state *state = machine.driver_data<gal3_state>();
-	int i;
-	UINT8 data[4];
-	if( read_or_write )
-	{
-		for( i=0; i<state->m_nvmem.bytes()/4; i++ )
-		{
-			UINT32 dword = state->m_nvmem[i];
-			data[0] = dword>>24;
-			data[1] = (dword&0x00ff0000)>>16;
-			data[2] = (dword&0x0000ff00)>>8;
-			data[3] = dword&0xff;
-			file->write( data, 4 );
-		}
-	}
-	else
-	{
-		if( file )
-		{
-			for( i=0; i<state->m_nvmem.bytes()/4; i++ )
-			{
-				file->read( data, 4 );
-				state->m_nvmem[i] = (data[0]<<24)|(data[1]<<16)|(data[2]<<8)|data[3];
-			}
-		}
-		else
-		{
-			/* fill in the default values */
-			memset( state->m_nvmem, 0x00, state->m_nvmem.bytes() );
-		}
-	}
 }
 
 
@@ -651,7 +614,7 @@ static MACHINE_CONFIG_START( gal3, gal3_state )
 */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60*8000)) /* 8000 CPU slices per frame */
 
-	MCFG_NVRAM_HANDLER(gal3)
+	MCFG_NVRAM_ADD_0FILL("nvmem")
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

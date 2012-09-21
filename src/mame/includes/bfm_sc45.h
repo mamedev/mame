@@ -6,26 +6,34 @@
 
 #include "machine/bfm_bda.h"
 
+#include "sound/ymz280b.h"
+#include "machine/68681.h"
+#include "machine/nvram.h"
+
 class sc4_state : public driver_device
 {
 public:
 	sc4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_cpuregion(*this, "maincpu"),
+		  m_duart(*this, "duart68681"),
+		  m_ymz(*this, "ymz"),
 		  m_maincpu(*this, "maincpu"),
-		  m_vfd0(*this, "vfd0")
+		  m_vfd0(*this, "vfd0"),
+		  m_nvram(*this, "nvram")
 
 	{
 		m_chk41addr = -1;
 		m_dochk41 = false;
 	}
 
-	UINT16* m_cpuregion;
-	UINT16* m_mainram;
+	required_memory_region m_cpuregion;
 	// devices
-	device_t* m_duart;
-	device_t* m_ymz;
+	required_device<duart68681_device> m_duart;
+	required_device<ymz280b_device> m_ymz;
 	required_device<cpu_device> m_maincpu;
 	optional_device<bfm_bda_t> m_vfd0;
+	required_device<nvram_device> m_nvram;
 
 	// serial vfd
 	int vfd_enabled;
@@ -48,6 +56,8 @@ public:
 
 	int m_chk41addr;
 	bool m_dochk41;
+	
+	UINT16 m_mainram[0x10000/2];
 
 
 	DECLARE_WRITE8_MEMBER(mux_output_w);

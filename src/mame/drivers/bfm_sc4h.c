@@ -34,8 +34,6 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/bfm_sc45.h"
-#include "sound/ymz280b.h"
-#include "machine/68681.h"
 #include "bfm_sc4.lh"
 #include "video/awpvid.h"
 //DMD01
@@ -103,7 +101,7 @@ READ16_MEMBER(sc4_state::sc4_cs1_r)
 		}
 
 
-		return m_cpuregion[offset];
+		return m_cpuregion->u16(offset);
 	}
 	else
 		logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d\n", pc, offset*2, mem_mask, 1);
@@ -603,36 +601,17 @@ MACHINE_RESET_MEMBER(sc4_state,sc4)
 	sec.reset();
 }
 
-static NVRAM_HANDLER( bfm_sc4 )
-{
-	sc4_state *state = machine.driver_data<sc4_state>();
-	if ( read_or_write )
-	{	// writing
-		file->write(state->m_mainram,0x10000);
-	}
-	else
-	{ // reading
-		if ( file )
-		{
-			file->read(state->m_mainram,0x10000);
-		}
-	}
-}
-
-
 
 MACHINE_START_MEMBER(sc4_state,sc4)
 {
-	m_cpuregion = (UINT16*)memregion( "maincpu" )->base();
-	m_mainram = (UINT16*)auto_alloc_array_clear(machine(), UINT16, 0x10000);
-	m_duart = machine().device("duart68681");
-	m_ymz = machine().device("ymz");
-	m68307_set_port_callbacks(machine().device("maincpu"),
+	m_nvram->set_base(m_mainram, sizeof(m_mainram));
+
+	m68307_set_port_callbacks(m_maincpu,
 		bfm_sc4_68307_porta_r,
 		bfm_sc4_68307_porta_w,
 		bfm_sc4_68307_portb_r,
 		bfm_sc4_68307_portb_w );
-	m68307_set_duart68681(machine().device("maincpu"),machine().device("m68307_68681"));
+	m68307_set_duart68681(m_maincpu,machine().device("m68307_68681"));
 
 	int reels = 6;
 	m_reels=reels;
@@ -773,7 +752,7 @@ MACHINE_CONFIG_START( sc4, sc4_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_NVRAM_HANDLER(bfm_sc4)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DUART68681_ADD("duart68681", 16000000/4, bfm_sc4_duart68681_config) // ?? Mhz
 

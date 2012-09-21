@@ -230,6 +230,7 @@ public:
 	int m_e2dummywrite;
 	int m_e2data_to_read;
 	UINT8 m_codec_data[256];
+	void e2ram_init(nvram_device &nvram, void *data, size_t size);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(reel12_vid_w);
 	DECLARE_WRITE8_MEMBER(reel12_w);
@@ -296,6 +297,7 @@ public:
 	DECLARE_DRIVER_INIT(focus);
 	DECLARE_DRIVER_INIT(drwho);
 	DECLARE_DRIVER_INIT(drwho_common);
+	DECLARE_MACHINE_START(bfm_sc2);
 	DECLARE_MACHINE_RESET(init);
 	DECLARE_MACHINE_RESET(awp_init);
 	DECLARE_MACHINE_START(sc2dmd);
@@ -471,26 +473,11 @@ int Scorpion2_GetSwitchState(running_machine &machine, int strobe, int data)
 
 ///////////////////////////////////////////////////////////////////////////
 
-static NVRAM_HANDLER( bfm_sc2 )
+void bfm_sc2_state::e2ram_init(nvram_device &nvram, void *data, size_t size)
 {
-	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
 	static const UINT8 init_e2ram[10] = { 1, 4, 10, 20, 0, 1, 1, 4, 10, 20 };
-	if ( read_or_write )
-	{	// writing
-		file->write(state->m_e2ram,sizeof(state->m_e2ram));
-	}
-	else
-	{ // reading
-		if ( file )
-		{
-			file->read(state->m_e2ram,sizeof(state->m_e2ram));
-		}
-		else
-		{
-			memset(state->m_e2ram,0x00,sizeof(state->m_e2ram));
-			memcpy(state->m_e2ram,init_e2ram,sizeof(init_e2ram));
-		}
-	}
+	memset(data,0x00,size);
+	memcpy(data,init_e2ram,size);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -2150,6 +2137,13 @@ INPUT_PORTS_END
 // machine driver for scorpion2 board + adder2 expansion //////////////////
 ///////////////////////////////////////////////////////////////////////////
 
+MACHINE_START_MEMBER(bfm_sc2_state,bfm_sc2)
+{
+	nvram_device *e2ram = subdevice<nvram_device>("e2ram");
+	if (e2ram != NULL)
+		e2ram->set_base(m_e2ram, sizeof(m_e2ram));
+}
+
 static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(bfm_sc2_state, init )							// main scorpion2 board initialisation
 	MCFG_QUANTUM_TIME(attotime::from_hz(960))									// needed for serial communication !!
@@ -2161,8 +2155,10 @@ static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
 	MCFG_BFMBD1_ADD("vfd0",0)
 	MCFG_BFMBD1_ADD("vfd1",1)
 
+	MCFG_MACHINE_START_OVERRIDE(bfm_sc2_state,bfm_sc2)
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_NVRAM_HANDLER(bfm_sc2)
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_state, e2ram_init)
 	MCFG_DEFAULT_LAYOUT(layout_bfm_sc2)
 
 	MCFG_SCREEN_ADD("adder", RASTER)
@@ -3691,7 +3687,7 @@ WRITE8_MEMBER(bfm_sc2_state::dmd_reset_w)
 
 MACHINE_START_MEMBER(bfm_sc2_state,sc2dmd)
 {
-
+	MACHINE_START_CALL_MEMBER(bfm_sc2);
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	space.install_write_handler(0x2800, 0x2800, 0, 0, write8_delegate(FUNC(bfm_sc2_state::vfd1_dmd_w),this));
 	space.install_write_handler(0x2900, 0x2900, 0, 0, write8_delegate(FUNC(bfm_sc2_state::dmd_reset_w),this));
@@ -3709,6 +3705,8 @@ static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
 	MCFG_BFMBD1_ADD("vfd0",0)
 	MCFG_BFMBD1_ADD("vfd1",1)
 
+	MCFG_MACHINE_START_OVERRIDE(bfm_sc2_state,bfm_sc2)
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -3717,7 +3715,7 @@ static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_NVRAM_HANDLER(bfm_sc2)
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_state, e2ram_init)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_bfm_sc2)
@@ -3749,7 +3747,7 @@ static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_NVRAM_HANDLER(bfm_sc2)
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_state, e2ram_init)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_sc2_dmd)
