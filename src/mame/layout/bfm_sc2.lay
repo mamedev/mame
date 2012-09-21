@@ -849,15 +849,15 @@
 		<backdrop name="vfd15" element="vfd0" state="0">
 			<bounds x="135" y="280" width="9" height="14"/>
 		</backdrop>
-		<screen index="0">
+		<!-- <screen index="0">
 			<bounds x="0" y="0" width="400" height="280" />
-		</screen>
+		</screen> no screen listed in the source -->
 	</view>
-	<view name="Adder 2 Output Only (400:280)">
+	<!-- <view name="Adder 2 Output Only (400:280)">
 		<screen index="0">
 			<bounds left="0" top="0" right="400" bottom="280" />
 		</screen>
-	</view>
+	</view> no screen listed in the source -->
 	<view name="VFD Only (144:17)">
 		<backdrop name="vfd0" element="vfd0" state="0">
 			<bounds x="0" y="0" width="9" height="14"/>
