@@ -2271,7 +2271,7 @@ BOARD 1:
 |  _|     |             |                                          |_______|    |_______|    |_______|    |_______|               |
 |___|     |         2708|                                                                                                         |
 |         |_____________|                                                                                            Model Racing |
-|                                                                                                                    CS235 A      |
+|                                                                                                                    CS 235A      |
 |               A               B            C            D            E            F            G            H                   |
 |_________________________________________________________________________________________________________________________________|
 
@@ -2337,7 +2337,7 @@ BOARD 2:
 |_________________________________________________________________________________________________________________________________|
 
 
-Claybuster is probably the same hardware
+Claybuster is on the same hardware, PCB labels CS 235A and CS 238A as well
 
 */
 
@@ -2411,18 +2411,13 @@ static INPUT_PORTS_START( claybust )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 
-	PORT_DIPNAME( 0x10, 0x10, "Shots" )
+	// switch is 6-pos, but DNS06:5 and DNS06:6 are not connected
+	PORT_DIPNAME( 0x10, 0x10, "Shots" )				PORT_DIPLOCATION("DNS06:1")
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DNS06:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DNS06:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DNS06:4" )
 
 	PORT_START( "GUNX" )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_MINMAX(0x00, 0xff) PORT_CROSSHAIR(X, 1.0 - (MW8080BW_HPIXCOUNT-256)/256.0, (MW8080BW_HPIXCOUNT-256)/256.0, 0) PORT_SENSITIVITY(56) PORT_KEYDELTA(5)
@@ -2434,10 +2429,12 @@ static INPUT_PORTS_START( gunchamp )
 	PORT_INCLUDE( claybust )
 	
 	PORT_MODIFY("IN1")
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+
+	// switch is 6-pos, but DNS06:5 and DNS06:6 are not connected
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DNS06:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xe0, 0x40, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0xe0, 0x40, DEF_STR( Coinage ) )	PORT_DIPLOCATION("DNS06:2,3,4")
 	PORT_DIPSETTING(    0xa0, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 2C_1C ) )
@@ -2712,25 +2709,25 @@ ROM_END
 
 ROM_START( claybust )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "mr0.a1",       0x0000, 0x0400, CRC(90810582) SHA1(a5c3655bae6f92a3cd0eae3a5a3c25e414d4fdf0) )
-	ROM_LOAD( "mr1.a2",       0x0400, 0x0400, CRC(5ce6fb0e) SHA1(19fa3fbc0dd7e0fa4fffc005ded5a814c3b48f2d) )
-	ROM_LOAD( "mr2.a4",       0x0800, 0x0400, CRC(d4c1d523) SHA1(1a4785095caa8200d7e1d8d53a93c8e298f52c65) )
-	ROM_LOAD( "mr3.a5",       0x0c00, 0x0400, CRC(1ca00825) SHA1(74633a4903a51f1eebdd09679597dbe86db2e001) )
-	ROM_LOAD( "mr4.a6",       0x1000, 0x0400, CRC(09a21120) SHA1(e976d2c173c649e51b032bc5dad54f006864155c) )
-	ROM_LOAD( "mr5.a8",       0x1400, 0x0400, CRC(92cd4da8) SHA1(217e00012a52c479bf0b0cf37ce556387755740d) )
+	ROM_LOAD( "0.a1",         0x0000, 0x0400, CRC(90810582) SHA1(a5c3655bae6f92a3cd0eae3a5a3c25e414d4fdf0) )
+	ROM_LOAD( "1.a2",         0x0400, 0x0400, CRC(5ce6fb0e) SHA1(19fa3fbc0dd7e0fa4fffc005ded5a814c3b48f2d) )
+	ROM_LOAD( "2.a4",         0x0800, 0x0400, CRC(d4c1d523) SHA1(1a4785095caa8200d7e1d8d53a93c8e298f52c65) )
+	ROM_LOAD( "3.a5",         0x0c00, 0x0400, CRC(1ca00825) SHA1(74633a4903a51f1eebdd09679597dbe86db2e001) )
+	ROM_LOAD( "4.a6",         0x1000, 0x0400, CRC(09a21120) SHA1(e976d2c173c649e51b032bc5dad54f006864155c) )
+	ROM_LOAD( "5.a8",         0x1400, 0x0400, CRC(92cd4da8) SHA1(217e00012a52c479bf0b0cf37ce556387755740d) )
 ROM_END
 
 
 ROM_START( gunchamp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "251.bin",      0x0000, 0x0400, CRC(f27a8c1e) SHA1(510debd1ac2c0986f99c217e3078208a39d7837c) )
-	ROM_LOAD( "252.bin",      0x0400, 0x0400, CRC(d53b8f91) SHA1(56919f4c88fb3b5c23b5365f0866698bfceb2762) )
-	ROM_LOAD( "253.bin",      0x0800, 0x0400, CRC(9ef35c6c) SHA1(95bda3e2cdd50f7ac989c581481bad5f1ef2992f) )
-	ROM_LOAD( "254.bin",      0x0c00, 0x0400, CRC(ba5b562d) SHA1(47819d7e5ef3700e700a5f2faa9537bc2199561c) )
-	ROM_LOAD( "255.bin",      0x1000, 0x0400, CRC(00ea8293) SHA1(9c921fa4bafc36fc16a3f5f8588887342936d433) )
-	ROM_LOAD( "256.bin",      0x1400, 0x0400, CRC(e271150c) SHA1(36d0c0c1335036b4a994e8a38904adcf74161c59) )
-	ROM_LOAD( "257.bin",      0x1800, 0x0400, CRC(0da5d9ad) SHA1(c87c6ab248bfd2b75f070343a8f7fcbaed13f4e3) )
-	ROM_LOAD( "258.bin",      0x1c00, 0x0400, CRC(471d4052) SHA1(c8ccda2eba44c2ab49f5fc2874fe70c2bdae35d3) )
+	ROM_LOAD( "251.a1",       0x0000, 0x0400, CRC(f27a8c1e) SHA1(510debd1ac2c0986f99c217e3078208a39d7837c) )
+	ROM_LOAD( "252.a2",       0x0400, 0x0400, CRC(d53b8f91) SHA1(56919f4c88fb3b5c23b5365f0866698bfceb2762) )
+	ROM_LOAD( "253.a4",       0x0800, 0x0400, CRC(9ef35c6c) SHA1(95bda3e2cdd50f7ac989c581481bad5f1ef2992f) )
+	ROM_LOAD( "254.a5",       0x0c00, 0x0400, CRC(ba5b562d) SHA1(47819d7e5ef3700e700a5f2faa9537bc2199561c) )
+	ROM_LOAD( "255.a6",       0x1000, 0x0400, CRC(00ea8293) SHA1(9c921fa4bafc36fc16a3f5f8588887342936d433) )
+	ROM_LOAD( "256.a8",       0x1400, 0x0400, CRC(e271150c) SHA1(36d0c0c1335036b4a994e8a38904adcf74161c59) )
+	ROM_LOAD( "257.a9",       0x1800, 0x0400, CRC(0da5d9ad) SHA1(c87c6ab248bfd2b75f070343a8f7fcbaed13f4e3) )
+	ROM_LOAD( "258.a10",      0x1c00, 0x0400, CRC(471d4052) SHA1(c8ccda2eba44c2ab49f5fc2874fe70c2bdae35d3) )
 ROM_END
 
 
