@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="cbm2_cart" description="Commodore CBM-II cartridges">
+
+	<software name="calcresu">
+		<description>Calc Result</description>
+		<year>198?</year>
+		<publisher>Handic Software</publisher>
+		
+		<part name="cart" interface="cbm2_cart">
+			<dataarea name="bank1" size="0x2000">
+				<rom name="calc_result-bx700.bin" size="0x2000" crc="4775ebb3" sha1="5c6928a9cd8a3ce6a1d11221292b832295d6543e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="1070662">
+				<rom name="calc_result_700_bx_single_version_v1.0.d82" size="1070662" crc="244a2122" sha1="44661ed8e3307bb967f97ce1f5a247ca3cded0b3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profitxt">
+		<description>ProfiText</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		
+		<part name="cart" interface="cbm2_cart">
+			<dataarea name="bank1" size="0x2000">
+				<rom name="profitext.bin" size="0x2000" crc="ac622a2b" sha1="a02fcd187b7493a08379bbaef3d4296a083d30c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo1">
+		<description>Demo 1</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		
+		<part name="cart" interface="cbm2_cart">
+			<dataarea name="bank1" size="0x2000">
+				<rom name="cbm610-cart1-red-left.bin" size="0x2000" crc="be426f3d" sha1="da6f1099fd09165f8ee454e2e517cfc523deb8b7" offset="0" />
+			</dataarea>
+
+			<dataarea name="bank2" size="0x2000">
+				<rom name="cbm610-cart1-blue-right.bin" size="0x2000" crc="61a5008b" sha1="02db07ca68631aefb69e5db41fada27486263c69" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo2">
+		<description>Demo 2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		
+		<part name="cart" interface="cbm2_cart">
+			<dataarea name="bank1" size="0x2000">
+				<rom name="cbm610-cart2-white-left.bin" size="0x2000" crc="aeb6881c" sha1="4bdabbd7d6d642f916b5a91155396c98fce591a3" offset="0" />
+			</dataarea>
+
+			<dataarea name="bank2" size="0x2000">
+				<rom name="cbm610-cart2-green-right.bin" size="0x2000" crc="61a5008b" sha1="02db07ca68631aefb69e5db41fada27486263c69" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moni610">
+		<description>Moni610</description>
+		<year>2008</year>
+		<publisher>Ullrich von Bassewitz</publisher>
+		
+		<part name="cart" interface="cbm2_cart">
+			<dataarea name="bank1" size="0x2000">
+				<rom name="moni.bin" size="0x2000" crc="43b08d1f" sha1="9c0c24907e85674348dd58e81e6da64e157e9d0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

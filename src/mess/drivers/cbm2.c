@@ -2,8 +2,8 @@
 
     TODO:
 
-	- cbm600
-	- cbm700
+	- foreign keyboard inputs
+	- cbm620hu charom banking?
 	- read VIC video RAM thru PLA
 	- read VIC color RAM thru PLA
 	- user port
@@ -29,30 +29,277 @@
 #define A12 BIT(offset, 12)
 #define A11 BIT(offset, 11)
 #define A10 BIT(offset, 10)
+#define A0 BIT(offset, 0)
 #define VA12 BIT(va, 12)
 
 
 
 //**************************************************************************
-//  INTERRUPTS
+//  ADDRESS DECODING
 //**************************************************************************
 
 //-------------------------------------------------
-//  check_interrupts -
+//  bankswitch -
 //-------------------------------------------------
 
-void p500_state::check_interrupts()
+void cbm2_state::bankswitch(offs_t offset, int busy2, int eras, int ecas, int refen, int cas, int ras, int *sysioen, int *dramen,
+	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *buframcs, int *extbufcs, int *vidramcs, 
+	int *diskromcs, int *csbank1, int *csbank2, int *csbank3, int *basiccs, int *knbcs, int *kernalcs,
+	int *crtccs, int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs)
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_vic_irq || m_tpi1_irq);	
+	UINT32 input = P0 << 15 | P1 << 14 | P2 << 13 | P3 << 12 | busy2 << 11 | eras << 10 | ecas << 9 | refen << 8 | cas << 7 | ras << 6;
+	UINT32 data = m_pla1->read(input);
 
-	mos6526_flag_w(m_cia, m_cass_rd && m_user_flag);
+	*casseg1 = BIT(data, 0);
+	//*rasseg1 = BIT(data, 1);
+	//*rasseg2 = BIT(data, 2);
+	*casseg2 = BIT(data, 3);
+	//*rasseg4 = BIT(data, 4);
+	*casseg4 = BIT(data, 5);
+	*casseg3 = BIT(data, 6);
+	//*rasseg3 = BIT(data, 7);
+
+	int busen1 = m_dramon;
+	int decoden = 0; // TODO
+	*sysioen = !(P0 && P1 && P2 && P3) && busen1;
+	*dramen = !((!(P0 && P1 && P2 && P3)) && busen1);
+
+	if (!decoden && !*sysioen)
+	{
+		switch ((offset >> 13) & 0x07)
+		{
+		case 0:
+			switch ((offset >> 11) & 0x03)
+			{
+			case 0: *buframcs = 0; break;
+			case 1: *extbufcs = 0; break;
+			case 2: // fallthru
+			case 3: *diskromcs = 0; break;
+			}
+			break;
+
+		case 1: *csbank1 = 0; break;
+		case 2: *csbank2 = 0; break;
+		case 3: *csbank3 = 0; break;
+		case 4: *basiccs = 0; break;
+		case 5: *knbcs = 0; break;
+		case 6:
+			switch ((offset >> 11) & 0x03)
+			{
+			case 2: *vidramcs = 0; break;
+			case 3:
+				switch ((offset >> 8) & 0x07)
+				{
+				case 0: *crtccs = 0; break;
+				case 1: *cs1 = 0; break;
+				case 2: *sidcs = 0; break;
+				case 3: *extprtcs = 0; break;
+				case 4: *ciacs = 0; break;
+				case 5: *aciacs = 0; break;
+				case 6: *tript1cs = 0; break;
+				case 7: *tript2cs = 0; break;
+				}
+				break;
+			}
+			break;
+
+		case 7: *kernalcs = 0; break;
+		}
+	}
 }
 
 
+//-------------------------------------------------
+//  read -
+//-------------------------------------------------
 
-//**************************************************************************
-//  MEMORY MANAGEMENT UNIT
-//**************************************************************************
+READ8_MEMBER( cbm2_state::read )
+{
+	int busy2 = 1, eras = 1, ecas = 1, refen = 1, cas = 1, ras = 1, sysioen = 1, dramen = 1;
+	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, buframcs = 1, extbufcs = 1, vidramcs = 1;
+	int diskromcs = 1, csbank1 = 1, csbank2 = 1, csbank3 = 1, basiccs = 1, knbcs = 1, kernalcs = 1;
+	int crtccs = 1, cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
+
+	bankswitch(offset, busy2, eras, ecas, refen, cas, ras, &sysioen, &dramen,
+		&casseg1, &casseg2, &casseg3, &casseg4, &buframcs, &extbufcs, &vidramcs,
+		&diskromcs, &csbank1, &csbank2, &csbank3, &basiccs, &knbcs, &kernalcs,
+		&crtccs, &cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs);
+/*
+	if (!space.debugger_access())
+	logerror("%05x %u %u - %u %u %u %u %u %u %u - %u %u %u %u %u %u %u - %u %u %u %u %u %u %u %u\n", offset, sysioen, dramen,
+		casseg1, casseg2, casseg3, casseg4, buframcs, extbufcs, vidramcs,
+		diskromcs, csbank1, csbank2, csbank3, basiccs, knbcs, kernalcs,
+		crtccs, cs1, sidcs, extprtcs, ciacs, aciacs, tript1cs, tript2cs);
+*/
+	UINT8 data = 0;
+
+	if (!dramen)
+	{
+		if (!casseg1)
+		{
+			data = m_ram->pointer()[offset & 0xffff];
+		}
+		else if (!casseg2)
+		{
+			data = m_ram->pointer()[0x10000 | (offset & 0xffff)];
+		}
+		else if (!casseg3 && (m_ram->size() > 0x20000))
+		{
+			data = m_ram->pointer()[0x20000 | (offset & 0xffff)];
+		}
+		else if (!casseg4 && (m_ram->size() > 0x30000))
+		{
+			data = m_ram->pointer()[0x30000 | (offset & 0xffff)];
+		}
+	}
+
+	if (!sysioen)
+	{
+		if (!buframcs)
+		{
+			data = m_buffer_ram[offset & 0x7ff];
+		}
+		else if (!vidramcs)
+		{
+			data = m_video_ram[offset & 0x7ff];
+		}
+		else if (!basiccs || !knbcs)
+		{
+			data = m_basic[offset & 0x3fff];
+		}
+		else if (!kernalcs)
+		{
+			data = m_kernal[offset & 0x1fff];
+		}
+		else if (!crtccs)
+		{
+			if (A0)
+			{
+				data = m_crtc->register_r(space, 0);
+			}
+			else
+			{
+				data = m_crtc->status_r(space, 0);
+			}
+		}
+		else if (!sidcs)
+		{
+			data = m_sid->read(space, offset & 0x1f);
+		}
+		else if (!ciacs)
+		{
+			data = m_cia->read(space, offset & 0x0f);
+		}
+		else if (!aciacs)
+		{
+			data = m_acia->read(space, offset & 0x03);
+		}
+		else if (!tript1cs)
+		{
+			data = m_tpi1->read(space, offset & 0x07);
+		}
+		else if (!tript2cs)
+		{
+			data = m_tpi2->read(space, offset & 0x07);
+		}
+
+		data = m_exp->read(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  write -
+//-------------------------------------------------
+
+WRITE8_MEMBER( cbm2_state::write )
+{
+	int busy2 = 1, eras = 1, ecas = 1, refen = 1, cas = 1, ras = 1, sysioen = 1, dramen = 1;
+	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, buframcs = 1, extbufcs = 1, vidramcs = 1;
+	int diskromcs = 1, csbank1 = 1, csbank2 = 1, csbank3 = 1, basiccs = 1, knbcs = 1, kernalcs = 1;
+	int crtccs = 1, cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
+
+	bankswitch(offset, busy2, eras, ecas, refen, cas, ras, &sysioen, &dramen,
+		&casseg1, &casseg2, &casseg3, &casseg4, &buframcs, &extbufcs, &vidramcs,
+		&diskromcs, &csbank1, &csbank2, &csbank3, &basiccs, &knbcs, &kernalcs,
+		&crtccs, &cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs);
+
+	if (!dramen)
+	{
+		if (!casseg1)
+		{
+			m_ram->pointer()[offset & 0xffff] = data;
+		}
+		else if (!casseg2)
+		{
+			m_ram->pointer()[0x10000 | (offset & 0xffff)] = data;
+		}
+		else if (!casseg3 && (m_ram->size() > 0x20000))
+		{
+			m_ram->pointer()[0x20000 | (offset & 0xffff)] = data;
+		}
+		else if (!casseg4 && (m_ram->size() > 0x30000))
+		{
+			m_ram->pointer()[0x30000 | (offset & 0xffff)] = data;
+		}
+	}
+
+	if (!sysioen)
+	{
+		if (!buframcs)
+		{
+			m_buffer_ram[offset & 0x7ff] = data;
+		}
+		else if (!vidramcs)
+		{
+			m_video_ram[offset & 0x7ff] = data;
+		}
+		else if (!basiccs || !knbcs)
+		{
+			m_basic[offset & 0x3fff] = data;
+		}
+		else if (!kernalcs)
+		{
+			m_kernal[offset & 0x1fff] = data;
+		}
+		else if (!crtccs)
+		{
+			if (A0)
+			{
+				m_crtc->register_w(space, 0, data);
+			}
+			else
+			{
+				m_crtc->address_w(space, 0, data);
+			}
+		}
+		else if (!sidcs)
+		{
+			m_sid->write(space, offset & 0x1f, data);
+		}
+		else if (!ciacs)
+		{
+			m_cia->write(space, offset & 0x0f, data);
+		}
+		else if (!aciacs)
+		{
+			m_acia->write(space, offset & 0x03, data);
+		}
+		else if (!tript1cs)
+		{
+			m_tpi1->write(space, offset & 0x07, data);
+		}
+		else if (!tript2cs)
+		{
+			m_tpi2->write(space, offset & 0x07, data);
+		}
+
+		m_exp->write(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
+	}
+}
+
 
 //-------------------------------------------------
 //  bankswitch -
@@ -428,6 +675,15 @@ READ8_MEMBER( p500_state::vic_videoram_r )
 //**************************************************************************
 
 //-------------------------------------------------
+//  ADDRESS_MAP( cbm2_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( cbm2_mem, AS_PROGRAM, 8, cbm2_state )
+	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(read, write)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
 //  ADDRESS_MAP( p500_mem )
 //-------------------------------------------------
 
@@ -460,10 +716,10 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  INPUT_PORTS( p500 )
+//  INPUT_PORTS( cbm2 )
 //-------------------------------------------------
 
-static INPUT_PORTS_START( p500 )
+static INPUT_PORTS_START( cbm2 )
 	PORT_START("PB0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)
@@ -616,6 +872,89 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
+//  mc6845_interface crtc_intf
+//-------------------------------------------------
+
+static MC6845_UPDATE_ROW( lp_crtc_update_row )
+{
+	cbm2_state *state = device->machine().driver_data<cbm2_state>();
+
+	int x = 0;
+
+	for (int column = 0; column < x_count; column++)
+	{
+		UINT8 code = state->m_video_ram[(ma + column) & 0x7ff];
+		offs_t char_rom_addr = (ma & 0x1000) | (state->m_graphics << 11) | ((code & 0x7f) << 4) | (ra & 0x0f);
+		UINT8 data = state->m_charom[char_rom_addr & 0xfff];
+
+		for (int bit = 0; bit < 8; bit++)
+		{
+			int color = BIT(data, 7) ^ BIT(code, 7) ^ BIT(ma, 13);
+			if (cursor_x == column) color ^= 1;
+			
+			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[color];
+
+			data <<= 1;
+		}
+	}
+}
+
+static const mc6845_interface lp_crtc_intf =
+{
+	SCREEN_TAG,
+	8,
+	NULL,
+	lp_crtc_update_row,
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	NULL
+};
+
+
+static MC6845_UPDATE_ROW( hp_crtc_update_row )
+{
+	cbm2_state *state = device->machine().driver_data<cbm2_state>();
+
+	int x = 0;
+
+	for (int column = 0; column < x_count; column++)
+	{
+		UINT8 code = state->m_video_ram[(ma + column) & 0x7ff];
+		offs_t char_rom_addr = (ma & 0x1000) | (state->m_graphics << 11) | ((code & 0x7f) << 4) | (ra & 0x0f);
+		UINT8 data = state->m_charom[char_rom_addr & 0xfff];
+
+		for (int bit = 0; bit < 8; bit++)
+		{
+			int color = BIT(data, 7) ^ BIT(code, 7) ^ BIT(ma, 13);
+			if (cursor_x == column) color ^= 1;
+			
+			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[color];
+
+			data <<= 1;
+		}
+
+		x++;
+	}
+}
+
+static const mc6845_interface hp_crtc_intf =
+{
+	SCREEN_TAG,
+	9,
+	NULL,
+	hp_crtc_update_row,
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	NULL
+};
+
+//-------------------------------------------------
 //  vic2_interface vic_intf
 //-------------------------------------------------
 
@@ -623,7 +962,7 @@ WRITE_LINE_MEMBER( p500_state::vic_irq_w )
 {
 	m_vic_irq = state;
 
-	check_interrupts();
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_vic_irq || m_tpi1_irq || m_user_irq);
 }
 
 static MOS6567_INTERFACE( vic_intf )
@@ -643,7 +982,7 @@ static MOS6567_INTERFACE( vic_intf )
 //  MOS6581_INTERFACE( sid_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( p500_state::sid_potx_r )
+READ8_MEMBER( cbm2_state::sid_potx_r )
 {
 	int sela = BIT(m_cia_pa, 6);
 	int selb = BIT(m_cia_pa, 7);
@@ -656,7 +995,7 @@ READ8_MEMBER( p500_state::sid_potx_r )
 	return data;
 }
 
-READ8_MEMBER( p500_state::sid_poty_r )
+READ8_MEMBER( cbm2_state::sid_poty_r )
 {
 	int sela = BIT(m_cia_pa, 6);
 	int selb = BIT(m_cia_pa, 7);
@@ -671,8 +1010,8 @@ READ8_MEMBER( p500_state::sid_poty_r )
 
 static MOS6581_INTERFACE( sid_intf )
 {
-	DEVCB_DRIVER_MEMBER(p500_state, sid_potx_r),
-	DEVCB_DRIVER_MEMBER(p500_state, sid_poty_r)
+	DEVCB_DRIVER_MEMBER(cbm2_state, sid_potx_r),
+	DEVCB_DRIVER_MEMBER(cbm2_state, sid_poty_r)
 };
 
 
@@ -680,14 +1019,21 @@ static MOS6581_INTERFACE( sid_intf )
 //  tpi6525_interface tpi1_intf
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( cbm2_state::tpi1_irq_w )
+{
+	m_tpi1_irq = state;
+
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_tpi1_irq || m_user_irq);
+}
+
 WRITE_LINE_MEMBER( p500_state::tpi1_irq_w )
 {
 	m_tpi1_irq = state;
 
-	check_interrupts();
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_vic_irq || m_tpi1_irq || m_user_irq);
 }
 
-READ8_MEMBER( p500_state::tpi1_pa_r )
+READ8_MEMBER( cbm2_state::tpi1_pa_r )
 {
 	/*
 	
@@ -717,7 +1063,7 @@ READ8_MEMBER( p500_state::tpi1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( p500_state::tpi1_pa_w )
+WRITE8_MEMBER( cbm2_state::tpi1_pa_w )
 {
 	/*
 	
@@ -743,7 +1089,7 @@ WRITE8_MEMBER( p500_state::tpi1_pa_w )
 	m_ieee->nrfd_w(BIT(data, 7));
 }
 
-READ8_MEMBER( p500_state::tpi1_pb_r )
+READ8_MEMBER( cbm2_state::tpi1_pb_r )
 {
 	/*
 	
@@ -772,7 +1118,7 @@ READ8_MEMBER( p500_state::tpi1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( p500_state::tpi1_pb_w )
+WRITE8_MEMBER( cbm2_state::tpi1_pb_w )
 {
 	/*
 	
@@ -801,27 +1147,41 @@ WRITE8_MEMBER( p500_state::tpi1_pb_w )
 	m_cassette->motor_w(BIT(data, 6));
 }
 
+WRITE_LINE_MEMBER( cbm2_state::tpi1_ca_w )
+{
+	m_graphics = state;
+}
+
 WRITE_LINE_MEMBER( p500_state::tpi1_ca_w )
 {
-	//logerror("STATVID %u\n", state);
-
 	m_statvid = state;
 }
 
 WRITE_LINE_MEMBER( p500_state::tpi1_cb_w )
 {
-	//logerror("VICDOTSEL %u\n", state);
-
 	m_vicdotsel = state;
 }
 
 static const tpi6525_interface tpi1_intf =
 {
+	DEVCB_DRIVER_LINE_MEMBER(cbm2_state, tpi1_irq_w),
+	DEVCB_DRIVER_MEMBER(cbm2_state, tpi1_pa_r),
+	DEVCB_DRIVER_MEMBER(cbm2_state, tpi1_pa_w),
+	DEVCB_DRIVER_MEMBER(cbm2_state, tpi1_pb_r),
+	DEVCB_DRIVER_MEMBER(cbm2_state, tpi1_pb_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(cbm2_state, tpi1_ca_w),
+	DEVCB_NULL
+};
+
+static const tpi6525_interface p500_tpi1_intf =
+{
 	DEVCB_DRIVER_LINE_MEMBER(p500_state, tpi1_irq_w),
-	DEVCB_DRIVER_MEMBER(p500_state, tpi1_pa_r),
-	DEVCB_DRIVER_MEMBER(p500_state, tpi1_pa_w),
-	DEVCB_DRIVER_MEMBER(p500_state, tpi1_pb_r),
-	DEVCB_DRIVER_MEMBER(p500_state, tpi1_pb_w),
+	DEVCB_DRIVER_MEMBER(cbm2_state, tpi1_pa_r),
+	DEVCB_DRIVER_MEMBER(cbm2_state, tpi1_pa_w),
+	DEVCB_DRIVER_MEMBER(cbm2_state, tpi1_pb_r),
+	DEVCB_DRIVER_MEMBER(cbm2_state, tpi1_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(p500_state, tpi1_ca_w),
@@ -833,33 +1193,8 @@ static const tpi6525_interface tpi1_intf =
 //  tpi6525_interface tpi2_intf
 //-------------------------------------------------
 
-WRITE8_MEMBER( p500_state::tpi2_pa_w )
+UINT8 cbm2_state::read_keyboard()
 {
-	m_tpi2_pa = data;
-}
-
-WRITE8_MEMBER( p500_state::tpi2_pb_w )
-{
-	m_tpi2_pb = data;
-}
-
-READ8_MEMBER( p500_state::tpi2_pc_r )
-{
-	/*
-	
-	    bit     description
-	
-	    0       COLUMN 0
-	    1       COLUMN 1
-	    2       COLUMN 2
-	    3       COLUMN 3
-	    4       COLUMN 4
-	    5       COLUMN 5
-	    6       
-	    7       
-	
-	*/
-
 	UINT8 data = 0xff;
 
 	if (!BIT(m_tpi2_pa, 0)) data &= ioport("PA0")->read();
@@ -880,6 +1215,76 @@ READ8_MEMBER( p500_state::tpi2_pc_r )
 	if (!BIT(m_tpi2_pb, 7)) data &= ioport("PB7")->read();
 
 	return data;
+}
+
+WRITE8_MEMBER( cbm2_state::tpi2_pa_w )
+{
+	m_tpi2_pa = data;
+}
+
+WRITE8_MEMBER( cbm2_state::tpi2_pb_w )
+{
+	m_tpi2_pb = data;
+}
+
+READ8_MEMBER( cbm2lp_state::tpi2_pc_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       COLUMN 0
+	    1       COLUMN 1
+	    2       COLUMN 2
+	    3       COLUMN 3
+	    4       COLUMN 4
+	    5       COLUMN 5
+	    6       0=PAL, 1=NTSC
+	    7       0
+	
+	*/
+
+	return (m_ntsc << 6) | (read_keyboard() & 0x3f);
+}
+
+READ8_MEMBER( cbm2hp_state::tpi2_pc_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       COLUMN 0
+	    1       COLUMN 1
+	    2       COLUMN 2
+	    3       COLUMN 3
+	    4       COLUMN 4
+	    5       COLUMN 5
+	    6       1
+	    7       1
+	
+	*/
+
+	return read_keyboard();
+}
+
+READ8_MEMBER( p500_state::tpi2_pc_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       COLUMN 0
+	    1       COLUMN 1
+	    2       COLUMN 2
+	    3       COLUMN 3
+	    4       COLUMN 4
+	    5       COLUMN 5
+	    6       
+	    7       
+	
+	*/
+
+	return read_keyboard();
 }
 
 WRITE8_MEMBER( p500_state::tpi2_pc_w )
@@ -906,9 +1311,35 @@ static const tpi6525_interface tpi2_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(p500_state, tpi2_pa_w),
+	DEVCB_DRIVER_MEMBER(cbm2_state, tpi2_pa_w),
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(p500_state, tpi2_pb_w),
+	DEVCB_DRIVER_MEMBER(cbm2_state, tpi2_pb_w),
+	DEVCB_DRIVER_MEMBER(cbm2lp_state, tpi2_pc_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static const tpi6525_interface hp_tpi2_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(cbm2_state, tpi2_pa_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(cbm2_state, tpi2_pb_w),
+	DEVCB_DRIVER_MEMBER(cbm2hp_state, tpi2_pc_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static const tpi6525_interface p500_tpi2_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(cbm2_state, tpi2_pa_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(cbm2_state, tpi2_pb_w),
 	DEVCB_DRIVER_MEMBER(p500_state, tpi2_pc_r),
 	DEVCB_DRIVER_MEMBER(p500_state, tpi2_pc_w),
 	DEVCB_NULL,
@@ -920,7 +1351,7 @@ static const tpi6525_interface tpi2_intf =
 //  mos6526_interface cia_intf
 //-------------------------------------------------
 
-READ8_MEMBER( p500_state::cia_pa_r )
+READ8_MEMBER( cbm2_state::cia_pa_r )
 {
 	/*
 	
@@ -946,7 +1377,7 @@ READ8_MEMBER( p500_state::cia_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( p500_state::cia_pa_w )
+WRITE8_MEMBER( cbm2_state::cia_pa_w )
 {
 	/*
 	
@@ -966,7 +1397,7 @@ WRITE8_MEMBER( p500_state::cia_pa_w )
 	m_cia_pa = data;
 }
 
-READ8_MEMBER( p500_state::cia_pb_r )
+READ8_MEMBER( cbm2_state::cia_pb_r )
 {
 	/*
 	
@@ -992,7 +1423,7 @@ READ8_MEMBER( p500_state::cia_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( p500_state::cia_pb_w )
+WRITE8_MEMBER( cbm2_state::cia_pb_w )
 {
 	/*
 	
@@ -1016,10 +1447,10 @@ static const mos6526_interface cia_intf =
 	DEVCB_NULL, // user port
 	DEVCB_NULL, // user port
 	DEVCB_NULL, // user port
-	DEVCB_DRIVER_MEMBER(p500_state, cia_pa_r),
-	DEVCB_DRIVER_MEMBER(p500_state, cia_pa_w),
-	DEVCB_DRIVER_MEMBER(p500_state, cia_pb_r),
-	DEVCB_DRIVER_MEMBER(p500_state, cia_pb_w),
+	DEVCB_DRIVER_MEMBER(cbm2_state, cia_pa_r),
+	DEVCB_DRIVER_MEMBER(cbm2_state, cia_pa_w),
+	DEVCB_DRIVER_MEMBER(cbm2_state, cia_pb_r),
+	DEVCB_DRIVER_MEMBER(cbm2_state, cia_pb_w),
 };
 
 
@@ -1027,16 +1458,16 @@ static const mos6526_interface cia_intf =
 //  PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( p500_state::tape_read_w )
+WRITE_LINE_MEMBER( cbm2_state::tape_read_w )
 {
 	m_cass_rd = state;
 
-	check_interrupts();
+	mos6526_flag_w(m_cia, m_cass_rd && m_user_flag);
 }
 
 static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(p500_state, tape_read_w)
+	DEVCB_DRIVER_LINE_MEMBER(cbm2_state, tape_read_w)
 };
 
 
@@ -1066,7 +1497,7 @@ static IEEE488_INTERFACE( ieee488_intf )
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void p500_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void cbm2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	m_tpi1->i0_w(m_todclk);
 
@@ -1075,10 +1506,10 @@ void p500_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 
 //-------------------------------------------------
-//  MACHINE_START( p500 )
+//  MACHINE_START( cbm2 )
 //-------------------------------------------------
 
-void p500_state::machine_start()
+MACHINE_START_MEMBER( cbm2_state, cbm2 )
 {
 	// find memory regions
 	m_basic = memregion("basic")->base();
@@ -1086,20 +1517,20 @@ void p500_state::machine_start()
 	m_charom = memregion("charom")->base();
 
 	// allocate memory
-	m_video_ram.allocate(0x400);
+	m_video_ram.allocate(m_video_ram_size);
 	m_buffer_ram.allocate(0x800);
 
 	// allocate timer
+	int todclk = (m_ntsc ? 60 : 50) * 2;
+
 	m_todclk_timer = timer_alloc();
-	m_todclk_timer->adjust(attotime::from_hz(60 * 2), 0, attotime::from_hz(60 * 2));
+	m_todclk_timer->adjust(attotime::from_hz(todclk), 0, attotime::from_hz(todclk));
 
 	// state saving
 	save_item(NAME(m_dramon));
-	save_item(NAME(m_statvid));
-	save_item(NAME(m_vicdotsel));
-	save_item(NAME(m_vicbnksel));
+	save_item(NAME(m_graphics));
+	save_item(NAME(m_ntsc));
 	save_item(NAME(m_todclk));
-	save_item(NAME(m_vic_irq));
 	save_item(NAME(m_tpi1_irq));
 	save_item(NAME(m_cass_rd));
 	save_item(NAME(m_user_flag));
@@ -1110,18 +1541,61 @@ void p500_state::machine_start()
 
 
 //-------------------------------------------------
-//  MACHINE_RESET( p500 )
+//  MACHINE_START( cbm2_ntsc )
 //-------------------------------------------------
 
-void p500_state::machine_reset()
+MACHINE_START_MEMBER( cbm2_state, cbm2_ntsc )
+{
+	m_video_ram_size = 0x800;
+	m_ntsc = 1;
+
+	MACHINE_START_CALL_MEMBER(cbm2);
+}
+
+
+//-------------------------------------------------
+//  MACHINE_START( cbm2_pal )
+//-------------------------------------------------
+
+MACHINE_START_MEMBER( cbm2_state, cbm2_pal )
+{
+	m_video_ram_size = 0x800;
+	m_ntsc = 0;
+
+	MACHINE_START_CALL_MEMBER(cbm2);
+}
+
+
+//-------------------------------------------------
+//  MACHINE_START( p500 )
+//-------------------------------------------------
+
+MACHINE_START_MEMBER( p500_state, p500 )
+{
+	m_video_ram_size = 0x400;
+	m_ntsc = 1;
+
+	MACHINE_START_CALL_MEMBER(cbm2);
+
+	// state saving
+	save_item(NAME(m_statvid));
+	save_item(NAME(m_vicdotsel));
+	save_item(NAME(m_vicbnksel));
+	save_item(NAME(m_vic_irq));
+}
+
+
+//-------------------------------------------------
+//  MACHINE_RESET( cbm2 )
+//-------------------------------------------------
+
+MACHINE_RESET_MEMBER( cbm2_state, cbm2 )
 {
 	m_dramon = 1;
-	m_statvid = 1;
-	m_vicdotsel = 1;
-	m_vicbnksel = 0x03;
-	m_vic_irq = CLEAR_LINE;
+	m_graphics = 1;
 	m_tpi1_irq = CLEAR_LINE;
 	m_cass_rd = 1;
+	m_user_irq = CLEAR_LINE;
 
 	m_maincpu->reset();
 
@@ -1134,16 +1608,57 @@ void p500_state::machine_reset()
 }
 
 
+//-------------------------------------------------
+//  MACHINE_RESET( p500 )
+//-------------------------------------------------
+
+MACHINE_RESET_MEMBER( p500_state, p500 )
+{
+	MACHINE_RESET_CALL_MEMBER(cbm2);
+
+	m_statvid = 1;
+	m_vicdotsel = 1;
+	m_vicbnksel = 0x03;
+	m_vic_irq = CLEAR_LINE;
+}
+
+
 
 //**************************************************************************
 //  MACHINE DRIVERS
 //**************************************************************************
 
 //-------------------------------------------------
+//  MACHINE_CONFIG( 128k )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_FRAGMENT( 128k )
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_EXTRA_OPTIONS("256K")
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( 256k )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_FRAGMENT( 256k )
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256K")
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
 //  MACHINE_CONFIG( p500 )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( p500, p500_state )
+	MCFG_MACHINE_START_OVERRIDE(p500_state, p500)
+	MCFG_MACHINE_RESET_OVERRIDE(p500_state, p500)
+
 	// basic hardware
 	MCFG_CPU_ADD(M6509_TAG, M6509, VIC6567_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(p500_mem)
@@ -1163,12 +1678,11 @@ static MACHINE_CONFIG_START( p500, p500_state )
 	// devices
 	MCFG_PLS100_ADD(PLA1_TAG)
 	MCFG_PLS100_ADD(PLA2_TAG)
-	MCFG_TPI6525_ADD(MOS6525_1_TAG, tpi1_intf)
-	MCFG_TPI6525_ADD(MOS6525_2_TAG, tpi2_intf)
+	MCFG_TPI6525_ADD(MOS6525_1_TAG, p500_tpi1_intf)
+	MCFG_TPI6525_ADD(MOS6525_2_TAG, p500_tpi2_intf)
 	MCFG_ACIA6551_ADD(MOS6551A_TAG)
 	MCFG_MOS6526R1_ADD(MOS6526_TAG, VIC6567_CLOCK, 60, cia_intf)
-	//MCFG_QUICKLOAD_ADD("quickload", cbm_p500, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
-	MCFG_CBM_IEEE488_ADD(ieee488_intf, NULL)
+	MCFG_CBM_IEEE488_ADD(ieee488_intf, "sfd1001")
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
@@ -1176,12 +1690,211 @@ static MACHINE_CONFIG_START( p500, p500_state )
 	//MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, user_intf, cbm2_user_port_cards, NULL, NULL)
 	//MCFG_CBM2_SYSTEM_PORT_ADD(CBM2_SYSTEM_PORT_TAG, system_intf, cbm2_system_port_cards, NULL, NULL)
 
-	// software list
-
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("256K")
+	MCFG_FRAGMENT_ADD(128k)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( cbm2lp_ntsc )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2lp_state )
+	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_ntsc)
+	MCFG_MACHINE_RESET_OVERRIDE(cbm2_state, cbm2)
+
+	// basic hardware
+	MCFG_CPU_ADD(M6509_TAG, M6509, XTAL_18MHz/8)
+	MCFG_CPU_PROGRAM_MAP(cbm2_mem)
+	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
+
+	// video hardware
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(MC68B45_TAG, mc6845_device, screen_update)
+
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(768, 312)
+	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 312-1)
+
+	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, XTAL_18MHz/8, lp_crtc_intf)
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(MOS6851_TAG, SID6581, XTAL_18MHz/8)
+	MCFG_SOUND_CONFIG(sid_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	// devices
+	MCFG_PLS100_ADD(PLA1_TAG)
+	MCFG_TPI6525_ADD(MOS6525_1_TAG, tpi1_intf)
+	MCFG_TPI6525_ADD(MOS6525_2_TAG, tpi2_intf)
+	MCFG_ACIA6551_ADD(MOS6551A_TAG)
+	MCFG_MOS6526R1_ADD(MOS6526_TAG, XTAL_18MHz/8, 60, cia_intf)
+	MCFG_CBM_IEEE488_ADD(ieee488_intf, "sfd1001")
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL_18MHz/8, cbm2_expansion_cards, NULL, NULL)
+	//MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, user_intf, cbm2_user_port_cards, NULL, NULL)
+	//MCFG_CBM2_SYSTEM_PORT_ADD(CBM2_SYSTEM_PORT_TAG, system_intf, cbm2_system_port_cards, NULL, NULL)
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "cbm2_cart")
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( b128 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( b128, cbm2lp_state )
+	MCFG_FRAGMENT_ADD(cbm2lp_ntsc)
+	MCFG_FRAGMENT_ADD(128k)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( b256 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( b256, cbm2lp_state )
+	MCFG_FRAGMENT_ADD(cbm2lp_ntsc)
+	MCFG_FRAGMENT_ADD(256k)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( cbm2lp_pal )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( cbm2lp_pal, cbm2lp_state )
+	MCFG_FRAGMENT_ADD(cbm2lp_ntsc)
+
+	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
+
+	MCFG_DEVICE_REMOVE(MOS6526_TAG)
+	MCFG_MOS6526R1_ADD(MOS6526_TAG, XTAL_18MHz/8, 50, cia_intf)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( cbm610 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( cbm610, cbm2lp_state )
+	MCFG_FRAGMENT_ADD(cbm2lp_pal)
+	MCFG_FRAGMENT_ADD(128k)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( cbm620 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( cbm620, cbm2lp_state )
+	MCFG_FRAGMENT_ADD(cbm2lp_pal)
+	MCFG_FRAGMENT_ADD(256k)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( cbm2hp_ntsc )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( cbm2hp_ntsc, cbm2hp_state )
+	MCFG_FRAGMENT_ADD(cbm2lp_ntsc)
+
+	MCFG_DEVICE_REMOVE(MC68B45_TAG)
+	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, XTAL_18MHz/8, hp_crtc_intf)
+
+	// devices
+	MCFG_DEVICE_REMOVE(MOS6525_2_TAG)
+	MCFG_TPI6525_ADD(MOS6525_2_TAG, hp_tpi2_intf)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( b128hp )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( b128hp, cbm2hp_state )
+	MCFG_FRAGMENT_ADD(cbm2hp_ntsc)
+	MCFG_FRAGMENT_ADD(128k)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( b256hp )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( b256hp, cbm2hp_state )
+	MCFG_FRAGMENT_ADD(cbm2hp_ntsc)
+	MCFG_FRAGMENT_ADD(256k)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( bx256hp )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( bx256hp, cbm2hp_state )
+	MCFG_FRAGMENT_ADD(b256hp)
+
+	//MCFG_DEVICE_REMOVE(CBM2_SYSTEM_PORT_TAG)
+	//MCFG_CBM2_SYSTEM_PORT_ADD(CBM2_SYSTEM_PORT_TAG, system_intf, cbm2_system_port_cards, "8088", NULL)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( cbm2hp_pal )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( cbm2hp_pal, cbm2hp_state )
+	MCFG_FRAGMENT_ADD(cbm2hp_ntsc)
+
+	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
+
+	// devices
+	MCFG_DEVICE_REMOVE(MOS6525_2_TAG)
+	MCFG_TPI6525_ADD(MOS6525_2_TAG, hp_tpi2_intf)
+
+	MCFG_DEVICE_REMOVE(MOS6526_TAG)
+	MCFG_MOS6526R1_ADD(MOS6526_TAG, XTAL_18MHz/8, 50, cia_intf)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( cbm710 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( cbm710, cbm2hp_state )
+	MCFG_FRAGMENT_ADD(cbm2hp_pal)
+	MCFG_FRAGMENT_ADD(128k)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( cbm720 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( cbm720, cbm2hp_state )
+	MCFG_FRAGMENT_ADD(cbm2hp_pal)
+	MCFG_FRAGMENT_ADD(256k)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( cbm730 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( cbm730, cbm2hp_state )
+	MCFG_FRAGMENT_ADD(cbm720)
+
+	//MCFG_DEVICE_REMOVE(CBM2_SYSTEM_PORT_TAG)
+	//MCFG_CBM2_SYSTEM_PORT_ADD(CBM2_SYSTEM_PORT_TAG, system_intf, cbm2_system_port_cards, "8088", NULL)
 MACHINE_CONFIG_END
 
 
@@ -1219,10 +1932,246 @@ ROM_START( p500 )
 ROM_END
 
 
+//-------------------------------------------------
+//  ROM( b500 )
+//-------------------------------------------------
+
+ROM_START( b500 )
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_LOAD( "901243-01.u59",  0x0000, 0x2000, CRC(22822706) SHA1(901bbf59d8b8682b481be8b2de99b406fffa4bab) )
+	ROM_LOAD( "901242-01a.u60", 0x2000, 0x2000, CRC(ef13d595) SHA1(2fb72985d7d4ab69c5780179178828c931a9f5b0) )
+
+	ROM_REGION( 0x2000, "kernal", 0 )
+	ROM_LOAD( "901244-01.u61",  0x0000, 0x2000, CRC(93414213) SHA1(a54a593dbb420ae1ac39b0acde9348160f7840ff) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "901237-01.u25", 0x0000, 0x1000, CRC(1acf5098) SHA1(e63bf18da48e5a53c99ef127c1ae721333d1d102) )
+
+	ROM_REGION( 0xf5, PLA1_TAG, 0 )
+	ROM_LOAD( "906114-04.bin", 0x00, 0xf5, CRC(ae3ec265) SHA1(334e0bc4b2c957ecb240c051d84372f7b47efba3) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( b128 )
+//-------------------------------------------------
+
+ROM_START( b128 )
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_DEFAULT_BIOS("r2")
+	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
+	ROMX_LOAD( "901243-02b.u59", 0x0000, 0x2000, CRC(9d0366f9) SHA1(625f7337ea972a8bce2bdf2daababc0ed0b3b69b), ROM_BIOS(1) )
+	ROMX_LOAD( "901242-02b.u60", 0x2000, 0x2000, CRC(837978b5) SHA1(56e8d2f86bf73ba36b3d3cb84dd75806b66c530a), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
+	ROMX_LOAD( "901243-04a.u59", 0x0000, 0x2000, CRC(b0dcb56d) SHA1(08d333208060ee2ce84d4532028d94f71c016b96), ROM_BIOS(2) )
+	ROMX_LOAD( "901242-04a.u60", 0x2000, 0x2000, CRC(de04ea4f) SHA1(7c6de17d46a3343dc597d9b9519cf63037b31908), ROM_BIOS(2) )
+
+	ROM_REGION( 0x2000, "kernal", 0 )
+	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(1) )
+	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(2) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "901237-01.u25", 0x0000, 0x1000, CRC(1acf5098) SHA1(e63bf18da48e5a53c99ef127c1ae721333d1d102) )
+
+	ROM_REGION( 0xf5, PLA1_TAG, 0 )
+	ROM_LOAD( "906114-04.bin", 0x00, 0xf5, CRC(ae3ec265) SHA1(334e0bc4b2c957ecb240c051d84372f7b47efba3) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( b256 )
+//-------------------------------------------------
+
+ROM_START( b256 )
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_LOAD( "901241-03.u59", 0x0000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42) )
+	ROM_LOAD( "901240-03.u60", 0x2000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce) )
+
+	ROM_REGION( 0x2000, "kernal", 0 )
+	ROM_DEFAULT_BIOS("r2")
+	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
+	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
+	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(2) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "901237-01.u25", 0x0000, 0x1000, CRC(1acf5098) SHA1(e63bf18da48e5a53c99ef127c1ae721333d1d102) )
+
+	ROM_REGION( 0xf5, PLA1_TAG, 0 )
+	ROM_LOAD( "906114-04.bin", 0x00, 0xf5, CRC(ae3ec265) SHA1(334e0bc4b2c957ecb240c051d84372f7b47efba3) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( cbm610 )
+//-------------------------------------------------
+
+#define rom_cbm610	rom_b128
+
+
+//-------------------------------------------------
+//  ROM( cbm620 )
+//-------------------------------------------------
+
+#define rom_cbm620	rom_b256
+
+
+//-------------------------------------------------
+//  ROM( cbm620hu )
+//-------------------------------------------------
+
+ROM_START( cbm620hu )
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_LOAD( "610.u60", 0x0000, 0x4000, CRC(8eed0d7e) SHA1(9d06c5c3c012204eaaef8b24b1801759b62bf57e) )
+
+	ROM_REGION( 0x2000, "kernal", 0 )
+	ROM_LOAD( "kernhun.bin", 0x0000, 0x2000, CRC(0ea8ca4d) SHA1(9977c9f1136ee9c04963e0b50ae0c056efa5663f) )
+
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "charhun.bin", 0x0000, 0x2000, CRC(1fb5e596) SHA1(3254e069f8691b30679b19a9505b6afdfedce6ac) )
+
+	ROM_REGION( 0xf5, PLA1_TAG, 0 )
+	ROM_LOAD( "906114-04.bin", 0x00, 0xf5, CRC(ae3ec265) SHA1(334e0bc4b2c957ecb240c051d84372f7b47efba3) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( b128hp )
+//-------------------------------------------------
+
+ROM_START( b128hp )
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_DEFAULT_BIOS("r2")
+	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
+	ROMX_LOAD( "901243-02b.u59", 0x0000, 0x2000, CRC(9d0366f9) SHA1(625f7337ea972a8bce2bdf2daababc0ed0b3b69b), ROM_BIOS(1) )
+	ROMX_LOAD( "901242-02b.u60", 0x2000, 0x2000, CRC(837978b5) SHA1(56e8d2f86bf73ba36b3d3cb84dd75806b66c530a), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
+	ROMX_LOAD( "901243-04a.u59", 0x0000, 0x2000, CRC(b0dcb56d) SHA1(08d333208060ee2ce84d4532028d94f71c016b96), ROM_BIOS(2) )
+	ROMX_LOAD( "901242-04a.u60", 0x2000, 0x2000, CRC(de04ea4f) SHA1(7c6de17d46a3343dc597d9b9519cf63037b31908), ROM_BIOS(2) )
+
+	ROM_REGION( 0x2000, "kernal", 0 )
+	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(1) )
+	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(2) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "901232-01.u25", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287) )
+
+	ROM_REGION( 0xf5, PLA1_TAG, 0 )
+	ROM_LOAD( "906114-05.bin", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( b256hp )
+//-------------------------------------------------
+
+ROM_START( b256hp )
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_LOAD( "901241-03.u59", 0x0000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42) )
+	ROM_LOAD( "901240-03.u60", 0x2000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce) )
+
+	ROM_REGION( 0x2000, "kernal", 0 )
+	ROM_DEFAULT_BIOS("r2")
+	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
+	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
+	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(2) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "901232-01.u25", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287) )
+
+	ROM_REGION( 0xf5, PLA1_TAG, 0 )
+	ROM_LOAD( "906114-05.bin", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( bx256hp )
+//-------------------------------------------------
+
+ROM_START( bx256hp )
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_LOAD( "901241-03.u59", 0x0000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42) )
+	ROM_LOAD( "901240-03.u60", 0x2000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce) )
+
+	ROM_REGION( 0x1000, "8088", 0)
+	ROM_LOAD( "8088.u14", 0x0000, 0x1000, CRC(195e0281) SHA1(ce8acd2a5fb6cbd70d837811d856d656544a1f97) )
+
+	ROM_REGION( 0x2000, "kernal", 0 )
+	ROM_DEFAULT_BIOS("r2")
+	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
+	ROMX_LOAD( "901244-03b.u61", 0x0000, 0x2000, CRC(4276dbba) SHA1(a624899c236bc4458570144d25aaf0b3be08b2cd), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
+	ROMX_LOAD( "901244-04a.u61", 0x0000, 0x2000, CRC(09a5667e) SHA1(abb26418b9e1614a8f52bdeee0822d4a96071439), ROM_BIOS(2) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "901232-01.u25", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287) )
+
+	ROM_REGION( 0xf5, PLA1_TAG, 0 )
+	ROM_LOAD( "906114-05.bin", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( cbm710 )
+//-------------------------------------------------
+
+#define rom_cbm710	rom_b128hp
+
+
+//-------------------------------------------------
+//  ROM( cbm720 )
+//-------------------------------------------------
+
+#define rom_cbm720	rom_b256hp
+
+
+//-------------------------------------------------
+//  ROM( cbm730 )
+//-------------------------------------------------
+
+#define rom_cbm730	rom_bx256hp
+
+
+//-------------------------------------------------
+//  ROM( cbm720sw )
+//-------------------------------------------------
+
+ROM_START( cbm720sw )
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_LOAD( "901241-03.u59", 0x0000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42) )
+	ROM_LOAD( "901240-03.u60", 0x2000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce) )
+
+	ROM_REGION( 0x2000, "kernal", 0 )
+	ROM_LOAD( "swe-901244-03.u61", 0x0000, 0x2000, CRC(87bc142b) SHA1(fa711f6082741b05a9c80744f5aee68dc8c1dcf4) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "901233-03.u25", 0x0000, 0x1000, CRC(09518b19) SHA1(2e28491e31e2c0a3b6db388055216140a637cd09) )
+
+	ROM_REGION( 0xf5, PLA1_TAG, 0 )
+	ROM_LOAD( "906114-05.bin", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
+ROM_END
+
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY                         FULLNAME                            FLAGS
-COMP( 1983,	p500,	0,		0,		p500,		p500,	driver_device,		0,		"Commodore Business Machines",	"P500 ~ B128-40 ~ PET-II (NTSC)",	GAME_NOT_WORKING )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY                         FULLNAME                            FLAGS
+COMP( 1983,	p500,		0,		0,		p500,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"P500 ~ C128-40 ~ PET-II (NTSC)",	GAME_NOT_WORKING )
+
+COMP( 1983,	b500,		p500,	0,		b128,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B500 (NTSC)",						GAME_NOT_WORKING )
+COMP( 1983,	b128,		p500,	0,		b128,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B128 (NTSC)",						GAME_NOT_WORKING )
+COMP( 1983,	b256,		p500,	0,		b256,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256 (NTSC)",						GAME_NOT_WORKING )
+COMP( 1983,	cbm610,		p500,	0,		cbm610,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 610 (PAL)",					GAME_NOT_WORKING )
+COMP( 1983,	cbm620,		p500,	0,		cbm620,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 620 (PAL)",					GAME_NOT_WORKING )
+COMP( 1983,	cbm620hu,	p500,	0,		cbm620,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 620 (Hungary)",				GAME_NOT_WORKING )
+
+COMP( 1983,	b128hp,		p500,	0,		b128hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B128-80HP (NTSC)",					GAME_NOT_WORKING )
+COMP( 1983,	b256hp,		p500,	0,		b256hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256-80HP (NTSC)",					GAME_NOT_WORKING )
+COMP( 1983,	bx256hp,	p500,	0,		bx256hp,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"BX256-80HP (NTSC)",				GAME_NOT_WORKING )
+COMP( 1983,	cbm710,		p500,	0,		cbm710,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 710 (PAL)",					GAME_NOT_WORKING )
+COMP( 1983,	cbm720,		p500,	0,		cbm720,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 720 (PAL)",					GAME_NOT_WORKING )
+COMP( 1983,	cbm720sw,	p500,	0,		cbm720,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 720 (Sweden/Finland)",			GAME_NOT_WORKING )
+COMP( 1983,	cbm730,		p500,	0,		cbm730,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 730 (PAL)",					GAME_NOT_WORKING )

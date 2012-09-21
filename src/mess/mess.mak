@@ -885,9 +885,6 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/diag264_lb_iec.o	\
 	$(MESS_MACHINE)/diag264_lb_tape.o	\
 	$(MESS_MACHINE)/diag264_lb_user.o	\
-	$(MESS_DRIVERS)/cbmb.o		\
-	$(MESS_MACHINE)/cbmb.o		\
-	$(MESS_VIDEO)/cbmb.o		\
 	$(MESS_DRIVERS)/cbm2.o		\
 	$(MESS_MACHINE)/cbm2exp.o	\
 	$(MESS_MACHINE)/cbm2_std.o	\

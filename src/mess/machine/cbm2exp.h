@@ -46,10 +46,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define CBM2_EXPANSION_INTERFACE(_name) \
-	const pet_expansion_slot_interface (_name) =
-
-
 #define MCFG_CBM2_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot, _def_inp) \
     MCFG_DEVICE_ADD(_tag, CBM2_EXPANSION_SLOT, _clock) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
