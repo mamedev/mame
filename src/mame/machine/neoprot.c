@@ -151,38 +151,79 @@ void install_kof98_protection( running_machine &machine )
 
 
 /************************ Metal Slug X *************************
-  todo: emulate, not patch!
   Special board is used: NEO-MVS PROGEOP (1999.2.2)
   The board has a ALTERA (EPM7128SQC100-15) chip which is tied to 250-P1
   Also found on this special board is a QFP144 labeled with 0103
 ***************************************************************/
 
-void mslugx_install_protection( running_machine &machine )
+static WRITE16_HANDLER( mslugx_protection_16_w )
 {
-	int i;
-	UINT16 *mem16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	neogeo_state *state = space.machine().driver_data<neogeo_state>();
 
-	for (i = 0;i < (0x100000/2) - 4;i++)
+	switch (offset)
 	{
-		if (mem16[i + 0] == 0x0243 &&
-			mem16[i + 1] == 0x0001 &&	/* andi.w  #$1, D3 */
-			mem16[i + 2] == 0x6600)		/* bne xxxx */
-		{
-			mem16[i + 2] = 0x4e71;
-			mem16[i + 3] = 0x4e71;
-		}
-	}
-	mem16[0x3bdc/2] = 0x4e71;
-	mem16[0x3bde/2] = 0x4e71;
-	mem16[0x3be0/2] = 0x4e71;
-	mem16[0x3c0c/2] = 0x4e71;
-	mem16[0x3c0e/2] = 0x4e71;
-	mem16[0x3c10/2] = 0x4e71;
+		case 0x0/2: // start new read?
+			state->m_mslugx_command = 0;
+		break;
 
-	mem16[0x3c36/2] = 0x4e71;
-	mem16[0x3c38/2] = 0x4e71;
+		case 0x2/2: // command? These are pulsed with data and then 0
+		case 0x4/2:
+			state->m_mslugx_command |= data;
+		break;
+
+		case 0x6/2: // finished?
+		break;
+
+		case 0xa/2: // init?
+			state->m_mslugx_counter = 0;
+			state->m_mslugx_command = 0;
+		break;
+
+		default:
+			logerror("unknown protection write at pc %06x, offset %08x, data %02x\n", space.device().safe_pc(), offset << 1, data);
+		break;
+	}
 }
 
+
+static READ16_HANDLER( mslugx_protection_16_r )
+{
+	neogeo_state *state = space.machine().driver_data<neogeo_state>();
+
+	UINT16 res = 0;
+
+	switch (state->m_mslugx_command)
+	{
+		case 0x0001: { // $3bdc(?) and $3c30 (Register D7)
+			res = (space.read_byte(0xdedd2 + ((state->m_mslugx_counter >> 3) & 0xfff)) >> (~state->m_mslugx_counter & 0x07)) & 1;
+			state->m_mslugx_counter++;
+		}
+		break;
+
+		case 0x0fff: { // All other accesses (Register D2)
+			INT32 select = space.read_word(0x10f00a) - 1; // How should this be calculated?
+			res = (space.read_byte(0xdedd2 + ((select >> 3) & 0x0fff)) >> (~select & 0x07)) & 1;
+		}
+		break;
+
+		default:
+			logerror("unknown protection read at pc %06x, offset %08x\n", space.device().safe_pc(), offset << 1);
+		break;
+	}
+
+	return res;
+}
+
+
+void mslugx_install_protection( running_machine &machine )
+{
+	neogeo_state *state = machine.driver_data<neogeo_state>();
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x2fffe0, 0x2fffef, FUNC(mslugx_protection_16_r), FUNC(mslugx_protection_16_w));
+
+	state->save_item(NAME(state->m_mslugx_command));
+	state->save_item(NAME(state->m_mslugx_counter));
+}
 
 
 /************************ SMA Protection************************

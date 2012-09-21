@@ -108,6 +108,8 @@ public:
 	UINT16     m_neogeo_rng;
 	UINT16     *m_pvc_cartridge_ram;
 	int        m_fixed_layer_bank_type;
+	UINT16     m_mslugx_counter;
+	UINT16     m_mslugx_command;
 
 	/* devices */
 	cpu_device *m_maincpu;
