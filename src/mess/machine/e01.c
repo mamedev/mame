@@ -557,8 +557,6 @@ void e01_device::device_start()
 
 void e01_device::device_reset()
 {
-	m_scsibus->init_scsibus(512);
-
 	m_clk_timer->adjust(attotime::zero, 0, attotime::from_hz(200000));
 
 	membank("bank1")->set_entry(1);

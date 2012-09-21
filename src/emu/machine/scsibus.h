@@ -118,9 +118,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( scsi_ack_w );
 	DECLARE_WRITE_LINE_MEMBER( scsi_rst_w );
 
-	/* Initialisation at machine reset time */
-	void init_scsibus(int sectorbytes);
-
 protected:
 	// device-level overrides
 	virtual void device_start();

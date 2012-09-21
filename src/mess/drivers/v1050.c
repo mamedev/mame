@@ -1022,9 +1022,6 @@ void v1050_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	// initialize SASI bus
-	m_sasibus->init_scsibus(256);
-
 	// initialize I8214
 	m_pic->etlg_w(1);
 	m_pic->inte_w(1);

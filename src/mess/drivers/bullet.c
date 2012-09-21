@@ -1102,9 +1102,6 @@ void bullet_state::machine_start()
 
 void bulletf_state::machine_start()
 {
-	// initialize SASI bus
-	m_scsibus->init_scsibus(512);
-
 	// state saving
 	save_item(NAME(m_fdrdy));
 	save_item(NAME(m_rome));

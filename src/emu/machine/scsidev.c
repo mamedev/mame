@@ -128,6 +128,11 @@ int scsidev_device::GetDeviceID()
 	return scsiID;
 }
 
+int scsidev_device::GetSectorBytes()
+{
+	return 0;
+}
+
 void scsidev_device::static_set_deviceid( device_t &device, int _scsiID )
 {
 	scsidev_device &scsidev = downcast<scsidev_device &>(device);

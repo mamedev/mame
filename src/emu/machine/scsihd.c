@@ -324,3 +324,8 @@ void scsihd_device::SetDevice( void *_disk )
 {
 	disk = (hard_disk_file *)_disk;
 }
+
+int scsihd_device::GetSectorBytes()
+{
+	return sectorbytes;
+}

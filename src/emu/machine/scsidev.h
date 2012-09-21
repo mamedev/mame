@@ -24,6 +24,7 @@ public:
 	virtual void SetPhase( int phase );
 	virtual void GetPhase( int *phase );
 	virtual int GetDeviceID();
+	virtual int GetSectorBytes();
 
 	// configuration helpers
 	static void static_set_deviceid(device_t &device, int _scsiID);

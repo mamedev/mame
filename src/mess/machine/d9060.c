@@ -560,8 +560,6 @@ void base_d9060_device::device_start()
 
 void base_d9060_device::device_reset()
 {
-	m_sasibus->init_scsibus(256);
-
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, ASSERT_LINE);
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, CLEAR_LINE);
 

@@ -23,6 +23,7 @@ public:
 	virtual void ExecCommand( int *transferLength );
 	virtual void WriteData( UINT8 *data, int dataLength );
 	virtual void ReadData( UINT8 *data, int dataLength );
+	virtual int GetSectorBytes();
 
 protected:
 	// device-level overrides

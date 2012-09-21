@@ -130,6 +130,7 @@ void scsibus_device::scsi_data_w( UINT8 data )
 		// only one line active.
 		case SCSI_PHASE_BUS_FREE:
 			last_id=scsibus_driveno(data);
+			sectorbytes = devices[last_id]->GetSectorBytes();
 			break;
 
 		case SCSI_PHASE_COMMAND:
@@ -688,11 +689,6 @@ int scsibus_device::get_scsi_cmd_len(int cbyte)
 	fatalerror("scsibus: Unknown SCSI command group %d, command byte=%02X\n", group,cbyte);
 
 	return 6;
-}
-
-void scsibus_device::init_scsibus(int _sectorbytes)
-{
-	sectorbytes = _sectorbytes;
 }
 
 scsibus_device::scsibus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

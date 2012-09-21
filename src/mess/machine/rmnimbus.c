@@ -2423,8 +2423,6 @@ static void hdc_reset(running_machine &machine)
 	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 	scsibus_device *hdc = machine.device<scsibus_device>(SCSIBUS_TAG);
 
-    hdc->init_scsibus(512);
-
     state->m_nimbus_drives.reg410_in=0;
     state->m_nimbus_drives.reg410_in |= (hdc->get_scsi_line(SCSI_LINE_REQ) ? HDC_REQ_MASK : 0);
     state->m_nimbus_drives.reg410_in |= (hdc->get_scsi_line(SCSI_LINE_CD)  ? HDC_CD_MASK  : 0);
