@@ -79,7 +79,7 @@ void nes_state::init_nes_core()
 	}
 
 	/* Set up the mapper callbacks */
-	pcb_handlers_setup(machine());
+	pcb_handlers_setup();
 
 	/* Set up the memory handlers for the mapper */
 	space.install_read_bank(0x8000, 0x9fff, "bank1");

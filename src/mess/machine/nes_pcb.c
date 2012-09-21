@@ -714,7 +714,7 @@ INLINE UINT8 mmc_hi_access_rom( running_machine &machine, UINT32 offset )
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::uxrom_w)
+WRITE8_MEMBER(nes_carts_state::uxrom_w)
 {
 	LOG_MMC(("uxrom_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -737,7 +737,7 @@ WRITE8_MEMBER(nes_state::uxrom_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::uxrom_cc_w)
+WRITE8_MEMBER(nes_carts_state::uxrom_cc_w)
 {
 	LOG_MMC(("uxrom_cc_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -760,7 +760,7 @@ WRITE8_MEMBER(nes_state::uxrom_cc_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::un1rom_w)
+WRITE8_MEMBER(nes_carts_state::un1rom_w)
 {
 	LOG_MMC(("un1rom_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -791,7 +791,7 @@ WRITE8_MEMBER(nes_state::un1rom_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::cnrom_w)
+WRITE8_MEMBER(nes_carts_state::cnrom_w)
 {
 	LOG_MMC(("cnrom_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -820,7 +820,7 @@ WRITE8_MEMBER(nes_state::cnrom_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bandai_pt554_m_w)
+WRITE8_MEMBER(nes_carts_state::bandai_pt554_m_w)
 {
 	LOG_MMC(("Bandai PT-554 Sound write, data: %02x\n", data));
 
@@ -845,7 +845,7 @@ WRITE8_MEMBER(nes_state::bandai_pt554_m_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::cprom_w)
+WRITE8_MEMBER(nes_carts_state::cprom_w)
 {
 	LOG_MMC(("cprom_w, offset: %04x, data: %02x\n", offset, data));
 	chr4_4(machine(), data, CHRRAM);
@@ -867,7 +867,7 @@ WRITE8_MEMBER(nes_state::cprom_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::axrom_w)
+WRITE8_MEMBER(nes_carts_state::axrom_w)
 {
 	LOG_MMC(("axrom_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -887,7 +887,7 @@ WRITE8_MEMBER(nes_state::axrom_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bxrom_w)
+WRITE8_MEMBER(nes_carts_state::bxrom_w)
 {
 	/* This portion of the mapper is nearly identical to Mapper 7, except no one-screen mirroring */
 	/* Deadly Towers is really a BxROM game - the demo screens look wrong using mapper 7. */
@@ -908,7 +908,7 @@ WRITE8_MEMBER(nes_state::bxrom_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::gxrom_w)
+WRITE8_MEMBER(nes_carts_state::gxrom_w)
 {
 	LOG_MMC(("gxrom_w, offset %04x, data: %02x\n", offset, data));
 
@@ -1100,9 +1100,8 @@ static void common_sxrom_write_handler( address_space &space, offs_t offset, UIN
 	}
 }
 
-WRITE8_MEMBER(nes_state::sxrom_w)
+WRITE8_MEMBER(nes_carts_state::sxrom_w)
 {
-
 	LOG_MMC(("sxrom_w, offset: %04x, data: %02x\n", offset, data));
 	common_sxrom_write_handler(space, offset, data, m_pcb_id);
 }
@@ -1148,7 +1147,7 @@ static void mmc2_latch( device_t *device, offs_t offset )
 	}
 }
 
-WRITE8_MEMBER(nes_state::pxrom_w)
+WRITE8_MEMBER(nes_carts_state::pxrom_w)
 {
 	LOG_MMC(("pxrom_w, offset: %04x, data: %02x\n", offset, data));
 	switch (offset & 0x7000)
@@ -1197,7 +1196,7 @@ WRITE8_MEMBER(nes_state::pxrom_w)
 
 *************************************************************/
 
-WRITE8_MEMBER(nes_state::fxrom_w)
+WRITE8_MEMBER(nes_carts_state::fxrom_w)
 {
 	LOG_MMC(("fxrom_w, offset: %04x, data: %02x\n", offset, data));
 	switch (offset & 0x7000)
@@ -1294,7 +1293,7 @@ static void mmc3_irq( device_t *device, int scanline, int vblank, int blanked )
 	state->m_IRQ_clear = 0;
 }
 
-WRITE8_MEMBER(nes_state::txrom_w)
+WRITE8_MEMBER(nes_carts_state::txrom_w)
 {
 	UINT8 mmc_helper, cmd;
 
@@ -1371,7 +1370,7 @@ WRITE8_MEMBER(nes_state::txrom_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::hkrom_m_w)
+WRITE8_MEMBER(nes_carts_state::hkrom_m_w)
 {
 	UINT8 write_hi, write_lo;
 	LOG_MMC(("hkrom_m_w, offset: %04x, data: %02x\n", offset, data));
@@ -1390,7 +1389,7 @@ WRITE8_MEMBER(nes_state::hkrom_m_w)
 		m_mapper_bram[offset & (m_mapper_bram_size - 1)] = data;
 }
 
-READ8_MEMBER(nes_state::hkrom_m_r)
+READ8_MEMBER(nes_carts_state::hkrom_m_r)
 {
 	LOG_MMC(("hkrom_m_r, offset: %04x\n", offset));
 
@@ -1410,7 +1409,7 @@ READ8_MEMBER(nes_state::hkrom_m_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(nes_state::hkrom_w)
+WRITE8_MEMBER(nes_carts_state::hkrom_w)
 {
 	UINT8 mmc6_helper;
 	LOG_MMC(("hkrom_w, offset: %04x, data: %02x\n", offset, data));
@@ -1487,7 +1486,7 @@ static void txsrom_chr_cb( running_machine &machine, int start, int bank, int so
 	chr1_x(machine, start, bank, source);
 }
 
-WRITE8_MEMBER(nes_state::txsrom_w)
+WRITE8_MEMBER(nes_carts_state::txsrom_w)
 {
 	LOG_MMC(("txsrom_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -1537,7 +1536,7 @@ static void tqrom_set_chr( running_machine &machine )
 	chr1_x(machine, chr_page ^ 7, (state->m_mmc_vrom_bank[5] & chr_mask[5]), chr_src[5]);
 }
 
-WRITE8_MEMBER(nes_state::tqrom_w)
+WRITE8_MEMBER(nes_carts_state::tqrom_w)
 {
 	UINT8 mmc_helper, cmd;
 	LOG_MMC(("tqrom_w, offset: %04x, data: %02x\n", offset, data));
@@ -1588,7 +1587,7 @@ WRITE8_MEMBER(nes_state::tqrom_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::zz_m_w)
+WRITE8_MEMBER(nes_carts_state::zz_m_w)
 {
 	UINT8 mmc_helper = data & 0x07;
 	LOG_MMC(("zz_m_w, offset: %04x, data: %02x\n", offset, data));
@@ -1610,7 +1609,7 @@ WRITE8_MEMBER(nes_state::zz_m_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::qj_m_w)
+WRITE8_MEMBER(nes_carts_state::qj_m_w)
 {
 	LOG_MMC(("qj_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -1846,7 +1845,7 @@ static void mmc5_ppu_mirror( running_machine &machine, int page, int src )
 	}
 }
 
-READ8_MEMBER(nes_state::exrom_l_r)
+READ8_MEMBER(nes_carts_state::exrom_l_r)
 {
 	int retVal;
 
@@ -1882,7 +1881,7 @@ READ8_MEMBER(nes_state::exrom_l_r)
 }
 
 
-WRITE8_MEMBER(nes_state::exrom_l_w)
+WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 {
 
 	//  LOG_MMC(("Mapper 5 write, offset: %04x, data: %02x\n", offset + 0x4100, data));
@@ -2383,7 +2382,7 @@ static void ntbrom_mirror( running_machine &machine, int mirror, int mirr0, int 
 	}
 }
 
-WRITE8_MEMBER(nes_state::ntbrom_w)
+WRITE8_MEMBER(nes_carts_state::ntbrom_w)
 {
 
 	LOG_MMC(("ntbrom_w, offset %04x, data: %02x\n", offset, data));
@@ -2461,7 +2460,7 @@ static void jxrom_irq( device_t *device, int scanline, int vblank, int blanked )
 	}
 }
 
-WRITE8_MEMBER(nes_state::jxrom_w)
+WRITE8_MEMBER(nes_carts_state::jxrom_w)
 {
 	LOG_MMC(("jxrom_w, offset %04x, data: %02x\n", offset, data));
 
@@ -2553,7 +2552,7 @@ WRITE8_MEMBER(nes_state::jxrom_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::dxrom_w)
+WRITE8_MEMBER(nes_carts_state::dxrom_w)
 {
 	LOG_MMC(("dxrom_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -2595,7 +2594,7 @@ WRITE8_MEMBER(nes_state::dxrom_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::namcot3453_w)
+WRITE8_MEMBER(nes_carts_state::namcot3453_w)
 {
 	LOG_MMC(("namcot3453_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -2618,7 +2617,7 @@ WRITE8_MEMBER(nes_state::namcot3453_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::namcot3446_w)
+WRITE8_MEMBER(nes_carts_state::namcot3446_w)
 {
 	LOG_MMC(("namcot3446_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -2662,7 +2661,7 @@ WRITE8_MEMBER(nes_state::namcot3446_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::namcot3425_w)
+WRITE8_MEMBER(nes_carts_state::namcot3425_w)
 {
 	UINT8 mode;
 	LOG_MMC(("namcot3425_w, offset: %04x, data: %02x\n", offset, data));
@@ -2715,7 +2714,7 @@ WRITE8_MEMBER(nes_state::namcot3425_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::dis_74x377_w)
+WRITE8_MEMBER(nes_carts_state::dis_74x377_w)
 {
 	LOG_MMC(("dis_74x377_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -2731,7 +2730,7 @@ WRITE8_MEMBER(nes_state::dis_74x377_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::dis_74x139x74_m_w)
+WRITE8_MEMBER(nes_carts_state::dis_74x139x74_m_w)
 {
 	LOG_MMC(("dis_74x139x74_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -2748,7 +2747,7 @@ WRITE8_MEMBER(nes_state::dis_74x139x74_m_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::dis_74x161x138_m_w)
+WRITE8_MEMBER(nes_carts_state::dis_74x161x138_m_w)
 {
 	LOG_MMC(("dis_74x161x138_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -2768,7 +2767,7 @@ WRITE8_MEMBER(nes_state::dis_74x161x138_m_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::dis_74x161x161x32_w)
+WRITE8_MEMBER(nes_carts_state::dis_74x161x161x32_w)
 {
 	LOG_MMC(("dis_74x161x161x32_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -2821,7 +2820,7 @@ static void bandai_lz_irq( device_t *device, int scanline, int vblank, int blank
 	}
 }
 
-WRITE8_MEMBER(nes_state::lz93d50_w)
+WRITE8_MEMBER(nes_carts_state::lz93d50_w)
 {
 	LOG_MMC(("lz93d50_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -2858,7 +2857,7 @@ WRITE8_MEMBER(nes_state::lz93d50_w)
 	}
 }
 
-WRITE8_MEMBER(nes_state::lz93d50_m_w)
+WRITE8_MEMBER(nes_carts_state::lz93d50_m_w)
 {
 	LOG_MMC(("lz93d50_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -2883,7 +2882,7 @@ static void fjump2_set_prg( running_machine &machine )
 	prg16_cdef(machine, mmc_helper | 0x0f);
 }
 
-WRITE8_MEMBER(nes_state::fjump2_w)
+WRITE8_MEMBER(nes_carts_state::fjump2_w)
 {
 	LOG_MMC(("fjump2_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -2916,7 +2915,7 @@ WRITE8_MEMBER(nes_state::fjump2_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bandai_ks_w)
+WRITE8_MEMBER(nes_carts_state::bandai_ks_w)
 {
 	LOG_MMC(("bandai_ks_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -2936,7 +2935,7 @@ WRITE8_MEMBER(nes_state::bandai_ks_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bandai_ok_w)
+WRITE8_MEMBER(nes_carts_state::bandai_ok_w)
 {
 	UINT8 mmc_helper;
 	LOG_MMC(("mapper96_w, offset: %04x, data: %02x\n", offset, data));
@@ -2959,7 +2958,7 @@ WRITE8_MEMBER(nes_state::bandai_ok_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::lrog017_w)
+WRITE8_MEMBER(nes_carts_state::lrog017_w)
 {
 	LOG_MMC(("lrog017_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -2975,7 +2974,7 @@ WRITE8_MEMBER(nes_state::lrog017_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::irem_hd_w)
+WRITE8_MEMBER(nes_carts_state::irem_hd_w)
 {
 	LOG_MMC(("irem_hd_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -2996,7 +2995,7 @@ WRITE8_MEMBER(nes_state::irem_hd_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::tam_s1_w)
+WRITE8_MEMBER(nes_carts_state::tam_s1_w)
 {
 	LOG_MMC(("tam_s1_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -3017,7 +3016,7 @@ WRITE8_MEMBER(nes_state::tam_s1_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::g101_w)
+WRITE8_MEMBER(nes_carts_state::g101_w)
 {
 	LOG_MMC(("g101_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -3072,7 +3071,7 @@ static void h3001_irq( device_t *device, int scanline, int vblank, int blanked )
 	}
 }
 
-WRITE8_MEMBER(nes_state::h3001_w)
+WRITE8_MEMBER(nes_carts_state::h3001_w)
 {
 	LOG_MMC(("h3001_w, offset %04x, data: %02x\n", offset, data));
 
@@ -3184,7 +3183,7 @@ static void ss88006_irq( device_t *device, int scanline, int vblank, int blanked
 	}
 }
 
-WRITE8_MEMBER(nes_state::ss88006_w)
+WRITE8_MEMBER(nes_carts_state::ss88006_w)
 {
 	UINT8 bank;
 	LOG_MMC(("mapper18_w, offset: %04x, data: %02x\n", offset, data));
@@ -3281,7 +3280,7 @@ WRITE8_MEMBER(nes_state::ss88006_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::jf11_m_w)
+WRITE8_MEMBER(nes_carts_state::jf11_m_w)
 {
 	LOG_MMC(("jf11_m_w, offset: %04x, data: %02x\n", offset, data));
 	chr8(machine(), data, CHRROM);
@@ -3302,7 +3301,7 @@ WRITE8_MEMBER(nes_state::jf11_m_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::jf13_m_w)
+WRITE8_MEMBER(nes_carts_state::jf13_m_w)
 {
 	LOG_MMC(("jf13_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -3331,7 +3330,7 @@ WRITE8_MEMBER(nes_state::jf13_m_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::jf16_w)
+WRITE8_MEMBER(nes_carts_state::jf16_w)
 {
 	LOG_MMC(("jf16_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -3355,7 +3354,7 @@ WRITE8_MEMBER(nes_state::jf16_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::jf17_w)
+WRITE8_MEMBER(nes_carts_state::jf17_w)
 {
 	LOG_MMC(("jf17_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -3381,7 +3380,7 @@ WRITE8_MEMBER(nes_state::jf17_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::jf19_w)
+WRITE8_MEMBER(nes_carts_state::jf19_w)
 {
 	LOG_MMC(("jf19_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -3405,7 +3404,7 @@ WRITE8_MEMBER(nes_state::jf19_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::konami_vrc1_w)
+WRITE8_MEMBER(nes_carts_state::konami_vrc1_w)
 {
 	LOG_MMC(("konami_vrc1_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -3446,7 +3445,7 @@ WRITE8_MEMBER(nes_state::konami_vrc1_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::konami_vrc2_w)
+WRITE8_MEMBER(nes_carts_state::konami_vrc2_w)
 {
 	UINT8 bank, shift, mask;
 	UINT32 shifted_offs = (offset & 0x7000)
@@ -3493,7 +3492,7 @@ WRITE8_MEMBER(nes_state::konami_vrc2_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::konami_vrc3_w)
+WRITE8_MEMBER(nes_carts_state::konami_vrc3_w)
 {
 	LOG_MMC(("konami_vrc3_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -3560,7 +3559,7 @@ static void konami_irq( device_t *device, int scanline, int vblank, int blanked 
 	}
 }
 
-WRITE8_MEMBER(nes_state::konami_vrc4_w)
+WRITE8_MEMBER(nes_carts_state::konami_vrc4_w)
 {
 	UINT8 bank, shift, mask;
 	UINT32 shifted_offs = (offset & 0x7000)
@@ -3648,7 +3647,7 @@ WRITE8_MEMBER(nes_state::konami_vrc4_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::konami_vrc6_w)
+WRITE8_MEMBER(nes_carts_state::konami_vrc6_w)
 {
 	UINT8 bank;
 	UINT32 shifted_offs = (offset & 0x7000)
@@ -3727,7 +3726,7 @@ WRITE8_MEMBER(nes_state::konami_vrc6_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::konami_vrc7_w)
+WRITE8_MEMBER(nes_carts_state::konami_vrc7_w)
 {
 	UINT8 bank;
 	LOG_MMC(("konami_vrc7_w, offset: %04x, data: %02x\n", offset, data));
@@ -3830,7 +3829,7 @@ static void namcot_irq( device_t *device, int scanline, int vblank, int blanked 
 	}
 }
 
-WRITE8_MEMBER(nes_state::namcot163_l_w)
+WRITE8_MEMBER(nes_carts_state::namcot163_l_w)
 {
 	LOG_MMC(("namcot163_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -3850,7 +3849,7 @@ WRITE8_MEMBER(nes_state::namcot163_l_w)
 	}
 }
 
-READ8_MEMBER(nes_state::namcot163_l_r)
+READ8_MEMBER(nes_carts_state::namcot163_l_r)
 {
 	LOG_MMC(("namcot163_l_r, offset: %04x\n", offset));
 	offset += 0x100;
@@ -3876,7 +3875,7 @@ static void namcot163_set_mirror( running_machine &machine, UINT8 page, UINT8 da
 		set_nt_page(machine, page, ROM, data, 0);
 }
 
-WRITE8_MEMBER(nes_state::namcot163_w)
+WRITE8_MEMBER(nes_carts_state::namcot163_w)
 {
 	LOG_MMC(("namcot163_w, offset: %04x, data: %02x\n", offset, data));
 	switch (offset & 0x7800)
@@ -3927,7 +3926,7 @@ WRITE8_MEMBER(nes_state::namcot163_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::sunsoft1_m_w)
+WRITE8_MEMBER(nes_carts_state::sunsoft1_m_w)
 {
 	LOG_MMC(("sunsoft1_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -3951,7 +3950,7 @@ WRITE8_MEMBER(nes_state::sunsoft1_m_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::sunsoft2_w)
+WRITE8_MEMBER(nes_carts_state::sunsoft2_w)
 {
 	UINT8 sunsoft_helper = (data & 0x07) | ((data & 0x80) ? 0x08 : 0x00);
 	LOG_MMC(("sunsoft2_w, offset: %04x, data: %02x\n", offset, data));
@@ -3997,7 +3996,7 @@ static void sunsoft3_irq( device_t *device, int scanline, int vblank, int blanke
 	}
 }
 
-WRITE8_MEMBER(nes_state::sunsoft3_w)
+WRITE8_MEMBER(nes_carts_state::sunsoft3_w)
 {
 	LOG_MMC(("sunsoft3_w, offset %04x, data: %02x\n", offset, data));
 
@@ -4059,7 +4058,7 @@ WRITE8_MEMBER(nes_state::sunsoft3_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::tc0190fmc_w)
+WRITE8_MEMBER(nes_carts_state::tc0190fmc_w)
 {
 	LOG_MMC(("tc0190fmc_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4112,7 +4111,7 @@ WRITE8_MEMBER(nes_state::tc0190fmc_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::tc0190fmc_p16_w)
+WRITE8_MEMBER(nes_carts_state::tc0190fmc_p16_w)
 {
 	LOG_MMC(("tc0190fmc_p16_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4162,7 +4161,7 @@ WRITE8_MEMBER(nes_state::tc0190fmc_p16_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::x1005_m_w)
+WRITE8_MEMBER(nes_carts_state::x1005_m_w)
 {
 	LOG_MMC(("x1005_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4217,7 +4216,7 @@ WRITE8_MEMBER(nes_state::x1005_m_w)
 		m_mapper_bram[offset & (m_mapper_bram_size - 1)] = data;
 }
 
-READ8_MEMBER(nes_state::x1005_m_r)
+READ8_MEMBER(nes_carts_state::x1005_m_r)
 {
 	LOG_MMC(("x1005a_m_r, offset: %04x\n", offset));
 
@@ -4229,7 +4228,7 @@ READ8_MEMBER(nes_state::x1005_m_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(nes_state::x1005a_m_w)
+WRITE8_MEMBER(nes_carts_state::x1005a_m_w)
 {
 	LOG_MMC(("x1005a_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4287,7 +4286,7 @@ static void x1017_set_chr( running_machine &machine )
 	chr1_x(machine, 7 ^ state->m_mmc_latch1, state->m_mmc_vrom_bank[5], CHRROM);
 }
 
-WRITE8_MEMBER(nes_state::x1017_m_w)
+WRITE8_MEMBER(nes_carts_state::x1017_m_w)
 {
 	UINT8 reg = offset & 0x07;
 	LOG_MMC(("x1017_m_w, offset: %04x, data: %02x\n", offset, data));
@@ -4337,7 +4336,7 @@ WRITE8_MEMBER(nes_state::x1017_m_w)
 	}
 }
 
-READ8_MEMBER(nes_state::x1017_m_r)
+READ8_MEMBER(nes_carts_state::x1017_m_r)
 {
 	LOG_MMC(("x1017_m_r, offset: %04x\n", offset));
 
@@ -4370,7 +4369,7 @@ READ8_MEMBER(nes_state::x1017_m_r)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::agci_50282_w)
+WRITE8_MEMBER(nes_carts_state::agci_50282_w)
 {
 	LOG_MMC(("agci_50282_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4389,7 +4388,7 @@ WRITE8_MEMBER(nes_state::agci_50282_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::nina01_m_w)
+WRITE8_MEMBER(nes_carts_state::nina01_m_w)
 {
 	LOG_MMC(("nina01_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4420,7 +4419,7 @@ WRITE8_MEMBER(nes_state::nina01_m_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::nina06_l_w)
+WRITE8_MEMBER(nes_carts_state::nina06_l_w)
 {
 	LOG_MMC(("nina06_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4439,7 +4438,7 @@ WRITE8_MEMBER(nes_state::nina06_l_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::ae_act52_w)
+WRITE8_MEMBER(nes_carts_state::ae_act52_w)
 {
 	int pbank, cbank;
 	UINT8 pmode;
@@ -4477,7 +4476,7 @@ WRITE8_MEMBER(nes_state::ae_act52_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::cne_decathl_w)
+WRITE8_MEMBER(nes_carts_state::cne_decathl_w)
 {
 	LOG_MMC(("cne_decathl_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4511,7 +4510,7 @@ WRITE8_MEMBER(nes_state::cne_decathl_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::cne_fsb_m_w)
+WRITE8_MEMBER(nes_carts_state::cne_fsb_m_w)
 {
 	LOG_MMC(("cne_fsb_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4566,7 +4565,7 @@ WRITE8_MEMBER(nes_state::cne_fsb_m_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::cne_shlz_l_w)
+WRITE8_MEMBER(nes_carts_state::cne_shlz_l_w)
 {
 	LOG_MMC(("cne_shlz_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4586,7 +4585,7 @@ WRITE8_MEMBER(nes_state::cne_shlz_l_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::caltron6in1_m_w)
+WRITE8_MEMBER(nes_carts_state::caltron6in1_m_w)
 {
 	LOG_MMC(("caltron6in1_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4595,7 +4594,7 @@ WRITE8_MEMBER(nes_state::caltron6in1_m_w)
 	prg32(machine(), offset & 0x07);
 }
 
-WRITE8_MEMBER(nes_state::caltron6in1_w)
+WRITE8_MEMBER(nes_carts_state::caltron6in1_w)
 {
 	LOG_MMC(("caltron6in1_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4620,7 +4619,7 @@ WRITE8_MEMBER(nes_state::caltron6in1_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bf9093_w)
+WRITE8_MEMBER(nes_carts_state::bf9093_w)
 {
 	LOG_MMC(("bf9093_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4665,7 +4664,7 @@ static void bf9096_set_prg( running_machine &machine )
 	prg16_cdef(machine, 0x03 | ((state->m_mmc_latch1 & 0x18) >> 1));
 }
 
-WRITE8_MEMBER(nes_state::bf9096_w)
+WRITE8_MEMBER(nes_carts_state::bf9096_w)
 {
 	LOG_MMC(("bf9096_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4689,7 +4688,7 @@ WRITE8_MEMBER(nes_state::bf9096_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::golden5_w)
+WRITE8_MEMBER(nes_carts_state::golden5_w)
 {
 	LOG_MMC(("golden5_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4723,7 +4722,7 @@ WRITE8_MEMBER(nes_state::golden5_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::cony_l_w)
+WRITE8_MEMBER(nes_carts_state::cony_l_w)
 {
 	LOG_MMC(("cony_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4731,7 +4730,7 @@ WRITE8_MEMBER(nes_state::cony_l_w)
 		m_mapper83_low_reg[offset & 0x03] = data;
 }
 
-READ8_MEMBER(nes_state::cony_l_r)
+READ8_MEMBER(nes_carts_state::cony_l_r)
 {
 	LOG_MMC(("cony_l_r, offset: %04x\n", offset));
 
@@ -4780,7 +4779,7 @@ static void cony_set_chr( running_machine &machine )
 	}
 }
 
-WRITE8_MEMBER(nes_state::cony_w)
+WRITE8_MEMBER(nes_carts_state::cony_w)
 {
 	LOG_MMC(("cony_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4861,7 +4860,7 @@ WRITE8_MEMBER(nes_state::cony_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::yoko_l_w)
+WRITE8_MEMBER(nes_carts_state::yoko_l_w)
 {
 	LOG_MMC(("cony_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4869,7 +4868,7 @@ WRITE8_MEMBER(nes_state::yoko_l_w)
 		m_mapper83_low_reg[offset & 0x03] = data;
 }
 
-READ8_MEMBER(nes_state::yoko_l_r)
+READ8_MEMBER(nes_carts_state::yoko_l_r)
 {
 	LOG_MMC(("cony_l_r, offset: %04x\n", offset));
 
@@ -4912,7 +4911,7 @@ static void yoko_set_chr( running_machine &machine )
 	chr2_6(machine, state->m_mapper83_reg[7], CHRROM);
 }
 
-WRITE8_MEMBER(nes_state::yoko_w)
+WRITE8_MEMBER(nes_carts_state::yoko_w)
 {
 	LOG_MMC(("yoko_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4963,7 +4962,7 @@ WRITE8_MEMBER(nes_state::yoko_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::dreamtech_l_w)
+WRITE8_MEMBER(nes_carts_state::dreamtech_l_w)
 {
 	LOG_MMC(("dreamtech_l_w offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -4985,7 +4984,7 @@ WRITE8_MEMBER(nes_state::dreamtech_l_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::fukutake_l_w)
+WRITE8_MEMBER(nes_carts_state::fukutake_l_w)
 {
 	LOG_MMC(("fukutake_l_w offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -5001,7 +5000,7 @@ WRITE8_MEMBER(nes_state::fukutake_l_w)
 		m_mapper_ram[offset - 0x400] = data;
 }
 
-READ8_MEMBER(nes_state::fukutake_l_r)
+READ8_MEMBER(nes_carts_state::fukutake_l_r)
 {
 	LOG_MMC(("fukutake_l_r offset: %04x\n", offset));
 	offset += 0x100;
@@ -5047,7 +5046,7 @@ static void futuremedia_irq( device_t *device, int scanline, int vblank, int bla
 	}
 }
 
-WRITE8_MEMBER(nes_state::futuremedia_w)
+WRITE8_MEMBER(nes_carts_state::futuremedia_w)
 {
 	LOG_MMC(("futuremedia_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5109,7 +5108,7 @@ WRITE8_MEMBER(nes_state::futuremedia_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::gouder_sf4_l_w)
+WRITE8_MEMBER(nes_carts_state::gouder_sf4_l_w)
 {
 	static const UINT8 conv_table[256] =
 	{
@@ -5141,7 +5140,7 @@ WRITE8_MEMBER(nes_state::gouder_sf4_l_w)
 		prg32(machine(), ((data >> 3) & 0x02) | (data & 0x01));
 }
 
-READ8_MEMBER(nes_state::gouder_sf4_l_r)
+READ8_MEMBER(nes_carts_state::gouder_sf4_l_r)
 {
 	LOG_MMC(("gouder_sf4_l_r, offset: %04x\n", offset));
 
@@ -5174,7 +5173,7 @@ static void gouder_sf4_prg_cb( running_machine &machine, int start, int bank )
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::henggedianzi_w)
+WRITE8_MEMBER(nes_carts_state::henggedianzi_w)
 {
 	LOG_MMC(("henggedianzi_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5197,7 +5196,7 @@ WRITE8_MEMBER(nes_state::henggedianzi_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::heng_xjzb_l_w)
+WRITE8_MEMBER(nes_carts_state::heng_xjzb_l_w)
 {
 	LOG_MMC(("heng_xjzb_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x4100;
@@ -5206,7 +5205,7 @@ WRITE8_MEMBER(nes_state::heng_xjzb_l_w)
 		prg32(machine(), data >> 1);
 }
 
-WRITE8_MEMBER(nes_state::heng_xjzb_w)
+WRITE8_MEMBER(nes_carts_state::heng_xjzb_w)
 {
 	LOG_MMC(("heng_xjzb_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5229,7 +5228,7 @@ WRITE8_MEMBER(nes_state::heng_xjzb_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::hes6in1_l_w)
+WRITE8_MEMBER(nes_carts_state::hes6in1_l_w)
 {
 	LOG_MMC(("hes6in1_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5241,7 +5240,7 @@ WRITE8_MEMBER(nes_state::hes6in1_l_w)
 	}
 }
 
-WRITE8_MEMBER(nes_state::hes_l_w)
+WRITE8_MEMBER(nes_carts_state::hes_l_w)
 {
 	LOG_MMC(("hes_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5264,7 +5263,7 @@ WRITE8_MEMBER(nes_state::hes_l_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::hosenkan_w)
+WRITE8_MEMBER(nes_carts_state::hosenkan_w)
 {
 	LOG_MMC(("hosenkan_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5333,7 +5332,7 @@ WRITE8_MEMBER(nes_state::hosenkan_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::ks7058_w)
+WRITE8_MEMBER(nes_carts_state::ks7058_w)
 {
 	LOG_MMC(("ks7058_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5360,7 +5359,7 @@ WRITE8_MEMBER(nes_state::ks7058_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::ks7022_w)
+WRITE8_MEMBER(nes_carts_state::ks7022_w)
 {
 	LOG_MMC(("ks7022_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5371,7 +5370,7 @@ WRITE8_MEMBER(nes_state::ks7022_w)
 		m_mmc_latch1 = data & 0x0f;
 }
 
-READ8_MEMBER(nes_state::ks7022_r)
+READ8_MEMBER(nes_carts_state::ks7022_r)
 {
 	LOG_MMC(("ks7022_r, offset: %04x\n", offset));
 
@@ -5424,7 +5423,7 @@ static void ks7032_irq( device_t *device, int scanline, int vblank, int blanked 
 	}
 }
 
-WRITE8_MEMBER(nes_state::ks7032_w)
+WRITE8_MEMBER(nes_carts_state::ks7032_w)
 {
 	LOG_MMC(("ks7032_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5468,7 +5467,7 @@ WRITE8_MEMBER(nes_state::ks7032_w)
  *************************************************************/
 
 
-WRITE8_MEMBER(nes_state::ks202_w)
+WRITE8_MEMBER(nes_carts_state::ks202_w)
 {
 	LOG_MMC(("ks202_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5537,7 +5536,7 @@ static void mmc_fds_irq( device_t *device, int scanline, int vblank, int blanked
 	}
 }
 
-WRITE8_MEMBER(nes_state::ks7017_l_w)
+WRITE8_MEMBER(nes_carts_state::ks7017_l_w)
 {
 	LOG_MMC(("ks7022_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5550,7 +5549,7 @@ WRITE8_MEMBER(nes_state::ks7017_l_w)
 		prg16_89ab(machine(), m_mmc_latch1);
 }
 
-WRITE8_MEMBER(nes_state::ks7017_extra_w)
+WRITE8_MEMBER(nes_carts_state::ks7017_extra_w)
 {
 	LOG_MMC(("ks7017_extra_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5566,7 +5565,7 @@ WRITE8_MEMBER(nes_state::ks7017_extra_w)
 		set_nt_mirroring(machine(), BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
-READ8_MEMBER(nes_state::ks7017_extra_r)
+READ8_MEMBER(nes_carts_state::ks7017_extra_r)
 {
 	LOG_MMC(("ks7017_extra_r, offset: %04x\n", offset));
 
@@ -5589,7 +5588,7 @@ READ8_MEMBER(nes_state::ks7017_extra_r)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::kay_pp_l_w)
+WRITE8_MEMBER(nes_carts_state::kay_pp_l_w)
 {
 	LOG_MMC(("kay_pp_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -5612,7 +5611,7 @@ WRITE8_MEMBER(nes_state::kay_pp_l_w)
 	}
 }
 
-READ8_MEMBER(nes_state::kay_pp_l_r)
+READ8_MEMBER(nes_carts_state::kay_pp_l_r)
 {
 	LOG_MMC(("kay_pp_l_r, offset: %04x\n", offset));
 	offset += 0x100;
@@ -5691,7 +5690,7 @@ static void kay_pp_chr_cb( running_machine &machine, int start, int bank, int so
 	chr1_x(machine, start, bank, source);
 }
 
-WRITE8_MEMBER(nes_state::kay_pp_w)
+WRITE8_MEMBER(nes_carts_state::kay_pp_w)
 {
 	LOG_MMC(("kay_pp_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5748,7 +5747,7 @@ static void kasing_prg_cb( running_machine &machine, int start, int bank )
 		prg8_x(machine, start, bank);
 }
 
-WRITE8_MEMBER(nes_state::kasing_m_w)
+WRITE8_MEMBER(nes_carts_state::kasing_m_w)
 {
 	LOG_MMC(("kasing_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5780,7 +5779,7 @@ WRITE8_MEMBER(nes_state::kasing_m_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::magics_md_w)
+WRITE8_MEMBER(nes_carts_state::magics_md_w)
 {
 	LOG_MMC(("magics_md_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5821,7 +5820,7 @@ static void nanjing_irq( device_t *device, int scanline, int vblank, int blanked
 
 }
 
-WRITE8_MEMBER(nes_state::nanjing_l_w)
+WRITE8_MEMBER(nes_carts_state::nanjing_l_w)
 {
 	LOG_MMC(("nanjing_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5862,7 +5861,7 @@ WRITE8_MEMBER(nes_state::nanjing_l_w)
 	prg32(machine(), (m_mmc_reg[0] & 0x0f) | ((m_mmc_reg[1] & 0x0f) << 4));
 }
 
-READ8_MEMBER(nes_state::nanjing_l_r)
+READ8_MEMBER(nes_carts_state::nanjing_l_r)
 {
 	UINT8 value = 0;
 	LOG_MMC(("nanjing_l_r, offset: %04x\n", offset));
@@ -5907,7 +5906,7 @@ READ8_MEMBER(nes_state::nanjing_l_r)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::nitra_w)
+WRITE8_MEMBER(nes_carts_state::nitra_w)
 {
 	LOG_MMC(("nitra_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5927,7 +5926,7 @@ WRITE8_MEMBER(nes_state::nitra_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::ntdec_asder_w)
+WRITE8_MEMBER(nes_carts_state::ntdec_asder_w)
 {
 	LOG_MMC(("ntdec_asder_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -5990,7 +5989,7 @@ WRITE8_MEMBER(nes_state::ntdec_asder_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::ntdec_fh_m_w)
+WRITE8_MEMBER(nes_carts_state::ntdec_fh_m_w)
 {
 	LOG_MMC(("ntdec_fh_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6026,7 +6025,7 @@ WRITE8_MEMBER(nes_state::ntdec_fh_m_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::daou306_w)
+WRITE8_MEMBER(nes_carts_state::daou306_w)
 {
 	LOG_MMC(("daou306_w, offset: %04x, data: %02x\n", offset, data));
 	int reg = BIT(offset, 2) ? 8 : 0;
@@ -6100,7 +6099,7 @@ WRITE8_MEMBER(nes_state::daou306_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::gs2015_w)
+WRITE8_MEMBER(nes_carts_state::gs2015_w)
 {
 	LOG_MMC(("gs2015_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6126,7 +6125,7 @@ WRITE8_MEMBER(nes_state::gs2015_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::rcm_tf_w)
+WRITE8_MEMBER(nes_carts_state::rcm_tf_w)
 {
 	LOG_MMC(("rcm_tf_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6159,7 +6158,7 @@ WRITE8_MEMBER(nes_state::rcm_tf_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::rex_dbz_l_w)
+WRITE8_MEMBER(nes_carts_state::rex_dbz_l_w)
 {
 	LOG_MMC(("rex_dbz_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6168,7 +6167,7 @@ WRITE8_MEMBER(nes_state::rex_dbz_l_w)
 }
 
 /* we would need to use this read handler in 0x6000-0x7fff as well */
-READ8_MEMBER(nes_state::rex_dbz_l_r)
+READ8_MEMBER(nes_carts_state::rex_dbz_l_r)
 {
 	LOG_MMC(("rex_dbz_l_r, offset: %04x\n", offset));
 	return 0x01;
@@ -6250,7 +6249,7 @@ static void rex_sl1632_set_chr( running_machine &machine, UINT8 chr, int chr_bas
 	chr1_x(machine, chr_page ^ 7, chr_base2[7] | (bank[7] & chr_mask), chr);
 }
 
-WRITE8_MEMBER(nes_state::rex_sl1632_w)
+WRITE8_MEMBER(nes_carts_state::rex_sl1632_w)
 {
 	UINT8 map14_helper1, map14_helper2, mmc_helper, cmd;
 	LOG_MMC(("rex_sl1632_w, offset: %04x, data: %02x\n", offset, data));
@@ -6350,7 +6349,7 @@ WRITE8_MEMBER(nes_state::rex_sl1632_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::rumblestation_m_w)
+WRITE8_MEMBER(nes_carts_state::rumblestation_m_w)
 {
 	LOG_MMC(("rumblestation_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6360,7 +6359,7 @@ WRITE8_MEMBER(nes_state::rumblestation_m_w)
 	chr8(machine(), m_mmc_vrom_bank[0], CHRROM);
 }
 
-WRITE8_MEMBER(nes_state::rumblestation_w)
+WRITE8_MEMBER(nes_carts_state::rumblestation_w)
 {
 	LOG_MMC(("rumblestation_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6404,7 +6403,7 @@ static void sachen_set_mirror( running_machine &machine, UINT8 nt ) // used by m
 	}
 }
 
-WRITE8_MEMBER(nes_state::sachen_74x374_l_w)
+WRITE8_MEMBER(nes_carts_state::sachen_74x374_l_w)
 {
 	LOG_MMC(("sachen_74x374_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6443,7 +6442,7 @@ WRITE8_MEMBER(nes_state::sachen_74x374_l_w)
 	}
 }
 
-READ8_MEMBER(nes_state::sachen_74x374_l_r)
+READ8_MEMBER(nes_carts_state::sachen_74x374_l_r)
 {
 	LOG_MMC(("sachen_74x374_l_r, offset: %04x", offset));
 
@@ -6454,7 +6453,7 @@ READ8_MEMBER(nes_state::sachen_74x374_l_r)
 		return 0;
 }
 
-WRITE8_MEMBER(nes_state::sachen_74x374a_l_w)
+WRITE8_MEMBER(nes_carts_state::sachen_74x374a_l_w)
 {
 	LOG_MMC(("sachen_74x374a_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6560,14 +6559,14 @@ static void common_s8259_write_handler( address_space &space, offs_t offset, UIN
 	}
 }
 
-WRITE8_MEMBER(nes_state::s8259_l_w)
+WRITE8_MEMBER(nes_carts_state::s8259_l_w)
 {
 	LOG_MMC(("s8259_w, type: %d, offset: %04x, data: %02x\n", m_pcb_id, offset, data));
 
 	common_s8259_write_handler(space, offset, data, m_pcb_id);
 }
 
-WRITE8_MEMBER(nes_state::s8259_m_w)
+WRITE8_MEMBER(nes_carts_state::s8259_m_w)
 {
 	LOG_MMC(("s8259_w, type: %d, offset: %04x, data: %02x\n", m_pcb_id, offset, data));
 
@@ -6587,7 +6586,7 @@ WRITE8_MEMBER(nes_state::s8259_m_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::sa009_l_w)
+WRITE8_MEMBER(nes_carts_state::sa009_l_w)
 {
 	LOG_MMC(("sa009_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6606,7 +6605,7 @@ WRITE8_MEMBER(nes_state::sa009_l_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::sa0036_w)
+WRITE8_MEMBER(nes_carts_state::sa0036_w)
 {
 	LOG_MMC(("sa0036_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6625,7 +6624,7 @@ WRITE8_MEMBER(nes_state::sa0036_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::sa0037_w)
+WRITE8_MEMBER(nes_carts_state::sa0037_w)
 {
 	LOG_MMC(("sa0037_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6645,7 +6644,7 @@ WRITE8_MEMBER(nes_state::sa0037_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::sa72007_l_w)
+WRITE8_MEMBER(nes_carts_state::sa72007_l_w)
 {
 	LOG_MMC(("sa72007_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6666,7 +6665,7 @@ WRITE8_MEMBER(nes_state::sa72007_l_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::sa72008_l_w)
+WRITE8_MEMBER(nes_carts_state::sa72008_l_w)
 {
 	LOG_MMC(("sa72008_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6686,7 +6685,7 @@ WRITE8_MEMBER(nes_state::sa72008_l_w)
 
  *************************************************************/
 
-READ8_MEMBER(nes_state::tca01_l_r)
+READ8_MEMBER(nes_carts_state::tca01_l_r)
 {
 	LOG_MMC(("tca01_l_r, offset: %04x\n", offset));
 
@@ -6709,7 +6708,7 @@ READ8_MEMBER(nes_state::tca01_l_r)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::tcu01_l_w)
+WRITE8_MEMBER(nes_carts_state::tcu01_l_w)
 {
 	LOG_MMC(("tcu01_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6720,14 +6719,14 @@ WRITE8_MEMBER(nes_state::tcu01_l_w)
 	}
 }
 
-WRITE8_MEMBER(nes_state::tcu01_m_w)
+WRITE8_MEMBER(nes_carts_state::tcu01_m_w)
 {
 	LOG_MMC(("tcu01_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	tcu01_l_w(space, (offset + 0x100) & 0xfff, data, mem_mask);
 }
 
-WRITE8_MEMBER(nes_state::tcu01_w)
+WRITE8_MEMBER(nes_carts_state::tcu01_w)
 {
 	LOG_MMC(("tcu01_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6746,7 +6745,7 @@ WRITE8_MEMBER(nes_state::tcu01_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::tcu02_l_w)
+WRITE8_MEMBER(nes_carts_state::tcu02_l_w)
 {
 	LOG_MMC(("tcu02_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6757,7 +6756,7 @@ WRITE8_MEMBER(nes_state::tcu02_l_w)
 	}
 }
 
-READ8_MEMBER(nes_state::tcu02_l_r)
+READ8_MEMBER(nes_carts_state::tcu02_l_r)
 {
 	LOG_MMC(("tcu02_l_r, offset: %04x\n", offset));
 
@@ -6776,7 +6775,7 @@ READ8_MEMBER(nes_state::tcu02_l_r)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::subor0_w)
+WRITE8_MEMBER(nes_carts_state::subor0_w)
 {
 	UINT8 subor_helper1, subor_helper2;
 	LOG_MMC(("subor0_w, offset: %04x, data: %02x\n", offset, data));
@@ -6814,7 +6813,7 @@ WRITE8_MEMBER(nes_state::subor0_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::subor1_w)
+WRITE8_MEMBER(nes_carts_state::subor1_w)
 {
 	UINT8 subor_helper1, subor_helper2;
 	LOG_MMC(("subor1_w, offset: %04x, data: %02x\n", offset, data));
@@ -6897,7 +6896,7 @@ static void sgame_boog_set_prg( running_machine &machine )
 		mmc3_set_prg(machine, state->m_mmc_prg_base, state->m_mmc_prg_mask);
 }
 
-WRITE8_MEMBER(nes_state::sgame_boog_l_w)
+WRITE8_MEMBER(nes_carts_state::sgame_boog_l_w)
 {
 	LOG_MMC(("sgame_boog_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -6921,7 +6920,7 @@ WRITE8_MEMBER(nes_state::sgame_boog_l_w)
 	}
 }
 
-WRITE8_MEMBER(nes_state::sgame_boog_m_w)
+WRITE8_MEMBER(nes_carts_state::sgame_boog_m_w)
 {
 	LOG_MMC(("sgame_boog_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6944,7 +6943,7 @@ WRITE8_MEMBER(nes_state::sgame_boog_m_w)
 	}
 }
 
-WRITE8_MEMBER(nes_state::sgame_boog_w)
+WRITE8_MEMBER(nes_carts_state::sgame_boog_w)
 {
 	static const UINT8 conv_table[8] = {0,2,5,3,6,1,7,4};
 	LOG_MMC(("sgame_boog_w, offset: %04x, data: %02x\n", offset, data));
@@ -7022,7 +7021,7 @@ WRITE8_MEMBER(nes_state::sgame_boog_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::sgame_lion_m_w)
+WRITE8_MEMBER(nes_carts_state::sgame_lion_m_w)
 {
 	LOG_MMC(("sgame_lion_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -7038,7 +7037,7 @@ WRITE8_MEMBER(nes_state::sgame_lion_m_w)
 
 }
 
-WRITE8_MEMBER(nes_state::sgame_lion_w)
+WRITE8_MEMBER(nes_carts_state::sgame_lion_w)
 {
 	static const UINT8 conv_table[8] = {0, 3, 1, 5, 6, 7, 2, 4};
 	LOG_MMC(("sgame_lion_w, offset: %04x, data: %02x\n", offset, data));
@@ -7090,7 +7089,7 @@ WRITE8_MEMBER(nes_state::sgame_lion_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::tengen_800008_w)
+WRITE8_MEMBER(nes_carts_state::tengen_800008_w)
 {
 	LOG_MMC(("tengen_800008_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -7204,7 +7203,7 @@ static void tengen_800032_set_chr( running_machine &machine )
 	chr1_x(machine, 7 ^ chr_page, state->m_mmc_vrom_bank[5], CHRROM);
 }
 
-WRITE8_MEMBER(nes_state::tengen_800032_w)
+WRITE8_MEMBER(nes_carts_state::tengen_800032_w)
 {
 	UINT8 map64_helper, cmd;
 	LOG_MMC(("tengen_800032_w, offset: %04x, data: %02x\n", offset, data));
@@ -7300,7 +7299,7 @@ static void tengen_800037_set_mirror( running_machine &machine )
 	set_nt_page(machine, 3, ROM, state->m_mmc_vrom_bank[nt_mode ? 5 : 1], 0);
 }
 
-WRITE8_MEMBER(nes_state::tengen_800037_w)
+WRITE8_MEMBER(nes_carts_state::tengen_800037_w)
 {
 	UINT8 map158_helper, cmd;
 	LOG_MMC(("tengen_800037_w, offset: %04x, data: %02x\n", offset, data));
@@ -7375,7 +7374,7 @@ WRITE8_MEMBER(nes_state::tengen_800037_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::txc_22211_l_w)
+WRITE8_MEMBER(nes_carts_state::txc_22211_l_w)
 {
 	LOG_MMC(("txc_22211_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -7383,7 +7382,7 @@ WRITE8_MEMBER(nes_state::txc_22211_l_w)
 		m_txc_reg[offset & 0x03] = data;
 }
 
-READ8_MEMBER(nes_state::txc_22211_l_r)
+READ8_MEMBER(nes_carts_state::txc_22211_l_r)
 {
 	LOG_MMC(("txc_22211_l_r, offset: %04x\n", offset));
 
@@ -7393,7 +7392,7 @@ READ8_MEMBER(nes_state::txc_22211_l_r)
 		return 0x00;
 }
 
-WRITE8_MEMBER(nes_state::txc_22211_w)
+WRITE8_MEMBER(nes_carts_state::txc_22211_w)
 {
 	LOG_MMC(("txc_22211_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -7416,7 +7415,7 @@ WRITE8_MEMBER(nes_state::txc_22211_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::txc_22211b_w)
+WRITE8_MEMBER(nes_carts_state::txc_22211b_w)
 {
 	LOG_MMC(("txc_22211b_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -7439,7 +7438,7 @@ WRITE8_MEMBER(nes_state::txc_22211b_w)
 
  *************************************************************/
 
-READ8_MEMBER(nes_state::txc_22211c_l_r)
+READ8_MEMBER(nes_carts_state::txc_22211c_l_r)
 {
 	LOG_MMC(("txc_22211c_l_r, offset: %04x\n", offset));
 
@@ -7463,14 +7462,14 @@ READ8_MEMBER(nes_state::txc_22211c_l_r)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::txc_tw_l_w)
+WRITE8_MEMBER(nes_carts_state::txc_tw_l_w)
 {
 	LOG_MMC(("txctw_l_w, offset: %04x, data: %02x\n", offset, data));
 
 	prg32(machine(), (data >> 4) | data);
 }
 
-WRITE8_MEMBER(nes_state::txc_tw_m_w)
+WRITE8_MEMBER(nes_carts_state::txc_tw_m_w)
 {
 	LOG_MMC(("txctw_m_w, offset: %04x, data: %04x\n", offset, data));
 
@@ -7497,7 +7496,7 @@ static void txc_tw_prg_cb( running_machine &machine, int start, int bank )
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::txc_strikewolf_w)
+WRITE8_MEMBER(nes_carts_state::txc_strikewolf_w)
 {
 	LOG_MMC(("txc_strikewolf_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -7524,12 +7523,12 @@ WRITE8_MEMBER(nes_state::txc_strikewolf_w)
 
  *************************************************************/
 
-READ8_MEMBER(nes_state::txc_mxmdhtwo_l_r)
+READ8_MEMBER(nes_carts_state::txc_mxmdhtwo_l_r)
 {
 	return 0x50;
 }
 
-WRITE8_MEMBER(nes_state::txc_mxmdhtwo_w)
+WRITE8_MEMBER(nes_carts_state::txc_mxmdhtwo_w)
 {
 	LOG_MMC(("txc_mxmdhtwo_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -7588,7 +7587,7 @@ static void waixing_a1_chr_cb( running_machine &machine, int start, int bank, in
 	chr1_x(machine, start, bank, chr_src);
 }
 
-WRITE8_MEMBER(nes_state::waixing_a_w)
+WRITE8_MEMBER(nes_carts_state::waixing_a_w)
 {
 	LOG_MMC(("waixing_a_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -7710,7 +7709,7 @@ static void waixing_e_chr_cb( running_machine &machine, int start, int bank, int
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::waixing_f_w)
+WRITE8_MEMBER(nes_carts_state::waixing_f_w)
 {
 	UINT8 cmd;
 	LOG_MMC(("waixing_f_w, offset: %04x, data: %02x\n", offset, data));
@@ -7770,7 +7769,7 @@ static void waixing_g_set_chr( running_machine &machine, int chr_base, int chr_m
 	state->m_mmc3_chr_cb(machine, chr_page ^ 7, chr_base | (state->m_mmc_vrom_bank[5] & chr_mask), state->m_mmc_chr_source);
 }
 
-WRITE8_MEMBER(nes_state::waixing_g_w)
+WRITE8_MEMBER(nes_carts_state::waixing_g_w)
 {
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("waixing_g_w, offset: %04x, data: %02x\n", offset, data));
@@ -7840,7 +7839,7 @@ static void waixing_h_chr_cb( running_machine &machine, int start, int bank, int
 		chr1_x(machine, start, bank, source);
 }
 
-WRITE8_MEMBER(nes_state::waixing_h_w)
+WRITE8_MEMBER(nes_carts_state::waixing_h_w)
 {
 	UINT8 cmd;
 	LOG_MMC(("waixing_h_w, offset: %04x, data: %02x\n", offset, data));
@@ -7885,7 +7884,7 @@ WRITE8_MEMBER(nes_state::waixing_h_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::waixing_sgz_w)
+WRITE8_MEMBER(nes_carts_state::waixing_sgz_w)
 {
 	UINT8 mmc_helper, bank;
 	LOG_MMC(("waixing_sgz_w, offset: %04x, data: %02x\n", offset, data));
@@ -7947,7 +7946,7 @@ WRITE8_MEMBER(nes_state::waixing_sgz_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::waixing_sgzlz_l_w)
+WRITE8_MEMBER(nes_carts_state::waixing_sgzlz_l_w)
 {
 	LOG_MMC(("waixing_sgzlz_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -7979,7 +7978,7 @@ WRITE8_MEMBER(nes_state::waixing_sgzlz_l_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::waixing_ffv_l_w)
+WRITE8_MEMBER(nes_carts_state::waixing_ffv_l_w)
 {
 	UINT8 mmc_helper;
 	LOG_MMC(("waixing_ffv_l_w, offset: %04x, data: %02x\n", offset, data));
@@ -8028,7 +8027,7 @@ WRITE8_MEMBER(nes_state::waixing_ffv_l_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::waixing_zs_w)
+WRITE8_MEMBER(nes_carts_state::waixing_zs_w)
 {
 	LOG_MMC(("waixing_zs_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -8058,7 +8057,7 @@ WRITE8_MEMBER(nes_state::waixing_zs_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::waixing_dq8_w)
+WRITE8_MEMBER(nes_carts_state::waixing_dq8_w)
 {
 	LOG_MMC(("waixing_dq8_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -8078,7 +8077,7 @@ WRITE8_MEMBER(nes_state::waixing_dq8_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::waixing_ps2_w)
+WRITE8_MEMBER(nes_carts_state::waixing_ps2_w)
 {
 	UINT8 map15_flip = (data & 0x80) >> 7;
 	UINT8 map15_helper = (data & 0x7f) << 1;
@@ -8155,7 +8154,7 @@ static void waixing_sec_chr_cb( running_machine &machine, int start, int bank, i
 	chr1_x(machine, start, bank, source);
 }
 
-WRITE8_MEMBER(nes_state::waixing_sec_l_w)
+WRITE8_MEMBER(nes_carts_state::waixing_sec_l_w)
 {
 	LOG_MMC(("waixing_sec_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -8191,7 +8190,7 @@ static void waixing_sh2_chr_cb( running_machine &machine, int start, int bank, i
 	chr4_4(machine, state->m_mmc_reg[1], state->m_mmc_reg[1] ? CHRRAM : CHRROM);
 }
 
-READ8_MEMBER(nes_state::waixing_sh2_chr_r)
+READ8_MEMBER(nes_carts_state::waixing_sh2_chr_r)
 {
 	int bank = offset >> 10;
 	UINT8 val = m_chr_map[bank].access[offset & 0x3ff];	// this would be usual return value
@@ -8241,7 +8240,7 @@ static void unl_8237_chr_cb( running_machine &machine, int start, int bank, int 
 	chr1_x(machine, start, bank, source);
 }
 
-WRITE8_MEMBER(nes_state::unl_8237_l_w)
+WRITE8_MEMBER(nes_carts_state::unl_8237_l_w)
 {
 	LOG_MMC(("unl_8237_l_w offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -8270,7 +8269,7 @@ WRITE8_MEMBER(nes_state::unl_8237_l_w)
 	}
 }
 
-WRITE8_MEMBER(nes_state::unl_8237_w)
+WRITE8_MEMBER(nes_carts_state::unl_8237_w)
 {
 	static const UINT8 conv_table[8] = {0, 2, 6, 1, 7, 3, 4, 5};
 	LOG_MMC(("unl_8237_w offset: %04x, data: %02x\n", offset, data));
@@ -8326,7 +8325,7 @@ static void unl_ax5705_set_prg( running_machine &machine )
 	prg8_ab(machine, state->m_mmc_prg_bank[1]);
 }
 
-WRITE8_MEMBER(nes_state::unl_ax5705_w)
+WRITE8_MEMBER(nes_carts_state::unl_ax5705_w)
 {
 	UINT8 bank;
 	LOG_MMC(("unl_ax5705_w offset: %04x, data: %02x\n", offset, data));
@@ -8391,7 +8390,7 @@ WRITE8_MEMBER(nes_state::unl_ax5705_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::unl_cc21_w)
+WRITE8_MEMBER(nes_carts_state::unl_cc21_w)
 {
 	LOG_MMC(("unl_cc21_w offset: %04x, data: %02x\n", offset, data));
 
@@ -8416,7 +8415,7 @@ static UINT8 unl_kof97_unscramble( UINT8 data )
 	return ((data >> 1) & 0x01) | ((data >> 4) & 0x02) | ((data << 2) & 0x04) | ((data >> 0) & 0xd8) | ((data << 3) & 0x20);
 }
 
-WRITE8_MEMBER(nes_state::unl_kof97_w)
+WRITE8_MEMBER(nes_carts_state::unl_kof97_w)
 {
 	LOG_MMC(("unl_kof97_w offset: %04x, data: %02x\n", offset, data));
 
@@ -8472,7 +8471,7 @@ WRITE8_MEMBER(nes_state::unl_kof97_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::ks7057_w)
+WRITE8_MEMBER(nes_carts_state::ks7057_w)
 {
 	LOG_MMC(("ks7057_w, offset: %04x, data: %02x\n", offset, data));
 	offset = (BIT(offset, 0) << 1) | BIT(offset, 1) | (offset & ~0x03);
@@ -8489,7 +8488,7 @@ WRITE8_MEMBER(nes_state::ks7057_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::unl_t230_w)
+WRITE8_MEMBER(nes_carts_state::unl_t230_w)
 {
 	UINT8 bank;
 	LOG_MMC(("unl_t230_w offset: %04x, data: %02x\n", offset, data));
@@ -8597,7 +8596,7 @@ static void kof96_chr_cb( running_machine &machine, int start, int bank, int sou
 	chr1_x(machine, start, bank, source);
 }
 
-WRITE8_MEMBER(nes_state::kof96_l_w)
+WRITE8_MEMBER(nes_carts_state::kof96_l_w)
 {
 	UINT8 new_bank;
 	LOG_MMC(("kof96_l_w, offset: %04x, data: %02x\n", offset, data));
@@ -8648,7 +8647,7 @@ WRITE8_MEMBER(nes_state::kof96_l_w)
 	}
 }
 
-READ8_MEMBER(nes_state::kof96_l_r)
+READ8_MEMBER(nes_carts_state::kof96_l_r)
 {
 	LOG_MMC(("kof96_l_r, offset: %04x\n", offset));
 	offset += 0x100;
@@ -8659,7 +8658,7 @@ READ8_MEMBER(nes_state::kof96_l_r)
 		return 0;
 }
 
-WRITE8_MEMBER(nes_state::kof96_w)
+WRITE8_MEMBER(nes_carts_state::kof96_w)
 {
 	LOG_MMC(("kof96_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -8709,7 +8708,7 @@ WRITE8_MEMBER(nes_state::kof96_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::mk2_m_w)
+WRITE8_MEMBER(nes_carts_state::mk2_m_w)
 {
 	LOG_MMC(("mk2_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -8764,7 +8763,7 @@ static void n625092_set_prg( running_machine &machine, UINT8 reg1, UINT8 reg2 )
 	prg16_cdef(machine, map221_helper2 | ((reg1 & 0x70) >> 1));
 }
 
-WRITE8_MEMBER(nes_state::n625092_w)
+WRITE8_MEMBER(nes_carts_state::n625092_w)
 {
 	LOG_MMC(("n625092_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -8821,7 +8820,7 @@ static void sc127_irq( device_t *device, int scanline, int vblank, int blanked )
 	}
 }
 
-WRITE8_MEMBER(nes_state::sc127_w)
+WRITE8_MEMBER(nes_carts_state::sc127_w)
 {
 	LOG_MMC(("sc127_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -8876,7 +8875,7 @@ WRITE8_MEMBER(nes_state::sc127_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::smb2j_w)
+WRITE8_MEMBER(nes_carts_state::smb2j_w)
 {
 	int bank = (((offset >> 8) & 0x03) * 0x20) + (offset & 0x1f);
 
@@ -8963,7 +8962,7 @@ static void smb2jb_irq( device_t *device, int scanline, int vblank, int blanked 
 	}
 }
 
-WRITE8_MEMBER(nes_state::smb2jb_l_w)
+WRITE8_MEMBER(nes_carts_state::smb2jb_l_w)
 {
 	UINT8 prg;
 	LOG_MMC(("smb2jb_l_w, offset: %04x, data: %02x\n", offset, data));
@@ -8982,7 +8981,7 @@ WRITE8_MEMBER(nes_state::smb2jb_l_w)
 }
 
 /* This goes to 0x4020-0x403f */
-WRITE8_MEMBER(nes_state::smb2jb_extra_w)
+WRITE8_MEMBER(nes_carts_state::smb2jb_extra_w)
 {
 	UINT8 prg;
 	LOG_MMC(("smb2jb_extra_w, offset: %04x, data: %02x\n", offset, data));
@@ -9011,7 +9010,7 @@ static void unl_sf3_set_chr( running_machine &machine, UINT8 chr_source, int chr
 	chr2_6(machine, chr_base | (state->m_mmc_vrom_bank[2] & chr_mask), chr_source);
 }
 
-WRITE8_MEMBER(nes_state::unl_sf3_w)
+WRITE8_MEMBER(nes_carts_state::unl_sf3_w)
 {
 	UINT8 mmc_helper, cmd;
 	LOG_MMC(("unl_sf3_w, offset: %04x, data: %02x\n", offset, data));
@@ -9068,7 +9067,7 @@ WRITE8_MEMBER(nes_state::unl_sf3_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::unl_xzy_l_w)
+WRITE8_MEMBER(nes_carts_state::unl_xzy_l_w)
 {
 	LOG_MMC(("unl_xzy_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -9099,7 +9098,7 @@ static void racmate_update_banks( running_machine &machine )
 	prg16_89ab(machine, state->m_mmc_latch1 >> 1);
 }
 
-WRITE8_MEMBER(nes_state::unl_racmate_w)
+WRITE8_MEMBER(nes_carts_state::unl_racmate_w)
 {
 	LOG_MMC(("unl_racmate_w offset: %04x, data: %02x\n", offset, data));
 
@@ -9123,7 +9122,7 @@ WRITE8_MEMBER(nes_state::unl_racmate_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::unl_fs304_l_w)
+WRITE8_MEMBER(nes_carts_state::unl_fs304_l_w)
 {
 	LOG_MMC(("unl_fs304_l_w, offset: %04x, data: %02x\n", offset, data));
 	int bank;
@@ -9160,7 +9159,7 @@ WRITE8_MEMBER(nes_state::unl_fs304_l_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::btl_smb11_w)
+WRITE8_MEMBER(nes_carts_state::btl_smb11_w)
 {
 	LOG_MMC(("btl_smb11_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -9180,7 +9179,7 @@ WRITE8_MEMBER(nes_state::btl_smb11_w)
  *************************************************************/
 
 // is the code fine for ai senshi nicol?!?
-WRITE8_MEMBER(nes_state::btl_mariobaby_w)
+WRITE8_MEMBER(nes_carts_state::btl_mariobaby_w)
 {
 	LOG_MMC(("btl_mariobaby_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -9240,7 +9239,7 @@ static void btl_smb2a_irq( device_t *device, int scanline, int vblank, int blank
 	}
 }
 
-WRITE8_MEMBER(nes_state::btl_smb2a_w)
+WRITE8_MEMBER(nes_carts_state::btl_smb2a_w)
 {
 	LOG_MMC(("btl_smb2a_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -9271,7 +9270,7 @@ WRITE8_MEMBER(nes_state::btl_smb2a_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::whirl2706_w)
+WRITE8_MEMBER(nes_carts_state::whirl2706_w)
 {
 	LOG_MMC(("whirl2706_w, offset: %04x, data: %02x\n", offset, data));
 	prg8_67(machine(), data);
@@ -9289,7 +9288,7 @@ WRITE8_MEMBER(nes_state::whirl2706_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::btl_tobi_l_w)
+WRITE8_MEMBER(nes_carts_state::btl_tobi_l_w)
 {
 	LOG_MMC(("btl_tobi_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -9326,7 +9325,7 @@ static void btl_smb3_irq( device_t *device, int scanline, int vblank, int blanke
 	}
 }
 
-WRITE8_MEMBER(nes_state::btl_smb3_w)
+WRITE8_MEMBER(nes_carts_state::btl_smb3_w)
 {
 	LOG_MMC(("btl_smb3_w, offset: %04x, data: %02x\n", offset, data));
 	switch (offset & 0x0f)
@@ -9400,7 +9399,7 @@ static void btl_dn_irq( device_t *device, int scanline, int vblank, int blanked 
 	}
 }
 
-WRITE8_MEMBER(nes_state::btl_dn_w)
+WRITE8_MEMBER(nes_carts_state::btl_dn_w)
 {
 	UINT8 bank;
 	LOG_MMC(("btl_dn_w, offset: %04x, data: %02x\n", offset, data));
@@ -9445,7 +9444,7 @@ WRITE8_MEMBER(nes_state::btl_dn_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::btl_pika_y2k_w)
+WRITE8_MEMBER(nes_carts_state::btl_pika_y2k_w)
 {
 	LOG_MMC(("btl_pika_y2k_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -9464,14 +9463,14 @@ WRITE8_MEMBER(nes_state::btl_pika_y2k_w)
 }
 
 // strange WRAM usage: it is protected at start, and gets unprotected after the first write to 0xa000
-WRITE8_MEMBER(nes_state::btl_pika_y2k_m_w)
+WRITE8_MEMBER(nes_carts_state::btl_pika_y2k_m_w)
 {
 	LOG_MMC(("btl_pika_y2k_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	m_wram[offset] = data;
 }
 
-READ8_MEMBER(nes_state::btl_pika_y2k_m_r)
+READ8_MEMBER(nes_carts_state::btl_pika_y2k_m_r)
 {
 	LOG_MMC(("btl_pika_y2k_m_r, offset: %04x\n", offset));
 
@@ -9581,7 +9580,7 @@ static void fk23c_set_chr( running_machine &machine )
 	}
 }
 
-WRITE8_MEMBER(nes_state::fk23c_l_w)
+WRITE8_MEMBER(nes_carts_state::fk23c_l_w)
 {
 	LOG_MMC(("fk23c_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -9598,7 +9597,7 @@ WRITE8_MEMBER(nes_state::fk23c_l_w)
 	}
 }
 
-WRITE8_MEMBER(nes_state::fk23c_w)
+WRITE8_MEMBER(nes_carts_state::fk23c_w)
 {
 	LOG_MMC(("fk23c_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -9669,7 +9668,7 @@ static void bmc_64in1nr_set_prg( running_machine &machine )
 		prg16_cdef(machine, helper2);
 }
 
-WRITE8_MEMBER(nes_state::bmc_64in1nr_l_w)
+WRITE8_MEMBER(nes_carts_state::bmc_64in1nr_l_w)
 {
 	LOG_MMC(("bmc_64in1nr_l_w offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -9689,7 +9688,7 @@ WRITE8_MEMBER(nes_state::bmc_64in1nr_l_w)
 		set_nt_mirroring(machine(), BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
-WRITE8_MEMBER(nes_state::bmc_64in1nr_w)
+WRITE8_MEMBER(nes_carts_state::bmc_64in1nr_w)
 {
 	LOG_MMC(("bmc_64in1nr_w offset: %04x, data: %02x\n", offset, data));
 
@@ -9706,7 +9705,7 @@ WRITE8_MEMBER(nes_state::bmc_64in1nr_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_190in1_w)
+WRITE8_MEMBER(nes_carts_state::bmc_190in1_w)
 {
 	LOG_MMC(("bmc_190in1_w offset: %04x, data: %02x\n", offset, data));
 
@@ -9727,7 +9726,7 @@ WRITE8_MEMBER(nes_state::bmc_190in1_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_a65as_w)
+WRITE8_MEMBER(nes_carts_state::bmc_a65as_w)
 {
 	UINT8 helper = (data & 0x30) >> 1;
 	LOG_MMC(("bmc_a65as_w offset: %04x, data: %02x\n", offset, data));
@@ -9757,7 +9756,7 @@ WRITE8_MEMBER(nes_state::bmc_a65as_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_gs2004_w)
+WRITE8_MEMBER(nes_carts_state::bmc_gs2004_w)
 {
 	LOG_MMC(("bmc_gs2004_w offset: %04x, data: %02x\n", offset, data));
 
@@ -9775,7 +9774,7 @@ WRITE8_MEMBER(nes_state::bmc_gs2004_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_gs2013_w)
+WRITE8_MEMBER(nes_carts_state::bmc_gs2013_w)
 {
 	LOG_MMC(("bmc_gs2013_w offset: %04x, data: %02x\n", offset, data));
 
@@ -9815,7 +9814,7 @@ static void bmc_s24in1sc03_chr_cb( running_machine &machine, int start, int bank
 	chr1_x(machine, start, chr_base | bank, chr);
 }
 
-WRITE8_MEMBER(nes_state::bmc_s24in1sc03_l_w)
+WRITE8_MEMBER(nes_carts_state::bmc_s24in1sc03_l_w)
 {
 	LOG_MMC(("bmc_s24in1sc03_l_w offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -9850,7 +9849,7 @@ WRITE8_MEMBER(nes_state::bmc_s24in1sc03_l_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_t262_w)
+WRITE8_MEMBER(nes_carts_state::bmc_t262_w)
 {
 	UINT8 mmc_helper;
 	LOG_MMC(("bmc_t262_w offset: %04x, data: %02x\n", offset, data));
@@ -9882,7 +9881,7 @@ WRITE8_MEMBER(nes_state::bmc_t262_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_ws_m_w)
+WRITE8_MEMBER(nes_carts_state::bmc_ws_m_w)
 {
 	UINT8 mmc_helper;
 	LOG_MMC(("bmc_ws_m_w offset: %04x, data: %02x\n", offset, data));
@@ -9928,7 +9927,7 @@ WRITE8_MEMBER(nes_state::bmc_ws_m_w)
  *************************************************************/
 
 // Are this correct or should they work the same?
-WRITE8_MEMBER(nes_state::novel1_w)
+WRITE8_MEMBER(nes_carts_state::novel1_w)
 {
 	LOG_MMC(("novel1_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -9936,7 +9935,7 @@ WRITE8_MEMBER(nes_state::novel1_w)
 	chr8(machine(), offset & 0x07, CHRROM);
 }
 
-WRITE8_MEMBER(nes_state::novel2_w)
+WRITE8_MEMBER(nes_carts_state::novel2_w)
 {
 	LOG_MMC(("novel2_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -9957,7 +9956,7 @@ WRITE8_MEMBER(nes_state::novel2_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_gka_w)
+WRITE8_MEMBER(nes_carts_state::bmc_gka_w)
 {
 	LOG_MMC(("bmc_gka_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -9993,7 +9992,7 @@ WRITE8_MEMBER(nes_state::bmc_gka_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::sng32_w)
+WRITE8_MEMBER(nes_carts_state::sng32_w)
 {
 	LOG_MMC(("sng32_w, offset: %04x, data: %02x\n", offset, data));
 	prg32(machine(), data);
@@ -10012,7 +10011,7 @@ WRITE8_MEMBER(nes_state::sng32_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_gkb_w)
+WRITE8_MEMBER(nes_carts_state::bmc_gkb_w)
 {
 	UINT8 bank = (offset & 0x40) ? 0 : 1;
 	LOG_MMC(("bmc_gkb_w, offset: %04x, data: %02x\n", offset, data));
@@ -10036,7 +10035,7 @@ WRITE8_MEMBER(nes_state::bmc_gkb_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_super700in1_w)
+WRITE8_MEMBER(nes_carts_state::bmc_super700in1_w)
 {
 	LOG_MMC(("bmc_super700in1_w, offset :%04x, data: %02x\n", offset, data));
 
@@ -10068,7 +10067,7 @@ WRITE8_MEMBER(nes_state::bmc_super700in1_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_36in1_w)
+WRITE8_MEMBER(nes_carts_state::bmc_36in1_w)
 {
 	LOG_MMC(("bmc_36in1_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -10092,7 +10091,7 @@ WRITE8_MEMBER(nes_state::bmc_36in1_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_21in1_w)
+WRITE8_MEMBER(nes_carts_state::bmc_21in1_w)
 {
 	LOG_MMC(("bmc_21in1_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -10113,7 +10112,7 @@ WRITE8_MEMBER(nes_state::bmc_21in1_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_150in1_w)
+WRITE8_MEMBER(nes_carts_state::bmc_150in1_w)
 {
 	int bank = (offset >> 1) & 0x07;
 
@@ -10139,7 +10138,7 @@ WRITE8_MEMBER(nes_state::bmc_150in1_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_35in1_w)
+WRITE8_MEMBER(nes_carts_state::bmc_35in1_w)
 {
 	LOG_MMC(("bmc_35in1_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -10161,7 +10160,7 @@ WRITE8_MEMBER(nes_state::bmc_35in1_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_64in1_w)
+WRITE8_MEMBER(nes_carts_state::bmc_64in1_w)
 {
 	int bank = (offset >> 1) & (offset >> 2) & 0x01;
 
@@ -10187,7 +10186,7 @@ WRITE8_MEMBER(nes_state::bmc_64in1_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_15in1_m_w)
+WRITE8_MEMBER(nes_carts_state::bmc_15in1_m_w)
 {
 	LOG_MMC(("bmc_15in1_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -10215,7 +10214,7 @@ WRITE8_MEMBER(nes_state::bmc_15in1_m_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_hik300_w)
+WRITE8_MEMBER(nes_carts_state::bmc_hik300_w)
 {
 	LOG_MMC(("bmc_hik300_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -10244,7 +10243,7 @@ WRITE8_MEMBER(nes_state::bmc_hik300_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::supergun20in1_w)
+WRITE8_MEMBER(nes_carts_state::supergun20in1_w)
 {
 	LOG_MMC(("supergun20in1_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -10266,7 +10265,7 @@ WRITE8_MEMBER(nes_state::supergun20in1_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_72in1_w)
+WRITE8_MEMBER(nes_carts_state::bmc_72in1_w)
 {
 	int hi_bank;
 	int size_16;
@@ -10307,7 +10306,7 @@ WRITE8_MEMBER(nes_state::bmc_72in1_w)
  *************************************************************/
 
 // does this work for super42in1 as well?!?
-WRITE8_MEMBER(nes_state::bmc_76in1_w)
+WRITE8_MEMBER(nes_carts_state::bmc_76in1_w)
 {
 	int hi_bank;
 	int size_16;
@@ -10352,7 +10351,7 @@ WRITE8_MEMBER(nes_state::bmc_76in1_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_1200in1_w)
+WRITE8_MEMBER(nes_carts_state::bmc_1200in1_w)
 {
 	int hi_bank;
 	int size_32;
@@ -10399,7 +10398,7 @@ WRITE8_MEMBER(nes_state::bmc_1200in1_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_31in1_w)
+WRITE8_MEMBER(nes_carts_state::bmc_31in1_w)
 {
 	LOG_MMC(("bmc_31in1_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -10432,7 +10431,7 @@ WRITE8_MEMBER(nes_state::bmc_31in1_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_22g_w)
+WRITE8_MEMBER(nes_carts_state::bmc_22g_w)
 {
 	LOG_MMC(("bmc_22g_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -10469,7 +10468,7 @@ WRITE8_MEMBER(nes_state::bmc_22g_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_20in1_w)
+WRITE8_MEMBER(nes_carts_state::bmc_20in1_w)
 {
 	LOG_MMC(("bmc_20in1_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -10492,7 +10491,7 @@ WRITE8_MEMBER(nes_state::bmc_20in1_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_110in1_w)
+WRITE8_MEMBER(nes_carts_state::bmc_110in1_w)
 {
 	UINT8 map255_helper1 = (offset >> 12) ? 0 : 1;
 	UINT8 map255_helper2 = ((offset >> 8) & 0x40) | ((offset >> 6) & 0x3f);
@@ -10518,7 +10517,7 @@ WRITE8_MEMBER(nes_state::bmc_110in1_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_sbig7_w)
+WRITE8_MEMBER(nes_carts_state::bmc_sbig7_w)
 {
 	UINT8 page;
 	LOG_MMC(("bmc_sbig7_w, offset: %04x, data: %02x\n", offset, data));
@@ -10557,7 +10556,7 @@ WRITE8_MEMBER(nes_state::bmc_sbig7_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_hik8_m_w)
+WRITE8_MEMBER(nes_carts_state::bmc_hik8_m_w)
 {
 	LOG_MMC(("bmc_hik8_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -10604,7 +10603,7 @@ WRITE8_MEMBER(nes_state::bmc_hik8_m_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_hik4in1_m_w)
+WRITE8_MEMBER(nes_carts_state::bmc_hik4in1_m_w)
 {
 	LOG_MMC(("bmc_hik4in1_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -10657,7 +10656,7 @@ static void bmc_ball11_set_banks( running_machine &machine )
 	}
 }
 
-WRITE8_MEMBER(nes_state::bmc_ball11_m_w)
+WRITE8_MEMBER(nes_carts_state::bmc_ball11_m_w)
 {
 
 	LOG_MMC(("bmc_ball11_m_w, offset: %04x, data: %02x\n", offset, data));
@@ -10666,7 +10665,7 @@ WRITE8_MEMBER(nes_state::bmc_ball11_m_w)
 	bmc_ball11_set_banks(machine());
 }
 
-WRITE8_MEMBER(nes_state::bmc_ball11_w)
+WRITE8_MEMBER(nes_carts_state::bmc_ball11_w)
 {
 
 	LOG_MMC(("bmc_ball11_w, offset: %04x, data: %02x\n", offset, data));
@@ -10699,7 +10698,7 @@ WRITE8_MEMBER(nes_state::bmc_ball11_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_mario7in1_m_w)
+WRITE8_MEMBER(nes_carts_state::bmc_mario7in1_m_w)
 {
 	UINT8 map52_helper1, map52_helper2;
 	LOG_MMC(("bmc_mario7in1_m_w, offset: %04x, data: %02x\n", offset, data));
@@ -10741,7 +10740,7 @@ WRITE8_MEMBER(nes_state::bmc_mario7in1_m_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_gold7in1_m_w)
+WRITE8_MEMBER(nes_carts_state::bmc_gold7in1_m_w)
 {
 	UINT8 map52_helper1, map52_helper2;
 	LOG_MMC(("bmc_gold7in1_m_w, offset: %04x, data: %02x\n", offset, data));
@@ -10810,7 +10809,7 @@ static void bmc_gc6in1_set_chr( running_machine &machine, UINT8 chr )
 	chr1_x(machine, chr_page ^ 7, chr_base | (state->m_mmc_vrom_bank[5] & chr_mask), chr);
 }
 
-WRITE8_MEMBER(nes_state::bmc_gc6in1_l_w)
+WRITE8_MEMBER(nes_carts_state::bmc_gc6in1_l_w)
 {
 	UINT8 bank;
 	LOG_MMC(("bmc_gc6in1_l_w, offset: %04x, data: %02x\n", offset, data));
@@ -10839,7 +10838,7 @@ WRITE8_MEMBER(nes_state::bmc_gc6in1_l_w)
 	}
 }
 
-WRITE8_MEMBER(nes_state::bmc_gc6in1_w)
+WRITE8_MEMBER(nes_carts_state::bmc_gc6in1_w)
 {
 	UINT8 mmc_helper, cmd;
 	static const UINT8 conv_table[8] = {0, 6, 3, 7, 5, 2, 4, 1};
@@ -10956,7 +10955,7 @@ WRITE8_MEMBER(nes_state::bmc_gc6in1_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_family4646_m_w)
+WRITE8_MEMBER(nes_carts_state::bmc_family4646_m_w)
 {
 	LOG_MMC(("bmc_family4646_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -10977,7 +10976,7 @@ WRITE8_MEMBER(nes_state::bmc_family4646_m_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_vt5201_w)
+WRITE8_MEMBER(nes_carts_state::bmc_vt5201_w)
 {
 	LOG_MMC(("bmc_vt5201_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -10996,7 +10995,7 @@ WRITE8_MEMBER(nes_state::bmc_vt5201_w)
 	chr8(machine(), offset, CHRROM);
 }
 
-READ8_MEMBER(nes_state::bmc_vt5201_r)
+READ8_MEMBER(nes_carts_state::bmc_vt5201_r)
 {
 	LOG_MMC(("bmc_vt5201_r, offset: %04x\n", offset));
 	//  m_mmc_dipsetting = ioport("CARTDIPS")->read();
@@ -11029,7 +11028,7 @@ static void bmc_bs5_update_banks( running_machine &machine )
 	chr2_6(machine, state->m_mmc_vrom_bank[3], CHRROM);
 }
 
-WRITE8_MEMBER(nes_state::bmc_bs5_w)
+WRITE8_MEMBER(nes_carts_state::bmc_bs5_w)
 {
 	UINT8 bs5_helper = (offset & 0xc00) >> 10;
 	LOG_MMC(("bmc_bs5_w, offset: %04x, data: %02x\n", offset, data));
@@ -11056,7 +11055,7 @@ WRITE8_MEMBER(nes_state::bmc_bs5_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_810544_w)
+WRITE8_MEMBER(nes_carts_state::bmc_810544_w)
 {
 	UINT8 bank = (offset >> 7);
 	LOG_MMC(("bmc_810544_w, offset: %04x, data: %02x\n", offset, data));
@@ -11080,7 +11079,7 @@ WRITE8_MEMBER(nes_state::bmc_810544_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::bmc_ntd03_w)
+WRITE8_MEMBER(nes_carts_state::bmc_ntd03_w)
 {
 	UINT8 pbank, cbank;
 	LOG_MMC(("bmc_ntd03_w, offset: %04x, data: %02x\n", offset, data));
@@ -11129,7 +11128,7 @@ static void bmc_gb63_update( running_machine &machine )
 //      chr8(machine, 0, CHRROM);
 }
 
-WRITE8_MEMBER(nes_state::bmc_gb63_w)
+WRITE8_MEMBER(nes_carts_state::bmc_gb63_w)
 {
 	LOG_MMC(("bmc_gb63_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -11138,7 +11137,7 @@ WRITE8_MEMBER(nes_state::bmc_gb63_w)
 
 }
 
-READ8_MEMBER(nes_state::bmc_gb63_r)
+READ8_MEMBER(nes_carts_state::bmc_gb63_r)
 {
 	LOG_MMC(("bmc_gb63_r, offset: %04x\n", offset));
 	//  m_mmc_dipsetting = ioport("CARTDIPS")->read();
@@ -11155,7 +11154,7 @@ READ8_MEMBER(nes_state::bmc_gb63_r)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::edu2k_w)
+WRITE8_MEMBER(nes_carts_state::edu2k_w)
 {
 	LOG_MMC(("edu2k_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -11177,7 +11176,7 @@ static void h2288_prg_cb( running_machine &machine, int start, int bank )
 		prg8_x(machine, start, bank);
 }
 
-WRITE8_MEMBER(nes_state::h2288_l_w)
+WRITE8_MEMBER(nes_carts_state::h2288_l_w)
 {
 	LOG_MMC(("h2288_l_w offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -11197,7 +11196,7 @@ WRITE8_MEMBER(nes_state::h2288_l_w)
 	}
 }
 
-READ8_MEMBER(nes_state::h2288_l_r)
+READ8_MEMBER(nes_carts_state::h2288_l_r)
 {
 	LOG_MMC(("h2288_l_r offset: %04x\n", offset));
 	offset += 0x100;
@@ -11214,7 +11213,7 @@ READ8_MEMBER(nes_state::h2288_l_r)
 	return 0;
 }
 
-WRITE8_MEMBER(nes_state::h2288_w)
+WRITE8_MEMBER(nes_carts_state::h2288_w)
 {
 	static const UINT8 conv_table[8] = {0, 3, 1, 5, 6, 7, 2, 4};
 	LOG_MMC(("h2288_w, offset: %04x, data: %02x\n", offset, data));
@@ -11282,7 +11281,7 @@ static void shjy3_update( running_machine &machine )
 	}
 }
 
-WRITE8_MEMBER(nes_state::shjy3_w)
+WRITE8_MEMBER(nes_carts_state::shjy3_w)
 {
 	UINT8 mmc_helper, shift;
 	LOG_MMC(("shjy3_w, offset: %04x, data: %02x\n", offset, data));
@@ -11343,7 +11342,7 @@ WRITE8_MEMBER(nes_state::shjy3_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::unl_6035052_extra_w)
+WRITE8_MEMBER(nes_carts_state::unl_6035052_extra_w)
 {
 	LOG_MMC(("unl_6035052_extra_w, offset: %04x, data: %02x\n", offset, data));
 	m_mmc_latch1 = data & 0x03;
@@ -11351,7 +11350,7 @@ WRITE8_MEMBER(nes_state::unl_6035052_extra_w)
 		m_mmc_latch1 = 2;
 }
 
-READ8_MEMBER(nes_state::unl_6035052_extra_r)
+READ8_MEMBER(nes_carts_state::unl_6035052_extra_r)
 {
 	LOG_MMC(("unl_6035052_extra_r, offset: %04x\n", offset));
 	return m_mmc_latch1;
@@ -11407,7 +11406,7 @@ INLINE void pjoy84_set_base_mask( running_machine &machine )
 	state->m_mmc_chr_mask = BIT(state->m_mmc_reg[0], 7) ? 0x7f : 0xff;
 }
 
-WRITE8_MEMBER(nes_state::pjoy84_m_w)
+WRITE8_MEMBER(nes_carts_state::pjoy84_m_w)
 {
 	LOG_MMC(("pjoy84_m_w offset: %04x, data: %02x\n", offset, data));
 
@@ -11486,7 +11485,7 @@ static void someri_mmc1_set_chr( running_machine &machine )
 		chr8(machine, (state->m_mmc_reg[1] & 0x1f) >> 1, state->m_mmc_chr_source);
 }
 
-WRITE8_MEMBER(nes_state::someri_mmc1_w)
+WRITE8_MEMBER(nes_carts_state::someri_mmc1_w)
 {
 
 	assert(m_mmc_cmd1 == 2);
@@ -11545,7 +11544,7 @@ WRITE8_MEMBER(nes_state::someri_mmc1_w)
 }
 
 // MMC3 Mode emulation
-WRITE8_MEMBER(nes_state::someri_mmc3_w)
+WRITE8_MEMBER(nes_carts_state::someri_mmc3_w)
 {
 	UINT8 mmc_helper, cmd;
 
@@ -11592,7 +11591,7 @@ WRITE8_MEMBER(nes_state::someri_mmc3_w)
 }
 
 // VRC2 Mode emulation
-WRITE8_MEMBER(nes_state::someri_vrc2_w)
+WRITE8_MEMBER(nes_carts_state::someri_vrc2_w)
 {
 	UINT8 bank, shift;
 
@@ -11628,7 +11627,7 @@ WRITE8_MEMBER(nes_state::someri_vrc2_w)
 	}
 }
 
-WRITE8_MEMBER(nes_state::someri_w)
+WRITE8_MEMBER(nes_carts_state::someri_w)
 {
 	LOG_MMC(("someri_w mode %d, offset: %04x, data: %02x\n", m_mmc_cmd1, offset, data));
 
@@ -11664,7 +11663,7 @@ static void someri_mode_update( running_machine &machine )
 	}
 }
 
-WRITE8_MEMBER(nes_state::someri_l_w)
+WRITE8_MEMBER(nes_carts_state::someri_l_w)
 {
 	LOG_MMC(("someri_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -11688,7 +11687,7 @@ WRITE8_MEMBER(nes_state::someri_l_w)
 
  *************************************************************/
 
-WRITE8_MEMBER(nes_state::fujiya_m_w)
+WRITE8_MEMBER(nes_carts_state::fujiya_m_w)
 {
 	LOG_MMC(("fujiya_m_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x6000;
@@ -11697,7 +11696,7 @@ WRITE8_MEMBER(nes_state::fujiya_m_w)
 		m_mmc_latch1 = (data & 0x40) << 1;
 }
 
-READ8_MEMBER(nes_state::fujiya_m_r)
+READ8_MEMBER(nes_carts_state::fujiya_m_r)
 {
 	LOG_MMC(("fujiya_m_r, offset: %04x\n", offset));
 	offset += 0x6000;
@@ -11741,34 +11740,38 @@ struct nes_pcb_intf
 #define NES_WRITEONLY(a) \
 {write8_delegate(FUNC(a),(nes_state *)0), read8_delegate()}
 
-WRITE8_MEMBER(nes_state::dummy_l_w)
+#define NES_READWRITE(a, b) \
+{write8_delegate(FUNC(a),(nes_state *)0), read8_delegate(FUNC(b),(nes_state *)0)}
+
+
+WRITE8_MEMBER(nes_carts_state::dummy_l_w)
 {
 	logerror("write access, offset: %04x, data: %02x\n", offset + 0x4100, data);
 }
 
-WRITE8_MEMBER(nes_state::dummy_m_w)
+WRITE8_MEMBER(nes_carts_state::dummy_m_w)
 {
 	logerror("write access, offset: %04x, data: %02x\n", offset + 0x6000, data);
 }
 
-WRITE8_MEMBER(nes_state::dummy_w)
+WRITE8_MEMBER(nes_carts_state::dummy_w)
 {
 	logerror("write access, offset: %04x, data: %02x\n", offset + 0x8000, data);
 }
 
-READ8_MEMBER(nes_state::dummy_l_r)
+READ8_MEMBER(nes_carts_state::dummy_l_r)
 {
 	logerror("read access, offset: %04x\n", offset + 0x4100);
 	return 0x00;
 }
 
-READ8_MEMBER(nes_state::dummy_m_r)
+READ8_MEMBER(nes_carts_state::dummy_m_r)
 {
 	logerror("read access, offset: %04x\n", offset + 0x6000);
 	return 0x00;
 }
 
-READ8_MEMBER(nes_state::dummy_r)
+READ8_MEMBER(nes_carts_state::dummy_r)
 {
 	logerror("read access, offset: %04x\n", offset + 0x8000);
 	return 0x00;
@@ -11779,250 +11782,250 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ STD_NROM,             NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NULL, NULL },
 	{ HVC_FAMBASIC,         NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NULL, NULL },
 	{ GG_NROM,              NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NULL, NULL },
-	{ STD_UXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::uxrom_w),               NULL, NULL, NULL },
-	{ STD_UN1ROM,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::un1rom_w),              NULL, NULL, NULL },
-	{ STD_CPROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::cprom_w),               NULL, NULL, NULL },
-	{ STD_CNROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::cnrom_w),               NULL, NULL, NULL },
-	{ BANDAI_PT554,         NES_NOACCESS, NES_WRITEONLY(nes_state::bandai_pt554_m_w), NES_WRITEONLY(nes_state::cnrom_w), NULL, NULL, NULL },
-	{ STD_AXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::axrom_w),               NULL, NULL, NULL },
-	{ STD_PXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::pxrom_w),               mmc2_latch, NULL, NULL },
-	{ STD_FXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::fxrom_w),               mmc2_latch, NULL, NULL },
-	{ STD_BXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bxrom_w),               NULL, NULL, NULL },
-	{ STD_GXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::gxrom_w),               NULL, NULL, NULL },
-	{ STD_MXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::gxrom_w),               NULL, NULL, NULL },
-	{ STD_NXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::ntbrom_w),              NULL, NULL, NULL },
-	{ SUNSOFT_DCS,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::ntbrom_w),              NULL, NULL, NULL },
-	{ STD_JXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::jxrom_w),               NULL, NULL, jxrom_irq },
-	{ STD_SXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::sxrom_w),               NULL, NULL, NULL },
-	{ STD_SOROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::sxrom_w),               NULL, NULL, NULL },
-	{ STD_SXROM_A,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::sxrom_w),               NULL, NULL, NULL },
-	{ STD_SOROM_A,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::sxrom_w),               NULL, NULL, NULL },
-	{ STD_TXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::txrom_w),               NULL, NULL, mmc3_irq },
-	{ STD_TVROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::txrom_w),               NULL, NULL, mmc3_irq },
-	{ STD_TKROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::txrom_w),               NULL, NULL, mmc3_irq },
-	{ STD_HKROM,            NES_NOACCESS, {write8_delegate(FUNC(nes_state::hkrom_m_w),(nes_state *)0), read8_delegate(FUNC(nes_state::hkrom_m_r),(nes_state *)0)}, NES_WRITEONLY(nes_state::hkrom_w),     NULL, NULL, mmc3_irq },
-	{ STD_TQROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::tqrom_w),               NULL, NULL, mmc3_irq },
-	{ STD_TXSROM,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::txsrom_w),              NULL, NULL, mmc3_irq },
-	{ STD_DXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::dxrom_w),               NULL, NULL, NULL },
-	{ STD_DRROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::dxrom_w),               NULL, NULL, NULL },
-	{ NAMCOT_34X3,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::dxrom_w),               NULL, NULL, NULL },
-	{ NAMCOT_3425,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::namcot3425_w),          NULL, NULL, NULL },
-	{ NAMCOT_3446,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::namcot3446_w),          NULL, NULL, NULL },
-	{ NAMCOT_3453,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::namcot3453_w),          NULL, NULL, NULL },
-	{ STD_EXROM,            {write8_delegate(FUNC(nes_state::exrom_l_w),(nes_state *)0), read8_delegate(FUNC(nes_state::exrom_l_r),(nes_state *)0)}, NES_NOACCESS, NES_NOACCESS,               NULL, NULL, mmc5_irq },
-	{ NES_QJ,               NES_NOACCESS, NES_WRITEONLY(nes_state::qj_m_w), NES_WRITEONLY(nes_state::txrom_w),      NULL, NULL, mmc3_irq },
-	{ PAL_ZZ,               NES_NOACCESS, NES_WRITEONLY(nes_state::zz_m_w), NES_WRITEONLY(nes_state::txrom_w),      NULL, NULL, mmc3_irq },
-	{ UXROM_CC,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::uxrom_cc_w),            NULL, NULL, NULL },
+	{ STD_UXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::uxrom_w),               NULL, NULL, NULL },
+	{ STD_UN1ROM,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::un1rom_w),              NULL, NULL, NULL },
+	{ STD_CPROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::cprom_w),               NULL, NULL, NULL },
+	{ STD_CNROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::cnrom_w),               NULL, NULL, NULL },
+	{ BANDAI_PT554,         NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bandai_pt554_m_w), NES_WRITEONLY(nes_carts_state::cnrom_w), NULL, NULL, NULL },
+	{ STD_AXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::axrom_w),               NULL, NULL, NULL },
+	{ STD_PXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::pxrom_w),               mmc2_latch, NULL, NULL },
+	{ STD_FXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::fxrom_w),               mmc2_latch, NULL, NULL },
+	{ STD_BXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bxrom_w),               NULL, NULL, NULL },
+	{ STD_GXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::gxrom_w),               NULL, NULL, NULL },
+	{ STD_MXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::gxrom_w),               NULL, NULL, NULL },
+	{ STD_NXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ntbrom_w),              NULL, NULL, NULL },
+	{ SUNSOFT_DCS,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ntbrom_w),              NULL, NULL, NULL },
+	{ STD_JXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jxrom_w),               NULL, NULL, jxrom_irq },
+	{ STD_SXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sxrom_w),               NULL, NULL, NULL },
+	{ STD_SOROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sxrom_w),               NULL, NULL, NULL },
+	{ STD_SXROM_A,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sxrom_w),               NULL, NULL, NULL },
+	{ STD_SOROM_A,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sxrom_w),               NULL, NULL, NULL },
+	{ STD_TXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },
+	{ STD_TVROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },
+	{ STD_TKROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },
+	{ STD_HKROM,            NES_NOACCESS, NES_READWRITE(nes_carts_state::hkrom_m_w, nes_carts_state::hkrom_m_r), NES_WRITEONLY(nes_carts_state::hkrom_w),     NULL, NULL, mmc3_irq },
+	{ STD_TQROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tqrom_w),               NULL, NULL, mmc3_irq },
+	{ STD_TXSROM,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txsrom_w),              NULL, NULL, mmc3_irq },
+	{ STD_DXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dxrom_w),               NULL, NULL, NULL },
+	{ STD_DRROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dxrom_w),               NULL, NULL, NULL },
+	{ NAMCOT_34X3,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dxrom_w),               NULL, NULL, NULL },
+	{ NAMCOT_3425,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::namcot3425_w),          NULL, NULL, NULL },
+	{ NAMCOT_3446,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::namcot3446_w),          NULL, NULL, NULL },
+	{ NAMCOT_3453,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::namcot3453_w),          NULL, NULL, NULL },
+	{ STD_EXROM,            NES_READWRITE(nes_carts_state::exrom_l_w, nes_carts_state::exrom_l_r), NES_NOACCESS, NES_NOACCESS,               NULL, NULL, mmc5_irq },
+	{ NES_QJ,               NES_NOACCESS, NES_WRITEONLY(nes_carts_state::qj_m_w), NES_WRITEONLY(nes_carts_state::txrom_w),      NULL, NULL, mmc3_irq },
+	{ PAL_ZZ,               NES_NOACCESS, NES_WRITEONLY(nes_carts_state::zz_m_w), NES_WRITEONLY(nes_carts_state::txrom_w),      NULL, NULL, mmc3_irq },
+	{ UXROM_CC,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::uxrom_cc_w),            NULL, NULL, NULL },
 	//
-	{ DIS_74X139X74,        NES_NOACCESS, NES_WRITEONLY(nes_state::dis_74x139x74_m_w), NES_NOACCESS,     NULL, NULL, NULL },
-	{ DIS_74X377,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::dis_74x377_w),          NULL, NULL, NULL },
-	{ DIS_74X161X161X32,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::dis_74x161x161x32_w),   NULL, NULL, NULL },
-	{ DIS_74X161X138,       NES_NOACCESS, NES_WRITEONLY(nes_state::dis_74x161x138_m_w), NES_NOACCESS,    NULL, NULL, NULL },
-	{ BANDAI_LZ93,          NES_NOACCESS, NES_WRITEONLY(nes_state::lz93d50_m_w), NES_WRITEONLY(nes_state::lz93d50_w), NULL, NULL, bandai_lz_irq },
-	{ BANDAI_LZ93EX,        NES_NOACCESS, NES_WRITEONLY(nes_state::lz93d50_m_w), NES_WRITEONLY(nes_state::lz93d50_w), NULL, NULL, bandai_lz_irq },
-	{ BANDAI_FCG,           NES_NOACCESS, NES_WRITEONLY(nes_state::lz93d50_m_w), NES_WRITEONLY(nes_state::lz93d50_w), NULL, NULL, bandai_lz_irq },
-	{ BANDAI_DATACH,        NES_NOACCESS, NES_WRITEONLY(nes_state::lz93d50_m_w), NES_WRITEONLY(nes_state::lz93d50_w), NULL, NULL, bandai_lz_irq },
-	{ BANDAI_JUMP2,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::fjump2_w),              NULL, NULL, bandai_lz_irq },
-	{ BANDAI_KARAOKE,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bandai_ks_w),           NULL, NULL, NULL },
-	{ BANDAI_OEKAKIDS,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bandai_ok_w),           NULL, NULL, NULL },
-	{ IREM_G101,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::g101_w),                NULL, NULL, NULL },
-	{ IREM_LROG017,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::lrog017_w),             NULL, NULL, NULL },
-	{ IREM_H3001,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::h3001_w),               NULL, NULL, h3001_irq },
-	{ IREM_TAM_S1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::tam_s1_w),              NULL, NULL, NULL },
-	{ IREM_HOLYDIV,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::irem_hd_w),             NULL, NULL, NULL },
-	{ JALECO_SS88006,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::ss88006_w),             NULL, NULL, ss88006_irq },
-	{ JALECO_JF11,          NES_NOACCESS, NES_WRITEONLY(nes_state::jf11_m_w), NES_NOACCESS,              NULL, NULL, NULL },
-	{ JALECO_JF13,          NES_NOACCESS, NES_WRITEONLY(nes_state::jf13_m_w), NES_NOACCESS,              NULL, NULL, NULL },
-	{ JALECO_JF16,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::jf16_w),                NULL, NULL, NULL },
-	{ JALECO_JF17,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::jf17_w),                NULL, NULL, NULL },
-	{ JALECO_JF19,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::jf19_w),                NULL, NULL, NULL },
-	{ KONAMI_VRC1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::konami_vrc1_w),         NULL, NULL, NULL },
-	{ KONAMI_VRC2,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::konami_vrc2_w),         NULL, NULL, NULL },
-	{ KONAMI_VRC3,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::konami_vrc3_w),         NULL, NULL, konami_irq },
-	{ KONAMI_VRC4,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::konami_vrc4_w),         NULL, NULL, konami_irq },
-	{ KONAMI_VRC6,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::konami_vrc6_w),         NULL, NULL, konami_irq },
-	{ KONAMI_VRC7,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::konami_vrc7_w),         NULL, NULL, konami_irq },
-	{ NAMCOT_163,           {write8_delegate(FUNC(nes_state::namcot163_l_w),(nes_state *)0), read8_delegate(FUNC(nes_state::namcot163_l_r),(nes_state *)0)}, NES_NOACCESS, NES_WRITEONLY(nes_state::namcot163_w), NULL, NULL, namcot_irq },
-	{ SUNSOFT_1,            NES_NOACCESS, NES_WRITEONLY(nes_state::sunsoft1_m_w), NES_NOACCESS,          NULL, NULL, NULL },
-	{ SUNSOFT_2,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::sunsoft2_w),            NULL, NULL, NULL },
-	{ SUNSOFT_3,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::sunsoft3_w),            NULL, NULL, sunsoft3_irq },
-	{ TAITO_TC0190FMC,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::tc0190fmc_w),           NULL, NULL, NULL },
-	{ TAITO_TC0190FMCP,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::tc0190fmc_p16_w),       NULL, NULL, mmc3_irq },
-	{ TAITO_X1_005,         NES_NOACCESS, {write8_delegate(FUNC(nes_state::x1005_m_w),(nes_state *)0), read8_delegate(FUNC(nes_state::x1005_m_r),(nes_state *)0)}, NES_NOACCESS,               NULL, NULL, NULL },
-	{ TAITO_X1_005_A,       NES_NOACCESS, {write8_delegate(FUNC(nes_state::x1005a_m_w),(nes_state *)0), read8_delegate(FUNC(nes_state::x1005_m_r),(nes_state *)0)}, NES_NOACCESS,              NULL, NULL, NULL },
-	{ TAITO_X1_017,         NES_NOACCESS, {write8_delegate(FUNC(nes_state::x1017_m_w),(nes_state *)0), read8_delegate(FUNC(nes_state::x1017_m_r),(nes_state *)0)}, NES_NOACCESS,               NULL, NULL, NULL },
+	{ DIS_74X139X74,        NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dis_74x139x74_m_w), NES_NOACCESS,     NULL, NULL, NULL },
+	{ DIS_74X377,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dis_74x377_w),          NULL, NULL, NULL },
+	{ DIS_74X161X161X32,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dis_74x161x161x32_w),   NULL, NULL, NULL },
+	{ DIS_74X161X138,       NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dis_74x161x138_m_w), NES_NOACCESS,    NULL, NULL, NULL },
+	{ BANDAI_LZ93,          NES_NOACCESS, NES_WRITEONLY(nes_carts_state::lz93d50_m_w), NES_WRITEONLY(nes_carts_state::lz93d50_w), NULL, NULL, bandai_lz_irq },
+	{ BANDAI_LZ93EX,        NES_NOACCESS, NES_WRITEONLY(nes_carts_state::lz93d50_m_w), NES_WRITEONLY(nes_carts_state::lz93d50_w), NULL, NULL, bandai_lz_irq },
+	{ BANDAI_FCG,           NES_NOACCESS, NES_WRITEONLY(nes_carts_state::lz93d50_m_w), NES_WRITEONLY(nes_carts_state::lz93d50_w), NULL, NULL, bandai_lz_irq },
+	{ BANDAI_DATACH,        NES_NOACCESS, NES_WRITEONLY(nes_carts_state::lz93d50_m_w), NES_WRITEONLY(nes_carts_state::lz93d50_w), NULL, NULL, bandai_lz_irq },
+	{ BANDAI_JUMP2,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::fjump2_w),              NULL, NULL, bandai_lz_irq },
+	{ BANDAI_KARAOKE,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bandai_ks_w),           NULL, NULL, NULL },
+	{ BANDAI_OEKAKIDS,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bandai_ok_w),           NULL, NULL, NULL },
+	{ IREM_G101,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::g101_w),                NULL, NULL, NULL },
+	{ IREM_LROG017,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::lrog017_w),             NULL, NULL, NULL },
+	{ IREM_H3001,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::h3001_w),               NULL, NULL, h3001_irq },
+	{ IREM_TAM_S1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tam_s1_w),              NULL, NULL, NULL },
+	{ IREM_HOLYDIV,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::irem_hd_w),             NULL, NULL, NULL },
+	{ JALECO_SS88006,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ss88006_w),             NULL, NULL, ss88006_irq },
+	{ JALECO_JF11,          NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jf11_m_w), NES_NOACCESS,              NULL, NULL, NULL },
+	{ JALECO_JF13,          NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jf13_m_w), NES_NOACCESS,              NULL, NULL, NULL },
+	{ JALECO_JF16,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jf16_w),                NULL, NULL, NULL },
+	{ JALECO_JF17,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jf17_w),                NULL, NULL, NULL },
+	{ JALECO_JF19,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jf19_w),                NULL, NULL, NULL },
+	{ KONAMI_VRC1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc1_w),         NULL, NULL, NULL },
+	{ KONAMI_VRC2,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc2_w),         NULL, NULL, NULL },
+	{ KONAMI_VRC3,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc3_w),         NULL, NULL, konami_irq },
+	{ KONAMI_VRC4,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc4_w),         NULL, NULL, konami_irq },
+	{ KONAMI_VRC6,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc6_w),         NULL, NULL, konami_irq },
+	{ KONAMI_VRC7,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc7_w),         NULL, NULL, konami_irq },
+	{ NAMCOT_163,           NES_READWRITE(nes_carts_state::namcot163_l_w, nes_carts_state::namcot163_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::namcot163_w), NULL, NULL, namcot_irq },
+	{ SUNSOFT_1,            NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sunsoft1_m_w), NES_NOACCESS,          NULL, NULL, NULL },
+	{ SUNSOFT_2,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sunsoft2_w),            NULL, NULL, NULL },
+	{ SUNSOFT_3,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sunsoft3_w),            NULL, NULL, sunsoft3_irq },
+	{ TAITO_TC0190FMC,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tc0190fmc_w),           NULL, NULL, NULL },
+	{ TAITO_TC0190FMCP,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tc0190fmc_p16_w),       NULL, NULL, mmc3_irq },
+	{ TAITO_X1_005,         NES_NOACCESS, NES_READWRITE(nes_carts_state::x1005_m_w, nes_carts_state::x1005_m_r), NES_NOACCESS,               NULL, NULL, NULL },
+	{ TAITO_X1_005_A,       NES_NOACCESS, NES_READWRITE(nes_carts_state::x1005a_m_w, nes_carts_state::x1005_m_r), NES_NOACCESS,              NULL, NULL, NULL },
+	{ TAITO_X1_017,         NES_NOACCESS, NES_READWRITE(nes_carts_state::x1017_m_w, nes_carts_state::x1017_m_r), NES_NOACCESS,               NULL, NULL, NULL },
 	//
-	{ AGCI_50282,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::agci_50282_w),          NULL, NULL, NULL },
-	{ ACTENT_ACT52,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::ae_act52_w),            NULL, NULL, NULL },
-	{ AVE_NINA01,           NES_NOACCESS, NES_WRITEONLY(nes_state::nina01_m_w), NES_NOACCESS,            NULL, NULL, NULL },
-	{ AVE_NINA06,           NES_WRITEONLY(nes_state::nina06_l_w), NES_NOACCESS, NES_NOACCESS,            NULL, NULL, NULL },
-	{ CNE_DECATHLON,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::cne_decathl_w),         NULL, NULL, NULL },
-	{ CNE_FSB,              NES_NOACCESS, NES_WRITEONLY(nes_state::cne_fsb_m_w), NES_NOACCESS,           NULL, NULL, NULL },
-	{ CNE_SHLZ,             NES_WRITEONLY(nes_state::cne_shlz_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NULL, NULL },
-	{ CALTRON_6IN1,         NES_NOACCESS, NES_WRITEONLY(nes_state::caltron6in1_m_w), NES_WRITEONLY(nes_state::caltron6in1_w),      NULL, NULL, NULL },
-	{ CAMERICA_BF9093,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bf9093_w),              NULL, NULL, NULL },
-	{ CAMERICA_BF9097,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bf9093_w),              NULL, NULL, NULL },
-	{ CAMERICA_BF9096,      NES_NOACCESS, NES_WRITEONLY(nes_state::bf9096_w), NES_WRITEONLY(nes_state::bf9096_w),   NULL, NULL, NULL },
-	{ CAMERICA_GOLDENFIVE,  NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::golden5_w),             NULL, NULL, NULL },
-	{ CONY_BOARD,           {write8_delegate(FUNC(nes_state::cony_l_w),(nes_state *)0), read8_delegate(FUNC(nes_state::cony_l_r),(nes_state *)0)}, NES_NOACCESS, NES_WRITEONLY(nes_state::cony_w),        NULL, NULL, sunsoft3_irq },
-	{ YOKO_BOARD,           {write8_delegate(FUNC(nes_state::yoko_l_w),(nes_state *)0), read8_delegate(FUNC(nes_state::yoko_l_r),(nes_state *)0)}, NES_NOACCESS, NES_WRITEONLY(nes_state::yoko_w),        NULL, NULL, sunsoft3_irq },
-	{ DREAMTECH_BOARD,      NES_WRITEONLY(nes_state::dreamtech_l_w), NES_NOACCESS, NES_NOACCESS,         NULL, NULL, NULL },
-	{ FUTUREMEDIA_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::futuremedia_w),         NULL, NULL, futuremedia_irq },
-	{ FUKUTAKE_BOARD,       {write8_delegate(FUNC(nes_state::fukutake_l_w),(nes_state *)0), read8_delegate(FUNC(nes_state::fukutake_l_r),(nes_state *)0)}, NES_NOACCESS, NES_NOACCESS,         NULL, NULL, NULL },
-	{ GOUDER_37017,         {write8_delegate(FUNC(nes_state::gouder_sf4_l_w),(nes_state *)0), read8_delegate(FUNC(nes_state::gouder_sf4_l_r),(nes_state *)0)}, NES_NOACCESS, NES_WRITEONLY(nes_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ HENGEDIANZI_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::henggedianzi_w),        NULL, NULL, NULL },
-	{ HENGEDIANZI_XJZB,     NES_WRITEONLY(nes_state::heng_xjzb_l_w), NES_NOACCESS, NES_WRITEONLY(nes_state::heng_xjzb_w), NULL, NULL, NULL },
-	{ HES6IN1_BOARD,        NES_WRITEONLY(nes_state::hes6in1_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, NULL },
-	{ HES_BOARD,            NES_WRITEONLY(nes_state::hes_l_w), NES_NOACCESS, NES_NOACCESS,               NULL, NULL, NULL },
-	{ HOSENKAN_BOARD,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::hosenkan_w),            NULL, NULL, mmc3_irq },
-	{ KAISER_KS7058,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::ks7058_w),              NULL, NULL, NULL },
-	{ KAISER_KS7022,        NES_NOACCESS, NES_NOACCESS, {write8_delegate(FUNC(nes_state::ks7022_w),(nes_state *)0), read8_delegate(FUNC(nes_state::ks7022_r),(nes_state *)0)},                 NULL, NULL, NULL },
-	{ KAISER_KS7032,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::ks7032_w),              NULL, NULL, ks7032_irq },
-	{ KAISER_KS202,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::ks202_w),               NULL, NULL, ks7032_irq },
-	{ KAISER_KS7017,		NES_WRITEONLY(nes_state::ks7017_l_w), NES_NOACCESS, NES_NOACCESS,            NULL, NULL, mmc_fds_irq },
-	{ KAY_PANDAPRINCE,      {write8_delegate(FUNC(nes_state::kay_pp_l_w),(nes_state *)0), read8_delegate(FUNC(nes_state::kay_pp_l_r),(nes_state *)0)}, NES_NOACCESS, NES_WRITEONLY(nes_state::kay_pp_w),  NULL, NULL, mmc3_irq },
-	{ KASING_BOARD,         NES_NOACCESS, NES_WRITEONLY(nes_state::kasing_m_w), NES_WRITEONLY(nes_state::txrom_w),  NULL, NULL, mmc3_irq },
-	{ SACHEN_74LS374,       {write8_delegate(FUNC(nes_state::sachen_74x374_l_w),(nes_state *)0), read8_delegate(FUNC(nes_state::sachen_74x374_l_r),(nes_state *)0)}, NES_NOACCESS, NES_NOACCESS, NULL, NULL, NULL },
-	{ SACHEN_74LS374_A,     NES_WRITEONLY(nes_state::sachen_74x374a_l_w), NES_NOACCESS, NES_NOACCESS,    NULL, NULL, NULL },
-	{ SACHEN_8259A,         NES_WRITEONLY(nes_state::s8259_l_w), NES_WRITEONLY(nes_state::s8259_m_w), NES_NOACCESS, NULL, NULL, NULL },
-	{ SACHEN_8259B,         NES_WRITEONLY(nes_state::s8259_l_w), NES_WRITEONLY(nes_state::s8259_m_w), NES_NOACCESS, NULL, NULL, NULL },
-	{ SACHEN_8259C,         NES_WRITEONLY(nes_state::s8259_l_w), NES_WRITEONLY(nes_state::s8259_m_w), NES_NOACCESS, NULL, NULL, NULL },
-	{ SACHEN_8259D,         NES_WRITEONLY(nes_state::s8259_l_w), NES_WRITEONLY(nes_state::s8259_m_w), NES_NOACCESS, NULL, NULL, NULL },
-	{ SACHEN_SA009,         NES_WRITEONLY(nes_state::sa009_l_w), NES_NOACCESS, NES_NOACCESS,             NULL, NULL, NULL },
-	{ SACHEN_SA0036,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::sa0036_w),              NULL, NULL, NULL },
-	{ SACHEN_SA0037,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::sa0037_w),              NULL, NULL, NULL },
-	{ SACHEN_SA72007,       NES_WRITEONLY(nes_state::sa72007_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, NULL },
-	{ SACHEN_SA72008,       NES_WRITEONLY(nes_state::sa72008_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, NULL },
-	{ SACHEN_TCA01,         NES_READONLY(nes_state::tca01_l_r), NES_NOACCESS, NES_NOACCESS,              NULL, NULL, NULL },
-	{ SACHEN_TCU01,         NES_WRITEONLY(nes_state::tcu01_l_w), NES_WRITEONLY(nes_state::tcu01_m_w), NES_WRITEONLY(nes_state::tcu01_w), NULL, NULL, NULL },
-	{ SACHEN_TCU02,         {write8_delegate(FUNC(nes_state::tcu02_l_w),(nes_state *)0), read8_delegate(FUNC(nes_state::tcu02_l_r),(nes_state *)0)}, NES_NOACCESS, NES_NOACCESS,               NULL, NULL, NULL },
-	{ SUBOR_TYPE0,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::subor0_w),              NULL, NULL, NULL },
-	{ SUBOR_TYPE1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::subor1_w),              NULL, NULL, NULL },
-	{ MAGICSERIES_MD,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::magics_md_w),           NULL, NULL, NULL },
-	{ NANJING_BOARD,        {write8_delegate(FUNC(nes_state::nanjing_l_w),(nes_state *)0), read8_delegate(FUNC(nes_state::nanjing_l_r),(nes_state *)0)}, NES_NOACCESS, NES_NOACCESS,           NULL, NULL, nanjing_irq },
-	{ NITRA_TDA,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::nitra_w),               NULL, NULL, mmc3_irq },
-	{ NTDEC_ASDER,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::ntdec_asder_w),         NULL, NULL, NULL },
-	{ NTDEC_FIGHTINGHERO,   NES_NOACCESS, NES_WRITEONLY(nes_state::ntdec_fh_m_w), NES_NOACCESS,          NULL, NULL, NULL },
-	{ OPENCORP_DAOU306,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::daou306_w),             NULL, NULL, NULL },
-	{ RCM_GS2015,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::gs2015_w),              NULL, NULL, NULL },
-	{ RCM_TETRISFAMILY,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::rcm_tf_w),              NULL, NULL, NULL },
-	{ REXSOFT_DBZ5,         {write8_delegate(FUNC(nes_state::rex_dbz_l_w),(nes_state *)0), read8_delegate(FUNC(nes_state::rex_dbz_l_r),(nes_state *)0)}, NES_READONLY(nes_state::rex_dbz_l_r), NES_WRITEONLY(nes_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ REXSOFT_SL1632,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::rex_sl1632_w),          NULL, NULL, mmc3_irq },
-	{ RUMBLESTATION_BOARD,  NES_NOACCESS, NES_WRITEONLY(nes_state::rumblestation_m_w), NES_WRITEONLY(nes_state::rumblestation_w),      NULL, NULL, NULL },
-	{ SOMERI_SL12,          NES_WRITEONLY(nes_state::someri_l_w), NES_NOACCESS, NES_WRITEONLY(nes_state::someri_w), NULL, NULL, mmc3_irq },
-	{ SUPERGAME_BOOGERMAN,  NES_WRITEONLY(nes_state::sgame_boog_l_w), NES_WRITEONLY(nes_state::sgame_boog_m_w), NES_WRITEONLY(nes_state::sgame_boog_w), NULL, NULL, mmc3_irq },
-	{ SUPERGAME_LIONKING,   NES_NOACCESS, NES_WRITEONLY(nes_state::sgame_lion_m_w), NES_WRITEONLY(nes_state::sgame_lion_w), NULL, NULL, mmc3_irq },
-	{ TENGEN_800008,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::tengen_800008_w),       NULL, NULL, NULL },
-	{ TENGEN_800032,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::tengen_800032_w),       NULL, NULL, tengen_800032_irq },
-	{ TENGEN_800037,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::tengen_800037_w),       NULL, NULL, tengen_800032_irq },
-	{ TXC_22211A,           {write8_delegate(FUNC(nes_state::txc_22211_l_w),(nes_state *)0), read8_delegate(FUNC(nes_state::txc_22211_l_r),(nes_state *)0)}, NES_NOACCESS, NES_WRITEONLY(nes_state::txc_22211_w), NULL, NULL, NULL },
-	{ TXC_22211B,           {write8_delegate(FUNC(nes_state::txc_22211_l_w),(nes_state *)0), read8_delegate(FUNC(nes_state::txc_22211_l_r),(nes_state *)0)}, NES_NOACCESS, NES_WRITEONLY(nes_state::txc_22211b_w), NULL, NULL, NULL },
-	{ TXC_22211C,           {write8_delegate(FUNC(nes_state::txc_22211_l_w),(nes_state *)0), read8_delegate(FUNC(nes_state::txc_22211c_l_r),(nes_state *)0)}, NES_NOACCESS, NES_WRITEONLY(nes_state::txc_22211_w), NULL, NULL, NULL },
-	{ TXC_TW,               NES_WRITEONLY(nes_state::txc_tw_l_w), NES_WRITEONLY(nes_state::txc_tw_m_w), NES_WRITEONLY(nes_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ TXC_STRIKEWOLF,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::txc_strikewolf_w),      NULL, NULL, NULL },
-	{ TXC_MXMDHTWO,         NES_READONLY(nes_state::txc_mxmdhtwo_l_r), NES_NOACCESS, NES_WRITEONLY(nes_state::txc_mxmdhtwo_w), NULL, NULL, NULL },
-	{ WAIXING_TYPE_A,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::waixing_a_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_A_1,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::waixing_a_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_B,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::waixing_a_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_C,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::waixing_a_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_D,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::waixing_a_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_E,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::waixing_a_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_F,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::waixing_f_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_G,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::waixing_g_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_H,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::waixing_h_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_I,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::txrom_w),               NULL, NULL, mmc3_irq },	// this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
-	{ WAIXING_TYPE_J,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::txrom_w),               NULL, NULL, mmc3_irq },	// this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
-	{ WAIXING_SGZ,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::waixing_sgz_w),         NULL, NULL, konami_irq },
-	{ WAIXING_SGZLZ,        NES_WRITEONLY(nes_state::waixing_sgzlz_l_w), NES_NOACCESS, NES_NOACCESS,     NULL, NULL, NULL },
-	{ WAIXING_FFV,          NES_WRITEONLY(nes_state::waixing_ffv_l_w), NES_NOACCESS, NES_NOACCESS,       NULL, NULL, NULL },
-	{ WAIXING_ZS,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::waixing_zs_w),          NULL, NULL, NULL },
-	{ WAIXING_DQ8,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::waixing_dq8_w),         NULL, NULL, NULL },
-	{ WAIXING_SECURITY,     NES_WRITEONLY(nes_state::waixing_sec_l_w), NES_NOACCESS, NES_WRITEONLY(nes_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ WAIXING_SH2,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::txrom_w),               NULL, NULL, mmc3_irq },	// this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
-	{ WAIXING_PS2,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::waixing_ps2_w),         NULL, NULL, NULL },
-	{ UNL_8237,             NES_WRITEONLY(nes_state::unl_8237_l_w), NES_NOACCESS, NES_WRITEONLY(nes_state::unl_8237_w),      NULL, NULL, mmc3_irq },
-	{ UNL_AX5705,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::unl_ax5705_w),          NULL, NULL, NULL },
-	{ UNL_CC21,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::unl_cc21_w),            NULL, NULL, NULL },
-	{ UNL_KOF97,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::unl_kof97_w),           NULL, NULL, mmc3_irq },
-	{ UNL_KS7057,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::ks7057_w),              NULL, NULL, mmc3_irq },
-	{ UNL_T230,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::unl_t230_w),            NULL, NULL, konami_irq },
-	{ UNL_KOF96,            {write8_delegate(FUNC(nes_state::kof96_l_w),(nes_state *)0), read8_delegate(FUNC(nes_state::kof96_l_r),(nes_state *)0)}, NES_NOACCESS, NES_WRITEONLY(nes_state::kof96_w),     NULL, NULL, mmc3_irq },
-	{ UNL_MK2,              NES_NOACCESS, NES_WRITEONLY(nes_state::mk2_m_w), NES_NOACCESS,               NULL, NULL, mmc3_irq },
-	{ UNL_N625092,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::n625092_w),             NULL, NULL, NULL },
-	{ UNL_SC127,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::sc127_w),               NULL, NULL, sc127_irq },
-	{ UNL_SMB2J,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::smb2j_w),               NULL, NULL, NULL },
-	{ UNL_SUPERFIGHTER3,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::unl_sf3_w),             NULL, NULL, mmc3_irq },
-	{ UNL_XZY,              NES_WRITEONLY(nes_state::unl_xzy_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, NULL },
-	{ UNL_RACERMATE,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::unl_racmate_w),         NULL, NULL, NULL },
-	{ UNL_STUDYNGAME,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::sng32_w),               NULL, NULL, NULL },
-	{ UNL_603_5052,         {write8_delegate(FUNC(nes_state::unl_6035052_extra_w),(nes_state *)0), read8_delegate(FUNC(nes_state::unl_6035052_extra_r),(nes_state *)0)}, {write8_delegate(FUNC(nes_state::unl_6035052_extra_w),(nes_state *)0), read8_delegate(FUNC(nes_state::unl_6035052_extra_r),(nes_state *)0)}, NES_WRITEONLY(nes_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ UNL_EDU2K,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::edu2k_w),               NULL, NULL, NULL },
-	{ UNL_SHJY3,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::shjy3_w),               NULL, NULL, shjy3_irq },
-	{ UNL_H2288,            {write8_delegate(FUNC(nes_state::h2288_l_w),(nes_state *)0), read8_delegate(FUNC(nes_state::h2288_l_r),(nes_state *)0)}, NES_NOACCESS, NES_WRITEONLY(nes_state::h2288_w),     NULL, NULL, mmc3_irq },
-	{ UNL_FS304,            NES_WRITEONLY(nes_state::unl_fs304_l_w), NES_NOACCESS, NES_NOACCESS,         NULL, NULL, NULL },
+	{ AGCI_50282,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::agci_50282_w),          NULL, NULL, NULL },
+	{ ACTENT_ACT52,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ae_act52_w),            NULL, NULL, NULL },
+	{ AVE_NINA01,           NES_NOACCESS, NES_WRITEONLY(nes_carts_state::nina01_m_w), NES_NOACCESS,            NULL, NULL, NULL },
+	{ AVE_NINA06,           NES_WRITEONLY(nes_carts_state::nina06_l_w), NES_NOACCESS, NES_NOACCESS,            NULL, NULL, NULL },
+	{ CNE_DECATHLON,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::cne_decathl_w),         NULL, NULL, NULL },
+	{ CNE_FSB,              NES_NOACCESS, NES_WRITEONLY(nes_carts_state::cne_fsb_m_w), NES_NOACCESS,           NULL, NULL, NULL },
+	{ CNE_SHLZ,             NES_WRITEONLY(nes_carts_state::cne_shlz_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NULL, NULL },
+	{ CALTRON_6IN1,         NES_NOACCESS, NES_WRITEONLY(nes_carts_state::caltron6in1_m_w), NES_WRITEONLY(nes_carts_state::caltron6in1_w),      NULL, NULL, NULL },
+	{ CAMERICA_BF9093,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bf9093_w),              NULL, NULL, NULL },
+	{ CAMERICA_BF9097,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bf9093_w),              NULL, NULL, NULL },
+	{ CAMERICA_BF9096,      NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bf9096_w), NES_WRITEONLY(nes_carts_state::bf9096_w),   NULL, NULL, NULL },
+	{ CAMERICA_GOLDENFIVE,  NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::golden5_w),             NULL, NULL, NULL },
+	{ CONY_BOARD,           NES_READWRITE(nes_carts_state::cony_l_w, nes_carts_state::cony_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::cony_w),        NULL, NULL, sunsoft3_irq },
+	{ YOKO_BOARD,           NES_READWRITE(nes_carts_state::yoko_l_w, nes_carts_state::yoko_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::yoko_w),        NULL, NULL, sunsoft3_irq },
+	{ DREAMTECH_BOARD,      NES_WRITEONLY(nes_carts_state::dreamtech_l_w), NES_NOACCESS, NES_NOACCESS,         NULL, NULL, NULL },
+	{ FUTUREMEDIA_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::futuremedia_w),         NULL, NULL, futuremedia_irq },
+	{ FUKUTAKE_BOARD,       NES_READWRITE(nes_carts_state::fukutake_l_w, nes_carts_state::fukutake_l_r), NES_NOACCESS, NES_NOACCESS,         NULL, NULL, NULL },
+	{ GOUDER_37017,         NES_READWRITE(nes_carts_state::gouder_sf4_l_w, nes_carts_state::gouder_sf4_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
+	{ HENGEDIANZI_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::henggedianzi_w),        NULL, NULL, NULL },
+	{ HENGEDIANZI_XJZB,     NES_WRITEONLY(nes_carts_state::heng_xjzb_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::heng_xjzb_w), NULL, NULL, NULL },
+	{ HES6IN1_BOARD,        NES_WRITEONLY(nes_carts_state::hes6in1_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, NULL },
+	{ HES_BOARD,            NES_WRITEONLY(nes_carts_state::hes_l_w), NES_NOACCESS, NES_NOACCESS,               NULL, NULL, NULL },
+	{ HOSENKAN_BOARD,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::hosenkan_w),            NULL, NULL, mmc3_irq },
+	{ KAISER_KS7058,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ks7058_w),              NULL, NULL, NULL },
+	{ KAISER_KS7022,        NES_NOACCESS, NES_NOACCESS, NES_READWRITE(nes_carts_state::ks7022_w, nes_carts_state::ks7022_r),                 NULL, NULL, NULL },
+	{ KAISER_KS7032,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ks7032_w),              NULL, NULL, ks7032_irq },
+	{ KAISER_KS202,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ks202_w),               NULL, NULL, ks7032_irq },
+	{ KAISER_KS7017,		NES_WRITEONLY(nes_carts_state::ks7017_l_w), NES_NOACCESS, NES_NOACCESS,            NULL, NULL, mmc_fds_irq },
+	{ KAY_PANDAPRINCE,      NES_READWRITE(nes_carts_state::kay_pp_l_w, nes_carts_state::kay_pp_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::kay_pp_w),  NULL, NULL, mmc3_irq },
+	{ KASING_BOARD,         NES_NOACCESS, NES_WRITEONLY(nes_carts_state::kasing_m_w), NES_WRITEONLY(nes_carts_state::txrom_w),  NULL, NULL, mmc3_irq },
+	{ SACHEN_74LS374,       NES_READWRITE(nes_carts_state::sachen_74x374_l_w, nes_carts_state::sachen_74x374_l_r), NES_NOACCESS, NES_NOACCESS, NULL, NULL, NULL },
+	{ SACHEN_74LS374_A,     NES_WRITEONLY(nes_carts_state::sachen_74x374a_l_w), NES_NOACCESS, NES_NOACCESS,    NULL, NULL, NULL },
+	{ SACHEN_8259A,         NES_WRITEONLY(nes_carts_state::s8259_l_w), NES_WRITEONLY(nes_carts_state::s8259_m_w), NES_NOACCESS, NULL, NULL, NULL },
+	{ SACHEN_8259B,         NES_WRITEONLY(nes_carts_state::s8259_l_w), NES_WRITEONLY(nes_carts_state::s8259_m_w), NES_NOACCESS, NULL, NULL, NULL },
+	{ SACHEN_8259C,         NES_WRITEONLY(nes_carts_state::s8259_l_w), NES_WRITEONLY(nes_carts_state::s8259_m_w), NES_NOACCESS, NULL, NULL, NULL },
+	{ SACHEN_8259D,         NES_WRITEONLY(nes_carts_state::s8259_l_w), NES_WRITEONLY(nes_carts_state::s8259_m_w), NES_NOACCESS, NULL, NULL, NULL },
+	{ SACHEN_SA009,         NES_WRITEONLY(nes_carts_state::sa009_l_w), NES_NOACCESS, NES_NOACCESS,             NULL, NULL, NULL },
+	{ SACHEN_SA0036,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sa0036_w),              NULL, NULL, NULL },
+	{ SACHEN_SA0037,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sa0037_w),              NULL, NULL, NULL },
+	{ SACHEN_SA72007,       NES_WRITEONLY(nes_carts_state::sa72007_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, NULL },
+	{ SACHEN_SA72008,       NES_WRITEONLY(nes_carts_state::sa72008_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, NULL },
+	{ SACHEN_TCA01,         NES_READONLY(nes_carts_state::tca01_l_r), NES_NOACCESS, NES_NOACCESS,              NULL, NULL, NULL },
+	{ SACHEN_TCU01,         NES_WRITEONLY(nes_carts_state::tcu01_l_w), NES_WRITEONLY(nes_carts_state::tcu01_m_w), NES_WRITEONLY(nes_carts_state::tcu01_w), NULL, NULL, NULL },
+	{ SACHEN_TCU02,         NES_READWRITE(nes_carts_state::tcu02_l_w, nes_carts_state::tcu02_l_r), NES_NOACCESS, NES_NOACCESS,               NULL, NULL, NULL },
+	{ SUBOR_TYPE0,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::subor0_w),              NULL, NULL, NULL },
+	{ SUBOR_TYPE1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::subor1_w),              NULL, NULL, NULL },
+	{ MAGICSERIES_MD,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::magics_md_w),           NULL, NULL, NULL },
+	{ NANJING_BOARD,        NES_READWRITE(nes_carts_state::nanjing_l_w, nes_carts_state::nanjing_l_r), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, nanjing_irq },
+	{ NITRA_TDA,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::nitra_w),               NULL, NULL, mmc3_irq },
+	{ NTDEC_ASDER,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ntdec_asder_w),         NULL, NULL, NULL },
+	{ NTDEC_FIGHTINGHERO,   NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ntdec_fh_m_w), NES_NOACCESS,          NULL, NULL, NULL },
+	{ OPENCORP_DAOU306,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::daou306_w),             NULL, NULL, NULL },
+	{ RCM_GS2015,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::gs2015_w),              NULL, NULL, NULL },
+	{ RCM_TETRISFAMILY,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::rcm_tf_w),              NULL, NULL, NULL },
+	{ REXSOFT_DBZ5,         NES_READWRITE(nes_carts_state::rex_dbz_l_w, nes_carts_state::rex_dbz_l_r), NES_READONLY(nes_carts_state::rex_dbz_l_r), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
+	{ REXSOFT_SL1632,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::rex_sl1632_w),          NULL, NULL, mmc3_irq },
+	{ RUMBLESTATION_BOARD,  NES_NOACCESS, NES_WRITEONLY(nes_carts_state::rumblestation_m_w), NES_WRITEONLY(nes_carts_state::rumblestation_w),      NULL, NULL, NULL },
+	{ SOMERI_SL12,          NES_WRITEONLY(nes_carts_state::someri_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::someri_w), NULL, NULL, mmc3_irq },
+	{ SUPERGAME_BOOGERMAN,  NES_WRITEONLY(nes_carts_state::sgame_boog_l_w), NES_WRITEONLY(nes_carts_state::sgame_boog_m_w), NES_WRITEONLY(nes_carts_state::sgame_boog_w), NULL, NULL, mmc3_irq },
+	{ SUPERGAME_LIONKING,   NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sgame_lion_m_w), NES_WRITEONLY(nes_carts_state::sgame_lion_w), NULL, NULL, mmc3_irq },
+	{ TENGEN_800008,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tengen_800008_w),       NULL, NULL, NULL },
+	{ TENGEN_800032,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tengen_800032_w),       NULL, NULL, tengen_800032_irq },
+	{ TENGEN_800037,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tengen_800037_w),       NULL, NULL, tengen_800032_irq },
+	{ TXC_22211A,           NES_READWRITE(nes_carts_state::txc_22211_l_w, nes_carts_state::txc_22211_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txc_22211_w), NULL, NULL, NULL },
+	{ TXC_22211B,           NES_READWRITE(nes_carts_state::txc_22211_l_w, nes_carts_state::txc_22211_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txc_22211b_w), NULL, NULL, NULL },
+	{ TXC_22211C,           NES_READWRITE(nes_carts_state::txc_22211_l_w, nes_carts_state::txc_22211c_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txc_22211_w), NULL, NULL, NULL },
+	{ TXC_TW,               NES_WRITEONLY(nes_carts_state::txc_tw_l_w), NES_WRITEONLY(nes_carts_state::txc_tw_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
+	{ TXC_STRIKEWOLF,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txc_strikewolf_w),      NULL, NULL, NULL },
+	{ TXC_MXMDHTWO,         NES_READONLY(nes_carts_state::txc_mxmdhtwo_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txc_mxmdhtwo_w), NULL, NULL, NULL },
+	{ WAIXING_TYPE_A,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NULL, mmc3_irq },
+	{ WAIXING_TYPE_A_1,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NULL, mmc3_irq },
+	{ WAIXING_TYPE_B,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NULL, mmc3_irq },
+	{ WAIXING_TYPE_C,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NULL, mmc3_irq },
+	{ WAIXING_TYPE_D,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NULL, mmc3_irq },
+	{ WAIXING_TYPE_E,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NULL, mmc3_irq },
+	{ WAIXING_TYPE_F,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_f_w),           NULL, NULL, mmc3_irq },
+	{ WAIXING_TYPE_G,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_g_w),           NULL, NULL, mmc3_irq },
+	{ WAIXING_TYPE_H,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_h_w),           NULL, NULL, mmc3_irq },
+	{ WAIXING_TYPE_I,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },	// this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
+	{ WAIXING_TYPE_J,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },	// this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
+	{ WAIXING_SGZ,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_sgz_w),         NULL, NULL, konami_irq },
+	{ WAIXING_SGZLZ,        NES_WRITEONLY(nes_carts_state::waixing_sgzlz_l_w), NES_NOACCESS, NES_NOACCESS,     NULL, NULL, NULL },
+	{ WAIXING_FFV,          NES_WRITEONLY(nes_carts_state::waixing_ffv_l_w), NES_NOACCESS, NES_NOACCESS,       NULL, NULL, NULL },
+	{ WAIXING_ZS,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_zs_w),          NULL, NULL, NULL },
+	{ WAIXING_DQ8,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_dq8_w),         NULL, NULL, NULL },
+	{ WAIXING_SECURITY,     NES_WRITEONLY(nes_carts_state::waixing_sec_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
+	{ WAIXING_SH2,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },	// this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
+	{ WAIXING_PS2,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_ps2_w),         NULL, NULL, NULL },
+	{ UNL_8237,             NES_WRITEONLY(nes_carts_state::unl_8237_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_8237_w),      NULL, NULL, mmc3_irq },
+	{ UNL_AX5705,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_ax5705_w),          NULL, NULL, NULL },
+	{ UNL_CC21,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_cc21_w),            NULL, NULL, NULL },
+	{ UNL_KOF97,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_kof97_w),           NULL, NULL, mmc3_irq },
+	{ UNL_KS7057,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ks7057_w),              NULL, NULL, mmc3_irq },
+	{ UNL_T230,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_t230_w),            NULL, NULL, konami_irq },
+	{ UNL_KOF96,            NES_READWRITE(nes_carts_state::kof96_l_w, nes_carts_state::kof96_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::kof96_w),     NULL, NULL, mmc3_irq },
+	{ UNL_MK2,              NES_NOACCESS, NES_WRITEONLY(nes_carts_state::mk2_m_w), NES_NOACCESS,               NULL, NULL, mmc3_irq },
+	{ UNL_N625092,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::n625092_w),             NULL, NULL, NULL },
+	{ UNL_SC127,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sc127_w),               NULL, NULL, sc127_irq },
+	{ UNL_SMB2J,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::smb2j_w),               NULL, NULL, NULL },
+	{ UNL_SUPERFIGHTER3,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_sf3_w),             NULL, NULL, mmc3_irq },
+	{ UNL_XZY,              NES_WRITEONLY(nes_carts_state::unl_xzy_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, NULL },
+	{ UNL_RACERMATE,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_racmate_w),         NULL, NULL, NULL },
+	{ UNL_STUDYNGAME,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sng32_w),               NULL, NULL, NULL },
+	{ UNL_603_5052,         NES_READWRITE(nes_carts_state::unl_6035052_extra_w, nes_carts_state::unl_6035052_extra_r), NES_READWRITE(nes_carts_state::unl_6035052_extra_w, nes_carts_state::unl_6035052_extra_r), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
+	{ UNL_EDU2K,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::edu2k_w),               NULL, NULL, NULL },
+	{ UNL_SHJY3,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::shjy3_w),               NULL, NULL, shjy3_irq },
+	{ UNL_H2288,            NES_READWRITE(nes_carts_state::h2288_l_w, nes_carts_state::h2288_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::h2288_w),     NULL, NULL, mmc3_irq },
+	{ UNL_FS304,            NES_WRITEONLY(nes_carts_state::unl_fs304_l_w), NES_NOACCESS, NES_NOACCESS,         NULL, NULL, NULL },
 	//
-	{ BTL_AISENSHINICOL,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::btl_mariobaby_w),       NULL, NULL, NULL },
-	{ BTL_DRAGONNINJA,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::btl_dn_w),              NULL, NULL, btl_dn_irq },
-	{ BTL_MARIOBABY,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::btl_mariobaby_w),       NULL, NULL, NULL },
-	{ BTL_SMB2A,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::btl_smb2a_w),           NULL, NULL, btl_smb2a_irq },
-	{ BTL_SMB2B,            NES_WRITEONLY(nes_state::smb2jb_l_w), NES_NOACCESS, NES_NOACCESS,            NULL, NULL, smb2jb_irq },
-	{ BTL_SMB3,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::btl_smb3_w),            NULL, NULL, btl_smb3_irq },
-	{ BTL_SUPERBROS11,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::btl_smb11_w),           NULL, NULL, mmc3_irq },
-	{ BTL_TOBIDASE,         NES_WRITEONLY(nes_state::btl_tobi_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NULL, NULL },
-	{ BTL_PIKACHUY2K,       NES_NOACCESS, {write8_delegate(FUNC(nes_state::btl_pika_y2k_m_w),(nes_state *)0), read8_delegate(FUNC(nes_state::btl_pika_y2k_m_r),(nes_state *)0)}, NES_WRITEONLY(nes_state::btl_pika_y2k_w),  NULL, NULL, mmc3_irq },
-	{ WHIRLWIND_2706,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::whirl2706_w),           NULL, NULL, NULL },
+	{ BTL_AISENSHINICOL,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_mariobaby_w),       NULL, NULL, NULL },
+	{ BTL_DRAGONNINJA,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_dn_w),              NULL, NULL, btl_dn_irq },
+	{ BTL_MARIOBABY,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_mariobaby_w),       NULL, NULL, NULL },
+	{ BTL_SMB2A,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_smb2a_w),           NULL, NULL, btl_smb2a_irq },
+	{ BTL_SMB2B,            NES_WRITEONLY(nes_carts_state::smb2jb_l_w), NES_NOACCESS, NES_NOACCESS,            NULL, NULL, smb2jb_irq },
+	{ BTL_SMB3,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_smb3_w),            NULL, NULL, btl_smb3_irq },
+	{ BTL_SUPERBROS11,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_smb11_w),           NULL, NULL, mmc3_irq },
+	{ BTL_TOBIDASE,         NES_WRITEONLY(nes_carts_state::btl_tobi_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NULL, NULL },
+	{ BTL_PIKACHUY2K,       NES_NOACCESS, NES_READWRITE(nes_carts_state::btl_pika_y2k_m_w, nes_carts_state::btl_pika_y2k_m_r), NES_WRITEONLY(nes_carts_state::btl_pika_y2k_w),  NULL, NULL, mmc3_irq },
+	{ WHIRLWIND_2706,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::whirl2706_w),           NULL, NULL, NULL },
 	//
-	{ BMC_190IN1,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_190in1_w),          NULL, NULL, NULL },
-	{ BMC_A65AS,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_a65as_w),           NULL, NULL, NULL },
-	{ BMC_GS2004,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_gs2004_w),          NULL, NULL, NULL },
-	{ BMC_GS2013,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_gs2013_w),          NULL, NULL, NULL },
-	{ BMC_NOVELDIAMOND,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::novel1_w),              NULL, NULL, NULL },
-	{ BMC_9999999IN1,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::novel2_w),              NULL, NULL, NULL },
-	{ BMC_T262,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_t262_w),            NULL, NULL, NULL },
-	{ BMC_WS,               NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_ws_m_w), NES_NOACCESS,            NULL, NULL, NULL },
-	{ BMC_GKA,              NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_gka_w),             NULL, NULL, NULL },
-	{ BMC_GKB,              NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_gkb_w),             NULL, NULL, NULL },
-	{ BMC_SUPER_700IN1,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_super700in1_w),     NULL, NULL, NULL },
-	{ BMC_36IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_36in1_w),           NULL, NULL, NULL },
-	{ BMC_21IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_21in1_w),           NULL, NULL, NULL },
-	{ BMC_150IN1,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_150in1_w),          NULL, NULL, NULL },
-	{ BMC_35IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_35in1_w),           NULL, NULL, NULL },
-	{ BMC_64IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_64in1_w),           NULL, NULL, NULL },
-	{ BMC_SUPERHIK_300IN1,  NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_hik300_w),          NULL, NULL, NULL },
-	{ BMC_SUPERGUN_20IN1,   NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::supergun20in1_w),       NULL, NULL, NULL },
-	{ BMC_72IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_72in1_w),           NULL, NULL, NULL },
-	{ BMC_76IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_76in1_w),           NULL, NULL, NULL },
-	{ BMC_SUPER_42IN1,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_76in1_w),           NULL, NULL, NULL },
-	{ BMC_1200IN1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_1200in1_w),         NULL, NULL, NULL },
-	{ BMC_31IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_31in1_w),           NULL, NULL, NULL },
-	{ BMC_22GAMES,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_22g_w),             NULL, NULL, NULL },
-	{ BMC_20IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_20in1_w),           NULL, NULL, NULL },
-	{ BMC_110IN1,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_110in1_w),          NULL, NULL, NULL },
-	{ BMC_64IN1NR,          NES_WRITEONLY(nes_state::bmc_64in1nr_l_w), NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_64in1nr_w), NULL, NULL, NULL },
-	{ BMC_S24IN1SC03,       NES_WRITEONLY(nes_state::bmc_s24in1sc03_l_w), NES_NOACCESS, NES_WRITEONLY(nes_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ BMC_HIK8IN1,          NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_hik8_m_w), NES_WRITEONLY(nes_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ BMC_SUPERHIK_4IN1,    NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_hik4in1_m_w), NES_WRITEONLY(nes_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ BMC_SUPERBIG_7IN1,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_sbig7_w),           NULL, NULL, mmc3_irq },
-	{ BMC_MARIOPARTY_7IN1,  NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_mario7in1_m_w), NES_WRITEONLY(nes_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ BMC_GOLD_7IN1,        NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_gold7in1_m_w), NES_WRITEONLY(nes_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ BMC_FAMILY_4646B,     NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_family4646_m_w), NES_WRITEONLY(nes_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ BMC_15IN1,            NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_15in1_m_w), NES_WRITEONLY(nes_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ BMC_BALLGAMES_11IN1,  NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_ball11_m_w), NES_WRITEONLY(nes_state::bmc_ball11_w), NULL, NULL, NULL },
-	{ BMC_GOLDENCARD_6IN1,  NES_WRITEONLY(nes_state::bmc_gc6in1_l_w), NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_gc6in1_w), NULL, NULL, mmc3_irq },
-	{ BMC_VT5201,           NES_NOACCESS, NES_NOACCESS, {write8_delegate(FUNC(nes_state::bmc_vt5201_w),(nes_state *)0), read8_delegate(FUNC(nes_state::bmc_vt5201_r),(nes_state *)0)},         NULL, NULL, NULL },
-	{ BMC_BENSHENG_BS5,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_bs5_w),             NULL, NULL, NULL },
-	{ BMC_810544,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_810544_w),          NULL, NULL, NULL },
-	{ BMC_NTD_03,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::bmc_ntd03_w),           NULL, NULL, NULL },
-	{ BMC_G63IN1,           NES_NOACCESS, NES_NOACCESS, {write8_delegate(FUNC(nes_state::bmc_gb63_w),(nes_state *)0), read8_delegate(FUNC(nes_state::bmc_gb63_r),(nes_state *)0)},             NULL, NULL, NULL },
-	{ BMC_FK23C,            NES_WRITEONLY(nes_state::fk23c_l_w), NES_NOACCESS, NES_WRITEONLY(nes_state::fk23c_w),   NULL, NULL, mmc3_irq },
-	{ BMC_FK23CA,           NES_WRITEONLY(nes_state::fk23c_l_w), NES_NOACCESS, NES_WRITEONLY(nes_state::fk23c_w),   NULL, NULL, mmc3_irq },
-	{ BMC_PJOY84,           NES_NOACCESS, NES_WRITEONLY(nes_state::pjoy84_m_w), NES_WRITEONLY(nes_state::txrom_w),  NULL, NULL, mmc3_irq },
+	{ BMC_190IN1,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_190in1_w),          NULL, NULL, NULL },
+	{ BMC_A65AS,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_a65as_w),           NULL, NULL, NULL },
+	{ BMC_GS2004,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gs2004_w),          NULL, NULL, NULL },
+	{ BMC_GS2013,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gs2013_w),          NULL, NULL, NULL },
+	{ BMC_NOVELDIAMOND,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::novel1_w),              NULL, NULL, NULL },
+	{ BMC_9999999IN1,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::novel2_w),              NULL, NULL, NULL },
+	{ BMC_T262,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_t262_w),            NULL, NULL, NULL },
+	{ BMC_WS,               NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_ws_m_w), NES_NOACCESS,            NULL, NULL, NULL },
+	{ BMC_GKA,              NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gka_w),             NULL, NULL, NULL },
+	{ BMC_GKB,              NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gkb_w),             NULL, NULL, NULL },
+	{ BMC_SUPER_700IN1,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_super700in1_w),     NULL, NULL, NULL },
+	{ BMC_36IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_36in1_w),           NULL, NULL, NULL },
+	{ BMC_21IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_21in1_w),           NULL, NULL, NULL },
+	{ BMC_150IN1,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_150in1_w),          NULL, NULL, NULL },
+	{ BMC_35IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_35in1_w),           NULL, NULL, NULL },
+	{ BMC_64IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_64in1_w),           NULL, NULL, NULL },
+	{ BMC_SUPERHIK_300IN1,  NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_hik300_w),          NULL, NULL, NULL },
+	{ BMC_SUPERGUN_20IN1,   NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::supergun20in1_w),       NULL, NULL, NULL },
+	{ BMC_72IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_72in1_w),           NULL, NULL, NULL },
+	{ BMC_76IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_76in1_w),           NULL, NULL, NULL },
+	{ BMC_SUPER_42IN1,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_76in1_w),           NULL, NULL, NULL },
+	{ BMC_1200IN1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_1200in1_w),         NULL, NULL, NULL },
+	{ BMC_31IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_31in1_w),           NULL, NULL, NULL },
+	{ BMC_22GAMES,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_22g_w),             NULL, NULL, NULL },
+	{ BMC_20IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_20in1_w),           NULL, NULL, NULL },
+	{ BMC_110IN1,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_110in1_w),          NULL, NULL, NULL },
+	{ BMC_64IN1NR,          NES_WRITEONLY(nes_carts_state::bmc_64in1nr_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_64in1nr_w), NULL, NULL, NULL },
+	{ BMC_S24IN1SC03,       NES_WRITEONLY(nes_carts_state::bmc_s24in1sc03_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
+	{ BMC_HIK8IN1,          NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_hik8_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
+	{ BMC_SUPERHIK_4IN1,    NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_hik4in1_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
+	{ BMC_SUPERBIG_7IN1,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_sbig7_w),           NULL, NULL, mmc3_irq },
+	{ BMC_MARIOPARTY_7IN1,  NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_mario7in1_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
+	{ BMC_GOLD_7IN1,        NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gold7in1_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
+	{ BMC_FAMILY_4646B,     NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_family4646_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
+	{ BMC_15IN1,            NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_15in1_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
+	{ BMC_BALLGAMES_11IN1,  NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_ball11_m_w), NES_WRITEONLY(nes_carts_state::bmc_ball11_w), NULL, NULL, NULL },
+	{ BMC_GOLDENCARD_6IN1,  NES_WRITEONLY(nes_carts_state::bmc_gc6in1_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gc6in1_w), NULL, NULL, mmc3_irq },
+	{ BMC_VT5201,           NES_NOACCESS, NES_NOACCESS, NES_READWRITE(nes_carts_state::bmc_vt5201_w, nes_carts_state::bmc_vt5201_r),         NULL, NULL, NULL },
+	{ BMC_BENSHENG_BS5,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_bs5_w),             NULL, NULL, NULL },
+	{ BMC_810544,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_810544_w),          NULL, NULL, NULL },
+	{ BMC_NTD_03,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_ntd03_w),           NULL, NULL, NULL },
+	{ BMC_G63IN1,           NES_NOACCESS, NES_NOACCESS, NES_READWRITE(nes_carts_state::bmc_gb63_w, nes_carts_state::bmc_gb63_r),             NULL, NULL, NULL },
+	{ BMC_FK23C,            NES_WRITEONLY(nes_carts_state::fk23c_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::fk23c_w),   NULL, NULL, mmc3_irq },
+	{ BMC_FK23CA,           NES_WRITEONLY(nes_carts_state::fk23c_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::fk23c_w),   NULL, NULL, mmc3_irq },
+	{ BMC_PJOY84,           NES_NOACCESS, NES_WRITEONLY(nes_carts_state::pjoy84_m_w), NES_WRITEONLY(nes_carts_state::txrom_w),  NULL, NULL, mmc3_irq },
 	//
-	{ FFE_MAPPER6,          NES_WRITEONLY(nes_state::mapper6_l_w), NES_NOACCESS, NES_WRITEONLY(nes_state::mapper6_w), NULL, NULL, ffe_irq },
-	{ FFE_MAPPER8,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_state::mapper8_w),             NULL, NULL, NULL },
-	{ FFE_MAPPER17,         NES_WRITEONLY(nes_state::mapper17_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NULL, ffe_irq },
+	{ FFE_MAPPER6,          NES_WRITEONLY(nes_carts_state::mapper6_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::mapper6_w), NULL, NULL, ffe_irq },
+	{ FFE_MAPPER8,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::mapper8_w),             NULL, NULL, NULL },
+	{ FFE_MAPPER17,         NES_WRITEONLY(nes_carts_state::mapper17_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NULL, ffe_irq },
 	// for debug and development
-	{ UNKNOWN_BOARD,        {write8_delegate(FUNC(nes_state::dummy_l_w),(nes_state *)0), read8_delegate(FUNC(nes_state::dummy_l_r),(nes_state *)0)}, {write8_delegate(FUNC(nes_state::dummy_m_w),(nes_state *)0), read8_delegate(FUNC(nes_state::dummy_m_r),(nes_state *)0)}, {write8_delegate(FUNC(nes_state::dummy_w),(nes_state *)0), read8_delegate(FUNC(nes_state::dummy_r),(nes_state *)0)}, NULL, NULL, NULL },
+	{ UNKNOWN_BOARD,        NES_READWRITE(nes_carts_state::dummy_l_w, nes_carts_state::dummy_l_r), NES_READWRITE(nes_carts_state::dummy_m_w, nes_carts_state::dummy_m_r), NES_READWRITE(nes_carts_state::dummy_w, nes_carts_state::dummy_r), NULL, NULL, NULL },
 	//
 	{ UNSUPPORTED_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NULL, NULL },
 	//
@@ -12039,124 +12042,123 @@ const nes_pcb_intf *nes_pcb_intf_lookup( int pcb_id )
 	return NULL;
 }
 
-void pcb_handlers_setup( running_machine &machine )
+void nes_state::pcb_handlers_setup()
 {
-	nes_state *state = machine.driver_data<nes_state>();
-	const nes_pcb_intf *intf = nes_pcb_intf_lookup(state->m_pcb_id);
+	const nes_pcb_intf *intf = nes_pcb_intf_lookup(m_pcb_id);
 
 	if (intf == NULL)
 		fatalerror("Missing PCB interface\n");
 
 	if (intf)
 	{	
-		state->m_mmc_write_low = intf->mmc_l.write;
-		if (!state->m_mmc_write_low.isnull()) state->m_mmc_write_low.late_bind(*state);
-		state->m_mmc_write_mid = intf->mmc_m.write;
-		if (!state->m_mmc_write_mid.isnull()) state->m_mmc_write_mid.late_bind(*state);
-		state->m_mmc_write = intf->mmc_h.write;
-		if (!state->m_mmc_write.isnull()) state->m_mmc_write.late_bind(*state);
-		state->m_mmc_read_low = intf->mmc_l.read;
-		if (!state->m_mmc_read_low.isnull()) state->m_mmc_read_low.late_bind(*state);
-		state->m_mmc_read_mid = intf->mmc_m.read;	// in progress
-		if (!state->m_mmc_read_mid.isnull()) state->m_mmc_read_mid.late_bind(*state);
-		state->m_mmc_read = intf->mmc_h.read;	// in progress
-		if (!state->m_mmc_read.isnull()) state->m_mmc_read.late_bind(*state);
-		state->m_ppu->set_latch(intf->mmc_ppu_latch);
+		m_mmc_write_low = intf->mmc_l.write;
+		if (!m_mmc_write_low.isnull()) m_mmc_write_low.late_bind(*this);
+		m_mmc_write_mid = intf->mmc_m.write;
+		if (!m_mmc_write_mid.isnull()) m_mmc_write_mid.late_bind(*this);
+		m_mmc_write = intf->mmc_h.write;
+		if (!m_mmc_write.isnull()) m_mmc_write.late_bind(*this);
+		m_mmc_read_low = intf->mmc_l.read;
+		if (!m_mmc_read_low.isnull()) m_mmc_read_low.late_bind(*this);
+		m_mmc_read_mid = intf->mmc_m.read;	// in progress
+		if (!m_mmc_read_mid.isnull()) m_mmc_read_mid.late_bind(*this);
+		m_mmc_read = intf->mmc_h.read;	// in progress
+		if (!m_mmc_read.isnull()) m_mmc_read.late_bind(*this);
+		m_ppu->set_latch(intf->mmc_ppu_latch);
 	}
 	else
 	{
-		logerror("PCB %d is not yet supported, defaulting to no mapper.\n", state->m_pcb_id);
-		state->m_mmc_write_low = write8_delegate();
-		state->m_mmc_write_mid = write8_delegate();
-		state->m_mmc_write = write8_delegate();
-		state->m_mmc_read_low = read8_delegate();
-		state->m_mmc_read_mid = read8_delegate();	// in progress
-		state->m_mmc_read = read8_delegate();	// in progress
-		state->m_ppu->set_latch(NULL);
+		logerror("PCB %d is not yet supported, defaulting to no mapper.\n", m_pcb_id);
+		m_mmc_write_low = write8_delegate();
+		m_mmc_write_mid = write8_delegate();
+		m_mmc_write = write8_delegate();
+		m_mmc_read_low = read8_delegate();
+		m_mmc_read_mid = read8_delegate();	// in progress
+		m_mmc_read = read8_delegate();	// in progress
+		m_ppu->set_latch(NULL);
 	}
 
-	state->m_mmc3_prg_cb = prg8_x;
-	state->m_mmc3_chr_cb = chr1_x;
+	m_mmc3_prg_cb = prg8_x;
+	m_mmc3_chr_cb = chr1_x;
 
-	switch (state->m_pcb_id)
+	switch (m_pcb_id)
 	{
 		case STD_TXSROM:
-			state->m_mmc3_chr_cb = txsrom_chr_cb;
+			m_mmc3_chr_cb = txsrom_chr_cb;
 			break;
 		case GOUDER_37017:
-			state->m_mmc3_prg_cb = gouder_sf4_prg_cb;
+			m_mmc3_prg_cb = gouder_sf4_prg_cb;
 			break;
 		case KASING_BOARD:
-			state->m_mmc3_prg_cb = kasing_prg_cb;
+			m_mmc3_prg_cb = kasing_prg_cb;
 			break;
 		case REXSOFT_DBZ5:
-			state->m_mmc3_chr_cb = rex_dbz_chr_cb;
+			m_mmc3_chr_cb = rex_dbz_chr_cb;
 			break;
 		case TXC_TW:
-			state->m_mmc3_prg_cb = txc_tw_prg_cb;
+			m_mmc3_prg_cb = txc_tw_prg_cb;
 			break;
 		case WAIXING_TYPE_A:
-			state->m_mmc3_chr_cb = waixing_a_chr_cb;
+			m_mmc3_chr_cb = waixing_a_chr_cb;
 			break;
 		case WAIXING_TYPE_A_1:
-			state->m_mmc3_chr_cb = waixing_a1_chr_cb;
+			m_mmc3_chr_cb = waixing_a1_chr_cb;
 			break;
 		case WAIXING_TYPE_B:
-			state->m_mmc3_chr_cb = waixing_b_chr_cb;
+			m_mmc3_chr_cb = waixing_b_chr_cb;
 			break;
 		case WAIXING_TYPE_C:
-			state->m_mmc3_chr_cb = waixing_c_chr_cb;
+			m_mmc3_chr_cb = waixing_c_chr_cb;
 			break;
 		case WAIXING_TYPE_D:
-			state->m_mmc3_chr_cb = waixing_d_chr_cb;
+			m_mmc3_chr_cb = waixing_d_chr_cb;
 			break;
 		case WAIXING_TYPE_E:
-			state->m_mmc3_chr_cb = waixing_e_chr_cb;
+			m_mmc3_chr_cb = waixing_e_chr_cb;
 			break;
 		case WAIXING_TYPE_G:
-			state->m_mmc3_chr_cb = waixing_g_chr_cb;
+			m_mmc3_chr_cb = waixing_g_chr_cb;
 			break;
 		case WAIXING_TYPE_H:
-			state->m_mmc3_chr_cb = waixing_h_chr_cb;
+			m_mmc3_chr_cb = waixing_h_chr_cb;
 			break;
 		case WAIXING_SECURITY:
-			state->m_mmc3_prg_cb = waixing_sec_prg_cb;
-			state->m_mmc3_chr_cb = waixing_sec_chr_cb;
+			m_mmc3_prg_cb = waixing_sec_prg_cb;
+			m_mmc3_chr_cb = waixing_sec_chr_cb;
 			break;
 		case WAIXING_SH2:
-			state->m_mmc3_chr_cb = waixing_sh2_chr_cb;
+			m_mmc3_chr_cb = waixing_sh2_chr_cb;
 			break;
 		case UNL_8237:
-			state->m_mmc3_prg_cb = unl_8237_prg_cb;
-			state->m_mmc3_chr_cb = unl_8237_chr_cb;
+			m_mmc3_prg_cb = unl_8237_prg_cb;
+			m_mmc3_chr_cb = unl_8237_chr_cb;
 			break;
 		case UNL_H2288:
-			state->m_mmc3_prg_cb = h2288_prg_cb;
+			m_mmc3_prg_cb = h2288_prg_cb;
 			break;
 		case SUPERGAME_BOOGERMAN:
-			state->m_mmc3_prg_cb = sgame_boog_prg_cb;
-			state->m_mmc3_chr_cb = sgame_boog_chr_cb;
+			m_mmc3_prg_cb = sgame_boog_prg_cb;
+			m_mmc3_chr_cb = sgame_boog_chr_cb;
 			break;
 		case UNL_KOF96:
-			state->m_mmc3_prg_cb = kof96_prg_cb;
-			state->m_mmc3_chr_cb = kof96_chr_cb;
+			m_mmc3_prg_cb = kof96_prg_cb;
+			m_mmc3_chr_cb = kof96_chr_cb;
 			break;
 		case KAY_PANDAPRINCE:
-			state->m_mmc3_prg_cb = kay_pp_prg_cb;
-			state->m_mmc3_chr_cb = kay_pp_chr_cb;
+			m_mmc3_prg_cb = kay_pp_prg_cb;
+			m_mmc3_chr_cb = kay_pp_chr_cb;
 			break;
 		case BMC_FK23C:
 		case BMC_FK23CA:
-			state->m_mmc3_prg_cb = fk23c_prg_cb;
-			state->m_mmc3_chr_cb = fk23c_chr_cb;
+			m_mmc3_prg_cb = fk23c_prg_cb;
+			m_mmc3_chr_cb = fk23c_chr_cb;
 			break;
 		case BMC_S24IN1SC03:
-			state->m_mmc3_prg_cb = bmc_s24in1sc03_prg_cb;
-			state->m_mmc3_chr_cb = bmc_s24in1sc03_chr_cb;
+			m_mmc3_prg_cb = bmc_s24in1sc03_prg_cb;
+			m_mmc3_chr_cb = bmc_s24in1sc03_chr_cb;
 			break;
 		case BMC_PJOY84:
-			state->m_mmc3_prg_cb = pjoy84_prg_cb;
-			state->m_mmc3_chr_cb = pjoy84_chr_cb;
+			m_mmc3_prg_cb = pjoy84_prg_cb;
+			m_mmc3_chr_cb = pjoy84_chr_cb;
 			break;
 	}
 }
@@ -12188,33 +12190,32 @@ static void mmc3_common_initialize( running_machine &machine, int prg_mask, int 
 }
 
 // WIP code
-static int pcb_initialize( running_machine &machine, int idx )
+int nes_state::pcb_initialize( int idx )
 {
-	nes_state *state = machine.driver_data<nes_state>();
 	int err = 0, i;
 
 	/* basic PRG config */
-	prg32(machine, 0);
+	prg32(machine(), 0);
 
 	/* some boards will not use this, but directly CHRROM (resp. CHRRAM) if the board only has VROM (resp. VRAM) */
-	state->m_mmc_chr_source = state->m_chr_chunks ? CHRROM : CHRRAM;
-	chr8(machine, 0, state->m_mmc_chr_source);
+	m_mmc_chr_source = m_chr_chunks ? CHRROM : CHRRAM;
+	chr8(machine(), 0, m_mmc_chr_source);
 
 	/* Here, we init a few helpers: 4 prg banks and 16 chr banks - some mappers use them */
 	for (i = 0; i < 4; i++)
-		state->m_mmc_prg_bank[i] = 0;
+		m_mmc_prg_bank[i] = 0;
 	for (i = 0; i < 16; i++)
-		state->m_mmc_vrom_bank[i] = 0;
+		m_mmc_vrom_bank[i] = 0;
 	for (i = 0; i < 16; i++)
-		state->m_mmc_extra_bank[i] = 0;
+		m_mmc_extra_bank[i] = 0;
 
-	state->m_mmc_latch1 = 0;
-	state->m_mmc_latch2 = 0;
+	m_mmc_latch1 = 0;
+	m_mmc_latch2 = 0;
 
 	/* Finally, we init IRQ-related quantities. */
-	state->m_IRQ_enable = state->m_IRQ_enable_latch = 0;
-	state->m_IRQ_count = state->m_IRQ_count_latch = 0;
-	state->m_IRQ_toggle = 0;
+	m_IRQ_enable = m_IRQ_enable_latch = 0;
+	m_IRQ_count = m_IRQ_count_latch = 0;
+	m_IRQ_toggle = 0;
 
 	switch (idx)
 	{
@@ -12316,47 +12317,47 @@ static int pcb_initialize( running_machine &machine, int idx )
 		case KAISER_KS7017:
 		case KAISER_KS7032:
 		case KAISER_KS202:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->m_prg_chunks - 1);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), m_prg_chunks - 1);
 			break;
 
 		case STD_CPROM:	// mapper 13
-			chr4_0(machine, 0, CHRRAM);
-			chr4_4(machine, 0, CHRRAM);
+			chr4_0(machine(), 0, CHRRAM);
+			chr4_4(machine(), 0, CHRRAM);
 			break;
 		case STD_AXROM:	// mapper 7
-			set_nt_mirroring(machine, PPU_MIRROR_LOW);
+			set_nt_mirroring(machine(), PPU_MIRROR_LOW);
 			break;
 		case STD_SXROM:	// mapper 1, 155
 		case STD_SOROM:
 		case STD_SXROM_A:
 		case STD_SOROM_A:
-			state->m_mmc1_latch = 0;
-			state->m_mmc1_count = 0;
-			state->m_mmc_reg[0] = 0x0f;
-			state->m_mmc_reg[1] = state->m_mmc_reg[2] = state->m_mmc_reg[3] = 0;
-			state->m_mmc1_reg_write_enable = 1;
-			set_nt_mirroring(machine, PPU_MIRROR_HORZ);
-			mmc1_set_chr(machine);
-			mmc1_set_prg(machine);
-			if (state->m_battery || state->m_wram)
-				wram_bank(machine, 0, (idx == STD_SOROM) ? NES_WRAM : NES_BATTERY);
+			m_mmc1_latch = 0;
+			m_mmc1_count = 0;
+			m_mmc_reg[0] = 0x0f;
+			m_mmc_reg[1] = m_mmc_reg[2] = m_mmc_reg[3] = 0;
+			m_mmc1_reg_write_enable = 1;
+			set_nt_mirroring(machine(), PPU_MIRROR_HORZ);
+			mmc1_set_chr(machine());
+			mmc1_set_prg(machine());
+			if (m_battery || m_wram)
+				wram_bank(machine(), 0, (idx == STD_SOROM) ? NES_WRAM : NES_BATTERY);
 			break;
 		case STD_PXROM:	// mapper 9
-			state->m_mmc_reg[0] = state->m_mmc_reg[2] = 0;
-			state->m_mmc_reg[1] = state->m_mmc_reg[3] = 0;
-			state->m_mmc_latch1 = state->m_mmc_latch2 = 0xfe;
-			prg8_89(machine, 0);
-			prg8_ab(machine, (state->m_prg_chunks << 1) - 3);
-			prg8_cd(machine, (state->m_prg_chunks << 1) - 2);
-			prg8_ef(machine, (state->m_prg_chunks << 1) - 1);
+			m_mmc_reg[0] = m_mmc_reg[2] = 0;
+			m_mmc_reg[1] = m_mmc_reg[3] = 0;
+			m_mmc_latch1 = m_mmc_latch2 = 0xfe;
+			prg8_89(machine(), 0);
+			prg8_ab(machine(), (m_prg_chunks << 1) - 3);
+			prg8_cd(machine(), (m_prg_chunks << 1) - 2);
+			prg8_ef(machine(), (m_prg_chunks << 1) - 1);
 			break;
 		case STD_FXROM: // mapper 10
-			state->m_mmc_reg[0] = state->m_mmc_reg[2] = 0;
-			state->m_mmc_reg[1] = state->m_mmc_reg[3] = 0;
-			state->m_mmc_latch1 = state->m_mmc_latch2 = 0xfe;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->m_prg_chunks - 1);
+			m_mmc_reg[0] = m_mmc_reg[2] = 0;
+			m_mmc_reg[1] = m_mmc_reg[3] = 0;
+			m_mmc_latch1 = m_mmc_latch2 = 0xfe;
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), m_prg_chunks - 1);
 			break;
 		case STD_TXROM:	// mapper 4
 		case STD_TVROM:
@@ -12378,125 +12379,125 @@ static int pcb_initialize( running_machine &machine, int idx )
 		case UNL_KOF97:
 		case UNL_603_5052:
 		case NITRA_TDA:	// mapper 250
-			if (state->m_four_screen_vram)	// only TXROM and DXROM have 4-screen mirroring
+			if (m_four_screen_vram)	// only TXROM and DXROM have 4-screen mirroring
 			{
-				set_nt_page(machine, 0, CART_NTRAM, 0, 1);
-				set_nt_page(machine, 1, CART_NTRAM, 1, 1);
-				set_nt_page(machine, 2, CART_NTRAM, 2, 1);
-				set_nt_page(machine, 3, CART_NTRAM, 3, 1);
+				set_nt_page(machine(), 0, CART_NTRAM, 0, 1);
+				set_nt_page(machine(), 1, CART_NTRAM, 1, 1);
+				set_nt_page(machine(), 2, CART_NTRAM, 2, 1);
+				set_nt_page(machine(), 3, CART_NTRAM, 3, 1);
 			}
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
 			break;
 		case STD_HKROM:	// MMC6 (basically the same as TxROM, but alt IRQ behaviour)
-			mmc3_common_initialize(machine, 0xff, 0xff, 1);
-			state->m_mmc6_reg = 0xf0;
-			state->m_mmc_latch2 = 0;	// this is used differently here compared to MMC3
+			mmc3_common_initialize(machine(), 0xff, 0xff, 1);
+			m_mmc6_reg = 0xf0;
+			m_mmc_latch2 = 0;	// this is used differently here compared to MMC3
 			break;
 		case PAL_ZZ:	// mapper 37
-			mmc3_common_initialize(machine, 0x07, 0x7f, 0);
+			mmc3_common_initialize(machine(), 0x07, 0x7f, 0);
 			break;
 		case NES_QJ:	// mapper 47
-			mmc3_common_initialize(machine, 0x0f, 0x7f, 0);
+			mmc3_common_initialize(machine(), 0x0f, 0x7f, 0);
 			break;
 		case STD_EXROM:	// mapper 5
-			state->m_MMC5_rom_bank_mode = 3;
-			state->m_MMC5_vrom_bank_mode = 0;
-			state->m_MMC5_vram_protect = 0;
-			state->m_mmc5_high_chr = 0;
-			state->m_mmc5_vram_control = 0;
-			state->m_mmc5_split_scr = 0;
-			memset(state->m_MMC5_vrom_bank, 0, ARRAY_LENGTH(state->m_MMC5_vrom_bank));
-			state->m_mmc5_prg_mode = 3;
-			state->m_mmc5_last_chr_a = 1;
-			state->m_mmc5_prg_regs[0] = 0xfc;
-			state->m_mmc5_prg_regs[1] = 0xfd;
-			state->m_mmc5_prg_regs[2] = 0xfe;
-			state->m_mmc5_prg_regs[3] = 0xff;
-			memset(state->m_mmc5_vrom_regA, ~0, ARRAY_LENGTH(state->m_mmc5_vrom_regA));
-			memset(state->m_mmc5_vrom_regB, ~0, ARRAY_LENGTH(state->m_mmc5_vrom_regB));
-			prg16_89ab(machine, state->m_prg_chunks - 2);
-			prg16_cdef(machine, state->m_prg_chunks - 1);
+			m_MMC5_rom_bank_mode = 3;
+			m_MMC5_vrom_bank_mode = 0;
+			m_MMC5_vram_protect = 0;
+			m_mmc5_high_chr = 0;
+			m_mmc5_vram_control = 0;
+			m_mmc5_split_scr = 0;
+			memset(m_MMC5_vrom_bank, 0, ARRAY_LENGTH(m_MMC5_vrom_bank));
+			m_mmc5_prg_mode = 3;
+			m_mmc5_last_chr_a = 1;
+			m_mmc5_prg_regs[0] = 0xfc;
+			m_mmc5_prg_regs[1] = 0xfd;
+			m_mmc5_prg_regs[2] = 0xfe;
+			m_mmc5_prg_regs[3] = 0xff;
+			memset(m_mmc5_vrom_regA, ~0, ARRAY_LENGTH(m_mmc5_vrom_regA));
+			memset(m_mmc5_vrom_regB, ~0, ARRAY_LENGTH(m_mmc5_vrom_regB));
+			prg16_89ab(machine(), m_prg_chunks - 2);
+			prg16_cdef(machine(), m_prg_chunks - 1);
 			break;
 		case STD_NXROM:		// mapper 68
 		case SUNSOFT_DCS:		// mapper 68
-			state->m_mmc_reg[0] = 0;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->m_prg_chunks - 1);
+			m_mmc_reg[0] = 0;
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), m_prg_chunks - 1);
 			break;
 		case NAMCOT_34X3:	// mapper 88
 		case STD_DXROM:	// mapper 206
 		case STD_DRROM:
-			if (state->m_four_screen_vram)	// only TXROM and DXROM have 4-screen mirroring
+			if (m_four_screen_vram)	// only TXROM and DXROM have 4-screen mirroring
 			{
-				set_nt_page(machine, 0, CART_NTRAM, 0, 1);
-				set_nt_page(machine, 1, CART_NTRAM, 1, 1);
-				set_nt_page(machine, 2, CART_NTRAM, 2, 1);
-				set_nt_page(machine, 3, CART_NTRAM, 3, 1);
+				set_nt_page(machine(), 0, CART_NTRAM, 0, 1);
+				set_nt_page(machine(), 1, CART_NTRAM, 1, 1);
+				set_nt_page(machine(), 2, CART_NTRAM, 2, 1);
+				set_nt_page(machine(), 3, CART_NTRAM, 3, 1);
 			}
 		case NAMCOT_3453:	// mapper 154
-			prg16_89ab(machine, state->m_prg_chunks - 2);
-			prg16_cdef(machine, state->m_prg_chunks - 1);
+			prg16_89ab(machine(), m_prg_chunks - 2);
+			prg16_cdef(machine(), m_prg_chunks - 1);
 			break;
 		case NAMCOT_3446:	// mapper 76
-			prg8_89(machine, 0);
-			prg8_ab(machine, 1);
-			prg16_cdef(machine, state->m_prg_chunks - 1);
-			chr2_0(machine, 0, CHRROM);
-			chr2_2(machine, 1, CHRROM);
-			chr2_4(machine, 2, CHRROM);
-			chr2_6(machine, 3, CHRROM);
+			prg8_89(machine(), 0);
+			prg8_ab(machine(), 1);
+			prg16_cdef(machine(), m_prg_chunks - 1);
+			chr2_0(machine(), 0, CHRROM);
+			chr2_2(machine(), 1, CHRROM);
+			chr2_4(machine(), 2, CHRROM);
+			chr2_6(machine(), 3, CHRROM);
 			break;
 		case BANDAI_JUMP2:	// mapper 153
 			for (i = 0; i < 8; i++)
-				state->m_mmc_reg[i] = 0;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->m_prg_chunks - 1);
-			fjump2_set_prg(machine);
+				m_mmc_reg[i] = 0;
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), m_prg_chunks - 1);
+			fjump2_set_prg(machine());
 			break;
 		case BANDAI_KARAOKE:	// mapper 188
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, (state->m_prg_chunks - 1) ^ 0x08);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), (m_prg_chunks - 1) ^ 0x08);
 			break;
 		case IREM_LROG017:	// mapper 77
-			chr2_2(machine, 0, CHRROM);
-			chr2_4(machine, 1, CHRROM);
-			chr2_6(machine, 2, CHRROM);
+			chr2_2(machine(), 0, CHRROM);
+			chr2_4(machine(), 1, CHRROM);
+			chr2_6(machine(), 2, CHRROM);
 			break;
 		case IREM_TAM_S1:	// mapper 97
-			prg16_89ab(machine, state->m_prg_chunks - 1);
-			prg16_cdef(machine, 0);
+			prg16_89ab(machine(), m_prg_chunks - 1);
+			prg16_cdef(machine(), 0);
 			break;
 		case KONAMI_VRC7:	// mapper 85
-			prg8_89(machine, 0);
-			prg8_ab(machine, 0);
-			prg8_cd(machine, 0);
-			prg8_ef(machine, 0xff);
+			prg8_89(machine(), 0);
+			prg8_ab(machine(), 0);
+			prg8_cd(machine(), 0);
+			prg8_ef(machine(), 0xff);
 			break;
 		case NAMCOT_163:	// mapper 19
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->m_prg_chunks - 1);
-			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), m_prg_chunks - 1);
+			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
 			break;
 		case SUNSOFT_1:	// mapper 184
 		case SUNSOFT_2:	// mapper 89 & 93
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->m_prg_chunks - 1);
-			if (!state->m_hard_mirroring)
-				set_nt_mirroring(machine, PPU_MIRROR_LOW);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), m_prg_chunks - 1);
+			if (!m_hard_mirroring)
+				set_nt_mirroring(machine(), PPU_MIRROR_LOW);
 			break;
 
 			// mapper 14
 		case REXSOFT_SL1632:
-			state->m_mmc_extra_bank[2] = 0xfe;
-			state->m_mmc_extra_bank[3] = 0xff;
-			state->m_mmc_extra_bank[0] = state->m_mmc_extra_bank[1] = state->m_mmc_extra_bank[4] = state->m_mmc_extra_bank[5] = state->m_mmc_extra_bank[6] = 0;
-			state->m_mmc_extra_bank[7] = state->m_mmc_extra_bank[8] = state->m_mmc_extra_bank[9] = state->m_mmc_extra_bank[0xa] = state->m_mmc_extra_bank[0xb] = 0;
-			state->m_mmc_reg[0] = state->m_mmc_reg[1] = 0;
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			m_mmc_extra_bank[2] = 0xfe;
+			m_mmc_extra_bank[3] = 0xff;
+			m_mmc_extra_bank[0] = m_mmc_extra_bank[1] = m_mmc_extra_bank[4] = m_mmc_extra_bank[5] = m_mmc_extra_bank[6] = 0;
+			m_mmc_extra_bank[7] = m_mmc_extra_bank[8] = m_mmc_extra_bank[9] = m_mmc_extra_bank[0xa] = m_mmc_extra_bank[0xb] = 0;
+			m_mmc_reg[0] = m_mmc_reg[1] = 0;
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
 			break;
 			// mapper 15
 		case WAIXING_PS2:
-			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
 			break;
 
 			// mapper 35
@@ -12504,180 +12505,180 @@ static int pcb_initialize( running_machine &machine, int idx )
 			// mapper 42
 		case BTL_MARIOBABY:
 		case BTL_AISENSHINICOL:
-			prg32(machine, 0xff);
+			prg32(machine(), 0xff);
 			break;
 
 			// mapper 40
 		case BTL_SMB2A:
-			prg8_67(machine, 0xfe);
-			prg8_89(machine, 0xfc);
-			prg8_ab(machine, 0xfd);
-			prg8_cd(machine, 0xfe);
-			prg8_ef(machine, 0xff);
+			prg8_67(machine(), 0xfe);
+			prg8_89(machine(), 0xfc);
+			prg8_ab(machine(), 0xfd);
+			prg8_cd(machine(), 0xfe);
+			prg8_ef(machine(), 0xff);
 			break;
 
 			// mapper 43
 		case UNL_SMB2J:
-			if (state->m_battery)
-				memset(state->m_battery_ram, 0x2000, 0xff);
-			else if (state->m_prg_ram)
-				memset(state->m_wram, 0x2000, 0xff);
+			if (m_battery)
+				memset(m_battery_ram, 0x2000, 0xff);
+			else if (m_prg_ram)
+				memset(m_wram, 0x2000, 0xff);
 			break;
 			// mapper 44
 		case BMC_SUPERBIG_7IN1:
 			// mapper 49
 		case BMC_SUPERHIK_4IN1:
-			mmc3_common_initialize(machine, 0x0f, 0x7f, 0);
+			mmc3_common_initialize(machine(), 0x0f, 0x7f, 0);
 			break;
 			// mapper 45
 		case BMC_HIK8IN1:
-			state->m_mmc_reg[0] = state->m_mmc_reg[1] = state->m_mmc_reg[2] = state->m_mmc_reg[3] = 0;
-			mmc3_common_initialize(machine, 0x3f, 0xff, 0);
+			m_mmc_reg[0] = m_mmc_reg[1] = m_mmc_reg[2] = m_mmc_reg[3] = 0;
+			mmc3_common_initialize(machine(), 0x3f, 0xff, 0);
 			break;
 
 			// mapper 50
 		case BTL_SMB2B:
-			prg8_67(machine, 0x0f);
-			prg8_89(machine, 0x08);
-			prg8_ab(machine, 0x09);
-			prg8_cd(machine, 0);
-			prg8_ef(machine, 0x0b);
+			prg8_67(machine(), 0x0f);
+			prg8_89(machine(), 0x08);
+			prg8_ab(machine(), 0x09);
+			prg8_cd(machine(), 0);
+			prg8_ef(machine(), 0x0b);
 			break;
 			// mapper 51
 		case BMC_BALLGAMES_11IN1:
-			state->m_mmc_reg[0] = 0x01;
-			state->m_mmc_reg[1] = 0x00;
-			bmc_ball11_set_banks(machine);
+			m_mmc_reg[0] = 0x01;
+			m_mmc_reg[1] = 0x00;
+			bmc_ball11_set_banks(machine());
 			break;
 			// mapper 52
 		case BMC_MARIOPARTY_7IN1:
 		case BMC_GOLD_7IN1:
-			state->m_map52_reg_written = 0;
-			mmc3_common_initialize(machine, 0x1f, 0xff, 0);
+			m_map52_reg_written = 0;
+			mmc3_common_initialize(machine(), 0x1f, 0xff, 0);
 			break;
 			// mapper 54
 		case BMC_NOVELDIAMOND:
-			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
 			break;
 			// mapper 57
 		case BMC_GKA:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 0);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 0);
 			break;
 
 			// mapper 64
 		case TENGEN_800032:
 			// mapper 158
 		case TENGEN_800037:
-			prg16_89ab(machine, state->m_prg_chunks - 1);
-			prg16_cdef(machine, state->m_prg_chunks - 1);
+			prg16_89ab(machine(), m_prg_chunks - 1);
+			prg16_cdef(machine(), m_prg_chunks - 1);
 			break;
 			// mapper 71
 		case CAMERICA_BF9097:
-			set_nt_mirroring(machine, PPU_MIRROR_HORZ);
+			set_nt_mirroring(machine(), PPU_MIRROR_HORZ);
 		case CAMERICA_BF9093:
-			prg32(machine, 0xff);
+			prg32(machine(), 0xff);
 			break;
 
 			// mapper 79 (& 146)
 		case AVE_NINA06:
-			set_nt_mirroring(machine, PPU_MIRROR_HORZ);
+			set_nt_mirroring(machine(), PPU_MIRROR_HORZ);
 			break;
 
 			// mapper 83
 		case CONY_BOARD:
 		case YOKO_BOARD:
-			state->m_mapper83_reg[9] = 0x0f;
-			prg8_cd(machine, 0x1e);
-			prg8_ef(machine, 0x1f);
+			m_mapper83_reg[9] = 0x0f;
+			prg8_cd(machine(), 0x1e);
+			prg8_ef(machine(), 0x1f);
 			break;
 
 			// mapper 91
 		case UNL_MK2:
-			set_nt_mirroring(machine, PPU_MIRROR_VERT);
-			prg16_89ab(machine, state->m_prg_chunks - 1);
-			prg16_cdef(machine, state->m_prg_chunks - 1);
+			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
+			prg16_89ab(machine(), m_prg_chunks - 1);
+			prg16_cdef(machine(), m_prg_chunks - 1);
 			break;
 
 			// mapper 104
 		case CAMERICA_GOLDENFIVE:
-			prg16_89ab(machine, 0x00);
-			prg16_cdef(machine, 0x0f);
+			prg16_89ab(machine(), 0x00);
+			prg16_cdef(machine(), 0x0f);
 			break;
 			// mapper 106
 		case BTL_SMB3:
-			prg8_89(machine, (state->m_prg_chunks << 1) - 1);
-			prg8_ab(machine, 0);
-			prg8_cd(machine, 0);
-			prg8_ef(machine, (state->m_prg_chunks << 1) - 1);
+			prg8_89(machine(), (m_prg_chunks << 1) - 1);
+			prg8_ab(machine(), 0);
+			prg8_cd(machine(), 0);
+			prg8_ef(machine(), (m_prg_chunks << 1) - 1);
 			break;
 
 			// mapper 108
 		case WHIRLWIND_2706:
-			prg32(machine, 0xff);
+			prg32(machine(), 0xff);
 			break;
 
 			// mapper 114
 		case SUPERGAME_LIONKING:
-			state->m_map114_reg = state->m_map114_reg_enabled = 0;
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			m_map114_reg = m_map114_reg_enabled = 0;
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
 			break;
 			// mapper 115
 		case KASING_BOARD:
-			state->m_mmc_reg[0] = 0;
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			m_mmc_reg[0] = 0;
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
 			break;
 			// mapper 116
 		case SOMERI_SL12:
-			state->m_mmc_prg_base = state->m_mmc_chr_base = 0;
-			state->m_mmc_prg_mask = 0xff;
-			state->m_mmc_chr_mask = 0xff;
-			state->m_mmc_cmd1 = 2; // mode
-			state->m_mmc3_latch = 0;
-			state->m_mmc3_wram_protect = 0;
+			m_mmc_prg_base = m_mmc_chr_base = 0;
+			m_mmc_prg_mask = 0xff;
+			m_mmc_chr_mask = 0xff;
+			m_mmc_cmd1 = 2; // mode
+			m_mmc3_latch = 0;
+			m_mmc3_wram_protect = 0;
 			// MMC1 regs
-			state->m_mmc1_count = 0;
-			state->m_mmc_reg[0] = 0x0c;
-			state->m_mmc_reg[1] = 0x00;
-			state->m_mmc_reg[2] = 0x00;
-			state->m_mmc_reg[3] = 0x00;
+			m_mmc1_count = 0;
+			m_mmc_reg[0] = 0x0c;
+			m_mmc_reg[1] = 0x00;
+			m_mmc_reg[2] = 0x00;
+			m_mmc_reg[3] = 0x00;
 			// MMC3 regs
-			state->m_mmc_prg_bank[0] = 0x3c;
-			state->m_mmc_prg_bank[1] = 0x3d;
-			state->m_mmc_prg_bank[2] = 0xfe;
-			state->m_mmc_prg_bank[3] = 0xff;
-			state->m_mmc_vrom_bank[0] = 0x00;
-			state->m_mmc_vrom_bank[1] = 0x01;
-			state->m_mmc_vrom_bank[2] = 0x04;
-			state->m_mmc_vrom_bank[3] = 0x05;
-			state->m_mmc_vrom_bank[4] = 0x06;
-			state->m_mmc_vrom_bank[5] = 0x07;
+			m_mmc_prg_bank[0] = 0x3c;
+			m_mmc_prg_bank[1] = 0x3d;
+			m_mmc_prg_bank[2] = 0xfe;
+			m_mmc_prg_bank[3] = 0xff;
+			m_mmc_vrom_bank[0] = 0x00;
+			m_mmc_vrom_bank[1] = 0x01;
+			m_mmc_vrom_bank[2] = 0x04;
+			m_mmc_vrom_bank[3] = 0x05;
+			m_mmc_vrom_bank[4] = 0x06;
+			m_mmc_vrom_bank[5] = 0x07;
 			// VRC2 regs
-			state->m_mmc_prg_bank[4] = 0x00;
-			state->m_mmc_prg_bank[5] = 0x01;
+			m_mmc_prg_bank[4] = 0x00;
+			m_mmc_prg_bank[5] = 0x01;
 			for (i = 0; i < 8; ++i)
-				state->m_mmc_vrom_bank[6 + i] = i;
-			someri_mode_update(machine);
+				m_mmc_vrom_bank[6 + i] = i;
+			someri_mode_update(machine());
 			break;
 
 			// mapper 120
 		case BTL_TOBIDASE:
-			prg32(machine, 2);
+			prg32(machine(), 2);
 			break;
 
 			// mapper 121
 		case KAY_PANDAPRINCE:
-			state->m_mmc_reg[5] = state->m_mmc_reg[6] = state->m_mmc_reg[7] = 0;
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			m_mmc_reg[5] = m_mmc_reg[6] = m_mmc_reg[7] = 0;
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
 			break;
 
 			// mapper 126
 		case BMC_PJOY84:
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
-			state->m_mmc_reg[0] = state->m_mmc_reg[1] = state->m_mmc_reg[2] = state->m_mmc_reg[3] = 0;
-			pjoy84_set_base_mask(machine);
-			mmc3_set_chr(machine, state->m_mmc_chr_source, state->m_mmc_chr_base, state->m_mmc_chr_mask);
-			mmc3_set_prg(machine, state->m_mmc_prg_base, state->m_mmc_prg_mask);
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
+			m_mmc_reg[0] = m_mmc_reg[1] = m_mmc_reg[2] = m_mmc_reg[3] = 0;
+			pjoy84_set_base_mask(machine());
+			mmc3_set_chr(machine(), m_mmc_chr_source, m_mmc_chr_base, m_mmc_chr_mask);
+			mmc3_set_prg(machine(), m_mmc_prg_base, m_mmc_prg_mask);
 			break;
 
 			// mapper 132
@@ -12686,18 +12687,18 @@ static int pcb_initialize( running_machine &machine, int idx )
 		case TXC_22211B:
 			// mapper 173
 		case TXC_22211C:
-			state->m_txc_reg[0] = state->m_txc_reg[1] = state->m_txc_reg[2] = state->m_txc_reg[3] = 0;
+			m_txc_reg[0] = m_txc_reg[1] = m_txc_reg[2] = m_txc_reg[3] = 0;
 			break;
 
 			// mapper 134
 		case BMC_FAMILY_4646B:
-			mmc3_common_initialize(machine, 0x1f, 0xff, 0);
+			mmc3_common_initialize(machine(), 0x1f, 0xff, 0);
 			break;
 
 			// mapper 137
 		case SACHEN_8259D:
-			chr8(machine, state->m_chr_chunks - 1, CHRROM);
-			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			chr8(machine(), m_chr_chunks - 1, CHRROM);
+			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
 			break;
 			// mapper 138
 		case SACHEN_8259B:
@@ -12707,113 +12708,113 @@ static int pcb_initialize( running_machine &machine, int idx )
 		case SACHEN_8259A:
 			// mapper 150
 		case SACHEN_74LS374:
-			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
 			break;
 			// mapper 143
 		case SACHEN_TCA01:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 1);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 1);
 			break;
 
 			// mapper 156
 		case OPENCORP_DAOU306:
-			prg16_89ab(machine, state->m_prg_chunks - 2);
-			prg16_cdef(machine, state->m_prg_chunks - 1);
-			set_nt_mirroring(machine, PPU_MIRROR_LOW);
+			prg16_89ab(machine(), m_prg_chunks - 2);
+			prg16_cdef(machine(), m_prg_chunks - 1);
+			set_nt_mirroring(machine(), PPU_MIRROR_LOW);
 			break;
 			// mapper 163
 		case NANJING_BOARD:
-			state->m_mmc_count = 0xff;
-			state->m_mmc_reg[0] = 0xff;
-			state->m_mmc_reg[1] = 0;
-			prg16_89ab(machine, state->m_prg_chunks - 2);
-			prg16_cdef(machine, state->m_prg_chunks - 1);
+			m_mmc_count = 0xff;
+			m_mmc_reg[0] = 0xff;
+			m_mmc_reg[1] = 0;
+			prg16_89ab(machine(), m_prg_chunks - 2);
+			prg16_cdef(machine(), m_prg_chunks - 1);
 			break;
 			// mapper 164
 		case WAIXING_FFV:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 0x1f);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 0x1f);
 			break;
 			// mapper 166
 		case SUBOR_TYPE1:
-			state->m_subor_reg[0] = state->m_subor_reg[1] = state->m_subor_reg[2] = state->m_subor_reg[3] = 0;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 0x07);
+			m_subor_reg[0] = m_subor_reg[1] = m_subor_reg[2] = m_subor_reg[3] = 0;
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 0x07);
 			break;
 			// mapper 167
 		case SUBOR_TYPE0:
-			state->m_subor_reg[0] = state->m_subor_reg[1] = state->m_subor_reg[2] = state->m_subor_reg[3] = 0;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 0x20);
+			m_subor_reg[0] = m_subor_reg[1] = m_subor_reg[2] = m_subor_reg[3] = 0;
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 0x20);
 			break;
 
 			// mapper 176
 		case UNL_XZY:
 			// mapper 182
 		case HOSENKAN_BOARD:
-			prg32(machine, (state->m_prg_chunks - 1) >> 1);
+			prg32(machine(), (m_prg_chunks - 1) >> 1);
 			break;
 
 		case FUKUTAKE_BOARD:	// mapper 186
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 0);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 0);
 			break;
 
 			// mapper 187
 		case UNL_KOF96:
-			state->m_mmc_reg[0] = state->m_mmc_reg[1] = state->m_mmc_reg[2] = state->m_mmc_reg[3] = 0;
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			m_mmc_reg[0] = m_mmc_reg[1] = m_mmc_reg[2] = m_mmc_reg[3] = 0;
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
 			break;
 			// mapper 189
 		case TXC_TW:
-			state->m_mmc_latch1 = 0;
-			state->m_mmc_latch2 = 0x80;
-			state->m_mmc_chr_base = 0;
-			state->m_mmc_chr_mask = 0xff;
-			mmc3_set_chr(machine, state->m_mmc_chr_source, state->m_mmc_chr_base, state->m_mmc_chr_mask);
+			m_mmc_latch1 = 0;
+			m_mmc_latch2 = 0x80;
+			m_mmc_chr_base = 0;
+			m_mmc_chr_mask = 0xff;
+			mmc3_set_chr(machine(), m_mmc_chr_source, m_mmc_chr_base, m_mmc_chr_mask);
 			break;
 			// mapper 193
 		case NTDEC_FIGHTINGHERO:
-			prg32(machine, (state->m_prg_chunks - 1) >> 1);
-			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			prg32(machine(), (m_prg_chunks - 1) >> 1);
+			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
 			break;
 			// mapper 197
 		case UNL_SUPERFIGHTER3:
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
-			unl_sf3_set_chr(machine, state->m_mmc_chr_source, state->m_mmc_chr_base, state->m_mmc_chr_mask);
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
+			unl_sf3_set_chr(machine(), m_mmc_chr_source, m_mmc_chr_base, m_mmc_chr_mask);
 			break;
 			// mapper 198
 		case WAIXING_TYPE_F:
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
-			state->m_mmc_prg_bank[0] = 0x00;
-			state->m_mmc_prg_bank[1] = 0x01;
-			state->m_mmc_prg_bank[2] = 0x4e;
-			state->m_mmc_prg_bank[3] = 0x4f;
-			mmc3_set_prg(machine, state->m_mmc_prg_base, state->m_mmc_prg_mask);
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
+			m_mmc_prg_bank[0] = 0x00;
+			m_mmc_prg_bank[1] = 0x01;
+			m_mmc_prg_bank[2] = 0x4e;
+			m_mmc_prg_bank[3] = 0x4f;
+			mmc3_set_prg(machine(), m_mmc_prg_base, m_mmc_prg_mask);
 			break;
 			// mapper 199
 		case WAIXING_TYPE_G:
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
-			state->m_mmc_prg_bank[0] = 0x00;
-			state->m_mmc_prg_bank[1] = 0x01;
-			state->m_mmc_prg_bank[2] = 0x3e;
-			state->m_mmc_prg_bank[3] = 0x3f;
-			mmc3_set_prg(machine, state->m_mmc_prg_base, state->m_mmc_prg_mask);
-			state->m_mmc_vrom_bank[0] = 0x00;
-			state->m_mmc_vrom_bank[1] = 0x02;
-			state->m_mmc_vrom_bank[2] = 0x04;
-			state->m_mmc_vrom_bank[3] = 0x05;
-			state->m_mmc_vrom_bank[4] = 0x06;
-			state->m_mmc_vrom_bank[5] = 0x07;
-			state->m_mmc_vrom_bank[6] = 0x01;
-			state->m_mmc_vrom_bank[7] = 0x03;
-			waixing_g_set_chr(machine, state->m_mmc_chr_base, state->m_mmc_chr_mask);
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
+			m_mmc_prg_bank[0] = 0x00;
+			m_mmc_prg_bank[1] = 0x01;
+			m_mmc_prg_bank[2] = 0x3e;
+			m_mmc_prg_bank[3] = 0x3f;
+			mmc3_set_prg(machine(), m_mmc_prg_base, m_mmc_prg_mask);
+			m_mmc_vrom_bank[0] = 0x00;
+			m_mmc_vrom_bank[1] = 0x02;
+			m_mmc_vrom_bank[2] = 0x04;
+			m_mmc_vrom_bank[3] = 0x05;
+			m_mmc_vrom_bank[4] = 0x06;
+			m_mmc_vrom_bank[5] = 0x07;
+			m_mmc_vrom_bank[6] = 0x01;
+			m_mmc_vrom_bank[7] = 0x03;
+			waixing_g_set_chr(machine(), m_mmc_chr_base, m_mmc_chr_mask);
 			break;
 
 			// mapper 200
 		case BMC_36IN1:
-			prg16_89ab(machine, state->m_prg_chunks - 1);
-			prg16_cdef(machine, state->m_prg_chunks - 1);
+			prg16_89ab(machine(), m_prg_chunks - 1);
+			prg16_cdef(machine(), m_prg_chunks - 1);
 			break;
 
 			// mapper 202
@@ -12824,233 +12825,233 @@ static int pcb_initialize( running_machine &machine, int idx )
 		case BMC_64IN1:
 			// mapper 214
 		case BMC_SUPERGUN_20IN1:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 0);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 0);
 			break;
 			// mapper 205
 		case BMC_15IN1:
-			mmc3_common_initialize(machine, 0x1f, 0xff, 0);
-			state->m_mmc_prg_base = 0x10;	// this board has a diff prg_base
-			mmc3_set_prg(machine, state->m_mmc_prg_base, state->m_mmc_prg_mask);
+			mmc3_common_initialize(machine(), 0x1f, 0xff, 0);
+			m_mmc_prg_base = 0x10;	// this board has a diff prg_base
+			mmc3_set_prg(machine(), m_mmc_prg_base, m_mmc_prg_mask);
 			break;
 
 			// mapper 208
 		case GOUDER_37017:
-			state->m_mmc_reg[0] = state->m_mmc_reg[1] = state->m_mmc_reg[2] = state->m_mmc_reg[3] = state->m_mmc_reg[4] = 0;
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			m_mmc_reg[0] = m_mmc_reg[1] = m_mmc_reg[2] = m_mmc_reg[3] = m_mmc_reg[4] = 0;
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
 			break;
 			// mapper 212
 		case BMC_SUPERHIK_300IN1:
-			chr8(machine, 0xff, CHRROM);
-			prg32(machine, 0xff);
+			chr8(machine(), 0xff, CHRROM);
+			prg32(machine(), 0xff);
 			break;
 
 			// mapper 215
 		case SUPERGAME_BOOGERMAN:
-			state->m_mmc_reg[0] = 0x00;
-			state->m_mmc_reg[1] = 0xff;
-			state->m_mmc_reg[2] = 0x04;
-			state->m_mmc_reg[3] = 0;
-			mmc3_common_initialize(machine, 0x1f, 0xff, 0);
-			sgame_boog_set_prg(machine);
-			mmc3_set_chr(machine, state->m_mmc_chr_source, state->m_mmc_chr_base, state->m_mmc_chr_mask);
+			m_mmc_reg[0] = 0x00;
+			m_mmc_reg[1] = 0xff;
+			m_mmc_reg[2] = 0x04;
+			m_mmc_reg[3] = 0;
+			mmc3_common_initialize(machine(), 0x1f, 0xff, 0);
+			sgame_boog_set_prg(machine());
+			mmc3_set_chr(machine(), m_mmc_chr_source, m_mmc_chr_base, m_mmc_chr_mask);
 			break;
 
 			// mapper 217
 		case BMC_GOLDENCARD_6IN1:
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
-			state->m_mmc_reg[0] = 0x00;
-			state->m_mmc_reg[1] = 0xff;
-			state->m_mmc_reg[2] = 0x03;
-			state->m_mmc_reg[3] = 0;
-			bmc_gc6in1_set_prg(machine, state->m_mmc_prg_base, state->m_mmc_prg_mask);
-			bmc_gc6in1_set_chr(machine, state->m_mmc_chr_source);
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
+			m_mmc_reg[0] = 0x00;
+			m_mmc_reg[1] = 0xff;
+			m_mmc_reg[2] = 0x03;
+			m_mmc_reg[3] = 0;
+			bmc_gc6in1_set_prg(machine(), m_mmc_prg_base, m_mmc_prg_mask);
+			bmc_gc6in1_set_chr(machine(), m_mmc_chr_source);
 			break;
 			// mapper 221
 		case UNL_N625092:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 0);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 0);
 			break;
 
 			// mapper 223?
 		case WAIXING_TYPE_I:
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
-			state->m_mmc3_wram_protect = 0;
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
+			m_mmc3_wram_protect = 0;
 			break;
 
 			// mapper 224?
 		case WAIXING_TYPE_J:
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
-			state->m_mmc_prg_bank[0] = 0x01;
-			state->m_mmc_prg_bank[1] = 0x02;
-			state->m_mmc_prg_bank[2] = 0x7e;
-			state->m_mmc_prg_bank[3] = 0x7f;
-			mmc3_set_prg(machine, state->m_mmc_prg_base, state->m_mmc_prg_mask);
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
+			m_mmc_prg_bank[0] = 0x01;
+			m_mmc_prg_bank[1] = 0x02;
+			m_mmc_prg_bank[2] = 0x7e;
+			m_mmc_prg_bank[3] = 0x7f;
+			mmc3_set_prg(machine(), m_mmc_prg_base, m_mmc_prg_mask);
 			break;
 
 			// mapper 227
 		case BMC_1200IN1:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 0);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 0);
 			break;
 
 			// mapper 229
 		case BMC_31IN1:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 1);
-			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 1);
+			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
 			break;
 			// mapper 230
 		case BMC_22GAMES:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 7);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 7);
 			break;
 			// mapper 231
 		case BMC_20IN1:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->m_prg_chunks - 1);
-			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), m_prg_chunks - 1);
+			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
 			break;
 			// mapper 232
 		case CAMERICA_BF9096:
-			state->m_mmc_latch1 = 0x18;
-			state->m_mmc_latch2 = 0x00;
-			bf9096_set_prg(machine);
+			m_mmc_latch1 = 0x18;
+			m_mmc_latch2 = 0x00;
+			bf9096_set_prg(machine());
 			break;
 
 			// mapper 243
 		case SACHEN_74LS374_A:
-			state->m_mmc_vrom_bank[0] = 3;
-			chr8(machine, 3, CHRROM);
-			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			m_mmc_vrom_bank[0] = 3;
+			chr8(machine(), 3, CHRROM);
+			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
 			break;
 
 			// mapper 246
 		case CNE_FSB:
-			prg32(machine, 0xff);
+			prg32(machine(), 0xff);
 			break;
 			// mapper 249
 		case WAIXING_SECURITY:
-			state->m_mmc_reg[0] = 0;
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			m_mmc_reg[0] = 0;
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
 			break;
 
 			// mapper 254
 		case BTL_PIKACHUY2K:
-			state->m_mmc_reg[0] = 0xff;
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			m_mmc_reg[0] = 0xff;
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
 			break;
 
 			// mapper 255
 		case BMC_110IN1:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 1);
-			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 1);
+			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
 			break;
 
 			// UNIF only
 		case BMC_64IN1NR:
-			state->m_mmc_reg[0] = 0x80;
-			state->m_mmc_reg[1] = 0x43;
-			state->m_mmc_reg[2] = state->m_mmc_reg[3] = 0;
-			bmc_64in1nr_set_prg(machine);
-			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			m_mmc_reg[0] = 0x80;
+			m_mmc_reg[1] = 0x43;
+			m_mmc_reg[2] = m_mmc_reg[3] = 0;
+			bmc_64in1nr_set_prg(machine());
+			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
 			break;
 		case BMC_190IN1:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 0);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 0);
 			break;
 		case BMC_A65AS:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 7);
-			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 7);
+			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
 			break;
 		case BMC_GS2004:
 		case BMC_GS2013:
-			prg32(machine, 0xff);
+			prg32(machine(), 0xff);
 			break;
 		case BMC_S24IN1SC03:
-			state->m_mmc_reg[0] = 0x24;
-			state->m_mmc_reg[1] = 0x9f;
-			state->m_mmc_reg[2] = 0;
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			m_mmc_reg[0] = 0x24;
+			m_mmc_reg[1] = 0x9f;
+			m_mmc_reg[2] = 0;
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
 			break;
 		case BMC_T262:
-			state->m_mmc_latch1 = 0;
-			state->m_mmc_latch2 = 0;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 7);
+			m_mmc_latch1 = 0;
+			m_mmc_latch2 = 0;
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 7);
 			break;
 		case DREAMTECH_BOARD:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 8);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 8);
 			break;
 		case UNL_8237:
-			state->m_mmc_reg[0] = state->m_mmc_reg[1] = state->m_mmc_reg[2] = 0;
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			m_mmc_reg[0] = m_mmc_reg[1] = m_mmc_reg[2] = 0;
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
 			break;
 		case UNL_AX5705:
-			state->m_mmc_prg_bank[0] = 0;
-			state->m_mmc_prg_bank[1] = 1;
-			prg8_89(machine, state->m_mmc_prg_bank[0]);
-			prg8_ab(machine, state->m_mmc_prg_bank[1]);
-			prg8_cd(machine, 0xfe);
-			prg8_ef(machine, 0xff);
+			m_mmc_prg_bank[0] = 0;
+			m_mmc_prg_bank[1] = 1;
+			prg8_89(machine(), m_mmc_prg_bank[0]);
+			prg8_ab(machine(), m_mmc_prg_bank[1]);
+			prg8_cd(machine(), 0xfe);
+			prg8_ef(machine(), 0xff);
 			break;
 		case UNL_RACERMATE:
-			chr4_0(machine, 0, state->m_mmc_chr_source);
-			chr4_4(machine, 0, state->m_mmc_chr_source);
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->m_prg_chunks - 1);
+			chr4_0(machine(), 0, m_mmc_chr_source);
+			chr4_4(machine(), 0, m_mmc_chr_source);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), m_prg_chunks - 1);
 			break;
 
 		case BMC_BENSHENG_BS5:
-			state->m_mmc_prg_bank[0] = 0xff;
-			state->m_mmc_prg_bank[1] = 0xff;
-			state->m_mmc_prg_bank[2] = 0xff;
-			state->m_mmc_prg_bank[3] = 0xff;
-			bmc_bs5_update_banks(machine);
+			m_mmc_prg_bank[0] = 0xff;
+			m_mmc_prg_bank[1] = 0xff;
+			m_mmc_prg_bank[2] = 0xff;
+			m_mmc_prg_bank[3] = 0xff;
+			bmc_bs5_update_banks(machine());
 			break;
 
 		case BMC_810544:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 0);
-			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 0);
+			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
 			break;
 
 		case BMC_G63IN1:
-			bmc_gb63_update(machine);
+			bmc_gb63_update(machine());
 			break;
 
 		case BMC_FK23C:
-			state->m_mmc_reg[0] = 4;
-			state->m_mmc_reg[1] = 0xff;
-			state->m_mmc_reg[2] = state->m_mmc_reg[3] = 0;
-			state->m_mmc_reg[4] = state->m_mmc_reg[5] = state->m_mmc_reg[6] = state->m_mmc_reg[7] = 0xff;
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
-			fk23c_set_prg(machine);
-			fk23c_set_chr(machine);
+			m_mmc_reg[0] = 4;
+			m_mmc_reg[1] = 0xff;
+			m_mmc_reg[2] = m_mmc_reg[3] = 0;
+			m_mmc_reg[4] = m_mmc_reg[5] = m_mmc_reg[6] = m_mmc_reg[7] = 0xff;
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
+			fk23c_set_prg(machine());
+			fk23c_set_chr(machine());
 			break;
 
 		case BMC_FK23CA:
-			state->m_mmc_reg[0] = state->m_mmc_reg[1] = state->m_mmc_reg[2] = state->m_mmc_reg[3] = 0;
-			state->m_mmc_reg[4] = state->m_mmc_reg[5] = state->m_mmc_reg[6] = state->m_mmc_reg[7] = 0xff;
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
-			fk23c_set_prg(machine);
-			fk23c_set_chr(machine);
+			m_mmc_reg[0] = m_mmc_reg[1] = m_mmc_reg[2] = m_mmc_reg[3] = 0;
+			m_mmc_reg[4] = m_mmc_reg[5] = m_mmc_reg[6] = m_mmc_reg[7] = 0xff;
+			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
+			fk23c_set_prg(machine());
+			fk23c_set_chr(machine());
 			break;
 
 
 		case FFE_MAPPER6:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, 7);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), 7);
 			break;
 		case FFE_MAPPER8:
-			prg32(machine, 0);
+			prg32(machine(), 0);
 			break;
 		case FFE_MAPPER17:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->m_prg_chunks - 1);
+			prg16_89ab(machine(), 0);
+			prg16_cdef(machine(), m_prg_chunks - 1);
 			break;
 
 		case UNSUPPORTED_BOARD:
@@ -13090,7 +13091,7 @@ int nes_pcb_reset( running_machine &machine )
 	state->m_ppu->set_scanline_callback(intf ? intf->mmc_scanline : NULL);
 	state->m_ppu->set_hblank_callback(intf ? intf->mmc_hblank : NULL);
 
-	err = pcb_initialize(machine, state->m_pcb_id);
+	err = state->pcb_initialize(state->m_pcb_id);
 
 	return err;
 }

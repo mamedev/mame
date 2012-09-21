@@ -45,7 +45,7 @@ static void ffe_irq( device_t *device, int scanline, int vblank, int blanked )
 	}
 }
 
-WRITE8_MEMBER(nes_state::mapper6_l_w)
+WRITE8_MEMBER(nes_carts_state::mapper6_l_w)
 {
 	LOG_MMC(("mapper6_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -72,7 +72,7 @@ WRITE8_MEMBER(nes_state::mapper6_l_w)
 	}
 }
 
-WRITE8_MEMBER(nes_state::mapper6_w)
+WRITE8_MEMBER(nes_carts_state::mapper6_w)
 {
 	LOG_MMC(("mapper6_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -99,7 +99,7 @@ WRITE8_MEMBER(nes_state::mapper6_w)
 
 *************************************************************/
 
-WRITE8_MEMBER(nes_state::mapper8_w)
+WRITE8_MEMBER(nes_carts_state::mapper8_w)
 {
 	LOG_MMC(("mapper8_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -119,7 +119,7 @@ WRITE8_MEMBER(nes_state::mapper8_w)
 
 *************************************************************/
 
-WRITE8_MEMBER(nes_state::mapper17_l_w)
+WRITE8_MEMBER(nes_carts_state::mapper17_l_w)
 {
 	LOG_MMC(("mapper17_l_w, offset: %04x, data: %02x\n", offset, data));
 
