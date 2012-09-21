@@ -14,7 +14,7 @@
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<!-- Additional Files -->
+			<feature name="part_id" value="Additional Files"/>
 			<dataarea name="flop" size="331979">
 				<rom name="cpm disk2.imd" size="331979" crc="39b9bd5a" sha1="c4c6ea52c983eda9282954e5fc9c7935bedfac14" offset="0"/>
 			</dataarea>
@@ -34,9 +34,16 @@
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<!-- Additional Files -->
+			<feature name="part_id" value="Additional Files"/>
 			<dataarea name="flop" size="364682">
 				<rom name="cpm_add.imd" size="364682" crc="3b190357" sha1="c733db6d9592088f7b655a156edefbf5b6834555" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Winchester Hard Disk Drive Option Disk"/>
+			<dataarea name="flop" size="197582">
+				<rom name="v1050win.imd" size="197582" crc="f76803e0" sha1="a5781a879141ad5e312bb72b8db245bf2b443d40" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
