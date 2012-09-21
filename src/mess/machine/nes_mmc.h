@@ -116,21 +116,6 @@ int nes_get_mmc_id(running_machine &machine, int mapper);	// for iNES files
 void pcb_handlers_setup(running_machine &machine);
 int nes_pcb_reset(running_machine &machine);
 
-
-DECLARE_WRITE8_HANDLER( nes_low_mapper_w );
-DECLARE_READ8_HANDLER( nes_low_mapper_r );
-DECLARE_WRITE8_HANDLER( nes_chr_w );
-DECLARE_READ8_HANDLER( nes_chr_r );
-DECLARE_WRITE8_HANDLER( nes_nt_w );
-DECLARE_READ8_HANDLER( nes_nt_r );
-
-DECLARE_WRITE8_HANDLER( smb2jb_extra_w );
-DECLARE_WRITE8_HANDLER( ks7017_extra_w );
-DECLARE_READ8_HANDLER( ks7017_extra_r );
-DECLARE_WRITE8_HANDLER( unl_6035052_extra_w );
-DECLARE_READ8_HANDLER( unl_6035052_extra_r );
-DECLARE_READ8_HANDLER( waixing_sh2_chr_r );
-
 //TEMPORARY PPU STUFF
 
 /* mirroring types */

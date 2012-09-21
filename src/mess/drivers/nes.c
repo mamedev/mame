@@ -50,7 +50,7 @@ static ADDRESS_MAP_START( nes_map, AS_PROGRAM, 8, nes_state )
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(nes_IN0_r, nes_IN0_w)			/* IN0 - input port 1 */
 	AM_RANGE(0x4017, 0x4017) AM_READ(nes_IN1_r)							/* IN1 - input port 2 */
 	AM_RANGE(0x4017, 0x4017) AM_DEVWRITE_LEGACY("nessound", psg_4017_w)		/* PSG second control register */
-	AM_RANGE(0x4100, 0x5fff) AM_READWRITE_LEGACY(nes_low_mapper_r, nes_low_mapper_w)	/* Perform unholy acts on the machine */
+	AM_RANGE(0x4100, 0x5fff) AM_READWRITE(nes_low_mapper_r, nes_low_mapper_w)	/* Perform unholy acts on the machine */
 ADDRESS_MAP_END
 
 
@@ -544,6 +544,9 @@ static MACHINE_CONFIG_DERIVED( famicom, nes )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","famicom_flop")
 MACHINE_CONFIG_END
 
+//static MACHINE_CONFIG_DERIVED( nes_test, nes )
+//MACHINE_CONFIG_END
+
 
 /* rom regions are just place-holders: they get removed and re-allocated when a cart is loaded */
 ROM_START( nes )
@@ -596,6 +599,8 @@ ROM_START( dendy )
 	ROM_REGION( 0x800,   "ciram", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
+//#define rom_nes_test rom_nes
+
 /***************************************************************************
 
   Game driver(s)
@@ -610,3 +615,5 @@ CONS( 1986, famitwin,  nes,    0,     famicom,  famicom, nes_state, famicom, "Sh
 CONS( 198?, m82,       nes,    0,     nes,      nes, driver_device,     0,       "Nintendo",  "M82 Display Unit", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 CONS( 1996, drpcjr,    nes,    0,     famicom,  famicom, nes_state, famicom, "Bung",      "Doctor PC Jr", GAME_IMPERFECT_GRAPHICS )
 CONS( 1992, dendy,     nes,    0,     dendy,    nes, driver_device,     0,       "Steepler",  "Dendy Classic", GAME_IMPERFECT_GRAPHICS )
+
+//CONS( 1985, nes_test,  0,      0,     nes_test, nes, driver_device,     0,       "Nintendo",  "Nintendo Entertainment System (Testdriver)", GAME_IMPERFECT_GRAPHICS )

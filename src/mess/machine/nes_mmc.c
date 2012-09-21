@@ -137,10 +137,6 @@
 #define LOG_FDS(x) do { if (VERBOSE) logerror x; } while (0)
 
 static void ffe_irq( device_t *device, int scanline, int vblank, int blanked );
-static DECLARE_WRITE8_HANDLER( mapper6_l_w );
-static DECLARE_WRITE8_HANDLER( mapper6_w );
-static DECLARE_WRITE8_HANDLER( mapper8_w );
-static DECLARE_WRITE8_HANDLER( mapper17_l_w );
 
 /*************************************************************
 
@@ -165,74 +161,68 @@ static DECLARE_WRITE8_HANDLER( mapper17_l_w );
 
 *************************************************************/
 
-WRITE8_HANDLER( nes_chr_w )
+WRITE8_MEMBER(nes_state::nes_chr_w)
 {
-	nes_state *state = space.machine().driver_data<nes_state>();
 	int bank = offset >> 10;
 
-	if (state->m_chr_map[bank].source == CHRRAM)
+	if (m_chr_map[bank].source == CHRRAM)
 	{
-		state->m_chr_map[bank].access[offset & 0x3ff] = data;
+		m_chr_map[bank].access[offset & 0x3ff] = data;
 	}
 }
 
-READ8_HANDLER( nes_chr_r )
+READ8_MEMBER(nes_state::nes_chr_r)
 {
-	nes_state *state = space.machine().driver_data<nes_state>();
 	int bank = offset >> 10;
 
 	// a few CNROM boards contained copy protection schemes through
 	// suitably configured diodes, so that subsequent CHR reads can
 	// give actual VROM content or open bus values.
 	// For most boards, chr_open_bus remains always zero.
-	if (state->m_chr_open_bus)
+	if (m_chr_open_bus)
 		return 0xff;
 
-	return state->m_chr_map[bank].access[offset & 0x3ff];
+	return m_chr_map[bank].access[offset & 0x3ff];
 }
 
-WRITE8_HANDLER( nes_nt_w )
+WRITE8_MEMBER(nes_state::nes_nt_w)
 {
-	nes_state *state = space.machine().driver_data<nes_state>();
 	int page = ((offset & 0xc00) >> 10);
 
-	if (state->m_nt_page[page].writable == 0)
+	if (m_nt_page[page].writable == 0)
 		return;
 
-	state->m_nt_page[page].access[offset & 0x3ff] = data;
+	m_nt_page[page].access[offset & 0x3ff] = data;
 }
 
-READ8_HANDLER( nes_nt_r )
+READ8_MEMBER(nes_state::nes_nt_r)
 {
-	nes_state *state = space.machine().driver_data<nes_state>();
 	int page = ((offset & 0xc00) >> 10);
 
-	if (state->m_nt_page[page].source == MMC5FILL)
+	if (m_nt_page[page].source == MMC5FILL)
 	{
 		if ((offset & 0x3ff) >= 0x3c0)
-			return state->m_MMC5_floodattr;
+			return m_MMC5_floodattr;
 
-		return state->m_MMC5_floodtile;
+		return m_MMC5_floodtile;
 	}
-	return state->m_nt_page[page].access[offset & 0x3ff];
+	return m_nt_page[page].access[offset & 0x3ff];
 }
 
-WRITE8_HANDLER( nes_low_mapper_w )
+WRITE8_MEMBER(nes_state::nes_low_mapper_w)
 {
-	nes_state *state = space.machine().driver_data<nes_state>();
 
-	if (state->m_mmc_write_low)
-		(*state->m_mmc_write_low)(space, offset, data, mem_mask);
+	if (!m_mmc_write_low.isnull())
+		(m_mmc_write_low)(space, offset, data, mem_mask);
 	else
 		logerror("Unimplemented LOW mapper write, offset: %04x, data: %02x\n", offset + 0x4100, data);
 }
 
-READ8_HANDLER( nes_low_mapper_r )
+READ8_MEMBER(nes_state::nes_low_mapper_r)
 {
-	nes_state *state = space.machine().driver_data<nes_state>();
 
-	if (state->m_mmc_read_low)
-		return (*state->m_mmc_read_low)(space, offset, mem_mask);
+	if (!m_mmc_read_low.isnull())
+		return (m_mmc_read_low)(space, offset, mem_mask);
 	else
 		logerror("Unimplemented LOW mapper read, offset: %04x\n", offset + 0x4100);
 
