@@ -1641,6 +1641,7 @@ $(MAMEOBJ)/pinball.a: \
 	$(DRIVERS)/flicker.o  \
 	$(DRIVERS)/g627.o  \
 	$(DRIVERS)/gp_1.o  \
+	$(MACHINE)/genpin.o  \
 	$(DRIVERS)/gp_2.o  \
 	$(DRIVERS)/gts1.o  \
 	$(DRIVERS)/gts3.o  \

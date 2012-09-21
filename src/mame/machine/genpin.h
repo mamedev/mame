@@ -26,11 +26,8 @@ static const samples_interface genpin_samples_intf =
 	genpin_sample_names
 };
 
-MACHINE_CONFIG_FRAGMENT( genpin_audio )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SAMPLES_ADD("samples", genpin_samples_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+
+MACHINE_CONFIG_EXTERN( genpin_audio );
 
 
 #endif /* GENPIN_H_ */
