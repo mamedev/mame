@@ -50,19 +50,22 @@ class poo_state : public driver_device
 {
 public:
 	poo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu"),
 		m_sprites(*this, "sprites"),
 		m_scrolly(*this, "scrolly"),
-		m_vram(*this, "vram"){ }
+		m_vram(*this, "vram")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 	required_shared_ptr<UINT8> m_sprites;
 	required_shared_ptr<UINT8> m_scrolly;
 	required_shared_ptr<UINT8> m_vram;
+
 	UINT8 m_vram_colbank;
-	DECLARE_READ8_MEMBER(unk_inp_r);
-	DECLARE_READ8_MEMBER(unk_inp2_r);
-	DECLARE_READ8_MEMBER(unk_inp3_r);
-	DECLARE_WRITE8_MEMBER(unk_w);
+
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 	DECLARE_WRITE8_MEMBER(poo_vregs_w);
 	DECLARE_READ8_MEMBER(timer_r);
@@ -71,6 +74,35 @@ public:
 	UINT32 screen_update_unclepoo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
+
+/******************************************************************************************/
+
+void poo_state::palette_init()
+{
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	int i,r,g,b,val;
+	int bit0,bit1,bit2;
+
+	for (i = 0; i < 0x100; i++)
+	{
+		val = (color_prom[i+0x100]) | (color_prom[i+0x000]<<4);
+
+		bit0 = 0;
+		bit1 = (val >> 6) & 0x01;
+		bit2 = (val >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (val >> 3) & 0x01;
+		bit1 = (val >> 4) & 0x01;
+		bit2 = (val >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (val >> 0) & 0x01;
+		bit1 = (val >> 1) & 0x01;
+		bit2 = (val >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+	}
+}
 
 void poo_state::video_start()
 {
@@ -118,37 +150,13 @@ UINT32 poo_state::screen_update_unclepoo(screen_device &screen, bitmap_ind16 &bi
 	return 0;
 }
 
-READ8_MEMBER(poo_state::unk_inp_r)
-{
-	return 0x00;//machine().rand();
-}
 
-#if 0
+/******************************************************************************************/
 
-READ8_MEMBER(poo_state::unk_inp2_r)
-{
-	return 0xff;
-}
-
-READ8_MEMBER(poo_state::unk_inp3_r)
-{
-	return machine().rand();
-}
-#endif
-
-
-#if 0
-WRITE8_MEMBER(poo_state::unk_w)
-{
-	printf("%02x %02x\n",data,offset);
-}
-#endif
-
-/* soundlatch write */
 WRITE8_MEMBER(poo_state::sound_cmd_w)
 {
-	soundlatch_byte_w(space, 0, (data & 0xff));
-	machine().device("subcpu")->execute().set_input_line(0, HOLD_LINE);
+	soundlatch_byte_w(space, 0, data);
+	m_subcpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(poo_state::poo_vregs_w)
@@ -161,7 +169,7 @@ static ADDRESS_MAP_START( unclepoo_main_map, AS_PROGRAM, 8, poo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_RAM
-	AM_RANGE(0x9800, 0x9801) AM_READ(unk_inp_r) //AM_WRITE(unk_w )
+	AM_RANGE(0x9800, 0x9801) AM_NOP // ?
 
 	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0xb080, 0xb0ff) AM_RAM AM_SHARE("scrolly")
@@ -177,13 +185,11 @@ static ADDRESS_MAP_START( unclepoo_main_map, AS_PROGRAM, 8, poo_state )
 	AM_RANGE(0xb700, 0xb700) AM_WRITE(poo_vregs_w)
 
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("vram")
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( unclepoo_main_portmap, AS_IO, 8, poo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
-
 
 
 static ADDRESS_MAP_START( unclepoo_sub_map, AS_PROGRAM, 8, poo_state )
@@ -198,6 +204,8 @@ static ADDRESS_MAP_START( unclepoo_sub_portmap, AS_IO, 8, poo_state )
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("ay", ay8910_address_w)
 ADDRESS_MAP_END
 
+
+/******************************************************************************************/
 
 static INPUT_PORTS_START( unclepoo )
 	PORT_START("P1")
@@ -265,16 +273,19 @@ static INPUT_PORTS_START( unclepoo )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Test Mode" )			PORT_DIPLOCATION("SW2:!6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:!6") // ??? Locks up at boot if set to ON
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Start with 255 Lives (Cheat)" )	PORT_DIPLOCATION("SW2:!8")
+	PORT_DIPNAME( 0x80, 0x00, "255 Lives (Cheat)" )		PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
+
+
+/******************************************************************************************/
 
 static const gfx_layout tiles8x8_layout =
 {
@@ -291,38 +302,11 @@ static GFXDECODE_START( unclepoo )
 	GFXDECODE_ENTRY( "gfx", 0, tiles8x8_layout, 0, 0x20 )
 GFXDECODE_END
 
-void poo_state::palette_init()
-{
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
-	int i,r,g,b,val;
-	int bit0,bit1,bit2;
-
-	for (i = 0; i < 0x100; i++)
-	{
-		val = (color_prom[i+0x100]) | (color_prom[i+0x000]<<4);
-
-		bit0 = 0;
-		bit1 = (val >> 6) & 0x01;
-		bit2 = (val >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (val >> 3) & 0x01;
-		bit1 = (val >> 4) & 0x01;
-		bit2 = (val >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (val >> 0) & 0x01;
-		bit1 = (val >> 1) & 0x01;
-		bit2 = (val >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
-	}
-}
 
 READ8_MEMBER(poo_state::timer_r)
 {
-	return downcast<cpu_device *>(&space.device())->total_cycles() / 16;
+	return m_subcpu->total_cycles() / 16;
 }
-
 
 static const ay8910_interface ay8910_config =
 {
@@ -335,6 +319,7 @@ static const ay8910_interface ay8910_config =
 };
 
 static MACHINE_CONFIG_START( unclepoo, poo_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,18000000/6)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(unclepoo_main_map)
@@ -358,7 +343,7 @@ static MACHINE_CONFIG_START( unclepoo, poo_state )
 	MCFG_GFXDECODE(unclepoo)
 	MCFG_PALETTE_LENGTH(0x100)
 
-
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay", AY8910, 18000000/12) /* ? Mhz */
 	MCFG_SOUND_CONFIG(ay8910_config)
@@ -366,6 +351,7 @@ static MACHINE_CONFIG_START( unclepoo, poo_state )
 MACHINE_CONFIG_END
 
 
+/******************************************************************************************/
 
 ROM_START( unclepoo )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -387,4 +373,5 @@ ROM_START( unclepoo )
 	ROM_LOAD( "diatec_l.bin", 0x100, 0x100, CRC(b04d466a) SHA1(1438abeae76ef807ba34bd6d3e4c44f707dbde6e) )
 ROM_END
 
-GAME( 1983, unclepoo, 0, unclepoo, unclepoo, driver_device, 0, ROT90, "Diatec",         "Uncle Poo", GAME_NO_COCKTAIL )
+
+GAME( 1983, unclepoo, 0, unclepoo, unclepoo, driver_device, 0, ROT90, "Diatec", "Uncle Poo", GAME_NO_COCKTAIL )
