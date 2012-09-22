@@ -79,18 +79,18 @@ void isa16_vga_gfxultra_device::device_start()
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "vga", "gfxultra");
 
 	m_isa->install_device(this, 0x1ce, 0x1cf, 0, 0, FUNC(ati_port_ext_r), FUNC(ati_port_ext_w));
-	m_isa->install16_device(0x2e8, 0x2eb, 0, 0, FUNC(mach8_status_r), FUNC(mach8_htotal_w));
+	m_isa->install16_device(0x2e8, 0x2eb, 0, 0, FUNC(ibm8514_status_r), FUNC(ibm8514_htotal_w));
 	m_isa->install_device(0x3b0, 0x3bf, 0, 0, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w));
 	m_isa->install_device(0x3c0, 0x3cf, 0, 0, FUNC(ati_port_03c0_r), FUNC(vga_port_03c0_w));
 	m_isa->install_device(0x3d0, 0x3df, 0, 0, FUNC(vga_port_03d0_r), FUNC(vga_port_03d0_w));
-	m_isa->install16_device(0x12e8, 0x12eb, 0, 0, FUNC(mach8_vtotal_r),FUNC(mach8_vtotal_w));
+	m_isa->install16_device(0x12e8, 0x12eb, 0, 0, FUNC(ibm8514_vtotal_r),FUNC(ibm8514_vtotal_w));
 	m_isa->install16_device(0x12ec, 0x12ef, 0, 0, FUNC(mach8_config1_r),NULL,NULL);
-	m_isa->install16_device(0x16e8, 0x16eb, 0, 0, FUNC(mach8_vdisp_r),FUNC(mach8_vdisp_w));
+	m_isa->install16_device(0x16e8, 0x16eb, 0, 0, FUNC(ibm8514_vdisp_r),FUNC(ibm8514_vdisp_w));
 	m_isa->install16_device(0x16ec, 0x16ef, 0, 0, FUNC(mach8_config2_r),NULL,NULL);
-	m_isa->install16_device(0x1ae8, 0x1aeb, 0, 0, FUNC(mach8_vsync_r),FUNC(mach8_vsync_w));
-	m_isa->install16_device(0x26e8, 0x26eb, 0, 0, FUNC(mach8_htotal_r),NULL,NULL);
-	m_isa->install16_device(0x2ee8, 0x2eeb, 0, 0, FUNC(mach8_subcontrol_r),NULL,NULL);
-	m_isa->install16_device(0x42e8, 0x42eb, 0, 0, FUNC(mach8_substatus_r), FUNC(mach8_subcontrol_w));
+	m_isa->install16_device(0x1ae8, 0x1aeb, 0, 0, FUNC(ibm8514_vsync_r),FUNC(ibm8514_vsync_w));
+	m_isa->install16_device(0x26e8, 0x26eb, 0, 0, FUNC(ibm8514_htotal_r),NULL,NULL);
+	m_isa->install16_device(0x2ee8, 0x2eeb, 0, 0, FUNC(ibm8514_subcontrol_r),NULL,NULL);
+	m_isa->install16_device(0x42e8, 0x42eb, 0, 0, FUNC(ibm8514_substatus_r), FUNC(ibm8514_subcontrol_w));
 	m_isa->install16_device(0x52e8, 0x52eb, 0, 0, FUNC(mach8_ec0_r), FUNC(mach8_ec0_w));
 	m_isa->install16_device(0x52ec, 0x52ef, 0, 0, FUNC(mach8_scratch0_r), FUNC(mach8_scratch0_w));
 	m_isa->install16_device(0x56e8, 0x56eb, 0, 0, FUNC(mach8_ec1_r), FUNC(mach8_ec1_w));

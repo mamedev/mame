@@ -5084,12 +5084,12 @@ bit     0  SENSE is the result of a wired-OR of 3 comparators, one
            This bit toggles every time a HSYNC pulse starts
      3-15  Reserved(0)
  */
-READ16_HANDLER(mach8_status_r)
+READ16_HANDLER(ibm8514_status_r)
 {
 	return vga_vblank(space.machine()) << 1;
 }
 
-WRITE16_HANDLER(mach8_htotal_w)
+WRITE16_HANDLER(ibm8514_htotal_w)
 {
 	ibm8514.htotal = data & 0x01ff;
 	//vga.crtc.horz_total = data & 0x01ff;
@@ -5116,7 +5116,7 @@ bit   0-3  Interrupt requests. These bits show the state of internal interrupt
      8-11  CHIP_REV. Chip revision number.
     12-15  (CT82c480) CHIP_ID. 0=CT 82c480.
  */
-READ16_HANDLER(mach8_substatus_r)
+READ16_HANDLER(ibm8514_substatus_r)
 {
 	// TODO:
 	if(vga_vblank(space.machine()) != 0)  // not correct, but will do for now
@@ -5141,53 +5141,53 @@ bit   0-3  Interrupt Reset. Write 1 to a bit to reset the interrupt.
     12-13  CHPTEST. Used for chip testing.
     14-15  Graphics Processor Control (GPCTRL).
  */
-WRITE16_HANDLER(mach8_subcontrol_w)
+WRITE16_HANDLER(ibm8514_subcontrol_w)
 {
 	ibm8514.subctrl = data;
 	ibm8514.substatus &= ~(data & 0x0f);  // reset interrupts
 //  logerror("8514/A: Subsystem control write %04x\n",data);
 }
 
-READ16_HANDLER(mach8_subcontrol_r)
+READ16_HANDLER(ibm8514_subcontrol_r)
 {
 	return ibm8514.subctrl;
 }
 
-READ16_HANDLER(mach8_htotal_r)
+READ16_HANDLER(ibm8514_htotal_r)
 {
 	return ibm8514.htotal;
 }
 
-READ16_HANDLER(mach8_vtotal_r)
+READ16_HANDLER(ibm8514_vtotal_r)
 {
 	return ibm8514.vtotal;
 }
 
-WRITE16_HANDLER(mach8_vtotal_w)
+WRITE16_HANDLER(ibm8514_vtotal_w)
 {
 	ibm8514.vtotal = data;
 //  vga.crtc.vert_total = data;
 	logerror("8514/A: Vertical total write %04x\n",data);
 }
 
-READ16_HANDLER(mach8_vdisp_r)
+READ16_HANDLER(ibm8514_vdisp_r)
 {
 	return ibm8514.vdisp;
 }
 
-WRITE16_HANDLER(mach8_vdisp_w)
+WRITE16_HANDLER(ibm8514_vdisp_w)
 {
 	ibm8514.vdisp = data;
 //  vga.crtc.vert_disp_end = data >> 3;
 	logerror("8514/A: Vertical Displayed write %04x\n",data);
 }
 
-READ16_HANDLER(mach8_vsync_r)
+READ16_HANDLER(ibm8514_vsync_r)
 {
 	return ibm8514.vsync;
 }
 
-WRITE16_HANDLER(mach8_vsync_w)
+WRITE16_HANDLER(ibm8514_vsync_w)
 {
 	ibm8514.vsync = data;
 	logerror("8514/A: Vertical Sync write %04x\n",data);
