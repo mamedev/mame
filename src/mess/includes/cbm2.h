@@ -90,6 +90,8 @@ public:
 	DECLARE_MACHINE_START( cbm2_pal );
 	DECLARE_MACHINE_RESET( cbm2 );
 
+	virtual void read_pla(offs_t offset, int busy2, int eras, int ecas, int refen, int cas, int ras, int *casseg1, int *casseg2, int *casseg3, int *casseg4);
+
 	void bankswitch(offs_t offset, int busy2, int eras, int ecas, int refen, int cas, int ras, int *sysioen, int *dramen,
 		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *buframcs, int *extbufcs, int *vidramcs, 
 		int *diskromcs, int *csbank1, int *csbank2, int *csbank3, int *basiccs, int *knbcs, int *kernalcs,
@@ -113,6 +115,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( tpi2_pa_w );
 	DECLARE_WRITE8_MEMBER( tpi2_pb_w );
+	DECLARE_READ8_MEMBER( tpi2_pc_r );
 
 	DECLARE_READ8_MEMBER( cia_pa_r );
 	DECLARE_WRITE8_MEMBER( cia_pa_w );
@@ -148,6 +151,19 @@ public:
 
 	// timers
 	emu_timer *m_todclk_timer;
+};
+
+
+class cbm2hp_state : public cbm2_state
+{
+public:
+	cbm2hp_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cbm2_state(mconfig, type, tag)
+	{ }
+
+	virtual void read_pla(offs_t offset, int busy2, int eras, int ecas, int refen, int cas, int ras, int *casseg1, int *casseg2, int *casseg3, int *casseg4);
+
+	DECLARE_READ8_MEMBER( tpi2_pc_r );
 };
 
 
@@ -200,28 +216,6 @@ public:
 
 	// interrupt state
 	int m_vic_irq;
-};
-
-
-class cbm2lp_state : public cbm2_state
-{
-public:
-	cbm2lp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cbm2_state(mconfig, type, tag)
-	{ }
-
-	DECLARE_READ8_MEMBER( tpi2_pc_r );
-};
-
-
-class cbm2hp_state : public cbm2_state
-{
-public:
-	cbm2hp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cbm2_state(mconfig, type, tag)
-	{ }
-
-	DECLARE_READ8_MEMBER( tpi2_pc_r );
 };
 
 

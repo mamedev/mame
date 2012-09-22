@@ -39,13 +39,10 @@
 //**************************************************************************
 
 //-------------------------------------------------
-//  bankswitch -
+//  read_pla -
 //-------------------------------------------------
 
-void cbm2_state::bankswitch(offs_t offset, int busy2, int eras, int ecas, int refen, int cas, int ras, int *sysioen, int *dramen,
-	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *buframcs, int *extbufcs, int *vidramcs, 
-	int *diskromcs, int *csbank1, int *csbank2, int *csbank3, int *basiccs, int *knbcs, int *kernalcs,
-	int *crtccs, int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs)
+void cbm2_state::read_pla(offs_t offset, int busy2, int eras, int ecas, int refen, int cas, int ras, int *casseg1, int *casseg2, int *casseg3, int *casseg4)
 {
 	UINT32 input = P0 << 15 | P1 << 14 | P2 << 13 | P3 << 12 | busy2 << 11 | eras << 10 | ecas << 9 | refen << 8 | cas << 7 | ras << 6;
 	UINT32 data = m_pla1->read(input);
@@ -58,6 +55,42 @@ void cbm2_state::bankswitch(offs_t offset, int busy2, int eras, int ecas, int re
 	*casseg4 = BIT(data, 5);
 	*casseg3 = BIT(data, 6);
 	//*rasseg3 = BIT(data, 7);
+}
+
+void cbm2hp_state::read_pla(offs_t offset, int busy2, int eras, int ecas, int refen, int cas, int ras, int *casseg1, int *casseg2, int *casseg3, int *casseg4)
+{
+	UINT32 input = ras << 13 | cas << 12 | refen << 11 | eras << 10 | ecas << 9 | busy2 << 8 | P3 << 3 | P2 << 2 | P1 << 1 | P0;
+	UINT32 data = m_pla1->read(input);
+
+	*casseg1 = BIT(data, 0);
+	*casseg2 = BIT(data, 1);
+	*casseg3 = BIT(data, 2);
+	*casseg4 = BIT(data, 3);
+	//*rasseg1 = BIT(data, 4);
+	//*rasseg2 = BIT(data, 5);
+	//*rasseg3 = BIT(data, 6);
+	//*rasseg4 = BIT(data, 7);
+}
+
+
+//-------------------------------------------------
+//  bankswitch -
+//-------------------------------------------------
+
+void cbm2_state::bankswitch(offs_t offset, int busy2, int eras, int ecas, int refen, int cas, int ras, int *sysioen, int *dramen,
+	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *buframcs, int *extbufcs, int *vidramcs, 
+	int *diskromcs, int *csbank1, int *csbank2, int *csbank3, int *basiccs, int *knbcs, int *kernalcs,
+	int *crtccs, int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs)
+{
+	//this->read_pla(offset, busy2, eras, ecas, refen, cas, ras, casseg1, casseg2, casseg3, casseg4);
+
+	switch (offset >> 16)
+	{
+	case 1: *casseg1 = 0; break;
+	case 2: *casseg2 = 0; break;
+	case 3: *casseg3 = 0; break;
+	case 4: *casseg4 = 0; break;
+	}
 
 	int busen1 = m_dramon;
 	int decoden = 0; // TODO
@@ -414,11 +447,6 @@ UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, in
 		cs1, sidcs, extprtcs, ciacs, aciacs, tript1cs, tript2cs, aec, vsysaden);
 */
 	UINT8 data = 0xff;
-
-	if (ae)
-	{
-		data = m_vic->bus_r();
-	}
 
 	if (aec && !datxen && !_64kcasen)
 	{
@@ -1257,7 +1285,7 @@ WRITE8_MEMBER( cbm2_state::tpi2_pb_w )
 	m_tpi2_pb = data;
 }
 
-READ8_MEMBER( cbm2lp_state::tpi2_pc_r )
+READ8_MEMBER( cbm2_state::tpi2_pc_r )
 {
 	/*
 	
@@ -1344,7 +1372,7 @@ static const tpi6525_interface tpi2_intf =
 	DEVCB_DRIVER_MEMBER(cbm2_state, tpi2_pa_w),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(cbm2_state, tpi2_pb_w),
-	DEVCB_DRIVER_MEMBER(cbm2lp_state, tpi2_pc_r),
+	DEVCB_DRIVER_MEMBER(cbm2_state, tpi2_pc_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -1729,7 +1757,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2lp_ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2lp_state )
+static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_ntsc)
 	MCFG_MACHINE_RESET_OVERRIDE(cbm2_state, cbm2)
 
@@ -1780,7 +1808,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b128 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( b128, cbm2lp_state )
+static MACHINE_CONFIG_START( b128, cbm2_state )
 	MCFG_FRAGMENT_ADD(cbm2lp_ntsc)
 	MCFG_FRAGMENT_ADD(128k)
 MACHINE_CONFIG_END
@@ -1790,7 +1818,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b256 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( b256, cbm2lp_state )
+static MACHINE_CONFIG_START( b256, cbm2_state )
 	MCFG_FRAGMENT_ADD(cbm2lp_ntsc)
 	MCFG_FRAGMENT_ADD(256k)
 MACHINE_CONFIG_END
@@ -1800,7 +1828,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2lp_pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cbm2lp_pal, cbm2lp_state )
+static MACHINE_CONFIG_START( cbm2lp_pal, cbm2_state )
 	MCFG_FRAGMENT_ADD(cbm2lp_ntsc)
 
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
@@ -1814,7 +1842,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm610 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cbm610, cbm2lp_state )
+static MACHINE_CONFIG_START( cbm610, cbm2_state )
 	MCFG_FRAGMENT_ADD(cbm2lp_pal)
 	MCFG_FRAGMENT_ADD(128k)
 MACHINE_CONFIG_END
@@ -1824,7 +1852,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm620 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cbm620, cbm2lp_state )
+static MACHINE_CONFIG_START( cbm620, cbm2_state )
 	MCFG_FRAGMENT_ADD(cbm2lp_pal)
 	MCFG_FRAGMENT_ADD(256k)
 MACHINE_CONFIG_END
