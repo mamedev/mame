@@ -7571,9 +7571,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="tazmars">
-		<description>Taz in Escape from Mars (Euro)</description>
+		<description>Escape from Mars Starring Taz (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="Taz in Escape from Mars (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="taz in escape from mars (euro).bin" size="2097152" crc="62100099" sha1="1edd44d9f9d1d410b6a9ec37647a04d9b50b549e" offset="000000" loadflag="load16_word_swap" />
@@ -7582,7 +7583,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="tazmarsp10" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940418)</description>
+		<description>Escape from Mars Starring Taz (Prototype, 19940418)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -7593,7 +7594,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="tazmarsp06" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940602)</description>
+		<description>Escape from Mars Starring Taz (Prototype, 19940602)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -7604,7 +7605,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="tazmarsp05" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940607)</description>
+		<description>Escape from Mars Starring Taz (Prototype, 19940607)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -7615,7 +7616,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="tazmarsp04" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940610)</description>
+		<description>Escape from Mars Starring Taz (Prototype, 19940610)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -7626,7 +7627,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="tazmarsp03" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940614)</description>
+		<description>Escape from Mars Starring Taz (Prototype, 19940614)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -7637,7 +7638,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="tazmarsp02" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940618-A)</description>
+		<description>Escape from Mars Starring Taz (Prototype, 19940618-A)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -7648,7 +7649,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="tazmarsp01" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940620)</description>
+		<description>Escape from Mars Starring Taz (Prototype, 19940620)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -7659,7 +7660,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="tazmarsp11" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940309)</description>
+		<description>Escape from Mars Starring Taz (Prototype, 19940309)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -7670,7 +7671,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="tazmarsp09" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940509)</description>
+		<description>Escape from Mars Starring Taz (Prototype, 19940509)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -7681,7 +7682,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="tazmarsp08" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940518)</description>
+		<description>Escape from Mars Starring Taz (Prototype, 19940518)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -7692,7 +7693,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="tazmarsp07" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940523)</description>
+		<description>Escape from Mars Starring Taz (Prototype, 19940523)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -7703,9 +7704,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="tazmarsu" cloneof="tazmars">
-		<description>Taz in Escape from Mars (USA)</description>
+		<description>Escape from Mars Starring Taz (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="Taz in Escape from Mars (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="taz in escape from mars (usa).bin" size="2097152" crc="62009f8c" sha1="7aa9c7b74541d414d81aa61d150803c3b3b1701b" offset="000000" loadflag="load16_word_swap" />
@@ -20468,7 +20470,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sttngb" cloneof="sttng">
+<!-- Should it be 19931228? -->
+	<software name="sttngp06" cloneof="sttng">
 		<description>Star Trek - The Next Generation - Echoes from the Past (Prototype, 19941228)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -20482,7 +20485,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sttngc" cloneof="sttng">
+<!-- Should it be 19931229? -->
+	<software name="sttngp05" cloneof="sttng">
 		<description>Star Trek - The Next Generation - Echoes from the Past (Prototype, 19941229)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -20496,7 +20500,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sttngd" cloneof="sttng">
+	<software name="sttngp04" cloneof="sttng">
 		<description>Star Trek - The Next Generation - Echoes from the Past (Prototype, 19940103)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -20510,7 +20514,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sttnge" cloneof="sttng">
+	<software name="sttngp03" cloneof="sttng">
 		<description>Star Trek - The Next Generation - Echoes from the Past (Prototype, 19940110)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -20524,7 +20528,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sttngf" cloneof="sttng">
+	<software name="sttngp02" cloneof="sttng">
 		<description>Star Trek - The Next Generation - Echoes from the Past (Prototype, 19940118)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -20538,7 +20542,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sttngg" cloneof="sttng">
+	<software name="sttngp01" cloneof="sttng">
 		<description>Star Trek - The Next Generation - Echoes from the Past (Prototype, 19940125)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -20740,8 +20744,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="thorp3" cloneof="thor">
-		<description>The Story of Thor (Prototype, 19941004)</description>
+	<software name="thorp2" cloneof="thor">
+		<description>The Story of Thor (USA, Prototype, 19941004)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -20754,8 +20758,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="thorp2" cloneof="thor">
-		<description>The Story of Thor (Prototype, 19941017)</description>
+	<software name="thorp1" cloneof="thor">
+		<description>The Story of Thor (USA, Prototype, 19941017)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -20768,14 +20772,14 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="thorp1" cloneof="thor">
-		<description>The Story of Thor (Prototype, 19941101)</description>
+	<software name="beyoasisp" cloneof="thor">
+		<description>Beyond Oasis (USA, Prototype, 19941101)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
-				<rom name="story of thor, the (prototype - nov 01, 1994).bin" size="3145728" crc="fa59f847" sha1="cb0606faeab0398244d4721d71cf7e1c5724a9ef" offset="000000" loadflag="load16_word_swap" />
+				<rom name="beyond oasis (prototype - nov 01, 1994).bin" size="3145728" crc="fa59f847" sha1="cb0606faeab0398244d4721d71cf7e1c5724a9ef" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -20810,14 +20814,14 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<!-- released also as Story of Thor proto... was a mistake by drx? -->
-	<!--software name="beyoasisp" cloneof="storytho">
-		<description>Beyond Oasis (Prototype, 19941101)</description>
+	<!-- released also as Beyond Oasis proto... was a mistake by drx or does it exist another 19941101 proto? -->
+	<!--software name="thorp" cloneof="thor">
+		<description>The Story of Thor (Prototype, 19941101)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="3145728">
-				<rom name="beyond oasis (prototype - nov 01, 1994).bin" size="3145728" crc="fa59f847" sha1="cb0606faeab0398244d4721d71cf7e1c5724a9ef" offset="000000" loadflag="load16_word_swap" />
+				<rom name="story of thor, the (prototype - nov 01, 1994).bin" size="3145728" crc="fa59f847" sha1="cb0606faeab0398244d4721d71cf7e1c5724a9ef" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software-->
@@ -21275,7 +21279,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="subterrp3" cloneof="subterr">
-		<description>SubTerrania (Prototype, 19940202)</description>
+		<description>SubTerrania (Jpn, Prototype, 19940202)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -22378,7 +22382,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="tmhtsh">
+	<software name="tmhthh">
 		<description>Teenage Mutant Hero Turtles - The Hyperstone Heist (Euro)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
@@ -22389,7 +22393,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="tmntshj" cloneof="tmhtsh">
+	<software name="tmntshj" cloneof="tmhthh">
 		<description>Teenage Mutant Ninja Turtles - Return of the Shredder (Jpn)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
@@ -22403,7 +22407,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="tmnthh" cloneof="tmhtsh">
+	<software name="tmnthh" cloneof="tmhthh">
 		<description>Teenage Mutant Ninja Turtles - The Hyperstone Heist (USA)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
@@ -22492,7 +22496,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="telebrad">
+	<software name="telebrad" supported="no">
 		<description>Telebradesco Residencia (Bra)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23805,7 +23809,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="vf2">
-		<description>Virtua Fighter 2 (Euro, USA)</description>
+		<description>Virtua Fighter 2 - Genesis (Euro, USA)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23816,7 +23820,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="vf2k" cloneof="vf2">
-		<description>Virtua Fighter 2 (Kor)</description>
+		<description>Virtua Fighter 2 - Genesis (Kor)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23827,7 +23831,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="vf2p5" cloneof="vf2">
-		<description>Virtua Fighter 2 (Prototype, 19960819)</description>
+		<description>Virtua Fighter 2 - Genesis (Prototype, 19960819)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23838,7 +23842,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="vf2p4" cloneof="vf2">
-		<description>Virtua Fighter 2 (Prototype, 19960830)</description>
+		<description>Virtua Fighter 2 - Genesis (Prototype, 19960830)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23849,7 +23853,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="vf2p3" cloneof="vf2">
-		<description>Virtua Fighter 2 (Prototype, 19960913)</description>
+		<description>Virtua Fighter 2 - Genesis (Prototype, 19960913)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23860,7 +23864,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="vf2p2" cloneof="vf2">
-		<description>Virtua Fighter 2 (Prototype, 19960920)</description>
+		<description>Virtua Fighter 2 - Genesis (Prototype, 19960920)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23871,7 +23875,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="vf2p1" cloneof="vf2">
-		<description>Virtua Fighter 2 (Prototype, 19960927)</description>
+		<description>Virtua Fighter 2 - Genesis (Prototype, 19960927)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23960,10 +23964,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="wworlds">
-		<!-- Alt. Title: Wacky Worlds Creativity Studio (Box) -->
 		<description>Wacky Worlds (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="Wacky Worlds Creativity Studio (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
@@ -23996,7 +24000,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wworldsp1" cloneof="wworlds">
+	<software name="wworldsp1" cloneof="wworlds" supported="no">
 		<description>Wacky Worlds (Prototype, 19940819)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24357,7 +24361,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="wintchal1" cloneof="wintchal">
-		<description>Winter Challenge (Euro, USA)</description>
+		<description>The Games: Winter Challenge (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Ballistic</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -24378,7 +24382,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wintolym">
+	<software name="wintol">
 		<description>Winter Olympics (Euro)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
@@ -24389,7 +24393,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wintolymj" cloneof="wintolym">
+	<software name="wintolj" cloneof="wintol">
 		<description>Winter Olympics (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24403,7 +24407,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wintolymu" cloneof="wintolym">
+	<software name="wintolu" cloneof="wintol">
 		<description>Winter Olympic Games (USA)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
@@ -24511,10 +24515,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wondlib">
+	<software name="wondlib" supported="no">
 		<description>Wonder Library (Jpn)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Victor</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="wonder library (jpn).bin" size="524288" crc="9350e754" sha1="57b97d9ddecfa2e9a75c4a05cd2b7e821210155a" offset="000000" loadflag="load16_word_swap" />
@@ -24545,7 +24549,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wcs2p18" cloneof="wcs2">
+	<software name="wcs2p17" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype, 19940223)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24556,7 +24560,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wcs2p13" cloneof="wcs2">
+	<software name="wcs2p12" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype, 19940309)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24568,7 +24572,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<!-- same as U proto, probably no changes happened -->
-	<!--software name="wcs2p11b" cloneof="wcs2">
+	<!--software name="wcs2p10b" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype, 19940314)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24579,7 +24583,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software-->
 
-	<software name="wcs2p09" cloneof="wcs2">
+	<software name="wcs2p08" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype, 19940323)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24590,7 +24594,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wcs2p08" cloneof="wcs2">
+	<software name="wcs2p07" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype, 19940324)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24601,7 +24605,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wcs2p07" cloneof="wcs2">
+	<software name="wcs2p06" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype, 19940325)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24612,7 +24616,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wcs2p06" cloneof="wcs2">
+	<software name="wcs2p05" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype, 19940326)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24623,7 +24627,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wcs2p05" cloneof="wcs2">
+	<software name="wcs2p04" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype, 19940327)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24634,7 +24638,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wcs2p04" cloneof="wcs2">
+	<software name="wcs2p03" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype, 19940329-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24645,7 +24649,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wcs2p03" cloneof="wcs2">
+	<software name="wcs2p02" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype, 19940329)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24656,7 +24660,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wcs2p02" cloneof="wcs2">
+	<software name="wcs2p01" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype, 19940330)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24667,7 +24671,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wcs2p19" cloneof="wcs2">
+	<software name="wcs2p18" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype G, 19940222)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24678,7 +24682,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wcs2p17" cloneof="wcs2">
+	<software name="wcs2p16" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype J, 19940228)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24689,7 +24693,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wcs2p16" cloneof="wcs2">
+	<software name="wcs2p15" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype N, 19940303)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24700,7 +24704,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wcs2p15" cloneof="wcs2">
+	<software name="wcs2p14" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype O, 19940303)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24711,7 +24715,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wcs2p14" cloneof="wcs2">
+	<software name="wcs2p13" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype P, 19940304)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24722,7 +24726,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wcs2p12" cloneof="wcs2">
+	<software name="wcs2p11" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype R, 19940309)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24733,7 +24737,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wcs2p11" cloneof="wcs2">
+	<software name="wcs2p10" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype U, 19940314)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24744,7 +24748,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wcs2p10" cloneof="wcs2">
+<!-- From this proto on, they implemented region lock! -->
+	<software name="wcs2p09" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype Y, 19940318)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -24878,7 +24883,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="whp02" cloneof="wh">
-		<description>World Heroes (Euro, Prototype, 19940331-B)</description>
+		<description>World Heroes (USA, Prototype, 19940331-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -24889,7 +24894,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="whp01" cloneof="wh">
-		<description>World Heroes (Euro, Prototype, 19940331)</description>
+		<description>World Heroes (USA, Prototype, 19940331)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25135,7 +25140,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95">
+	<software name="wsb95" supported="no">
 		<description>World Series Baseball '95 (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -25149,8 +25154,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p23" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19941208)</description>
+	<software name="wsb95p23" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19941208)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25160,8 +25165,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p22" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19941214)</description>
+	<software name="wsb95p22" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19941214)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25171,8 +25176,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p21" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19941228-SB)</description>
+	<software name="wsb95p21" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19941228-SB)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25185,8 +25190,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p09" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950202)</description>
+	<software name="wsb95p09" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950202)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25199,8 +25204,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p08" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950203)</description>
+	<software name="wsb95p08" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950203)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25213,8 +25218,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p07" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950207)</description>
+	<software name="wsb95p07" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950207)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25227,8 +25232,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p06" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950209-B)</description>
+	<software name="wsb95p06" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950209-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25241,8 +25246,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p05" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950209)</description>
+	<software name="wsb95p05" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950209)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25255,8 +25260,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p04" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950211)</description>
+	<software name="wsb95p04" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950211)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25269,8 +25274,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p03" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950212)</description>
+	<software name="wsb95p03" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950212)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25283,8 +25288,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p02" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950213)</description>
+	<software name="wsb95p02" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950213)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25297,8 +25302,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p01" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950214)</description>
+	<software name="wsb95p01" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950214)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25311,8 +25316,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p20" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950101-TST)</description>
+	<software name="wsb95p20" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950101-TST)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25325,8 +25330,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p19" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950103-TST)</description>
+	<software name="wsb95p19" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950103-TST)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25339,8 +25344,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p18" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950105)</description>
+	<software name="wsb95p18" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950105)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25353,8 +25358,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p17" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950109-TST)</description>
+	<software name="wsb95p17" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950109-TST)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25367,8 +25372,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p16" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950110)</description>
+	<software name="wsb95p16" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950110)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25381,8 +25386,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p15" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950114-RM)</description>
+	<software name="wsb95p15" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950114-RM)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25392,8 +25397,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p14" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950116)</description>
+	<software name="wsb95p14" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950116)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25406,8 +25411,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p13" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950118-RM)</description>
+	<software name="wsb95p13" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950118-RM)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25417,8 +25422,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p12" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950120)</description>
+	<software name="wsb95p12" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950120)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25431,8 +25436,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p11" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950125)</description>
+	<software name="wsb95p11" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950125)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25445,8 +25450,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p10" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19950130)</description>
+	<software name="wsb95p10" cloneof="wsb95" supported="no">
+		<description>World Series Baseball '95 (USA, Prototype, 19950130)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25459,7 +25464,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb96">
+	<software name="wsb96" supported="no">
 		<description>World Series Baseball '96 (USA)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -25473,7 +25478,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb98">
+	<software name="wsb98" supported="no">
 		<description>World Series Baseball '98 (USA)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
@@ -25501,8 +25506,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsbp09" cloneof="wsb">
-		<description>World Series Baseball (Prototype, 19931222)</description>
+	<software name="wsbp09" cloneof="wsb" supported="no">
+		<description>World Series Baseball (USA, Prototype, 19931222)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25513,7 +25518,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="wsbp08" cloneof="wsb">
-		<description>World Series Baseball (Prototype, 19931226)</description>
+		<description>World Series Baseball (USA, Prototype, 19931226)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25527,7 +25532,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="wsbp07" cloneof="wsb">
-		<description>World Series Baseball (Prototype, 19931229)</description>
+		<description>World Series Baseball (USA, Prototype, 19931229)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25541,7 +25546,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="wsbp03" cloneof="wsb">
-		<description>World Series Baseball (Prototype, 19940218)</description>
+		<description>World Series Baseball (USA, Prototype, 19940218)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25555,7 +25560,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="wsbp06" cloneof="wsb">
-		<description>World Series Baseball (Prototype, 19940103)</description>
+		<description>World Series Baseball (USA, Prototype, 19940103)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25569,7 +25574,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="wsbp05" cloneof="wsb">
-		<description>World Series Baseball (Prototype, 19940106)</description>
+		<description>World Series Baseball (USA, Prototype, 19940106)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25583,7 +25588,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="wsbp04" cloneof="wsb">
-		<description>World Series Baseball (Prototype, 19940116)</description>
+		<description>World Series Baseball (USA, Prototype, 19940116)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25596,8 +25601,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsbp02" cloneof="wsb">
-		<description>World Series Baseball (Prototype, 19940304)</description>
+	<software name="wsbp02" cloneof="wsb" supported="no">
+		<description>World Series Baseball (USA, Prototype, 19940304)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25608,7 +25613,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="wsbp01" cloneof="wsb">
-		<description>World Series Baseball (Prototype, 19940527)</description>
+		<description>World Series Baseball (USA, Prototype, 19940527)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25621,8 +25626,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsbp10" cloneof="wsb">
-		<description>World Series Baseball (Prototype, 19931001)</description>
+	<software name="wsbp10" cloneof="wsb" supported="no">
+		<description>World Series Baseball (USA, Prototype, 19931001)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25745,7 +25750,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wwfaga" cloneof="wwfag">
+	<software name="wwfagp" cloneof="wwfag" supported="no">
 		<description>WWF WrestleMania - The Arcade Game (USA, Prototype)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -25987,7 +25992,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="xmen2p17" cloneof="xmen2">
+	<software name="xmen2p17" cloneof="xmen2" supported="no">
 		<description>X-Men 2 - Clone Wars (Prototype, 19941018)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -26155,7 +26160,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="yuyusf">
+	<software name="yuyumt" cloneof="yuyusf">
 		<description>Yu Yu Hakusho - Makyou Toitsusen (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -26169,7 +26174,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="yuyusfb" cloneof="yuyusf">
+	<software name="yuyusf">
 		<description>Yu Yu Hakusho - Sunset Fighters (Bra)</description>
 		<year>199?</year>
 		<publisher>Tec Toy</publisher>
@@ -26317,9 +26322,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="zool">
-		<description>Zool - Ninja of the 'Nth' Dimension (Euro)</description>
+		<description>Zool (Euro)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="alt_title" value="Zool - Ninja of the &quot;Nth&quot; Dimension (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="zool04.bin" size="1048576" crc="1ee58b03" sha1="cab14f63b7d00b35a11a3a7f60cf231199121dc8" offset="000000" loadflag="load16_word_swap" />
@@ -26328,9 +26334,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="zoolu" cloneof="zool">
-		<description>Zool - Ninja of the 'Nth' Dimension (USA)</description>
+		<description>Zool (USA)</description>
 		<year>1993</year>
 		<publisher>GameTek</publisher>
+		<info name="alt_title" value="Zool - Ninja of the &quot;Nth&quot; Dimension (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="zool - ninja of the 'nth' dimension (usa).bin" size="1048576" crc="cb2939f1" sha1="ee016f127b81f1ca25657e8fa47fac0c4ed15c97" offset="000000" loadflag="load16_word_swap" />

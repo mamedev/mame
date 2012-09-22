@@ -30,7 +30,6 @@ Undumped:
 - Rampage 2 - Universal Tour CGB-AUTP-EUR
 - Road Rash CGB-BRRP-EUR
 - Rocket Power - Gettin' Air CGB-BRUP-EUR
-- Rugrats - Totally Angelica CGB-BAGP-EUR
 - San Francisco Rush 2049 (Euro, fr/de/nl) [small pic]
 - Sesame Street Sports (Euro) [small pic]
 - Shaun Palmer's Pro Snowboarder CGB-B3SP-AUS
@@ -39,7 +38,6 @@ Undumped:
 - TOCA Touring Car Championship CGB-BTCP-EUR
 - Toy Story Racer CGB-BTBP-EUR? [unclear pic]
 - Yoda Stories DMG-AYDP-EUR
-- WWF Attitude CGB-AWTP-AUS
 
 nointro guys also list the following
 - 1942 (Euro)
@@ -14467,10 +14465,10 @@ Undumped Pirates:
 
 	<software name="rugtotan">
 		<!-- Notes: GBC only -->
-		<description>Rugrats - Totally Angelica (USA)</description>
+		<description>Rugrats - Totally Angelica (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="CGB-BAGE-USA"/>
+		<info name="serial" value="CGB-BAGE-USA, CGB-BAGP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="rugrats - totally angelica (usa).bin" size="1048576" crc="fc6195ef" sha1="d4396a974aee16f74a5a80f4845c24dde5a083d6" offset="000000" />
@@ -18309,10 +18307,10 @@ Undumped Pirates:
 
 	<software name="wwfattit">
 		<!-- Notes: GBC only -->
-		<description>WWF Attitude (USA)</description>
+		<description>WWF Attitude (Euro, USA)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="CGB-AWTE-USA"/>
+		<info name="serial" value="CGB-AWTE-USA, CGB-AWTP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="wwf attitude (usa).bin" size="1048576" crc="d5fdf68a" sha1="d5c37eabe3311666123b22f44a973c06d96bfce0" offset="000000" />
