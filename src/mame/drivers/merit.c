@@ -1921,7 +1921,7 @@ ROM_END
 
 ROM_START( dodgectya )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2131-82.u5", 0x0000, 0x8000, CRC(eb82515d) SHA1(d2c15bd633472f50b621ba90598559e345246d01) )
+	ROM_LOAD( "2131-82_u5-0d.u5", 0x0000, 0x8000, CRC(ef71b268) SHA1(c85f2c8e7e9cd89b4720699814d8fcfbecf4dc1b) ) /* 2131-82 U5-0D 884111 2131 820*/
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "dodg_u39.u39", 0x00000, 0x8000, CRC(3b3376a1) SHA1(6880cdc29686ff7328717c3833ff826c278b023e) ) /* These 3 roms: 1st & 2nd half identical - Verified correct */
@@ -1934,7 +1934,20 @@ ROM_END
 
 ROM_START( dodgectyb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2131-82_gt.u5", 0x0000, 0x8000, CRC(3858cd50) SHA1(1b1e208076df964afd68d01aa8d5489d36a934a5) ) /* Hand written label */
+	ROM_LOAD( "2131-82_u5-50.u5", 0x0000, 0x8000, CRC(eb82515d) SHA1(d2c15bd633472f50b621ba90598559e345246d01) ) /* 2131-82 U5-50 987130 2131 825 */
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "dodg_u39.u39", 0x00000, 0x8000, CRC(3b3376a1) SHA1(6880cdc29686ff7328717c3833ff826c278b023e) ) /* These 3 roms: 1st & 2nd half identical - Verified correct */
+	ROM_LOAD( "dodg_u38.u38", 0x08000, 0x8000, CRC(654d5b00) SHA1(9e16330b2dc8821fc20a39eb42176fda23085bfc) )
+	ROM_LOAD( "dodg_u37.u37", 0x10000, 0x8000, CRC(bc9e63d4) SHA1(2320f5a0545f18e1e42a3a45fedce912c36fbe13) )
+
+	ROM_REGION( 0x0800, "gfx2", ROMREGION_ERASEFF )
+	ROM_LOAD( "ctr-209_2131-82", 0x00000, 0x0800, NO_DUMP ) /* 2816 EEPROM in Z80 epoxy CPU module */
+ROM_END
+
+ROM_START( dodgectyc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2131-82_u5-0_gt.u5", 0x0000, 0x8000, CRC(3858cd50) SHA1(1b1e208076df964afd68d01aa8d5489d36a934a5) ) /* 2131-82 U5-0 GT 982050 2131 820 */
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "dodg_u39.u39", 0x00000, 0x8000, CRC(3b3376a1) SHA1(6880cdc29686ff7328717c3833ff826c278b023e) ) /* These 3 roms: 1st & 2nd half identical - Verified correct */
@@ -2114,8 +2127,9 @@ GAME( 1986, phrcrazev,phrcraze,phrcraze, phrcrazs, merit_state, key_7,  ROT90, "
 
 GAME( 1986, bigappg,  0,       bigappg,  bigappg, driver_device,  0,    ROT0,  "Merit", "Big Apple Games (2131-13)",                   GAME_SUPPORTS_SAVE )
 
-GAME( 1986, dodgectya,dodgecty,dodge,    couple, driver_device,   0,    ROT0,  "Merit", "Dodge City (2131-82, set 1)",                 GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1986, dodgectyb,dodgecty,dodge,    couple, driver_device,   0,    ROT0,  "Merit", "Dodge City (2131-82, set 2)",                 GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1986, dodgectya,dodgecty,dodge,    couple, driver_device,   0,    ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",                 GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1986, dodgectyb,dodgecty,dodge,    couple, driver_device,   0,    ROT0,  "Merit", "Dodge City (2131-82, U5-50)",                 GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1986, dodgectyc,dodgecty,dodge,    couple, driver_device,   0,    ROT0,  "Merit", "Dodge City (2131-82, U5-0 GT)",               GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 
 GAME( 1987, dtrvwz5,  0,       dtrvwz5,  dtrvwh5, merit_state,  dtrvwz5,ROT0,  "Merit", "Deluxe Trivia ? Whiz (Edition 5)",  GAME_SUPPORTS_SAVE )
 
