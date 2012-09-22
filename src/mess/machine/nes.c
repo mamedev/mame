@@ -3,7 +3,7 @@
 #include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"
 #include "includes/nes.h"
-#include "machine/nes_mmc.h"
+//#include "includes/nes_mmc.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/flopdrv.h"
 #include "hashfile.h"

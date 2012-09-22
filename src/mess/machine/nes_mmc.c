@@ -124,7 +124,7 @@
 #include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"
 #include "includes/nes.h"
-#include "nes_mmc.h"
+#include "includes/nes_mmc.h"
 #include "sound/nes_apu.h"
 
 #ifdef MAME_DEBUG

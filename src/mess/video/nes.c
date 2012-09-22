@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "video/ppu2c0x.h"
 #include "includes/nes.h"
-#include "machine/nes_mmc.h"
+//#include "includes/nes_mmc.h"
 
 static void nes_vh_reset( running_machine &machine )
 {
