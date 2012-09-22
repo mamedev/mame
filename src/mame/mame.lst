@@ -4464,13 +4464,13 @@ sonicp			// 1993.?? Sonic the Hedgehog (proto, Japan)
 kokoroj2		// 1993.12 Soreike! Kokoroji 2 (Japan)
 jpark			// 1994.?? Jurassic Park (World)
 				// 1994.?? Jurassic Park (US)
-				// 1994.02 Jurassic Park (Japan)
+jparkj			// 1994.02 Jurassic Park (Japan)
 dbzvrvs			// 1994.03 Dragon Ball Z V.R.V.S. (Japan)
 jleague			// 1994.07 The J League 1994 (Japan)
 svf				// 1994.?? Super Visual Football
 svs				// 1994.?? Super Visual Soccer
-slipstrm		// 1995.?? Slip Stream (Capcom)
-slipstrmh
+slipstrm		// 1995.?? Slip Stream (950515 Brazil) (c) Capcom
+slipstrmh		// 1995.?? Slip Stream (950515 Hispanic) (c) Capcom
 
 // Sega Multi System 32 games
 orunners		// 1993.?? Outrunners (World)
