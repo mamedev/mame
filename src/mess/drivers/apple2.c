@@ -209,6 +209,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "machine/a2alfam2.h"
 #include "machine/laser128.h"
 #include "machine/a2echoii.h"
+#include "machine/a2arcadebd.h"
 
 /***************************************************************************
     PARAMETERS
@@ -632,6 +633,7 @@ static SLOT_INTERFACE_START(apple2_cards)
     SLOT_INTERFACE("ap16alt", A2BUS_IBSAP16ALT)    /* IBS AP16 (German VideoTerm clone), alternate revision */
     SLOT_INTERFACE("vtc1", A2BUS_VTC1)    /* Unknown VideoTerm clone #1 */
     SLOT_INTERFACE("vtc2", A2BUS_VTC2)    /* Unknown VideoTerm clone #2 */
+    SLOT_INTERFACE("arcbd", A2BUS_ARCADEBOARD)    /* Third Millenium Engineering Arcade Board */
 //    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
 SLOT_INTERFACE_END
 
