@@ -718,7 +718,7 @@ WRITE8_MEMBER(nes_carts_state::uxrom_w)
 {
 	LOG_MMC(("uxrom_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg16_89ab(machine(), data);
+	prg16_89ab(data);
 }
 
 /*************************************************************
@@ -741,7 +741,7 @@ WRITE8_MEMBER(nes_carts_state::uxrom_cc_w)
 {
 	LOG_MMC(("uxrom_cc_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg16_cdef(machine(), data);
+	prg16_cdef(data);
 }
 
 /*************************************************************
@@ -764,7 +764,7 @@ WRITE8_MEMBER(nes_carts_state::un1rom_w)
 {
 	LOG_MMC(("un1rom_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg16_89ab(machine(), data >> 2);
+	prg16_89ab(data >> 2);
 }
 
 /*************************************************************
@@ -797,7 +797,7 @@ WRITE8_MEMBER(nes_carts_state::cnrom_w)
 
 	if (m_ce_mask)
 	{
-		chr8(machine(), data & ~m_ce_mask, CHRROM);
+		chr8(data & ~m_ce_mask, CHRROM);
 
 		if ((data & m_ce_mask) == m_ce_state)
 			m_chr_open_bus = 0;
@@ -805,7 +805,7 @@ WRITE8_MEMBER(nes_carts_state::cnrom_w)
 			m_chr_open_bus = 1;
 	}
 	else
-		chr8(machine(), data, CHRROM);
+		chr8(data, CHRROM);
 }
 
 /*************************************************************
@@ -848,7 +848,7 @@ WRITE8_MEMBER(nes_carts_state::bandai_pt554_m_w)
 WRITE8_MEMBER(nes_carts_state::cprom_w)
 {
 	LOG_MMC(("cprom_w, offset: %04x, data: %02x\n", offset, data));
-	chr4_4(machine(), data, CHRRAM);
+	chr4_4(data, CHRRAM);
 }
 
 /*************************************************************
@@ -871,8 +871,8 @@ WRITE8_MEMBER(nes_carts_state::axrom_w)
 {
 	LOG_MMC(("axrom_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring(machine(), BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
-	prg32(machine(), data);
+	set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+	prg32(data);
 }
 
 /*************************************************************
@@ -893,7 +893,7 @@ WRITE8_MEMBER(nes_carts_state::bxrom_w)
 	/* Deadly Towers is really a BxROM game - the demo screens look wrong using mapper 7. */
 	LOG_MMC(("bxrom_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), data);
+	prg32(data);
 }
 
 /*************************************************************
@@ -912,8 +912,8 @@ WRITE8_MEMBER(nes_carts_state::gxrom_w)
 {
 	LOG_MMC(("gxrom_w, offset %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), (data & 0xf0) >> 4);
-	chr8(machine(), data & 0x0f, CHRROM);
+	prg32((data & 0xf0) >> 4);
+	chr8(data & 0x0f, CHRROM);
 }
 
 /*************************************************************
@@ -950,9 +950,9 @@ static void mmc1_set_wram( address_space &space, int board )
 			}
 		case STD_SXROM_A:	// ignore WRAM enable bit
 			if (state->m_battery_size > 0x2000)
-				wram_bank(machine, ((state->m_mmc_reg[1] & 3) >> 2), NES_BATTERY);
+				state->wram_bank(((state->m_mmc_reg[1] & 3) >> 2), NES_BATTERY);
 			else if (state->m_battery_size)
-				wram_bank(machine, 0, NES_BATTERY);
+				state->wram_bank(0, NES_BATTERY);
 			break;
 		case STD_SOROM:		// there are 2 WRAM banks only and battery is bank 2 for the cart (hence, we invert bank, because we have battery first)
 			if (!BIT(state->m_mmc_reg[3], 4))
@@ -963,7 +963,7 @@ static void mmc1_set_wram( address_space &space, int board )
 				break;
 			}
 		case STD_SOROM_A:	// ignore WRAM enable bit
-			wram_bank(machine, 0, bank ? NES_BATTERY : NES_WRAM);
+			state->wram_bank(0, bank ? NES_BATTERY : NES_WRAM);
 			break;
 	}
 }
@@ -989,17 +989,17 @@ static void mmc1_set_prg( running_machine &machine )
 		case 0x00:
 		case 0x04:
 //          printf("PRG 32 bank %d \n", (prg_offset + state->m_mmc_reg[3]) >> 1);
-			prg32(machine, (prg_offset + state->m_mmc_reg[3]) >> 1);
+			state->prg32((prg_offset + state->m_mmc_reg[3]) >> 1);
 			break;
 		case 0x08:
 //          printf("PRG 16 bank %d (high) \n", prg_offset + state->m_mmc_reg[3]);
-			prg16_89ab(machine, prg_offset + 0);
-			prg16_cdef(machine, prg_offset + state->m_mmc_reg[3]);
+			state->prg16_89ab(prg_offset + 0);
+			state->prg16_cdef(prg_offset + state->m_mmc_reg[3]);
 			break;
 		case 0x0c:
 //          printf("PRG 16 bank %d (low) \n", prg_offset + state->m_mmc_reg[3]);
-			prg16_89ab(machine, prg_offset + state->m_mmc_reg[3]);
-			prg16_cdef(machine, prg_offset + 0x0f);
+			state->prg16_89ab(prg_offset + state->m_mmc_reg[3]);
+			state->prg16_cdef(prg_offset + 0x0f);
 			break;
 	}
 }
@@ -1017,11 +1017,11 @@ static void mmc1_set_chr( running_machine &machine )
 
 	if (chr_mode)
 	{
-		chr4_0(machine, state->m_mmc_reg[1] & 0x1f, state->m_mmc_chr_source);
-		chr4_4(machine, state->m_mmc_reg[2] & 0x1f, state->m_mmc_chr_source);
+		state->chr4_0(state->m_mmc_reg[1] & 0x1f, state->m_mmc_chr_source);
+		state->chr4_4(state->m_mmc_reg[2] & 0x1f, state->m_mmc_chr_source);
 	}
 	else
-		chr8(machine, (state->m_mmc_reg[1] & 0x1f) >> 1, state->m_mmc_chr_source);
+		state->chr8((state->m_mmc_reg[1] & 0x1f) >> 1, state->m_mmc_chr_source);
 }
 
 static void common_sxrom_write_handler( address_space &space, offs_t offset, UINT8 data, int board )
@@ -1043,7 +1043,7 @@ static void common_sxrom_write_handler( address_space &space, offs_t offset, UIN
 	else
 	{
 		state->m_mmc1_reg_write_enable = 0;
-		space.machine().scheduler().synchronize(FUNC(mmc1_resync_callback));
+		machine.scheduler().synchronize(FUNC(mmc1_resync_callback));
 	}
 
 	if (data & 0x80)
@@ -1074,10 +1074,10 @@ static void common_sxrom_write_handler( address_space &space, offs_t offset, UIN
 
 				switch (state->m_mmc_reg[0] & 0x03)
 				{
-				case 0: set_nt_mirroring(machine, PPU_MIRROR_LOW); break;
-				case 1: set_nt_mirroring(machine, PPU_MIRROR_HIGH); break;
-				case 2: set_nt_mirroring(machine, PPU_MIRROR_VERT); break;
-				case 3: set_nt_mirroring(machine, PPU_MIRROR_HORZ); break;
+				case 0: state->set_nt_mirroring(PPU_MIRROR_LOW); break;
+				case 1: state->set_nt_mirroring(PPU_MIRROR_HIGH); break;
+				case 2: state->set_nt_mirroring(PPU_MIRROR_VERT); break;
+				case 3: state->set_nt_mirroring(PPU_MIRROR_HORZ); break;
 				}
 				mmc1_set_chr(machine);
 				mmc1_set_prg_wram(space, board);
@@ -1125,25 +1125,25 @@ static void mmc2_latch( device_t *device, offs_t offset )
 	{
 		LOG_MMC(("mmc2 vrom latch switch (bank 0 low): %02x\n", state->m_mmc_reg[0]));
 		state->m_mmc_latch1 = 0xfd;
-		chr4_0(device->machine(), state->m_mmc_reg[0], CHRROM);
+		state->chr4_0(state->m_mmc_reg[0], CHRROM);
 	}
 	else if ((offset & 0x3ff0) == 0x0fe0)
 	{
 		LOG_MMC(("mmc2 vrom latch switch (bank 0 high): %02x\n", state->m_mmc_reg[1]));
 		state->m_mmc_latch1 = 0xfe;
-		chr4_0(device->machine(), state->m_mmc_reg[1], CHRROM);
+		state->chr4_0(state->m_mmc_reg[1], CHRROM);
 	}
 	else if ((offset & 0x3ff0) == 0x1fd0)
 	{
 		LOG_MMC(("mmc2 vrom latch switch (bank 1 low): %02x\n", state->m_mmc_reg[2]));
 		state->m_mmc_latch2 = 0xfd;
-		chr4_4(device->machine(), state->m_mmc_reg[2], CHRROM);
+		state->chr4_4(state->m_mmc_reg[2], CHRROM);
 	}
 	else if ((offset & 0x3ff0) == 0x1fe0)
 	{
 		LOG_MMC(("mmc2 vrom latch switch (bank 0 high): %02x\n", state->m_mmc_reg[3]));
 		state->m_mmc_latch2 = 0xfe;
-		chr4_4(device->machine(), state->m_mmc_reg[3], CHRROM);
+		state->chr4_4(state->m_mmc_reg[3], CHRROM);
 	}
 }
 
@@ -1153,30 +1153,30 @@ WRITE8_MEMBER(nes_carts_state::pxrom_w)
 	switch (offset & 0x7000)
 	{
 		case 0x2000:
-			prg8_89(machine(), data);
+			prg8_89(data);
 			break;
 		case 0x3000:
 			m_mmc_reg[0] = data;
 			if (m_mmc_latch1 == 0xfd)
-				chr4_0(machine(), m_mmc_reg[0], CHRROM);
+				chr4_0(m_mmc_reg[0], CHRROM);
 			break;
 		case 0x4000:
 			m_mmc_reg[1] = data;
 			if (m_mmc_latch1 == 0xfe)
-				chr4_0(machine(), m_mmc_reg[1], CHRROM);
+				chr4_0(m_mmc_reg[1], CHRROM);
 			break;
 		case 0x5000:
 			m_mmc_reg[2] = data;
 			if (m_mmc_latch2 == 0xfd)
-				chr4_4(machine(), m_mmc_reg[2], CHRROM);
+				chr4_4(m_mmc_reg[2], CHRROM);
 			break;
 		case 0x6000:
 			m_mmc_reg[3] = data;
 			if (m_mmc_latch2 == 0xfe)
-				chr4_4(machine(), m_mmc_reg[3], CHRROM);
+				chr4_4(m_mmc_reg[3], CHRROM);
 			break;
 		case 0x7000:
-			set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		default:
 			LOG_MMC(("MMC2 uncaught w: %04x:%02x\n", offset, data));
@@ -1202,7 +1202,7 @@ WRITE8_MEMBER(nes_carts_state::fxrom_w)
 	switch (offset & 0x7000)
 	{
 		case 0x2000:
-			prg16_89ab(machine(), data);
+			prg16_89ab(data);
 			break;
 		default:
 			pxrom_w(space, offset, data, mem_mask);
@@ -1243,6 +1243,21 @@ static void mmc3_set_wram( address_space &space )
 		return;
 	}
 }
+
+// base MMC3 simply calls prg8_x
+static void mmc3_base_prg_cb( running_machine &machine, int start, int bank )
+{
+	nes_state *state = machine.driver_data<nes_state>();
+	state->prg8_x(start, bank);
+}
+
+// base MMC3 simply calls chr1_x
+static void mmc3_base_chr_cb( running_machine &machine, int start, int bank, int source )
+{
+	nes_state *state = machine.driver_data<nes_state>();
+	state->chr1_x(start, bank, source);
+}
+
 
 static void mmc3_set_prg( running_machine &machine, int prg_base, int prg_mask )
 {
@@ -1332,7 +1347,7 @@ WRITE8_MEMBER(nes_carts_state::txrom_w)
 			break;
 
 		case 0x2000:
-			set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x2001:
@@ -1466,24 +1481,25 @@ static void txsrom_set_mirror( running_machine &machine )
 	nes_state *state = machine.driver_data<nes_state>();
 	if (state->m_mmc3_latch & 0x80)
 	{
-		set_nt_page(machine, 0, CIRAM, (state->m_mmc_vrom_bank[2] & 0x80) >> 7, 1);
-		set_nt_page(machine, 1, CIRAM, (state->m_mmc_vrom_bank[3] & 0x80) >> 7, 1);
-		set_nt_page(machine, 2, CIRAM, (state->m_mmc_vrom_bank[4] & 0x80) >> 7, 1);
-		set_nt_page(machine, 3, CIRAM, (state->m_mmc_vrom_bank[5] & 0x80) >> 7, 1);
+		state->set_nt_page(0, CIRAM, (state->m_mmc_vrom_bank[2] & 0x80) >> 7, 1);
+		state->set_nt_page(1, CIRAM, (state->m_mmc_vrom_bank[3] & 0x80) >> 7, 1);
+		state->set_nt_page(2, CIRAM, (state->m_mmc_vrom_bank[4] & 0x80) >> 7, 1);
+		state->set_nt_page(3, CIRAM, (state->m_mmc_vrom_bank[5] & 0x80) >> 7, 1);
 	}
 	else
 	{
-		set_nt_page(machine, 0, CIRAM, (state->m_mmc_vrom_bank[0] & 0x80) >> 7, 1);
-		set_nt_page(machine, 1, CIRAM, (state->m_mmc_vrom_bank[0] & 0x80) >> 7, 1);
-		set_nt_page(machine, 2, CIRAM, (state->m_mmc_vrom_bank[1] & 0x80) >> 7, 1);
-		set_nt_page(machine, 3, CIRAM, (state->m_mmc_vrom_bank[1] & 0x80) >> 7, 1);
+		state->set_nt_page(0, CIRAM, (state->m_mmc_vrom_bank[0] & 0x80) >> 7, 1);
+		state->set_nt_page(1, CIRAM, (state->m_mmc_vrom_bank[0] & 0x80) >> 7, 1);
+		state->set_nt_page(2, CIRAM, (state->m_mmc_vrom_bank[1] & 0x80) >> 7, 1);
+		state->set_nt_page(3, CIRAM, (state->m_mmc_vrom_bank[1] & 0x80) >> 7, 1);
 	}
 }
 
 static void txsrom_chr_cb( running_machine &machine, int start, int bank, int source )
 {
+	nes_state *state = machine.driver_data<nes_state>();
 	txsrom_set_mirror(machine);	// we could probably update only for one (e.g. the first) call, to slightly optimize the code
-	chr1_x(machine, start, bank, source);
+	state->chr1_x(start, bank, source);
 }
 
 WRITE8_MEMBER(nes_carts_state::txsrom_w)
@@ -1526,14 +1542,14 @@ static void tqrom_set_chr( running_machine &machine )
 		chr_mask[i] =  (state->m_mmc_vrom_bank[i] & 0x40) ? 0x07 : 0x3f;
 	}
 
-	chr1_x(machine, chr_page ^ 0, ((state->m_mmc_vrom_bank[0] & ~0x01) & chr_mask[0]), chr_src[0]);
-	chr1_x(machine, chr_page ^ 1, ((state->m_mmc_vrom_bank[0] |  0x01) & chr_mask[0]), chr_src[0]);
-	chr1_x(machine, chr_page ^ 2, ((state->m_mmc_vrom_bank[1] & ~0x01) & chr_mask[1]), chr_src[1]);
-	chr1_x(machine, chr_page ^ 3, ((state->m_mmc_vrom_bank[1] |  0x01) & chr_mask[1]), chr_src[1]);
-	chr1_x(machine, chr_page ^ 4, (state->m_mmc_vrom_bank[2] & chr_mask[2]), chr_src[2]);
-	chr1_x(machine, chr_page ^ 5, (state->m_mmc_vrom_bank[3] & chr_mask[3]), chr_src[3]);
-	chr1_x(machine, chr_page ^ 6, (state->m_mmc_vrom_bank[4] & chr_mask[4]), chr_src[4]);
-	chr1_x(machine, chr_page ^ 7, (state->m_mmc_vrom_bank[5] & chr_mask[5]), chr_src[5]);
+	state->chr1_x(chr_page ^ 0, ((state->m_mmc_vrom_bank[0] & ~0x01) & chr_mask[0]), chr_src[0]);
+	state->chr1_x(chr_page ^ 1, ((state->m_mmc_vrom_bank[0] |  0x01) & chr_mask[0]), chr_src[0]);
+	state->chr1_x(chr_page ^ 2, ((state->m_mmc_vrom_bank[1] & ~0x01) & chr_mask[1]), chr_src[1]);
+	state->chr1_x(chr_page ^ 3, ((state->m_mmc_vrom_bank[1] |  0x01) & chr_mask[1]), chr_src[1]);
+	state->chr1_x(chr_page ^ 4, (state->m_mmc_vrom_bank[2] & chr_mask[2]), chr_src[2]);
+	state->chr1_x(chr_page ^ 5, (state->m_mmc_vrom_bank[3] & chr_mask[3]), chr_src[3]);
+	state->chr1_x(chr_page ^ 6, (state->m_mmc_vrom_bank[4] & chr_mask[4]), chr_src[4]);
+	state->chr1_x(chr_page ^ 7, (state->m_mmc_vrom_bank[5] & chr_mask[5]), chr_src[5]);
 }
 
 WRITE8_MEMBER(nes_carts_state::tqrom_w)
@@ -1640,30 +1656,30 @@ static void mmc5_update_chr_a( running_machine &machine )
 	switch (state->m_mmc5_chr_mode)
 	{
 		case 0:	// 8k banks
-			chr8(machine, state->m_mmc5_vrom_regA[7] & 0xff, CHRROM);
+			state->chr8(state->m_mmc5_vrom_regA[7] & 0xff, CHRROM);
 			break;
 
 		case 1:	// 4k banks
-			chr4_0(machine, state->m_mmc5_vrom_regA[3] & 0xff, CHRROM);
-			chr4_4(machine, state->m_mmc5_vrom_regA[7] & 0xff, CHRROM);
+			state->chr4_0(state->m_mmc5_vrom_regA[3] & 0xff, CHRROM);
+			state->chr4_4(state->m_mmc5_vrom_regA[7] & 0xff, CHRROM);
 			break;
 
 		case 2:	// 2k banks
-			chr2_0(machine, state->m_mmc5_vrom_regA[1], CHRROM);
-			chr2_2(machine, state->m_mmc5_vrom_regA[3], CHRROM);
-			chr2_4(machine, state->m_mmc5_vrom_regA[5], CHRROM);
-			chr2_6(machine, state->m_mmc5_vrom_regA[7], CHRROM);
+			state->chr2_0(state->m_mmc5_vrom_regA[1], CHRROM);
+			state->chr2_2(state->m_mmc5_vrom_regA[3], CHRROM);
+			state->chr2_4(state->m_mmc5_vrom_regA[5], CHRROM);
+			state->chr2_6(state->m_mmc5_vrom_regA[7], CHRROM);
 			break;
 
 		case 3:	// 1k banks
-			chr1_0(machine, state->m_mmc5_vrom_regA[0], CHRROM);
-			chr1_1(machine, state->m_mmc5_vrom_regA[1], CHRROM);
-			chr1_2(machine, state->m_mmc5_vrom_regA[2], CHRROM);
-			chr1_3(machine, state->m_mmc5_vrom_regA[3], CHRROM);
-			chr1_4(machine, state->m_mmc5_vrom_regA[4], CHRROM);
-			chr1_5(machine, state->m_mmc5_vrom_regA[5], CHRROM);
-			chr1_6(machine, state->m_mmc5_vrom_regA[6], CHRROM);
-			chr1_7(machine, state->m_mmc5_vrom_regA[7], CHRROM);
+			state->chr1_0(state->m_mmc5_vrom_regA[0], CHRROM);
+			state->chr1_1(state->m_mmc5_vrom_regA[1], CHRROM);
+			state->chr1_2(state->m_mmc5_vrom_regA[2], CHRROM);
+			state->chr1_3(state->m_mmc5_vrom_regA[3], CHRROM);
+			state->chr1_4(state->m_mmc5_vrom_regA[4], CHRROM);
+			state->chr1_5(state->m_mmc5_vrom_regA[5], CHRROM);
+			state->chr1_6(state->m_mmc5_vrom_regA[6], CHRROM);
+			state->chr1_7(state->m_mmc5_vrom_regA[7], CHRROM);
 			break;
 	}
 }
@@ -1674,30 +1690,30 @@ static void mmc5_update_chr_b( running_machine &machine )
 	switch (state->m_mmc5_chr_mode)
 	{
 		case 0:	// 8k banks
-			chr8(machine, state->m_mmc5_vrom_regB[3] & 0xff, CHRROM);
+			state->chr8(state->m_mmc5_vrom_regB[3] & 0xff, CHRROM);
 			break;
 
 		case 1:	// 4k banks
-			chr4_0(machine, state->m_mmc5_vrom_regB[3] & 0xff, CHRROM);
-			chr4_4(machine, state->m_mmc5_vrom_regB[3] & 0xff, CHRROM);
+			state->chr4_0(state->m_mmc5_vrom_regB[3] & 0xff, CHRROM);
+			state->chr4_4(state->m_mmc5_vrom_regB[3] & 0xff, CHRROM);
 			break;
 
 		case 2:	// 2k banks
-			chr2_0(machine, state->m_mmc5_vrom_regB[1], CHRROM);
-			chr2_2(machine, state->m_mmc5_vrom_regB[3], CHRROM);
-			chr2_4(machine, state->m_mmc5_vrom_regB[1], CHRROM);
-			chr2_6(machine, state->m_mmc5_vrom_regB[3], CHRROM);
+			state->chr2_0(state->m_mmc5_vrom_regB[1], CHRROM);
+			state->chr2_2(state->m_mmc5_vrom_regB[3], CHRROM);
+			state->chr2_4(state->m_mmc5_vrom_regB[1], CHRROM);
+			state->chr2_6(state->m_mmc5_vrom_regB[3], CHRROM);
 			break;
 
 		case 3:	// 1k banks
-			chr1_0(machine, state->m_mmc5_vrom_regB[0], CHRROM);
-			chr1_1(machine, state->m_mmc5_vrom_regB[1], CHRROM);
-			chr1_2(machine, state->m_mmc5_vrom_regB[2], CHRROM);
-			chr1_3(machine, state->m_mmc5_vrom_regB[3], CHRROM);
-			chr1_4(machine, state->m_mmc5_vrom_regB[0], CHRROM);
-			chr1_5(machine, state->m_mmc5_vrom_regB[1], CHRROM);
-			chr1_6(machine, state->m_mmc5_vrom_regB[2], CHRROM);
-			chr1_7(machine, state->m_mmc5_vrom_regB[3], CHRROM);
+			state->chr1_0(state->m_mmc5_vrom_regB[0], CHRROM);
+			state->chr1_1(state->m_mmc5_vrom_regB[1], CHRROM);
+			state->chr1_2(state->m_mmc5_vrom_regB[2], CHRROM);
+			state->chr1_3(state->m_mmc5_vrom_regB[3], CHRROM);
+			state->chr1_4(state->m_mmc5_vrom_regB[0], CHRROM);
+			state->chr1_5(state->m_mmc5_vrom_regB[1], CHRROM);
+			state->chr1_6(state->m_mmc5_vrom_regB[2], CHRROM);
+			state->chr1_7(state->m_mmc5_vrom_regB[3], CHRROM);
 			break;
 	}
 }
@@ -1711,7 +1727,7 @@ static void mmc5_update_prg( running_machine &machine )
 	switch (state->m_mmc5_prg_mode)
 	{
 		case 0:	// 32k banks
-			prg32(machine, state->m_mmc5_prg_regs[3] >> 2);
+			state->prg32(state->m_mmc5_prg_regs[3] >> 2);
 			break;
 
 		case 1:	// 16k banks
@@ -1726,9 +1742,9 @@ static void mmc5_update_prg( running_machine &machine )
 				state->membank("bank2")->set_entry(state->m_prg_bank[1]);
 			}
 			else
-				prg16_89ab(machine, bank1 >> 1);
+				state->prg16_89ab(bank1 >> 1);
 
-			prg16_cdef(machine, state->m_mmc5_prg_regs[3] >> 1);
+			state->prg16_cdef(state->m_mmc5_prg_regs[3] >> 1);
 			break;
 
 		case 2:	// 16k-8k banks
@@ -1744,7 +1760,7 @@ static void mmc5_update_prg( running_machine &machine )
 				state->membank("bank2")->set_entry(state->m_prg_bank[1]);
 			}
 			else
-				prg16_89ab(machine, (bank1 & 0x7f) >> 1);
+				state->prg16_89ab((bank1 & 0x7f) >> 1);
 
 			if (!BIT(bank3, 7))
 			{
@@ -1752,9 +1768,9 @@ static void mmc5_update_prg( running_machine &machine )
 				state->membank("bank3")->set_entry(state->m_prg_bank[2]);
 			}
 			else
-				prg8_cd(machine, bank3 & 0x7f);
+				state->prg8_cd(bank3 & 0x7f);
 
-			prg8_ef(machine, state->m_mmc5_prg_regs[3]);
+			state->prg8_ef(state->m_mmc5_prg_regs[3]);
 			break;
 
 		case 3:	// 8k banks
@@ -1769,7 +1785,7 @@ static void mmc5_update_prg( running_machine &machine )
 				state->membank("bank1")->set_entry(state->m_prg_bank[0]);
 			}
 			else
-				prg8_89(machine, bank1 & 0x7f);
+				state->prg8_89(bank1 & 0x7f);
 
 			if (!BIT(bank2, 7))
 			{
@@ -1777,7 +1793,7 @@ static void mmc5_update_prg( running_machine &machine )
 				state->membank("bank2")->set_entry(state->m_prg_bank[1]);
 			}
 			else
-				prg8_ab(machine, bank2 & 0x7f);
+				state->prg8_ab(bank2 & 0x7f);
 
 			if (!BIT(bank3, 7))
 			{
@@ -1785,9 +1801,9 @@ static void mmc5_update_prg( running_machine &machine )
 				state->membank("bank3")->set_entry(state->m_prg_bank[2]);
 			}
 			else
-				prg8_cd(machine, bank3 & 0x7f);
+				state->prg8_cd(bank3 & 0x7f);
 
-			prg8_ef(machine, state->m_mmc5_prg_regs[3]);
+			state->prg8_ef(state->m_mmc5_prg_regs[3]);
 			break;
 	}
 }
@@ -1825,19 +1841,20 @@ static void mmc5_irq( device_t *device, int scanline, int vblank, int blanked )
 
 static void mmc5_ppu_mirror( running_machine &machine, int page, int src )
 {
+	nes_state *state = machine.driver_data<nes_state>();
 	switch (src)
 	{
 		case 0:	/* CIRAM0 */
-			set_nt_page(machine, page, CIRAM, 0, 1);
+			state->set_nt_page(page, CIRAM, 0, 1);
 			break;
 		case 1:	/* CIRAM1 */
-			set_nt_page(machine, page, CIRAM, 1, 1);
+			state->set_nt_page(page, CIRAM, 1, 1);
 			break;
 		case 2:	/* ExRAM */
-			set_nt_page(machine, page, EXRAM, 0, 1);	// actually only works during rendering.
+			state->set_nt_page(page, EXRAM, 0, 1);	// actually only works during rendering.
 			break;
 		case 3: /* Fill Registers */
-			set_nt_page(machine, page, MMC5FILL, 0, 0);
+			state->set_nt_page(page, MMC5FILL, 0, 0);
 			break;
 		default:
 			fatalerror("This should never happen\n");
@@ -1966,9 +1983,9 @@ WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 			LOG_MMC(("MMC5 mid RAM bank select: %02x\n", data & 0x07));
 			// FIXME: a few Koei games have both WRAM & BWRAM but here we don't support this (yet)
 			if (m_battery)
-				wram_bank(machine(), data, NES_BATTERY);
+				wram_bank(data, NES_BATTERY);
 			else
-				wram_bank(machine(), data, NES_WRAM);
+				wram_bank(data, NES_WRAM);
 			break;
 
 
@@ -2031,7 +2048,7 @@ WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 				/* 1k switch */
 				m_MMC5_vrom_bank[0] = data | (m_mmc5_high_chr << 8);
 				//                  mapper5_sync_vrom(0);
-				chr1_0(machine(), m_MMC5_vrom_bank[0], CHRROM);
+				chr1_0(m_MMC5_vrom_bank[0], CHRROM);
 				//                  m_nes_vram_sprite[0] = m_MMC5_vrom_bank[0] * 64;
 				//                  vrom_next[0] = 4;
 				//                  vrom_page_a = 1;
@@ -2045,13 +2062,13 @@ WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 		{
 			case 0x02:
 				/* 2k switch */
-				chr2_0(machine(), data | (m_mmc5_high_chr << 8), CHRROM);
+				chr2_0(data | (m_mmc5_high_chr << 8), CHRROM);
 				break;
 			case 0x03:
 				/* 1k switch */
 				m_MMC5_vrom_bank[1] = data | (m_mmc5_high_chr << 8);
 				//                  mapper5_sync_vrom(0);
-				chr1_1(machine(), m_MMC5_vrom_bank[1], CHRROM);
+				chr1_1(m_MMC5_vrom_bank[1], CHRROM);
 				//                  m_nes_vram_sprite[1] = m_MMC5_vrom_bank[0] * 64;
 				//                  vrom_next[1] = 5;
 				//                  vrom_page_a = 1;
@@ -2067,7 +2084,7 @@ WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 				/* 1k switch */
 				m_MMC5_vrom_bank[2] = data | (m_mmc5_high_chr << 8);
 				//                  mapper5_sync_vrom(0);
-				chr1_2(machine(), m_MMC5_vrom_bank[2], CHRROM);
+				chr1_2(m_MMC5_vrom_bank[2], CHRROM);
 				//                  m_nes_vram_sprite[2] = m_MMC5_vrom_bank[0] * 64;
 				//                  vrom_next[2] = 6;
 				//                  vrom_page_a = 1;
@@ -2080,17 +2097,17 @@ WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 			switch (m_mmc5_chr_mode)
 		{
 			case 0x01:
-				chr4_0(machine(), data, CHRROM);
+				chr4_0(data, CHRROM);
 				break;
 			case 0x02:
 				/* 2k switch */
-				chr2_2(machine(), data | (m_mmc5_high_chr << 8), CHRROM);
+				chr2_2(data | (m_mmc5_high_chr << 8), CHRROM);
 				break;
 			case 0x03:
 				/* 1k switch */
 				m_MMC5_vrom_bank[3] = data | (m_mmc5_high_chr << 8);
 				//                  mapper5_sync_vrom(0);
-				chr1_3(machine(), m_MMC5_vrom_bank[3], CHRROM);
+				chr1_3(m_MMC5_vrom_bank[3], CHRROM);
 				//                  m_nes_vram_sprite[3] = m_MMC5_vrom_bank[0] * 64;
 				//                  vrom_next[3] = 7;
 				//                  vrom_page_a = 1;
@@ -2106,7 +2123,7 @@ WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 				/* 1k switch */
 				m_MMC5_vrom_bank[4] = data | (m_mmc5_high_chr << 8);
 				//                  mapper5_sync_vrom(0);
-				chr1_4(machine(), m_MMC5_vrom_bank[4], CHRROM);
+				chr1_4(m_MMC5_vrom_bank[4], CHRROM);
 				//                  m_nes_vram_sprite[4] = m_MMC5_vrom_bank[0] * 64;
 				//                  vrom_next[0] = 0;
 				//                  vrom_page_a = 0;
@@ -2120,13 +2137,13 @@ WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 		{
 			case 0x02:
 				/* 2k switch */
-				chr2_4(machine(), data | (m_mmc5_high_chr << 8), CHRROM);
+				chr2_4(data | (m_mmc5_high_chr << 8), CHRROM);
 				break;
 			case 0x03:
 				/* 1k switch */
 				m_MMC5_vrom_bank[5] = data | (m_mmc5_high_chr << 8);
 				//                  mapper5_sync_vrom(0);
-				chr1_5(machine(), m_MMC5_vrom_bank[5], CHRROM);
+				chr1_5(m_MMC5_vrom_bank[5], CHRROM);
 				//                  m_nes_vram_sprite[5] = m_MMC5_vrom_bank[0] * 64;
 				//                  vrom_next[1] = 1;
 				//                  vrom_page_a = 0;
@@ -2142,7 +2159,7 @@ WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 				/* 1k switch */
 				m_MMC5_vrom_bank[6] = data | (m_mmc5_high_chr << 8);
 				//                  mapper5_sync_vrom(0);
-				chr1_6(machine(), m_MMC5_vrom_bank[6], CHRROM);
+				chr1_6(m_MMC5_vrom_bank[6], CHRROM);
 				//                  m_nes_vram_sprite[6] = m_MMC5_vrom_bank[0] * 64;
 				//                  vrom_next[2] = 2;
 				//                  vrom_page_a = 0;
@@ -2156,21 +2173,21 @@ WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 		{
 			case 0x00:
 				/* 8k switch */
-				chr8(machine(), data, CHRROM);
+				chr8(data, CHRROM);
 				break;
 			case 0x01:
 				/* 4k switch */
-				chr4_4(machine(), data, CHRROM);
+				chr4_4(data, CHRROM);
 				break;
 			case 0x02:
 				/* 2k switch */
-				chr2_6(machine(), data | (m_mmc5_high_chr << 8), CHRROM);
+				chr2_6(data | (m_mmc5_high_chr << 8), CHRROM);
 				break;
 			case 0x03:
 				/* 1k switch */
 				m_MMC5_vrom_bank[7] = data | (m_mmc5_high_chr << 8);
 				//                  mapper5_sync_vrom(0);
-				chr1_7(machine(), m_MMC5_vrom_bank[7], CHRROM);
+				chr1_7(m_MMC5_vrom_bank[7], CHRROM);
 				//                  m_nes_vram_sprite[7] = m_MMC5_vrom_bank[0] * 64;
 				//                  vrom_next[3] = 3;
 				//                  vrom_page_a = 0;
@@ -2188,7 +2205,7 @@ WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 				//                  nes_vram[vrom_next[0]] = data * 64;
 				//                  nes_vram[0 + (vrom_page_a*4)] = data * 64;
 				//                  nes_vram[0] = data * 64;
-				chr1_4(machine(), m_MMC5_vrom_bank[8], CHRROM);
+				chr1_4(m_MMC5_vrom_bank[8], CHRROM);
 				//                  mapper5_sync_vrom(1);
 				if (!m_vrom_page_b)
 				{
@@ -2204,8 +2221,8 @@ WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 		{
 			case 0x02:
 				/* 2k switch */
-				chr2_0(machine(), data | (m_mmc5_high_chr << 8), CHRROM);
-				chr2_4(machine(), data | (m_mmc5_high_chr << 8), CHRROM);
+				chr2_0(data | (m_mmc5_high_chr << 8), CHRROM);
+				chr2_4(data | (m_mmc5_high_chr << 8), CHRROM);
 				break;
 			case 0x03:
 				/* 1k switch */
@@ -2213,7 +2230,7 @@ WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 				//                  nes_vram[vrom_next[1]] = data * 64;
 				//                  nes_vram[1 + (vrom_page_a*4)] = data * 64;
 				//                  nes_vram[1] = data * 64;
-				chr1_5(machine(), m_MMC5_vrom_bank[9], CHRROM);
+				chr1_5(m_MMC5_vrom_bank[9], CHRROM);
 				//                  mapper5_sync_vrom(1);
 				if (!m_vrom_page_b)
 				{
@@ -2233,7 +2250,7 @@ WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 				//                  nes_vram[vrom_next[2]] = data * 64;
 				//                  nes_vram[2 + (vrom_page_a*4)] = data * 64;
 				//                  nes_vram[2] = data * 64;
-				chr1_6(machine(), m_MMC5_vrom_bank[10], CHRROM);
+				chr1_6(m_MMC5_vrom_bank[10], CHRROM);
 				//                  mapper5_sync_vrom(1);
 				if (!m_vrom_page_b)
 				{
@@ -2250,18 +2267,18 @@ WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 			case 0x00:
 				/* 8k switch */
 				/* switches in first half of an 8K bank!) */
-				chr4_0(machine(), data << 1, CHRROM);
-				chr4_4(machine(), data << 1, CHRROM);
+				chr4_0(data << 1, CHRROM);
+				chr4_4(data << 1, CHRROM);
 				break;
 			case 0x01:
 				/* 4k switch */
-				chr4_0(machine(), data, CHRROM);
-				chr4_4(machine(), data, CHRROM);
+				chr4_0(data, CHRROM);
+				chr4_4(data, CHRROM);
 				break;
 			case 0x02:
 				/* 2k switch */
-				chr2_2(machine(), data | (m_mmc5_high_chr << 8), CHRROM);
-				chr2_6(machine(), data | (m_mmc5_high_chr << 8), CHRROM);
+				chr2_2(data | (m_mmc5_high_chr << 8), CHRROM);
+				chr2_6(data | (m_mmc5_high_chr << 8), CHRROM);
 				break;
 			case 0x03:
 				/* 1k switch */
@@ -2269,7 +2286,7 @@ WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 				//                  nes_vram[vrom_next[3]] = data * 64;
 				//                  nes_vram[3 + (vrom_page_a*4)] = data * 64;
 				//                  nes_vram[3] = data * 64;
-				chr1_7(machine(), m_MMC5_vrom_bank[11], CHRROM);
+				chr1_7(m_MMC5_vrom_bank[11], CHRROM);
 				//                  mapper5_sync_vrom(1);
 				if (!m_vrom_page_b)
 				{
@@ -2341,43 +2358,44 @@ WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 
 static void ntbrom_mirror( running_machine &machine, int mirror, int mirr0, int mirr1 )
 {
+	nes_state *state = machine.driver_data<nes_state>();
 	switch (mirror)
 	{
 		case 0x00:
-			set_nt_mirroring(machine, PPU_MIRROR_HORZ);
+			state->set_nt_mirroring(PPU_MIRROR_HORZ);
 			break;
 		case 0x01:
-			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			state->set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 		case 0x02:
-			set_nt_mirroring(machine, PPU_MIRROR_LOW);
+			state->set_nt_mirroring(PPU_MIRROR_LOW);
 			break;
 		case 0x03:
-			set_nt_mirroring(machine, PPU_MIRROR_HIGH);
+			state->set_nt_mirroring(PPU_MIRROR_HIGH);
 			break;
 		case 0x10:
-			set_nt_page(machine, 0, ROM, mirr0 | 0x80, 0);
-			set_nt_page(machine, 1, ROM, mirr1 | 0x80, 0);
-			set_nt_page(machine, 2, ROM, mirr0 | 0x80, 0);
-			set_nt_page(machine, 3, ROM, mirr1 | 0x80, 0);
+			state->set_nt_page(0, ROM, mirr0 | 0x80, 0);
+			state->set_nt_page(1, ROM, mirr1 | 0x80, 0);
+			state->set_nt_page(2, ROM, mirr0 | 0x80, 0);
+			state->set_nt_page(3, ROM, mirr1 | 0x80, 0);
 			break;
 		case 0x11:
-			set_nt_page(machine, 0, ROM, mirr0 | 0x80, 0);
-			set_nt_page(machine, 1, ROM, mirr0 | 0x80, 0);
-			set_nt_page(machine, 2, ROM, mirr1 | 0x80, 0);
-			set_nt_page(machine, 3, ROM, mirr1 | 0x80, 0);
+			state->set_nt_page(0, ROM, mirr0 | 0x80, 0);
+			state->set_nt_page(1, ROM, mirr0 | 0x80, 0);
+			state->set_nt_page(2, ROM, mirr1 | 0x80, 0);
+			state->set_nt_page(3, ROM, mirr1 | 0x80, 0);
 			break;
 		case 0x12:
-			set_nt_page(machine, 0, ROM, mirr0 | 0x80, 0);
-			set_nt_page(machine, 1, ROM, mirr0 | 0x80, 0);
-			set_nt_page(machine, 2, ROM, mirr0 | 0x80, 0);
-			set_nt_page(machine, 3, ROM, mirr0 | 0x80, 0);
+			state->set_nt_page(0, ROM, mirr0 | 0x80, 0);
+			state->set_nt_page(1, ROM, mirr0 | 0x80, 0);
+			state->set_nt_page(2, ROM, mirr0 | 0x80, 0);
+			state->set_nt_page(3, ROM, mirr0 | 0x80, 0);
 			break;
 		case 0x13:
-			set_nt_page(machine, 0, ROM, mirr1 | 0x80, 0);
-			set_nt_page(machine, 1, ROM, mirr1 | 0x80, 0);
-			set_nt_page(machine, 2, ROM, mirr1 | 0x80, 0);
-			set_nt_page(machine, 3, ROM, mirr1 | 0x80, 0);
+			state->set_nt_page(0, ROM, mirr1 | 0x80, 0);
+			state->set_nt_page(1, ROM, mirr1 | 0x80, 0);
+			state->set_nt_page(2, ROM, mirr1 | 0x80, 0);
+			state->set_nt_page(3, ROM, mirr1 | 0x80, 0);
 			break;
 	}
 }
@@ -2390,16 +2408,16 @@ WRITE8_MEMBER(nes_carts_state::ntbrom_w)
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
-			chr2_0(machine(), data, CHRROM);
+			chr2_0(data, CHRROM);
 			break;
 		case 0x1000:
-			chr2_2(machine(), data, CHRROM);
+			chr2_2(data, CHRROM);
 			break;
 		case 0x2000:
-			chr2_4(machine(), data, CHRROM);
+			chr2_4(data, CHRROM);
 			break;
 		case 0x3000:
-			chr2_6(machine(), data, CHRROM);
+			chr2_6(data, CHRROM);
 			break;
 		case 0x4000:
 			m_mmc_latch1 = data & 0x7f;
@@ -2414,7 +2432,7 @@ WRITE8_MEMBER(nes_carts_state::ntbrom_w)
 			ntbrom_mirror(machine(), m_mmc_reg[0], m_mmc_latch1, m_mmc_latch2);
 			break;
 		case 0x7000:
-			prg16_89ab(machine(), data);
+			prg16_89ab(data);
 			break;
 		default:
 			LOG_MMC(("ntbrom_w uncaught write, offset: %04x, data: %02x\n", offset, data));
@@ -2474,7 +2492,7 @@ WRITE8_MEMBER(nes_carts_state::jxrom_w)
 			switch (m_mmc_latch1)
 			{
 			case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
-				chr1_x(machine(), m_mmc_latch1, data, CHRROM);
+				chr1_x(m_mmc_latch1, data, CHRROM);
 				break;
 
 			case 8:
@@ -2482,7 +2500,7 @@ WRITE8_MEMBER(nes_carts_state::jxrom_w)
 				{
 					// is PRG ROM
 					space.unmap_write(0x6000, 0x7fff);
-					prg8_67(machine(), data & 0x3f);
+					prg8_67(data & 0x3f);
 				}
 				else if (data & 0x80)
 				{
@@ -2494,21 +2512,21 @@ WRITE8_MEMBER(nes_carts_state::jxrom_w)
 				break;
 
 			case 9:
-				prg8_89(machine(), data);
+				prg8_89(data);
 				break;
 			case 0x0a:
-				prg8_ab(machine(), data);
+				prg8_ab(data);
 				break;
 			case 0x0b:
-				prg8_cd(machine(), data);
+				prg8_cd(data);
 				break;
 			case 0x0c:
 				switch (data & 0x03)
 				{
-				case 0x00: set_nt_mirroring(machine(), PPU_MIRROR_VERT); break;
-				case 0x01: set_nt_mirroring(machine(), PPU_MIRROR_HORZ); break;
-				case 0x02: set_nt_mirroring(machine(), PPU_MIRROR_LOW); break;
-				case 0x03: set_nt_mirroring(machine(), PPU_MIRROR_HIGH); break;
+				case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
+				case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+				case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
+				case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 				}
 				break;
 			case 0x0d:
@@ -2564,14 +2582,14 @@ WRITE8_MEMBER(nes_carts_state::dxrom_w)
 		case 1:
 			switch (m_mmc_latch1 & 0x07)
 			{
-			case 0: chr2_0(machine(), data >> 1, CHRROM); break;
-			case 1: chr2_2(machine(), data >> 1, CHRROM); break;
-			case 2: chr1_4(machine(), data | 0x40, CHRROM); break;
-			case 3: chr1_5(machine(), data | 0x40, CHRROM); break;
-			case 4: chr1_6(machine(), data | 0x40, CHRROM); break;
-			case 5: chr1_7(machine(), data | 0x40, CHRROM); break;
-			case 6: prg8_89(machine(), data); break;
-			case 7: prg8_ab(machine(), data); break;
+			case 0: chr2_0(data >> 1, CHRROM); break;
+			case 1: chr2_2(data >> 1, CHRROM); break;
+			case 2: chr1_4(data | 0x40, CHRROM); break;
+			case 3: chr1_5(data | 0x40, CHRROM); break;
+			case 4: chr1_6(data | 0x40, CHRROM); break;
+			case 5: chr1_7(data | 0x40, CHRROM); break;
+			case 6: prg8_89(data); break;
+			case 7: prg8_ab(data); break;
 			}
 			break;
 		case 0:
@@ -2600,7 +2618,7 @@ WRITE8_MEMBER(nes_carts_state::namcot3453_w)
 
 	// additional mirroring control when writing to even addresses
 	if (!(offset & 1))
-		set_nt_mirroring(machine(), BIT(data, 6) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+		set_nt_mirroring(BIT(data, 6) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 
 	dxrom_w(space, offset, data, mem_mask);
 }
@@ -2625,7 +2643,7 @@ WRITE8_MEMBER(nes_carts_state::namcot3446_w)
 	if (offset >= 0x2000)
 	{
 		if (!(offset & 1))
-			set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		return;
 	}
 
@@ -2634,12 +2652,12 @@ WRITE8_MEMBER(nes_carts_state::namcot3446_w)
 		case 1:
 			switch (m_mmc_latch1 & 0x07)
 			{
-			case 2: chr2_0(machine(), data, CHRROM); break;
-			case 3: chr2_2(machine(), data, CHRROM); break;
-			case 4: chr2_4(machine(), data, CHRROM); break;
-			case 5: chr2_6(machine(), data, CHRROM); break;
-			case 6: BIT(m_mmc_latch1, 6) ? prg8_cd(machine(), data) : prg8_89(machine(), data); break;
-			case 7: prg8_ab(machine(), data); break;
+			case 2: chr2_0(data, CHRROM); break;
+			case 3: chr2_2(data, CHRROM); break;
+			case 4: chr2_4(data, CHRROM); break;
+			case 5: chr2_6(data, CHRROM); break;
+			case 6: BIT(m_mmc_latch1, 6) ? prg8_cd(data) : prg8_89(data); break;
+			case 7: prg8_ab(data); break;
 			}
 			break;
 		case 0:
@@ -2674,26 +2692,26 @@ WRITE8_MEMBER(nes_carts_state::namcot3425_w)
 			mode = m_mmc_latch1 & 0x07;
 			switch (mode)
 			{
-			case 0: chr2_0(machine(), data >> 1, CHRROM); break;
-			case 1: chr2_2(machine(), data >> 1, CHRROM); break;
+			case 0: chr2_0(data >> 1, CHRROM); break;
+			case 1: chr2_2(data >> 1, CHRROM); break;
 			case 2:
 			case 3:
 			case 4:
 			case 5:
-				chr1_x(machine(), 2 + mode, data, CHRROM);
+				chr1_x(2 + mode, data, CHRROM);
 				m_mmc_reg[mode - 2] = BIT(data, 5);
 				if (!BIT(m_mmc_latch1, 7))
 				{
-						set_nt_page(machine(), 0, CIRAM, m_mmc_reg[0], 1);
-						set_nt_page(machine(), 1, CIRAM, m_mmc_reg[1], 1);
-						set_nt_page(machine(), 2, CIRAM, m_mmc_reg[2], 1);
-						set_nt_page(machine(), 3, CIRAM, m_mmc_reg[3], 1);
+						set_nt_page(0, CIRAM, m_mmc_reg[0], 1);
+						set_nt_page(1, CIRAM, m_mmc_reg[1], 1);
+						set_nt_page(2, CIRAM, m_mmc_reg[2], 1);
+						set_nt_page(3, CIRAM, m_mmc_reg[3], 1);
 				}
 				else
-					set_nt_mirroring(machine(), PPU_MIRROR_HORZ);
+					set_nt_mirroring(PPU_MIRROR_HORZ);
 				break;
-			case 6: prg8_89(machine(), data); break;
-			case 7: prg8_ab(machine(), data); break;
+			case 6: prg8_89(data); break;
+			case 7: prg8_ab(data); break;
 			}
 			break;
 		case 0:
@@ -2718,8 +2736,8 @@ WRITE8_MEMBER(nes_carts_state::dis_74x377_w)
 {
 	LOG_MMC(("dis_74x377_w, offset: %04x, data: %02x\n", offset, data));
 
-	chr8(machine(), data >> 4, m_mmc_chr_source);
-	prg32(machine(), data & 0x0f);
+	chr8(data >> 4, m_mmc_chr_source);
+	prg32(data & 0x0f);
 }
 
 /*************************************************************
@@ -2734,7 +2752,7 @@ WRITE8_MEMBER(nes_carts_state::dis_74x139x74_m_w)
 {
 	LOG_MMC(("dis_74x139x74_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	chr8(machine(), ((data & 0x02) >> 1) | ((data & 0x01) << 1), CHRROM);
+	chr8(((data & 0x02) >> 1) | ((data & 0x01) << 1), CHRROM);
 }
 
 /*************************************************************
@@ -2751,8 +2769,8 @@ WRITE8_MEMBER(nes_carts_state::dis_74x161x138_m_w)
 {
 	LOG_MMC(("dis_74x161x138_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	chr8(machine(), data >> 2, CHRROM);
-	prg32(machine(), data);
+	chr8(data >> 2, CHRROM);
+	prg32(data);
 }
 
 /*************************************************************
@@ -2772,9 +2790,9 @@ WRITE8_MEMBER(nes_carts_state::dis_74x161x161x32_w)
 	LOG_MMC(("dis_74x161x161x32_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (!m_hard_mirroring)	// there are two 'variants' depending on hardwired or mapper ctrl mirroring
-		set_nt_mirroring(machine(), BIT(data, 7) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
-	chr8(machine(), data, CHRROM);
-	prg16_89ab(machine(), data >> 4);
+		set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+	chr8(data, CHRROM);
+	prg16_89ab(data >> 4);
 }
 
 /*************************************************************
@@ -2828,18 +2846,18 @@ WRITE8_MEMBER(nes_carts_state::lz93d50_w)
 	{
 		case 0: case 1: case 2: case 3:
 		case 4: case 5: case 6: case 7:
-			chr1_x(machine(), offset & 0x07, data, m_mmc_chr_source);
+			chr1_x(offset & 0x07, data, m_mmc_chr_source);
 			break;
 		case 8:
-			prg16_89ab(machine(), data);
+			prg16_89ab(data);
 			break;
 		case 9:
 			switch (data & 0x03)
 			{
-			case 0: set_nt_mirroring(machine(), PPU_MIRROR_VERT); break;
-			case 1: set_nt_mirroring(machine(), PPU_MIRROR_HORZ); break;
-			case 2: set_nt_mirroring(machine(), PPU_MIRROR_LOW); break;
-			case 3: set_nt_mirroring(machine(), PPU_MIRROR_HIGH); break;
+			case 0: set_nt_mirroring(PPU_MIRROR_VERT); break;
+			case 1: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+			case 2: set_nt_mirroring(PPU_MIRROR_LOW); break;
+			case 3: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 			}
 			break;
 		case 0x0a:
@@ -2878,8 +2896,8 @@ static void fjump2_set_prg( running_machine &machine )
 	for (i = 0; i < 8; i++)
 		mmc_helper |= ((state->m_mmc_reg[i] & 0x01) << 4);
 
-	prg16_89ab(machine, mmc_helper | state->m_mmc_latch1);
-	prg16_cdef(machine, mmc_helper | 0x0f);
+	state->prg16_89ab(mmc_helper | state->m_mmc_latch1);
+	state->prg16_cdef(mmc_helper | 0x0f);
 }
 
 WRITE8_MEMBER(nes_carts_state::fjump2_w)
@@ -2919,7 +2937,7 @@ WRITE8_MEMBER(nes_carts_state::bandai_ks_w)
 {
 	LOG_MMC(("bandai_ks_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg16_89ab(machine(), data ^ 0x08);
+	prg16_89ab(data ^ 0x08);
 }
 
 /*************************************************************
@@ -2940,12 +2958,12 @@ WRITE8_MEMBER(nes_carts_state::bandai_ok_w)
 	UINT8 mmc_helper;
 	LOG_MMC(("mapper96_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), data);
+	prg32(data);
 
 	m_mmc_latch1 = data;
 	mmc_helper = (m_mmc_latch1 & 0x03) | (data & 0x04);
-	chr4_0(machine(), mmc_helper, CHRRAM);
-	chr4_4(machine(), 0x03 | (data & 0x04), CHRRAM);
+	chr4_0(mmc_helper, CHRRAM);
+	chr4_4(0x03 | (data & 0x04), CHRRAM);
 }
 
 /*************************************************************
@@ -2962,8 +2980,8 @@ WRITE8_MEMBER(nes_carts_state::lrog017_w)
 {
 	LOG_MMC(("lrog017_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), data);
-	chr2_0(machine(), (data >> 4), CHRROM);
+	prg32(data);
+	chr2_0((data >> 4), CHRROM);
 }
 
 /*************************************************************
@@ -2978,9 +2996,9 @@ WRITE8_MEMBER(nes_carts_state::irem_hd_w)
 {
 	LOG_MMC(("irem_hd_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring(machine(), BIT(data, 3) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
-	chr8(machine(), data >> 4, CHRROM);
-	prg16_89ab(machine(), data);
+	set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+	chr8(data >> 4, CHRROM);
+	prg16_89ab(data);
 }
 
 /*************************************************************
@@ -3001,8 +3019,8 @@ WRITE8_MEMBER(nes_carts_state::tam_s1_w)
 
 	if (offset < 0x4000)
 	{
-		set_nt_mirroring(machine(), BIT(data, 7) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
-		prg16_cdef(machine(), data);
+		set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+		prg16_cdef(data);
 	}
 }
 
@@ -3024,18 +3042,18 @@ WRITE8_MEMBER(nes_carts_state::g101_w)
 	{
 		case 0x0000:
 			// NEStopia here differs a little bit
-			m_mmc_latch1 ? prg8_cd(machine(), data) : prg8_89(machine(), data);
+			m_mmc_latch1 ? prg8_cd(data) : prg8_89(data);
 			break;
 		case 0x1000:
 			m_mmc_latch1 = BIT(data, 1);
 			if (!m_hard_mirroring)	// there are two 'variants' depending on hardwired or mapper ctrl mirroring
-				set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+				set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 0x2000:
-			prg8_ab(machine(), data);
+			prg8_ab(data);
 			break;
 		case 0x3000:
-			chr1_x(machine(), offset & 0x07, data, CHRROM);
+			chr1_x(offset & 0x07, data, CHRROM);
 			break;
 	}
 }
@@ -3078,11 +3096,11 @@ WRITE8_MEMBER(nes_carts_state::h3001_w)
 	switch (offset & 0x7fff)
 	{
 		case 0x0000:
-			prg8_89(machine(), data);
+			prg8_89(data);
 			break;
 
 		case 0x1001:
-			set_nt_mirroring(machine(), BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x1003:
@@ -3102,16 +3120,16 @@ WRITE8_MEMBER(nes_carts_state::h3001_w)
 			break;
 
 		case 0x2000:
-			prg8_ab(machine(), data);
+			prg8_ab(data);
 			break;
 
 		case 0x3000: case 0x3001: case 0x3002: case 0x3003:
 		case 0x3004: case 0x3005: case 0x3006: case 0x3007:
-			chr1_x(machine(), offset & 0x07, data, CHRROM);
+			chr1_x(offset & 0x07, data, CHRROM);
 			break;
 
 		case 0x4000:
-			prg8_cd(machine(), data);
+			prg8_cd(data);
 			break;
 
 		default:
@@ -3192,27 +3210,27 @@ WRITE8_MEMBER(nes_carts_state::ss88006_w)
 	{
 		case 0x0000:
 			m_mmc_prg_bank[0] = (m_mmc_prg_bank[0] & 0xf0) | (data & 0x0f);
-			prg8_89(machine(), m_mmc_prg_bank[0]);
+			prg8_89(m_mmc_prg_bank[0]);
 			break;
 		case 0x0001:
 			m_mmc_prg_bank[0] = (m_mmc_prg_bank[0] & 0x0f) | (data << 4);
-			prg8_89(machine(), m_mmc_prg_bank[0]);
+			prg8_89(m_mmc_prg_bank[0]);
 			break;
 		case 0x0002:
 			m_mmc_prg_bank[1] = (m_mmc_prg_bank[1] & 0xf0) | (data & 0x0f);
-			prg8_ab(machine(), m_mmc_prg_bank[1]);
+			prg8_ab(m_mmc_prg_bank[1]);
 			break;
 		case 0x0003:
 			m_mmc_prg_bank[1] = (m_mmc_prg_bank[1] & 0x0f) | (data << 4);
-			prg8_ab(machine(), m_mmc_prg_bank[1]);
+			prg8_ab(m_mmc_prg_bank[1]);
 			break;
 		case 0x1000:
 			m_mmc_prg_bank[2] = (m_mmc_prg_bank[2] & 0xf0) | (data & 0x0f);
-			prg8_cd(machine(), m_mmc_prg_bank[2]);
+			prg8_cd(m_mmc_prg_bank[2]);
 			break;
 		case 0x1001:
 			m_mmc_prg_bank[2] = (m_mmc_prg_bank[2] & 0x0f) | (data << 4);
-			prg8_cd(machine(), m_mmc_prg_bank[2]);
+			prg8_cd(m_mmc_prg_bank[2]);
 			break;
 
 			/* $9002, 3 (1002, 3) uncaught = Jaleco Baseball writes 0 */
@@ -3228,7 +3246,7 @@ WRITE8_MEMBER(nes_carts_state::ss88006_w)
 			else
 				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
 
-			chr1_x(machine(), bank, m_mmc_vrom_bank[bank], CHRROM);
+			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
 			break;
 
 		case 0x6000:
@@ -3255,10 +3273,10 @@ WRITE8_MEMBER(nes_carts_state::ss88006_w)
 		case 0x7002:
 			switch (data & 0x03)
 			{
-			case 0: set_nt_mirroring(machine(), PPU_MIRROR_HORZ); break;
-			case 1: set_nt_mirroring(machine(), PPU_MIRROR_VERT); break;
-			case 2: set_nt_mirroring(machine(), PPU_MIRROR_LOW); break;
-			case 3: set_nt_mirroring(machine(), PPU_MIRROR_HIGH); break;
+			case 0: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+			case 1: set_nt_mirroring(PPU_MIRROR_VERT); break;
+			case 2: set_nt_mirroring(PPU_MIRROR_LOW); break;
+			case 3: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 			}
 			break;
 
@@ -3283,8 +3301,8 @@ WRITE8_MEMBER(nes_carts_state::ss88006_w)
 WRITE8_MEMBER(nes_carts_state::jf11_m_w)
 {
 	LOG_MMC(("jf11_m_w, offset: %04x, data: %02x\n", offset, data));
-	chr8(machine(), data, CHRROM);
-	prg32(machine(), data >> 4);
+	chr8(data, CHRROM);
+	prg32(data >> 4);
 }
 
 /*************************************************************
@@ -3307,8 +3325,8 @@ WRITE8_MEMBER(nes_carts_state::jf13_m_w)
 
 	if (offset == 0)
 	{
-		prg32(machine(), (data >> 4) & 0x03);
-		chr8(machine(), ((data >> 4) & 0x04) | (data & 0x03), CHRROM);
+		prg32((data >> 4) & 0x03);
+		chr8(((data >> 4) & 0x04) | (data & 0x03), CHRROM);
 	}
 
 	if (offset == 0x1000)
@@ -3334,9 +3352,9 @@ WRITE8_MEMBER(nes_carts_state::jf16_w)
 {
 	LOG_MMC(("jf16_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring(machine(), BIT(data, 3) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
-	chr8(machine(), data >> 4, CHRROM);
-	prg16_89ab(machine(), data);
+	set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+	chr8(data >> 4, CHRROM);
+	prg16_89ab(data);
 }
 
 /*************************************************************
@@ -3359,9 +3377,9 @@ WRITE8_MEMBER(nes_carts_state::jf17_w)
 	LOG_MMC(("jf17_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (BIT(data, 7))
-		prg16_89ab(machine(), data & 0x0f);
+		prg16_89ab(data & 0x0f);
 	if (BIT(data, 6))
-		chr8(machine(), data & 0x0f, CHRROM);
+		chr8(data & 0x0f, CHRROM);
 	if (BIT(data, 5) && !BIT(data,4))
 		LOG_MMC(("Jaleco JF-17 sound write, data: %02x\n", data & 0x1f));
 }
@@ -3385,9 +3403,9 @@ WRITE8_MEMBER(nes_carts_state::jf19_w)
 	LOG_MMC(("jf19_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (BIT(data, 7))
-		prg16_cdef(machine(), data & 0x0f);
+		prg16_cdef(data & 0x0f);
 	if (BIT(data, 6))
-		chr8(machine(), data & 0x0f, CHRROM);
+		chr8(data & 0x0f, CHRROM);
 	if (BIT(data, 5) && !BIT(data,4))
 		LOG_MMC(("Jaleco JF-19 sound write, data: %02x\n", data & 0x1f));
 }
@@ -3411,28 +3429,28 @@ WRITE8_MEMBER(nes_carts_state::konami_vrc1_w)
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
-			prg8_89(machine(), data);
+			prg8_89(data);
 			break;
 		case 0x1000:
-			set_nt_mirroring(machine(), (data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			m_mmc_vrom_bank[0] = (m_mmc_vrom_bank[0] & 0x0f) | ((data & 0x02) << 3);
 			m_mmc_vrom_bank[1] = (m_mmc_vrom_bank[1] & 0x0f) | ((data & 0x04) << 2);
-			chr4_0(machine(), m_mmc_vrom_bank[0], CHRROM);
-			chr4_4(machine(), m_mmc_vrom_bank[1], CHRROM);
+			chr4_0(m_mmc_vrom_bank[0], CHRROM);
+			chr4_4(m_mmc_vrom_bank[1], CHRROM);
 			break;
 		case 0x2000:
-			prg8_ab(machine(), data);
+			prg8_ab(data);
 			break;
 		case 0x4000:
-			prg8_cd(machine(), data);
+			prg8_cd(data);
 			break;
 		case 0x6000:
 			m_mmc_vrom_bank[0] = (m_mmc_vrom_bank[0] & 0x10) | (data & 0x0f);
-			chr4_0(machine(), m_mmc_vrom_bank[0], CHRROM);
+			chr4_0(m_mmc_vrom_bank[0], CHRROM);
 			break;
 		case 0x7000:
 			m_mmc_vrom_bank[1] = (m_mmc_vrom_bank[1] & 0x10) | (data & 0x0f);
-			chr4_4(machine(), m_mmc_vrom_bank[1], CHRROM);
+			chr4_4(m_mmc_vrom_bank[1], CHRROM);
 			break;
 	}
 }
@@ -3454,19 +3472,19 @@ WRITE8_MEMBER(nes_carts_state::konami_vrc2_w)
 	LOG_MMC(("konami_vrc2_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset < 0x1000)
-		prg8_89(machine(), data);
+		prg8_89(data);
 	else if (offset < 0x2000)
 	{
 		switch (data & 0x03)
 		{
-			case 0x00: set_nt_mirroring(machine(), PPU_MIRROR_VERT); break;
-			case 0x01: set_nt_mirroring(machine(), PPU_MIRROR_HORZ); break;
-			case 0x02: set_nt_mirroring(machine(), PPU_MIRROR_LOW); break;
-			case 0x03: set_nt_mirroring(machine(), PPU_MIRROR_HIGH); break;
+			case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
+			case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+			case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
+			case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 		}
 	}
 	else if (offset < 0x3000)
-		prg8_ab(machine(), data);
+		prg8_ab(data);
 	else if (offset < 0x7000)
 	{
 		bank = ((shifted_offs & 0x7000) - 0x3000) / 0x0800 + BIT(shifted_offs, 9);
@@ -3474,7 +3492,7 @@ WRITE8_MEMBER(nes_carts_state::konami_vrc2_w)
 		mask = (0xf0 >> shift);
 		m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & mask)
 									| (((data >> m_vrc_ls_chr) & 0x0f) << shift);
-		chr1_x(machine(), bank, m_mmc_vrom_bank[bank], CHRROM);
+		chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
 	}
 	else
 		logerror("konami_vrc2_w uncaught write, addr: %04x value: %02x\n", offset + 0x8000, data);
@@ -3516,7 +3534,7 @@ WRITE8_MEMBER(nes_carts_state::konami_vrc3_w)
 			m_IRQ_count |= (data & 0x0f) << 4;
 			break;
 		case 0x7000:
-			prg16_89ab(machine(), data);
+			prg16_89ab(data);
 			break;
 		default:
 			logerror("konami_vrc3_w uncaught write, offset %04x, data: %02x\n", offset, data);
@@ -3537,13 +3555,13 @@ static void vrc4_set_prg( running_machine &machine )
 	nes_state *state = machine.driver_data<nes_state>();
 	if (state->m_mmc_latch1 & 0x02)
 	{
-		prg8_89(machine, 0xfe);
-		prg8_cd(machine, state->m_mmc_prg_bank[0]);
+		state->prg8_89(0xfe);
+		state->prg8_cd(state->m_mmc_prg_bank[0]);
 	}
 	else
 	{
-		prg8_89(machine, state->m_mmc_prg_bank[0]);
-		prg8_cd(machine, 0xfe);
+		state->prg8_89(state->m_mmc_prg_bank[0]);
+		state->prg8_cd(0xfe);
 	}
 }
 
@@ -3573,7 +3591,7 @@ WRITE8_MEMBER(nes_carts_state::konami_vrc4_w)
 		vrc4_set_prg(machine());
 	}
 	else if (offset >= 0x2000 && offset < 0x3000)
-		prg8_ab(machine(), data);
+		prg8_ab(data);
 	else
 	{
 		switch (shifted_offs & 0x7300)
@@ -3582,10 +3600,10 @@ WRITE8_MEMBER(nes_carts_state::konami_vrc4_w)
 			case 0x1100:
 				switch (data & 0x03)
 				{
-				case 0x00: set_nt_mirroring(machine(), PPU_MIRROR_VERT); break;
-				case 0x01: set_nt_mirroring(machine(), PPU_MIRROR_HORZ); break;
-				case 0x02: set_nt_mirroring(machine(), PPU_MIRROR_LOW); break;
-				case 0x03: set_nt_mirroring(machine(), PPU_MIRROR_HIGH); break;
+				case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
+				case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+				case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
+				case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 				}
 				break;
 			case 0x1200:
@@ -3613,7 +3631,7 @@ WRITE8_MEMBER(nes_carts_state::konami_vrc4_w)
 				shift = BIT(shifted_offs, 8) * 4;
 				mask = (0xf0 >> shift);
 				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & mask) | ((data & 0x0f) << shift);
-				chr1_x(machine(), bank, m_mmc_vrom_bank[bank], CHRROM);
+				chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
 				break;
 			case 0x7000:
 				m_IRQ_count_latch = (m_IRQ_count_latch & 0xf0) | (data & 0x0f);
@@ -3656,9 +3674,9 @@ WRITE8_MEMBER(nes_carts_state::konami_vrc6_w)
 	LOG_MMC(("konami_vrc6_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset < 0x1000)
-		prg16_89ab(machine(), data);
+		prg16_89ab(data);
 	else if (offset >= 0x4000 && offset < 0x5000)
-		prg8_cd(machine(), data);
+		prg8_cd(data);
 	else
 	{
 		switch (shifted_offs & 0x7300)
@@ -3677,10 +3695,10 @@ WRITE8_MEMBER(nes_carts_state::konami_vrc6_w)
 			case 0x3300:
 				switch (data & 0x0c)
 				{
-				case 0x00: set_nt_mirroring(machine(), PPU_MIRROR_VERT); break;
-				case 0x04: set_nt_mirroring(machine(), PPU_MIRROR_HORZ); break;
-				case 0x08: set_nt_mirroring(machine(), PPU_MIRROR_LOW); break;
-				case 0x0c: set_nt_mirroring(machine(), PPU_MIRROR_HIGH); break;
+				case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
+				case 0x04: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+				case 0x08: set_nt_mirroring(PPU_MIRROR_LOW); break;
+				case 0x0c: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 				}
 				break;
 			case 0x5000:
@@ -3692,7 +3710,7 @@ WRITE8_MEMBER(nes_carts_state::konami_vrc6_w)
 			case 0x6200:
 			case 0x6300:
 				bank = ((shifted_offs & 0x7000) - 0x5000) / 0x0400 + ((shifted_offs & 0x0300) >> 8);
-				chr1_x(machine(), bank, data, CHRROM);
+				chr1_x(bank, data, CHRROM);
 				break;
 			case 0x7000:
 				m_IRQ_count_latch = data;
@@ -3734,16 +3752,16 @@ WRITE8_MEMBER(nes_carts_state::konami_vrc7_w)
 	switch (offset & 0x7018)
 	{
 		case 0x0000:
-			prg8_89(machine(), data);
+			prg8_89(data);
 			break;
 		case 0x0008:
 		case 0x0010:
 		case 0x0018:
-			prg8_ab(machine(), data);
+			prg8_ab(data);
 			break;
 
 		case 0x1000:
-			prg8_cd(machine(), data);
+			prg8_cd(data);
 			break;
 
 			/* TODO: there are sound regs in here */
@@ -3765,16 +3783,16 @@ WRITE8_MEMBER(nes_carts_state::konami_vrc7_w)
 		case 0x5010:
 		case 0x5018:
 			bank = ((offset & 0x7000) - 0x2000) / 0x0800 + ((offset & 0x0018) ? 1 : 0);
-			chr1_x(machine(), bank, data, m_mmc_chr_source);
+			chr1_x(bank, data, m_mmc_chr_source);
 			break;
 
 		case 0x6000:
 			switch (data & 0x03)
 			{
-			case 0x00: set_nt_mirroring(machine(), PPU_MIRROR_VERT); break;
-			case 0x01: set_nt_mirroring(machine(), PPU_MIRROR_HORZ); break;
-			case 0x02: set_nt_mirroring(machine(), PPU_MIRROR_LOW); break;
-			case 0x03: set_nt_mirroring(machine(), PPU_MIRROR_HIGH); break;
+			case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
+			case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+			case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
+			case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 			}
 			break;
 		case 0x6008: case 0x6010: case 0x6018:
@@ -3869,10 +3887,11 @@ READ8_MEMBER(nes_carts_state::namcot163_l_r)
 
 static void namcot163_set_mirror( running_machine &machine, UINT8 page, UINT8 data )
 {
+	nes_state *state = machine.driver_data<nes_state>();
 	if (!(data < 0xe0))
-		set_nt_page(machine, page, CIRAM, data & 0x01, 1);
+		state->set_nt_page(page, CIRAM, data & 0x01, 1);
 	else
-		set_nt_page(machine, page, ROM, data, 0);
+		state->set_nt_page(page, ROM, data, 0);
 }
 
 WRITE8_MEMBER(nes_carts_state::namcot163_w)
@@ -3884,7 +3903,7 @@ WRITE8_MEMBER(nes_carts_state::namcot163_w)
 		case 0x1000: case 0x1800:
 		case 0x2000: case 0x2800:
 		case 0x3000: case 0x3800:
-			chr1_x(machine(), offset / 0x800, data, CHRROM);
+			chr1_x(offset / 0x800, data, CHRROM);
 			break;
 		case 0x4000:
 			namcot163_set_mirror(machine(), 0, data);
@@ -3899,14 +3918,14 @@ WRITE8_MEMBER(nes_carts_state::namcot163_w)
 			namcot163_set_mirror(machine(), 3, data);
 			break;
 		case 0x6000:
-			prg8_89(machine(), data & 0x3f);
+			prg8_89(data & 0x3f);
 			break;
 		case 0x6800:
 			m_mmc_latch1 = data & 0xc0;		// this should enable High CHRRAM, but we still have to properly implement it!
-			prg8_ab(machine(), data & 0x3f);
+			prg8_ab(data & 0x3f);
 			break;
 		case 0x7000:
-			prg8_cd(machine(), data & 0x3f);
+			prg8_cd(data & 0x3f);
 			break;
 		case 0x7800:
 			LOG_MMC(("Namcot-163 sound address write, data: %02x\n", data));
@@ -3932,11 +3951,11 @@ WRITE8_MEMBER(nes_carts_state::sunsoft1_m_w)
 
 	if (m_chr_chunks)
 	{
-		chr4_0(machine(), data & 0x0f, CHRROM);
-		chr4_4(machine(), data >> 4, CHRROM);
+		chr4_0(data & 0x0f, CHRROM);
+		chr4_4(data >> 4, CHRROM);
 	}
 	else
-		prg16_89ab(machine(), data & 0x0f);
+		prg16_89ab(data & 0x0f);
 }
 
 /*************************************************************
@@ -3956,11 +3975,11 @@ WRITE8_MEMBER(nes_carts_state::sunsoft2_w)
 	LOG_MMC(("sunsoft2_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (!m_hard_mirroring)	// there are two 'variants' depending on hardwired or mapper ctrl mirroring
-		set_nt_mirroring(machine(), BIT(data, 3) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+		set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 	if (m_chr_chunks)
-		chr8(machine(), sunsoft_helper, CHRROM);
+		chr8(sunsoft_helper, CHRROM);
 
-	prg16_89ab(machine(), data >> 4);
+	prg16_89ab(data >> 4);
 }
 
 /*************************************************************
@@ -4003,16 +4022,16 @@ WRITE8_MEMBER(nes_carts_state::sunsoft3_w)
 	switch (offset & 0x7800)
 	{
 		case 0x0800:
-			chr2_0(machine(), data, CHRROM);
+			chr2_0(data, CHRROM);
 			break;
 		case 0x1800:
-			chr2_2(machine(), data, CHRROM);
+			chr2_2(data, CHRROM);
 			break;
 		case 0x2800:
-			chr2_4(machine(), data, CHRROM);
+			chr2_4(data, CHRROM);
 			break;
 		case 0x3800:
-			chr2_6(machine(), data, CHRROM);
+			chr2_6(data, CHRROM);
 			break;
 		case 0x4000:
 		case 0x4800:
@@ -4029,14 +4048,14 @@ WRITE8_MEMBER(nes_carts_state::sunsoft3_w)
 		case 0x6800:
 			switch (data & 3)
 			{
-			case 0x00: set_nt_mirroring(machine(), PPU_MIRROR_VERT); break;
-			case 0x01: set_nt_mirroring(machine(), PPU_MIRROR_HORZ); break;
-			case 0x02: set_nt_mirroring(machine(), PPU_MIRROR_LOW); break;
-			case 0x03: set_nt_mirroring(machine(), PPU_MIRROR_HIGH); break;
+			case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
+			case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+			case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
+			case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 			}
 			break;
 		case 0x7800:
-			prg16_89ab(machine(), data);
+			prg16_89ab(data);
 			break;
 		default:
 			LOG_MMC(("sunsoft3_w uncaught write, offset: %04x, data: %02x\n", offset, data));
@@ -4065,29 +4084,29 @@ WRITE8_MEMBER(nes_carts_state::tc0190fmc_w)
 	switch (offset & 0x7003)
 	{
 		case 0x0000:
-			set_nt_mirroring(machine(), BIT(data, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-			prg8_89(machine(), data);
+			set_nt_mirroring(BIT(data, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			prg8_89(data);
 			break;
 		case 0x0001:
-			prg8_ab(machine(), data);
+			prg8_ab(data);
 			break;
 		case 0x0002:
-			chr2_0(machine(), data, CHRROM);
+			chr2_0(data, CHRROM);
 			break;
 		case 0x0003:
-			chr2_2(machine(), data, CHRROM);
+			chr2_2(data, CHRROM);
 			break;
 		case 0x2000:
-			chr1_4(machine(), data, CHRROM);
+			chr1_4(data, CHRROM);
 			break;
 		case 0x2001:
-			chr1_5(machine(), data, CHRROM);
+			chr1_5(data, CHRROM);
 			break;
 		case 0x2002:
-			chr1_6(machine(), data, CHRROM);
+			chr1_6(data, CHRROM);
 			break;
 		case 0x2003:
-			chr1_7(machine(), data, CHRROM);
+			chr1_7(data, CHRROM);
 			break;
 	}
 }
@@ -4118,7 +4137,7 @@ WRITE8_MEMBER(nes_carts_state::tc0190fmc_p16_w)
 	switch (offset & 0x7003)
 	{
 		case 0x0000:
-			prg8_89(machine(), data);
+			prg8_89(data);
 			break;
 		case 0x0001:
 		case 0x0002:
@@ -4142,7 +4161,7 @@ WRITE8_MEMBER(nes_carts_state::tc0190fmc_p16_w)
 			m_IRQ_enable = 0;
 			break;
 		case 0x6000:
-			set_nt_mirroring(machine(), BIT(data, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 	}
 }
@@ -4168,26 +4187,26 @@ WRITE8_MEMBER(nes_carts_state::x1005_m_w)
 	switch (offset)
 	{
 		case 0x1ef0:
-			chr2_0(machine(), (data & 0x7f) >> 1, CHRROM);
+			chr2_0((data & 0x7f) >> 1, CHRROM);
 			break;
 		case 0x1ef1:
-			chr2_2(machine(), (data & 0x7f) >> 1, CHRROM);
+			chr2_2((data & 0x7f) >> 1, CHRROM);
 			break;
 		case 0x1ef2:
-			chr1_4(machine(), data, CHRROM);
+			chr1_4(data, CHRROM);
 			break;
 		case 0x1ef3:
-			chr1_5(machine(), data, CHRROM);
+			chr1_5(data, CHRROM);
 			break;
 		case 0x1ef4:
-			chr1_6(machine(), data, CHRROM);
+			chr1_6(data, CHRROM);
 			break;
 		case 0x1ef5:
-			chr1_7(machine(), data, CHRROM);
+			chr1_7(data, CHRROM);
 			break;
 		case 0x1ef6:
 		case 0x1ef7:
-			set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 			break;
 		case 0x1ef8:
 		case 0x1ef9:
@@ -4195,15 +4214,15 @@ WRITE8_MEMBER(nes_carts_state::x1005_m_w)
 			break;
 		case 0x1efa:
 		case 0x1efb:
-			prg8_89(machine(), data);
+			prg8_89(data);
 			break;
 		case 0x1efc:
 		case 0x1efd:
-			prg8_ab(machine(), data);
+			prg8_ab(data);
 			break;
 		case 0x1efe:
 		case 0x1eff:
-			prg8_cd(machine(), data);
+			prg8_cd(data);
 			break;
 		default:
 			logerror("mapper80_m_w uncaught addr: %04x, value: %02x\n", offset + 0x6000, data);
@@ -4239,12 +4258,12 @@ WRITE8_MEMBER(nes_carts_state::x1005a_m_w)
 	switch (offset)
 	{
 		case 0x1ef0:
-			set_nt_page(machine(), 0, CIRAM, (data & 0x80) ? 1 : 0, 1);
-			set_nt_page(machine(), 1, CIRAM, (data & 0x80) ? 1 : 0, 1);
+			set_nt_page(0, CIRAM, (data & 0x80) ? 1 : 0, 1);
+			set_nt_page(1, CIRAM, (data & 0x80) ? 1 : 0, 1);
 			break;
 		case 0x1ef1:
-			set_nt_page(machine(), 2, CIRAM, (data & 0x80) ? 1 : 0, 1);
-			set_nt_page(machine(), 3, CIRAM, (data & 0x80) ? 1 : 0, 1);
+			set_nt_page(2, CIRAM, (data & 0x80) ? 1 : 0, 1);
+			set_nt_page(3, CIRAM, (data & 0x80) ? 1 : 0, 1);
 			break;
 	}
 
@@ -4272,18 +4291,18 @@ static void x1017_set_chr( running_machine &machine )
 	nes_state *state = machine.driver_data<nes_state>();
 	if (state->m_mmc_latch1)
 	{
-		chr2_4(machine, state->m_mmc_vrom_bank[0] >> 1, CHRROM);
-		chr2_6(machine, state->m_mmc_vrom_bank[1] >> 1, CHRROM);
+		state->chr2_4(state->m_mmc_vrom_bank[0] >> 1, CHRROM);
+		state->chr2_6(state->m_mmc_vrom_bank[1] >> 1, CHRROM);
 	}
 	else
 	{
-		chr2_0(machine, state->m_mmc_vrom_bank[0] >> 1, CHRROM);
-		chr2_2(machine, state->m_mmc_vrom_bank[1] >> 1, CHRROM);
+		state->chr2_0(state->m_mmc_vrom_bank[0] >> 1, CHRROM);
+		state->chr2_2(state->m_mmc_vrom_bank[1] >> 1, CHRROM);
 	}
-	chr1_x(machine, 4 ^ state->m_mmc_latch1, state->m_mmc_vrom_bank[2], CHRROM);
-	chr1_x(machine, 5 ^ state->m_mmc_latch1, state->m_mmc_vrom_bank[3], CHRROM);
-	chr1_x(machine, 6 ^ state->m_mmc_latch1, state->m_mmc_vrom_bank[4], CHRROM);
-	chr1_x(machine, 7 ^ state->m_mmc_latch1, state->m_mmc_vrom_bank[5], CHRROM);
+	state->chr1_x(4 ^ state->m_mmc_latch1, state->m_mmc_vrom_bank[2], CHRROM);
+	state->chr1_x(5 ^ state->m_mmc_latch1, state->m_mmc_vrom_bank[3], CHRROM);
+	state->chr1_x(6 ^ state->m_mmc_latch1, state->m_mmc_vrom_bank[4], CHRROM);
+	state->chr1_x(7 ^ state->m_mmc_latch1, state->m_mmc_vrom_bank[5], CHRROM);
 }
 
 WRITE8_MEMBER(nes_carts_state::x1017_m_w)
@@ -4312,7 +4331,7 @@ WRITE8_MEMBER(nes_carts_state::x1017_m_w)
 			}
 			break;
 		case 0x1ef6:
-			set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 			m_mmc_latch1 = ((data & 0x02) << 1);
 			x1017_set_chr(machine());
 			break;
@@ -4322,13 +4341,13 @@ WRITE8_MEMBER(nes_carts_state::x1017_m_w)
 			m_mmc_reg[(offset & 0x0f) - 7] = data;
 			break;
 		case 0x1efa:
-			prg8_89(machine(), data >> 2);
+			prg8_89(data >> 2);
 			break;
 		case 0x1efb:
-			prg8_ab(machine(), data >> 2);
+			prg8_ab(data >> 2);
 			break;
 		case 0x1efc:
-			prg8_cd(machine(), data >> 2);
+			prg8_cd(data >> 2);
 			break;
 		default:
 			logerror("x1017_m_w uncaught write, addr: %04x, value: %02x\n", offset + 0x6000, data);
@@ -4376,8 +4395,8 @@ WRITE8_MEMBER(nes_carts_state::agci_50282_w)
 	offset += 0x8000;
 	data |= (space.read_byte(offset) & 1);
 
-	chr8(machine(), data >> 4, CHRROM);
-	prg32(machine(), data);
+	chr8(data >> 4, CHRROM);
+	prg32(data);
 }
 
 /*************************************************************
@@ -4395,13 +4414,13 @@ WRITE8_MEMBER(nes_carts_state::nina01_m_w)
 	switch (offset)
 	{
 		case 0x1ffd:
-			prg32(machine(), data);
+			prg32(data);
 			break;
 		case 0x1ffe:
-			chr4_0(machine(), data, CHRROM);
+			chr4_0(data, CHRROM);
 			break;
 		case 0x1fff:
-			chr4_4(machine(), data, CHRROM);
+			chr4_4(data, CHRROM);
 			break;
 	}
 }
@@ -4425,8 +4444,8 @@ WRITE8_MEMBER(nes_carts_state::nina06_l_w)
 
 	if (!(offset & 0x0100))
 	{
-		prg32(machine(), data >> 3);
-		chr8(machine(), data, CHRROM);
+		prg32(data >> 3);
+		chr8(data, CHRROM);
 	}
 }
 
@@ -4444,20 +4463,20 @@ WRITE8_MEMBER(nes_carts_state::ae_act52_w)
 	UINT8 pmode;
 	LOG_MMC(("ae_act52_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring(machine(), BIT(offset, 13) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(offset, 13) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	cbank = (data & 0x03) | ((offset & 0x0f) << 2);
-	chr8(machine(), cbank, CHRROM);
+	chr8(cbank, CHRROM);
 
 	pmode = offset & 0x20;
 	pbank = (offset & 0x1fc0) >> 6;
 	if (pmode)
 	{
-		prg16_89ab(machine(), pbank);
-		prg16_cdef(machine(), pbank);
+		prg16_89ab(pbank);
+		prg16_cdef(pbank);
 	}
 	else
-		prg32(machine(), pbank >> 1);
+		prg32(pbank >> 1);
 }
 
 
@@ -4484,12 +4503,12 @@ WRITE8_MEMBER(nes_carts_state::cne_decathl_w)
 		return;
 	if (offset < 0x00a5)
 	{
-		prg32(machine(), (offset - 0x0065) & 0x03);
+		prg32((offset - 0x0065) & 0x03);
 		return;
 	}
 	if (offset < 0x00e5)
 	{
-		chr8(machine(), (offset - 0x00a5) & 0x07, CHRROM);
+		chr8((offset - 0x00a5) & 0x07, CHRROM);
 	}
 }
 
@@ -4519,28 +4538,28 @@ WRITE8_MEMBER(nes_carts_state::cne_fsb_m_w)
 		switch (offset & 0x0007)
 		{
 			case 0x0000:
-				prg8_89(machine(), data);
+				prg8_89(data);
 				break;
 			case 0x0001:
-				prg8_ab(machine(), data);
+				prg8_ab(data);
 				break;
 			case 0x0002:
-				prg8_cd(machine(), data);
+				prg8_cd(data);
 				break;
 			case 0x0003:
-				prg8_ef(machine(), data);
+				prg8_ef(data);
 				break;
 			case 0x0004:
-				chr2_0(machine(), data, CHRROM);
+				chr2_0(data, CHRROM);
 				break;
 			case 0x0005:
-				chr2_2(machine(), data, CHRROM);
+				chr2_2(data, CHRROM);
 				break;
 			case 0x0006:
-				chr2_4(machine(), data, CHRROM);
+				chr2_4(data, CHRROM);
 				break;
 			case 0x0007:
-				chr2_6(machine(), data, CHRROM);
+				chr2_6(data, CHRROM);
 				break;
 		}
 	}
@@ -4569,8 +4588,8 @@ WRITE8_MEMBER(nes_carts_state::cne_shlz_l_w)
 {
 	LOG_MMC(("cne_shlz_l_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), data >> 4);
-	chr8(machine(), data & 0x0f, CHRROM);
+	prg32(data >> 4);
+	chr8(data & 0x0f, CHRROM);
 }
 
 /*************************************************************
@@ -4590,8 +4609,8 @@ WRITE8_MEMBER(nes_carts_state::caltron6in1_m_w)
 	LOG_MMC(("caltron6in1_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	m_mmc_latch1 = offset & 0xff;
-	set_nt_mirroring(machine(), BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	prg32(machine(), offset & 0x07);
+	set_nt_mirroring(BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	prg32(offset & 0x07);
 }
 
 WRITE8_MEMBER(nes_carts_state::caltron6in1_w)
@@ -4599,7 +4618,7 @@ WRITE8_MEMBER(nes_carts_state::caltron6in1_w)
 	LOG_MMC(("caltron6in1_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (m_mmc_latch1 & 0x04)
-		chr8(machine(), ((m_mmc_latch1 & 0x18) >> 1) | (data & 0x03), CHRROM);
+		chr8(((m_mmc_latch1 & 0x18) >> 1) | (data & 0x03), CHRROM);
 }
 
 /*************************************************************
@@ -4628,13 +4647,13 @@ WRITE8_MEMBER(nes_carts_state::bf9093_w)
 		case 0x0000:
 		case 0x1000:
 			if (!m_hard_mirroring)
-				set_nt_mirroring(machine(), BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+				set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 			break;
 		case 0x4000:
 		case 0x5000:
 		case 0x6000:
 		case 0x7000:
-			prg16_89ab(machine(), data);
+			prg16_89ab(data);
 			break;
 	}
 }
@@ -4660,8 +4679,8 @@ WRITE8_MEMBER(nes_carts_state::bf9093_w)
 static void bf9096_set_prg( running_machine &machine )
 {
 	nes_state *state = machine.driver_data<nes_state>();
-	prg16_89ab(machine, (state->m_mmc_latch2 & 0x03) | ((state->m_mmc_latch1 & 0x18) >> 1));
-	prg16_cdef(machine, 0x03 | ((state->m_mmc_latch1 & 0x18) >> 1));
+	state->prg16_89ab((state->m_mmc_latch2 & 0x03) | ((state->m_mmc_latch1 & 0x18) >> 1));
+	state->prg16_cdef(0x03 | ((state->m_mmc_latch1 & 0x18) >> 1));
 }
 
 WRITE8_MEMBER(nes_carts_state::bf9096_w)
@@ -4697,15 +4716,15 @@ WRITE8_MEMBER(nes_carts_state::golden5_w)
 		if (data & 0x08)
 		{
 			m_mmc_prg_bank[0] = ((data & 0x07) << 4) | (m_mmc_prg_bank[0] & 0x0f);
-			prg16_89ab(machine(), m_mmc_prg_bank[0]);
-			prg16_cdef(machine(), ((data & 0x07) << 4) | 0x0f);
+			prg16_89ab(m_mmc_prg_bank[0]);
+			prg16_cdef(((data & 0x07) << 4) | 0x0f);
 		}
 
 	}
 	else
 	{
 		m_mmc_prg_bank[0] = (m_mmc_prg_bank[0] & 0x70) | (data & 0x0f);
-		prg16_89ab(machine(), m_mmc_prg_bank[0]);
+		prg16_89ab(m_mmc_prg_bank[0]);
 	}
 }
 
@@ -4747,8 +4766,8 @@ READ8_MEMBER(nes_carts_state::cony_l_r)
 static void cony_set_prg( running_machine &machine )
 {
 	nes_state *state = machine.driver_data<nes_state>();
-	prg16_89ab(machine, state->m_mapper83_reg[8] & 0x3f);
-	prg16_cdef(machine, (state->m_mapper83_reg[8] & 0x30) | 0x0f);
+	state->prg16_89ab(state->m_mapper83_reg[8] & 0x3f);
+	state->prg16_cdef((state->m_mapper83_reg[8] & 0x30) | 0x0f);
 }
 
 static void cony_set_chr( running_machine &machine )
@@ -4761,21 +4780,21 @@ static void cony_set_chr( running_machine &machine )
 	// we should split them and possibly document the proper behavior of each variant
 	if (state->m_mmc_latch1 && !state->m_mmc_latch2)
 	{
-		chr2_0(machine, state->m_mapper83_reg[0], CHRROM);
-		chr2_2(machine, state->m_mapper83_reg[1], CHRROM);
-		chr2_4(machine, state->m_mapper83_reg[6], CHRROM);
-		chr2_6(machine, state->m_mapper83_reg[7], CHRROM);
+		state->chr2_0(state->m_mapper83_reg[0], CHRROM);
+		state->chr2_2(state->m_mapper83_reg[1], CHRROM);
+		state->chr2_4(state->m_mapper83_reg[6], CHRROM);
+		state->chr2_6(state->m_mapper83_reg[7], CHRROM);
 	}
 	else
 	{
-		chr1_0(machine, state->m_mapper83_reg[0] | ((state->m_mapper83_reg[8] & 0x30) << 4), CHRROM);
-		chr1_1(machine, state->m_mapper83_reg[1] | ((state->m_mapper83_reg[8] & 0x30) << 4), CHRROM);
-		chr1_2(machine, state->m_mapper83_reg[2] | ((state->m_mapper83_reg[8] & 0x30) << 4), CHRROM);
-		chr1_3(machine, state->m_mapper83_reg[3] | ((state->m_mapper83_reg[8] & 0x30) << 4), CHRROM);
-		chr1_4(machine, state->m_mapper83_reg[4] | ((state->m_mapper83_reg[8] & 0x30) << 4), CHRROM);
-		chr1_5(machine, state->m_mapper83_reg[5] | ((state->m_mapper83_reg[8] & 0x30) << 4), CHRROM);
-		chr1_6(machine, state->m_mapper83_reg[6] | ((state->m_mapper83_reg[8] & 0x30) << 4), CHRROM);
-		chr1_7(machine, state->m_mapper83_reg[7] | ((state->m_mapper83_reg[8] & 0x30) << 4), CHRROM);
+		state->chr1_0(state->m_mapper83_reg[0] | ((state->m_mapper83_reg[8] & 0x30) << 4), CHRROM);
+		state->chr1_1(state->m_mapper83_reg[1] | ((state->m_mapper83_reg[8] & 0x30) << 4), CHRROM);
+		state->chr1_2(state->m_mapper83_reg[2] | ((state->m_mapper83_reg[8] & 0x30) << 4), CHRROM);
+		state->chr1_3(state->m_mapper83_reg[3] | ((state->m_mapper83_reg[8] & 0x30) << 4), CHRROM);
+		state->chr1_4(state->m_mapper83_reg[4] | ((state->m_mapper83_reg[8] & 0x30) << 4), CHRROM);
+		state->chr1_5(state->m_mapper83_reg[5] | ((state->m_mapper83_reg[8] & 0x30) << 4), CHRROM);
+		state->chr1_6(state->m_mapper83_reg[6] | ((state->m_mapper83_reg[8] & 0x30) << 4), CHRROM);
+		state->chr1_7(state->m_mapper83_reg[7] | ((state->m_mapper83_reg[8] & 0x30) << 4), CHRROM);
 	}
 }
 
@@ -4799,16 +4818,16 @@ WRITE8_MEMBER(nes_carts_state::cony_w)
 			switch (data & 0x03)
 			{
 			case 0:
-				set_nt_mirroring(machine(), PPU_MIRROR_VERT);
+				set_nt_mirroring(PPU_MIRROR_VERT);
 				break;
 			case 1:
-				set_nt_mirroring(machine(), PPU_MIRROR_HORZ);
+				set_nt_mirroring(PPU_MIRROR_HORZ);
 				break;
 			case 2:
-				set_nt_mirroring(machine(), PPU_MIRROR_LOW);
+				set_nt_mirroring(PPU_MIRROR_LOW);
 				break;
 			case 3:
-				set_nt_mirroring(machine(), PPU_MIRROR_HIGH);
+				set_nt_mirroring(PPU_MIRROR_HIGH);
 				break;
 			}
 			break;
@@ -4820,13 +4839,13 @@ WRITE8_MEMBER(nes_carts_state::cony_w)
 			m_IRQ_count = (data << 8) | (m_IRQ_count & 0xff);
 			break;
 		case 0x0300:
-			prg8_89(machine(), data);
+			prg8_89(data);
 			break;
 		case 0x0301:
-			prg8_ab(machine(), data);
+			prg8_ab(data);
 			break;
 		case 0x0302:
-			prg8_cd(machine(), data);
+			prg8_cd(data);
 			break;
 		case 0x0312:
 		case 0x0313:
@@ -4888,27 +4907,27 @@ static void yoko_set_prg( running_machine &machine )
 	if (state->m_mmc_reg[0] & 0x10)
 	{
 		int base = (state->m_mmc_reg[1] & 0x08) << 1;
-		prg8_89(machine, base | (state->m_mapper83_reg[0] & 0x0f));
-		prg8_ab(machine, base | (state->m_mapper83_reg[1] & 0x0f));
-		prg8_cd(machine, base | (state->m_mapper83_reg[2] & 0x0f));
-		prg8_ef(machine, base | 0x0f);
+		state->prg8_89(base | (state->m_mapper83_reg[0] & 0x0f));
+		state->prg8_ab(base | (state->m_mapper83_reg[1] & 0x0f));
+		state->prg8_cd(base | (state->m_mapper83_reg[2] & 0x0f));
+		state->prg8_ef(base | 0x0f);
 	}
 	else if (state->m_mmc_reg[0] & 0x08)
-		prg32(machine, state->m_mmc_reg[1] >> 1);
+		state->prg32(state->m_mmc_reg[1] >> 1);
 	else
 	{
-		prg16_89ab(machine, state->m_mmc_reg[1]);
-		prg16_cdef(machine, 0xff);
+		state->prg16_89ab(state->m_mmc_reg[1]);
+		state->prg16_cdef(0xff);
 	}
 }
 
 static void yoko_set_chr( running_machine &machine )
 {
 	nes_state *state = machine.driver_data<nes_state>();
-	chr2_0(machine, state->m_mapper83_reg[4], CHRROM);
-	chr2_2(machine, state->m_mapper83_reg[5], CHRROM);
-	chr2_4(machine, state->m_mapper83_reg[6], CHRROM);
-	chr2_6(machine, state->m_mapper83_reg[7], CHRROM);
+	state->chr2_0(state->m_mapper83_reg[4], CHRROM);
+	state->chr2_2(state->m_mapper83_reg[5], CHRROM);
+	state->chr2_4(state->m_mapper83_reg[6], CHRROM);
+	state->chr2_6(state->m_mapper83_reg[7], CHRROM);
 }
 
 WRITE8_MEMBER(nes_carts_state::yoko_w)
@@ -4924,9 +4943,9 @@ WRITE8_MEMBER(nes_carts_state::yoko_w)
 		case 0x400:
 			m_mmc_reg[0] = data;
 			if (data & 1)
-				set_nt_mirroring(machine(), PPU_MIRROR_HORZ);
+				set_nt_mirroring(PPU_MIRROR_HORZ);
 			else
-				set_nt_mirroring(machine(), PPU_MIRROR_VERT);
+				set_nt_mirroring(PPU_MIRROR_VERT);
 			yoko_set_prg(machine());
 			break;
 		case 0x0800:
@@ -4968,7 +4987,7 @@ WRITE8_MEMBER(nes_carts_state::dreamtech_l_w)
 	offset += 0x100;
 
 	if (offset == 0x1020)	/* 0x5020 */
-		prg16_89ab(machine(), data);
+		prg16_89ab(data);
 }
 
 /*************************************************************
@@ -4992,9 +5011,9 @@ WRITE8_MEMBER(nes_carts_state::fukutake_l_w)
 	if (offset >= 0x200 && offset < 0x400)
 	{
 		if (offset & 1)
-			prg16_89ab(machine(), data);
+			prg16_89ab(data);
 		else
-			wram_bank(machine(), data >> 6, NES_WRAM);
+			wram_bank(data >> 6, NES_WRAM);
 	}
 	else if (offset >= 0x400 && offset < 0xf00)
 		m_mapper_ram[offset - 0x400] = data;
@@ -5053,16 +5072,16 @@ WRITE8_MEMBER(nes_carts_state::futuremedia_w)
 	switch (offset)
 	{
 		case 0x0000:
-			prg8_89(machine(), data);
+			prg8_89(data);
 			break;
 		case 0x0001:
-			prg8_ab(machine(), data);
+			prg8_ab(data);
 			break;
 		case 0x0002:
-			prg8_cd(machine(), data);
+			prg8_cd(data);
 			break;
 		case 0x0003:
-			prg8_ef(machine(), data);
+			prg8_ef(data);
 			break;
 		case 0x2000:
 		case 0x2001:
@@ -5072,11 +5091,11 @@ WRITE8_MEMBER(nes_carts_state::futuremedia_w)
 		case 0x2005:
 		case 0x2006:
 		case 0x2007:
-			chr1_x(machine(), offset & 0x07, data, CHRROM);
+			chr1_x(offset & 0x07, data, CHRROM);
 			break;
 
 		case 0x5000:
-			set_nt_mirroring(machine(), BIT(data, 0) ?  PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 0) ?  PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x4001:
@@ -5137,7 +5156,7 @@ WRITE8_MEMBER(nes_carts_state::gouder_sf4_l_w)
 	else if (!(offset < 0xf00))
 		m_mmc_reg[4] = data;
 	else if (!(offset < 0x700))
-		prg32(machine(), ((data >> 3) & 0x02) | (data & 0x01));
+		prg32(((data >> 3) & 0x02) | (data & 0x01));
 }
 
 READ8_MEMBER(nes_carts_state::gouder_sf4_l_r)
@@ -5177,8 +5196,8 @@ WRITE8_MEMBER(nes_carts_state::henggedianzi_w)
 {
 	LOG_MMC(("henggedianzi_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), data);
-	set_nt_mirroring(machine(), BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	prg32(data);
+	set_nt_mirroring(BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -5202,14 +5221,14 @@ WRITE8_MEMBER(nes_carts_state::heng_xjzb_l_w)
 	offset += 0x4100;
 
 	if (offset & 0x5000)
-		prg32(machine(), data >> 1);
+		prg32(data >> 1);
 }
 
 WRITE8_MEMBER(nes_carts_state::heng_xjzb_w)
 {
 	LOG_MMC(("heng_xjzb_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -5234,9 +5253,9 @@ WRITE8_MEMBER(nes_carts_state::hes6in1_l_w)
 
 	if (!(offset & 0x100))
 	{
-		prg32(machine(), (data & 0x38) >> 3);
-		chr8(machine(), (data & 0x07) | ((data & 0x40) >> 3), CHRROM);
-		set_nt_mirroring(machine(), BIT(data, 7) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+		prg32((data & 0x38) >> 3);
+		chr8((data & 0x07) | ((data & 0x40) >> 3), CHRROM);
+		set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 	}
 }
 
@@ -5246,8 +5265,8 @@ WRITE8_MEMBER(nes_carts_state::hes_l_w)
 
 	if (!(offset & 0x100))
 	{
-		prg32(machine(), (data & 0x38) >> 3);
-		chr8(machine(), (data & 0x07) | ((data & 0x40) >> 3), CHRROM);
+		prg32((data & 0x38) >> 3);
+		chr8((data & 0x07) | ((data & 0x40) >> 3), CHRROM);
 	}
 }
 
@@ -5270,7 +5289,7 @@ WRITE8_MEMBER(nes_carts_state::hosenkan_w)
 	switch (offset & 0x7003)
 	{
 		case 0x0001:
-			set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 0x2000:
 			m_mmc_latch1 = data;
@@ -5279,28 +5298,28 @@ WRITE8_MEMBER(nes_carts_state::hosenkan_w)
 			switch (m_mmc_latch1)
 		{
 			case 0:
-				chr2_0(machine(), data >> 1, CHRROM);
+				chr2_0(data >> 1, CHRROM);
 				break;
 			case 1:
-				chr1_5(machine(), data, CHRROM);
+				chr1_5(data, CHRROM);
 				break;
 			case 2:
-				chr2_2(machine(), data >> 1, CHRROM);
+				chr2_2(data >> 1, CHRROM);
 				break;
 			case 3:
-				chr1_7(machine(), data, CHRROM);
+				chr1_7(data, CHRROM);
 				break;
 			case 4:
-				prg8_89(machine(), data);
+				prg8_89(data);
 				break;
 			case 5:
-				prg8_ab(machine(), data);
+				prg8_ab(data);
 				break;
 			case 6:
-				chr1_4(machine(), data, CHRROM);
+				chr1_4(data, CHRROM);
 				break;
 			case 7:
-				chr1_6(machine(), data, CHRROM);
+				chr1_6(data, CHRROM);
 				break;
 		}
 			break;
@@ -5339,10 +5358,10 @@ WRITE8_MEMBER(nes_carts_state::ks7058_w)
 	switch (offset & 0x7080)
 	{
 		case 0x7000:
-			chr4_0(machine(), data, CHRROM);
+			chr4_0(data, CHRROM);
 			break;
 		case 0x7080:
-			chr4_4(machine(), data, CHRROM);
+			chr4_4(data, CHRROM);
 			break;
 	}
 }
@@ -5364,7 +5383,7 @@ WRITE8_MEMBER(nes_carts_state::ks7022_w)
 	LOG_MMC(("ks7022_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset == 0)
-		set_nt_mirroring(machine(), BIT(data, 2) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(BIT(data, 2) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	if (offset == 0x2000)
 		m_mmc_latch1 = data & 0x0f;
@@ -5376,9 +5395,9 @@ READ8_MEMBER(nes_carts_state::ks7022_r)
 
 	if (offset == 0x7ffc)
 	{
-		chr8(machine(), m_mmc_latch1, CHRROM);
-		prg16_89ab(machine(), m_mmc_latch1);
-		prg16_cdef(machine(), m_mmc_latch1);
+		chr8(m_mmc_latch1, CHRROM);
+		prg16_89ab(m_mmc_latch1);
+		prg16_cdef(m_mmc_latch1);
 	}
 
 	return mmc_hi_access_rom(machine(), offset);
@@ -5400,10 +5419,10 @@ static void ks7032_prg_update( running_machine &machine )
 {
 	nes_state *state = machine.driver_data<nes_state>();
 
-	prg8_67(machine, state->m_mmc_reg[4]);
-	prg8_89(machine, state->m_mmc_reg[1]);
-	prg8_ab(machine, state->m_mmc_reg[2]);
-	prg8_cd(machine, state->m_mmc_reg[3]);
+	state->prg8_67(state->m_mmc_reg[4]);
+	state->prg8_89(state->m_mmc_reg[1]);
+	state->prg8_ab(state->m_mmc_reg[2]);
+	state->prg8_cd(state->m_mmc_reg[3]);
 }
 
 static void ks7032_irq( device_t *device, int scanline, int vblank, int blanked )
@@ -5497,10 +5516,10 @@ WRITE8_MEMBER(nes_carts_state::ks202_w)
 			switch (offset & 0xc00)
 			{
 			case 0x800:
-				set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+				set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 				break;
 			case 0xc00:
-				chr1_x(machine(), offset & 0x07, data, CHRROM);
+				chr1_x(offset & 0x07, data, CHRROM);
 				break;
 			}
 			break;
@@ -5546,7 +5565,7 @@ WRITE8_MEMBER(nes_carts_state::ks7017_l_w)
 		m_mmc_latch1 = ((offset >> 2) & 0x03) | ((offset >> 4) & 0x04);
 
 	if (offset >= 0x1000 && offset < 0x1100)
-		prg16_89ab(machine(), m_mmc_latch1);
+		prg16_89ab(m_mmc_latch1);
 }
 
 WRITE8_MEMBER(nes_carts_state::ks7017_extra_w)
@@ -5562,7 +5581,7 @@ WRITE8_MEMBER(nes_carts_state::ks7017_extra_w)
 		m_IRQ_count = (m_IRQ_count & 0x00ff) | (data << 8);
 
 	if (offset == 0x0025) /* 0x4025 */
-		set_nt_mirroring(machine(), BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 READ8_MEMBER(nes_carts_state::ks7017_extra_r)
@@ -5670,13 +5689,13 @@ static void kay_pp_prg_cb( running_machine &machine, int start, int bank )
 
 	if (state->m_mmc_reg[5] & 0x3f)
 	{
-		prg8_x(machine, start, bank & 0x3f);
-		prg8_ef(machine, state->m_mmc_reg[1]);
-		prg8_cd(machine, state->m_mmc_reg[2]);
-		prg8_ab(machine, state->m_mmc_reg[3]);
+		state->prg8_x(start, bank & 0x3f);
+		state->prg8_ef(state->m_mmc_reg[1]);
+		state->prg8_cd(state->m_mmc_reg[2]);
+		state->prg8_ab(state->m_mmc_reg[3]);
 	}
 	else
-		prg8_x(machine, start, bank & 0x3f);
+		state->prg8_x(start, bank & 0x3f);
 }
 
 static void kay_pp_chr_cb( running_machine &machine, int start, int bank, int source )
@@ -5687,7 +5706,7 @@ static void kay_pp_chr_cb( running_machine &machine, int start, int bank, int so
 	if ((start & 0x04) == chr_page)
 		bank |= 0x100;
 
-	chr1_x(machine, start, bank, source);
+	state->chr1_x(start, bank, source);
 }
 
 WRITE8_MEMBER(nes_carts_state::kay_pp_w)
@@ -5742,9 +5761,9 @@ static void kasing_prg_cb( running_machine &machine, int start, int bank )
 {
 	nes_state *state = machine.driver_data<nes_state>();
 	if (BIT(state->m_mmc_reg[0], 7))
-		prg32(machine, state->m_mmc_reg[0] >> 1);
+		state->prg32(state->m_mmc_reg[0] >> 1);
 	else
-		prg8_x(machine, start, bank);
+		state->prg8_x(start, bank);
 }
 
 WRITE8_MEMBER(nes_carts_state::kasing_m_w)
@@ -5783,8 +5802,8 @@ WRITE8_MEMBER(nes_carts_state::magics_md_w)
 {
 	LOG_MMC(("magics_md_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), data >> 1);
-	chr8(machine(), data, CHRROM);
+	prg32(data >> 1);
+	chr8(data, CHRROM);
 }
 
 /*************************************************************
@@ -5807,14 +5826,14 @@ static void nanjing_irq( device_t *device, int scanline, int vblank, int blanked
 	{
 		if (scanline == 127)
 		{
-			chr4_0(device->machine(), 1, CHRRAM);
-			chr4_4(device->machine(), 1, CHRRAM);
+			state->chr4_0(1, CHRRAM);
+			state->chr4_4(1, CHRRAM);
 		}
 
 		if (scanline == 239)
 		{
-			chr4_0(device->machine(), 0, CHRRAM);
-			chr4_4(device->machine(), 0, CHRRAM);
+			state->chr4_0(0, CHRRAM);
+			state->chr4_4(0, CHRRAM);
 		}
 	}
 
@@ -5832,7 +5851,7 @@ WRITE8_MEMBER(nes_carts_state::nanjing_l_w)
 	if (offset == 0x1100)	// 0x5100
 	{
 		if (data == 6)
-			prg32(machine(), 3);
+			prg32(3);
 		return;
 	}
 
@@ -5851,14 +5870,14 @@ WRITE8_MEMBER(nes_carts_state::nanjing_l_w)
 		case 0x200:
 			m_mmc_reg[BIT(offset, 9)] = data;
 			if (!BIT(m_mmc_reg[0], 7) && m_ppu->get_current_scanline() <= 127)
-				chr8(machine(), 0, CHRRAM);
+				chr8(0, CHRRAM);
 			break;
 		case 0x300:
 			m_mmc_latch1 = data;
 			break;
 	}
 
-	prg32(machine(), (m_mmc_reg[0] & 0x0f) | ((m_mmc_reg[1] & 0x0f) << 4));
+	prg32((m_mmc_reg[0] & 0x0f) | ((m_mmc_reg[1] & 0x0f) << 4));
 }
 
 READ8_MEMBER(nes_carts_state::nanjing_l_r)
@@ -5939,37 +5958,37 @@ WRITE8_MEMBER(nes_carts_state::ntdec_asder_w)
 			switch (m_mmc_latch1)
 		{
 			case 0:
-				prg8_89(machine(), data);
+				prg8_89(data);
 				break;
 			case 1:
-				prg8_ab(machine(), data);
+				prg8_ab(data);
 				break;
 			case 2:
 				data &= 0xfe;
-				chr1_0(machine(), data, CHRROM);
-				chr1_1(machine(), data + 1, CHRROM);
+				chr1_0(data, CHRROM);
+				chr1_1(data + 1, CHRROM);
 				break;
 			case 3:
 				data &= 0xfe;
-				chr1_2(machine(), data, CHRROM);
-				chr1_3(machine(), data + 1, CHRROM);
+				chr1_2(data, CHRROM);
+				chr1_3(data + 1, CHRROM);
 				break;
 			case 4:
-				chr1_4(machine(), data, CHRROM);
+				chr1_4(data, CHRROM);
 				break;
 			case 5:
-				chr1_5(machine(), data, CHRROM);
+				chr1_5(data, CHRROM);
 				break;
 			case 6:
-				chr1_6(machine(), data, CHRROM);
+				chr1_6(data, CHRROM);
 				break;
 			case 7:
-				chr1_7(machine(), data, CHRROM);
+				chr1_7(data, CHRROM);
 				break;
 		}
 			break;
 		case 0x6000:
-			set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 	}
 }
@@ -5996,16 +6015,16 @@ WRITE8_MEMBER(nes_carts_state::ntdec_fh_m_w)
 	switch (offset & 0x03)
 	{
 		case 0:
-			chr4_0(machine(), data >> 2, CHRROM);
+			chr4_0(data >> 2, CHRROM);
 			break;
 		case 1:
-			chr2_4(machine(), data >> 1, CHRROM);
+			chr2_4(data >> 1, CHRROM);
 			break;
 		case 2:
-			chr2_6(machine(), data >> 1 , CHRROM);
+			chr2_6(data >> 1 , CHRROM);
 			break;
 		case 3:
-			prg8_89(machine(), data);
+			prg8_89(data);
 			break;
 	}
 }
@@ -6035,51 +6054,51 @@ WRITE8_MEMBER(nes_carts_state::daou306_w)
 		case 0x4000:
 		case 0x4004:
 			m_mmc_reg[reg + 0] = data;
-			chr1_0(machine(), m_mmc_reg[0] | (m_mmc_reg[8] << 8), CHRROM);
+			chr1_0(m_mmc_reg[0] | (m_mmc_reg[8] << 8), CHRROM);
 			break;
 		case 0x4001:
 		case 0x4005:
 			m_mmc_reg[reg + 1] = data;
-			chr1_1(machine(), m_mmc_reg[1] | (m_mmc_reg[9] << 8), CHRROM);
+			chr1_1(m_mmc_reg[1] | (m_mmc_reg[9] << 8), CHRROM);
 			break;
 		case 0x4002:
 		case 0x4006:
 			m_mmc_reg[reg + 2] = data;
-			chr1_2(machine(), m_mmc_reg[2] | (m_mmc_reg[10] << 8), CHRROM);
+			chr1_2(m_mmc_reg[2] | (m_mmc_reg[10] << 8), CHRROM);
 			break;
 		case 0x4003:
 		case 0x4007:
 			m_mmc_reg[reg + 3] = data;
-			chr1_3(machine(), m_mmc_reg[3] | (m_mmc_reg[11] << 8), CHRROM);
+			chr1_3(m_mmc_reg[3] | (m_mmc_reg[11] << 8), CHRROM);
 			break;
 		case 0x4008:
 		case 0x400c:
 			m_mmc_reg[reg + 4] = data;
-			chr1_4(machine(), m_mmc_reg[4] | (m_mmc_reg[12] << 8), CHRROM);
+			chr1_4(m_mmc_reg[4] | (m_mmc_reg[12] << 8), CHRROM);
 			break;
 		case 0x4009:
 		case 0x400d:
 			m_mmc_reg[reg + 5] = data;
-			chr1_5(machine(), m_mmc_reg[5] | (m_mmc_reg[13] << 8), CHRROM);
+			chr1_5(m_mmc_reg[5] | (m_mmc_reg[13] << 8), CHRROM);
 			break;
 		case 0x400a:
 		case 0x400e:
 			m_mmc_reg[reg + 6] = data;
-			chr1_6(machine(), m_mmc_reg[6] | (m_mmc_reg[14] << 8), CHRROM);
+			chr1_6(m_mmc_reg[6] | (m_mmc_reg[14] << 8), CHRROM);
 			break;
 		case 0x400b:
 		case 0x400f:
 			m_mmc_reg[reg + 7] = data;
-			chr1_7(machine(), m_mmc_reg[7] | (m_mmc_reg[15] << 8), CHRROM);
+			chr1_7(m_mmc_reg[7] | (m_mmc_reg[15] << 8), CHRROM);
 			break;
 		case 0x4010:
-			prg16_89ab(machine(), data);
+			prg16_89ab(data);
 			break;
 		case 0x4014:
 			if (data & 1)
-				set_nt_mirroring(machine(), PPU_MIRROR_HORZ);
+				set_nt_mirroring(PPU_MIRROR_HORZ);
 			else
-				set_nt_mirroring(machine(), PPU_MIRROR_VERT);
+				set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 	}
 }
@@ -6103,8 +6122,8 @@ WRITE8_MEMBER(nes_carts_state::gs2015_w)
 {
 	LOG_MMC(("gs2015_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), offset);
-	chr8(machine(), offset >> 1, m_mmc_chr_source);
+	prg32(offset);
+	chr8(offset >> 1, m_mmc_chr_source);
 }
 
 /*************************************************************
@@ -6133,15 +6152,15 @@ WRITE8_MEMBER(nes_carts_state::rcm_tf_w)
 	{
 		case 0x00:
 		case 0x30:
-			prg32(machine(), offset & 0x0f);
+			prg32(offset & 0x0f);
 			break;
 		case 0x10:
 		case 0x20:
-			prg16_89ab(machine(), ((offset & 0x0f) << 1) | ((offset & 0x20) >> 4));
-			prg16_cdef(machine(), ((offset & 0x0f) << 1) | ((offset & 0x20) >> 4));
+			prg16_89ab(((offset & 0x0f) << 1) | ((offset & 0x20) >> 4));
+			prg16_cdef(((offset & 0x0f) << 1) | ((offset & 0x20) >> 4));
 			break;
 	}
-	set_nt_mirroring(machine(), BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -6179,7 +6198,7 @@ static void rex_dbz_chr_cb( running_machine &machine, int start, int bank, int s
 	int shift = (start < 4) ? 8 : 4;
 
 	bank |= ((state->m_mmc_reg[0] << shift) & 0x100);
-	chr1_x(machine, start, bank, source);
+	state->chr1_x(start, bank, source);
 }
 
 /*************************************************************
@@ -6206,10 +6225,10 @@ static void rex_sl1632_set_prg( running_machine &machine, int prg_base, int prg_
 	}
 	else
 	{
-		prg8_89(machine, state->m_mmc_extra_bank[0]);
-		prg8_ab(machine, state->m_mmc_extra_bank[1]);
-		prg8_cd(machine, state->m_mmc_extra_bank[2]);
-		prg8_ef(machine, state->m_mmc_extra_bank[3]);
+		state->prg8_89(state->m_mmc_extra_bank[0]);
+		state->prg8_ab(state->m_mmc_extra_bank[1]);
+		state->prg8_cd(state->m_mmc_extra_bank[2]);
+		state->prg8_ef(state->m_mmc_extra_bank[3]);
 	}
 }
 
@@ -6239,14 +6258,14 @@ static void rex_sl1632_set_chr( running_machine &machine, UINT8 chr, int chr_bas
 		}
 	}
 
-	chr1_x(machine, chr_page ^ 0, chr_base2[0] | (bank[0] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 1, chr_base2[1] | (bank[1] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 2, chr_base2[2] | (bank[2] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 3, chr_base2[3] | (bank[3] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 4, chr_base2[4] | (bank[4] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 5, chr_base2[5] | (bank[5] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 6, chr_base2[6] | (bank[6] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 7, chr_base2[7] | (bank[7] & chr_mask), chr);
+	state->chr1_x(chr_page ^ 0, chr_base2[0] | (bank[0] & chr_mask), chr);
+	state->chr1_x(chr_page ^ 1, chr_base2[1] | (bank[1] & chr_mask), chr);
+	state->chr1_x(chr_page ^ 2, chr_base2[2] | (bank[2] & chr_mask), chr);
+	state->chr1_x(chr_page ^ 3, chr_base2[3] | (bank[3] & chr_mask), chr);
+	state->chr1_x(chr_page ^ 4, chr_base2[4] | (bank[4] & chr_mask), chr);
+	state->chr1_x(chr_page ^ 5, chr_base2[5] | (bank[5] & chr_mask), chr);
+	state->chr1_x(chr_page ^ 6, chr_base2[6] | (bank[6] & chr_mask), chr);
+	state->chr1_x(chr_page ^ 7, chr_base2[7] | (bank[7] & chr_mask), chr);
 }
 
 WRITE8_MEMBER(nes_carts_state::rex_sl1632_w)
@@ -6261,7 +6280,7 @@ WRITE8_MEMBER(nes_carts_state::rex_sl1632_w)
 		rex_sl1632_set_chr(machine(), m_mmc_chr_source, m_mmc_chr_base, m_mmc_chr_mask);
 
 		if (!(m_mmc_reg[0] & 0x02))
-			set_nt_mirroring(machine(), BIT(m_mmc_reg[1], 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(m_mmc_reg[1], 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	}
 
 	if (m_mmc_reg[0] & 0x02)
@@ -6303,7 +6322,7 @@ WRITE8_MEMBER(nes_carts_state::rex_sl1632_w)
 				break;
 
 			case 0x2000:
-				set_nt_mirroring(machine(), BIT(m_mmc_reg[1], 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+				set_nt_mirroring(BIT(m_mmc_reg[1], 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 				break;
 
 			default:
@@ -6331,7 +6350,7 @@ WRITE8_MEMBER(nes_carts_state::rex_sl1632_w)
 
 			case 0x1000:
 				m_mmc_reg[1] = data;
-				set_nt_mirroring(machine(), BIT(m_mmc_reg[1], 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+				set_nt_mirroring(BIT(m_mmc_reg[1], 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 				break;
 		}
 	}
@@ -6355,8 +6374,8 @@ WRITE8_MEMBER(nes_carts_state::rumblestation_m_w)
 
 	m_mmc_prg_bank[0] = (m_mmc_prg_bank[0] & 0x01) | ((data & 0x0f) << 1);
 	m_mmc_vrom_bank[0] = (m_mmc_vrom_bank[0] & 0x07) | ((data & 0xf0) >> 1);
-	prg32(machine(), m_mmc_prg_bank[0]);
-	chr8(machine(), m_mmc_vrom_bank[0], CHRROM);
+	prg32(m_mmc_prg_bank[0]);
+	chr8(m_mmc_vrom_bank[0], CHRROM);
 }
 
 WRITE8_MEMBER(nes_carts_state::rumblestation_w)
@@ -6365,8 +6384,8 @@ WRITE8_MEMBER(nes_carts_state::rumblestation_w)
 
 	m_mmc_prg_bank[0] = (m_mmc_prg_bank[0] & ~0x01) | (data & 0x01);
 	m_mmc_vrom_bank[0] = (m_mmc_vrom_bank[0] & ~0x07) | ((data & 0x70) >> 4);
-	prg32(machine(), m_mmc_prg_bank[0]);
-	chr8(machine(), m_mmc_vrom_bank[0], CHRROM);
+	prg32(m_mmc_prg_bank[0]);
+	chr8(m_mmc_vrom_bank[0], CHRROM);
 }
 
 /*************************************************************
@@ -6382,20 +6401,21 @@ WRITE8_MEMBER(nes_carts_state::rumblestation_w)
 
 static void sachen_set_mirror( running_machine &machine, UINT8 nt ) // used by mappers 137, 138, 139, 141
 {
+	nes_state *state = machine.driver_data<nes_state>();
 	switch (nt)
 	{
 		case 0:
 		case 1:
-			set_nt_mirroring(machine, nt ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			state->set_nt_mirroring(nt ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 2:
-			set_nt_page(machine, 0, CIRAM, 0, 1);
-			set_nt_page(machine, 1, CIRAM, 1, 1);
-			set_nt_page(machine, 2, CIRAM, 1, 1);
-			set_nt_page(machine, 3, CIRAM, 1, 1);
+			state->set_nt_page(0, CIRAM, 0, 1);
+			state->set_nt_page(1, CIRAM, 1, 1);
+			state->set_nt_page(2, CIRAM, 1, 1);
+			state->set_nt_page(3, CIRAM, 1, 1);
 			break;
 		case 3:
-			set_nt_mirroring(machine, PPU_MIRROR_LOW);
+			state->set_nt_mirroring(PPU_MIRROR_LOW);
 			break;
 		default:
 			LOG_MMC(("Mapper set NT to invalid value %02x", nt));
@@ -6418,19 +6438,19 @@ WRITE8_MEMBER(nes_carts_state::sachen_74x374_l_w)
 			{
 				case 0x02:
 					m_mmc_vrom_bank[0] = (m_mmc_vrom_bank[0] & ~0x08) | ((data << 3) & 0x08);
-					chr8(machine(), m_mmc_vrom_bank[0], CHRROM);
-					prg32(machine(), data & 0x01);
+					chr8(m_mmc_vrom_bank[0], CHRROM);
+					prg32(data & 0x01);
 					break;
 				case 0x04:
 					m_mmc_vrom_bank[0] = (m_mmc_vrom_bank[0] & ~0x04) | ((data << 2) & 0x04);
-					chr8(machine(), m_mmc_vrom_bank[0], CHRROM);
+					chr8(m_mmc_vrom_bank[0], CHRROM);
 					break;
 				case 0x05:
-					prg32(machine(), data & 0x07);
+					prg32(data & 0x07);
 					break;
 				case 0x06:
 					m_mmc_vrom_bank[0] = (m_mmc_vrom_bank[0] & ~0x03) | ((data << 0) & 0x03);
-					chr8(machine(), m_mmc_vrom_bank[0], CHRROM);
+					chr8(m_mmc_vrom_bank[0], CHRROM);
 					break;
 				case 0x07:
 					sachen_set_mirror(machine(), (data >> 1) & 0x03);
@@ -6467,23 +6487,23 @@ WRITE8_MEMBER(nes_carts_state::sachen_74x374a_l_w)
 			switch (m_mmc_latch1 & 0x07)
 			{
 				case 0x00:
-					prg32(machine(), 0);
-					chr8(machine(), 3, CHRROM);
+					prg32(0);
+					chr8(3, CHRROM);
 					break;
 				case 0x02:
 					m_mmc_vrom_bank[0] = (m_mmc_vrom_bank[0] & ~0x08) | ((data << 3) & 0x08);
-					chr8(machine(), m_mmc_vrom_bank[0], CHRROM);
+					chr8(m_mmc_vrom_bank[0], CHRROM);
 					break;
 				case 0x04:
 					m_mmc_vrom_bank[0] = (m_mmc_vrom_bank[0] & ~0x01) | ((data << 0) & 0x01);
-					chr8(machine(), m_mmc_vrom_bank[0], CHRROM);
+					chr8(m_mmc_vrom_bank[0], CHRROM);
 					break;
 				case 0x05:
-					prg32(machine(), data & 0x01);
+					prg32(data & 0x01);
 					break;
 				case 0x06:
 					m_mmc_vrom_bank[0] = (m_mmc_vrom_bank[0] & ~0x06) | ((data << 1) & 0x06);
-					chr8(machine(), m_mmc_vrom_bank[0], CHRROM);
+					chr8(m_mmc_vrom_bank[0], CHRROM);
 					break;
 				case 0x07:
 					sachen_set_mirror(machine(), BIT(data, 0));
@@ -6505,7 +6525,8 @@ WRITE8_MEMBER(nes_carts_state::sachen_74x374a_l_w)
 
 static void common_s8259_write_handler( address_space &space, offs_t offset, UINT8 data, int board )
 {
-	nes_state *state = space.machine().driver_data<nes_state>();
+	running_machine &machine = space.machine();
+	nes_state *state = machine.driver_data<nes_state>();
 	UINT8 bank_helper1, bank_helper2, shift, add1, add2, add3;
 
 	/* write happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
@@ -6520,20 +6541,20 @@ static void common_s8259_write_handler( address_space &space, offs_t offset, UIN
 			switch (state->m_mmc_latch1)
 			{
 				case 0x05:
-					prg32(space.machine(), data);
+					state->prg32(data);
 					break;
 				case 0x07:
-					sachen_set_mirror(space.machine(), BIT(data, 0) ? 0 : (data >> 1) & 0x03);
+					sachen_set_mirror(machine, BIT(data, 0) ? 0 : (data >> 1) & 0x03);
 					break;
 				default:
 					if (board == SACHEN_8259D)
 					{
 						if (state->m_mmc_chr_source == CHRROM)
 						{
-							chr1_0(space.machine(), (state->m_sachen_reg[0] & 0x07), CHRROM);
-							chr1_1(space.machine(), (state->m_sachen_reg[1] & 0x07) | (state->m_sachen_reg[4] << 4 & 0x10), CHRROM);
-							chr1_2(space.machine(), (state->m_sachen_reg[2] & 0x07) | (state->m_sachen_reg[4] << 3 & 0x10), CHRROM);
-							chr1_3(space.machine(), (state->m_sachen_reg[3] & 0x07) | (state->m_sachen_reg[4] << 2 & 0x10) | (state->m_sachen_reg[6] << 3 & 0x08), CHRROM);
+							state->chr1_0((state->m_sachen_reg[0] & 0x07), CHRROM);
+							state->chr1_1((state->m_sachen_reg[1] & 0x07) | (state->m_sachen_reg[4] << 4 & 0x10), CHRROM);
+							state->chr1_2((state->m_sachen_reg[2] & 0x07) | (state->m_sachen_reg[4] << 3 & 0x10), CHRROM);
+							state->chr1_3((state->m_sachen_reg[3] & 0x07) | (state->m_sachen_reg[4] << 2 & 0x10) | (state->m_sachen_reg[6] << 3 & 0x08), CHRROM);
 						}
 					}
 					else
@@ -6547,10 +6568,10 @@ static void common_s8259_write_handler( address_space &space, offs_t offset, UIN
 
 						if (state->m_mmc_chr_source == CHRROM)
 						{
-							chr2_0(space.machine(), ((state->m_sachen_reg[bank_helper1 ? 0 : 0] & 0x07) | bank_helper2) << shift, CHRROM);
-							chr2_2(space.machine(), ((state->m_sachen_reg[bank_helper1 ? 0 : 1] & 0x07) | bank_helper2) << shift | add1, CHRROM);
-							chr2_4(space.machine(), ((state->m_sachen_reg[bank_helper1 ? 0 : 2] & 0x07) | bank_helper2) << shift | add2, CHRROM);
-							chr2_6(space.machine(), ((state->m_sachen_reg[bank_helper1 ? 0 : 3] & 0x07) | bank_helper2) << shift | add3, CHRROM);
+							state->chr2_0(((state->m_sachen_reg[bank_helper1 ? 0 : 0] & 0x07) | bank_helper2) << shift, CHRROM);
+							state->chr2_2(((state->m_sachen_reg[bank_helper1 ? 0 : 1] & 0x07) | bank_helper2) << shift | add1, CHRROM);
+							state->chr2_4(((state->m_sachen_reg[bank_helper1 ? 0 : 2] & 0x07) | bank_helper2) << shift | add2, CHRROM);
+							state->chr2_6(((state->m_sachen_reg[bank_helper1 ? 0 : 3] & 0x07) | bank_helper2) << shift | add3, CHRROM);
 						}
 					}
 					break;
@@ -6590,7 +6611,7 @@ WRITE8_MEMBER(nes_carts_state::sa009_l_w)
 {
 	LOG_MMC(("sa009_l_w, offset: %04x, data: %02x\n", offset, data));
 
-	chr8(machine(), data, m_mmc_chr_source);
+	chr8(data, m_mmc_chr_source);
 }
 
 /*************************************************************
@@ -6609,7 +6630,7 @@ WRITE8_MEMBER(nes_carts_state::sa0036_w)
 {
 	LOG_MMC(("sa0036_w, offset: %04x, data: %02x\n", offset, data));
 
-	chr8(machine(), data >> 7, CHRROM);
+	chr8(data >> 7, CHRROM);
 }
 
 /*************************************************************
@@ -6628,8 +6649,8 @@ WRITE8_MEMBER(nes_carts_state::sa0037_w)
 {
 	LOG_MMC(("sa0037_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), data >> 3);
-	chr8(machine(), data, CHRROM);
+	prg32(data >> 3);
+	chr8(data, CHRROM);
 }
 
 /*************************************************************
@@ -6650,7 +6671,7 @@ WRITE8_MEMBER(nes_carts_state::sa72007_l_w)
 
 	/* only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
-		chr8(machine(), data >> 7, CHRROM);
+		chr8(data >> 7, CHRROM);
 }
 
 /*************************************************************
@@ -6669,8 +6690,8 @@ WRITE8_MEMBER(nes_carts_state::sa72008_l_w)
 {
 	LOG_MMC(("sa72008_l_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), data >> 2);
-	chr8(machine(), data, CHRROM);
+	prg32(data >> 2);
+	chr8(data, CHRROM);
 }
 
 /*************************************************************
@@ -6714,8 +6735,8 @@ WRITE8_MEMBER(nes_carts_state::tcu01_l_w)
 
 	if ((offset & 0x103) == 0x002)
 	{
-		prg32(machine(), ((data >> 6) & 0x02) | ((data >> 2) & 0x01));
-		chr8(machine(), data >> 3, CHRROM);
+		prg32(((data >> 6) & 0x02) | ((data >> 2) & 0x01));
+		chr8(data >> 3, CHRROM);
 	}
 }
 
@@ -6752,7 +6773,7 @@ WRITE8_MEMBER(nes_carts_state::tcu02_l_w)
 	if ((offset & 0x103) == 0x002)
 	{
 		m_mmc_latch1 = (data & 0x30) | ((data + 3) & 0x0f);
-		chr8(machine(), m_mmc_latch1, CHRROM);
+		chr8(m_mmc_latch1, CHRROM);
 	}
 }
 
@@ -6801,8 +6822,8 @@ WRITE8_MEMBER(nes_carts_state::subor0_w)
 		subor_helper2 = 0x20;
 	}
 
-	prg16_89ab(machine(), subor_helper1);
-	prg16_cdef(machine(), subor_helper2);
+	prg16_89ab(subor_helper1);
+	prg16_cdef(subor_helper2);
 }
 
 /*************************************************************
@@ -6839,8 +6860,8 @@ WRITE8_MEMBER(nes_carts_state::subor1_w)
 		subor_helper2 = 0x07;
 	}
 
-	prg16_89ab(machine(), subor_helper1);
-	prg16_cdef(machine(), subor_helper2);
+	prg16_89ab(subor_helper1);
+	prg16_cdef(subor_helper2);
 }
 
 /*************************************************************
@@ -6868,7 +6889,7 @@ static void sgame_boog_prg_cb( running_machine &machine, int start, int bank )
 		else
 			bank = (bank & 0x0f) | (state->m_mmc_reg[1] & 0x10);
 
-		prg8_x(machine, start, bank);
+		state->prg8_x(start, bank);
 	}
 }
 
@@ -6881,7 +6902,7 @@ static void sgame_boog_chr_cb( running_machine &machine, int start, int bank, in
 	else
 		bank = (bank & 0x7f) | ((state->m_mmc_reg[1] & 0x10) << 3);
 
-	chr1_x(machine, start, bank, source);
+	state->chr1_x(start, bank, source);
 }
 
 static void sgame_boog_set_prg( running_machine &machine )
@@ -6889,8 +6910,8 @@ static void sgame_boog_set_prg( running_machine &machine )
 	nes_state *state = machine.driver_data<nes_state>();
 	if (state->m_mmc_reg[0] & 0x80)
 	{
-		prg16_89ab(machine, (state->m_mmc_reg[0] & 0xf0) | (state->m_mmc_reg[1] & 0x10));
-		prg16_cdef(machine, (state->m_mmc_reg[0] & 0xf0) | (state->m_mmc_reg[1] & 0x10));
+		state->prg16_89ab((state->m_mmc_reg[0] & 0xf0) | (state->m_mmc_reg[1] & 0x10));
+		state->prg16_cdef((state->m_mmc_reg[0] & 0xf0) | (state->m_mmc_reg[1] & 0x10));
 	}
 	else
 		mmc3_set_prg(machine, state->m_mmc_prg_base, state->m_mmc_prg_mask);
@@ -6981,7 +7002,7 @@ WRITE8_MEMBER(nes_carts_state::sgame_boog_w)
 			if (!m_mmc_reg[2])
 				txrom_w(space, 0x4000, data, mem_mask);
 			else
-				set_nt_mirroring(machine(), ((data >> 7) | data) & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+				set_nt_mirroring(((data >> 7) | data) & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x4001:
@@ -7029,8 +7050,8 @@ WRITE8_MEMBER(nes_carts_state::sgame_lion_m_w)
 
 	if (m_map114_reg & 0x80)
 	{
-		prg16_89ab(machine(), data & 0x1f);
-		prg16_cdef(machine(), data & 0x1f);
+		prg16_89ab(data & 0x1f);
+		prg16_cdef(data & 0x1f);
 	}
 	else
 		mmc3_set_prg(machine(), m_mmc_prg_base, m_mmc_prg_mask);
@@ -7047,7 +7068,7 @@ WRITE8_MEMBER(nes_carts_state::sgame_lion_w)
 		switch (offset & 0x6000)
 		{
 			case 0x0000:
-				set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+				set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 				break;
 			case 0x2000:
 				m_map114_reg_enabled = 1;
@@ -7093,8 +7114,8 @@ WRITE8_MEMBER(nes_carts_state::tengen_800008_w)
 {
 	LOG_MMC(("tengen_800008_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), data >> 3);
-	chr8(machine(), data, CHRROM);
+	prg32(data >> 3);
+	chr8(data, CHRROM);
 }
 
 /*************************************************************
@@ -7172,9 +7193,9 @@ static void tengen_800032_set_prg( running_machine &machine )
 	nes_state *state = machine.driver_data<nes_state>();
 	UINT8 prg_mode = state->m_mmc_latch1 & 0x40;
 
-	prg8_89(machine, state->m_mmc_prg_bank[prg_mode ? 2: 0]);
-	prg8_ab(machine, state->m_mmc_prg_bank[prg_mode ? 0: 1]);
-	prg8_cd(machine, state->m_mmc_prg_bank[prg_mode ? 1: 2]);
+	state->prg8_89(state->m_mmc_prg_bank[prg_mode ? 2: 0]);
+	state->prg8_ab(state->m_mmc_prg_bank[prg_mode ? 0: 1]);
+	state->prg8_cd(state->m_mmc_prg_bank[prg_mode ? 1: 2]);
 }
 
 static void tengen_800032_set_chr( running_machine &machine )
@@ -7184,23 +7205,23 @@ static void tengen_800032_set_chr( running_machine &machine )
 
 	if (state->m_mmc_latch1 & 0x20)
 	{
-		chr1_x(machine, 0 ^ chr_page, state->m_mmc_vrom_bank[0], CHRROM);
-		chr1_x(machine, 1 ^ chr_page, state->m_mmc_vrom_bank[8], CHRROM);
-		chr1_x(machine, 2 ^ chr_page, state->m_mmc_vrom_bank[1], CHRROM);
-		chr1_x(machine, 3 ^ chr_page, state->m_mmc_vrom_bank[9], CHRROM);
+		state->chr1_x(0 ^ chr_page, state->m_mmc_vrom_bank[0], CHRROM);
+		state->chr1_x(1 ^ chr_page, state->m_mmc_vrom_bank[8], CHRROM);
+		state->chr1_x(2 ^ chr_page, state->m_mmc_vrom_bank[1], CHRROM);
+		state->chr1_x(3 ^ chr_page, state->m_mmc_vrom_bank[9], CHRROM);
 	}
 	else
 	{
-		chr1_x(machine, 0 ^ chr_page, state->m_mmc_vrom_bank[0] & ~0x01, CHRROM);
-		chr1_x(machine, 1 ^ chr_page, state->m_mmc_vrom_bank[0] |  0x01, CHRROM);
-		chr1_x(machine, 2 ^ chr_page, state->m_mmc_vrom_bank[1] & ~0x01, CHRROM);
-		chr1_x(machine, 3 ^ chr_page, state->m_mmc_vrom_bank[1] |  0x01, CHRROM);
+		state->chr1_x(0 ^ chr_page, state->m_mmc_vrom_bank[0] & ~0x01, CHRROM);
+		state->chr1_x(1 ^ chr_page, state->m_mmc_vrom_bank[0] |  0x01, CHRROM);
+		state->chr1_x(2 ^ chr_page, state->m_mmc_vrom_bank[1] & ~0x01, CHRROM);
+		state->chr1_x(3 ^ chr_page, state->m_mmc_vrom_bank[1] |  0x01, CHRROM);
 	}
 
-	chr1_x(machine, 4 ^ chr_page, state->m_mmc_vrom_bank[2], CHRROM);
-	chr1_x(machine, 5 ^ chr_page, state->m_mmc_vrom_bank[3], CHRROM);
-	chr1_x(machine, 6 ^ chr_page, state->m_mmc_vrom_bank[4], CHRROM);
-	chr1_x(machine, 7 ^ chr_page, state->m_mmc_vrom_bank[5], CHRROM);
+	state->chr1_x(4 ^ chr_page, state->m_mmc_vrom_bank[2], CHRROM);
+	state->chr1_x(5 ^ chr_page, state->m_mmc_vrom_bank[3], CHRROM);
+	state->chr1_x(6 ^ chr_page, state->m_mmc_vrom_bank[4], CHRROM);
+	state->chr1_x(7 ^ chr_page, state->m_mmc_vrom_bank[5], CHRROM);
 }
 
 WRITE8_MEMBER(nes_carts_state::tengen_800032_w)
@@ -7249,7 +7270,7 @@ WRITE8_MEMBER(nes_carts_state::tengen_800032_w)
 			break;
 
 		case 0x2000:
-			set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x4000:
@@ -7293,10 +7314,10 @@ static void tengen_800037_set_mirror( running_machine &machine )
 	nes_state *state = machine.driver_data<nes_state>();
 	UINT8 nt_mode = state->m_mmc_latch1 & 0x80;
 
-	set_nt_page(machine, 0, ROM, state->m_mmc_vrom_bank[nt_mode ? 2 : 0], 0);
-	set_nt_page(machine, 1, ROM, state->m_mmc_vrom_bank[nt_mode ? 3 : 0], 0);
-	set_nt_page(machine, 2, ROM, state->m_mmc_vrom_bank[nt_mode ? 4 : 1], 0);
-	set_nt_page(machine, 3, ROM, state->m_mmc_vrom_bank[nt_mode ? 5 : 1], 0);
+	state->set_nt_page(0, ROM, state->m_mmc_vrom_bank[nt_mode ? 2 : 0], 0);
+	state->set_nt_page(1, ROM, state->m_mmc_vrom_bank[nt_mode ? 3 : 0], 0);
+	state->set_nt_page(2, ROM, state->m_mmc_vrom_bank[nt_mode ? 4 : 1], 0);
+	state->set_nt_page(3, ROM, state->m_mmc_vrom_bank[nt_mode ? 5 : 1], 0);
 }
 
 WRITE8_MEMBER(nes_carts_state::tengen_800037_w)
@@ -7396,8 +7417,8 @@ WRITE8_MEMBER(nes_carts_state::txc_22211_w)
 {
 	LOG_MMC(("txc_22211_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), m_txc_reg[2] >> 2);
-	chr8(machine(), m_txc_reg[2], CHRROM);
+	prg32(m_txc_reg[2] >> 2);
+	chr8(m_txc_reg[2], CHRROM);
 }
 
 /*************************************************************
@@ -7419,8 +7440,8 @@ WRITE8_MEMBER(nes_carts_state::txc_22211b_w)
 {
 	LOG_MMC(("txc_22211b_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), m_txc_reg[2] >> 2);
-	chr8(machine(), (((data ^ m_txc_reg[2]) >> 3) & 0x02) | (((data ^ m_txc_reg[2]) >> 5) & 0x01), CHRROM);
+	prg32(m_txc_reg[2] >> 2);
+	chr8((((data ^ m_txc_reg[2]) >> 3) & 0x02) | (((data ^ m_txc_reg[2]) >> 5) & 0x01), CHRROM);
 }
 
 /*************************************************************
@@ -7466,7 +7487,7 @@ WRITE8_MEMBER(nes_carts_state::txc_tw_l_w)
 {
 	LOG_MMC(("txctw_l_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), (data >> 4) | data);
+	prg32((data >> 4) | data);
 }
 
 WRITE8_MEMBER(nes_carts_state::txc_tw_m_w)
@@ -7502,8 +7523,8 @@ WRITE8_MEMBER(nes_carts_state::txc_strikewolf_w)
 
 	if ((offset >= 0x400) && (offset < 0x7fff))
 	{
-		prg32(machine(), data >> 4);
-		chr8(machine(), data & 0x0f, CHRROM);
+		prg32(data >> 4);
+		chr8(data & 0x0f, CHRROM);
 	}
 }
 
@@ -7532,7 +7553,7 @@ WRITE8_MEMBER(nes_carts_state::txc_mxmdhtwo_w)
 {
 	LOG_MMC(("txc_mxmdhtwo_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), data);
+	prg32(data);
 }
 
 /*************************************************************
@@ -7555,17 +7576,18 @@ WRITE8_MEMBER(nes_carts_state::txc_mxmdhtwo_w)
 /* MIRROR_LOW and MIRROR_HIGH are swapped! */
 static void waixing_set_mirror( running_machine &machine, UINT8 nt )
 {
+	nes_state *state = machine.driver_data<nes_state>();
 	switch (nt)
 	{
 		case 0:
 		case 1:
-			set_nt_mirroring(machine, nt ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			state->set_nt_mirroring(nt ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 2:
-			set_nt_mirroring(machine, PPU_MIRROR_LOW);
+			state->set_nt_mirroring(PPU_MIRROR_LOW);
 			break;
 		case 3:
-			set_nt_mirroring(machine, PPU_MIRROR_HIGH);
+			state->set_nt_mirroring(PPU_MIRROR_HIGH);
 			break;
 		default:
 			LOG_MMC(("Mapper set NT to invalid value %02x", nt));
@@ -7576,15 +7598,17 @@ static void waixing_set_mirror( running_machine &machine, UINT8 nt )
 /* Luo Ke Ren X only works with this */
 static void waixing_a_chr_cb( running_machine &machine, int start, int bank, int source )
 {
+	nes_state *state = machine.driver_data<nes_state>();
 	int chr_src = (bank <= 9) ? CHRRAM : CHRROM;
-	chr1_x(machine, start, bank, chr_src);
+	state->chr1_x(start, bank, chr_src);
 }
 
 /* Ji Jia Zhan Shi only works with this */
 static void waixing_a1_chr_cb( running_machine &machine, int start, int bank, int source )
 {
+	nes_state *state = machine.driver_data<nes_state>();
 	int chr_src = ((bank == 8) || (bank == 9)) ? CHRRAM : CHRROM;
-	chr1_x(machine, start, bank, chr_src);
+	state->chr1_x(start, bank, chr_src);
 }
 
 WRITE8_MEMBER(nes_carts_state::waixing_a_w)
@@ -7624,8 +7648,9 @@ WRITE8_MEMBER(nes_carts_state::waixing_a_w)
 
 static void waixing_b_chr_cb( running_machine &machine, int start, int bank, int source )
 {
+	nes_state *state = machine.driver_data<nes_state>();
 	int chr_src = BIT(bank, 7) ? CHRRAM : CHRROM;
-	chr1_x(machine, start, bank, chr_src);
+	state->chr1_x(start, bank, chr_src);
 }
 
 /*************************************************************
@@ -7646,8 +7671,9 @@ static void waixing_b_chr_cb( running_machine &machine, int start, int bank, int
 
 static void waixing_c_chr_cb( running_machine &machine, int start, int bank, int source )
 {
+	nes_state *state = machine.driver_data<nes_state>();
 	int chr_src = ((bank == 0x08) || (bank == 0x09) || (bank == 0x0a) || (bank == 0x0b)) ? CHRRAM : CHRROM;
-	chr1_x(machine, start, bank, chr_src);
+	state->chr1_x(start, bank, chr_src);
 }
 
 /*************************************************************
@@ -7668,8 +7694,9 @@ static void waixing_c_chr_cb( running_machine &machine, int start, int bank, int
 
 static void waixing_d_chr_cb( running_machine &machine, int start, int bank, int source )
 {
+	nes_state *state = machine.driver_data<nes_state>();
 	int chr_src = (bank < 0x02) ? CHRRAM : CHRROM;
-	chr1_x(machine, start, bank, chr_src);
+	state->chr1_x(start, bank, chr_src);
 }
 
 /*************************************************************
@@ -7691,8 +7718,9 @@ static void waixing_d_chr_cb( running_machine &machine, int start, int bank, int
 
 static void waixing_e_chr_cb( running_machine &machine, int start, int bank, int source )
 {
+	nes_state *state = machine.driver_data<nes_state>();
 	int chr_src = (bank < 0x04) ? CHRRAM : CHRROM;
-	chr1_x(machine, start, bank, chr_src);
+	state->chr1_x(start, bank, chr_src);
 }
 
 /*************************************************************
@@ -7750,8 +7778,9 @@ WRITE8_MEMBER(nes_carts_state::waixing_f_w)
 
 static void waixing_g_chr_cb( running_machine &machine, int start, int bank, int source )
 {
+	nes_state *state = machine.driver_data<nes_state>();
 	int chr_src = (bank < 0x08) ? CHRRAM : CHRROM;
-	chr1_x(machine, start, bank, chr_src);
+	state->chr1_x(start, bank, chr_src);
 }
 
 static void waixing_g_set_chr( running_machine &machine, int chr_base, int chr_mask )
@@ -7835,8 +7864,9 @@ WRITE8_MEMBER(nes_carts_state::waixing_g_w)
 
 static void waixing_h_chr_cb( running_machine &machine, int start, int bank, int source )
 {
+	nes_state *state = machine.driver_data<nes_state>();
 	if (source == CHRROM)
-		chr1_x(machine, start, bank, source);
+		state->chr1_x(start, bank, source);
 }
 
 WRITE8_MEMBER(nes_carts_state::waixing_h_w)
@@ -7892,10 +7922,10 @@ WRITE8_MEMBER(nes_carts_state::waixing_sgz_w)
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
-			prg8_89(machine(), data);
+			prg8_89(data);
 			break;
 		case 0x2000:
-			prg8_ab(machine(), data);
+			prg8_ab(data);
 			break;
 		case 0x3000:
 		case 0x4000:
@@ -7907,7 +7937,7 @@ WRITE8_MEMBER(nes_carts_state::waixing_sgz_w)
 				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x0f) << 4);
 			else
 				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
-			chr1_x(machine(), bank, m_mmc_vrom_bank[bank], CHRROM);
+			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
 			break;
 		case 0x7000:
 			switch (offset & 0x0c)
@@ -7953,11 +7983,11 @@ WRITE8_MEMBER(nes_carts_state::waixing_sgzlz_l_w)
 	switch (offset)
 	{
 		case 0x700:
-			set_nt_mirroring(machine(), data ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(data ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 0x701:
 			m_mmc_latch1 = (m_mmc_latch1 & 0x0c) | ((data >> 1) & 0x03);
-			prg32(machine(), m_mmc_latch1);
+			prg32(m_mmc_latch1);
 			break;
 		case 0x702:
 			m_mmc_latch1 = (m_mmc_latch1 & 0x03) | ((data << 2) & 0x0c);
@@ -7994,15 +8024,15 @@ WRITE8_MEMBER(nes_carts_state::waixing_ffv_l_w)
 			case 0x20:
 			case 0x40:
 			case 0x60:
-				prg16_89ab(machine(), mmc_helper | ((m_mmc_reg[0] >> 1) & 0x10) | (m_mmc_reg[0] & 0x0f));
-				prg16_cdef(machine(), mmc_helper & 0x1f);
+				prg16_89ab(mmc_helper | ((m_mmc_reg[0] >> 1) & 0x10) | (m_mmc_reg[0] & 0x0f));
+				prg16_cdef(mmc_helper & 0x1f);
 				break;
 			case 0x50:
-				prg32(machine(), (mmc_helper >> 1) | (m_mmc_reg[0] & 0x0f));
+				prg32((mmc_helper >> 1) | (m_mmc_reg[0] & 0x0f));
 				break;
 			case 0x70:
-				prg16_89ab(machine(), mmc_helper | ((m_mmc_reg[0] << 1) & 0x10) | (m_mmc_reg[0] & 0x0f));
-				prg16_cdef(machine(), mmc_helper & 0x1f);
+				prg16_89ab(mmc_helper | ((m_mmc_reg[0] << 1) & 0x10) | (m_mmc_reg[0] & 0x0f));
+				prg16_cdef(mmc_helper & 0x1f);
 				break;
 		}
 	}
@@ -8031,14 +8061,14 @@ WRITE8_MEMBER(nes_carts_state::waixing_zs_w)
 {
 	LOG_MMC(("waixing_zs_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), offset >> 3);
+	prg32(offset >> 3);
 
 	switch (data & 0x03)
 	{
-		case 0: set_nt_mirroring(machine(), PPU_MIRROR_VERT); break;
-		case 1: set_nt_mirroring(machine(), PPU_MIRROR_HORZ); break;
-		case 2: set_nt_mirroring(machine(), PPU_MIRROR_LOW); break;
-		case 3: set_nt_mirroring(machine(), PPU_MIRROR_HIGH); break;
+		case 0: set_nt_mirroring(PPU_MIRROR_VERT); break;
+		case 1: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+		case 2: set_nt_mirroring(PPU_MIRROR_LOW); break;
+		case 3: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 	}
 }
 
@@ -8061,7 +8091,7 @@ WRITE8_MEMBER(nes_carts_state::waixing_dq8_w)
 {
 	LOG_MMC(("waixing_dq8_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), offset >> 3);
+	prg32(offset >> 3);
 }
 
 
@@ -8084,36 +8114,36 @@ WRITE8_MEMBER(nes_carts_state::waixing_ps2_w)
 
 	LOG_MMC(("waixing_ps2_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring(machine(), BIT(data, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(data, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	switch (offset & 0x0fff)
 	{
 		case 0x000:
-			prg8_89(machine(), (map15_helper + 0) ^ map15_flip);
-			prg8_ab(machine(), (map15_helper + 1) ^ map15_flip);
-			prg8_cd(machine(), (map15_helper + 2) ^ map15_flip);
-			prg8_ef(machine(), (map15_helper + 3) ^ map15_flip);
+			prg8_89((map15_helper + 0) ^ map15_flip);
+			prg8_ab((map15_helper + 1) ^ map15_flip);
+			prg8_cd((map15_helper + 2) ^ map15_flip);
+			prg8_ef((map15_helper + 3) ^ map15_flip);
 			break;
 		case 0x001:
 			map15_helper |= map15_flip;
-			prg8_89(machine(), map15_helper);
-			prg8_ab(machine(), map15_helper + 1);
-			prg8_cd(machine(), map15_helper + 1);
-			prg8_ef(machine(), map15_helper + 1);
+			prg8_89(map15_helper);
+			prg8_ab(map15_helper + 1);
+			prg8_cd(map15_helper + 1);
+			prg8_ef(map15_helper + 1);
 			break;
 		case 0x002:
 			map15_helper |= map15_flip;
-			prg8_89(machine(), map15_helper);
-			prg8_ab(machine(), map15_helper);
-			prg8_cd(machine(), map15_helper);
-			prg8_ef(machine(), map15_helper);
+			prg8_89(map15_helper);
+			prg8_ab(map15_helper);
+			prg8_cd(map15_helper);
+			prg8_ef(map15_helper);
 			break;
 		case 0x003:
 			map15_helper |= map15_flip;
-			prg8_89(machine(), map15_helper);
-			prg8_ab(machine(), map15_helper + 1);
-			prg8_cd(machine(), map15_helper);
-			prg8_ef(machine(), map15_helper + 1);
+			prg8_89(map15_helper);
+			prg8_ab(map15_helper + 1);
+			prg8_cd(map15_helper);
+			prg8_ef(map15_helper + 1);
 			break;
 	}
 }
@@ -8140,7 +8170,7 @@ static void waixing_sec_prg_cb( running_machine &machine, int start, int bank )
 	if (state->m_mmc_reg[0])
 		bank = ((bank & 0x01)) | ((bank >> 3) & 0x02) | ((bank >> 1) & 0x04) | ((bank << 2) & 0x18);
 
-	prg8_x(machine, start, bank);
+	state->prg8_x(start, bank);
 }
 
 static void waixing_sec_chr_cb( running_machine &machine, int start, int bank, int source )
@@ -8151,7 +8181,7 @@ static void waixing_sec_chr_cb( running_machine &machine, int start, int bank, i
 		bank = ((bank & 0x03)) | ((bank >> 1) & 0x04) | ((bank >> 4) & 0x08) |
 				((bank >> 2) & 0x10) | ((bank << 3) & 0x20) | ((bank << 2) & 0xc0);
 
-	chr1_x(machine, start, bank, source);
+	state->chr1_x(start, bank, source);
 }
 
 WRITE8_MEMBER(nes_carts_state::waixing_sec_l_w)
@@ -8186,8 +8216,8 @@ static void waixing_sh2_chr_cb( running_machine &machine, int start, int bank, i
 {
 	nes_state *state = machine.driver_data<nes_state>();
 
-	chr4_0(machine, state->m_mmc_reg[0], state->m_mmc_reg[0] ? CHRRAM : CHRROM);
-	chr4_4(machine, state->m_mmc_reg[1], state->m_mmc_reg[1] ? CHRRAM : CHRROM);
+	state->chr4_0(state->m_mmc_reg[0], state->m_mmc_reg[0] ? CHRRAM : CHRROM);
+	state->chr4_4(state->m_mmc_reg[1], state->m_mmc_reg[1] ? CHRRAM : CHRROM);
 }
 
 READ8_MEMBER(nes_carts_state::waixing_sh2_chr_r)
@@ -8205,9 +8235,9 @@ READ8_MEMBER(nes_carts_state::waixing_sh2_chr_r)
 
 	m_mmc_reg[offset >> 12] = chr_helper;
 	if (offset & 0x1000)
-		chr4_4(machine(), m_mmc_reg[1], m_mmc_reg[1] ? CHRRAM : CHRROM);
+		chr4_4(m_mmc_reg[1], m_mmc_reg[1] ? CHRRAM : CHRROM);
 	else
-		chr4_0(machine(), m_mmc_reg[0], m_mmc_reg[0] ? CHRRAM : CHRROM);
+		chr4_0(m_mmc_reg[0], m_mmc_reg[0] ? CHRRAM : CHRROM);
 
 	return val;
 }
@@ -8229,7 +8259,7 @@ static void unl_8237_prg_cb( running_machine &machine, int start, int bank )
 	nes_state *state = machine.driver_data<nes_state>();
 
 	if (!(state->m_mmc_reg[0] & 0x80))
-		prg8_x(machine, start, bank);
+		state->prg8_x(start, bank);
 }
 
 static void unl_8237_chr_cb( running_machine &machine, int start, int bank, int source )
@@ -8237,7 +8267,7 @@ static void unl_8237_chr_cb( running_machine &machine, int start, int bank, int 
 	nes_state *state = machine.driver_data<nes_state>();
 	bank |= ((state->m_mmc_reg[1] << 6) & 0x100);
 
-	chr1_x(machine, start, bank, source);
+	state->chr1_x(start, bank, source);
 }
 
 WRITE8_MEMBER(nes_carts_state::unl_8237_l_w)
@@ -8251,11 +8281,11 @@ WRITE8_MEMBER(nes_carts_state::unl_8237_l_w)
 		if (m_mmc_reg[0] & 0x80)
 		{
 			if (m_mmc_reg[0] & 0x20)
-				prg32(machine(), (m_mmc_reg[0] & 0x0f) >> 1);
+				prg32((m_mmc_reg[0] & 0x0f) >> 1);
 			else
 			{
-				prg16_89ab(machine(), m_mmc_reg[0] & 0x1f);
-				prg16_cdef(machine(), m_mmc_reg[0] & 0x1f);
+				prg16_89ab(m_mmc_reg[0] & 0x1f);
+				prg16_cdef(m_mmc_reg[0] & 0x1f);
 			}
 		}
 		else
@@ -8278,7 +8308,7 @@ WRITE8_MEMBER(nes_carts_state::unl_8237_w)
 	{
 		case 0x0000:
 		case 0x1000:
-			set_nt_mirroring(machine(), (data | (data >> 7)) & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring((data | (data >> 7)) & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x2000:
@@ -8321,8 +8351,8 @@ WRITE8_MEMBER(nes_carts_state::unl_8237_w)
 static void unl_ax5705_set_prg( running_machine &machine )
 {
 	nes_state *state = machine.driver_data<nes_state>();
-	prg8_89(machine, state->m_mmc_prg_bank[0]);
-	prg8_ab(machine, state->m_mmc_prg_bank[1]);
+	state->prg8_89(state->m_mmc_prg_bank[0]);
+	state->prg8_ab(state->m_mmc_prg_bank[1]);
 }
 
 WRITE8_MEMBER(nes_carts_state::unl_ax5705_w)
@@ -8337,7 +8367,7 @@ WRITE8_MEMBER(nes_carts_state::unl_ax5705_w)
 			unl_ax5705_set_prg(machine());
 			break;
 		case 0x0008:
-			set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 0x2000:
 			m_mmc_prg_bank[1] = (data & 0x05) | ((data & 0x08) >> 2) | ((data & 0x02) << 2);
@@ -8350,7 +8380,7 @@ WRITE8_MEMBER(nes_carts_state::unl_ax5705_w)
 		case 0x400a:
 			bank = ((offset & 0x4000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
 			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
-			chr1_x(machine(), bank, m_mmc_vrom_bank[bank], CHRROM);
+			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
 			break;
 		case 0x2009:
 		case 0x200b:
@@ -8358,7 +8388,7 @@ WRITE8_MEMBER(nes_carts_state::unl_ax5705_w)
 		case 0x400b:
 			bank = ((offset & 0x4000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
 			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x04) << 3) | ((data & 0x02) << 5) | ((data & 0x09) << 4);
-			chr1_x(machine(), bank, m_mmc_vrom_bank[bank], CHRROM);
+			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
 			break;
 			/* CHR banks 2, 3, 6, 7 */
 		case 0x4000:
@@ -8367,7 +8397,7 @@ WRITE8_MEMBER(nes_carts_state::unl_ax5705_w)
 		case 0x6002:
 			bank = 2 + ((offset & 0x2000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
 			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
-			chr1_x(machine(), bank, m_mmc_vrom_bank[bank], CHRROM);
+			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
 			break;
 		case 0x4001:
 		case 0x4003:
@@ -8375,7 +8405,7 @@ WRITE8_MEMBER(nes_carts_state::unl_ax5705_w)
 		case 0x6003:
 			bank = 2 + ((offset & 0x2000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
 			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x04) << 3) | ((data & 0x02) << 5) | ((data & 0x09) << 4);
-			chr1_x(machine(), bank, m_mmc_vrom_bank[bank], CHRROM);
+			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
 			break;
 	}
 }
@@ -8394,8 +8424,8 @@ WRITE8_MEMBER(nes_carts_state::unl_cc21_w)
 {
 	LOG_MMC(("unl_cc21_w offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring(machine(), BIT(data, 1) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
-	chr8(machine(), (offset & 0x01), CHRROM);
+	set_nt_mirroring(BIT(data, 1) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+	chr8((offset & 0x01), CHRROM);
 }
 
 /*************************************************************
@@ -8498,7 +8528,7 @@ WRITE8_MEMBER(nes_carts_state::unl_t230_w)
 		case 0x0000:
 			break;
 		case 0x2000:
-			prg16_89ab(machine(), data);
+			prg16_89ab(data);
 			break;
 
 		// the part below works like VRC-2. how was the original board wired up?
@@ -8509,10 +8539,10 @@ WRITE8_MEMBER(nes_carts_state::unl_t230_w)
 		case 0x100c:
 			switch (data & 0x03)
 			{
-			case 0x00: set_nt_mirroring(machine(), PPU_MIRROR_VERT); break;
-			case 0x01: set_nt_mirroring(machine(), PPU_MIRROR_HORZ); break;
-			case 0x02: set_nt_mirroring(machine(), PPU_MIRROR_LOW); break;
-			case 0x03: set_nt_mirroring(machine(), PPU_MIRROR_HIGH); break;
+			case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
+			case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+			case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
+			case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 			}
 			break;
 
@@ -8538,7 +8568,7 @@ WRITE8_MEMBER(nes_carts_state::unl_t230_w)
 			else
 				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
 
-			chr1_x(machine(), bank, m_mmc_vrom_bank[bank], m_mmc_chr_source);
+			chr1_x(bank, m_mmc_vrom_bank[bank], m_mmc_chr_source);
 			break;
 		case 0x7000:
 			m_IRQ_count_latch &= ~0x0f;
@@ -8582,7 +8612,7 @@ static void kof96_prg_cb( running_machine &machine, int start, int bank )
 	nes_state *state = machine.driver_data<nes_state>();
 
 	if (!(state->m_mmc_reg[0] & 0x80))
-		prg8_x(machine, start, bank);
+		state->prg8_x(start, bank);
 }
 
 static void kof96_chr_cb( running_machine &machine, int start, int bank, int source )
@@ -8593,7 +8623,7 @@ static void kof96_chr_cb( running_machine &machine, int start, int bank, int sou
 	if ((start & 0x04) == chr_page)
 		bank |= 0x100;
 
-	chr1_x(machine, start, bank, source);
+	state->chr1_x(start, bank, source);
 }
 
 WRITE8_MEMBER(nes_carts_state::kof96_l_w)
@@ -8611,11 +8641,11 @@ WRITE8_MEMBER(nes_carts_state::kof96_l_w)
 			new_bank = (m_mmc_reg[0] & 0x1f);
 
 			if (m_mmc_reg[0] & 0x20)
-				prg32(machine(), new_bank >> 2);
+				prg32(new_bank >> 2);
 			else
 			{
-				prg16_89ab(machine(), new_bank);
-				prg16_cdef(machine(), new_bank);
+				prg16_89ab(new_bank);
+				prg16_cdef(new_bank);
 			}
 		}
 		else
@@ -8681,9 +8711,9 @@ WRITE8_MEMBER(nes_carts_state::kof96_w)
 			m_mmc_reg[2] = 0;
 
 			if (data == 0x28)
-				prg8_cd(machine(), 0x17);
+				prg8_cd(0x17);
 			else if (data == 0x2a)
-				prg8_ab(machine(), 0x0f);
+				prg8_ab(0x0f);
 			break;
 
 		default:
@@ -8717,17 +8747,17 @@ WRITE8_MEMBER(nes_carts_state::mk2_m_w)
 		case 0x0000:
 			switch (offset & 0x03)
 			{
-			case 0x00: chr2_0(machine(), data, CHRROM); break;
-			case 0x01: chr2_2(machine(), data, CHRROM); break;
-			case 0x02: chr2_4(machine(), data, CHRROM); break;
-			case 0x03: chr2_6(machine(), data, CHRROM); break;
+			case 0x00: chr2_0(data, CHRROM); break;
+			case 0x01: chr2_2(data, CHRROM); break;
+			case 0x02: chr2_4(data, CHRROM); break;
+			case 0x03: chr2_6(data, CHRROM); break;
 			}
 			break;
 		case 0x1000:
 			switch (offset & 0x03)
 			{
-			case 0x00: prg8_89(machine(), data); break;
-			case 0x01: prg8_ab(machine(), data); break;
+			case 0x00: prg8_89(data); break;
+			case 0x01: prg8_ab(data); break;
 			case 0x02: m_IRQ_enable = 0; m_IRQ_count = 0; break;
 			case 0x03: m_IRQ_enable = 1; m_IRQ_count = 7; break;
 			}
@@ -8752,6 +8782,7 @@ WRITE8_MEMBER(nes_carts_state::mk2_m_w)
 
 static void n625092_set_prg( running_machine &machine, UINT8 reg1, UINT8 reg2 )
 {
+	nes_state *state = machine.driver_data<nes_state>();
 	UINT8 map221_helper1, map221_helper2;
 
 	map221_helper1 = !(reg1 & 0x01) ? reg2 :
@@ -8759,8 +8790,8 @@ static void n625092_set_prg( running_machine &machine, UINT8 reg1, UINT8 reg2 )
 	map221_helper2 = !(reg1 & 0x01) ? reg2 :
 	(reg1 & 0x80) ? 0x07 : (reg2 & 0x06) | 0x01;
 
-	prg16_89ab(machine, map221_helper1 | ((reg1 & 0x70) >> 1));
-	prg16_cdef(machine, map221_helper2 | ((reg1 & 0x70) >> 1));
+	state->prg16_89ab(map221_helper1 | ((reg1 & 0x70) >> 1));
+	state->prg16_cdef(map221_helper2 | ((reg1 & 0x70) >> 1));
 }
 
 WRITE8_MEMBER(nes_carts_state::n625092_w)
@@ -8769,7 +8800,7 @@ WRITE8_MEMBER(nes_carts_state::n625092_w)
 
 	if (offset < 0x4000)
 	{
-		set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		offset = (offset >> 1) & 0xff;
 
 		if (m_mmc_latch1 != offset)
@@ -8827,14 +8858,14 @@ WRITE8_MEMBER(nes_carts_state::sc127_w)
 	switch (offset)
 	{
 		case 0x0000:
-			prg8_89(machine(), data);
+			prg8_89(data);
 			break;
 		case 0x0001:
-			prg8_ab(machine(), data);
+			prg8_ab(data);
 			break;
 		case 0x0002:
 			//      m_mmc_prg_bank[offset & 0x02] = data;
-			prg8_cd(machine(), data);
+			prg8_cd(data);
 			break;
 		case 0x1000:
 		case 0x1001:
@@ -8845,7 +8876,7 @@ WRITE8_MEMBER(nes_carts_state::sc127_w)
 		case 0x1006:
 		case 0x1007:
 			//      m_mmc_vrom_bank[offset & 0x07] = data;
-			chr1_x(machine(), offset & 0x07, data, CHRROM);
+			chr1_x(offset & 0x07, data, CHRROM);
 			break;
 		case 0x4002:
 			m_IRQ_enable = 0;
@@ -8857,7 +8888,7 @@ WRITE8_MEMBER(nes_carts_state::sc127_w)
 			m_IRQ_count = data;
 			break;
 		case 0x5001:
-			set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 	}
 }
@@ -8881,7 +8912,7 @@ WRITE8_MEMBER(nes_carts_state::smb2j_w)
 
 	LOG_MMC(("smb2j_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring(machine(), (offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring((offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	if (offset & 0x0800)
 	{
@@ -8895,7 +8926,7 @@ WRITE8_MEMBER(nes_carts_state::smb2j_w)
 			else
 			{
 				LOG_MMC(("smb2j_w, selecting upper 16KB bank of #%02x\n", bank));
-				prg16_cdef(machine(), 2 * bank + 1);
+				prg16_cdef(2 * bank + 1);
 			}
 		}
 		else
@@ -8908,7 +8939,7 @@ WRITE8_MEMBER(nes_carts_state::smb2j_w)
 			else
 			{
 				LOG_MMC(("smb2j_w, selecting lower 16KB bank of #%02x\n", bank));
-				prg16_89ab(machine(), 2 * bank);
+				prg16_89ab(2 * bank);
 			}
 		}
 	}
@@ -8924,7 +8955,7 @@ WRITE8_MEMBER(nes_carts_state::smb2j_w)
 		else
 		{
 			LOG_MMC(("smb2j_w, selecting 32KB bank #%02x\n", bank));
-			prg32(machine(), bank);
+			prg32(bank);
 		}
 	}
 }
@@ -8972,7 +9003,7 @@ WRITE8_MEMBER(nes_carts_state::smb2jb_l_w)
 	{
 		case 0x020:
 			prg = (data & 0x08) | ((data & 0x06) >> 1) | ((data & 0x01) << 2);
-			prg8_cd(machine(), prg);
+			prg8_cd(prg);
 			break;
 		case 0x120:
 			m_IRQ_enable = data & 0x01;
@@ -8987,7 +9018,7 @@ WRITE8_MEMBER(nes_carts_state::smb2jb_extra_w)
 	LOG_MMC(("smb2jb_extra_w, offset: %04x, data: %02x\n", offset, data));
 
 	prg = (data & 0x08) | ((data & 0x06) >> 1) | ((data & 0x01) << 2);
-	prg8_cd(machine(), prg);
+	prg8_cd(prg);
 }
 
 /*************************************************************
@@ -9005,9 +9036,9 @@ WRITE8_MEMBER(nes_carts_state::smb2jb_extra_w)
 static void unl_sf3_set_chr( running_machine &machine, UINT8 chr_source, int chr_base, int chr_mask )
 {
 	nes_state *state = machine.driver_data<nes_state>();
-	chr4_0(machine, chr_base | ((state->m_mmc_vrom_bank[0] >> 1) & chr_mask), chr_source);
-	chr2_4(machine, chr_base | (state->m_mmc_vrom_bank[1] & chr_mask), chr_source);
-	chr2_6(machine, chr_base | (state->m_mmc_vrom_bank[2] & chr_mask), chr_source);
+	state->chr4_0(chr_base | ((state->m_mmc_vrom_bank[0] >> 1) & chr_mask), chr_source);
+	state->chr2_4(chr_base | (state->m_mmc_vrom_bank[1] & chr_mask), chr_source);
+	state->chr2_6(chr_base | (state->m_mmc_vrom_bank[2] & chr_mask), chr_source);
 }
 
 WRITE8_MEMBER(nes_carts_state::unl_sf3_w)
@@ -9074,10 +9105,10 @@ WRITE8_MEMBER(nes_carts_state::unl_xzy_l_w)
 	switch (offset)
 	{
 		case 0x1ef1:	/* 0x5ff1 */
-			prg32(machine(), data >> 1);
+			prg32(data >> 1);
 			break;
 		case 0x1ef2:	/* 0x5ff2 */
-			chr8(machine(), data, CHRROM);
+			chr8(data, CHRROM);
 			break;
 	}
 }
@@ -9094,8 +9125,8 @@ WRITE8_MEMBER(nes_carts_state::unl_xzy_l_w)
 static void racmate_update_banks( running_machine &machine )
 {
 	nes_state *state = machine.driver_data<nes_state>();
-	chr4_4(machine, state->m_mmc_latch1 & 0x0f, state->m_mmc_chr_source);
-	prg16_89ab(machine, state->m_mmc_latch1 >> 1);
+	state->chr4_4(state->m_mmc_latch1 & 0x0f, state->m_mmc_chr_source);
+	state->prg16_89ab(state->m_mmc_latch1 >> 1);
 }
 
 WRITE8_MEMBER(nes_carts_state::unl_racmate_w)
@@ -9132,8 +9163,8 @@ WRITE8_MEMBER(nes_carts_state::unl_fs304_l_w)
 	{
 		m_mmc_reg[(offset >> 8) & 3] = data;
 		bank = ((m_mmc_reg[2] & 0x0f) << 4) | BIT(m_mmc_reg[1], 1) | (m_mmc_reg[0] & 0x0e);
-		prg32(machine(), bank);
-		chr8(machine(), 0, CHRRAM);
+		prg32(bank);
+		chr8(0, CHRRAM);
 	}
 }
 
@@ -9188,10 +9219,10 @@ WRITE8_MEMBER(nes_carts_state::btl_mariobaby_w)
 		switch (offset & 0x03)
 		{
 			case 0x00:
-				prg8_67(machine(), data);
+				prg8_67(data);
 				break;
 			case 0x01:
-				set_nt_mirroring(machine(), BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+				set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 				break;
 			case 0x02:
 				/* Check if IRQ is being enabled */
@@ -9253,7 +9284,7 @@ WRITE8_MEMBER(nes_carts_state::btl_smb2a_w)
 			m_IRQ_enable = 1;
 			break;
 		case 0x6000:
-			prg8_cd(machine(), data);
+			prg8_cd(data);
 			break;
 	}
 }
@@ -9273,7 +9304,7 @@ WRITE8_MEMBER(nes_carts_state::btl_smb2a_w)
 WRITE8_MEMBER(nes_carts_state::whirl2706_w)
 {
 	LOG_MMC(("whirl2706_w, offset: %04x, data: %02x\n", offset, data));
-	prg8_67(machine(), data);
+	prg8_67(data);
 }
 
 /*************************************************************
@@ -9294,7 +9325,7 @@ WRITE8_MEMBER(nes_carts_state::btl_tobi_l_w)
 	offset += 0x100;
 
 	if ((offset & 0x43c0) == 0x41c0)
-		prg8_67(machine(), data & 0x07);
+		prg8_67(data & 0x07);
 }
 
 /*************************************************************
@@ -9332,30 +9363,30 @@ WRITE8_MEMBER(nes_carts_state::btl_smb3_w)
 	{
 		case 0x00:
 		case 0x02:
-			chr1_x(machine(), offset & 0x07, data & 0xfe, CHRROM);
+			chr1_x(offset & 0x07, data & 0xfe, CHRROM);
 			break;
 		case 0x01:
 		case 0x03:
-			chr1_x(machine(), offset & 0x07, data | 0x01, CHRROM);
+			chr1_x(offset & 0x07, data | 0x01, CHRROM);
 			break;
 		case 0x04: case 0x05:
 		case 0x06: case 0x07:
-			chr1_x(machine(), offset & 0x07, data, CHRROM);
+			chr1_x(offset & 0x07, data, CHRROM);
 			break;
 		case 0x08:
-			prg8_89(machine(), data | 0x10);
+			prg8_89(data | 0x10);
 			break;
 		case 0x09:
-			prg8_ab(machine(), data);
+			prg8_ab(data);
 			break;
 		case 0x0a:
-			prg8_cd(machine(), data);
+			prg8_cd(data);
 			break;
 		case 0x0b:
-			prg8_ef(machine(), data | 0x10);
+			prg8_ef(data | 0x10);
 			break;
 		case 0x0c:
-			set_nt_mirroring(machine(), BIT(data, 0) ?  PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 0) ?  PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 0x0d:
 			m_IRQ_count = 0;
@@ -9407,13 +9438,13 @@ WRITE8_MEMBER(nes_carts_state::btl_dn_w)
 	switch (offset & 0x7003)
 	{
 		case 0x0000:
-			prg8_89(machine(), data);
+			prg8_89(data);
 			break;
 		case 0x1000:
-			set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 0x2000:
-			prg8_ab(machine(), data);
+			prg8_ab(data);
 			break;
 		case 0x3000:
 		case 0x3002:
@@ -9424,7 +9455,7 @@ WRITE8_MEMBER(nes_carts_state::btl_dn_w)
 		case 0x6000:
 		case 0x6002:
 			bank = ((offset & 0x7000) - 0x3000) / 0x0800 + ((offset & 0x0002) >> 3);
-			chr1_x(machine(), bank, data, CHRROM);
+			chr1_x(bank, data, CHRROM);
 			break;
 		case 0x7000:
 			m_IRQ_count = data;
@@ -9502,7 +9533,7 @@ static void fk23c_prg_cb( running_machine &machine, int start, int bank )
 		if (state->m_mmc_reg[0] & 0x03)
 			bank = (bank & (0x3f >> (state->m_mmc_reg[0] & 0x03))) | (state->m_mmc_reg[1] << 1);
 
-		prg8_x(machine, start, bank);
+		state->prg8_x(start, bank);
 	}
 }
 
@@ -9511,7 +9542,7 @@ static void fk23c_chr_cb( running_machine &machine, int start, int bank, int sou
 	nes_state *state = machine.driver_data<nes_state>();
 
 	if (!(state->m_mmc_reg[0] & 0x40) && (!(state->m_mmc_reg[3] & 0x02) || (start != 1 && start != 3)))
-		chr1_x(machine, start, ((state->m_mmc_reg[2] & 0x7f) << 3) | bank, source);
+		state->chr1_x(start, ((state->m_mmc_reg[2] & 0x7f) << 3) | bank, source);
 }
 
 #endif
@@ -9526,7 +9557,7 @@ static void fk23c_prg_cb( running_machine &machine, int start, int bank )
 		if (!(state->m_mmc_reg[0] & 0x03))
 			bank = (bank & mask) | ((state->m_mmc_reg[1]  & (0x7f ^ mask)) << 1);
 
-		prg8_x(machine, start, bank);
+		state->prg8_x(start, bank);
 	}
 }
 
@@ -9535,7 +9566,7 @@ static void fk23c_chr_cb( running_machine &machine, int start, int bank, int sou
 	nes_state *state = machine.driver_data<nes_state>();
 
 	if (!(state->m_mmc_reg[0] & 0x40) && (!(state->m_mmc_reg[3] & 0x02) || (start != 1 && start != 3)))
-		chr1_x(machine, start, ((state->m_mmc_reg[2] & 0x7f) << 3) | bank, source);
+		state->chr1_x(start, ((state->m_mmc_reg[2] & 0x7f) << 3) | bank, source);
 }
 
 static void fk23c_set_prg( running_machine &machine )
@@ -9543,18 +9574,18 @@ static void fk23c_set_prg( running_machine &machine )
 	nes_state *state = machine.driver_data<nes_state>();
 
 	if ((state->m_mmc_reg[0] & 0x07) == 4)
-		prg32(machine, (state->m_mmc_reg[1] & 0x7f) >> 1);
+		state->prg32((state->m_mmc_reg[1] & 0x7f) >> 1);
 	else if ((state->m_mmc_reg[0] & 0x07) == 3)
 	{
-		prg16_89ab(machine, state->m_mmc_reg[1] & 0x7f);
-		prg16_cdef(machine, state->m_mmc_reg[1] & 0x7f);
+		state->prg16_89ab(state->m_mmc_reg[1] & 0x7f);
+		state->prg16_cdef(state->m_mmc_reg[1] & 0x7f);
 	}
 	else
 	{
 		if (state->m_mmc_reg[3] & 0x02)
 		{
-			prg8_cd(machine, state->m_mmc_reg[4]);
-			prg8_ef(machine, state->m_mmc_reg[5]);
+			state->prg8_cd(state->m_mmc_reg[4]);
+			state->prg8_ef(state->m_mmc_reg[5]);
 		}
 		else
 			mmc3_set_prg(machine, state->m_mmc_prg_base, state->m_mmc_prg_mask);
@@ -9566,14 +9597,14 @@ static void fk23c_set_chr( running_machine &machine )
 	nes_state *state = machine.driver_data<nes_state>();
 
 	if (state->m_mmc_reg[0] & 0x40)
-		chr8(machine, state->m_mmc_reg[2] | state->m_mmc_cmd1, state->m_mmc_chr_source);
+		state->chr8(state->m_mmc_reg[2] | state->m_mmc_cmd1, state->m_mmc_chr_source);
 	else
 	{
 		if (state->m_mmc_reg[3] & 0x02)
 		{
 			int base = (state->m_mmc_reg[2] & 0x7f) << 3;
-			chr1_x(machine, 1, base | state->m_mmc_reg[6], state->m_mmc_chr_source);
-			chr1_x(machine, 3, base | state->m_mmc_reg[7], state->m_mmc_chr_source);
+			state->chr1_x(1, base | state->m_mmc_reg[6], state->m_mmc_chr_source);
+			state->chr1_x(3, base | state->m_mmc_reg[7], state->m_mmc_chr_source);
 		}
 		else
 			mmc3_set_chr(machine, state->m_mmc_chr_source, state->m_mmc_chr_base, state->m_mmc_chr_mask);
@@ -9627,7 +9658,7 @@ WRITE8_MEMBER(nes_carts_state::fk23c_w)
 				break;
 
 			case 0x2000:
-				set_nt_mirroring(machine(), data ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+				set_nt_mirroring(data ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 				break;
 
 			default:
@@ -9657,15 +9688,15 @@ static void bmc_64in1nr_set_prg( running_machine &machine )
 	if (state->m_mmc_reg[0] & 0x80)
 	{
 		if (state->m_mmc_reg[1] & 0x80)
-			prg32(machine, helper1);
+			state->prg32(helper1);
 		else
 		{
-			prg16_89ab(machine, helper2);
-			prg16_cdef(machine, helper2);
+			state->prg16_89ab(helper2);
+			state->prg16_cdef(helper2);
 		}
 	}
 	else
-		prg16_cdef(machine, helper2);
+		state->prg16_cdef(helper2);
 }
 
 WRITE8_MEMBER(nes_carts_state::bmc_64in1nr_l_w)
@@ -9681,11 +9712,11 @@ WRITE8_MEMBER(nes_carts_state::bmc_64in1nr_l_w)
 		case 0x1003:
 			m_mmc_reg[offset & 0x03] = data;
 			bmc_64in1nr_set_prg(machine());
-			chr8(machine(), ((m_mmc_reg[0] >> 1) & 0x03) | (m_mmc_reg[2] << 2), CHRROM);
+			chr8(((m_mmc_reg[0] >> 1) & 0x03) | (m_mmc_reg[2] << 2), CHRROM);
 			break;
 	}
 	if (offset == 0x1000)	/* reg[0] also sets mirroring */
-		set_nt_mirroring(machine(), BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 WRITE8_MEMBER(nes_carts_state::bmc_64in1nr_w)
@@ -9709,11 +9740,11 @@ WRITE8_MEMBER(nes_carts_state::bmc_190in1_w)
 {
 	LOG_MMC(("bmc_190in1_w offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	offset >>= 2;
-	prg16_89ab(machine(), offset);
-	prg16_cdef(machine(), offset);
-	chr8(machine(), offset, CHRROM);
+	prg16_89ab(offset);
+	prg16_cdef(offset);
+	chr8(offset, CHRROM);
 }
 
 /*************************************************************
@@ -9732,16 +9763,16 @@ WRITE8_MEMBER(nes_carts_state::bmc_a65as_w)
 	LOG_MMC(("bmc_a65as_w offset: %04x, data: %02x\n", offset, data));
 
 	if (data & 0x80)
-		set_nt_mirroring(machine(), BIT(data, 5) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+		set_nt_mirroring(BIT(data, 5) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 	else
-		set_nt_mirroring(machine(), BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	if (data & 0x40)
-		prg32(machine(), data >> 1);
+		prg32(data >> 1);
 	else
 	{
-		prg16_89ab(machine(), helper | (data & 0x07));
-		prg16_cdef(machine(), helper | 0x07);
+		prg16_89ab(helper | (data & 0x07));
+		prg16_cdef(helper | 0x07);
 	}
 }
 
@@ -9760,7 +9791,7 @@ WRITE8_MEMBER(nes_carts_state::bmc_gs2004_w)
 {
 	LOG_MMC(("bmc_gs2004_w offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), data);
+	prg32(data);
 }
 
 /*************************************************************
@@ -9779,9 +9810,9 @@ WRITE8_MEMBER(nes_carts_state::bmc_gs2013_w)
 	LOG_MMC(("bmc_gs2013_w offset: %04x, data: %02x\n", offset, data));
 
 	if (data & 0x08)
-		prg32(machine(), data & 0x09);
+		prg32(data & 0x09);
 	else
-		prg32(machine(), data & 0x07);
+		prg32(data & 0x07);
 }
 
 /*************************************************************
@@ -9802,7 +9833,7 @@ static void bmc_s24in1sc03_prg_cb( running_machine &machine, int start, int bank
 	int prg_mask = masks[state->m_mmc_reg[0] & 0x07];
 
 	bank = prg_base | (bank & prg_mask);
-	prg8_x(machine, start, bank);
+	state->prg8_x(start, bank);
 }
 
 static void bmc_s24in1sc03_chr_cb( running_machine &machine, int start, int bank, int source )
@@ -9811,7 +9842,7 @@ static void bmc_s24in1sc03_chr_cb( running_machine &machine, int start, int bank
 	UINT8 chr = BIT(state->m_mmc_reg[0], 5) ? CHRRAM : CHRROM;
 	int chr_base = (state->m_mmc_reg[2] << 3) & 0xf00;
 
-	chr1_x(machine, start, chr_base | bank, chr);
+	state->chr1_x(start, chr_base | bank, chr);
 }
 
 WRITE8_MEMBER(nes_carts_state::bmc_s24in1sc03_l_w)
@@ -9857,16 +9888,16 @@ WRITE8_MEMBER(nes_carts_state::bmc_t262_w)
 	if (m_mmc_latch2 || offset == 0)
 	{
 		m_mmc_latch1 = (m_mmc_latch1 & 0x38) | (data & 0x07);
-		prg16_89ab(machine(), m_mmc_latch1);
+		prg16_89ab(m_mmc_latch1);
 	}
 	else
 	{
 		m_mmc_latch2 = 1;
-		set_nt_mirroring(machine(), BIT(data, 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(BIT(data, 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		mmc_helper = ((offset >> 3) & 0x20) | ((offset >> 2) & 0x18);
 		m_mmc_latch1 = mmc_helper | (m_mmc_latch1 & 0x07);
-		prg16_89ab(machine(), m_mmc_latch1);
-		prg16_cdef(machine(), mmc_helper | 0x07);
+		prg16_89ab(m_mmc_latch1);
+		prg16_cdef(mmc_helper | 0x07);
 	}
 }
 
@@ -9894,16 +9925,16 @@ WRITE8_MEMBER(nes_carts_state::bmc_ws_m_w)
 				if (!m_mmc_latch1)
 				{
 					m_mmc_latch1 = data & 0x20;
-					set_nt_mirroring(machine(), BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+					set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 					mmc_helper = (~data & 0x08) >> 3;
-					prg16_89ab(machine(), data & ~mmc_helper);
-					prg16_cdef(machine(), data |  mmc_helper);
+					prg16_89ab(data & ~mmc_helper);
+					prg16_cdef(data |  mmc_helper);
 				}
 				break;
 			case 1:
 				if (!m_mmc_latch1)
 				{
-					chr8(machine(), data, CHRROM);
+					chr8(data, CHRROM);
 				}
 				break;
 		}
@@ -9931,16 +9962,16 @@ WRITE8_MEMBER(nes_carts_state::novel1_w)
 {
 	LOG_MMC(("novel1_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), offset & 0x03);
-	chr8(machine(), offset & 0x07, CHRROM);
+	prg32(offset & 0x03);
+	chr8(offset & 0x07, CHRROM);
 }
 
 WRITE8_MEMBER(nes_carts_state::novel2_w)
 {
 	LOG_MMC(("novel2_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), offset >> 1);
-	chr8(machine(), offset >> 3, CHRROM);
+	prg32(offset >> 1);
+	chr8(offset >> 3, CHRROM);
 }
 
 /*************************************************************
@@ -9966,16 +9997,16 @@ WRITE8_MEMBER(nes_carts_state::bmc_gka_w)
 		m_mmc_latch1 = data;
 
 	if (m_mmc_latch2 & 0x80)
-		prg32(machine(), 2 | (m_mmc_latch2 >> 6));
+		prg32(2 | (m_mmc_latch2 >> 6));
 	else
 	{
-		prg16_89ab(machine(), (m_mmc_latch2 >> 5) & 0x03);
-		prg16_cdef(machine(), (m_mmc_latch2 >> 5) & 0x03);
+		prg16_89ab((m_mmc_latch2 >> 5) & 0x03);
+		prg16_cdef((m_mmc_latch2 >> 5) & 0x03);
 	}
 
-	set_nt_mirroring(machine(), (m_mmc_latch2 & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring((m_mmc_latch2 & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
-	chr8(machine(), (m_mmc_latch1 & 0x03) | (m_mmc_latch2 & 0x07) | ((m_mmc_latch2 & 0x10) >> 1), CHRROM);
+	chr8((m_mmc_latch1 & 0x03) | (m_mmc_latch2 & 0x07) | ((m_mmc_latch2 & 0x10) >> 1), CHRROM);
 }
 
 
@@ -9995,7 +10026,7 @@ WRITE8_MEMBER(nes_carts_state::bmc_gka_w)
 WRITE8_MEMBER(nes_carts_state::sng32_w)
 {
 	LOG_MMC(("sng32_w, offset: %04x, data: %02x\n", offset, data));
-	prg32(machine(), data);
+	prg32(data);
 }
 
 /*************************************************************
@@ -10016,10 +10047,10 @@ WRITE8_MEMBER(nes_carts_state::bmc_gkb_w)
 	UINT8 bank = (offset & 0x40) ? 0 : 1;
 	LOG_MMC(("bmc_gkb_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg16_89ab(machine(), offset & ~bank);
-	prg16_cdef(machine(), offset | bank);
-	chr8(machine(), offset >> 3, m_mmc_chr_source);
-	set_nt_mirroring(machine(), BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	prg16_89ab(offset & ~bank);
+	prg16_cdef(offset | bank);
+	chr8(offset >> 3, m_mmc_chr_source);
+	set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -10039,19 +10070,19 @@ WRITE8_MEMBER(nes_carts_state::bmc_super700in1_w)
 {
 	LOG_MMC(("bmc_super700in1_w, offset :%04x, data: %02x\n", offset, data));
 
-	chr8(machine(), ((offset & 0x1f) << 2) | (data & 0x03), CHRROM);
+	chr8(((offset & 0x1f) << 2) | (data & 0x03), CHRROM);
 
 	if (offset & 0x20)
 	{
-		prg16_89ab(machine(), (offset & 0x40) | ((offset >> 8) & 0x3f));
-		prg16_cdef(machine(), (offset & 0x40) | ((offset >> 8) & 0x3f));
+		prg16_89ab((offset & 0x40) | ((offset >> 8) & 0x3f));
+		prg16_cdef((offset & 0x40) | ((offset >> 8) & 0x3f));
 	}
 	else
 	{
-		prg32(machine(), ((offset & 0x40) | ((offset >> 8) & 0x3f)) >> 1);
+		prg32(((offset & 0x40) | ((offset >> 8) & 0x3f)) >> 1);
 	}
 
-	set_nt_mirroring(machine(), BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -10071,11 +10102,11 @@ WRITE8_MEMBER(nes_carts_state::bmc_36in1_w)
 {
 	LOG_MMC(("bmc_36in1_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg16_89ab(machine(), offset & 0x07);
-	prg16_cdef(machine(), offset & 0x07);
-	chr8(machine(), offset & 0x07, CHRROM);
+	prg16_89ab(offset & 0x07);
+	prg16_cdef(offset & 0x07);
+	chr8(offset & 0x07, CHRROM);
 
-	set_nt_mirroring(machine(), BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -10095,8 +10126,8 @@ WRITE8_MEMBER(nes_carts_state::bmc_21in1_w)
 {
 	LOG_MMC(("bmc_21in1_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), offset & 0x03);
-	chr8(machine(), offset & 0x03, CHRROM);
+	prg32(offset & 0x03);
+	chr8(offset & 0x03, CHRROM);
 }
 
 /*************************************************************
@@ -10118,11 +10149,11 @@ WRITE8_MEMBER(nes_carts_state::bmc_150in1_w)
 
 	LOG_MMC(("bmc_150in1_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg16_89ab(machine(), bank);
-	prg16_cdef(machine(), bank + (((bank & 0x06) == 0x06) ? 1 : 0));
-	chr8(machine(), bank, CHRROM);
+	prg16_89ab(bank);
+	prg16_cdef(bank + (((bank & 0x06) == 0x06) ? 1 : 0));
+	chr8(bank, CHRROM);
 
-	set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -10142,9 +10173,9 @@ WRITE8_MEMBER(nes_carts_state::bmc_35in1_w)
 {
 	LOG_MMC(("bmc_35in1_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg16_89ab(machine(), (data >> 2) & 0x03);
-	prg16_cdef(machine(), (data >> 2) & 0x03);
-	chr8(machine(), data & 0x03, CHRROM);
+	prg16_89ab((data >> 2) & 0x03);
+	prg16_cdef((data >> 2) & 0x03);
+	chr8(data & 0x03, CHRROM);
 }
 
 /*************************************************************
@@ -10166,11 +10197,11 @@ WRITE8_MEMBER(nes_carts_state::bmc_64in1_w)
 
 	LOG_MMC(("bmc_64in1_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg16_89ab(machine(), offset & ~bank);
-	prg16_cdef(machine(), offset | bank);
-	chr8(machine(), offset & ~bank, CHRROM);
+	prg16_89ab(offset & ~bank);
+	prg16_cdef(offset | bank);
+	chr8(offset & ~bank, CHRROM);
 
-	set_nt_mirroring(machine(), BIT(data, 4) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -10218,16 +10249,16 @@ WRITE8_MEMBER(nes_carts_state::bmc_hik300_w)
 {
 	LOG_MMC(("bmc_hik300_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring(machine(), BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	chr8(machine(), offset, CHRROM);
+	set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	chr8(offset, CHRROM);
 
 	if (offset < 0x4000)
 	{
-		prg16_89ab(machine(), offset);
-		prg16_cdef(machine(), offset);
+		prg16_89ab(offset);
+		prg16_cdef(offset);
 	}
 	else
-		prg32(machine(), offset >> 1);
+		prg32(offset >> 1);
 }
 
 /*************************************************************
@@ -10247,9 +10278,9 @@ WRITE8_MEMBER(nes_carts_state::supergun20in1_w)
 {
 	LOG_MMC(("supergun20in1_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg16_89ab(machine(), offset >> 2);
-	prg16_cdef(machine(), offset >> 2);
-	chr8(machine(), offset, CHRROM);
+	prg16_89ab(offset >> 2);
+	prg16_cdef(offset >> 2);
+	chr8(offset, CHRROM);
 }
 
 /*************************************************************
@@ -10273,8 +10304,8 @@ WRITE8_MEMBER(nes_carts_state::bmc_72in1_w)
 
 	LOG_MMC(("bmc_72in1_w, offset: %04x, data: %02x\n", offset, data));
 
-	chr8(machine(), offset, CHRROM);
-	set_nt_mirroring(machine(), (offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	chr8(offset, CHRROM);
+	set_nt_mirroring((offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	hi_bank = offset & 0x40;
 	size_16 = offset & 0x1000;
@@ -10285,11 +10316,11 @@ WRITE8_MEMBER(nes_carts_state::bmc_72in1_w)
 		if (hi_bank)
 			bank ++;
 
-		prg16_89ab(machine(), bank);
-		prg16_cdef(machine(), bank);
+		prg16_89ab(bank);
+		prg16_cdef(bank);
 	}
 	else
-		prg32(machine(), bank);
+		prg32(bank);
 }
 
 /*************************************************************
@@ -10319,7 +10350,7 @@ WRITE8_MEMBER(nes_carts_state::bmc_76in1_w)
 	else
 		m_mmc_latch1 = data;
 
-	set_nt_mirroring(machine(), BIT(m_mmc_latch1, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(m_mmc_latch1, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	hi_bank = m_mmc_latch1 & 0x01;
 	size_16 = m_mmc_latch1 & 0x20;
@@ -10331,11 +10362,11 @@ WRITE8_MEMBER(nes_carts_state::bmc_76in1_w)
 		if (hi_bank)
 			bank ++;
 
-		prg16_89ab(machine(), bank);
-		prg16_cdef(machine(), bank);
+		prg16_89ab(bank);
+		prg16_cdef(bank);
 	}
 	else
-		prg32(machine(), bank);
+		prg32(bank);
 }
 
 /*************************************************************
@@ -10368,21 +10399,21 @@ WRITE8_MEMBER(nes_carts_state::bmc_1200in1_w)
 		if (hi_bank)
 			bank ++;
 
-		prg16_89ab(machine(), bank);
-		prg16_cdef(machine(), bank);
+		prg16_89ab(bank);
+		prg16_cdef(bank);
 	}
 	else
-		prg32(machine(), bank);
+		prg32(bank);
 
 	if (!(offset & 0x80))
 	{
 		if (offset & 0x200)
-			prg16_cdef(machine(), ((bank << 1) & 0x38) + 7);
+			prg16_cdef(((bank << 1) & 0x38) + 7);
 		else
-			prg16_cdef(machine(), ((bank << 1) & 0x38));
+			prg16_cdef(((bank << 1) & 0x38));
 	}
 
-	set_nt_mirroring(machine(), BIT(data, 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(data, 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -10402,18 +10433,18 @@ WRITE8_MEMBER(nes_carts_state::bmc_31in1_w)
 {
 	LOG_MMC(("bmc_31in1_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring(machine(), BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	chr8(machine(), offset, CHRROM);
+	set_nt_mirroring(BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	chr8(offset, CHRROM);
 
 	if ((offset & 0x1e) == 0)
 	{
-		prg16_89ab(machine(), 0);
-		prg16_89ab(machine(), 1);
+		prg16_89ab(0);
+		prg16_89ab(1);
 	}
 	else
 	{
-		prg16_89ab(machine(), offset & 0x1f);
-		prg16_89ab(machine(), offset & 0x1f);
+		prg16_89ab(offset & 0x1f);
+		prg16_89ab(offset & 0x1f);
 	}
 }
 
@@ -10437,21 +10468,21 @@ WRITE8_MEMBER(nes_carts_state::bmc_22g_w)
 
 	if (1)	// this should flip at reset
 	{
-		prg16_89ab(machine(), data & 0x07);
+		prg16_89ab(data & 0x07);
 	}
 	else
 	{
 		if (data & 0x20)
 		{
-			prg16_89ab(machine(), (data & 0x1f) + 8);
-			prg16_cdef(machine(), (data & 0x1f) + 8);
+			prg16_89ab((data & 0x1f) + 8);
+			prg16_cdef((data & 0x1f) + 8);
 		}
 		else
 		{
-			prg16_89ab(machine(), (data & 0x1f) + 8);
-			prg16_cdef(machine(), (data & 0x1f) + 9);
+			prg16_89ab((data & 0x1f) + 8);
+			prg16_cdef((data & 0x1f) + 9);
 		}
-		set_nt_mirroring(machine(), BIT(data, 6) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+		set_nt_mirroring(BIT(data, 6) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 	}
 }
 
@@ -10472,10 +10503,10 @@ WRITE8_MEMBER(nes_carts_state::bmc_20in1_w)
 {
 	LOG_MMC(("bmc_20in1_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring(machine(), BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
-	prg16_89ab(machine(), (offset & 0x1e));
-	prg16_cdef(machine(), (offset & 0x1e) | ((offset & 0x20) ? 1 : 0));
+	prg16_89ab((offset & 0x1e));
+	prg16_cdef((offset & 0x1e) | ((offset & 0x20) ? 1 : 0));
 }
 
 /*************************************************************
@@ -10498,10 +10529,10 @@ WRITE8_MEMBER(nes_carts_state::bmc_110in1_w)
 
 	LOG_MMC(("bmc_110in1_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring(machine(), (offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	prg16_89ab(machine(), map255_helper1 & ~map255_helper2);
-	prg16_cdef(machine(), map255_helper1 | map255_helper2);
-	chr8(machine(), ((offset >> 8) & 0x40) | (offset & 0x3f), CHRROM);
+	set_nt_mirroring((offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	prg16_89ab(map255_helper1 & ~map255_helper2);
+	prg16_cdef(map255_helper1 | map255_helper2);
+	chr8(((offset >> 8) & 0x40) | (offset & 0x3f), CHRROM);
 }
 
 /*************************************************************
@@ -10619,7 +10650,7 @@ WRITE8_MEMBER(nes_carts_state::bmc_hik4in1_m_w)
 			mmc3_set_prg(machine(), m_mmc_prg_base, m_mmc_prg_mask);
 		}
 		else
-			prg32(machine(), (data & 0x30) >> 4);
+			prg32((data & 0x30) >> 4);
 
 		m_mmc_chr_base = (data & 0xc0) << 1;
 		m_mmc_chr_mask = 0x7f;
@@ -10643,16 +10674,16 @@ WRITE8_MEMBER(nes_carts_state::bmc_hik4in1_m_w)
 static void bmc_ball11_set_banks( running_machine &machine )
 {
 	nes_state *state = machine.driver_data<nes_state>();
-	set_nt_mirroring(machine, (state->m_mmc_reg[0] == 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	state->set_nt_mirroring((state->m_mmc_reg[0] == 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	if (state->m_mmc_reg[0] & 0x01)
 	{
-		prg32(machine, state->m_mmc_reg[1]);
+		state->prg32(state->m_mmc_reg[1]);
 	}
 	else
 	{
-		prg16_89ab(machine, (state->m_mmc_reg[1] << 1) | (state->m_mmc_reg[0] >> 1));
-		prg16_cdef(machine, (state->m_mmc_reg[1] << 1) | 0x07);
+		state->prg16_89ab((state->m_mmc_reg[1] << 1) | (state->m_mmc_reg[0] >> 1));
+		state->prg16_cdef((state->m_mmc_reg[1] << 1) | 0x07);
 	}
 }
 
@@ -10799,14 +10830,14 @@ static void bmc_gc6in1_set_chr( running_machine &machine, UINT8 chr )
 
 	chr_base |= ((state->m_mmc_reg[1] & 0x03) << 8);
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((state->m_mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((state->m_mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((state->m_mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((state->m_mmc_vrom_bank[1] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 4, chr_base | (state->m_mmc_vrom_bank[2] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 5, chr_base | (state->m_mmc_vrom_bank[3] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 6, chr_base | (state->m_mmc_vrom_bank[4] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 7, chr_base | (state->m_mmc_vrom_bank[5] & chr_mask), chr);
+	state->chr1_x(chr_page ^ 0, chr_base | ((state->m_mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
+	state->chr1_x(chr_page ^ 1, chr_base | ((state->m_mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
+	state->chr1_x(chr_page ^ 2, chr_base | ((state->m_mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
+	state->chr1_x(chr_page ^ 3, chr_base | ((state->m_mmc_vrom_bank[1] |  0x01) & chr_mask), chr);
+	state->chr1_x(chr_page ^ 4, chr_base | (state->m_mmc_vrom_bank[2] & chr_mask), chr);
+	state->chr1_x(chr_page ^ 5, chr_base | (state->m_mmc_vrom_bank[3] & chr_mask), chr);
+	state->chr1_x(chr_page ^ 6, chr_base | (state->m_mmc_vrom_bank[4] & chr_mask), chr);
+	state->chr1_x(chr_page ^ 7, chr_base | (state->m_mmc_vrom_bank[5] & chr_mask), chr);
 }
 
 WRITE8_MEMBER(nes_carts_state::bmc_gc6in1_l_w)
@@ -10821,8 +10852,8 @@ WRITE8_MEMBER(nes_carts_state::bmc_gc6in1_l_w)
 		if (data & 0x80)
 		{
 			bank = (data & 0x0f) | ((m_mmc_reg[1] & 0x03) << 4);
-			prg16_89ab(machine(), bank);
-			prg16_cdef(machine(), bank);
+			prg16_89ab(bank);
+			prg16_cdef(bank);
 		}
 		else
 			bmc_gc6in1_set_prg(machine(), m_mmc_prg_base, m_mmc_prg_mask);
@@ -10930,7 +10961,7 @@ WRITE8_MEMBER(nes_carts_state::bmc_gc6in1_w)
 
 
 			case 0x2001:
-				set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+				set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 				break;
 
 			default:
@@ -10984,15 +11015,15 @@ WRITE8_MEMBER(nes_carts_state::bmc_vt5201_w)
 
 	// not sure about this mirroring bit!!
 	// without it TN 95 in 1 has glitches in Lunar Ball; with it TN 95 in 1 has glitches in Galaxian!
-	set_nt_mirroring(machine(), BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	if (BIT(offset, 7))
 	{
-		prg16_89ab(machine(), (offset >> 4) & 0x07);
-		prg16_cdef(machine(), (offset >> 4) & 0x07);
+		prg16_89ab((offset >> 4) & 0x07);
+		prg16_cdef((offset >> 4) & 0x07);
 	}
 	else
-		prg32(machine(), (offset >> 5) & 0x03);
-	chr8(machine(), offset, CHRROM);
+		prg32((offset >> 5) & 0x03);
+	chr8(offset, CHRROM);
 }
 
 READ8_MEMBER(nes_carts_state::bmc_vt5201_r)
@@ -11018,14 +11049,14 @@ static void bmc_bs5_update_banks( running_machine &machine )
 {
 	nes_state *state = machine.driver_data<nes_state>();
 
-	prg8_89(machine, state->m_mmc_prg_bank[0]);
-	prg8_ab(machine, state->m_mmc_prg_bank[1]);
-	prg8_cd(machine, state->m_mmc_prg_bank[2]);
-	prg8_ef(machine, state->m_mmc_prg_bank[3]);
-	chr2_0(machine, state->m_mmc_vrom_bank[0], CHRROM);
-	chr2_2(machine, state->m_mmc_vrom_bank[1], CHRROM);
-	chr2_4(machine, state->m_mmc_vrom_bank[2], CHRROM);
-	chr2_6(machine, state->m_mmc_vrom_bank[3], CHRROM);
+	state->prg8_89(state->m_mmc_prg_bank[0]);
+	state->prg8_ab(state->m_mmc_prg_bank[1]);
+	state->prg8_cd(state->m_mmc_prg_bank[2]);
+	state->prg8_ef(state->m_mmc_prg_bank[3]);
+	state->chr2_0(state->m_mmc_vrom_bank[0], CHRROM);
+	state->chr2_2(state->m_mmc_vrom_bank[1], CHRROM);
+	state->chr2_4(state->m_mmc_vrom_bank[2], CHRROM);
+	state->chr2_6(state->m_mmc_vrom_bank[3], CHRROM);
 }
 
 WRITE8_MEMBER(nes_carts_state::bmc_bs5_w)
@@ -11062,15 +11093,15 @@ WRITE8_MEMBER(nes_carts_state::bmc_810544_w)
 
 	if (!BIT(offset, 6))
 	{
-		prg16_89ab(machine(), (bank << 1) | BIT(offset, 5));
-		prg16_cdef(machine(), (bank << 1) | BIT(offset, 5));
+		prg16_89ab((bank << 1) | BIT(offset, 5));
+		prg16_cdef((bank << 1) | BIT(offset, 5));
 	}
 	else
-		prg32(machine(), bank);
+		prg32(bank);
 
-	set_nt_mirroring(machine(), BIT(offset, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(offset, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
-	chr8(machine(), offset & 0x0f, CHRROM);
+	chr8(offset & 0x0f, CHRROM);
 }
 
 /*************************************************************
@@ -11089,15 +11120,15 @@ WRITE8_MEMBER(nes_carts_state::bmc_ntd03_w)
 
 	if (BIT(offset, 7))
 	{
-		prg16_89ab(machine(), pbank | BIT(offset, 6));
-		prg16_cdef(machine(), pbank | BIT(offset, 6));
+		prg16_89ab(pbank | BIT(offset, 6));
+		prg16_cdef(pbank | BIT(offset, 6));
 	}
 	else
-		prg32(machine(), pbank >> 1);
+		prg32(pbank >> 1);
 
-	set_nt_mirroring(machine(), BIT(offset, 10) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(offset, 10) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
-	chr8(machine(), cbank, CHRROM);
+	chr8(cbank, CHRROM);
 }
 
 /*************************************************************
@@ -11112,20 +11143,20 @@ static void bmc_gb63_update( running_machine &machine )
 {
 	nes_state *state = machine.driver_data<nes_state>();
 
-	set_nt_mirroring(machine, BIT(state->m_mmc_reg[0], 6) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+	state->set_nt_mirroring(BIT(state->m_mmc_reg[0], 6) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 
 	if (BIT(state->m_mmc_reg[0], 5))
 	{
-		prg16_89ab(machine, state->m_mmc_reg[0] & 0x1f);	// FIXME: here probably we could also have PRGRAM, depending on mmc_latch1!
-		prg16_cdef(machine, state->m_mmc_reg[0] & 0x1f);	// FIXME: here probably we could also have PRGRAM, depending on mmc_latch1!
+		state->prg16_89ab(state->m_mmc_reg[0] & 0x1f);	// FIXME: here probably we could also have PRGRAM, depending on mmc_latch1!
+		state->prg16_cdef(state->m_mmc_reg[0] & 0x1f);	// FIXME: here probably we could also have PRGRAM, depending on mmc_latch1!
 	}
 	else
-		prg32(machine, (state->m_mmc_reg[0] & 0x1f) >> 1);	// FIXME: here probably we could also have PRGRAM, depending on mmc_latch1!
+		state->prg32((state->m_mmc_reg[0] & 0x1f) >> 1);	// FIXME: here probably we could also have PRGRAM, depending on mmc_latch1!
 
 	if (BIT(state->m_mmc_reg[1], 2))
-		chr8(machine, 0, CHRRAM);
+		state->chr8(0, CHRRAM);
 //  else
-//      chr8(machine, 0, CHRROM);
+//      state->chr8(0, CHRROM);
 }
 
 WRITE8_MEMBER(nes_carts_state::bmc_gb63_w)
@@ -11158,8 +11189,8 @@ WRITE8_MEMBER(nes_carts_state::edu2k_w)
 {
 	LOG_MMC(("edu2k_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(machine(), data & 0x1f);
-	wram_bank(machine(), (data & 0xc0) >> 6, NES_WRAM);
+	prg32(data & 0x1f);
+	wram_bank((data & 0xc0) >> 6, NES_WRAM);
 }
 
 /*************************************************************
@@ -11173,7 +11204,7 @@ static void h2288_prg_cb( running_machine &machine, int start, int bank )
 	nes_state *state = machine.driver_data<nes_state>();
 
 	if (!(state->m_mmc_reg[0] & 0x40))
-		prg8_x(machine, start, bank);
+		state->prg8_x(start, bank);
 }
 
 WRITE8_MEMBER(nes_carts_state::h2288_l_w)
@@ -11188,8 +11219,8 @@ WRITE8_MEMBER(nes_carts_state::h2288_l_w)
 		{
 			UINT8 helper1 = (m_mmc_reg[0] & 0x05) | ((m_mmc_reg[0] >> 2) & 0x0a);
 			UINT8 helper2 = BIT(m_mmc_reg[0], 1);
-			prg16_89ab(machine(), helper1 & ~helper2);
-			prg16_cdef(machine(), helper1 |  helper2);
+			prg16_89ab(helper1 & ~helper2);
+			prg16_cdef(helper1 |  helper2);
 		}
 		else
 			mmc3_set_prg(machine(), m_mmc_prg_base, m_mmc_prg_mask);
@@ -11258,8 +11289,8 @@ static void shjy3_update( running_machine &machine )
 	nes_state *state = machine.driver_data<nes_state>();
 	int i;
 
-	prg8_89(machine, state->m_mmc_prg_bank[0]);
-	prg8_ab(machine, state->m_mmc_prg_bank[1]);
+	state->prg8_89(state->m_mmc_prg_bank[0]);
+	state->prg8_ab(state->m_mmc_prg_bank[1]);
 
 	for (i = 0; i < 8; i++)
 	{
@@ -11275,9 +11306,9 @@ static void shjy3_update( running_machine &machine )
 			continue;
 		}
 		if ((state->m_mmc_vrom_bank[i] == 4 || state->m_mmc_vrom_bank[i] == 5) && !state->m_mmc_latch1)
-			chr1_x(machine, i, chr_bank & 1, CHRRAM);
+			state->chr1_x(i, chr_bank & 1, CHRRAM);
 		else
-			chr1_x(machine, i, chr_bank, CHRROM);
+			state->chr1_x(i, chr_bank, CHRROM);
 	}
 }
 
@@ -11310,10 +11341,10 @@ WRITE8_MEMBER(nes_carts_state::shjy3_w)
 			case 0x1400:
 				switch (data & 0x03)
 				{
-					case 0: set_nt_mirroring(machine(), PPU_MIRROR_VERT); break;
-					case 1: set_nt_mirroring(machine(), PPU_MIRROR_HORZ); break;
-					case 2: set_nt_mirroring(machine(), PPU_MIRROR_LOW); break;
-					case 3: set_nt_mirroring(machine(), PPU_MIRROR_HIGH); break;
+					case 0: set_nt_mirroring(PPU_MIRROR_VERT); break;
+					case 1: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+					case 2: set_nt_mirroring(PPU_MIRROR_LOW); break;
+					case 3: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 				}
 				break;
 			case 0x7000:
@@ -11369,15 +11400,15 @@ static void pjoy84_prg_cb( running_machine &machine, int start, int bank )
 	UINT8 flip = (state->m_mmc3_latch & 0x40) ? 2 : 0;
 
 	if (!(state->m_mmc_reg[3] & 0x03))
-		prg8_x(machine, start, bank);
+		state->prg8_x(start, bank);
 	else if (start == flip)
 	{
 		if ((state->m_mmc_reg[3] & 0x03) == 0x03)
-			prg32(machine, bank >> 2);
+			state->prg32(bank >> 2);
 		else
 		{
-			prg16_89ab(machine, bank >> 1);
-			prg16_cdef(machine, bank >> 1);
+			state->prg16_89ab(bank >> 1);
+			state->prg16_cdef(bank >> 1);
 		}
 	}
 }
@@ -11387,7 +11418,7 @@ static void pjoy84_chr_cb( running_machine &machine, int start, int bank, int so
 	nes_state *state = machine.driver_data<nes_state>();
 
 	if (!(state->m_mmc_reg[3] & 0x10))
-		chr1_x(machine, start, bank, source);
+		state->chr1_x(start, bank, source);
 }
 
 INLINE void pjoy84_set_base_mask( running_machine &machine )
@@ -11421,7 +11452,7 @@ WRITE8_MEMBER(nes_carts_state::pjoy84_m_w)
 			m_mmc_reg[offset & 0x03] = data;
 			pjoy84_set_base_mask(machine());
 			if (m_mmc_reg[3] & 0x10)
-				chr8(machine(), (m_mmc_chr_base >> 3) | (m_mmc_reg[2] & 0x0f), m_mmc_chr_source);
+				chr8((m_mmc_chr_base >> 3) | (m_mmc_reg[2] & 0x0f), m_mmc_chr_source);
 			else
 				mmc3_set_chr(machine(), m_mmc_chr_source, m_mmc_chr_base, m_mmc_chr_mask);
 			mmc3_set_prg(machine(), m_mmc_prg_base, m_mmc_prg_mask);
@@ -11458,15 +11489,15 @@ static void someri_mmc1_set_prg( running_machine &machine )
 	{
 		case 0x00:
 		case 0x04:
-			prg32(machine, (prg_offset + state->m_mmc_reg[3]) >> 1);
+			state->prg32((prg_offset + state->m_mmc_reg[3]) >> 1);
 			break;
 		case 0x08:
-			prg16_89ab(machine, prg_offset + 0);
-			prg16_cdef(machine, prg_offset + state->m_mmc_reg[3]);
+			state->prg16_89ab(prg_offset + 0);
+			state->prg16_cdef(prg_offset + state->m_mmc_reg[3]);
 			break;
 		case 0x0c:
-			prg16_89ab(machine, prg_offset + state->m_mmc_reg[3]);
-			prg16_cdef(machine, prg_offset + 0x0f);
+			state->prg16_89ab(prg_offset + state->m_mmc_reg[3]);
+			state->prg16_cdef(prg_offset + 0x0f);
 			break;
 	}
 }
@@ -11478,11 +11509,11 @@ static void someri_mmc1_set_chr( running_machine &machine )
 
 	if (chr_mode)
 	{
-		chr4_0(machine, state->m_mmc_reg[1] & 0x1f, state->m_mmc_chr_source);
-		chr4_4(machine, state->m_mmc_reg[2] & 0x1f, state->m_mmc_chr_source);
+		state->chr4_0(state->m_mmc_reg[1] & 0x1f, state->m_mmc_chr_source);
+		state->chr4_4(state->m_mmc_reg[2] & 0x1f, state->m_mmc_chr_source);
 	}
 	else
-		chr8(machine, (state->m_mmc_reg[1] & 0x1f) >> 1, state->m_mmc_chr_source);
+		state->chr8((state->m_mmc_reg[1] & 0x1f) >> 1, state->m_mmc_chr_source);
 }
 
 WRITE8_MEMBER(nes_carts_state::someri_mmc1_w)
@@ -11516,10 +11547,10 @@ WRITE8_MEMBER(nes_carts_state::someri_mmc1_w)
 				m_mmc_reg[0] = m_mmc1_latch;
 				switch (m_mmc_reg[0] & 0x03)
 				{
-				case 0: set_nt_mirroring(machine(), PPU_MIRROR_LOW); break;
-				case 1: set_nt_mirroring(machine(), PPU_MIRROR_HIGH); break;
-				case 2: set_nt_mirroring(machine(), PPU_MIRROR_VERT); break;
-				case 3: set_nt_mirroring(machine(), PPU_MIRROR_HORZ); break;
+				case 0: set_nt_mirroring(PPU_MIRROR_LOW); break;
+				case 1: set_nt_mirroring(PPU_MIRROR_HIGH); break;
+				case 2: set_nt_mirroring(PPU_MIRROR_VERT); break;
+				case 3: set_nt_mirroring(PPU_MIRROR_HORZ); break;
 				}
 				someri_mmc1_set_chr(machine());
 				someri_mmc1_set_prg(machine());
@@ -11580,7 +11611,7 @@ WRITE8_MEMBER(nes_carts_state::someri_mmc3_w)
 			break;
 
 		case 0x2000:
-			set_nt_mirroring(machine(), BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 0x2001: break;
 		case 0x4000: m_IRQ_count_latch = data; break;
@@ -11600,22 +11631,22 @@ WRITE8_MEMBER(nes_carts_state::someri_vrc2_w)
 	if (offset < 0x1000)
 	{
 		m_mmc_prg_bank[4] = data;
-		prg8_89(machine(), m_mmc_prg_bank[4]);
+		prg8_89(m_mmc_prg_bank[4]);
 	}
 	else if (offset < 0x2000)
 	{
 		switch (data & 0x03)
 		{
-			case 0x00: set_nt_mirroring(machine(), PPU_MIRROR_VERT); break;
-			case 0x01: set_nt_mirroring(machine(), PPU_MIRROR_HORZ); break;
-			case 0x02: set_nt_mirroring(machine(), PPU_MIRROR_LOW); break;
-			case 0x03: set_nt_mirroring(machine(), PPU_MIRROR_HIGH); break;
+			case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
+			case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+			case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
+			case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 		}
 	}
 	else if (offset < 0x3000)
 	{
 		m_mmc_prg_bank[5] = data;
-		prg8_ab(machine(), m_mmc_prg_bank[5]);
+		prg8_ab(m_mmc_prg_bank[5]);
 	}
 	else if (offset < 0x7000)
 	{
@@ -11623,7 +11654,7 @@ WRITE8_MEMBER(nes_carts_state::someri_vrc2_w)
 		shift = BIT(offset, 2) * 4;
 		data = (data & 0x0f) << shift;
 		m_mmc_vrom_bank[6 + bank] = data | m_mmc_chr_base;
-		chr1_x(machine(), bank, m_mmc_vrom_bank[6 + bank], CHRROM);
+		chr1_x(bank, m_mmc_vrom_bank[6 + bank], CHRROM);
 	}
 }
 
@@ -11647,10 +11678,10 @@ static void someri_mode_update( running_machine &machine )
 	switch (state->m_mmc_cmd1)
 	{
 		case 0x00:
-			prg8_89(machine, state->m_mmc_prg_bank[4]);
-			prg8_ab(machine, state->m_mmc_prg_bank[5]);
+			state->prg8_89(state->m_mmc_prg_bank[4]);
+			state->prg8_ab(state->m_mmc_prg_bank[5]);
 			for (i = 0; i < 8; i++)
-				chr1_x(machine, i, state->m_mmc_vrom_bank[6 + i], CHRROM);
+				state->chr1_x(i, state->m_mmc_vrom_bank[6 + i], CHRROM);
 			break;
 		case 0x01:
 			mmc3_set_prg(machine, state->m_mmc_prg_base, state->m_mmc_prg_mask);
@@ -12050,7 +12081,7 @@ void nes_state::pcb_handlers_setup()
 		fatalerror("Missing PCB interface\n");
 
 	if (intf)
-	{	
+	{
 		m_mmc_write_low = intf->mmc_l.write;
 		if (!m_mmc_write_low.isnull()) m_mmc_write_low.late_bind(*this);
 		m_mmc_write_mid = intf->mmc_m.write;
@@ -12077,8 +12108,8 @@ void nes_state::pcb_handlers_setup()
 		m_ppu->set_latch(NULL);
 	}
 
-	m_mmc3_prg_cb = prg8_x;
-	m_mmc3_chr_cb = chr1_x;
+	m_mmc3_prg_cb = mmc3_base_prg_cb;
+	m_mmc3_chr_cb = mmc3_base_chr_cb;
 
 	switch (m_pcb_id)
 	{
@@ -12195,11 +12226,11 @@ int nes_state::pcb_initialize( int idx )
 	int err = 0, i;
 
 	/* basic PRG config */
-	prg32(machine(), 0);
+	prg32(0);
 
 	/* some boards will not use this, but directly CHRROM (resp. CHRRAM) if the board only has VROM (resp. VRAM) */
 	m_mmc_chr_source = m_chr_chunks ? CHRROM : CHRRAM;
-	chr8(machine(), 0, m_mmc_chr_source);
+	chr8(0, m_mmc_chr_source);
 
 	/* Here, we init a few helpers: 4 prg banks and 16 chr banks - some mappers use them */
 	for (i = 0; i < 4; i++)
@@ -12317,16 +12348,16 @@ int nes_state::pcb_initialize( int idx )
 		case KAISER_KS7017:
 		case KAISER_KS7032:
 		case KAISER_KS202:
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), m_prg_chunks - 1);
+			prg16_89ab(0);
+			prg16_cdef(m_prg_chunks - 1);
 			break;
 
 		case STD_CPROM:	// mapper 13
-			chr4_0(machine(), 0, CHRRAM);
-			chr4_4(machine(), 0, CHRRAM);
+			chr4_0(0, CHRRAM);
+			chr4_4(0, CHRRAM);
 			break;
 		case STD_AXROM:	// mapper 7
-			set_nt_mirroring(machine(), PPU_MIRROR_LOW);
+			set_nt_mirroring(PPU_MIRROR_LOW);
 			break;
 		case STD_SXROM:	// mapper 1, 155
 		case STD_SOROM:
@@ -12337,27 +12368,27 @@ int nes_state::pcb_initialize( int idx )
 			m_mmc_reg[0] = 0x0f;
 			m_mmc_reg[1] = m_mmc_reg[2] = m_mmc_reg[3] = 0;
 			m_mmc1_reg_write_enable = 1;
-			set_nt_mirroring(machine(), PPU_MIRROR_HORZ);
+			set_nt_mirroring(PPU_MIRROR_HORZ);
 			mmc1_set_chr(machine());
 			mmc1_set_prg(machine());
 			if (m_battery || m_wram)
-				wram_bank(machine(), 0, (idx == STD_SOROM) ? NES_WRAM : NES_BATTERY);
+				wram_bank(0, (idx == STD_SOROM) ? NES_WRAM : NES_BATTERY);
 			break;
 		case STD_PXROM:	// mapper 9
 			m_mmc_reg[0] = m_mmc_reg[2] = 0;
 			m_mmc_reg[1] = m_mmc_reg[3] = 0;
 			m_mmc_latch1 = m_mmc_latch2 = 0xfe;
-			prg8_89(machine(), 0);
-			prg8_ab(machine(), (m_prg_chunks << 1) - 3);
-			prg8_cd(machine(), (m_prg_chunks << 1) - 2);
-			prg8_ef(machine(), (m_prg_chunks << 1) - 1);
+			prg8_89(0);
+			prg8_ab((m_prg_chunks << 1) - 3);
+			prg8_cd((m_prg_chunks << 1) - 2);
+			prg8_ef((m_prg_chunks << 1) - 1);
 			break;
 		case STD_FXROM: // mapper 10
 			m_mmc_reg[0] = m_mmc_reg[2] = 0;
 			m_mmc_reg[1] = m_mmc_reg[3] = 0;
 			m_mmc_latch1 = m_mmc_latch2 = 0xfe;
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), m_prg_chunks - 1);
+			prg16_89ab(0);
+			prg16_cdef(m_prg_chunks - 1);
 			break;
 		case STD_TXROM:	// mapper 4
 		case STD_TVROM:
@@ -12381,10 +12412,10 @@ int nes_state::pcb_initialize( int idx )
 		case NITRA_TDA:	// mapper 250
 			if (m_four_screen_vram)	// only TXROM and DXROM have 4-screen mirroring
 			{
-				set_nt_page(machine(), 0, CART_NTRAM, 0, 1);
-				set_nt_page(machine(), 1, CART_NTRAM, 1, 1);
-				set_nt_page(machine(), 2, CART_NTRAM, 2, 1);
-				set_nt_page(machine(), 3, CART_NTRAM, 3, 1);
+				set_nt_page(0, CART_NTRAM, 0, 1);
+				set_nt_page(1, CART_NTRAM, 1, 1);
+				set_nt_page(2, CART_NTRAM, 2, 1);
+				set_nt_page(3, CART_NTRAM, 3, 1);
 			}
 			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
 			break;
@@ -12415,75 +12446,75 @@ int nes_state::pcb_initialize( int idx )
 			m_mmc5_prg_regs[3] = 0xff;
 			memset(m_mmc5_vrom_regA, ~0, ARRAY_LENGTH(m_mmc5_vrom_regA));
 			memset(m_mmc5_vrom_regB, ~0, ARRAY_LENGTH(m_mmc5_vrom_regB));
-			prg16_89ab(machine(), m_prg_chunks - 2);
-			prg16_cdef(machine(), m_prg_chunks - 1);
+			prg16_89ab(m_prg_chunks - 2);
+			prg16_cdef(m_prg_chunks - 1);
 			break;
 		case STD_NXROM:		// mapper 68
 		case SUNSOFT_DCS:		// mapper 68
 			m_mmc_reg[0] = 0;
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), m_prg_chunks - 1);
+			prg16_89ab(0);
+			prg16_cdef(m_prg_chunks - 1);
 			break;
 		case NAMCOT_34X3:	// mapper 88
 		case STD_DXROM:	// mapper 206
 		case STD_DRROM:
 			if (m_four_screen_vram)	// only TXROM and DXROM have 4-screen mirroring
 			{
-				set_nt_page(machine(), 0, CART_NTRAM, 0, 1);
-				set_nt_page(machine(), 1, CART_NTRAM, 1, 1);
-				set_nt_page(machine(), 2, CART_NTRAM, 2, 1);
-				set_nt_page(machine(), 3, CART_NTRAM, 3, 1);
+				set_nt_page(0, CART_NTRAM, 0, 1);
+				set_nt_page(1, CART_NTRAM, 1, 1);
+				set_nt_page(2, CART_NTRAM, 2, 1);
+				set_nt_page(3, CART_NTRAM, 3, 1);
 			}
 		case NAMCOT_3453:	// mapper 154
-			prg16_89ab(machine(), m_prg_chunks - 2);
-			prg16_cdef(machine(), m_prg_chunks - 1);
+			prg16_89ab(m_prg_chunks - 2);
+			prg16_cdef(m_prg_chunks - 1);
 			break;
 		case NAMCOT_3446:	// mapper 76
-			prg8_89(machine(), 0);
-			prg8_ab(machine(), 1);
-			prg16_cdef(machine(), m_prg_chunks - 1);
-			chr2_0(machine(), 0, CHRROM);
-			chr2_2(machine(), 1, CHRROM);
-			chr2_4(machine(), 2, CHRROM);
-			chr2_6(machine(), 3, CHRROM);
+			prg8_89(0);
+			prg8_ab(1);
+			prg16_cdef(m_prg_chunks - 1);
+			chr2_0(0, CHRROM);
+			chr2_2(1, CHRROM);
+			chr2_4(2, CHRROM);
+			chr2_6(3, CHRROM);
 			break;
 		case BANDAI_JUMP2:	// mapper 153
 			for (i = 0; i < 8; i++)
 				m_mmc_reg[i] = 0;
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), m_prg_chunks - 1);
+			prg16_89ab(0);
+			prg16_cdef(m_prg_chunks - 1);
 			fjump2_set_prg(machine());
 			break;
 		case BANDAI_KARAOKE:	// mapper 188
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), (m_prg_chunks - 1) ^ 0x08);
+			prg16_89ab(0);
+			prg16_cdef((m_prg_chunks - 1) ^ 0x08);
 			break;
 		case IREM_LROG017:	// mapper 77
-			chr2_2(machine(), 0, CHRROM);
-			chr2_4(machine(), 1, CHRROM);
-			chr2_6(machine(), 2, CHRROM);
+			chr2_2(0, CHRROM);
+			chr2_4(1, CHRROM);
+			chr2_6(2, CHRROM);
 			break;
 		case IREM_TAM_S1:	// mapper 97
-			prg16_89ab(machine(), m_prg_chunks - 1);
-			prg16_cdef(machine(), 0);
+			prg16_89ab(m_prg_chunks - 1);
+			prg16_cdef(0);
 			break;
 		case KONAMI_VRC7:	// mapper 85
-			prg8_89(machine(), 0);
-			prg8_ab(machine(), 0);
-			prg8_cd(machine(), 0);
-			prg8_ef(machine(), 0xff);
+			prg8_89(0);
+			prg8_ab(0);
+			prg8_cd(0);
+			prg8_ef(0xff);
 			break;
 		case NAMCOT_163:	// mapper 19
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), m_prg_chunks - 1);
-			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
+			prg16_89ab(0);
+			prg16_cdef(m_prg_chunks - 1);
+			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 		case SUNSOFT_1:	// mapper 184
 		case SUNSOFT_2:	// mapper 89 & 93
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), m_prg_chunks - 1);
+			prg16_89ab(0);
+			prg16_cdef(m_prg_chunks - 1);
 			if (!m_hard_mirroring)
-				set_nt_mirroring(machine(), PPU_MIRROR_LOW);
+				set_nt_mirroring(PPU_MIRROR_LOW);
 			break;
 
 			// mapper 14
@@ -12497,7 +12528,7 @@ int nes_state::pcb_initialize( int idx )
 			break;
 			// mapper 15
 		case WAIXING_PS2:
-			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
+			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 
 			// mapper 35
@@ -12505,16 +12536,16 @@ int nes_state::pcb_initialize( int idx )
 			// mapper 42
 		case BTL_MARIOBABY:
 		case BTL_AISENSHINICOL:
-			prg32(machine(), 0xff);
+			prg32(0xff);
 			break;
 
 			// mapper 40
 		case BTL_SMB2A:
-			prg8_67(machine(), 0xfe);
-			prg8_89(machine(), 0xfc);
-			prg8_ab(machine(), 0xfd);
-			prg8_cd(machine(), 0xfe);
-			prg8_ef(machine(), 0xff);
+			prg8_67(0xfe);
+			prg8_89(0xfc);
+			prg8_ab(0xfd);
+			prg8_cd(0xfe);
+			prg8_ef(0xff);
 			break;
 
 			// mapper 43
@@ -12538,11 +12569,11 @@ int nes_state::pcb_initialize( int idx )
 
 			// mapper 50
 		case BTL_SMB2B:
-			prg8_67(machine(), 0x0f);
-			prg8_89(machine(), 0x08);
-			prg8_ab(machine(), 0x09);
-			prg8_cd(machine(), 0);
-			prg8_ef(machine(), 0x0b);
+			prg8_67(0x0f);
+			prg8_89(0x08);
+			prg8_ab(0x09);
+			prg8_cd(0);
+			prg8_ef(0x0b);
 			break;
 			// mapper 51
 		case BMC_BALLGAMES_11IN1:
@@ -12558,64 +12589,64 @@ int nes_state::pcb_initialize( int idx )
 			break;
 			// mapper 54
 		case BMC_NOVELDIAMOND:
-			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
+			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 			// mapper 57
 		case BMC_GKA:
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 0);
+			prg16_89ab(0);
+			prg16_cdef(0);
 			break;
 
 			// mapper 64
 		case TENGEN_800032:
 			// mapper 158
 		case TENGEN_800037:
-			prg16_89ab(machine(), m_prg_chunks - 1);
-			prg16_cdef(machine(), m_prg_chunks - 1);
+			prg16_89ab(m_prg_chunks - 1);
+			prg16_cdef(m_prg_chunks - 1);
 			break;
 			// mapper 71
 		case CAMERICA_BF9097:
-			set_nt_mirroring(machine(), PPU_MIRROR_HORZ);
+			set_nt_mirroring(PPU_MIRROR_HORZ);
 		case CAMERICA_BF9093:
-			prg32(machine(), 0xff);
+			prg32(0xff);
 			break;
 
 			// mapper 79 (& 146)
 		case AVE_NINA06:
-			set_nt_mirroring(machine(), PPU_MIRROR_HORZ);
+			set_nt_mirroring(PPU_MIRROR_HORZ);
 			break;
 
 			// mapper 83
 		case CONY_BOARD:
 		case YOKO_BOARD:
 			m_mapper83_reg[9] = 0x0f;
-			prg8_cd(machine(), 0x1e);
-			prg8_ef(machine(), 0x1f);
+			prg8_cd(0x1e);
+			prg8_ef(0x1f);
 			break;
 
 			// mapper 91
 		case UNL_MK2:
-			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
-			prg16_89ab(machine(), m_prg_chunks - 1);
-			prg16_cdef(machine(), m_prg_chunks - 1);
+			set_nt_mirroring(PPU_MIRROR_VERT);
+			prg16_89ab(m_prg_chunks - 1);
+			prg16_cdef(m_prg_chunks - 1);
 			break;
 
 			// mapper 104
 		case CAMERICA_GOLDENFIVE:
-			prg16_89ab(machine(), 0x00);
-			prg16_cdef(machine(), 0x0f);
+			prg16_89ab(0x00);
+			prg16_cdef(0x0f);
 			break;
 			// mapper 106
 		case BTL_SMB3:
-			prg8_89(machine(), (m_prg_chunks << 1) - 1);
-			prg8_ab(machine(), 0);
-			prg8_cd(machine(), 0);
-			prg8_ef(machine(), (m_prg_chunks << 1) - 1);
+			prg8_89((m_prg_chunks << 1) - 1);
+			prg8_ab(0);
+			prg8_cd(0);
+			prg8_ef((m_prg_chunks << 1) - 1);
 			break;
 
 			// mapper 108
 		case WHIRLWIND_2706:
-			prg32(machine(), 0xff);
+			prg32(0xff);
 			break;
 
 			// mapper 114
@@ -12663,7 +12694,7 @@ int nes_state::pcb_initialize( int idx )
 
 			// mapper 120
 		case BTL_TOBIDASE:
-			prg32(machine(), 2);
+			prg32(2);
 			break;
 
 			// mapper 121
@@ -12697,8 +12728,8 @@ int nes_state::pcb_initialize( int idx )
 
 			// mapper 137
 		case SACHEN_8259D:
-			chr8(machine(), m_chr_chunks - 1, CHRROM);
-			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
+			chr8(m_chr_chunks - 1, CHRROM);
+			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 			// mapper 138
 		case SACHEN_8259B:
@@ -12708,56 +12739,56 @@ int nes_state::pcb_initialize( int idx )
 		case SACHEN_8259A:
 			// mapper 150
 		case SACHEN_74LS374:
-			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
+			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 			// mapper 143
 		case SACHEN_TCA01:
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 1);
+			prg16_89ab(0);
+			prg16_cdef(1);
 			break;
 
 			// mapper 156
 		case OPENCORP_DAOU306:
-			prg16_89ab(machine(), m_prg_chunks - 2);
-			prg16_cdef(machine(), m_prg_chunks - 1);
-			set_nt_mirroring(machine(), PPU_MIRROR_LOW);
+			prg16_89ab(m_prg_chunks - 2);
+			prg16_cdef(m_prg_chunks - 1);
+			set_nt_mirroring(PPU_MIRROR_LOW);
 			break;
 			// mapper 163
 		case NANJING_BOARD:
 			m_mmc_count = 0xff;
 			m_mmc_reg[0] = 0xff;
 			m_mmc_reg[1] = 0;
-			prg16_89ab(machine(), m_prg_chunks - 2);
-			prg16_cdef(machine(), m_prg_chunks - 1);
+			prg16_89ab(m_prg_chunks - 2);
+			prg16_cdef(m_prg_chunks - 1);
 			break;
 			// mapper 164
 		case WAIXING_FFV:
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 0x1f);
+			prg16_89ab(0);
+			prg16_cdef(0x1f);
 			break;
 			// mapper 166
 		case SUBOR_TYPE1:
 			m_subor_reg[0] = m_subor_reg[1] = m_subor_reg[2] = m_subor_reg[3] = 0;
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 0x07);
+			prg16_89ab(0);
+			prg16_cdef(0x07);
 			break;
 			// mapper 167
 		case SUBOR_TYPE0:
 			m_subor_reg[0] = m_subor_reg[1] = m_subor_reg[2] = m_subor_reg[3] = 0;
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 0x20);
+			prg16_89ab(0);
+			prg16_cdef(0x20);
 			break;
 
 			// mapper 176
 		case UNL_XZY:
 			// mapper 182
 		case HOSENKAN_BOARD:
-			prg32(machine(), (m_prg_chunks - 1) >> 1);
+			prg32((m_prg_chunks - 1) >> 1);
 			break;
 
 		case FUKUTAKE_BOARD:	// mapper 186
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 0);
+			prg16_89ab(0);
+			prg16_cdef(0);
 			break;
 
 			// mapper 187
@@ -12775,8 +12806,8 @@ int nes_state::pcb_initialize( int idx )
 			break;
 			// mapper 193
 		case NTDEC_FIGHTINGHERO:
-			prg32(machine(), (m_prg_chunks - 1) >> 1);
-			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
+			prg32((m_prg_chunks - 1) >> 1);
+			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 			// mapper 197
 		case UNL_SUPERFIGHTER3:
@@ -12813,8 +12844,8 @@ int nes_state::pcb_initialize( int idx )
 
 			// mapper 200
 		case BMC_36IN1:
-			prg16_89ab(machine(), m_prg_chunks - 1);
-			prg16_cdef(machine(), m_prg_chunks - 1);
+			prg16_89ab(m_prg_chunks - 1);
+			prg16_cdef(m_prg_chunks - 1);
 			break;
 
 			// mapper 202
@@ -12825,8 +12856,8 @@ int nes_state::pcb_initialize( int idx )
 		case BMC_64IN1:
 			// mapper 214
 		case BMC_SUPERGUN_20IN1:
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 0);
+			prg16_89ab(0);
+			prg16_cdef(0);
 			break;
 			// mapper 205
 		case BMC_15IN1:
@@ -12842,8 +12873,8 @@ int nes_state::pcb_initialize( int idx )
 			break;
 			// mapper 212
 		case BMC_SUPERHIK_300IN1:
-			chr8(machine(), 0xff, CHRROM);
-			prg32(machine(), 0xff);
+			chr8(0xff, CHRROM);
+			prg32(0xff);
 			break;
 
 			// mapper 215
@@ -12869,8 +12900,8 @@ int nes_state::pcb_initialize( int idx )
 			break;
 			// mapper 221
 		case UNL_N625092:
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 0);
+			prg16_89ab(0);
+			prg16_cdef(0);
 			break;
 
 			// mapper 223?
@@ -12891,26 +12922,26 @@ int nes_state::pcb_initialize( int idx )
 
 			// mapper 227
 		case BMC_1200IN1:
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 0);
+			prg16_89ab(0);
+			prg16_cdef(0);
 			break;
 
 			// mapper 229
 		case BMC_31IN1:
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 1);
-			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
+			prg16_89ab(0);
+			prg16_cdef(1);
+			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 			// mapper 230
 		case BMC_22GAMES:
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 7);
+			prg16_89ab(0);
+			prg16_cdef(7);
 			break;
 			// mapper 231
 		case BMC_20IN1:
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), m_prg_chunks - 1);
-			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
+			prg16_89ab(0);
+			prg16_cdef(m_prg_chunks - 1);
+			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 			// mapper 232
 		case CAMERICA_BF9096:
@@ -12922,13 +12953,13 @@ int nes_state::pcb_initialize( int idx )
 			// mapper 243
 		case SACHEN_74LS374_A:
 			m_mmc_vrom_bank[0] = 3;
-			chr8(machine(), 3, CHRROM);
-			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
+			chr8(3, CHRROM);
+			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 
 			// mapper 246
 		case CNE_FSB:
-			prg32(machine(), 0xff);
+			prg32(0xff);
 			break;
 			// mapper 249
 		case WAIXING_SECURITY:
@@ -12944,9 +12975,9 @@ int nes_state::pcb_initialize( int idx )
 
 			// mapper 255
 		case BMC_110IN1:
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 1);
-			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
+			prg16_89ab(0);
+			prg16_cdef(1);
+			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 
 			// UNIF only
@@ -12955,20 +12986,20 @@ int nes_state::pcb_initialize( int idx )
 			m_mmc_reg[1] = 0x43;
 			m_mmc_reg[2] = m_mmc_reg[3] = 0;
 			bmc_64in1nr_set_prg(machine());
-			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
+			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 		case BMC_190IN1:
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 0);
+			prg16_89ab(0);
+			prg16_cdef(0);
 			break;
 		case BMC_A65AS:
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 7);
-			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
+			prg16_89ab(0);
+			prg16_cdef(7);
+			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 		case BMC_GS2004:
 		case BMC_GS2013:
-			prg32(machine(), 0xff);
+			prg32(0xff);
 			break;
 		case BMC_S24IN1SC03:
 			m_mmc_reg[0] = 0x24;
@@ -12979,12 +13010,12 @@ int nes_state::pcb_initialize( int idx )
 		case BMC_T262:
 			m_mmc_latch1 = 0;
 			m_mmc_latch2 = 0;
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 7);
+			prg16_89ab(0);
+			prg16_cdef(7);
 			break;
 		case DREAMTECH_BOARD:
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 8);
+			prg16_89ab(0);
+			prg16_cdef(8);
 			break;
 		case UNL_8237:
 			m_mmc_reg[0] = m_mmc_reg[1] = m_mmc_reg[2] = 0;
@@ -12993,16 +13024,16 @@ int nes_state::pcb_initialize( int idx )
 		case UNL_AX5705:
 			m_mmc_prg_bank[0] = 0;
 			m_mmc_prg_bank[1] = 1;
-			prg8_89(machine(), m_mmc_prg_bank[0]);
-			prg8_ab(machine(), m_mmc_prg_bank[1]);
-			prg8_cd(machine(), 0xfe);
-			prg8_ef(machine(), 0xff);
+			prg8_89(m_mmc_prg_bank[0]);
+			prg8_ab(m_mmc_prg_bank[1]);
+			prg8_cd(0xfe);
+			prg8_ef(0xff);
 			break;
 		case UNL_RACERMATE:
-			chr4_0(machine(), 0, m_mmc_chr_source);
-			chr4_4(machine(), 0, m_mmc_chr_source);
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), m_prg_chunks - 1);
+			chr4_0(0, m_mmc_chr_source);
+			chr4_4(0, m_mmc_chr_source);
+			prg16_89ab(0);
+			prg16_cdef(m_prg_chunks - 1);
 			break;
 
 		case BMC_BENSHENG_BS5:
@@ -13014,9 +13045,9 @@ int nes_state::pcb_initialize( int idx )
 			break;
 
 		case BMC_810544:
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 0);
-			set_nt_mirroring(machine(), PPU_MIRROR_VERT);
+			prg16_89ab(0);
+			prg16_cdef(0);
+			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 
 		case BMC_G63IN1:
@@ -13043,15 +13074,15 @@ int nes_state::pcb_initialize( int idx )
 
 
 		case FFE_MAPPER6:
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), 7);
+			prg16_89ab(0);
+			prg16_cdef(7);
 			break;
 		case FFE_MAPPER8:
-			prg32(machine(), 0);
+			prg32(0);
 			break;
 		case FFE_MAPPER17:
-			prg16_89ab(machine(), 0);
-			prg16_cdef(machine(), m_prg_chunks - 1);
+			prg16_89ab(0);
+			prg16_cdef(m_prg_chunks - 1);
 			break;
 
 		case UNSUPPORTED_BOARD:

@@ -53,10 +53,10 @@ WRITE8_MEMBER(nes_carts_state::mapper6_l_w)
 	{
 		case 0x1fe:
 			m_mmc_latch1 = data & 0x80;
-			set_nt_mirroring(machine(), BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+			set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 			break;
 		case 0x1ff:
-			set_nt_mirroring(machine(), BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x401:
@@ -78,14 +78,14 @@ WRITE8_MEMBER(nes_carts_state::mapper6_w)
 
 	if (!m_mmc_latch1)	// when in "FFE mode" we are forced to use CHRRAM/EXRAM bank?
 	{
-		prg16_89ab(machine(), data >> 2);
-		// chr8(machine(), data & 0x03, ???);
+		prg16_89ab(data >> 2);
+		// chr8(data & 0x03, ???);
 		// due to lack of info on the exact behavior, we simply act as if mmc_latch1=1
 		if (m_mmc_chr_source == CHRROM)
-			chr8(machine(), data & 0x03, CHRROM);
+			chr8(data & 0x03, CHRROM);
 	}
 	else if (m_mmc_chr_source == CHRROM)			// otherwise, we can use CHRROM (when present)
-		chr8(machine(), data, CHRROM);
+		chr8(data, CHRROM);
 }
 
 /*************************************************************
@@ -103,8 +103,8 @@ WRITE8_MEMBER(nes_carts_state::mapper8_w)
 {
 	LOG_MMC(("mapper8_w, offset: %04x, data: %02x\n", offset, data));
 
-	chr8(machine(), data & 0x07, CHRROM);
-	prg16_89ab(machine(), data >> 3);
+	chr8(data & 0x07, CHRROM);
+	prg16_89ab(data >> 3);
 }
 
 /*************************************************************
@@ -126,10 +126,10 @@ WRITE8_MEMBER(nes_carts_state::mapper17_l_w)
 	switch (offset)
 	{
 		case 0x1fe:
-			set_nt_mirroring(machine(), BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+			set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 			break;
 		case 0x1ff:
-			set_nt_mirroring(machine(), BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x401:
@@ -144,16 +144,16 @@ WRITE8_MEMBER(nes_carts_state::mapper17_l_w)
 			break;
 
 		case 0x404:
-			prg8_89(machine(), data);
+			prg8_89(data);
 			break;
 		case 0x405:
-			prg8_ab(machine(), data);
+			prg8_ab(data);
 			break;
 		case 0x406:
-			prg8_cd(machine(), data);
+			prg8_cd(data);
 			break;
 		case 0x407:
-			prg8_ef(machine(), data);
+			prg8_ef(data);
 			break;
 
 		case 0x410:
@@ -164,7 +164,7 @@ WRITE8_MEMBER(nes_carts_state::mapper17_l_w)
 		case 0x415:
 		case 0x416:
 		case 0x417:
-			chr1_x(machine(), offset & 7, data, CHRROM);
+			chr1_x(offset & 7, data, CHRROM);
 			break;
 	}
 }

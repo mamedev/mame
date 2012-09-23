@@ -140,7 +140,7 @@ void nes_state::init_nes_core()
 	}
 
 	if (m_four_screen_vram)
-		set_nt_mirroring(machine(), PPU_MIRROR_4SCREEN);
+		set_nt_mirroring(PPU_MIRROR_4SCREEN);
 	else
 	{
 		switch (m_hard_mirroring)
@@ -149,10 +149,10 @@ void nes_state::init_nes_core()
 			case PPU_MIRROR_VERT:
 			case PPU_MIRROR_HIGH:
 			case PPU_MIRROR_LOW:
-				set_nt_mirroring(machine(), m_hard_mirroring);
+				set_nt_mirroring(m_hard_mirroring);
 				break;
 			default:
-				set_nt_mirroring(machine(), PPU_MIRROR_NONE);
+				set_nt_mirroring(PPU_MIRROR_NONE);
 				break;
 		}
 	}
@@ -1633,7 +1633,7 @@ WRITE8_MEMBER(nes_state::nes_fds_w)
 				m_fds_head_position = 0;
 
 			m_fds_read_mode = BIT(data, 2);
-			set_nt_mirroring(machine(), BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 			if ((!(data & 0x40)) && (m_fds_write_reg & 0x40))
 				m_fds_head_position -= 2; // ???

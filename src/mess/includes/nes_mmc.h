@@ -152,27 +152,28 @@ class nes_carts_state : public driver_device
 public:
 	nes_carts_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag) { }
-	
+
 	int           m_prg_bank[5];
 	chr_bank      m_chr_map[8];  //quick banking structure, because some of this changes multiple times per scanline!
 	name_table    m_nt_page[4];  //quick banking structure for a maximum of 4K of RAM/ROM/ExRAM
-	
+
 	nes_prg_callback    m_mmc3_prg_cb;	// these are used to simplify a lot emulation of some MMC3 pirate clones
 	nes_chr_callback    m_mmc3_chr_cb;
-	
+
+	// mapper variables (to be sorted out at some point, to split more complex mappers as separate devices)
 	int m_chr_open_bus;
 	int m_prgram_bank5_start, m_battery_bank5_start, m_empty_bank5_start;
-	
+
 	UINT8 m_ce_mask, m_ce_state;
 	UINT8 m_vrc_ls_prg_a, m_vrc_ls_prg_b, m_vrc_ls_chr;
-	
+
 	int m_MMC5_floodtile;
 	int m_MMC5_floodattr;
 	int m_mmc5_vram_control;
 	UINT8 m_mmc5_high_chr;
 	UINT8 m_mmc5_split_scr;
 	UINT8 *m_extended_ntram;
-	
+
 	UINT8 m_mmc5_last_chr_a;
 	UINT16 m_mmc5_vrom_regA[8];
 	UINT16 m_mmc5_vrom_regB[4];
@@ -184,9 +185,9 @@ public:
 	UINT8 m_mmc5_split_ctrl;
 	UINT8 m_mmc5_split_yst;
 	UINT8 m_mmc5_split_bank;
-	
+
 	/***** Mapper-related variables *****/
-	
+
 	// common ones
 	int        m_IRQ_enable, m_IRQ_enable_latch;
 	UINT16     m_IRQ_count, m_IRQ_count_latch;
@@ -196,37 +197,37 @@ public:
 	UINT8      m_IRQ_mode;
 	UINT8      m_IRQ_clear;
 	int        m_mult1, m_mult2;
-	
+
 	UINT8 m_mmc_chr_source;			// This is set at init to CHRROM or CHRRAM. a few mappers can swap between
 	// the two (this is done in the specific handlers).
-	
+
 	UINT8 m_mmc_cmd1, m_mmc_cmd2;		// These represent registers where the mapper writes important values
 	UINT8 m_mmc_count;				// This is used as counter in mappers like 1 and 45
-	
+
 	int m_mmc_prg_base, m_mmc_prg_mask;	// MMC3 based multigame carts select a block of banks by using these (and then act like normal MMC3),
 	int m_mmc_chr_base, m_mmc_chr_mask;	// while MMC3 and clones (mapper 118 & 119) simply set them as 0 and 0xff resp.
-	
+
 	UINT8 m_mmc_prg_bank[6];				// Many mappers writes only some bits of the selected bank (for both PRG and CHR),
 	UINT8 m_mmc_vrom_bank[16];			// hence these are handy to latch bank values.
-	
+
 	UINT16 m_MMC5_vrom_bank[12];			// MMC5 has 10bit wide VROM regs!
 	UINT8 m_mmc_extra_bank[16];			// some MMC3 clone have 2 series of PRG/CHR banks...
 	// we collect them all here: first 4 elements PRG banks, then 6/8 CHR banks
-	
+
 	UINT8 m_mmc_latch1, m_mmc_latch2;
 	UINT8 m_mmc_reg[16];
-	
+
 	UINT8 m_mmc_dipsetting;
-	
+
 	// misc mapper related variables which should be merged with the above one, where possible
 	int m_mmc1_reg_write_enable;
 	int m_mmc1_latch;
 	int m_mmc1_count;
-	
+
 	int m_mmc3_latch;
 	int m_mmc3_wram_protect;
 	int m_mmc3_alt_irq;
-	
+
 	int m_MMC5_rom_bank_mode;
 	int m_MMC5_vrom_bank_mode;
 	int m_MMC5_vram_protect;
@@ -234,9 +235,9 @@ public:
 	int m_vrom_page_a;
 	int m_vrom_page_b;
 	// int vrom_next[4];
-	
+
 	UINT8 m_mmc6_reg;
-	
+
 	// these might be unified in single mmc_reg[] array, together with state->m_mmc_cmd1 & state->m_mmc_cmd2
 	// but be careful that MMC3 clones often use state->m_mmc_cmd1/state->m_mmc_cmd2 (from base MMC3) AND additional regs below!
 	UINT8 m_mapper83_reg[10];
@@ -246,7 +247,7 @@ public:
 	UINT8 m_sachen_reg[8];	// used by mappers 137, 138, 139 & 141
 	UINT8 m_map52_reg_written;
 	UINT8 m_map114_reg, m_map114_reg_enabled;
-	
+
 	// i/o handlers
 	DECLARE_WRITE8_MEMBER(mapper6_l_w);
 	DECLARE_WRITE8_MEMBER(mapper6_w);
@@ -522,15 +523,23 @@ public:
 	DECLARE_WRITE8_MEMBER(dummy_w);
 	DECLARE_READ8_MEMBER(dummy_l_r);
 	DECLARE_READ8_MEMBER(dummy_m_r);
-	DECLARE_READ8_MEMBER(dummy_r);	
-	
+	DECLARE_READ8_MEMBER(dummy_r);
+
+	/* misc region to be allocated at init */
+	// variables which don't change at run-time
+	UINT8      *m_rom;
+	UINT8      *m_prg;
+	UINT8      *m_vrom;
+	UINT8      *m_vram;
+	UINT8      *m_ciram; //PPU nametable RAM - external to PPU!
+
 	UINT8      *m_wram;
 	UINT8      *m_battery_ram;
 	UINT8      *m_mapper_ram;
 	UINT8      *m_mapper_bram;
 	UINT32      m_mapper_ram_size;
 	UINT32      m_mapper_bram_size;
-	
+
 	/* load-time cart variables which remain constant */
 	UINT16 m_prg_chunks;		// iNES 2.0 allows for more chunks (a recently dumped multigame cart has 256 chunks of both PRG & CHR!)
 	UINT16 m_chr_chunks;
@@ -540,7 +549,7 @@ public:
 	UINT32 m_battery_size;
 	UINT8 m_prg_ram;			// if there is PRG RAM with no backup
 	UINT32 m_wram_size;
-	
+
 	/* system variables which don't change at run-time */
 	UINT16 m_mapper;		// for iNES
 	UINT16 m_pcb_id;		// for UNIF & xml
@@ -556,7 +565,49 @@ public:
 	cpu_device        *m_maincpu;
 	ppu2c0x_device    *m_ppu;
 	device_t          *m_sound;
-	emu_timer	      *m_irq_timer;	
+	emu_timer	      *m_irq_timer;
+
+//private:
+
+	// banking helpers
+	// WRAM bankswitch
+	void wram_bank(int bank, int source);
+	// PRG bankswitch
+	void prg32(int bank);
+	void prg16_89ab(int bank);
+	void prg16_cdef(int bank);
+	void prg8_89(int bank);
+	void prg8_ab(int bank);
+	void prg8_cd(int bank);
+	void prg8_ef(int bank);
+	void prg8_67(int bank);	// a bunch of pcbs can bank ROM in WRAM area!
+	void prg8_x(int start, int bank);
+	// CHR 8k bankswitch
+	void chr8(int bank, int source);
+	// CHR 4k bankswitch
+	void chr4_x(int start, int bank, int source);
+	void chr4_0(int bank, int source){ chr4_x(0, bank, source); };
+	void chr4_4(int bank, int source){ chr4_x(4, bank, source); };
+	// CHR 2k bankswitch
+	void chr2_x(int start, int bank, int source);
+	void chr2_0(int bank, int source) { chr2_x(0, bank, source); };
+	void chr2_2(int bank, int source) { chr2_x(2, bank, source); };
+	void chr2_4(int bank, int source) { chr2_x(4, bank, source); };
+	void chr2_6(int bank, int source) { chr2_x(6, bank, source); };
+	// CHR 1k bankswitch
+	void chr1_x(int start, int bank, int source);
+	void chr1_0(int bank, int source) { chr1_x(0, bank, source); };
+	void chr1_1(int bank, int source) { chr1_x(1, bank, source); };
+	void chr1_2(int bank, int source) { chr1_x(2, bank, source); };
+	void chr1_3(int bank, int source) { chr1_x(3, bank, source); };
+	void chr1_4(int bank, int source) { chr1_x(4, bank, source); };
+	void chr1_5(int bank, int source) { chr1_x(5, bank, source); };
+	void chr1_6(int bank, int source) { chr1_x(6, bank, source); };
+	void chr1_7(int bank, int source) { chr1_x(7, bank, source); };
+	// NT bankswitch
+	void set_nt_page(int page, int source, int bank, int writable);
+	void set_nt_mirroring(int mirroring);
+
 };
 
 

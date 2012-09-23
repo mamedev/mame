@@ -67,7 +67,7 @@ public:
 	void init_nes_core();
 	void pcb_handlers_setup();
 	int pcb_initialize(int idx);
-	
+
 	DECLARE_WRITE8_MEMBER(nes_chr_w);
 	DECLARE_READ8_MEMBER(nes_chr_r);
 	DECLARE_WRITE8_MEMBER(nes_nt_w);
@@ -82,22 +82,14 @@ public:
 	read8_delegate    m_mmc_read_low;
 	read8_delegate    m_mmc_read_mid;
 	read8_delegate    m_mmc_read;
-	
+
 	/* devices */
-//	cpu_device        *m_maincpu;
-//	ppu2c0x_device    *m_ppu;
-//	device_t          *m_sound;
+//  cpu_device        *m_maincpu;
+//  ppu2c0x_device    *m_ppu;
+//  device_t          *m_sound;
 	device_t          *m_cart;
-//	emu_timer	      *m_irq_timer;
-	
-	/* misc region to be allocated at init */
-	// variables which don't change at run-time
-	UINT8      *m_rom;
-	UINT8      *m_prg;
-	UINT8      *m_vrom;
-	UINT8      *m_vram;
-	UINT8      *m_ciram; //PPU nametable RAM - external to PPU!	
-	
+//  emu_timer         *m_irq_timer;
+
 	/***** FDS-floppy related *****/
 
 	int     m_disk_expansion;

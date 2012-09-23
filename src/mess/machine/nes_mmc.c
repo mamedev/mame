@@ -235,22 +235,20 @@ READ8_MEMBER(nes_state::nes_low_mapper_r)
 
 *************************************************************/
 
-static void wram_bank( running_machine &machine, int bank, int source )
+void nes_carts_state::wram_bank(int bank, int source)
 {
-	nes_state *state = machine.driver_data<nes_state>();
-
-	assert(state->m_battery || state->m_prg_ram);
+	assert(m_battery || m_prg_ram);
 	if (source == NES_BATTERY)
 	{
-		bank &= (state->m_battery_size / 0x2000) - 1;
-		state->m_prg_bank[4] = state->m_battery_bank5_start + bank;
+		bank &= (m_battery_size / 0x2000) - 1;
+		m_prg_bank[4] = m_battery_bank5_start + bank;
 	}
 	else
 	{
-		bank &= (state->m_wram_size / 0x2000) - 1;
-		state->m_prg_bank[4] = state->m_prgram_bank5_start + bank;
+		bank &= (m_wram_size / 0x2000) - 1;
+		m_prg_bank[4] = m_prgram_bank5_start + bank;
 	}
-	state->membank("bank5")->set_entry(state->m_prg_bank[4]);
+	membank("bank5")->set_entry(m_prg_bank[4]);
 }
 
 INLINE void prg_bank_refresh( running_machine &machine )
@@ -264,118 +262,100 @@ INLINE void prg_bank_refresh( running_machine &machine )
 
 /* PRG ROM in 8K, 16K or 32K blocks */
 
-static void prg32( running_machine &machine, int bank )
+void nes_carts_state::prg32(int bank)
 {
-	nes_state *state = machine.driver_data<nes_state>();
-
 	/* if there is only 16k PRG, return */
-	if (!(state->m_prg_chunks >> 1))
+	if (!(m_prg_chunks >> 1))
 		return;
 
 	/* assumes that bank references a 32k chunk */
-	bank &= ((state->m_prg_chunks >> 1) - 1);
+	bank &= ((m_prg_chunks >> 1) - 1);
 
-	state->m_prg_bank[0] = bank * 4 + 0;
-	state->m_prg_bank[1] = bank * 4 + 1;
-	state->m_prg_bank[2] = bank * 4 + 2;
-	state->m_prg_bank[3] = bank * 4 + 3;
-	prg_bank_refresh(machine);
+	m_prg_bank[0] = bank * 4 + 0;
+	m_prg_bank[1] = bank * 4 + 1;
+	m_prg_bank[2] = bank * 4 + 2;
+	m_prg_bank[3] = bank * 4 + 3;
+	prg_bank_refresh(machine());
 }
 
-static void prg16_89ab( running_machine &machine, int bank )
+void nes_carts_state::prg16_89ab(int bank)
 {
-	nes_state *state = machine.driver_data<nes_state>();
-
 	/* assumes that bank references a 16k chunk */
-	bank &= (state->m_prg_chunks - 1);
+	bank &= (m_prg_chunks - 1);
 
-	state->m_prg_bank[0] = bank * 2 + 0;
-	state->m_prg_bank[1] = bank * 2 + 1;
-	prg_bank_refresh(machine);
+	m_prg_bank[0] = bank * 2 + 0;
+	m_prg_bank[1] = bank * 2 + 1;
+	prg_bank_refresh(machine());
 }
 
-static void prg16_cdef( running_machine &machine, int bank )
+void nes_carts_state::prg16_cdef(int bank)
 {
-	nes_state *state = machine.driver_data<nes_state>();
-
 	/* assumes that bank references a 16k chunk */
-	bank &= (state->m_prg_chunks - 1);
+	bank &= (m_prg_chunks - 1);
 
-	state->m_prg_bank[2] = bank * 2 + 0;
-	state->m_prg_bank[3] = bank * 2 + 1;
-	prg_bank_refresh(machine);
+	m_prg_bank[2] = bank * 2 + 0;
+	m_prg_bank[3] = bank * 2 + 1;
+	prg_bank_refresh(machine());
 }
 
-static void prg8_89( running_machine &machine, int bank )
+void nes_carts_state::prg8_89(int bank)
 {
-	nes_state *state = machine.driver_data<nes_state>();
-
 	/* assumes that bank references an 8k chunk */
-	bank &= ((state->m_prg_chunks << 1) - 1);
+	bank &= ((m_prg_chunks << 1) - 1);
 
-	state->m_prg_bank[0] = bank;
-	prg_bank_refresh(machine);
+	m_prg_bank[0] = bank;
+	prg_bank_refresh(machine());
 }
 
-static void prg8_ab( running_machine &machine, int bank )
+void nes_carts_state::prg8_ab(int bank)
 {
-	nes_state *state = machine.driver_data<nes_state>();
-
 	/* assumes that bank references an 8k chunk */
-	bank &= ((state->m_prg_chunks << 1) - 1);
+	bank &= ((m_prg_chunks << 1) - 1);
 
-	state->m_prg_bank[1] = bank;
-	prg_bank_refresh(machine);
+	m_prg_bank[1] = bank;
+	prg_bank_refresh(machine());
 }
 
-static void prg8_cd( running_machine &machine, int bank )
+void nes_carts_state::prg8_cd(int bank)
 {
-	nes_state *state = machine.driver_data<nes_state>();
-
 	/* assumes that bank references an 8k chunk */
-	bank &= ((state->m_prg_chunks << 1) - 1);
+	bank &= ((m_prg_chunks << 1) - 1);
 
-	state->m_prg_bank[2] = bank;
-	prg_bank_refresh(machine);
+	m_prg_bank[2] = bank;
+	prg_bank_refresh(machine());
 }
 
-static void prg8_ef( running_machine &machine, int bank )
+void nes_carts_state::prg8_ef(int bank)
 {
-	nes_state *state = machine.driver_data<nes_state>();
-
 	/* assumes that bank references an 8k chunk */
-	bank &= ((state->m_prg_chunks << 1) - 1);
+	bank &= ((m_prg_chunks << 1) - 1);
 
-	state->m_prg_bank[3] = bank;
-	prg_bank_refresh(machine);
+	m_prg_bank[3] = bank;
+	prg_bank_refresh(machine());
 }
 
 /* We define an additional helper to map PRG-ROM to 0x6000-0x7000 */
 // TODO: are we implementing this correctly in the mappers which uses it? check!
 
-static void prg8_67( running_machine &machine, int bank )
+void nes_carts_state::prg8_67(int bank)
 {
-	nes_state *state = machine.driver_data<nes_state>();
-
 	/* assumes that bank references an 8k chunk */
-	bank &= ((state->m_prg_chunks << 1) - 1);
+	bank &= ((m_prg_chunks << 1) - 1);
 
-	state->m_prg_bank[4] = bank;
-	state->membank("bank5")->set_entry(state->m_prg_bank[4]);
+	m_prg_bank[4] = bank;
+	membank("bank5")->set_entry(m_prg_bank[4]);
 }
 
 /* We also define an additional helper to map 8k PRG-ROM to one of the banks (passed as parameter) */
-static void prg8_x( running_machine &machine, int start, int bank )
+void nes_carts_state::prg8_x(int start, int bank)
 {
-	nes_state *state = machine.driver_data<nes_state>();
-
 	assert(start < 4);
 
 	/* assumes that bank references an 8k chunk */
-	bank &= ((state->m_prg_chunks << 1) - 1);
+	bank &= ((m_prg_chunks << 1) - 1);
 
-	state->m_prg_bank[start] = bank;
-	prg_bank_refresh(machine);
+	m_prg_bank[start] = bank;
+	prg_bank_refresh(machine());
 }
 
 /* CHR ROM in 1K, 2K, 4K or 8K blocks */
@@ -392,256 +372,174 @@ INLINE void chr_sanity_check( running_machine &machine, int source )
 		fatalerror("CHRROM bankswitch with no VROM\n");
 }
 
-static void chr8( running_machine &machine, int bank, int source )
+void nes_carts_state::chr8(int bank, int source)
 {
-	nes_state *state = machine.driver_data<nes_state>();
-	int i;
-
-	chr_sanity_check(machine, source);
+	chr_sanity_check(machine(), source);
 
 	if (source == CHRRAM)
 	{
-		bank &= (state->m_vram_chunks - 1);
-		for (i = 0; i < 8; i++)
+		bank &= (m_vram_chunks - 1);
+		for (int i = 0; i < 8; i++)
 		{
-			state->m_chr_map[i].source = source;
-			state->m_chr_map[i].origin = (bank * 0x2000) + (i * 0x400); // for save state uses!
-			state->m_chr_map[i].access = &state->m_vram[state->m_chr_map[i].origin];
+			m_chr_map[i].source = source;
+			m_chr_map[i].origin = (bank * 0x2000) + (i * 0x400); // for save state uses!
+			m_chr_map[i].access = &m_vram[m_chr_map[i].origin];
 		}
 	}
 	else
 	{
-		bank &= (state->m_chr_chunks - 1);
-		for (i = 0; i < 8; i++)
+		bank &= (m_chr_chunks - 1);
+		for (int i = 0; i < 8; i++)
 		{
-			state->m_chr_map[i].source = source;
-			state->m_chr_map[i].origin = (bank * 0x2000) + (i * 0x400); // for save state uses!
-			state->m_chr_map[i].access = &state->m_vrom[state->m_chr_map[i].origin];
+			m_chr_map[i].source = source;
+			m_chr_map[i].origin = (bank * 0x2000) + (i * 0x400); // for save state uses!
+			m_chr_map[i].access = &m_vrom[m_chr_map[i].origin];
 		}
 	}
 }
 
-static void chr4_x( running_machine &machine, int start, int bank, int source )
+void nes_carts_state::chr4_x(int start, int bank, int source)
 {
-	nes_state *state = machine.driver_data<nes_state>();
-	int i;
-
-	chr_sanity_check(machine, source);
+	chr_sanity_check(machine(), source);
 
 	if (source == CHRRAM)
 	{
-		bank &= ((state->m_vram_chunks << 1) - 1);
-		for (i = 0; i < 4; i++)
+		bank &= ((m_vram_chunks << 1) - 1);
+		for (int i = 0; i < 4; i++)
 		{
-			state->m_chr_map[i + start].source = source;
-			state->m_chr_map[i + start].origin = (bank * 0x1000) + (i * 0x400); // for save state uses!
-			state->m_chr_map[i + start].access = &state->m_vram[state->m_chr_map[i + start].origin];
+			m_chr_map[i + start].source = source;
+			m_chr_map[i + start].origin = (bank * 0x1000) + (i * 0x400); // for save state uses!
+			m_chr_map[i + start].access = &m_vram[m_chr_map[i + start].origin];
 		}
 	}
 	else
 	{
-		bank &= ((state->m_chr_chunks << 1) - 1);
-		for (i = 0; i < 4; i++)
+		bank &= ((m_chr_chunks << 1) - 1);
+		for (int i = 0; i < 4; i++)
 		{
-			state->m_chr_map[i + start].source = source;
-			state->m_chr_map[i + start].origin = (bank * 0x1000) + (i * 0x400); // for save state uses!
-			state->m_chr_map[i + start].access = &state->m_vrom[state->m_chr_map[i + start].origin];
+			m_chr_map[i + start].source = source;
+			m_chr_map[i + start].origin = (bank * 0x1000) + (i * 0x400); // for save state uses!
+			m_chr_map[i + start].access = &m_vrom[m_chr_map[i + start].origin];
 		}
 	}
 }
 
-static void chr4_0( running_machine &machine, int bank, int source )
+void nes_carts_state::chr2_x(int start, int bank, int source)
 {
-	chr4_x(machine, 0, bank, source);
-}
-
-static void chr4_4( running_machine &machine, int bank, int source )
-{
-	chr4_x(machine, 4, bank, source);
-}
-
-static void chr2_x( running_machine &machine, int start, int bank, int source )
-{
-	nes_state *state = machine.driver_data<nes_state>();
-	int i;
-
-	chr_sanity_check(machine, source);
+	chr_sanity_check(machine(), source);
 
 	if (source == CHRRAM)
 	{
-		bank &= ((state->m_vram_chunks << 2) - 1);
-		for (i = 0; i < 2; i++)
+		bank &= ((m_vram_chunks << 2) - 1);
+		for (int i = 0; i < 2; i++)
 		{
-			state->m_chr_map[i + start].source = source;
-			state->m_chr_map[i + start].origin = (bank * 0x800) + (i * 0x400); // for save state uses!
-			state->m_chr_map[i + start].access = &state->m_vram[state->m_chr_map[i + start].origin];
+			m_chr_map[i + start].source = source;
+			m_chr_map[i + start].origin = (bank * 0x800) + (i * 0x400); // for save state uses!
+			m_chr_map[i + start].access = &m_vram[m_chr_map[i + start].origin];
 		}
 	}
 	else
 	{
-		bank &= ((state->m_chr_chunks << 2) - 1);
-		for (i = 0; i < 2; i++)
+		bank &= ((m_chr_chunks << 2) - 1);
+		for (int i = 0; i < 2; i++)
 		{
-			state->m_chr_map[i + start].source = source;
-			state->m_chr_map[i + start].origin = (bank * 0x800) + (i * 0x400); // for save state uses!
-			state->m_chr_map[i + start].access = &state->m_vrom[state->m_chr_map[i + start].origin];
+			m_chr_map[i + start].source = source;
+			m_chr_map[i + start].origin = (bank * 0x800) + (i * 0x400); // for save state uses!
+			m_chr_map[i + start].access = &m_vrom[m_chr_map[i + start].origin];
 		}
 	}
 }
 
-static void chr2_0( running_machine &machine, int bank, int source )
+void nes_carts_state::chr1_x(int start, int bank, int source)
 {
-	chr2_x(machine, 0, bank, source);
-}
-
-static void chr2_2( running_machine &machine, int bank, int source )
-{
-	chr2_x(machine, 2, bank, source);
-}
-
-static void chr2_4( running_machine &machine, int bank, int source )
-{
-	chr2_x(machine, 4, bank, source);
-}
-
-static void chr2_6( running_machine &machine, int bank, int source )
-{
-	chr2_x(machine, 6, bank, source);
-}
-
-static void chr1_x( running_machine &machine, int start, int bank, int source )
-{
-	nes_state *state = machine.driver_data<nes_state>();
-
-	chr_sanity_check(machine, source);
+	chr_sanity_check(machine(), source);
 
 	if (source == CHRRAM)
 	{
-		bank &= ((state->m_vram_chunks << 3) - 1);
-		state->m_chr_map[start].source = source;
-		state->m_chr_map[start].origin = (bank * 0x400); // for save state uses!
-		state->m_chr_map[start].access = &state->m_vram[state->m_chr_map[start].origin];
+		bank &= ((m_vram_chunks << 3) - 1);
+		m_chr_map[start].source = source;
+		m_chr_map[start].origin = (bank * 0x400); // for save state uses!
+		m_chr_map[start].access = &m_vram[m_chr_map[start].origin];
 	}
 	else
 	{
-		bank &= ((state->m_chr_chunks << 3) - 1);
-		state->m_chr_map[start].source = source;
-		state->m_chr_map[start].origin = (bank * 0x400); // for save state uses!
-		state->m_chr_map[start].access = &state->m_vrom[state->m_chr_map[start].origin];
+		bank &= ((m_chr_chunks << 3) - 1);
+		m_chr_map[start].source = source;
+		m_chr_map[start].origin = (bank * 0x400); // for save state uses!
+		m_chr_map[start].access = &m_vrom[m_chr_map[start].origin];
 	}
-}
-
-static void chr1_0 (running_machine &machine, int bank, int source)
-{
-	chr1_x(machine, 0, bank, source);
-}
-
-static void chr1_1( running_machine &machine, int bank, int source )
-{
-	chr1_x(machine, 1, bank, source);
-}
-
-static void chr1_2( running_machine &machine, int bank, int source )
-{
-	chr1_x(machine, 2, bank, source);
-}
-
-static void chr1_3( running_machine &machine, int bank, int source )
-{
-	chr1_x(machine, 3, bank, source);
-}
-
-static void chr1_4( running_machine &machine, int bank, int source )
-{
-	chr1_x(machine, 4, bank, source);
-}
-
-static void chr1_5( running_machine &machine, int bank, int source )
-{
-	chr1_x(machine, 5, bank, source);
-}
-
-static void chr1_6( running_machine &machine, int bank, int source )
-{
-	chr1_x(machine, 6, bank, source);
-}
-
-static void chr1_7( running_machine &machine, int bank, int source )
-{
-	chr1_x(machine, 7, bank, source);
 }
 
 
 /* NameTable paging and mirroring */
 
-static void set_nt_page( running_machine &machine, int page, int source, int bank, int writable )
+void nes_carts_state::set_nt_page(int page, int source, int bank, int writable)
 {
-	nes_state *state = machine.driver_data<nes_state>();
 	UINT8* base_ptr;
 
 	switch (source)
 	{
 		case CART_NTRAM:
-			base_ptr = state->m_extended_ntram;
+			base_ptr = m_extended_ntram;
 			break;
 		case MMC5FILL:
 			base_ptr = NULL;
 			break;
 		case ROM:
-			base_ptr = state->m_vrom;
+			base_ptr = m_vrom;
 			break;
 		case EXRAM:
-			base_ptr = state->m_mapper_ram;
+			base_ptr = m_mapper_ram;
 			break;
 		case CIRAM:
 		default:
-			base_ptr = state->m_ciram;
+			base_ptr = m_ciram;
 			break;
 	}
 
 	page &= 3; /* mask down to the 4 logical pages */
-	state->m_nt_page[page].source = source;
+	m_nt_page[page].source = source;
 
 	if (base_ptr != NULL)
 	{
-		state->m_nt_page[page].origin = bank * 0x400;
-		state->m_nt_page[page].access = base_ptr + state->m_nt_page[page].origin;
+		m_nt_page[page].origin = bank * 0x400;
+		m_nt_page[page].access = base_ptr + m_nt_page[page].origin;
 	}
 
-	state->m_nt_page[page].writable = writable;
+	m_nt_page[page].writable = writable;
 }
 
-void set_nt_mirroring( running_machine &machine, int mirroring )
+void nes_carts_state::set_nt_mirroring(int mirroring)
 {
 	/* setup our videomem handlers based on mirroring */
 	switch (mirroring)
 	{
 		case PPU_MIRROR_VERT:
-			set_nt_page(machine, 0, CIRAM, 0, 1);
-			set_nt_page(machine, 1, CIRAM, 1, 1);
-			set_nt_page(machine, 2, CIRAM, 0, 1);
-			set_nt_page(machine, 3, CIRAM, 1, 1);
+			set_nt_page(0, CIRAM, 0, 1);
+			set_nt_page(1, CIRAM, 1, 1);
+			set_nt_page(2, CIRAM, 0, 1);
+			set_nt_page(3, CIRAM, 1, 1);
 			break;
 
 		case PPU_MIRROR_HORZ:
-			set_nt_page(machine, 0, CIRAM, 0, 1);
-			set_nt_page(machine, 1, CIRAM, 0, 1);
-			set_nt_page(machine, 2, CIRAM, 1, 1);
-			set_nt_page(machine, 3, CIRAM, 1, 1);
+			set_nt_page(0, CIRAM, 0, 1);
+			set_nt_page(1, CIRAM, 0, 1);
+			set_nt_page(2, CIRAM, 1, 1);
+			set_nt_page(3, CIRAM, 1, 1);
 			break;
 
 		case PPU_MIRROR_HIGH:
-			set_nt_page(machine, 0, CIRAM, 1, 1);
-			set_nt_page(machine, 1, CIRAM, 1, 1);
-			set_nt_page(machine, 2, CIRAM, 1, 1);
-			set_nt_page(machine, 3, CIRAM, 1, 1);
+			set_nt_page(0, CIRAM, 1, 1);
+			set_nt_page(1, CIRAM, 1, 1);
+			set_nt_page(2, CIRAM, 1, 1);
+			set_nt_page(3, CIRAM, 1, 1);
 			break;
 
 		case PPU_MIRROR_LOW:
-			set_nt_page(machine, 0, CIRAM, 0, 1);
-			set_nt_page(machine, 1, CIRAM, 0, 1);
-			set_nt_page(machine, 2, CIRAM, 0, 1);
-			set_nt_page(machine, 3, CIRAM, 0, 1);
+			set_nt_page(0, CIRAM, 0, 1);
+			set_nt_page(1, CIRAM, 0, 1);
+			set_nt_page(2, CIRAM, 0, 1);
+			set_nt_page(3, CIRAM, 0, 1);
 			break;
 
 		case PPU_MIRROR_NONE:
@@ -653,10 +551,10 @@ void set_nt_mirroring( running_machine &machine, int mirroring )
 
 			logerror("Mapper set 4-screen mirroring without supplying external nametable memory!\n");
 
-			set_nt_page(machine, 0, CIRAM, 0, 1);
-			set_nt_page(machine, 1, CIRAM, 0, 1);
-			set_nt_page(machine, 2, CIRAM, 1, 1);
-			set_nt_page(machine, 3, CIRAM, 1, 1);
+			set_nt_page(0, CIRAM, 0, 1);
+			set_nt_page(1, CIRAM, 0, 1);
+			set_nt_page(2, CIRAM, 1, 1);
+			set_nt_page(3, CIRAM, 1, 1);
 			break;
 	}
 }
