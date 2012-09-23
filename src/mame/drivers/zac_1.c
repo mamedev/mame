@@ -2,6 +2,8 @@
 
     Zaccaria Generation 1
 
+    Made working in Sept 2012 [Robbbert]
+
     These games allow for up to 4 players at the same time.
     Setup is via a menu - there are no dipswitches.
     If you see 6 and 9 flashing at start- this indicates the battery is flat,
@@ -21,14 +23,13 @@
 ToDo:
 - Outputs
 - Sound
-- Proper Artwork
-- Battery Backup
 
 **************************************************************************************/
 
 
 #include "machine/genpin.h"
 #include "cpu/s2650/s2650.h"
+#include "machine/nvram.h"
 #include "zac_1.lh"
 
 class zac_1_state : public driver_device
@@ -246,6 +247,8 @@ static MACHINE_CONFIG_START( zac_1, zac_1_state )
 	MCFG_CPU_ADD("maincpu", S2650, 6000000/2)
 	MCFG_CPU_PROGRAM_MAP(zac_1_map)
 	MCFG_CPU_IO_MAP(zac_1_io)
+	MCFG_NVRAM_ADD_0FILL("ram")
+
 	MCFG_TIMER_ADD_PERIODIC("zac_1_inttimer", zac_1_inttimer, attotime::from_hz(200))
 	MCFG_TIMER_ADD_PERIODIC("zac_1_outtimer", zac_1_outtimer, attotime::from_hz(187500))
 
