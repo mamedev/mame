@@ -7,13 +7,13 @@
 ToDo:
 - Once game starts, nothing responds
 - No sound due to missing roms
-- Battery backup to be added
 
 ***********************************************************************************/
 
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/nvram.h"
 #include "techno.lh"
 
 #define TECHNO_MAINCLK 8e6
@@ -57,7 +57,7 @@ public:
 static ADDRESS_MAP_START( techno_map, AS_PROGRAM, 16, techno_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
-	AM_RANGE(0x04000, 0x04fff) AM_RAM // battery backed-up
+	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("nvram") // battery backed-up
 	AM_RANGE(0x06000, 0x0ffff) AM_ROM
 	AM_RANGE(0x14000, 0x147ff) AM_READWRITE(key_r,lamp1_w)
 	AM_RANGE(0x14800, 0x14fff) AM_READWRITE(sound_r,lamp2_w)
@@ -253,6 +253,7 @@ static MACHINE_CONFIG_START( techno, techno_state )
 	MCFG_CPU_ADD("maincpu", M68000, TECHNO_MAINCLK)
 	MCFG_CPU_PROGRAM_MAP(techno_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(techno_state, techno_intgen,  TECHNO_MAINCLK/256) // 31250Hz
+	MCFG_NVRAM_ADD_0FILL("nvram")
 	//MCFG_CPU_ADD("cpu2", TMS7000, 4000000)
 	//MCFG_CPU_PROGRAM_MAP(techno_sub_map)
 
