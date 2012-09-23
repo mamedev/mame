@@ -24,9 +24,8 @@ Machine Operation:
 5. Press and hold X to simulate losing the ball
 6. When score starts flashing, release X and go to step 5 to play next ball
 
-Notes: Do not play more than one player because the machine will try to
-rotate the table, and the motor circuits are not emulated due to lack of info.
-This means that the score labels of East, West and South are not verified.
+Note: You can start play at any of the 4 stations, and the table will rotate
+      as needed. Multiplayer works as well.
 
 The manual explains the tests available, and also how to set number of balls,
 high score, etc., with the diagnostic keyboard.
