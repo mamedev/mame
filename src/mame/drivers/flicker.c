@@ -11,15 +11,15 @@
   Inputs from US Patent 4093232
   Some clues from PinMAME
 
-ToDo:
-- Better artwork
-- It freezes when F3 pressed or game tilted
-
+  Note: If F3 pressed, or you start the system, it will remember any credits from
+        last time. However, you still need to insert a coin before the start button
+        will work.
 
 ************************************************************************************/
 
 #include "machine/genpin.h"
 #include "cpu/i4004/i4004.h"
+#include "machine/nvram.h"
 #include "flicker.lh"
 
 class flicker_state : public driver_device
@@ -42,8 +42,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 
-	// driver_device overrides
-	virtual void machine_reset();
 private:
 	UINT8 m_out_data;
 };
@@ -54,7 +52,7 @@ static ADDRESS_MAP_START( flicker_rom, AS_PROGRAM, 8, flicker_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(flicker_map, AS_DATA, 8, flicker_state )
-	AM_RANGE(0x0000, 0x00FF) AM_RAM
+	AM_RANGE(0x0000, 0x00FF) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( flicker_io, AS_IO, 8, flicker_state )
@@ -211,16 +209,13 @@ sound to produce. We need to change this to just one pulse per actual sound. */
 }
 
 
-void flicker_state::machine_reset()
-{
-}
-
 static MACHINE_CONFIG_START( flicker, flicker_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I4004, XTAL_5MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(flicker_rom)
 	MCFG_CPU_DATA_MAP(flicker_map)
 	MCFG_CPU_IO_MAP(flicker_io)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_flicker)
