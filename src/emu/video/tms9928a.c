@@ -90,16 +90,6 @@ static const rgb_t tms9928a_palette[16] =
 	RGB_WHITE
 };
 
-
-/*
-** initialize the palette
-*/
-PALETTE_INIT( tms9928a )
-{
-	palette_set_colors(machine, 0, tms9928a_palette, TMS9928A_PALETTE_SIZE);
-}
-
-
 tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_50hz, bool is_reva )
 	: device_t( mconfig, type, name, tag, owner, clock ),
 	  device_memory_interface(mconfig, *this),
@@ -625,6 +615,8 @@ void tms9928a_device::device_start()
 	m_tmpbmp.allocate(TMS9928A_TOTAL_HORZ, TMS9928A_TOTAL_VERT_PAL);
 
 	m_line_timer = timer_alloc(TIMER_LINE);
+
+	palette_set_colors(machine(), 0, tms9928a_palette, TMS9928A_PALETTE_SIZE);
 
 	save_item(NAME(m_Regs[0]));
 	save_item(NAME(m_Regs[1]));
