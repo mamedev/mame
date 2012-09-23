@@ -14,15 +14,15 @@
     to start.
 
     Schematic and PinMAME used as references
+    System made working in Sept 2012 [Robbbert]
 
 Machine Operation:
-1. Press num-enter then END then .(period key)   (the displays will flash 400000)
-2. Press num-enter
-3. Insert a coin, credit will be registered
-4. Hold X and start game. When 00 is flashing, release X
-5. Press any of QWERYUIOASDFGHJKLZ-='; to simulate scoring shots (T will tilt)
-6. Press and hold X to simulate losing the ball
-7. When score starts flashing, release X and go to step 5 to play next ball
+1. Press .(period key) (this sets up nvram and the displays will flash 400000)
+2. Insert a coin, credit will be registered
+3. Hold X and start game. When 00 is flashing, release X
+4. Press any of QWERYUIOASDFGHJKLZ-='; to simulate scoring shots (T will tilt)
+5. Press and hold X to simulate losing the ball
+6. When score starts flashing, release X and go to step 5 to play next ball
 
 Notes: Do not play more than one player because the machine will try to
 rotate the table, and the motor circuits are not emulated due to lack of info.
@@ -32,18 +32,16 @@ The manual explains the tests available, and also how to set number of balls,
 high score, etc., with the diagnostic keyboard.
 
 ToDo:
-- Battery backup
-- Outputs
-- Simulate motor circuitry and sensor feedback
-- Verify labels of East, West and South on the display panel
+- Lamp outputs
 - Possibility of a rom missing (most likely it is optional)
 
 *******************************************************************************/
 
 
-#include "emu.h"
+#include "machine/genpin.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8155.h"
+#include "machine/nvram.h"
 #include "sound/astrocde.h"
 #include "g627.lh"
 
@@ -53,7 +51,8 @@ class g627_state : public driver_device
 public:
 	g627_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+	m_maincpu(*this, "maincpu"),
+	m_samples(*this, "samples")
 	{ }
 
 	DECLARE_READ8_MEMBER(porta_r);
@@ -66,19 +65,19 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<samples_device> m_samples;
 
-	// driver_device overrides
-	virtual void machine_reset();
 private:
 	UINT8 m_seg[6];
 	UINT8 m_portc;
+	UINT8 m_motor;
 };
 
 
 static ADDRESS_MAP_START( g627_map, AS_PROGRAM, 8, g627_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_DEVREADWRITE("i8156", i8155_device, memory_r, memory_w)
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM // battery backed
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_SHARE("nvram") // battery backed
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( g627_io, AS_IO, 8, g627_state )
@@ -90,11 +89,9 @@ static ADDRESS_MAP_START( g627_io, AS_IO, 8, g627_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( g627 )
-	PORT_START("X0")
-	PORT_BIT(0x03, IP_ACTIVE_LOW, IPT_UNUSED) // force 3 here so game can start
+	//PORT_START("X0")
 	//bits 0,1 : optical encoder for precise table alignment. Correct position = 3.
 	//bit2-7   : position of table as it turns, using Gray code.
-	// code to convert a number to a Gray Code: { return (input >> 1)^input; }
 	PORT_START("X1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Centre TB") PORT_CODE(KEYCODE_Q)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Bank Shot Outlane") PORT_CODE(KEYCODE_W)
@@ -172,14 +169,13 @@ static INPUT_PORTS_START( g627 )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Test 8") PORT_CODE(KEYCODE_STOP)
 INPUT_PORTS_END
 
-void g627_state::machine_reset()
-{
-
-}
 
 // inputs
 READ8_MEMBER( g627_state::porta_r )
 {
+	if (!m_portc)
+		return ((m_motor >> 1)^m_motor) | 3; // convert to Gray Code
+	else
 	if (m_portc < 7)
 	{
 		char kbdrow[6];
@@ -201,7 +197,7 @@ READ8_MEMBER( g627_state::portb_r )
 	return 0;
 }
 
-// write 6 digits
+// display digits
 WRITE8_MEMBER( g627_state::portc_w )
 {
 	m_portc = data;
@@ -227,6 +223,50 @@ WRITE8_MEMBER( g627_state::disp_w )
 // lamps and solenoids
 WRITE8_MEMBER( g627_state::lamp_w )
 {
+/* offset 0 together with m_portc activates the lamps.
+   offset 1 and 2 are solenoids.
+   offset 1:
+     d0   = Outhole
+     d1   = Bank shot
+     d2-4 = Bumper : centre, Bottom, Top
+     d5-7 = Sling Shot : Top, Right, Left
+   offset 2:
+     d0   = Break Shot
+     d1   = Motor clockwise*
+     d2   = Motor anti-clockwise*
+     d3   = 3 flippers
+     d4   = unknown*
+
+   * = undocumented
+
+ */
+
+	UINT16 solenoid = (offset << 8) | data;
+	switch (solenoid)
+	{
+		case 0x0101:
+		case 0x0120:
+		case 0x0140:
+		case 0x0180:
+		case 0x0201:
+			m_samples->start(0, 5);
+			break;
+		case 0x0104:
+		case 0x0108:
+		case 0x0110:
+			m_samples->start(1, 0);
+			break;
+		case 0x0202:
+		case 0x0212:
+			m_motor++;
+			break;
+		case 0x0204:
+		case 0x0214:
+			m_motor--;
+			break;
+		default:
+			break;
+	}
 }
 
 static I8156_INTERFACE(i8156_intf)
@@ -246,7 +286,10 @@ static MACHINE_CONFIG_START( g627, g627_state )
 	MCFG_CPU_PROGRAM_MAP(g627_map)
 	MCFG_CPU_IO_MAP(g627_io)
 	MCFG_I8156_ADD("i8156", 14138000/8, i8156_intf)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	/* Sound */
+	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SOUND_ADD("astrocade",  ASTROCADE, 14138000/8) // 0066-117XX audio chip
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

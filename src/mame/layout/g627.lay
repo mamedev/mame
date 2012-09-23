@@ -16,7 +16,7 @@
 			<color red="0.0" green="0.0" blue="0.0" />
 		</rect>
 	</element>
-	<element name="P0"><text string="Balls"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P0"><text string="Ball / Match"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P1"><text string="Credits"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P3"><text string="East"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P4"><text string="North"><color red="1.0" green="1.0" blue="1.0" /></text></element>
