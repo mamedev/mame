@@ -3107,7 +3107,8 @@ ROM_END
     Jurassic Park
     not protected
      Game: 833-10544 JURASSIC PARK
-     A/D BD NO. 837-7536-91
+   ROM BD: 834-10545
+A/D BD NO: 837-7536-91
 */
 ROM_START( jpark )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* v60 code + data */
