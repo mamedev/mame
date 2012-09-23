@@ -8,7 +8,6 @@ The inputs work with 'strike' and 'skijump'.
 The playboard inputs are unknown.
 
 ToDo:
-- Proper artwork
 - Mirrors of ram and switches
 - battery backup of ram
 - Inputs
@@ -19,6 +18,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/scmp/scmp.h"
+#include "machine/nvram.h"
 #include "zac_proto.lh"
 
 class zac_proto_state : public driver_device
@@ -45,7 +45,7 @@ protected:
 
 static ADDRESS_MAP_START( zac_proto_map, AS_PROGRAM, 8, zac_proto_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0d00, 0x0dff) AM_RAM
+	AM_RANGE(0x0d00, 0x0dff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0e00, 0x0e00) AM_READ_PORT("PL0")
 	AM_RANGE(0x0e01, 0x0e01) AM_READ_PORT("PL1")
 	AM_RANGE(0x0e02, 0x0e02) AM_READ_PORT("PL2")
@@ -226,6 +226,7 @@ static MACHINE_CONFIG_START( zac_proto, zac_proto_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SCMP, 1000000)
 	MCFG_CPU_PROGRAM_MAP(zac_proto_map)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_zac_proto)

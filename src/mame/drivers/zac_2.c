@@ -5,6 +5,7 @@
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
+#include "machine/nvram.h"
 #include "zac_2.lh"
 
 class zac_2_state : public driver_device
@@ -202,6 +203,8 @@ static MACHINE_CONFIG_START( zac_2, zac_2_state )
 	MCFG_CPU_ADD("maincpu", S2650, 6000000/2)
 	MCFG_CPU_PROGRAM_MAP(zac_2_map)
 	MCFG_CPU_IO_MAP(zac_2_io)
+	MCFG_NVRAM_ADD_0FILL("ram")
+
 	MCFG_TIMER_ADD_PERIODIC("zac_2_inttimer", zac_2_inttimer, attotime::from_hz(200))
 	MCFG_TIMER_ADD_PERIODIC("zac_2_outtimer", zac_2_outtimer, attotime::from_hz(187500))
 
