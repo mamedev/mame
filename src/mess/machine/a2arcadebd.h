@@ -30,6 +30,8 @@ public:
     // optional information overrides
     virtual machine_config_constructor device_mconfig_additions() const;
 
+    DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
+
 protected:
     virtual void device_start();
     virtual void device_reset();
