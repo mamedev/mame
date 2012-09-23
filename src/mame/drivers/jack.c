@@ -1146,6 +1146,27 @@ ROM_START( joinem )
 ROM_END
 
 
+ROM_START( unclepoop )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main z80 cpu */
+	ROM_LOAD( "01.f17", 0x00000, 0x2000, CRC(92fb238c) SHA1(e9476c5c1a0bf9e8c6c364ac022ed1d97ae66d2e) )
+	ROM_LOAD( "02.f14", 0x02000, 0x2000, CRC(b99214ef) SHA1(c8e4af0efbc5ea543277b2764dc6f119aae477ca) )
+	ROM_LOAD( "03.f11", 0x04000, 0x2000, CRC(a136af97) SHA1(cfa610bf357870053617fed8aef6bb30bd996422) )
+	ROM_LOAD( "04.f09", 0x06000, 0x2000, CRC(c4bcd414) SHA1(df3125358530f5fb8d202bddcb0ef5e322fabb7b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 cpu */
+	ROM_LOAD( "08.c15", 0x00000, 0x1000, CRC(fd84106b) SHA1(891853d2b39850a981016108b74ca20337d2cdd8) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 ) /* gfx - 8x8x3bpp */
+	ROM_LOAD( "05.k04", 0x0000, 0x2000, CRC(64026934) SHA1(a5342335d02d34fa6ba2b29484ed71ecc96292f2) )
+	ROM_LOAD( "06.j04", 0x2000, 0x2000, CRC(94b5f676) SHA1(32c27854726636c4ce03bb6a83b32d04ed6c42af) )
+	ROM_LOAD( "07.h04", 0x4000, 0x2000, CRC(e2f73e99) SHA1(61cb09ff424ba63b892b4822e7ed916af73412f1) )
+
+	ROM_REGION( 0x200, "proms", 0 ) /* colours */
+	ROM_LOAD( "diatec_h.bin", 0x000, 0x100, CRC(938601b1) SHA1(8213284989bebb5f7375878181840de8079dc1f3) )
+	ROM_LOAD( "diatec_l.bin", 0x100, 0x100, CRC(b04d466a) SHA1(1438abeae76ef807ba34bd6d3e4c44f707dbde6e) )
+ROM_END
+
+
 ROM_START( loverboy )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main z80 cpu */
 	ROM_LOAD( "lover.r0", 0x0000, 0x2000, CRC(ffec4e41) SHA1(65428ebcb3af47071fef70a35388e070a019f692) )
@@ -1425,5 +1446,6 @@ GAME( 1984, sucasino, 0,        jack,    sucasino, jack_state, jack,     ROT90, 
 GAME( 1981, tripool,  0,        tripool, tripool, jack_state,  jack,     ROT90,  "Noma (Casino Tech license)",  "Tri-Pool (Casino Tech)", GAME_SUPPORTS_SAVE )
 GAME( 1981, tripoola, tripool,  tripool, tripool, jack_state,  jack,     ROT90,  "Noma (Costal Games license)", "Tri-Pool (Costal Games)", GAME_SUPPORTS_SAVE )
 GAME( 1983, joinem,   0,        joinem,  joinem, jack_state,   zzyzzyxx, ROT90,  "Global Corporation",          "Joinem", GAME_SUPPORTS_SAVE )
+GAME( 1983, unclepoop, unclepoo, joinem, joinem, jack_state, zzyzzyxx, ROT90, "Diatec", "Uncle Poo (nincompoop version)", GAME_NOT_WORKING )
 GAME( 1983, loverboy, 0,        loverboy,loverboy, jack_state, loverboy, ROT90,  "G.T Enterprise Inc",          "Lover Boy", GAME_SUPPORTS_SAVE )
 GAME( 1985, striv,    0,        jack,    striv, jack_state,    striv,    ROT270, "Hara Industries",             "Super Triv", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
