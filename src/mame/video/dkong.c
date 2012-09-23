@@ -119,13 +119,17 @@ static const res_net_info dkong3_net_info =
     darlington. The blue channel has a pulldown resistor (R8, 0M15) as well.
 */
 
+
+#define TRS_J1	(1)			// (1) = Closed (0) = Open
+
+
 static const res_net_info radarscp_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_TTL | RES_NET_VIN_MB7052 |  RES_NET_MONITOR_SANYO_EZV20,
 	{
-		{ RES_NET_AMP_DARLINGTON, 470,      0, 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_DARLINGTON, 470,      0, 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_DARLINGTON, 680, 150000, 2, {  470, 220,   0 } }    /*  radarscp */
+		{ RES_NET_AMP_DARLINGTON, 470 * TRS_J1, 470*(1-TRS_J1), 3, { 1000, 470, 220 } },
+		{ RES_NET_AMP_DARLINGTON, 470 * TRS_J1, 470*(1-TRS_J1), 3, { 1000, 470, 220 } },
+		{ RES_NET_AMP_EMITTER, 	  680 * TRS_J1, 680*(1-TRS_J1), 2, {  470, 220,   0 } }    /*  radarscp */
 	}
 };
 
@@ -133,9 +137,9 @@ static const res_net_info radarscp_net_bck_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_TTL | RES_NET_VIN_MB7052 |  RES_NET_MONITOR_SANYO_EZV20,
 	{
-		{ RES_NET_AMP_DARLINGTON, 470,      0, 0, { 0 } },
-		{ RES_NET_AMP_DARLINGTON, 470,      0, 0, { 0 } },
-		{ RES_NET_AMP_DARLINGTON, 680, 150000, 0, { 0 } }    /*  radarscp */
+		{ RES_NET_AMP_DARLINGTON, 470, 4700, 0, { 0 } },
+		{ RES_NET_AMP_DARLINGTON, 470, 4700, 0, { 0 } },
+		{ RES_NET_AMP_EMITTER, 	  470, 4700, 0, { 0 } }    /*  radarscp */
 	}
 };
 
@@ -153,7 +157,7 @@ static const res_net_info radarscp1_net_info =
 	{
 		{ RES_NET_AMP_DARLINGTON, 0,      0, 4, { 39000, 20000, 10000, 4990 } },
 		{ RES_NET_AMP_DARLINGTON, 0,      0, 4, { 39000, 20000, 10000, 4990 } },
-		{ RES_NET_AMP_DARLINGTON, 0,      0, 4, { 39000, 20000, 10000, 4990 } }
+		{ RES_NET_AMP_EMITTER,    0,      0, 4, { 39000, 20000, 10000, 4990 } }
 	}
 };
 
@@ -165,7 +169,7 @@ static const res_net_info radarscp_stars_net_info =
 	{
 		{ RES_NET_AMP_DARLINGTON, 4700, 470, 0, { 0 } },
 		{ RES_NET_AMP_DARLINGTON,    1,   0, 0, { 0 } },	/*  dummy */
-		{ RES_NET_AMP_DARLINGTON,    1,   0, 0, { 0 } },	/*  dummy */
+		{ RES_NET_AMP_EMITTER,       1,   0, 0, { 0 } },	/*  dummy */
 	}
 };
 
@@ -177,7 +181,7 @@ static const res_net_info radarscp_blue_net_info =
 	{
 		{ RES_NET_AMP_DARLINGTON,  470, 4700, 0, { 0 } },	/*  bias/gnd exist in schematics, readable in TKG3 schematics */
 		{ RES_NET_AMP_DARLINGTON,  470, 4700, 0, { 0 } },	/*  bias/gnd exist in schematics, readable in TKG3 schematics */
-		{ RES_NET_AMP_DARLINGTON,    0,    0, 8, { 128,64,32,16,8,4,2,1 } },	/*  dummy */
+		{ RES_NET_AMP_EMITTER,       0,    0, 8, { 128,64,32,16,8,4,2,1 } },	/*  dummy */
 	}
 };
 
@@ -189,7 +193,7 @@ static const res_net_info radarscp_grid_net_info =
 	{
 		{ RES_NET_AMP_DARLINGTON,    0,   0, 1, { 1 } },	/*  dummy */
 		{ RES_NET_AMP_DARLINGTON,    0,   0, 1, { 1 } },	/*  dummy */
-		{ RES_NET_AMP_DARLINGTON,    0,   0, 1, { 1 } },	/*  dummy */
+		{ RES_NET_AMP_EMITTER,       0,   0, 1, { 1 } },	/*  dummy */
 	}
 };
 
@@ -291,7 +295,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp)
 	/* Now treat tri-state black background generation */
 
 	for (i=0;i<256;i++)
-		if ( (i & 0x03) == 0x00 )  /*  NOR => CS=1 => Tristate => real black */
+		if ( (m_vidhw != DKONG_RADARSCP_CONVERSION) && ( (i & 0x03) == 0x00 ))  /*  NOR => CS=1 => Tristate => real black */
 		{
 			r = compute_res_net( 1, 0, &radarscp_net_bck_info );
 			g = compute_res_net( 1, 1, &radarscp_net_bck_info );
@@ -708,25 +712,32 @@ static void radarscp_step(running_machine &machine, int line_cnt)
 	double diff;
 	int sig;
 
-	line_cnt += 256;
-	if (line_cnt>511)
-		line_cnt -= VTOTAL;
+	/* vsync is divided by 2 by a LS161
+	 * The resulting 30 Hz signal clocks a LFSR (LS164) operating as a
+	 * random number generator.
+	 */
+
+	if ( line_cnt == 0)
+	{
+		state->m_sig30Hz = (1-state->m_sig30Hz);
+		if (state->m_sig30Hz)
+			state->m_lfsr_5I = (machine.rand() > RAND_MAX/2);
+	}
 
 	/* sound2 mixes in a 30Hz noise signal.
      * With the current model this has no real effect
      * Included for completeness
      */
 
-	line_cnt++;
-	if (line_cnt>=512)
-		line_cnt=512-VTOTAL;
-
-	if ( ( !(line_cnt & 0x40) && ((line_cnt+1) & 0x40) ) && (machine.rand() > RAND_MAX/2))
-		state->m_sig30Hz = (1-state->m_sig30Hz);
-
 	/* Now mix with SND02 (sound 2) line - on 74ls259, bit2 */
 	address_space &space = machine.driver_data()->generic_space();
-	state->m_rflip_sig = latch8_bit2_r(state->m_dev_6h, space, 0) & state->m_sig30Hz;
+	state->m_rflip_sig = latch8_bit2_r(state->m_dev_6h, space, 0) & state->m_lfsr_5I;
+
+	/* blue background generation */
+
+	line_cnt += (256 - 8) + 1; // offset 8 needed to match monitor pictures
+	if (line_cnt>511)
+		line_cnt -= VTOTAL;
 
 	sig = state->m_rflip_sig ^ ((line_cnt & 0x80)>>7);
 
@@ -736,7 +747,7 @@ static void radarscp_step(running_machine &machine, int line_cnt)
 	if  (sig) /*  128VF */
 		diff = (0.0 - state->m_cv1);
 	else
-		diff = (3.4 - state->m_cv1);
+		diff = (4.8 - state->m_cv1);
 	diff = diff - diff*exp(0.0 - (1.0/RC1 * dt) );
 	state->m_cv1 += diff;
 
@@ -744,16 +755,41 @@ static void radarscp_step(running_machine &machine, int line_cnt)
 	diff = diff - diff*exp(0.0 - (1.0/RC2 * dt) );
 	state->m_cv2 += diff;
 
-	state->m_vg1 = (state->m_cv1 - state->m_cv2)*0.9 + 0.1 * state->m_vg2;
-	state->m_vg2 = 5*CD4049(machine, state->m_vg1/5);
+	// FIXME: use the inverse function
+	// Solve the amplifier by iteration
+	for (int j=1; j<=11; j++)// 11% = 1/75 / (1/75+1/10)
+	{
+		double f = (double) j / 100.0f;
+		state->m_vg1 = (state->m_cv1 - state->m_cv2)*(1-f) + f * state->m_vg2;
+		state->m_vg2 = 5*CD4049(machine, state->m_vg1/5);
+	}
+	// FIXME: use the inverse function
+	// Solve the amplifier by iteration 50% = both resistors equal
+	for (int j=10; j<=20; j++)
+	{
+		double f = (double) j / 40.0f;
+		vg3i = (1.0f-f) * state->m_vg2 + f * state->m_vg3;
+		state->m_vg3 = 5*CD4049(machine, vg3i/5);
+	}
 
-	/* on the real hardware, the gain would be 1.
-     * This will not work here.
-     */
-	vg3i = 0.9*state->m_vg2 + 0.1 * state->m_vg3;
-	state->m_vg3 = 5*CD4049(machine, vg3i/5);
+#define RC17 (33e-6 * 1e3 * (0*4.7+1.0/(1.0/10.0+1.0/20.0+0.0/0.3)))
+	diff = (state->m_vg3 - state->m_vc17);
+	diff = diff - diff*exp(0.0 - (1.0/RC17 * dt) );
+	state->m_vc17 += diff;
 
-	state->m_blue_level = (int)(state->m_vg3/5.0*255);
+	double vo = (state->m_vg3 - state->m_vc17);
+	vo = vo + 20.0 / (20.0+10.0) * 5;
+
+	// Transistor is marked as OMIT in TRS-02 schems.
+	//vo = vo - 0.7;
+
+
+	//double vo = (vg3o - vg3)/4.7 + 5.0/16.0;
+	//vo = vo / (1.0 / 4.7 + 1.0 / 16.0 + 1.0 / 30.0 );
+	//printf("%f %f\n", vg3, vc17);
+
+	state->m_blue_level = (int)(vo/5.0*255);
+	//printf("%d\n", state->m_blue_level);
 
 	/*
      * Grid signal
@@ -776,7 +812,7 @@ static void radarscp_step(running_machine &machine, int line_cnt)
 	diff = diff - diff*exp(0.0 - (1.0/RC4 * dt) );
 	state->m_cv4 += diff;
 
-	if (CD4049(machine, CD4049(machine, state->m_vg2 - state->m_cv4))>2.4/5.0) /* TTL - Level */
+	if (CD4049(machine, CD4049(machine, (state->m_vg2 - state->m_cv4)/5.0))>2.4/5.0) /* TTL - Level */
 		state->m_grid_sig = 0;
 	else
 		state->m_grid_sig = 1;
@@ -886,10 +922,10 @@ static void check_palette(running_machine &machine)
 			state->m_vidhw = newset;
 			switch (newset)
 			{
-				case 0x00:
+				case DKONG_RADARSCP_CONVERSION:
 					state->PALETTE_INIT_CALL_MEMBER(radarscp);
 					break;
-				case 0x01:
+				case DKONG_BOARD:
 					state->PALETTE_INIT_CALL_MEMBER(dkong2b);
 					break;
 			}

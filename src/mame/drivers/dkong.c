@@ -458,6 +458,7 @@ MACHINE_START_MEMBER(dkong_state,radarscp)
 
     MACHINE_START_CALL_MEMBER(dkong2b);
     m_hardware_type = HARDWARE_TRS02;
+    m_vidhw = DKONG_BOARD;
 }
 
 MACHINE_START_MEMBER(dkong_state,radarscp1)
@@ -465,6 +466,7 @@ MACHINE_START_MEMBER(dkong_state,radarscp1)
 
     MACHINE_START_CALL_MEMBER(dkong2b);
     m_hardware_type = HARDWARE_TRS01;
+    m_vidhw = DKONG_BOARD;
 }
 
 MACHINE_START_MEMBER(dkong_state,dkong3)
