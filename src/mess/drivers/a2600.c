@@ -1501,13 +1501,14 @@ READ8_MEMBER(a2600_state::a2600_get_databus_contents)
 {
 	UINT16	last_address, prev_address;
 	UINT8	last_byte, prev_byte;
+	address_space& prog_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	last_address = machine().device("maincpu")->safe_pc() - 1;
 	if ( ! ( last_address & 0x1080 ) )
 	{
 		return offset;
 	}
-	last_byte = space.read_byte(last_address );
+	last_byte = prog_space.read_byte(last_address );
 	if ( last_byte < 0x80 || last_byte == 0xFF )
 	{
 		return last_byte;
@@ -1517,10 +1518,10 @@ READ8_MEMBER(a2600_state::a2600_get_databus_contents)
 	{
 		return last_byte;
 	}
-	prev_byte = space.read_byte(prev_address );
+	prev_byte = prog_space.read_byte(prev_address );
 	if ( prev_byte == 0xB1 )
 	{	/* LDA (XX),Y */
-		return space.read_byte(last_byte + 1 );
+		return prog_space.read_byte(last_byte + 1 );
 	}
 	return last_byte;
 }
