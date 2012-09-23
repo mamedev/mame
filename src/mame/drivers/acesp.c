@@ -3653,6 +3653,12 @@ ROM_START( sp_poundbwbf )
 	SP_POUND_SOUND
 ROM_END
 
+ROM_START( sp_poundbwbg )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "p4p_1.bin", 0x0000, 0x8000, CRC(b2c1625e) SHA1(c992e54280bfe42a77686802faccfebb4db300a8) )
+	ROM_LOAD( "p4p_2.bin", 0x8000, 0x8000, CRC(30f09a7d) SHA1(e00eeba15b8ed1f47a5d8f7ae1e59fcadbcbd838) )
+	SP_POUND_SOUND
+ROM_END
 
 #define SP_PRZNA_SOUND \
 	ROM_REGION(	0x100000, "oki", ROMREGION_ERASE00 ) \
@@ -4427,6 +4433,7 @@ GAME( 199?, sp_poundbwbc	,sp_pound	,ace_sp	,ace_sp	, ace_sp_state,ace_sp	,ROT0	,
 GAME( 199?, sp_poundbwbd	,sp_pound	,ace_sp	,ace_sp	, ace_sp_state,ace_sp	,ROT0	,"Ace / Bwb", "Pound For Pound (Ace/Bwb) (sp.ACE) (set 5)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, sp_poundbwbe	,sp_pound	,ace_sp	,ace_sp	, ace_sp_state,ace_sp	,ROT0	,"Ace / Bwb", "Pound For Pound (Ace/Bwb) (sp.ACE) (set 6)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, sp_poundbwbf	,sp_pound	,ace_sp	,ace_sp	, ace_sp_state,ace_sp	,ROT0	,"Ace / Bwb", "Pound For Pound (Ace/Bwb) (sp.ACE) (set 7)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_poundbwbg	,sp_pound	,ace_sp	,ace_sp	, ace_sp_state,ace_sp	,ROT0	,"Ace / Bwb", "Pound For Pound (Ace/Bwb) (sp.ACE) (set 8)",GAME_IS_SKELETON_MECHANICAL )
 
 GAME( 199?, sp_road			,0			,ace_sp	,ace_sp	, ace_sp_state,ace_sp	,ROT0	,"Ace", "Road To Hell (Ace) (sp.ACE)",GAME_IS_SKELETON_MECHANICAL ) // incomplete program
 

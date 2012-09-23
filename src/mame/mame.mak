@@ -1982,8 +1982,9 @@ $(DRIVERS)/beaminv.o:	$(LAYOUT)/beaminv.lh
 
 $(DRIVERS)/bfm_sc1.o:	$(LAYOUT)/bfm_sc1.lh
 
-$(DRIVERS)/bfm_sc2.o:	$(LAYOUT)/bfm_sc2.lh \
+$(DRIVERS)/bfm_sc2.o:	$(LAYOUT)/sc2_vfd.lh \
 			$(LAYOUT)/sc2_dmd.lh \
+			$(LAYOUT)/sc2_vid.lh \
 			$(LAYOUT)/drwho.lh \
 			$(LAYOUT)/gldncrwn.lh \
 			$(LAYOUT)/quintoon.lh \

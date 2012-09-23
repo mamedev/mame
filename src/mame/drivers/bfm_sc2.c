@@ -155,7 +155,7 @@ Adder hardware:
 #include "machine/bfm_bd1.h"  // vfd
 #include "machine/meters.h"
 
-#include "bfm_sc2.lh"
+#include "sc2_vid.lh"
 #include "gldncrwn.lh"
 #include "paradice.lh"
 #include "pokio.lh"
@@ -167,6 +167,7 @@ Adder hardware:
 
 /* fruit machines only */
 #include "video/bfm_dm01.h"
+#include "sc2_vfd.lh"
 #include "sc2_dmd.lh"
 #include "drwho.lh"
 #include "machine/bfm_comn.h"
@@ -2159,7 +2160,7 @@ static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_state, e2ram_init)
-	MCFG_DEFAULT_LAYOUT(layout_bfm_sc2)
+	MCFG_DEFAULT_LAYOUT(layout_sc2_vid)
 
 	MCFG_SCREEN_ADD("adder", RASTER)
 	MCFG_SCREEN_SIZE( 400, 280)
@@ -3718,7 +3719,7 @@ static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_state, e2ram_init)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_bfm_sc2)
+	MCFG_DEFAULT_LAYOUT(layout_sc2_vfd)
 MACHINE_CONFIG_END
 
 
