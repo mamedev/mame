@@ -82,15 +82,7 @@ void cbm2_state::bankswitch(offs_t offset, int busy2, int eras, int ecas, int re
 	int *diskromcs, int *csbank1, int *csbank2, int *csbank3, int *basiccs, int *knbcs, int *kernalcs,
 	int *crtccs, int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs)
 {
-	//this->read_pla(offset, busy2, eras, ecas, refen, cas, ras, casseg1, casseg2, casseg3, casseg4);
-
-	switch (offset >> 16)
-	{
-	case 1: *casseg1 = 0; break;
-	case 2: *casseg2 = 0; break;
-	case 3: *casseg3 = 0; break;
-	case 4: *casseg4 = 0; break;
-	}
+	this->read_pla(offset, busy2, eras, ecas, refen, cas, ras, casseg1, casseg2, casseg3, casseg4);
 
 	int busen1 = m_dramon;
 	int decoden = 0; // TODO
@@ -148,7 +140,7 @@ void cbm2_state::bankswitch(offs_t offset, int busy2, int eras, int ecas, int re
 
 READ8_MEMBER( cbm2_state::read )
 {
-	int busy2 = 1, eras = 1, ecas = 1, refen = 1, cas = 1, ras = 1, sysioen = 1, dramen = 1;
+	int busy2 = 1, eras = 1, ecas = 1, refen = 0, cas = 0, ras = 1, sysioen = 1, dramen = 1;
 	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, buframcs = 1, extbufcs = 1, vidramcs = 1;
 	int diskromcs = 1, csbank1 = 1, csbank2 = 1, csbank3 = 1, basiccs = 1, knbcs = 1, kernalcs = 1;
 	int crtccs = 1, cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
@@ -159,7 +151,7 @@ READ8_MEMBER( cbm2_state::read )
 		&crtccs, &cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs);
 /*
 	if (!space.debugger_access())
-	logerror("%05x %u %u - %u %u %u %u %u %u %u - %u %u %u %u %u %u %u - %u %u %u %u %u %u %u %u\n", offset, sysioen, dramen,
+	logerror("r %05x %u %u - %u %u %u %u %u %u %u - %u %u %u %u %u %u %u - %u %u %u %u %u %u %u %u\n", offset, sysioen, dramen,
 		casseg1, casseg2, casseg3, casseg4, buframcs, extbufcs, vidramcs,
 		diskromcs, csbank1, csbank2, csbank3, basiccs, knbcs, kernalcs,
 		crtccs, cs1, sidcs, extprtcs, ciacs, aciacs, tript1cs, tript2cs);
@@ -249,7 +241,7 @@ READ8_MEMBER( cbm2_state::read )
 
 WRITE8_MEMBER( cbm2_state::write )
 {
-	int busy2 = 1, eras = 1, ecas = 1, refen = 1, cas = 1, ras = 1, sysioen = 1, dramen = 1;
+	int busy2 = 1, eras = 1, ecas = 1, refen = 0, cas = 0, ras = 1, sysioen = 1, dramen = 1;
 	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, buframcs = 1, extbufcs = 1, vidramcs = 1;
 	int diskromcs = 1, csbank1 = 1, csbank2 = 1, csbank3 = 1, basiccs = 1, knbcs = 1, kernalcs = 1;
 	int crtccs = 1, cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
@@ -258,7 +250,13 @@ WRITE8_MEMBER( cbm2_state::write )
 		&casseg1, &casseg2, &casseg3, &casseg4, &buframcs, &extbufcs, &vidramcs,
 		&diskromcs, &csbank1, &csbank2, &csbank3, &basiccs, &knbcs, &kernalcs,
 		&crtccs, &cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs);
-
+/*
+	if (!space.debugger_access())
+	logerror("w %05x %u %u - %u %u %u %u %u %u %u - %u %u %u %u %u %u %u - %u %u %u %u %u %u %u %u\n", offset, sysioen, dramen,
+		casseg1, casseg2, casseg3, casseg4, buframcs, extbufcs, vidramcs,
+		diskromcs, csbank1, csbank2, csbank3, basiccs, knbcs, kernalcs,
+		crtccs, cs1, sidcs, extprtcs, ciacs, aciacs, tript1cs, tript2cs);
+*/
 	if (!dramen)
 	{
 		if (!casseg1)
@@ -439,8 +437,8 @@ UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, in
 		&csbank1, &csbank2, &csbank3, &basiclocs, &basichics, &kernalcs,
 		&cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs, &aec, &vsysaden);
 /*
-	if (!space.debugger_access() && !ae)
-	logerror("read  %05x %u %u %u %u %u %u %u - %u %u %u %u %u %u %u - %u %u %u %u %u %u - %u %u %u %u %u %u %u - %u %u : ",
+	if (!space.debugger_access())
+	logerror("r %05x %u %u %u %u %u %u %u - %u %u %u %u %u %u %u - %u %u %u %u %u %u - %u %u %u %u %u %u %u - %u %u : ",
 		offset, datxen, dramxen, clrniben, _64kcasen, casenb, viddaten, viddat_tr,
 		clrnibcs, extbufcs, discromcs, buframcs, charomcs, viccs, vidmatcs,
 		csbank1, csbank2, csbank3, basiclocs, basichics, kernalcs,
@@ -451,12 +449,12 @@ UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, in
 	if (aec && !datxen && !_64kcasen)
 	{
 		data = m_ram->pointer()[offset & 0xffff];
-		//if (!space.debugger_access() && !ae) logerror("64K\n");
+		//if (!space.debugger_access()) logerror("64K\n");
 	}
 	else if (!aec && !viddaten && viddat_tr && !_64kcasen)
 	{
 		data = m_ram->pointer()[(m_vicbnksel << 14) | va];
-		//if (!space.debugger_access() && !ae) logerror("64K\n");
+		//if (!space.debugger_access()) logerror("64K\n");
 	}
 	else if (!dramxen && casenb && !P3)
 	{
@@ -466,84 +464,84 @@ UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, in
 		case 2: if (m_ram->size() > 0x20000) data = m_ram->pointer()[0x20000 + (offset & 0xffff)]; break;
 		case 3: if (m_ram->size() > 0x30000) data = m_ram->pointer()[0x30000 + (offset & 0xffff)]; break;
 		}
-		//if (!space.debugger_access() && !ae) logerror("CASEN\n");
+		//if (!space.debugger_access()) logerror("CASEN\n");
 	}
 	else if (!datxen && !buframcs)
 	{
 		data = m_buffer_ram[offset & 0x7ff];
-		//if (!space.debugger_access() && !ae) logerror("BUFRAM\n");
+		//if (!space.debugger_access()) logerror("BUFRAM\n");
 	}
 	else if (!vsysaden && clrniben && !clrnibcs)
 	{
 		data = m_color_ram[offset & 0x3ff];
-		//if (!space.debugger_access() && !ae) logerror("CLRNIB\n");
+		//if (!space.debugger_access()) logerror("CLRNIB\n");
 	}
 	else if (vsysaden && !clrnibcs)
 	{
 		data = m_color_ram[va & 0x3ff];
-		//if (!space.debugger_access() && !ae) logerror("CLRNIB\n");
+		//if (!space.debugger_access()) logerror("CLRNIB\n");
 	}
 	else if (!datxen && !vsysaden && !viddaten && viddat_tr && !vidmatcs)
 	{
 		data = m_video_ram[offset & 0x3ff];
-		//if (!space.debugger_access() && !ae) logerror("VIDMAT\n");
+		//if (!space.debugger_access()) logerror("VIDMAT\n");
 	}
 	else if (vsysaden && !vidmatcs)
 	{
 		data = m_video_ram[va & 0x3ff];
-		//if (!space.debugger_access() && !ae) logerror("VIDMAT\n");
+		//if (!space.debugger_access()) logerror("VIDMAT\n");
 	}
 	else if (!datxen && (!basiclocs || !basichics))
 	{
 		data = m_basic[offset & 0x3fff];
-		//if (!space.debugger_access() && !ae) logerror("BASIC\n");
+		//if (!space.debugger_access()) logerror("BASIC\n");
 	}
 	else if (!datxen && !kernalcs)
 	{
 		data = m_kernal[offset & 0x1fff];
-		//if (!space.debugger_access() && !ae) logerror("KERNAL\n");
+		//if (!space.debugger_access()) logerror("KERNAL\n");
 	}
 	else if (!datxen && !vsysaden && !viddaten && viddat_tr && !charomcs)
 	{
 		data = m_charom[offset & 0xfff];
-		//if (!space.debugger_access() && !ae) logerror("CHAROM\n");
+		//if (!space.debugger_access()) logerror("CHAROM\n");
 	}
 	else if (vsysaden && !charomcs)
 	{
 		data = m_charom[va & 0xfff];
-		//if (!space.debugger_access() && !ae) logerror("CHAROM\n");
+		//if (!space.debugger_access()) logerror("CHAROM\n");
 	}
 	else if (!datxen && !viddaten && viddat_tr && !viccs)
 	{
 		data = m_vic->read(space, offset & 0x3f);
-		//if (!space.debugger_access() && !ae) logerror("VIC\n");
+		//if (!space.debugger_access()) logerror("VIC\n");
 	}
 	else if (!datxen && !sidcs)
 	{
 		data = m_sid->read(space, offset & 0x1f);
-		//if (!space.debugger_access() && !ae) logerror("SID\n");
+		//if (!space.debugger_access()) logerror("SID\n");
 	}
 	else if (!datxen && !ciacs)
 	{
 		data = m_cia->read(space, offset & 0x0f);
-		//if (!space.debugger_access() && !ae) logerror("CIA\n");
+		//if (!space.debugger_access()) logerror("CIA\n");
 	}
 	else if (!datxen && !aciacs)
 	{
 		data = m_acia->read(space, offset & 0x03);
-		//if (!space.debugger_access() && !ae) logerror("ACIA\n");
+		//if (!space.debugger_access()) logerror("ACIA\n");
 	}
 	else if (!datxen && !tript1cs)
 	{
 		data = m_tpi1->read(space, offset & 0x07);
-		//if (!space.debugger_access() && !ae) logerror("TPI1\n");
+		//if (!space.debugger_access()) logerror("TPI1\n");
 	}
 	else if (!datxen && !tript2cs)
 	{
 		data = m_tpi2->read(space, offset & 0x07);
-		//if (!space.debugger_access() && !ae) logerror("TPI2\n");
+		//if (!space.debugger_access()) logerror("TPI2\n");
 	}
-	//else if (!space.debugger_access() && !ae) logerror("\n");
+	//else //if (!space.debugger_access()) logerror("\n");
 
 	if (!datxen) data = m_exp->read(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
 
@@ -573,7 +571,7 @@ void p500_state::write_memory(address_space &space, offs_t offset, UINT8 data, i
 		&cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs, &aec, &vsysaden);
 /*
 	if (!space.debugger_access())
-	logerror("write %05x %u %u %u %u %u %u %u - %u %u %u %u %u %u %u - %u %u %u %u %u %u - %u %u %u %u %u %u %u - %u %u: ",
+	logerror("w %05x %u %u %u %u %u %u %u - %u %u %u %u %u %u %u - %u %u %u %u %u %u - %u %u %u %u %u %u %u - %u %u : ",
 		offset, datxen, dramxen, clrniben, _64kcasen, casenb, viddaten, viddat_tr,
 		clrnibcs, extbufcs, discromcs, buframcs, charomcs, viccs, vidmatcs,
 		csbank1, csbank2, csbank3, basiclocs, basichics, kernalcs,
@@ -581,12 +579,12 @@ void p500_state::write_memory(address_space &space, offs_t offset, UINT8 data, i
 */
 	if (!aec && !datxen && !_64kcasen)
 	{
-		//logerror("64K RAM\n");
+		//if (!space.debugger_access()) logerror("64K RAM\n");
 		m_ram->pointer()[offset & 0xffff] = data;
 	}
 	else if (!dramxen && casenb && !P3)
 	{
-		//logerror("CASENB\n");
+		//if (!space.debugger_access()) logerror("CASENB\n");
 		switch ((offset >> 15) & 0x07)
 		{
 		case 1: m_ram->pointer()[0x10000 + (offset & 0xffff)] = data; break;
@@ -596,55 +594,55 @@ void p500_state::write_memory(address_space &space, offs_t offset, UINT8 data, i
 	}
 	else if (!datxen && !buframcs)
 	{
-		//logerror("BUFRAM\n");
+		//if (!space.debugger_access()) logerror("BUFRAM\n");
 		m_buffer_ram[offset & 0x7ff] = data;
 	}
 	else if (!vsysaden && clrniben && !clrnibcs)
 	{
-		//logerror("CLRNIB\n");
+		//if (!space.debugger_access()) logerror("CLRNIB\n");
 		m_color_ram[offset & 0x3ff] = data;
 	}
 	else if (!datxen && !vsysaden && !viddaten && !viddat_tr && !vidmatcs)
 	{
-		//logerror("VIDMAT\n");
+		//if (!space.debugger_access()) logerror("VIDMAT\n");
 		m_video_ram[offset & 0x3ff] = data;
 	}
 	else if (vsysaden && !vidmatcs)
 	{
-		//logerror("VIDMAT\n");
+		//if (!space.debugger_access()) logerror("VIDMAT\n");
 		m_video_ram[va & 0x3ff] = data;
 	}
 	else if (!datxen && !viddaten && !viddat_tr && !viccs)
 	{
-		//logerror("VIC\n");
+		//if (!space.debugger_access()) logerror("VIC\n");
 		m_vic->write(space, offset & 0x3f, data);
 	}
 	else if (!datxen && !sidcs)
 	{
-		//logerror("SID\n");
+		//if (!space.debugger_access()) logerror("SID\n");
 		m_sid->write(space, offset & 0x1f, data);
 	}
 	else if (!datxen && !ciacs)
 	{
-		//logerror("CIA\n");
+		//if (!space.debugger_access()) logerror("CIA\n");
 		m_cia->write(space, offset & 0x0f, data);
 	}
 	else if (!datxen && !aciacs)
 	{
-		//logerror("ACIA\n");
+		//if (!space.debugger_access()) logerror("ACIA\n");
 		m_acia->write(space, offset & 0x03, data);
 	}
 	else if (!datxen && !tript1cs)
 	{
-		//logerror("TPI1\n");
+		//if (!space.debugger_access()) logerror("TPI1\n");
 		m_tpi1->write(space, offset & 0x07, data);
 	}
 	else if (!datxen && !tript2cs)
 	{
-		//logerror("TPI2\n");
+		//if (!space.debugger_access()) logerror("TPI2\n");
 		m_tpi2->write(space, offset & 0x07, data);
 	}
-	//else logerror("\n");
+	//else //if (!space.debugger_access()) logerror("\n");
 
 	if (!datxen) m_exp->write(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
 }
