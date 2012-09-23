@@ -207,7 +207,7 @@ void nes_state::machine_reset()
 	if (m_disk_expansion && m_pcb_id == NO_BOARD)
 		m_ppu->set_hblank_callback(fds_irq);
 	else
-		nes_pcb_reset(machine());
+		nes_pcb_reset();
 
 	/* Reset the serial input ports */
 	m_in_0.shift = 0;
