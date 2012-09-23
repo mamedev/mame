@@ -1228,6 +1228,7 @@ Notes:
 #include "cpu/sh2/sh2.h"
 #include "sound/c352.h"
 #include "machine/nvram.h"
+#include "machine/rtc4543.h"
 
 #define S23_BUSCLOCK	(66664460/2)	/* 33MHz CPU bus clock / input, somehow derived from 14.31721 MHz crystal */
 #define S23_H8CLOCK		(14745600)
@@ -1320,6 +1321,7 @@ class namcos23_state : public driver_device
 public:
 	namcos23_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
+        m_rtc(*this, "rtc"),
 		m_shared_ram(*this, "shared_ram"),
 		m_charram(*this, "charram"),
 		m_textram(*this, "textram"),
@@ -1333,6 +1335,7 @@ public:
 	render_t m_render;
 
 	tilemap_t *m_bgtilemap;
+    required_device<rtc4543_device> m_rtc;
 	required_shared_ptr<UINT32> m_shared_ram;
 	required_shared_ptr<UINT32> m_charram;
 	required_shared_ptr<UINT32> m_textram;
@@ -2610,57 +2613,21 @@ READ8_MEMBER(namcos23_state::s23_mcu_pa_r)
 WRITE8_MEMBER(namcos23_state::s23_mcu_pa_w)
 {
 	// bit 0 = chip enable for the RTC
-	// reset the state on the rising edge of the bit
-	if ((!(m_s23_porta & 1)) && (data & 1))
-	{
-		m_s23_rtcstate = 0;
-	}
-
+    m_rtc->ce_w(data & 1);
 	m_s23_porta = data;
-}
-
-INLINE UINT8 make_bcd(UINT8 data)
-{
-	return ((data / 10) << 4) | (data % 10);
 }
 
 READ8_MEMBER(namcos23_state::s23_mcu_rtc_r)
 {
-	UINT8 ret = 0;
-	system_time systime;
-	static const int weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
+    UINT8 ret = 0;
 
-	machine().current_datetime(systime);
-
-	switch (m_s23_rtcstate)
-	{
-		case 0:
-			ret = make_bcd(systime.local_time.second);	// seconds (BCD, 0-59) in bits 0-6, bit 7 = battery low
-			break;
-		case 1:
-			ret = make_bcd(systime.local_time.minute);	// minutes (BCD, 0-59)
-			break;
-		case 2:
-			ret = make_bcd(systime.local_time.hour);	// hour (BCD, 0-23)
-			break;
-		case 3:
-			ret = make_bcd(weekday[systime.local_time.weekday]);	// low nibble = day of the week
-			ret |= (make_bcd(systime.local_time.mday) & 0x0f)<<4;	// high nibble = low digit of day
-			break;
-		case 4:
-			ret = (make_bcd(systime.local_time.mday) >> 4);			// low nibble = high digit of day
-			ret |= (make_bcd(systime.local_time.month + 1) & 0x0f)<<4;	// high nibble = low digit of month
-			break;
-		case 5:
-			ret = make_bcd(systime.local_time.month + 1) >> 4;	// low nibble = high digit of month
-			ret |= (make_bcd(systime.local_time.year % 10) << 4);	// high nibble = low digit of year
-			break;
-		case 6:
-			ret = make_bcd(systime.local_time.year % 100) >> 4;	// low nibble = tens digit of year (BCD, 0-9)
-			break;
-	}
-
-	m_s23_rtcstate++;
+    for (int i = 0; i < 8; i++)
+    {
+        m_rtc->clk_w(0);
+        m_rtc->clk_w(1);
+        ret <<= 1;
+        ret |= m_rtc->data_r();
+    }
 
 	return ret;
 }
@@ -3161,6 +3128,8 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
+    MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
@@ -3206,6 +3175,8 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
+    MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
@@ -3246,6 +3217,8 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  irq1_line_pulse)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+
+    MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
