@@ -292,6 +292,8 @@ An additional control PCB is used for Mocap Golf for the golf club sensor. It co
 #define VIPER_DEBUG_LOG
 #define VIPER_DEBUG_EPIC_INTS		1
 #define VIPER_DEBUG_EPIC_TIMERS		0
+#define VIPER_DEBUG_EPIC_REGS		0
+#define VIPER_DEBUG_EPIC_I2C		0
 
 
 #define SDRAM_CLOCK			166666666		// Main SDRAMs run at 166MHz
@@ -491,6 +493,7 @@ struct MPC8240_EPIC
 // TODO: move to viper_state
 static MPC8240_EPIC epic;
 
+#if VIPER_DEBUG_EPIC_REGS
 static const char* epic_get_register_name(UINT32 reg)
 {
 	switch (reg >> 16)
@@ -604,6 +607,7 @@ static const char* epic_get_register_name(UINT32 reg)
 
 	return NULL;
 }
+#endif
 
 static TIMER_CALLBACK(epic_global_timer_callback)
 {
@@ -682,6 +686,7 @@ READ32_MEMBER(viper_state::epic_r)
 	int reg;
 	reg = offset * 4;
 
+#if VIPER_DEBUG_EPIC_REGS
 	if (reg != 0x600a0)		// IACK is spammy
 	{
 		const char *regname = epic_get_register_name(reg);
@@ -694,6 +699,9 @@ READ32_MEMBER(viper_state::epic_r)
 			printf("EPIC: read %08X at %08X\n", reg, space.device().safe_pc());
 		}
 	}
+#endif
+
+	UINT32 ret = 0;
 
 	switch (reg >> 16)
 	{
@@ -704,19 +712,23 @@ READ32_MEMBER(viper_state::epic_r)
 			{
 				case 0x3000:			// Offset 0x3000 - I2CADR
 				{
-					return epic.i2c_adr;
+					ret = epic.i2c_adr;
+					break;
 				}
 				case 0x3004:			// Offset 0x3004 - I2CFDR
 				{
-					return epic.i2c_freq_div | (epic.i2c_freq_sample_rate << 8);
+					ret = epic.i2c_freq_div | (epic.i2c_freq_sample_rate << 8);
+					break;
 				}
 				case 0x3008:			// Offset 0x3008 - I2CCR
 				{
-					return epic.i2c_cr;
+					ret = epic.i2c_cr;
+					break;
 				}
 				case 0x300c:			// Offset 0x300c - I2CSR
 				{
-					return epic.i2c_sr;
+					ret = epic.i2c_sr;
+					break;
 				}
 				case 0x3010:			// Offset 0x3010 - I2CDR
 				{
@@ -778,12 +790,12 @@ READ32_MEMBER(viper_state::epic_r)
 				case 0x11e0:			// Offset 0x411e0 - Global Timer 3 vector/priority register
 				{
 					int timer_num = ((reg & 0xffff) - 0x1120) >> 6;
-					UINT32 value = 0;
-					value |= epic.irq[MPC8240_GTIMER0_IRQ + timer_num].mask ? 0x80000000 : 0;
-					value |= epic.irq[MPC8240_GTIMER0_IRQ + timer_num].priority << 16;
-					value |= epic.irq[MPC8240_GTIMER0_IRQ + timer_num].vector;
-					value |= epic.irq[MPC8240_GTIMER0_IRQ + timer_num].active ? 0x40000000 : 0;
-					return value;
+
+					ret |= epic.irq[MPC8240_GTIMER0_IRQ + timer_num].mask ? 0x80000000 : 0;
+					ret |= epic.irq[MPC8240_GTIMER0_IRQ + timer_num].priority << 16;
+					ret |= epic.irq[MPC8240_GTIMER0_IRQ + timer_num].vector;
+					ret |= epic.irq[MPC8240_GTIMER0_IRQ + timer_num].active ? 0x40000000 : 0;
+					break;
 				}
 			}
 			break;
@@ -812,23 +824,20 @@ READ32_MEMBER(viper_state::epic_r)
 				case 0x03e0:			// Offset 0x503e0 - IRQ15 vector/priority register
 				{
 					int irq = ((reg & 0xffff) - 0x200) >> 5;
-					int value = 0;
 
-					value |= epic.irq[MPC8240_IRQ0 + irq].mask ? 0x80000000 : 0;
-					value |= epic.irq[MPC8240_IRQ0 + irq].priority << 16;
-					value |= epic.irq[MPC8240_IRQ0 + irq].vector;
-					value |= epic.irq[MPC8240_IRQ0 + irq].active ? 0x40000000 : 0;
-
-					return value;
+					ret |= epic.irq[MPC8240_IRQ0 + irq].mask ? 0x80000000 : 0;
+					ret |= epic.irq[MPC8240_IRQ0 + irq].priority << 16;
+					ret |= epic.irq[MPC8240_IRQ0 + irq].vector;
+					ret |= epic.irq[MPC8240_IRQ0 + irq].active ? 0x40000000 : 0;
+					break;
 				}
 				case 0x1020:			// Offset 0x51020 - I2C IRQ vector/priority register
 				{
-					UINT32 value = 0;
-					value |= epic.irq[MPC8240_I2C_IRQ].mask ? 0x80000000 : 0;
-					value |= epic.irq[MPC8240_I2C_IRQ].priority << 16;
-					value |= epic.irq[MPC8240_I2C_IRQ].vector;
-					value |= epic.irq[MPC8240_I2C_IRQ].active ? 0x40000000 : 0;
-					return value;
+					ret |= epic.irq[MPC8240_I2C_IRQ].mask ? 0x80000000 : 0;
+					ret |= epic.irq[MPC8240_I2C_IRQ].priority << 16;
+					ret |= epic.irq[MPC8240_I2C_IRQ].vector;
+					ret |= epic.irq[MPC8240_I2C_IRQ].active ? 0x40000000 : 0;
+					return ret;
 				}
 			}
 			break;
@@ -845,13 +854,14 @@ READ32_MEMBER(viper_state::epic_r)
 
 					if (epic.active_irq >= 0)
 					{
-						return epic.iack;
+						ret = epic.iack;
 					}
 					else
 					{
 						// spurious vector register is returned if no pending interrupts
-						return epic.svr;
+						ret = epic.svr;
 					}
+					break;
 				}
 
 			}
@@ -859,7 +869,7 @@ READ32_MEMBER(viper_state::epic_r)
 		}
 	}
 
-	return 0;
+	return FLIPENDIAN_INT32(ret);
 }
 
 WRITE32_MEMBER(viper_state::epic_w)
@@ -867,6 +877,9 @@ WRITE32_MEMBER(viper_state::epic_w)
 	int reg;
 	reg = offset * 4;
 
+	data = FLIPENDIAN_INT32(data);
+
+#if VIPER_DEBUG_EPIC_REGS
 	if (reg != 0x600b0)		// interrupt clearing is spammy
 	{
 		const char *regname = epic_get_register_name(reg);
@@ -879,6 +892,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 			printf("EPIC: write %08X, %08X at %08X\n", data, reg, space.device().safe_pc());
 		}
 	}
+#endif
 
 	switch (reg >> 16)
 	{
@@ -921,10 +935,12 @@ WRITE32_MEMBER(viper_state::epic_w)
 					{
 						if (epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)			// waiting for address cycle
 						{
-							int addr = (data >> 1) & 0x7f;
 							//int rw = data & 1;
 
+#if VIPER_DEBUG_EPIC_I2C
+							int addr = (data >> 1) & 0x7f;
 							printf("I2C address cycle, addr = %02X\n", addr);
+#endif
 							epic.i2c_state = I2C_STATE_DATA_TRANSFER;
 
 							// set transfer complete in status register
@@ -933,7 +949,9 @@ WRITE32_MEMBER(viper_state::epic_w)
 							// generate interrupt if interrupt are enabled
 							if (epic.i2c_cr & 0x40)
 							{
+#if VIPER_DEBUG_EPIC_I2C
 								printf("I2C interrupt\n");
+#endif
 								mpc8240_interrupt(machine(), MPC8240_I2C_IRQ);
 
 								// set interrupt flag in status register
@@ -942,7 +960,9 @@ WRITE32_MEMBER(viper_state::epic_w)
 						}
 						else if (epic.i2c_state == I2C_STATE_DATA_TRANSFER)		// waiting for data transfer
 						{
+#if VIPER_DEBUG_EPIC_I2C
 							printf("I2C data transfer, data = %02X\n", data);
+#endif
 							epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
 
 							// set transfer complete in status register
@@ -951,7 +971,9 @@ WRITE32_MEMBER(viper_state::epic_w)
 							// generate interrupt if interrupts are enabled
 							if (epic.i2c_cr & 0x40)
 							{
+#if VIPER_DEBUG_EPIC_I2C
 								printf("I2C interrupt\n");
+#endif
 								mpc8240_interrupt(machine(), MPC8240_I2C_IRQ);
 
 								// set interrupt flag in status register
