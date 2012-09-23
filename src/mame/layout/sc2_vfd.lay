@@ -14,15 +14,6 @@
 			<color red="0.0" green="1.0" blue="0.0" />
 		</rect>
 	</element>
-	<element name="door0" defstate="1">
-		<rect state="0">
-			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>
-		<text string="DOOR OPEN" state="0">
-			<color red="1.0" green="1.0" blue="1.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
-		</text>
-	</element>
 	<element name="vfd0">
 	<led14segsc>
 			<color red="0" green="0.6" blue="1.0" />
@@ -798,9 +789,6 @@
 		<backdrop name="lamp255" element="matrixlamp" state="0">
 			<bounds x="120" y="120" width="7" height="7"/>
 		</backdrop>
-		<bezel name="door" element="door0">
-			<bounds x="370" y="270" width="30" height="10" />
-		</bezel>
 		<backdrop name="vfd0" element="vfd0" state="0">
 			<bounds x="0" y="280" width="9" height="14"/>
 		</backdrop>
