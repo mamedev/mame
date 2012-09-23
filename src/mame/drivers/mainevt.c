@@ -554,11 +554,10 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-/* 4 players - English title screen - No "Warning" message in the ROM */
 
-ROM_START( mainevt )
+ROM_START( mainevt )	/* 4 players - English title screen - No "Warning" message in the ROM */
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "799c02.k11",   0x10000, 0x08000, CRC(e2e7dbd5) SHA1(80314cd42a9f47f7bb82a2160fb5ef2ddc6dff30) )
+	ROM_LOAD( "799y02.k11",   0x10000, 0x08000, CRC(e2e7dbd5) SHA1(80314cd42a9f47f7bb82a2160fb5ef2ddc6dff30) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
@@ -584,12 +583,9 @@ ROM_START( mainevt )
 	ROM_LOAD( "799b06.c22",   0x00000, 0x80000, CRC(2c8c47d7) SHA1(18a899767177ddfd870df9ed156d8bbc04b58a19) )
 ROM_END
 
-
-/* 4 players - English title screen - No "Warning" message in the ROM */
-
-ROM_START( mainevto )
+ROM_START( mainevto )	/* 4 players - English title screen - No "Warning" message in the ROM */
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "799_02.k11",   0x10000, 0x08000, CRC(c143596b) SHA1(5da7efaf0f7c7a493cc242eae115f278bc9c134b) )
+	ROM_LOAD( "799f02.k11",   0x10000, 0x08000, CRC(c143596b) SHA1(5da7efaf0f7c7a493cc242eae115f278bc9c134b) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
@@ -615,10 +611,7 @@ ROM_START( mainevto )
 	ROM_LOAD( "799b06.c22",   0x00000, 0x80000, CRC(2c8c47d7) SHA1(18a899767177ddfd870df9ed156d8bbc04b58a19) )
 ROM_END
 
-
-/* 2 players - English title screen - "Warning" message in the ROM (not displayed) */
-
-ROM_START( mainevt2p )
+ROM_START( mainevt2p )	/* 2 players - English title screen - "Warning" message in the ROM (not displayed) */
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "799x02.k11",   0x10000, 0x08000, CRC(42cfc650) SHA1(2d1918ebc0d93a2356ad995a6854dbde7c3b8daf) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
@@ -646,10 +639,7 @@ ROM_START( mainevt2p )
 	ROM_LOAD( "799b06.c22",   0x00000, 0x80000, CRC(2c8c47d7) SHA1(18a899767177ddfd870df9ed156d8bbc04b58a19) )
 ROM_END
 
-
-/* 2 players - Japan title screen - "Warning" message in the ROM (displayed) */
-
-ROM_START( ringohja )
+ROM_START( ringohja )	/* 2 players - Japan title screen - "Warning" message in the ROM (displayed) */
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "799n02.k11",   0x10000, 0x08000, CRC(f9305dd0) SHA1(7135053be9d46ac9c09ab63eca1eb71825a71a13) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
@@ -676,6 +666,7 @@ ROM_START( ringohja )
 	ROM_REGION( 0x80000, "upd", 0 )	/* 512k for the UPD7759C samples */
 	ROM_LOAD( "799b06.c22",   0x00000, 0x80000, CRC(2c8c47d7) SHA1(18a899767177ddfd870df9ed156d8bbc04b58a19) )
 ROM_END
+
 
 ROM_START( devstors )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -729,7 +720,7 @@ ROM_END
 
 ROM_START( devstors3 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "890k02.k11",   0x10000, 0x08000, CRC(52f4ccdd) SHA1(074e526ed170a5f2083c8c0808734291a2ea7403) )
+	ROM_LOAD( "890k02.k11",   0x10000, 0x08000, CRC(52f4ccdd) SHA1(074e526ed170a5f2083c8c0808734291a2ea7403) ) /* Most likely should be 890v02.k11 */
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
