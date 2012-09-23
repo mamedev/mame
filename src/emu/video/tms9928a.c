@@ -70,7 +70,7 @@ ADDRESS_MAP_END
     E Gray          0.80    0.47    0.47    0.80    0.80    0.80    204 204 204
     F White         1.00    0.47    0.47    1.00    1.00    1.00    255 255 255
 */
-static const rgb_t tms9928a_palette[16] =
+static const rgb_t tms9928a_palette[TMS9928A_PALETTE_SIZE] =
 {
 	RGB_BLACK,
 	RGB_BLACK,
@@ -93,22 +93,22 @@ static const rgb_t tms9928a_palette[16] =
 tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_50hz, bool is_reva )
 	: device_t( mconfig, type, name, tag, owner, clock ),
 	  device_memory_interface(mconfig, *this),
-	  m_space_config("vram", ENDIANNESS_BIG, 8, 14)
+      m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(memmap))
 {
 	m_50hz = is_50hz;
 	m_reva = is_reva;
-	static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
+//	static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
 
 
 tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
 	: device_t( mconfig, TMS9928A, "TMS9928A", tag, owner, clock ),
 	  device_memory_interface(mconfig, *this),
-	  m_space_config("vram", ENDIANNESS_BIG, 8, 14)
+    m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(memmap))
 {
 	m_50hz = false;
 	m_reva = true;
-	static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
+//	static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
 
 
@@ -163,7 +163,7 @@ void tms9928a_device::update_backdrop()
 {
 	// update backdrop colour to transparent if EXTVID bit is set
 	if ((m_Regs[7] & 15) == 0)
-		palette_set_color(machine(), 0, MAKE_ARGB(m_Regs[0] & 1 ? 0 : 255,0,0,0));
+		m_palette[0] = MAKE_ARGB(m_Regs[0] & 1 ? 0 : 255,0,0,0);
 }
 
 
@@ -280,7 +280,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	int raw_vpos = m_screen->vpos();
 	int vpos = raw_vpos * m_vertical_size / m_screen->height();
 	UINT16 BackColour = m_Regs[7] & 15;
-	UINT16 *p = &m_tmpbmp.pix16(vpos);
+	UINT32 *p = &m_tmpbmp.pix32(vpos);
 
 	int y = vpos - m_top_border;
 
@@ -288,7 +288,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	{
 		/* Draw backdrop colour */
 		for ( int i = 0; i < TMS9928A_TOTAL_HORZ; i++ )
-			p[i] = BackColour;
+			p[i] = m_palette[BackColour];
 
 		/* vblank is set at the last cycle of the first inactive line */
 		if ( y == 193 )
@@ -303,7 +303,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 		/* Left border */
 		for ( int i = 0; i < TMS9928A_HORZ_DISPLAY_START; i++ )
-			p[i] = BackColour;
+			p[i] = m_palette[BackColour];
 
 		/* Active display */
 
@@ -319,8 +319,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					UINT8 charcode = m_vram_space->read_byte( addr );
 					UINT8 pattern =  m_vram_space->read_byte( m_pattern + ( charcode << 3 ) + ( y & 7 ) );
 					UINT8 colour =  m_vram_space->read_byte( m_colour + ( charcode >> 3 ) );
-					UINT16 fg = (colour >> 4) ? (colour >> 4) : BackColour;
-					UINT16 bg = (colour & 15) ? (colour & 15) : BackColour;
+					rgb_t fg = m_palette[(colour >> 4) ? (colour >> 4) : BackColour];
+					rgb_t bg = m_palette[(colour & 15) ? (colour & 15) : BackColour];
 
 					for ( int i = 0; i < 8; pattern <<= 1, i++ )
 						p[x+i] = ( pattern & 0x80 ) ? fg : bg;
@@ -332,8 +332,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			//if (vpos==100 ) popmessage("TMS9928A MODE 1");
 			{
 				UINT16 addr = m_nametbl + ( ( y >> 3 ) * 40 );
-				UINT16 fg = (m_Regs[7] >> 4) ? (m_Regs[7] >> 4) : BackColour;
-				UINT16 bg = BackColour;
+				rgb_t fg = m_palette[(m_Regs[7] >> 4) ? (m_Regs[7] >> 4) : BackColour];
+				rgb_t bg = m_palette[BackColour];
 
 				/* Extra 6 pixels left border */
 				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 6; x++ )
@@ -364,8 +364,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					UINT16 charcode =  m_vram_space->read_byte( addr ) + ( ( y >> 6 ) << 8 );
 					UINT8 pattern =  m_vram_space->read_byte( m_pattern + ( ( charcode & m_patternmask ) << 3 ) + ( y & 7 ) );
 					UINT8 colour =  m_vram_space->read_byte( m_colour + ( ( charcode & m_colourmask ) << 3 ) + ( y & 7 ) );
-					UINT16 fg = (colour >> 4) ? (colour >> 4) : BackColour;
-					UINT16 bg = (colour & 15) ? (colour & 15) : BackColour;
+					rgb_t fg = m_palette[(colour >> 4) ? (colour >> 4) : BackColour];
+					rgb_t bg = m_palette[(colour & 15) ? (colour & 15) : BackColour];
 
 					for ( int i = 0; i < 8; pattern <<= 1, i++ )
 						p[x+i] = ( pattern & 0x80 ) ? fg : bg;
@@ -377,8 +377,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			//if (vpos==100) popmessage("TMS9928A MODE1+2");
 			{
 				UINT16 addr = m_nametbl + ( ( y >> 3 ) * 40 );
-				UINT16 fg = (m_Regs[7] >> 4) ? (m_Regs[7] >> 4) : BackColour;
-				UINT16 bg = BackColour;
+				rgb_t fg = m_palette[(m_Regs[7] >> 4) ? (m_Regs[7] >> 4) : BackColour];
+				rgb_t bg = m_palette[BackColour];
 
 				/* Extra 6 pixels left border */
 				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 6; x++ )
@@ -408,8 +408,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				{
 					UINT8 charcode =  m_vram_space->read_byte( addr );
 					UINT8 colour =  m_vram_space->read_byte( m_pattern + ( charcode << 3 ) + ( ( y >> 2 ) & 7 ) );
-					UINT16 fg = (colour >> 4) ? (colour >> 4) : BackColour;
-					UINT16 bg = (colour & 15) ? (colour & 15) : BackColour;
+					rgb_t fg = m_palette[(colour >> 4) ? (colour >> 4) : BackColour];
+					rgb_t bg = m_palette[(colour & 15) ? (colour & 15) : BackColour];
 
 					p[x+0] = p[x+1] = p[x+2] = p[x+3] = fg;
 					p[x+4] = p[x+5] = p[x+6] = p[x+7] = bg;
@@ -420,8 +420,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		case 5:	case 7:		/* MODE bogus */
 			//if (vpos==100 ) popmessage("TMS9928A MODE bogus");
 			{
-				UINT16 fg = (m_Regs[7] >> 4) ? (m_Regs[7] >> 4) : BackColour;
-				UINT16 bg = BackColour;
+				rgb_t fg = m_palette[(m_Regs[7] >> 4) ? (m_Regs[7] >> 4) : BackColour];
+				rgb_t bg = m_palette[BackColour];
 
 				/* Extra 6 pixels left border */
 				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 6; x++ )
@@ -448,8 +448,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				{
 					UINT8 charcode =  m_vram_space->read_byte( addr );
 					UINT8 colour =  m_vram_space->read_byte( m_pattern + ( ( ( charcode + ( ( y >> 2 ) & 7 ) + ( ( y >> 6 ) << 8 ) ) & m_patternmask ) << 3 ) );
-					UINT16 fg = (colour >> 4) ? (colour >> 4) : BackColour;
-					UINT16 bg = (colour & 15) ? (colour & 15) : BackColour;
+					rgb_t fg = m_palette[(colour >> 4) ? (colour >> 4) : BackColour];
+					rgb_t bg = m_palette[(colour & 15) ? (colour & 15) : BackColour];
 
 					p[x+0] = p[x+1] = p[x+2] = p[x+3] = fg;
 					p[x+4] = p[x+5] = p[x+6] = p[x+7] = bg;
@@ -542,7 +542,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 											if ( ! ( spr_drawn[ colission_index ] & 0x02 ) )
 											{
 												spr_drawn[ colission_index ] |= 0x02;
-												p[ TMS9928A_HORZ_DISPLAY_START + colission_index - 32 ] = sprcol;
+												p[ TMS9928A_HORZ_DISPLAY_START + colission_index - 32 ] = m_palette[sprcol];
 											}
 										}
 									}
@@ -567,7 +567,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 		/* Right border */
 		for ( int i = TMS9928A_HORZ_DISPLAY_START + 256; i < TMS9928A_TOTAL_HORZ; i++ )
-			p[i] = BackColour;
+			p[i] = m_palette[BackColour];
 	}
 
 	/* Schedule next callback */
@@ -575,7 +575,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 }
 
 
-UINT32 tms9928a_device::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+UINT32 tms9928a_device::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	copybitmap( bitmap, m_tmpbmp, 0, 0, 0, 0, cliprect );
 	return 0;
@@ -600,7 +600,8 @@ void tms9928a_device::device_config_complete()
 
 void tms9928a_device::device_start()
 {
-	m_screen = machine().device<screen_device>( m_screen_tag );
+    astring tempstring;
+    m_screen = downcast<screen_device *>(machine().device(siblingtag(tempstring,m_screen_tag)));
 	assert( m_screen != NULL );
 
 	m_top_border = m_50hz ? TMS9928A_VERT_DISPLAY_START_PAL : TMS9928A_VERT_DISPLAY_START_NTSC;
@@ -616,7 +617,11 @@ void tms9928a_device::device_start()
 
 	m_line_timer = timer_alloc(TIMER_LINE);
 
-	palette_set_colors(machine(), 0, tms9928a_palette, TMS9928A_PALETTE_SIZE);
+	/* copy default palette into working palette */
+    for (int i = 0; i < TMS9928A_PALETTE_SIZE; i++)
+    {
+		m_palette[i] = tms9928a_palette[i];
+    }
 
 	save_item(NAME(m_Regs[0]));
 	save_item(NAME(m_Regs[1]));
@@ -641,6 +646,7 @@ void tms9928a_device::device_start()
 	save_item(NAME(m_spriteattribute));
 	save_item(NAME(m_spritepattern));
 	save_item(NAME(m_mode));
+	save_item(NAME(m_palette));
 }
 
 

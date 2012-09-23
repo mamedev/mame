@@ -49,8 +49,7 @@
 
 #define MCFG_TMS9928A_ADD(_tag, _variant, _config) \
 	MCFG_DEVICE_ADD(_tag, _variant, XTAL_10_738635MHz / 2 ) \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_PALETTE_LENGTH(TMS9928A_PALETTE_SIZE) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 #define MCFG_TMS9928A_SCREEN_ADD_NTSC(_screen_tag) \
@@ -84,9 +83,6 @@ struct tms9928a_interface
 };
 
 
-PALETTE_INIT( tms9928a );
-
-
 class tms9928a_device :	public device_t,
 						public device_memory_interface,
 						public tms9928a_interface
@@ -102,8 +98,8 @@ public:
 	DECLARE_WRITE8_MEMBER( register_write );
 
 	/* update the screen */
-	UINT32 screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	bitmap_ind16 &get_bitmap() { return m_tmpbmp; }
+	UINT32 screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	bitmap_rgb32 &get_bitmap() { return m_tmpbmp; }
 
 	/* RESET pin */
 	void reset_line(int state) { if (state==ASSERT_LINE) device_reset(); }
@@ -145,12 +141,13 @@ private:
 	devcb_resolved_write_line	m_irq_changed;
 	bool	m_50hz;
 	bool	m_reva;
+	rgb_t	m_palette[16];
 
 	/* memory */
 	const address_space_config		m_space_config;
 	address_space*					m_vram_space;
 
-	bitmap_ind16 m_tmpbmp;
+	bitmap_rgb32 m_tmpbmp;
 	emu_timer	*m_line_timer;
 	UINT8		m_mode;
 

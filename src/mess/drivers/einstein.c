@@ -486,11 +486,10 @@ UINT32 einstein_state::screen_update_einstein2(screen_device &screen, bitmap_rgb
 	if (&screen == m_color_screen)
 	{
 		tms9929a_device *tms9929a = machine().device<tms9929a_device>( "tms9929a" );
-		const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-		bitmap_ind16 &src = tms9929a->get_bitmap();
+		bitmap_rgb32 &src = tms9929a->get_bitmap();
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-				bitmap.pix32(y, x) = palette[src.pix16(y, x)];
+				bitmap.pix32(y, x) = src.pix32(y, x);
 	}
 	else if (&screen == m_crtc_screen)
 		m_mc6845->screen_update( screen, bitmap, cliprect);
