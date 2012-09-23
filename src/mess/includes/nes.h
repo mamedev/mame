@@ -67,6 +67,7 @@ public:
 	void init_nes_core();
 	void pcb_handlers_setup();
 	int pcb_initialize(int idx);
+	int nes_pcb_reset();
 
 	DECLARE_WRITE8_MEMBER(nes_chr_w);
 	DECLARE_READ8_MEMBER(nes_chr_r);

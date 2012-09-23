@@ -13109,20 +13109,19 @@ int nes_state::pcb_initialize( int idx )
 
  *************************************************************/
 
-int nes_pcb_reset( running_machine &machine )
+int nes_state::nes_pcb_reset()
 {
-	nes_state *state = machine.driver_data<nes_state>();
 	int err = 0;
-	const nes_pcb_intf *intf = nes_pcb_intf_lookup(state->m_pcb_id);
+	const nes_pcb_intf *intf = nes_pcb_intf_lookup(m_pcb_id);
 
 	if (intf == NULL)
 		fatalerror("Missing PCB interface\n");
 
 	/* Set the mapper irq callback */
-	state->m_ppu->set_scanline_callback(intf ? intf->mmc_scanline : NULL);
-	state->m_ppu->set_hblank_callback(intf ? intf->mmc_hblank : NULL);
+	m_ppu->set_scanline_callback(intf ? intf->mmc_scanline : NULL);
+	m_ppu->set_hblank_callback(intf ? intf->mmc_hblank : NULL);
 
-	err = state->pcb_initialize(state->m_pcb_id);
+	err = pcb_initialize(m_pcb_id);
 
 	return err;
 }
