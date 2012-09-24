@@ -3720,7 +3720,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 	/* first make sure this register is readable */
 	if (!(v->regaccess[regnum] & REGISTER_READ))
 	{
-		logerror("VOODOO.%d.ERROR:Invalid attempt to read %s\n", v->index, v->regnames[regnum]);
+		logerror("VOODOO.%d.ERROR:Invalid attempt to read %s\n", v->index, regnum < 225 ? v->regnames[regnum] : "unknown register");
 		return 0xffffffff;
 	}
 
