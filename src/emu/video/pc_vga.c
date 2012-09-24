@@ -2755,11 +2755,17 @@ static UINT8 s3_crtc_reg_read(running_machine &machine, UINT8 index)
 			case 0x4f:
 				res = s3.cursor_pattern_y;
 				break;
+			case 0x51:
+				res = (vga.crtc.start_addr & 0x0c0000) >> 18;
+				break;
 			case 0x55:
 				res = s3.extended_dac_ctrl;
 				break;
 			case 0x67:
 				res = s3.ext_misc_ctrl_2;
+				break;
+			case 0x69:
+				res = vga.crtc.start_addr >> 16;
 				break;
 			case 0x6a:
 				res = svga.bank_r & 0x7f;
@@ -2964,6 +2970,9 @@ bit  0-5  Pattern Display Start Y-Pixel Position.
 			case 0x51:
 				vga.crtc.start_addr &= ~0xc0000;
 				vga.crtc.start_addr |= ((data & 0x3) << 18);
+				svga.bank_w = (svga.bank_w & 0xcf) | ((data & 0x0c) << 2);
+				svga.bank_r = svga.bank_r;
+				s3_define_video_mode();
 				break;
 			case 0x53:
 				s3.cr53 = data;
@@ -2996,10 +3005,14 @@ bit 0-1  DAC Register Select Bits. Passed to the RS2 and RS3 pins on the
 				s3.ext_misc_ctrl_2 = data;
 				s3_define_video_mode();
 				//printf("%02x X\n",data);
-				//debugger_break(machine);
+				break;
+			case 0x69:
+				vga.crtc.start_addr &= ~0x1f0000;
+				vga.crtc.start_addr |= ((data & 0x1f) << 16);
+				s3_define_video_mode();
 				break;
 			case 0x6a:
-				svga.bank_w = data & 0xf;
+				svga.bank_w = data & 0x3f;
 				svga.bank_r = svga.bank_w;
 				if(data & 0x60)
 					fatalerror("TODO: s3 bank selects above 1M\n");
