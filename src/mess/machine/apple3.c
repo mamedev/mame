@@ -627,10 +627,10 @@ READ8_MEMBER(apple3_state::apple3_indexed_read)
 {
 	UINT8 result;
 	UINT8 *addr;
-
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	addr = apple3_get_indexed_addr(machine(),offset);
 	if (!addr)
-		result = space.read_byte(offset);
+		result = prog_space.read_byte(offset);
 	else if (addr != (UINT8 *) ~0)
 		result = *addr;
 	else
@@ -643,10 +643,10 @@ READ8_MEMBER(apple3_state::apple3_indexed_read)
 WRITE8_MEMBER(apple3_state::apple3_indexed_write)
 {
 	UINT8 *addr;
-
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	addr = apple3_get_indexed_addr(machine(),offset);
 	if (!addr)
-		space.write_byte(offset, data);
+		prog_space.write_byte(offset, data);
 	else if (addr != (UINT8 *) ~0)
 		*addr = data;
 }
