@@ -180,6 +180,8 @@ private:
 	emu_timer *m_cassette_timer;
 public:
 	DECLARE_DRIVER_INIT(sol20);
+	TIMER_CALLBACK_MEMBER(sol20_cassette_tc);
+	TIMER_CALLBACK_MEMBER(sol20_boot);
 };
 
 
@@ -197,89 +199,88 @@ static cassette_image_device *cassette_device_image(running_machine &machine)
 
 
 // identical to sorcerer
-static TIMER_CALLBACK(sol20_cassette_tc)
+TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 {
-	sol20_state *state = machine.driver_data<sol20_state>();
 	UINT8 cass_ws = 0;
-	switch (state->m_sol20_fa & 0x20)
+	switch (m_sol20_fa & 0x20)
 	{
 		case 0x20:				/* Cassette 300 baud */
 
 			/* loading a tape - this is basically the same as the super80.
                            We convert the 1200/2400 Hz signal to a 0 or 1, and send it to the uart. */
 
-			state->m_cass_data.input.length++;
+			m_cass_data.input.length++;
 
-			cass_ws = ((cassette_device_image(machine))->input() > +0.02) ? 1 : 0;
+			cass_ws = ((cassette_device_image(machine()))->input() > +0.02) ? 1 : 0;
 
-			if (cass_ws != state->m_cass_data.input.level)
+			if (cass_ws != m_cass_data.input.level)
 			{
-				state->m_cass_data.input.level = cass_ws;
-				state->m_cass_data.input.bit = ((state->m_cass_data.input.length < 0x6) || (state->m_cass_data.input.length > 0x20)) ? 1 : 0;
-				state->m_cass_data.input.length = 0;
-				ay31015_set_input_pin( state->m_uart, AY31015_SI, state->m_cass_data.input.bit );
+				m_cass_data.input.level = cass_ws;
+				m_cass_data.input.bit = ((m_cass_data.input.length < 0x6) || (m_cass_data.input.length > 0x20)) ? 1 : 0;
+				m_cass_data.input.length = 0;
+				ay31015_set_input_pin( m_uart, AY31015_SI, m_cass_data.input.bit );
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 1200 and 2400 Hz frequencies.
                            Synchronisation of the frequency pulses to the uart is extremely important. */
 
-			state->m_cass_data.output.length++;
-			if (!(state->m_cass_data.output.length & 0x1f))
+			m_cass_data.output.length++;
+			if (!(m_cass_data.output.length & 0x1f))
 			{
-				cass_ws = ay31015_get_output_pin( state->m_uart, AY31015_SO );
-				if (cass_ws != state->m_cass_data.output.bit)
+				cass_ws = ay31015_get_output_pin( m_uart, AY31015_SO );
+				if (cass_ws != m_cass_data.output.bit)
 				{
-					state->m_cass_data.output.bit = cass_ws;
-					state->m_cass_data.output.length = 0;
+					m_cass_data.output.bit = cass_ws;
+					m_cass_data.output.length = 0;
 				}
 			}
 
-			if (!(state->m_cass_data.output.length & 3))
+			if (!(m_cass_data.output.length & 3))
 			{
-				if (!((state->m_cass_data.output.bit == 0) && (state->m_cass_data.output.length & 4)))
+				if (!((m_cass_data.output.bit == 0) && (m_cass_data.output.length & 4)))
 				{
-					state->m_cass_data.output.level ^= 1;			// toggle output state, except on 2nd half of low bit
-					cassette_device_image(machine)->output(state->m_cass_data.output.level ? -1.0 : +1.0);
+					m_cass_data.output.level ^= 1;			// toggle output this, except on 2nd half of low bit
+					cassette_device_image(machine())->output(m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;
 
 		case 0x00:			/* Cassette 1200 baud */
 			/* loading a tape */
-			state->m_cass_data.input.length++;
+			m_cass_data.input.length++;
 
-			cass_ws = ((cassette_device_image(machine))->input() > +0.02) ? 1 : 0;
+			cass_ws = ((cassette_device_image(machine()))->input() > +0.02) ? 1 : 0;
 
-			if (cass_ws != state->m_cass_data.input.level || state->m_cass_data.input.length == 10)
+			if (cass_ws != m_cass_data.input.level || m_cass_data.input.length == 10)
 			{
-				state->m_cass_data.input.bit = ((state->m_cass_data.input.length < 10) || (state->m_cass_data.input.length > 0x20)) ? 1 : 0;
-				if ( cass_ws != state->m_cass_data.input.level )
+				m_cass_data.input.bit = ((m_cass_data.input.length < 10) || (m_cass_data.input.length > 0x20)) ? 1 : 0;
+				if ( cass_ws != m_cass_data.input.level )
 				{
-					state->m_cass_data.input.length = 0;
-					state->m_cass_data.input.level = cass_ws;
+					m_cass_data.input.length = 0;
+					m_cass_data.input.level = cass_ws;
 				}
-				ay31015_set_input_pin( state->m_uart, AY31015_SI, state->m_cass_data.input.bit );
+				ay31015_set_input_pin( m_uart, AY31015_SI, m_cass_data.input.bit );
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 600 and 1200 Hz frequencies. */
 
-			state->m_cass_data.output.length++;
-			if (!(state->m_cass_data.output.length & 7))
+			m_cass_data.output.length++;
+			if (!(m_cass_data.output.length & 7))
 			{
-				cass_ws = ay31015_get_output_pin( state->m_uart, AY31015_SO );
-				if (cass_ws != state->m_cass_data.output.bit)
+				cass_ws = ay31015_get_output_pin( m_uart, AY31015_SO );
+				if (cass_ws != m_cass_data.output.bit)
 				{
-					state->m_cass_data.output.bit = cass_ws;
-					state->m_cass_data.output.length = 0;
+					m_cass_data.output.bit = cass_ws;
+					m_cass_data.output.length = 0;
 				}
 			}
 
-			if (!(state->m_cass_data.output.length & 7))
+			if (!(m_cass_data.output.length & 7))
 			{
-				if (!((state->m_cass_data.output.bit == 0) && (state->m_cass_data.output.length & 8)))
+				if (!((m_cass_data.output.bit == 0) && (m_cass_data.output.length & 8)))
 				{
-					state->m_cass_data.output.level ^= 1;			// toggle output state, except on 2nd half of low bit
-					cassette_device_image(machine)->output(state->m_cass_data.output.level ? -1.0 : +1.0);
+					m_cass_data.output.level ^= 1;			// toggle output this, except on 2nd half of low bit
+					cassette_device_image(machine())->output(m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;
@@ -538,15 +539,14 @@ static const cassette_interface sol20_cassette_interface =
 };
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
-static TIMER_CALLBACK( sol20_boot )
+TIMER_CALLBACK_MEMBER(sol20_state::sol20_boot)
 {
-	sol20_state *state = machine.driver_data<sol20_state>();
-	state->membank("boot")->set_entry(0);
+	membank("boot")->set_entry(0);
 }
 
 void sol20_state::machine_start()
 {
-	m_cassette_timer = machine().scheduler().timer_alloc(FUNC(sol20_cassette_tc));
+	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sol20_state::sol20_cassette_tc),this));
 }
 
 void sol20_state::machine_reset()
@@ -598,7 +598,7 @@ void sol20_state::machine_reset()
 
 	// boot-bank
 	membank("boot")->set_entry(1);
-	machine().scheduler().timer_set(attotime::from_usec(9), FUNC(sol20_boot));
+	machine().scheduler().timer_set(attotime::from_usec(9), timer_expired_delegate(FUNC(sol20_state::sol20_boot),this));
 }
 
 DRIVER_INIT_MEMBER(sol20_state,sol20)

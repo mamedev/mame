@@ -51,6 +51,7 @@ public:
 	void kb_matrix_w(running_machine &machine, UINT8 matrix);
 	UINT16 read_touchscreen(running_machine &machine, UINT8 line);
 	virtual void palette_init();
+	TIMER_CALLBACK_MEMBER(keyboard_timer);
 };
 
 static ADDRESS_MAP_START(pb1000_mem, AS_PROGRAM, 16, pb1000_state)
@@ -482,17 +483,17 @@ static const hd61700_config pb2000c_config =
 	port_w              	//8 bit port  write
 };
 
-static TIMER_CALLBACK( keyboard_timer )
+TIMER_CALLBACK_MEMBER(pb1000_state::keyboard_timer)
 {
-	machine.device("maincpu")->execute().set_input_line(HD61700_KEY_INT, ASSERT_LINE);
-	machine.device("maincpu")->execute().set_input_line(HD61700_KEY_INT, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(HD61700_KEY_INT, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(HD61700_KEY_INT, CLEAR_LINE);
 }
 
 void pb1000_state::machine_start()
 {
 	membank("bank1")->set_base(machine().root_device().memregion("rom")->base());
 
-	m_kb_timer = machine().scheduler().timer_alloc(FUNC(keyboard_timer));
+	m_kb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pb1000_state::keyboard_timer),this));
 	m_kb_timer->adjust(attotime::from_hz(192), 0, attotime::from_hz(192));
 }
 

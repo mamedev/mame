@@ -248,6 +248,8 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_ssfindo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ssfindo_interrupt);
+	TIMER_CALLBACK_MEMBER(PS7500_Timer0_callback);
+	TIMER_CALLBACK_MEMBER(PS7500_Timer1_callback);
 };
 
 
@@ -290,13 +292,12 @@ WRITE32_MEMBER(ssfindo_state::FIFO_w)
 		m_PS7500_FIFO[1]++; //autoinc
 	}
 }
-static TIMER_CALLBACK( PS7500_Timer0_callback )
+TIMER_CALLBACK_MEMBER(ssfindo_state::PS7500_Timer0_callback)
 {
-	ssfindo_state *state = machine.driver_data<ssfindo_state>();
-	state->m_PS7500_IO[IRQSTA]|=0x20;
-	if(state->m_PS7500_IO[IRQMSKA]&0x20)
+	m_PS7500_IO[IRQSTA]|=0x20;
+	if(m_PS7500_IO[IRQMSKA]&0x20)
 	{
-		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE, 1);
+		generic_pulse_irq_line(machine().device("maincpu")->execute(), ARM7_IRQ_LINE, 1);
 	}
 }
 
@@ -311,13 +312,12 @@ static void PS7500_startTimer0(running_machine &machine)
 		state->m_PS7500timer0->adjust(attotime::from_usec(val ), 0, attotime::from_usec(val ));
 }
 
-static TIMER_CALLBACK( PS7500_Timer1_callback )
+TIMER_CALLBACK_MEMBER(ssfindo_state::PS7500_Timer1_callback)
 {
-	ssfindo_state *state = machine.driver_data<ssfindo_state>();
-	state->m_PS7500_IO[IRQSTA]|=0x40;
-	if(state->m_PS7500_IO[IRQMSKA]&0x40)
+	m_PS7500_IO[IRQSTA]|=0x40;
+	if(m_PS7500_IO[IRQMSKA]&0x40)
 	{
-		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE, 1);
+		generic_pulse_irq_line(machine().device("maincpu")->execute(), ARM7_IRQ_LINE, 1);
 	}
 }
 
@@ -857,8 +857,8 @@ ROM_END
 DRIVER_INIT_MEMBER(ssfindo_state,common)
 {
 	ssfindo_speedup = 0;
-	m_PS7500timer0 = machine().scheduler().timer_alloc(FUNC(PS7500_Timer0_callback));
-	m_PS7500timer1 = machine().scheduler().timer_alloc(FUNC(PS7500_Timer1_callback));
+	m_PS7500timer0 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ssfindo_state::PS7500_Timer0_callback),this));
+	m_PS7500timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ssfindo_state::PS7500_Timer1_callback),this));
 
 }
 

@@ -71,6 +71,8 @@ public:
 	virtual void machine_reset();
 	DECLARE_DRIVER_INIT(supercon);
 	virtual void machine_start();
+	TIMER_CALLBACK_MEMBER(mouse_click);
+	TIMER_CALLBACK_MEMBER(update_irq);
 };
 
 
@@ -503,14 +505,13 @@ WRITE8_MEMBER( supercon_state::supercon_port4_w )
 		beep_set_state(m_beep ,0);
 }
 
-static TIMER_CALLBACK( mouse_click )
+TIMER_CALLBACK_MEMBER(supercon_state::mouse_click)
 {
-	supercon_state *state = machine.driver_data<supercon_state>();
 
-	if (state->ioport("BUTTON_L")->read_safe(0) )				/* wait for mouse release */
-		state->m_timer_mouse_click->adjust(state->m_wait_time, 0);
+	if (ioport("BUTTON_L")->read_safe(0) )				/* wait for mouse release */
+		m_timer_mouse_click->adjust(m_wait_time, 0);
 	else
-		state->m_selecting=FALSE;
+		m_selecting=FALSE;
 }
 
 static TIMER_DEVICE_CALLBACK( update_artwork )
@@ -518,10 +519,10 @@ static TIMER_DEVICE_CALLBACK( update_artwork )
 	mouse_update(timer.machine());
 }
 
-static TIMER_CALLBACK( update_irq )
+TIMER_CALLBACK_MEMBER(supercon_state::update_irq)
 {
-	machine.device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	machine.device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 /* Save state call backs */
@@ -544,9 +545,9 @@ static void board_postload(supercon_state *state)
 
 void supercon_state::machine_start()
 {
-	m_timer_update_irq = machine().scheduler().timer_alloc(FUNC(update_irq));
+	m_timer_update_irq = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(supercon_state::update_irq),this));
 	m_timer_update_irq->adjust( attotime::zero, 0, attotime::from_hz(1000) );
-	m_timer_mouse_click =  machine().scheduler().timer_alloc(FUNC(mouse_click),NULL);
+	m_timer_mouse_click =  machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(supercon_state::mouse_click),this),NULL);
 	save_item(NAME(m_save_board));
 	machine().save().register_postload(save_prepost_delegate(FUNC(board_postload),this));
 	machine().save().register_presave(save_prepost_delegate(FUNC(board_presave),this));

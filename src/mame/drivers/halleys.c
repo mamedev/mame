@@ -266,6 +266,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_halleys(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_benberob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(blitter_reset);
 };
 
 
@@ -1040,10 +1041,9 @@ READ8_MEMBER(halleys_state::blitter_r)
 }
 
 
-static TIMER_CALLBACK( blitter_reset )
+TIMER_CALLBACK_MEMBER(halleys_state::blitter_reset)
 {
-	halleys_state *state = machine.driver_data<halleys_state>();
-	state->m_blitter_busy = 0;
+	m_blitter_busy = 0;
 }
 
 
@@ -2238,7 +2238,7 @@ DRIVER_INIT_MEMBER(halleys_state,benberob)
 
 	init_common(machine());
 
-	m_blitter_reset_timer = machine().scheduler().timer_alloc(FUNC(blitter_reset));
+	m_blitter_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(halleys_state::blitter_reset),this));
 }
 
 

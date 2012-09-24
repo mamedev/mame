@@ -583,6 +583,7 @@ public:
 	DECLARE_DRIVER_INIT(ddrdigital);
 	DECLARE_DRIVER_INIT(konami573);
 	DECLARE_MACHINE_RESET(konami573);
+	TIMER_CALLBACK_MEMBER(atapi_xfer_end);
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -693,61 +694,60 @@ WRITE32_MEMBER(ksys573_state::control_w)
 	}
 }
 
-static TIMER_CALLBACK( atapi_xfer_end )
+TIMER_CALLBACK_MEMBER(ksys573_state::atapi_xfer_end)
 {
-	ksys573_state *state = machine.driver_data<ksys573_state>();
-	UINT32 *p_n_psxram = state->m_p_n_psxram;
-	UINT8 *atapi_regs = state->m_atapi_regs;
-	int i, n_this;
+	UINT32 *p_n_psxram = m_p_n_psxram;
+	UINT8 *atapi_regs = m_atapi_regs;
+	int i, n_state;
 	UINT8 sector_buffer[ 4096 ];
 
-	state->m_atapi_timer->adjust(attotime::never);
+	m_atapi_timer->adjust(attotime::never);
 
-//  verboselog( machine, 2, "atapi_xfer_end( %d ) atapi_xferlen = %d, atapi_xfermod=%d\n", x, atapi_xfermod, atapi_xferlen );
+//  verboselog( machine(), 2, "atapi_xfer_end( %d ) atapi_xferlen = %d, atapi_xfermod=%d\n", x, atapi_xfermod, atapi_xferlen );
 
 //  mame_printf_debug("ATAPI: xfer_end.  xferlen = %d, atapi_xfermod = %d\n", atapi_xferlen, atapi_xfermod);
 
-	while( state->m_atapi_xferlen > 0 )
+	while( m_atapi_xferlen > 0 )
 	{
 		// get a sector from the SCSI device
-		state->m_inserted_cdrom->ReadData( sector_buffer, 2048 );
+		m_inserted_cdrom->ReadData( sector_buffer, 2048 );
 
-		state->m_atapi_xferlen -= 2048;
+		m_atapi_xferlen -= 2048;
 
 		i = 0;
-		n_this = 2048 / 4;
-		while( n_this > 0 )
+		n_state = 2048 / 4;
+		while( n_state > 0 )
 		{
-			p_n_psxram[ state->m_atapi_xferbase / 4 ] =
+			p_n_psxram[ m_atapi_xferbase / 4 ] =
 				( sector_buffer[ i + 0 ] << 0 ) |
 				( sector_buffer[ i + 1 ] << 8 ) |
 				( sector_buffer[ i + 2 ] << 16 ) |
 				( sector_buffer[ i + 3 ] << 24 );
-			state->m_atapi_xferbase += 4;
+			m_atapi_xferbase += 4;
 			i += 4;
-			n_this--;
+			n_state--;
 		}
 	}
 
-	if (state->m_atapi_xfermod > MAX_TRANSFER_SIZE)
+	if (m_atapi_xfermod > MAX_TRANSFER_SIZE)
 	{
-		state->m_atapi_xferlen = MAX_TRANSFER_SIZE;
-		state->m_atapi_xfermod = state->m_atapi_xfermod - MAX_TRANSFER_SIZE;
+		m_atapi_xferlen = MAX_TRANSFER_SIZE;
+		m_atapi_xfermod = m_atapi_xfermod - MAX_TRANSFER_SIZE;
 	}
 	else
 	{
-		state->m_atapi_xferlen = state->m_atapi_xfermod;
-		state->m_atapi_xfermod = 0;
+		m_atapi_xferlen = m_atapi_xfermod;
+		m_atapi_xfermod = 0;
 	}
 
 
-	if (state->m_atapi_xferlen > 0)
+	if (m_atapi_xferlen > 0)
 	{
 		//mame_printf_debug("ATAPI: starting next piece of multi-part transfer\n");
-		atapi_regs[ATAPI_REG_COUNTLOW] = state->m_atapi_xferlen & 0xff;
-		atapi_regs[ATAPI_REG_COUNTHIGH] = (state->m_atapi_xferlen>>8)&0xff;
+		atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
+		atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
 
-		state->m_atapi_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (state->m_atapi_xferlen/2048))));
+		m_atapi_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (m_atapi_xferlen/2048))));
 	}
 	else
 	{
@@ -756,9 +756,9 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO | ATAPI_INTREASON_COMMAND;
 	}
 
-	psx_irq_set(machine, 0x400);
+	psx_irq_set(machine(), 0x400);
 
-	verboselog( machine, 2, "atapi_xfer_end: %d %d\n", state->m_atapi_xferlen, state->m_atapi_xfermod );
+	verboselog( machine(), 2, "atapi_xfer_end: %d %d\n", m_atapi_xferlen, m_atapi_xfermod );
 }
 
 READ32_MEMBER(ksys573_state::atapi_r)
@@ -1131,7 +1131,7 @@ static void atapi_init(running_machine &machine)
 	state->m_atapi_data_len = 0;
 	state->m_atapi_cdata_wait = 0;
 
-	state->m_atapi_timer = machine.scheduler().timer_alloc(FUNC(atapi_xfer_end));
+	state->m_atapi_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(ksys573_state::atapi_xfer_end),state));
 	state->m_atapi_timer->adjust(attotime::never);
 
 	state->m_available_cdroms[ 0 ] = machine.device<scsidev_device>( ":cdrom0" );

@@ -76,6 +76,9 @@ public:
 	virtual void machine_start();
 	UINT32 screen_update_39in1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pxa255_vblank_start);
+	TIMER_CALLBACK_MEMBER(pxa255_dma_dma_end);
+	TIMER_CALLBACK_MEMBER(pxa255_ostimer_match);
+	TIMER_CALLBACK_MEMBER(pxa255_lcd_dma_eof);
 };
 
 
@@ -87,7 +90,7 @@ static void pxa255_dma_irq_check(running_machine& machine);
 
 
 static void pxa255_ostimer_irq_check(running_machine& machine);
-static TIMER_CALLBACK( pxa255_ostimer_match );
+
 
 
 
@@ -308,10 +311,9 @@ static void pxa255_dma_load_descriptor_and_start(running_machine& machine, int c
 	dma_regs->dcsr[channel] &= ~PXA255_DCSR_STOPSTATE;
 }
 
-static TIMER_CALLBACK( pxa255_dma_dma_end )
+TIMER_CALLBACK_MEMBER(_39in1_state::pxa255_dma_dma_end)
 {
-	_39in1_state *state = machine.driver_data<_39in1_state>();
-	PXA255_DMA_Regs *dma_regs = &state->m_dma_regs;
+	PXA255_DMA_Regs *dma_regs = &m_dma_regs;
 	UINT32 sadr = dma_regs->dsadr[param];
 	UINT32 tadr = dma_regs->dtadr[param];
 	UINT32 count = dma_regs->dcmd[param] & 0x00001fff;
@@ -320,18 +322,18 @@ static TIMER_CALLBACK( pxa255_dma_dma_end )
 	UINT16 temp16;
 	UINT32 temp32;
 
-	address_space &space = machine.device<pxa255_device>("maincpu")->space(AS_PROGRAM);
+	address_space &space = machine().device<pxa255_device>("maincpu")->space(AS_PROGRAM);
 	switch(param)
 	{
 		case 3:
 			for(index = 0; index < count; index += 4)
 			{
-				state->m_words[index >> 2] = space.read_dword(sadr);
-				state->m_samples[(index >> 1) + 0] = (INT16)(state->m_words[index >> 2] >> 16);
-				state->m_samples[(index >> 1) + 1] = (INT16)(state->m_words[index >> 2] & 0xffff);
+				m_words[index >> 2] = space.read_dword(sadr);
+				m_samples[(index >> 1) + 0] = (INT16)(m_words[index >> 2] >> 16);
+				m_samples[(index >> 1) + 1] = (INT16)(m_words[index >> 2] & 0xffff);
 				sadr += 4;
 			}
-			dmadac_transfer(&state->m_dmadac[0], 2, 2, 2, count/4, state->m_samples);
+			dmadac_transfer(&m_dmadac[0], 2, 2, 2, count/4, m_samples);
 			break;
 		default:
 			for(index = 0; index < count;)
@@ -403,7 +405,7 @@ static TIMER_CALLBACK( pxa255_dma_dma_end )
 	{
 		if(dma_regs->dcsr[param] & PXA255_DCSR_RUN)
 		{
-			pxa255_dma_load_descriptor_and_start(machine, param);
+			pxa255_dma_load_descriptor_and_start(machine(), param);
 		}
 		else
 		{
@@ -416,7 +418,7 @@ static TIMER_CALLBACK( pxa255_dma_dma_end )
 		dma_regs->dcsr[param] &= ~PXA255_DCSR_RUN;
 		dma_regs->dcsr[param] |= PXA255_DCSR_STOPSTATE;
 	}
-	pxa255_dma_irq_check(machine);
+	pxa255_dma_irq_check(machine());
 }
 
 READ32_MEMBER(_39in1_state::pxa255_dma_r)
@@ -579,15 +581,14 @@ static void pxa255_ostimer_irq_check(running_machine& machine)
 	//pxa255_set_irq_line(machine, PXA255_INT_OSTIMER3, (ostimer_regs->oier & PXA255_OIER_E3) ? ((ostimer_regs->ossr & PXA255_OSSR_M3) ? 1 : 0) : 0);
 }
 
-static TIMER_CALLBACK( pxa255_ostimer_match )
+TIMER_CALLBACK_MEMBER(_39in1_state::pxa255_ostimer_match)
 {
-	_39in1_state *state = machine.driver_data<_39in1_state>();
-	PXA255_OSTMR_Regs *ostimer_regs = &state->m_ostimer_regs;
+	PXA255_OSTMR_Regs *ostimer_regs = &m_ostimer_regs;
 
-	if (0) verboselog(machine, 3, "pxa255_ostimer_match channel %d\n", param);
+	if (0) verboselog(machine(), 3, "pxa255_ostimer_match channel %d\n", param);
 	ostimer_regs->ossr |= (1 << param);
 	ostimer_regs->oscr = ostimer_regs->osmr[param];
-	pxa255_ostimer_irq_check(machine);
+	pxa255_ostimer_irq_check(machine());
 }
 
 READ32_MEMBER(_39in1_state::pxa255_ostimer_r)
@@ -1166,19 +1167,18 @@ static void pxa255_lcd_check_load_next_branch(running_machine& machine, int chan
 	}
 }
 
-static TIMER_CALLBACK( pxa255_lcd_dma_eof )
+TIMER_CALLBACK_MEMBER(_39in1_state::pxa255_lcd_dma_eof)
 {
-	_39in1_state *state = machine.driver_data<_39in1_state>();
-	PXA255_LCD_Regs *lcd_regs = &state->m_lcd_regs;
+	PXA255_LCD_Regs *lcd_regs = &m_lcd_regs;
 
-	if (0) verboselog( machine, 3, "End of frame callback\n" );
+	if (0) verboselog( machine(), 3, "End of frame callback\n" );
 	if(lcd_regs->dma[param].ldcmd & PXA255_LDCMD_EOFINT)
 	{
 		lcd_regs->liidr = lcd_regs->dma[param].fidr;
 		lcd_regs->lcsr |= PXA255_LCSR_EOF;
 	}
-	pxa255_lcd_check_load_next_branch(machine, param);
-	pxa255_lcd_irq_check(machine);
+	pxa255_lcd_check_load_next_branch(machine(), param);
+	pxa255_lcd_irq_check(machine());
 }
 
 READ32_MEMBER(_39in1_state::pxa255_lcd_r)
@@ -1548,21 +1548,21 @@ static void pxa255_start(running_machine& machine)
 	for(index = 0; index < 16; index++)
 	{
 		state->m_dma_regs.dcsr[index] = 0x00000008;
-		state->m_dma_regs.timer[index] = machine.scheduler().timer_alloc(FUNC(pxa255_dma_dma_end));
+		state->m_dma_regs.timer[index] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(_39in1_state::pxa255_dma_dma_end),state));
 	}
 
 	memset(&state->m_ostimer_regs, 0, sizeof(state->m_ostimer_regs));
 	for(index = 0; index < 4; index++)
 	{
 		state->m_ostimer_regs.osmr[index] = 0;
-		state->m_ostimer_regs.timer[index] = machine.scheduler().timer_alloc(FUNC(pxa255_ostimer_match));
+		state->m_ostimer_regs.timer[index] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(_39in1_state::pxa255_ostimer_match),state));
 	}
 
 	memset(&state->m_intc_regs, 0, sizeof(state->m_intc_regs));
 
 	memset(&state->m_lcd_regs, 0, sizeof(state->m_lcd_regs));
-	state->m_lcd_regs.dma[0].eof = machine.scheduler().timer_alloc(FUNC(pxa255_lcd_dma_eof));
-	state->m_lcd_regs.dma[1].eof = machine.scheduler().timer_alloc(FUNC(pxa255_lcd_dma_eof));
+	state->m_lcd_regs.dma[0].eof = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(_39in1_state::pxa255_lcd_dma_eof),state));
+	state->m_lcd_regs.dma[1].eof = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(_39in1_state::pxa255_lcd_dma_eof),state));
 	state->m_lcd_regs.trgbr = 0x00aa5500;
 	state->m_lcd_regs.tcr = 0x0000754f;
 

@@ -71,12 +71,12 @@ private:
 	static const device_timer_id SERIAL_TIMER = 1;
 	UINT8 m_timer_bit;
 	virtual void palette_init();
+	TIMER_CALLBACK_MEMBER(alphatro_beepoff);
 };
 
-static TIMER_CALLBACK( alphatro_beepoff )
+TIMER_CALLBACK_MEMBER(alphatro_state::alphatro_beepoff)
 {
-	alphatro_state *state = machine.driver_data<alphatro_state>();
-	beep_set_state(state->m_beep, 0);
+	beep_set_state(m_beep, 0);
 }
 
 READ8_MEMBER( alphatro_state::port10_r )
@@ -101,7 +101,7 @@ WRITE8_MEMBER( alphatro_state::port10_w )
 
 	if (length)
 	{
-		machine().scheduler().timer_set(attotime::from_msec(length), FUNC(alphatro_beepoff));
+		machine().scheduler().timer_set(attotime::from_msec(length), timer_expired_delegate(FUNC(alphatro_state::alphatro_beepoff),this));
 		beep_set_state(m_beep, 1);
 	}
 

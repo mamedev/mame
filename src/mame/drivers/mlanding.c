@@ -78,6 +78,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_mlanding(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(dma_complete);
 };
 
 
@@ -312,10 +313,9 @@ static void ml_msm5205_vck(device_t *device)
 	}
 }
 
-static TIMER_CALLBACK( dma_complete )
+TIMER_CALLBACK_MEMBER(mlanding_state::dma_complete)
 {
-	mlanding_state *state = machine.driver_data<mlanding_state>();
-	state->m_dma_active = 0;
+	m_dma_active = 0;
 }
 
 /* TODO: this uses many bits */
@@ -329,7 +329,7 @@ WRITE16_MEMBER(mlanding_state::ml_sub_reset_w)
 	if (pixels)
 	{
 		m_dma_active = 1;
-		machine().scheduler().timer_set(attotime::from_msec(20), FUNC(dma_complete));
+		machine().scheduler().timer_set(attotime::from_msec(20), timer_expired_delegate(FUNC(mlanding_state::dma_complete),this));
 	}
 
 	if(!(data & 0x40)) // unknown line used

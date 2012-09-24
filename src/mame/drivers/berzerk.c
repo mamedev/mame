@@ -59,6 +59,8 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_berzerk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(irq_callback);
+	TIMER_CALLBACK_MEMBER(nmi_callback);
 };
 
 
@@ -181,9 +183,8 @@ WRITE8_MEMBER(berzerk_state::irq_enable_w)
 }
 
 
-static TIMER_CALLBACK( irq_callback )
+TIMER_CALLBACK_MEMBER(berzerk_state::irq_callback)
 {
-	berzerk_state *state = machine.driver_data<berzerk_state>();
 	int irq_number = param;
 	UINT8 next_counter;
 	UINT8 next_v256;
@@ -191,8 +192,8 @@ static TIMER_CALLBACK( irq_callback )
 	int next_irq_number;
 
 	/* set the IRQ line if enabled */
-	if (state->m_irq_enabled)
-		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xfc);
+	if (m_irq_enabled)
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xfc);
 
 	/* set up for next interrupt */
 	next_irq_number = (irq_number + 1) % IRQS_PER_FRAME;
@@ -200,14 +201,14 @@ static TIMER_CALLBACK( irq_callback )
 	next_v256 = irq_trigger_v256s[next_irq_number];
 
 	next_vpos = vsync_chain_counter_to_vpos(next_counter, next_v256);
-	state->m_irq_timer->adjust(machine.primary_screen->time_until_pos(next_vpos), next_irq_number);
+	m_irq_timer->adjust(machine().primary_screen->time_until_pos(next_vpos), next_irq_number);
 }
 
 
 static void create_irq_timer(running_machine &machine)
 {
 	berzerk_state *state = machine.driver_data<berzerk_state>();
-	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(irq_callback));
+	state->m_irq_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(berzerk_state::irq_callback),state));
 }
 
 
@@ -261,9 +262,8 @@ READ8_MEMBER(berzerk_state::nmi_disable_r)
 }
 
 
-static TIMER_CALLBACK( nmi_callback )
+TIMER_CALLBACK_MEMBER(berzerk_state::nmi_callback)
 {
-	berzerk_state *state = machine.driver_data<berzerk_state>();
 	int nmi_number = param;
 	UINT8 next_counter;
 	UINT8 next_v256;
@@ -271,8 +271,8 @@ static TIMER_CALLBACK( nmi_callback )
 	int next_nmi_number;
 
 	/* pulse the NMI line if enabled */
-	if (state->m_nmi_enabled)
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_enabled)
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	/* set up for next interrupt */
 	next_nmi_number = (nmi_number + 1) % NMIS_PER_FRAME;
@@ -280,14 +280,14 @@ static TIMER_CALLBACK( nmi_callback )
 	next_v256 = nmi_trigger_v256s[next_nmi_number];
 
 	next_vpos = vsync_chain_counter_to_vpos(next_counter, next_v256);
-	state->m_nmi_timer->adjust(machine.primary_screen->time_until_pos(next_vpos), next_nmi_number);
+	m_nmi_timer->adjust(machine().primary_screen->time_until_pos(next_vpos), next_nmi_number);
 }
 
 
 static void create_nmi_timer(running_machine &machine)
 {
 	berzerk_state *state = machine.driver_data<berzerk_state>();
-	state->m_nmi_timer = machine.scheduler().timer_alloc(FUNC(nmi_callback));
+	state->m_nmi_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(berzerk_state::nmi_callback),state));
 }
 
 

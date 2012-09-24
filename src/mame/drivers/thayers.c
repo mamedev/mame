@@ -82,6 +82,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_ready_r);
 	virtual void machine_start();
 	virtual void machine_reset();
+	TIMER_CALLBACK_MEMBER(intrq_tick);
+	TIMER_CALLBACK_MEMBER(ssi263_phoneme_tick);
 };
 
 
@@ -106,9 +108,9 @@ static void check_interrupt(running_machine &machine)
 	}
 }
 
-static TIMER_CALLBACK( intrq_tick )
+TIMER_CALLBACK_MEMBER(thayers_state::intrq_tick)
 {
-	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(thayers_state::intrq_w)
@@ -117,7 +119,7 @@ WRITE8_MEMBER(thayers_state::intrq_w)
 
 	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 
-	machine().scheduler().timer_set(attotime::from_usec(8250), FUNC(intrq_tick));
+	machine().scheduler().timer_set(attotime::from_usec(8250), timer_expired_delegate(FUNC(thayers_state::intrq_tick),this));
 }
 
 READ8_MEMBER(thayers_state::irqstate_r)
@@ -470,11 +472,10 @@ static const char SSI263_PHONEMES[0x40][5] =
 	"L", "L1", "LF", "W", "B", "D", "KV", "P", "T", "K", "HV", "HVC", "HF", "HFC", "HN", "Z", "S", "J", "SCH", "V", "F", "THV", "TH", "M", "N", "NG", ":A", ":OH", ":U", ":UH", "E2", "LB"
 };
 
-static TIMER_CALLBACK( ssi263_phoneme_tick )
+TIMER_CALLBACK_MEMBER(thayers_state::ssi263_phoneme_tick)
 {
-	thayers_state *state = machine.driver_data<thayers_state>();
-	state->m_ssi_data_request = 0;
-	check_interrupt(machine);
+	m_ssi_data_request = 0;
+	check_interrupt(machine());
 }
 
 WRITE8_MEMBER(thayers_state::ssi263_register_w)
@@ -499,11 +500,11 @@ WRITE8_MEMBER(thayers_state::ssi263_register_w)
 		case 0:
 		case 1:
 			// phoneme timing response
-			machine().scheduler().timer_set(attotime::from_usec(phoneme_time), FUNC(ssi263_phoneme_tick));
+			machine().scheduler().timer_set(attotime::from_usec(phoneme_time), timer_expired_delegate(FUNC(thayers_state::ssi263_phoneme_tick),this));
 			break;
 		case 2:
 			// frame timing response
-			machine().scheduler().timer_set(attotime::from_usec(frame_time), FUNC(ssi263_phoneme_tick));
+			machine().scheduler().timer_set(attotime::from_usec(frame_time), timer_expired_delegate(FUNC(thayers_state::ssi263_phoneme_tick),this));
 			break;
 		case 3:
 			// disable A/_R output

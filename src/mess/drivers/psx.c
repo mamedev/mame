@@ -55,6 +55,7 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(psx_setopbase);
 	DECLARE_DRIVER_INIT(psx);
 	DECLARE_MACHINE_RESET(psx);
+	TIMER_CALLBACK_MEMBER(psx_pad_ack);
 };
 
 
@@ -493,19 +494,18 @@ static QUICKLOAD_LOAD( psx_exe_load )
 #define PAD_DATA_OK   ( 0x5a ) /* Z */
 #define PAD_DATA_IDLE ( 0xff )
 
-static TIMER_CALLBACK(psx_pad_ack)
+TIMER_CALLBACK_MEMBER(psx1_state::psx_pad_ack)
 {
-	psx1_state *state = machine.driver_data<psx1_state>();
 	int n_port = param;
-	pad_t *pad = &state->m_pad[ n_port ];
+	pad_t *pad = &m_pad[ n_port ];
 
 	if( pad->n_state != PAD_STATE_IDLE )
 	{
-		psx_sio_input( machine, 0, PSX_SIO_IN_DSR, pad->b_ack * PSX_SIO_IN_DSR );
+		psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, pad->b_ack * PSX_SIO_IN_DSR );
 		if( !pad->b_ack )
 		{
 			pad->b_ack = 1;
-			machine.scheduler().timer_set(attotime::from_usec( 2 ), FUNC(psx_pad_ack) , n_port);
+			machine().scheduler().timer_set(attotime::from_usec( 2 ), timer_expired_delegate(FUNC(psx1_state::psx_pad_ack),this) , n_port);
 		}
 	}
 }
@@ -650,7 +650,7 @@ static void psx_pad( running_machine &machine, int n_port, int n_data )
 	if( b_ack )
 	{
 		pad->b_ack = 0;
-		machine.scheduler().timer_set(attotime::from_usec( 10 ), FUNC(psx_pad_ack), n_port);
+		machine.scheduler().timer_set(attotime::from_usec( 10 ), timer_expired_delegate(FUNC(psx1_state::psx_pad_ack),state), n_port);
 	}
 }
 

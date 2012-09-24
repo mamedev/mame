@@ -110,6 +110,7 @@ public:
 	DECLARE_DRIVER_INIT(osbexec);
 	virtual void machine_reset();
 	virtual void palette_init();
+	TIMER_CALLBACK_MEMBER(osbexec_video_callback);
 };
 
 
@@ -551,42 +552,41 @@ static const floppy_interface osbexec_floppy_interface =
 };
 
 
-static TIMER_CALLBACK( osbexec_video_callback )
+TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 {
-	osbexec_state *state = machine.driver_data<osbexec_state>();
-	int y = machine.primary_screen->vpos();
+	int y = machine().primary_screen->vpos();
 
 	/* Start of frame */
 	if ( y == 0 )
 	{
 		/* Clear CB1 on PIA @ UD12 */
-		state->m_pia_0->cb1_w(0);
+		m_pia_0->cb1_w(0);
 	}
 	else if ( y == 240 )
 	{
 		/* Set CB1 on PIA @ UD12 */
-		state->m_pia_0->cb1_w(1);
-		state->m_rtc++;
+		m_pia_0->cb1_w(1);
+		m_rtc++;
 	}
 	if ( y < 240 )
 	{
 		UINT16 row_addr = ( y / 10 ) * 128;
-		UINT16 *p = &state->m_bitmap.pix16(y);
+		UINT16 *p = &m_bitmap.pix16(y);
 		UINT8 char_line = y % 10;
 
 		for ( int x = 0; x < 80; x++ )
 		{
-			UINT8 ch = state->m_vram[ row_addr + x ];
-			UINT8 attr = state->m_vram[ 0x1000 + row_addr + x ];
+			UINT8 ch = m_vram[ row_addr + x ];
+			UINT8 attr = m_vram[ 0x1000 + row_addr + x ];
 			UINT8 fg_col = ( attr & 0x80 ) ? 1 : 2;
-			UINT8 font_bits = state->m_fontram[ ( ( attr & 0x10 ) ? 0x800 : 0 ) + ( ch & 0x7f ) * 16 + char_line ];
+			UINT8 font_bits = m_fontram[ ( ( attr & 0x10 ) ? 0x800 : 0 ) + ( ch & 0x7f ) * 16 + char_line ];
 
 			/* Check for underline */
 			if ( ( attr & 0x40 ) && char_line == 9 )
 				font_bits = 0xFF;
 
 			/* Check for blink */
-			if ( ( attr & 0x20 ) && ( state->m_rtc & 0x10 ) )
+			if ( ( attr & 0x20 ) && ( m_rtc & 0x10 ) )
 				font_bits = 0;
 
 			/* Check for inverse video */
@@ -601,7 +601,7 @@ static TIMER_CALLBACK( osbexec_video_callback )
 		}
 	}
 
-	state->m_video_timer->adjust( machine.primary_screen->time_until_pos( y + 1, 0 ) );
+	m_video_timer->adjust( machine().primary_screen->time_until_pos( y + 1, 0 ) );
 }
 
 
@@ -617,7 +617,7 @@ DRIVER_INIT_MEMBER(osbexec_state,osbexec)
 	memset( m_fontram, 0x00, 0x1000 );
 	memset( m_vram, 0x00, 0x2000 );
 
-	m_video_timer = machine().scheduler().timer_alloc(FUNC(osbexec_video_callback));
+	m_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(osbexec_state::osbexec_video_callback),this));
 }
 
 

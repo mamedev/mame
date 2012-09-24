@@ -55,6 +55,9 @@ public:
 	virtual void machine_start();
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(IOMD_timer0_callback);
+	TIMER_CALLBACK_MEMBER(IOMD_timer1_callback);
+	TIMER_CALLBACK_MEMBER(flyback_timer_callback);
 };
 
 
@@ -568,36 +571,33 @@ void a7000_state::fire_iomd_timer(int timer)
 		m_IOMD_timer[timer]->adjust(attotime::from_usec(val), 0, attotime::from_usec(val));
 }
 
-static TIMER_CALLBACK( IOMD_timer0_callback )
+TIMER_CALLBACK_MEMBER(a7000_state::IOMD_timer0_callback)
 {
-	a7000_state *state = machine.driver_data<a7000_state>();
-	state->m_IRQ_status_A|=0x20;
-	if(state->m_IRQ_mask_A&0x20)
+	m_IRQ_status_A|=0x20;
+	if(m_IRQ_mask_A&0x20)
 	{
-		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE,1);
+		generic_pulse_irq_line(machine().device("maincpu")->execute(), ARM7_IRQ_LINE,1);
 	}
 }
 
-static TIMER_CALLBACK( IOMD_timer1_callback )
+TIMER_CALLBACK_MEMBER(a7000_state::IOMD_timer1_callback)
 {
-	a7000_state *state = machine.driver_data<a7000_state>();
-	state->m_IRQ_status_A|=0x40;
-	if(state->m_IRQ_mask_A&0x40)
+	m_IRQ_status_A|=0x40;
+	if(m_IRQ_mask_A&0x40)
 	{
-		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE,1);
+		generic_pulse_irq_line(machine().device("maincpu")->execute(), ARM7_IRQ_LINE,1);
 	}
 }
 
-static TIMER_CALLBACK( flyback_timer_callback )
+TIMER_CALLBACK_MEMBER(a7000_state::flyback_timer_callback)
 {
-	a7000_state *state = machine.driver_data<a7000_state>();
-	state->m_IRQ_status_A|=0x08;
-	if(state->m_IRQ_mask_A&0x08)
+	m_IRQ_status_A|=0x08;
+	if(m_IRQ_mask_A&0x08)
 	{
-		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE,1);
+		generic_pulse_irq_line(machine().device("maincpu")->execute(), ARM7_IRQ_LINE,1);
 	}
 
-	state->m_flyback_timer->adjust(machine.primary_screen->time_until_pos(state->m_vidc20_vert_reg[VDER]));
+	m_flyback_timer->adjust(machine().primary_screen->time_until_pos(m_vidc20_vert_reg[VDER]));
 }
 
 void a7000_state::viddma_transfer_start()
@@ -766,9 +766,9 @@ INPUT_PORTS_END
 
 void a7000_state::machine_start()
 {
-	m_IOMD_timer[0] = machine().scheduler().timer_alloc(FUNC(IOMD_timer0_callback));
-	m_IOMD_timer[1] = machine().scheduler().timer_alloc(FUNC(IOMD_timer1_callback));
-	m_flyback_timer = machine().scheduler().timer_alloc(FUNC(flyback_timer_callback));
+	m_IOMD_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a7000_state::IOMD_timer0_callback),this));
+	m_IOMD_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a7000_state::IOMD_timer1_callback),this));
+	m_flyback_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a7000_state::flyback_timer_callback),this));
 
 	m_io_id = 0xd4e7;
 }

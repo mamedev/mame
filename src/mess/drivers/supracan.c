@@ -203,6 +203,10 @@ public:
 	UINT32 screen_update_supracan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(supracan_irq);
 	INTERRUPT_GEN_MEMBER(supracan_sound_irq);
+	TIMER_CALLBACK_MEMBER(supracan_hbl_callback);
+	TIMER_CALLBACK_MEMBER(supracan_line_on_callback);
+	TIMER_CALLBACK_MEMBER(supracan_line_off_callback);
+	TIMER_CALLBACK_MEMBER(supracan_video_callback);
 };
 
 
@@ -1488,71 +1492,67 @@ READ16_MEMBER( supracan_state::supracan_video_r )
 	return data;
 }
 
-static TIMER_CALLBACK( supracan_hbl_callback )
+TIMER_CALLBACK_MEMBER(supracan_state::supracan_hbl_callback)
 {
-	supracan_state *state = machine.driver_data<supracan_state>();
 
-	state->m_maincpu->set_input_line(3, HOLD_LINE);
+	m_maincpu->set_input_line(3, HOLD_LINE);
 
-	state->m_hbl_timer->adjust(attotime::never);
+	m_hbl_timer->adjust(attotime::never);
 }
 
-static TIMER_CALLBACK( supracan_line_on_callback )
+TIMER_CALLBACK_MEMBER(supracan_state::supracan_line_on_callback)
 {
-	supracan_state *state = machine.driver_data<supracan_state>();
 
-	state->m_maincpu->set_input_line(5, HOLD_LINE);
+	m_maincpu->set_input_line(5, HOLD_LINE);
 
-	state->m_line_on_timer->adjust(attotime::never);
+	m_line_on_timer->adjust(attotime::never);
 }
 
-static TIMER_CALLBACK( supracan_line_off_callback )
+TIMER_CALLBACK_MEMBER(supracan_state::supracan_line_off_callback)
 {
-	supracan_state *state = machine.driver_data<supracan_state>();
 
-	state->m_maincpu->set_input_line(5, CLEAR_LINE);
+	m_maincpu->set_input_line(5, CLEAR_LINE);
 
-	state->m_line_on_timer->adjust(attotime::never);
+	m_line_on_timer->adjust(attotime::never);
 }
 
-static TIMER_CALLBACK( supracan_video_callback )
+TIMER_CALLBACK_MEMBER(supracan_state::supracan_video_callback)
 {
-	supracan_state *state = machine.driver_data<supracan_state>();
-	int vpos = machine.primary_screen->vpos();
+	int vpos = machine().primary_screen->vpos();
 
-	state->m_video_regs[0] &= ~0x0002;
+	m_video_regs[0] &= ~0x0002;
 
 	switch( vpos )
 	{
 	case 0:
-		state->m_video_regs[0] &= 0x7fff;
+		m_video_regs[0] &= 0x7fff;
 
 		// we really need better management of this
-		mark_active_tilemap_all_dirty(machine, 0);
-		mark_active_tilemap_all_dirty(machine, 1);
-		mark_active_tilemap_all_dirty(machine, 2);
-		mark_active_tilemap_all_dirty(machine, 3);
+		mark_active_tilemap_all_dirty(machine(), 0);
+		mark_active_tilemap_all_dirty(machine(), 1);
+		mark_active_tilemap_all_dirty(machine(), 2);
+		mark_active_tilemap_all_dirty(machine(), 3);
 
 
 		break;
 
 	case 224://FIXME: Son of Evil is pretty picky about this one, a timing of 240 makes it to crash
-		state->m_video_regs[0] |= 0x8000;
+		m_video_regs[0] |= 0x8000;
 		break;
 
 	case 240:
-		if(state->m_irq_mask & 1)
+		if(m_irq_mask & 1)
 		{
-			verboselog("maincpu", machine, 0, "Triggering VBL IRQ\n\n");
-			state->m_maincpu->set_input_line(7, HOLD_LINE);
+			verboselog("maincpu", machine(), 0, "Triggering VBL IRQ\n\n");
+			m_maincpu->set_input_line(7, HOLD_LINE);
 		}
 		break;
 	}
 
-	state->m_video_regs[1] = machine.primary_screen->vpos()-16; // for son of evil, wants vblank active around 224 instead...
+	m_video_regs[1] = machine().primary_screen->vpos()-16; // for son of evil, wants vblank active around 224 instead...
 
-	state->m_hbl_timer->adjust( machine.primary_screen->time_until_pos( vpos, 320 ) );
-	state->m_video_timer->adjust( machine.primary_screen->time_until_pos( ( vpos + 1 ) % 256, 0 ) );
+	m_hbl_timer->adjust( machine().primary_screen->time_until_pos( vpos, 320 ) );
+	m_video_timer->adjust( machine().primary_screen->time_until_pos( ( vpos + 1 ) % 256, 0 ) );
 }
 
 WRITE16_MEMBER( supracan_state::supracan_video_w )
@@ -1774,10 +1774,10 @@ static DEVICE_IMAGE_LOAD( supracan_cart )
 void supracan_state::machine_start()
 {
 
-	m_video_timer = machine().scheduler().timer_alloc(FUNC(supracan_video_callback));
-	m_hbl_timer = machine().scheduler().timer_alloc(FUNC(supracan_hbl_callback));
-	m_line_on_timer = machine().scheduler().timer_alloc(FUNC(supracan_line_on_callback));
-	m_line_off_timer = machine().scheduler().timer_alloc(FUNC(supracan_line_off_callback));
+	m_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(supracan_state::supracan_video_callback),this));
+	m_hbl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(supracan_state::supracan_hbl_callback),this));
+	m_line_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(supracan_state::supracan_line_on_callback),this));
+	m_line_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(supracan_state::supracan_line_off_callback),this));
 }
 
 

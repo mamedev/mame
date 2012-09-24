@@ -41,6 +41,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(acefruit_vblank);
+	TIMER_CALLBACK_MEMBER(acefruit_refresh);
 };
 
 
@@ -66,22 +67,21 @@ static void acefruit_update_irq(running_machine &machine, int vpos )
 }
 
 
-static TIMER_CALLBACK( acefruit_refresh )
+TIMER_CALLBACK_MEMBER(acefruit_state::acefruit_refresh)
 {
-	acefruit_state *state = machine.driver_data<acefruit_state>();
-	int vpos = machine.primary_screen->vpos();
+	int vpos = machine().primary_screen->vpos();
 
-	machine.primary_screen->update_partial(vpos );
-	acefruit_update_irq(machine, vpos );
+	machine().primary_screen->update_partial(vpos );
+	acefruit_update_irq(machine(), vpos );
 
 	vpos = ( ( vpos / 8 ) + 1 ) * 8;
 
-	state->m_refresh_timer->adjust( machine.primary_screen->time_until_pos(vpos) );
+	m_refresh_timer->adjust( machine().primary_screen->time_until_pos(vpos) );
 }
 
 void acefruit_state::video_start()
 {
-	m_refresh_timer = machine().scheduler().timer_alloc(FUNC(acefruit_refresh));
+	m_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(acefruit_state::acefruit_refresh),this));
 }
 
 INTERRUPT_GEN_MEMBER(acefruit_state::acefruit_vblank)

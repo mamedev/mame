@@ -69,6 +69,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_tmmjprd_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_tmmjprd_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(tmmjprd_blit_done);
 };
 
 
@@ -378,9 +379,9 @@ READ32_MEMBER(tmmjprd_state::randomtmmjprds)
 #define BLITLOG 0
 
 #if 0
-static TIMER_CALLBACK( tmmjprd_blit_done )
+TIMER_CALLBACK_MEMBER(tmmjprd_state::tmmjprd_blit_done)
 {
-	machine.device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 }
 
 static void tmmjprd_do_blit(running_machine &machine)
@@ -428,7 +429,7 @@ static void tmmjprd_do_blit(running_machine &machine)
 				if (!blt_amount)
 				{
 					if(BLITLOG) mame_printf_debug("end of blit list\n");
-					machine.scheduler().timer_set(attotime::from_usec(500), FUNC(tmmjprd_blit_done));
+					machine.scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(tmmjprd_state::tmmjprd_blit_done),this));
 					return;
 				}
 

@@ -102,6 +102,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_pipeline(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(protection_deferred_w);
 };
 
 
@@ -178,15 +179,14 @@ READ8_MEMBER(pipeline_state::protection_r)
 	return m_fromMCU;
 }
 
-static TIMER_CALLBACK( protection_deferred_w )
+TIMER_CALLBACK_MEMBER(pipeline_state::protection_deferred_w)
 {
-	pipeline_state *state = machine.driver_data<pipeline_state>();
-	state->m_toMCU = param;
+	m_toMCU = param;
 }
 
 WRITE8_MEMBER(pipeline_state::protection_w)
 {
-	machine().scheduler().synchronize(FUNC(protection_deferred_w), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pipeline_state::protection_deferred_w),this), data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 

@@ -67,6 +67,8 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_sbrkout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(scanline_callback);
+	TIMER_CALLBACK_MEMBER(pot_trigger_callback);
 };
 
 
@@ -89,8 +91,8 @@ public:
  *
  *************************************/
 
-static TIMER_CALLBACK( scanline_callback );
-static TIMER_CALLBACK( pot_trigger_callback );
+
+
 
 
 
@@ -104,8 +106,8 @@ void sbrkout_state::machine_start()
 {
 	UINT8 *videoram = m_videoram;
 	membank("bank1")->set_base(&videoram[0x380]);
-	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(scanline_callback));
-	m_pot_timer = machine().scheduler().timer_alloc(FUNC(pot_trigger_callback));
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sbrkout_state::scanline_callback),this));
+	m_pot_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sbrkout_state::pot_trigger_callback),this));
 
 	save_item(NAME(m_sync2_value));
 	save_item(NAME(m_pot_mask));
@@ -126,34 +128,33 @@ void sbrkout_state::machine_reset()
  *
  *************************************/
 
-static TIMER_CALLBACK( scanline_callback )
+TIMER_CALLBACK_MEMBER(sbrkout_state::scanline_callback)
 {
-	sbrkout_state *state = machine.driver_data<sbrkout_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int scanline = param;
 
 	/* force a partial update before anything happens */
-	machine.primary_screen->update_partial(scanline);
+	machine().primary_screen->update_partial(scanline);
 
 	/* if this is a rising edge of 16V, assert the CPU interrupt */
 	if (scanline % 32 == 16)
-		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
 	/* update the DAC state */
-	machine.device<dac_device>("dac")->write_unsigned8((videoram[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
+	machine().device<dac_device>("dac")->write_unsigned8((videoram[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
 
 	/* on the VBLANK, read the pot and schedule an interrupt time for it */
-	if (scanline == machine.primary_screen->visible_area().max_y + 1)
+	if (scanline == machine().primary_screen->visible_area().max_y + 1)
 	{
-		UINT8 potvalue = state->ioport("PADDLE")->read();
-		state->m_pot_timer->adjust(machine.primary_screen->time_until_pos(56 + (potvalue / 2), (potvalue % 2) * 128));
+		UINT8 potvalue = ioport("PADDLE")->read();
+		m_pot_timer->adjust(machine().primary_screen->time_until_pos(56 + (potvalue / 2), (potvalue % 2) * 128));
 	}
 
 	/* call us back in 4 scanlines */
 	scanline += 4;
-	if (scanline >= machine.primary_screen->height())
+	if (scanline >= machine().primary_screen->height())
 		scanline = 0;
-	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -210,11 +211,10 @@ static void update_nmi_state(running_machine &machine)
 }
 
 
-static TIMER_CALLBACK( pot_trigger_callback )
+TIMER_CALLBACK_MEMBER(sbrkout_state::pot_trigger_callback)
 {
-	sbrkout_state *state = machine.driver_data<sbrkout_state>();
-	state->m_pot_trigger[param] = 1;
-	update_nmi_state(machine);
+	m_pot_trigger[param] = 1;
+	update_nmi_state(machine());
 }
 
 

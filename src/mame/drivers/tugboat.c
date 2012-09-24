@@ -50,6 +50,7 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_tugboat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(interrupt_gen);
 };
 
 
@@ -202,15 +203,15 @@ static const pia6821_interface pia1_intf =
 	DEVCB_NULL		/* IRQB */
 };
 
-static TIMER_CALLBACK( interrupt_gen )
+TIMER_CALLBACK_MEMBER(tugboat_state::interrupt_gen)
 {
-	machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
-	machine.scheduler().timer_set(machine.primary_screen->frame_period(), FUNC(interrupt_gen));
+	machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+	machine().scheduler().timer_set(machine().primary_screen->frame_period(), timer_expired_delegate(FUNC(tugboat_state::interrupt_gen),this));
 }
 
 void tugboat_state::machine_reset()
 {
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(30*8+4), FUNC(interrupt_gen));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(30*8+4), timer_expired_delegate(FUNC(tugboat_state::interrupt_gen),this));
 }
 
 

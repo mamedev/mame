@@ -192,6 +192,7 @@ public:
 	DECLARE_DRIVER_INIT(vk100);
 	virtual void machine_reset();
 	virtual void video_start();
+	TIMER_CALLBACK_MEMBER(execute_vg);
 };
 
 // vram access functions:
@@ -250,35 +251,34 @@ static void vram_write(running_machine &machine, UINT8 data)
 	state->m_vram[(EA<<1)] = (block&0xFF00)>>8; // ''
 }
 
-static TIMER_CALLBACK( execute_vg )
+TIMER_CALLBACK_MEMBER(vk100_state::execute_vg)
 {
-	vk100_state *state = machine.driver_data<vk100_state>();
-	UINT8 thisNyb = vram_read(machine); // read in the nybble
+	UINT8 thisNyb = vram_read(machine()); // read in the nybble
 	// pattern rom addressing is a complex mess. see the pattern rom def later in this file.
-	UINT8 newNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Mask)?0x200:0)|((state->VG_WOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb]; // calculate new nybble based on pattern rom
+	UINT8 newNyb = m_pattern[((m_vgPAT&m_vgPAT_Mask)?0x200:0)|((VG_WOPS&7)<<6)|((m_vgX&3)<<4)|thisNyb]; // calculate new nybble based on pattern rom
 	// finally write the block back to ram depending on the VG_MODE (sort of a hack until we get the vector and synd and dir roms all hooked up)
-	switch (state->m_VG_MODE)
+	switch (m_VG_MODE)
 	{
 		case 0: // move; adjusts the x and y but doesn't write anything. do nothing
 			break;
 		case 1: // dot: only write the LAST pixel in the chain? TODO: some fallthrough magic here?
-			if ((state->m_vgDownCount) == 0x00)
+			if ((m_vgDownCount) == 0x00)
 			{
-				vram_write(machine, newNyb); // write out the modified nybble
+				vram_write(machine(), newNyb); // write out the modified nybble
 			}
 			break;
 		case 2: // vec: draw the vector
-				vram_write(machine, newNyb); // write out the modified nybble
+				vram_write(machine(), newNyb); // write out the modified nybble
 			break;
 		case 3: // er: erase: special case here: wipe the entire screen (except for color/attrib?) and then set done.
 			for (int i = 0; i < 0x8000; i++)
 			{
 				if (!(i&1)) // avoid stomping attribute
-					state->m_vram[i] = state->m_vram[i]&0xF0;
+					m_vram[i] = m_vram[i]&0xF0;
 				else // (i&1)
-					state->m_vram[i] = 0;
+					m_vram[i] = 0;
 			}
-			state->m_vgGO = 0; // done
+			m_vgGO = 0; // done
 			break;
 	}
     /* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
@@ -305,48 +305,48 @@ static TIMER_CALLBACK( execute_vg )
      *            \--------- UNUSED, always 0
      * The VT125 prom @ E41 is literally identical to this, the same exact part: 23-059B1
      */
-	//UINT8 direction_rom = state->m_dir[];
+	//UINT8 direction_rom = m_dir[];
 	// HACK: we need the proper direction rom dump for this!
-	switch(state->VG_DIR&0x7)
+	switch(VG_DIR&0x7)
 	{
 		case 0:
-			state->m_vgX++;
+			m_vgX++;
 			break;
 		case 7:
-			state->m_vgX++;
-			state->m_vgY++;
+			m_vgX++;
+			m_vgY++;
 			break;
 		case 6:
-			state->m_vgY++;
+			m_vgY++;
 			break;
 		case 5:
-			state->m_vgX--;
-			state->m_vgY++;
+			m_vgX--;
+			m_vgY++;
 			break;
 		case 4:
-			state->m_vgX--;
+			m_vgX--;
 			break;
 		case 3:
-			state->m_vgX--;
-			state->m_vgY--;
+			m_vgX--;
+			m_vgY--;
 			break;
 		case 2:
-			state->m_vgY--;
+			m_vgY--;
 			break;
 		case 1:
-			state->m_vgX++;
-			state->m_vgY--;
+			m_vgX++;
+			m_vgY--;
 			break;
 	}
-	state->m_vgDownCount--; // decrement the down counter
-	if ((state->m_vgDownCount) == 0x00) state->m_vgGO = 0; // check if the down counter hit terminal count (0), if so we're done.
-	if (((++state->m_vgPMUL_Count)&0xF)==0) // if pattern multiplier counter overflowed
+	m_vgDownCount--; // decrement the down counter
+	if ((m_vgDownCount) == 0x00) m_vgGO = 0; // check if the down counter hit terminal count (0), if so we're done.
+	if (((++m_vgPMUL_Count)&0xF)==0) // if pattern multiplier counter overflowed
 	{
-		state->m_vgPMUL_Count = state->m_vgPMUL; // reload counter
-		state->m_vgPAT_Mask >>= 1; // shift the mask
-		if (state->m_vgPAT_Mask == 0) state->m_vgPAT_Mask = 0x80; // reset mask if it hits 0
+		m_vgPMUL_Count = m_vgPMUL; // reload counter
+		m_vgPAT_Mask >>= 1; // shift the mask
+		if (m_vgPAT_Mask == 0) m_vgPAT_Mask = 0x80; // reset mask if it hits 0
 	}
-	if (state->m_vgGO) machine.scheduler().timer_set(attotime::from_hz(XTAL_45_6192Mhz/3/12/2), FUNC(execute_vg)); // /3/12/2 is correct. the sync counter is clocked by the dot clock, despite the error on figure 5-21
+	if (m_vgGO) machine().scheduler().timer_set(attotime::from_hz(XTAL_45_6192Mhz/3/12/2), timer_expired_delegate(FUNC(vk100_state::execute_vg),this)); // /3/12/2 is correct. the sync counter is clocked by the dot clock, despite the error on figure 5-21
 }
 
 /* ports 0x40 and 0x41: load low and high bytes of vector gen X register */
@@ -459,7 +459,7 @@ WRITE8_MEMBER(vk100_state::vgEX)
 	m_vgDownCount = VG_DU; // set down counter to length of major vector
 	m_VG_MODE = offset&3;
 	m_vgGO = 1;
-	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg));
+	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(vk100_state::execute_vg),this));
 }
 
 

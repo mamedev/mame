@@ -167,6 +167,9 @@ public:
 	DECLARE_PALETTE_INIT(px4p);
 	UINT32 screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(key_callback);
+	TIMER_CALLBACK_MEMBER(ext_cassette_read);
+	TIMER_CALLBACK_MEMBER(transmit_data);
+	TIMER_CALLBACK_MEMBER(receive_data);
 };
 
 
@@ -303,42 +306,41 @@ static void gapnit_interrupt(running_machine &machine)
 }
 
 /* external cassette or barcode reader input */
-static TIMER_CALLBACK( ext_cassette_read )
+TIMER_CALLBACK_MEMBER(px4_state::ext_cassette_read)
 {
-	px4_state *px4 = machine.driver_data<px4_state>();
 	UINT8 result;
 	int trigger = 0;
 
 	/* sample input state */
-	result = (px4->m_ext_cas->input() > 0) ? 1 : 0;
+	result = (m_ext_cas->input() > 0) ? 1 : 0;
 
 	/* detect transition */
-	switch ((px4->m_ctrl1 >> 1) & 0x03)
+	switch ((m_ctrl1 >> 1) & 0x03)
 	{
 	case 0: /* trigger inhibit */
 		trigger = 0;
 		break;
 	case 1: /* falling edge trigger */
-		trigger = px4->m_ear_last_state == 1 && result == 0;
+		trigger = m_ear_last_state == 1 && result == 0;
 		break;
 	case 2: /* rising edge trigger */
-		trigger = px4->m_ear_last_state == 0 && result == 1;
+		trigger = m_ear_last_state == 0 && result == 1;
 		break;
 	case 3: /* rising/falling edge trigger */
-		trigger = px4->m_ear_last_state != result;
+		trigger = m_ear_last_state != result;
 		break;
 	}
 
 	/* generate an interrupt if we need to trigger */
 	if (trigger)
 	{
-		px4->m_icrb = px4->m_frc_value;
-		px4->m_isr |= INT2_ICF;
-		gapnit_interrupt(machine);
+		m_icrb = m_frc_value;
+		m_isr |= INT2_ICF;
+		gapnit_interrupt(machine());
 	}
 
 	/* save last state */
-	px4->m_ear_last_state = result;
+	m_ear_last_state = result;
 }
 
 /* free running counter */
@@ -747,19 +749,18 @@ WRITE8_MEMBER(px4_state::px4_spur_w)
     GAPNIO
 ***************************************************************************/
 
-static TIMER_CALLBACK( transmit_data )
+TIMER_CALLBACK_MEMBER(px4_state::transmit_data)
 {
-	px4_state *px4 = machine.driver_data<px4_state>();
 
-	if (BIT(px4->m_artcr, 0))// ART_TX_ENABLED
+	if (BIT(m_artcr, 0))// ART_TX_ENABLED
 	{
 
 	}
 }
 
-static TIMER_CALLBACK( receive_data )
+TIMER_CALLBACK_MEMBER(px4_state::receive_data)
 {
-	px4_state *px4 = machine.driver_data<px4_state>();
+	px4_state *px4 = machine().driver_data<px4_state>();
 
 	if (ART_RX_ENABLED)
 	{
@@ -1087,14 +1088,14 @@ DRIVER_INIT_MEMBER(px4_state,px4)
 	m_alarm_int_enabled = TRUE;
 
 	/* art */
-	m_receive_timer = machine().scheduler().timer_alloc(FUNC(receive_data));
-	m_transmit_timer = machine().scheduler().timer_alloc(FUNC(transmit_data));
+	m_receive_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(px4_state::receive_data),this));
+	m_transmit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(px4_state::transmit_data),this));
 
 	/* printer */
 	m_centronics = machine().device<centronics_device>("centronics");
 
 	/* external cassette or barcode reader */
-	m_ext_cas_timer = machine().scheduler().timer_alloc(FUNC(ext_cassette_read));
+	m_ext_cas_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(px4_state::ext_cassette_read),this));
 	m_ext_cas = machine().device<cassette_image_device>("extcas");
 	m_ear_last_state = 0;
 

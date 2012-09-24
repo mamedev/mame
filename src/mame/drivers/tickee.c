@@ -56,6 +56,9 @@ public:
 	DECLARE_MACHINE_RESET(tickee);
 	DECLARE_VIDEO_START(tickee);
 	DECLARE_MACHINE_RESET(rapidfir);
+	TIMER_CALLBACK_MEMBER(trigger_gun_interrupt);
+	TIMER_CALLBACK_MEMBER(clear_gun_interrupt);
+	TIMER_CALLBACK_MEMBER(setup_gun_interrupts);
 };
 
 
@@ -86,49 +89,47 @@ INLINE void get_crosshair_xy(running_machine &machine, int player, int *x, int *
  *
  *************************************/
 
-static TIMER_CALLBACK( trigger_gun_interrupt )
+TIMER_CALLBACK_MEMBER(tickee_state::trigger_gun_interrupt)
 {
-	tickee_state *state = machine.driver_data<tickee_state>();
 	int which = param & 1;
-	int beamx = (machine.primary_screen->hpos()/2)-58;
+	int beamx = (machine().primary_screen->hpos()/2)-58;
 
 	/* once we're ready to fire, set the X coordinate and assert the line */
-	state->m_gunx[which] = beamx;
+	m_gunx[which] = beamx;
 
 	/* fire the IRQ at the correct moment */
-	machine.device("maincpu")->execute().set_input_line(param, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(param, ASSERT_LINE);
 }
 
 
-static TIMER_CALLBACK( clear_gun_interrupt )
+TIMER_CALLBACK_MEMBER(tickee_state::clear_gun_interrupt)
 {
 	/* clear the IRQ on the next scanline? */
-	machine.device("maincpu")->execute().set_input_line(param, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(param, CLEAR_LINE);
 }
 
 
-static TIMER_CALLBACK( setup_gun_interrupts )
+TIMER_CALLBACK_MEMBER(tickee_state::setup_gun_interrupts)
 {
-	tickee_state *state = machine.driver_data<tickee_state>();
 	int beamx, beamy;
 
 	/* set a timer to do this again next frame */
-	state->m_setup_gun_timer->adjust(machine.primary_screen->time_until_pos(0));
+	m_setup_gun_timer->adjust(machine().primary_screen->time_until_pos(0));
 
 	/* only do work if the palette is flashed */
-	if (state->m_control)
-		if (!state->m_control[2])
+	if (m_control)
+		if (!m_control[2])
 			return;
 
 	/* generate interrupts for player 1's gun */
-	get_crosshair_xy(machine, 0, &beamx, &beamy);
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(beamy + state->m_beamyadd, beamx + state->m_beamxadd), FUNC(trigger_gun_interrupt), 0);
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(beamy + state->m_beamyadd + 1, beamx + state->m_beamxadd), FUNC(clear_gun_interrupt), 0);
+	get_crosshair_xy(machine(), 0, &beamx, &beamy);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), timer_expired_delegate(FUNC(tickee_state::trigger_gun_interrupt),this), 0);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), timer_expired_delegate(FUNC(tickee_state::clear_gun_interrupt),this), 0);
 
 	/* generate interrupts for player 2's gun */
-	get_crosshair_xy(machine, 1, &beamx, &beamy);
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(beamy + state->m_beamyadd, beamx + state->m_beamxadd), FUNC(trigger_gun_interrupt), 1);
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(beamy + state->m_beamyadd + 1, beamx + state->m_beamxadd), FUNC(clear_gun_interrupt), 1);
+	get_crosshair_xy(machine(), 1, &beamx, &beamy);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), timer_expired_delegate(FUNC(tickee_state::trigger_gun_interrupt),this), 1);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), timer_expired_delegate(FUNC(tickee_state::clear_gun_interrupt),this), 1);
 }
 
 
@@ -142,7 +143,7 @@ static TIMER_CALLBACK( setup_gun_interrupts )
 VIDEO_START_MEMBER(tickee_state,tickee)
 {
 	/* start a timer going on the first scanline of every frame */
-	m_setup_gun_timer = machine().scheduler().timer_alloc(FUNC(setup_gun_interrupts));
+	m_setup_gun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tickee_state::setup_gun_interrupts),this));
 	m_setup_gun_timer->adjust(machine().primary_screen->time_until_pos(0));
 }
 

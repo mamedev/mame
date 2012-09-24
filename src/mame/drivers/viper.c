@@ -350,6 +350,8 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(viper_vblank);
+	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
+	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
 };
 
 UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -609,7 +611,7 @@ static const char* epic_get_register_name(UINT32 reg)
 }
 #endif
 
-static TIMER_CALLBACK(epic_global_timer_callback)
+TIMER_CALLBACK_MEMBER(viper_state::epic_global_timer_callback)
 {
 	int timer_num = param;
 
@@ -627,7 +629,7 @@ static TIMER_CALLBACK(epic_global_timer_callback)
 		epic.global_timer[timer_num].timer->reset();
 	}
 
-	mpc8240_interrupt(machine, MPC8240_GTIMER0_IRQ + timer_num);
+	mpc8240_interrupt(machine(), MPC8240_GTIMER0_IRQ + timer_num);
 }
 
 
@@ -1172,10 +1174,11 @@ static void mpc8240_interrupt(running_machine &machine, int irq)
 
 static void mpc8240_epic_init(running_machine &machine)
 {
-	epic.global_timer[0].timer = machine.scheduler().timer_alloc(FUNC(epic_global_timer_callback));
-	epic.global_timer[1].timer = machine.scheduler().timer_alloc(FUNC(epic_global_timer_callback));
-	epic.global_timer[2].timer = machine.scheduler().timer_alloc(FUNC(epic_global_timer_callback));
-	epic.global_timer[3].timer = machine.scheduler().timer_alloc(FUNC(epic_global_timer_callback));
+	viper_state *state = machine.driver_data<viper_state>();
+	epic.global_timer[0].timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),state));
+	epic.global_timer[1].timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),state));
+	epic.global_timer[2].timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),state));
+	epic.global_timer[3].timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),state));
 }
 
 static void mpc8240_epic_reset(void)
@@ -1606,7 +1609,7 @@ static UINT8 *ds2430_rom;
 static UINT8 ds2430_addr;
 
 
-static TIMER_CALLBACK(ds2430_timer_callback)
+TIMER_CALLBACK_MEMBER(viper_state::ds2430_timer_callback)
 {
 	printf("DS2430 timer callback\n");
 
@@ -1965,7 +1968,7 @@ static void ide_interrupt(device_t *device, int state)
 
 void viper_state::machine_start()
 {
-	ds2430_timer = machine().scheduler().timer_alloc(FUNC(ds2430_timer_callback));
+	ds2430_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::ds2430_timer_callback),this));
 	ds2430_bit_timer = machine().device<timer_device>("ds2430_timer2");
 	mpc8240_epic_init(machine());
 

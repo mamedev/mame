@@ -65,6 +65,7 @@ public:
 	UINT8 m_segment;
 	UINT8 m_digit;
 	UINT8 m_keydata;
+	TIMER_CALLBACK_MEMBER(mekd2_trace);
 };
 
 
@@ -159,9 +160,9 @@ INPUT_PORTS_END
 
 ************************************************************/
 
-static TIMER_CALLBACK( mekd2_trace )
+TIMER_CALLBACK_MEMBER(mekd2_state::mekd2_trace)
 {
-	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER( mekd2_state::mekd2_nmi_w )
@@ -169,7 +170,7 @@ WRITE_LINE_MEMBER( mekd2_state::mekd2_nmi_w )
 	if (state)
 		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	else
-		machine().scheduler().timer_set(attotime::from_usec(18), FUNC(mekd2_trace));
+		machine().scheduler().timer_set(attotime::from_usec(18), timer_expired_delegate(FUNC(mekd2_state::mekd2_trace),this));
 }
 
 

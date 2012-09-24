@@ -139,6 +139,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_rabbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rabbit_vblank_interrupt);
+	TIMER_CALLBACK_MEMBER(rabbit_blit_done);
 };
 
 
@@ -558,10 +559,9 @@ WRITE32_MEMBER(rabbit_state::rabbit_rombank_w)
 #define BLITCMDLOG 0
 #define BLITLOG 0
 
-static TIMER_CALLBACK( rabbit_blit_done )
+TIMER_CALLBACK_MEMBER(rabbit_state::rabbit_blit_done)
 {
-	rabbit_state *state = machine.driver_data<rabbit_state>();
-	machine.device("maincpu")->execute().set_input_line(state->m_bltirqlevel, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(m_bltirqlevel, HOLD_LINE);
 }
 
 static void rabbit_do_blit(running_machine &machine)
@@ -609,7 +609,7 @@ static void rabbit_do_blit(running_machine &machine)
 				if (!blt_amount)
 				{
 					if(BLITLOG) mame_printf_debug("end of blit list\n");
-					machine.scheduler().timer_set(attotime::from_usec(500), FUNC(rabbit_blit_done));
+					machine.scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(rabbit_state::rabbit_blit_done),state));
 					return;
 				}
 

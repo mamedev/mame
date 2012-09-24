@@ -141,6 +141,8 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vii_vblank);
+	TIMER_CALLBACK_MEMBER(tmb1_tick);
+	TIMER_CALLBACK_MEMBER(tmb2_tick);
 };
 
 enum
@@ -979,16 +981,14 @@ static DEVICE_IMAGE_LOAD( vsmile_cart )
 	return IMAGE_INIT_PASS;
 }
 
-static TIMER_CALLBACK( tmb1_tick )
+TIMER_CALLBACK_MEMBER(vii_state::tmb1_tick)
 {
-	vii_state *state = machine.driver_data<vii_state>();
-	state->m_io_regs[0x22] |= 1;
+	m_io_regs[0x22] |= 1;
 }
 
-static TIMER_CALLBACK( tmb2_tick )
+TIMER_CALLBACK_MEMBER(vii_state::tmb2_tick)
 {
-	vii_state *state = machine.driver_data<vii_state>();
-	state->m_io_regs[0x22] |= 2;
+	m_io_regs[0x22] |= 2;
 }
 
 void vii_state::machine_start()
@@ -1012,8 +1012,8 @@ void vii_state::machine_start()
 	m_video_regs[0x36] = 0xffff;
 	m_video_regs[0x37] = 0xffff;
 
-	m_tmb1 = machine().scheduler().timer_alloc(FUNC(tmb1_tick));
-	m_tmb2 = machine().scheduler().timer_alloc(FUNC(tmb2_tick));
+	m_tmb1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vii_state::tmb1_tick),this));
+	m_tmb2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vii_state::tmb2_tick),this));
 	m_tmb1->reset();
 	m_tmb2->reset();
 }

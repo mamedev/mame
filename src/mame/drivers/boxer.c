@@ -50,6 +50,8 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_boxer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(pot_interrupt);
+	TIMER_CALLBACK_MEMBER(periodic_callback);
 };
 
 /*************************************
@@ -58,24 +60,22 @@ public:
  *
  *************************************/
 
-static TIMER_CALLBACK( pot_interrupt )
+TIMER_CALLBACK_MEMBER(boxer_state::pot_interrupt)
 {
-	boxer_state *state = machine.driver_data<boxer_state>();
 	int mask = param;
 
-	if (state->m_pot_latch & mask)
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (m_pot_latch & mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
-	state->m_pot_state |= mask;
+	m_pot_state |= mask;
 }
 
 
-static TIMER_CALLBACK( periodic_callback )
+TIMER_CALLBACK_MEMBER(boxer_state::periodic_callback)
 {
-	boxer_state *state = machine.driver_data<boxer_state>();
 	int scanline = param;
 
-	state->m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if (scanline == 0)
 	{
@@ -85,18 +85,18 @@ static TIMER_CALLBACK( periodic_callback )
 
 		memset(mask, 0, sizeof mask);
 
-		mask[state->ioport("STICK0_X")->read()] |= 0x01;
-		mask[state->ioport("STICK0_Y")->read()] |= 0x02;
-		mask[state->ioport("PADDLE0")->read()]  |= 0x04;
-		mask[state->ioport("STICK1_X")->read()] |= 0x08;
-		mask[state->ioport("STICK1_Y")->read()] |= 0x10;
-		mask[state->ioport("PADDLE1")->read()]  |= 0x20;
+		mask[ioport("STICK0_X")->read()] |= 0x01;
+		mask[ioport("STICK0_Y")->read()] |= 0x02;
+		mask[ioport("PADDLE0")->read()]  |= 0x04;
+		mask[ioport("STICK1_X")->read()] |= 0x08;
+		mask[ioport("STICK1_Y")->read()] |= 0x10;
+		mask[ioport("PADDLE1")->read()]  |= 0x20;
 
 		for (i = 1; i < 256; i++)
 			if (mask[i] != 0)
-				machine.scheduler().timer_set(machine.primary_screen->time_until_pos(i), FUNC(pot_interrupt), mask[i]);
+				machine().scheduler().timer_set(machine().primary_screen->time_until_pos(i), timer_expired_delegate(FUNC(boxer_state::pot_interrupt),this), mask[i]);
 
-		state->m_pot_state = 0;
+		m_pot_state = 0;
 	}
 
 	scanline += 64;
@@ -104,7 +104,7 @@ static TIMER_CALLBACK( periodic_callback )
 	if (scanline >= 262)
 		scanline = 0;
 
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(periodic_callback), scanline);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(boxer_state::periodic_callback),this), scanline);
 }
 
 
@@ -436,7 +436,7 @@ void boxer_state::machine_start()
 
 void boxer_state::machine_reset()
 {
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(periodic_callback));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(boxer_state::periodic_callback),this));
 
 	m_pot_state = 0;
 	m_pot_latch = 0;

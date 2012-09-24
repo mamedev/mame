@@ -58,6 +58,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank);
+	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
 };
 
 
@@ -256,19 +257,20 @@ WRITE16_MEMBER(cubeqst_state::control_w)
  *
  *************************************/
 
-static TIMER_CALLBACK( delayed_bank_swap )
+TIMER_CALLBACK_MEMBER(cubeqst_state::delayed_bank_swap)
 {
-	cubeqcpu_swap_line_banks(machine.device("line_cpu"));
+	cubeqcpu_swap_line_banks(machine().device("line_cpu"));
 
 	/* TODO: This is a little dubious */
-	cubeqcpu_clear_stack(machine.device("line_cpu"));
+	cubeqcpu_clear_stack(machine().device("line_cpu"));
 }
 
 
 static void swap_linecpu_banks(running_machine &machine)
 {
+	cubeqst_state *state = machine.driver_data<cubeqst_state>();
 	/* Best sync up before we switch banks around */
-	machine.scheduler().synchronize(FUNC(delayed_bank_swap));
+	machine.scheduler().synchronize(timer_expired_delegate(FUNC(cubeqst_state::delayed_bank_swap),state));
 }
 
 

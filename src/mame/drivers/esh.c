@@ -51,6 +51,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_esh);
+	TIMER_CALLBACK_MEMBER(irq_stop);
 };
 
 
@@ -279,16 +280,16 @@ static GFXDECODE_START( esh )
 	GFXDECODE_ENTRY("gfx1", 0, esh_gfx_layout, 0x0, 0x20)
 GFXDECODE_END
 
-static TIMER_CALLBACK( irq_stop )
+TIMER_CALLBACK_MEMBER(esh_state::irq_stop)
 {
-	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(esh_state::vblank_callback_esh)
 {
 	// IRQ
 	device.execute().set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_usec(50), FUNC(irq_stop));
+	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(esh_state::irq_stop),this));
 }
 
 void esh_state::machine_start()

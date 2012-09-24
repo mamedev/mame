@@ -235,6 +235,7 @@ public:
 	UINT32 screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pc6001_interrupt);
 	INTERRUPT_GEN_MEMBER(pc6001sr_interrupt);
+	TIMER_CALLBACK_MEMBER(audio_callback);
 };
 
 
@@ -1357,14 +1358,13 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_0xf3_w)
 	m_timer_irq_mask2 = data & 4;
 }
 
-static TIMER_CALLBACK(audio_callback)
+TIMER_CALLBACK_MEMBER(pc6001_state::audio_callback)
 {
-	pc6001_state *state = machine.driver_data<pc6001_state>();
-	if(state->m_cas_switch == 0 && ((state->m_timer_irq_mask == 0) || (state->m_timer_irq_mask2 == 0)))
+	if(m_cas_switch == 0 && ((m_timer_irq_mask == 0) || (m_timer_irq_mask2 == 0)))
 	{
-		if(IRQ_LOG) printf("Timer IRQ called %02x\n",state->m_timer_irq_vector);
-		state->m_irq_vector = state->m_timer_irq_vector;
-		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		if(IRQ_LOG) printf("Timer IRQ called %02x\n",m_timer_irq_vector);
+		m_irq_vector = m_timer_irq_vector;
+		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 	}
 }
 
@@ -2106,7 +2106,7 @@ void pc6001_state::machine_start()
 	m_timer_hz_div = 3;
 	{
 		attotime period = attotime::from_hz((487.5*4)/(m_timer_hz_div+1));
-		m_timer_irq_timer = machine().scheduler().timer_alloc(FUNC(audio_callback));
+		m_timer_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc6001_state::audio_callback),this));
 		m_timer_irq_timer->adjust(period,  0, period);
 	}
 }

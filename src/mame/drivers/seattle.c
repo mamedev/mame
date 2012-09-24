@@ -494,6 +494,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_seattle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(galileo_timer_callback);
 };
 
 
@@ -506,7 +507,7 @@ public:
 static void vblank_assert(device_t *device, int state);
 static void update_vblank_irq(running_machine &machine);
 static void galileo_reset(running_machine &machine);
-static TIMER_CALLBACK( galileo_timer_callback );
+
 static void galileo_perform_dma(address_space &space, int which);
 static void voodoo_stall(device_t *device, int stall);
 static void widget_reset(running_machine &machine);
@@ -540,10 +541,10 @@ void seattle_state::machine_start()
 	m_voodoo = machine().device("voodoo");
 
 	/* allocate timers for the galileo */
-	m_galileo.timer[0].timer = machine().scheduler().timer_alloc(FUNC(galileo_timer_callback));
-	m_galileo.timer[1].timer = machine().scheduler().timer_alloc(FUNC(galileo_timer_callback));
-	m_galileo.timer[2].timer = machine().scheduler().timer_alloc(FUNC(galileo_timer_callback));
-	m_galileo.timer[3].timer = machine().scheduler().timer_alloc(FUNC(galileo_timer_callback));
+	m_galileo.timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seattle_state::galileo_timer_callback),this));
+	m_galileo.timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seattle_state::galileo_timer_callback),this));
+	m_galileo.timer[2].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seattle_state::galileo_timer_callback),this));
+	m_galileo.timer[3].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seattle_state::galileo_timer_callback),this));
 
 	/* set the fastest DRC options, but strict verification */
 	mips3drc_set_options(machine().device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
@@ -940,29 +941,28 @@ static void update_galileo_irqs(running_machine &machine)
 }
 
 
-static TIMER_CALLBACK( galileo_timer_callback )
+TIMER_CALLBACK_MEMBER(seattle_state::galileo_timer_callback)
 {
-	seattle_state *state = machine.driver_data<seattle_state>();
 	int which = param;
-	galileo_timer *timer = &state->m_galileo.timer[which];
+	galileo_timer *timer = &m_galileo.timer[which];
 
 	if (LOG_TIMERS)
 		logerror("timer %d fired\n", which);
 
 	/* copy the start value from the registers */
-	timer->count = state->m_galileo.reg[GREG_TIMER0_COUNT + which];
+	timer->count = m_galileo.reg[GREG_TIMER0_COUNT + which];
 	if (which != 0)
 		timer->count &= 0xffffff;
 
 	/* if we're a timer, adjust the timer to fire again */
-	if (state->m_galileo.reg[GREG_TIMER_CONTROL] & (2 << (2 * which)))
+	if (m_galileo.reg[GREG_TIMER_CONTROL] & (2 << (2 * which)))
 		timer->timer->adjust(TIMER_PERIOD * timer->count, which);
 	else
 		timer->active = timer->count = 0;
 
 	/* trigger the interrupt */
-	state->m_galileo.reg[GREG_INT_STATE] |= 1 << (GINT_T0EXP_SHIFT + which);
-	update_galileo_irqs(machine);
+	m_galileo.reg[GREG_INT_STATE] |= 1 << (GINT_T0EXP_SHIFT + which);
+	update_galileo_irqs(machine());
 }
 
 

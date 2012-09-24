@@ -218,6 +218,7 @@ public:
 	DECLARE_READ32_MEMBER(ppc_spu_share_r);
 	DECLARE_WRITE32_MEMBER(ppc_spu_share_w);
 	DECLARE_READ16_MEMBER(spu_unk_r);	
+	TIMER_CALLBACK_MEMBER(keyboard_timer_callback);
 };
 
 
@@ -1475,9 +1476,8 @@ static const int keyboard_notes[24] =
 	0x53,	// B2
 };
 
-static TIMER_CALLBACK( keyboard_timer_callback )
+TIMER_CALLBACK_MEMBER(firebeat_state::keyboard_timer_callback)
 {
-	firebeat_state *state = machine.driver_data<firebeat_state>();
 	static const int kb_uart_channel[2] = { 1, 0 };
 	static const char *const keynames[] = { "KEYBOARD_P1", "KEYBOARD_P2" };
 	int keyboard;
@@ -1485,38 +1485,38 @@ static TIMER_CALLBACK( keyboard_timer_callback )
 
 	for (keyboard=0; keyboard < 2; keyboard++)
 	{
-		UINT32 kbstate = machine.root_device().ioport(keynames[keyboard])->read();
+		UINT32 kbstate = machine().root_device().ioport(keynames[keyboard])->read();
 		int uart_channel = kb_uart_channel[keyboard];
 
-		if (kbstate != state->m_keyboard_state[keyboard])
+		if (kbstate != m_keyboard_state[keyboard])
 		{
 			for (i=0; i < 24; i++)
 			{
 				int kbnote = keyboard_notes[i];
 
-				if ((state->m_keyboard_state[keyboard] & (1 << i)) != 0 && (kbstate & (1 << i)) == 0)
+				if ((m_keyboard_state[keyboard] & (1 << i)) != 0 && (kbstate & (1 << i)) == 0)
 				{
 					// key was on, now off -> send Note Off message
-					pc16552d_rx_data(machine, 1, uart_channel, 0x80);
-					pc16552d_rx_data(machine, 1, uart_channel, kbnote);
-					pc16552d_rx_data(machine, 1, uart_channel, 0x7f);
+					pc16552d_rx_data(machine(), 1, uart_channel, 0x80);
+					pc16552d_rx_data(machine(), 1, uart_channel, kbnote);
+					pc16552d_rx_data(machine(), 1, uart_channel, 0x7f);
 				}
-				else if ((state->m_keyboard_state[keyboard] & (1 << i)) == 0 && (kbstate & (1 << i)) != 0)
+				else if ((m_keyboard_state[keyboard] & (1 << i)) == 0 && (kbstate & (1 << i)) != 0)
 				{
 					// key was off, now on -> send Note On message
-					pc16552d_rx_data(machine, 1, uart_channel, 0x90);
-					pc16552d_rx_data(machine, 1, uart_channel, kbnote);
-					pc16552d_rx_data(machine, 1, uart_channel, 0x7f);
+					pc16552d_rx_data(machine(), 1, uart_channel, 0x90);
+					pc16552d_rx_data(machine(), 1, uart_channel, kbnote);
+					pc16552d_rx_data(machine(), 1, uart_channel, 0x7f);
 				}
 			}
 		}
 		else
 		{
 			// no messages, send Active Sense message instead
-			pc16552d_rx_data(machine, 1, uart_channel, 0xfe);
+			pc16552d_rx_data(machine(), 1, uart_channel, 0xfe);
 		}
 
-		state->m_keyboard_state[keyboard] = kbstate;
+		m_keyboard_state[keyboard] = kbstate;
 	}
 }
 
@@ -2287,7 +2287,7 @@ static void init_keyboard(running_machine &machine)
 {
 	firebeat_state *state = machine.driver_data<firebeat_state>();
 	// set keyboard timer
-	state->m_keyboard_timer = machine.scheduler().timer_alloc(FUNC(keyboard_timer_callback));
+	state->m_keyboard_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(firebeat_state::keyboard_timer_callback),state));
 	state->m_keyboard_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
 }
 

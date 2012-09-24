@@ -264,6 +264,7 @@ public:
 	DECLARE_MACHINE_RESET(gticlub);
 	DECLARE_MACHINE_RESET(hangplt);
 	INTERRUPT_GEN_MEMBER(gticlub_vblank);
+	TIMER_CALLBACK_MEMBER(irq_off);
 };
 
 
@@ -707,17 +708,18 @@ static const sharc_config sharc_cfg =
 };
 
 
-static TIMER_CALLBACK( irq_off )
+TIMER_CALLBACK_MEMBER(gticlub_state::irq_off)
 {
-	machine.device("audiocpu")->execute().set_input_line(param, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(param, CLEAR_LINE);
 }
 
 static void sound_irq_callback( running_machine &machine, int irq )
 {
+	gticlub_state *state = machine.driver_data<gticlub_state>();
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
 	machine.device("audiocpu")->execute().set_input_line(line, ASSERT_LINE);
-	machine.scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off), line);
+	machine.scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(gticlub_state::irq_off),state), line);
 }
 
 static const k056800_interface gticlub_k056800_interface =

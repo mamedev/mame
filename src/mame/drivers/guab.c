@@ -99,6 +99,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(fdc_data_callback);
 };
 
 
@@ -324,11 +325,10 @@ enum wd1770_status
 };
 
 
-static TIMER_CALLBACK( fdc_data_callback )
+TIMER_CALLBACK_MEMBER(guab_state::fdc_data_callback)
 {
-	guab_state *state = machine.driver_data<guab_state>();
-	struct wd1770 &fdc = state->m_fdc;
-	UINT8* disk = (UINT8*)state->memregion("user1")->base();
+	struct wd1770 &fdc = m_fdc;
+	UINT8* disk = (UINT8*)memregion("user1")->base();
 	int more_data = 0;
 
 	/*
@@ -374,7 +374,7 @@ static TIMER_CALLBACK( fdc_data_callback )
 
 	if (more_data)
 	{
-		state->m_fdc_timer->adjust(attotime::from_usec(USEC_DELAY));
+		m_fdc_timer->adjust(attotime::from_usec(USEC_DELAY));
 	}
 	else
 	{
@@ -384,7 +384,7 @@ static TIMER_CALLBACK( fdc_data_callback )
 	}
 
 	fdc.status |= DATA_REQUEST;
-	machine.device("maincpu")->execute().set_input_line(INT_FLOPPYCTRL, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(INT_FLOPPYCTRL, ASSERT_LINE);
 }
 
 
@@ -805,7 +805,7 @@ static const sn76496_config psg_intf =
 
 void guab_state::machine_start()
 {
-	m_fdc_timer = machine().scheduler().timer_alloc(FUNC(fdc_data_callback));
+	m_fdc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(guab_state::fdc_data_callback),this));
 }
 
 void guab_state::machine_reset()

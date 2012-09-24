@@ -60,6 +60,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq13_w );
 	DECLARE_WRITE_LINE_MEMBER( irq14_w );
 	DECLARE_WRITE_LINE_MEMBER( irq15_w );
+	TIMER_CALLBACK_MEMBER(pad_func);
 };
 
 
@@ -117,16 +118,15 @@ READ16_MEMBER( pcfx_state::pad_r )
 	return res;
 }
 
-static TIMER_CALLBACK(pad_func)
+TIMER_CALLBACK_MEMBER(pcfx_state::pad_func)
 {
-	pcfx_state *state = machine.driver_data<pcfx_state>();
 	const char *const padnames[] = { "P1", "P2" };
 
-	state->m_pad.latch[param] = machine.root_device().ioport(padnames[param])->read();
-	state->m_pad.status[param] |= 8;
-	state->m_pad.ctrl[param] &= ~1; // ack TX line
+	m_pad.latch[param] = machine().root_device().ioport(padnames[param])->read();
+	m_pad.status[param] |= 8;
+	m_pad.ctrl[param] &= ~1; // ack TX line
 	// TODO: pad IRQ
-//  state->set_irq_line(11, 1);
+//  set_irq_line(11, 1);
 }
 
 WRITE16_MEMBER( pcfx_state::pad_w )
@@ -143,7 +143,7 @@ WRITE16_MEMBER( pcfx_state::pad_w )
         */
 		if(data & 1 && (!(m_pad.ctrl[port_type] & 1)))
 		{
-			machine().scheduler().timer_set(attotime::from_msec(1), FUNC(pad_func), port_type); // TODO: time
+			machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(pcfx_state::pad_func),this), port_type); // TODO: time
 		}
 
 		m_pad.ctrl[port_type] = data & 7;

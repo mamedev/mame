@@ -80,6 +80,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_beaminv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(interrupt_callback);
 };
 
 
@@ -97,27 +98,26 @@ public:
 static const int interrupt_lines[INTERRUPTS_PER_FRAME] = { 0x00, 0x80 };
 
 
-static TIMER_CALLBACK( interrupt_callback )
+TIMER_CALLBACK_MEMBER(beaminv_state::interrupt_callback)
 {
-	beaminv_state *state = machine.driver_data<beaminv_state>();
 	int interrupt_number = param;
 	int next_interrupt_number;
 	int next_vpos;
 
-	state->m_maincpu->set_input_line(0, HOLD_LINE);
+	m_maincpu->set_input_line(0, HOLD_LINE);
 
 	/* set up for next interrupt */
 	next_interrupt_number = (interrupt_number + 1) % INTERRUPTS_PER_FRAME;
 	next_vpos = interrupt_lines[next_interrupt_number];
 
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(next_vpos), next_interrupt_number);
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(next_vpos), next_interrupt_number);
 }
 
 
 static void create_interrupt_timer( running_machine &machine )
 {
 	beaminv_state *state = machine.driver_data<beaminv_state>();
-	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
+	state->m_interrupt_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(beaminv_state::interrupt_callback),state));
 }
 
 

@@ -80,6 +80,7 @@ public:
 	virtual void video_start();
 	DECLARE_DRIVER_INIT(okean240);
 	UINT32 screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(okean240_boot);
 };
 
 // okean240 requires bit 4 to change
@@ -356,15 +357,14 @@ INPUT_PORTS_END
 
 
 /* after the first 6 bytes have been read from ROM, switch the ram back in */
-static TIMER_CALLBACK( okean240_boot )
+TIMER_CALLBACK_MEMBER(okean240_state::okean240_boot)
 {
-	okean240_state *state = machine.driver_data<okean240_state>();
-	state->membank("boot")->set_entry(0);
+	membank("boot")->set_entry(0);
 }
 
 void okean240_state::machine_reset()
 {
-	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(okean240_boot));
+	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(okean240_state::okean240_boot),this));
 	membank("boot")->set_entry(1);
 	m_term_data = 0;
 	m_j = 0;

@@ -65,6 +65,8 @@ public:
 	DECLARE_MACHINE_RESET(drill);
 	INTERRUPT_GEN_MEMBER(drill_vblank_irq);
 	//INTERRUPT_GEN_MEMBER(drill_device_irq);
+	TIMER_CALLBACK_MEMBER(shutter_req);
+	TIMER_CALLBACK_MEMBER(defender_req);
 };
 
 
@@ -132,16 +134,14 @@ WRITE16_MEMBER(_2mindril_state::drill_io_w)
     PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
 */
 #ifdef UNUSED_FUNCTION
-static TIMER_CALLBACK( shutter_req )
+TIMER_CALLBACK_MEMBER(_2mindril_state::shutter_req)
 {
-	_2mindril_state *state = machine.driver_data<_2mindril_state>();
-	state->m_shutter_sensor = param;
+	m_shutter_sensor = param;
 }
 
-static TIMER_CALLBACK( defender_req )
+TIMER_CALLBACK_MEMBER(_2mindril_state::defender_req)
 {
-	_2mindril_state *state = machine.driver_data<_2mindril_state>();
-	state->m_defender_sensor = param;
+	m_defender_sensor = param;
 }
 #endif
 

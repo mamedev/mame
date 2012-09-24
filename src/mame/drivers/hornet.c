@@ -371,6 +371,7 @@ public:
 	DECLARE_MACHINE_RESET(hornet_2board);
 	UINT32 screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(irq_off);
 };
 
 
@@ -880,7 +881,7 @@ static const sharc_config sharc_cfg =
     NMI:    SCI
 
 */
-static TIMER_CALLBACK( irq_off );
+
 
 void hornet_state::machine_start()
 {
@@ -898,7 +899,7 @@ void hornet_state::machine_start()
 	state_save_register_global_pointer(machine(), m_jvs_sdata, 1024);
 	state_save_register_global(machine(), m_jvs_sdata_ptr);
 
-	m_sound_irq_timer = machine().scheduler().timer_alloc(FUNC(irq_off));
+	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hornet_state::irq_off),this));
 }
 
 void hornet_state::machine_reset()
@@ -933,9 +934,9 @@ static const adc12138_interface hornet_adc_interface = {
 	adc12138_input_callback
 };
 
-static TIMER_CALLBACK( irq_off )
+TIMER_CALLBACK_MEMBER(hornet_state::irq_off)
 {
-	machine.device("audiocpu")->execute().set_input_line(param, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(param, CLEAR_LINE);
 }
 
 static void sound_irq_callback( running_machine &machine, int irq )

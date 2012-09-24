@@ -267,6 +267,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(assert_lp_cb);
 };
 
 static const UINT8  id_022[8] = { 0x00, 0x01, 0x04, 0x09, 0x13, 0x16, 0x18, 0x00 };
@@ -372,13 +373,14 @@ WRITE8_MEMBER(peplus_state::peplus_crtc_mode_w)
 	/* Reset timing logic */
 }
 
-static TIMER_CALLBACK(assert_lp_cb)
+TIMER_CALLBACK_MEMBER(peplus_state::assert_lp_cb)
 {
 	downcast<mc6845_device *>((device_t*)ptr)->assert_light_pen_input();
 }
 
 static void handle_lightpen( device_t *device )
 {
+	peplus_state *state = device->machine().driver_data<peplus_state>();
     int x_val = device->machine().root_device().ioport("TOUCH_X")->read_safe(0x00);
     int y_val = device->machine().root_device().ioport("TOUCH_Y")->read_safe(0x00);
     const rectangle &vis_area = device->machine().primary_screen->visible_area();
@@ -387,7 +389,7 @@ static void handle_lightpen( device_t *device )
     xt = x_val * vis_area.width() / 1024 + vis_area.min_x;
     yt = y_val * vis_area.height() / 1024 + vis_area.min_y;
 
-     device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(yt, xt), FUNC(assert_lp_cb), 0, device);
+     device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(yt, xt), timer_expired_delegate(FUNC(peplus_state::assert_lp_cb),state), 0, device);
 }
 
 WRITE_LINE_MEMBER(peplus_state::crtc_vsync)

@@ -38,6 +38,7 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(scv_vb_callback);
 };
 
 
@@ -407,22 +408,21 @@ void scv_state::palette_init()
 }
 
 
-static TIMER_CALLBACK( scv_vb_callback )
+TIMER_CALLBACK_MEMBER(scv_state::scv_vb_callback)
 {
-	scv_state *state = machine.driver_data<scv_state>();
-	int vpos = machine.primary_screen->vpos();
+	int vpos = machine().primary_screen->vpos();
 
 	switch( vpos )
 	{
 	case 240:
-		machine.device("maincpu")->execute().set_input_line(UPD7810_INTF2, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(UPD7810_INTF2, ASSERT_LINE);
 		break;
 	case 0:
-		machine.device("maincpu")->execute().set_input_line(UPD7810_INTF2, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(UPD7810_INTF2, CLEAR_LINE);
 		break;
 	}
 
-	state->m_vb_timer->adjust( machine.primary_screen->time_until_pos(( vpos + 1 ) % 262, 0 ) );
+	m_vb_timer->adjust( machine().primary_screen->time_until_pos(( vpos + 1 ) % 262, 0 ) );
 }
 
 
@@ -751,7 +751,7 @@ WRITE_LINE_MEMBER( scv_state::scv_upd1771_ack_w )
 void scv_state::machine_start()
 {
 
-	m_vb_timer = machine().scheduler().timer_alloc(FUNC(scv_vb_callback));
+	m_vb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scv_state::scv_vb_callback),this));
 }
 
 

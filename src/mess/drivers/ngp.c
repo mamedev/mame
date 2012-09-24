@@ -166,38 +166,38 @@ public:
 	DECLARE_WRITE8_MEMBER( ngp_tlcs900_to3 );
 	UINT32 screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(power_callback);
+	TIMER_CALLBACK_MEMBER(ngp_seconds_callback);
 };
 
 
-static TIMER_CALLBACK( ngp_seconds_callback )
+TIMER_CALLBACK_MEMBER(ngp_state::ngp_seconds_callback)
 {
-	ngp_state *state = machine.driver_data<ngp_state>();
 
-	state->m_io_reg[0x16] += 1;
-	if ( ( state->m_io_reg[0x16] & 0x0f ) == 0x0a )
+	m_io_reg[0x16] += 1;
+	if ( ( m_io_reg[0x16] & 0x0f ) == 0x0a )
 	{
-		state->m_io_reg[0x16] += 0x06;
+		m_io_reg[0x16] += 0x06;
 	}
 
-	if ( state->m_io_reg[0x16] >= 0x60 )
+	if ( m_io_reg[0x16] >= 0x60 )
 	{
-		state->m_io_reg[0x16] = 0;
-		state->m_io_reg[0x15] += 1;
-		if ( ( state->m_io_reg[0x15] & 0x0f ) == 0x0a ) {
-			state->m_io_reg[0x15] += 0x06;
+		m_io_reg[0x16] = 0;
+		m_io_reg[0x15] += 1;
+		if ( ( m_io_reg[0x15] & 0x0f ) == 0x0a ) {
+			m_io_reg[0x15] += 0x06;
 		}
 
-		if ( state->m_io_reg[0x15] >= 0x60 )
+		if ( m_io_reg[0x15] >= 0x60 )
 		{
-			state->m_io_reg[0x15] = 0;
-			state->m_io_reg[0x14] += 1;
-			if ( ( state->m_io_reg[0x14] & 0x0f ) == 0x0a ) {
-				state->m_io_reg[0x14] += 0x06;
+			m_io_reg[0x15] = 0;
+			m_io_reg[0x14] += 1;
+			if ( ( m_io_reg[0x14] & 0x0f ) == 0x0a ) {
+				m_io_reg[0x14] += 0x06;
 			}
 
-			if ( state->m_io_reg[0x14] == 0x24 )
+			if ( m_io_reg[0x14] == 0x24 )
 			{
-				state->m_io_reg[0x14] = 0;
+				m_io_reg[0x14] = 0;
 			}
 		}
 	}
@@ -603,7 +603,7 @@ WRITE8_MEMBER( ngp_state::ngp_tlcs900_to3 )
 
 void ngp_state::machine_start()
 {
-	m_seconds_timer = machine().scheduler().timer_alloc(FUNC(ngp_seconds_callback));
+	m_seconds_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ngp_state::ngp_seconds_callback),this));
 	m_seconds_timer->adjust( attotime::from_seconds(1), 0, attotime::from_seconds(1) );
 }
 

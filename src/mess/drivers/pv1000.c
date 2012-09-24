@@ -100,6 +100,8 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(d65010_irq_on_cb);
+	TIMER_CALLBACK_MEMBER(d65010_irq_off_cb);
 };
 
 
@@ -345,38 +347,36 @@ static DEVICE_START( pv1000_sound )
 
 /* Interrupt is triggering 16 times during vblank. */
 /* we have chosen to trigger on scanlines 195, 199, 203, 207, 211, 215, 219, 223, 227, 231, 235, 239, 243, 247, 251, 255 */
-static TIMER_CALLBACK( d65010_irq_on_cb )
+TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_on_cb)
 {
-	pv1000_state *state = machine.driver_data<pv1000_state>();
-	int vpos = state->m_screen->vpos();
+	int vpos = m_screen->vpos();
 	int next_vpos = vpos + 12;
 
 	/* Set IRQ line and schedule release of IRQ line */
-	state->m_maincpu->set_input_line(0, ASSERT_LINE );
-	state->m_irq_off_timer->adjust( state->m_screen->time_until_pos(vpos, 380/2 ) );
+	m_maincpu->set_input_line(0, ASSERT_LINE );
+	m_irq_off_timer->adjust( m_screen->time_until_pos(vpos, 380/2 ) );
 
 	/* Schedule next IRQ trigger */
 	if ( vpos >= 255 )
 	{
 		next_vpos = 195;
 	}
-	state->m_irq_on_timer->adjust( state->m_screen->time_until_pos(next_vpos, 0 ) );
+	m_irq_on_timer->adjust( m_screen->time_until_pos(next_vpos, 0 ) );
 }
 
 
-static TIMER_CALLBACK( d65010_irq_off_cb )
+TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_off_cb)
 {
-	pv1000_state *state = machine.driver_data<pv1000_state>();
 
-	state->m_maincpu->set_input_line(0, CLEAR_LINE );
+	m_maincpu->set_input_line(0, CLEAR_LINE );
 }
 
 
 void pv1000_state::machine_start()
 {
 
-	m_irq_on_timer = machine().scheduler().timer_alloc(FUNC(d65010_irq_on_cb));
-	m_irq_off_timer = machine().scheduler().timer_alloc(FUNC(d65010_irq_off_cb));
+	m_irq_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pv1000_state::d65010_irq_on_cb),this));
+	m_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pv1000_state::d65010_irq_off_cb),this));
 }
 
 

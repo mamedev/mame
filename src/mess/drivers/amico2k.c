@@ -52,6 +52,7 @@ public:
 
 	// timers
 	emu_timer *m_led_refresh_timer;
+	TIMER_CALLBACK_MEMBER(led_refresh);
 };
 
 
@@ -97,13 +98,12 @@ static INPUT_PORTS_START( amico2k )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static TIMER_CALLBACK( led_refresh )
+TIMER_CALLBACK_MEMBER(amico2k_state::led_refresh)
 {
-	amico2k_state *state = machine.driver_data<amico2k_state>();
 
-	if (state->m_ls145_p > 3)
+	if (m_ls145_p > 3)
 	{
-		output_set_digit_value(state->m_ls145_p - 4, state->m_segment);
+		output_set_digit_value(m_ls145_p - 4, m_segment);
 	}
 }
 
@@ -206,7 +206,7 @@ static I8255_INTERFACE( ppi_intf )
 
 void amico2k_state::machine_start()
 {
-	m_led_refresh_timer = machine().scheduler().timer_alloc(FUNC(led_refresh));
+	m_led_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amico2k_state::led_refresh),this));
 
 	// state saving
 	save_item(NAME(m_ls145_p));

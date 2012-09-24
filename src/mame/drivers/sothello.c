@@ -66,6 +66,8 @@ public:
 	DECLARE_READ8_MEMBER(subcpu_status_r);
 	DECLARE_WRITE8_MEMBER(msm_cfg_w);
 	virtual void machine_reset();
+	TIMER_CALLBACK_MEMBER(subcpu_suspend);
+	TIMER_CALLBACK_MEMBER(subcpu_resume);
 };
 
 
@@ -94,27 +96,27 @@ WRITE8_MEMBER(sothello_state::bank_w)
     membank("bank1")->set_base(&RAM[bank*0x4000+0x10000]);
 }
 
-static TIMER_CALLBACK( subcpu_suspend )
+TIMER_CALLBACK_MEMBER(sothello_state::subcpu_suspend)
 {
-    machine.device<cpu_device>("sub")->suspend(SUSPEND_REASON_HALT, 1);
+    machine().device<cpu_device>("sub")->suspend(SUSPEND_REASON_HALT, 1);
 }
 
-static TIMER_CALLBACK( subcpu_resume )
+TIMER_CALLBACK_MEMBER(sothello_state::subcpu_resume)
 {
-    machine.device<cpu_device>("sub")->resume(SUSPEND_REASON_HALT);
-    machine.device("sub")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+    machine().device<cpu_device>("sub")->resume(SUSPEND_REASON_HALT);
+    machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(sothello_state::subcpu_halt_set)
 {
-    machine().scheduler().synchronize(FUNC(subcpu_suspend));
+    machine().scheduler().synchronize(timer_expired_delegate(FUNC(sothello_state::subcpu_suspend),this));
     m_subcpu_status|=2;
     return 0;
 }
 
 READ8_MEMBER(sothello_state::subcpu_halt_clear)
 {
-    machine().scheduler().synchronize(FUNC(subcpu_resume));
+    machine().scheduler().synchronize(timer_expired_delegate(FUNC(sothello_state::subcpu_resume),this));
     m_subcpu_status&=~1;
     m_subcpu_status&=~2;
     return 0;

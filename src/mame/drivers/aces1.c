@@ -146,34 +146,34 @@ public:
 	DECLARE_DRIVER_INIT(aces1);
 	virtual void machine_start();
 	virtual void machine_reset();
+	TIMER_CALLBACK_MEMBER(m_aces1_irq_timer_callback);
+	TIMER_CALLBACK_MEMBER(m_aces1_nmi_timer_callback);
 };
 
 
 
 
 
-static TIMER_CALLBACK( m_aces1_irq_timer_callback )
+TIMER_CALLBACK_MEMBER(aces1_state::m_aces1_irq_timer_callback)
 {
-	aces1_state *state = machine.driver_data<aces1_state>();
 //  printf("irq\n");
-	state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
-	state->aces1_reset_irq_timer();
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
+	aces1_reset_irq_timer();
 }
 
-static TIMER_CALLBACK( m_aces1_nmi_timer_callback )
+TIMER_CALLBACK_MEMBER(aces1_state::m_aces1_nmi_timer_callback)
 {
-	aces1_state *state = machine.driver_data<aces1_state>();
 //  printf("nmi\n");
-	state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	state->aces1_reset_nmi_timer();
+	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	aces1_reset_nmi_timer();
 }
 
 static void aces1_create_timers(running_machine &machine)
 {
 	aces1_state *state = machine.driver_data<aces1_state>();
 
-	state->m_aces1_irq_timer = machine.scheduler().timer_alloc(FUNC(m_aces1_irq_timer_callback), 0);
-	state->m_aces1_nmi_timer = machine.scheduler().timer_alloc(FUNC(m_aces1_nmi_timer_callback), 0);
+	state->m_aces1_irq_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(aces1_state::m_aces1_irq_timer_callback),state), 0);
+	state->m_aces1_nmi_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(aces1_state::m_aces1_nmi_timer_callback),state), 0);
 }
 
 void aces1_state::machine_start()

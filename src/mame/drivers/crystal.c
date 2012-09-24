@@ -193,6 +193,7 @@ public:
 	UINT32 screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_crystal(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(crystal_interrupt);
+	TIMER_CALLBACK_MEMBER(Timercb);
 };
 
 static void IntReq( running_machine &machine, int num )
@@ -300,16 +301,15 @@ WRITE32_MEMBER(crystal_state::Banksw_w)
 		membank("bank1")->set_base(machine().root_device().memregion("user2")->base());
 }
 
-static TIMER_CALLBACK( Timercb )
+TIMER_CALLBACK_MEMBER(crystal_state::Timercb)
 {
-	crystal_state *state = machine.driver_data<crystal_state>();
 	int which = (int)(FPTR)ptr;
 	static const int num[] = { 0, 1, 9, 10 };
 
-	if (!(state->m_Timerctrl[which] & 2))
-		state->m_Timerctrl[which] &= ~1;
+	if (!(m_Timerctrl[which] & 2))
+		m_Timerctrl[which] &= ~1;
 
-	IntReq(machine, num[which]);
+	IntReq(machine(), num[which]);
 }
 
 INLINE void Timer_w( address_space &space, int which, UINT32 data, UINT32 mem_mask )
@@ -589,7 +589,7 @@ void crystal_state::machine_start()
 
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(icallback);
 	for (i = 0; i < 4; i++)
-		m_Timer[i] = machine().scheduler().timer_alloc(FUNC(Timercb), (void*)(FPTR)i);
+		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crystal_state::Timercb),this), (void*)(FPTR)i);
 
 	PatchReset(machine());
 

@@ -49,6 +49,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(argo);
+	TIMER_CALLBACK_MEMBER(argo_boot);
 };
 
 // write to videoram if following 'out b9,61' otherwise write to the unknown 'extra' ram
@@ -249,16 +250,15 @@ INPUT_PORTS_END
 
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
-static TIMER_CALLBACK( argo_boot )
+TIMER_CALLBACK_MEMBER(argo_state::argo_boot)
 {
-	argo_state *state = machine.driver_data<argo_state>();
-	state->membank("boot")->set_entry(0);
+	membank("boot")->set_entry(0);
 }
 
 void argo_state::machine_reset()
 {
 	membank("boot")->set_entry(1);
-	machine().scheduler().timer_set(attotime::from_usec(5), FUNC(argo_boot));
+	machine().scheduler().timer_set(attotime::from_usec(5), timer_expired_delegate(FUNC(argo_state::argo_boot),this));
 }
 
 DRIVER_INIT_MEMBER(argo_state,argo)

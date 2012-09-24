@@ -66,13 +66,13 @@ public:
 	UINT8 m_term_data;
 	virtual void machine_reset();
 	virtual void video_start();
+	TIMER_CALLBACK_MEMBER(h19_beepoff);
 };
 
 
-static TIMER_CALLBACK( h19_beepoff )
+TIMER_CALLBACK_MEMBER(h19_state::h19_beepoff)
 {
-	h19_state *state = machine.driver_data<h19_state>();
-	beep_set_state(state->m_beep, 0);
+	beep_set_state(m_beep, 0);
 }
 
 READ8_MEMBER( h19_state::h19_80_r )
@@ -99,7 +99,7 @@ WRITE8_MEMBER( h19_state::h19_c0_w )
 
 	UINT8 length = (offset & 0x20) ? 200 : 4;
 	beep_set_state(m_beep, 1);
-	machine().scheduler().timer_set(attotime::from_msec(length), FUNC(h19_beepoff));
+	machine().scheduler().timer_set(attotime::from_msec(length), timer_expired_delegate(FUNC(h19_state::h19_beepoff),this));
 }
 
 static ADDRESS_MAP_START(h19_mem, AS_PROGRAM, 8, h19_state)

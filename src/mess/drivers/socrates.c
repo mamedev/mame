@@ -129,6 +129,8 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(assert_irq);
+	TIMER_CALLBACK_MEMBER(clear_speech_cb);
+	TIMER_CALLBACK_MEMBER(clear_irq_cb);
 };
 
 
@@ -331,12 +333,11 @@ UINT8 *speechromext = memregion("speechext")->base();
 	logerror("read from i/o 0x4x of %x\n", temp);
 	return temp;
 }
-static TIMER_CALLBACK( clear_speech_cb )
+TIMER_CALLBACK_MEMBER(socrates_state::clear_speech_cb)
 {
-	socrates_state *state = machine.driver_data<socrates_state>();
-	state->m_speech_running = 0;
-	state->m_speech_load_address_count = 0; // should this be here or in the write functuon subpart which is speak command?
-	state->m_speech_load_settings_count = 0;
+	m_speech_running = 0;
+	m_speech_load_address_count = 0; // should this be here or in the write functuon subpart which is speak command?
+	m_speech_load_settings_count = 0;
 }
 
 WRITE8_MEMBER(socrates_state::speech_command)// write 0x4x, some sort of bitfield; speech chip is probably hitachi hd38880 related but not exact, w/4 bit interface
@@ -399,7 +400,7 @@ end hd38880 info.*/
 			{
 				/* write me: start talking */
 				m_speech_running = 1;
-				machine().scheduler().timer_set(attotime::from_seconds(4), FUNC(clear_speech_cb)); // hack
+				machine().scheduler().timer_set(attotime::from_seconds(4), timer_expired_delegate(FUNC(socrates_state::clear_speech_cb),this)); // hack
 			}
 			break;
 		case 0x90: // unknown, one of these is probably read and branch
@@ -423,7 +424,7 @@ end hd38880 info.*/
 			if ((data&0xF) == 0) // speak
 			{
 				m_speech_running = 1;
-				machine().scheduler().timer_set(attotime::from_seconds(4), FUNC(clear_speech_cb)); // hack
+				machine().scheduler().timer_set(attotime::from_seconds(4), timer_expired_delegate(FUNC(socrates_state::clear_speech_cb),this)); // hack
 			}
 			else if ((data&0xF) == 8) // reset
 			{
@@ -903,17 +904,16 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-static TIMER_CALLBACK( clear_irq_cb )
+TIMER_CALLBACK_MEMBER(socrates_state::clear_irq_cb)
 {
-	socrates_state *state = machine.driver_data<socrates_state>();
-	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
-	state->m_vblankstate = 0;
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_vblankstate = 0;
 }
 
 INTERRUPT_GEN_MEMBER(socrates_state::assert_irq)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(44), FUNC(clear_irq_cb));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(44), timer_expired_delegate(FUNC(socrates_state::clear_irq_cb),this));
 // 44 is a complete and total guess, need to properly measure how many clocks/microseconds the int line is high for.
 	m_vblankstate = 1;
 	m_kbmcu_rscount = 0; // clear the mcu poke count

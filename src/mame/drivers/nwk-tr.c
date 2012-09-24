@@ -255,6 +255,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(irq_off);
 };
 
 
@@ -510,9 +511,9 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 
 /*****************************************************************************/
 
-static TIMER_CALLBACK( irq_off )
+TIMER_CALLBACK_MEMBER(nwktr_state::irq_off)
 {
-	machine.device("audiocpu")->execute().set_input_line(param, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(param, CLEAR_LINE);
 }
 
 void nwktr_state::machine_start()
@@ -523,7 +524,7 @@ void nwktr_state::machine_start()
 	/* configure fast RAM regions for DRC */
 	ppcdrc_add_fastram(machine().device("maincpu"), 0x00000000, 0x003fffff, FALSE, m_work_ram);
 
-	m_sound_irq_timer = machine().scheduler().timer_alloc(FUNC(irq_off));
+	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nwktr_state::irq_off),this));
 }
 
 static ADDRESS_MAP_START( nwktr_map, AS_PROGRAM, 32, nwktr_state )

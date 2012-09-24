@@ -1439,6 +1439,7 @@ public:
 	DECLARE_MACHINE_RESET(gmen);
 	UINT32 screen_update_ss23(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(s23_interrupt);
+	TIMER_CALLBACK_MEMBER(c361_timer_cb);
 };
 
 
@@ -1749,14 +1750,13 @@ READ16_MEMBER(namcos23_state::s23_ctl_r)
 }
 
 // raster timer.  TC2 indicates it's probably one-shot since it resets it each VBL...
-static TIMER_CALLBACK( c361_timer_cb )
+TIMER_CALLBACK_MEMBER(namcos23_state::c361_timer_cb)
 {
-	namcos23_state *state = machine.driver_data<namcos23_state>();
-	c361_t &c361 = state->m_c361;
+	c361_t &c361 = m_c361;
 
 	if (c361.scanline != 511)
 	{
-		machine.device("maincpu")->execute().set_input_line(MIPS3_IRQ1, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ1, ASSERT_LINE);
 		c361.timer->adjust(attotime::never);
 	}
 }
@@ -2452,7 +2452,7 @@ INTERRUPT_GEN_MEMBER(namcos23_state::s23_interrupt)
 MACHINE_START_MEMBER(namcos23_state,s23)
 {
 	c361_t &c361 = m_c361;
-	c361.timer = machine().scheduler().timer_alloc(FUNC(c361_timer_cb));
+	c361.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos23_state::c361_timer_cb),this));
 	c361.timer->adjust(attotime::never);
 }
 

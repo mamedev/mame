@@ -124,6 +124,8 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(input_update);
+	TIMER_CALLBACK_MEMBER(timer_tick);
+	TIMER_CALLBACK_MEMBER(rtc_tick);
 };
 
 
@@ -182,7 +184,7 @@ static void ps_intc_set_interrupt_line(running_machine &machine, UINT32 line, in
 
 
 // Timers
-static TIMER_CALLBACK( timer_tick );
+
 static void ps_timer_start(running_machine &machine, int index);
 
 
@@ -192,7 +194,7 @@ static void ps_timer_start(running_machine &machine, int index);
 
 
 // RTC
-static TIMER_CALLBACK( rtc_tick );
+
 
 
 
@@ -422,13 +424,12 @@ WRITE32_MEMBER(pockstat_state::ps_intc_w)
 	}
 }
 
-static TIMER_CALLBACK( timer_tick )
+TIMER_CALLBACK_MEMBER(pockstat_state::timer_tick)
 {
-	pockstat_state *state = machine.driver_data<pockstat_state>();
-	ps_intc_set_interrupt_line(machine, param == 2 ? PS_INT_TIMER2 : (param == 1 ? PS_INT_TIMER1 : PS_INT_TIMER0), 1);
+	ps_intc_set_interrupt_line(machine(), param == 2 ? PS_INT_TIMER2 : (param == 1 ? PS_INT_TIMER1 : PS_INT_TIMER0), 1);
 	//printf( "Timer %d is calling back\n", param );
-	state->m_timer_regs.timer[param].count = state->m_timer_regs.timer[param].period;
-	ps_timer_start(machine, param);
+	m_timer_regs.timer[param].count = m_timer_regs.timer[param].period;
+	ps_timer_start(machine(), param);
 }
 
 static void ps_timer_start(running_machine &machine, int index)
@@ -561,51 +562,50 @@ WRITE32_MEMBER(pockstat_state::ps_clock_w)
 	}
 }
 
-static TIMER_CALLBACK( rtc_tick )
+TIMER_CALLBACK_MEMBER(pockstat_state::rtc_tick)
 {
-	pockstat_state *state = machine.driver_data<pockstat_state>();
 	//printf( "RTC is calling back\n" );
-	ps_intc_set_interrupt_line(machine, PS_INT_RTC, ps_intc_get_interrupt_line(machine, PS_INT_RTC) ? 0 : 1);
-	if(!(state->m_rtc_regs.mode & 1))
+	ps_intc_set_interrupt_line(machine(), PS_INT_RTC, ps_intc_get_interrupt_line(machine(), PS_INT_RTC) ? 0 : 1);
+	if(!(m_rtc_regs.mode & 1))
 	{
-		state->m_rtc_regs.time++;
-		if((state->m_rtc_regs.time & 0x0000000f) == 0x0000000a)
+		m_rtc_regs.time++;
+		if((m_rtc_regs.time & 0x0000000f) == 0x0000000a)
 		{
-			state->m_rtc_regs.time &= 0xfffffff0;
-			state->m_rtc_regs.time += 0x00000010;
-			if((state->m_rtc_regs.time & 0x000000ff) == 0x00000060)
+			m_rtc_regs.time &= 0xfffffff0;
+			m_rtc_regs.time += 0x00000010;
+			if((m_rtc_regs.time & 0x000000ff) == 0x00000060)
 			{
-				state->m_rtc_regs.time &= 0xffffff00;
-				state->m_rtc_regs.time += 0x00000100;
-				if((state->m_rtc_regs.time & 0x00000f00) == 0x00000a00)
+				m_rtc_regs.time &= 0xffffff00;
+				m_rtc_regs.time += 0x00000100;
+				if((m_rtc_regs.time & 0x00000f00) == 0x00000a00)
 				{
-					state->m_rtc_regs.time &= 0xfffff0ff;
-					state->m_rtc_regs.time += 0x00001000;
-					if((state->m_rtc_regs.time & 0x0000ff00) == 0x00006000)
+					m_rtc_regs.time &= 0xfffff0ff;
+					m_rtc_regs.time += 0x00001000;
+					if((m_rtc_regs.time & 0x0000ff00) == 0x00006000)
 					{
-						state->m_rtc_regs.time &= 0xffff00ff;
-						state->m_rtc_regs.time += 0x00010000;
-						if((state->m_rtc_regs.time & 0x00ff0000) == 0x00240000)
+						m_rtc_regs.time &= 0xffff00ff;
+						m_rtc_regs.time += 0x00010000;
+						if((m_rtc_regs.time & 0x00ff0000) == 0x00240000)
 						{
-							state->m_rtc_regs.time &= 0xff00ffff;
-							state->m_rtc_regs.time += 0x01000000;
-							if((state->m_rtc_regs.time & 0x0f000000) == 0x08000000)
+							m_rtc_regs.time &= 0xff00ffff;
+							m_rtc_regs.time += 0x01000000;
+							if((m_rtc_regs.time & 0x0f000000) == 0x08000000)
 							{
-								state->m_rtc_regs.time &= 0xf0ffffff;
-								state->m_rtc_regs.time |= 0x01000000;
+								m_rtc_regs.time &= 0xf0ffffff;
+								m_rtc_regs.time |= 0x01000000;
 							}
 						}
-						else if((state->m_rtc_regs.time & 0x000f0000) == 0x000a0000)
+						else if((m_rtc_regs.time & 0x000f0000) == 0x000a0000)
 						{
-							state->m_rtc_regs.time &= 0xfff0ffff;
-							state->m_rtc_regs.time += 0x00100000;
+							m_rtc_regs.time &= 0xfff0ffff;
+							m_rtc_regs.time += 0x00100000;
 						}
 					}
 				}
 			}
 		}
 	}
-	state->m_rtc_regs.timer->adjust(attotime::from_hz(1));
+	m_rtc_regs.timer->adjust(attotime::from_hz(1));
 }
 
 READ32_MEMBER(pockstat_state::ps_rtc_r)
@@ -875,14 +875,14 @@ void pockstat_state::machine_start()
 	int index = 0;
 	for(index = 0; index < 3; index++)
 	{
-		m_timer_regs.timer[index].timer = machine().scheduler().timer_alloc(FUNC(timer_tick));
+		m_timer_regs.timer[index].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pockstat_state::timer_tick),this));
 		m_timer_regs.timer[index].timer->adjust(attotime::never, index);
 	}
 
 	m_rtc_regs.time = 0x01000000;
 	m_rtc_regs.date = 0x19990101;
 
-	m_rtc_regs.timer = machine().scheduler().timer_alloc(FUNC(rtc_tick));
+	m_rtc_regs.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pockstat_state::rtc_tick),this));
 	m_rtc_regs.timer->adjust(attotime::from_hz(1), index);
 
 	save_item(NAME(m_ftlb_regs.control));

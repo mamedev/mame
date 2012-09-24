@@ -185,12 +185,13 @@ emu_timer *m_ic21_timer;
 	DECLARE_DRIVER_INIT(m3hprvpr);
 	virtual void machine_start();
 	virtual void machine_reset();
+	TIMER_CALLBACK_MEMBER(ic21_timeout);
 };
 
 #define DISPLAY_PORT 0
 #define METER_PORT 1
 #define BWB_FUNCTIONALITY 2
-static TIMER_CALLBACK( ic21_timeout );
+
 
 static void update_triacs(running_machine &machine)
 {
@@ -353,11 +354,10 @@ static void ic21_setup(mpu3_state *state)
 	}
 }
 
-static TIMER_CALLBACK( ic21_timeout )
+TIMER_CALLBACK_MEMBER(mpu3_state::ic21_timeout)
 {
-	mpu3_state *state = machine.driver_data<mpu3_state>();
-	state->m_ic11_active=0;
-	ic21_output(state,0);
+	m_ic11_active=0;
+	ic21_output(this,0);
 }
 
 READ8_MEMBER(mpu3_state::pia_ic3_porta_r)
@@ -785,7 +785,7 @@ static const stepper_interface mpu3_reel_interface =
 static void mpu3_config_common(running_machine &machine)
 {
 	mpu3_state *state = machine.driver_data<mpu3_state>();
-	state->m_ic21_timer = machine.scheduler().timer_alloc(FUNC(ic21_timeout));
+	state->m_ic21_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(mpu3_state::ic21_timeout),state));
 }
 
 void mpu3_state::machine_start()

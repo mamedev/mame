@@ -52,6 +52,8 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_destroyr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(destroyr_dial_callback);
+	TIMER_CALLBACK_MEMBER(destroyr_frame_callback);
 };
 
 
@@ -121,9 +123,8 @@ UINT32 destroyr_state::screen_update_destroyr(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-static TIMER_CALLBACK( destroyr_dial_callback )
+TIMER_CALLBACK_MEMBER(destroyr_state::destroyr_dial_callback)
 {
-	destroyr_state *state = machine.driver_data<destroyr_state>();
 	int dial = param;
 
 	/* Analog inputs come from the player's depth control potentiometer.
@@ -133,31 +134,30 @@ static TIMER_CALLBACK( destroyr_dial_callback )
        computer then reads the VSYNC data functions to tell where the
        cursor should be located. */
 
-	state->m_potsense[dial] = 1;
+	m_potsense[dial] = 1;
 
-	if (state->m_potmask[dial])
+	if (m_potmask[dial])
 	{
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 
-static TIMER_CALLBACK( destroyr_frame_callback )
+TIMER_CALLBACK_MEMBER(destroyr_state::destroyr_frame_callback)
 {
-	destroyr_state *state = machine.driver_data<destroyr_state>();
-	state->m_potsense[0] = 0;
-	state->m_potsense[1] = 0;
+	m_potsense[0] = 0;
+	m_potsense[1] = 0;
 
 	/* PCB supports two dials, but cab has only got one */
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(state->ioport("PADDLE")->read()), FUNC(destroyr_dial_callback));
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(destroyr_frame_callback));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(ioport("PADDLE")->read()), timer_expired_delegate(FUNC(destroyr_state::destroyr_dial_callback),this));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(destroyr_state::destroyr_frame_callback),this));
 }
 
 
 void destroyr_state::machine_reset()
 {
 
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(destroyr_frame_callback));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(destroyr_state::destroyr_frame_callback),this));
 
 	m_cursor = 0;
 	m_wavemod = 0;

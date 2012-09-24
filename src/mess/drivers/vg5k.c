@@ -88,6 +88,7 @@ public:
 	DECLARE_READ8_MEMBER ( cassette_r );
 	DECLARE_WRITE8_MEMBER ( cassette_w );
 	DECLARE_DRIVER_INIT(vg5k);
+	TIMER_CALLBACK_MEMBER(z80_irq_clear);
 };
 
 
@@ -274,17 +275,18 @@ static INPUT_PORTS_START( vg5k )
 INPUT_PORTS_END
 
 
-static TIMER_CALLBACK( z80_irq_clear )
+TIMER_CALLBACK_MEMBER(vg5k_state::z80_irq_clear)
 {
-	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
 static TIMER_DEVICE_CALLBACK( z80_irq )
 {
+	vg5k_state *state = timer.machine().driver_data<vg5k_state>();
 	timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
-	timer.machine().scheduler().timer_set(attotime::from_usec(100), FUNC(z80_irq_clear));
+	timer.machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(vg5k_state::z80_irq_clear),state));
 }
 
 static TIMER_DEVICE_CALLBACK( vg5k_scanline )

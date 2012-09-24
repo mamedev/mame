@@ -61,6 +61,8 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_flyball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(flyball_joystick_callback);
+	TIMER_CALLBACK_MEMBER(flyball_quarter_callback);
 };
 
 
@@ -129,42 +131,40 @@ UINT32 flyball_state::screen_update_flyball(screen_device &screen, bitmap_ind16 
 }
 
 
-static TIMER_CALLBACK( flyball_joystick_callback )
+TIMER_CALLBACK_MEMBER(flyball_state::flyball_joystick_callback)
 {
-	flyball_state *state = machine.driver_data<flyball_state>();
 	int potsense = param;
 
-	if (potsense & ~state->m_potmask)
-		generic_pulse_irq_line(state->m_maincpu, 0, 1);
+	if (potsense & ~m_potmask)
+		generic_pulse_irq_line(*m_maincpu, 0, 1);
 
-	state->m_potsense |= potsense;
+	m_potsense |= potsense;
 }
 
 
-static TIMER_CALLBACK( flyball_quarter_callback	)
+TIMER_CALLBACK_MEMBER(flyball_state::flyball_quarter_callback)
 {
-	flyball_state *state = machine.driver_data<flyball_state>();
 	int scanline = param;
 	int potsense[64], i;
 
 	memset(potsense, 0, sizeof potsense);
 
-	potsense[state->ioport("STICK1_Y")->read()] |= 1;
-	potsense[state->ioport("STICK1_X")->read()] |= 2;
-	potsense[state->ioport("STICK0_Y")->read()] |= 4;
-	potsense[state->ioport("STICK0_X")->read()] |= 8;
+	potsense[ioport("STICK1_Y")->read()] |= 1;
+	potsense[ioport("STICK1_X")->read()] |= 2;
+	potsense[ioport("STICK0_Y")->read()] |= 4;
+	potsense[ioport("STICK0_X")->read()] |= 8;
 
 	for (i = 0; i < 64; i++)
 		if (potsense[i] != 0)
-			machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline + i), FUNC(flyball_joystick_callback), potsense[i]);
+			machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline + i), timer_expired_delegate(FUNC(flyball_state::flyball_joystick_callback),this), potsense[i]);
 
 	scanline += 0x40;
 	scanline &= 0xff;
 
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(flyball_quarter_callback), scanline);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(flyball_state::flyball_quarter_callback),this), scanline);
 
-	state->m_potsense = 0;
-	state->m_potmask = 0;
+	m_potsense = 0;
+	m_potmask = 0;
 }
 
 
@@ -398,7 +398,7 @@ void flyball_state::machine_reset()
 
 	machine().device("maincpu")->reset();
 
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(flyball_quarter_callback));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(flyball_state::flyball_quarter_callback),this));
 
 	m_pitcher_vert = 0;
 	m_pitcher_horz = 0;

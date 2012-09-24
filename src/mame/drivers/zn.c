@@ -118,6 +118,7 @@ public:
 	DECLARE_MACHINE_RESET(coh1002v);
 	DECLARE_MACHINE_RESET(coh1002m);
 	INTERRUPT_GEN_MEMBER(qsound_interrupt);
+	TIMER_CALLBACK_MEMBER(dip_timer_fired);
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -420,14 +421,13 @@ WRITE32_MEMBER(zn_state::znsecsel_w)
 	verboselog( machine(), 2, "znsecsel_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 }
 
-static TIMER_CALLBACK( dip_timer_fired )
+TIMER_CALLBACK_MEMBER(zn_state::dip_timer_fired)
 {
-	zn_state *state = machine.driver_data<zn_state>();
-	psx_sio_input( machine, 0, PSX_SIO_IN_DSR, param * PSX_SIO_IN_DSR );
+	psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, param * PSX_SIO_IN_DSR );
 
 	if( param )
 	{
-		state->m_dip_timer->adjust( machine.device<cpu_device>( "maincpu" )->cycles_to_attotime(50 ) );
+		m_dip_timer->adjust( machine().device<cpu_device>( "maincpu" )->cycles_to_attotime(50 ) );
 	}
 }
 
@@ -531,7 +531,7 @@ static void zn_driver_init( running_machine &machine )
 		n_game++;
 	}
 
-	state->m_dip_timer = machine.scheduler().timer_alloc( FUNC(dip_timer_fired), NULL );
+	state->m_dip_timer = machine.scheduler().timer_alloc( timer_expired_delegate(FUNC(zn_state::dip_timer_fired),state), NULL );
 }
 
 static void psx_spu_irq(device_t *device, UINT32 data)

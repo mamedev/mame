@@ -71,6 +71,8 @@ public:
 	DECLARE_VIDEO_START(swyft);
 	UINT32 screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(keyboard_callback);
+	TIMER_CALLBACK_MEMBER(swyft_reset);
 };
 
 WRITE16_MEMBER( cat_state::cat_video_status_w )
@@ -297,9 +299,9 @@ static INPUT_PORTS_START( swyft )
 INPUT_PORTS_END
 
 
-static TIMER_CALLBACK(keyboard_callback)
+TIMER_CALLBACK_MEMBER(cat_state::keyboard_callback)
 {
-	machine.device("maincpu")->execute().set_input_line(M68K_IRQ_1, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1, ASSERT_LINE);
 }
 
 static IRQ_CALLBACK(cat_int_ack)
@@ -312,7 +314,7 @@ MACHINE_START_MEMBER(cat_state,cat)
 {
 
 	m_duart_inp = 0x0e;
-	m_keyboard_timer = machine().scheduler().timer_alloc(FUNC(keyboard_callback));
+	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cat_state::keyboard_callback),this));
 	machine().device<nvram_device>("nvram")->set_base(m_p_sram, 0x4000);
 }
 
@@ -353,9 +355,9 @@ UINT32 cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-static TIMER_CALLBACK( swyft_reset )
+TIMER_CALLBACK_MEMBER(cat_state::swyft_reset)
 {
-	memset(machine.device("maincpu")->memory().space(AS_PROGRAM).get_read_ptr(0xe2341), 0xff, 1);
+	memset(machine().device("maincpu")->memory().space(AS_PROGRAM).get_read_ptr(0xe2341), 0xff, 1);
 }
 
 MACHINE_START_MEMBER(cat_state,swyft)
@@ -364,7 +366,7 @@ MACHINE_START_MEMBER(cat_state,swyft)
 
 MACHINE_RESET_MEMBER(cat_state,swyft)
 {
-	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(swyft_reset));
+	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(cat_state::swyft_reset),this));
 }
 
 VIDEO_START_MEMBER(cat_state,swyft)

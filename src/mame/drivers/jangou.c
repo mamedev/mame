@@ -90,6 +90,7 @@ public:
 	DECLARE_MACHINE_START(common);
 	DECLARE_MACHINE_RESET(common);
 	UINT32 screen_update_jangou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(cvsd_bit_timer_callback);
 };
 
 
@@ -328,17 +329,16 @@ WRITE8_MEMBER(jangou_state::cvsd_w)
 	m_cvsd_shiftreg = data;
 }
 
-static TIMER_CALLBACK( cvsd_bit_timer_callback )
+TIMER_CALLBACK_MEMBER(jangou_state::cvsd_bit_timer_callback)
 {
-	jangou_state *state = machine.driver_data<jangou_state>();
 
 	/* Data is shifted out at the MSB */
-	hc55516_digit_w(state->m_cvsd, (state->m_cvsd_shiftreg >> 7) & 1);
-	state->m_cvsd_shiftreg <<= 1;
+	hc55516_digit_w(m_cvsd, (m_cvsd_shiftreg >> 7) & 1);
+	m_cvsd_shiftreg <<= 1;
 
 	/* Trigger an IRQ for every 8 shifted bits */
-	if ((++state->m_cvsd_shift_cnt & 7) == 0)
-		state->m_cpu_1->execute().set_input_line(0, HOLD_LINE);
+	if ((++m_cvsd_shift_cnt & 7) == 0)
+		m_cpu_1->execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -907,7 +907,7 @@ static SOUND_START( jangou )
 	jangou_state *state = machine.driver_data<jangou_state>();
 
 	/* Create a timer to feed the CVSD DAC with sample bits */
-	state->m_cvsd_bit_timer = machine.scheduler().timer_alloc(FUNC(cvsd_bit_timer_callback));
+	state->m_cvsd_bit_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(jangou_state::cvsd_bit_timer_callback),state));
 	state->m_cvsd_bit_timer->adjust(attotime::from_hz(MASTER_CLOCK / 1024), 0, attotime::from_hz(MASTER_CLOCK / 1024));
 }
 

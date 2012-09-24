@@ -59,9 +59,10 @@ public:
 	DECLARE_MACHINE_START(alg);
 	DECLARE_MACHINE_RESET(alg);
 	DECLARE_VIDEO_START(alg);
+	TIMER_CALLBACK_MEMBER(response_timer);
 };
 
-static TIMER_CALLBACK( response_timer );
+
 
 
 
@@ -115,7 +116,7 @@ VIDEO_START_MEMBER(alg_state,alg)
 MACHINE_START_MEMBER(alg_state,alg)
 {
 
-	m_serial_timer = machine().scheduler().timer_alloc(FUNC(response_timer));
+	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alg_state::response_timer),this));
 	m_serial_timer_active = FALSE;
 }
 
@@ -133,24 +134,23 @@ MACHINE_RESET_MEMBER(alg_state,alg)
  *
  *************************************/
 
-static TIMER_CALLBACK( response_timer )
+TIMER_CALLBACK_MEMBER(alg_state::response_timer)
 {
-	alg_state *state = machine.driver_data<alg_state>();
 
 	/* if we still have data to send, do it now */
-	if (state->m_laserdisc->data_available_r() == ASSERT_LINE)
+	if (m_laserdisc->data_available_r() == ASSERT_LINE)
 	{
-		UINT8 data = state->m_laserdisc->data_r();
+		UINT8 data = m_laserdisc->data_r();
 		if (data != 0x0a)
 			mame_printf_debug("Sending serial data = %02X\n", data);
-		amiga_serial_in_w(machine, data);
+		amiga_serial_in_w(machine(), data);
 	}
 
 	/* if there's more to come, set another timer */
-	if (state->m_laserdisc->data_available_r() == ASSERT_LINE)
-		state->m_serial_timer->adjust(amiga_get_serial_char_period(machine));
+	if (m_laserdisc->data_available_r() == ASSERT_LINE)
+		m_serial_timer->adjust(amiga_get_serial_char_period(machine()));
 	else
-		state->m_serial_timer_active = FALSE;
+		m_serial_timer_active = FALSE;
 }
 
 

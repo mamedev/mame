@@ -61,6 +61,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_mjsister(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(dac_callback);
 };
 
 
@@ -165,17 +166,16 @@ UINT32 mjsister_state::screen_update_mjsister(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-static TIMER_CALLBACK( dac_callback )
+TIMER_CALLBACK_MEMBER(mjsister_state::dac_callback)
 {
-	mjsister_state *state = machine.driver_data<mjsister_state>();
-	UINT8 *DACROM = state->memregion("samples")->base();
+	UINT8 *DACROM = memregion("samples")->base();
 
-	state->m_dac->write_unsigned8(DACROM[(state->m_dac_bank * 0x10000 + state->m_dac_adr++) & 0x1ffff]);
+	m_dac->write_unsigned8(DACROM[(m_dac_bank * 0x10000 + m_dac_adr++) & 0x1ffff]);
 
-	if (((state->m_dac_adr & 0xff00 ) >> 8) !=  state->m_dac_adr_e)
-		machine.scheduler().timer_set(attotime::from_hz(MCLK) * 1024, FUNC(dac_callback));
+	if (((m_dac_adr & 0xff00 ) >> 8) !=  m_dac_adr_e)
+		machine().scheduler().timer_set(attotime::from_hz(MCLK) * 1024, timer_expired_delegate(FUNC(mjsister_state::dac_callback),this));
 	else
-		state->m_dac_busy = 0;
+		m_dac_busy = 0;
 }
 
 WRITE8_MEMBER(mjsister_state::mjsister_dac_adr_s_w)
@@ -189,7 +189,7 @@ WRITE8_MEMBER(mjsister_state::mjsister_dac_adr_e_w)
 	m_dac_adr = m_dac_adr_s << 8;
 
 	if (m_dac_busy == 0)
-		machine().scheduler().synchronize(FUNC(dac_callback));
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(mjsister_state::dac_callback),this));
 
 	m_dac_busy = 1;
 }

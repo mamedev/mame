@@ -103,6 +103,8 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_pc88va(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pc88va_vrtc_irq);
+	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
+	TIMER_CALLBACK_MEMBER(t3_mouse_callback);
 };
 
 
@@ -944,18 +946,17 @@ WRITE8_MEMBER(pc88va_state::upd765_mc_w)
 	floppy_drive_set_ready_state(floppy_get_device(machine(), 1), (data & 2), 0);
 }
 
-static TIMER_CALLBACK( pc8801fd_upd765_tc_to_zero )
+TIMER_CALLBACK_MEMBER(pc88va_state::pc8801fd_upd765_tc_to_zero)
 {
-//  pc88va_state *state = machine.driver_data<pc88va_state>();
 
-	upd765_tc_w(machine.device("upd765"), 0);
+	upd765_tc_w(machine().device("upd765"), 0);
 }
 
 READ8_MEMBER(pc88va_state::upd765_tc_r)
 {
 
 	upd765_tc_w(machine().device("upd765"), 1);
-	machine().scheduler().timer_set(attotime::from_usec(500), FUNC(pc8801fd_upd765_tc_to_zero));
+	machine().scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(pc88va_state::pc8801fd_upd765_tc_to_zero),this));
 	return 0;
 }
 
@@ -1038,13 +1039,12 @@ WRITE16_MEMBER(pc88va_state::screen_ctrl_w)
 	m_screen_ctrl_reg = data;
 }
 
-static TIMER_CALLBACK( t3_mouse_callback )
+TIMER_CALLBACK_MEMBER(pc88va_state::t3_mouse_callback)
 {
-	pc88va_state *state = machine.driver_data<pc88va_state>();
-	if(state->m_timer3_io_reg & 0x80)
+	if(m_timer3_io_reg & 0x80)
 	{
-		pic8259_ir5_w(machine.device("pic8259_slave"), 1);
-		state->m_t3_mouse_timer->adjust(attotime::from_hz(120 >> (state->m_timer3_io_reg & 3)));
+		pic8259_ir5_w(machine().device("pic8259_slave"), 1);
+		m_t3_mouse_timer->adjust(attotime::from_hz(120 >> (m_timer3_io_reg & 3)));
 	}
 }
 
@@ -1533,7 +1533,7 @@ void pc88va_state::machine_start()
 {
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pc88va_irq_callback);
 
-	m_t3_mouse_timer = machine().scheduler().timer_alloc(FUNC(t3_mouse_callback));
+	m_t3_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc88va_state::t3_mouse_callback),this));
 	m_t3_mouse_timer->adjust(attotime::never);
 }
 

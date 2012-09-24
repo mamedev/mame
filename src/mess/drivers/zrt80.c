@@ -46,6 +46,7 @@ public:
 	const UINT8 *m_p_chargen;
 	virtual void machine_reset();
 	virtual void video_start();
+	TIMER_CALLBACK_MEMBER(zrt80_beepoff);
 };
 
 READ8_MEMBER( zrt80_state::zrt80_10_r )
@@ -55,21 +56,20 @@ READ8_MEMBER( zrt80_state::zrt80_10_r )
 	return ret;
 }
 
-static TIMER_CALLBACK( zrt80_beepoff )
+TIMER_CALLBACK_MEMBER(zrt80_state::zrt80_beepoff)
 {
-	zrt80_state *state = machine.driver_data<zrt80_state>();
-	beep_set_state(state->m_beep, 0);
+	beep_set_state(m_beep, 0);
 }
 
 WRITE8_MEMBER(zrt80_state::zrt80_30_w)
 {
-	machine().scheduler().timer_set(attotime::from_msec(100), FUNC(zrt80_beepoff));
+	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(zrt80_state::zrt80_beepoff),this));
 	beep_set_state(m_beep, 1);
 }
 
 WRITE8_MEMBER(zrt80_state::zrt80_38_w)
 {
-	machine().scheduler().timer_set(attotime::from_msec(400), FUNC(zrt80_beepoff));
+	machine().scheduler().timer_set(attotime::from_msec(400), timer_expired_delegate(FUNC(zrt80_state::zrt80_beepoff),this));
 	beep_set_state(m_beep, 1);
 }
 

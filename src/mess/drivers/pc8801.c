@@ -452,6 +452,7 @@ public:
 	DECLARE_MACHINE_RESET(pc8801_dic);
 	DECLARE_MACHINE_RESET(pc8801_cdrom);
 	INTERRUPT_GEN_MEMBER(pc8801_vrtc_irq);
+	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
 };
 
 
@@ -1877,12 +1878,11 @@ static ADDRESS_MAP_START( pc8801fdc_mem, AS_PROGRAM, 8, pc8801_state )
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
-static TIMER_CALLBACK( pc8801fd_upd765_tc_to_zero )
+TIMER_CALLBACK_MEMBER(pc8801_state::pc8801fd_upd765_tc_to_zero)
 {
-//  pc8801_state *state = machine.driver_data<pc8801_state>();
 
 	//printf("0\n");
-	upd765_tc_w(machine.device("upd765"), 0);
+	upd765_tc_w(machine().device("upd765"), 0);
 }
 
 WRITE8_MEMBER(pc8801_state::upd765_mc_w)
@@ -1899,7 +1899,7 @@ READ8_MEMBER(pc8801_state::upd765_tc_r)
 
 	upd765_tc_w(machine().device("upd765"), 1);
 	 //TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.
-	machine().scheduler().timer_set(attotime::from_usec(750), FUNC(pc8801fd_upd765_tc_to_zero));
+	machine().scheduler().timer_set(attotime::from_usec(750), timer_expired_delegate(FUNC(pc8801_state::pc8801fd_upd765_tc_to_zero),this));
 	return 0xff; // value is meaningless
 }
 

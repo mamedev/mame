@@ -88,6 +88,7 @@ public:
 	virtual void machine_start();
 	UINT32 screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_lgp);
+	TIMER_CALLBACK_MEMBER(irq_stop);
 };
 
 
@@ -332,9 +333,9 @@ static GFXDECODE_START( lgp )
 	GFXDECODE_ENTRY("gfx4", 0, lgp_gfx_layout_16x32, 0x0, 0x100)
 GFXDECODE_END
 
-static TIMER_CALLBACK( irq_stop )
+TIMER_CALLBACK_MEMBER(lgp_state::irq_stop)
 {
-	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(lgp_state::vblank_callback_lgp)
@@ -350,7 +351,7 @@ INTERRUPT_GEN_MEMBER(lgp_state::vblank_callback_lgp)
 
 void lgp_state::machine_start()
 {
-	m_irq_timer = machine().scheduler().timer_alloc(FUNC(irq_stop));
+	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lgp_state::irq_stop),this));
 }
 
 

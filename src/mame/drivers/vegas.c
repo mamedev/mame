@@ -502,6 +502,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_vegas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(nile_timer_callback);
 };
 
 
@@ -512,7 +513,7 @@ public:
  *
  *************************************/
 
-static TIMER_CALLBACK( nile_timer_callback );
+
 static void ide_interrupt(device_t *device, int state);
 static void remap_dynamic_addresses(running_machine &machine);
 
@@ -543,8 +544,8 @@ void vegas_state::machine_start()
 	/* allocate timers for the NILE */
 	m_timer[0] = machine().scheduler().timer_alloc(FUNC_NULL);
 	m_timer[1] = machine().scheduler().timer_alloc(FUNC_NULL);
-	m_timer[2] = machine().scheduler().timer_alloc(FUNC(nile_timer_callback));
-	m_timer[3] = machine().scheduler().timer_alloc(FUNC(nile_timer_callback));
+	m_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vegas_state::nile_timer_callback),this));
+	m_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vegas_state::nile_timer_callback),this));
 
 	/* identify our sound board */
 	if (machine().device("dsio") != NULL)
@@ -918,11 +919,10 @@ static void update_nile_irqs(running_machine &machine)
 }
 
 
-static TIMER_CALLBACK( nile_timer_callback )
+TIMER_CALLBACK_MEMBER(vegas_state::nile_timer_callback)
 {
-	vegas_state *state = machine.driver_data<vegas_state>();
 	int which = param;
-	UINT32 *regs = &state->m_nile_regs[NREG_T0CTRL + which * 4];
+	UINT32 *regs = &m_nile_regs[NREG_T0CTRL + which * 4];
 	if (LOG_TIMERS) logerror("timer %d fired\n", which);
 
 	/* adjust the timer to fire again */
@@ -931,16 +931,16 @@ static TIMER_CALLBACK( nile_timer_callback )
 		if (regs[1] & 2)
 			logerror("Unexpected value: timer %d is prescaled\n", which);
 		if (scale != 0)
-			state->m_timer[which]->adjust(TIMER_PERIOD * scale, which);
+			m_timer[which]->adjust(TIMER_PERIOD * scale, which);
 	}
 
 	/* trigger the interrupt */
 	if (which == 2)
-		state->m_nile_irq_state |= 1 << 6;
+		m_nile_irq_state |= 1 << 6;
 	if (which == 3)
-		state->m_nile_irq_state |= 1 << 5;
+		m_nile_irq_state |= 1 << 5;
 
-	update_nile_irqs(machine);
+	update_nile_irqs(machine());
 }
 
 

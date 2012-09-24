@@ -39,6 +39,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_mgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(interrupt_callback);
 };
 
 
@@ -113,21 +114,20 @@ static void update_plunger( running_machine &machine )
 }
 
 
-static TIMER_CALLBACK( interrupt_callback )
+TIMER_CALLBACK_MEMBER(mgolf_state::interrupt_callback)
 {
-	mgolf_state *state = machine.driver_data<mgolf_state>();
 	int scanline = param;
 
-	update_plunger(machine);
+	update_plunger(machine());
 
-	generic_pulse_irq_line(state->m_maincpu, 0, 1);
+	generic_pulse_irq_line(*m_maincpu, 0, 1);
 
 	scanline = scanline + 32;
 
 	if (scanline >= 262)
 		scanline = 16;
 
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(interrupt_callback), scanline);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(mgolf_state::interrupt_callback),this), scanline);
 }
 
 
@@ -316,7 +316,7 @@ void mgolf_state::machine_start()
 
 void mgolf_state::machine_reset()
 {
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(16), FUNC(interrupt_callback), 16);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(16), timer_expired_delegate(FUNC(mgolf_state::interrupt_callback),this), 16);
 
 	m_mask = 0;
 	m_prev = 0;

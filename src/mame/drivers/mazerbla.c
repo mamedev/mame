@@ -146,6 +146,9 @@ public:
 	UINT32 screen_update_mazerbla(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_test_vcu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
+	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
+	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
+	TIMER_CALLBACK_MEMBER(delayed_sound_w);
 };
 
 
@@ -790,19 +793,18 @@ READ8_MEMBER(mazerbla_state::ls670_0_r)
 	return m_ls670_0[offset];
 }
 
-static TIMER_CALLBACK( deferred_ls670_0_w )
+TIMER_CALLBACK_MEMBER(mazerbla_state::deferred_ls670_0_w)
 {
-	mazerbla_state *state = machine.driver_data<mazerbla_state>();
 	int offset = (param >> 8) & 255;
 	int data = param & 255;
 
-	state->m_ls670_0[offset] = data;
+	m_ls670_0[offset] = data;
 }
 
 WRITE8_MEMBER(mazerbla_state::ls670_0_w)
 {
 	/* do this on a timer to let the CPUs synchronize */
-	machine().scheduler().synchronize(FUNC(deferred_ls670_0_w), (offset << 8) | data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(mazerbla_state::deferred_ls670_0_w),this), (offset << 8) | data);
 }
 
 READ8_MEMBER(mazerbla_state::ls670_1_r)
@@ -814,19 +816,18 @@ READ8_MEMBER(mazerbla_state::ls670_1_r)
 	return m_ls670_1[offset];
 }
 
-static TIMER_CALLBACK( deferred_ls670_1_w )
+TIMER_CALLBACK_MEMBER(mazerbla_state::deferred_ls670_1_w)
 {
-	mazerbla_state *state = machine.driver_data<mazerbla_state>();
 	int offset = (param >> 8) & 255;
 	int data = param & 255;
 
-	state->m_ls670_1[offset] = data;
+	m_ls670_1[offset] = data;
 }
 
 WRITE8_MEMBER(mazerbla_state::ls670_1_w)
 {
 	/* do this on a timer to let the CPUs synchronize */
-	machine().scheduler().synchronize(FUNC(deferred_ls670_1_w), (offset << 8) | data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(mazerbla_state::deferred_ls670_1_w),this), (offset << 8) | data);
 }
 
 
@@ -955,18 +956,17 @@ READ8_MEMBER(mazerbla_state::soundcommand_r)
 	return m_soundlatch;
 }
 
-static TIMER_CALLBACK( delayed_sound_w )
+TIMER_CALLBACK_MEMBER(mazerbla_state::delayed_sound_w)
 {
-	mazerbla_state *state = machine.driver_data<mazerbla_state>();
-	state->m_soundlatch = param;
+	m_soundlatch = param;
 
 	/* cause NMI on sound CPU */
-	state->m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(mazerbla_state::main_sound_w)
 {
-	machine().scheduler().synchronize(FUNC(delayed_sound_w), data & 0xff);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(mazerbla_state::delayed_sound_w),this), data & 0xff);
 }
 
 WRITE8_MEMBER(mazerbla_state::sound_int_clear_w)

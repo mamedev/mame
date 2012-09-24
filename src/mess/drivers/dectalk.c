@@ -194,6 +194,7 @@ public:
 	DECLARE_READ16_MEMBER(spc_semaphore_r);
 	DECLARE_DRIVER_INIT(dectalk);
 	virtual void machine_reset();
+	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
 };
 
 
@@ -697,15 +698,15 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-static TIMER_CALLBACK( outfifo_read_cb )
+TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 {
 	UINT16 data;
-	dac_device *speaker = machine.device<dac_device>("dac");
-	data = dectalk_outfifo_r(machine);
+	dac_device *speaker = machine().device<dac_device>("dac");
+	data = dectalk_outfifo_r(machine());
 #ifdef VERBOSE
 	if (data!= 0x8000) logerror("sample output: %04X\n", data);
 #endif
-	machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(outfifo_read_cb));
+	machine().scheduler().timer_set(attotime::from_hz(10000), timer_expired_delegate(FUNC(dectalk_state::outfifo_read_cb),this));
 	speaker->write_signed16(data);
 }
 
@@ -714,7 +715,7 @@ DRIVER_INIT_MEMBER(dectalk_state,dectalk)
 {
 	dectalk_clear_all_fifos(machine());
 	m_simulate_outfifo_error = 0;
-	machine().scheduler().timer_set(attotime::from_hz(10000), FUNC(outfifo_read_cb));
+	machine().scheduler().timer_set(attotime::from_hz(10000), timer_expired_delegate(FUNC(dectalk_state::outfifo_read_cb),this));
 }
 
 static WRITE8_DEVICE_HANDLER( dectalk_kbd_put )

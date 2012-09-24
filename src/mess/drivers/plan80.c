@@ -44,6 +44,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(plan80);
+	TIMER_CALLBACK_MEMBER(plan80_boot);
 };
 
 READ8_MEMBER( plan80_state::plan80_04_r )
@@ -140,16 +141,15 @@ INPUT_PORTS_END
 
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
-static TIMER_CALLBACK( plan80_boot )
+TIMER_CALLBACK_MEMBER(plan80_state::plan80_boot)
 {
-	plan80_state *state = machine.driver_data<plan80_state>();
-	state->membank("boot")->set_entry(0);
+	membank("boot")->set_entry(0);
 }
 
 void plan80_state::machine_reset()
 {
 	membank("boot")->set_entry(1);
-	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(plan80_boot));
+	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(plan80_state::plan80_boot),this));
 }
 
 DRIVER_INIT_MEMBER(plan80_state,plan80)

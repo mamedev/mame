@@ -33,6 +33,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_cball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(interrupt_callback);
 };
 
 
@@ -74,19 +75,18 @@ UINT32 cball_state::screen_update_cball(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-static TIMER_CALLBACK( interrupt_callback )
+TIMER_CALLBACK_MEMBER(cball_state::interrupt_callback)
 {
-	cball_state *state = machine.driver_data<cball_state>();
 	int scanline = param;
 
-	generic_pulse_irq_line(state->m_maincpu, 0, 1);
+	generic_pulse_irq_line(*m_maincpu, 0, 1);
 
 	scanline = scanline + 32;
 
 	if (scanline >= 262)
 		scanline = 16;
 
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(interrupt_callback), scanline);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(cball_state::interrupt_callback),this), scanline);
 }
 
 
@@ -97,7 +97,7 @@ void cball_state::machine_start()
 
 void cball_state::machine_reset()
 {
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(16), FUNC(interrupt_callback), 16);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(16), timer_expired_delegate(FUNC(cball_state::interrupt_callback),this), 16);
 }
 
 

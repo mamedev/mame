@@ -53,6 +53,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(timer_d_callback);
 };
 
 
@@ -283,9 +284,9 @@ WRITE8_MEMBER(jr200_state::jr200_border_col_w)
 }
 
 
-static TIMER_CALLBACK(timer_d_callback)
+TIMER_CALLBACK_MEMBER(jr200_state::timer_d_callback)
 {
-	machine.firstcpu->set_input_line(0, HOLD_LINE);
+	machine().firstcpu->set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(jr200_state::mn1271_io_r)
@@ -484,7 +485,7 @@ void jr200_state::machine_start()
 {
 	beep_set_frequency(machine().device(BEEPER_TAG),0);
 	beep_set_state(machine().device(BEEPER_TAG),0);
-	m_timer_d = machine().scheduler().timer_alloc(FUNC(timer_d_callback));
+	m_timer_d = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jr200_state::timer_d_callback),this));
 }
 
 void jr200_state::machine_reset()

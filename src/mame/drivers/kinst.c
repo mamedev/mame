@@ -164,6 +164,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq0_start);
+	TIMER_CALLBACK_MEMBER(irq0_stop);
 };
 
 
@@ -276,16 +277,16 @@ UINT32 kinst_state::screen_update_kinst(screen_device &screen, bitmap_ind16 &bit
  *
  *************************************/
 
-static TIMER_CALLBACK( irq0_stop )
+TIMER_CALLBACK_MEMBER(kinst_state::irq0_stop)
 {
-	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
 INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_usec(50), FUNC(irq0_stop));
+	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(kinst_state::irq0_stop),this));
 }
 
 

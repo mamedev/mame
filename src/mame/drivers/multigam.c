@@ -145,6 +145,7 @@ public:
 	DECLARE_MACHINE_RESET(multigm3);
 	DECLARE_MACHINE_START(supergm3);
 	UINT32 screen_update_multigam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(mmc1_resync_callback);
 };
 
 
@@ -693,10 +694,9 @@ static void multigam_init_mapper02(running_machine &machine, UINT8* prg_base, in
 *******************************************************/
 
 
-static TIMER_CALLBACK( mmc1_resync_callback )
+TIMER_CALLBACK_MEMBER(multigam_state::mmc1_resync_callback)
 {
-	multigam_state *state = machine.driver_data<multigam_state>();
-	state->m_mmc1_reg_write_enable = 1;
+	m_mmc1_reg_write_enable = 1;
 }
 
 WRITE8_MEMBER(multigam_state::mmc1_rom_switch_w)
@@ -710,7 +710,7 @@ WRITE8_MEMBER(multigam_state::mmc1_rom_switch_w)
 	else
 	{
 		m_mmc1_reg_write_enable = 0;
-		machine().scheduler().synchronize(FUNC(mmc1_resync_callback));
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(multigam_state::mmc1_resync_callback),this));
 	}
 
 	int reg = (offset >> 13);

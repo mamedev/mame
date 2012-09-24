@@ -132,6 +132,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	INTERRUPT_GEN_MEMBER(ip22_vbl);
+	TIMER_CALLBACK_MEMBER(ip22_dma);
+	TIMER_CALLBACK_MEMBER(ip22_timer);
 };
 
 
@@ -1073,37 +1075,36 @@ WRITE32_MEMBER(ip22_state::hal2_w)
 #define PBUS_DMADESC_BC			0x00003fff
 
 
-static TIMER_CALLBACK(ip22_dma)
+TIMER_CALLBACK_MEMBER(ip22_state::ip22_dma)
 {
-	//ip22_state *state = machine.driver_data<ip22_state>();
-	machine.scheduler().timer_set(attotime::never, FUNC(ip22_dma));
+	machine().scheduler().timer_set(attotime::never, timer_expired_delegate(FUNC(ip22_state::ip22_dma),this));
 #if 0
-	if( state->m_PBUS_DMA.nActive )
+	if( m_PBUS_DMA.nActive )
 	{
-		UINT16 temp16 = ( state->m_mainram[(state->m_PBUS_DMA.nCurPtr - 0x08000000)/4] & 0xffff0000 ) >> 16;
+		UINT16 temp16 = ( m_mainram[(m_PBUS_DMA.nCurPtr - 0x08000000)/4] & 0xffff0000 ) >> 16;
 		INT16 stemp16 = (INT16)((temp16 >> 8) | (temp16 << 8));
 
-		machine.device<dac_device>("dac")->write_signed16(stemp16 ^ 0x8000);
+		machine().device<dac_device>("dac")->write_signed16(stemp16 ^ 0x8000);
 
-		state->m_PBUS_DMA.nCurPtr += 4;
+		m_PBUS_DMA.nCurPtr += 4;
 
-		state->m_PBUS_DMA.nWordsLeft -= 4;
-		if( state->m_PBUS_DMA.nWordsLeft == 0 )
+		m_PBUS_DMA.nWordsLeft -= 4;
+		if( m_PBUS_DMA.nWordsLeft == 0 )
 		{
-			if( state->m_PBUS_DMA.nNextPtr != 0 )
+			if( m_PBUS_DMA.nNextPtr != 0 )
 			{
-				state->m_PBUS_DMA.nDescPtr = state->m_PBUS_DMA.nNextPtr;
-				state->m_PBUS_DMA.nCurPtr = state->m_mainram[(state->m_PBUS_DMA.nDescPtr - 0x08000000)/4];
-				state->m_PBUS_DMA.nWordsLeft = state->m_mainram[(state->m_PBUS_DMA.nDescPtr - 0x08000000)/4+1];
-				state->m_PBUS_DMA.nNextPtr = state->m_mainram[(state->m_PBUS_DMA.nDescPtr - 0x08000000)/4+2];
+				m_PBUS_DMA.nDescPtr = m_PBUS_DMA.nNextPtr;
+				m_PBUS_DMA.nCurPtr = m_mainram[(m_PBUS_DMA.nDescPtr - 0x08000000)/4];
+				m_PBUS_DMA.nWordsLeft = m_mainram[(m_PBUS_DMA.nDescPtr - 0x08000000)/4+1];
+				m_PBUS_DMA.nNextPtr = m_mainram[(m_PBUS_DMA.nDescPtr - 0x08000000)/4+2];
 			}
 			else
 			{
-				state->m_PBUS_DMA.nActive = 0;
+				m_PBUS_DMA.nActive = 0;
 				return;
 			}
 		}
-		machine.scheduler().timer_set(attotime::from_hz(44100), FUNC(ip22_dma));
+		machine().scheduler().timer_set(attotime::from_hz(44100), timer_expired_delegate(FUNC(ip22_state::ip22_dma),this));
 	}
 #endif
 }
@@ -1173,7 +1174,7 @@ WRITE32_MEMBER(ip22_state::hpc3_pbusdma_w)
 		//verboselog((machine, 0, "    FIFO End: Rowe %04x\n", ( data & PBUS_CTRL_FIFO_END ) >> 24 );
 		if( ( data & PBUS_CTRL_DMASTART ) || ( data & PBUS_CTRL_LOAD_EN ) )
 		{
-			machine().scheduler().timer_set(attotime::from_hz(44100), FUNC(ip22_dma));
+			machine().scheduler().timer_set(attotime::from_hz(44100), timer_expired_delegate(FUNC(ip22_state::ip22_dma),this));
 			m_PBUS_DMA.nActive = 1;
 		}
 		return;
@@ -1216,9 +1217,9 @@ static ADDRESS_MAP_START( ip225015_map, AS_PROGRAM, 32, ip22_state )
 ADDRESS_MAP_END
 
 
-static TIMER_CALLBACK(ip22_timer)
+TIMER_CALLBACK_MEMBER(ip22_state::ip22_timer)
 {
-	machine.scheduler().timer_set(attotime::from_msec(1), FUNC(ip22_timer));
+	machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(ip22_state::ip22_timer),this));
 }
 
 void ip22_state::machine_reset()
@@ -1230,7 +1231,7 @@ void ip22_state::machine_reset()
 	RTC_REGISTERB = 0x08;
 	RTC_REGISTERD = 0x80;
 
-	machine().scheduler().timer_set(attotime::from_msec(1), FUNC(ip22_timer));
+	machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(ip22_state::ip22_timer),this));
 
 	// set up low RAM mirror
 	membank("bank1")->set_base(m_mainram);

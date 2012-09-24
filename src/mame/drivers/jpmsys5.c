@@ -107,6 +107,7 @@ public:
 	DECLARE_MACHINE_START(jpmsys5);
 	DECLARE_MACHINE_RESET(jpmsys5);
 	UINT32 screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(touch_cb);
 };
 
 
@@ -409,10 +410,9 @@ ADDRESS_MAP_END
  *************************************/
 
 /* Serial bit transmission callback */
-static TIMER_CALLBACK( touch_cb )
+TIMER_CALLBACK_MEMBER(jpmsys5_state::touch_cb)
 {
-	jpmsys5_state *state = machine.driver_data<jpmsys5_state>();
-	switch (state->m_touch_state)
+	switch (m_touch_state)
 	{
 		case IDLE:
 		{
@@ -420,38 +420,38 @@ static TIMER_CALLBACK( touch_cb )
 		}
 		case START:
 		{
-			state->m_touch_shift_cnt = 0;
-			state->m_a2_data_in = 0;
-			state->m_touch_state = DATA;
+			m_touch_shift_cnt = 0;
+			m_a2_data_in = 0;
+			m_touch_state = DATA;
 			break;
 		}
 		case DATA:
 		{
-			state->m_a2_data_in = (state->m_touch_data[state->m_touch_data_count] >> (state->m_touch_shift_cnt)) & 1;
+			m_a2_data_in = (m_touch_data[m_touch_data_count] >> (m_touch_shift_cnt)) & 1;
 
-			if (++state->m_touch_shift_cnt == 8)
-				state->m_touch_state = STOP1;
+			if (++m_touch_shift_cnt == 8)
+				m_touch_state = STOP1;
 
 			break;
 		}
 		case STOP1:
 		{
-			state->m_a2_data_in = 1;
-			state->m_touch_state = STOP2;
+			m_a2_data_in = 1;
+			m_touch_state = STOP2;
 			break;
 		}
 		case STOP2:
 		{
-			state->m_a2_data_in = 1;
+			m_a2_data_in = 1;
 
-			if (++state->m_touch_data_count == 3)
+			if (++m_touch_data_count == 3)
 			{
-				state->m_touch_timer->reset();
-				state->m_touch_state = IDLE;
+				m_touch_timer->reset();
+				m_touch_state = IDLE;
 			}
 			else
 			{
-				state->m_touch_state = START;
+				m_touch_state = START;
 			}
 
 			break;
@@ -690,7 +690,7 @@ static ACIA6850_INTERFACE( acia2_if )
 MACHINE_START_MEMBER(jpmsys5_state,jpmsys5v)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base()+0x20000);
-	m_touch_timer = machine().scheduler().timer_alloc(FUNC(touch_cb));
+	m_touch_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jpmsys5_state::touch_cb),this));
 }
 
 MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5v)

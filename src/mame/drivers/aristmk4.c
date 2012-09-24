@@ -322,6 +322,9 @@ public:
 	virtual void palette_init();
 	DECLARE_PALETTE_INIT(lions);
 	UINT32 screen_update_aristmk4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(note_input_reset);
+	TIMER_CALLBACK_MEMBER(coin_input_reset);
+	TIMER_CALLBACK_MEMBER(hopper_reset);
 };
 
 /* Partial Cashcade protocol */
@@ -484,10 +487,9 @@ READ8_MEMBER(aristmk4_state::u3_p3)
 
 }
 
-static TIMER_CALLBACK(note_input_reset)
+TIMER_CALLBACK_MEMBER(aristmk4_state::note_input_reset)
 {
-	aristmk4_state *state = machine.driver_data<aristmk4_state>();
-	state->m_insnote=0; //reset note input after 150msec
+	m_insnote=0; //reset note input after 150msec
 }
 
 READ8_MEMBER(aristmk4_state::bv_p0)
@@ -504,7 +506,7 @@ READ8_MEMBER(aristmk4_state::bv_p0)
 	case 0x02:
 		bv_p0_ret=0x89;
 		m_insnote++;
-		machine().scheduler().timer_set(attotime::from_msec(150), FUNC(note_input_reset));
+		machine().scheduler().timer_set(attotime::from_msec(150), timer_expired_delegate(FUNC(aristmk4_state::note_input_reset),this));
 		break;
 	default:
 		break; //timer will reset the input
@@ -630,16 +632,14 @@ VERSATILE INTERFACE ADAPTER CONFIGURATION
 
 ******************************************************************************/
 
-static TIMER_CALLBACK(coin_input_reset)
+TIMER_CALLBACK_MEMBER(aristmk4_state::coin_input_reset)
 {
-	aristmk4_state *state = machine.driver_data<aristmk4_state>();
-	state->m_inscrd=0; //reset credit input after 150msec
+	m_inscrd=0; //reset credit input after 150msec
 }
 
-static TIMER_CALLBACK(hopper_reset)
+TIMER_CALLBACK_MEMBER(aristmk4_state::hopper_reset)
 {
-	aristmk4_state *state = machine.driver_data<aristmk4_state>();
-	state->m_hopper_motor=0x01;
+	m_hopper_motor=0x01;
 }
 
 // Port A read (SW1)
@@ -686,7 +686,7 @@ READ8_MEMBER(aristmk4_state::via_b_r)
 	case 0x02:
 		ret=ret^0x20;
 		m_inscrd++;
-		machine().scheduler().timer_set(attotime::from_msec(150), FUNC(coin_input_reset));
+		machine().scheduler().timer_set(attotime::from_msec(150), timer_expired_delegate(FUNC(aristmk4_state::coin_input_reset),this));
 		break;
 	default:
 		break; //timer will reset the input
@@ -698,7 +698,7 @@ READ8_MEMBER(aristmk4_state::via_b_r)
 	{
 	case 0x00:
 		ret=ret^0x40;
-		machine().scheduler().timer_set(attotime::from_msec(175), FUNC(hopper_reset));
+		machine().scheduler().timer_set(attotime::from_msec(175), timer_expired_delegate(FUNC(aristmk4_state::hopper_reset),this));
 		m_hopper_motor=0x02;
 		break;
 	case 0x01:

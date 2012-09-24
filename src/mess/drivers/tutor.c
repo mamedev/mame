@@ -206,13 +206,14 @@ public:
 	DECLARE_DRIVER_INIT(pyuuta);
 	virtual void machine_start();
 	virtual void machine_reset();
+	TIMER_CALLBACK_MEMBER(tape_interrupt_handler);
 };
 
 
 /* mapper state */
 
 /* tape interface state */
-static TIMER_CALLBACK(tape_interrupt_handler);
+
 
 
 /* parallel interface state */
@@ -226,7 +227,7 @@ enum
 
 DRIVER_INIT_MEMBER(tutor_state,tutor)
 {
-	m_tape_interrupt_timer = machine().scheduler().timer_alloc(FUNC(tape_interrupt_handler));
+	m_tape_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tutor_state::tape_interrupt_handler),this));
 
 	membank("bank1")->configure_entry(0, machine().root_device().memregion("maincpu")->base() + basic_base);
 	membank("bank1")->configure_entry(1, memregion("maincpu")->base() + cartridge_base);
@@ -400,11 +401,10 @@ WRITE8_MEMBER( tutor_state::tutor_mapper_w )
     know their exact meaning.
 */
 
-static TIMER_CALLBACK(tape_interrupt_handler)
+TIMER_CALLBACK_MEMBER(tutor_state::tape_interrupt_handler)
 {
-	tutor_state *state = machine.driver_data<tutor_state>();
-	//assert(state->m_tape_interrupt_enable);
-	machine.device("maincpu")->execute().set_input_line(1, (state->m_cass->input() > 0.0) ? ASSERT_LINE : CLEAR_LINE);
+	//assert(m_tape_interrupt_enable);
+	machine().device("maincpu")->execute().set_input_line(1, (m_cass->input() > 0.0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* CRU handler */

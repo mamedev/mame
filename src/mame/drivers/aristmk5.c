@@ -83,14 +83,15 @@ public:
 	DECLARE_DRIVER_INIT(aristmk5);
 	virtual void machine_start();
 	virtual void machine_reset();
+	TIMER_CALLBACK_MEMBER(mk5_VSYNC_callback);
+	TIMER_CALLBACK_MEMBER(mk5_2KHz_callback);
 };
 
 
-static TIMER_CALLBACK( mk5_VSYNC_callback )
+TIMER_CALLBACK_MEMBER(aristmk5_state::mk5_VSYNC_callback)
 {
-	aristmk5_state *state = machine.driver_data<aristmk5_state>();
-    state->m_ioc_regs[IRQ_STATUS_A] |= 0x08; //turn vsync bit on
-	state->m_mk5_VSYNC_timer->adjust(attotime::never);
+    m_ioc_regs[IRQ_STATUS_A] |= 0x08; //turn vsync bit on
+	m_mk5_VSYNC_timer->adjust(attotime::never);
 }
 
 WRITE32_MEMBER(aristmk5_state::Ns5w48)
@@ -152,11 +153,10 @@ WRITE32_MEMBER(aristmk5_state::Ns5w48)
     }
 }
 
-static TIMER_CALLBACK( mk5_2KHz_callback )
+TIMER_CALLBACK_MEMBER(aristmk5_state::mk5_2KHz_callback)
 {
-	aristmk5_state *state = machine.driver_data<aristmk5_state>();
-	state->m_ioc_regs[IRQ_STATUS_A] |= 0x01;
-	state->m_mk5_2KHz_timer->adjust(attotime::never);
+	m_ioc_regs[IRQ_STATUS_A] |= 0x01;
+	m_mk5_2KHz_timer->adjust(attotime::never);
 
 }
 
@@ -379,8 +379,8 @@ void aristmk5_state::machine_start()
 	// reset the DAC to centerline
 	//machine().device<dac_device>("dac")->write_signed8(0x80);
 
-	m_mk5_2KHz_timer = machine().scheduler().timer_alloc(FUNC(mk5_2KHz_callback));
-	m_mk5_VSYNC_timer = machine().scheduler().timer_alloc(FUNC(mk5_VSYNC_callback));
+	m_mk5_2KHz_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk5_state::mk5_2KHz_callback),this));
+	m_mk5_VSYNC_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk5_state::mk5_VSYNC_callback),this));
 }
 
 void aristmk5_state::machine_reset()

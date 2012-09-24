@@ -41,6 +41,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_clayshoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(reset_analog_bit);
 };
 
 
@@ -100,10 +101,9 @@ READ8_MEMBER(clayshoo_state::input_port_r)
  *
  *************************************/
 
-static TIMER_CALLBACK( reset_analog_bit )
+TIMER_CALLBACK_MEMBER(clayshoo_state::reset_analog_bit)
 {
-	clayshoo_state *state = machine.driver_data<clayshoo_state>();
-	state->m_analog_port_val &= ~param;
+	m_analog_port_val &= ~param;
 }
 
 
@@ -137,8 +137,8 @@ READ8_MEMBER(clayshoo_state::analog_r)
 static void create_analog_timers( running_machine &machine )
 {
 	clayshoo_state *state = machine.driver_data<clayshoo_state>();
-	state->m_analog_timer_1 = machine.scheduler().timer_alloc(FUNC(reset_analog_bit));
-	state->m_analog_timer_2 = machine.scheduler().timer_alloc(FUNC(reset_analog_bit));
+	state->m_analog_timer_1 = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(clayshoo_state::reset_analog_bit),state));
+	state->m_analog_timer_2 = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(clayshoo_state::reset_analog_bit),state));
 }
 
 

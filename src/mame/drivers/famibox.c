@@ -110,6 +110,8 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_famibox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(famicombox_attract_timer_callback);
+	TIMER_CALLBACK_MEMBER(famicombox_gameplay_timer_callback);
 };
 
 /******************************************************
@@ -282,32 +284,30 @@ static void famicombox_reset(running_machine &machine)
 	machine.device("maincpu")->reset();
 }
 
-static TIMER_CALLBACK(famicombox_attract_timer_callback)
+TIMER_CALLBACK_MEMBER(famibox_state::famicombox_attract_timer_callback)
 {
-	famibox_state *state = machine.driver_data<famibox_state>();
 
-	state->m_attract_timer->adjust(attotime::never, 0, attotime::never);
-	if ( BIT(state->m_exception_mask,1) )
+	m_attract_timer->adjust(attotime::never, 0, attotime::never);
+	if ( BIT(m_exception_mask,1) )
 	{
-		state->m_exception_cause &= ~0x02;
-		famicombox_reset(machine);
+		m_exception_cause &= ~0x02;
+		famicombox_reset(machine());
 	}
 }
 
-static TIMER_CALLBACK(famicombox_gameplay_timer_callback)
+TIMER_CALLBACK_MEMBER(famibox_state::famicombox_gameplay_timer_callback)
 {
-	famibox_state *state = machine.driver_data<famibox_state>();
 
-	if (state->m_coins > 0)
-		state->m_coins--;
+	if (m_coins > 0)
+		m_coins--;
 
-	if (state->m_coins == 0)
+	if (m_coins == 0)
 	{
-		state->m_gameplay_timer->adjust(attotime::never, 0, attotime::never);
-		if ( BIT(state->m_exception_mask,4) )
+		m_gameplay_timer->adjust(attotime::never, 0, attotime::never);
+		if ( BIT(m_exception_mask,4) )
 		{
-			state->m_exception_cause &= ~0x10;
-			famicombox_reset(machine);
+			m_exception_cause &= ~0x10;
+			famicombox_reset(machine());
 		}
 	}
 }
@@ -570,8 +570,8 @@ void famibox_state::machine_start()
 	famicombox_bankswitch(machine(), 0);
 
 
-	m_attract_timer = machine().scheduler().timer_alloc(FUNC(famicombox_attract_timer_callback));
-	m_gameplay_timer = machine().scheduler().timer_alloc(FUNC(famicombox_gameplay_timer_callback));
+	m_attract_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(famibox_state::famicombox_attract_timer_callback),this));
+	m_gameplay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(famibox_state::famicombox_gameplay_timer_callback),this));
 	m_exception_cause = 0xff;
 	m_exception_mask = 0;
 	m_attract_timer_period = 0;

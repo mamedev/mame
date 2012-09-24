@@ -208,6 +208,7 @@ public:
 	UINT32 screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(zr107_vblank);
+	TIMER_CALLBACK_MEMBER(irq_off);
 };
 
 
@@ -677,17 +678,18 @@ static const adc083x_interface zr107_adc_interface = {
 };
 
 
-static TIMER_CALLBACK( irq_off )
+TIMER_CALLBACK_MEMBER(zr107_state::irq_off)
 {
-	machine.device("audiocpu")->execute().set_input_line(param, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(param, CLEAR_LINE);
 }
 
 static void sound_irq_callback( running_machine &machine, int irq )
 {
+	zr107_state *state = machine.driver_data<zr107_state>();
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
 	machine.device("audiocpu")->execute().set_input_line(line, ASSERT_LINE);
-	machine.scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off), line);
+	machine.scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(zr107_state::irq_off),state), line);
 }
 
 static const k056800_interface zr107_k056800_interface =

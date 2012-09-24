@@ -63,6 +63,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_ip204415(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(ip20_timer);
 };
 
 
@@ -495,15 +496,15 @@ DRIVER_INIT_MEMBER(ip20_state,ip204415)
 {
 }
 
-static TIMER_CALLBACK(ip20_timer)
+TIMER_CALLBACK_MEMBER(ip20_state::ip20_timer)
 {
-	ip20_state *state = machine.driver_data<ip20_state>();
+	ip20_state *state = machine().driver_data<ip20_state>();
 
 	// update RTC every 10 milliseconds
-	state->m_RTC.nTemp++;
-	if (state->m_RTC.nTemp >= 10)
+	m_RTC.nTemp++;
+	if (m_RTC.nTemp >= 10)
 	{
-		state->m_RTC.nTemp = 0;
+		m_RTC.nTemp = 0;
 		RTC_HUNDREDTH++;
 
 		if( ( RTC_HUNDREDTH & 0x0f ) == 0x0a )
@@ -551,7 +552,7 @@ static TIMER_CALLBACK(ip20_timer)
 		}
 	}
 
-	machine.scheduler().timer_set(attotime::from_msec(1), FUNC(ip20_timer));
+	machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(ip20_state::ip20_timer),this));
 }
 
 void ip20_state::machine_start()
@@ -568,7 +569,7 @@ void ip20_state::machine_start()
 
 	m_RTC.nTemp = 0;
 
-	machine().scheduler().timer_set(attotime::from_msec(1), FUNC(ip20_timer));
+	machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(ip20_state::ip20_timer),this));
 }
 
 static INPUT_PORTS_START( ip204415 )

@@ -388,6 +388,7 @@ public:
 	DECLARE_DRIVER_INIT(coh3002t_mp);
 	DECLARE_DRIVER_INIT(coh3002t);
 	DECLARE_MACHINE_RESET(coh3002t);
+	TIMER_CALLBACK_MEMBER(dip_timer_fired);
 };
 
 
@@ -782,15 +783,14 @@ WRITE32_MEMBER(taitogn_state::znsecsel_w)
         }
 }
 
-static TIMER_CALLBACK( dip_timer_fired )
+TIMER_CALLBACK_MEMBER(taitogn_state::dip_timer_fired)
 {
-	taitogn_state *state = machine.driver_data<taitogn_state>();
 
-	psx_sio_input( machine, 0, PSX_SIO_IN_DSR, param * PSX_SIO_IN_DSR );
+	psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, param * PSX_SIO_IN_DSR );
 
 	if( param )
 	{
-		state->m_dip_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(50));
+		m_dip_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(50));
 	}
 }
 
@@ -868,7 +868,7 @@ DRIVER_INIT_MEMBER(taitogn_state,coh3002t)
 	znsec_init(0, tt10);
 	znsec_init(1, tt16);
 	psx_sio_install_handler(machine(), 0, sio_pad_handler);
-	m_dip_timer = machine().scheduler().timer_alloc( FUNC(dip_timer_fired), NULL );
+	m_dip_timer = machine().scheduler().timer_alloc( timer_expired_delegate(FUNC(taitogn_state::dip_timer_fired),this), NULL );
 
 	UINT32 metalength;
 	memset(m_cis, 0xff, 512);

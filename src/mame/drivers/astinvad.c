@@ -83,6 +83,8 @@ public:
 	DECLARE_VIDEO_START(spaceint);
 	UINT32 screen_update_astinvad(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(kamikaze_int_off);
+	TIMER_CALLBACK_MEMBER(kamizake_int_gen);
 };
 
 
@@ -219,23 +221,21 @@ UINT32 astinvad_state::screen_update_spaceint(screen_device &screen, bitmap_rgb3
  *
  *************************************/
 
-static TIMER_CALLBACK( kamikaze_int_off )
+TIMER_CALLBACK_MEMBER(astinvad_state::kamikaze_int_off)
 {
-	astinvad_state *state = machine.driver_data<astinvad_state>();
-	state->m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-static TIMER_CALLBACK( kamizake_int_gen )
+TIMER_CALLBACK_MEMBER(astinvad_state::kamizake_int_gen)
 {
-	astinvad_state *state = machine.driver_data<astinvad_state>();
 	/* interrupts are asserted on every state change of the 128V line */
-	state->m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 	param ^= 128;
-	state->m_int_timer->adjust(machine.primary_screen->time_until_pos(param), param);
+	m_int_timer->adjust(machine().primary_screen->time_until_pos(param), param);
 
 	/* an RC circuit turns the interrupt off after a short amount of time */
-	machine.scheduler().timer_set(attotime::from_double(300 * 0.1e-6), FUNC(kamikaze_int_off));
+	machine().scheduler().timer_set(attotime::from_double(300 * 0.1e-6), timer_expired_delegate(FUNC(astinvad_state::kamikaze_int_off),this));
 }
 
 
@@ -244,7 +244,7 @@ MACHINE_START_MEMBER(astinvad_state,kamikaze)
 
 	m_samples = machine().device<samples_device>("samples");
 
-	m_int_timer = machine().scheduler().timer_alloc(FUNC(kamizake_int_gen));
+	m_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astinvad_state::kamizake_int_gen),this));
 	m_int_timer->adjust(machine().primary_screen->time_until_pos(128), 128);
 
 	save_item(NAME(m_screen_flip));

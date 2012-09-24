@@ -73,6 +73,7 @@ public:
 	virtual void machine_start();
 	UINT32 screen_update_gpworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_gpworld);
+	TIMER_CALLBACK_MEMBER(irq_stop);
 };
 
 
@@ -425,9 +426,9 @@ static INPUT_PORTS_START( gpworld )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static TIMER_CALLBACK( irq_stop )
+TIMER_CALLBACK_MEMBER(gpworld_state::irq_stop)
 {
-	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(gpworld_state::vblank_callback_gpworld)
@@ -442,7 +443,7 @@ INTERRUPT_GEN_MEMBER(gpworld_state::vblank_callback_gpworld)
 
 	/* The time the IRQ line stays high is set just long enough to happen after the NMI - hacky? */
 	device.execute().set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_usec(100), FUNC(irq_stop));
+	machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(gpworld_state::irq_stop),this));
 }
 
 static const gfx_layout gpworld_tile_layout =

@@ -108,6 +108,7 @@ public:
 	UINT8 tec1_convert_col_to_bin( UINT8 col, UINT8 row );
 	virtual void machine_reset();
 	virtual void machine_start();
+	TIMER_CALLBACK_MEMBER(tec1_kbd_callback);
 };
 
 
@@ -209,50 +210,49 @@ UINT8 tec1_state::tec1_convert_col_to_bin( UINT8 col, UINT8 row )
 	return data;
 }
 
-static TIMER_CALLBACK( tec1_kbd_callback )
+TIMER_CALLBACK_MEMBER(tec1_state::tec1_kbd_callback)
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3" };
-	tec1_state *state = machine.driver_data<tec1_state>();
 	UINT8 i;
 
     // Display the digits. Blank any digits that haven't been refreshed for a while.
     // This will fix the problem reported by a user.
 	for (i = 0; i < 6; i++)
 	{
-		if (BIT(state->m_digit, i))
+		if (BIT(m_digit, i))
 		{
-			state->m_refresh[i] = 1;
-			output_set_digit_value(i, state->m_segment);
+			m_refresh[i] = 1;
+			output_set_digit_value(i, m_segment);
 		}
 		else
-		if (state->m_refresh[i] == 0x80)
+		if (m_refresh[i] == 0x80)
 		{
 			output_set_digit_value(i, 0);
-			state->m_refresh[i] = 0;
+			m_refresh[i] = 0;
 		}
 		else
-		if (state->m_refresh[i])
-			state->m_refresh[i]++;
+		if (m_refresh[i])
+			m_refresh[i]++;
 	}
 
     // 74C923 4 by 5 key encoder.
     // if previous key is still held, bail out
-	if (machine.root_device().ioport(keynames[state->m_kbd_row])->read())
-		if (state->tec1_convert_col_to_bin(machine.root_device().ioport(keynames[state->m_kbd_row])->read(), state->m_kbd_row) == state->m_kbd)
+	if (machine().root_device().ioport(keynames[m_kbd_row])->read())
+		if (tec1_convert_col_to_bin(machine().root_device().ioport(keynames[m_kbd_row])->read(), m_kbd_row) == m_kbd)
 			return;
 
-	state->m_kbd_row++;
-	state->m_kbd_row &= 3;
+	m_kbd_row++;
+	m_kbd_row &= 3;
 
 	/* see if a key pressed */
-	if (machine.root_device().ioport(keynames[state->m_kbd_row])->read())
+	if (machine().root_device().ioport(keynames[m_kbd_row])->read())
 	{
-		state->m_kbd = state->tec1_convert_col_to_bin(machine.root_device().ioport(keynames[state->m_kbd_row])->read(), state->m_kbd_row);
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, HOLD_LINE);
-		state->m_key_pressed = TRUE;
+		m_kbd = tec1_convert_col_to_bin(machine().root_device().ioport(keynames[m_kbd_row])->read(), m_kbd_row);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, HOLD_LINE);
+		m_key_pressed = TRUE;
 	}
 	else
-		state->m_key_pressed = FALSE;
+		m_key_pressed = FALSE;
 }
 
 
@@ -264,7 +264,7 @@ static TIMER_CALLBACK( tec1_kbd_callback )
 
 void tec1_state::machine_start()
 {
-	m_kbd_timer = machine().scheduler().timer_alloc(FUNC(tec1_kbd_callback));
+	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tec1_state::tec1_kbd_callback),this));
 	m_kbd_timer->adjust( attotime::zero, 0, attotime::from_hz(500) );
 }
 

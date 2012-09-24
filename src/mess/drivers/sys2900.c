@@ -47,6 +47,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(sys2900_boot);
 };
 
 
@@ -69,16 +70,15 @@ INPUT_PORTS_END
 
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
-static TIMER_CALLBACK( sys2900_boot )
+TIMER_CALLBACK_MEMBER(sys2900_state::sys2900_boot)
 {
-	sys2900_state *state = machine.driver_data<sys2900_state>();
-	state->membank("boot")->set_entry(0);
+	membank("boot")->set_entry(0);
 }
 
 void sys2900_state::machine_reset()
 {
 	membank("boot")->set_entry(1);
-	machine().scheduler().timer_set(attotime::from_usec(5), FUNC(sys2900_boot));
+	machine().scheduler().timer_set(attotime::from_usec(5), timer_expired_delegate(FUNC(sys2900_state::sys2900_boot),this));
 }
 
 DRIVER_INIT_MEMBER(sys2900_state,sys2900)

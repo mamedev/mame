@@ -382,6 +382,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(clock_irq);
+	TIMER_CALLBACK_MEMBER(adjust_cpu_speed);
 };
 
 
@@ -436,20 +438,19 @@ INLINE void schedule_next_irq(running_machine &machine, int curv)
 }
 
 
-static TIMER_CALLBACK( clock_irq )
+TIMER_CALLBACK_MEMBER(missile_state::clock_irq)
 {
-	missile_state *state = machine.driver_data<missile_state>();
 	int curv = param;
 
 	/* assert the IRQ if not already asserted */
-	state->m_irq_state = (~curv >> 5) & 1;
-	state->m_maincpu->set_input_line(0, state->m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	m_irq_state = (~curv >> 5) & 1;
+	m_maincpu->set_input_line(0, m_irq_state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* force an update while we're here */
-	machine.primary_screen->update_partial(v_to_scanline(state, curv));
+	machine().primary_screen->update_partial(v_to_scanline(this, curv));
 
 	/* find the next edge */
-	schedule_next_irq(machine, curv);
+	schedule_next_irq(machine(), curv);
 }
 
 
@@ -468,20 +469,19 @@ CUSTOM_INPUT_MEMBER(missile_state::get_vblank)
  *
  *************************************/
 
-static TIMER_CALLBACK( adjust_cpu_speed )
+TIMER_CALLBACK_MEMBER(missile_state::adjust_cpu_speed)
 {
-	missile_state *state = machine.driver_data<missile_state>();
 	int curv = param;
 
 	/* starting at scanline 224, the CPU runs at half speed */
 	if (curv == 224)
-		state->m_maincpu->set_unscaled_clock(MASTER_CLOCK/16);
+		m_maincpu->set_unscaled_clock(MASTER_CLOCK/16);
 	else
-		state->m_maincpu->set_unscaled_clock(MASTER_CLOCK/8);
+		m_maincpu->set_unscaled_clock(MASTER_CLOCK/8);
 
 	/* scanline for the next run */
 	curv ^= 224;
-	state->m_cpu_timer->adjust(machine.primary_screen->time_until_pos(v_to_scanline(state, curv)), curv);
+	m_cpu_timer->adjust(machine().primary_screen->time_until_pos(v_to_scanline(this, curv)), curv);
 }
 
 
@@ -522,11 +522,11 @@ void missile_state::machine_start()
 	space.set_direct_update_handler(direct_update_delegate(FUNC(missile_state::missile_direct_handler), this));
 
 	/* create a timer to speed/slow the CPU */
-	m_cpu_timer = machine().scheduler().timer_alloc(FUNC(adjust_cpu_speed));
+	m_cpu_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(missile_state::adjust_cpu_speed),this));
 	m_cpu_timer->adjust(machine().primary_screen->time_until_pos(v_to_scanline(this, 0), 0));
 
 	/* create a timer for IRQs and set up the first callback */
-	m_irq_timer = machine().scheduler().timer_alloc(FUNC(clock_irq));
+	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(missile_state::clock_irq),this));
 	m_irq_state = 0;
 	schedule_next_irq(machine(), -32);
 

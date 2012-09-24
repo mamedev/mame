@@ -114,6 +114,7 @@ public:
 	virtual void machine_reset();
 	DECLARE_MACHINE_START(a2600);
 	DECLARE_MACHINE_START(a2600p);
+	TIMER_CALLBACK_MEMBER(modeDPC_timer_callback);
 };
 
 
@@ -959,15 +960,14 @@ void a2600_state::modeDPC_decrement_counter(UINT8 data_fetcher)
 	modeDPC_check_flag(data_fetcher );
 }
 
-static TIMER_CALLBACK(modeDPC_timer_callback)
+TIMER_CALLBACK_MEMBER(a2600_state::modeDPC_timer_callback)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	int data_fetcher;
 	for( data_fetcher = 5; data_fetcher < 8; data_fetcher++ )
 	{
-		if ( state->m_dpc.df[data_fetcher].osc_clk )
+		if ( m_dpc.df[data_fetcher].osc_clk )
 		{
-			state->modeDPC_decrement_counter(data_fetcher );
+			modeDPC_decrement_counter(data_fetcher );
 		}
 	}
 }
@@ -1592,7 +1592,7 @@ static void common_init(running_machine &machine)
 	state->m_extra_RAM = machine.memory().region_alloc("user2", 0x8600, 1, ENDIANNESS_LITTLE);
 	memset( state->m_riot_ram, 0x00, 0x80 );
 	state->m_current_reset_bank_counter = 0xFF;
-	state->m_dpc.oscillator = machine.scheduler().timer_alloc(FUNC(modeDPC_timer_callback));
+	state->m_dpc.oscillator = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_state::modeDPC_timer_callback),state));
 }
 
 MACHINE_START_MEMBER(a2600_state,a2600)
