@@ -8,16 +8,20 @@ class jack_state : public driver_device
 {
 public:
 	jack_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"){ }
+		m_colorram(*this, "colorram")
+	{ }
 
-	/* memory pointers */
+	/* device- and memory pointers */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-//  UINT8 *    paletteram;  // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -29,9 +33,6 @@ public:
 	int m_question_rom;
 	int m_remap_address[16];
 
-
-	/* devices */
-	cpu_device *m_audiocpu;
 	DECLARE_WRITE8_MEMBER(jack_sh_command_w);
 	DECLARE_WRITE8_MEMBER(joinem_misc_w);
 	DECLARE_READ8_MEMBER(striv_question_r);
@@ -42,20 +43,25 @@ public:
 	DECLARE_WRITE8_MEMBER(jack_flipscreen_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(sound_check_r);
 	DECLARE_READ8_MEMBER(timer_r);
+
 	DECLARE_DRIVER_INIT(zzyzzyxx);
 	DECLARE_DRIVER_INIT(striv);
 	DECLARE_DRIVER_INIT(treahunt);
 	DECLARE_DRIVER_INIT(loverboy);
 	DECLARE_DRIVER_INIT(jack);
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_flipy);
 	TILE_GET_INFO_MEMBER(joinem_get_bg_tile_info);
+	DECLARE_VIDEO_START(joinem);
+	DECLARE_PALETTE_INIT(joinem);
+
+	UINT32 screen_update_jack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_joinem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	DECLARE_VIDEO_START(joinem);
-	DECLARE_PALETTE_INIT(joinem);
-	UINT32 screen_update_jack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_joinem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	INTERRUPT_GEN_MEMBER(joinem_vblank_irq);
 };

@@ -164,6 +164,11 @@ static ADDRESS_MAP_START( joinem_map, AS_PROGRAM, 8, jack_state )
 	AM_RANGE(0xbc00, 0xbfff) AM_RAM_WRITE(jack_colorram_w) AM_SHARE("colorram")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( unclepoo_map, AS_PROGRAM, 8, jack_state )
+	AM_RANGE(0x9000, 0x97ff) AM_RAM
+	AM_IMPORT_FROM( joinem_map )
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, jack_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
@@ -787,9 +792,6 @@ static const ay8910_interface ay8910_config =
 
 void jack_state::machine_start()
 {
-
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
-
 	save_item(NAME(m_joinem_snd_bit));
 	save_item(NAME(m_question_address));
 	save_item(NAME(m_question_rom));
@@ -813,7 +815,7 @@ static MACHINE_CONFIG_START( jack, jack_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18000000/6)	/* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(jack_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jack_state,  irq0_line_hold) /* jack needs 1 or its too fast */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", jack_state, irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,18000000/12)	/* 1.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -871,6 +873,14 @@ static MACHINE_CONFIG_DERIVED( joinem, jack )
 
 	MCFG_PALETTE_INIT_OVERRIDE(jack_state,joinem)
 	MCFG_VIDEO_START_OVERRIDE(jack_state,joinem)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( unclepoo, joinem )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(unclepoo_map)
 MACHINE_CONFIG_END
 
 
@@ -1371,7 +1381,6 @@ DRIVER_INIT_MEMBER(jack_state,zzyzzyxx)
 
 DRIVER_INIT_MEMBER(jack_state,loverboy)
 {
-
 	/* this doesn't make sense.. the startup code, and irq0 have jumps to 0..
        I replace the startup jump with another jump to what appears to be
        the start of the game code.
@@ -1446,6 +1455,6 @@ GAME( 1984, sucasino, 0,        jack,    sucasino, jack_state, jack,     ROT90, 
 GAME( 1981, tripool,  0,        tripool, tripool, jack_state,  jack,     ROT90,  "Noma (Casino Tech license)",  "Tri-Pool (Casino Tech)", GAME_SUPPORTS_SAVE )
 GAME( 1981, tripoola, tripool,  tripool, tripool, jack_state,  jack,     ROT90,  "Noma (Costal Games license)", "Tri-Pool (Costal Games)", GAME_SUPPORTS_SAVE )
 GAME( 1983, joinem,   0,        joinem,  joinem, jack_state,   zzyzzyxx, ROT90,  "Global Corporation",          "Joinem", GAME_SUPPORTS_SAVE )
-GAME( 1983, unclepoop, unclepoo, joinem, joinem, jack_state, zzyzzyxx, ROT90, "Diatec", "Uncle Poo (nincompoop version)", GAME_NOT_WORKING )
+GAME( 1983, unclepoop, unclepoo, unclepoo, joinem, jack_state, zzyzzyxx, ROT90, "Diatec", "Uncle Poo (nincompoop version)", GAME_NOT_WORKING )
 GAME( 1983, loverboy, 0,        loverboy,loverboy, jack_state, loverboy, ROT90,  "G.T Enterprise Inc",          "Lover Boy", GAME_SUPPORTS_SAVE )
 GAME( 1985, striv,    0,        jack,    striv, jack_state,    striv,    ROT270, "Hara Industries",             "Super Triv", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
