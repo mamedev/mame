@@ -4756,18 +4756,33 @@ WRITE32_DEVICE_HANDLER( banshee_io_w )
 			break;
 
 		case io_vidScreenSize:
-			/* warning: this is a hack for now! We should really compute the screen size */
-			/* from the CRTC registers */
-			COMBINE_DATA(&v->banshee.io[offset]);
 			if (data & 0xfff)
 				v->fbi.width = data & 0xfff;
 			if (data & 0xfff000)
 				v->fbi.height = (data >> 12) & 0xfff;
-			v->screen->set_visible_area(0, v->fbi.width - 1, 0, v->fbi.height - 1);
+			/* fall through */
+		case io_vidOverlayDudx:
+		case io_vidOverlayDvdy:
+		{
+			/* warning: this is a hack for now! We should really compute the screen size */
+			/* from the CRTC registers */
+			COMBINE_DATA(&v->banshee.io[offset]);
+
+			int width = v->fbi.width;
+			int height = v->fbi.height;
+
+			if (v->banshee.io[io_vidOverlayDudx] != 0)
+				width = (v->fbi.width * v->banshee.io[io_vidOverlayDudx]) / 1048576;
+			if (v->banshee.io[io_vidOverlayDvdy] != 0)
+				height = (v->fbi.height * v->banshee.io[io_vidOverlayDvdy]) / 1048576;
+
+			v->screen->set_visible_area(0, width - 1, 0, height - 1);
+
 			adjust_vblank_timer(v);
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", device->machine().describe_context(), banshee_io_reg_name[offset], data, mem_mask);
 			break;
+		}
 
 		case io_lfbMemoryConfig:
 			v->fbi.lfb_base = (data & 0x1fff) << 10;
