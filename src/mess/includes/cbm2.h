@@ -59,6 +59,8 @@ public:
 		  m_buffer_ram(*this, "buffer_ram"),
 		  m_dramon(1),
 		  m_video_ram(*this, "video_ram"),
+		  m_video_ram_size(0x800),
+		  m_graphics(1),
 		  m_todclk(0),
 		  m_tpi1_irq(CLEAR_LINE),
 		  m_cass_rd(1),
@@ -90,7 +92,8 @@ public:
 	DECLARE_MACHINE_START( cbm2_pal );
 	DECLARE_MACHINE_RESET( cbm2 );
 
-	virtual void read_pla(offs_t offset, int busy2, int eras, int ecas, int refen, int cas, int ras, int *casseg1, int *casseg2, int *casseg3, int *casseg4);
+	virtual void read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas, int busy2, 
+		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4);
 
 	void bankswitch(offs_t offset, int busy2, int eras, int ecas, int refen, int cas, int ras, int *sysioen, int *dramen,
 		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *buframcs, int *extbufcs, int *vidramcs, 
@@ -161,7 +164,8 @@ public:
 		: cbm2_state(mconfig, type, tag)
 	{ }
 
-	virtual void read_pla(offs_t offset, int busy2, int eras, int ecas, int refen, int cas, int ras, int *casseg1, int *casseg2, int *casseg3, int *casseg4);
+	virtual void read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas, int busy2, 
+		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4);
 
 	DECLARE_READ8_MEMBER( tpi2_pc_r );
 };
@@ -185,14 +189,23 @@ public:
 	required_device<mos6566_device> m_vic;
 
 	DECLARE_MACHINE_START( p500 );
+	DECLARE_MACHINE_START( p500_ntsc );
+	DECLARE_MACHINE_START( p500_pal );
 	DECLARE_MACHINE_RESET( p500 );
+
+	void read_pla1(offs_t offset, int bras, int busy2, int sphi2, int clrnibcsb, int procvid, int refen, int ba, int aec, int srw,
+		int *datxen, int *dramxen, int *clrniben, int *segf, int *_64kcasen, int *casenb, int *viddaten, int *viddat_tr);
+	
+	void read_pla2(offs_t offset, offs_t va, int ba, int sphi2, int vicen, int ae, int segf, int bcas, int bank0,
+		int *clrnibcsb, int *extbufcs, int *discromcs, int *buframcs, int *charomcs, int *procvid, int *viccs, int *vidmatcs);
 
 	void bankswitch(offs_t offset, offs_t va, int srw, int sphi0, int sphi1, int sphi2, int ba, int ae, int bras, int bcas, int busy2, int refen,
 		int *datxen, int *dramxen, int *clrniben, int *_64kcasen, int *casenb, int *viddaten, int *viddat_tr,
 		int *clrnibcs, int *extbufcs, int *discromcs, int *buframcs, int *charomcs, int *viccs, int *vidmatcs,
 		int *csbank1, int *csbank2, int *csbank3, int *basiclocs, int *basichics, int *kernalcs,
 		int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs, int *aec, int *vsysaden);
-	UINT8 read_memory(address_space &space, offs_t offset, offs_t va, int sphi0, int sphi1, int sphi2, int ba, int ae, int bras, int bcas);
+	
+	UINT8 read_memory(address_space &space, offs_t offset, offs_t va, int sphi0, int sphi1, int sphi2, int ba, int ae, int bras, int bcas, UINT8 *clrnib);
 	void write_memory(address_space &space, offs_t offset, UINT8 data, int sphi0, int sphi1, int sphi2, int ba, int ae, int bras, int bcas);
 
 	DECLARE_READ8_MEMBER( read );

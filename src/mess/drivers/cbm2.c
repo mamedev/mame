@@ -2,10 +2,11 @@
 
     TODO:
 
-	- foreign keyboard inputs
+	- basic does not work
+	- shift lock
+	- Hungarian keyboard
 	- cbm620hu charom banking?
-	- read VIC video RAM thru PLA
-	- read VIC color RAM thru PLA
+	- read VIC video/color RAM thru PLA (Sphi2 = 1, AE = 0)
 	- user port
 	- co-processor bus
 
@@ -39,25 +40,32 @@
 //**************************************************************************
 
 //-------------------------------------------------
-//  read_pla -
+//  read_pla - low profile PLA read
 //-------------------------------------------------
 
-void cbm2_state::read_pla(offs_t offset, int busy2, int eras, int ecas, int refen, int cas, int ras, int *casseg1, int *casseg2, int *casseg3, int *casseg4)
+void cbm2_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas, int busy2, 
+	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4)
 {
 	UINT32 input = P0 << 15 | P1 << 14 | P2 << 13 | P3 << 12 | busy2 << 11 | eras << 10 | ecas << 9 | refen << 8 | cas << 7 | ras << 6;
 	UINT32 data = m_pla1->read(input);
 
 	*casseg1 = BIT(data, 0);
-	//*rasseg1 = BIT(data, 1);
-	//*rasseg2 = BIT(data, 2);
+	*rasseg1 = BIT(data, 1);
+	*rasseg2 = BIT(data, 2);
 	*casseg2 = BIT(data, 3);
-	//*rasseg4 = BIT(data, 4);
+	*rasseg4 = BIT(data, 4);
 	*casseg4 = BIT(data, 5);
 	*casseg3 = BIT(data, 6);
-	//*rasseg3 = BIT(data, 7);
+	*rasseg3 = BIT(data, 7);
 }
 
-void cbm2hp_state::read_pla(offs_t offset, int busy2, int eras, int ecas, int refen, int cas, int ras, int *casseg1, int *casseg2, int *casseg3, int *casseg4)
+
+//-------------------------------------------------
+//  read_pla - high profile PLA read
+//-------------------------------------------------
+
+void cbm2hp_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas, int busy2, 
+	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4)
 {
 	UINT32 input = ras << 13 | cas << 12 | refen << 11 | eras << 10 | ecas << 9 | busy2 << 8 | P3 << 3 | P2 << 2 | P1 << 1 | P0;
 	UINT32 data = m_pla1->read(input);
@@ -66,10 +74,10 @@ void cbm2hp_state::read_pla(offs_t offset, int busy2, int eras, int ecas, int re
 	*casseg2 = BIT(data, 1);
 	*casseg3 = BIT(data, 2);
 	*casseg4 = BIT(data, 3);
-	//*rasseg1 = BIT(data, 4);
-	//*rasseg2 = BIT(data, 5);
-	//*rasseg3 = BIT(data, 6);
-	//*rasseg4 = BIT(data, 7);
+	*rasseg1 = BIT(data, 4);
+	*rasseg2 = BIT(data, 5);
+	*rasseg3 = BIT(data, 6);
+	*rasseg4 = BIT(data, 7);
 }
 
 
@@ -82,10 +90,12 @@ void cbm2_state::bankswitch(offs_t offset, int busy2, int eras, int ecas, int re
 	int *diskromcs, int *csbank1, int *csbank2, int *csbank3, int *basiccs, int *knbcs, int *kernalcs,
 	int *crtccs, int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs)
 {
-	this->read_pla(offset, busy2, eras, ecas, refen, cas, ras, casseg1, casseg2, casseg3, casseg4);
+	int rasseg1 = 1, rasseg2 = 1, rasseg3 = 1, rasseg4 = 1;
+
+	this->read_pla(offset, ras, cas, refen, eras, ecas, busy2, casseg1, casseg2, casseg3, casseg4, &rasseg1, &rasseg2, &rasseg3, &rasseg4);
 
 	int busen1 = m_dramon;
-	int decoden = 0; // TODO
+	int decoden = 0;
 	*sysioen = !(P0 && P1 && P2 && P3) && busen1;
 	*dramen = !((!(P0 && P1 && P2 && P3)) && busen1);
 
@@ -164,15 +174,15 @@ READ8_MEMBER( cbm2_state::read )
 		{
 			data = m_ram->pointer()[offset & 0xffff];
 		}
-		else if (!casseg2)
+		if (!casseg2)
 		{
 			data = m_ram->pointer()[0x10000 | (offset & 0xffff)];
 		}
-		else if (!casseg3 && (m_ram->size() > 0x20000))
+		if (!casseg3 && (m_ram->size() > 0x20000))
 		{
 			data = m_ram->pointer()[0x20000 | (offset & 0xffff)];
 		}
-		else if (!casseg4 && (m_ram->size() > 0x30000))
+		if (!casseg4 && (m_ram->size() > 0x30000))
 		{
 			data = m_ram->pointer()[0x30000 | (offset & 0xffff)];
 		}
@@ -184,19 +194,19 @@ READ8_MEMBER( cbm2_state::read )
 		{
 			data = m_buffer_ram[offset & 0x7ff];
 		}
-		else if (!vidramcs)
+		if (!vidramcs)
 		{
 			data = m_video_ram[offset & 0x7ff];
 		}
-		else if (!basiccs || !knbcs)
+		if (!basiccs || !knbcs)
 		{
 			data = m_basic[offset & 0x3fff];
 		}
-		else if (!kernalcs)
+		if (!kernalcs)
 		{
 			data = m_kernal[offset & 0x1fff];
 		}
-		else if (!crtccs)
+		if (!crtccs)
 		{
 			if (A0)
 			{
@@ -207,23 +217,23 @@ READ8_MEMBER( cbm2_state::read )
 				data = m_crtc->status_r(space, 0);
 			}
 		}
-		else if (!sidcs)
+		if (!sidcs)
 		{
 			data = m_sid->read(space, offset & 0x1f);
 		}
-		else if (!ciacs)
+		if (!ciacs)
 		{
 			data = m_cia->read(space, offset & 0x0f);
 		}
-		else if (!aciacs)
+		if (!aciacs)
 		{
 			data = m_acia->read(space, offset & 0x03);
 		}
-		else if (!tript1cs)
+		if (!tript1cs)
 		{
 			data = m_tpi1->read(space, offset & 0x07);
 		}
-		else if (!tript2cs)
+		if (!tript2cs)
 		{
 			data = m_tpi2->read(space, offset & 0x07);
 		}
@@ -263,15 +273,15 @@ WRITE8_MEMBER( cbm2_state::write )
 		{
 			m_ram->pointer()[offset & 0xffff] = data;
 		}
-		else if (!casseg2)
+		if (!casseg2)
 		{
 			m_ram->pointer()[0x10000 | (offset & 0xffff)] = data;
 		}
-		else if (!casseg3 && (m_ram->size() > 0x20000))
+		if (!casseg3 && (m_ram->size() > 0x20000))
 		{
 			m_ram->pointer()[0x20000 | (offset & 0xffff)] = data;
 		}
-		else if (!casseg4 && (m_ram->size() > 0x30000))
+		if (!casseg4 && (m_ram->size() > 0x30000))
 		{
 			m_ram->pointer()[0x30000 | (offset & 0xffff)] = data;
 		}
@@ -283,19 +293,19 @@ WRITE8_MEMBER( cbm2_state::write )
 		{
 			m_buffer_ram[offset & 0x7ff] = data;
 		}
-		else if (!vidramcs)
+		if (!vidramcs)
 		{
 			m_video_ram[offset & 0x7ff] = data;
 		}
-		else if (!basiccs || !knbcs)
+		if (!basiccs || !knbcs)
 		{
 			m_basic[offset & 0x3fff] = data;
 		}
-		else if (!kernalcs)
+		if (!kernalcs)
 		{
 			m_kernal[offset & 0x1fff] = data;
 		}
-		else if (!crtccs)
+		if (!crtccs)
 		{
 			if (A0)
 			{
@@ -306,29 +316,75 @@ WRITE8_MEMBER( cbm2_state::write )
 				m_crtc->address_w(space, 0, data);
 			}
 		}
-		else if (!sidcs)
+		if (!sidcs)
 		{
 			m_sid->write(space, offset & 0x1f, data);
 		}
-		else if (!ciacs)
+		if (!ciacs)
 		{
 			m_cia->write(space, offset & 0x0f, data);
 		}
-		else if (!aciacs)
+		if (!aciacs)
 		{
 			m_acia->write(space, offset & 0x03, data);
 		}
-		else if (!tript1cs)
+		if (!tript1cs)
 		{
 			m_tpi1->write(space, offset & 0x07, data);
 		}
-		else if (!tript2cs)
+		if (!tript2cs)
 		{
 			m_tpi2->write(space, offset & 0x07, data);
 		}
 
 		m_exp->write(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
 	}
+}
+
+
+//-------------------------------------------------
+//  read_pla1 - P500 PLA #1 read
+//-------------------------------------------------
+
+void p500_state::read_pla1(offs_t offset, int bras, int busy2, int sphi2, int clrnibcsb, int procvid, int refen, int ba, int aec, int srw,
+	int *datxen, int *dramxen, int *clrniben, int *segf, int *_64kcasen, int *casenb, int *viddaten, int *viddat_tr)
+{
+	UINT32 input = P0 << 15 | P2 << 14 | bras << 13 | P1 << 12 | P3 << 11 | busy2 << 10 | m_statvid << 9 | sphi2 << 8 |
+			clrnibcsb << 7 | m_dramon << 6 | procvid << 5 | refen << 4 | m_vicdotsel << 3 | ba << 2 | aec << 1 | srw;
+	
+	UINT32 data = m_pla1->read(input);
+
+	*datxen = BIT(data, 0);
+	*dramxen = BIT(data, 1);
+	*clrniben = BIT(data, 2);
+	*segf = BIT(data, 3);
+	*_64kcasen = BIT(data, 4);
+	*casenb = BIT(data, 5);
+	*viddaten = BIT(data, 6);
+	*viddat_tr = BIT(data, 7);
+}
+
+
+//-------------------------------------------------
+//  read_pla2 - P500 PLA #2 read
+//-------------------------------------------------
+
+void p500_state::read_pla2(offs_t offset, offs_t va, int ba, int sphi2, int vicen, int ae, int segf, int bcas, int bank0,
+	int *clrnibcsb, int *extbufcs, int *discromcs, int *buframcs, int *charomcs, int *procvid, int *viccs, int *vidmatcs)
+{
+	UINT32 input = VA12 << 15 | ba << 14 | A13 << 13 | A15 << 12 | A14 << 11 | A11 << 10 | A10 << 9 | A12 << 8 |
+			sphi2 << 7 | vicen << 6 | m_statvid << 5 | m_vicdotsel << 4 | ae << 3 | segf << 2 | bcas << 1 | bank0;
+	
+	UINT32 data = m_pla2->read(input);
+
+	*clrnibcsb = BIT(data, 0);
+	*extbufcs = BIT(data, 1);
+	*discromcs = BIT(data, 2);
+	*buframcs = BIT(data, 3);
+	*charomcs = BIT(data, 4);
+	*procvid = BIT(data, 5);
+	*viccs = BIT(data, 6);
+	*vidmatcs = BIT(data, 7);
 }
 
 
@@ -343,15 +399,12 @@ void p500_state::bankswitch(offs_t offset, offs_t va, int srw, int sphi0, int sp
 	int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs, int *aec, int *vsysaden)
 {
 	*aec = !((m_statvid || ae) && sphi2);
+	*vsysaden = sphi1 || ba;
 
-	int clrnibcsb = 1;
-	int procvid = 1;
+	int clrnibcsb = 1, procvid = 1, segf = 1;
 
-	UINT32 input = P0 << 15 | P2 << 14 | bras << 13 | P1 << 12 | P3 << 11 | busy2 << 10 | m_statvid << 9 | sphi2 << 8 |
-				   clrnibcsb << 7 | m_dramon << 6 | procvid << 5 | refen << 4 | m_vicdotsel << 3 | ba << 2 | *aec << 1 | srw;
-	UINT32 data = m_pla1->read(input);
-
-	int segf = BIT(data, 3);
+	read_pla1(offset, bras, busy2, sphi2, clrnibcsb, procvid, refen, ba, *aec, srw, 
+		datxen, dramxen, clrniben, &segf, _64kcasen, casenb, viddaten, viddat_tr);
 
 	int bank0 = 1, vicen = 1;
 
@@ -386,34 +439,16 @@ void p500_state::bankswitch(offs_t offset, offs_t va, int srw, int sphi0, int sp
 		}
 	}
 
-	input = VA12 << 15 | ba << 14 | A13 << 13 | A15 << 12 | A14 << 11 | A11 << 10 | A10 << 9 | A12 << 8 |
-			sphi2 << 7 | vicen << 6 | m_statvid << 5 | m_vicdotsel << 4 | ae << 3 | segf << 2 | bcas << 1 | bank0;
-	data = m_pla2->read(input);
+	int vidmatcsb = 1;
 
-	clrnibcsb = BIT(data, 0);
-	if (!bcas) *clrnibcs = clrnibcsb;
-	*extbufcs = BIT(data, 1);
-	*discromcs = BIT(data, 2);
-	*buframcs = BIT(data, 3);
-	*charomcs = BIT(data, 4);
-	procvid = BIT(data, 5);
-	*viccs = BIT(data, 6);
-	if (!bcas) *vidmatcs = BIT(data, 7);
+	read_pla2(offset, va, ba, sphi2, vicen, ae, segf, bcas, bank0,
+		&clrnibcsb, extbufcs, discromcs, buframcs, charomcs, &procvid, viccs, &vidmatcsb);
 
-	input = P0 << 15 | P2 << 14 | bras << 13 | P1 << 12 | P3 << 11 | busy2 << 10 | m_statvid << 9 | sphi2 << 8 |
-			clrnibcsb << 7 | m_dramon << 6 | procvid << 5 | refen << 4 | m_vicdotsel << 3 | ba << 2 | *aec << 1 | srw;
-	data = m_pla1->read(input);
+	*clrnibcs = clrnibcsb || bcas;
+	*vidmatcs = vidmatcsb || bcas;
 
-	*datxen = BIT(data, 0);
-	*dramxen = BIT(data, 1);
-	*clrniben = BIT(data, 2);
-	//*segf = BIT(data, 3);
-	*_64kcasen = BIT(data, 4);
-	*casenb = BIT(data, 5);
-	*viddaten = BIT(data, 6);
-	*viddat_tr = BIT(data, 7);
-
-	*vsysaden = sphi1 || ba;
+	read_pla1(offset, bras, busy2, sphi2, clrnibcsb, procvid, refen, ba, *aec, srw, 
+		datxen, dramxen, clrniben, &segf, _64kcasen, casenb, viddaten, viddat_tr);
 }
 
 
@@ -421,7 +456,7 @@ void p500_state::bankswitch(offs_t offset, offs_t va, int srw, int sphi0, int sp
 //  read_memory -
 //-------------------------------------------------
 
-UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, int sphi0, int sphi1, int sphi2, int ba, int ae, int bras, int bcas)
+UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, int sphi0, int sphi1, int sphi2, int ba, int ae, int bras, int bcas, UINT8 *clrnib)
 {
 	int srw = 1, busy2 = 1, refen = 0;
 	
@@ -439,111 +474,108 @@ UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, in
 /*
 	if (!space.debugger_access())
 	logerror("r %05x %u %u %u %u %u %u %u - %u %u %u %u %u %u %u - %u %u %u %u %u %u - %u %u %u %u %u %u %u - %u %u : ",
-		offset, datxen, dramxen, clrniben, _64kcasen, casenb, viddaten, viddat_tr,
+		va, datxen, dramxen, clrniben, _64kcasen, casenb, viddaten, viddat_tr,
 		clrnibcs, extbufcs, discromcs, buframcs, charomcs, viccs, vidmatcs,
 		csbank1, csbank2, csbank3, basiclocs, basichics, kernalcs,
 		cs1, sidcs, extprtcs, ciacs, aciacs, tript1cs, tript2cs, aec, vsysaden);
 */
 	UINT8 data = 0xff;
+	*clrnib = 0xf;
 
-	if (aec && !datxen && !_64kcasen)
+	if (vsysaden)
 	{
-		data = m_ram->pointer()[offset & 0xffff];
-		//if (!space.debugger_access()) logerror("64K\n");
-	}
-	else if (!aec && !viddaten && viddat_tr && !_64kcasen)
-	{
-		data = m_ram->pointer()[(m_vicbnksel << 14) | va];
-		//if (!space.debugger_access()) logerror("64K\n");
-	}
-	else if (!dramxen && casenb && !P3)
-	{
-		switch ((offset >> 15) & 0x07)
+		if (!_64kcasen && !aec && !viddaten && !viddat_tr)
 		{
-		case 1: data = m_ram->pointer()[0x10000 + (offset & 0xffff)]; break;
-		case 2: if (m_ram->size() > 0x20000) data = m_ram->pointer()[0x20000 + (offset & 0xffff)]; break;
-		case 3: if (m_ram->size() > 0x30000) data = m_ram->pointer()[0x30000 + (offset & 0xffff)]; break;
+			data = m_ram->pointer()[(m_vicbnksel << 14) | va];
 		}
-		//if (!space.debugger_access()) logerror("CASEN\n");
+		if (!clrnibcs)
+		{
+			*clrnib = m_color_ram[va & 0x3ff];
+		}
+		if (!vidmatcs)
+		{
+			data = m_video_ram[va & 0x3ff];
+		}
+		if (!charomcs)
+		{
+			data = m_charom[va & 0xfff];
+		}
 	}
-	else if (!datxen && !buframcs)
+	
+	if (clrniben)
 	{
-		data = m_buffer_ram[offset & 0x7ff];
-		//if (!space.debugger_access()) logerror("BUFRAM\n");
+		if (!clrnibcs && !vsysaden)
+		{
+			data = m_color_ram[offset & 0x3ff];
+		}
 	}
-	else if (!vsysaden && clrniben && !clrnibcs)
-	{
-		data = m_color_ram[offset & 0x3ff];
-		//if (!space.debugger_access()) logerror("CLRNIB\n");
-	}
-	else if (vsysaden && !clrnibcs)
-	{
-		data = m_color_ram[va & 0x3ff];
-		//if (!space.debugger_access()) logerror("CLRNIB\n");
-	}
-	else if (!datxen && !vsysaden && !viddaten && viddat_tr && !vidmatcs)
-	{
-		data = m_video_ram[offset & 0x3ff];
-		//if (!space.debugger_access()) logerror("VIDMAT\n");
-	}
-	else if (vsysaden && !vidmatcs)
-	{
-		data = m_video_ram[va & 0x3ff];
-		//if (!space.debugger_access()) logerror("VIDMAT\n");
-	}
-	else if (!datxen && (!basiclocs || !basichics))
-	{
-		data = m_basic[offset & 0x3fff];
-		//if (!space.debugger_access()) logerror("BASIC\n");
-	}
-	else if (!datxen && !kernalcs)
-	{
-		data = m_kernal[offset & 0x1fff];
-		//if (!space.debugger_access()) logerror("KERNAL\n");
-	}
-	else if (!datxen && !vsysaden && !viddaten && viddat_tr && !charomcs)
-	{
-		data = m_charom[offset & 0xfff];
-		//if (!space.debugger_access()) logerror("CHAROM\n");
-	}
-	else if (vsysaden && !charomcs)
-	{
-		data = m_charom[va & 0xfff];
-		//if (!space.debugger_access()) logerror("CHAROM\n");
-	}
-	else if (!datxen && !viddaten && viddat_tr && !viccs)
-	{
-		data = m_vic->read(space, offset & 0x3f);
-		//if (!space.debugger_access()) logerror("VIC\n");
-	}
-	else if (!datxen && !sidcs)
-	{
-		data = m_sid->read(space, offset & 0x1f);
-		//if (!space.debugger_access()) logerror("SID\n");
-	}
-	else if (!datxen && !ciacs)
-	{
-		data = m_cia->read(space, offset & 0x0f);
-		//if (!space.debugger_access()) logerror("CIA\n");
-	}
-	else if (!datxen && !aciacs)
-	{
-		data = m_acia->read(space, offset & 0x03);
-		//if (!space.debugger_access()) logerror("ACIA\n");
-	}
-	else if (!datxen && !tript1cs)
-	{
-		data = m_tpi1->read(space, offset & 0x07);
-		//if (!space.debugger_access()) logerror("TPI1\n");
-	}
-	else if (!datxen && !tript2cs)
-	{
-		data = m_tpi2->read(space, offset & 0x07);
-		//if (!space.debugger_access()) logerror("TPI2\n");
-	}
-	//else //if (!space.debugger_access()) logerror("\n");
 
-	if (!datxen) data = m_exp->read(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
+	if (!dramxen)
+	{
+		if (casenb)
+		{
+			switch (offset >> 16)
+			{
+			case 1: data = m_ram->pointer()[0x10000 + (offset & 0xffff)]; break;
+			case 2: if (m_ram->size() > 0x20000) data = m_ram->pointer()[0x20000 + (offset & 0xffff)]; break;
+			case 3: if (m_ram->size() > 0x30000) data = m_ram->pointer()[0x30000 + (offset & 0xffff)]; break;
+			}
+		}
+	}
+
+	if (!datxen)
+	{
+		if (!_64kcasen && !aec)
+		{
+			data = m_ram->pointer()[offset & 0xffff];
+		}
+		if (!buframcs)
+		{
+			data = m_buffer_ram[offset & 0x7ff];
+		}
+		if (!vidmatcs && !vsysaden && !viddaten && viddat_tr)
+		{
+			data = m_video_ram[offset & 0x3ff];
+		}
+		if (!basiclocs || !basichics)
+		{
+			data = m_basic[offset & 0x3fff];
+		}
+		if (!kernalcs)
+		{
+			data = m_kernal[offset & 0x1fff];
+		}
+		if (!charomcs && !vsysaden && !viddaten && viddat_tr)
+		{
+			data = m_charom[offset & 0xfff];
+		}
+		if (!viccs && !viddaten && viddat_tr)
+		{
+			data = m_vic->read(space, offset & 0x3f);
+		}
+		if (!sidcs)
+		{
+			data = m_sid->read(space, offset & 0x1f);
+		}
+		if (!ciacs)
+		{
+			data = m_cia->read(space, offset & 0x0f);
+		}
+		if (!aciacs)
+		{
+			data = m_acia->read(space, offset & 0x03);
+		}
+		if (!tript1cs)
+		{
+			data = m_tpi1->read(space, offset & 0x07);
+		}
+		if (!tript2cs)
+		{
+			data = m_tpi2->read(space, offset & 0x07);
+		}
+
+		data = m_exp->read(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
+	}
 
 	return data;
 }
@@ -577,74 +609,69 @@ void p500_state::write_memory(address_space &space, offs_t offset, UINT8 data, i
 		csbank1, csbank2, csbank3, basiclocs, basichics, kernalcs,
 		cs1, sidcs, extprtcs, ciacs, aciacs, tript1cs, tript2cs, aec, vsysaden);
 */
-	if (!aec && !datxen && !_64kcasen)
+
+	if (clrniben)
 	{
-		//if (!space.debugger_access()) logerror("64K RAM\n");
-		m_ram->pointer()[offset & 0xffff] = data;
-	}
-	else if (!dramxen && casenb && !P3)
-	{
-		//if (!space.debugger_access()) logerror("CASENB\n");
-		switch ((offset >> 15) & 0x07)
+		if (!clrnibcs && !vsysaden)
 		{
-		case 1: m_ram->pointer()[0x10000 + (offset & 0xffff)] = data; break;
-		case 2: if (m_ram->size() > 0x20000) m_ram->pointer()[0x20000 + (offset & 0xffff)] = data; break;
-		case 3: if (m_ram->size() > 0x30000) m_ram->pointer()[0x30000 + (offset & 0xffff)] = data; break;
+			m_color_ram[offset & 0x3ff] = data & 0x0f;
 		}
 	}
-	else if (!datxen && !buframcs)
-	{
-		//if (!space.debugger_access()) logerror("BUFRAM\n");
-		m_buffer_ram[offset & 0x7ff] = data;
-	}
-	else if (!vsysaden && clrniben && !clrnibcs)
-	{
-		//if (!space.debugger_access()) logerror("CLRNIB\n");
-		m_color_ram[offset & 0x3ff] = data;
-	}
-	else if (!datxen && !vsysaden && !viddaten && !viddat_tr && !vidmatcs)
-	{
-		//if (!space.debugger_access()) logerror("VIDMAT\n");
-		m_video_ram[offset & 0x3ff] = data;
-	}
-	else if (vsysaden && !vidmatcs)
-	{
-		//if (!space.debugger_access()) logerror("VIDMAT\n");
-		m_video_ram[va & 0x3ff] = data;
-	}
-	else if (!datxen && !viddaten && !viddat_tr && !viccs)
-	{
-		//if (!space.debugger_access()) logerror("VIC\n");
-		m_vic->write(space, offset & 0x3f, data);
-	}
-	else if (!datxen && !sidcs)
-	{
-		//if (!space.debugger_access()) logerror("SID\n");
-		m_sid->write(space, offset & 0x1f, data);
-	}
-	else if (!datxen && !ciacs)
-	{
-		//if (!space.debugger_access()) logerror("CIA\n");
-		m_cia->write(space, offset & 0x0f, data);
-	}
-	else if (!datxen && !aciacs)
-	{
-		//if (!space.debugger_access()) logerror("ACIA\n");
-		m_acia->write(space, offset & 0x03, data);
-	}
-	else if (!datxen && !tript1cs)
-	{
-		//if (!space.debugger_access()) logerror("TPI1\n");
-		m_tpi1->write(space, offset & 0x07, data);
-	}
-	else if (!datxen && !tript2cs)
-	{
-		//if (!space.debugger_access()) logerror("TPI2\n");
-		m_tpi2->write(space, offset & 0x07, data);
-	}
-	//else //if (!space.debugger_access()) logerror("\n");
 
-	if (!datxen) m_exp->write(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
+	if (!dramxen)
+	{
+		if (casenb)
+		{
+			switch (offset >> 16)
+			{
+			case 1: m_ram->pointer()[0x10000 + (offset & 0xffff)] = data; break;
+			case 2: if (m_ram->size() > 0x20000) m_ram->pointer()[0x20000 + (offset & 0xffff)] = data; break;
+			case 3: if (m_ram->size() > 0x30000) m_ram->pointer()[0x30000 + (offset & 0xffff)] = data; break;
+			}
+		}
+	}
+
+	if (!datxen)
+	{
+		if (!_64kcasen && !aec)
+		{
+			m_ram->pointer()[offset & 0xffff] = data;
+		}
+		if (!buframcs)
+		{
+			m_buffer_ram[offset & 0x7ff] = data;
+		}
+		if (!vidmatcs && !vsysaden && !viddaten && !viddat_tr)
+		{
+			m_video_ram[offset & 0x3ff] = data;
+		}
+		if (!viccs && !viddaten && !viddat_tr)
+		{
+			m_vic->write(space, offset & 0x3f, data);
+		}
+		if (!sidcs)
+		{
+			m_sid->write(space, offset & 0x1f, data);
+		}
+		if (!ciacs)
+		{
+			m_cia->write(space, offset & 0x0f, data);
+		}
+		if (!aciacs)
+		{
+			m_acia->write(space, offset & 0x03, data);
+		}
+		if (!tript1cs)
+		{
+			m_tpi1->write(space, offset & 0x07, data);
+		}
+		if (!tript2cs)
+		{
+			m_tpi2->write(space, offset & 0x07, data);
+		}
+
+		m_exp->write(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
+	}
 }
 
 
@@ -656,8 +683,9 @@ READ8_MEMBER( p500_state::read )
 {
 	int sphi0 = 1, sphi1 = 0, sphi2 = 1, ba = 0, ae = 1, bras = 1, bcas = 0;
 	offs_t va = 0xffff;
+	UINT8 clrnib = 0xf;
 
-	return read_memory(space, offset, va, sphi0, sphi1, sphi2, ba, ae, bras, bcas);
+	return read_memory(space, offset, va, sphi0, sphi1, sphi2, ba, ae, bras, bcas, &clrnib);
 }
 
 
@@ -679,11 +707,26 @@ WRITE8_MEMBER( p500_state::write )
 
 READ8_MEMBER( p500_state::vic_videoram_r )
 {
-/*	int sphi0 = 0, sphi1 = 1, sphi2 = 0, ba = 1, ae = 0, bras = 0, bcas = 0;
+	/*
+	int sphi0 = 0, sphi1 = 1, sphi2 = 0, ba = 1, ae = 0, bras = 0, bcas = 0;
 	offs_t va = offset;
 
-	return read_memory(space, 0, va, sphi0, sphi1, sphi2, ba, ae, bras, bcas);*/
+	return read_memory(space, 0, va, sphi0, sphi1, sphi2, ba, ae, bras, bcas);
+	*/
+	/*
+	int ba = 1, ae = 0, bras = 1, bcas = 0;
+	UINT8 clrnib = 0xf;
 
+	if (offset < 0x1000)
+	{
+		return read_memory(space, 0, offset, 0, 1, 0, ba, ae, bras, bcas, &clrnib);
+	}
+	else
+	{
+		return read_memory(space, 0, offset, 1, 0, 1, ba, ae, bras, bcas, &clrnib);
+	}
+	*/
+	
 	if (offset < 0x1000)
 	{
 		return m_charom[offset & 0xfff];
@@ -889,6 +932,10 @@ static INPUT_PORTS_START( cbm2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad ENTER") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("LOCK")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE
+	PORT_BIT( 0xef, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1261,7 +1308,7 @@ UINT8 cbm2_state::read_keyboard()
 	if (!BIT(m_tpi2_pa, 5)) data &= ioport("PA5")->read();
 	if (!BIT(m_tpi2_pa, 6)) data &= ioport("PA6")->read();
 	if (!BIT(m_tpi2_pa, 7)) data &= ioport("PA7")->read();
-	if (!BIT(m_tpi2_pb, 0)) data &= ioport("PB0")->read();
+	if (!BIT(m_tpi2_pb, 0)) data &= ioport("PB0")->read() & ioport("LOCK")->read();
 	if (!BIT(m_tpi2_pb, 1)) data &= ioport("PB1")->read();
 	if (!BIT(m_tpi2_pb, 2)) data &= ioport("PB2")->read();
 	if (!BIT(m_tpi2_pb, 3)) data &= ioport("PB3")->read();
@@ -1602,7 +1649,6 @@ MACHINE_START_MEMBER( cbm2_state, cbm2 )
 
 MACHINE_START_MEMBER( cbm2_state, cbm2_ntsc )
 {
-	m_video_ram_size = 0x800;
 	m_ntsc = 1;
 
 	MACHINE_START_CALL_MEMBER(cbm2);
@@ -1615,7 +1661,6 @@ MACHINE_START_MEMBER( cbm2_state, cbm2_ntsc )
 
 MACHINE_START_MEMBER( cbm2_state, cbm2_pal )
 {
-	m_video_ram_size = 0x800;
 	m_ntsc = 0;
 
 	MACHINE_START_CALL_MEMBER(cbm2);
@@ -1629,7 +1674,6 @@ MACHINE_START_MEMBER( cbm2_state, cbm2_pal )
 MACHINE_START_MEMBER( p500_state, p500 )
 {
 	m_video_ram_size = 0x400;
-	m_ntsc = 1;
 
 	MACHINE_START_CALL_MEMBER(cbm2);
 
@@ -1638,6 +1682,30 @@ MACHINE_START_MEMBER( p500_state, p500 )
 	save_item(NAME(m_vicdotsel));
 	save_item(NAME(m_vicbnksel));
 	save_item(NAME(m_vic_irq));
+}
+
+
+//-------------------------------------------------
+//  MACHINE_START( p500_ntsc )
+//-------------------------------------------------
+
+MACHINE_START_MEMBER( p500_state, p500_ntsc )
+{
+	m_ntsc = 1;
+
+	MACHINE_START_CALL_MEMBER(p500);
+}
+
+
+//-------------------------------------------------
+//  MACHINE_START( p500_pal )
+//-------------------------------------------------
+
+MACHINE_START_MEMBER( p500_state, p500_pal )
+{
+	m_ntsc = 0;
+
+	MACHINE_START_CALL_MEMBER(p500);
 }
 
 
@@ -1689,7 +1757,6 @@ MACHINE_RESET_MEMBER( p500_state, p500 )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( 128k )
-	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("256K")
@@ -1701,18 +1768,17 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( 256k )
-	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
 MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( p500 )
+//  MACHINE_CONFIG( p500_ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( p500, p500_state )
-	MCFG_MACHINE_START_OVERRIDE(p500_state, p500)
+static MACHINE_CONFIG_START( p500_ntsc, p500_state )
+	MCFG_MACHINE_START_OVERRIDE(p500_state, p500_ntsc)
 	MCFG_MACHINE_RESET_OVERRIDE(p500_state, p500)
 
 	// basic hardware
@@ -1738,7 +1804,7 @@ static MACHINE_CONFIG_START( p500, p500_state )
 	MCFG_TPI6525_ADD(MOS6525_2_TAG, p500_tpi2_intf)
 	MCFG_ACIA6551_ADD(MOS6551A_TAG)
 	MCFG_MOS6526R1_ADD(MOS6526_TAG, VIC6567_CLOCK, 60, cia_intf)
-	MCFG_CBM_IEEE488_ADD(ieee488_intf, "sfd1001")
+	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
@@ -1748,6 +1814,58 @@ static MACHINE_CONFIG_START( p500, p500_state )
 
 	// internal ram
 	MCFG_FRAGMENT_ADD(128k)
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "p500_flop")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "cbm2_cart")
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( p500_pal )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( p500_pal, p500_state )
+	MCFG_MACHINE_START_OVERRIDE(p500_state, p500_pal)
+	MCFG_MACHINE_RESET_OVERRIDE(p500_state, p500)
+
+	// basic hardware
+	MCFG_CPU_ADD(M6509_TAG, M6509, VIC6569_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(p500_mem)
+	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
+
+	// video hardware
+	MCFG_MOS6569_ADD(MOS6569_TAG, SCREEN_TAG, VIC6569_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(MOS6851_TAG, SID6581, VIC6569_CLOCK)
+	MCFG_SOUND_CONFIG(sid_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	// devices
+	MCFG_PLS100_ADD(PLA1_TAG)
+	MCFG_PLS100_ADD(PLA2_TAG)
+	MCFG_TPI6525_ADD(MOS6525_1_TAG, p500_tpi1_intf)
+	MCFG_TPI6525_ADD(MOS6525_2_TAG, p500_tpi2_intf)
+	MCFG_ACIA6551_ADD(MOS6551A_TAG)
+	MCFG_MOS6526R1_ADD(MOS6526_TAG, VIC6569_CLOCK, 50, cia_intf)
+	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, VIC6569_CLOCK, cbm2_expansion_cards, NULL, NULL)
+	//MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, user_intf, cbm2_user_port_cards, NULL, NULL)
+	//MCFG_CBM2_SYSTEM_PORT_ADD(CBM2_SYSTEM_PORT_TAG, system_intf, cbm2_system_port_cards, NULL, NULL)
+
+	// internal ram
+	MCFG_FRAGMENT_ADD(128k)
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "p500_flop")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "cbm2_cart")
 MACHINE_CONFIG_END
 
 
@@ -1789,7 +1907,7 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	MCFG_TPI6525_ADD(MOS6525_2_TAG, tpi2_intf)
 	MCFG_ACIA6551_ADD(MOS6551A_TAG)
 	MCFG_MOS6526R1_ADD(MOS6526_TAG, XTAL_18MHz/8, 60, cia_intf)
-	MCFG_CBM_IEEE488_ADD(ieee488_intf, "sfd1001")
+	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
@@ -1798,6 +1916,7 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	//MCFG_CBM2_SYSTEM_PORT_ADD(CBM2_SYSTEM_PORT_TAG, system_intf, cbm2_system_port_cards, NULL, NULL)
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "cbm2_flop")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "cbm2_cart")
 MACHINE_CONFIG_END
 
@@ -1960,10 +2079,10 @@ MACHINE_CONFIG_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  ROM( p500 )
+//  ROM( p500n )
 //-------------------------------------------------
 
-ROM_START( p500 )
+ROM_START( p500n )
 	ROM_REGION( 0x4000, "basic", 0 )
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
@@ -1986,6 +2105,13 @@ ROM_START( p500 )
 	ROM_REGION( 0xf5, PLA2_TAG, 0 )
 	ROM_LOAD( "906114-03.u88", 0x00, 0xf5, CRC(668c073e) SHA1(1115858bb2dc91ea9e2016ba2e23ec94239358b4) )
 ROM_END
+
+
+//-------------------------------------------------
+//  ROM( p500p )
+//-------------------------------------------------
+
+#define rom_p500p	rom_p500n
 
 
 //-------------------------------------------------
@@ -2215,19 +2341,20 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY                         FULLNAME                            FLAGS
-COMP( 1983,	p500,		0,		0,		p500,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"P500 ~ C128-40 ~ PET-II (NTSC)",	GAME_NOT_WORKING )
+COMP( 1983,	p500n,		0,		0,		p500_ntsc,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"P500 ~ C128-40 ~ PET-II (NTSC)",	GAME_NOT_WORKING )
+COMP( 1983,	p500p,		p500n,	0,		p500_pal,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"P500 ~ C128-40 ~ PET-II (PAL)",	GAME_NOT_WORKING )
 
-COMP( 1983,	b500,		p500,	0,		b128,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B500 (NTSC)",						GAME_NOT_WORKING )
-COMP( 1983,	b128,		p500,	0,		b128,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B128 (NTSC)",						GAME_NOT_WORKING )
-COMP( 1983,	b256,		p500,	0,		b256,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256 (NTSC)",						GAME_NOT_WORKING )
-COMP( 1983,	cbm610,		p500,	0,		cbm610,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 610 (PAL)",					GAME_NOT_WORKING )
-COMP( 1983,	cbm620,		p500,	0,		cbm620,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 620 (PAL)",					GAME_NOT_WORKING )
-COMP( 1983,	cbm620hu,	p500,	0,		cbm620,		cbm2hu,	driver_device,		0,		"Commodore Business Machines",	"CBM 620 (Hungary)",				GAME_NOT_WORKING )
+COMP( 1983,	b500,		p500n,	0,		b128,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B500 (NTSC)",						GAME_NOT_WORKING )
+COMP( 1983,	b128,		p500n,	0,		b128,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B128 (NTSC)",						GAME_NOT_WORKING )
+COMP( 1983,	b256,		p500n,	0,		b256,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256 (NTSC)",						GAME_NOT_WORKING )
+COMP( 1983,	cbm610,		p500n,	0,		cbm610,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 610 (PAL)",					GAME_NOT_WORKING )
+COMP( 1983,	cbm620,		p500n,	0,		cbm620,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 620 (PAL)",					GAME_NOT_WORKING )
+COMP( 1983,	cbm620hu,	p500n,	0,		cbm620,		cbm2hu,	driver_device,		0,		"Commodore Business Machines",	"CBM 620 (Hungary)",				GAME_NOT_WORKING )
 
-COMP( 1983,	b128hp,		p500,	0,		b128hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B128-80HP (NTSC)",					GAME_NOT_WORKING )
-COMP( 1983,	b256hp,		p500,	0,		b256hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256-80HP (NTSC)",					GAME_NOT_WORKING )
-COMP( 1983,	bx256hp,	p500,	0,		bx256hp,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"BX256-80HP (NTSC)",				GAME_NOT_WORKING )
-COMP( 1983,	cbm710,		p500,	0,		cbm710,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 710 (PAL)",					GAME_NOT_WORKING )
-COMP( 1983,	cbm720,		p500,	0,		cbm720,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 720 (PAL)",					GAME_NOT_WORKING )
-COMP( 1983,	cbm720sw,	p500,	0,		cbm720,		cbm2sw,	driver_device,		0,		"Commodore Business Machines",	"CBM 720 (Sweden/Finland)",			GAME_NOT_WORKING )
-COMP( 1983,	cbm730,		p500,	0,		cbm730,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 730 (PAL)",					GAME_NOT_WORKING )
+COMP( 1983,	b128hp,		p500n,	0,		b128hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B128-80HP (NTSC)",					GAME_NOT_WORKING )
+COMP( 1983,	b256hp,		p500n,	0,		b256hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256-80HP (NTSC)",					GAME_NOT_WORKING )
+COMP( 1983,	bx256hp,	p500n,	0,		bx256hp,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"BX256-80HP (NTSC)",				GAME_NOT_WORKING )
+COMP( 1983,	cbm710,		p500n,	0,		cbm710,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 710 (PAL)",					GAME_NOT_WORKING )
+COMP( 1983,	cbm720,		p500n,	0,		cbm720,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 720 (PAL)",					GAME_NOT_WORKING )
+COMP( 1983,	cbm720sw,	p500n,	0,		cbm720,		cbm2sw,	driver_device,		0,		"Commodore Business Machines",	"CBM 720 (Sweden/Finland)",			GAME_NOT_WORKING )
+COMP( 1983,	cbm730,		p500n,	0,		cbm730,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 730 (PAL)",					GAME_NOT_WORKING )

@@ -76,4 +76,16 @@
 		</part>
 	</software>
 
+	<software name="vt52">
+		<description>VT52 Emulator</description>
+		<year>1986</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		
+		<part name="cart" interface="cbm2_cart">
+			<dataarea name="bank2" size="0x2000">
+				<rom name="vt52emu.bin" size="0x2000" crc="b3b6173a" sha1="dd4a412a1a6ce4272b02d731364dd6dc96a4570b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

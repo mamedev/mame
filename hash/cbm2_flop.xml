@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="cbm2_flop" description="Commodore CBM-II diskettes">
+	
+	<software name="burnin">
+		<description>Factory Burn In Diagnostics for B Series</description>
+		<year>1983</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbm2-burnin.d80" size="533248" crc="b716a2af" sha1="b9c12437a178a574675168ec3f751afc7d24b638" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="termv2">
+		<description>Terminal Version 2.0 for B Series</description>
+		<year>1983</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbmtermv2.d80" size="533248" crc="cd0d4cd4" sha1="e0064bfe4576171cf852cb0bf4b61630a653529a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="b700demo">
+		<description>B700 Demo (UK)</description>
+		<year>1983</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="ukb700-demo.d80" size="533248" crc="dc7f9f48" sha1="b1778b7d8e8c2f1749ec05485b01878e4271b4f9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
