@@ -28,8 +28,8 @@ public:
 
 	/* misc */
 	int m_timer_rate;
-	UINT8 m_joinem_snd_bit;
-	UINT8 m_joinem_color_bank;
+	UINT8 m_joinem_nmi_enable;
+	UINT8 m_joinem_palette_bank;
 	int m_question_address;
 	int m_question_rom;
 	int m_remap_address[16];
@@ -42,7 +42,6 @@ public:
 	DECLARE_WRITE8_MEMBER(jack_paletteram_w);
 	DECLARE_READ8_MEMBER(jack_flipscreen_r);
 	DECLARE_WRITE8_MEMBER(jack_flipscreen_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(sound_check_r);
 	DECLARE_READ8_MEMBER(timer_r);
 
 	DECLARE_DRIVER_INIT(zzyzzyxx);

@@ -68,26 +68,31 @@ WRITE8_MEMBER(jack_state::jack_sh_command_w)
 }
 
 
-/* these handlers are guessed, because otherwise you can't enter test mode */
+
 
 WRITE8_MEMBER(jack_state::joinem_control_w)
 {
-	flip_screen_set(data & 0x80);
-	m_joinem_snd_bit = data & 1;
-	m_joinem_color_bank = data & 0x18;
+	// d0: related to test mode?
+	// d1: unused?
+	// d2: ?
 	
-	m_bg_tilemap->mark_all_dirty();
+	// d3-d4: palette bank
+	int palette_bank = data & (machine().total_colors() - 1) >> 3 & 0x18;
+	if (m_joinem_palette_bank != palette_bank)
+	{
+		m_joinem_palette_bank = palette_bank;
+		m_bg_tilemap->mark_all_dirty();
+	}
+
+	// d5: assume nmi enable
+	m_joinem_nmi_enable = data & 0x20;
+	
+	// d6: unused?
+
+	// d7: flip screen
+	flip_screen_set(data & 0x80);
 }
 
-CUSTOM_INPUT_MEMBER(jack_state::sound_check_r)
-{
-	UINT8 ret = 0;
-
-	if ((ioport("IN2")->read() & 0x80) && !m_joinem_snd_bit)
-		ret = 1;
-
-	return ret;
-}
 
 /*
     Super Triv questions read handler
@@ -95,7 +100,6 @@ CUSTOM_INPUT_MEMBER(jack_state::sound_check_r)
 
 READ8_MEMBER(jack_state::striv_question_r)
 {
-
 	// Set-up the remap table for every 16 bytes
 	if ((offset & 0xc00) == 0x800)
 	{
@@ -579,36 +583,53 @@ static INPUT_PORTS_START( joinem )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW2:!3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW2:!4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jack_state,sound_check_r, NULL) // sound check
+	PORT_SERVICE_DIPLOC( 0x20, IP_ACTIVE_HIGH, "SW2:!6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW2:!7" )
-	PORT_DIPNAME( 0x80, 0x00, "Infinite Lives" )		PORT_DIPLOCATION("SW2:!8")
+	PORT_DIPNAME( 0x80, 0x00, "Infinite Lives (Cheat)" )		PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // 1S in testmode
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // 1J "
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // X6 "
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // X7 "
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // 2S in testmode
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // 2J "
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Y6 "
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Y7 "
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) // otherwise it doesn't boot because the code is buggy
-	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Z4 in testmode
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Z5 "
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // Z6 ", locks up at boot if low?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ?
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( unclepoo )
+	PORT_INCLUDE( joinem )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( loverboy )
@@ -795,7 +816,6 @@ static const ay8910_interface ay8910_config =
 
 void jack_state::machine_start()
 {
-	save_item(NAME(m_joinem_snd_bit));
 	save_item(NAME(m_question_address));
 	save_item(NAME(m_question_rom));
 	save_item(NAME(m_remap_address));
@@ -803,9 +823,9 @@ void jack_state::machine_start()
 
 void jack_state::machine_reset()
 {
+	joinem_control_w(m_maincpu->space(AS_PROGRAM), 0, 0, 0xff);
 	int i;
 
-	m_joinem_snd_bit = 0;
 	m_question_address = 0;
 	m_question_rom = 0;
 
@@ -854,8 +874,7 @@ MACHINE_CONFIG_END
 
 INTERRUPT_GEN_MEMBER(jack_state::joinem_vblank_irq)
 {
-	 /* TODO: looks hackish to me ... */
-	if (!(machine().root_device().ioport("IN2")->read() & 0x80))
+	if (m_joinem_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -868,7 +887,7 @@ static MACHINE_CONFIG_DERIVED( joinem, jack )
 	MCFG_CPU_PERIODIC_INT_DRIVER(jack_state, irq0_line_hold, 2*60)
 
 	MCFG_GFXDECODE(joinem)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_LENGTH(0x40)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
@@ -884,6 +903,8 @@ static MACHINE_CONFIG_DERIVED( unclepoo, joinem )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(unclepoo_map)
+
+	MCFG_PALETTE_LENGTH(0x100)
 MACHINE_CONFIG_END
 
 
@@ -892,10 +913,10 @@ static MACHINE_CONFIG_DERIVED( loverboy, jack )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(joinem_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jack_state,  nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", jack_state, nmi_line_pulse)
 
 	MCFG_GFXDECODE(joinem)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_LENGTH(0x40)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
@@ -1458,6 +1479,6 @@ GAME( 1984, sucasino, 0,        jack,    sucasino, jack_state, jack,     ROT90, 
 GAME( 1981, tripool,  0,        tripool, tripool, jack_state,  jack,     ROT90,  "Noma (Casino Tech license)",  "Tri-Pool (Casino Tech)", GAME_SUPPORTS_SAVE )
 GAME( 1981, tripoola, tripool,  tripool, tripool, jack_state,  jack,     ROT90,  "Noma (Costal Games license)", "Tri-Pool (Costal Games)", GAME_SUPPORTS_SAVE )
 GAME( 1983, joinem,   0,        joinem,  joinem, jack_state,   zzyzzyxx, ROT90,  "Global Corporation",          "Joinem", GAME_SUPPORTS_SAVE )
-GAME( 1983, unclepoop, unclepoo, unclepoo, joinem, jack_state, zzyzzyxx, ROT90, "Diatec", "Uncle Poo (nincompoop version)", GAME_NOT_WORKING )
+GAME( 1983, unclepoop, unclepoo, unclepoo, unclepoo, jack_state, zzyzzyxx, ROT90, "Diatec", "Uncle Poo (nincompoop version)", GAME_NOT_WORKING )
 GAME( 1983, loverboy, 0,        loverboy,loverboy, jack_state, loverboy, ROT90,  "G.T Enterprise Inc",          "Lover Boy", GAME_SUPPORTS_SAVE )
 GAME( 1985, striv,    0,        jack,    striv, jack_state,    striv,    ROT270, "Hara Industries",             "Super Triv", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

@@ -68,14 +68,12 @@ static void jack_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, c
 
 	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		int sx, sy, num, color, flipx, flipy;
-
-		sx    = spriteram[offs + 1];
-		sy    = spriteram[offs];
-		num   = spriteram[offs + 2] + ((spriteram[offs + 3] & 0x08) << 5);
-		color = spriteram[offs + 3] & 0x07;
-		flipx = (spriteram[offs + 3] & 0x80);
-		flipy = (spriteram[offs + 3] & 0x40);
+		int sy = spriteram[offs];
+		int sx = spriteram[offs + 1];
+		int code = spriteram[offs + 2] | ((spriteram[offs + 3] & 0x08) << 5);
+		int color = spriteram[offs + 3] & 0x07;
+		int flipx = (spriteram[offs + 3] & 0x80) >> 7;
+		int flipy = (spriteram[offs + 3] & 0x40) >> 6;
 
 		if (state->flip_screen())
 		{
@@ -86,7 +84,7 @@ static void jack_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, c
 		}
 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
-				num,
+				code,
 				color,
 				flipx,flipy,
 				sx,sy,0);
@@ -133,7 +131,7 @@ PALETTE_INIT_MEMBER(jack_state,joinem)
 TILE_GET_INFO_MEMBER(jack_state::joinem_get_bg_tile_info)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x03) << 8);
-	int color = (m_colorram[tile_index] & 0x38) >> 3 | m_joinem_color_bank;
+	int color = (m_colorram[tile_index] & 0x38) >> 3 | m_joinem_palette_bank;
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
@@ -151,14 +149,12 @@ static void joinem_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 
 	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		int sx, sy, num, color, flipx, flipy;
-
-		sx    = spriteram[offs + 1];
-		sy    = spriteram[offs];
-		num   = spriteram[offs + 2] + ((spriteram[offs + 3] & 0x01) << 8);
-		color = (spriteram[offs + 3] & 0x38) >> 3;
-		flipx = (spriteram[offs + 3] & 0x80);
-		flipy = (spriteram[offs + 3] & 0x40);
+		int sy = spriteram[offs];
+		int sx = spriteram[offs + 1];
+		int code = spriteram[offs + 2] | ((spriteram[offs + 3] & 0x03) << 8);
+		int color = (spriteram[offs + 3] & 0x38) >> 3 | state->m_joinem_palette_bank;
+		int flipx = (spriteram[offs + 3] & 0x80) >> 7;
+		int flipy = (spriteram[offs + 3] & 0x40) >> 6;
 
 		if (state->flip_screen())
 		{
@@ -169,7 +165,7 @@ static void joinem_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 		}
 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
-				num,
+				code,
 				color,
 				flipx,flipy,
 				sx,sy,0);
