@@ -12,6 +12,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_spriteram(*this, "spriteram"),
+		m_scrollram(*this, "scrollram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram")
 	{ }
@@ -20,6 +21,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_scrollram;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 
@@ -36,6 +38,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(jack_sh_command_w);
 	DECLARE_WRITE8_MEMBER(joinem_control_w);
+	DECLARE_WRITE8_MEMBER(joinem_scroll_w);
 	DECLARE_READ8_MEMBER(striv_question_r);
 	DECLARE_WRITE8_MEMBER(jack_videoram_w);
 	DECLARE_WRITE8_MEMBER(jack_colorram_w);

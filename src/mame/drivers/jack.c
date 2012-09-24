@@ -158,7 +158,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( joinem_map, AS_PROGRAM, 8, jack_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xb000, 0xb0ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xb080, 0xb0ff) AM_RAM_WRITE(joinem_scroll_w) AM_SHARE("scrollram")
 	AM_RANGE(0xb400, 0xb400) AM_WRITE(jack_sh_command_w)
 	AM_RANGE(0xb500, 0xb500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xb501, 0xb501) AM_READ_PORT("DSW2")
@@ -844,7 +845,6 @@ static MACHINE_CONFIG_START( jack, jack_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -855,7 +855,6 @@ static MACHINE_CONFIG_START( jack, jack_state )
 
 	MCFG_GFXDECODE(jack)
 	MCFG_PALETTE_LENGTH(32)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -886,15 +885,15 @@ static MACHINE_CONFIG_DERIVED( joinem, jack )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jack_state, joinem_vblank_irq)
 	MCFG_CPU_PERIODIC_INT_DRIVER(jack_state, irq0_line_hold, 2*60)
 
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_joinem)
+
 	MCFG_GFXDECODE(joinem)
 	MCFG_PALETTE_LENGTH(0x40)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_joinem)
-
-	MCFG_PALETTE_INIT_OVERRIDE(jack_state,joinem)
-	MCFG_VIDEO_START_OVERRIDE(jack_state,joinem)
+	MCFG_PALETTE_INIT_OVERRIDE(jack_state, joinem)
+	MCFG_VIDEO_START_OVERRIDE(jack_state, joinem)
 MACHINE_CONFIG_END
 
 
@@ -904,27 +903,13 @@ static MACHINE_CONFIG_DERIVED( unclepoo, joinem )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(unclepoo_map)
 
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+
 	MCFG_PALETTE_LENGTH(0x100)
 MACHINE_CONFIG_END
 
-
-static MACHINE_CONFIG_DERIVED( loverboy, jack )
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(joinem_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jack_state, nmi_line_pulse)
-
-	MCFG_GFXDECODE(joinem)
-	MCFG_PALETTE_LENGTH(0x40)
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_joinem)
-
-	MCFG_PALETTE_INIT_OVERRIDE(jack_state,joinem)
-	MCFG_VIDEO_START_OVERRIDE(jack_state,joinem)
-MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -1480,5 +1465,5 @@ GAME( 1981, tripool,  0,        tripool, tripool, jack_state,  jack,     ROT90, 
 GAME( 1981, tripoola, tripool,  tripool, tripool, jack_state,  jack,     ROT90,  "Noma (Costal Games license)", "Tri-Pool (Costal Games)", GAME_SUPPORTS_SAVE )
 GAME( 1983, joinem,   0,        joinem,  joinem, jack_state,   zzyzzyxx, ROT90,  "Global Corporation",          "Joinem", GAME_SUPPORTS_SAVE )
 GAME( 1983, unclepoop, unclepoo, unclepoo, unclepoo, jack_state, zzyzzyxx, ROT90, "Diatec", "Uncle Poo (nincompoop version)", GAME_NOT_WORKING )
-GAME( 1983, loverboy, 0,        loverboy,loverboy, jack_state, loverboy, ROT90,  "G.T Enterprise Inc",          "Lover Boy", GAME_SUPPORTS_SAVE )
+GAME( 1983, loverboy, 0,        joinem,loverboy, jack_state, loverboy, ROT90,  "G.T Enterprise Inc",          "Lover Boy", GAME_SUPPORTS_SAVE )
 GAME( 1985, striv,    0,        jack,    striv, jack_state,    striv,    ROT270, "Hara Industries",             "Super Triv", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

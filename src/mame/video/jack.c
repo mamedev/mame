@@ -103,6 +103,23 @@ UINT32 jack_state::screen_update_jack(screen_device &screen, bitmap_ind16 &bitma
    3bpp gfx and different banking / colors bits
 */
 
+WRITE8_MEMBER(jack_state::joinem_scroll_w)
+{
+	switch (offset & 3)
+	{
+		// byte 0: column scroll
+		case 0:
+			m_bg_tilemap->set_scrolly(offset >> 2, -data);
+			break;
+		
+		// byte 1/2/3: no effect?
+		default:
+			break;
+	}
+	
+	m_scrollram[offset] = data;
+}
+
 PALETTE_INIT_MEMBER(jack_state,joinem)
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
@@ -139,6 +156,7 @@ TILE_GET_INFO_MEMBER(jack_state::joinem_get_bg_tile_info)
 VIDEO_START_MEMBER(jack_state,joinem)
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jack_state::joinem_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(jack_state::tilemap_scan_cols_flipy),this), 8, 8, 32, 32);
+	m_bg_tilemap->set_scroll_cols(32);
 }
 
 static void joinem_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
