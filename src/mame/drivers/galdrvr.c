@@ -6695,8 +6695,9 @@ GAME( 1985, superbon,  0,        scobra,   superbon, galaxian_state,  superbon, 
 //GAME( 1982, mimonsco, mimonkey, scobra/*mimonkey*/, mimonsco, XXX_CLASS, mimonsco,     ROT90,  "bootleg", "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
 
 /* currently in dambustr.c and should be moved here */
-//GAME( 1981, dambustr, 0,        dambustr, dambustr, dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (US)", 0 )
-//GAME( 1981, dambust,  dambustr, dambustr, dambustr, dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (UK)", 0 )
+//GAME( 1981, dambustr,   0,        dambustr, dambustr, dambustr_state,   dambustr, ROT90, "South West Research", "Dambusters (US, set 1)", 0 )
+//GAME( 1981, dambustra,  dambustr, dambustr, dambustr, dambustr_state,   dambustr, ROT90, "South West Research", "Dambusters (US, set 2)", 0 )
+//GAME( 1981, dambustruk, dambustr, dambustr, dambustruk, dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (UK)", 0 )
 
 /* misc stuff that should eventually be moved here */
 //GAME( 1981, scramblb, scramble, scramblb, scramblb, galaxian_state, galaxian, ROT90,  "bootleg", "Scramble (Galaxian hardware)", GAME_SUPPORTS_SAVE )
