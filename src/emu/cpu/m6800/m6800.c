@@ -1048,8 +1048,8 @@ static CPU_INIT( m6800 )
 
 	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = &device->space(AS_DATA);
-	cpustate->io = &device->space(AS_IO);
+	//cpustate->data = &device->space(AS_DATA);
+	//cpustate->io = &device->space(AS_IO);
 
 	//  cpustate->subtype   = SUBTYPE_M6800;
 	cpustate->insn = m6800_insn;
@@ -1201,7 +1201,7 @@ static CPU_INIT( m6801 )
 
 	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = &device->space(AS_DATA);
+	//cpustate->data = &device->space(AS_DATA);
 	cpustate->io = &device->space(AS_IO);
 
 	cpustate->clock = device->clock() / 4;
@@ -1236,8 +1236,8 @@ static CPU_INIT( m6802 )
 
 	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = &device->space(AS_DATA);
-	cpustate->io = &device->space(AS_IO);
+	//cpustate->data = &device->space(AS_DATA);
+	//cpustate->io = &device->space(AS_IO);
 
 	state_register(cpustate, "m6802");
 }
@@ -1256,7 +1256,7 @@ static CPU_INIT( m6803 )
 
 	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = &device->space(AS_DATA);
+	//cpustate->data = &device->space(AS_DATA);
 	cpustate->io = &device->space(AS_IO);
 
 	cpustate->clock = device->clock() / 4;
@@ -1298,8 +1298,8 @@ static CPU_INIT( m6808 )
 
 	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = &device->space(AS_DATA);
-	cpustate->io = &device->space(AS_IO);
+	//cpustate->data = &device->space(AS_DATA);
+	//cpustate->io = &device->space(AS_IO);
 
 	state_register(cpustate, "m6808");
 }
@@ -1319,7 +1319,7 @@ static CPU_INIT( hd6301 )
 
 	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = &device->space(AS_DATA);
+	//cpustate->data = &device->space(AS_DATA);
 	cpustate->io = &device->space(AS_IO);
 
 	cpustate->clock = device->clock() / 4;
@@ -1344,7 +1344,7 @@ static CPU_INIT( hd63701 )
 
 	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = &device->space(AS_DATA);
+	//cpustate->data = &device->space(AS_DATA);
 	cpustate->io = &device->space(AS_IO);
 
 	cpustate->clock = device->clock() / 4;
@@ -1379,8 +1379,8 @@ static CPU_INIT( nsc8105 )
 
 	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = &device->space(AS_DATA);
-	cpustate->io = &device->space(AS_IO);
+	//cpustate->data = &device->space(AS_DATA);
+	//cpustate->io = &device->space(AS_IO);
 
 	cpustate->insn = nsc8105_insn;
 	cpustate->cycles = cycles_nsc8105;
@@ -1893,7 +1893,7 @@ CPU_GET_INFO( m6800 )
 		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 9;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
 

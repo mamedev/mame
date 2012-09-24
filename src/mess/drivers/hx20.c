@@ -27,6 +27,9 @@ static ADDRESS_MAP_START(ehx20_mem, AS_PROGRAM, 8, hx20_state)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(ehx20_io, AS_IO, 8, hx20_state)
+ADDRESS_MAP_END
+
 /* Input ports */
 static INPUT_PORTS_START( ehx20 )
 INPUT_PORTS_END
@@ -95,7 +98,7 @@ static MACHINE_CONFIG_START( ehx20, hx20_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",HD63701, 614000) // HD6301
 	MCFG_CPU_PROGRAM_MAP(ehx20_mem)
-
+	MCFG_CPU_IO_MAP(ehx20_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
