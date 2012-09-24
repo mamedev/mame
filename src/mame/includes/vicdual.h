@@ -71,7 +71,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(vicdual_get_vblank_comp);
 	DECLARE_CUSTOM_INPUT_MEMBER(vicdual_get_composite_blank_comp);
 	DECLARE_CUSTOM_INPUT_MEMBER(vicdual_get_timer_value);
-	DECLARE_CUSTOM_INPUT_MEMBER(brdrline_lives);
+	DECLARE_CUSTOM_INPUT_MEMBER(vicdual_fake_lives_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(samurai_protection_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
 	DECLARE_MACHINE_START(frogs_audio);

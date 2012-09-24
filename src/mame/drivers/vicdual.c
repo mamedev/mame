@@ -43,7 +43,7 @@
           The timing is implemented according to the schematics, but
           who knows...
         * DIP switches need verifying in most of the games
-        * DIP switch locations need to be added to all the games
+        * DIP switch locations need to be added to most of the games
 
 ****************************************************************************/
 
@@ -218,7 +218,6 @@ static MACHINE_CONFIG_START( vicdual_root, vicdual_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VICDUAL_PIXEL_CLOCK, VICDUAL_HTOTAL, VICDUAL_HBEND, VICDUAL_HBSTART, VICDUAL_VTOTAL, VICDUAL_VBEND, VICDUAL_VBSTART)
-
 MACHINE_CONFIG_END
 
 
@@ -300,7 +299,6 @@ static MACHINE_CONFIG_DERIVED( depthch, vicdual_root )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_FRAGMENT_ADD(depthch_audio)
-
 MACHINE_CONFIG_END
 
 
@@ -384,7 +382,6 @@ static MACHINE_CONFIG_DERIVED( safari, vicdual_root )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_vicdual_bw)
-
 MACHINE_CONFIG_END
 
 
@@ -491,7 +488,6 @@ static MACHINE_CONFIG_DERIVED( frogs, vicdual_root )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_FRAGMENT_ADD(frogs_audio)
-
 MACHINE_CONFIG_END
 
 
@@ -679,7 +675,6 @@ static MACHINE_CONFIG_DERIVED( headon, vicdual_root )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_FRAGMENT_ADD(headon_audio)
-
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( headons, headon )
@@ -688,7 +683,6 @@ static MACHINE_CONFIG_DERIVED( headons, headon )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_vicdual_bw)
 MACHINE_CONFIG_END
-
 
 
 static MACHINE_CONFIG_DERIVED( sspaceat, vicdual_root )
@@ -701,7 +695,6 @@ static MACHINE_CONFIG_DERIVED( sspaceat, vicdual_root )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_vicdual_bw_or_color)
-
 MACHINE_CONFIG_END
 
 
@@ -899,7 +892,6 @@ static MACHINE_CONFIG_DERIVED( headon2, vicdual_root )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_FRAGMENT_ADD(headon_audio)
-
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( headon2bw, headon2 )
@@ -921,7 +913,6 @@ static MACHINE_CONFIG_DERIVED( digger, vicdual_root )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_vicdual_color)
-
 MACHINE_CONFIG_END
 
 
@@ -1182,13 +1173,25 @@ static ADDRESS_MAP_START( alphaho_io_map, AS_IO, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
+/* several of the games' lives DIPs are spread across two input ports */
+CUSTOM_INPUT_MEMBER(vicdual_state::vicdual_fake_lives_r)
+{
+	static const char *const portnames[] = { "FAKE_LIVES1", "FAKE_LIVES2" };
+
+	/* use the low byte for the bitmask */
+	UINT8 bit_mask = ((FPTR)param) & 0xff;
+
+	/* and use d8 for the port */
+	int port = ((FPTR)param) >> 8 & 1;
+	return (ioport(portnames[port])->read_safe(0) & bit_mask) ? 0 : 1;
+}
+
+
 static INPUT_PORTS_START( invho2 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_DIPNAME( 0x04, 0x04, "Head On Lives (1/2)" )
-	PORT_DIPSETTING(    0x04, "+0" )
-	PORT_DIPSETTING(    0x00, "+1" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x001)
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1199,9 +1202,7 @@ static INPUT_PORTS_START( invho2 )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_DIPNAME( 0x04, 0x00, "Head On Lives (2/2)" )
-	PORT_DIPSETTING(    0x04, "+0" )
-	PORT_DIPSETTING(    0x00, "+1" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x002)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_composite_blank_comp, NULL)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
@@ -1210,29 +1211,42 @@ static INPUT_PORTS_START( invho2 )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_DIPNAME( 0x04, 0x00, "Invinco Lives" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPSETTING(    0x04, "6" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x101)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_timer_value, NULL)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )	/* probably unused */
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	/* There's probably a bug in the code: this would likely be the second */
-	/* bit of the Invinco Lives setting, but the game reads bit 3 instead */
-	/* of bit 2. */
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x102)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_read_coin_status, NULL)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Game Select") PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_COIN
+
+	PORT_START("FAKE_LIVES1")
+	PORT_DIPNAME( 0x03, 0x01, "Head On 2 Lives" )	PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+//	PORT_DIPSETTING(    0x02, "3" ) // dupe
+	PORT_DIPSETTING(    0x03, "4" )
+
+	/* There's probably a bug in the Invinco game code:
+       it does support lives set to 5 or 6, but the game
+       reads IN3 bit 3 instead of bit 2.
+       Note that the manual only lists setting it to 3 or 4.
+    */
+	PORT_START("FAKE_LIVES2")
+	PORT_DIPNAME( 0x03, 0x03, "Invinco Lives" )		PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+//	PORT_DIPSETTING(    0x01, "5" ) // results in 3, see above
+//	PORT_DIPSETTING(    0x00, "6" ) // results in 4, see above
+
 INPUT_PORTS_END
 
 
@@ -1240,9 +1254,7 @@ static INPUT_PORTS_START( invds )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_DIPNAME( 0x04, 0x00, "Invinco Lives (1/2)" )
-	PORT_DIPSETTING(    0x00, "+0" )
-	PORT_DIPSETTING(    0x04, "+1" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x001)
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1253,9 +1265,7 @@ static INPUT_PORTS_START( invds )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_DIPNAME( 0x04, 0x00, "Invinco Lives (2/2)" )
-	PORT_DIPSETTING(    0x00, "+0" )
-	PORT_DIPSETTING(    0x04, "+2" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x002)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_composite_blank_comp, NULL)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
@@ -1264,9 +1274,7 @@ static INPUT_PORTS_START( invds )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_DIPNAME( 0x04, 0x00, "Deep Scan Lives (1/2)" )
-	PORT_DIPSETTING(    0x00, "+0" )
-	PORT_DIPSETTING(    0x04, "+1" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x101)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_timer_value, NULL)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -1275,16 +1283,27 @@ static INPUT_PORTS_START( invds )
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	/* +1 and +2 gives 2 lives instead of 6 */
-	PORT_DIPNAME( 0x04, 0x00, "Deep Scan Lives (2/2)" )
-	PORT_DIPSETTING(    0x04, "+0" )
-	PORT_DIPSETTING(    0x00, "+2" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x102)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_read_coin_status, NULL)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Game Select") PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Game Select") PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_COIN
+
+	PORT_START("FAKE_LIVES1")
+	PORT_DIPNAME( 0x03, 0x03, "Invinco Lives" )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+
+	PORT_START("FAKE_LIVES2")
+	PORT_DIPNAME( 0x03, 0x01, "Deep Scan Lives" )	PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
 INPUT_PORTS_END
 
 
@@ -1292,10 +1311,8 @@ static INPUT_PORTS_START( sspacaho )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_DIPNAME( 0x04, 0x04, "S.A. Lives (1/2)" )
-	PORT_DIPSETTING(    0x00, "+0" )
-	PORT_DIPSETTING(    0x04, "+1" )
-	PORT_DIPNAME( 0x08, 0x00, "H.O. Lives" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x001)
+	PORT_DIPNAME( 0x08, 0x00, "Head On Lives" )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -1305,9 +1322,7 @@ static INPUT_PORTS_START( sspacaho )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x04, 0x00, "S.A. Lives (2/2)" )
-	PORT_DIPSETTING(    0x00, "+0" )
-	PORT_DIPSETTING(    0x04, "+2" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x002)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_composite_blank_comp, NULL)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
@@ -1316,7 +1331,7 @@ static INPUT_PORTS_START( sspacaho )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x04, 0x00, "S.A. Bonus Life" )
+	PORT_DIPNAME( 0x04, 0x00, "Space Attack Bonus Life" )
 	PORT_DIPSETTING(    0x00, "10000" )
 	PORT_DIPSETTING(    0x04, "15000" )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_timer_value, NULL)
@@ -1327,7 +1342,7 @@ static INPUT_PORTS_START( sspacaho )
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x04, 0x00, "S.A. Bonus Life For Final UFO" )
+	PORT_DIPNAME( 0x04, 0x00, "Space Attack Final UFO Bonus" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_read_coin_status, NULL)
@@ -1336,6 +1351,13 @@ static INPUT_PORTS_START( sspacaho )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_COIN
+
+	PORT_START("FAKE_LIVES1")
+	PORT_DIPNAME( 0x03, 0x03, "Space Attack Lives" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
 INPUT_PORTS_END
 
 
@@ -1407,7 +1429,7 @@ static INPUT_PORTS_START( spacetrk )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) /* unknown, but used */
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )	/* unknown, but used */
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_composite_blank_comp, NULL)
@@ -1624,12 +1646,6 @@ static INPUT_PORTS_START( carnvckt )
 	PORT_COIN
 INPUT_PORTS_END
 
-/* brdrline lives DIPs are spread across two input ports */
-CUSTOM_INPUT_MEMBER(vicdual_state::brdrline_lives)
-{
-	int bit_mask = (FPTR)param;
-	return (ioport("FAKE_LIVES")->read() & bit_mask) ? 0x00 : 0x01;
-}
 
 static INPUT_PORTS_START( brdrline )
 	PORT_START("IN0")
@@ -1653,7 +1669,7 @@ static INPUT_PORTS_START( brdrline )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,brdrline_lives, (void *)0x01)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x001)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_vblank_comp, NULL)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
@@ -1662,7 +1678,7 @@ static INPUT_PORTS_START( brdrline )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,brdrline_lives, (void *)0x02)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x002)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_64v, NULL)	/* yes, this is different */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -1681,12 +1697,14 @@ static INPUT_PORTS_START( brdrline )
 
 	PORT_COIN
 
-	PORT_START("FAKE_LIVES")
+	PORT_START("FAKE_LIVES1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+//	PORT_DIPSETTING(    0x03, "5" ) // dupe
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( starrkr )
 	PORT_START("IN0")
@@ -1710,7 +1728,7 @@ static INPUT_PORTS_START( starrkr )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,brdrline_lives, (void *)0x01)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x001)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_vblank_comp, NULL)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
@@ -1719,7 +1737,7 @@ static INPUT_PORTS_START( starrkr )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,brdrline_lives, (void *)0x02)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x002)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_64v, NULL)	/* yes, this is different */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -1738,20 +1756,20 @@ static INPUT_PORTS_START( starrkr )
 
 	PORT_COIN
 
-	PORT_START("FAKE_LIVES")
+	PORT_START("FAKE_LIVES1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+//	PORT_DIPSETTING(    0x03, "5" ) // dupe
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( pulsar )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_DIPNAME( 0x04, 0x04, "Lives (1/2)" )
-	PORT_DIPSETTING(    0x04, "+0" )
-	PORT_DIPSETTING(    0x00, "+2" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x001)
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1762,9 +1780,7 @@ static INPUT_PORTS_START( pulsar )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_DIPNAME( 0x04, 0x04, "Lives (2/2)" )
-	PORT_DIPSETTING(    0x04, "+0" )
-	PORT_DIPSETTING(    0x00, "+1" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x002)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_composite_blank_comp, NULL)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
@@ -1793,6 +1809,13 @@ static INPUT_PORTS_START( pulsar )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_COIN
+
+	PORT_START("FAKE_LIVES1")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
 INPUT_PORTS_END
 
 
@@ -1851,9 +1874,7 @@ static INPUT_PORTS_START( alphaho )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_DIPNAME( 0x04, 0x00, "Alpha Fighter Lives (1/2)" )
-	PORT_DIPSETTING(    0x00, "+0" )
-	PORT_DIPSETTING(    0x04, "+1" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x001)
 	PORT_DIPNAME( 0x08, 0x00, "Head On Lives" )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
@@ -1864,9 +1885,7 @@ static INPUT_PORTS_START( alphaho )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_DIPNAME( 0x04, 0x00, "Alpha Fighter Lives (2/2)" )
-	PORT_DIPSETTING(    0x00, "+0" )
-	PORT_DIPSETTING(    0x04, "+2" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x002)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_composite_blank_comp, NULL)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
@@ -1893,6 +1912,13 @@ static INPUT_PORTS_START( alphaho )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 
 	PORT_COIN
+
+	PORT_START("FAKE_LIVES1")
+	PORT_DIPNAME( 0x03, 0x03, "Alpha Fighter Lives" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
 INPUT_PORTS_END
 
 
@@ -1905,7 +1931,6 @@ static MACHINE_CONFIG_DERIVED( vicdual_dualgame_root, vicdual_root )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_vicdual_color)
-
 MACHINE_CONFIG_END
 
 
@@ -1919,7 +1944,6 @@ static MACHINE_CONFIG_DERIVED( invho2, vicdual_dualgame_root )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_FRAGMENT_ADD(invinco_audio)
 	MCFG_FRAGMENT_ADD(headon_audio)
-
 MACHINE_CONFIG_END
 
 
@@ -1932,7 +1956,6 @@ static MACHINE_CONFIG_DERIVED( invds, vicdual_dualgame_root )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_FRAGMENT_ADD(invinco_audio)
-
 MACHINE_CONFIG_END
 
 
@@ -1953,7 +1976,6 @@ static MACHINE_CONFIG_DERIVED( spacetrk, vicdual_dualgame_root )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(spacetrk_io_map)
-
 MACHINE_CONFIG_END
 
 
@@ -1966,7 +1988,6 @@ static MACHINE_CONFIG_DERIVED( carnival, vicdual_dualgame_root )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_FRAGMENT_ADD(carnival_audio)
-
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( carnivalh, vicdual_dualgame_root )
@@ -1978,7 +1999,6 @@ static MACHINE_CONFIG_DERIVED( carnivalh, vicdual_dualgame_root )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_FRAGMENT_ADD(carnival_audio)
-
 MACHINE_CONFIG_END
 
 
@@ -1988,7 +2008,6 @@ static MACHINE_CONFIG_DERIVED( tranqgun, vicdual_dualgame_root )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(tranqgun_io_map)
-
 MACHINE_CONFIG_END
 
 
@@ -1997,7 +2016,6 @@ static MACHINE_CONFIG_DERIVED( brdrline, vicdual_dualgame_root )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(brdrline_io_map)
-
 MACHINE_CONFIG_END
 
 
@@ -2010,7 +2028,6 @@ static MACHINE_CONFIG_DERIVED( pulsar, vicdual_dualgame_root )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_FRAGMENT_ADD(pulsar_audio)
-
 MACHINE_CONFIG_END
 
 
@@ -2019,7 +2036,6 @@ static MACHINE_CONFIG_DERIVED( heiankyo, vicdual_dualgame_root )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(heiankyo_io_map)
-
 MACHINE_CONFIG_END
 
 
@@ -2028,7 +2044,6 @@ static MACHINE_CONFIG_DERIVED( alphaho, vicdual_dualgame_root )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(alphaho_io_map)
-
 MACHINE_CONFIG_END
 
 
@@ -2152,7 +2167,6 @@ static MACHINE_CONFIG_DERIVED( samurai, vicdual_root )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_vicdual_color)
-
 MACHINE_CONFIG_END
 
 
@@ -2247,7 +2261,6 @@ static MACHINE_CONFIG_DERIVED( nsub, vicdual_root )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_vicdual_color)
-
 MACHINE_CONFIG_END
 
 
@@ -2350,7 +2363,6 @@ static MACHINE_CONFIG_DERIVED( invinco, vicdual_root )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_FRAGMENT_ADD(invinco_audio)
-
 MACHINE_CONFIG_END
 
 
