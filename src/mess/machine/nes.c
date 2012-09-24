@@ -332,7 +332,7 @@ READ8_MEMBER(nes_state::nes_IN0_r)
 	int cfg = ioport("CTRLSEL")->read();
 	int ret;
 
-	if ((cfg & 0x000f) >= 0x07)	// for now we treat the FC keyboard separately from other inputs!
+	if ((cfg & 0x000f) >= 0x08)	// for now we treat the FC keyboard separately from other inputs!
 	{
 		// here we should have the tape input
 		ret = 0;
@@ -384,14 +384,16 @@ READ8_MEMBER(nes_state::nes_IN0_r)
 static UINT8 nes_read_fc_keyboard_line( running_machine &machine, UINT8 scan, UINT8 mode )
 {
 	static const char *const fc_keyport_names[] = { "FCKEY0", "FCKEY1", "FCKEY2", "FCKEY3", "FCKEY4", "FCKEY5", "FCKEY6", "FCKEY7", "FCKEY8" };
-	return ((machine.root_device().ioport(fc_keyport_names[scan])->read() >> (mode * 4)) & 0x0f) << 1;
+	nes_state *state = machine.driver_data<nes_state>();
+	return ((state->ioport(fc_keyport_names[scan])->read() >> (mode * 4)) & 0x0f) << 1;
 }
 
 static UINT8 nes_read_subor_keyboard_line( running_machine &machine, UINT8 scan, UINT8 mode )
 {
 	static const char *const sub_keyport_names[] = { "SUBKEY0", "SUBKEY1", "SUBKEY2", "SUBKEY3", "SUBKEY4",
 		"SUBKEY5", "SUBKEY6", "SUBKEY7", "SUBKEY8", "SUBKEY9", "SUBKEY10", "SUBKEY11", "SUBKEY12" };
-	return ((machine.root_device().ioport(sub_keyport_names[scan])->read() >> (mode * 4)) & 0x0f) << 1;
+	nes_state *state = machine.driver_data<nes_state>();
+	return ((state->ioport(sub_keyport_names[scan])->read() >> (mode * 4)) & 0x0f) << 1;
 }
 
 READ8_MEMBER(nes_state::nes_IN1_r)
@@ -399,14 +401,14 @@ READ8_MEMBER(nes_state::nes_IN1_r)
 	int cfg = ioport("CTRLSEL")->read();
 	int ret;
 
-	if ((cfg & 0x000f) == 0x07)	// for now we treat the FC keyboard separately from other inputs!
+	if ((cfg & 0x000f) == 0x08)	// for now we treat the FC keyboard separately from other inputs!
 	{
 		if (m_fck_scan < 9)
 			ret = ~nes_read_fc_keyboard_line(machine(), m_fck_scan, m_fck_mode) & 0x1e;
 		else
 			ret = 0x1e;
 	}
-	else if ((cfg & 0x000f) == 0x08)	// for now we treat the Subor keyboard separately from other inputs!
+	else if ((cfg & 0x000f) == 0x09)	// for now we treat the Subor keyboard separately from other inputs!
 	{
 		if (m_fck_scan < 12)
 			ret = ~nes_read_subor_keyboard_line(machine(), m_fck_scan, m_fck_mode) & 0x1e;
@@ -554,7 +556,7 @@ WRITE8_MEMBER(nes_state::nes_IN0_w)
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
 	machine().scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 
-	if ((cfg & 0x000f) >= 0x07)	// for now we treat the FC keyboard separately from other inputs!
+	if ((cfg & 0x000f) >= 0x08)	// for now we treat the FC keyboard separately from other inputs!
 	{
 		// here we should also have the tape output
 
