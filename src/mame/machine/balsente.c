@@ -28,9 +28,9 @@ static void update_grudge_steering(running_machine &machine);
  *
  *************************************/
 
-static TIMER_CALLBACK( irq_off )
+TIMER_CALLBACK_MEMBER(balsente_state::irq_off)
 {
-	machine.device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -48,7 +48,7 @@ TIMER_DEVICE_CALLBACK( balsente_interrupt_timer )
 	timer.machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	timer.machine().scheduler().timer_set(timer.machine().primary_screen->time_until_pos(param, BALSENTE_HBSTART), FUNC(irq_off));
+	timer.machine().scheduler().timer_set(timer.machine().primary_screen->time_until_pos(param, BALSENTE_HBSTART), timer_expired_delegate(FUNC(balsente_state::irq_off),state));
 
 	/* if this is Grudge Match, update the steering */
 	if (state->m_grudge_steering_result & 0x80)
@@ -456,28 +456,26 @@ READ8_MEMBER(balsente_state::balsente_m6850_r)
 }
 
 
-static TIMER_CALLBACK( m6850_data_ready_callback )
+TIMER_CALLBACK_MEMBER(balsente_state::m6850_data_ready_callback)
 {
-	balsente_state *state = machine.driver_data<balsente_state>();
 
 	/* set the output data byte and indicate that we're ready to go */
-	state->m_m6850_output = param;
-	state->m_m6850_data_ready = 1;
-	m6850_update_io(machine);
+	m_m6850_output = param;
+	m_m6850_data_ready = 1;
+	m6850_update_io(machine());
 }
 
 
-static TIMER_CALLBACK( m6850_w_callback )
+TIMER_CALLBACK_MEMBER(balsente_state::m6850_w_callback)
 {
-	balsente_state *state = machine.driver_data<balsente_state>();
 
 	/* indicate that the transmit buffer is no longer empty and update the I/O state */
-	state->m_m6850_status &= ~0x02;
-	m6850_update_io(machine);
+	m_m6850_status &= ~0x02;
+	m6850_update_io(machine());
 
 	/* set a timer for 500usec later to actually transmit the data */
 	/* (this is very important for several games, esp Snacks'n Jaxson) */
-	machine.scheduler().timer_set(attotime::from_usec(500), FUNC(m6850_data_ready_callback), param);
+	machine().scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(balsente_state::m6850_data_ready_callback),this), param);
 }
 
 
@@ -495,7 +493,7 @@ WRITE8_MEMBER(balsente_state::balsente_m6850_w)
 
 	/* output register is at offset 1; set a timer to synchronize the CPUs */
 	else
-		machine().scheduler().synchronize(FUNC(m6850_w_callback), data);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(balsente_state::m6850_w_callback),this), data);
 }
 
 
@@ -570,19 +568,18 @@ INTERRUPT_GEN_MEMBER(balsente_state::balsente_update_analog_inputs)
 }
 
 
-static TIMER_CALLBACK( adc_finished )
+TIMER_CALLBACK_MEMBER(balsente_state::adc_finished)
 {
-	balsente_state *state = machine.driver_data<balsente_state>();
 	int which = param;
 
 	/* analog controls are read in two pieces; the lower port returns the sign */
 	/* and the upper port returns the absolute value of the magnitude */
-	int val = state->m_analog_input_data[which / 2] << state->m_adc_shift;
+	int val = m_analog_input_data[which / 2] << m_adc_shift;
 
 	/* special case for Stompin'/Shrike Avenger */
-	if (state->m_adc_shift == 32)
+	if (m_adc_shift == 32)
 	{
-		state->m_adc_value = state->m_analog_input_data[which];
+		m_adc_value = m_analog_input_data[which];
 		return;
 	}
 
@@ -597,11 +594,11 @@ static TIMER_CALLBACK( adc_finished )
 
 	/* return the sign */
 	if (!(which & 1))
-		state->m_adc_value = (val < 0) ? 0xff : 0x00;
+		m_adc_value = (val < 0) ? 0xff : 0x00;
 
 	/* return the magnitude */
 	else
-		state->m_adc_value = (val < 0) ? -val : val;
+		m_adc_value = (val < 0) ? -val : val;
 }
 
 
@@ -618,7 +615,7 @@ WRITE8_MEMBER(balsente_state::balsente_adc_select_w)
 	/* set a timer to go off and read the value after 50us */
 	/* it's important that we do this for Mini Golf */
 logerror("adc_select %d\n", offset & 7);
-	machine().scheduler().timer_set(attotime::from_usec(50), FUNC(adc_finished), offset & 7);
+	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(balsente_state::adc_finished),this), offset & 7);
 }
 
 

@@ -119,14 +119,14 @@ INTERRUPT_GEN_MEMBER(capbowl_state::capbowl_interrupt)
  *
  *************************************/
 
-static TIMER_CALLBACK( capbowl_update )
+TIMER_CALLBACK_MEMBER(capbowl_state::capbowl_update)
 {
 	int scanline = param;
 
-	machine.primary_screen->update_partial(scanline - 1);
+	machine().primary_screen->update_partial(scanline - 1);
 	scanline += 32;
 	if (scanline > 240) scanline = 32;
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(capbowl_update), scanline);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(capbowl_state::capbowl_update),this), scanline);
 }
 
 
@@ -348,7 +348,7 @@ void capbowl_state::machine_start()
 void capbowl_state::machine_reset()
 {
 
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(32), FUNC(capbowl_update), 32);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(32), timer_expired_delegate(FUNC(capbowl_state::capbowl_update),this), 32);
 
 	m_blitter_addr = 0;
 	m_last_trackball_val[0] = 0;

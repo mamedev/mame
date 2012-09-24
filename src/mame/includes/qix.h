@@ -84,6 +84,7 @@ public:
 	virtual void machine_reset();
 	DECLARE_MACHINE_START(qixmcu);
 	DECLARE_VIDEO_START(qix);
+	TIMER_CALLBACK_MEMBER(pia_w_callback);
 };
 
 

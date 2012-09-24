@@ -220,8 +220,8 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
  *
  *************************************/
 
-static TIMER_CALLBACK( laserdisc_bit_callback );
-static TIMER_CALLBACK( laserdisc_philips_callback );
+
+
 
 
 
@@ -249,8 +249,8 @@ void gottlieb_state::machine_start()
 		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x05806, 0x05806, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::laserdisc_select_w),this));
 
 		/* allocate a timer for serial transmission, and one for philips code processing */
-		m_laserdisc_bit_timer = machine().scheduler().timer_alloc(FUNC(laserdisc_bit_callback));
-		m_laserdisc_philips_timer = machine().scheduler().timer_alloc(FUNC(laserdisc_philips_callback));
+		m_laserdisc_bit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gottlieb_state::laserdisc_bit_callback),this));
+		m_laserdisc_philips_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gottlieb_state::laserdisc_philips_callback),this));
 
 		/* create some audio RAM */
 		m_laserdisc_audio_buffer = auto_alloc_array(machine(), UINT8, AUDIORAM_SIZE);
@@ -420,10 +420,9 @@ WRITE8_MEMBER(gottlieb_state::laserdisc_command_w)
  *
  *************************************/
 
-static TIMER_CALLBACK( laserdisc_philips_callback )
+TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_philips_callback)
 {
-	gottlieb_state *state = machine.driver_data<gottlieb_state>();
-	UINT32 newcode = state->m_laserdisc->get_field_code((param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, TRUE);
+	UINT32 newcode = m_laserdisc->get_field_code((param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, TRUE);
 
 	/* the PR8210 sends line 17/18 data on each frame; the laserdisc interface
        board receives notification and latches the most recent frame number */
@@ -431,34 +430,32 @@ static TIMER_CALLBACK( laserdisc_philips_callback )
 	/* the logic detects a valid code when the top 4 bits are all 1s */
 	if ((newcode & 0xf00000) == 0xf00000)
 	{
-		state->m_laserdisc_philips_code = newcode;
-		state->m_laserdisc_status = (state->m_laserdisc_status & ~0x07) | ((newcode >> 16) & 7);
+		m_laserdisc_philips_code = newcode;
+		m_laserdisc_status = (m_laserdisc_status & ~0x07) | ((newcode >> 16) & 7);
 	}
 
 	/* toggle to the next one */
 	param = (param == 17) ? 18 : 17;
-	state->m_laserdisc_philips_timer->adjust(machine.primary_screen->time_until_pos(param * 2), param);
+	m_laserdisc_philips_timer->adjust(machine().primary_screen->time_until_pos(param * 2), param);
 }
 
 
-static TIMER_CALLBACK( laserdisc_bit_off_callback )
+TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_off_callback)
 {
-	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	/* deassert the control line */
-	state->m_laserdisc->control_w(CLEAR_LINE);
+	m_laserdisc->control_w(CLEAR_LINE);
 }
 
 
-static TIMER_CALLBACK( laserdisc_bit_callback )
+TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_callback)
 {
-	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	UINT8 bitsleft = param >> 16;
 	UINT8 data = param;
 	attotime duration;
 
 	/* assert the line and set a timer for deassertion */
-	state->m_laserdisc->control_w(ASSERT_LINE);
-	machine.scheduler().timer_set(LASERDISC_CLOCK * 10, FUNC(laserdisc_bit_off_callback));
+	m_laserdisc->control_w(ASSERT_LINE);
+	machine().scheduler().timer_set(LASERDISC_CLOCK * 10, timer_expired_delegate(FUNC(gottlieb_state::laserdisc_bit_off_callback),this));
 
 	/* determine how long for the next command; there is a 555 timer with a
        variable resistor controlling the timing of the pulses. Nominally, the
@@ -470,9 +467,9 @@ static TIMER_CALLBACK( laserdisc_bit_callback )
 
 	/* if we're not out of bits, set a timer for the next one; else set the ready bit */
 	if (bitsleft-- != 0)
-		state->m_laserdisc_bit_timer->adjust(duration, (bitsleft << 16) | data);
+		m_laserdisc_bit_timer->adjust(duration, (bitsleft << 16) | data);
 	else
-		state->m_laserdisc_status |= 0x10;
+		m_laserdisc_status |= 0x10;
 }
 
 
@@ -651,9 +648,9 @@ static void laserdisc_audio_process(device_t *dummy, laserdisc_device &device, i
  *
  *************************************/
 
-static TIMER_CALLBACK( nmi_clear )
+TIMER_CALLBACK_MEMBER(gottlieb_state::nmi_clear)
 {
-	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -661,7 +658,7 @@ INTERRUPT_GEN_MEMBER(gottlieb_state::gottlieb_interrupt)
 {
 	/* assert the NMI and set a timer to clear it at the first visible line */
 	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(nmi_clear));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(gottlieb_state::nmi_clear),this));
 
 	/* if we have a laserdisc, update it */
 	if (m_laserdisc != NULL)

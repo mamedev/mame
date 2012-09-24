@@ -298,37 +298,37 @@ VIDEO_START_MEMBER(segas32_state,multi32)
  *
  *************************************/
 
-static TIMER_CALLBACK( update_sprites )
+TIMER_CALLBACK_MEMBER(segas32_state::update_sprites)
 {
-	segas32_state *state = machine.driver_data<segas32_state>();
 	/* if automatic mode is selected, do it every frame (0) or every other frame (1) */
-	if (!(state->m_sprite_control[3] & 2))
+	if (!(m_sprite_control[3] & 2))
 	{
 		/* if we count down to the start, process the automatic swapping, but only after a short delay */
-		if (state->m_sprite_render_count-- == 0)
+		if (m_sprite_render_count-- == 0)
 		{
-			state->m_sprite_control[0] = 3;
-			state->m_sprite_render_count = state->m_sprite_control[3] & 1;
+			m_sprite_control[0] = 3;
+			m_sprite_render_count = m_sprite_control[3] & 1;
 		}
 	}
 
 	/* look for pending commands */
-	if (state->m_sprite_control[0] & 2)
-		sprite_erase_buffer(state);
-	if (state->m_sprite_control[0] & 1)
+	if (m_sprite_control[0] & 2)
+		sprite_erase_buffer(this);
+	if (m_sprite_control[0] & 1)
 	{
-		sprite_swap_buffers(state);
-		sprite_render_list(machine);
+		sprite_swap_buffers(this);
+		sprite_render_list(machine());
 	}
-	state->m_sprite_control[0] = 0;
+	m_sprite_control[0] = 0;
 }
 
 
 void system32_set_vblank(running_machine &machine, int state)
 {
+	segas32_state *drvstate = machine.driver_data<segas32_state>();
 	/* at the end of VBLANK is when automatic sprite rendering happens */
 	if (!state)
-		machine.scheduler().timer_set(attotime::from_usec(50), FUNC(update_sprites), 1);
+		machine.scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(segas32_state::update_sprites),drvstate), 1);
 }
 
 

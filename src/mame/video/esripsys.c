@@ -15,22 +15,21 @@ INTERRUPT_GEN_MEMBER(esripsys_state::esripsys_vblank_irq)
 	m_frame_vbl = 0;
 }
 
-static TIMER_CALLBACK( hblank_start_callback )
+TIMER_CALLBACK_MEMBER(esripsys_state::hblank_start_callback)
 {
-	esripsys_state *state = machine.driver_data<esripsys_state>();
-	int v = machine.primary_screen->vpos();
+	int v = machine().primary_screen->vpos();
 
-	if (state->m_video_firq)
+	if (m_video_firq)
 	{
-		state->m_video_firq = 0;
-		machine.device("game_cpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+		m_video_firq = 0;
+		machine().device("game_cpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	}
 
 	/* Not sure if this is totally accurate - I couldn't find the circuit that generates the FIRQs! */
-	if (!(v % 6) && v && state->m_video_firq_en && v < ESRIPSYS_VBLANK_START)
+	if (!(v % 6) && v && m_video_firq_en && v < ESRIPSYS_VBLANK_START)
 	{
-		state->m_video_firq = 1;
-		machine.device("game_cpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+		m_video_firq = 1;
+		machine().device("game_cpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 	}
 
 	/* Adjust for next scanline */
@@ -38,22 +37,21 @@ static TIMER_CALLBACK( hblank_start_callback )
 		v = 0;
 
 	/* Set end of HBLANK timer */
-	state->m_hblank_end_timer->adjust(machine.primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_END), v);
-	state->m_hblank = 0;
+	m_hblank_end_timer->adjust(machine().primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_END), v);
+	m_hblank = 0;
 }
 
-static TIMER_CALLBACK( hblank_end_callback )
+TIMER_CALLBACK_MEMBER(esripsys_state::hblank_end_callback)
 {
-	esripsys_state *state = machine.driver_data<esripsys_state>();
-	int v = machine.primary_screen->vpos();
+	int v = machine().primary_screen->vpos();
 
 	if (v > 0)
-		machine.primary_screen->update_partial(v - 1);
+		machine().primary_screen->update_partial(v - 1);
 
-	state->m_12sel ^= 1;
-	state->m_hblank_start_timer->adjust(machine.primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_START));
+	m_12sel ^= 1;
+	m_hblank_start_timer->adjust(machine().primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_START));
 
-	state->m_hblank = 1;
+	m_hblank = 1;
 }
 
 void esripsys_state::video_start()
@@ -71,8 +69,8 @@ void esripsys_state::video_start()
 	line_buffer[1].priority_buf = auto_alloc_array(machine(), UINT8, 512);
 
 	/* Create and initialise the HBLANK timers */
-	m_hblank_start_timer = machine().scheduler().timer_alloc(FUNC(hblank_start_callback));
-	m_hblank_end_timer = machine().scheduler().timer_alloc(FUNC(hblank_end_callback));
+	m_hblank_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(esripsys_state::hblank_start_callback),this));
+	m_hblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(esripsys_state::hblank_end_callback),this));
 	m_hblank_start_timer->adjust(machine().primary_screen->time_until_pos(0, ESRIPSYS_HBLANK_START));
 
 	/* Create the sprite scaling table */

@@ -120,26 +120,25 @@ void mhavoc_state::machine_reset()
  *
  *************************************/
 
-static TIMER_CALLBACK( delayed_gamma_w )
+TIMER_CALLBACK_MEMBER(mhavoc_state::delayed_gamma_w)
 {
-	mhavoc_state *state = machine.driver_data<mhavoc_state>();
 	/* mark the data received */
-	state->m_gamma_rcvd = 0;
-	state->m_alpha_xmtd = 1;
-	state->m_alpha_data = param;
+	m_gamma_rcvd = 0;
+	m_alpha_xmtd = 1;
+	m_alpha_data = param;
 
 	/* signal with an NMI pulse */
-	machine.device("gamma")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("gamma")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the sound CPU needs to reply in 250microseconds (according to Neil Bradley) */
-	machine.scheduler().timer_set(attotime::from_usec(250), FUNC_NULL);
+	machine().scheduler().timer_set(attotime::from_usec(250), FUNC_NULL);
 }
 
 
 WRITE8_MEMBER(mhavoc_state::mhavoc_gamma_w)
 {
 	logerror("  writing to gamma processor: %02x (%d %d)\n", data, m_gamma_rcvd, m_alpha_xmtd);
-	machine().scheduler().synchronize(FUNC(delayed_gamma_w), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(mhavoc_state::delayed_gamma_w),this), data);
 }
 
 

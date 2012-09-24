@@ -384,17 +384,16 @@ READ8_MEMBER(grchamp_state::sub_to_main_comm_r)
 }
 
 
-static TIMER_CALLBACK( main_to_sub_comm_sync_w )
+TIMER_CALLBACK_MEMBER(grchamp_state::main_to_sub_comm_sync_w)
 {
-	grchamp_state *state = machine.driver_data<grchamp_state>();
 	int offset = param >> 8;
-	state->m_comm_latch2[offset & 3] = param;
+	m_comm_latch2[offset & 3] = param;
 }
 
 
 WRITE8_MEMBER(grchamp_state::main_to_sub_comm_w)
 {
-	machine().scheduler().synchronize(FUNC(main_to_sub_comm_sync_w), data | (offset << 8));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(grchamp_state::main_to_sub_comm_sync_w),this), data | (offset << 8));
 }
 
 

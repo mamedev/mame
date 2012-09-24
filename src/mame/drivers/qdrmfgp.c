@@ -293,11 +293,10 @@ static void ide_interrupt(device_t *device, int state)
 
 /*************/
 
-static TIMER_CALLBACK( gp2_timer_callback )
+TIMER_CALLBACK_MEMBER(qdrmfgp_state::gp2_timer_callback)
 {
-	qdrmfgp_state *state = machine.driver_data<qdrmfgp_state>();
-	if (state->m_control & 0x0004)
-		machine.device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+	if (m_control & 0x0004)
+		machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(qdrmfgp_state::qdrmfgp2_interrupt)
@@ -644,7 +643,7 @@ MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp)
 MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp2)
 {
 	/* sound irq (CCU? 240Hz) */
-	machine().scheduler().timer_pulse(attotime::from_hz(18432000/76800), FUNC(gp2_timer_callback));
+	machine().scheduler().timer_pulse(attotime::from_hz(18432000/76800), timer_expired_delegate(FUNC(qdrmfgp_state::gp2_timer_callback),this));
 
 	MACHINE_START_CALL_MEMBER( qdrmfgp );
 }

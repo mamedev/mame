@@ -230,15 +230,14 @@ DIP locations verified for:
                 INTERRUPTS
 ***********************************************************/
 
-static TIMER_CALLBACK( cadash_interrupt5 )
+TIMER_CALLBACK_MEMBER(asuka_state::cadash_interrupt5)
 {
-	asuka_state *state = machine.driver_data<asuka_state>();
-	state->m_maincpu->set_input_line(5, HOLD_LINE);
+	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(asuka_state::cadash_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), FUNC(cadash_interrupt5));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), timer_expired_delegate(FUNC(asuka_state::cadash_interrupt5),this));
 	device.execute().set_input_line(4, HOLD_LINE);  /* interrupt vector 4 */
 }
 

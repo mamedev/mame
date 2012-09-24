@@ -255,22 +255,21 @@ static void ym_set_mixing(device_t *device, double left, double right)
 	flt_volume_set_volume(state->m_filter2r, (71.0 * right) / 55.0);
 }
 
-static TIMER_CALLBACK( dmaend_callback )
+TIMER_CALLBACK_MEMBER(xexex_state::dmaend_callback)
 {
-	xexex_state *state = machine.driver_data<xexex_state>();
 
-	if (state->m_cur_control2 & 0x0040)
+	if (m_cur_control2 & 0x0040)
 	{
 		// foul-proof (CPU0 could be deactivated while we wait)
-		if (state->m_suspension_active)
+		if (m_suspension_active)
 		{
-			state->m_suspension_active = 0;
-			machine.scheduler().trigger(state->m_resume_trigger);
+			m_suspension_active = 0;
+			machine().scheduler().trigger(m_resume_trigger);
 		}
 
 		// IRQ 5 is the "object DMA end interrupt" and shouldn't be triggered
 		// if object data isn't ready for DMA within the frame.
-		state->m_maincpu->set_input_line(5, HOLD_LINE);
+		m_maincpu->set_input_line(5, HOLD_LINE);
 	}
 }
 
@@ -486,7 +485,7 @@ void xexex_state::machine_start()
 	save_item(NAME(m_cur_sound_region));
 	machine().save().register_postload(save_prepost_delegate(FUNC(xexex_postload), &machine()));
 
-	m_dmadelay_timer = machine().scheduler().timer_alloc(FUNC(dmaend_callback));
+	m_dmadelay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xexex_state::dmaend_callback),this));
 }
 
 void xexex_state::machine_reset()

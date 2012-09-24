@@ -58,4 +58,8 @@ public:
 	INTERRUPT_GEN_MEMBER(mappy_main_vblank_irq);
 	INTERRUPT_GEN_MEMBER(sub_vblank_irq);
 	INTERRUPT_GEN_MEMBER(sub2_vblank_irq);
+	TIMER_CALLBACK_MEMBER(superpac_io_run);
+	TIMER_CALLBACK_MEMBER(pacnpal_io_run);
+	TIMER_CALLBACK_MEMBER(phozon_io_run);
+	TIMER_CALLBACK_MEMBER(mappy_io_run);
 };

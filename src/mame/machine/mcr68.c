@@ -21,15 +21,15 @@
 
 static void subtract_from_counter(running_machine &machine, int counter, int count);
 
-static TIMER_CALLBACK( mcr68_493_callback );
-static TIMER_CALLBACK( zwackery_493_callback );
+
+
 
 static DECLARE_WRITE8_DEVICE_HANDLER( zwackery_pia0_w );
 static DECLARE_WRITE8_DEVICE_HANDLER( zwackery_pia1_w );
 static WRITE_LINE_DEVICE_HANDLER( zwackery_ca2_w );
 static WRITE_LINE_DEVICE_HANDLER( zwackery_pia_irq );
 
-static TIMER_CALLBACK( counter_fired_callback );
+
 
 
 
@@ -125,7 +125,7 @@ MACHINE_START_MEMBER(mcr68_state,mcr68)
 	{
 		struct counter_state *m6840 = &m_m6840_state[i];
 
-		m6840->timer = machine().scheduler().timer_alloc(FUNC(counter_fired_callback));
+		m6840->timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mcr68_state::counter_fired_callback),this));
 
 		state_save_register_item(machine(), "m6840", NULL, i, m6840->control);
 		state_save_register_item(machine(), "m6840", NULL, i, m6840->latch);
@@ -177,8 +177,7 @@ MACHINE_RESET_MEMBER(mcr68_state,mcr68)
 {
 	/* for the most part all MCR/68k games are the same */
 	mcr68_common_init(machine());
-	m_v493_callback = mcr68_493_callback;
-	m_v493_callback_name = "mcr68_493_callback";
+	m_v493_callback = timer_expired_delegate(FUNC(mcr68_state::mcr68_493_callback),this);
 
 	/* vectors are 1 and 2 */
 	m_v493_irq_vector = 1;
@@ -196,8 +195,7 @@ MACHINE_RESET_MEMBER(mcr68_state,zwackery)
 {
 	/* for the most part all MCR/68k games are the same */
 	mcr68_common_init(machine());
-	m_v493_callback = zwackery_493_callback;
-	m_v493_callback_name = "zwackery_493_callback";
+	m_v493_callback = timer_expired_delegate(FUNC(mcr68_state::zwackery_493_callback),this);
 
 	/* vectors are 5 and 6 */
 	m_v493_irq_vector = 5;
@@ -223,7 +221,7 @@ INTERRUPT_GEN_MEMBER(mcr68_state::mcr68_interrupt)
 	/* also set a timer to generate the 493 signal at a specific time before the next VBLANK */
 	/* the timing of this is crucial for Blasted and Tri-Sports, which check the timing of */
 	/* VBLANK and 493 using counter 2 */
-	machine().scheduler().timer_set(attotime::from_hz(30) - m_timing_factor, m_v493_callback, m_v493_callback_name);
+	machine().scheduler().timer_set(attotime::from_hz(30) - m_timing_factor, m_v493_callback);
 }
 
 
@@ -242,20 +240,18 @@ static void update_mcr68_interrupts(running_machine &machine)
 }
 
 
-static TIMER_CALLBACK( mcr68_493_off_callback )
+TIMER_CALLBACK_MEMBER(mcr68_state::mcr68_493_off_callback)
 {
-	mcr68_state *state = machine.driver_data<mcr68_state>();
-	state->m_v493_irq_state = 0;
-	update_mcr68_interrupts(machine);
+	m_v493_irq_state = 0;
+	update_mcr68_interrupts(machine());
 }
 
 
-static TIMER_CALLBACK( mcr68_493_callback )
+TIMER_CALLBACK_MEMBER(mcr68_state::mcr68_493_callback)
 {
-	mcr68_state *state = machine.driver_data<mcr68_state>();
-	state->m_v493_irq_state = 1;
-	update_mcr68_interrupts(machine);
-	machine.scheduler().timer_set(machine.primary_screen->scan_period(), FUNC(mcr68_493_off_callback));
+	m_v493_irq_state = 1;
+	update_mcr68_interrupts(machine());
+	machine().scheduler().timer_set(machine().primary_screen->scan_period(), timer_expired_delegate(FUNC(mcr68_state::mcr68_493_off_callback),this));
 	logerror("--- (INT1) ---\n");
 }
 
@@ -302,19 +298,19 @@ static WRITE_LINE_DEVICE_HANDLER( zwackery_pia_irq )
 }
 
 
-static TIMER_CALLBACK( zwackery_493_off_callback )
+TIMER_CALLBACK_MEMBER(mcr68_state::zwackery_493_off_callback)
 {
-	pia6821_device *pia = machine.device<pia6821_device>("pia0");
+	pia6821_device *pia = machine().device<pia6821_device>("pia0");
 	pia->ca1_w(0);
 }
 
 
-static TIMER_CALLBACK( zwackery_493_callback )
+TIMER_CALLBACK_MEMBER(mcr68_state::zwackery_493_callback)
 {
-	pia6821_device *pia = machine.device<pia6821_device>("pia0");
+	pia6821_device *pia = machine().device<pia6821_device>("pia0");
 
 	pia->ca1_w(1);
-	machine.scheduler().timer_set(machine.primary_screen->scan_period(), FUNC(zwackery_493_off_callback));
+	machine().scheduler().timer_set(machine().primary_screen->scan_period(), timer_expired_delegate(FUNC(mcr68_state::zwackery_493_off_callback),this));
 }
 
 
@@ -402,18 +398,17 @@ static void subtract_from_counter(running_machine &machine, int counter, int cou
 }
 
 
-static TIMER_CALLBACK( counter_fired_callback )
+TIMER_CALLBACK_MEMBER(mcr68_state::counter_fired_callback)
 {
-	mcr68_state *state = machine.driver_data<mcr68_state>();
 	int count = param >> 2;
 	int counter = param & 3;
-	struct counter_state *m6840 = &state->m_m6840_state[counter];
+	struct counter_state *m6840 = &m_m6840_state[counter];
 
 	/* reset the timer */
 	m6840->timer_active = 0;
 
 	/* subtract it all from the counter; this will generate an interrupt */
-	subtract_from_counter(machine, counter, count);
+	subtract_from_counter(machine(), counter, count);
 }
 
 

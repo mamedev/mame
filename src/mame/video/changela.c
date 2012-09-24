@@ -15,7 +15,7 @@ Todo: Priority between tree0 and tree1.
 #include "includes/changela.h"
 
 
-static TIMER_CALLBACK( changela_scanline_callback );
+
 
 void changela_state::video_start()
 {
@@ -28,7 +28,7 @@ void changela_state::video_start()
 	machine().primary_screen->register_screen_bitmap(m_tree0_bitmap);
 	machine().primary_screen->register_screen_bitmap(m_tree1_bitmap);
 
-	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(changela_scanline_callback));
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(changela_state::changela_scanline_callback),this));
 	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(30), 30);
 
 	save_pointer(NAME(m_memory_devices), 4 * 0x800);
@@ -644,81 +644,80 @@ e:|7 6 5 4 3 2 1 0 Hex|/RAMw /RAMr /ROM  /AdderOutput  AdderInput TrainInputs|
                  written back to RAM
 */
 
-static TIMER_CALLBACK( changela_scanline_callback )
+TIMER_CALLBACK_MEMBER(changela_state::changela_scanline_callback)
 {
-	changela_state *state = machine.driver_data<changela_state>();
 	int sy = param;
 	int sx;
 
 	/* clear the current scanline first */
 	const rectangle rect(0, 255, sy, sy);
-	state->m_river_bitmap.fill(0x00, rect);
-	state->m_obj0_bitmap.fill(0x00, rect);
-	state->m_tree0_bitmap.fill(0x00, rect);
-	state->m_tree1_bitmap.fill(0x00, rect);
+	m_river_bitmap.fill(0x00, rect);
+	m_obj0_bitmap.fill(0x00, rect);
+	m_tree0_bitmap.fill(0x00, rect);
+	m_tree1_bitmap.fill(0x00, rect);
 
-	draw_river(machine, state->m_river_bitmap, sy);
-	draw_obj0(machine, state->m_obj0_bitmap, sy);
-	draw_tree(machine, state->m_tree0_bitmap, sy, 0);
-	draw_tree(machine, state->m_tree1_bitmap, sy, 1);
+	draw_river(machine(), m_river_bitmap, sy);
+	draw_obj0(machine(), m_obj0_bitmap, sy);
+	draw_tree(machine(), m_tree0_bitmap, sy, 0);
+	draw_tree(machine(), m_tree1_bitmap, sy, 1);
 
 	/* Collision Detection */
 	for (sx = 1; sx < 256; sx++)
 	{
 		int riv_col, prev_col;
 
-		if ((state->m_river_bitmap.pix16(sy, sx) == 0x08)
-		|| (state->m_river_bitmap.pix16(sy, sx) == 0x09)
-		|| (state->m_river_bitmap.pix16(sy, sx) == 0x0a))
+		if ((m_river_bitmap.pix16(sy, sx) == 0x08)
+		|| (m_river_bitmap.pix16(sy, sx) == 0x09)
+		|| (m_river_bitmap.pix16(sy, sx) == 0x0a))
 			riv_col = 1;
 		else
 			riv_col = 0;
 
-		if ((state->m_river_bitmap.pix16(sy, sx-1) == 0x08)
-		|| (state->m_river_bitmap.pix16(sy, sx-1) == 0x09)
-		|| (state->m_river_bitmap.pix16(sy, sx-1) == 0x0a))
+		if ((m_river_bitmap.pix16(sy, sx-1) == 0x08)
+		|| (m_river_bitmap.pix16(sy, sx-1) == 0x09)
+		|| (m_river_bitmap.pix16(sy, sx-1) == 0x0a))
 			prev_col = 1;
 		else
 			prev_col = 0;
 
-		if (state->m_obj0_bitmap.pix16(sy, sx) == 0x14) /* Car Outline Color */
+		if (m_obj0_bitmap.pix16(sy, sx) == 0x14) /* Car Outline Color */
 		{
 			/* Tree 0 Collision */
-			if (state->m_tree0_bitmap.pix16(sy, sx) != 0)
-				state->m_tree0_col = 1;
+			if (m_tree0_bitmap.pix16(sy, sx) != 0)
+				m_tree0_col = 1;
 
 			/* Tree 1 Collision */
-			if (state->m_tree1_bitmap.pix16(sy, sx) != 0)
-				state->m_tree1_col = 1;
+			if (m_tree1_bitmap.pix16(sy, sx) != 0)
+				m_tree1_col = 1;
 
 			/* Hit Right Bank */
 			if (riv_col == 0 && prev_col == 1)
-				state->m_right_bank_col = 1;
+				m_right_bank_col = 1;
 
 			/* Hit Left Bank */
 			if (riv_col == 1 && prev_col == 0)
-				state->m_left_bank_col = 1;
+				m_left_bank_col = 1;
 
 			/* Boat Hit Shore */
 			if (riv_col == 1)
-				state->m_boat_shore_col = 1;
+				m_boat_shore_col = 1;
 		}
 	}
-	if (!state->m_tree_collision_reset)
+	if (!m_tree_collision_reset)
 	{
-		state->m_tree0_col = 0;
-		state->m_tree1_col = 0;
+		m_tree0_col = 0;
+		m_tree1_col = 0;
 	}
-	if (!state->m_collision_reset)
+	if (!m_collision_reset)
 	{
-		state->m_left_bank_col = 0;
-		state->m_right_bank_col = 0;
-		state->m_boat_shore_col = 0;
+		m_left_bank_col = 0;
+		m_right_bank_col = 0;
+		m_boat_shore_col = 0;
 	}
 
 	sy++;
 	if (sy > 256) sy = 30;
-	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(sy), sy);
+	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(sy), sy);
 }
 
 UINT32 changela_state::screen_update_changela(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

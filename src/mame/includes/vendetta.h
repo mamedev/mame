@@ -45,6 +45,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_vendetta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vendetta_irq);
+	TIMER_CALLBACK_MEMBER(z80_nmi_callback);
 };
 
 /*----------- defined in video/vendetta.c -----------*/

@@ -44,4 +44,5 @@ public:
 	DECLARE_DRIVER_INIT(fireone);
 	virtual void video_start();
 	UINT32 screen_update_starfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(starfire_scanline_callback);
 };

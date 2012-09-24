@@ -24,9 +24,9 @@ void triplhnt_state::video_start()
 }
 
 
-static TIMER_CALLBACK( triplhnt_hit_callback )
+TIMER_CALLBACK_MEMBER(triplhnt_state::triplhnt_hit_callback)
 {
-	triplhnt_set_collision(machine, param);
+	triplhnt_set_collision(machine(), param);
 }
 
 
@@ -99,7 +99,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 
 	if (hit_line != 999 && hit_code != 999)
-		machine.scheduler().timer_set(machine.primary_screen->time_until_pos(hit_line), FUNC(triplhnt_hit_callback), hit_code);
+		machine.scheduler().timer_set(machine.primary_screen->time_until_pos(hit_line), timer_expired_delegate(FUNC(triplhnt_state::triplhnt_hit_callback),state), hit_code);
 }
 
 

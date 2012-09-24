@@ -1401,10 +1401,10 @@ static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int 
 /*------------------------------
     callback
 ------------------------------*/
-static TIMER_CALLBACK( uPD71054_timer_callback )
+TIMER_CALLBACK_MEMBER(seta_state::uPD71054_timer_callback)
 {
-	machine.device("maincpu")->execute().set_input_line(4, HOLD_LINE );
-	uPD71054_update_timer( machine, NULL, param );
+	machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE );
+	uPD71054_update_timer( machine(), NULL, param );
 }
 
 
@@ -1424,7 +1424,7 @@ static void uPD71054_timer_init( running_machine &machine )
 		uPD71054->max[no] = 0xffff;
 	}
 	for( no = 0; no < USED_TIMER_NUM; no++ ) {
-		uPD71054->timer[no] = machine.scheduler().timer_alloc( FUNC(uPD71054_timer_callback ));
+		uPD71054->timer[no] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(seta_state::uPD71054_timer_callback),state));
 	}
 }
 
@@ -2140,10 +2140,9 @@ READ16_MEMBER(seta_state::keroppi_coin_r)
 	return result;
 }
 
-static TIMER_CALLBACK( keroppi_prize_hop_callback )
+TIMER_CALLBACK_MEMBER(seta_state::keroppi_prize_hop_callback)
 {
-	seta_state *state = machine.driver_data<seta_state>();
-	state->m_keroppi_prize_hop = 2;
+	m_keroppi_prize_hop = 2;
 }
 
 WRITE16_MEMBER(seta_state::keroppi_prize_w)
@@ -2151,7 +2150,7 @@ WRITE16_MEMBER(seta_state::keroppi_prize_w)
 	if ((data & 0x0010) && !m_keroppi_prize_hop)
 	{
 		m_keroppi_prize_hop = 1;
-		machine().scheduler().timer_set(attotime::from_seconds(3), FUNC(keroppi_prize_hop_callback), 0x20);		/* 3 seconds */
+		machine().scheduler().timer_set(attotime::from_seconds(3), timer_expired_delegate(FUNC(seta_state::keroppi_prize_hop_callback),this), 0x20);		/* 3 seconds */
 	}
 }
 

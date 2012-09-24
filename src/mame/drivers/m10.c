@@ -504,21 +504,20 @@ INPUT_CHANGED_MEMBER(m10_state::coin_inserted)
 }
 
 
-static TIMER_CALLBACK( interrupt_callback )
+TIMER_CALLBACK_MEMBER(m10_state::interrupt_callback)
 {
-	m10_state *state = machine.driver_data<m10_state>();
 	if (param == 0)
 	{
-		state->m_maincpu->set_input_line(0, ASSERT_LINE);
-		machine.scheduler().timer_set(machine.primary_screen->time_until_pos(IREMM10_VBSTART + 16), FUNC(interrupt_callback), 1);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+		machine().scheduler().timer_set(machine().primary_screen->time_until_pos(IREMM10_VBSTART + 16), timer_expired_delegate(FUNC(m10_state::interrupt_callback),this), 1);
 	}
 	if (param == 1)
 	{
-		state->m_maincpu->set_input_line(0, ASSERT_LINE);
-		machine.scheduler().timer_set(machine.primary_screen->time_until_pos(IREMM10_VBSTART + 24), FUNC(interrupt_callback), 2);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+		machine().scheduler().timer_set(machine().primary_screen->time_until_pos(IREMM10_VBSTART + 24), timer_expired_delegate(FUNC(m10_state::interrupt_callback),this), 2);
 	}
 	if (param == -1)
-		state->m_maincpu->set_input_line(0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 
 }
 
@@ -526,7 +525,7 @@ static TIMER_CALLBACK( interrupt_callback )
 INTERRUPT_GEN_MEMBER(m10_state::m11_interrupt)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	//machine().scheduler().timer_set(machine.primary_screen->time_until_pos(IREMM10_VBEND), FUNC(interrupt_callback), -1);
+	//machine().scheduler().timer_set(machine.primary_screen->time_until_pos(IREMM10_VBEND), timer_expired_delegate(FUNC(m10_state::interrupt_callback),this), -1);
 }
 
 INTERRUPT_GEN_MEMBER(m10_state::m10_interrupt)
@@ -538,7 +537,7 @@ INTERRUPT_GEN_MEMBER(m10_state::m10_interrupt)
 INTERRUPT_GEN_MEMBER(m10_state::m15_interrupt)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(IREMM10_VBSTART + 1, 80), FUNC(interrupt_callback), -1);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(IREMM10_VBSTART + 1, 80), timer_expired_delegate(FUNC(m10_state::interrupt_callback),this), -1);
 }
 
 /*************************************

@@ -31,11 +31,10 @@
 /*
     TODO: Check interrupt timing from CRT config. Probably different between games.
 */
-static TIMER_CALLBACK( interrupt_callback )
+TIMER_CALLBACK_MEMBER(tx1_state::interrupt_callback)
 {
-	tx1_state *state = machine.driver_data<tx1_state>();
-	machine.device("main_cpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
+	machine().device("main_cpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 
@@ -1113,7 +1112,7 @@ VIDEO_START_MEMBER(tx1_state,tx1)
 	m_rod_bmp = auto_alloc_array(machine(), UINT8, 256 * 3 * 240);
 
 	/* Set a timer to run the interrupts */
-	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(interrupt_callback));
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx1_state::interrupt_callback),this));
 
 	/* /CUDISP CRTC interrupt */
 	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
@@ -3001,7 +3000,7 @@ VIDEO_START_MEMBER(tx1_state,buggyboy)
 	m_rod_bmp = auto_alloc_array(machine(), UINT8, 3 * 256 * 240);
 
 	/* Set a timer to run the interrupts */
-	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(interrupt_callback));
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx1_state::interrupt_callback),this));
 
 	/* /CUDISP CRTC interrupt */
 	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
@@ -3015,7 +3014,7 @@ VIDEO_START_MEMBER(tx1_state,buggybjr)
 	m_rod_bmp = auto_alloc_array(machine(), UINT8, 256 * 240);
 
 	/* Set a timer to run the interrupts */
-	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(interrupt_callback));
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx1_state::interrupt_callback),this));
 
 	/* /CUDISP CRTC interrupt */
 	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));

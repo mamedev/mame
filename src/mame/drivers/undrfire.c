@@ -225,9 +225,9 @@ WRITE32_MEMBER(undrfire_state::color_ram_w)
                 INTERRUPTS
 ***********************************************************/
 
-static TIMER_CALLBACK( interrupt5 )
+TIMER_CALLBACK_MEMBER(undrfire_state::interrupt5)
 {
-	machine.device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 }
 
 
@@ -359,7 +359,7 @@ READ32_MEMBER(undrfire_state::unknown_hardware_r)
 WRITE32_MEMBER(undrfire_state::unknown_int_req_w)
 {
 	/* 10000 cycle delay is arbitrary */
-	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), FUNC(interrupt5));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), timer_expired_delegate(FUNC(undrfire_state::interrupt5),this));
 }
 
 
@@ -464,7 +464,7 @@ WRITE32_MEMBER(undrfire_state::cbombers_adc_w)
 {
 	/* One interrupt per input port (4 per frame, though only 2 used).
         1000 cycle delay is arbitrary */
-	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), FUNC(interrupt5));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), timer_expired_delegate(FUNC(undrfire_state::interrupt5),this));
 }
 
 /***********************************************************

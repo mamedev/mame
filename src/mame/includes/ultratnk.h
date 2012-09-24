@@ -41,4 +41,5 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_ultratnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_ultratnk(screen_device &screen, bool state);
+	TIMER_CALLBACK_MEMBER(nmi_callback);
 };

@@ -196,139 +196,128 @@ WRITE8_MEMBER(taitob_state::bankswitch_w)
 	membank("bank1")->set_entry((data - 1) & 3);
 }
 
-static TIMER_CALLBACK( rsaga2_interrupt2 )
+TIMER_CALLBACK_MEMBER(taitob_state::rsaga2_interrupt2)
 {
-	taitob_state *state = machine.driver_data<taitob_state>();
-	state->m_maincpu->set_input_line(2, HOLD_LINE);
+	m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(taitob_state::rastansaga2_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), FUNC(rsaga2_interrupt2));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), timer_expired_delegate(FUNC(taitob_state::rsaga2_interrupt2),this));
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
 
-static TIMER_CALLBACK( crimec_interrupt3 )
+TIMER_CALLBACK_MEMBER(taitob_state::crimec_interrupt3)
 {
-	taitob_state *state = machine.driver_data<taitob_state>();
-	state->m_maincpu->set_input_line(3, HOLD_LINE);
+	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(taitob_state::crimec_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), FUNC(crimec_interrupt3));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), timer_expired_delegate(FUNC(taitob_state::crimec_interrupt3),this));
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
 
-static TIMER_CALLBACK( hitice_interrupt6 )
+TIMER_CALLBACK_MEMBER(taitob_state::hitice_interrupt6)
 {
-	taitob_state *state = machine.driver_data<taitob_state>();
-	state->m_maincpu->set_input_line(6, HOLD_LINE);
+	m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(taitob_state::hitice_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), FUNC(hitice_interrupt6));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), timer_expired_delegate(FUNC(taitob_state::hitice_interrupt6),this));
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
 
-static TIMER_CALLBACK( rambo3_interrupt1 )
+TIMER_CALLBACK_MEMBER(taitob_state::rambo3_interrupt1)
 {
-	taitob_state *state = machine.driver_data<taitob_state>();
-	state->m_maincpu->set_input_line(1, HOLD_LINE);
+	m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(taitob_state::rambo3_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), FUNC(rambo3_interrupt1));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), timer_expired_delegate(FUNC(taitob_state::rambo3_interrupt1),this));
 	device.execute().set_input_line(6, HOLD_LINE);
 }
 
 
-static TIMER_CALLBACK( pbobble_interrupt5 )
+TIMER_CALLBACK_MEMBER(taitob_state::pbobble_interrupt5)
 {
-	taitob_state *state = machine.driver_data<taitob_state>();
-	state->m_maincpu->set_input_line(5, HOLD_LINE);
+	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(taitob_state::pbobble_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), FUNC(pbobble_interrupt5));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), timer_expired_delegate(FUNC(taitob_state::pbobble_interrupt5),this));
 	device.execute().set_input_line(3, HOLD_LINE);
 }
 
-static TIMER_CALLBACK( viofight_interrupt1 )
+TIMER_CALLBACK_MEMBER(taitob_state::viofight_interrupt1)
 {
-	taitob_state *state = machine.driver_data<taitob_state>();
-	state->m_maincpu->set_input_line(1, HOLD_LINE);
+	m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(taitob_state::viofight_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), FUNC(viofight_interrupt1));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), timer_expired_delegate(FUNC(taitob_state::viofight_interrupt1),this));
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-static TIMER_CALLBACK( masterw_interrupt4 )
+TIMER_CALLBACK_MEMBER(taitob_state::masterw_interrupt4)
 {
-	taitob_state *state = machine.driver_data<taitob_state>();
-	state->m_maincpu->set_input_line(4, HOLD_LINE);
+	m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(taitob_state::masterw_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), FUNC(masterw_interrupt4));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), timer_expired_delegate(FUNC(taitob_state::masterw_interrupt4),this));
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
-static TIMER_CALLBACK( silentd_interrupt4 )
+TIMER_CALLBACK_MEMBER(taitob_state::silentd_interrupt4)
 {
-	taitob_state *state = machine.driver_data<taitob_state>();
-	state->m_maincpu->set_input_line(4, HOLD_LINE);
+	m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(taitob_state::silentd_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), FUNC(silentd_interrupt4));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), timer_expired_delegate(FUNC(taitob_state::silentd_interrupt4),this));
 	device.execute().set_input_line(6, HOLD_LINE);
 }
 
-static TIMER_CALLBACK( selfeena_interrupt4 )
+TIMER_CALLBACK_MEMBER(taitob_state::selfeena_interrupt4)
 {
-	taitob_state *state = machine.driver_data<taitob_state>();
-	state->m_maincpu->set_input_line(4, HOLD_LINE);
+	m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(taitob_state::selfeena_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), FUNC(selfeena_interrupt4));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), timer_expired_delegate(FUNC(taitob_state::selfeena_interrupt4),this));
 	device.execute().set_input_line(6, HOLD_LINE);
 }
 
-static TIMER_CALLBACK( sbm_interrupt5 )//4
+TIMER_CALLBACK_MEMBER(taitob_state::sbm_interrupt5)//4
 {
-	taitob_state *state = machine.driver_data<taitob_state>();
-	state->m_maincpu->set_input_line(5, HOLD_LINE);
+	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(taitob_state::sbm_interrupt)//5
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), FUNC(sbm_interrupt5));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), timer_expired_delegate(FUNC(taitob_state::sbm_interrupt5),this));
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-static TIMER_CALLBACK( realpunc_interrupt3 )//3
+TIMER_CALLBACK_MEMBER(taitob_state::realpunc_interrupt3)//3
 {
-	taitob_state *state = machine.driver_data<taitob_state>();
-	state->m_maincpu->set_input_line(3, HOLD_LINE);
+	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(taitob_state::realpunc_interrupt)//2
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), FUNC(realpunc_interrupt3));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), timer_expired_delegate(FUNC(taitob_state::realpunc_interrupt3),this));
 	device.execute().set_input_line(2, HOLD_LINE);
 }
 

@@ -157,9 +157,9 @@ static GFXDECODE_START( mustache )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x80, 8 )
 GFXDECODE_END
 
-static TIMER_CALLBACK( clear_irq_cb )
+TIMER_CALLBACK_MEMBER(mustache_state::clear_irq_cb)
 {
-	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(mustache_state::assert_irq)
@@ -179,7 +179,7 @@ INTERRUPT_GEN_MEMBER(mustache_state::assert_irq)
 
 void mustache_state::machine_start()
 {
-	m_clear_irq_timer = machine().scheduler().timer_alloc(FUNC(clear_irq_cb));
+	m_clear_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mustache_state::clear_irq_cb),this));
 }
 
 static MACHINE_CONFIG_START( mustache, mustache_state )

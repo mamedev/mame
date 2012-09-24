@@ -122,6 +122,8 @@ public:
 	DECLARE_PALETTE_INIT(profpac);
 	UINT32 screen_update_astrocde(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_profpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(interrupt_off);
+	TIMER_CALLBACK_MEMBER(scanline_callback);
 };
 
 /*----------- defined in audio/wow.c -----------*/

@@ -278,48 +278,47 @@ static const UINT16 *const palette_data_lookup[] =
 };
 
 
-static TIMER_CALLBACK( volfied_timer_callback )
+TIMER_CALLBACK_MEMBER(volfied_state::volfied_timer_callback)
 {
-	volfied_state *state = machine.driver_data<volfied_state>();
 
 	// Palette commands - palette data written to bank 0: $10 - $af
-	if (state->m_current_cmd >= 0x1 && state->m_current_cmd < 0x12)
+	if (m_current_cmd >= 0x1 && m_current_cmd < 0x12)
 	{
-		const UINT16* palette_data = palette_data_lookup[state->m_current_cmd];
+		const UINT16* palette_data = palette_data_lookup[m_current_cmd];
 		int i;
 		for (i = 0; i < 0x50; i++)
 		{
-			state->m_cchip_ram[0x10 + i * 2 + 0] = palette_data[i] >> 8;
-			state->m_cchip_ram[0x10 + i * 2 + 1] = palette_data[i] & 0xff;
+			m_cchip_ram[0x10 + i * 2 + 0] = palette_data[i] >> 8;
+			m_cchip_ram[0x10 + i * 2 + 1] = palette_data[i] & 0xff;
 		}
 	}
 
 	// Unknown command - result written to bank 0: $23
-	if (state->m_current_cmd >= 0x81 && state->m_current_cmd < 0x92)
+	if (m_current_cmd >= 0x81 && m_current_cmd < 0x92)
 	{
-		switch (state->m_current_cmd)
+		switch (m_current_cmd)
 		{
-		case 0x81: state->m_cchip_ram[0x23] = 0xf; break;
-		case 0x82: state->m_cchip_ram[0x23] = 0x1; break;
-		case 0x83: state->m_cchip_ram[0x23] = 0x6; break;
-		case 0x84: state->m_cchip_ram[0x23] = 0xf; break;
-		case 0x85: state->m_cchip_ram[0x23] = 0x9; break;
-		case 0x86: state->m_cchip_ram[0x23] = 0x6; break;
-		case 0x87: state->m_cchip_ram[0x23] = 0x6; break;
-		case 0x88: state->m_cchip_ram[0x23] = 0xf; break;
-		case 0x89: state->m_cchip_ram[0x23] = 0x8; break;
-		case 0x8a: state->m_cchip_ram[0x23] = 0x1; break;
-		case 0x8b: state->m_cchip_ram[0x23] = 0xa; break;
-		case 0x8c: state->m_cchip_ram[0x23] = 0x1; break;
-		case 0x8d: state->m_cchip_ram[0x23] = 0x1; break;
-		case 0x8e: state->m_cchip_ram[0x23] = 0x8; break;
-		case 0x8f: state->m_cchip_ram[0x23] = 0x6; break;
-		case 0x90: state->m_cchip_ram[0x23] = 0xa; break;
-		case 0x91: state->m_cchip_ram[0x23] = 0x0; break;
+		case 0x81: m_cchip_ram[0x23] = 0xf; break;
+		case 0x82: m_cchip_ram[0x23] = 0x1; break;
+		case 0x83: m_cchip_ram[0x23] = 0x6; break;
+		case 0x84: m_cchip_ram[0x23] = 0xf; break;
+		case 0x85: m_cchip_ram[0x23] = 0x9; break;
+		case 0x86: m_cchip_ram[0x23] = 0x6; break;
+		case 0x87: m_cchip_ram[0x23] = 0x6; break;
+		case 0x88: m_cchip_ram[0x23] = 0xf; break;
+		case 0x89: m_cchip_ram[0x23] = 0x8; break;
+		case 0x8a: m_cchip_ram[0x23] = 0x1; break;
+		case 0x8b: m_cchip_ram[0x23] = 0xa; break;
+		case 0x8c: m_cchip_ram[0x23] = 0x1; break;
+		case 0x8d: m_cchip_ram[0x23] = 0x1; break;
+		case 0x8e: m_cchip_ram[0x23] = 0x8; break;
+		case 0x8f: m_cchip_ram[0x23] = 0x6; break;
+		case 0x90: m_cchip_ram[0x23] = 0xa; break;
+		case 0x91: m_cchip_ram[0x23] = 0x0; break;
 		}
 	}
 
-	state->m_current_cmd = 0;
+	m_current_cmd = 0;
 }
 
 /*************************************
@@ -390,12 +389,12 @@ WRITE16_MEMBER(volfied_state::volfied_cchip_ram_w)
 			// Palette request cmd - verified to take around 122242 68000 cycles to complete
 			if (m_current_cmd >= 0x1 && m_current_cmd < 0x12)
 			{
-				machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(122242), FUNC(volfied_timer_callback));
+				machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(122242), timer_expired_delegate(FUNC(volfied_state::volfied_timer_callback),this));
 			}
 			// Unknown cmd - verified to take around 105500 68000 cycles to complete
 			else if (m_current_cmd >= 0x81 && m_current_cmd < 0x92)
 			{
-				machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(105500), FUNC(volfied_timer_callback));
+				machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(105500), timer_expired_delegate(FUNC(volfied_state::volfied_timer_callback),this));
 			}
 			else
 			{

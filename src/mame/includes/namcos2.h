@@ -181,6 +181,7 @@ public:
 	INTERRUPT_GEN_MEMBER(namcos2_68k_master_vblank);
 	INTERRUPT_GEN_MEMBER(namcos2_68k_slave_vblank);
 	INTERRUPT_GEN_MEMBER(namcos2_68k_gpu_vblank);
+	TIMER_CALLBACK_MEMBER(namcos2_posirq_tick);
 };
 
 class namcos2_state : public namcos2_shared_state

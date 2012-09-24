@@ -213,7 +213,7 @@ void psxrcnt_device::root_timer_adjust( int n_counter )
 	}
 }
 
-void psxrcnt_device::root_finished( void *ptr, int param )
+TIMER_CALLBACK_MEMBER(psxrcnt_device::root_finished)
 {
 	int n_counter = param;
 	psx_root *root = &root_counter[ n_counter ];

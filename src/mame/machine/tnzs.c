@@ -495,14 +495,14 @@ interleave.
 *********************************/
 
 /*
-static TIMER_CALLBACK( kludge_callback )
+TIMER_CALLBACK_MEMBER(tnzs_state::kludge_callback)
 {
     tnzs_sharedram[0x0f10] = param;
 }
 
 WRITE8_MEMBER(tnzs_state::tnzs_sync_kludge_w)
 {
-    machine().scheduler().synchronize(FUNC(kludge_callback), data);
+    machine().scheduler().synchronize(timer_expired_delegate(FUNC(tnzs_state::kludge_callback),this), data);
 }
 */
 

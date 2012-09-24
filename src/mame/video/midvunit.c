@@ -34,25 +34,24 @@ midvunit_renderer::midvunit_renderer(midvunit_state &state)
  *
  *************************************/
 
-static TIMER_CALLBACK( scanline_timer_cb )
+TIMER_CALLBACK_MEMBER(midvunit_state::scanline_timer_cb)
 {
-	midvunit_state *state = machine.driver_data<midvunit_state>();
 	int scanline = param;
 
 	if (scanline != -1)
 	{
-		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
-		state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(scanline + 1), scanline);
-		machine.scheduler().timer_set(attotime::from_hz(25000000), FUNC(scanline_timer_cb), -1);
+		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		m_scanline_timer->adjust(machine().primary_screen->time_until_pos(scanline + 1), scanline);
+		machine().scheduler().timer_set(attotime::from_hz(25000000), timer_expired_delegate(FUNC(midvunit_state::scanline_timer_cb),this), -1);
 	}
 	else
-		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
 void midvunit_state::video_start()
 {
-	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(scanline_timer_cb));
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midvunit_state::scanline_timer_cb),this));
 
 	m_poly = auto_alloc(machine(), midvunit_renderer(*this));
 

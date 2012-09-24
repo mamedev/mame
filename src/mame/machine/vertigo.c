@@ -165,23 +165,22 @@ WRITE16_MEMBER(vertigo_state::vertigo_wsot_w)
 }
 
 
-static TIMER_CALLBACK( sound_command_w )
+TIMER_CALLBACK_MEMBER(vertigo_state::sound_command_w)
 {
-	vertigo_state *state = machine.driver_data<vertigo_state>();
-	exidy440_sound_command(state->m_custom, param);
+	exidy440_sound_command(m_custom, param);
 
 	/* It is important that the sound cpu ACKs the sound command
        quickly. Otherwise the main CPU gives up with sound. Boosting
        the interleave for a while helps. */
 
-	machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 
 WRITE16_MEMBER(vertigo_state::vertigo_audio_w)
 {
 	if (ACCESSING_BITS_0_7)
-		machine().scheduler().synchronize(FUNC(sound_command_w), data & 0xff);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(vertigo_state::sound_command_w),this), data & 0xff);
 }
 
 

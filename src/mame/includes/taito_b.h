@@ -84,4 +84,15 @@ public:
 	INTERRUPT_GEN_MEMBER(selfeena_interrupt);
 	INTERRUPT_GEN_MEMBER(sbm_interrupt);
 	INTERRUPT_GEN_MEMBER(realpunc_interrupt);
+	TIMER_CALLBACK_MEMBER(rsaga2_interrupt2);
+	TIMER_CALLBACK_MEMBER(crimec_interrupt3);
+	TIMER_CALLBACK_MEMBER(hitice_interrupt6);
+	TIMER_CALLBACK_MEMBER(rambo3_interrupt1);
+	TIMER_CALLBACK_MEMBER(pbobble_interrupt5);
+	TIMER_CALLBACK_MEMBER(viofight_interrupt1);
+	TIMER_CALLBACK_MEMBER(masterw_interrupt4);
+	TIMER_CALLBACK_MEMBER(silentd_interrupt4);
+	TIMER_CALLBACK_MEMBER(selfeena_interrupt4);
+	TIMER_CALLBACK_MEMBER(sbm_interrupt5);
+	TIMER_CALLBACK_MEMBER(realpunc_interrupt3);
 };

@@ -61,4 +61,5 @@ public:
 	DECLARE_MACHINE_RESET(lsasquad);
 	UINT32 screen_update_lsasquad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_daikaiju(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(nmi_callback);
 };

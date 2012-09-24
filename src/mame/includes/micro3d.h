@@ -115,6 +115,8 @@ public:
 	virtual void video_start();
 	virtual void video_reset();
 	INTERRUPT_GEN_MEMBER(micro3d_vblank);
+	TIMER_CALLBACK_MEMBER(mac_done_callback);
+	TIMER_CALLBACK_MEMBER(adc_done_callback);
 };
 
 struct micro3d_vtx

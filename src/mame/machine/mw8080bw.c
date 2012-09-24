@@ -42,18 +42,17 @@ static int vysnc_chain_counter_to_vpos( UINT8 counter, int vblank )
 }
 
 
-static TIMER_CALLBACK( mw8080bw_interrupt_callback )
+TIMER_CALLBACK_MEMBER(mw8080bw_state::mw8080bw_interrupt_callback)
 {
-	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
 	UINT8 next_counter;
 	int next_vpos;
 	int next_vblank;
 
 	/* compute vector and set the interrupt line */
-	int vpos = machine.primary_screen->vpos();
+	int vpos = machine().primary_screen->vpos();
 	UINT8 counter = vpos_to_vysnc_chain_counter(vpos);
 	UINT8 vector = 0xc7 | ((counter & 0x40) >> 2) | ((~counter & 0x40) >> 3);
-	state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, vector);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, vector);
 
 	/* set up for next interrupt */
 	if (counter == MW8080BW_INT_TRIGGER_COUNT_1)
@@ -68,14 +67,14 @@ static TIMER_CALLBACK( mw8080bw_interrupt_callback )
 	}
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_vblank);
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(next_vpos));
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(next_vpos));
 }
 
 
 static void mw8080bw_create_interrupt_timer( running_machine &machine )
 {
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
-	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(mw8080bw_interrupt_callback));
+	state->m_interrupt_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(mw8080bw_state::mw8080bw_interrupt_callback),state));
 }
 
 

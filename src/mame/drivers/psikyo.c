@@ -144,18 +144,17 @@ READ32_MEMBER(psikyo_state::gunbird_input_r)
 }
 
 
-static TIMER_CALLBACK( psikyo_soundlatch_callback )
+TIMER_CALLBACK_MEMBER(psikyo_state::psikyo_soundlatch_callback)
 {
-	psikyo_state *state = machine.driver_data<psikyo_state>();
-	state->m_soundlatch = param;
-	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	state->m_z80_nmi = 1;
+	m_soundlatch = param;
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_z80_nmi = 1;
 }
 
 WRITE32_MEMBER(psikyo_state::psikyo_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
-		machine().scheduler().synchronize(FUNC(psikyo_soundlatch_callback), data & 0xff);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(psikyo_state::psikyo_soundlatch_callback),this), data & 0xff);
 }
 
 /***************************************************************************
@@ -165,7 +164,7 @@ WRITE32_MEMBER(psikyo_state::psikyo_soundlatch_w)
 WRITE32_MEMBER(psikyo_state::s1945_soundlatch_w)
 {
 	if (ACCESSING_BITS_16_23)
-		machine().scheduler().synchronize(FUNC(psikyo_soundlatch_callback), (data >> 16) & 0xff);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(psikyo_state::psikyo_soundlatch_callback),this), (data >> 16) & 0xff);
 }
 
 static const UINT8 s1945_table[256] = {

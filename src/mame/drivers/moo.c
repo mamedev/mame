@@ -118,11 +118,10 @@ static void moo_objdma( running_machine &machine, int type )
 	if (num_inactive) do { *dst = 0; dst += 8; } while (--num_inactive);
 }
 
-static TIMER_CALLBACK( dmaend_callback )
+TIMER_CALLBACK_MEMBER(moo_state::dmaend_callback)
 {
-	moo_state *state = machine.driver_data<moo_state>();
-	if (state->m_cur_control2 & 0x800)
-		state->m_maincpu->set_input_line(4, HOLD_LINE);
+	if (m_cur_control2 & 0x800)
+		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(moo_state::moo_interrupt)
@@ -439,7 +438,7 @@ MACHINE_START_MEMBER(moo_state,moo)
 	save_item(NAME(m_layerpri));
 	save_item(NAME(m_protram));
 
-    m_dmaend_timer = machine().scheduler().timer_alloc(FUNC(dmaend_callback));
+    m_dmaend_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(moo_state::dmaend_callback),this));
 }
 
 MACHINE_RESET_MEMBER(moo_state,moo)

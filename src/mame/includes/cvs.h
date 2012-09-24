@@ -106,6 +106,7 @@ public:
 	DECLARE_PALETTE_INIT(cvs);
 	UINT32 screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cvs_main_cpu_interrupt);
+	TIMER_CALLBACK_MEMBER(cvs_393hz_timer_cb);
 };
 
 /*----------- defined in video/cvs.c -----------*/

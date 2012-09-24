@@ -69,6 +69,7 @@ public:
 	DECLARE_MACHINE_START(teetert);
 	UINT32 screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(exidy_vblank_interrupt);
+	TIMER_CALLBACK_MEMBER(collision_irq_callback);
 };
 
 /*----------- defined in video/exidy.c -----------*/

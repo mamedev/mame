@@ -231,19 +231,18 @@ Notes - Has jumper setting for 122HZ or 61HZ)
 #include "machine/buggychl.h"
 #include "includes/40love.h"
 
-static TIMER_CALLBACK( nmi_callback )
+TIMER_CALLBACK_MEMBER(fortyl_state::nmi_callback)
 {
-	fortyl_state *state = machine.driver_data<fortyl_state>();
-	if (state->m_sound_nmi_enable)
-		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_sound_nmi_enable)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
-		state->m_pending_nmi = 1;
+		m_pending_nmi = 1;
 }
 
 WRITE8_MEMBER(fortyl_state::sound_command_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	machine().scheduler().synchronize(FUNC(nmi_callback), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(fortyl_state::nmi_callback),this), data);
 }
 
 WRITE8_MEMBER(fortyl_state::nmi_disable_w)

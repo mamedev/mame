@@ -604,9 +604,9 @@ void itech8_update_interrupts(running_machine &machine, int periodic, int tms340
  *
  *************************************/
 
-static TIMER_CALLBACK( irq_off )
+TIMER_CALLBACK_MEMBER(itech8_state::irq_off)
 {
-	itech8_update_interrupts(machine, 0, -1, -1);
+	itech8_update_interrupts(machine(), 0, -1, -1);
 }
 
 
@@ -614,7 +614,7 @@ INTERRUPT_GEN_MEMBER(itech8_state::generate_nmi)
 {
 	/* signal the NMI */
 	itech8_update_interrupts(machine(), 1, -1, -1);
-	machine().scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off));
+	machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(itech8_state::irq_off),this));
 
 	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", machine().primary_screen->vpos());
 }
@@ -640,13 +640,13 @@ static void generate_sound_irq(device_t *device, int state)
  *
  *************************************/
 
-static TIMER_CALLBACK( behind_the_beam_update );
+
 
 
 MACHINE_START_MEMBER(itech8_state,sstrike)
 {
 	/* we need to update behind the beam as well */
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(behind_the_beam_update), 32);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(itech8_state::behind_the_beam_update),this), 32);
 }
 
 void itech8_state::machine_reset()
@@ -676,20 +676,20 @@ void itech8_state::machine_reset()
  *
  *************************************/
 
-static TIMER_CALLBACK( behind_the_beam_update )
+TIMER_CALLBACK_MEMBER(itech8_state::behind_the_beam_update)
 {
 	int scanline = param >> 8;
 	int interval = param & 0xff;
 
 	/* force a partial update to the current scanline */
-	machine.primary_screen->update_partial(scanline);
+	machine().primary_screen->update_partial(scanline);
 
 	/* advance by the interval, and wrap to 0 */
 	scanline += interval;
 	if (scanline >= 256) scanline = 0;
 
 	/* set a new timer */
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(behind_the_beam_update), (scanline << 8) + interval);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(itech8_state::behind_the_beam_update),this), (scanline << 8) + interval);
 }
 
 
@@ -779,17 +779,16 @@ WRITE8_MEMBER(itech8_state::ym2203_portb_out)
  *
  *************************************/
 
-static TIMER_CALLBACK( delayed_sound_data_w )
+TIMER_CALLBACK_MEMBER(itech8_state::delayed_sound_data_w)
 {
-	itech8_state *state = machine.driver_data<itech8_state>();
-	state->m_sound_data = param;
-	machine.device("soundcpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	m_sound_data = param;
+	machine().device("soundcpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
 WRITE8_MEMBER(itech8_state::sound_data_w)
 {
-	machine().scheduler().synchronize(FUNC(delayed_sound_data_w), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(itech8_state::delayed_sound_data_w),this), data);
 }
 
 
@@ -800,7 +799,7 @@ WRITE8_MEMBER(itech8_state::gtg2_sound_data_w)
 	       ((data & 0x5d) << 1) |
 	       ((data & 0x20) >> 3) |
 	       ((data & 0x02) << 5);
-	machine().scheduler().synchronize(FUNC(delayed_sound_data_w), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(itech8_state::delayed_sound_data_w),this), data);
 }
 
 

@@ -32,6 +32,7 @@ public:
 	INPUT_CHANGED_MEMBER(cchasm_set_coin_flag);
 	DECLARE_WRITE_LINE_MEMBER(cchasm_6840_irq);
 	virtual void video_start();
+	TIMER_CALLBACK_MEMBER(cchasm_refresh_end);
 };
 
 /*----------- defined in audio/cchasm.c -----------*/

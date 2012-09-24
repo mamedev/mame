@@ -74,4 +74,5 @@ public:
 	virtual void video_start();
 	DECLARE_VIDEO_START(nbmj8891_1layer);
 	UINT32 screen_update_nbmj8891(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(blitter_timer_callback);
 };

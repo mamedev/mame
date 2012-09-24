@@ -562,10 +562,10 @@ WRITE32_MEMBER(segas32_state::interrupt_control_32_w)
 }
 
 
-static TIMER_CALLBACK( end_of_vblank_int )
+TIMER_CALLBACK_MEMBER(segas32_state::end_of_vblank_int)
 {
-	signal_v60_irq(machine, MAIN_IRQ_VBSTOP);
-	system32_set_vblank(machine, 0);
+	signal_v60_irq(machine(), MAIN_IRQ_VBSTOP);
+	system32_set_vblank(machine(), 0);
 }
 
 
@@ -573,7 +573,7 @@ INTERRUPT_GEN_MEMBER(segas32_state::start_of_vblank_int)
 {
 	signal_v60_irq(machine(), MAIN_IRQ_VBSTART);
 	system32_set_vblank(machine(), 1);
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(end_of_vblank_int));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(segas32_state::end_of_vblank_int),this));
 	if (m_system32_prot_vblank)
 		(*m_system32_prot_vblank)(&device);
 }

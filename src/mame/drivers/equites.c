@@ -395,32 +395,30 @@ D                                                                               
 
 /******************************************************************************/
 
-static TIMER_CALLBACK( equites_nmi_callback )
+TIMER_CALLBACK_MEMBER(equites_state::equites_nmi_callback)
 {
-	equites_state *state = machine.driver_data<equites_state>();
-	state->m_audio_cpu->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audio_cpu->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static TIMER_CALLBACK( equites_frq_adjuster_callback )
+TIMER_CALLBACK_MEMBER(equites_state::equites_frq_adjuster_callback)
 {
-	equites_state *state = machine.driver_data<equites_state>();
-	UINT8 frq = state->ioport(FRQ_ADJUSTER_TAG)->read();
+	UINT8 frq = ioport(FRQ_ADJUSTER_TAG)->read();
 
-	msm5232_set_clock(state->m_msm, MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
-//popmessage("8155: C %02x A %02x  AY: A %02x B %02x Unk:%x", state->m_eq8155_port_c, state->m_eq8155_port_a, state->m_ay_port_a, state->m_ay_port_b, state->m_eq_cymbal_ctrl & 15);
+	msm5232_set_clock(m_msm, MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
+//popmessage("8155: C %02x A %02x  AY: A %02x B %02x Unk:%x", m_eq8155_port_c, m_eq8155_port_a, m_ay_port_a, m_ay_port_b, m_eq_cymbal_ctrl & 15);
 
-	state->m_cymvol *= 0.94f;
-	state->m_hihatvol *= 0.94f;
+	m_cymvol *= 0.94f;
+	m_hihatvol *= 0.94f;
 
-	state->m_msm->set_output_gain(10, state->m_hihatvol + state->m_cymvol * (state->m_ay_port_b & 3) * 0.33);	/* NO from msm5232 */
+	m_msm->set_output_gain(10, m_hihatvol + m_cymvol * (m_ay_port_b & 3) * 0.33);	/* NO from msm5232 */
 }
 
 static SOUND_START(equites)
 {
 	equites_state *state = machine.driver_data<equites_state>();
-	state->m_nmi_timer = machine.scheduler().timer_alloc(FUNC(equites_nmi_callback));
+	state->m_nmi_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(equites_state::equites_nmi_callback),state));
 
-	state->m_adjuster_timer = machine.scheduler().timer_alloc(FUNC(equites_frq_adjuster_callback));
+	state->m_adjuster_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(equites_state::equites_frq_adjuster_callback),state));
 	state->m_adjuster_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }
 

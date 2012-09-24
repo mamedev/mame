@@ -86,20 +86,19 @@ READ8_MEMBER(bublbobl_state::tokiob_mcu_r)
 }
 
 
-static TIMER_CALLBACK( nmi_callback )
+TIMER_CALLBACK_MEMBER(bublbobl_state::nmi_callback)
 {
-	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
-	if (state->m_sound_nmi_enable)
-		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_sound_nmi_enable)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
-		state->m_pending_nmi = 1;
+		m_pending_nmi = 1;
 }
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	machine().scheduler().synchronize(FUNC(nmi_callback), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bublbobl_state::nmi_callback),this), data);
 }
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_sh_nmi_disable_w)
@@ -367,16 +366,16 @@ READ8_MEMBER(bublbobl_state::boblbobl_ic43_b_r)
  The following is ENTIRELY GUESSWORK!!!
 
 ***************************************************************************/
-static TIMER_CALLBACK( bublbobl_m68705_irq_ack )
+TIMER_CALLBACK_MEMBER(bublbobl_state::bublbobl_m68705_irq_ack)
 {
-	machine.device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(bublbobl_state::bublbobl_m68705_interrupt)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
 
-	machine().scheduler().timer_set(attotime::from_msec(1000/60), FUNC(bublbobl_m68705_irq_ack)); /* TODO: understand how this is ack'ed */
+	machine().scheduler().timer_set(attotime::from_msec(1000/60), timer_expired_delegate(FUNC(bublbobl_state::bublbobl_m68705_irq_ack),this)); /* TODO: understand how this is ack'ed */
 }
 
 

@@ -97,15 +97,15 @@ other supported games as well.
 
 
 
-static TIMER_CALLBACK( m72_scanline_interrupt );
-static TIMER_CALLBACK( kengo_scanline_interrupt );
+
+
 
 /***************************************************************************/
 
 MACHINE_START_MEMBER(m72_state,m72)
 {
 	m_audio = machine().device("m72");
-	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(m72_scanline_interrupt));
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m72_state::m72_scanline_interrupt),this));
 
 	save_item(NAME(m_mcu_sample_addr));
 	save_item(NAME(m_mcu_snd_cmd_latch));
@@ -113,16 +113,16 @@ MACHINE_START_MEMBER(m72_state,m72)
 
 MACHINE_START_MEMBER(m72_state,kengo)
 {
-	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(kengo_scanline_interrupt));
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m72_state::kengo_scanline_interrupt),this));
 
 	save_item(NAME(m_mcu_sample_addr));
 	save_item(NAME(m_mcu_snd_cmd_latch));
 }
 
-static TIMER_CALLBACK( synch_callback )
+TIMER_CALLBACK_MEMBER(m72_state::synch_callback)
 {
-	//machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(8000000));
-	machine.scheduler().boost_interleave(attotime::from_hz(MASTER_CLOCK/4/12), attotime::from_seconds(25));
+	//machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(8000000));
+	machine().scheduler().boost_interleave(attotime::from_hz(MASTER_CLOCK/4/12), attotime::from_seconds(25));
 }
 
 MACHINE_RESET_MEMBER(m72_state,m72)
@@ -132,7 +132,7 @@ MACHINE_RESET_MEMBER(m72_state,m72)
 	m_mcu_snd_cmd_latch = 0;
 
 	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(0));
-	machine().scheduler().synchronize(FUNC(synch_callback));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::synch_callback),this));
 }
 
 MACHINE_RESET_MEMBER(m72_state,xmultipl)
@@ -146,58 +146,56 @@ MACHINE_RESET_MEMBER(m72_state,kengo)
 	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(0));
 }
 
-static TIMER_CALLBACK( m72_scanline_interrupt )
+TIMER_CALLBACK_MEMBER(m72_state::m72_scanline_interrupt)
 {
-	m72_state *state = machine.driver_data<m72_state>();
 	int scanline = param;
 
 	/* raster interrupt - visible area only? */
-	if (scanline < 256 && scanline == state->m_raster_irq_position - 128)
+	if (scanline < 256 && scanline == m_raster_irq_position - 128)
 	{
-		machine.primary_screen->update_partial(scanline);
-		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_irq_base + 2);
+		machine().primary_screen->update_partial(scanline);
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, m_irq_base + 2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == 256)
 	{
-		machine.primary_screen->update_partial(scanline);
-		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_irq_base + 0);
+		machine().primary_screen->update_partial(scanline);
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, m_irq_base + 0);
 	}
 
 	/* adjust for next scanline */
-	if (++scanline >= machine.primary_screen->height())
+	if (++scanline >= machine().primary_screen->height())
 		scanline = 0;
-	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
-static TIMER_CALLBACK( kengo_scanline_interrupt )
+TIMER_CALLBACK_MEMBER(m72_state::kengo_scanline_interrupt)
 {
-	m72_state *state = machine.driver_data<m72_state>();
 	int scanline = param;
 
 	/* raster interrupt - visible area only? */
-	if (scanline < 256 && scanline == state->m_raster_irq_position - 128)
+	if (scanline < 256 && scanline == m_raster_irq_position - 128)
 	{
-		machine.primary_screen->update_partial(scanline);
-		machine.device("maincpu")->execute().set_input_line(NEC_INPUT_LINE_INTP2, ASSERT_LINE);
+		machine().primary_screen->update_partial(scanline);
+		machine().device("maincpu")->execute().set_input_line(NEC_INPUT_LINE_INTP2, ASSERT_LINE);
 	}
 	else
-		machine.device("maincpu")->execute().set_input_line(NEC_INPUT_LINE_INTP2, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(NEC_INPUT_LINE_INTP2, CLEAR_LINE);
 
 	/* VBLANK interrupt */
 	if (scanline == 256)
 	{
-		machine.primary_screen->update_partial(scanline);
-		machine.device("maincpu")->execute().set_input_line(NEC_INPUT_LINE_INTP0, ASSERT_LINE);
+		machine().primary_screen->update_partial(scanline);
+		machine().device("maincpu")->execute().set_input_line(NEC_INPUT_LINE_INTP0, ASSERT_LINE);
 	}
 	else
-		machine.device("maincpu")->execute().set_input_line(NEC_INPUT_LINE_INTP0, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(NEC_INPUT_LINE_INTP0, CLEAR_LINE);
 
 	/* adjust for next scanline */
-	if (++scanline >= machine.primary_screen->height())
+	if (++scanline >= machine().primary_screen->height())
 		scanline = 0;
-	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 /***************************************************************************
@@ -215,7 +213,7 @@ The protection device does
 
 ***************************************************************************/
 
-static TIMER_CALLBACK( delayed_ram16_w )
+TIMER_CALLBACK_MEMBER(m72_state::delayed_ram16_w)
 {
 	UINT16 val = ((UINT32) param) & 0xffff;
 	UINT16 offset = (((UINT32) param) >> 16) & 0xffff;
@@ -256,7 +254,7 @@ WRITE16_MEMBER(m72_state::m72_main_mcu_w)
 		//machine().scheduler().timer_set(machine().device<cpu_device>("mcu")->cycles_to_attotime(0), FUNC(mcu_irq0_raise));
 	}
 	else
-		machine().scheduler().synchronize( FUNC(delayed_ram16_w), (offset<<16) | val, m_protection_ram);
+		machine().scheduler().synchronize( timer_expired_delegate(FUNC(m72_state::delayed_ram16_w),this), (offset<<16) | val, m_protection_ram);
 }
 
 WRITE8_MEMBER(m72_state::m72_mcu_data_w)
@@ -265,7 +263,7 @@ WRITE8_MEMBER(m72_state::m72_mcu_data_w)
 	if (offset&1) val = (m_protection_ram[offset/2] & 0x00ff) | (data << 8);
 	else val = (m_protection_ram[offset/2] & 0xff00) | (data&0xff);
 
-	machine().scheduler().synchronize( FUNC(delayed_ram16_w), ((offset >>1 ) << 16) | val, m_protection_ram);
+	machine().scheduler().synchronize( timer_expired_delegate(FUNC(m72_state::delayed_ram16_w),this), ((offset >>1 ) << 16) | val, m_protection_ram);
 }
 
 READ8_MEMBER(m72_state::m72_mcu_data_r)

@@ -98,9 +98,9 @@ WRITE32_MEMBER(groundfx_state::color_ram_w)
                 INTERRUPTS
 ***********************************************************/
 
-static TIMER_CALLBACK( groundfx_interrupt5 )
+TIMER_CALLBACK_MEMBER(groundfx_state::groundfx_interrupt5)
 {
-	machine.device("maincpu")->execute().set_input_line(5, HOLD_LINE); //from 5... ADC port
+	machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE); //from 5... ADC port
 }
 
 
@@ -173,7 +173,7 @@ WRITE32_MEMBER(groundfx_state::groundfx_adc_w)
 {
 	/* One interrupt per input port (4 per frame, though only 2 used).
         1000 cycle delay is arbitrary */
-	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), FUNC(groundfx_interrupt5));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), timer_expired_delegate(FUNC(groundfx_state::groundfx_interrupt5),this));
 }
 
 WRITE32_MEMBER(groundfx_state::rotate_control_w)/* only a guess that it's rotation */

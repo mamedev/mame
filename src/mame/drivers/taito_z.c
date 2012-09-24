@@ -1019,18 +1019,16 @@ WRITE16_MEMBER(taitoz_state::dblaxle_cpua_ctrl_w)
 
 /* 68000 A */
 
-static TIMER_CALLBACK( taitoz_interrupt6 )
+TIMER_CALLBACK_MEMBER(taitoz_state::taitoz_interrupt6)
 {
-	taitoz_state *state = machine.driver_data<taitoz_state>();
-	state->m_maincpu->set_input_line(6, HOLD_LINE);
+	m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 /* 68000 B */
 
-static TIMER_CALLBACK( taitoz_cpub_interrupt5 )
+TIMER_CALLBACK_MEMBER(taitoz_state::taitoz_cpub_interrupt5)
 {
-	taitoz_state *state = machine.driver_data<taitoz_state>();
-	state->m_subcpu->set_input_line(5, HOLD_LINE);
+	m_subcpu->set_input_line(5, HOLD_LINE);
 }
 
 
@@ -1045,7 +1043,7 @@ INTERRUPT_GEN_MEMBER(taitoz_state::sci_interrupt)
 	m_sci_int6 = !m_sci_int6;
 
 	if (m_sci_int6)
-		machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), FUNC(taitoz_interrupt6));
+		machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), timer_expired_delegate(FUNC(taitoz_state::taitoz_interrupt6),this));
 
 	device.execute().set_input_line(4, HOLD_LINE);
 }
@@ -1229,7 +1227,7 @@ WRITE16_MEMBER(taitoz_state::bshark_stick_w)
        but we don't want CPUA to have an int6 before int4 is over (?)
     */
 
-	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), FUNC(taitoz_interrupt6));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), timer_expired_delegate(FUNC(taitoz_state::taitoz_interrupt6),this));
 }
 
 
@@ -1294,7 +1292,7 @@ WRITE16_MEMBER(taitoz_state::spacegun_lightgun_w)
        Four lightgun interrupts happen before the collected coords
        are moved to shared ram where CPUA can use them. */
 
-	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), FUNC(taitoz_cpub_interrupt5));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), timer_expired_delegate(FUNC(taitoz_state::taitoz_cpub_interrupt5),this));
 }
 
 WRITE16_MEMBER(taitoz_state::spacegun_gun_output_w)

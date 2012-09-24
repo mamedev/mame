@@ -632,16 +632,15 @@ WRITE16_HANDLER( hd68k_adsp_buffer_w )
  *
  *************************************/
 
-static TIMER_CALLBACK( deferred_adsp_bank_switch )
+TIMER_CALLBACK_MEMBER(harddriv_state::deferred_adsp_bank_switch)
 {
-	harddriv_state *state = machine.driver_data<harddriv_state>();
-	if (LOG_COMMANDS && state->m_m68k_adsp_buffer_bank != param && machine.input().code_pressed(KEYCODE_L))
+	if (LOG_COMMANDS && m_m68k_adsp_buffer_bank != param && machine().input().code_pressed(KEYCODE_L))
 	{
 		static FILE *commands;
 		if (!commands) commands = fopen("commands.log", "w");
 		if (commands)
 		{
-			INT16 *base = (INT16 *)&state->m_som_memory[param * 0x2000];
+			INT16 *base = (INT16 *)&m_som_memory[param * 0x2000];
 			INT16 *end = base + (UINT16)*base;
 			INT16 *current = base + 1;
 			INT16 *table = base + 1 + (UINT16)*current++;
@@ -679,7 +678,7 @@ static TIMER_CALLBACK( deferred_adsp_bank_switch )
 		}
 	}
 
-	state->m_m68k_adsp_buffer_bank = param;
+	m_m68k_adsp_buffer_bank = param;
 	logerror("ADSP bank = %d\n", param);
 }
 
@@ -702,7 +701,7 @@ WRITE16_HANDLER( hd68k_adsp_control_w )
 
 		case 3:
 			logerror("ADSP bank = %d (deferred)\n", val);
-			space.machine().scheduler().synchronize(FUNC(deferred_adsp_bank_switch), val);
+			space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(harddriv_state::deferred_adsp_bank_switch),state), val);
 			break;
 
 		case 5:
@@ -1308,10 +1307,9 @@ READ16_HANDLER( hd68k_dsk_dsp32_r )
  *
  *************************************/
 
-static TIMER_CALLBACK( rddsp32_sync_cb )
+TIMER_CALLBACK_MEMBER(harddriv_state::rddsp32_sync_cb)
 {
-	harddriv_state *state = machine.driver_data<harddriv_state>();
-	*state->m_dataptr[param] = state->m_dataval[param];
+	*m_dataptr[param] = m_dataval[param];
 }
 
 
@@ -1325,7 +1323,7 @@ WRITE32_HANDLER( rddsp32_sync0_w )
 		COMBINE_DATA(&newdata);
 		state->m_dataptr[state->m_next_msp_sync % MAX_MSP_SYNC] = dptr;
 		state->m_dataval[state->m_next_msp_sync % MAX_MSP_SYNC] = newdata;
-		space.machine().scheduler().synchronize(FUNC(rddsp32_sync_cb), state->m_next_msp_sync++ % MAX_MSP_SYNC);
+		space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(harddriv_state::rddsp32_sync_cb),state), state->m_next_msp_sync++ % MAX_MSP_SYNC);
 	}
 	else
 		COMBINE_DATA(&state->m_rddsp32_sync[0][offset]);
@@ -1342,7 +1340,7 @@ WRITE32_HANDLER( rddsp32_sync1_w )
 		COMBINE_DATA(&newdata);
 		state->m_dataptr[state->m_next_msp_sync % MAX_MSP_SYNC] = dptr;
 		state->m_dataval[state->m_next_msp_sync % MAX_MSP_SYNC] = newdata;
-		space.machine().scheduler().synchronize(FUNC(rddsp32_sync_cb), state->m_next_msp_sync++ % MAX_MSP_SYNC);
+		space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(harddriv_state::rddsp32_sync_cb),state), state->m_next_msp_sync++ % MAX_MSP_SYNC);
 	}
 	else
 		COMBINE_DATA(&state->m_rddsp32_sync[1][offset]);

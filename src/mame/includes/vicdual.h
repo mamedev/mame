@@ -78,6 +78,7 @@ public:
 	UINT32 screen_update_vicdual_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_vicdual_bw_or_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_vicdual_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(clear_coin_status);
 };
 
 /*----------- defined in drivers/vicdual.c -----------*/

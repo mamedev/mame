@@ -303,6 +303,10 @@ public:
 	DECLARE_VIDEO_START(screwloo);
 	UINT32 screen_update_gottlieb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gottlieb_interrupt);
+	TIMER_CALLBACK_MEMBER(laserdisc_philips_callback);
+	TIMER_CALLBACK_MEMBER(laserdisc_bit_off_callback);
+	TIMER_CALLBACK_MEMBER(laserdisc_bit_callback);
+	TIMER_CALLBACK_MEMBER(nmi_clear);
 };
 
 /*----------- defined in video/gottlieb.c -----------*/

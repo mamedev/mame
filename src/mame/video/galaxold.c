@@ -32,8 +32,8 @@ static void dambustr_modify_spritecode(running_machine &machine, UINT8 *spritera
 
 static void drivfrcg_modify_color(UINT8 *color);
 
-static TIMER_CALLBACK( stars_blink_callback );
-static TIMER_CALLBACK( stars_scroll_callback );
+
+
 
        void galaxold_init_stars(running_machine &machine, int colors_offset);
 static void     noop_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1367,8 +1367,8 @@ void galaxold_init_stars(running_machine &machine, int colors_offset)
 
 	state->m_stars_on = 0;
 	state->m_stars_blink_state = 0;
-	state->m_stars_blink_timer = machine.scheduler().timer_alloc(FUNC(stars_blink_callback));
-	state->m_stars_scroll_timer = machine.scheduler().timer_alloc(FUNC(stars_scroll_callback));
+	state->m_stars_blink_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(galaxold_state::stars_blink_callback),state));
+	state->m_stars_scroll_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(galaxold_state::stars_scroll_callback),state));
 	state->m_timer_adjusted = 0;
 	state->m_stars_colors_start = colors_offset;
 
@@ -1604,10 +1604,9 @@ static void mariner_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, c
 	}
 }
 
-static TIMER_CALLBACK( stars_blink_callback )
+TIMER_CALLBACK_MEMBER(galaxold_state::stars_blink_callback)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	state->m_stars_blink_state++;
+	m_stars_blink_state++;
 }
 
 static void start_stars_blink_timer(running_machine &machine, double ra, double rb, double c)
@@ -1621,12 +1620,11 @@ static void start_stars_blink_timer(running_machine &machine, double ra, double 
 }
 
 
-static TIMER_CALLBACK( stars_scroll_callback )
+TIMER_CALLBACK_MEMBER(galaxold_state::stars_scroll_callback)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	if (state->m_stars_on)
+	if (m_stars_on)
 	{
-		state->m_stars_scrollpos++;
+		m_stars_scrollpos++;
 	}
 }
 

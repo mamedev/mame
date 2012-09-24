@@ -597,10 +597,10 @@ WRITE32_MEMBER(konamigx_state::ccu_w)
     12Mhz dotclock: 42.7us(clear) / 341.3us(transfer)
 */
 
-static TIMER_CALLBACK( dmaend_callback )
+TIMER_CALLBACK_MEMBER(konamigx_state::dmaend_callback)
 {
 	// foul-proof (CPU0 could be deactivated while we wait)
-	if (resume_trigger && suspension_active) { suspension_active = 0; machine.scheduler().trigger(resume_trigger); }
+	if (resume_trigger && suspension_active) { suspension_active = 0; machine().scheduler().trigger(resume_trigger); }
 
 	// DMA busy flag must be cleared before triggering IRQ 3
 	gx_rdport1_3 &= ~2;
@@ -612,7 +612,7 @@ static TIMER_CALLBACK( dmaend_callback )
 
 		// lower OBJINT-REQ flag and trigger interrupt
 		gx_rdport1_3 &= ~0x80;
-		machine.device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 	}
 }
 
@@ -3729,7 +3729,7 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 	snd020_hack = 0;
 	resume_trigger = 0;
 
-	dmadelay_timer = machine().scheduler().timer_alloc(FUNC(dmaend_callback));
+	dmadelay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(konamigx_state::dmaend_callback),this));
 	i = match = 0;
 	while ((gameDefs[i].cfgport != -1) && (!match))
 	{

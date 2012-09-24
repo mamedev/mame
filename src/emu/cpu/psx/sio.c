@@ -157,7 +157,7 @@ void psxsio_device::sio_timer_adjust( int n_port )
 	sio->timer->adjust( n_time, n_port);
 }
 
-void psxsio_device::sio_clock(void *ptr, int param)
+TIMER_CALLBACK_MEMBER(psxsio_device::sio_clock)
 {
 	int n_port = param;
 	psx_sio *sio = &port[ n_port ];

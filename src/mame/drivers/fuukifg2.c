@@ -414,28 +414,25 @@ static const ym3812_interface fuuki16_ym3812_intf =
             also used for water effects and titlescreen linescroll on gogomile
 */
 
-static TIMER_CALLBACK( level_1_interrupt_callback )
+TIMER_CALLBACK_MEMBER(fuuki16_state::level_1_interrupt_callback)
 {
-	fuuki16_state *state = machine.driver_data<fuuki16_state>();
-	state->m_maincpu->set_input_line(1, HOLD_LINE);
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(248), FUNC(level_1_interrupt_callback));
+	m_maincpu->set_input_line(1, HOLD_LINE);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(248), timer_expired_delegate(FUNC(fuuki16_state::level_1_interrupt_callback),this));
 }
 
 
-static TIMER_CALLBACK( vblank_interrupt_callback )
+TIMER_CALLBACK_MEMBER(fuuki16_state::vblank_interrupt_callback)
 {
-	fuuki16_state *state = machine.driver_data<fuuki16_state>();
-	state->m_maincpu->set_input_line(3, HOLD_LINE);	// VBlank IRQ
-	machine.scheduler().timer_set(machine.primary_screen->time_until_vblank_start(), FUNC(vblank_interrupt_callback));
+	m_maincpu->set_input_line(3, HOLD_LINE);	// VBlank IRQ
+	machine().scheduler().timer_set(machine().primary_screen->time_until_vblank_start(), timer_expired_delegate(FUNC(fuuki16_state::vblank_interrupt_callback),this));
 }
 
 
-static TIMER_CALLBACK( raster_interrupt_callback )
+TIMER_CALLBACK_MEMBER(fuuki16_state::raster_interrupt_callback)
 {
-	fuuki16_state *state = machine.driver_data<fuuki16_state>();
-	state->m_maincpu->set_input_line(5, HOLD_LINE);	// Raster Line IRQ
-	machine.primary_screen->update_partial(machine.primary_screen->vpos());
-	state->m_raster_interrupt_timer->adjust(machine.primary_screen->frame_period());
+	m_maincpu->set_input_line(5, HOLD_LINE);	// Raster Line IRQ
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_raster_interrupt_timer->adjust(machine().primary_screen->frame_period());
 }
 
 
@@ -448,7 +445,7 @@ void fuuki16_state::machine_start()
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
-	m_raster_interrupt_timer = machine().scheduler().timer_alloc(FUNC(raster_interrupt_callback));
+	m_raster_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fuuki16_state::raster_interrupt_callback),this));
 }
 
 
@@ -456,8 +453,8 @@ void fuuki16_state::machine_reset()
 {
 	const rectangle &visarea = machine().primary_screen->visible_area();
 
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(248), FUNC(level_1_interrupt_callback));
-	machine().scheduler().timer_set(machine().primary_screen->time_until_vblank_start(), FUNC(vblank_interrupt_callback));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(248), timer_expired_delegate(FUNC(fuuki16_state::level_1_interrupt_callback),this));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_vblank_start(), timer_expired_delegate(FUNC(fuuki16_state::vblank_interrupt_callback),this));
 	m_raster_interrupt_timer->adjust(machine().primary_screen->time_until_pos(0, visarea.max_x + 1));
 }
 

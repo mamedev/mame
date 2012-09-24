@@ -56,7 +56,7 @@ WRITE8_MEMBER(hyhoo_state::hyhoo_romsel_w)
 }
 
 
-static TIMER_CALLBACK( blitter_timer_callback )
+TIMER_CALLBACK_MEMBER(hyhoo_state::blitter_timer_callback)
 {
 	nb1413m3_busyflag = 1;
 }
@@ -218,7 +218,7 @@ static void hyhoo_gfxdraw(running_machine &machine)
 	}
 
 	nb1413m3_busyflag = 0;
-	machine.scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, FUNC(blitter_timer_callback));
+	machine.scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, timer_expired_delegate(FUNC(hyhoo_state::blitter_timer_callback),state));
 }
 
 

@@ -95,6 +95,10 @@ public:
 	UINT32 screen_update_itech8_2page(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_itech8_2page_large(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(generate_nmi);
+	TIMER_CALLBACK_MEMBER(irq_off);
+	TIMER_CALLBACK_MEMBER(behind_the_beam_update);
+	TIMER_CALLBACK_MEMBER(delayed_sound_data_w);
+	TIMER_CALLBACK_MEMBER(blitter_done);
 };
 
 

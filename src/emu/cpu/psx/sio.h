@@ -82,7 +82,7 @@ protected:
 private:
 	void sio_interrupt( int n_port );
 	void sio_timer_adjust( int n_port );
-	void sio_clock(void *ptr, int param);
+	TIMER_CALLBACK_MEMBER(sio_clock);
 
 	psx_sio port[2];
 };

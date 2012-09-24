@@ -108,12 +108,11 @@ static void gijoe_objdma( running_machine &machine )
 	}
 }
 
-static TIMER_CALLBACK( dmaend_callback )
+TIMER_CALLBACK_MEMBER(gijoe_state::dmaend_callback)
 {
-	gijoe_state *state = machine.driver_data<gijoe_state>();
 
-	if (state->m_cur_control2 & 0x0020)
-		state->m_maincpu->set_input_line(6, HOLD_LINE);
+	if (m_cur_control2 & 0x0020)
+		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(gijoe_state::gijoe_interrupt)
@@ -280,7 +279,7 @@ void gijoe_state::machine_start()
 	m_k053246 = machine().device("k053246");
 	m_k053251 = machine().device("k053251");
 
-	m_dmadelay_timer = machine().scheduler().timer_alloc(FUNC(dmaend_callback));
+	m_dmadelay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gijoe_state::dmaend_callback),this));
 
 	save_item(NAME(m_cur_control2));
 }

@@ -296,15 +296,14 @@ static TIMER_DEVICE_CALLBACK( mcu_interrupt )
 }
 
 
-static TIMER_CALLBACK( namconb1_TriggerPOSIRQ )
+TIMER_CALLBACK_MEMBER(namconb1_state::namconb1_TriggerPOSIRQ)
 {
-	namconb1_state *state = machine.driver_data<namconb1_state>();
-	if(state->m_pos_irq_active || !(state->m_namconb_cpureg[0x02] & 0xf0))
+	if(m_pos_irq_active || !(m_namconb_cpureg[0x02] & 0xf0))
 		return;
 
-	machine.primary_screen->update_partial(param);
-	state->m_pos_irq_active = 1;
-	machine.device("maincpu")->execute().set_input_line(state->m_namconb_cpureg[0x02] & 0xf, ASSERT_LINE);
+	machine().primary_screen->update_partial(param);
+	m_pos_irq_active = 1;
+	machine().device("maincpu")->execute().set_input_line(m_namconb_cpureg[0x02] & 0xf, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(namconb1_state::namconb1_interrupt)
@@ -356,17 +355,16 @@ INTERRUPT_GEN_MEMBER(namconb1_state::namconb1_interrupt)
 	}
 	if( scanline < NAMCONB1_VBSTART )
 	{
-		machine().scheduler().timer_set( machine().primary_screen->time_until_pos(scanline), FUNC(namconb1_TriggerPOSIRQ ), scanline);
+		machine().scheduler().timer_set( machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(namconb1_state::namconb1_TriggerPOSIRQ),this), scanline);
 	}
 } /* namconb1_interrupt */
 
 
-static TIMER_CALLBACK( namconb2_TriggerPOSIRQ )
+TIMER_CALLBACK_MEMBER(namconb1_state::namconb2_TriggerPOSIRQ)
 {
-	namconb1_state *state = machine.driver_data<namconb1_state>();
-	machine.primary_screen->update_partial(param);
-	state->m_pos_irq_active = 1;
-	machine.device("maincpu")->execute().set_input_line(state->m_namconb_cpureg[0x02], ASSERT_LINE);
+	machine().primary_screen->update_partial(param);
+	m_pos_irq_active = 1;
+	machine().device("maincpu")->execute().set_input_line(m_namconb_cpureg[0x02], ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(namconb1_state::namconb2_interrupt)
@@ -411,7 +409,7 @@ INTERRUPT_GEN_MEMBER(namconb1_state::namconb2_interrupt)
 		scanline = 0;
 
 	if( scanline < NAMCONB1_VBSTART )
-		machine().scheduler().timer_set( machine().primary_screen->time_until_pos(scanline), FUNC(namconb2_TriggerPOSIRQ ), scanline);
+		machine().scheduler().timer_set( machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(namconb1_state::namconb2_TriggerPOSIRQ),this), scanline);
 } /* namconb2_interrupt */
 
 static void namconb1_cpureg8_w(running_machine &machine, int reg, UINT8 data)

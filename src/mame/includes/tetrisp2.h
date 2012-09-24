@@ -110,6 +110,10 @@ public:
 	UINT32 screen_update_rockntread(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_rocknms_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_rocknms_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(rockn_timer_level4_callback);
+	TIMER_CALLBACK_MEMBER(rockn_timer_sub_level4_callback);
+	TIMER_CALLBACK_MEMBER(rockn_timer_level1_callback);
+	TIMER_CALLBACK_MEMBER(rockn_timer_sub_level1_callback);
 };
 
 class stepstag_state : public tetrisp2_state

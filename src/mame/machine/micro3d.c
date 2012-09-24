@@ -258,12 +258,11 @@ INLINE INT64 normalised_multiply(INT32 a, INT32 b)
 	return result >> 14;
 }
 
-static TIMER_CALLBACK( mac_done_callback )
+TIMER_CALLBACK_MEMBER(micro3d_state::mac_done_callback)
 {
-	micro3d_state *state = machine.driver_data<micro3d_state>();
 
-	machine.device("drmath")->execute().set_input_line(AM29000_INTR0, ASSERT_LINE);
-	state->m_mac_stat = 0;
+	machine().device("drmath")->execute().set_input_line(AM29000_INTR0, ASSERT_LINE);
+	m_mac_stat = 0;
 }
 
 
@@ -466,7 +465,7 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 
 	/* TODO: Calculate a better estimate for timing */
 	if (m_mac_stat)
-		machine().scheduler().timer_set(attotime::from_hz(MAC_CLK) * mac_cycles, FUNC(mac_done_callback));
+		machine().scheduler().timer_set(attotime::from_hz(MAC_CLK) * mac_cycles, timer_expired_delegate(FUNC(micro3d_state::mac_done_callback),this));
 
 	m_mrab11 = mrab11;
 	m_vtx_addr = vtx_addr;
@@ -497,21 +496,20 @@ READ16_MEMBER(micro3d_state::micro3d_encoder_l_r)
 	return ((y_encoder & 0xff) << 8) | (x_encoder & 0xff);
 }
 
-static TIMER_CALLBACK( adc_done_callback )
+TIMER_CALLBACK_MEMBER(micro3d_state::adc_done_callback)
 {
-	micro3d_state *state = machine.driver_data<micro3d_state>();
 
 	switch (param)
 	{
-		case 0: state->m_adc_val = state->ioport("THROTTLE")->read_safe(0);
+		case 0: m_adc_val = ioport("THROTTLE")->read_safe(0);
 				break;
-		case 1: state->m_adc_val = (UINT8)((255.0/100.0) * state->ioport("VOLUME")->read() + 0.5);
+		case 1: m_adc_val = (UINT8)((255.0/100.0) * ioport("VOLUME")->read() + 0.5);
 				break;
 		case 2: break;
 		case 3: break;
 	}
 
-//  mc68901_int_gen(machine, GPIP3);
+//  mc68901_int_gen(machine(), GPIP3);
 }
 
 READ16_MEMBER(micro3d_state::micro3d_adc_r)
@@ -528,7 +526,7 @@ WRITE16_MEMBER(micro3d_state::micro3d_adc_w)
 		return;
 	}
 
-	machine().scheduler().timer_set(attotime::from_usec(40), FUNC(adc_done_callback), data & ~4);
+	machine().scheduler().timer_set(attotime::from_usec(40), timer_expired_delegate(FUNC(micro3d_state::adc_done_callback),this), data & ~4);
 }
 
 CUSTOM_INPUT_MEMBER(micro3d_state::botss_hwchk_r)

@@ -266,7 +266,7 @@ static void writeram_high(nbmj8688_state *state, int x, int y, int color)
 	update_pixel(state, x, y);
 }
 
-static TIMER_CALLBACK( blitter_timer_callback )
+TIMER_CALLBACK_MEMBER(nbmj8688_state::blitter_timer_callback)
 {
 	nb1413m3_busyflag = 1;
 }
@@ -525,9 +525,9 @@ static void mbmj8688_gfxdraw(running_machine &machine, int gfxtype)
 	nb1413m3_busyflag = 0;
 
 	if (gfxtype == GFXTYPE_8BIT)
-		machine.scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, FUNC(blitter_timer_callback));
+		machine.scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, timer_expired_delegate(FUNC(nbmj8688_state::blitter_timer_callback),state));
 	else
-		machine.scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, FUNC(blitter_timer_callback));
+		machine.scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, timer_expired_delegate(FUNC(nbmj8688_state::blitter_timer_callback),state));
 }
 
 

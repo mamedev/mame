@@ -454,23 +454,22 @@ WRITE16_MEMBER(coolpool_state::coolpool_misc_w)
  *
  *************************************/
 
-static TIMER_CALLBACK( deferred_iop_w )
+TIMER_CALLBACK_MEMBER(coolpool_state::deferred_iop_w)
 {
-	coolpool_state *state = machine.driver_data<coolpool_state>();
 
-	state->m_iop_cmd = param;
-	state->m_cmd_pending = 1;
-	machine.device("dsp")->execute().set_input_line(0, HOLD_LINE);	/* ???  I have no idea who should generate this! */
+	m_iop_cmd = param;
+	m_cmd_pending = 1;
+	machine().device("dsp")->execute().set_input_line(0, HOLD_LINE);	/* ???  I have no idea who should generate this! */
 															/* the DSP polls the status bit so it isn't strictly */
 															/* necessary to also have an IRQ */
-	machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 }
 
 
 WRITE16_MEMBER(coolpool_state::coolpool_iop_w)
 {
 	logerror("%08x:IOP write %04x\n", space.device().safe_pc(), data);
-	machine().scheduler().synchronize(FUNC(deferred_iop_w), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(coolpool_state::deferred_iop_w),this), data);
 }
 
 

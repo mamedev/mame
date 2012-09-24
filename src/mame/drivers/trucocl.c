@@ -44,9 +44,9 @@ WRITE8_MEMBER(trucocl_state::irq_enable_w)
 }
 
 
-static TIMER_CALLBACK( dac_irq )
+TIMER_CALLBACK_MEMBER(trucocl_state::dac_irq)
 {
-	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 WRITE8_MEMBER(trucocl_state::audio_dac_w)
@@ -76,7 +76,7 @@ WRITE8_MEMBER(trucocl_state::audio_dac_w)
 
 	device->write_unsigned8( rom[dac_address+m_cur_dac_address_index] );
 
-	machine().scheduler().timer_set( attotime::from_hz( 16000 ), FUNC(dac_irq ));
+	machine().scheduler().timer_set( attotime::from_hz( 16000 ), timer_expired_delegate(FUNC(trucocl_state::dac_irq),this));
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trucocl_state )

@@ -58,4 +58,7 @@ public:
 	DECLARE_MACHINE_RESET(namcofl);
 	DECLARE_VIDEO_START(namcofl);
 	UINT32 screen_update_namcofl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(network_interrupt_callback);
+	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
+	TIMER_CALLBACK_MEMBER(raster_interrupt_callback);
 };

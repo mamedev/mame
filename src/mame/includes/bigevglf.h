@@ -90,4 +90,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_bigevglf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(from_sound_latch_callback);
+	TIMER_CALLBACK_MEMBER(nmi_callback);
+	TIMER_CALLBACK_MEMBER(deferred_ls74_w);
 };

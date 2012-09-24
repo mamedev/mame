@@ -200,10 +200,9 @@ static void update_pixel(running_machine &machine, int vram, int x, int y)
 	state->m_tmpbitmap[vram].pix16(y, x) = color;
 }
 
-static TIMER_CALLBACK( blitter_timer_callback )
+TIMER_CALLBACK_MEMBER(nbmj9195_state::blitter_timer_callback)
 {
-	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
-	state->m_nb19010_busyflag = 1;
+	m_nb19010_busyflag = 1;
 }
 
 static void nbmj9195_gfxdraw(running_machine &machine, int vram)
@@ -364,7 +363,7 @@ static void nbmj9195_gfxdraw(running_machine &machine, int vram)
 	state->m_nb19010_busyflag = 0;
 
 	/* 1650ns per count */
-	machine.scheduler().timer_set(attotime::from_nsec(state->m_nb19010_busyctr * 1650), FUNC(blitter_timer_callback));
+	machine.scheduler().timer_set(attotime::from_nsec(state->m_nb19010_busyctr * 1650), timer_expired_delegate(FUNC(nbmj9195_state::blitter_timer_callback),state));
 }
 
 /******************************************************************************

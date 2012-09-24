@@ -1221,13 +1221,12 @@ static void configure_fast_ram(running_machine &machine)
 	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x007fffff, FALSE, state->m_work_ram);
 }
 
-static TIMER_CALLBACK(model3_sound_timer_tick)
+TIMER_CALLBACK_MEMBER(model3_state::model3_sound_timer_tick)
 {
-	model3_state *state = machine.driver_data<model3_state>();
 
-	if (state->m_sound_irq_enable)
+	if (m_sound_irq_enable)
 	{
-		model3_set_irq_line(machine, 0x40, ASSERT_LINE);
+		model3_set_irq_line(machine(), 0x40, ASSERT_LINE);
 	}
 }
 
@@ -1235,25 +1234,25 @@ MACHINE_START_MEMBER(model3_state,model3_10)
 {
 	configure_fast_ram(machine());
 
-	m_sound_timer = machine().scheduler().timer_alloc(FUNC(model3_sound_timer_tick));
+	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 }
 MACHINE_START_MEMBER(model3_state,model3_15)
 {
 	configure_fast_ram(machine());
 
-	m_sound_timer = machine().scheduler().timer_alloc(FUNC(model3_sound_timer_tick));
+	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 }
 MACHINE_START_MEMBER(model3_state,model3_20)
 {
 	configure_fast_ram(machine());
 
-	m_sound_timer = machine().scheduler().timer_alloc(FUNC(model3_sound_timer_tick));
+	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 }
 MACHINE_START_MEMBER(model3_state,model3_21)
 {
 	configure_fast_ram(machine());
 
-	m_sound_timer = machine().scheduler().timer_alloc(FUNC(model3_sound_timer_tick));
+	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 }
 
 static void model3_init(running_machine &machine, int step)

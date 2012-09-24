@@ -143,6 +143,10 @@ public:
 	UINT32 screen_update_leland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ataxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(leland_master_interrupt);
+	TIMER_CALLBACK_MEMBER(leland_interrupt_callback);
+	TIMER_CALLBACK_MEMBER(ataxx_interrupt_callback);
+	TIMER_CALLBACK_MEMBER(scanline_callback);
+	TIMER_CALLBACK_MEMBER(leland_delayed_mvram_w);
 };
 
 

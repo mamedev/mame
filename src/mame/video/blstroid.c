@@ -87,20 +87,20 @@ VIDEO_START_MEMBER(blstroid_state,blstroid)
  *
  *************************************/
 
-static TIMER_CALLBACK( irq_off )
+TIMER_CALLBACK_MEMBER(blstroid_state::irq_off)
 {
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* clear the interrupt */
 	atarigen_scanline_int_ack_w(space, 0, 0, 0xffff);
 }
 
 
-static TIMER_CALLBACK( irq_on )
+TIMER_CALLBACK_MEMBER(blstroid_state::irq_on)
 {
 	/* generate the interrupt */
-	atarigen_scanline_int_gen(machine.device("maincpu"));
-	atarigen_update_interrupts(machine);
+	atarigen_scanline_int_gen(machine().device("maincpu"));
+	atarigen_update_interrupts(machine());
 }
 
 
@@ -129,8 +129,8 @@ void blstroid_scanline_update(screen_device &screen, int scanline)
 			period_on  = screen.time_until_pos(vpos + 7, width * 0.9);
 			period_off = screen.time_until_pos(vpos + 8, width * 0.9);
 
-			screen.machine().scheduler().timer_set(period_on, FUNC(irq_on));
-			screen.machine().scheduler().timer_set(period_off, FUNC(irq_off));
+			screen.machine().scheduler().timer_set(period_on, timer_expired_delegate(FUNC(blstroid_state::irq_on),state));
+			screen.machine().scheduler().timer_set(period_off, timer_expired_delegate(FUNC(blstroid_state::irq_off),state));
 		}
 }
 

@@ -423,9 +423,9 @@ WRITE8_MEMBER(tubep_state::tubep_background_c000_w)
 }
 
 
-static TIMER_CALLBACK( sprite_timer_callback )
+TIMER_CALLBACK_MEMBER(tubep_state::sprite_timer_callback)
 {
-	machine.device("mcu")->execute().set_input_line(0, ASSERT_LINE);
+	machine().device("mcu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -558,7 +558,7 @@ WRITE8_MEMBER(tubep_state::tubep_sprite_control_w)
 			machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 
 			/* 2.assert /SINT again after this time */
-			machine().scheduler().timer_set( attotime::from_hz(19968000/8) * ((m_XSize+1)*(m_YSize+1)), FUNC(sprite_timer_callback));
+			machine().scheduler().timer_set( attotime::from_hz(19968000/8) * ((m_XSize+1)*(m_YSize+1)), timer_expired_delegate(FUNC(tubep_state::sprite_timer_callback),this));
 
 			/* 3.clear of /SINT starts sprite drawing circuit */
 			draw_sprite(machine());

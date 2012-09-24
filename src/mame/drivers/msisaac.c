@@ -22,19 +22,18 @@ TO DO:
 */
 
 
-static TIMER_CALLBACK( nmi_callback )
+TIMER_CALLBACK_MEMBER(msisaac_state::nmi_callback)
 {
-	msisaac_state *state = machine.driver_data<msisaac_state>();
-	if (state->m_sound_nmi_enable)
-		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_sound_nmi_enable)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
-		state->m_pending_nmi = 1;
+		m_pending_nmi = 1;
 }
 
 WRITE8_MEMBER(msisaac_state::sound_command_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	machine().scheduler().synchronize(FUNC(nmi_callback), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(msisaac_state::nmi_callback),this), data);
 }
 
 WRITE8_MEMBER(msisaac_state::nmi_disable_w)

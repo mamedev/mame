@@ -322,32 +322,30 @@ WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
 
 /* 68000 A */
 
-static TIMER_CALLBACK( topspeed_interrupt6  )
+TIMER_CALLBACK_MEMBER(topspeed_state::topspeed_interrupt6)
 {
-	topspeed_state *state = machine.driver_data<topspeed_state>();
-	state->m_maincpu->set_input_line(6, HOLD_LINE);
+	m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 /* 68000 B */
 
-static TIMER_CALLBACK( topspeed_cpub_interrupt6 )
+TIMER_CALLBACK_MEMBER(topspeed_state::topspeed_cpub_interrupt6)
 {
-	topspeed_state *state = machine.driver_data<topspeed_state>();
-	state->m_subcpu->set_input_line(6, HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
+	m_subcpu->set_input_line(6, HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
 }
 
 
 INTERRUPT_GEN_MEMBER(topspeed_state::topspeed_interrupt)
 {
 	/* Unsure how many int6's per frame */
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), FUNC(topspeed_interrupt6));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), timer_expired_delegate(FUNC(topspeed_state::topspeed_interrupt6),this));
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(topspeed_state::topspeed_cpub_interrupt)
 {
 	/* Unsure how many int6's per frame */
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), FUNC(topspeed_cpub_interrupt6));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), timer_expired_delegate(FUNC(topspeed_state::topspeed_cpub_interrupt6),this));
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 

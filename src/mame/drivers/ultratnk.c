@@ -41,7 +41,7 @@ CUSTOM_INPUT_MEMBER(ultratnk_state::get_joystick)
 }
 
 
-static TIMER_CALLBACK( nmi_callback	)
+TIMER_CALLBACK_MEMBER(ultratnk_state::nmi_callback)
 {
 	int scanline = param + 64;
 
@@ -50,18 +50,18 @@ static TIMER_CALLBACK( nmi_callback	)
 
 	/* NMI and watchdog are disabled during service mode */
 
-	machine.watchdog_enable(machine.root_device().ioport("IN0")->read() & 0x40);
+	machine().watchdog_enable(machine().root_device().ioport("IN0")->read() & 0x40);
 
-	if (machine.root_device().ioport("IN0")->read() & 0x40)
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (machine().root_device().ioport("IN0")->read() & 0x40)
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(nmi_callback), scanline);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(ultratnk_state::nmi_callback),this), scanline);
 }
 
 
 void ultratnk_state::machine_reset()
 {
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(32), FUNC(nmi_callback), 32);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(32), timer_expired_delegate(FUNC(ultratnk_state::nmi_callback),this), 32);
 }
 
 

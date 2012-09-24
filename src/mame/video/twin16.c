@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "includes/twin16.h"
 
-static TIMER_CALLBACK( twin16_sprite_tick );
+
 
 
 enum
@@ -137,10 +137,9 @@ READ16_MEMBER(twin16_state::twin16_sprite_status_r)
 	return m_sprite_busy;
 }
 
-static TIMER_CALLBACK( twin16_sprite_tick )
+TIMER_CALLBACK_MEMBER(twin16_state::twin16_sprite_tick)
 {
-	twin16_state *state = machine.driver_data<twin16_state>();
-	state->m_sprite_busy = 0;
+	m_sprite_busy = 0;
 }
 
 static int twin16_set_sprite_timer( running_machine &machine )
@@ -500,7 +499,7 @@ VIDEO_START_MEMBER(twin16_state,twin16)
 
 	memset(m_sprite_buffer,0xff,0x800*sizeof(UINT16));
 	m_sprite_busy = 0;
-	m_sprite_timer = machine().scheduler().timer_alloc(FUNC(twin16_sprite_tick));
+	m_sprite_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(twin16_state::twin16_sprite_tick),this));
 	m_sprite_timer->adjust(attotime::never);
 
 	/* register for savestates */

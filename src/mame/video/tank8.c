@@ -168,9 +168,9 @@ static void draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-static TIMER_CALLBACK( tank8_collision_callback )
+TIMER_CALLBACK_MEMBER(tank8_state::tank8_collision_callback)
 {
-	tank8_set_collision(machine, param);
+	tank8_set_collision(machine(), param);
 }
 
 
@@ -269,7 +269,7 @@ void tank8_state::screen_eof_tank8(screen_device &screen, bool state)
 						index |= 0x80; /* collision on right side */
 				}
 
-				machine().scheduler().timer_set(screen.time_until_pos(y, x), FUNC(tank8_collision_callback), index);
+				machine().scheduler().timer_set(screen.time_until_pos(y, x), timer_expired_delegate(FUNC(tank8_state::tank8_collision_callback),this), index);
 
 				_state = 1;
 			}

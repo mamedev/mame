@@ -731,40 +731,39 @@ static void request_goalin_data( running_machine &machine )
 	state->m_CRAM[1][0x154] = cchip_goalin[n][5];
 }
 
-static TIMER_CALLBACK( cchip_timer )
+TIMER_CALLBACK_MEMBER(rbisland_state::cchip_timer)
 {
-	rbisland_state *state = machine.driver_data<rbisland_state>();
 
-	if (state->m_CRAM[1][0x100] == 1)
+	if (m_CRAM[1][0x100] == 1)
 	{
-		request_round_data(machine);
+		request_round_data(machine());
 
-		state->m_CRAM[1][0x100] = 0xFF;
+		m_CRAM[1][0x100] = 0xFF;
 	}
 
-	if (state->m_CRAM[5][0x000] == 1)
+	if (m_CRAM[5][0x000] == 1)
 	{
-		request_world_data(machine);
+		request_world_data(machine());
 
-		state->m_CRAM[5][0x000] = 0xFF;
+		m_CRAM[5][0x000] = 0xFF;
 	}
 
-	if (state->m_CRAM[1][0x149] == 1)
+	if (m_CRAM[1][0x149] == 1)
 	{
-		request_goalin_data(machine);
+		request_goalin_data(machine());
 
-		state->m_CRAM[1][0x149] = 0xFF;
+		m_CRAM[1][0x149] = 0xFF;
 	}
 
-	coin_lockout_w(machine, 1, state->m_CRAM[0][8] & 0x80);
-	coin_lockout_w(machine, 0, state->m_CRAM[0][8] & 0x40);
-	coin_counter_w(machine, 1, state->m_CRAM[0][8] & 0x20);
-	coin_counter_w(machine, 0, state->m_CRAM[0][8] & 0x10);
+	coin_lockout_w(machine(), 1, m_CRAM[0][8] & 0x80);
+	coin_lockout_w(machine(), 0, m_CRAM[0][8] & 0x40);
+	coin_counter_w(machine(), 1, m_CRAM[0][8] & 0x20);
+	coin_counter_w(machine(), 0, m_CRAM[0][8] & 0x10);
 
-	state->m_CRAM[0][3] = machine.root_device().ioport("800007")->read();    /* STARTn + SERVICE1 */
-	state->m_CRAM[0][4] = machine.root_device().ioport("800009")->read();    /* COINn */
-	state->m_CRAM[0][5] = machine.root_device().ioport("80000B")->read();    /* Player controls + TILT */
-	state->m_CRAM[0][6] = machine.root_device().ioport("80000D")->read();    /* Player controls (cocktail) */
+	m_CRAM[0][3] = machine().root_device().ioport("800007")->read();    /* STARTn + SERVICE1 */
+	m_CRAM[0][4] = machine().root_device().ioport("800009")->read();    /* COINn */
+	m_CRAM[0][5] = machine().root_device().ioport("80000B")->read();    /* Player controls + TILT */
+	m_CRAM[0][6] = machine().root_device().ioport("80000D")->read();    /* Player controls (cocktail) */
 }
 
 /*************************************
@@ -830,5 +829,5 @@ void rbisland_cchip_init( running_machine &machine, int version )
 
 	state_save_register_item(machine, "cchip", NULL, 0, state->m_current_bank);
 
-	machine.scheduler().timer_pulse(attotime::from_hz(60), FUNC(cchip_timer));
+	machine.scheduler().timer_pulse(attotime::from_hz(60), timer_expired_delegate(FUNC(rbisland_state::cchip_timer),state));
 }

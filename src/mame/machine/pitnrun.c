@@ -19,29 +19,27 @@ void pitnrun_state::machine_reset()
 	machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
-static TIMER_CALLBACK( pitnrun_mcu_real_data_r )
+TIMER_CALLBACK_MEMBER(pitnrun_state::pitnrun_mcu_real_data_r)
 {
-	pitnrun_state *state = machine.driver_data<pitnrun_state>();
-	state->m_zaccept = 1;
+	m_zaccept = 1;
 }
 
 READ8_MEMBER(pitnrun_state::pitnrun_mcu_data_r)
 {
-	machine().scheduler().synchronize(FUNC(pitnrun_mcu_real_data_r));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pitnrun_state::pitnrun_mcu_real_data_r),this));
 	return m_toz80;
 }
 
-static TIMER_CALLBACK( pitnrun_mcu_real_data_w )
+TIMER_CALLBACK_MEMBER(pitnrun_state::pitnrun_mcu_real_data_w)
 {
-	pitnrun_state *state = machine.driver_data<pitnrun_state>();
-	state->m_zready = 1;
-	machine.device("mcu")->execute().set_input_line(0, ASSERT_LINE);
-	state->m_fromz80 = param;
+	m_zready = 1;
+	machine().device("mcu")->execute().set_input_line(0, ASSERT_LINE);
+	m_fromz80 = param;
 }
 
 WRITE8_MEMBER(pitnrun_state::pitnrun_mcu_data_w)
 {
-	machine().scheduler().synchronize(FUNC(pitnrun_mcu_real_data_w), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pitnrun_state::pitnrun_mcu_real_data_w),this), data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
 }
 
@@ -90,17 +88,15 @@ READ8_MEMBER(pitnrun_state::pitnrun_68705_portB_r)
 }
 
 
-static TIMER_CALLBACK( pitnrun_mcu_data_real_r )
+TIMER_CALLBACK_MEMBER(pitnrun_state::pitnrun_mcu_data_real_r)
 {
-	pitnrun_state *state = machine.driver_data<pitnrun_state>();
-	state->m_zready = 0;
+	m_zready = 0;
 }
 
-static TIMER_CALLBACK( pitnrun_mcu_status_real_w )
+TIMER_CALLBACK_MEMBER(pitnrun_state::pitnrun_mcu_status_real_w)
 {
-	pitnrun_state *state = machine.driver_data<pitnrun_state>();
-	state->m_toz80 = param;
-	state->m_zaccept = 0;
+	m_toz80 = param;
+	m_zaccept = 0;
 }
 
 WRITE8_MEMBER(pitnrun_state::pitnrun_68705_portB_w)
@@ -109,14 +105,14 @@ WRITE8_MEMBER(pitnrun_state::pitnrun_68705_portB_w)
 	if (~data & 0x02)
 	{
 		/* 68705 is going to read data from the Z80 */
-		machine().scheduler().synchronize(FUNC(pitnrun_mcu_data_real_r));
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(pitnrun_state::pitnrun_mcu_data_real_r),this));
 		machine().device("mcu")->execute().set_input_line(0,CLEAR_LINE);
 		m_portA_in = m_fromz80;
 	}
 	if (~data & 0x04)
 	{
 		/* 68705 is writing data for the Z80 */
-		machine().scheduler().synchronize(FUNC(pitnrun_mcu_status_real_w), m_portA_out);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(pitnrun_state::pitnrun_mcu_status_real_w),this), m_portA_out);
 	}
 	if (~data & 0x10)
 	{

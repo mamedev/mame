@@ -33,8 +33,8 @@
 
 
 /* Internal routines */
-static TIMER_CALLBACK( leland_interrupt_callback );
-static TIMER_CALLBACK( ataxx_interrupt_callback );
+
+
 
 
 
@@ -322,7 +322,7 @@ MACHINE_START_MEMBER(leland_state,leland)
 	m_battery_ram = reinterpret_cast<UINT8 *>(memshare("battery")->ptr());
 
 	/* start scanline interrupts going */
-	m_master_int_timer = machine().scheduler().timer_alloc(FUNC(leland_interrupt_callback));
+	m_master_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::leland_interrupt_callback),this));
 }
 
 
@@ -372,7 +372,7 @@ MACHINE_START_MEMBER(leland_state,ataxx)
 	m_extra_tram = auto_alloc_array(machine(), UINT8, ATAXX_EXTRA_TRAM_SIZE);
 
 	/* start scanline interrupts going */
-	m_master_int_timer = machine().scheduler().timer_alloc(FUNC(ataxx_interrupt_callback));
+	m_master_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::ataxx_interrupt_callback),this));
 }
 
 
@@ -416,33 +416,31 @@ MACHINE_RESET_MEMBER(leland_state,ataxx)
  *
  *************************************/
 
-static TIMER_CALLBACK( leland_interrupt_callback )
+TIMER_CALLBACK_MEMBER(leland_state::leland_interrupt_callback)
 {
-	leland_state *state = machine.driver_data<leland_state>();
 	int scanline = param;
 
 	/* interrupts generated on the VA10 line, which is every */
 	/* 16 scanlines starting with scanline #8 */
-	machine.device("master")->execute().set_input_line(0, HOLD_LINE);
+	machine().device("master")->execute().set_input_line(0, HOLD_LINE);
 
 	/* set a timer for the next one */
 	scanline += 16;
 	if (scanline > 248)
 		scanline = 8;
-	state->m_master_int_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	m_master_int_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 
-static TIMER_CALLBACK( ataxx_interrupt_callback )
+TIMER_CALLBACK_MEMBER(leland_state::ataxx_interrupt_callback)
 {
-	leland_state *state = machine.driver_data<leland_state>();
 	int scanline = param;
 
 	/* interrupts generated according to the interrupt control register */
-	machine.device("master")->execute().set_input_line(0, HOLD_LINE);
+	machine().device("master")->execute().set_input_line(0, HOLD_LINE);
 
 	/* set a timer for the next one */
-	state->m_master_int_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	m_master_int_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 

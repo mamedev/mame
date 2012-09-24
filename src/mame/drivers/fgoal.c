@@ -69,25 +69,24 @@ void fgoal_state::palette_init()
 }
 
 
-static TIMER_CALLBACK( interrupt_callback )
+TIMER_CALLBACK_MEMBER(fgoal_state::interrupt_callback)
 {
-	fgoal_state *state = machine.driver_data<fgoal_state>();
 	int scanline;
-	int coin = (state->ioport("IN1")->read() & 2);
+	int coin = (ioport("IN1")->read() & 2);
 
-	state->m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 
-	if (!coin && state->m_prev_coin)
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (!coin && m_prev_coin)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
-	state->m_prev_coin = coin;
+	m_prev_coin = coin;
 
-	scanline = machine.primary_screen->vpos() + 128;
+	scanline = machine().primary_screen->vpos() + 128;
 
 	if (scanline > 256)
 		scanline = 0;
 
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(interrupt_callback));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(fgoal_state::interrupt_callback),this));
 }
 
 
@@ -346,7 +345,7 @@ void fgoal_state::machine_start()
 void fgoal_state::machine_reset()
 {
 
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(interrupt_callback));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(fgoal_state::interrupt_callback),this));
 
 	m_xpos = 0;
 	m_ypos = 0;

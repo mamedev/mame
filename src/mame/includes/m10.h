@@ -91,5 +91,6 @@ public:
 	INTERRUPT_GEN_MEMBER(m11_interrupt);
 	INTERRUPT_GEN_MEMBER(m10_interrupt);
 	INTERRUPT_GEN_MEMBER(m15_interrupt);
+	TIMER_CALLBACK_MEMBER(interrupt_callback);
 };
 

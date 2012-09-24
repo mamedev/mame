@@ -199,6 +199,8 @@ public:
 	void screen_eof_seta_buffer_sprites(screen_device &screen, bool state);
 	void screen_eof_setaroul(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(wrofaero_interrupt);
+	TIMER_CALLBACK_MEMBER(uPD71054_timer_callback);
+	TIMER_CALLBACK_MEMBER(keroppi_prize_hop_callback);
 };
 
 /*----------- defined in video/seta.c -----------*/

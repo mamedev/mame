@@ -419,14 +419,13 @@ static void perform_blit(address_space &space)
  *
  *************************************/
 
-static TIMER_CALLBACK( blitter_done )
+TIMER_CALLBACK_MEMBER(itech8_state::blitter_done)
 {
-	itech8_state *state = machine.driver_data<itech8_state>();
 	/* turn off blitting and generate an interrupt */
-	state->m_blit_in_progress = 0;
-	itech8_update_interrupts(machine, -1, -1, 1);
+	m_blit_in_progress = 0;
+	itech8_update_interrupts(machine(), -1, -1, 1);
 
-	if (FULL_LOGGING) logerror("------------ BLIT DONE (%d) --------------\n", machine.primary_screen->vpos());
+	if (FULL_LOGGING) logerror("------------ BLIT DONE (%d) --------------\n", machine().primary_screen->vpos());
 }
 
 
@@ -502,7 +501,7 @@ WRITE8_MEMBER(itech8_state::itech8_blitter_w)
 		m_blit_in_progress = 1;
 
 		/* set a timer to go off when we're done */
-		machine().scheduler().timer_set(attotime::from_hz(12000000/4) * (BLITTER_WIDTH * BLITTER_HEIGHT + 12), FUNC(blitter_done));
+		machine().scheduler().timer_set(attotime::from_hz(12000000/4) * (BLITTER_WIDTH * BLITTER_HEIGHT + 12), timer_expired_delegate(FUNC(itech8_state::blitter_done),this));
 	}
 
 	/* debugging */

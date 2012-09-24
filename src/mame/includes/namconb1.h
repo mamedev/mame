@@ -79,4 +79,6 @@ public:
 	UINT32 screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(namconb1_interrupt);
 	INTERRUPT_GEN_MEMBER(namconb2_interrupt);
+	TIMER_CALLBACK_MEMBER(namconb1_TriggerPOSIRQ);
+	TIMER_CALLBACK_MEMBER(namconb2_TriggerPOSIRQ);
 };

@@ -354,16 +354,15 @@ READ8_MEMBER(exidy440_state::sound_command_ack_r)
  *
  *************************************/
 
-static TIMER_CALLBACK( delayed_sound_command_w )
+TIMER_CALLBACK_MEMBER(exidy440_state::delayed_sound_command_w)
 {
-	exidy440_state *state = machine.driver_data<exidy440_state>();
-	exidy440_sound_command(state->m_custom, param);
+	exidy440_sound_command(m_custom, param);
 }
 
 
 WRITE8_MEMBER(exidy440_state::sound_command_w)
 {
-	machine().scheduler().synchronize(FUNC(delayed_sound_command_w), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(exidy440_state::delayed_sound_command_w),this), data);
 }
 
 

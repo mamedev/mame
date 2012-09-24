@@ -80,6 +80,8 @@ public:
 	DECLARE_VIDEO_START(atarisy2);
 	UINT32 screen_update_atarisy2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_int);
+	TIMER_CALLBACK_MEMBER(delayed_int_enable_w);
+	TIMER_CALLBACK_MEMBER(reset_yscroll_callback);
 };
 
 

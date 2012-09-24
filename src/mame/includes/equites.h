@@ -106,4 +106,6 @@ public:
 	DECLARE_PALETTE_INIT(splndrbt);
 	UINT32 screen_update_equites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_splndrbt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(equites_nmi_callback);
+	TIMER_CALLBACK_MEMBER(equites_frq_adjuster_callback);
 };

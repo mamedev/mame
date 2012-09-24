@@ -49,6 +49,7 @@ public:
 	DECLARE_VIDEO_START(jumping);
 	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_jumping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(cchip_timer);
 };
 
 /*----------- defined in machine/rainbow.c -----------*/

@@ -123,20 +123,19 @@
  *
  *************************************/
 
-static TIMER_CALLBACK( generate_interrupt )
+TIMER_CALLBACK_MEMBER(jedi_state::generate_interrupt)
 {
-	jedi_state *state = machine.driver_data<jedi_state>();
 	int scanline = param;
 
 	/* IRQ is set by /32V */
-	machine.device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
-	machine.device("audiocpu")->execute().set_input_line(M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* set up for the next */
 	scanline += 32;
 	if (scanline > 256)
 		scanline = 32;
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -157,7 +156,7 @@ void jedi_state::machine_start()
 {
 
 	/* set a timer to run the interrupts */
-	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(generate_interrupt));
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jedi_state::generate_interrupt),this));
 	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(32), 32);
 
 	/* configure the banks */

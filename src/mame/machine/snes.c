@@ -101,15 +101,14 @@ void st010_write_ram(snes_state *state, UINT16 addr, UINT8 data)
 
 *************************************/
 
-static TIMER_CALLBACK( snes_nmi_tick )
+TIMER_CALLBACK_MEMBER(snes_state::snes_nmi_tick)
 {
-	snes_state *state = machine.driver_data<snes_state>();
 
 	// pull NMI
-	state->m_maincpu->set_input_line(G65816_LINE_NMI, ASSERT_LINE);
+	m_maincpu->set_input_line(G65816_LINE_NMI, ASSERT_LINE);
 
 	// don't happen again
-	state->m_nmi_timer->adjust(attotime::never);
+	m_nmi_timer->adjust(attotime::never);
 }
 
 static void snes_hirq_tick( running_machine &machine )
@@ -126,16 +125,15 @@ static void snes_hirq_tick( running_machine &machine )
 	state->m_hirq_timer->adjust(attotime::never);
 }
 
-static TIMER_CALLBACK( snes_hirq_tick_callback )
+TIMER_CALLBACK_MEMBER(snes_state::snes_hirq_tick_callback)
 {
-	snes_hirq_tick(machine);
+	snes_hirq_tick(machine());
 }
 
-static TIMER_CALLBACK( snes_reset_oam_address )
+TIMER_CALLBACK_MEMBER(snes_state::snes_reset_oam_address)
 {
-	snes_state *state = machine.driver_data<snes_state>();
 	// make sure we're in the 65816's context since we're messing with the OAM and stuff
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	if (!(snes_ppu.screen_disabled)) //Reset OAM address, byuu says it happens at H=10
 	{
@@ -145,29 +143,26 @@ static TIMER_CALLBACK( snes_reset_oam_address )
 	}
 }
 
-static TIMER_CALLBACK( snes_reset_hdma )
+TIMER_CALLBACK_MEMBER(snes_state::snes_reset_hdma)
 {
-	snes_state *state = machine.driver_data<snes_state>();
-	address_space &cpu0space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 	snes_hdma_init(cpu0space);
 }
 
-static TIMER_CALLBACK( snes_update_io )
+TIMER_CALLBACK_MEMBER(snes_state::snes_update_io)
 {
-	snes_state *state = machine.driver_data<snes_state>();
-	address_space &cpu0space = state->m_maincpu->space(AS_PROGRAM);
-	state->m_io_read(cpu0space.machine());
+	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
+	m_io_read(cpu0space.machine());
 	snes_ram[HVBJOY] &= 0xfe;		/* Clear busy bit */
 
-	state->m_io_timer->adjust(attotime::never);
+	m_io_timer->adjust(attotime::never);
 }
 
-static TIMER_CALLBACK( snes_scanline_tick )
+TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 {
-	snes_state *state = machine.driver_data<snes_state>();
 
 	/* Increase current line - we want to latch on this line during it, not after it */
-	snes_ppu.beam.current_vert = machine.primary_screen->vpos();
+	snes_ppu.beam.current_vert = machine().primary_screen->vpos();
 
 	// not in hblank
 	snes_ram[HVBJOY] &= ~0x40;
@@ -175,24 +170,24 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	/* Vertical IRQ timer - only if horizontal isn't also enabled! */
 	if ((snes_ram[NMITIMEN] & 0x20) && !(snes_ram[NMITIMEN] & 0x10))
 	{
-		if (snes_ppu.beam.current_vert == state->m_vtime)
+		if (snes_ppu.beam.current_vert == m_vtime)
 		{
 			snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occurred */
 			// IRQ latches the counters, do it now
-			snes_latch_counters(machine);
-			state->m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE );
+			snes_latch_counters(machine());
+			m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE );
 		}
 	}
 	/* Horizontal IRQ timer */
 	if (snes_ram[NMITIMEN] & 0x10)
 	{
 		int setirq = 1;
-		int pixel = state->m_htime;
+		int pixel = m_htime;
 
 		// is the HIRQ on a specific scanline?
 		if (snes_ram[NMITIMEN] & 0x20)
 		{
-			if (snes_ppu.beam.current_vert != state->m_vtime)
+			if (snes_ppu.beam.current_vert != m_vtime)
 			{
 				setirq = 0;
 			}
@@ -200,14 +195,14 @@ static TIMER_CALLBACK( snes_scanline_tick )
 
 		if (setirq)
 		{
-//          printf("HIRQ @ %d, %d\n", pixel * state->m_htmult, snes_ppu.beam.current_vert);
+//          printf("HIRQ @ %d, %d\n", pixel * m_htmult, snes_ppu.beam.current_vert);
 			if (pixel == 0)
 			{
-				snes_hirq_tick(machine);
+				snes_hirq_tick(machine());
 			}
 			else
 			{
-				state->m_hirq_timer->adjust(machine.primary_screen->time_until_pos(snes_ppu.beam.current_vert, pixel * state->m_htmult));
+				m_hirq_timer->adjust(machine().primary_screen->time_until_pos(snes_ppu.beam.current_vert, pixel * m_htmult));
 			}
 		}
 	}
@@ -215,7 +210,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	/* Start of VBlank */
 	if (snes_ppu.beam.current_vert == snes_ppu.beam.last_visible_line)
 	{
-		machine.scheduler().timer_set(machine.primary_screen->time_until_pos(snes_ppu.beam.current_vert, 10), FUNC(snes_reset_oam_address));
+		machine().scheduler().timer_set(machine().primary_screen->time_until_pos(snes_ppu.beam.current_vert, 10), timer_expired_delegate(FUNC(snes_state::snes_reset_oam_address),this));
 
 		snes_ram[HVBJOY] |= 0x81;		/* Set vblank bit to on & indicate controllers being read */
 		snes_ram[RDNMI] |= 0x80;		/* Set NMI occurred bit */
@@ -223,17 +218,17 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		if (snes_ram[NMITIMEN] & 0x80)	/* NMI only signaled if this bit set */
 		{
 			// NMI goes off about 12 cycles after this (otherwise Chrono Trigger, NFL QB Club, etc. lock up)
-			state->m_nmi_timer->adjust(state->m_maincpu->cycles_to_attotime(12));
+			m_nmi_timer->adjust(m_maincpu->cycles_to_attotime(12));
 		}
 
 		/* three lines after start of vblank we update the controllers (value from snes9x) */
-		state->m_io_timer->adjust(machine.primary_screen->time_until_pos(snes_ppu.beam.current_vert + 2, state->m_hblank_offset * state->m_htmult));
+		m_io_timer->adjust(machine().primary_screen->time_until_pos(snes_ppu.beam.current_vert + 2, m_hblank_offset * m_htmult));
 	}
 
 	// hdma reset happens at scanline 0, H=~6
 	if (snes_ppu.beam.current_vert == 0)
 	{
-		address_space &cpu0space = state->m_maincpu->space(AS_PROGRAM);
+		address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 		snes_hdma_init(cpu0space);
 	}
 
@@ -244,37 +239,36 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		snes_ram[STAT78] ^= 0x80;		/* Toggle field flag */
 		snes_ppu.stat77_flags &= 0x3f;	/* Clear Time Over and Range Over bits */
 
-		state->m_maincpu->set_input_line(G65816_LINE_NMI, CLEAR_LINE );
+		m_maincpu->set_input_line(G65816_LINE_NMI, CLEAR_LINE );
 	}
 
-	state->m_scanline_timer->adjust(attotime::never);
-	state->m_hblank_timer->adjust(machine.primary_screen->time_until_pos(snes_ppu.beam.current_vert, state->m_hblank_offset * state->m_htmult));
+	m_scanline_timer->adjust(attotime::never);
+	m_hblank_timer->adjust(machine().primary_screen->time_until_pos(snes_ppu.beam.current_vert, m_hblank_offset * m_htmult));
 
 //  printf("%02x %d\n",snes_ram[HVBJOY],snes_ppu.beam.current_vert);
 }
 
 /* This is called at the start of hblank *before* the scanline indicated in current_vert! */
-static TIMER_CALLBACK( snes_hblank_tick )
+TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 {
-	snes_state *state = machine.driver_data<snes_state>();
-	address_space &cpu0space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 	int nextscan;
 
-	snes_ppu.beam.current_vert = machine.primary_screen->vpos();
+	snes_ppu.beam.current_vert = machine().primary_screen->vpos();
 
 	/* make sure we halt */
-	state->m_hblank_timer->adjust(attotime::never);
+	m_hblank_timer->adjust(attotime::never);
 
 	/* draw a scanline */
 	if (snes_ppu.beam.current_vert <= snes_ppu.beam.last_visible_line)
 	{
-		if (machine.primary_screen->vpos() > 0)
+		if (machine().primary_screen->vpos() > 0)
 		{
 			/* Do HDMA */
 			if (snes_ram[HDMAEN])
 				snes_hdma(cpu0space);
 
-			machine.primary_screen->update_partial((snes_ppu.interlace == 2) ? (snes_ppu.beam.current_vert * snes_ppu.interlace) : snes_ppu.beam.current_vert - 1);
+			machine().primary_screen->update_partial((snes_ppu.interlace == 2) ? (snes_ppu.beam.current_vert * snes_ppu.interlace) : snes_ppu.beam.current_vert - 1);
 		}
 	}
 
@@ -288,7 +282,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 		nextscan = 0;
 	}
 
-	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(nextscan));
+	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(nextscan));
 }
 
 
@@ -723,7 +717,7 @@ WRITE8_HANDLER( snes_w_io )
 			break;
 		case HDMAEN:	/* HDMA channel designation */
 			if (data) //if a HDMA is enabled, data is inited at the next scanline
-				space.machine().scheduler().timer_set(space.machine().primary_screen->time_until_pos(snes_ppu.beam.current_vert + 1), FUNC(snes_reset_hdma));
+				space.machine().scheduler().timer_set(space.machine().primary_screen->time_until_pos(snes_ppu.beam.current_vert + 1), timer_expired_delegate(FUNC(snes_state::snes_reset_hdma),state));
 			break;
 		case TIMEUP:	// IRQ Flag is cleared on both read and write
 			state->m_maincpu->set_input_line(G65816_LINE_IRQ, CLEAR_LINE );
@@ -1534,19 +1528,19 @@ static void snes_init_timers( running_machine &machine )
 	snes_state *state = machine.driver_data<snes_state>();
 
 	/* init timers and stop them */
-	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(snes_scanline_tick));
+	state->m_scanline_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_state::snes_scanline_tick),state));
 	state->m_scanline_timer->adjust(attotime::never);
-	state->m_hblank_timer = machine.scheduler().timer_alloc(FUNC(snes_hblank_tick));
+	state->m_hblank_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_state::snes_hblank_tick),state));
 	state->m_hblank_timer->adjust(attotime::never);
-	state->m_nmi_timer = machine.scheduler().timer_alloc(FUNC(snes_nmi_tick));
+	state->m_nmi_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_state::snes_nmi_tick),state));
 	state->m_nmi_timer->adjust(attotime::never);
-	state->m_hirq_timer = machine.scheduler().timer_alloc(FUNC(snes_hirq_tick_callback));
+	state->m_hirq_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_state::snes_hirq_tick_callback),state));
 	state->m_hirq_timer->adjust(attotime::never);
 	//state->m_div_timer = machine.scheduler().timer_alloc(FUNC(snes_div_callback));
 	//state->m_div_timer->adjust(attotime::never);
 	//state->m_mult_timer = machine.scheduler().timer_alloc(FUNC(snes_mult_callback));
 	//state->m_mult_timer->adjust(attotime::never);
-	state->m_io_timer = machine.scheduler().timer_alloc(FUNC(snes_update_io));
+	state->m_io_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_state::snes_update_io),state));
 	state->m_io_timer->adjust(attotime::never);
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.

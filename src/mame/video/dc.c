@@ -1292,44 +1292,39 @@ WRITE64_HANDLER( pvr_ta_w )
 	#endif
 }
 
-static TIMER_CALLBACK( transfer_opaque_list_irq )
+TIMER_CALLBACK_MEMBER(dc_state::transfer_opaque_list_irq)
 {
-	dc_state *state = machine.driver_data<dc_state>();
 
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPLST;
-	dc_update_interrupt_status(machine);
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPLST;
+	dc_update_interrupt_status(machine());
 }
 
-static TIMER_CALLBACK( transfer_opaque_modifier_volume_list_irq )
+TIMER_CALLBACK_MEMBER(dc_state::transfer_opaque_modifier_volume_list_irq)
 {
-	dc_state *state = machine.driver_data<dc_state>();
 
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPMV;
-	dc_update_interrupt_status(machine);
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPMV;
+	dc_update_interrupt_status(machine());
 }
 
-static TIMER_CALLBACK( transfer_translucent_list_irq )
+TIMER_CALLBACK_MEMBER(dc_state::transfer_translucent_list_irq)
 {
-	dc_state *state = machine.driver_data<dc_state>();
 
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRLST;
-	dc_update_interrupt_status(machine);
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRLST;
+	dc_update_interrupt_status(machine());
 }
 
-static TIMER_CALLBACK( transfer_translucent_modifier_volume_list_irq )
+TIMER_CALLBACK_MEMBER(dc_state::transfer_translucent_modifier_volume_list_irq)
 {
-	dc_state *state = machine.driver_data<dc_state>();
 
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRMV;
-	dc_update_interrupt_status(machine);
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRMV;
+	dc_update_interrupt_status(machine());
 }
 
-static TIMER_CALLBACK( transfer_punch_through_list_irq )
+TIMER_CALLBACK_MEMBER(dc_state::transfer_punch_through_list_irq)
 {
-	dc_state *state = machine.driver_data<dc_state>();
 
-	state->dc_sysctrl_regs[SB_ISTNRM] |= (1 << 21);
-	dc_update_interrupt_status(machine);
+	dc_sysctrl_regs[SB_ISTNRM] |= (1 << 21);
+	dc_update_interrupt_status(machine());
 }
 
 static void process_ta_fifo(running_machine& machine)
@@ -1420,11 +1415,11 @@ static void process_ta_fifo(running_machine& machine)
 		/* FIXME: timing of these */
 		switch (state_ta.tafifo_listtype)
 		{
-		case 0: machine.scheduler().timer_set(attotime::from_usec(100), FUNC(transfer_opaque_list_irq)); break;
-		case 1: machine.scheduler().timer_set(attotime::from_usec(100), FUNC(transfer_opaque_modifier_volume_list_irq)); break;
-		case 2: machine.scheduler().timer_set(attotime::from_usec(100), FUNC(transfer_translucent_list_irq)); break;
-		case 3: machine.scheduler().timer_set(attotime::from_usec(100), FUNC(transfer_translucent_modifier_volume_list_irq)); break;
-		case 4: machine.scheduler().timer_set(attotime::from_usec(100), FUNC(transfer_punch_through_list_irq)); break;
+		case 0: machine.scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(dc_state::transfer_opaque_list_irq),state)); break;
+		case 1: machine.scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(dc_state::transfer_opaque_modifier_volume_list_irq),state)); break;
+		case 2: machine.scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(dc_state::transfer_translucent_list_irq),state)); break;
+		case 3: machine.scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(dc_state::transfer_translucent_modifier_volume_list_irq),state)); break;
+		case 4: machine.scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(dc_state::transfer_punch_through_list_irq),state)); break;
 		}
 		state_ta.tafifo_listtype= -1; // no list being received
 		state_ta.listtype_used |= (2+8);
@@ -2498,86 +2493,83 @@ static void pvr_build_parameterconfig(void)
 			pvr_parameterconfig[a] = pvr_parameterconfig[a-1];
 }
 
-static TIMER_CALLBACK(vbin)
+TIMER_CALLBACK_MEMBER(dc_state::vbin)
 {
-	dc_state *state = machine.driver_data<dc_state>();
+	dc_state *state = machine().driver_data<dc_state>();
 
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
-	dc_update_interrupt_status(machine);
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
+	dc_update_interrupt_status(machine());
 
-	state->vbin_timer->adjust(machine.primary_screen->time_until_pos(spg_vblank_in_irq_line_num));
+	vbin_timer->adjust(machine().primary_screen->time_until_pos(spg_vblank_in_irq_line_num));
 }
 
-static TIMER_CALLBACK(vbout)
+TIMER_CALLBACK_MEMBER(dc_state::vbout)
 {
-	dc_state *state = machine.driver_data<dc_state>();
+	dc_state *state = machine().driver_data<dc_state>();
 
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_OUT; // V Blank-out interrupt
-	dc_update_interrupt_status(machine);
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_OUT; // V Blank-out interrupt
+	dc_update_interrupt_status(machine());
 
-	state->vbout_timer->adjust(machine.primary_screen->time_until_pos(spg_vblank_out_irq_line_num));
+	vbout_timer->adjust(machine().primary_screen->time_until_pos(spg_vblank_out_irq_line_num));
 }
 
-static TIMER_CALLBACK(hbin)
+TIMER_CALLBACK_MEMBER(dc_state::hbin)
 {
-	dc_state *state = machine.driver_data<dc_state>();
+	dc_state *state = machine().driver_data<dc_state>();
 
 	if(spg_hblank_int_mode & 1)
 	{
-		if(state->scanline == state->next_y)
+		if(scanline == next_y)
 		{
-			state->dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
-			dc_update_interrupt_status(machine);
-			state->next_y+=spg_line_comp_val;
+			dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
+			dc_update_interrupt_status(machine());
+			next_y+=spg_line_comp_val;
 		}
 	}
-	else if((state->scanline == spg_line_comp_val) || (spg_hblank_int_mode & 2))
+	else if((scanline == spg_line_comp_val) || (spg_hblank_int_mode & 2))
 	{
-		state->dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
-		dc_update_interrupt_status(machine);
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
+		dc_update_interrupt_status(machine());
 	}
 
-//  printf("hbin on state->scanline %d\n",state->scanline);
+//  printf("hbin on scanline %d\n",scanline);
 
-	state->scanline++;
+	scanline++;
 
-	if(state->scanline >= spg_vblank_in_irq_line_num)
+	if(scanline >= spg_vblank_in_irq_line_num)
 	{
-		state->scanline = 0;
-		state->next_y = spg_line_comp_val;
+		scanline = 0;
+		next_y = spg_line_comp_val;
 	}
 
-	state->hbin_timer->adjust(machine.primary_screen->time_until_pos(state->scanline, spg_hblank_in_irq-1));
+	hbin_timer->adjust(machine().primary_screen->time_until_pos(scanline, spg_hblank_in_irq-1));
 }
 
 
 
-static TIMER_CALLBACK(endofrender_video)
+TIMER_CALLBACK_MEMBER(dc_state::endofrender_video)
 {
-	dc_state *state = machine.driver_data<dc_state>();
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_VIDEO;// VIDEO end of render
-	dc_update_interrupt_status(machine);
-	state->endofrender_timer_video->adjust(attotime::never);
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_VIDEO;// VIDEO end of render
+	dc_update_interrupt_status(machine());
+	endofrender_timer_video->adjust(attotime::never);
 }
 
-static TIMER_CALLBACK(endofrender_tsp)
+TIMER_CALLBACK_MEMBER(dc_state::endofrender_tsp)
 {
-	dc_state *state = machine.driver_data<dc_state>();
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
-	dc_update_interrupt_status(machine);
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
+	dc_update_interrupt_status(machine());
 
-	state->endofrender_timer_tsp->adjust(attotime::never);
-	state->endofrender_timer_video->adjust(attotime::from_usec(500) );
+	endofrender_timer_tsp->adjust(attotime::never);
+	endofrender_timer_video->adjust(attotime::from_usec(500) );
 }
 
-static TIMER_CALLBACK(endofrender_isp)
+TIMER_CALLBACK_MEMBER(dc_state::endofrender_isp)
 {
-	dc_state *state = machine.driver_data<dc_state>();
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_ISP;	// ISP end of render
-	dc_update_interrupt_status(machine);
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_ISP;	// ISP end of render
+	dc_update_interrupt_status(machine());
 
-	state->endofrender_timer_isp->adjust(attotime::never);
-	state->endofrender_timer_tsp->adjust(attotime::from_usec(500) );
+	endofrender_timer_isp->adjust(attotime::never);
+	endofrender_timer_tsp->adjust(attotime::from_usec(500) );
 }
 
 
@@ -2613,21 +2605,21 @@ void dc_state::video_start()
 
 	computedilated();
 
-	vbout_timer = machine().scheduler().timer_alloc(FUNC(vbout));
+	vbout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dc_state::vbout),this));
 	vbout_timer->adjust(machine().primary_screen->time_until_pos(spg_vblank_out_irq_line_num_new));
 
-	vbin_timer = machine().scheduler().timer_alloc(FUNC(vbin));
+	vbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dc_state::vbin),this));
 	vbin_timer->adjust(machine().primary_screen->time_until_pos(spg_vblank_in_irq_line_num_new));
 
-	hbin_timer = machine().scheduler().timer_alloc(FUNC(hbin));
+	hbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dc_state::hbin),this));
 	hbin_timer->adjust(machine().primary_screen->time_until_pos(0, spg_hblank_in_irq_new-1));
 
 	scanline = 0;
 	next_y = 0;
 
-	endofrender_timer_isp = machine().scheduler().timer_alloc(FUNC(endofrender_isp));
-	endofrender_timer_tsp = machine().scheduler().timer_alloc(FUNC(endofrender_tsp));
-	endofrender_timer_video = machine().scheduler().timer_alloc(FUNC(endofrender_video));
+	endofrender_timer_isp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dc_state::endofrender_isp),this));
+	endofrender_timer_tsp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dc_state::endofrender_tsp),this));
+	endofrender_timer_video = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dc_state::endofrender_video),this));
 
 	endofrender_timer_isp->adjust(attotime::never);
 	endofrender_timer_tsp->adjust(attotime::never);

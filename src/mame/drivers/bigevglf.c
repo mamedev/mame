@@ -73,15 +73,14 @@ WRITE8_MEMBER(bigevglf_state::beg_banking_w)
 	membank("bank1")->set_entry(m_beg_bank & 0xff); /* empty sockets for IC37-IC44 ROMS */
 }
 
-static TIMER_CALLBACK( from_sound_latch_callback )
+TIMER_CALLBACK_MEMBER(bigevglf_state::from_sound_latch_callback)
 {
-	bigevglf_state *state = machine.driver_data<bigevglf_state>();
-	state->m_from_sound = param & 0xff;
-	state->m_sound_state |= 2;
+	m_from_sound = param & 0xff;
+	m_sound_state |= 2;
 }
 WRITE8_MEMBER(bigevglf_state::beg_fromsound_w)/* write to D800 sets bit 1 in status */
 {
-	machine().scheduler().synchronize(FUNC(from_sound_latch_callback), (space.device().safe_pc() << 16) | data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::from_sound_latch_callback),this), (space.device().safe_pc() << 16) | data);
 }
 
 READ8_MEMBER(bigevglf_state::beg_fromsound_r)
@@ -107,21 +106,20 @@ READ8_MEMBER(bigevglf_state::soundstate_r)
 	return m_sound_state;
 }
 
-static TIMER_CALLBACK( nmi_callback )
+TIMER_CALLBACK_MEMBER(bigevglf_state::nmi_callback)
 {
-	bigevglf_state *state = machine.driver_data<bigevglf_state>();
 
-	if (state->m_sound_nmi_enable)
-		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_sound_nmi_enable)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
-		state->m_pending_nmi = 1;
-	state->m_sound_state &= ~1;
+		m_pending_nmi = 1;
+	m_sound_state &= ~1;
 }
 
 WRITE8_MEMBER(bigevglf_state::sound_command_w)/* write to port 20 clears bit 0 in status */
 {
 	m_for_sound = data;
-	machine().scheduler().synchronize(FUNC(nmi_callback), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::nmi_callback),this), data);
 }
 
 READ8_MEMBER(bigevglf_state::sound_command_r)/* read from D800 sets bit 0 in status */
@@ -145,33 +143,32 @@ WRITE8_MEMBER(bigevglf_state::nmi_enable_w)
 	}
 }
 
-static TIMER_CALLBACK( deferred_ls74_w )
+TIMER_CALLBACK_MEMBER(bigevglf_state::deferred_ls74_w)
 {
-	bigevglf_state *state = machine.driver_data<bigevglf_state>();
 	int offs = (param >> 8) & 255;
 	int data = param & 255;
-	state->m_beg13_ls74[offs] = data;
+	m_beg13_ls74[offs] = data;
 }
 
 /* do this on a timer to let the CPUs synchronize */
 WRITE8_MEMBER(bigevglf_state::beg13_a_clr_w)
 {
-	machine().scheduler().synchronize(FUNC(deferred_ls74_w), (0 << 8) | 0);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::deferred_ls74_w),this), (0 << 8) | 0);
 }
 
 WRITE8_MEMBER(bigevglf_state::beg13_b_clr_w)
 {
-	machine().scheduler().synchronize(FUNC(deferred_ls74_w), (1 << 8) | 0);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::deferred_ls74_w),this), (1 << 8) | 0);
 }
 
 WRITE8_MEMBER(bigevglf_state::beg13_a_set_w)
 {
-	machine().scheduler().synchronize(FUNC(deferred_ls74_w), (0 << 8) | 1);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::deferred_ls74_w),this), (0 << 8) | 1);
 }
 
 WRITE8_MEMBER(bigevglf_state::beg13_b_set_w)
 {
-	machine().scheduler().synchronize(FUNC(deferred_ls74_w), (1 << 8) | 1);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::deferred_ls74_w),this), (1 << 8) | 1);
 }
 
 READ8_MEMBER(bigevglf_state::beg_status_r)

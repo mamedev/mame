@@ -92,6 +92,7 @@ public:
 	UINT32 screen_update_psikyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_psikyo_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_psikyo(screen_device &screen, bool state);
+	TIMER_CALLBACK_MEMBER(psikyo_soundlatch_callback);
 };
 
 /*----------- defined in video/psikyo.c -----------*/

@@ -75,6 +75,10 @@ public:
 	DECLARE_WRITE32_MEMBER( dd_reg_w );
 	DECLARE_READ32_MEMBER( pif_ram_r );
 	DECLARE_WRITE32_MEMBER( pif_ram_w );
+	TIMER_CALLBACK_MEMBER(reset_timer_callback);
+	TIMER_CALLBACK_MEMBER(vi_scanline_callback);
+	TIMER_CALLBACK_MEMBER(ai_timer_callback);
+	TIMER_CALLBACK_MEMBER(pi_dma_callback);
 
 	UINT32 sp_reg_r(UINT32 offset);
 	void sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask);

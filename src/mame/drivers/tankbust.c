@@ -24,15 +24,14 @@ To do:
 
 //port A of ay8910#0
 
-static TIMER_CALLBACK( soundlatch_callback )
+TIMER_CALLBACK_MEMBER(tankbust_state::soundlatch_callback)
 {
-	tankbust_state *state = machine.driver_data<tankbust_state>();
-	state->m_latch = param;
+	m_latch = param;
 }
 
 WRITE8_MEMBER(tankbust_state::tankbust_soundlatch_w)
 {
-	machine().scheduler().synchronize(FUNC(soundlatch_callback), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(tankbust_state::soundlatch_callback),this), data);
 }
 
 READ8_MEMBER(tankbust_state::tankbust_soundlatch_r)
@@ -50,12 +49,12 @@ READ8_MEMBER(tankbust_state::tankbust_soundtimer_r)
 	return ret;
 }
 
-static TIMER_CALLBACK( soundirqline_callback )
+TIMER_CALLBACK_MEMBER(tankbust_state::soundirqline_callback)
 {
 //logerror("sound_irq_line write = %2x (after CPUs synced) \n",param);
 
 		if ((param & 1) == 0)
-			machine.device("sub")->execute().set_input_line(0, HOLD_LINE);
+			machine().device("sub")->execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -79,7 +78,7 @@ WRITE8_MEMBER(tankbust_state::tankbust_e0xx_w)
 		break;
 
 	case 1:	/* 0xe001 (value 0 then 1) written right after the soundlatch_byte_w */
-		machine().scheduler().synchronize(FUNC(soundirqline_callback), data);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(tankbust_state::soundirqline_callback),this), data);
 		break;
 
 	case 2:	/* 0xe002 coin counter */

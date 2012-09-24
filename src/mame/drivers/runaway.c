@@ -17,25 +17,24 @@
 #include "includes/runaway.h"
 
 
-static TIMER_CALLBACK( interrupt_callback )
+TIMER_CALLBACK_MEMBER(runaway_state::interrupt_callback)
 {
-	runaway_state *state = machine.driver_data<runaway_state>();
 	/* assume Centipede-style interrupt timing */
 	int scanline = param;
 
-	machine.device("maincpu")->execute().set_input_line(0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
 
 	scanline += 32;
 
 	if (scanline >= 263)
 		scanline = 16;
 
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 void runaway_state::machine_start()
 {
-	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(interrupt_callback));
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(runaway_state::interrupt_callback),this));
 }
 
 void runaway_state::machine_reset()

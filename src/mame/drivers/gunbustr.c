@@ -52,14 +52,14 @@
 
 /*********************************************************************/
 
-static TIMER_CALLBACK( gunbustr_interrupt5 )
+TIMER_CALLBACK_MEMBER(gunbustr_state::gunbustr_interrupt5)
 {
-	machine.device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(gunbustr_state::gunbustr_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000-500), FUNC(gunbustr_interrupt5));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000-500), timer_expired_delegate(FUNC(gunbustr_state::gunbustr_interrupt5),this));
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
@@ -143,7 +143,7 @@ READ32_MEMBER(gunbustr_state::gunbustr_gun_r)
 WRITE32_MEMBER(gunbustr_state::gunbustr_gun_w)
 {
 	/* 10000 cycle delay is arbitrary */
-	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), FUNC(gunbustr_interrupt5));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), timer_expired_delegate(FUNC(gunbustr_state::gunbustr_interrupt5),this));
 }
 
 

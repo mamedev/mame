@@ -15,7 +15,7 @@ Namco System II
 #include "includes/namcos2.h"
 #include "machine/nvram.h"
 
-static TIMER_CALLBACK( namcos2_posirq_tick );
+
 static void InitC148(void);
 
 static emu_timer *namcos2_posirq_timer;
@@ -108,7 +108,7 @@ MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
 	namcos2_kickstart = NULL;
 	namcos2_eeprom = auto_alloc_array(machine(), UINT8, namcos2_eeprom_size);
 	machine().device<nvram_device>("nvram")->set_base(namcos2_eeprom, namcos2_eeprom_size);
-	namcos2_posirq_timer = machine().scheduler().timer_alloc(FUNC(namcos2_posirq_tick));
+	namcos2_posirq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos2_shared_state::namcos2_posirq_tick),this));
 }
 
 MACHINE_RESET_MEMBER(namcos2_shared_state,namcos2)
@@ -657,21 +657,20 @@ static int GetPosIRQScanline( running_machine &machine )
 	return downcast<namcos2_state *>(state)->get_pos_irq_scanline();
 }
 
-static TIMER_CALLBACK( namcos2_posirq_tick )
+TIMER_CALLBACK_MEMBER(namcos2_shared_state::namcos2_posirq_tick)
 {
-	namcos2_shared_state *state = machine.driver_data<namcos2_shared_state>();
-	if (state->is_system21()) {
+	if (is_system21()) {
 		if (namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ]) {
-			machine.primary_screen->update_partial(param);
-			machine.device("gpu")->execute().set_input_line(namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
+			machine().primary_screen->update_partial(param);
+			machine().device("gpu")->execute().set_input_line(namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 		}
 		return;
 	}
 
 	if (namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ]|namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ]) {
-		machine.primary_screen->update_partial(param);
-		if (namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ]) machine.device("maincpu")->execute().set_input_line(namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
-		if (namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ]) machine.device("slave")->execute().set_input_line(namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
+		machine().primary_screen->update_partial(param);
+		if (namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ]) machine().device("maincpu")->execute().set_input_line(namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
+		if (namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ]) machine().device("slave")->execute().set_input_line(namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 	}
 }
 

@@ -588,10 +588,10 @@ DECLARE_BLITTER_SET(dma_draw_noskip_noscale,   dma_state.bpp, EXTRACTGEN,   SKIP
  *
  *************************************/
 
-static TIMER_CALLBACK( dma_callback )
+TIMER_CALLBACK_MEMBER(midtunit_state::dma_callback)
 {
 	dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
-	machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -791,7 +791,7 @@ if (LOG_DMA)
 
 	/* signal we're done */
 skipdma:
-	machine().scheduler().timer_set(attotime::from_nsec(41 * pixels), FUNC(dma_callback));
+	machine().scheduler().timer_set(attotime::from_nsec(41 * pixels), timer_expired_delegate(FUNC(midtunit_state::dma_callback),this));
 
 	g_profiler.stop();
 }

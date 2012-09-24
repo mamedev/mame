@@ -17,7 +17,7 @@
  *
  *************************************/
 
-static TIMER_CALLBACK( reset_yscroll_callback );
+
 
 
 
@@ -107,7 +107,7 @@ VIDEO_START_MEMBER(atarisy2_state,atarisy2)
 	m_alpha_tilemap->set_transparent_pen(0);
 
 	/* reset the statics */
-	m_yscroll_reset_timer = machine().scheduler().timer_alloc(FUNC(reset_yscroll_callback));
+	m_yscroll_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atarisy2_state::reset_yscroll_callback),this));
 	m_videobank = 0;
 
 	/* save states */
@@ -150,10 +150,9 @@ WRITE16_HANDLER( atarisy2_xscroll_w )
 }
 
 
-static TIMER_CALLBACK( reset_yscroll_callback )
+TIMER_CALLBACK_MEMBER(atarisy2_state::reset_yscroll_callback)
 {
-	atarisy2_state *state = machine.driver_data<atarisy2_state>();
-	state->m_playfield_tilemap->set_scrolly(0, param);
+	m_playfield_tilemap->set_scrolly(0, param);
 }
 
 

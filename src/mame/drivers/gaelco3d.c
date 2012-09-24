@@ -361,13 +361,12 @@ WRITE16_MEMBER(gaelco3d_state::eeprom_cs_w)
  *
  *************************************/
 
-static TIMER_CALLBACK( delayed_sound_w )
+TIMER_CALLBACK_MEMBER(gaelco3d_state::delayed_sound_w)
 {
-	gaelco3d_state *state = machine.driver_data<gaelco3d_state>();
 	if (LOG)
 		logerror("delayed_sound_w(%02X)\n", param);
-	state->m_sound_data = param;
-	machine.device("adsp")->execute().set_input_line(ADSP2115_IRQ2, ASSERT_LINE);
+	m_sound_data = param;
+	machine().device("adsp")->execute().set_input_line(ADSP2115_IRQ2, ASSERT_LINE);
 }
 
 
@@ -376,7 +375,7 @@ WRITE16_MEMBER(gaelco3d_state::sound_data_w)
 	if (LOG)
 		logerror("%06X:sound_data_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 	if (ACCESSING_BITS_0_7)
-		machine().scheduler().synchronize(FUNC(delayed_sound_w), data & 0xff);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(gaelco3d_state::delayed_sound_w),this), data & 0xff);
 }
 
 

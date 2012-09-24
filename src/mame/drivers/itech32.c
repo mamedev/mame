@@ -635,19 +635,18 @@ WRITE8_MEMBER(itech32_state::sound_bank_w)
  *
  *************************************/
 
-static TIMER_CALLBACK( delayed_sound_data_w )
+TIMER_CALLBACK_MEMBER(itech32_state::delayed_sound_data_w)
 {
-	itech32_state *state = machine.driver_data<itech32_state>();
-	state->m_sound_data = param;
-	state->m_sound_int_state = 1;
-	machine.device("soundcpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	m_sound_data = param;
+	m_sound_int_state = 1;
+	machine().device("soundcpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
 WRITE16_MEMBER(itech32_state::sound_data_w)
 {
 	if (ACCESSING_BITS_0_7)
-		machine().scheduler().synchronize(FUNC(delayed_sound_data_w), data & 0xff);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(itech32_state::delayed_sound_data_w),this), data & 0xff);
 }
 
 
@@ -660,7 +659,7 @@ READ32_MEMBER(itech32_state::sound_data32_r)
 WRITE32_MEMBER(itech32_state::sound_data32_w)
 {
 	if (ACCESSING_BITS_16_23)
-		machine().scheduler().synchronize(FUNC(delayed_sound_data_w), (data >> 16) & 0xff);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(itech32_state::delayed_sound_data_w),this), (data >> 16) & 0xff);
 }
 
 

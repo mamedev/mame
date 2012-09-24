@@ -90,5 +90,8 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_taitosj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_kikstart(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(taitosj_mcu_real_data_w);
+	TIMER_CALLBACK_MEMBER(taitosj_mcu_data_real_r);
+	TIMER_CALLBACK_MEMBER(taitosj_mcu_status_real_w);
 };
 

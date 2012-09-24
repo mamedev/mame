@@ -60,6 +60,7 @@ public:
 	void screen_eof_galaga(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(main_vblank_irq);
 	INTERRUPT_GEN_MEMBER(sub_vblank_irq);
+	TIMER_CALLBACK_MEMBER(cpu3_interrupt_callback);
 };
 
 class xevious_state : public galaga_state

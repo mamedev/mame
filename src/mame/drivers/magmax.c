@@ -58,26 +58,25 @@ WRITE8_MEMBER(magmax_state::ay8910_portB_0_w)
 		m_LS74_q = 0;
 }
 
-static TIMER_CALLBACK( scanline_callback )
+TIMER_CALLBACK_MEMBER(magmax_state::scanline_callback)
 {
-	magmax_state *state = machine.driver_data<magmax_state>();
 	int scanline = param;
 
 	/* bit 0 goes hi whenever line V6 from video part goes lo->hi */
 	/* that is when scanline is 64 and 192 accordingly */
-	if (state->m_LS74_clr != 0)
-		state->m_LS74_q = 1;
+	if (m_LS74_clr != 0)
+		m_LS74_q = 1;
 
 	scanline += 128;
 	scanline &= 255;
 
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 void magmax_state::machine_start()
 {
 	/* Create interrupt timer */
-	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(scanline_callback));
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(magmax_state::scanline_callback),this));
 
 	/* Set up save state */
 	state_save_register_global(machine(), m_sound_latch);

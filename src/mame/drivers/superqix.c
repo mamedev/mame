@@ -182,17 +182,16 @@ READ8_MEMBER(superqix_state::sqix_from_mcu_r)
 	return m_from_mcu;
 }
 
-static TIMER_CALLBACK( mcu_acknowledge_callback )
+TIMER_CALLBACK_MEMBER(superqix_state::mcu_acknowledge_callback)
 {
-	superqix_state *state = machine.driver_data<superqix_state>();
-	state->m_from_z80_pending = 1;
-	state->m_from_z80 = state->m_portb;
-//  logerror("Z80->MCU %02x\n",state->m_from_z80);
+	m_from_z80_pending = 1;
+	m_from_z80 = m_portb;
+//  logerror("Z80->MCU %02x\n",m_from_z80);
 }
 
 READ8_MEMBER(superqix_state::mcu_acknowledge_r)
 {
-	machine().scheduler().synchronize(FUNC(mcu_acknowledge_callback));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(superqix_state::mcu_acknowledge_callback),this));
 	return 0;
 }
 
@@ -364,22 +363,20 @@ static int read_dial(running_machine &machine, int player)
 
 
 
-static TIMER_CALLBACK( delayed_z80_mcu_w )
+TIMER_CALLBACK_MEMBER(superqix_state::delayed_z80_mcu_w)
 {
-	superqix_state *state = machine.driver_data<superqix_state>();
 //  logerror("Z80 sends command %02x\n",param);
-	state->m_from_z80 = param;
-	state->m_from_mcu_pending = 0;
-	machine.device("mcu")->execute().set_input_line(0, HOLD_LINE);
-	machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
+	m_from_z80 = param;
+	m_from_mcu_pending = 0;
+	machine().device("mcu")->execute().set_input_line(0, HOLD_LINE);
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
 }
 
-static TIMER_CALLBACK( delayed_mcu_z80_w )
+TIMER_CALLBACK_MEMBER(superqix_state::delayed_mcu_z80_w)
 {
-	superqix_state *state = machine.driver_data<superqix_state>();
 //  logerror("68705 sends answer %02x\n",param);
-	state->m_from_mcu = param;
-	state->m_from_mcu_pending = 1;
+	m_from_mcu = param;
+	m_from_mcu_pending = 1;
 }
 
 
@@ -445,7 +442,7 @@ WRITE8_MEMBER(superqix_state::hotsmash_68705_portC_w)
 				break;
 
 			case 0x5:	// answer to Z80
-				machine().scheduler().synchronize(FUNC(delayed_mcu_z80_w), m_portB_out);
+				machine().scheduler().synchronize(timer_expired_delegate(FUNC(superqix_state::delayed_mcu_z80_w),this), m_portB_out);
 				break;
 
 			case 0x6:
@@ -461,7 +458,7 @@ WRITE8_MEMBER(superqix_state::hotsmash_68705_portC_w)
 
 WRITE8_MEMBER(superqix_state::hotsmash_z80_mcu_w)
 {
-	machine().scheduler().synchronize(FUNC(delayed_z80_mcu_w), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(superqix_state::delayed_z80_mcu_w),this), data);
 }
 
 READ8_MEMBER(superqix_state::hotsmash_from_mcu_r)

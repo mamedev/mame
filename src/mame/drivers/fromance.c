@@ -59,18 +59,17 @@ READ8_MEMBER(fromance_state::fromance_commanddata_r)
 }
 
 
-static TIMER_CALLBACK( deferred_commanddata_w )
+TIMER_CALLBACK_MEMBER(fromance_state::deferred_commanddata_w)
 {
-	fromance_state *state = machine.driver_data<fromance_state>();
-	state->m_commanddata = param;
-	state->m_directionflag = 1;
+	m_commanddata = param;
+	m_directionflag = 1;
 }
 
 
 WRITE8_MEMBER(fromance_state::fromance_commanddata_w)
 {
 	/* do this on a timer to let the slave CPU synchronize */
-	machine().scheduler().synchronize(FUNC(deferred_commanddata_w), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(fromance_state::deferred_commanddata_w),this), data);
 }
 
 

@@ -53,4 +53,5 @@ public:
 	INTERRUPT_GEN_MEMBER(toypop_main_vblank_irq);
 	INTERRUPT_GEN_MEMBER(toypop_sound_timer_irq);
 	INTERRUPT_GEN_MEMBER(toypop_m68000_interrupt);
+	TIMER_CALLBACK_MEMBER(namcoio_run);
 };

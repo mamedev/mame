@@ -54,9 +54,9 @@ INTERRUPT_GEN_MEMBER(galastrm_state::galastrm_interrupt)
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
-static TIMER_CALLBACK( galastrm_interrupt6 )
+TIMER_CALLBACK_MEMBER(galastrm_state::galastrm_interrupt6)
 {
-	machine.device("maincpu")->execute().set_input_line(6, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(6, HOLD_LINE);
 }
 
 
@@ -158,7 +158,7 @@ READ32_MEMBER(galastrm_state::galastrm_adstick_ctrl_r)
 
 WRITE32_MEMBER(galastrm_state::galastrm_adstick_ctrl_w)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), FUNC(galastrm_interrupt6));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), timer_expired_delegate(FUNC(galastrm_state::galastrm_interrupt6),this));
 }
 
 /***********************************************************

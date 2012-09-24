@@ -107,6 +107,11 @@ public:
 	UINT32 screen_update_williams(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_williams2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_blaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(williams_count240_off_callback);
+	TIMER_CALLBACK_MEMBER(williams2_endscreen_off_callback);
+	TIMER_CALLBACK_MEMBER(williams_deferred_snd_cmd_w);
+	TIMER_CALLBACK_MEMBER(blaster_deferred_snd_cmd_w);
+	TIMER_CALLBACK_MEMBER(williams2_deferred_snd_cmd_w);
 };
 
 
@@ -121,7 +126,7 @@ public:
 	DECLARE_DRIVER_INIT(joust2);
 	DECLARE_MACHINE_START(joust2);
 	DECLARE_MACHINE_RESET(joust2);
-
+	TIMER_CALLBACK_MEMBER(joust2_deferred_snd_cmd_w);
 };
 
 /*----------- defined in drivers/williams.c -----------*/

@@ -261,13 +261,13 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 ***************************************************************************/
 
-static TIMER_CALLBACK( collision_irq_callback )
+TIMER_CALLBACK_MEMBER(exidy_state::collision_irq_callback)
 {
 	/* latch the collision bits */
-	latch_condition(machine, param);
+	latch_condition(machine(), param);
 
 	/* set the IRQ line */
-	machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -334,7 +334,7 @@ static void check_collision(running_machine &machine)
 
 				/* if we got one, trigger an interrupt */
 				if ((current_collision_mask & state->m_collision_mask) && (count++ < 128))
-					machine.scheduler().timer_set(machine.primary_screen->time_until_pos(org_1_x + sx, org_1_y + sy), FUNC(collision_irq_callback), current_collision_mask);
+					machine.scheduler().timer_set(machine.primary_screen->time_until_pos(org_1_x + sx, org_1_y + sy), timer_expired_delegate(FUNC(exidy_state::collision_irq_callback),state), current_collision_mask);
 			}
 
 			if (state->m_motion_object_2_vid.pix16(sy, sx) != 0xff)
@@ -342,7 +342,7 @@ static void check_collision(running_machine &machine)
 				/* check for background collision (M2CHAR) */
 				if (state->m_background_bitmap.pix16(org_2_y + sy, org_2_x + sx) != 0)
 					if ((state->m_collision_mask & 0x08) && (count++ < 128))
-						machine.scheduler().timer_set(machine.primary_screen->time_until_pos(org_2_x + sx, org_2_y + sy), FUNC(collision_irq_callback), 0x08);
+						machine.scheduler().timer_set(machine.primary_screen->time_until_pos(org_2_x + sx, org_2_y + sy), timer_expired_delegate(FUNC(exidy_state::collision_irq_callback),state), 0x08);
 			}
 		}
 }

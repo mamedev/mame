@@ -163,16 +163,15 @@ WRITE8_MEMBER(esripsys_state::f_status_w)
  *
  *************************************/
 
-static TIMER_CALLBACK( delayed_bank_swap )
+TIMER_CALLBACK_MEMBER(esripsys_state::delayed_bank_swap)
 {
-	esripsys_state *state = machine.driver_data<esripsys_state>();
-	state->m_fasel ^= 1;
-	state->m_fbsel ^= 1;
+	m_fasel ^= 1;
+	m_fbsel ^= 1;
 }
 
 WRITE8_MEMBER(esripsys_state::frame_w)
 {
-	machine().scheduler().synchronize(FUNC(delayed_bank_swap));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(esripsys_state::delayed_bank_swap),this));
 	m_frame_vbl = 1;
 }
 

@@ -31,8 +31,8 @@
  *************************************/
 
 static void init_savestate(running_machine &machine);
-static TIMER_CALLBACK( scanline_callback );
-static TIMER_CALLBACK( interrupt_off );
+
+
 static void init_sparklestar(running_machine &machine);
 
 
@@ -164,9 +164,9 @@ void astrocde_state::video_start()
 {
 
 	/* allocate timers */
-	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(scanline_callback));
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astrocde_state::scanline_callback),this));
 	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(1), 1);
-	m_intoff_timer = machine().scheduler().timer_alloc(FUNC(interrupt_off));
+	m_intoff_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astrocde_state::interrupt_off),this));
 
 	/* register for save states */
 	init_savestate(machine());
@@ -181,9 +181,9 @@ VIDEO_START_MEMBER(astrocde_state,profpac)
 {
 
 	/* allocate timers */
-	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(scanline_callback));
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astrocde_state::scanline_callback),this));
 	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(1), 1);
-	m_intoff_timer = machine().scheduler().timer_alloc(FUNC(interrupt_off));
+	m_intoff_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astrocde_state::interrupt_off),this));
 
 	/* allocate videoram */
 	m_profpac_videoram = auto_alloc_array(machine(), UINT16, 0x4000 * 4);
@@ -373,9 +373,9 @@ UINT32 astrocde_state::screen_update_profpac(screen_device &screen, bitmap_ind16
  *
  *************************************/
 
-static TIMER_CALLBACK( interrupt_off )
+TIMER_CALLBACK_MEMBER(astrocde_state::interrupt_off)
 {
-	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -414,43 +414,42 @@ static void astrocade_trigger_lightpen(running_machine &machine, UINT8 vfeedback
  *
  *************************************/
 
-static TIMER_CALLBACK( scanline_callback )
+TIMER_CALLBACK_MEMBER(astrocde_state::scanline_callback)
 {
-	astrocde_state *state = machine.driver_data<astrocde_state>();
 	int scanline = param;
 	int astrocade_scanline = mame_vpos_to_astrocade_vpos(scanline);
 
 	/* force an update against the current scanline */
 	if (scanline > 0)
-		machine.primary_screen->update_partial(scanline - 1);
+		machine().primary_screen->update_partial(scanline - 1);
 
 	/* generate a scanline interrupt if it's time */
-	if (astrocade_scanline == state->m_interrupt_scanline && (state->m_interrupt_enabl & 0x08) != 0)
+	if (astrocade_scanline == m_interrupt_scanline && (m_interrupt_enabl & 0x08) != 0)
 	{
 		/* bit 2 controls the interrupt mode: mode 0 means assert until acknowledged */
-		if ((state->m_interrupt_enabl & 0x04) == 0)
+		if ((m_interrupt_enabl & 0x04) == 0)
 		{
-			machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_interrupt_vector);
-			machine.scheduler().timer_set(machine.primary_screen->time_until_vblank_end(), FUNC(interrupt_off));
+			machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector);
+			machine().scheduler().timer_set(machine().primary_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(astrocde_state::interrupt_off),this));
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, state->m_interrupt_vector);
-			machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(interrupt_off));
+			machine().device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, m_interrupt_vector);
+			machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")->cycles_to_attotime(1), timer_expired_delegate(FUNC(astrocde_state::interrupt_off),this));
 		}
 	}
 
 	/* on some games, the horizontal drive line is conected to the lightpen interrupt */
-	else if (state->m_video_config & AC_LIGHTPEN_INTS)
-		astrocade_trigger_lightpen(machine, astrocade_scanline, 8);
+	else if (m_video_config & AC_LIGHTPEN_INTS)
+		astrocade_trigger_lightpen(machine(), astrocade_scanline, 8);
 
 	/* advance to the next scanline */
 	scanline++;
-	if (scanline >= machine.primary_screen->height())
+	if (scanline >= machine().primary_screen->height())
 		scanline = 0;
-	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 

@@ -113,17 +113,16 @@ INTERRUPT_GEN_MEMBER(suprridr_state::main_nmi_gen)
  *
  *************************************/
 
-static TIMER_CALLBACK( delayed_sound_w )
+TIMER_CALLBACK_MEMBER(suprridr_state::delayed_sound_w)
 {
-	suprridr_state *state = machine.driver_data<suprridr_state>();
-	state->m_sound_data = param;
-	machine.device("audiocpu")->execute().set_input_line(0, ASSERT_LINE);
+	m_sound_data = param;
+	machine().device("audiocpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
 WRITE8_MEMBER(suprridr_state::sound_data_w)
 {
-	machine().scheduler().synchronize(FUNC(delayed_sound_w), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(suprridr_state::delayed_sound_w),this), data);
 }
 
 

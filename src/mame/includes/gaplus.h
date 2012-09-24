@@ -50,4 +50,5 @@ public:
 	INTERRUPT_GEN_MEMBER(gaplus_vblank_main_irq);
 	INTERRUPT_GEN_MEMBER(gaplus_vblank_sub_irq);
 	INTERRUPT_GEN_MEMBER(gaplus_vblank_sub2_irq);
+	TIMER_CALLBACK_MEMBER(namcoio_run);
 };

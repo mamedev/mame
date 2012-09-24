@@ -107,6 +107,8 @@ public:
 	DECLARE_VIDEO_START(midyunit_6bit);
 	DECLARE_VIDEO_START(mkyawdim);
 	DECLARE_VIDEO_START(common);
+	TIMER_CALLBACK_MEMBER(dma_callback);
+	TIMER_CALLBACK_MEMBER(autoerase_line);
 };
 /*----------- defined in video/midyunit.c -----------*/
 void midyunit_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);

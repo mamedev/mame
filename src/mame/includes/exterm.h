@@ -35,6 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ym2151_data_latch_w);
 	DECLARE_WRITE8_MEMBER(sound_slave_dac_w);
 	virtual void palette_init();
+	TIMER_CALLBACK_MEMBER(sound_delayed_w);
 };
 
 /*----------- defined in video/exterm.c -----------*/

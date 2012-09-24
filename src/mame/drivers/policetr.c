@@ -101,16 +101,16 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
  *
  *************************************/
 
-static TIMER_CALLBACK( irq5_gen )
+TIMER_CALLBACK_MEMBER(policetr_state::irq5_gen)
 {
-	machine.device("maincpu")->execute().set_input_line(R3000_IRQ5, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(R3000_IRQ5, ASSERT_LINE);
 }
 
 
 INTERRUPT_GEN_MEMBER(policetr_state::irq4_gen)
 {
 	device.execute().set_input_line(R3000_IRQ4, ASSERT_LINE);
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(irq5_gen));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(policetr_state::irq5_gen),this));
 }
 
 

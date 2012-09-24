@@ -35,10 +35,9 @@
 
 
 
-static TIMER_CALLBACK( math_run_clear )
+TIMER_CALLBACK_MEMBER(starwars_state::math_run_clear)
 {
-	starwars_state *state = machine.driver_data<starwars_state>();
-	state->m_math_run = 0;
+	m_math_run = 0;
 }
 
 
@@ -174,7 +173,7 @@ void starwars_mproc_init(running_machine &machine)
 		state->m_PROM_AM[cnt]  = (val >> 7) & 0x0001;
 	}
 
-	state->m_math_timer = machine.scheduler().timer_alloc(FUNC(math_run_clear));
+	state->m_math_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(starwars_state::math_run_clear),state));
 }
 
 

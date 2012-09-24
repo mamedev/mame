@@ -101,6 +101,7 @@ public:
 	UINT32 screen_update_segag80r(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(segag80r_vblank_start);
 	INTERRUPT_GEN_MEMBER(sindbadm_vblank_start);
+	TIMER_CALLBACK_MEMBER(vblank_latch_clear);
 };
 
 

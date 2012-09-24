@@ -80,4 +80,7 @@ public:
 	UINT32 screen_update_superqix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sqix_timer_irq);
+	TIMER_CALLBACK_MEMBER(mcu_acknowledge_callback);
+	TIMER_CALLBACK_MEMBER(delayed_z80_mcu_w);
+	TIMER_CALLBACK_MEMBER(delayed_mcu_z80_w);
 };

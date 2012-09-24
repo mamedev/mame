@@ -121,17 +121,16 @@ static void sound_nmi_callback( running_machine &machine, int param )
 }
 #endif
 
-static TIMER_CALLBACK( nmi_callback )
+TIMER_CALLBACK_MEMBER(parodius_state::nmi_callback)
 {
-	parodius_state *state = machine.driver_data<parodius_state>();
-	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(parodius_state::sound_arm_nmi_w)
 {
 
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	machine().scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
+	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(parodius_state::nmi_callback),this));	/* kludge until the K053260 is emulated correctly */
 }
 
 /********************************************/

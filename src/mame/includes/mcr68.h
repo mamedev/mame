@@ -45,8 +45,7 @@ public:
 	struct counter_state m_m6840_state[3];
 	UINT8 m_v493_irq_state;
 	UINT8 m_v493_irq_vector;
-	timer_expired_func m_v493_callback;
-	const char *m_v493_callback_name;
+	timer_expired_delegate m_v493_callback;
 	UINT8 m_zwackery_sound_data;
 	attotime m_m6840_counter_periods[3];
 	attotime m_m6840_internal_counter_period;
@@ -99,6 +98,11 @@ public:
 	UINT32 screen_update_zwackery(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mcr68(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mcr68_interrupt);
+	TIMER_CALLBACK_MEMBER(mcr68_493_off_callback);
+	TIMER_CALLBACK_MEMBER(mcr68_493_callback);
+	TIMER_CALLBACK_MEMBER(zwackery_493_off_callback);
+	TIMER_CALLBACK_MEMBER(zwackery_493_callback);
+	TIMER_CALLBACK_MEMBER(counter_fired_callback);
 };
 
 /*----------- defined in machine/mcr68.c -----------*/

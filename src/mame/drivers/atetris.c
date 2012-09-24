@@ -66,19 +66,18 @@
  *
  *************************************/
 
-static TIMER_CALLBACK( interrupt_gen )
+TIMER_CALLBACK_MEMBER(atetris_state::interrupt_gen)
 {
-	atetris_state *state = machine.driver_data<atetris_state>();
 	int scanline = param;
 
 	/* assert/deassert the interrupt */
-	machine.device("maincpu")->execute().set_input_line(0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* set the next timer */
 	scanline += 32;
 	if (scanline >= 256)
 		scanline -= 256;
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -107,7 +106,7 @@ void atetris_state::machine_start()
 {
 
 	/* Allocate interrupt timer */
-	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(interrupt_gen));
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atetris_state::interrupt_gen),this));
 
 	/* Set up save state */
 	save_item(NAME(m_current_bank));

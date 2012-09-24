@@ -19,9 +19,9 @@
 
 
 
-static TIMER_CALLBACK( cchasm_refresh_end )
+TIMER_CALLBACK_MEMBER(cchasm_state::cchasm_refresh_end)
 {
-    machine.device("maincpu")->execute().set_input_line(2, ASSERT_LINE);
+    machine().device("maincpu")->execute().set_input_line(2, ASSERT_LINE);
 }
 
 static void cchasm_refresh (running_machine &machine)
@@ -99,7 +99,7 @@ static void cchasm_refresh (running_machine &machine)
 		}
 	}
     /* Refresh processor runs with 6 MHz */
-    machine.scheduler().timer_set (attotime::from_hz(6000000) * total_length, FUNC(cchasm_refresh_end));
+    machine.scheduler().timer_set (attotime::from_hz(6000000) * total_length, timer_expired_delegate(FUNC(cchasm_state::cchasm_refresh_end),state));
 }
 
 

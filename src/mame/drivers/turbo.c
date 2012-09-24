@@ -564,10 +564,9 @@ READ8_MEMBER(turbo_state::buckrog_port_3_r)
 }
 
 
-static TIMER_CALLBACK( delayed_i8255_w )
+TIMER_CALLBACK_MEMBER(turbo_state::delayed_i8255_w)
 {
-	turbo_state *state = machine.driver_data<turbo_state>();
-	state->m_i8255_0->write(state->m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
+	m_i8255_0->write(m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
 }
 
 
@@ -575,7 +574,7 @@ WRITE8_MEMBER(turbo_state::buckrog_i8255_0_w)
 {
 	/* the port C handshaking signals control the sub CPU IRQ, */
 	/* so we have to sync whenever we access this PPI */
-	machine().scheduler().synchronize(FUNC(delayed_i8255_w), ((offset & 3) << 8) | (data & 0xff));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(turbo_state::delayed_i8255_w),this), ((offset & 3) << 8) | (data & 0xff));
 }
 
 

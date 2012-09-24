@@ -27,25 +27,24 @@
  *
  *************************************/
 
-static TIMER_CALLBACK( scanline_callback )
+TIMER_CALLBACK_MEMBER(leland_state::scanline_callback)
 {
-	leland_state *state = machine.driver_data<leland_state>();
-	device_t *audio = machine.device("custom");
+	device_t *audio = machine().device("custom");
 	int scanline = param;
 
 	/* update the DACs */
-	if (!(state->m_dac_control & 0x01))
-		leland_dac_update(audio, 0, state->m_video_ram[(state->m_last_scanline) * 256 + 160]);
+	if (!(m_dac_control & 0x01))
+		leland_dac_update(audio, 0, m_video_ram[(m_last_scanline) * 256 + 160]);
 
-	if (!(state->m_dac_control & 0x02))
-		leland_dac_update(audio, 1, state->m_video_ram[(state->m_last_scanline) * 256 + 161]);
+	if (!(m_dac_control & 0x02))
+		leland_dac_update(audio, 1, m_video_ram[(m_last_scanline) * 256 + 161]);
 
-	state->m_last_scanline = scanline;
+	m_last_scanline = scanline;
 
 	scanline = (scanline+1) % 256;
 
 	/* come back at the next appropriate scanline */
-	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -61,7 +60,7 @@ VIDEO_START_MEMBER(leland_state,leland)
 	m_video_ram = auto_alloc_array_clear(machine(), UINT8, VRAM_SIZE);
 
 	/* scanline timer */
-	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(scanline_callback));
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::scanline_callback),this));
 	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(0));
 
 }
@@ -288,9 +287,9 @@ WRITE8_MEMBER(leland_state::leland_master_video_addr_w)
 }
 
 
-static TIMER_CALLBACK( leland_delayed_mvram_w )
+TIMER_CALLBACK_MEMBER(leland_state::leland_delayed_mvram_w)
 {
-	address_space &space = machine.device("master")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("master")->memory().space(AS_PROGRAM);
 
 	int num = (param >> 16) & 1;
 	int offset = (param >> 8) & 0xff;
@@ -301,7 +300,7 @@ static TIMER_CALLBACK( leland_delayed_mvram_w )
 
 WRITE8_MEMBER(leland_state::leland_mvram_port_w)
 {
-	machine().scheduler().synchronize(FUNC(leland_delayed_mvram_w), 0x00000 | (offset << 8) | data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(leland_state::leland_delayed_mvram_w),this), 0x00000 | (offset << 8) | data);
 }
 
 
@@ -346,7 +345,7 @@ READ8_MEMBER(leland_state::leland_svram_port_r)
 WRITE8_MEMBER(leland_state::ataxx_mvram_port_w)
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
-	machine().scheduler().synchronize(FUNC(leland_delayed_mvram_w), 0x00000 | (offset << 8) | data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(leland_state::leland_delayed_mvram_w),this), 0x00000 | (offset << 8) | data);
 }
 
 

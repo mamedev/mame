@@ -150,7 +150,7 @@ static void pastelg_vramflip(running_machine &machine)
 	state->m_flipscreen_old = state->m_flipscreen;
 }
 
-static TIMER_CALLBACK( blitter_timer_callback )
+TIMER_CALLBACK_MEMBER(pastelg_state::blitter_timer_callback)
 {
 	nb1413m3_busyflag = 1;
 }
@@ -276,7 +276,7 @@ static void pastelg_gfxdraw(running_machine &machine)
 	}
 
 	nb1413m3_busyflag = 0;
-	machine.scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, FUNC(blitter_timer_callback));
+	machine.scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, timer_expired_delegate(FUNC(pastelg_state::blitter_timer_callback),state));
 }
 
 /******************************************************************************

@@ -76,22 +76,20 @@ static const char *const sysctrl_names[] =
 
 #endif
 
-static TIMER_CALLBACK( aica_dma_irq )
+TIMER_CALLBACK_MEMBER(dc_state::aica_dma_irq)
 {
-	dc_state *state = machine.driver_data<dc_state>();
 
-	state->m_wave_dma.start = state->g2bus_regs[SB_ADST] = 0;
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
-	dc_update_interrupt_status(machine);
+	m_wave_dma.start = g2bus_regs[SB_ADST] = 0;
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
+	dc_update_interrupt_status(machine());
 }
 
-static TIMER_CALLBACK( pvr_dma_irq )
+TIMER_CALLBACK_MEMBER(dc_state::pvr_dma_irq)
 {
-	dc_state *state = machine.driver_data<dc_state>();
 
-	state->m_pvr_dma.start = state->pvrctrl_regs[SB_PDST] = 0;
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_PVR;
-	dc_update_interrupt_status(machine);
+	m_pvr_dma.start = pvrctrl_regs[SB_PDST] = 0;
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_PVR;
+	dc_update_interrupt_status(machine());
 }
 
 void naomi_g1_irq(running_machine &machine)
@@ -110,22 +108,20 @@ void dc_maple_irq(running_machine &machine)
 	dc_update_interrupt_status(machine);
 }
 
-static TIMER_CALLBACK( ch2_dma_irq )
+TIMER_CALLBACK_MEMBER(dc_state::ch2_dma_irq)
 {
-	dc_state *state = machine.driver_data<dc_state>();
 
-	state->dc_sysctrl_regs[SB_C2DLEN]=0;
-	state->dc_sysctrl_regs[SB_C2DST]=0;
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_CH2;
-	dc_update_interrupt_status(machine);
+	dc_sysctrl_regs[SB_C2DLEN]=0;
+	dc_sysctrl_regs[SB_C2DST]=0;
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_CH2;
+	dc_update_interrupt_status(machine());
 }
 
-static TIMER_CALLBACK( yuv_fifo_irq )
+TIMER_CALLBACK_MEMBER(dc_state::yuv_fifo_irq)
 {
-	dc_state *state = machine.driver_data<dc_state>();
 
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
-	dc_update_interrupt_status(machine);
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
+	dc_update_interrupt_status(machine());
 }
 
 static void wave_dma_execute(address_space &space)
@@ -166,7 +162,7 @@ static void wave_dma_execute(address_space &space)
 	state->m_wave_dma.flag = (state->m_wave_dma.indirect & 1) ? 1 : 0;
 	/* Note: if you trigger an instant DMA IRQ trigger, sfz3upper doesn't play any bgm. */
 	/* TODO: timing of this */
-	space.machine().scheduler().timer_set(attotime::from_usec(300), FUNC(aica_dma_irq));
+	space.machine().scheduler().timer_set(attotime::from_usec(300), timer_expired_delegate(FUNC(dc_state::aica_dma_irq),state));
 }
 
 static void pvr_dma_execute(address_space &space)
@@ -206,7 +202,7 @@ static void pvr_dma_execute(address_space &space)
 	}
 	/* Note: do not update the params, since this DMA type doesn't support it. */
 	/* TODO: timing of this */
-	space.machine().scheduler().timer_set(attotime::from_usec(250), FUNC(pvr_dma_irq));
+	space.machine().scheduler().timer_set(attotime::from_usec(250), timer_expired_delegate(FUNC(dc_state::pvr_dma_irq),state));
 }
 
 // register decode helpers
@@ -419,10 +415,10 @@ WRITE64_HANDLER( dc_sysctrl_w )
 					state->dc_sysctrl_regs[SB_C2DSTAT]=address+ddtdata.length;
 
 				/* 200 usecs breaks sfz3upper */
-				space.machine().scheduler().timer_set(attotime::from_usec(50), FUNC(ch2_dma_irq));
+				space.machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(dc_state::ch2_dma_irq),state));
 				/* simulate YUV FIFO processing here */
 				if((address & 0x1800000) == 0x0800000)
-					space.machine().scheduler().timer_set(attotime::from_usec(500), FUNC(yuv_fifo_irq));
+					space.machine().scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(dc_state::yuv_fifo_irq),state));
 			}
 			break;
 
@@ -737,13 +733,12 @@ WRITE64_HANDLER( dc_rtc_w )
 	mame_printf_verbose("RTC: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x710000 + reg*4, dat, data, offset, mem_mask);
 }
 
-static TIMER_CALLBACK(dc_rtc_increment)
+TIMER_CALLBACK_MEMBER(dc_state::dc_rtc_increment)
 {
-	dc_state *state = machine.driver_data<dc_state>();
 
-    state->dc_rtcregister[RTC2] = (state->dc_rtcregister[RTC2] + 1) & 0xFFFF;
-    if (state->dc_rtcregister[RTC2] == 0)
-        state->dc_rtcregister[RTC1] = (state->dc_rtcregister[RTC1] + 1) & 0xFFFF;
+    dc_rtcregister[RTC2] = (dc_rtcregister[RTC2] + 1) & 0xFFFF;
+    if (dc_rtcregister[RTC2] == 0)
+        dc_rtcregister[RTC1] = (dc_rtcregister[RTC1] + 1) & 0xFFFF;
 }
 
 /* fill the RTC registers with the proper start-up values */
@@ -784,7 +779,7 @@ static void rtc_initial_setup(running_machine &machine)
 	state->dc_rtcregister[RTC2] = current_time & 0x0000ffff;
 	state->dc_rtcregister[RTC1] = (current_time & 0xffff0000) >> 16;
 
-	state->dc_rtc_timer = machine.scheduler().timer_alloc(FUNC(dc_rtc_increment));
+	state->dc_rtc_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(dc_state::dc_rtc_increment),state));
 }
 
 void dc_state::machine_start()

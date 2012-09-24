@@ -140,9 +140,9 @@ const char *const amiga_custom_names[0x100] =
 
 static void custom_reset(running_machine &machine);
 static void autoconfig_reset(running_machine &machine);
-static TIMER_CALLBACK( amiga_irq_proc );
-static TIMER_CALLBACK( amiga_blitter_proc );
-static TIMER_CALLBACK( scanline_callback );
+
+
+
 
 
 
@@ -251,8 +251,8 @@ void amiga_machine_config(running_machine &machine, const amiga_machine_interfac
 	}
 
 	/* setup the timers */
-	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(amiga_irq_proc));
-	state->m_blitter_timer = machine.scheduler().timer_alloc(FUNC(amiga_blitter_proc));
+	state->m_irq_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(amiga_state::amiga_irq_proc),state));
+	state->m_blitter_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(amiga_state::amiga_blitter_proc),state));
 
 	state->m_sound_device = machine.device("amiga");
 }
@@ -296,7 +296,7 @@ MACHINE_RESET_MEMBER(amiga_state,amiga)
 		(*m_intf->reset_callback)(machine());
 
 	/* start the scanline timer */
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), FUNC(scanline_callback));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(amiga_state::scanline_callback),this));
 }
 
 
@@ -307,51 +307,51 @@ MACHINE_RESET_MEMBER(amiga_state,amiga)
  *
  *************************************/
 
-static TIMER_CALLBACK( scanline_callback )
+TIMER_CALLBACK_MEMBER(amiga_state::scanline_callback)
 {
-	amiga_state *state = machine.driver_data<amiga_state>();
+
 	int scanline = param;
-	device_t *cia_0 = machine.device("cia_0");
-	device_t *cia_1 = machine.device("cia_1");
+	device_t *cia_0 = machine().device("cia_0");
+	device_t *cia_1 = machine().device("cia_1");
 
 	/* on the first scanline, we do some extra bookkeeping */
 	if (scanline == 0)
 	{
 		/* signal VBLANK IRQ */
-		amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_VERTB, 0xffff);
+		amiga_custom_w(machine().device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_VERTB, 0xffff);
 
 		/* clock the first CIA TOD */
 		mos6526_tod_w(cia_0, 1);
 
 		/* call the system-specific callback */
-		if (state->m_intf->scanline0_callback != NULL)
-			(*state->m_intf->scanline0_callback)(machine);
+		if (m_intf->scanline0_callback != NULL)
+			(*m_intf->scanline0_callback)(machine());
 	}
 
 	/* on every scanline, clock the second CIA TOD */
 	mos6526_tod_w(cia_1, 1);
 
 	/* render up to this scanline */
-	if (!machine.primary_screen->update_partial(scanline))
+	if (!machine().primary_screen->update_partial(scanline))
 	{
-		if (IS_AGA(state->m_intf))
+		if (IS_AGA(m_intf))
 		{
 			bitmap_rgb32 dummy_bitmap;
-			amiga_aga_render_scanline(machine, dummy_bitmap, scanline);
+			amiga_aga_render_scanline(machine(), dummy_bitmap, scanline);
 		}
 		else
 		{
 			bitmap_ind16 dummy_bitmap;
-			amiga_render_scanline(machine, dummy_bitmap, scanline);
+			amiga_render_scanline(machine(), dummy_bitmap, scanline);
 		}
 	}
 
 	/* force a sound update */
-	amiga_audio_update(state->m_sound_device);
+	amiga_audio_update(m_sound_device);
 
 	/* set timer for next line */
-	scanline = (scanline + 1) % machine.primary_screen->height();
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(scanline_callback), scanline);
+	scanline = (scanline + 1) % machine().primary_screen->height();
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(amiga_state::scanline_callback),this), scanline);
 }
 
 
@@ -400,12 +400,11 @@ static void update_irqs(running_machine &machine)
 }
 
 
-static TIMER_CALLBACK( amiga_irq_proc )
+TIMER_CALLBACK_MEMBER(amiga_state::amiga_irq_proc)
 {
-	amiga_state *state = machine.driver_data<amiga_state>();
 
-	update_irqs(machine);
-	state->m_irq_timer->reset( );
+	update_irqs(machine());
+	m_irq_timer->reset( );
 }
 
 
@@ -891,9 +890,9 @@ static UINT32 blit_line(amiga_state *state)
  *
  *************************************/
 
-static TIMER_CALLBACK( amiga_blitter_proc )
+TIMER_CALLBACK_MEMBER(amiga_state::amiga_blitter_proc)
 {
-	amiga_state *state = machine.driver_data<amiga_state>();
+	amiga_state *state = machine().driver_data<amiga_state>();
 	UINT32 blitsum = 0;
 
 	/* logging */
@@ -918,16 +917,16 @@ static TIMER_CALLBACK( amiga_blitter_proc )
 	switch (CUSTOM_REG(REG_BLTCON1) & 0x0003)
 	{
 		case 0:	/* ascending */
-			blitsum = blit_ascending(state);
+			blitsum = blit_ascending(this);
 			break;
 
 		case 2:	/* descending */
-			blitsum = blit_descending(state);
+			blitsum = blit_descending(this);
 			break;
 
 		case 1:	/* line */
 		case 3:
-			blitsum = blit_line(state);
+			blitsum = blit_line(this);
 			break;
 	}
 
@@ -939,10 +938,10 @@ static TIMER_CALLBACK( amiga_blitter_proc )
 	CUSTOM_REG(REG_DMACON) &= ~0x4000;
 
 	/* signal an interrupt */
-	amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_BLIT, 0xffff);
+	amiga_custom_w(machine().device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_BLIT, 0xffff);
 
 	/* reset the blitter timer */
-	state->m_blitter_timer->reset( );
+	m_blitter_timer->reset( );
 }
 
 
@@ -1241,15 +1240,15 @@ READ16_HANDLER( amiga_custom_r )
  *
  *************************************/
 
-static TIMER_CALLBACK( finish_serial_write )
+TIMER_CALLBACK_MEMBER(amiga_state::finish_serial_write)
 {
-	amiga_state *state = machine.driver_data<amiga_state>();
+	amiga_state *state = machine().driver_data<amiga_state>();
 
 	/* mark the transfer buffer empty */
 	CUSTOM_REG(REG_SERDATR) |= 0x3000;
 
 	/* signal an interrupt */
-	amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_TBE, 0xffff);
+	amiga_custom_w(machine().device("maincpu")->memory().space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_TBE, 0xffff);
 }
 
 
@@ -1298,7 +1297,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			if (state->m_intf->serdat_w != NULL)
 				(*state->m_intf->serdat_w)(space.machine(), data);
 			CUSTOM_REG(REG_SERDATR) &= ~0x3000;
-			space.machine().scheduler().timer_set(amiga_get_serial_char_period(space.machine()), FUNC(finish_serial_write));
+			space.machine().scheduler().timer_set(amiga_get_serial_char_period(space.machine()), timer_expired_delegate(FUNC(amiga_state::finish_serial_write),state));
 			break;
 
 		case REG_BLTSIZE:

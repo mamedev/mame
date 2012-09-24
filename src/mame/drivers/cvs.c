@@ -293,16 +293,15 @@ READ8_MEMBER(cvs_state::tms_clock_r)
 	return tms5110_romclk_hack_r(device, space, 0) ? 0x80 : 0;
 }
 
-static TIMER_CALLBACK( cvs_393hz_timer_cb )
+TIMER_CALLBACK_MEMBER(cvs_state::cvs_393hz_timer_cb)
 {
-	cvs_state *state = machine.driver_data<cvs_state>();
-	state->m_cvs_393hz_clock = !state->m_cvs_393hz_clock;
+	m_cvs_393hz_clock = !m_cvs_393hz_clock;
 
 	/* quasar.c games use this timer but have no dac3! */
-	if (state->m_dac3 != NULL)
+	if (m_dac3 != NULL)
 	{
-		if (state->m_dac3_state[2])
-			state->m_dac3->write_unsigned8(state->m_cvs_393hz_clock * 0xff);
+		if (m_dac3_state[2])
+			m_dac3->write_unsigned8(m_cvs_393hz_clock * 0xff);
 	}
 }
 
@@ -310,7 +309,7 @@ static TIMER_CALLBACK( cvs_393hz_timer_cb )
 static void start_393hz_timer(running_machine &machine)
 {
 	cvs_state *state = machine.driver_data<cvs_state>();
-	state->m_cvs_393hz_timer = machine.scheduler().timer_alloc(FUNC(cvs_393hz_timer_cb));
+	state->m_cvs_393hz_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(cvs_state::cvs_393hz_timer_cb),state));
 	state->m_cvs_393hz_timer->adjust(attotime::from_hz(30*393), 0, attotime::from_hz(30*393));
 }
 

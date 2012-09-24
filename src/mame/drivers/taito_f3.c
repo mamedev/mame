@@ -390,15 +390,15 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static TIMER_CALLBACK( f3_interrupt3 )
+TIMER_CALLBACK_MEMBER(taito_f3_state::f3_interrupt3)
 {
-	machine.device("maincpu")->execute().set_input_line(3, HOLD_LINE);	// some signal from video hardware?
+	machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);	// some signal from video hardware?
 }
 
 INTERRUPT_GEN_MEMBER(taito_f3_state::f3_interrupt2)
 {
 	device.execute().set_input_line(2, HOLD_LINE);	// vblank
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), FUNC(f3_interrupt3));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), timer_expired_delegate(FUNC(taito_f3_state::f3_interrupt3),this));
 }
 
 static SOUND_RESET( f3 )

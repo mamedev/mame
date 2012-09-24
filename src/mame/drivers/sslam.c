@@ -213,38 +213,37 @@ static const UINT8 sslam_snd_loop[8][19] =
 
 
 
-static TIMER_CALLBACK( music_playback )
+TIMER_CALLBACK_MEMBER(sslam_state::music_playback)
 {
-	sslam_state *state = machine.driver_data<sslam_state>();
 	int pattern = 0;
-	okim6295_device *device = machine.device<okim6295_device>("oki");
+	okim6295_device *device = machine().device<okim6295_device>("oki");
 
 	if ((device->read_status() & 0x08) == 0)
 	{
-		state->m_bar += 1;
-		pattern = sslam_snd_loop[state->m_melody][state->m_bar];
+		m_bar += 1;
+		pattern = sslam_snd_loop[m_melody][m_bar];
 
 		if (pattern) {
 			if (pattern == 0xff) {		/* Repeat track from first bar */
-				state->m_bar = 0;
-				pattern = sslam_snd_loop[state->m_melody][state->m_bar];
+				m_bar = 0;
+				pattern = sslam_snd_loop[m_melody][m_bar];
 			}
 			logerror("Changing bar in music track to pattern %02x\n",pattern);
 			device->write_command(0x80 | pattern);
 			device->write_command(0x81);
 		}
 		else if (pattern == 0x00) {		/* Non-looped track. Stop playing it */
-			state->m_track = 0;
-			state->m_melody = 0;
-			state->m_bar = 0;
-			state->m_music_timer->enable(false);
+			m_track = 0;
+			m_melody = 0;
+			m_bar = 0;
+			m_music_timer->enable(false);
 		}
 	}
 
 	if (0)
 	{
-		pattern = sslam_snd_loop[state->m_melody][state->m_bar];
-		popmessage("Music track: %02x, Melody: %02x, Pattern: %02x, Bar:%02d",state->m_track,state->m_melody,pattern,state->m_bar);
+		pattern = sslam_snd_loop[m_melody][m_bar];
+		popmessage("Music track: %02x, Melody: %02x, Pattern: %02x, Bar:%02d",m_track,m_melody,pattern,m_bar);
 	}
 }
 
@@ -926,7 +925,7 @@ DRIVER_INIT_MEMBER(sslam_state,sslam)
 	save_item(NAME(m_bar));
 	save_item(NAME(m_snd_bank));
 
-	m_music_timer = machine().scheduler().timer_alloc(FUNC(music_playback));
+	m_music_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sslam_state::music_playback),this));
 }
 
 DRIVER_INIT_MEMBER(sslam_state,powerbls)

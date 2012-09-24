@@ -132,9 +132,9 @@ READ32_MEMBER(midvunit_state::midvunit_adc_r)
 }
 
 
-static TIMER_CALLBACK( adc_ready )
+TIMER_CALLBACK_MEMBER(midvunit_state::adc_ready)
 {
-	machine.device("maincpu")->execute().set_input_line(3, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(3, ASSERT_LINE);
 }
 
 
@@ -148,7 +148,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_adc_w)
 		if (which < 0 || which > 2)
 			logerror("adc_w: unexpected which = %02X\n", which + 4);
 		m_adc_data = ioport(adcnames[which])->read_safe(0);
-		machine().scheduler().timer_set(attotime::from_msec(1), FUNC(adc_ready));
+		machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(midvunit_state::adc_ready),this));
 	}
 	else
 		logerror("adc_w without enabling writes!\n");

@@ -56,6 +56,7 @@ public:
 	UINT32 screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(moo_interrupt);
 	INTERRUPT_GEN_MEMBER(moobl_interrupt);
+	TIMER_CALLBACK_MEMBER(dmaend_callback);
 };
 
 /*----------- defined in video/moo.c -----------*/

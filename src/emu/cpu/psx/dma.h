@@ -51,7 +51,7 @@ private:
 	void dma_timer_adjust( int n_channel );
 	void dma_interrupt_update();
 	void dma_finished( int n_channel );
-	void dma_finished_callback(void *ptr, int param);
+	TIMER_CALLBACK_MEMBER(dma_finished_callback);
 	void write( offs_t offset, UINT32 data, UINT32 mem_mask );
 	UINT32 read( offs_t offset, UINT32 mem_mask );
 

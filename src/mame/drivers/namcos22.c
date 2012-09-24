@@ -2705,10 +2705,9 @@ READ8_MEMBER(namcos22_state::propcycle_mcu_adc_r)
 	}
 }
 
-static TIMER_CALLBACK( alpine_steplock_callback )
+TIMER_CALLBACK_MEMBER(namcos22_state::alpine_steplock_callback)
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	state->m_motor_status = param;
+	m_motor_status = param;
 }
 
 WRITE8_MEMBER(namcos22_state::alpine_mcu_port5_w)
@@ -5486,7 +5485,7 @@ static void alpine_init_common( running_machine &machine, int game_type )
 	state->m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::alpineracer_mcu_adc_r),state));
 	state->m_mcu->space(AS_IO).install_write_handler(M37710_PORT5, M37710_PORT5, write8_delegate(FUNC(namcos22_state::alpine_mcu_port5_w),state));
 
-	state->m_motor_timer = machine.scheduler().timer_alloc(FUNC(alpine_steplock_callback));
+	state->m_motor_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos22_state::alpine_steplock_callback),state));
 	state->m_motor_timer->reset();
 	state->m_motor_status = 2;
 }

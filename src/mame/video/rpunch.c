@@ -58,12 +58,11 @@ TILE_GET_INFO_MEMBER(rpunch_state::get_bg1_tile_info)
  *
  *************************************/
 
-static TIMER_CALLBACK( crtc_interrupt_gen )
+TIMER_CALLBACK_MEMBER(rpunch_state::crtc_interrupt_gen)
 {
-	rpunch_state *state = machine.driver_data<rpunch_state>();
-	machine.device("maincpu")->execute().set_input_line(1, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
 	if (param != 0)
-		state->m_crtc_timer->adjust(machine.primary_screen->frame_period() / param, 0, machine.primary_screen->frame_period() / param);
+		m_crtc_timer->adjust(machine().primary_screen->frame_period() / param, 0, machine().primary_screen->frame_period() / param);
 }
 
 
@@ -80,7 +79,7 @@ void rpunch_state::video_start()
 		memset(m_bitmapram, 0xff, m_bitmapram.bytes());
 
 	/* reset the timer */
-	m_crtc_timer = machine().scheduler().timer_alloc(FUNC(crtc_interrupt_gen));
+	m_crtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rpunch_state::crtc_interrupt_gen),this));
 }
 
 

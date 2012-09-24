@@ -23,17 +23,16 @@ READ8_MEMBER(arkanoid_state::arkanoid_Z80_mcu_r)
 	return m_toz80;
 }
 
-static TIMER_CALLBACK( test )
+TIMER_CALLBACK_MEMBER(arkanoid_state::test)
 {
-	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 
-	state->m_z80write = 1;
-	state->m_fromz80 = param;
+	m_z80write = 1;
+	m_fromz80 = param;
 }
 
 WRITE8_MEMBER(arkanoid_state::arkanoid_Z80_mcu_w)
 {
-	machine().scheduler().synchronize(FUNC(test), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(arkanoid_state::test),this), data);
 	/* boost the interleave for a few usecs to make sure it is read successfully */
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }

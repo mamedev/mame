@@ -120,16 +120,15 @@ static void sound_nmi_callback( running_machine &machine, int param )
 }
 #endif
 
-static TIMER_CALLBACK( nmi_callback )
+TIMER_CALLBACK_MEMBER(simpsons_state::nmi_callback)
 {
-	simpsons_state *state = machine.driver_data<simpsons_state>();
-	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(simpsons_state::z80_arm_nmi_w)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	machine().scheduler().timer_set(attotime::from_usec(25), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
+	machine().scheduler().timer_set(attotime::from_usec(25), timer_expired_delegate(FUNC(simpsons_state::nmi_callback),this));	/* kludge until the K053260 is emulated correctly */
 }
 
 static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, simpsons_state )
@@ -252,11 +251,10 @@ static void simpsons_objdma( running_machine &machine )
 	if (num_inactive) do { *dst = 0; dst += 8; } while (--num_inactive);
 }
 
-static TIMER_CALLBACK( dmaend_callback )
+TIMER_CALLBACK_MEMBER(simpsons_state::dmaend_callback)
 {
-	simpsons_state *state = machine.driver_data<simpsons_state>();
-	if (state->m_firq_enabled)
-		state->m_maincpu->set_input_line(KONAMI_FIRQ_LINE, HOLD_LINE);
+	if (m_firq_enabled)
+		m_maincpu->set_input_line(KONAMI_FIRQ_LINE, HOLD_LINE);
 }
 
 
@@ -267,7 +265,7 @@ INTERRUPT_GEN_MEMBER(simpsons_state::simpsons_irq)
 	{
 		simpsons_objdma(machine());
 		// 32+256us delay at 8MHz dotclock; artificially shortened since actual V-blank length is unknown
-		machine().scheduler().timer_set(attotime::from_usec(30), FUNC(dmaend_callback));
+		machine().scheduler().timer_set(attotime::from_usec(30), timer_expired_delegate(FUNC(simpsons_state::dmaend_callback),this));
 	}
 
 	if (k052109_is_irq_enabled(m_k052109))

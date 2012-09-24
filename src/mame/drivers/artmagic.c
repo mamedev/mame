@@ -133,11 +133,10 @@ WRITE16_MEMBER(artmagic_state::control_w)
  *
  *************************************/
 
-static TIMER_CALLBACK( irq_off )
+TIMER_CALLBACK_MEMBER(artmagic_state::irq_off)
 {
-	artmagic_state *state = machine.driver_data<artmagic_state>();
-	state->m_hack_irq = 0;
-	update_irq_state(machine);
+	m_hack_irq = 0;
+	update_irq_state(machine());
 }
 
 READ16_MEMBER(artmagic_state::ultennis_hack_r)
@@ -148,7 +147,7 @@ READ16_MEMBER(artmagic_state::ultennis_hack_r)
 	{
 		m_hack_irq = 1;
 		update_irq_state(machine());
-		machine().scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off));
+		machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(artmagic_state::irq_off),this));
 	}
 	return ioport("300000")->read();
 }

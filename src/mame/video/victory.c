@@ -1068,13 +1068,12 @@ static void update_foreground(running_machine &machine)
 }
 
 
-static TIMER_CALLBACK( bgcoll_irq_callback )
+TIMER_CALLBACK_MEMBER(victory_state::bgcoll_irq_callback)
 {
-	victory_state *state = machine.driver_data<victory_state>();
-	state->m_bgcollx = param & 0xff;
-	state->m_bgcolly = param >> 8;
-	state->m_bgcoll = 1;
-	victory_update_irq(machine);
+	m_bgcollx = param & 0xff;
+	m_bgcolly = param >> 8;
+	m_bgcoll = 1;
+	victory_update_irq(machine());
 }
 
 
@@ -1113,7 +1112,7 @@ UINT32 victory_state::screen_update_victory(screen_device &screen, bitmap_ind16 
 			int bpix = bg[(x + m_scrollx) & 255];
 			scanline[x] = bpix | (fpix << 3);
 			if (fpix && (bpix & bgcollmask) && count++ < 128)
-				machine().scheduler().timer_set(screen.time_until_pos(y, x), FUNC(bgcoll_irq_callback), x | (y << 8));
+				machine().scheduler().timer_set(screen.time_until_pos(y, x), timer_expired_delegate(FUNC(victory_state::bgcoll_irq_callback),this), x | (y << 8));
 		}
 	}
 

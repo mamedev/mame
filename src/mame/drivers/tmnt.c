@@ -315,17 +315,16 @@ static void sound_nmi_callback( int param )
 }
 #endif
 
-static TIMER_CALLBACK( nmi_callback )
+TIMER_CALLBACK_MEMBER(tmnt_state::nmi_callback)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
-	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(tmnt_state::sound_arm_nmi_w)
 {
 //  sound_nmi_enabled = 1;
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	machine().scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
+	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(tmnt_state::nmi_callback),this));	/* kludge until the K053260 is emulated correctly */
 }
 
 

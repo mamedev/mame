@@ -178,6 +178,8 @@ public:
 	UINT32 screen_update_multi32_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_multi32_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(start_of_vblank_int);
+	TIMER_CALLBACK_MEMBER(end_of_vblank_int);
+	TIMER_CALLBACK_MEMBER(update_sprites);
 };
 
 /*----------- defined in machine/segas32.c -----------*/

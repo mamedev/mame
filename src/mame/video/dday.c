@@ -23,13 +23,12 @@ READ8_MEMBER(dday_state::dday_countdown_timer_r)
 	return ((m_timer_value / 10) << 4) | (m_timer_value % 10);
 }
 
-static TIMER_CALLBACK( countdown_timer_callback )
+TIMER_CALLBACK_MEMBER(dday_state::countdown_timer_callback)
 {
-	dday_state *state = machine.driver_data<dday_state>();
-	state->m_timer_value--;
+	m_timer_value--;
 
-	if (state->m_timer_value < 0)
-		state->m_timer_value = 99;
+	if (m_timer_value < 0)
+		m_timer_value = 99;
 }
 
 static void start_countdown_timer(running_machine &machine)
@@ -38,7 +37,7 @@ static void start_countdown_timer(running_machine &machine)
 
 	state->m_timer_value = 0;
 
-	machine.scheduler().timer_pulse(attotime::from_seconds(1), FUNC(countdown_timer_callback));
+	machine.scheduler().timer_pulse(attotime::from_seconds(1), timer_expired_delegate(FUNC(dday_state::countdown_timer_callback),state));
 }
 
 

@@ -522,26 +522,25 @@ static GFXDECODE_START( 2 )
 GFXDECODE_END
 
 
-static TIMER_CALLBACK( network_interrupt_callback )
+TIMER_CALLBACK_MEMBER(namcofl_state::network_interrupt_callback)
 {
-	machine.device("maincpu")->execute().set_input_line(I960_IRQ0, ASSERT_LINE);
-	machine.scheduler().timer_set(machine.primary_screen->frame_period(), FUNC(network_interrupt_callback));
+	machine().device("maincpu")->execute().set_input_line(I960_IRQ0, ASSERT_LINE);
+	machine().scheduler().timer_set(machine().primary_screen->frame_period(), timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
 }
 
 
-static TIMER_CALLBACK( vblank_interrupt_callback )
+TIMER_CALLBACK_MEMBER(namcofl_state::vblank_interrupt_callback)
 {
-	machine.device("maincpu")->execute().set_input_line(I960_IRQ2, ASSERT_LINE);
-	machine.scheduler().timer_set(machine.primary_screen->frame_period(), FUNC(vblank_interrupt_callback));
+	machine().device("maincpu")->execute().set_input_line(I960_IRQ2, ASSERT_LINE);
+	machine().scheduler().timer_set(machine().primary_screen->frame_period(), timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
 }
 
 
-static TIMER_CALLBACK( raster_interrupt_callback )
+TIMER_CALLBACK_MEMBER(namcofl_state::raster_interrupt_callback)
 {
-	namcofl_state *state = machine.driver_data<namcofl_state>();
-	machine.primary_screen->update_partial(machine.primary_screen->vpos());
-	machine.device("maincpu")->execute().set_input_line(I960_IRQ1, ASSERT_LINE);
-	state->m_raster_interrupt_timer->adjust(machine.primary_screen->frame_period());
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	machine().device("maincpu")->execute().set_input_line(I960_IRQ1, ASSERT_LINE);
+	m_raster_interrupt_timer->adjust(machine().primary_screen->frame_period());
 }
 
 static TIMER_DEVICE_CALLBACK( mcu_irq0_cb )
@@ -568,14 +567,14 @@ static TIMER_DEVICE_CALLBACK( mcu_adc_cb )
 
 MACHINE_START_MEMBER(namcofl_state,namcofl)
 {
-	m_raster_interrupt_timer = machine().scheduler().timer_alloc(FUNC(raster_interrupt_callback));
+	m_raster_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::raster_interrupt_callback),this));
 }
 
 
 MACHINE_RESET_MEMBER(namcofl_state,namcofl)
 {
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(machine().primary_screen->visible_area().max_y + 3), FUNC(network_interrupt_callback));
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(machine().primary_screen->visible_area().max_y + 1), FUNC(vblank_interrupt_callback));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(machine().primary_screen->visible_area().max_y + 3), timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(machine().primary_screen->visible_area().max_y + 1), timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
 
 	membank("bank1")->set_base(memregion("maincpu")->base() );
 	membank("bank2")->set_base(m_workram );

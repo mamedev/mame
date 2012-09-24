@@ -171,16 +171,15 @@ WRITE16_MEMBER(slapshot_state::color_ram_word_w)
                 INTERRUPTS
 ***********************************************************/
 
-static TIMER_CALLBACK( slapshot_interrupt6 )
+TIMER_CALLBACK_MEMBER(slapshot_state::slapshot_interrupt6)
 {
-	slapshot_state *state = machine.driver_data<slapshot_state>();
-	state->m_maincpu->set_input_line(6, HOLD_LINE);
+	m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 
 INTERRUPT_GEN_MEMBER(slapshot_state::slapshot_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), FUNC(slapshot_interrupt6));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), timer_expired_delegate(FUNC(slapshot_state::slapshot_interrupt6),this));
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 

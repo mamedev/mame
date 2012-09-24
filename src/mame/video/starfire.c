@@ -7,7 +7,7 @@
 #include "emu.h"
 #include "includes/starfire.h"
 
-static TIMER_CALLBACK( starfire_scanline_callback );
+
 
 /*************************************
  *
@@ -19,7 +19,7 @@ void starfire_state::video_start()
 {
 
 	machine().primary_screen->register_screen_bitmap(m_starfire_screen);
-	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(starfire_scanline_callback));
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(starfire_state::starfire_scanline_callback),this));
 	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(STARFIRE_VBEND), STARFIRE_VBEND);
 
     /* register for state saving */
@@ -229,30 +229,29 @@ static void get_pens(running_machine &machine, pen_t *pens)
 	}
 }
 
-static TIMER_CALLBACK( starfire_scanline_callback )
+TIMER_CALLBACK_MEMBER(starfire_state::starfire_scanline_callback)
 {
-    starfire_state *state = machine.driver_data<starfire_state>();
     pen_t pens[STARFIRE_NUM_PENS];
 	int y = param;
 
-	get_pens(machine, pens);
+	get_pens(machine(), pens);
 
-	UINT8 *pix = &state->m_starfire_videoram[y];
-	UINT8 *col = &state->m_starfire_colorram[y];
+	UINT8 *pix = &m_starfire_videoram[y];
+	UINT8 *col = &m_starfire_colorram[y];
 
 	for (int x = 0; x < 256; x += 8)
 	{
 		int data = pix[0];
 		int color = col[0];
 
-		state->m_starfire_screen.pix32(y, x + 0) = pens[color | ((data >> 2) & 0x20)];
-		state->m_starfire_screen.pix32(y, x + 1) = pens[color | ((data >> 1) & 0x20)];
-		state->m_starfire_screen.pix32(y, x + 2) = pens[color | ((data >> 0) & 0x20)];
-		state->m_starfire_screen.pix32(y, x + 3) = pens[color | ((data << 1) & 0x20)];
-		state->m_starfire_screen.pix32(y, x + 4) = pens[color | ((data << 2) & 0x20)];
-		state->m_starfire_screen.pix32(y, x + 5) = pens[color | ((data << 3) & 0x20)];
-		state->m_starfire_screen.pix32(y, x + 6) = pens[color | ((data << 4) & 0x20)];
-		state->m_starfire_screen.pix32(y, x + 7) = pens[color | ((data << 5) & 0x20)];
+		m_starfire_screen.pix32(y, x + 0) = pens[color | ((data >> 2) & 0x20)];
+		m_starfire_screen.pix32(y, x + 1) = pens[color | ((data >> 1) & 0x20)];
+		m_starfire_screen.pix32(y, x + 2) = pens[color | ((data >> 0) & 0x20)];
+		m_starfire_screen.pix32(y, x + 3) = pens[color | ((data << 1) & 0x20)];
+		m_starfire_screen.pix32(y, x + 4) = pens[color | ((data << 2) & 0x20)];
+		m_starfire_screen.pix32(y, x + 5) = pens[color | ((data << 3) & 0x20)];
+		m_starfire_screen.pix32(y, x + 6) = pens[color | ((data << 4) & 0x20)];
+		m_starfire_screen.pix32(y, x + 7) = pens[color | ((data << 5) & 0x20)];
 
 		pix += 256;
 		col += 256;
@@ -260,7 +259,7 @@ static TIMER_CALLBACK( starfire_scanline_callback )
 
 	y++;
 	if (y >= STARFIRE_VBSTART) y = STARFIRE_VBEND;
-	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(y), y);
+	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(y), y);
 }
 
 UINT32 starfire_state::screen_update_starfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

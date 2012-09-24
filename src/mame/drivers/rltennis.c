@@ -130,21 +130,20 @@ static INPUT_PORTS_START( rltennis )
 	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static TIMER_CALLBACK( sample_player )
+TIMER_CALLBACK_MEMBER(rltennis_state::sample_player)
 {
-	rltennis_state *state = machine.driver_data<rltennis_state>();
 
-	if((state->m_dac_counter&0x7ff) == 0x7ff) /* reload top address bits */
+	if((m_dac_counter&0x7ff) == 0x7ff) /* reload top address bits */
 	{
-		state->m_sample_rom_offset_1=(( state->m_data740000 >> state->m_offset_shift ) & 0xff )<<11;
-		state->m_sample_rom_offset_2=(( state->m_data760000 >> state->m_offset_shift ) & 0xff )<<11;
-		state->m_offset_shift^=8; /* switch between MSB and LSB */
+		m_sample_rom_offset_1=(( m_data740000 >> m_offset_shift ) & 0xff )<<11;
+		m_sample_rom_offset_2=(( m_data760000 >> m_offset_shift ) & 0xff )<<11;
+		m_offset_shift^=8; /* switch between MSB and LSB */
 	}
-	++state->m_dac_counter; /* update low address bits */
+	++m_dac_counter; /* update low address bits */
 
-	state->m_dac_1->write_signed8(state->m_samples_1[state->m_sample_rom_offset_1 + ( state->m_dac_counter&0x7ff )]);
-	state->m_dac_2->write_unsigned8(state->m_samples_2[state->m_sample_rom_offset_2 + ( state->m_dac_counter&0x7ff )]);
-	state->m_timer->adjust(attotime::from_hz( RLT_TIMER_FREQ ));
+	m_dac_1->write_signed8(m_samples_1[m_sample_rom_offset_1 + ( m_dac_counter&0x7ff )]);
+	m_dac_2->write_unsigned8(m_samples_2[m_sample_rom_offset_2 + ( m_dac_counter&0x7ff )]);
+	m_timer->adjust(attotime::from_hz( RLT_TIMER_FREQ ));
 }
 
 INTERRUPT_GEN_MEMBER(rltennis_state::rltennis_interrupt)
@@ -163,7 +162,7 @@ void rltennis_state::machine_start()
 	m_samples_1 = memregion("samples1")->base();
 	m_samples_2 = memregion("samples2")->base();
 	m_gfx =  memregion("gfx1")->base();
-	m_timer = machine().scheduler().timer_alloc(FUNC(sample_player));
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rltennis_state::sample_player),this));
 }
 
 void rltennis_state::machine_reset()

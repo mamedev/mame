@@ -223,25 +223,24 @@ UINT8 neogeo_get_auto_animation_counter( running_machine &machine )
 }
 
 
-static TIMER_CALLBACK( auto_animation_timer_callback )
+TIMER_CALLBACK_MEMBER(neogeo_state::auto_animation_timer_callback)
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
-	if (state->m_auto_animation_frame_counter == 0)
+	if (m_auto_animation_frame_counter == 0)
 	{
-		state->m_auto_animation_frame_counter = state->m_auto_animation_speed;
-		state->m_auto_animation_counter += 1;
+		m_auto_animation_frame_counter = m_auto_animation_speed;
+		m_auto_animation_counter += 1;
 	}
 	else
-		state->m_auto_animation_frame_counter = state->m_auto_animation_frame_counter - 1;
+		m_auto_animation_frame_counter = m_auto_animation_frame_counter - 1;
 
-	state->m_auto_animation_timer->adjust(machine.primary_screen->time_until_pos(NEOGEO_VSSTART));
+	m_auto_animation_timer->adjust(machine().primary_screen->time_until_pos(NEOGEO_VSSTART));
 }
 
 
 static void create_auto_animation_timer( running_machine &machine )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
-	state->m_auto_animation_timer = machine.scheduler().timer_alloc(FUNC(auto_animation_timer_callback));
+	state->m_auto_animation_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(neogeo_state::auto_animation_timer_callback),state));
 }
 
 
@@ -640,29 +639,28 @@ static void parse_sprites( running_machine &machine, int scanline )
 }
 
 
-static TIMER_CALLBACK( sprite_line_timer_callback )
+TIMER_CALLBACK_MEMBER(neogeo_state::sprite_line_timer_callback)
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
 	int scanline = param;
 
 	/* we are at the beginning of a scanline -
        we need to draw the previous scanline and parse the sprites on the current one */
 	if (scanline != 0)
-		machine.primary_screen->update_partial(scanline - 1);
+		machine().primary_screen->update_partial(scanline - 1);
 
-	parse_sprites(machine, scanline);
+	parse_sprites(machine(), scanline);
 
 	/* let's come back at the beginning of the next line */
 	scanline = (scanline + 1) % NEOGEO_VTOTAL;
 
-	state->m_sprite_line_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	m_sprite_line_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 
 static void create_sprite_line_timer( running_machine &machine )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
-	state->m_sprite_line_timer = machine.scheduler().timer_alloc(FUNC(sprite_line_timer_callback));
+	state->m_sprite_line_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(neogeo_state::sprite_line_timer_callback),state));
 }
 
 

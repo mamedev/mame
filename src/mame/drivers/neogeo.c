@@ -268,67 +268,64 @@ void neogeo_acknowledge_interrupt( running_machine &machine, UINT16 data )
 }
 
 
-static TIMER_CALLBACK( display_position_interrupt_callback )
+TIMER_CALLBACK_MEMBER(neogeo_state::display_position_interrupt_callback)
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
 
-	if (LOG_VIDEO_SYSTEM) logerror("--- Scanline @ %d,%d\n", machine.primary_screen->vpos(), machine.primary_screen->hpos());
+	if (LOG_VIDEO_SYSTEM) logerror("--- Scanline @ %d,%d\n", machine().primary_screen->vpos(), machine().primary_screen->hpos());
 
-	if (state->m_display_position_interrupt_control & IRQ2CTRL_ENABLE)
+	if (m_display_position_interrupt_control & IRQ2CTRL_ENABLE)
 	{
-		if (LOG_VIDEO_SYSTEM) logerror("*** Scanline interrupt (IRQ2) ***  y: %02x  x: %02x\n", machine.primary_screen->vpos(), machine.primary_screen->hpos());
-		state->m_display_position_interrupt_pending = 1;
+		if (LOG_VIDEO_SYSTEM) logerror("*** Scanline interrupt (IRQ2) ***  y: %02x  x: %02x\n", machine().primary_screen->vpos(), machine().primary_screen->hpos());
+		m_display_position_interrupt_pending = 1;
 
-		update_interrupts(machine);
+		update_interrupts(machine());
 	}
 
-	if (state->m_display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_REPEAT)
+	if (m_display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_REPEAT)
 	{
 		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_REPEAT ");
-		adjust_display_position_interrupt_timer(machine);
+		adjust_display_position_interrupt_timer(machine());
 	}
 }
 
 
-static TIMER_CALLBACK( display_position_vblank_callback )
+TIMER_CALLBACK_MEMBER(neogeo_state::display_position_vblank_callback)
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
 
-	if (state->m_display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_VBLANK)
+	if (m_display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_VBLANK)
 	{
 		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_VBLANK ");
-		adjust_display_position_interrupt_timer(machine);
+		adjust_display_position_interrupt_timer(machine());
 	}
 
 	/* set timer for next screen */
-	state->m_display_position_vblank_timer->adjust(machine.primary_screen->time_until_pos(NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS));
+	m_display_position_vblank_timer->adjust(machine().primary_screen->time_until_pos(NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS));
 }
 
 
-static TIMER_CALLBACK( vblank_interrupt_callback )
+TIMER_CALLBACK_MEMBER(neogeo_state::vblank_interrupt_callback)
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
 
-	if (LOG_VIDEO_SYSTEM) logerror("+++ VBLANK @ %d,%d\n", machine.primary_screen->vpos(), machine.primary_screen->hpos());
+	if (LOG_VIDEO_SYSTEM) logerror("+++ VBLANK @ %d,%d\n", machine().primary_screen->vpos(), machine().primary_screen->hpos());
 
 	/* add a timer tick to the pd4990a */
-	upd4990a_addretrace(state->m_upd4990a);
+	upd4990a_addretrace(m_upd4990a);
 
-	state->m_vblank_interrupt_pending = 1;
+	m_vblank_interrupt_pending = 1;
 
-	update_interrupts(machine);
+	update_interrupts(machine());
 
 	/* set timer for next screen */
-	state->m_vblank_interrupt_timer->adjust(machine.primary_screen->time_until_pos(NEOGEO_VBSTART));
+	m_vblank_interrupt_timer->adjust(machine().primary_screen->time_until_pos(NEOGEO_VBSTART));
 }
 
 
 static void create_interrupt_timers( running_machine &machine )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
-	state->m_display_position_interrupt_timer = machine.scheduler().timer_alloc(FUNC(display_position_interrupt_callback));
-	state->m_display_position_vblank_timer = machine.scheduler().timer_alloc(FUNC(display_position_vblank_callback));
-	state->m_vblank_interrupt_timer = machine.scheduler().timer_alloc(FUNC(vblank_interrupt_callback));
+	state->m_display_position_interrupt_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(neogeo_state::display_position_interrupt_callback),state));
+	state->m_display_position_vblank_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(neogeo_state::display_position_vblank_callback),state));
+	state->m_vblank_interrupt_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(neogeo_state::vblank_interrupt_callback),state));
 }
 
 

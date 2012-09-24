@@ -217,6 +217,7 @@ public:
 	UINT32 screen_update_spclforc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(s2650_interrupt);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	TIMER_CALLBACK_MEMBER(scanline_callback);
 };
 
 /*----------- defined in audio/dkong.c -----------*/

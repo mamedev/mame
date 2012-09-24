@@ -40,9 +40,9 @@ static void update_interrupts(running_machine &machine)
 }
 
 
-static TIMER_CALLBACK( irq_gen )
+TIMER_CALLBACK_MEMBER(skullxbo_state::irq_gen)
 {
-	atarigen_scanline_int_gen(machine.device("maincpu"));
+	atarigen_scanline_int_gen(machine().device("maincpu"));
 }
 
 
@@ -57,7 +57,7 @@ static void alpha_row_update(screen_device &screen, int scanline)
 	{
 		int	width = screen.width();
 		attotime period = screen.time_until_pos(screen.vpos() + 6, width * 0.9);
-		screen.machine().scheduler().timer_set(period, FUNC(irq_gen));
+		screen.machine().scheduler().timer_set(period, timer_expired_delegate(FUNC(skullxbo_state::irq_gen),state));
 	}
 
 	/* update the playfield and motion objects */

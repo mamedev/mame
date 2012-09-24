@@ -170,20 +170,19 @@ WRITE16_MEMBER(exterm_state::exterm_output_port_0_w)
 }
 
 
-static TIMER_CALLBACK( sound_delayed_w )
+TIMER_CALLBACK_MEMBER(exterm_state::sound_delayed_w)
 {
-	exterm_state *state = machine.driver_data<exterm_state>();
 	/* data is latched independently for both sound CPUs */
-	state->m_master_sound_latch = state->m_slave_sound_latch = param;
-	machine.device("audiocpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	machine.device("audioslave")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	m_master_sound_latch = m_slave_sound_latch = param;
+	machine().device("audiocpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	machine().device("audioslave")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 
 WRITE16_MEMBER(exterm_state::sound_latch_w)
 {
 	if (ACCESSING_BITS_0_7)
-		machine().scheduler().synchronize(FUNC(sound_delayed_w), data & 0xff);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(exterm_state::sound_delayed_w),this), data & 0xff);
 }
 
 

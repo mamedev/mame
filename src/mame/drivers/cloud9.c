@@ -122,21 +122,20 @@ INLINE void schedule_next_irq(running_machine &machine, int curscanline)
 }
 
 
-static TIMER_CALLBACK( clock_irq )
+TIMER_CALLBACK_MEMBER(cloud9_state::clock_irq)
 {
-	cloud9_state *state = machine.driver_data<cloud9_state>();
 	/* assert the IRQ if not already asserted */
-	if (!state->m_irq_state)
+	if (!m_irq_state)
 	{
-		state->m_maincpu->set_input_line(0, ASSERT_LINE);
-		state->m_irq_state = 1;
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_irq_state = 1;
 	}
 
 	/* force an update now */
-	machine.primary_screen->update_partial(machine.primary_screen->vpos());
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
 
 	/* find the next edge */
-	schedule_next_irq(machine, param);
+	schedule_next_irq(machine(), param);
 }
 
 
@@ -181,7 +180,7 @@ void cloud9_state::machine_start()
 	machine().primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* create a timer for IRQs and set up the first callback */
-	m_irq_timer = machine().scheduler().timer_alloc(FUNC(clock_irq));
+	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cloud9_state::clock_irq),this));
 	m_irq_state = 0;
 	schedule_next_irq(machine(), 0-64);
 

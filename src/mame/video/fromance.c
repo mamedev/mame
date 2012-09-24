@@ -11,7 +11,7 @@
 #include "includes/fromance.h"
 
 
-static TIMER_CALLBACK( crtc_interrupt_gen );
+
 
 /*************************************
  *
@@ -70,7 +70,7 @@ static void init_common( running_machine &machine )
 	state->m_fg_tilemap->set_transparent_pen(15);
 
 	/* reset the timer */
-	state->m_crtc_timer = machine.scheduler().timer_alloc(FUNC(crtc_interrupt_gen));
+	state->m_crtc_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(fromance_state::crtc_interrupt_gen),state));
 
 	/* state save */
 	state->save_item(NAME(state->m_selected_videoram));
@@ -251,12 +251,11 @@ WRITE8_MEMBER(fromance_state::fromance_scroll_w)
  *
  *************************************/
 
-static TIMER_CALLBACK( crtc_interrupt_gen )
+TIMER_CALLBACK_MEMBER(fromance_state::crtc_interrupt_gen)
 {
-	fromance_state *state = machine.driver_data<fromance_state>();
-	state->m_subcpu->set_input_line(0, HOLD_LINE);
+	m_subcpu->set_input_line(0, HOLD_LINE);
 	if (param != 0)
-		state->m_crtc_timer->adjust(machine.primary_screen->frame_period() / param, 0, machine.primary_screen->frame_period() / param);
+		m_crtc_timer->adjust(machine().primary_screen->frame_period() / param, 0, machine().primary_screen->frame_period() / param);
 }
 
 

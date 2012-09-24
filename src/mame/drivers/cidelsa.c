@@ -425,11 +425,10 @@ INPUT_PORTS_END
 
 /* Machine Start */
 
-static TIMER_CALLBACK( set_cpu_mode )
+TIMER_CALLBACK_MEMBER(cidelsa_state::set_cpu_mode)
 {
-	cidelsa_state *state = machine.driver_data<cidelsa_state>();
 
-	state->m_reset = 1;
+	m_reset = 1;
 }
 
 void cidelsa_state::machine_start()
@@ -456,7 +455,7 @@ void cidelsa_state::machine_reset()
 {
 	/* reset the CPU */
 	m_reset = 0;
-	machine().scheduler().timer_set(attotime::from_msec(200), FUNC(set_cpu_mode));
+	machine().scheduler().timer_set(attotime::from_msec(200), timer_expired_delegate(FUNC(cidelsa_state::set_cpu_mode),this));
 }
 
 /* Machine Drivers */

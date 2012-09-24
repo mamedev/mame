@@ -80,6 +80,7 @@ public:
 	UINT32 screen_update_konamigx_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(konamigx_vbinterrupt);
 	INTERRUPT_GEN_MEMBER(tms_sync);
+	TIMER_CALLBACK_MEMBER(dmaend_callback);
 };
 
 

@@ -210,6 +210,11 @@ public:
 	virtual void video_start();
 	virtual void video_reset();
 	UINT32 screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(display_position_interrupt_callback);
+	TIMER_CALLBACK_MEMBER(display_position_vblank_callback);
+	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
+	TIMER_CALLBACK_MEMBER(auto_animation_timer_callback);
+	TIMER_CALLBACK_MEMBER(sprite_line_timer_callback);
 };
 
 

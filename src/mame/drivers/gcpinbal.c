@@ -47,20 +47,18 @@ Stephh's notes (based on the game M68000 code and some tests) :
                       INTERRUPTS
 ***********************************************************/
 
-static TIMER_CALLBACK( gcpinbal_interrupt1 )
+TIMER_CALLBACK_MEMBER(gcpinbal_state::gcpinbal_interrupt1)
 {
-	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
-	state->m_maincpu->set_input_line(1, HOLD_LINE);
+	m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
-static TIMER_CALLBACK( gcpinbal_interrupt3 )
+TIMER_CALLBACK_MEMBER(gcpinbal_state::gcpinbal_interrupt3)
 {
-	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
 	// IRQ3 is from the M6585
 //  if (!ADPCM_playing(0))
 	{
-		state->m_maincpu->set_input_line(3, HOLD_LINE);
+		m_maincpu->set_input_line(3, HOLD_LINE);
 	}
 }
 #endif
@@ -69,8 +67,8 @@ INTERRUPT_GEN_MEMBER(gcpinbal_state::gcpinbal_interrupt)
 {
 	/* Unsure of actual sequence */
 
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), FUNC(gcpinbal_interrupt1));
-//  machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(1000), FUNC(gcpinbal_interrupt3));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), timer_expired_delegate(FUNC(gcpinbal_state::gcpinbal_interrupt1),this));
+//  machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(1000), timer_expired_delegate(FUNC(gcpinbal_state::gcpinbal_interrupt3),this));
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 

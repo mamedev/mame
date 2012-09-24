@@ -119,4 +119,8 @@ public:
 	UINT32 screen_update_majtitle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m72_mcu_int);
 	INTERRUPT_GEN_MEMBER(fake_nmi);
+	TIMER_CALLBACK_MEMBER(synch_callback);
+	TIMER_CALLBACK_MEMBER(m72_scanline_interrupt);
+	TIMER_CALLBACK_MEMBER(kengo_scanline_interrupt);
+	TIMER_CALLBACK_MEMBER(delayed_ram16_w);
 };

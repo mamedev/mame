@@ -203,7 +203,7 @@ static void update_pixel1(running_machine &machine, int x, int y)
 	state->m_tmpbitmap1.pix16(y, x) = machine.pens[color];
 }
 
-static TIMER_CALLBACK( blitter_timer_callback )
+TIMER_CALLBACK_MEMBER(nbmj8900_state::blitter_timer_callback)
 {
 	nb1413m3_busyflag = 1;
 }
@@ -357,7 +357,7 @@ static void nbmj8900_gfxdraw(running_machine &machine)
 	}
 
 	nb1413m3_busyflag = 0;
-	machine.scheduler().timer_set(attotime::from_nsec(2500) * nb1413m3_busyctr, FUNC(blitter_timer_callback));
+	machine.scheduler().timer_set(attotime::from_nsec(2500) * nb1413m3_busyctr, timer_expired_delegate(FUNC(nbmj8900_state::blitter_timer_callback),state));
 }
 
 /******************************************************************************

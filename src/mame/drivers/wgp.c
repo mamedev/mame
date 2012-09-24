@@ -444,25 +444,22 @@ WRITE16_MEMBER(wgp_state::cpua_ctrl_w)/* assumes Z80 sandwiched between 68Ks */
 /* 68000 A */
 
 #ifdef UNUSED_FUNCTION
-static TIMER_CALLBACK( wgp_interrupt4 )
+TIMER_CALLBACK_MEMBER(wgp_state::wgp_interrupt4)
 {
-	wgp_state *state = machine.driver_data<wgp_state>();
-	state->m_maincpu->set_input_line(4, HOLD_LINE);
+	m_maincpu->set_input_line(4, HOLD_LINE);
 }
 #endif
 
-static TIMER_CALLBACK( wgp_interrupt6 )
+TIMER_CALLBACK_MEMBER(wgp_state::wgp_interrupt6)
 {
-	wgp_state *state = machine.driver_data<wgp_state>();
-	state->m_maincpu->set_input_line(6, HOLD_LINE);
+	m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 /* 68000 B */
 
-static TIMER_CALLBACK( wgp_cpub_interrupt6 )
+TIMER_CALLBACK_MEMBER(wgp_state::wgp_cpub_interrupt6)
 {
-	wgp_state *state = machine.driver_data<wgp_state>();
-	state->m_subcpu->set_input_line(6, HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
+	m_subcpu->set_input_line(6, HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
 }
 
 
@@ -474,7 +471,7 @@ static TIMER_CALLBACK( wgp_cpub_interrupt6 )
 
 INTERRUPT_GEN_MEMBER(wgp_state::wgp_cpub_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000-500), FUNC(wgp_cpub_interrupt6));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000-500), timer_expired_delegate(FUNC(wgp_state::wgp_cpub_interrupt6),this));
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
@@ -597,7 +594,7 @@ WRITE16_MEMBER(wgp_state::wgp_adinput_w)
        hardware has got the next a/d conversion ready. We set a token
        delay of 10000 cycles although our inputs are always ready. */
 
-	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), FUNC(wgp_interrupt6));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), timer_expired_delegate(FUNC(wgp_state::wgp_interrupt6),this));
 }
 
 

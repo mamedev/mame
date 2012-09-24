@@ -8,14 +8,13 @@
 
 ***************************************************************************/
 
-static TIMER_CALLBACK( nmi_callback )
+TIMER_CALLBACK_MEMBER(lsasquad_state::nmi_callback)
 {
-	lsasquad_state *state = machine.driver_data<lsasquad_state>();
 
-	if (state->m_sound_nmi_enable)
-		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_sound_nmi_enable)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
-		state->m_pending_nmi = 1;
+		m_pending_nmi = 1;
 }
 
 WRITE8_MEMBER(lsasquad_state::lsasquad_sh_nmi_disable_w)
@@ -40,7 +39,7 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_sound_command_w)
 	m_sound_cmd = data;
 
 	//logerror("%04x: sound cmd %02x\n", space.device().safe_pc(), data);
-	machine().scheduler().synchronize(FUNC(nmi_callback), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(lsasquad_state::nmi_callback),this), data);
 }
 
 READ8_MEMBER(lsasquad_state::lsasquad_sh_sound_command_r)

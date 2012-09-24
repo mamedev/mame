@@ -40,17 +40,16 @@ static TIMER_DEVICE_CALLBACK( nmi_32v )
 }
 
 
-static TIMER_CALLBACK( irq_off )
+TIMER_CALLBACK_MEMBER(orbit_state::irq_off)
 {
-	orbit_state *state = machine.driver_data<orbit_state>();
-	state->m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
 INTERRUPT_GEN_MEMBER(orbit_state::orbit_interrupt)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(machine().primary_screen->time_until_vblank_end(), FUNC(irq_off));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(orbit_state::irq_off),this));
 }
 
 

@@ -86,4 +86,6 @@ public:
 	DECLARE_VIDEO_START(hatris);
 	UINT32 screen_update_fromance(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_pipedrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(deferred_commanddata_w);
+	TIMER_CALLBACK_MEMBER(crtc_interrupt_gen);
 };

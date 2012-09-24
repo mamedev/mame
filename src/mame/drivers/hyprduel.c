@@ -53,10 +53,9 @@ static void update_irq_state( running_machine &machine )
 	state->m_maincpu->set_input_line(3, (irq & state->m_int_num) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static TIMER_CALLBACK( vblank_end_callback )
+TIMER_CALLBACK_MEMBER(hyprduel_state::vblank_end_callback)
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
-	state->m_requested_int &= ~param;
+	m_requested_int &= ~param;
 }
 
 static TIMER_DEVICE_CALLBACK( hyprduel_interrupt )
@@ -70,7 +69,7 @@ static TIMER_DEVICE_CALLBACK( hyprduel_interrupt )
 		state->m_requested_int |= 0x20;
 		state->m_maincpu->set_input_line(2, HOLD_LINE);
 		/* the duration is a guess */
-		timer.machine().scheduler().timer_set(attotime::from_usec(2500), FUNC(vblank_end_callback), 0x20);
+		timer.machine().scheduler().timer_set(attotime::from_usec(2500), timer_expired_delegate(FUNC(hyprduel_state::vblank_end_callback),state), 0x20);
 	}
 	else
 		state->m_requested_int |= 0x12;		/* hsync */
@@ -181,10 +180,9 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger2_w)
 }
 
 
-static TIMER_CALLBACK( magerror_irq_callback )
+TIMER_CALLBACK_MEMBER(hyprduel_state::magerror_irq_callback)
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
-	state->m_subcpu->set_input_line(1, HOLD_LINE);
+	m_subcpu->set_input_line(1, HOLD_LINE);
 }
 
 /***************************************************************************
@@ -256,11 +254,10 @@ READ16_MEMBER(hyprduel_state::hyprduel_bankedrom_r)
 
 ***************************************************************************/
 
-static TIMER_CALLBACK( hyprduel_blit_done )
+TIMER_CALLBACK_MEMBER(hyprduel_state::hyprduel_blit_done)
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
-	state->m_requested_int |= 1 << state->m_blitter_bit;
-	update_irq_state(machine);
+	m_requested_int |= 1 << m_blitter_bit;
+	update_irq_state(machine());
 }
 
 INLINE int blt_read( const UINT8 *ROM, const int offs )
@@ -332,7 +329,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_blitter_w)
                        another blit. */
 					if (b1 == 0)
 					{
-						machine().scheduler().timer_set(attotime::from_usec(500), FUNC(hyprduel_blit_done));
+						machine().scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(hyprduel_state::hyprduel_blit_done),this));
 						return;
 					}
 
@@ -813,7 +810,7 @@ DRIVER_INIT_MEMBER(hyprduel_state,magerror)
 {
 
 	m_int_num = 0x01;
-	m_magerror_irq_timer = machine().scheduler().timer_alloc(FUNC(magerror_irq_callback));
+	m_magerror_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyprduel_state::magerror_irq_callback),this));
 }
 
 

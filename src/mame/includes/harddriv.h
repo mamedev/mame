@@ -218,6 +218,8 @@ public:
 	DECLARE_MACHINE_RESET(harddriv);
 	DECLARE_VIDEO_START(harddriv);
 	INTERRUPT_GEN_MEMBER(hd68k_irq_gen);
+	TIMER_CALLBACK_MEMBER(deferred_adsp_bank_switch);
+	TIMER_CALLBACK_MEMBER(rddsp32_sync_cb);
 };
 
 

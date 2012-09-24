@@ -97,6 +97,22 @@ class dc_state : public driver_device
 	virtual void video_start();
 	DECLARE_MACHINE_RESET(naomi);
 	UINT32 screen_update_dc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(aica_dma_irq);
+	TIMER_CALLBACK_MEMBER(pvr_dma_irq);
+	TIMER_CALLBACK_MEMBER(ch2_dma_irq);
+	TIMER_CALLBACK_MEMBER(yuv_fifo_irq);
+	TIMER_CALLBACK_MEMBER(dc_rtc_increment);
+	TIMER_CALLBACK_MEMBER(transfer_opaque_list_irq);
+	TIMER_CALLBACK_MEMBER(transfer_opaque_modifier_volume_list_irq);
+	TIMER_CALLBACK_MEMBER(transfer_translucent_list_irq);
+	TIMER_CALLBACK_MEMBER(transfer_translucent_modifier_volume_list_irq);
+	TIMER_CALLBACK_MEMBER(transfer_punch_through_list_irq);
+	TIMER_CALLBACK_MEMBER(vbin);
+	TIMER_CALLBACK_MEMBER(vbout);
+	TIMER_CALLBACK_MEMBER(hbin);
+	TIMER_CALLBACK_MEMBER(endofrender_video);
+	TIMER_CALLBACK_MEMBER(endofrender_tsp);
+	TIMER_CALLBACK_MEMBER(endofrender_isp);
 };
 
 /*----------- defined in machine/dc.c -----------*/

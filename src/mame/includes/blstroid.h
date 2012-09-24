@@ -22,6 +22,8 @@ public:
 	DECLARE_MACHINE_RESET(blstroid);
 	DECLARE_VIDEO_START(blstroid);
 	UINT32 screen_update_blstroid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(irq_off);
+	TIMER_CALLBACK_MEMBER(irq_on);
 };
 
 

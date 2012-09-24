@@ -47,6 +47,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_stfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(stfight_vb_interrupt);
+	TIMER_CALLBACK_MEMBER(stfight_interrupt_1);
 };
 
 /*----------- defined in machine/stfight.c -----------*/

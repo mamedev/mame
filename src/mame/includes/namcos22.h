@@ -258,6 +258,7 @@ public:
 	UINT32 screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(namcos22s_interrupt);
 	INTERRUPT_GEN_MEMBER(namcos22_interrupt);
+	TIMER_CALLBACK_MEMBER(alpine_steplock_callback);
 };
 
 /*----------- defined in video/namcos22.c -----------*/

@@ -544,6 +544,13 @@ public:
 	UINT16 *m_snes_cgram;	/* Palette RAM */
 	UINT8  *m_snes_vram;	/* Video RAM (TODO: Should be 16-bit, but it's easier this way) */
 
+	TIMER_CALLBACK_MEMBER(snes_nmi_tick);
+	TIMER_CALLBACK_MEMBER(snes_hirq_tick_callback);
+	TIMER_CALLBACK_MEMBER(snes_reset_oam_address);
+	TIMER_CALLBACK_MEMBER(snes_reset_hdma);
+	TIMER_CALLBACK_MEMBER(snes_update_io);
+	TIMER_CALLBACK_MEMBER(snes_scanline_tick);
+	TIMER_CALLBACK_MEMBER(snes_hblank_tick);
 };
 
 /* Special chips, checked at init and used in memory handlers */

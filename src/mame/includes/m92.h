@@ -77,6 +77,7 @@ public:
 	DECLARE_VIDEO_START(ppan);
 	UINT32 screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(spritebuffer_callback);
 };
 
 /*----------- defined in drivers/m92.c -----------*/

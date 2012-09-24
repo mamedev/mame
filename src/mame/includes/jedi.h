@@ -77,6 +77,7 @@ public:
 	virtual void machine_reset();
 	DECLARE_VIDEO_START(jedi);
 	UINT32 screen_update_jedi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(generate_interrupt);
 };
 
 /*----------- defined in audio/jedi.c -----------*/

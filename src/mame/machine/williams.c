@@ -268,9 +268,9 @@ TIMER_DEVICE_CALLBACK( williams_va11_callback )
 }
 
 
-static TIMER_CALLBACK( williams_count240_off_callback )
+TIMER_CALLBACK_MEMBER(williams_state::williams_count240_off_callback)
 {
-	pia6821_device *pia_1 = machine.device<pia6821_device>("pia_1");
+	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
 
 	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
 	pia_1->ca1_w(0);
@@ -279,13 +279,14 @@ static TIMER_CALLBACK( williams_count240_off_callback )
 
 TIMER_DEVICE_CALLBACK( williams_count240_callback )
 {
+	williams_state *state = timer.machine().driver_data<williams_state>();
 	pia6821_device *pia_1 = timer.machine().device<pia6821_device>("pia_1");
 
 	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
 	pia_1->ca1_w(1);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	timer.machine().scheduler().timer_set(timer.machine().primary_screen->time_until_pos(0), FUNC(williams_count240_off_callback));
+	timer.machine().scheduler().timer_set(timer.machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(williams_state::williams_count240_off_callback),state));
 
 	/* set a timer for next frame */
 	timer.adjust(timer.machine().primary_screen->time_until_pos(240));
@@ -422,9 +423,9 @@ TIMER_DEVICE_CALLBACK( williams2_va11_callback )
 }
 
 
-static TIMER_CALLBACK( williams2_endscreen_off_callback )
+TIMER_CALLBACK_MEMBER(williams_state::williams2_endscreen_off_callback)
 {
-	pia6821_device *pia_0 = machine.device<pia6821_device>("pia_0");
+	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
 
 	/* the /ENDSCREEN signal comes into CA1 */
 	pia_0->ca1_w(1);
@@ -433,13 +434,14 @@ static TIMER_CALLBACK( williams2_endscreen_off_callback )
 
 TIMER_DEVICE_CALLBACK( williams2_endscreen_callback )
 {
+	williams_state *state = timer.machine().driver_data<williams_state>();
 	pia6821_device *pia_0 = timer.machine().device<pia6821_device>("pia_0");
 
 	/* the /ENDSCREEN signal comes into CA1 */
 	pia_0->ca1_w(0);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	timer.machine().scheduler().timer_set(timer.machine().primary_screen->time_until_pos(8), FUNC(williams2_endscreen_off_callback));
+	timer.machine().scheduler().timer_set(timer.machine().primary_screen->time_until_pos(8), timer_expired_delegate(FUNC(williams_state::williams2_endscreen_off_callback),state));
 
 	/* set a timer for next frame */
 	timer.adjust(timer.machine().primary_screen->time_until_pos(254));
@@ -550,9 +552,9 @@ WRITE8_MEMBER(williams_state::williams2_bank_select_w)
  *
  *************************************/
 
-static TIMER_CALLBACK( williams_deferred_snd_cmd_w )
+TIMER_CALLBACK_MEMBER(williams_state::williams_deferred_snd_cmd_w)
 {
-	pia6821_device *pia_2 = machine.device<pia6821_device>("pia_2");
+	pia6821_device *pia_2 = machine().device<pia6821_device>("pia_2");
 
 	pia_2->portb_w(param);
 	pia_2->cb1_w((param == 0xff) ? 0 : 1);
@@ -560,19 +562,21 @@ static TIMER_CALLBACK( williams_deferred_snd_cmd_w )
 
 WRITE8_DEVICE_HANDLER( williams_snd_cmd_w )
 {
+	williams_state *state = device->machine().driver_data<williams_state>();
 	/* the high two bits are set externally, and should be 1 */
-	space.machine().scheduler().synchronize(FUNC(williams_deferred_snd_cmd_w), data | 0xc0);
+	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams_deferred_snd_cmd_w),state), data | 0xc0);
 }
 
 WRITE8_DEVICE_HANDLER( playball_snd_cmd_w )
 {
-	space.machine().scheduler().synchronize(FUNC(williams_deferred_snd_cmd_w), data);
+	williams_state *state = device->machine().driver_data<williams_state>();
+	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams_deferred_snd_cmd_w),state), data);
 }
 
-static TIMER_CALLBACK( blaster_deferred_snd_cmd_w )
+TIMER_CALLBACK_MEMBER(williams_state::blaster_deferred_snd_cmd_w)
 {
-	pia6821_device *pia_2l = machine.device<pia6821_device>("pia_2");
-	pia6821_device *pia_2r = machine.device<pia6821_device>("pia_2b");
+	pia6821_device *pia_2l = machine().device<pia6821_device>("pia_2");
+	pia6821_device *pia_2r = machine().device<pia6821_device>("pia_2b");
 	UINT8 l_data = param | 0x80;
 	UINT8 r_data = (param >> 1 & 0x40) | (param & 0x3f) | 0x80;
 
@@ -582,20 +586,22 @@ static TIMER_CALLBACK( blaster_deferred_snd_cmd_w )
 
 WRITE8_DEVICE_HANDLER( blaster_snd_cmd_w )
 {
-	space.machine().scheduler().synchronize(FUNC(blaster_deferred_snd_cmd_w), data);
+	williams_state *state = device->machine().driver_data<williams_state>();
+	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::blaster_deferred_snd_cmd_w),state), data);
 }
 
 
-static TIMER_CALLBACK( williams2_deferred_snd_cmd_w )
+TIMER_CALLBACK_MEMBER(williams_state::williams2_deferred_snd_cmd_w)
 {
-	pia6821_device *pia_2 = machine.device<pia6821_device>("pia_2");
+	pia6821_device *pia_2 = machine().device<pia6821_device>("pia_2");
 
 	pia_2->porta_w(param);
 }
 
 static WRITE8_DEVICE_HANDLER( williams2_snd_cmd_w )
 {
-	space.machine().scheduler().synchronize(FUNC(williams2_deferred_snd_cmd_w), data);
+	williams_state *state = device->machine().driver_data<williams_state>();
+	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams2_deferred_snd_cmd_w),state), data);
 }
 
 
@@ -991,9 +997,9 @@ MACHINE_RESET_MEMBER(joust2_state,joust2)
 }
 
 
-static TIMER_CALLBACK( joust2_deferred_snd_cmd_w )
+TIMER_CALLBACK_MEMBER(joust2_state::joust2_deferred_snd_cmd_w)
 {
-	pia6821_device *pia_2 = machine.device<pia6821_device>("pia_2");
+	pia6821_device *pia_2 = machine().device<pia6821_device>("pia_2");
 	pia_2->porta_w(param & 0xff);
 }
 
@@ -1011,5 +1017,5 @@ static WRITE8_DEVICE_HANDLER( joust2_snd_cmd_w )
 	joust2_state *state = space.machine().driver_data<joust2_state>();
 	state->m_joust2_current_sound_data = (state->m_joust2_current_sound_data & ~0xff) | (data & 0xff);
 	state->m_cvsd_sound->write(space.machine().driver_data()->generic_space(), 0, state->m_joust2_current_sound_data);
-	space.machine().scheduler().synchronize(FUNC(joust2_deferred_snd_cmd_w), state->m_joust2_current_sound_data);
+	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(joust2_state::joust2_deferred_snd_cmd_w),state), state->m_joust2_current_sound_data);
 }

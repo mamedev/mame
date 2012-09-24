@@ -891,20 +891,19 @@ static void radarscp_scanline(running_machine &machine, int scanline)
 		state->m_counter++;
 }
 
-static TIMER_CALLBACK( scanline_callback )
+TIMER_CALLBACK_MEMBER(dkong_state::scanline_callback)
 {
-	dkong_state *state = machine.driver_data<dkong_state>();
 	int scanline = param;
 
-	if ((state->m_hardware_type == HARDWARE_TRS02) || (state->m_hardware_type == HARDWARE_TRS01))
-		radarscp_scanline(machine, scanline);
+	if ((m_hardware_type == HARDWARE_TRS02) || (m_hardware_type == HARDWARE_TRS01))
+		radarscp_scanline(machine(), scanline);
 
 	/* update any video up to the current scanline */
-	machine.primary_screen->update_now();
+	machine().primary_screen->update_now();
 
 	scanline = (scanline+1) % VTOTAL;
 	/* come back at the next appropriate scanline */
-	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 static void check_palette(running_machine &machine)
@@ -958,7 +957,7 @@ VIDEO_START_MEMBER(dkong_state,dkong)
 
 	VIDEO_START_CALL_MEMBER(dkong_base);
 
-	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(scanline_callback));
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dkong_state::scanline_callback),this));
 	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(0));
 
 	switch (m_hardware_type)

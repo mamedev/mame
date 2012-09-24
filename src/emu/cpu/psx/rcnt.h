@@ -53,7 +53,7 @@ private:
 	UINT16 root_current( int n_counter );
 	int root_target( int n_counter );
 	void root_timer_adjust( int n_counter );
-	void root_finished( void *ptr, int param );
+	TIMER_CALLBACK_MEMBER(root_finished);
 };
 
 #endif

@@ -358,11 +358,10 @@ static void dma_draw(running_machine &machine, UINT16 command)
  *
  *************************************/
 
-static TIMER_CALLBACK( dma_callback )
+TIMER_CALLBACK_MEMBER(midyunit_state::dma_callback)
 {
-	midyunit_state *state = machine.driver_data<midyunit_state>();
-	state->m_dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
-	machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+	m_dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
+	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -516,7 +515,7 @@ if (LOG_DMA)
 	}
 
 	/* signal we're done */
-	machine().scheduler().timer_set(attotime::from_nsec(41 * dma_state.width * dma_state.height), FUNC(dma_callback));
+	machine().scheduler().timer_set(attotime::from_nsec(41 * dma_state.width * dma_state.height), timer_expired_delegate(FUNC(midyunit_state::dma_callback),this));
 
 	g_profiler.stop();
 }
@@ -529,13 +528,12 @@ if (LOG_DMA)
  *
  *************************************/
 
-static TIMER_CALLBACK( autoerase_line )
+TIMER_CALLBACK_MEMBER(midyunit_state::autoerase_line)
 {
-	midyunit_state *state = machine.driver_data<midyunit_state>();
 	int scanline = param;
 
-	if (state->m_autoerase_enable && scanline >= 0 && scanline < 510)
-		memcpy(&state->m_local_videoram[512 * scanline], &state->m_local_videoram[512 * (510 + (scanline & 1))], 512 * sizeof(UINT16));
+	if (m_autoerase_enable && scanline >= 0 && scanline < 510)
+		memcpy(&m_local_videoram[512 * scanline], &m_local_videoram[512 * (510 + (scanline & 1))], 512 * sizeof(UINT16));
 }
 
 
@@ -552,10 +550,10 @@ void midyunit_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int s
 		dest[x] = state->m_pen_map[src[coladdr++ & 0x1ff]];
 
 	/* handle autoerase on the previous line */
-	autoerase_line(screen.machine(), NULL, params->rowaddr - 1);
+	state->autoerase_line(NULL, params->rowaddr - 1);
 
 	/* if this is the last update of the screen, set a timer to clear out the final line */
 	/* (since we update one behind) */
 	if (scanline == screen.visible_area().max_y)
-		screen.machine().scheduler().timer_set(screen.time_until_pos(scanline + 1), FUNC(autoerase_line), params->rowaddr);
+		screen.machine().scheduler().timer_set(screen.time_until_pos(scanline + 1), timer_expired_delegate(FUNC(midyunit_state::autoerase_line),state), params->rowaddr);
 }

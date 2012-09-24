@@ -54,12 +54,11 @@ void spacefev_start_red_cannon( running_machine &machine )
 }
 
 
-static TIMER_CALLBACK( spacefev_stop_red_cannon )
+TIMER_CALLBACK_MEMBER(n8080_state::spacefev_stop_red_cannon)
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
 
-	state->m_spacefev_red_cannon = 0;
-	state->m_cannon_timer->adjust(attotime::never);
+	m_spacefev_red_cannon = 0;
+	m_cannon_timer->adjust(attotime::never);
 }
 
 
@@ -91,7 +90,7 @@ static void helifire_next_line( running_machine &machine )
 VIDEO_START_MEMBER(n8080_state,spacefev)
 {
 
-	m_cannon_timer = machine().scheduler().timer_alloc(FUNC(spacefev_stop_red_cannon));
+	m_cannon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::spacefev_stop_red_cannon),this));
 
 	flip_screen_set_no_update(0);
 

@@ -747,10 +747,10 @@ MACHINE_RESET_MEMBER(mappy_state,mappy)
 
 /* different games need different interrupt generators & timers because they use different Namco I/O devices */
 
-static TIMER_CALLBACK( superpac_io_run )
+TIMER_CALLBACK_MEMBER(mappy_state::superpac_io_run)
 {
-	device_t *io56xx_1 = machine.device("namcoio_1");
-	device_t *io56xx_2 = machine.device("namcoio_2");
+	device_t *io56xx_1 = machine().device("namcoio_1");
+	device_t *io56xx_2 = machine().device("namcoio_2");
 
 	switch (param)
 	{
@@ -772,16 +772,16 @@ INTERRUPT_GEN_MEMBER(mappy_state::superpac_main_vblank_irq)
 		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
-		machine().scheduler().timer_set(attotime::from_usec(50), FUNC(superpac_io_run));
+		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::superpac_io_run),this));
 
 	if (!namcoio_read_reset_line(namcoio_2))		/* give the cpu a tiny bit of time to write the command before processing it */
-		machine().scheduler().timer_set(attotime::from_usec(50), FUNC(superpac_io_run), 1);
+		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::superpac_io_run),this), 1);
 }
 
-static TIMER_CALLBACK( pacnpal_io_run )
+TIMER_CALLBACK_MEMBER(mappy_state::pacnpal_io_run)
 {
-	device_t *io56xx = machine.device("namcoio_1");
-	device_t *io59xx = machine.device("namcoio_2");
+	device_t *io56xx = machine().device("namcoio_1");
+	device_t *io59xx = machine().device("namcoio_2");
 
 	switch (param)
 	{
@@ -803,16 +803,16 @@ INTERRUPT_GEN_MEMBER(mappy_state::pacnpal_main_vblank_irq)
 		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
-		machine().scheduler().timer_set(attotime::from_usec(50), FUNC(pacnpal_io_run));
+		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::pacnpal_io_run),this));
 
 	if (!namcoio_read_reset_line(namcoio_2))		/* give the cpu a tiny bit of time to write the command before processing it */
-		machine().scheduler().timer_set(attotime::from_usec(50), FUNC(pacnpal_io_run), 1);
+		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::pacnpal_io_run),this), 1);
 }
 
-static TIMER_CALLBACK( phozon_io_run )
+TIMER_CALLBACK_MEMBER(mappy_state::phozon_io_run)
 {
-	device_t *io58xx = machine.device("namcoio_1");
-	device_t *io56xx = machine.device("namcoio_2");
+	device_t *io58xx = machine().device("namcoio_1");
+	device_t *io56xx = machine().device("namcoio_2");
 
 	switch (param)
 	{
@@ -834,16 +834,16 @@ INTERRUPT_GEN_MEMBER(mappy_state::phozon_main_vblank_irq)
 		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
-		machine().scheduler().timer_set(attotime::from_usec(50), FUNC(phozon_io_run));
+		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::phozon_io_run),this));
 
 	if (!namcoio_read_reset_line(namcoio_2))		/* give the cpu a tiny bit of time to write the command before processing it */
-		machine().scheduler().timer_set(attotime::from_usec(50), FUNC(phozon_io_run), 1);
+		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::phozon_io_run),this), 1);
 }
 
-static TIMER_CALLBACK( mappy_io_run )
+TIMER_CALLBACK_MEMBER(mappy_state::mappy_io_run)
 {
-	device_t *io58xx_1 = machine.device("namcoio_1");
-	device_t *io58xx_2 = machine.device("namcoio_2");
+	device_t *io58xx_1 = machine().device("namcoio_1");
+	device_t *io58xx_2 = machine().device("namcoio_2");
 
 	switch (param)
 	{
@@ -865,10 +865,10 @@ INTERRUPT_GEN_MEMBER(mappy_state::mappy_main_vblank_irq)
 		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
-		machine().scheduler().timer_set(attotime::from_usec(50), FUNC(mappy_io_run));
+		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::mappy_io_run),this));
 
 	if (!namcoio_read_reset_line(namcoio_2))		/* give the cpu a tiny bit of time to write the command before processing it */
-		machine().scheduler().timer_set(attotime::from_usec(50), FUNC(mappy_io_run), 1);
+		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::mappy_io_run),this), 1);
 }
 
 INTERRUPT_GEN_MEMBER(mappy_state::sub_vblank_irq)

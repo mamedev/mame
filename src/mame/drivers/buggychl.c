@@ -91,20 +91,19 @@ WRITE8_MEMBER(buggychl_state::bankswitch_w)
 	membank("bank1")->set_entry(data & 0x07);	// shall we check if data&7 < # banks?
 }
 
-static TIMER_CALLBACK( nmi_callback )
+TIMER_CALLBACK_MEMBER(buggychl_state::nmi_callback)
 {
-	buggychl_state *state = machine.driver_data<buggychl_state>();
 
-	if (state->m_sound_nmi_enable)
-		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_sound_nmi_enable)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
-		state->m_pending_nmi = 1;
+		m_pending_nmi = 1;
 }
 
 WRITE8_MEMBER(buggychl_state::sound_command_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	machine().scheduler().synchronize(FUNC(nmi_callback), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(buggychl_state::nmi_callback),this), data);
 }
 
 WRITE8_MEMBER(buggychl_state::nmi_disable_w)

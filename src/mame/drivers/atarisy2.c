@@ -284,17 +284,16 @@ WRITE16_MEMBER(atarisy2_state::int1_ack_w)
 }
 
 
-static TIMER_CALLBACK( delayed_int_enable_w )
+TIMER_CALLBACK_MEMBER(atarisy2_state::delayed_int_enable_w)
 {
-	atarisy2_state *state = machine.driver_data<atarisy2_state>();
-	state->m_interrupt_enable = param;
+	m_interrupt_enable = param;
 }
 
 
 WRITE16_MEMBER(atarisy2_state::int_enable_w)
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
-		machine().scheduler().synchronize(FUNC(delayed_int_enable_w), data);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(atarisy2_state::delayed_int_enable_w),this), data);
 }
 
 

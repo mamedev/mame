@@ -95,19 +95,18 @@ TODO:
 #define MCU_CLOCK			(XTAL_12MHz/4)
 
 
-static TIMER_CALLBACK( nmi_callback )
+TIMER_CALLBACK_MEMBER(lkage_state::nmi_callback)
 {
-	lkage_state *state = machine.driver_data<lkage_state>();
-	if (state->m_sound_nmi_enable)
-		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_sound_nmi_enable)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
-		state->m_pending_nmi = 1;
+		m_pending_nmi = 1;
 }
 
 WRITE8_MEMBER(lkage_state::lkage_sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	machine().scheduler().synchronize(FUNC(nmi_callback), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(lkage_state::nmi_callback),this), data);
 }
 
 WRITE8_MEMBER(lkage_state::lkage_sh_nmi_disable_w)

@@ -70,6 +70,13 @@ public:
 	virtual void video_start();
 	DECLARE_VIDEO_START(raaspec);
 	UINT32 screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(vectrex_imager_change_color);
+	TIMER_CALLBACK_MEMBER(update_level);
+	TIMER_CALLBACK_MEMBER(vectrex_imager_eye);
+	TIMER_CALLBACK_MEMBER(lightpen_trigger);
+	TIMER_CALLBACK_MEMBER(vectrex_refresh);
+	TIMER_CALLBACK_MEMBER(vectrex_zero_integrators);
+	TIMER_CALLBACK_MEMBER(update_signal);
 };
 
 

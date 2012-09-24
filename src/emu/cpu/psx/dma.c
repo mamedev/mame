@@ -190,7 +190,7 @@ void psxdma_device::dma_finished( int index )
 	dma_stop_timer( index );
 }
 
-void psxdma_device::dma_finished_callback(void *ptr, int param)
+TIMER_CALLBACK_MEMBER(psxdma_device::dma_finished_callback)
 {
 	dma_finished(param);
 }

@@ -62,6 +62,7 @@ public:
 	DECLARE_DRIVER_INIT(mhavocrv);
 	virtual void machine_start();
 	virtual void machine_reset();
+	TIMER_CALLBACK_MEMBER(delayed_gamma_w);
 };
 
 /*----------- defined in machine/mhavoc.c -----------*/

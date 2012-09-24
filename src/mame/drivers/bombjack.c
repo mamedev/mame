@@ -101,16 +101,15 @@ Dip Locations and factory settings verified with manual
 #include "includes/bombjack.h"
 
 
-static TIMER_CALLBACK( soundlatch_callback )
+TIMER_CALLBACK_MEMBER(bombjack_state::soundlatch_callback)
 {
-	bombjack_state *state = machine.driver_data<bombjack_state>();
-	state->m_latch = param;
+	m_latch = param;
 }
 
 WRITE8_MEMBER(bombjack_state::bombjack_soundlatch_w)
 {
 	/* make all the CPUs synchronize, and only AFTER that write the new command to the latch */
-	machine().scheduler().synchronize(FUNC(soundlatch_callback), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bombjack_state::soundlatch_callback),this), data);
 }
 
 READ8_MEMBER(bombjack_state::bombjack_soundlatch_r)

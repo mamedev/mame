@@ -62,14 +62,13 @@ WRITE16_MEMBER(lockon_state::lockon_crtc_w)
 #endif
 }
 
-static TIMER_CALLBACK( cursor_callback )
+TIMER_CALLBACK_MEMBER(lockon_state::cursor_callback)
 {
-	lockon_state *state = machine.driver_data<lockon_state>();
 
-	if (state->m_main_inten)
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	if (m_main_inten)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 
-	state->m_cursor_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
+	m_cursor_timer->adjust(machine().primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 /*************************************
@@ -281,11 +280,10 @@ WRITE16_MEMBER(lockon_state::lockon_ground_ctrl_w)
 	m_ground_ctrl = data & 0xff;
 }
 
-static TIMER_CALLBACK( bufend_callback )
+TIMER_CALLBACK_MEMBER(lockon_state::bufend_callback)
 {
-	lockon_state *state = machine.driver_data<lockon_state>();
-	state->m_ground->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
-	state->m_object->execute().set_input_line(NEC_INPUT_LINE_POLL, ASSERT_LINE);
+	m_ground->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_object->execute().set_input_line(NEC_INPUT_LINE_POLL, ASSERT_LINE);
 }
 
 /* Get data for a each 8x8x3 ground tile */
@@ -909,10 +907,10 @@ void lockon_state::video_start()
 	m_obj_pal_ram = auto_alloc_array(machine(), UINT8, 2048);
 
 	/* Timer for ground display list callback */
-	m_bufend_timer = machine().scheduler().timer_alloc(FUNC(bufend_callback));
+	m_bufend_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lockon_state::bufend_callback),this));
 
 	/* Timer for the CRTC cursor pulse */
-	m_cursor_timer = machine().scheduler().timer_alloc(FUNC(cursor_callback));
+	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lockon_state::cursor_callback),this));
 	m_cursor_timer->adjust(machine().primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 
 	save_item(NAME(*m_back_buffer));

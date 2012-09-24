@@ -28,10 +28,9 @@ INTERRUPT_GEN_MEMBER(thunderx_state::scontra_interrupt)
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
-static TIMER_CALLBACK( thunderx_firq_callback )
+TIMER_CALLBACK_MEMBER(thunderx_state::thunderx_firq_callback)
 {
-	thunderx_state *state = machine.driver_data<thunderx_state>();
-	state->m_maincpu->set_input_line(KONAMI_FIRQ_LINE, HOLD_LINE);
+	m_maincpu->set_input_line(KONAMI_FIRQ_LINE, HOLD_LINE);
 }
 
 READ8_MEMBER(thunderx_state::scontra_bankedram_r)
@@ -306,7 +305,7 @@ WRITE8_MEMBER(thunderx_state::thunderx_1f98_w)
 		calculate_collisions(machine());
 
 		/* 100 cycle delay is arbitrary */
-		machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(100), FUNC(thunderx_firq_callback));
+		machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(100), timer_expired_delegate(FUNC(thunderx_state::thunderx_firq_callback),this));
 	}
 
 	m_1f98_data = data;

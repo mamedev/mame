@@ -462,7 +462,7 @@ WRITE8_MEMBER(qix_state::qix_68705_portC_w)
  *
  *************************************/
 
-static TIMER_CALLBACK( pia_w_callback )
+TIMER_CALLBACK_MEMBER(qix_state::pia_w_callback)
 {
 	pia6821_device *device = (pia6821_device *)ptr;
 	device->write(device->machine().driver_data()->generic_space(), param >> 8, param & 0xff);
@@ -471,9 +471,10 @@ static TIMER_CALLBACK( pia_w_callback )
 
 WRITE8_DEVICE_HANDLER( qix_pia_w )
 {
+	qix_state *state = device->machine().driver_data<qix_state>();
 	/* make all the CPUs synchronize, and only AFTER that write the command to the PIA */
 	/* otherwise the 68705 will miss commands */
-	space.machine().scheduler().synchronize(FUNC(pia_w_callback), data | (offset << 8), (void *)downcast<pia6821_device *>(device));
+	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(qix_state::pia_w_callback),state), data | (offset << 8), (void *)downcast<pia6821_device *>(device));
 }
 
 

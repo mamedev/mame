@@ -40,7 +40,7 @@ static emu_timer *ipu_watchdog_timer;
  *
  *************************************/
 
-static TIMER_CALLBACK( ipu_watchdog_reset );
+
 static DECLARE_WRITE8_DEVICE_HANDLER( ipu_break_changed );
 
 
@@ -164,7 +164,7 @@ MACHINE_START_MEMBER(mcr_state,mcr)
 MACHINE_START_MEMBER(mcr_state,nflfoot)
 {
 	/* allocate a timer for the IPU watchdog */
-	ipu_watchdog_timer = machine().scheduler().timer_alloc(FUNC(ipu_watchdog_reset));
+	ipu_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mcr_state::ipu_watchdog_reset),this));
 }
 
 
@@ -250,14 +250,14 @@ WRITE8_MEMBER(mcr_state::mcr_ipu_laserdisk_w)
 }
 
 
-static TIMER_CALLBACK( ipu_watchdog_reset )
+TIMER_CALLBACK_MEMBER(mcr_state::ipu_watchdog_reset)
 {
 	logerror("ipu_watchdog_reset\n");
-	machine.device("ipu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-	machine.device("ipu_ctc")->reset();
-	machine.device("ipu_pio0")->reset();
-	machine.device("ipu_pio1")->reset();
-	machine.device("ipu_sio")->reset();
+	machine().device("ipu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	machine().device("ipu_ctc")->reset();
+	machine().device("ipu_pio0")->reset();
+	machine().device("ipu_pio1")->reset();
+	machine().device("ipu_sio")->reset();
 }
 
 

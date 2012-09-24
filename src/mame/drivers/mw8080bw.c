@@ -873,11 +873,10 @@ static void maze_update_discrete(running_machine &machine)
 }
 
 
-static TIMER_CALLBACK( maze_tone_timing_timer_callback )
+TIMER_CALLBACK_MEMBER(mw8080bw_state::maze_tone_timing_timer_callback)
 {
-	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
-	state->m_maze_tone_timing_state = !state->m_maze_tone_timing_state;
-	maze_write_discrete(state->m_discrete, state->m_maze_tone_timing_state);
+	m_maze_tone_timing_state = !m_maze_tone_timing_state;
+	maze_write_discrete(m_discrete, m_maze_tone_timing_state);
 }
 
 
@@ -885,7 +884,7 @@ MACHINE_START_MEMBER(mw8080bw_state,maze)
 {
 
 	/* create astable timer for IC B1 */
-	machine().scheduler().timer_pulse(MAZE_555_B1_PERIOD, FUNC(maze_tone_timing_timer_callback));
+	machine().scheduler().timer_pulse(MAZE_555_B1_PERIOD, timer_expired_delegate(FUNC(mw8080bw_state::maze_tone_timing_timer_callback),this));
 
 	/* initialize state of Tone Timing FF, IC C1 */
 	m_maze_tone_timing_state = 0;

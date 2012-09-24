@@ -254,19 +254,18 @@ static ADDRESS_MAP_START( tubep_sound_portmap, AS_IO, 8, tubep_state )
 ADDRESS_MAP_END
 
 
-static TIMER_CALLBACK( tubep_scanline_callback )
+TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 {
-	tubep_state *state = machine.driver_data<tubep_state>();
 	int scanline = param;
 
-	state->m_curr_scanline = scanline;//for debugging
+	m_curr_scanline = scanline;//for debugging
 
 	/* CPU #0 interrupt */
 	/* activates at the start of VBLANK signal which happens at the beginning of scaline number 240 */
 	if (scanline == 240)
 	{
 		logerror("VBLANK CPU#0\n");
-		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 	}
 
 
@@ -275,7 +274,7 @@ static TIMER_CALLBACK( tubep_scanline_callback )
 	if (scanline == 16)
 	{
 		logerror("/VBLANK CPU#1\n");
-		machine.device("slave")->execute().set_input_line(0, ASSERT_LINE);
+		machine().device("slave")->execute().set_input_line(0, ASSERT_LINE);
 	}
 
 
@@ -284,15 +283,15 @@ static TIMER_CALLBACK( tubep_scanline_callback )
 	if (scanline == 16)
 	{
 		logerror("/nmi CPU#3\n");
-		tubep_vblank_end(machine); /* switch buffered sprite RAM page */
-		machine.device("mcu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		tubep_vblank_end(machine()); /* switch buffered sprite RAM page */
+		machine().device("mcu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	/* CPU #3 MS2010-A NMI */
 	/* deactivates at the start of VBLANK signal which happens at the beginning of scanline number 240*/
 	if (scanline == 240)
 	{
 		logerror("CPU#3 nmi clear\n");
-		machine.device("mcu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		machine().device("mcu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 
 
@@ -300,20 +299,20 @@ static TIMER_CALLBACK( tubep_scanline_callback )
 	/* activates whenever line V6 from video part goes lo->hi that is when the scanline becomes 64 and 192 */
 	if ((scanline == 64) || (scanline == 192))
 	{
-		machine.device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);	/* sound cpu interrupt (music tempo) */
+		machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);	/* sound cpu interrupt (music tempo) */
 	}
 
 
-	machine.primary_screen->update_partial(machine.primary_screen->vpos());
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
 
 	//debug
-	logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,machine.primary_screen->vpos());
+	logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,machine().primary_screen->vpos());
 
 	scanline++;
 	if (scanline >= 264)
 		scanline = 0;
 
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -338,7 +337,7 @@ static void tubep_setup_save_state(running_machine &machine)
 MACHINE_START_MEMBER(tubep_state,tubep)
 {
 	/* Create interrupt timer */
-	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(tubep_scanline_callback));
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tubep_state::tubep_scanline_callback),this));
 
 	tubep_setup_save_state(machine());
 }
@@ -437,19 +436,18 @@ static ADDRESS_MAP_START( rjammer_second_portmap, AS_IO, 8, tubep_state )
 ADDRESS_MAP_END
 
 
-static TIMER_CALLBACK( rjammer_scanline_callback )
+TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 {
-	tubep_state *state = machine.driver_data<tubep_state>();
 	int scanline = param;
 
-	state->m_curr_scanline = scanline;//for debugging
+	m_curr_scanline = scanline;//for debugging
 
 	/* CPU #0 interrupt */
 	/* activates at the start of VBLANK signal which happens at the beginning of scaline number 240 */
 	if (scanline == 240)
 	{
 		logerror("VBLANK CPU#0\n");
-		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 	}
 
 
@@ -458,7 +456,7 @@ static TIMER_CALLBACK( rjammer_scanline_callback )
 	if (scanline == 16)
 	{
 		logerror("/VBLANK CPU#1\n");
-		machine.device("slave")->execute().set_input_line(0, HOLD_LINE);
+		machine().device("slave")->execute().set_input_line(0, HOLD_LINE);
 	}
 
 
@@ -467,15 +465,15 @@ static TIMER_CALLBACK( rjammer_scanline_callback )
 	if (scanline == 16)
 	{
 		logerror("/nmi CPU#3\n");
-		tubep_vblank_end(machine); /* switch buffered sprite RAM page */
-		machine.device("mcu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		tubep_vblank_end(machine()); /* switch buffered sprite RAM page */
+		machine().device("mcu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	/* CPU #3 MS2010-A NMI */
 	/* deactivates at the start of VBLANK signal which happens at the beginning of scanline number 240*/
 	if (scanline == 240)
 	{
 		logerror("CPU#3 nmi clear\n");
-		machine.device("mcu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		machine().device("mcu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 
 
@@ -483,26 +481,26 @@ static TIMER_CALLBACK( rjammer_scanline_callback )
 	/* activates whenever line V6 from video part goes lo->hi that is when the scanline becomes 64 and 192 */
 	if ((scanline == 64) || (scanline == 192))
 	{
-		machine.device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);	/* sound cpu interrupt (music tempo) */
+		machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);	/* sound cpu interrupt (music tempo) */
 	}
 
 
-	machine.primary_screen->update_partial(machine.primary_screen->vpos());
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
 
-	logerror("scanline=%3i scrgetvpos(0)=%3i\n", scanline, machine.primary_screen->vpos());
+	logerror("scanline=%3i scrgetvpos(0)=%3i\n", scanline, machine().primary_screen->vpos());
 
 	scanline++;
 	if (scanline >= 264)
 		scanline = 0;
 
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 
 MACHINE_START_MEMBER(tubep_state,rjammer)
 {
 	/* Create interrupt timer */
-	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(rjammer_scanline_callback));
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tubep_state::rjammer_scanline_callback),this));
 
 	tubep_setup_save_state(machine());
 }

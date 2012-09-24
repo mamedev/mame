@@ -61,7 +61,7 @@ static UINT8 cmos_protected;
 
 static emu_timer *timer[2];
 
-static TIMER_CALLBACK( invasn_gun_callback );
+
 
 
 
@@ -76,8 +76,8 @@ MACHINE_START_MEMBER(midzeus_state,midzeus)
 	timer[0] = machine().scheduler().timer_alloc(FUNC_NULL);
 	timer[1] = machine().scheduler().timer_alloc(FUNC_NULL);
 
-	gun_timer[0] = machine().scheduler().timer_alloc(FUNC(invasn_gun_callback));
-	gun_timer[1] = machine().scheduler().timer_alloc(FUNC(invasn_gun_callback));
+	gun_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback),this));
+	gun_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback),this));
 
 	state_save_register_global(machine(), gun_control);
 	state_save_register_global(machine(), gun_irq_state);
@@ -106,15 +106,15 @@ MACHINE_RESET_MEMBER(midzeus_state,midzeus)
  *
  *************************************/
 
-static TIMER_CALLBACK( display_irq_off )
+TIMER_CALLBACK_MEMBER(midzeus_state::display_irq_off)
 {
-	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(midzeus_state::display_irq)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_hz(30000000), FUNC(display_irq_off));
+	machine().scheduler().timer_set(attotime::from_hz(30000000), timer_expired_delegate(FUNC(midzeus_state::display_irq_off),this));
 }
 
 
@@ -489,19 +489,19 @@ static void update_gun_irq(running_machine &machine)
 }
 
 
-static TIMER_CALLBACK( invasn_gun_callback )
+TIMER_CALLBACK_MEMBER(midzeus_state::invasn_gun_callback)
 {
 	int player = param;
-	int beamy = machine.primary_screen->vpos();
+	int beamy = machine().primary_screen->vpos();
 
 	/* set the appropriate IRQ in the internal gun control and update */
 	gun_irq_state |= 0x01 << player;
-	update_gun_irq(machine);
+	update_gun_irq(machine());
 
 	/* generate another interrupt on the next scanline while we are within the BEAM_DY */
 	beamy++;
-	if (beamy <= machine.primary_screen->visible_area().max_y && beamy <= gun_y[player] + BEAM_DY)
-		gun_timer[player]->adjust(machine.primary_screen->time_until_pos(beamy, MAX(0, gun_x[player] - BEAM_DX)), player);
+	if (beamy <= machine().primary_screen->visible_area().max_y && beamy <= gun_y[player] + BEAM_DY)
+		gun_timer[player]->adjust(machine().primary_screen->time_until_pos(beamy, MAX(0, gun_x[player] - BEAM_DX)), player);
 }
 
 

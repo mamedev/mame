@@ -44,27 +44,27 @@ static void update_plunger(running_machine &machine)
 }
 
 
-static TIMER_CALLBACK( interrupt_callback )
+TIMER_CALLBACK_MEMBER(videopin_state::interrupt_callback)
 {
 	int scanline = param;
 
-	update_plunger(machine);
+	update_plunger(machine());
 
-	machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
 	scanline = scanline + 32;
 
 	if (scanline >= 263)
 		scanline = 32;
 
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(interrupt_callback), scanline);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(videopin_state::interrupt_callback),this), scanline);
 }
 
 
 void videopin_state::machine_reset()
 {
 
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(32), FUNC(interrupt_callback), 32);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(32), timer_expired_delegate(FUNC(videopin_state::interrupt_callback),this), 32);
 
 	/* both output latches are cleared on reset */
 

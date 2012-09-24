@@ -178,6 +178,7 @@ public:
 	void screen_eof_tx1(screen_device &screen, bool state);
 	void screen_eof_buggyboy(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(z80_irq);
+	TIMER_CALLBACK_MEMBER(interrupt_callback);
 };
 
 /*----------- defined in audio/tx1.c -----------*/

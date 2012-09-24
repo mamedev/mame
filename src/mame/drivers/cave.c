@@ -113,15 +113,14 @@ static void update_irq_state( running_machine &machine )
 		state->m_maincpu->set_input_line(state->m_irq_level, CLEAR_LINE);
 }
 
-static TIMER_CALLBACK( cave_vblank_end )
+TIMER_CALLBACK_MEMBER(cave_state::cave_vblank_end)
 {
-	cave_state *state = machine.driver_data<cave_state>();
-	if (state->m_kludge == 3)	/* mazinger metmqstr */
+	if (m_kludge == 3)	/* mazinger metmqstr */
 	{
-		state->m_unknown_irq = 1;
-		update_irq_state(machine);
+		m_unknown_irq = 1;
+		update_irq_state(machine());
 	}
-	state->m_agallet_vblank_irq = 0;
+	m_agallet_vblank_irq = 0;
 }
 
 static TIMER_DEVICE_CALLBACK( cave_vblank_start )
@@ -131,7 +130,7 @@ static TIMER_DEVICE_CALLBACK( cave_vblank_start )
 	update_irq_state(timer.machine());
 	cave_get_sprite_info(timer.machine());
 	state->m_agallet_vblank_irq = 1;
-	timer.machine().scheduler().timer_set(attotime::from_usec(2000), FUNC(cave_vblank_end));
+	timer.machine().scheduler().timer_set(attotime::from_usec(2000), timer_expired_delegate(FUNC(cave_state::cave_vblank_end),state));
 }
 
 /* Called once/frame to generate the VBLANK interrupt */

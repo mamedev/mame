@@ -134,10 +134,9 @@ WRITE8_MEMBER(champbas_state::irq_enable_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-static TIMER_CALLBACK( exctsccr_fm_callback )
+TIMER_CALLBACK_MEMBER(champbas_state::exctsccr_fm_callback)
 {
-	champbas_state *state = machine.driver_data<champbas_state>();
-	state->m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 // Champion Baseball has only one DAC
@@ -591,7 +590,7 @@ MACHINE_START_MEMBER(champbas_state,exctsccr)
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	// FIXME
-	machine().scheduler().timer_pulse(attotime::from_hz(75), FUNC(exctsccr_fm_callback)); /* updates fm */
+	machine().scheduler().timer_pulse(attotime::from_hz(75), timer_expired_delegate(FUNC(champbas_state::exctsccr_fm_callback),this)); /* updates fm */
 
 	MACHINE_START_CALL_MEMBER(champbas);
 }

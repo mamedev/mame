@@ -572,15 +572,14 @@ driftout  8000 0000/8  0000 0000    The first control changes from 8000 to 0000 
 
 ******************************************************************/
 
-static TIMER_CALLBACK( taitof2_interrupt6 )
+TIMER_CALLBACK_MEMBER(taitof2_state::taitof2_interrupt6)
 {
-	taitof2_state *state = machine.driver_data<taitof2_state>();
-	state->m_maincpu->set_input_line(6, HOLD_LINE);
+	m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(taitof2_state::taitof2_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), FUNC(taitof2_interrupt6));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), timer_expired_delegate(FUNC(taitof2_state::taitof2_interrupt6),this));
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 

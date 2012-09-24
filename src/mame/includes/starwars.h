@@ -62,6 +62,7 @@ public:
 	DECLARE_DRIVER_INIT(esb);
 	DECLARE_DRIVER_INIT(starwars);
 	virtual void machine_reset();
+	TIMER_CALLBACK_MEMBER(math_run_clear);
 };
 
 

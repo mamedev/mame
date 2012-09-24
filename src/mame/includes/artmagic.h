@@ -49,6 +49,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	TIMER_CALLBACK_MEMBER(irq_off);
 };
 
 

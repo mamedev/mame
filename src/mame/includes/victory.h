@@ -63,4 +63,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_victory(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(victory_vblank_interrupt);
+	TIMER_CALLBACK_MEMBER(bgcoll_irq_callback);
 };

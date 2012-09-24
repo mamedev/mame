@@ -73,6 +73,8 @@ public:
 	virtual void machine_start();
 	DECLARE_MACHINE_RESET(opwolf);
 	UINT32 screen_update_opwolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(opwolf_timer_callback);
+	TIMER_CALLBACK_MEMBER(cchip_timer);
 };
 
 /*----------- defined in machine/opwolf.c -----------*/

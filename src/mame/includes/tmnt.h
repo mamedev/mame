@@ -144,6 +144,7 @@ public:
 	INTERRUPT_GEN_MEMBER(punkshot_interrupt);
 	INTERRUPT_GEN_MEMBER(lgtnfght_interrupt);
 	INTERRUPT_GEN_MEMBER(tmnt_vblank_irq);
+	TIMER_CALLBACK_MEMBER(nmi_callback);
 };
 
 

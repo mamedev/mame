@@ -69,17 +69,16 @@ READ8_MEMBER(asterix_state::asterix_sound_r)
 	return k053260_r(device, space, 2 + offset);
 }
 
-static TIMER_CALLBACK( nmi_callback )
+TIMER_CALLBACK_MEMBER(asterix_state::nmi_callback)
 {
-	asterix_state *state = machine.driver_data<asterix_state>();
-	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(asterix_state::sound_arm_nmi_w)
 {
 
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	machine().scheduler().timer_set(attotime::from_usec(5), FUNC(nmi_callback));
+	machine().scheduler().timer_set(attotime::from_usec(5), timer_expired_delegate(FUNC(asterix_state::nmi_callback),this));
 }
 
 WRITE16_MEMBER(asterix_state::sound_irq_w)

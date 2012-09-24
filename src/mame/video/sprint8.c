@@ -148,9 +148,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-static TIMER_CALLBACK( sprint8_collision_callback )
+TIMER_CALLBACK_MEMBER(sprint8_state::sprint8_collision_callback)
 {
-	sprint8_set_collision(machine, param);
+	sprint8_set_collision(machine(), param);
 }
 
 
@@ -186,7 +186,7 @@ void sprint8_state::screen_eof_sprint8(screen_device &screen, bool state)
 			for (x = visarea.min_x; x <= visarea.max_x; x++)
 				if (p1[x] != 0x20 && p2[x] == 0x23)
 					machine().scheduler().timer_set(machine().primary_screen->time_until_pos(y + 24, x),
-							FUNC(sprint8_collision_callback),
+							timer_expired_delegate(FUNC(sprint8_state::sprint8_collision_callback),this),
 							colortable_entry_get_value(machine().colortable, p1[x]));
 		}
 	}

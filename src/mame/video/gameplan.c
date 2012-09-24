@@ -138,12 +138,11 @@ static WRITE8_DEVICE_HANDLER( leprechn_video_command_w )
 }
 
 
-static TIMER_CALLBACK( clear_screen_done_callback )
+TIMER_CALLBACK_MEMBER(gameplan_state::clear_screen_done_callback)
 {
-	gameplan_state *state = machine.driver_data<gameplan_state>();
 
 	/* indicate that the we are done clearing the screen */
-	state->m_via_0->write_ca1(0);
+	m_via_0->write_ca1(0);
 }
 
 
@@ -201,7 +200,7 @@ static WRITE_LINE_DEVICE_HANDLER( video_command_trigger_w )
 			/* set a timer for an arbitrarily short period.
                The real time it takes to clear to screen is not
                important to the software */
-			device->machine().scheduler().synchronize(FUNC(clear_screen_done_callback));
+			device->machine().scheduler().synchronize(timer_expired_delegate(FUNC(gameplan_state::clear_screen_done_callback),driver_state));
 
 			break;
 		}
@@ -209,19 +208,19 @@ static WRITE_LINE_DEVICE_HANDLER( video_command_trigger_w )
 }
 
 
-static TIMER_CALLBACK( via_irq_delayed )
+TIMER_CALLBACK_MEMBER(gameplan_state::via_irq_delayed)
 {
-	gameplan_state *state = machine.driver_data<gameplan_state>();
-	state->m_maincpu->set_input_line(0, param);
+	m_maincpu->set_input_line(0, param);
 }
 
 
 static void via_irq(device_t *device, int state)
 {
+	gameplan_state *driver_state = device->machine().driver_data<gameplan_state>();
 	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
        cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
        leave time for the program to see the flag change. */
-	device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(via_irq_delayed), state);
+	device->machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(gameplan_state::via_irq_delayed),driver_state), state);
 }
 
 
@@ -262,17 +261,16 @@ const via6522_interface trvquest_via_0_interface =
 };
 
 
-static TIMER_CALLBACK( via_0_ca1_timer_callback )
+TIMER_CALLBACK_MEMBER(gameplan_state::via_0_ca1_timer_callback)
 {
-	gameplan_state *state = machine.driver_data<gameplan_state>();
 
 	/* !VBLANK is connected to CA1 */
-	state->m_via_0->write_ca1(param);
+	m_via_0->write_ca1(param);
 
 	if (param)
-		state->m_via_0_ca1_timer->adjust(machine.primary_screen->time_until_pos(VBSTART));
+		m_via_0_ca1_timer->adjust(machine().primary_screen->time_until_pos(VBSTART));
 	else
-		state->m_via_0_ca1_timer->adjust(machine.primary_screen->time_until_pos(VBEND), 1);
+		m_via_0_ca1_timer->adjust(machine().primary_screen->time_until_pos(VBEND), 1);
 }
 
 
@@ -288,7 +286,7 @@ VIDEO_START_MEMBER(gameplan_state,common)
 	m_videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
 	m_videoram = auto_alloc_array(machine(), UINT8, m_videoram_size);
 
-	m_via_0_ca1_timer = machine().scheduler().timer_alloc(FUNC(via_0_ca1_timer_callback));
+	m_via_0_ca1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameplan_state::via_0_ca1_timer_callback),this));
 
 	/* register for save states */
 	save_pointer(NAME(m_videoram), m_videoram_size);

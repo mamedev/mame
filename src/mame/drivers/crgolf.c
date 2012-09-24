@@ -147,18 +147,17 @@ WRITE8_MEMBER(crgolf_state::unknown_w)
  *
  *************************************/
 
-static TIMER_CALLBACK( main_to_sound_callback )
+TIMER_CALLBACK_MEMBER(crgolf_state::main_to_sound_callback)
 {
-	crgolf_state *state = machine.driver_data<crgolf_state>();
 
-	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	state->m_main_to_sound_data = param;
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_main_to_sound_data = param;
 }
 
 
 WRITE8_MEMBER(crgolf_state::main_to_sound_w)
 {
-	machine().scheduler().synchronize(FUNC(main_to_sound_callback), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(crgolf_state::main_to_sound_callback),this), data);
 }
 
 
@@ -177,18 +176,17 @@ READ8_MEMBER(crgolf_state::main_to_sound_r)
  *
  *************************************/
 
-static TIMER_CALLBACK( sound_to_main_callback )
+TIMER_CALLBACK_MEMBER(crgolf_state::sound_to_main_callback)
 {
-	crgolf_state *state = machine.driver_data<crgolf_state>();
 
-	state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	state->m_sound_to_main_data = param;
+	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_sound_to_main_data = param;
 }
 
 
 WRITE8_MEMBER(crgolf_state::sound_to_main_w)
 {
-	machine().scheduler().synchronize(FUNC(sound_to_main_callback), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(crgolf_state::sound_to_main_callback),this), data);
 }
 
 

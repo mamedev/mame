@@ -93,9 +93,9 @@ void lethalj_state::video_start()
  *
  *************************************/
 
-static TIMER_CALLBACK( gen_ext1_int )
+TIMER_CALLBACK_MEMBER(lethalj_state::gen_ext1_int)
 {
-	machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -152,7 +152,7 @@ WRITE16_MEMBER(lethalj_state::lethalj_blitter_w)
 		else
 			do_blit();
 
-		machine().scheduler().timer_set(attotime::from_hz(XTAL_32MHz) * ((m_blitter_data[5] + 1) * (m_blitter_data[7] + 1)), FUNC(gen_ext1_int));
+		machine().scheduler().timer_set(attotime::from_hz(XTAL_32MHz) * ((m_blitter_data[5] + 1) * (m_blitter_data[7] + 1)), timer_expired_delegate(FUNC(lethalj_state::gen_ext1_int),this));
 	}
 
 	/* clear the IRQ on offset 0 */

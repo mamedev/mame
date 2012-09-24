@@ -70,6 +70,9 @@ public:
 	UINT32 screen_update_exidy440(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_topsecex(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(exidy440_vblank_interrupt);
+	TIMER_CALLBACK_MEMBER(delayed_sound_command_w);
+	TIMER_CALLBACK_MEMBER(beam_firq_callback);
+	TIMER_CALLBACK_MEMBER(collide_firq_callback);
 };
 
 

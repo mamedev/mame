@@ -67,10 +67,9 @@
 #define COIN_PORT_TAG		"COIN"
 
 
-static TIMER_CALLBACK( clear_coin_status )
+TIMER_CALLBACK_MEMBER(vicdual_state::clear_coin_status)
 {
-	vicdual_state *state = machine.driver_data<vicdual_state>();
-	state->m_coin_status = 0;
+	m_coin_status = 0;
 }
 
 
@@ -98,7 +97,7 @@ INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
 		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 		/* simulate the coin switch being closed for a while */
-		machine().scheduler().timer_set(4 * machine().primary_screen->frame_period(), FUNC(clear_coin_status));
+		machine().scheduler().timer_set(4 * machine().primary_screen->frame_period(), timer_expired_delegate(FUNC(vicdual_state::clear_coin_status),this));
 	}
 }
 

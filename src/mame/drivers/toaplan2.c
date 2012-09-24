@@ -484,17 +484,17 @@ DRIVER_INIT_MEMBER(toaplan2_state,bbakraid)
 ***************************************************************************/
 
 
-static TIMER_CALLBACK( toaplan2_raise_irq )
+TIMER_CALLBACK_MEMBER(toaplan2_state::toaplan2_raise_irq)
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	state->m_main_cpu->execute().set_input_line(param, HOLD_LINE);
+	m_main_cpu->execute().set_input_line(param, HOLD_LINE);
 }
 
 static void toaplan2_vblank_irq(running_machine &machine, int irq_line)
 {
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 	// the IRQ appears to fire at line 0xe6
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0xe6), FUNC(toaplan2_raise_irq), irq_line);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0xe6), timer_expired_delegate(FUNC(toaplan2_state::toaplan2_raise_irq),state), irq_line);
 }
 
 INTERRUPT_GEN_MEMBER(toaplan2_state::toaplan2_vblank_irq1){ toaplan2_vblank_irq(machine(), 1); }

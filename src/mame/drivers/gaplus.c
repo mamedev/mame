@@ -234,10 +234,10 @@ void gaplus_state::machine_reset()
 	machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
 }
 
-static TIMER_CALLBACK( namcoio_run )
+TIMER_CALLBACK_MEMBER(gaplus_state::namcoio_run)
 {
-	device_t *io58xx = machine.device("58xx");
-	device_t *io56xx = machine.device("56xx");
+	device_t *io58xx = machine().device("58xx");
+	device_t *io56xx = machine().device("56xx");
 
 	switch (param)
 	{
@@ -260,10 +260,10 @@ INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_main_irq)
 		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(io58xx))		/* give the cpu a tiny bit of time to write the command before processing it */
-		machine().scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run));
+		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(gaplus_state::namcoio_run),this));
 
 	if (!namcoio_read_reset_line(io56xx))		/* give the cpu a tiny bit of time to write the command before processing it */
-		machine().scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run), 1);
+		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(gaplus_state::namcoio_run),this), 1);
 }
 
 INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_sub_irq)

@@ -857,20 +857,19 @@ static const namco_53xx_interface namco_53xx_intf =
 };
 
 
-static TIMER_CALLBACK( cpu3_interrupt_callback )
+TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
 {
-	galaga_state *state = machine.driver_data<galaga_state>();
 	int scanline = param;
 
-	if(state->m_sub2_nmi_mask)
-		nmi_line_pulse(machine.device("sub2"));
+	if(m_sub2_nmi_mask)
+		nmi_line_pulse(machine().device("sub2")->execute());
 
 	scanline = scanline + 128;
 	if (scanline >= 272)
 		scanline = 64;
 
 	/* the vertical synch chain is clocked by H256 -- this is probably not important, but oh well */
-	state->m_cpu3_interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	m_cpu3_interrupt_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -878,7 +877,7 @@ MACHINE_START_MEMBER(galaga_state,galaga)
 {
 
 	/* create the interrupt timer */
-	m_cpu3_interrupt_timer = machine().scheduler().timer_alloc(FUNC(cpu3_interrupt_callback));
+	m_cpu3_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaga_state::cpu3_interrupt_callback),this));
 	m_custom_mod = 0;
 	state_save_register_global(machine(), m_custom_mod);
 	save_item(NAME(m_main_irq_mask));

@@ -132,6 +132,7 @@ public:
 	void screen_eof_dec8(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(gondo_interrupt);
 	INTERRUPT_GEN_MEMBER(oscar_interrupt);
+	TIMER_CALLBACK_MEMBER(dec8_i8751_timer_callback);
 };
 
 /*----------- defined in video/dec8.c -----------*/

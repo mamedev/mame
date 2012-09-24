@@ -52,6 +52,7 @@ public:
 	DECLARE_MACHINE_RESET(thunderx);
 	UINT32 screen_update_scontra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(scontra_interrupt);
+	TIMER_CALLBACK_MEMBER(thunderx_firq_callback);
 };
 
 

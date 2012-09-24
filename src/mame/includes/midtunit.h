@@ -65,6 +65,7 @@ public:
 	DECLARE_DRIVER_INIT(mk2);
 	DECLARE_MACHINE_RESET(midtunit);
 	DECLARE_VIDEO_START(midtunit);
+	TIMER_CALLBACK_MEMBER(dma_callback);
 };
 /*----------- defined in video/midtunit.c -----------*/
 extern UINT8 midtunit_gfx_rom_large;

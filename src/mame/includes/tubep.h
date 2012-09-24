@@ -78,6 +78,9 @@ public:
 	DECLARE_PALETTE_INIT(rjammer);
 	UINT32 screen_update_tubep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_rjammer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(tubep_scanline_callback);
+	TIMER_CALLBACK_MEMBER(rjammer_scanline_callback);
+	TIMER_CALLBACK_MEMBER(sprite_timer_callback);
 };
 
 

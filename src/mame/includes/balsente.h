@@ -194,6 +194,10 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_balsente(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(balsente_update_analog_inputs);
+	TIMER_CALLBACK_MEMBER(irq_off);
+	TIMER_CALLBACK_MEMBER(m6850_data_ready_callback);
+	TIMER_CALLBACK_MEMBER(m6850_w_callback);
+	TIMER_CALLBACK_MEMBER(adc_finished);
 };
 
 

@@ -65,6 +65,7 @@ public:
 	void screen_eof_twin16(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(CPUA_interrupt);
 	INTERRUPT_GEN_MEMBER(CPUB_interrupt);
+	TIMER_CALLBACK_MEMBER(twin16_sprite_tick);
 };
 
 /*----------- defined in drivers/twin16.c -----------*/
