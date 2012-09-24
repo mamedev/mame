@@ -275,8 +275,8 @@ static void UpdateBanks(running_machine &machine, int first, int last)
 			}
 			write8_delegate func = bank_info[Page].func;
 			if (!func.isnull()) func.late_bind(*state);
-			space_0.install_write_handler(bank_start, bank_end,bank_info[Page].func);
-			space_1.install_write_handler(bank_start, bank_end,bank_info[Page].func);
+			space_0.install_write_handler(bank_start, bank_end, func);
+			space_1.install_write_handler(bank_start, bank_end, func);
 		}
 		else					// Block is rom, or undefined
 		{
