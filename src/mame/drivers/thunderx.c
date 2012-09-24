@@ -6,6 +6,10 @@
 
     K052591 emulation by Eddie Edwards
 
+- There was a set in MAME at one time that was given the setname (thndrxja)
+  which is supposedly a later revision of the japanese set currently in MAME.
+  No roms were ever sourced for this set, so the GAME macro no longer exists.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -994,4 +998,3 @@ GAME( 1988, thunderx,  0,        thunderx, thunderx, driver_device, 0, ROT0,  "K
 GAME( 1988, thunderxa, thunderx, thunderx, thunderx, driver_device, 0, ROT0,  "Konami", "Thunder Cross (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1988, thunderxb, thunderx, thunderx, thunderx, driver_device, 0, ROT0,  "Konami", "Thunder Cross (set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1988, thunderxj, thunderx, thunderx, thnderxj, driver_device, 0, ROT0,  "Konami", "Thunder Cross (Japan)", GAME_SUPPORTS_SAVE )
-//GAME( 1988, thndrxja, thunderx, thunderx, thndrxja, driver_device, 0, ROT0,  "Konami", "Thunder Cross (Japan, newer revision)", GAME_SUPPORTS_SAVE )
