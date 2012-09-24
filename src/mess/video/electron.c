@@ -35,7 +35,7 @@ Mode changes are 'immediate', so any change in RAM access timing occurs exactly 
 
 */
 
-static TIMER_CALLBACK( electron_scanline_interrupt );
+
 
 
 void electron_state::video_start()
@@ -45,7 +45,7 @@ void electron_state::video_start()
 		m_map4[i] = ( ( i & 0x10 ) >> 3 ) | ( i & 0x01 );
 		m_map16[i] = ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x04 ) >> 1 ) | ( i & 0x01 );
 	}
-	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(electron_scanline_interrupt));
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(electron_state::electron_scanline_interrupt),this));
 	m_scanline_timer->adjust( machine().primary_screen->time_until_pos(0), 0, machine().primary_screen->scan_period() );
 }
 
@@ -254,19 +254,18 @@ UINT32 electron_state::screen_update_electron(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-static TIMER_CALLBACK( electron_scanline_interrupt )
+TIMER_CALLBACK_MEMBER(electron_state::electron_scanline_interrupt)
 {
-	electron_state *state = machine.driver_data<electron_state>();
-	switch (machine.primary_screen->vpos())
+	switch (machine().primary_screen->vpos())
 	{
 	case 43:
-		electron_interrupt_handler( machine, INT_SET, INT_RTC );
+		electron_interrupt_handler( machine(), INT_SET, INT_RTC );
 		break;
 	case 199:
-		electron_interrupt_handler( machine, INT_SET, INT_DISPLAY_END );
+		electron_interrupt_handler( machine(), INT_SET, INT_DISPLAY_END );
 		break;
 	case 0:
-		state->m_ula.screen_addr = state->m_ula.screen_start - state->m_ula.screen_base;
+		m_ula.screen_addr = m_ula.screen_start - m_ula.screen_base;
 		break;
 	}
 }

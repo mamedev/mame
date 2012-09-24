@@ -136,21 +136,20 @@ static IRQ_CALLBACK( vector06_irq_callback )
 	return 0xff;
 }
 
-static TIMER_CALLBACK( reset_check_callback )
+TIMER_CALLBACK_MEMBER(vector06_state::reset_check_callback)
 {
-	vector06_state *state = machine.driver_data<vector06_state>();
-	UINT8 val = machine.root_device().ioport("RESET")->read();
+	UINT8 val = machine().root_device().ioport("RESET")->read();
 
 	if (BIT(val, 0))
 	{
-		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x10000);
-		machine.device("maincpu")->reset();
+		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x10000);
+		machine().device("maincpu")->reset();
 	}
 
 	if (BIT(val, 1))
 	{
-		state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x0000);
-		machine.device("maincpu")->reset();
+		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x0000);
+		machine().device("maincpu")->reset();
 	}
 }
 
@@ -164,7 +163,7 @@ WRITE8_MEMBER( vector06_state::vector06_disc_w )
 
 void vector06_state::machine_start()
 {
-	machine().scheduler().timer_pulse(attotime::from_hz(50), FUNC(reset_check_callback));
+	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(vector06_state::reset_check_callback),this));
 }
 
 void vector06_state::machine_reset()

@@ -1305,13 +1305,12 @@ static void towns_cdrom_set_irq(running_machine &machine,int line,int state)
 	}
 }
 
-static TIMER_CALLBACK( towns_cd_status_ready )
+TIMER_CALLBACK_MEMBER(towns_state::towns_cd_status_ready)
 {
-	towns_state* state = machine.driver_data<towns_state>();
-	state->m_towns_cd.status |= 0x02;  // status read request
-	state->m_towns_cd.status |= 0x01;  // ready
-	state->m_towns_cd.cmd_status_ptr = 0;
-	towns_cdrom_set_irq((running_machine&)machine,TOWNS_CD_IRQ_MPU,1);
+	m_towns_cd.status |= 0x02;  // status read request
+	m_towns_cd.status |= 0x01;  // ready
+	m_towns_cd.cmd_status_ptr = 0;
+	towns_cdrom_set_irq((running_machine&)machine(),TOWNS_CD_IRQ_MPU,1);
 }
 
 static void towns_cd_set_status(running_machine &machine, UINT8 st0, UINT8 st1, UINT8 st2, UINT8 st3)
@@ -1322,7 +1321,7 @@ static void towns_cd_set_status(running_machine &machine, UINT8 st0, UINT8 st1, 
 	state->m_towns_cd.cmd_status[2] = st2;
 	state->m_towns_cd.cmd_status[3] = st3;
 	// wait a bit
-	machine.scheduler().timer_set(attotime::from_msec(1), FUNC(towns_cd_status_ready), 0, &machine);
+	machine.scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(towns_state::towns_cd_status_ready),state), 0, &machine);
 }
 
 static UINT8 towns_cd_get_track(running_machine &machine)
@@ -1341,52 +1340,51 @@ static UINT8 towns_cd_get_track(running_machine &machine)
 	return track;
 }
 
-static TIMER_CALLBACK( towns_cdrom_read_byte )
+TIMER_CALLBACK_MEMBER(towns_state::towns_cdrom_read_byte)
 {
 	device_t* device = (device_t* )ptr;
-	towns_state* state = machine.driver_data<towns_state>();
 	int masked;
 	// TODO: support software transfers, for now DMA is assumed.
 
-	if(state->m_towns_cd.buffer_ptr < 0) // transfer has ended
+	if(m_towns_cd.buffer_ptr < 0) // transfer has ended
 		return;
 
 	masked = upd71071_dmarq(device,param,3);  // CD-ROM controller uses DMA1 channel 3
-//  logerror("DMARQ: param=%i ret=%i bufferptr=%i\n",param,masked,state->m_towns_cd.buffer_ptr);
+//  logerror("DMARQ: param=%i ret=%i bufferptr=%i\n",param,masked,m_towns_cd.buffer_ptr);
 	if(param != 0)
 	{
-		state->m_towns_cd.read_timer->adjust(attotime::from_hz(300000));
+		m_towns_cd.read_timer->adjust(attotime::from_hz(300000));
 	}
 	else
 	{
 		if(masked != 0)  // check if the DMA channel is masked
 		{
-			state->m_towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
+			m_towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
 			return;
 		}
-		if(state->m_towns_cd.buffer_ptr < 2048)
-			state->m_towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
+		if(m_towns_cd.buffer_ptr < 2048)
+			m_towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
 		else
 		{  // end of transfer
-			state->m_towns_cd.status &= ~0x10;  // no longer transferring by DMA
-			state->m_towns_cd.status &= ~0x20;  // no longer transferring by software
-			logerror("DMA1: end of transfer (LBA=%08x)\n",state->m_towns_cd.lba_current);
-			if(state->m_towns_cd.lba_current >= state->m_towns_cd.lba_last)
+			m_towns_cd.status &= ~0x10;  // no longer transferring by DMA
+			m_towns_cd.status &= ~0x20;  // no longer transferring by software
+			logerror("DMA1: end of transfer (LBA=%08x)\n",m_towns_cd.lba_current);
+			if(m_towns_cd.lba_current >= m_towns_cd.lba_last)
 			{
-				state->m_towns_cd.extra_status = 0;
+				m_towns_cd.extra_status = 0;
 				towns_cd_set_status(device->machine(),0x06,0x00,0x00,0x00);
 				towns_cdrom_set_irq(device->machine(),TOWNS_CD_IRQ_DMA,1);
-				state->m_towns_cd.buffer_ptr = -1;
-				state->m_towns_cd.status |= 0x01;  // ready
+				m_towns_cd.buffer_ptr = -1;
+				m_towns_cd.status |= 0x01;  // ready
 			}
 			else
 			{
-				state->m_towns_cd.extra_status = 0;
+				m_towns_cd.extra_status = 0;
 				towns_cd_set_status(device->machine(),0x22,0x00,0x00,0x00);
 				towns_cdrom_set_irq(device->machine(),TOWNS_CD_IRQ_DMA,1);
-				cdrom_read_data(state->m_cdrom->get_cdrom_file(),++state->m_towns_cd.lba_current,state->m_towns_cd.buffer,CD_TRACK_MODE1);
-				state->m_towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
-				state->m_towns_cd.buffer_ptr = -1;
+				cdrom_read_data(m_cdrom->get_cdrom_file(),++m_towns_cd.lba_current,m_towns_cd.buffer,CD_TRACK_MODE1);
+				m_towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
+				m_towns_cd.buffer_ptr = -1;
 			}
 		}
 	}
@@ -1482,7 +1480,7 @@ static void towns_cdrom_play_cdda(cdrom_image_device* device)
 	}
 }
 
-static TIMER_CALLBACK(towns_delay_cdda)
+TIMER_CALLBACK_MEMBER(towns_state::towns_delay_cdda)
 {
 	towns_cdrom_play_cdda((cdrom_image_device*)ptr);
 }
@@ -1526,7 +1524,7 @@ static void towns_cdrom_execute_command(cdrom_image_device* device)
 				break;
 			case 0x04:  // Play Audio Track
 				logerror("CD: Command 0x04: PLAY CD-DA\n");
-				device->machine().scheduler().timer_set(attotime::from_msec(1), FUNC(towns_delay_cdda), 0, device);
+				device->machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(towns_state::towns_delay_cdda),state), 0, device);
 				break;
 			case 0x05:  // Read TOC
 				logerror("CD: Command 0x05: READ TOC\n");
@@ -2456,7 +2454,7 @@ void towns_state::driver_start()
 	m_towns_intervaltimer2 = timer_alloc(TIMER_INTERVAL2);
 
 	// CD-ROM init
-	m_towns_cd.read_timer = machine().scheduler().timer_alloc(FUNC(towns_cdrom_read_byte), (void*)machine().device("dma_1"));
+	m_towns_cd.read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cdrom_read_byte),this), (void*)machine().device("dma_1"));
 
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(towns_irq_callback);
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x100000,machine().device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,NULL);

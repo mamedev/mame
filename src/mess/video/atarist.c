@@ -166,11 +166,10 @@ void st_state::shifter_tick()
 //  TIMER_CALLBACK( atarist_shifter_tick )
 //-------------------------------------------------
 
-static TIMER_CALLBACK( atarist_shifter_tick )
+TIMER_CALLBACK_MEMBER(st_state::atarist_shifter_tick)
 {
-	st_state *state = machine.driver_data<st_state>();
 
-	state->shifter_tick();
+	shifter_tick();
 }
 
 
@@ -298,11 +297,10 @@ void st_state::glue_tick()
 //  TIMER_CALLBACK( atarist_glue_tick )
 //-------------------------------------------------
 
-static TIMER_CALLBACK( atarist_glue_tick )
+TIMER_CALLBACK_MEMBER(st_state::atarist_glue_tick)
 {
-	st_state *state = machine.driver_data<st_state>();
 
-	state->glue_tick();
+	glue_tick();
 }
 
 
@@ -752,11 +750,10 @@ void st_state::blitter_tick()
 //  TIMER_CALLBACK( atarist_blitter_tick )
 //-------------------------------------------------
 
-static TIMER_CALLBACK( atarist_blitter_tick )
+TIMER_CALLBACK_MEMBER(st_state::atarist_blitter_tick)
 {
-	st_state *state = machine.driver_data<st_state>();
 
-	state->blitter_tick();
+	blitter_tick();
 }
 
 
@@ -1086,7 +1083,7 @@ WRITE16_MEMBER( st_state::blitter_ctrl_w )
 				m_mfp->i3_w(m_blitter_done);
 
 				int nops = BLITTER_NOPS[m_blitter_op][m_blitter_hop]; // each NOP takes 4 cycles
-				machine().scheduler().timer_set(attotime::from_hz((Y2/4)/(4*nops)), FUNC(atarist_blitter_tick));
+				machine().scheduler().timer_set(attotime::from_hz((Y2/4)/(4*nops)), timer_expired_delegate(FUNC(st_state::atarist_blitter_tick),this));
 			}
 		}
 	}
@@ -1108,8 +1105,8 @@ WRITE16_MEMBER( st_state::blitter_ctrl_w )
 
 void st_state::video_start()
 {
-	m_shifter_timer = machine().scheduler().timer_alloc(FUNC(atarist_shifter_tick));
-	m_glue_timer = machine().scheduler().timer_alloc(FUNC(atarist_glue_tick));
+	m_shifter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_state::atarist_shifter_tick),this));
+	m_glue_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_state::atarist_glue_tick),this));
 
 //  m_shifter_timer->adjust(machine().primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/4)); // 125 ns
 	m_glue_timer->adjust(machine().primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/16)); // 500 ns

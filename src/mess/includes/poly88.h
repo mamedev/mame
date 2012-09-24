@@ -35,6 +35,10 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_poly88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(poly88_interrupt);
+	TIMER_CALLBACK_MEMBER(poly88_usart_timer_callback);
+	TIMER_CALLBACK_MEMBER(keyboard_callback);
+	TIMER_CALLBACK_MEMBER(poly88_cassette_timer_callback);
+	TIMER_CALLBACK_MEMBER(setup_machine_state);
 };
 
 

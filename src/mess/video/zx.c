@@ -84,42 +84,40 @@ void zx_state::zx_ula_bkgnd(UINT8 color)
  *           32..223 192 visible lines
  *          224..233 vblank
  */
-static TIMER_CALLBACK(zx_ula_nmi)
+TIMER_CALLBACK_MEMBER(zx_state::zx_ula_nmi)
 {
-	zx_state *state = machine.driver_data<zx_state>();
 	/*
      * An NMI is issued on the ZX81 every 64us for the blanked
      * scanlines at the top and bottom of the display.
      */
-	screen_device *screen = machine.first_screen();
+	screen_device *screen = machine().first_screen();
 	int height = screen->height();
 	const rectangle& r1 = screen->visible_area();
 	rectangle r;
 
-	bitmap_ind16 &bitmap = state->m_bitmap;
-	r.set(r1.min_x, r1.max_x, state->m_ula_scanline_count, state->m_ula_scanline_count);
+	bitmap_ind16 &bitmap = m_bitmap;
+	r.set(r1.min_x, r1.max_x, m_ula_scanline_count, m_ula_scanline_count);
 	bitmap.fill(1, r);
-//  logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", machine.primary_screen->vpos(), ula_scancode_count, (unsigned) machine.device("maincpu")->state().state_int(Z80_R), (unsigned) machine.device("maincpu")->state().state_int(Z80_PC));
-	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	if (++state->m_ula_scanline_count == height)
-		state->m_ula_scanline_count = 0;
+//  logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", machine().primary_screen->vpos(), ula_scancode_count, (unsigned) machine().device("maincpu")->state().state_int(Z80_R), (unsigned) machine().device("maincpu")->state().state_int(Z80_PC));
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (++m_ula_scanline_count == height)
+		m_ula_scanline_count = 0;
 }
 
-static TIMER_CALLBACK(zx_ula_irq)
+TIMER_CALLBACK_MEMBER(zx_state::zx_ula_irq)
 {
-	zx_state *state = machine.driver_data<zx_state>();
 
 	/*
      * An IRQ is issued on the ZX80/81 whenever the R registers
      * bit 6 goes low. In MESS this IRQ timed from the first read
      * from the copy of the DFILE in the upper 32K in zx_ula_r().
      */
-	if (state->m_ula_irq_active)
+	if (m_ula_irq_active)
 	{
-//      logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", machine.primary_screen->vpos(), ula_scancode_count, (unsigned) machine.device("maincpu")->state().state_int(Z80_R), (unsigned) machine.device("maincpu")->state().state_int(Z80_PC));
+//      logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", machine().primary_screen->vpos(), ula_scancode_count, (unsigned) machine().device("maincpu")->state().state_int(Z80_R), (unsigned) machine().device("maincpu")->state().state_int(Z80_PC));
 
-		state->m_ula_irq_active = 0;
-		machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+		m_ula_irq_active = 0;
+		machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -163,7 +161,7 @@ void zx_ula_r(running_machine &machine, int offs, const char *region, const UINT
 		for (y = state->m_charline_ptr; y < ARRAY_LENGTH(state->m_charline); y++)
 			state->m_charline[y] = 0;
 
-		machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(((32 - state->m_charline_ptr) << 2)), FUNC(zx_ula_irq));
+		machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(((32 - state->m_charline_ptr) << 2)), timer_expired_delegate(FUNC(zx_state::zx_ula_irq),state));
 		state->m_ula_irq_active++;
 
 		scanline = &bitmap.pix16(state->m_ula_scanline_count);
@@ -192,7 +190,7 @@ void zx_ula_r(running_machine &machine, int offs, const char *region, const UINT
 
 void zx_state::video_start()
 {
-	m_ula_nmi = machine().scheduler().timer_alloc(FUNC(zx_ula_nmi));
+	m_ula_nmi = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zx_state::zx_ula_nmi),this));
 	m_ula_irq_active = 0;
 	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }

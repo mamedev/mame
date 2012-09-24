@@ -84,13 +84,12 @@ INPUT_PORTS_END
 
 /* M6532 Interface */
 
-static TIMER_CALLBACK( led_refresh )
+TIMER_CALLBACK_MEMBER(beta_state::led_refresh)
 {
-	beta_state *state = machine.driver_data<beta_state>();
 
-	if (state->m_ls145_p < 6)
+	if (m_ls145_p < 6)
 	{
-		output_set_digit_value(state->m_ls145_p, state->m_segment);
+		output_set_digit_value(m_ls145_p, m_segment);
 	}
 }
 
@@ -237,7 +236,7 @@ static DEVICE_IMAGE_UNLOAD( beta_eprom )
 
 void beta_state::machine_start()
 {
-	m_led_refresh_timer = machine().scheduler().timer_alloc(FUNC(led_refresh));
+	m_led_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(beta_state::led_refresh),this));
 
 	/* register for state saving */
 	save_item(NAME(m_eprom_oe));

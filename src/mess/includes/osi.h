@@ -64,6 +64,7 @@ public:
 
 	/* floppy state */
 	int m_fdc_index;
+	TIMER_CALLBACK_MEMBER(setup_beep);
 };
 
 class c1p_state : public sb2m600_state

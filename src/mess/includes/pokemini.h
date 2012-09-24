@@ -64,6 +64,15 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void palette_init();
+	TIMER_CALLBACK_MEMBER(pokemini_seconds_timer_callback);
+	TIMER_CALLBACK_MEMBER(pokemini_256hz_timer_callback);
+	TIMER_CALLBACK_MEMBER(pokemini_timer1_callback);
+	TIMER_CALLBACK_MEMBER(pokemini_timer1_hi_callback);
+	TIMER_CALLBACK_MEMBER(pokemini_timer2_callback);
+	TIMER_CALLBACK_MEMBER(pokemini_timer2_hi_callback);
+	TIMER_CALLBACK_MEMBER(pokemini_timer3_callback);
+	TIMER_CALLBACK_MEMBER(pokemini_timer3_hi_callback);
+	TIMER_CALLBACK_MEMBER(pokemini_prc_counter_callback);
 };
 
 

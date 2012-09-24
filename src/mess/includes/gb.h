@@ -246,6 +246,10 @@ public:
 	DECLARE_MACHINE_START(gb_video);
 	DECLARE_MACHINE_START(gbc_video);
 	INTERRUPT_GEN_MEMBER(gb_scanline_interrupt);
+	TIMER_CALLBACK_MEMBER(gb_serial_timer_proc);
+	TIMER_CALLBACK_MEMBER(gb_video_init_vbl);
+	TIMER_CALLBACK_MEMBER(gb_lcd_timer_proc);
+	TIMER_CALLBACK_MEMBER(gbc_lcd_timer_proc);
 };
 
 

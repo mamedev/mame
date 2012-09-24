@@ -27,6 +27,7 @@ public:
 
 	DECLARE_DRIVER_INIT(pc1251);
 	UINT32 screen_update_pc1251(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(pc1251_power_up);
 };
 
 

@@ -2432,32 +2432,31 @@ TIMER_DEVICE_CALLBACK(x1_keyboard_callback)
 	}
 }
 
-TIMER_CALLBACK(x1_rtc_increment)
+TIMER_CALLBACK_MEMBER(x1_state::x1_rtc_increment)
 {
-	x1_state *state = machine.driver_data<x1_state>();
 	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 
-	state->m_rtc.sec++;
+	m_rtc.sec++;
 
-	if((state->m_rtc.sec & 0x0f) >= 0x0a)				{ state->m_rtc.sec+=0x10; state->m_rtc.sec&=0xf0; }
-	if((state->m_rtc.sec & 0xf0) >= 0x60)				{ state->m_rtc.min++; state->m_rtc.sec = 0; }
-	if((state->m_rtc.min & 0x0f) >= 0x0a)				{ state->m_rtc.min+=0x10; state->m_rtc.min&=0xf0; }
-	if((state->m_rtc.min & 0xf0) >= 0x60)				{ state->m_rtc.hour++; state->m_rtc.min = 0; }
-	if((state->m_rtc.hour & 0x0f) >= 0x0a)				{ state->m_rtc.hour+=0x10; state->m_rtc.hour&=0xf0; }
-	if((state->m_rtc.hour & 0xff) >= 0x24)				{ state->m_rtc.day++; state->m_rtc.wday++; state->m_rtc.hour = 0; }
-	if((state->m_rtc.wday & 0x0f) >= 0x07)				{ state->m_rtc.wday = 0; }
-	if((state->m_rtc.day & 0x0f) >= 0x0a)				{ state->m_rtc.day+=0x10; state->m_rtc.day&=0xf0; }
+	if((m_rtc.sec & 0x0f) >= 0x0a)				{ m_rtc.sec+=0x10; m_rtc.sec&=0xf0; }
+	if((m_rtc.sec & 0xf0) >= 0x60)				{ m_rtc.min++; m_rtc.sec = 0; }
+	if((m_rtc.min & 0x0f) >= 0x0a)				{ m_rtc.min+=0x10; m_rtc.min&=0xf0; }
+	if((m_rtc.min & 0xf0) >= 0x60)				{ m_rtc.hour++; m_rtc.min = 0; }
+	if((m_rtc.hour & 0x0f) >= 0x0a)				{ m_rtc.hour+=0x10; m_rtc.hour&=0xf0; }
+	if((m_rtc.hour & 0xff) >= 0x24)				{ m_rtc.day++; m_rtc.wday++; m_rtc.hour = 0; }
+	if((m_rtc.wday & 0x0f) >= 0x07)				{ m_rtc.wday = 0; }
+	if((m_rtc.day & 0x0f) >= 0x0a)				{ m_rtc.day+=0x10; m_rtc.day&=0xf0; }
 	/* FIXME: very crude leap year support (i.e. it treats the RTC to be with a 2000-2099 timeline), dunno how the real x1 supports this,
        maybe it just have a 1980-1999 timeline since year 0x00 shows as a XX on display */
-	if(((state->m_rtc.year % 4) == 0) && state->m_rtc.month == 2)
+	if(((m_rtc.year % 4) == 0) && m_rtc.month == 2)
 	{
-		if((state->m_rtc.day & 0xff) >= dpm[state->m_rtc.month-1]+1+1)
-			{ state->m_rtc.month++; state->m_rtc.day = 0x01; }
+		if((m_rtc.day & 0xff) >= dpm[m_rtc.month-1]+1+1)
+			{ m_rtc.month++; m_rtc.day = 0x01; }
 	}
-	else if((state->m_rtc.day & 0xff) >= dpm[state->m_rtc.month-1]+1){ state->m_rtc.month++; state->m_rtc.day = 0x01; }
-	if(state->m_rtc.month > 12)							{ state->m_rtc.year++;  state->m_rtc.month = 0x01; }
-	if((state->m_rtc.year & 0x0f) >= 0x0a)				{ state->m_rtc.year+=0x10; state->m_rtc.year&=0xf0; }
-	if((state->m_rtc.year & 0xf0) >= 0xa0)				{ state->m_rtc.year = 0; } //roll over
+	else if((m_rtc.day & 0xff) >= dpm[m_rtc.month-1]+1){ m_rtc.month++; m_rtc.day = 0x01; }
+	if(m_rtc.month > 12)							{ m_rtc.year++;  m_rtc.month = 0x01; }
+	if((m_rtc.year & 0x0f) >= 0x0a)				{ m_rtc.year+=0x10; m_rtc.year&=0xf0; }
+	if((m_rtc.year & 0xf0) >= 0xa0)				{ m_rtc.year = 0; } //roll over
 }
 
 MACHINE_RESET_MEMBER(x1_state,x1)
@@ -2530,7 +2529,7 @@ MACHINE_START_MEMBER(x1_state,x1)
 		m_rtc.min = ((systime.local_time.minute / 10)<<4) | ((systime.local_time.minute % 10) & 0xf);
 		m_rtc.sec = ((systime.local_time.second / 10)<<4) | ((systime.local_time.second % 10) & 0xf);
 
-		m_rtc_timer = machine().scheduler().timer_alloc(FUNC(x1_rtc_increment));
+		m_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x1_state::x1_rtc_increment),this));
 	}
 }
 

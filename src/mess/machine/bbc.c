@@ -1314,63 +1314,62 @@ static void MC6850_Receive_Clock(running_machine &machine, int new_clock)
 	state->m_mc6850_clock = new_clock;
 }
 
-static TIMER_CALLBACK(bbc_tape_timer_cb)
+TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 {
-	bbc_state *state = machine.driver_data<bbc_state>();
 
 	double dev_val;
-	dev_val=machine.device<cassette_image_device>(CASSETTE_TAG)->input();
+	dev_val=machine().device<cassette_image_device>(CASSETTE_TAG)->input();
 
 	// look for rising edges on the cassette wave
-	if (((dev_val>=0.0) && (state->m_last_dev_val<0.0)) || ((dev_val<0.0) && (state->m_last_dev_val>=0.0)))
+	if (((dev_val>=0.0) && (m_last_dev_val<0.0)) || ((dev_val<0.0) && (m_last_dev_val>=0.0)))
 	{
-		if (state->m_wav_len>(9*3))
+		if (m_wav_len>(9*3))
 		{
 			//this is to long to recive anything so reset the serial IC. This is a hack, this should be done as a timer in the MC6850 code.
-			logerror ("Cassette length %d\n",state->m_wav_len);
-			state->m_len0=0;
-			state->m_len1=0;
-			state->m_len2=0;
-			state->m_len3=0;
-			state->m_wav_len=0;
+			logerror ("Cassette length %d\n",m_wav_len);
+			m_len0=0;
+			m_len1=0;
+			m_len2=0;
+			m_len3=0;
+			m_wav_len=0;
 
 		}
 
-		state->m_len3=state->m_len2;
-		state->m_len2=state->m_len1;
-		state->m_len1=state->m_len0;
-		state->m_len0=state->m_wav_len;
+		m_len3=m_len2;
+		m_len2=m_len1;
+		m_len1=m_len0;
+		m_len0=m_wav_len;
 
-		state->m_wav_len=0;
-		logerror ("cassette  %d  %d  %d  %d\n",state->m_len3,state->m_len2,state->m_len1,state->m_len0);
+		m_wav_len=0;
+		logerror ("cassette  %d  %d  %d  %d\n",m_len3,m_len2,m_len1,m_len0);
 
-		if ((state->m_len0+state->m_len1)>=(18+18-5))
+		if ((m_len0+m_len1)>=(18+18-5))
 		{
 			/* Clock a 0 onto the serial line */
 			logerror("Serial value 0\n");
-			MC6850_Receive_Clock(machine, 0);
-			state->m_len0=0;
-			state->m_len1=0;
-			state->m_len2=0;
-			state->m_len3=0;
+			MC6850_Receive_Clock(machine(), 0);
+			m_len0=0;
+			m_len1=0;
+			m_len2=0;
+			m_len3=0;
 		}
 
-		if (((state->m_len0+state->m_len1+state->m_len2+state->m_len3)<=41) && (state->m_len3!=0))
+		if (((m_len0+m_len1+m_len2+m_len3)<=41) && (m_len3!=0))
 		{
 			/* Clock a 1 onto the serial line */
 			logerror("Serial value 1\n");
-			MC6850_Receive_Clock(machine, 1);
-			state->m_len0=0;
-			state->m_len1=0;
-			state->m_len2=0;
-			state->m_len3=0;
+			MC6850_Receive_Clock(machine(), 1);
+			m_len0=0;
+			m_len1=0;
+			m_len2=0;
+			m_len3=0;
 		}
 
 
 	}
 
-	state->m_wav_len++;
-	state->m_last_dev_val=dev_val;
+	m_wav_len++;
+	m_last_dev_val=dev_val;
 
 }
 
@@ -1987,12 +1986,12 @@ DEVICE_IMAGE_LOAD( bbcb_cart )
 DRIVER_INIT_MEMBER(bbc_state,bbc)
 {
 	m_Master=0;
-	m_tape_timer = machine().scheduler().timer_alloc(FUNC(bbc_tape_timer_cb));
+	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bbc_state::bbc_tape_timer_cb),this));
 }
 DRIVER_INIT_MEMBER(bbc_state,bbcm)
 {
 	m_Master=1;
-	m_tape_timer = machine().scheduler().timer_alloc(FUNC(bbc_tape_timer_cb));
+	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bbc_state::bbc_tape_timer_cb),this));
 }
 
 MACHINE_START_MEMBER(bbc_state,bbca)

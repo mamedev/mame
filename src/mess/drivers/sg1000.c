@@ -1025,19 +1025,19 @@ static const sn76496_config psg_intf =
     TIMER_CALLBACK( lightgun_tick )
 -------------------------------------------------*/
 
-static TIMER_CALLBACK( lightgun_tick )
+TIMER_CALLBACK_MEMBER(sg1000_state::lightgun_tick)
 {
-	UINT8 *rom = machine.root_device().memregion(Z80_TAG)->base();
+	UINT8 *rom = machine().root_device().memregion(Z80_TAG)->base();
 
 	if (IS_CARTRIDGE_TV_DRAW(rom))
 	{
 		/* enable crosshair for TV Draw */
-		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
+		crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_ALL);
 	}
 	else
 	{
 		/* disable crosshair for other cartridges */
-		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);
+		crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_NONE);
 	}
 }
 
@@ -1048,7 +1048,7 @@ static TIMER_CALLBACK( lightgun_tick )
 void sg1000_state::machine_start()
 {
 	/* toggle light gun crosshair */
-	machine().scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
+	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(sg1000_state::lightgun_tick),this));
 
 	/* register for state saving */
 	save_item(NAME(m_tvdraw_data));
@@ -1061,7 +1061,7 @@ void sg1000_state::machine_start()
 void sc3000_state::machine_start()
 {
 	/* toggle light gun crosshair */
-	machine().scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
+	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(sg1000_state::lightgun_tick),this));
 
 	/* register for state saving */
 	save_item(NAME(m_tvdraw_data));

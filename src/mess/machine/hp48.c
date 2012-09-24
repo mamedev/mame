@@ -95,21 +95,20 @@ static void hp48_pulse_irq( running_machine &machine, int irq_line)
 #define RS232_DELAY attotime::from_usec( 300 )
 
 /* end of receive event */
-static TIMER_CALLBACK( hp48_rs232_byte_recv_cb )
+TIMER_CALLBACK_MEMBER(hp48_state::hp48_rs232_byte_recv_cb)
 {
-	hp48_state *state = machine.driver_data<hp48_state>();
 	LOG_SERIAL(( "%f hp48_rs232_byte_recv_cb: end of receive, data=%02x\n",
-		     machine.time().as_double(), param ));
+		     machine().time().as_double(), param ));
 
-	state->m_io[0x14] = param & 0xf; /* receive zone */
-	state->m_io[0x15] = param >> 4;
-	state->m_io[0x11] &= ~2; /* clear byte receiving */
-	state->m_io[0x11] |= 1;  /* set byte received */
+	m_io[0x14] = param & 0xf; /* receive zone */
+	m_io[0x15] = param >> 4;
+	m_io[0x11] &= ~2; /* clear byte receiving */
+	m_io[0x11] |= 1;  /* set byte received */
 
 	/* interrupt */
-	if ( state->m_io[0x10] & 2 )
+	if ( m_io[0x10] & 2 )
 	{
-		hp48_pulse_irq( machine, SATURN_IRQ_LINE );
+		hp48_pulse_irq( machine(), SATURN_IRQ_LINE );
 	}
 }
 
@@ -129,33 +128,32 @@ void hp48_rs232_start_recv_byte( running_machine &machine, UINT8 data )
 	}
 
 	/* schedule end of reception */
-	machine.scheduler().timer_set( RS232_DELAY, FUNC(hp48_rs232_byte_recv_cb), data);
+	machine.scheduler().timer_set( RS232_DELAY, timer_expired_delegate(FUNC(hp48_state::hp48_rs232_byte_recv_cb),state), data);
 }
 
 
 /* end of send event */
-static TIMER_CALLBACK( hp48_rs232_byte_sent_cb )
+TIMER_CALLBACK_MEMBER(hp48_state::hp48_rs232_byte_sent_cb)
 {
-	hp48_state *state = machine.driver_data<hp48_state>();
-	//device_image_interface *xmodem = dynamic_cast<device_image_interface *>(machine.device("rs232_x"));
-	//device_image_interface *kermit = dynamic_cast<device_image_interface *>(machine.device("rs232_k"));
+	//device_image_interface *xmodem = dynamic_cast<device_image_interface *>(machine().device("rs232_x"));
+	//device_image_interface *kermit = dynamic_cast<device_image_interface *>(machine().device("rs232_k"));
 
 	LOG_SERIAL(( "%f hp48_rs232_byte_sent_cb: end of send, data=%02x\n",
-		     machine.time().as_double(), param ));
+		     machine().time().as_double(), param ));
 
-	state->m_io[0x12] &= ~3; /* clear byte sending and buffer full */
+	m_io[0x12] &= ~3; /* clear byte sending and buffer full */
 
 	/* interrupt */
-	if ( state->m_io[0x10] & 4 )
+	if ( m_io[0x10] & 4 )
 	{
-		hp48_pulse_irq( machine, SATURN_IRQ_LINE );
+		hp48_pulse_irq( machine(), SATURN_IRQ_LINE );
 	}
 
 	/* protocol action */
 	//if ( xmodem && xmodem->exists() ) xmodem_receive_byte( &xmodem->device(), param );
 	//else if ( kermit && kermit->exists() ) kermit_receive_byte( &kermit->device(), param );
 //#ifdef CHARDEV
-//  else chardev_out( state->m_chardev, param );
+//  else chardev_out( m_chardev, param );
 //#endif
 }
 
@@ -172,29 +170,28 @@ static void hp48_rs232_send_byte( running_machine &machine )
 	state->m_io[0x12] |= 3;
 
 	/* schedule transmission */
-	machine.scheduler().timer_set( RS232_DELAY, FUNC(hp48_rs232_byte_sent_cb), data);
+	machine.scheduler().timer_set( RS232_DELAY, timer_expired_delegate(FUNC(hp48_state::hp48_rs232_byte_sent_cb),state), data);
 }
 
 
 #ifdef CHARDEV
 
-static TIMER_CALLBACK( hp48_chardev_byte_recv_cb )
+TIMER_CALLBACK_MEMBER(hp48_state::hp48_chardev_byte_recv_cb)
 {
-	hp48_state *state = machine.driver_data<hp48_state>();
-	UINT8 data = chardev_in( state->m_chardev );
+	UINT8 data = chardev_in( m_chardev );
 
 	LOG_SERIAL(( "%f hp48_chardev_byte_recv_cb: end of receive, data=%02x\n",
-		     machine.time().as_double(), data ));
+		     machine().time().as_double(), data ));
 
-	state->m_io[0x14] = data & 0xf; /* receive zone */
-	state->m_io[0x15] = data >> 4;
-	state->m_io[0x11] &= ~2; /* clear byte receiving */
-	state->m_io[0x11] |= 1;  /* set byte received */
+	m_io[0x14] = data & 0xf; /* receive zone */
+	m_io[0x15] = data >> 4;
+	m_io[0x11] &= ~2; /* clear byte receiving */
+	m_io[0x11] |= 1;  /* set byte received */
 
 	/* interrupt */
-	if ( state->m_io[0x10] & 2 )
+	if ( m_io[0x10] & 2 )
 	{
-		hp48_pulse_irq( machine, SATURN_IRQ_LINE );
+		hp48_pulse_irq( machine(), SATURN_IRQ_LINE );
 	}
 }
 
@@ -215,7 +212,7 @@ static void hp48_chardev_start_recv_byte( running_machine &machine, chardev_err 
 	}
 
 	/* schedule end of reception */
-	machine.scheduler().timer_set( RS232_DELAY, FUNC(hp48_chardev_byte_recv_cb));
+	machine.scheduler().timer_set( RS232_DELAY, timer_expired_delegate(FUNC(hp48_state::hp48_chardev_byte_recv_cb),this));
 }
 
 static void hp48_chardev_ready_to_send( running_machine &machine )
@@ -305,22 +302,21 @@ static void hp48_update_kdn( running_machine &machine )
 }
 
 /* periodic keyboard polling, generates an interrupt */
-static TIMER_CALLBACK( hp48_kbd_cb )
+TIMER_CALLBACK_MEMBER(hp48_state::hp48_kbd_cb)
 {
-	hp48_state *state = machine.driver_data<hp48_state>();
 	/* NMI for ON key */
-	if ( machine.root_device().ioport( "ON" )->read() )
+	if ( machine().root_device().ioport( "ON" )->read() )
 	{
 		LOG(( "%f hp48_kbd_cb: keyboard interrupt, on key\n",
-		      machine.time().as_double() ));
-		state->m_io[0x19] |= 8;                                          /* set service request */
-		hp48_pulse_irq( machine, SATURN_WAKEUP_LINE );
-		hp48_pulse_irq( machine, SATURN_NMI_LINE );
+		      machine().time().as_double() ));
+		m_io[0x19] |= 8;                                          /* set service request */
+		hp48_pulse_irq( machine(), SATURN_WAKEUP_LINE );
+		hp48_pulse_irq( machine(), SATURN_NMI_LINE );
 		return;
 	}
 
 	/* regular keys */
-	hp48_update_kdn( machine );
+	hp48_update_kdn( machine() );
 }
 
 /* RSI opcode */
@@ -611,53 +607,51 @@ READ8_MEMBER(hp48_state::hp48_bank_r)
 
 /* ---------------- timers --------------- */
 
-static TIMER_CALLBACK( hp48_timer1_cb )
+TIMER_CALLBACK_MEMBER(hp48_state::hp48_timer1_cb)
 {
-	hp48_state *state = machine.driver_data<hp48_state>();
-	if ( !(state->m_io[0x2f] & 1) ) return; /* timer enable */
+	if ( !(m_io[0x2f] & 1) ) return; /* timer enable */
 
-	state->m_timer1 = (state->m_timer1 - 1) & 0xf;
+	m_timer1 = (m_timer1 - 1) & 0xf;
 
 	/* wake-up on carry */
-	if ( (state->m_io[0x2e] & 4) && (state->m_timer1 == 0xf) )
+	if ( (m_io[0x2e] & 4) && (m_timer1 == 0xf) )
 	{
 		LOG(( "wake-up on timer1\n" ));
-		state->m_io[0x2e] |= 8;                                      /* set service request */
-		state->m_io[0x18] |= 4;                                      /* set service request */
-		hp48_pulse_irq( machine, SATURN_WAKEUP_LINE );
+		m_io[0x2e] |= 8;                                      /* set service request */
+		m_io[0x18] |= 4;                                      /* set service request */
+		hp48_pulse_irq( machine(), SATURN_WAKEUP_LINE );
 	}
 	/* interrupt on carry */
-	if ( (state->m_io[0x2e] & 2) && (state->m_timer1 == 0xf) )
+	if ( (m_io[0x2e] & 2) && (m_timer1 == 0xf) )
 	{
 		LOG(( "generate timer1 interrupt\n" ));
-		state->m_io[0x2e] |= 8; /* set service request */
-		state->m_io[0x18] |= 4; /* set service request */
-		hp48_pulse_irq( machine, SATURN_NMI_LINE );
+		m_io[0x2e] |= 8; /* set service request */
+		m_io[0x18] |= 4; /* set service request */
+		hp48_pulse_irq( machine(), SATURN_NMI_LINE );
 	}
 }
 
-static TIMER_CALLBACK( hp48_timer2_cb )
+TIMER_CALLBACK_MEMBER(hp48_state::hp48_timer2_cb)
 {
-	hp48_state *state = machine.driver_data<hp48_state>();
-	if ( !(state->m_io[0x2f] & 1) ) return; /* timer enable */
+	if ( !(m_io[0x2f] & 1) ) return; /* timer enable */
 
-	state->m_timer2 = (state->m_timer2 - 1) & 0xffffffff;
+	m_timer2 = (m_timer2 - 1) & 0xffffffff;
 
 	/* wake-up on carry */
-	if ( (state->m_io[0x2f] & 4) && (state->m_timer2 == 0xffffffff) )
+	if ( (m_io[0x2f] & 4) && (m_timer2 == 0xffffffff) )
 	{
 		LOG(( "wake-up on timer2\n" ));
-		state->m_io[0x2f] |= 8;                                      /* set service request */
-		state->m_io[0x18] |= 4;                                      /* set service request */
-		hp48_pulse_irq( machine, SATURN_WAKEUP_LINE );
+		m_io[0x2f] |= 8;                                      /* set service request */
+		m_io[0x18] |= 4;                                      /* set service request */
+		hp48_pulse_irq( machine(), SATURN_WAKEUP_LINE );
 	}
 	/* interrupt on carry */
-	if ( (state->m_io[0x2f] & 2) && (state->m_timer2 == 0xffffffff) )
+	if ( (m_io[0x2f] & 2) && (m_timer2 == 0xffffffff) )
 	{
 		LOG(( "generate timer2 interrupt\n" ));
-		state->m_io[0x2f] |= 8;                                      /* set service request */
-		state->m_io[0x18] |= 4;                                      /* set service request */
-		hp48_pulse_irq( machine, SATURN_NMI_LINE );
+		m_io[0x2f] |= 8;                                      /* set service request */
+		m_io[0x18] |= 4;                                      /* set service request */
+		hp48_pulse_irq( machine(), SATURN_NMI_LINE );
 	}
 }
 
@@ -1171,11 +1165,11 @@ void hp48_state::hp48_machine_start( hp48_models model )
 	m_modules[5].data     = rom;
 
 	/* timers */
-	machine().scheduler().timer_pulse(attotime::from_hz( 16 ), FUNC(hp48_timer1_cb));
-	machine().scheduler().timer_pulse(attotime::from_hz( 8192 ), FUNC(hp48_timer2_cb));
+	machine().scheduler().timer_pulse(attotime::from_hz( 16 ), timer_expired_delegate(FUNC(hp48_state::hp48_timer1_cb),this));
+	machine().scheduler().timer_pulse(attotime::from_hz( 8192 ), timer_expired_delegate(FUNC(hp48_state::hp48_timer2_cb),this));
 
 	/* 1ms keyboard polling */
-	machine().scheduler().timer_pulse(attotime::from_msec( 1 ), FUNC(hp48_kbd_cb));
+	machine().scheduler().timer_pulse(attotime::from_msec( 1 ), timer_expired_delegate(FUNC(hp48_state::hp48_kbd_cb),this));
 
 	/* save state */
 	save_item(NAME(m_out) );

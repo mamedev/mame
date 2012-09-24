@@ -104,25 +104,24 @@ static void gba_request_irq(running_machine &machine, UINT32 int_type)
 	}
 }
 
-static TIMER_CALLBACK( dma_complete )
+TIMER_CALLBACK_MEMBER(gba_state::dma_complete)
 {
 	int ctrl;
 	FPTR ch;
 	static const UINT32 ch_int[4] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3 };
-	gba_state *state = machine.driver_data<gba_state>();
 
 	ch = param;
 
 //  printf("dma complete: ch %d\n", ch);
 
-	state->m_dma_timer[ch]->adjust(attotime::never);
+	m_dma_timer[ch]->adjust(attotime::never);
 
-	ctrl = state->m_dma_regs[(ch*3)+2] >> 16;
+	ctrl = m_dma_regs[(ch*3)+2] >> 16;
 
 	// IRQ
 	if (ctrl & 0x4000)
 	{
-		gba_request_irq(machine, ch_int[ch]);
+		gba_request_irq(machine(), ch_int[ch]);
 	}
 
 	// if we're supposed to repeat, don't clear "active" and then the next vbl/hbl will retrigger us
@@ -130,19 +129,19 @@ static TIMER_CALLBACK( dma_complete )
 	if (!((ctrl>>9) & 1) || ((ctrl & 0x3000) == 0))
 	{
 //      printf("clear active for ch %d\n", ch);
-		state->m_dma_regs[(ch*3)+2] &= ~0x80000000;	// clear "active" bit
+		m_dma_regs[(ch*3)+2] &= ~0x80000000;	// clear "active" bit
 	}
 	else
 	{
 		// if repeat, reload the count
 		if ((ctrl>>9) & 1)
 		{
-			state->m_dma_cnt[ch] = state->m_dma_regs[(ch*3)+2]&0xffff;
+			m_dma_cnt[ch] = m_dma_regs[(ch*3)+2]&0xffff;
 
 			// if increment & reload mode, reload the destination
 			if (((ctrl>>5)&3) == 3)
 			{
-				state->m_dma_dst[ch] = state->m_dma_regs[(ch*3)+1];
+				m_dma_dst[ch] = m_dma_regs[(ch*3)+1];
 			}
 		}
 	}
@@ -278,7 +277,7 @@ static void dma_exec(running_machine &machine, FPTR ch)
 
 //  printf("settng DMA timer %d for %d cycs (tmr %x)\n", ch, cnt, (UINT32)state->m_dma_timer[ch]);
 //  state->m_dma_timer[ch]->adjust(ATTOTIME_IN_CYCLES(0, cnt), ch);
-	dma_complete(machine, NULL, ch);
+	state->dma_complete(NULL, ch);
 }
 
 static void audio_tick(running_machine &machine, int ref)
@@ -371,55 +370,54 @@ static void audio_tick(running_machine &machine, int ref)
 	}
 }
 
-static TIMER_CALLBACK(timer_expire)
+TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 {
 	static const UINT32 tmr_ints[4] = { INT_TM0_OVERFLOW, INT_TM1_OVERFLOW, INT_TM2_OVERFLOW, INT_TM3_OVERFLOW };
 	FPTR tmr = (FPTR) param;
-	gba_state *state = machine.driver_data<gba_state>();
 
-//  printf("Timer %d expired, SOUNDCNT_H %04x\n", tmr, state->m_SOUNDCNT_H);
+//  printf("Timer %d expired, SOUNDCNT_H %04x\n", tmr, m_SOUNDCNT_H);
 
 	// "The reload value is copied into the counter only upon following two situations: Automatically upon timer overflows,"
 	// "or when the timer start bit becomes changed from 0 to 1."
-	if (state->m_timer_recalc[tmr] != 0)
+	if (m_timer_recalc[tmr] != 0)
 	{
 		double rate, clocksel, final;
 		attotime time;
-		state->m_timer_recalc[tmr] = 0;
-		state->m_timer_regs[tmr] = (state->m_timer_regs[tmr] & 0xFFFF0000) | (state->m_timer_reload[tmr] & 0x0000FFFF);
-		rate = 0x10000 - (state->m_timer_regs[tmr] & 0xffff);
-		clocksel = timer_clks[(state->m_timer_regs[tmr] >> 16) & 3];
+		m_timer_recalc[tmr] = 0;
+		m_timer_regs[tmr] = (m_timer_regs[tmr] & 0xFFFF0000) | (m_timer_reload[tmr] & 0x0000FFFF);
+		rate = 0x10000 - (m_timer_regs[tmr] & 0xffff);
+		clocksel = timer_clks[(m_timer_regs[tmr] >> 16) & 3];
 		final = clocksel / rate;
-		state->m_timer_hz[tmr] = final;
+		m_timer_hz[tmr] = final;
 		time = attotime::from_hz(final);
 		GBA_ATTOTIME_NORMALIZE(time);
-		state->m_tmr_timer[tmr]->adjust(time, tmr, time);
+		m_tmr_timer[tmr]->adjust(time, tmr, time);
 	}
 
 	// check if timers 0 or 1 are feeding directsound
 	if (tmr == 0)
 	{
-		if ((state->m_SOUNDCNT_H & 0x400) == 0)
+		if ((m_SOUNDCNT_H & 0x400) == 0)
 		{
-			audio_tick(machine, 0);
+			audio_tick(machine(), 0);
 		}
 
-		if ((state->m_SOUNDCNT_H & 0x4000) == 0)
+		if ((m_SOUNDCNT_H & 0x4000) == 0)
 		{
-			audio_tick(machine, 1);
+			audio_tick(machine(), 1);
 		}
 	}
 
 	if (tmr == 1)
 	{
-		if ((state->m_SOUNDCNT_H & 0x400) == 0x400)
+		if ((m_SOUNDCNT_H & 0x400) == 0x400)
 		{
-			audio_tick(machine, 0);
+			audio_tick(machine(), 0);
 		}
 
-		if ((state->m_SOUNDCNT_H & 0x4000) == 0x4000)
+		if ((m_SOUNDCNT_H & 0x4000) == 0x4000)
 		{
-			audio_tick(machine, 1);
+			audio_tick(machine(), 1);
 		}
 	}
 
@@ -427,35 +425,35 @@ static TIMER_CALLBACK(timer_expire)
 	switch (tmr)
 	{
 	case 0:
-		if (state->m_timer_regs[1] & 0x40000)
+		if (m_timer_regs[1] & 0x40000)
 		{
-			state->m_timer_regs[1] = (( ( state->m_timer_regs[1] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (state->m_timer_regs[1] & 0xffff0000);
-			if( ( state->m_timer_regs[1] & 0x0000ffff ) == 0 )
+			m_timer_regs[1] = (( ( m_timer_regs[1] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (m_timer_regs[1] & 0xffff0000);
+			if( ( m_timer_regs[1] & 0x0000ffff ) == 0 )
 			{
-				state->m_timer_regs[1] |= state->m_timer_reload[1];
-				if( ( state->m_timer_regs[1] & 0x400000 ) && ( state->m_IME != 0 ) )
+				m_timer_regs[1] |= m_timer_reload[1];
+				if( ( m_timer_regs[1] & 0x400000 ) && ( m_IME != 0 ) )
 				{
-					gba_request_irq( machine, tmr_ints[1] );
+					gba_request_irq( machine(), tmr_ints[1] );
 				}
-				if( ( state->m_timer_regs[2] & 0x40000 ) )
+				if( ( m_timer_regs[2] & 0x40000 ) )
 				{
-					state->m_timer_regs[2] = (( ( state->m_timer_regs[2] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (state->m_timer_regs[2] & 0xffff0000);
-					if( ( state->m_timer_regs[2] & 0x0000ffff ) == 0 )
+					m_timer_regs[2] = (( ( m_timer_regs[2] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (m_timer_regs[2] & 0xffff0000);
+					if( ( m_timer_regs[2] & 0x0000ffff ) == 0 )
 					{
-						state->m_timer_regs[2] |= state->m_timer_reload[2];
-						if( ( state->m_timer_regs[2] & 0x400000 ) && ( state->m_IME != 0 ) )
+						m_timer_regs[2] |= m_timer_reload[2];
+						if( ( m_timer_regs[2] & 0x400000 ) && ( m_IME != 0 ) )
 						{
-							gba_request_irq( machine, tmr_ints[2] );
+							gba_request_irq( machine(), tmr_ints[2] );
 						}
-						if( ( state->m_timer_regs[3] & 0x40000 ) )
+						if( ( m_timer_regs[3] & 0x40000 ) )
 						{
-							state->m_timer_regs[3] = (( ( state->m_timer_regs[3] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (state->m_timer_regs[3] & 0xffff0000);
-							if( ( state->m_timer_regs[3] & 0x0000ffff ) == 0 )
+							m_timer_regs[3] = (( ( m_timer_regs[3] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (m_timer_regs[3] & 0xffff0000);
+							if( ( m_timer_regs[3] & 0x0000ffff ) == 0 )
 							{
-								state->m_timer_regs[3] |= state->m_timer_reload[3];
-								if( ( state->m_timer_regs[3] & 0x400000 ) && ( state->m_IME != 0 ) )
+								m_timer_regs[3] |= m_timer_reload[3];
+								if( ( m_timer_regs[3] & 0x400000 ) && ( m_IME != 0 ) )
 								{
-									gba_request_irq( machine, tmr_ints[3] );
+									gba_request_irq( machine(), tmr_ints[3] );
 								}
 							}
 						}
@@ -465,25 +463,25 @@ static TIMER_CALLBACK(timer_expire)
 		}
 		break;
 	case 1:
-		if (state->m_timer_regs[2] & 0x40000)
+		if (m_timer_regs[2] & 0x40000)
 		{
-			state->m_timer_regs[2] = (( ( state->m_timer_regs[2] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (state->m_timer_regs[2] & 0xffff0000);
-			if( ( state->m_timer_regs[2] & 0x0000ffff ) == 0 )
+			m_timer_regs[2] = (( ( m_timer_regs[2] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (m_timer_regs[2] & 0xffff0000);
+			if( ( m_timer_regs[2] & 0x0000ffff ) == 0 )
 			{
-				state->m_timer_regs[2] |= state->m_timer_reload[2];
-				if( ( state->m_timer_regs[2] & 0x400000 ) && ( state->m_IME != 0 ) )
+				m_timer_regs[2] |= m_timer_reload[2];
+				if( ( m_timer_regs[2] & 0x400000 ) && ( m_IME != 0 ) )
 				{
-					gba_request_irq( machine, tmr_ints[2] );
+					gba_request_irq( machine(), tmr_ints[2] );
 				}
-				if( ( state->m_timer_regs[3] & 0x40000 ) )
+				if( ( m_timer_regs[3] & 0x40000 ) )
 				{
-					state->m_timer_regs[3] = (( ( state->m_timer_regs[3] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (state->m_timer_regs[3] & 0xffff0000);
-					if( ( state->m_timer_regs[3] & 0x0000ffff ) == 0 )
+					m_timer_regs[3] = (( ( m_timer_regs[3] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (m_timer_regs[3] & 0xffff0000);
+					if( ( m_timer_regs[3] & 0x0000ffff ) == 0 )
 					{
-						state->m_timer_regs[3] |= state->m_timer_reload[3];
-						if( ( state->m_timer_regs[3] & 0x400000 ) && ( state->m_IME != 0 ) )
+						m_timer_regs[3] |= m_timer_reload[3];
+						if( ( m_timer_regs[3] & 0x400000 ) && ( m_IME != 0 ) )
 						{
-							gba_request_irq( machine, tmr_ints[3] );
+							gba_request_irq( machine(), tmr_ints[3] );
 						}
 					}
 				}
@@ -491,15 +489,15 @@ static TIMER_CALLBACK(timer_expire)
 		}
 		break;
 	case 2:
-		if (state->m_timer_regs[3] & 0x40000)
+		if (m_timer_regs[3] & 0x40000)
 		{
-			state->m_timer_regs[3] = (( ( state->m_timer_regs[3] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (state->m_timer_regs[3] & 0xffff0000);
-			if( ( state->m_timer_regs[3] & 0x0000ffff ) == 0 )
+			m_timer_regs[3] = (( ( m_timer_regs[3] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (m_timer_regs[3] & 0xffff0000);
+			if( ( m_timer_regs[3] & 0x0000ffff ) == 0 )
 			{
-				state->m_timer_regs[3] |= state->m_timer_reload[3];
-				if( ( state->m_timer_regs[3] & 0x400000 ) && ( state->m_IME != 0 ) )
+				m_timer_regs[3] |= m_timer_reload[3];
+				if( ( m_timer_regs[3] & 0x400000 ) && ( m_IME != 0 ) )
 				{
-					gba_request_irq( machine, tmr_ints[3] );
+					gba_request_irq( machine(), tmr_ints[3] );
 				}
 			}
 		}
@@ -507,19 +505,18 @@ static TIMER_CALLBACK(timer_expire)
 	}
 
 	// are we supposed to IRQ?
-	if ((state->m_timer_regs[tmr] & 0x400000) && (state->m_IME != 0))
+	if ((m_timer_regs[tmr] & 0x400000) && (m_IME != 0))
 	{
-		gba_request_irq(machine, tmr_ints[tmr]);
+		gba_request_irq(machine(), tmr_ints[tmr]);
 	}
 }
 
-static TIMER_CALLBACK(handle_irq)
+TIMER_CALLBACK_MEMBER(gba_state::handle_irq)
 {
-	gba_state *state = machine.driver_data<gba_state>();
 
-	gba_request_irq(machine, state->m_IF);
+	gba_request_irq(machine(), m_IF);
 
-	state->m_irq_timer->adjust(attotime::never);
+	m_irq_timer->adjust(attotime::never);
 }
 
 READ32_MEMBER(gba_state::gba_io_r)
@@ -2004,64 +2001,62 @@ static INPUT_PORTS_START( gbadv )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A") PORT_PLAYER(1)	// A
 INPUT_PORTS_END
 
-static TIMER_CALLBACK( perform_hbl )
+TIMER_CALLBACK_MEMBER(gba_state::perform_hbl)
 {
 	int ch, ctrl;
-	gba_state *state = machine.driver_data<gba_state>();
-	int scanline = machine.primary_screen->vpos();
+	int scanline = machine().primary_screen->vpos();
 
 	// draw only visible scanlines
 	if (scanline < 160)
 	{
-		gba_draw_scanline(machine, scanline);
+		gba_draw_scanline(machine(), scanline);
 	}
-	state->m_DISPSTAT |= DISPSTAT_HBL;
-	if ((state->m_DISPSTAT & DISPSTAT_HBL_IRQ_EN ) != 0)
+	m_DISPSTAT |= DISPSTAT_HBL;
+	if ((m_DISPSTAT & DISPSTAT_HBL_IRQ_EN ) != 0)
 	{
-		gba_request_irq(machine, INT_HBL);
+		gba_request_irq(machine(), INT_HBL);
 	}
 
 	for (ch = 0; ch < 4; ch++)
 	{
-		ctrl = state->m_dma_regs[(ch*3)+2]>>16;
+		ctrl = m_dma_regs[(ch*3)+2]>>16;
 
 		// HBL-triggered DMA?
 		if ((ctrl & 0x8000) && ((ctrl & 0x3000) == 0x2000))
 		{
-			dma_exec(machine, ch);
+			dma_exec(machine(), ch);
 		}
 	}
 
-	state->m_hbl_timer->adjust(attotime::never);
+	m_hbl_timer->adjust(attotime::never);
 }
 
-static TIMER_CALLBACK( perform_scan )
+TIMER_CALLBACK_MEMBER(gba_state::perform_scan)
 {
 	int scanline;
-	gba_state *state = machine.driver_data<gba_state>();
 
 	// clear hblank and raster IRQ flags
-	state->m_DISPSTAT &= ~(DISPSTAT_HBL|DISPSTAT_VCNT);
+	m_DISPSTAT &= ~(DISPSTAT_HBL|DISPSTAT_VCNT);
 
-	scanline = machine.primary_screen->vpos();
+	scanline = machine().primary_screen->vpos();
 
 	// VBL is set for scanlines 160 through 226 (but not 227, which is the last line)
 	if (scanline >= 160 && scanline < 227)
 	{
-		state->m_DISPSTAT |= DISPSTAT_VBL;
+		m_DISPSTAT |= DISPSTAT_VBL;
 	}
 	else
 	{
-		state->m_DISPSTAT &= ~DISPSTAT_VBL;
+		m_DISPSTAT &= ~DISPSTAT_VBL;
 	}
 
 	// handle VCNT match interrupt/flag
-	if (scanline == ((state->m_DISPSTAT >> 8) & 0xff))
+	if (scanline == ((m_DISPSTAT >> 8) & 0xff))
 	{
-		state->m_DISPSTAT |= DISPSTAT_VCNT;
-		if (state->m_DISPSTAT & DISPSTAT_VCNT_IRQ_EN)
+		m_DISPSTAT |= DISPSTAT_VCNT;
+		if (m_DISPSTAT & DISPSTAT_VCNT_IRQ_EN)
 		{
-			gba_request_irq(machine, INT_VCNT);
+			gba_request_irq(machine(), INT_VCNT);
 		}
 	}
 
@@ -2092,25 +2087,25 @@ static TIMER_CALLBACK( perform_scan )
 		// More work on IRQs is definitely necessary!
 		int ch, ctrl;
 
-		if (state->m_DISPSTAT & DISPSTAT_VBL_IRQ_EN)
+		if (m_DISPSTAT & DISPSTAT_VBL_IRQ_EN)
 		{
-			gba_request_irq(machine, INT_VBL);
+			gba_request_irq(machine(), INT_VBL);
 		}
 
 		for (ch = 0; ch < 4; ch++)
 		{
-			ctrl = state->m_dma_regs[(ch*3)+2]>>16;
+			ctrl = m_dma_regs[(ch*3)+2]>>16;
 
 			// VBL-triggered DMA?
 			if ((ctrl & 0x8000) && ((ctrl & 0x3000) == 0x1000))
 			{
-				dma_exec(machine, ch);
+				dma_exec(machine(), ch);
 			}
 		}
 	}
 
-	state->m_hbl_timer->adjust(machine.primary_screen->time_until_pos(scanline, 240));
-	state->m_scan_timer->adjust(machine.primary_screen->time_until_pos(( scanline + 1 ) % 228, 0));
+	m_hbl_timer->adjust(machine().primary_screen->time_until_pos(scanline, 240));
+	m_scan_timer->adjust(machine().primary_screen->time_until_pos(( scanline + 1 ) % 228, 0));
 }
 
 void gba_state::machine_reset()
@@ -2179,32 +2174,32 @@ void gba_state::machine_start()
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gba_machine_stop),&machine()));
 
 	/* create a timer to fire scanline functions */
-	m_scan_timer = machine().scheduler().timer_alloc(FUNC(perform_scan));
-	m_hbl_timer = machine().scheduler().timer_alloc(FUNC(perform_hbl));
+	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::perform_scan),this));
+	m_hbl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::perform_hbl),this));
 	m_scan_timer->adjust(machine().primary_screen->time_until_pos(0, 0));
 
 	/* and one for each DMA channel */
-	m_dma_timer[0] = machine().scheduler().timer_alloc(FUNC(dma_complete));
-	m_dma_timer[1] = machine().scheduler().timer_alloc(FUNC(dma_complete));
-	m_dma_timer[2] = machine().scheduler().timer_alloc(FUNC(dma_complete));
-	m_dma_timer[3] = machine().scheduler().timer_alloc(FUNC(dma_complete));
+	m_dma_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::dma_complete),this));
+	m_dma_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::dma_complete),this));
+	m_dma_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::dma_complete),this));
+	m_dma_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::dma_complete),this));
 	m_dma_timer[0]->adjust(attotime::never);
 	m_dma_timer[1]->adjust(attotime::never, 1);
 	m_dma_timer[2]->adjust(attotime::never, 2);
 	m_dma_timer[3]->adjust(attotime::never, 3);
 
 	/* also one for each timer (heh) */
-	m_tmr_timer[0] = machine().scheduler().timer_alloc(FUNC(timer_expire));
-	m_tmr_timer[1] = machine().scheduler().timer_alloc(FUNC(timer_expire));
-	m_tmr_timer[2] = machine().scheduler().timer_alloc(FUNC(timer_expire));
-	m_tmr_timer[3] = machine().scheduler().timer_alloc(FUNC(timer_expire));
+	m_tmr_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::timer_expire),this));
+	m_tmr_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::timer_expire),this));
+	m_tmr_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::timer_expire),this));
+	m_tmr_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::timer_expire),this));
 	m_tmr_timer[0]->adjust(attotime::never);
 	m_tmr_timer[1]->adjust(attotime::never, 1);
 	m_tmr_timer[2]->adjust(attotime::never, 2);
 	m_tmr_timer[3]->adjust(attotime::never, 3);
 
 	/* and an IRQ handling timer */
-	m_irq_timer = machine().scheduler().timer_alloc(FUNC(handle_irq));
+	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::handle_irq),this));
 	m_irq_timer->adjust(attotime::never);
 }
 

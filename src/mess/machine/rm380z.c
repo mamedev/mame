@@ -158,33 +158,32 @@ WRITE8_MEMBER( rm380z_state::rm380z_porthi_w )
 // for about 4.5 milliseconds every 20 milliseconds"
 //
 
-static TIMER_CALLBACK(static_vblank_timer)
+TIMER_CALLBACK_MEMBER(rm380z_state::static_vblank_timer)
 {
-	//printf("timer callback called at [%f]\n",machine.time().as_double());
+	//printf("timer callback called at [%f]\n",machine().time().as_double());
 
-	rm380z_state *state = machine.driver_data<rm380z_state>();
 
-	state->m_rasterlineCtr++;
-	state->m_rasterlineCtr%=(HORZ_LINES*LINE_SUBDIVISION);
+	m_rasterlineCtr++;
+	m_rasterlineCtr%=(HORZ_LINES*LINE_SUBDIVISION);
 
 	// frame blanking
-	if (state->m_rasterlineCtr>=((HORZ_LINES-22)*LINE_SUBDIVISION))
+	if (m_rasterlineCtr>=((HORZ_LINES-22)*LINE_SUBDIVISION))
 	{
-		state->m_port1|=0x40;
+		m_port1|=0x40;
 	}
 	else
 	{
-		state->m_port1&=~0x40;
+		m_port1&=~0x40;
 	}
 
 	// line blanking
-	if ((state->m_rasterlineCtr%LINE_SUBDIVISION)>80)
+	if ((m_rasterlineCtr%LINE_SUBDIVISION)>80)
 	{
-		state->m_port1|=0x80;
+		m_port1|=0x80;
 	}
 	else
 	{
-		state->m_port1&=~0x80;
+		m_port1&=~0x80;
 	}
 }
 
@@ -249,7 +248,7 @@ WRITE8_MEMBER( rm380z_state::disk_0_control )
 
 void rm380z_state::machine_start()
 {
-	machine().scheduler().timer_pulse(attotime::from_hz(TIMER_SPEED), FUNC(static_vblank_timer));
+	machine().scheduler().timer_pulse(attotime::from_hz(TIMER_SPEED), timer_expired_delegate(FUNC(rm380z_state::static_vblank_timer),this));
 }
 
 void rm380z_state::machine_reset()

@@ -331,10 +331,9 @@ const pia6821_interface osborne1_video_pia_config =
 //};
 
 
-static TIMER_CALLBACK(osborne1_video_callback)
+TIMER_CALLBACK_MEMBER(osborne1_state::osborne1_video_callback)
 {
-	osborne1_state *state = machine.driver_data<osborne1_state>();
-	int y = machine.primary_screen->vpos();
+	int y = machine().primary_screen->vpos();
 	UINT8 ra=0,chr,gfx,dim;
 	UINT16 x,ma;
 
@@ -342,29 +341,29 @@ static TIMER_CALLBACK(osborne1_video_callback)
 	if ( y == 0 )
 	{
 		/* Clear CA1 on video PIA */
-		state->m_pia1->ca1_w(0);
+		m_pia1->ca1_w(0);
 	}
 	if ( y == 240 )
 	{
 		/* Set CA1 on video PIA */
-		state->m_pia1->ca1_w(1);
+		m_pia1->ca1_w(1);
 	}
 	if ( y < 240 )
 	{
 		ra = y % 10;
 		/* Draw a line of the display */
-		ma = (state->m_new_start_y + (y/10)) * 128 + state->m_new_start_x;
-		UINT16 *p = &state->m_bitmap.pix16(y);
+		ma = (m_new_start_y + (y/10)) * 128 + m_new_start_x;
+		UINT16 *p = &m_bitmap.pix16(y);
 
 		for ( x = 0; x < 52; x++ )
 		{
-			chr = machine.device<ram_device>(RAM_TAG)->pointer()[ 0xF000 + ( (ma+x) & 0xFFF ) ];
-			dim = machine.device<ram_device>(RAM_TAG)->pointer()[ 0x10000 + ( (ma+x) & 0xFFF ) ] & 0x80;
+			chr = machine().device<ram_device>(RAM_TAG)->pointer()[ 0xF000 + ( (ma+x) & 0xFFF ) ];
+			dim = machine().device<ram_device>(RAM_TAG)->pointer()[ 0x10000 + ( (ma+x) & 0xFFF ) ] & 0x80;
 
 			if ( (chr & 0x80) && (ra == 9) )
 				gfx = 0xFF;
 			else
-				gfx = state->m_p_chargen[ (ra << 7) | ( chr & 0x7F ) ];
+				gfx = m_p_chargen[ (ra << 7) | ( chr & 0x7F ) ];
 
 			/* Display a scanline of a character */
 			*p++ = BIT(gfx, 7) ? ( dim ? 1 : 2 ) : 0;
@@ -380,22 +379,21 @@ static TIMER_CALLBACK(osborne1_video_callback)
 
 	if ( (ra==2) || (ra== 6) )
 	{
-		beep_set_state( state->m_beep, state->m_beep_state );
+		beep_set_state( m_beep, m_beep_state );
 	}
 	else
 	{
-		beep_set_state( state->m_beep, 0 );
+		beep_set_state( m_beep, 0 );
 	}
 
-	state->m_video_timer->adjust(machine.primary_screen->time_until_pos(y + 1, 0 ));
+	m_video_timer->adjust(machine().primary_screen->time_until_pos(y + 1, 0 ));
 }
 
-static TIMER_CALLBACK( setup_osborne1 )
+TIMER_CALLBACK_MEMBER(osborne1_state::setup_osborne1)
 {
-	osborne1_state *state = machine.driver_data<osborne1_state>();
-	beep_set_state( state->m_beep, 0 );
-	beep_set_frequency( state->m_beep, 300 /* 60 * 240 / 2 */ );
-	state->m_pia1->ca1_w(0);
+	beep_set_state( m_beep, 0 );
+	beep_set_frequency( m_beep, 300 /* 60 * 240 / 2 */ );
+	m_pia1->ca1_w(0);
 }
 
 static void osborne1_load_proc(device_image_interface &image)
@@ -453,10 +451,10 @@ DRIVER_INIT_MEMBER(osborne1_state,osborne1)
 
 	/* Configure the 6850 ACIA */
 //  acia6850_config( 0, &osborne1_6850_config );
-	m_video_timer = machine().scheduler().timer_alloc(FUNC(osborne1_video_callback));
+	m_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(osborne1_state::osborne1_video_callback),this));
 	m_video_timer->adjust(machine().primary_screen->time_until_pos(1, 0 ));
 
-	machine().scheduler().timer_set(attotime::zero, FUNC(setup_osborne1));
+	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(osborne1_state::setup_osborne1),this));
 }
 
 

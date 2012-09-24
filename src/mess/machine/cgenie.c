@@ -32,15 +32,14 @@
 
 
 
-static TIMER_CALLBACK( handle_cassette_input )
+TIMER_CALLBACK_MEMBER(cgenie_state::handle_cassette_input)
 {
-	cgenie_state *state = machine.driver_data<cgenie_state>();
-	UINT8 new_level = ( (machine.device<cassette_image_device>(CASSETTE_TAG)->input()) > 0.0 ) ? 1 : 0;
+	UINT8 new_level = ( (machine().device<cassette_image_device>(CASSETTE_TAG)->input()) > 0.0 ) ? 1 : 0;
 
-	if ( new_level != state->m_cass_level )
+	if ( new_level != m_cass_level )
 	{
-		state->m_cass_level = new_level;
-		state->m_cass_bit ^= 1;
+		m_cass_level = new_level;
+		m_cass_bit ^= 1;
 	}
 }
 
@@ -151,7 +150,7 @@ void cgenie_state::machine_start()
 	space.install_legacy_write_handler(0x4000, 0x4000 + machine().device<ram_device>(RAM_TAG)->size() - 1, FUNC(cgenie_videoram_w));
 	m_videoram = machine().device<ram_device>(RAM_TAG)->pointer();
 	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
-	machine().scheduler().timer_pulse(attotime::from_hz(11025), FUNC(handle_cassette_input));
+	machine().scheduler().timer_pulse(attotime::from_hz(11025), timer_expired_delegate(FUNC(cgenie_state::handle_cassette_input),this));
 }
 
 /*************************************

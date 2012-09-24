@@ -100,11 +100,10 @@ return ((strncmp(machine.system().name , "hec2mdhrx", 9)==0) ||
 }
 
 /* Cassette timer*/
-static TIMER_CALLBACK( Callback_CK )
+TIMER_CALLBACK_MEMBER(hec2hrp_state::Callback_CK)
 {
-	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
 /* To generate the CK signal (K7)*/
-	state->m_CK_signal++;
+	m_CK_signal++;
 }
 
 void hector_minidisc_init(running_machine &machine)
@@ -891,7 +890,7 @@ void hector_init(running_machine &machine)
 	state->m_pot0 = state->m_pot1 = 0x40;
 
 	/* For Cassette synchro*/
-	state->m_Cassette_timer = machine.scheduler().timer_alloc(FUNC(Callback_CK));
+	state->m_Cassette_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(hec2hrp_state::Callback_CK),state));
 	state->m_Cassette_timer->adjust(attotime::from_msec(100), 0, attotime::from_usec(64));/* => real synchro scan speed for 15,624Khz*/
 
 	/* Sound sn76477*/

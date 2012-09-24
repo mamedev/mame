@@ -285,9 +285,9 @@ static void scan_keyboard(running_machine &machine)
 	}
 }
 
-static TIMER_CALLBACK(keyscan_callback)
+TIMER_CALLBACK_MEMBER(mbc55x_state::keyscan_callback)
 {
-	scan_keyboard(machine);
+	scan_keyboard(machine());
 }
 
 /* i8251 serial */
@@ -409,7 +409,7 @@ void mbc55x_state::machine_start()
 	m_debug_machine=DEBUG_NONE;
 
 	// Allocate keyscan timer
-	m_keyboard.keyscan_timer=machine().scheduler().timer_alloc(FUNC(keyscan_callback));
+	m_keyboard.keyscan_timer=machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mbc55x_state::keyscan_callback),this));
 }
 
 

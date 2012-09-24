@@ -157,6 +157,8 @@ public:
 	virtual void palette_init();
 	DECLARE_MACHINE_START(wscolor);
 	DECLARE_PALETTE_INIT(wscolor);
+	TIMER_CALLBACK_MEMBER(wswan_rtc_callback);
+	TIMER_CALLBACK_MEMBER(wswan_scanline_interrupt);
 };
 
 

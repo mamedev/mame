@@ -340,24 +340,23 @@ static void scan_keyboard(running_machine &machine)
 
 /* handle mouse moves */
 /* shamelessly stolen from machine/mac.c :-) */
-static TIMER_CALLBACK(handle_mouse)
+TIMER_CALLBACK_MEMBER(lisa_state::handle_mouse)
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
 	int diff_x = 0, diff_y = 0;
 	int new_mx, new_my;
 
 #if 0
-	if (state->m_COPS_force_unplug)
+	if (m_COPS_force_unplug)
 		return;	/* ???? */
 #endif
 
-	new_mx = machine.root_device().ioport("MOUSE_X")->read();
-	new_my = machine.root_device().ioport("MOUSE_Y")->read();
+	new_mx = machine().root_device().ioport("MOUSE_X")->read();
+	new_my = machine().root_device().ioport("MOUSE_Y")->read();
 
 	/* see if it moved in the x coord */
-	if (new_mx != state->m_last_mx)
+	if (new_mx != m_last_mx)
 	{
-		diff_x = new_mx - state->m_last_mx;
+		diff_x = new_mx - m_last_mx;
 
 		/* check for wrap */
 		if (diff_x > 0x80)
@@ -365,12 +364,12 @@ static TIMER_CALLBACK(handle_mouse)
 		if  (diff_x < -0x80)
 			diff_x = -0x100-diff_x;
 
-		state->m_last_mx = new_mx;
+		m_last_mx = new_mx;
 	}
 	/* see if it moved in the y coord */
-	if (new_my != state->m_last_my)
+	if (new_my != m_last_my)
 	{
-		diff_y = new_my - state->m_last_my;
+		diff_y = new_my - m_last_my;
 
 		/* check for wrap */
 		if (diff_y > 0x80)
@@ -378,43 +377,43 @@ static TIMER_CALLBACK(handle_mouse)
 		if  (diff_y < -0x80)
 			diff_y = -0x100-diff_y;
 
-		state->m_last_my = new_my;
+		m_last_my = new_my;
 	}
 
 	/* update any remaining count and then return */
 	if (diff_x || diff_y)
 	{
-		if (state->m_mouse_data_offset != -1)
+		if (m_mouse_data_offset != -1)
 		{
-			state->m_fifo_data[state->m_mouse_data_offset] += diff_x;
-			state->m_fifo_data[(state->m_mouse_data_offset+1) & 0x7] += diff_y;
+			m_fifo_data[m_mouse_data_offset] += diff_x;
+			m_fifo_data[(m_mouse_data_offset+1) & 0x7] += diff_y;
 		}
 		else
 		{
 #if 0
-			if (state->m_fifo_size <= 5)
+			if (m_fifo_size <= 5)
 #else
 			/* trash old data */
-			while (state->m_fifo_size > 5)
+			while (m_fifo_size > 5)
 			{
-				state->m_fifo_head = (state->m_fifo_head+1) & 0x7;
-				state->m_fifo_size--;
+				m_fifo_head = (m_fifo_head+1) & 0x7;
+				m_fifo_size--;
 			}
 #endif
 
 			{
 				/*logerror("Adding 3 bytes of mouse data to FIFO\n");*/
 
-				state->m_fifo_data[state->m_fifo_tail] = 0;
-				state->m_mouse_data_offset = state->m_fifo_tail = (state->m_fifo_tail+1) & 0x7;
-				state->m_fifo_data[state->m_fifo_tail] = diff_x;
-				state->m_fifo_tail = (state->m_fifo_tail+1) & 0x7;
-				state->m_fifo_data[state->m_fifo_tail] = diff_y;
-				state->m_fifo_tail = (state->m_fifo_tail+1) & 0x7;
-				state->m_fifo_size += 3;
+				m_fifo_data[m_fifo_tail] = 0;
+				m_mouse_data_offset = m_fifo_tail = (m_fifo_tail+1) & 0x7;
+				m_fifo_data[m_fifo_tail] = diff_x;
+				m_fifo_tail = (m_fifo_tail+1) & 0x7;
+				m_fifo_data[m_fifo_tail] = diff_y;
+				m_fifo_tail = (m_fifo_tail+1) & 0x7;
+				m_fifo_size += 3;
 
 				/*logerror("handle_mouse : trying to send data to VIA\n");*/
-				COPS_send_data_if_possible(machine);
+				COPS_send_data_if_possible(machine());
 			}
 			/* else, mouse data is lost forever (correct ??) */
 		}
@@ -422,20 +421,19 @@ static TIMER_CALLBACK(handle_mouse)
 }
 
 /* read command from the VIA port A */
-static TIMER_CALLBACK(read_COPS_command)
+TIMER_CALLBACK_MEMBER(lisa_state::read_COPS_command)
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
 	int command;
-	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->m_COPS_Ready = 0;
+	m_COPS_Ready = 0;
 
 	/*logerror("read_COPS_command : trying to send data to VIA\n");*/
-	COPS_send_data_if_possible(machine);
+	COPS_send_data_if_possible(machine());
 
 	/* some pull-ups allow the COPS to read 1s when the VIA port is not set as output */
-	command = (state->m_COPS_command | (~ via_0->read(space, VIA_DDRA))) & 0xff;
+	command = (m_COPS_command | (~ via_0->read(space, VIA_DDRA))) & 0xff;
 
 //    printf("Dropping Ready, command = %02x\n", command);
 
@@ -449,9 +447,9 @@ static TIMER_CALLBACK(read_COPS_command)
 		switch ((command & 0xF0) >> 4)
 		{
 		case 0x1:	/* write clock data */
-			if (state->m_clock_regs.clock_write_ptr != -1)
+			if (m_clock_regs.clock_write_ptr != -1)
 			{
-				switch (state->m_clock_regs.clock_write_ptr)
+				switch (m_clock_regs.clock_write_ptr)
 				{
 				case 0:
 				case 1:
@@ -459,57 +457,57 @@ static TIMER_CALLBACK(read_COPS_command)
 				case 3:
 				case 4:
 					/* alarm */
-					state->m_clock_regs.alarm &= ~ (0xf << (4 * (4 - state->m_clock_regs.clock_write_ptr)));
-					state->m_clock_regs.alarm |= immediate << (4 * (4 - state->m_clock_regs.clock_write_ptr));
+					m_clock_regs.alarm &= ~ (0xf << (4 * (4 - m_clock_regs.clock_write_ptr)));
+					m_clock_regs.alarm |= immediate << (4 * (4 - m_clock_regs.clock_write_ptr));
 					break;
 				case 5:
 					/* year */
-					state->m_clock_regs.years = immediate;
+					m_clock_regs.years = immediate;
 					break;
 				case 6:
 					/* day */
-					state->m_clock_regs.days1 = immediate;
+					m_clock_regs.days1 = immediate;
 					break;
 				case 7:
 					/* day */
-					state->m_clock_regs.days2 = immediate;
+					m_clock_regs.days2 = immediate;
 					break;
 				case 8:
 					/* day */
-					state->m_clock_regs.days3 = immediate;
+					m_clock_regs.days3 = immediate;
 					break;
 				case 9:
 					/* hours */
-					state->m_clock_regs.hours1 = immediate;
+					m_clock_regs.hours1 = immediate;
 					break;
 				case 10:
 					/* hours */
-					state->m_clock_regs.hours2 = immediate;
+					m_clock_regs.hours2 = immediate;
 					break;
 				case 11:
 					/* minutes */
-					state->m_clock_regs.minutes1 = immediate;
+					m_clock_regs.minutes1 = immediate;
 					break;
 				case 12:
 					/* minutes */
-					state->m_clock_regs.minutes1 = immediate;
+					m_clock_regs.minutes1 = immediate;
 					break;
 				case 13:
 					/* seconds */
-					state->m_clock_regs.seconds1 = immediate;
+					m_clock_regs.seconds1 = immediate;
 					break;
 				case 14:
 					/* seconds */
-					state->m_clock_regs.seconds2 = immediate;
+					m_clock_regs.seconds2 = immediate;
 					break;
 				case 15:
 					/* tenth */
-					state->m_clock_regs.tenths = immediate;
+					m_clock_regs.tenths = immediate;
 					break;
 				}
-				state->m_clock_regs.clock_write_ptr++;
-				if (state->m_clock_regs.clock_write_ptr == 16)
-					state->m_clock_regs.clock_write_ptr = -1;
+				m_clock_regs.clock_write_ptr++;
+				if (m_clock_regs.clock_write_ptr == 16)
+					m_clock_regs.clock_write_ptr = -1;
 			}
 
 			break;
@@ -517,11 +515,11 @@ static TIMER_CALLBACK(read_COPS_command)
 		case 0x2:	/* set clock mode */
 			if (immediate & 0x8)
 			{	/* start setting the clock */
-				state->m_clock_regs.clock_write_ptr = 0;
+				m_clock_regs.clock_write_ptr = 0;
 			}
 			else
 			{	/* clock write disabled */
-				state->m_clock_regs.clock_write_ptr = -1;
+				m_clock_regs.clock_write_ptr = -1;
 			}
 
 			if (! (immediate & 0x4))
@@ -533,7 +531,7 @@ static TIMER_CALLBACK(read_COPS_command)
 				/* should never happen */
 			}
 
-			state->m_clock_regs.clock_mode = (clock_mode_t)(immediate & 0x3);
+			m_clock_regs.clock_mode = (clock_mode_t)(immediate & 0x3);
 			break;
 
 #if 0
@@ -548,18 +546,18 @@ static TIMER_CALLBACK(read_COPS_command)
 #endif
 
 		case 0x5:	/* set high nibble of NMI character to nnnn */
-			state->m_NMIcode = (state->m_NMIcode & 0x0f) | (immediate << 4);
+			m_NMIcode = (m_NMIcode & 0x0f) | (immediate << 4);
 			break;
 
 		case 0x6:	/* set low nibble of NMI character to nnnn */
-			state->m_NMIcode = (state->m_NMIcode & 0xf0) | immediate;
+			m_NMIcode = (m_NMIcode & 0xf0) | immediate;
 			break;
 
 		case 0x7:	/* send mouse command */
 			if (immediate & 0x8)
-				state->m_mouse_timer->adjust(attotime::zero, 0, attotime::from_msec((immediate & 0x7)*4)); /* enable mouse */
+				m_mouse_timer->adjust(attotime::zero, 0, attotime::from_msec((immediate & 0x7)*4)); /* enable mouse */
 			else
-				state->m_mouse_timer->reset();
+				m_mouse_timer->reset();
 			break;
 		}
 	}
@@ -582,14 +580,14 @@ static TIMER_CALLBACK(read_COPS_command)
 				UINT8 reply[7];
 
 				reply[0] = 0x80;
-				reply[1] = 0xE0 | state->m_clock_regs.years;
-				reply[2] = (state->m_clock_regs.days1 << 4) | state->m_clock_regs.days2;
-				reply[3] = (state->m_clock_regs.days3 << 4) | state->m_clock_regs.hours1;
-				reply[4] = (state->m_clock_regs.hours2 << 4) | state->m_clock_regs.minutes1;
-				reply[5] = (state->m_clock_regs.minutes2 << 4) | state->m_clock_regs.seconds1;
-				reply[6] = (state->m_clock_regs.seconds2 << 4) | state->m_clock_regs.tenths;
+				reply[1] = 0xE0 | m_clock_regs.years;
+				reply[2] = (m_clock_regs.days1 << 4) | m_clock_regs.days2;
+				reply[3] = (m_clock_regs.days3 << 4) | m_clock_regs.hours1;
+				reply[4] = (m_clock_regs.hours2 << 4) | m_clock_regs.minutes1;
+				reply[5] = (m_clock_regs.minutes2 << 4) | m_clock_regs.seconds1;
+				reply[6] = (m_clock_regs.seconds2 << 4) | m_clock_regs.tenths;
 
-				COPS_queue_data(machine, reply, 7);
+				COPS_queue_data(machine(), reply, 7);
 			}
 			break;
 		}
@@ -597,13 +595,12 @@ static TIMER_CALLBACK(read_COPS_command)
 }
 
 /* this timer callback raises the COPS Ready line, which tells the COPS is about to read a command */
-static TIMER_CALLBACK(set_COPS_ready)
+TIMER_CALLBACK_MEMBER(lisa_state::set_COPS_ready)
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
-	state->m_COPS_Ready = 1;
+	m_COPS_Ready = 1;
 
 	/* impulsion width : +/- 20us */
-	machine.scheduler().timer_set(attotime::from_usec(20), FUNC(read_COPS_command));
+	machine().scheduler().timer_set(attotime::from_usec(20), timer_expired_delegate(FUNC(lisa_state::read_COPS_command),this));
 }
 
 static void reset_COPS(lisa_state *state)
@@ -1031,10 +1028,10 @@ DRIVER_INIT_MEMBER(lisa_state,mac_xl)
 
 void lisa_state::machine_start()
 {
-	m_mouse_timer = machine().scheduler().timer_alloc(FUNC(handle_mouse));
+	m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lisa_state::handle_mouse),this));
 
 	/* read command every ms (don't know the real value) */
-	machine().scheduler().timer_pulse(attotime::from_msec(1), FUNC(set_COPS_ready));
+	machine().scheduler().timer_pulse(attotime::from_msec(1), timer_expired_delegate(FUNC(lisa_state::set_COPS_ready),this));
 }
 
 void lisa_state::machine_reset()

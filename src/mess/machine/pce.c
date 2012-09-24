@@ -103,11 +103,11 @@ const msm5205_interface pce_cd_msm5205_interface = {
 /* prototypes */
 static void pce_cd_init( running_machine &machine );
 static void pce_cd_set_irq_line( running_machine &machine, int num, int state );
-static TIMER_CALLBACK( pce_cd_adpcm_dma_timer_callback );
-static TIMER_CALLBACK( pce_cd_cdda_fadeout_callback );
-static TIMER_CALLBACK( pce_cd_cdda_fadein_callback );
-static TIMER_CALLBACK( pce_cd_adpcm_fadeout_callback );
-static TIMER_CALLBACK( pce_cd_adpcm_fadein_callback );
+
+
+
+
+
 
 WRITE8_MEMBER(pce_state::pce_sf2_banking_w)
 {
@@ -1118,10 +1118,9 @@ static void pce_cd_set_irq_line( running_machine &machine, int num, int state )
 	}
 }
 
-static TIMER_CALLBACK( pce_cd_data_timer_callback )
+TIMER_CALLBACK_MEMBER(pce_state::pce_cd_data_timer_callback)
 {
-	pce_state *state = machine.driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+	pce_cd_t &pce_cd = m_cd;
 	if ( pce_cd.data_buffer_index == pce_cd.data_buffer_size )
 	{
 		/* Read next data sector */
@@ -1208,19 +1207,19 @@ static void pce_cd_init( running_machine &machine )
 		}
 	}
 
-	pce_cd.data_timer = machine.scheduler().timer_alloc(FUNC(pce_cd_data_timer_callback));
+	pce_cd.data_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(pce_state::pce_cd_data_timer_callback),state));
 	pce_cd.data_timer->adjust(attotime::never);
-	pce_cd.adpcm_dma_timer = machine.scheduler().timer_alloc(FUNC(pce_cd_adpcm_dma_timer_callback));
+	pce_cd.adpcm_dma_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(pce_state::pce_cd_adpcm_dma_timer_callback),state));
 	pce_cd.adpcm_dma_timer->adjust(attotime::never);
 
-	pce_cd.cdda_fadeout_timer = machine.scheduler().timer_alloc(FUNC(pce_cd_cdda_fadeout_callback));
+	pce_cd.cdda_fadeout_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(pce_state::pce_cd_cdda_fadeout_callback),state));
 	pce_cd.cdda_fadeout_timer->adjust(attotime::never);
-	pce_cd.cdda_fadein_timer = machine.scheduler().timer_alloc(FUNC(pce_cd_cdda_fadein_callback));
+	pce_cd.cdda_fadein_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(pce_state::pce_cd_cdda_fadein_callback),state));
 	pce_cd.cdda_fadein_timer->adjust(attotime::never);
 
-	pce_cd.adpcm_fadeout_timer = machine.scheduler().timer_alloc(FUNC(pce_cd_adpcm_fadeout_callback));
+	pce_cd.adpcm_fadeout_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(pce_state::pce_cd_adpcm_fadeout_callback),state));
 	pce_cd.adpcm_fadeout_timer->adjust(attotime::never);
-	pce_cd.adpcm_fadein_timer = machine.scheduler().timer_alloc(FUNC(pce_cd_adpcm_fadein_callback));
+	pce_cd.adpcm_fadein_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(pce_state::pce_cd_adpcm_fadein_callback),state));
 	pce_cd.adpcm_fadein_timer->adjust(attotime::never);
 }
 
@@ -1249,78 +1248,74 @@ static void pce_cd_set_adpcm_ram_byte(running_machine &machine, UINT8 val)
 	}
 }
 
-static TIMER_CALLBACK( pce_cd_cdda_fadeout_callback )
+TIMER_CALLBACK_MEMBER(pce_state::pce_cd_cdda_fadeout_callback)
 {
-	pce_state *state = machine.driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+	pce_cd_t &pce_cd = m_cd;
 	pce_cd.cdda_volume-= 0.1;
 
 	if(pce_cd.cdda_volume <= 0)
 	{
 		pce_cd.cdda_volume = 0.0;
-		cdda_set_volume(machine.device("cdda"), 0.0);
+		cdda_set_volume(machine().device("cdda"), 0.0);
 		pce_cd.cdda_fadeout_timer->adjust(attotime::never);
 	}
 	else
 	{
-		cdda_set_volume(machine.device("cdda"), pce_cd.cdda_volume);
+		cdda_set_volume(machine().device("cdda"), pce_cd.cdda_volume);
 		pce_cd.cdda_fadeout_timer->adjust(attotime::from_usec(param), param);
 	}
 }
 
-static TIMER_CALLBACK( pce_cd_cdda_fadein_callback )
+TIMER_CALLBACK_MEMBER(pce_state::pce_cd_cdda_fadein_callback)
 {
-	pce_state *state = machine.driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+	pce_cd_t &pce_cd = m_cd;
 	pce_cd.cdda_volume+= 0.1;
 
 	if(pce_cd.cdda_volume >= 100.0)
 	{
 		pce_cd.cdda_volume = 100.0;
-		cdda_set_volume(machine.device("cdda"), 100.0);
+		cdda_set_volume(machine().device("cdda"), 100.0);
 		pce_cd.cdda_fadein_timer->adjust(attotime::never);
 	}
 	else
 	{
-		cdda_set_volume(machine.device("cdda"), pce_cd.cdda_volume);
+		cdda_set_volume(machine().device("cdda"), pce_cd.cdda_volume);
 		pce_cd.cdda_fadein_timer->adjust(attotime::from_usec(param), param);
 	}
 }
 
-static TIMER_CALLBACK( pce_cd_adpcm_fadeout_callback )
+TIMER_CALLBACK_MEMBER(pce_state::pce_cd_adpcm_fadeout_callback)
 {
-	pce_state *state = machine.driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+	pce_cd_t &pce_cd = m_cd;
 	pce_cd.adpcm_volume-= 0.1;
 
 	if(pce_cd.adpcm_volume <= 0)
 	{
 		pce_cd.adpcm_volume = 0.0;
-		msm5205_set_volume(machine.device("msm5205"), 0.0);
+		msm5205_set_volume(machine().device("msm5205"), 0.0);
 		pce_cd.adpcm_fadeout_timer->adjust(attotime::never);
 	}
 	else
 	{
-		msm5205_set_volume(machine.device("msm5205"), pce_cd.adpcm_volume);
+		msm5205_set_volume(machine().device("msm5205"), pce_cd.adpcm_volume);
 		pce_cd.adpcm_fadeout_timer->adjust(attotime::from_usec(param), param);
 	}
 }
 
-static TIMER_CALLBACK( pce_cd_adpcm_fadein_callback )
+TIMER_CALLBACK_MEMBER(pce_state::pce_cd_adpcm_fadein_callback)
 {
-	pce_state *state = machine.driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+	pce_cd_t &pce_cd = m_cd;
 	pce_cd.adpcm_volume+= 0.1;
 
 	if(pce_cd.adpcm_volume >= 100.0)
 	{
 		pce_cd.adpcm_volume = 100.0;
-		msm5205_set_volume(machine.device("msm5205"), 100.0);
+		msm5205_set_volume(machine().device("msm5205"), 100.0);
 		pce_cd.adpcm_fadein_timer->adjust(attotime::never);
 	}
 	else
 	{
-		msm5205_set_volume(machine.device("msm5205"), pce_cd.adpcm_volume);
+		msm5205_set_volume(machine().device("msm5205"), pce_cd.adpcm_volume);
 		pce_cd.adpcm_fadein_timer->adjust(attotime::from_usec(param), param);
 	}
 }
@@ -1515,13 +1510,12 @@ WRITE8_MEMBER(pce_state::pce_cd_intf_w)
 	pce_cd_update(machine());
 }
 
-static TIMER_CALLBACK( pce_cd_clear_ack )
+TIMER_CALLBACK_MEMBER(pce_state::pce_cd_clear_ack)
 {
-	pce_state *state = machine.driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
-	pce_cd_update(machine);
+	pce_cd_t &pce_cd = m_cd;
+	pce_cd_update(machine());
 	pce_cd.scsi_ACK = 0;
-	pce_cd_update(machine);
+	pce_cd_update(machine());
 	if ( pce_cd.scsi_CD )
 	{
 		pce_cd.regs[0x0B] &= 0xFE;
@@ -1538,20 +1532,19 @@ static UINT8 pce_cd_get_cd_data_byte(running_machine &machine)
 		if ( pce_cd.scsi_IO )
 		{
 			pce_cd.scsi_ACK = 1;
-			machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(15), FUNC(pce_cd_clear_ack));
+			machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(15), timer_expired_delegate(FUNC(pce_state::pce_cd_clear_ack),state));
 		}
 	}
 	return data;
 }
 
 
-static TIMER_CALLBACK( pce_cd_adpcm_dma_timer_callback )
+TIMER_CALLBACK_MEMBER(pce_state::pce_cd_adpcm_dma_timer_callback)
 {
-	pce_state *state = machine.driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+	pce_cd_t &pce_cd = m_cd;
 	if ( pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && ! pce_cd.scsi_CD && pce_cd.scsi_IO  )
 	{
-		pce_cd.adpcm_ram[pce_cd.adpcm_write_ptr] = pce_cd_get_cd_data_byte(machine);
+		pce_cd.adpcm_ram[pce_cd.adpcm_write_ptr] = pce_cd_get_cd_data_byte(machine());
 		pce_cd.adpcm_write_ptr = ( pce_cd.adpcm_write_ptr + 1 ) & 0xFFFF;
 
 		pce_cd.regs[0x0c] &= ~4;

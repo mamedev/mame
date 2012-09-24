@@ -177,14 +177,14 @@ static void hdc_post_rw(running_machine &machine);
 static void hdc_drq(running_machine &machine);
 
 static void keyboard_reset(running_machine &machine);
-static TIMER_CALLBACK(keyscan_callback);
+
 
 static void pc8031_reset(running_machine &machine);
 static void iou_reset(running_machine &machine);
 static void rmni_sound_reset(running_machine &machine);
 
 static void mouse_js_reset(running_machine &machine);
-static TIMER_CALLBACK(mouse_callback);
+
 
 
 /*************************************
@@ -458,11 +458,10 @@ static void nimbus_recalculate_ints(running_machine &machine)
  *
  *************************************/
 
-static TIMER_CALLBACK(internal_timer_int)
+TIMER_CALLBACK_MEMBER(rmnimbus_state::internal_timer_int)
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 	int which = param;
-	struct timer_state *t = &state->m_i186.timer[which];
+	struct timer_state *t = &m_i186.timer[which];
 
 	if (LOG_TIMER) logerror("Hit interrupt callback for timer %d\n", which);
 
@@ -472,8 +471,8 @@ static TIMER_CALLBACK(internal_timer_int)
 	/* request an interrupt */
 	if (t->control & 0x2000)
 	{
-		state->m_i186.intr.status |= 0x01 << which;
-		update_interrupt_state(machine);
+		m_i186.intr.status |= 0x01 << which;
+		update_interrupt_state(machine());
 		if (LOG_TIMER) logerror("  Generating timer interrupt\n");
 	}
 
@@ -654,11 +653,10 @@ static void internal_timer_update(running_machine &machine,
  *
  *************************************/
 
-static TIMER_CALLBACK(dma_timer_callback)
+TIMER_CALLBACK_MEMBER(rmnimbus_state::dma_timer_callback)
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 	int which = param;
-	struct dma_state *d = &state->m_i186.dma[which];
+	struct dma_state *d = &m_i186.dma[which];
 
 	/* complete the status update */
 	d->control &= ~0x0002;
@@ -669,8 +667,8 @@ static TIMER_CALLBACK(dma_timer_callback)
 	if (d->control & 0x0100)
 	{
 		if (LOG_DMA>1) logerror("DMA%d timer callback - requesting interrupt: count = %04X, source = %04X\n", which, d->count, d->source);
-		state->m_i186.intr.request |= 0x04 << which;
-		update_interrupt_state(machine);
+		m_i186.intr.request |= 0x04 << which;
+		update_interrupt_state(machine());
 	}
 }
 
@@ -806,14 +804,14 @@ static void nimbus_cpu_init(running_machine &machine)
 	logerror("Machine reset\n");
 
 	/* create timers here so they stick around */
-	state->m_i186.timer[0].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int));
-	state->m_i186.timer[1].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int));
-	state->m_i186.timer[2].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int));
+	state->m_i186.timer[0].int_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::internal_timer_int),state));
+	state->m_i186.timer[1].int_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::internal_timer_int),state));
+	state->m_i186.timer[2].int_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::internal_timer_int),state));
 	state->m_i186.timer[0].time_timer = machine.scheduler().timer_alloc(FUNC_NULL);
 	state->m_i186.timer[1].time_timer = machine.scheduler().timer_alloc(FUNC_NULL);
 	state->m_i186.timer[2].time_timer = machine.scheduler().timer_alloc(FUNC_NULL);
-	state->m_i186.dma[0].finish_timer = machine.scheduler().timer_alloc(FUNC(dma_timer_callback));
-	state->m_i186.dma[1].finish_timer = machine.scheduler().timer_alloc(FUNC(dma_timer_callback));
+	state->m_i186.dma[0].finish_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::dma_timer_callback),state));
+	state->m_i186.dma[1].finish_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::dma_timer_callback),state));
 }
 
 static void nimbus_cpu_reset(running_machine &machine)
@@ -1262,8 +1260,8 @@ void rmnimbus_state::machine_start()
 	/* init cpu */
 	nimbus_cpu_init(machine());
 
-	m_keyboard.keyscan_timer=machine().scheduler().timer_alloc(FUNC(keyscan_callback));
-	m_nimbus_mouse.m_mouse_timer=machine().scheduler().timer_alloc(FUNC(mouse_callback));
+	m_keyboard.keyscan_timer=machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::keyscan_callback),this));
+	m_nimbus_mouse.m_mouse_timer=machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::mouse_callback),this));
 
 	/* setup debug commands */
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
@@ -2171,9 +2169,9 @@ static void scan_keyboard(running_machine &machine)
     }
 }
 
-static TIMER_CALLBACK(keyscan_callback)
+TIMER_CALLBACK_MEMBER(rmnimbus_state::keyscan_callback)
 {
-    scan_keyboard(machine);
+    scan_keyboard(machine());
 }
 
 /*
@@ -2836,24 +2834,23 @@ static void mouse_js_reset(running_machine &machine)
     state->m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(1000));
 }
 
-static TIMER_CALLBACK(mouse_callback)
+TIMER_CALLBACK_MEMBER(rmnimbus_state::mouse_callback)
 {
-	rmnimbus_state *drvstate = machine.driver_data<rmnimbus_state>();
     UINT8   x = 0;
     UINT8   y = 0;
-//  int     pc=machine.device(MAINCPU_TAG)->safe_pc();
+//  int     pc=machine().device(MAINCPU_TAG)->safe_pc();
 
     UINT8   intstate_x;
     UINT8   intstate_y;
     int     xint;
     int     yint;
 
-    mouse_joy_state *state = &drvstate->m_nimbus_mouse;
+    mouse_joy_state *state = &m_nimbus_mouse;
 
 
-	state->m_reg0a4 = machine.root_device().ioport(MOUSE_BUTTON_TAG)->read() | 0xC0;
-	x = machine.root_device().ioport(MOUSEX_TAG)->read();
-    y = machine.root_device().ioport(MOUSEY_TAG)->read();
+	state->m_reg0a4 = machine().root_device().ioport(MOUSE_BUTTON_TAG)->read() | 0xC0;
+	x = machine().root_device().ioport(MOUSEX_TAG)->read();
+    y = machine().root_device().ioport(MOUSEY_TAG)->read();
 
     UINT8   mxa;
     UINT8   mxb;
@@ -2923,10 +2920,10 @@ static TIMER_CALLBACK(mouse_callback)
 //              mxb,mxa, (mxb ^ mxa) , (state->m_ay8910_a & 0xC0), (mxb ^ mxa) ^ ((state->m_ay8910_a & 0x40) >> 6));
     }
 
-    intstate_x = (mxb ^ mxa) ^ ((drvstate->m_ay8910_a & 0x40) >> 6);
-    intstate_y = (myb ^ mya) ^ ((drvstate->m_ay8910_a & 0x80) >> 7);
+    intstate_x = (mxb ^ mxa) ^ ((m_ay8910_a & 0x40) >> 6);
+    intstate_y = (myb ^ mya) ^ ((m_ay8910_a & 0x80) >> 7);
 
-    if (MOUSE_INT_ENABLED(drvstate))
+    if (MOUSE_INT_ENABLED(this))
     {
         if ((intstate_x==1) && (state->m_intstate_x==0))
 //        if (intstate_x!=state->m_intstate_x)
@@ -2934,7 +2931,7 @@ static TIMER_CALLBACK(mouse_callback)
 
             xint=mxa ? EXTERNAL_INT_MOUSE_XR : EXTERNAL_INT_MOUSE_XL;
 
-            external_int(machine,0,xint);
+            external_int(machine(),0,xint);
 
 //            logerror("Xint:%02X, mxb=%02X\n",xint,mxb);
         }
@@ -2944,7 +2941,7 @@ static TIMER_CALLBACK(mouse_callback)
         {
             yint=myb ? EXTERNAL_INT_MOUSE_YU : EXTERNAL_INT_MOUSE_YD;
 
-            external_int(machine,0,yint);
+            external_int(machine(),0,yint);
 //            logerror("Yint:%02X, myb=%02X\n",yint,myb);
         }
     }

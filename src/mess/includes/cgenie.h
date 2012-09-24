@@ -73,6 +73,7 @@ public:
 	UINT32 screen_update_cgenie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cgenie_timer_interrupt);
 	INTERRUPT_GEN_MEMBER(cgenie_frame_interrupt);
+	TIMER_CALLBACK_MEMBER(handle_cassette_input);
 };
 
 

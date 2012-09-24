@@ -154,10 +154,9 @@ I8257_INTERFACE( radio86_dma )
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER("i8275", i8275_dack_w), DEVCB_NULL }
 };
 
-static TIMER_CALLBACK( radio86_reset )
+TIMER_CALLBACK_MEMBER(radio86_state::radio86_reset)
 {
-	radio86_state *state = machine.driver_data<radio86_state>();
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->set_entry(0);
 }
 
 
@@ -178,7 +177,7 @@ WRITE8_MEMBER(radio86_state::radio_io_w)
 
 MACHINE_RESET_MEMBER(radio86_state,radio86)
 {
-	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(radio86_reset));
+	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(radio86_state::radio86_reset),this));
 	membank("bank1")->set_entry(1);
 
 	m_keyboard_mask = 0;

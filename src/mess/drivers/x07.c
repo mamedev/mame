@@ -666,20 +666,18 @@ void x07_state::cassette_w()
 	m_cass_data = m_regs_w[7];
 }
 
-static TIMER_CALLBACK( cassette_tick )
+TIMER_CALLBACK_MEMBER(x07_state::cassette_tick)
 {
-	x07_state *state = machine.driver_data<x07_state>();
-	state->m_cass_clk++;
+	m_cass_clk++;
 }
 
-static TIMER_CALLBACK( cassette_poll )
+TIMER_CALLBACK_MEMBER(x07_state::cassette_poll)
 {
-	x07_state *state = machine.driver_data<x07_state>();
 
-	if ((state->m_cassette->get_state() & 0x03) == CASSETTE_PLAY)
-		state->cassette_load();
-	else if ((state->m_cassette->get_state() & 0x03) == CASSETTE_RECORD)
-		state->cassette_save();
+	if ((m_cassette->get_state() & 0x03) == CASSETTE_PLAY)
+		cassette_load();
+	else if ((m_cassette->get_state() & 0x03) == CASSETTE_RECORD)
+		cassette_save();
 }
 
 void x07_state::cassette_load()
@@ -1367,26 +1365,23 @@ static TIMER_DEVICE_CALLBACK( blink_timer )
 	state->m_blink = !state->m_blink;
 }
 
-static TIMER_CALLBACK( rsta_clear )
+TIMER_CALLBACK_MEMBER(x07_state::rsta_clear)
 {
-	x07_state *state = machine.driver_data<x07_state>();
-	state->m_maincpu->set_input_line(NSC800_RSTA, CLEAR_LINE);
+	m_maincpu->set_input_line(NSC800_RSTA, CLEAR_LINE);
 
-	if (state->m_kb_size)
-		state->kb_irq();
+	if (m_kb_size)
+		kb_irq();
 }
 
-static TIMER_CALLBACK( rstb_clear )
+TIMER_CALLBACK_MEMBER(x07_state::rstb_clear)
 {
-	x07_state *state = machine.driver_data<x07_state>();
-	state->m_maincpu->set_input_line(NSC800_RSTB, CLEAR_LINE);
+	m_maincpu->set_input_line(NSC800_RSTB, CLEAR_LINE);
 }
 
-static TIMER_CALLBACK( beep_stop )
+TIMER_CALLBACK_MEMBER(x07_state::beep_stop)
 {
-	x07_state *state = machine.driver_data<x07_state>();
 
-	beep_set_state(state->m_beep, 0);
+	beep_set_state(m_beep, 0);
 }
 
 static const gfx_layout x07_charlayout =
@@ -1406,11 +1401,11 @@ GFXDECODE_END
 
 void x07_state::machine_start()
 {
-	m_rsta_clear = machine().scheduler().timer_alloc(FUNC(rsta_clear));
-	m_rstb_clear = machine().scheduler().timer_alloc(FUNC(rstb_clear));
-	m_beep_stop = machine().scheduler().timer_alloc(FUNC(beep_stop));
-	m_cass_poll = machine().scheduler().timer_alloc(FUNC(cassette_poll));
-	m_cass_tick = machine().scheduler().timer_alloc(FUNC(cassette_tick));
+	m_rsta_clear = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x07_state::rsta_clear),this));
+	m_rstb_clear = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x07_state::rstb_clear),this));
+	m_beep_stop = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x07_state::beep_stop),this));
+	m_cass_poll = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x07_state::cassette_poll),this));
+	m_cass_tick = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x07_state::cassette_tick),this));
 
 	/* Save State */
 	save_item(NAME(m_sleep));

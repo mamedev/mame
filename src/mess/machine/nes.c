@@ -216,11 +216,10 @@ void nes_state::machine_reset()
 	machine().device("maincpu")->reset();
 }
 
-static TIMER_CALLBACK( nes_irq_callback )
+TIMER_CALLBACK_MEMBER(nes_state::nes_irq_callback)
 {
-	nes_state *state = machine.driver_data<nes_state>();
-	state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-	state->m_irq_timer->adjust(attotime::never);
+	m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+	m_irq_timer->adjust(attotime::never);
 }
 
 static void nes_banks_restore(nes_state *state)
@@ -309,7 +308,7 @@ void nes_state::machine_start()
 		}
 	}
 
-	m_irq_timer = machine().scheduler().timer_alloc(FUNC(nes_irq_callback));
+	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_state::nes_irq_callback),this));
 	nes_state_register(machine());
 }
 
@@ -524,28 +523,28 @@ static void nes_read_input_device( running_machine &machine, int cfg, nes_input 
 }
 
 
-static TIMER_CALLBACK( lightgun_tick )
+TIMER_CALLBACK_MEMBER(nes_state::lightgun_tick)
 {
-	if ((machine.root_device().ioport("CTRLSEL")->read() & 0x000f) == 0x0002)
+	if ((machine().root_device().ioport("CTRLSEL")->read() & 0x000f) == 0x0002)
 	{
 		/* enable lightpen crosshair */
-		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
+		crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_ALL);
 	}
 	else
 	{
 		/* disable lightpen crosshair */
-		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);
+		crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_NONE);
 	}
 
-	if ((machine.root_device().ioport("CTRLSEL")->read() & 0x00f0) == 0x0030)
+	if ((machine().root_device().ioport("CTRLSEL")->read() & 0x00f0) == 0x0030)
 	{
 		/* enable lightpen crosshair */
-		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_ALL);
+		crosshair_set_screen(machine(), 1, CROSSHAIR_SCREEN_ALL);
 	}
 	else
 	{
 		/* disable lightpen crosshair */
-		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_NONE);
+		crosshair_set_screen(machine(), 1, CROSSHAIR_SCREEN_NONE);
 	}
 }
 
@@ -554,7 +553,7 @@ WRITE8_MEMBER(nes_state::nes_IN0_w)
 	int cfg = ioport("CTRLSEL")->read();
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	machine().scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
+	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(nes_state::lightgun_tick),this));
 
 	if ((cfg & 0x000f) >= 0x08)	// for now we treat the FC keyboard separately from other inputs!
 	{

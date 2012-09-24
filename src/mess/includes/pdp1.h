@@ -262,6 +262,11 @@ public:
 	UINT32 screen_update_pdp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_pdp1(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(pdp1_interrupt);
+	TIMER_CALLBACK_MEMBER(reader_callback);
+	TIMER_CALLBACK_MEMBER(puncher_callback);
+	TIMER_CALLBACK_MEMBER(tyo_callback);
+	TIMER_CALLBACK_MEMBER(dpy_callback);
+	TIMER_CALLBACK_MEMBER(il_timer_callback);
 };
 
 /*----------- defined in video/pdp1.c -----------*/

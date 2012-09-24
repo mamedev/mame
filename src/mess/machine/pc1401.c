@@ -124,10 +124,9 @@ MACHINE_START( pc1401 )
 	machine.device<nvram_device>("ram_nvram")->set_base(ram, 0x2800);
 }
 
-static TIMER_CALLBACK(pc1401_power_up)
+TIMER_CALLBACK_MEMBER(pc1401_state::pc1401_power_up)
 {
-	pc1401_state *state = machine.driver_data<pc1401_state>();
-	state->m_power = 0;
+	m_power = 0;
 }
 
 DRIVER_INIT_MEMBER(pc1401_state,pc1401)
@@ -234,5 +233,5 @@ DRIVER_INIT_MEMBER(pc1401_state,pc1401)
 		gfx[i]=i;
 
 	m_power = 1;
-	machine().scheduler().timer_set(attotime::from_seconds(1), FUNC(pc1401_power_up));
+	machine().scheduler().timer_set(attotime::from_seconds(1), timer_expired_delegate(FUNC(pc1401_state::pc1401_power_up),this));
 }

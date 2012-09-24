@@ -48,6 +48,10 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_apple1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(apple1_kbd_poll);
+	TIMER_CALLBACK_MEMBER(apple1_kbd_strobe_end);
+	TIMER_CALLBACK_MEMBER(apple1_dsp_ready_start);
+	TIMER_CALLBACK_MEMBER(apple1_dsp_ready_end);
 };
 
 

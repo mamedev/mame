@@ -80,7 +80,7 @@ enum {
   Prototypes
 */
 
-static TIMER_CALLBACK(gb_serial_timer_proc);
+
 static void gb_machine_stop(running_machine &machine);
 
 
@@ -250,7 +250,7 @@ MACHINE_START_MEMBER(gb_state,gb)
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_machine_stop),&machine()));
 
 	/* Allocate the serial timer, and disable it */
-	m_gb_serial_timer = machine().scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
+	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
 	m_gb_serial_timer->enable( 0 );
 
 	MACHINE_START_CALL_MEMBER( gb_video );
@@ -261,7 +261,7 @@ MACHINE_START_MEMBER(gb_state,gbc)
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_machine_stop),&machine()));
 
 	/* Allocate the serial timer, and disable it */
-	m_gb_serial_timer = machine().scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
+	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
 	m_gb_serial_timer->enable( 0 );
 
 	MACHINE_START_CALL_MEMBER( gbc_video );
@@ -291,7 +291,7 @@ MACHINE_START_MEMBER(gb_state,sgb)
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_machine_stop),&machine()));
 
 	/* Allocate the serial timer, and disable it */
-	m_gb_serial_timer = machine().scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
+	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
 	m_gb_serial_timer->enable( 0 );
 
 	MACHINE_START_CALL_MEMBER( gb_video );
@@ -1896,19 +1896,18 @@ INTERRUPT_GEN_MEMBER(gb_state::gb_scanline_interrupt)
 {
 }
 
-static TIMER_CALLBACK(gb_serial_timer_proc)
+TIMER_CALLBACK_MEMBER(gb_state::gb_serial_timer_proc)
 {
-	gb_state *state = machine.driver_data<gb_state>();
 	/* Shift in a received bit */
-	state->SIODATA = (state->SIODATA << 1) | 0x01;
+	SIODATA = (SIODATA << 1) | 0x01;
 	/* Decrement number of handled bits */
-	state->m_SIOCount--;
+	m_SIOCount--;
 	/* If all bits done, stop timer and trigger interrupt */
-	if ( ! state->m_SIOCount )
+	if ( ! m_SIOCount )
 	{
-		state->SIOCONT &= 0x7F;
-		state->m_gb_serial_timer->enable( 0 );
-		machine.device("maincpu")->execute().set_input_line(SIO_INT, ASSERT_LINE);
+		SIOCONT &= 0x7F;
+		m_gb_serial_timer->enable( 0 );
+		machine().device("maincpu")->execute().set_input_line(SIO_INT, ASSERT_LINE);
 	}
 }
 
@@ -2017,7 +2016,7 @@ READ8_MEMBER(gb_state::gbc_io2_r)
 MACHINE_START_MEMBER(gb_state,megaduck)
 {
 	/* Allocate the serial timer, and disable it */
-	m_gb_serial_timer = machine().scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
+	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
 	m_gb_serial_timer->enable( 0 );
 
 	MACHINE_START_CALL_MEMBER( gb_video );

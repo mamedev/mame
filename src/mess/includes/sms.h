@@ -186,6 +186,10 @@ public:
 	UINT32 screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(lgun1_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(lgun2_changed);
+	TIMER_CALLBACK_MEMBER(rapid_fire_callback);
+	TIMER_CALLBACK_MEMBER(lightgun_tick);
+	TIMER_CALLBACK_MEMBER(lphaser_1_callback);
+	TIMER_CALLBACK_MEMBER(lphaser_2_callback);
 };
 
 

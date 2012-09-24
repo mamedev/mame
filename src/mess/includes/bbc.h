@@ -285,6 +285,7 @@ public:
 	INTERRUPT_GEN_MEMBER(bbcb_vsync);
 	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
 	INTERRUPT_GEN_MEMBER(bbcm_keyscan);
+	TIMER_CALLBACK_MEMBER(bbc_tape_timer_cb);
 };
 
 

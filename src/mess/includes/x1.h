@@ -202,6 +202,7 @@ public:
 	UINT32 screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
+	TIMER_CALLBACK_MEMBER(x1_rtc_increment);
 };
 
 

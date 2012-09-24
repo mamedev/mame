@@ -294,25 +294,23 @@ void apple2gs_doc_irq(device_t *device, int state)
 
 
 /* Clock interrupt */
-static TIMER_CALLBACK( apple2gs_clock_tick )
+TIMER_CALLBACK_MEMBER(apple2gs_state::apple2gs_clock_tick)
 {
-	apple2gs_state *state = machine.driver_data<apple2gs_state>();
-	if ((state->m_vgcint & 0x04) && !(state->m_vgcint & 0x40))
+	if ((m_vgcint & 0x04) && !(m_vgcint & 0x40))
 	{
-		state->m_vgcint |= 0xc0;
-		apple2gs_add_irq(machine, IRQ_VGC_SECOND);
+		m_vgcint |= 0xc0;
+		apple2gs_add_irq(machine(), IRQ_VGC_SECOND);
 	}
 }
 
 
 /* Quarter-second interrupt */
-static TIMER_CALLBACK( apple2gs_qsecond_tick )
+TIMER_CALLBACK_MEMBER(apple2gs_state::apple2gs_qsecond_tick)
 {
-	apple2gs_state *state = machine.driver_data<apple2gs_state>();
-	if ((state->m_inten & 0x10) && !(state->m_intflag & 0x10))
+	if ((m_inten & 0x10) && !(m_intflag & 0x10))
 	{
-		state->m_intflag |= 0x10;
-		apple2gs_add_irq(machine, IRQ_INTEN_QSECOND);
+		m_intflag |= 0x10;
+		apple2gs_add_irq(machine(), IRQ_INTEN_QSECOND);
 	}
 }
 
@@ -736,31 +734,30 @@ static void apple2gs_set_scanint(running_machine &machine, UINT8 data)
 }
 
 
-static TIMER_CALLBACK(apple2gs_scanline_tick)
+TIMER_CALLBACK_MEMBER(apple2gs_state::apple2gs_scanline_tick)
 {
-	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	int scanline;
 
-	scanline = machine.primary_screen->vpos();
-	machine.primary_screen->update_partial(scanline);
+	scanline = machine().primary_screen->vpos();
+	machine().primary_screen->update_partial(scanline);
 
 	/* check scanline interrupt bits if we're in super hi-res and the current scanline is within the active display area */
-	if ((state->m_newvideo & 0x80) && (scanline >= (BORDER_TOP-1)) && (scanline < (200+BORDER_TOP-1)))
+	if ((m_newvideo & 0x80) && (scanline >= (BORDER_TOP-1)) && (scanline < (200+BORDER_TOP-1)))
 	{
 		UINT8 scb;
 
-		scb = state->m_slowmem[0x19D00 + scanline - BORDER_TOP + 1];
+		scb = m_slowmem[0x19D00 + scanline - BORDER_TOP + 1];
 
 		if (scb & 0x40)
 		{
 			// scanline int flag is set even when the actual interrupt is disabled
-			state->m_vgcint |= 0x20;
+			m_vgcint |= 0x20;
 
 			// see if the interrupt is also enabled and trigger it if so
-			if (state->m_vgcint & 0x02)
+			if (m_vgcint & 0x02)
 			{
-				state->m_vgcint |= 0x80;
-				apple2gs_add_irq(machine, IRQ_VGC_SCANLINE);
+				m_vgcint |= 0x80;
+				apple2gs_add_irq(machine(), IRQ_VGC_SCANLINE);
 			}
 		}
 	}
@@ -768,28 +765,28 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 	if (scanline == (192+BORDER_TOP))
 	{
 		/* VBL interrupt */
-		if ((state->m_inten & 0x08) && !(state->m_intflag & 0x08))
+		if ((m_inten & 0x08) && !(m_intflag & 0x08))
 		{
-			state->m_intflag |= 0x08;
-			apple2gs_add_irq(machine, IRQ_INTEN_VBL);
+			m_intflag |= 0x08;
+			apple2gs_add_irq(machine(), IRQ_INTEN_VBL);
 		}
 	}
 
 	/* check the mouse status */
 	if ((scanline % 8) == 0)
 	{
-		adb_check_mouse(machine);
+		adb_check_mouse(machine());
 
 		/* call Apple II interrupt handler */
-		if ((machine.primary_screen->vpos() % 8) == 7)
+		if ((machine().primary_screen->vpos() % 8) == 7)
 		{
-			//apple2_interrupt(machine.device("maincpu"));
+			//apple2_interrupt(machine().device("maincpu"));
 			/* TODO: check me! */
-			machine.primary_screen->update_partial(machine.primary_screen->vpos());
+			machine().primary_screen->update_partial(machine().primary_screen->vpos());
 		}
 	}
 
-	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos((scanline+1)%262, 0));
+	m_scanline_timer->adjust(machine().primary_screen->time_until_pos((scanline+1)%262, 0));
 }
 
 
@@ -1993,13 +1990,13 @@ MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
 
 	state_save_register_item(machine(), "ECHOBANK", NULL,0, m_echo_bank);
 
-	m_clock_timer = machine().scheduler().timer_alloc(FUNC(apple2gs_clock_tick));
+	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple2gs_state::apple2gs_clock_tick),this));
 	m_clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
-	m_qsecond_timer = machine().scheduler().timer_alloc(FUNC(apple2gs_qsecond_tick));
+	m_qsecond_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple2gs_state::apple2gs_qsecond_tick),this));
 	m_qsecond_timer->adjust(attotime::from_usec(266700), 0, attotime::from_usec(266700));
 
-	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(apple2gs_scanline_tick));
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple2gs_state::apple2gs_scanline_tick),this));
 	m_scanline_timer->adjust(attotime::never);
 
 	// fire on scanline zero

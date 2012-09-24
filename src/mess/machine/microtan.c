@@ -333,10 +333,10 @@ const via6522_interface microtan_via6522_1 =
 	DEVCB_LINE(via_1_irq)
 };
 
-static TIMER_CALLBACK(microtan_read_cassette)
+TIMER_CALLBACK_MEMBER(microtan_state::microtan_read_cassette)
 {
-	double level = (cassette_device_image(machine))->input();
-	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
+	double level = (cassette_device_image(machine()))->input();
+	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 
 	LOG(("microtan_read_cassette: %g\n", level));
 	if (level < -0.07)
@@ -382,9 +382,9 @@ READ8_MEMBER(microtan_state::microtan_bffx_r)
 
 
 /* This callback is called one clock cycle after BFF2 is written (delayed nmi) */
-static TIMER_CALLBACK(microtan_pulse_nmi)
+TIMER_CALLBACK_MEMBER(microtan_state::microtan_pulse_nmi)
 {
-    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+    machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(microtan_state::microtan_bffx_w)
@@ -400,7 +400,7 @@ WRITE8_MEMBER(microtan_state::microtan_bffx_w)
         break;
     case 1: /* BFF1: write delayed NMI */
         LOG(("microtan_bff1_w: %d <- %02x (delayed NMI)\n", offset, data));
-        machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")->cycles_to_attotime(8), FUNC(microtan_pulse_nmi));
+        machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")->cycles_to_attotime(8), timer_expired_delegate(FUNC(microtan_state::microtan_pulse_nmi),this));
         break;
     case 2: /* BFF2: write keypad column write (what is this meant for?) */
         LOG(("microtan_bff2_w: %d <- %02x (keypad column)\n", offset, data));
@@ -566,7 +566,7 @@ DRIVER_INIT_MEMBER(microtan_state,microtan)
             break;
     }
 
-	m_timer = machine().scheduler().timer_alloc(FUNC(microtan_read_cassette));
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(microtan_state::microtan_read_cassette),this));
 }
 
 void microtan_state::machine_reset()

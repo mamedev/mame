@@ -900,16 +900,16 @@ ROM_END
 
 /* Driver Initialization */
 
-static TIMER_CALLBACK(setup_beep)
+TIMER_CALLBACK_MEMBER(tmc1800_state::setup_beep)
 {
-	device_t *speaker = machine.device(BEEPER_TAG);
+	device_t *speaker = machine().device(BEEPER_TAG);
 	beep_set_state(speaker, 0);
 	beep_set_frequency( speaker, 0 );
 }
 
 DRIVER_INIT_MEMBER(tmc1800_state,tmc1800)
 {
-	machine().scheduler().timer_set(attotime::zero, FUNC(setup_beep));
+	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(tmc1800_state::setup_beep),this));
 }
 
 /* System Drivers */

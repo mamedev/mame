@@ -41,6 +41,7 @@ public:
 	DECLARE_DRIVER_INIT(bebox);
 	virtual void machine_start();
 	virtual void machine_reset();
+	TIMER_CALLBACK_MEMBER(bebox_get_devices);
 };
 
 

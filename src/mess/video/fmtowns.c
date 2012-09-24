@@ -1766,25 +1766,23 @@ static void draw_text_layer(running_machine &machine)
 	}
 }
 
-static TIMER_CALLBACK( towns_sprite_done )
+TIMER_CALLBACK_MEMBER(towns_state::towns_sprite_done)
 {
 	// sprite drawing is complete, lower flag
-	towns_state* state = machine.driver_data<towns_state>();
-	state->m_video.towns_sprite_flag = 0;
-	if(state->m_video.towns_sprite_page != 0)
-		state->m_video.towns_crtc_reg[21] |= 0x8000;
+	m_video.towns_sprite_flag = 0;
+	if(m_video.towns_sprite_page != 0)
+		m_video.towns_crtc_reg[21] |= 0x8000;
 	else
-		state->m_video.towns_crtc_reg[21] &= ~0x8000;
+		m_video.towns_crtc_reg[21] &= ~0x8000;
 }
 
-static TIMER_CALLBACK( towns_vblank_end )
+TIMER_CALLBACK_MEMBER(towns_state::towns_vblank_end)
 {
 	// here we'll clear the vsync signal, I presume it goes low on it's own eventually
-	towns_state* state = machine.driver_data<towns_state>();
 	device_t* dev = (device_t*)ptr;
 	pic8259_ir3_w(dev, 0);  // IRQ11 = VSync
 	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set low\n");
-	state->m_video.towns_vblank_flag = 0;
+	m_video.towns_vblank_flag = 0;
 }
 
 INTERRUPT_GEN_MEMBER(towns_state::towns_vsync_irq)
@@ -1793,7 +1791,7 @@ INTERRUPT_GEN_MEMBER(towns_state::towns_vsync_irq)
 	pic8259_ir3_w(dev, 1);  // IRQ11 = VSync
 	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set high\n");
 	m_video.towns_vblank_flag = 1;
-	machine().scheduler().timer_set(machine().primary_screen->time_until_vblank_end(), FUNC(towns_vblank_end), 0, (void*)dev);
+	machine().scheduler().timer_set(machine().primary_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(towns_state::towns_vblank_end),this), 0, (void*)dev);
 	if(m_video.towns_tvram_enable)
 		draw_text_layer(dev->machine());
 	if(m_video.towns_sprite_reg[1] & 0x80)
@@ -1804,7 +1802,7 @@ void towns_state::video_start()
 {
 	m_video.towns_vram_wplane = 0x00;
 	m_video.towns_sprite_page = 0;
-	m_video.sprite_timer = machine().scheduler().timer_alloc(FUNC(towns_sprite_done));
+	m_video.sprite_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_sprite_done),this));
 }
 
 UINT32 towns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

@@ -72,6 +72,7 @@ public:
 
 	/* TV Draw state */
 	UINT8 m_tvdraw_data;
+	TIMER_CALLBACK_MEMBER(lightgun_tick);
 };
 
 class sc3000_state : public sg1000_state

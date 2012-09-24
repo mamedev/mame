@@ -234,9 +234,9 @@ READ8_MEMBER(fm7_state::fm7_irq_cause_r)
 	return ret;
 }
 
-static TIMER_CALLBACK( fm7_beeper_off )
+TIMER_CALLBACK_MEMBER(fm7_state::fm7_beeper_off)
 {
-	beep_set_state(machine.device(BEEPER_TAG),0);
+	beep_set_state(machine().device(BEEPER_TAG),0);
 	logerror("timed beeper off\n");
 }
 
@@ -264,7 +264,7 @@ WRITE8_MEMBER(fm7_state::fm7_beeper_w)
 		{
 			beep_set_state(machine().device(BEEPER_TAG),1);
 			logerror("timed beeper on\n");
-			machine().scheduler().timer_set(attotime::from_msec(205), FUNC(fm7_beeper_off));
+			machine().scheduler().timer_set(attotime::from_msec(205), timer_expired_delegate(FUNC(fm7_state::fm7_beeper_off),this));
 		}
 	}
 	logerror("beeper state: %02x\n",data);
@@ -281,7 +281,7 @@ READ8_MEMBER(fm7_state::fm7_sub_beeper_r)
 	{
 		beep_set_state(machine().device(BEEPER_TAG),1);
 		logerror("timed beeper on\n");
-		machine().scheduler().timer_set(attotime::from_msec(205), FUNC(fm7_beeper_off));
+		machine().scheduler().timer_set(attotime::from_msec(205), timer_expired_delegate(FUNC(fm7_state::fm7_beeper_off),this));
 	}
 	return 0xff;
 }
@@ -628,10 +628,9 @@ void fm7_state::fm77av_encoder_setup_command()
 	}
 }
 
-static TIMER_CALLBACK( fm77av_encoder_ack )
+TIMER_CALLBACK_MEMBER(fm7_state::fm77av_encoder_ack)
 {
-	fm7_state *state = machine.driver_data<fm7_state>();
-	state->m_encoder.ack = 1;
+	m_encoder.ack = 1;
 }
 
 void fm7_state::fm77av_encoder_handle_command()
@@ -716,7 +715,7 @@ WRITE8_MEMBER(fm7_state::fm77av_key_encoder_w)
 			fm77av_encoder_handle_command();
 
 		// wait 5us to set ACK flag
-		machine().scheduler().timer_set(attotime::from_usec(5), FUNC(fm77av_encoder_ack));
+		machine().scheduler().timer_set(attotime::from_usec(5), timer_expired_delegate(FUNC(fm7_state::fm77av_encoder_ack),this));
 
 		//logerror("ENC: write 0x%02x to data register, moved to pos %i\n",data,m_encoder.position);
 	}
@@ -1204,20 +1203,18 @@ WRITE8_MEMBER(fm7_state::fm7_kanji_w)
 	}
 }
 
-static TIMER_CALLBACK( fm7_timer_irq )
+TIMER_CALLBACK_MEMBER(fm7_state::fm7_timer_irq)
 {
-	fm7_state *state = machine.driver_data<fm7_state>();
-	if(state->m_irq_mask & IRQ_FLAG_TIMER)
+	if(m_irq_mask & IRQ_FLAG_TIMER)
 	{
-		main_irq_set_flag(machine,IRQ_FLAG_TIMER);
+		main_irq_set_flag(machine(),IRQ_FLAG_TIMER);
 	}
 }
 
-static TIMER_CALLBACK( fm7_subtimer_irq )
+TIMER_CALLBACK_MEMBER(fm7_state::fm7_subtimer_irq)
 {
-	fm7_state *state = machine.driver_data<fm7_state>();
-	if(state->m_video.nmi_mask == 0 && state->m_video.sub_halt == 0)
-		machine.device("sub")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+	if(m_video.nmi_mask == 0 && m_video.sub_halt == 0)
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 }
 
 // When a key is pressed or released (in scan mode only), an IRQ is generated on the main CPU,
@@ -1288,28 +1285,27 @@ static void fm7_keyboard_poll_scan(running_machine &machine)
 	state->m_mod_data = modifiers;
 }
 
-static TIMER_CALLBACK( fm7_keyboard_poll )
+TIMER_CALLBACK_MEMBER(fm7_state::fm7_keyboard_poll)
 {
-	fm7_state *state = machine.driver_data<fm7_state>();
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int x,y;
 	int bit = 0;
 	int mod = 0;
 	UINT32 keys;
-	UINT32 modifiers = machine.root_device().ioport("key_modifiers")->read();
+	UINT32 modifiers = machine().root_device().ioport("key_modifiers")->read();
 
-	if(machine.root_device().ioport("key3")->read() & 0x40000)
+	if(machine().root_device().ioport("key3")->read() & 0x40000)
 	{
-		state->m_break_flag = 1;
-		machine.device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
+		m_break_flag = 1;
+		machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
 	}
 	else
-		state->m_break_flag = 0;
+		m_break_flag = 0;
 
-	if(state->m_key_scan_mode == KEY_MODE_SCAN)
+	if(m_key_scan_mode == KEY_MODE_SCAN)
 	{
 		// handle scancode mode
-		fm7_keyboard_poll_scan(machine);
+		fm7_keyboard_poll_scan(machine());
 		return;
 	}
 
@@ -1327,18 +1323,18 @@ static TIMER_CALLBACK( fm7_keyboard_poll )
 
 	for(x=0;x<3;x++)
 	{
-		keys = machine.root_device().ioport(portnames[x])->read();
+		keys = machine().root_device().ioport(portnames[x])->read();
 
 		for(y=0;y<32;y++)  // loop through each bit in the port
 		{
-			if((keys & (1<<y)) != 0 && (state->m_key_data[x] & (1<<y)) == 0)
+			if((keys & (1<<y)) != 0 && (m_key_data[x] & (1<<y)) == 0)
 			{
-				key_press(machine,fm7_key_list[bit][mod]); // key press
+				key_press(machine(),fm7_key_list[bit][mod]); // key press
 			}
 			bit++;
 		}
 
-		state->m_key_data[x] = keys;
+		m_key_data[x] = keys;
 	}
 }
 
@@ -1834,10 +1830,10 @@ DRIVER_INIT_MEMBER(fm7_state,fm7)
 {
 //  m_shared_ram = auto_alloc_array(machine(),UINT8,0x80);
 	m_video_ram = auto_alloc_array(machine(),UINT8,0x18000);  // 2 pages on some systems
-	m_timer = machine().scheduler().timer_alloc(FUNC(fm7_timer_irq));
-	m_subtimer = machine().scheduler().timer_alloc(FUNC(fm7_subtimer_irq));
-	m_keyboard_timer = machine().scheduler().timer_alloc(FUNC(fm7_keyboard_poll));
-	m_fm77av_vsync_timer = machine().scheduler().timer_alloc(FUNC(fm77av_vsync));
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::fm7_timer_irq),this));
+	m_subtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::fm7_subtimer_irq),this));
+	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::fm7_keyboard_poll),this));
+	m_fm77av_vsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::fm77av_vsync),this));
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(fm7_irq_ack);
 	machine().device("sub")->execute().set_irq_acknowledge_callback(fm7_sub_irq_ack);
 }

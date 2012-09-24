@@ -22,37 +22,36 @@ MAX_SECTORS     5       and granules of sectors
 #define MODEL4_MASTER_CLOCK 20275200
 
 
-static TIMER_CALLBACK( cassette_data_callback )
+TIMER_CALLBACK_MEMBER(trs80_state::cassette_data_callback)
 {
-	trs80_state *state = machine.driver_data<trs80_state>();
 /* This does all baud rates. 250 baud (trs80), and 500 baud (all others) set bit 7 of "cassette_data".
     1500 baud (trs80m3, trs80m4) is interrupt-driven and uses bit 0 of "cassette_data" */
 
-	double new_val = (state->m_cass->input());
+	double new_val = (m_cass->input());
 
 	/* Check for HI-LO transition */
-	if ( state->m_old_cassette_val > -0.2 && new_val < -0.2 )
+	if ( m_old_cassette_val > -0.2 && new_val < -0.2 )
 	{
-		state->m_cassette_data |= 0x80;		/* 500 baud */
-		if (state->m_mask & CASS_FALL)	/* see if 1500 baud */
+		m_cassette_data |= 0x80;		/* 500 baud */
+		if (m_mask & CASS_FALL)	/* see if 1500 baud */
 		{
-			state->m_cassette_data = 0;
-			state->m_irq |= CASS_FALL;
-			machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+			m_cassette_data = 0;
+			m_irq |= CASS_FALL;
+			machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 		}
 	}
 	else
-	if ( state->m_old_cassette_val < -0.2 && new_val > -0.2 )
+	if ( m_old_cassette_val < -0.2 && new_val > -0.2 )
 	{
-		if (state->m_mask & CASS_RISE)	/* 1500 baud */
+		if (m_mask & CASS_RISE)	/* 1500 baud */
 		{
-			state->m_cassette_data = 1;
-			state->m_irq |= CASS_RISE;
-			machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+			m_cassette_data = 1;
+			m_irq |= CASS_RISE;
+			machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 		}
 	}
 
-	state->m_old_cassette_val = new_val;
+	m_old_cassette_val = new_val;
 }
 
 
@@ -852,7 +851,7 @@ void trs80_state::machine_start()
 	m_reg_load=1;
 	m_nmi_data=0xff;
 
-	m_cassette_data_timer = machine().scheduler().timer_alloc(FUNC(cassette_data_callback));
+	m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(trs80_state::cassette_data_callback),this));
 	m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
 }
 

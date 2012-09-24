@@ -86,6 +86,10 @@ public:
 	DECLARE_MACHINE_START(pcjr);
 	DECLARE_MACHINE_RESET(pcjr);
 	DECLARE_MACHINE_START(mc1502);
+	TIMER_CALLBACK_MEMBER(pcjr_delayed_pic8259_irq);
+	TIMER_CALLBACK_MEMBER(pcjr_keyb_signal_callback);
+	TIMER_CALLBACK_MEMBER(mc1502_keyb_signal_callback);
+	TIMER_CALLBACK_MEMBER(pc_rtc_timer);
 };
 
 /*----------- defined in machine/pc.c -----------*/

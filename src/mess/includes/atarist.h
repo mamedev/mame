@@ -274,6 +274,10 @@ public:
 	floppy_image_device *floppy_devices[2];
 
 	static const floppy_format_type floppy_formats[];
+	TIMER_CALLBACK_MEMBER(st_mouse_tick);
+	TIMER_CALLBACK_MEMBER(atarist_shifter_tick);
+	TIMER_CALLBACK_MEMBER(atarist_glue_tick);
+	TIMER_CALLBACK_MEMBER(atarist_blitter_tick);
 };
 
 class megast_state : public st_state
@@ -327,6 +331,9 @@ public:
 
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
 
+	TIMER_CALLBACK_MEMBER(atariste_dmasound_tick);
+	TIMER_CALLBACK_MEMBER(atariste_microwire_tick);
+	
 	void dmasound_set_state(int level);
 	void dmasound_tick();
 	void microwire_shift();

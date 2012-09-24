@@ -53,6 +53,8 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_microtan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(microtan_interrupt);
+	TIMER_CALLBACK_MEMBER(microtan_read_cassette);
+	TIMER_CALLBACK_MEMBER(microtan_pulse_nmi);
 };
 
 

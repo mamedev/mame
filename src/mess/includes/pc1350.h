@@ -25,6 +25,7 @@ public:
 	int m_power;
 	UINT8 m_reg[0x1000];
 	UINT32 screen_update_pc1350(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(pc1350_power_up);
 };
 
 

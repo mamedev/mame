@@ -125,11 +125,10 @@ static void draw_mode1_line(running_machine &machine, int y, int hpos)
 	draw_mode12_block(state, state->m_bitmap, y, hpos, mask);
 }
 
-TIMER_CALLBACK( sam_video_update_callback )
+TIMER_CALLBACK_MEMBER(samcoupe_state::sam_video_update_callback)
 {
-	samcoupe_state *state = machine.driver_data<samcoupe_state>();
-	int vpos = machine.primary_screen->vpos();
-	int hpos = machine.primary_screen->hpos();
+	int vpos = machine().primary_screen->vpos();
+	int hpos = machine().primary_screen->hpos();
 
 	int next_vpos = vpos;
 	int next_hpos = hpos + SAM_BLOCK*2;
@@ -142,35 +141,35 @@ TIMER_CALLBACK( sam_video_update_callback )
 	}
 
 	/* display disabled? (only in mode 3 or 4) */
-	if (BIT(state->m_vmpr, 6) && BIT(state->m_border, 7))
+	if (BIT(m_vmpr, 6) && BIT(m_border, 7))
 	{
-		state->m_bitmap.plot_box(hpos, vpos, SAM_BLOCK*2, 1, 0);
+		m_bitmap.plot_box(hpos, vpos, SAM_BLOCK*2, 1, 0);
 	}
 	else
 	{
 		/* border area? */
 		if (vpos < SAM_BORDER_TOP || vpos >= SAM_BORDER_TOP + SAM_SCREEN_HEIGHT || hpos < SAM_BORDER_LEFT || hpos >= SAM_BORDER_LEFT + SAM_SCREEN_WIDTH)
 		{
-			state->m_attribute = 0xff;
-			state->m_bitmap.plot_box(hpos, vpos, SAM_BLOCK*2, 1, state->m_clut[BORDER_COLOR(state->m_border)]);
+			m_attribute = 0xff;
+			m_bitmap.plot_box(hpos, vpos, SAM_BLOCK*2, 1, m_clut[BORDER_COLOR(m_border)]);
 		}
 		else
 		{
 			/* main screen area */
-			switch ((state->m_vmpr & 0x60) >> 5)
+			switch ((m_vmpr & 0x60) >> 5)
 			{
-			case 0:	draw_mode1_line(machine, vpos, hpos); break;
-			case 1:	draw_mode2_line(machine, vpos, hpos); break;
-			case 2:	draw_mode3_line(machine, vpos, hpos); break;
-			case 3:	draw_mode4_line(machine, vpos, hpos); break;
+			case 0:	draw_mode1_line(machine(), vpos, hpos); break;
+			case 1:	draw_mode2_line(machine(), vpos, hpos); break;
+			case 2:	draw_mode3_line(machine(), vpos, hpos); break;
+			case 3:	draw_mode4_line(machine(), vpos, hpos); break;
 			}
 		}
 	}
 
 	/* do we need to trigger the scanline interrupt (interrupt happens at the start of the right border before the specified line)? */
-	if (state->m_line_int < SAM_SCREEN_HEIGHT && hpos == SAM_BORDER_LEFT + SAM_SCREEN_WIDTH && vpos == (state->m_line_int + SAM_BORDER_TOP - 1))
-		samcoupe_irq(machine.firstcpu, SAM_LINE_INT);
+	if (m_line_int < SAM_SCREEN_HEIGHT && hpos == SAM_BORDER_LEFT + SAM_SCREEN_WIDTH && vpos == (m_line_int + SAM_BORDER_TOP - 1))
+		samcoupe_irq(machine().firstcpu, SAM_LINE_INT);
 
 	/* schedule next update */
-	state->m_video_update_timer->adjust(machine.primary_screen->time_until_pos(next_vpos, next_hpos));
+	m_video_update_timer->adjust(machine().primary_screen->time_until_pos(next_vpos, next_hpos));
 }

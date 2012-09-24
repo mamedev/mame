@@ -162,11 +162,10 @@ static void pcw_update_irqs(running_machine &machine)
 	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
-static TIMER_CALLBACK(pcw_timer_pulse)
+TIMER_CALLBACK_MEMBER(pcw_state::pcw_timer_pulse)
 {
-	pcw_state *state = machine.driver_data<pcw_state>();
-	state->m_timer_irq_flag = 0;
-	pcw_update_irqs(machine);
+	m_timer_irq_flag = 0;
+	pcw_update_irqs(machine());
 }
 
 /* callback for 1/300ths of a second interrupt */
@@ -177,7 +176,7 @@ static TIMER_DEVICE_CALLBACK(pcw_timer_interrupt)
 
 	state->m_timer_irq_flag = 1;
 	pcw_update_irqs(timer.machine());
-	timer.machine().scheduler().timer_set(attotime::from_usec(100), FUNC(pcw_timer_pulse));
+	timer.machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(pcw_state::pcw_timer_pulse),state));
 }
 
 /* fdc interrupt callback. set/clear fdc int */
@@ -731,73 +730,71 @@ READ8_MEMBER(pcw_state::pcw_printer_status_r)
  * T0: Paper sensor (?)
  * T1: Print head location (1 if not at left margin)
  */
-static TIMER_CALLBACK(pcw_stepper_callback)
+TIMER_CALLBACK_MEMBER(pcw_state::pcw_stepper_callback)
 {
-	pcw_state *state = machine.driver_data<pcw_state>();
 
-	//popmessage("PRN: P2 bits %s %s %s\nSerial: %02x\nHeadpos: %i",state->m_printer_p2 & 0x40 ? " " : "6",state->m_printer_p2 & 0x20 ? " " : "5",state->m_printer_p2 & 0x10 ? " " : "4",state->m_printer_shift_output,state->m_printer_headpos);
-	if((state->m_printer_p2 & 0x10) == 0)  // print head motor active
+	//popmessage("PRN: P2 bits %s %s %s\nSerial: %02x\nHeadpos: %i",m_printer_p2 & 0x40 ? " " : "6",m_printer_p2 & 0x20 ? " " : "5",m_printer_p2 & 0x10 ? " " : "4",m_printer_shift_output,m_printer_headpos);
+	if((m_printer_p2 & 0x10) == 0)  // print head motor active
 	{
-		UINT8 stepper_state = (state->m_printer_shift_output >> 4) & 0x0f;
-		if(stepper_state == full_step_table[(state->m_head_motor_state + 1) & 0x03])
+		UINT8 stepper_state = (m_printer_shift_output >> 4) & 0x0f;
+		if(stepper_state == full_step_table[(m_head_motor_state + 1) & 0x03])
 		{
-			state->m_printer_headpos += 2;
-			state->m_head_motor_state++;
-			logerror("Printer head moved forward by 2 to %i\n",state->m_printer_headpos);
+			m_printer_headpos += 2;
+			m_head_motor_state++;
+			logerror("Printer head moved forward by 2 to %i\n",m_printer_headpos);
 		}
-		if(stepper_state == half_step_table[(state->m_head_motor_state + 1) & 0x03])
+		if(stepper_state == half_step_table[(m_head_motor_state + 1) & 0x03])
 		{
-			state->m_printer_headpos += 1;
-			state->m_head_motor_state++;
-			logerror("Printer head moved forward by 1 to %i\n",state->m_printer_headpos);
+			m_printer_headpos += 1;
+			m_head_motor_state++;
+			logerror("Printer head moved forward by 1 to %i\n",m_printer_headpos);
 		}
-		if(stepper_state == full_step_table[(state->m_head_motor_state - 1) & 0x03])
+		if(stepper_state == full_step_table[(m_head_motor_state - 1) & 0x03])
 		{
-			state->m_printer_headpos -= 2;
-			state->m_head_motor_state--;
-			logerror("Printer head moved back by 2 to %i\n",state->m_printer_headpos);
+			m_printer_headpos -= 2;
+			m_head_motor_state--;
+			logerror("Printer head moved back by 2 to %i\n",m_printer_headpos);
 		}
-		if(stepper_state == half_step_table[(state->m_head_motor_state - 1) & 0x03])
+		if(stepper_state == half_step_table[(m_head_motor_state - 1) & 0x03])
 		{
-			state->m_printer_headpos -= 1;
-			state->m_head_motor_state--;
-			logerror("Printer head moved back by 1 to %i\n",state->m_printer_headpos);
+			m_printer_headpos -= 1;
+			m_head_motor_state--;
+			logerror("Printer head moved back by 1 to %i\n",m_printer_headpos);
 		}
-		if(state->m_printer_headpos < 0)
-			state->m_printer_headpos = 0;
-		if(state->m_printer_headpos > PCW_PRINTER_WIDTH)
-			state->m_printer_headpos = PCW_PRINTER_WIDTH;
-		state->m_head_motor_state &= 0x03;
-		state->m_printer_p2 |= 0x10;
+		if(m_printer_headpos < 0)
+			m_printer_headpos = 0;
+		if(m_printer_headpos > PCW_PRINTER_WIDTH)
+			m_printer_headpos = PCW_PRINTER_WIDTH;
+		m_head_motor_state &= 0x03;
+		m_printer_p2 |= 0x10;
 	}
-	if((state->m_printer_p2 & 0x20) == 0)  // line feed motor active
+	if((m_printer_p2 & 0x20) == 0)  // line feed motor active
 	{
-		UINT8 stepper_state = state->m_printer_shift_output & 0x0f;
-		if(stepper_state == full_step_table[(state->m_linefeed_motor_state + 1) & 0x03])
+		UINT8 stepper_state = m_printer_shift_output & 0x0f;
+		if(stepper_state == full_step_table[(m_linefeed_motor_state + 1) & 0x03])
 		{
-			state->m_paper_feed++;
-			if(state->m_paper_feed > PCW_PRINTER_HEIGHT*2)
-				state->m_paper_feed = 0;
-			state->m_linefeed_motor_state++;
+			m_paper_feed++;
+			if(m_paper_feed > PCW_PRINTER_HEIGHT*2)
+				m_paper_feed = 0;
+			m_linefeed_motor_state++;
 		}
-		if(stepper_state == half_step_table[(state->m_linefeed_motor_state + 1) & 0x03])
+		if(stepper_state == half_step_table[(m_linefeed_motor_state + 1) & 0x03])
 		{
-			state->m_paper_feed++;
-			if(state->m_paper_feed > PCW_PRINTER_HEIGHT*2)
-				state->m_paper_feed = 0;
-			state->m_linefeed_motor_state++;
+			m_paper_feed++;
+			if(m_paper_feed > PCW_PRINTER_HEIGHT*2)
+				m_paper_feed = 0;
+			m_linefeed_motor_state++;
 		}
-		state->m_linefeed_motor_state &= 0x03;
-		state->m_printer_p2 |= 0x20;
+		m_linefeed_motor_state &= 0x03;
+		m_printer_p2 |= 0x20;
 	}
 }
 
-static TIMER_CALLBACK(pcw_pins_callback)
+TIMER_CALLBACK_MEMBER(pcw_state::pcw_pins_callback)
 {
-	pcw_state *state = machine.driver_data<pcw_state>();
 
-	pcw_printer_fire_pins(machine,state->m_printer_pins);
-	state->m_printer_p2 |= 0x40;
+	pcw_printer_fire_pins(machine(),m_printer_pins);
+	m_printer_p2 |= 0x40;
 }
 
 READ8_MEMBER(pcw_state::mcu_printer_p1_r)
@@ -1034,9 +1031,9 @@ static ADDRESS_MAP_START(pcw_keyboard_io, AS_IO, 8, pcw_state )
 ADDRESS_MAP_END
 
 
-static TIMER_CALLBACK(setup_beep)
+TIMER_CALLBACK_MEMBER(pcw_state::setup_beep)
 {
-	device_t *speaker = machine.device(BEEPER_TAG);
+	device_t *speaker = machine().device(BEEPER_TAG);
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 3750);
 }
@@ -1096,10 +1093,10 @@ DRIVER_INIT_MEMBER(pcw_state,pcw)
 	m_roller_ram_offset = 0;
 
 	/* timer interrupt */
-	machine().scheduler().timer_set(attotime::zero, FUNC(setup_beep));
+	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(pcw_state::setup_beep),this));
 
-	m_prn_stepper = machine().scheduler().timer_alloc(FUNC(pcw_stepper_callback));
-	m_prn_pins = machine().scheduler().timer_alloc(FUNC(pcw_pins_callback));
+	m_prn_stepper = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcw_state::pcw_stepper_callback),this));
+	m_prn_pins = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcw_state::pcw_pins_callback),this));
 }
 
 

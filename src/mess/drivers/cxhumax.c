@@ -301,32 +301,31 @@ WRITE32_MEMBER( cxhumax_state::cx_extdesc_w )
 	COMBINE_DATA(&m_extdesc_regs[offset]);
 }
 
-static TIMER_CALLBACK( timer_tick )
+TIMER_CALLBACK_MEMBER(cxhumax_state::timer_tick)
 {
-	cxhumax_state *state = machine.driver_data<cxhumax_state>();
-	state->m_timer_regs.timer[param].value++;
-	if(state->m_timer_regs.timer[param].value==state->m_timer_regs.timer[param].limit) {
+	m_timer_regs.timer[param].value++;
+	if(m_timer_regs.timer[param].value==m_timer_regs.timer[param].limit) {
 		/* Reset counter when reaching limit and RESET_CNTR bit is cleared */
-		if(!(state->m_timer_regs.timer[param].mode & 2))
-			state->m_timer_regs.timer[param].value=0;
+		if(!(m_timer_regs.timer[param].mode & 2))
+			m_timer_regs.timer[param].value=0;
 
 		/* Indicate interrupt request if EN_INT bit is set */
-		if (state->m_timer_regs.timer[param].mode & 8) {
+		if (m_timer_regs.timer[param].mode & 8) {
 			//printf( "IRQ on Timer %d\n", param );
-			verboselog( machine, 9, "(TIMER%d) Interrupt\n", param);
-			state->m_intctrl_regs[INTREG(INTGROUP2, INTIRQ)] |= INT_TIMER_BIT;     /* Timer interrupt */
-			state->m_intctrl_regs[INTREG(INTGROUP2, INTSTATCLR)] |= INT_TIMER_BIT; /* Timer interrupt */
-			state->m_intctrl_regs[INTREG(INTGROUP2, INTSTATSET)] |= INT_TIMER_BIT; /* Timer interrupt */
+			verboselog( machine(), 9, "(TIMER%d) Interrupt\n", param);
+			m_intctrl_regs[INTREG(INTGROUP2, INTIRQ)] |= INT_TIMER_BIT;     /* Timer interrupt */
+			m_intctrl_regs[INTREG(INTGROUP2, INTSTATCLR)] |= INT_TIMER_BIT; /* Timer interrupt */
+			m_intctrl_regs[INTREG(INTGROUP2, INTSTATSET)] |= INT_TIMER_BIT; /* Timer interrupt */
 
-			state->m_timer_regs.timer_irq |= 1<<param; /* Indicate which timer interrupted */
+			m_timer_regs.timer_irq |= 1<<param; /* Indicate which timer interrupted */
 
 			/* Interrupt if Timer interrupt is not masked in ITC_INTENABLE_REG */
-			if (state->m_intctrl_regs[INTREG(INTGROUP2, INTENABLE)] & INT_TIMER_BIT)
-				machine.device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+			if (m_intctrl_regs[INTREG(INTGROUP2, INTENABLE)] & INT_TIMER_BIT)
+				machine().device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 		}
 	}
-	attotime period = attotime::from_hz(XTAL_54MHz)*state->m_timer_regs.timer[param].timebase;
-	state->m_timer_regs.timer[param].timer->adjust(period,param);
+	attotime period = attotime::from_hz(XTAL_54MHz)*m_timer_regs.timer[param].timebase;
+	m_timer_regs.timer[param].timer->adjust(period,param);
 }
 
 READ32_MEMBER( cxhumax_state::cx_timers_r )
@@ -983,7 +982,7 @@ void cxhumax_state::machine_start()
 	int index = 0;
 	for(index = 0; index < MAX_CX_TIMERS; index++)
 	{
-		m_timer_regs.timer[index].timer = machine().scheduler().timer_alloc(FUNC(timer_tick));
+		m_timer_regs.timer[index].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxhumax_state::timer_tick),this));
 		m_timer_regs.timer[index].timer->adjust(attotime::never, index);
 	}
 }

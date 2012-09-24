@@ -203,16 +203,15 @@ INPUT_PORTS_END
 
 /* Intel 8255A Interface */
 
-static TIMER_CALLBACK( led_refresh )
+TIMER_CALLBACK_MEMBER(mpf1_state::led_refresh)
 {
-	mpf1_state *state = machine.driver_data<mpf1_state>();
 
-	if (BIT(state->m_lednum, 5)) output_set_digit_value(0, param);
-	if (BIT(state->m_lednum, 4)) output_set_digit_value(1, param);
-	if (BIT(state->m_lednum, 3)) output_set_digit_value(2, param);
-	if (BIT(state->m_lednum, 2)) output_set_digit_value(3, param);
-	if (BIT(state->m_lednum, 1)) output_set_digit_value(4, param);
-	if (BIT(state->m_lednum, 0)) output_set_digit_value(5, param);
+	if (BIT(m_lednum, 5)) output_set_digit_value(0, param);
+	if (BIT(m_lednum, 4)) output_set_digit_value(1, param);
+	if (BIT(m_lednum, 3)) output_set_digit_value(2, param);
+	if (BIT(m_lednum, 2)) output_set_digit_value(3, param);
+	if (BIT(m_lednum, 1)) output_set_digit_value(4, param);
+	if (BIT(m_lednum, 0)) output_set_digit_value(5, param);
 }
 
 READ8_MEMBER( mpf1_state::ppi_pa_r )
@@ -346,7 +345,7 @@ static TIMER_DEVICE_CALLBACK( check_halt_callback )
 
 void mpf1_state::machine_start()
 {
-	m_led_refresh_timer = machine().scheduler().timer_alloc(FUNC(led_refresh));
+	m_led_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mpf1_state::led_refresh),this));
 
 	/* register for state saving */
 	save_item(NAME(m_break));

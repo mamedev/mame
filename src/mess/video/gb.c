@@ -47,8 +47,8 @@ enum {
 
 
 /* Prototypes */
-static TIMER_CALLBACK(gb_lcd_timer_proc);
-static TIMER_CALLBACK(gbc_lcd_timer_proc);
+
+
 static void gb_lcd_switch_on( running_machine &machine );
 
 static const unsigned char palette[] =
@@ -1194,20 +1194,20 @@ enum {
 	GB_LCD_STATE_LY00_M0
 };
 
-static TIMER_CALLBACK( gb_video_init_vbl )
+TIMER_CALLBACK_MEMBER(gb_state::gb_video_init_vbl)
 {
-	machine.device("maincpu")->execute().set_input_line(VBL_INT, ASSERT_LINE );
+	machine().device("maincpu")->execute().set_input_line(VBL_INT, ASSERT_LINE );
 }
 
 MACHINE_START_MEMBER(gb_state,gb_video)
 {
-	m_lcd.lcd_timer = machine().scheduler().timer_alloc(FUNC(gb_lcd_timer_proc));
+	m_lcd.lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_lcd_timer_proc),this));
 	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 
 MACHINE_START_MEMBER(gb_state,gbc_video)
 {
-	m_lcd.lcd_timer = machine().scheduler().timer_alloc(FUNC(gbc_lcd_timer_proc));
+	m_lcd.lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gbc_lcd_timer_proc),this));
 	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 
@@ -1288,7 +1288,7 @@ void gb_video_reset( running_machine &machine, int mode )
 		memcpy( state->m_lcd.gb_oam->base(), mgb_oam_fingerprint, 0x100 );
 
 		/* Make sure the VBlank interrupt is set when the first instruction gets executed */
-		machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(gb_video_init_vbl));
+		machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(1), timer_expired_delegate(FUNC(gb_state::gb_video_init_vbl),state));
 
 		/* Initialize some video registers */
 		state->gb_video_w( space, 0x0, 0x91 );    /* LCDCONT */
@@ -1367,50 +1367,50 @@ static void gb_increment_scanline( gb_state *state )
 	}
 }
 
-static TIMER_CALLBACK(gb_lcd_timer_proc)
+TIMER_CALLBACK_MEMBER(gb_state::gb_lcd_timer_proc)
 {
-	gb_state *state = machine.driver_data<gb_state>();
+	gb_state *state = machine().driver_data<gb_state>();
 	static const int sprite_cycles[] = { 0, 8, 20, 32, 44, 52, 64, 76, 88, 96, 108 };
 
-	state->m_lcd.state = param;
+	m_lcd.state = param;
 
 	if ( LCDCONT & 0x80 )
 	{
-		switch( state->m_lcd.state )
+		switch( m_lcd.state )
 		{
 		case GB_LCD_STATE_LYXX_PRE_M0:	/* Just before switching to mode 0 */
-			state->m_lcd.mode = 0;
+			m_lcd.mode = 0;
 			if ( LCDSTAT & 0x08 )
 			{
-				if ( ! state->m_lcd.mode_irq )
+				if ( ! m_lcd.mode_irq )
 				{
-					if ( ! state->m_lcd.line_irq && ! state->m_lcd.delayed_line_irq )
+					if ( ! m_lcd.line_irq && ! m_lcd.delayed_line_irq )
 					{
-						state->m_lcd.mode_irq = 1;
-						machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+						m_lcd.mode_irq = 1;
+						machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 					}
 				}
 				else
 				{
-					state->m_lcd.mode_irq = 0;
+					m_lcd.mode_irq = 0;
 				}
 			}
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0);
 			break;
 		case GB_LCD_STATE_LYXX_M0:		/* Switch to mode 0 */
 			/* update current scanline */
-			(*state->update_scanline)( machine );
+			(*update_scanline)( machine() );
 			/* Increment the number of window lines drawn if enabled */
-			if ( state->m_lcd.layer[1].enabled )
+			if ( m_lcd.layer[1].enabled )
 			{
-				state->m_lcd.window_lines_drawn++;
+				m_lcd.window_lines_drawn++;
 			}
-			state->m_lcd.previous_line = state->m_lcd.current_line;
+			m_lcd.previous_line = m_lcd.current_line;
 			/* Set Mode 0 lcdstate */
-			state->m_lcd.mode = 0;
+			m_lcd.mode = 0;
 			LCDSTAT &= 0xFC;
-			state->m_lcd.oam_locked = UNLOCKED;
-			state->m_lcd.vram_locked = UNLOCKED;
+			m_lcd.oam_locked = UNLOCKED;
+			m_lcd.vram_locked = UNLOCKED;
 			/*
                 There seems to a kind of feature in the Game Boy hardware when the lowest bits of the
                 SCROLLX register equals 3 or 7, then the delayed M0 irq is triggered 4 cycles later
@@ -1419,134 +1419,134 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
             */
 			if ( ( SCROLLX & 0x03 ) == 0x03 )
 			{
-				state->m_lcd.scrollx_adjust += 4;
-				state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_SCX3);
+				m_lcd.scrollx_adjust += 4;
+				m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_SCX3);
 				break;
 			}
 		case GB_LCD_STATE_LYXX_M0_SCX3:
 			/* Generate lcd interrupt if requested */
-			if ( ! state->m_lcd.mode_irq && ( LCDSTAT & 0x08 ) &&
-			     ( ( ! state->m_lcd.line_irq && state->m_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) )
+			if ( ! m_lcd.mode_irq && ( LCDSTAT & 0x08 ) &&
+			     ( ( ! m_lcd.line_irq && m_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) )
 			{
-				machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+				machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 			}
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(196 - state->m_lcd.scrollx_adjust - state->m_lcd.sprite_cycles), GB_LCD_STATE_LYXX_M0_PRE_INC);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(196 - m_lcd.scrollx_adjust - m_lcd.sprite_cycles), GB_LCD_STATE_LYXX_M0_PRE_INC);
 			break;
 		case GB_LCD_STATE_LYXX_M0_PRE_INC:	/* Just before incrementing the line counter go to mode 2 internally */
 			if ( CURLINE < 143 )
 			{
-				state->m_lcd.mode = 2;
-				state->m_lcd.triggering_mode_irq = ( LCDSTAT & 0x20 ) ? 1 : 0;
-				if ( state->m_lcd.triggering_mode_irq )
+				m_lcd.mode = 2;
+				m_lcd.triggering_mode_irq = ( LCDSTAT & 0x20 ) ? 1 : 0;
+				if ( m_lcd.triggering_mode_irq )
 				{
-					if ( ! state->m_lcd.mode_irq )
+					if ( ! m_lcd.mode_irq )
 					{
-						if ( ! state->m_lcd.line_irq && ! state->m_lcd.delayed_line_irq )
+						if ( ! m_lcd.line_irq && ! m_lcd.delayed_line_irq )
 						{
-							state->m_lcd.mode_irq = 1;
-							machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+							m_lcd.mode_irq = 1;
+							machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 						}
 					}
 					else
 					{
-						state->m_lcd.mode_irq = 0;
+						m_lcd.mode_irq = 0;
 					}
 				}
 			}
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_INC);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_INC);
 			break;
 		case GB_LCD_STATE_LYXX_M0_INC:	/* Increment LY, stay in M0 for 4 more cycles */
-			gb_increment_scanline(state);
-			state->m_lcd.delayed_line_irq = state->m_lcd.line_irq;
-			state->m_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
-			state->m_lcd.line_irq = 0;
-			if ( ! state->m_lcd.mode_irq && ! state->m_lcd.delayed_line_irq && state->m_lcd.triggering_line_irq && ! state->m_lcd.triggering_mode_irq )
+			gb_increment_scanline(this);
+			m_lcd.delayed_line_irq = m_lcd.line_irq;
+			m_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
+			m_lcd.line_irq = 0;
+			if ( ! m_lcd.mode_irq && ! m_lcd.delayed_line_irq && m_lcd.triggering_line_irq && ! m_lcd.triggering_mode_irq )
 			{
-				state->m_lcd.line_irq = state->m_lcd.triggering_line_irq;
-				machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+				m_lcd.line_irq = m_lcd.triggering_line_irq;
+				machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 			}
 			/* Reset LY==LYC STAT bit */
 			LCDSTAT &= 0xFB;
 			/* Check if we're going into VBlank next */
 			if ( CURLINE == 144 )
 			{
-				state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
+				m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
 			}
 			else
 			{
 				/* Internally switch to mode 2 */
-				state->m_lcd.mode = 2;
+				m_lcd.mode = 2;
 				/* Generate lcd interrupt if requested */
-				if ( ! state->m_lcd.mode_irq && state->m_lcd.triggering_mode_irq &&
-					 ( ( ! state->m_lcd.triggering_line_irq && ! state->m_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) )
+				if ( ! m_lcd.mode_irq && m_lcd.triggering_mode_irq &&
+					 ( ( ! m_lcd.triggering_line_irq && ! m_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) )
 				{
-					state->m_lcd.mode_irq = 1;
-					machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+					m_lcd.mode_irq = 1;
+					machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 				}
-				state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M2);
+				m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M2);
 			}
 			break;
 		case GB_LCD_STATE_LY00_M2:		/* Switch to mode 2 on line #0 */
 			/* Set Mode 2 lcdstate */
-			state->m_lcd.mode = 2;
+			m_lcd.mode = 2;
 			LCDSTAT = ( LCDSTAT & 0xFC ) | 0x02;
-			state->m_lcd.oam_locked = LOCKED;
+			m_lcd.oam_locked = LOCKED;
 			/* Generate lcd interrupt if requested */
-			if ( ( LCDSTAT & 0x20 ) && ! state->m_lcd.line_irq )
+			if ( ( LCDSTAT & 0x20 ) && ! m_lcd.line_irq )
 			{
-				machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+				machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 			}
 			/* Check for regular compensation of x-scroll register */
-			state->m_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
+			m_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
 			/* Mode 2 lasts approximately 80 clock cycles */
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
 			break;
 		case GB_LCD_STATE_LYXX_M2:		/* Switch to mode 2 */
 			/* Update STAT register to the correct state */
 			LCDSTAT = (LCDSTAT & 0xFC) | 0x02;
-			state->m_lcd.oam_locked = LOCKED;
+			m_lcd.oam_locked = LOCKED;
 			/* Generate lcd interrupt if requested */
-			if ( ( state->m_lcd.delayed_line_irq && state->m_lcd.triggering_line_irq && ! ( LCDSTAT & 0x20 ) ) ||
-				 ( ! state->m_lcd.mode_irq && ! state->m_lcd.line_irq && ! state->m_lcd.delayed_line_irq && state->m_lcd.triggering_mode_irq ) )
+			if ( ( m_lcd.delayed_line_irq && m_lcd.triggering_line_irq && ! ( LCDSTAT & 0x20 ) ) ||
+				 ( ! m_lcd.mode_irq && ! m_lcd.line_irq && ! m_lcd.delayed_line_irq && m_lcd.triggering_mode_irq ) )
 			{
-				machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+				machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 			}
-			state->m_lcd.line_irq = state->m_lcd.triggering_line_irq;
-			state->m_lcd.triggering_mode_irq = 0;
+			m_lcd.line_irq = m_lcd.triggering_line_irq;
+			m_lcd.triggering_mode_irq = 0;
 			/* Check if LY==LYC STAT bit should be set */
 			if ( CURLINE == CMPLINE )
 			{
 				LCDSTAT |= 0x04;
 			}
 			/* Check for regular compensation of x-scroll register */
-			state->m_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
+			m_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
 			/* Mode 2 last for approximately 80 clock cycles */
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
 			break;
 		case GB_LCD_STATE_LYXX_M3:		/* Switch to mode 3 */
-			gb_select_sprites(state);
-			state->m_lcd.sprite_cycles = sprite_cycles[ state->m_lcd.sprCount ];
+			gb_select_sprites(this);
+			m_lcd.sprite_cycles = sprite_cycles[ m_lcd.sprCount ];
 			/* Set Mode 3 lcdstate */
-			state->m_lcd.mode = 3;
+			m_lcd.mode = 3;
 			LCDSTAT = (LCDSTAT & 0xFC) | 0x03;
-			state->m_lcd.vram_locked = LOCKED;
+			m_lcd.vram_locked = LOCKED;
 			/* Check for compensations of x-scroll register */
 			/* Mode 3 lasts for approximately 172+cycles needed to handle sprites clock cycles */
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(168 + state->m_lcd.scrollx_adjust + state->m_lcd.sprite_cycles), GB_LCD_STATE_LYXX_PRE_M0);
-			state->m_lcd.start_x = -1;
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(168 + m_lcd.scrollx_adjust + m_lcd.sprite_cycles), GB_LCD_STATE_LYXX_PRE_M0);
+			m_lcd.start_x = -1;
 			break;
 		case GB_LCD_STATE_LY9X_M1:		/* Switch to or stay in mode 1 */
 			if ( CURLINE == 144 )
 			{
 				/* Trigger VBlank interrupt */
-				machine.device("maincpu")->execute().set_input_line(VBL_INT, ASSERT_LINE );
+				machine().device("maincpu")->execute().set_input_line(VBL_INT, ASSERT_LINE );
 				/* Set VBlank lcdstate */
-				state->m_lcd.mode = 1;
+				m_lcd.mode = 1;
 				LCDSTAT = (LCDSTAT & 0xFC) | 0x01;
 				/* Trigger LCD interrupt if requested */
 				if ( LCDSTAT & 0x10 )
 				{
-					machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+					machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 				}
 			}
 			/* Check if LY==LYC STAT bit should be set */
@@ -1554,256 +1554,256 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			{
 				LCDSTAT |= 0x04;
 			}
-			if ( state->m_lcd.delayed_line_irq && state->m_lcd.triggering_line_irq )
+			if ( m_lcd.delayed_line_irq && m_lcd.triggering_line_irq )
 			{
-				machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+				machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 			}
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(452), GB_LCD_STATE_LY9X_M1_INC);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(452), GB_LCD_STATE_LY9X_M1_INC);
 			break;
 		case GB_LCD_STATE_LY9X_M1_INC:		/* Increment scanline counter */
-			gb_increment_scanline(state);
-			state->m_lcd.delayed_line_irq = state->m_lcd.line_irq;
-			state->m_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
-			state->m_lcd.line_irq = 0;
-			if ( ! state->m_lcd.delayed_line_irq && state->m_lcd.triggering_line_irq )
+			gb_increment_scanline(this);
+			m_lcd.delayed_line_irq = m_lcd.line_irq;
+			m_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
+			m_lcd.line_irq = 0;
+			if ( ! m_lcd.delayed_line_irq && m_lcd.triggering_line_irq )
 			{
-				state->m_lcd.line_irq = state->m_lcd.triggering_line_irq;
-				machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+				m_lcd.line_irq = m_lcd.triggering_line_irq;
+				machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 			}
 			/* Reset LY==LYC STAT bit */
 			LCDSTAT &= 0xFB;
-			if ( state->m_lcd.current_line == 153 )
+			if ( m_lcd.current_line == 153 )
 			{
-				state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1);
+				m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1);
 			}
 			else
 			{
-				state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
+				m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
 			}
 			break;
 		case GB_LCD_STATE_LY00_M1:		/* we stay in VBlank but current line counter should already be incremented */
 			/* Check LY=LYC for line #153 */
-			if ( state->m_lcd.delayed_line_irq )
+			if ( m_lcd.delayed_line_irq )
 			{
-				if ( state->m_lcd.triggering_line_irq )
+				if ( m_lcd.triggering_line_irq )
 				{
-					machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+					machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 				}
 			}
-			state->m_lcd.delayed_line_irq = state->m_lcd.delayed_line_irq | state->m_lcd.line_irq;
+			m_lcd.delayed_line_irq = m_lcd.delayed_line_irq | m_lcd.line_irq;
 			if ( CURLINE == CMPLINE )
 			{
 				LCDSTAT |= 0x04;
 			}
-			gb_increment_scanline(state);
-			state->m_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
-			state->m_lcd.line_irq = 0;
+			gb_increment_scanline(this);
+			m_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
+			m_lcd.line_irq = 0;
 			LCDSTAT &= 0xFB;
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4/*8*/), GB_LCD_STATE_LY00_M1_1);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4/*8*/), GB_LCD_STATE_LY00_M1_1);
 			break;
 		case GB_LCD_STATE_LY00_M1_1:
-			if ( ! state->m_lcd.delayed_line_irq && state->m_lcd.triggering_line_irq )
+			if ( ! m_lcd.delayed_line_irq && m_lcd.triggering_line_irq )
 			{
-				state->m_lcd.line_irq = state->m_lcd.triggering_line_irq;
-				machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+				m_lcd.line_irq = m_lcd.triggering_line_irq;
+				machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 			}
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1_2);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1_2);
 			break;
 		case GB_LCD_STATE_LY00_M1_2:	/* Rest of line #0 during VBlank */
-			if ( state->m_lcd.delayed_line_irq && state->m_lcd.triggering_line_irq )
+			if ( m_lcd.delayed_line_irq && m_lcd.triggering_line_irq )
 			{
-				state->m_lcd.line_irq = state->m_lcd.triggering_line_irq;
-				machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+				m_lcd.line_irq = m_lcd.triggering_line_irq;
+				machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 			}
 			if ( CURLINE == CMPLINE )
 			{
 				LCDSTAT |= 0x04;
 			}
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(444), GB_LCD_STATE_LY00_M0);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(444), GB_LCD_STATE_LY00_M0);
 			break;
 		case GB_LCD_STATE_LY00_M0:		/* The STAT register seems to go to 0 for about 4 cycles */
 			/* Set Mode 0 lcdstat */
-			state->m_lcd.mode = 0;
+			m_lcd.mode = 0;
 			LCDSTAT = ( LCDSTAT & 0xFC );
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M2);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M2);
 			break;
 		}
 	}
 	else
 	{
-		gb_increment_scanline(state);
-		if ( state->m_lcd.current_line < 144 )
+		gb_increment_scanline(this);
+		if ( m_lcd.current_line < 144 )
 		{
-			(*state->update_scanline)( machine );
+			(*update_scanline)( machine() );
 		}
-		state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(456));
+		m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(456));
 	}
 }
 
-static TIMER_CALLBACK(gbc_lcd_timer_proc)
+TIMER_CALLBACK_MEMBER(gb_state::gbc_lcd_timer_proc)
 {
-	gb_state *state = machine.driver_data<gb_state>();
+	gb_state *state = machine().driver_data<gb_state>();
 	static const int sprite_cycles[] = { 0, 8, 20, 32, 44, 52, 64, 76, 88, 96, 108 };
 
-	state->m_lcd.state = param;
+	m_lcd.state = param;
 
 	if ( LCDCONT & 0x80 )
 	{
-		switch( state->m_lcd.state )
+		switch( m_lcd.state )
 		{
 		case GB_LCD_STATE_LYXX_PRE_M0:	/* Just before switching to mode 0 */
-			state->m_lcd.mode = 0;
+			m_lcd.mode = 0;
 			if ( LCDSTAT & 0x08 )
 			{
-				if ( ! state->m_lcd.mode_irq )
+				if ( ! m_lcd.mode_irq )
 				{
-					if ( ! state->m_lcd.line_irq && ! state->m_lcd.delayed_line_irq )
+					if ( ! m_lcd.line_irq && ! m_lcd.delayed_line_irq )
 					{
-						state->m_lcd.mode_irq = 1;
-						machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+						m_lcd.mode_irq = 1;
+						machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 					}
 				}
 				else
 				{
-					state->m_lcd.mode_irq = 0;
+					m_lcd.mode_irq = 0;
 				}
 			}
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0);
 			break;
 		case GB_LCD_STATE_LYXX_M0:		/* Switch to mode 0 */
 			/* update current scanline */
-			(*state->update_scanline)( machine );
+			(*update_scanline)( machine() );
 			/* Increment the number of window lines drawn if enabled */
-			if ( state->m_lcd.layer[1].enabled )
+			if ( m_lcd.layer[1].enabled )
 			{
-				state->m_lcd.window_lines_drawn++;
+				m_lcd.window_lines_drawn++;
 			}
-			state->m_lcd.previous_line = state->m_lcd.current_line;
+			m_lcd.previous_line = m_lcd.current_line;
 			/* Set Mode 0 lcdstate */
-			state->m_lcd.mode = 0;
+			m_lcd.mode = 0;
 			LCDSTAT &= 0xFC;
-			state->m_lcd.oam_locked = UNLOCKED;
-			state->m_lcd.vram_locked = UNLOCKED;
+			m_lcd.oam_locked = UNLOCKED;
+			m_lcd.vram_locked = UNLOCKED;
 			/*
                 There seems to a kind of feature in the Game Boy hardware when the lowest bits of the
                 SCROLLX register equals 3 or 7, then the delayed M0 irq is triggered 4 cycles later
                 than usual.
                 The SGB probably has the same bug.
             */
-			state->m_lcd.triggering_mode_irq = ( LCDSTAT & 0x08 ) ? 1 : 0;
+			m_lcd.triggering_mode_irq = ( LCDSTAT & 0x08 ) ? 1 : 0;
 			if ( ( SCROLLX & 0x03 ) == 0x03 )
 			{
-				state->m_lcd.scrollx_adjust += 4;
-				state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_SCX3);
+				m_lcd.scrollx_adjust += 4;
+				m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_SCX3);
 				break;
 			}
 		case GB_LCD_STATE_LYXX_M0_SCX3:
 			/* Generate lcd interrupt if requested */
-			if ( ! state->m_lcd.mode_irq && state->m_lcd.triggering_mode_irq &&
-			     ( ( ! state->m_lcd.line_irq && state->m_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) )
+			if ( ! m_lcd.mode_irq && m_lcd.triggering_mode_irq &&
+			     ( ( ! m_lcd.line_irq && m_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) )
 			{
-				machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
-				state->m_lcd.triggering_mode_irq = 0;
+				machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+				m_lcd.triggering_mode_irq = 0;
 			}
 			if ( ( SCROLLX & 0x03 ) == 0x03 )
 			{
-				state->m_lcd.pal_locked = UNLOCKED;
+				m_lcd.pal_locked = UNLOCKED;
 			}
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_GBC_PAL);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_GBC_PAL);
 			break;
 		case GB_LCD_STATE_LYXX_M0_GBC_PAL:
-			state->m_lcd.pal_locked = UNLOCKED;
+			m_lcd.pal_locked = UNLOCKED;
             /* Check for HBLANK DMA */
-			if( state->m_lcd.hdma_enabled )
+			if( m_lcd.hdma_enabled )
 			{
-				gbc_hdma(machine, 0x10);
+				gbc_hdma(machine(), 0x10);
 //              cpunum_set_reg( 0, LR35902_DMA_CYCLES, 36 );
 			}
 			else
 			{
-				state->m_lcd.hdma_possible = 1;
+				m_lcd.hdma_possible = 1;
 			}
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(192 - state->m_lcd.scrollx_adjust - state->m_lcd.sprite_cycles), GB_LCD_STATE_LYXX_M0_PRE_INC);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(192 - m_lcd.scrollx_adjust - m_lcd.sprite_cycles), GB_LCD_STATE_LYXX_M0_PRE_INC);
 			break;
 		case GB_LCD_STATE_LYXX_M0_PRE_INC:	/* Just before incrementing the line counter go to mode 2 internally */
-			state->m_lcd.cmp_line = CMPLINE;
+			m_lcd.cmp_line = CMPLINE;
 			if ( CURLINE < 143 )
 			{
-				state->m_lcd.mode = 2;
+				m_lcd.mode = 2;
 				if ( LCDSTAT & 0x20 )
 				{
-					if ( ! state->m_lcd.mode_irq )
+					if ( ! m_lcd.mode_irq )
 					{
-						if ( ! state->m_lcd.line_irq && ! state->m_lcd.delayed_line_irq )
+						if ( ! m_lcd.line_irq && ! m_lcd.delayed_line_irq )
 						{
-							state->m_lcd.mode_irq = 1;
-							machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+							m_lcd.mode_irq = 1;
+							machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 						}
 					}
 					else
 					{
-						state->m_lcd.mode_irq = 0;
+						m_lcd.mode_irq = 0;
 					}
 				}
 			}
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_INC);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_INC);
 			break;
 		case GB_LCD_STATE_LYXX_M0_INC:	/* Increment LY, stay in M0 for 4 more cycles */
-			gb_increment_scanline(state);
-			state->m_lcd.delayed_line_irq = state->m_lcd.line_irq;
-			state->m_lcd.triggering_line_irq = ( ( state->m_lcd.cmp_line == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
-			state->m_lcd.line_irq = 0;
-			if ( ! state->m_lcd.mode_irq && ! state->m_lcd.delayed_line_irq && state->m_lcd.triggering_line_irq && ! ( LCDSTAT & 0x20 ) )
+			gb_increment_scanline(this);
+			m_lcd.delayed_line_irq = m_lcd.line_irq;
+			m_lcd.triggering_line_irq = ( ( m_lcd.cmp_line == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
+			m_lcd.line_irq = 0;
+			if ( ! m_lcd.mode_irq && ! m_lcd.delayed_line_irq && m_lcd.triggering_line_irq && ! ( LCDSTAT & 0x20 ) )
 			{
-				state->m_lcd.line_irq = state->m_lcd.triggering_line_irq;
-				machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+				m_lcd.line_irq = m_lcd.triggering_line_irq;
+				machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 			}
-			state->m_lcd.hdma_possible = 0;
+			m_lcd.hdma_possible = 0;
 			/* Check if we're going into VBlank next */
 			if ( CURLINE == 144 )
 			{
-				state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
+				m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
 			}
 			else
 			{
 				/* Internally switch to mode 2 */
-				state->m_lcd.mode = 2;
+				m_lcd.mode = 2;
 				/* Generate lcd interrupt if requested */
-				if ( ! state->m_lcd.mode_irq && ( LCDSTAT & 0x20 ) &&
-					 ( ( ! state->m_lcd.triggering_line_irq && ! state->m_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) )
+				if ( ! m_lcd.mode_irq && ( LCDSTAT & 0x20 ) &&
+					 ( ( ! m_lcd.triggering_line_irq && ! m_lcd.delayed_line_irq ) || ! ( LCDSTAT & 0x40 ) ) )
 				{
-					state->m_lcd.mode_irq = 1;
-					machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+					m_lcd.mode_irq = 1;
+					machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 				}
-				state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M2);
+				m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M2);
 			}
 			break;
 		case GB_LCD_STATE_LY00_M2:		/* Switch to mode 2 on line #0 */
 			/* Set Mode 2 lcdstate */
-			state->m_lcd.mode = 2;
+			m_lcd.mode = 2;
 			LCDSTAT = ( LCDSTAT & 0xFC ) | 0x02;
-			state->m_lcd.oam_locked = LOCKED;
+			m_lcd.oam_locked = LOCKED;
 			/* Generate lcd interrupt if requested */
-			if ( ( LCDSTAT & 0x20 ) && ! state->m_lcd.line_irq )
+			if ( ( LCDSTAT & 0x20 ) && ! m_lcd.line_irq )
 			{
-				machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+				machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 			}
 			/* Check for regular compensation of x-scroll register */
-			state->m_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
+			m_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
 			/* Mode 2 lasts approximately 80 clock cycles */
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
 			break;
 		case GB_LCD_STATE_LYXX_M2:		/* Switch to mode 2 */
 			/* Update STAT register to the correct state */
 			LCDSTAT = (LCDSTAT & 0xFC) | 0x02;
-			state->m_lcd.oam_locked = LOCKED;
+			m_lcd.oam_locked = LOCKED;
 			/* Generate lcd interrupt if requested */
-			if ( ( state->m_lcd.delayed_line_irq && state->m_lcd.triggering_line_irq && ! ( LCDSTAT & 0x20 ) ) ||
-				 ( !state->m_lcd.mode_irq && ! state->m_lcd.line_irq && ! state->m_lcd.delayed_line_irq && ( LCDSTAT & 0x20 ) ) )
+			if ( ( m_lcd.delayed_line_irq && m_lcd.triggering_line_irq && ! ( LCDSTAT & 0x20 ) ) ||
+				 ( !m_lcd.mode_irq && ! m_lcd.line_irq && ! m_lcd.delayed_line_irq && ( LCDSTAT & 0x20 ) ) )
 			{
-				machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+				machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 			}
-			state->m_lcd.line_irq = state->m_lcd.triggering_line_irq;
+			m_lcd.line_irq = m_lcd.triggering_line_irq;
 			/* Check if LY==LYC STAT bit should be set */
 			if ( CURLINE == CMPLINE )
 			{
@@ -1814,35 +1814,35 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 				LCDSTAT &= ~0x04;
 			}
 			/* Check for regular compensation of x-scroll register */
-			state->m_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
+			m_lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
 			/* Mode 2 last for approximately 80 clock cycles */
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
 			break;
 		case GB_LCD_STATE_LYXX_M3:		/* Switch to mode 3 */
-			gb_select_sprites(state);
-			state->m_lcd.sprite_cycles = sprite_cycles[ state->m_lcd.sprCount ];
+			gb_select_sprites(this);
+			m_lcd.sprite_cycles = sprite_cycles[ m_lcd.sprCount ];
 			/* Set Mode 3 lcdstate */
-			state->m_lcd.mode = 3;
+			m_lcd.mode = 3;
 			LCDSTAT = (LCDSTAT & 0xFC) | 0x03;
-			state->m_lcd.vram_locked = LOCKED;
-			state->m_lcd.pal_locked = LOCKED;
+			m_lcd.vram_locked = LOCKED;
+			m_lcd.pal_locked = LOCKED;
 			/* Check for compensations of x-scroll register */
 			/* Mode 3 lasts for approximately 172+cycles needed to handle sprites clock cycles */
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(168 + state->m_lcd.scrollx_adjust + state->m_lcd.sprite_cycles), GB_LCD_STATE_LYXX_PRE_M0);
-			state->m_lcd.start_x = -1;
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(168 + m_lcd.scrollx_adjust + m_lcd.sprite_cycles), GB_LCD_STATE_LYXX_PRE_M0);
+			m_lcd.start_x = -1;
 			break;
 		case GB_LCD_STATE_LY9X_M1:		/* Switch to or stay in mode 1 */
 			if ( CURLINE == 144 )
 			{
 				/* Trigger VBlank interrupt */
-				machine.device("maincpu")->execute().set_input_line(VBL_INT, ASSERT_LINE );
+				machine().device("maincpu")->execute().set_input_line(VBL_INT, ASSERT_LINE );
 				/* Set VBlank lcdstate */
-				state->m_lcd.mode = 1;
+				m_lcd.mode = 1;
 				LCDSTAT = (LCDSTAT & 0xFC) | 0x01;
 				/* Trigger LCD interrupt if requested */
 				if ( LCDSTAT & 0x10 )
 				{
-					machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+					machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 				}
 			}
 			/* Check if LY==LYC STAT bit should be set */
@@ -1854,41 +1854,41 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			{
 				LCDSTAT &= ~0x04;
 			}
-			if ( state->m_lcd.delayed_line_irq && state->m_lcd.triggering_line_irq )
+			if ( m_lcd.delayed_line_irq && m_lcd.triggering_line_irq )
 			{
-				machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+				machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 			}
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(452), GB_LCD_STATE_LY9X_M1_INC);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(452), GB_LCD_STATE_LY9X_M1_INC);
 			break;
 		case GB_LCD_STATE_LY9X_M1_INC:		/* Increment scanline counter */
-			gb_increment_scanline(state);
-			state->m_lcd.delayed_line_irq = state->m_lcd.line_irq;
-			state->m_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
-			state->m_lcd.line_irq = 0;
-			if ( ! state->m_lcd.delayed_line_irq && state->m_lcd.triggering_line_irq )
+			gb_increment_scanline(this);
+			m_lcd.delayed_line_irq = m_lcd.line_irq;
+			m_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
+			m_lcd.line_irq = 0;
+			if ( ! m_lcd.delayed_line_irq && m_lcd.triggering_line_irq )
 			{
-				state->m_lcd.line_irq = state->m_lcd.triggering_line_irq;
-				machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+				m_lcd.line_irq = m_lcd.triggering_line_irq;
+				machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 			}
-			if ( state->m_lcd.current_line == 153 )
+			if ( m_lcd.current_line == 153 )
 			{
-				state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1);
+				m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1);
 			}
 			else
 			{
-				state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
+				m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
 			}
 			break;
 		case GB_LCD_STATE_LY00_M1:		/* we stay in VBlank but current line counter should already be incremented */
 			/* Check LY=LYC for line #153 */
-			if ( state->m_lcd.delayed_line_irq )
+			if ( m_lcd.delayed_line_irq )
 			{
-				if ( state->m_lcd.triggering_line_irq )
+				if ( m_lcd.triggering_line_irq )
 				{
-					machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+					machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 				}
 			}
-			state->m_lcd.delayed_line_irq = state->m_lcd.delayed_line_irq | state->m_lcd.line_irq;
+			m_lcd.delayed_line_irq = m_lcd.delayed_line_irq | m_lcd.line_irq;
 			if ( CURLINE == CMPLINE )
 			{
 				LCDSTAT |= 0x04;
@@ -1897,25 +1897,25 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			{
 				LCDSTAT &= ~0x04;
 			}
-			gb_increment_scanline(state);
-			state->m_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
-			state->m_lcd.line_irq = 0;
+			gb_increment_scanline(this);
+			m_lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
+			m_lcd.line_irq = 0;
 			LCDSTAT &= 0xFB;
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1_1);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1_1);
 			break;
 		case GB_LCD_STATE_LY00_M1_1:
-			if ( ! state->m_lcd.delayed_line_irq && state->m_lcd.triggering_line_irq )
+			if ( ! m_lcd.delayed_line_irq && m_lcd.triggering_line_irq )
 			{
-				state->m_lcd.line_irq = state->m_lcd.triggering_line_irq;
-				machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+				m_lcd.line_irq = m_lcd.triggering_line_irq;
+				machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 			}
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1_2);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1_2);
 			break;
 		case GB_LCD_STATE_LY00_M1_2:	/* Rest of line #0 during VBlank */
-			if ( state->m_lcd.delayed_line_irq && state->m_lcd.triggering_line_irq )
+			if ( m_lcd.delayed_line_irq && m_lcd.triggering_line_irq )
 			{
-				state->m_lcd.line_irq = state->m_lcd.triggering_line_irq;
-				machine.device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
+				m_lcd.line_irq = m_lcd.triggering_line_irq;
+				machine().device("maincpu")->execute().set_input_line(LCD_INT, ASSERT_LINE );
 			}
 			if ( CURLINE == CMPLINE )
 			{
@@ -1925,23 +1925,23 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			{
 				LCDSTAT &= ~0x04;
 			}
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(444), GB_LCD_STATE_LY00_M0);
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(444), GB_LCD_STATE_LY00_M0);
 			break;
 		case GB_LCD_STATE_LY00_M0:		/* The STAT register seems to go to 0 for about 4 cycles */
 			/* Set Mode 0 lcdstat */
-			state->m_lcd.mode = 0;
-			state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M2);
+			m_lcd.mode = 0;
+			m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M2);
 			break;
 		}
 	}
 	else
 	{
-		gb_increment_scanline(state);
-		if ( state->m_lcd.current_line < 144 )
+		gb_increment_scanline(this);
+		if ( m_lcd.current_line < 144 )
 		{
-			(*state->update_scanline)( machine );
+			(*update_scanline)( machine() );
 		}
-		state->m_lcd.lcd_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(456));
+		m_lcd.lcd_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(456));
 	}
 }
 

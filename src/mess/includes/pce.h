@@ -142,6 +142,13 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_MACHINE_START(pce);
 	DECLARE_MACHINE_RESET(mess_pce);
+	TIMER_CALLBACK_MEMBER(pce_cd_data_timer_callback);
+	TIMER_CALLBACK_MEMBER(pce_cd_cdda_fadeout_callback);
+	TIMER_CALLBACK_MEMBER(pce_cd_cdda_fadein_callback);
+	TIMER_CALLBACK_MEMBER(pce_cd_adpcm_fadeout_callback);
+	TIMER_CALLBACK_MEMBER(pce_cd_adpcm_fadein_callback);
+	TIMER_CALLBACK_MEMBER(pce_cd_clear_ack);
+	TIMER_CALLBACK_MEMBER(pce_cd_adpcm_dma_timer_callback);
 };
 
 

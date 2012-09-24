@@ -152,10 +152,9 @@ MACHINE_START( pc1403 )
 	machine.device<nvram_device>("ram_nvram")->set_base(ram, 0x8000);
 }
 
-static TIMER_CALLBACK(pc1403_power_up)
+TIMER_CALLBACK_MEMBER(pc1403_state::pc1403_power_up)
 {
-	pc1403_state *state = machine.driver_data<pc1403_state>();
-	state->m_power=0;
+	m_power=0;
 }
 
 DRIVER_INIT_MEMBER(pc1403_state,pc1403)
@@ -166,7 +165,7 @@ DRIVER_INIT_MEMBER(pc1403_state,pc1403)
 	for (i=0; i<128; i++) gfx[i]=i;
 
 	m_power = 1;
-	machine().scheduler().timer_set(attotime::from_seconds(1), FUNC(pc1403_power_up));
+	machine().scheduler().timer_set(attotime::from_seconds(1), timer_expired_delegate(FUNC(pc1403_state::pc1403_power_up),this));
 
 	membank("bank1")->set_base(memregion("user1")->base());
 }

@@ -73,10 +73,9 @@ static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_5_w )
 }
 
 
-static TIMER_CALLBACK( led_refresh )
+TIMER_CALLBACK_MEMBER(sym1_state::led_refresh)
 {
-	sym1_state *state = machine.driver_data<sym1_state>();
-	output_set_digit_value(param, state->m_riot_port_a);
+	output_set_digit_value(param, m_riot_port_a);
 }
 
 
@@ -294,7 +293,7 @@ DRIVER_INIT_MEMBER(sym1_state,sym1)
 	}
 
 	/* allocate a timer to refresh the led display */
-	m_led_update = machine().scheduler().timer_alloc(FUNC(led_refresh));
+	m_led_update = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sym1_state::led_refresh),this));
 }
 
 

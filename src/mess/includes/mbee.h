@@ -142,6 +142,9 @@ public:
 	DECLARE_MACHINE_RESET(mbeett);
 	UINT32 screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mbee_interrupt);
+	TIMER_CALLBACK_MEMBER(mbee256_kbd);
+	TIMER_CALLBACK_MEMBER(mbee_rtc_irq);
+	TIMER_CALLBACK_MEMBER(mbee_reset);
 };
 
 

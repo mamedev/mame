@@ -12,11 +12,10 @@
 
 #include "includes/oric.h"
 
-static TIMER_CALLBACK(oric_vh_timer_callback)
+TIMER_CALLBACK_MEMBER(oric_state::oric_vh_timer_callback)
 {
-	oric_state *state = machine.driver_data<oric_state>();
 	/* update flash count */
-	state->m_vh_state.flash_count++;
+	m_vh_state.flash_count++;
 }
 
 static void oric_vh_update_flash(oric_state *state)
@@ -299,7 +298,7 @@ void oric_state::video_start()
 	m_vh_state.char_base = 0;
 	/* initialise flash timer */
 	m_vh_state.flash_count = 0;
-	machine().scheduler().timer_pulse(attotime::from_hz(50), FUNC(oric_vh_timer_callback));
+	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(oric_state::oric_vh_timer_callback),this));
 	/* mode */
 	oric_vh_update_attribute(machine(),(1<<3)|(1<<4));
 }

@@ -90,10 +90,9 @@ int pc1350_brk(device_t *device)
 	return (device->machine().root_device().ioport("EXTRA")->read() & 0x01);
 }
 
-static TIMER_CALLBACK(pc1350_power_up)
+TIMER_CALLBACK_MEMBER(pc1350_state::pc1350_power_up)
 {
-	pc1350_state *state = machine.driver_data<pc1350_state>();
-	state->m_power=0;
+	m_power=0;
 }
 
 MACHINE_START( pc1350 )
@@ -102,7 +101,7 @@ MACHINE_START( pc1350 )
 	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->m_power = 1;
-	machine.scheduler().timer_set(attotime::from_seconds(1), FUNC(pc1350_power_up));
+	machine.scheduler().timer_set(attotime::from_seconds(1), timer_expired_delegate(FUNC(pc1350_state::pc1350_power_up),state));
 
 	space.install_readwrite_bank(0x6000, 0x6fff, "bank1");
 	state->membank("bank1")->set_base(&machine.device<ram_device>(RAM_TAG)->pointer()[0x0000]);

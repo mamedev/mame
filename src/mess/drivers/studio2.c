@@ -546,16 +546,16 @@ ROM_END
 
 /* Driver Initialization */
 
-static TIMER_CALLBACK( setup_beep )
+TIMER_CALLBACK_MEMBER(studio2_state::setup_beep)
 {
-	device_t *speaker = machine.device(BEEPER_TAG);
+	device_t *speaker = machine().device(BEEPER_TAG);
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 300);
 }
 
 DRIVER_INIT_MEMBER(studio2_state,studio2)
 {
-	machine().scheduler().timer_set(attotime::zero, FUNC(setup_beep));
+	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(studio2_state::setup_beep),this));
 }
 
 /* Game Drivers */

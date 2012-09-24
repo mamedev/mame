@@ -257,33 +257,32 @@ static void s3c240x_lcd_render_16( running_machine &machine)
 	}
 }
 
-static TIMER_CALLBACK( s3c240x_lcd_timer_exp )
+TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_lcd_timer_exp)
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	screen_device *screen = machine.primary_screen;
-	verboselog( machine, 2, "LCD timer callback\n");
-	state->m_s3c240x_lcd.vpos = screen->vpos();
-	state->m_s3c240x_lcd.hpos = screen->hpos();
-	verboselog( machine, 3, "LCD - vpos %d hpos %d\n", state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
-	if (state->m_s3c240x_lcd.vramaddr_cur >= state->m_s3c240x_lcd.vramaddr_max)
+	screen_device *screen = machine().primary_screen;
+	verboselog( machine(), 2, "LCD timer callback\n");
+	m_s3c240x_lcd.vpos = screen->vpos();
+	m_s3c240x_lcd.hpos = screen->hpos();
+	verboselog( machine(), 3, "LCD - vpos %d hpos %d\n", m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
+	if (m_s3c240x_lcd.vramaddr_cur >= m_s3c240x_lcd.vramaddr_max)
 	{
-		s3c240x_lcd_dma_reload( machine);
+		s3c240x_lcd_dma_reload( machine());
 	}
-	verboselog( machine, 3, "LCD - vramaddr %08X\n", state->m_s3c240x_lcd.vramaddr_cur);
-	while (state->m_s3c240x_lcd.vramaddr_cur < state->m_s3c240x_lcd.vramaddr_max)
+	verboselog( machine(), 3, "LCD - vramaddr %08X\n", m_s3c240x_lcd.vramaddr_cur);
+	while (m_s3c240x_lcd.vramaddr_cur < m_s3c240x_lcd.vramaddr_max)
 	{
-		switch (state->m_s3c240x_lcd.bppmode)
+		switch (m_s3c240x_lcd.bppmode)
 		{
-			case BPPMODE_TFT_01 : s3c240x_lcd_render_01( machine); break;
-			case BPPMODE_TFT_02 : s3c240x_lcd_render_02( machine); break;
-			case BPPMODE_TFT_04 : s3c240x_lcd_render_04( machine); break;
-			case BPPMODE_TFT_08 : s3c240x_lcd_render_08( machine); break;
-			case BPPMODE_TFT_16 : s3c240x_lcd_render_16( machine); break;
-			default : verboselog( machine, 0, "s3c240x_lcd_timer_exp: bppmode %d not supported\n", state->m_s3c240x_lcd.bppmode); break;
+			case BPPMODE_TFT_01 : s3c240x_lcd_render_01( machine()); break;
+			case BPPMODE_TFT_02 : s3c240x_lcd_render_02( machine()); break;
+			case BPPMODE_TFT_04 : s3c240x_lcd_render_04( machine()); break;
+			case BPPMODE_TFT_08 : s3c240x_lcd_render_08( machine()); break;
+			case BPPMODE_TFT_16 : s3c240x_lcd_render_16( machine()); break;
+			default : verboselog( machine(), 0, "s3c240x_lcd_timer_exp: bppmode %d not supported\n", m_s3c240x_lcd.bppmode); break;
 		}
-		if ((state->m_s3c240x_lcd.vpos == 0) && (state->m_s3c240x_lcd.hpos == 0)) break;
+		if ((m_s3c240x_lcd.vpos == 0) && (m_s3c240x_lcd.hpos == 0)) break;
 	}
-	state->m_s3c240x_lcd_timer->adjust( screen->time_until_pos(state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos));
+	m_s3c240x_lcd_timer->adjust( screen->time_until_pos(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos));
 }
 
 void gp32_state::video_start()
@@ -673,19 +672,18 @@ WRITE32_MEMBER(gp32_state::s3c240x_pwm_w)
 	}
 }
 
-static TIMER_CALLBACK( s3c240x_pwm_timer_exp )
+TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_pwm_timer_exp)
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
 	int ch = param;
 	static const int ch_int[] = { INT_TIMER0, INT_TIMER1, INT_TIMER2, INT_TIMER3, INT_TIMER4 };
-	verboselog( machine, 2, "PWM %d timer callback\n", ch);
-	if (BITS( state->m_s3c240x_pwm_regs[1], 23, 20) == (ch + 1))
+	verboselog( machine(), 2, "PWM %d timer callback\n", ch);
+	if (BITS( m_s3c240x_pwm_regs[1], 23, 20) == (ch + 1))
 	{
-		s3c240x_dma_request_pwm( machine);
+		s3c240x_dma_request_pwm( machine());
 	}
 	else
 	{
-		s3c240x_request_irq( machine, ch_int[ch]);
+		s3c240x_request_irq( machine(), ch_int[ch]);
 	}
 }
 
@@ -911,10 +909,10 @@ WRITE32_MEMBER(gp32_state::s3c240x_dma_w)
 	}
 }
 
-static TIMER_CALLBACK( s3c240x_dma_timer_exp )
+TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_dma_timer_exp)
 {
 	int ch = param;
-	verboselog( machine, 2, "DMA %d timer callback\n", ch);
+	verboselog( machine(), 2, "DMA %d timer callback\n", ch);
 }
 
 // SMARTMEDIA
@@ -1439,52 +1437,51 @@ WRITE32_MEMBER(gp32_state::s3c240x_iic_w)
 	}
 }
 
-static TIMER_CALLBACK( s3c240x_iic_timer_exp )
+TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_iic_timer_exp)
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
 	int enable_interrupt, mode_selection;
-	verboselog( machine, 2, "IIC timer callback\n");
-	mode_selection = BITS( state->m_s3c240x_iic_regs[1], 7, 6);
+	verboselog( machine(), 2, "IIC timer callback\n");
+	mode_selection = BITS( m_s3c240x_iic_regs[1], 7, 6);
 	switch (mode_selection)
 	{
 		// master receive mode
 		case 2 :
 		{
-			if (state->m_s3c240x_iic.data_index == 0)
+			if (m_s3c240x_iic.data_index == 0)
 			{
-				UINT8 data_shift = state->m_s3c240x_iic_regs[3] & 0xFF;
-				verboselog( machine, 5, "IIC write %02X\n", data_shift);
+				UINT8 data_shift = m_s3c240x_iic_regs[3] & 0xFF;
+				verboselog( machine(), 5, "IIC write %02X\n", data_shift);
 			}
 			else
 			{
-				UINT8 data_shift = eeprom_read( machine, state->m_s3c240x_iic.address);
-				verboselog( machine, 5, "IIC read %02X\n", data_shift);
-				state->m_s3c240x_iic_regs[3] = (state->m_s3c240x_iic_regs[3] & ~0xFF) | data_shift;
+				UINT8 data_shift = eeprom_read( machine(), m_s3c240x_iic.address);
+				verboselog( machine(), 5, "IIC read %02X\n", data_shift);
+				m_s3c240x_iic_regs[3] = (m_s3c240x_iic_regs[3] & ~0xFF) | data_shift;
 			}
-			state->m_s3c240x_iic.data_index++;
+			m_s3c240x_iic.data_index++;
 		}
 		break;
 		// master transmit mode
 		case 3 :
 		{
-			UINT8 data_shift = state->m_s3c240x_iic_regs[3] & 0xFF;
-			verboselog( machine, 5, "IIC write %02X\n", data_shift);
-			state->m_s3c240x_iic.data[state->m_s3c240x_iic.data_index++] = data_shift;
-			if (state->m_s3c240x_iic.data_index == 3)
+			UINT8 data_shift = m_s3c240x_iic_regs[3] & 0xFF;
+			verboselog( machine(), 5, "IIC write %02X\n", data_shift);
+			m_s3c240x_iic.data[m_s3c240x_iic.data_index++] = data_shift;
+			if (m_s3c240x_iic.data_index == 3)
 			{
-				state->m_s3c240x_iic.address = (state->m_s3c240x_iic.data[1] << 8) | state->m_s3c240x_iic.data[2];
+				m_s3c240x_iic.address = (m_s3c240x_iic.data[1] << 8) | m_s3c240x_iic.data[2];
 			}
-			if ((state->m_s3c240x_iic.data_index == 4) && (state->m_s3c240x_iic.data[0] == 0xA0))
+			if ((m_s3c240x_iic.data_index == 4) && (m_s3c240x_iic.data[0] == 0xA0))
 			{
-				eeprom_write( machine, state->m_s3c240x_iic.address, data_shift);
+				eeprom_write( machine(), m_s3c240x_iic.address, data_shift);
 			}
 		}
 		break;
 	}
-	enable_interrupt = BIT( state->m_s3c240x_iic_regs[0], 5);
+	enable_interrupt = BIT( m_s3c240x_iic_regs[0], 5);
 	if (enable_interrupt)
 	{
-		s3c240x_request_irq( machine, INT_IIC);
+		s3c240x_request_irq( machine(), INT_IIC);
 	}
 }
 
@@ -1582,10 +1579,10 @@ WRITE32_MEMBER(gp32_state::s3c240x_iis_w)
 	}
 }
 
-static TIMER_CALLBACK( s3c240x_iis_timer_exp )
+TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_iis_timer_exp)
 {
-	verboselog( machine, 2, "IIS timer callback\n");
-	s3c240x_dma_request_iis( machine);
+	verboselog( machine(), 2, "IIS timer callback\n");
+	s3c240x_dma_request_iis( machine());
 }
 
 // RTC
@@ -1657,18 +1654,18 @@ WRITE32_MEMBER(gp32_state::s3c240x_mmc_w)
 static void s3c240x_machine_start( running_machine &machine)
 {
 	gp32_state *state = machine.driver_data<gp32_state>();
-	state->m_s3c240x_pwm_timer[0] = machine.scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)0);
-	state->m_s3c240x_pwm_timer[1] = machine.scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)1);
-	state->m_s3c240x_pwm_timer[2] = machine.scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)2);
-	state->m_s3c240x_pwm_timer[3] = machine.scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)3);
-	state->m_s3c240x_pwm_timer[4] = machine.scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)4);
-	state->m_s3c240x_dma_timer[0] = machine.scheduler().timer_alloc(FUNC(s3c240x_dma_timer_exp), (void *)(FPTR)0);
-	state->m_s3c240x_dma_timer[1] = machine.scheduler().timer_alloc(FUNC(s3c240x_dma_timer_exp), (void *)(FPTR)1);
-	state->m_s3c240x_dma_timer[2] = machine.scheduler().timer_alloc(FUNC(s3c240x_dma_timer_exp), (void *)(FPTR)2);
-	state->m_s3c240x_dma_timer[3] = machine.scheduler().timer_alloc(FUNC(s3c240x_dma_timer_exp), (void *)(FPTR)3);
-	state->m_s3c240x_iic_timer = machine.scheduler().timer_alloc(FUNC(s3c240x_iic_timer_exp), (void *)(FPTR)0);
-	state->m_s3c240x_iis_timer = machine.scheduler().timer_alloc(FUNC(s3c240x_iis_timer_exp), (void *)(FPTR)0);
-	state->m_s3c240x_lcd_timer = machine.scheduler().timer_alloc(FUNC(s3c240x_lcd_timer_exp), (void *)(FPTR)0);
+	state->m_s3c240x_pwm_timer[0] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),state), (void *)(FPTR)0);
+	state->m_s3c240x_pwm_timer[1] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),state), (void *)(FPTR)1);
+	state->m_s3c240x_pwm_timer[2] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),state), (void *)(FPTR)2);
+	state->m_s3c240x_pwm_timer[3] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),state), (void *)(FPTR)3);
+	state->m_s3c240x_pwm_timer[4] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),state), (void *)(FPTR)4);
+	state->m_s3c240x_dma_timer[0] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),state), (void *)(FPTR)0);
+	state->m_s3c240x_dma_timer[1] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),state), (void *)(FPTR)1);
+	state->m_s3c240x_dma_timer[2] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),state), (void *)(FPTR)2);
+	state->m_s3c240x_dma_timer[3] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),state), (void *)(FPTR)3);
+	state->m_s3c240x_iic_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iic_timer_exp),state), (void *)(FPTR)0);
+	state->m_s3c240x_iis_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iis_timer_exp),state), (void *)(FPTR)0);
+	state->m_s3c240x_lcd_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_lcd_timer_exp),state), (void *)(FPTR)0);
 	state->m_eeprom_data = auto_alloc_array( machine, UINT8, 0x2000);
 	machine.device<nvram_device>("nvram")->set_base(state->m_eeprom_data, 0x2000);
 	smc_init( machine);

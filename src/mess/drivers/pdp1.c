@@ -383,10 +383,10 @@ by a pdp-1 programming error, even if there is no emulator error. */
 
 
 static int tape_read(pdp1_state *state, UINT8 *reply);
-static TIMER_CALLBACK(reader_callback);
-static TIMER_CALLBACK(puncher_callback);
-static TIMER_CALLBACK(tyo_callback);
-static TIMER_CALLBACK(dpy_callback);
+
+
+
+
 static void pdp1_machine_stop(running_machine &machine);
 
 static void pdp1_tape_read_binary(device_t *device);
@@ -658,10 +658,10 @@ void pdp1_state::machine_start()
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(pdp1_machine_stop),&machine()));
 
-	m_tape_reader.timer = machine().scheduler().timer_alloc(FUNC(reader_callback));
-	m_tape_puncher.timer = machine().scheduler().timer_alloc(FUNC(puncher_callback));
-	m_typewriter.tyo_timer = machine().scheduler().timer_alloc(FUNC(tyo_callback));
-	m_dpy_timer = machine().scheduler().timer_alloc(FUNC(dpy_callback));
+	m_tape_reader.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_state::reader_callback),this));
+	m_tape_puncher.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_state::puncher_callback),this));
+	m_typewriter.tyo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_state::tyo_callback),this));
+	m_dpy_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_state::dpy_callback),this));
 	m_tape_reader.timer->adjust(attotime::zero, 0, attotime::from_hz(2500));
 	m_tape_reader.timer->enable(0);
 }
@@ -902,54 +902,53 @@ static void begin_tape_read(pdp1_state *state, int binary, int nac)
 /*
     timer callback to simulate reader IO
 */
-static TIMER_CALLBACK(reader_callback)
+TIMER_CALLBACK_MEMBER(pdp1_state::reader_callback)
 {
-	pdp1_state *state = machine.driver_data<pdp1_state>();
 	int not_ready;
 	UINT8 data;
 
-	if (state->m_tape_reader.rc)
+	if (m_tape_reader.rc)
 	{
-		not_ready = tape_read(state, & data);
+		not_ready = tape_read(this, & data);
 		if (not_ready)
 		{
-			state->m_tape_reader.motor_on = 0;	/* let us stop the motor */
+			m_tape_reader.motor_on = 0;	/* let us stop the motor */
 		}
 		else
 		{
-			if ((! state->m_tape_reader.rby) || (data & 0200))
+			if ((! m_tape_reader.rby) || (data & 0200))
 			{
-				state->m_tape_reader.rb |= (state->m_tape_reader.rby) ? (data & 077) : data;
+				m_tape_reader.rb |= (m_tape_reader.rby) ? (data & 077) : data;
 
-				if (state->m_tape_reader.rc != 3)
+				if (m_tape_reader.rc != 3)
 				{
-					state->m_tape_reader.rb <<= 6;
+					m_tape_reader.rb <<= 6;
 				}
 
-				state->m_tape_reader.rc = (state->m_tape_reader.rc+1) & 3;
+				m_tape_reader.rc = (m_tape_reader.rc+1) & 3;
 
-				if (state->m_tape_reader.rc == 0)
+				if (m_tape_reader.rc == 0)
 				{	/* IO complete */
-					state->m_tape_reader.rcl = 0;
-					if (state->m_tape_reader.rcp)
+					m_tape_reader.rcl = 0;
+					if (m_tape_reader.rcp)
 					{
-						machine.device("maincpu")->state().set_state_int(PDP1_IO, state->m_tape_reader.rb);	/* transfer reader buffer to IO */
-						pdp1_pulse_iot_done(machine.device("maincpu"));
+						machine().device("maincpu")->state().set_state_int(PDP1_IO, m_tape_reader.rb);	/* transfer reader buffer to IO */
+						pdp1_pulse_iot_done(machine().device("maincpu"));
 					}
 					else
-						state->m_io_status |= io_st_ptr;
+						m_io_status |= io_st_ptr;
 				}
 			}
 		}
 	}
 
-	if (state->m_tape_reader.motor_on && state->m_tape_reader.rcl)
+	if (m_tape_reader.motor_on && m_tape_reader.rcl)
 	{
-		state->m_tape_reader.timer->enable(1);
+		m_tape_reader.timer->enable(1);
 	}
 	else
 	{
-		state->m_tape_reader.timer->enable(0);
+		m_tape_reader.timer->enable(0);
 	}
 }
 
@@ -1080,14 +1079,13 @@ static void tape_write(pdp1_state *state, UINT8 data)
 /*
     timer callback to generate punch completion pulse
 */
-static TIMER_CALLBACK(puncher_callback)
+TIMER_CALLBACK_MEMBER(pdp1_state::puncher_callback)
 {
-	pdp1_state *state = machine.driver_data<pdp1_state>();
 	int nac = param;
-	state->m_io_status |= io_st_ptp;
+	m_io_status |= io_st_ptp;
 	if (nac)
 	{
-		pdp1_pulse_iot_done(machine.device("maincpu"));
+		pdp1_pulse_iot_done(machine().device("maincpu"));
 	}
 }
 
@@ -1290,14 +1288,13 @@ static void typewriter_out(running_machine &machine, UINT8 data)
 /*
     timer callback to generate typewriter completion pulse
 */
-static TIMER_CALLBACK(tyo_callback)
+TIMER_CALLBACK_MEMBER(pdp1_state::tyo_callback)
 {
-	pdp1_state *state = machine.driver_data<pdp1_state>();
 	int nac = param;
-	state->m_io_status |= io_st_tyo;
+	m_io_status |= io_st_tyo;
 	if (nac)
 	{
-		pdp1_pulse_iot_done(machine.device("maincpu"));
+		pdp1_pulse_iot_done(machine().device("maincpu"));
 	}
 }
 
@@ -1413,9 +1410,9 @@ static void iot_tyi(device_t *device, int op2, int nac, int mb, int *io, int ac)
 /*
     timer callback to generate crt completion pulse
 */
-static TIMER_CALLBACK(dpy_callback)
+TIMER_CALLBACK_MEMBER(pdp1_state::dpy_callback)
 {
-	pdp1_pulse_iot_done(machine.device("maincpu"));
+	pdp1_pulse_iot_done(machine().device("maincpu"));
 }
 
 
@@ -1478,10 +1475,9 @@ static void parallel_drum_set_il(pdp1_state *state, int il)
 }
 
 #ifdef UNUSED_FUNCTION
-static TIMER_CALLBACK(il_timer_callback)
+TIMER_CALLBACK_MEMBER(pdp1_state::il_timer_callback)
 {
-	pdp1_state *state = machine.driver_data<pdp1_state>();
-	if (state->m_parallel_drum.dba)
+	if (m_parallel_drum.dba)
 	{
 		/* set break request and status bit 5 */
 		/* ... */
@@ -1493,7 +1489,7 @@ static void parallel_drum_init(pdp1_state *state)
 	state->m_parallel_drum.rotation_timer = machine.scheduler().timer_alloc();
 	state->m_parallel_drum.rotation_timer->adjust(PARALLEL_DRUM_ROTATION_TIME, 0, PARALLEL_DRUM_ROTATION_TIME);
 
-	state->m_parallel_drum.il_timer = machine.scheduler().timer_alloc(FUNC(il_timer_callback));
+	state->m_parallel_drum.il_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_state::il_timer_callback),this));
 	parallel_drum_set_il(0);
 }
 #endif

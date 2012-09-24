@@ -296,19 +296,18 @@ static void nc_update_interrupts(running_machine &machine)
 	}
 }
 
-static TIMER_CALLBACK(nc_keyboard_timer_callback)
+TIMER_CALLBACK_MEMBER(nc_state::nc_keyboard_timer_callback)
 {
-	nc_state *state = machine.driver_data<nc_state>();
 		LOG(("keyboard int\n"));
 
         /* set int */
-        state->m_irq_status |= (1<<3);
+        m_irq_status |= (1<<3);
 
         /* update ints */
-        nc_update_interrupts(machine);
+        nc_update_interrupts(machine());
 
         /* don't trigger again, but don't free it */
-        state->m_keyboard_timer->reset();
+        m_keyboard_timer->reset();
 }
 
 
@@ -539,7 +538,7 @@ static TIMER_DEVICE_CALLBACK(dummy_timer_callback)
 	state->m_previous_inputport_10_state = inputport_10_state;
 }
 
-static TIMER_CALLBACK(nc_serial_timer_callback);
+
 
 static void nc_common_init_machine(running_machine &machine)
 {
@@ -767,9 +766,9 @@ static const unsigned long baud_rate_table[]=
     19200
 };
 
-static TIMER_CALLBACK(nc_serial_timer_callback)
+TIMER_CALLBACK_MEMBER(nc_state::nc_serial_timer_callback)
 {
-	i8251_device *uart = machine.device<i8251_device>("uart");
+	i8251_device *uart = machine().device<i8251_device>("uart");
 
 	uart->transmit_clock();
 	uart->receive_clock();
@@ -952,11 +951,11 @@ void nc_state::machine_start()
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(nc100_machine_stop),&machine()));
 
 	/* keyboard timer */
-	m_keyboard_timer = machine().scheduler().timer_alloc(FUNC(nc_keyboard_timer_callback));
+	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_keyboard_timer_callback),this));
 	m_keyboard_timer->adjust(attotime::from_msec(10));
 
 	/* serial timer */
-	m_serial_timer = machine().scheduler().timer_alloc(FUNC(nc_serial_timer_callback));
+	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_serial_timer_callback),this));
 }
 
 
@@ -1342,11 +1341,11 @@ MACHINE_START_MEMBER(nc_state,nc200)
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(nc200_machine_stop),&machine()));
 
 	/* keyboard timer */
-	m_keyboard_timer = machine().scheduler().timer_alloc(FUNC(nc_keyboard_timer_callback));
+	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_keyboard_timer_callback),this));
 	m_keyboard_timer->adjust(attotime::from_msec(10));
 
 	/* serial timer */
-	m_serial_timer = machine().scheduler().timer_alloc(FUNC(nc_serial_timer_callback));
+	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_serial_timer_callback),this));
 }
 
 /*

@@ -41,15 +41,15 @@ static void lviv_update_memory (running_machine &machine)
 	}
 }
 
-static TIMER_CALLBACK( lviv_reset )
+TIMER_CALLBACK_MEMBER(lviv_state::lviv_reset)
 {
-	machine.schedule_soft_reset();
+	machine().schedule_soft_reset();
 }
 
 DIRECT_UPDATE_MEMBER(lviv_state::lviv_directoverride)
 {
 	if (ioport("RESET")->read() & 0x01)
-		machine().scheduler().timer_set(attotime::from_usec(10), FUNC(lviv_reset));
+		machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(lviv_state::lviv_reset),this));
 	return address;
 }
 

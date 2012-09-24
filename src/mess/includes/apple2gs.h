@@ -142,6 +142,9 @@ public:
 	DECLARE_MACHINE_START(apple2gsr1);
 	DECLARE_MACHINE_START(apple2gscommon);
 	UINT32 screen_update_apple2gs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(apple2gs_clock_tick);
+	TIMER_CALLBACK_MEMBER(apple2gs_qsecond_tick);
+	TIMER_CALLBACK_MEMBER(apple2gs_scanline_tick);
 };
 
 

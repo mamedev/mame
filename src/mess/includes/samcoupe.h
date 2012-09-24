@@ -83,6 +83,9 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	INTERRUPT_GEN_MEMBER(samcoupe_frame_interrupt);
+	TIMER_CALLBACK_MEMBER(irq_off);
+	TIMER_CALLBACK_MEMBER(samcoupe_mouse_reset);
+	TIMER_CALLBACK_MEMBER(sam_video_update_callback);
 };
 
 

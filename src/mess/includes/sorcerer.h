@@ -86,6 +86,9 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_MACHINE_START(sorcererd);
+	TIMER_CALLBACK_MEMBER(sorcerer_serial_tc);
+	TIMER_CALLBACK_MEMBER(sorcerer_cassette_tc);
+	TIMER_CALLBACK_MEMBER(sorcerer_reset);
 };
 
 

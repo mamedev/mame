@@ -140,6 +140,10 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void palette_init();
+	TIMER_CALLBACK_MEMBER(lynx_blitter_timer);
+	TIMER_CALLBACK_MEMBER(lynx_timer_shot);
+	TIMER_CALLBACK_MEMBER(lynx_uart_loopback_timer);
+	TIMER_CALLBACK_MEMBER(lynx_uart_timer);
 };
 
 

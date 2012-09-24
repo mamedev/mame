@@ -291,9 +291,9 @@ const struct pic8259_interface ibm5150_pic8259_config =
 
 static emu_timer	*pc_int_delay_timer;
 
-static TIMER_CALLBACK( pcjr_delayed_pic8259_irq )
+TIMER_CALLBACK_MEMBER(pc_state::pcjr_delayed_pic8259_irq)
 {
-    machine.firstcpu->set_input_line(0, param ? ASSERT_LINE : CLEAR_LINE);
+    machine().firstcpu->set_input_line(0, param ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pcjr_pic8259_set_int_line )
@@ -594,7 +594,7 @@ READ8_MEMBER(pc_state::pcjr_nmi_enable_r)
 }
 
 
-static TIMER_CALLBACK( pcjr_keyb_signal_callback )
+TIMER_CALLBACK_MEMBER(pc_state::pcjr_keyb_signal_callback)
 {
 	pcjr_keyb.raw_keyb_data = pcjr_keyb.raw_keyb_data >> 1;
 	pcjr_keyb.signal_count--;
@@ -922,25 +922,24 @@ static struct {
 
 /* check if any keys are pressed, raise IRQ1 if so */
 
-static TIMER_CALLBACK( mc1502_keyb_signal_callback )
+TIMER_CALLBACK_MEMBER(pc_state::mc1502_keyb_signal_callback)
 {
-	pc_state *st = machine.driver_data<pc_state>();
 	UINT8 key = 0;
 
-	key |= machine.root_device().ioport("Y1")->read();
-	key |= machine.root_device().ioport("Y2")->read();
-	key |= machine.root_device().ioport("Y3")->read();
-	key |= machine.root_device().ioport("Y4")->read();
-	key |= machine.root_device().ioport("Y5")->read();
-	key |= machine.root_device().ioport("Y6")->read();
-	key |= machine.root_device().ioport("Y7")->read();
-	key |= machine.root_device().ioport("Y8")->read();
-	key |= machine.root_device().ioport("Y9")->read();
-	key |= machine.root_device().ioport("Y10")->read();
-	key |= machine.root_device().ioport("Y11")->read();
-	key |= machine.root_device().ioport("Y12")->read();
-	DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, mc1502_keyb.pulsing,
-		(key || mc1502_keyb.pulsing) ? " will IRQ" : ""));
+	key |= machine().root_device().ioport("Y1")->read();
+	key |= machine().root_device().ioport("Y2")->read();
+	key |= machine().root_device().ioport("Y3")->read();
+	key |= machine().root_device().ioport("Y4")->read();
+	key |= machine().root_device().ioport("Y5")->read();
+	key |= machine().root_device().ioport("Y6")->read();
+	key |= machine().root_device().ioport("Y7")->read();
+	key |= machine().root_device().ioport("Y8")->read();
+	key |= machine().root_device().ioport("Y9")->read();
+	key |= machine().root_device().ioport("Y10")->read();
+	key |= machine().root_device().ioport("Y11")->read();
+	key |= machine().root_device().ioport("Y12")->read();
+//	DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, mc1502_keyb.pulsing,
+//		(key || mc1502_keyb.pulsing) ? " will IRQ" : ""));
 
 	/*
        If a key is pressed and we're not pulsing yet, start pulsing the IRQ1;
@@ -954,7 +953,7 @@ static TIMER_CALLBACK( mc1502_keyb_signal_callback )
 	}
 
 	if (mc1502_keyb.pulsing) {
-		pic8259_ir1_w(st->m_pic8259, (mc1502_keyb.pulsing & 1));
+		pic8259_ir1_w(m_pic8259, (mc1502_keyb.pulsing & 1));
 		mc1502_keyb.pulsing--;
 	}
 }
@@ -1486,7 +1485,7 @@ MACHINE_START_MEMBER(pc_state,mc1502)
      */
 	pic8259_ir1_w(m_pic8259, 1);
 	memset(&mc1502_keyb, 0, sizeof(mc1502_keyb));
-	mc1502_keyb.keyb_signal_timer = machine().scheduler().timer_alloc(FUNC(mc1502_keyb_signal_callback));
+	mc1502_keyb.keyb_signal_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::mc1502_keyb_signal_callback),this));
 	mc1502_keyb.keyb_signal_timer->adjust( attotime::from_msec(20), 0, attotime::from_msec(20) );
 }
 
@@ -1494,8 +1493,8 @@ MACHINE_START_MEMBER(pc_state,mc1502)
 MACHINE_START_MEMBER(pc_state,pcjr)
 {
 	pc_fdc_init( machine(), &pcjr_fdc_interface_nc );
-	pcjr_keyb.keyb_signal_timer = machine().scheduler().timer_alloc(FUNC(pcjr_keyb_signal_callback));
-	pc_int_delay_timer = machine().scheduler().timer_alloc(FUNC(pcjr_delayed_pic8259_irq));
+	pcjr_keyb.keyb_signal_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pcjr_keyb_signal_callback),this));
+	pc_int_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pcjr_delayed_pic8259_irq),this));
 	m_maincpu = machine().device<cpu_device>("maincpu" );
 	m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);
 
@@ -1679,7 +1678,7 @@ static struct {
 	emu_timer *timer;
 } pc_rtc;
 
-static TIMER_CALLBACK(pc_rtc_timer)
+TIMER_CALLBACK_MEMBER(pc_state::pc_rtc_timer)
 {
 	int year;
 	if (++pc_rtc.data[2]>=60) {
@@ -1704,8 +1703,9 @@ static TIMER_CALLBACK(pc_rtc_timer)
 
 void pc_rtc_init(running_machine &machine)
 {
+	pc_state *state = machine.driver_data<pc_state>();
 	memset(&pc_rtc,0,sizeof(pc_rtc));
-	pc_rtc.timer = machine.scheduler().timer_alloc(FUNC(pc_rtc_timer));
+	pc_rtc.timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pc_rtc_timer),state));
 	pc_rtc.timer->adjust(attotime::zero, 0, attotime(1,0));
 }
 

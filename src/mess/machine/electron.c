@@ -41,75 +41,74 @@ void electron_state::electron_tape_stop()
 #define TAPE_LOW	0x00;
 #define TAPE_HIGH	0xFF;
 
-static TIMER_CALLBACK(electron_tape_timer_handler)
+TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
 {
-	electron_state *state = machine.driver_data<electron_state>();
-	if ( state->m_ula.cassette_motor_mode )
+	if ( m_ula.cassette_motor_mode )
 	{
 		double tap_val;
-		tap_val = cassette_device_image(machine)->input();
+		tap_val = cassette_device_image(machine())->input();
 		if ( tap_val < -0.5 )
 		{
-			state->m_ula.tape_value = ( state->m_ula.tape_value << 8 ) | TAPE_LOW;
-			state->m_ula.tape_steps++;
+			m_ula.tape_value = ( m_ula.tape_value << 8 ) | TAPE_LOW;
+			m_ula.tape_steps++;
 		}
 		else if ( tap_val > 0.5 )
 		{
-			state->m_ula.tape_value = ( state->m_ula.tape_value << 8 ) | TAPE_HIGH;
-			state->m_ula.tape_steps++;
+			m_ula.tape_value = ( m_ula.tape_value << 8 ) | TAPE_HIGH;
+			m_ula.tape_steps++;
 		}
 		else
 		{
-			state->m_ula.tape_steps = 0;
-			state->m_ula.bit_count = 0;
-			state->m_ula.high_tone_set = 0;
-			state->m_ula.tape_value = 0x80808080;
+			m_ula.tape_steps = 0;
+			m_ula.bit_count = 0;
+			m_ula.high_tone_set = 0;
+			m_ula.tape_value = 0x80808080;
 		}
-		if ( state->m_ula.tape_steps > 2 && ( state->m_ula.tape_value == 0x0000FFFF || state->m_ula.tape_value == 0x00FF00FF ) )
+		if ( m_ula.tape_steps > 2 && ( m_ula.tape_value == 0x0000FFFF || m_ula.tape_value == 0x00FF00FF ) )
 		{
-			state->m_ula.tape_steps = 0;
-			switch( state->m_ula.bit_count )
+			m_ula.tape_steps = 0;
+			switch( m_ula.bit_count )
 			{
 			case 0:	/* start bit */
-				state->m_ula.start_bit = ( ( state->m_ula.tape_value == 0x0000FFFF ) ? 0 : 1 );
-				//logerror( "++ Read start bit: %d\n", state->m_ula.start_bit );
-				if ( state->m_ula.start_bit )
+				m_ula.start_bit = ( ( m_ula.tape_value == 0x0000FFFF ) ? 0 : 1 );
+				//logerror( "++ Read start bit: %d\n", m_ula.start_bit );
+				if ( m_ula.start_bit )
 				{
-					if ( state->m_ula.high_tone_set )
+					if ( m_ula.high_tone_set )
 					{
-						state->m_ula.bit_count--;
+						m_ula.bit_count--;
 					}
 				}
 				else
 				{
-					state->m_ula.high_tone_set = 0;
+					m_ula.high_tone_set = 0;
 				}
 				break;
 			case 1: case 2: case 3: case 4:
 			case 5: case 6: case 7: case 8:
-				//logerror( "++ Read regular bit: %d\n", state->m_ula.tape_value == 0x0000FFFF ? 0 : 1 );
-				state->m_ula.tape_byte = ( state->m_ula.tape_byte >> 1 ) | ( state->m_ula.tape_value == 0x0000FFFF ? 0 : 0x80 );
+				//logerror( "++ Read regular bit: %d\n", m_ula.tape_value == 0x0000FFFF ? 0 : 1 );
+				m_ula.tape_byte = ( m_ula.tape_byte >> 1 ) | ( m_ula.tape_value == 0x0000FFFF ? 0 : 0x80 );
 				break;
 			case 9: /* stop bit */
-				state->m_ula.stop_bit = ( ( state->m_ula.tape_value == 0x0000FFFF ) ? 0 : 1 );
-				//logerror( "++ Read stop bit: %d\n", state->m_ula.stop_bit );
-				if ( state->m_ula.start_bit && state->m_ula.stop_bit && state->m_ula.tape_byte == 0xFF && ! state->m_ula.high_tone_set )
+				m_ula.stop_bit = ( ( m_ula.tape_value == 0x0000FFFF ) ? 0 : 1 );
+				//logerror( "++ Read stop bit: %d\n", m_ula.stop_bit );
+				if ( m_ula.start_bit && m_ula.stop_bit && m_ula.tape_byte == 0xFF && ! m_ula.high_tone_set )
 				{
-					electron_interrupt_handler( machine, INT_SET, INT_HIGH_TONE );
-					state->m_ula.high_tone_set = 1;
+					electron_interrupt_handler( machine(), INT_SET, INT_HIGH_TONE );
+					m_ula.high_tone_set = 1;
 				}
-				else if ( ! state->m_ula.start_bit && state->m_ula.stop_bit )
+				else if ( ! m_ula.start_bit && m_ula.stop_bit )
 				{
-					//logerror( "-- Byte read from tape: %02x\n", state->m_ula.tape_byte );
-					electron_interrupt_handler( machine, INT_SET, INT_RECEIVE_FULL );
+					//logerror( "-- Byte read from tape: %02x\n", m_ula.tape_byte );
+					electron_interrupt_handler( machine(), INT_SET, INT_RECEIVE_FULL );
 				}
 				else
 				{
-					logerror( "Invalid start/stop bit combination detected: %d,%d\n", state->m_ula.start_bit, state->m_ula.stop_bit );
+					logerror( "Invalid start/stop bit combination detected: %d,%d\n", m_ula.start_bit, m_ula.stop_bit );
 				}
 				break;
 			}
-			state->m_ula.bit_count = ( state->m_ula.bit_count + 1 ) % 10;
+			m_ula.bit_count = ( m_ula.bit_count + 1 ) % 10;
 		}
 	}
 }
@@ -315,9 +314,9 @@ void electron_interrupt_handler(running_machine &machine, int mode, int interrup
    Machine Initialisation functions
 ***************************************/
 
-static TIMER_CALLBACK(setup_beep)
+TIMER_CALLBACK_MEMBER(electron_state::setup_beep)
 {
-	device_t *speaker = machine.device(BEEPER_TAG);
+	device_t *speaker = machine().device(BEEPER_TAG);
 	beep_set_state( speaker, 0 );
 	beep_set_frequency( speaker, 300 );
 }
@@ -346,8 +345,8 @@ void electron_state::machine_start()
 
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0x00;
-	machine().scheduler().timer_set(attotime::zero, FUNC(setup_beep));
-	m_tape_timer = machine().scheduler().timer_alloc(FUNC(electron_tape_timer_handler));
+	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(electron_state::setup_beep),this));
+	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(electron_state::electron_tape_timer_handler),this));
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(electron_reset),&machine()));
 }
 

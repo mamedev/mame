@@ -108,11 +108,10 @@ static void x68k_crtc_text_copy(x68k_state *state, int src, int dest)
 
 }
 
-static TIMER_CALLBACK(x68k_crtc_operation_end)
+TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_operation_end)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
 	int bit = param;
-	state->m_crtc.operation &= ~bit;
+	m_crtc.operation &= ~bit;
 }
 
 static void x68k_crtc_refresh_mode(running_machine &machine)
@@ -174,67 +173,66 @@ static void x68k_crtc_refresh_mode(running_machine &machine)
 	machine.primary_screen->configure(scr.max_x,scr.max_y,visiblescr,HZ_TO_ATTOSECONDS(55.45));
 }
 
-TIMER_CALLBACK(x68k_hsync)
+TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
 	int hstate = param;
 	attotime hsync_time;
 
-	state->m_crtc.hblank = hstate;
-	state->m_mfpdev->i7_w(!state->m_crtc.hblank);
-	if(state->m_crtc.vmultiple == 2) // 256-line (doublescan)
+	m_crtc.hblank = hstate;
+	m_mfpdev->i7_w(!m_crtc.hblank);
+	if(m_crtc.vmultiple == 2) // 256-line (doublescan)
 	{
 		if(hstate == 1)
 		{
-			if(state->m_oddscanline == 1)
+			if(m_oddscanline == 1)
 			{
-				int scan = machine.primary_screen->vpos();
-				if(scan > state->m_crtc.vend)
-					scan = state->m_crtc.vbegin;
-				hsync_time = machine.primary_screen->time_until_pos(scan,(state->m_crtc.htotal + state->m_crtc.hend) / 2);
-				state->m_scanline_timer->adjust(hsync_time);
+				int scan = machine().primary_screen->vpos();
+				if(scan > m_crtc.vend)
+					scan = m_crtc.vbegin;
+				hsync_time = machine().primary_screen->time_until_pos(scan,(m_crtc.htotal + m_crtc.hend) / 2);
+				m_scanline_timer->adjust(hsync_time);
 				if(scan != 0)
 				{
-					if((machine.root_device().ioport("options")->read() & 0x04))
+					if((machine().root_device().ioport("options")->read() & 0x04))
 					{
-						machine.primary_screen->update_partial(scan);
+						machine().primary_screen->update_partial(scan);
 					}
 				}
 			}
 			else
 			{
-				int scan = machine.primary_screen->vpos();
-				if(scan > state->m_crtc.vend)
-					scan = state->m_crtc.vbegin;
-				hsync_time = machine.primary_screen->time_until_pos(scan,state->m_crtc.hend / 2);
-				state->m_scanline_timer->adjust(hsync_time);
+				int scan = machine().primary_screen->vpos();
+				if(scan > m_crtc.vend)
+					scan = m_crtc.vbegin;
+				hsync_time = machine().primary_screen->time_until_pos(scan,m_crtc.hend / 2);
+				m_scanline_timer->adjust(hsync_time);
 				if(scan != 0)
 				{
-					if((machine.root_device().ioport("options")->read() & 0x04))
+					if((machine().root_device().ioport("options")->read() & 0x04))
 					{
-						machine.primary_screen->update_partial(scan);
+						machine().primary_screen->update_partial(scan);
 					}
 				}
 			}
 		}
 		if(hstate == 0)
 		{
-			if(state->m_oddscanline == 1)
+			if(m_oddscanline == 1)
 			{
-				int scan = machine.primary_screen->vpos();
-				if(scan > state->m_crtc.vend)
-					scan = state->m_crtc.vbegin;
+				int scan = machine().primary_screen->vpos();
+				if(scan > m_crtc.vend)
+					scan = m_crtc.vbegin;
 				else
 					scan++;
-				hsync_time = machine.primary_screen->time_until_pos(scan,state->m_crtc.hbegin / 2);
-				state->m_scanline_timer->adjust(hsync_time, 1);
-				state->m_oddscanline = 0;
+				hsync_time = machine().primary_screen->time_until_pos(scan,m_crtc.hbegin / 2);
+				m_scanline_timer->adjust(hsync_time, 1);
+				m_oddscanline = 0;
 			}
 			else
 			{
-				hsync_time = machine.primary_screen->time_until_pos(machine.primary_screen->vpos(),(state->m_crtc.htotal + state->m_crtc.hbegin) / 2);
-				state->m_scanline_timer->adjust(hsync_time, 1);
-				state->m_oddscanline = 1;
+				hsync_time = machine().primary_screen->time_until_pos(machine().primary_screen->vpos(),(m_crtc.htotal + m_crtc.hbegin) / 2);
+				m_scanline_timer->adjust(hsync_time, 1);
+				m_oddscanline = 1;
 			}
 		}
 	}
@@ -242,88 +240,85 @@ TIMER_CALLBACK(x68k_hsync)
 	{
 		if(hstate == 1)
 		{
-			int scan = machine.primary_screen->vpos();
-			if(scan > state->m_crtc.vend)
+			int scan = machine().primary_screen->vpos();
+			if(scan > m_crtc.vend)
 				scan = 0;
-			hsync_time = machine.primary_screen->time_until_pos(scan,state->m_crtc.hend);
-			state->m_scanline_timer->adjust(hsync_time);
+			hsync_time = machine().primary_screen->time_until_pos(scan,m_crtc.hend);
+			m_scanline_timer->adjust(hsync_time);
 			if(scan != 0)
 			{
-				if((machine.root_device().ioport("options")->read() & 0x04))
+				if((machine().root_device().ioport("options")->read() & 0x04))
 				{
-					machine.primary_screen->update_partial(scan);
+					machine().primary_screen->update_partial(scan);
 				}
 			}
 		}
 		if(hstate == 0)
 		{
-			hsync_time = machine.primary_screen->time_until_pos(machine.primary_screen->vpos()+1,state->m_crtc.hbegin);
-			state->m_scanline_timer->adjust(hsync_time, 1);
-	//      if(!(state->m_mfp.gpio & 0x40))  // if GPIP6 is active, clear it
-	//          state->m_mfp.gpio |= 0x40;
+			hsync_time = machine().primary_screen->time_until_pos(machine().primary_screen->vpos()+1,m_crtc.hbegin);
+			m_scanline_timer->adjust(hsync_time, 1);
+	//      if(!(m_mfp.gpio & 0x40))  // if GPIP6 is active, clear it
+	//          m_mfp.gpio |= 0x40;
 		}
 	}
 }
 
-static TIMER_CALLBACK(x68k_crtc_raster_end)
+TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_raster_end)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-	state->m_mfp.gpio |= 0x40;
-	state->m_mfpdev->i6_w(1);
+	m_mfp.gpio |= 0x40;
+	m_mfpdev->i6_w(1);
 }
 
-TIMER_CALLBACK(x68k_crtc_raster_irq)
+TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_raster_irq)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
 	int scan = param;
 	attotime irq_time;
 	attotime end_time;
 
-	if(scan <= state->m_crtc.vtotal)
+	if(scan <= m_crtc.vtotal)
 	{
-		state->m_mfp.gpio &= ~0x40;  // GPIP6
-		state->m_mfpdev->i6_w(0);
-		machine.primary_screen->update_partial(scan);
-		irq_time = machine.primary_screen->time_until_pos(scan,state->m_crtc.hbegin);
+		m_mfp.gpio &= ~0x40;  // GPIP6
+		m_mfpdev->i6_w(0);
+		machine().primary_screen->update_partial(scan);
+		irq_time = machine().primary_screen->time_until_pos(scan,m_crtc.hbegin);
 		// end of HBlank period clears GPIP6 also?
-		end_time = machine.primary_screen->time_until_pos(scan,state->m_crtc.hend);
-		state->m_raster_irq->adjust(irq_time, scan);
-		machine.scheduler().timer_set(end_time, FUNC(x68k_crtc_raster_end));
-		logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,machine.primary_screen->vpos());
+		end_time = machine().primary_screen->time_until_pos(scan,m_crtc.hend);
+		m_raster_irq->adjust(irq_time, scan);
+		machine().scheduler().timer_set(end_time, timer_expired_delegate(FUNC(x68k_state::x68k_crtc_raster_end),this));
+		logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,machine().primary_screen->vpos());
 	}
 }
 
-TIMER_CALLBACK(x68k_crtc_vblank_irq)
+TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_vblank_irq)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-	device_t *x68k_mfp = machine.device(MC68901_TAG);
+	device_t *x68k_mfp = machine().device(MC68901_TAG);
 	int val = param;
 	attotime irq_time;
 	int vblank_line;
 
 	if(val == 1)  // V-DISP on
 	{
-		state->m_crtc.vblank = 1;
-		vblank_line = state->m_crtc.vbegin;
-		irq_time = machine.primary_screen->time_until_pos(vblank_line,2);
-		state->m_vblank_irq->adjust(irq_time);
+		m_crtc.vblank = 1;
+		vblank_line = m_crtc.vbegin;
+		irq_time = machine().primary_screen->time_until_pos(vblank_line,2);
+		m_vblank_irq->adjust(irq_time);
 		logerror("CRTC: VBlank on\n");
 	}
 	if(val == 0)  // V-DISP off
 	{
-		state->m_crtc.vblank = 0;
-		vblank_line = state->m_crtc.vend;
-		if(vblank_line > state->m_crtc.vtotal)
-			vblank_line = state->m_crtc.vtotal;
-		irq_time = machine.primary_screen->time_until_pos(vblank_line,2);
-		state->m_vblank_irq->adjust(irq_time, 1);
+		m_crtc.vblank = 0;
+		vblank_line = m_crtc.vend;
+		if(vblank_line > m_crtc.vtotal)
+			vblank_line = m_crtc.vtotal;
+		irq_time = machine().primary_screen->time_until_pos(vblank_line,2);
+		m_vblank_irq->adjust(irq_time, 1);
 		logerror("CRTC: VBlank off\n");
 	}
 
 	if (x68k_mfp != NULL)
 	{
-		state->m_mfpdev->tai_w(!state->m_crtc.vblank);
-		state->m_mfpdev->i4_w(!state->m_crtc.vblank);
+		m_mfpdev->tai_w(!m_crtc.vblank);
+		m_mfpdev->i4_w(!m_crtc.vblank);
 	}
 }
 
@@ -449,7 +444,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 		if(data & 0x08)  // text screen raster copy
 		{
 			x68k_crtc_text_copy(state, (state->m_crtc.reg[22] & 0xff00) >> 8,(state->m_crtc.reg[22] & 0x00ff));
-			space.machine().scheduler().timer_set(attotime::from_msec(1), FUNC(x68k_crtc_operation_end), 0x02);  // time taken to do operation is a complete guess.
+			space.machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(x68k_state::x68k_crtc_operation_end),state), 0x02);  // time taken to do operation is a complete guess.
 		}
 		if(data & 0x02)  // high-speed graphic screen clear
 		{
@@ -457,7 +452,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 				memset(state->m_gvram32,0,0x40000);
 			else
 				memset(state->m_gvram16,0,0x40000);
-			space.machine().scheduler().timer_set(attotime::from_msec(10), FUNC(x68k_crtc_operation_end), 0x02);  // time taken to do operation is a complete guess.
+			space.machine().scheduler().timer_set(attotime::from_msec(10), timer_expired_delegate(FUNC(x68k_state::x68k_crtc_operation_end),state), 0x02);  // time taken to do operation is a complete guess.
 		}
 		break;
 	}

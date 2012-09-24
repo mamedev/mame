@@ -57,6 +57,7 @@ public:
 	required_device<cassette_image_device> m_cass1;
 	required_device<cassette_image_device> m_cass2;
 	virtual void machine_start();
+	TIMER_CALLBACK_MEMBER(aim65_printer_timer);
 };
 
 

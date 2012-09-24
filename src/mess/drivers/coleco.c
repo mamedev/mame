@@ -176,43 +176,40 @@ static WRITE_LINE_DEVICE_HANDLER(coleco_vdp_interrupt)
 	drvstate->m_last_nmi_state = state;
 }
 
-static TIMER_CALLBACK( paddle_d7reset_callback )
+TIMER_CALLBACK_MEMBER(coleco_state::paddle_d7reset_callback)
 {
-	coleco_state *state = machine.driver_data<coleco_state>();
 
-	state->m_joy_d7_state[param] = 0;
-	state->m_joy_analog_state[param] = 0;
+	m_joy_d7_state[param] = 0;
+	m_joy_analog_state[param] = 0;
 }
 
-static TIMER_CALLBACK( paddle_irqreset_callback )
+TIMER_CALLBACK_MEMBER(coleco_state::paddle_irqreset_callback)
 {
-	coleco_state *state = machine.driver_data<coleco_state>();
 
-	state->m_joy_irq_state[param] = 0;
+	m_joy_irq_state[param] = 0;
 
-	if (!state->m_joy_irq_state[param ^ 1])
-		state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	if (!m_joy_irq_state[param ^ 1])
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-static TIMER_CALLBACK( paddle_pulse_callback )
+TIMER_CALLBACK_MEMBER(coleco_state::paddle_pulse_callback)
 {
-	coleco_state *state = machine.driver_data<coleco_state>();
 
-	if (state->m_joy_analog_reload[param])
+	if (m_joy_analog_reload[param])
 	{
-		state->m_joy_analog_state[param] = state->m_joy_analog_reload[param];
+		m_joy_analog_state[param] = m_joy_analog_reload[param];
 
 		// on movement, controller port d7 is set for a short period and an irq is fired on d7 rising edge
-		state->m_joy_d7_state[param] = 0x80;
-		state->m_joy_d7_timer[param]->adjust(attotime::from_usec(500), param); // TODO: measure duration
+		m_joy_d7_state[param] = 0x80;
+		m_joy_d7_timer[param]->adjust(attotime::from_usec(500), param); // TODO: measure duration
 
 		// irq on rising edge, PULSE_LINE is not supported in this case, so clear it manually
-		state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		state->m_joy_irq_timer[param]->adjust(attotime::from_usec(11), param); // TODO: measure duration
-		state->m_joy_irq_state[param] = 1;
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_joy_irq_timer[param]->adjust(attotime::from_usec(11), param); // TODO: measure duration
+		m_joy_irq_state[param] = 1;
 
 		// reload timer
-		state->m_joy_pulse_timer[param]->adjust(state->m_joy_pulse_reload[param], param);
+		m_joy_pulse_timer[param]->adjust(m_joy_pulse_reload[param], param);
 	}
 }
 
@@ -264,9 +261,9 @@ void coleco_state::machine_start()
 	// init paddles
 	for (int port = 0; port < 2; port++)
 	{
-		m_joy_pulse_timer[port] = machine().scheduler().timer_alloc(FUNC(paddle_pulse_callback));
-		m_joy_d7_timer[port] = machine().scheduler().timer_alloc(FUNC(paddle_d7reset_callback));
-		m_joy_irq_timer[port] = machine().scheduler().timer_alloc(FUNC(paddle_irqreset_callback));
+		m_joy_pulse_timer[port] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(coleco_state::paddle_pulse_callback),this));
+		m_joy_d7_timer[port] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(coleco_state::paddle_d7reset_callback),this));
+		m_joy_irq_timer[port] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(coleco_state::paddle_irqreset_callback),this));
 
 		m_joy_irq_state[port] = 0;
 		m_joy_d7_state[port] = 0;

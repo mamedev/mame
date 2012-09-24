@@ -340,10 +340,10 @@ static const crt_interface tx0_crt_interface =
 */
 
 
-static TIMER_CALLBACK(reader_callback);
-static TIMER_CALLBACK(puncher_callback);
-static TIMER_CALLBACK(prt_callback);
-static TIMER_CALLBACK(dis_callback);
+
+
+
+
 
 
 
@@ -383,10 +383,10 @@ static void tx0_machine_stop(running_machine &machine)
 
 void tx0_state::machine_start()
 {
-	m_tape_reader.timer = machine().scheduler().timer_alloc(FUNC(reader_callback));
-	m_tape_puncher.timer = machine().scheduler().timer_alloc(FUNC(puncher_callback));
-	m_typewriter.prt_timer = machine().scheduler().timer_alloc(FUNC(prt_callback));
-	m_dis_timer = machine().scheduler().timer_alloc(FUNC(dis_callback));
+	m_tape_reader.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx0_state::reader_callback),this));
+	m_tape_puncher.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx0_state::puncher_callback),this));
+	m_typewriter.prt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx0_state::prt_callback),this));
+	m_dis_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx0_state::dis_callback),this));
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(tx0_machine_stop),&machine()));
 }
@@ -631,49 +631,48 @@ static void begin_tape_read(tx0_state *state, int binary)
 /*
     timer callback to simulate reader IO
 */
-static TIMER_CALLBACK(reader_callback)
+TIMER_CALLBACK_MEMBER(tx0_state::reader_callback)
 {
-	tx0_state *state = machine.driver_data<tx0_state>();
 	int not_ready;
 	UINT8 data;
 	int ac;
 
-	if (state->m_tape_reader.rc)
+	if (m_tape_reader.rc)
 	{
-		not_ready = tape_read(state, & data);
+		not_ready = tape_read(this, & data);
 		if (not_ready)
 		{
-			state->m_tape_reader.motor_on = 0;	/* let us stop the motor */
+			m_tape_reader.motor_on = 0;	/* let us stop the motor */
 		}
 		else
 		{
 			if (data & 0100)
 			{
 				/* read current AC */
-				ac = machine.device("maincpu")->state().state_int(TX0_AC);
+				ac = machine().device("maincpu")->state().state_int(TX0_AC);
 				/* cycle right */
 				ac = (ac >> 1) | ((ac & 1) << 17);
 				/* shuffle and insert data into AC */
 				ac = (ac /*& 0333333*/) | ((data & 001) << 17) | ((data & 002) << 13) | ((data & 004) << 9) | ((data & 010) << 5) | ((data & 020) << 1) | ((data & 040) >> 3);
 				/* write modified AC */
-				machine.device("maincpu")->state().set_state_int(TX0_AC, ac);
+				machine().device("maincpu")->state().set_state_int(TX0_AC, ac);
 
-				state->m_tape_reader.rc = (state->m_tape_reader.rc+1) & 3;
+				m_tape_reader.rc = (m_tape_reader.rc+1) & 3;
 
-				if (state->m_tape_reader.rc == 0)
+				if (m_tape_reader.rc == 0)
 				{	/* IO complete */
-					state->m_tape_reader.rcl = 0;
-					machine.device("maincpu")->state().set_state_int(TX0_IO_COMPLETE, (UINT64)0);
+					m_tape_reader.rcl = 0;
+					machine().device("maincpu")->state().set_state_int(TX0_IO_COMPLETE, (UINT64)0);
 				}
 			}
 		}
 	}
 
-	if (state->m_tape_reader.motor_on && state->m_tape_reader.rcl)
+	if (m_tape_reader.motor_on && m_tape_reader.rcl)
 		/* delay is approximately 1/400s */
-		state->m_tape_reader.timer->adjust(attotime::from_usec(2500));
+		m_tape_reader.timer->adjust(attotime::from_usec(2500));
 	else
-		state->m_tape_reader.timer->enable(0);
+		m_tape_reader.timer->enable(0);
 }
 
 /*
@@ -697,9 +696,9 @@ void tx0_punchtape_image_device::call_unload()
 	state->m_tape_puncher.fd = NULL;
 }
 
-static TIMER_CALLBACK(puncher_callback)
+TIMER_CALLBACK_MEMBER(tx0_state::puncher_callback)
 {
-	machine.device("maincpu")->state().set_state_int(TX0_IO_COMPLETE, (UINT64)0);
+	machine().device("maincpu")->state().set_state_int(TX0_IO_COMPLETE, (UINT64)0);
 }
 
 /*
@@ -792,9 +791,9 @@ static void typewriter_out(running_machine &machine, UINT8 data)
 /*
     timer callback to generate typewriter completion pulse
 */
-static TIMER_CALLBACK(prt_callback)
+TIMER_CALLBACK_MEMBER(tx0_state::prt_callback)
 {
-	machine.device("maincpu")->state().set_state_int(TX0_IO_COMPLETE, (UINT64)0);
+	machine().device("maincpu")->state().set_state_int(TX0_IO_COMPLETE, (UINT64)0);
 }
 
 /*
@@ -819,9 +818,9 @@ static void tx0_io_prt(device_t *device)
 /*
     timer callback to generate crt completion pulse
 */
-static TIMER_CALLBACK(dis_callback)
+TIMER_CALLBACK_MEMBER(tx0_state::dis_callback)
 {
-	machine.device("maincpu")->state().set_state_int(TX0_IO_COMPLETE, (UINT64)0);
+	machine().device("maincpu")->state().set_state_int(TX0_IO_COMPLETE, (UINT64)0);
 }
 
 /*

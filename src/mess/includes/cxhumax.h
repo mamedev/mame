@@ -152,6 +152,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_cxhumax(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(timer_tick);
 };
 
 #define INTDEST			0	// Interrupt destination (1=IRQ, 0=FIQ)

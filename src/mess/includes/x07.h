@@ -260,4 +260,9 @@ public:
 	UINT8 m_prn_buffer[0x100];
 	UINT8 m_prn_size;
 	virtual void palette_init();
+	TIMER_CALLBACK_MEMBER(cassette_tick);
+	TIMER_CALLBACK_MEMBER(cassette_poll);
+	TIMER_CALLBACK_MEMBER(rsta_clear);
+	TIMER_CALLBACK_MEMBER(rstb_clear);
+	TIMER_CALLBACK_MEMBER(beep_stop);
 };

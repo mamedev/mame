@@ -34,9 +34,9 @@ static void dai_update_memory(running_machine &machine, int dai_rom_bank)
 	state->membank("bank2")->set_entry(dai_rom_bank);
 }
 
-static TIMER_CALLBACK(dai_bootstrap_callback)
+TIMER_CALLBACK_MEMBER(dai_state::dai_bootstrap_callback)
 {
-	machine.device("maincpu")->state().set_pc(0xc000);
+	machine().device("maincpu")->state().set_pc(0xc000);
 }
 
 
@@ -105,18 +105,17 @@ const struct pit8253_config dai_pit8253_intf =
 	}
 };
 
-static TIMER_CALLBACK( dai_timer )
+TIMER_CALLBACK_MEMBER(dai_state::dai_timer)
 {
-	dai_state *state = machine.driver_data<dai_state>();
-	state->m_tms5501->set_pio_bit_7((state->ioport("IN8")->read() & 0x04) ? 1:0);
+	m_tms5501->set_pio_bit_7((ioport("IN8")->read() & 0x04) ? 1:0);
 }
 
 void dai_state::machine_start()
 {
 
 	membank("bank2")->configure_entries(0, 4, memregion("maincpu")->base() + 0x010000, 0x1000);
-	machine().scheduler().timer_set(attotime::zero, FUNC(dai_bootstrap_callback));
-	machine().scheduler().timer_pulse(attotime::from_hz(100), FUNC(dai_timer));	/* timer for tms5501 */
+	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(dai_state::dai_bootstrap_callback),this));
+	machine().scheduler().timer_pulse(attotime::from_hz(100), timer_expired_delegate(FUNC(dai_state::dai_timer),this));	/* timer for tms5501 */
 
 	memset(machine().device<ram_device>(RAM_TAG)->pointer(), 0, machine().device<ram_device>(RAM_TAG)->size());
 }

@@ -240,6 +240,11 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void palette_init();
+	TIMER_CALLBACK_MEMBER(dma_complete);
+	TIMER_CALLBACK_MEMBER(timer_expire);
+	TIMER_CALLBACK_MEMBER(handle_irq);
+	TIMER_CALLBACK_MEMBER(perform_hbl);
+	TIMER_CALLBACK_MEMBER(perform_scan);
 };
 
 /*----------- defined in video/gba.c -----------*/

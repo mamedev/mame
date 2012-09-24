@@ -244,6 +244,8 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	INTERRUPT_GEN_MEMBER(gamecom_interrupt);
+	TIMER_CALLBACK_MEMBER(gamecom_clock_timer_callback);
+	TIMER_CALLBACK_MEMBER(gamecom_scanline);
 };
 
 

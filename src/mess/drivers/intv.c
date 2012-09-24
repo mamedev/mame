@@ -796,15 +796,15 @@ ADDRESS_MAP_END
 /* This is needed because MAME core does not allow PULSE_LINE.
     The time interval is not critical, although it should be below 1000. */
 
-static TIMER_CALLBACK(intv_interrupt2_complete)
+TIMER_CALLBACK_MEMBER(intv_state::intv_interrupt2_complete)
 {
-	machine.device("keyboard")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("keyboard")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt2)
 {
 	machine().device("keyboard")->execute().set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(machine().device<cpu_device>("keyboard")->cycles_to_attotime(100), FUNC(intv_interrupt2_complete));
+	machine().scheduler().timer_set(machine().device<cpu_device>("keyboard")->cycles_to_attotime(100), timer_expired_delegate(FUNC(intv_state::intv_interrupt2_complete),this));
 }
 
 static MACHINE_CONFIG_START( intv, intv_state )

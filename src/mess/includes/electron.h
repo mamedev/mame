@@ -75,6 +75,9 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_electron(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(electron_tape_timer_handler);
+	TIMER_CALLBACK_MEMBER(setup_beep);
+	TIMER_CALLBACK_MEMBER(electron_scanline_interrupt);
 };
 
 

@@ -40,6 +40,7 @@ public:
 	virtual void machine_reset();
 	DECLARE_VIDEO_START(pecom);
 	DECLARE_INPUT_CHANGED_MEMBER(ef_w);
+	TIMER_CALLBACK_MEMBER(reset_tick);
 };
 
 /*----------- defined in machine/pecom.c -----------*/

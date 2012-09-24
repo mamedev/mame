@@ -94,10 +94,9 @@ WRITE8_MEMBER(fm7_state::fm7_vram_access_w)
 	m_video.vram_access = 0;
 }
 
-static TIMER_CALLBACK( fm77av_alu_task_end )
+TIMER_CALLBACK_MEMBER(fm7_state::fm77av_alu_task_end)
 {
-	fm7_state *state = machine.driver_data<fm7_state>();
-	state->m_alu.busy = 0;
+	m_alu.busy = 0;
 }
 
 static void fm7_alu_mask_write(fm7_state *state, UINT32 offset, int bank, UINT8 dat)
@@ -628,7 +627,7 @@ static void fm77av_line_draw(running_machine &machine)
 
 	// set timer to disable busy flag
 	// 1/16 us for each byte changed
-	machine.scheduler().timer_set(attotime::from_usec(byte_count/16), FUNC(fm77av_alu_task_end));
+	machine.scheduler().timer_set(attotime::from_usec(byte_count/16), timer_expired_delegate(FUNC(fm7_state::fm77av_alu_task_end),state));
 }
 
 READ8_MEMBER(fm7_state::fm7_vram_r)
@@ -1350,18 +1349,17 @@ WRITE8_MEMBER(fm7_state::fm77av_alu_w)
 	}
 }
 
-TIMER_CALLBACK( fm77av_vsync )
+TIMER_CALLBACK_MEMBER(fm7_state::fm77av_vsync)
 {
-	fm7_state *state = machine.driver_data<fm7_state>();
 	if(param == 0)  // start of vsync
 	{
-		state->m_video.vsync_flag = 1;
-		state->m_fm77av_vsync_timer->adjust(attotime::from_usec(510),1);  // VSync length for 200 line modes = 0.51ms
+		m_video.vsync_flag = 1;
+		m_fm77av_vsync_timer->adjust(attotime::from_usec(510),1);  // VSync length for 200 line modes = 0.51ms
 	}
 	else
 	{
-		state->m_video.vsync_flag = 0;
-		state->m_fm77av_vsync_timer->adjust(machine.primary_screen->time_until_vblank_end());
+		m_video.vsync_flag = 0;
+		m_fm77av_vsync_timer->adjust(machine().primary_screen->time_until_vblank_end());
 	}
 }
 

@@ -5,12 +5,12 @@
 
 static const int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };
 
-static TIMER_CALLBACK(gamecom_clock_timer_callback)
+TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_clock_timer_callback)
 {
-	UINT8 * RAM = machine.root_device().memregion("maincpu")->base();
+	UINT8 * RAM = machine().root_device().memregion("maincpu")->base();
 	UINT8 val = ( ( RAM[SM8521_CLKT] & 0x3F ) + 1 ) & 0x3F;
 	RAM[SM8521_CLKT] = ( RAM[SM8521_CLKT] & 0xC0 ) | val;
-	machine.device("maincpu")->execute().set_input_line(CK_INT, ASSERT_LINE );
+	machine().device("maincpu")->execute().set_input_line(CK_INT, ASSERT_LINE );
 }
 
 void gamecom_state::machine_reset()
@@ -536,7 +536,7 @@ void gamecom_update_timers( device_t *device, int cycles )
 
 DRIVER_INIT_MEMBER(gamecom_state,gamecom)
 {
-	m_clock_timer = machine().scheduler().timer_alloc(FUNC(gamecom_clock_timer_callback));
+	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamecom_state::gamecom_clock_timer_callback),this));
 	m_p_ram = memregion("maincpu")->base(); // required here because pio_w gets called before machine_reset
 }
 

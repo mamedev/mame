@@ -101,6 +101,10 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_pcw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_pcw_printer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(pcw_timer_pulse);
+	TIMER_CALLBACK_MEMBER(pcw_stepper_callback);
+	TIMER_CALLBACK_MEMBER(pcw_pins_callback);
+	TIMER_CALLBACK_MEMBER(setup_beep);
 };
 
 #endif /* PCW_H_ */

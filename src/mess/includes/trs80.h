@@ -124,6 +124,7 @@ public:
 	UINT32 screen_update_meritum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(trs80_rtc_interrupt);
 	INTERRUPT_GEN_MEMBER(trs80_fdc_interrupt);
+	TIMER_CALLBACK_MEMBER(cassette_data_callback);
 };
 
 

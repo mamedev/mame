@@ -177,58 +177,57 @@ static void mfp_init(running_machine &machine)
 	state->m_mfp.current_irq = -1;  // No current interrupt
 
 #if 0
-    mfp_timer[0] = machine.scheduler().timer_alloc(FUNC(mfp_timer_a_callback));
-    mfp_timer[1] = machine.scheduler().timer_alloc(FUNC(mfp_timer_b_callback));
-    mfp_timer[2] = machine.scheduler().timer_alloc(FUNC(mfp_timer_c_callback));
-    mfp_timer[3] = machine.scheduler().timer_alloc(FUNC(mfp_timer_d_callback));
-    mfp_irq = machine.scheduler().timer_alloc(FUNC(mfp_update_irq));
+    mfp_timer[0] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_timer_a_callback),this));
+    mfp_timer[1] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_timer_b_callback),this));
+    mfp_timer[2] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_timer_c_callback),this));
+    mfp_timer[3] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_timer_d_callback),this));
+    mfp_irq = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_update_irq),this));
     mfp_irq->adjust(attotime::zero, 0, attotime::from_usec(32));
 #endif
 }
 
 #ifdef UNUSED_FUNCTION
-TIMER_CALLBACK(mfp_update_irq)
+TIMER_CALLBACK_MEMBER(x68k_state::mfp_update_irq)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
     int x;
 
-    if((state->m_ioc.irqstatus & 0xc0) != 0)
+    if((m_ioc.irqstatus & 0xc0) != 0)
         return;
 
     // check for pending IRQs, in priority order
-    if(state->m_mfp.ipra != 0)
+    if(m_mfp.ipra != 0)
     {
         for(x=7;x>=0;x--)
         {
-            if((state->m_mfp.ipra & (1 << x)) && (state->m_mfp.imra & (1 << x)))
+            if((m_mfp.ipra & (1 << x)) && (m_mfp.imra & (1 << x)))
             {
-                state->m_current_irq_line = state->m_mfp.irqline;
-                state->m_mfp.current_irq = x + 8;
+                m_current_irq_line = m_mfp.irqline;
+                m_mfp.current_irq = x + 8;
                 // assert IRQ line
-//              if(state->m_mfp.iera & (1 << x))
+//              if(m_mfp.iera & (1 << x))
                 {
-                    state->m_current_vector[6] = (state->m_mfp.vr & 0xf0) | (x+8);
-                    machine.device("maincpu")->execute().set_input_line_and_vector(state->m_mfp.irqline,ASSERT_LINE,(state->m_mfp.vr & 0xf0) | (x + 8));
-//                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(state->m_mfp.vr & 0xf0) | (x+8),state->m_mfp.irqline);
+                    m_current_vector[6] = (m_mfp.vr & 0xf0) | (x+8);
+                    machine().device("maincpu")->execute().set_input_line_and_vector(m_mfp.irqline,ASSERT_LINE,(m_mfp.vr & 0xf0) | (x + 8));
+//                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(m_mfp.vr & 0xf0) | (x+8),m_mfp.irqline);
                     return;  // one at a time only
                 }
             }
         }
     }
-    if(state->m_mfp.iprb != 0)
+    if(m_mfp.iprb != 0)
     {
         for(x=7;x>=0;x--)
         {
-            if((state->m_mfp.iprb & (1 << x)) && (state->m_mfp.imrb & (1 << x)))
+            if((m_mfp.iprb & (1 << x)) && (m_mfp.imrb & (1 << x)))
             {
-                state->m_current_irq_line = state->m_mfp.irqline;
-                state->m_mfp.current_irq = x;
+                m_current_irq_line = m_mfp.irqline;
+                m_mfp.current_irq = x;
                 // assert IRQ line
-//              if(state->m_mfp.ierb & (1 << x))
+//              if(m_mfp.ierb & (1 << x))
                 {
-                    state->m_current_vector[6] = (state->m_mfp.vr & 0xf0) | x;
-                    machine.device("maincpu")->execute().set_input_line_and_vector(state->m_mfp.irqline,ASSERT_LINE,(state->m_mfp.vr & 0xf0) | x);
-//                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(state->m_mfp.vr & 0xf0) | x,state->m_mfp.irqline);
+                    m_current_vector[6] = (m_mfp.vr & 0xf0) | x;
+                    machine().device("maincpu")->execute().set_input_line_and_vector(m_mfp.irqline,ASSERT_LINE,(m_mfp.vr & 0xf0) | x);
+//                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(m_mfp.vr & 0xf0) | x,m_mfp.irqline);
                     return;  // one at a time only
                 }
             }
@@ -262,46 +261,42 @@ void mfp_trigger_irq(running_machine &machine, int irq)
 
 }
 
-TIMER_CALLBACK(mfp_timer_a_callback)
+TIMER_CALLBACK_MEMBER(x68k_state::mfp_timer_a_callback)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-    state->m_mfp.timer[0].counter--;
-    if(state->m_mfp.timer[0].counter == 0)
+    m_mfp.timer[0].counter--;
+    if(m_mfp.timer[0].counter == 0)
     {
-        state->m_mfp.timer[0].counter = state->m_mfp.tadr;
+        m_mfp.timer[0].counter = m_mfp.tadr;
         mfp_trigger_irq(MFP_IRQ_TIMERA);
     }
 }
 
-TIMER_CALLBACK(mfp_timer_b_callback)
+TIMER_CALLBACK_MEMBER(x68k_state::mfp_timer_b_callback)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-    state->m_mfp.timer[1].counter--;
-    if(state->m_mfp.timer[1].counter == 0)
+    m_mfp.timer[1].counter--;
+    if(m_mfp.timer[1].counter == 0)
     {
-        state->m_mfp.timer[1].counter = state->m_mfp.tbdr;
+        m_mfp.timer[1].counter = m_mfp.tbdr;
             mfp_trigger_irq(MFP_IRQ_TIMERB);
     }
 }
 
-TIMER_CALLBACK(mfp_timer_c_callback)
+TIMER_CALLBACK_MEMBER(x68k_state::mfp_timer_c_callback)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-    state->m_mfp.timer[2].counter--;
-    if(state->m_mfp.timer[2].counter == 0)
+    m_mfp.timer[2].counter--;
+    if(m_mfp.timer[2].counter == 0)
     {
-        state->m_mfp.timer[2].counter = state->m_mfp.tcdr;
+        m_mfp.timer[2].counter = m_mfp.tcdr;
             mfp_trigger_irq(MFP_IRQ_TIMERC);
     }
 }
 
-TIMER_CALLBACK(mfp_timer_d_callback)
+TIMER_CALLBACK_MEMBER(x68k_state::mfp_timer_d_callback)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-    state->m_mfp.timer[3].counter--;
-    if(state->m_mfp.timer[3].counter == 0)
+    m_mfp.timer[3].counter--;
+    if(m_mfp.timer[3].counter == 0)
     {
-        state->m_mfp.timer[3].counter = state->m_mfp.tddr;
+        m_mfp.timer[3].counter = m_mfp.tddr;
             mfp_trigger_irq(MFP_IRQ_TIMERD);
     }
 }
@@ -322,18 +317,17 @@ void mfp_set_timer(int timer, unsigned char data)
 #endif
 
 // LED timer callback
-static TIMER_CALLBACK( x68k_led_callback )
+TIMER_CALLBACK_MEMBER(x68k_state::x68k_led_callback)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
 	int drive;
-	if(state->m_led_state == 0)
-		state->m_led_state = 1;
+	if(m_led_state == 0)
+		m_led_state = 1;
 	else
-		state->m_led_state = 0;
-	if(state->m_led_state == 1)
+		m_led_state = 0;
+	if(m_led_state == 1)
 	{
 		for(drive=0;drive<4;drive++)
-			output_set_indexed_value("ctrl_drv",drive,state->m_fdc.led_ctrl[drive] ? 0 : 1);
+			output_set_indexed_value("ctrl_drv",drive,m_fdc.led_ctrl[drive] ? 0 : 1);
 	}
 	else
 	{
@@ -470,48 +464,47 @@ static void x68k_keyboard_push_scancode(running_machine &machine,unsigned char c
 	}
 }
 
-static TIMER_CALLBACK(x68k_keyboard_poll)
+TIMER_CALLBACK_MEMBER(x68k_state::x68k_keyboard_poll)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
 	int x;
 	static const char *const keynames[] = { "key1", "key2", "key3", "key4" };
 
 	for(x=0;x<0x80;x++)
 	{
 		// adjust delay/repeat timers
-		if(state->m_keyboard.keytime[x] > 0)
+		if(m_keyboard.keytime[x] > 0)
 		{
-			state->m_keyboard.keytime[x] -= 5;
+			m_keyboard.keytime[x] -= 5;
 		}
-		if(!(machine.root_device().ioport(keynames[x / 32])->read() & (1 << (x % 32))))
+		if(!(machine().root_device().ioport(keynames[x / 32])->read() & (1 << (x % 32))))
 		{
-			if(state->m_keyboard.keyon[x] != 0)
+			if(m_keyboard.keyon[x] != 0)
 			{
-				x68k_keyboard_push_scancode(machine,0x80 + x);
-				state->m_keyboard.keytime[x] = 0;
-				state->m_keyboard.keyon[x] = 0;
-				state->m_keyboard.last_pressed = 0;
+				x68k_keyboard_push_scancode(machine(),0x80 + x);
+				m_keyboard.keytime[x] = 0;
+				m_keyboard.keyon[x] = 0;
+				m_keyboard.last_pressed = 0;
 				logerror("KB: Released key 0x%02x\n",x);
 			}
 		}
 		// check to see if a key is being held
-		if(state->m_keyboard.keyon[x] != 0 && state->m_keyboard.keytime[x] == 0 && state->m_keyboard.last_pressed == x)
+		if(m_keyboard.keyon[x] != 0 && m_keyboard.keytime[x] == 0 && m_keyboard.last_pressed == x)
 		{
-			if(machine.root_device().ioport(keynames[state->m_keyboard.last_pressed / 32])->read() & (1 << (state->m_keyboard.last_pressed % 32)))
+			if(machine().root_device().ioport(keynames[m_keyboard.last_pressed / 32])->read() & (1 << (m_keyboard.last_pressed % 32)))
 			{
-				x68k_keyboard_push_scancode(machine,state->m_keyboard.last_pressed);
-				state->m_keyboard.keytime[state->m_keyboard.last_pressed] = (state->m_keyboard.repeat^2)*5+30;
-				logerror("KB: Holding key 0x%02x\n",state->m_keyboard.last_pressed);
+				x68k_keyboard_push_scancode(machine(),m_keyboard.last_pressed);
+				m_keyboard.keytime[m_keyboard.last_pressed] = (m_keyboard.repeat^2)*5+30;
+				logerror("KB: Holding key 0x%02x\n",m_keyboard.last_pressed);
 			}
 		}
-		if((machine.root_device().ioport(keynames[x / 32])->read() & (1 << (x % 32))))
+		if((machine().root_device().ioport(keynames[x / 32])->read() & (1 << (x % 32))))
 		{
-			if(state->m_keyboard.keyon[x] == 0)
+			if(m_keyboard.keyon[x] == 0)
 			{
-				x68k_keyboard_push_scancode(machine,x);
-				state->m_keyboard.keytime[x] = state->m_keyboard.delay * 100 + 200;
-				state->m_keyboard.keyon[x] = 1;
-				state->m_keyboard.last_pressed = x;
+				x68k_keyboard_push_scancode(machine(),x);
+				m_keyboard.keytime[x] = m_keyboard.delay * 100 + 200;
+				m_keyboard.keyon[x] = 1;
+				m_keyboard.last_pressed = x;
 				logerror("KB: Pushed key 0x%02x\n",x);
 			}
 		}
@@ -634,14 +627,13 @@ static WRITE16_HANDLER( x68k_scc_w )
 	state->m_scc_prev = scc->get_reg_b(5) & 0x02;
 }
 
-static TIMER_CALLBACK(x68k_scc_ack)
+TIMER_CALLBACK_MEMBER(x68k_state::x68k_scc_ack)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-	scc8530_t *scc = machine.device<scc8530_t>("scc");
-	if(state->m_mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
+	scc8530_t *scc = machine().device<scc8530_t>("scc");
+	if(m_mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
 		return;
 
-//  if((state->m_ioc.irqstatus & 0xc0) != 0)
+//  if((m_ioc.irqstatus & 0xc0) != 0)
 //      return;
 
 	// hard-code the IRQ vector for now, until the SCC code is more complete
@@ -651,10 +643,10 @@ static TIMER_CALLBACK(x68k_scc_ack)
 		{
 			if(scc->get_reg_b(5) & 0x02)  // RTS signal
 			{
-				state->m_mouse.irqactive = 1;
-				state->m_current_vector[5] = 0x54;
-				state->m_current_irq_line = 5;
-				machine.device("maincpu")->execute().set_input_line_and_vector(5,ASSERT_LINE,0x54);
+				m_mouse.irqactive = 1;
+				m_current_vector[5] = 0x54;
+				m_current_irq_line = 5;
+				machine().device("maincpu")->execute().set_input_line_and_vector(5,ASSERT_LINE,0x54);
 			}
 		}
 	}
@@ -725,23 +717,21 @@ static UINT8 md_3button_r(device_t* device, int port)
 }
 
 // Megadrive 6 button gamepad
-static TIMER_CALLBACK(md_6button_port1_timeout)
+TIMER_CALLBACK_MEMBER(x68k_state::md_6button_port1_timeout)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-	state->m_mdctrl.seq1 = 0;
+	m_mdctrl.seq1 = 0;
 }
 
-static TIMER_CALLBACK(md_6button_port2_timeout)
+TIMER_CALLBACK_MEMBER(x68k_state::md_6button_port2_timeout)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-	state->m_mdctrl.seq2 = 0;
+	m_mdctrl.seq2 = 0;
 }
 
 static void md_6button_init(running_machine &machine)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-	state->m_mdctrl.io_timeout1 = machine.scheduler().timer_alloc(FUNC(md_6button_port1_timeout));
-	state->m_mdctrl.io_timeout2 = machine.scheduler().timer_alloc(FUNC(md_6button_port2_timeout));
+	state->m_mdctrl.io_timeout1 = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::md_6button_port1_timeout),state));
+	state->m_mdctrl.io_timeout2 = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::md_6button_port2_timeout),state));
 }
 
 static UINT8 md_6button_r(device_t* device, int port)
@@ -1689,20 +1679,20 @@ static WRITE16_HANDLER( x68k_enh_areaset_w )
 	logerror("SYS: Enhanced Supervisor area set (from %iMB): 0x%02x\n",(offset + 1) * 2,data & 0xff);
 }
 
-static TIMER_CALLBACK(x68k_bus_error)
+TIMER_CALLBACK_MEMBER(x68k_state::x68k_bus_error)
 {
 	int val = param;
 	int v;
-	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
-	if(strcmp(machine.system().name,"x68030") == 0)
+	if(strcmp(machine().system().name,"x68030") == 0)
 		v = 0x0b;
 	else
 		v = 0x09;
 	if(ram[v] != 0x02)  // normal vector for bus errors points to 02FF0540
 	{
-		machine.device("maincpu")->execute().set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		machine.device("maincpu")->execute().set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		popmessage("Bus error: Unused RAM access [%08x]", val);
 	}
 }
@@ -1720,7 +1710,7 @@ static READ16_HANDLER( x68k_rom0_r )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_bus_error), 0xbffffc+offset);
+		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),state), 0xbffffc+offset);
 	}
 	return 0xff;
 }
@@ -1738,7 +1728,7 @@ static WRITE16_HANDLER( x68k_rom0_w )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_bus_error), 0xbffffc+offset);
+		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),state), 0xbffffc+offset);
 	}
 }
 
@@ -1755,7 +1745,7 @@ static READ16_HANDLER( x68k_emptyram_r )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_bus_error), offset);
+		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),state), offset);
 	}
 	return 0xff;
 }
@@ -1773,7 +1763,7 @@ static WRITE16_HANDLER( x68k_emptyram_w )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_bus_error), offset);
+		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),state), offset);
 	}
 }
 
@@ -1788,7 +1778,7 @@ static READ16_HANDLER( x68k_exp_r )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_bus_error), 0xeafa00+offset);
+		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),state), 0xeafa00+offset);
 //      machine.device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
 	}
 	return 0xffff;
@@ -1805,7 +1795,7 @@ static WRITE16_HANDLER( x68k_exp_w )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_bus_error), 0xeafa00+offset);
+		space.machine().scheduler().timer_set(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),state), 0xeafa00+offset);
 //      machine.device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
 	}
 }
@@ -2482,13 +2472,12 @@ static void x68k_unload_proc(device_image_interface &image)
 	state->m_fdc.disk_inserted[floppy_get_drive(&image.device())] = 0;
 }
 
-static TIMER_CALLBACK( x68k_net_irq )
+TIMER_CALLBACK_MEMBER(x68k_state::x68k_net_irq)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
 
-	state->m_current_vector[2] = 0xf9;
-	state->m_current_irq_line = 2;
-	machine.device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
+	m_current_vector[2] = 0xf9;
+	m_current_irq_line = 2;
+	machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
 }
 
 static void x68k_irq2_line(device_t* device,int state)
@@ -2708,13 +2697,13 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 	// init keyboard
 	m_keyboard.delay = 500;  // 3*100+200
 	m_keyboard.repeat = 110;  // 4^2*5+30
-	m_kb_timer = machine().scheduler().timer_alloc(FUNC(x68k_keyboard_poll));
-	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(x68k_hsync));
-	m_raster_irq = machine().scheduler().timer_alloc(FUNC(x68k_crtc_raster_irq));
-	m_vblank_irq = machine().scheduler().timer_alloc(FUNC(x68k_crtc_vblank_irq));
-	m_mouse_timer = machine().scheduler().timer_alloc(FUNC(x68k_scc_ack));
-	m_led_timer = machine().scheduler().timer_alloc(FUNC(x68k_led_callback));
-	m_net_timer = machine().scheduler().timer_alloc(FUNC(x68k_net_irq));
+	m_kb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::x68k_keyboard_poll),this));
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::x68k_hsync),this));
+	m_raster_irq = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::x68k_crtc_raster_irq),this));
+	m_vblank_irq = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::x68k_crtc_vblank_irq),this));
+	m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::x68k_scc_ack),this));
+	m_led_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::x68k_led_callback),this));
+	m_net_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::x68k_net_irq),this));
 
 	// Initialise timers for 6-button MD controllers
 	md_6button_init(machine());

@@ -24,7 +24,7 @@ enum enum_sram { SRAM_NONE=0, SRAM_64K, SRAM_256K, SRAM_512K, SRAM_1M, SRAM_2M, 
 static const char *const wswan_sram_str[] = { "none", "64Kbit SRAM", "256Kbit SRAM", "512Kbit SRAM", "1Mbit SRAM", "2Mbit SRAM", "1Kbit EEPROM", "16Kbit EEPROM", "8Kbit EEPROM", "Unknown" };
 static const int wswan_sram_size[] = { 0, 64*1024/8, 256*1024/8, 512*1024/8, 1024*1024/8, 2*1024*1024/8,  1024/8, 16*1024/8, 8*1024/8, 0 };
 
-static TIMER_CALLBACK(wswan_scanline_interrupt);
+
 
 
 static const UINT8 ws_portram_init[256] =
@@ -123,47 +123,46 @@ void wswan_state::wswan_clear_irq_line(int irq)
 	wswan_handle_irqs( machine() );
 }
 
-static TIMER_CALLBACK(wswan_rtc_callback)
+TIMER_CALLBACK_MEMBER(wswan_state::wswan_rtc_callback)
 {
-	wswan_state *state = machine.driver_data<wswan_state>();
 	/* A second passed */
-	state->m_rtc.second = state->m_rtc.second + 1;
-	if ( ( state->m_rtc.second & 0x0F ) > 9 )
+	m_rtc.second = m_rtc.second + 1;
+	if ( ( m_rtc.second & 0x0F ) > 9 )
 	{
-		state->m_rtc.second = ( state->m_rtc.second & 0xF0 ) + 0x10;
+		m_rtc.second = ( m_rtc.second & 0xF0 ) + 0x10;
 	}
 
 	/* Check for minute passed */
-	if ( state->m_rtc.second >= 0x60 )
+	if ( m_rtc.second >= 0x60 )
 	{
-		state->m_rtc.second = 0;
-		state->m_rtc.minute = state->m_rtc.minute + 1;
-		if ( ( state->m_rtc.minute & 0x0F ) > 9 )
+		m_rtc.second = 0;
+		m_rtc.minute = m_rtc.minute + 1;
+		if ( ( m_rtc.minute & 0x0F ) > 9 )
 		{
-			state->m_rtc.minute = ( state->m_rtc.minute & 0xF0 ) + 0x10;
+			m_rtc.minute = ( m_rtc.minute & 0xF0 ) + 0x10;
 		}
 	}
 
 	/* Check for hour passed */
-	if ( state->m_rtc.minute >= 0x60 )
+	if ( m_rtc.minute >= 0x60 )
 	{
-		state->m_rtc.minute = 0;
-		state->m_rtc.hour = state->m_rtc.hour + 1;
-		if ( ( state->m_rtc.hour & 0x0F ) > 9 )
+		m_rtc.minute = 0;
+		m_rtc.hour = m_rtc.hour + 1;
+		if ( ( m_rtc.hour & 0x0F ) > 9 )
 		{
-			state->m_rtc.hour = ( state->m_rtc.hour & 0xF0 ) + 0x10;
+			m_rtc.hour = ( m_rtc.hour & 0xF0 ) + 0x10;
 		}
-		if ( state->m_rtc.hour == 0x12 )
+		if ( m_rtc.hour == 0x12 )
 		{
-			state->m_rtc.hour |= 0x80;
+			m_rtc.hour |= 0x80;
 		}
 	}
 
 	/* Check for day passed */
-	if ( state->m_rtc.hour >= 0x24 )
+	if ( m_rtc.hour >= 0x24 )
 	{
-		state->m_rtc.hour = 0;
-		state->m_rtc.day = state->m_rtc.day + 1;
+		m_rtc.hour = 0;
+		m_rtc.day = m_rtc.day + 1;
 	}
 }
 
@@ -192,14 +191,14 @@ void wswan_state::machine_start()
 	m_ws_bios_bank = NULL;
 	m_system_type = TYPE_WSWAN;
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(wswan_machine_stop),&machine()));
-	m_vdp.timer = machine().scheduler().timer_alloc(FUNC(wswan_scanline_interrupt), &m_vdp );
+	m_vdp.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wswan_state::wswan_scanline_interrupt),this), &m_vdp );
 	m_vdp.timer->adjust( attotime::from_ticks( 256, 3072000 ), 0, attotime::from_ticks( 256, 3072000 ) );
 
 	wswan_setup_bios(machine());
 
 	/* Set up RTC timer */
 	if ( m_rtc.present )
-		machine().scheduler().timer_pulse(attotime::from_seconds(1), FUNC(wswan_rtc_callback));
+		machine().scheduler().timer_pulse(attotime::from_seconds(1), timer_expired_delegate(FUNC(wswan_state::wswan_rtc_callback),this));
 
 	machine().device<nvram_device>("nvram")->set_base(m_internal_eeprom, INTERNAL_EEPROM_SIZE);
 }
@@ -209,14 +208,14 @@ MACHINE_START_MEMBER(wswan_state,wscolor)
 	m_ws_bios_bank = NULL;
 	m_system_type = TYPE_WSC;
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(wswan_machine_stop),&machine()));
-	m_vdp.timer = machine().scheduler().timer_alloc(FUNC(wswan_scanline_interrupt), &m_vdp );
+	m_vdp.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wswan_state::wswan_scanline_interrupt),this), &m_vdp );
 	m_vdp.timer->adjust( attotime::from_ticks( 256, 3072000 ), 0, attotime::from_ticks( 256, 3072000 ) );
 
 	wswan_setup_bios(machine());
 
 	/* Set up RTC timer */
 	if ( m_rtc.present )
-		machine().scheduler().timer_pulse(attotime::from_seconds(1), FUNC(wswan_rtc_callback));
+		machine().scheduler().timer_pulse(attotime::from_seconds(1), timer_expired_delegate(FUNC(wswan_state::wswan_rtc_callback),this));
 
 	machine().device<nvram_device>("nvram")->set_base(m_internal_eeprom, INTERNAL_EEPROM_SIZE);
 }
@@ -1428,88 +1427,87 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 	return IMAGE_INIT_PASS;
 }
 
-static TIMER_CALLBACK(wswan_scanline_interrupt)
+TIMER_CALLBACK_MEMBER(wswan_state::wswan_scanline_interrupt)
 {
-	wswan_state *state = machine.driver_data<wswan_state>();
-	if( state->m_vdp.current_line < 144 )
+	if( m_vdp.current_line < 144 )
 	{
-		wswan_refresh_scanline(machine);
+		wswan_refresh_scanline(machine());
 	}
 
 	/* Decrement 12kHz (HBlank) counter */
-	if ( state->m_vdp.timer_hblank_enable && state->m_vdp.timer_hblank_reload != 0 )
+	if ( m_vdp.timer_hblank_enable && m_vdp.timer_hblank_reload != 0 )
 	{
-		state->m_vdp.timer_hblank_count--;
-		logerror( "timer_hblank_count: %X\n", state->m_vdp.timer_hblank_count );
-		if ( state->m_vdp.timer_hblank_count == 0 )
+		m_vdp.timer_hblank_count--;
+		logerror( "timer_hblank_count: %X\n", m_vdp.timer_hblank_count );
+		if ( m_vdp.timer_hblank_count == 0 )
 		{
-			if ( state->m_vdp.timer_hblank_mode )
+			if ( m_vdp.timer_hblank_mode )
 			{
-				state->m_vdp.timer_hblank_count = state->m_vdp.timer_hblank_reload;
+				m_vdp.timer_hblank_count = m_vdp.timer_hblank_reload;
 			}
 			else
 			{
-				state->m_vdp.timer_hblank_reload = 0;
+				m_vdp.timer_hblank_reload = 0;
 			}
 			logerror( "trigerring hbltmr interrupt\n" );
-			wswan_set_irq_line( machine, WSWAN_IFLAG_HBLTMR );
+			wswan_set_irq_line( machine(), WSWAN_IFLAG_HBLTMR );
 		}
 	}
 
 	/* Handle Sound DMA */
-	if ( ( state->m_sound_dma.enable & 0x88 ) == 0x80 )
+	if ( ( m_sound_dma.enable & 0x88 ) == 0x80 )
 	{
-		address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM );
+		address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM );
 		/* TODO: Output sound DMA byte */
-		state->wswan_port_w( space, 0x89, space.read_byte(state->m_sound_dma.source ) );
-		state->m_sound_dma.size--;
-		state->m_sound_dma.source = ( state->m_sound_dma.source + 1 ) & 0x0FFFFF;
-		if ( state->m_sound_dma.size == 0 )
+		wswan_port_w( space, 0x89, space.read_byte(m_sound_dma.source ) );
+		m_sound_dma.size--;
+		m_sound_dma.source = ( m_sound_dma.source + 1 ) & 0x0FFFFF;
+		if ( m_sound_dma.size == 0 )
 		{
-			state->m_sound_dma.enable &= 0x7F;
+			m_sound_dma.enable &= 0x7F;
 		}
 	}
 
-//  state->m_vdp.current_line = (state->m_vdp.current_line + 1) % 159;
+//  m_vdp.current_line = (m_vdp.current_line + 1) % 159;
 
-	if( state->m_vdp.current_line == 144 ) // buffer sprite table
+	if( m_vdp.current_line == 144 ) // buffer sprite table
 	{
-		memcpy(state->m_vdp.sprite_table_buffer, &state->m_vdp.vram[state->m_vdp.sprite_table_address], 512);
-		state->m_vdp.sprite_count = state->m_ws_portram[0x06];
-		state->m_vdp.sprite_first = state->m_ws_portram[0x05]; // always zero?
+		memcpy(m_vdp.sprite_table_buffer, &m_vdp.vram[m_vdp.sprite_table_address], 512);
+		m_vdp.sprite_count = m_ws_portram[0x06];
+		m_vdp.sprite_first = m_ws_portram[0x05]; // always zero?
 	}
 
-	if( state->m_vdp.current_line == 144 )
+	if( m_vdp.current_line == 144 )
 	{
-		wswan_set_irq_line( machine, WSWAN_IFLAG_VBL );
+		wswan_set_irq_line( machine(), WSWAN_IFLAG_VBL );
 		/* Decrement 75Hz (VBlank) counter */
-		if ( state->m_vdp.timer_vblank_enable && state->m_vdp.timer_vblank_reload != 0 )
+		if ( m_vdp.timer_vblank_enable && m_vdp.timer_vblank_reload != 0 )
 		{
-			state->m_vdp.timer_vblank_count--;
-			logerror( "timer_vblank_count: %X\n", state->m_vdp.timer_vblank_count );
-			if ( state->m_vdp.timer_vblank_count == 0 )
+			m_vdp.timer_vblank_count--;
+			logerror( "timer_vblank_count: %X\n", m_vdp.timer_vblank_count );
+			if ( m_vdp.timer_vblank_count == 0 )
 			{
-				if ( state->m_vdp.timer_vblank_mode )
+				if ( m_vdp.timer_vblank_mode )
 				{
-					state->m_vdp.timer_vblank_count = state->m_vdp.timer_vblank_reload;
+					m_vdp.timer_vblank_count = m_vdp.timer_vblank_reload;
 				}
 				else
 				{
-					state->m_vdp.timer_vblank_reload = 0;
+					m_vdp.timer_vblank_reload = 0;
 				}
 				logerror( "triggering vbltmr interrupt\n" );
-				wswan_set_irq_line( machine, WSWAN_IFLAG_VBLTMR );
+				wswan_set_irq_line( machine(), WSWAN_IFLAG_VBLTMR );
 			}
 		}
 	}
 
-//  state->m_vdp.current_line = (state->m_vdp.current_line + 1) % 159;
+//  m_vdp.current_line = (m_vdp.current_line + 1) % 159;
 
-	if ( state->m_vdp.current_line == state->m_vdp.line_compare )
+	if ( m_vdp.current_line == m_vdp.line_compare )
 	{
-		wswan_set_irq_line( machine, WSWAN_IFLAG_LCMP );
+		wswan_set_irq_line( machine(), WSWAN_IFLAG_LCMP );
 	}
 
-	state->m_vdp.current_line = (state->m_vdp.current_line + 1) % 159;
+	m_vdp.current_line = (m_vdp.current_line + 1) % 159;
 }
 

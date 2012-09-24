@@ -596,11 +596,10 @@ void compis_state::handle_eoi(int data)
  *
  *************************************/
 
-static TIMER_CALLBACK(internal_timer_int)
+TIMER_CALLBACK_MEMBER(compis_state::internal_timer_int)
 {
-	compis_state *state = machine.driver_data<compis_state>();
 	int which = param;
-	struct timer_state *t = &state->m_i186.timer[which];
+	struct timer_state *t = &m_i186.timer[which];
 
 	if (LOG_TIMER) logerror("Hit interrupt callback for timer %d\n", which);
 
@@ -610,8 +609,8 @@ static TIMER_CALLBACK(internal_timer_int)
 	/* request an interrupt */
 	if (t->control & 0x2000)
 	{
-		state->m_i186.intr.status |= 0x01 << which;
-		update_interrupt_state(machine);
+		m_i186.intr.status |= 0x01 << which;
+		update_interrupt_state(machine());
 		if (LOG_TIMER) logerror("  Generating timer interrupt\n");
 	}
 
@@ -781,11 +780,10 @@ void compis_state::internal_timer_update(int which, int new_count, int new_maxA,
  *
  *************************************/
 
-static TIMER_CALLBACK(dma_timer_callback)
+TIMER_CALLBACK_MEMBER(compis_state::dma_timer_callback)
 {
-	compis_state *state = machine.driver_data<compis_state>();
 	int which = param;
-	struct dma_state *d = &state->m_i186.dma[which];
+	struct dma_state *d = &m_i186.dma[which];
 
 	/* force an update and see if we're really done */
 	//stream_update(dma_stream, 0);
@@ -799,8 +797,8 @@ static TIMER_CALLBACK(dma_timer_callback)
 	if (d->control & 0x0100)
 	{
 		if (LOG_DMA) logerror("DMA%d timer callback - requesting interrupt: count = %04X, source = %04X\n", which, d->count, d->source);
-		state->m_i186.intr.request |= 0x04 << which;
-		update_interrupt_state(machine);
+		m_i186.intr.request |= 0x04 << which;
+		update_interrupt_state(machine());
 	}
 }
 
@@ -1301,14 +1299,14 @@ static void compis_cpu_init(running_machine &machine)
 {
 	compis_state *state = machine.driver_data<compis_state>();
 	/* create timers here so they stick around */
-	state->m_i186.timer[0].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int));
-	state->m_i186.timer[1].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int));
-	state->m_i186.timer[2].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int));
-	state->m_i186.timer[0].time_timer = machine.scheduler().timer_alloc(FUNC_NULL);
-	state->m_i186.timer[1].time_timer = machine.scheduler().timer_alloc(FUNC_NULL);
-	state->m_i186.timer[2].time_timer = machine.scheduler().timer_alloc(FUNC_NULL);
-	state->m_i186.dma[0].finish_timer = machine.scheduler().timer_alloc(FUNC(dma_timer_callback));
-	state->m_i186.dma[1].finish_timer = machine.scheduler().timer_alloc(FUNC(dma_timer_callback));
+	state->m_i186.timer[0].int_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::internal_timer_int),state));
+	state->m_i186.timer[1].int_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::internal_timer_int),state));
+	state->m_i186.timer[2].int_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::internal_timer_int),state));
+	state->m_i186.timer[0].time_timer = machine.scheduler().timer_alloc(timer_expired_delegate());
+	state->m_i186.timer[1].time_timer = machine.scheduler().timer_alloc(timer_expired_delegate());
+	state->m_i186.timer[2].time_timer = machine.scheduler().timer_alloc(timer_expired_delegate());
+	state->m_i186.dma[0].finish_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::dma_timer_callback),state));
+	state->m_i186.dma[1].finish_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::dma_timer_callback),state));
 }
 
 /*-------------------------------------------------------------------------*/

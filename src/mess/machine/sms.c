@@ -30,11 +30,10 @@
 static void setup_rom(address_space &space);
 
 
-static TIMER_CALLBACK( rapid_fire_callback )
+TIMER_CALLBACK_MEMBER(sms_state::rapid_fire_callback)
 {
-	sms_state *state = machine.driver_data<sms_state>();
-	state->m_rapid_fire_state_1 ^= 0xff;
-	state->m_rapid_fire_state_2 ^= 0xff;
+	m_rapid_fire_state_1 ^= 0xff;
+	m_rapid_fire_state_2 ^= 0xff;
 }
 
 
@@ -487,49 +486,48 @@ static void lphaser2_sensor_check( running_machine &machine )
 
 // at each input port read we check if lightguns are enabled in one of the ports:
 // if so, we turn on crosshair and the lightgun timer
-static TIMER_CALLBACK( lightgun_tick )
+TIMER_CALLBACK_MEMBER(sms_state::lightgun_tick)
 {
-	sms_state *state = machine.driver_data<sms_state>();
 
-	if ((state->ioport("CTRLSEL")->read_safe(0x00) & 0x0f) == 0x01)
+	if ((ioport("CTRLSEL")->read_safe(0x00) & 0x0f) == 0x01)
 	{
 		/* enable crosshair */
-		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
-		if (!state->m_lphaser_1_timer->enabled())
-			lphaser1_sensor_check(machine);
+		crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_ALL);
+		if (!m_lphaser_1_timer->enabled())
+			lphaser1_sensor_check(machine());
 	}
 	else
 	{
 		/* disable crosshair */
-		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);
-		state->m_lphaser_1_timer->enable(0);
+		crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_NONE);
+		m_lphaser_1_timer->enable(0);
 	}
 
-	if ((state->ioport("CTRLSEL")->read_safe(0x00) & 0xf0) == 0x10)
+	if ((ioport("CTRLSEL")->read_safe(0x00) & 0xf0) == 0x10)
 	{
 		/* enable crosshair */
-		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_ALL);
-		if (!state->m_lphaser_2_timer->enabled())
-			lphaser2_sensor_check(machine);
+		crosshair_set_screen(machine(), 1, CROSSHAIR_SCREEN_ALL);
+		if (!m_lphaser_2_timer->enabled())
+			lphaser2_sensor_check(machine());
 	}
 	else
 	{
 		/* disable crosshair */
-		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_NONE);
-		state->m_lphaser_2_timer->enable(0);
+		crosshair_set_screen(machine(), 1, CROSSHAIR_SCREEN_NONE);
+		m_lphaser_2_timer->enable(0);
 	}
 }
 
 
-static TIMER_CALLBACK( lphaser_1_callback )
+TIMER_CALLBACK_MEMBER(sms_state::lphaser_1_callback)
 {
-	lphaser1_sensor_check(machine);
+	lphaser1_sensor_check(machine());
 }
 
 
-static TIMER_CALLBACK( lphaser_2_callback )
+TIMER_CALLBACK_MEMBER(sms_state::lphaser_2_callback)
 {
-	lphaser2_sensor_check(machine);
+	lphaser2_sensor_check(machine());
 }
 
 
@@ -571,7 +569,7 @@ static void sms_get_inputs( address_space &space )
 	}
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	machine.scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
+	machine.scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(sms_state::lightgun_tick),state));
 
 	/* Player 1 */
 	switch (machine.root_device().ioport("CTRLSEL")->read_safe(0x00) & 0x0f)
@@ -1926,11 +1924,11 @@ MACHINE_START_MEMBER(sms_state,sms)
 {
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sms_machine_stop),&machine()));
-	m_rapid_fire_timer = machine().scheduler().timer_alloc(FUNC(rapid_fire_callback));
+	m_rapid_fire_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_state::rapid_fire_callback),this));
 	m_rapid_fire_timer->adjust(attotime::from_hz(10), 0, attotime::from_hz(10));
 
-	m_lphaser_1_timer = machine().scheduler().timer_alloc(FUNC(lphaser_1_callback));
-	m_lphaser_2_timer = machine().scheduler().timer_alloc(FUNC(lphaser_2_callback));
+	m_lphaser_1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_state::lphaser_1_callback),this));
+	m_lphaser_2_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_state::lphaser_2_callback),this));
 
 	m_main_cpu = machine().device("maincpu");
 	m_control_cpu = machine().device("control");
@@ -1943,7 +1941,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 	m_space = &machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	machine().scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
+	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(sms_state::lightgun_tick),this));
 }
 
 MACHINE_RESET_MEMBER(sms_state,sms)

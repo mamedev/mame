@@ -249,60 +249,59 @@ READ8_MEMBER(odyssey2_state::odyssey2_t1_r)
 	return 0;
 }
 
-static TIMER_CALLBACK( i824x_scanline_callback )
+TIMER_CALLBACK_MEMBER(odyssey2_state::i824x_scanline_callback)
 {
-	odyssey2_state *state = machine.driver_data<odyssey2_state>();
 	UINT8	collision_map[160];
-	int		vpos = machine.primary_screen->vpos();
+	int		vpos = machine().primary_screen->vpos();
 
-	if ( vpos < state->m_start_vpos )
+	if ( vpos < m_start_vpos )
 		return;
 
-	if ( vpos == state->m_start_vpos )
+	if ( vpos == m_start_vpos )
 	{
-		state->m_control_status &= ~0x08;
+		m_control_status &= ~0x08;
 	}
 
-	if ( vpos < state->m_start_vblank )
+	if ( vpos < m_start_vblank )
 	{
 		rectangle rect;
 		//static const int sprite_width[4] = { 8, 8, 8, 8 };
 		int i;
 
-		state->m_control_status &= ~ 0x01;
+		m_control_status &= ~ 0x01;
 
 		/* Draw a line */
 		rect.set(I824X_START_ACTIVE_SCAN, I824X_END_ACTIVE_SCAN - 1, vpos, vpos);
-		state->m_tmp_bitmap.fill(( (state->m_o2_vdc.s.color >> 3) & 0x7 ) | ( ( state->m_lum << 3 ) ^ 0x08 ), rect );
+		m_tmp_bitmap.fill(( (m_o2_vdc.s.color >> 3) & 0x7 ) | ( ( m_lum << 3 ) ^ 0x08 ), rect );
 
 		/* Clear collision map */
 		memset( collision_map, 0, sizeof( collision_map ) );
 
 		/* Display grid if enabled */
-		if ( state->m_o2_vdc.s.control & 0x08 )
+		if ( m_o2_vdc.s.control & 0x08 )
 		{
-			UINT16	color = ( state->m_o2_vdc.s.color & 7 ) | ( ( state->m_o2_vdc.s.color >> 3 ) & 0x08 ) | ( ( state->m_lum << 3 ) ^ 0x08 );
+			UINT16	color = ( m_o2_vdc.s.color & 7 ) | ( ( m_o2_vdc.s.color >> 3 ) & 0x08 ) | ( ( m_lum << 3 ) ^ 0x08 );
 			int		x_grid_offset = 8;
 			int 	y_grid_offset = 24;
 			int		width = 16;
 			int		height = 24;
-			int		w = ( state->m_o2_vdc.s.control & 0x80 ) ? width : 2;
+			int		w = ( m_o2_vdc.s.control & 0x80 ) ? width : 2;
 			int		j, k, y;
 
 			/* Draw horizontal part of grid */
 			for ( j = 1, y = 0; y < 9; y++, j <<= 1 )
 			{
-				if ( y_grid_offset + y * height <= ( vpos - state->m_start_vpos ) && ( vpos - state->m_start_vpos ) < y_grid_offset + y * height + 3 )
+				if ( y_grid_offset + y * height <= ( vpos - m_start_vpos ) && ( vpos - m_start_vpos ) < y_grid_offset + y * height + 3 )
 				{
 					for ( i = 0; i < 9; i++ )
 					{
-						if ( ( state->m_o2_vdc.s.hgrid[0][i] & j ) || ( state->m_o2_vdc.s.hgrid[1][i] & ( j >> 8 ) ) )
+						if ( ( m_o2_vdc.s.hgrid[0][i] & j ) || ( m_o2_vdc.s.hgrid[1][i] & ( j >> 8 ) ) )
 						{
 							for ( k = 0; k < width + 2; k++ )
 							{
 								int px = x_grid_offset + i * width + k;
 								collision_map[ px ] |= COLLISION_HORIZ_GRID_DOTS;
-								state->m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + px ) = color;
+								m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + px ) = color;
 							}
 						}
 					}
@@ -312,28 +311,28 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 			/* Draw vertical part of grid */
 			for( j = 1, y = 0; y < 8; y++, j <<= 1 )
 			{
-				if ( y_grid_offset + y * height <= ( vpos - state->m_start_vpos ) && ( vpos - state->m_start_vpos ) < y_grid_offset + ( y + 1 ) * height )
+				if ( y_grid_offset + y * height <= ( vpos - m_start_vpos ) && ( vpos - m_start_vpos ) < y_grid_offset + ( y + 1 ) * height )
 				{
 					for ( i = 0; i < 10; i++ )
 					{
-						if ( state->m_o2_vdc.s.vgrid[i] & j )
+						if ( m_o2_vdc.s.vgrid[i] & j )
 						{
 							for ( k = 0; k < w; k++ )
 							{
 								int px = x_grid_offset + i * width + k;
 
 								/* Check if we collide with an already drawn source object */
-								if ( collision_map[ px ] & state->m_o2_vdc.s.collision )
+								if ( collision_map[ px ] & m_o2_vdc.s.collision )
 								{
-									state->m_collision_status |= COLLISION_VERTICAL_GRID;
+									m_collision_status |= COLLISION_VERTICAL_GRID;
 								}
 								/* Check if an already drawn object would collide with us */
-								if ( COLLISION_VERTICAL_GRID & state->m_o2_vdc.s.collision && collision_map[ px ] )
+								if ( COLLISION_VERTICAL_GRID & m_o2_vdc.s.collision && collision_map[ px ] )
 								{
-									state->m_collision_status |= collision_map[ px ];
+									m_collision_status |= collision_map[ px ];
 								}
 								collision_map[ px ] |= COLLISION_VERTICAL_GRID;
-								state->m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + px ) = color;
+								m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + px ) = color;
 							}
 						}
 					}
@@ -342,20 +341,20 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 		}
 
 		/* Display objects if enabled */
-		if ( state->m_o2_vdc.s.control & 0x20 )
+		if ( m_o2_vdc.s.control & 0x20 )
 		{
 			/* Regular foreground objects */
-			for ( i = 0; i < ARRAY_LENGTH( state->m_o2_vdc.s.foreground ); i++ )
+			for ( i = 0; i < ARRAY_LENGTH( m_o2_vdc.s.foreground ); i++ )
 			{
-				int	y = state->m_o2_vdc.s.foreground[i].y;
-				int	height = 8 - ( ( ( y >> 1 ) + state->m_o2_vdc.s.foreground[i].ptr ) & 7 );
+				int	y = m_o2_vdc.s.foreground[i].y;
+				int	height = 8 - ( ( ( y >> 1 ) + m_o2_vdc.s.foreground[i].ptr ) & 7 );
 
-				if ( y <= ( vpos - state->m_start_vpos ) && ( vpos - state->m_start_vpos ) < y + height * 2 )
+				if ( y <= ( vpos - m_start_vpos ) && ( vpos - m_start_vpos ) < y + height * 2 )
 				{
-					UINT16	color = 16 + ( ( state->m_o2_vdc.s.foreground[i].color & 0x0E ) >> 1 );
-					int		offset = ( state->m_o2_vdc.s.foreground[i].ptr | ( ( state->m_o2_vdc.s.foreground[i].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( vpos - state->m_start_vpos - y ) >> 1 );
+					UINT16	color = 16 + ( ( m_o2_vdc.s.foreground[i].color & 0x0E ) >> 1 );
+					int		offset = ( m_o2_vdc.s.foreground[i].ptr | ( ( m_o2_vdc.s.foreground[i].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( vpos - m_start_vpos - y ) >> 1 );
 					UINT8	chr = ((char*)o2_shape)[ offset & 0x1FF ];
-					int		x = state->m_o2_vdc.s.foreground[i].x;
+					int		x = m_o2_vdc.s.foreground[i].x;
 					UINT8	m;
 
 					for ( m = 0x80; m > 0; m >>= 1, x++ )
@@ -365,17 +364,17 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 							if ( x >= 0 && x < 160 )
 							{
 								/* Check if we collide with an already drawn source object */
-								if ( collision_map[ x ] & state->m_o2_vdc.s.collision )
+								if ( collision_map[ x ] & m_o2_vdc.s.collision )
 								{
-									state->m_collision_status |= COLLISION_CHARACTERS;
+									m_collision_status |= COLLISION_CHARACTERS;
 								}
 								/* Check if an already drawn object would collide with us */
-								if ( COLLISION_CHARACTERS & state->m_o2_vdc.s.collision && collision_map[ x ] )
+								if ( COLLISION_CHARACTERS & m_o2_vdc.s.collision && collision_map[ x ] )
 								{
-									state->m_collision_status |= collision_map[ x ];
+									m_collision_status |= collision_map[ x ];
 								}
 								collision_map[ x ] |= COLLISION_CHARACTERS;
-								state->m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + x ) = color;
+								m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + x ) = color;
 							}
 						}
 					}
@@ -383,30 +382,30 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 			}
 
 			/* Quad objects */
-			for ( i = 0; i < ARRAY_LENGTH( state->m_o2_vdc.s.quad ); i++ )
+			for ( i = 0; i < ARRAY_LENGTH( m_o2_vdc.s.quad ); i++ )
 			{
-				int y = state->m_o2_vdc.s.quad[i].single[0].y;
+				int y = m_o2_vdc.s.quad[i].single[0].y;
 				int height = 8;
 
-				if ( y <= ( vpos - state->m_start_vpos ) && ( vpos - state->m_start_vpos ) < y + height * 2 )
+				if ( y <= ( vpos - m_start_vpos ) && ( vpos - m_start_vpos ) < y + height * 2 )
 				{
-					int	x = state->m_o2_vdc.s.quad[i].single[0].x;
+					int	x = m_o2_vdc.s.quad[i].single[0].x;
 					int j;
 
 					// Charaecter height is always determined by the height of the 4th character
-					int char_height = 8 - ( ( ( y >> 1 ) + state->m_o2_vdc.s.quad[i].single[3].ptr ) & 7 );
+					int char_height = 8 - ( ( ( y >> 1 ) + m_o2_vdc.s.quad[i].single[3].ptr ) & 7 );
 
-					for ( j = 0; j < ARRAY_LENGTH( state->m_o2_vdc.s.quad[0].single ); j++, x += 8 )
+					for ( j = 0; j < ARRAY_LENGTH( m_o2_vdc.s.quad[0].single ); j++, x += 8 )
 					{
 
 
-						if ( y <= ( vpos - state->m_start_vpos ) && ( vpos - state->m_start_vpos ) < y + char_height * 2 )
+						if ( y <= ( vpos - m_start_vpos ) && ( vpos - m_start_vpos ) < y + char_height * 2 )
 						{
 
-						UINT16 color = 16 + ( ( state->m_o2_vdc.s.quad[i].single[j].color & 0x0E ) >> 1 );
+						UINT16 color = 16 + ( ( m_o2_vdc.s.quad[i].single[j].color & 0x0E ) >> 1 );
 
 
-							int	offset = ( state->m_o2_vdc.s.quad[i].single[j].ptr | ( ( state->m_o2_vdc.s.quad[i].single[j].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( vpos - state->m_start_vpos - y ) >> 1 );
+							int	offset = ( m_o2_vdc.s.quad[i].single[j].ptr | ( ( m_o2_vdc.s.quad[i].single[j].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( vpos - m_start_vpos - y ) >> 1 );
 
 							UINT8	chr = ((char*)o2_shape)[ offset & 0x1FF ];
 
@@ -418,17 +417,17 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 									if ( x >= 0 && x < 160 )
 									{
 										/* Check if we collide with an already drawn source object */
-										if ( collision_map[ x ] & state->m_o2_vdc.s.collision )
+										if ( collision_map[ x ] & m_o2_vdc.s.collision )
 										{
-											state->m_collision_status |= COLLISION_CHARACTERS;
+											m_collision_status |= COLLISION_CHARACTERS;
 										}
 										/* Check if an already drawn object would collide with us */
-										if ( COLLISION_CHARACTERS & state->m_o2_vdc.s.collision && collision_map[ x ] )
+										if ( COLLISION_CHARACTERS & m_o2_vdc.s.collision && collision_map[ x ] )
 										{
-											state->m_collision_status |= collision_map[ x ];
+											m_collision_status |= collision_map[ x ];
 										}
 										collision_map[ x ] |= COLLISION_CHARACTERS;
-										state->m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + x ) = color;
+										m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + x ) = color;
 									}
 								}
 							}
@@ -442,19 +441,19 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 			}
 
 			/* Sprites */
-			for ( i = 0; i < ARRAY_LENGTH( state->m_o2_vdc.s.sprites ); i++ )
+			for ( i = 0; i < ARRAY_LENGTH( m_o2_vdc.s.sprites ); i++ )
 			{
-				int y = state->m_o2_vdc.s.sprites[i].y;
+				int y = m_o2_vdc.s.sprites[i].y;
 				int height = 8;
-				if ( state->m_o2_vdc.s.sprites[i].color & 4 )
+				if ( m_o2_vdc.s.sprites[i].color & 4 )
 				{
 					/* Zoomed sprite */
 					//sprite_width[i] = 16;
-					if ( y <= ( vpos - state->m_start_vpos ) && ( vpos - state->m_start_vpos ) < y + height * 4 )
+					if ( y <= ( vpos - m_start_vpos ) && ( vpos - m_start_vpos ) < y + height * 4 )
 					{
-						UINT16 color = 16 + ( ( state->m_o2_vdc.s.sprites[i].color >> 3 ) & 0x07 );
-						UINT8	chr = state->m_o2_vdc.s.shape[i][ ( ( vpos - state->m_start_vpos - y ) >> 2 ) ];
-						int		x = state->m_o2_vdc.s.sprites[i].x;
+						UINT16 color = 16 + ( ( m_o2_vdc.s.sprites[i].color >> 3 ) & 0x07 );
+						UINT8	chr = m_o2_vdc.s.shape[i][ ( ( vpos - m_start_vpos - y ) >> 2 ) ];
+						int		x = m_o2_vdc.s.sprites[i].x;
 						UINT8	m;
 
 						for ( m = 0x01; m > 0; m <<= 1, x += 2 )
@@ -464,32 +463,32 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 								if ( x >= 0 && x < 160 )
 								{
 									/* Check if we collide with an already drawn source object */
-									if ( collision_map[ x ] & state->m_o2_vdc.s.collision )
+									if ( collision_map[ x ] & m_o2_vdc.s.collision )
 									{
-										state->m_collision_status |= ( 1 << i );
+										m_collision_status |= ( 1 << i );
 									}
 									/* Check if an already drawn object would collide with us */
-									if ( ( 1 << i ) & state->m_o2_vdc.s.collision && collision_map[ x ] )
+									if ( ( 1 << i ) & m_o2_vdc.s.collision && collision_map[ x ] )
 									{
-										state->m_collision_status |= collision_map[ x ];
+										m_collision_status |= collision_map[ x ];
 									}
 									collision_map[ x ] |= ( 1 << i );
-									state->m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + x ) = color;
+									m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + x ) = color;
 								}
 								if ( x >= -1 && x < 159 )
 								{
 									/* Check if we collide with an already drawn source object */
-									if ( collision_map[ x ] & state->m_o2_vdc.s.collision )
+									if ( collision_map[ x ] & m_o2_vdc.s.collision )
 									{
-										state->m_collision_status |= ( 1 << i );
+										m_collision_status |= ( 1 << i );
 									}
 									/* Check if an already drawn object would collide with us */
-									if ( ( 1 << i ) & state->m_o2_vdc.s.collision && collision_map[ x ] )
+									if ( ( 1 << i ) & m_o2_vdc.s.collision && collision_map[ x ] )
 									{
-										state->m_collision_status |= collision_map[ x ];
+										m_collision_status |= collision_map[ x ];
 									}
 									collision_map[ x ] |= ( 1 << i );
-									state->m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + x + 1 ) = color;
+									m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + x + 1 ) = color;
 								}
 							}
 						}
@@ -498,11 +497,11 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 				else
 				{
 					/* Regular sprite */
-					if ( y <= ( vpos - state->m_start_vpos ) && ( vpos - state->m_start_vpos ) < y + height * 2 )
+					if ( y <= ( vpos - m_start_vpos ) && ( vpos - m_start_vpos ) < y + height * 2 )
 					{
-						UINT16 color = 16 + ( ( state->m_o2_vdc.s.sprites[i].color >> 3 ) & 0x07 );
-						UINT8	chr = state->m_o2_vdc.s.shape[i][ ( ( vpos - state->m_start_vpos - y ) >> 1 ) ];
-						int		x = state->m_o2_vdc.s.sprites[i].x;
+						UINT16 color = 16 + ( ( m_o2_vdc.s.sprites[i].color >> 3 ) & 0x07 );
+						UINT8	chr = m_o2_vdc.s.shape[i][ ( ( vpos - m_start_vpos - y ) >> 1 ) ];
+						int		x = m_o2_vdc.s.sprites[i].x;
 						UINT8	m;
 
 						for ( m = 0x01; m > 0; m <<= 1, x++ )
@@ -512,17 +511,17 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 								if ( x >= 0 && x < 160 )
 								{
 									/* Check if we collide with an already drawn source object */
-									if ( collision_map[ x ] & state->m_o2_vdc.s.collision )
+									if ( collision_map[ x ] & m_o2_vdc.s.collision )
 									{
-										state->m_collision_status |= ( 1 << i );
+										m_collision_status |= ( 1 << i );
 									}
 									/* Check if an already drawn object would collide with us */
-									if ( ( 1 << i ) & state->m_o2_vdc.s.collision && collision_map[ x ] )
+									if ( ( 1 << i ) & m_o2_vdc.s.collision && collision_map[ x ] )
 									{
-										state->m_collision_status |= collision_map[ x ];
+										m_collision_status |= collision_map[ x ];
 									}
 									collision_map[ x ] |= ( 1 << i );
-									state->m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + x ) = color;
+									m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + x ) = color;
 								}
 							}
 						}
@@ -533,28 +532,27 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 	}
 
 	/* Check for start of VBlank */
-	if ( vpos == state->m_start_vblank )
+	if ( vpos == m_start_vblank )
 	{
-		state->m_control_status |= 0x08;
-		if ( ! state->m_iff )
+		m_control_status |= 0x08;
+		if ( ! m_iff )
 		{
-			machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
-			state->m_iff = 1;
+			machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+			m_iff = 1;
 		}
 	}
 }
 
-static TIMER_CALLBACK( i824x_hblank_callback )
+TIMER_CALLBACK_MEMBER(odyssey2_state::i824x_hblank_callback)
 {
-	odyssey2_state *state = machine.driver_data<odyssey2_state>();
-	int vpos = machine.primary_screen->vpos();
+	int vpos = machine().primary_screen->vpos();
 
-	if ( vpos < state->m_start_vpos - 1 )
+	if ( vpos < m_start_vpos - 1 )
 		return;
 
-	if ( vpos < state->m_start_vblank - 1 )
+	if ( vpos < m_start_vblank - 1 )
 	{
-		state->m_control_status |= 0x01;
+		m_control_status |= 0x01;
 	}
 }
 
@@ -590,10 +588,10 @@ void odyssey2_state::video_start()
 
 	screen->register_screen_bitmap(m_tmp_bitmap);
 
-	m_i824x_line_timer = machine().scheduler().timer_alloc(FUNC(i824x_scanline_callback));
+	m_i824x_line_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(odyssey2_state::i824x_scanline_callback),this));
 	m_i824x_line_timer->adjust( machine().primary_screen->time_until_pos(1, I824X_START_ACTIVE_SCAN ), 0,  machine().primary_screen->scan_period() );
 
-	m_i824x_hblank_timer = machine().scheduler().timer_alloc(FUNC(i824x_hblank_callback));
+	m_i824x_hblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(odyssey2_state::i824x_hblank_callback),this));
 	m_i824x_hblank_timer->adjust( machine().primary_screen->time_until_pos(1, I824X_END_ACTIVE_SCAN + 18 ), 0, machine().primary_screen->scan_period() );
 }
 

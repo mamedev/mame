@@ -13,9 +13,8 @@
 #include "includes/bk.h"
 
 
-static TIMER_CALLBACK(keyboard_callback)
+TIMER_CALLBACK_MEMBER(bk_state::keyboard_callback)
 {
-	bk_state *state = machine.driver_data<bk_state>();
 	UINT8 code, i, j;
 	static const char *const keynames[] = {
 		"LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6",
@@ -24,42 +23,42 @@ static TIMER_CALLBACK(keyboard_callback)
 
 	for(i = 1; i < 12; i++)
 	{
-		code =	machine.root_device().ioport(keynames[i-1])->read();
+		code =	machine().root_device().ioport(keynames[i-1])->read();
 		if (code != 0)
 		{
 			for(j = 0; j < 8; j++)
 			{
 				if (code == (1 << j))
 				{
-					state->m_key_code = j + i*8;
+					m_key_code = j + i*8;
 					break;
 				}
 			}
-			if ((machine.root_device().ioport("LINE0")->read() & 4) == 4)
+			if ((machine().root_device().ioport("LINE0")->read() & 4) == 4)
 			{
 				if (i==6 || i==7)
 				{
-					state->m_key_code -= 16;
+					m_key_code -= 16;
 				}
 
 			}
-			if ((machine.root_device().ioport("LINE0")->read() & 4) == 4)
+			if ((machine().root_device().ioport("LINE0")->read() & 4) == 4)
 			{
 				if (i>=8 && i<=11)
 				{
-					state->m_key_code += 32;
+					m_key_code += 32;
 				}
 			}
-			state->m_key_pressed = 0x40;
-			if ((machine.root_device().ioport("LINE0")->read() & 2) == 0)
+			m_key_pressed = 0x40;
+			if ((machine().root_device().ioport("LINE0")->read() & 2) == 0)
 			{
-				state->m_key_irq_vector = 0x30;
+				m_key_irq_vector = 0x30;
 			}
 			else
 			{
-				state->m_key_irq_vector = 0xBC;
+				m_key_irq_vector = 0xBC;
 			}
-			machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+			machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 			break;
 		}
 	}
@@ -68,7 +67,7 @@ static TIMER_CALLBACK(keyboard_callback)
 
 void bk_state::machine_start()
 {
-	machine().scheduler().timer_pulse(attotime::from_hz(2400), FUNC(keyboard_callback));
+	machine().scheduler().timer_pulse(attotime::from_hz(2400), timer_expired_delegate(FUNC(bk_state::keyboard_callback),this));
 }
 
 static IRQ_CALLBACK(bk0010_irq_callback)

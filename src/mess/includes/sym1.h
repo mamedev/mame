@@ -41,6 +41,7 @@ public:
 	emu_timer *m_led_update;
 	DECLARE_DRIVER_INIT(sym1);
 	virtual void machine_reset();
+	TIMER_CALLBACK_MEMBER(led_refresh);
 };
 
 /*----------- defined in machine/sym1.c -----------*/

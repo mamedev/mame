@@ -651,30 +651,28 @@ static void dafb_recalc_ints(mac_state *mac)
 	}
 }
 
-static TIMER_CALLBACK(dafb_vbl_tick)
+TIMER_CALLBACK_MEMBER(mac_state::dafb_vbl_tick)
 {
-	mac_state *mac = machine.driver_data<mac_state>();
 
-	mac->m_dafb_int_status |= 1;
-	dafb_recalc_ints(mac);
+	m_dafb_int_status |= 1;
+	dafb_recalc_ints(this);
 
-	mac->m_vbl_timer->adjust(mac->m_screen->time_until_pos(480, 0), 0);
+	m_vbl_timer->adjust(m_screen->time_until_pos(480, 0), 0);
 }
 
-static TIMER_CALLBACK(dafb_cursor_tick)
+TIMER_CALLBACK_MEMBER(mac_state::dafb_cursor_tick)
 {
-	mac_state *mac = machine.driver_data<mac_state>();
 
-	mac->m_dafb_int_status |= 4;
-	dafb_recalc_ints(mac);
+	m_dafb_int_status |= 4;
+	dafb_recalc_ints(this);
 
-	mac->m_cursor_timer->adjust(mac->m_screen->time_until_pos(mac->m_cursor_line, 0), 0);
+	m_cursor_timer->adjust(m_screen->time_until_pos(m_cursor_line, 0), 0);
 }
 
 VIDEO_START_MEMBER(mac_state,macdafb)
 {
-	m_vbl_timer = machine().scheduler().timer_alloc(FUNC(dafb_vbl_tick));
-	m_cursor_timer = machine().scheduler().timer_alloc(FUNC(dafb_cursor_tick));
+	m_vbl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::dafb_vbl_tick),this));
+	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::dafb_cursor_tick),this));
 
 	m_vbl_timer->adjust(attotime::never);
 	m_cursor_timer->adjust(attotime::never);

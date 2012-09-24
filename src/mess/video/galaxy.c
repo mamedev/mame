@@ -13,93 +13,92 @@
 #include "cpu/z80/z80.h"
 
 
-static TIMER_CALLBACK( gal_video )
+TIMER_CALLBACK_MEMBER(galaxy_state::gal_video)
 {
-	galaxy_state *state = machine.driver_data<galaxy_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int y, x;
-	if (state->m_interrupts_enabled == TRUE)
+	if (m_interrupts_enabled == TRUE)
 	{
-		UINT8 *gfx = state->memregion("gfx1")->base();
-		UINT8 dat = (state->m_latch_value & 0x3c) >> 2;
-		if ((state->m_gal_cnt >= 48 * 2) && (state->m_gal_cnt < 48 * 210))  // display on screen just state->m_first 208 lines
+		UINT8 *gfx = memregion("gfx1")->base();
+		UINT8 dat = (m_latch_value & 0x3c) >> 2;
+		if ((m_gal_cnt >= 48 * 2) && (m_gal_cnt < 48 * 210))  // display on screen just m_first 208 lines
 		{
-			UINT8 mode = (state->m_latch_value >> 1) & 1; // bit 2 latch represents mode
-			UINT16 addr = (machine.device("maincpu")->state().state_int(Z80_I) << 8) | machine.device("maincpu")->state().state_int(Z80_R) | ((state->m_latch_value & 0x80) ^ 0x80);
+			UINT8 mode = (m_latch_value >> 1) & 1; // bit 2 latch represents mode
+			UINT16 addr = (machine().device("maincpu")->state().state_int(Z80_I) << 8) | machine().device("maincpu")->state().state_int(Z80_R) | ((m_latch_value & 0x80) ^ 0x80);
 			if (mode == 0)
 			{
 				// Text mode
-				if (state->m_first == 0 && (machine.device("maincpu")->state().state_int(Z80_R) & 0x1f) == 0)
+				if (m_first == 0 && (machine().device("maincpu")->state().state_int(Z80_R) & 0x1f) == 0)
 				{
 					// Due to a fact that on real processor latch value is set at
 					// the end of last cycle we need to skip dusplay of double
-					// state->m_first char in each row
-					state->m_code = 0x00;
-					state->m_first = 1;
+					// m_first char in each row
+					m_code = 0x00;
+					m_first = 1;
 				}
 				else
 				{
-					state->m_code = space.read_byte(addr) & 0xbf;
-					state->m_code += (state->m_code & 0x80) >> 1;
-					state->m_code = gfx[(state->m_code & 0x7f) +(dat << 7 )] ^ 0xff;
-					state->m_first = 0;
+					m_code = space.read_byte(addr) & 0xbf;
+					m_code += (m_code & 0x80) >> 1;
+					m_code = gfx[(m_code & 0x7f) +(dat << 7 )] ^ 0xff;
+					m_first = 0;
 				}
-				y = state->m_gal_cnt / 48 - 2;
-				x = (state->m_gal_cnt % 48) * 8;
+				y = m_gal_cnt / 48 - 2;
+				x = (m_gal_cnt % 48) * 8;
 
-				state->m_bitmap.pix16(y, x ) = (state->m_code >> 0) & 1; x++;
-				state->m_bitmap.pix16(y, x ) = (state->m_code >> 1) & 1; x++;
-				state->m_bitmap.pix16(y, x ) = (state->m_code >> 2) & 1; x++;
-				state->m_bitmap.pix16(y, x ) = (state->m_code >> 3) & 1; x++;
-				state->m_bitmap.pix16(y, x ) = (state->m_code >> 4) & 1; x++;
-				state->m_bitmap.pix16(y, x ) = (state->m_code >> 5) & 1; x++;
-				state->m_bitmap.pix16(y, x ) = (state->m_code >> 6) & 1; x++;
-				state->m_bitmap.pix16(y, x ) = (state->m_code >> 7) & 1;
+				m_bitmap.pix16(y, x ) = (m_code >> 0) & 1; x++;
+				m_bitmap.pix16(y, x ) = (m_code >> 1) & 1; x++;
+				m_bitmap.pix16(y, x ) = (m_code >> 2) & 1; x++;
+				m_bitmap.pix16(y, x ) = (m_code >> 3) & 1; x++;
+				m_bitmap.pix16(y, x ) = (m_code >> 4) & 1; x++;
+				m_bitmap.pix16(y, x ) = (m_code >> 5) & 1; x++;
+				m_bitmap.pix16(y, x ) = (m_code >> 6) & 1; x++;
+				m_bitmap.pix16(y, x ) = (m_code >> 7) & 1;
 			}
 			else
 			{ // Graphics mode
-				if (state->m_first < 4 && (machine.device("maincpu")->state().state_int(Z80_R) & 0x1f) == 0)
+				if (m_first < 4 && (machine().device("maincpu")->state().state_int(Z80_R) & 0x1f) == 0)
 				{
 					// Due to a fact that on real processor latch value is set at
 					// the end of last cycle we need to skip dusplay of 4 times
-					// state->m_first char in each row
-					state->m_code = 0x00;
-					state->m_first++;
+					// m_first char in each row
+					m_code = 0x00;
+					m_first++;
 				}
 				else
 				{
-					state->m_code = space.read_byte(addr) ^ 0xff;
-					state->m_first = 0;
+					m_code = space.read_byte(addr) ^ 0xff;
+					m_first = 0;
 				}
-				y = state->m_gal_cnt / 48 - 2;
-				x = (state->m_gal_cnt % 48) * 8;
+				y = m_gal_cnt / 48 - 2;
+				x = (m_gal_cnt % 48) * 8;
 
 				/* hack - until calc of R is fixed in Z80 */
 				if (x == 11 * 8 && y == 0)
 				{
-					state->m_start_addr = addr;
+					m_start_addr = addr;
 				}
 				if ((x / 8 >= 11) && (x / 8 < 44))
 				{
-					state->m_code = space.read_byte(state->m_start_addr + y * 32 + (state->m_gal_cnt % 48) - 11) ^ 0xff;
+					m_code = space.read_byte(m_start_addr + y * 32 + (m_gal_cnt % 48) - 11) ^ 0xff;
 				}
 				else
 				{
-					state->m_code = 0x00;
+					m_code = 0x00;
 				}
 				/* end of hack */
 
-				state->m_bitmap.pix16(y, x ) = (state->m_code >> 0) & 1; x++;
-				state->m_bitmap.pix16(y, x ) = (state->m_code >> 1) & 1; x++;
-				state->m_bitmap.pix16(y, x ) = (state->m_code >> 2) & 1; x++;
-				state->m_bitmap.pix16(y, x ) = (state->m_code >> 3) & 1; x++;
-				state->m_bitmap.pix16(y, x ) = (state->m_code >> 4) & 1; x++;
-				state->m_bitmap.pix16(y, x ) = (state->m_code >> 5) & 1; x++;
-				state->m_bitmap.pix16(y, x ) = (state->m_code >> 6) & 1; x++;
-				state->m_bitmap.pix16(y, x ) = (state->m_code >> 7) & 1;
+				m_bitmap.pix16(y, x ) = (m_code >> 0) & 1; x++;
+				m_bitmap.pix16(y, x ) = (m_code >> 1) & 1; x++;
+				m_bitmap.pix16(y, x ) = (m_code >> 2) & 1; x++;
+				m_bitmap.pix16(y, x ) = (m_code >> 3) & 1; x++;
+				m_bitmap.pix16(y, x ) = (m_code >> 4) & 1; x++;
+				m_bitmap.pix16(y, x ) = (m_code >> 5) & 1; x++;
+				m_bitmap.pix16(y, x ) = (m_code >> 6) & 1; x++;
+				m_bitmap.pix16(y, x ) = (m_code >> 7) & 1;
 			}
 		}
-		state->m_gal_cnt++;
+		m_gal_cnt++;
 	}
 }
 
@@ -114,7 +113,7 @@ void galaxy_state::video_start()
 {
 	m_gal_cnt = 0;
 
-	m_gal_video_timer = machine().scheduler().timer_alloc(FUNC(gal_video));
+	m_gal_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaxy_state::gal_video),this));
 	m_gal_video_timer->adjust(attotime::zero, 0, attotime::never);
 
 	machine().primary_screen->register_screen_bitmap(m_bitmap);

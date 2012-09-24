@@ -82,6 +82,8 @@ public:
 	DECLARE_DRIVER_INIT(osborne1);
 	virtual void machine_reset();
 	virtual void palette_init();
+	TIMER_CALLBACK_MEMBER(osborne1_video_callback);
+	TIMER_CALLBACK_MEMBER(setup_osborne1);
 };
 
 

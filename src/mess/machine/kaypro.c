@@ -278,16 +278,16 @@ WRITE8_DEVICE_HANDLER( kaypro_sio_w )
 
 *************************************************************************************/
 
-static TIMER_CALLBACK( kaypro_timer_callback )
+TIMER_CALLBACK_MEMBER(kaypro_state::kaypro_timer_callback)
 {
-	if (machine.device("maincpu")->state().state_int(Z80_HALT))
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (machine().device("maincpu")->state().state_int(Z80_HALT))
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_intrq_w )
 {
 	if (state)
-		machine().scheduler().timer_set(attotime::from_usec(25), FUNC(kaypro_timer_callback));
+		machine().scheduler().timer_set(attotime::from_usec(25), timer_expired_delegate(FUNC(kaypro_state::kaypro_timer_callback),this));
 	else
 		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -295,7 +295,7 @@ WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_intrq_w )
 WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_drq_w )
 {
 	if (state)
-		machine().scheduler().timer_set(attotime::from_usec(25), FUNC(kaypro_timer_callback));
+		machine().scheduler().timer_set(attotime::from_usec(25), timer_expired_delegate(FUNC(kaypro_state::kaypro_timer_callback),this));
 	else
 		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 

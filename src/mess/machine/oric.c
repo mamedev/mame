@@ -254,15 +254,15 @@ static cassette_image_device *cassette_device_image(running_machine &machine)
 
 /* not called yet - this will update the via with the state of the tape data.
 This allows the via to trigger on bit changes and issue interrupts */
-static TIMER_CALLBACK(oric_refresh_tape)
+TIMER_CALLBACK_MEMBER(oric_state::oric_refresh_tape)
 {
 	int data;
 	int input_port_9;
-	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
+	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 
 	data = 0;
 
-	if ((cassette_device_image(machine))->input() > 0.0038)
+	if ((cassette_device_image(machine()))->input() > 0.0038)
 		data |= 1;
 
 	/* "A simple cable to catch the vertical retrace signal !
@@ -270,7 +270,7 @@ static TIMER_CALLBACK(oric_refresh_tape)
     to the via cb1 input. Interrupts can be generated from the vertical
     sync, and flicker free games can be produced */
 
-	input_port_9 = machine.root_device().ioport("FLOPPY")->read();
+	input_port_9 = machine().root_device().ioport("FLOPPY")->read();
 	/* cable is enabled? */
 	if ((input_port_9 & 0x08)!=0)
 	{
@@ -1048,7 +1048,7 @@ static void oric_common_init_machine(running_machine &machine)
 	state->m_port_314_r = 0;
 	state->m_port_318_r = 0;
 	state->m_port_314_w = 0;
-	machine.scheduler().timer_pulse(attotime::from_hz(4800), FUNC(oric_refresh_tape));
+	machine.scheduler().timer_pulse(attotime::from_hz(4800), timer_expired_delegate(FUNC(oric_state::oric_refresh_tape),state));
 }
 
 void oric_state::machine_start()

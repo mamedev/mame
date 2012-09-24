@@ -210,30 +210,28 @@ void kc_state::update_cassette(int state)
 	}
 }
 
-static TIMER_CALLBACK(kc_cassette_oneshot_timer)
+TIMER_CALLBACK_MEMBER(kc_state::kc_cassette_oneshot_timer)
 {
-	kc_state *state = machine.driver_data<kc_state>();
 
-	state->update_cassette(0);
+	update_cassette(0);
 
-	state->m_cassette_oneshot_timer->reset();
+	m_cassette_oneshot_timer->reset();
 }
 
 // timer used for polling data from cassette input
 // enabled only when cassette motor is on
-static TIMER_CALLBACK(kc_cassette_timer_callback)
+TIMER_CALLBACK_MEMBER(kc_state::kc_cassette_timer_callback)
 {
-	kc_state *state = machine.driver_data<kc_state>();
 
 	// read cassette data
-	int bit = (state->m_cassette->input() > 0.0038) ? 1 : 0;
+	int bit = (m_cassette->input() > 0.0038) ? 1 : 0;
 
 	// generates a pulse when the cassette input changes state
-	if (bit ^ state->m_cassette_in)
+	if (bit ^ m_cassette_in)
 	{
-		state->update_cassette(1);
-		state->m_cassette_in = bit;
-		state->m_cassette_oneshot_timer->adjust(attotime::from_double(TIME_OF_74LS123(RES_K(10), CAP_N(1))));
+		update_cassette(1);
+		m_cassette_in = bit;
+		m_cassette_oneshot_timer->adjust(attotime::from_double(TIME_OF_74LS123(RES_K(10), CAP_N(1))));
 	}
 }
 
@@ -759,8 +757,8 @@ WRITE_LINE_MEMBER( kc_state::keyboard_cb )
 
 void kc_state::machine_start()
 {
-	m_cassette_timer = machine().scheduler().timer_alloc(FUNC(kc_cassette_timer_callback));
-	m_cassette_oneshot_timer = machine().scheduler().timer_alloc(FUNC(kc_cassette_oneshot_timer));
+	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(kc_state::kc_cassette_timer_callback),this));
+	m_cassette_oneshot_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(kc_state::kc_cassette_oneshot_timer),this));
 
 	m_ram_base = m_ram->pointer();
 

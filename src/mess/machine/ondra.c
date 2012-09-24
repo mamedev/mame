@@ -75,11 +75,11 @@ WRITE8_MEMBER(ondra_state::ondra_port_0a_w)
 {
 }
 
-static TIMER_CALLBACK(nmi_check_callback)
+TIMER_CALLBACK_MEMBER(ondra_state::nmi_check_callback)
 {
-	if ((machine.root_device().ioport("NMI")->read() & 1) == 1)
+	if ((machine().root_device().ioport("NMI")->read() & 1) == 1)
 	{
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -92,5 +92,5 @@ void ondra_state::machine_reset()
 
 void ondra_state::machine_start()
 {
-	machine().scheduler().timer_pulse(attotime::from_hz(10), FUNC(nmi_check_callback));
+	machine().scheduler().timer_pulse(attotime::from_hz(10), timer_expired_delegate(FUNC(ondra_state::nmi_check_callback),this));
 }

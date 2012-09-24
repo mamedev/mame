@@ -178,10 +178,9 @@ static WRITE8_DEVICE_HANDLER( samcoupe_rtc_w )
     MOUSE
 ***************************************************************************/
 
-static TIMER_CALLBACK( samcoupe_mouse_reset )
+TIMER_CALLBACK_MEMBER(samcoupe_state::samcoupe_mouse_reset)
 {
-	samcoupe_state *state = machine.driver_data<samcoupe_state>();
-	state->m_mouse_index = 0;
+	m_mouse_index = 0;
 }
 
 UINT8 samcoupe_mouse_r(running_machine &machine)
@@ -231,10 +230,10 @@ UINT8 samcoupe_mouse_r(running_machine &machine)
 
 void samcoupe_state::machine_start()
 {
-	m_mouse_reset = machine().scheduler().timer_alloc(FUNC(samcoupe_mouse_reset));
+	m_mouse_reset = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(samcoupe_state::samcoupe_mouse_reset),this));
 
 	/* schedule our video updates */
-	m_video_update_timer = machine().scheduler().timer_alloc(FUNC(sam_video_update_callback));
+	m_video_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(samcoupe_state::sam_video_update_callback),this));
 	m_video_update_timer->adjust(machine().primary_screen->time_until_pos(0, 0));
 }
 

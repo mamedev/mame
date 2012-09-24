@@ -57,6 +57,9 @@ public:
 	DECLARE_VIDEO_START(pet_crtc);
 	UINT32 screen_update_pet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pet_frame_interrupt);
+	TIMER_CALLBACK_MEMBER(pet_interrupt);
+	TIMER_CALLBACK_MEMBER(pet_tape1_timer);
+	TIMER_CALLBACK_MEMBER(pet_tape2_timer);
 };
 
 /*----------- defined in video/pet.c -----------*/

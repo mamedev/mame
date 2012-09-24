@@ -39,39 +39,38 @@ static cassette_image_device *cassette_device_image(running_machine &machine)
 		return machine.device<cassette_image_device>(CASSETTE_TAG);
 }
 
-static TIMER_CALLBACK(z80ne_cassette_tc)
+TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_cassette_tc)
 {
-	z80ne_state *state = machine.driver_data<z80ne_state>();
 	UINT8 cass_ws = 0;
-	state->m_cass_data.input.length++;
+	m_cass_data.input.length++;
 
-	cass_ws = ((cassette_device_image(machine))->input() > +0.02) ? 1 : 0;
+	cass_ws = ((cassette_device_image(machine()))->input() > +0.02) ? 1 : 0;
 
-	if ((cass_ws ^ state->m_cass_data.input.level) & cass_ws)
+	if ((cass_ws ^ m_cass_data.input.level) & cass_ws)
 	{
-		state->m_cass_data.input.level = cass_ws;
-		state->m_cass_data.input.bit = ((state->m_cass_data.input.length < state->m_cass_data.wave_filter) || (state->m_cass_data.input.length > 0x20)) ? 1 : 0;
-		state->m_cass_data.input.length = 0;
-		ay31015_set_input_pin( state->m_ay31015, AY31015_SI, state->m_cass_data.input.bit );
+		m_cass_data.input.level = cass_ws;
+		m_cass_data.input.bit = ((m_cass_data.input.length < m_cass_data.wave_filter) || (m_cass_data.input.length > 0x20)) ? 1 : 0;
+		m_cass_data.input.length = 0;
+		ay31015_set_input_pin( m_ay31015, AY31015_SI, m_cass_data.input.bit );
 	}
-	state->m_cass_data.input.level = cass_ws;
+	m_cass_data.input.level = cass_ws;
 
 	/* saving a tape - convert the serial stream from the uart */
 
-	state->m_cass_data.output.length--;
+	m_cass_data.output.length--;
 
-	if (!(state->m_cass_data.output.length))
+	if (!(m_cass_data.output.length))
 	{
-		if (state->m_cass_data.output.level)
-			state->m_cass_data.output.level = 0;
+		if (m_cass_data.output.level)
+			m_cass_data.output.level = 0;
 		else
 		{
-			state->m_cass_data.output.level=1;
-			cass_ws = ay31015_get_output_pin( state->m_ay31015, AY31015_SO );
-			state->m_cass_data.wave_length = cass_ws ? state->m_cass_data.wave_short : state->m_cass_data.wave_long;
+			m_cass_data.output.level=1;
+			cass_ws = ay31015_get_output_pin( m_ay31015, AY31015_SO );
+			m_cass_data.wave_length = cass_ws ? m_cass_data.wave_short : m_cass_data.wave_long;
 		}
-		cassette_device_image(machine)->output(state->m_cass_data.output.level ? -1.0 : +1.0);
-		state->m_cass_data.output.length = state->m_cass_data.wave_length;
+		cassette_device_image(machine())->output(m_cass_data.output.level ? -1.0 : +1.0);
+		m_cass_data.output.length = m_cass_data.wave_length;
 	}
 }
 
@@ -114,9 +113,8 @@ DRIVER_INIT_MEMBER(z80ne_state,z80netf)
 
 }
 
-static TIMER_CALLBACK( z80ne_kbd_scan )
+TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_kbd_scan)
 {
-	z80ne_state *state = machine.driver_data<z80ne_state>();
 	/*
      * NE555 is connected to a 74LS93 binary counter
      * 74LS93 output:
@@ -141,19 +139,19 @@ static TIMER_CALLBACK( z80ne_kbd_scan )
 	UINT8 i;
 
 	/* 4-bit counter */
-	--state->m_lx383_scan_counter;
-	state->m_lx383_scan_counter &= 0x0f;
+	--m_lx383_scan_counter;
+	m_lx383_scan_counter &= 0x0f;
 
-	if ( --state->m_lx383_downsampler == 0 )
+	if ( --m_lx383_downsampler == 0 )
 	{
-		state->m_lx383_downsampler = LX383_DOWNSAMPLING;
-		key_bits = (machine.root_device().ioport("ROW1")->read() << 8) | machine.root_device().ioport("ROW0")->read();
-//      rst = machine.root_device().ioport("RST")->read();
-		ctrl = machine.root_device().ioport("CTRL")->read();
+		m_lx383_downsampler = LX383_DOWNSAMPLING;
+		key_bits = (machine().root_device().ioport("ROW1")->read() << 8) | machine().root_device().ioport("ROW0")->read();
+//      rst = machine().root_device().ioport("RST")->read();
+		ctrl = machine().root_device().ioport("CTRL")->read();
 
 		for ( i = 0; i<LX383_KEYS; i++)
 		{
-			state->m_lx383_key[i] = ( i | (key_bits & 0x01 ? 0x80 : 0x00) | ~ctrl);
+			m_lx383_key[i] = ( i | (key_bits & 0x01 ? 0x80 : 0x00) | ~ctrl);
 			key_bits >>= 1;
 		}
 	}
@@ -399,8 +397,8 @@ MACHINE_START_MEMBER(z80ne_state,z80ne)
 	state_save_register_item( machine(), "z80ne", NULL, 0, m_lx383_downsampler );
 	state_save_register_item_array( machine(), "z80ne", NULL, 0, m_lx383_key );
 	state_save_register_item( machine(), "z80ne", NULL, 0, m_nmi_delay_counter );
-	m_cassette_timer = machine().scheduler().timer_alloc(FUNC(z80ne_cassette_tc));
-	machine().scheduler().timer_pulse( attotime::from_hz(1000), FUNC(z80ne_kbd_scan));
+	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ne_state::z80ne_cassette_tc),this));
+	machine().scheduler().timer_pulse( attotime::from_hz(1000), timer_expired_delegate(FUNC(z80ne_state::z80ne_kbd_scan),this));
 }
 
 MACHINE_START_MEMBER(z80ne_state,z80net)

@@ -58,6 +58,9 @@ public:
 	DECLARE_MACHINE_RESET(pc8300);
 	DECLARE_MACHINE_RESET(pow3000);
 	void screen_eof_zx(screen_device &screen, bool state);
+	TIMER_CALLBACK_MEMBER(zx_tape_pulse);
+	TIMER_CALLBACK_MEMBER(zx_ula_nmi);
+	TIMER_CALLBACK_MEMBER(zx_ula_irq);
 };
 /*----------- defined in video/zx.c -----------*/
 

@@ -15,26 +15,25 @@
 #define TI86_SNAPSHOT_SIZE	131284
 
 
-static TIMER_CALLBACK(ti85_timer_callback)
+TIMER_CALLBACK_MEMBER(ti85_state::ti85_timer_callback)
 {
-	ti85_state *state = machine.driver_data<ti85_state>();
-	if (machine.root_device().ioport("ON")->read() & 0x01)
+	if (machine().root_device().ioport("ON")->read() & 0x01)
 	{
-		if (state->m_ON_interrupt_mask && !state->m_ON_pressed)
+		if (m_ON_interrupt_mask && !m_ON_pressed)
 		{
-			state->m_maincpu->set_input_line(0, HOLD_LINE);
-			state->m_ON_interrupt_status = 1;
-			if (!state->m_timer_interrupt_mask) state->m_timer_interrupt_mask = 1;
+			m_maincpu->set_input_line(0, HOLD_LINE);
+			m_ON_interrupt_status = 1;
+			if (!m_timer_interrupt_mask) m_timer_interrupt_mask = 1;
 		}
-		state->m_ON_pressed = 1;
+		m_ON_pressed = 1;
 		return;
 	}
 	else
-		state->m_ON_pressed = 0;
-	if (state->m_timer_interrupt_mask)
+		m_ON_pressed = 0;
+	if (m_timer_interrupt_mask)
 	{
-		state->m_maincpu->set_input_line(0, HOLD_LINE);
-		state->m_timer_interrupt_status = 1;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_timer_interrupt_status = 1;
 	}
 }
 
@@ -131,7 +130,7 @@ void ti85_state::machine_start()
 	m_port4_bit0 = 0;
 	m_ti81_port_7_data = 0;
 
-	machine().scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
+	machine().scheduler().timer_pulse(attotime::from_hz(200), timer_expired_delegate(FUNC(ti85_state::ti85_timer_callback),this));
 
 	space.unmap_write(0x0000, 0x3fff);
 	space.unmap_write(0x4000, 0x7fff);
@@ -180,7 +179,7 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 	membank("bank3")->set_base(m_bios);
 	membank("bank4")->set_base(m_ti8x_ram);
 
-	machine().scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
+	machine().scheduler().timer_pulse(attotime::from_hz(200), timer_expired_delegate(FUNC(ti85_state::ti85_timer_callback),this));
 
 }
 
@@ -216,7 +215,7 @@ MACHINE_START_MEMBER(ti85_state,ti86)
 
 	membank("bank4")->set_base(m_ti8x_ram);
 
-	machine().scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
+	machine().scheduler().timer_pulse(attotime::from_hz(200), timer_expired_delegate(FUNC(ti85_state::ti85_timer_callback),this));
 }
 
 

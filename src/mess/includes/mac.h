@@ -523,6 +523,12 @@ public:
 	UINT32 screen_update_macrbvvram(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mac_rbv_vbl);
+	TIMER_CALLBACK_MEMBER(kbd_clock);
+	TIMER_CALLBACK_MEMBER(inquiry_timeout_func);
+	TIMER_CALLBACK_MEMBER(mac_6015_tick);
+	TIMER_CALLBACK_MEMBER(mac_scanline_tick);
+	TIMER_CALLBACK_MEMBER(dafb_vbl_tick);
+	TIMER_CALLBACK_MEMBER(dafb_cursor_tick);
 };
 
 #endif /* MAC_H_ */

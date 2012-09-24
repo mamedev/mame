@@ -124,6 +124,8 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(nes_irq_callback);
+	TIMER_CALLBACK_MEMBER(lightgun_tick);
 };
 
 /*----------- defined in machine/nes.c -----------*/

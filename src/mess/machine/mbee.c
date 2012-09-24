@@ -129,9 +129,8 @@ WRITE8_MEMBER( mbee_state::mbee_fdc_motor_w )
 ************************************************************/
 
 
-static TIMER_CALLBACK( mbee256_kbd )
+TIMER_CALLBACK_MEMBER(mbee_state::mbee256_kbd)
 {
-	mbee_state *state = machine.driver_data<mbee_state>();
     /* Keyboard scanner is a Mostek M3870 chip. Its speed of operation is determined by a 15k resistor on
     pin 2 (XTL2) and is therefore unknown. If a key change is detected (up or down), the /strobe
     line activates, sending a high to bit 1 of port 2 (one of the pio input lines). The next read of
@@ -152,31 +151,31 @@ static TIMER_CALLBACK( mbee256_kbd )
 	for (i = 0; i < 15; i++)
 	{
 		sprintf(kbdrow,"X%d",i);
-		pressed[i] = (machine.root_device().ioport(kbdrow)->read());
+		pressed[i] = (machine().root_device().ioport(kbdrow)->read());
 	}
 
 	/* find what has changed */
 	for (i = 0; i < 15; i++)
 	{
-		if (pressed[i] != state->m_mbee256_was_pressed[i])
+		if (pressed[i] != m_mbee256_was_pressed[i])
 		{
 			/* get scankey value */
 			for (j = 0; j < 8; j++)
 			{
-				if (BIT(pressed[i]^state->m_mbee256_was_pressed[i], j))
+				if (BIT(pressed[i]^m_mbee256_was_pressed[i], j))
 				{
 					/* put it in the queue */
-					state->m_mbee256_q[state->m_mbee256_q_pos] = (i << 3) | j | (BIT(pressed[i], j) ? 0x80 : 0);
-					if (state->m_mbee256_q_pos < 19) state->m_mbee256_q_pos++;
+					m_mbee256_q[m_mbee256_q_pos] = (i << 3) | j | (BIT(pressed[i], j) ? 0x80 : 0);
+					if (m_mbee256_q_pos < 19) m_mbee256_q_pos++;
 				}
 			}
-			state->m_mbee256_was_pressed[i] = pressed[i];
+			m_mbee256_was_pressed[i] = pressed[i];
 		}
 	}
 
 	/* if anything queued, cause an interrupt */
-	if (state->m_mbee256_q_pos)
-		state->m_mbee256_key_available = 2; // set irq
+	if (m_mbee256_q_pos)
+		m_mbee256_key_available = 2; // set irq
 }
 
 READ8_MEMBER( mbee_state::mbee256_18_r )
@@ -238,12 +237,11 @@ READ8_MEMBER( mbee_state::mbee_07_r )	// read
 	return machine().device<mc146818_device>("rtc")->read(mem, 1);
 }
 
-static TIMER_CALLBACK( mbee_rtc_irq )
+TIMER_CALLBACK_MEMBER(mbee_state::mbee_rtc_irq)
 {
-	mbee_state *state = machine.driver_data<mbee_state>();
-	address_space &mem = machine.device("maincpu")->memory().space(AS_IO);
-	UINT8 data = machine.device<mc146818_device>("rtc")->read(mem, 12);
-	if (data) state->m_clock_pulse = 0x80;
+	address_space &mem = machine().device("maincpu")->memory().space(AS_IO);
+	UINT8 data = machine().device<mc146818_device>("rtc")->read(mem, 12);
+	if (data) m_clock_pulse = 0x80;
 }
 
 
@@ -495,10 +493,9 @@ READ8_MEMBER( mbee_state::mbeepc_telcom_high_r )
 
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
-static TIMER_CALLBACK( mbee_reset )
+TIMER_CALLBACK_MEMBER(mbee_state::mbee_reset)
 {
-	mbee_state *state = machine.driver_data<mbee_state>();
-	state->membank("boot")->set_entry(0);
+	membank("boot")->set_entry(0);
 }
 
 static void machine_reset_common_disk(running_machine &machine)
@@ -512,14 +509,14 @@ static void machine_reset_common_disk(running_machine &machine)
 MACHINE_RESET_MEMBER(mbee_state,mbee)
 {
 	membank("boot")->set_entry(1);
-	machine().scheduler().timer_set(attotime::from_usec(4), FUNC(mbee_reset));
+	machine().scheduler().timer_set(attotime::from_usec(4), timer_expired_delegate(FUNC(mbee_state::mbee_reset),this));
 }
 
 MACHINE_RESET_MEMBER(mbee_state,mbee56)
 {
 	machine_reset_common_disk(machine());
 	membank("boot")->set_entry(1);
-	machine().scheduler().timer_set(attotime::from_usec(4), FUNC(mbee_reset));
+	machine().scheduler().timer_set(attotime::from_usec(4), timer_expired_delegate(FUNC(mbee_state::mbee_reset),this));
 }
 
 MACHINE_RESET_MEMBER(mbee_state,mbee64)
@@ -547,7 +544,7 @@ MACHINE_RESET_MEMBER(mbee_state,mbee256)
 	m_mbee256_q_pos = 0;
 	mbee256_50_w(mem,0,0); // set banks to default
 	membank("boot")->set_entry(8); // boot time
-	machine().scheduler().timer_set(attotime::from_usec(4), FUNC(mbee_reset));
+	machine().scheduler().timer_set(attotime::from_usec(4), timer_expired_delegate(FUNC(mbee_state::mbee_reset),this));
 }
 
 MACHINE_RESET_MEMBER(mbee_state,mbeett)
@@ -556,7 +553,7 @@ MACHINE_RESET_MEMBER(mbee_state,mbeett)
 	for (i = 0; i < 15; i++) m_mbee256_was_pressed[i] = 0;
 	m_mbee256_q_pos = 0;
 	membank("boot")->set_entry(1);
-	machine().scheduler().timer_set(attotime::from_usec(4), FUNC(mbee_reset));
+	machine().scheduler().timer_set(attotime::from_usec(4), timer_expired_delegate(FUNC(mbee_state::mbee_reset),this));
 }
 
 INTERRUPT_GEN_MEMBER(mbee_state::mbee_interrupt)
@@ -713,8 +710,8 @@ DRIVER_INIT_MEMBER(mbee_state,mbee256)
 	membank("bank8l")->configure_entry(0, &RAM[0x0000]); // rom
 	membank("bank8h")->configure_entry(0, &RAM[0x0800]); // rom
 
-	machine().scheduler().timer_pulse(attotime::from_hz(1), FUNC(mbee_rtc_irq));	/* timer for rtc */
-	machine().scheduler().timer_pulse(attotime::from_hz(25), FUNC(mbee256_kbd));	/* timer for kbd */
+	machine().scheduler().timer_pulse(attotime::from_hz(1), timer_expired_delegate(FUNC(mbee_state::mbee_rtc_irq),this));	/* timer for rtc */
+	machine().scheduler().timer_pulse(attotime::from_hz(25), timer_expired_delegate(FUNC(mbee_state::mbee256_kbd),this));	/* timer for kbd */
 
 	m_size = 0x8000;
 }
@@ -733,8 +730,8 @@ DRIVER_INIT_MEMBER(mbee_state,mbeett)
 	membank("pak")->set_entry(5);
 	membank("telcom")->set_entry(0);
 
-	machine().scheduler().timer_pulse(attotime::from_hz(1), FUNC(mbee_rtc_irq));	/* timer for rtc */
-	machine().scheduler().timer_pulse(attotime::from_hz(25), FUNC(mbee256_kbd));	/* timer for kbd */
+	machine().scheduler().timer_pulse(attotime::from_hz(1), timer_expired_delegate(FUNC(mbee_state::mbee_rtc_irq),this));	/* timer for rtc */
+	machine().scheduler().timer_pulse(attotime::from_hz(25), timer_expired_delegate(FUNC(mbee_state::mbee256_kbd),this));	/* timer for kbd */
 
 	m_size = 0x8000;
 }

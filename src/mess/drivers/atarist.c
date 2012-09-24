@@ -479,11 +479,10 @@ void st_state::mouse_tick()
 //  TIMER_CALLBACK( st_mouse_tick )
 //-------------------------------------------------
 
-static TIMER_CALLBACK( st_mouse_tick )
+TIMER_CALLBACK_MEMBER(st_state::st_mouse_tick)
 {
-	st_state *state = machine.driver_data<st_state>();
 
-	state->mouse_tick();
+	mouse_tick();
 }
 
 
@@ -776,11 +775,10 @@ void ste_state::dmasound_tick()
 //  TIMER_CALLBACK( atariste_dmasound_tick )
 //-------------------------------------------------
 
-static TIMER_CALLBACK( atariste_dmasound_tick )
+TIMER_CALLBACK_MEMBER(ste_state::atariste_dmasound_tick)
 {
-	ste_state *state = machine.driver_data<ste_state>();
 
-	state->dmasound_tick();
+	dmasound_tick();
 }
 
 
@@ -1027,11 +1025,10 @@ void ste_state::microwire_tick()
 //  TIMER_CALLBACK( atariste_microwire_tick )
 //-------------------------------------------------
 
-static TIMER_CALLBACK( atariste_microwire_tick )
+TIMER_CALLBACK_MEMBER(ste_state::atariste_microwire_tick)
 {
-	ste_state *state = machine.driver_data<ste_state>();
 
-	state->microwire_tick();
+	microwire_tick();
 }
 
 
@@ -2208,7 +2205,7 @@ void st_state::machine_start()
 	m_maincpu->set_irq_acknowledge_callback(atarist_int_ack);
 
 	// allocate timers
-	m_mouse_timer = machine().scheduler().timer_alloc(FUNC(st_mouse_tick));
+	m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_state::st_mouse_tick),this));
 	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(500));
 
 	// register for state saving
@@ -2265,8 +2262,8 @@ void ste_state::machine_start()
 	m_maincpu->set_irq_acknowledge_callback(atarist_int_ack);
 
 	/* allocate timers */
-	m_dmasound_timer = machine().scheduler().timer_alloc(FUNC(atariste_dmasound_tick));
-	m_microwire_timer = machine().scheduler().timer_alloc(FUNC(atariste_microwire_tick));
+	m_dmasound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ste_state::atariste_dmasound_tick),this));
+	m_microwire_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ste_state::atariste_microwire_tick),this));
 
 	/* register for state saving */
 	state_save();

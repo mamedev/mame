@@ -164,6 +164,11 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_gp32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(s3c240x_lcd_timer_exp);
+	TIMER_CALLBACK_MEMBER(s3c240x_pwm_timer_exp);
+	TIMER_CALLBACK_MEMBER(s3c240x_dma_timer_exp);
+	TIMER_CALLBACK_MEMBER(s3c240x_iic_timer_exp);
+	TIMER_CALLBACK_MEMBER(s3c240x_iis_timer_exp);
 };
 
 

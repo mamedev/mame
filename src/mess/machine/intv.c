@@ -650,25 +650,23 @@ MACHINE_RESET_MEMBER(intv_state,intvecs)
 }
 
 
-static TIMER_CALLBACK(intv_interrupt_complete)
+TIMER_CALLBACK_MEMBER(intv_state::intv_interrupt_complete)
 {
-	intv_state *state = machine.driver_data<intv_state>();
-	machine.device("maincpu")->execute().set_input_line(CP1610_INT_INTRM, CLEAR_LINE);
-	state->m_bus_copy_mode = 0;
+	machine().device("maincpu")->execute().set_input_line(CP1610_INT_INTRM, CLEAR_LINE);
+	m_bus_copy_mode = 0;
 }
 
-static TIMER_CALLBACK(intv_btb_fill)
+TIMER_CALLBACK_MEMBER(intv_state::intv_btb_fill)
 {
-	intv_state *state = machine.driver_data<intv_state>();
 	UINT8 column;
-	UINT8 row = state->m_backtab_row;
-	//machine.device("maincpu")->execute().adjust_icount(-STIC_ROW_FETCH);
+	UINT8 row = m_backtab_row;
+	//machine().device("maincpu")->execute().adjust_icount(-STIC_ROW_FETCH);
 	for(column=0; column < STIC_BACKTAB_WIDTH; column++)
 	{
-		state->m_backtab_buffer[row][column] = state->m_ram16[column + row * STIC_BACKTAB_WIDTH];
+		m_backtab_buffer[row][column] = m_ram16[column + row * STIC_BACKTAB_WIDTH];
 	}
 
-	state->m_backtab_row += 1;
+	m_backtab_row += 1;
 }
 
 INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt)
@@ -680,11 +678,11 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt)
 	UINT8 row;
 	machine().device("maincpu")->execute().adjust_icount(-(12*STIC_ROW_BUSRQ+STIC_FRAME_BUSRQ)); // Account for stic cycle stealing
 	machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")
-		->cycles_to_attotime(STIC_VBLANK_END), FUNC(intv_interrupt_complete));
+		->cycles_to_attotime(STIC_VBLANK_END), timer_expired_delegate(FUNC(intv_state::intv_interrupt_complete),this));
 	for (row=0; row < STIC_BACKTAB_HEIGHT; row++)
 	{
 		machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")
-			->cycles_to_attotime(STIC_FIRST_FETCH-STIC_FRAME_BUSRQ+STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*m_row_delay + (STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*STIC_CARD_HEIGHT - STIC_ROW_BUSRQ)*row), FUNC(intv_btb_fill));
+			->cycles_to_attotime(STIC_FIRST_FETCH-STIC_FRAME_BUSRQ+STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*m_row_delay + (STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*STIC_CARD_HEIGHT - STIC_ROW_BUSRQ)*row), timer_expired_delegate(FUNC(intv_state::intv_btb_fill),this));
 	}
 
 	if (m_row_delay == 0)

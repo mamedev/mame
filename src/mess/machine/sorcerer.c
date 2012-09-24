@@ -12,14 +12,13 @@
 
 /* timer for sorcerer serial chip transmit and receive */
 
-static TIMER_CALLBACK(sorcerer_serial_tc)
+TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_serial_tc)
 {
-	sorcerer_state *state = machine.driver_data<sorcerer_state>();
 	/* if rs232 is enabled, uart is connected to clock defined by bit6 of port fe.
     Transmit and receive clocks are connected to the same clock */
 
 	/* if rs232 is disabled, receive clock is linked to cassette hardware */
-	if (state->m_fe & 0x80)
+	if (m_fe & 0x80)
 	{
 		/* connect to rs232 */
 	}
@@ -41,89 +40,88 @@ static cassette_image_device *cassette_device_image(running_machine &machine)
 
 
 
-static TIMER_CALLBACK(sorcerer_cassette_tc)
+TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
 {
-	sorcerer_state *state = machine.driver_data<sorcerer_state>();
 	UINT8 cass_ws = 0;
-	switch (state->m_fe & 0xc0)		/*/ bit 7 low indicates cassette */
+	switch (m_fe & 0xc0)		/*/ bit 7 low indicates cassette */
 	{
 		case 0x00:				/* Cassette 300 baud */
 
 			/* loading a tape - this is basically the same as the super80.
                            We convert the 1200/2400 Hz signal to a 0 or 1, and send it to the uart. */
 
-			state->m_cass_data.input.length++;
+			m_cass_data.input.length++;
 
-			cass_ws = ((cassette_device_image(machine))->input() > +0.02) ? 1 : 0;
+			cass_ws = ((cassette_device_image(machine()))->input() > +0.02) ? 1 : 0;
 
-			if (cass_ws != state->m_cass_data.input.level)
+			if (cass_ws != m_cass_data.input.level)
 			{
-				state->m_cass_data.input.level = cass_ws;
-				state->m_cass_data.input.bit = ((state->m_cass_data.input.length < 0x6) || (state->m_cass_data.input.length > 0x20)) ? 1 : 0;
-				state->m_cass_data.input.length = 0;
-				ay31015_set_input_pin( state->m_uart, AY31015_SI, state->m_cass_data.input.bit );
+				m_cass_data.input.level = cass_ws;
+				m_cass_data.input.bit = ((m_cass_data.input.length < 0x6) || (m_cass_data.input.length > 0x20)) ? 1 : 0;
+				m_cass_data.input.length = 0;
+				ay31015_set_input_pin( m_uart, AY31015_SI, m_cass_data.input.bit );
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 1200 and 2400 Hz frequencies.
                            Synchronisation of the frequency pulses to the uart is extremely important. */
 
-			state->m_cass_data.output.length++;
-			if (!(state->m_cass_data.output.length & 0x1f))
+			m_cass_data.output.length++;
+			if (!(m_cass_data.output.length & 0x1f))
 			{
-				cass_ws = ay31015_get_output_pin( state->m_uart, AY31015_SO );
-				if (cass_ws != state->m_cass_data.output.bit)
+				cass_ws = ay31015_get_output_pin( m_uart, AY31015_SO );
+				if (cass_ws != m_cass_data.output.bit)
 				{
-					state->m_cass_data.output.bit = cass_ws;
-					state->m_cass_data.output.length = 0;
+					m_cass_data.output.bit = cass_ws;
+					m_cass_data.output.length = 0;
 				}
 			}
 
-			if (!(state->m_cass_data.output.length & 3))
+			if (!(m_cass_data.output.length & 3))
 			{
-				if (!((state->m_cass_data.output.bit == 0) && (state->m_cass_data.output.length & 4)))
+				if (!((m_cass_data.output.bit == 0) && (m_cass_data.output.length & 4)))
 				{
-					state->m_cass_data.output.level ^= 1;			// toggle output state, except on 2nd half of low bit
-					cassette_device_image(machine)->output(state->m_cass_data.output.level ? -1.0 : +1.0);
+					m_cass_data.output.level ^= 1;			// toggle output this, except on 2nd half of low bit
+					cassette_device_image(machine())->output(m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;
 
 		case 0x40:			/* Cassette 1200 baud */
 			/* loading a tape */
-			state->m_cass_data.input.length++;
+			m_cass_data.input.length++;
 
-			cass_ws = ((cassette_device_image(machine))->input() > +0.02) ? 1 : 0;
+			cass_ws = ((cassette_device_image(machine()))->input() > +0.02) ? 1 : 0;
 
-			if (cass_ws != state->m_cass_data.input.level || state->m_cass_data.input.length == 10)
+			if (cass_ws != m_cass_data.input.level || m_cass_data.input.length == 10)
 			{
-				state->m_cass_data.input.bit = ((state->m_cass_data.input.length < 10) || (state->m_cass_data.input.length > 0x20)) ? 1 : 0;
-				if ( cass_ws != state->m_cass_data.input.level )
+				m_cass_data.input.bit = ((m_cass_data.input.length < 10) || (m_cass_data.input.length > 0x20)) ? 1 : 0;
+				if ( cass_ws != m_cass_data.input.level )
 				{
-					state->m_cass_data.input.length = 0;
-					state->m_cass_data.input.level = cass_ws;
+					m_cass_data.input.length = 0;
+					m_cass_data.input.level = cass_ws;
 				}
-				ay31015_set_input_pin( state->m_uart, AY31015_SI, state->m_cass_data.input.bit );
+				ay31015_set_input_pin( m_uart, AY31015_SI, m_cass_data.input.bit );
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 600 and 1200 Hz frequencies. */
 
-			state->m_cass_data.output.length++;
-			if (!(state->m_cass_data.output.length & 7))
+			m_cass_data.output.length++;
+			if (!(m_cass_data.output.length & 7))
 			{
-				cass_ws = ay31015_get_output_pin( state->m_uart, AY31015_SO );
-				if (cass_ws != state->m_cass_data.output.bit)
+				cass_ws = ay31015_get_output_pin( m_uart, AY31015_SO );
+				if (cass_ws != m_cass_data.output.bit)
 				{
-					state->m_cass_data.output.bit = cass_ws;
-					state->m_cass_data.output.length = 0;
+					m_cass_data.output.bit = cass_ws;
+					m_cass_data.output.length = 0;
 				}
 			}
 
-			if (!(state->m_cass_data.output.length & 7))
+			if (!(m_cass_data.output.length & 7))
 			{
-				if (!((state->m_cass_data.output.bit == 0) && (state->m_cass_data.output.length & 8)))
+				if (!((m_cass_data.output.bit == 0) && (m_cass_data.output.length & 8)))
 				{
-					state->m_cass_data.output.level ^= 1;			// toggle output state, except on 2nd half of low bit
-					cassette_device_image(machine)->output(state->m_cass_data.output.level ? -1.0 : +1.0);
+					m_cass_data.output.level ^= 1;			// toggle output this, except on 2nd half of low bit
+					cassette_device_image(machine())->output(m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;
@@ -132,10 +130,9 @@ static TIMER_CALLBACK(sorcerer_cassette_tc)
 
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
-static TIMER_CALLBACK( sorcerer_reset )
+TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_reset)
 {
-	sorcerer_state *state = machine.driver_data<sorcerer_state>();
-	state->membank("boot")->set_entry(0);
+	membank("boot")->set_entry(0);
 }
 
 WRITE8_MEMBER(sorcerer_state::sorcerer_fc_w)
@@ -353,9 +350,9 @@ SNAPSHOT_LOAD(sorcerer)
 
 void sorcerer_state::machine_start()
 {
-	m_cassette_timer = machine().scheduler().timer_alloc(FUNC(sorcerer_cassette_tc));
+	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sorcerer_state::sorcerer_cassette_tc),this));
 #if SORCERER_USING_RS232
-	m_serial_timer = machine().scheduler().timer_alloc(FUNC(sorcerer_serial_tc));
+	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sorcerer_state::sorcerer_serial_tc),this));
 #endif
 
 	UINT16 endmem = 0xbfff;
@@ -380,9 +377,9 @@ void sorcerer_state::machine_start()
 
 MACHINE_START_MEMBER(sorcerer_state,sorcererd)
 {
-	m_cassette_timer = machine().scheduler().timer_alloc(FUNC(sorcerer_cassette_tc));
+	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sorcerer_state::sorcerer_cassette_tc),this));
 #if SORCERER_USING_RS232
-	m_serial_timer = machine().scheduler().timer_alloc(FUNC(sorcerer_serial_tc));
+	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sorcerer_state::sorcerer_serial_tc),this));
 #endif
 
 	UINT16 endmem = 0xbbff;
@@ -419,5 +416,5 @@ void sorcerer_state::machine_reset()
 	sorcerer_fe_w(space, 0, 0, 0xff);
 
 	membank("boot")->set_entry(1);
-	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(sorcerer_reset));
+	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(sorcerer_state::sorcerer_reset),this));
 }

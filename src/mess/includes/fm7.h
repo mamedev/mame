@@ -239,6 +239,13 @@ public:
 	DECLARE_MACHINE_START(fm11);
 	DECLARE_MACHINE_START(fm16);
 	UINT32 screen_update_fm7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(fm7_beeper_off);
+	TIMER_CALLBACK_MEMBER(fm77av_encoder_ack);
+	TIMER_CALLBACK_MEMBER(fm7_timer_irq);
+	TIMER_CALLBACK_MEMBER(fm7_subtimer_irq);
+	TIMER_CALLBACK_MEMBER(fm7_keyboard_poll);
+	TIMER_CALLBACK_MEMBER(fm77av_alu_task_end);
+	TIMER_CALLBACK_MEMBER(fm77av_vsync);
 };
 
 /*----------- defined in video/fm7.c -----------*/

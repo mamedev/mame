@@ -49,6 +49,7 @@ public:
 	UINT8 m_segment;
 
 	emu_timer *m_led_refresh_timer;
+	TIMER_CALLBACK_MEMBER(led_refresh);
 };
 
 #endif

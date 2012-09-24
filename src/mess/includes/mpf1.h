@@ -55,6 +55,7 @@ public:
 
 	emu_timer *m_led_refresh_timer;
 	DECLARE_DRIVER_INIT(mpf1);
+	TIMER_CALLBACK_MEMBER(led_refresh);
 };
 
 #endif

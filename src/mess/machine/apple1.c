@@ -51,15 +51,15 @@
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 
-static TIMER_CALLBACK(apple1_kbd_poll);
-static TIMER_CALLBACK(apple1_kbd_strobe_end);
+
+
 
 static DECLARE_READ8_DEVICE_HANDLER( apple1_pia0_kbdin );
 static DECLARE_WRITE8_DEVICE_HANDLER( apple1_pia0_dspout );
 static DECLARE_WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal );
 
-static TIMER_CALLBACK(apple1_dsp_ready_start);
-static TIMER_CALLBACK(apple1_dsp_ready_end);
+
+
 
 /*****************************************************************************
 **  Structures
@@ -158,7 +158,7 @@ DRIVER_INIT_MEMBER(apple1_state,apple1)
 
        A 120-Hz poll rate seems to be fast enough to ensure no
        keystrokes are missed. */
-	machine().scheduler().timer_pulse(attotime::from_hz(120), FUNC(apple1_kbd_poll));
+	machine().scheduler().timer_pulse(attotime::from_hz(120), timer_expired_delegate(FUNC(apple1_state::apple1_kbd_poll),this));
 }
 
 
@@ -277,13 +277,12 @@ SNAPSHOT_LOAD(apple1)
 **  If multiple newly-pressed keys are found, the one closest to the
 **  end of the input ports list is counted; the others are ignored.
 *****************************************************************************/
-static TIMER_CALLBACK(apple1_kbd_poll)
+TIMER_CALLBACK_MEMBER(apple1_state::apple1_kbd_poll)
 {
-	apple1_state *state = machine.driver_data<apple1_state>();
 	int port, bit;
 	int key_pressed;
 	UINT32 shiftkeys, ctrlkeys;
-	pia6821_device *pia = machine.device<pia6821_device>("pia");
+	pia6821_device *pia = machine().device<pia6821_device>("pia");
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
 	/* This holds the values of all the input ports for ordinary keys
@@ -292,56 +291,56 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	/* First we check the RESET and CLEAR SCREEN pushbutton switches. */
 
 	/* The RESET switch resets the CPU and the 6820 PIA. */
-	if (machine.root_device().ioport("KEY5")->read() & 0x0001)
+	if (machine().root_device().ioport("KEY5")->read() & 0x0001)
 	{
-		if (!state->m_reset_flag) {
-			state->m_reset_flag = 1;
+		if (!m_reset_flag) {
+			m_reset_flag = 1;
 			/* using PULSE_LINE does not allow us to press and hold key */
-			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			pia->reset();
 		}
 	}
-	else if (state->m_reset_flag) {
+	else if (m_reset_flag) {
 		/* RESET released--allow the processor to continue. */
-		state->m_reset_flag = 0;
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_reset_flag = 0;
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
 
 	/* The CLEAR SCREEN switch clears the video hardware. */
-	if (machine.root_device().ioport("KEY5")->read() & 0x0002)
+	if (machine().root_device().ioport("KEY5")->read() & 0x0002)
 	{
-		if (!state->m_vh_clrscrn_pressed)
+		if (!m_vh_clrscrn_pressed)
 		{
 			/* Ignore further video writes, and clear the screen. */
-			state->m_vh_clrscrn_pressed = 1;
-			apple1_vh_dsp_clr(machine);
+			m_vh_clrscrn_pressed = 1;
+			apple1_vh_dsp_clr(machine());
 		}
 	}
-	else if (state->m_vh_clrscrn_pressed)
+	else if (m_vh_clrscrn_pressed)
 	{
 		/* CLEAR SCREEN released--pay attention to video writes again. */
-		state->m_vh_clrscrn_pressed = 0;
+		m_vh_clrscrn_pressed = 0;
 	}
 
 	/* Now we scan all the input ports for ordinary keys, recording
        new keypresses while ignoring keys that were already pressed in
        the last scan. */
 
-	state->m_kbd_data = 0;
+	m_kbd_data = 0;
 	key_pressed = 0;
 
 	/* The keyboard strobe line should always be low when a scan starts. */
 	pia->ca1_w(0);
 
-	shiftkeys = machine.root_device().ioport("KEY4")->read() & 0x0003;
-	ctrlkeys = machine.root_device().ioport("KEY4")->read() & 0x000c;
+	shiftkeys = machine().root_device().ioport("KEY4")->read() & 0x0003;
+	ctrlkeys = machine().root_device().ioport("KEY4")->read() & 0x000c;
 
 	for (port = 0; port < 4; port++)
 	{
 		UINT32 portval, newkeys;
 
-		portval = machine.root_device().ioport(keynames[port])->read();
-		newkeys = portval & ~(state->m_kbd_last_scan[port]);
+		portval = machine().root_device().ioport(keynames[port])->read();
+		newkeys = portval & ~(m_kbd_last_scan[port]);
 
 		if (newkeys)
 		{
@@ -349,7 +348,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 			for (bit = 0; bit < 16; bit++) {
 				if (newkeys & 1)
 				{
-					state->m_kbd_data = (ctrlkeys)
+					m_kbd_data = (ctrlkeys)
 					  ? apple1_control_keymap[port*16 + bit]
 					  : (shiftkeys)
 					  ? apple1_shifted_keymap[port*16 + bit]
@@ -358,7 +357,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 				newkeys >>= 1;
 			}
 		}
-		state->m_kbd_last_scan[port] = portval;
+		m_kbd_last_scan[port] = portval;
 	}
 
 	if (key_pressed)
@@ -366,13 +365,13 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 		/* The keyboard will pulse its strobe line when a key is
            pressed.  A 10-usec pulse is typical. */
 		pia->ca1_w(1);
-		machine.scheduler().timer_set(attotime::from_usec(10), FUNC(apple1_kbd_strobe_end));
+		machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(apple1_state::apple1_kbd_strobe_end),this));
 	}
 }
 
-static TIMER_CALLBACK(apple1_kbd_strobe_end)
+TIMER_CALLBACK_MEMBER(apple1_state::apple1_kbd_strobe_end)
 {
-	pia6821_device *pia = machine.device<pia6821_device>("pia");
+	pia6821_device *pia = machine().device<pia6821_device>("pia");
 
 	/* End of the keyboard strobe pulse. */
 	pia->ca1_w(0);
@@ -412,25 +411,26 @@ static WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal )
        Only then will it assert \RDA to signal readiness for another
        write.  Thus the write delay depends on the cursor position and
        where the display is in the refresh cycle. */
+	apple1_state *state = space.machine().driver_data<apple1_state>();	   
 	if (!data)
-		space.machine().scheduler().timer_set(apple1_vh_dsp_time_to_ready(space.machine()), FUNC(apple1_dsp_ready_start));
+		space.machine().scheduler().timer_set(apple1_vh_dsp_time_to_ready(space.machine()), timer_expired_delegate(FUNC(apple1_state::apple1_dsp_ready_start),state));
 }
 
-static TIMER_CALLBACK(apple1_dsp_ready_start)
+TIMER_CALLBACK_MEMBER(apple1_state::apple1_dsp_ready_start)
 {
-	pia6821_device *pia = machine.device<pia6821_device>("pia");
+	pia6821_device *pia = machine().device<pia6821_device>("pia");
 
 	/* When the display asserts \RDA to signal it is ready, it
        triggers a 74123 one-shot to send a 3.5-usec low pulse to PIA
        input CB1.  The end of this pulse will tell the PIA that the
        display is ready for another write. */
 	pia->cb1_w(0);
-	machine.scheduler().timer_set(attotime::from_nsec(3500), FUNC(apple1_dsp_ready_end));
+	machine().scheduler().timer_set(attotime::from_nsec(3500), timer_expired_delegate(FUNC(apple1_state::apple1_dsp_ready_end),this));
 }
 
-static TIMER_CALLBACK(apple1_dsp_ready_end)
+TIMER_CALLBACK_MEMBER(apple1_state::apple1_dsp_ready_end)
 {
-	pia6821_device *pia = machine.device<pia6821_device>("pia");
+	pia6821_device *pia = machine().device<pia6821_device>("pia");
 
 	/* The one-shot pulse has ended; return CB1 to high, so we can do
        another display write. */

@@ -386,10 +386,9 @@ static INPUT_PORTS_START( xerox820 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT CTRL") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 INPUT_PORTS_END
 
-static TIMER_CALLBACK( bigboard_beepoff )
+TIMER_CALLBACK_MEMBER(xerox820_state::bigboard_beepoff)
 {
-	xerox820_state *state = machine.driver_data<xerox820_state>();
-	beep_set_state(state->m_beeper, 0);
+	beep_set_state(m_beeper, 0);
 }
 
 /* Z80 PIO */
@@ -461,7 +460,7 @@ WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
 	/* beeper on bigboard */
 	if (BIT(data, 5) & (!m_bit5))
 	{
-		machine().scheduler().timer_set(attotime::from_msec(40), FUNC(bigboard_beepoff));
+		machine().scheduler().timer_set(attotime::from_msec(40), timer_expired_delegate(FUNC(xerox820_state::bigboard_beepoff),this));
 		beep_set_state(m_beeper, 1 );
 	}
 	m_bit5 = BIT(data, 5);

@@ -276,6 +276,11 @@ class towns_state : public driver_device
 	void wait_end();
 public:	
 	INTERRUPT_GEN_MEMBER(towns_vsync_irq);
+	TIMER_CALLBACK_MEMBER(towns_cd_status_ready);
+	TIMER_CALLBACK_MEMBER(towns_cdrom_read_byte);
+	TIMER_CALLBACK_MEMBER(towns_delay_cdda);
+	TIMER_CALLBACK_MEMBER(towns_sprite_done);
+	TIMER_CALLBACK_MEMBER(towns_vblank_end);
 };
 
 class marty_state : public towns_state

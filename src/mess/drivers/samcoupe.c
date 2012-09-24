@@ -325,15 +325,14 @@ ADDRESS_MAP_END
     INTERRUPTS
 ***************************************************************************/
 
-static TIMER_CALLBACK( irq_off )
+TIMER_CALLBACK_MEMBER(samcoupe_state::irq_off)
 {
-	samcoupe_state *state = machine.driver_data<samcoupe_state>();
 	/* adjust STATUS register */
-	state->m_status |= param;
+	m_status |= param;
 
 	/* clear interrupt */
-	if ((state->m_status & 0x1f) == 0x1f)
-		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	if ((m_status & 0x1f) == 0x1f)
+		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 
 }
 
@@ -343,7 +342,7 @@ void samcoupe_irq(device_t *device, UINT8 src)
 
 	/* assert irq and a timer to set it off again */
 	device->execute().set_input_line(0, ASSERT_LINE);
-	device->machine().scheduler().timer_set(attotime::from_usec(20), FUNC(irq_off), src);
+	device->machine().scheduler().timer_set(attotime::from_usec(20), timer_expired_delegate(FUNC(samcoupe_state::irq_off),state), src);
 
 	/* adjust STATUS register */
 	state->m_status &= ~src;

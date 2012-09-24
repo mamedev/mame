@@ -618,29 +618,28 @@ WRITE8_HANDLER( superpet_w )
 	}
 }
 
-static TIMER_CALLBACK( pet_interrupt )
+TIMER_CALLBACK_MEMBER(pet_state::pet_interrupt)
 {
-	pet_state *state = machine.driver_data<pet_state>();
-	pia6821_device *pia_0 = machine.device<pia6821_device>("pia_0");
+	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
 
-	pia_0->cb1_w(state->m_pia_level);
-	state->m_pia_level = !state->m_pia_level;
+	pia_0->cb1_w(m_pia_level);
+	m_pia_level = !m_pia_level;
 }
 
 
-static TIMER_CALLBACK( pet_tape1_timer )
+TIMER_CALLBACK_MEMBER(pet_state::pet_tape1_timer)
 {
-	pia6821_device *pia_0 = machine.device<pia6821_device>("pia_0");
+	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
 //  cassette 1
-	UINT8 data = (machine.device<cassette_image_device>(CASSETTE_TAG)->input() > +0.0) ? 1 : 0;
+	UINT8 data = (machine().device<cassette_image_device>(CASSETTE_TAG)->input() > +0.0) ? 1 : 0;
 	pia_0->ca1_w(data);
 }
 
-static TIMER_CALLBACK( pet_tape2_timer )
+TIMER_CALLBACK_MEMBER(pet_state::pet_tape2_timer)
 {
-	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
+	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 //  cassette 2
-	UINT8 data = (machine.device<cassette_image_device>(CASSETTE2_TAG)->input() > +0.0) ? 1 : 0;
+	UINT8 data = (machine().device<cassette_image_device>(CASSETTE2_TAG)->input() > +0.0) ? 1 : 0;
 	via_0->write_cb1(data);
 }
 
@@ -671,11 +670,11 @@ static void pet_common_driver_init( running_machine &machine )
 	}
 
 	/* pet clock */
-	machine.scheduler().timer_pulse(attotime::from_msec(10), FUNC(pet_interrupt));
+	machine.scheduler().timer_pulse(attotime::from_msec(10), timer_expired_delegate(FUNC(pet_state::pet_interrupt),state));
 
 	/* datasette */
-	state->m_datasette1_timer = machine.scheduler().timer_alloc(FUNC(pet_tape1_timer));
-	state->m_datasette2_timer = machine.scheduler().timer_alloc(FUNC(pet_tape2_timer));
+	state->m_datasette1_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(pet_state::pet_tape1_timer),state));
+	state->m_datasette2_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(pet_state::pet_tape2_timer),state));
 }
 
 

@@ -268,6 +268,23 @@ public:
 	DECLARE_PALETTE_INIT(x68000);
 	UINT32 screen_update_x68000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(x68k_vsync_irq);
+	TIMER_CALLBACK_MEMBER(mfp_update_irq);
+	TIMER_CALLBACK_MEMBER(mfp_timer_a_callback);
+	TIMER_CALLBACK_MEMBER(mfp_timer_b_callback);
+	TIMER_CALLBACK_MEMBER(mfp_timer_c_callback);
+	TIMER_CALLBACK_MEMBER(mfp_timer_d_callback);
+	TIMER_CALLBACK_MEMBER(x68k_led_callback);
+	TIMER_CALLBACK_MEMBER(x68k_keyboard_poll);
+	TIMER_CALLBACK_MEMBER(x68k_scc_ack);
+	TIMER_CALLBACK_MEMBER(md_6button_port1_timeout);
+	TIMER_CALLBACK_MEMBER(md_6button_port2_timeout);
+	TIMER_CALLBACK_MEMBER(x68k_bus_error);
+	TIMER_CALLBACK_MEMBER(x68k_net_irq);
+	TIMER_CALLBACK_MEMBER(x68k_crtc_operation_end);
+	TIMER_CALLBACK_MEMBER(x68k_hsync);
+	TIMER_CALLBACK_MEMBER(x68k_crtc_raster_end);
+	TIMER_CALLBACK_MEMBER(x68k_crtc_raster_irq);
+	TIMER_CALLBACK_MEMBER(x68k_crtc_vblank_irq);
 };
 
 

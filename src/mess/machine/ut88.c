@@ -60,15 +60,14 @@ I8255A_INTERFACE( ut88_ppi8255_interface )
 	DEVCB_NULL,
 };
 
-static TIMER_CALLBACK( ut88_reset )
+TIMER_CALLBACK_MEMBER(ut88_state::ut88_reset)
 {
-	ut88_state *state = machine.driver_data<ut88_state>();
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->set_entry(0);
 }
 
 MACHINE_RESET_MEMBER(ut88_state,ut88)
 {
-	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(ut88_reset));
+	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(ut88_state::ut88_reset),this));
 	membank("bank1")->set_entry(1);
 	m_keyboard_mask = 0;
 }
@@ -148,12 +147,11 @@ static const UINT8 hex_to_7seg[16] =
 	 0x39, 0x5e, 0x79, 0x71
 };
 
-static TIMER_CALLBACK( update_display )
+TIMER_CALLBACK_MEMBER(ut88_state::update_display)
 {
-	ut88_state *state = machine.driver_data<ut88_state>();
 	int i;
 	for (i=0;i<6;i++)
-		output_set_digit_value(i, hex_to_7seg[state->m_lcd_digit[i]]);
+		output_set_digit_value(i, hex_to_7seg[m_lcd_digit[i]]);
 }
 
 
@@ -163,7 +161,7 @@ DRIVER_INIT_MEMBER(ut88_state,ut88mini)
 
 MACHINE_START_MEMBER(ut88_state,ut88mini)
 {
-	machine().scheduler().timer_pulse(attotime::from_hz(60), FUNC(update_display));
+	machine().scheduler().timer_pulse(attotime::from_hz(60), timer_expired_delegate(FUNC(ut88_state::update_display),this));
 }
 
 MACHINE_RESET_MEMBER(ut88_state,ut88mini)

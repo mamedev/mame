@@ -102,6 +102,7 @@ public:
 	DECLARE_MACHINE_START(ti86);
 	DECLARE_MACHINE_START(ti83p);
 	UINT32 screen_update_ti85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(ti85_timer_callback);
 };
 
 

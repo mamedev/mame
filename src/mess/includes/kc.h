@@ -146,6 +146,8 @@ public:
 
 	kcexp_slot_device *	m_expansions[3];
 	DECLARE_PALETTE_INIT(kc85);
+	TIMER_CALLBACK_MEMBER(kc_cassette_oneshot_timer);
+	TIMER_CALLBACK_MEMBER(kc_cassette_timer_callback);
 };
 
 

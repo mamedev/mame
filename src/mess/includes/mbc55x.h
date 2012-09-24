@@ -157,6 +157,7 @@ public:
 	virtual void video_reset();
 	virtual void palette_init();
 	void screen_eof_mbc55x(screen_device &screen, bool state);
+	TIMER_CALLBACK_MEMBER(keyscan_callback);
 };
 
 /* IO chips */

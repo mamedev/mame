@@ -24,36 +24,36 @@
 #define YPOS state->m_reg[3]
 #define BANK m_reg[0x26]
 
-static TIMER_CALLBACK(svision_pet_timer)
+TIMER_CALLBACK_MEMBER(svision_state::svision_pet_timer)
 {
-	svision_state *state = machine.driver_data<svision_state>();
-	switch (state->m_pet.state)
+	switch (m_pet.state)
 	{
 		case 0:
-			state->m_pet.input = machine.root_device().ioport("JOY2")->read();
+			m_pet.input = machine().root_device().ioport("JOY2")->read();
 			/* fall through */
 
 		case 2: case 4: case 6: case 8:
 		case 10: case 12: case 14:
-			state->m_pet.clock=state->m_pet.state&2;
-			state->m_pet.data=state->m_pet.input&1;
-			state->m_pet.input>>=1;
-			state->m_pet.state++;
+			m_pet.clock=m_pet.state&2;
+			m_pet.data=m_pet.input&1;
+			m_pet.input>>=1;
+			m_pet.state++;
 			break;
 
 		case 16+15:
-			state->m_pet.state = 0;
+			m_pet.state = 0;
 			break;
 
 		default:
-			state->m_pet.state++;
+			m_pet.state++;
 			break;
 	}
 }
 
 static TIMER_DEVICE_CALLBACK(svision_pet_timer_dev)
 {
-	svision_pet_timer(timer.machine(),ptr,param);
+	svision_state *state = timer.machine().driver_data<svision_state>();
+	state->svision_pet_timer(ptr,param);
 }
 
 void svision_irq(running_machine &machine)
@@ -65,12 +65,11 @@ void svision_irq(running_machine &machine)
 	machine.device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static TIMER_CALLBACK(svision_timer)
+TIMER_CALLBACK_MEMBER(svision_state::svision_timer)
 {
-	svision_state *state = machine.driver_data<svision_state>();
-    state->m_svision.timer_shot = TRUE;
-    state->m_svision.timer1->enable(FALSE);
-    svision_irq( machine );
+    m_svision.timer_shot = TRUE;
+    m_svision.timer1->enable(FALSE);
+    svision_irq( machine() );
 }
 
 READ8_MEMBER(svision_state::svision_r)
@@ -424,7 +423,7 @@ INTERRUPT_GEN_MEMBER(svision_state::svision_frame_int)
 
 DRIVER_INIT_MEMBER(svision_state,svision)
 {
-	m_svision.timer1 = machine().scheduler().timer_alloc(FUNC(svision_timer));
+	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
 	m_sound = machine().device("custom");
 	m_dma_finished = svision_dma_finished(m_sound);
 	m_pet.on = FALSE;
@@ -433,13 +432,13 @@ DRIVER_INIT_MEMBER(svision_state,svision)
 
 DRIVER_INIT_MEMBER(svision_state,svisions)
 {
-	m_svision.timer1 = machine().scheduler().timer_alloc(FUNC(svision_timer));
+	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
 	m_sound = machine().device("custom");
 	m_dma_finished = svision_dma_finished(m_sound);
 	membank("bank2")->set_base(memregion("user1")->base() + 0x1c000);
-	m_svision.timer1 = machine().scheduler().timer_alloc(FUNC(svision_timer));
+	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
 	m_pet.on = TRUE;
-	m_pet.timer = machine().scheduler().timer_alloc(FUNC(svision_pet_timer));
+	m_pet.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_pet_timer),this));
 }
 
 static DEVICE_IMAGE_LOAD( svision_cart )

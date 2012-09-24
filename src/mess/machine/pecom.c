@@ -12,16 +12,15 @@
 #include "machine/ram.h"
 #include "includes/pecom.h"
 
-static TIMER_CALLBACK( reset_tick )
+TIMER_CALLBACK_MEMBER(pecom_state::reset_tick)
 {
-	pecom_state *state = machine.driver_data<pecom_state>();
 
-	state->m_reset = 1;
+	m_reset = 1;
 }
 
 void pecom_state::machine_start()
 {
-	m_reset_timer = machine().scheduler().timer_alloc(FUNC(reset_tick));
+	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pecom_state::reset_tick),this));
 }
 
 void pecom_state::machine_reset()

@@ -101,16 +101,15 @@ I8255_INTERFACE( specialist_ppi8255_interface )
 	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_portc_w)
 };
 
-static TIMER_CALLBACK( special_reset )
+TIMER_CALLBACK_MEMBER(special_state::special_reset)
 {
-	special_state *state = machine.driver_data<special_state>();
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->set_entry(0);
 }
 
 
 MACHINE_RESET_MEMBER(special_state,special)
 {
-	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(special_reset));
+	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(special_state::special_reset),this));
 	membank("bank1")->set_entry(1);
 }
 
@@ -224,9 +223,9 @@ MACHINE_START_MEMBER(special_state,specimx)
 	m_specimx_audio = machine().device("custom");
 }
 
-static TIMER_CALLBACK( setup_pit8253_gates )
+TIMER_CALLBACK_MEMBER(special_state::setup_pit8253_gates)
 {
-	device_t *pit8253 = machine.device("pit8253");
+	device_t *pit8253 = machine().device("pit8253");
 
 	pit8253_gate0_w(pit8253, 0);
 	pit8253_gate1_w(pit8253, 0);
@@ -237,7 +236,7 @@ MACHINE_RESET_MEMBER(special_state,specimx)
 {
 	specimx_set_bank(2, 0); // Initiali load ROM disk
 	m_specimx_color = 0x70;
-	machine().scheduler().timer_set(attotime::zero, FUNC(setup_pit8253_gates));
+	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(special_state::setup_pit8253_gates),this));
 	device_t *fdc = machine().device("wd1793");
 	wd17xx_set_pause_time(fdc,12);
 	wd17xx_dden_w(fdc, 0);

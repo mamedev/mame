@@ -78,6 +78,12 @@ public:
 	DECLARE_WRITE8_MEMBER(hp48_io_w);
 	DECLARE_READ8_MEMBER(hp48_io_r);
 	DECLARE_READ8_MEMBER(hp48_bank_r);
+	TIMER_CALLBACK_MEMBER(hp48_rs232_byte_recv_cb);
+	TIMER_CALLBACK_MEMBER(hp48_rs232_byte_sent_cb);
+	TIMER_CALLBACK_MEMBER(hp48_chardev_byte_recv_cb);
+	TIMER_CALLBACK_MEMBER(hp48_kbd_cb);
+	TIMER_CALLBACK_MEMBER(hp48_timer1_cb);
+	TIMER_CALLBACK_MEMBER(hp48_timer2_cb);
 };
 
 

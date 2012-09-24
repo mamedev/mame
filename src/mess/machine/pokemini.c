@@ -189,202 +189,194 @@ static void pokemini_update_sound( running_machine &machine )
 }
 
 
-static TIMER_CALLBACK(pokemini_seconds_timer_callback)
+TIMER_CALLBACK_MEMBER(pokemini_state::pokemini_seconds_timer_callback)
 {
-	pokemini_state *state = machine.driver_data<pokemini_state>();
-	if ( state->m_pm_reg[0x08] & 0x01 )
+	if ( m_pm_reg[0x08] & 0x01 )
 	{
-		state->m_pm_reg[0x09] += 1;
-		if ( ! state->m_pm_reg[0x09] )
+		m_pm_reg[0x09] += 1;
+		if ( ! m_pm_reg[0x09] )
 		{
-			state->m_pm_reg[0x0A] += 1;
-			if ( ! state->m_pm_reg[0x0A] )
+			m_pm_reg[0x0A] += 1;
+			if ( ! m_pm_reg[0x0A] )
 			{
-				state->m_pm_reg[0x0B] += 1;
+				m_pm_reg[0x0B] += 1;
 			}
 		}
 	}
 }
 
 
-static TIMER_CALLBACK(pokemini_256hz_timer_callback)
+TIMER_CALLBACK_MEMBER(pokemini_state::pokemini_256hz_timer_callback)
 {
-	pokemini_state *state = machine.driver_data<pokemini_state>();
-	if ( state->m_pm_reg[0x40] & 0x01 )
+	if ( m_pm_reg[0x40] & 0x01 )
 	{
-		state->m_pm_reg[0x41] += 1;
+		m_pm_reg[0x41] += 1;
 		/* Check if the 32Hz IRQ should be triggered */
-		if ( ! ( state->m_pm_reg[0x41] & 0x07 ) )
+		if ( ! ( m_pm_reg[0x41] & 0x07 ) )
 		{
-			state->m_pm_reg[0x28] |= 0x20;
+			m_pm_reg[0x28] |= 0x20;
 
 			/* Check if the 8Hz IRQ should be triggered */
-			if ( ! ( state->m_pm_reg[0x41] & 0x1F ) )
+			if ( ! ( m_pm_reg[0x41] & 0x1F ) )
 			{
-				state->m_pm_reg[0x28] |= 0x10;
+				m_pm_reg[0x28] |= 0x10;
 
 				/* Check if the 2Hz IRQ should be triggered */
-				if ( ! ( state->m_pm_reg[0x41] & 0x7F ) )
+				if ( ! ( m_pm_reg[0x41] & 0x7F ) )
 				{
-					state->m_pm_reg[0x28] |= 0x08;
+					m_pm_reg[0x28] |= 0x08;
 
 					/* Check if the 1Hz IRQ should be triggered */
-					if ( ! state->m_pm_reg[0x41] )
+					if ( ! m_pm_reg[0x41] )
 					{
-						state->m_pm_reg[0x28] |= 0x04;
+						m_pm_reg[0x28] |= 0x04;
 					}
 				}
 			}
 
-			pokemini_check_irqs( machine );
+			pokemini_check_irqs( machine() );
 		}
 	}
 }
 
 
-static TIMER_CALLBACK(pokemini_timer1_callback)
+TIMER_CALLBACK_MEMBER(pokemini_state::pokemini_timer1_callback)
 {
-	pokemini_state *state = machine.driver_data<pokemini_state>();
-	state->m_pm_reg[0x36] -= 1;
+	m_pm_reg[0x36] -= 1;
 	/* Check for underflow of timer */
-	if ( state->m_pm_reg[0x36] == 0xFF )
+	if ( m_pm_reg[0x36] == 0xFF )
 	{
 		/* Check if timer1 is running in 16bit mode */
-		if ( state->m_pm_reg[0x30] & 0x80 )
+		if ( m_pm_reg[0x30] & 0x80 )
 		{
-			state->m_pm_reg[0x37] -= 1;
-			if ( state->m_pm_reg[0x37] == 0xFF )
+			m_pm_reg[0x37] -= 1;
+			if ( m_pm_reg[0x37] == 0xFF )
 			{
-				state->m_pm_reg[0x27] |= 0x08;
-				pokemini_check_irqs( machine );
-				state->m_pm_reg[0x36] = state->m_pm_reg[0x32];
-				state->m_pm_reg[0x37] = state->m_pm_reg[0x33];
+				m_pm_reg[0x27] |= 0x08;
+				pokemini_check_irqs( machine() );
+				m_pm_reg[0x36] = m_pm_reg[0x32];
+				m_pm_reg[0x37] = m_pm_reg[0x33];
 			}
 		}
 		else
 		{
-			state->m_pm_reg[0x27] |= 0x04;
-			pokemini_check_irqs( machine );
-			state->m_pm_reg[0x36] = state->m_pm_reg[0x32];
+			m_pm_reg[0x27] |= 0x04;
+			pokemini_check_irqs( machine() );
+			m_pm_reg[0x36] = m_pm_reg[0x32];
 		}
 	}
 }
 
 
-static TIMER_CALLBACK(pokemini_timer1_hi_callback)
+TIMER_CALLBACK_MEMBER(pokemini_state::pokemini_timer1_hi_callback)
 {
-	pokemini_state *state = machine.driver_data<pokemini_state>();
-	state->m_pm_reg[0x37] -= 1;
+	m_pm_reg[0x37] -= 1;
 	/* Check for underflow of timer */
-	if ( state->m_pm_reg[0x37] == 0xFF )
+	if ( m_pm_reg[0x37] == 0xFF )
 	{
-		state->m_pm_reg[0x27] |= 0x08;
-		pokemini_check_irqs( machine );
-		state->m_pm_reg[0x37] = state->m_pm_reg[0x33];
+		m_pm_reg[0x27] |= 0x08;
+		pokemini_check_irqs( machine() );
+		m_pm_reg[0x37] = m_pm_reg[0x33];
 	}
 }
 
 
-static TIMER_CALLBACK(pokemini_timer2_callback)
+TIMER_CALLBACK_MEMBER(pokemini_state::pokemini_timer2_callback)
 {
-	pokemini_state *state = machine.driver_data<pokemini_state>();
-	state->m_pm_reg[0x3E] -= 1;
+	m_pm_reg[0x3E] -= 1;
 	/* Check for underflow of timer */
-	if ( state->m_pm_reg[0x3E] == 0xFF )
+	if ( m_pm_reg[0x3E] == 0xFF )
 	{
 		/* Check if timer2 is running in 16bit mode */
-		if ( state->m_pm_reg[0x38] & 0x80 )
+		if ( m_pm_reg[0x38] & 0x80 )
 		{
-			state->m_pm_reg[0x3F] -= 1;
-			if ( state->m_pm_reg[0x3F] == 0xFF )
+			m_pm_reg[0x3F] -= 1;
+			if ( m_pm_reg[0x3F] == 0xFF )
 			{
-				state->m_pm_reg[0x27] |= 0x20;
-				pokemini_check_irqs( machine );
-				state->m_pm_reg[0x3E] = state->m_pm_reg[0x3A];
-				state->m_pm_reg[0x3F] = state->m_pm_reg[0x3B];
+				m_pm_reg[0x27] |= 0x20;
+				pokemini_check_irqs( machine() );
+				m_pm_reg[0x3E] = m_pm_reg[0x3A];
+				m_pm_reg[0x3F] = m_pm_reg[0x3B];
 			}
 		}
 		else
 		{
-			state->m_pm_reg[0x27] |= 0x10;
-			pokemini_check_irqs( machine );
-			state->m_pm_reg[0x3E] = state->m_pm_reg[0x3A];
+			m_pm_reg[0x27] |= 0x10;
+			pokemini_check_irqs( machine() );
+			m_pm_reg[0x3E] = m_pm_reg[0x3A];
 		}
 	}
 }
 
 
-static TIMER_CALLBACK(pokemini_timer2_hi_callback)
+TIMER_CALLBACK_MEMBER(pokemini_state::pokemini_timer2_hi_callback)
 {
-	pokemini_state *state = machine.driver_data<pokemini_state>();
-	state->m_pm_reg[0x3F] -= 1;
+	m_pm_reg[0x3F] -= 1;
 	/* Check for underfow of timer */
-	if ( state->m_pm_reg[0x3F] == 0xFF )
+	if ( m_pm_reg[0x3F] == 0xFF )
 	{
-		state->m_pm_reg[0x27] |= 0x20;
-		pokemini_check_irqs( machine );
-		state->m_pm_reg[0x3F] = state->m_pm_reg[0x3B];
+		m_pm_reg[0x27] |= 0x20;
+		pokemini_check_irqs( machine() );
+		m_pm_reg[0x3F] = m_pm_reg[0x3B];
 	}
 }
 
 
-static TIMER_CALLBACK(pokemini_timer3_callback)
+TIMER_CALLBACK_MEMBER(pokemini_state::pokemini_timer3_callback)
 {
-	pokemini_state *state = machine.driver_data<pokemini_state>();
-	state->m_pm_reg[0x4E] -= 1;
+	m_pm_reg[0x4E] -= 1;
 	/* Check for underflow of timer */
-	if ( state->m_pm_reg[0x4E] == 0xFF )
+	if ( m_pm_reg[0x4E] == 0xFF )
 	{
 		/* Check if timer3 is running in 16bit mode */
-		if ( state->m_pm_reg[0x48] & 0x80 )
+		if ( m_pm_reg[0x48] & 0x80 )
 		{
-			state->m_pm_reg[0x4F] -= 1;
-			if ( state->m_pm_reg[0x4F] == 0xFF )
+			m_pm_reg[0x4F] -= 1;
+			if ( m_pm_reg[0x4F] == 0xFF )
 			{
-				state->m_pm_reg[0x27] |= 0x02;
-				pokemini_check_irqs( machine );
-				state->m_pm_reg[0x4E] = state->m_pm_reg[0x4A];
-				state->m_pm_reg[0x4F] = state->m_pm_reg[0x4B];
+				m_pm_reg[0x27] |= 0x02;
+				pokemini_check_irqs( machine() );
+				m_pm_reg[0x4E] = m_pm_reg[0x4A];
+				m_pm_reg[0x4F] = m_pm_reg[0x4B];
 			}
 		}
 		else
 		{
-			state->m_pm_reg[0x4E] = state->m_pm_reg[0x4A];
+			m_pm_reg[0x4E] = m_pm_reg[0x4A];
 		}
 	}
 
-	if ( state->m_pm_reg[0x48] & 0x80 )
+	if ( m_pm_reg[0x48] & 0x80 )
 	{
-		if (  ( state->m_pm_reg[0x4E] == state->m_pm_reg[0x4C] ) && ( state->m_pm_reg[0x4F] == state->m_pm_reg[0x4D] ) )
+		if (  ( m_pm_reg[0x4E] == m_pm_reg[0x4C] ) && ( m_pm_reg[0x4F] == m_pm_reg[0x4D] ) )
 		{
-			state->m_pm_reg[0x27] |= 0x01;
-			pokemini_check_irqs( machine );
+			m_pm_reg[0x27] |= 0x01;
+			pokemini_check_irqs( machine() );
 		}
-		pokemini_update_sound( machine );
+		pokemini_update_sound( machine() );
 	}
 }
 
 
-static TIMER_CALLBACK(pokemini_timer3_hi_callback)
+TIMER_CALLBACK_MEMBER(pokemini_state::pokemini_timer3_hi_callback)
 {
-	pokemini_state *state = machine.driver_data<pokemini_state>();
-	state->m_pm_reg[0x4F] -= 1;
+	m_pm_reg[0x4F] -= 1;
 	/* Check for underflow of timer */
-	if ( state->m_pm_reg[0x4F] == 0xFF )
+	if ( m_pm_reg[0x4F] == 0xFF )
 	{
-		state->m_pm_reg[0x27] |= 0x02;
-		pokemini_check_irqs( machine );
-		state->m_pm_reg[0x4F] = state->m_pm_reg[0x4B];
+		m_pm_reg[0x27] |= 0x02;
+		pokemini_check_irqs( machine() );
+		m_pm_reg[0x4F] = m_pm_reg[0x4B];
 	}
 
-	if ( ! ( state->m_pm_reg[0x48] & 0x80 ) )
+	if ( ! ( m_pm_reg[0x48] & 0x80 ) )
 	{
-		if( state->m_pm_reg[0x4F] == state->m_pm_reg[0x4D] )
+		if( m_pm_reg[0x4F] == m_pm_reg[0x4D] )
 		{
-			state->m_pm_reg[0x27] |= 0x01;
-			pokemini_check_irqs( machine );
+			m_pm_reg[0x27] |= 0x01;
+			pokemini_check_irqs( machine() );
 		}
-		pokemini_update_sound( machine );
+		pokemini_update_sound( machine() );
 	}
 }
 
@@ -1413,55 +1405,54 @@ DEVICE_IMAGE_LOAD( pokemini_cart )
 }
 
 
-static TIMER_CALLBACK( pokemini_prc_counter_callback )
+TIMER_CALLBACK_MEMBER(pokemini_state::pokemini_prc_counter_callback)
 {
-	pokemini_state *state = machine.driver_data<pokemini_state>();
-	address_space &space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
-	state->m_prc.count++;
+	address_space &space = machine().device( "maincpu")->memory().space( AS_PROGRAM );
+	m_prc.count++;
 
 	/* Check for overflow */
-	if ( state->m_prc.count >= 0x42 )
+	if ( m_prc.count >= 0x42 )
 	{
-		state->m_prc.count = 0;
-		state->m_prc.frame_count++;
+		m_prc.count = 0;
+		m_prc.frame_count++;
 	}
 	else
 	{
-		if ( state->m_prc.count == 0x18 && state->m_prc.frame_count >= state->m_prc.max_frame_count )
+		if ( m_prc.count == 0x18 && m_prc.frame_count >= m_prc.max_frame_count )
 		{
-			state->m_prc.frame_count = 0;
+			m_prc.frame_count = 0;
 
 			/* Check if the background should be drawn */
-			if ( state->m_prc.background_enabled )
+			if ( m_prc.background_enabled )
 			{
 				int x, y;
 				for ( y = 0; y < 8; y++ ) {
 					for ( x = 0; x < 12; x++ ) {
-						UINT8 tile = state->m_p_ram[ 0x360 + ( y * state->m_prc.map_size_x ) + x ];
+						UINT8 tile = m_p_ram[ 0x360 + ( y * m_prc.map_size_x ) + x ];
 						int i;
 						for( i = 0; i < 8; i++ ) {
-							state->m_p_ram[ ( y * 96 ) + ( x * 8 ) + i ] = space.read_byte( state->m_prc.bg_tiles + ( tile * 8 ) + i );
+							m_p_ram[ ( y * 96 ) + ( x * 8 ) + i ] = space.read_byte( m_prc.bg_tiles + ( tile * 8 ) + i );
 						}
 					}
 				}
 			}
 
 			/* Check if the sprites should be drawn */
-			if ( state->m_prc.sprites_enabled )
+			if ( m_prc.sprites_enabled )
 			{
 				UINT16	spr;
 
 				for ( spr = 0x35C; spr >= 0x300; spr -= 4 )
 				{
-					int		spr_x = ( state->m_p_ram[ spr + 0 ] & 0x7F ) - 16;
-					int		spr_y = ( state->m_p_ram[ spr + 1 ] & 0x7F ) - 16;
-					UINT8	spr_tile = state->m_p_ram[ spr + 2 ];
-					UINT8	spr_flag = state->m_p_ram[ spr + 3 ];
+					int		spr_x = ( m_p_ram[ spr + 0 ] & 0x7F ) - 16;
+					int		spr_y = ( m_p_ram[ spr + 1 ] & 0x7F ) - 16;
+					UINT8	spr_tile = m_p_ram[ spr + 2 ];
+					UINT8	spr_flag = m_p_ram[ spr + 3 ];
 
 					if ( spr_flag & 0x08 )
 					{
 						UINT16	gfx, mask;
-						UINT32	spr_base = state->m_prc.spr_tiles + spr_tile * 64;
+						UINT32	spr_base = m_prc.spr_tiles + spr_tile * 64;
 						int		i, j;
 
 						for ( i = 0; i < 16; i++ )
@@ -1490,10 +1481,10 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 										{
 											if ( mask & 0x8000 )
 											{
-												state->m_p_ram[ ram_addr ] &= ~ ( 1 << ( ( spr_y + j ) & 0x07 ) );
+												m_p_ram[ ram_addr ] &= ~ ( 1 << ( ( spr_y + j ) & 0x07 ) );
 												if ( gfx & 0x8000 )
 												{
-													state->m_p_ram[ ram_addr ] |= ( 1 << ( ( spr_y + j ) & 0x07 ) );
+													m_p_ram[ ram_addr ] |= ( 1 << ( ( spr_y + j ) & 0x07 ) );
 												}
 											}
 											mask <<= 1;
@@ -1503,10 +1494,10 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 										{
 											if ( mask & 0x0001 )
 											{
-												state->m_p_ram[ ram_addr ] &= ~ ( 1 << ( ( spr_y + j ) & 0x07 ) );
+												m_p_ram[ ram_addr ] &= ~ ( 1 << ( ( spr_y + j ) & 0x07 ) );
 												if ( gfx & 0x0001 )
 												{
-													state->m_p_ram[ ram_addr ] |= ( 1 << ( ( spr_y + j ) & 0x07 ) );
+													m_p_ram[ ram_addr ] |= ( 1 << ( ( spr_y + j ) & 0x07 ) );
 												}
 											}
 											mask >>= 1;
@@ -1521,37 +1512,37 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 			}
 
 			/* Set PRC Render interrupt */
-			state->m_pm_reg[0x27] |= 0x40;
-			pokemini_check_irqs( machine );
+			m_pm_reg[0x27] |= 0x40;
+			pokemini_check_irqs( machine() );
 
 			/* Check if the rendered data should be copied to the LCD */
-			if ( state->m_prc.copy_enabled )
+			if ( m_prc.copy_enabled )
 			{
 				int	x, y;
 
 				for( y = 0; y < 64; y += 8 ) {
 					for( x = 0; x < 96; x++ ) {
-						UINT8 data = state->m_p_ram[ ( y * 12 ) + x ];
+						UINT8 data = m_p_ram[ ( y * 12 ) + x ];
 
-						state->m_bitmap.pix16(y + 0, x) = ( data & 0x01 ) ? 3 : 0;
-						state->m_bitmap.pix16(y + 1, x) = ( data & 0x02 ) ? 3 : 0;
-						state->m_bitmap.pix16(y + 2, x) = ( data & 0x04 ) ? 3 : 0;
-						state->m_bitmap.pix16(y + 3, x) = ( data & 0x08 ) ? 3 : 0;
-						state->m_bitmap.pix16(y + 4, x) = ( data & 0x10 ) ? 3 : 0;
-						state->m_bitmap.pix16(y + 5, x) = ( data & 0x20 ) ? 3 : 0;
-						state->m_bitmap.pix16(y + 6, x) = ( data & 0x40 ) ? 3 : 0;
-						state->m_bitmap.pix16(y + 7, x) = ( data & 0x80 ) ? 3 : 0;
+						m_bitmap.pix16(y + 0, x) = ( data & 0x01 ) ? 3 : 0;
+						m_bitmap.pix16(y + 1, x) = ( data & 0x02 ) ? 3 : 0;
+						m_bitmap.pix16(y + 2, x) = ( data & 0x04 ) ? 3 : 0;
+						m_bitmap.pix16(y + 3, x) = ( data & 0x08 ) ? 3 : 0;
+						m_bitmap.pix16(y + 4, x) = ( data & 0x10 ) ? 3 : 0;
+						m_bitmap.pix16(y + 5, x) = ( data & 0x20 ) ? 3 : 0;
+						m_bitmap.pix16(y + 6, x) = ( data & 0x40 ) ? 3 : 0;
+						m_bitmap.pix16(y + 7, x) = ( data & 0x80 ) ? 3 : 0;
 					}
 				}
 
 				/* Set PRC Copy interrupt */
-				state->m_pm_reg[0x27] |= 0x80;
-				pokemini_check_irqs( machine );
+				m_pm_reg[0x27] |= 0x80;
+				pokemini_check_irqs( machine() );
 			}
 		}
 
 		/* Set possible input irqs */
-		state->m_pm_reg[0x29] |= ~ machine.root_device().ioport( "INPUTS" )->read();
+		m_pm_reg[0x29] |= ~ machine().root_device().ioport( "INPUTS" )->read();
 	}
 }
 
@@ -1564,22 +1555,22 @@ void pokemini_state::machine_start()
 	memset( m_pm_reg, 0, sizeof(m_pm_reg) );
 
 	/* Set up timers */
-	m_timers.seconds_timer = machine().scheduler().timer_alloc(FUNC(pokemini_seconds_timer_callback));
+	m_timers.seconds_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::pokemini_seconds_timer_callback),this));
 	m_timers.seconds_timer->adjust( attotime::zero, 0, attotime::from_seconds( 1 ) );
 
-	m_timers.hz256_timer = machine().scheduler().timer_alloc(FUNC(pokemini_256hz_timer_callback));
+	m_timers.hz256_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::pokemini_256hz_timer_callback),this));
 	m_timers.hz256_timer->adjust( attotime::zero, 0, attotime::from_hz( 256 ) );
 
-	m_timers.timer1 = machine().scheduler().timer_alloc(FUNC(pokemini_timer1_callback));
-	m_timers.timer1_hi = machine().scheduler().timer_alloc(FUNC(pokemini_timer1_hi_callback));
-	m_timers.timer2 = machine().scheduler().timer_alloc(FUNC(pokemini_timer2_callback));
-	m_timers.timer2_hi = machine().scheduler().timer_alloc(FUNC(pokemini_timer2_hi_callback));
-	m_timers.timer3 = machine().scheduler().timer_alloc(FUNC(pokemini_timer3_callback));
-	m_timers.timer3_hi = machine().scheduler().timer_alloc(FUNC(pokemini_timer3_hi_callback));
+	m_timers.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::pokemini_timer1_callback),this));
+	m_timers.timer1_hi = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::pokemini_timer1_hi_callback),this));
+	m_timers.timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::pokemini_timer2_callback),this));
+	m_timers.timer2_hi = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::pokemini_timer2_hi_callback),this));
+	m_timers.timer3 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::pokemini_timer3_callback),this));
+	m_timers.timer3_hi = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::pokemini_timer3_hi_callback),this));
 
 	/* Set up the PRC */
 	m_prc.max_frame_count = 2;
-	m_prc.count_timer = machine().scheduler().timer_alloc(FUNC(pokemini_prc_counter_callback));
+	m_prc.count_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::pokemini_prc_counter_callback),this));
 	m_prc.count_timer->adjust( attotime::zero, 0, m_maincpu->cycles_to_attotime(55640 / 65) );
 }
 

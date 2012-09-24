@@ -600,11 +600,10 @@ static void lynx_blit_lines(lynx_state *state)
 	}
 }
 
-static TIMER_CALLBACK(lynx_blitter_timer)
+TIMER_CALLBACK_MEMBER(lynx_state::lynx_blitter_timer)
 {
-	lynx_state *state = machine.driver_data<lynx_state>();
-	state->m_blitter.busy=0; // blitter finished
-	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_blitter.busy=0; // blitter finished
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 /*
@@ -805,7 +804,7 @@ static void lynx_blitter(running_machine &machine)
 		}
 	}
 
-	machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(state->m_blitter.memory_accesses), FUNC(lynx_blitter_timer));
+	machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(state->m_blitter.memory_accesses), timer_expired_delegate(FUNC(lynx_state::lynx_blitter_timer),state));
 }
 
 
@@ -1394,13 +1393,13 @@ TIM_BORROWOUT   EQU %00000001
 #define NR_LYNX_TIMERS	8
 
 
-static TIMER_CALLBACK(lynx_timer_shot);
+
 
 static void lynx_timer_init(running_machine &machine, int which)
 {
 	lynx_state *state = machine.driver_data<lynx_state>();
 	memset( &state->m_timer[which], 0, sizeof(LYNX_TIMER) );
-	state->m_timer[which].timer = machine.scheduler().timer_alloc(FUNC(lynx_timer_shot));
+	state->m_timer[which].timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(lynx_state::lynx_timer_shot),state));
 }
 
 static void lynx_timer_signal_irq(running_machine &machine, int which)
@@ -1506,19 +1505,18 @@ static UINT32 lynx_time_factor(int val)
 	}
 }
 
-static TIMER_CALLBACK(lynx_timer_shot)
+TIMER_CALLBACK_MEMBER(lynx_state::lynx_timer_shot)
 {
-	lynx_state *state = machine.driver_data<lynx_state>();
-	lynx_timer_signal_irq( machine, param );
-	if ( ! ( state->m_timer[param].cntrl1 & 0x10 ) ) // if reload not enabled
+	lynx_timer_signal_irq( machine(), param );
+	if ( ! ( m_timer[param].cntrl1 & 0x10 ) ) // if reload not enabled
 	{
-		state->m_timer[param].timer_active = 0;
-		state->m_timer[param].cntrl2 |= 8; // set timer done
+		m_timer[param].timer_active = 0;
+		m_timer[param].cntrl2 |= 8; // set timer done
 	}
 	else
 	{
-		attotime t = (attotime::from_hz(lynx_time_factor(state->m_timer[param].cntrl1 & 0x07)) * (state->m_timer[param].bakup + 1));
-		state->m_timer[param].timer->adjust(t, param);
+		attotime t = (attotime::from_hz(lynx_time_factor(m_timer[param].cntrl1 & 0x07)) * (m_timer[param].bakup + 1));
+		m_timer[param].timer->adjust(t, param);
 	}
 }
 
@@ -1616,40 +1614,38 @@ static void lynx_uart_reset(lynx_state *state)
 	memset(&state->m_uart, 0, sizeof(state->m_uart));
 }
 
-static TIMER_CALLBACK(lynx_uart_loopback_timer)
+TIMER_CALLBACK_MEMBER(lynx_state::lynx_uart_loopback_timer)
 {
-	lynx_state *state = machine.driver_data<lynx_state>();
-	state->m_uart.received = FALSE;
+	m_uart.received = FALSE;
 }
 
-static TIMER_CALLBACK(lynx_uart_timer)
+TIMER_CALLBACK_MEMBER(lynx_state::lynx_uart_timer)
 {
-	lynx_state *state = machine.driver_data<lynx_state>();
-	if (state->m_uart.buffer_loaded)
+	if (m_uart.buffer_loaded)
 	{
-		state->m_uart.data_to_send = state->m_uart.buffer;
-		state->m_uart.buffer_loaded = FALSE;
-		machine.scheduler().timer_set(attotime::from_usec(11*16), FUNC(lynx_uart_timer));
+		m_uart.data_to_send = m_uart.buffer;
+		m_uart.buffer_loaded = FALSE;
+		machine().scheduler().timer_set(attotime::from_usec(11*16), timer_expired_delegate(FUNC(lynx_state::lynx_uart_timer),this));
 	}
 	else
 	{
-		state->m_uart.sending = FALSE;
-		state->m_uart.received = TRUE;
-		state->m_uart.data_received = state->m_uart.data_to_send;
-		machine.scheduler().timer_set(attotime::from_usec(11*16), FUNC(lynx_uart_loopback_timer));
-		if (state->m_uart.serctl & 0x40)
+		m_uart.sending = FALSE;
+		m_uart.received = TRUE;
+		m_uart.data_received = m_uart.data_to_send;
+		machine().scheduler().timer_set(attotime::from_usec(11*16), timer_expired_delegate(FUNC(lynx_state::lynx_uart_loopback_timer),this));
+		if (m_uart.serctl & 0x40)
 		{
-			state->m_mikey.data[0x81] |= 0x10;
-			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			machine.device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
+			m_mikey.data[0x81] |= 0x10;
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
 		}
 	}
 
-	if (state->m_uart.serctl & 0x80)
+	if (m_uart.serctl & 0x80)
 	{
-		state->m_mikey.data[0x81] |= 0x10;
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		machine.device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
+		m_mikey.data[0x81] |= 0x10;
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
 	}
 }
 
@@ -1696,7 +1692,7 @@ WRITE8_MEMBER(lynx_state::lynx_uart_w)
 				m_uart.sending = TRUE;
 				m_uart.data_to_send = data;
 				// timing not accurate, baude rate should be calculated from timer 4 backup value and clock rate
-				machine().scheduler().timer_set(attotime::from_usec(11*16), FUNC(lynx_uart_timer));
+				machine().scheduler().timer_set(attotime::from_usec(11*16), timer_expired_delegate(FUNC(lynx_state::lynx_uart_timer),this));
 			}
 			break;
 	}

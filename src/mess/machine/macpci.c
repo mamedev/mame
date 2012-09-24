@@ -22,7 +22,7 @@
 #define LOG_ADB			0
 #define LOG_VIA			0
 
-static TIMER_CALLBACK(mac_6015_tick);
+
 
 /* VIA1 Handlers */
 
@@ -144,7 +144,7 @@ static WRITE8_DEVICE_HANDLER(mac_adb_via_out_cb2)
 
 void macpci_state::machine_start()
 {
-	m_6015_timer = machine().scheduler().timer_alloc(FUNC(mac_6015_tick));
+	m_6015_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macpci_state::mac_6015_tick),this));
 	m_6015_timer->adjust(attotime::never);
 }
 
@@ -250,7 +250,6 @@ WRITE_LINE_MEMBER(macpci_state::drq_539x_1_w)
 {
 }
 
-static TIMER_CALLBACK(mac_6015_tick)
+TIMER_CALLBACK_MEMBER(macpci_state::mac_6015_tick)
 {
-//  macpci_state *mac = machine.driver_data<macpci_state>();
 }

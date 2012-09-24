@@ -127,10 +127,10 @@
 
 extern TIMER_CALLBACK(mac_adb_tick);	// macadb.c
 extern TIMER_CALLBACK(mac_pmu_tick);	// macadb.c
-static TIMER_CALLBACK(mac_scanline_tick);
-static TIMER_CALLBACK(mac_6015_tick);
+
+
 static int scan_keyboard(running_machine &machine);
-static TIMER_CALLBACK(inquiry_timeout_func);
+
 static void keyboard_receive(running_machine &machine, int val);
 static DECLARE_READ8_DEVICE_HANDLER(mac_via_in_a);
 static DECLARE_READ8_DEVICE_HANDLER(mac_via_in_b);
@@ -695,32 +695,31 @@ static void keyboard_init(mac_state *mac)
 
 /******************* Keyboard <-> VIA communication ***********************/
 
-static TIMER_CALLBACK(kbd_clock)
+TIMER_CALLBACK_MEMBER(mac_state::kbd_clock)
 {
 	int i;
-	mac_state *mac = machine.driver_data<mac_state>();
 
-	if (mac->m_kbd_comm == TRUE)
+	if (m_kbd_comm == TRUE)
 	{
 		for (i=0; i<8; i++)
 		{
 			/* Put data on CB2 if we are sending*/
-			if (mac->m_kbd_receive == FALSE)
-				mac->m_via1->write_cb2(mac->m_kbd_shift_reg&0x80?1:0);
-			mac->m_kbd_shift_reg <<= 1;
-			mac->m_via1->write_cb1(0);
-			mac->m_via1->write_cb1(1);
+			if (m_kbd_receive == FALSE)
+				m_via1->write_cb2(m_kbd_shift_reg&0x80?1:0);
+			m_kbd_shift_reg <<= 1;
+			m_via1->write_cb1(0);
+			m_via1->write_cb1(1);
 		}
-		if (mac->m_kbd_receive == TRUE)
+		if (m_kbd_receive == TRUE)
 		{
-			mac->m_kbd_receive = FALSE;
+			m_kbd_receive = FALSE;
 			/* Process the command received from mac */
-			keyboard_receive(machine, mac->m_kbd_shift_reg & 0xff);
+			keyboard_receive(machine(), m_kbd_shift_reg & 0xff);
 		}
 		else
 		{
 			/* Communication is over */
-			mac->m_kbd_comm = FALSE;
+			m_kbd_comm = FALSE;
 		}
 	}
 }
@@ -732,7 +731,7 @@ static void kbd_shift_out(running_machine &machine, int data)
 	if (mac->m_kbd_comm == TRUE)
 	{
 		mac->m_kbd_shift_reg = data;
-		machine.scheduler().timer_set(attotime::from_msec(1), FUNC(kbd_clock));
+		machine.scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(mac_state::kbd_clock),mac));
 	}
 }
 
@@ -745,7 +744,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_cb2)
 		/* Mac pulls CB2 down to initiate communication */
 		mac->m_kbd_comm = TRUE;
 		mac->m_kbd_receive = TRUE;
-		space.machine().scheduler().timer_set(attotime::from_usec(100), FUNC(kbd_clock));
+		space.machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(mac_state::kbd_clock),mac));
 	}
 	if (mac->m_kbd_comm == TRUE && mac->m_kbd_receive == TRUE)
 	{
@@ -757,11 +756,11 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_cb2)
 /*
     called when inquiry times out (1/4s)
 */
-static TIMER_CALLBACK(inquiry_timeout_func)
+TIMER_CALLBACK_MEMBER(mac_state::inquiry_timeout_func)
 {
 	if (LOG_KEYBOARD)
 		logerror("keyboard enquiry timeout\n");
-	kbd_shift_out(machine, 0x7B);	/* always send NULL */
+	kbd_shift_out(machine(), 0x7B);	/* always send NULL */
 }
 
 /*
@@ -1770,12 +1769,10 @@ static WRITE8_DEVICE_HANDLER(mac_via2_out_b)
 }
 
 // This signal is generated internally on RBV, V8, Sonora, VASP, Eagle, etc.
-static TIMER_CALLBACK(mac_6015_tick)
+TIMER_CALLBACK_MEMBER(mac_state::mac_6015_tick)
 {
-	mac_state *mac = machine.driver_data<mac_state>();
-
-	mac->m_via1->write_ca1(0);
-	mac->m_via1->write_ca1(1);
+	m_via1->write_ca1(0);
+	m_via1->write_ca1(1);
 }
 
 /* *************************************************************************
@@ -1798,10 +1795,10 @@ void mac_state::machine_start()
 		}
 
 	}
-	this->m_scanline_timer = machine().scheduler().timer_alloc(FUNC(mac_scanline_tick));
+	this->m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_scanline_tick),this));
 	this->m_scanline_timer->adjust(machine().primary_screen->time_until_pos(0, 0));
 
-	m_6015_timer = machine().scheduler().timer_alloc(FUNC(mac_6015_tick));
+	m_6015_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_6015_tick),this));
 	m_6015_timer->adjust(attotime::never);
 }
 
@@ -2105,7 +2102,7 @@ static void mac_driver_init(running_machine &machine, model_t model)
 	/* setup keyboard */
 	keyboard_init(mac);
 
-	mac->m_inquiry_timeout = machine.scheduler().timer_alloc(FUNC(inquiry_timeout_func));
+	mac->m_inquiry_timeout = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::inquiry_timeout_func),mac));
 
 	/* save state stuff */
 	machine.save().register_postload(save_prepost_delegate(FUNC(mac_state_load), mac));
@@ -2251,39 +2248,38 @@ void mac_state::vblank_irq()
 	}
 }
 
-static TIMER_CALLBACK(mac_scanline_tick)
+TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 {
 	int scanline;
-	mac_state *mac = machine.driver_data<mac_state>();
 
-	if (machine.device("custom") != NULL)
+	if (machine().device("custom") != NULL)
 	{
-		mac_sh_updatebuffer(machine.device("custom"));
+		mac_sh_updatebuffer(machine().device("custom"));
 	}
 
-	if (mac->m_rbv_vbltime > 0)
+	if (m_rbv_vbltime > 0)
 	{
-		mac->m_rbv_vbltime--;
+		m_rbv_vbltime--;
 
-		if (mac->m_rbv_vbltime == 0)
+		if (m_rbv_vbltime == 0)
 		{
-			mac->m_rbv_regs[2] |= 0x40;
-			mac->rbv_recalc_irqs();
+			m_rbv_regs[2] |= 0x40;
+			rbv_recalc_irqs();
 		}
 	}
 
-	scanline = machine.primary_screen->vpos();
+	scanline = machine().primary_screen->vpos();
 	if (scanline == MAC_V_VIS)
-		mac->vblank_irq();
+		vblank_irq();
 
 	/* check for mouse changes at 10 irqs per frame */
-	if (mac->m_model <= MODEL_MAC_PLUS)
+	if (m_model <= MODEL_MAC_PLUS)
 	{
 		if (!(scanline % 10))
-			mac->mouse_callback();
+			mouse_callback();
 	}
 
-	mac->m_scanline_timer->adjust(machine.primary_screen->time_until_pos((scanline+1) % MAC_V_TOTAL, 0));
+	m_scanline_timer->adjust(machine().primary_screen->time_until_pos((scanline+1) % MAC_V_TOTAL, 0));
 }
 
 WRITE_LINE_MEMBER(mac_state::nubus_irq_9_w)

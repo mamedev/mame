@@ -108,6 +108,8 @@ public:
 	virtual void palette_init();
 	DECLARE_MACHINE_START(telestrat);
 	UINT32 screen_update_oric(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(oric_refresh_tape);
+	TIMER_CALLBACK_MEMBER(oric_vh_timer_callback);
 };
 
 /*----------- defined in machine/oric.c -----------*/
