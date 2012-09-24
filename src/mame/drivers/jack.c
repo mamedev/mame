@@ -70,10 +70,13 @@ WRITE8_MEMBER(jack_state::jack_sh_command_w)
 
 /* these handlers are guessed, because otherwise you can't enter test mode */
 
-WRITE8_MEMBER(jack_state::joinem_misc_w)
+WRITE8_MEMBER(jack_state::joinem_control_w)
 {
 	flip_screen_set(data & 0x80);
 	m_joinem_snd_bit = data & 1;
+	m_joinem_color_bank = data & 0x18;
+	
+	m_bg_tilemap->mark_all_dirty();
 }
 
 CUSTOM_INPUT_MEMBER(jack_state::sound_check_r)
@@ -159,7 +162,7 @@ static ADDRESS_MAP_START( joinem_map, AS_PROGRAM, 8, jack_state )
 	AM_RANGE(0xb503, 0xb503) AM_READ_PORT("IN1")
 	AM_RANGE(0xb504, 0xb504) AM_READ_PORT("IN2")
 	AM_RANGE(0xb506, 0xb507) AM_READWRITE(jack_flipscreen_r, jack_flipscreen_w)
-	AM_RANGE(0xb700, 0xb700) AM_WRITE(joinem_misc_w)
+	AM_RANGE(0xb700, 0xb700) AM_WRITE(joinem_control_w)
 	AM_RANGE(0xb800, 0xbbff) AM_RAM_WRITE(jack_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xbc00, 0xbfff) AM_RAM_WRITE(jack_colorram_w) AM_SHARE("colorram")
 ADDRESS_MAP_END
@@ -1151,8 +1154,8 @@ ROM_START( joinem )
 	ROM_LOAD( "join6.p1", 0x2000, 0x1000, CRC(2b533261) SHA1(ce6c1fa833b34aeb401f430d212415c33beb2922) )
 
 	ROM_REGION( 0x100, "proms", 0 ) /* colours */
-	ROM_LOAD_NIB_LOW(  "l82s129.11n", 0x0000, 0x100, CRC(7b724211) SHA1(7396c773e8d48dea856d9482d6c48de966616c83) )
-	ROM_LOAD_NIB_HIGH( "h82s129.12n", 0x0000, 0x100, CRC(2e81c5ff) SHA1(e103c8813af704d5de11fe705de5105ff3a691c3) )
+	ROM_LOAD_NIB_LOW(  "l82s129.11n", 0x000, 0x100, CRC(7b724211) SHA1(7396c773e8d48dea856d9482d6c48de966616c83) )
+	ROM_LOAD_NIB_HIGH( "h82s129.12n", 0x000, 0x100, CRC(2e81c5ff) SHA1(e103c8813af704d5de11fe705de5105ff3a691c3) )
 ROM_END
 
 
@@ -1167,13 +1170,13 @@ ROM_START( unclepoop )
 	ROM_LOAD( "08.c15", 0x00000, 0x1000, CRC(fd84106b) SHA1(891853d2b39850a981016108b74ca20337d2cdd8) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 ) /* gfx - 8x8x3bpp */
-	ROM_LOAD( "05.k04", 0x0000, 0x2000, CRC(64026934) SHA1(a5342335d02d34fa6ba2b29484ed71ecc96292f2) )
+	ROM_LOAD( "07.h04", 0x0000, 0x2000, CRC(e2f73e99) SHA1(61cb09ff424ba63b892b4822e7ed916af73412f1) )
 	ROM_LOAD( "06.j04", 0x2000, 0x2000, CRC(94b5f676) SHA1(32c27854726636c4ce03bb6a83b32d04ed6c42af) )
-	ROM_LOAD( "07.h04", 0x4000, 0x2000, CRC(e2f73e99) SHA1(61cb09ff424ba63b892b4822e7ed916af73412f1) )
+	ROM_LOAD( "05.k04", 0x4000, 0x2000, CRC(64026934) SHA1(a5342335d02d34fa6ba2b29484ed71ecc96292f2) )
 
 	ROM_REGION( 0x200, "proms", 0 ) /* colours */
-	ROM_LOAD( "diatec_h.bin", 0x000, 0x100, CRC(938601b1) SHA1(8213284989bebb5f7375878181840de8079dc1f3) )
-	ROM_LOAD( "diatec_l.bin", 0x100, 0x100, CRC(b04d466a) SHA1(1438abeae76ef807ba34bd6d3e4c44f707dbde6e) )
+	ROM_LOAD_NIB_LOW(  "diatec_l.bin", 0x000, 0x100, CRC(b04d466a) SHA1(1438abeae76ef807ba34bd6d3e4c44f707dbde6e) )
+	ROM_LOAD_NIB_HIGH( "diatec_h.bin", 0x000, 0x100, CRC(938601b1) SHA1(8213284989bebb5f7375878181840de8079dc1f3) )
 ROM_END
 
 
@@ -1193,8 +1196,8 @@ ROM_START( loverboy )
 	ROM_LOAD( "lover.p1", 0x4000, 0x2000, CRC(cda0d87e) SHA1(efff230e994e21705902f252e50ee40a20444c0f) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD_NIB_LOW( "color.n11", 0x0000, 0x200, CRC(cf4a16ae) SHA1(e17c5dfd73c5bc55c0a929cf65ee5b516c9776a5) )
-	ROM_LOAD_NIB_HIGH( "color.n12", 0x0000, 0x200, CRC(4b11ac21) SHA1(d9e7cecfb7237335288ab6f94bb35696d8291bdf) )
+	ROM_LOAD_NIB_LOW(  "color.n11", 0x000, 0x200, CRC(cf4a16ae) SHA1(e17c5dfd73c5bc55c0a929cf65ee5b516c9776a5) )
+	ROM_LOAD_NIB_HIGH( "color.n12", 0x000, 0x200, CRC(4b11ac21) SHA1(d9e7cecfb7237335288ab6f94bb35696d8291bdf) )
 ROM_END
 
 

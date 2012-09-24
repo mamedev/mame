@@ -133,7 +133,7 @@ PALETTE_INIT_MEMBER(jack_state,joinem)
 TILE_GET_INFO_MEMBER(jack_state::joinem_get_bg_tile_info)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x03) << 8);
-	int color = (m_colorram[tile_index] & 0x38) >> 3;
+	int color = (m_colorram[tile_index] & 0x38) >> 3 | m_joinem_color_bank;
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }

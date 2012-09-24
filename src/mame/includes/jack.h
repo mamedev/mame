@@ -28,13 +28,14 @@ public:
 
 	/* misc */
 	int m_timer_rate;
-	int m_joinem_snd_bit;
+	UINT8 m_joinem_snd_bit;
+	UINT8 m_joinem_color_bank;
 	int m_question_address;
 	int m_question_rom;
 	int m_remap_address[16];
 
 	DECLARE_WRITE8_MEMBER(jack_sh_command_w);
-	DECLARE_WRITE8_MEMBER(joinem_misc_w);
+	DECLARE_WRITE8_MEMBER(joinem_control_w);
 	DECLARE_READ8_MEMBER(striv_question_r);
 	DECLARE_WRITE8_MEMBER(jack_videoram_w);
 	DECLARE_WRITE8_MEMBER(jack_colorram_w);
