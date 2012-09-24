@@ -99,7 +99,4 @@ void samcoupe_irq(device_t *device, UINT8 src);
 void samcoupe_update_memory(address_space &space);
 UINT8 samcoupe_mouse_r(running_machine &machine);
 
-/*----------- defined in video/samcoupe.c -----------*/
-TIMER_CALLBACK( sam_video_update_callback );
-
 #endif /* SAMCOUPE_H_ */

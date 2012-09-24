@@ -209,7 +209,6 @@ public:
 /*----------- shared with x1twin.c -----------*/
 
 TIMER_DEVICE_CALLBACK(x1_keyboard_callback);
-TIMER_CALLBACK(x1_rtc_increment);
 TIMER_DEVICE_CALLBACK( x1_cmt_wind_timer );
 
 /*----------- defined in machine/x1.c -----------*/

@@ -83,7 +83,6 @@ public:
 /*----------- defined in machine/vectrex.c -----------*/
 
 DEVICE_IMAGE_LOAD( vectrex_cart );
-TIMER_CALLBACK(vectrex_imager_eye);
 void vectrex_configuration(running_machine &machine);
 DECLARE_READ8_DEVICE_HANDLER (vectrex_via_pa_r);
 DECLARE_READ8_DEVICE_HANDLER(vectrex_via_pb_r );

@@ -299,12 +299,6 @@ TIMER_CALLBACK(mfp_timer_d_callback);
 #endif
 
 /*----------- defined in video/x68k.c -----------*/
-
-TIMER_CALLBACK(x68k_crtc_raster_irq);
-TIMER_CALLBACK(x68k_crtc_vblank_irq);
-TIMER_CALLBACK(x68k_hsync);
-
-
 DECLARE_READ16_HANDLER( x68k_spritereg_r );
 DECLARE_WRITE16_HANDLER( x68k_spritereg_w );
 DECLARE_READ16_HANDLER( x68k_spriteram_r );

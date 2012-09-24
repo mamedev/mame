@@ -248,7 +248,4 @@ public:
 	TIMER_CALLBACK_MEMBER(fm77av_vsync);
 };
 
-/*----------- defined in video/fm7.c -----------*/
-TIMER_CALLBACK( fm77av_vsync );
-
 #endif /*FM7_H_*/
