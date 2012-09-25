@@ -202,6 +202,38 @@ public:
 	UINT32 screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_slave_scanline);
+	
+	void scu_do_transfer(UINT8 event);
+	void scu_test_pending_irq();
+	DECLARE_READ32_MEMBER(saturn_scu_r);
+	DECLARE_WRITE32_MEMBER(saturn_scu_w);
+	TIMER_CALLBACK_MEMBER(dma_lv0_ended);
+	TIMER_CALLBACK_MEMBER(dma_lv1_ended);
+	TIMER_CALLBACK_MEMBER(dma_lv2_ended);
+	void scu_single_transfer(address_space &space, UINT32 src, UINT32 dst,UINT8 *src_shift);
+	void scu_dma_direct(address_space &space, UINT8 dma_ch);
+	void scu_dma_indirect(address_space &space,UINT8 dma_ch);
+	DECLARE_WRITE16_MEMBER(saturn_soundram_w);
+	DECLARE_READ16_MEMBER(saturn_soundram_r);
+	DECLARE_WRITE32_MEMBER(minit_w);
+	DECLARE_WRITE32_MEMBER(sinit_w);
+	DECLARE_READ8_MEMBER(saturn_backupram_r);
+	DECLARE_WRITE8_MEMBER(saturn_backupram_w);
+	DECLARE_READ8_MEMBER(saturn_cart_type_r);
+	TIMER_CALLBACK_MEMBER(stv_rtc_increment);
+	DECLARE_READ32_MEMBER(saturn_null_ram_r);
+	DECLARE_WRITE32_MEMBER(saturn_null_ram_w);
+	DECLARE_READ32_MEMBER(saturn_cart_dram0_r);
+	DECLARE_WRITE32_MEMBER(saturn_cart_dram0_w);
+	DECLARE_READ32_MEMBER(saturn_cart_dram1_r);
+	DECLARE_WRITE32_MEMBER(saturn_cart_dram1_w);
+	DECLARE_READ32_MEMBER(saturn_cs1_r);
+	DECLARE_WRITE32_MEMBER(saturn_cs1_w);
+	WRITE_LINE_MEMBER(scsp_to_main_irq);
+	void saturn_init_driver(int rgn);
+
+	int m_scsp_last_line;
+	
 };
 
 #define MASTER_CLOCK_352 57272720

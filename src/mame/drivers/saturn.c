@@ -121,10 +121,6 @@ static int DectoBCD(int num)
 	return res;
 }
 
-static void scu_do_transfer(running_machine &machine,UINT8 event);
-static void scu_dma_direct(address_space &space, UINT8 dma_ch);	/*DMA level 0 direct transfer function*/
-static void scu_dma_indirect(address_space &space, UINT8 dma_ch); /*DMA level 0 indirect transfer function*/
-
 /**************************************************************************************/
 
 /*
@@ -216,19 +212,19 @@ DMA TODO:
 -Add level priority & DMA status register.
 */
 
-#define DIRECT_MODE(_lv_)			(!(state->m_scu_regs[5+(_lv_*8)] & 0x01000000))
-#define INDIRECT_MODE(_lv_)			  (state->m_scu_regs[5+(_lv_*8)] & 0x01000000)
-#define DRUP(_lv_)					  (state->m_scu_regs[5+(_lv_*8)] & 0x00010000)
-#define DWUP(_lv_)                    (state->m_scu_regs[5+(_lv_*8)] & 0x00000100)
+#define DIRECT_MODE(_lv_)			(!(m_scu_regs[5+(_lv_*8)] & 0x01000000))
+#define INDIRECT_MODE(_lv_)			  (m_scu_regs[5+(_lv_*8)] & 0x01000000)
+#define DRUP(_lv_)					  (m_scu_regs[5+(_lv_*8)] & 0x00010000)
+#define DWUP(_lv_)                    (m_scu_regs[5+(_lv_*8)] & 0x00000100)
 
-#define DMA_STATUS				(state->m_scu_regs[31])
+#define DMA_STATUS				(m_scu_regs[31])
 /*These macros sets the various DMA status flags.*/
 #define DnMV_1(_ch_) DMA_STATUS|=(0x10 << 4 * _ch_)
 #define DnMV_0(_ch_) DMA_STATUS&=~(0x10 << 4 * _ch_)
 
 /*For area checking*/
 #define BIOS_BUS(var)   (var & 0x07000000) == 0
-#define ABUS(_lv_)       ((state->m_scu.src[_lv_] & 0x07000000) >= 0x02000000) && ((state->m_scu.src[_lv_] & 0x07000000) <= 0x04000000)
+#define ABUS(_lv_)       ((m_scu.src[_lv_] & 0x07000000) >= 0x02000000) && ((m_scu.src[_lv_] & 0x07000000) <= 0x04000000)
 #define BBUS(_lv_)       ((scu_##_lv_ & 0x07ffffff) >= 0x05a00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05ffffff)
 #define VDP1_REGS(_lv_)  ((scu_##_lv_ & 0x07ffffff) >= 0x05d00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05dfffff)
 #define VDP2(_lv_)       ((scu_##_lv_ & 0x07ffffff) >= 0x05e00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05fdffff)
@@ -236,15 +232,14 @@ DMA TODO:
 #define WORK_RAM_H(var) (var & 0x07000000) == 0x06000000
 #define SOUND_RAM(_lv_)  ((scu_##_lv_ & 0x07ffffff) >= 0x05a00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05afffff)
 
-static void scu_do_transfer(running_machine &machine,UINT8 event)
+void saturn_state::scu_do_transfer(UINT8 event)
 {
-	saturn_state *state = machine.driver_data<saturn_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	for(i=0;i<3;i++)
 	{
-		if(state->m_scu.enable_mask[i] && state->m_scu.start_factor[i] == event)
+		if(m_scu.enable_mask[i] && m_scu.start_factor[i] == event)
 		{
 			if(DIRECT_MODE(i))		{ scu_dma_direct(space,i);   }
 			else				    { scu_dma_indirect(space,i); }
@@ -253,9 +248,8 @@ static void scu_do_transfer(running_machine &machine,UINT8 event)
 }
 
 /* test pending irqs */
-static void scu_test_pending_irq(running_machine &machine)
+void saturn_state::scu_test_pending_irq()
 {
-	saturn_state *state = machine.driver_data<saturn_state>();
 	int i;
 	const int irq_level[32] = { 0xf, 0xe, 0xd, 0xc,
 								0xb, 0xa, 0x9, 0x8,
@@ -268,21 +262,20 @@ static void scu_test_pending_irq(running_machine &machine)
 
 	for(i=0;i<32;i++)
 	{
-		if((!(state->m_scu.ism & 1 << i)) && (state->m_scu.ist & 1 << i))
+		if((!(m_scu.ism & 1 << i)) && (m_scu.ist & 1 << i))
 		{
 			if(irq_level[i] != -1) /* TODO: cheap check for undefined irqs */
 			{
-				state->m_maincpu->set_input_line_and_vector(irq_level[i], HOLD_LINE, 0x40 + i);
-				state->m_scu.ist &= ~(1 << i);
+				m_maincpu->set_input_line_and_vector(irq_level[i], HOLD_LINE, 0x40 + i);
+				m_scu.ist &= ~(1 << i);
 				return; /* avoid spurious irqs, correct? */
 			}
 		}
 	}
 }
 
-static READ32_HANDLER( saturn_scu_r )
+READ32_MEMBER(saturn_state::saturn_scu_r)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
 	UINT32 res;
 
 	/*TODO: write only registers must return 0 or open bus */
@@ -291,34 +284,34 @@ static READ32_HANDLER( saturn_scu_r )
 		case 0x5c/4:
 		//  Super Major League and Shin Megami Tensei - Akuma Zensho reads from there (undocumented), DMA status mirror?
 			if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",space.device().safe_pc());
-			res = state->m_scu_regs[0x7c/4];
+			res = m_scu_regs[0x7c/4];
 			break;
 		case 0x7c/4:
 			if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",space.device().safe_pc());
-			res = state->m_scu_regs[offset];
+			res = m_scu_regs[offset];
 			break;
 		case 0x80/4:
 			res = dsp_prg_ctrl_r(space);
 			break;
 		case 0x8c/4:
-			if(LOG_SCU) logerror( "DSP mem read at %08X\n", state->m_scu_regs[34]);
+			if(LOG_SCU) logerror( "DSP mem read at %08X\n", m_scu_regs[34]);
         	res = dsp_ram_addr_r();
         	break;
         case 0xa0/4:
-    		if(LOG_SCU) logerror("(PC=%08x) IRQ mask reg read %08x MASK=%08x\n",space.device().safe_pc(),mem_mask,state->m_scu_regs[0xa0/4]);
-    		res = state->m_scu.ism;
+    		if(LOG_SCU) logerror("(PC=%08x) IRQ mask reg read %08x MASK=%08x\n",space.device().safe_pc(),mem_mask,m_scu_regs[0xa0/4]);
+    		res = m_scu.ism;
     		break;
     	case 0xa4/4:
-    		if(LOG_SCU) logerror("(PC=%08x) IRQ status reg read %08x MASK=%08x\n",space.device().safe_pc(),mem_mask,state->m_scu_regs[0xa0/4]);
-			res = state->m_scu.ist;
+    		if(LOG_SCU) logerror("(PC=%08x) IRQ status reg read %08x MASK=%08x\n",space.device().safe_pc(),mem_mask,m_scu_regs[0xa0/4]);
+			res = m_scu.ist;
 			break;
 		case 0xc8/4:
 			logerror("(PC=%08x) SCU version reg read\n",space.device().safe_pc());
 			res = 0x00000004;/*SCU Version 4, OK? */
 			break;
 		default:
-	    	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",space.device().safe_pc(),offset,state->m_scu_regs[offset]);
-	    	res = state->m_scu_regs[offset];
+	    	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",space.device().safe_pc(),offset,m_scu_regs[offset]);
+	    	res = m_scu_regs[offset];
 			break;
 	}
 
@@ -327,121 +320,113 @@ static READ32_HANDLER( saturn_scu_r )
 
 #define DMA_CH ((offset & 0x18) / 8)
 
-static WRITE32_HANDLER( saturn_scu_w )
+WRITE32_MEMBER(saturn_state::saturn_scu_w)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
-
-	COMBINE_DATA(&state->m_scu_regs[offset]);
+	COMBINE_DATA(&m_scu_regs[offset]);
 
 	switch(offset)
 	{
 		/*LV 0 DMA*/
-		case 0x00/4: case 0x20/4: case 0x40/4:  state->m_scu.src[DMA_CH]  = ((state->m_scu_regs[offset] & 0x07ffffff) >> 0); break;
-		case 0x04/4: case 0x24/4: case 0x44/4:  state->m_scu.dst[DMA_CH]  = ((state->m_scu_regs[offset] & 0x07ffffff) >> 0); break;
-		case 0x08/4: case 0x28/4: case 0x48/4:  state->m_scu.size[DMA_CH] = ((state->m_scu_regs[offset] & ((offset == 2) ? 0x000fffff : 0xfff)) >> 0); break;
+		case 0x00/4: case 0x20/4: case 0x40/4:  m_scu.src[DMA_CH]  = ((m_scu_regs[offset] & 0x07ffffff) >> 0); break;
+		case 0x04/4: case 0x24/4: case 0x44/4:  m_scu.dst[DMA_CH]  = ((m_scu_regs[offset] & 0x07ffffff) >> 0); break;
+		case 0x08/4: case 0x28/4: case 0x48/4:  m_scu.size[DMA_CH] = ((m_scu_regs[offset] & ((offset == 2) ? 0x000fffff : 0xfff)) >> 0); break;
 		case 0x0c/4: case 0x2c/4: case 0x4c/4:
-			state->m_scu.src_add[DMA_CH] = (state->m_scu_regs[offset] & 0x100) ? 4 : 0;
-			state->m_scu.dst_add[DMA_CH] = 1 << (state->m_scu_regs[offset] & 7);
-			if(state->m_scu.dst_add[DMA_CH] == 1) { state->m_scu.dst_add[DMA_CH] = 0; }
+			m_scu.src_add[DMA_CH] = (m_scu_regs[offset] & 0x100) ? 4 : 0;
+			m_scu.dst_add[DMA_CH] = 1 << (m_scu_regs[offset] & 7);
+			if(m_scu.dst_add[DMA_CH] == 1) { m_scu.dst_add[DMA_CH] = 0; }
 			break;
 		case 0x10/4: case 0x30/4: case 0x50/4:
-			state->m_scu.enable_mask[DMA_CH] = (data & 0x100) >> 8;
-			if(state->m_scu.enable_mask[DMA_CH] && state->m_scu.start_factor[DMA_CH] == 7 && state->m_scu_regs[offset] & 1)
+			m_scu.enable_mask[DMA_CH] = (data & 0x100) >> 8;
+			if(m_scu.enable_mask[DMA_CH] && m_scu.start_factor[DMA_CH] == 7 && m_scu_regs[offset] & 1)
 			{
 				if(DIRECT_MODE(DMA_CH)) { scu_dma_direct(space,DMA_CH);   }
 				else				    { scu_dma_indirect(space,DMA_CH); }
-				state->m_scu_regs[offset]&=~1;//disable starting bit.
+				m_scu_regs[offset]&=~1;//disable starting bit.
 			}
 			break;
 		case 0x14/4: case 0x34/4: case 0x54/4:
 			if(INDIRECT_MODE(DMA_CH))
 			{
 				//if(LOG_SCU) logerror("Indirect Mode DMA lv %d set\n",DMA_CH);
-				if(!DWUP(DMA_CH)) state->m_scu.index[DMA_CH] = state->m_scu.dst[DMA_CH];
+				if(!DWUP(DMA_CH)) m_scu.index[DMA_CH] = m_scu.dst[DMA_CH];
 			}
 
-			state->m_scu.start_factor[DMA_CH] = state->m_scu_regs[offset] & 7;
+			m_scu.start_factor[DMA_CH] = m_scu_regs[offset] & 7;
 			break;
 
 		case 0x60/4:
-			if(LOG_SCU) logerror("DMA Forced Stop Register set = %02x\n",state->m_scu_regs[24]);
+			if(LOG_SCU) logerror("DMA Forced Stop Register set = %02x\n",m_scu_regs[24]);
 			break;
 		case 0x7c/4: if(LOG_SCU) logerror("Warning: DMA status WRITE! Offset %02x(%d)\n",offset*4,offset); break;
 		/*DSP section*/
 		case 0x80/4:
 			/* TODO: you can't overwrite some flags with this */
-			dsp_prg_ctrl_w(space, state->m_scu_regs[offset]);
+			dsp_prg_ctrl_w(space, m_scu_regs[offset]);
 			if(LOG_SCU) logerror("SCU DSP: Program Control Port Access %08x\n",data);
 			break;
 		case 0x84/4:
-			dsp_prg_data(state->m_scu_regs[offset]);
+			dsp_prg_data(m_scu_regs[offset]);
 			if(LOG_SCU) logerror("SCU DSP: Program RAM Data Port Access %08x\n",data);
 			break;
 		case 0x88/4:
-			dsp_ram_addr_ctrl(state->m_scu_regs[offset]);
+			dsp_ram_addr_ctrl(m_scu_regs[offset]);
 			if(LOG_SCU) logerror("SCU DSP: Data RAM Address Port Access %08x\n",data);
 			break;
 		case 0x8c/4:
-			dsp_ram_addr_w(state->m_scu_regs[offset]);
+			dsp_ram_addr_w(m_scu_regs[offset]);
 			if(LOG_SCU) logerror("SCU DSP: Data RAM Data Port Access %08x\n",data);
 			break;
-		case 0x90/4: /*if(LOG_SCU) logerror("timer 0 compare data = %03x\n",state->m_scu_regs[36]);*/ break;
-		case 0x94/4: /*if(LOG_SCU) logerror("timer 1 set data = %08x\n",state->m_scu_regs[37]);*/ break;
-		case 0x98/4: /*if(LOG_SCU) logerror("timer 1 mode data = %08x\n",state->m_scu_regs[38]);*/ break;
+		case 0x90/4: /*if(LOG_SCU) logerror("timer 0 compare data = %03x\n",m_scu_regs[36]);*/ break;
+		case 0x94/4: /*if(LOG_SCU) logerror("timer 1 set data = %08x\n",m_scu_regs[37]);*/ break;
+		case 0x98/4: /*if(LOG_SCU) logerror("timer 1 mode data = %08x\n",m_scu_regs[38]);*/ break;
 		case 0xa0/4: /* IRQ mask */
-			state->m_scu.ism = state->m_scu_regs[0xa0/4];
-			scu_test_pending_irq(space.machine());
+			m_scu.ism = m_scu_regs[0xa0/4];
+			scu_test_pending_irq();
 			break;
 		case 0xa4/4: /* IRQ control */
-			if(LOG_SCU) logerror("PC=%08x IRQ status reg set:%08x %08x\n",space.device().safe_pc(),state->m_scu_regs[41],mem_mask);
-			state->m_scu.ist &= state->m_scu_regs[offset];
+			if(LOG_SCU) logerror("PC=%08x IRQ status reg set:%08x %08x\n",space.device().safe_pc(),m_scu_regs[41],mem_mask);
+			m_scu.ist &= m_scu_regs[offset];
 			break;
-		case 0xa8/4: if(LOG_SCU) logerror("A-Bus IRQ ACK %08x\n",state->m_scu_regs[42]); break;
-		case 0xc4/4: if(LOG_SCU) logerror("SCU SDRAM set: %02x\n",state->m_scu_regs[49]); break;
+		case 0xa8/4: if(LOG_SCU) logerror("A-Bus IRQ ACK %08x\n",m_scu_regs[42]); break;
+		case 0xc4/4: if(LOG_SCU) logerror("SCU SDRAM set: %02x\n",m_scu_regs[49]); break;
 		default: if(LOG_SCU) logerror("Warning: unused SCU reg set %d = %08x\n",offset,data);
 	}
 }
 
 /*Lv 0 DMA end irq*/
-static TIMER_CALLBACK( dma_lv0_ended )
+TIMER_CALLBACK_MEMBER(saturn_state::dma_lv0_ended )
 {
-	saturn_state *state = machine.driver_data<saturn_state>();
-
-	if(!(state->m_scu.ism & IRQ_DMALV0))
-		state->m_maincpu->set_input_line_and_vector(5, HOLD_LINE, 0x4b);
+	if(!(m_scu.ism & IRQ_DMALV0))
+		m_maincpu->set_input_line_and_vector(5, HOLD_LINE, 0x4b);
 	else
-		state->m_scu.ist |= (IRQ_DMALV0);
+		m_scu.ist |= (IRQ_DMALV0);
 
 	DnMV_0(0);
 }
 
 /*Lv 1 DMA end irq*/
-static TIMER_CALLBACK( dma_lv1_ended )
+TIMER_CALLBACK_MEMBER(saturn_state::dma_lv1_ended)
 {
-	saturn_state *state = machine.driver_data<saturn_state>();
-
-	if(!(state->m_scu.ism & IRQ_DMALV1))
-		state->m_maincpu->set_input_line_and_vector(6, HOLD_LINE, 0x4a);
+	if(!(m_scu.ism & IRQ_DMALV1))
+		m_maincpu->set_input_line_and_vector(6, HOLD_LINE, 0x4a);
 	else
-		state->m_scu.ist |= (IRQ_DMALV1);
+		m_scu.ist |= (IRQ_DMALV1);
 
 	DnMV_0(1);
 }
 
 /*Lv 2 DMA end irq*/
-static TIMER_CALLBACK( dma_lv2_ended )
+TIMER_CALLBACK_MEMBER(saturn_state::dma_lv2_ended)
 {
-	saturn_state *state = machine.driver_data<saturn_state>();
-
-	if(!(state->m_scu.ism & IRQ_DMALV2))
-		state->m_maincpu->set_input_line_and_vector(6, HOLD_LINE, 0x49);
+	if(!(m_scu.ism & IRQ_DMALV2))
+		m_maincpu->set_input_line_and_vector(6, HOLD_LINE, 0x49);
 	else
-		state->m_scu.ist |= (IRQ_DMALV2);
+		m_scu.ist |= (IRQ_DMALV2);
 
 	DnMV_0(2);
 }
 
-static void scu_single_transfer(address_space &space, UINT32 src, UINT32 dst,UINT8 *src_shift)
+void saturn_state::scu_single_transfer(address_space &space, UINT32 src, UINT32 dst,UINT8 *src_shift)
 {
 	UINT32 src_data;
 
@@ -460,53 +445,52 @@ static void scu_single_transfer(address_space &space, UINT32 src, UINT32 dst,UIN
 	*src_shift ^= 1;
 }
 
-static void scu_dma_direct(address_space &space, UINT8 dma_ch)
+void saturn_state::scu_dma_direct(address_space &space, UINT8 dma_ch)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
 	UINT32 tmp_src,tmp_dst,tmp_size;
 	UINT8 cd_transfer_flag;
 
-	if(state->m_scu.src_add[dma_ch] == 0 || (state->m_scu.dst_add[dma_ch] != 2 && state->m_scu.dst_add[dma_ch] != 4))
+	if(m_scu.src_add[dma_ch] == 0 || (m_scu.dst_add[dma_ch] != 2 && m_scu.dst_add[dma_ch] != 4))
 	{
 	if(LOG_SCU) printf("DMA lv %d transfer START\n"
-			             "Start %08x End %08x Size %04x\n",dma_ch,state->m_scu.src[dma_ch],state->m_scu.dst[dma_ch],state->m_scu.size[dma_ch]);
-	if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",state->m_scu.src_add[dma_ch],state->m_scu.dst_add[dma_ch]);
+			             "Start %08x End %08x Size %04x\n",dma_ch,m_scu.src[dma_ch],m_scu.dst[dma_ch],m_scu.size[dma_ch]);
+	if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",m_scu.src_add[dma_ch],m_scu.dst_add[dma_ch]);
 	}
 
 	/* TODO: Game Basic trips this, bogus transfer from BIOS area to VDP1? */
-	if(BIOS_BUS(state->m_scu.src[dma_ch]))
+	if(BIOS_BUS(m_scu.src[dma_ch]))
 		popmessage("Warning: SCU transfer from BIOS area, contact MAMEdev");
 
 	DnMV_1(dma_ch);
 
 	/* max size */
-	if(state->m_scu.size[dma_ch] == 0) { state->m_scu.size[dma_ch] = (dma_ch == 0) ? 0x00100000 : 0x1000; }
+	if(m_scu.size[dma_ch] == 0) { m_scu.size[dma_ch] = (dma_ch == 0) ? 0x00100000 : 0x1000; }
 
 	tmp_src = tmp_dst = 0;
 
-	tmp_size = state->m_scu.size[dma_ch];
-	if(!(DRUP(dma_ch))) tmp_src = state->m_scu.src[dma_ch];
-	if(!(DWUP(dma_ch))) tmp_dst = state->m_scu.dst[dma_ch];
+	tmp_size = m_scu.size[dma_ch];
+	if(!(DRUP(dma_ch))) tmp_src = m_scu.src[dma_ch];
+	if(!(DWUP(dma_ch))) tmp_dst = m_scu.dst[dma_ch];
 
-	cd_transfer_flag = state->m_scu.src_add[dma_ch] == 0 && state->m_scu.src[dma_ch] == 0x05818000;
+	cd_transfer_flag = m_scu.src_add[dma_ch] == 0 && m_scu.src[dma_ch] == 0x05818000;
 
 	/* TODO: Many games directly accesses CD-ROM register 0x05818000, it must be a dword access with current implementation otherwise it won't work */
 	if(cd_transfer_flag)
 	{
 		int i;
-		if(WORK_RAM_H(state->m_scu.dst[dma_ch]))
-			state->m_scu.dst_add[dma_ch] = 4;
+		if(WORK_RAM_H(m_scu.dst[dma_ch]))
+			m_scu.dst_add[dma_ch] = 4;
 		else
-			state->m_scu.dst_add[dma_ch] <<= 1;
+			m_scu.dst_add[dma_ch] <<= 1;
 
-		for (i = 0; i < state->m_scu.size[dma_ch];i+=state->m_scu.dst_add[dma_ch])
+		for (i = 0; i < m_scu.size[dma_ch];i+=m_scu.dst_add[dma_ch])
 		{
-			space.write_dword(state->m_scu.dst[dma_ch],space.read_dword(state->m_scu.src[dma_ch]));
-			if(state->m_scu.dst_add[dma_ch] == 8)
-				space.write_dword(state->m_scu.dst[dma_ch]+4,space.read_dword(state->m_scu.src[dma_ch]));
+			space.write_dword(m_scu.dst[dma_ch],space.read_dword(m_scu.src[dma_ch]));
+			if(m_scu.dst_add[dma_ch] == 8)
+				space.write_dword(m_scu.dst[dma_ch]+4,space.read_dword(m_scu.src[dma_ch]));
 
-			state->m_scu.src[dma_ch]+=state->m_scu.src_add[dma_ch];
-			state->m_scu.dst[dma_ch]+=state->m_scu.dst_add[dma_ch];
+			m_scu.src[dma_ch]+=m_scu.src_add[dma_ch];
+			m_scu.dst[dma_ch]+=m_scu.dst_add[dma_ch];
 		}
 	}
 	else
@@ -514,39 +498,37 @@ static void scu_dma_direct(address_space &space, UINT8 dma_ch)
 		int i;
 		UINT8  src_shift;
 
-		src_shift = ((state->m_scu.src[dma_ch] & 2) >> 1) ^ 1;
+		src_shift = ((m_scu.src[dma_ch] & 2) >> 1) ^ 1;
 
-		for (i = 0; i < state->m_scu.size[dma_ch];i+=2)
+		for (i = 0; i < m_scu.size[dma_ch];i+=2)
 		{
-			scu_single_transfer(space,state->m_scu.src[dma_ch],state->m_scu.dst[dma_ch],&src_shift);
+			scu_single_transfer(space,m_scu.src[dma_ch],m_scu.dst[dma_ch],&src_shift);
 
 			if(src_shift)
-				state->m_scu.src[dma_ch]+=state->m_scu.src_add[dma_ch];
+				m_scu.src[dma_ch]+=m_scu.src_add[dma_ch];
 
 			/* if target is Work RAM H, the add value is fixed, behaviour confirmed by Final Romance 2, Virtual Mahjong and Burning Rangers */
-			state->m_scu.dst[dma_ch]+=(WORK_RAM_H(state->m_scu.dst[dma_ch])) ? 2 : state->m_scu.dst_add[dma_ch];
+			m_scu.dst[dma_ch]+=(WORK_RAM_H(m_scu.dst[dma_ch])) ? 2 : m_scu.dst_add[dma_ch];
 		}
 	}
 
-	state->m_scu.size[dma_ch] = tmp_size;
-	if(!(DRUP(dma_ch))) state->m_scu.src[dma_ch] = tmp_src;
-	if(!(DWUP(dma_ch))) state->m_scu.dst[dma_ch] = tmp_dst;
+	m_scu.size[dma_ch] = tmp_size;
+	if(!(DRUP(dma_ch))) m_scu.src[dma_ch] = tmp_src;
+	if(!(DWUP(dma_ch))) m_scu.dst[dma_ch] = tmp_dst;
 
 	{
 		/*TODO: this is completely wrong HW-wise ...  */
 		switch(dma_ch)
 		{
-			case 0: space.machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended)); break;
-			case 1: space.machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended)); break;
-			case 2: space.machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended)); break;
+			case 0: machine().scheduler().timer_set(attotime::from_usec(300), timer_expired_delegate(FUNC(saturn_state::dma_lv0_ended),this)); break;
+			case 1: machine().scheduler().timer_set(attotime::from_usec(300), timer_expired_delegate(FUNC(saturn_state::dma_lv1_ended),this)); break;
+			case 2: machine().scheduler().timer_set(attotime::from_usec(300), timer_expired_delegate(FUNC(saturn_state::dma_lv2_ended),this)); break;
 		}
 	}
 }
 
-static void scu_dma_indirect(address_space &space,UINT8 dma_ch)
+void saturn_state::scu_dma_indirect(address_space &space,UINT8 dma_ch)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
-
 	/*Helper to get out of the cycle*/
 	UINT8 job_done = 0;
 	/*temporary storage for the transfer data*/
@@ -556,24 +538,24 @@ static void scu_dma_indirect(address_space &space,UINT8 dma_ch)
 
 	DnMV_1(dma_ch);
 
-	state->m_scu.index[dma_ch] = state->m_scu.dst[dma_ch];
+	m_scu.index[dma_ch] = m_scu.dst[dma_ch];
 
 	do{
-		tmp_src = state->m_scu.index[dma_ch];
+		tmp_src = m_scu.index[dma_ch];
 
-		indirect_size = space.read_dword(state->m_scu.index[dma_ch]);
-		indirect_src  = space.read_dword(state->m_scu.index[dma_ch]+8);
-		indirect_dst  = space.read_dword(state->m_scu.index[dma_ch]+4);
+		indirect_size = space.read_dword(m_scu.index[dma_ch]);
+		indirect_src  = space.read_dword(m_scu.index[dma_ch]+8);
+		indirect_dst  = space.read_dword(m_scu.index[dma_ch]+4);
 
 		/*Indirect Mode end factor*/
 		if(indirect_src & 0x80000000)
 			job_done = 1;
 
-		if(state->m_scu.src_add[dma_ch] == 0 || (state->m_scu.dst_add[dma_ch] != 2))
+		if(m_scu.src_add[dma_ch] == 0 || (m_scu.dst_add[dma_ch] != 2))
 		{
 			if(LOG_SCU) printf("DMA lv %d indirect mode transfer START\n"
 					           "Index %08x Start %08x End %08x Size %04x\n",dma_ch,tmp_src,indirect_src,indirect_dst,indirect_size);
-			if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",state->m_scu.src_add[dma_ch],state->m_scu.dst_add[dma_ch]);
+			if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",m_scu.src_add[dma_ch],m_scu.dst_add[dma_ch]);
 		}
 
 		indirect_src &=0x07ffffff;
@@ -593,16 +575,16 @@ static void scu_dma_indirect(address_space &space,UINT8 dma_ch)
 				scu_single_transfer(space,indirect_src,indirect_dst,&src_shift);
 
 				if(src_shift)
-					indirect_src+=state->m_scu.src_add[dma_ch];
+					indirect_src+=m_scu.src_add[dma_ch];
 
-				indirect_dst+= (WORK_RAM_H(indirect_dst)) ? 2 : state->m_scu.dst_add[dma_ch];
+				indirect_dst+= (WORK_RAM_H(indirect_dst)) ? 2 : m_scu.dst_add[dma_ch];
 			}
 		}
 
-		//if(DRUP(0))   space.write_dword(tmp_src+8,state->m_scu.src[0]|job_done ? 0x80000000 : 0);
-		//if(DWUP(0)) space.write_dword(tmp_src+4,state->m_scu.dst[0]);
+		//if(DRUP(0))   space.write_dword(tmp_src+8,m_scu.src[0]|job_done ? 0x80000000 : 0);
+		//if(DWUP(0)) space.write_dword(tmp_src+4,m_scu.dst[0]);
 
-		state->m_scu.index[dma_ch] = tmp_src+0xc;
+		m_scu.index[dma_ch] = tmp_src+0xc;
 
 	}while(job_done == 0);
 
@@ -610,9 +592,9 @@ static void scu_dma_indirect(address_space &space,UINT8 dma_ch)
 		/*TODO: this is completely wrong HW-wise ...  */
 		switch(dma_ch)
 		{
-			case 0: space.machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended)); break;
-			case 1: space.machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended)); break;
-			case 2: space.machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended)); break;
+			case 0: machine().scheduler().timer_set(attotime::from_usec(300), timer_expired_delegate(FUNC(saturn_state::dma_lv0_ended),this)); break;
+			case 1: machine().scheduler().timer_set(attotime::from_usec(300), timer_expired_delegate(FUNC(saturn_state::dma_lv1_ended),this)); break;
+			case 2: machine().scheduler().timer_set(attotime::from_usec(300), timer_expired_delegate(FUNC(saturn_state::dma_lv2_ended),this)); break;
 		}
 	}
 }
@@ -620,62 +602,50 @@ static void scu_dma_indirect(address_space &space,UINT8 dma_ch)
 
 /**************************************************************************************/
 
-static WRITE16_HANDLER( saturn_soundram_w )
+WRITE16_MEMBER(saturn_state::saturn_soundram_w)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
+	//machine().scheduler().synchronize(); // force resync
 
-	//space.machine().scheduler().synchronize(); // force resync
-
-	COMBINE_DATA(&state->m_sound_ram[offset]);
+	COMBINE_DATA(&m_sound_ram[offset]);
 }
 
-static READ16_HANDLER( saturn_soundram_r )
+READ16_MEMBER(saturn_state::saturn_soundram_r)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
+	//machine().scheduler().synchronize(); // force resync
 
-	//space.machine().scheduler().synchronize(); // force resync
-
-	return state->m_sound_ram[offset];
+	return m_sound_ram[offset];
 }
 
 /* communication,SLAVE CPU acquires data from the MASTER CPU and triggers an irq.  */
-static WRITE32_HANDLER( minit_w )
+WRITE32_MEMBER(saturn_state::minit_w)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
-
 	//logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space.device().tag(), space.device().safe_pc(),data);
-	space.machine().scheduler().boost_interleave(state->m_minit_boost_timeslice, attotime::from_usec(state->m_minit_boost));
-	space.machine().scheduler().trigger(1000);
-	sh2_set_frt_input(state->m_slave, PULSE_LINE);
+	machine().scheduler().boost_interleave(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
+	machine().scheduler().trigger(1000);
+	sh2_set_frt_input(m_slave, PULSE_LINE);
 }
 
-static WRITE32_HANDLER( sinit_w )
+WRITE32_MEMBER(saturn_state::sinit_w)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
-
 	//logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space.device().tag(), space.device().safe_pc(),data);
-	space.machine().scheduler().boost_interleave(state->m_sinit_boost_timeslice, attotime::from_usec(state->m_sinit_boost));
-	sh2_set_frt_input(state->m_maincpu, PULSE_LINE);
+	machine().scheduler().boost_interleave(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
+	sh2_set_frt_input(m_maincpu, PULSE_LINE);
 }
 
-static READ8_HANDLER(saturn_backupram_r)
+READ8_MEMBER(saturn_state::saturn_backupram_r)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
-
 	if(!(offset & 1))
 		return 0; // yes, it makes sure the "holes" are there.
 
-	return state->m_backupram[offset >> 1] & 0xff;
+	return m_backupram[offset >> 1] & 0xff;
 }
 
-static WRITE8_HANDLER(saturn_backupram_w)
+WRITE8_MEMBER(saturn_state::saturn_backupram_w)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
-
 	if(!(offset & 1))
 		return;
 
-	state->m_backupram[offset >> 1] = data;
+	m_backupram[offset >> 1] = data;
 }
 
 /* TODO: if you change the driver configuration then NVRAM contents gets screwed, needs mods in MAME framework */
@@ -741,28 +711,27 @@ static NVRAM_HANDLER(saturn)
 	}
 }
 
-static READ8_HANDLER( saturn_cart_type_r )
+READ8_MEMBER(saturn_state::saturn_cart_type_r)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
 	const int cart_ram_header[7] = { 0xff, 0x21, 0x22, 0x23, 0x24, 0x5a, 0x5c };
 
-	return cart_ram_header[state->m_cart_type];
+	return cart_ram_header[m_cart_type];
 }
 
 static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8_LEGACY(saturn_SMPC_r, saturn_SMPC_w,0xffffffff)
-	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8_LEGACY(saturn_backupram_r, saturn_backupram_w,0xffffffff) AM_SHARE("share1")
+	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r, saturn_backupram_w,0xffffffff) AM_SHARE("share1")
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("workram_l")
-	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE_LEGACY(minit_w)
-	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE_LEGACY(sinit_w)
+	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(minit_w)
+	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(sinit_w)
 	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_SHARE("share7") AM_REGION("maincpu", 0x80000)	// cartridge space
 //  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
 //  AM_RANGE(0x04000000, 0x047fffff) AM_RAM //backup RAM area, dynamically allocated
-	AM_RANGE(0x04fffffc, 0x04ffffff) AM_READ8_LEGACY(saturn_cart_type_r,0x000000ff)
+	AM_RANGE(0x04fffffc, 0x04ffffff) AM_READ8(saturn_cart_type_r,0x000000ff)
 	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE_LEGACY(stvcd_r, stvcd_w)
 	/* Sound */
-	AM_RANGE(0x05a00000, 0x05a7ffff) AM_READWRITE16_LEGACY(saturn_soundram_r, saturn_soundram_w,0xffffffff)
+	AM_RANGE(0x05a00000, 0x05a7ffff) AM_READWRITE16(saturn_soundram_r, saturn_soundram_w,0xffffffff)
 	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16_LEGACY("scsp", scsp_r, scsp_w, 0xffffffff)
 	/* VDP1 */
 	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE_LEGACY(saturn_vdp1_vram_r, saturn_vdp1_vram_w)
@@ -771,7 +740,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x05e00000, 0x05efffff) AM_READWRITE_LEGACY(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
 	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE_LEGACY(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE16_LEGACY(saturn_vdp2_regs_r, saturn_vdp2_regs_w,0xffffffff)
-	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE_LEGACY(saturn_scu_r, saturn_scu_w)
+	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE(saturn_scu_r, saturn_scu_w)
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("workram_h")
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
 	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM AM_SHARE("share7")  // cart mirror
@@ -782,15 +751,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8_LEGACY(stv_SMPC_r, stv_SMPC_w,0xffffffff)
-	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8_LEGACY(saturn_backupram_r,saturn_backupram_w,0xffffffff) AM_SHARE("share1")
+	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r,saturn_backupram_w,0xffffffff) AM_SHARE("share1")
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("workram_l")
 //  AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE_LEGACY(stv_ioga_r32, stv_io_w32) AM_SHARE("ioga") AM_MIRROR(0x20) /* installed with per-game specific */
-	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE_LEGACY(minit_w)
-	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE_LEGACY(sinit_w)
+	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(minit_w)
+	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(sinit_w)
 	AM_RANGE(0x02000000, 0x04ffffff) AM_ROM AM_SHARE("share7") AM_REGION("abus", 0) // cartridge
 	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE_LEGACY(stvcd_r, stvcd_w)
 	/* Sound */
-	AM_RANGE(0x05a00000, 0x05afffff) AM_READWRITE16_LEGACY(saturn_soundram_r, saturn_soundram_w,0xffffffff)
+	AM_RANGE(0x05a00000, 0x05afffff) AM_READWRITE16(saturn_soundram_r, saturn_soundram_w,0xffffffff)
 	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16_LEGACY("scsp", scsp_r, scsp_w, 0xffffffff)
 	/* VDP1 */
 	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE_LEGACY(saturn_vdp1_vram_r, saturn_vdp1_vram_w)
@@ -799,7 +768,7 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x05e00000, 0x05efffff) AM_READWRITE_LEGACY(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
 	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE_LEGACY(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE16_LEGACY(saturn_vdp2_regs_r, saturn_vdp2_regs_w,0xffffffff)
-	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE_LEGACY(saturn_scu_r, saturn_scu_w)
+	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE(saturn_scu_r, saturn_scu_w)
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("workram_h")
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
 	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM AM_SHARE("share7")  // cart mirror
@@ -824,7 +793,7 @@ INPUT_CHANGED_MEMBER(saturn_state::key_stroke)
 
 	if(oldval && !newval)
 	{
-		//state->m_keyb.status &= ~8;
+		//m_keyb.status &= ~8;
 		m_keyb.data = 0;
 	}
 }
@@ -1628,8 +1597,6 @@ GFXDECODE_END
 static const sh2_cpu_core sh2_conf_master = { 0, NULL };
 static const sh2_cpu_core sh2_conf_slave  = { 1, NULL };
 
-static int scsp_last_line = 0;
-
 static void scsp_irq(device_t *device, int irq)
 {
 	saturn_state *state = device->machine().driver_data<saturn_state>();
@@ -1642,7 +1609,7 @@ static void scsp_irq(device_t *device, int irq)
 
 	if (irq > 0)
 	{
-		scsp_last_line = irq;
+		state->m_scsp_last_line = irq;
 		device->machine().device("audiocpu")->execute().set_input_line(irq, ASSERT_LINE);
 	}
 	else if (irq < 0)
@@ -1651,98 +1618,95 @@ static void scsp_irq(device_t *device, int irq)
 	}
 	else
 	{
-		device->machine().device("audiocpu")->execute().set_input_line(scsp_last_line, CLEAR_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(state->m_scsp_last_line, CLEAR_LINE);
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( scsp_to_main_irq )
+WRITE_LINE_MEMBER(saturn_state::scsp_to_main_irq)
 {
-	saturn_state *drvstate = device->machine().driver_data<saturn_state>();
-
-	if(!(drvstate->m_scu.ism & IRQ_SOUND_REQ))
+	if(!(m_scu.ism & IRQ_SOUND_REQ))
 	{
-		drvstate->m_maincpu->set_input_line_and_vector(9, HOLD_LINE, 0x46);
-		scu_do_transfer(device->machine(),5);
+		m_maincpu->set_input_line_and_vector(9, HOLD_LINE, 0x46);
+		scu_do_transfer(5);
 	}
 	else
-		drvstate->m_scu.ist |= (IRQ_SOUND_REQ);
+		m_scu.ist |= (IRQ_SOUND_REQ);
 }
 
 static const scsp_interface scsp_config =
 {
 	0,
 	scsp_irq,
-	DEVCB_LINE(scsp_to_main_irq)
+	DEVCB_DRIVER_LINE_MEMBER(saturn_state, scsp_to_main_irq)
 };
 
-static TIMER_CALLBACK(stv_rtc_increment)
+TIMER_CALLBACK_MEMBER(saturn_state::stv_rtc_increment)
 {
-	saturn_state *state = machine.driver_data<saturn_state>();
 	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 	static int year_num, year_count;
 
 	/*
-        state->m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
-        state->m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
-        state->m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-        state->m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
-        state->m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
-        state->m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
-        state->m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
+        m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
+        m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
+        m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
+        m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
+        m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
+        m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
+        m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
     */
 
-	state->m_smpc.rtc_data[6]++;
+	m_smpc.rtc_data[6]++;
 
 	/* seconds from 9 -> 10*/
-	if((state->m_smpc.rtc_data[6] & 0x0f) >= 0x0a)			{ state->m_smpc.rtc_data[6]+=0x10; state->m_smpc.rtc_data[6]&=0xf0; }
+	if((m_smpc.rtc_data[6] & 0x0f) >= 0x0a)			{ m_smpc.rtc_data[6]+=0x10; m_smpc.rtc_data[6]&=0xf0; }
 	/* seconds from 59 -> 0 */
-	if((state->m_smpc.rtc_data[6] & 0xf0) >= 0x60)			{ state->m_smpc.rtc_data[5]++;     state->m_smpc.rtc_data[6] = 0; }
+	if((m_smpc.rtc_data[6] & 0xf0) >= 0x60)			{ m_smpc.rtc_data[5]++;     m_smpc.rtc_data[6] = 0; }
 	/* minutes from 9 -> 10 */
-	if((state->m_smpc.rtc_data[5] & 0x0f) >= 0x0a)			{ state->m_smpc.rtc_data[5]+=0x10; state->m_smpc.rtc_data[5]&=0xf0; }
+	if((m_smpc.rtc_data[5] & 0x0f) >= 0x0a)			{ m_smpc.rtc_data[5]+=0x10; m_smpc.rtc_data[5]&=0xf0; }
 	/* minutes from 59 -> 0 */
-	if((state->m_smpc.rtc_data[5] & 0xf0) >= 0x60)			{ state->m_smpc.rtc_data[4]++;     state->m_smpc.rtc_data[5] = 0; }
+	if((m_smpc.rtc_data[5] & 0xf0) >= 0x60)			{ m_smpc.rtc_data[4]++;     m_smpc.rtc_data[5] = 0; }
 	/* hours from 9 -> 10 */
-	if((state->m_smpc.rtc_data[4] & 0x0f) >= 0x0a)			{ state->m_smpc.rtc_data[4]+=0x10; state->m_smpc.rtc_data[4]&=0xf0; }
+	if((m_smpc.rtc_data[4] & 0x0f) >= 0x0a)			{ m_smpc.rtc_data[4]+=0x10; m_smpc.rtc_data[4]&=0xf0; }
 	/* hours from 23 -> 0 */
-	if((state->m_smpc.rtc_data[4] & 0xff) >= 0x24)				{ state->m_smpc.rtc_data[3]++; state->m_smpc.rtc_data[2]+=0x10; state->m_smpc.rtc_data[4] = 0; }
+	if((m_smpc.rtc_data[4] & 0xff) >= 0x24)				{ m_smpc.rtc_data[3]++; m_smpc.rtc_data[2]+=0x10; m_smpc.rtc_data[4] = 0; }
 	/* week day name sunday -> monday */
-	if((state->m_smpc.rtc_data[2] & 0xf0) >= 0x70)				{ state->m_smpc.rtc_data[2]&=0x0f; }
+	if((m_smpc.rtc_data[2] & 0xf0) >= 0x70)				{ m_smpc.rtc_data[2]&=0x0f; }
 	/* day number 9 -> 10 */
-	if((state->m_smpc.rtc_data[3] & 0x0f) >= 0x0a)				{ state->m_smpc.rtc_data[3]+=0x10; state->m_smpc.rtc_data[3]&=0xf0; }
+	if((m_smpc.rtc_data[3] & 0x0f) >= 0x0a)				{ m_smpc.rtc_data[3]+=0x10; m_smpc.rtc_data[3]&=0xf0; }
 
 	// year BCD to dec conversion (for the leap year stuff)
 	{
-		year_num = (state->m_smpc.rtc_data[1] & 0xf);
+		year_num = (m_smpc.rtc_data[1] & 0xf);
 
-		for(year_count = 0; year_count < (state->m_smpc.rtc_data[1] & 0xf0); year_count += 0x10)
+		for(year_count = 0; year_count < (m_smpc.rtc_data[1] & 0xf0); year_count += 0x10)
 			year_num += 0xa;
 
-		year_num += (state->m_smpc.rtc_data[0] & 0xf)*0x64;
+		year_num += (m_smpc.rtc_data[0] & 0xf)*0x64;
 
-		for(year_count = 0; year_count < (state->m_smpc.rtc_data[0] & 0xf0); year_count += 0x10)
+		for(year_count = 0; year_count < (m_smpc.rtc_data[0] & 0xf0); year_count += 0x10)
 			year_num += 0x3e8;
 	}
 
 	/* month +1 check */
 	/* the RTC have a range of 1980 - 2100, so we don't actually need to support the leap year special conditions */
-	if(((year_num % 4) == 0) && (state->m_smpc.rtc_data[2] & 0xf) == 2)
+	if(((year_num % 4) == 0) && (m_smpc.rtc_data[2] & 0xf) == 2)
 	{
-		if((state->m_smpc.rtc_data[3] & 0xff) >= dpm[(state->m_smpc.rtc_data[2] & 0xf)-1]+1+1)
-			{ state->m_smpc.rtc_data[2]++; state->m_smpc.rtc_data[3] = 0x01; }
+		if((m_smpc.rtc_data[3] & 0xff) >= dpm[(m_smpc.rtc_data[2] & 0xf)-1]+1+1)
+			{ m_smpc.rtc_data[2]++; m_smpc.rtc_data[3] = 0x01; }
 	}
-	else if((state->m_smpc.rtc_data[3] & 0xff) >= dpm[(state->m_smpc.rtc_data[2] & 0xf)-1]+1){ state->m_smpc.rtc_data[2]++; state->m_smpc.rtc_data[3] = 0x01; }
+	else if((m_smpc.rtc_data[3] & 0xff) >= dpm[(m_smpc.rtc_data[2] & 0xf)-1]+1){ m_smpc.rtc_data[2]++; m_smpc.rtc_data[3] = 0x01; }
 	/* year +1 check */
-	if((state->m_smpc.rtc_data[2] & 0x0f) > 12)				{ state->m_smpc.rtc_data[1]++;  state->m_smpc.rtc_data[2] = (state->m_smpc.rtc_data[2] & 0xf0) | 0x01; }
+	if((m_smpc.rtc_data[2] & 0x0f) > 12)				{ m_smpc.rtc_data[1]++;  m_smpc.rtc_data[2] = (m_smpc.rtc_data[2] & 0xf0) | 0x01; }
 	/* year from 9 -> 10 */
-	if((state->m_smpc.rtc_data[1] & 0x0f) >= 0x0a)				{ state->m_smpc.rtc_data[1]+=0x10; state->m_smpc.rtc_data[1]&=0xf0; }
+	if((m_smpc.rtc_data[1] & 0x0f) >= 0x0a)				{ m_smpc.rtc_data[1]+=0x10; m_smpc.rtc_data[1]&=0xf0; }
 	/* year from 99 -> 100 */
-	if((state->m_smpc.rtc_data[1] & 0xf0) >= 0xa0)				{ state->m_smpc.rtc_data[0]++; state->m_smpc.rtc_data[1] = 0; }
+	if((m_smpc.rtc_data[1] & 0xf0) >= 0xa0)				{ m_smpc.rtc_data[0]++; m_smpc.rtc_data[1] = 0; }
 
 	// probably not SO precise, here just for reference ...
 	/* year from 999 -> 1000 */
-	//if((state->m_smpc.rtc_data[0] & 0x0f) >= 0x0a)               { state->m_smpc.rtc_data[0]+=0x10; state->m_smpc.rtc_data[0]&=0xf0; }
+	//if((m_smpc.rtc_data[0] & 0x0f) >= 0x0a)               { m_smpc.rtc_data[0]+=0x10; m_smpc.rtc_data[0]&=0xf0; }
 	/* year from 9999 -> 0 */
-	//if((state->m_smpc.rtc_data[0] & 0xf0) >= 0xa0)               { state->m_smpc.rtc_data[0] = 0; } //roll over
+	//if((m_smpc.rtc_data[0] & 0xf0) >= 0xa0)               { m_smpc.rtc_data[0] = 0; } //roll over
 }
 
 MACHINE_START_MEMBER(saturn_state,stv)
@@ -1770,7 +1734,7 @@ MACHINE_START_MEMBER(saturn_state,stv)
 	state_save_register_global(machine(), m_smpc.PDR2);
 	state_save_register_global(machine(), m_port_sel);
 	state_save_register_global(machine(), m_mux_data);
-	state_save_register_global(machine(), scsp_last_line);
+	state_save_register_global(machine(), m_scsp_last_line);
 
 	stv_register_protection_savestates(machine()); // machine/stvprot.c
 
@@ -1784,7 +1748,7 @@ MACHINE_START_MEMBER(saturn_state,stv)
     m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
     m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
 
-	m_stv_rtc_timer = machine().scheduler().timer_alloc(FUNC(stv_rtc_increment));
+	m_stv_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(saturn_state::stv_rtc_increment),this));
 }
 
 
@@ -1812,7 +1776,7 @@ MACHINE_START_MEMBER(saturn_state,saturn)
 	state_save_register_global(machine(), m_smpc.PDR2);
 //  state_save_register_global(machine(), m_port_sel);
 //  state_save_register_global(machine(), mux_data);
-	state_save_register_global(machine(), scsp_last_line);
+	state_save_register_global(machine(), m_scsp_last_line);
 	state_save_register_global(machine(), m_smpc.intback_stage);
 	state_save_register_global(machine(), m_smpc.pmode);
 	state_save_register_global(machine(), m_smpc.SR);
@@ -1829,7 +1793,7 @@ MACHINE_START_MEMBER(saturn_state,saturn)
     m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
     m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
 
-	m_stv_rtc_timer = machine().scheduler().timer_alloc(FUNC(stv_rtc_increment));
+	m_stv_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(saturn_state::stv_rtc_increment),this));
 }
 
 
@@ -1860,7 +1824,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 {
 	saturn_state *state = machine().driver_data<saturn_state>();
 	int scanline = param;
-	int max_y = timer.machine().primary_screen->height();
+	int max_y = machine().primary_screen->height();
 	int y_step,vblank_line;
 
 	y_step = 2;
@@ -1874,7 +1838,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 
 	if(scanline == (0)*y_step)
 	{
-		video_update_vdp1(timer.machine());
+		video_update_vdp1(machine());
 
 		if(STV_VDP1_VBE)
 			m_vdp1.framebuffer_clear_on_next_frame = 1;
@@ -1882,7 +1846,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 		if(!(m_scu.ism & IRQ_VDP1_END))
 		{
 			m_maincpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d);
-			scu_do_transfer(timer.machine(),6);
+			scu_do_transfer(6);
 		}
 		else
 			m_scu.ist |= (IRQ_VDP1_END);
@@ -1893,7 +1857,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 		if(!(m_scu.ism & IRQ_VBLANK_OUT))
 		{
 			m_maincpu->set_input_line_and_vector(0xe, HOLD_LINE, 0x41);
-			scu_do_transfer(timer.machine(),1);
+			scu_do_transfer(1);
 		}
 		else
 			m_scu.ist |= (IRQ_VBLANK_OUT);
@@ -1904,7 +1868,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 		if(!(m_scu.ism & IRQ_VBLANK_IN))
 		{
 			m_maincpu->set_input_line_and_vector(0xf, HOLD_LINE ,0x40);
-			scu_do_transfer(timer.machine(),0);
+			scu_do_transfer(0);
 		}
 		else
 			m_scu.ist |= (IRQ_VBLANK_IN);
@@ -1914,7 +1878,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 		if(!(m_scu.ism & IRQ_HBLANK_IN))
 		{
 			m_maincpu->set_input_line_and_vector(0xd, HOLD_LINE, 0x42);
-			scu_do_transfer(timer.machine(),2);
+			scu_do_transfer(2);
 		}
 		else
 			m_scu.ist |= (IRQ_HBLANK_IN);
@@ -1925,7 +1889,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 		if(!(m_scu.ism & IRQ_TIMER_0))
 		{
 			m_maincpu->set_input_line_and_vector(0xc, HOLD_LINE, 0x43 );
-			scu_do_transfer(timer.machine(),3);
+			scu_do_transfer(3);
 		}
 		else
 			m_scu.ist |= (IRQ_TIMER_0);
@@ -1940,7 +1904,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 			if(!(m_scu.ism & IRQ_TIMER_1))
 			{
 				m_maincpu->set_input_line_and_vector(0xb, HOLD_LINE, 0x44 );
-				scu_do_transfer(timer.machine(),4);
+				scu_do_transfer(4);
 			}
 			else
 				m_scu.ist |= (IRQ_TIMER_1);
@@ -1951,7 +1915,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_slave_scanline )
 {
 	int scanline = param;
-	int max_y = timer.machine().primary_screen->height();
+	int max_y = machine().primary_screen->height();
 	int y_step,vblank_line;
 
 	y_step = 2;
@@ -1968,70 +1932,61 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_slave_scanline )
 }
 
 /* Die Hard Trilogy tests RAM address 0x25e7ffe bit 2 with Slave during FRT minit irq, in-development tool for breaking execution of it? */
-static READ32_HANDLER( saturn_null_ram_r )
+READ32_MEMBER(saturn_state::saturn_null_ram_r)
 {
 	return 0xffffffff;
 }
 
-static WRITE32_HANDLER( saturn_null_ram_w )
+WRITE32_MEMBER(saturn_state::saturn_null_ram_w)
 {
 
 }
 
-static READ32_HANDLER( saturn_cart_dram0_r )
+READ32_MEMBER(saturn_state::saturn_cart_dram0_r)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
-
-	return state->m_cart_dram[offset];
+	return m_cart_dram[offset];
 }
 
-static WRITE32_HANDLER( saturn_cart_dram0_w )
+WRITE32_MEMBER(saturn_state::saturn_cart_dram0_w)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
-
-	COMBINE_DATA(&state->m_cart_dram[offset]);
+	COMBINE_DATA(&m_cart_dram[offset]);
 }
 
-static READ32_HANDLER( saturn_cart_dram1_r )
+READ32_MEMBER(saturn_state::saturn_cart_dram1_r)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
-
-	return state->m_cart_dram[offset+0x200000/4];
+	return m_cart_dram[offset+0x200000/4];
 }
 
-static WRITE32_HANDLER( saturn_cart_dram1_w )
+WRITE32_MEMBER(saturn_state::saturn_cart_dram1_w)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
-
-	COMBINE_DATA(&state->m_cart_dram[offset+0x200000/4]);
+	COMBINE_DATA(&m_cart_dram[offset+0x200000/4]);
 }
 
-static READ32_HANDLER( saturn_cs1_r )
+READ32_MEMBER(saturn_state::saturn_cs1_r)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
 	UINT32 res;
 
 	res = 0;
-	//res  = state->m_cart_backupram[offset*4+0] << 24;
-	res |= state->m_cart_backupram[offset*2+0] << 16;
-	//res |= state->m_cart_backupram[offset*4+2] << 8;
-	res |= state->m_cart_backupram[offset*2+1] << 0;
+	//res  = m_cart_backupram[offset*4+0] << 24;
+	res |= m_cart_backupram[offset*2+0] << 16;
+	//res |= m_cart_backupram[offset*4+2] << 8;
+	res |= m_cart_backupram[offset*2+1] << 0;
 
 	return res;
 }
 
-static WRITE32_HANDLER( saturn_cs1_w )
+WRITE32_MEMBER(saturn_state::saturn_cs1_w)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
-
 	if(ACCESSING_BITS_16_23)
-		state->m_cart_backupram[offset*2+0] = (data & 0x00ff0000) >> 16;
+		m_cart_backupram[offset*2+0] = (data & 0x00ff0000) >> 16;
 	if(ACCESSING_BITS_0_7)
-		state->m_cart_backupram[offset*2+1] = (data & 0x000000ff) >> 0;
+		m_cart_backupram[offset*2+1] = (data & 0x000000ff) >> 0;
 }
 
 MACHINE_RESET_MEMBER(saturn_state,saturn)
 {
+	m_scsp_last_line = 0;
+	
 	// don't let the slave cpu and the 68k go anywhere
 	machine().device("slave")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -2053,8 +2008,8 @@ MACHINE_RESET_MEMBER(saturn_state,saturn)
 
 	m_cart_type = ioport("CART_AREA")->read() & 7;
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02400000, 0x027fffff, FUNC(saturn_null_ram_r), FUNC(saturn_null_ram_w));
-	machine().device("slave")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02400000, 0x027fffff, FUNC(saturn_null_ram_r), FUNC(saturn_null_ram_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(saturn_state::saturn_null_ram_r),this), write32_delegate(FUNC(saturn_state::saturn_null_ram_w),this));
+	machine().device("slave")->memory().space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(saturn_state::saturn_null_ram_r),this), write32_delegate(FUNC(saturn_state::saturn_null_ram_w),this));
 
 	if(m_cart_type == 5)
 	{
@@ -2062,10 +2017,10 @@ MACHINE_RESET_MEMBER(saturn_state,saturn)
 		machine().device("maincpu")->memory().space(AS_PROGRAM).nop_readwrite(0x02400000, 0x027fffff);
 		machine().device("slave")->memory().space(AS_PROGRAM).nop_readwrite(0x02400000, 0x027fffff);
 
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02400000, 0x0247ffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
-		machine().device("slave")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02400000, 0x0247ffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02600000, 0x0267ffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
-		machine().device("slave")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02600000, 0x0267ffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x0247ffff, read32_delegate(FUNC(saturn_state::saturn_cart_dram0_r),this), write32_delegate(FUNC(saturn_state::saturn_cart_dram0_w),this));
+		machine().device("slave")->memory().space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x0247ffff, read32_delegate(FUNC(saturn_state::saturn_cart_dram0_r),this), write32_delegate(FUNC(saturn_state::saturn_cart_dram0_w),this));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x02600000, 0x0267ffff, read32_delegate(FUNC(saturn_state::saturn_cart_dram1_r),this), write32_delegate(FUNC(saturn_state::saturn_cart_dram1_w),this));
+		machine().device("slave")->memory().space(AS_PROGRAM).install_readwrite_handler(0x02600000, 0x0267ffff, read32_delegate(FUNC(saturn_state::saturn_cart_dram1_r),this), write32_delegate(FUNC(saturn_state::saturn_cart_dram1_w),this));
 	}
 
 	if(m_cart_type == 6)
@@ -2074,10 +2029,10 @@ MACHINE_RESET_MEMBER(saturn_state,saturn)
 		machine().device("maincpu")->memory().space(AS_PROGRAM).nop_readwrite(0x02400000, 0x027fffff);
 		machine().device("slave")->memory().space(AS_PROGRAM).nop_readwrite(0x02400000, 0x027fffff);
 
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02400000, 0x025fffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
-		machine().device("slave")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02400000, 0x025fffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02600000, 0x027fffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
-		machine().device("slave")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x02600000, 0x027fffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x025fffff, read32_delegate(FUNC(saturn_state::saturn_cart_dram0_r),this), write32_delegate(FUNC(saturn_state::saturn_cart_dram0_w),this));
+		machine().device("slave")->memory().space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x025fffff, read32_delegate(FUNC(saturn_state::saturn_cart_dram0_r),this), write32_delegate(FUNC(saturn_state::saturn_cart_dram0_w),this));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x02600000, 0x027fffff, read32_delegate(FUNC(saturn_state::saturn_cart_dram1_r),this), write32_delegate(FUNC(saturn_state::saturn_cart_dram1_w),this));
+		machine().device("slave")->memory().space(AS_PROGRAM).install_readwrite_handler(0x02600000, 0x027fffff, read32_delegate(FUNC(saturn_state::saturn_cart_dram1_r),this), write32_delegate(FUNC(saturn_state::saturn_cart_dram1_w),this));
 	}
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_readwrite(0x04000000, 0x047fffff);
@@ -2092,8 +2047,8 @@ MACHINE_RESET_MEMBER(saturn_state,saturn)
 		//mask = 0x7fffff >> 4-3 = 0x3fffff 16mbit
 		//mask = 0x7fffff >> 4-2 = 0x1fffff 8mbit
 		//mask = 0x7fffff >> 4-1 = 0x0fffff 4mbit
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x04000000, 0x04000000 | mask, FUNC(saturn_cs1_r), FUNC(saturn_cs1_w));
-		machine().device("slave")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x04000000, 0x04000000 | mask, FUNC(saturn_cs1_r), FUNC(saturn_cs1_w));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x04000000, 0x04000000 | mask, read32_delegate(FUNC(saturn_state::saturn_cs1_r),this), write32_delegate(FUNC(saturn_state::saturn_cs1_w),this));
+		machine().device("slave")->memory().space(AS_PROGRAM).install_readwrite_handler(0x04000000, 0x04000000 | mask, read32_delegate(FUNC(saturn_state::saturn_cs1_r),this), write32_delegate(FUNC(saturn_state::saturn_cs1_w),this));
 	}
 
 
@@ -2111,7 +2066,8 @@ MACHINE_RESET_MEMBER(saturn_state,saturn)
 
 MACHINE_RESET_MEMBER(saturn_state,stv)
 {
-
+	m_scsp_last_line = 0;
+	
 	// don't let the slave cpu and the 68k go anywhere
 	machine().device("slave")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -2403,43 +2359,41 @@ static MACHINE_CONFIG_DERIVED( stv_slot, stv )
 MACHINE_CONFIG_END
 
 
-static void saturn_init_driver(running_machine &machine, int rgn)
+void saturn_state::saturn_init_driver(int rgn)
 {
-	saturn_state *state = machine.driver_data<saturn_state>();
-
-	state->m_saturn_region = rgn;
-	state->m_vdp2.pal = (rgn == 12) ? 1 : 0;
+	m_saturn_region = rgn;
+	m_vdp2.pal = (rgn == 12) ? 1 : 0;
 
 	// set compatible options
-	sh2drc_set_options(machine.device("maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
-	sh2drc_set_options(machine.device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(machine().device("maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(machine().device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
-	state->m_minit_boost = 400;
-	state->m_sinit_boost = 400;
-	state->m_minit_boost_timeslice = attotime::zero;
-	state->m_sinit_boost_timeslice = attotime::zero;
+	m_minit_boost = 400;
+	m_sinit_boost = 400;
+	m_minit_boost_timeslice = attotime::zero;
+	m_sinit_boost_timeslice = attotime::zero;
 
-	state->m_scu_regs = auto_alloc_array(machine, UINT32, 0x100/4);
-	state->m_scsp_regs = auto_alloc_array(machine, UINT16, 0x1000/2);
-	state->m_cart_dram = auto_alloc_array(machine, UINT32, 0x400000/4);
-	state->m_backupram = auto_alloc_array(machine, UINT8, 0x8000);
-	state->m_cart_backupram = auto_alloc_array(machine, UINT8, 0x400000);
+	m_scu_regs = auto_alloc_array(machine(), UINT32, 0x100/4);
+	m_scsp_regs = auto_alloc_array(machine(), UINT16, 0x1000/2);
+	m_cart_dram = auto_alloc_array(machine(), UINT32, 0x400000/4);
+	m_backupram = auto_alloc_array(machine(), UINT8, 0x8000);
+	m_cart_backupram = auto_alloc_array(machine(), UINT8, 0x400000);
 }
 
 DRIVER_INIT_MEMBER(saturn_state,saturnus)
 {
-	saturn_init_driver(machine(), 4);
+	saturn_init_driver(4);
 }
 
 DRIVER_INIT_MEMBER(saturn_state,saturneu)
 {
-	saturn_init_driver(machine(), 12);
+	saturn_init_driver(12);
 }
 
 DRIVER_INIT_MEMBER(saturn_state,saturnjp)
 {
-	saturn_init_driver(machine(), 1);
+	saturn_init_driver(1);
 }
 
 
