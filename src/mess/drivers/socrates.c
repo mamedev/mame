@@ -11,7 +11,6 @@ TODO:
     hook up mouse
     add waitstates for ram access (lack of this causes the system to run way too fast)
     find and hook up any timers/interrupt controls
-    switch cartridges over to a CART system rather than abusing BIOS
     keyboard IR decoder MCU is HLE'd for now, needs decap and cpu core (it is rather tms1000 or CIC-like)
 
 
@@ -74,6 +73,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "audio/socrates.h"
+#include "imagedev/cartslot.h"
 
 
 class socrates_state : public driver_device
@@ -944,6 +944,13 @@ static MACHINE_CONFIG_START( socrates, socrates_state )
 	MCFG_SOUND_ADD("soc_snd", SOCRATES, XTAL_21_4772MHz/(512+256)) // this is correct, as strange as it sounds.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("socrates_cart")
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "socrates")
 MACHINE_CONFIG_END
 
 
@@ -987,25 +994,8 @@ ROM_START(socrates)
     * read 0x7ff3(0x3ff3 in cart rom) and compare to 0x18
     if all tests passed, jump to 0x4000 (0x0000 in cart rom)
     */
-    ROM_DEFAULT_BIOS("nocart")
     ROM_LOAD("27-00817-000-000.u1", 0x00000, 0x40000, CRC(80f5aa20) SHA1(4fd1ff7f78b5dd2582d5de6f30633e4e4f34ca8f)) // Label: "(Vtech) 27-00817-000-000 // (C)1987 VIDEO TECHNOLOGY // 8811 D"
-    ROM_SYSTEM_BIOS( 0, "nocart", "Socrates w/o cartridge installed")
-    ROM_SYSTEM_BIOS( 1, "maze", "Socrates w/Amazing Mazes cartridge installed")
-    ROMX_LOAD("27-5050-00.u1", 0x40000, 0x20000, CRC(95B84308) SHA1(32E065E8F48BAF0126C1B9AA111C291EC644E387), ROM_BIOS(2)) // Label: "(Vtech) 27-5050-00 // TC531000CP-L332 // (C)1989 VIDEO TECHNOLOGY // 8931EAI   JAPAN"; Alt label: "(Vtech) LH53101Y // (C)1989 VIDEO TECHNOLOGY // 8934 D"; cart has an orange QC stickse
-    ROM_SYSTEM_BIOS( 2, "world", "Socrates w/Around the World cartridge installed")
-    ROMX_LOAD("27-5013-00-0.u1", 0x40000, 0x20000, CRC(A1E01C38) SHA1(BEEB2869AE1DDC8BBC9A81749AB9662C14DD47D3), ROM_BIOS(3)) // Label: "(Vtech) 27-5013-00-0 // TC531000CP-L318 // (C)1989 VIDEO TECHNOLOGY // 8918EAI   JAPAN"; cart has an orange QC sticker
-    ROM_SYSTEM_BIOS( 3, "fracts", "Socrates w/Facts'N Fractions cartridge installed")
-    ROMX_LOAD("27-5001-00-0.u1", 0x40000, 0x20000, CRC(7118617B) SHA1(52268EF0ADB651AD62773FB2EBCB7506759B2686), ROM_BIOS(4)) // Label: "(Vtech) 27-5001-00-0 // TC531000CP-L313 // (C)1988 VIDEO TECHNOLOGY // 8918EAI   JAPAN"; cart has a brown QC sticker
-    ROM_SYSTEM_BIOS( 4, "hodge", "Socrates w/Hodge-Podge cartridge installed")
-    ROMX_LOAD("27-5014-00-0.u1", 0x40000, 0x20000, CRC(19E1A301) SHA1(649A7791E97BCD0D31AC65A890FACB5753AB04A3), ROM_BIOS(5)) // Label: "(Vtech) 27-5014-00-0 // TC531000CP-L316 // (C)1989 VIDEO TECHNOLOGY // 8913EAI   JAPAN"; cart has a green QC sticker
-    ROM_SYSTEM_BIOS( 5, "memoryb", "Socrates w/Memory Mania rev B cartridge installed")
-    ROMX_LOAD("27-5002-00-0.u1", 0x40000, 0x20000, CRC(3C7FD651) SHA1(3118F53625553010EC95EA91DA8320CCE3DC7FE4), ROM_BIOS(6)) // Label: "(Vtech) 27-5002-00-0 // TC531000CP-L314 // (C)1988 VIDEO TECHNOLOGY // 8905EAI   JAPAN"; cart has a red QC sticker with a small B sticker on top of it, and the rom has a large B sticker; cart pcb shows signs of resoldering, which leads me to believe this is the B revision of the rom code for this game
-    ROM_SYSTEM_BIOS( 6, "state", "Socrates w/State to State cartridge installed")
-    ROMX_LOAD("27-5045-00-0.u1", 0x40000, 0x20000, CRC(5848379F) SHA1(961C9CA4F28A9E02AA1D67583B2D2ADF8EE5F10E), ROM_BIOS(7)) // Label: "(Vtech) 27-5045-00-0 // TC531000CP-L333 // (C)1989 VIDEO TECHNOLOGY // 8931EAI   JAPAN"; cart has a brown QC sticker
-// a cartridge called 'game master' is supposed to be here
-// an international-only? cartridge called 'puzzles' is supposed to be here
-// Cad professor mouse is supposed to be here
-// the touch pad cartridge is supposed to be here
+    ROM_CART_LOAD( "cart", 0x40000, 0x20000, 0 )
 
     ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
@@ -1027,7 +1017,7 @@ ROM_START(socratfc)
     ROM_REGION(0x80000, "maincpu", ROMREGION_ERASEVAL(0xF3))
     /* Socrates SAITOUT (French Canadian) NTSC */
     ROM_LOAD("27-00884-001-000.u1", 0x00000, 0x40000, CRC(042d9d21) SHA1(9ffc67b2721683b2536727d0592798fbc4d061cb)) // Label: "(Vtech) 27-00884-001-000 // (C)1988 VIDEO TECHNOLOGY // 8911 D"
-    ROM_LOAD_OPTIONAL("cartridge.bin", 0x40000, 0x20000, NO_DUMP)
+    ROM_CART_LOAD( "cart", 0x40000, 0x20000, 0 )
 
     ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 

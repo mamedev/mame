@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="socrates" description="Video Technology Socrates cartridges">
+
+<!--
+	a cartridge called 'game master' is supposed to be here
+	an international-only? cartridge called 'puzzles' is supposed to be here
+	Cad professor mouse is supposed to be here
+	the touch pad cartridge is supposed to be here
+-->
+
+	<software name="amazes">
+		<description>Amazing Mazes</description>
+		<year>1989</year>
+		<publisher>Video Technology</publisher>
+		<part name="cart" interface="socrates_cart">
+			<dataarea name="rom" size="0x20000">
+				<!-- Label: "(Vtech) 27-5050-00 // TC531000CP-L332 // (C)1989 VIDEO TECHNOLOGY // 8931EAI   JAPAN";	Alt label: "(Vtech) LH53101Y // (C)1989 VIDEO TECHNOLOGY // 8934 D"; cart has an orange QC stickse -->
+				<rom name="27-5050-00.u1" size="0x20000" crc="95B84308" sha1="32E065E8F48BAF0126C1B9AA111C291EC644E387" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aworld">
+		<description>Around the World</description>
+		<year>1989</year>
+		<publisher>Video Technology</publisher>
+		<part name="cart" interface="socrates_cart">
+			<dataarea name="rom" size="0x20000">
+				<!-- Label: "(Vtech) 27-5013-00-0 // TC531000CP-L318 // (C)1989 VIDEO TECHNOLOGY // 8918EAI   JAPAN"; cart has an orange QC sticker -->
+				<rom name="27-5013-00-0.u1" size="0x20000" crc="A1E01C38" sha1="BEEB2869AE1DDC8BBC9A81749AB9662C14DD47D3" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="facts">
+		<description>Facts'N Fraction</description>
+		<year>1988</year>
+		<publisher>Video Technology</publisher>
+		<part name="cart" interface="socrates_cart">
+			<dataarea name="rom" size="0x20000">
+				<!-- Label: "(Vtech) 27-5001-00-0 // TC531000CP-L313 // (C)1988 VIDEO TECHNOLOGY // 8918EAI   JAPAN"; cart has a brown QC sticker -->
+				<rom name="27-5001-00-0.u1" size="0x20000" crc="7118617B" sha1="52268EF0ADB651AD62773FB2EBCB7506759B2686" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hodgepod">
+		<description>Hodge-Podge</description>
+		<year>1989</year>
+		<publisher>Video Technology</publisher>
+		<part name="cart" interface="socrates_cart">
+			<dataarea name="rom" size="0x20000">
+				<!-- Label: "(Vtech) 27-5014-00-0 // TC531000CP-L316 // (C)1989 VIDEO TECHNOLOGY // 8913EAI   JAPAN"; cart has a green QC sticker -->
+				<rom name="27-5014-00-0.u1" size="0x20000" crc="19E1A301" sha1="649A7791E97BCD0D31AC65A890FACB5753AB04A3" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memmania">
+		<description>Memory Mania (Rev. B)</description>
+		<year>1988</year>
+		<publisher>Video Technology</publisher>
+		<part name="cart" interface="socrates_cart">
+			<dataarea name="rom" size="0x20000">
+				<!-- Label: "(Vtech) 27-5002-00-0 // TC531000CP-L314 // (C)1988 VIDEO TECHNOLOGY // 8905EAI   JAPAN"; cart has a red QC sticker with a small B sticker on top of it, and the rom has a large B sticker; cart pcb shows signs of resoldering, which leads me to believe this is the B revision of the rom code for this game -->
+				<rom name="27-5002-00-0.u1" size="0x20000" crc="3C7FD651" sha1="3118F53625553010EC95EA91DA8320CCE3DC7FE4" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="state">
+		<description>State to State</description>
+		<year>1989</year>
+		<publisher>Video Technology</publisher>
+		<part name="cart" interface="socrates_cart">
+			<dataarea name="rom" size="0x20000">
+				<!-- Label: "(Vtech) 27-5045-00-0 // TC531000CP-L333 // (C)1989 VIDEO TECHNOLOGY // 8931EAI   JAPAN"; cart has a brown QC sticker -->
+				<rom name="27-5045-00-0.u1" size="0x20000" crc="5848379F" sha1="961C9CA4F28A9E02AA1D67583B2D2ADF8EE5F10E" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

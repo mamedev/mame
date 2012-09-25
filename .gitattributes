@@ -155,6 +155,7 @@ hash/sgx.xml svneol=native#text/xml
 hash/smc777.xml svneol=native#text/xml
 hash/sms.xml svneol=native#text/xml
 hash/snes.xml svneol=native#text/xml
+hash/socrates.xml svneol=native#text/xml
 hash/softwarelist.dtd svneol=native#text/plain
 hash/sorcerer_cart.xml svneol=native#text/xml
 hash/spectrum.xml svneol=native#text/xml
