@@ -274,9 +274,24 @@ void s1410_device::WriteData( UINT8 *data, int dataLength )
 	{
 	case S1410_CMD_INIT_DRIVE_PARAMS:
 		{
-			UINT16 tracks=((data[0]<<8)+data[1]);
+			int sectorsPerTrack = 0;
+			int bytesPerSector = GetSectorBytes();
+
+			switch( bytesPerSector )
+			{
+			case 256:
+				sectorsPerTrack = 32;
+				break;
+
+			case 512:
+				sectorsPerTrack = 17;
+				break;
+			}
+
+			UINT16 tracks = ((data[0]<<8)+data[1]);
 			UINT8 heads = data[2];
-			UINT32 capacity=(tracks * heads) * 17;
+			UINT32 capacity = tracks * heads * sectorsPerTrack * bytesPerSector;
+
 			logerror("S1410_CMD_INIT_DRIVE_PARAMS Tracks=%d, Heads=%d, Capacity=%d\n",tracks,heads,capacity);
 		}
 		break;
