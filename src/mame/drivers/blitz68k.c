@@ -175,6 +175,7 @@ public:
 	DECLARE_VIDEO_START(blitz68k_addr_factor1);
 	UINT32 screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(steaser_mcu_sim);
 };
 
 /*************************************************************************************************************
@@ -1755,24 +1756,23 @@ MACHINE_CONFIG_END
 2008ad = 1 -> hold 5
 */
 
-static TIMER_DEVICE_CALLBACK( steaser_mcu_sim )
+TIMER_DEVICE_CALLBACK_MEMBER(blitz68k_state::steaser_mcu_sim)
 {
-	blitz68k_state *state = timer.machine().driver_data<blitz68k_state>();
 //  static int i;
 	/*first off, signal the "MCU is running" flag*/
-	state->m_nvram[0x932/2] = 0xffff;
+	m_nvram[0x932/2] = 0xffff;
 	/*clear the inputs (they are impulsed)*/
 //  for(i=0;i<8;i+=2)
-//      state->m_nvram[((0x8a0)+i)/2] = 0;
+//      m_nvram[((0x8a0)+i)/2] = 0;
 	/*finally, read the inputs*/
-	state->m_nvram[0x89e/2] = timer.machine().root_device().ioport("MENU")->read() & 0xffff;
-	state->m_nvram[0x8a0/2] = timer.machine().root_device().ioport("STAT")->read() & 0xffff;
-	state->m_nvram[0x8a2/2] = timer.machine().root_device().ioport("BET_DEAL")->read() & 0xffff;
-	state->m_nvram[0x8a4/2] = timer.machine().root_device().ioport("TAKE_DOUBLE")->read() & 0xffff;
-	state->m_nvram[0x8a6/2] = timer.machine().root_device().ioport("SMALL_BIG")->read() & 0xffff;
-	state->m_nvram[0x8a8/2] = timer.machine().root_device().ioport("CANCEL_HOLD1")->read() & 0xffff;
-	state->m_nvram[0x8aa/2] = timer.machine().root_device().ioport("HOLD2_HOLD3")->read() & 0xffff;
-	state->m_nvram[0x8ac/2] = timer.machine().root_device().ioport("HOLD4_HOLD5")->read() & 0xffff;
+	m_nvram[0x89e/2] = machine().root_device().ioport("MENU")->read() & 0xffff;
+	m_nvram[0x8a0/2] = machine().root_device().ioport("STAT")->read() & 0xffff;
+	m_nvram[0x8a2/2] = machine().root_device().ioport("BET_DEAL")->read() & 0xffff;
+	m_nvram[0x8a4/2] = machine().root_device().ioport("TAKE_DOUBLE")->read() & 0xffff;
+	m_nvram[0x8a6/2] = machine().root_device().ioport("SMALL_BIG")->read() & 0xffff;
+	m_nvram[0x8a8/2] = machine().root_device().ioport("CANCEL_HOLD1")->read() & 0xffff;
+	m_nvram[0x8aa/2] = machine().root_device().ioport("HOLD2_HOLD3")->read() & 0xffff;
+	m_nvram[0x8ac/2] = machine().root_device().ioport("HOLD4_HOLD5")->read() & 0xffff;
 }
 
 
@@ -1781,7 +1781,7 @@ static MACHINE_CONFIG_DERIVED( steaser, ilpag )
 	MCFG_CPU_PROGRAM_MAP(steaser_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state, irq5_line_hold) //3, 4 & 6 used, mcu comms?
 
-	MCFG_TIMER_ADD_PERIODIC("coinsim", steaser_mcu_sim, attotime::from_hz(10000)) // not real, but for simulating the MCU
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", blitz68k_state, steaser_mcu_sim, attotime::from_hz(10000))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( cjffruit, blitz68k_state )

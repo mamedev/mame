@@ -43,6 +43,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_tick);
 };
 
 
@@ -279,15 +280,14 @@ static const cassette_interface jr100_cassette_interface =
 	NULL
 };
 
-static TIMER_DEVICE_CALLBACK( sound_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(jr100_state::sound_tick)
 {
-	jr100_state *state = timer.machine().driver_data<jr100_state>();
-	device_t *speaker = timer.machine().device(SPEAKER_TAG);
-	speaker_level_w(speaker,state->m_speaker);
-	state->m_speaker = 0;
+	device_t *speaker = machine().device(SPEAKER_TAG);
+	speaker_level_w(speaker,m_speaker);
+	m_speaker = 0;
 
-	via6522_device *via = timer.machine().device<via6522_device>("via");
-	double level = (timer.machine().device<cassette_image_device>(CASSETTE_TAG)->input());
+	via6522_device *via = machine().device<via6522_device>("via");
+	double level = (machine().device<cassette_image_device>(CASSETTE_TAG)->input());
 	if (level > 0.0) {
 		via->write_ca1(0);
 		via->write_cb1(0);
@@ -385,7 +385,7 @@ static MACHINE_CONFIG_START( jr100, jr100_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, jr100_cassette_interface )
 
-	MCFG_TIMER_ADD_PERIODIC("sound_tick", sound_tick, attotime::from_hz(XTAL_14_31818MHz / 16))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("sound_tick", jr100_state, sound_tick, attotime::from_hz(XTAL_14_31818MHz / 16))
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", jr100, "prg", 2)

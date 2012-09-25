@@ -93,6 +93,9 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_MACHINE_START(mm2);
+	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
+	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi_r5);
+	TIMER_DEVICE_CALLBACK_MEMBER(update_irq);
 };
 
 
@@ -330,31 +333,28 @@ static INPUT_PORTS_START( mephisto )
 INPUT_PORTS_END
 
 
-static TIMER_DEVICE_CALLBACK( update_nmi )
+TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi)
 {
-	mephisto_state *state = timer.machine().driver_data<mephisto_state>();
-	if (state->m_allowNMI)
+	if (m_allowNMI)
 	{
-		state->m_allowNMI = 0;
-		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+		m_allowNMI = 0;
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 	}
-	beep_set_state(state->m_beep, state->m_led_status&64?1:0);
+	beep_set_state(m_beep, m_led_status&64?1:0);
 }
 
-static TIMER_DEVICE_CALLBACK( update_nmi_r5 )
+TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi_r5)
 {
-	mephisto_state *state = timer.machine().driver_data<mephisto_state>();
-	timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
-	beep_set_state(state->m_beep, state->m_led_status&64?1:0);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+	beep_set_state(m_beep, m_led_status&64?1:0);
 }
 
-static TIMER_DEVICE_CALLBACK( update_irq )		//only mm2
+TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_irq)//only mm2
 {
-	mephisto_state *state = timer.machine().driver_data<mephisto_state>();
-	timer.machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	timer.machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 
-	beep_set_state(state->m_beep, state->m_led_status&64?1:0);
+	beep_set_state(m_beep, m_led_status&64?1:0);
 }
 
 void mephisto_state::machine_start()
@@ -410,7 +410,7 @@ static MACHINE_CONFIG_START( mephisto, mephisto_state )
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_TIMER_ADD_PERIODIC("nmi_timer", update_nmi, attotime::from_hz(600))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", mephisto_state, update_nmi, attotime::from_hz(600))
 	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(100))
 MACHINE_CONFIG_END
 
@@ -419,7 +419,7 @@ static MACHINE_CONFIG_DERIVED( rebel5, mephisto )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rebel5_mem)
 	MCFG_DEVICE_REMOVE("nmi_timer")
-	MCFG_TIMER_ADD_PERIODIC("nmi_timer_r5", update_nmi_r5, attotime::from_hz(600))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer_r5", mephisto_state, update_nmi_r5, attotime::from_hz(600))
 
 MACHINE_CONFIG_END
 
@@ -429,7 +429,7 @@ static MACHINE_CONFIG_DERIVED( mm2, mephisto )
 	MCFG_MACHINE_START_OVERRIDE(mephisto_state, mm2 )
 
 	MCFG_DEVICE_REMOVE("nmi_timer")
-	MCFG_TIMER_ADD_PERIODIC("irq_timer", update_irq, attotime::from_hz(450))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", mephisto_state, update_irq, attotime::from_hz(450))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mm4tk, mephisto )

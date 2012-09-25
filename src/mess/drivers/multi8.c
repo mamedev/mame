@@ -69,6 +69,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_multi8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 };
 
 #define mc6845_h_char_total 	(m_crtc_vreg[0])
@@ -482,24 +483,23 @@ static INPUT_PORTS_START( multi8 )
 	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("GRPH") PORT_CODE(KEYCODE_LALT)
 INPUT_PORTS_END
 
-static TIMER_DEVICE_CALLBACK( keyboard_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(multi8_state::keyboard_callback)
 {
-	multi8_state *state = timer.machine().driver_data<multi8_state>();
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
-	UINT8 keymod = timer.machine().root_device().ioport("key_modifiers")->read() & 0x1f;
+	UINT8 keymod = machine().root_device().ioport("key_modifiers")->read() & 0x1f;
 	scancode = 0;
 
-	state->m_shift_press_flag = ((keymod & 0x02) >> 1);
+	m_shift_press_flag = ((keymod & 0x02) >> 1);
 
 	for(port_i=0;port_i<3;port_i++)
 	{
 		for(i=0;i<32;i++)
 		{
-			if((timer.machine().root_device().ioport(portnames[port_i])->read()>>i) & 1)
+			if((machine().root_device().ioport(portnames[port_i])->read()>>i) & 1)
 			{
 				//key_flag = 1;
-				if(!state->m_shift_press_flag)  // shift not pressed
+				if(!m_shift_press_flag)  // shift not pressed
 				{
 					if(scancode >= 0x41 && scancode < 0x5b)
 						scancode += 0x20;  // lowercase
@@ -521,8 +521,8 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 					if(scancode == 0x3c)
 						scancode = 0x3e;
 				}
-				state->m_keyb_press = scancode;
-				state->m_keyb_press_flag = 1;
+				m_keyb_press = scancode;
+				m_keyb_press_flag = 1;
 				return;
 			}
 			scancode++;
@@ -684,7 +684,7 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	/* Devices */
-	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240/32))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", multi8_state, keyboard_callback, attotime::from_hz(240/32))
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/2, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 	MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
 MACHINE_CONFIG_END

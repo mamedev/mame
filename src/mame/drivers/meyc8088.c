@@ -65,6 +65,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_meyc8088(screen_device &screen, bool state);
+	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
 };
 
 
@@ -166,10 +167,9 @@ void meyc8088_state::screen_eof_meyc8088(screen_device &screen, bool state)
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK( heartbeat_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(meyc8088_state::heartbeat_callback)
 {
-	meyc8088_state *state = timer.machine().driver_data<meyc8088_state>();
-	state->m_status |= 0x20;
+	m_status |= 0x20;
 }
 
 WRITE8_MEMBER(meyc8088_state::drive_w)
@@ -380,7 +380,7 @@ static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_ADD("heartbeat", heartbeat_callback)
+	MCFG_TIMER_DRIVER_ADD("heartbeat", meyc8088_state, heartbeat_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

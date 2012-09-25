@@ -29,6 +29,7 @@ public:
 	UINT16 m_nixie[16];
 	UINT8 m_timer;
 	virtual void machine_start();
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 };
 
 READ8_MEMBER(nixieclock_state::data_r)
@@ -124,11 +125,10 @@ INPUT_PORTS_END
 
 */
 
-static TIMER_DEVICE_CALLBACK(timer_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(nixieclock_state::timer_callback)
 {
-	nixieclock_state *state = timer.machine().driver_data<nixieclock_state>();
-	i4004_set_test(timer.machine().device("maincpu"),state->m_timer);
-	state->m_timer^=1;
+	i4004_set_test(machine().device("maincpu"),m_timer);
+	m_timer^=1;
 }
 
 void nixieclock_state::machine_start()
@@ -157,7 +157,7 @@ static MACHINE_CONFIG_START( 4004clk, nixieclock_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_TIMER_ADD_PERIODIC("4004clk_timer", timer_callback, attotime::from_hz(120))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("4004clk_timer", nixieclock_state, timer_callback, attotime::from_hz(120))
 MACHINE_CONFIG_END
 
 /* ROM definition */

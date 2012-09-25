@@ -48,6 +48,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_INPUT_CHANGED_MEMBER(junior_reset);
+	TIMER_DEVICE_CALLBACK_MEMBER(junior_update_leds);
 };
 
 
@@ -192,15 +193,14 @@ static const riot6532_interface junior_riot_interface =
 };
 
 
-static TIMER_DEVICE_CALLBACK( junior_update_leds )
+TIMER_DEVICE_CALLBACK_MEMBER(junior_state::junior_update_leds)
 {
-	junior_state *state = timer.machine().driver_data<junior_state>();
 	int i;
 
 	for ( i = 0; i < 6; i++ )
 	{
-		if ( state->m_led_time[i] )
-			state->m_led_time[i]--;
+		if ( m_led_time[i] )
+			m_led_time[i]--;
 		else
 			output_set_digit_value( i, 0 );
 	}
@@ -235,7 +235,7 @@ static MACHINE_CONFIG_START( junior, junior_state )
 
 	/* Devices */
 	MCFG_RIOT6532_ADD("riot", XTAL_1MHz, junior_riot_interface)
-	MCFG_TIMER_ADD_PERIODIC("led_timer", junior_update_leds, attotime::from_hz(50))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", junior_state, junior_update_leds, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
 

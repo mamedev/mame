@@ -111,6 +111,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_jackie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(jackie_irq);
 };
 
 
@@ -557,18 +558,17 @@ DRIVER_INIT_MEMBER(jackie_state,jackie)
 	rom[0x7e86] = 0xc3;
 }
 
-static TIMER_DEVICE_CALLBACK( jackie_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(jackie_state::jackie_irq)
 {
-	jackie_state *state = timer.machine().driver_data<jackie_state>();
 	int scanline = param;
 
 	if((scanline % 32) != 0)
 		return;
 
-	if((scanline % 64) == 32 && state->m_irq_enable)
-		state->m_maincpu->set_input_line(0, HOLD_LINE);
-	else if	((scanline % 64) == 0 && state->m_nmi_enable)
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if((scanline % 64) == 32 && m_irq_enable)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	else if	((scanline % 64) == 0 && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( jackie, jackie_state )
@@ -577,7 +577,7 @@ static MACHINE_CONFIG_START( jackie, jackie_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(jackie_prg_map)
 	MCFG_CPU_IO_MAP(jackie_io_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", jackie_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jackie_state, jackie_irq, "screen", 0, 1)
 
 
 	/* video hardware */

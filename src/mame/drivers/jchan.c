@@ -225,6 +225,7 @@ public:
 	DECLARE_DRIVER_INIT(jchan);
 	virtual void video_start();
 	UINT32 screen_update_jchan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(jchan_vblank);
 };
 
 
@@ -243,27 +244,26 @@ public:
 //  if it is incorrect jchan2 will crash when
 //  certain characters win/lose but no finish
 //  move was performed
-static TIMER_DEVICE_CALLBACK( jchan_vblank )
+TIMER_DEVICE_CALLBACK_MEMBER(jchan_state::jchan_vblank)
 {
-	jchan_state *state = timer.machine().driver_data<jchan_state>();
 	int scanline = param;
 
 	if(scanline == 240)
-		state->m_maincpu->set_input_line(1, HOLD_LINE);
+		m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if(scanline == 11)
-		state->m_maincpu->set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 
-	if (state->m_irq_sub_enable)
+	if (m_irq_sub_enable)
 	{
 		if(scanline == 240)
-			state->m_subcpu->set_input_line(1, HOLD_LINE);
+			m_subcpu->set_input_line(1, HOLD_LINE);
 
 		if(scanline == 249)
-			state->m_subcpu->set_input_line(2, HOLD_LINE);
+			m_subcpu->set_input_line(2, HOLD_LINE);
 
 		if(scanline == 11)
-			state->m_subcpu->set_input_line(3, HOLD_LINE);
+			m_subcpu->set_input_line(3, HOLD_LINE);
 	}
 }
 
@@ -599,7 +599,7 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(jchan_main)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", jchan_vblank, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jchan_state, jchan_vblank, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(jchan_sub)

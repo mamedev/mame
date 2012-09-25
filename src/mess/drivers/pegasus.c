@@ -81,11 +81,12 @@ public:
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(pegasus);
+	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
 };
 
-static TIMER_DEVICE_CALLBACK( pegasus_firq )
+TIMER_DEVICE_CALLBACK_MEMBER(pegasus_state::pegasus_firq)
 {
-	device_t *cpu = timer.machine().device( "maincpu" );
+	device_t *cpu = machine().device( "maincpu" );
 	cpu->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
@@ -494,7 +495,7 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_CPU_ADD("maincpu", M6809E, XTAL_4MHz)	// actually a 6809C - 4MHZ clock coming in, 1MHZ internally
 	MCFG_CPU_PROGRAM_MAP(pegasus_mem)
 
-	MCFG_TIMER_ADD_PERIODIC("pegasus_firq", pegasus_firq, attotime::from_hz(400))	// controls accuracy of the clock (ctrl-P)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("pegasus_firq", pegasus_state, pegasus_firq, attotime::from_hz(400))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

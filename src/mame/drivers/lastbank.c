@@ -65,6 +65,7 @@ public:
 
 	UINT8 ram_bank_r(UINT16 offset, UINT8 bank_num);
 	void ram_bank_w(UINT16 offset, UINT8 data, UINT8 bank_num);
+	TIMER_DEVICE_CALLBACK_MEMBER(lastbank_irq_scanline);
 };
 
 void lastbank_state::video_start()
@@ -433,19 +434,18 @@ static GFXDECODE_START( lastbank )
 	GFXDECODE_ENTRY( "gfx1",		0, sp2_layout, 0, 16 )
 GFXDECODE_END
 
-static TIMER_DEVICE_CALLBACK( lastbank_irq_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::lastbank_irq_scanline)
 {
-	lastbank_state *state = timer.machine().driver_data<lastbank_state>();
 	int scanline = param;
 
-	if (scanline == 240 && (state->m_irq_enable & 4))
+	if (scanline == 240 && (m_irq_enable & 4))
 	{
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, state->m_irq_vector[2]);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[2]);
 	}
 
-	if (scanline == 0 && (state->m_irq_enable & 2))
+	if (scanline == 0 && (m_irq_enable & 2))
 	{
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, state->m_irq_vector[1]);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[1]);
 	}
 }
 
@@ -454,7 +454,7 @@ static MACHINE_CONFIG_START( lastbank, lastbank_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/4) //!!! TC0091LVC !!!
 	MCFG_CPU_PROGRAM_MAP(lastbank_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", lastbank_irq_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lastbank_state, lastbank_irq_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu",Z80,MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(lastbank_audio_map)

@@ -342,6 +342,9 @@ public:
 	DECLARE_DRIVER_INIT(xevi3dg);
 	DECLARE_DRIVER_INIT(tekken2);
 	DECLARE_MACHINE_RESET(namcos11);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -1000,25 +1003,22 @@ MACHINE_RESET_MEMBER(namcos11_state,namcos11)
 }
 
 
-static TIMER_DEVICE_CALLBACK( mcu_irq0_cb )
+TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_irq0_cb)
 {
-	namcos11_state *state = timer.machine().driver_data<namcos11_state>();
 
-	state->m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
+	m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK( mcu_irq2_cb )
+TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_irq2_cb)
 {
-	namcos11_state *state = timer.machine().driver_data<namcos11_state>();
 
-	state->m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
+	m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK( mcu_adc_cb )
+TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_adc_cb)
 {
-	namcos11_state *state = timer.machine().driver_data<namcos11_state>();
 
-	state->m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
+	m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( coh100, namcos11_state )
@@ -1030,9 +1030,9 @@ static MACHINE_CONFIG_START( coh100, namcos11_state )
 	MCFG_CPU_PROGRAM_MAP(c76_map)
 	MCFG_CPU_IO_MAP(c76_io_map)
 	/* TODO: irq generation for these */
-	MCFG_TIMER_ADD_PERIODIC("mcu_irq0", mcu_irq0_cb, attotime::from_hz(60))
-	MCFG_TIMER_ADD_PERIODIC("mcu_irq2", mcu_irq2_cb, attotime::from_hz(60))
-	MCFG_TIMER_ADD_PERIODIC("mcu_adc",  mcu_adc_cb, attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq0", namcos11_state, mcu_irq0_cb, attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namcos11_state, mcu_irq2_cb, attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_adc", namcos11_state, mcu_adc_cb, attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET_OVERRIDE(namcos11_state, namcos11 )
 

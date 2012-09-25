@@ -34,6 +34,7 @@ public:
 	UINT8 m_ram_addr;
 	UINT8 *m_ram;
 	UINT8 m_matrix;
+	//TIMER_DEVICE_CALLBACK_MEMBER(borisdpl_timer_interrupt);
 };
 
 WRITE8_MEMBER( chesstrv_state::ram_addr_w )
@@ -194,9 +195,9 @@ static INPUT_PORTS_START( borisdpl )
 INPUT_PORTS_END
 
 /*
-static TIMER_DEVICE_CALLBACK( borisdpl_timer_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(chesstrv_state::borisdpl_timer_interrupt)
 {
-    timer.machine().device("maincpu")->execute().set_input_line_and_vector(F8_INPUT_LINE_INT_REQ, HOLD_LINE, 0x20);
+    machine().device("maincpu")->execute().set_input_line_and_vector(F8_INPUT_LINE_INT_REQ, HOLD_LINE, 0x20);
 }
 */
 
@@ -227,7 +228,7 @@ static MACHINE_CONFIG_START( borisdpl, chesstrv_state )
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_borisdpl )
 
-	//MCFG_TIMER_ADD_PERIODIC("timer_interrupt", borisdpl_timer_interrupt, attotime::from_hz(40))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_interrupt", chesstrv_state, borisdpl_timer_interrupt, attotime::from_hz(40))
 MACHINE_CONFIG_END
 
 

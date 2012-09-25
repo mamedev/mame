@@ -65,6 +65,7 @@ public:
 	DECLARE_DRIVER_INIT(showhand);
 	DECLARE_VIDEO_START(astrocorp);
 	UINT32 screen_update_astrocorp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline);
 };
 
 /***************************************************************************
@@ -508,15 +509,15 @@ static MACHINE_CONFIG_DERIVED( showhanc, showhand )
 MACHINE_CONFIG_END
 
 
-static TIMER_DEVICE_CALLBACK( skilldrp_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(astrocorp_state::skilldrp_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq. controls sprites, sound, i/o
-		timer.machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 
 	if(scanline == 0) // vblank-in? controls palette
-		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( skilldrp, astrocorp_state )
@@ -524,7 +525,7 @@ static MACHINE_CONFIG_START( skilldrp, astrocorp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)	// JX-1689F1028N GRX586.V5
 	MCFG_CPU_PROGRAM_MAP(skilldrp_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", skilldrp_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", astrocorp_state, skilldrp_scanline, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_EEPROM_93C46_ADD("eeprom")

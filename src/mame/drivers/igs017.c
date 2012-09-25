@@ -156,6 +156,9 @@ public:
 	DECLARE_MACHINE_RESET(mgcs);
 	DECLARE_MACHINE_RESET(lhzb2a);
 	UINT32 screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(irqblocka_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(mgcs_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(mgdh_interrupt);
 };
 
 
@@ -3221,16 +3224,15 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
-static TIMER_DEVICE_CALLBACK( irqblocka_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::irqblocka_interrupt)
 {
-	igs017_state *state = timer.machine().driver_data<igs017_state>();
 	int scanline = param;
 
-	if(scanline == 240 && state->m_irq_enable)
-		state->m_maincpu->set_input_line(0, HOLD_LINE);
+	if(scanline == 240 && m_irq_enable)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 
-	if(scanline == 0 && state->m_nmi_enable)
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(scanline == 0 && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -3257,7 +3259,7 @@ static MACHINE_CONFIG_START( iqblocka, igs017_state )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(iqblocka_map)
 	MCFG_CPU_IO_MAP(iqblocka_io)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", irqblocka_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, irqblocka_interrupt, "screen", 0, 1)
 
 	MCFG_I8255A_ADD( "ppi8255", iqblocka_ppi8255_intf )
 
@@ -3288,16 +3290,15 @@ MACHINE_CONFIG_END
 
 // mgcs
 
-static TIMER_DEVICE_CALLBACK( mgcs_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgcs_interrupt)
 {
-	igs017_state *state = timer.machine().driver_data<igs017_state>();
 	int scanline = param;
 
-	if(scanline == 240 && state->m_irq1_enable)
-		state->m_maincpu->set_input_line(1, HOLD_LINE);
+	if(scanline == 240 && m_irq1_enable)
+		m_maincpu->set_input_line(1, HOLD_LINE);
 
-	if(scanline == 0 && state->m_irq2_enable)
-		state->m_maincpu->set_input_line(2, HOLD_LINE);
+	if(scanline == 0 && m_irq2_enable)
+		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 MACHINE_RESET_MEMBER(igs017_state,mgcs)
@@ -3322,7 +3323,7 @@ static I8255A_INTERFACE( mgcs_ppi8255_intf )
 static MACHINE_CONFIG_START( mgcs, igs017_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mgcs)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", mgcs_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
@@ -3362,7 +3363,7 @@ static I8255A_INTERFACE( lhzb2_ppi8255_intf )
 static MACHINE_CONFIG_START( lhzb2, igs017_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(lhzb2)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", mgcs_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
@@ -3399,7 +3400,7 @@ MACHINE_RESET_MEMBER(igs017_state,lhzb2a)
 static MACHINE_CONFIG_START( lhzb2a, igs017_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
 	MCFG_CPU_PROGRAM_MAP(lhzb2a)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", mgcs_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,lhzb2a)
 
@@ -3430,7 +3431,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( slqz2, igs017_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(slqz2)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", mgcs_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
@@ -3470,7 +3471,7 @@ static I8255A_INTERFACE( sdmg2_ppi8255_intf )
 static MACHINE_CONFIG_START( sdmg2, igs017_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sdmg2)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", mgcs_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
@@ -3497,16 +3498,15 @@ MACHINE_CONFIG_END
 
 // mgdh
 
-static TIMER_DEVICE_CALLBACK( mgdh_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgdh_interrupt)
 {
-	igs017_state *state = timer.machine().driver_data<igs017_state>();
 	int scanline = param;
 
-	if(scanline == 240 && state->m_irq1_enable)
-		state->m_maincpu->set_input_line(1, HOLD_LINE);
+	if(scanline == 240 && m_irq1_enable)
+		m_maincpu->set_input_line(1, HOLD_LINE);
 
-	if(scanline == 0 && state->m_irq2_enable)
-		state->m_maincpu->set_input_line(3, HOLD_LINE); // lev 3 instead of 2
+	if(scanline == 0 && m_irq2_enable)
+		m_maincpu->set_input_line(3, HOLD_LINE); // lev 3 instead of 2
 }
 
 static I8255A_INTERFACE( mgdh_ppi8255_intf )
@@ -3522,7 +3522,7 @@ static I8255A_INTERFACE( mgdh_ppi8255_intf )
 static MACHINE_CONFIG_START( mgdha, igs017_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mgdha_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", mgdh_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgdh_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
@@ -3553,7 +3553,7 @@ static MACHINE_CONFIG_START( tjsb, igs017_state )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tjsb_map)
 	MCFG_CPU_IO_MAP(tjsb_io)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", irqblocka_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, irqblocka_interrupt, "screen", 0, 1)
 
 	MCFG_I8255A_ADD( "ppi8255", iqblocka_ppi8255_intf )
 

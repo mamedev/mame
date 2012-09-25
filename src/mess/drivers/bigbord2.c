@@ -145,6 +145,7 @@ public:
 	required_device<device_t> m_floppy3;
 	required_device<device_t> m_beeper;
 	DECLARE_DRIVER_INIT(bigbord2);
+	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 };
 
 /* Status port
@@ -405,14 +406,13 @@ const z80sio_interface sio_intf =
 
 /* Z80 CTC */
 
-static TIMER_DEVICE_CALLBACK( ctc_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(bigbord2_state::ctc_tick)
 {
-	bigbord2_state *state = timer.machine().driver_data<bigbord2_state>();
 
-	state->m_ctcb->trg0(1);
-	state->m_ctcb->trg1(1);
-	state->m_ctcb->trg0(0);
-	state->m_ctcb->trg1(0);
+	m_ctcb->trg0(1);
+	m_ctcb->trg1(1);
+	m_ctcb->trg0(0);
+	m_ctcb->trg1(0);
 }
 
 WRITE_LINE_MEMBER( bigbord2_state::frame )
@@ -696,7 +696,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	MCFG_PALETTE_INIT(black_and_white)
 
 	/* keyboard */
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(MAIN_CLOCK))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bigbord2_state, ctc_tick, attotime::from_hz(MAIN_CLOCK))
 
 	/* devices */
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, MAIN_CLOCK, dma_intf)

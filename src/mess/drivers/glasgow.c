@@ -85,6 +85,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_MACHINE_START(dallas32);
+	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
+	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi32);
 };
 
 
@@ -273,14 +275,14 @@ WRITE32_MEMBER( glasgow_state::write_beeper32 )
 	m_beeper = data;
 }
 
-static TIMER_DEVICE_CALLBACK( update_nmi )
+TIMER_DEVICE_CALLBACK_MEMBER(glasgow_state::update_nmi)
 {
-	timer.machine().device("maincpu")->execute().set_input_line(7, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(7, HOLD_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK( update_nmi32 )
+TIMER_DEVICE_CALLBACK_MEMBER(glasgow_state::update_nmi32)
 {
-	timer.machine().device("maincpu")->execute().set_input_line(6, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(6, HOLD_LINE);
 }
 
 void glasgow_state::machine_start()
@@ -514,7 +516,7 @@ static MACHINE_CONFIG_START( glasgow, glasgow_state )
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_TIMER_ADD_PERIODIC("nmi_timer", update_nmi, attotime::from_hz(50))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", glasgow_state, update_nmi, attotime::from_hz(50))
 	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(100))
 MACHINE_CONFIG_END
 
@@ -531,7 +533,7 @@ static MACHINE_CONFIG_DERIVED( dallas32, glasgow )
 	MCFG_MACHINE_START_OVERRIDE(glasgow_state, dallas32 )
 
 	MCFG_DEVICE_REMOVE("nmi_timer")
-	MCFG_TIMER_ADD_PERIODIC("nmi_timer", update_nmi32, attotime::from_hz(50))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", glasgow_state, update_nmi32, attotime::from_hz(50))
 
 MACHINE_CONFIG_END
 

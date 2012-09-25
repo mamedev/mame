@@ -146,6 +146,7 @@ public:
 	UINT32 screen_update_darkhors(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_jclub2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_jclub2o(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(darkhors_irq);
 };
 
 
@@ -672,25 +673,24 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static TIMER_DEVICE_CALLBACK( darkhors_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(darkhors_state::darkhors_irq)
 {
-	darkhors_state *state = timer.machine().driver_data<darkhors_state>();
 	int scanline = param;
 
 	if(scanline == 248)
-		state->m_maincpu->set_input_line(5, HOLD_LINE);
+		m_maincpu->set_input_line(5, HOLD_LINE);
 
 	if(scanline == 0)
-		state->m_maincpu->set_input_line(3, HOLD_LINE);
+		m_maincpu->set_input_line(3, HOLD_LINE);
 
 	if(scanline == 128)
-		state->m_maincpu->set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( darkhors, darkhors_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, 12000000) // 36MHz/3 ??
 	MCFG_CPU_PROGRAM_MAP(darkhors_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", darkhors_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkhors_state, darkhors_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
 
@@ -733,7 +733,7 @@ UINT32 darkhors_state::screen_update_jclub2(screen_device &screen, bitmap_ind16 
 static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, 12000000)
 	MCFG_CPU_PROGRAM_MAP(jclub2_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", darkhors_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkhors_state, darkhors_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
 
@@ -795,7 +795,7 @@ UINT32 darkhors_state::screen_update_jclub2o(screen_device &screen, bitmap_ind16
 static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, 12000000)
 	MCFG_CPU_PROGRAM_MAP(jclub2o_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", darkhors_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkhors_state, darkhors_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("st0016",Z80,8000000)
 	MCFG_CPU_PROGRAM_MAP(st0016_mem)

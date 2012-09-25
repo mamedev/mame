@@ -184,6 +184,7 @@ public:
 	DECLARE_MACHINE_RESET(galgames);
 	DECLARE_VIDEO_START(galgames);
 	UINT32 screen_update_tmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(tm3k_interrupt);
 };
 
 
@@ -902,15 +903,14 @@ MACHINE_RESET_MEMBER(tmaster_state,tmaster)
 	m_duart68681 = machine().device( "duart68681" );
 }
 
-static TIMER_DEVICE_CALLBACK( tm3k_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(tmaster_state::tm3k_interrupt)
 {
-	tmaster_state *state = timer.machine().driver_data<tmaster_state>();
 	int scanline = param;
 
 	if(scanline == 0) // vblank, FIXME
-		state->m_maincpu->set_input_line(3, HOLD_LINE);
+		m_maincpu->set_input_line(3, HOLD_LINE);
 	else if((scanline % 16) == 0)
-		state->m_maincpu->set_input_line(1, HOLD_LINE);
+		m_maincpu->set_input_line(1, HOLD_LINE);
 
 	// lev 2 triggered at the end of the blit
 }
@@ -927,7 +927,7 @@ static const duart68681_config tmaster_duart68681_config =
 static MACHINE_CONFIG_START( tm3k, tmaster_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) /* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(tmaster_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", tm3k_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmaster_state, tm3k_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tmaster_state,tmaster)
 
@@ -981,7 +981,7 @@ MACHINE_RESET_MEMBER(tmaster_state,galgames)
 static MACHINE_CONFIG_START( galgames, tmaster_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(galgames_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", tm3k_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmaster_state, tm3k_interrupt, "screen", 0, 1)
 
 	// 5 EEPROMs on the motherboard (for BIOS + 4 Carts)
 	MCFG_EEPROM_ADD(GALGAMES_EEPROM_BIOS,  galgames_eeprom_interface)

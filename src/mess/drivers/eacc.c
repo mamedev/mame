@@ -76,6 +76,8 @@ public:
 	required_device<device_t> m_pia;
 	required_shared_ptr<UINT8> m_p_nvram;
 	virtual void machine_reset();
+	TIMER_DEVICE_CALLBACK_MEMBER(eacc_cb1);
+	TIMER_DEVICE_CALLBACK_MEMBER(eacc_nmi);
 private:
 	UINT8 m_digit;
 };
@@ -132,22 +134,20 @@ void eacc_state::machine_reset()
 	m_cb2 = 0;
 }
 
-static TIMER_DEVICE_CALLBACK( eacc_cb1 )
+TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::eacc_cb1)
 {
-	eacc_state *state = timer.machine().driver_data<eacc_state>();
-	state->m_cb1 ^= 1; // 15hz
-	if (state->m_cb2)
-		state->m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);
+	m_cb1 ^= 1; // 15hz
+	if (m_cb2)
+		m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK( eacc_nmi )
+TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::eacc_nmi)
 {
-	eacc_state *state = timer.machine().driver_data<eacc_state>();
 
-	if (state->m_cb2)
+	if (m_cb2)
 	{
-		state->m_nmi = true;
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_nmi = true;
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -261,8 +261,8 @@ static MACHINE_CONFIG_START( eacc, eacc_state )
 
 	MCFG_PIA6821_ADD("pia", eacc_mc6821_intf)
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_TIMER_ADD_PERIODIC("eacc_nmi", eacc_nmi, attotime::from_hz(600) )
-	MCFG_TIMER_ADD_PERIODIC("eacc_cb1", eacc_cb1, attotime::from_hz(30) )
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("eacc_nmi", eacc_state, eacc_nmi, attotime::from_hz(600))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("eacc_cb1", eacc_state, eacc_cb1, attotime::from_hz(30))
 MACHINE_CONFIG_END
 
 

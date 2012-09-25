@@ -66,15 +66,15 @@ public:
 	DECLARE_DRIVER_INIT(rockduck);
 	DECLARE_MACHINE_START(scregg);
 	DECLARE_MACHINE_RESET(scregg);
+	TIMER_DEVICE_CALLBACK_MEMBER(scregg_interrupt);
 };
 
 
 
-static TIMER_DEVICE_CALLBACK( scregg_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(scregg_state::scregg_interrupt)
 {
 	// assume that the irq generator is similar to burgertime hw
-	scregg_state *state = timer.machine().driver_data<scregg_state>();
-	state->m_maincpu->set_input_line(0, (param & 8) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, (param & 8) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(scregg_state::scregg_irqack_w)
@@ -262,7 +262,7 @@ static MACHINE_CONFIG_START( dommy, scregg_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(dommy_map)
-	MCFG_TIMER_ADD_SCANLINE("irq", scregg_interrupt, "screen", 0, 8)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq", scregg_state, scregg_interrupt, "screen", 0, 8)
 
 	MCFG_MACHINE_START_OVERRIDE(scregg_state,scregg)
 	MCFG_MACHINE_RESET_OVERRIDE(scregg_state,scregg)
@@ -294,7 +294,7 @@ static MACHINE_CONFIG_START( scregg, scregg_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(eggs_map)
-	MCFG_TIMER_ADD_SCANLINE("irq", scregg_interrupt, "screen", 0, 8)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq", scregg_state, scregg_interrupt, "screen", 0, 8)
 
 	MCFG_MACHINE_START_OVERRIDE(scregg_state,scregg)
 	MCFG_MACHINE_RESET_OVERRIDE(scregg_state,scregg)

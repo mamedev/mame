@@ -96,6 +96,7 @@ public:
 	DECLARE_WRITE8_MEMBER(popobear_irq_ack_w);
 	virtual void video_start();
 	UINT32 screen_update_popobear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(popobear_irq);
 };
 
 void popobear_state::video_start()
@@ -437,21 +438,20 @@ static INPUT_PORTS_START( popobear )
 INPUT_PORTS_END
 
 
-static TIMER_DEVICE_CALLBACK( popobear_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(popobear_state::popobear_irq)
 {
-	popobear_state *state = timer.machine().driver_data<popobear_state>();
 	int scanline = param;
 
 	/* Order is trusted (5 as vblank-out makes the title screen logo spinning to behave wrongly) */
 	if(scanline == 240)
-		state->m_maincpu->set_input_line(3, ASSERT_LINE);
+		m_maincpu->set_input_line(3, ASSERT_LINE);
 
 	if(scanline == 0)
-		state->m_maincpu->set_input_line(5, ASSERT_LINE);
+		m_maincpu->set_input_line(5, ASSERT_LINE);
 
 	/* TODO: actually a timer irq, tied with YM2413 sound chip (controls BGM tempo) */
 	if(scanline == 64 || scanline == 192)
-		state->m_maincpu->set_input_line(2, ASSERT_LINE);
+		m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( popobear, popobear_state )
@@ -460,7 +460,7 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 	// levels 2,3,5 look interesting
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", popobear_state, irq5_line_assert)
 	//MCFG_CPU_PERIODIC_INT_DRIVER(popobear_state, irq2_line_assert, 120)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", popobear_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", popobear_state, popobear_irq, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

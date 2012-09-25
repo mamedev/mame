@@ -321,6 +321,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(system_h1);
+	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_sub);
 };
 
 
@@ -1144,16 +1145,15 @@ INTERRUPT_GEN_MEMBER(coolridr_state::system_h1)
 }
 
 //IRQs 10,12 and 14 are valid on SH-1 instead
-static TIMER_DEVICE_CALLBACK( system_h1_sub )
+TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_sub)
 {
-	coolridr_state *state = timer.machine().driver_data<coolridr_state>();
 	int scanline = param;
 
 	switch(scanline)
 	{
-    	case 512:state->m_subcpu->set_input_line(0xa, HOLD_LINE); break;
-        case 256:state->m_subcpu->set_input_line(0xc, HOLD_LINE); break;
-        case 0:state->m_subcpu->set_input_line(0xe, HOLD_LINE); break;
+    	case 512:m_subcpu->set_input_line(0xa, HOLD_LINE); break;
+        case 256:m_subcpu->set_input_line(0xc, HOLD_LINE); break;
+        case 0:m_subcpu->set_input_line(0xe, HOLD_LINE); break;
 	}
 }
 
@@ -1173,7 +1173,7 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 
 	MCFG_CPU_ADD("sub", SH1, 16000000)	// SH7032 HD6417032F20!! 16 mhz
 	MCFG_CPU_PROGRAM_MAP(coolridr_submap)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", system_h1_sub, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, system_h1_sub, "screen", 0, 1)
 
 	MCFG_GFXDECODE(coolridr)
 

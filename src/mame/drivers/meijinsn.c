@@ -97,6 +97,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_meijinsn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(meijinsn_interrupt);
 };
 
 
@@ -316,16 +317,15 @@ UINT32 meijinsn_state::screen_update_meijinsn(screen_device &screen, bitmap_ind1
 }
 
 
-static TIMER_DEVICE_CALLBACK( meijinsn_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(meijinsn_state::meijinsn_interrupt)
 {
-	meijinsn_state *state = timer.machine().driver_data<meijinsn_state>();
 	int scanline = param;
 
 	if(scanline == 240)
-		state->m_maincpu->set_input_line(1, HOLD_LINE);
+		m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if(scanline == 0)
-		state->m_maincpu->set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 static const ay8910_interface ay8910_config =
@@ -357,7 +357,7 @@ static MACHINE_CONFIG_START( meijinsn, meijinsn_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 9000000 )
 	MCFG_CPU_PROGRAM_MAP(meijinsn_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", meijinsn_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", meijinsn_state, meijinsn_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(meijinsn_sound_map)

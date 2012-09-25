@@ -198,6 +198,7 @@ public:
 	DECLARE_READ32_MEMBER(speedup9_r); 	
 	DECLARE_READ32_MEMBER(speedup10_r);	
 	DECLARE_READ32_MEMBER(speedup11_r);	
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
 };
 
 // Display controller registers
@@ -742,18 +743,17 @@ static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, in
 
 /* Analog Devices AD1847 Stereo DAC */
 
-static TIMER_DEVICE_CALLBACK( sound_timer_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(mediagx_state::sound_timer_callback)
 {
-	mediagx_state *state = timer.machine().driver_data<mediagx_state>();
 
-	state->m_ad1847_sample_counter = 0;
+	m_ad1847_sample_counter = 0;
 	timer.adjust(attotime::from_msec(10));
 
-	dmadac_transfer(&state->m_dmadac[0], 1, 0, 1, state->m_dacl_ptr, state->m_dacl);
-	dmadac_transfer(&state->m_dmadac[1], 1, 0, 1, state->m_dacr_ptr, state->m_dacr);
+	dmadac_transfer(&m_dmadac[0], 1, 0, 1, m_dacl_ptr, m_dacl);
+	dmadac_transfer(&m_dmadac[1], 1, 0, 1, m_dacr_ptr, m_dacr);
 
-	state->m_dacl_ptr = 0;
-	state->m_dacr_ptr = 0;
+	m_dacl_ptr = 0;
+	m_dacr_ptr = 0;
 }
 
 static void ad1847_reg_write(running_machine &machine, int reg, UINT8 data)
@@ -1193,7 +1193,7 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 
-	MCFG_TIMER_ADD("sound_timer", sound_timer_callback)
+	MCFG_TIMER_DRIVER_ADD("sound_timer", mediagx_state, sound_timer_callback)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 

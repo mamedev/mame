@@ -286,6 +286,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_wheelfir(screen_device &screen, bool state);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_callback);
 };
 
 
@@ -727,40 +728,39 @@ static INPUT_PORTS_START( wheelfir )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 {
-	wheelfir_state *state = timer.machine().driver_data<wheelfir_state>();
-	timer.machine().scheduler().synchronize();
-	state->m_current_scanline=param;
+	machine().scheduler().synchronize();
+	m_current_scanline=param;
 
-	if(state->m_current_scanline<NUM_SCANLINES)
+	if(m_current_scanline<NUM_SCANLINES)
 	{
 		//visible scanline
 
-		state->m_toggle_bit = 0x0000;
+		m_toggle_bit = 0x0000;
 
-		--state->m_scanline_cnt;
+		--m_scanline_cnt;
 
-		if(state->m_current_scanline>0)
+		if(m_current_scanline>0)
 		{
 			//copy scanline offset
-			state->m_scanlines[state->m_current_scanline].x=(state->m_scanlines[state->m_current_scanline-1].x);
-			state->m_scanlines[state->m_current_scanline].y=(state->m_scanlines[state->m_current_scanline-1].y+1);
-			state->m_scanlines[state->m_current_scanline].unkbits=state->m_scanlines[state->m_current_scanline-1].unkbits;
+			m_scanlines[m_current_scanline].x=(m_scanlines[m_current_scanline-1].x);
+			m_scanlines[m_current_scanline].y=(m_scanlines[m_current_scanline-1].y+1);
+			m_scanlines[m_current_scanline].unkbits=m_scanlines[m_current_scanline-1].unkbits;
 		}
 
-		if(state->m_scanline_cnt==0) //<=0 ?
+		if(m_scanline_cnt==0) //<=0 ?
 		{
-			timer.machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE); // raster IRQ, changes scroll values for road
+			machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE); // raster IRQ, changes scroll values for road
 		}
 
 	}
 	else
 	{
-		if(state->m_current_scanline==NUM_SCANLINES) /* vblank */
+		if(m_current_scanline==NUM_SCANLINES) /* vblank */
 		{
-			state->m_toggle_bit = 0x8000;
-			timer.machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+			m_toggle_bit = 0x8000;
+			machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 		}
 	}
 }
@@ -822,7 +822,7 @@ static MACHINE_CONFIG_START( wheelfir, wheelfir_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 
-	MCFG_TIMER_ADD_SCANLINE("scan_timer", scanline_timer_callback, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", wheelfir_state, scanline_timer_callback, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

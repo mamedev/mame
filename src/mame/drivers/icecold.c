@@ -56,6 +56,8 @@ public:
 	// motors positions
 	int		m_rmotor;			// right motor position (0-100)
 	int		m_lmotor;			// left motor position (0-100)
+	TIMER_DEVICE_CALLBACK_MEMBER(icecold_sint_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(icecold_motors_timer);
 };
 
 static ADDRESS_MAP_START( icecold_map, AS_PROGRAM, 8, icecold_state )
@@ -286,48 +288,46 @@ READ_LINE_MEMBER( icecold_state::sint_r )
 	return m_sint;
 }
 
-static TIMER_DEVICE_CALLBACK( icecold_sint_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_sint_timer)
 {
-	icecold_state *state = timer.machine().driver_data<icecold_state>();
-	state->m_sint = !state->m_sint;
-	state->m_pia1->ca1_w(state->m_sint);
+	m_sint = !m_sint;
+	m_pia1->ca1_w(m_sint);
 }
 
-static TIMER_DEVICE_CALLBACK( icecold_motors_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_motors_timer)
 {
-	icecold_state *state = timer.machine().driver_data<icecold_state>();
 
 	// /MOTENBL is set high during reset for disable the motors control
-	if (state->m_motenbl == 0)
+	if (m_motenbl == 0)
 	{
-		int lmotor_dir = ((state->m_motors_ctrl & 0x0f) == 0x06) ? -1 : ((state->m_motors_ctrl & 0x0f) == 0x09) ? +1 : 0;
-		int rmotor_dir = ((state->m_motors_ctrl & 0xf0) == 0x60) ? -1 : ((state->m_motors_ctrl & 0xf0) == 0x90) ? +1 : 0;
+		int lmotor_dir = ((m_motors_ctrl & 0x0f) == 0x06) ? -1 : ((m_motors_ctrl & 0x0f) == 0x09) ? +1 : 0;
+		int rmotor_dir = ((m_motors_ctrl & 0xf0) == 0x60) ? -1 : ((m_motors_ctrl & 0xf0) == 0x90) ? +1 : 0;
 
 		// update motors position
-		state->m_lmotor += lmotor_dir;
-		state->m_rmotor += rmotor_dir;
+		m_lmotor += lmotor_dir;
+		m_rmotor += rmotor_dir;
 
 		// if one motor is at the top of the playfield, closes the ball gate switch, to simulate ball movement
-		if (state->m_lmotor >= 99 || state->m_rmotor >= 99 )
-			state->m_ball_gate_sw = 1;
+		if (m_lmotor >= 99 || m_rmotor >= 99 )
+			m_ball_gate_sw = 1;
 		// if the motors are at the bottom of the playfield, opens the ball gate switch for start the game
-		else if (state->m_lmotor <= 1 && state->m_rmotor <= 1 )
-			state->m_ball_gate_sw = 0;
+		else if (m_lmotor <= 1 && m_rmotor <= 1 )
+			m_ball_gate_sw = 0;
 
 		// motors are keep in range 0-100
-		state->m_lmotor = MIN(state->m_lmotor, 100);
-		state->m_lmotor = MAX(state->m_lmotor, 0);
-		state->m_rmotor = MIN(state->m_rmotor, 100);
-		state->m_rmotor = MAX(state->m_rmotor, 0);
+		m_lmotor = MIN(m_lmotor, 100);
+		m_lmotor = MAX(m_lmotor, 0);
+		m_rmotor = MIN(m_rmotor, 100);
+		m_rmotor = MAX(m_rmotor, 0);
 
 		if (lmotor_dir != 0 || rmotor_dir != 0)
 		{
-			output_set_value("lmotor", state->m_lmotor);
-			output_set_value("rmotor", state->m_rmotor);
+			output_set_value("lmotor", m_lmotor);
+			output_set_value("rmotor", m_rmotor);
 
 			popmessage("Left Motor   Right Motor\n%-4s         %-4s\n%02d\\100       %02d\\100",
 					  (lmotor_dir > 0) ? " up" : ((lmotor_dir < 0) ? "down" : "off"),
-					  (rmotor_dir > 0) ? " up" : ((rmotor_dir < 0) ? "down" : "off"), state->m_lmotor, state->m_rmotor);
+					  (rmotor_dir > 0) ? " up" : ((rmotor_dir < 0) ? "down" : "off"), m_lmotor, m_rmotor);
 		}
 	}
 }
@@ -424,10 +424,10 @@ static MACHINE_CONFIG_START( icecold, icecold_state )
 	MCFG_I8279_ADD("i8279", XTAL_6MHz/4, icecold_i8279_intf)
 
 	// 30Hz signal from CH-C of ay0
-	MCFG_TIMER_ADD_PERIODIC("sint_timer", icecold_sint_timer, attotime::from_hz(30))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("sint_timer", icecold_state, icecold_sint_timer, attotime::from_hz(30))
 
 	// for update motors position
-	MCFG_TIMER_ADD_PERIODIC("motors_timer", icecold_motors_timer, attotime::from_msec(50))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("motors_timer", icecold_state, icecold_motors_timer, attotime::from_msec(50))
 
 	// video hardware
 	MCFG_DEFAULT_LAYOUT(layout_icecold)

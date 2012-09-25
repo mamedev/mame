@@ -74,6 +74,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_sbowling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(sbw_interrupt);
 };
 
 TILE_GET_INFO_MEMBER(sbowling_state::get_sb_tile_info)
@@ -160,16 +161,15 @@ READ8_MEMBER(sbowling_state::pix_data_r)
 
 
 
-static TIMER_DEVICE_CALLBACK( sbw_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(sbowling_state::sbw_interrupt)
 {
-	sbowling_state *state = timer.machine().driver_data<sbowling_state>();
 	int scanline = param;
 
 	if(scanline == 256)
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* RST 08h */
 
 	if(scanline == 128)
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
 
 }
 
@@ -385,7 +385,7 @@ static MACHINE_CONFIG_START( sbowling, sbowling_state )
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_19_968MHz/10)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", sbw_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sbowling_state, sbw_interrupt, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

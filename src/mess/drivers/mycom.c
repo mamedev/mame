@@ -110,6 +110,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_DRIVER_INIT(mycom);
+	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
 };
 
 
@@ -472,21 +473,20 @@ static const UINT8 mycom_keyval[] = { 0,
 0x0d,0x0d,0x38,0x28,0x49,0x69,0x4b,0x6b,0x2c,0x3c,0x39,0x39,0x36,0x36,0x33,0x33,0x12,0x12,
 0x07,0x07,0x39,0x29,0x4f,0x6f,0x4c,0x6c,0x2e,0x3e,0x63,0x63,0x66,0x66,0x61,0x61,0x2f,0x3f };
 
-static TIMER_DEVICE_CALLBACK( mycom_kbd )
+TIMER_DEVICE_CALLBACK_MEMBER(mycom_state::mycom_kbd)
 {
-	mycom_state *state = timer.machine().driver_data<mycom_state>();
 	UINT8 x, y, scancode = 0;
 	UINT16 pressed[9];
 	char kbdrow[3];
-	UINT8 modifiers = timer.machine().root_device().ioport("XX")->read();
+	UINT8 modifiers = machine().root_device().ioport("XX")->read();
 	UINT8 shift_pressed = (modifiers & 2) >> 1;
-	state->m_keyb_press_flag = 0;
+	m_keyb_press_flag = 0;
 
 	/* see what is pressed */
 	for (x = 0; x < 9; x++)
 	{
 		sprintf(kbdrow,"X%d",x);
-		pressed[x] = (timer.machine().root_device().ioport(kbdrow)->read());
+		pressed[x] = (machine().root_device().ioport(kbdrow)->read());
 	}
 
 	/* find what has changed */
@@ -500,17 +500,17 @@ static TIMER_DEVICE_CALLBACK( mycom_kbd )
 				if (BIT(pressed[x], y))
 				{
 					scancode = ((x + y * 9) << 1) + shift_pressed + 1;
-					state->m_keyb_press_flag = 1;
-					state->m_keyb_press = mycom_keyval[scancode];
+					m_keyb_press_flag = 1;
+					m_keyb_press = mycom_keyval[scancode];
 				}
 			}
 		}
 	}
 
-	if (state->m_keyb_press_flag)
+	if (m_keyb_press_flag)
 	{
-		if (modifiers & 1) state->m_keyb_press &= 0xbf;
-		if (modifiers & 4) state->m_keyb_press |= 0x80;
+		if (modifiers & 1) m_keyb_press &= 0xbf;
+		if (modifiers & 4) m_keyb_press |= 0x80;
 	}
 }
 
@@ -619,7 +619,7 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_FD1771_ADD("fdc", wd1771_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mycom_floppy_interface)
 
-	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", mycom_kbd, attotime::from_hz(20))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", mycom_state, mycom_kbd, attotime::from_hz(20))
 MACHINE_CONFIG_END
 
 /* ROM definition */

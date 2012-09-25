@@ -73,6 +73,7 @@ public:
 	virtual void machine_start();
 	TIMER_CALLBACK_MEMBER(mouse_click);
 	TIMER_CALLBACK_MEMBER(update_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(update_artwork);
 };
 
 
@@ -514,9 +515,9 @@ TIMER_CALLBACK_MEMBER(supercon_state::mouse_click)
 		m_selecting=FALSE;
 }
 
-static TIMER_DEVICE_CALLBACK( update_artwork )
+TIMER_DEVICE_CALLBACK_MEMBER(supercon_state::update_artwork)
 {
-	mouse_update(timer.machine());
+	mouse_update(machine());
 }
 
 TIMER_CALLBACK_MEMBER(supercon_state::update_irq)
@@ -742,7 +743,7 @@ static MACHINE_CONFIG_START( supercon, supercon_state )
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_TIMER_ADD_PERIODIC("artwork_timer", update_artwork, attotime::from_hz(20))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", supercon_state, update_artwork, attotime::from_hz(20))
 MACHINE_CONFIG_END
 
 /* ROM definition */

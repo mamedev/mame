@@ -46,6 +46,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( pia1_cb1_r );
 
 	UINT8 m_selector;
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 };
 
 
@@ -173,10 +174,10 @@ READ_LINE_MEMBER( csc_state::pia1_cb1_r )
 }
 
 
-static TIMER_DEVICE_CALLBACK( irq_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(csc_state::irq_timer)
 {
-	timer.machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	timer.machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 /* Address maps */
@@ -315,7 +316,7 @@ static MACHINE_CONFIG_START( csc, csc_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_vsc)
 
-	MCFG_TIMER_ADD_PERIODIC("irq_timer", irq_timer, attotime::from_hz(38400/64))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", csc_state, irq_timer, attotime::from_hz(38400/64))
 
 	MCFG_PIA6821_ADD("pia0", pia0_config)
 	MCFG_PIA6821_ADD("pia1", pia1_config)

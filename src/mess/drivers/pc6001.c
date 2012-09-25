@@ -236,6 +236,8 @@ public:
 	INTERRUPT_GEN_MEMBER(pc6001_interrupt);
 	INTERRUPT_GEN_MEMBER(pc6001sr_interrupt);
 	TIMER_CALLBACK_MEMBER(audio_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(cassette_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 };
 
 
@@ -2021,80 +2023,78 @@ static UINT8 check_joy_press(running_machine &machine)
 	return joy_press;
 }
 
-static TIMER_DEVICE_CALLBACK(cassette_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
 {
-	pc6001_state *state = timer.machine().driver_data<pc6001_state>();
-	if(state->m_cas_switch == 1)
+	if(m_cas_switch == 1)
 	{
 		#if 0
 		static UINT8 cas_data_i = 0x80,cas_data_poll;
-		//state->m_cur_keycode = gfx_data[state->m_cas_offset++];
-		if((timer.machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.03)
+		//m_cur_keycode = gfx_data[m_cas_offset++];
+		if((machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.03)
 			cas_data_poll|= cas_data_i;
 		else
 			cas_data_poll&=~cas_data_i;
 		if(cas_data_i == 1)
 		{
-			state->m_cur_keycode = cas_data_poll;
+			m_cur_keycode = cas_data_poll;
 			cas_data_i = 0x80;
 			/* data ready, poll irq */
-			state->m_irq_vector = 0x08;
-			timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+			m_irq_vector = 0x08;
+			machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 		}
 		else
 			cas_data_i>>=1;
 		#else
-			UINT8 *cas_data = timer.machine().root_device().memregion("cas")->base();
+			UINT8 *cas_data = machine().root_device().memregion("cas")->base();
 
-			state->m_cur_keycode = cas_data[state->m_cas_offset++];
-			popmessage("%04x %04x",state->m_cas_offset,state->m_cas_maxsize);
-			if(state->m_cas_offset > state->m_cas_maxsize)
+			m_cur_keycode = cas_data[m_cas_offset++];
+			popmessage("%04x %04x",m_cas_offset,m_cas_maxsize);
+			if(m_cas_offset > m_cas_maxsize)
 			{
-				state->m_cas_offset = 0;
-				state->m_cas_switch = 0;
+				m_cas_offset = 0;
+				m_cas_switch = 0;
 				if(IRQ_LOG) printf("Tape-E IRQ 0x12\n");
-				state->m_irq_vector = 0x12;
-				timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+				m_irq_vector = 0x12;
+				machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 			}
 			else
 			{
 				if(IRQ_LOG) printf("Tape-D IRQ 0x08\n");
-				state->m_irq_vector = 0x08;
-				timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+				m_irq_vector = 0x08;
+				machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 			}
 		#endif
 	}
 }
 
-static TIMER_DEVICE_CALLBACK(keyboard_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::keyboard_callback)
 {
-	pc6001_state *state = timer.machine().driver_data<pc6001_state>();
-	address_space &space = timer.machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT32 key1 = timer.machine().root_device().ioport("key1")->read();
-	UINT32 key2 = timer.machine().root_device().ioport("key2")->read();
-	UINT32 key3 = timer.machine().root_device().ioport("key3")->read();
-//  UINT8 p1_key = timer.machine().root_device().ioport("P1")->read();
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT32 key1 = machine().root_device().ioport("key1")->read();
+	UINT32 key2 = machine().root_device().ioport("key2")->read();
+	UINT32 key3 = machine().root_device().ioport("key3")->read();
+//  UINT8 p1_key = machine().root_device().ioport("P1")->read();
 
-	if(state->m_cas_switch == 0)
+	if(m_cas_switch == 0)
 	{
-		if((key1 != state->m_old_key1) || (key2 != state->m_old_key2) || (key3 != state->m_old_key3))
+		if((key1 != m_old_key1) || (key2 != m_old_key2) || (key3 != m_old_key3))
 		{
-			state->m_cur_keycode = check_keyboard_press(space.machine());
+			m_cur_keycode = check_keyboard_press(space.machine());
 			if(IRQ_LOG) printf("KEY IRQ 0x02\n");
-			state->m_irq_vector = 0x02;
-			timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
-			state->m_old_key1 = key1;
-			state->m_old_key2 = key2;
-			state->m_old_key3 = key3;
+			m_irq_vector = 0x02;
+			machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+			m_old_key1 = key1;
+			m_old_key2 = key2;
+			m_old_key3 = key3;
 		}
 		#if 0
 		else /* joypad polling */
 		{
-			state->m_cur_keycode = check_joy_press(space.machine());
-			if(state->m_cur_keycode)
+			m_cur_keycode = check_joy_press(space.machine());
+			if(m_cur_keycode)
 			{
-				state->m_irq_vector = 0x16;
-				timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+				m_irq_vector = 0x16;
+				machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 			}
 		}
 		#endif
@@ -2368,8 +2368,8 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* TODO: accurate timing on this */
-	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(250))
-	MCFG_TIMER_ADD_PERIODIC("cassette_timer", cassette_callback, attotime::from_hz(1200/12)) //1200 bauds / (1 start bit -> 8 data bits -> 3 stop bits)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", pc6001_state, keyboard_callback, attotime::from_hz(250))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", pc6001_state, cassette_callback, attotime::from_hz(1200/12))
 MACHINE_CONFIG_END
 
 

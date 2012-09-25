@@ -93,6 +93,7 @@ public:
 	TILE_GET_INFO_MEMBER(ac_get_tx_tile_info);
 	virtual void video_start();
 	UINT32 screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(acommand_scanline);
 };
 
 
@@ -585,15 +586,15 @@ static GFXDECODE_START( acommand )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x1800, 256 )
 GFXDECODE_END
 
-static TIMER_DEVICE_CALLBACK( acommand_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(acommand_state::acommand_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 
 	if(scanline == 0) // vblank-in irq? (update palette and layers)
-		timer.machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( acommand, acommand_state )
@@ -601,7 +602,7 @@ static MACHINE_CONFIG_START( acommand, acommand_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,12000000)
 	MCFG_CPU_PROGRAM_MAP(acommand_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", acommand_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", acommand_state, acommand_scanline, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

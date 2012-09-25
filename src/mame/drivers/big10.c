@@ -75,6 +75,7 @@ public:
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	virtual void machine_reset();
+	TIMER_DEVICE_CALLBACK_MEMBER(big10_interrupt);
 };
 
 
@@ -90,10 +91,9 @@ static void big10_vdp_interrupt(device_t *, v99x8_device &device, int i)
 	device.machine().device("maincpu")->execute().set_input_line(0, (i ? ASSERT_LINE : CLEAR_LINE));
 }
 
-static TIMER_DEVICE_CALLBACK( big10_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(big10_state::big10_interrupt)
 {
-	big10_state *state = timer.machine().driver_data<big10_state>();
-	state->m_v9938->interrupt();
+	m_v9938->interrupt();
 }
 
 
@@ -247,7 +247,7 @@ static MACHINE_CONFIG_START( big10, big10_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* guess */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", big10_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", big10_state, big10_interrupt, "screen", 0, 1)
 
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

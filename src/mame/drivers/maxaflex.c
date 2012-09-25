@@ -59,6 +59,7 @@ public:
 	DECLARE_READ8_MEMBER(maxaflex_atari_pia_pb_r);
 	DECLARE_DRIVER_INIT(a600xl);
 	DECLARE_MACHINE_RESET(supervisor_board);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_timer_proc);
 };
 
 
@@ -180,15 +181,14 @@ WRITE8_MEMBER(maxaflex_state::mcu_portC_ddr_w)
 	m_ddrC = data;
 }
 
-static TIMER_DEVICE_CALLBACK( mcu_timer_proc )
+TIMER_DEVICE_CALLBACK_MEMBER(maxaflex_state::mcu_timer_proc)
 {
-	maxaflex_state *state = timer.machine().driver_data<maxaflex_state>();
-	if ( --state->m_tdr == 0x00 )
+	if ( --m_tdr == 0x00 )
 	{
-		if ( (state->m_tcr & 0x40) == 0 )
+		if ( (m_tcr & 0x40) == 0 )
 		{
 			//timer interrupt!
-			generic_pulse_irq_line(timer.machine().device("mcu"), M68705_INT_TIMER, 1);
+			generic_pulse_irq_line(machine().device("mcu")->execute(), M68705_INT_TIMER, 1);
 		}
 	}
 }
@@ -410,7 +410,7 @@ static MACHINE_CONFIG_START( a600xl, maxaflex_state )
 	MCFG_CPU_PROGRAM_MAP(mcu_mem)
 
 	MCFG_PIA6821_ADD("pia", maxaflex_atarixl_pia_interface)
-	MCFG_TIMER_ADD("mcu_timer", mcu_timer_proc)
+	MCFG_TIMER_DRIVER_ADD("mcu_timer", maxaflex_state, mcu_timer_proc)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

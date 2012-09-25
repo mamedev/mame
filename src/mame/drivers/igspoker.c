@@ -121,6 +121,7 @@ public:
 	DECLARE_VIDEO_START(cpokerpk);
 	UINT32 screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt);
 };
 
 
@@ -132,19 +133,18 @@ void igspoker_state::machine_reset()
 }
 
 
-static TIMER_DEVICE_CALLBACK( igs_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(igspoker_state::igs_interrupt)
 {
-	igspoker_state *state = timer.machine().driver_data<igspoker_state>();
 	int scanline = param;
 
 	if((scanline % 32) != 0)
 		return;
 
 	if((scanline % 64) == 32)
-		state->m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 
-	if((scanline % 64) == 0 && state->m_nmi_enable)
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if((scanline % 64) == 0 && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -1771,7 +1771,7 @@ static MACHINE_CONFIG_START( igspoker, igspoker_state )
 	MCFG_CPU_ADD("maincpu",Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(igspoker_prg_map)
 	MCFG_CPU_IO_MAP(igspoker_io_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", igs_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igspoker_state, igs_interrupt, "screen", 0, 1)
 
 
 	/* video hardware */

@@ -170,6 +170,8 @@ public:
 	TIMER_CALLBACK_MEMBER(ext_cassette_read);
 	TIMER_CALLBACK_MEMBER(transmit_data);
 	TIMER_CALLBACK_MEMBER(receive_data);
+	TIMER_DEVICE_CALLBACK_MEMBER(frc_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(upd7508_1sec_callback);
 };
 
 
@@ -344,16 +346,15 @@ TIMER_CALLBACK_MEMBER(px4_state::ext_cassette_read)
 }
 
 /* free running counter */
-static TIMER_DEVICE_CALLBACK( frc_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(px4_state::frc_tick)
 {
-	px4_state *px4 = timer.machine().driver_data<px4_state>();
 
-	px4->m_frc_value++;
+	m_frc_value++;
 
-	if (px4->m_frc_value == 0)
+	if (m_frc_value == 0)
 	{
-		px4->m_isr |= INT3_OVF;
-		gapnit_interrupt(timer.machine());
+		m_isr |= INT3_OVF;
+		gapnit_interrupt(machine());
 	}
 }
 
@@ -919,18 +920,17 @@ WRITE8_MEMBER(px4_state::px4_ioctlr_w)
     7508 RELATED
 ***************************************************************************/
 
-static TIMER_DEVICE_CALLBACK( upd7508_1sec_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(px4_state::upd7508_1sec_callback)
 {
-	px4_state *px4 = timer.machine().driver_data<px4_state>();
 
 	/* adjust interrupt status */
-	px4->m_interrupt_status |= UPD7508_INT_ONE_SECOND;
+	m_interrupt_status |= UPD7508_INT_ONE_SECOND;
 
 	/* are interrupts enabled? */
-	if (px4->m_one_sec_int_enabled)
+	if (m_one_sec_int_enabled)
 	{
-		px4->m_isr |= INT0_7508;
-		gapnit_interrupt(timer.machine());
+		m_isr |= INT0_7508;
+		gapnit_interrupt(machine());
 	}
 }
 
@@ -1376,8 +1376,8 @@ static MACHINE_CONFIG_START( px4, px4_state )
 
 	MCFG_PALETTE_LENGTH(2)
 
-	MCFG_TIMER_ADD_PERIODIC("one_sec", upd7508_1sec_callback, attotime::from_seconds(1))
-	MCFG_TIMER_ADD_PERIODIC("frc", frc_tick, attotime::from_hz(XTAL_7_3728MHz / 2 / 6))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("one_sec", px4_state, upd7508_1sec_callback, attotime::from_seconds(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("frc", px4_state, frc_tick, attotime::from_hz(XTAL_7_3728MHz / 2 / 6))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

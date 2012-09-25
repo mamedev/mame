@@ -115,6 +115,7 @@ public:
 	UINT32 screen_update_bml3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(bml3_irq);
 	INTERRUPT_GEN_MEMBER(bml3_timer_firq);
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 };
 
 #define mc6845_h_char_total 	(m_crtc_vreg[0])
@@ -575,9 +576,8 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static TIMER_DEVICE_CALLBACK( keyboard_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 {
-	bml3_state *state = timer.machine().driver_data<bml3_state>();
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
 	scancode = 0;
@@ -586,12 +586,12 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 	{
 		for(i=0;i<32;i++)
 		{
-			if((timer.machine().root_device().ioport(portnames[port_i])->read()>>i) & 1)
+			if((machine().root_device().ioport(portnames[port_i])->read()>>i) & 1)
 			{
 				{
-					state->m_keyb_press = scancode;
-					state->m_keyb_press_flag = 1;
-					timer.machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+					m_keyb_press = scancode;
+					m_keyb_press_flag = 1;
+					machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 					return;
 				}
 			}
@@ -907,7 +907,7 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_1MHz, mc6845_intf)
-	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240/8))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", bml3_state, keyboard_callback, attotime::from_hz(240/8))
 	MCFG_MC6843_ADD( "mc6843", bml3_6843_if )
 	MCFG_PIA6821_ADD("pia6821", bml3_pia_config)
 	MCFG_ACIA6850_ADD("acia6850", bml3_acia_if)

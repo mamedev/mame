@@ -364,6 +364,7 @@ public:
 	DECLARE_PALETTE_INIT(babypkr);
 	DECLARE_PALETTE_INIT(fortune1);
 	UINT32 screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_t1_callback);
 };
 
 
@@ -930,16 +931,15 @@ WRITE8_MEMBER(videopkr_state::baby_sound_p3_w)
 }
 
 
-static TIMER_DEVICE_CALLBACK(sound_t1_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(videopkr_state::sound_t1_callback)
 {
-	videopkr_state *state = timer.machine().driver_data<videopkr_state>();
-	if (state->m_te_40103 == 1)
+	if (m_te_40103 == 1)
 	{
-		state->m_dc_40103++;
+		m_dc_40103++;
 
-		if (state->m_dc_40103 == 0)
+		if (m_dc_40103 == 0)
 		{
-			timer.machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);
+			machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);
 		}
 	}
 }
@@ -1244,7 +1244,7 @@ static MACHINE_CONFIG_START( videopkr, videopkr_state )
 	MCFG_CPU_IO_MAP(i8039_sound_port)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_ADD_PERIODIC("t1_timer", sound_t1_callback, attotime::from_hz(50))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("t1_timer", videopkr_state, sound_t1_callback, attotime::from_hz(50))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -88,6 +88,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(smc777_vblank_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 };
 
 
@@ -930,25 +931,24 @@ static const UINT8 smc777_keytable[2][0xa0] =
 	}
 };
 
-static TIMER_DEVICE_CALLBACK( keyboard_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(smc777_state::keyboard_callback)
 {
-	smc777_state *state = timer.machine().driver_data<smc777_state>();
 	static const char *const portnames[11] = { "key0","key1","key2","key3","key4","key5","key6","key7", "key8", "key9", "keya" };
 	int i,port_i,scancode;
-	UINT8 shift_mod = timer.machine().root_device().ioport("key_mod")->read() & 1;
-	UINT8 kana_mod = timer.machine().root_device().ioport("key_mod")->read() & 0x10;
+	UINT8 shift_mod = machine().root_device().ioport("key_mod")->read() & 1;
+	UINT8 kana_mod = machine().root_device().ioport("key_mod")->read() & 0x10;
 	scancode = 0;
 
 	for(port_i=0;port_i<11;port_i++)
 	{
 		for(i=0;i<8;i++)
 		{
-			if((timer.machine().root_device().ioport(portnames[port_i])->read()>>i) & 1)
+			if((machine().root_device().ioport(portnames[port_i])->read()>>i) & 1)
 			{
-				state->m_keyb_press = smc777_keytable[shift_mod & 1][scancode];
-				if(kana_mod) { state->m_keyb_press|=0x80; }
-				state->m_keyb_press_flag = 1;
-				state->m_shift_press_flag = shift_mod & 1;
+				m_keyb_press = smc777_keytable[shift_mod & 1][scancode];
+				if(kana_mod) { m_keyb_press|=0x80; }
+				m_keyb_press_flag = 1;
+				m_shift_press_flag = shift_mod & 1;
 				return;
 			}
 			scancode++;
@@ -1109,7 +1109,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
-	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240/32))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", smc777_state, keyboard_callback, attotime::from_hz(240/32))
 MACHINE_CONFIG_END
 
 /* ROM definition */

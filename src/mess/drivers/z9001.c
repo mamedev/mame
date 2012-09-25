@@ -65,6 +65,7 @@ public:
 	//virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 };
 
 static ADDRESS_MAP_START(z9001_mem, AS_PROGRAM, 8, z9001_state)
@@ -142,10 +143,9 @@ WRITE_LINE_MEMBER( z9001_state::cass_w )
 
 
 // temporary (prevent freezing when you type an invalid filename)
-static TIMER_DEVICE_CALLBACK( timer_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(z9001_state::timer_callback)
 {
-	z9001_state *state = timer.machine().driver_data<z9001_state>();
-	state->m_maincpu->space(AS_PROGRAM).write_byte(0x006a, 0);
+	m_maincpu->space(AS_PROGRAM).write_byte(0x006a, 0);
 }
 
 void z9001_state::machine_reset()
@@ -257,7 +257,7 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 
 	/* Devices */
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
-	MCFG_TIMER_ADD_PERIODIC("z9001_timer", timer_callback, attotime::from_msec(10))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("z9001_timer", z9001_state, timer_callback, attotime::from_msec(10))
 	MCFG_Z80PIO_ADD( "z80pio1", XTAL_9_8304MHz / 4, pio1_intf )
 	MCFG_Z80PIO_ADD( "z80pio2", XTAL_9_8304MHz / 4, pio2_intf )
 	MCFG_Z80CTC_ADD( "z80ctc", XTAL_9_8304MHz / 4, ctc_intf )

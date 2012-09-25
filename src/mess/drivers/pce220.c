@@ -94,6 +94,7 @@ public:
 	DECLARE_PALETTE_INIT(pce220);
 	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(on_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(pce220_timer_callback);
 };
 
 class pcg850v_state : public pce220_state
@@ -900,17 +901,16 @@ void pcg850v_state::machine_reset()
 	m_lcd_read_mode = 0;
 }
 
-static TIMER_DEVICE_CALLBACK(pce220_timer_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(pce220_state::pce220_timer_callback)
 {
-	pce220_state *state = timer.machine().driver_data<pce220_state>();
 
-	state->m_timer_status = !state->m_timer_status;
+	m_timer_status = !m_timer_status;
 
-	if (state->m_irq_mask & IRQ_FLAG_TIMER)
+	if (m_irq_mask & IRQ_FLAG_TIMER)
 	{
-		state->m_maincpu->set_input_line(0, HOLD_LINE );
+		m_maincpu->set_input_line(0, HOLD_LINE );
 
-		state->m_irq_flag = (state->m_irq_flag & 0xfb) | (state->m_timer_status<<2);
+		m_irq_flag = (m_irq_flag & 0xfb) | (m_timer_status<<2);
 	}
 }
 
@@ -945,7 +945,7 @@ static MACHINE_CONFIG_START( pce220, pce220_state )
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_TIMER_ADD_PERIODIC("pce220_timer", pce220_timer_callback, attotime::from_msec(468))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -980,7 +980,7 @@ static MACHINE_CONFIG_START( pcg850v, pcg850v_state )
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_TIMER_ADD_PERIODIC("pce220_timer", pce220_timer_callback, attotime::from_msec(468))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

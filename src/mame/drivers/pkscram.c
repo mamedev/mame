@@ -45,6 +45,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 };
 
 
@@ -215,22 +216,21 @@ TILE_GET_INFO_MEMBER(pkscram_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
-static TIMER_DEVICE_CALLBACK( scanline_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(pkscram_state::scanline_callback)
 {
-	pkscram_state *state = timer.machine().driver_data<pkscram_state>();
 	if (param == interrupt_scanline)
 	{
-    	if (state->m_out & 0x2000)
-    		timer.machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
-		timer.adjust(timer.machine().primary_screen->time_until_pos(param + 1), param+1);
-		state->m_interrupt_line_active = 1;
+    	if (m_out & 0x2000)
+    		machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
+		timer.adjust(machine().primary_screen->time_until_pos(param + 1), param+1);
+		m_interrupt_line_active = 1;
 	}
 	else
 	{
-		if (state->m_interrupt_line_active)
-	    	timer.machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
-		timer.adjust(timer.machine().primary_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
-		state->m_interrupt_line_active = 0;
+		if (m_interrupt_line_active)
+	    	machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
+		timer.adjust(machine().primary_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
+		m_interrupt_line_active = 0;
 	}
 }
 
@@ -308,7 +308,7 @@ static MACHINE_CONFIG_START( pkscramble, pkscram_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 
-	MCFG_TIMER_ADD("scan_timer", scanline_callback)
+	MCFG_TIMER_DRIVER_ADD("scan_timer", pkscram_state, scanline_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -70,6 +70,7 @@ public:
 	UINT32 screen_update_tmmjprd_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_tmmjprd_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(tmmjprd_blit_done);
+	TIMER_DEVICE_CALLBACK_MEMBER(tmmjprd_scanline);
 };
 
 
@@ -732,23 +733,22 @@ static GFXDECODE_START( tmmjprd )
 GFXDECODE_END
 
 
-static TIMER_DEVICE_CALLBACK( tmmjprd_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(tmmjprd_state::tmmjprd_scanline)
 {
-	//tmmjprd_state *state = timer.machine().driver_data<tmmjprd_state>();
 	int scanline = param;
 
 	if(scanline == 224) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 
 	if(scanline == 736) // blitter irq?
-		timer.machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 
 }
 
 static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 	MCFG_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
 	MCFG_CPU_PROGRAM_MAP(tmmjprd_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", tmmjprd_scanline, "lscreen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmmjprd_state, tmmjprd_scanline, "lscreen", 0, 1)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 

@@ -167,6 +167,7 @@ public:
 	DECLARE_WRITE8_MEMBER(scorpion_port_1ffd_w);
 	DECLARE_MACHINE_START(scorpion);
 	DECLARE_MACHINE_RESET(scorpion);
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_check_callback);
 };
 
 /****************************************************************************************************/
@@ -272,15 +273,14 @@ DIRECT_UPDATE_MEMBER(scorpion_state::scorpion_direct)
 	return address;
 }
 
-static TIMER_DEVICE_CALLBACK(nmi_check_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(scorpion_state::nmi_check_callback)
 {
-	spectrum_state *state = timer.machine().driver_data<spectrum_state>();
 
-	if ((timer.machine().root_device().ioport("NMI")->read() & 1)==1)
+	if ((machine().root_device().ioport("NMI")->read() & 1)==1)
 	{
-		state->m_port_1ffd_data |= 0x02;
-		scorpion_update_memory(timer.machine());
-		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_port_1ffd_data |= 0x02;
+		scorpion_update_memory(machine());
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -421,7 +421,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( scorpion, spectrum_128, scorpion_state )
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
 
-	MCFG_TIMER_ADD_PERIODIC("nmi_timer", nmi_check_callback, attotime::from_hz(50))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", scorpion_state, nmi_check_callback, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( profi, scorpion )

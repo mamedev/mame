@@ -87,6 +87,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_olibochu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(olibochu_scanline);
 };
 
 
@@ -432,15 +433,15 @@ void olibochu_state::machine_reset()
 	m_cmd = 0;
 }
 
-static TIMER_DEVICE_CALLBACK( olibochu_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(olibochu_state::olibochu_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 248) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
 
 	if(scanline == 0) // sprite buffer irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);	/* RST 08h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);	/* RST 08h */
 }
 
 static MACHINE_CONFIG_START( olibochu, olibochu_state )
@@ -448,7 +449,7 @@ static MACHINE_CONFIG_START( olibochu, olibochu_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ?? */
 	MCFG_CPU_PROGRAM_MAP(olibochu_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", olibochu_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", olibochu_state, olibochu_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ?? */
 	MCFG_CPU_PROGRAM_MAP(olibochu_sound_map)

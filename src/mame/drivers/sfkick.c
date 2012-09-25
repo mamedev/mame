@@ -79,6 +79,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_port_c_w);
 	DECLARE_DRIVER_INIT(sfkick);
 	virtual void machine_reset();
+	TIMER_DEVICE_CALLBACK_MEMBER(sfkick_interrupt);
 };
 
 
@@ -449,10 +450,9 @@ void sfkick_state::machine_reset()
 	sfkick_remap_banks(machine());
 }
 
-static TIMER_DEVICE_CALLBACK( sfkick_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(sfkick_state::sfkick_interrupt)
 {
-	sfkick_state *state = timer.machine().driver_data<sfkick_state>();
-	state->m_v9938->interrupt();
+	m_v9938->interrupt();
 }
 
 static void irqhandler(device_t *device, int irq)
@@ -475,7 +475,7 @@ static MACHINE_CONFIG_START( sfkick, sfkick_state )
 	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(sfkick_map)
 	MCFG_CPU_IO_MAP(sfkick_io_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", sfkick_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sfkick_state, sfkick_interrupt, "screen", 0, 1)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 

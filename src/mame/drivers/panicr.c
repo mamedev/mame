@@ -99,6 +99,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_panicr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(panicr_scanline);
 };
 
 
@@ -490,21 +491,21 @@ static GFXDECODE_START( panicr )
 GFXDECODE_END
 
 
-static TIMER_DEVICE_CALLBACK( panicr_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(panicr_state::panicr_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xc4/4);
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xc4/4);
 
 	if(scanline == 0) // <unknown>
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
 }
 
 static MACHINE_CONFIG_START( panicr, panicr_state )
 	MCFG_CPU_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
 	MCFG_CPU_PROGRAM_MAP(panicr_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", panicr_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", panicr_state, panicr_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD(CPUTAG_T5182,Z80,SOUND_CLOCK/4)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(t5182_map)

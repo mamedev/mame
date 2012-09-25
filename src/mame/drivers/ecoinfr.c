@@ -87,17 +87,17 @@ public:
 	DECLARE_DRIVER_INIT(ecoinfr);
 	DECLARE_DRIVER_INIT(ecoinfrmab);
 	virtual void machine_reset();
+	TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_irq_timer);
 };
 
 
 
-TIMER_DEVICE_CALLBACK( ecoinfr_irq_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_state::ecoinfr_irq_timer)
 {
 
-	ecoinfr_state *state = timer.machine().driver_data<ecoinfr_state>();
-	state->irq_toggle^=1;
+	irq_toggle^=1;
 
-	//printf("blah %d\n", state->irq_toggle);
+	//printf("blah %d\n", irq_toggle);
 
 	/* What are the IRQ sources / freq?
      It runs in IM2
@@ -108,13 +108,13 @@ TIMER_DEVICE_CALLBACK( ecoinfr_irq_timer )
 
     */
 
-	if (state->irq_toggle==0)
+	if (irq_toggle==0)
 	{
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xe4);
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xe4);
 	}
 	else
 	{
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xe0);
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xe0);
 	}
 
 
@@ -651,7 +651,7 @@ static MACHINE_CONFIG_START( ecoinfr, ecoinfr_state )
 	MCFG_CPU_ADD("maincpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(memmap)
 	MCFG_CPU_IO_MAP(portmap)
-	MCFG_TIMER_ADD_PERIODIC("ectimer",ecoinfr_irq_timer, attotime::from_hz(250))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ectimer", ecoinfr_state, ecoinfr_irq_timer, attotime::from_hz(250))
 
 	MCFG_I8251_ADD(UPD8251_TAG, default_i8251_interface)
 MACHINE_CONFIG_END

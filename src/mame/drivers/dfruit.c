@@ -64,6 +64,7 @@ public:
 
 	UINT8 ram_bank_r(UINT16 offset, UINT8 bank_num);
 	void ram_bank_w(UINT16 offset, UINT8 data, UINT8 bank_num);
+	TIMER_DEVICE_CALLBACK_MEMBER(dfruit_irq_scanline);
 };
 
 void dfruit_state::video_start()
@@ -347,24 +348,23 @@ static I8255A_INTERFACE( ppi8255_intf )
 	DEVCB_NULL						/* Port C write */
 };
 
-static TIMER_DEVICE_CALLBACK( dfruit_irq_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::dfruit_irq_scanline)
 {
-	dfruit_state *state = timer.machine().driver_data<dfruit_state>();
 	int scanline = param;
 
-	if (scanline == 240 && (state->m_irq_enable & 4))
+	if (scanline == 240 && (m_irq_enable & 4))
 	{
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, state->m_irq_vector[2]);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[2]);
 	}
 
-	if (scanline == 0 && (state->m_irq_enable & 2))
+	if (scanline == 0 && (m_irq_enable & 2))
 	{
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, state->m_irq_vector[1]);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[1]);
 	}
 
-	if (scanline == 196 && (state->m_irq_enable & 1))
+	if (scanline == 196 && (m_irq_enable & 1))
 	{
-		//state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, state->m_irq_vector[0]);
+		//m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[0]);
 	}
 }
 
@@ -387,7 +387,7 @@ static MACHINE_CONFIG_START( dfruit, dfruit_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/2) //!!! TC0091LVC !!!
 	MCFG_CPU_PROGRAM_MAP(dfruit_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", dfruit_irq_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dfruit_state, dfruit_irq_scanline, "screen", 0, 1)
 
 	//MCFG_MACHINE_START_OVERRIDE(dfruit_state,4enraya)
 	//MCFG_MACHINE_RESET_OVERRIDE(dfruit_state,4enraya)

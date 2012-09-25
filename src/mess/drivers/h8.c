@@ -44,6 +44,7 @@ public:
 	UINT8 m_irq_ctl;
 	UINT8 m_ff_b;
 	virtual void machine_reset();
+	TIMER_DEVICE_CALLBACK_MEMBER(h8_irq_pulse);
 };
 
 
@@ -52,11 +53,10 @@ public:
 #define H8_IRQ_PULSE (H8_BEEP_FRQ / 2)
 
 
-static TIMER_DEVICE_CALLBACK( h8_irq_pulse )
+TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_irq_pulse)
 {
-	h8_state *state = timer.machine().driver_data<h8_state>();
-	if (state->m_irq_ctl & 1)
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
+	if (m_irq_ctl & 1)
+		machine().device("maincpu")->execute().set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
 }
 
 READ8_MEMBER( h8_state::h8_f0_r )
@@ -225,7 +225,7 @@ static MACHINE_CONFIG_START( h8, h8_state )
 	MCFG_CPU_IO_MAP(h8_io)
 	MCFG_CPU_CONFIG(h8_cpu_config)
 
-	MCFG_TIMER_ADD_PERIODIC("h8_timer", h8_irq_pulse, attotime::from_hz(H8_IRQ_PULSE) )
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("h8_timer", h8_state, h8_irq_pulse, attotime::from_hz(H8_IRQ_PULSE))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_h8)

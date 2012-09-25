@@ -113,6 +113,7 @@ public:
 	}
 	virtual void video_start();
 	UINT32 screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);
 };
 
 
@@ -124,19 +125,18 @@ public:
 
 
 
-static TIMER_DEVICE_CALLBACK( galpani3_vblank ) // 2, 3, 5 ?
+TIMER_DEVICE_CALLBACK_MEMBER(galpani3_state::galpani3_vblank)// 2, 3, 5 ?
 {
-	galpani3_state *state = timer.machine().driver_data<galpani3_state>();
 	int scanline = param;
 
 	if(scanline == 240)
-		state->m_maincpu->set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 
 	if(scanline == 0)
-		state->m_maincpu->set_input_line(3, HOLD_LINE);
+		m_maincpu->set_input_line(3, HOLD_LINE);
 
 	if(scanline == 128)
-		state->m_maincpu->set_input_line(5, HOLD_LINE); // timer, related to sound chip?
+		m_maincpu->set_input_line(5, HOLD_LINE); // timer, related to sound chip?
 }
 
 
@@ -510,7 +510,7 @@ static const ymz280b_interface ymz280b_intf =
 static MACHINE_CONFIG_START( galpani3, galpani3_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28_63636MHz/2)	// Confirmed from PCB
 	MCFG_CPU_PROGRAM_MAP(galpani3_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", galpani3_vblank, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpani3_state, galpani3_vblank, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -75,6 +75,7 @@ public:
 	DECLARE_WRITE8_MEMBER( mc10_port2_w );
 	DECLARE_READ8_MEMBER( mc10_mc6847_videoram_r );
 	DECLARE_DRIVER_INIT(mc10);
+	TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
 };
 
 
@@ -223,11 +224,10 @@ READ8_MEMBER( mc10_state::mc10_mc6847_videoram_r )
 	return m_ram_base[offset];
 }
 
-static TIMER_DEVICE_CALLBACK( alice32_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(mc10_state::alice32_scanline)
 {
-	mc10_state *state = timer.machine().driver_data<mc10_state>();
 
-	state->m_ef9345->update_scanline((UINT16)param);
+	m_ef9345->update_scanline((UINT16)param);
 }
 
 /***************************************************************************
@@ -551,7 +551,7 @@ static MACHINE_CONFIG_START( alice32, mc10_state )
 	MCFG_PALETTE_LENGTH(8)
 
 	MCFG_EF9345_ADD("ef9345", alice32_ef9345_config)
-	MCFG_TIMER_ADD_SCANLINE("alice32_sl", alice32_scanline, "screen", 0, 10)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("alice32_sl", mc10_state, alice32_scanline, "screen", 0, 10)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

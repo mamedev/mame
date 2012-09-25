@@ -206,6 +206,7 @@ public:
 	DECLARE_VIDEO_START(urashima);
 	UINT32 screen_update_jalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(jalmah_mcu_sim);
 };
 
 
@@ -930,10 +931,9 @@ static void second_mcu_run(running_machine &machine)
 
 }
 
-static TIMER_DEVICE_CALLBACK( jalmah_mcu_sim )
+TIMER_DEVICE_CALLBACK_MEMBER(jalmah_state::jalmah_mcu_sim)
 {
-	jalmah_state *state = timer.machine().driver_data<jalmah_state>();
-	switch(state->m_mcu_prg)
+	switch(m_mcu_prg)
 	{
 		/*
             #define DAIREIKA_MCU (0x11)
@@ -943,12 +943,12 @@ static TIMER_DEVICE_CALLBACK( jalmah_mcu_sim )
             #define KAKUMEI2_MCU (0x22)
             #define SUCHIPI_MCU  (0x23)
         */
-			case MJZOOMIN_MCU: mjzoomin_mcu_run(timer.machine()); break;
-			case DAIREIKA_MCU: daireika_mcu_run(timer.machine()); break;
-			case URASHIMA_MCU: urashima_mcu_run(timer.machine()); break;
+			case MJZOOMIN_MCU: mjzoomin_mcu_run(machine()); break;
+			case DAIREIKA_MCU: daireika_mcu_run(machine()); break;
+			case URASHIMA_MCU: urashima_mcu_run(machine()); break;
 			case KAKUMEI_MCU:
 			case KAKUMEI2_MCU:
-			case SUCHIPI_MCU:  second_mcu_run(timer.machine()); break;
+			case SUCHIPI_MCU:  second_mcu_run(machine()); break;
 	}
 }
 
@@ -1422,7 +1422,7 @@ static MACHINE_CONFIG_START( jalmah, jalmah_state )
 	MCFG_PALETTE_LENGTH(0x400)
 
 
-	MCFG_TIMER_ADD_PERIODIC("mcusim", jalmah_mcu_sim, attotime::from_hz(10000)) // not real, but for simulating the MCU
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", jalmah_state, jalmah_mcu_sim, attotime::from_hz(10000))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_OKIM6295_ADD("oki", 4000000, OKIM6295_PIN7_LOW)

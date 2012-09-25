@@ -65,6 +65,10 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pc100_vblank_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(pc100_600hz_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(pc100_100hz_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(pc100_50hz_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(pc100_10hz_irq);
 };
 
 void pc100_state::video_start()
@@ -348,36 +352,32 @@ INTERRUPT_GEN_MEMBER(pc100_state::pc100_vblank_irq)
 	pic8259_ir4_w(machine().device("pic8259"), 1);
 }
 
-static TIMER_DEVICE_CALLBACK( pc100_600hz_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_600hz_irq)
 {
-	pc100_state *state = timer.machine().driver_data<pc100_state>();
 
-	if(state->m_timer_mode == 0)
-		pic8259_ir2_w(timer.machine().device("pic8259"), 1);
+	if(m_timer_mode == 0)
+		pic8259_ir2_w(machine().device("pic8259"), 1);
 }
 
-static TIMER_DEVICE_CALLBACK( pc100_100hz_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_100hz_irq)
 {
-	pc100_state *state = timer.machine().driver_data<pc100_state>();
 
-	if(state->m_timer_mode == 1)
-		pic8259_ir2_w(timer.machine().device("pic8259"), 1);
+	if(m_timer_mode == 1)
+		pic8259_ir2_w(machine().device("pic8259"), 1);
 }
 
-static TIMER_DEVICE_CALLBACK( pc100_50hz_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_50hz_irq)
 {
-	pc100_state *state = timer.machine().driver_data<pc100_state>();
 
-	if(state->m_timer_mode == 2)
-		pic8259_ir2_w(timer.machine().device("pic8259"), 1);
+	if(m_timer_mode == 2)
+		pic8259_ir2_w(machine().device("pic8259"), 1);
 }
 
-static TIMER_DEVICE_CALLBACK( pc100_10hz_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_10hz_irq)
 {
-	pc100_state *state = timer.machine().driver_data<pc100_state>();
 
-	if(state->m_timer_mode == 3)
-		pic8259_ir2_w(timer.machine().device("pic8259"), 1);
+	if(m_timer_mode == 3)
+		pic8259_ir2_w(machine().device("pic8259"), 1);
 }
 
 #define MASTER_CLOCK 6988800
@@ -401,10 +401,10 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_PALETTE_LENGTH(16)
 //  MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_TIMER_ADD_PERIODIC("600hz", pc100_600hz_irq, attotime::from_hz(MASTER_CLOCK/600))
-	MCFG_TIMER_ADD_PERIODIC("100hz", pc100_100hz_irq, attotime::from_hz(MASTER_CLOCK/100))
-	MCFG_TIMER_ADD_PERIODIC("50hz", pc100_50hz_irq, attotime::from_hz(MASTER_CLOCK/50))
-	MCFG_TIMER_ADD_PERIODIC("10hz", pc100_10hz_irq, attotime::from_hz(MASTER_CLOCK/10))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("600hz", pc100_state, pc100_600hz_irq, attotime::from_hz(MASTER_CLOCK/600))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("100hz", pc100_state, pc100_100hz_irq, attotime::from_hz(MASTER_CLOCK/100))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", pc100_state, pc100_50hz_irq, attotime::from_hz(MASTER_CLOCK/50))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("10hz", pc100_state, pc100_10hz_irq, attotime::from_hz(MASTER_CLOCK/10))
 	MCFG_I8255_ADD( "ppi8255_2", pc100_ppi8255_interface_2 )
 	MCFG_PIC8259_ADD( "pic8259", pc100_pic8259_config )
 MACHINE_CONFIG_END

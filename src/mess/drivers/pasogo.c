@@ -71,13 +71,13 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pasogo_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(vg230_timer);
 };
 
 
-static TIMER_DEVICE_CALLBACK( vg230_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(pasogo_state::vg230_timer)
 {
-	pasogo_state *state = timer.machine().driver_data<pasogo_state>();
-	vg230_t *vg230 = &state->m_vg230;
+	vg230_t *vg230 = &m_vg230;
 
 	vg230->rtc.seconds+=1;
 	if (vg230->rtc.seconds>=60)
@@ -532,7 +532,7 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_CARTSLOT_INTERFACE("pasogo_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pasogo")
 
-	MCFG_TIMER_ADD_PERIODIC("vg230_timer", vg230_timer, attotime::from_hz(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("vg230_timer", pasogo_state, vg230_timer, attotime::from_hz(1))
 MACHINE_CONFIG_END
 
 

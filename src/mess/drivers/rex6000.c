@@ -116,6 +116,9 @@ public:
 	UINT8 identify_bank_type(UINT32 bank);
 	virtual void palette_init();
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer1);
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer2);
+	TIMER_DEVICE_CALLBACK_MEMBER(sec_timer);
 };
 
 
@@ -512,40 +515,37 @@ UINT32 rex6000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-static TIMER_DEVICE_CALLBACK( irq_timer1 )
+TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::irq_timer1)
 {
-	rex6000_state *state = timer.machine().driver_data<rex6000_state>();
 
-	if (!(state->m_irq_mask & IRQ_FLAG_IRQ2))
+	if (!(m_irq_mask & IRQ_FLAG_IRQ2))
 	{
-		state->m_irq_flag |= IRQ_FLAG_IRQ2;
+		m_irq_flag |= IRQ_FLAG_IRQ2;
 
-		state->m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 
 }
 
-static TIMER_DEVICE_CALLBACK( irq_timer2 )
+TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::irq_timer2)
 {
-	rex6000_state *state = timer.machine().driver_data<rex6000_state>();
 
-	if (!(state->m_irq_mask & IRQ_FLAG_IRQ1))
+	if (!(m_irq_mask & IRQ_FLAG_IRQ1))
 	{
-		state->m_irq_flag |= IRQ_FLAG_IRQ1;
+		m_irq_flag |= IRQ_FLAG_IRQ1;
 
-		state->m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( sec_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::sec_timer)
 {
-	rex6000_state *state = timer.machine().driver_data<rex6000_state>();
 
-	if (!(state->m_irq_mask & IRQ_FLAG_1HZ))
+	if (!(m_irq_mask & IRQ_FLAG_1HZ))
 	{
-		state->m_irq_flag |= IRQ_FLAG_1HZ;
+		m_irq_flag |= IRQ_FLAG_1HZ;
 
-		state->m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -650,9 +650,9 @@ static MACHINE_CONFIG_START( rex6000, rex6000_state )
     MCFG_CPU_PROGRAM_MAP(rex6000_mem)
     MCFG_CPU_IO_MAP(rex6000_io)
 
-	MCFG_TIMER_ADD_PERIODIC("sec_timer", sec_timer, attotime::from_hz(1))
-	MCFG_TIMER_ADD_PERIODIC("irq_timer1", irq_timer1, attotime::from_hz(32))
-	MCFG_TIMER_ADD_PERIODIC("irq_timer2", irq_timer2, attotime::from_hz(4096))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("sec_timer", rex6000_state, sec_timer, attotime::from_hz(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer1", rex6000_state, irq_timer1, attotime::from_hz(32))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer2", rex6000_state, irq_timer2, attotime::from_hz(4096))
 
     /* video hardware */
     MCFG_SCREEN_ADD("screen", LCD)

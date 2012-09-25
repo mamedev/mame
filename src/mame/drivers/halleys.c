@@ -267,6 +267,8 @@ public:
 	UINT32 screen_update_halleys(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_benberob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(blitter_reset);
+	TIMER_DEVICE_CALLBACK_MEMBER(halleys_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(benberob_scanline);
 };
 
 
@@ -1541,9 +1543,8 @@ READ8_MEMBER(halleys_state::debug_r)
 // Interrupt and Hardware Handlers
 
 
-static TIMER_DEVICE_CALLBACK( halleys_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(halleys_state::halleys_scanline)
 {
-	halleys_state *state = timer.machine().driver_data<halleys_state>();
 	int scanline = param;
 
 	/* TODO: fix this */
@@ -1551,29 +1552,28 @@ static TIMER_DEVICE_CALLBACK( halleys_scanline )
 	{
 		case 248:
 			// clear collision list of this frame unconditionally
-			state->m_collision_count = 0;
+			m_collision_count = 0;
 			break;
 
 		// In Halley's Comet, NMI is used exclusively to handle coin input
 		case 56*3:
-			timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			break;
 
 		// FIRQ drives gameplay; we need both types of NMI each frame.
 		case 56*2:
-			state->m_mVectorType = 1; timer.machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+			m_mVectorType = 1; machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 			break;
 
 		case 56:
-			state->m_mVectorType = 0; timer.machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+			m_mVectorType = 0; machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 			break;
 	}
 }
 
 
-static TIMER_DEVICE_CALLBACK( benberob_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(halleys_state::benberob_scanline)
 {
-	halleys_state *state = timer.machine().driver_data<halleys_state>();
 	int scanline = param;
 
 	/* TODO: fix this */
@@ -1583,13 +1583,13 @@ static TIMER_DEVICE_CALLBACK( benberob_scanline )
 			break;
 
 		case 56*3:
-			timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			break;
 
 		case 56*2:
 		case 56*1:
 			// FIRQ must not happen when the blitter is being updated or it'll cause serious screen artifacts
-			if (!state->m_blitter_busy) timer.machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE); else state->m_firq_level++;
+			if (!m_blitter_busy) machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE); else m_firq_level++;
 			break;
 	}
 }
@@ -1959,7 +1959,7 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( halleys, halleys_state )
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_19_968MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(halleys_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", halleys_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", halleys_state, halleys_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_6MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -2000,7 +2000,7 @@ static MACHINE_CONFIG_DERIVED( benberob, halleys )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_19_968MHz/12) /* not verified but pcb identical to halley's comet */
 	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_CALLBACK(benberob_scanline)
+	MCFG_TIMER_DRIVER_CALLBACK(halleys_state, benberob_scanline)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(halleys_state, screen_update_benberob)

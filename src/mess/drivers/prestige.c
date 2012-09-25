@@ -111,6 +111,7 @@ public:
 	DECLARE_READ8_MEMBER( mouse_r );
 	DECLARE_WRITE8_MEMBER( mouse_w );
 	virtual void palette_init();
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 };
 
 
@@ -469,9 +470,9 @@ UINT32 prestige_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
     return 0;
 }
 
-static TIMER_DEVICE_CALLBACK( irq_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(prestige_state::irq_timer)
 {
-	timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( prestige, prestige_state )
@@ -480,7 +481,7 @@ static MACHINE_CONFIG_START( prestige, prestige_state )
     MCFG_CPU_PROGRAM_MAP(prestige_mem)
     MCFG_CPU_IO_MAP(prestige_io)
 
-	MCFG_TIMER_ADD_PERIODIC("irq_timer", irq_timer, attotime::from_msec(10))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", prestige_state, irq_timer, attotime::from_msec(10))
 
     /* video hardware */
     MCFG_SCREEN_ADD("screen", LCD)

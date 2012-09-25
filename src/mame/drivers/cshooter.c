@@ -120,6 +120,7 @@ public:
 	DECLARE_MACHINE_RESET(cshooter);
 	DECLARE_MACHINE_RESET(airraid);
 	UINT32 screen_update_cshooter(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
 };
 
 
@@ -202,15 +203,15 @@ UINT32 cshooter_state::screen_update_cshooter(screen_device &screen, bitmap_ind1
 /* main cpu */
 
 
-static TIMER_DEVICE_CALLBACK( cshooter_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(cshooter_state::cshooter_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0x10); /* RST 10h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0x10); /* RST 10h */
 
 	if(scanline == 0) // vblank-in irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
 }
 
 
@@ -439,7 +440,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( cshooter, cshooter_state )
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cshooter_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", cshooter_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cshooter_state, cshooter_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4)		 /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -466,7 +467,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( airraid, cshooter_state )
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(airraid_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", cshooter_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cshooter_state, cshooter_scanline, "screen", 0, 1)
 
 	SEIBU2_AIRRAID_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)		 /* verified on pcb */
 

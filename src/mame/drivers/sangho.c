@@ -67,6 +67,7 @@ public:
 	DECLARE_DRIVER_INIT(sangho);
 	DECLARE_MACHINE_RESET(pzlestar);
 	DECLARE_MACHINE_RESET(sexyboom);
+	TIMER_DEVICE_CALLBACK_MEMBER(sangho_interrupt);
 };
 
 
@@ -405,16 +406,15 @@ static void msx_vdp_interrupt(device_t *, v99x8_device &device, int i)
 	device.machine().device("maincpu")->execute().set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
-static TIMER_DEVICE_CALLBACK( sangho_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(sangho_state::sangho_interrupt)
 {
-	sangho_state *state = timer.machine().driver_data<sangho_state>();
 	int scanline = param;
 
 	if((scanline % 2) == 0)
 	{
-		state->m_v9958->set_sprite_limit(0);
-		state->m_v9958->set_resolution(RENDER_HIGH);
-		state->m_v9958->interrupt();
+		m_v9958->set_sprite_limit(0);
+		m_v9958->set_resolution(RENDER_HIGH);
+		m_v9958->interrupt();
 	}
 }
 
@@ -424,7 +424,7 @@ static MACHINE_CONFIG_START( pzlestar, sangho_state )
 	MCFG_CPU_ADD("maincpu", Z80,8000000) // ?
 	MCFG_CPU_PROGRAM_MAP(sangho_map)
 	MCFG_CPU_IO_MAP(pzlestar_io_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", sangho_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sangho_state, sangho_interrupt, "screen", 0, 1)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
@@ -456,7 +456,7 @@ static MACHINE_CONFIG_START( sexyboom, sangho_state )
 	MCFG_CPU_ADD("maincpu", Z80,8000000) // ?
 	MCFG_CPU_PROGRAM_MAP(sangho_map)
 	MCFG_CPU_IO_MAP(sexyboom_io_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", sangho_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sangho_state, sangho_interrupt, "screen", 0, 1)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 

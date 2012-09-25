@@ -97,6 +97,7 @@ public:
 	DECLARE_DRIVER_INIT(iq151);
 	INTERRUPT_GEN_MEMBER(iq151_vblank_interrupt);
 	DECLARE_INPUT_CHANGED_MEMBER(iq151_break);
+	TIMER_DEVICE_CALLBACK_MEMBER(cassette_timer);
 };
 
 READ8_MEMBER(iq151_state::keyboard_row_r)
@@ -334,13 +335,12 @@ static IRQ_CALLBACK(iq151_irq_callback)
 	return pic8259_acknowledge(state->m_pic);
 }
 
-static TIMER_DEVICE_CALLBACK( cassette_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(iq151_state::cassette_timer)
 {
-	iq151_state *state = timer.machine().driver_data<iq151_state>();
 
-	state->m_cassette_clk ^= 1;
+	m_cassette_clk ^= 1;
 
-	state->m_cassette->output((state->m_cassette_data & 1) ^ (state->m_cassette_clk & 1) ? +1 : -1);
+	m_cassette->output((m_cassette_data & 1) ^ (m_cassette_clk & 1) ? +1 : -1);
 }
 
 DRIVER_INIT_MEMBER(iq151_state,iq151)
@@ -457,7 +457,7 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_I8255_ADD("ppi8255", iq151_ppi8255_intf)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, iq151_cassette_interface )
-	MCFG_TIMER_ADD_PERIODIC("cassette_timer", cassette_timer, attotime::from_hz(2000))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", iq151_state, cassette_timer, attotime::from_hz(2000))
 
 	/* cartridge */
 	MCFG_IQ151_CARTRIDGE_ADD("slot1", iq151_cart_interface, iq151_cart, NULL, NULL)

@@ -105,13 +105,13 @@ public:
 	UINT8	m_wx318;	/* data of 74ls374 labeled wx318 */
 	UINT8	m_wx319;	/* data of 74sl374 labeled wx319 */
 	virtual void palette_init();
+	TIMER_DEVICE_CALLBACK_MEMBER(exelv_hblank_interrupt);
 };
 
 
-static TIMER_DEVICE_CALLBACK( exelv_hblank_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(exelv_state::exelv_hblank_interrupt)
 {
-	exelv_state *exelv = timer.machine().driver_data<exelv_state>();
-	exelv->m_tms3556->interrupt(timer.machine());
+	m_tms3556->interrupt(machine());
 }
 
 #ifdef UNUSED_FUNCTION
@@ -530,7 +530,7 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 	MCFG_CPU_ADD("maincpu", TMS7000_EXL, XTAL_4_9152MHz)	/* TMS7020 */
 	MCFG_CPU_PROGRAM_MAP(tms7020_mem)
 	MCFG_CPU_IO_MAP(tms7020_port)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", exelv_hblank_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("tms7041", TMS7000, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(tms7041_map)
@@ -570,7 +570,7 @@ static MACHINE_CONFIG_START( exeltel, exelv_state )
 	MCFG_CPU_ADD("maincpu", TMS7000_EXL, XTAL_4_9152MHz)	/* TMS7040 */
 	MCFG_CPU_PROGRAM_MAP(tms7040_mem)
 	MCFG_CPU_IO_MAP(tms7020_port)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", exelv_hblank_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("tms7042", TMS7000, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(tms7042_map)

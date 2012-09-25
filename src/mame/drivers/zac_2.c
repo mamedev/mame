@@ -27,6 +27,8 @@ public:
 	UINT8 m_out_offs;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_p_ram;
+	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_inttimer);
+	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_outtimer);
 protected:
 
 	// devices
@@ -173,28 +175,26 @@ void zac_2_state::machine_reset()
 	m_t_c = 0;
 }
 
-static TIMER_DEVICE_CALLBACK( zac_2_inttimer )
+TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_inttimer)
 {
 	// a pulse is sent via a capacitor (similar to what one finds at a reset pin)
-	zac_2_state *state = timer.machine().driver_data<zac_2_state>();
-	if (state->m_t_c > 0x80)
-		generic_pulse_irq_line_and_vector(state->m_maincpu, INPUT_LINE_IRQ0, 0xbf, 2);
+	if (m_t_c > 0x80)
+		generic_pulse_irq_line_and_vector(m_maincpu, INPUT_LINE_IRQ0, 0xbf, 2);
 	else
-		state->m_t_c++;
+		m_t_c++;
 }
 
-static TIMER_DEVICE_CALLBACK( zac_2_outtimer )
+TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_outtimer)
 {
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
-	zac_2_state *state = timer.machine().driver_data<zac_2_state>();
-	state->m_out_offs++;
+	m_out_offs++;
 // displays, solenoids, lamps
 
-	if (state->m_out_offs < 0x40)
+	if (m_out_offs < 0x40)
 	{
-		UINT8 display = (state->m_out_offs >> 3) & 7;
-		UINT8 digit = state->m_out_offs & 7;
-		output_set_digit_value(display * 10 + digit, patterns[state->m_p_ram[state->m_out_offs]&15]);
+		UINT8 display = (m_out_offs >> 3) & 7;
+		UINT8 digit = m_out_offs & 7;
+		output_set_digit_value(display * 10 + digit, patterns[m_p_ram[m_out_offs]&15]);
 	}
 }
 
@@ -205,8 +205,8 @@ static MACHINE_CONFIG_START( zac_2, zac_2_state )
 	MCFG_CPU_IO_MAP(zac_2_io)
 	MCFG_NVRAM_ADD_0FILL("ram")
 
-	MCFG_TIMER_ADD_PERIODIC("zac_2_inttimer", zac_2_inttimer, attotime::from_hz(200))
-	MCFG_TIMER_ADD_PERIODIC("zac_2_outtimer", zac_2_outtimer, attotime::from_hz(187500))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_2_inttimer", zac_2_state, zac_2_inttimer, attotime::from_hz(200))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_2_outtimer", zac_2_state, zac_2_outtimer, attotime::from_hz(187500))
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_zac_2)

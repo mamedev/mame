@@ -52,6 +52,8 @@ public:
 	UINT8 m_int_vector;
 	virtual void machine_reset();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(vsync_callback);
 };
 
 
@@ -382,14 +384,13 @@ static INPUT_PORTS_START( fk1 )
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 INPUT_PORTS_END
 
-static TIMER_DEVICE_CALLBACK(keyboard_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(fk1_state::keyboard_callback)
 {
-	fk1_state *state = timer.machine().driver_data<fk1_state>();
 
-	if (timer.machine().root_device().ioport("LINE0")->read())
+	if (machine().root_device().ioport("LINE0")->read())
 	{
-		state->m_int_vector = 6;
-		timer.machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+		m_int_vector = 6;
+		machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -412,12 +413,11 @@ static IRQ_CALLBACK (fk1_irq_callback)
 	return state->m_int_vector * 2;
 }
 
-static TIMER_DEVICE_CALLBACK( vsync_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(fk1_state::vsync_callback)
 {
-	fk1_state *state = timer.machine().driver_data<fk1_state>();
 
-	state->m_int_vector = 3;
-	timer.machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+	m_int_vector = 3;
+	machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -482,8 +482,8 @@ static MACHINE_CONFIG_START( fk1, fk1_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("80K") // 64 + 16
 
-	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(24000))
-	MCFG_TIMER_ADD_PERIODIC("vsync_timer", vsync_callback, attotime::from_hz(50))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", fk1_state, keyboard_callback, attotime::from_hz(24000))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("vsync_timer", fk1_state, vsync_callback, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
 /* ROM definition */

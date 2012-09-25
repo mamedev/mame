@@ -58,6 +58,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vt100_vertical_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 };
 
 
@@ -115,22 +116,21 @@ static UINT8 bit_sel(UINT8 data)
 	return 0;
 }
 
-static TIMER_DEVICE_CALLBACK(keyboard_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(vt100_state::keyboard_callback)
 {
-	vt100_state *state = timer.machine().driver_data<vt100_state>();
 	UINT8 i, code;
 	char kbdrow[8];
-	if (state->m_key_scan)
+	if (m_key_scan)
 	{
 		for(i = 0; i < 16; i++)
 		{
 			sprintf(kbdrow,"LINE%X", i);
-			code =	timer.machine().root_device().ioport(kbdrow)->read();
+			code =	machine().root_device().ioport(kbdrow)->read();
 			if (code < 0xff)
 			{
-				state->m_keyboard_int = 1;
-				state->m_key_code = i | bit_sel(code);
-				timer.machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+				m_keyboard_int = 1;
+				m_key_code = i | bit_sel(code);
+				machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 				break;
 			}
 		}
@@ -436,7 +436,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(800))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", vt100_state, keyboard_callback, attotime::from_hz(800))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( vt180, vt100 )

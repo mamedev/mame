@@ -37,6 +37,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_spectrum(screen_device &screen, bool state);
+	TIMER_DEVICE_CALLBACK_MEMBER(spec_interrupt_hack);
 };
 
 
@@ -294,20 +295,19 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static TIMER_DEVICE_CALLBACK( spec_interrupt_hack )
+TIMER_DEVICE_CALLBACK_MEMBER(photon2_state::spec_interrupt_hack)
 {
-	photon2_state *state = timer.machine().driver_data<photon2_state>();
 	int scanline = param;
 
 	if (scanline == SPEC_SCREEN_HEIGHT/2)
 	{
-		state->m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 	else if(scanline == 0)
 	{
-		if ( state->m_nmi_enable )
+		if ( m_nmi_enable )
 		{
-			state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 }
@@ -322,7 +322,7 @@ static MACHINE_CONFIG_START( photon2, photon2_state )
 	MCFG_CPU_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(spectrum_mem)
 	MCFG_CPU_IO_MAP(spectrum_io)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", spec_interrupt_hack, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", photon2_state, spec_interrupt_hack, "screen", 0, 1)
 
 
     /* video hardware */

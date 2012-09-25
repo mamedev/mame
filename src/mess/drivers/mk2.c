@@ -73,6 +73,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mk2_write_b);
 	UINT8 m_led[5];
 	virtual void machine_start();
+	TIMER_DEVICE_CALLBACK_MEMBER(update_leds);
 };
 
 
@@ -112,20 +113,19 @@ static INPUT_PORTS_START( mk2 )
 INPUT_PORTS_END
 
 
-static TIMER_DEVICE_CALLBACK( update_leds )
+TIMER_DEVICE_CALLBACK_MEMBER(mk2_state::update_leds)
 {
-	mk2_state *state = timer.machine().driver_data<mk2_state>();
 	int i;
 
 	for (i=0; i<4; i++)
-		output_set_digit_value(i, state->m_led[i]);
+		output_set_digit_value(i, m_led[i]);
 
-	output_set_led_value(0, BIT(state->m_led[4], 3));
-	output_set_led_value(1, BIT(state->m_led[4], 5));
-	output_set_led_value(2, BIT(state->m_led[4], 4));
-	output_set_led_value(3, BIT(state->m_led[4], 4) ? 0 : 1);
+	output_set_led_value(0, BIT(m_led[4], 3));
+	output_set_led_value(1, BIT(m_led[4], 5));
+	output_set_led_value(2, BIT(m_led[4], 4));
+	output_set_led_value(3, BIT(m_led[4], 4) ? 0 : 1);
 
-	state->m_led[0]= state->m_led[1]= state->m_led[2]= state->m_led[3]= state->m_led[4]= 0;
+	m_led[0]= m_led[1]= m_led[2]= m_led[3]= m_led[4]= 0;
 }
 
 void mk2_state::machine_start()
@@ -207,7 +207,7 @@ static MACHINE_CONFIG_START( mk2, mk2_state )
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_TIMER_ADD_PERIODIC("led_timer", update_leds, attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", mk2_state, update_leds, attotime::from_hz(60))
 MACHINE_CONFIG_END
 
 

@@ -99,6 +99,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(video_timer_callback);
 };
 
 
@@ -250,11 +251,11 @@ UINT32 firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-static TIMER_DEVICE_CALLBACK( video_timer_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(firefox_state::video_timer_callback)
 {
-	timer.machine().primary_screen->update_now();
+	machine().primary_screen->update_now();
 
-	timer.machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE );
+	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE );
 }
 
 static void set_rgba( running_machine &machine, int start, int index, unsigned char *palette_ram )
@@ -701,7 +702,7 @@ static MACHINE_CONFIG_START( firefox, firefox_state )
 	MCFG_CPU_ADD("maincpu", M6809E, MASTER_XTAL/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	/* interrupts count starting at end of VBLANK, which is 44, so add 44 */
-	MCFG_TIMER_ADD_SCANLINE("32v", video_timer_callback, "screen", 96+44, 128)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", firefox_state, video_timer_callback, "screen", 96+44, 128)
 
 	MCFG_CPU_ADD("audiocpu", M6502, MASTER_XTAL/8)
 	MCFG_CPU_PROGRAM_MAP(audio_map)

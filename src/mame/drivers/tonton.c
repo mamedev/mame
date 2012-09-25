@@ -43,6 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ay_bout_w);
 	virtual void machine_start();
 	virtual void machine_reset();
+	TIMER_DEVICE_CALLBACK_MEMBER(tonton_interrupt);
 };
 
 #define MAIN_CLOCK XTAL_21_4772MHz
@@ -202,12 +203,11 @@ void tonton_state::machine_reset()
 *      R/W Handlers and Interrupt Routines       *
 *************************************************/
 
-static TIMER_DEVICE_CALLBACK( tonton_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(tonton_state::tonton_interrupt)
 {
-	tonton_state *state = timer.machine().driver_data<tonton_state>();
-	state->m_v9938->set_sprite_limit(0);
-	state->m_v9938->set_resolution(0);
-	state->m_v9938->interrupt();
+	m_v9938->set_sprite_limit(0);
+	m_v9938->set_resolution(0);
+	m_v9938->interrupt();
 }
 
 
@@ -255,7 +255,7 @@ static MACHINE_CONFIG_START( tonton, tonton_state )
 	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/6)	/* Guess. According to other MSX2 based gambling games */
 	MCFG_CPU_PROGRAM_MAP(tonton_map)
 	MCFG_CPU_IO_MAP(tonton_io)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", tonton_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tonton_state, tonton_interrupt, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

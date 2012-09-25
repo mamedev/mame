@@ -53,6 +53,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_p_ram;
 	required_device<samples_device> m_samples;
+	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_inttimer);
+	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_outtimer);
 protected:
 
 	// devices
@@ -201,44 +203,42 @@ void zac_1_state::machine_reset()
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( zac_1_inttimer )
+TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_inttimer)
 {
-	zac_1_state *state = timer.machine().driver_data<zac_1_state>();
-	if (state->m_t_c > 0x40)
+	if (m_t_c > 0x40)
 	{
-		UINT8 vector = (state->ioport("TEST")->read() ) ? 0x10 : 0x18;
-		state->m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, vector);
+		UINT8 vector = (ioport("TEST")->read() ) ? 0x10 : 0x18;
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, vector);
 	}
 	else
-		state->m_t_c++;
+		m_t_c++;
 }
 
 /* scores = 1800-182D; solenoids = 1840-1853;
    lamps = 1880-18BF; bookkeeping=18C0-18FF. 4-tone osc=1854-1857.
    182E-183F is a storage area for inputs. */
-static TIMER_DEVICE_CALLBACK( zac_1_outtimer )
+TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_outtimer)
 {
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
-	zac_1_state *state = timer.machine().driver_data<zac_1_state>();
-	state->m_out_offs++;
+	m_out_offs++;
 
-	if (state->m_out_offs < 0x40)
+	if (m_out_offs < 0x40)
 	{
-		UINT8 display = (state->m_out_offs >> 3) & 7;
-		UINT8 digit = state->m_out_offs & 7;
-		output_set_digit_value(display * 10 + digit, patterns[state->m_p_ram[state->m_out_offs]&15]);
+		UINT8 display = (m_out_offs >> 3) & 7;
+		UINT8 digit = m_out_offs & 7;
+		output_set_digit_value(display * 10 + digit, patterns[m_p_ram[m_out_offs]&15]);
 	}
 	else
-	if (state->m_out_offs == 0x4a) // outhole
+	if (m_out_offs == 0x4a) // outhole
 	{
-		if (BIT(state->m_p_ram[state->m_out_offs], 0))
-			state->m_samples->start(0, 5);
+		if (BIT(m_p_ram[m_out_offs], 0))
+			m_samples->start(0, 5);
 	}
 	else
-	if (state->m_out_offs == 0x4b) // knocker (not strapids)
+	if (m_out_offs == 0x4b) // knocker (not strapids)
 	{
-		if (BIT(state->m_p_ram[state->m_out_offs], 0))
-			state->m_samples->start(0, 6);
+		if (BIT(m_p_ram[m_out_offs], 0))
+			m_samples->start(0, 6);
 	}
 }
 
@@ -249,8 +249,8 @@ static MACHINE_CONFIG_START( zac_1, zac_1_state )
 	MCFG_CPU_IO_MAP(zac_1_io)
 	MCFG_NVRAM_ADD_0FILL("ram")
 
-	MCFG_TIMER_ADD_PERIODIC("zac_1_inttimer", zac_1_inttimer, attotime::from_hz(200))
-	MCFG_TIMER_ADD_PERIODIC("zac_1_outtimer", zac_1_outtimer, attotime::from_hz(187500))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_1_inttimer", zac_1_state, zac_1_inttimer, attotime::from_hz(200))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_1_outtimer", zac_1_state, zac_1_outtimer, attotime::from_hz(187500))
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_zac_1)

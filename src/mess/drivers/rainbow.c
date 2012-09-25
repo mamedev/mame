@@ -133,6 +133,7 @@ private:
 public:	
 	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
 };
 
 void rainbow_state::machine_start()
@@ -390,12 +391,11 @@ WRITE_LINE_MEMBER(rainbow_state::kbd_txready_w)
     update_kbd_irq();
 }
 
-static TIMER_DEVICE_CALLBACK( keyboard_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::keyboard_tick)
 {
-	rainbow_state *state = timer.machine().driver_data<rainbow_state>();
 
-    state->m_kbd8251->transmit_clock();
-    state->m_kbd8251->receive_clock();
+    m_kbd8251->transmit_clock();
+    m_kbd8251->receive_clock();
 }
 
 static const vt_video_interface video_interface =
@@ -488,7 +488,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","rainbow")
 
 	MCFG_I8251_ADD("kbdser", i8251_intf)
-	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, attotime::from_hz(4800))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", rainbow_state, keyboard_tick, attotime::from_hz(4800))
 
     MCFG_LK201_ADD()
 MACHINE_CONFIG_END

@@ -124,6 +124,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_INPUT_CHANGED_MEMBER(kim1_reset);
+	TIMER_DEVICE_CALLBACK_MEMBER(kim1_cassette_input);
+	TIMER_DEVICE_CALLBACK_MEMBER(kim1_update_leds);
 };
 
 
@@ -265,34 +267,32 @@ static MOS6530_INTERFACE( kim1_u3_mos6530_interface )
 };
 
 
-static TIMER_DEVICE_CALLBACK( kim1_cassette_input )
+TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_cassette_input)
 {
-	kim1_state *state = timer.machine().driver_data<kim1_state>();
-	double tap_val = state->m_cass->input();
+	double tap_val = m_cass->input();
 
 	if ( tap_val <= 0 )
 	{
-		if ( state->m_cassette_high_count )
+		if ( m_cassette_high_count )
 		{
-			state->m_311_output = ( state->m_cassette_high_count < 8 ) ? 0x80 : 0;
-			state->m_cassette_high_count = 0;
+			m_311_output = ( m_cassette_high_count < 8 ) ? 0x80 : 0;
+			m_cassette_high_count = 0;
 		}
 	}
 
 	if ( tap_val > 0 )
-		state->m_cassette_high_count++;
+		m_cassette_high_count++;
 }
 
 
-static TIMER_DEVICE_CALLBACK( kim1_update_leds )
+TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_update_leds)
 {
-	kim1_state *state = timer.machine().driver_data<kim1_state>();
 	UINT8 i;
 
 	for ( i = 0; i < 6; i++ )
 	{
-		if ( state->m_led_time[i] )
-			state->m_led_time[i]--;
+		if ( m_led_time[i] )
+			m_led_time[i]--;
 		else
 			output_set_digit_value( i, 0 );
 	}
@@ -348,8 +348,8 @@ static MACHINE_CONFIG_START( kim1, kim1_state )
 	MCFG_MOS6530_ADD( "miot_u2", 1000000, kim1_u2_mos6530_interface )
 	MCFG_MOS6530_ADD( "miot_u3", 1000000, kim1_u3_mos6530_interface )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, kim1_cassette_interface )
-	MCFG_TIMER_ADD_PERIODIC("led_timer", kim1_update_leds, attotime::from_hz(60))
-	MCFG_TIMER_ADD_PERIODIC("cassette_timer", kim1_cassette_input, attotime::from_hz(44100))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", kim1_state, kim1_update_leds, attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", kim1_state, kim1_cassette_input, attotime::from_hz(44100))
 MACHINE_CONFIG_END
 
 

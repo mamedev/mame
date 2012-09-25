@@ -49,6 +49,7 @@ protected:
 	virtual void machine_reset();
 public:
 	DECLARE_DRIVER_INIT(rowamet);
+	TIMER_DEVICE_CALLBACK_MEMBER(rowamet_timer);
 };
 
 
@@ -119,15 +120,14 @@ DRIVER_INIT_MEMBER(rowamet_state,rowamet)
 {
 }
 
-static TIMER_DEVICE_CALLBACK( rowamet_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(rowamet_state::rowamet_timer)
 {
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
-	rowamet_state *state = timer.machine().driver_data<rowamet_state>();
-	state->m_out_offs &= 15;
+	m_out_offs &= 15;
 
-	UINT8 digit = state->m_out_offs << 1;
-	output_set_digit_value(digit, patterns[state->m_p_ram[state->m_out_offs]>>4]);
-	output_set_digit_value(++digit, patterns[state->m_p_ram[state->m_out_offs++]&15]);
+	UINT8 digit = m_out_offs << 1;
+	output_set_digit_value(digit, patterns[m_p_ram[m_out_offs]>>4]);
+	output_set_digit_value(++digit, patterns[m_p_ram[m_out_offs++]&15]);
 }
 
 static MACHINE_CONFIG_START( rowamet, rowamet_state )
@@ -137,7 +137,7 @@ static MACHINE_CONFIG_START( rowamet, rowamet_state )
 	MCFG_CPU_ADD("cpu2", Z80, 1888888)
 	MCFG_CPU_PROGRAM_MAP(rowamet_sub_map)
 	MCFG_CPU_IO_MAP(rowamet_sub_io)
-	MCFG_TIMER_ADD_PERIODIC("rowamet_timer", rowamet_timer, attotime::from_hz(200))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("rowamet_timer", rowamet_state, rowamet_timer, attotime::from_hz(200))
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_rowamet)

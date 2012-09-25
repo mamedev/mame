@@ -128,6 +128,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_hvyunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_hvyunit(screen_device &screen, bool state);
+	TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_scanline);
 };
 
 
@@ -624,17 +625,16 @@ GFXDECODE_END
  *************************************/
 
 /* Main Z80 uses IM2 */
-static TIMER_DEVICE_CALLBACK( hvyunit_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::hvyunit_scanline)
 {
-	hvyunit_state *state = timer.machine().driver_data<hvyunit_state>();
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		state->m_master_cpu->execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd);
+		m_master_cpu->execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd);
 
 	/* Pandora "sprite end dma" irq? TODO: timing is likely off */
 	if(scanline == 64)
-		state->m_master_cpu->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_master_cpu->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 static const kaneko_pandora_interface hvyunit_pandora_config =
@@ -656,7 +656,7 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 	MCFG_CPU_ADD("master", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(master_memory)
 	MCFG_CPU_IO_MAP(master_io)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", hvyunit_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hvyunit_state, hvyunit_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(slave_memory)

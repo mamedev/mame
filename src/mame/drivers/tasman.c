@@ -37,6 +37,7 @@ public:
 	DECLARE_DRIVER_INIT(kingtut);
 	DECLARE_VIDEO_START(kongambl);
 	UINT32 screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(kongambl_vblank);
 };
 
 
@@ -579,22 +580,21 @@ static const k053247_interface k053247_intf =
 	kongambl_sprite_callback
 };
 
-static TIMER_DEVICE_CALLBACK( kongambl_vblank )
+TIMER_DEVICE_CALLBACK_MEMBER(kongambl_state::kongambl_vblank)
 {
-	kongambl_state *state = timer.machine().driver_data<kongambl_state>();
 	int scanline = param;
 
 	if(scanline == 512)
-		state->m_maincpu->set_input_line(1, HOLD_LINE); // vblank?
+		m_maincpu->set_input_line(1, HOLD_LINE); // vblank?
 
 	if(scanline == 0)
-		state->m_maincpu->set_input_line(3, HOLD_LINE); // sprite irq?
+		m_maincpu->set_input_line(3, HOLD_LINE); // sprite irq?
 }
 
 static MACHINE_CONFIG_START( kongambl, kongambl_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, 25000000)
 	MCFG_CPU_PROGRAM_MAP(kongambl_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", kongambl_vblank, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kongambl_state, kongambl_vblank, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sndcpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(kongamaud_map)

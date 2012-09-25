@@ -269,6 +269,7 @@ public:
 	DECLARE_MACHINE_RESET(mpu4_vid);
 	DECLARE_VIDEO_START(mpu4_vid);
 	UINT32 screen_update_mpu4_vid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_callback);
 };
 
 
@@ -1496,11 +1497,10 @@ ADDRESS_MAP_END
 
 
 
-static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(mpu4vid_state::scanline_timer_callback)
 {
-	mpu4vid_state *state = timer.machine().driver_data<mpu4vid_state>();
 
-	state->m_scn2674->scn2674_do_scanline(timer.machine(), param);
+	m_scn2674->scn2674_do_scanline(machine(), param);
 }
 
 
@@ -1545,7 +1545,7 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4vid_state )
 	MCFG_ACIA6850_ADD("acia6850_1", m68k_acia_if)
 
 	// for the video timing
-	MCFG_TIMER_ADD_SCANLINE("scan_timer", scanline_timer_callback, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", mpu4vid_state, scanline_timer_callback, "screen", 0, 1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( crmaze, mpu4_vid )

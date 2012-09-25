@@ -56,6 +56,7 @@ public:
 	bool m_step;
 	virtual void machine_reset();
 	virtual void machine_start();
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 };
 
 
@@ -220,9 +221,8 @@ static const z80_daisy_config babbage_daisy_chain[] =
 	{ NULL }
 };
 
-static TIMER_DEVICE_CALLBACK( keyboard_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 {
-	babbage_state *state = timer.machine().driver_data<babbage_state>();
 
 	UINT8 i, j, inp;
 	char kbdrow[6];
@@ -231,7 +231,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 	for (i = 0; i < 4; i++)
 	{
 		sprintf(kbdrow,"X%X",i);
-		inp = timer.machine().root_device().ioport(kbdrow)->read();
+		inp = machine().root_device().ioport(kbdrow)->read();
 
 		for (j = 0; j < 5; j++)
 			if (BIT(inp, j))
@@ -239,19 +239,19 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 	}
 
 	/* make sure only one keystroke */
-	if (data != state->m_prev_key)
-		state->m_prev_key = data;
+	if (data != m_prev_key)
+		m_prev_key = data;
 	else
 		data = 0xff;
 
 	/* while key is down, activate strobe. When key released, deactivate strobe which causes an interrupt */
 	if (data < 0xff)
 	{
-		state->m_key = data;
-		state->m_pio_2->strobe(0, 0);
+		m_key = data;
+		m_pio_2->strobe(0, 0);
 	}
 	else
-		state->m_pio_2->strobe(0, 1);
+		m_pio_2->strobe(0, 1);
 }
 
 
@@ -276,7 +276,7 @@ static MACHINE_CONFIG_START( babbage, babbage_state )
 	MCFG_Z80PIO_ADD( "z80pio_1", MAIN_CLOCK, babbage_z80pio1_intf )
 	MCFG_Z80PIO_ADD( "z80pio_2", MAIN_CLOCK, babbage_z80pio2_intf )
 
-	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(30))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", babbage_state, keyboard_callback, attotime::from_hz(30))
 MACHINE_CONFIG_END
 
 

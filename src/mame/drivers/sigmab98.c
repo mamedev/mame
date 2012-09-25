@@ -178,6 +178,7 @@ public:
 	UINT32 screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sammymdl(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(gegege_vblank_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(sammymd1_irq);
 };
 
 
@@ -1785,26 +1786,25 @@ MACHINE_CONFIG_END
                                  Animal Catch
 ***************************************************************************/
 
-static TIMER_DEVICE_CALLBACK( sammymd1_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(sigmab98_state::sammymd1_irq)
 {
-	sigmab98_state *state = timer.machine().driver_data<sigmab98_state>();
 	int scanline = param;
 
 	if(scanline == 240)
-		state->m_maincpu->set_input_line_and_vector(0,HOLD_LINE, state->m_vblank_vector);
+		m_maincpu->set_input_line_and_vector(0,HOLD_LINE, m_vblank_vector);
 
 	if(scanline == 128)
-		state->m_maincpu->set_input_line_and_vector(0,HOLD_LINE, state->m_timer0_vector);
+		m_maincpu->set_input_line_and_vector(0,HOLD_LINE, m_timer0_vector);
 
 	if(scanline == 32)
-		state->m_maincpu->set_input_line_and_vector(0,HOLD_LINE, state->m_timer1_vector);
+		m_maincpu->set_input_line_and_vector(0,HOLD_LINE, m_timer1_vector);
 }
 
 static MACHINE_CONFIG_DERIVED( animalc, sammymdl )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( animalc_map )
 	MCFG_CPU_IO_MAP( animalc_io )
-	MCFG_TIMER_ADD_SCANLINE("scantimer", sammymd1_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sigmab98_state, sammymd1_irq, "screen", 0, 1)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -1815,7 +1815,7 @@ static MACHINE_CONFIG_DERIVED( haekaka, sammymdl )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( haekaka_map )
 	MCFG_CPU_IO_MAP( haekaka_io )
-	MCFG_TIMER_ADD_SCANLINE("scantimer", sammymd1_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sigmab98_state, sammymd1_irq, "screen", 0, 1)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -1826,7 +1826,7 @@ static MACHINE_CONFIG_DERIVED( itazuram, sammymdl )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( itazuram_map )
 	MCFG_CPU_IO_MAP( itazuram_io )
-	MCFG_TIMER_ADD_SCANLINE("scantimer", sammymd1_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sigmab98_state, sammymd1_irq, "screen", 0, 1)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -1837,7 +1837,7 @@ static MACHINE_CONFIG_DERIVED( pyenaget, sammymdl )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( haekaka_map )
 	MCFG_CPU_IO_MAP( pyenaget_io )
-	MCFG_TIMER_ADD_SCANLINE("scantimer", sammymd1_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sigmab98_state, sammymd1_irq, "screen", 0, 1)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -1848,7 +1848,7 @@ static MACHINE_CONFIG_DERIVED( tdoboon, sammymdl )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( tdoboon_map )
 	MCFG_CPU_IO_MAP( tdoboon_io )
-	MCFG_TIMER_ADD_SCANLINE("scantimer", sammymd1_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sigmab98_state, sammymd1_irq, "screen", 0, 1)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0,0x140-1, 0+4,0xf0+4-1)

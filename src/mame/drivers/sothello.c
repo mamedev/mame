@@ -68,6 +68,7 @@ public:
 	virtual void machine_reset();
 	TIMER_CALLBACK_MEMBER(subcpu_suspend);
 	TIMER_CALLBACK_MEMBER(subcpu_resume);
+	TIMER_DEVICE_CALLBACK_MEMBER(sothello_interrupt);
 };
 
 
@@ -324,10 +325,9 @@ static void sothello_vdp_interrupt(device_t *, v99x8_device &device, int i)
     device.machine().device("maincpu")->execute().set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
-static TIMER_DEVICE_CALLBACK( sothello_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(sothello_state::sothello_interrupt)
 {
-	sothello_state *state = timer.machine().driver_data<sothello_state>();
-    state->m_v9938->interrupt();
+    m_v9938->interrupt();
 }
 
 static void adpcm_int(device_t *device)
@@ -369,7 +369,7 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
     MCFG_CPU_ADD("maincpu",Z80, MAINCPU_CLOCK)
     MCFG_CPU_PROGRAM_MAP(maincpu_mem_map)
     MCFG_CPU_IO_MAP(maincpu_io_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", sothello_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sothello_state, sothello_interrupt, "screen", 0, 1)
 
     MCFG_CPU_ADD("soundcpu",Z80, SOUNDCPU_CLOCK)
     MCFG_CPU_PROGRAM_MAP(soundcpu_mem_map)

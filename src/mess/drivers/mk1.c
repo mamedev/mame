@@ -56,6 +56,7 @@ public:
 	UINT8 m_f8[2];
 	UINT8 m_led[4];
 	virtual void machine_start();
+	TIMER_DEVICE_CALLBACK_MEMBER(mk1_update_leds);
 };
 
 
@@ -146,16 +147,15 @@ static INPUT_PORTS_START( mk1 )
 INPUT_PORTS_END
 
 
-static TIMER_DEVICE_CALLBACK( mk1_update_leds )
+TIMER_DEVICE_CALLBACK_MEMBER(mk1_state::mk1_update_leds)
 {
-	mk1_state *state = timer.machine().driver_data<mk1_state>();
 	UINT8 i;
 
 	for ( i = 0; i < 4; i++ )
 	{
-		output_set_digit_value( i, state->m_led[i] >> 1 );
-		output_set_led_value( i, state->m_led[i] & 0x01 );
-		state->m_led[i] = 0;
+		output_set_digit_value( i, m_led[i] >> 1 );
+		output_set_led_value( i, m_led[i] & 0x01 );
+		m_led[i] = 0;
 	}
 }
 
@@ -192,7 +192,7 @@ static MACHINE_CONFIG_START( mk1, mk1_state )
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_mk1 )
 
-	MCFG_TIMER_ADD_PERIODIC("led_timer", mk1_update_leds, attotime::from_hz(30))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", mk1_state, mk1_update_leds, attotime::from_hz(30))
 MACHINE_CONFIG_END
 
 

@@ -199,6 +199,7 @@ public:
 	UINT32 screen_update_royalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(suzume_irq);
 	INTERRUPT_GEN_MEMBER(mjtensin_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(janptr96_interrupt);
 };
 
 
@@ -3291,16 +3292,15 @@ static MACHINE_CONFIG_DERIVED( mjderngr, dondenmj )
 MACHINE_CONFIG_END
 
 /* It runs in IM 2, thus needs a vector on the data bus */
-static TIMER_DEVICE_CALLBACK( janptr96_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(royalmah_state::janptr96_interrupt)
 {
-	royalmah_state *state = timer.machine().driver_data<royalmah_state>();
 	int scanline = param;
 
 	if(scanline == 248)
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x80);	// vblank
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x80);	// vblank
 
 	if(scanline == 0)
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x84);	// demo
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x84);	// demo
 }
 
 WRITE_LINE_MEMBER(royalmah_state::janptr96_rtc_irq)
@@ -3319,7 +3319,7 @@ static MACHINE_CONFIG_DERIVED( janptr96, mjderngr )
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_16MHz/2)	/* 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(janptr96_map)
 	MCFG_CPU_IO_MAP(janptr96_iomap)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", janptr96_interrupt, "screen", 0, 1)	/* IM 2 needs a vector on the data bus */
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", royalmah_state, janptr96_interrupt, "screen", 0, 1)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)

@@ -240,6 +240,9 @@ public:
 	DECLARE_MACHINE_START(meritm_crt260);
 	DECLARE_MACHINE_START(merit_common);
 	UINT32 screen_update_meritm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(meritm_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(vblank_start_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(vblank_end_tick);
 };
 
 
@@ -422,20 +425,19 @@ static const microtouch_interface meritm_microtouch_config =
  *************************************/
 
 
-static TIMER_DEVICE_CALLBACK( meritm_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::meritm_interrupt)
 {
-	meritm_state *state = timer.machine().driver_data<meritm_state>();
 	int scanline = param;
 
 	if((scanline % 2) == 0)
 	{
-		state->m_v9938_0->set_sprite_limit(0);
-		state->m_v9938_0->set_resolution(RENDER_HIGH);
-		state->m_v9938_0->interrupt();
+		m_v9938_0->set_sprite_limit(0);
+		m_v9938_0->set_resolution(RENDER_HIGH);
+		m_v9938_0->interrupt();
 
-		state->m_v9938_1->set_sprite_limit(0);
-		state->m_v9938_1->set_resolution(RENDER_HIGH);
-		state->m_v9938_1->interrupt();
+		m_v9938_1->set_sprite_limit(0);
+		m_v9938_1->set_resolution(RENDER_HIGH);
+		m_v9938_1->interrupt();
 	}
 }
 
@@ -1150,20 +1152,18 @@ MACHINE_START_MEMBER(meritm_state,meritm_crt260)
 #define MSX2_VISIBLE_XBORDER_PIXELS	8 * 2
 #define MSX2_VISIBLE_YBORDER_PIXELS	14 * 2
 
-static TIMER_DEVICE_CALLBACK( vblank_start_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_start_tick)
 {
-	meritm_state *state = timer.machine().driver_data<meritm_state>();
 	/* this is a workaround to signal the v9938 vblank interrupt correctly */
-	state->m_vint = 0x08;
-	state->m_z80pio_0->port_a_write(state->m_vint);
+	m_vint = 0x08;
+	m_z80pio_0->port_a_write(m_vint);
 }
 
-static TIMER_DEVICE_CALLBACK( vblank_end_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_end_tick)
 {
-	meritm_state *state = timer.machine().driver_data<meritm_state>();
 	/* this is a workaround to signal the v9938 vblank interrupt correctly */
-	state->m_vint = 0x18;
-	state->m_z80pio_0->port_a_write(state->m_vint);
+	m_vint = 0x18;
+	m_z80pio_0->port_a_write(m_vint);
 }
 
 static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
@@ -1171,7 +1171,7 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	MCFG_CPU_PROGRAM_MAP(meritm_crt250_map)
 	MCFG_CPU_IO_MAP(meritm_crt250_io_map)
 	MCFG_CPU_CONFIG(meritm_daisy_chain)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", meritm_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", meritm_state, meritm_interrupt, "screen", 0, 1)
 
 
 	MCFG_I8255A_ADD( "ppi8255", crt250_ppi8255_intf )
@@ -1179,8 +1179,8 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	MCFG_Z80PIO_ADD( "z80pio_0", SYSTEM_CLK/6, meritm_audio_pio_intf )
 	MCFG_Z80PIO_ADD( "z80pio_1", SYSTEM_CLK/6, meritm_io_pio_intf )
 
-	MCFG_TIMER_ADD_SCANLINE("vblank_start", vblank_start_tick, "screen", 259, 262)
-	MCFG_TIMER_ADD_SCANLINE("vblank_end",   vblank_end_tick,   "screen", 262, 262)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_start", meritm_state, vblank_start_tick, "screen", 259, 262)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_end", meritm_state, vblank_end_tick, "screen", 262, 262)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

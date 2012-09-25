@@ -183,6 +183,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_galsnew(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(expro02_scanline);
 };
 
 
@@ -497,16 +498,16 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static TIMER_DEVICE_CALLBACK( expro02_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(expro02_state::expro02_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 224) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 	else if(scanline == 0) // vblank-in irq?
-		timer.machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 	else if(scanline == 112) // VDP end task? (controls sprite colors in gameplay)
-		timer.machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 }
 
 void expro02_state::machine_reset()
@@ -547,7 +548,7 @@ static MACHINE_CONFIG_START( galsnew, expro02_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(galsnew_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", expro02_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", expro02_state, expro02_scanline, "screen", 0, 1)
 
 	/* CALC01 MCU @ 16Mhz (unknown type, simulated) */
 

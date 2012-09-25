@@ -167,6 +167,8 @@ public:
 	DECLARE_VIDEO_START(xtrain);
 	UINT32 screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(am188em_int0_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(am188em_timer2_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(h8_timer_irq);
 };
 
 
@@ -870,11 +872,10 @@ INTERRUPT_GEN_MEMBER(subsino2_state::am188em_int0_irq)
 		device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x0c);	// INT0 (background scrolling in xplan)
 }
 
-static TIMER_DEVICE_CALLBACK( am188em_timer2_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(subsino2_state::am188em_timer2_irq)
 {
-	subsino2_state *state = timer.machine().driver_data<subsino2_state>();
-	if ((state->m_am188em_regs[AM188EM_IMASK+0] & 0x01) == 0)	// TMR mask
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0x4c/4);
+	if ((m_am188em_regs[AM188EM_IMASK+0] & 0x01) == 0)	// TMR mask
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0x4c/4);
 }
 
 /***************************************************************************
@@ -882,9 +883,9 @@ static TIMER_DEVICE_CALLBACK( am188em_timer2_irq )
 ***************************************************************************/
 
 // To be removed when cpu core is updated
-static TIMER_DEVICE_CALLBACK( h8_timer_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(subsino2_state::h8_timer_irq)
 {
-	timer.machine().device("maincpu")->execute().set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
 
@@ -2178,7 +2179,7 @@ static MACHINE_CONFIG_START( bishjan, subsino2_state )
 	MCFG_CPU_ADD("maincpu", H83044, XTAL_44_1MHz / 3)
 	MCFG_CPU_PROGRAM_MAP( bishjan_map )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state,  irq0_line_hold)
-	MCFG_TIMER_ADD_PERIODIC("timer", h8_timer_irq, attotime::from_hz(60)) // timer, ?? Hz
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", subsino2_state, h8_timer_irq, attotime::from_hz(60))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
@@ -2238,7 +2239,7 @@ static MACHINE_CONFIG_START( saklove, subsino2_state )
 	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz )	// !! AMD AM188-EM !!
 	MCFG_CPU_PROGRAM_MAP( saklove_map )
 	MCFG_CPU_IO_MAP( saklove_io )
-	MCFG_TIMER_ADD_PERIODIC("timer2", am188em_timer2_irq, attotime::from_hz(60)) // timer 2, ?? Hz
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer2", subsino2_state, am188em_timer2_irq, attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET_OVERRIDE(subsino2_state,am188em)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -2275,7 +2276,7 @@ static MACHINE_CONFIG_START( xplan, subsino2_state )
 	MCFG_CPU_PROGRAM_MAP( xplan_map )
 	MCFG_CPU_IO_MAP( xplan_io )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state,  am188em_int0_irq)
-	MCFG_TIMER_ADD_PERIODIC("timer2", am188em_timer2_irq, attotime::from_hz(60)) // timer 2, ?? Hz
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer2", subsino2_state, am188em_timer2_irq, attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET_OVERRIDE(subsino2_state,am188em)
 	MCFG_NVRAM_ADD_0FILL("nvram")

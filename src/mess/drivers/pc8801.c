@@ -453,6 +453,7 @@ public:
 	DECLARE_MACHINE_RESET(pc8801_cdrom);
 	INTERRUPT_GEN_MEMBER(pc8801_vrtc_irq);
 	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
+	TIMER_DEVICE_CALLBACK_MEMBER(pc8801_rtc_irq);
 };
 
 
@@ -2338,12 +2339,13 @@ static void pc8801_sound_irq( device_t *device, int irq )
 		pc8801_raise_irq(device->machine(),1<<(4),1);
 }
 
-static TIMER_DEVICE_CALLBACK( pc8801_rtc_irq )
+/*
+TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::pc8801_rtc_irq)
 {
-	pc8801_state *state = timer.machine().driver_data<pc8801_state>();
-	if(state->m_timer_irq_mask)
-		pc8801_raise_irq(timer.machine(),1<<(2),1);
+	if(m_timer_irq_mask)
+		pc8801_raise_irq(machine(),1<<(2),1);
 }
+*/
 
 INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
 {
@@ -2400,14 +2402,13 @@ static void pc8801_sound_irq( device_t *device, int irq )
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( pc8801_rtc_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::pc8801_rtc_irq)
 {
-	pc8801_state *state = timer.machine().driver_data<pc8801_state>();
-	if(state->m_timer_irq_mask && state->m_i8214_irq_level >= 3)
+	if(m_timer_irq_mask && m_i8214_irq_level >= 3)
 	{
-		state->m_timer_irq_latch = 1;
+		m_timer_irq_latch = 1;
 		//IRQ_LOG(("timer\n"));
-		timer.machine().device("maincpu")->execute().set_input_line(0,HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(0,HOLD_LINE);
 	}
 }
 
@@ -2713,7 +2714,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_TIMER_ADD_PERIODIC("rtc_timer", pc8801_rtc_irq, attotime::from_hz(600))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", pc8801_state, pc8801_rtc_irq, attotime::from_hz(600))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc8801fh, pc8801 )

@@ -27,6 +27,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
 	UINT32 screen_update_rotaryf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_interrupt);
 };
 
 
@@ -40,17 +41,16 @@ public:
  *
  *************************************/
 
-static TIMER_DEVICE_CALLBACK( rotaryf_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_state::rotaryf_interrupt)
 {
-	rotaryf_state *state = timer.machine().driver_data<rotaryf_state>();
 	int scanline = param;
 
 	if (scanline == 256)
-		state->m_maincpu->set_input_line(I8085_RST55_LINE, HOLD_LINE);
+		m_maincpu->set_input_line(I8085_RST55_LINE, HOLD_LINE);
 	else if((scanline % 64) == 0)
 	{
-		state->m_maincpu->set_input_line(I8085_RST75_LINE, ASSERT_LINE);
-		state->m_maincpu->set_input_line(I8085_RST75_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(I8085_RST75_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 	}
 }
 
@@ -171,7 +171,7 @@ static MACHINE_CONFIG_START( rotaryf, rotaryf_state )
 	MCFG_CPU_ADD("maincpu",I8085A,4000000) /* ?? MHz */
 	MCFG_CPU_PROGRAM_MAP(rotaryf_map)
 	MCFG_CPU_IO_MAP(rotaryf_io_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", rotaryf_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", rotaryf_state, rotaryf_interrupt, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

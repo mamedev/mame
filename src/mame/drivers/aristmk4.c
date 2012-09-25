@@ -325,6 +325,7 @@ public:
 	TIMER_CALLBACK_MEMBER(note_input_reset);
 	TIMER_CALLBACK_MEMBER(coin_input_reset);
 	TIMER_CALLBACK_MEMBER(hopper_reset);
+	TIMER_DEVICE_CALLBACK_MEMBER(aristmk4_pf);
 };
 
 /* Partial Cashcade protocol */
@@ -1656,7 +1657,7 @@ void aristmk4_state::machine_reset()
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( aristmk4_pf )
+TIMER_DEVICE_CALLBACK_MEMBER(aristmk4_state::aristmk4_pf)
 {
 	/*
     IRQ generator pulses the NMI signal to CPU in the event of power down or power failure.
@@ -1674,9 +1675,9 @@ static TIMER_DEVICE_CALLBACK( aristmk4_pf )
     Note: The use of 1 Hz in the timer is to avoid unintentional triggering the NMI ( ie.. hold down L for at least 1 second )
     */
 
-	if(timer.machine().root_device().ioport("powerfail")->read()) // send NMI signal if L pressed
+	if(machine().root_device().ioport("powerfail")->read()) // send NMI signal if L pressed
 	{
-	timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE );
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE );
 	}
 }
 
@@ -1687,7 +1688,7 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aristmk4_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_TIMER_ADD_PERIODIC("power_fail", aristmk4_pf,attotime::from_hz(1)) // not real but required to simulate power failure to access robot test. How else can we do this ?
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("power_fail", aristmk4_state, aristmk4_pf, attotime::from_hz(1))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

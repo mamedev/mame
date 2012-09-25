@@ -203,6 +203,7 @@ public:
 	}
 	virtual void video_start();
 	UINT32 screen_update_littlerb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_scanline);
 };
 
 
@@ -565,30 +566,29 @@ UINT32 littlerb_state::screen_update_littlerb(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-static TIMER_DEVICE_CALLBACK( littlerb_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_scanline)
 {
-	littlerb_state *state = timer.machine().driver_data<littlerb_state>();
 	int scanline = param;
 
 	if((scanline % 2) == 0)
 	{
 		UINT8 res;
-		UINT8 *sample_rom = state->memregion("samples")->base();
+		UINT8 *sample_rom = memregion("samples")->base();
 
-		res = sample_rom[state->m_sound_pointer_l|(state->m_sound_index_l<<10)|0x40000];
-		state->m_dacl->write_signed8(res);
-		res = sample_rom[state->m_sound_pointer_r|(state->m_sound_index_r<<10)|0x00000];
-		state->m_dacr->write_signed8(res);
-		state->m_sound_pointer_l++;
-		state->m_sound_pointer_l&=0x3ff;
-		state->m_sound_pointer_r++;
-		state->m_sound_pointer_r&=0x3ff;
+		res = sample_rom[m_sound_pointer_l|(m_sound_index_l<<10)|0x40000];
+		m_dacl->write_signed8(res);
+		res = sample_rom[m_sound_pointer_r|(m_sound_index_r<<10)|0x00000];
+		m_dacr->write_signed8(res);
+		m_sound_pointer_l++;
+		m_sound_pointer_l&=0x3ff;
+		m_sound_pointer_r++;
+		m_sound_pointer_r&=0x3ff;
 	}
 
 //  logerror("IRQ\n");
 	if(scanline == 288)
 	{
-		state->m_maincpu->set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 	}
 }
 
@@ -827,7 +827,7 @@ static void littlerb_draw_sprites(running_machine &machine)
 static MACHINE_CONFIG_START( littlerb, littlerb_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(littlerb_main)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", littlerb_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", littlerb_state, littlerb_scanline, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50) // guess based on high vertical resolution

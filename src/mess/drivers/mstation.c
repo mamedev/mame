@@ -88,6 +88,8 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void palette_init();
+	TIMER_DEVICE_CALLBACK_MEMBER(mstation_1hz_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(mstation_kb_timer);
 };
 
 READ8_MEMBER( mstation_state::flash_0x0000_read_handler )
@@ -469,22 +471,20 @@ WRITE_LINE_MEMBER( mstation_state::rtc_irq )
 	refresh_ints();
 }
 
-static TIMER_DEVICE_CALLBACK( mstation_1hz_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(mstation_state::mstation_1hz_timer)
 {
-	mstation_state *state = timer.machine().driver_data<mstation_state>();
 
-	state->m_irq |= (1<<4);
+	m_irq |= (1<<4);
 
-	state->refresh_ints();
+	refresh_ints();
 }
 
-static TIMER_DEVICE_CALLBACK( mstation_kb_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(mstation_state::mstation_kb_timer)
 {
-	mstation_state *state = timer.machine().driver_data<mstation_state>();
 
-	state->m_irq |= (1<<1);
+	m_irq |= (1<<1);
 
-	state->refresh_ints();
+	refresh_ints();
 }
 
 void mstation_state::palette_init()
@@ -519,10 +519,10 @@ static MACHINE_CONFIG_START( mstation, mstation_state )
 	MCFG_AMD_29F080_ADD("flash1")	//SST-28SF040
 
 	// IRQ 4 is generated every second, used for auto power off
-	MCFG_TIMER_ADD_PERIODIC("1hz_timer", mstation_1hz_timer, attotime::from_hz(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz_timer", mstation_state, mstation_1hz_timer, attotime::from_hz(1))
 
 	// IRQ 1 is used for scan the kb and for cursor blinking
-	MCFG_TIMER_ADD_PERIODIC("kb_timer", mstation_kb_timer, attotime::from_hz(50))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", mstation_state, mstation_kb_timer, attotime::from_hz(50))
 
 	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)
 

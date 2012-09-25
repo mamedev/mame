@@ -150,6 +150,10 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_vboy_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_vboy_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_main_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_pad_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
+	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineR);
 };
 
 
@@ -1213,19 +1217,17 @@ void vboy_state::m_timer_tick()
     }
 }
 
-static TIMER_DEVICE_CALLBACK( timer_main_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::timer_main_tick)
 {
-	vboy_state *state = timer.machine().driver_data<vboy_state>();
 
-    state->m_timer_tick();
+    m_timer_tick();
 }
 
-static TIMER_DEVICE_CALLBACK( timer_pad_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::timer_pad_tick)
 {
-	vboy_state *state = timer.machine().driver_data<vboy_state>();
 
-	if((state->m_vboy_regs.kcr & 0x80) == 0)
-		state->m_maincpu->set_input_line(0, HOLD_LINE);
+	if((m_vboy_regs.kcr & 0x80) == 0)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 void vboy_state::palette_init()
@@ -1299,21 +1301,19 @@ void vboy_state::m_scanline_tick(int scanline, UINT8 screen_type)
 
 }
 
-static TIMER_DEVICE_CALLBACK( vboy_scanlineL )
+TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::vboy_scanlineL)
 {
-	vboy_state *state = timer.machine().driver_data<vboy_state>();
 	int scanline = param;
 
-	state->m_scanline_tick(scanline,0);
+	m_scanline_tick(scanline,0);
 }
 
 #if 0
-static TIMER_DEVICE_CALLBACK( vboy_scanlineR )
+TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::vboy_scanlineR)
 {
-	vboy_state *state = timer.machine().driver_data<vboy_state>();
 	int scanline = param;
 
-	//state->m_scanline_tick(scanline,1);
+	//m_scanline_tick(scanline,1);
 }
 #endif
 
@@ -1425,15 +1425,15 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_CPU_ADD( "maincpu", V810, XTAL_20MHz )
 	MCFG_CPU_PROGRAM_MAP(vboy_mem)
 	MCFG_CPU_IO_MAP(vboy_io)
-	MCFG_TIMER_ADD_SCANLINE("scantimer_l", vboy_scanlineL, "3dleft", 0, 1)
-	//MCFG_TIMER_ADD_SCANLINE("scantimer_r", vboy_scanlineR, "3dright", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer_l", vboy_state, vboy_scanlineL, "3dleft", 0, 1)
+	//MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer_r", vboy_state, vboy_scanlineR, "3dright", 0, 1)
 
 
     // programmable timer
-	MCFG_TIMER_ADD("timer_main", timer_main_tick)
+	MCFG_TIMER_DRIVER_ADD("timer_main", vboy_state, timer_main_tick)
 
     // pad ready, which should be once per VBL
-	MCFG_TIMER_ADD_PERIODIC("timer_pad", timer_pad_tick, attotime::from_hz(50.038029f))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_pad", vboy_state, timer_pad_tick, attotime::from_hz(50.038029f))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_vboy)

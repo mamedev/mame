@@ -80,6 +80,7 @@ public:
 	DECLARE_DRIVER_INIT(csplayh7);
 	DECLARE_DRIVER_INIT(junai2);
 	virtual void machine_reset();
+	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
 };
 
 
@@ -596,19 +597,18 @@ void csplayh5_state::machine_reset()
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( csplayh5_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_state::csplayh5_irq)
 {
-	csplayh5_state *state = timer.machine().driver_data<csplayh5_state>();
 	int scanline = param;
 
 	if(scanline == 212*2)
-		state->m_maincpu->set_input_line_and_vector(1, HOLD_LINE,0x100/4);
+		m_maincpu->set_input_line_and_vector(1, HOLD_LINE,0x100/4);
 
 	if((scanline % 2) == 0)
 	{
-		state->m_v9958->set_sprite_limit(0);
-		state->m_v9958->set_resolution(RENDER_HIGH);
-		state->m_v9958->interrupt();
+		m_v9958->set_sprite_limit(0);
+		m_v9958->set_resolution(RENDER_HIGH);
+		m_v9958->interrupt();
 	}
 }
 
@@ -624,7 +624,7 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,16000000) /* TMP68301-16 */
 	MCFG_CPU_PROGRAM_MAP(csplayh5_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", csplayh5_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", csplayh5_state, csplayh5_irq, "screen", 0, 1)
 
 #if USE_H8
 	MCFG_CPU_ADD("subcpu", H83002, 16000000)	/* unknown clock */

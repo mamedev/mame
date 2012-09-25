@@ -41,6 +41,7 @@ public:
 
 	UINT8 m_port_f2;
 	virtual void machine_reset();
+	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
 };
 
 
@@ -97,12 +98,11 @@ void h89_state::machine_reset()
 {
 }
 
-static TIMER_DEVICE_CALLBACK( h89_irq_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
 {
-	h89_state *state = timer.machine().driver_data<h89_state>();
 
-	if (state->m_port_f2 & 0x02)
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);
+	if (m_port_f2 & 0x02)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);
 }
 
 WRITE8_MEMBER( h89_state::port_f2_w )
@@ -149,7 +149,7 @@ static MACHINE_CONFIG_START( h89, h89_state )
 
 	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 9600)
 
-	MCFG_TIMER_ADD_PERIODIC("irq_timer", h89_irq_timer, attotime::from_hz(100))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", h89_state, h89_irq_timer, attotime::from_hz(100))
 MACHINE_CONFIG_END
 
 /* ROM definition */

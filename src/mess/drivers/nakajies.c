@@ -335,6 +335,7 @@ public:
 	UINT8	*m_bank_base[8];
 	virtual void palette_init();
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
 };
 
 
@@ -674,24 +675,23 @@ UINT32 nakajies_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-static TIMER_DEVICE_CALLBACK( kb_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(nakajies_state::kb_timer)
 {
-	nakajies_state *state = timer.machine().driver_data<nakajies_state>();
 
-	if (state->m_matrix > 0x09)
+	if (m_matrix > 0x09)
 	{
 		// reset the keyboard scan
-		state->m_matrix = 0;
-		state->m_irq_active |= 0x20;
+		m_matrix = 0;
+		m_irq_active |= 0x20;
 	}
 	else
 	{
 		// next row
-		state->m_matrix++;
-		state->m_irq_active |= 0x10;
+		m_matrix++;
+		m_irq_active |= 0x10;
 	}
 
-	state->nakajies_update_irqs(timer.machine());
+	nakajies_update_irqs(machine());
 }
 
 
@@ -759,7 +759,7 @@ static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 	/* rtc */
 	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)
 
-	MCFG_TIMER_ADD_PERIODIC("kb_timer", kb_timer, attotime::from_hz(250))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", nakajies_state, kb_timer, attotime::from_hz(250))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dator3k, nakajies210 )

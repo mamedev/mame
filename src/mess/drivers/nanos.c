@@ -57,6 +57,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 };
 
 
@@ -348,21 +349,20 @@ static UINT8 row_number(UINT8 code) {
 	return 0;
 }
 
-static TIMER_DEVICE_CALLBACK(keyboard_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(nanos_state::keyboard_callback)
 {
-	nanos_state *state = timer.machine().driver_data<nanos_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6" };
 
 	int i;
 	UINT8 code;
 	UINT8 key_code = 0;
-	UINT8 shift = timer.machine().root_device().ioport("LINEC")->read() & 0x02 ? 1 : 0;
-	UINT8 ctrl =  timer.machine().root_device().ioport("LINEC")->read() & 0x01 ? 1 : 0;
-	state->m_key_pressed = 0xff;
+	UINT8 shift = machine().root_device().ioport("LINEC")->read() & 0x02 ? 1 : 0;
+	UINT8 ctrl =  machine().root_device().ioport("LINEC")->read() & 0x01 ? 1 : 0;
+	m_key_pressed = 0xff;
 	for(i = 0; i < 7; i++)
 	{
 
-		code =	timer.machine().root_device().ioport(keynames[i])->read();
+		code =	machine().root_device().ioport(keynames[i])->read();
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {
@@ -424,11 +424,11 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 					case 7: key_code = 0x0A; break; // LF
 				}
 			}
-			state->m_last_code = key_code;
+			m_last_code = key_code;
 		}
 	}
 	if (key_code==0){
-		state->m_key_pressed = 0xf7;
+		m_key_pressed = 0xf7;
 	}
 }
 
@@ -548,7 +548,7 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
-	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(24000))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", nanos_state, keyboard_callback, attotime::from_hz(24000))
 MACHINE_CONFIG_END
 
 /* ROM definition */
