@@ -86,8 +86,8 @@ private:
 	void vidc_dynamic_res_change();	
 	void latch_timer_cnt(int tmr);
 	void a310_set_timer(int tmr);
-	READ32_MEMBER(ioc_ctrl_r);
-	WRITE32_MEMBER(ioc_ctrl_w);
+	DECLARE_READ32_MEMBER(ioc_ctrl_r);
+	DECLARE_WRITE32_MEMBER(ioc_ctrl_w);
 
 	UINT32 *m_archimedes_memc_physmem;
 	UINT32 m_memc_pagesize;

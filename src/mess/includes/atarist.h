@@ -305,15 +305,15 @@ public:
 
 	void video_start();
 
-	READ8_MEMBER( shifter_base_low_r );
-	WRITE8_MEMBER( shifter_base_low_w );
-	READ8_MEMBER( shifter_counter_r );
-	WRITE8_MEMBER( shifter_counter_w );
-	WRITE16_MEMBER( shifter_palette_w );
-	READ8_MEMBER( shifter_lineofs_r );
-	WRITE8_MEMBER( shifter_lineofs_w );
-	READ8_MEMBER( shifter_pixelofs_r );
-	WRITE8_MEMBER( shifter_pixelofs_w );
+	DECLARE_READ8_MEMBER( shifter_base_low_r );
+	DECLARE_WRITE8_MEMBER( shifter_base_low_w );
+	DECLARE_READ8_MEMBER( shifter_counter_r );
+	DECLARE_WRITE8_MEMBER( shifter_counter_w );
+	DECLARE_WRITE16_MEMBER( shifter_palette_w );
+	DECLARE_READ8_MEMBER( shifter_lineofs_r );
+	DECLARE_WRITE8_MEMBER( shifter_lineofs_w );
+	DECLARE_READ8_MEMBER( shifter_pixelofs_r );
+	DECLARE_WRITE8_MEMBER( shifter_pixelofs_w );
 
 	DECLARE_READ8_MEMBER( sound_dma_control_r );
 	DECLARE_READ8_MEMBER( sound_dma_base_r );

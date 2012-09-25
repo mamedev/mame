@@ -44,11 +44,11 @@ public:
 	s3520cf_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
-	READ_LINE_MEMBER( read_bit );
-	WRITE_LINE_MEMBER( set_dir_line );
-	WRITE_LINE_MEMBER( set_cs_line );
-	WRITE_LINE_MEMBER( set_clock_line );
-	WRITE_LINE_MEMBER( write_bit );
+	DECLARE_READ_LINE_MEMBER( read_bit );
+	DECLARE_WRITE_LINE_MEMBER( set_dir_line );
+	DECLARE_WRITE_LINE_MEMBER( set_cs_line );
+	DECLARE_WRITE_LINE_MEMBER( set_clock_line );
+	DECLARE_WRITE_LINE_MEMBER( write_bit );
 	void timer_callback();
 
 protected:

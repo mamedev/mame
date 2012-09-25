@@ -68,17 +68,17 @@ public:
 	}
 
 	// YM2151 chip callbacks
-	WRITE_LINE_MEMBER( sound_cpu_irq );
+	DECLARE_WRITE_LINE_MEMBER( sound_cpu_irq );
 
 	// main CPU read/write handlers
-	READ16_MEMBER( analog_r );
-	WRITE16_MEMBER( analog_w );
-	READ16_MEMBER( io_chip_r );
-	WRITE16_MEMBER( io_chip_w );
-	WRITE16_MEMBER( sound_data_w );
+	DECLARE_READ16_MEMBER( analog_r );
+	DECLARE_WRITE16_MEMBER( analog_w );
+	DECLARE_READ16_MEMBER( io_chip_r );
+	DECLARE_WRITE16_MEMBER( io_chip_w );
+	DECLARE_WRITE16_MEMBER( sound_data_w );
 
 	// sound Z80 CPU read/write handlers
-	READ8_MEMBER( sound_data_r );
+	DECLARE_READ8_MEMBER( sound_data_r );
 
 	// game-specific output handlers
 	void gforce2_output_cb2(UINT16 data);

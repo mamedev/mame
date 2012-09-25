@@ -79,7 +79,7 @@ public:
 
 	// reads for both host and peripherals
 	UINT8 dio_r();
-	READ8_MEMBER( dio_r );
+	DECLARE_READ8_MEMBER( dio_r );
 	DECLARE_READ_LINE_MEMBER( eoi_r );
 	DECLARE_READ_LINE_MEMBER( dav_r );
 	DECLARE_READ_LINE_MEMBER( nrfd_r );
@@ -91,7 +91,7 @@ public:
 
 	// writes for host (driver_device)
 	void dio_w(UINT8 data);
-	WRITE8_MEMBER( dio_w );
+	DECLARE_WRITE8_MEMBER( dio_w );
 	DECLARE_WRITE_LINE_MEMBER( eoi_w );
 	DECLARE_WRITE_LINE_MEMBER( dav_w );
 	DECLARE_WRITE_LINE_MEMBER( nrfd_w );

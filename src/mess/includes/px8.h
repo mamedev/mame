@@ -46,14 +46,14 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	READ8_MEMBER( gah40m_r );
-	WRITE8_MEMBER( gah40m_w );
-	READ8_MEMBER( gah40s_r );
-	WRITE8_MEMBER( gah40s_w );
-	WRITE8_MEMBER( gah40s_ier_w );
-	READ8_MEMBER( krtn_0_3_r );
-	READ8_MEMBER( krtn_4_7_r );
-	WRITE8_MEMBER( ksc_w );
+	DECLARE_READ8_MEMBER( gah40m_r );
+	DECLARE_WRITE8_MEMBER( gah40m_w );
+	DECLARE_READ8_MEMBER( gah40s_r );
+	DECLARE_WRITE8_MEMBER( gah40s_w );
+	DECLARE_WRITE8_MEMBER( gah40s_ier_w );
+	DECLARE_READ8_MEMBER( krtn_0_3_r );
+	DECLARE_READ8_MEMBER( krtn_4_7_r );
+	DECLARE_WRITE8_MEMBER( ksc_w );
 
 	void bankswitch();
 	UINT8 krtn_read();

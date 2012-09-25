@@ -37,8 +37,8 @@ class psxrcnt_device : public device_t
 public:
 	psxrcnt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	WRITE32_MEMBER( write );
-	READ32_MEMBER( read );
+	DECLARE_WRITE32_MEMBER( write );
+	DECLARE_READ32_MEMBER( read );
 
 protected:
 	virtual void device_start();

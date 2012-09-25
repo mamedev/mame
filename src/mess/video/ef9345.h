@@ -39,8 +39,8 @@ public:
     ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device interface
-	READ8_MEMBER( data_r );
-	WRITE8_MEMBER( data_w );
+	DECLARE_READ8_MEMBER( data_r );
+	DECLARE_WRITE8_MEMBER( data_w );
 	void update_scanline(UINT16 scanline);
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

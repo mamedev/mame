@@ -125,10 +125,10 @@ public:
 	psxcpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// public interfaces
-	WRITE32_MEMBER( biu_w );
-	READ32_MEMBER( biu_r );
-	WRITE32_MEMBER( berr_w );
-	READ32_MEMBER( berr_r );
+	DECLARE_WRITE32_MEMBER( biu_w );
+	DECLARE_READ32_MEMBER( biu_r );
+	DECLARE_WRITE32_MEMBER( berr_w );
+	DECLARE_READ32_MEMBER( berr_r );
 
 	static psxcpu_device *getcpu( device_t &device, const char *cputag );
 	static void install_sio_handler( device_t &device, const char *cputag, int n_port, psx_sio_handler p_f_sio_handler );

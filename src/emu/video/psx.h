@@ -181,8 +181,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	WRITE32_MEMBER( write );
-	READ32_MEMBER( read );
+	DECLARE_WRITE32_MEMBER( write );
+	DECLARE_READ32_MEMBER( read );
 	void dma_read( UINT32 n_address, INT32 n_size );
 	void dma_write( UINT32 n_address, INT32 n_size );
 	void lightgun_set( int, int );

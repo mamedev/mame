@@ -41,7 +41,7 @@ public:
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
-	WRITE_LINE_MEMBER( set_cs_line );
+	DECLARE_WRITE_LINE_MEMBER( set_cs_line );
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual const rom_entry *device_rom_region() const;

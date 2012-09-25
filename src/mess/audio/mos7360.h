@@ -127,8 +127,8 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// horrible crap code
-	WRITE_LINE_MEMBER( rom_switch_w );
-	READ_LINE_MEMBER( rom_switch_r );
+	DECLARE_WRITE_LINE_MEMBER( rom_switch_w );
+	DECLARE_READ_LINE_MEMBER( rom_switch_r );
 	void frame_interrupt_gen();
 	void raster_interrupt_gen();
 

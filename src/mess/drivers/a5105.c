@@ -52,7 +52,7 @@ public:
 	DECLARE_WRITE8_MEMBER(key_mux_w);
 	DECLARE_WRITE8_MEMBER(a5105_ab_w);
 	DECLARE_WRITE8_MEMBER(a5105_memsel_w);
-	WRITE8_MEMBER( a5105_upd765_w );
+	DECLARE_WRITE8_MEMBER( a5105_upd765_w );
 	DECLARE_WRITE8_MEMBER(pcg_addr_w);
 	DECLARE_WRITE8_MEMBER(pcg_val_w);
 	required_shared_ptr<UINT8> m_video_ram;

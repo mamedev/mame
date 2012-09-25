@@ -69,8 +69,8 @@ public:
 
 	void install_handler( int n_port, psx_sio_handler p_f_sio_handler );
 
-	WRITE32_MEMBER( write );
-	READ32_MEMBER( read );
+	DECLARE_WRITE32_MEMBER( write );
+	DECLARE_READ32_MEMBER( read );
 
 	void input( int n_port, int n_mask, int n_data );
 

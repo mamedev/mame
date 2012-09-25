@@ -46,12 +46,12 @@ class h19_state : public driver_device
 public:
 	h19_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_crtc(*this, "crtc"),
-	m_ace(*this, "ins8250"),
-	m_beep(*this, BEEPER_TAG)
-	,
-		m_p_videoram(*this, "p_videoram"){ }
+		  m_maincpu(*this, "maincpu"),
+		  m_crtc(*this, "crtc"),
+		  m_ace(*this, "ins8250"),
+		  m_beep(*this, BEEPER_TAG),
+		  m_p_videoram(*this, "p_videoram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -60,7 +60,7 @@ public:
 	DECLARE_READ8_MEMBER(h19_80_r);
 	DECLARE_READ8_MEMBER(h19_a0_r);
 	DECLARE_WRITE8_MEMBER(h19_c0_w);
-	WRITE8_MEMBER(h19_kbd_put);
+	DECLARE_WRITE8_MEMBER(h19_kbd_put);
 	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 *m_p_chargen;
 	UINT8 m_term_data;

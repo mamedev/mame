@@ -37,8 +37,8 @@ public:
 	void install_read_handler( int n_channel, psx_dma_read_delegate p_fn_dma_read );
 	void install_write_handler( int n_channel, psx_dma_read_delegate p_fn_dma_write );
 
-	WRITE32_MEMBER( write );
-	READ32_MEMBER( read );
+	DECLARE_WRITE32_MEMBER( write );
+	DECLARE_READ32_MEMBER( read );
 
 protected:
 	virtual void device_start();

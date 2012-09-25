@@ -52,7 +52,7 @@ private:
 	UINT8 m_select;
 
 	// methods
-	WRITE8_MEMBER(ff7f_write);
+	DECLARE_WRITE8_MEMBER(ff7f_write);
 	cococart_slot_device *active_scs_slot(void);
 	cococart_slot_device *active_cts_slot(void);
 	void set_select(UINT8 new_select);

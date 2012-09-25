@@ -55,15 +55,15 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	READ8_MEMBER( gfxram_r );
-	WRITE8_MEMBER( gfxram_w );
-	READ8_MEMBER( keyboard_r );
-	WRITE8_MEMBER( keyboard_w );
-	WRITE8_MEMBER( video_mode_w );
-	WRITE8_MEMBER( palette_w );
-	WRITE8_MEMBER( system_w );
-	WRITE_LINE_MEMBER( ctc_z1_w );
-	WRITE8_MEMBER( video_scroll_w );
+	DECLARE_READ8_MEMBER( gfxram_r );
+	DECLARE_WRITE8_MEMBER( gfxram_w );
+	DECLARE_READ8_MEMBER( keyboard_r );
+	DECLARE_WRITE8_MEMBER( keyboard_w );
+	DECLARE_WRITE8_MEMBER( video_mode_w );
+	DECLARE_WRITE8_MEMBER( palette_w );
+	DECLARE_WRITE8_MEMBER( system_w );
+	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
+	DECLARE_WRITE8_MEMBER( video_scroll_w );
 
 	void bankswitch();
 

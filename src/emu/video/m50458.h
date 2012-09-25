@@ -52,9 +52,9 @@ public:
 	m50458_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
-	WRITE_LINE_MEMBER( write_bit );
-	WRITE_LINE_MEMBER( set_cs_line );
-	WRITE_LINE_MEMBER( set_clock_line );
+	DECLARE_WRITE_LINE_MEMBER( write_bit );
+	DECLARE_WRITE_LINE_MEMBER( set_cs_line );
+	DECLARE_WRITE_LINE_MEMBER( set_clock_line );
 	DECLARE_WRITE16_MEMBER(vreg_120_w);
 	DECLARE_WRITE16_MEMBER(vreg_121_w);
 	DECLARE_WRITE16_MEMBER(vreg_122_w);

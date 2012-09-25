@@ -242,7 +242,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
 
-	WRITE_LINE_MEMBER( keyboard_interrupt );
+	DECLARE_WRITE_LINE_MEMBER( keyboard_interrupt );
 
 	geneve_keyboard_device*	m_keyboard;
 	geneve_mouse_device*	m_mouse;
@@ -252,10 +252,10 @@ public:
 	tms9995_device*			m_cpu;
 	joyport_device*			m_joyport;
 
-	WRITE_LINE_MEMBER( inta );
-	WRITE_LINE_MEMBER( intb );
-	WRITE_LINE_MEMBER( ext_ready );
-	WRITE_LINE_MEMBER( mapper_ready );
+	DECLARE_WRITE_LINE_MEMBER( inta );
+	DECLARE_WRITE_LINE_MEMBER( intb );
+	DECLARE_WRITE_LINE_MEMBER( ext_ready );
+	DECLARE_WRITE_LINE_MEMBER( mapper_ready );
 
 	DECLARE_DRIVER_INIT(geneve);
 	virtual void machine_start();

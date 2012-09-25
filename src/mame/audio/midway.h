@@ -111,7 +111,7 @@ public:
 
 	// internal communications
 	INTERRUPT_GEN_MEMBER(clock_14024);
-	READ8_MEMBER(irq_clear);
+	DECLARE_READ8_MEMBER(irq_clear);
 	DECLARE_WRITE8_MEMBER(status_w);
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(porta0_w);

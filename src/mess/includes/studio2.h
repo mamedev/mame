@@ -40,10 +40,10 @@ public:
 	DECLARE_READ8_MEMBER( dispon_r );
 	DECLARE_WRITE8_MEMBER( keylatch_w );
 	DECLARE_WRITE8_MEMBER( dispon_w );
-	READ_LINE_MEMBER( clear_r );
-	READ_LINE_MEMBER( ef3_r );
-	READ_LINE_MEMBER( ef4_r );
-	WRITE_LINE_MEMBER( q_w );
+	DECLARE_READ_LINE_MEMBER( clear_r );
+	DECLARE_READ_LINE_MEMBER( ef3_r );
+	DECLARE_READ_LINE_MEMBER( ef4_r );
+	DECLARE_WRITE_LINE_MEMBER( q_w );
 	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
 
 	/* keyboard state */
