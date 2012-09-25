@@ -102,4 +102,17 @@
 		</part>
 	</software>
 
+	<software name="wordresu">
+		<description>Word Result</description>
+		<year>198?</year>
+		<publisher>Handic Software</publisher>
+		
+		<part name="cart" interface="cbm2_cart">
+			<dataarea name="bank1" size="0x1000">
+				<!-- this is the Commodore 64 character generator ROM, used as a copy protection dongle -->
+				<rom name="901225-01.bin" size="0x1000" crc="ec4272ee" sha1="adc7c31e18c7c7413d54802ef2f4193da14711aa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
