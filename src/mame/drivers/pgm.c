@@ -488,16 +488,15 @@ GFXDECODE_END
 
 /* most games require IRQ4 for inputs to work, Puzzli 2 is explicit about not wanting it tho
    what is the source? */
-TIMER_DEVICE_CALLBACK( pgm_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(pgm_state::pgm_interrupt)
 {
-	pgm_state *state = timer.machine().driver_data<pgm_state>();
 	int scanline = param;
 
 	if(scanline == 224)
-		state->m_maincpu->set_input_line(6, HOLD_LINE);
+		m_maincpu->set_input_line(6, HOLD_LINE);
 
 	if(scanline == 0)
-		if (!state->m_irq4_disabled) state->m_maincpu->set_input_line(4, HOLD_LINE);
+		if (!m_irq4_disabled) m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 MACHINE_START_MEMBER(pgm_state,pgm)
@@ -521,7 +520,7 @@ MACHINE_CONFIG_FRAGMENT( pgmbase )
 	MCFG_CPU_ADD("maincpu", M68000, 20000000) /* 20 mhz! verified on real board */
 	MCFG_CPU_PROGRAM_MAP(pgm_basic_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pgm_state,  irq6_line_hold)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", pgm_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pgm_state, pgm_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 33868800/4)
 	MCFG_CPU_PROGRAM_MAP(pgm_z80_mem)

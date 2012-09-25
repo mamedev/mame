@@ -409,14 +409,12 @@ void mc1000_state::machine_reset()
 #define MC1000_NE555_FREQ       (368) /* Hz */
 #define MC1000_NE555_DUTY_CYCLE (99.745) /* % */
 
-static TIMER_DEVICE_CALLBACK( ne555_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(mc1000_state::ne555_tick)
 {
-	mc1000_state *state = timer.machine().driver_data<mc1000_state>();
-
 	// (m_ne555_int not needed anymore and can be done with?)
-	state->m_ne555_int = param;
+	m_ne555_int = param;
 
-	state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, param);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, param);
 }
 
 static const cassette_interface mc1000_cassette_interface =
@@ -444,10 +442,10 @@ static MACHINE_CONFIG_START( mc1000, mc1000_state )
 	MCFG_CPU_IO_MAP(mc1000_io)
 
 	/* timers */
-	MCFG_TIMER_ADD_PERIODIC("ne555clear", ne555_tick, attotime::from_hz(MC1000_NE555_FREQ))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ne555clear", mc1000_state, ne555_tick, attotime::from_hz(MC1000_NE555_FREQ))
 	MCFG_TIMER_PARAM(CLEAR_LINE)
 
-	MCFG_TIMER_ADD_PERIODIC("ne555assert", ne555_tick, attotime::from_hz(MC1000_NE555_FREQ))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ne555assert", mc1000_state, ne555_tick, attotime::from_hz(MC1000_NE555_FREQ))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(MC1000_NE555_FREQ * 100 / MC1000_NE555_DUTY_CYCLE))
 	MCFG_TIMER_PARAM(ASSERT_LINE)
 

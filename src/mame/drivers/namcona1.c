@@ -955,28 +955,27 @@ static ADDRESS_MAP_START( namcona1_mcu_io_map, AS_IO, 8, namcona1_state )
 ADDRESS_MAP_END
 
 
-static TIMER_DEVICE_CALLBACK( namcona1_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(namcona1_state::namcona1_interrupt)
 {
-	namcona1_state *state = timer.machine().driver_data<namcona1_state>();
 	int scanline = param;
-	int enabled = state->m_mEnableInterrupts ? ~state->m_vreg[0x1a/2] : 0;
+	int enabled = m_mEnableInterrupts ? ~m_vreg[0x1a/2] : 0;
 
 	// vblank
 	if (scanline == 224)
 	{
-		simulate_mcu( timer.machine() );
+		simulate_mcu( machine() );
 		if (enabled & 8)
-			state->m_maincpu->set_input_line(4, HOLD_LINE);
+			m_maincpu->set_input_line(4, HOLD_LINE);
 	}
 
 	// posirq, used with dolphin in Emeraldia's "how to play" attract mode
-	int posirq_scanline = state->m_vreg[0x8a/2] & 0xff;
+	int posirq_scanline = m_vreg[0x8a/2] & 0xff;
 	if (scanline == posirq_scanline && enabled & 4)
 	{
 		if (posirq_scanline)
-			timer.machine().primary_screen->update_partial(posirq_scanline);
+			machine().primary_screen->update_partial(posirq_scanline);
 
-		state->m_maincpu->set_input_line(3, HOLD_LINE);
+		m_maincpu->set_input_line(3, HOLD_LINE);
 	}
 }
 
@@ -984,18 +983,17 @@ static TIMER_DEVICE_CALLBACK( namcona1_interrupt )
 //                 IRQ 1 =>
 //                 IRQ 2 =>
 
-static TIMER_DEVICE_CALLBACK( mcu_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(namcona1_state::mcu_interrupt)
 {
-	namcona1_state *state = timer.machine().driver_data<namcona1_state>();
 	int scanline = param;
 
 	// vblank
 	if (scanline == 224)
-		state->m_mcu->set_input_line(M37710_LINE_IRQ1, HOLD_LINE);
+		m_mcu->set_input_line(M37710_LINE_IRQ1, HOLD_LINE);
 
 	// adc (timing guessed, when does this trigger?)
 	if (scanline == 0)
-		state->m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
+		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 }
 
 static const c140_interface C140_interface_typeA =
@@ -1008,12 +1006,12 @@ static MACHINE_CONFIG_START( namcona1, namcona1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 50113000/4)
 	MCFG_CPU_PROGRAM_MAP(namcona1_main_map)
-	MCFG_TIMER_ADD_SCANLINE("scan_main", namcona1_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_main", namcona1_state, namcona1_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("mcu", M37702, 50113000/4)
 	MCFG_CPU_PROGRAM_MAP(namcona1_mcu_map)
 	MCFG_CPU_IO_MAP( namcona1_mcu_io_map)
-	MCFG_TIMER_ADD_SCANLINE("scan_mcu", mcu_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_mcu", namcona1_state, mcu_interrupt, "screen", 0, 1)
 
 	MCFG_NVRAM_HANDLER(namcosna1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(2400))

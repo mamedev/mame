@@ -106,6 +106,8 @@ public:
 	UINT32 screen_update_shuttlei(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(polaris_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(claybust_gun_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(schaser_effect_555_cb);
 };
 
 
@@ -122,4 +124,4 @@ DISCRETE_SOUND_EXTERN( polaris );
 
 extern const sn76477_interface schaser_sn76477_interface;
 DISCRETE_SOUND_EXTERN( schaser );
-TIMER_DEVICE_CALLBACK( schaser_effect_555_cb );
+

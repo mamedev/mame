@@ -623,34 +623,33 @@ WRITE16_MEMBER(gaelco3d_state::adsp_rombank_w)
  *
  *************************************/
 
-static TIMER_DEVICE_CALLBACK( adsp_autobuffer_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
 {
-	gaelco3d_state *state = timer.machine().driver_data<gaelco3d_state>();
-	cpu_device *adsp = timer.machine().device<cpu_device>("adsp");
+	cpu_device *adsp = machine().device<cpu_device>("adsp");
 
 	/* get the index register */
-	int reg = adsp->state_int(ADSP2100_I0 + state->m_adsp_ireg);
+	int reg = adsp->state_int(ADSP2100_I0 + m_adsp_ireg);
 
 	/* copy the current data into the buffer */
-// logerror("ADSP buffer: I%d=%04X incs=%04X size=%04X\n", state->m_adsp_ireg, reg, state->m_adsp_incs, state->m_adsp_size);
-	if (state->m_adsp_incs)
-		dmadac_transfer(&state->m_dmadac[0], SOUND_CHANNELS, state->m_adsp_incs, SOUND_CHANNELS * state->m_adsp_incs, state->m_adsp_size / (SOUND_CHANNELS * state->m_adsp_incs), (INT16 *)&state->m_adsp_fastram_base[reg - 0x3800]);
+// logerror("ADSP buffer: I%d=%04X incs=%04X size=%04X\n", m_adsp_ireg, reg, m_adsp_incs, m_adsp_size);
+	if (m_adsp_incs)
+		dmadac_transfer(&m_dmadac[0], SOUND_CHANNELS, m_adsp_incs, SOUND_CHANNELS * m_adsp_incs, m_adsp_size / (SOUND_CHANNELS * m_adsp_incs), (INT16 *)&m_adsp_fastram_base[reg - 0x3800]);
 
 	/* increment it */
-	reg += state->m_adsp_size;
+	reg += m_adsp_size;
 
 	/* check for wrapping */
-	if (reg >= state->m_adsp_ireg_base + state->m_adsp_size)
+	if (reg >= m_adsp_ireg_base + m_adsp_size)
 	{
 		/* reset the base pointer */
-		reg = state->m_adsp_ireg_base;
+		reg = m_adsp_ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		generic_pulse_irq_line(adsp, ADSP2105_IRQ1, 1);
+		generic_pulse_irq_line(*adsp, ADSP2105_IRQ1, 1);
 	}
 
 	/* store it */
-	adsp->set_state_int(ADSP2100_I0 + state->m_adsp_ireg, reg);
+	adsp->set_state_int(ADSP2100_I0 + m_adsp_ireg, reg);
 }
 
 
@@ -1009,7 +1008,7 @@ static MACHINE_CONFIG_START( gaelco3d, gaelco3d_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_TIMER_ADD("adsp_timer", adsp_autobuffer_irq)
+	MCFG_TIMER_DRIVER_ADD("adsp_timer", gaelco3d_state, adsp_autobuffer_irq)
 	MCFG_GAELCO_SERIAL_ADD("serial", 0, serial_interface)
 
 	/* video hardware */

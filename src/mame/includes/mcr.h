@@ -102,6 +102,10 @@ public:
 	DECLARE_MACHINE_START(nflfoot);
 	UINT32 screen_update_mcr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(ipu_watchdog_reset);
+	TIMER_DEVICE_CALLBACK_MEMBER(dpoker_hopper_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(dpoker_coin_in_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcr_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcr_ipu_interrupt);
 };
 
 
@@ -125,9 +129,6 @@ extern const gfx_layout mcr_sprite_layout;
 
 extern UINT32 mcr_cpu_board;
 extern UINT32 mcr_sprite_board;
-
-TIMER_DEVICE_CALLBACK( mcr_interrupt );
-TIMER_DEVICE_CALLBACK( mcr_ipu_interrupt );
 
 /*----------- defined in video/mcr.c -----------*/
 

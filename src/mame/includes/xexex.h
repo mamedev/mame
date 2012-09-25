@@ -66,6 +66,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_xexex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(xexex_interrupt);
 };
 
 /*----------- defined in video/xexex.c -----------*/

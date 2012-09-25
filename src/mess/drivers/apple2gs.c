@@ -235,7 +235,7 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", G65816, APPLE2GS_14M/5)
 	MCFG_CPU_PROGRAM_MAP(apple2gs_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", apple2_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", apple2gs_state, apple2_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_SCREEN_ADD("screen", RASTER)

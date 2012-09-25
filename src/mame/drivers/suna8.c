@@ -1737,15 +1737,14 @@ static const ym3812_interface brickzn_ym3812_interface =
 	soundirq	/* IRQ Line */
 };
 
-static TIMER_DEVICE_CALLBACK( brickzn_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(suna8_state::brickzn_interrupt)
 {
-	suna8_state *state = timer.machine().driver_data<suna8_state>();
 	int scanline = param;
 
 	if(scanline == 240)
-		state->m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	if(scanline == 112)
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	// TODO: NMI enable
 }
@@ -1819,15 +1818,14 @@ MACHINE_CONFIG_END
 
 /* 1 x 24 MHz crystal */
 
-static TIMER_DEVICE_CALLBACK( hardhea2_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(suna8_state::hardhea2_interrupt)
 {
-	suna8_state *state = timer.machine().driver_data<suna8_state>();
 	int scanline = param;
 
 	if(scanline == 240)
-		state->m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	if(scanline == 112)
-		if (state->m_nmi_enable)	state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		if (m_nmi_enable)	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 MACHINE_RESET_MEMBER(suna8_state,hardhea2)
@@ -1841,7 +1839,7 @@ static MACHINE_CONFIG_DERIVED( hardhea2, brickzn )
 
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)		/* SUNA T568009 */
 	MCFG_CPU_PROGRAM_MAP(hardhea2_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", hardhea2_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(suna8_state,hardhea2)
 	MCFG_PALETTE_LENGTH(256)
@@ -1867,7 +1865,7 @@ static MACHINE_CONFIG_START( starfigh, suna8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
 	MCFG_CPU_PROGRAM_MAP(starfigh_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", brickzn_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, brickzn_interrupt, "screen", 0, 1)
 
 	/* The sound section is identical to that of hardhead */
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
@@ -1915,7 +1913,7 @@ static MACHINE_CONFIG_START( sparkman, suna8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
 	MCFG_CPU_PROGRAM_MAP(sparkman_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", hardhea2_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)				/* ? */
 	MCFG_CPU_PROGRAM_MAP(hardhead_sound_map)

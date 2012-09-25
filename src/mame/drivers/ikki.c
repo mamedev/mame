@@ -239,16 +239,15 @@ void ikki_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static TIMER_DEVICE_CALLBACK( ikki_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(ikki_state::ikki_irq)
 {
-	ikki_state *state = timer.machine().driver_data<ikki_state>();
 	int scanline = param;
 
 	if(scanline == 240 || scanline == 120) // TODO: where non-timer IRQ happens?
 	{
-		state->m_maincpu->set_input_line(0,HOLD_LINE);
+		m_maincpu->set_input_line(0,HOLD_LINE);
 
-		state->m_irq_source = (scanline != 240);
+		m_irq_source = (scanline != 240);
 	}
 }
 
@@ -260,7 +259,7 @@ static MACHINE_CONFIG_START( ikki, ikki_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
 	MCFG_CPU_PROGRAM_MAP(ikki_cpu1)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", ikki_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ikki_state, ikki_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", Z80,8000000/2) /* 4.000MHz */
 	MCFG_CPU_PROGRAM_MAP(ikki_cpu2)

@@ -248,29 +248,27 @@ WRITE8_MEMBER(nitedrvr_state::nitedrvr_out1_w)
 }
 
 
-TIMER_DEVICE_CALLBACK( nitedrvr_crash_toggle_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_state::nitedrvr_crash_toggle_callback)
 {
-	nitedrvr_state *state = timer.machine().driver_data<nitedrvr_state>();
-
-	if (state->m_crash_en && state->m_crash_data_en)
+	if (m_crash_en && m_crash_data_en)
 	{
-		state->m_crash_data--;
-		address_space &space = timer.machine().driver_data()->generic_space();
-		discrete_sound_w(state->m_discrete, space, NITEDRVR_BANG_DATA, state->m_crash_data);	// Crash Volume
-		if (!state->m_crash_data)
-			state->m_crash_data_en = 0;	// Done counting?
+		m_crash_data--;
+		address_space &space = machine().driver_data()->generic_space();
+		discrete_sound_w(m_discrete, space, NITEDRVR_BANG_DATA, m_crash_data);	// Crash Volume
+		if (!m_crash_data)
+			m_crash_data_en = 0;	// Done counting?
 
-		if (state->m_crash_data & 0x01)
+		if (m_crash_data & 0x01)
 		{
 			/* Invert video */
-			palette_set_color(timer.machine(), 1, MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-			palette_set_color(timer.machine(), 0, MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
+			palette_set_color(machine(), 1, MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+			palette_set_color(machine(), 0, MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 		}
 		else
 		{
 			/* Normal video */
-			palette_set_color(timer.machine(), 0, MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-			palette_set_color(timer.machine(), 1, MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
+			palette_set_color(machine(), 0, MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+			palette_set_color(machine(), 1, MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 		}
 	}
 }

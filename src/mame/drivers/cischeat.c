@@ -1533,18 +1533,18 @@ GFXDECODE_END
 **************************************************************************/
 
 /* TODO: this is hackish */
-static TIMER_DEVICE_CALLBACK( bigrun_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("cpu1")->execute().set_input_line(4, HOLD_LINE);
+		machine().device("cpu1")->execute().set_input_line(4, HOLD_LINE);
 
 	if(scanline == 154)
-		timer.machine().device("cpu1")->execute().set_input_line(2, HOLD_LINE);
+		machine().device("cpu1")->execute().set_input_line(2, HOLD_LINE);
 
 	if(scanline == 69)
-		timer.machine().device("cpu1")->execute().set_input_line(1, HOLD_LINE);
+		machine().device("cpu1")->execute().set_input_line(1, HOLD_LINE);
 }
 
 
@@ -1560,7 +1560,7 @@ static MACHINE_CONFIG_START( bigrun, cischeat_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(bigrun_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", bigrun_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, bigrun_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("cpu2", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(bigrun_map2)
@@ -1691,15 +1691,15 @@ MACHINE_CONFIG_END
     4]          == 3
 */
 
-static TIMER_DEVICE_CALLBACK( scudhamm_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 
 	if(scanline == 120) // timer irq (clears a flag, presumably sprite DMA end)
-		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( scudhamm, cischeat_state )
@@ -1707,7 +1707,7 @@ static MACHINE_CONFIG_START( scudhamm, cischeat_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(scudhamm_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", scudhamm_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, scudhamm_scanline, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_HAS_SHADOWS)
@@ -1741,15 +1741,15 @@ MACHINE_CONFIG_END
                             Arm Champs II
 **************************************************************************/
 
-static TIMER_DEVICE_CALLBACK( armchamp2_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::armchamp2_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 
 	if(scanline == 120) // timer irq (TODO: timing)
-		timer.machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( armchmp2, scudhamm )
@@ -1758,7 +1758,7 @@ static MACHINE_CONFIG_DERIVED( armchmp2, scudhamm )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(armchmp2_map)
 	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_CALLBACK(armchamp2_scanline)
+	MCFG_TIMER_DRIVER_CALLBACK(cischeat_state, armchamp2_scanline)
 MACHINE_CONFIG_END
 
 

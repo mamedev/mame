@@ -298,11 +298,9 @@ Stephh's notes (based on the games M6502 code and some tests) :
 
 
 /* binary counter (1.4MHz update) */
-static TIMER_DEVICE_CALLBACK( sasuke_update_counter )
+TIMER_DEVICE_CALLBACK_MEMBER(snk6502_state::sasuke_update_counter)
 {
-	snk6502_state *state = timer.machine().driver_data<snk6502_state>();
-
-	state->m_sasuke_counter += 0x10;
+	m_sasuke_counter += 0x10;
 }
 
 static void sasuke_start_counter(running_machine &machine)
@@ -844,7 +842,7 @@ static MACHINE_CONFIG_START( sasuke, snk6502_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / 16, mc6845_intf)
 
-	MCFG_TIMER_ADD_PERIODIC("sasuke_timer", sasuke_update_counter, attotime::from_hz(MASTER_CLOCK / 8))	// 1.4 MHz
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("sasuke_timer", snk6502_state, sasuke_update_counter, attotime::from_hz(MASTER_CLOCK / 8))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -440,9 +440,9 @@ static void signal_v60_irq(running_machine &machine, int which)
 }
 
 
-static TIMER_DEVICE_CALLBACK( signal_v60_irq_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(segas32_state::signal_v60_irq_callback)
 {
-	signal_v60_irq(timer.machine(), param);
+	signal_v60_irq(machine(), param);
 }
 
 
@@ -2202,8 +2202,8 @@ static MACHINE_CONFIG_START( system32, segas32_state )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TIMER_ADD("v60_irq0", signal_v60_irq_callback)
-	MCFG_TIMER_ADD("v60_irq1", signal_v60_irq_callback)
+	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
+	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
 
 	/* video hardware */
 	MCFG_GFXDECODE(segas32)
@@ -2261,8 +2261,8 @@ static MACHINE_CONFIG_START( multi32, segas32_state )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TIMER_ADD("v60_irq0", signal_v60_irq_callback)
-	MCFG_TIMER_ADD("v60_irq1", signal_v60_irq_callback)
+	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
+	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
 
 	/* video hardware */
 	MCFG_GFXDECODE(segas32)

@@ -89,6 +89,7 @@ public:
 	int m_motor_on;
 	int m_motor0;
 	int m_motor1;
+	TIMER_DEVICE_CALLBACK_MEMBER(floppy_motor_off_tick);
 };
 
 #endif

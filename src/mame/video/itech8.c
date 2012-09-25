@@ -568,15 +568,14 @@ WRITE8_MEMBER(itech8_state::grmatch_xscroll_w)
 }
 
 
-TIMER_DEVICE_CALLBACK( grmatch_palette_update )
+TIMER_DEVICE_CALLBACK_MEMBER(itech8_state::grmatch_palette_update)
 {
-	itech8_state *state = timer.machine().driver_data<itech8_state>();
-	struct tms34061_display &tms_state = state->m_tms_state;
+	struct tms34061_display &tms_state = m_tms_state;
 	/* if the high bit is set, we are supposed to latch the palette values */
-	if (state->m_grmatch_palcontrol & 0x80)
+	if (m_grmatch_palcontrol & 0x80)
 	{
 		/* the TMS34070s latch at the start of the frame, based on the first few bytes */
-		UINT32 page_offset = (tms_state.dispstart & 0x0ffff) | state->m_grmatch_xscroll;
+		UINT32 page_offset = (tms_state.dispstart & 0x0ffff) | m_grmatch_xscroll;
 		int page, x;
 
 		/* iterate over both pages */
@@ -587,7 +586,7 @@ TIMER_DEVICE_CALLBACK( grmatch_palette_update )
 			{
 				UINT8 data0 = base[x * 2 + 0];
 				UINT8 data1 = base[x * 2 + 1];
-				state->m_grmatch_palette[page][x] = MAKE_RGB(pal4bit(data0 >> 0), pal4bit(data1 >> 4), pal4bit(data1 >> 0));
+				m_grmatch_palette[page][x] = MAKE_RGB(pal4bit(data0 >> 0), pal4bit(data1 >> 4), pal4bit(data1 >> 0));
 			}
 		}
 	}

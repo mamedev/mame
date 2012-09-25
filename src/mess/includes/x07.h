@@ -265,4 +265,5 @@ public:
 	TIMER_CALLBACK_MEMBER(rsta_clear);
 	TIMER_CALLBACK_MEMBER(rstb_clear);
 	TIMER_CALLBACK_MEMBER(beep_stop);
+	TIMER_DEVICE_CALLBACK_MEMBER(blink_timer);
 };

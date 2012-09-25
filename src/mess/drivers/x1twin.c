@@ -601,8 +601,8 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	MCFG_SOUND_ROUTE(1, "pce_r", 0.5)
 #endif
 
-	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", x1_keyboard_callback, attotime::from_hz(250))
-	MCFG_TIMER_ADD_PERIODIC("cmt_wind_timer", x1_cmt_wind_timer, attotime::from_hz(16))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", x1twin_state, x1_keyboard_callback, attotime::from_hz(250))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("cmt_wind_timer", x1twin_state, x1_cmt_wind_timer, attotime::from_hz(16))
 MACHINE_CONFIG_END
 
 ROM_START( x1twin )

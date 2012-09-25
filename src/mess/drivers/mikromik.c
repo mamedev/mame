@@ -319,11 +319,9 @@ void mm1_state::scan_keyboard()
 //  TIMER_DEVICE_CALLBACK( kbclk_tick )
 //-------------------------------------------------
 
-static TIMER_DEVICE_CALLBACK( kbclk_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(mm1_state::kbclk_tick)
 {
-	mm1_state *state = timer.machine().driver_data<mm1_state>();
-
-	state->scan_keyboard();
+	scan_keyboard();
 }
 
 
@@ -787,7 +785,7 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 	MCFG_CPU_PROGRAM_MAP(mm1_map)
 	MCFG_CPU_CONFIG(i8085_intf)
 
-	MCFG_TIMER_ADD_PERIODIC("kbclk", kbclk_tick, attotime::from_hz(2500)) //attotime::from_hz(XTAL_6_144MHz/2/8))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("kbclk", mm1_state, kbclk_tick, attotime::from_hz(2500))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

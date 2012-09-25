@@ -671,18 +671,16 @@ INPUT_PORTS_END
 //  Z80CTC_INTERFACE( ctc_intf )
 //-------------------------------------------------
 
-static TIMER_DEVICE_CALLBACK( ctc_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(bullet_state::ctc_tick)
 {
-	bullet_state *state = timer.machine().driver_data<bullet_state>();
+	m_ctc->trg0(1);
+	m_ctc->trg0(0);
 
-	state->m_ctc->trg0(1);
-	state->m_ctc->trg0(0);
+	m_ctc->trg1(1);
+	m_ctc->trg1(0);
 
-	state->m_ctc->trg1(1);
-	state->m_ctc->trg1(0);
-
-	state->m_ctc->trg2(1);
-	state->m_ctc->trg2(0);
+	m_ctc->trg2(1);
+	m_ctc->trg2(0);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( dart_rxtxca_w )
@@ -1164,7 +1162,7 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 
 	// devices
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_4_9152MHz/4))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bullet_state, ctc_tick, attotime::from_hz(XTAL_4_9152MHz/4))
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_16MHz/4, dart_intf)
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_16MHz/4, pio_intf)
@@ -1195,7 +1193,7 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 
 	// devices
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_4_9152MHz/4))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bullet_state, ctc_tick, attotime::from_hz(XTAL_4_9152MHz/4))
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_16MHz/4, dart_intf)
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_16MHz/4, bulletf_pio_intf)

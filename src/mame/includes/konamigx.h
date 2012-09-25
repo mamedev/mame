@@ -81,6 +81,7 @@ public:
 	INTERRUPT_GEN_MEMBER(konamigx_vbinterrupt);
 	INTERRUPT_GEN_MEMBER(tms_sync);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_hbinterrupt);
 };
 
 

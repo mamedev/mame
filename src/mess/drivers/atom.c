@@ -592,15 +592,13 @@ static const floppy_interface atom_floppy_interface =
     cassette_interface atom_cassette_interface
 -------------------------------------------------*/
 
-static TIMER_DEVICE_CALLBACK( cassette_output_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(atom_state::cassette_output_tick)
 {
-	atom_state *state = timer.machine().driver_data<atom_state>();
+	int level = !(!(!m_hz2400 && m_pc1) && m_pc0);
 
-	int level = !(!(!state->m_hz2400 && state->m_pc1) && state->m_pc0);
+	m_cassette->output(level ? -1.0 : +1.0);
 
-	state->m_cassette->output(level ? -1.0 : +1.0);
-
-	state->m_hz2400 = !state->m_hz2400;
+	m_hz2400 = !m_hz2400;
 }
 
 static const cassette_interface atom_cassette_interface =
@@ -784,7 +782,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_TIMER_ADD_PERIODIC("hz2400", cassette_output_tick, attotime::from_hz(4806)) // X2/4/416
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
 	MCFG_VIA6522_ADD(R6522_TAG, X2/4, via_intf)
 	MCFG_I8255_ADD(INS8255_TAG, ppi_intf)
 	MCFG_I8271_ADD(I8271_TAG, fdc_intf)

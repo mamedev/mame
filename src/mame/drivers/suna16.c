@@ -753,16 +753,15 @@ GFXDECODE_END
                             Back Street Soccer
 ***************************************************************************/
 
-static TIMER_DEVICE_CALLBACK( bssoccer_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(suna16_state::bssoccer_interrupt)
 {
-	suna16_state *state = timer.machine().driver_data<suna16_state>();
 	int scanline = param;
 
 	if(scanline == 240)
-		state->m_maincpu->set_input_line(1, HOLD_LINE);
+		m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if(scanline == 0)
-		state->m_maincpu->set_input_line(2, HOLD_LINE); // does RAM to sprite buffer copy here
+		m_maincpu->set_input_line(2, HOLD_LINE); // does RAM to sprite buffer copy here
 }
 
 static MACHINE_CONFIG_START( bssoccer, suna16_state )
@@ -770,7 +769,7 @@ static MACHINE_CONFIG_START( bssoccer, suna16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", bssoccer_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna16_state, bssoccer_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)		/* Z80B */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_sound_map)
@@ -944,7 +943,7 @@ static MACHINE_CONFIG_START( bestbest, suna16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 24000000/4)
 	MCFG_CPU_PROGRAM_MAP(bestbest_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", bssoccer_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna16_state, bssoccer_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 24000000/4)
 	MCFG_CPU_PROGRAM_MAP(bestbest_sound_map)

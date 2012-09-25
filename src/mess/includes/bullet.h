@@ -93,6 +93,7 @@ public:
 	int m_winrdy;
 	int m_exrdy1;
 	int m_exrdy2;
+	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 };
 
 class bulletf_state : public bullet_state

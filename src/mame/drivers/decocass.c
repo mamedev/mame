@@ -760,7 +760,7 @@ static MACHINE_CONFIG_START( decocass, decocass_state )
 
 	MCFG_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
 	MCFG_CPU_PROGRAM_MAP(decocass_sound_map)
-	MCFG_TIMER_ADD_SCANLINE("audionmi", decocass_audio_nmi_gen, "screen", 0, 8)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("audionmi", decocass_state, decocass_audio_nmi_gen, "screen", 0, 8)
 
 	MCFG_CPU_ADD("mcu", I8041, HCLK)
 	MCFG_CPU_IO_MAP(decocass_mcu_portmap)

@@ -210,14 +210,12 @@ INPUT_PORTS_END
     Z80CTC_INTERFACE( ctc_intf )
 -------------------------------------------------*/
 
-static TIMER_DEVICE_CALLBACK( ctc_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::ctc_tick)
 {
-	mtx_state *state = timer.machine().driver_data<mtx_state>();
-
-	state->m_z80ctc->trg1(1);
-	state->m_z80ctc->trg1(0);
-	state->m_z80ctc->trg2(1);
-	state->m_z80ctc->trg2(0);
+	m_z80ctc->trg1(1);
+	m_z80ctc->trg1(0);
+	m_z80ctc->trg2(1);
+	m_z80ctc->trg2(0);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_trg1_w )
@@ -302,12 +300,11 @@ static const z80_daisy_config rs128_daisy_chain[] =
     cassette_interface mtx_cassette_interface
 -------------------------------------------------*/
 
-static TIMER_DEVICE_CALLBACK( cassette_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::cassette_tick)
 {
-	mtx_state *state = timer.machine().driver_data<mtx_state>();
-	int data = ((state->m_cassette)->input() > +0.0) ? 0 : 1;
+	int data = ((m_cassette)->input() > +0.0) ? 0 : 1;
 
-	state->m_z80ctc->trg3(data);
+	m_z80ctc->trg3(data);
 }
 
 static const cassette_interface mtx_cassette_interface =
@@ -368,11 +365,11 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 
 	/* devices */
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_4MHz, ctc_intf )
-	MCFG_TIMER_ADD_PERIODIC("z80ctc_timer", ctc_tick, attotime::from_hz(XTAL_4MHz/13))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_timer", mtx_state, ctc_tick, attotime::from_hz(XTAL_4MHz/13))
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_SNAPSHOT_ADD("snapshot", mtx, "mtb", 0.5)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, mtx_cassette_interface)
-	MCFG_TIMER_ADD_PERIODIC("cassette_timer", cassette_tick, attotime::from_hz(44100))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", mtx_state, cassette_tick, attotime::from_hz(44100))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

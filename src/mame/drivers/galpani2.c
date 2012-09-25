@@ -542,39 +542,37 @@ GFXDECODE_END
 
 
 /* CPU#1 Interrups , lev 3,4 & 5 are tested on power up. The rest is rte, but lev 6 */
-static TIMER_DEVICE_CALLBACK( galpani2_interrupt1 )
+TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt1)
 {
-	galpani2_state *state = timer.machine().driver_data<galpani2_state>();
 	int scanline = param;
 
 	if(scanline == 240)
-		 state->m_maincpu->set_input_line(5, HOLD_LINE);
+		 m_maincpu->set_input_line(5, HOLD_LINE);
 
 	/* MCU related? */
 	if(scanline == 128)
 	{
-		state->m_maincpu->set_input_line(3, HOLD_LINE);
-		state->m_maincpu->set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(3, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 	}
 
 	if(scanline == 0)
-		 state->m_maincpu->set_input_line(6, HOLD_LINE); // hblank?
+		 m_maincpu->set_input_line(6, HOLD_LINE); // hblank?
 }
 
 /* CPU#2 interrupts, lev 3,4 & 5 are tested on power up. The rest is rte, but lev 7 */
-static TIMER_DEVICE_CALLBACK( galpani2_interrupt2 )
+TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt2)
 {
-	galpani2_state *state = timer.machine().driver_data<galpani2_state>();
 	int scanline = param;
 
 	if(scanline == 240)
-		state->m_subcpu->set_input_line(5, HOLD_LINE);
+		m_subcpu->set_input_line(5, HOLD_LINE);
 
 	if(scanline == 128)
-		state->m_subcpu->set_input_line(4, HOLD_LINE);
+		m_subcpu->set_input_line(4, HOLD_LINE);
 
 	if(scanline == 0)
-		state->m_subcpu->set_input_line(3, HOLD_LINE);
+		m_subcpu->set_input_line(3, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( galpani2, galpani2_state )
@@ -582,12 +580,12 @@ static MACHINE_CONFIG_START( galpani2, galpani2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_27MHz/2)		/* Confirmed on galpani2i PCB */
 	MCFG_CPU_PROGRAM_MAP(galpani2_mem1)
-	MCFG_TIMER_ADD_SCANLINE("m_scantimer", galpani2_interrupt1, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("m_scantimer", galpani2_state, galpani2_interrupt1, "screen", 0, 1)
 	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_CPU_ADD("sub", M68000, XTAL_27MHz/2)			/* Confirmed on galpani2i PCB */
 	MCFG_CPU_PROGRAM_MAP(galpani2_mem2)
-	MCFG_TIMER_ADD_SCANLINE("s_scantimer", galpani2_interrupt2, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", galpani2_state, galpani2_interrupt2, "screen", 0, 1)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 

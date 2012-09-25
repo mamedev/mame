@@ -79,6 +79,7 @@ public:
 	required_shared_ptr<UINT8> m_mc6847_video_ram;
 	UINT8 m_mc6847_attr;
 	DECLARE_DRIVER_INIT(mc1000);
+	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tick);
 };
 
 #endif

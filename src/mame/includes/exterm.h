@@ -36,6 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_slave_dac_w);
 	virtual void palette_init();
 	TIMER_CALLBACK_MEMBER(sound_delayed_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(master_sound_nmi_callback);
 };
 
 /*----------- defined in video/exterm.c -----------*/

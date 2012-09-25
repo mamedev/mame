@@ -84,4 +84,7 @@ public:
 	UINT32 screen_update_scudhamm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_cischeat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_f1gpstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(bigrun_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(scudhamm_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(armchamp2_scanline);
 };

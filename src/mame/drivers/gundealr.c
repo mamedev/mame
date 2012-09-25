@@ -381,14 +381,14 @@ void gundealr_state::machine_reset()
 	m_scroll[3] = 0;
 }
 
-static TIMER_DEVICE_CALLBACK( gundealr_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::gundealr_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
 	else if((scanline == 0) || (scanline == 120) ) //timer irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 10h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 10h */
 }
 
 static const ym2203_interface ym2203_config =
@@ -410,7 +410,7 @@ static MACHINE_CONFIG_START( gundealr, gundealr_state )
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)	/* 8 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", gundealr_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gundealr_state, gundealr_scanline, "screen", 0, 1)
 
 
 	/* video hardware */
@@ -433,20 +433,19 @@ static MACHINE_CONFIG_START( gundealr, gundealr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static TIMER_DEVICE_CALLBACK( yamyam_mcu_sim )
+TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::yamyam_mcu_sim)
 {
-	gundealr_state *state = timer.machine().driver_data<gundealr_state>();
 	static const UINT8 snipped_cmd03[8] = { 0x3a, 0x00, 0xc0, 0x47, 0x3a, 0x01, 0xc0, 0xc9 };
 	static const UINT8 snipped_cmd05_1[5] = { 0xcd, 0x20, 0xe0, 0x7e, 0xc9 };
 	static const UINT8 snipped_cmd05_2[8] = { 0xc5, 0x01, 0x00, 0x00, 0x4f, 0x09, 0xc1, 0xc9 };
 
 	int i;
 
-	//logerror("e000 = %02x\n", state->m_rambase[0x000]);
-	switch(state->m_rambase[0x000])
+	//logerror("e000 = %02x\n", m_rambase[0x000]);
+	switch(m_rambase[0x000])
 	{
 		case 0x03:
-			state->m_rambase[0x001] = 0x03;
+			m_rambase[0x001] = 0x03;
 			/*
                 read dip switches
                 3a 00 c0  ld   a,($c000)
@@ -455,14 +454,14 @@ static TIMER_DEVICE_CALLBACK( yamyam_mcu_sim )
                 c9        ret
             */
         	for(i=0;i<8;i++)
-        		state->m_rambase[0x010+i] = snipped_cmd03[i];
+        		m_rambase[0x010+i] = snipped_cmd03[i];
 
 			break;
 		case 0x04:
-			state->m_rambase[0x001] = 0x04;
+			m_rambase[0x001] = 0x04;
 			break;
 		case 0x05:
-			state->m_rambase[0x001] = 0x05;
+			m_rambase[0x001] = 0x05;
 			/*
                 add a to hl
                 c5          push    bc
@@ -473,7 +472,7 @@ static TIMER_DEVICE_CALLBACK( yamyam_mcu_sim )
                 c9          ret
             */
         	for(i=0;i<8;i++)
-				state->m_rambase[0x020+i] = snipped_cmd05_2[i];
+				m_rambase[0x020+i] = snipped_cmd05_2[i];
 
 			/*
                 lookup data in table
@@ -482,25 +481,25 @@ static TIMER_DEVICE_CALLBACK( yamyam_mcu_sim )
                 c9          ret
             */
         	for(i=0;i<5;i++)
-				state->m_rambase[0x010+i] = snipped_cmd05_1[i];
+				m_rambase[0x010+i] = snipped_cmd05_1[i];
 
 			break;
 		case 0x0a:
-			state->m_rambase[0x001] = 0x08;
+			m_rambase[0x001] = 0x08;
 			break;
 		case 0x0d:
-			state->m_rambase[0x001] = 0x07;
+			m_rambase[0x001] = 0x07;
 			break;
 	}
 
-	state->m_rambase[0x004] = timer.machine().root_device().ioport("IN2")->read();
-	state->m_rambase[0x005] = timer.machine().root_device().ioport("IN1")->read();
-	state->m_rambase[0x006] = timer.machine().root_device().ioport("IN0")->read();
+	m_rambase[0x004] = machine().root_device().ioport("IN2")->read();
+	m_rambase[0x005] = machine().root_device().ioport("IN1")->read();
+	m_rambase[0x006] = machine().root_device().ioport("IN0")->read();
 }
 
 static MACHINE_CONFIG_DERIVED( yamyam, gundealr )
 
-	MCFG_TIMER_ADD_PERIODIC("mcusim", yamyam_mcu_sim, attotime::from_hz(8000000/60)) // not real, but for simulating the MCU
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", gundealr_state, yamyam_mcu_sim, attotime::from_hz(8000000/60))
 MACHINE_CONFIG_END
 
 

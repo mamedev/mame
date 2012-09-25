@@ -1165,13 +1165,11 @@ WRITE8_MEMBER( adam_state::fdc6801_p4_w )
 //  TIMER_DEVICE_CALLBACK( paddle_tick )
 //-------------------------------------------------
 
-static TIMER_DEVICE_CALLBACK( paddle_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(adam_state::paddle_tick)
 {
-	adam_state *state = timer.machine().driver_data<adam_state>();
-
 	// TODO: improve irq behaviour (see drivers/coleco.c)
-	if (coleco_scan_paddles(timer.machine(), &state->m_joy_status0, &state->m_joy_status1))
-		state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
+	if (coleco_scan_paddles(machine(), &m_joy_status0, &m_joy_status1))
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
 
@@ -1732,7 +1730,7 @@ static MACHINE_CONFIG_START( adam, adam_state )
     MCFG_SOUND_CONFIG(psg_intf)
 
 	// devices
-	MCFG_TIMER_ADD_PERIODIC("paddles", paddle_tick, attotime::from_msec(20))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("paddles", adam_state, paddle_tick, attotime::from_msec(20))
 	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, adam_floppy_interface)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, adam_cassette_interface)

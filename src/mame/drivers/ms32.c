@@ -1304,11 +1304,11 @@ static void irq_raise(running_machine &machine, int level)
 }
 
 /* TODO: fix this arrangement (derived from old deprecat lib) */
-static TIMER_DEVICE_CALLBACK(ms32_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
 {
 	int scanline = param;
-	if( scanline == 0) irq_raise(timer.machine(), 10);
-	if( scanline == 8) irq_raise(timer.machine(), 9);
+	if( scanline == 0) irq_raise(machine(), 10);
+	if( scanline == 8) irq_raise(machine(), 9);
 	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289)
        kirarast needs it too, at least 8 per frame, but waits for a variable amount
        47pi2 needs ?? per frame (otherwise it hangs when you lose)
@@ -1317,7 +1317,7 @@ static TIMER_DEVICE_CALLBACK(ms32_interrupt)
        desertwr
        p47aces
        */
-	if( (scanline % 8) == 0 && scanline <= 224 ) irq_raise(timer.machine(), 0);
+	if( (scanline % 8) == 0 && scanline <= 224 ) irq_raise(machine(), 0);
 }
 
 
@@ -1394,7 +1394,7 @@ static MACHINE_CONFIG_START( ms32, ms32_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V70, 20000000) // 20MHz
 	MCFG_CPU_PROGRAM_MAP(ms32_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", ms32_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ms32_state, ms32_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(ms32_sound_map)

@@ -169,14 +169,13 @@ TIMER_CALLBACK_MEMBER(pcw_state::pcw_timer_pulse)
 }
 
 /* callback for 1/300ths of a second interrupt */
-static TIMER_DEVICE_CALLBACK(pcw_timer_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(pcw_state::pcw_timer_interrupt)
 {
-	pcw_state *state = timer.machine().driver_data<pcw_state>();
-	pcw_update_interrupt_counter(state);
+	pcw_update_interrupt_counter(this);
 
-	state->m_timer_irq_flag = 1;
-	pcw_update_irqs(timer.machine());
-	timer.machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(pcw_state::pcw_timer_pulse),state));
+	m_timer_irq_flag = 1;
+	pcw_update_irqs(machine());
+	machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(pcw_state::pcw_timer_pulse),this));
 }
 
 /* fdc interrupt callback. set/clear fdc int */
@@ -1347,7 +1346,7 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
 
-	MCFG_TIMER_ADD_PERIODIC("pcw_timer", pcw_timer_interrupt, attotime::from_hz(300))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("pcw_timer", pcw_state, pcw_timer_interrupt, attotime::from_hz(300))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pcw8256, pcw )

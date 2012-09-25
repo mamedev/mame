@@ -242,6 +242,7 @@ public:
 	DECLARE_MACHINE_START(laser128);
 	DECLARE_MACHINE_START(space84);
 	UINT32 screen_update_apple2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 };
 
 
@@ -269,8 +270,6 @@ DECLARE_READ8_HANDLER( apple2_c0xx_r );
 DECLARE_WRITE8_HANDLER( apple2_c0xx_w );
 DECLARE_READ8_HANDLER( apple2_c080_r );
 DECLARE_WRITE8_HANDLER( apple2_c080_w );
-
-TIMER_DEVICE_CALLBACK( apple2_interrupt );
 
 INT8 apple2_slotram_r(running_machine &machine, int slotnum, int offset);
 

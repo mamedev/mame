@@ -16,16 +16,15 @@
 #include "includes/konamipt.h"
 #include "includes/fastlane.h"
 
-static TIMER_DEVICE_CALLBACK( fastlane_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::fastlane_scanline)
 {
-	fastlane_state *state = timer.machine().driver_data<fastlane_state>();
 	int scanline = param;
 
-	address_space &space = state->generic_space();
-	if(scanline == 240 && k007121_ctrlram_r(state->m_k007121, space, 7) & 0x02) // vblank irq
-		state->m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
-	else if(((scanline % 32) == 0) && k007121_ctrlram_r(state->m_k007121, space, 7) & 0x01) // timer irq
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	address_space &space = generic_space();
+	if(scanline == 240 && k007121_ctrlram_r(m_k007121, space, 7) & 0x02) // vblank irq
+		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
+	else if(((scanline % 32) == 0) && k007121_ctrlram_r(m_k007121, space, 7) & 0x01) // timer irq
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -219,7 +218,7 @@ static MACHINE_CONFIG_START( fastlane, fastlane_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)		/* 24MHz/8? */
 	MCFG_CPU_PROGRAM_MAP(fastlane_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", fastlane_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastlane_state, fastlane_scanline, "screen", 0, 1)
 
 
 	/* video hardware */

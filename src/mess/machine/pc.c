@@ -1588,7 +1588,7 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
  *
  **************************************************************************/
 
-TIMER_DEVICE_CALLBACK( pc_frame_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(pc_state::pc_frame_interrupt)
 {
 	int scanline = param;
 
@@ -1596,7 +1596,7 @@ TIMER_DEVICE_CALLBACK( pc_frame_interrupt )
 		pc_keyboard();
 }
 
-TIMER_DEVICE_CALLBACK( pc_vga_frame_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(pc_state::pc_vga_frame_interrupt)
 {
 	int scanline = param;
 
@@ -1607,7 +1607,7 @@ TIMER_DEVICE_CALLBACK( pc_vga_frame_interrupt )
 	}
 }
 
-TIMER_DEVICE_CALLBACK( pcjr_frame_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(pc_state::pcjr_frame_interrupt)
 {
 	int scanline = param;
 

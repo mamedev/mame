@@ -47,4 +47,5 @@ public:
 	DECLARE_VIDEO_RESET(bombsa);
 	UINT32 screen_update_psychic5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_bombsa(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(psychic5_scanline);
 };

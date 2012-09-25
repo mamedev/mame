@@ -2162,16 +2162,15 @@ MACHINE_CONFIG_END
                                Funcube series
 ***************************************************************************/
 
-static TIMER_DEVICE_CALLBACK( funcube_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(seta2_state::funcube_interrupt)
 {
-	seta2_state *state = timer.machine().driver_data<seta2_state>();
 	int scanline = param;
 
 	if(scanline == 368)
-		state->m_maincpu->set_input_line(1, HOLD_LINE);
+		m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if(scanline == 0)
-		state->m_maincpu->set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(seta2_state::funcube_sub_timer_irq)
@@ -2213,7 +2212,7 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 
 	MCFG_CPU_ADD("maincpu", MCF5206E, XTAL_25_447MHz)
 	MCFG_CPU_PROGRAM_MAP(funcube_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", funcube_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta2_state, funcube_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", H83007, FUNCUBE_SUB_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(funcube_sub_map)

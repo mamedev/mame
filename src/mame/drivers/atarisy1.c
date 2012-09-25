@@ -250,12 +250,11 @@ MACHINE_RESET_MEMBER(atarisy1_state,atarisy1)
  *
  *************************************/
 
-static TIMER_DEVICE_CALLBACK( delayed_joystick_int )
+TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::delayed_joystick_int)
 {
-	atarisy1_state *state = timer.machine().driver_data<atarisy1_state>();
-	state->m_joystick_value = param;
-	state->m_joystick_int = 1;
-	atarigen_update_interrupts(timer.machine());
+	m_joystick_value = param;
+	m_joystick_int = 1;
+	atarigen_update_interrupts(machine());
 }
 
 
@@ -771,10 +770,10 @@ static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy1_state,atarisy1)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
-	MCFG_TIMER_ADD("joystick_timer", delayed_joystick_int)
-	MCFG_TIMER_ADD("scan_timer", atarisy1_int3_callback)
-	MCFG_TIMER_ADD("int3off_timer", atarisy1_int3off_callback)
-	MCFG_TIMER_ADD("yreset_timer", atarisy1_reset_yscroll_callback)
+	MCFG_TIMER_DRIVER_ADD("joystick_timer", atarisy1_state, delayed_joystick_int)
+	MCFG_TIMER_DRIVER_ADD("scan_timer", atarisy1_state, atarisy1_int3_callback)
+	MCFG_TIMER_DRIVER_ADD("int3off_timer", atarisy1_state, atarisy1_int3off_callback)
+	MCFG_TIMER_DRIVER_ADD("yreset_timer", atarisy1_state, atarisy1_reset_yscroll_callback)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

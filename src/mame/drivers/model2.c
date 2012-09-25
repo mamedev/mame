@@ -288,22 +288,21 @@ WRITE32_MEMBER(model2_state::timers_w)
 	m_timerrun[offset] = 1;
 }
 
-static TIMER_DEVICE_CALLBACK( model2_timer_cb )
+TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 {
-	model2_state *state = timer.machine().driver_data<model2_state>();
 	int tnum = (int)(FPTR)ptr;
 	int bit = tnum + 2;
 
-	state->m_timers[tnum]->reset();
+	m_timers[tnum]->reset();
 
-	state->m_intreq |= (1<<bit);
-	if (state->m_intena & (1<<bit))
+	m_intreq |= (1<<bit);
+	if (m_intena & (1<<bit))
 	{
-		timer.machine().device("maincpu")->execute().set_input_line(I960_IRQ2, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(I960_IRQ2, ASSERT_LINE);
 	}
 
-	state->m_timervals[tnum] = 0;
-	state->m_timerrun[tnum] = 0;
+	m_timervals[tnum] = 0;
+	m_timerrun[tnum] = 0;
 }
 
 MACHINE_START_MEMBER(model2_state,model2)
@@ -1746,50 +1745,48 @@ static INPUT_PORTS_START( rchase2 )
 	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 
-static TIMER_DEVICE_CALLBACK(model2_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 {
-	model2_state *state = timer.machine().driver_data<model2_state>();
 	int scanline = param;
 
 	if(scanline == 0) // 384
 	{
-		state->m_intreq |= (1<<10);
-		if (state->m_intena & (1<<10))
-			state->m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
+		m_intreq |= (1<<10);
+		if (m_intena & (1<<10))
+			m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
 	}
 
 	if(scanline == 384/2)
 	{
-		state->m_intreq |= (1<<0);
-		if (state->m_intena & (1<<0))
-			state->m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
+		m_intreq |= (1<<0);
+		if (m_intena & (1<<0))
+			m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
 	}
 }
 
-static TIMER_DEVICE_CALLBACK(model2c_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2c_interrupt)
 {
-	model2_state *state = timer.machine().driver_data<model2_state>();
 	int scanline = param;
 
 	if(scanline == 0) // 384
 	{
-		state->m_intreq |= (1<<10);
-		if (state->m_intena & (1<<10))
-			state->m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
+		m_intreq |= (1<<10);
+		if (m_intena & (1<<10))
+			m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
 	}
 
 	if(scanline == 256)
 	{
-		state->m_intreq |= (1<<2);
-		if (state->m_intena & (1<<2))
-			state->m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
+		m_intreq |= (1<<2);
+		if (m_intena & (1<<2))
+			m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
 	}
 
 	if(scanline == 128)
 	{
-		state->m_intreq |= (1<<0);
-		if (state->m_intena & (1<<0))
-			state->m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
+		m_intreq |= (1<<0);
+		if (m_intena & (1<<0))
+			m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
 	}
 }
 
@@ -1967,7 +1964,7 @@ static const mb86233_cpu_core tgp_config =
 static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2o_mem)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", model2_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(model1_snd)
@@ -1983,13 +1980,13 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_NVRAM_ADD_1FILL("backup1")
 	MCFG_NVRAM_ADD_1FILL("backup2")
 
-	MCFG_TIMER_ADD("timer0", model2_timer_cb)
+	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)0)
-	MCFG_TIMER_ADD("timer1", model2_timer_cb)
+	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)1)
-	MCFG_TIMER_ADD("timer2", model2_timer_cb)
+	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)2)
-	MCFG_TIMER_ADD("timer3", model2_timer_cb)
+	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)3)
 
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
@@ -2026,7 +2023,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2a_crx_mem)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", model2_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(model2_snd)
@@ -2041,13 +2038,13 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MCFG_TIMER_ADD("timer0", model2_timer_cb)
+	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)0)
-	MCFG_TIMER_ADD("timer1", model2_timer_cb)
+	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)1)
-	MCFG_TIMER_ADD("timer2", model2_timer_cb)
+	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)2)
-	MCFG_TIMER_ADD("timer3", model2_timer_cb)
+	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)3)
 
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
@@ -2123,7 +2120,7 @@ static const sharc_config sharc_cfg =
 static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2b_crx_mem)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", model2_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(model2_snd)
@@ -2144,13 +2141,13 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MCFG_TIMER_ADD("timer0", model2_timer_cb)
+	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)0)
-	MCFG_TIMER_ADD("timer1", model2_timer_cb)
+	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)1)
-	MCFG_TIMER_ADD("timer2", model2_timer_cb)
+	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)2)
-	MCFG_TIMER_ADD("timer3", model2_timer_cb)
+	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)3)
 
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
@@ -2180,7 +2177,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2c_crx_mem)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", model2c_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2c_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(model2_snd)
@@ -2191,13 +2188,13 @@ static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MCFG_TIMER_ADD("timer0", model2_timer_cb)
+	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)0)
-	MCFG_TIMER_ADD("timer1", model2_timer_cb)
+	MCFG_TIMER_DRIVER_ADD("timer1", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)1)
-	MCFG_TIMER_ADD("timer2", model2_timer_cb)
+	MCFG_TIMER_DRIVER_ADD("timer2", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)2)
-	MCFG_TIMER_ADD("timer3", model2_timer_cb)
+	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)3)
 
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)

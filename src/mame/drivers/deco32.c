@@ -277,9 +277,9 @@ static const deco16ic_interface fghthist_deco16ic_tilegen2_intf =
 
 
 
-static TIMER_DEVICE_CALLBACK( interrupt_gen )
+TIMER_DEVICE_CALLBACK_MEMBER(deco32_state::interrupt_gen)
 {
-	timer.machine().device("maincpu")->execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
 
 READ32_MEMBER(deco32_state::deco32_irq_controller_r)
@@ -1742,7 +1742,7 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(deco32_state,deco32)
 
-	MCFG_TIMER_ADD("int_timer", interrupt_gen)
+	MCFG_TIMER_DRIVER_ADD("int_timer", deco32_state, interrupt_gen)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1951,7 +1951,7 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_MACHINE_RESET_OVERRIDE(deco32_state,deco32)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TIMER_ADD("int_timer", interrupt_gen)
+	MCFG_TIMER_DRIVER_ADD("int_timer", deco32_state, interrupt_gen)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1992,21 +1992,20 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static TIMER_DEVICE_CALLBACK( lockload_vbl_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(deco32_state::lockload_vbl_irq)
 {
-	deco32_state *state = timer.machine().driver_data<deco32_state>();
 	int scanline = param;
 
 	if(scanline == 31*8)
 	{
-		state->m_irq_source = 0;
-		state->m_maincpu->set_input_line(ARM_IRQ_LINE, HOLD_LINE);
+		m_irq_source = 0;
+		m_maincpu->set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 	}
 
 	if(scanline == 0)
 	{
-		state->m_irq_source = 1;
-		state->m_maincpu->set_input_line(ARM_IRQ_LINE, HOLD_LINE);
+		m_irq_source = 1;
+		m_maincpu->set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -2016,7 +2015,7 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4)
 	MCFG_CPU_PROGRAM_MAP(lockload_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", lockload_vbl_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", deco32_state, lockload_vbl_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 32220000/8)
 	MCFG_CPU_PROGRAM_MAP(nslasher_sound)
@@ -2027,7 +2026,7 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_MACHINE_RESET_OVERRIDE(deco32_state,deco32)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TIMER_ADD("int_timer", interrupt_gen)
+	MCFG_TIMER_DRIVER_ADD("int_timer", deco32_state, interrupt_gen)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

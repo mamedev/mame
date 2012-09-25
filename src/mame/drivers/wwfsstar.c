@@ -239,35 +239,34 @@ WRITE16_MEMBER(wwfsstar_state::wwfsstar_irqack_w)
     A hack is required: raise the vblank bit a scanline early.
 */
 
-static TIMER_DEVICE_CALLBACK( wwfsstar_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(wwfsstar_state::wwfsstar_scanline)
 {
-	wwfsstar_state *state = timer.machine().driver_data<wwfsstar_state>();
 	int scanline = param;
 
 	/* Vblank is lowered on scanline 0 */
 	if (scanline == 0)
 	{
-		state->m_vblank = 0;
+		m_vblank = 0;
 	}
 	/* Hack */
 	else if (scanline == (240-1))		/* -1 is an hack needed to avoid deadlocks */
 	{
-		state->m_vblank = 1;
+		m_vblank = 1;
 	}
 
 	/* An interrupt is generated every 16 scanlines */
 	if (scanline % 16 == 0)
 	{
 		if (scanline > 0)
-			timer.machine().primary_screen->update_partial(scanline - 1);
-		timer.machine().device("maincpu")->execute().set_input_line(5, ASSERT_LINE);
+			machine().primary_screen->update_partial(scanline - 1);
+		machine().device("maincpu")->execute().set_input_line(5, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 240 */
 	if (scanline == 240)
 	{
-		timer.machine().primary_screen->update_partial(scanline - 1);
-		timer.machine().device("maincpu")->execute().set_input_line(6, ASSERT_LINE);
+		machine().primary_screen->update_partial(scanline - 1);
+		machine().device("maincpu")->execute().set_input_line(6, ASSERT_LINE);
 	}
 }
 
@@ -426,7 +425,7 @@ static MACHINE_CONFIG_START( wwfsstar, wwfsstar_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", wwfsstar_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wwfsstar_state, wwfsstar_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)

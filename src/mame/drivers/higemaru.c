@@ -16,15 +16,15 @@ Use Player 1 joystick and button, then press START1 to go to next screen.
 #include "includes/higemaru.h"
 
 
-static TIMER_DEVICE_CALLBACK( higemaru_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(higemaru_state::higemaru_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);	/* RST 08h - vblank */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);	/* RST 08h - vblank */
 
 	if(scanline == 0) // unknown irq event, does various stuff like copying the spriteram
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h */
 }
 
 
@@ -162,7 +162,7 @@ static MACHINE_CONFIG_START( higemaru, higemaru_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)	/* 3 MHz Sharp LH0080A Z80A-CPU-D */
 	MCFG_CPU_PROGRAM_MAP(higemaru_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", higemaru_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", higemaru_state, higemaru_scanline, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

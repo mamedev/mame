@@ -441,16 +441,16 @@ each direction to assign the boundries.
  *
  *************************************/
 
-static TIMER_DEVICE_CALLBACK( generate_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(centiped_state::generate_interrupt)
 {
 	int scanline = param;
 
 	/* IRQ is clocked on the rising edge of 16V, equal to the previous 32V */
 	if (scanline & 16)
-		timer.machine().device("maincpu")->execute().set_input_line(0, ((scanline - 1) & 32) ? ASSERT_LINE : CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, ((scanline - 1) & 32) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* do a partial update now to handle sprite multiplexing (Maze Invaders) */
-	timer.machine().primary_screen->update_partial(scanline);
+	machine().primary_screen->update_partial(scanline);
 }
 
 
@@ -1759,7 +1759,7 @@ static MACHINE_CONFIG_START( centiped_base, centiped_state )
 	MCFG_ATARIVGEAROM_ADD("earom")
 
 	/* timer */
-	MCFG_TIMER_ADD_SCANLINE("32v", generate_interrupt, "screen", 0, 16)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", centiped_state, generate_interrupt, "screen", 0, 16)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

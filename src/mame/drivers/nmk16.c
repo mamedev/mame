@@ -867,14 +867,14 @@ static void mcu_run(running_machine &machine, UINT8 dsw_setting)
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( tdragon_mcu_sim )
+TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::tdragon_mcu_sim)
 {
-	mcu_run(timer.machine(),1);
+	mcu_run(machine(),1);
 }
 
-static TIMER_DEVICE_CALLBACK( hachamf_mcu_sim )
+TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::hachamf_mcu_sim)
 {
-	mcu_run(timer.machine(),0);
+	mcu_run(machine(),0);
 }
 
 static ADDRESS_MAP_START( tdragon_map, AS_PROGRAM, 16, nmk16_state )
@@ -3512,30 +3512,30 @@ static const ym2203_interface ym2203_config =
 	DEVCB_LINE(ym2203_irqhandler)
 };
 
-static TIMER_DEVICE_CALLBACK( nmk16_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 
 	/* This is either vblank-in or sprite dma irq complete, Vandyke definitely relies that irq fires at scanline ~0 instead of 112 (as per previous
        cpu_getiloops function implementation), mostly noticeable with sword collisions and related attract mode behaviour. */
 	if(scanline == 0)
-		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 }
 
 /* bee-oh board, almost certainly it has different timings */
-static TIMER_DEVICE_CALLBACK( manybloc_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::manybloc_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 248) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 
 	/* This is either vblank-in or sprite dma irq complete */
 	if(scanline == 0)
-		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 }
 
 
@@ -3550,7 +3550,7 @@ static MACHINE_CONFIG_START( tharrier, nmk16_state )
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(tharrier_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nmk16_state, irq1_line_hold, 112)/* ???????? */
-	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, nmk16_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000)
 	MCFG_CPU_PROGRAM_MAP(tharrier_sound_map)
@@ -3595,7 +3595,7 @@ static MACHINE_CONFIG_START( manybloc, nmk16_state )
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10? MHz - check */
 	MCFG_CPU_PROGRAM_MAP(manybloc_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nmk16_state, irq1_line_hold, 56)/* this needs to equal the framerate on this, rather than being double it .. */
-	MCFG_TIMER_ADD_SCANLINE("scantimer", manybloc_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, manybloc_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000)
 	MCFG_CPU_PROGRAM_MAP(tharrier_sound_map)
@@ -3638,7 +3638,7 @@ static MACHINE_CONFIG_START( mustang, nmk16_state )
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(mustang_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nmk16_state, irq1_line_hold, 112)/* ???????? */
-	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, nmk16_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,NMK004)
 
@@ -3679,7 +3679,7 @@ static MACHINE_CONFIG_START( mustangb, nmk16_state )
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(mustangb_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nmk16_state, irq1_line_hold, 112)/* ???????? */
-	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, nmk16_scanline, "screen", 0, 1)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
@@ -3713,7 +3713,7 @@ static MACHINE_CONFIG_START( bioship, nmk16_state )
 	MCFG_CPU_ADD("maincpu", M68000, BIOSHIP_CRYSTAL1 ) /* 10.0 MHz (verified) */
 	MCFG_CPU_PROGRAM_MAP(bioship_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nmk16_state, irq1_line_hold, 100)/* 112 breaks the title screen */
-	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, nmk16_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,NMK004)
 
@@ -3754,7 +3754,7 @@ static MACHINE_CONFIG_START( vandyke, nmk16_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* 68000p12 running at 10Mhz, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(vandyke_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nmk16_state, irq1_line_hold, 112)/* ???????? */
-	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, nmk16_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,NMK004)
 
@@ -3795,7 +3795,7 @@ static MACHINE_CONFIG_START( vandykeb, nmk16_state )
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(vandykeb_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nmk16_state, irq1_line_hold, 112)/* ???????? */
-	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, nmk16_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("mcu", PIC16C57, 12000000)	/* 3MHz */
 	MCFG_DEVICE_DISABLE()
@@ -3829,7 +3829,7 @@ static MACHINE_CONFIG_START( acrobatm, nmk16_state )
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(acrobatm_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nmk16_state, irq1_line_hold, 112)/* ???????? */
-	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, nmk16_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,NMK004)
 
@@ -3872,7 +3872,7 @@ static MACHINE_CONFIG_START( tdragonb, nmk16_state )	/* bootleg using Raiden sou
 	MCFG_CPU_PROGRAM_MAP(tdragonb_map)
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", nmk16_state,  irq4_line_hold)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nmk16_state, irq1_line_hold, 112)/* ?? drives music */
-	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, nmk16_scanline, "screen", 0, 1)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
@@ -3903,7 +3903,7 @@ static MACHINE_CONFIG_START( tdragon, nmk16_state )
 	MCFG_CPU_PROGRAM_MAP(tdragon_map)
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", nmk16_state,  irq4_line_hold)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nmk16_state, irq1_line_hold, 112)/* ?? drives music */
-	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, nmk16_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,NMK004)
 
@@ -3920,7 +3920,7 @@ static MACHINE_CONFIG_START( tdragon, nmk16_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
-	MCFG_TIMER_ADD_PERIODIC("coinsim", tdragon_mcu_sim, attotime::from_hz(10000)) // not real, but for simulating the MCU
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", nmk16_state, tdragon_mcu_sim, attotime::from_hz(10000))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3978,7 +3978,7 @@ static MACHINE_CONFIG_START( strahl, nmk16_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* 12 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(strahl_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nmk16_state, irq1_line_hold, 112)/* ???????? */
-	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, nmk16_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,NMK004)
 
@@ -4036,7 +4036,7 @@ static MACHINE_CONFIG_START( hachamf, nmk16_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
-	MCFG_TIMER_ADD_PERIODIC("coinsim", hachamf_mcu_sim, attotime::from_hz(10000)) // not real, but for simulating the MCU
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", nmk16_state, hachamf_mcu_sim, attotime::from_hz(10000))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4815,7 +4815,7 @@ static MACHINE_CONFIG_START( stagger1, nmk16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_12MHz) /* 68000p10 running at 12mhz, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(afega)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, nmk16_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(afega_sound_cpu)
@@ -4900,7 +4900,7 @@ static MACHINE_CONFIG_START( firehawk, nmk16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)
 	MCFG_CPU_PROGRAM_MAP(afega)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, nmk16_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(firehawk_sound_cpu)
@@ -4935,7 +4935,7 @@ static MACHINE_CONFIG_START( twinactn, nmk16_state )
 	MCFG_CPU_ADD("maincpu", M68000,12000000)
 	MCFG_CPU_PROGRAM_MAP(twinactn_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nmk16_state, irq1_line_hold, 112)/* ???????? */
-	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, nmk16_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(twinactn_sound_cpu)

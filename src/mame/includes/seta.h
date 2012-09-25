@@ -201,6 +201,14 @@ public:
 	INTERRUPT_GEN_MEMBER(wrofaero_interrupt);
 	TIMER_CALLBACK_MEMBER(uPD71054_timer_callback);
 	TIMER_CALLBACK_MEMBER(keroppi_prize_hop_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(seta_interrupt_1_and_2);
+	TIMER_DEVICE_CALLBACK_MEMBER(seta_interrupt_2_and_4);
+	TIMER_DEVICE_CALLBACK_MEMBER(seta_sub_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(tndrcade_sub_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(calibr50_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(setaroul_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(crazyfgt_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(inttoote_interrupt);
 };
 
 /*----------- defined in video/seta.c -----------*/

@@ -22,15 +22,14 @@
 
 
 
-static TIMER_DEVICE_CALLBACK( finalizr_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(finalizr_state::finalizr_scanline)
 {
-	finalizr_state *state = timer.machine().driver_data<finalizr_state>();
 	int scanline = param;
 
-	if(scanline == 240 && state->m_irq_enable) // vblank irq
-		timer.machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
-	else if(((scanline % 32) == 0) && state->m_nmi_enable) // timer irq
-		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(scanline == 240 && m_irq_enable) // vblank irq
+		machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+	else if(((scanline % 32) == 0) && m_nmi_enable) // timer irq
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -279,7 +278,7 @@ static MACHINE_CONFIG_START( finalizr, finalizr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,XTAL_18_432MHz/6)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", finalizr_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", finalizr_state, finalizr_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", I8039,XTAL_18_432MHz/2)	/* 9.216MHz clkin ?? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

@@ -1008,9 +1008,9 @@ void fidelz80_state::machine_reset()
 	memset(m_digit_line_status, 0, sizeof(m_digit_line_status));
 }
 
-static TIMER_DEVICE_CALLBACK( nmi_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(fidelz80_state::nmi_timer)
 {
-	timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /******************************************************************************
@@ -1335,7 +1335,7 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 	MCFG_I8255_ADD("ppi8255", vsc_ppi8255_intf)
 	MCFG_Z80PIO_ADD("z80pio", XTAL_4MHz, vsc_z80pio_intf)
 
-	MCFG_TIMER_ADD_PERIODIC("nmi_timer", nmi_timer, attotime::from_hz(600))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", fidelz80_state, nmi_timer, attotime::from_hz(600))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(600))
 
 	/* sound hardware */

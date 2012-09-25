@@ -44,6 +44,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_overdriv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cpuB_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(overdriv_cpuA_scanline);
 };
 
 /*----------- defined in video/overdriv.c -----------*/

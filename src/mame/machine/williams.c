@@ -253,9 +253,9 @@ const pia6821_interface joust2_pia_1_intf =
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK( williams_va11_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_va11_callback)
 {
-	pia6821_device *pia_1 = timer.machine().device<pia6821_device>("pia_1");
+	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
 	int scanline = param;
 
 	/* the IRQ signal comes into CB1, and is set to VA11 */
@@ -264,7 +264,7 @@ TIMER_DEVICE_CALLBACK( williams_va11_callback )
 	/* set a timer for the next update */
 	scanline += 0x20;
 	if (scanline >= 256) scanline = 0;
-	timer.adjust(timer.machine().primary_screen->time_until_pos(scanline), scanline);
+	timer.adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -277,19 +277,18 @@ TIMER_CALLBACK_MEMBER(williams_state::williams_count240_off_callback)
 }
 
 
-TIMER_DEVICE_CALLBACK( williams_count240_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_count240_callback)
 {
-	williams_state *state = timer.machine().driver_data<williams_state>();
-	pia6821_device *pia_1 = timer.machine().device<pia6821_device>("pia_1");
+	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
 
 	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
 	pia_1->ca1_w(1);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	timer.machine().scheduler().timer_set(timer.machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(williams_state::williams_count240_off_callback),state));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(williams_state::williams_count240_off_callback),this));
 
 	/* set a timer for next frame */
-	timer.adjust(timer.machine().primary_screen->time_until_pos(240));
+	timer.adjust(machine().primary_screen->time_until_pos(240));
 }
 
 
@@ -406,10 +405,10 @@ MACHINE_RESET_MEMBER(williams_state,williams)
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK( williams2_va11_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams2_va11_callback)
 {
-	pia6821_device *pia_0 = timer.machine().device<pia6821_device>("pia_0");
-	pia6821_device *pia_1 = timer.machine().device<pia6821_device>("pia_1");
+	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
+	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
 	int scanline = param;
 
 	/* the IRQ signal comes into CB1, and is set to VA11 */
@@ -419,7 +418,7 @@ TIMER_DEVICE_CALLBACK( williams2_va11_callback )
 	/* set a timer for the next update */
 	scanline += 0x20;
 	if (scanline >= 256) scanline = 0;
-	timer.adjust(timer.machine().primary_screen->time_until_pos(scanline), scanline);
+	timer.adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -432,19 +431,18 @@ TIMER_CALLBACK_MEMBER(williams_state::williams2_endscreen_off_callback)
 }
 
 
-TIMER_DEVICE_CALLBACK( williams2_endscreen_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams2_endscreen_callback)
 {
-	williams_state *state = timer.machine().driver_data<williams_state>();
-	pia6821_device *pia_0 = timer.machine().device<pia6821_device>("pia_0");
+	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
 
 	/* the /ENDSCREEN signal comes into CA1 */
 	pia_0->ca1_w(0);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	timer.machine().scheduler().timer_set(timer.machine().primary_screen->time_until_pos(8), timer_expired_delegate(FUNC(williams_state::williams2_endscreen_off_callback),state));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(8), timer_expired_delegate(FUNC(williams_state::williams2_endscreen_off_callback),this));
 
 	/* set a timer for next frame */
-	timer.adjust(timer.machine().primary_screen->time_until_pos(254));
+	timer.adjust(machine().primary_screen->time_until_pos(254));
 }
 
 

@@ -103,36 +103,35 @@ INLINE int scanline_to_vcount(int scanline)
 		return (vcount - 0x18) | 0x100;
 }
 
-static TIMER_DEVICE_CALLBACK( vball_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(vball_state::vball_scanline)
 {
-	vball_state *state = timer.machine().driver_data<vball_state>();
 	int scanline = param;
-	int screen_height = timer.machine().primary_screen->height();
+	int screen_height = machine().primary_screen->height();
 	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
 	int vcount = scanline_to_vcount(scanline);
 
 	/* Update to the current point */
 	if (scanline > 0)
 	{
-		timer.machine().primary_screen->update_partial(scanline - 1);
+		machine().primary_screen->update_partial(scanline - 1);
 	}
 
 	/* IRQ fires every on every 8th scanline */
 	if (!(vcount_old & 8) && (vcount & 8))
 	{
-		timer.machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 	}
 
 	/* NMI fires on scanline 248 (VBL) and is latched */
 	if (vcount == 0xf8)
 	{
-		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 
 	/* Save the scroll x register value */
 	if (scanline < 256)
 	{
-		state->m_vb_scrollx[255 - scanline] = (state->m_vb_scrollx_hi + state->m_vb_scrollx_lo + 4);
+		m_vb_scrollx[255 - scanline] = (m_vb_scrollx_hi + m_vb_scrollx_lo + 4);
 	}
 }
 
@@ -410,7 +409,7 @@ static MACHINE_CONFIG_START( vball, vball_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)	/* 2 MHz - measured by guru but it makes the game far far too slow ?! */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", vball_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", vball_state, vball_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

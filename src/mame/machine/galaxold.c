@@ -49,9 +49,9 @@ WRITE8_MEMBER(galaxold_state::galaxold_nmi_enable_w)
 }
 
 
-TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(galaxold_state::galaxold_interrupt_timer)
 {
-    ttl7474_device *target = timer.machine().device<ttl7474_device>("7474_9m_2");
+    ttl7474_device *target = machine().device<ttl7474_device>("7474_9m_2");
 
 	/* 128V, 64V and 32V go to D */
 	target->d_w(((param & 0xe0) != 0xe0) ? 1 : 0);
@@ -61,7 +61,7 @@ TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer )
 
 	param = (param + 0x10) & 0xff;
 
-	timer.adjust(timer.machine().primary_screen->time_until_pos(param), param);
+	timer.adjust(machine().primary_screen->time_until_pos(param), param);
 }
 
 

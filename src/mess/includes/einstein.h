@@ -83,6 +83,8 @@ public:
 	DECLARE_MACHINE_START(einstein2);
 	DECLARE_MACHINE_RESET(einstein2);
 	UINT32 screen_update_einstein2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(einstein_keyboard_timer_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(einstein_ctc_trigger_callback);
 };
 
 

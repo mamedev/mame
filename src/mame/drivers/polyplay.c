@@ -88,7 +88,7 @@ emulated now. ;)
 
 
 /* timer handling */
-static TIMER_DEVICE_CALLBACK( polyplay_timer_callback );
+
 
 
 
@@ -276,7 +276,7 @@ static MACHINE_CONFIG_START( polyplay, polyplay_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", polyplay_state,  coin_interrupt)
 
 
-	MCFG_TIMER_ADD("timer", polyplay_timer_callback)
+	MCFG_TIMER_DRIVER_ADD("timer", polyplay_state, polyplay_timer_callback)
 
 
 	/* video hardware */
@@ -342,9 +342,9 @@ ROM_START( polyplay )
 ROM_END
 
 
-static TIMER_DEVICE_CALLBACK( polyplay_timer_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(polyplay_state::polyplay_timer_callback)
 {
-	timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0x4c);
+	machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0x4c);
 }
 
 /* game driver */

@@ -16,25 +16,24 @@
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK( mhavoc_cpu_irq_clock )
+TIMER_DEVICE_CALLBACK_MEMBER(mhavoc_state::mhavoc_cpu_irq_clock)
 {
-	mhavoc_state *state = timer.machine().driver_data<mhavoc_state>();
 	/* clock the LS161 driving the alpha CPU IRQ */
-	if (state->m_alpha_irq_clock_enable)
+	if (m_alpha_irq_clock_enable)
 	{
-		state->m_alpha_irq_clock++;
-		if ((state->m_alpha_irq_clock & 0x0c) == 0x0c)
+		m_alpha_irq_clock++;
+		if ((m_alpha_irq_clock & 0x0c) == 0x0c)
 		{
-			timer.machine().device("alpha")->execute().set_input_line(0, ASSERT_LINE);
-			state->m_alpha_irq_clock_enable = 0;
+			machine().device("alpha")->execute().set_input_line(0, ASSERT_LINE);
+			m_alpha_irq_clock_enable = 0;
 		}
 	}
 
 	/* clock the LS161 driving the gamma CPU IRQ */
-	if (state->m_has_gamma_cpu)
+	if (m_has_gamma_cpu)
 	{
-		state->m_gamma_irq_clock++;
-		timer.machine().device("gamma")->execute().set_input_line(0, (state->m_gamma_irq_clock & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		m_gamma_irq_clock++;
+		machine().device("gamma")->execute().set_input_line(0, (m_gamma_irq_clock & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

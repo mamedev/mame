@@ -288,7 +288,7 @@ static MACHINE_CONFIG_START( bang, gaelco2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 30000000/2)			/* 15 MHz */
 	MCFG_CPU_PROGRAM_MAP(bang_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", bang_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gaelco2_state, bang_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
 

@@ -129,26 +129,26 @@ Known issues :
 
 ***************************************************************************/
 
-static TIMER_DEVICE_CALLBACK( argus_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(argus_state::argus_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
 
 	if(scanline == 16) // vblank-in irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */
 }
 
-static TIMER_DEVICE_CALLBACK( butasan_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(argus_state::butasan_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 248) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
 
 	if(scanline == 8) // vblank-in irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */
 }
 
 /* Handler called by the YM2203 emulator when the internal timers cause an IRQ */
@@ -545,7 +545,7 @@ static MACHINE_CONFIG_START( argus, argus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)			/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(argus_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", argus_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", argus_state, argus_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 5000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map_a)
@@ -589,7 +589,7 @@ static MACHINE_CONFIG_START( valtric, argus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)			/* 5 MHz */
 	MCFG_CPU_PROGRAM_MAP(valtric_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", argus_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", argus_state, argus_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 5000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map_a)
@@ -633,7 +633,7 @@ static MACHINE_CONFIG_START( butasan, argus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)			/* 5 MHz */
 	MCFG_CPU_PROGRAM_MAP(butasan_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", butasan_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", argus_state, butasan_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 5000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map_b)

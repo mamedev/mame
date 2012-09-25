@@ -52,12 +52,12 @@ public:
 	UINT32 screen_update_gaelco2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_gaelco2_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_gaelco2_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(bang_irq);
 };
 
 
 /*----------- defined in machine/gaelco2.c -----------*/
 
-TIMER_DEVICE_CALLBACK( bang_irq );
 DECLARE_WRITE16_DEVICE_HANDLER( gaelco2_eeprom_cs_w );
 DECLARE_WRITE16_DEVICE_HANDLER( gaelco2_eeprom_sk_w );
 DECLARE_WRITE16_DEVICE_HANDLER( gaelco2_eeprom_data_w );

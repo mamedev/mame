@@ -341,20 +341,16 @@ INPUT_PORTS_END
 
 /* Video */
 
-static TIMER_DEVICE_CALLBACK( digit_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::digit_tick)
 {
-	cosmicos_state *state = timer.machine().driver_data<cosmicos_state>();
+	m_digit = !m_digit;
 
-	state->m_digit = !state->m_digit;
-
-	output_set_digit_value(state->m_digit, state->m_segment);
+	output_set_digit_value(m_digit, m_segment);
 }
 
-static TIMER_DEVICE_CALLBACK( int_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::int_tick)
 {
-	cosmicos_state *state = timer.machine().driver_data<cosmicos_state>();
-
-	state->m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, ASSERT_LINE);
+	m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER( cosmicos_state::dmaout_w )
@@ -569,8 +565,8 @@ static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
     /* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_cosmicos )
 	MCFG_DM9368_ADD(DM9368_TAG, led_intf)
-	MCFG_TIMER_ADD_PERIODIC("digit", digit_tick, attotime::from_hz(100))
-	MCFG_TIMER_ADD_PERIODIC("interrupt", int_tick, attotime::from_hz(1000))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("digit", cosmicos_state, digit_tick, attotime::from_hz(100))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("interrupt", cosmicos_state, int_tick, attotime::from_hz(1000))
 
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)
 	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)

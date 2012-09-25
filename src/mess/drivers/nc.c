@@ -492,15 +492,14 @@ static void nc_common_close_stream(running_machine &machine)
 
 
 
-static TIMER_DEVICE_CALLBACK(dummy_timer_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(nc_state::dummy_timer_callback)
 {
-	nc_state *state = timer.machine().driver_data<nc_state>();
 	int inputport_10_state;
 	int changed_bits;
 
-	inputport_10_state = timer.machine().root_device().ioport("EXTRA")->read();
+	inputport_10_state = machine().root_device().ioport("EXTRA")->read();
 
-	changed_bits = inputport_10_state^state->m_previous_inputport_10_state;
+	changed_bits = inputport_10_state^m_previous_inputport_10_state;
 
 	/* on/off button changed state? */
 	if (changed_bits & 0x01)
@@ -509,19 +508,19 @@ static TIMER_DEVICE_CALLBACK(dummy_timer_callback)
         {
 			/* on NC100 on/off button causes a nmi, on
             nc200 on/off button causes an int */
-			switch (state->m_type)
+			switch (m_type)
 			{
 				case NC_TYPE_1xx:
 				{
 			        LOG(("nmi triggered\n"));
-				    timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+				    machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 				}
 				break;
 
 				case NC_TYPE_200:
 				{
-					state->m_irq_status |= (1 << 4);
-					nc_update_interrupts(timer.machine());
+					m_irq_status |= (1 << 4);
+					nc_update_interrupts(machine());
 				}
 				break;
 			}
@@ -532,10 +531,10 @@ static TIMER_DEVICE_CALLBACK(dummy_timer_callback)
 	if (changed_bits & 0x02)
 	{
 		/* yes refresh memory config */
-		nc_refresh_memory_config(timer.machine());
+		nc_refresh_memory_config(machine());
 	}
 
-	state->m_previous_inputport_10_state = inputport_10_state;
+	m_previous_inputport_10_state = inputport_10_state;
 }
 
 
@@ -1640,7 +1639,7 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	/* dummy timer */
-	MCFG_TIMER_ADD_PERIODIC("dummy_timer", dummy_timer_callback, attotime::from_hz(50))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", nc_state, dummy_timer_callback, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
 static const floppy_interface nc200_floppy_interface =

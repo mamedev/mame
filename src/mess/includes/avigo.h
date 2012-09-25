@@ -105,5 +105,7 @@ public:
 	UINT8				m_warm_start;
 	UINT8 * 			m_ram_base;
 	virtual void palette_init();
+	TIMER_DEVICE_CALLBACK_MEMBER(avigo_scan_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(avigo_1hz_timer);
 };
 #endif /* AVIGO_H_ */

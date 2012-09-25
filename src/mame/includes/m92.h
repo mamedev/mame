@@ -78,6 +78,7 @@ public:
 	UINT32 screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(spritebuffer_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(m92_scanline_interrupt);
 };
 
 /*----------- defined in drivers/m92.c -----------*/

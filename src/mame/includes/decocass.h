@@ -223,6 +223,7 @@ public:
 	DECLARE_READ8_MEMBER(mirrorcolorram_r);
 	DECLARE_READ8_MEMBER(cdsteljn_input_r);
 	DECLARE_WRITE8_MEMBER(cdsteljn_mux_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(decocass_audio_nmi_gen);
 private:
 	DECLARE_READ8_MEMBER(decocass_type1_latch_26_pass_3_inv_2_r);
 	DECLARE_READ8_MEMBER(decocass_type1_pass_136_r);
@@ -251,4 +252,3 @@ private:
 					UINT8 *missile_ram, int interleave);							
 };
 
-TIMER_DEVICE_CALLBACK(decocass_audio_nmi_gen);

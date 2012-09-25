@@ -402,14 +402,14 @@ static const ay8910_interface ay8910_interface_2 =
 };
 
 
-TIMER_DEVICE_CALLBACK( changela_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(changela_state::changela_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 256) // vblank irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xdf);
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xdf);
 	else if(((scanline % 64) == 0)) // timer irq, 3 times per given vblank field
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xcf);
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xcf);
 }
 
 INTERRUPT_GEN_MEMBER(changela_state::chl_mcu_irq)
@@ -503,7 +503,7 @@ static MACHINE_CONFIG_START( changela, changela_state )
 
 	MCFG_CPU_ADD("maincpu", Z80,5000000)
 	MCFG_CPU_PROGRAM_MAP(changela_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", changela_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", changela_state, changela_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("mcu", M68705,2500000)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)

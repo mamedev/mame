@@ -10,26 +10,25 @@ Atari Drag Race Driver
 #include "sound/discrete.h"
 
 
-static TIMER_DEVICE_CALLBACK( dragrace_frame_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::dragrace_frame_callback)
 {
-	dragrace_state *state = timer.machine().driver_data<dragrace_state>();
 	int i;
 	static const char *const portnames[] = { "P1", "P2" };
 
 	for (i = 0; i < 2; i++)
 	{
-		switch (timer.machine().root_device().ioport(portnames[i])->read())
+		switch (machine().root_device().ioport(portnames[i])->read())
 		{
-		case 0x01: state->m_gear[i] = 1; break;
-		case 0x02: state->m_gear[i] = 2; break;
-		case 0x04: state->m_gear[i] = 3; break;
-		case 0x08: state->m_gear[i] = 4; break;
-		case 0x10: state->m_gear[i] = 0; break;
+		case 0x01: m_gear[i] = 1; break;
+		case 0x02: m_gear[i] = 2; break;
+		case 0x04: m_gear[i] = 3; break;
+		case 0x08: m_gear[i] = 4; break;
+		case 0x10: m_gear[i] = 0; break;
 		}
 	}
 
 	/* watchdog is disabled during service mode */
-	timer.machine().watchdog_enable(timer.machine().root_device().ioport("IN0")->read() & 0x20);
+	machine().watchdog_enable(machine().root_device().ioport("IN0")->read() & 0x20);
 }
 
 
@@ -336,7 +335,7 @@ static MACHINE_CONFIG_START( dragrace, dragrace_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 
-	MCFG_TIMER_ADD_PERIODIC("frame_timer", dragrace_frame_callback, attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("frame_timer", dragrace_state, dragrace_frame_callback, attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -183,12 +183,11 @@ WRITE8_MEMBER(btime_state::ay_audio_nmi_enable_w)
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( audio_nmi_gen )
+TIMER_DEVICE_CALLBACK_MEMBER(btime_state::audio_nmi_gen)
 {
-	btime_state *state = timer.machine().driver_data<btime_state>();
 	int scanline = param;
-	state->m_audio_nmi_state = scanline & 8;
-	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, (state->m_audio_nmi_enabled && state->m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+	m_audio_nmi_state = scanline & 8;
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1463,7 +1462,7 @@ static MACHINE_CONFIG_START( btime, btime_state )
 
 	MCFG_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_TIMER_ADD_SCANLINE("audionmi", audio_nmi_gen, "screen", 0, 8)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("audionmi", btime_state, audio_nmi_gen, "screen", 0, 8)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

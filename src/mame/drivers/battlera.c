@@ -234,7 +234,7 @@ static MACHINE_CONFIG_START( battlera, battlera_state )
 	MCFG_CPU_ADD("maincpu", H6280,21477200/3)
 	MCFG_CPU_PROGRAM_MAP(battlera_map)
 	MCFG_CPU_IO_MAP(battlera_portmap)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", battlera_irq, "screen", 0, 1) /* 8 prelines, 232 lines, 16 vblank? */
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", battlera_state, battlera_irq, "screen", 0, 1) /* 8 prelines, 232 lines, 16 vblank? */
 
 	MCFG_CPU_ADD("audiocpu", H6280,21477200/3)
 	MCFG_CPU_PROGRAM_MAP(sound_map)

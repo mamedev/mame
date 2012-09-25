@@ -110,6 +110,8 @@ public:
 	UINT32 screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);	
 	void screen_eof_captaven(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
+	TIMER_DEVICE_CALLBACK_MEMBER(lockload_vbl_irq);
 };
 
 class dragngun_state : public deco32_state

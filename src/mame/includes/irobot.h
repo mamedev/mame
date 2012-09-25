@@ -79,11 +79,9 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_irobot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(irobot_irvg_done_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(irobot_irmb_done_callback);
 };
-
-/*----------- defined in machine/irobot.c -----------*/
-TIMER_DEVICE_CALLBACK( irobot_irvg_done_callback );
-TIMER_DEVICE_CALLBACK( irobot_irmb_done_callback );
 
 /*----------- defined in video/irobot.c -----------*/
 void irobot_poly_clear(running_machine &machine);

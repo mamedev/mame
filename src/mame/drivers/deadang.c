@@ -206,26 +206,26 @@ GFXDECODE_END
 
 /* Interrupt Generators */
 
-static TIMER_DEVICE_CALLBACK( deadang_main_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::deadang_main_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xc4/4);
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xc4/4);
 
 	if(scanline == 0) // vblank-in irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xc8/4);
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xc8/4);
 }
 
-static TIMER_DEVICE_CALLBACK( deadang_sub_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::deadang_sub_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("sub")->execute().set_input_line_and_vector(0, HOLD_LINE,0xc4/4);
+		machine().device("sub")->execute().set_input_line_and_vector(0, HOLD_LINE,0xc4/4);
 
 	if(scanline == 0) // vblank-in irq
-		timer.machine().device("sub")->execute().set_input_line_and_vector(0, HOLD_LINE,0xc8/4);
+		machine().device("sub")->execute().set_input_line_and_vector(0, HOLD_LINE,0xc8/4);
 }
 
 /* Machine Drivers */
@@ -235,11 +235,11 @@ static MACHINE_CONFIG_START( deadang, deadang_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer1", deadang_main_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer1", deadang_state, deadang_main_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer2", deadang_sub_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", deadang_state, deadang_sub_scanline, "screen", 0, 1)
 
 	SEIBU3A_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)
 

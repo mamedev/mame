@@ -133,10 +133,9 @@ void xerox820_state::scan_keyboard()
 	m_keydata = keydata;
 }
 
-static TIMER_DEVICE_CALLBACK( xerox820_keyboard_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(xerox820_state::xerox820_keyboard_tick)
 {
-	xerox820_state *state = timer.machine().driver_data<xerox820_state>();
-	state->scan_keyboard();
+	scan_keyboard();
 }
 
 /* Read/Write Handlers */
@@ -552,12 +551,10 @@ static Z80DART_INTERFACE( sio_intf )
 
 /* Z80 CTC */
 
-static TIMER_DEVICE_CALLBACK( ctc_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(xerox820_state::ctc_tick)
 {
-	xerox820_state *state = timer.machine().driver_data<xerox820_state>();
-
-	state->m_ctc->trg0(1);
-	state->m_ctc->trg0(0);
+	m_ctc->trg0(1);
+	m_ctc->trg0(0);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
@@ -848,8 +845,8 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_PALETTE_INIT(black_and_white)
 
 	/* keyboard */
-	MCFG_TIMER_ADD_PERIODIC("keyboard", xerox820_keyboard_tick,attotime::from_hz(60))
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_20MHz/8))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", xerox820_state, xerox820_keyboard_tick, attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(XTAL_20MHz/8))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -886,8 +883,8 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_PALETTE_INIT(black_and_white)
 
 	/* keyboard */
-	MCFG_TIMER_ADD_PERIODIC("keyboard", xerox820_keyboard_tick, attotime::from_hz(60))
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_16MHz/4))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", xerox820_state, xerox820_keyboard_tick, attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(XTAL_16MHz/4))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

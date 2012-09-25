@@ -70,31 +70,29 @@ INTERRUPT_GEN_MEMBER(nemesis_state::blkpnthr_interrupt)
 		device.execute().set_input_line(2, HOLD_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK( konamigt_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::konamigt_interrupt)
 {
-	nemesis_state *state = timer.machine().driver_data<nemesis_state>();
 	int scanline = param;
 
-	if (scanline == 240 && state->m_irq_on && (timer.machine().primary_screen->frame_number() & 1) == 0)
-		state->m_maincpu->set_input_line(1, HOLD_LINE);
+	if (scanline == 240 && m_irq_on && (machine().primary_screen->frame_number() & 1) == 0)
+		m_maincpu->set_input_line(1, HOLD_LINE);
 
-	if (scanline == 0 && state->m_irq2_on)
-		state->m_maincpu->set_input_line(2, HOLD_LINE);
+	if (scanline == 0 && m_irq2_on)
+		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK( gx400_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::gx400_interrupt)
 {
-	nemesis_state *state = timer.machine().driver_data<nemesis_state>();
 	int scanline = param;
 
-	if (scanline == 240 && state->m_irq1_on && (timer.machine().primary_screen->frame_number() & 1) == 0)
-		state->m_maincpu->set_input_line(1, HOLD_LINE);
+	if (scanline == 240 && m_irq1_on && (machine().primary_screen->frame_number() & 1) == 0)
+		m_maincpu->set_input_line(1, HOLD_LINE);
 
-	if (scanline == 0 && state->m_irq2_on)
-		state->m_maincpu->set_input_line(2, HOLD_LINE);
+	if (scanline == 0 && m_irq2_on)
+		m_maincpu->set_input_line(2, HOLD_LINE);
 
-	if (scanline == 120 && state->m_irq4_on)
-		state->m_maincpu->set_input_line(4, HOLD_LINE);
+	if (scanline == 120 && m_irq4_on)
+		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 
@@ -1598,7 +1596,7 @@ static MACHINE_CONFIG_START( gx400, nemesis_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
 	MCFG_CPU_PROGRAM_MAP(gx400_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", gx400_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nemesis_state, gx400_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
@@ -1641,7 +1639,7 @@ static MACHINE_CONFIG_START( konamigt, nemesis_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
 	MCFG_CPU_PROGRAM_MAP(konamigt_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", konamigt_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nemesis_state, konamigt_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -1680,7 +1678,7 @@ static MACHINE_CONFIG_START( rf2_gx400, nemesis_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
 	MCFG_CPU_PROGRAM_MAP(rf2_gx400_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", gx400_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nemesis_state, gx400_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
@@ -1903,7 +1901,7 @@ static MACHINE_CONFIG_START( hcrash, nemesis_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/3)         /* 6.144MHz */
 	MCFG_CPU_PROGRAM_MAP(hcrash_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", konamigt_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nemesis_state, konamigt_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)       /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(sal_sound_map)
@@ -2648,7 +2646,7 @@ static MACHINE_CONFIG_START( bubsys, nemesis_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
 	MCFG_CPU_PROGRAM_MAP(gx400_map)
-//  MCFG_TIMER_ADD_SCANLINE("scantimer", gx400_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nemesis_state, gx400_interrupt, "screen", 0, 1)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */

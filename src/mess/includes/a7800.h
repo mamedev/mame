@@ -66,12 +66,8 @@ public:
 	virtual void palette_init();
 	DECLARE_PALETTE_INIT(a7800p);
 	UINT32 screen_update_a7800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(a7800_interrupt);
 };
-
-
-/*----------- defined in video/a7800.c -----------*/
-
-TIMER_DEVICE_CALLBACK( a7800_interrupt );
 
 /*----------- defined in machine/a7800.c -----------*/
 

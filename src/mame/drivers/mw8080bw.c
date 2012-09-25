@@ -2116,10 +2116,9 @@ MACHINE_CONFIG_END
 #define SPCENCTR_STROBE_DUTY_CYCLE	(95)	/* % */
 
 
-static TIMER_DEVICE_CALLBACK( spcenctr_strobe_timer_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(mw8080bw_state::spcenctr_strobe_timer_callback)
 {
-	mw8080bw_state *state = timer.machine().driver_data<mw8080bw_state>();
-	output_set_value("STROBE", param && state->m_spcenctr_strobe_state);
+	output_set_value("STROBE", param && m_spcenctr_strobe_state);
 }
 
 
@@ -2259,10 +2258,10 @@ static MACHINE_CONFIG_DERIVED( spcenctr, mw8080bw_root )
 	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
 
 	/* timers */
-	MCFG_TIMER_ADD_PERIODIC("strobeon", spcenctr_strobe_timer_callback, attotime::from_hz(SPCENCTR_STROBE_FREQ))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("strobeon", mw8080bw_state, spcenctr_strobe_timer_callback, attotime::from_hz(SPCENCTR_STROBE_FREQ))
 	MCFG_TIMER_PARAM(TRUE)	/* indicates strobe ON */
 
-	MCFG_TIMER_ADD_PERIODIC("strobeoff", spcenctr_strobe_timer_callback, attotime::from_hz(SPCENCTR_STROBE_FREQ))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("strobeoff", mw8080bw_state, spcenctr_strobe_timer_callback, attotime::from_hz(SPCENCTR_STROBE_FREQ))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(SPCENCTR_STROBE_FREQ * 100 / SPCENCTR_STROBE_DUTY_CYCLE))
 	MCFG_TIMER_PARAM(FALSE)	/* indicates strobe OFF */
 

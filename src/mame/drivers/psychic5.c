@@ -327,15 +327,15 @@ void psychic5_state::machine_reset()
 
 ***************************************************************************/
 
-static TIMER_DEVICE_CALLBACK( psychic5_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(psychic5_state::psychic5_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
 
 	if(scanline == 0) // sprite buffer irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);	/* RST 08h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);	/* RST 08h */
 }
 
 
@@ -663,7 +663,7 @@ static MACHINE_CONFIG_START( psychic5, psychic5_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
 	MCFG_CPU_PROGRAM_MAP(psychic5_main_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", psychic5_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, psychic5_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2)
 	MCFG_CPU_PROGRAM_MAP(psychic5_sound_map)
@@ -708,7 +708,7 @@ static MACHINE_CONFIG_START( bombsa, psychic5_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2 ) /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(bombsa_main_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", psychic5_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, psychic5_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz )
 	MCFG_CPU_PROGRAM_MAP(bombsa_sound_map)

@@ -115,4 +115,5 @@ public:
 	DECLARE_READ32_MEMBER( hsync_ram_r );
 	DECLARE_WRITE32_MEMBER( hsync_ram_w );
 	DECLARE_DRIVER_INIT(beathead);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 };

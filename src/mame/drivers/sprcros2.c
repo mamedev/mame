@@ -245,20 +245,19 @@ static const sn76496_config psg_intf =
 };
 
 
-static TIMER_DEVICE_CALLBACK( sprcros2_m_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(sprcros2_state::sprcros2_m_interrupt)
 {
-	sprcros2_state *state = timer.machine().driver_data<sprcros2_state>();
 	int scanline = param;
 
 	if (scanline == 240)
 	{
-		if(state->m_port7&0x01)
-			state->m_master->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		if(m_port7&0x01)
+			m_master->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else if(scanline == 0)
 	{
-		if(state->m_port7&0x08)
-			state->m_master->set_input_line(0, HOLD_LINE);
+		if(m_port7&0x08)
+			m_master->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -282,7 +281,7 @@ static MACHINE_CONFIG_START( sprcros2, sprcros2_state )
 	MCFG_CPU_ADD("master", Z80,10000000/2)
 	MCFG_CPU_PROGRAM_MAP(sprcros2_master_map)
 	MCFG_CPU_IO_MAP(sprcros2_master_io_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", sprcros2_m_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sprcros2_state, sprcros2_m_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", Z80,10000000/2)
 	MCFG_CPU_PROGRAM_MAP(sprcros2_slave_map)

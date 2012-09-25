@@ -483,6 +483,9 @@ public:
 	INTERRUPT_GEN_MEMBER(hginga_irq);
 	INTERRUPT_GEN_MEMBER(mjflove_irq);
 	INTERRUPT_GEN_MEMBER(hparadis_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(neruton_irq_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(majxtal7_vblank_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(tenkai_interrupt);
 };
 
 //----------- defined in drivers/dynax.c -----------

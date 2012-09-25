@@ -543,25 +543,19 @@ TIMER_CALLBACK_MEMBER(namcofl_state::raster_interrupt_callback)
 	m_raster_interrupt_timer->adjust(machine().primary_screen->frame_period());
 }
 
-static TIMER_DEVICE_CALLBACK( mcu_irq0_cb )
+TIMER_DEVICE_CALLBACK_MEMBER(namcofl_state::mcu_irq0_cb)
 {
-	namcofl_state *state = timer.machine().driver_data<namcofl_state>();
-
-	state->m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
+	m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK( mcu_irq2_cb )
+TIMER_DEVICE_CALLBACK_MEMBER(namcofl_state::mcu_irq2_cb)
 {
-	namcofl_state *state = timer.machine().driver_data<namcofl_state>();
-
-	state->m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
+	m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK( mcu_adc_cb )
+TIMER_DEVICE_CALLBACK_MEMBER(namcofl_state::mcu_adc_cb)
 {
-	namcofl_state *state = timer.machine().driver_data<namcofl_state>();
-
-	state->m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
+	m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 }
 
 
@@ -591,9 +585,9 @@ static MACHINE_CONFIG_START( namcofl, namcofl_state )
 	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
 	MCFG_CPU_IO_MAP(namcoc75_io)
 	/* TODO: irq generation for these */
-	MCFG_TIMER_ADD_PERIODIC("mcu_irq0", mcu_irq0_cb, attotime::from_hz(60))
-	MCFG_TIMER_ADD_PERIODIC("mcu_irq2", mcu_irq2_cb, attotime::from_hz(60))
-	MCFG_TIMER_ADD_PERIODIC("mcu_adc",  mcu_adc_cb, attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq0", namcofl_state, mcu_irq0_cb, attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namcofl_state, mcu_irq2_cb, attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_adc", namcofl_state, mcu_adc_cb, attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(namcofl_state,namcofl)
 	MCFG_MACHINE_RESET_OVERRIDE(namcofl_state,namcofl)

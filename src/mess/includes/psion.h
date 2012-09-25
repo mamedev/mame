@@ -86,6 +86,7 @@ public:
 	DECLARE_READ8_MEMBER( io_r );
 	virtual void palette_init();
 	DECLARE_INPUT_CHANGED_MEMBER(psion_on);
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 };
 
 // device type definition

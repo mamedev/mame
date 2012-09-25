@@ -213,25 +213,23 @@ TIMER_CALLBACK_MEMBER(coleco_state::paddle_pulse_callback)
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( paddle_update_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(coleco_state::paddle_update_callback)
 {
 	// arbitrary timer for reading analog controls
-	coleco_state *state = timer.machine().driver_data<coleco_state>();
-
-	coleco_scan_paddles(timer.machine(), &state->m_joy_analog_reload[0], &state->m_joy_analog_reload[1]);
+	coleco_scan_paddles(machine(), &m_joy_analog_reload[0], &m_joy_analog_reload[1]);
 
 	for (int port = 0; port < 2; port++)
 	{
-		if (state->m_joy_analog_reload[port])
+		if (m_joy_analog_reload[port])
 		{
 			const int sensitivity = 500;
-			int ipt = state->m_joy_analog_reload[port];
+			int ipt = m_joy_analog_reload[port];
 			if (ipt & 0x80) ipt = 0x100 - ipt;
 			attotime freq = attotime::from_msec(sensitivity / ipt);
 
 			// change pulse intervals relative to spinner/trackball speed
-			state->m_joy_pulse_reload[port] = freq;
-			state->m_joy_pulse_timer[port]->adjust(min(freq, state->m_joy_pulse_timer[port]->remaining()), port);
+			m_joy_pulse_reload[port] = freq;
+			m_joy_pulse_timer[port]->adjust(min(freq, m_joy_pulse_timer[port]->remaining()), port);
 		}
 	}
 }
@@ -340,7 +338,7 @@ static MACHINE_CONFIG_START( coleco, coleco_state )
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","coleco")
 
-	MCFG_TIMER_ADD_PERIODIC("paddle_timer", paddle_update_callback, attotime::from_msec(20))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("paddle_timer", coleco_state, paddle_update_callback, attotime::from_msec(20))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( czz50, coleco_state )
@@ -370,7 +368,7 @@ static MACHINE_CONFIG_START( czz50, coleco_state )
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","coleco")
 
-	MCFG_TIMER_ADD_PERIODIC("paddle_timer", paddle_update_callback, attotime::from_msec(20))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("paddle_timer", coleco_state, paddle_update_callback, attotime::from_msec(20))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dina, czz50 )

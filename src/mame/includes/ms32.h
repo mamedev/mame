@@ -88,4 +88,5 @@ public:
 	virtual void video_start();
 	DECLARE_VIDEO_START(f1superb);
 	UINT32 screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(ms32_interrupt);
 };

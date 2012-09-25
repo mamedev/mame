@@ -65,14 +65,11 @@ public:
 	DECLARE_MACHINE_RESET(atarisy1);
 	DECLARE_VIDEO_START(atarisy1);
 	UINT32 screen_update_atarisy1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(delayed_joystick_int);
+	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_reset_yscroll_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_int3off_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_int3_callback);
 };
-
-
-/*----------- defined in video/atarisy1.c -----------*/
-
-TIMER_DEVICE_CALLBACK( atarisy1_int3_callback );
-TIMER_DEVICE_CALLBACK( atarisy1_int3off_callback );
-TIMER_DEVICE_CALLBACK( atarisy1_reset_yscroll_callback );
 
 DECLARE_READ16_HANDLER( atarisy1_int3state_r );
 

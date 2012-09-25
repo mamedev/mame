@@ -1212,10 +1212,10 @@ static MACHINE_CONFIG_START( balsente, balsente_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_ADD("scan_timer", balsente_interrupt_timer)
-	MCFG_TIMER_ADD("8253_0_timer", balsente_clock_counter_0_ff)
-	MCFG_TIMER_ADD("8253_1_timer", balsente_counter_callback)
-	MCFG_TIMER_ADD("8253_2_timer", balsente_counter_callback)
+	MCFG_TIMER_DRIVER_ADD("scan_timer", balsente_state, balsente_interrupt_timer)
+	MCFG_TIMER_DRIVER_ADD("8253_0_timer", balsente_state, balsente_clock_counter_0_ff)
+	MCFG_TIMER_DRIVER_ADD("8253_1_timer", balsente_state, balsente_counter_callback)
+	MCFG_TIMER_DRIVER_ADD("8253_2_timer", balsente_state, balsente_counter_callback)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

@@ -518,10 +518,10 @@ WRITE8_MEMBER(system1_state::soundport_w)
 }
 
 
-static TIMER_DEVICE_CALLBACK( soundirq_gen )
+TIMER_DEVICE_CALLBACK_MEMBER(system1_state::soundirq_gen)
 {
 	/* sound IRQ is generated on 32V, 96V, ... and auto-acknowledged */
-	timer.machine().device("soundcpu")->execute().set_input_line(0, HOLD_LINE);
+	machine().device("soundcpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -602,7 +602,7 @@ INTERRUPT_GEN_MEMBER(system1_state::mcu_irq_assert)
 }
 
 
-static TIMER_DEVICE_CALLBACK( mcu_t0_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(system1_state::mcu_t0_callback)
 {
 	/* The T0 line is clocked by something; if it is not clocked fast
        enough, the MCU will fail; on shtngmst this happens after 3
@@ -610,7 +610,7 @@ static TIMER_DEVICE_CALLBACK( mcu_t0_callback )
        choplift is even more picky about it, affecting scroll speed
     */
 
-	device_t *mcu = timer.machine().device("mcu");
+	device_t *mcu = machine().device("mcu");
 	mcu->execute().set_input_line(MCS51_T0_LINE, ASSERT_LINE);
 	mcu->execute().set_input_line(MCS51_T0_LINE, CLEAR_LINE);
 }
@@ -2151,7 +2151,7 @@ static MACHINE_CONFIG_START( sys1ppi, system1_state )
 
 	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_TIMER_ADD_SCANLINE("soundirq", soundirq_gen, "screen", 32, 64)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("soundirq", system1_state, soundirq_gen, "screen", 32, 64)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -2222,7 +2222,7 @@ static MACHINE_CONFIG_FRAGMENT( mcu )
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state,  mcu_irq_assert)
 
-	MCFG_TIMER_ADD_PERIODIC("mcu_t0", mcu_t0_callback, attotime::from_usec(2500))	/* ??? actual clock unknown */
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_t0", system1_state, mcu_t0_callback, attotime::from_usec(2500))
 MACHINE_CONFIG_END
 
 

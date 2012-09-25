@@ -664,15 +664,14 @@ WRITE8_MEMBER(renegade_state::bankswitch_w)
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( renegade_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(renegade_state::renegade_interrupt)
 {
-	renegade_state *state = timer.machine().driver_data<renegade_state>();
 	int scanline = param;
 
 	if (scanline == 112) // ???
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else if(scanline == 240)
-		state->m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(renegade_state::renegade_coin_counter_w)
@@ -935,7 +934,7 @@ static MACHINE_CONFIG_START( renegade, renegade_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12000000/8)	/* 1.5 MHz (measured) */
 	MCFG_CPU_PROGRAM_MAP(renegade_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", renegade_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", renegade_state, renegade_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M6809, 12000000/8)
 	MCFG_CPU_PROGRAM_MAP(renegade_sound_map)	/* IRQs are caused by the main CPU */

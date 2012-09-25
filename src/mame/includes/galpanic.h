@@ -27,6 +27,8 @@ public:
 	UINT32 screen_update_galpanic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_comad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_galpanic(screen_device &screen, bool state);
+	TIMER_DEVICE_CALLBACK_MEMBER(galpanic_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(galhustl_scanline);
 };
 
 /*----------- defined in video/galpanic.c -----------*/

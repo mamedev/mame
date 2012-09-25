@@ -90,6 +90,9 @@ public:
 	TIMER_CALLBACK_MEMBER(pcjr_keyb_signal_callback);
 	TIMER_CALLBACK_MEMBER(mc1502_keyb_signal_callback);
 	TIMER_CALLBACK_MEMBER(pc_rtc_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(pc_frame_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(pc_vga_frame_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(pcjr_frame_interrupt);
 };
 
 /*----------- defined in machine/pc.c -----------*/
@@ -123,12 +126,6 @@ DECLARE_READ8_DEVICE_HANDLER( mc1502_wd17xx_motor_r );
 DECLARE_WRITE8_DEVICE_HANDLER( mc1502_wd17xx_aux_w );
 
 DEVICE_IMAGE_LOAD( pcjr_cartridge );
-
-TIMER_DEVICE_CALLBACK( pc_frame_interrupt );
-TIMER_DEVICE_CALLBACK( pc_vga_frame_interrupt );
-TIMER_DEVICE_CALLBACK( pcjr_frame_interrupt );
-TIMER_DEVICE_CALLBACK( null_frame_interrupt );
-
 
 void pc_rtc_init(running_machine &machine);
 

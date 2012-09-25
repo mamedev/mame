@@ -80,6 +80,7 @@ public:
 	UINT8 *m_crt_ram;			// CRT video RAM
 
 	UINT8 m_key_latch;
+	TIMER_DEVICE_CALLBACK_MEMBER(pc8401a_keyboard_tick);
 };
 
 class pc8500_state : public pc8401a_state

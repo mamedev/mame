@@ -254,7 +254,7 @@ static MACHINE_CONFIG_START( dambustr, dambustr_state )
 	MCFG_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
 	MCFG_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
 
-	MCFG_TIMER_ADD("int_timer", galaxold_interrupt_timer)
+	MCFG_TIMER_DRIVER_ADD("int_timer", dambustr_state, galaxold_interrupt_timer)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

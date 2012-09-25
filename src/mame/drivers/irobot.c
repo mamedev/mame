@@ -308,8 +308,8 @@ static MACHINE_CONFIG_START( irobot, irobot_state )
 	MCFG_PALETTE_LENGTH(64 + 32)	/* 64 for polygons, 32 for text */
 
 
-	MCFG_TIMER_ADD("irvg_timer", irobot_irvg_done_callback)
-	MCFG_TIMER_ADD("irmb_timer", irobot_irmb_done_callback)
+	MCFG_TIMER_DRIVER_ADD("irvg_timer", irobot_state, irobot_irvg_done_callback)
+	MCFG_TIMER_DRIVER_ADD("irmb_timer", irobot_state, irobot_irmb_done_callback)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

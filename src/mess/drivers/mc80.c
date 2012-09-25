@@ -134,16 +134,16 @@ static INPUT_PORTS_START( mc8030 )
 INPUT_PORTS_END
 
 
-static TIMER_DEVICE_CALLBACK( mc8020_kbd )
+TIMER_DEVICE_CALLBACK_MEMBER(mc80_state::mc8020_kbd)
 {
-	device_t *cpu = timer.machine().device( "maincpu" );
+	device_t *cpu = machine().device( "maincpu" );
 	address_space &mem = cpu->memory().space(AS_PROGRAM);
 	char kbdrow[6];
 	UINT8 i;
 	for (i = 1; i < 8; i++)
 	{
 		sprintf(kbdrow,"X%X", i);
-		mem.write_word(0xd20+i, timer.machine().root_device().ioport(kbdrow)->read());
+		mem.write_word(0xd20+i, machine().root_device().ioport(kbdrow)->read());
 	}
 }
 
@@ -180,7 +180,7 @@ static MACHINE_CONFIG_START( mc8020, mc80_state )
 	/* Devices */
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_2_4576MHz, mc8020_z80pio_intf )
 	MCFG_Z80CTC_ADD( "z80ctc", XTAL_2_4576MHz / 100, mc8020_ctc_intf )
-	MCFG_TIMER_ADD_PERIODIC("mc8020_kbd", mc8020_kbd, attotime::from_hz(50)) // keyscanner
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mc8020_kbd", mc80_state, mc8020_kbd, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mc8030, mc80_state )

@@ -124,6 +124,7 @@ public:
 
 	// GPIB
 	int m_talk;
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
 };
 
 class tek4052_state : public driver_device

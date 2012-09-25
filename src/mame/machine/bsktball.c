@@ -19,15 +19,14 @@ WRITE8_MEMBER(bsktball_state::bsktball_nmion_w)
     bsktball_interrupt
 ***************************************************************************/
 /* NMI every 32V, IRQ every VBLANK */
-TIMER_DEVICE_CALLBACK( bsktball_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(bsktball_state::bsktball_scanline)
 {
-	bsktball_state *state = timer.machine().driver_data<bsktball_state>();
 	int scanline = param;
 
 	if(scanline == 0) // vblank irq
-		timer.machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
-	else if(((scanline % 28) == 0) && (state->m_nmi_on)) // 32v timer irq
-		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+	else if(((scanline % 28) == 0) && (m_nmi_on)) // 32v timer irq
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

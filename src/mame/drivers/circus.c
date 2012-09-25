@@ -347,12 +347,12 @@ static MACHINE_CONFIG_START( robotbwl, circus_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static TIMER_DEVICE_CALLBACK( crash_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(circus_state::crash_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 256 || scanline == 0) // vblank-out / in irq
-		timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( crash, circus_state )
@@ -360,7 +360,7 @@ static MACHINE_CONFIG_START( crash, circus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 	MCFG_CPU_PROGRAM_MAP(circus_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", crash_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", circus_state, crash_scanline, "screen", 0, 1)
 
 
 	/* video hardware */

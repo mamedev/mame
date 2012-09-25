@@ -1024,24 +1024,24 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-static TIMER_DEVICE_CALLBACK( wecleman_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::wecleman_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 232) // vblank irq
-		timer.machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 	else if(((scanline % 64) == 0)) // timer irq TODO: timings
-		timer.machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK( hotchase_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::hotchase_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 224) // vblank irq
-		timer.machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 	else if(((scanline % 64) == 0)) // timer irq TODO: timings
-		timer.machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 }
 
 
@@ -1055,7 +1055,7 @@ static MACHINE_CONFIG_START( wecleman, wecleman_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)	/* Schems show 10MHz */
 	MCFG_CPU_PROGRAM_MAP(wecleman_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", wecleman_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wecleman_state, wecleman_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", M68000, 10000000)	/* Schems show 10MHz */
 	MCFG_CPU_PROGRAM_MAP(wecleman_sub_map)
@@ -1139,7 +1139,7 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz - PCB is drawn in one set's readme */
 	MCFG_CPU_PROGRAM_MAP(hotchase_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", hotchase_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wecleman_state, hotchase_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", M68000, 10000000)	/* 10 MHz - PCB is drawn in one set's readme */
 	MCFG_CPU_PROGRAM_MAP(hotchase_sub_map)

@@ -445,18 +445,17 @@ static const namco_53xx_interface namco_53xx_intf =
 };
 
 
-static TIMER_DEVICE_CALLBACK( polepos_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(polepos_state::polepos_scanline)
 {
-	polepos_state *state = timer.machine().driver_data<polepos_state>();
 	int scanline = param;
 
-	if (((scanline == 64) || (scanline == 192)) && state->m_main_irq_mask)	// 64V
-		timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+	if (((scanline == 64) || (scanline == 192)) && m_main_irq_mask)	// 64V
+		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
-	if (scanline == 240 && state->m_sub_irq_mask)	// VBLANK
+	if (scanline == 240 && m_sub_irq_mask)	// VBLANK
 	{
-		timer.machine().device("sub")->execute().set_input_line(0, ASSERT_LINE);
-		timer.machine().device("sub2")->execute().set_input_line(0, ASSERT_LINE);
+		machine().device("sub")->execute().set_input_line(0, ASSERT_LINE);
+		machine().device("sub2")->execute().set_input_line(0, ASSERT_LINE);
 	}
 }
 
@@ -903,7 +902,7 @@ static MACHINE_CONFIG_START( polepos, polepos_state )
 	MCFG_MACHINE_RESET_OVERRIDE(polepos_state,polepos)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_TIMER_ADD_SCANLINE("scantimer", polepos_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", polepos_state, polepos_scanline, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -982,7 +981,7 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 	MCFG_MACHINE_RESET_OVERRIDE(polepos_state,polepos)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_TIMER_ADD_SCANLINE("scantimer", polepos_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", polepos_state, polepos_scanline, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

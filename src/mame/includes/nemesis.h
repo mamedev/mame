@@ -87,4 +87,6 @@ public:
 	UINT32 screen_update_nemesis(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nemesis_interrupt);
 	INTERRUPT_GEN_MEMBER(blkpnthr_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(konamigt_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(gx400_interrupt);
 };

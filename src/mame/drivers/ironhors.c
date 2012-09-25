@@ -20,20 +20,19 @@
  *
  *************************************/
 
-static TIMER_DEVICE_CALLBACK( ironhors_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::ironhors_irq)
 {
-	ironhors_state *state = timer.machine().driver_data<ironhors_state>();
 	int scanline = param;
 
 	if (scanline == 240)
 	{
-		if (*state->m_interrupt_enable & 4)
-			state->m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+		if (*m_interrupt_enable & 4)
+			m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 	}
 	else if (((scanline+16) % 64) == 0)
 	{
-		if (*state->m_interrupt_enable & 1)
-			state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		if (*m_interrupt_enable & 1)
+			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -380,7 +379,7 @@ static MACHINE_CONFIG_START( ironhors, ironhors_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
 	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", ironhors_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ironhors_state, ironhors_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu",Z80,18432000/6)		 /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(slave_map)
@@ -416,20 +415,19 @@ static MACHINE_CONFIG_START( ironhors, ironhors_state )
 
 MACHINE_CONFIG_END
 
-static TIMER_DEVICE_CALLBACK( farwest_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_irq)
 {
-	ironhors_state *state = timer.machine().driver_data<ironhors_state>();
 	int scanline = param;
 
 	if ((scanline % 2) == 1)
 	{
-		if (*state->m_interrupt_enable & 4)
-			state->m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+		if (*m_interrupt_enable & 4)
+			m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 	}
 	else if ((scanline % 2) == 0)
 	{
-		if (*state->m_interrupt_enable & 1)
-			state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		if (*m_interrupt_enable & 1)
+			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -459,7 +457,7 @@ static MACHINE_CONFIG_DERIVED( farwest, ironhors )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(farwest_master_map)
 	MCFG_DEVICE_MODIFY("scantimer")
-	MCFG_TIMER_CALLBACK(farwest_irq)
+	MCFG_TIMER_DRIVER_CALLBACK(ironhors_state, farwest_irq)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(farwest_slave_map)

@@ -1078,16 +1078,15 @@ MACHINE_RESET_MEMBER(mitchell_state,mitchell)
 	m_keymatrix = 0;
 }
 
-static TIMER_DEVICE_CALLBACK( mitchell_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(mitchell_state::mitchell_irq)
 {
-	mitchell_state *state = timer.machine().driver_data<mitchell_state>();
 	int scanline = param;
 
 	if (scanline == 240 || scanline == 0)
 	{
-		state->m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 
-		state->m_irq_source = (scanline == 240);
+		m_irq_source = (scanline == 240);
 	}
 }
 
@@ -1097,7 +1096,7 @@ static MACHINE_CONFIG_START( mgakuen, mitchell_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2) /* probably same clock as the other mitchell hardware games */
 	MCFG_CPU_PROGRAM_MAP(mgakuen_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", mitchell_irq, "screen", 0, 1)	/* ??? one extra irq seems to be needed for music (see input5_r) */
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
@@ -1134,7 +1133,7 @@ static MACHINE_CONFIG_START( pang, mitchell_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", mitchell_irq, "screen", 0, 1)	/* ??? one extra irq seems to be needed for music (see input5_r) */
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
@@ -1273,7 +1272,7 @@ static MACHINE_CONFIG_START( marukin, mitchell_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", mitchell_irq, "screen", 0, 1)	/* ??? one extra irq seems to be needed for music (see input5_r) */
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -1324,7 +1323,7 @@ static MACHINE_CONFIG_START( pkladiesbl, mitchell_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", mitchell_irq, "screen", 0, 1)	/* ??? one extra irq seems to be needed for music (see input5_r) */
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 

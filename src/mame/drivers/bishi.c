@@ -106,18 +106,17 @@ WRITE16_MEMBER(bishi_state::control2_w)
 	COMBINE_DATA(&m_cur_control2);
 }
 
-static TIMER_DEVICE_CALLBACK( bishi_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(bishi_state::bishi_scanline)
 {
-	bishi_state *state = timer.machine().driver_data<bishi_state>();
 	int scanline = param;
 
-	if (state->m_cur_control & 0x800)
+	if (m_cur_control & 0x800)
 	{
 		if(scanline == 240) // vblank-out irq
-			timer.machine().device("maincpu")->execute().set_input_line(M68K_IRQ_3, HOLD_LINE);
+			machine().device("maincpu")->execute().set_input_line(M68K_IRQ_3, HOLD_LINE);
 
 		if(scanline == 0) // vblank-in irq
-			timer.machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, HOLD_LINE);
+			machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, HOLD_LINE);
 	}
 }
 
@@ -411,7 +410,7 @@ static MACHINE_CONFIG_START( bishi, bishi_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK) /* 12MHz (24MHz OSC / 2 ) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", bishi_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bishi_state, bishi_scanline, "screen", 0, 1)
 
 
 	/* video hardware */

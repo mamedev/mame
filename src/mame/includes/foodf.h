@@ -36,4 +36,5 @@ public:
 	DECLARE_MACHINE_RESET(foodf);
 	DECLARE_VIDEO_START(foodf);
 	UINT32 screen_update_foodf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 };

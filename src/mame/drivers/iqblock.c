@@ -73,18 +73,17 @@ WRITE8_MEMBER(iqblock_state::grndtour_prot_w)
 }
 
 
-static TIMER_DEVICE_CALLBACK( iqblock_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(iqblock_state::iqblock_irq)
 {
-	iqblock_state *state = timer.machine().driver_data<iqblock_state>();
 	int scanline = param;
 
 	if((scanline % 16) != 0)
 		return;
 
 	if((scanline % 32) == 16)
-		state->m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	else if	((scanline % 32) == 0)
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -275,7 +274,7 @@ static MACHINE_CONFIG_START( iqblock, iqblock_state )
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)	/* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", iqblock_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", iqblock_state, iqblock_irq, "screen", 0, 1)
 
 	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 

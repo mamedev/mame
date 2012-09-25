@@ -68,12 +68,10 @@ WRITE16_MEMBER(cninja_state::stoneage_sound_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK( interrupt_gen )
+TIMER_DEVICE_CALLBACK_MEMBER(cninja_state::interrupt_gen)
 {
-	cninja_state *state = timer.machine().driver_data<cninja_state>();
-
-	state->m_maincpu->set_input_line((state->m_irq_mask & 0x10) ? 3 : 4, ASSERT_LINE);
-	state->m_raster_irq_timer->reset();
+	m_maincpu->set_input_line((m_irq_mask & 0x10) ? 3 : 4, ASSERT_LINE);
+	m_raster_irq_timer->reset();
 }
 
 READ16_MEMBER(cninja_state::cninja_irq_r)
@@ -912,7 +910,7 @@ static MACHINE_CONFIG_START( cninja, cninja_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
-	MCFG_TIMER_ADD("raster_timer", interrupt_gen)
+	MCFG_TIMER_DRIVER_ADD("raster_timer", cninja_state, interrupt_gen)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -964,7 +962,7 @@ static MACHINE_CONFIG_START( stoneage, cninja_state )
 	MCFG_CPU_PROGRAM_MAP(stoneage_s_map)
 
 
-	MCFG_TIMER_ADD("raster_timer", interrupt_gen)
+	MCFG_TIMER_DRIVER_ADD("raster_timer", cninja_state, interrupt_gen)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1016,7 +1014,7 @@ static MACHINE_CONFIG_START( cninjabl, cninja_state )
 	MCFG_CPU_PROGRAM_MAP(stoneage_s_map)
 
 
-	MCFG_TIMER_ADD("raster_timer", interrupt_gen)
+	MCFG_TIMER_DRIVER_ADD("raster_timer", cninja_state, interrupt_gen)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1059,7 +1057,7 @@ static MACHINE_CONFIG_START( edrandy, cninja_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
-	MCFG_TIMER_ADD("raster_timer", interrupt_gen)
+	MCFG_TIMER_DRIVER_ADD("raster_timer", cninja_state, interrupt_gen)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1111,7 +1109,7 @@ static MACHINE_CONFIG_START( robocop2, cninja_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
-	MCFG_TIMER_ADD("raster_timer", interrupt_gen)
+	MCFG_TIMER_DRIVER_ADD("raster_timer", cninja_state, interrupt_gen)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

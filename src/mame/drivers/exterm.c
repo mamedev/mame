@@ -193,12 +193,11 @@ WRITE16_MEMBER(exterm_state::sound_latch_w)
  *
  *************************************/
 
-static TIMER_DEVICE_CALLBACK( master_sound_nmi_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(exterm_state::master_sound_nmi_callback)
 {
-	exterm_state *state = timer.machine().driver_data<exterm_state>();
 	/* bit 0 of the sound control determines if the NMI is actually delivered */
-	if (state->m_sound_control & 0x01)
-		timer.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_sound_control & 0x01)
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -457,7 +456,7 @@ static MACHINE_CONFIG_START( exterm, exterm_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_ADD("snd_nmi_timer", master_sound_nmi_callback)
+	MCFG_TIMER_DRIVER_ADD("snd_nmi_timer", exterm_state, master_sound_nmi_callback)
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(2048+32768)

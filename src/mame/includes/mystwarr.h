@@ -72,4 +72,7 @@ public:
 	UINT32 screen_update_dadandrn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_martchmp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ddd_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(metamrph_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(mchamp_interrupt);
 };

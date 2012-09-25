@@ -361,27 +361,26 @@ UINT32 battlera_state::screen_update_battlera(screen_device &screen, bitmap_ind1
 
 /******************************************************************************/
 
-TIMER_DEVICE_CALLBACK( battlera_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(battlera_state::battlera_irq)
 {
-	battlera_state *state = timer.machine().driver_data<battlera_state>();
-	state->m_current_scanline = param; /* 8 lines clipped at top */
+	m_current_scanline = param; /* 8 lines clipped at top */
 
 	/* If raster interrupt occurs, refresh screen _up_ to this point */
-	if (state->m_rcr_enable && (state->m_current_scanline+56)==state->m_HuC6270_registers[6]) {
-		timer.machine().primary_screen->update_partial(state->m_current_scanline);
-		state->m_maincpu->set_input_line(0, HOLD_LINE); /* RCR interrupt */
+	if (m_rcr_enable && (m_current_scanline+56)==m_HuC6270_registers[6]) {
+		machine().primary_screen->update_partial(m_current_scanline);
+		m_maincpu->set_input_line(0, HOLD_LINE); /* RCR interrupt */
 	}
 
 	/* Start of vblank */
-	else if (state->m_current_scanline==240) {
-		state->m_bldwolf_vblank=1;
-		timer.machine().primary_screen->update_partial(240);
-		if (state->m_irq_enable)
-			state->m_maincpu->set_input_line(0, HOLD_LINE); /* VBL */
+	else if (m_current_scanline==240) {
+		m_bldwolf_vblank=1;
+		machine().primary_screen->update_partial(240);
+		if (m_irq_enable)
+			m_maincpu->set_input_line(0, HOLD_LINE); /* VBL */
 	}
 
 	/* End of vblank */
-	if (state->m_current_scanline==254) {
-		state->m_bldwolf_vblank=0;
+	if (m_current_scanline==254) {
+		m_bldwolf_vblank=0;
 	}
 }

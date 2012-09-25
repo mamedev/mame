@@ -155,10 +155,9 @@ MACHINE_RESET_MEMBER(coolpool_state,coolpool)
  *
  *************************************/
 
-static TIMER_DEVICE_CALLBACK( nvram_write_timeout )
+TIMER_DEVICE_CALLBACK_MEMBER(coolpool_state::nvram_write_timeout)
 {
-	coolpool_state *state = timer.machine().driver_data<coolpool_state>();
-	state->m_nvram_write_enable = 0;
+	m_nvram_write_enable = 0;
 }
 
 
@@ -205,12 +204,10 @@ WRITE16_MEMBER(coolpool_state::nvram_thrash_data_w)
  *
  *************************************/
 
-static TIMER_DEVICE_CALLBACK( amerdart_audio_int_gen )
+TIMER_DEVICE_CALLBACK_MEMBER(coolpool_state::amerdart_audio_int_gen)
 {
-	coolpool_state *state = timer.machine().driver_data<coolpool_state>();
-
-	state->m_dsp->execute().set_input_line(0, ASSERT_LINE);
-	state->m_dsp->execute().set_input_line(0, CLEAR_LINE);
+	m_dsp->execute().set_input_line(0, ASSERT_LINE);
+	m_dsp->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -858,12 +855,12 @@ static MACHINE_CONFIG_START( amerdart, coolpool_state )
 	MCFG_CPU_PROGRAM_MAP(amerdart_dsp_pgm_map)
 	/* Data Map is internal to the CPU */
 	MCFG_CPU_IO_MAP(amerdart_dsp_io_map)
-	MCFG_TIMER_ADD_SCANLINE("audioint", amerdart_audio_int_gen, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("audioint", coolpool_state, amerdart_audio_int_gen, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,amerdart)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_ADD("nvram_timer", nvram_write_timeout)
+	MCFG_TIMER_DRIVER_ADD("nvram_timer", coolpool_state, nvram_write_timeout)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -892,7 +889,7 @@ static MACHINE_CONFIG_START( coolpool, coolpool_state )
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,coolpool)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_ADD("nvram_timer", nvram_write_timeout)
+	MCFG_TIMER_DRIVER_ADD("nvram_timer", coolpool_state, nvram_write_timeout)
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)

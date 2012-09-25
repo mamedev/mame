@@ -136,6 +136,8 @@ public:
 	DECLARE_MACHINE_RESET(sknsk);
 	UINT32 screen_update_skns(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_skns(screen_device &screen, bool state);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(skns_irq);
 };
 
 /*----------- defined in video/suprnova.c -----------*/

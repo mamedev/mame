@@ -869,18 +869,17 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_2_w)
 }
 
 
-TIMER_DEVICE_CALLBACK( schaser_effect_555_cb )
+TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::schaser_effect_555_cb)
 {
-	_8080bw_state *state = timer.machine().driver_data<_8080bw_state>();
 	int effect = param;
 	attotime new_time;
 
 	/* Toggle 555 output */
-	state->m_schaser_effect_555_is_low = !state->m_schaser_effect_555_is_low;
-	state->m_schaser_effect_555_time_remain = attotime::zero;
-	state->m_schaser_effect_555_time_remain_savable = state->m_schaser_effect_555_time_remain.as_double();
+	m_schaser_effect_555_is_low = !m_schaser_effect_555_is_low;
+	m_schaser_effect_555_time_remain = attotime::zero;
+	m_schaser_effect_555_time_remain_savable = m_schaser_effect_555_time_remain.as_double();
 
-	if (state->m_schaser_effect_555_is_low)
+	if (m_schaser_effect_555_is_low)
 		new_time = PERIOD_OF_555_ASTABLE(0, RES_K(20), CAP_U(1)) / 2;
 	else
 	{
@@ -889,9 +888,9 @@ TIMER_DEVICE_CALLBACK( schaser_effect_555_cb )
 		else
 			new_time = attotime::never;
 	}
-	state->m_schaser_effect_555_timer->adjust(new_time, effect);
-	sn76477_enable_w(state->m_sn, !(state->m_schaser_effect_555_is_low || state->m_schaser_explosion));
-	sn76477_one_shot_cap_voltage_w(state->m_sn, !(state->m_schaser_effect_555_is_low || state->m_schaser_explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
+	m_schaser_effect_555_timer->adjust(new_time, effect);
+	sn76477_enable_w(m_sn, !(m_schaser_effect_555_is_low || m_schaser_explosion));
+	sn76477_one_shot_cap_voltage_w(m_sn, !(m_schaser_effect_555_is_low || m_schaser_explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
 }
 
 

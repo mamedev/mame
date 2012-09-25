@@ -106,16 +106,15 @@ INTERRUPT_GEN_MEMBER(gradius3_state::cpuA_interrupt)
 }
 
 
-static TIMER_DEVICE_CALLBACK( gradius3_sub_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(gradius3_state::gradius3_sub_scanline)
 {
-	gradius3_state *state = timer.machine().driver_data<gradius3_state>();
 	int scanline = param;
 
-	if(scanline == 240 && state->m_irqBmask & 1) // vblank-out irq
-		timer.machine().device("sub")->execute().set_input_line(1, HOLD_LINE);
+	if(scanline == 240 && m_irqBmask & 1) // vblank-out irq
+		machine().device("sub")->execute().set_input_line(1, HOLD_LINE);
 
-	if(scanline ==  16 && state->m_irqBmask & 2) // sprite end DMA irq
-		timer.machine().device("sub")->execute().set_input_line(2, HOLD_LINE);
+	if(scanline ==  16 && m_irqBmask & 2) // sprite end DMA irq
+		machine().device("sub")->execute().set_input_line(2, HOLD_LINE);
 }
 
 WRITE16_MEMBER(gradius3_state::cpuB_irqtrigger_w)
@@ -320,7 +319,7 @@ static MACHINE_CONFIG_START( gradius3, gradius3_state )
 
 	MCFG_CPU_ADD("sub", M68000, 10000000)	/* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(gradius3_map2)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", gradius3_sub_scanline, "screen", 0, 1) /* has three interrupt vectors, 1 2 and 4 */
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gradius3_state, gradius3_sub_scanline, "screen", 0, 1)
 																				/* 4 is triggered by cpu A, the others are unknown but */
 																				/* required for the game to run. */
 

@@ -47,11 +47,9 @@ void amu880_state::scan_keyboard()
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( keyboard_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(amu880_state::keyboard_tick)
 {
-	amu880_state *state = timer.machine().driver_data<amu880_state>();
-
-	state->scan_keyboard();
+	scan_keyboard();
 }
 
 /* Read/Write Handlers */
@@ -388,7 +386,7 @@ static MACHINE_CONFIG_START( amu880, amu880_state )
 	MCFG_CPU_IO_MAP(amu880_io)
 	MCFG_CPU_CONFIG(amu880_daisy_chain)
 
-	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, attotime::from_hz(1500))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", amu880_state, keyboard_tick, attotime::from_hz(1500))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)

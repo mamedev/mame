@@ -142,4 +142,8 @@ public:
 	UINT32 screen_update_bubl2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_nmk(screen_device &screen, bool state);
 	void screen_eof_strahl(screen_device &screen, bool state);
+	TIMER_DEVICE_CALLBACK_MEMBER(tdragon_mcu_sim);
+	TIMER_DEVICE_CALLBACK_MEMBER(hachamf_mcu_sim);
+	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(manybloc_scanline);
 };

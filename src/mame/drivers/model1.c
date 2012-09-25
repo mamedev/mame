@@ -725,23 +725,22 @@ static void irq_init(running_machine &machine)
 	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 }
 
-static TIMER_DEVICE_CALLBACK( model1_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 {
-	model1_state *state = timer.machine().driver_data<model1_state>();
 	int scanline = param;
 
 	if (scanline == 384)
 	{
-		irq_raise(timer.machine(), 1);
+		irq_raise(machine(), 1);
 	}
 	else if(scanline == 384/2)
 	{
-		irq_raise(timer.machine(), state->m_sound_irq);
+		irq_raise(machine(), m_sound_irq);
 
 		// if the FIFO has something in it, signal the 68k too
-		if (state->m_fifo_rptr != state->m_fifo_wptr)
+		if (m_fifo_rptr != m_fifo_wptr)
 		{
-			timer.machine().device("audiocpu")->execute().set_input_line(2, HOLD_LINE);
+			machine().device("audiocpu")->execute().set_input_line(2, HOLD_LINE);
 		}
 	}
 }
@@ -1520,7 +1519,7 @@ static MACHINE_CONFIG_START( model1, model1_state )
 	MCFG_CPU_ADD("maincpu", V60, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_mem)
 	MCFG_CPU_IO_MAP(model1_io)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", model1_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model1_state, model1_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 10000000)	// verified on real h/w
 	MCFG_CPU_PROGRAM_MAP(model1_snd)
@@ -1565,7 +1564,7 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_CPU_ADD("maincpu", V60, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_vr_mem)
 	MCFG_CPU_IO_MAP(model1_vr_io)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", model1_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model1_state, model1_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 10000000)	// verified on real h/w
 	MCFG_CPU_PROGRAM_MAP(model1_snd)

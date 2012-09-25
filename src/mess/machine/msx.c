@@ -524,12 +524,11 @@ DRIVER_INIT_MEMBER(msx_state,msx)
 	z80_set_cycle_tables( machine().device("maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
 }
 
-TIMER_DEVICE_CALLBACK( msx2_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(msx_state::msx2_interrupt)
 {
-	msx_state *state = timer.machine().driver_data<msx_state>();
-	state->m_v9938->set_sprite_limit(timer.machine().root_device().ioport("DSW")->read() & 0x20);
-	state->m_v9938->set_resolution(timer.machine().root_device().ioport("DSW")->read() & 0x03);
-	state->m_v9938->interrupt();
+	m_v9938->set_sprite_limit(machine().root_device().ioport("DSW")->read() & 0x20);
+	m_v9938->set_resolution(machine().root_device().ioport("DSW")->read() & 0x03);
+	m_v9938->interrupt();
 }
 
 INTERRUPT_GEN_MEMBER(msx_state::msx_interrupt)

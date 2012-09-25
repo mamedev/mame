@@ -35,6 +35,7 @@ public:
 	UINT32 screen_update_polyplay(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(periodic_interrupt);
 	INTERRUPT_GEN_MEMBER(coin_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(polyplay_timer_callback);
 };
 
 

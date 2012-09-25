@@ -146,6 +146,7 @@ public:
 	void screen_eof_phantom2(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(maze_tone_timing_timer_callback);
 	TIMER_CALLBACK_MEMBER(mw8080bw_interrupt_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(spcenctr_strobe_timer_callback);
 };
 
 

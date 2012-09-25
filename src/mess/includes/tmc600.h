@@ -66,6 +66,7 @@ public:
 
 	// keyboard state
 	int m_keylatch;				// key latch
+	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
 };
 
 // ---------- defined in video/tmc600.c ----------

@@ -4745,24 +4745,23 @@ void neruton_update_irq( running_machine &machine )
 	state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x42);
 }
 
-static TIMER_DEVICE_CALLBACK( neruton_irq_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(dynax_state::neruton_irq_scanline)
 {
-	dynax_state *state = timer.machine().driver_data<dynax_state>();
 	int scanline = param;
 
 	// This is a kludge to avoid losing blitter interrupts
 	// there should be a vblank ack mechanism
-	if (state->m_blitter_irq)	return;
+	if (m_blitter_irq)	return;
 
 	if(scanline == 256)
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x40);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x40);
 	else if((scanline % 32) == 0)
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x46);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x46);
 }
 
 static MACHINE_CONFIG_DERIVED( neruton, mjelctrn )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_TIMER_ADD_SCANLINE("scantimer", neruton_irq_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dynax_state, neruton_irq_scanline, "screen", 0, 1)
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,neruton)
 MACHINE_CONFIG_END
@@ -4775,24 +4774,23 @@ MACHINE_CONFIG_END
     0x42 and 0x44 are very similar, they should be triggered by the blitter
     0x40 is vblank  */
 
-static TIMER_DEVICE_CALLBACK( majxtal7_vblank_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(dynax_state::majxtal7_vblank_interrupt)
 {
-	dynax_state *state = timer.machine().driver_data<dynax_state>();
 	int scanline = param;
 
 	// This is a kludge to avoid losing blitter interrupts
 	// there should be a vblank ack mechanism
-	if (state->m_blitter_irq)	return;
+	if (m_blitter_irq)	return;
 
 	if(scanline == 256)
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x40);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x40);
 	else if((scanline % 32) == 0)
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x44); // temp kludge
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x44); // temp kludge
 }
 
 static MACHINE_CONFIG_DERIVED( majxtal7, neruton )
 	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_CALLBACK(majxtal7_vblank_interrupt)
+	MCFG_TIMER_DRIVER_CALLBACK(dynax_state, majxtal7_vblank_interrupt)
 MACHINE_CONFIG_END
 
 
@@ -4861,16 +4859,15 @@ MACHINE_CONFIG_END
                                Mahjong Tenkaigen
 ***************************************************************************/
 
-static TIMER_DEVICE_CALLBACK( tenkai_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(dynax_state::tenkai_interrupt)
 {
-	dynax_state *state = timer.machine().driver_data<dynax_state>();
 	int scanline = param;
 
 	if(scanline == 256)
-		state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 
 	if(scanline == 0)
-		state->m_maincpu->set_input_line(INPUT_LINE_IRQ1, HOLD_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_IRQ1, HOLD_LINE);
 }
 
 static const ay8910_interface tenkai_ay8910_interface =
@@ -4905,7 +4902,7 @@ static MACHINE_CONFIG_START( tenkai, dynax_state )
 	MCFG_CPU_ADD("maincpu",TMP91640, 21472700 / 2)
 	MCFG_CPU_PROGRAM_MAP(tenkai_map)
 	MCFG_CPU_IO_MAP(tenkai_io_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", tenkai_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dynax_state, tenkai_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,tenkai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)

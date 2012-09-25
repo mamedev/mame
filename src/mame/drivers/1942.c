@@ -74,15 +74,15 @@ WRITE8_MEMBER(_1942_state::c1942_bankswitch_w)
 	membank("bank1")->set_entry(data & 0x03);
 }
 
-static TIMER_DEVICE_CALLBACK( c1942_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::c1942_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
 
 	if(scanline == 0) // unknown irq event, presumably vblank-in or a periodic one (writes to the soundlatch and drives freeze dip-switch)
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);	/* RST 08h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);	/* RST 08h */
 }
 
 
@@ -258,7 +258,7 @@ static MACHINE_CONFIG_START( 1942, _1942_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)	/* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(c1942_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", c1942_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", _1942_state, c1942_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)	/* 3 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

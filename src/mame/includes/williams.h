@@ -112,6 +112,10 @@ public:
 	TIMER_CALLBACK_MEMBER(williams_deferred_snd_cmd_w);
 	TIMER_CALLBACK_MEMBER(blaster_deferred_snd_cmd_w);
 	TIMER_CALLBACK_MEMBER(williams2_deferred_snd_cmd_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(williams_va11_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(williams_count240_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(williams2_va11_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(williams2_endscreen_callback);
 };
 
 
@@ -164,12 +168,6 @@ extern const pia6821_interface tshoot_pia_0_intf;
 extern const pia6821_interface tshoot_pia_1_intf;
 extern const pia6821_interface tshoot_snd_pia_intf;
 extern const pia6821_interface joust2_pia_1_intf;
-
-/* timer callbacks */
-TIMER_DEVICE_CALLBACK( williams_va11_callback );
-TIMER_DEVICE_CALLBACK( williams_count240_callback );
-TIMER_DEVICE_CALLBACK( williams2_va11_callback );
-TIMER_DEVICE_CALLBACK( williams2_endscreen_callback );
 
 /*----------- defined in video/williams.c -----------*/
 

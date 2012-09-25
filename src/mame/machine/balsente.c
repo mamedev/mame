@@ -34,42 +34,40 @@ TIMER_CALLBACK_MEMBER(balsente_state::irq_off)
 }
 
 
-TIMER_DEVICE_CALLBACK( balsente_interrupt_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(balsente_state::balsente_interrupt_timer)
 {
-	balsente_state *state = timer.machine().driver_data<balsente_state>();
-
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
-		state->m_scanline_timer->adjust(timer.machine().primary_screen->time_until_pos(64), 64);
+		m_scanline_timer->adjust(machine().primary_screen->time_until_pos(64), 64);
 	else
-		state->m_scanline_timer->adjust(timer.machine().primary_screen->time_until_pos(param + 64), param + 64);
+		m_scanline_timer->adjust(machine().primary_screen->time_until_pos(param + 64), param + 64);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
-	timer.machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	timer.machine().scheduler().timer_set(timer.machine().primary_screen->time_until_pos(param, BALSENTE_HBSTART), timer_expired_delegate(FUNC(balsente_state::irq_off),state));
+	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(param, BALSENTE_HBSTART), timer_expired_delegate(FUNC(balsente_state::irq_off),this));
 
 	/* if this is Grudge Match, update the steering */
-	if (state->m_grudge_steering_result & 0x80)
-		update_grudge_steering(timer.machine());
+	if (m_grudge_steering_result & 0x80)
+		update_grudge_steering(machine());
 
 	/* if we're a shooter, we do a little more work */
-	if (state->m_shooter)
+	if (m_shooter)
 	{
 		UINT8 tempx, tempy;
 
 		/* we latch the beam values on the first interrupt after VBLANK */
 		if (param == 64)
 		{
-			state->m_shooter_x = timer.machine().root_device().ioport("FAKEX")->read();
-			state->m_shooter_y = timer.machine().root_device().ioport("FAKEY")->read();
+			m_shooter_x = machine().root_device().ioport("FAKEX")->read();
+			m_shooter_y = machine().root_device().ioport("FAKEY")->read();
 		}
 
 		/* which bits get returned depends on which scanline we're at */
-		tempx = state->m_shooter_x << ((param - 64) / 64);
-		tempy = state->m_shooter_y << ((param - 64) / 64);
-		state->m_nstocker_bits = ((tempx >> 4) & 0x08) | ((tempx >> 1) & 0x04) |
+		tempx = m_shooter_x << ((param - 64) / 64);
+		tempy = m_shooter_y << ((param - 64) / 64);
+		m_nstocker_bits = ((tempx >> 4) & 0x08) | ((tempx >> 1) & 0x04) |
 								((tempy >> 6) & 0x02) | ((tempy >> 3) & 0x01);
 	}
 }
@@ -721,18 +719,16 @@ void balsente_state::counter_set_out(int which, int out)
 }
 
 
-TIMER_DEVICE_CALLBACK( balsente_counter_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(balsente_state::balsente_counter_callback)
 {
-	balsente_state *state = timer.machine().driver_data<balsente_state>();
-
 	/* reset the counter and the count */
-	state->m_counter[param].timer_active = 0;
-	state->m_counter[param].count = 0;
+	m_counter[param].timer_active = 0;
+	m_counter[param].count = 0;
 
 	/* set the state of the OUT line */
 	/* mode 0 and 1: when firing, transition OUT to high */
-	if (state->m_counter[param].mode == 0 || state->m_counter[param].mode == 1)
-		state->counter_set_out(param, 1);
+	if (m_counter[param].mode == 0 || m_counter[param].mode == 1)
+		counter_set_out(param, 1);
 
 	/* no other modes handled currently */
 }
@@ -867,7 +863,7 @@ static void set_counter_0_ff(timer_device &timer, int newstate)
 		{
 			state->m_counter[0].count--;
 			if (state->m_counter[0].count == 0)
-				balsente_counter_callback(state, timer, NULL, 0);
+				state->balsente_counter_callback(timer, NULL, 0);
 		}
 	}
 
@@ -876,12 +872,10 @@ static void set_counter_0_ff(timer_device &timer, int newstate)
 }
 
 
-TIMER_DEVICE_CALLBACK( balsente_clock_counter_0_ff )
+TIMER_DEVICE_CALLBACK_MEMBER(balsente_state::balsente_clock_counter_0_ff)
 {
-	balsente_state *state = timer.machine().driver_data<balsente_state>();
-
 	/* clock the D value through the flip-flop */
-	set_counter_0_ff(timer, (state->m_counter_control >> 3) & 1);
+	set_counter_0_ff(timer, (m_counter_control >> 3) & 1);
 }
 
 

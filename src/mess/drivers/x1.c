@@ -807,26 +807,24 @@ static void cmt_command( running_machine &machine, UINT8 cmd )
 	logerror("CMT: Command 0xe9-0x%02x received.\n",cmd);
 }
 
-TIMER_DEVICE_CALLBACK( x1_cmt_wind_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_cmt_wind_timer)
 {
-	x1_state *state = timer.machine().driver_data<x1_state>();
-
-	if(state->m_cass->get_image() == NULL) //avoid a crash if a disk game tries to access this
+	if(m_cass->get_image() == NULL) //avoid a crash if a disk game tries to access this
 		return;
 
-	switch(state->m_cmt_current_cmd)
+	switch(m_cmt_current_cmd)
 	{
 		case 0x03:
 		case 0x05:  // Fast Forwarding tape
-			state->m_cass->seek(1,SEEK_CUR);
-			if(state->m_cass->get_position() >= state->m_cass->get_length())  // at end?
-				cmt_command(timer.machine(),0x01);  // Stop tape
+			m_cass->seek(1,SEEK_CUR);
+			if(m_cass->get_position() >= m_cass->get_length())  // at end?
+				cmt_command(machine(),0x01);  // Stop tape
 			break;
 		case 0x04:
 		case 0x06:  // Rewinding tape
-			state->m_cass->seek(-1,SEEK_CUR);
-			if(state->m_cass->get_position() <= 0) // at beginning?
-				cmt_command(timer.machine(),0x01);  // Stop tape
+			m_cass->seek(-1,SEEK_CUR);
+			if(m_cass->get_position() <= 0) // at beginning?
+				cmt_command(machine(),0x01);  // Stop tape
 			break;
 	}
 }
@@ -2401,33 +2399,32 @@ static IRQ_CALLBACK(x1_irq_callback)
 }
 #endif
 
-TIMER_DEVICE_CALLBACK(x1_keyboard_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_keyboard_callback)
 {
-	x1_state *state = timer.machine().driver_data<x1_state>();
-	address_space &space = timer.machine().device("x1_cpu")->memory().space(AS_PROGRAM);
-	UINT32 key1 = timer.machine().root_device().ioport("key1")->read();
-	UINT32 key2 = timer.machine().root_device().ioport("key2")->read();
-	UINT32 key3 = timer.machine().root_device().ioport("key3")->read();
-	UINT32 key4 = timer.machine().root_device().ioport("tenkey")->read();
-	UINT32 f_key = timer.machine().root_device().ioport("f_keys")->read();
+	address_space &space = machine().device("x1_cpu")->memory().space(AS_PROGRAM);
+	UINT32 key1 = machine().root_device().ioport("key1")->read();
+	UINT32 key2 = machine().root_device().ioport("key2")->read();
+	UINT32 key3 = machine().root_device().ioport("key3")->read();
+	UINT32 key4 = machine().root_device().ioport("tenkey")->read();
+	UINT32 f_key = machine().root_device().ioport("f_keys")->read();
 
-	if(state->m_key_irq_vector)
+	if(m_key_irq_vector)
 	{
 		//if(key1 == 0 && key2 == 0 && key3 == 0 && key4 == 0 && f_key == 0)
 		//  return;
 
-		if((key1 != state->m_old_key1) || (key2 != state->m_old_key2) || (key3 != state->m_old_key3) || (key4 != state->m_old_key4) || (f_key != state->m_old_fkey))
+		if((key1 != m_old_key1) || (key2 != m_old_key2) || (key3 != m_old_key3) || (key4 != m_old_key4) || (f_key != m_old_fkey))
 		{
 			// generate keyboard IRQ
-			state->x1_sub_io_w(space,0,0xe6);
-			state->m_irq_vector = state->m_key_irq_vector;
-			state->m_key_irq_flag = 1;
-			timer.machine().device("x1_cpu")->execute().set_input_line(0,ASSERT_LINE);
-			state->m_old_key1 = key1;
-			state->m_old_key2 = key2;
-			state->m_old_key3 = key3;
-			state->m_old_key4 = key4;
-			state->m_old_fkey = f_key;
+			x1_sub_io_w(space,0,0xe6);
+			m_irq_vector = m_key_irq_vector;
+			m_key_irq_flag = 1;
+			machine().device("x1_cpu")->execute().set_input_line(0,ASSERT_LINE);
+			m_old_key1 = key1;
+			m_old_key2 = key2;
+			m_old_key3 = key3;
+			m_old_key4 = key4;
+			m_old_fkey = f_key;
 		}
 	}
 }
@@ -2620,8 +2617,8 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(x1_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","x1_flop")
 
-	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", x1_keyboard_callback, attotime::from_hz(250))
-	MCFG_TIMER_ADD_PERIODIC("cmt_wind_timer", x1_cmt_wind_timer, attotime::from_hz(16))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", x1_state, x1_keyboard_callback, attotime::from_hz(250))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("cmt_wind_timer", x1_state, x1_cmt_wind_timer, attotime::from_hz(16))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( x1turbo, x1 )

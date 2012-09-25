@@ -531,24 +531,23 @@ static const ym2151_interface ym2151_config =
  *
  *************************************/
 
-static TIMER_DEVICE_CALLBACK( ddragon3_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(ddragon3_state::ddragon3_scanline)
 {
-	ddragon3_state *state = timer.machine().driver_data<ddragon3_state>();
 	int scanline = param;
 
 	/* An interrupt is generated every 16 scanlines */
 	if (scanline % 16 == 0)
 	{
 		if (scanline > 0)
-			timer.machine().primary_screen->update_partial(scanline - 1);
-		state->m_maincpu->set_input_line(5, ASSERT_LINE);
+			machine().primary_screen->update_partial(scanline - 1);
+		m_maincpu->set_input_line(5, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 248 */
 	if (scanline == 248)
 	{
-		timer.machine().primary_screen->update_partial(scanline - 1);
-		state->m_maincpu->set_input_line(6, ASSERT_LINE);
+		machine().primary_screen->update_partial(scanline - 1);
+		m_maincpu->set_input_line(6, ASSERT_LINE);
 	}
 }
 
@@ -593,7 +592,7 @@ static MACHINE_CONFIG_START( ddragon3, ddragon3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(ddragon3_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", ddragon3_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon3_state, ddragon3_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)

@@ -126,6 +126,7 @@ public:
 	int m_wr0;
 	int m_wr1;
 	int m_track;
+	TIMER_DEVICE_CALLBACK_MEMBER(paddle_tick);
 };
 
 #endif

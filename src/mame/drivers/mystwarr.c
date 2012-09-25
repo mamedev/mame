@@ -104,52 +104,49 @@ WRITE16_MEMBER(mystwarr_state::mmeeprom_w)
 /**********************************************************************************/
 /* IRQ controllers */
 
-static TIMER_DEVICE_CALLBACK(mystwarr_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mystwarr_interrupt)
 {
-	mystwarr_state *state = timer.machine().driver_data<mystwarr_state>();
 	int scanline = param;
 
-	if (!(state->m_mw_irq_control & 0x01)) return;
+	if (!(m_mw_irq_control & 0x01)) return;
 
 	if(scanline == 240)
-		state->m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 
 	if(scanline == 0)
-		state->m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
 
 	/* writes to LSB of 0x410000 port and clears a work RAM flag, almost likely not really necessary. */
-//  state->m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
+//  m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK(metamrph_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::metamrph_interrupt)
 {
-	mystwarr_state *state = timer.machine().driver_data<mystwarr_state>();
 	int scanline = param;
 
 	/* irq 4 has an irq routine in metamrph, but it's not really called */
-//  state->m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
+//  m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
 
 	if(scanline == 24)
-		state->m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 
 	if(scanline == 248)
-		if (K053246_is_IRQ_enabled()) state->m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
+		if (K053246_is_IRQ_enabled()) m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK(mchamp_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mchamp_interrupt)
 {
-	mystwarr_state *state = timer.machine().driver_data<mystwarr_state>();
 	int scanline = param;
 
-	if (!(state->m_mw_irq_control & 0x02)) return;
+	if (!(m_mw_irq_control & 0x02)) return;
 
 	if(scanline == 247)
 	{
-		if (K053246_is_IRQ_enabled()) state->m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
+		if (K053246_is_IRQ_enabled()) m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 	}
 
 	if(scanline == 23)
-		state->m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(mystwarr_state::ddd_interrupt)
@@ -986,7 +983,7 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz (confirmed) */
 	MCFG_CPU_PROGRAM_MAP(mystwarr_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", mystwarr_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mystwarr_state, mystwarr_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(mystwarr_sound_map)
@@ -1038,7 +1035,7 @@ static MACHINE_CONFIG_DERIVED( viostorm, mystwarr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(viostorm_map)
 	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_CALLBACK(metamrph_interrupt)
+	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, metamrph_interrupt)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,viostorm)
@@ -1059,7 +1056,7 @@ static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(metamrph_map)
 	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_CALLBACK(metamrph_interrupt)
+	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, metamrph_interrupt)
 
 	MCFG_DEVICE_REMOVE("k053252")
 	MCFG_K053252_ADD("k053252", 6000000, metamrph_k053252_intf) // 6 MHz?
@@ -1140,7 +1137,7 @@ static MACHINE_CONFIG_DERIVED( martchmp, mystwarr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(martchmp_map)
 	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_CALLBACK(mchamp_interrupt)
+	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, mchamp_interrupt)
 
 	MCFG_DEVICE_REMOVE("k053252")
 	MCFG_K053252_ADD("k053252", 16000000/2, martchmp_k053252_intf)

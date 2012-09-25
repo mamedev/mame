@@ -1331,7 +1331,7 @@ static MACHINE_CONFIG_START( scramble, scramble_state )
 
 	MCFG_7474_ADD("konami_7474", "konami_7474", NULL, scramble_sh_7474_q_callback)
 
-	MCFG_TIMER_ADD("int_timer", galaxold_interrupt_timer)
+	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
 	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,scramble)
 
@@ -1562,7 +1562,7 @@ static MACHINE_CONFIG_START( ad2083, scramble_state )
 	MCFG_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
 	MCFG_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
 
-	MCFG_TIMER_ADD("int_timer", galaxold_interrupt_timer)
+	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
 	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,galaxold)
 

@@ -247,11 +247,9 @@ void portfolio_state::scan_keyboard()
 //  TIMER_DEVICE_CALLBACK( keyboard_tick )
 //-------------------------------------------------
 
-static TIMER_DEVICE_CALLBACK( keyboard_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::keyboard_tick)
 {
-	portfolio_state *state = timer.machine().driver_data<portfolio_state>();
-
-	state->scan_keyboard();
+	scan_keyboard();
 }
 
 //-------------------------------------------------
@@ -370,22 +368,18 @@ WRITE8_MEMBER( portfolio_state::unknown_w )
 //  TIMER_DEVICE_CALLBACK( system_tick )
 //-------------------------------------------------
 
-static TIMER_DEVICE_CALLBACK( system_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::system_tick)
 {
-	portfolio_state *state = timer.machine().driver_data<portfolio_state>();
-
-	state->trigger_interrupt(INT_TICK);
+	trigger_interrupt(INT_TICK);
 }
 
 //-------------------------------------------------
 //  TIMER_DEVICE_CALLBACK( counter_tick )
 //-------------------------------------------------
 
-static TIMER_DEVICE_CALLBACK( counter_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::counter_tick)
 {
-	portfolio_state *state = timer.machine().driver_data<portfolio_state>();
-
-	state->m_counter++;
+	m_counter++;
 }
 
 //-------------------------------------------------
@@ -859,11 +853,11 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_I8255A_ADD(M82C55A_TAG, ppi_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_INS8250_ADD(M82C50A_TAG, i8250_intf, XTAL_1_8432MHz) // should be MCFG_INS8250A_ADD
-	MCFG_TIMER_ADD_PERIODIC("counter", counter_tick, attotime::from_hz(XTAL_32_768kHz/16384))
-	MCFG_TIMER_ADD_PERIODIC(TIMER_TICK_TAG, system_tick, attotime::from_hz(XTAL_32_768kHz/32768))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("counter", portfolio_state, counter_tick, attotime::from_hz(XTAL_32_768kHz/16384))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_TICK_TAG, portfolio_state, system_tick, attotime::from_hz(XTAL_32_768kHz/32768))
 
 	/* fake keyboard */
-	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, attotime::from_usec(2500))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", portfolio_state, keyboard_tick, attotime::from_usec(2500))
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

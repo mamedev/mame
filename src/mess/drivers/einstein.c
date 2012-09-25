@@ -188,24 +188,22 @@ static void einstein_scan_keyboard(running_machine &machine)
 	einstein->m_keyboard_data = data;
 }
 
-static TIMER_DEVICE_CALLBACK( einstein_keyboard_timer_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(einstein_state::einstein_keyboard_timer_callback)
 {
-	einstein_state *einstein = timer.machine().driver_data<einstein_state>();
-
 	/* re-scan keyboard */
-	einstein_scan_keyboard(timer.machine());
+	einstein_scan_keyboard(machine());
 
 	/* if /fire1 or /fire2 is 0, signal a fire interrupt */
-	if ((timer.machine().root_device().ioport("BUTTONS")->read() & 0x03) != 0)
+	if ((machine().root_device().ioport("BUTTONS")->read() & 0x03) != 0)
 	{
-		einstein->m_interrupt |= EINSTEIN_FIRE_INT;
+		m_interrupt |= EINSTEIN_FIRE_INT;
 	}
 
 	/* keyboard data changed? */
-	if (einstein->m_keyboard_data != 0xff)
+	if (m_keyboard_data != 0xff)
 	{
 		/* generate interrupt */
-		einstein->m_interrupt |= EINSTEIN_KEY_INT;
+		m_interrupt |= EINSTEIN_KEY_INT;
 	}
 }
 
@@ -271,15 +269,13 @@ static WRITE8_DEVICE_HANDLER( einstein_drsel_w )
 ***************************************************************************/
 
 /* channel 0 and 1 have a 2 MHz input clock for triggering */
-static TIMER_DEVICE_CALLBACK( einstein_ctc_trigger_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(einstein_state::einstein_ctc_trigger_callback)
 {
-	einstein_state *einstein = timer.machine().driver_data<einstein_state>();
-
 	/* toggle line status */
-	einstein->m_ctc_trigger ^= 1;
+	m_ctc_trigger ^= 1;
 
-	einstein->m_ctc->trg0(einstein->m_ctc_trigger);
-	einstein->m_ctc->trg1(einstein->m_ctc_trigger);
+	m_ctc->trg0(m_ctc_trigger);
+	m_ctc->trg1(m_ctc_trigger);
 }
 
 
@@ -777,13 +773,13 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 
 	/* this is actually clocked at the system clock 4 MHz, but this would be too fast for our
     driver. So we update at 50Hz and hope this is good enough. */
-	MCFG_TIMER_ADD_PERIODIC("keyboard", einstein_keyboard_timer_callback, attotime::from_hz(50))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", einstein_state, einstein_keyboard_timer_callback, attotime::from_hz(50))
 
 	MCFG_Z80PIO_ADD(IC_I063, XTAL_X002 / 2, einstein_pio_intf)
 
 	MCFG_Z80CTC_ADD(IC_I058, XTAL_X002 / 2, einstein_ctc_intf)
 	/* the input to channel 0 and 1 of the ctc is a 2 MHz clock */
-	MCFG_TIMER_ADD_PERIODIC("ctc", einstein_ctc_trigger_callback, attotime::from_hz(XTAL_X002 /4))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", einstein_state, einstein_ctc_trigger_callback, attotime::from_hz(XTAL_X002 /4))
 
 	/* Einstein daisy chain support for non-Z80 devices */
 	MCFG_DEVICE_ADD("keyboard_daisy", EINSTEIN_KEYBOARD_DAISY, 0)

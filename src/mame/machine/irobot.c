@@ -61,11 +61,10 @@ WRITE8_MEMBER(irobot_state::irobot_sharedmem_w)
 		m_combase[BYTE_XOR_BE(offset & 0xFFF)] = data;
 }
 
-TIMER_DEVICE_CALLBACK( irobot_irvg_done_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(irobot_state::irobot_irvg_done_callback)
 {
-	irobot_state *state = timer.machine().driver_data<irobot_state>();
 	logerror("vg done. ");
-	state->m_irvg_running = 0;
+	m_irvg_running = 0;
 }
 
 WRITE8_MEMBER(irobot_state::irobot_statwr_w)
@@ -412,12 +411,11 @@ DRIVER_INIT_MEMBER(irobot_state,irobot)
 	load_oproms(machine());
 }
 
-TIMER_DEVICE_CALLBACK( irobot_irmb_done_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(irobot_state::irobot_irmb_done_callback)
 {
-	irobot_state *state = timer.machine().driver_data<irobot_state>();
 	logerror("mb done. ");
-	state->m_irmb_running = 0;
-	timer.machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+	m_irmb_running = 0;
+	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 

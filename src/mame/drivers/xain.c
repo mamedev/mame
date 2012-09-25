@@ -173,40 +173,39 @@ INLINE int scanline_to_vcount(int scanline)
 		return (vcount - 0x18) | 0x100;
 }
 
-static TIMER_DEVICE_CALLBACK( xain_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(xain_state::xain_scanline)
 {
-	xain_state *state = timer.machine().driver_data<xain_state>();
 	int scanline = param;
-	int screen_height = timer.machine().primary_screen->height();
+	int screen_height = machine().primary_screen->height();
 	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
 	int vcount = scanline_to_vcount(scanline);
 
 	/* update to the current point */
 	if (scanline > 0)
 	{
-		timer.machine().primary_screen->update_partial(scanline - 1);
+		machine().primary_screen->update_partial(scanline - 1);
 	}
 
 	/* FIRQ (IMS) fires every on every 8th scanline (except 0) */
 	if (!(vcount_old & 8) && (vcount & 8))
 	{
-		timer.machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 	}
 
 	/* NMI fires on scanline 248 (VBL) and is latched */
 	if (vcount == 0xf8)
 	{
-		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 
 	/* VBLANK input bit is held high from scanlines 248-255 */
 	if (vcount >= 248-1)	// -1 is a hack - see notes above
 	{
-		state->m_vblank = 1;
+		m_vblank = 1;
 	}
 	else
 	{
-		state->m_vblank = 0;
+		m_vblank = 0;
 	}
 }
 
@@ -579,7 +578,7 @@ static MACHINE_CONFIG_START( xsleena, xain_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", xain_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xain_state, xain_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", M6809, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cpu_map_B)

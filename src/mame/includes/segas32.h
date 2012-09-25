@@ -180,6 +180,7 @@ public:
 	INTERRUPT_GEN_MEMBER(start_of_vblank_int);
 	TIMER_CALLBACK_MEMBER(end_of_vblank_int);
 	TIMER_CALLBACK_MEMBER(update_sprites);
+	TIMER_DEVICE_CALLBACK_MEMBER(signal_v60_irq_callback);
 };
 
 /*----------- defined in machine/segas32.c -----------*/

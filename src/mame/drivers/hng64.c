@@ -1757,17 +1757,16 @@ void hng64_state::m_set_irq(UINT32 irq_vector)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK( hng64_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
 {
-	hng64_state *state = timer.machine().driver_data<hng64_state>();
 	int scanline = param;
 
 	switch(scanline)
 	{
-		case 224*2:	state->m_set_irq(0x0001);  break; // lv 0 vblank irq
-		//case 0*2:   state->m_set_irq(0x0002);  break; // lv 1
-		//case 64*2:  state->m_set_irq(0x0004);  break; // lv 2
-		case 128*2: state->m_set_irq(0x0800);  break; // lv 11 network irq?
+		case 224*2:	m_set_irq(0x0001);  break; // lv 0 vblank irq
+		//case 0*2:   m_set_irq(0x0002);  break; // lv 1
+		//case 64*2:  m_set_irq(0x0004);  break; // lv 2
+		case 128*2: m_set_irq(0x0800);  break; // lv 11 network irq?
 	}
 }
 
@@ -1832,7 +1831,7 @@ static MACHINE_CONFIG_START( hng64, hng64_state )
 	MCFG_CPU_ADD("maincpu", VR4300BE, MASTER_CLOCK) 	// actually R4300
 	MCFG_CPU_CONFIG(vr4300_config)
 	MCFG_CPU_PROGRAM_MAP(hng_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", hng64_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hng64_state, hng64_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", V33, 8000000)				// v53, 16? mhz!
 	MCFG_CPU_PROGRAM_MAP(hng_sound_map)

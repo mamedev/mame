@@ -338,7 +338,7 @@ WRITE16_MEMBER( segahang_state::sharrier_io_w )
 
 
 #if 0
-static TIMER_DEVICE_CALLBACK( hangon_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(segahang_state::hangon_irq)
 {
 	int scanline = param;
 

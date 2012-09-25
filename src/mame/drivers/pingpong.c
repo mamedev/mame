@@ -55,33 +55,31 @@ WRITE8_MEMBER(pingpong_state::coin_w)
 	/* other bits unknown */
 }
 
-static TIMER_DEVICE_CALLBACK( pingpong_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(pingpong_state::pingpong_interrupt)
 {
-	pingpong_state *state = timer.machine().driver_data<pingpong_state>();
 	int scanline = param;
 
 	if (scanline == 240)
 	{
-		if (state->m_intenable & 0x04) state->m_maincpu->set_input_line(0, HOLD_LINE);
+		if (m_intenable & 0x04) m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 	else if ((scanline % 32) == 0)
 	{
-		if (state->m_intenable & 0x08) state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		if (m_intenable & 0x08) m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( merlinmm_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(pingpong_state::merlinmm_interrupt)
 {
-	pingpong_state *state = timer.machine().driver_data<pingpong_state>();
 	int scanline = param;
 
 	if (scanline == 240)
 	{
-		if (state->m_intenable & 0x04) state->m_maincpu->set_input_line(0, HOLD_LINE);
+		if (m_intenable & 0x04) m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 	else if (scanline == 0)
 	{
-		if (state->m_intenable & 0x08) state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		if (m_intenable & 0x08) m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -464,7 +462,7 @@ static MACHINE_CONFIG_START( pingpong, pingpong_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,18432000/6)		/* 3.072 MHz (probably) */
 	MCFG_CPU_PROGRAM_MAP(pingpong_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", pingpong_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pingpong_state, pingpong_interrupt, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -491,7 +489,7 @@ static MACHINE_CONFIG_DERIVED( merlinmm, pingpong )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(merlinmm_map)
 	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_CALLBACK(merlinmm_interrupt)
+	MCFG_TIMER_DRIVER_CALLBACK(pingpong_state, merlinmm_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END

@@ -79,6 +79,7 @@ public:
 
 	/* keyboard state */
 	int m_keylatch;
+	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 };
 
 #endif

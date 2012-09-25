@@ -103,16 +103,15 @@ WRITE8_MEMBER( zodiack_state::sound_nmi_enable_w )
 }
 
 
-static TIMER_DEVICE_CALLBACK( zodiack_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(zodiack_state::zodiack_scanline)
 {
-	zodiack_state *state = timer.machine().driver_data<zodiack_state>();
 	int scanline = param;
 
-	if(scanline == 240 && state->m_nmi_enable) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(scanline == 240 && m_nmi_enable) // vblank-out irq
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	if(scanline == 0 ) // vblank-in irq
-		timer.machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_sound_nmi_gen)
@@ -559,7 +558,7 @@ static MACHINE_CONFIG_START( zodiack, zodiack_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4.00 MHz??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", zodiack_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", zodiack_state, zodiack_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)	/* 1.78975 MHz??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

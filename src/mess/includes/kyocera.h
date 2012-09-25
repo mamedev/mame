@@ -190,6 +190,8 @@ public:
 
 	DECLARE_PALETTE_INIT(tandy200);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(tandy200_tp_tick);
+
 	void bankswitch(UINT8 data);
 
 	/* memory state */

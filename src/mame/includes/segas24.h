@@ -113,4 +113,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_system24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer_clear_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_frc_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_vbl);
 };

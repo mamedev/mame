@@ -16,15 +16,15 @@
 #include "includes/exedexes.h"
 
 
-static TIMER_DEVICE_CALLBACK( exedexes_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(exedexes_state::exedexes_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
 
 	if(scanline == 0) // unknown irq event
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);	/* RST 08h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);	/* RST 08h */
 }
 
 
@@ -228,7 +228,7 @@ static MACHINE_CONFIG_START( exedexes, exedexes_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(exedexes_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", exedexes_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exedexes_state, exedexes_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000)	/* 3 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

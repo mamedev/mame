@@ -1443,8 +1443,8 @@ static MACHINE_CONFIG_START( defender, williams_state )
 	MCFG_MACHINE_RESET_OVERRIDE(williams_state,defender)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_ADD("scan_timer", williams_va11_callback)
-	MCFG_TIMER_ADD("240_timer", williams_count240_callback)
+	MCFG_TIMER_DRIVER_ADD("scan_timer", williams_state, williams_va11_callback)
+	MCFG_TIMER_DRIVER_ADD("240_timer", williams_state, williams_count240_callback)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
@@ -1633,8 +1633,8 @@ static MACHINE_CONFIG_START( williams2, williams_state )
 	MCFG_MACHINE_RESET_OVERRIDE(williams_state,williams2)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_ADD("scan_timer", williams2_va11_callback)
-	MCFG_TIMER_ADD("254_timer", williams2_endscreen_callback)
+	MCFG_TIMER_DRIVER_ADD("scan_timer", williams_state, williams2_va11_callback)
+	MCFG_TIMER_DRIVER_ADD("254_timer", williams_state, williams2_endscreen_callback)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)

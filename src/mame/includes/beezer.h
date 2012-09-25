@@ -18,6 +18,7 @@ public:
 	DECLARE_DRIVER_INIT(beezer);
 	virtual void machine_start();
 	UINT32 screen_update_beezer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(beezer_interrupt);
 };
 
 
@@ -60,7 +61,4 @@ DECLARE_WRITE8_DEVICE_HANDLER( beezer_sfxctrl_w );
 DECLARE_WRITE8_DEVICE_HANDLER( beezer_timer1_w );
 DECLARE_READ8_DEVICE_HANDLER( beezer_noise_r );
 
-/*----------- defined in video/beezer.c -----------*/
-
-TIMER_DEVICE_CALLBACK( beezer_interrupt );
 

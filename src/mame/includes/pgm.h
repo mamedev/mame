@@ -116,6 +116,7 @@ public:
 	DECLARE_MACHINE_RESET(pgm);
 	UINT32 screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_pgm(screen_device &screen, bool state);
+	TIMER_DEVICE_CALLBACK_MEMBER(pgm_interrupt);
 };
 
 
@@ -316,8 +317,6 @@ public:
 void pgm_basic_init( running_machine &machine, bool set_bank  = true );
 
 INPUT_PORTS_EXTERN( pgm );
-
-TIMER_DEVICE_CALLBACK( pgm_interrupt );
 
 GFXDECODE_EXTERN( pgm );
 

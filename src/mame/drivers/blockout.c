@@ -293,16 +293,15 @@ void blockout_state::machine_reset()
 	m_color = 0;
 }
 
-static TIMER_DEVICE_CALLBACK( blockout_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(blockout_state::blockout_scanline)
 {
-	blockout_state *state = timer.machine().driver_data<blockout_state>();
 	int scanline = param;
 
 	if(scanline == 248) // vblank-out irq
-		state->m_maincpu->set_input_line(6, ASSERT_LINE);
+		m_maincpu->set_input_line(6, ASSERT_LINE);
 
 	if(scanline == 0) // vblank-in irq or directly tied to coin inputs (TODO: check)
-		state->m_maincpu->set_input_line(5, ASSERT_LINE);
+		m_maincpu->set_input_line(5, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( blockout, blockout_state )
@@ -310,7 +309,7 @@ static MACHINE_CONFIG_START( blockout, blockout_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", blockout_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", blockout_state, blockout_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, AUDIO_CLOCK)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)

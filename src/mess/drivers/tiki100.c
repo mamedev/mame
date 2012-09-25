@@ -483,15 +483,13 @@ static Z80PIO_INTERFACE( pio_intf )
 
 /* Z80-CTC Interface */
 
-static TIMER_DEVICE_CALLBACK( ctc_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(tiki100_state::ctc_tick)
 {
-	tiki100_state *state = timer.machine().driver_data<tiki100_state>();
+	m_ctc->trg0(1);
+	m_ctc->trg0(0);
 
-	state->m_ctc->trg0(1);
-	state->m_ctc->trg0(0);
-
-	state->m_ctc->trg1(1);
-	state->m_ctc->trg1(0);
+	m_ctc->trg1(1);
+	m_ctc->trg1(0);
 }
 
 WRITE_LINE_MEMBER( tiki100_state::ctc_z1_w )
@@ -639,7 +637,7 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_8MHz/4, dart_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/4, pio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/4, ctc_intf)
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_8MHz/4))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", tiki100_state, ctc_tick, attotime::from_hz(XTAL_8MHz/4))
 	MCFG_FD1797_ADD(FD1797_TAG, fdc_intf) // FD1767PL-02 or FD1797-PL
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(tiki100_floppy_interface)
 

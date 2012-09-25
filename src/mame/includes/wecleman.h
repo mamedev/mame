@@ -79,6 +79,8 @@ public:
 	UINT32 screen_update_wecleman(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(hotchase_sound_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(wecleman_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(hotchase_scanline);
 };
 
 /*----------- defined in video/wecleman.c -----------*/

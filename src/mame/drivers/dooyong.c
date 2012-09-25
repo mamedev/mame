@@ -1062,15 +1062,15 @@ static MACHINE_CONFIG_START( primella, dooyong_state )
 	MCFG_FRAGMENT_ADD( sound_2151 )
 MACHINE_CONFIG_END
 
-static TIMER_DEVICE_CALLBACK( rshark_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(dooyong_state::rshark_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 248) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 
 	if(scanline == 120) // timer irq?
-		timer.machine().device("maincpu")->execute().set_input_line(6, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(6, HOLD_LINE);
 }
 
 
@@ -1079,7 +1079,7 @@ static MACHINE_CONFIG_START( rshark, dooyong_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* measured on super-x */
 	MCFG_CPU_PROGRAM_MAP(rshark_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", rshark_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dooyong_state, rshark_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* measured on super-x */
 	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
@@ -1109,7 +1109,7 @@ static MACHINE_CONFIG_START( superx, dooyong_state ) // dif mem map
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* measured on super-x */
 	MCFG_CPU_PROGRAM_MAP(superx_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", rshark_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dooyong_state, rshark_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* measured on super-x */
 	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
@@ -1139,7 +1139,7 @@ static MACHINE_CONFIG_START( popbingo, dooyong_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(popbingo_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", rshark_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dooyong_state, rshark_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* measured on super-x */
 	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)

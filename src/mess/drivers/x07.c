@@ -1358,11 +1358,9 @@ static NVRAM_HANDLER( x07 )
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( blink_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(x07_state::blink_timer)
 {
-	x07_state *state = timer.machine().driver_data<x07_state>();
-
-	state->m_blink = !state->m_blink;
+	m_blink = !m_blink;
 }
 
 TIMER_CALLBACK_MEMBER(x07_state::rsta_clear)
@@ -1524,7 +1522,7 @@ static MACHINE_CONFIG_START( x07, x07_state )
 	/* printer */
 	MCFG_PRINTER_ADD("printer")
 
-	MCFG_TIMER_ADD_PERIODIC("blink_timer", blink_timer, attotime::from_msec(300))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink_timer", x07_state, blink_timer, attotime::from_msec(300))
 
 	MCFG_NVRAM_HANDLER( x07 )
 

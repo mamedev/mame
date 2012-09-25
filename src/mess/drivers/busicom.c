@@ -178,13 +178,12 @@ static INPUT_PORTS_START( busicom )
 INPUT_PORTS_END
 
 
-static TIMER_DEVICE_CALLBACK(timer_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(busicom_state::timer_callback)
 {
-	busicom_state *state = timer.machine().driver_data<busicom_state>();
-	state->m_timer ^=1;
-	if (state->m_timer==1) state->m_drum_index++;
-	if (state->m_drum_index==13) state->m_drum_index=0;
-	i4004_set_test(timer.machine().device("maincpu"),state->m_timer);
+	m_timer ^=1;
+	if (m_timer==1) m_drum_index++;
+	if (m_drum_index==13) m_drum_index=0;
+	i4004_set_test(machine().device("maincpu"),m_timer);
 
 }
 
@@ -229,7 +228,7 @@ static MACHINE_CONFIG_START( busicom, busicom_state )
     MCFG_PALETTE_LENGTH(16)
 
 
-	MCFG_TIMER_ADD_PERIODIC("busicom_timer", timer_callback, attotime::from_msec(28*2))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("busicom_timer", busicom_state, timer_callback, attotime::from_msec(28*2))
 MACHINE_CONFIG_END
 
 /* ROM definition */

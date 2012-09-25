@@ -51,6 +51,7 @@ public:
 	// video state
 	required_shared_ptr<UINT8> m_video_ram;
 	const UINT8 *m_char_rom;
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
 };
 
 #endif

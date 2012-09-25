@@ -63,7 +63,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	TIMER_CALLBACK_MEMBER(delayed_gamma_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(mhavoc_cpu_irq_clock);
 };
 
-/*----------- defined in machine/mhavoc.c -----------*/
-TIMER_DEVICE_CALLBACK( mhavoc_cpu_irq_clock );

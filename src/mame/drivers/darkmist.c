@@ -213,15 +213,15 @@ static GFXDECODE_START( darkmist )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,  0, 16*4 )
 GFXDECODE_END
 
-static TIMER_DEVICE_CALLBACK( darkmist_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::darkmist_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0x10); /* RST 10h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0x10); /* RST 10h */
 
 	if(scanline == 0) // vblank-in irq
-		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
 }
 
 
@@ -230,7 +230,7 @@ static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", darkmist_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkmist_state, darkmist_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD(CPUTAG_T5182,Z80,14318180/4)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(t5182_map)

@@ -29,23 +29,22 @@ static GFXDECODE_START( 0x080000 )
 GFXDECODE_END
 
 
-static TIMER_DEVICE_CALLBACK(targeth_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(targeth_state::targeth_interrupt)
 {
-	targeth_state *state = timer.machine().driver_data<targeth_state>();
 	int scanline = param;
 
 	if(scanline == 240)
 	{
 		/* IRQ 2: drives the game */
-		state->m_maincpu->set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 	}
 
 	if(scanline == 0)
 	{
 		/* IRQ 4: Read 1P Gun */
-		state->m_maincpu->set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 		/* IRQ 6: Read 2P Gun */
-		state->m_maincpu->set_input_line(6, HOLD_LINE);
+		m_maincpu->set_input_line(6, HOLD_LINE);
 	}
 }
 
@@ -176,7 +175,7 @@ static MACHINE_CONFIG_START( targeth, targeth_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", targeth_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", targeth_state, targeth_interrupt, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -98,6 +98,9 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_pcw16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(pcw16_timer_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(pcw16_keyboard_timer_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(rtc_timer_callback);
 };
 
 #endif /* PCW16_H_ */

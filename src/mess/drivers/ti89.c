@@ -152,37 +152,35 @@ READ16_MEMBER ( ti68k_state::flash_r )
 }
 
 
-static TIMER_DEVICE_CALLBACK( ti68k_timer_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(ti68k_state::ti68k_timer_callback)
 {
-	ti68k_state *state = timer.machine().driver_data<ti68k_state>();
+	m_timer++;
 
-	state->m_timer++;
-
-	if (state->m_timer_on)
+	if (m_timer_on)
 	{
-		if (!(state->m_timer & state->m_timer_mask) && BIT(state->m_io_hw1[0x0a], 3))
+		if (!(m_timer & m_timer_mask) && BIT(m_io_hw1[0x0a], 3))
 		{
-			if (state->m_timer_val)
-				state->m_timer_val++;
+			if (m_timer_val)
+				m_timer_val++;
 			else
-				state->m_timer_val = (state->m_io_hw1[0x0b]) & 0xff;
+				m_timer_val = (m_io_hw1[0x0b]) & 0xff;
 		}
 
-		if (!BIT(state->m_io_hw1[0x0a], 7) && ((state->m_hw_version == state->m_HW1) || (!BIT(state->m_io_hw1[0x0f], 2) && !BIT(state->m_io_hw1[0x0f], 1))))
+		if (!BIT(m_io_hw1[0x0a], 7) && ((m_hw_version == m_HW1) || (!BIT(m_io_hw1[0x0f], 2) && !BIT(m_io_hw1[0x0f], 1))))
 		{
-			if (!(state->m_timer & 0x003f))
-				state->m_maincpu->set_input_line(M68K_IRQ_1, HOLD_LINE);
+			if (!(m_timer & 0x003f))
+				m_maincpu->set_input_line(M68K_IRQ_1, HOLD_LINE);
 
-			if (!(state->m_timer & 0x3fff) && !BIT(state->m_io_hw1[0x0a], 3))
-				state->m_maincpu->set_input_line(M68K_IRQ_3, HOLD_LINE);
+			if (!(m_timer & 0x3fff) && !BIT(m_io_hw1[0x0a], 3))
+				m_maincpu->set_input_line(M68K_IRQ_3, HOLD_LINE);
 
-			if (!(state->m_timer & state->m_timer_mask) && BIT(state->m_io_hw1[0x0a], 3) && state->m_timer_val == 0)
-				state->m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
+			if (!(m_timer & m_timer_mask) && BIT(m_io_hw1[0x0a], 3) && m_timer_val == 0)
+				m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
 		}
 	}
 
-	if (state->keypad_r(timer.machine()) != 0xff)
-		state->m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
+	if (keypad_r(machine()) != 0xff)
+		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 }
 
 
@@ -526,7 +524,7 @@ static MACHINE_CONFIG_START( ti89, ti68k_state )
 
 	MCFG_SHARP_UNK128MBIT_ADD("flash")	//should be LH28F320 for ti89t and v200 and LH28F160S3T for other models
 
-	MCFG_TIMER_ADD_PERIODIC("ti68k_timer", ti68k_timer_callback, attotime::from_hz(1<<14))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ti68k_timer", ti68k_state, ti68k_timer_callback, attotime::from_hz(1<<14))
 MACHINE_CONFIG_END
 
 

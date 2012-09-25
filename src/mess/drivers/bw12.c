@@ -91,11 +91,9 @@ void bw12_state::floppy_motor_off()
 	m_motor_on = 0;
 }
 
-static TIMER_DEVICE_CALLBACK( floppy_motor_off_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(bw12_state::floppy_motor_off_tick)
 {
-	bw12_state *state = timer.machine().driver_data<bw12_state>();
-
-	state->floppy_motor_off();
+	floppy_motor_off();
 }
 
 void bw12_state::set_floppy_motor_off_timer()
@@ -789,7 +787,7 @@ static MACHINE_CONFIG_START( common, bw12_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_TIMER_ADD(FLOPPY_TIMER_TAG, floppy_motor_off_tick)
+	MCFG_TIMER_DRIVER_ADD(FLOPPY_TIMER_TAG, bw12_state, floppy_motor_off_tick)
 	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
 	MCFG_PIA6821_ADD(PIA6821_TAG, pia_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_16MHz/4, sio_intf)

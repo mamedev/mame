@@ -58,23 +58,22 @@ TIMER_CALLBACK_MEMBER(hyprduel_state::vblank_end_callback)
 	m_requested_int &= ~param;
 }
 
-static TIMER_DEVICE_CALLBACK( hyprduel_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(hyprduel_state::hyprduel_interrupt)
 {
-	hyprduel_state *state = timer.machine().driver_data<hyprduel_state>();
 	int line = param;
 
 	if (line == 0) /* TODO: fix this! */
 	{
-		state->m_requested_int |= 0x01;		/* vblank */
-		state->m_requested_int |= 0x20;
-		state->m_maincpu->set_input_line(2, HOLD_LINE);
+		m_requested_int |= 0x01;		/* vblank */
+		m_requested_int |= 0x20;
+		m_maincpu->set_input_line(2, HOLD_LINE);
 		/* the duration is a guess */
-		timer.machine().scheduler().timer_set(attotime::from_usec(2500), timer_expired_delegate(FUNC(hyprduel_state::vblank_end_callback),state), 0x20);
+		machine().scheduler().timer_set(attotime::from_usec(2500), timer_expired_delegate(FUNC(hyprduel_state::vblank_end_callback),this), 0x20);
 	}
 	else
-		state->m_requested_int |= 0x12;		/* hsync */
+		m_requested_int |= 0x12;		/* hsync */
 
-	update_irq_state(timer.machine());
+	update_irq_state(machine());
 }
 
 READ16_MEMBER(hyprduel_state::hyprduel_irq_cause_r)
@@ -669,7 +668,7 @@ static MACHINE_CONFIG_START( hyprduel, hyprduel_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)		/* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(hyprduel_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", hyprduel_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hyprduel_state, hyprduel_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", M68000,20000000/2)		/* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(hyprduel_map2)
@@ -710,7 +709,7 @@ static MACHINE_CONFIG_START( magerror, hyprduel_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)		/* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(magerror_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", hyprduel_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hyprduel_state, hyprduel_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", M68000,20000000/2)		/* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(magerror_map2)

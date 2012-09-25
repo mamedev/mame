@@ -113,7 +113,7 @@ static void update_interrupts(running_machine &machine)
 }
 
 
-static TIMER_DEVICE_CALLBACK( scanline_update )
+TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update)
 {
 	int scanline = param;
 
@@ -123,7 +123,7 @@ static TIMER_DEVICE_CALLBACK( scanline_update )
        mystery yet */
 
 	/* INT 1 is on 32V */
-	atarigen_scanline_int_gen(timer.machine().device("maincpu"));
+	atarigen_scanline_int_gen(machine().device("maincpu"));
 
 	/* advance to the next interrupt */
 	scanline += 64;
@@ -131,7 +131,7 @@ static TIMER_DEVICE_CALLBACK( scanline_update )
 		scanline = 0;
 
 	/* set a timer for it */
-	timer.adjust(timer.machine().primary_screen->time_until_pos(scanline), scanline);
+	timer.adjust(machine().primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -363,7 +363,7 @@ static MACHINE_CONFIG_START( foodf, foodf_state )
 
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
-	MCFG_TIMER_ADD("scan_timer", scanline_update)
+	MCFG_TIMER_DRIVER_ADD("scan_timer", foodf_state, scanline_update)
 
 	/* video hardware */
 	MCFG_GFXDECODE(foodf)

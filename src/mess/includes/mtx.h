@@ -58,6 +58,8 @@ public:
 	DECLARE_WRITE8_MEMBER(hrx_attr_w);
 	DECLARE_MACHINE_START(mtx512);
 	DECLARE_MACHINE_RESET(mtx512);
+	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(cassette_tick);
 };
 
 /*----------- defined in machine/mtx.c -----------*/

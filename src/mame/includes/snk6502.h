@@ -63,6 +63,7 @@ public:
 	UINT32 screen_update_snk6502(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(satansat_interrupt);
 	INTERRUPT_GEN_MEMBER(snk6502_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(sasuke_update_counter);
 };
 
 

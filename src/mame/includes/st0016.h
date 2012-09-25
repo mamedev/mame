@@ -39,6 +39,7 @@ public:
 	DECLARE_VIDEO_START(st0016);
 	void st0016_draw_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_st0016(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(st0016_int);
 };
 
 #define ISMACS  (st0016_game&0x80)

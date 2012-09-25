@@ -50,10 +50,9 @@ TIMER_CALLBACK_MEMBER(svision_state::svision_pet_timer)
 	}
 }
 
-static TIMER_DEVICE_CALLBACK(svision_pet_timer_dev)
+TIMER_DEVICE_CALLBACK_MEMBER(svision_state::svision_pet_timer_dev)
 {
-	svision_state *state = timer.machine().driver_data<svision_state>();
-	state->svision_pet_timer(ptr,param);
+	svision_pet_timer(ptr,param);
 }
 
 void svision_irq(running_machine &machine)
@@ -544,7 +543,7 @@ static MACHINE_CONFIG_START( svision, svision_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( svisions, svision )
-	MCFG_TIMER_ADD_PERIODIC("pet_timer", svision_pet_timer_dev, attotime::from_seconds(8) * 256/4000000)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("pet_timer", svision_state, svision_pet_timer_dev, attotime::from_seconds(8))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( svisionp, svision )

@@ -36,6 +36,7 @@ public:
 	int m_keylatch;
 	int m_keyclk;
 	DECLARE_DRIVER_INIT(vcs80);
+	TIMER_DEVICE_CALLBACK_MEMBER(vcs80_keyboard_tick);
 };
 
 #endif

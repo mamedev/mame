@@ -87,10 +87,9 @@ READ8_MEMBER(astrof_state::irq_clear_r)
 }
 
 
-static TIMER_DEVICE_CALLBACK( irq_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(astrof_state::irq_callback)
 {
-	astrof_state *state = timer.machine().driver_data<astrof_state>();
-	state->m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -943,7 +942,7 @@ static MACHINE_CONFIG_START( base, astrof_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MCFG_TIMER_ADD_SCANLINE("vblank", irq_callback, "screen", VBSTART, 0)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank", astrof_state, irq_callback, "screen", VBSTART, 0)
 
 	/* video hardware */
 

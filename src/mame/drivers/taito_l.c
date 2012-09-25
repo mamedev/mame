@@ -297,32 +297,31 @@ static IRQ_CALLBACK( irq_callback )
 	return state->m_irq_adr_table[state->m_last_irq_level];
 }
 
-static TIMER_DEVICE_CALLBACK( vbl_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(taitol_state::vbl_interrupt)
 {
-	taitol_state *state = timer.machine().driver_data<taitol_state>();
 	int scanline = param;
-	state->m_maincpu->set_irq_acknowledge_callback(irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(irq_callback);
 
 	/* kludge to make plgirls boot */
-	if (state->m_maincpu->state_int(Z80_IM) != 2)
+	if (m_maincpu->state_int(Z80_IM) != 2)
 		return;
 
 	// What is really generating interrupts 0 and 1 is still to be found
 
-	if (scanline == 120 && (state->m_irq_enable & 1))
+	if (scanline == 120 && (m_irq_enable & 1))
 	{
-		state->m_last_irq_level = 0;
-		state->m_maincpu->set_input_line(0, HOLD_LINE);
+		m_last_irq_level = 0;
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
-	else if (scanline == 0 && (state->m_irq_enable & 2))
+	else if (scanline == 0 && (m_irq_enable & 2))
 	{
-		state->m_last_irq_level = 1;
-		state->m_maincpu->set_input_line(0, HOLD_LINE);
+		m_last_irq_level = 1;
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
-	else if (scanline == 240 && (state->m_irq_enable & 4))
+	else if (scanline == 240 && (m_irq_enable & 4))
 	{
-		state->m_last_irq_level = 2;
-		state->m_maincpu->set_input_line(0, HOLD_LINE);
+		m_last_irq_level = 2;
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -1844,7 +1843,7 @@ static MACHINE_CONFIG_START( fhawk, taitol_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
 	MCFG_CPU_PROGRAM_MAP(fhawk_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", vbl_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)		/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(fhawk_3_map)
@@ -1939,7 +1938,7 @@ static MACHINE_CONFIG_START( kurikint, taitol_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
 	MCFG_CPU_PROGRAM_MAP(kurikint_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", vbl_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu",  Z80, XTAL_12MHz/3)		/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kurikint_2_map)
@@ -1991,7 +1990,7 @@ static MACHINE_CONFIG_START( plotting, taitol_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
 	MCFG_CPU_PROGRAM_MAP(plotting_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", vbl_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state,taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state,plotting)
@@ -2077,7 +2076,7 @@ static MACHINE_CONFIG_START( evilston, taitol_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* not verified */
 	MCFG_CPU_PROGRAM_MAP(evilston_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", vbl_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)		/* not verified */
 	MCFG_CPU_PROGRAM_MAP(evilston_2_map)

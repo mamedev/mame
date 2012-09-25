@@ -878,7 +878,7 @@ SLOT_INTERFACE_END
 	MCFG_CPU_ADD("maincpu", type, clock)				\
 	MCFG_CPU_PROGRAM_MAP(mem##_map)	\
 	MCFG_CPU_IO_MAP(port##_io)	\
-	MCFG_TIMER_ADD_SCANLINE("scantimer", vblankfunc, "screen", 0, 1) \
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pc_state, vblankfunc, "screen", 0, 1) \
 	MCFG_CPU_CONFIG(i86_address_mask)
 
 

@@ -301,10 +301,9 @@ WRITE16_HANDLER( atarisy1_xscroll_w )
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK( atarisy1_reset_yscroll_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_reset_yscroll_callback)
 {
-	atarisy1_state *state = timer.machine().driver_data<atarisy1_state>();
-	state->m_playfield_tilemap->set_scrolly(0, param);
+	m_playfield_tilemap->set_scrolly(0, param);
 }
 
 
@@ -382,29 +381,28 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK( atarisy1_int3off_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3off_callback)
 {
-	address_space &space = timer.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* clear the state */
 	atarigen_scanline_int_ack_w(space, 0, 0, 0xffff);
 }
 
 
-TIMER_DEVICE_CALLBACK( atarisy1_int3_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3_callback)
 {
-	atarisy1_state *state = timer.machine().driver_data<atarisy1_state>();
 	int scanline = param;
 
 	/* update the state */
-	atarigen_scanline_int_gen(timer.machine().device("maincpu"));
+	atarigen_scanline_int_gen(machine().device("maincpu"));
 
 	/* set a timer to turn it off */
-	state->m_int3off_timer->adjust(timer.machine().primary_screen->scan_period());
+	m_int3off_timer->adjust(machine().primary_screen->scan_period());
 
 	/* determine the time of the next one */
-	state->m_next_timer_scanline = -1;
-	update_timers(timer.machine(), scanline);
+	m_next_timer_scanline = -1;
+	update_timers(machine(), scanline);
 }
 
 

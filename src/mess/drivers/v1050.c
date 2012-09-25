@@ -272,11 +272,9 @@ void v1050_state::scan_keyboard()
 	m_keydata = keydata;
 }
 
-static TIMER_DEVICE_CALLBACK( v1050_keyboard_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::v1050_keyboard_tick)
 {
-	v1050_state *state = timer.machine().driver_data<v1050_state>();
-
-	state->scan_keyboard();
+	scan_keyboard();
 }
 
 READ8_MEMBER( v1050_state::kb_data_r )
@@ -374,18 +372,14 @@ READ8_MEMBER( v1050_state::sasi_status_r )
 	return data;
 }
 
-static TIMER_DEVICE_CALLBACK( sasi_ack_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::sasi_ack_tick)
 {
-	v1050_state *state = timer.machine().driver_data<v1050_state>();
-
-	state->m_sasibus->scsi_ack_w(1);
+	m_sasibus->scsi_ack_w(1);
 }
 
-static TIMER_DEVICE_CALLBACK( sasi_rst_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::sasi_rst_tick)
 {
-	v1050_state *state = timer.machine().driver_data<v1050_state>();
-
-	state->m_sasibus->scsi_rst_w(1);
+	m_sasibus->scsi_rst_w(1);
 }
 
 WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
@@ -867,12 +861,10 @@ static I8255A_INTERFACE( rtc_ppi_intf )
 
 // Keyboard 8251A Interface
 
-static TIMER_DEVICE_CALLBACK( kb_8251_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::kb_8251_tick)
 {
-	v1050_state *state = timer.machine().driver_data<v1050_state>();
-
-	state->m_uart_kb->transmit_clock();
-	state->m_uart_kb->receive_clock();
+	m_uart_kb->transmit_clock();
+	m_uart_kb->receive_clock();
 }
 
 WRITE_LINE_MEMBER( v1050_state::kb_rxrdy_w )
@@ -895,12 +887,10 @@ static const i8251_interface kb_8251_intf =
 
 // Serial 8251A Interface
 
-static TIMER_DEVICE_CALLBACK( sio_8251_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::sio_8251_tick)
 {
-	v1050_state *state = timer.machine().driver_data<v1050_state>();
-
-	state->m_uart_sio->transmit_clock();
-	state->m_uart_sio->receive_clock();
+	m_uart_sio->transmit_clock();
+	m_uart_sio->receive_clock();
 }
 
 WRITE_LINE_MEMBER( v1050_state::sio_rxrdy_w )
@@ -1090,7 +1080,7 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
 	// keyboard HACK
-	MCFG_TIMER_ADD_PERIODIC("keyboard", v1050_keyboard_tick, attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", v1050_state, v1050_keyboard_tick, attotime::from_hz(60))
 
     // video hardware
 	MCFG_FRAGMENT_ADD(v1050_video)
@@ -1106,16 +1096,16 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_I8251_ADD(I8251A_SIO_TAG, /*XTAL_16MHz/8,*/ sio_8251_intf)
 	MCFG_MB8877_ADD(MB8877_TAG, /*XTAL_16MHz/16,*/ fdc_intf )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(v1050_floppy_interface)
-	MCFG_TIMER_ADD_PERIODIC(TIMER_KB_TAG, kb_8251_tick, attotime::from_hz((double)XTAL_16MHz/4/13/8))
-	MCFG_TIMER_ADD(TIMER_SIO_TAG, sio_8251_tick)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_KB_TAG, v1050_state, kb_8251_tick, attotime::from_hz((double)XTAL_16MHz/4/13/8))
+	MCFG_TIMER_DRIVER_ADD(TIMER_SIO_TAG, v1050_state, sio_8251_tick)
 
 	// SASI bus
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", S1410, SCSI_ID_0)
 	MCFG_SCSICB_ADD(SASIBUS_TAG ":host", sasi_intf)
 
-	MCFG_TIMER_ADD(TIMER_ACK_TAG, sasi_ack_tick)
-	MCFG_TIMER_ADD(TIMER_RST_TAG, sasi_rst_tick)
+	MCFG_TIMER_DRIVER_ADD(TIMER_ACK_TAG, v1050_state, sasi_ack_tick)
+	MCFG_TIMER_DRIVER_ADD(TIMER_RST_TAG, v1050_state, sasi_rst_tick)
 
 	// keyboard
 	MCFG_V1050_KEYBOARD_ADD()

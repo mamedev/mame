@@ -232,40 +232,38 @@ WRITE16_MEMBER(ssv_state::ssv_irq_enable_w)
 	COMBINE_DATA(&m_irq_enable);
 }
 
-static TIMER_DEVICE_CALLBACK( ssv_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(ssv_state::ssv_interrupt)
 {
-	ssv_state *state = timer.machine().driver_data<ssv_state>();
 	int scanline = param;
 
 	if (scanline == 0)
 	{
-		if (state->m_interrupt_ultrax)
+		if (m_interrupt_ultrax)
 		{
-			state->m_requested_int |= 1 << 1;	// needed by ultrax to coin up, breaks cairblad
-			update_irq_state(timer.machine());
+			m_requested_int |= 1 << 1;	// needed by ultrax to coin up, breaks cairblad
+			update_irq_state(machine());
 		}
 	}
 	else if(scanline == 240)
 	{
-		state->m_requested_int |= 1 << 3;	// vblank
-		update_irq_state(timer.machine());
+		m_requested_int |= 1 << 3;	// vblank
+		update_irq_state(machine());
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( gdfs_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(ssv_state::gdfs_interrupt)
 {
-	ssv_state *state = timer.machine().driver_data<ssv_state>();
 	int scanline = param;
 
 	if ((scanline % 64) == 0)
 	{
-		state->m_requested_int |= 1 << 6;	// reads lightgun (4 times for 4 axis)
-		update_irq_state(timer.machine());
+		m_requested_int |= 1 << 6;	// reads lightgun (4 times for 4 axis)
+		update_irq_state(machine());
 	}
 	else if(scanline == 240)
 	{
-		state->m_requested_int |= 1 << 3;	// vblank
-		update_irq_state(timer.machine());
+		m_requested_int |= 1 << 3;	// vblank
+		update_irq_state(machine());
 	}
 }
 
@@ -2602,7 +2600,7 @@ static MACHINE_CONFIG_START( ssv, ssv_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V60, 16000000) /* Based on STA-0001 & STA-0001B System boards */
-	MCFG_TIMER_ADD_SCANLINE("scantimer", ssv_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ssv_state, ssv_interrupt, "screen", 0, 1)
 
 
 	/* video hardware */
@@ -2651,7 +2649,7 @@ static MACHINE_CONFIG_DERIVED( gdfs, ssv )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gdfs_map)
 	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_CALLBACK(gdfs_interrupt)
+	MCFG_TIMER_DRIVER_CALLBACK(ssv_state, gdfs_interrupt)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 

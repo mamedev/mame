@@ -846,10 +846,9 @@ static void stars_update_origin(running_machine &machine)
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK( galaxian_stars_blink_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::galaxian_stars_blink_timer)
 {
-	galaxian_state *state = timer.machine().driver_data<galaxian_state>();
-	state->m_stars_blink_state++;
+	m_stars_blink_state++;
 }
 
 

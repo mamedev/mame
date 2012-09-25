@@ -1578,22 +1578,21 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static TIMER_DEVICE_CALLBACK( kaneko16_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_state::kaneko16_interrupt)
 {
-	kaneko16_state *state = timer.machine().driver_data<kaneko16_state>();
 	int scanline = param;
 
 	// main vblank interrupt
 	if(scanline == 224)
-		state->m_maincpu->set_input_line(5, HOLD_LINE);
+		m_maincpu->set_input_line(5, HOLD_LINE);
 
 	// each of these 2 int are responsible of translating a part of sprite buffer
 	// from work ram to sprite ram. How these are scheduled is unknown.
 	if(scanline == 64)
-		state->m_maincpu->set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 
 	if(scanline == 144)
-		state->m_maincpu->set_input_line(3, HOLD_LINE);
+		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 static const ay8910_interface ay8910_intf_dsw =
@@ -1644,7 +1643,7 @@ static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* MC68000P12 */
 	MCFG_CPU_PROGRAM_MAP(berlwall)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", kaneko16_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)	// mangled sprites otherwise
@@ -1695,7 +1694,7 @@ static MACHINE_CONFIG_START( bakubrkr, kaneko16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(bakubrkr)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", kaneko16_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,gtmr)
 	MCFG_EEPROM_93C46_ADD("eeprom")
@@ -1763,7 +1762,7 @@ static MACHINE_CONFIG_START( blazeon, kaneko16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)	/* TMP68HC000-12 */
 	MCFG_CPU_PROGRAM_MAP(blazeon)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", kaneko16_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80,4000000)	/* D780C-2 */
 	MCFG_CPU_PROGRAM_MAP(blazeon_soundmem)
@@ -1823,7 +1822,7 @@ static MACHINE_CONFIG_START( gtmr, kaneko16_gtmr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(gtmr_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", kaneko16_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state,gtmr)
 
@@ -1942,7 +1941,7 @@ static MACHINE_CONFIG_START( mgcrystl, kaneko16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mgcrystl)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", kaneko16_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,mgcrystl)
 	MCFG_EEPROM_93C46_ADD("eeprom")
@@ -2009,22 +2008,21 @@ MACHINE_CONFIG_END
     other: busy loop
 */
 
-static TIMER_DEVICE_CALLBACK( shogwarr_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_state::shogwarr_interrupt)
 {
-	kaneko16_shogwarr_state *state = timer.machine().driver_data<kaneko16_shogwarr_state>();
 	int scanline = param;
 
 	if(scanline == 224)
 	{
 		// the code for this interrupt is provided by the MCU..
-		state->m_maincpu->set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 	}
 
 	if(scanline == 64)
-		state->m_maincpu->set_input_line(3, HOLD_LINE);
+		m_maincpu->set_input_line(3, HOLD_LINE);
 
 	if(scanline == 144)
-		state->m_maincpu->set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 /*
@@ -2066,7 +2064,7 @@ static MACHINE_CONFIG_START( shogwarr, kaneko16_shogwarr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(shogwarr)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", shogwarr_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, shogwarr_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_shogwarr_state,mgcrystl)
 

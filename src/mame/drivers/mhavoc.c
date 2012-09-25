@@ -483,7 +483,7 @@ static MACHINE_CONFIG_START( mhavoc, mhavoc_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_TIMER_ADD_PERIODIC("5k_timer", mhavoc_cpu_irq_clock, attotime::from_hz(MHAVOC_CLOCK_5K))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("5k_timer", mhavoc_state, mhavoc_cpu_irq_clock, attotime::from_hz(MHAVOC_CLOCK_5K))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", VECTOR)

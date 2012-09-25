@@ -253,7 +253,7 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, A7800_NTSC_Y1/8)	/* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
 	MCFG_CPU_PROGRAM_MAP(a7800_mem)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", a7800_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a7800_state, a7800_interrupt, "screen", 0, 1)
 
 
 	/* video hardware */

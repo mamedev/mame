@@ -46,6 +46,7 @@ public:
 	TIMER_CALLBACK_MEMBER(paddle_d7reset_callback);
 	TIMER_CALLBACK_MEMBER(paddle_irqreset_callback);
 	TIMER_CALLBACK_MEMBER(paddle_pulse_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(paddle_update_callback);
 };
 
 #endif

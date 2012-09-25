@@ -241,7 +241,7 @@ SLOT_INTERFACE_END
 	MCFG_CPU_ADD("maincpu", type, clock)				\
 	MCFG_CPU_PROGRAM_MAP(mem##_map)	\
 	MCFG_CPU_IO_MAP(port##_io)	\
-	MCFG_TIMER_ADD_SCANLINE("scantimer", vblankfunc, "screen", 0, 1) \
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pc_state, vblankfunc, "screen", 0, 1) \
 	MCFG_CPU_CONFIG(i86_address_mask)
 
 
@@ -334,7 +334,7 @@ static MACHINE_CONFIG_START( ppc512, pc_state )
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(ppc512_map)
 	MCFG_CPU_IO_MAP(ppc512_io)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", pc_frame_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pc_state, pc_frame_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)

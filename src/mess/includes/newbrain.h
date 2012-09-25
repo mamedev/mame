@@ -158,6 +158,7 @@ public:
 	int m_copbytes;
 	int m_copregint;
 	INTERRUPT_GEN_MEMBER(newbrain_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(cop_regint_tick);
 };
 
 class newbrain_eim_state : public newbrain_state
@@ -205,6 +206,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
 	DECLARE_WRITE_LINE_MEMBER( adc_eoc_w );
+
+	TIMER_DEVICE_CALLBACK_MEMBER(ctc_c2_tick);
 
 	void bankswitch();
 

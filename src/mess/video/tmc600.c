@@ -43,11 +43,9 @@ WRITE8_MEMBER( tmc600_state::vismac_data_w )
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( blink_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(tmc600_state::blink_tick)
 {
-	tmc600_state *state = timer.machine().driver_data<tmc600_state>();
-
-	state->m_blink = !state->m_blink;
+	m_blink = !m_blink;
 }
 
 UINT8 tmc600_state::get_color(UINT16 pma)
@@ -146,7 +144,7 @@ GFXDECODE_END
 MACHINE_CONFIG_FRAGMENT( tmc600_video )
 	// video hardware
 	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, CDP1869_DOT_CLK_PAL)
-	MCFG_TIMER_ADD_PERIODIC("blink", blink_tick, attotime::from_hz(2))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink", tmc600_state, blink_tick, attotime::from_hz(2))
 	MCFG_GFXDECODE(tmc600)
 
 	// sound hardware

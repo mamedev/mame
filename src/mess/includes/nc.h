@@ -82,6 +82,7 @@ public:
 	UINT32 screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nc_keyboard_timer_callback);
 	TIMER_CALLBACK_MEMBER(nc_serial_timer_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(dummy_timer_callback);
 };
 
 

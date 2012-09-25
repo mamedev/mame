@@ -82,6 +82,10 @@ public:
 	UINT32 screen_update_helifire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_helifire(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(spacefev_stop_red_cannon);
+	TIMER_DEVICE_CALLBACK_MEMBER(rst1_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(rst2_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(spacefev_vco_voltage_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(helifire_dac_volume_timer);
 };
 
 /*----------- defined in video/n8080.c -----------*/

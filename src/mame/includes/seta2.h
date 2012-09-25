@@ -74,4 +74,5 @@ public:
 	INTERRUPT_GEN_MEMBER(seta2_interrupt);
 	INTERRUPT_GEN_MEMBER(samshoot_interrupt);
 	INTERRUPT_GEN_MEMBER(funcube_sub_timer_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(funcube_interrupt);
 };

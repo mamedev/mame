@@ -167,11 +167,10 @@ READ32_MEMBER(deco_mlc_state::mlc_scanline_r)
 	return machine().primary_screen->vpos();
 }
 
-static TIMER_DEVICE_CALLBACK( interrupt_gen )
+TIMER_DEVICE_CALLBACK_MEMBER(deco_mlc_state::interrupt_gen)
 {
-	deco_mlc_state *state = timer.machine().driver_data<deco_mlc_state>();
 //  logerror("hit scanline IRQ %d (%08x)\n", machine.primary_screen->vpos(), info.i);
-	timer.machine().device("maincpu")->execute().set_input_line(state->m_mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(m_mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
 }
 
 WRITE32_MEMBER(deco_mlc_state::mlc_irq_w)
@@ -384,7 +383,7 @@ static MACHINE_CONFIG_START( avengrgs, deco_mlc_state )
 	MCFG_MACHINE_RESET_OVERRIDE(deco_mlc_state,mlc)
 	MCFG_EEPROM_93C46_ADD("eeprom") /* Actually 93c45 */
 
-	MCFG_TIMER_ADD("int_timer", interrupt_gen)
+	MCFG_TIMER_DRIVER_ADD("int_timer", deco_mlc_state, interrupt_gen)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -416,7 +415,7 @@ static MACHINE_CONFIG_START( mlc, deco_mlc_state )
 	MCFG_MACHINE_RESET_OVERRIDE(deco_mlc_state,mlc)
 	MCFG_EEPROM_93C46_ADD("eeprom") /* Actually 93c45 */
 
-	MCFG_TIMER_ADD("int_timer", interrupt_gen)
+	MCFG_TIMER_DRIVER_ADD("int_timer", deco_mlc_state, interrupt_gen)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

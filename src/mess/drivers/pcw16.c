@@ -134,20 +134,19 @@ void pcw16_state::pcw16_refresh_ints()
 }
 
 
-static TIMER_DEVICE_CALLBACK(pcw16_timer_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(pcw16_state::pcw16_timer_callback)
 {
-	pcw16_state *state = timer.machine().driver_data<pcw16_state>();
 	/* do not increment past 15 */
-	if (state->m_interrupt_counter!=15)
+	if (m_interrupt_counter!=15)
 	{
-		state->m_interrupt_counter++;
+		m_interrupt_counter++;
 		/* display int */
-		state->m_system_status |= (1<<0);
+		m_system_status |= (1<<0);
 	}
 
-	if (state->m_interrupt_counter!=0)
+	if (m_interrupt_counter!=0)
 	{
-		state->pcw16_refresh_ints();
+		pcw16_refresh_ints();
 	}
 }
 
@@ -878,11 +877,10 @@ WRITE8_MEMBER(pcw16_state::pcw16_keyboard_control_w)
 }
 
 
-static TIMER_DEVICE_CALLBACK(pcw16_keyboard_timer_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(pcw16_state::pcw16_keyboard_timer_callback)
 {
-	pcw16_state *state = timer.machine().driver_data<pcw16_state>();
 	at_keyboard_polling();
-	if (state->pcw16_keyboard_can_transmit())
+	if (pcw16_keyboard_can_transmit())
 	{
 		int data;
 
@@ -895,11 +893,11 @@ static TIMER_DEVICE_CALLBACK(pcw16_keyboard_timer_callback)
 //              pcw16_dump_cpu_ram();
 //          }
 
-			state->pcw16_keyboard_signal_byte_received(data);
+			pcw16_keyboard_signal_byte_received(data);
 		}
 	}
 	// TODO: fix
-	state->subdevice<ns16550_device>("ns16550_2")->ri_w((timer.machine().root_device().ioport("EXTRA")->read() & 0x040) ? 0 : 1);
+	subdevice<ns16550_device>("ns16550_2")->ri_w((machine().root_device().ioport("EXTRA")->read() & 0x040) ? 0 : 1);
 }
 
 
@@ -938,58 +936,57 @@ void pcw16_state::rtc_setup_max_days()
 	}
 }
 
-static TIMER_DEVICE_CALLBACK(rtc_timer_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(pcw16_state::rtc_timer_callback)
 {
-	pcw16_state *state = timer.machine().driver_data<pcw16_state>();
 	int fraction_of_second;
 
 	/* halt counter? */
-	if ((state->m_rtc_control & 0x01)!=0)
+	if ((m_rtc_control & 0x01)!=0)
 	{
 		/* no */
 
 		/* increment 256th's of a second register */
-		fraction_of_second = state->m_rtc_256ths_seconds+1;
+		fraction_of_second = m_rtc_256ths_seconds+1;
 		/* add bit 8 = overflow */
-		state->m_rtc_seconds+=(fraction_of_second>>8);
+		m_rtc_seconds+=(fraction_of_second>>8);
 		/* ensure counter is in range 0-255 */
-		state->m_rtc_256ths_seconds = fraction_of_second & 0x0ff;
+		m_rtc_256ths_seconds = fraction_of_second & 0x0ff;
 	}
 
-	if (state->m_rtc_seconds>59)
+	if (m_rtc_seconds>59)
 	{
-		state->m_rtc_seconds = 0;
+		m_rtc_seconds = 0;
 
-		state->m_rtc_minutes++;
+		m_rtc_minutes++;
 
-		if (state->m_rtc_minutes>59)
+		if (m_rtc_minutes>59)
 		{
-			state->m_rtc_minutes = 0;
+			m_rtc_minutes = 0;
 
-			state->m_rtc_hours++;
+			m_rtc_hours++;
 
-			if (state->m_rtc_hours>23)
+			if (m_rtc_hours>23)
 			{
-				state->m_rtc_hours = 0;
+				m_rtc_hours = 0;
 
-				state->m_rtc_days++;
+				m_rtc_days++;
 
-				if (state->m_rtc_days > state->m_rtc_days_max)
+				if (m_rtc_days > m_rtc_days_max)
 				{
-					state->m_rtc_days = 1;
+					m_rtc_days = 1;
 
-					state->m_rtc_months++;
+					m_rtc_months++;
 
-					if (state->m_rtc_months>12)
+					if (m_rtc_months>12)
 					{
-						state->m_rtc_months = 1;
+						m_rtc_months = 1;
 
 						/* 7 bit year counter */
-						state->m_rtc_years = (state->m_rtc_years + 1) & 0x07f;
+						m_rtc_years = (m_rtc_years + 1) & 0x07f;
 
 					}
 
-					state->rtc_setup_max_days();
+					rtc_setup_max_days();
 				}
 
 			}
@@ -1512,11 +1509,11 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_INTEL_E28F008SA_ADD("flash1")
 
 	/* video ints */
-	MCFG_TIMER_ADD_PERIODIC("video_timer", pcw16_timer_callback, attotime::from_usec(5830))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("video_timer", pcw16_state, pcw16_timer_callback, attotime::from_usec(5830))
 	/* rtc timer */
-	MCFG_TIMER_ADD_PERIODIC("rtc_timer", rtc_timer_callback, attotime::from_hz(256))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", pcw16_state, rtc_timer_callback, attotime::from_hz(256))
 	/* keyboard timer */
-	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", pcw16_keyboard_timer_callback, attotime::from_hz(50))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", pcw16_state, pcw16_keyboard_timer_callback, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
 /***************************************************************************

@@ -1067,7 +1067,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( schaser, mw8080bw_root, _8080bw_state )
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,schaser)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,schaser)
 
-	MCFG_TIMER_ADD("schaser_sh_555", schaser_effect_555_cb)
+	MCFG_TIMER_DRIVER_ADD("schaser_sh_555", _8080bw_state, schaser_effect_555_cb)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -2341,12 +2341,11 @@ Claybuster is on the same hardware, PCB labels CS 235A and CS 238A as well
 
 */
 
-TIMER_DEVICE_CALLBACK( claybust_gun_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::claybust_gun_callback)
 {
-	_8080bw_state *state = timer.machine().driver_data<_8080bw_state>();
 	
 	// reset gun latch
-	state->m_claybust_gun_pos = 0;
+	m_claybust_gun_pos = 0;
 }
 
 CUSTOM_INPUT_MEMBER(_8080bw_state::claybust_gun_on_r)
@@ -2460,7 +2459,7 @@ MACHINE_CONFIG_DERIVED_CLASS( claybust, invaders, _8080bw_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(claybust_io_map)
 
-	MCFG_TIMER_ADD("claybust_gun", claybust_gun_callback)
+	MCFG_TIMER_DRIVER_ADD("claybust_gun", _8080bw_state, claybust_gun_callback)
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, claybust) 
 

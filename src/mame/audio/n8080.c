@@ -426,33 +426,31 @@ WRITE8_MEMBER(n8080_state::helifire_sound_ctrl_w)
 }
 
 
-static TIMER_DEVICE_CALLBACK( spacefev_vco_voltage_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::spacefev_vco_voltage_timer)
 {
-	device_t *sn = timer.machine().device("snsnd");
-	n8080_state *state = timer.machine().driver_data<n8080_state>();
+	device_t *sn = machine().device("snsnd");
 	double voltage = 0;
 
-	if (state->m_mono_flop[2])
+	if (m_mono_flop[2])
 	{
-		voltage = 5 * (1 - exp(- state->m_sound_timer[2]->elapsed().as_double() / 0.22));
+		voltage = 5 * (1 - exp(- m_sound_timer[2]->elapsed().as_double() / 0.22));
 	}
 
 	sn76477_vco_voltage_w(sn, voltage);
 }
 
 
-static TIMER_DEVICE_CALLBACK( helifire_dac_volume_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::helifire_dac_volume_timer)
 {
-	n8080_state *state = timer.machine().driver_data<n8080_state>();
-	double t = state->m_helifire_dac_timing - timer.machine().time().as_double();
+	double t = m_helifire_dac_timing - machine().time().as_double();
 
-	if (state->m_helifire_dac_phase)
+	if (m_helifire_dac_phase)
 	{
-		state->m_helifire_dac_volume = 1 - exp(t / ATTACK_RATE);
+		m_helifire_dac_volume = 1 - exp(t / ATTACK_RATE);
 	}
 	else
 	{
-		state->m_helifire_dac_volume = exp(t / DECAY_RATE);
+		m_helifire_dac_volume = exp(t / DECAY_RATE);
 	}
 }
 
@@ -577,7 +575,7 @@ MACHINE_CONFIG_FRAGMENT( spacefev_sound )
 	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
 	MCFG_CPU_IO_MAP(n8080_sound_io_map)
 
-	MCFG_TIMER_ADD_PERIODIC("vco_timer", spacefev_vco_voltage_timer, attotime::from_hz(1000))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("vco_timer", n8080_state, spacefev_vco_voltage_timer, attotime::from_hz(1000))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -617,7 +615,7 @@ MACHINE_CONFIG_FRAGMENT( helifire_sound )
 	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
 	MCFG_CPU_IO_MAP(helifire_sound_io_map)
 
-	MCFG_TIMER_ADD_PERIODIC("helifire_dac", helifire_dac_volume_timer, attotime::from_hz(1000) )
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("helifire_dac", n8080_state, helifire_dac_volume_timer, attotime::from_hz(1000))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

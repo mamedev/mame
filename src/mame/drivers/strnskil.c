@@ -317,16 +317,15 @@ static GFXDECODE_START( strnskil )
 GFXDECODE_END
 
 
-static TIMER_DEVICE_CALLBACK( strnskil_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(strnskil_state::strnskil_irq)
 {
-	strnskil_state *state = timer.machine().driver_data<strnskil_state>();
 	int scanline = param;
 
 	if(scanline == 240 || scanline == 96)
 	{
-		state->m_maincpu->set_input_line(0,HOLD_LINE);
+		m_maincpu->set_input_line(0,HOLD_LINE);
 
-		state->m_irq_source = (scanline != 240);
+		m_irq_source = (scanline != 240);
 	}
 }
 
@@ -352,7 +351,7 @@ static MACHINE_CONFIG_START( strnskil, strnskil_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
 	MCFG_CPU_PROGRAM_MAP(strnskil_map1)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", strnskil_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", strnskil_state, strnskil_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", Z80,8000000/2) /* 4.000MHz */
 	MCFG_CPU_PROGRAM_MAP(strnskil_map2)

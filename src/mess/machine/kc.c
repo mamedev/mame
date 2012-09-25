@@ -718,24 +718,23 @@ WRITE_LINE_MEMBER( kc_state::ctc_zc1_callback)
 
 }
 
-TIMER_DEVICE_CALLBACK( kc_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(kc_state::kc_scanline)
 {
-	kc_state *state = timer.machine().driver_data<kc_state>();
 	int scanline = (int)param;
 
 	/* set clock input for channel 0 and 1 to ctc */
-	state->m_z80ctc->trg0(1);
-	state->m_z80ctc->trg0(0);
-	state->m_z80ctc->trg1(1);
-	state->m_z80ctc->trg1(0);
+	m_z80ctc->trg0(1);
+	m_z80ctc->trg0(0);
+	m_z80ctc->trg1(1);
+	m_z80ctc->trg1(0);
 
 	if (scanline == 256)
 	{
 		/* set clock input for channel 2 and 3 to ctc */
-		state->m_z80ctc->trg2(1);
-		state->m_z80ctc->trg2(0);
-		state->m_z80ctc->trg3(1);
-		state->m_z80ctc->trg3(0);
+		m_z80ctc->trg2(1);
+		m_z80ctc->trg2(0);
+		m_z80ctc->trg3(1);
+		m_z80ctc->trg3(0);
 	}
 }
 

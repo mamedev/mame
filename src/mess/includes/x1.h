@@ -203,13 +203,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
 	TIMER_CALLBACK_MEMBER(x1_rtc_increment);
+	TIMER_DEVICE_CALLBACK_MEMBER(x1_cmt_wind_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(x1_keyboard_callback);
 };
-
-
-/*----------- shared with x1twin.c -----------*/
-
-TIMER_DEVICE_CALLBACK(x1_keyboard_callback);
-TIMER_DEVICE_CALLBACK( x1_cmt_wind_timer );
 
 /*----------- defined in machine/x1.c -----------*/
 

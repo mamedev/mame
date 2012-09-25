@@ -50,6 +50,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_gradius3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cpuA_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(gradius3_sub_scanline);
 };
 
 /*----------- defined in video/gradius3.c -----------*/

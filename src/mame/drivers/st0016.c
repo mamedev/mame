@@ -417,16 +417,15 @@ static GFXDECODE_START( st0016 )
 //  GFXDECODE_ENTRY( NULL, 0, charlayout,      0, 16*4  )
 GFXDECODE_END
 
-static TIMER_DEVICE_CALLBACK(st0016_int)
+TIMER_DEVICE_CALLBACK_MEMBER(st0016_state::st0016_int)
 {
-	st0016_state *state = timer.machine().driver_data<st0016_state>();
 	int scanline = param;
 
 	if(scanline == 240)
-		state->m_maincpu->set_input_line(0,HOLD_LINE);
+		m_maincpu->set_input_line(0,HOLD_LINE);
 	else if((scanline % 64) == 0)
-		if(state->m_maincpu->state_int(Z80_IFF1)) /* dirty hack ... */
-			state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+		if(m_maincpu->state_int(Z80_IFF1)) /* dirty hack ... */
+			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static const st0016_interface st0016_config =
@@ -446,7 +445,7 @@ static MACHINE_CONFIG_START( st0016, st0016_state )
 	MCFG_CPU_ADD("maincpu",Z80,8000000) /* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(st0016_mem)
 	MCFG_CPU_IO_MAP(st0016_io)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", st0016_int, "screen", 0, 1) /*  4*nmi + int0 */
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", st0016_state, st0016_int, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

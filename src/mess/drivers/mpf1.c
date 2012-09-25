@@ -333,14 +333,12 @@ static const tms5220_interface mpf1_tms5220_intf =
 
 /* Machine Initialization */
 
-static TIMER_DEVICE_CALLBACK( check_halt_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(mpf1_state::check_halt_callback)
 {
-	mpf1_state *state = timer.machine().driver_data<mpf1_state>();
-
 	// halt-LED; the red one, is turned on when the processor is halted
 	// TODO: processor seems to halt, but restarts(?) at 0x0000 after a while -> fix
-	INT64 led_halt = state->m_maincpu->state_int(Z80_HALT);
-	set_led_status(timer.machine(), 1, led_halt);
+	INT64 led_halt = m_maincpu->state_int(Z80_HALT);
+	set_led_status(machine(), 1, led_halt);
 }
 
 void mpf1_state::machine_start()
@@ -382,7 +380,7 @@ static MACHINE_CONFIG_START( mpf1, mpf1_state )
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_TIMER_ADD_PERIODIC("halt_timer", check_halt_callback, attotime::from_hz(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mpf1b, mpf1_state )
@@ -410,7 +408,7 @@ static MACHINE_CONFIG_START( mpf1b, mpf1_state )
 	MCFG_SOUND_CONFIG(mpf1_tms5220_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_TIMER_ADD_PERIODIC("halt_timer", check_halt_callback, attotime::from_hz(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mpf1p, mpf1_state )
@@ -434,7 +432,7 @@ static MACHINE_CONFIG_START( mpf1p, mpf1_state )
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_TIMER_ADD_PERIODIC("halt_timer", check_halt_callback, attotime::from_hz(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
 MACHINE_CONFIG_END
 
 /* ROMs */

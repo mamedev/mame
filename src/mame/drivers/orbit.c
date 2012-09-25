@@ -31,12 +31,11 @@ Atari Orbit Driver
  *
  *************************************/
 
-static TIMER_DEVICE_CALLBACK( nmi_32v )
+TIMER_DEVICE_CALLBACK_MEMBER(orbit_state::nmi_32v)
 {
-	orbit_state *state = timer.machine().driver_data<orbit_state>();
 	int scanline = param;
-	int nmistate = (scanline & 32) && (state->m_misc_flags & 4);
-	state->m_maincpu->set_input_line(INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
+	int nmistate = (scanline & 32) && (m_misc_flags & 4);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -300,7 +299,7 @@ static MACHINE_CONFIG_START( orbit, orbit_state )
 	MCFG_CPU_PROGRAM_MAP(orbit_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", orbit_state,  orbit_interrupt)
 
-	MCFG_TIMER_ADD_SCANLINE("32v", nmi_32v, "screen", 0, 32)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", orbit_state, nmi_32v, "screen", 0, 32)
 
 
 	/* video hardware */

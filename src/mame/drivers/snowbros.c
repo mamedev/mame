@@ -120,42 +120,40 @@ WRITE16_MEMBER(snowbros_state::snowbros_irq2_ack_w)
 	machine().device("maincpu")->execute().set_input_line(2, CLEAR_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK( snowbros_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros_irq)
 {
-	snowbros_state *state = timer.machine().driver_data<snowbros_state>();
 	int scanline = param;
 
 	if(scanline == 240)
-		state->m_maincpu->set_input_line(2, ASSERT_LINE);
+		m_maincpu->set_input_line(2, ASSERT_LINE);
 
 	if(scanline == 128)
-		state->m_maincpu->set_input_line(3, ASSERT_LINE);
+		m_maincpu->set_input_line(3, ASSERT_LINE);
 
 	if(scanline == 32)
-		state->m_maincpu->set_input_line(4, ASSERT_LINE);
+		m_maincpu->set_input_line(4, ASSERT_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK( snowbros3_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros3_irq)
 {
-	snowbros_state *state = timer.machine().driver_data<snowbros_state>();
-	okim6295_device *adpcm = timer.machine().device<okim6295_device>("oki");
+	okim6295_device *adpcm = machine().device<okim6295_device>("oki");
 	int status = adpcm->read_status();
 	int scanline = param;
 
 	if(scanline == 240)
-		state->m_maincpu->set_input_line(2, ASSERT_LINE);
+		m_maincpu->set_input_line(2, ASSERT_LINE);
 
 	if(scanline == 128)
-		state->m_maincpu->set_input_line(3, ASSERT_LINE);
+		m_maincpu->set_input_line(3, ASSERT_LINE);
 
 	if(scanline == 32)
-		state->m_maincpu->set_input_line(4, ASSERT_LINE);
+		m_maincpu->set_input_line(4, ASSERT_LINE);
 
-	if (state->m_sb3_music_is_playing)
+	if (m_sb3_music_is_playing)
 	{
 		if ((status&0x08)==0x00)
 		{
-			adpcm->write_command(0x80|state->m_sb3_music);
+			adpcm->write_command(0x80|m_sb3_music);
 			adpcm->write_command(0x00|0x82);
 		}
 
@@ -1544,7 +1542,7 @@ static MACHINE_CONFIG_START( snowbros, snowbros_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz - confirmed */
 	MCFG_CPU_PROGRAM_MAP(snowbros_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", snowbros_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 6000000) /* 6 MHz - confirmed */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -1654,7 +1652,7 @@ static MACHINE_CONFIG_START( honeydol, snowbros_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(honeydol_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", snowbros_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(honeydol_sound_map)
@@ -1690,7 +1688,7 @@ static MACHINE_CONFIG_START( twinadv, snowbros_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) // or 12
 	MCFG_CPU_PROGRAM_MAP(twinadv_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", snowbros_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -1767,7 +1765,7 @@ static MACHINE_CONFIG_START( snowbro3, snowbros_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz or 12mhz ? */
 	MCFG_CPU_PROGRAM_MAP(snowbros3_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", snowbros3_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros3_irq, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

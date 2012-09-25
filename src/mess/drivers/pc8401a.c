@@ -61,11 +61,9 @@ void pc8401a_state::scan_keyboard()
 	if (strobe)	m_key_strobe = strobe;
 }
 
-static TIMER_DEVICE_CALLBACK( pc8401a_keyboard_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(pc8401a_state::pc8401a_keyboard_tick)
 {
-	pc8401a_state *state = timer.machine().driver_data<pc8401a_state>();
-
-	state->scan_keyboard();
+	scan_keyboard();
 }
 
 /* Read/Write Handlers */
@@ -602,7 +600,7 @@ static MACHINE_CONFIG_START( pc8401a, pc8401a_state )
 	MCFG_CPU_IO_MAP(pc8401a_io)
 
 	/* fake keyboard */
-	MCFG_TIMER_ADD_PERIODIC("keyboard", pc8401a_keyboard_tick, attotime::from_hz(64))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
 
 	/* devices */
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, rtc_intf)
@@ -635,7 +633,7 @@ static MACHINE_CONFIG_START( pc8500, pc8500_state )
 	MCFG_CPU_IO_MAP(pc8500_io)
 
 	/* fake keyboard */
-	MCFG_TIMER_ADD_PERIODIC("keyboard", pc8401a_keyboard_tick, attotime::from_hz(64))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
 
 	/* devices */
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, rtc_intf)

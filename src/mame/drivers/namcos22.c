@@ -1683,36 +1683,34 @@ READ16_MEMBER(namcos22_state::master_serial_io_r)
 	return m_mSerialDataSlaveToMasterCurrent;
 }
 
-static TIMER_DEVICE_CALLBACK( dsp_master_serial_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_master_serial_irq)
 {
-	namcos22_state *state = timer.machine().driver_data<namcos22_state>();
 	int scanline = param;
 
-	if( state->m_mbEnableDspIrqs )
+	if( m_mbEnableDspIrqs )
 	{
-		state->m_mSerialDataSlaveToMasterCurrent = state->m_mSerialDataSlaveToMasterNext;
+		m_mSerialDataSlaveToMasterCurrent = m_mSerialDataSlaveToMasterNext;
 
 		if(scanline == 480)
-			state->m_master->set_input_line(TMS32025_INT0, HOLD_LINE);
+			m_master->set_input_line(TMS32025_INT0, HOLD_LINE);
 		else if((scanline % 2) == 0)
 		{
-			state->m_master->set_input_line(TMS32025_RINT, HOLD_LINE);
-			state->m_master->set_input_line(TMS32025_XINT, HOLD_LINE);
+			m_master->set_input_line(TMS32025_RINT, HOLD_LINE);
+			m_master->set_input_line(TMS32025_XINT, HOLD_LINE);
 		}
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( dsp_slave_serial_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_slave_serial_irq)
 {
-	namcos22_state *state = timer.machine().driver_data<namcos22_state>();
 	int scanline = param;
 
-	if( state->m_mbEnableDspIrqs )
+	if( m_mbEnableDspIrqs )
 	{
 		if((scanline % 2) == 0)
 		{
-			state->m_slave->set_input_line(TMS32025_RINT, HOLD_LINE);
-			state->m_slave->set_input_line(TMS32025_XINT, HOLD_LINE);
+			m_slave->set_input_line(TMS32025_RINT, HOLD_LINE);
+			m_slave->set_input_line(TMS32025_XINT, HOLD_LINE);
 		}
 	}
 }
@@ -2920,18 +2918,17 @@ static ADDRESS_MAP_START( mcu_s22_io, AS_IO, 8, namcos22_state )
 	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READ(mcu_port4_s22_r )
 ADDRESS_MAP_END
 
-static TIMER_DEVICE_CALLBACK( mcu_irq )
+TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::mcu_irq)
 {
-	namcos22_state *state = timer.machine().driver_data<namcos22_state>();
 	int scanline = param;
 
 	/* TODO: real sources of these */
 	if(scanline == 480)
-		state->m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
+		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
 	else if(scanline == 500)
-		state->m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
+		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 	else if(scanline == 0)
-		state->m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
+		m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
 void namcos22_state::machine_reset()
@@ -2948,18 +2945,18 @@ static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 	MCFG_CPU_PROGRAM_MAP(master_dsp_program)
 	MCFG_CPU_DATA_MAP(master_dsp_data)
 	MCFG_CPU_IO_MAP(master_dsp_io)
-	MCFG_TIMER_ADD_SCANLINE("master_st", dsp_master_serial_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("master_st", namcos22_state, dsp_master_serial_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", TMS32025,SS22_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(slave_dsp_program)
 	MCFG_CPU_DATA_MAP(slave_dsp_data)
 	MCFG_CPU_IO_MAP(slave_dsp_io)
-	MCFG_TIMER_ADD_SCANLINE("slave_st", dsp_slave_serial_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_st", namcos22_state, dsp_slave_serial_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("mcu", M37710, SS22_MASTER_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(mcu_program)
 	MCFG_CPU_IO_MAP( mcu_io)
-	MCFG_TIMER_ADD_SCANLINE("mcu_st", mcu_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("mcu_st", namcos22_state, mcu_irq, "screen", 0, 1)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -3199,13 +3196,13 @@ static MACHINE_CONFIG_START( namcos22, namcos22_state )
 	MCFG_CPU_PROGRAM_MAP(master_dsp_program)
 	MCFG_CPU_DATA_MAP(master_dsp_data)
 	MCFG_CPU_IO_MAP(master_dsp_io)
-	MCFG_TIMER_ADD_SCANLINE("master_st", dsp_master_serial_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("master_st", namcos22_state, dsp_master_serial_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", TMS32025,SS22_MASTER_CLOCK) /* ? */
 	MCFG_CPU_PROGRAM_MAP(slave_dsp_program)
 	MCFG_CPU_DATA_MAP(slave_dsp_data)
 	MCFG_CPU_IO_MAP(slave_dsp_io)
-	MCFG_TIMER_ADD_SCANLINE("slave_st", dsp_slave_serial_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_st", namcos22_state, dsp_slave_serial_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("mcu", M37702, SS22_MASTER_CLOCK/3)	// C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
 	MCFG_CPU_PROGRAM_MAP( mcu_s22_program)

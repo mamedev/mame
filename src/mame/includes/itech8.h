@@ -99,6 +99,7 @@ public:
 	TIMER_CALLBACK_MEMBER(behind_the_beam_update);
 	TIMER_CALLBACK_MEMBER(delayed_sound_data_w);
 	TIMER_CALLBACK_MEMBER(blitter_done);
+	TIMER_DEVICE_CALLBACK_MEMBER(grmatch_palette_update);
 };
 
 
@@ -116,5 +117,3 @@ DECLARE_READ8_HANDLER( slikshot_z80_r );
 DECLARE_READ8_HANDLER( slikshot_z80_control_r );
 DECLARE_WRITE8_HANDLER( slikshot_z80_control_w );
 
-/*----------- defined in video/itech8.c -----------*/
-TIMER_DEVICE_CALLBACK( grmatch_palette_update );

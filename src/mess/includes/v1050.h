@@ -157,6 +157,11 @@ public:
 	required_shared_ptr<UINT8> m_video_ram; 			// video RAM
 	UINT8 *m_attr_ram;			// attribute RAM
 	UINT8 m_attr;				// attribute latch
+	TIMER_DEVICE_CALLBACK_MEMBER(v1050_keyboard_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(sasi_ack_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(sasi_rst_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(kb_8251_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(sio_8251_tick);
 };
 
 //----------- defined in video/v1050.c -----------

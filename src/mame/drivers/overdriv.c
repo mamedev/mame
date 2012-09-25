@@ -74,16 +74,16 @@ WRITE16_MEMBER(overdriv_state::eeprom_w)
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( overdriv_cpuA_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::overdriv_cpuA_scanline)
 {
 	int scanline = param;
 
 	/* TODO: irqs routines are TOO slow right now, it ends up firing spurious irqs for whatever reason (shared ram fighting?) */
 	/*       this is a temporary solution to get rid of deprecat lib and the crashes, but also makes the game timer to be too slow */
-	if(scanline == 256 && timer.machine().primary_screen->frame_number() & 1) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+	if(scanline == 256 && machine().primary_screen->frame_number() & 1) // vblank-out irq
+		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 	else if((scanline % 128) == 0) // timer irq
-		timer.machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(overdriv_state::cpuB_interrupt)
@@ -328,7 +328,7 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)	/* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(overdriv_master_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", overdriv_cpuA_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", overdriv_state, overdriv_cpuA_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", M68000,24000000/2)	/* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(overdriv_slave_map)

@@ -123,14 +123,13 @@ TIMER_CALLBACK_MEMBER(cave_state::cave_vblank_end)
 	m_agallet_vblank_irq = 0;
 }
 
-static TIMER_DEVICE_CALLBACK( cave_vblank_start )
+TIMER_DEVICE_CALLBACK_MEMBER(cave_state::cave_vblank_start)
 {
-	cave_state *state = timer.machine().driver_data<cave_state>();
-	state->m_vblank_irq = 1;
-	update_irq_state(timer.machine());
-	cave_get_sprite_info(timer.machine());
-	state->m_agallet_vblank_irq = 1;
-	timer.machine().scheduler().timer_set(attotime::from_usec(2000), timer_expired_delegate(FUNC(cave_state::cave_vblank_end),state));
+	m_vblank_irq = 1;
+	update_irq_state(machine());
+	cave_get_sprite_info(machine());
+	m_agallet_vblank_irq = 1;
+	machine().scheduler().timer_set(attotime::from_usec(2000), timer_expired_delegate(FUNC(cave_state::cave_vblank_end),this));
 }
 
 /* Called once/frame to generate the VBLANK interrupt */
@@ -1858,7 +1857,7 @@ static MACHINE_CONFIG_START( dfeveron, cave_state )
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1900,7 +1899,7 @@ static MACHINE_CONFIG_START( ddonpach, cave_state )
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1946,7 +1945,7 @@ static MACHINE_CONFIG_START( donpachi, cave_state )
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1992,7 +1991,7 @@ static MACHINE_CONFIG_START( esprade, cave_state )
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2032,7 +2031,7 @@ static MACHINE_CONFIG_START( gaia, cave_state )
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 
-	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2073,7 +2072,7 @@ static MACHINE_CONFIG_START( guwange, cave_state )
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2117,7 +2116,7 @@ static MACHINE_CONFIG_START( hotdogst, cave_state )
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2169,7 +2168,7 @@ static MACHINE_CONFIG_START( korokoro, cave_state )
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_8BIT_ADD("eeprom")
 
-	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2223,7 +2222,7 @@ static MACHINE_CONFIG_START( mazinger, cave_state )
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2281,7 +2280,7 @@ static MACHINE_CONFIG_START( metmqstr, cave_state )
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)	/* start with the watchdog armed */
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2336,7 +2335,7 @@ static MACHINE_CONFIG_START( pacslot, cave_state )
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_pacslot)
 
-	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2392,7 +2391,7 @@ static MACHINE_CONFIG_START( pwrinst2, cave_state )
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2455,7 +2454,7 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2509,7 +2508,7 @@ static MACHINE_CONFIG_START( tjumpman, cave_state )
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2550,7 +2549,7 @@ static MACHINE_CONFIG_START( uopoko, cave_state )
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

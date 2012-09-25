@@ -259,6 +259,9 @@ public:
 	INTERRUPT_GEN_MEMBER(namcos22s_interrupt);
 	INTERRUPT_GEN_MEMBER(namcos22_interrupt);
 	TIMER_CALLBACK_MEMBER(alpine_steplock_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(dsp_master_serial_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(dsp_slave_serial_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq);
 };
 
 /*----------- defined in video/namcos22.c -----------*/

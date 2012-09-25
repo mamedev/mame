@@ -1806,7 +1806,7 @@ static MACHINE_CONFIG_DERIVED( grmatch, itech8_core_hi )
 	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_grmatch)
 
 	/* palette updater */
-	MCFG_TIMER_ADD_SCANLINE("palette", grmatch_palette_update, "screen", 0, 0)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("palette", itech8_state, grmatch_palette_update, "screen", 0, 0)
 MACHINE_CONFIG_END
 
 

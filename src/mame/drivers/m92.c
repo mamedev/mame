@@ -225,23 +225,22 @@ MACHINE_RESET_MEMBER(m92_state,m92)
 
 /*****************************************************************************/
 
-static TIMER_DEVICE_CALLBACK( m92_scanline_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(m92_state::m92_scanline_interrupt)
 {
-	running_machine &machine = timer.machine();
-	m92_state *state = machine.driver_data<m92_state>();
+	m92_state *state = machine().driver_data<m92_state>();
 	int scanline = param;
 
 	/* raster interrupt */
-	if (scanline == state->m_raster_irq_position)
+	if (scanline == m_raster_irq_position)
 	{
-		machine.primary_screen->update_partial(scanline);
+		machine().primary_screen->update_partial(scanline);
 		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M92_IRQ_2);
 	}
 
 	/* VBLANK interrupt */
-	else if (scanline == machine.primary_screen->visible_area().max_y + 1)
+	else if (scanline == machine().primary_screen->visible_area().max_y + 1)
 	{
-		machine.primary_screen->update_partial(scanline);
+		machine().primary_screen->update_partial(scanline);
 		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M92_IRQ_0);
 	}
 }
@@ -944,7 +943,7 @@ static MACHINE_CONFIG_START( m92, m92_state )
 	MCFG_MACHINE_START_OVERRIDE(m92_state,m92)
 	MCFG_MACHINE_RESET_OVERRIDE(m92_state,m92)
 
-	MCFG_TIMER_ADD_SCANLINE("scantimer", m92_scanline_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", m92_state, m92_scanline_interrupt, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1030,7 +1029,7 @@ static MACHINE_CONFIG_START( ppan, m92_state )
 	MCFG_MACHINE_START_OVERRIDE(m92_state,m92)
 	MCFG_MACHINE_RESET_OVERRIDE(m92_state,m92)
 
-	MCFG_TIMER_ADD_SCANLINE("scantimer", m92_scanline_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", m92_state, m92_scanline_interrupt, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram") // not really...

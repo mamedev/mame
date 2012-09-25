@@ -144,17 +144,16 @@
  *
  *************************************/
 
-static TIMER_DEVICE_CALLBACK( scanline_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(beathead_state::scanline_callback)
 {
-	beathead_state *state = timer.machine().driver_data<beathead_state>();
 	int scanline = param;
 
 	/* update the video */
-	timer.machine().primary_screen->update_now();
+	machine().primary_screen->update_now();
 
 	/* on scanline zero, clear any halt condition */
 	if (scanline == 0)
-		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
 	/* wrap around at 262 */
 	scanline++;
@@ -162,11 +161,11 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 		scanline = 0;
 
 	/* set the scanline IRQ */
-	state->m_irq_state[2] = 1;
-	state->update_interrupts();
+	m_irq_state[2] = 1;
+	update_interrupts();
 
 	/* set the timer for the next one */
-	timer.adjust(timer.machine().primary_screen->time_until_pos(scanline) - state->m_hblank_offset, scanline);
+	timer.adjust(machine().primary_screen->time_until_pos(scanline) - m_hblank_offset, scanline);
 }
 
 
@@ -436,7 +435,7 @@ static MACHINE_CONFIG_START( beathead, beathead_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_TIMER_ADD("scan_timer", scanline_callback)
+	MCFG_TIMER_DRIVER_ADD("scan_timer", beathead_state, scanline_callback)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

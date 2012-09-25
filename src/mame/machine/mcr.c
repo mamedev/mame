@@ -182,10 +182,9 @@ MACHINE_RESET_MEMBER(mcr_state,mcr)
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK( mcr_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::mcr_interrupt)
 {
-	//mcr_state *state = timer.machine().driver_data<mcr_state>();
-	z80ctc_device *ctc = timer.machine().device<z80ctc_device>("ctc");
+	z80ctc_device *ctc = machine().device<z80ctc_device>("ctc");
 	int scanline = param;
 
 	/* CTC line 2 is connected to VBLANK, which is once every 1/2 frame */
@@ -205,10 +204,9 @@ TIMER_DEVICE_CALLBACK( mcr_interrupt )
 	}
 }
 
-TIMER_DEVICE_CALLBACK( mcr_ipu_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::mcr_ipu_interrupt)
 {
-	//mcr_state *state = timer.machine().driver_data<mcr_state>();
-	z80ctc_device *ctc = timer.machine().device<z80ctc_device>("ctc");
+	z80ctc_device *ctc = machine().device<z80ctc_device>("ctc");
 	int scanline = param;
 
 	/* CTC line 3 is connected to 493, which is signalled once every */

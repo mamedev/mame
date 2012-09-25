@@ -90,12 +90,11 @@ READ8_MEMBER(decocass_state::decocass_sound_command_r)
 	return data;
 }
 
-TIMER_DEVICE_CALLBACK( decocass_audio_nmi_gen )
+TIMER_DEVICE_CALLBACK_MEMBER(decocass_state::decocass_audio_nmi_gen)
 {
-	decocass_state *state = timer.machine().driver_data<decocass_state>();
 	int scanline = param;
-	state->m_audio_nmi_state = scanline & 8;
-	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, (state->m_audio_nmi_enabled && state->m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+	m_audio_nmi_state = scanline & 8;
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(decocass_state::decocass_sound_nmi_enable_w)

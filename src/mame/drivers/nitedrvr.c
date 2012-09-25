@@ -143,7 +143,7 @@ static MACHINE_CONFIG_START( nitedrvr, nitedrvr_state )
 	MCFG_WATCHDOG_VBLANK_INIT(3)
 
 
-	MCFG_TIMER_ADD_PERIODIC("crash_timer", nitedrvr_crash_toggle_callback, PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("crash_timer", nitedrvr_state, nitedrvr_crash_toggle_callback, PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

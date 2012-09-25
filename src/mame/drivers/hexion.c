@@ -199,15 +199,14 @@ static GFXDECODE_START( hexion )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
-static TIMER_DEVICE_CALLBACK( hexion_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(hexion_state::hexion_scanline)
 {
-	//hexion_state *state = timer.machine().driver_data<hexion_state>();
 	int scanline = param;
 
 	if(scanline == 256)
-		timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 	else if ((scanline == 85) || (scanline == 170)) //TODO
-		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static const k053252_interface hexion_k053252_intf =
@@ -225,7 +224,7 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,24000000/4)	/* Z80B 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(hexion_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", hexion_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hexion_state, hexion_scanline, "screen", 0, 1)
 
 	MCFG_K053252_ADD("k053252", 24000000/2, hexion_k053252_intf)
 

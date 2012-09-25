@@ -108,19 +108,17 @@ INPUT_PORTS_END
 
 /* Z80-PIO Interface */
 
-static TIMER_DEVICE_CALLBACK( vcs80_keyboard_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(vcs80_state::vcs80_keyboard_tick)
 {
-	vcs80_state *state = timer.machine().driver_data<vcs80_state>();
-
-	if (state->m_keyclk)
+	if (m_keyclk)
 	{
-		state->m_keylatch++;
-		state->m_keylatch &= 7;
+		m_keylatch++;
+		m_keylatch &= 7;
 	}
 
-	state->m_pio->port_a_write(state->m_keyclk << 7);
+	m_pio->port_a_write(m_keyclk << 7);
 
-	state->m_keyclk = !state->m_keyclk;
+	m_keyclk = !m_keyclk;
 }
 
 READ8_MEMBER( vcs80_state::pio_pa_r )
@@ -223,7 +221,7 @@ static MACHINE_CONFIG_START( vcs80, vcs80_state )
 	MCFG_CPU_CONFIG(vcs80_daisy_chain)
 
 	/* keyboard timer */
-	MCFG_TIMER_ADD_PERIODIC("keyboard", vcs80_keyboard_tick, attotime::from_hz(1000))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", vcs80_state, vcs80_keyboard_tick, attotime::from_hz(1000))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_vcs80 )

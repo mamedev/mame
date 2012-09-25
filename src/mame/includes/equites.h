@@ -108,4 +108,6 @@ public:
 	UINT32 screen_update_splndrbt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(equites_nmi_callback);
 	TIMER_CALLBACK_MEMBER(equites_frq_adjuster_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(equites_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(splndrbt_scanline);
 };

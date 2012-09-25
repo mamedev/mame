@@ -77,6 +77,7 @@ public:
 	UINT8 m_s100;
 	UINT8 m_bank0;
 	UINT8 m_bank1;
+	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 };
 
 #endif

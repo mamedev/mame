@@ -730,15 +730,13 @@ WRITE8_MEMBER( newbrain_state::cop_w )
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( cop_regint_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(newbrain_state::cop_regint_tick)
 {
-	newbrain_state *state = timer.machine().driver_data<newbrain_state>();
-
-	if (state->m_copregint)
+	if (m_copregint)
 	{
 		logerror("COP REGINT\n");
-		state->m_copint = 0;
-		state->check_interrupt();
+		m_copint = 0;
+		check_interrupt();
 	}
 }
 
@@ -1226,12 +1224,10 @@ static Z80CTC_INTERFACE( newbrain_ctc_intf )
 	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, ctc_z2_w)	/* ZC/TO2 callback */
 };
 
-static TIMER_DEVICE_CALLBACK( ctc_c2_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(newbrain_eim_state::ctc_c2_tick)
 {
-	newbrain_eim_state *state = timer.machine().driver_data<newbrain_eim_state>();
-
-	state->m_ctc->trg2(1);
-	state->m_ctc->trg2(0);
+	m_ctc->trg2(1);
+	m_ctc->trg2(0);
 }
 
 inline int newbrain_state::get_reset_t()
@@ -1388,7 +1384,7 @@ static MACHINE_CONFIG_START( newbrain_a, newbrain_state )
 
 	MCFG_GFXDECODE(newbrain)
 
-	MCFG_TIMER_ADD_PERIODIC("cop_regint", cop_regint_tick, attotime::from_usec(12500)) // HACK
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("cop_regint", newbrain_state, cop_regint_tick, attotime::from_usec(12500))
 
 	// video hardware
 	MCFG_FRAGMENT_ADD(newbrain_video)
@@ -1430,7 +1426,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( newbrain_eim, newbrain_a, newbrain_eim_stat
 
 	// devices
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/8, newbrain_ctc_intf)
-	MCFG_TIMER_ADD_PERIODIC("z80ctc_c2", ctc_c2_tick, attotime::from_hz(XTAL_16MHz/4/13))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_c2", newbrain_eim_state, ctc_c2_tick, attotime::from_hz(XTAL_16MHz/4/13))
 	MCFG_ADC0808_ADD(ADC0809_TAG, 500000, adc_intf)
 	MCFG_ACIA6850_ADD(MC6850_TAG, acia_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)

@@ -264,19 +264,18 @@ READ16_MEMBER(qdrmfgp_state::gp2_ide_std_r)
  *
  *************************************/
 
-static TIMER_DEVICE_CALLBACK(qdrmfgp_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(qdrmfgp_state::qdrmfgp_interrupt)
 {
-	qdrmfgp_state *state = timer.machine().driver_data<qdrmfgp_state>();
 	int scanline = param;
 
 	if(scanline == 0)
-		if (state->m_control & 0x0001)
-			state->m_maincpu->set_input_line(1, HOLD_LINE);
+		if (m_control & 0x0001)
+			m_maincpu->set_input_line(1, HOLD_LINE);
 
 	/* trigger V-blank interrupt */
 	if(scanline == 240)
-		if (state->m_control & 0x0004)
-			state->m_maincpu->set_input_line(3, HOLD_LINE);
+		if (m_control & 0x0004)
+			m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 static void ide_interrupt(device_t *device, int state)
@@ -675,7 +674,7 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)	/*  16.000 MHz */
 	MCFG_CPU_PROGRAM_MAP(qdrmfgp_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", qdrmfgp_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", qdrmfgp_state, qdrmfgp_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 	MCFG_NVRAM_ADD_1FILL("nvram")

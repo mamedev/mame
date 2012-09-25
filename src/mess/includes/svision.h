@@ -59,6 +59,7 @@ public:
 	INTERRUPT_GEN_MEMBER(svision_frame_int);
 	TIMER_CALLBACK_MEMBER(svision_pet_timer);
 	TIMER_CALLBACK_MEMBER(svision_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(svision_pet_timer_dev);
 };
 
 

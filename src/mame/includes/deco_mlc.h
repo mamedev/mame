@@ -38,4 +38,5 @@ public:
 	DECLARE_VIDEO_START(mlc);
 	UINT32 screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_mlc(screen_device &screen, bool state);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
 };

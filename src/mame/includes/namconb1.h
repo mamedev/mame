@@ -81,4 +81,5 @@ public:
 	INTERRUPT_GEN_MEMBER(namconb2_interrupt);
 	TIMER_CALLBACK_MEMBER(namconb1_TriggerPOSIRQ);
 	TIMER_CALLBACK_MEMBER(namconb2_TriggerPOSIRQ);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_interrupt);
 };

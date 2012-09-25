@@ -46,6 +46,7 @@ public:
 	UINT32 screen_update_orbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(orbit_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_off);
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_32v);
 };
 /*----------- defined in audio/orbit.c -----------*/
 DECLARE_WRITE8_DEVICE_HANDLER( orbit_note_w );

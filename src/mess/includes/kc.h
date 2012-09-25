@@ -148,6 +148,7 @@ public:
 	DECLARE_PALETTE_INIT(kc85);
 	TIMER_CALLBACK_MEMBER(kc_cassette_oneshot_timer);
 	TIMER_CALLBACK_MEMBER(kc_cassette_timer_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(kc_scanline);
 };
 
 
@@ -185,6 +186,5 @@ public:
 /*----------- defined in machine/kc.c -----------*/
 
 QUICKLOAD_LOAD( kc );
-TIMER_DEVICE_CALLBACK( kc_scanline );
 
 #endif /* KC_H_ */

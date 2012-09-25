@@ -198,16 +198,11 @@ public:
 	TIMER_CALLBACK_MEMBER(m6850_data_ready_callback);
 	TIMER_CALLBACK_MEMBER(m6850_w_callback);
 	TIMER_CALLBACK_MEMBER(adc_finished);
+	TIMER_DEVICE_CALLBACK_MEMBER(balsente_interrupt_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(balsente_counter_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(balsente_clock_counter_0_ff);
 };
 
 
 /*----------- defined in machine/balsente.c -----------*/
-
-TIMER_DEVICE_CALLBACK( balsente_interrupt_timer );
-
 void balsente_noise_gen(device_t *device, int count, short *buffer);
-
-TIMER_DEVICE_CALLBACK( balsente_counter_callback );
-
-TIMER_DEVICE_CALLBACK( balsente_clock_counter_0_ff );
-

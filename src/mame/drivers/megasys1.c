@@ -155,18 +155,18 @@ MACHINE_RESET_MEMBER(megasys1_state,megasys1_hachoo)
                         [ Main CPU - System A / Z ]
 ***************************************************************************/
 
-static TIMER_DEVICE_CALLBACK( megasys1A_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 
 	if(scanline == 0)
-		timer.machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
 
 	if(scanline == 128)
-		timer.machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16, megasys1_state )
@@ -191,18 +191,18 @@ ADDRESS_MAP_END
                             [ Main CPU - System B ]
 ***************************************************************************/
 
-static TIMER_DEVICE_CALLBACK( megasys1B_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1B_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 
 	if(scanline == 0)
-		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 
 	if(scanline == 128)
-		timer.machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
 }
 
 
@@ -1466,7 +1466,7 @@ static MACHINE_CONFIG_START( system_A, megasys1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
 	MCFG_CPU_PROGRAM_MAP(megasys1A_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", megasys1A_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
 	MCFG_CPU_PROGRAM_MAP(megasys1A_sound_map)
@@ -1519,7 +1519,7 @@ static MACHINE_CONFIG_DERIVED( system_B, system_A )
 	MCFG_CPU_CLOCK(SYS_B_CPU_CLOCK) /* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(megasys1B_map)
 	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_CALLBACK(megasys1B_scanline)
+	MCFG_TIMER_DRIVER_CALLBACK(megasys1_state, megasys1B_scanline)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(megasys1B_sound_map)
@@ -1531,7 +1531,7 @@ static MACHINE_CONFIG_START( system_Bbl, megasys1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_B_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(megasys1B_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", megasys1B_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1B_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
 
@@ -1580,7 +1580,7 @@ static MACHINE_CONFIG_DERIVED( system_C, system_A )
 	MCFG_CPU_CLOCK(SYS_C_CPU_CLOCK) /* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(megasys1C_map)
 	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_CALLBACK(megasys1B_scanline)
+	MCFG_TIMER_DRIVER_CALLBACK(megasys1_state, megasys1B_scanline)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(megasys1B_sound_map)
@@ -1664,7 +1664,7 @@ static MACHINE_CONFIG_START( system_Z, megasys1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
 	MCFG_CPU_PROGRAM_MAP(megasys1A_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", megasys1A_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)

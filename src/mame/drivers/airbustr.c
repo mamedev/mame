@@ -548,16 +548,16 @@ static const ym2203_interface ym2203_config =
 /* Interrupt Generators */
 
 /* Main Z80 uses IM2 */
-static TIMER_DEVICE_CALLBACK( airbustr_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(airbustr_state::airbustr_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		timer.machine().device("master")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		machine().device("master")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
 
 	/* Pandora "sprite end dma" irq? TODO: timing is likely off */
 	if(scanline == 64)
-		timer.machine().device("master")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd);
+		machine().device("master")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd);
 }
 
 /* Sub Z80 uses IM2 too, but 0xff irq routine just contains an irq ack in it */
@@ -625,7 +625,7 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 	MCFG_CPU_ADD("master", Z80, 6000000)	// ???
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_CPU_IO_MAP(master_io_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", airbustr_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", airbustr_state, airbustr_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", Z80, 6000000)	// ???
 	MCFG_CPU_PROGRAM_MAP(slave_map)

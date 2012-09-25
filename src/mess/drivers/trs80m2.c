@@ -109,11 +109,9 @@ void trs80m2_state::scan_keyboard()
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( trs80m2_keyboard_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(trs80m2_state::trs80m2_keyboard_tick)
 {
-	trs80m2_state *state = timer.machine().driver_data<trs80m2_state>();
-
-	state->scan_keyboard();
+	scan_keyboard();
 }
 
 
@@ -833,18 +831,16 @@ static Z80DART_INTERFACE( sio_intf )
 //  Z80CTC_INTERFACE( ctc_intf )
 //-------------------------------------------------
 
-static TIMER_DEVICE_CALLBACK( ctc_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(trs80m2_state::ctc_tick)
 {
-	trs80m2_state *state = timer.machine().driver_data<trs80m2_state>();
+	m_ctc->trg0(1);
+	m_ctc->trg0(0);
 
-	state->m_ctc->trg0(1);
-	state->m_ctc->trg0(0);
+	m_ctc->trg1(1);
+	m_ctc->trg1(0);
 
-	state->m_ctc->trg1(1);
-	state->m_ctc->trg1(0);
-
-	state->m_ctc->trg2(1);
-	state->m_ctc->trg2(0);
+	m_ctc->trg2(1);
+	m_ctc->trg2(0);
 }
 
 static Z80CTC_INTERFACE( ctc_intf )
@@ -1016,7 +1012,7 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	// devices
 	MCFG_FD1791_ADD(FD1791_TAG, fdc_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
@@ -1024,7 +1020,7 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, trs80m2_floppy_interface)
 	MCFG_TRS80M2_KEYBOARD_ADD(kb_intf)
 
-	MCFG_TIMER_ADD_PERIODIC("keyboard", trs80m2_keyboard_tick,attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", trs80m2_state, trs80m2_keyboard_tick, attotime::from_hz(60))
 
 	// internal RAM
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1067,7 +1063,7 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	// devices
 	MCFG_FD1791_ADD(FD1791_TAG, fdc_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
@@ -1076,7 +1072,7 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_PIC8259_ADD(AM9519A_TAG, pic_intf)
 	MCFG_TRS80M2_KEYBOARD_ADD(kb_intf)
 
-	MCFG_TIMER_ADD_PERIODIC("keyboard", trs80m2_keyboard_tick,attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", trs80m2_state, trs80m2_keyboard_tick, attotime::from_hz(60))
 
 	// internal RAM
 	MCFG_RAM_ADD(RAM_TAG)

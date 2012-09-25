@@ -1261,9 +1261,9 @@ WRITE8_MEMBER(galaxian_state::checkman_sound_command_w)
 }
 
 
-static TIMER_DEVICE_CALLBACK( checkmaj_irq0_gen )
+TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::checkmaj_irq0_gen)
 {
-	timer.machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -2096,7 +2096,7 @@ static MACHINE_CONFIG_START( galaxian_base, galaxian_state )
 
 
 	/* blinking frequency is determined by 555 counter with Ra=100k, Rb=10k, C=10uF */
-	MCFG_TIMER_ADD_PERIODIC("stars", galaxian_stars_blink_timer, PERIOD_OF_555_ASTABLE(100000, 10000, 0.00001))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("stars", galaxian_state, galaxian_stars_blink_timer, PERIOD_OF_555_ASTABLE(100000, 10000, 0.00001))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2276,7 +2276,7 @@ static MACHINE_CONFIG_DERIVED( checkmaj, galaxian_base )
 	MCFG_CPU_ADD("audiocpu", Z80, 1620000)
 	MCFG_CPU_PROGRAM_MAP(checkmaj_sound_map)
 
-	MCFG_TIMER_ADD_SCANLINE("irq0", checkmaj_irq0_gen, "screen", 0, 8)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq0", galaxian_state, checkmaj_irq0_gen, "screen", 0, 8)
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("aysnd", AY8910, 1620000)

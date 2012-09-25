@@ -89,6 +89,7 @@ public:
 	required_shared_ptr<UINT16> m_roll_overlay;
 	int m_blink;
 	UINT32 screen_update_cgc7900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
 };
 
 /*----------- defined in video/cgc7900.c -----------*/

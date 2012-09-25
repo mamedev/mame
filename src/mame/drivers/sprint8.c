@@ -23,31 +23,30 @@ void sprint8_set_collision(running_machine &machine, int n)
 }
 
 
-static TIMER_DEVICE_CALLBACK( input_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(sprint8_state::input_callback)
 {
-	sprint8_state *state = timer.machine().driver_data<sprint8_state>();
 	static const char *const dialnames[] = { "DIAL1", "DIAL2", "DIAL3", "DIAL4", "DIAL5", "DIAL6", "DIAL7", "DIAL8" };
 
 	int i;
 
 	for (i = 0; i < 8; i++)
 	{
-		UINT8 val = timer.machine().root_device().ioport(dialnames[i])->read() >> 4;
+		UINT8 val = machine().root_device().ioport(dialnames[i])->read() >> 4;
 
-		signed char delta = (val - state->m_dial[i]) & 15;
+		signed char delta = (val - m_dial[i]) & 15;
 
 		if (delta & 8)
 			delta |= 0xf0; /* extend sign to 8 bits */
 
-		state->m_steer_flag[i] = (delta != 0);
+		m_steer_flag[i] = (delta != 0);
 
 		if (delta > 0)
-			state->m_steer_dir[i] = 0;
+			m_steer_dir[i] = 0;
 
 		if (delta < 0)
-			state->m_steer_dir[i] = 1;
+			m_steer_dir[i] = 1;
 
-		state->m_dial[i] = val;
+		m_dial[i] = val;
 	}
 }
 
@@ -456,7 +455,7 @@ static MACHINE_CONFIG_START( sprint8, sprint8_state )
 	MCFG_CPU_PROGRAM_MAP(sprint8_map)
 
 
-	MCFG_TIMER_ADD_PERIODIC("input_timer", input_callback, attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("input_timer", sprint8_state, input_callback, attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

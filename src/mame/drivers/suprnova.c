@@ -416,9 +416,9 @@ READ32_MEMBER(skns_state::skns_hit_r)
 /* start old driver code */
 
 
-static TIMER_DEVICE_CALLBACK( interrupt_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(skns_state::interrupt_callback)
 {
-	timer.machine().device("maincpu")->execute().set_input_line(param, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(param, HOLD_LINE);
 }
 
 void skns_state::machine_reset()
@@ -434,15 +434,14 @@ void skns_state::machine_reset()
 }
 
 
-static TIMER_DEVICE_CALLBACK(skns_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(skns_state::skns_irq)
 {
-	skns_state *state = timer.machine().driver_data<skns_state>();
 	int scanline = param;
 
 	if(scanline == 240)
-		state->m_maincpu->set_input_line(5,HOLD_LINE); //vblank
+		m_maincpu->set_input_line(5,HOLD_LINE); //vblank
 	else if(scanline == 0)
-		state->m_maincpu->set_input_line(1,HOLD_LINE); // spc
+		m_maincpu->set_input_line(1,HOLD_LINE); // spc
 }
 
 /**********************************************************************************
@@ -757,17 +756,17 @@ static MSM6242_INTERFACE( rtc_intf )
 static MACHINE_CONFIG_START( skns, skns_state )
 	MCFG_CPU_ADD("maincpu", SH2,28638000)
 	MCFG_CPU_PROGRAM_MAP(skns_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", skns_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", skns_state, skns_irq, "screen", 0, 1)
 
 	MCFG_MSM6242_ADD("rtc", rtc_intf)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_TIMER_ADD_PERIODIC("int15_timer", interrupt_callback, attotime::from_msec(2))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("int15_timer", skns_state, interrupt_callback, attotime::from_msec(2))
 	MCFG_TIMER_PARAM(15)
-	MCFG_TIMER_ADD_PERIODIC("int11_timer", interrupt_callback, attotime::from_msec(8))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("int11_timer", skns_state, interrupt_callback, attotime::from_msec(8))
 	MCFG_TIMER_PARAM(11)
-	MCFG_TIMER_ADD_PERIODIC("int9_timer", interrupt_callback, attotime::from_hz(28638000/1824))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("int9_timer", skns_state, interrupt_callback, attotime::from_hz(28638000/1824))
 	MCFG_TIMER_PARAM(9)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)

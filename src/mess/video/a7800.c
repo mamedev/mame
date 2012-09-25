@@ -316,45 +316,44 @@ static void maria_draw_scanline(running_machine &machine)
 }
 
 
-TIMER_DEVICE_CALLBACK( a7800_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(a7800_state::a7800_interrupt)
 {
-	a7800_state *state = timer.machine().driver_data<a7800_state>();
 	int frame_scanline;
-	UINT8 *ROM = timer.machine().root_device().memregion("maincpu")->base();
-	address_space& space = timer.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->m_maria_scanline++;
+	m_maria_scanline++;
 
 	/* why + 1? */
-	frame_scanline = state->m_maria_scanline % ( state->m_lines + 1 );
+	frame_scanline = m_maria_scanline % ( m_lines + 1 );
 
 	if( frame_scanline == 1 )
 	{
 		/*logerror( "frame beg\n" );*/
 	}
 
-	if( state->m_maria_wsync )
+	if( m_maria_wsync )
 	{
-		timer.machine().scheduler().trigger( TRIGGER_HSYNC );
-		state->m_maria_wsync = 0;
+		machine().scheduler().trigger( TRIGGER_HSYNC );
+		m_maria_wsync = 0;
 	}
 
 	if( frame_scanline == 16 )
 	{
 		/* end of vblank */
 
-		state->m_maria_vblank=0;
-		if( state->m_maria_dmaon || state->m_maria_dodma )
+		m_maria_vblank=0;
+		if( m_maria_dmaon || m_maria_dodma )
 		{
-			state->m_maria_dodma = 1;	/* if dma allowed, start it */
+			m_maria_dodma = 1;	/* if dma allowed, start it */
 
-			state->m_maria_dll = (ROM[DPPH] << 8) | ROM[DPPL];
-			state->m_maria_dl = (READ_MEM(state->m_maria_dll+1) << 8) | READ_MEM(state->m_maria_dll+2);
-			state->m_maria_offset = READ_MEM(state->m_maria_dll) & 0x0f;
-			state->m_maria_holey = (READ_MEM(state->m_maria_dll) & 0x60) >> 5;
-			state->m_maria_dli = READ_MEM(state->m_maria_dll) & 0x80;
-			/*  logerror("DLL=%x\n",state->m_maria_dll); */
-			/*  logerror("DLL: DL = %x  dllctrl = %x\n",state->m_maria_dl,ROM[state->m_maria_dll]); */
+			m_maria_dll = (ROM[DPPH] << 8) | ROM[DPPL];
+			m_maria_dl = (READ_MEM(m_maria_dll+1) << 8) | READ_MEM(m_maria_dll+2);
+			m_maria_offset = READ_MEM(m_maria_dll) & 0x0f;
+			m_maria_holey = (READ_MEM(m_maria_dll) & 0x60) >> 5;
+			m_maria_dli = READ_MEM(m_maria_dll) & 0x80;
+			/*  logerror("DLL=%x\n",m_maria_dll); */
+			/*  logerror("DLL: DL = %x  dllctrl = %x\n",m_maria_dl,ROM[m_maria_dll]); */
 		}
 
 		/*logerror( "vblank end on line %d\n", frame_scanline );*/
@@ -364,11 +363,11 @@ TIMER_DEVICE_CALLBACK( a7800_interrupt )
         this fix made PR Baseball happy
         Kung-Fu Master looks worse
         don't know about others yet */
-	if( frame_scanline == ( state->m_lines - 4 ) )
+	if( frame_scanline == ( m_lines - 4 ) )
 	{
 		/* vblank starts 4 scanlines before end of screen */
 
-		state->m_maria_vblank = 0x80;
+		m_maria_vblank = 0x80;
 
 		/* fixed 2002/05/14 kubecj
                 when going vblank, dma must be stopped
@@ -385,39 +384,39 @@ TIMER_DEVICE_CALLBACK( a7800_interrupt )
                 Jinks
         */
 
-		state->m_maria_dodma = 0;
+		m_maria_dodma = 0;
 		/*logerror( "vblank on line %d\n\n", frame_scanline );*/
 	}
 
 
-	if( ( frame_scanline > 15 ) && state->m_maria_dodma )
+	if( ( frame_scanline > 15 ) && m_maria_dodma )
 	{
-		if (state->m_maria_scanline < ( state->m_lines - 4 ) )
-			maria_draw_scanline(timer.machine());
+		if (m_maria_scanline < ( m_lines - 4 ) )
+			maria_draw_scanline(machine());
 
-		if( state->m_maria_offset == 0 )
+		if( m_maria_offset == 0 )
 		{
-			state->m_maria_dll+=3;
-			state->m_maria_dl = (READ_MEM(state->m_maria_dll+1) << 8) | READ_MEM(state->m_maria_dll+2);
-			state->m_maria_offset = READ_MEM(state->m_maria_dll) & 0x0f;
-			state->m_maria_holey = (READ_MEM(state->m_maria_dll) & 0x60) >> 5;
-			state->m_maria_dli = READ_MEM(state->m_maria_dll) & 0x80;
+			m_maria_dll+=3;
+			m_maria_dl = (READ_MEM(m_maria_dll+1) << 8) | READ_MEM(m_maria_dll+2);
+			m_maria_offset = READ_MEM(m_maria_dll) & 0x0f;
+			m_maria_holey = (READ_MEM(m_maria_dll) & 0x60) >> 5;
+			m_maria_dli = READ_MEM(m_maria_dll) & 0x80;
 		}
 		else
 		{
-			state->m_maria_offset--;
+			m_maria_offset--;
 		}
 	}
 
-	if( state->m_maria_dli )
+	if( m_maria_dli )
 	{
 		/*logerror( "dli on line %d [%02X] [%02X] [%02X]\n", frame_scanline, ROM[0x7E], ROM[0x7C], ROM[0x7D] );*/
 	}
 
-	if( state->m_maria_dli )
+	if( m_maria_dli )
 	{
-		state->m_maria_dli = 0;
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maria_dli = 0;
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 }

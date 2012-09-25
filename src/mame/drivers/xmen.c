@@ -349,16 +349,15 @@ static const k053247_interface xmen_k053246_intf =
 	xmen_sprite_callback
 };
 
-static TIMER_DEVICE_CALLBACK( xmen_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(xmen_state::xmen_scanline)
 {
-	xmen_state *state = timer.machine().driver_data<xmen_state>();
 	int scanline = param;
 
-	if(scanline == 240 && state->m_vblank_irq_mask) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+	if(scanline == 240 && m_vblank_irq_mask) // vblank-out irq
+		machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 
 	if(scanline == 0) // sprite DMA irq?
-		timer.machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 
 }
 
@@ -369,7 +368,7 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", xmen_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xmen_state, xmen_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -419,7 +418,7 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(6p_main_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", xmen_scanline, "lscreen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xmen_state, xmen_scanline, "lscreen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80,8000000)	/* verified with M1, guessed but accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

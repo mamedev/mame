@@ -22,12 +22,10 @@
 #include "includes/psion.h"
 #include "rendlay.h"
 
-static TIMER_DEVICE_CALLBACK( nmi_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(psion_state::nmi_timer)
 {
-	psion_state *state = timer.machine().driver_data<psion_state>();
-
-	if (state->m_enable_nmi)
-		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_enable_nmi)
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 UINT8 psion_state::kb_read(running_machine &machine)
@@ -492,7 +490,7 @@ static MACHINE_CONFIG_START( psion_2lines, psion_state )
 
 	MCFG_NVRAM_HANDLER(psion)
 
-	MCFG_TIMER_ADD_PERIODIC("nmi_timer", nmi_timer, attotime::from_seconds(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", psion_state, nmi_timer, attotime::from_seconds(1))
 
 	/* Datapack */
 	MCFG_PSION_DATAPACK_ADD("pack1")

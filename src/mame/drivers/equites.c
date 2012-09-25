@@ -575,26 +575,26 @@ static WRITE_LINE_DEVICE_HANDLER( equites_msm5232_gate )
 // Interrupt Handlers
 
 // Equites Hardware
-static TIMER_DEVICE_CALLBACK( equites_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(equites_state::equites_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 232) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
 
 	if(scanline == 24) // vblank-in irq
-		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK( splndrbt_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(equites_state::splndrbt_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 224) // vblank-out irq
-		timer.machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
 
 	if(scanline == 32) // vblank-in irq
-		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 }
 
 WRITE8_MEMBER(equites_state::equites_8155_w)
@@ -1249,7 +1249,7 @@ static MACHINE_CONFIG_START( equites, equites_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz/4) /* 68000P8 running at 3mhz! verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(equites_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", equites_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, equites_scanline, "screen", 0, 1)
 
 	MCFG_FRAGMENT_ADD(common_sound)
 
@@ -1286,7 +1286,7 @@ static MACHINE_CONFIG_START( splndrbt, equites_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4) /* 68000P8 running at 6mhz, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(splndrbt_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", splndrbt_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, splndrbt_scanline, "screen", 0, 1)
 
 	MCFG_FRAGMENT_ADD(common_sound)
 

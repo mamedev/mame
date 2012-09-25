@@ -653,15 +653,14 @@ INTERRUPT_GEN_MEMBER(konamigx_state::konamigx_vbinterrupt)
 	dmastart_callback(0);
 }
 
-static TIMER_DEVICE_CALLBACK(konamigx_hbinterrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_hbinterrupt)
 {
-	konamigx_state *state = timer.machine().driver_data<konamigx_state>();
 	int scanline = param;
 
 	if (scanline == 240)
 	{
 		// lift idle suspension
-		if (resume_trigger && suspension_active) { suspension_active = 0; timer.machine().scheduler().trigger(resume_trigger); }
+		if (resume_trigger && suspension_active) { suspension_active = 0; machine().scheduler().trigger(resume_trigger); }
 
 		// IRQ 1 is the main 60hz vblank interrupt
 		// the gx_syncen & 0x20 test doesn't work on type 3 or 4 ROM boards, likely because the ROM board
@@ -677,7 +676,7 @@ static TIMER_DEVICE_CALLBACK(konamigx_hbinterrupt)
 			if ((konamigx_wrport1_1 & 0x81) == 0x81 || (gx_syncen & 1))
 			{
 				gx_syncen &= ~1;
-				state->m_maincpu->set_input_line(1, HOLD_LINE);
+				m_maincpu->set_input_line(1, HOLD_LINE);
 
 			}
 		}
@@ -694,7 +693,7 @@ static TIMER_DEVICE_CALLBACK(konamigx_hbinterrupt)
 			if ((konamigx_wrport1_1 & 0x82) == 0x82 || (gx_syncen & 2))
 			{
 				gx_syncen &= ~2;
-				state->m_maincpu->set_input_line(2, HOLD_LINE);
+				m_maincpu->set_input_line(2, HOLD_LINE);
 			}
 		}
 	}
@@ -1859,7 +1858,7 @@ static MACHINE_CONFIG_DERIVED( gxtype3, konamigx )
 
 	MCFG_CPU_ADD("maincpu", M68EC020, 24000000)
 	MCFG_CPU_PROGRAM_MAP(gx_type3_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", konamigx_hbinterrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_hbinterrupt, "screen", 0, 1)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
@@ -1886,7 +1885,7 @@ static MACHINE_CONFIG_DERIVED( gxtype4, konamigx )
 
 	MCFG_CPU_ADD("maincpu", M68EC020, 24000000)
 	MCFG_CPU_PROGRAM_MAP(gx_type4_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", konamigx_hbinterrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_hbinterrupt, "screen", 0, 1)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)

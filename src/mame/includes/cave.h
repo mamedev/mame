@@ -203,6 +203,7 @@ public:
 	UINT32 screen_update_cave(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cave_interrupt);
 	TIMER_CALLBACK_MEMBER(cave_vblank_end);
+	TIMER_DEVICE_CALLBACK_MEMBER(cave_vblank_start);
 };
 
 /*----------- defined in video/cave.c -----------*/

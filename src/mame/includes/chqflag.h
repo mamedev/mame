@@ -44,6 +44,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(chqflag_scanline);
 };
 
 /*----------- defined in video/chqflag.c -----------*/

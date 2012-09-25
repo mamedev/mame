@@ -282,17 +282,17 @@ GFX:                Custom 145     ( 80 pin PQFP)
 /****************************************************************************/
 
 
-static TIMER_DEVICE_CALLBACK( mcu_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::mcu_interrupt)
 {
 	int scanline = param;
 
 	/* TODO: real sources of these */
 	if (scanline == 224)
-		timer.machine().device("mcu")->execute().set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
+		machine().device("mcu")->execute().set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
 	else if (scanline == 0)
-		timer.machine().device("mcu")->execute().set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
+		machine().device("mcu")->execute().set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 	else if (scanline == 128)
-		timer.machine().device("mcu")->execute().set_input_line(M37710_LINE_ADC, HOLD_LINE);
+		machine().device("mcu")->execute().set_input_line(M37710_LINE_ADC, HOLD_LINE);
 }
 
 
@@ -1010,7 +1010,7 @@ static MACHINE_CONFIG_START( namconb1, namconb1_state )
 	MCFG_CPU_ADD("mcu", M37702, MASTER_CLOCK_HZ/3)
 	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
 	MCFG_CPU_IO_MAP(namcoc75_io)
-	MCFG_TIMER_ADD_SCANLINE("mcu_st", mcu_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("mcu_st", namconb1_state, mcu_interrupt, "screen", 0, 1)
 
 	MCFG_NVRAM_HANDLER(namconb1)
 	MCFG_MACHINE_START_OVERRIDE(namconb1_state,namconb)
@@ -1042,7 +1042,7 @@ static MACHINE_CONFIG_START( namconb2, namconb1_state )
 	MCFG_CPU_ADD("mcu", M37702, MASTER_CLOCK_HZ/3)
 	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
 	MCFG_CPU_IO_MAP(namcoc75_io)
-	MCFG_TIMER_ADD_SCANLINE("mcu_st", mcu_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("mcu_st", namconb1_state, mcu_interrupt, "screen", 0, 1)
 
 	MCFG_NVRAM_HANDLER(namconb1)
 	MCFG_MACHINE_START_OVERRIDE(namconb1_state,namconb)

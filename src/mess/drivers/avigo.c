@@ -809,22 +809,18 @@ static GFXDECODE_START( avigo )
 GFXDECODE_END
 
 
-static TIMER_DEVICE_CALLBACK( avigo_scan_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(avigo_state::avigo_scan_timer)
 {
-	avigo_state *state = timer.machine().driver_data<avigo_state>();
+	m_irq |= (1<<1);
 
-	state->m_irq |= (1<<1);
-
-	state->refresh_ints();
+	refresh_ints();
 }
 
-static TIMER_DEVICE_CALLBACK( avigo_1hz_timer )
+TIMER_DEVICE_CALLBACK_MEMBER(avigo_state::avigo_1hz_timer)
 {
-	avigo_state *state = timer.machine().driver_data<avigo_state>();
+	m_irq |= (1<<4);
 
-	state->m_irq |= (1<<4);
-
-	state->refresh_ints();
+	refresh_ints();
 }
 
 static QUICKLOAD_LOAD(avigo)
@@ -930,10 +926,10 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", avigo_state, nvram_init)
 
 	// IRQ 1 is used for scan the pen and for cursor blinking
-	MCFG_TIMER_ADD_PERIODIC("scan_timer", avigo_scan_timer, attotime::from_hz(50))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("scan_timer", avigo_state, avigo_scan_timer, attotime::from_hz(50))
 
 	// IRQ 4 is generated every second, used for auto power off
-	MCFG_TIMER_ADD_PERIODIC("1hz_timer", avigo_1hz_timer, attotime::from_hz(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz_timer", avigo_state, avigo_1hz_timer, attotime::from_hz(1))
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", avigo, "app", 0)

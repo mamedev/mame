@@ -1287,13 +1287,11 @@ static I8085_CONFIG( kc85_i8085_config )
 	DEVCB_DEVICE_LINE(CASSETTE_TAG, kc85_sod_w)	/* SOD changed callback (I8085A only) */
 };
 
-static TIMER_DEVICE_CALLBACK( tandy200_tp_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(tandy200_state::tandy200_tp_tick)
 {
-	tandy200_state *state = timer.machine().driver_data<tandy200_state>();
+	m_maincpu->set_input_line(I8085_RST75_LINE, m_tp);
 
-	state->m_maincpu->set_input_line(I8085_RST75_LINE, state->m_tp);
-
-	state->m_tp = !state->m_tp;
+	m_tp = !m_tp;
 }
 
 static MACHINE_CONFIG_START( kc85, kc85_state )
@@ -1431,7 +1429,7 @@ static MACHINE_CONFIG_START( tandy200, tandy200_state )
 	MCFG_FRAGMENT_ADD(tandy200_video)
 
 	/* TP timer */
-	MCFG_TIMER_ADD_PERIODIC("tp", tandy200_tp_tick, attotime::from_hz(XTAL_4_9152MHz/2/8192))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("tp", tandy200_state, tandy200_tp_tick, attotime::from_hz(XTAL_4_9152MHz/2/8192))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -104,6 +104,8 @@ public:
 	DECLARE_VIDEO_START(suna8_textdim0);
 	DECLARE_MACHINE_RESET(hardhea2);
 	UINT32 screen_update_suna8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(brickzn_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(hardhea2_interrupt);
 };
 
 /*----------- defined in audio/suna8.c -----------*/

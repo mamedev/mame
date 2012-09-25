@@ -428,22 +428,20 @@ INPUT_PORTS_END
 
 /* Interrupts */
 
-static TIMER_DEVICE_CALLBACK( rst1_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst1_tick)
 {
-	n8080_state *n8080 = timer.machine().driver_data<n8080_state>();
-	int state = n8080->m_inte ? ASSERT_LINE : CLEAR_LINE;
+	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* V7 = 1, V6 = 0 */
-	n8080->m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xcf);
+	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xcf);
 }
 
-static TIMER_DEVICE_CALLBACK( rst2_tick )
+TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst2_tick)
 {
-	n8080_state *n8080 = timer.machine().driver_data<n8080_state>();
-	int state = n8080->m_inte ? ASSERT_LINE : CLEAR_LINE;
+	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* vblank */
-	n8080->m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xd7);
+	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xd7);
 }
 
 WRITE_LINE_MEMBER(n8080_state::n8080_inte_callback)
@@ -560,8 +558,8 @@ static MACHINE_CONFIG_START( spacefev, n8080_state )
 	MCFG_PALETTE_INIT_OVERRIDE(n8080_state,n8080)
 	MCFG_VIDEO_START_OVERRIDE(n8080_state,spacefev)
 
-	MCFG_TIMER_ADD_SCANLINE("rst1", rst1_tick, "screen", 128, 256)
-	MCFG_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst1", n8080_state, rst1_tick, "screen", 128, 256)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst2", n8080_state, rst2_tick, "screen", 240, 256)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD( spacefev_sound )
@@ -590,8 +588,8 @@ static MACHINE_CONFIG_START( sheriff, n8080_state )
 	MCFG_PALETTE_INIT_OVERRIDE(n8080_state,n8080)
 	MCFG_VIDEO_START_OVERRIDE(n8080_state,sheriff)
 
-	MCFG_TIMER_ADD_SCANLINE("rst1", rst1_tick, "screen", 128, 256)
-	MCFG_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst1", n8080_state, rst1_tick, "screen", 128, 256)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst2", n8080_state, rst2_tick, "screen", 240, 256)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD( sheriff_sound )
@@ -632,8 +630,8 @@ static MACHINE_CONFIG_START( helifire, n8080_state )
 	MCFG_PALETTE_INIT_OVERRIDE(n8080_state,helifire)
 	MCFG_VIDEO_START_OVERRIDE(n8080_state,helifire)
 
-	MCFG_TIMER_ADD_SCANLINE("rst1", rst1_tick, "screen", 128, 256)
-	MCFG_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst1", n8080_state, rst1_tick, "screen", 128, 256)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst2", n8080_state, rst2_tick, "screen", 240, 256)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD( helifire_sound )

@@ -377,25 +377,23 @@ READ8_MEMBER(mcr_state::kick_ip1_r)
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK( dpoker_hopper_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::dpoker_hopper_callback)
 {
-	mcr_state *state = timer.machine().driver_data<mcr_state>();
-
 	if (dpoker_output & 0x40)
 	{
 		// hopper timing is a guesstimate
 		dpoker_coin_status ^= 8;
-		state->m_dpoker_hopper_timer->adjust(attotime::from_msec((dpoker_coin_status & 8) ? 100 : 250));
+		m_dpoker_hopper_timer->adjust(attotime::from_msec((dpoker_coin_status & 8) ? 100 : 250));
 	}
 	else
 	{
 		dpoker_coin_status &= ~8;
 	}
 
-	coin_counter_w(timer.machine(), 3, dpoker_coin_status & 8);
+	coin_counter_w(machine(), 3, dpoker_coin_status & 8);
 }
 
-TIMER_DEVICE_CALLBACK( dpoker_coin_in_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::dpoker_coin_in_callback)
 {
 	dpoker_coin_status &= ~2;
 }
@@ -1827,7 +1825,7 @@ static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 	MCFG_CPU_CONFIG(mcr_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(cpu_90009_map)
 	MCFG_CPU_IO_MAP(cpu_90009_portmap)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", mcr_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr_state, mcr_interrupt, "screen", 0, 1)
 
 	MCFG_Z80CTC_ADD("ctc", MAIN_OSC_MCR_I/8 /* same as "maincpu" */, mcr_ctc_intf)
 
@@ -1863,8 +1861,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcr_90009_dp, mcr_90009 )
 
 	/* basic machine hardware */
-	MCFG_TIMER_ADD("dp_coinin", dpoker_coin_in_callback)
-	MCFG_TIMER_ADD("dp_hopper", dpoker_hopper_callback)
+	MCFG_TIMER_DRIVER_ADD("dp_coinin", mcr_state, dpoker_coin_in_callback)
+	MCFG_TIMER_DRIVER_ADD("dp_hopper", mcr_state, dpoker_hopper_callback)
 MACHINE_CONFIG_END
 
 
@@ -1939,7 +1937,7 @@ static MACHINE_CONFIG_DERIVED( mcr_91490_ipu, mcr_91490_snt )
 	MCFG_CPU_PROGRAM_MAP(ipu_91695_map)
 	MCFG_CPU_IO_MAP(ipu_91695_portmap)
 	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_CALLBACK(mcr_ipu_interrupt)
+	MCFG_TIMER_DRIVER_CALLBACK(mcr_state, mcr_ipu_interrupt)
 
 	MCFG_Z80CTC_ADD("ipu_ctc", 7372800/2 /* same as "ipu" */, nflfoot_ctc_intf)
 	MCFG_Z80PIO_ADD("ipu_pio0", 7372800/2, nflfoot_pio_intf)
