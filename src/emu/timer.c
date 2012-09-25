@@ -226,6 +226,8 @@ void timer_device::device_start()
 	// allocate the timer
 	m_timer = timer_alloc();
 
+	m_callback.bind_relative_to(*owner());
+
 	// register for save states
 	save_item(NAME(m_first_time));
 }
@@ -299,7 +301,8 @@ void timer_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			{
 				// call the real callback
 				int vpos = m_screen->vpos();
-				(m_callback)(*this, m_ptr, vpos);
+				if (!m_callback.isnull())
+					(m_callback)(*this, m_ptr, vpos);
 
 				// advance by the increment only if we will still be within the screen bounds
 		        if (m_increment != 0 && (vpos + m_increment) < m_screen->height())
