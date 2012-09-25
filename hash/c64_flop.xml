@@ -9,7 +9,7 @@
 		<year>1983</year>
 		<publisher>Cosmi</publisher>
 		<info name="protection" value="none" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="aztec_challenge[cosmi_1983](!).g64" size="333744" crc="2268d7ae" sha1="b63aa4f59b7d43e37c3633199457b511d394f19c" offset="0" />
 			</dataarea>
@@ -20,7 +20,7 @@
 		<description>Barbarian: The Ultimate Warrior</description>
 		<year>1988</year>
 		<publisher>Melbourne House</publisher>
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="barbarian[melbourne_house_1988].g64" size="333744" crc="db28e401" sha1="c8d6027dee3ddfab8adc5e352f201afb0c59d518" offset="0" />
 			</dataarea>
@@ -32,7 +32,7 @@
 		<year>1987</year>
 		<publisher>Gremlin Graphics</publisher>
 		<info name="protection" value="cyan" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="basil_the_great_mouse_detective[gremlin_1987](cyan-early).g64" size="333744" crc="bbf79c1f" sha1="984df9a8d9ed08408bc93de1265771309b5f1367" offset="0" />
 			</dataarea>
@@ -44,7 +44,7 @@
 		<year>1988</year>
 		<publisher>Capcom</publisher>
 		<info name="video" value="PAL" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="bionic_commando[capcom_1988](!).g64" size="333744" crc="b216989d" sha1="f1feb2dcb2af5af56051187ffda495c92e967302" offset="0" />
 			</dataarea>
@@ -56,7 +56,7 @@
 		<year>1984</year>
 		<publisher>First Star</publisher>
 		<info name="video" value="PAL" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="boulder_dash[first_star_1984](pal)(!).g64" size="333744" crc="659ad749" sha1="1529cfb26ce01e36869219c874e81b5f7e6cdc49" offset="0" />
 			</dataarea>
@@ -82,7 +82,7 @@
 		<year>1992</year>
 		<publisher>Chris Miller</publisher>
 		<info name="protection" value="none" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="buddy64.g64" size="333744" crc="986d5e3d" sha1="3aeedd8e4e9c7a9412144fa5f7930e3492b79d33" offset="0"/>
 			</dataarea>
@@ -94,7 +94,7 @@
 		<year>1985</year>
 		<publisher>Elite</publisher>
 		<info name="video" value="PAL" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="commando[elite_1985](pal).g64" size="333744" crc="e5679217" sha1="05be404ba9d6b1685935a44291420014f1c3959f" offset="0" />
 			</dataarea>
@@ -128,7 +128,7 @@
 		<year>1986</year>
 		<publisher>Ocean</publisher>
 		<info name="video" value="PAL" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="green_beret[ocean_1986](!).g64" size="333744" crc="d5795cde" sha1="889393ba8d3238e8cb53640c85eb7153570a0be0" offset="0" />
 			</dataarea>
@@ -140,7 +140,7 @@
 		<year>1984</year>
 		<publisher>Epyx</publisher>
 		<info name="video" value="PAL" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="impossible_mission[epyx_1984](pal)(!).g64" size="333744" crc="d6cad3cd" sha1="23796cca5d5bbe4f90751aa52085cb69ce67f29f" offset="0" />
 			</dataarea>
@@ -153,7 +153,7 @@
 		<publisher>Gremlin Graphics</publisher>
 		<info name="video" value="PAL" />
 		<info name="protection" value="cyan" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="jack_the_nipper[gremlin_1986](cyan1)(pal).g64" size="333744" crc="14c6f53d" sha1="6427cc16ed360890034f84182a9db02b2e568f0a" offset="0" />
 			</dataarea>
@@ -166,7 +166,7 @@
 		<publisher>Ocean</publisher>
 		<info name="video" value="PAL" />
 		<info name="protection" value="cyan" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="miami_vice[ocean_1986](cyan1)(pal).g64" size="333744" crc="b3556e0c" sha1="ed1d290baf83f0ad31424a4e11f4f2aef8515dbb" offset="0" />
 			</dataarea>
@@ -178,7 +178,7 @@
 		<year>1983</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="protection" value="fat" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="mule[ea_1983](!).g64" size="333744" crc="9c5adfdd" sha1="8b894a5be8ef2e0cfded4e20cf0c7e6c9c68e369" offset="0" />
 			</dataarea>
@@ -191,7 +191,7 @@
 		<publisher>Ocean</publisher>
 		<info name="video" value="PAL" />
 		<info name="protection" value="xrom" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="rambo[ocean_1985](pal).g64" size="333744" crc="e9e186dd" sha1="ce2c06cf341c629e75ae6e47887f2aab635f9340" offset="0" />
 			</dataarea>
@@ -204,7 +204,7 @@
 		<publisher>Thunder Mountain</publisher>
 		<info name="video" value="NTSC" />
 		<info name="protection" value="signature" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="rambo_first_blood_part_ii[thunder_mtn_1985](ntsc)(!).g64" size="333744" crc="f1e99142" sha1="8263d6eecd017468d505891b3546b80f7cc4989f" offset="0" />
 			</dataarea>
@@ -237,7 +237,7 @@
 		<publisher>Taito</publisher>
 		<info name="video" value="NTSC" />
 		<info name="protection" value="vmax3" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="rambo_iii[taito_1989](vmax3)(!).g64" size="333744" crc="8e34cbc7" sha1="a83030d9a46a5a7a33b9cfedf6adf0b778f7262b" offset="0" />
 			</dataarea>
@@ -249,7 +249,7 @@
 		<year>1987</year>
 		<publisher>Melbourne House</publisher>
 		<info name="video" value="PAL" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="street_hassle[melbourne_house_1987](pal).g64" size="333744" crc="92c15c93" sha1="a1bc536294ae1d36ffde644798dc25cd1d514c93" offset="0" />
 			</dataarea>
@@ -261,7 +261,7 @@
 		<year>1984</year>
 		<publisher>Artworx</publisher>
 		<info name="video" value="PAL" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="strip_poker[artworx_1984](pal).g64" size="333744" crc="4a66bc83" sha1="68d66ee9f357c3964303e94c625ff9587f5df7c2" offset="0" />
 			</dataarea>
@@ -347,7 +347,7 @@
 		<year>1984</year>
 		<publisher>Amersoft</publisher>
 
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="basic-kaantaja[amersoft_1984].g64" size="333744" crc="68ffade3" sha1="951e63d05c0911abcc247ff8327b7239fc0c9e86" offset="0" />
 			</dataarea>
@@ -372,7 +372,7 @@
 		<year>1983</year>
 		<publisher>Precision</publisher>
 
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="superbase_64[precision_1983](finnish).g64" size="333744" crc="83eb8f50" sha1="2cff03d08f15f8d66fad9d20233fc4d87f71395c" offset="0" />
 			</dataarea>

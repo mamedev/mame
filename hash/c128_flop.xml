@@ -85,7 +85,7 @@
 		<year>1985</year>
 		<publisher>Mastertronic</publisher>
 		<info name="protection" value="none" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="the_last_v8[mastertronic_1985](c128).g64" size="333744" crc="34ee8b20" sha1="3d752a5f4924cf48689270f5f9464cc9529d7aa7" offset="0" />
 			</dataarea>
@@ -97,7 +97,7 @@
 		<year>1987</year>
 		<publisher>CRL</publisher>
 		<info name="protection" value="fat" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="rocky_horror_show[crl_1987](c128).g64" size="333744" crc="cd1915f9" sha1="792756c0ae514b55ab4e06a2f4601f9cd1edf7c7" offset="0" />
 			</dataarea>
@@ -109,7 +109,7 @@
 		<year>1986</year>
 		<publisher>Anco</publisher>
 		<info name="protection" value="fat" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="thai_boxing[anco_1986](c128)(fat).g64" size="333744" crc="6a29ef3a" sha1="ca317c6f44e940c38e1f537d88e66c52c6968885" offset="0" />
 			</dataarea>
@@ -123,7 +123,7 @@
 		<year>1985</year>
 		<publisher>Abacus</publisher>
 		<info name="protection" value="none" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="basic-128[abacus_1985](v1_03).g64" size="333744" crc="94047950" sha1="a1cd6e8302699684e0eaa8bccc0de6ad70918397" offset="0" />
 			</dataarea>
@@ -135,7 +135,7 @@
 		<year>1991</year>
 		<publisher>SOGWAP</publisher>
 		<info name="protection" value="none" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="big_blue_reader_128[sogwap_1989](v3_12).g64" size="333744" crc="57d64987" sha1="8de9b32074ad13277d1e6e3f910adce234c8c9bd" offset="0"/>
 			</dataarea>
@@ -147,7 +147,7 @@
 		<year>1992</year>
 		<publisher>Chris Miller</publisher>
 		<info name="protection" value="none" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="buddy128.g64" size="333744" crc="6f4326a2" sha1="750490f1aaa445ca603282642ed3e4976029982a" offset="0"/>
 			</dataarea>
@@ -159,7 +159,7 @@
 		<year>1985</year>
 		<publisher>Commodore</publisher>
 		<info name="protection" value="none" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="commodore_128_tutorial[cbm_1985[.g64" size="333744" crc="0a807511" sha1="270a4f0efb950184fa53bb86ad1535192c94bb5f" offset="0"/>
 			</dataarea>
@@ -190,7 +190,7 @@
 		<year>1986</year>
 		<publisher>Anchor Automation</publisher>
 		<info name="protection" value="none" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="comm_term_64_128[anchor_automation_1987].g64" size="333744" crc="c9462996" sha1="c71ee5e1c71a1770bc569b96794d555fc8c3d08b" offset="0"/>
 			</dataarea>
@@ -221,7 +221,7 @@
 		<year>198?</year>
 		<publisher>Compute!</publisher>
 		<info name="protection" value="none" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="enhanced_sid_player_128_version[compute!_198x].g64" size="333744" crc="284e224c" sha1="8057964665c16330a3283fdd44205a17075711a0" offset="0"/>
 			</dataarea>
@@ -233,7 +233,7 @@
 		<year>1988</year>
 		<publisher>Basement Boys</publisher>
 		<info name="protection" value="none" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="fast_hack_em_128[basement_boys_1988](v6_00).g64" size="333744" crc="4af25fa0" sha1="b6f829654116feb69155876cb7ad182be15a9474" offset="0"/>
 			</dataarea>
@@ -307,7 +307,7 @@
 		<year>1985</year>
 		<publisher>Access</publisher>
 		<info name="protection" value="none" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="mach_128[access_1985].g64" size="333744" crc="9cb01daa" sha1="47c5f1dc1a242edbff1ff51a0e89f89019f5aacd" offset="0"/>
 			</dataarea>
@@ -319,7 +319,7 @@
 		<year>1987</year>
 		<publisher>Roger Wagner Publishing</publisher>
 		<info name="protection" value="none" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="merlin_128_macro_assembler[roger_wagner_pub_1987](v1_10)(c128).g64" size="333744" crc="ab9a0899" sha1="55d112b3fe01b56f593d7f7dde3458279a1bf834" offset="0"/>
 			</dataarea>
@@ -331,7 +331,7 @@
 		<year>1986</year>
 		<publisher>Systems Software</publisher>
 		<info name="protection" value="codesheet" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="petspeed_128[systems_software_1986](v2_2).g64" size="333744" crc="64be27bc" sha1="08050d19159dbe566e16f85586cebc142dc83773" offset="0"/>
 			</dataarea>
@@ -343,7 +343,7 @@
 		<year>19??</year>
 		<publisher>Data Becker</publisher>
 		<info name="protection" value="none" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="super_pascal_128[data_becker_19xx](v6_1).g64" size="333744" crc="32716bcb" sha1="6c4a0fed4f5f3fc3961d12922d563307d8de6399" offset="0"/>
 			</dataarea>
@@ -355,7 +355,7 @@
 		<year>1985</year>
 		<publisher>Data Becker</publisher>
 		<info name="protection" value="none" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="super_c_128_[data_becker_1985](v3_02).g64" size="333744" crc="b0208ed2" sha1="9e21cf8b2bfdbe7de62a935579cd2ea16d3e2711" offset="0"/>
 			</dataarea>
