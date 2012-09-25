@@ -46,6 +46,7 @@ Todo:
     The tripool driver used to have a hack making the vblank interrupt go off
     twice per frame, this made the game run way too fast, but no palette bug.
   - what's the correct irq0 frequency of joinem/unclepoo/loverboy?
+  - some remaining unknown memorymap writes
 
 
 ****************************************************************************
@@ -457,8 +458,14 @@ static INPUT_PORTS_START( freeze )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Free_Play ) )
 
 	PORT_START("DSW2")
-	/* probably unused */
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW2:!1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW2:!2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW2:!3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW2:!4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW2:!6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW2:!7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW2:!8" )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
@@ -644,7 +651,6 @@ static INPUT_PORTS_START( striv )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW2:!6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW2:!7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW2:!8" )
-//	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) //?
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -777,7 +783,7 @@ static INPUT_PORTS_START( loverboy )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )
-	PORT_DIPNAME( 0x20, 0x00, "Bonus" )					PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x00, "20000" )
 	PORT_DIPSETTING(    0x20, "30000" )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:!7")
@@ -883,6 +889,8 @@ MACHINE_RESET_MEMBER(jack_state,striv)
 
 MACHINE_START_MEMBER(jack_state,joinem)
 {
+	m_joinem_palette_bank = 0;
+	
 	save_item(NAME(m_joinem_nmi_enable));
 	save_item(NAME(m_joinem_palette_bank));
 }
@@ -1188,15 +1196,16 @@ ROM_START( sucasino )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "11",     	  0x0000, 0x1000, CRC(f92c4c5b) SHA1(a415c8f55d1792e79d05ece223ef423f8578f896) )
-	/* 1000-1fff empty */
+	ROM_FILL(                 0x1000, 0x1000, 0 )
 	ROM_LOAD( "10",     	  0x2000, 0x1000, CRC(3b0783ce) SHA1(880f258351a8b0d76abe433cc77d95b991ae1adc) )
-	/* 3000-3fff empty */
+	ROM_FILL(                 0x3000, 0x1000, 0 )
 ROM_END
 
 
 ROM_START( tripool )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tri73a.bin",   0x0000, 0x1000, CRC(96893aa7) SHA1(ea1dc5824d89c1bb131850625a65d018a9127179) )
+	ROM_FILL(                 0x1000, 0x1000, 0 )
 	ROM_LOAD( "tri62a.bin",   0x2000, 0x1000, CRC(3299dc65) SHA1(8f93247e2f49be6b601006be62f4ad539ec899fe) )
 	ROM_LOAD( "tri52b.bin",   0x3000, 0x1000, CRC(27ef765e) SHA1(2a18a9b74fd4d9f3a724270cd3a98adbfdf22a5e) )
 	ROM_LOAD( "tri33c.bin",   0xc000, 0x1000, CRC(d7ef061d) SHA1(3ea3a136ecb3b5753a1dd929212b93ad8c7e9157) )
@@ -1208,14 +1217,17 @@ ROM_START( tripool )
 	ROM_LOAD( "trisnd.bin",   0x0000, 0x1000, CRC(945c4b8b) SHA1(f574de1633e7dd71d29c0bcdbc6fa675d1a3f7d1) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "tri93a.bin",   0x2000, 0x1000, CRC(35213782) SHA1(05d5a67ffa3d26377c54777917d3ba51677ebd28) )
 	ROM_LOAD( "tri105a.bin",  0x0000, 0x1000, CRC(366a753c) SHA1(30fa8d80e42287e3e8677aefd15beab384265728) )
+	ROM_FILL(                 0x1000, 0x1000, 0 )
+	ROM_LOAD( "tri93a.bin",   0x2000, 0x1000, CRC(35213782) SHA1(05d5a67ffa3d26377c54777917d3ba51677ebd28) )
+	ROM_FILL(                 0x3000, 0x1000, 0 )
 ROM_END
 
 
 ROM_START( tripoola )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tri73a.bin",   0x0000, 0x1000, CRC(96893aa7) SHA1(ea1dc5824d89c1bb131850625a65d018a9127179) )
+	ROM_FILL(                 0x1000, 0x1000, 0 )
 	ROM_LOAD( "tri62a.bin",   0x2000, 0x1000, CRC(3299dc65) SHA1(8f93247e2f49be6b601006be62f4ad539ec899fe) )
 	ROM_LOAD( "tri52b.bin",   0x3000, 0x1000, CRC(27ef765e) SHA1(2a18a9b74fd4d9f3a724270cd3a98adbfdf22a5e) )
 	ROM_LOAD( "tri33c.bin",   0xc000, 0x1000, CRC(d7ef061d) SHA1(3ea3a136ecb3b5753a1dd929212b93ad8c7e9157) )
@@ -1227,8 +1239,10 @@ ROM_START( tripoola )
 	ROM_LOAD( "trisnd.bin",   0x0000, 0x1000, CRC(945c4b8b) SHA1(f574de1633e7dd71d29c0bcdbc6fa675d1a3f7d1) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "tri93a.bin",   0x2000, 0x1000, CRC(35213782) SHA1(05d5a67ffa3d26377c54777917d3ba51677ebd28) )
 	ROM_LOAD( "tri105a.bin",  0x0000, 0x1000, CRC(366a753c) SHA1(30fa8d80e42287e3e8677aefd15beab384265728) )
+	ROM_FILL(                 0x1000, 0x1000, 0 )
+	ROM_LOAD( "tri93a.bin",   0x2000, 0x1000, CRC(35213782) SHA1(05d5a67ffa3d26377c54777917d3ba51677ebd28) )
+	ROM_FILL(                 0x3000, 0x1000, 0 )
 ROM_END
 
 
@@ -1546,8 +1560,8 @@ GAME( 1982, zzyzzyxx,  0,        jack,     zzyzzyxx, jack_state, zzyzzyxx, ROT90
 GAME( 1982, zzyzzyxx2, zzyzzyxx, jack,     zzyzzyxx, jack_state, zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, brix,      zzyzzyxx, jack,     zzyzzyxx, jack_state, zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Brix", GAME_SUPPORTS_SAVE )
 GAME( 1984, freeze,    0,        jack,     freeze,   jack_state, jack,     ROT90,  "Cinematronics", "Freeze", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
-GAME( 1981, tripool,   0,        jack,     tripool,  jack_state, jack,     ROT90,  "Noma (Casino Tech license)", "Tri-Pool (Casino Tech)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1981, tripoola,  tripool,  jack,     tripool,  jack_state, jack,     ROT90,  "Noma (Costal Games license)", "Tri-Pool (Costal Games)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1981, tripool,   0,        jack,     tripool,  jack_state, jack,     ROT90,  "Noma (Casino Tech license)", "Tri-Pool (Casino Tech)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1981, tripoola,  tripool,  jack,     tripool,  jack_state, jack,     ROT90,  "Noma (Costal Games license)", "Tri-Pool (Costal Games)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1984, sucasino,  0,        jack,     sucasino, jack_state, jack,     ROT90,  "Data Amusement", "Super Casino", GAME_SUPPORTS_SAVE )
 GAME( 1985, striv,     0,        striv,    striv,    jack_state, striv,    ROT270, "Nova du Canada", "Super Triv", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Hara Industries PCB
 GAME( 1983, joinem,    0,        joinem,   joinem,   jack_state, zzyzzyxx, ROT90,  "Global Corporation", "Joinem", GAME_SUPPORTS_SAVE )
