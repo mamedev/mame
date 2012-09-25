@@ -10,6 +10,7 @@
 #include "includes/jack.h"
 
 
+
 WRITE8_MEMBER(jack_state::jack_videoram_w)
 {
 	m_videoram[offset] = data;
@@ -39,6 +40,9 @@ WRITE8_MEMBER(jack_state::jack_flipscreen_w)
 	flip_screen_set(offset);
 }
 
+
+/**************************************************************************/
+
 TILE_GET_INFO_MEMBER(jack_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x18) << 5);
@@ -59,6 +63,9 @@ void jack_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jack_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(jack_state::tilemap_scan_cols_flipy),this), 8, 8, 32, 32);
 }
+
+
+/**************************************************************************/
 
 static void jack_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
@@ -98,10 +105,25 @@ UINT32 jack_state::screen_update_jack(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-/*
+
+UINT32 jack_state::screen_update_striv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// no sprites
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+
+
+
+
+
+/***************************************************************************
+
    Joinem has a bit different video hardware with proms based palette,
    3bpp gfx and different banking / colors bits
-*/
+
+***************************************************************************/
 
 WRITE8_MEMBER(jack_state::joinem_scroll_w)
 {
@@ -119,6 +141,9 @@ WRITE8_MEMBER(jack_state::joinem_scroll_w)
 	
 	m_scrollram[offset] = data;
 }
+
+
+/**************************************************************************/
 
 PALETTE_INIT_MEMBER(jack_state,joinem)
 {
@@ -145,6 +170,7 @@ PALETTE_INIT_MEMBER(jack_state,joinem)
 	}
 }
 
+
 TILE_GET_INFO_MEMBER(jack_state::joinem_get_bg_tile_info)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x03) << 8);
@@ -158,6 +184,9 @@ VIDEO_START_MEMBER(jack_state,joinem)
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jack_state::joinem_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(jack_state::tilemap_scan_cols_flipy),this), 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);
 }
+
+
+/**************************************************************************/
 
 static void joinem_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {

@@ -34,10 +34,18 @@ I/O
 
 The 2 ay-8910 read ports are responsible for reading the sound commands.
 
-    Notes:
-        * "Jack to Mame no Ki (Jack the Giant Killer)" and
-          "Pro Billiard (Tri Pool)" is developed by Noma Trading
-          (distributed via SNK).  Hara Industries probably a bootlegger.
+
+Notes:
+  - "Jack to Mame no Ki (Jack the Giant Killer)" and
+    "Pro Billiard (Tri Pool)" is developed by Noma Trading
+    (distributed via SNK).  Hara Industries probably a bootlegger.
+
+Todo:
+  - fix striv hanging notes
+  - fix tripool palette problems (see attract)
+    The tripool driver used to have a hack making the vblank interrupt go off
+    twice per frame, this made the game run way too fast, but no palette bug.
+  - what's the correct irq0 frequency of joinem/unclepoo/loverboy?
 
 ***************************************************************************/
 
@@ -45,6 +53,7 @@ The 2 ay-8910 read ports are responsible for reading the sound commands.
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "includes/jack.h"
+
 
 
 /*************************************
@@ -60,7 +69,6 @@ READ8_MEMBER(jack_state::timer_r)
 	return m_audiocpu->total_cycles() / m_timer_rate;
 }
 
-
 WRITE8_MEMBER(jack_state::jack_sh_command_w)
 {
 	soundlatch_byte_w(space, 0, data);
@@ -68,35 +76,7 @@ WRITE8_MEMBER(jack_state::jack_sh_command_w)
 }
 
 
-
-
-WRITE8_MEMBER(jack_state::joinem_control_w)
-{
-	// d0: related to test mode?
-	// d1: unused?
-	// d2: ?
-	
-	// d3-d4: palette bank
-	int palette_bank = data & (machine().total_colors() - 1) >> 3 & 0x18;
-	if (m_joinem_palette_bank != palette_bank)
-	{
-		m_joinem_palette_bank = palette_bank;
-		m_bg_tilemap->mark_all_dirty();
-	}
-
-	// d5: assume nmi enable
-	m_joinem_nmi_enable = data & 0x20;
-	
-	// d6: unused?
-
-	// d7: flip screen
-	flip_screen_set(data & 0x80);
-}
-
-
-/*
-    Super Triv questions read handler
-*/
+/***************************************************************/
 
 READ8_MEMBER(jack_state::striv_question_r)
 {
@@ -131,6 +111,32 @@ READ8_MEMBER(jack_state::striv_question_r)
 	return 0; // the value read from the configuration reads is discarded
 }
 
+
+WRITE8_MEMBER(jack_state::joinem_control_w)
+{
+	// d0: related to test mode?
+	// d1: unused?
+	// d2: ?
+	
+	// d3-d4: palette bank
+	int palette_bank = data & (machine().total_colors() - 1) >> 3 & 0x18;
+	if (m_joinem_palette_bank != palette_bank)
+	{
+		m_joinem_palette_bank = palette_bank;
+		m_bg_tilemap->mark_all_dirty();
+	}
+
+	// d5: assume nmi enable
+	m_joinem_nmi_enable = data & 0x20;
+	
+	// d6: unused?
+
+	// d7: flip screen
+	flip_screen_set(data & 0x80);
+}
+
+
+
 /*************************************
  *
  *  Address maps
@@ -154,6 +160,13 @@ static ADDRESS_MAP_START( jack_map, AS_PROGRAM, 8, jack_state )
 	AM_RANGE(0xbc00, 0xbfff) AM_RAM_WRITE(jack_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( striv_map, AS_PROGRAM, 8, jack_state )
+	AM_RANGE(0xb000, 0xb0ff) AM_WRITENOP
+	AM_RANGE(0xc000, 0xcfff) AM_READ(striv_question_r)
+	AM_IMPORT_FROM( jack_map )
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( joinem_map, AS_PROGRAM, 8, jack_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -189,6 +202,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, jack_state )
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 ADDRESS_MAP_END
+
 
 
 /*************************************
@@ -230,7 +244,7 @@ static INPUT_PORTS_START( jack )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW2:!3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW2:!4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )
-	PORT_SERVICE( 0x20, IP_ACTIVE_HIGH )			PORT_DIPLOCATION("SW2:!6")
+	PORT_SERVICE( 0x20, IP_ACTIVE_HIGH )				PORT_DIPLOCATION("SW2:!6")
 	PORT_DIPNAME( 0x40, 0x00, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
@@ -247,14 +261,14 @@ static INPUT_PORTS_START( jack )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -266,6 +280,7 @@ static INPUT_PORTS_START( jack )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
 
 /* Same as 'jack', but different coinage */
 static INPUT_PORTS_START( jack2 )
@@ -284,6 +299,7 @@ static INPUT_PORTS_START( jack2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 INPUT_PORTS_END
 
+
 /* Same as 'jack', but another different coinage */
 static INPUT_PORTS_START( jack3 )
 	PORT_INCLUDE( jack )
@@ -301,6 +317,7 @@ static INPUT_PORTS_START( jack3 )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 INPUT_PORTS_END
 
+
 /* Same as 'jack', but different "Bullets per Bean Collected" and "Difficulty" Dip Switches */
 static INPUT_PORTS_START( treahunt )
 	PORT_INCLUDE( jack )
@@ -313,6 +330,7 @@ static INPUT_PORTS_START( treahunt )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x80, "20" )
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( zzyzzyxx )
 	PORT_START("DSW1")
@@ -333,7 +351,7 @@ static INPUT_PORTS_START( zzyzzyxx )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )			PORT_DIPLOCATION("SW1:!7")
+	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )				PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
@@ -347,7 +365,7 @@ static INPUT_PORTS_START( zzyzzyxx )
 	PORT_DIPNAME( 0x04, 0x04, "2nd Bonus Given" )		PORT_DIPLOCATION("SW2:!3")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Starting Laps" )		PORT_DIPLOCATION("SW2:!4")
+	PORT_DIPNAME( 0x08, 0x00, "Starting Laps" )			PORT_DIPLOCATION("SW2:!4")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPNAME( 0x10, 0x00, "Difficulty of Pleasing Lola" )	PORT_DIPLOCATION("SW2:!5")
@@ -356,7 +374,7 @@ static INPUT_PORTS_START( zzyzzyxx )
 	PORT_DIPNAME( 0x20, 0x00, "Show Intermissions" )	PORT_DIPLOCATION("SW2:!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0xc0, 0x40, "Extra Lives" )		PORT_DIPLOCATION("SW2:!7,!8")
+	PORT_DIPNAME( 0xc0, 0x40, "Extra Lives" )			PORT_DIPLOCATION("SW2:!7,!8")
 	PORT_DIPSETTING(    0x00, "3 under 4000 pts" )
 	PORT_DIPSETTING(    0x80, "5 under 4000 pts" )
 	PORT_DIPSETTING(    0x40, DEF_STR( None ) )			// 3 under 0 pts
@@ -370,10 +388,10 @@ static INPUT_PORTS_START( zzyzzyxx )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_2WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP   ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_2WAY
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP   ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -386,12 +404,13 @@ static INPUT_PORTS_START( zzyzzyxx )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( freeze )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_SERVICE( 0x02, IP_ACTIVE_HIGH )			PORT_DIPLOCATION("SW1:!2")
+	PORT_SERVICE( 0x02, IP_ACTIVE_HIGH )				PORT_DIPLOCATION("SW1:!2")
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:!3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
@@ -425,7 +444,7 @@ static INPUT_PORTS_START( freeze )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -453,6 +472,7 @@ static INPUT_PORTS_START( freeze )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( sucasino )
 	PORT_START("DSW1")
@@ -485,10 +505,10 @@ static INPUT_PORTS_START( sucasino )
 	PORT_START("IN1")
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_2WAY
 	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_2WAY PORT_COCKTAIL
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -498,6 +518,7 @@ static INPUT_PORTS_START( sucasino )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( tripool )
 	PORT_START("DSW1")
@@ -537,14 +558,14 @@ static INPUT_PORTS_START( tripool )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -556,6 +577,75 @@ static INPUT_PORTS_START( tripool )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL  // not needed?
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( striv )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x02, 0x00, "Monitor" )				PORT_DIPLOCATION("SW1:!2")
+	PORT_DIPSETTING(    0x02, "Horizontal" )
+	PORT_DIPSETTING(    0x00, "Vertical" )
+	PORT_DIPNAME( 0x05, 0x05, "Gaming Option Number" )	PORT_DIPLOCATION("SW1:!1,!3")
+	PORT_DIPSETTING(    0x01, "2" ) PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x05, "3" ) PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "4" ) PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x04, "5" ) PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x01, "4" ) PORT_CONDITION("DSW1", 0x20, NOTEQUALS, 0x20)
+	PORT_DIPSETTING(    0x05, "5" ) PORT_CONDITION("DSW1", 0x20, NOTEQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "6" ) PORT_CONDITION("DSW1", 0x20, NOTEQUALS, 0x20)
+	PORT_DIPSETTING(    0x04, "7" ) PORT_CONDITION("DSW1", 0x20, NOTEQUALS, 0x20)
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:!4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:!5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x20, 0x20, "Gaming Option" )			PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPSETTING(    0x20, "Number of Wrong Answer" )
+	PORT_DIPSETTING(    0x00, "Number of Questions" )
+	PORT_DIPNAME( 0x40, 0x40, "Show Correct Answer" )	PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )					PORT_DIPLOCATION("SW1:!8")
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW2:!1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW2:!2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW2:!3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW2:!4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW2:!6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW2:!7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW2:!8" )
+//	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) //?
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0xfd, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) //?
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( joinem )
 	PORT_START("DSW1")
@@ -586,7 +676,7 @@ static INPUT_PORTS_START( joinem )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )
 	PORT_SERVICE_DIPLOC( 0x20, IP_ACTIVE_HIGH, "SW2:!6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW2:!7" )
-	PORT_DIPNAME( 0x80, 0x00, "Infinite Lives (Cheat)" )		PORT_DIPLOCATION("SW2:!8")
+	PORT_DIPNAME( 0x80, 0x00, "Infinite Lives (Cheat)" )	PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -621,6 +711,7 @@ static INPUT_PORTS_START( joinem )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ?
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( unclepoo )
 	PORT_INCLUDE( joinem )
 
@@ -633,8 +724,11 @@ static INPUT_PORTS_START( unclepoo )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( loverboy )
-	PORT_START("DSW1")
+	PORT_INCLUDE( joinem )
+
+	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:!1,!2,!3,!4")
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
@@ -653,7 +747,7 @@ static INPUT_PORTS_START( loverboy )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )
-	PORT_DIPNAME( 0x20, 0x00, "Bonus" )			PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPNAME( 0x20, 0x00, "Bonus" )					PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x00, "20000" )
 	PORT_DIPSETTING(    0x20, "30000" )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:!7")
@@ -663,7 +757,7 @@ static INPUT_PORTS_START( loverboy )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
-	PORT_START("DSW2")
+	PORT_MODIFY("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW2:!1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW2:!2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW2:!3" )
@@ -673,117 +767,36 @@ static INPUT_PORTS_START( loverboy )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW2:!7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW2:!8" )
 
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_MODIFY("IN0")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) // otherwise it doesn't boot because the code is buggy
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( striv )
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x02, 0x00, "Monitor" )			PORT_DIPLOCATION("SW1:!2")
-	PORT_DIPSETTING(    0x02, "Horizontal" )
-	PORT_DIPSETTING(    0x00, "Vertical" )
-	PORT_DIPNAME( 0x05, 0x05, "Gaming Option Number" )	PORT_DIPLOCATION("SW1:!1,!3")
-	PORT_DIPSETTING(    0x01, "2" ) PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x05, "3" ) PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x00, "4" ) PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x04, "5" ) PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x01, "4" ) PORT_CONDITION("DSW1", 0x20, NOTEQUALS, 0x20)
-	PORT_DIPSETTING(    0x05, "5" ) PORT_CONDITION("DSW1", 0x20, NOTEQUALS, 0x20)
-	PORT_DIPSETTING(    0x00, "6" ) PORT_CONDITION("DSW1", 0x20, NOTEQUALS, 0x20)
-	PORT_DIPSETTING(    0x04, "7" ) PORT_CONDITION("DSW1", 0x20, NOTEQUALS, 0x20)
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:!4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:!5")
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x20, 0x20, "Gaming Option" )		PORT_DIPLOCATION("SW1:!6")
-	PORT_DIPSETTING(    0x20, "Number of Wrong Answer" )
-	PORT_DIPSETTING(    0x00, "Number of Questions" )
-	PORT_DIPNAME( 0x40, 0x40, "Show Correct Answer" )	PORT_DIPLOCATION("SW1:!7")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )			PORT_DIPLOCATION("SW1:!8")
-
-	PORT_START("DSW2")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) //?
-
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
-	PORT_BIT( 0xfd, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN3")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) //?
-INPUT_PORTS_END
 
 
 /*************************************
  *
- *  Graphics definitions
+ *  Machine configs
  *
  *************************************/
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	RGN_FRAC(1,2),	/* 1024 characters */
-	2,	/* 2 bits per pixel */
-	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },	/* the two bitplanes are separated */
+	8,8,
+	RGN_FRAC(1,2),
+	2,
+	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 16 bytes */
+	8*8
 };
 
 static GFXDECODE_START( jack )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 8 )
 GFXDECODE_END
+
 
 static const gfx_layout joinem_charlayout =
 {
@@ -800,48 +813,66 @@ static GFXDECODE_START( joinem )
 	GFXDECODE_ENTRY( "gfx1", 0, joinem_charlayout, 0, 32 )
 GFXDECODE_END
 
+
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_DRIVER_MEMBER(jack_state,timer_r)
+	DEVCB_DRIVER_MEMBER(jack_state, timer_r)
 };
 
 
-/*************************************
- *
- *  Machine driver
- *
- *************************************/
+/***************************************************************/
 
 void jack_state::machine_start()
+{
+}
+
+void jack_state::machine_reset()
+{
+}
+
+
+MACHINE_START_MEMBER(jack_state,striv)
 {
 	save_item(NAME(m_question_address));
 	save_item(NAME(m_question_rom));
 	save_item(NAME(m_remap_address));
 }
 
-void jack_state::machine_reset()
+MACHINE_RESET_MEMBER(jack_state,striv)
 {
-	joinem_control_w(m_maincpu->space(AS_PROGRAM), 0, 0, 0xff);
-	int i;
-
 	m_question_address = 0;
 	m_question_rom = 0;
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 		m_remap_address[i] = 0;
 }
+
+
+MACHINE_START_MEMBER(jack_state,joinem)
+{
+	save_item(NAME(m_joinem_nmi_enable));
+	save_item(NAME(m_joinem_palette_bank));
+}
+
+MACHINE_RESET_MEMBER(jack_state,joinem)
+{
+	joinem_control_w(m_maincpu->space(AS_PROGRAM), 0, 0, 0xff);
+}
+
+
+/***************************************************************/
 
 static MACHINE_CONFIG_START( jack, jack_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18000000/6)	/* 3 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/6)
 	MCFG_CPU_PROGRAM_MAP(jack_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jack_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,18000000/12)	/* 1.5 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18MHz/6)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
@@ -859,17 +890,28 @@ static MACHINE_CONFIG_START( jack, jack_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 18000000/12)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18MHz/12)
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tripool, jack )
+
+static MACHINE_CONFIG_DERIVED( striv, jack )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PERIODIC_INT_DRIVER(jack_state, irq0_line_hold, 2*60) /* tripool needs 2 or the palette is broken */
+	MCFG_CPU_PROGRAM_MAP(striv_map)
+
+	MCFG_MACHINE_START_OVERRIDE(jack_state,striv)
+	MCFG_MACHINE_RESET_OVERRIDE(jack_state,striv)
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_striv)
 MACHINE_CONFIG_END
+
+
+/***************************************************************/
 
 INTERRUPT_GEN_MEMBER(jack_state::joinem_vblank_irq)
 {
@@ -883,7 +925,10 @@ static MACHINE_CONFIG_DERIVED( joinem, jack )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(joinem_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jack_state, joinem_vblank_irq)
-	MCFG_CPU_PERIODIC_INT_DRIVER(jack_state, irq0_line_hold, 2*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(jack_state, irq0_line_hold, 250) // ??? controls game speed
+
+	MCFG_MACHINE_START_OVERRIDE(jack_state,joinem)
+	MCFG_MACHINE_RESET_OVERRIDE(jack_state,joinem)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -892,8 +937,8 @@ static MACHINE_CONFIG_DERIVED( joinem, jack )
 	MCFG_GFXDECODE(joinem)
 	MCFG_PALETTE_LENGTH(0x40)
 
-	MCFG_PALETTE_INIT_OVERRIDE(jack_state, joinem)
-	MCFG_VIDEO_START_OVERRIDE(jack_state, joinem)
+	MCFG_PALETTE_INIT_OVERRIDE(jack_state,joinem)
+	MCFG_VIDEO_START_OVERRIDE(jack_state,joinem)
 MACHINE_CONFIG_END
 
 
@@ -909,6 +954,7 @@ static MACHINE_CONFIG_DERIVED( unclepoo, joinem )
 
 	MCFG_PALETTE_LENGTH(0x100)
 MACHINE_CONFIG_END
+
 
 
 /*************************************
@@ -938,6 +984,7 @@ ROM_START( jack )
 	ROM_LOAD( "jgk.j10",      0x3000, 0x1000, CRC(eab890b2) SHA1(a5b83dff6bc6fd51f80db136fad8075262720f01) )
 ROM_END
 
+
 ROM_START( jack2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jgk.j8",       0x0000, 0x1000, CRC(fe229e20) SHA1(191cfb7bb08d46cab713e23abd69f27db1685346) )
@@ -958,6 +1005,7 @@ ROM_START( jack2 )
 	ROM_LOAD( "jgk.j11",      0x2000, 0x1000, CRC(fd14c525) SHA1(5e6a8274d008c5dd276aaf85f7f943810b5ac987) )
 	ROM_LOAD( "jgk.j10",      0x3000, 0x1000, CRC(eab890b2) SHA1(a5b83dff6bc6fd51f80db136fad8075262720f01) )
 ROM_END
+
 
 ROM_START( jack3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -980,6 +1028,7 @@ ROM_START( jack3 )
 	ROM_LOAD( "jgk.j10",      0x3000, 0x1000, CRC(eab890b2) SHA1(a5b83dff6bc6fd51f80db136fad8075262720f01) )
 ROM_END
 
+
 ROM_START( treahunt )
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "thunt-1.f2",   0x0000, 0x1000, CRC(0b35858c) SHA1(b8f80c69fcbce71e1b85c8f39599f8bebfeb2585) )
@@ -1000,6 +1049,7 @@ ROM_START( treahunt )
 	ROM_LOAD( "thunt-10.a1",  0x2000, 0x1000, CRC(51ec7934) SHA1(f39d99c356d8d9960022fa2c068b5f7206404d85) )
 	ROM_LOAD( "thunt-11.a2",  0x3000, 0x1000, CRC(f9781143) SHA1(f168648a78240fdf02063d39f324838f4dfe9a56) )
 ROM_END
+
 
 ROM_START( zzyzzyxx )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1023,6 +1073,7 @@ ROM_START( zzyzzyxx )
 	ROM_LOAD( "l.1a",         0x3000, 0x1000, CRC(ab421a83) SHA1(1cc3e1bcf9e90ffbf7bfeeb0caa8a4f63b34146a) )
 ROM_END
 
+
 ROM_START( zzyzzyxx2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a.2f",         0x0000, 0x1000, CRC(a9102e34) SHA1(80d71df7d235980603f35aa3f474aaf58fb39946) )
@@ -1044,6 +1095,7 @@ ROM_START( zzyzzyxx2 )
 	ROM_LOAD( "k.1b",         0x2000, 0x1000, CRC(b8b2b8cc) SHA1(e149fc91043f3233e10c81358b8624a4bc0baf4e) )
 	ROM_LOAD( "l.1a",         0x3000, 0x1000, CRC(ab421a83) SHA1(1cc3e1bcf9e90ffbf7bfeeb0caa8a4f63b34146a) )
 ROM_END
+
 
 ROM_START( brix )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1067,6 +1119,7 @@ ROM_START( brix )
 	ROM_LOAD( "l.1a",         0x3000, 0x1000, CRC(ab421a83) SHA1(1cc3e1bcf9e90ffbf7bfeeb0caa8a4f63b34146a) )
 ROM_END
 
+
 ROM_START( freeze )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "freeze.f2",    0x0000, 0x1000, CRC(0a431665) SHA1(57b7fc72c7e3b0d09b4a0676a4e7094657e2b742) )
@@ -1087,6 +1140,7 @@ ROM_START( freeze )
 	ROM_LOAD( "freeze.1a",    0x2000, 0x1000, CRC(3a7f2fa9) SHA1(5f0811ea4e61b9918de2d16ffcfa4a02af833613) )
 	ROM_LOAD( "freeze.2a",    0x3000, 0x1000, CRC(dd70ddd6) SHA1(d03cac0b4248da5d49ffac6ee57a3f8dd368731b) )
 ROM_END
+
 
 ROM_START( sucasino )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1109,6 +1163,7 @@ ROM_START( sucasino )
 	/* 3000-3fff empty */
 ROM_END
 
+
 ROM_START( tripool )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tri73a.bin",   0x0000, 0x1000, CRC(96893aa7) SHA1(ea1dc5824d89c1bb131850625a65d018a9127179) )
@@ -1120,12 +1175,13 @@ ROM_START( tripool )
 	ROM_LOAD( "tri13d.bin",   0xf000, 0x1000, CRC(ad268e9b) SHA1(5d8d9b1c57b332b5a28b01d6a4f4885239d80b00) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "trisnd.bin",       0x0000, 0x1000, CRC(945c4b8b) SHA1(f574de1633e7dd71d29c0bcdbc6fa675d1a3f7d1) )
+	ROM_LOAD( "trisnd.bin",   0x0000, 0x1000, CRC(945c4b8b) SHA1(f574de1633e7dd71d29c0bcdbc6fa675d1a3f7d1) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "tri93a.bin",   0x2000, 0x1000, CRC(35213782) SHA1(05d5a67ffa3d26377c54777917d3ba51677ebd28) )
 	ROM_LOAD( "tri105a.bin",  0x0000, 0x1000, CRC(366a753c) SHA1(30fa8d80e42287e3e8677aefd15beab384265728) )
 ROM_END
+
 
 ROM_START( tripoola )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1138,72 +1194,11 @@ ROM_START( tripoola )
 	ROM_LOAD( "tp1ckt",       0xf000, 0x1000, CRC(72ec43a3) SHA1(a4f5b20872e41845340db627321e0dbcad4b964e) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "trisnd.bin",       0x0000, 0x1000, CRC(945c4b8b) SHA1(f574de1633e7dd71d29c0bcdbc6fa675d1a3f7d1) )
+	ROM_LOAD( "trisnd.bin",   0x0000, 0x1000, CRC(945c4b8b) SHA1(f574de1633e7dd71d29c0bcdbc6fa675d1a3f7d1) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "tri93a.bin",   0x2000, 0x1000, CRC(35213782) SHA1(05d5a67ffa3d26377c54777917d3ba51677ebd28) )
 	ROM_LOAD( "tri105a.bin",  0x0000, 0x1000, CRC(366a753c) SHA1(30fa8d80e42287e3e8677aefd15beab384265728) )
-ROM_END
-
-ROM_START( joinem )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* main z80 cpu */
-	ROM_LOAD( "join1.r0", 0x0000, 0x2000, CRC(b5b2e2cc) SHA1(e939478d19ac27807ba4180835c512b5fcb8d0c5) )
-	ROM_LOAD( "join2.r2", 0x2000, 0x2000, CRC(bcf140e6) SHA1(3fb4fbb758518d8ae26abbe76f12678cf988bd0e) )
-	ROM_LOAD( "join3.r4", 0x4000, 0x2000, CRC(fe04e4d4) SHA1(9b34cc5915dd78340d1cedb34f5d397d3b39ca14) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 cpu */
-	ROM_LOAD( "join7.s0", 0x0000, 0x1000, CRC(bb8a7814) SHA1(cfb85408827b96a81401223256e23082b7e9598f) )
-
-	ROM_REGION( 0x3000, "gfx1", 0 ) /* gfx - 8x8x3bpp */
-	ROM_LOAD( "join4.p3", 0x0000, 0x1000, CRC(4964c82c) SHA1(7a45399db20f9bbdb2de58243732e3951ffe358c) )
-	ROM_LOAD( "join5.p2", 0x1000, 0x1000, CRC(ae78fa89) SHA1(8f43fd2ec037185a1b9bd9c61c49ad891c504d4d) )
-	ROM_LOAD( "join6.p1", 0x2000, 0x1000, CRC(2b533261) SHA1(ce6c1fa833b34aeb401f430d212415c33beb2922) )
-
-	ROM_REGION( 0x100, "proms", 0 ) /* colours */
-	ROM_LOAD_NIB_LOW(  "l82s129.11n", 0x000, 0x100, CRC(7b724211) SHA1(7396c773e8d48dea856d9482d6c48de966616c83) )
-	ROM_LOAD_NIB_HIGH( "h82s129.12n", 0x000, 0x100, CRC(2e81c5ff) SHA1(e103c8813af704d5de11fe705de5105ff3a691c3) )
-ROM_END
-
-
-ROM_START( unclepoop )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* main z80 cpu */
-	ROM_LOAD( "01.f17", 0x00000, 0x2000, CRC(92fb238c) SHA1(e9476c5c1a0bf9e8c6c364ac022ed1d97ae66d2e) )
-	ROM_LOAD( "02.f14", 0x02000, 0x2000, CRC(b99214ef) SHA1(c8e4af0efbc5ea543277b2764dc6f119aae477ca) )
-	ROM_LOAD( "03.f11", 0x04000, 0x2000, CRC(a136af97) SHA1(cfa610bf357870053617fed8aef6bb30bd996422) )
-	ROM_LOAD( "04.f09", 0x06000, 0x2000, CRC(c4bcd414) SHA1(df3125358530f5fb8d202bddcb0ef5e322fabb7b) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 cpu */
-	ROM_LOAD( "08.c15", 0x00000, 0x1000, CRC(fd84106b) SHA1(891853d2b39850a981016108b74ca20337d2cdd8) )
-
-	ROM_REGION( 0x6000, "gfx1", 0 ) /* gfx - 8x8x3bpp */
-	ROM_LOAD( "07.h04", 0x0000, 0x2000, CRC(e2f73e99) SHA1(61cb09ff424ba63b892b4822e7ed916af73412f1) )
-	ROM_LOAD( "06.j04", 0x2000, 0x2000, CRC(94b5f676) SHA1(32c27854726636c4ce03bb6a83b32d04ed6c42af) )
-	ROM_LOAD( "05.k04", 0x4000, 0x2000, CRC(64026934) SHA1(a5342335d02d34fa6ba2b29484ed71ecc96292f2) )
-
-	ROM_REGION( 0x200, "proms", 0 ) /* colours */
-	ROM_LOAD_NIB_LOW(  "diatec_l.bin", 0x000, 0x100, CRC(b04d466a) SHA1(1438abeae76ef807ba34bd6d3e4c44f707dbde6e) )
-	ROM_LOAD_NIB_HIGH( "diatec_h.bin", 0x000, 0x100, CRC(938601b1) SHA1(8213284989bebb5f7375878181840de8079dc1f3) )
-ROM_END
-
-
-ROM_START( loverboy )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* main z80 cpu */
-	ROM_LOAD( "lover.r0", 0x0000, 0x2000, CRC(ffec4e41) SHA1(65428ebcb3af47071fef70a35388e070a019f692) )
-	ROM_LOAD( "lover.r2", 0x2000, 0x2000, CRC(04052262) SHA1(056a225c8625e53881753b0b0330f9b277d14a7d) )
-	ROM_LOAD( "lover.r4", 0x4000, 0x2000, CRC(ce5f3b49) SHA1(cb55e1f7c3df59389ac14b7da4f584ae054abca3) )
-	ROM_LOAD( "lover.r6", 0x6000, 0x1000, CRC(839d79b7) SHA1(ac1c0fbf23e7d1a53b47dae16170857c55e6ae48) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 cpu */
-	ROM_LOAD( "lover.s0", 0x0000, 0x1000, CRC(ec38111c) SHA1(09efded9e905658bdbcde4ad4f0b4cb9585bdb33) )
-
-	ROM_REGION( 0x6000, "gfx1", 0 ) /* gfx - 8x8x3bpp */
-	ROM_LOAD( "lover.p3", 0x0000, 0x2000, CRC(1a519c8f) SHA1(36f546deaf36e8cd3bd113d84fd5e5f6e98d5de5) )
-	ROM_LOAD( "lover.p2", 0x2000, 0x2000, CRC(e465372f) SHA1(345b769ebc33f60daa9692b64e8ef43062552a33) )
-	ROM_LOAD( "lover.p1", 0x4000, 0x2000, CRC(cda0d87e) SHA1(efff230e994e21705902f252e50ee40a20444c0f) )
-
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD_NIB_LOW(  "color.n11", 0x000, 0x200, CRC(cf4a16ae) SHA1(e17c5dfd73c5bc55c0a929cf65ee5b516c9776a5) )
-	ROM_LOAD_NIB_HIGH( "color.n12", 0x000, 0x200, CRC(4b11ac21) SHA1(d9e7cecfb7237335288ab6f94bb35696d8291bdf) )
 ROM_END
 
 
@@ -1280,7 +1275,6 @@ ROM Daughterboard
 |PR1.F2  TBFD2.U8   TBFD1.U15 |
 |-----------------------------|
 
-
 */
 
 ROM_START( striv )
@@ -1321,11 +1315,86 @@ ROM_START( striv )
 ROM_END
 
 
+ROM_START( joinem )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main z80 cpu */
+	ROM_LOAD( "join1.r0", 0x0000, 0x2000, CRC(b5b2e2cc) SHA1(e939478d19ac27807ba4180835c512b5fcb8d0c5) )
+	ROM_LOAD( "join2.r2", 0x2000, 0x2000, CRC(bcf140e6) SHA1(3fb4fbb758518d8ae26abbe76f12678cf988bd0e) )
+	ROM_LOAD( "join3.r4", 0x4000, 0x2000, CRC(fe04e4d4) SHA1(9b34cc5915dd78340d1cedb34f5d397d3b39ca14) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 cpu */
+	ROM_LOAD( "join7.s0", 0x0000, 0x1000, CRC(bb8a7814) SHA1(cfb85408827b96a81401223256e23082b7e9598f) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 ) /* gfx - 8x8x3bpp */
+	ROM_LOAD( "join4.p3", 0x0000, 0x1000, CRC(4964c82c) SHA1(7a45399db20f9bbdb2de58243732e3951ffe358c) )
+	ROM_LOAD( "join5.p2", 0x1000, 0x1000, CRC(ae78fa89) SHA1(8f43fd2ec037185a1b9bd9c61c49ad891c504d4d) )
+	ROM_LOAD( "join6.p1", 0x2000, 0x1000, CRC(2b533261) SHA1(ce6c1fa833b34aeb401f430d212415c33beb2922) )
+
+	ROM_REGION( 0x100, "proms", 0 ) /* colours */
+	ROM_LOAD_NIB_LOW(  "l82s129.11n", 0x000, 0x100, CRC(7b724211) SHA1(7396c773e8d48dea856d9482d6c48de966616c83) )
+	ROM_LOAD_NIB_HIGH( "h82s129.12n", 0x000, 0x100, CRC(2e81c5ff) SHA1(e103c8813af704d5de11fe705de5105ff3a691c3) )
+ROM_END
+
+
+ROM_START( unclepoop )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main z80 cpu */
+	ROM_LOAD( "01.f17", 0x0000, 0x2000, CRC(92fb238c) SHA1(e9476c5c1a0bf9e8c6c364ac022ed1d97ae66d2e) )
+	ROM_LOAD( "02.f14", 0x2000, 0x2000, CRC(b99214ef) SHA1(c8e4af0efbc5ea543277b2764dc6f119aae477ca) )
+	ROM_LOAD( "03.f11", 0x4000, 0x2000, CRC(a136af97) SHA1(cfa610bf357870053617fed8aef6bb30bd996422) )
+	ROM_LOAD( "04.f09", 0x6000, 0x2000, CRC(c4bcd414) SHA1(df3125358530f5fb8d202bddcb0ef5e322fabb7b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 cpu */
+	ROM_LOAD( "08.c15", 0x0000, 0x1000, CRC(fd84106b) SHA1(891853d2b39850a981016108b74ca20337d2cdd8) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 ) /* gfx - 8x8x3bpp */
+	ROM_LOAD( "07.h04", 0x0000, 0x2000, CRC(e2f73e99) SHA1(61cb09ff424ba63b892b4822e7ed916af73412f1) )
+	ROM_LOAD( "06.j04", 0x2000, 0x2000, CRC(94b5f676) SHA1(32c27854726636c4ce03bb6a83b32d04ed6c42af) )
+	ROM_LOAD( "05.k04", 0x4000, 0x2000, CRC(64026934) SHA1(a5342335d02d34fa6ba2b29484ed71ecc96292f2) )
+
+	ROM_REGION( 0x200, "proms", 0 ) /* colours */
+	ROM_LOAD_NIB_LOW(  "diatec_l.bin", 0x000, 0x100, CRC(b04d466a) SHA1(1438abeae76ef807ba34bd6d3e4c44f707dbde6e) )
+	ROM_LOAD_NIB_HIGH( "diatec_h.bin", 0x000, 0x100, CRC(938601b1) SHA1(8213284989bebb5f7375878181840de8079dc1f3) )
+ROM_END
+
+
+ROM_START( loverboy )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main z80 cpu */
+	ROM_LOAD( "lover.r0", 0x0000, 0x2000, CRC(ffec4e41) SHA1(65428ebcb3af47071fef70a35388e070a019f692) )
+	ROM_LOAD( "lover.r2", 0x2000, 0x2000, CRC(04052262) SHA1(056a225c8625e53881753b0b0330f9b277d14a7d) )
+	ROM_LOAD( "lover.r4", 0x4000, 0x2000, CRC(ce5f3b49) SHA1(cb55e1f7c3df59389ac14b7da4f584ae054abca3) )
+	ROM_LOAD( "lover.r6", 0x6000, 0x1000, CRC(839d79b7) SHA1(ac1c0fbf23e7d1a53b47dae16170857c55e6ae48) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 cpu */
+	ROM_LOAD( "lover.s0", 0x0000, 0x1000, CRC(ec38111c) SHA1(09efded9e905658bdbcde4ad4f0b4cb9585bdb33) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 ) /* gfx - 8x8x3bpp */
+	ROM_LOAD( "lover.p3", 0x0000, 0x2000, CRC(1a519c8f) SHA1(36f546deaf36e8cd3bd113d84fd5e5f6e98d5de5) )
+	ROM_LOAD( "lover.p2", 0x2000, 0x2000, CRC(e465372f) SHA1(345b769ebc33f60daa9692b64e8ef43062552a33) )
+	ROM_LOAD( "lover.p1", 0x4000, 0x2000, CRC(cda0d87e) SHA1(efff230e994e21705902f252e50ee40a20444c0f) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD_NIB_LOW(  "color.n11", 0x000, 0x200, CRC(cf4a16ae) SHA1(e17c5dfd73c5bc55c0a929cf65ee5b516c9776a5) )
+	ROM_LOAD_NIB_HIGH( "color.n12", 0x000, 0x200, CRC(4b11ac21) SHA1(d9e7cecfb7237335288ab6f94bb35696d8291bdf) )
+ROM_END
+
+
+
 /*************************************
  *
  *  Driver initialization
  *
  *************************************/
+
+DRIVER_INIT_MEMBER(jack_state,jack)
+{
+	m_timer_rate = 256;
+}
+
+
+DRIVER_INIT_MEMBER(jack_state,zzyzzyxx)
+{
+	m_timer_rate = 32;
+}
+
 
 static void treahunt_decode( running_machine &machine )
 {
@@ -1372,21 +1441,12 @@ static void treahunt_decode( running_machine &machine )
 	}
 }
 
-DRIVER_INIT_MEMBER(jack_state,jack)
-{
-	m_timer_rate = 128;
-}
-
 DRIVER_INIT_MEMBER(jack_state,treahunt)
 {
-	m_timer_rate = 128;
+	m_timer_rate = 256;
 	treahunt_decode(machine());
 }
 
-DRIVER_INIT_MEMBER(jack_state,zzyzzyxx)
-{
-	m_timer_rate = 16;
-}
 
 DRIVER_INIT_MEMBER(jack_state,loverboy)
 {
@@ -1400,12 +1460,12 @@ DRIVER_INIT_MEMBER(jack_state,loverboy)
        sends a custom irq (either ld hl,$019d or jp $019d). After the initial
        code, the protection device is disabled or changes behaviour via
        writes at 0xf000 and 0xf008. -AS
-       */
+    */
 	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x13] = 0x01;
 	ROM[0x12] = 0x9d;
 
-	m_timer_rate = 16;
+	m_timer_rate = 32;
 }
 
 
@@ -1437,14 +1497,10 @@ DRIVER_INIT_MEMBER(jack_state,striv)
 		}
 	}
 
-	// Set-up the weirdest questions read ever done
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc000, 0xcfff, read8_delegate(FUNC(jack_state::striv_question_r),this));
-
-	// Nop out unused sprites writes
-	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0xb000, 0xb0ff);
-
-	m_timer_rate = 128;
+	m_timer_rate = 256;
 }
+
+
 
 /*************************************
  *
@@ -1452,18 +1508,18 @@ DRIVER_INIT_MEMBER(jack_state,striv)
  *
  *************************************/
 
-GAME( 1982, jack,     0,        jack,    jack, jack_state,     jack,     ROT90,  "Cinematronics",               "Jack the Giantkiller (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, jack2,    jack,     jack,    jack2, jack_state,    jack,     ROT90,  "Cinematronics",               "Jack the Giantkiller (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, jack3,    jack,     jack,    jack3, jack_state,    jack,     ROT90,  "Cinematronics",               "Jack the Giantkiller (set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1982, treahunt, jack,     jack,    treahunt, jack_state, treahunt, ROT90,  "bootleg? (Hara Industries)",  "Treasure Hunt (bootleg?)", GAME_SUPPORTS_SAVE )
-GAME( 1982, zzyzzyxx, 0,        jack,    zzyzzyxx, jack_state, zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, zzyzzyxx2,zzyzzyxx, jack,    zzyzzyxx, jack_state, zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, brix,     zzyzzyxx, jack,    zzyzzyxx, jack_state, zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Brix", GAME_SUPPORTS_SAVE )
-GAME( 1984, freeze,   0,        jack,    freeze, jack_state,   jack,     ROT90,  "Cinematronics",               "Freeze", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
-GAME( 1984, sucasino, 0,        jack,    sucasino, jack_state, jack,     ROT90,  "Data Amusement",              "Super Casino", GAME_SUPPORTS_SAVE )
-GAME( 1981, tripool,  0,        tripool, tripool, jack_state,  jack,     ROT90,  "Noma (Casino Tech license)",  "Tri-Pool (Casino Tech)", GAME_SUPPORTS_SAVE )
-GAME( 1981, tripoola, tripool,  tripool, tripool, jack_state,  jack,     ROT90,  "Noma (Costal Games license)", "Tri-Pool (Costal Games)", GAME_SUPPORTS_SAVE )
-GAME( 1983, joinem,   0,        joinem,  joinem, jack_state,   zzyzzyxx, ROT90,  "Global Corporation",          "Joinem", GAME_SUPPORTS_SAVE )
-GAME( 1983, unclepoop, unclepoo, unclepoo, unclepoo, jack_state, zzyzzyxx, ROT90, "Diatec", "Uncle Poo (nincompoop version)", GAME_NOT_WORKING )
-GAME( 1983, loverboy, 0,        joinem,loverboy, jack_state, loverboy, ROT90,  "G.T Enterprise Inc",          "Lover Boy", GAME_SUPPORTS_SAVE )
-GAME( 1985, striv,    0,        jack,    striv, jack_state,    striv,    ROT270, "Hara Industries",             "Super Triv", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, jack,      0,        jack,     jack,     jack_state, jack,     ROT90,  "Cinematronics",               "Jack the Giantkiller (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, jack2,     jack,     jack,     jack2,    jack_state, jack,     ROT90,  "Cinematronics",               "Jack the Giantkiller (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, jack3,     jack,     jack,     jack3,    jack_state, jack,     ROT90,  "Cinematronics",               "Jack the Giantkiller (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1982, treahunt,  jack,     jack,     treahunt, jack_state, treahunt, ROT90,  "bootleg? (Hara Industries)",  "Treasure Hunt (bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1982, zzyzzyxx,  0,        jack,     zzyzzyxx, jack_state, zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, zzyzzyxx2, zzyzzyxx, jack,     zzyzzyxx, jack_state, zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, brix,      zzyzzyxx, jack,     zzyzzyxx, jack_state, zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Brix", GAME_SUPPORTS_SAVE )
+GAME( 1984, freeze,    0,        jack,     freeze,   jack_state, jack,     ROT90,  "Cinematronics",               "Freeze", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1981, tripool,   0,        jack,     tripool,  jack_state, jack,     ROT90,  "Noma (Casino Tech license)",  "Tri-Pool (Casino Tech)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1981, tripoola,  tripool,  jack,     tripool,  jack_state, jack,     ROT90,  "Noma (Costal Games license)", "Tri-Pool (Costal Games)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1984, sucasino,  0,        jack,     sucasino, jack_state, jack,     ROT90,  "Data Amusement",              "Super Casino", GAME_SUPPORTS_SAVE )
+GAME( 1985, striv,     0,        striv,    striv,    jack_state, striv,    ROT270, "Nova du Canada",              "Super Triv", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Hara Industries PCB
+GAME( 1983, joinem,    0,        joinem,   joinem,   jack_state, zzyzzyxx, ROT90,  "Global Corporation",          "Joinem", GAME_SUPPORTS_SAVE )
+GAME( 1983, unclepoop, unclepoo, unclepoo, unclepoo, jack_state, zzyzzyxx, ROT90,  "Diatec", "Uncle Poo (nincompoop version)", GAME_NOT_WORKING ) // based on Joinem?
+GAME( 1983, loverboy,  0,        joinem,   loverboy, jack_state, loverboy, ROT90,  "G.T Enterprise Inc.",         "Lover Boy", GAME_SUPPORTS_SAVE )

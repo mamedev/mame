@@ -20,7 +20,7 @@ public:
 	/* device- and memory pointers */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_scrollram;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
@@ -58,8 +58,13 @@ public:
 	TILE_GET_INFO_MEMBER(joinem_get_bg_tile_info);
 	DECLARE_VIDEO_START(joinem);
 	DECLARE_PALETTE_INIT(joinem);
+	DECLARE_MACHINE_START(striv);
+	DECLARE_MACHINE_RESET(striv);
+	DECLARE_MACHINE_START(joinem);
+	DECLARE_MACHINE_RESET(joinem);
 
 	UINT32 screen_update_jack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_striv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_joinem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start();
