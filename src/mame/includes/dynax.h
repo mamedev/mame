@@ -486,6 +486,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(neruton_irq_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(majxtal7_vblank_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(tenkai_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(mjmyster_irq);
 };
 
 //----------- defined in drivers/dynax.c -----------

@@ -316,7 +316,7 @@ void mm1_state::scan_keyboard()
 
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK( kbclk_tick )
+//  TIMER_DEVICE_CALLBACK_MEMBER( kbclk_tick )
 //-------------------------------------------------
 
 TIMER_DEVICE_CALLBACK_MEMBER(mm1_state::kbclk_tick)

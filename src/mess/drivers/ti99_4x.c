@@ -87,7 +87,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
 
 	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
-
+	TIMER_DEVICE_CALLBACK_MEMBER(ti99_4ev_hblank_interrupt);
+	
 	// Some values to keep
 	tms9900_device*		m_cpu;
 	tms9901_device*		m_tms9901;
@@ -1072,9 +1073,9 @@ static MACHINE_CONFIG_START( ti99_4a_50hz, ti99_4x )
 MACHINE_CONFIG_END
 
 
-TIMER_DEVICE_CALLBACK( ti99_4ev_hblank_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(ti99_4x::ti99_4ev_hblank_interrupt)
 {
-	timer.machine().device<v9938_device>(VDP_TAG)->interrupt();
+	machine().device<v9938_device>(VDP_TAG)->interrupt();
 }
 
 /*
@@ -1094,7 +1095,7 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x )
 	// painted. Accordingly, the full set of lines is refreshed at 30 Hz,
 	// not 60 Hz. This should be fixed in the v9938 emulation.
 	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, DEVICE_SELF, ti99_4x, set_tms9901_INT2_from_v9938)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", ti99_4ev_hblank_interrupt, SCREEN_TAG, 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ti99_4x, ti99_4ev_hblank_interrupt, SCREEN_TAG, 0, 1)
 
 	/* Main board */
 	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_ti99_4a, 3000000)

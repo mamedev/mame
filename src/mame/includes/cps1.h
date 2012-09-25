@@ -215,6 +215,7 @@ public:
 	void screen_eof_cps1(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(cps1_interrupt);
 	INTERRUPT_GEN_MEMBER(cps1_qsound_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/

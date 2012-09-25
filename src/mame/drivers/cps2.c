@@ -621,57 +621,55 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
  *
  *************************************/
 
-static TIMER_DEVICE_CALLBACK( cps2_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(cps_state::cps2_interrupt)
 {
-	cps_state *state = timer.machine().driver_data<cps_state>();
-
 	/* 2 is vblank, 4 is some sort of scanline interrupt, 6 is both at the same time. */
 	if (param == 0)
-		state->m_scancalls = 0;
+		m_scancalls = 0;
 
-	if (state->m_cps_b_regs[0x10 / 2] & 0x8000)
-		state->m_cps_b_regs[0x10 / 2] &= 0x1ff;
+	if (m_cps_b_regs[0x10 / 2] & 0x8000)
+		m_cps_b_regs[0x10 / 2] &= 0x1ff;
 
-	if (state->m_cps_b_regs[0x12 / 2] & 0x8000)
-		state->m_cps_b_regs[0x12 / 2] &= 0x1ff;
+	if (m_cps_b_regs[0x12 / 2] & 0x8000)
+		m_cps_b_regs[0x12 / 2] &= 0x1ff;
 
-//  popmessage("%04x %04x - %04x %04x",state->m_scanline1,state->m_scanline2,state->m_cps_b_regs[0x10/2],state->m_cps_b_regs[0x12/2]);
+//  popmessage("%04x %04x - %04x %04x",m_scanline1,m_scanline2,m_cps_b_regs[0x10/2],m_cps_b_regs[0x12/2]);
 
 	/* raster effects */
-	if (state->m_scanline1 == param || (state->m_scanline1 < param && !state->m_scancalls))
+	if (m_scanline1 == param || (m_scanline1 < param && !m_scancalls))
 	{
-		state->m_cps_b_regs[0x10/2] = 0;
-		state->m_maincpu->set_input_line(4, HOLD_LINE);
+		m_cps_b_regs[0x10/2] = 0;
+		m_maincpu->set_input_line(4, HOLD_LINE);
 		cps2_set_sprite_priorities(timer.machine());
 		timer.machine().primary_screen->update_partial(param);
-		state->m_scancalls++;
+		m_scancalls++;
 //      popmessage("IRQ4 scancounter = %04i", param);
 	}
 
 	/* raster effects */
-	if(state->m_scanline2 == param || (state->m_scanline2 < param && !state->m_scancalls))
+	if(m_scanline2 == param || (m_scanline2 < param && !m_scancalls))
 	{
-		state->m_cps_b_regs[0x12 / 2] = 0;
-		state->m_maincpu->set_input_line(4, HOLD_LINE);
+		m_cps_b_regs[0x12 / 2] = 0;
+		m_maincpu->set_input_line(4, HOLD_LINE);
 		cps2_set_sprite_priorities(timer.machine());
 		timer.machine().primary_screen->update_partial(param);
-		state->m_scancalls++;
+		m_scancalls++;
 //      popmessage("IRQ4 scancounter = %04i", param);
 	}
 
 	if (param == 240)  /* VBlank */
 	{
-		state->m_cps_b_regs[0x10 / 2] = state->m_scanline1;
-		state->m_cps_b_regs[0x12 / 2] = state->m_scanline2;
-		state->m_maincpu->set_input_line(2, HOLD_LINE);
-		if(state->m_scancalls)
+		m_cps_b_regs[0x10 / 2] = m_scanline1;
+		m_cps_b_regs[0x12 / 2] = m_scanline2;
+		m_maincpu->set_input_line(2, HOLD_LINE);
+		if(m_scancalls)
 		{
 			cps2_set_sprite_priorities(timer.machine());
 			timer.machine().primary_screen->update_partial(256);
 		}
 		cps2_objram_latch(timer.machine());
 	}
-//  popmessage("Raster calls = %i", state->m_scancalls);
+//  popmessage("Raster calls = %i", m_scancalls);
 }
 
 
@@ -1226,7 +1224,7 @@ static MACHINE_CONFIG_START( cps2, cps_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(cps2_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", cps2_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cps_state, cps2_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(qsound_sub_map)

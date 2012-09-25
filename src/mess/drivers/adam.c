@@ -1162,7 +1162,7 @@ WRITE8_MEMBER( adam_state::fdc6801_p4_w )
 //**************************************************************************
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK( paddle_tick )
+//  TIMER_DEVICE_CALLBACK_MEMBER( paddle_tick )
 //-------------------------------------------------
 
 TIMER_DEVICE_CALLBACK_MEMBER(adam_state::paddle_tick)

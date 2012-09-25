@@ -361,7 +361,7 @@ GFXDECODE_END
 
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK( set_irq )
+//  TIMER_DEVICE_CALLBACK_MEMBER( set_irq )
 //-------------------------------------------------
 
 TIMER_DEVICE_CALLBACK_MEMBER(ace_state::set_irq)
@@ -371,7 +371,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ace_state::set_irq)
 
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK( clear_irq )
+//  TIMER_DEVICE_CALLBACK_MEMBER( clear_irq )
 //-------------------------------------------------
 
 TIMER_DEVICE_CALLBACK_MEMBER(ace_state::clear_irq)

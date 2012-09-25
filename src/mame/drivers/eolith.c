@@ -571,7 +571,7 @@ static QS1000_INTERFACE( qs1000_intf )
 static MACHINE_CONFIG_START( eolith45, eolith_state )
 	MCFG_CPU_ADD("maincpu", E132N, 45000000)		 /* 45 MHz */
 	MCFG_CPU_PROGRAM_MAP(eolith_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", eolith_speedup, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith_state, eolith_speedup, "screen", 0, 1)
 
 	/* Sound CPU */
 	MCFG_CPU_ADD("soundcpu", I8032, XTAL_12MHz)

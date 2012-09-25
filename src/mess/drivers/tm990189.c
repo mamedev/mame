@@ -144,6 +144,8 @@ public:
 	DECLARE_MACHINE_RESET(tm990_189);
 	DECLARE_MACHINE_START(tm990_189_v);
 	DECLARE_MACHINE_RESET(tm990_189_v);
+	
+	TIMER_DEVICE_CALLBACK_MEMBER(display_callback);
 private:
 	void draw_digit(void);
 	void led_set(int number, bool state);
@@ -247,26 +249,25 @@ void tm990189::draw_digit()
 }
 
 
-static TIMER_DEVICE_CALLBACK( display_callback )
+TIMER_DEVICE_CALLBACK_MEMBER(tm990189::display_callback)
 {
-	tm990189 *state = timer.machine().driver_data<tm990189>();
 	UINT8 i;
 	char ledname[8];
     // since the segment data is cleared after being used, the old_segment is there
     // in case the segment data hasn't been refreshed yet.
 	for (i = 0; i < 10; i++)
 	{
-		state->m_old_segment_state[i] |= state->m_segment_state[i];
+		m_old_segment_state[i] |= m_segment_state[i];
 		sprintf(ledname,"digit%d",i);
-		output_set_digit_value(i, state->m_old_segment_state[i]);
-		state->m_old_segment_state[i] = state->m_segment_state[i];
-		state->m_segment_state[i] = 0;
+		output_set_digit_value(i, m_old_segment_state[i]);
+		m_old_segment_state[i] = m_segment_state[i];
+		m_segment_state[i] = 0;
 	}
 
 	for (i = 0; i < 7; i++)
 	{
 		sprintf(ledname,"led%d",i);
-		output_set_value(ledname, !BIT(state->m_LED_state, i));
+		output_set_value(ledname, !BIT(m_LED_state, i));
 	}
 }
 
@@ -855,7 +856,7 @@ static MACHINE_CONFIG_START( tm990_189, tm990189 )
 	MCFG_TMS9901_ADD("tms9901_1", sys9901reset_param, 2000000)
 	MCFG_TMS9902_ADD("tms9902", tms9902_params, 2000000)
 	MCFG_TM990_189_RS232_ADD("rs232")
-	MCFG_TIMER_ADD_PERIODIC("display_timer", display_callback, attotime::from_hz(30))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189, display_callback, attotime::from_hz(30))
 	// Need to delay the timer, or it will spoil the initial LOAD
 	// TODO: Fix this, probably inside CPU
 	MCFG_TIMER_START_DELAY(attotime::from_msec(150))
@@ -887,7 +888,7 @@ static MACHINE_CONFIG_START( tm990_189_v, tm990189 )
 	MCFG_TMS9901_ADD("tms9901_1", sys9901reset_param, 2000000)
 	MCFG_TMS9902_ADD("tms9902", tms9902_params,	2000000)
 	MCFG_TM990_189_RS232_ADD("rs232")
-	MCFG_TIMER_ADD_PERIODIC("display_timer", display_callback, attotime::from_hz(30))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189, display_callback, attotime::from_hz(30))
 	MCFG_TIMER_START_DELAY(attotime::from_msec(150))
 MACHINE_CONFIG_END
 

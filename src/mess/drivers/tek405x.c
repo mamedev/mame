@@ -95,7 +95,7 @@ void tek4051_state::scan_keyboard()
 
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK( keyboard_tick )
+//  TIMER_DEVICE_CALLBACK_MEMBER( keyboard_tick )
 //-------------------------------------------------
 
 TIMER_DEVICE_CALLBACK_MEMBER(tek4051_state::keyboard_tick)

@@ -251,7 +251,7 @@ static QS1000_INTERFACE( qs1000_intf )
 static MACHINE_CONFIG_START( vega, vegaeo_state )
 	MCFG_CPU_ADD("maincpu", GMS30C2132, XTAL_55MHz)
 	MCFG_CPU_PROGRAM_MAP(vega_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", eolith_speedup, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", vegaeo_state, eolith_speedup, "screen", 0, 1)
 
 	MCFG_AT28C16_ADD("at28c16", NULL)
 

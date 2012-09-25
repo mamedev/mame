@@ -244,7 +244,7 @@ void portfolio_state::scan_keyboard()
 }
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK( keyboard_tick )
+//  TIMER_DEVICE_CALLBACK_MEMBER( keyboard_tick )
 //-------------------------------------------------
 
 TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::keyboard_tick)
@@ -365,7 +365,7 @@ WRITE8_MEMBER( portfolio_state::unknown_w )
 //**************************************************************************
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK( system_tick )
+//  TIMER_DEVICE_CALLBACK_MEMBER( system_tick )
 //-------------------------------------------------
 
 TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::system_tick)
@@ -374,7 +374,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::system_tick)
 }
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK( counter_tick )
+//  TIMER_DEVICE_CALLBACK_MEMBER( counter_tick )
 //-------------------------------------------------
 
 TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::counter_tick)

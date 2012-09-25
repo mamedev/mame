@@ -255,6 +255,7 @@ public:
 	DECLARE_MACHINE_START(mpu4oki);
 	DECLARE_MACHINE_START(mpu4bwb);
 	DECLARE_MACHINE_START(mpu4cry);
+	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
 };
 
 /* mpu4.c, used by mpu4vid.c */

@@ -2661,16 +2661,15 @@ DRIVER_INIT_MEMBER(mpu4_state,crystali)
 }
 
 /* generate a 50 Hz signal (based on an RC time) */
-TIMER_DEVICE_CALLBACK( gen_50hz )
+TIMER_DEVICE_CALLBACK_MEMBER(mpu4_state::gen_50hz)
 {
-	mpu4_state *state = timer.machine().driver_data<mpu4_state>();
 	/* Although reported as a '50Hz' signal, the fact that both rising and
     falling edges of the pulse are used means the timer actually gives a 100Hz
     oscillating signal.*/
-	state->m_signal_50hz = state->m_signal_50hz?0:1;
-	timer.machine().device<pia6821_device>("pia_ic4")->ca1_w(state->m_signal_50hz);	/* signal is connected to IC4 CA1 */
+	m_signal_50hz = m_signal_50hz?0:1;
+	machine().device<pia6821_device>("pia_ic4")->ca1_w(m_signal_50hz);	/* signal is connected to IC4 CA1 */
 
-	update_meters(state);//run at 100Hz to sync with PIAs
+	update_meters(this);//run at 100Hz to sync with PIAs
 }
 
 static ADDRESS_MAP_START( mpu4_memmap, AS_PROGRAM, 8, mpu4_state )
@@ -2699,7 +2698,7 @@ const ay8910_interface ay8910_config =
 };
 
 MACHINE_CONFIG_FRAGMENT( mpu4_common )
-	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, attotime::from_hz(100))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", mpu4_state, gen_50hz, attotime::from_hz(100))
 
 	MCFG_MSC1937_ADD("vfd",0,LEFT_TO_RIGHT)
 	/* 6840 PTM */

@@ -390,7 +390,7 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK( vsync_tick )
+//  TIMER_DEVICE_CALLBACK_MEMBER( vsync_tick )
 //-------------------------------------------------
 
 TIMER_DEVICE_CALLBACK_MEMBER(vixen_state::vsync_tick)

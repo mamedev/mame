@@ -170,7 +170,7 @@ void cgc7900_state::draw_overlay(screen_device *screen, bitmap_rgb32 &bitmap)
 }
 
 /*-------------------------------------------------
-    TIMER_DEVICE_CALLBACK( blink_tick )
+    TIMER_DEVICE_CALLBACK_MEMBER( blink_tick )
 -------------------------------------------------*/
 
 TIMER_DEVICE_CALLBACK_MEMBER(cgc7900_state::blink_tick)

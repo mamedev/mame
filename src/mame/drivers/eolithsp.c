@@ -87,7 +87,7 @@ void init_eolith_speedup(running_machine &machine)
 }
 
 /* todo, use timers instead! */
-TIMER_DEVICE_CALLBACK( eolith_speedup )
+TIMER_DEVICE_CALLBACK_MEMBER(eolith_state::eolith_speedup)
 {
 	if (param==0)
 	{
@@ -96,7 +96,7 @@ TIMER_DEVICE_CALLBACK( eolith_speedup )
 
 	if (param==eolith_speedup_resume_scanline)
 	{
-		timer.machine().scheduler().trigger(1000);
+		machine().scheduler().trigger(1000);
 	}
 
 	if (param==240)

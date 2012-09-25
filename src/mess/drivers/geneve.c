@@ -260,6 +260,7 @@ public:
 	DECLARE_DRIVER_INIT(geneve);
 	virtual void machine_start();
 	virtual void machine_reset();
+	TIMER_DEVICE_CALLBACK_MEMBER(geneve_hblank_interrupt);
 
 	void	set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state);
 
@@ -634,12 +635,11 @@ WRITE_LINE_MEMBER( geneve::keyboard_interrupt )
 /*
     scanline interrupt
 */
-TIMER_DEVICE_CALLBACK( geneve_hblank_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER(geneve::geneve_hblank_interrupt)
 {
 	int scanline = param;
-	geneve *driver = timer.machine().driver_data<geneve>();
 
-	timer.machine().device<v9938_device>(VDP_TAG)->interrupt();
+	machine().device<v9938_device>(VDP_TAG)->interrupt();
 
 	if (scanline == 0) // was 262
 	{
@@ -649,7 +649,7 @@ TIMER_DEVICE_CALLBACK( geneve_hblank_interrupt )
 		// per vertical interrupt; however, the mouse sometimes shows jerky
 		// behaviour. Maybe we should use an autonomous timer with a higher
 		// rate? -> to be checked
-		driver->m_mouse->poll();
+		m_mouse->poll();
 	}
 }
 
@@ -763,7 +763,7 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve )
 	// painted. Accordingly, the full set of lines is refreshed at 30 Hz,
 	// not 60 Hz. This should be fixed in the v9938 emulation.
 	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, DEVICE_SELF, geneve, set_tms9901_INT2_from_v9938)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", geneve_hblank_interrupt, SCREEN_TAG, 0, 1) /* 262.5 in 60Hz, 312.5 in 50Hz */
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", geneve, geneve_hblank_interrupt, SCREEN_TAG, 0, 1) /* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	// Main board components
 	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_geneve, 3000000)

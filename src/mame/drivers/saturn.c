@@ -1856,116 +1856,115 @@ TODO:
 */
 
 
-static TIMER_DEVICE_CALLBACK( saturn_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 {
-	saturn_state *state = timer.machine().driver_data<saturn_state>();
+	saturn_state *state = machine().driver_data<saturn_state>();
 	int scanline = param;
 	int max_y = timer.machine().primary_screen->height();
 	int y_step,vblank_line;
 
 	y_step = 2;
 
-	if((max_y == 263 && state->m_vdp2.pal == 0) || (max_y == 313 && state->m_vdp2.pal == 1))
+	if((max_y == 263 && m_vdp2.pal == 0) || (max_y == 313 && m_vdp2.pal == 1))
 		y_step = 1;
 
-	vblank_line = (state->m_vdp2.pal) ? 288 : 240;
+	vblank_line = (m_vdp2.pal) ? 288 : 240;
 
-	//popmessage("%08x %d T0 %d T1 %d %08x",state->m_scu.ism ^ 0xffffffff,max_y,state->m_scu_regs[36],state->m_scu_regs[37],state->m_scu_regs[38]);
+	//popmessage("%08x %d T0 %d T1 %d %08x",m_scu.ism ^ 0xffffffff,max_y,m_scu_regs[36],m_scu_regs[37],m_scu_regs[38]);
 
 	if(scanline == (0)*y_step)
 	{
 		video_update_vdp1(timer.machine());
 
 		if(STV_VDP1_VBE)
-			state->m_vdp1.framebuffer_clear_on_next_frame = 1;
+			m_vdp1.framebuffer_clear_on_next_frame = 1;
 
-		if(!(state->m_scu.ism & IRQ_VDP1_END))
+		if(!(m_scu.ism & IRQ_VDP1_END))
 		{
-			state->m_maincpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d);
+			m_maincpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d);
 			scu_do_transfer(timer.machine(),6);
 		}
 		else
-			state->m_scu.ist |= (IRQ_VDP1_END);
+			m_scu.ist |= (IRQ_VDP1_END);
 	}
 
 	if(scanline == 0*y_step)
 	{
-		if(!(state->m_scu.ism & IRQ_VBLANK_OUT))
+		if(!(m_scu.ism & IRQ_VBLANK_OUT))
 		{
-			state->m_maincpu->set_input_line_and_vector(0xe, HOLD_LINE, 0x41);
+			m_maincpu->set_input_line_and_vector(0xe, HOLD_LINE, 0x41);
 			scu_do_transfer(timer.machine(),1);
 		}
 		else
-			state->m_scu.ist |= (IRQ_VBLANK_OUT);
+			m_scu.ist |= (IRQ_VBLANK_OUT);
 
 	}
 	else if(scanline == vblank_line*y_step)
 	{
-		if(!(state->m_scu.ism & IRQ_VBLANK_IN))
+		if(!(m_scu.ism & IRQ_VBLANK_IN))
 		{
-			state->m_maincpu->set_input_line_and_vector(0xf, HOLD_LINE ,0x40);
+			m_maincpu->set_input_line_and_vector(0xf, HOLD_LINE ,0x40);
 			scu_do_transfer(timer.machine(),0);
 		}
 		else
-			state->m_scu.ist |= (IRQ_VBLANK_IN);
+			m_scu.ist |= (IRQ_VBLANK_IN);
 	}
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
 	{
-		if(!(state->m_scu.ism & IRQ_HBLANK_IN))
+		if(!(m_scu.ism & IRQ_HBLANK_IN))
 		{
-			state->m_maincpu->set_input_line_and_vector(0xd, HOLD_LINE, 0x42);
+			m_maincpu->set_input_line_and_vector(0xd, HOLD_LINE, 0x42);
 			scu_do_transfer(timer.machine(),2);
 		}
 		else
-			state->m_scu.ist |= (IRQ_HBLANK_IN);
+			m_scu.ist |= (IRQ_HBLANK_IN);
 	}
 
-	if(scanline == (state->m_scu_regs[36] & 0x3ff)*y_step)
+	if(scanline == (m_scu_regs[36] & 0x3ff)*y_step)
 	{
-		if(!(state->m_scu.ism & IRQ_TIMER_0))
+		if(!(m_scu.ism & IRQ_TIMER_0))
 		{
-			state->m_maincpu->set_input_line_and_vector(0xc, HOLD_LINE, 0x43 );
+			m_maincpu->set_input_line_and_vector(0xc, HOLD_LINE, 0x43 );
 			scu_do_transfer(timer.machine(),3);
 		}
 		else
-			state->m_scu.ist |= (IRQ_TIMER_0);
+			m_scu.ist |= (IRQ_TIMER_0);
 	}
 
 	/* TODO: this isn't completely correct */
-	if(state->m_scu_regs[38] & 0x1)
+	if(m_scu_regs[38] & 0x1)
 	{
-		if((!(state->m_scu_regs[38] & 0x100) && (scanline % y_step) == 0) ||
-		    ((state->m_scu_regs[38] & 0x100) && (scanline == (state->m_scu_regs[36] & 0x3ff)*y_step)))
+		if((!(m_scu_regs[38] & 0x100) && (scanline % y_step) == 0) ||
+		    ((m_scu_regs[38] & 0x100) && (scanline == (m_scu_regs[36] & 0x3ff)*y_step)))
 		{
-			if(!(state->m_scu.ism & IRQ_TIMER_1))
+			if(!(m_scu.ism & IRQ_TIMER_1))
 			{
-				state->m_maincpu->set_input_line_and_vector(0xb, HOLD_LINE, 0x44 );
+				m_maincpu->set_input_line_and_vector(0xb, HOLD_LINE, 0x44 );
 				scu_do_transfer(timer.machine(),4);
 			}
 			else
-				state->m_scu.ist |= (IRQ_TIMER_1);
+				m_scu.ist |= (IRQ_TIMER_1);
 		}
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( saturn_slave_scanline )
+TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_slave_scanline )
 {
-	saturn_state *state = timer.machine().driver_data<saturn_state>();
 	int scanline = param;
 	int max_y = timer.machine().primary_screen->height();
 	int y_step,vblank_line;
 
 	y_step = 2;
 
-	if((max_y == 263 && state->m_vdp2.pal == 0) || (max_y == 313 && state->m_vdp2.pal == 1))
+	if((max_y == 263 && m_vdp2.pal == 0) || (max_y == 313 && m_vdp2.pal == 1))
 		y_step = 1;
 
-	vblank_line = (state->m_vdp2.pal) ? 288 : 240;
+	vblank_line = (m_vdp2.pal) ? 288 : 240;
 
 	if(scanline == vblank_line*y_step)
-		state->m_slave->set_input_line_and_vector(0x6, HOLD_LINE, 0x43);
+		m_slave->set_input_line_and_vector(0x6, HOLD_LINE, 0x43);
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
-		state->m_slave->set_input_line_and_vector(0x2, HOLD_LINE, 0x41);
+		m_slave->set_input_line_and_vector(0x2, HOLD_LINE, 0x41);
 }
 
 /* Die Hard Trilogy tests RAM address 0x25e7ffe bit 2 with Slave during FRT minit irq, in-development tool for breaking execution of it? */
@@ -2185,12 +2184,12 @@ static MACHINE_CONFIG_START( saturn, saturn_state )
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(saturn_mem)
 	MCFG_CPU_CONFIG(sh2_conf_master)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", saturn_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", saturn_state, saturn_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(saturn_mem)
 	MCFG_CPU_CONFIG(sh2_conf_slave)
-	MCFG_TIMER_ADD_SCANLINE("slave_scantimer", saturn_slave_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_scantimer", saturn_state, saturn_slave_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
@@ -2273,12 +2272,12 @@ static MACHINE_CONFIG_START( stv, saturn_state )
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(stv_mem)
 	MCFG_CPU_CONFIG(sh2_conf_master)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", saturn_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", saturn_state, saturn_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(stv_mem)
 	MCFG_CPU_CONFIG(sh2_conf_slave)
-	MCFG_TIMER_ADD_SCANLINE("slave_scantimer", saturn_slave_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_scantimer", saturn_state, saturn_slave_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)

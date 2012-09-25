@@ -97,6 +97,7 @@ public:
 	DECLARE_MACHINE_RESET(battles);
 	UINT32 screen_update_xevious(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(battles_interrupt_4);
+	TIMER_DEVICE_CALLBACK_MEMBER(battles_nmi_generate);
 };
 
 
@@ -192,7 +193,6 @@ DECLARE_READ8_HANDLER( xevious_bb_r );
 /*----------- defined in machine/xevious.c -----------*/
 
 void battles_customio_init(running_machine &machine);
-TIMER_DEVICE_CALLBACK( battles_nmi_generate );
 
 DECLARE_READ8_HANDLER( battles_customio0_r );
 DECLARE_READ8_HANDLER( battles_customio_data0_r );

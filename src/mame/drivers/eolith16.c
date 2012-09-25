@@ -179,7 +179,7 @@ PALETTE_INIT_MEMBER(eolith16_state,eolith16)
 static MACHINE_CONFIG_START( eolith16, eolith16_state )
 	MCFG_CPU_ADD("maincpu", E116T, 60000000)		/* no internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(eolith16_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", eolith_speedup, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith16_state, eolith_speedup, "screen", 0, 1)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C66)
 

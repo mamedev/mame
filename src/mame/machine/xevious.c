@@ -35,7 +35,7 @@ void battles_customio_init(running_machine &machine)
 }
 
 
-TIMER_DEVICE_CALLBACK( battles_nmi_generate )
+TIMER_DEVICE_CALLBACK_MEMBER(xevious_state::battles_nmi_generate)
 {
 
 	battles_customio_prev_command = battles_customio_command;
@@ -44,18 +44,18 @@ TIMER_DEVICE_CALLBACK( battles_nmi_generate )
 	{
 		if( battles_customio_command_count == 0 )
 		{
-			timer.machine().device("sub3")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			machine().device("sub3")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 		else
 		{
-			timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-			timer.machine().device("sub3")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			machine().device("sub3")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 	else
 	{
-		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		timer.machine().device("sub3")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("sub3")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	battles_customio_command_count++;
 }

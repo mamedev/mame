@@ -1872,7 +1872,7 @@ static MACHINE_CONFIG_DERIVED( battles, xevious )
 	MCFG_CPU_PROGRAM_MAP(battles_mem4)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", xevious_state, battles_interrupt_4)
 
-	MCFG_TIMER_ADD("battles_nmi", battles_nmi_generate)
+	MCFG_TIMER_DRIVER_ADD("battles_nmi", xevious_state, battles_nmi_generate)
 
 	MCFG_MACHINE_RESET_OVERRIDE(xevious_state,battles)
 
