@@ -44,7 +44,7 @@
 	</software>
 
 	<software name="4in1funj" cloneof="4in1fun">
-		<description>4 in 1 Funpak (Jpn)</description>
+		<description>4 in 1 - Funpak (Jpn)</description>
 		<year>1992</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-F4J"/>
@@ -58,7 +58,7 @@
 	</software>
 
 	<software name="4in1fun">
-		<description>4 in 1 Funpak (Euro, USA)</description>
+		<description>4 in 1 - Funpak (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Interplay</publisher>
 		<info name="serial" value="DMG-F4-USA, DMG-F4-NOE"/>
@@ -70,7 +70,7 @@
 	</software>
 
 	<software name="4in1fun2">
-		<description>4 in 1 Funpak Vol. II (Euro, USA)</description>
+		<description>4 in 1 - Funpak: Vol. II (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Interplay</publisher>
 		<info name="serial" value="DMG-F9-USA, DMG-F9-GPS"/>
@@ -485,7 +485,7 @@
 		</part>
 	</software>
 
-	<software name="altspace">
+	<software name="altspace" supported="partial">
 		<description>Altered Space - A 3-D Alien Adventure (Euro)</description>
 		<year>1991</year>
 		<publisher>Hi Tech Expressions</publisher>
@@ -496,7 +496,7 @@
 		</part>
 	</software>
 
-	<software name="altspacej" cloneof="altspace">
+	<software name="altspacej" cloneof="altspace" supported="partial">
 		<description>Altered Space - A 3-D Alien Adventure (Jpn)</description>
 		<year>1991</year>
 		<publisher>Epic Sony Record</publisher>
@@ -510,7 +510,7 @@
 		</part>
 	</software>
 
-	<software name="altspaceu" cloneof="altspace">
+	<software name="altspaceu" cloneof="altspace" supported="partial">
 		<description>Altered Space - A 3-D Alien Adventure (USA)</description>
 		<year>1991</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -776,7 +776,7 @@
 		</part>
 	</software>
 
-	<software name="arcadcl4">
+	<software name="arcadcl4" supported="partial">
 		<!-- Notes: SGB enhanced -->
 		<description>Arcade Classic No. 4 - Defender &amp; Joust (Euro, USA)</description>
 		<year>1995</year>
@@ -861,12 +861,13 @@
 		</part>
 	</software>
 
-	<software name="astobelx">
+	<software name="obelix">
 		<!-- Notes: SGB enhanced -->
-		<description>Astérix &amp; Obélix (Euro, English / Spanish)</description>
+		<description>Obélix (Euro, English / Spanish)</description>
 		<year>1995</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="DMG-AXOS-EUR"/>
+		<info name="alt_title" value="Astérix &amp; Obélix (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="asterix &amp; obelix (europe) (en,es).bin" size="262144" crc="b1fd41d0" sha1="b6cd446962357d0f560a5c9fae4c917e039fbb77" offset="000000" />
@@ -874,11 +875,13 @@
 		</part>
 	</software>
 
-	<software name="astobelxa" cloneof="astobelx">
+	<software name="obelixa" cloneof="obelix">
 		<!-- Notes: SGB enhanced -->
-		<description>Astérix &amp; Obélix (Euro, French / German)</description>
+		<description>Obélix (Euro, French / German)</description>
 		<year>1995</year>
 		<publisher>Infogrames</publisher>
+		<info name="serial" value="DMG-AXOP-FAH"/>
+		<info name="alt_title" value="Astérix &amp; Obélix (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="asterix &amp; obelix (europe) (fr,de).bin" size="262144" crc="5143e227" sha1="ebc68b180680c7037b151b9a1b511b681499ba30" offset="000000" />
@@ -1012,7 +1015,7 @@
 		</part>
 	</software>
 
-	<software name="babytrex">
+	<software name="babytrex" cloneof="wereback">
 		<description>Baby T-Rex (Euro)</description>
 		<year>1993</year>
 		<publisher>Laser Beam Entertainment</publisher>
@@ -1147,27 +1150,13 @@
 		</part>
 	</software>
 
-	<software name="bartjack" cloneof="bartbean">
-		<description>Bart no Jack to Mame no Ki (Jpn)</description>
-		<year>1994</year>
-		<publisher>Acclaim Japan</publisher>
-		<info name="serial" value="DMG-EKA"/>
-		<info name="release" value="19940930"/>
-		<info name="alt_title" value="バートのジャックと豆の木"/>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="131072">
-				<rom name="bart no jack to mame no ki (japan).bin" size="131072" crc="7aa4e0bb" sha1="f73e5fda698e102d8cad610bd601c73f6ec6e51a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bartsurv" cloneof="bartesc">
-		<description>Bart no Survival Camp (Jpn)</description>
+	<software name="bartescj" cloneof="bartesc">
+		<description>Bart Simpson's Escape from Camp Deadly (Jpn)</description>
 		<year>1993</year>
 		<publisher>Acclaim Japan</publisher>
 		<info name="serial" value="DMG-TSA"/>
 		<info name="release" value="19930226"/>
-		<info name="alt_title" value="バートのサバイバルキャンプ"/>
+		<info name="alt_title" value="バートのサバイバルキャンプ ~ Bart no Survival Camp (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="bart no survival camp (japan).bin" size="131072" crc="0fd66b1a" sha1="f0d855bba656b628c7dd9ed9e586853be75b790f" offset="000000" />
@@ -1357,7 +1346,7 @@
 		</part>
 	</software>
 
-	<software name="bbull">
+	<software name="bbullj" cloneof="bbull">
 		<description>Battle Bull (Jpn)</description>
 		<year>1990</year>
 		<publisher>Seta</publisher>
@@ -1371,7 +1360,7 @@
 		</part>
 	</software>
 
-	<software name="bbullu" cloneof="bbull">
+	<software name="bbull">
 		<description>Battle Bull (USA)</description>
 		<year>1991</year>
 		<publisher>Seta</publisher>
@@ -1451,7 +1440,8 @@
 		</part>
 	</software>
 
-	<software name="bspace">
+<!-- Requires barcode boy set emulation -->
+	<software name="bspace" supported="no">
 		<description>Battle Space (Jpn)</description>
 		<year>1992</year>
 		<publisher>Namcot</publisher>
@@ -1602,11 +1592,11 @@
 		</part>
 	</software>
 
-	<software name="beethov2">
-		<!-- Alt. Title: Beethoven: The Ultimate Canine Caper (Box) -->
-		<description>Beethoven's 2nd (Euro)</description>
+	<software name="beethovn">
+		<description>Beethoven (Euro)</description>
 		<year>1994</year>
 		<publisher>Hi Tech Expressions</publisher>
+		<info name="alt_title" value="Beethoven - The Ultimate Canine Caper (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="beethoven's 2nd (europe).bin" size="131072" crc="637e54e3" sha1="a175778faca00f096f0bfdbaa844a38816bbeb0f" offset="000000" />
@@ -1869,7 +1859,7 @@
 	</software>
 
 	<software name="bluesbja">
-		<description>The Blues Brothers - Jukebox Adventure (Euro)</description>
+		<description>Blues Brothers - Jukebox Adventure (Euro)</description>
 		<year>1994</year>
 		<publisher>Titus</publisher>
 		<info name="serial" value="DMG-J6-UKV"/>
@@ -1974,7 +1964,7 @@
 		</part>
 	</software>
 
-	<software name="bombcoll">
+	<software name="bombcoll" supported="no">
 		<!-- Notes: SGB enhanced -->
 		<description>Bomberman Collection (Jpn)</description>
 		<year>1996</year>
@@ -9429,7 +9419,7 @@
 		</part>
 	</software>
 
-	<software name="bugsyuka">
+	<software name="bugsyuka" cloneof="looney">
 		<description>Looney Tunes - Bugs Bunny to Yukai na Nakama-tachi (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
@@ -16296,6 +16286,20 @@
 		</part>
 	</software>
 
+	<software name="bartbeanj" cloneof="bartbean">
+		<description>The Simpsons - Bart &amp; the Beanstalk (Jpn)</description>
+		<year>1994</year>
+		<publisher>Acclaim Japan</publisher>
+		<info name="serial" value="DMG-EKA"/>
+		<info name="release" value="19940930"/>
+		<info name="alt_title" value="バートのジャックと豆の木 ~ Bart no Jack to Mame no Ki (Box)"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="bart no jack to mame no ki (japan).bin" size="131072" crc="7aa4e0bb" sha1="f73e5fda698e102d8cad610bd601c73f6ec6e51a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bartvsju">
 		<description>The Simpsons - Bart vs. the Juggernauts (Euro, USA)</description>
 		<year>1992</year>
@@ -18422,7 +18426,7 @@
 		</part>
 	</software>
 
-	<software name="asmikkw" cloneof="asmikwld">
+	<software name="asmikwldj" cloneof="asmikwld">
 		<description>Teke! Teke! Asmik-kun World (Jpn)</description>
 		<year>1989</year>
 		<publisher>Asmik Ace</publisher>
@@ -20932,7 +20936,7 @@
 
 	<software name="azone">
 		<description>Arctic Zone (ripped from 4-in-1 4B-005)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
@@ -20976,7 +20980,7 @@
 
 	<software name="bombdisp">
 		<description>Bomb Disposer (ripped from 4-in-1 4B-006)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
@@ -20987,7 +20991,7 @@
 
 	<software name="aforce">
 		<description>A-Force (ripped from 4-in-1 4B-006)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
@@ -20998,7 +21002,7 @@
 
 	<software name="bftale">
 		<description>Black Forest Tale (ripped from 4-in-1 4B-006)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
@@ -21009,7 +21013,7 @@
 
 	<software name="2ndspace">
 		<description>2nd Space (ripped from 4-in-1 4B-006)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
@@ -21018,9 +21022,9 @@
 		</part>
 	</software>
 
-	<software name="antsoldr">
+	<software name="antsoldr" supported="partial">
 		<description>Ant Soldier (ripped from 4-in-1 4B-007)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
@@ -21062,7 +21066,7 @@
 		</part>
 	</software>
 
-	<software name="captkk">
+	<software name="captkk" supported="no">
 		<description>Captain Knick-Knack (ripped from 4-in-1 4B-008)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>

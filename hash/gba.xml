@@ -6106,7 +6106,7 @@
 		</part>
 	</software>
 
-	<software name="castlewn">
+	<software name="castlewn" supported="partial">
 		<description>Castleween (Euro)</description>
 		<year>2002</year>
 		<publisher>Wanadoo</publisher>
@@ -20165,7 +20165,7 @@
 		</part>
 	</software>
 
-	<software name="mahopmpk" cloneof="castlewn">
+	<software name="mahopmpk" cloneof="castlewn" supported="partial">
 		<description>Mahou no Pumpkin - Ann to Greg no Daibouken (Jpn)</description>
 		<year>2003</year>
 		<publisher>MTO</publisher>
@@ -30452,7 +30452,7 @@
 		</part>
 	</software>
 
-	<software name="smuggler">
+	<software name="smuggler" supported="no">
 		<description>Smuggler's Run (Euro)</description>
 		<year>2002</year>
 		<publisher>Digital Worldwide</publisher>
@@ -30476,7 +30476,7 @@
 		</part>
 	</software>
 
-	<software name="smurfs">
+	<software name="smurfs" supported="partial">
 		<!-- Alt. Title: The Revenge of the Smurfs (Box) -->
 		<description>The Smurfs - The Revenge of the Smurfs (Euro)</description>
 		<year>2002</year>
@@ -30564,7 +30564,7 @@
 		</part>
 	</software>
 
-	<software name="sonic">
+	<software name="sonic" supported="partial">
 		<description>Sonic Advance (Euro)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
@@ -30577,7 +30577,7 @@
 		</part>
 	</software>
 
-	<software name="sonicj" cloneof="sonic">
+	<software name="sonicj" cloneof="sonic" supported="partial">
 		<description>Sonic Advance (Jpn, Rev. 1)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
@@ -30592,7 +30592,7 @@
 		</part>
 	</software>
 
-	<software name="sonicja" cloneof="sonic">
+	<software name="sonicja" cloneof="sonic" supported="partial">
 		<description>Sonic Advance (Jpn)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
@@ -30607,7 +30607,7 @@
 		</part>
 	</software>
 
-	<software name="sonicu" cloneof="sonic">
+	<software name="sonicu" cloneof="sonic" supported="partial">
 		<description>Sonic Advance (USA)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
@@ -30620,7 +30620,7 @@
 		</part>
 	</software>
 
-	<software name="sonic2">
+	<software name="sonic2" supported="partial">
 		<description>Sonic Advance 2 (Euro)</description>
 		<year>2003</year>
 		<publisher>Infogrames</publisher>
@@ -30633,7 +30633,7 @@
 		</part>
 	</software>
 
-	<software name="sonic2j" cloneof="sonic2">
+	<software name="sonic2j" cloneof="sonic2" supported="partial">
 		<description>Sonic Advance 2 (Jpn)</description>
 		<year>2002</year>
 		<publisher>Sega</publisher>
@@ -30648,7 +30648,7 @@
 		</part>
 	</software>
 
-	<software name="sonic2u" cloneof="sonic2">
+	<software name="sonic2u" cloneof="sonic2" supported="partial">
 		<description>Sonic Advance 2 (USA)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
@@ -30661,8 +30661,8 @@
 		</part>
 	</software>
 
-	<software name="sonic3p" cloneof="sonic3">
-		<description>Sonic Advance 3 (Euro, Prototype)</description>
+	<software name="sonic3p" cloneof="sonic3" supported="partial">
+		<description>Sonic Advance 3 (Jpn, Prototype)</description>
 		<year>2004</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gba_cart">
@@ -30673,7 +30673,7 @@
 		</part>
 	</software>
 
-	<software name="sonic3">
+	<software name="sonic3" supported="partial">
 		<description>Sonic Advance 3 (Euro)</description>
 		<year>2004</year>
 		<publisher>THQ</publisher>
@@ -30686,7 +30686,7 @@
 		</part>
 	</software>
 
-	<software name="sonic3j" cloneof="sonic3">
+	<software name="sonic3j" cloneof="sonic3" supported="partial">
 		<description>Sonic Advance 3 (Jpn)</description>
 		<year>2004</year>
 		<publisher>Sega</publisher>
@@ -30701,7 +30701,7 @@
 		</part>
 	</software>
 
-	<software name="sonic3u" cloneof="sonic3">
+	<software name="sonic3u" cloneof="sonic3" supported="partial">
 		<description>Sonic Advance 3 (USA)</description>
 		<year>2004</year>
 		<publisher>THQ</publisher>
@@ -31185,7 +31185,7 @@
 		</part>
 	</software>
 
-	<software name="spirspel" cloneof="castlewn">
+	<software name="spirspel" cloneof="castlewn" supported="partial">
 		<description>Spirits &amp; Spells (USA)</description>
 		<year>2003</year>
 		<publisher>Dreamcatcher</publisher>
@@ -31394,7 +31394,7 @@
 		</part>
 	</software>
 
-	<software name="spilbase">
+	<software name="spilbase" supported="no">
 		<description>Sports Illustrated for Kids - Baseball (USA)</description>
 		<year>2001</year>
 		<publisher>BAM! Entertainment</publisher>
@@ -31407,7 +31407,7 @@
 		</part>
 	</software>
 
-	<software name="spilfoot">
+	<software name="spilfoot" supported="partial">
 		<description>Sports Illustrated for Kids - Football (USA)</description>
 		<year>2003</year>
 		<publisher>BAM! Entertainment</publisher>
@@ -32765,7 +32765,7 @@
 		</part>
 	</software>
 
-	<software name="smb">
+	<software name="smb" supported="partial">
 		<description>Super Mario Bros. (Jpn, Hot Mario Campaign)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34378,7 +34378,7 @@
 		</part>
 	</software>
 
-	<software name="splintclp" cloneof="splintcl">
+	<software name="splintclp" cloneof="splintcl" supported="no">
 		<description>Tom Clancy's Splinter Cell (Euro, Prototype)</description>
 		<year>2003</year>
 		<publisher>Ubi Soft</publisher>
@@ -34390,7 +34390,7 @@
 		</part>
 	</software>
 
-	<software name="splintcl">
+	<software name="splintcl" supported="no">
 		<description>Tom Clancy's Splinter Cell (Euro)</description>
 		<year>2003</year>
 		<publisher>Ubi Soft</publisher>
@@ -34403,7 +34403,7 @@
 		</part>
 	</software>
 
-	<software name="splintclu" cloneof="splintcl">
+	<software name="splintclu" cloneof="splintcl" supported="no">
 		<description>Tom Clancy's Splinter Cell (USA)</description>
 		<year>2003</year>
 		<publisher>Ubi Soft</publisher>

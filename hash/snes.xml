@@ -31902,7 +31902,7 @@ Alternate board (XL-1)
 		<info name="alt_title" value="エナジーブレイカー" />
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
-				<rom name="energy breaker (japan).sfc" size="3145728" crc="f70f2a95" sha1="20321943fd6f2a15e43da8406220a720fce94f38" offset="0x000000" />
+				<rom name="energy breaker (japan).sfc" size="3145728" crc="74d89d96" sha1="3c9fa95193170428bc4a705e45db7fe5d9ea1e2c" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -43908,7 +43908,7 @@ Alternate board (XL-1)
 		<info name="alt_title" value="ポパイいじわる魔女シーハッグ の巻" />
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1572864">
-				<rom name="popeye - ijiwaru majo sea hag no maki (japan).sfc" size="1572864" crc="f9171003" sha1="a6087c97493e418c4dd2c9811a9e1876abe3867e" offset="0x000000" />
+				<rom name="popeye - ijiwaru majo sea hag no maki (japan).sfc" size="1572864" crc="f5bfcd90" sha1="0b762610f612b98941203ca82c98e3d6082e3535" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>

@@ -22,13 +22,11 @@ Undumped:
 - The Lion King - Simba's Mighty Adventure CGB-BLKP-UKV
 - Mary-Kate and Ashley - Crush Course CGB-BCVP-UKV
 - Mary-Kate and Ashley - Pocket Planner DMG-BMAP-EUR
-- Matchbox Emergency Patrol CGB-BEPP-EUR
 - Mickey's Racing Adventure CGB-ARNP-EUR
 - Microsoft Pinball Arcade CGB-BMQP-EUR
 - MTV Sports - Skateboarding featuring Andy MacDonald CGB-BMTP-EUR
 - NHL 2000 DMG-ANRP-EUR
 - Rampage 2 - Universal Tour CGB-AUTP-EUR
-- Road Rash CGB-BRRP-EUR
 - Rocket Power - Gettin' Air CGB-BRUP-EUR
 - San Francisco Rush 2049 (Euro, fr/de/nl) [small pic]
 - Sesame Street Sports (Euro) [small pic]
@@ -9560,10 +9558,10 @@ Undumped Pirates:
 
 	<software name="matchbox">
 		<!-- Notes: GBC only -->
-		<description>Matchbox Emergency Patrol (USA)</description>
+		<description>Matchbox Emergency Patrol (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="CGB-BEPE-USA"/>
+		<info name="serial" value="CGB-BEPE-USA, CGB-BEPP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="matchbox emergency patrol (usa).bin" size="2097152" crc="a3f23d7e" sha1="8697a1a2d3575527c06114b422bd855384cf8905" offset="000000" />
@@ -14096,10 +14094,10 @@ Undumped Pirates:
 
 	<software name="roadrash">
 		<!-- Notes: GBC only -->
-		<description>Road Rash (USA)</description>
+		<description>Road Rash (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="CGB-BRRE-USA"/>
+		<info name="serial" value="CGB-BRRE-USA, CGB-BRRP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="road rash (usa).bin" size="1048576" crc="11025eeb" sha1="b3329c0f92c1a6a6cfa894f487f68a7fcceb5844" offset="000000" />
