@@ -135,8 +135,6 @@ private:
 	void scsi_out_line_req(UINT8 state);
 	void scsibus_read_data();
 	void scsibus_write_data();
-	int datain_done();
-	int dataout_done();
 	void scsibus_exec_command();
 	void check_process_dataout();
 	void dump_command_bytes();
@@ -156,7 +154,6 @@ private:
 
 	UINT8       buffer[ADAPTEC_BUF_SIZE];
 	UINT16      data_idx;
-	int         xfer_count;
 	int         bytes_left;
 	int         data_last;
 	int         sectorbytes;

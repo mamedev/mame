@@ -64,25 +64,26 @@ void scsibus_device::scsibus_read_data()
 {
 	data_last = (bytes_left >= sectorbytes) ? sectorbytes : bytes_left;
 
-	LOG(2,"SCSIBUS:scsibus_read_data bytes_left=%04X, data_last=%04X, xfer_count=%04X\n",bytes_left,data_last,xfer_count);
+	LOG(2,"SCSIBUS:scsibus_read_data bytes_left=%04X, data_last=%04X\n",bytes_left,data_last);
 
 	if (data_last > 0)
 	{
 		devices[last_id]->ReadData(buffer, data_last);
 		bytes_left-=data_last;
-		data_idx=0;
 	}
+
+	data_idx=0;
 }
 
 void scsibus_device::scsibus_write_data()
 {
-	if(bytes_left >= sectorbytes)
+	if (data_last > 0)
 	{
-		devices[last_id]->WriteData(buffer, sectorbytes);
-
-		bytes_left-=sectorbytes;
-		data_idx=0;
+		devices[last_id]->WriteData(buffer, data_last);
+		bytes_left-=data_last;
 	}
+
+	data_idx=0;
 }
 
 /* SCSI Bus read/write */
@@ -94,14 +95,7 @@ UINT8 scsibus_device::scsi_data_r()
 	switch (phase)
 	{
 		case SCSI_PHASE_DATAIN:
-			result=buffer[data_idx++];
-
-			// check to see if we have reached the end of the block buffer
-			// and that there is more data to read from the scsi disk
-			if((data_idx==sectorbytes) && (bytes_left>0) && IS_READ_COMMAND())
-			{
-				scsibus_read_data();
-			}
+			result=buffer[data_idx];
 			break;
 
 		case SCSI_PHASE_STATUS:
@@ -134,44 +128,39 @@ void scsibus_device::scsi_data_w( UINT8 data )
 			break;
 
 		case SCSI_PHASE_COMMAND:
-			command[cmd_idx++]=data;
+			command[cmd_idx]=data;
 			break;
 
 		case SCSI_PHASE_DATAOUT:
 
-			//LOG(1,"SCSIBUS:xfer_count=%02X, bytes_left=%02X data_idx=%02X\n",xfer_count,bytes_left,data_idx);
+			//LOG(1,"SCSIBUS:bytes_left=%02X data_idx=%02X\n",bytes_left,data_idx);
 
 			if(IS_COMMAND(SCSI_CMD_FORMAT_UNIT))
 			{
 				// Only store the first 4 bytes of the bad block list (the header)
 				//if(data_idx<4)
-					buffer[data_idx++]=data;
+					buffer[data_idx]=data;
 					dump_data_bytes(4);
 				//else
 				//   data_idx++;
 
 				// If we have the first byte, then cancel the dataout timout
-				if(data_idx==1)
+				if(data_idx==0)
 					dataout_timer->adjust(attotime::never);
 
 				// When we have the first 3 bytes, calculate how many more are in the
 				// bad block list.
-				if(data_idx==3)
+				if(data_idx==2)
 				{
-					xfer_count+=((buffer[2]<<8)+buffer[3]);
-					data_last=xfer_count;
-					LOG(1,"format_unit reading an extra %d bytes\n",xfer_count-4);
+					bytes_left+=((buffer[2]<<8)+buffer[3]);
+					LOG(1,"format_unit reading an extra %d bytes\n",bytes_left-4);
 					dump_data_bytes(4);
 				}
 			}
 			else
 			{
-				buffer[data_idx++]=data;
+				buffer[data_idx]=data;
 			}
-
-			// If the data buffer is full, and we are writing blocks flush it to the SCSI disk
-			if((data_idx == sectorbytes) && IS_WRITE_COMMAND())
-				scsibus_write_data();
 			break;
 	}
 }
@@ -277,17 +266,13 @@ void scsibus_device::scsibus_exec_command()
 			else
 				devices[last_id]->SetPhase(SCSI_PHASE_STATUS);
 
-			xfer_count=4;
-			data_last=xfer_count;
-			bytes_left=0;
+			bytes_left=4;
 			dataout_timer->adjust(attotime::from_seconds(FORMAT_UNIT_TIMEOUT));
 			break;
 
 		case SCSI_CMD_SEARCH_DATA_EQUAL:
 			LOG(1,"SCSIBUS: Search_data_equaln");
 			command_local=1;
-			xfer_count=0;
-			data_last=xfer_count;
 			bytes_left=0;
 			devices[last_id]->SetPhase(SCSI_PHASE_STATUS);
 			break;
@@ -301,9 +286,7 @@ void scsibus_device::scsibus_exec_command()
 			buffer[3] = 0x00; // defect list len msb
 			buffer[4] = 0x00; // defect list len lsb
 
-			xfer_count=4;
-			data_last=xfer_count;
-			bytes_left=0;
+			bytes_left=4;
 			devices[last_id]->SetPhase(SCSI_PHASE_DATAIN);
 			break;
 
@@ -311,9 +294,7 @@ void scsibus_device::scsibus_exec_command()
 		case SCSI_CMD_BUFFER_WRITE:
 			LOG(1,"SCSIBUS: write_buffer\n");
 			command_local=1;
-			xfer_count=(command[7]<<8)+command[8];
-			data_last=xfer_count;
-			bytes_left=0;
+			bytes_left=(command[7]<<8)+command[8];
 			devices[last_id]->SetPhase(SCSI_PHASE_DATAOUT);
 			break;
 
@@ -321,9 +302,7 @@ void scsibus_device::scsibus_exec_command()
 		case SCSI_CMD_BUFFER_READ:
 			LOG(1,"SCSIBUS: read_buffer\n");
 			command_local=1;
-			xfer_count=(command[7]<<8)+command[8];
-			data_last=xfer_count;
-			bytes_left=0;
+			bytes_left=(command[7]<<8)+command[8];
 			devices[last_id]->SetPhase(SCSI_PHASE_DATAIN);
 			break;
 	}
@@ -334,9 +313,7 @@ void scsibus_device::scsibus_exec_command()
 	if(!command_local)
 	{
 		devices[last_id]->SetCommand(command, cmd_idx);
-		devices[last_id]->ExecCommand(&xfer_count);
-		bytes_left=xfer_count;
-		data_last=xfer_count;
+		devices[last_id]->ExecCommand(&bytes_left);
 		data_idx=0;
 	}
 
@@ -344,37 +321,11 @@ void scsibus_device::scsibus_exec_command()
 
 	scsi_change_phase(newphase);
 
-	LOG(1,"SCSIBUS:xfer_count=%02X, bytes_left=%02X data_idx=%02X\n",xfer_count,bytes_left,data_idx);
+	LOG(1,"SCSIBUS:bytes_left=%02X data_idx=%02X\n",bytes_left,data_idx);
 
 	// This is correct as we need to read from disk for commands other than just read data
 	if ((phase == SCSI_PHASE_DATAIN) && (!command_local))
 		scsibus_read_data();
-}
-
-int scsibus_device::datain_done()
-{
-	int result=0;
-
-	// Read data commands
-	if(IS_READ_COMMAND() && (data_idx == data_last) && (bytes_left == 0))
-		result=1;
-	else if (data_idx==data_last)
-		result=1;
-
-	return result;
-}
-
-int scsibus_device::dataout_done()
-{
-	int result=0;
-
-	// Write data commands
-	if(IS_WRITE_COMMAND() && (data_idx == 0) && (bytes_left == 0))
-		result=1;
-	else if (data_idx==data_last)
-		result=1;
-
-	return result;
 }
 
 void scsibus_device::check_process_dataout()
@@ -438,6 +389,8 @@ void scsibus_device::scsi_in_line_changed(UINT8 line, UINT8 state)
 			{
 				if(state)
 				{
+					cmd_idx++;
+
 					// If the command is ready go and execute it
 					if(cmd_idx==get_scsi_cmd_len(command[0]))
 					{
@@ -456,7 +409,16 @@ void scsibus_device::scsi_in_line_changed(UINT8 line, UINT8 state)
 			{
 				if(state)
 				{
-					if(datain_done())
+					data_idx++;
+
+					// check to see if we have reached the end of the block buffer
+					// and that there is more data to read from the scsi disk
+					if(data_idx==sectorbytes)
+					{
+						scsibus_read_data();
+					}
+
+					if(data_idx == data_last && bytes_left == 0)
 						scsi_change_phase(SCSI_PHASE_STATUS);
 					else
 						scsi_out_line_change(SCSI_LINE_REQ,0);
@@ -471,7 +433,16 @@ void scsibus_device::scsi_in_line_changed(UINT8 line, UINT8 state)
 			{
 				if(state)
 				{
-					if(dataout_done())
+					data_idx++;
+					
+					// If the data buffer is full flush it to the SCSI disk
+
+					data_last = (bytes_left >= sectorbytes) ? sectorbytes : bytes_left;
+
+					if(data_idx == data_last)
+						scsibus_write_data();
+
+					if(data_idx == 0 && bytes_left == 0)
 					{
 						check_process_dataout();
 						scsi_change_phase(SCSI_PHASE_STATUS);
