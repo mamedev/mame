@@ -681,7 +681,7 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen, 
 
 						// otherwise, just add in sprite palette base
 						else
-							dest[x] = 1024 + (pix & 0x3ff);
+							dest[x] = 0x400 | (pix & 0x3ff);
 					}
 				}
 			}
@@ -752,7 +752,7 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_device 
 
 						// otherwise, just add in sprite palette base
 						else
-							dest[x] = 1024 + (pix & 0x3ff);
+							dest[x] = 0x400 | (pix & 0x3ff);
 					}
 				}
 			}
@@ -832,7 +832,7 @@ UINT32 segas1x_bootleg_state::screen_update_system16(screen_device &screen, bitm
 
 						// otherwise, just add in sprite palette base
 						else
-							dest[x] = 1024 + (pix & 0x3ff);
+							dest[x] = 0x400 | (pix & 0x3ff);
 					}
 				}
 			}
@@ -896,7 +896,7 @@ UINT32 segas1x_bootleg_state::screen_update_system18old(screen_device &screen, b
 
 						// otherwise, just add in sprite palette base
 						else
-							dest[x] = 1024 + (pix & 0x3ff);
+							dest[x] = 0x400 | (pix & 0x3ff);
 					}
 				}
 			}

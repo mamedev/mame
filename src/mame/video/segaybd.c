@@ -97,7 +97,7 @@ UINT32 segaybd_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 						// otherwise, just add in sprite palette base
 						else
-							dest[x] = 2048 + (pix & 0x3ff);
+							dest[x] = 0x800 | (pix & 0x7ff);
 					}
 				}
 			}

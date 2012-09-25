@@ -122,7 +122,7 @@ UINT32 segaorun_state::screen_update_shangon(screen_device &screen, bitmap_ind16
 
 						// otherwise, just add in sprite palette base
 						else
-							dest[x] = 1024 + (pix & 0x3ff);
+							dest[x] = 0x400 | (pix & 0x3ff);
 					}
 				}
 			}
@@ -189,7 +189,7 @@ UINT32 segaorun_state::screen_update_outrun(screen_device &screen, bitmap_ind16 
 
 						// otherwise, just add in sprite palette base
 						else
-							dest[x] = 2048 + (pix & 0x7ff);
+							dest[x] = 0x800 | (pix & 0x7ff);
 					}
 				}
 			}

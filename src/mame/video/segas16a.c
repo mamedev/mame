@@ -111,7 +111,7 @@ UINT32 segas16a_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 						// otherwise, just add in sprite palette base
 						else
-							dest[x] = 1024 + (pix & 0x3ff);
+							dest[x] = 0x400 | (pix & 0x3ff);
 					}
 				}
 			}
