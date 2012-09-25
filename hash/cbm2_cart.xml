@@ -88,4 +88,18 @@
 		</part>
 	</software>
 
+	<software name="graphic">
+		<description>High Resolution Graphics</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		
+		<part name="cart" interface="cbm2_cart">
+			<feature name="slot" value="graphic" />
+
+			<dataarea name="bank3" size="0x2000">
+				<rom name="324688-01.bin" size="0x2000" crc="863e9ef8" sha1="d75ffa97b2dd4e1baefe4acaa130daae866ab0e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
