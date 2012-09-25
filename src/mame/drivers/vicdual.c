@@ -1227,6 +1227,7 @@ static INPUT_PORTS_START( invho2 )
 
 	PORT_COIN
 
+	// SW1 @ C1, 6-pos (where are 5 & 6?)
 	PORT_START("FAKE_LIVES1")
 	PORT_DIPNAME( 0x03, 0x01, "Head On 2 Lives" )	PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "2" )
@@ -1290,6 +1291,7 @@ static INPUT_PORTS_START( invds )
 
 	PORT_COIN
 
+	// SW1 @ C1, 6-pos (where are 5 & 6?)
 	PORT_START("FAKE_LIVES1")
 	PORT_DIPNAME( 0x03, 0x03, "Invinco Lives" )		PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
@@ -2224,6 +2226,7 @@ static INPUT_PORTS_START( nsub )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 
+	// according to the manual, there's also an 8-pos dipswitch for coinage settings (MT 4717), where is it read?
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_composite_blank_comp, NULL)
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -2503,6 +2506,9 @@ Epr-273.u43
 Epr-274.u42
 Epr-275.u41
 Pr-69.u11
+
+Also PR33.u82 and PR34.u83 were not dumped from this pcb, couldn't be read because aluminium cooler on it.
+They're probably the same as on other games.
 
 This game use a separate "daughter" board for input ??? ref: 97269-P-B
 with a prom on it : PR-02 type MMI 6336-1j which is soldered.
@@ -3473,7 +3479,7 @@ GAME( 1979, headon2,  0,        headon2,  headon2, driver_device,  0, ROT0,   "S
 GAME( 1979, headon2s, headon2,  headon2bw,car2, driver_device,     0, ROT0,   "bootleg (Sidam)", "Head On 2 (Sidam bootleg)",  GAME_NOT_WORKING ) // won't coin up?
 GAME( 1979, car2,     headon2,  headon2bw,car2, driver_device,     0, ROT0,   "bootleg (RZ Bologna)", "Car 2 (bootleg of Head On 2)",  GAME_IMPERFECT_SOUND ) // title still says 'HeadOn 2'
 GAME( 1979, invho2,   0,        invho2,   invho2, driver_device,   0, ROT270, "Sega", "Invinco / Head On 2", GAME_IMPERFECT_SOUND )
-GAME( 1980, nsub,     0,        nsub,     nsub, driver_device,     0, ROT270, "Sega", "N-Sub (upright)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1980, nsub,     0,        nsub,     nsub, driver_device,     0, ROT270, "Sega", "N-Sub (upright)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND ) // this is the upright set. cocktail set still needs to be dumped
 GAME( 1980, samurai,  0,        samurai,  samurai, driver_device,  0, ROT270, "Sega", "Samurai", GAME_NO_SOUND )
 GAME( 1979, invinco,  0,        invinco,  invinco, driver_device,  0, ROT270, "Sega", "Invinco", GAME_IMPERFECT_SOUND )
 GAME( 1979, invds,    0,        invds,    invds, driver_device,    0, ROT270, "Sega", "Invinco / Deep Scan", GAME_IMPERFECT_SOUND )
