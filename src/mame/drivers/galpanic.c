@@ -621,7 +621,7 @@ static MACHINE_CONFIG_DERIVED( supmodel, comad )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(12000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(supmodel_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpanic_state, galpanic_scanline, "screen", 0, 1)
+	//MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpanic_state, galpanic_scanline, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
