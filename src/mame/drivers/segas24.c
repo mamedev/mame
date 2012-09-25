@@ -1956,7 +1956,7 @@ static MACHINE_CONFIG_START( system24, segas24_state )
 
 	MCFG_TIMER_ADD("irq_timer", irq_timer_cb)
 	MCFG_TIMER_ADD("irq_timer_clear", irq_timer_clear_cb)
-	MCFG_TIMER_ADD("frc_timer", NULL)
+	MCFG_TIMER_ADD_NONE("frc_timer")
 	MCFG_TIMER_ADD_PERIODIC("irq_frc", irq_frc_cb, attotime::from_hz(FRC_CLOCK_MODE1))
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)

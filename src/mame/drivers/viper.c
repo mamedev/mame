@@ -2039,7 +2039,7 @@ static MACHINE_CONFIG_START( viper, viper_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(viper_state, screen_update_viper)
 
-	MCFG_TIMER_ADD("ds2430_timer2", NULL)
+	MCFG_TIMER_ADD_NONE("ds2430_timer2")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -1018,8 +1018,8 @@ static MACHINE_CONFIG_START( midvcommon, midvunit_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_TIMER_ADD("timer0", NULL)
-	MCFG_TIMER_ADD("timer1", NULL)
+	MCFG_TIMER_ADD_NONE("timer0")
+	MCFG_TIMER_ADD_NONE("timer1")
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(32768)

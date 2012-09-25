@@ -64,7 +64,7 @@ const device_type TIMER = &device_creator<timer_device>;
 timer_device::timer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TIMER, "Timer", tag, owner, clock),
 	  m_type(TIMER_TYPE_GENERIC),
-	  m_callback(NULL),
+	  m_callback(timer_device_expired_delegate()),
 	  m_ptr(NULL),
 	  m_start_delay(attotime::zero),
 	  m_period(attotime::zero),
@@ -84,7 +84,7 @@ timer_device::timer_device(const machine_config &mconfig, const char *tag, devic
 //  helper to set up a generic timer
 //-------------------------------------------------
 
-void timer_device::static_configure_generic(device_t &device, timer_device_fired_func callback)
+void timer_device::static_configure_generic(device_t &device, timer_device_expired_delegate callback)
 {
 	timer_device &timer = downcast<timer_device &>(device);
 	timer.m_type = TIMER_TYPE_GENERIC;
@@ -97,7 +97,7 @@ void timer_device::static_configure_generic(device_t &device, timer_device_fired
 //  helper to set up a periodic timer
 //-------------------------------------------------
 
-void timer_device::static_configure_periodic(device_t &device, timer_device_fired_func callback, attotime period)
+void timer_device::static_configure_periodic(device_t &device, timer_device_expired_delegate callback, attotime period)
 {
 	timer_device &timer = downcast<timer_device &>(device);
 	timer.m_type = TIMER_TYPE_PERIODIC;
@@ -111,7 +111,7 @@ void timer_device::static_configure_periodic(device_t &device, timer_device_fire
 //  helper to set up a scanline timer
 //-------------------------------------------------
 
-void timer_device::static_configure_scanline(device_t &device, timer_device_fired_func callback, const char *screen, int first_vpos, int increment)
+void timer_device::static_configure_scanline(device_t &device, timer_device_expired_delegate callback, const char *screen, int first_vpos, int increment)
 {
 	timer_device &timer = downcast<timer_device &>(device);
 	timer.m_type = TIMER_TYPE_SCANLINE;
@@ -127,7 +127,7 @@ void timer_device::static_configure_scanline(device_t &device, timer_device_fire
 //  to set the callback
 //-------------------------------------------------
 
-void timer_device::static_set_callback(device_t &device, timer_device_fired_func callback)
+void timer_device::static_set_callback(device_t &device, timer_device_expired_delegate callback)
 {
 	timer_device &timer = downcast<timer_device &>(device);
 	timer.m_callback = callback;
@@ -283,8 +283,8 @@ void timer_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		// general periodic timers just call through
 		case TIMER_TYPE_GENERIC:
 		case TIMER_TYPE_PERIODIC:
-			if (m_callback != NULL)
-				(*m_callback)(*this, m_ptr, param);
+			if (!m_callback.isnull())
+				(m_callback)(*this, m_ptr, param);
 			break;
 
 
@@ -299,7 +299,7 @@ void timer_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			{
 				// call the real callback
 				int vpos = m_screen->vpos();
-				(*m_callback)(*this, m_ptr, vpos);
+				(m_callback)(*this, m_ptr, vpos);
 
 				// advance by the increment only if we will still be within the screen bounds
 		        if (m_increment != 0 && (vpos + m_increment) < m_screen->height())

@@ -867,7 +867,7 @@ static void set_counter_0_ff(timer_device &timer, int newstate)
 		{
 			state->m_counter[0].count--;
 			if (state->m_counter[0].count == 0)
-				balsente_counter_callback(timer, NULL, 0);
+				balsente_counter_callback(state, timer, NULL, 0);
 		}
 	}
 

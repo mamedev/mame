@@ -53,10 +53,8 @@
 //**************************************************************************
 
 // macros for a timer callback functions
-#define TIMER_DEVICE_CALLBACK(name)		void name(timer_device &timer, void *ptr, INT32 param)
-
-
-
+#define TIMER_DEVICE_CALLBACK(name)		void name(device_t *, timer_device &timer, void *ptr, INT32 param)
+#define TIMER_DEVICE_CALLBACK_MEMBER(name)	void name(timer_device &timer, void *ptr, INT32 param)
 
 //**************************************************************************
 //  TIMER DEVICE CONFIGURATION MACROS
@@ -64,21 +62,40 @@
 
 #define MCFG_TIMER_ADD(_tag, _callback) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_generic(*device, _callback); \
+	timer_device::static_configure_generic(*device, timer_device_expired_delegate(&_callback, #_callback)); \
+
+#define MCFG_TIMER_ADD_NONE(_tag) \
+	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
+	timer_device::static_configure_generic(*device, timer_device_expired_delegate()); \
 
 #define MCFG_TIMER_ADD_PERIODIC(_tag, _callback, _period) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_periodic(*device, _callback, _period); \
+	timer_device::static_configure_periodic(*device, timer_device_expired_delegate(&_callback, #_callback), _period); \
 
 #define MCFG_TIMER_ADD_SCANLINE(_tag, _callback, _screen, _first_vpos, _increment) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_scanline(*device, _callback, _screen, _first_vpos, _increment); \
+	timer_device::static_configure_scanline(*device, timer_device_expired_delegate(&_callback, #_callback), _screen, _first_vpos, _increment); \
+
+#define MCFG_TIMER_DRIVER_ADD(_tag, _class, _callback) \
+	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
+	timer_device::static_configure_generic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL)); \
+
+#define MCFG_TIMER_DRIVER_ADD_PERIODIC(_tag, _class, _callback, _period) \
+	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
+	timer_device::static_configure_periodic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL), _period); \
+
+#define MCFG_TIMER_DRIVER_ADD_SCANLINE(_tag, _class, _callback, _screen, _first_vpos, _increment) \
+	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
+	timer_device::static_configure_scanline(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL), _screen, _first_vpos, _increment); \
 
 #define MCFG_TIMER_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)
 
 #define MCFG_TIMER_CALLBACK(_callback) \
-	timer_device::static_set_callback(*device, _callback); \
+	timer_device::static_set_callback(*device, timer_device_expired_delegate(&_callback, #_callback)); \
+
+#define MCFG_TIMER_DRIVER_CALLBACK(_class, _callback) \
+	timer_device::static_set_callback(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL)); \
 
 #define MCFG_TIMER_START_DELAY(_start_delay) \
 	timer_device::static_set_start_delay(*device, _start_delay); \
@@ -99,9 +116,8 @@
 class emu_timer;
 class timer_device;
 
-// a timer callback looks like this
-typedef void (*timer_device_fired_func)(timer_device &timer, void *ptr, INT32 param);
-
+// a timer callbacks look like this
+typedef device_delegate<void (timer_device &, void *, INT32)> timer_device_expired_delegate;
 
 // ======================> timer_device
 
@@ -112,10 +128,10 @@ public:
 	timer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
-	static void static_configure_generic(device_t &device, timer_device_fired_func callback);
-	static void static_configure_periodic(device_t &device, timer_device_fired_func callback, attotime period);
-	static void static_configure_scanline(device_t &device, timer_device_fired_func callback, const char *screen, int first_vpos, int increment);
-	static void static_set_callback(device_t &device, timer_device_fired_func callback);
+	static void static_configure_generic(device_t &device, timer_device_expired_delegate callback);
+	static void static_configure_periodic(device_t &device, timer_device_expired_delegate callback, attotime period);
+	static void static_configure_scanline(device_t &device, timer_device_expired_delegate callback, const char *screen, int first_vpos, int increment);
+	static void static_set_callback(device_t &device, timer_device_expired_delegate callback);
 	static void static_set_start_delay(device_t &device, attotime delay);
 	static void static_set_param(device_t &device, int param);
 	static void static_set_ptr(device_t &device, void *ptr);
@@ -157,7 +173,7 @@ private:
 
 	// configuration data
 	timer_type				m_type;				// type of timer
-	timer_device_fired_func	m_callback;			// the timer's callback function
+	timer_device_expired_delegate	m_callback;			// the timer's callback function
 	void *					m_ptr;				// the pointer parameter passed to the timer callback
 
 	// periodic timers only
