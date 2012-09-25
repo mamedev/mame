@@ -1551,5 +1551,5 @@ GAME( 1981, tripoola,  tripool,  jack,     tripool,  jack_state, jack,     ROT90
 GAME( 1984, sucasino,  0,        jack,     sucasino, jack_state, jack,     ROT90,  "Data Amusement", "Super Casino", GAME_SUPPORTS_SAVE )
 GAME( 1985, striv,     0,        striv,    striv,    jack_state, striv,    ROT270, "Nova du Canada", "Super Triv", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Hara Industries PCB
 GAME( 1983, joinem,    0,        joinem,   joinem,   jack_state, zzyzzyxx, ROT90,  "Global Corporation", "Joinem", GAME_SUPPORTS_SAVE )
-GAME( 1983, unclepoo,  unclepoo, unclepoo, unclepoo, jack_state, zzyzzyxx, ROT90,  "Diatec", "Uncle Poo", GAME_SUPPORTS_SAVE ) // based on Joinem?
+GAME( 1983, unclepoo,  0,        unclepoo, unclepoo, jack_state, zzyzzyxx, ROT90,  "Diatec", "Uncle Poo", GAME_SUPPORTS_SAVE ) // based on Joinem?
 GAME( 1983, loverboy,  0,        joinem,   loverboy, jack_state, loverboy, ROT90,  "G.T Enterprise Inc.", "Lover Boy", GAME_SUPPORTS_SAVE )
