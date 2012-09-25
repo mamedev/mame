@@ -1697,6 +1697,74 @@ static void copd2_set_tableoffset(running_machine &machine, UINT16 data)
 static void copd2_set_tabledata(running_machine &machine, UINT16 data)
 {
 	copd2_table[copd2_offs] = data;
+
+	if(data) {
+		int off = data & 31;
+		int reg = (data >> 5) & 3;
+		int op = (data >> 7) & 31;
+
+		logerror("COPDIS: %04x s=%02x f1=%x l=%x f2=%02x %x %04x %02x %03x %02x.%x.%02x ", cop_43c,  (cop_43c >> 11) << 3, (cop_43c >> 10) & 1, ((cop_43c >> 7) & 7)+1, cop_43c & 0x7f, cop_438, cop_43a, copd2_offs, data, op, reg, off);
+
+		off *= 2;
+
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 00 188 03.0.08 read32 10(r0)
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 01 282 05.0.02 add32 4(r0)
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 02 082 01.0.02 write32 4(r0)
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 03 b8e 17.0.0e add16h 1c(r0)
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 04 98e 13.0.0e write16h 1c(r0)
+
+		// 188 182 082 b8e 98e -> 04  = 04+04    1ch = 1c+04
+		// 188 188 082 b8e 98e -> 04  = 04+10    1ch = 1c+10
+		// 188 18e 082 b8e 98e -> 04  = 04+1c    1ch = 1c+1c
+		// 188 282 082 b8e 98e -> 04  = 04+10    1ch = 1c+10
+		// 188 288 082 b8e 98e -> 04  = 10+10    1ch = 1c+10
+		// 188 28e 082 b8e 98e -> 04  = 1c+10    1ch = 1c+10
+		// 188 282 282 282 082 -> 04  = 04+04+10 10h = 04+10
+		// 188 188 188 188 082 -> 04h = 04+10    04l = 04+10+10
+		// 188 188 188 188 082 -> 04  = 04+10    04l = 04+10+10  10h = 04+10 (same, but trigger = 020b)
+
+		switch(op) {
+		case 0x01:
+			if(off)
+				logerror("addmem32 %x(r%x)\n", off, reg);
+			else
+				logerror("addmem32 (r%x)\n", reg);
+			break;
+		case 0x03:
+			if(off)
+				logerror("read32 %x(r%x)\n", off, reg);
+			else
+				logerror("read32 (r%x)\n", reg);
+			break;
+		case 0x05:
+			if(off)
+				logerror("add32 %x(r%x)\n", off, reg);
+			else
+				logerror("add32 (r%x)\n", reg);
+			break;
+		case 0x13:
+			if(off)
+				logerror("write16h %x(r%x)\n", off, reg);
+			else
+				logerror("write16h (r%x)\n", reg);
+			break;
+		case 0x15:
+			if(off)
+				logerror("sub32 %x(r%x)\n", off, reg);
+			else
+				logerror("sub32 (r%x)\n", reg);
+			break;
+		case 0x17:
+			if(off)
+				logerror("addmem16 %x(r%x)\n", off, reg);
+			else
+				logerror("addmem16 (r%x)\n", reg);
+			break;
+		default:
+			logerror("?\n");
+			break;
+		}
+	}
 	//logerror("mcu_data %04x\n", data);
 #if 0
     {
