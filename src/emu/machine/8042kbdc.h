@@ -36,8 +36,6 @@ void kbdc8042_init(running_machine &machine, const struct kbdc8042_interface *in
 
 DECLARE_READ8_HANDLER(kbdc8042_8_r);
 DECLARE_WRITE8_HANDLER(kbdc8042_8_w);
-DECLARE_READ64_HANDLER(kbdc8042_64be_r);
-DECLARE_WRITE64_HANDLER(kbdc8042_64be_w);
 
 #endif /* KBDC8042_H */
 
