@@ -730,7 +730,7 @@ READ8_MEMBER(vicdual_state::headon2_io_r)
 	UINT8 ret = 0;
 
 	if (offset & 0x01)  ret = ioport("IN0")->read();
-	if (offset & 0x02)  /* schematics show this as in input port, but never read from */
+	if (offset & 0x02) { /* schematics show this as in input port, but never read from */ }
 	if (offset & 0x04)  ret = ioport("IN1")->read();
 	if (offset & 0x08)  ret = ioport("IN2")->read();
 	if (offset & 0x12)  logerror("********* Read from port %x\n", offset);
@@ -824,6 +824,7 @@ static INPUT_PORTS_START( headon2 )
 	PORT_COIN
 INPUT_PORTS_END
 
+
 /* this actually seems to ignore the dipswitches and is hardcoded to 2 coins 1 credit, and 2 lives */
 static INPUT_PORTS_START( car2 )
 	PORT_START("IN0")
@@ -856,6 +857,7 @@ static INPUT_PORTS_START( car2 )
 
 	PORT_COIN
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( digger )
 	PORT_START("IN0")
