@@ -270,6 +270,23 @@ public:
 	DECLARE_VIDEO_START(mpu4_vid);
 	UINT32 screen_update_mpu4_vid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_callback);
+	DECLARE_READ_LINE_MEMBER(m6809_acia_rx_r);
+	DECLARE_WRITE_LINE_MEMBER(m6809_acia_tx_w);
+	DECLARE_READ_LINE_MEMBER(m6809_acia_cts_r);
+	DECLARE_WRITE_LINE_MEMBER(m6809_acia_rts_w);
+	DECLARE_READ_LINE_MEMBER(m6809_acia_dcd_r);
+	DECLARE_WRITE_LINE_MEMBER(m6809_acia_irq);
+	DECLARE_READ_LINE_MEMBER(m68k_acia_rx_r);
+	DECLARE_WRITE_LINE_MEMBER(m68k_acia_tx_w);
+	DECLARE_READ_LINE_MEMBER(m68k_acia_cts_r);
+	DECLARE_WRITE_LINE_MEMBER(m68k_acia_rts_w);
+	DECLARE_READ_LINE_MEMBER(m68k_acia_dcd_r);
+	DECLARE_WRITE_LINE_MEMBER(m68k_acia_irq);
+	DECLARE_WRITE_LINE_MEMBER(cpu1_ptm_irq);
+	DECLARE_WRITE8_MEMBER(vid_o1_callback);
+	DECLARE_WRITE8_MEMBER(vid_o2_callback);
+	DECLARE_WRITE8_MEMBER(vid_o3_callback);
+	DECLARE_READ8_MEMBER(pia_ic5_porta_track_r);
 };
 
 
@@ -312,122 +329,109 @@ static void update_mpu68_interrupts(running_machine &machine)
 
 /* Communications with 6809 board */
 
-static READ_LINE_DEVICE_HANDLER( m6809_acia_rx_r )
+READ_LINE_MEMBER(mpu4vid_state::m6809_acia_rx_r)
 {
-	mpu4vid_state *state = device->machine().driver_data<mpu4vid_state>();
-	return state->m_m68k_m6809_line;
+	return m_m68k_m6809_line;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( m6809_acia_tx_w )
+WRITE_LINE_MEMBER(mpu4vid_state::m6809_acia_tx_w)
 {
-	mpu4vid_state *drvstate = device->machine().driver_data<mpu4vid_state>();
-	drvstate->m_m6809_m68k_line = state;
+	m_m6809_m68k_line = state;
 }
 
-static READ_LINE_DEVICE_HANDLER( m6809_acia_cts_r )
+READ_LINE_MEMBER(mpu4vid_state::m6809_acia_cts_r)
 {
-	mpu4vid_state *state = device->machine().driver_data<mpu4vid_state>();
-	return state->m_m6809_acia_cts;
+	return m_m6809_acia_cts;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( m6809_acia_rts_w )
+WRITE_LINE_MEMBER(mpu4vid_state::m6809_acia_rts_w)
 {
-	mpu4vid_state *drvstate = device->machine().driver_data<mpu4vid_state>();
-	drvstate->m_m6809_acia_rts = state;
+	m_m6809_acia_rts = state;
 }
 
-static READ_LINE_DEVICE_HANDLER( m6809_acia_dcd_r )
+READ_LINE_MEMBER(mpu4vid_state::m6809_acia_dcd_r)
 {
-	mpu4vid_state *state = device->machine().driver_data<mpu4vid_state>();
-	return state->m_m6809_acia_dcd;
+	return m_m6809_acia_dcd;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( m6809_acia_irq )
+WRITE_LINE_MEMBER(mpu4vid_state::m6809_acia_irq)
 {
-	mpu4vid_state *drvstate = device->machine().driver_data<mpu4vid_state>();
-	drvstate->m_m68k_acia_cts = !state;
-	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+	m_m68k_acia_cts = !state;
+	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static ACIA6850_INTERFACE( m6809_acia_if )
 {
 	0,
 	0,
-	DEVCB_LINE(m6809_acia_rx_r),
-	DEVCB_LINE(m6809_acia_tx_w),
-	DEVCB_LINE(m6809_acia_cts_r),
-	DEVCB_LINE(m6809_acia_rts_w),
-	DEVCB_LINE(m6809_acia_dcd_r),
-	DEVCB_LINE(m6809_acia_irq)
+	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m6809_acia_rx_r),
+	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m6809_acia_tx_w),
+	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m6809_acia_cts_r),
+	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m6809_acia_rts_w),
+	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m6809_acia_dcd_r),
+	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m6809_acia_irq)
 };
 
-static READ_LINE_DEVICE_HANDLER( m68k_acia_rx_r )
+READ_LINE_MEMBER(mpu4vid_state::m68k_acia_rx_r)
 {
-	mpu4vid_state *state = device->machine().driver_data<mpu4vid_state>();
-	return state->m_m6809_m68k_line;
+	return m_m6809_m68k_line;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( m68k_acia_tx_w )
+WRITE_LINE_MEMBER(mpu4vid_state::m68k_acia_tx_w)
 {
-	mpu4vid_state *drvstate = device->machine().driver_data<mpu4vid_state>();
-	drvstate->m_m68k_m6809_line = state;
+	m_m68k_m6809_line = state;
 }
 
-static READ_LINE_DEVICE_HANDLER( m68k_acia_cts_r )
+READ_LINE_MEMBER(mpu4vid_state::m68k_acia_cts_r)
 {
-	mpu4vid_state *state = device->machine().driver_data<mpu4vid_state>();
-	return state->m_m68k_acia_cts;
+	return m_m68k_acia_cts;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( m68k_acia_rts_w )
+WRITE_LINE_MEMBER(mpu4vid_state::m68k_acia_rts_w)
 {
-	mpu4vid_state *drvstate = device->machine().driver_data<mpu4vid_state>();
-	drvstate->m_m6809_acia_dcd = state;
+	m_m6809_acia_dcd = state;
 }
 
-static READ_LINE_DEVICE_HANDLER( m68k_acia_dcd_r )
+READ_LINE_MEMBER(mpu4vid_state::m68k_acia_dcd_r)
 {
-	mpu4vid_state *state = device->machine().driver_data<mpu4vid_state>();
-	return state->m_m6809_acia_rts;
+	return m_m6809_acia_rts;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( m68k_acia_irq )
+WRITE_LINE_MEMBER(mpu4vid_state::m68k_acia_irq)
 {
-	mpu4vid_state *drvstate = device->machine().driver_data<mpu4vid_state>();
-	drvstate->m_m6809_acia_cts = !state;
-	drvstate->m_m6850_irq_state = state;
-	update_mpu68_interrupts(device->machine());
+	m_m6809_acia_cts = !state;
+	m_m6850_irq_state = state;
+	update_mpu68_interrupts(machine());
 }
 
 static ACIA6850_INTERFACE( m68k_acia_if )
 {
 	0,
 	0,
-	DEVCB_LINE(m68k_acia_rx_r),
-	DEVCB_LINE(m68k_acia_tx_w),
-	DEVCB_LINE(m68k_acia_cts_r),
-	DEVCB_LINE(m68k_acia_rts_w),
-	DEVCB_LINE(m68k_acia_dcd_r),
-	DEVCB_LINE(m68k_acia_irq)
+	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m68k_acia_rx_r),
+	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m68k_acia_tx_w),
+	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m68k_acia_cts_r),
+	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m68k_acia_rts_w),
+	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m68k_acia_dcd_r),
+	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m68k_acia_irq)
 };
 
 
-static WRITE_LINE_DEVICE_HANDLER( cpu1_ptm_irq )
+WRITE_LINE_MEMBER(mpu4vid_state::cpu1_ptm_irq)
 {
-	mpu4vid_state *drvstate = device->machine().driver_data<mpu4vid_state>();
-	drvstate->m_m6840_irq_state = state;
-	update_mpu68_interrupts(device->machine());
+	m_m6840_irq_state = state;
+	update_mpu68_interrupts(machine());
 }
 
 
-static WRITE8_DEVICE_HANDLER( vid_o1_callback )
+WRITE8_MEMBER(mpu4vid_state::vid_o1_callback)
 {
-	downcast<ptm6840_device *>(device)->set_c2(data); /* this output is the clock for timer2 */
+	downcast<ptm6840_device *>(machine().device("6840ptm_68k"))->set_c2(data); /* this output is the clock for timer2 */
 
 	if (data)
 	{
-		acia6850_device *acia_0 = space.machine().device<acia6850_device>("acia6850_0");
-		acia6850_device *acia_1 = space.machine().device<acia6850_device>("acia6850_1");
+		acia6850_device *acia_0 = machine().device<acia6850_device>("acia6850_0");
+		acia6850_device *acia_1 = machine().device<acia6850_device>("acia6850_1");
 		acia_0->tx_clock_in();
 		acia_0->rx_clock_in();
 		acia_1->tx_clock_in();
@@ -436,15 +440,15 @@ static WRITE8_DEVICE_HANDLER( vid_o1_callback )
 }
 
 
-static WRITE8_DEVICE_HANDLER( vid_o2_callback )
+WRITE8_MEMBER(mpu4vid_state::vid_o2_callback)
 {
-	downcast<ptm6840_device *>(device)->set_c3(data); /* this output is the clock for timer3 */
+	downcast<ptm6840_device *>(machine().device("6840ptm_68k"))->set_c3(data); /* this output is the clock for timer3 */
 }
 
 
-static WRITE8_DEVICE_HANDLER( vid_o3_callback )
+WRITE8_MEMBER(mpu4vid_state::vid_o3_callback)
 {
-	downcast<ptm6840_device *>(device)->set_c1(data); /* this output is the clock for timer1 */
+	downcast<ptm6840_device *>(machine().device("6840ptm_68k"))->set_c1(data); /* this output is the clock for timer1 */
 }
 
 
@@ -452,10 +456,10 @@ static const ptm6840_interface ptm_vid_intf =
 {
 	VIDEO_MASTER_CLOCK / 10, /* 68k E clock */
 	{ 0, 0, 0 },
-	{ DEVCB_HANDLER(vid_o1_callback),
-	  DEVCB_HANDLER(vid_o2_callback),
-	  DEVCB_HANDLER(vid_o3_callback) },
-	DEVCB_LINE(cpu1_ptm_irq)
+	{ DEVCB_DRIVER_MEMBER(mpu4vid_state,vid_o1_callback),
+	  DEVCB_DRIVER_MEMBER(mpu4vid_state,vid_o2_callback),
+	  DEVCB_DRIVER_MEMBER(mpu4vid_state,vid_o3_callback) },
+	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, cpu1_ptm_irq)
 };
 
 
@@ -719,9 +723,8 @@ READ16_HANDLER( bt471_r )
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( pia_ic5_porta_track_r )
+READ8_MEMBER(mpu4vid_state::pia_ic5_porta_track_r)
 {
-	mpu4vid_state *state = space.machine().driver_data<mpu4vid_state>();
 	/* The SWP trackball interface connects a standard trackball to the AUX1 port on the MPU4
     mainboard. As per usual, they've taken the cheap route here, reading and processing the
     raw quadrature signal from the encoder wheels for a 4 bit interface, rather than use any
@@ -730,24 +733,24 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_track_r )
     We invert the X and Y data at source due to the use of Schmitt triggers in the interface, which
     clean up the pulses and flip the active phase.*/
 
-	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",space.machine().describe_context()));
+	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",machine().describe_context()));
 
 
-	UINT8 data = state->ioport("AUX1")->read();
+	UINT8 data = ioport("AUX1")->read();
 
-	INT8 dx = state->ioport("TRACKX")->read();
-	INT8 dy = state->ioport("TRACKY")->read();
+	INT8 dx = ioport("TRACKX")->read();
+	INT8 dy = ioport("TRACKY")->read();
 
-	state->m_cur[0] = dy + dx;
-	state->m_cur[1] = dy - dx;
+	m_cur[0] = dy + dx;
+	m_cur[1] = dy - dx;
 
 	UINT8 xa, xb, ya, yb;
 
 	/* generate pulses for the input port (A and B are 1 unit out of phase for direction sensing)*/
-	xa = ((state->m_cur[0] + 1) & 3) <= 1;
-	xb = (state->m_cur[0] & 3) <= 1;
-	ya = ((state->m_cur[1] + 1) & 3) <= 1;
-	yb = (state->m_cur[1] & 3) <= 1;
+	xa = ((m_cur[0] + 1) & 3) <= 1;
+	xb = (m_cur[0] & 3) <= 1;
+	ya = ((m_cur[1] + 1) & 3) <= 1;
+	yb = (m_cur[1] & 3) <= 1;
 
 	data |= (xa << 4); // XA
 	data |= (ya << 5); // YA
@@ -759,7 +762,7 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_track_r )
 
 static const pia6821_interface pia_ic5t_intf =
 {
-	DEVCB_HANDLER(pia_ic5_porta_track_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(mpu4vid_state,pia_ic5_porta_track_r),		/* port A in */
 	DEVCB_DRIVER_MEMBER(mpu4_state, pia_ic5_portb_r),	/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */

@@ -132,6 +132,7 @@ public:
 	UINT8 m_chipinsert_state;
 	UINT8 m_keyen_state;
 	UINT8 m_op41;
+	DECLARE_WRITE8_MEMBER(digel804_serial_put);
 };
 
 
@@ -558,15 +559,14 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-static WRITE8_DEVICE_HANDLER( digel804_serial_put )
+WRITE8_MEMBER(digel804_state::digel804_serial_put)
 {
-	digel804_state *state = space.machine().driver_data<digel804_state>();
-	state->m_acia->receive_character(data);
+	m_acia->receive_character(data);
 }
 
 static GENERIC_TERMINAL_INTERFACE( digel804_terminal_intf )
 {
-	DEVCB_HANDLER(digel804_serial_put)
+	DEVCB_DRIVER_MEMBER(digel804_state,digel804_serial_put)
 };
 
 WRITE_LINE_MEMBER( digel804_state::da_w )

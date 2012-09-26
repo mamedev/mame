@@ -150,6 +150,8 @@ public:
 	DECLARE_WRITE8_MEMBER( snes_map_1_w );
 	DECLARE_MACHINE_START(sfcbox);
 	DECLARE_MACHINE_RESET(sfcbox);
+	DECLARE_READ8_MEMBER(spc_ram_100_r);
+	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
 };
 
 UINT32 sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
@@ -169,20 +171,22 @@ static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, sfcbox_state )
 	AM_RANGE(0xc00000, 0xffffff) AM_READWRITE_LEGACY(snes_r_bank7, snes_w_bank7)	/* Mirror and ROM */
 ADDRESS_MAP_END
 
-static READ8_DEVICE_HANDLER( spc_ram_100_r )
+READ8_MEMBER(sfcbox_state::spc_ram_100_r)
 {
+	device_t *device = machine().device("spc700");
 	return spc_ram_r(device, space, offset + 0x100);
 }
 
-static WRITE8_DEVICE_HANDLER( spc_ram_100_w )
+WRITE8_MEMBER(sfcbox_state::spc_ram_100_w)
 {
+	device_t *device = machine().device("spc700");
 	spc_ram_w(device, space, offset + 0x100, data);
 }
 
 static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8, sfcbox_state )
 	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE_LEGACY("spc700", spc_ram_r, spc_ram_w)	/* lower 32k ram */
 	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE_LEGACY("spc700", spc_io_r, spc_io_w)	/* spc io */
-	AM_RANGE(0x0100, 0xffff) AM_DEVREADWRITE_LEGACY("spc700", spc_ram_100_r, spc_ram_100_w)
+	AM_RANGE(0x0100, 0xffff) AM_READWRITE(spc_ram_100_r, spc_ram_100_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sfcbox_map, AS_PROGRAM, 8, sfcbox_state )

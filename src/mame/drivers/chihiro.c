@@ -416,6 +416,10 @@ public:
 
 	nv2a_renderer *nvidia_nv2a;
 	virtual void machine_start();
+	DECLARE_WRITE_LINE_MEMBER(chihiro_pic8259_1_set_int_line);
+	DECLARE_READ8_MEMBER(get_slave_ack);
+	DECLARE_WRITE_LINE_MEMBER(chihiro_pit8254_out0_changed);
+	DECLARE_WRITE_LINE_MEMBER(chihiro_pit8254_out2_changed);
 };
 
 /*
@@ -1552,25 +1556,24 @@ int ide_baseboard_device::write_sector(UINT32 lba, const void *buffer)
  * PIC & PIT
  */
 
-static WRITE_LINE_DEVICE_HANDLER( chihiro_pic8259_1_set_int_line )
+WRITE_LINE_MEMBER(chihiro_state::chihiro_pic8259_1_set_int_line)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-static READ8_DEVICE_HANDLER( get_slave_ack )
+READ8_MEMBER(chihiro_state::get_slave_ack)
 {
-	chihiro_state *chst=space.machine().driver_data<chihiro_state>();
 	if (offset==2) { // IRQ = 2
-		return pic8259_acknowledge(chst->chihiro_devs.pic8259_2);
+		return pic8259_acknowledge(chihiro_devs.pic8259_2);
 	}
 	return 0x00;
 }
 
 static const struct pic8259_interface chihiro_pic8259_1_config =
 {
-	DEVCB_LINE(chihiro_pic8259_1_set_int_line),
+	DEVCB_DRIVER_LINE_MEMBER(chihiro_state, chihiro_pic8259_1_set_int_line),
 	DEVCB_LINE_VCC,
-	DEVCB_HANDLER(get_slave_ack)
+	DEVCB_DRIVER_MEMBER(chihiro_state,get_slave_ack)
 };
 
 static const struct pic8259_interface chihiro_pic8259_2_config =
@@ -1592,15 +1595,15 @@ static IRQ_CALLBACK(irq_callback)
 	return r;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( chihiro_pit8254_out0_changed )
+WRITE_LINE_MEMBER(chihiro_state::chihiro_pit8254_out0_changed)
 {
-	if ( device->machine().device("pic8259_1") )
+	if ( machine().device("pic8259_1") )
 	{
-		pic8259_ir0_w(device->machine().device("pic8259_1"), state);
+		pic8259_ir0_w(machine().device("pic8259_1"), state);
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( chihiro_pit8254_out2_changed )
+WRITE_LINE_MEMBER(chihiro_state::chihiro_pit8254_out2_changed)
 {
 	//chihiro_speaker_set_input( state ? 1 : 0 );
 }
@@ -1611,7 +1614,7 @@ static const struct pit8253_config chihiro_pit8254_config =
 		{
 			1125000,				/* heartbeat IRQ */
 			DEVCB_NULL,
-			DEVCB_LINE(chihiro_pit8254_out0_changed)
+			DEVCB_DRIVER_LINE_MEMBER(chihiro_state, chihiro_pit8254_out0_changed)
 		}, {
 			1125000,				/* (unused) dram refresh */
 			DEVCB_NULL,
@@ -1619,7 +1622,7 @@ static const struct pit8253_config chihiro_pit8254_config =
 		}, {
 			1125000,				/* (unused) pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
-			DEVCB_LINE(chihiro_pit8254_out2_changed)
+			DEVCB_DRIVER_LINE_MEMBER(chihiro_state, chihiro_pit8254_out2_changed)
 		}
 	}
 };

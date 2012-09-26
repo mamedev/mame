@@ -173,6 +173,8 @@ protected:
 public:
 	DECLARE_DRIVER_INIT(proconn);
 	virtual void machine_reset();
+	DECLARE_WRITE16_MEMBER(serial_transmit);
+	DECLARE_READ16_MEMBER(serial_receive);
 };
 
 static ADDRESS_MAP_START( proconn_map, AS_PROGRAM, 8, proconn_state )
@@ -309,24 +311,23 @@ static Z80CTC_INTERFACE( ctc_intf )
 	DEVCB_NULL					// ZC/TO2 callback
 };
 
-static WRITE16_DEVICE_HANDLER( serial_transmit )
+WRITE16_MEMBER(proconn_state::serial_transmit)
 {
-	proconn_state *state = space.machine().driver_data<proconn_state>();
 
 //Don't like the look of this, should be a clock somewhere
 //  if (offset == 0)
-//      state->m_vfd->write_char( data );
+//      m_vfd->write_char( data );
 
 	// should probably be in the pios above
 
 	for (int i=0; i<8;i++)
 	{
-		state->m_vfd->shift_data( (data & (1<<i))?0:1  );
+		m_vfd->shift_data( (data & (1<<i))?0:1  );
 	}
 }
 
 
-static READ16_DEVICE_HANDLER( serial_receive )
+READ16_MEMBER(proconn_state::serial_receive)
 {
 	return -1;
 }
@@ -338,8 +339,8 @@ static const z80sio_interface sio_intf =
 	DEVCB_NULL,					/* DTR changed handler */
 	DEVCB_NULL,					/* RTS changed handler */
 	DEVCB_NULL,					/* BREAK changed handler */
-	DEVCB_HANDLER(serial_transmit),	/* transmit handler */
-	DEVCB_HANDLER(serial_receive)		/* receive handler */
+	DEVCB_DRIVER_MEMBER16(proconn_state,serial_transmit),	/* transmit handler */
+	DEVCB_DRIVER_MEMBER16(proconn_state,serial_receive)		/* receive handler */
 };
 
 static const ay8910_interface ay8910_config =

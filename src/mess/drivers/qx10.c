@@ -140,6 +140,7 @@ public:
 
 	virtual void palette_init();
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 };
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
@@ -349,8 +350,9 @@ READ8_MEMBER( qx10_state::qx10_30_r )
 /*
     DMA8237
 */
-WRITE_LINE_DEVICE_HANDLER( dma_hrq_changed )
+WRITE_LINE_MEMBER(qx10_state::dma_hrq_changed)
 {
+	device_t *device = machine().device("8237dma_1");
 	/* Assert HLDA */
 	i8237_hlda_w(device, state);
 }
@@ -383,7 +385,7 @@ static void memory_write_byte(address_space &space, offs_t address, UINT8 data, 
 
 static I8237_INTERFACE( qx10_dma8237_1_interface )
 {
-	DEVCB_DEVICE_LINE("8237dma_1", dma_hrq_changed),
+	DEVCB_DRIVER_LINE_MEMBER(qx10_state,dma_hrq_changed),
 	DEVCB_DRIVER_LINE_MEMBER(qx10_state, tc_w),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),

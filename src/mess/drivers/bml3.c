@@ -116,6 +116,8 @@ public:
 	INTERRUPT_GEN_MEMBER(bml3_irq);
 	INTERRUPT_GEN_MEMBER(bml3_timer_firq);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	DECLARE_READ8_MEMBER(bml3_ym2203_r);
+	DECLARE_WRITE8_MEMBER(bml3_ym2203_w);
 };
 
 #define mc6845_h_char_total 	(m_crtc_vreg[0])
@@ -329,18 +331,18 @@ WRITE8_MEMBER( bml3_state::bml3_psg_latch_w)
 	m_psg_latch = data;
 }
 
-static READ8_DEVICE_HANDLER( bml3_ym2203_r )
+READ8_MEMBER(bml3_state::bml3_ym2203_r)
 {
-	bml3_state *state = space.machine().driver_data<bml3_state>();
-	UINT8 dev_offs = ((state->m_psg_latch & 3) != 3);
+	device_t *device = machine().device("ym2203");
+	UINT8 dev_offs = ((m_psg_latch & 3) != 3);
 
 	return ym2203_r(device,space, dev_offs);
 }
 
-static WRITE8_DEVICE_HANDLER( bml3_ym2203_w )
+WRITE8_MEMBER(bml3_state::bml3_ym2203_w)
 {
-	bml3_state *state = space.machine().driver_data<bml3_state>();
-	UINT8 dev_offs = ((state->m_psg_latch & 3) != 3);
+	device_t *device = machine().device("ym2203");
+	UINT8 dev_offs = ((m_psg_latch & 3) != 3);
 
 	ym2203_w(device,space, dev_offs,data);
 }
@@ -404,7 +406,7 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x43ff) AM_READWRITE(bml3_vram_r,bml3_vram_w)
 	AM_RANGE(0x4400, 0x9fff) AM_RAM
-	AM_RANGE(0xff00, 0xff00) AM_DEVREADWRITE_LEGACY("ym2203",bml3_ym2203_r,bml3_ym2203_w)
+	AM_RANGE(0xff00, 0xff00) AM_READWRITE(bml3_ym2203_r,bml3_ym2203_w)
 	AM_RANGE(0xff02, 0xff02) AM_READWRITE(bml3_psg_latch_r,bml3_psg_latch_w) // PSG address/data select
 	AM_RANGE(0xff18, 0xff1f) AM_DEVREADWRITE_LEGACY("mc6843",mc6843_r,mc6843_w)
 	AM_RANGE(0xff20, 0xff20) AM_READWRITE(bml3_fdd_r,bml3_fdd_w) // FDD drive select

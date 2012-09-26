@@ -111,6 +111,14 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	TIMER_CALLBACK_MEMBER(osbexec_video_callback);
+	DECLARE_READ8_MEMBER(osbexec_pia0_a_r);
+	DECLARE_WRITE8_MEMBER(osbexec_pia0_a_w);
+	DECLARE_READ8_MEMBER(osbexec_pia0_b_r);
+	DECLARE_WRITE8_MEMBER(osbexec_pia0_b_w);
+	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_cb2_w);
+	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_irq);
+	DECLARE_WRITE_LINE_MEMBER(osbexec_pia1_irq);
 };
 
 
@@ -348,102 +356,95 @@ UINT32 osbexec_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
   CB2 - 60/50 (?)
 */
 
-static READ8_DEVICE_HANDLER( osbexec_pia0_a_r )
+READ8_MEMBER(osbexec_state::osbexec_pia0_a_r)
 {
-	osbexec_state *state = space.machine().driver_data<osbexec_state>();
 
-	return state->m_pia0_porta;
+	return m_pia0_porta;
 }
 
 
-static WRITE8_DEVICE_HANDLER( osbexec_pia0_a_w )
+WRITE8_MEMBER(osbexec_state::osbexec_pia0_a_w)
 {
-	osbexec_state *state = space.machine().driver_data<osbexec_state>();
 
 	logerror("osbexec_pia0_a_w: %02x\n", data );
 
-	state->m_pia0_porta = data;
+	m_pia0_porta = data;
 
-	state->set_banks(space.machine());
+	set_banks(machine());
 }
 
 
-static READ8_DEVICE_HANDLER( osbexec_pia0_b_r )
+READ8_MEMBER(osbexec_state::osbexec_pia0_b_r)
 {
-	osbexec_state *state = space.machine().driver_data<osbexec_state>();
 
-	return state->m_pia0_portb;
+	return m_pia0_portb;
 }
 
 
-static WRITE8_DEVICE_HANDLER( osbexec_pia0_b_w )
+WRITE8_MEMBER(osbexec_state::osbexec_pia0_b_w)
 {
-	osbexec_state *state = space.machine().driver_data<osbexec_state>();
 
-	state->m_pia0_portb = data;
+	m_pia0_portb = data;
 
-	speaker_level_w( state->m_speaker, ( data & 0x08 ) ? 0 : 1 );
+	speaker_level_w( m_speaker, ( data & 0x08 ) ? 0 : 1 );
 
 	switch ( data & 0x06 )
 	{
 	case 0x02:
-		wd17xx_set_drive( state->m_mb8877, 1 );
+		wd17xx_set_drive( m_mb8877, 1 );
 		break;
 	case 0x04:
-		wd17xx_set_drive( state->m_mb8877, 0 );
+		wd17xx_set_drive( m_mb8877, 0 );
 		break;
 	}
 
-	wd17xx_dden_w( state->m_mb8877, ( data & 0x01 ) ? 1 : 0 );
+	wd17xx_dden_w( m_mb8877, ( data & 0x01 ) ? 1 : 0 );
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( osbexec_pia0_ca2_w )
+WRITE_LINE_MEMBER(osbexec_state::osbexec_pia0_ca2_w)
 {
 	logerror("osbexec_pia0_ca2_w: state = %d\n", state);
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( osbexec_pia0_cb2_w )
+WRITE_LINE_MEMBER(osbexec_state::osbexec_pia0_cb2_w)
 {
-	osbexec_state *st = device->machine().driver_data<osbexec_state>();
 
-	st->m_pia0_cb2 = state;
+	m_pia0_cb2 = state;
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( osbexec_pia0_irq )
+WRITE_LINE_MEMBER(osbexec_state::osbexec_pia0_irq)
 {
-	osbexec_state *st = device->machine().driver_data<osbexec_state>();
 
-	st->m_pia0_irq_state = state;
-	st->update_irq_state(device->machine());
+	m_pia0_irq_state = state;
+	update_irq_state(machine());
 }
 
 
 static const pia6821_interface osbexec_pia0_config =
 {
-	DEVCB_HANDLER( osbexec_pia0_a_r ),	/* in_a_func */			/* port A - banking */
-	DEVCB_HANDLER( osbexec_pia0_b_r),	/* in_b_func */			/* modem / speaker */
+	DEVCB_DRIVER_MEMBER(osbexec_state, osbexec_pia0_a_r ),	/* in_a_func */			/* port A - banking */
+	DEVCB_DRIVER_MEMBER(osbexec_state, osbexec_pia0_b_r),	/* in_b_func */			/* modem / speaker */
 	DEVCB_NULL,							/* in_ca1_func */		/* DMA IRQ */
 	DEVCB_NULL,							/* in_cb1_func */		/* Vblank (rtc irq) */
 	DEVCB_NULL,							/* in_ca2_func */
 	DEVCB_NULL,							/* in_cb2_func */
-	DEVCB_HANDLER( osbexec_pia0_a_w ),	/* out_a_func */		/* port A - banking */
-	DEVCB_HANDLER( osbexec_pia0_b_w ),	/* out_b_func */		/* modem / speaker */
-	DEVCB_LINE( osbexec_pia0_ca2_w ),	/* out_ca2_func */		/* Keyboard strobe */
-	DEVCB_LINE( osbexec_pia0_cb2_w ),	/* out_cb2_func */		/* 60/50 */
-	DEVCB_LINE( osbexec_pia0_irq ),		/* irq_a_func */		/* IRQ */
-	DEVCB_LINE( osbexec_pia0_irq )		/* irq_b_func */		/* IRQ */
+	DEVCB_DRIVER_MEMBER(osbexec_state, osbexec_pia0_a_w ),	/* out_a_func */		/* port A - banking */
+	DEVCB_DRIVER_MEMBER(osbexec_state, osbexec_pia0_b_w ),	/* out_b_func */		/* modem / speaker */
+	DEVCB_DRIVER_LINE_MEMBER(osbexec_state, osbexec_pia0_ca2_w ),	/* out_ca2_func */		/* Keyboard strobe */
+	DEVCB_DRIVER_LINE_MEMBER(osbexec_state, osbexec_pia0_cb2_w ),	/* out_cb2_func */		/* 60/50 */
+	DEVCB_DRIVER_LINE_MEMBER(osbexec_state, osbexec_pia0_irq ),		/* irq_a_func */		/* IRQ */
+	DEVCB_DRIVER_LINE_MEMBER(osbexec_state, osbexec_pia0_irq )		/* irq_b_func */		/* IRQ */
 };
 
 
-static WRITE_LINE_DEVICE_HANDLER( osbexec_pia1_irq )
+WRITE_LINE_MEMBER(osbexec_state::osbexec_pia1_irq)
 {
-	osbexec_state *st = device->machine().driver_data<osbexec_state>();
 
-	st->m_pia1_irq_state = state;
-	st->update_irq_state(device->machine());
+	m_pia1_irq_state = state;
+	update_irq_state(machine());
 }
 
 
@@ -459,8 +460,8 @@ static const pia6821_interface osbexec_pia1_config =
 	DEVCB_NULL,							/* out_b_func */
 	DEVCB_NULL,							/* out_ca2_func */
 	DEVCB_NULL,							/* out_cb2_func */
-	DEVCB_LINE( osbexec_pia1_irq ),		/* irq_a_func */
-	DEVCB_LINE( osbexec_pia1_irq )		/* irq_b_func */
+	DEVCB_DRIVER_LINE_MEMBER(osbexec_state, osbexec_pia1_irq ),		/* irq_a_func */
+	DEVCB_DRIVER_LINE_MEMBER(osbexec_state, osbexec_pia1_irq )		/* irq_b_func */
 };
 
 

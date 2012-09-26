@@ -65,6 +65,7 @@ public:
 	DECLARE_DRIVER_INIT(apricot);
 	virtual void palette_init();
 	UINT32 screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(apricot_sio_irq_w);
 };
 
 
@@ -121,15 +122,14 @@ static const struct pit8253_config apricot_pit8253_intf =
 	}
 };
 
-static WRITE_LINE_DEVICE_HANDLER( apricot_sio_irq_w )
+WRITE_LINE_MEMBER(apricot_state::apricot_sio_irq_w)
 {
-	apricot_state *astate = device->machine().driver_data<apricot_state>();
-	pic8259_ir5_w(astate->m_pic, state);
+	pic8259_ir5_w(m_pic, state);
 }
 
 static const z80sio_interface apricot_z80sio_intf =
 {
-	DEVCB_LINE(apricot_sio_irq_w),
+	DEVCB_DRIVER_LINE_MEMBER(apricot_state, apricot_sio_irq_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

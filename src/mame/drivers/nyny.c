@@ -130,6 +130,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	INTERRUPT_GEN_MEMBER(update_pia_1);
+	DECLARE_WRITE8_MEMBER(ic48_1_74123_output_changed);
 };
 
 
@@ -262,10 +263,9 @@ static const pia6821_interface pia_2_intf =
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( ic48_1_74123_output_changed )
+WRITE8_MEMBER(nyny_state::ic48_1_74123_output_changed)
 {
-	nyny_state *state = space.machine().driver_data<nyny_state>();
-	state->m_pia2->ca1_w(data);
+	m_pia2->ca1_w(data);
 }
 
 
@@ -277,7 +277,7 @@ static const ttl74123_interface ic48_1_config =
 	1,					/* A pin - driven by the CRTC */
 	1,					/* B pin - pulled high */
 	1,					/* Clear pin - pulled high */
-	DEVCB_HANDLER(ic48_1_74123_output_changed)
+	DEVCB_DRIVER_MEMBER(nyny_state,ic48_1_74123_output_changed)
 };
 
 

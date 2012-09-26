@@ -39,6 +39,9 @@ public:
 	DECLARE_READ8_MEMBER(spc1000_video_ram_r);
 	DECLARE_READ8_MEMBER(spc1000_keyboard_r);
 	virtual void machine_reset();
+	DECLARE_WRITE8_MEMBER(spc1000_gmode_w);
+	DECLARE_READ8_MEMBER(spc1000_gmode_r);
+	DECLARE_READ8_MEMBER(spc1000_mc6847_videoram_r);
 };
 
 
@@ -98,29 +101,27 @@ READ8_MEMBER(spc1000_state::spc1000_keyboard_r){
 	return ioport(keynames[offset])->read();
 }
 
-static WRITE8_DEVICE_HANDLER(spc1000_gmode_w)
+WRITE8_MEMBER(spc1000_state::spc1000_gmode_w)
 {
-	spc1000_state *state = space.machine().driver_data<spc1000_state>();
-	state->m_GMODE = data;
+	m_GMODE = data;
 
-	// state->m_GMODE layout: CSS|NA|PS2|PS1|~A/G|GM0|GM1|NA
+	// m_GMODE layout: CSS|NA|PS2|PS1|~A/G|GM0|GM1|NA
 	//  [PS2,PS1] is used to set screen 0/1 pages
-	state->m_vdg->gm1_w(BIT(data, 1));
-	state->m_vdg->gm0_w(BIT(data, 2));
-	state->m_vdg->ag_w(BIT(data, 3));
-	state->m_vdg->css_w(BIT(data, 7));
+	m_vdg->gm1_w(BIT(data, 1));
+	m_vdg->gm0_w(BIT(data, 2));
+	m_vdg->ag_w(BIT(data, 3));
+	m_vdg->css_w(BIT(data, 7));
 }
 
-static READ8_DEVICE_HANDLER(spc1000_gmode_r)
+READ8_MEMBER(spc1000_state::spc1000_gmode_r)
 {
-	spc1000_state *state = space.machine().driver_data<spc1000_state>();
-	return state->m_GMODE;
+	return m_GMODE;
 }
 
 static ADDRESS_MAP_START( spc1000_io , AS_IO, 8, spc1000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(spc1000_video_ram_r, spc1000_video_ram_w)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_LEGACY("mc6847", spc1000_gmode_r, spc1000_gmode_w)
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(spc1000_gmode_r, spc1000_gmode_w)
 	AM_RANGE(0x8000, 0x8009) AM_READ(spc1000_keyboard_r)
 	AM_RANGE(0xA000, 0xA000) AM_READWRITE(spc1000_iplk_r, spc1000_iplk_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
@@ -242,22 +243,21 @@ void spc1000_state::machine_reset()
 	m_IPLK = 1;
 }
 
-static READ8_DEVICE_HANDLER( spc1000_mc6847_videoram_r )
+READ8_MEMBER(spc1000_state::spc1000_mc6847_videoram_r)
 {
-	spc1000_state *state = space.machine().driver_data<spc1000_state>();
 	if (offset == ~0) return 0xff;
 
-	// state->m_GMODE layout: CSS|NA|PS2|PS1|~A/G|GM0|GM1|NA
+	// m_GMODE layout: CSS|NA|PS2|PS1|~A/G|GM0|GM1|NA
 	//  [PS2,PS1] is used to set screen 0/1 pages
-	if ( !BIT(state->m_GMODE, 3) ) {	// text mode (~A/G set to A)
-		unsigned int page = (BIT(state->m_GMODE, 5) << 1) | BIT(state->m_GMODE, 4);
-		state->m_vdg->inv_w(BIT(state->m_video_ram[offset+page*0x200+0x800], 0));
-		state->m_vdg->css_w(BIT(state->m_video_ram[offset+page*0x200+0x800], 1));
-		state->m_vdg->as_w(BIT(state->m_video_ram[offset+page*0x200+0x800], 2));
-		state->m_vdg->intext_w(BIT(state->m_video_ram[offset+page*0x200+0x800], 3));
-		return state->m_video_ram[offset+page*0x200];
+	if ( !BIT(m_GMODE, 3) ) {	// text mode (~A/G set to A)
+		unsigned int page = (BIT(m_GMODE, 5) << 1) | BIT(m_GMODE, 4);
+		m_vdg->inv_w(BIT(m_video_ram[offset+page*0x200+0x800], 0));
+		m_vdg->css_w(BIT(m_video_ram[offset+page*0x200+0x800], 1));
+		m_vdg->as_w(BIT(m_video_ram[offset+page*0x200+0x800], 2));
+		m_vdg->intext_w(BIT(m_video_ram[offset+page*0x200+0x800], 3));
+		return m_video_ram[offset+page*0x200];
 	} else {	// graphics mode: uses full 6KB of VRAM
-		return state->m_video_ram[offset];
+		return m_video_ram[offset];
 	}
 }
 
@@ -280,7 +280,7 @@ static const cassette_interface spc1000_cassette_interface =
 static const mc6847_interface spc1000_mc6847_intf =
 {
 	"screen",
-	DEVCB_HANDLER(spc1000_mc6847_videoram_r),	// data fetch
+	DEVCB_DRIVER_MEMBER(spc1000_state,spc1000_mc6847_videoram_r),	// data fetch
 	DEVCB_NULL,
 	DEVCB_NULL,
 

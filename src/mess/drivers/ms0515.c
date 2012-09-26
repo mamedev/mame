@@ -34,6 +34,7 @@ public:
 	int m_blink;
 	virtual void palette_init();
 	UINT32 screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE8_MEMBER(ms0515_portc_w);
 };
 
 static ADDRESS_MAP_START(ms0515_mem, AS_PROGRAM, 16, ms0515_state)
@@ -234,10 +235,9 @@ void ms0515_state::palette_init()
 	palette_set_color(machine(), 15, MAKE_RGB(255, 255, 255));
 }
 
-static WRITE8_DEVICE_HANDLER(ms0515_portc_w)
+WRITE8_MEMBER(ms0515_state::ms0515_portc_w)
 {
-	ms0515_state *state = space.machine().driver_data<ms0515_state>();
-	state->m_sysreg = data;
+	m_sysreg = data;
 }
 I8255A_INTERFACE( ms0515_ppi8255_interface_1 )
 {
@@ -246,7 +246,7 @@ I8255A_INTERFACE( ms0515_ppi8255_interface_1 )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(ms0515_portc_w)
+	DEVCB_DRIVER_MEMBER(ms0515_state,ms0515_portc_w)
 };
 
 static MACHINE_CONFIG_START( ms0515, ms0515_state )

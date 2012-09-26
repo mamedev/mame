@@ -195,6 +195,7 @@ public:
 	DECLARE_DRIVER_INIT(dectalk);
 	virtual void machine_reset();
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
+	DECLARE_WRITE8_MEMBER(dectalk_kbd_put);
 };
 
 
@@ -718,14 +719,14 @@ DRIVER_INIT_MEMBER(dectalk_state,dectalk)
 	machine().scheduler().timer_set(attotime::from_hz(10000), timer_expired_delegate(FUNC(dectalk_state::outfifo_read_cb),this));
 }
 
-static WRITE8_DEVICE_HANDLER( dectalk_kbd_put )
+WRITE8_MEMBER(dectalk_state::dectalk_kbd_put)
 {
-	duart68681_rx_data(space.machine().device("duart68681"), 1, data);
+	duart68681_rx_data(machine().device("duart68681"), 1, data);
 }
 
 static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
 {
-	DEVCB_HANDLER(dectalk_kbd_put)
+	DEVCB_DRIVER_MEMBER(dectalk_state,dectalk_kbd_put)
 };
 
 static MACHINE_CONFIG_START( dectalk, dectalk_state )

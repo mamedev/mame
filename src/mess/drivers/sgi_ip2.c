@@ -103,6 +103,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	INTERRUPT_GEN_MEMBER(sgi_ip2_vbl);
+	DECLARE_WRITE8_MEMBER(sgi_kbd_put);
 };
 
 
@@ -357,14 +358,14 @@ WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_stklmt_w)
 	COMBINE_DATA(&m_stklmt);
 }
 
-static WRITE8_DEVICE_HANDLER( sgi_kbd_put )
+WRITE8_MEMBER(sgi_ip2_state::sgi_kbd_put)
 {
-	duart68681_rx_data(space.machine().device("duart68681a"), 1, data);
+	duart68681_rx_data(machine().device("duart68681a"), 1, data);
 }
 
 static GENERIC_TERMINAL_INTERFACE( sgi_terminal_intf )
 {
-	DEVCB_HANDLER(sgi_kbd_put)
+	DEVCB_DRIVER_MEMBER(sgi_ip2_state,sgi_kbd_put)
 };
 
 

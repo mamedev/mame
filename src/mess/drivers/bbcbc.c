@@ -28,6 +28,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_start();
 	virtual void machine_reset();
+	DECLARE_WRITE_LINE_MEMBER(tms_interrupt);
 };
 
 
@@ -98,16 +99,16 @@ static INPUT_PORTS_START( bbcbc )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Play, No") PORT_CODE(KEYCODE_B) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
-static WRITE_LINE_DEVICE_HANDLER(tms_interrupt)
+WRITE_LINE_MEMBER(bbcbc_state::tms_interrupt)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TMS9928A_INTERFACE(tms9129_interface)
 {
 	"screen",
 	0x4000,
-	DEVCB_LINE(tms_interrupt)
+	DEVCB_DRIVER_LINE_MEMBER(bbcbc_state, tms_interrupt)
 };
 
 /* TODO */

@@ -418,6 +418,28 @@ public:
 	INTERRUPT_GEN_MEMBER(pc9801_vrtc_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	DECLARE_INPUT_CHANGED_MEMBER(shift_stroke);
+	DECLARE_WRITE_LINE_MEMBER(pc9801_master_set_int_line);
+	DECLARE_READ8_MEMBER(get_slave_ack);
+	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
+	DECLARE_READ8_MEMBER(test_r);
+	DECLARE_WRITE8_MEMBER(test_w);
+	DECLARE_READ8_MEMBER(ppi_sys_porta_r);
+	DECLARE_READ8_MEMBER(ppi_sys_portb_r);
+	DECLARE_READ8_MEMBER(ppi_prn_portb_r);
+	DECLARE_WRITE8_MEMBER(ppi_sys_portc_w);
+	DECLARE_READ8_MEMBER(ppi_fdd_porta_r);
+	DECLARE_READ8_MEMBER(ppi_fdd_portb_r);
+	DECLARE_READ8_MEMBER(ppi_fdd_portc_r);
+	DECLARE_WRITE8_MEMBER(ppi_fdd_portc_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_2hd_irq);
+	DECLARE_WRITE_LINE_MEMBER(fdc_2hd_drq);
+	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_irq);
+	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_drq);
+	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
 };
 
 
@@ -2198,25 +2220,25 @@ ir7
 */
 
 
-static WRITE_LINE_DEVICE_HANDLER( pc9801_master_set_int_line )
+WRITE_LINE_MEMBER(pc9801_state::pc9801_master_set_int_line)
 {
 	//printf("%02x\n",interrupt);
-	device->machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-static READ8_DEVICE_HANDLER( get_slave_ack )
+READ8_MEMBER(pc9801_state::get_slave_ack)
 {
 	if (offset==7) { // IRQ = 7
-		return	pic8259_acknowledge( space.machine().device( "pic8259_slave" ));
+		return	pic8259_acknowledge( machine().device( "pic8259_slave" ));
 	}
 	return 0x00;
 }
 
 static const struct pic8259_interface pic8259_master_config =
 {
-	DEVCB_LINE(pc9801_master_set_int_line),
+	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_master_set_int_line),
 	DEVCB_LINE_VCC,
-	DEVCB_HANDLER(get_slave_ack)
+	DEVCB_DRIVER_MEMBER(pc9801_state,get_slave_ack)
 };
 
 static const struct pic8259_interface pic8259_slave_config =
@@ -2276,12 +2298,12 @@ static const struct pit8253_config pc9801rs_pit8253_config =
 *
 ****************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
+WRITE_LINE_MEMBER(pc9801_state::pc_dma_hrq_changed)
 {
-	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	i8237_hlda_w( device, state );
+	i8237_hlda_w( machine().device("dma8237"), state );
 }
 
 
@@ -2302,38 +2324,38 @@ WRITE8_MEMBER(pc9801_state::pc_dma_write_byte)
 	space.write_byte(page_offset + offset, data);
 }
 
-static void set_dma_channel(device_t *device, int channel, int state)
+static void set_dma_channel(running_machine &machine, int channel, int state)
 {
-	pc9801_state *drvstate = device->machine().driver_data<pc9801_state>();
+	pc9801_state *drvstate = machine.driver_data<pc9801_state>();
 	if (!state) drvstate->m_dma_channel = channel;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { /*printf("%02x 0\n",state);*/ set_dma_channel(device, 0, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { /*printf("%02x 1\n",state);*/ set_dma_channel(device, 1, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { /*printf("%02x 2\n",state);*/ set_dma_channel(device, 2, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { /*printf("%02x 3\n",state);*/ set_dma_channel(device, 3, state); }
+WRITE_LINE_MEMBER(pc9801_state::pc_dack0_w){ /*printf("%02x 0\n",state);*/ set_dma_channel(machine(), 0, state); }
+WRITE_LINE_MEMBER(pc9801_state::pc_dack1_w){ /*printf("%02x 1\n",state);*/ set_dma_channel(machine(), 1, state); }
+WRITE_LINE_MEMBER(pc9801_state::pc_dack2_w){ /*printf("%02x 2\n",state);*/ set_dma_channel(machine(), 2, state); }
+WRITE_LINE_MEMBER(pc9801_state::pc_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma_channel(machine(), 3, state); }
 
-static READ8_DEVICE_HANDLER( test_r )
+READ8_MEMBER(pc9801_state::test_r)
 {
 	printf("2dd DACK R\n");
 
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( test_w )
+WRITE8_MEMBER(pc9801_state::test_w)
 {
 	printf("2dd DACK W\n");
 }
 
 static I8237_INTERFACE( dma8237_config )
 {
-	DEVCB_LINE(pc_dma_hrq_changed),
+	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc_dma_hrq_changed),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(pc9801_state, pc_dma_read_byte),
 	DEVCB_DRIVER_MEMBER(pc9801_state, pc_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(test_r) },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(test_w) },
-	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,test_r) },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,test_w) },
+	{ DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc_dack3_w) }
 };
 
 /****************************************
@@ -2342,63 +2364,63 @@ static I8237_INTERFACE( dma8237_config )
 *
 ****************************************/
 
-static READ8_DEVICE_HANDLER( ppi_sys_porta_r ) { return device->machine().root_device().ioport("DSW2")->read(); }
-static READ8_DEVICE_HANDLER( ppi_sys_portb_r ) { return device->machine().root_device().ioport("DSW1")->read() & 0xff; }
-static READ8_DEVICE_HANDLER( ppi_prn_portb_r ) { return device->machine().root_device().ioport("DSW1")->read() >> 8; }
+READ8_MEMBER(pc9801_state::ppi_sys_porta_r){ return machine().root_device().ioport("DSW2")->read(); }
+READ8_MEMBER(pc9801_state::ppi_sys_portb_r){ return machine().root_device().ioport("DSW1")->read() & 0xff; }
+READ8_MEMBER(pc9801_state::ppi_prn_portb_r){ return machine().root_device().ioport("DSW1")->read() >> 8; }
 
-static WRITE8_DEVICE_HANDLER( ppi_sys_portc_w )
+WRITE8_MEMBER(pc9801_state::ppi_sys_portc_w)
 {
-	beep_set_state(space.machine().device(BEEPER_TAG),!(data & 0x08));
+	beep_set_state(machine().device(BEEPER_TAG),!(data & 0x08));
 }
 
 static I8255A_INTERFACE( ppi_system_intf )
 {
-	DEVCB_HANDLER(ppi_sys_porta_r),					/* Port A read */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_sys_porta_r),					/* Port A read */
 	DEVCB_NULL,					/* Port A write */
-	DEVCB_HANDLER(ppi_sys_portb_r),					/* Port B read */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_sys_portb_r),					/* Port B read */
 	DEVCB_NULL,					/* Port B write */
 	DEVCB_NULL,					/* Port C read */
-	DEVCB_HANDLER(ppi_sys_portc_w)					/* Port C write */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_sys_portc_w)					/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi_printer_intf )
 {
 	DEVCB_NULL,					/* Port A read */
 	DEVCB_NULL,					/* Port A write */
-	DEVCB_HANDLER(ppi_prn_portb_r),					/* Port B read */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_prn_portb_r),					/* Port B read */
 	DEVCB_NULL,					/* Port B write */
 	DEVCB_NULL,					/* Port C read */
 	DEVCB_NULL					/* Port C write */
 };
 
-static READ8_DEVICE_HANDLER( ppi_fdd_porta_r )
+READ8_MEMBER(pc9801_state::ppi_fdd_porta_r)
 {
 	return 0xff;
 }
 
-static READ8_DEVICE_HANDLER( ppi_fdd_portb_r )
+READ8_MEMBER(pc9801_state::ppi_fdd_portb_r)
 {
-	return 0xff; //upd765_status_r(space.machine().device("upd765_2dd"),space, 0);
+	return 0xff; //upd765_status_r(machine().device("upd765_2dd"),space, 0);
 }
 
-static READ8_DEVICE_HANDLER( ppi_fdd_portc_r )
+READ8_MEMBER(pc9801_state::ppi_fdd_portc_r)
 {
-	return 0xff; //upd765_data_r(space.machine().device("upd765_2dd"),space, 0);
+	return 0xff; //upd765_data_r(machine().device("upd765_2dd"),space, 0);
 }
 
-static WRITE8_DEVICE_HANDLER( ppi_fdd_portc_w )
+WRITE8_MEMBER(pc9801_state::ppi_fdd_portc_w)
 {
-	//upd765_data_w(space.machine().device("upd765_2dd"),space, 0,data);
+	//upd765_data_w(machine().device("upd765_2dd"),space, 0,data);
 }
 
 static I8255A_INTERFACE( ppi_fdd_intf )
 {
-	DEVCB_HANDLER(ppi_fdd_porta_r),					/* Port A read */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_fdd_porta_r),					/* Port A read */
 	DEVCB_NULL,					/* Port A write */
-	DEVCB_HANDLER(ppi_fdd_portb_r),					/* Port B read */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_fdd_portb_r),					/* Port B read */
 	DEVCB_NULL,					/* Port B write */
-	DEVCB_HANDLER(ppi_fdd_portc_r),					/* Port C read */
-	DEVCB_HANDLER(ppi_fdd_portc_w)					/* Port C write */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_fdd_portc_r),					/* Port C read */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_fdd_portc_w)					/* Port C write */
 };
 
 /****************************************
@@ -2407,39 +2429,38 @@ static I8255A_INTERFACE( ppi_fdd_intf )
 *
 ****************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( fdc_2hd_irq )
+WRITE_LINE_MEMBER(pc9801_state::fdc_2hd_irq)
 {
 	printf("IRQ %d\n",state);
 	//if(state)
-	//  pic8259_ir3_w(device->machine().device("pic8259_slave"), state);
+	//  pic8259_ir3_w(machine().device("pic8259_slave"), state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( fdc_2hd_drq )
+WRITE_LINE_MEMBER(pc9801_state::fdc_2hd_drq)
 {
 	printf("%02x DRQ\n",state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( fdc_2dd_irq )
+WRITE_LINE_MEMBER(pc9801_state::fdc_2dd_irq)
 {
-	pc9801_state *drvstate = device->machine().driver_data<pc9801_state>();
 
 	printf("IRQ %d\n",state);
 
-	if(drvstate->m_fdc_2dd_ctrl & 8)
+	if(m_fdc_2dd_ctrl & 8)
 	{
-		pic8259_ir2_w(device->machine().device("pic8259_slave"), state);
+		pic8259_ir2_w(machine().device("pic8259_slave"), state);
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( fdc_2dd_drq )
+WRITE_LINE_MEMBER(pc9801_state::fdc_2dd_drq)
 {
 	printf("%02x DRQ\n",state);
 }
 
 static const struct upd765_interface upd765_2hd_intf =
 {
-	DEVCB_LINE(fdc_2hd_irq),
-	DEVCB_LINE(fdc_2hd_drq), //DRQ, TODO
+	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, fdc_2hd_irq),
+	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, fdc_2hd_drq), //DRQ, TODO
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
@@ -2447,29 +2468,28 @@ static const struct upd765_interface upd765_2hd_intf =
 
 static const struct upd765_interface upd765_2dd_intf =
 {
-	DEVCB_LINE(fdc_2dd_irq),
-	DEVCB_LINE(fdc_2dd_drq), //DRQ, TODO
+	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, fdc_2dd_irq),
+	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, fdc_2dd_drq), //DRQ, TODO
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{NULL, NULL, NULL, NULL}
 };
 
-static WRITE_LINE_DEVICE_HANDLER( pc9801rs_fdc_irq )
+WRITE_LINE_MEMBER(pc9801_state::pc9801rs_fdc_irq)
 {
-	pc9801_state *drvstate = device->machine().driver_data<pc9801_state>();
 
 	/* 0xffaf8 */
 
-	if(drvstate->m_fdc_ctrl & 1)
-		pic8259_ir3_w(device->machine().device("pic8259_slave"), state);
+	if(m_fdc_ctrl & 1)
+		pic8259_ir3_w(machine().device("pic8259_slave"), state);
 	else
-		pic8259_ir2_w(device->machine().device("pic8259_slave"), state);
+		pic8259_ir2_w(machine().device("pic8259_slave"), state);
 }
 
 static const struct upd765_interface pc9801rs_upd765_intf =
 {
-	DEVCB_LINE(pc9801rs_fdc_irq),
-	DEVCB_LINE(fdc_2dd_drq), //DRQ, TODO
+	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801rs_fdc_irq),
+	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, fdc_2dd_drq), //DRQ, TODO
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}

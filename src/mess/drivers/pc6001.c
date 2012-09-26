@@ -238,6 +238,12 @@ public:
 	TIMER_CALLBACK_MEMBER(audio_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	DECLARE_READ8_MEMBER(pc6001_8255_porta_r);
+	DECLARE_WRITE8_MEMBER(pc6001_8255_porta_w);
+	DECLARE_READ8_MEMBER(pc6001_8255_portb_r);
+	DECLARE_WRITE8_MEMBER(pc6001_8255_portb_w);
+	DECLARE_WRITE8_MEMBER(pc6001_8255_portc_w);
+	DECLARE_READ8_MEMBER(pc6001_8255_portc_r);
 };
 
 
@@ -1875,33 +1881,33 @@ static IRQ_CALLBACK ( pc6001_irq_callback )
 	return state->m_irq_vector;
 }
 
-static READ8_DEVICE_HANDLER (pc6001_8255_porta_r )
+READ8_MEMBER(pc6001_state::pc6001_8255_porta_r)
 {
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER (pc6001_8255_porta_w )
+WRITE8_MEMBER(pc6001_state::pc6001_8255_porta_w)
 {
 //  if(data != 0x06)
 //      printf("pc6001_8255_porta_w %02x\n",data);
 }
 
-static READ8_DEVICE_HANDLER (pc6001_8255_portb_r )
+READ8_MEMBER(pc6001_state::pc6001_8255_portb_r)
 {
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER (pc6001_8255_portb_w )
+WRITE8_MEMBER(pc6001_state::pc6001_8255_portb_w)
 {
 	//printf("pc6001_8255_portb_w %02x\n",data);
 }
 
-static WRITE8_DEVICE_HANDLER (pc6001_8255_portc_w )
+WRITE8_MEMBER(pc6001_state::pc6001_8255_portc_w)
 {
 	//printf("pc6001_8255_portc_w %02x\n",data);
 }
 
-static READ8_DEVICE_HANDLER (pc6001_8255_portc_r )
+READ8_MEMBER(pc6001_state::pc6001_8255_portc_r)
 {
 	return 0x88;
 }
@@ -1910,12 +1916,12 @@ static READ8_DEVICE_HANDLER (pc6001_8255_portc_r )
 
 static I8255_INTERFACE( pc6001_ppi8255_interface )
 {
-	DEVCB_HANDLER(pc6001_8255_porta_r),
-	DEVCB_HANDLER(pc6001_8255_porta_w),
-	DEVCB_HANDLER(pc6001_8255_portb_r),
-	DEVCB_HANDLER(pc6001_8255_portb_w),
-	DEVCB_HANDLER(pc6001_8255_portc_r),
-	DEVCB_HANDLER(pc6001_8255_portc_w)
+	DEVCB_DRIVER_MEMBER(pc6001_state,pc6001_8255_porta_r),
+	DEVCB_DRIVER_MEMBER(pc6001_state,pc6001_8255_porta_w),
+	DEVCB_DRIVER_MEMBER(pc6001_state,pc6001_8255_portb_r),
+	DEVCB_DRIVER_MEMBER(pc6001_state,pc6001_8255_portb_w),
+	DEVCB_DRIVER_MEMBER(pc6001_state,pc6001_8255_portc_r),
+	DEVCB_DRIVER_MEMBER(pc6001_state,pc6001_8255_portc_w)
 };
 
 static const i8251_interface pc6001_usart_interface=

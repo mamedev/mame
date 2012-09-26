@@ -111,6 +111,7 @@ public:
 	virtual void video_start();
 	DECLARE_DRIVER_INIT(mycom);
 	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
+	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
 };
 
 
@@ -419,16 +420,15 @@ WRITE8_MEMBER( mycom_state::mycom_0a_w )
 		m_audio->write(space, 0, m_sn_we);
 }
 
-static WRITE8_DEVICE_HANDLER( mycom_rtc_w )
+WRITE8_MEMBER(mycom_state::mycom_rtc_w)
 {
-	mycom_state *state = space.machine().driver_data<mycom_state>();
 
-	state->m_rtc->address_w(data & 0x0f);
+	m_rtc->address_w(data & 0x0f);
 
-	state->m_rtc->hold_w(BIT(data, 4));
-	state->m_rtc->read_w(BIT(data, 5));
-	state->m_rtc->write_w(BIT(data, 6));
-	state->m_rtc->cs_w(BIT(data, 7));
+	m_rtc->hold_w(BIT(data, 4));
+	m_rtc->read_w(BIT(data, 5));
+	m_rtc->write_w(BIT(data, 6));
+	m_rtc->cs_w(BIT(data, 7));
 }
 
 static I8255_INTERFACE( ppi8255_intf_0 )
@@ -458,7 +458,7 @@ static I8255_INTERFACE( ppi8255_intf_2 )
 	DEVCB_DEVICE_MEMBER(MSM5832RS_TAG, msm5832_device, data_r),			/* Port B read */
 	DEVCB_DEVICE_MEMBER(MSM5832RS_TAG, msm5832_device, data_w),			/* Port B write */
 	DEVCB_NULL,			/* Port C read */
-	DEVCB_HANDLER(mycom_rtc_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(mycom_state,mycom_rtc_w)			/* Port C write */
 };
 
 static const UINT8 mycom_keyval[] = { 0,

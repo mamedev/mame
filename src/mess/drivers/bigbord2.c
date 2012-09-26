@@ -146,6 +146,7 @@ public:
 	required_device<device_t> m_beeper;
 	DECLARE_DRIVER_INIT(bigbord2);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
+	DECLARE_WRITE_LINE_MEMBER(bigbord2_interrupt);
 };
 
 /* Status port
@@ -388,14 +389,14 @@ INPUT_PORTS_END
 
 /* Z80 SIO */
 
-static WRITE_LINE_DEVICE_HANDLER( bigbord2_interrupt )
+WRITE_LINE_MEMBER(bigbord2_state::bigbord2_interrupt)
 {
-	device->machine().device(Z80_TAG)->execute().set_input_line(0, state);
+	machine().device(Z80_TAG)->execute().set_input_line(0, state);
 }
 
 const z80sio_interface sio_intf =
 {
-	DEVCB_LINE(bigbord2_interrupt),	/* interrupt handler */
+	DEVCB_DRIVER_LINE_MEMBER(bigbord2_state, bigbord2_interrupt),	/* interrupt handler */
 	DEVCB_NULL,			/* DTR changed handler */
 	DEVCB_NULL,			/* RTS changed handler */
 	DEVCB_NULL,			/* BREAK changed handler */

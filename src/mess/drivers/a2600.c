@@ -115,6 +115,11 @@ public:
 	DECLARE_MACHINE_START(a2600);
 	DECLARE_MACHINE_START(a2600p);
 	TIMER_CALLBACK_MEMBER(modeDPC_timer_callback);
+	DECLARE_WRITE8_MEMBER(switch_A_w);
+	DECLARE_READ8_MEMBER(switch_A_r);
+	DECLARE_WRITE8_MEMBER(switch_B_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_callback);
+	DECLARE_READ8_MEMBER(riot_input_port_8_r);
 };
 
 
@@ -1175,48 +1180,44 @@ static ADDRESS_MAP_START(a2600_mem, AS_PROGRAM, 8, a2600_state )
 	AM_RANGE(0x1000, 0x1FFF)                   AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static WRITE8_DEVICE_HANDLER(switch_A_w)
+WRITE8_MEMBER(a2600_state::switch_A_w)
 {
-	a2600_state *state = space.machine().driver_data<a2600_state>();
-	running_machine &machine = space.machine();
-
 	/* Left controller port */
-	if ( machine.root_device().ioport("CONTROLLERS")->read() / CATEGORY_SELECT == 0x03 )
+	if ( machine().root_device().ioport("CONTROLLERS")->read() / CATEGORY_SELECT == 0x03 )
 	{
-		state->m_keypad_left_column = data / 16;
+		m_keypad_left_column = data / 16;
 	}
 
 	/* Right controller port */
-	switch( machine.root_device().ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
+	switch( machine().root_device().ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
 	{
 	case 0x03:	/* Keypad */
-		state->m_keypad_right_column = data & 0x0F;
+		m_keypad_right_column = data & 0x0F;
 		break;
 	case 0x0a:	/* KidVid voice module */
-		machine.device<cassette_image_device>(CASSETTE_TAG)->change_state(( data & 0x02 ) ? (cassette_state)CASSETTE_MOTOR_DISABLED : (cassette_state)(CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), (cassette_state)CASSETTE_MOTOR_DISABLED );
+		machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(( data & 0x02 ) ? (cassette_state)CASSETTE_MOTOR_DISABLED : (cassette_state)(CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), (cassette_state)CASSETTE_MOTOR_DISABLED );
 		break;
 	}
 }
 
-static READ8_DEVICE_HANDLER( switch_A_r )
+READ8_MEMBER(a2600_state::switch_A_r)
 {
 	static const UINT8 driving_lookup[4] = { 0x00, 0x02, 0x03, 0x01 };
-	running_machine &machine = space.machine();
 	UINT8 val = 0;
 
 	/* Left controller port PINs 1-4 ( 4321 ) */
-	switch( machine.root_device().ioport("CONTROLLERS")->read() / CATEGORY_SELECT )
+	switch( machine().root_device().ioport("CONTROLLERS")->read() / CATEGORY_SELECT )
 	{
 	case 0x00:  /* Joystick */
 	case 0x05:	/* Joystick w/Boostergrip */
-		val |= machine.root_device().ioport("SWA_JOY")->read() & 0xF0;
+		val |= machine().root_device().ioport("SWA_JOY")->read() & 0xF0;
 		break;
 	case 0x01:  /* Paddle */
-		val |= machine.root_device().ioport("SWA_PAD")->read() & 0xF0;
+		val |= machine().root_device().ioport("SWA_PAD")->read() & 0xF0;
 		break;
 	case 0x02:	/* Driving */
 		val |= 0xC0;
-		val |= ( driving_lookup[ ( machine.root_device().ioport("WHEEL_L")->read() & 0x18 ) >> 3 ] << 4 );
+		val |= ( driving_lookup[ ( machine().root_device().ioport("WHEEL_L")->read() & 0x18 ) >> 3 ] << 4 );
 		break;
 	case 0x06:	/* Trakball CX-22 */
 	case 0x07:	/* Trakball CX-80 / ST mouse */
@@ -1227,18 +1228,18 @@ static READ8_DEVICE_HANDLER( switch_A_r )
 	}
 
 	/* Right controller port PINs 1-4 ( 4321 ) */
-	switch( machine.root_device().ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
+	switch( machine().root_device().ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
 	{
 	case 0x00:	/* Joystick */
 	case 0x05:	/* Joystick w/Boostergrip */
-		val |= machine.root_device().ioport("SWA_JOY")->read() & 0x0F;
+		val |= machine().root_device().ioport("SWA_JOY")->read() & 0x0F;
 		break;
 	case 0x01:	/* Paddle */
-		val |= machine.root_device().ioport("SWA_PAD")->read() & 0x0F;
+		val |= machine().root_device().ioport("SWA_PAD")->read() & 0x0F;
 		break;
 	case 0x02:	/* Driving */
 		val |= 0x0C;
-		val |= ( driving_lookup[ ( machine.root_device().ioport("WHEEL_R")->read() & 0x18 ) >> 3 ] );
+		val |= ( driving_lookup[ ( machine().root_device().ioport("WHEEL_R")->read() & 0x18 ) >> 3 ] );
 		break;
 	case 0x06:	/* Trakball CX-22 */
 	case 0x07:	/* Trakball CX-80 / ST mouse */
@@ -1251,26 +1252,26 @@ static READ8_DEVICE_HANDLER( switch_A_r )
 	return val;
 }
 
-static WRITE8_DEVICE_HANDLER(switch_B_w )
+WRITE8_MEMBER(a2600_state::switch_B_w)
 {
 }
 
-static WRITE_LINE_DEVICE_HANDLER( irq_callback )
+WRITE_LINE_MEMBER(a2600_state::irq_callback)
 {
 }
 
-static READ8_DEVICE_HANDLER( riot_input_port_8_r )
+READ8_MEMBER(a2600_state::riot_input_port_8_r)
 {
-	return space.machine().root_device().ioport("SWB")->read();
+	return machine().root_device().ioport("SWB")->read();
 }
 
 static const riot6532_interface r6532_interface =
 {
-	DEVCB_HANDLER(switch_A_r),
-	DEVCB_HANDLER(riot_input_port_8_r),
-	DEVCB_HANDLER(switch_A_w),
-	DEVCB_HANDLER(switch_B_w),
-	DEVCB_LINE(irq_callback)
+	DEVCB_DRIVER_MEMBER(a2600_state,switch_A_r),
+	DEVCB_DRIVER_MEMBER(a2600_state,riot_input_port_8_r),
+	DEVCB_DRIVER_MEMBER(a2600_state,switch_A_w),
+	DEVCB_DRIVER_MEMBER(a2600_state,switch_B_w),
+	DEVCB_DRIVER_LINE_MEMBER(a2600_state, irq_callback)
 };
 
 

@@ -199,6 +199,9 @@ public:
 	DECLARE_WRITE8_MEMBER(vtech1_video_bank_w);
 	DECLARE_DRIVER_INIT(vtech1h);
 	DECLARE_DRIVER_INIT(vtech1);
+	DECLARE_READ8_MEMBER(vtech1_printer_r);
+	DECLARE_WRITE8_MEMBER(vtech1_strobe_w);
+	DECLARE_READ8_MEMBER(vtech1_mc6847_videoram_r);
 };
 
 
@@ -480,16 +483,16 @@ static const floppy_interface vtech1_floppy_interface =
     PRINTER
 ***************************************************************************/
 
-static READ8_DEVICE_HANDLER( vtech1_printer_r )
+READ8_MEMBER(vtech1_state::vtech1_printer_r)
 {
-	centronics_device *centronics = space.machine().device<centronics_device>("centronics");
+	centronics_device *centronics = machine().device<centronics_device>("centronics");
 	return 0xfe | centronics->busy_r();
 }
 
 /* TODO: figure out how this really works */
-static WRITE8_DEVICE_HANDLER( vtech1_strobe_w )
+WRITE8_MEMBER(vtech1_state::vtech1_strobe_w)
 {
-	centronics_device *centronics = space.machine().device<centronics_device>("centronics");
+	centronics_device *centronics = machine().device<centronics_device>("centronics");
 	centronics->strobe_w(TRUE);
 	centronics->strobe_w(FALSE);
 }
@@ -611,14 +614,13 @@ WRITE8_MEMBER(vtech1_state::vtech1_video_bank_w)
     VIDEO EMULATION
 ***************************************************************************/
 
-static READ8_DEVICE_HANDLER( vtech1_mc6847_videoram_r )
+READ8_MEMBER(vtech1_state::vtech1_mc6847_videoram_r)
 {
-	vtech1_state *vtech1 = space.machine().driver_data<vtech1_state>();
 	if (offset == ~0) return 0xff;
-	vtech1->m_mc6847->inv_w(BIT(vtech1->m_videoram[offset], 6));
-	vtech1->m_mc6847->as_w(BIT(vtech1->m_videoram[offset], 7));
+	m_mc6847->inv_w(BIT(m_videoram[offset], 6));
+	m_mc6847->as_w(BIT(m_videoram[offset], 7));
 
-	return vtech1->m_videoram[offset];
+	return m_videoram[offset];
 }
 
 
@@ -733,8 +735,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vtech1_io, AS_IO, 8, vtech1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD_LEGACY("centronics", vtech1_printer_r)
-	AM_RANGE(0x0d, 0x0d) AM_DEVWRITE_LEGACY("centronics", vtech1_strobe_w)
+	AM_RANGE(0x00, 0x00) AM_READ(vtech1_printer_r)
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(vtech1_strobe_w)
 	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("centronics", centronics_device, write)
 	AM_RANGE(0x10, 0x1f) AM_READWRITE(vtech1_fdc_r, vtech1_fdc_w)
 	AM_RANGE(0x20, 0x2f) AM_READ(vtech1_joystick_r)
@@ -912,7 +914,7 @@ static const cassette_interface laser_cassette_interface =
 static const mc6847_interface vtech1_mc6847_bw_intf =
 {
 	"screen",
-	DEVCB_HANDLER(vtech1_mc6847_videoram_r),
+	DEVCB_DRIVER_MEMBER(vtech1_state,vtech1_mc6847_videoram_r),
 	DEVCB_NULL,									/* horz sync */
 	DEVCB_CPU_INPUT_LINE("maincpu", 0),			/* field sync */
 
@@ -932,7 +934,7 @@ static const mc6847_interface vtech1_mc6847_bw_intf =
 static const mc6847_interface vtech1_mc6847_intf =
 {
 	"screen",
-	DEVCB_HANDLER(vtech1_mc6847_videoram_r),
+	DEVCB_DRIVER_MEMBER(vtech1_state,vtech1_mc6847_videoram_r),
 	DEVCB_NULL,									/* horz sync */
 	DEVCB_CPU_INPUT_LINE("maincpu", 0),			/* field sync */
 
@@ -952,7 +954,7 @@ static const mc6847_interface vtech1_mc6847_intf =
 static const mc6847_interface vtech1_shrg_mc6847_intf =
 {
 	"screen",
-	DEVCB_HANDLER(vtech1_mc6847_videoram_r),
+	DEVCB_DRIVER_MEMBER(vtech1_state,vtech1_mc6847_videoram_r),
 	DEVCB_NULL,									/* horz sync */
 	DEVCB_CPU_INPUT_LINE("maincpu", 0),			/* field sync */
 

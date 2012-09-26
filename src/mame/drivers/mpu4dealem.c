@@ -31,6 +31,7 @@ public:
 	DECLARE_MACHINE_RESET(dealem_vid);
 	DECLARE_PALETTE_INIT(dealem);
 	UINT32 screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(dealem_vsync_changed);
 };
 
 
@@ -132,9 +133,9 @@ UINT32 mpu4dealem_state::screen_update_dealem(screen_device &screen, bitmap_ind1
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( dealem_vsync_changed )
+WRITE_LINE_MEMBER(mpu4dealem_state::dealem_vsync_changed)
 {
-	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, state);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, state);
 }
 
 
@@ -154,7 +155,7 @@ static const mc6845_interface hd6845_intf =
 	DEVCB_NULL,							/* callback for display state changes */
 	DEVCB_NULL,							/* callback for cursor state changes */
 	DEVCB_NULL,							/* HSYNC callback */
-	DEVCB_LINE(dealem_vsync_changed),	/* VSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4dealem_state, dealem_vsync_changed),	/* VSYNC callback */
 	NULL								/* update address callback */
 };
 

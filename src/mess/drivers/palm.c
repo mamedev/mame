@@ -45,6 +45,12 @@ public:
 	virtual void machine_reset();
 	DECLARE_INPUT_CHANGED_MEMBER(pen_check);
 	DECLARE_INPUT_CHANGED_MEMBER(button_check);
+	DECLARE_WRITE8_MEMBER(palm_port_f_out);
+	DECLARE_READ8_MEMBER(palm_port_c_in);
+	DECLARE_READ8_MEMBER(palm_port_f_in);
+	DECLARE_WRITE16_MEMBER(palm_spim_out);
+	DECLARE_READ16_MEMBER(palm_spim_in);
+	DECLARE_WRITE8_MEMBER(palm_dac_transition);
 };
 
 static offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
@@ -71,33 +77,29 @@ INPUT_CHANGED_MEMBER(palm_state::button_check)
 	mc68328_set_port_d_lines(m_lsi, button_state, (int)(FPTR)param);
 }
 
-static WRITE8_DEVICE_HANDLER( palm_port_f_out )
+WRITE8_MEMBER(palm_state::palm_port_f_out)
 {
-	palm_state *state = space.machine().driver_data<palm_state>();
-	state->m_port_f_latch = data;
+	m_port_f_latch = data;
 }
 
-static READ8_DEVICE_HANDLER( palm_port_c_in )
+READ8_MEMBER(palm_state::palm_port_c_in)
 {
 	return 0x10;
 }
 
-static READ8_DEVICE_HANDLER( palm_port_f_in )
+READ8_MEMBER(palm_state::palm_port_f_in)
 {
-	palm_state *state = space.machine().driver_data<palm_state>();
-	return state->m_port_f_latch;
+	return m_port_f_latch;
 }
 
-static WRITE16_DEVICE_HANDLER( palm_spim_out )
+WRITE16_MEMBER(palm_state::palm_spim_out)
 {
-	palm_state *state = space.machine().driver_data<palm_state>();
-	state->m_spim_data = data;
+	m_spim_data = data;
 }
 
-static READ16_DEVICE_HANDLER( palm_spim_in )
+READ16_MEMBER(palm_state::palm_spim_in)
 {
-	palm_state *state = space.machine().driver_data<palm_state>();
-	return state->m_spim_data;
+	return m_spim_data;
 }
 
 static void palm_spim_exchange( device_t *device )
@@ -157,10 +159,9 @@ ADDRESS_MAP_END
     AUDIO HARDWARE
 ***************************************************************************/
 
-static WRITE8_DEVICE_HANDLER( palm_dac_transition )
+WRITE8_MEMBER(palm_state::palm_dac_transition)
 {
-	palm_state *state = space.machine().driver_data<palm_state>();
-	state->m_dac->write_unsigned8(0x7f * data );
+	m_dac->write_unsigned8(0x7f * data );
 }
 
 
@@ -176,7 +177,7 @@ static MC68328_INTERFACE(palm_dragonball_iface)
 	DEVCB_NULL,                   // Port C Output
 	DEVCB_NULL,                   // Port D Output
 	DEVCB_NULL,                   // Port E Output
-	DEVCB_HANDLER(palm_port_f_out),// Port F Output
+	DEVCB_DRIVER_MEMBER(palm_state,palm_port_f_out),// Port F Output
 	DEVCB_NULL,                   // Port G Output
 	DEVCB_NULL,                   // Port J Output
 	DEVCB_NULL,                   // Port K Output
@@ -184,19 +185,19 @@ static MC68328_INTERFACE(palm_dragonball_iface)
 
 	DEVCB_NULL,                   // Port A Input
 	DEVCB_NULL,                   // Port B Input
-	DEVCB_HANDLER(palm_port_c_in),// Port C Input
+	DEVCB_DRIVER_MEMBER(palm_state,palm_port_c_in),// Port C Input
 	DEVCB_NULL,                   // Port D Input
 	DEVCB_NULL,                   // Port E Input
-	DEVCB_HANDLER(palm_port_f_in),// Port F Input
+	DEVCB_DRIVER_MEMBER(palm_state,palm_port_f_in),// Port F Input
 	DEVCB_NULL,                   // Port G Input
 	DEVCB_NULL,                   // Port J Input
 	DEVCB_NULL,                   // Port K Input
 	DEVCB_NULL,                   // Port M Input
 
-	DEVCB_HANDLER(palm_dac_transition),
+	DEVCB_DRIVER_MEMBER(palm_state,palm_dac_transition),
 
-	DEVCB_HANDLER(palm_spim_out),
-	DEVCB_HANDLER(palm_spim_in),
+	DEVCB_DRIVER_MEMBER16(palm_state,palm_spim_out),
+	DEVCB_DRIVER_MEMBER16(palm_state,palm_spim_in),
 	palm_spim_exchange
 };
 

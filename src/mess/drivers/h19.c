@@ -67,6 +67,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	TIMER_CALLBACK_MEMBER(h19_beepoff);
+	DECLARE_WRITE_LINE_MEMBER(h19_ace_irq);
 };
 
 
@@ -334,9 +335,9 @@ static MC6845_UPDATE_ROW( h19_update_row )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER(h19_ace_irq)
+WRITE_LINE_MEMBER(h19_state::h19_ace_irq)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
+	machine().device("maincpu")->execute().set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
 static const ins8250_interface h19_ace_interface =
@@ -344,7 +345,7 @@ static const ins8250_interface h19_ace_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(h19_ace_irq), // interrupt
+	DEVCB_DRIVER_LINE_MEMBER(h19_state, h19_ace_irq), // interrupt
 	DEVCB_NULL,
 	DEVCB_NULL
 };

@@ -239,6 +239,9 @@ public:
 	DECLARE_DRIVER_INIT(a800xl);
 	DECLARE_DRIVER_INIT(a600xl);
 	virtual void palette_init();
+	DECLARE_WRITE8_MEMBER(a1200xl_pia_pb_w);
+	DECLARE_WRITE8_MEMBER(a800xl_pia_pb_w);
+	DECLARE_WRITE8_MEMBER(xegs_pia_pb_w);
 };
 
 /**************************************************************
@@ -905,17 +908,19 @@ static void xegs_mmu(running_machine &machine, UINT8 new_mmu)
  *
  **************************************************************/
 
-static WRITE8_DEVICE_HANDLER(a1200xl_pia_pb_w) { a1200xl_mmu(device->machine(), data); }
-static WRITE8_DEVICE_HANDLER(a800xl_pia_pb_w)
+WRITE8_MEMBER(a400_state::a1200xl_pia_pb_w){ device_t *device = machine().device("pia");  a1200xl_mmu(device->machine(), data); }
+WRITE8_MEMBER(a400_state::a800xl_pia_pb_w)
 {
+	device_t *device = machine().device("pia");
 	if (downcast<pia6821_device *>(device)->port_b_z_mask() != 0xff)
-		a800xl_mmu(space.machine(), data);
+		a800xl_mmu(machine(), data);
 }
 
-static WRITE8_DEVICE_HANDLER(xegs_pia_pb_w)
+WRITE8_MEMBER(a400_state::xegs_pia_pb_w)
 {
+	device_t *device = machine().device("pia");
 	if (downcast<pia6821_device *>(device)->port_b_z_mask() != 0xff)
-		xegs_mmu(space.machine(), data);
+		xegs_mmu(machine(), data);
 }
 
 static const pokey_interface atari_pokey_interface =
@@ -977,7 +982,7 @@ static const pia6821_interface a1200xl_pia_interface =
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_DEVICE_HANDLER("pia", a1200xl_pia_pb_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(a400_state, a1200xl_pia_pb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
@@ -993,7 +998,7 @@ static const pia6821_interface a800xl_pia_interface =
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_DEVICE_HANDLER("pia", a800xl_pia_pb_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(a400_state,a800xl_pia_pb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
@@ -1009,7 +1014,7 @@ static const pia6821_interface xegs_pia_interface =
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_DEVICE_HANDLER("pia", xegs_pia_pb_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(a400_state,xegs_pia_pb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */

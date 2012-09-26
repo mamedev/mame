@@ -33,6 +33,8 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(apexc_interrupt);
+	DECLARE_READ8_MEMBER(tape_read);
+	DECLARE_WRITE8_MEMBER(tape_write);
 };
 
 
@@ -264,8 +266,9 @@ apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_con
     Open a tape image
 */
 
-static READ8_DEVICE_HANDLER(tape_read)
+READ8_MEMBER(apexc_state::tape_read)
 {
+	device_t *device = machine().device("tape_reader");
 	UINT8 reply;
 	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 
@@ -275,15 +278,16 @@ static READ8_DEVICE_HANDLER(tape_read)
 		return 0;	/* unit not ready - I don't know what we should do */
 }
 
-static WRITE8_DEVICE_HANDLER(tape_write)
+WRITE8_MEMBER(apexc_state::tape_write)
 {
+	device_t *device = machine().device("tape_puncher");
 	UINT8 data5 = (data & 0x1f);
 	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 
 	if (image->exists())
 		image->fwrite(& data5, 1);
 
-	apexc_teletyper_putchar(space.machine(), data & 0x1f);	/* display on screen */
+	apexc_teletyper_putchar(machine(), data & 0x1f);	/* display on screen */
 }
 
 /*
@@ -855,8 +859,8 @@ static ADDRESS_MAP_START(apexc_mem_map, AS_PROGRAM, 32, apexc_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(apexc_io_map, AS_IO, 8, apexc_state )
-	AM_RANGE(0x00, 0x00) AM_DEVREAD_LEGACY("tape_reader",tape_read)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("tape_puncher",tape_write)
+	AM_RANGE(0x00, 0x00) AM_READ(tape_read)
+	AM_RANGE(0x00, 0x00) AM_WRITE(tape_write)
 ADDRESS_MAP_END
 
 

@@ -58,6 +58,10 @@ public:
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	DECLARE_WRITE_LINE_MEMBER(z80daisy_interrupt);
+	DECLARE_READ8_MEMBER(nanos_port_a_r);
+	DECLARE_READ8_MEMBER(nanos_port_b_r);
+	DECLARE_WRITE8_MEMBER(nanos_port_b_w);
 };
 
 
@@ -121,14 +125,14 @@ static Z80PIO_INTERFACE( pio2_intf )
 
 /* Z80-SIO Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( z80daisy_interrupt )
+WRITE_LINE_MEMBER(nanos_state::z80daisy_interrupt)
 {
-	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, state);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, state);
 }
 
 static const z80sio_interface sio_intf =
 {
-	DEVCB_LINE(z80daisy_interrupt),	/* interrupt handler */
+	DEVCB_DRIVER_LINE_MEMBER(nanos_state, z80daisy_interrupt),	/* interrupt handler */
 	DEVCB_NULL,				/* DTR changed handler */
 	DEVCB_NULL,				/* RTS changed handler */
 	DEVCB_NULL,				/* BREAK changed handler */
@@ -307,33 +311,31 @@ UINT32 nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-static READ8_DEVICE_HANDLER (nanos_port_a_r)
+READ8_MEMBER(nanos_state::nanos_port_a_r)
 {
-	nanos_state *state = space.machine().driver_data<nanos_state>();
 	UINT8 retVal;
-	if (state->m_key_command==0)  {
-		return state->m_key_pressed;
+	if (m_key_command==0)  {
+		return m_key_pressed;
 	} else {
-		retVal = state->m_last_code;
-		state->m_last_code = 0;
+		retVal = m_last_code;
+		m_last_code = 0;
 		return retVal;
 	}
 }
 
-static READ8_DEVICE_HANDLER (nanos_port_b_r)
+READ8_MEMBER(nanos_state::nanos_port_b_r)
 {
 	return 0xff;
 }
 
 
-static WRITE8_DEVICE_HANDLER (nanos_port_b_w)
+WRITE8_MEMBER(nanos_state::nanos_port_b_w)
 {
-	nanos_state *state = space.machine().driver_data<nanos_state>();
-	state->m_key_command = BIT(data,1);
+	m_key_command = BIT(data,1);
 	if (BIT(data,7)) {
-		state->membank("bank1")->set_base(state->memregion("maincpu")->base());
+		membank("bank1")->set_base(memregion("maincpu")->base());
 	} else {
-		state->membank("bank1")->set_base(space.machine().device<ram_device>(RAM_TAG)->pointer());
+		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 	}
 }
 
@@ -455,11 +457,11 @@ void nanos_state::machine_reset()
 static Z80PIO_INTERFACE( nanos_z80pio_intf )
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
-	DEVCB_HANDLER(nanos_port_a_r),
+	DEVCB_DRIVER_MEMBER(nanos_state,nanos_port_a_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(nanos_port_b_r),
-	DEVCB_HANDLER(nanos_port_b_w),
+	DEVCB_DRIVER_MEMBER(nanos_state,nanos_port_b_r),
+	DEVCB_DRIVER_MEMBER(nanos_state,nanos_port_b_w),
 	DEVCB_NULL
 };
 

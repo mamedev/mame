@@ -172,6 +172,17 @@ public:
 	TIMER_CALLBACK_MEMBER(receive_data);
 	TIMER_DEVICE_CALLBACK_MEMBER(frc_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(upd7508_1sec_callback);
+	void px4_sio_txd(device_t *device,int state);
+	int px4_sio_rxd(device_t *device);
+	int px4_sio_pin(device_t *device);
+	void px4_sio_pout(device_t *device,int state);
+	void px4_rs232c_txd(device_t *device,int state);
+	int px4_rs232c_rxd(device_t *device);
+	void px4_rs232c_rts(device_t *device,int state);
+	int px4_rs232c_cts(device_t *device);
+	int px4_rs232c_dsr(device_t *device);
+	void px4_rs232c_dtr(device_t *device,int state);
+	int px4_rs232c_dcd(device_t *device);
 };
 
 
@@ -181,7 +192,7 @@ public:
 
 /* The floppy is connected to this port */
 
-static WRITE_LINE_DEVICE_HANDLER( px4_sio_txd )
+void px4_state::px4_sio_txd(device_t *device,int state)
 {
 	if (VERBOSE)
 		logerror("px4_sio_txd: %d\n", state);
@@ -190,7 +201,7 @@ static WRITE_LINE_DEVICE_HANDLER( px4_sio_txd )
 		tf20_txs_w(device, state);
 }
 
-static READ_LINE_DEVICE_HANDLER( px4_sio_rxd )
+int px4_state::px4_sio_rxd(device_t *device)
 {
 	if (VERBOSE)
 		logerror("px4_sio_rxd\n");
@@ -201,7 +212,7 @@ static READ_LINE_DEVICE_HANDLER( px4_sio_rxd )
 		return ASSERT_LINE;
 }
 
-static READ_LINE_DEVICE_HANDLER( px4_sio_pin )
+int px4_state::px4_sio_pin(device_t *device)
 {
 	if (VERBOSE)
 		logerror("px4_sio_pin\n");
@@ -212,7 +223,7 @@ static READ_LINE_DEVICE_HANDLER( px4_sio_pin )
 		return ASSERT_LINE;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( px4_sio_pout )
+void px4_state::px4_sio_pout(device_t *device,int state)
 {
 	if (VERBOSE)
 		logerror("px4_sio_pout: %d\n", state);
@@ -228,14 +239,14 @@ static WRITE_LINE_DEVICE_HANDLER( px4_sio_pout )
 
 /* Currently nothing is connected to this port */
 
-static WRITE_LINE_DEVICE_HANDLER( px4_rs232c_txd )
+void px4_state::px4_rs232c_txd(device_t *device,int state)
 {
 	if (VERBOSE)
 		logerror("px4_rs232c_txd: %d\n", state);
 }
 
 #ifdef UNUSED_FUNCTION
-static READ_LINE_DEVICE_HANDLER( px4_rs232c_rxd )
+int px4_state::px4_rs232c_rxd(device_t *device)
 {
 	if (VERBOSE)
 		logerror("px4_rs232c_rxd\n");
@@ -243,13 +254,13 @@ static READ_LINE_DEVICE_HANDLER( px4_rs232c_rxd )
 }
 #endif
 
-static WRITE_LINE_DEVICE_HANDLER( px4_rs232c_rts )
+void px4_state::px4_rs232c_rts(device_t *device,int state)
 {
 	if (VERBOSE)
 		logerror("px4_rs232c_rts: %d\n", state);
 }
 
-static READ_LINE_DEVICE_HANDLER( px4_rs232c_cts )
+int px4_state::px4_rs232c_cts(device_t *device)
 {
 	if (VERBOSE)
 		logerror("px4_rs232c_cts\n");
@@ -257,7 +268,7 @@ static READ_LINE_DEVICE_HANDLER( px4_rs232c_cts )
 	return ASSERT_LINE;
 }
 
-static READ_LINE_DEVICE_HANDLER( px4_rs232c_dsr )
+int px4_state::px4_rs232c_dsr(device_t *device)
 {
 	if (VERBOSE)
 		logerror("px4_rs232c_dsr\n");
@@ -265,13 +276,13 @@ static READ_LINE_DEVICE_HANDLER( px4_rs232c_dsr )
 	return ASSERT_LINE;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( px4_rs232c_dtr )
+void px4_state::px4_rs232c_dtr(device_t *device,int state)
 {
 	if (VERBOSE)
 		logerror("px4_rs232c_dtr: %d\n", state);
 }
 
-static READ_LINE_DEVICE_HANDLER( px4_rs232c_dcd )
+int px4_state::px4_rs232c_dcd(device_t *device)
 {
 	if (VERBOSE)
 		logerror("px4_rs232c_dcd\n");

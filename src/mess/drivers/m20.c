@@ -95,6 +95,9 @@ public:
 	DECLARE_DRIVER_INIT(m20);
 	virtual void video_start();
 	UINT32 screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(kbd_rxrdy_int);
+	DECLARE_READ_LINE_MEMBER(wd177x_dden_r);
+	DECLARE_WRITE_LINE_MEMBER(wd177x_intrq_w);
 };
 
 
@@ -410,23 +413,22 @@ static I8255A_INTERFACE( ppi_interface )
     DEVCB_NULL      // port C write
 };
 
-static WRITE_LINE_DEVICE_HANDLER(kbd_rxrdy_int)
+WRITE_LINE_MEMBER(m20_state::kbd_rxrdy_int)
 {
-	pic8259_ir4_w(device->machine().device("i8259"), state);
+	pic8259_ir4_w(machine().device("i8259"), state);
 }
 
 #if 0
-static READ_LINE_DEVICE_HANDLER( wd177x_dden_r )
+READ_LINE_MEMBER(m20_state::wd177x_dden_r)
 {
-	m20_state *state = device->machine().driver_data<m20_state>();
-	printf ("wd177x_dden_r called, returning %d\n", !state->m_port21_sd);
-	return !state->m_port21_sd;
+	printf ("wd177x_dden_r called, returning %d\n", !m_port21_sd);
+	return !m_port21_sd;
 }
 #endif
 
-static WRITE_LINE_DEVICE_HANDLER( wd177x_intrq_w )
+WRITE_LINE_MEMBER(m20_state::wd177x_intrq_w)
 {
-	pic8259_ir0_w(device->machine().device("i8259"), state);
+	pic8259_ir0_w(machine().device("i8259"), state);
 }
 
 static const i8251_interface kbd_i8251_intf =
@@ -436,7 +438,7 @@ static const i8251_interface kbd_i8251_intf =
 	DEVCB_NULL,         // dsr
 	DEVCB_NULL,         // dtr
 	DEVCB_NULL,         // rts
-	DEVCB_LINE(kbd_rxrdy_int),  // rx ready
+	DEVCB_DRIVER_LINE_MEMBER(m20_state, kbd_rxrdy_int),  // rx ready
 	DEVCB_NULL,         // tx ready
 	DEVCB_NULL,         // tx empty
 	DEVCB_NULL          // syndet
@@ -457,8 +459,8 @@ static const i8251_interface tty_i8251_intf =
 
 const wd17xx_interface m20_wd17xx_interface =
 {
-	DEVCB_NULL, //DEVCB_LINE(wd177x_dden_r),
-	DEVCB_LINE(wd177x_intrq_w),
+	DEVCB_NULL, //DEVCB_DRIVER_LINE_MEMBER(m20_state, wd177x_dden_r),
+	DEVCB_DRIVER_LINE_MEMBER(m20_state, wd177x_intrq_w),
 	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };

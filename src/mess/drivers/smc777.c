@@ -89,6 +89,8 @@ public:
 	UINT32 screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(smc777_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	DECLARE_WRITE_LINE_MEMBER(smc777_fdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(smc777_fdc_drq_w);
 };
 
 
@@ -414,16 +416,14 @@ WRITE8_MEMBER(smc777_state::smc777_fdc1_w)
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( smc777_fdc_intrq_w )
+WRITE_LINE_MEMBER(smc777_state::smc777_fdc_intrq_w)
 {
-	smc777_state *drvstate = device->machine().driver_data<smc777_state>();
-	drvstate->m_fdc_irq_flag = state;
+	m_fdc_irq_flag = state;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( smc777_fdc_drq_w )
+WRITE_LINE_MEMBER(smc777_state::smc777_fdc_drq_w)
 {
-	smc777_state *drvstate = device->machine().driver_data<smc777_state>();
-	drvstate->m_fdc_drq_flag = state;
+	m_fdc_drq_flag = state;
 }
 
 READ8_MEMBER(smc777_state::key_r)
@@ -1020,8 +1020,8 @@ void smc777_state::palette_init()
 static const wd17xx_interface smc777_mb8876_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE(smc777_fdc_intrq_w),
-	DEVCB_LINE(smc777_fdc_drq_w),
+	DEVCB_DRIVER_LINE_MEMBER(smc777_state, smc777_fdc_intrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(smc777_state, smc777_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 

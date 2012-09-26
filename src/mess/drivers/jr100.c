@@ -44,6 +44,10 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_tick);
+	DECLARE_READ8_MEMBER(jr100_via_read_b);
+	DECLARE_WRITE8_MEMBER(jr100_via_write_a);
+	DECLARE_WRITE8_MEMBER(jr100_via_write_b);
+	DECLARE_WRITE_LINE_MEMBER(jr100_via_write_cb2);
 };
 
 
@@ -228,47 +232,44 @@ static const char *const keynames[] = {
 };
 
 
-static READ8_DEVICE_HANDLER(jr100_via_read_b)
+READ8_MEMBER(jr100_state::jr100_via_read_b)
 {
-	jr100_state *state = space.machine().driver_data<jr100_state>();
 	UINT8 val = 0x1f;
-	if (keynames[state->m_keyboard_line]) {
-		val = state->ioport(keynames[state->m_keyboard_line])->read();
+	if (keynames[m_keyboard_line]) {
+		val = ioport(keynames[m_keyboard_line])->read();
 	}
 	return val;
 }
 
-static WRITE8_DEVICE_HANDLER(jr100_via_write_a )
+WRITE8_MEMBER(jr100_state::jr100_via_write_a)
 {
-	jr100_state *state = space.machine().driver_data<jr100_state>();
-	state->m_keyboard_line = data & 0x0f;
+	m_keyboard_line = data & 0x0f;
 }
 
-static WRITE8_DEVICE_HANDLER(jr100_via_write_b )
+WRITE8_MEMBER(jr100_state::jr100_via_write_b)
 {
-	jr100_state *state = space.machine().driver_data<jr100_state>();
-	state->m_use_pcg = (data & 0x20) ? TRUE : FALSE;
-	state->m_speaker = data>>7;
+	m_use_pcg = (data & 0x20) ? TRUE : FALSE;
+	m_speaker = data>>7;
 }
 
-static WRITE_LINE_DEVICE_HANDLER(jr100_via_write_cb2)
+WRITE_LINE_MEMBER(jr100_state::jr100_via_write_cb2)
 {
-	device->machine().device<cassette_image_device>(CASSETTE_TAG)->output(state ? -1.0 : +1.0);
+	machine().device<cassette_image_device>(CASSETTE_TAG)->output(state ? -1.0 : +1.0);
 }
 static const via6522_interface jr100_via_intf =
 {
 	DEVCB_NULL,											/* in_a_func */
-	DEVCB_HANDLER(jr100_via_read_b),					/* in_b_func */
+	DEVCB_DRIVER_MEMBER(jr100_state,jr100_via_read_b),					/* in_b_func */
 	DEVCB_NULL,     									/* in_ca1_func */
 	DEVCB_NULL,     									/* in_cb1_func */
 	DEVCB_NULL,     									/* in_ca2_func */
 	DEVCB_NULL,     									/* in_cb2_func */
-	DEVCB_HANDLER(jr100_via_write_a),					/* out_a_func */
-	DEVCB_HANDLER(jr100_via_write_b),   				/* out_b_func */
+	DEVCB_DRIVER_MEMBER(jr100_state,jr100_via_write_a),					/* out_a_func */
+	DEVCB_DRIVER_MEMBER(jr100_state,jr100_via_write_b),   				/* out_b_func */
 	DEVCB_NULL,     									/* out_ca1_func */
 	DEVCB_NULL,											/* out_cb1_func */
 	DEVCB_NULL,     									/* out_ca2_func */
-	DEVCB_LINE(jr100_via_write_cb2),    				/* out_cb2_func */
+	DEVCB_DRIVER_LINE_MEMBER(jr100_state, jr100_via_write_cb2),    				/* out_cb2_func */
 	DEVCB_NULL  										/* irq_func */
 };
 static const cassette_interface jr100_cassette_interface =

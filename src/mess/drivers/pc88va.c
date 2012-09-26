@@ -105,6 +105,20 @@ public:
 	INTERRUPT_GEN_MEMBER(pc88va_vrtc_irq);
 	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
 	TIMER_CALLBACK_MEMBER(t3_mouse_callback);
+	DECLARE_READ8_MEMBER(cpu_8255_c_r);
+	DECLARE_WRITE8_MEMBER(cpu_8255_c_w);
+	DECLARE_READ8_MEMBER(fdc_8255_c_r);
+	DECLARE_WRITE8_MEMBER(fdc_8255_c_w);
+	DECLARE_READ8_MEMBER(r232_ctrl_porta_r);
+	DECLARE_READ8_MEMBER(r232_ctrl_portb_r);
+	DECLARE_READ8_MEMBER(r232_ctrl_portc_r);
+	DECLARE_WRITE8_MEMBER(r232_ctrl_porta_w);
+	DECLARE_WRITE8_MEMBER(r232_ctrl_portb_w);
+	DECLARE_WRITE8_MEMBER(r232_ctrl_portc_w);
+	DECLARE_WRITE_LINE_MEMBER(pc88va_pic_irq);
+	DECLARE_READ8_MEMBER(get_slave_ack);
+	DECLARE_WRITE_LINE_MEMBER(pc88va_pit_out0_changed);
+	DECLARE_WRITE_LINE_MEMBER(pc88va_upd765_interrupt);
 };
 
 
@@ -1396,18 +1410,16 @@ static GFXDECODE_START( pc88va )
 	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_16x16,  0, 1 )
 GFXDECODE_END
 
-static READ8_DEVICE_HANDLER( cpu_8255_c_r )
+READ8_MEMBER(pc88va_state::cpu_8255_c_r)
 {
-	pc88va_state *state = space.machine().driver_data<pc88va_state>();
 
-	return state->m_i8255_1_pc >> 4;
+	return m_i8255_1_pc >> 4;
 }
 
-static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
+WRITE8_MEMBER(pc88va_state::cpu_8255_c_w)
 {
-	pc88va_state *state = space.machine().driver_data<pc88va_state>();
 
-	state->m_i8255_0_pc = data;
+	m_i8255_0_pc = data;
 }
 
 static I8255A_INTERFACE( master_fdd_intf )
@@ -1416,22 +1428,20 @@ static I8255A_INTERFACE( master_fdd_intf )
 	DEVCB_NULL,							// Port A write
 	DEVCB_DEVICE_MEMBER("d8255_2s", i8255_device, pa_r), // Port B read
 	DEVCB_NULL,							// Port B write
-	DEVCB_HANDLER(cpu_8255_c_r),		// Port C read
-	DEVCB_HANDLER(cpu_8255_c_w)			// Port C write
+	DEVCB_DRIVER_MEMBER(pc88va_state,cpu_8255_c_r),		// Port C read
+	DEVCB_DRIVER_MEMBER(pc88va_state,cpu_8255_c_w)			// Port C write
 };
 
-static READ8_DEVICE_HANDLER( fdc_8255_c_r )
+READ8_MEMBER(pc88va_state::fdc_8255_c_r)
 {
-	pc88va_state *state = space.machine().driver_data<pc88va_state>();
 
-	return state->m_i8255_0_pc >> 4;
+	return m_i8255_0_pc >> 4;
 }
 
-static WRITE8_DEVICE_HANDLER( fdc_8255_c_w )
+WRITE8_MEMBER(pc88va_state::fdc_8255_c_w)
 {
-	pc88va_state *state = space.machine().driver_data<pc88va_state>();
 
-	state->m_i8255_1_pc = data;
+	m_i8255_1_pc = data;
 }
 
 static I8255A_INTERFACE( slave_fdd_intf )
@@ -1440,60 +1450,60 @@ static I8255A_INTERFACE( slave_fdd_intf )
 	DEVCB_NULL,							// Port A write
 	DEVCB_DEVICE_MEMBER("d8255_2", i8255_device, pa_r), // Port B read
 	DEVCB_NULL,							// Port B write
-	DEVCB_HANDLER(fdc_8255_c_r),		// Port C read
-	DEVCB_HANDLER(fdc_8255_c_w)			// Port C write
+	DEVCB_DRIVER_MEMBER(pc88va_state,fdc_8255_c_r),		// Port C read
+	DEVCB_DRIVER_MEMBER(pc88va_state,fdc_8255_c_w)			// Port C write
 };
 
-static READ8_DEVICE_HANDLER( r232_ctrl_porta_r )
+READ8_MEMBER(pc88va_state::r232_ctrl_porta_r)
 {
 	UINT8 sw5, sw4, sw3, sw2,speed_sw;
 
-	speed_sw = (space.machine().root_device().ioport("SPEED_SW")->read() & 1) ? 0x20 : 0x00;
-	sw5 = (space.machine().root_device().ioport("DSW")->read() & 0x10);
-	sw4 = (space.machine().root_device().ioport("DSW")->read() & 0x08);
-	sw3 = (space.machine().root_device().ioport("DSW")->read() & 0x04);
-	sw2 = (space.machine().root_device().ioport("DSW")->read() & 0x02);
+	speed_sw = (machine().root_device().ioport("SPEED_SW")->read() & 1) ? 0x20 : 0x00;
+	sw5 = (machine().root_device().ioport("DSW")->read() & 0x10);
+	sw4 = (machine().root_device().ioport("DSW")->read() & 0x08);
+	sw3 = (machine().root_device().ioport("DSW")->read() & 0x04);
+	sw2 = (machine().root_device().ioport("DSW")->read() & 0x02);
 
 	return 0xc1 | sw5 | sw4 | sw3 | sw2 | speed_sw;
 }
 
-static READ8_DEVICE_HANDLER( r232_ctrl_portb_r )
+READ8_MEMBER(pc88va_state::r232_ctrl_portb_r)
 {
 	UINT8 xsw1;
 
-	xsw1 = (space.machine().root_device().ioport("DSW")->read() & 1) ? 0 : 8;
+	xsw1 = (machine().root_device().ioport("DSW")->read() & 1) ? 0 : 8;
 
 	return 0xf7 | xsw1;
 }
 
-static READ8_DEVICE_HANDLER( r232_ctrl_portc_r )
+READ8_MEMBER(pc88va_state::r232_ctrl_portc_r)
 {
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( r232_ctrl_porta_w )
+WRITE8_MEMBER(pc88va_state::r232_ctrl_porta_w)
 {
 	// ...
 }
 
-static WRITE8_DEVICE_HANDLER( r232_ctrl_portb_w )
+WRITE8_MEMBER(pc88va_state::r232_ctrl_portb_w)
 {
 	// ...
 }
 
-static WRITE8_DEVICE_HANDLER( r232_ctrl_portc_w )
+WRITE8_MEMBER(pc88va_state::r232_ctrl_portc_w)
 {
 	// ...
 }
 
 static I8255_INTERFACE( r232c_ctrl_intf )
 {
-	DEVCB_HANDLER(r232_ctrl_porta_r),						/* Port A read */
-	DEVCB_HANDLER(r232_ctrl_porta_w),						/* Port A write */
-	DEVCB_HANDLER(r232_ctrl_portb_r),						/* Port B read */
-	DEVCB_HANDLER(r232_ctrl_portb_w),						/* Port B write */
-	DEVCB_HANDLER(r232_ctrl_portc_r),						/* Port C read */
-	DEVCB_HANDLER(r232_ctrl_portc_w)						/* Port C write */
+	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_porta_r),						/* Port A read */
+	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_porta_w),						/* Port A write */
+	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_portb_r),						/* Port B read */
+	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_portb_w),						/* Port B write */
+	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_portc_r),						/* Port C read */
+	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_portc_w)						/* Port C write */
 };
 
 static IRQ_CALLBACK(pc88va_irq_callback)
@@ -1501,25 +1511,25 @@ static IRQ_CALLBACK(pc88va_irq_callback)
 	return pic8259_acknowledge( device->machine().device( "pic8259_master" ) );
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pc88va_pic_irq )
+WRITE_LINE_MEMBER(pc88va_state::pc88va_pic_irq)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 //  logerror("PIC#1: set IRQ line to %i\n",interrupt);
 }
 
-static READ8_DEVICE_HANDLER( get_slave_ack )
+READ8_MEMBER(pc88va_state::get_slave_ack)
 {
 	if (offset==7) { // IRQ = 7
-		return pic8259_acknowledge(space.machine().device( "pic8259_slave"));
+		return pic8259_acknowledge(machine().device( "pic8259_slave"));
 	}
 	return 0x00;
 }
 
 static const struct pic8259_interface pc88va_pic8259_master_config =
 {
-	DEVCB_LINE(pc88va_pic_irq),
+	DEVCB_DRIVER_LINE_MEMBER(pc88va_state, pc88va_pic_irq),
 	DEVCB_LINE_VCC,
-	DEVCB_HANDLER(get_slave_ack)
+	DEVCB_DRIVER_MEMBER(pc88va_state,get_slave_ack)
 };
 
 static const struct pic8259_interface pc88va_pic8259_slave_config =
@@ -1592,9 +1602,9 @@ static const floppy_interface pc88va_floppy_interface =
 };
 
 
-static WRITE_LINE_DEVICE_HANDLER( pc88va_pit_out0_changed )
+WRITE_LINE_MEMBER(pc88va_state::pc88va_pit_out0_changed)
 {
-	pic8259_ir0_w(device->machine().device("pic8259_master"), 1);
+	pic8259_ir0_w(machine().device("pic8259_master"), 1);
 }
 
 static const struct pit8253_config pc88va_pit8253_config =
@@ -1604,7 +1614,7 @@ static const struct pit8253_config pc88va_pit8253_config =
 			/* general purpose timer 1 */
 			8000000,
 			DEVCB_NULL,
-			DEVCB_LINE(pc88va_pit_out0_changed)
+			DEVCB_DRIVER_LINE_MEMBER(pc88va_state, pc88va_pit_out0_changed)
 		},
 		{
 			/* BEEP frequency setting */
@@ -1622,18 +1632,17 @@ static const struct pit8253_config pc88va_pit8253_config =
 };
 
 
-static WRITE_LINE_DEVICE_HANDLER(pc88va_upd765_interrupt)
+WRITE_LINE_MEMBER(pc88va_state::pc88va_upd765_interrupt)
 {
-	pc88va_state *drvstate = device->machine().driver_data<pc88va_state>();
-	if(drvstate->m_fdc_mode)
-		pic8259_ir3_w(device->machine().device( "pic8259_slave"), state);
+	if(m_fdc_mode)
+		pic8259_ir3_w(machine().device( "pic8259_slave"), state);
 	else
-		device->machine().device("fdccpu")->execute().set_input_line(0, HOLD_LINE);
+		machine().device("fdccpu")->execute().set_input_line(0, HOLD_LINE);
 };
 
 static const struct upd765_interface pc88va_upd765_interface =
 {
-	DEVCB_LINE(pc88va_upd765_interrupt),
+	DEVCB_DRIVER_LINE_MEMBER(pc88va_state, pc88va_upd765_interrupt),
 	DEVCB_NULL, //DRQ, TODO
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,

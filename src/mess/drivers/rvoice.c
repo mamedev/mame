@@ -81,6 +81,7 @@ public:
 	DECLARE_WRITE8_MEMBER(main_hd63701_internal_registers_w);
 	DECLARE_DRIVER_INIT(rvoicepc);
 	virtual void machine_reset();
+	DECLARE_WRITE8_MEMBER(null_kbd_put);
 };
 
 
@@ -347,13 +348,13 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-static WRITE8_DEVICE_HANDLER( null_kbd_put )
+WRITE8_MEMBER(rvoice_state::null_kbd_put)
 {
 }
 
 static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
 {
-	DEVCB_HANDLER(null_kbd_put)
+	DEVCB_DRIVER_MEMBER(rvoice_state,null_kbd_put)
 };
 
 static MACHINE_CONFIG_START( rvoicepc, rvoice_state )

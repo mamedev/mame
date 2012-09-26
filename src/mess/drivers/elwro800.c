@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE8_MEMBER(elwro800jr_io_w);
 	DECLARE_MACHINE_RESET(elwro800);	
 	INTERRUPT_GEN_MEMBER(elwro800jr_interrupt);
+	DECLARE_READ8_MEMBER(i8255_port_c_r);
+	DECLARE_WRITE8_MEMBER(i8255_port_c_w);
 };
 
 
@@ -174,15 +176,15 @@ static void elwro800jr_mmu_w(running_machine &machine, UINT8 data)
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER(i8255_port_c_r)
+READ8_MEMBER(elwro800_state::i8255_port_c_r)
 {
-	centronics_device *centronics = space.machine().device<centronics_device>("centronics");
+	centronics_device *centronics = machine().device<centronics_device>("centronics");
 	return (centronics->ack_r() << 2);
 }
 
-static WRITE8_DEVICE_HANDLER(i8255_port_c_w)
+WRITE8_MEMBER(elwro800_state::i8255_port_c_w)
 {
-	centronics_device *centronics = space.machine().device<centronics_device>("centronics");
+	centronics_device *centronics = machine().device<centronics_device>("centronics");
 	centronics->strobe_w((data >> 7) & 0x01);
 }
 
@@ -192,8 +194,8 @@ static I8255_INTERFACE(elwro800jr_ppi8255_interface)
 	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER("centronics", centronics_device, read),
 	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write),
-	DEVCB_HANDLER(i8255_port_c_r),
-	DEVCB_HANDLER(i8255_port_c_w)
+	DEVCB_DRIVER_MEMBER(elwro800_state,i8255_port_c_r),
+	DEVCB_DRIVER_MEMBER(elwro800_state,i8255_port_c_w)
 };
 
 static const centronics_interface elwro800jr_centronics_interface =

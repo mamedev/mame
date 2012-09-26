@@ -115,6 +115,9 @@ public:
 	DECLARE_PALETTE_INIT(dleuro);
 	UINT32 screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback);
+	DECLARE_WRITE_LINE_MEMBER(dleuro_interrupt);
+	DECLARE_WRITE16_MEMBER(serial_transmit);
+	DECLARE_READ16_MEMBER(serial_receive);
 };
 
 
@@ -150,25 +153,23 @@ static const UINT8 led_map[16] =
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( dleuro_interrupt )
+WRITE_LINE_MEMBER(dlair_state::dleuro_interrupt)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, state);
+	machine().device("maincpu")->execute().set_input_line(0, state);
 }
 
 
-static WRITE16_DEVICE_HANDLER( serial_transmit )
+WRITE16_MEMBER(dlair_state::serial_transmit)
 {
-	dlair_state *state = space.machine().driver_data<dlair_state>();
-	state->laserdisc_data_w(data);
+	laserdisc_data_w(data);
 }
 
 
-static READ16_DEVICE_HANDLER( serial_receive )
+READ16_MEMBER(dlair_state::serial_receive)
 {
-	dlair_state *state = space.machine().driver_data<dlair_state>();
 	/* if we still have data to send, do it now */
-	if (offset == 0 && state->laserdisc_data_available_r() == ASSERT_LINE)
-		return state->laserdisc_data_r();
+	if (offset == 0 && laserdisc_data_available_r() == ASSERT_LINE)
+		return laserdisc_data_r();
 
 	return -1;
 }
@@ -185,12 +186,12 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 static const z80sio_interface sio_intf =
 {
-	DEVCB_LINE(dleuro_interrupt),	/* interrupt handler */
+	DEVCB_DRIVER_LINE_MEMBER(dlair_state, dleuro_interrupt),	/* interrupt handler */
 	DEVCB_NULL,					/* DTR changed handler */
 	DEVCB_NULL,					/* RTS changed handler */
 	DEVCB_NULL,					/* BREAK changed handler */
-	DEVCB_HANDLER(serial_transmit),	/* transmit handler */
-	DEVCB_HANDLER(serial_receive)		/* receive handler */
+	DEVCB_DRIVER_MEMBER16(dlair_state,serial_transmit),	/* transmit handler */
+	DEVCB_DRIVER_MEMBER16(dlair_state,serial_receive)		/* receive handler */
 };
 
 

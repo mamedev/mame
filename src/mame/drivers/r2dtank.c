@@ -76,6 +76,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
 	DECLARE_WRITE8_MEMBER(pia_comp_w);
 	virtual void machine_start();
+	DECLARE_WRITE8_MEMBER(ttl74123_output_changed);
 };
 
 
@@ -229,12 +230,11 @@ static const ay8910_interface ay8910_2_interface =
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( ttl74123_output_changed )
+WRITE8_MEMBER(r2dtank_state::ttl74123_output_changed)
 {
-	r2dtank_state *state = space.machine().driver_data<r2dtank_state>();
-	pia6821_device *pia = space.machine().device<pia6821_device>("pia_main");
+	pia6821_device *pia = machine().device<pia6821_device>("pia_main");
 	pia->ca1_w(data);
-	state->m_ttl74123_output = data;
+	m_ttl74123_output = data;
 }
 
 
@@ -252,7 +252,7 @@ static const ttl74123_interface ttl74123_intf =
 	1,					/* A pin - driven by the CRTC */
 	1,					/* B pin - pulled high */
 	1,					/* Clear pin - pulled high */
-	DEVCB_HANDLER(ttl74123_output_changed)
+	DEVCB_DRIVER_MEMBER(r2dtank_state,ttl74123_output_changed)
 };
 
 

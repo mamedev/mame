@@ -72,6 +72,7 @@ public:
 	UINT32 screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pasogo_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg230_timer);
+	DECLARE_WRITE_LINE_MEMBER(pasogo_pic8259_set_int_line);
 };
 
 
@@ -487,14 +488,14 @@ static const pit8253_config pc_pit8254_config =
 };
 
 
-static WRITE_LINE_DEVICE_HANDLER( pasogo_pic8259_set_int_line )
+WRITE_LINE_MEMBER(pasogo_state::pasogo_pic8259_set_int_line)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const pic8259_interface pasogo_pic8259_config =
 {
-	DEVCB_LINE(pasogo_pic8259_set_int_line),
+	DEVCB_DRIVER_LINE_MEMBER(pasogo_state, pasogo_pic8259_set_int_line),
 	DEVCB_LINE_VCC,
 	DEVCB_NULL
 };

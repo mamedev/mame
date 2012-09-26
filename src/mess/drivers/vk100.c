@@ -193,6 +193,10 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	TIMER_CALLBACK_MEMBER(execute_vg);
+	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
+	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
+	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);
+	DECLARE_WRITE_LINE_MEMBER(i8251_rts);
 };
 
 // vram access functions:
@@ -873,31 +877,27 @@ void vk100_state::machine_reset()
 	m_TXDivisor = 6336;
 }
 
-static WRITE_LINE_DEVICE_HANDLER(crtc_vsync)
+WRITE_LINE_MEMBER(vk100_state::crtc_vsync)
 {
-	vk100_state *m_state = device->machine().driver_data<vk100_state>();
-	m_state->m_maincpu->set_input_line(I8085_RST75_LINE, state? ASSERT_LINE : CLEAR_LINE);
-	m_state->m_vsync = state;
+	m_maincpu->set_input_line(I8085_RST75_LINE, state? ASSERT_LINE : CLEAR_LINE);
+	m_vsync = state;
 }
 
-static WRITE_LINE_DEVICE_HANDLER(i8251_rxrdy_int)
+WRITE_LINE_MEMBER(vk100_state::i8251_rxrdy_int)
 {
-	vk100_state *m_state = device->machine().driver_data<vk100_state>();
-	m_state->m_maincpu->set_input_line(I8085_RST65_LINE, state?ASSERT_LINE:CLEAR_LINE);
+	m_maincpu->set_input_line(I8085_RST65_LINE, state?ASSERT_LINE:CLEAR_LINE);
 }
 
-static WRITE_LINE_DEVICE_HANDLER(i8251_txrdy_int)
+WRITE_LINE_MEMBER(vk100_state::i8251_txrdy_int)
 {
-	vk100_state *m_state = device->machine().driver_data<vk100_state>();
-	m_state->m_maincpu->set_input_line(I8085_RST55_LINE, state?ASSERT_LINE:CLEAR_LINE);
+	m_maincpu->set_input_line(I8085_RST55_LINE, state?ASSERT_LINE:CLEAR_LINE);
 }
 
-static WRITE_LINE_DEVICE_HANDLER(i8251_rts)
+WRITE_LINE_MEMBER(vk100_state::i8251_rts)
 {
-	vk100_state *m_state = device->machine().driver_data<vk100_state>();
 	logerror("callback: RTS state changed to %d\n", state);
 	// TODO: only change this during loopback mode!
-	m_state->m_ACTS = state;
+	m_ACTS = state;
 }
 
 DRIVER_INIT_MEMBER(vk100_state,vk100)
@@ -957,7 +957,7 @@ static const mc6845_interface mc6845_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(crtc_vsync),
+	DEVCB_DRIVER_LINE_MEMBER(vk100_state, crtc_vsync),
 	NULL
 };
 
@@ -969,9 +969,9 @@ static const i8251_interface i8251_intf =
 	//TODO: DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_tx), // out_txd_cb
 	DEVCB_NULL, // in_dsr_cb
 	DEVCB_NULL, // out_dtr_cb
-	DEVCB_LINE(i8251_rts), // out_rts_cb
-	DEVCB_LINE(i8251_rxrdy_int), // out_rxrdy_cb
-	DEVCB_LINE(i8251_txrdy_int), // out_txrdy_cb
+	DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_rts), // out_rts_cb
+	DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_rxrdy_int), // out_rxrdy_cb
+	DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_txrdy_int), // out_txrdy_cb
 	DEVCB_NULL, // out_txempty_cb
 	DEVCB_NULL // out_syndet_cb
 };
