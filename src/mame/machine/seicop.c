@@ -1988,7 +1988,7 @@ WRITE16_HANDLER( copdxbl_0_w )
 /* Generic COP functions
   -- the game specific handlers fall through to these if there
      isn't a specific case for them.  these implement behavior
-     which seems common to all the agmes
+     which seems common to all the games
 */
 
 static UINT16 cop_status,cop_dist,cop_angle;
