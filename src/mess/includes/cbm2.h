@@ -152,6 +152,10 @@ public:
 	UINT8 m_tpi2_pb;
 	UINT8 m_cia_pa;
 
+	// IEEE-488 state
+	int m_ieee_dc;
+	int m_ieee_te;
+
 	// timers
 	emu_timer *m_todclk_timer;
 };
