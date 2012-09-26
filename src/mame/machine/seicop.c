@@ -1761,7 +1761,7 @@ static void copd2_set_tabledata(running_machine &machine, UINT16 data)
 				logerror("addmem16 (r%x)\n", reg);
 			break;
 		default:
-			logerror("?\n");
+			logerror("? %x(r%x)\n",off, reg);
 			break;
 		}
 	}
