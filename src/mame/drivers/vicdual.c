@@ -39,9 +39,6 @@
         * A few of the games have an extra 18K pull-up resistor on the
           blue color gun, Carnival, for example.
           Colors inaccurate?  Blue background?
-        * Does Digger run too fast compared to the real machine?
-          The timing is implemented according to the schematics, but
-          who knows...
         * DIP switches need verifying in most of the games
         * DIP switch locations need to be added to some
 
@@ -747,7 +744,7 @@ WRITE8_MEMBER(vicdual_state::headon2_io_w)
 	if (offset & 0x01)  assert_coin_status(machine());
 	if (offset & 0x02)  headon_audio_w(space, 0, data);
 	if (offset & 0x04)  vicdual_palette_bank_w(space, 0, data);
-    if (offset & 0x08) { /* schematics show this as going into a shifer circuit, but never written to */ }
+    if (offset & 0x08) { /* schematics show this as going into a shifter circuit, but never written to */ }
     if (offset & 0x10) { /* schematics show this as going to an edge connector, but never written to */ }
 	if (offset & 0x18)  logerror("********* Write to port %x\n", offset);
 }
@@ -763,7 +760,7 @@ WRITE8_MEMBER(vicdual_state::digger_io_w)
 		/* digger_audio_2_w(0, data & 0xfc); */
 	}
 
-    if (offset & 0x08) { /* schematics show this as going into a shifer circuit, but never written to */ }
+    if (offset & 0x08) { /* schematics show this as going into a shifter circuit, but never written to */ }
     if (offset & 0x10) { /* schematics show this as going to an edge connector, but never written to */ }
 	if (offset & 0x18)  logerror("********* Write to port %x\n", offset);
 }
@@ -892,7 +889,8 @@ static INPUT_PORTS_START( digger )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_timer_value, NULL)
+//	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_timer_value, NULL)			// it's like this according to the schematics, but gameplay speed is too fast;
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_composite_blank_comp, NULL) // gameplay speed is correct now, there's likely an error in the schematics then...
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_read_coin_status, NULL)
 
