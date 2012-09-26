@@ -56,10 +56,6 @@ address_map_entry::address_map_entry(address_map &map, offs_t start, offs_t end)
 	  m_addrmirror(0),
 	  m_addrmask(0),
 	  m_share(NULL),
-	  m_baseptr(NULL),
-	  m_sizeptr(NULL),
-	  m_baseptroffs_plus1(0),
-	  m_sizeptroffs_plus1(0),
 	  m_region(NULL),
 	  m_rgnoffs(0),
 	  m_rspace8(NULL),
@@ -96,10 +92,11 @@ void address_map_entry::set_mask(offs_t _mask)
 //  an I/O port
 //-------------------------------------------------
 
-void address_map_entry::set_read_port(const device_t &device, const char *tag)
+void address_map_entry::set_read_port(device_t &device, const char *tag)
 {
 	m_read.m_type = AMH_PORT;
-	device.subtag(m_read.m_tag, tag);
+	m_read.m_tag = tag;
+	m_read.m_devbase = &device;
 }
 
 
@@ -108,10 +105,11 @@ void address_map_entry::set_read_port(const device_t &device, const char *tag)
 //  an I/O port
 //-------------------------------------------------
 
-void address_map_entry::set_write_port(const device_t &device, const char *tag)
+void address_map_entry::set_write_port(device_t &device, const char *tag)
 {
 	m_write.m_type = AMH_PORT;
-	device.subtag(m_write.m_tag, tag);
+	m_write.m_tag = tag;
+	m_write.m_devbase = &device;
 }
 
 
@@ -120,12 +118,14 @@ void address_map_entry::set_write_port(const device_t &device, const char *tag)
 //  reading and writing an I/O port
 //-------------------------------------------------
 
-void address_map_entry::set_readwrite_port(const device_t &device, const char *tag)
+void address_map_entry::set_readwrite_port(device_t &device, const char *tag)
 {
 	m_read.m_type = AMH_PORT;
-	device.subtag(m_read.m_tag, tag);
+	m_read.m_tag = tag;
+	m_read.m_devbase = &device;
 	m_write.m_type = AMH_PORT;
-	device.subtag(m_write.m_tag, tag);
+	m_write.m_tag = tag;
+	m_write.m_devbase = &device;
 }
 
 
@@ -134,10 +134,11 @@ void address_map_entry::set_readwrite_port(const device_t &device, const char *t
 //  from a memory bank
 //-------------------------------------------------
 
-void address_map_entry::set_read_bank(const device_t &device, const char *tag)
+void address_map_entry::set_read_bank(device_t &device, const char *tag)
 {
 	m_read.m_type = AMH_BANK;
-	device.subtag(m_read.m_tag, tag);
+	m_read.m_tag = tag;
+	m_read.m_devbase = &device;
 }
 
 
@@ -146,10 +147,11 @@ void address_map_entry::set_read_bank(const device_t &device, const char *tag)
 //  to a memory bank
 //-------------------------------------------------
 
-void address_map_entry::set_write_bank(const device_t &device, const char *tag)
+void address_map_entry::set_write_bank(device_t &device, const char *tag)
 {
 	m_write.m_type = AMH_BANK;
-	device.subtag(m_write.m_tag, tag);
+	m_write.m_tag = tag;
+	m_write.m_devbase = &device;
 }
 
 
@@ -158,12 +160,14 @@ void address_map_entry::set_write_bank(const device_t &device, const char *tag)
 //  reading and writing to a memory bank
 //-------------------------------------------------
 
-void address_map_entry::set_readwrite_bank(const device_t &device, const char *tag)
+void address_map_entry::set_readwrite_bank(device_t &device, const char *tag)
 {
 	m_read.m_type = AMH_BANK;
-	device.subtag(m_read.m_tag, tag);
+	m_read.m_tag = tag;
+	m_read.m_devbase = &device;
 	m_write.m_type = AMH_BANK;
-	device.subtag(m_write.m_tag, tag);
+	m_write.m_tag = tag;
+	m_write.m_devbase = &device;
 }
 
 
@@ -172,7 +176,7 @@ void address_map_entry::set_readwrite_bank(const device_t &device, const char *t
 //  retrieve a submap from a device
 //-------------------------------------------------
 
-void address_map_entry::set_submap(const device_t &device, const char *tag, address_map_delegate func, int bits, UINT64 mask)
+void address_map_entry::set_submap(device_t &device, const char *tag, address_map_delegate func, int bits, UINT64 mask)
 {
 	if(!bits)
 		bits = m_map.m_databits;
@@ -180,10 +184,12 @@ void address_map_entry::set_submap(const device_t &device, const char *tag, addr
 	assert(unitmask_is_appropriate(bits, mask, func.name()));
 
 	m_read.m_type = AMH_DEVICE_SUBMAP;
-	device.subtag(m_read.m_tag, tag);
+	m_read.m_tag = tag;
+	m_read.m_devbase = &device;
 	m_read.m_mask = mask;
 	m_write.m_type = AMH_DEVICE_SUBMAP;
-	device.subtag(m_write.m_tag, tag);
+	m_write.m_tag = tag;
+	m_write.m_devbase = &device;
 	m_write.m_mask = mask;
 	m_submap_delegate = func;
 	m_submap_bits = bits;
@@ -226,7 +232,7 @@ void address_map_entry::internal_set_handler(read8_space_func rfunc, const char 
 }
 
 
-void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read8_delegate func, UINT64 unitmask)
+void address_map_entry::internal_set_handler(device_t &device, read8_delegate func, UINT64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(8, unitmask, func.name()));
@@ -234,12 +240,12 @@ void address_map_entry::internal_set_handler(const device_t &device, const char 
 	m_read.m_bits = 8;
 	m_read.m_mask = unitmask;
 	m_read.m_name = func.name();
-	device.subtag(m_read.m_tag, tag);
+	m_read.m_devbase = &device;
 	m_rproto8 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_t &device, const char *tag, write8_delegate func, UINT64 unitmask)
+void address_map_entry::internal_set_handler(device_t &device, write8_delegate func, UINT64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(8, unitmask, func.name()));
@@ -247,15 +253,15 @@ void address_map_entry::internal_set_handler(const device_t &device, const char 
 	m_write.m_bits = 8;
 	m_write.m_mask = unitmask;
 	m_write.m_name = func.name();
-	device.subtag(m_write.m_tag, tag);
+	m_write.m_devbase = &device;
 	m_wproto8 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read8_delegate rfunc, write8_delegate wfunc, UINT64 unitmask)
+void address_map_entry::internal_set_handler(device_t &device, read8_delegate rfunc, write8_delegate wfunc, UINT64 unitmask)
 {
-	internal_set_handler(device, tag, rfunc, unitmask);
-	internal_set_handler(device, tag, wfunc, unitmask);
+	internal_set_handler(device, rfunc, unitmask);
+	internal_set_handler(device, wfunc, unitmask);
 }
 
 
@@ -295,7 +301,7 @@ void address_map_entry::internal_set_handler(read16_space_func rfunc, const char
 }
 
 
-void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read16_delegate func, UINT64 unitmask)
+void address_map_entry::internal_set_handler(device_t &device, read16_delegate func, UINT64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(16, unitmask, func.name()));
@@ -303,12 +309,12 @@ void address_map_entry::internal_set_handler(const device_t &device, const char 
 	m_read.m_bits = 16;
 	m_read.m_mask = unitmask;
 	m_read.m_name = func.name();
-	device.subtag(m_read.m_tag, tag);
+	m_read.m_devbase = &device;
 	m_rproto16 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_t &device, const char *tag, write16_delegate func, UINT64 unitmask)
+void address_map_entry::internal_set_handler(device_t &device, write16_delegate func, UINT64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(16, unitmask, func.name()));
@@ -316,15 +322,15 @@ void address_map_entry::internal_set_handler(const device_t &device, const char 
 	m_write.m_bits = 16;
 	m_write.m_mask = unitmask;
 	m_write.m_name = func.name();
-	device.subtag(m_write.m_tag, tag);
+	m_write.m_devbase = &device;
 	m_wproto16 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read16_delegate rfunc, write16_delegate wfunc, UINT64 unitmask)
+void address_map_entry::internal_set_handler(device_t &device, read16_delegate rfunc, write16_delegate wfunc, UINT64 unitmask)
 {
-	internal_set_handler(device, tag, rfunc, unitmask);
-	internal_set_handler(device, tag, wfunc, unitmask);
+	internal_set_handler(device, rfunc, unitmask);
+	internal_set_handler(device, wfunc, unitmask);
 }
 
 
@@ -364,7 +370,7 @@ void address_map_entry::internal_set_handler(read32_space_func rfunc, const char
 }
 
 
-void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read32_delegate func, UINT64 unitmask)
+void address_map_entry::internal_set_handler(device_t &device, read32_delegate func, UINT64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(32, unitmask, func.name()));
@@ -372,12 +378,12 @@ void address_map_entry::internal_set_handler(const device_t &device, const char 
 	m_read.m_bits = 32;
 	m_read.m_mask = unitmask;
 	m_read.m_name = func.name();
-	device.subtag(m_read.m_tag, tag);
+	m_read.m_devbase = &device;
 	m_rproto32 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_t &device, const char *tag, write32_delegate func, UINT64 unitmask)
+void address_map_entry::internal_set_handler(device_t &device, write32_delegate func, UINT64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(32, unitmask, func.name()));
@@ -385,15 +391,15 @@ void address_map_entry::internal_set_handler(const device_t &device, const char 
 	m_write.m_bits = 32;
 	m_write.m_mask = unitmask;
 	m_write.m_name = func.name();
-	device.subtag(m_write.m_tag, tag);
+	m_write.m_devbase = &device;
 	m_wproto32 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read32_delegate rfunc, write32_delegate wfunc, UINT64 unitmask)
+void address_map_entry::internal_set_handler(device_t &device, read32_delegate rfunc, write32_delegate wfunc, UINT64 unitmask)
 {
-	internal_set_handler(device, tag, rfunc, unitmask);
-	internal_set_handler(device, tag, wfunc, unitmask);
+	internal_set_handler(device, rfunc, unitmask);
+	internal_set_handler(device, wfunc, unitmask);
 }
 
 
@@ -433,7 +439,7 @@ void address_map_entry::internal_set_handler(read64_space_func rfunc, const char
 }
 
 
-void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read64_delegate func, UINT64 unitmask)
+void address_map_entry::internal_set_handler(device_t &device, read64_delegate func, UINT64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(64, unitmask, func.name()));
@@ -441,12 +447,12 @@ void address_map_entry::internal_set_handler(const device_t &device, const char 
 	m_read.m_bits = 64;
 	m_read.m_mask = 0;
 	m_read.m_name = func.name();
-	device.subtag(m_read.m_tag, tag);
+	m_read.m_devbase = &device;
 	m_rproto64 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_t &device, const char *tag, write64_delegate func, UINT64 unitmask)
+void address_map_entry::internal_set_handler(device_t &device, write64_delegate func, UINT64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(64, unitmask, func.name()));
@@ -454,15 +460,15 @@ void address_map_entry::internal_set_handler(const device_t &device, const char 
 	m_write.m_bits = 64;
 	m_write.m_mask = 0;
 	m_write.m_name = func.name();
-	device.subtag(m_write.m_tag, tag);
+	m_write.m_devbase = &device;
 	m_wproto64 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read64_delegate rfunc, write64_delegate wfunc, UINT64 unitmask)
+void address_map_entry::internal_set_handler(device_t &device, read64_delegate rfunc, write64_delegate wfunc, UINT64 unitmask)
 {
-	internal_set_handler(device, tag, rfunc, unitmask);
-	internal_set_handler(device, tag, wfunc, unitmask);
+	internal_set_handler(device, rfunc, unitmask);
+	internal_set_handler(device, wfunc, unitmask);
 }
 
 
@@ -552,7 +558,7 @@ address_map_entry64::address_map_entry64(address_map &map, offs_t start, offs_t 
 //  address_map - constructor
 //-------------------------------------------------
 
-address_map::address_map(const device_t &device, address_spacenum spacenum)
+address_map::address_map(device_t &device, address_spacenum spacenum)
 	: m_spacenum(spacenum),
 	  m_databits(0xff),
 	  m_unmapval(0),
@@ -587,14 +593,14 @@ address_map::address_map(const device_t &device, address_spacenum spacenum)
 //  address_map - constructor in the submap case
 //-------------------------------------------------
 
-address_map::address_map(const device_t &device, address_map_entry *entry)
+address_map::address_map(device_t &device, address_map_entry *entry)
 	: m_spacenum(AS_PROGRAM),
 	  m_databits(0xff),
 	  m_unmapval(0),
 	  m_globalmask(0)
 {
 	// Retrieve the submap
-	entry->m_submap_delegate.late_bind(const_cast<device_t &>(device));
+	entry->m_submap_delegate.late_bind(device);
 	entry->m_submap_delegate(*this, device);
 }
 
@@ -604,7 +610,7 @@ address_map::address_map(const device_t &device, address_map_entry *entry)
 //  address_map - constructor dynamic device mapping case
 //----------------------------------------------------------
 
-address_map::address_map(const address_space &space, offs_t start, offs_t end, int bits, UINT64 unitmask, const device_t &device, address_map_delegate submap_delegate)
+address_map::address_map(const address_space &space, offs_t start, offs_t end, int bits, UINT64 unitmask, device_t &device, address_map_delegate submap_delegate)
 	: m_spacenum(space.spacenum()),
 	  m_databits(space.data_width()),
 	  m_unmapval(space.unmap()),

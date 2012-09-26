@@ -241,7 +241,7 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 			int alignunit = datawidth / 8;
 
 			// construct the maps
-			::address_map *map = global_alloc(::address_map(device(), spacenum));
+			::address_map *map = global_alloc(::address_map(const_cast<device_t &>(device()), spacenum));
 
 			// if this is an empty map, just skip it
 			if (map->m_entrylist.first() == NULL)
@@ -323,15 +323,23 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 				}
 
 				// make sure all devices exist
-				if (entry->m_read.m_type == AMH_DEVICE_DELEGATE && entry->m_read.m_tag && device().siblingdevice(entry->m_read.m_tag) == NULL)
-					mame_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_read.m_tag.cstr());
-				if (entry->m_write.m_type == AMH_DEVICE_DELEGATE && entry->m_write.m_tag && device().siblingdevice(entry->m_write.m_tag) == NULL)
-					mame_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_write.m_tag.cstr());
+				if (entry->m_read.m_type == AMH_DEVICE_DELEGATE && entry->m_read.m_tag != NULL)
+				{
+					astring temp(entry->m_read.m_tag);
+					if (device().siblingdevice(temp) == NULL)
+						mame_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_read.m_tag);
+				}
+				if (entry->m_write.m_type == AMH_DEVICE_DELEGATE && entry->m_write.m_tag != NULL)
+				{
+					astring temp(entry->m_write.m_tag);
+					if (device().siblingdevice(temp) == NULL)
+						mame_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_write.m_tag);
+				}
 
 				// make sure ports exist
 //              if ((entry->m_read.m_type == AMH_PORT && entry->m_read.m_tag != NULL && portlist.find(entry->m_read.m_tag) == NULL) ||
 //                  (entry->m_write.m_type == AMH_PORT && entry->m_write.m_tag != NULL && portlist.find(entry->m_write.m_tag) == NULL))
-//                  mame_printf_error("%s space memory map entry references nonexistant port tag '%s'\n", spaceconfig->m_name, entry->m_read.m_tag.cstr());
+//                  mame_printf_error("%s space memory map entry references nonexistant port tag '%s'\n", spaceconfig->m_name, entry->m_read.m_tag);
 
 				// validate bank and share tags
 				if (entry->m_read.m_type == AMH_BANK)

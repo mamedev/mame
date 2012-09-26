@@ -99,6 +99,9 @@ enum
 //  MACROS
 //**************************************************************************
 
+// Some useful delegates
+typedef delegate<void (bool state)> line_cb_t;
+
 // static template for a read_line stub function that calls through a given READ_LINE_MEMBER
 template<class _Class, int (_Class::*_Function)()>
 int devcb_line_stub(device_t *device)

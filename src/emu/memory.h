@@ -105,10 +105,10 @@ class address_table_write;
 typedef UINT32	offs_t;
 
 // address map constructors are functions that build up an address_map
-typedef void (*address_map_constructor)(address_map &map, const device_t &devconfig);
+typedef void (*address_map_constructor)(address_map &map, device_t &devconfig);
 
 // submap retriever delegate
-typedef delegate<void (address_map &, const device_t &)> address_map_delegate;
+typedef delegate<void (address_map &, device_t &)> address_map_delegate;
 
 
 // legacy space read/write handlers
@@ -162,19 +162,19 @@ typedef delegate<offs_t (direct_read_data &, offs_t)> direct_update_delegate;
 // ======================> read_delegate
 
 // declare delegates for each width
-typedef delegate<UINT8 (address_space &, offs_t, UINT8)> read8_delegate;
-typedef delegate<UINT16 (address_space &, offs_t, UINT16)> read16_delegate;
-typedef delegate<UINT32 (address_space &, offs_t, UINT32)> read32_delegate;
-typedef delegate<UINT64 (address_space &, offs_t, UINT64)> read64_delegate;
+typedef device_delegate<UINT8 (address_space &, offs_t, UINT8)> read8_delegate;
+typedef device_delegate<UINT16 (address_space &, offs_t, UINT16)> read16_delegate;
+typedef device_delegate<UINT32 (address_space &, offs_t, UINT32)> read32_delegate;
+typedef device_delegate<UINT64 (address_space &, offs_t, UINT64)> read64_delegate;
 
 
 // ======================> write_delegate
 
 // declare delegates for each width
-typedef delegate<void (address_space &, offs_t, UINT8, UINT8)> write8_delegate;
-typedef delegate<void (address_space &, offs_t, UINT16, UINT16)> write16_delegate;
-typedef delegate<void (address_space &, offs_t, UINT32, UINT32)> write32_delegate;
-typedef delegate<void (address_space &, offs_t, UINT64, UINT64)> write64_delegate;
+typedef device_delegate<void (address_space &, offs_t, UINT8, UINT8)> write8_delegate;
+typedef device_delegate<void (address_space &, offs_t, UINT16, UINT16)> write16_delegate;
+typedef device_delegate<void (address_space &, offs_t, UINT32, UINT32)> write32_delegate;
+typedef device_delegate<void (address_space &, offs_t, UINT64, UINT64)> write64_delegate;
 
 
 // ======================> direct_read_data

@@ -448,7 +448,8 @@ protected:
 	template<class _FunctionClass>
 	static delegate_generic_class *late_bind_helper(delegate_late_bind &object)
 	{
-		return reinterpret_cast<delegate_generic_class *>(dynamic_cast<_FunctionClass *>(&object));
+		_FunctionClass *result = dynamic_cast<_FunctionClass *>(&object);
+		return reinterpret_cast<delegate_generic_class *>(result);
 	}
 
 	// internal state
@@ -636,7 +637,8 @@ protected:
 	template<class _FunctionClass>
 	static delegate_generic_class *late_bind_helper(delegate_late_bind &object)
 	{
-		return reinterpret_cast<delegate_generic_class *>(dynamic_cast<_FunctionClass *>(&object));
+		_FunctionClass *result = dynamic_cast<_FunctionClass *>(&object);
+		return reinterpret_cast<delegate_generic_class *>(result);
 	}
 
 	// internal state
@@ -760,9 +762,5 @@ public:
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
-
-// Some useful delegates
-
-typedef delegate<void (bool state)> line_cb_t;
 
 #endif	/* __DELEGATE_H__ */

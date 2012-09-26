@@ -1828,7 +1828,7 @@ void address_space::prepare_map()
 		}
 
 		// validate adjusted addresses against implicit regions
-		if (entry->m_region != NULL && entry->m_share == NULL && entry->m_baseptr == NULL)
+		if (entry->m_region != NULL && entry->m_share == NULL)
 		{
 			// determine full tag
 			astring fulltag;
@@ -1903,7 +1903,6 @@ void address_space::populate_from_map(address_map *map)
 void address_space::populate_map_entry(const address_map_entry &entry, read_or_write readorwrite)
 {
 	const map_handler_data &data = (readorwrite == ROW_READ) ? entry.m_read : entry.m_write;
-	device_t *target_device;
 	astring fulltag;
 
 	// based on the handler type, alter the bits, name, funcptr, and object
@@ -1931,25 +1930,21 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 			break;
 
 		case AMH_DEVICE_DELEGATE:
-			target_device = device().siblingdevice(data.m_tag);
-			if (target_device == NULL)
-				throw emu_fatalerror("Attempted to map a non-existent device '%s' in space %s of device '%s'\n", data.m_tag.cstr(), m_name, m_device.tag());
-
 			if (readorwrite == ROW_READ)
 				switch (data.m_bits)
 				{
-					case 8:		install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read8_delegate(entry.m_rproto8, *target_device), data.m_mask);		break;
-					case 16:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read16_delegate(entry.m_rproto16, *target_device), data.m_mask);		break;
-					case 32:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read32_delegate(entry.m_rproto32, *target_device), data.m_mask);		break;
-					case 64:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read64_delegate(entry.m_rproto64, *target_device), data.m_mask);		break;
+					case 8:		install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read8_delegate(entry.m_rproto8, *entry.m_read.m_devbase), data.m_mask); break;
+					case 16:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read16_delegate(entry.m_rproto16, *entry.m_read.m_devbase), data.m_mask); break;
+					case 32:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read32_delegate(entry.m_rproto32, *entry.m_read.m_devbase), data.m_mask); break;
+					case 64:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read64_delegate(entry.m_rproto64, *entry.m_read.m_devbase), data.m_mask); break;
 				}
 			else
 				switch (data.m_bits)
 				{
-					case 8:		install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write8_delegate(entry.m_wproto8, *target_device), data.m_mask);		break;
-					case 16:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write16_delegate(entry.m_wproto16, *target_device), data.m_mask);	break;
-					case 32:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write32_delegate(entry.m_wproto32, *target_device), data.m_mask);	break;
-					case 64:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write64_delegate(entry.m_wproto64, *target_device), data.m_mask);	break;
+					case 8:		install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write8_delegate(entry.m_wproto8, *entry.m_write.m_devbase), data.m_mask); break;
+					case 16:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write16_delegate(entry.m_wproto16, *entry.m_write.m_devbase), data.m_mask); break;
+					case 32:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write32_delegate(entry.m_wproto32, *entry.m_write.m_devbase), data.m_mask); break;
+					case 64:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write64_delegate(entry.m_wproto64, *entry.m_write.m_devbase), data.m_mask); break;
 				}
 			break;
 
@@ -1974,18 +1969,18 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 
 		case AMH_PORT:
 			install_readwrite_port(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror,
-							(readorwrite == ROW_READ) ? data.m_tag.cstr() : NULL,
-							(readorwrite == ROW_WRITE) ? data.m_tag.cstr() : NULL);
+							(readorwrite == ROW_READ) ? data.m_tag : NULL,
+							(readorwrite == ROW_WRITE) ? data.m_tag : NULL);
 			break;
 
 		case AMH_BANK:
 			install_bank_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror,
-							(readorwrite == ROW_READ) ? data.m_tag.cstr() : NULL,
-							(readorwrite == ROW_WRITE) ? data.m_tag.cstr() : NULL);
+							(readorwrite == ROW_READ) ? data.m_tag : NULL,
+							(readorwrite == ROW_WRITE) ? data.m_tag : NULL);
 			break;
 
 		case AMH_DEVICE_SUBMAP:
-			throw emu_fatalerror("Internal mapping error: leftover mapping of '%s'.\n", data.m_tag.cstr());
+			throw emu_fatalerror("Internal mapping error: leftover mapping of '%s'.\n", data.m_tag);
 	}
 }
 
@@ -2067,19 +2062,6 @@ void address_space::allocate_memory()
 
 void address_space::locate_memory()
 {
-	// fill in base/size entries
-	for (const address_map_entry *entry = m_map->m_entrylist.first(); entry != NULL; entry = entry->next())
-	{
-		if (entry->m_baseptr != NULL)
-			*entry->m_baseptr = entry->m_memory;
-		if (entry->m_baseptroffs_plus1 != 0)
-			*(void **)(reinterpret_cast<UINT8 *>(machine().driver_data()) + entry->m_baseptroffs_plus1 - 1) = entry->m_memory;
-		if (entry->m_sizeptr != NULL)
-			*entry->m_sizeptr = entry->m_byteend - entry->m_bytestart + 1;
-		if (entry->m_sizeptroffs_plus1 != 0)
-			*(size_t *)(reinterpret_cast<UINT8 *>(machine().driver_data()) + entry->m_sizeptroffs_plus1 - 1) = entry->m_byteend - entry->m_bytestart + 1;
-	}
-
 	// once this is done, find the starting bases for the banks
 	for (memory_bank *bank = manager().m_banklist.first(); bank != NULL; bank = bank->next())
 		if (bank->base() == NULL && bank->references_space(*this, ROW_READWRITE))
@@ -2713,10 +2695,6 @@ void *address_space::find_backing_memory(offs_t addrstart, offs_t addrend)
 
 bool address_space::needs_backing_store(const address_map_entry *entry)
 {
-	// if we are asked to provide a base pointer, then yes, we do need backing
-	if (entry->m_baseptr != NULL || entry->m_baseptroffs_plus1 != 0)
-		return true;
-
 	// if we are sharing, and we don't have a pointer yet, create one
 	if (entry->m_share != NULL)
 	{

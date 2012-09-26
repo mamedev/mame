@@ -992,22 +992,4 @@ inline device_t *device_t::siblingdevice(const char *tag) const
 	return (tag[0] == ':') ? subdevice(tag) : NULL;
 }
 
-
-//-------------------------------------------------
-//  bind_relative_to - perform a late binding of
-//  a device_delegate
-//-------------------------------------------------
-
-template<typename _Signature>
-void device_delegate<_Signature>::bind_relative_to(device_t &search_root)
-{
-	if (!basetype::isnull())
-	{
-		device_t *device = search_root.subdevice(m_device_name);
-		if (device == NULL)
-			throw emu_fatalerror("Unable to locate device '%s' relative to '%s'\n", m_device_name, search_root.tag());
-		basetype::late_bind(*device);
-	}
-}
-
 #endif	/* __DEVINTRF_H__ */
