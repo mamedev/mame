@@ -81,6 +81,7 @@ struct m6509_Regs {
 	address_space *space;
 	direct_read_data *direct;
 
+	int		int_occured;
 	int 	icount;
 
 	devcb_resolved_read8 rdmem_id;					/* readmem callback for indexed instructions */
@@ -157,6 +158,18 @@ static CPU_INIT( m6509 )
 		cpustate->rdmem_id.resolve(nullrcb, *device);
 		cpustate->wrmem_id.resolve(nullwcb, *device);
 	}
+
+	device->save_item(NAME(cpustate->pc.w.l));
+	device->save_item(NAME(cpustate->sp.w.l));
+	device->save_item(NAME(cpustate->p));
+	device->save_item(NAME(cpustate->a));
+	device->save_item(NAME(cpustate->x));
+	device->save_item(NAME(cpustate->y));
+	device->save_item(NAME(cpustate->pending_irq));
+	device->save_item(NAME(cpustate->after_cli));
+	device->save_item(NAME(cpustate->nmi_state));
+	device->save_item(NAME(cpustate->irq_state));
+	device->save_item(NAME(cpustate->so_state));
 }
 
 static CPU_RESET( m6509 )
@@ -177,7 +190,8 @@ static CPU_RESET( m6509 )
 	cpustate->p = F_T|F_B|F_I|F_Z|(P&F_D);	/* set T, I and Z flags */
 	cpustate->pending_irq = 0;	/* nonzero if an IRQ is pending */
 	cpustate->after_cli = 0;	/* pending IRQ and last insn cleared I */
-	cpustate->irq_callback = NULL;
+	cpustate->irq_state = 0;
+	cpustate->nmi_state = 0;
 }
 
 static CPU_EXIT( m6509 )
@@ -239,9 +253,18 @@ static CPU_EXECUTE( m6509 )
 				LOG((": irq line is clear\n"));
 			}
 		}
-		else
-		if( cpustate->pending_irq )
-			m6509_take_irq(cpustate);
+		else {
+			if ( cpustate->pending_irq == 2 ) {
+				if ( cpustate->int_occured - cpustate->icount > 1 ) {
+					cpustate->pending_irq = 1;
+				}
+			}
+			if( cpustate->pending_irq == 1 )
+				m6509_take_irq(cpustate);
+			if ( cpustate->pending_irq == 2 ) {
+				cpustate->pending_irq = 1;
+			}
+		}
 
 	} while (cpustate->icount > 0);
 }
@@ -284,6 +307,7 @@ static void m6509_set_irq_line(m6509_Regs *cpustate, int irqline, int state)
 		{
 			LOG(( "M6509 '%s' set_irq_line(ASSERT)\n", cpustate->device->tag()));
 			cpustate->pending_irq = 1;
+			cpustate->int_occured = cpustate->icount;
 		}
 	}
 }
@@ -401,7 +425,7 @@ CPU_GET_INFO( m6509 )
 				cpustate->p & 0x01 ? 'C':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + M6509_PC:			sprintf(info->s, "PC:%04X", cpustate->pc.w.l); break;
+		case CPUINFO_STR_REGISTER + M6509_PC:			sprintf(info->s, "PC:%05X", cpustate->pc.d); break;
 		case CPUINFO_STR_REGISTER + M6509_S:			sprintf(info->s, "S:%02X", cpustate->sp.b.l); break;
 		case CPUINFO_STR_REGISTER + M6509_P:			sprintf(info->s, "P:%02X", cpustate->p); break;
 		case CPUINFO_STR_REGISTER + M6509_A:			sprintf(info->s, "A:%02X", cpustate->a); break;
@@ -409,7 +433,7 @@ CPU_GET_INFO( m6509 )
 		case CPUINFO_STR_REGISTER + M6509_Y:			sprintf(info->s, "Y:%02X", cpustate->y); break;
 		case CPUINFO_STR_REGISTER + M6509_PC_BANK:		sprintf(info->s, "M0:%01X", cpustate->pc_bank.b.h2); break;
 		case CPUINFO_STR_REGISTER + M6509_IND_BANK:		sprintf(info->s, "M1:%01X", cpustate->ind_bank.b.h2); break;
-		case CPUINFO_STR_REGISTER + M6509_EA:			sprintf(info->s, "EA:%04X", cpustate->ea.w.l); break;
+		case CPUINFO_STR_REGISTER + M6509_EA:			sprintf(info->s, "EA:%05X", cpustate->ea.d); break;
 		case CPUINFO_STR_REGISTER + M6509_ZP:			sprintf(info->s, "ZP:%03X", cpustate->zp.w.l); break;
 	}
 }

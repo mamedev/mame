@@ -128,9 +128,24 @@
 	EAH = RDMEM(ZPD);											\
 	EAWH = PBWH;												\
     if (EAL + Y > 0xff)                                         \
-		cpustate->icount--; 										\
+		cpustate->icount--; 									\
 	EAW += Y
 
+/***************************************************************
+ *  EA = zero page indirect + Y (post indexed)
+ *  subtract 1 cycle if page boundary is crossed
+ ***************************************************************/
+#undef EA_IDY_P
+#define EA_IDY_P												\
+	ZPL = RDOPARG();											\
+	EAL = RDMEM(ZPD);											\
+	ZPL++;														\
+	EAH = RDMEM(ZPD);											\
+	EAWH = PBWH;												\
+	if (EAL + Y > 0xff) {										\
+		RDMEM( ( EAH << 8 ) | ( ( EAL + Y ) & 0xff ) );			\
+	}															\
+	EAW += Y;
 
 /***************************************************************
  *  EA = zero page indirect + Y (post indexed)
@@ -144,7 +159,7 @@
 	EAH = RDMEM(ZPD);											\
 	EAWH = IBWH;												\
     if (EAL + Y > 0xff)                                         \
-		cpustate->icount--; 										\
+		cpustate->icount--; 									\
 	EAW += Y
 
 /***************************************************************
@@ -172,13 +187,13 @@
 	{															\
 		tmp = RDOPARG();										\
 		EAW = PCW + (signed char)tmp;							\
-		cpustate->icount -= (PCH == EAH) ? 1 : 2;					\
+		cpustate->icount -= (PCH == EAH) ? 1 : 2;				\
 		PCD = EAD|PB;											\
 	}															\
 	else														\
 	{															\
 		PCW++;													\
-		cpustate->icount -= 1;										\
+		cpustate->icount -= 1;									\
 	}
 
 /* 6502 ********************************************************
