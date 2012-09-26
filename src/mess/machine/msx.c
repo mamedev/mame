@@ -98,52 +98,49 @@ DEVICE_IMAGE_LOAD (msx_cart)
 		/* Load software from software list */
 		/* TODO: Add proper SRAM (size) handling */
 
-		const char *mapper = software_part_get_feature( (software_part*)image.part_entry(), "mapper" );
-		const char *sram = software_part_get_feature( (software_part*)image.part_entry(), "sram" );
-
-		if ( mapper != NULL )
+		const char *mapper = software_part_get_feature((software_part*)image.part_entry(), "mapper");
+		if (mapper != NULL)
 		{
-			/* TODO: Split out the SRAM recognition code and 8KB/16KB bank configuration */
-			static const struct { const char *mapper_name; bool sram_present; int mapper_type; } mapper_types[] =
+			static const struct { const char *mapper_name; int mapper_type; } mapper_types[] =
 			{
-				{ "M60002-0125SP",		false,		SLOT_ASCII8 },
-				{ "M60002-0125SP",		true,		SLOT_ASCII8_SRAM },
-				{ "LZ93A13",			false,		SLOT_ASCII8 },
-				{ "LZ93A13",			true,		SLOT_ASCII8_SRAM },
-				{ "LZ93A13-16",			false,		SLOT_ASCII16 },
-				{ "LZ93A13-16",			true,		SLOT_ASCII16_SRAM },
-				{ "M60002-0125SP-16",	false,		SLOT_ASCII16 },
-				{ "M60002-0125SP-16",	true,		SLOT_ASCII16_SRAM },
-				{ "IREM TAM-S1",		false,		SLOT_RTYPE },
-				{ "MR6401",				false,		SLOT_ASCII16 },
-				{ "NEOS MR6401",		false,		SLOT_ASCII8 },
-				{ "BS6202",				false,		SLOT_ASCII8 },
-				{ "BS6101",				false,		SLOT_ASCII8 },
-				{ "BS6101-16",			false,		SLOT_ASCII16 },
+				{ "M60002-0125SP",		SLOT_ASCII8 },
+				{ "LZ93A13",			SLOT_ASCII8 },
+				{ "LZ93A13-16",			SLOT_ASCII16 },
+				{ "M60002-0125SP-16",	SLOT_ASCII16 },
+				{ "IREM TAM-S1",		SLOT_RTYPE },
+				{ "MR6401",				SLOT_ASCII16 },
+				{ "NEOS MR6401",		SLOT_ASCII8 },
+				{ "BS6202",				SLOT_ASCII8 },
+				{ "BS6101",				SLOT_ASCII8 },
+				{ "BS6101-16",			SLOT_ASCII16 },
+				{ "KONAMI-SCC",			SLOT_KONAMI_SCC },
+				{ "KONAMI",				SLOT_KONAMI },
+				{ "SUPERLODE",			SLOT_MAJUTSUSHI },
+				{ "MAJUTSUSHI",			SLOT_SUPERLOADRUNNER },
 			};
-
-			for ( int i = 0; i < ARRAY_LENGTH(mapper_types) && type < 0; i++ )
+			
+			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && type < 0; i++)
 			{
-				if ( !mame_stricmp( mapper, mapper_types[i].mapper_name ) )
-				{
-					if ( sram == NULL && ! mapper_types[i].sram_present )
-						type = mapper_types[i].mapper_type;
-
-
-					if ( sram != NULL && mapper_types[i].sram_present )
-						type = mapper_types[i].mapper_type;
-				}
+				if (!mame_stricmp(mapper, mapper_types[i].mapper_name))
+					type = mapper_types[i].mapper_type;
 			}
 
-			if ( -1 == type )
-				logerror( "Mapper '%s' not recognized!\n", mapper );
+			if (-1 == type)
+				logerror("Mapper '%s' not recognized!\n", mapper);
 		}
 
-		UINT8 *rom_region = image.get_software_region( "rom" );
-		size = size_aligned = image.get_software_region_length( "rom" );
+		UINT8 *tmp_sram = image.get_software_region("sram");
+		if (tmp_sram)
+		{
+			if (type == SLOT_ASCII8) type = SLOT_ASCII8_SRAM;
+			if (type == SLOT_ASCII16) type = SLOT_ASCII16_SRAM;
+		}
 
-		mem = auto_alloc_array( image.device().machine(), UINT8, size_aligned );
-		memcpy( mem, rom_region, size_aligned );
+		UINT8 *rom_region = image.get_software_region("rom");
+		size = size_aligned = image.get_software_region_length("rom");
+
+		mem = auto_alloc_array(image.device().machine(), UINT8, size_aligned);
+		memcpy(mem, rom_region, size_aligned);
 	}
 	else
 	{

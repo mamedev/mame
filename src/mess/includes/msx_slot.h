@@ -102,7 +102,7 @@ enum msx_slot_type {
 	SLOT_RAM_MM,
 	SLOT_CARTRIDGE1,
 	SLOT_CARTRIDGE2,
-        SLOT_DISK_ROM2,
+	SLOT_DISK_ROM2,
 	SLOT_END
 };
 

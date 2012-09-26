@@ -22,6 +22,8 @@ Unless otherwise noted, the information in this list has not been verified by op
 			<dataarea name="rom" size="262144">
 				<rom name="lh532077" size="262144" crc="4ead5098" sha1="12b3c31f0fd10ff5823dcc8bf6dfeb785a8af2f7" offset="0" />
 			</dataarea>
+			<dataarea name="sram" size="8192" >
+			</dataarea>
 		</part>
 	</software>
 
@@ -202,9 +204,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621 KAGA" />
 			<feature name="mapper" value="M60002-0125SP" />
-			<feature name="sram" value="SRAM" />
 			<dataarea name="rom" size="262144">
 				<rom name="lh532051" size="262144" crc="d640deaf" sha1="6c1814c70d69a50ec60e39ef281f0b8cd7bf8598" offset="0" />
+			</dataarea>
+			<dataarea name="sram" size="8192" >
 			</dataarea>
 		</part>
 	</software>
@@ -276,9 +279,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-621-64K" />
 			<feature name="mapper" value="M60002-0125SP" />
-			<feature name="sram" value="SRAM" />
 			<dataarea name="rom" size="131072">
 				<rom name="lh23100y" size="131072" crc="" sha1="" offset="0" />
+			</dataarea>
+			<dataarea name="sram" size="8192" >
 			</dataarea>
 		</part>
 	</software>
@@ -501,6 +505,8 @@ Unless otherwise noted, the information in this list has not been verified by op
 			<dataarea name="rom" size="262144">
 				<rom name="lh532038" size="262144" crc="3aa33a30" sha1="e6de8bbd60123444de2a90928853985ceb0b4cbf" offset="0" />
 			</dataarea>
+			<dataarea name="sram" size="8192" >
+			</dataarea>
 		</part>
 	</software>
 
@@ -529,6 +535,8 @@ Unless otherwise noted, the information in this list has not been verified by op
 			<feature name="sram" value="HM6116LP-3" />
 			<dataarea name="rom" size="131072">
 				<rom name="lh531043" size="131072" crc="d8055f5f" sha1="da4b44c734029f60388b7cea4ab97c3d5c6a09e9" offset="0" />
+			</dataarea>
+			<dataarea name="sram" size="8192" >
 			</dataarea>
 		</part>
 	</software>
