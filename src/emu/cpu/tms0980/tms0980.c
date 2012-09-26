@@ -269,6 +269,10 @@ struct tms0980_state
 	const tms0980_config	*config;
 	address_space *program;
 	address_space *data;
+	
+	devcb_resolved_read8 m_read_k;
+	devcb_resolved_write16 m_write_o;
+	devcb_resolved_write16 m_write_r;
 };
 
 
@@ -505,6 +509,11 @@ static void cpu_init_tms_common( legacy_cpu_device *device, const UINT32* decode
 
 	cpustate->program = &device->space( AS_PROGRAM );
 	cpustate->data = &device->space( AS_PROGRAM );
+	
+	cpustate->m_read_k.resolve(cpustate->config->read_k, *device);
+	cpustate->m_write_o.resolve(cpustate->config->write_o, *device);
+	cpustate->m_write_r.resolve(cpustate->config->write_r, *device);
+
 
 	device->save_item( NAME(cpustate->prev_pc) );
 	device->save_item( NAME(cpustate->prev_pa) );
@@ -764,9 +773,9 @@ static void tms0980_set_cki_bus( device_t *device )
 	switch( cpustate->opcode & 0x1F8 )
 	{
 	case 0x008:
-		if ( cpustate->config->read_k )
+		if ( !cpustate->m_read_k.isnull() )
 		{
-			cpustate->cki_bus = cpustate->config->read_k( device, *cpustate->program, 0, 0xff );
+			cpustate->cki_bus = cpustate->m_read_k( 0, 0xff );
 		}
 		else
 		{
@@ -928,17 +937,17 @@ static CPU_EXECUTE( tms0980 )
 				if ( cpustate->decode & F_SETR )
 				{
 					cpustate->r = cpustate->r | ( 1 << cpustate->y );
-					if ( cpustate->config->write_r )
+					if ( !cpustate->m_write_r.isnull() )
 					{
-						cpustate->config->write_r( device, *cpustate->program, 0, cpustate->r & cpustate->r_mask, 0xffff );
+						cpustate->m_write_r( 0, cpustate->r & cpustate->r_mask, 0xffff );
 					}
 				}
 				if ( cpustate->decode & F_RSTR )
 				{
 					cpustate->r = cpustate->r & ( ~( 1 << cpustate->y ) );
-					if ( cpustate->config->write_r )
+					if ( !cpustate->m_write_r.isnull() )
 					{
-						cpustate->config->write_r( device, *cpustate->program, 0, cpustate->r & cpustate->r_mask, 0xffff );
+						cpustate->m_write_r( 0, cpustate->r & cpustate->r_mask, 0xffff );
 					}
 				}
 				if ( cpustate->decode & F_TDO )
@@ -955,17 +964,17 @@ static CPU_EXECUTE( tms0980 )
 						}
 					}
 
-					if ( cpustate->config->write_o )
+					if ( !cpustate->m_write_o.isnull() )
 					{
-						cpustate->config->write_o( device, *cpustate->program, 0, cpustate->o & cpustate->o_mask, 0xffff );
+						cpustate->m_write_o( 0, cpustate->o & cpustate->o_mask, 0xffff );
 					}
 				}
 				if ( cpustate->decode & F_CLO )
 				{
 					cpustate->o = 0;
-					if ( cpustate->config->write_o )
+					if ( !cpustate->m_write_o.isnull() )
 					{
-						cpustate->config->write_o( device, *cpustate->program, 0, cpustate->o & cpustate->o_mask, 0xffff );
+						cpustate->m_write_o( 0, cpustate->o & cpustate->o_mask, 0xffff );
 					}
 				}
 				if ( cpustate->decode & F_LDX )

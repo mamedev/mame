@@ -15,9 +15,9 @@ struct tms0980_config {
 		UINT8	value;
 		UINT16	output;
 	}	o_pla[20];
-	read8_device_func	read_k;
-	write16_device_func	write_o;		/* tms1270 has 10 O-outputs */
-	write16_device_func	write_r;
+	devcb_read8		read_k;
+	devcb_write16	write_o;		/* tms1270 has 10 O-outputs */
+	devcb_write16	write_r;
 };
 
 

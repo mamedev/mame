@@ -11,6 +11,9 @@ public:
 	stopthie_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_READ8_MEMBER(stopthie_read_k);
+	DECLARE_WRITE16_MEMBER(stopthie_write_o);
+	DECLARE_WRITE16_MEMBER(stopthie_write_r);
 };
 
 
@@ -21,7 +24,7 @@ static INPUT_PORTS_START( stopthie )
 INPUT_PORTS_END
 
 
-static READ8_DEVICE_HANDLER( stopthie_read_k )
+READ8_MEMBER(stopthie_state::stopthie_read_k)
 {
 	UINT8 data = 0xFF;
 
@@ -32,14 +35,14 @@ static READ8_DEVICE_HANDLER( stopthie_read_k )
 }
 
 
-static WRITE16_DEVICE_HANDLER( stopthie_write_o )
+WRITE16_MEMBER(stopthie_state::stopthie_write_o)
 {
 	if (LOG)
 		logerror( "stopthie_write_o: write %02x\n", data );
 }
 
 
-static WRITE16_DEVICE_HANDLER( stopthie_write_r )
+WRITE16_MEMBER(stopthie_state::stopthie_write_r)
 {
 	if (LOG)
 		logerror( "stopthie_write_r: write %04x\n", data );
@@ -56,9 +59,9 @@ static const tms0980_config stopthie_tms0980_config =
 		{ 0x0d, 0x0d }, { 0x0e, 0x0e }, { 0x0f, 0x0f }, { 0x10, 0x10 },
 		{ 0x11, 0x11 }, { 0x12, 0x12 }, { 0x13, 0x13 }, { 0x14, 0x14 }
 	},
-	stopthie_read_k,
-	stopthie_write_o,
-	stopthie_write_r
+	DEVCB_DRIVER_MEMBER(stopthie_state, stopthie_read_k),
+	DEVCB_DRIVER_MEMBER16(stopthie_state, stopthie_write_o),
+	DEVCB_DRIVER_MEMBER16(stopthie_state, stopthie_write_r)
 };
 
 
