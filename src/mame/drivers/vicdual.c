@@ -254,7 +254,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( depthch_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xf)
+	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	/* no decoder, just logic gates, so in theory the
        game can read/write from multiple locations at once */
@@ -337,7 +337,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( safari_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xf)
+	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	/* no decoder, just logic gates, so in theory the
        game can read/write from multiple locations at once */
@@ -418,7 +418,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( frogs_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xf)
+	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	/* no decoder, just logic gates, so in theory the
        game can read/write from multiple locations at once */
@@ -542,7 +542,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( headon_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xf)
+	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	/* no decoder, just logic gates, so in theory the
        game can read/write from multiple locations at once */
@@ -551,7 +551,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sspaceat_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xf)
+	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	/* no decoder, just logic gates, so in theory the
        game can read/write from multiple locations at once */
@@ -1098,7 +1098,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( tranqgun_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xf)
+	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x0c) AM_READ_PORT("IN1")
@@ -1140,7 +1140,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( brdrline_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xf)
+	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x0c) AM_READ_PORT("IN1")
@@ -1168,7 +1168,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( heiankyo_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xf)
+	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x0c) AM_READ_PORT("IN1")
@@ -2123,11 +2123,11 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( nsub_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xf)
+	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	/* no decoder, just logic gates, so in theory the
        game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(nsub_io_r, nsub_io_w)
+	AM_RANGE(0x00, 0x0f) AM_READWRITE(nsub_io_r, nsub_io_w)
 ADDRESS_MAP_END
 
 
@@ -2219,11 +2219,11 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( invinco_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xf)
+	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	/* no decoder, just logic gates, so in theory the
        game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(invinco_io_r, invinco_io_w)
+	AM_RANGE(0x00, 0x0f) AM_READWRITE(invinco_io_r, invinco_io_w)
 ADDRESS_MAP_END
 
 
