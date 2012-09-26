@@ -89,7 +89,6 @@
 
 /* Core includes */
 #include "emu.h"
-#include "memconv.h"
 #include "includes/bebox.h"
 
 /* Components */
@@ -113,6 +112,61 @@
 #define LOG_UART		1
 #define LOG_INTERRUPTS	1
 
+INLINE UINT16 read16be_with_read8_handler(read8_space_func handler, address_space &space, offs_t offset, UINT16 mem_mask)
+{
+	UINT16 result = 0;
+	if (ACCESSING_BITS_8_15)
+		result |= ((UINT16)(*handler)(space, offset * 2 + 0, mem_mask >> 8)) << 8;
+	if (ACCESSING_BITS_0_7)
+		result |= ((UINT16)(*handler)(space, offset * 2 + 1, mem_mask >> 0)) << 0;
+	return result;
+}
+
+INLINE void write16be_with_write8_handler(write8_space_func handler, address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask)
+{
+	if (ACCESSING_BITS_8_15)
+		(*handler)(space, offset * 2 + 0, data >> 8, mem_mask >> 8);
+	if (ACCESSING_BITS_0_7)
+		(*handler)(space, offset * 2 + 1, data >> 0, mem_mask >> 0);
+}
+
+INLINE UINT32 read32be_with_read8_handler(read8_space_func handler, address_space &space, offs_t offset, UINT32 mem_mask)
+{
+	UINT32 result = 0;
+	if (ACCESSING_BITS_16_31)
+		result |= read16be_with_read8_handler(handler, space, offset * 2 + 0, mem_mask >> 16) << 16;
+	if (ACCESSING_BITS_0_15)
+		result |= read16be_with_read8_handler(handler, space, offset * 2 + 1, mem_mask) << 0;
+	return result;
+}
+
+
+INLINE void write32be_with_write8_handler(write8_space_func handler, address_space &space, offs_t offset, UINT32 data, UINT32 mem_mask)
+{
+	if (ACCESSING_BITS_16_31)
+		write16be_with_write8_handler(handler, space, offset * 2 + 0, data >> 16, mem_mask >> 16);
+	if (ACCESSING_BITS_0_15)
+		write16be_with_write8_handler(handler, space, offset * 2 + 1, data, mem_mask);
+}
+
+INLINE UINT64 read64be_with_read8_handler(read8_space_func handler, address_space &space, offs_t offset, UINT64 mem_mask)
+{
+	UINT64 result = 0;
+	if (ACCESSING_BITS_32_63)
+		result |= (UINT64)read32be_with_read8_handler(handler, space, offset * 2 + 0, mem_mask >> 32) << 32;
+	if (ACCESSING_BITS_0_31)
+		result |= (UINT64)read32be_with_read8_handler(handler, space, offset * 2 + 1, mem_mask) << 0;
+	return result;
+}
+
+
+INLINE void write64be_with_write8_handler(write8_space_func handler, address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
+{
+	if (ACCESSING_BITS_32_63)
+		write32be_with_write8_handler(handler, space, offset * 2 + 0, data >> 32, mem_mask >> 32);
+	if (ACCESSING_BITS_0_31)
+		write32be_with_write8_handler(handler, space, offset * 2 + 1, data, mem_mask);
+}
 
 
 /*************************************
