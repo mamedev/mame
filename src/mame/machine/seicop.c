@@ -2368,7 +2368,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			/* search the uploaded 'trigger' table for a matching trigger*/
 			/* note, I don't know what the 'mask' or 'value' tables are... probably important, might determine what actually gets executed! */
 			/* note: Zero Team triggers macro 0x904 instead of 0x905, Seibu Cup Soccer triggers 0xe30e instead of 0xe38e. I highly doubt that AT LEAST
-               it isn't supposed to do anything, especially in the former case (it definitely NEED that sprites have an ark movement when they are knocked down). */
+               it isn't supposed to do anything, especially in the former case (it definitely NEEDS that sprites have an arc movement when they are knocked down). */
 			for (i=0;i<32;i++)
 			{
 				if ((cop_mcu_ram[offset] & 0xff00) == (copd2_table_4[i] & 0xff00))
@@ -2433,7 +2433,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				return;
 			}
 
-			/* "automatic" movement, for arks in Legionnaire / Zero Team (expression adjustment) */
+			/* "automatic" movement, for arcs in Legionnaire / Zero Team (expression adjustment) */
 			if(COP_CMD(0x194,0x288,0x088,0x000,0x000,0x000,0x000,0x000,6,0xfbfb))
 			{
 				UINT8 offs;
