@@ -608,7 +608,7 @@
 	<software name="columns">
 		<description>Columns</description>
 		<year>1991</year>
-		<publisher>Nippon Telenet</publisher>
+		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="TJ03002"/>
 		<info name="release" value="19910329"/>
 		<info name="alt_title" value="コラムス"/>
@@ -3164,7 +3164,7 @@
 	<software name="puzzlboy">
 		<description>Puzzle Boy</description>
 		<year>1991</year>
-		<publisher>Nippon Telenet</publisher>
+		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="TJ03001"/>
 		<info name="release" value="19910222"/>
 		<info name="alt_title" value="パズルボーイ"/>

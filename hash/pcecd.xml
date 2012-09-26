@@ -3235,7 +3235,7 @@
 	<software name="silkylipo" cloneof="silkylip">
 		<description>Mahou no Shoujo Silky Lip [Ver 3.1 Prototype][Backup] (SCD)(Jpn)</description>
 		<year>19??</year>
-		<publisher>Telenet Japan</publisher>
+		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="魔法の少女シルキーリップ"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
@@ -3249,7 +3249,7 @@
 	<software name="silkylip">
 		<description>Mahou no Shoujo Silky Lip [Ver 5.0 Prototype][Backup][alt] (SCD)(Jpn)</description>
 		<year>19??</year>
-		<publisher>Telenet Japan</publisher>
+		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="魔法の少女シルキーリップ"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
@@ -7087,7 +7087,7 @@
 	<software name="cosmfnt2">
 		<description>Cosmic Fantasy II (CD)(USA)</description>
 		<year>1992</year>
-		<publisher>Telenet Japan</publisher>
+		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="WTG990301"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>

@@ -181,11 +181,11 @@
 	</software>
 
 	<software name="rockybw">
-		<!-- Alt. Title: The Adventures of Rocky and Bullwinkle and Friends (Box) -->
 		<description>The Adventures of Rocky and Bullwinkle (USA)</description>
 		<year>1992</year>
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="DMG-RY-USA"/>
+		<info name="alt_title" value="The Adventures of Rocky and Bullwinkle and Friends (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="adventures of rocky and bullwinkle and friends, the (usa).bin" size="131072" crc="74c700a4" sha1="924a9bd18328da81b5554e42db873d1981ee9b20" offset="000000" />
@@ -12768,7 +12768,7 @@
 		<!-- Notes: SGB enhanced -->
 		<description>Pachinko CR Daiku no Gen-san GB (Jpn)</description>
 		<year>1998</year>
-		<publisher>Nippon Telenet</publisher>
+		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="DMG-AKZJ-JPN"/>
 		<info name="release" value="19980313"/>
 		<info name="alt_title" value="パチンコCR大工の源さんGB"/>

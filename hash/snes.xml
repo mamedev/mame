@@ -26271,7 +26271,7 @@ Alternate board (XL-1)
 	<software name="acenerae">
 		<description>Ace o Nerae! (Jpn)</description>
 		<year>1993</year>
-		<publisher>Nippon Telenet</publisher>
+		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="SHVC-EE" />
 		<info name="release" value="19931222" />
 		<info name="alt_title" value="エースをねらえ!" />

@@ -9085,7 +9085,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="genchohi" cloneof="genghis2">
-		<description>Aoki Ookami to Shiroki Meshika - Genchou Hishi (Jpn)</description>
+		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi (Jpn)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-76103"/>
@@ -9410,7 +9410,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	<software name="grandslj" cloneof="grandsl">
 		<description>GrandSlam - The Tennis Tournament '92 (Jpn)</description>
 		<year>1992</year>
-		<publisher>Nippon Telenet</publisher>
+		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49133"/>
 		<info name="release" value="19920612"/>
 		<info name="alt_title" value="グランドスラム ザ・テニストーナメント'92"/>
