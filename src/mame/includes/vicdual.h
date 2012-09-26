@@ -26,15 +26,20 @@ class vicdual_state : public driver_device
 {
 public:
 	vicdual_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
 		m_videoram(*this, "videoram"),
-		m_characterram(*this, "characterram"){ }
+		m_characterram(*this, "characterram")
+	{ }
 
-	UINT32 m_coin_status;
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_characterram;
-	UINT8 m_samurai_protection_data;
+
+	UINT8 m_coin_status;
 	UINT8 m_palette_bank;
+	UINT8 m_samurai_protection_data;
+
 	DECLARE_WRITE8_MEMBER(vicdual_videoram_w);
 	DECLARE_WRITE8_MEMBER(vicdual_characterram_w);
 	DECLARE_READ8_MEMBER(depthch_io_r);
@@ -66,6 +71,7 @@ public:
 	DECLARE_READ8_MEMBER(invinco_io_r);
 	DECLARE_WRITE8_MEMBER(invinco_io_w);
 	DECLARE_WRITE8_MEMBER(vicdual_palette_bank_w);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(vicdual_read_coin_status);
 	DECLARE_CUSTOM_INPUT_MEMBER(vicdual_get_64v);
 	DECLARE_CUSTOM_INPUT_MEMBER(vicdual_get_vblank_comp);

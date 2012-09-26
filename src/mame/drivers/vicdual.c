@@ -59,11 +59,6 @@
  *
  *************************************/
 
-/* the main CPU is reset when a coin is inserted */
-
-#define COIN_PORT_TAG		"COIN"
-
-
 TIMER_CALLBACK_MEMBER(vicdual_state::clear_coin_status)
 {
 	m_coin_status = 0;
@@ -83,6 +78,7 @@ CUSTOM_INPUT_MEMBER(vicdual_state::vicdual_read_coin_status)
 }
 
 
+/* the main CPU is reset when a coin is inserted */
 INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
 {
 	if (newval)
@@ -91,7 +87,7 @@ INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
 		coin_counter_w(machine(), 0, 1);
 		coin_counter_w(machine(), 0, 0);
 
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 		/* simulate the coin switch being closed for a while */
 		machine().scheduler().timer_set(4 * machine().primary_screen->frame_period(), timer_expired_delegate(FUNC(vicdual_state::clear_coin_status),this));
@@ -100,9 +96,8 @@ INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
 
 
 #define PORT_COIN										\
-	PORT_START(COIN_PORT_TAG)							\
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vicdual_state,coin_changed, NULL) \
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("COIN")									\
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vicdual_state,coin_changed, NULL)
 
 
 
@@ -166,7 +161,7 @@ CUSTOM_INPUT_MEMBER(vicdual_state::vicdual_get_timer_value)
 
 int vicdual_is_cabinet_color(running_machine &machine)
 {
-	return (machine.root_device().ioport(COLOR_BW_PORT_TAG)->read() == 0);
+	return (machine.root_device().ioport(COLOR_BW_PORT_TAG)->read() & 1) ? 0 : 1;
 }
 
 
@@ -174,8 +169,7 @@ int vicdual_is_cabinet_color(running_machine &machine)
 	PORT_START(COLOR_BW_PORT_TAG)						\
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )		\
 	PORT_CONFSETTING(    0x00, "Color" )				\
-	PORT_CONFSETTING(    0x01, "Black and White" )		\
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFSETTING(    0x01, "Black and White" )
 
 
 
