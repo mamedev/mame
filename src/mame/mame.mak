@@ -2195,6 +2195,8 @@ $(DRIVERS)/segaybd.o:	$(LAYOUT)/pdrift.lh
 
 $(DRIVERS)/snookr10.o:	$(LAYOUT)/snookr10.lh
 
+$(DRIVERS)/spectra.o:	$(LAYOUT)/spectra.lh
+
 $(DRIVERS)/splus.o:	$(LAYOUT)/splus.lh
 
 $(DRIVERS)/sspeedr.o:	$(LAYOUT)/sspeedr.lh
