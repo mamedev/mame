@@ -209,9 +209,9 @@ void sega_hangon_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 		// loop from top to bottom
 		int minx = xpos;
-		int maxx = xpos;
-		int miny = -1;
-		int maxy = -1;
+		int maxx = cliprect.min_x - 1;
+		int miny = cliprect.max_y + 1;
+		int maxy = cliprect.min_y - 1;
 		for (int y = top; y < bottom; y++)
 		{
 			// advance a row
@@ -278,13 +278,13 @@ void sega_hangon_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 				// update bounds
 				if (x > maxx) maxx = x;
-				if (miny == -1) miny = y;
+				if (y < miny) miny = y;
 				maxy = y;
 			}
 		}
 
 		// mark dirty
-		if (miny != -1)
+		if (minx <= maxx && miny <= maxy)
 			mark_dirty(minx, maxx, miny, maxy);
 	}
 }
@@ -388,9 +388,9 @@ void sega_sharrier_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 
 		// loop from top to bottom
 		int minx = xpos;
-		int maxx = xpos;
-		int miny = -1;
-		int maxy = -1;
+		int maxx = cliprect.min_x - 1;
+		int miny = cliprect.max_y + 1;
+		int maxy = cliprect.min_y - 1;
 		for (int y = top; y < bottom; y++)
 		{
 			// advance a row
@@ -465,13 +465,13 @@ void sega_sharrier_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 
 				// update bounds
 				if (x > maxx) maxx = x;
-				if (miny == -1) miny = y;
+				if (y < miny) miny = y;
 				maxy = y;
 			}
 		}
 
 		// mark dirty
-		if (miny != -1)
+		if (minx <= maxx && miny <= maxy)
 			mark_dirty(minx, maxx, miny, maxy);
 	}
 }
@@ -576,8 +576,8 @@ void sega_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 		// loop from top to bottom
 		int minx = xpos;
 		int maxx = xpos;
-		int miny = -1;
-		int maxy = -1;
+		int miny = cliprect.max_y + 1;
+		int maxy = cliprect.min_y - 1;
 		for (int y = top; y < bottom; y++)
 		{
 			// advance a row
@@ -640,13 +640,13 @@ void sega_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 				// update bounds
 				if (x > maxx) maxx = x;
 				if (x < minx) minx = x;
-				if (miny == -1) miny = y;
+				if (y < miny) miny = y;
 				maxy = y;
 			}
 		}
 
 		// mark dirty
-		if (miny != -1)
+		if (minx <= maxx && miny <= maxy)
 			mark_dirty(minx, maxx, miny, maxy);
 	}
 }
@@ -758,8 +758,8 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 		// loop from top to bottom
 		int minx = xpos;
 		int maxx = xpos;
-		int miny = -1;
-		int maxy = -1;
+		int miny = cliprect.max_y + 1;
+		int maxy = cliprect.min_y - 1;
 		for (int y = top; y < bottom; y++)
 		{
 			// skip drawing if not within the cliprect
@@ -819,7 +819,7 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 				// update bounds
 				if (x > maxx) maxx = x;
 				if (x < minx) minx = x;
-				if (miny == -1) miny = y;
+				if (y < miny) miny = y;
 				maxy = y;
 			}
 
@@ -828,7 +828,7 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 		}
 
 		// mark dirty
-		if (miny != -1)
+		if (minx <= maxx && miny <= maxy)
 			mark_dirty(minx, maxx, miny, maxy);
 	}
 }
@@ -941,8 +941,8 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 		// loop from top to bottom
 		int minx = xpos;
 		int maxx = xpos;
-		int miny = -1;
-		int maxy = -1;
+		int miny = cliprect.max_y + 1;
+		int maxy = cliprect.min_y - 1;
 		for (int y = top; y < bottom; y++)
 		{
 			// advance a row
@@ -1012,13 +1012,13 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 				// update bounds
 				if (x > maxx) maxx = x;
 				if (x < minx) minx = x;
-				if (miny == -1) miny = y;
+				if (y < miny) miny = y;
 				maxy = y;
 			}
 		}
 
 		// mark dirty
-		if (miny != -1)
+		if (minx <= maxx && miny <= maxy)
 			mark_dirty(minx, maxx, miny, maxy);
 	}
 }
@@ -1150,8 +1150,8 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 		// loop from top to bottom
 		int minx = xpos;
 		int maxx = xpos;
-		int miny = -1;
-		int maxy = -1;
+		int miny = cliprect.max_y + 1;
+		int maxy = cliprect.min_y - 1;
 		int yacc = 0;
 		int ytarget = top + ydelta * height;
 		for (int y = top; y != ytarget; y += ydelta)
@@ -1218,8 +1218,8 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 				// update bounds
 				if (x > maxx) maxx = x;
 				if (x < minx) minx = x;
-				if (miny == -1) miny = y;
-				maxy = y;
+				if (y < miny) miny = y;
+				if (y > maxy) maxy = y;
 			}
 
 			// accumulate zoom factors; if we carry into the high bit, skip an extra row
@@ -1229,7 +1229,7 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 		}
 
 		// mark dirty
-		if (miny != -1)
+		if (minx <= maxx && miny <= maxy)
 			mark_dirty(minx, maxx, miny, maxy);
 	}
 }
@@ -1340,8 +1340,8 @@ void sega_yboard_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 		// loop from top to bottom
 		int dminx = xpos;
 		int dmaxx = xpos;
-		int dminy = -1;
-		int dmaxy = -1;
+		int dminy = cliprect.max_y + 1;
+		int dmaxy = cliprect.min_y - 1;
 		int ytarget = top + ydelta * height;
 		int yacc = 0;
 		for (int y = top; y != ytarget; y += ydelta)
@@ -1443,8 +1443,8 @@ void sega_yboard_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 					// update bounds
 					if (x > dmaxx) dmaxx = x;
 					if (x < dminx) dminx = x;
-					if (dminy == -1) dminy = y;
-					dmaxy = y;
+					if (y < dminy) dminy = y;
+					if (y > dmaxy) dmaxy = y;
 				}
 			}
 
@@ -1455,7 +1455,7 @@ void sega_yboard_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 		}
 
 		// mark dirty
-		if (dminy != -1)
+		if (dminx <= dmaxx && dminy <= dmaxy)
 			mark_dirty(dminx, dmaxx, dminy, dmaxy);
 	}
 }
