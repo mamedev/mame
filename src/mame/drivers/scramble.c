@@ -1215,8 +1215,8 @@ I8255A_INTERFACE( scramble_protection_ppi_1_intf )
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
 	DEVCB_NULL,								/* Port B read */
 	DEVCB_HANDLER(scramble_sh_irqtrigger_w),/* Port B write */
-	DEVCB_HANDLER(scramble_protection_r),	/* Port C read */
-	DEVCB_HANDLER(scramble_protection_w)	/* Port C write */
+	DEVCB_DRIVER_MEMBER(scramble_state, scramble_protection_r),	/* Port C read */
+	DEVCB_DRIVER_MEMBER(scramble_state, scramble_protection_w)	/* Port C write */
 };
 
 I8255A_INTERFACE( mrkougar_ppi_1_intf )
