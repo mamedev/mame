@@ -128,10 +128,6 @@ void mos6526_device::device_reset()
 	m_cnt = 1;
 	m_sp = 0;
 
-	/* initialize data direction registers */
-	m_port[0].m_ddr = !strcmp(tag(), "cia_0") ? 0x03 : 0xff;
-	m_port[1].m_ddr = !strcmp(tag(), "cia_0") ? 0x00 : 0xff;
-
 	/* TOD running by default */
 	m_tod_running = TRUE;
 

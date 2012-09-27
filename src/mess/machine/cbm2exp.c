@@ -108,7 +108,7 @@ UINT8* device_cbm2_expansion_card_interface::cbm2_bank3_pointer(running_machine 
 		m_bank3_mask = size - 1;
 	}
 
-	return m_bank1;
+	return m_bank3;
 }
 
 

@@ -93,8 +93,6 @@ private:
     void update_pa7_state();
     UINT8 get_timer();
 
-    int             m_index;
-
     riot6532_port   m_port[2];
 
     devcb_resolved_write_line   m_irq_func;

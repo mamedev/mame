@@ -2,6 +2,8 @@
 
     TODO:
 
+	- CIA timers fail in burn-in test
+	- NTSC variants unable to load from disk
 	- shift lock
 	- Hungarian keyboard
 	- cbm620hu charom banking?
@@ -1004,7 +1006,7 @@ static MC6845_UPDATE_ROW( hp_crtc_update_row )
 			data <<= 1;
 		}
 
-		bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[BIT(code, 7)];
+		bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[BIT(code, 7) ^ BIT(ma, 13)];
 	}
 }
 
@@ -1121,13 +1123,12 @@ READ8_MEMBER( cbm2_state::tpi1_pa_r )
 	UINT8 data = 0;
 
 	// IEEE-488
-	if (m_ieee_dc) data |= m_ieee->ren_r() << 2;
-	if (m_ieee_dc) data |= m_ieee->atn_r() << 3;
-	if (!m_ieee_te) data |= m_ieee->dav_r() << 4;
-	if (m_ieee->atn_r() && !m_ieee_te) data |= m_ieee->eoi_r() << 5;
-	if (!m_ieee->atn_r() && !m_ieee_dc) data |= m_ieee->eoi_r() << 5;
-	if (m_ieee_te) data |= m_ieee->ndac_r() << 6;
-	if (m_ieee_te) data |= m_ieee->nrfd_r() << 7;
+	data |= m_ieee2->ren_r() << 2;
+	data |= m_ieee2->atn_r() << 3;
+	data |= m_ieee2->dav_r() << 4;
+	data |= m_ieee2->eoi_r() << 5;
+	data |= m_ieee2->ndac_r() << 6;
+	data |= m_ieee2->nrfd_r() << 7;
 
 	return data;
 }
@@ -1150,16 +1151,17 @@ WRITE8_MEMBER( cbm2_state::tpi1_pa_w )
 	*/
 
 	// IEEE-488
-	m_ieee_dc = BIT(data, 0);
-	m_ieee_te = BIT(data, 1);
+	m_ieee2->dc_w(BIT(data, 0));
 
-	if (!m_ieee_dc) m_ieee->ren_w(BIT(data, 2));
-	if (!m_ieee_dc) m_ieee->atn_w(BIT(data, 3));
-	if (m_ieee_te) m_ieee->dav_w(BIT(data, 4));
-	if (m_ieee->atn_r() && m_ieee_te) m_ieee->eoi_w(BIT(data, 5));
-	if (!m_ieee->atn_r() && m_ieee_dc) m_ieee->eoi_w(BIT(data, 5));
-	if (!m_ieee_te) m_ieee->ndac_w(BIT(data, 6));
-	if (!m_ieee_te) m_ieee->nrfd_w(BIT(data, 7));
+	m_ieee1->te_w(BIT(data, 1));
+	m_ieee2->te_w(BIT(data, 1));
+
+	m_ieee2->ren_w(BIT(data, 2));
+	m_ieee2->atn_w(BIT(data, 3));
+	m_ieee2->dav_w(BIT(data, 4));
+	m_ieee2->eoi_w(BIT(data, 5));
+	m_ieee2->ndac_w(BIT(data, 6));
+	m_ieee2->nrfd_w(BIT(data, 7));
 }
 
 READ8_MEMBER( cbm2_state::tpi1_pb_r )
@@ -1179,18 +1181,18 @@ READ8_MEMBER( cbm2_state::tpi1_pb_r )
 	
 	*/
 
-	UINT8 data = 0xff;
+	UINT8 data = 0;
 
 	// IEEE-488
-	if (m_ieee_dc) data &= m_ieee->ifc_r();
-	if (!m_ieee_dc) data &= m_ieee->srq_r() << 1;
+	data |= m_ieee2->ifc_r();
+	data |= m_ieee2->srq_r() << 1;
 	
 	// user port
-	//data &= m_user->pb2_r() << 2;
-	//data &= m_user->pb3_r() << 3;
+	//data |= m_user->pb2_r() << 2;
+	//data |= m_user->pb3_r() << 3;
 
 	// cassette
-	data &= m_cassette->sense_r() << 7;
+	data |= m_cassette->sense_r() << 7;
 
 	return data;
 }
@@ -1213,8 +1215,8 @@ WRITE8_MEMBER( cbm2_state::tpi1_pb_w )
 	*/
 
 	// IEEE-488
-	if (!m_ieee_dc) m_ieee->ifc_w(BIT(data, 0));
-	if (m_ieee_dc) m_ieee->srq_w(BIT(data, 1));
+   	m_ieee2->ifc_w(BIT(data, 0));
+   	m_ieee2->srq_w(BIT(data, 1));
 
 	// user port
 	//m_user->pb2_w(BIT(data, 2));
@@ -1449,15 +1451,17 @@ READ8_MEMBER( cbm2_state::cia_pa_r )
 	
 	*/
 
-	UINT8 data = 0xff;
+	UINT8 data = 0;
 
-	if (!m_ieee_te) data &= m_ieee->dio_r();
+	// IEEE-488
+	data |= m_ieee1->read(space, 0);
 
-	//data &= m_user->data1_r();
+	// user port
+	//data |= m_user->data1_r();
 
 	// joystick
-	//data &= BIT(m_joy1->joy_r(), 5) << 6;
-	//data &= BIT(m_joy2->joy_r(), 5) << 7;
+	//data |= BIT(m_joy1->joy_r(), 5) << 6;
+	//data |= BIT(m_joy2->joy_r(), 5) << 7;
 
 	return data;
 }
@@ -1479,10 +1483,13 @@ WRITE8_MEMBER( cbm2_state::cia_pa_w )
 	
 	*/
 
-	if (m_ieee_te) m_ieee->dio_w(data);
+	// IEEE-488
+	m_ieee1->write(space, 0, data);
 
+	// user port
 	//m_user->data1_w(data);
 
+	// joystick
 	m_cia_pa = data;
 }
 
@@ -1566,6 +1573,42 @@ static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 
 
 //-------------------------------------------------
+//  DS75160A_INTERFACE( ds75160a_intf )
+//-------------------------------------------------
+
+static DS75160A_INTERFACE( ds75160a_intf )
+{
+	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_r),
+	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_w)
+};
+
+
+//-------------------------------------------------
+//  DS75161A_INTERFACE( ds75161a_intf )
+//-------------------------------------------------
+
+static DS75161A_INTERFACE( ds75161a_intf )
+{
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ren_r),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ifc_r),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ndac_r),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, nrfd_r),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, dav_r),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, eoi_r),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, atn_r),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, srq_r),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ren_w),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ifc_w),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ndac_w),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, nrfd_w),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, dav_w),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, eoi_w),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, atn_w),
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, srq_w)
+};
+
+
+//-------------------------------------------------
 //  IEEE488_INTERFACE( ieee488_intf )
 //-------------------------------------------------
 
@@ -1631,8 +1674,6 @@ MACHINE_START_MEMBER( cbm2_state, cbm2 )
 	save_item(NAME(m_tpi2_pa));
 	save_item(NAME(m_tpi2_pb));
 	save_item(NAME(m_cia_pa));
-	save_item(NAME(m_ieee_dc));
-	save_item(NAME(m_ieee_te));
 }
 
 
@@ -1797,6 +1838,8 @@ static MACHINE_CONFIG_START( p500_ntsc, p500_state )
 	MCFG_TPI6525_ADD(MOS6525_2_TAG, p500_tpi2_intf)
 	MCFG_ACIA6551_ADD(MOS6551A_TAG)
 	MCFG_MOS6526R1_ADD(MOS6526_TAG, VIC6567_CLOCK, 60, cia_intf)
+	MCFG_DS75160A_ADD(DS75160A_TAG, ds75160a_intf)
+	MCFG_DS75161A_ADD(DS75161A_TAG, ds75161a_intf)
 	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
@@ -1845,6 +1888,8 @@ static MACHINE_CONFIG_START( p500_pal, p500_state )
 	MCFG_TPI6525_ADD(MOS6525_2_TAG, p500_tpi2_intf)
 	MCFG_ACIA6551_ADD(MOS6551A_TAG)
 	MCFG_MOS6526R1_ADD(MOS6526_TAG, VIC6569_CLOCK, 50, cia_intf)
+	MCFG_DS75160A_ADD(DS75160A_TAG, ds75160a_intf)
+	MCFG_DS75161A_ADD(DS75161A_TAG, ds75161a_intf)
 	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
@@ -1871,7 +1916,7 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(cbm2_state, cbm2)
 
 	// basic hardware
-	MCFG_CPU_ADD(M6509_TAG, M6509, XTAL_18MHz/8)
+	MCFG_CPU_ADD(M6509_TAG, M6509, XTAL_18MHz/9)
 	MCFG_CPU_PROGRAM_MAP(cbm2_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
 
@@ -1884,11 +1929,11 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	MCFG_SCREEN_SIZE(768, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 312-1)
 
-	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, XTAL_18MHz/8, lp_crtc_intf)
+	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, XTAL_18MHz/9, lp_crtc_intf)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6851_TAG, SID6581, XTAL_18MHz/8)
+	MCFG_SOUND_ADD(MOS6851_TAG, SID6581, XTAL_18MHz/9)
 	MCFG_SOUND_CONFIG(sid_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1899,12 +1944,14 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	MCFG_TPI6525_ADD(MOS6525_1_TAG, tpi1_intf)
 	MCFG_TPI6525_ADD(MOS6525_2_TAG, tpi2_intf)
 	MCFG_ACIA6551_ADD(MOS6551A_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_TAG, XTAL_18MHz/8, 60, cia_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_TAG, XTAL_18MHz/9, 60, cia_intf)
+	MCFG_DS75160A_ADD(DS75160A_TAG, ds75160a_intf)
+	MCFG_DS75161A_ADD(DS75161A_TAG, ds75161a_intf)
 	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
-	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL_18MHz/8, cbm2_expansion_cards, NULL, NULL)
+	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL_18MHz/9, cbm2_expansion_cards, NULL, NULL)
 	//MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, user_intf, cbm2_user_port_cards, NULL, NULL)
 	//MCFG_CBM2_SYSTEM_PORT_ADD(CBM2_SYSTEM_PORT_TAG, system_intf, cbm2_system_port_cards, NULL, NULL)
 
@@ -1944,7 +1991,7 @@ static MACHINE_CONFIG_START( cbm2lp_pal, cbm2_state )
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
 
 	MCFG_DEVICE_REMOVE(MOS6526_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_TAG, XTAL_18MHz/8, 50, cia_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_TAG, XTAL_18MHz/9, 50, cia_intf)
 MACHINE_CONFIG_END
 
 
@@ -1976,7 +2023,7 @@ static MACHINE_CONFIG_START( cbm2hp_ntsc, cbm2hp_state )
 	MCFG_FRAGMENT_ADD(cbm2lp_ntsc)
 
 	MCFG_DEVICE_REMOVE(MC68B45_TAG)
-	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, XTAL_18MHz/8, hp_crtc_intf)
+	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, XTAL_18MHz/9, hp_crtc_intf)
 
 	// devices
 	MCFG_DEVICE_REMOVE(MOS6525_2_TAG)
@@ -2030,7 +2077,7 @@ static MACHINE_CONFIG_START( cbm2hp_pal, cbm2hp_state )
 	MCFG_TPI6525_ADD(MOS6525_2_TAG, hp_tpi2_intf)
 
 	MCFG_DEVICE_REMOVE(MOS6526_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_TAG, XTAL_18MHz/8, 50, cia_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_TAG, XTAL_18MHz/9, 50, cia_intf)
 MACHINE_CONFIG_END
 
 

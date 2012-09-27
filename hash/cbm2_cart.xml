@@ -4,11 +4,11 @@
 
 	<software name="calcresu">
 		<description>Calc Result</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Handic Software</publisher>
 		
 		<part name="cart" interface="cbm2_cart">
-			<dataarea name="bank1" size="0x2000">
+			<dataarea name="bank3" size="0x2000">
 				<rom name="calc_result-bx700.bin" size="0x2000" crc="4775ebb3" sha1="5c6928a9cd8a3ce6a1d11221292b832295d6543e" offset="0" />
 			</dataarea>
 		</part>

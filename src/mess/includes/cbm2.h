@@ -12,6 +12,8 @@
 #include "machine/6551acia.h"
 #include "machine/cbm2exp.h"
 #include "machine/cbmipt.h"
+#include "machine/ds75160a.h"
+#include "machine/ds75161a.h"
 #include "machine/ieee488.h"
 #include "machine/petcass.h"
 #include "machine/pla.h"
@@ -27,12 +29,14 @@
 #define PLA2_TAG		"u88"
 #define MOS6567_TAG		"u23"
 #define MOS6569_TAG		"u23"
-#define MC68B45_TAG		"u7"
+#define MC68B45_TAG		"u10"
 #define MOS6851_TAG		"u4"
 #define MOS6525_1_TAG	"u20"
 #define MOS6525_2_TAG	"u102"
 #define MOS6551A_TAG	"u19"
 #define MOS6526_TAG		"u2"
+#define DS75160A_TAG	"u3"
+#define DS75161A_TAG	"u7"
 #define SCREEN_TAG		"screen"
 #define CONTROL1_TAG	"joy1"
 #define CONTROL2_TAG	"joy2"
@@ -50,6 +54,8 @@ public:
 		  m_tpi2(*this, MOS6525_2_TAG),
 		  m_acia(*this, MOS6551A_TAG),
 		  m_cia(*this, MOS6526_TAG),
+		  m_ieee1(*this, DS75160A_TAG),
+		  m_ieee2(*this, DS75161A_TAG),
 		  m_joy1(*this, CONTROL1_TAG),
 		  m_joy2(*this, CONTROL2_TAG),
 		  m_exp(*this, CBM2_EXPANSION_SLOT_TAG),
@@ -78,6 +84,8 @@ public:
 	required_device<tpi6525_device> m_tpi2;
 	required_device<acia6551_device> m_acia;
 	required_device<mos6526_device> m_cia;
+	required_device<ds75160a_device> m_ieee1;
+	required_device<ds75161a_device> m_ieee2;
 	required_device<vcs_control_port_device> m_joy1;
 	required_device<vcs_control_port_device> m_joy2;
 	required_device<cbm2_expansion_slot_device> m_exp;
@@ -151,10 +159,6 @@ public:
 	UINT8 m_tpi2_pa;
 	UINT8 m_tpi2_pb;
 	UINT8 m_cia_pa;
-
-	// IEEE-488 state
-	int m_ieee_dc;
-	int m_ieee_te;
 
 	// timers
 	emu_timer *m_todclk_timer;

@@ -475,13 +475,6 @@ void riot6532_device::device_config_complete()
 
 void riot6532_device::device_start()
 {
-	/* validate arguments */
-	assert(this != NULL);
-
-	/* set static values */
-	device_type_iterator<&device_creator<riot6532_device>, riot6532_device> iter(machine().root_device());
-	m_index = iter.indexof(*this);
-
 	/* configure the ports */
 	m_port[0].m_in_func.resolve(m_in_a_cb, *this);
 	m_port[0].m_out_func.resolve(m_out_a_cb, *this);

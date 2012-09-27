@@ -174,6 +174,8 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/ds1302.o		\
 	$(EMUMACHINE)/ds2401.o		\
 	$(EMUMACHINE)/ds2404.o		\
+	$(EMUMACHINE)/ds75160a.o	\
+	$(EMUMACHINE)/ds75161a.o	\
 	$(EMUMACHINE)/e0516.o		\
 	$(EMUMACHINE)/eeprom.o		\
 	$(EMUMACHINE)/er2055.o		\
