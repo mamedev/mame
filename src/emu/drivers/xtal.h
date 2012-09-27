@@ -126,7 +126,7 @@ enum
 	XTAL_14_7456MHz 	= 14745600,		/* Namco System 12 & System Super 22/23 for H8/3002 CPU */
 	XTAL_15MHz			= 15000000,		/* Sinclair QL */
 	XTAL_15_36MHz		= 15360000,		/* Visual 1050 */
-	XTAL_15_468MHz  	= 15468000,		/* Bank Panic h/w, Sega G80 */
+	XTAL_15_468MHz  	= 15468480,		/* Bank Panic h/w, Sega G80 */
 	XTAL_16MHz  		= 16000000,		/* Extremely common, used on 100's of PCBs */
 	XTAL_16_9344MHz 	= 16934400,		/* Usually used to drive 90's Yamaha OPL/FM chips */
 	XTAL_17_36MHz		= 17360000,		/* OMTI Series 10 SCSI controller */

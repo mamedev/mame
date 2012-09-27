@@ -754,6 +754,21 @@ static INPUT_PORTS_START( headoni )
 	PORT_DIPSETTING (  0x10, "1 Coin 1 Play" )
 	PORT_DIPSETTING (  0x20, "1 Coin 2 Plays" )
 
+//  PORT_START("VR1")
+//  PORT_ADJUSTER( 50, "Car Rumble Volume" )
+
+//  PORT_START("VR2")
+//  PORT_ADJUSTER( 50, "Collision Volume" )
+
+//  PORT_START("VR3")
+//  PORT_ADJUSTER( 50, "Tire Screech Volume" )
+
+//  PORT_START("VR4")
+//  PORT_ADJUSTER( 50, "Score Counter Volume" )
+
+//  PORT_START("VR5")
+//  PORT_ADJUSTER( 50, "Master Volume" )
+
 	PORT_START("FAKE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state,coin_inserted, 0)
 

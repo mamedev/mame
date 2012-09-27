@@ -7,21 +7,6 @@
 #include "sound/discrete.h"
 
 
-#define VICDUAL_MASTER_CLOCK				(15468480)
-#define VICDUAL_MAIN_CPU_CLOCK				(VICDUAL_MASTER_CLOCK/8)
-#define VICDUAL_PIXEL_CLOCK					(VICDUAL_MASTER_CLOCK/3)
-#define VICDUAL_HTOTAL						(0x148)
-#define VICDUAL_HBEND						(0x000)
-#define VICDUAL_HBSTART						(0x100)
-#define VICDUAL_HSSTART						(0x110)
-#define VICDUAL_HSEND						(0x130)
-#define VICDUAL_VTOTAL						(0x106)
-#define VICDUAL_VBEND						(0x000)
-#define VICDUAL_VBSTART						(0x0e0)
-#define VICDUAL_VSSTART						(0x0ec)
-#define VICDUAL_VSEND						(0x0f0)
-
-
 class vicdual_state : public driver_device
 {
 public:

@@ -52,6 +52,22 @@
 #include "depthch.lh"
 
 
+#define VICDUAL_MASTER_CLOCK				(XTAL_15_468MHz)
+#define VICDUAL_MAIN_CPU_CLOCK				(VICDUAL_MASTER_CLOCK/8)
+#define VICDUAL_PIXEL_CLOCK					(VICDUAL_MASTER_CLOCK/3)
+
+#define VICDUAL_HTOTAL						(0x148)
+#define VICDUAL_HBEND						(0x000)
+#define VICDUAL_HBSTART						(0x100)
+#define VICDUAL_HSSTART						(0x110)
+#define VICDUAL_HSEND						(0x130)
+#define VICDUAL_VTOTAL						(0x106)
+#define VICDUAL_VBEND						(0x000)
+#define VICDUAL_VBSTART						(0x0e0)
+#define VICDUAL_VSSTART						(0x0ec)
+#define VICDUAL_VSEND						(0x0f0)
+
+
 
 /*************************************
  *
@@ -2514,82 +2530,6 @@ ROM_START( sspaceatc )
 	ROM_LOAD( "316-0043.u65", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )	/* control PROM */
 	ROM_LOAD( "316-0042.u66", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )	/* sequence PROM */
 ROM_END
-
-
-/*
-Head On
-Irem, 1979? / 1980?
-
-PCB Layout
-----------
-
-    M-15L
-   |---------------------------------------------------------------------------------|
-   |                                                                                 |
-   | DSW(8)  74175   74175   7400  74LS08   74121   M53214     |-------|      E1.9A  |
-   |                                                           | 6502  |             |
-   |          7432   74175   7404    7427    7442  74LS241     |-------|             |
-   |                                                                          E2.9B  |
-   |                                                                                 |
-   |        74LS74    7432  74161   74161    7442  74LS241  74LS367  74LS367         |
- |-|                                                                          E3.9C  |
- |          M53214 74LS367   7442    7486    8216     2114  74LS157  74LS367         |
- |                                                                                   |
- |4         M53214 74LS367  74161    7486    8216     2114  74LS157     2111  E4.9D  |
- |4                                                                                  |
- |W         M53214 74LS367  74161    7486    8216     2114  74LS157     2111         |
- |A                                                                           E5.9F  |
- |Y         M53214 74LS367  74161    7486    8216    74166     2114  74LS157         |
- |                         11.73MHz                                                  |
- |            7400    7432  7404    74161    8216    74166     2114  74LS157  E6.9G  |
- |-|                                                                                 |
-   |   VR3 VR2 VR1    7432  7404     7400  *74173     7400  74LS139  74LS157         |
-   |                                       *74S04                                    |
-   |                                                                                 |
-   |---------------------------------------------------------------------------------|
-Notes:
-      All IC's are listed
-      All ROMs type 2708 (1K x8)
-
-      6502 clock: 733.125kHz (11.73 /16)
-               *: These 2 IC's piggybacked. 74S04 on top
-         VR1/2/3: 5K potentiometers, controls RGB saturation levels
-            2114: 1K x4 SRAM
-            2111: 256bytes x4 SRAM
-            8216: 256bytes x1 SRAM
-
-Sound PCB
----------
-
-M-15S
-|---------------------------|
-|                           |
-|  NE555  NE555             |
-|                           |
-|  NE555  NE555             |
-|               LM3900   VR1|
-|                           |
-|  C1815x9               VR2|
-|                           |
-|               LM3900   VR3|
-|                           |
-|                        VR4|
-|                           |
-|                        VR5|
-|    TA7222                 |
-|---------------------------|
-Notes:
-      PCB contains lots of resistors, capacitors, transistors etc.
-
-      VR1/2/3/4/5: Potentiometers for volume of each sound
-                   VR1 - Car rumble
-                   VR2 - Collision bang
-                   VR3 - Tire screech (when changing lanes)
-                   VR4 - Score counter (numbers incrementing etc)
-                   VR5 - Master volume
-            C1815: Transistor (x9)
-           TA7222: Power Amp
-*/
 
 ROM_START( headon )
 	ROM_REGION( 0x10000, "maincpu", 0 )
