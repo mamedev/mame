@@ -64,13 +64,10 @@ TIMER_CALLBACK_MEMBER(vicdual_state::clear_coin_status)
 	m_coin_status = 0;
 }
 
-
-static void assert_coin_status(running_machine &machine)
+void vicdual_state::assert_coin_status()
 {
-	vicdual_state *state = machine.driver_data<vicdual_state>();
-	state->m_coin_status = 1;
+	m_coin_status = 1;
 }
-
 
 CUSTOM_INPUT_MEMBER(vicdual_state::vicdual_read_coin_status)
 {
@@ -79,6 +76,14 @@ CUSTOM_INPUT_MEMBER(vicdual_state::vicdual_read_coin_status)
 
 
 /* the main CPU is reset when a coin is inserted */
+void vicdual_state::coin_in()
+{
+		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+
+		/* simulate the coin switch being closed for a while */
+		machine().scheduler().timer_set(4 * machine().primary_screen->frame_period(), timer_expired_delegate(FUNC(vicdual_state::clear_coin_status),this));
+}
+
 INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
 {
 	if (newval)
@@ -86,16 +91,13 @@ INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
 		/* increment the coin counter */
 		coin_counter_w(machine(), 0, 1);
 		coin_counter_w(machine(), 0, 0);
-
-		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-
-		/* simulate the coin switch being closed for a while */
-		machine().scheduler().timer_set(4 * machine().primary_screen->frame_period(), timer_expired_delegate(FUNC(vicdual_state::clear_coin_status),this));
+		
+		coin_in();
 	}
 }
 
 
-#define PORT_COIN										\
+#define PORT_COIN_DEFAULT								\
 	PORT_START("COIN")									\
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vicdual_state,coin_changed, NULL)
 
@@ -231,7 +233,7 @@ READ8_MEMBER(vicdual_state::depthch_io_r)
 
 WRITE8_MEMBER(vicdual_state::depthch_io_w)
 {
-	if (offset & 0x01)  assert_coin_status(machine());
+	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x04)  depthch_audio_w(space, 0, data);
 }
 
@@ -271,7 +273,7 @@ static INPUT_PORTS_START( depthch )
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_read_coin_status, NULL)
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
@@ -312,7 +314,7 @@ READ8_MEMBER(vicdual_state::safari_io_r)
 
 WRITE8_MEMBER(vicdual_state::safari_io_w)
 {
-	if (offset & 0x01)  assert_coin_status(machine());
+	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02) { /* safari_audio_w(0, data) */ }
 }
 
@@ -358,7 +360,7 @@ static INPUT_PORTS_START( safari )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_read_coin_status, NULL)
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
@@ -395,7 +397,7 @@ READ8_MEMBER(vicdual_state::frogs_io_r)
 
 WRITE8_MEMBER(vicdual_state::frogs_io_w)
 {
-	if (offset & 0x01)  assert_coin_status(machine());
+	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02)  frogs_audio_w(space, 0, data);
 }
 
@@ -444,7 +446,7 @@ static INPUT_PORTS_START( frogs )
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_read_coin_status, NULL)
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 
 //  PORT_START("IN2")
 //  PORT_ADJUSTER( 25, "Boing Volume" )
@@ -517,7 +519,7 @@ READ8_MEMBER(vicdual_state::sspaceat_io_r)
 
 WRITE8_MEMBER(vicdual_state::headon_io_w)
 {
-	if (offset & 0x01)  assert_coin_status(machine());
+	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02)  headon_audio_w(space, 0, data);
 	if (offset & 0x04) { /* vicdual_palette_bank_w(0, data)  */ }	 /* not written to */
 }
@@ -573,7 +575,7 @@ static INPUT_PORTS_START( headon )
 
 	PORT_CABINET_COLOR_OR_BW
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
@@ -604,7 +606,7 @@ static INPUT_PORTS_START( supcrash )
 
 	PORT_CABINET_COLOR_OR_BW
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
@@ -626,7 +628,7 @@ static INPUT_PORTS_START( carnivalh )
 
 	PORT_CABINET_COLOR_OR_BW
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
@@ -670,7 +672,7 @@ static INPUT_PORTS_START( sspaceat )
 
 	PORT_CABINET_COLOR_OR_BW
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
@@ -735,7 +737,7 @@ READ8_MEMBER(vicdual_state::headon2_io_r)
 
 WRITE8_MEMBER(vicdual_state::headon2_io_w)
 {
-	if (offset & 0x01)  assert_coin_status(machine());
+	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02)  headon_audio_w(space, 0, data);
 	if (offset & 0x04)  vicdual_palette_bank_w(space, 0, data);
     if (offset & 0x08) { /* schematics show this as going into a shifter circuit, but never written to */ }
@@ -746,7 +748,7 @@ WRITE8_MEMBER(vicdual_state::headon2_io_w)
 
 WRITE8_MEMBER(vicdual_state::digger_io_w)
 {
-	if (offset & 0x01)  assert_coin_status(machine());
+	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02) { /* digger_audio_1_w(0, data) */ }
 	if (offset & 0x04)
 	{
@@ -815,7 +817,7 @@ static INPUT_PORTS_START( headon2 )
 	PORT_BIT( 0x7c, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_read_coin_status, NULL)
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
@@ -849,7 +851,7 @@ static INPUT_PORTS_START( car2 )
 	PORT_BIT( 0x7c, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_read_coin_status, NULL)
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
@@ -890,7 +892,7 @@ static INPUT_PORTS_START( digger )
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_read_coin_status, NULL)
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
@@ -952,7 +954,7 @@ WRITE8_MEMBER(vicdual_state::invho2_io_w)
 {
 	if (offset & 0x01)  invho2_audio_w(space, 0, data);
 	if (offset & 0x02)  invinco_audio_w(space, 0, data);
-	if (offset & 0x08)  assert_coin_status(machine());
+	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -961,7 +963,7 @@ WRITE8_MEMBER(vicdual_state::invds_io_w)
 {
 	if (offset & 0x01)  invinco_audio_w(space, 0, data);
 	if (offset & 0x02) { /* deepscan_audio_w(0, data) */ }
-	if (offset & 0x08)  assert_coin_status(machine());
+	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -970,7 +972,7 @@ WRITE8_MEMBER(vicdual_state::sspacaho_io_w)
 {
 	if (offset & 0x01)  invho2_audio_w(space, 0, data);
 	if (offset & 0x02) { /* s&spaceatt_audio_w(space, 0, data) */ }
-	if (offset & 0x08)  assert_coin_status(machine());
+	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -979,7 +981,7 @@ WRITE8_MEMBER(vicdual_state::tranqgun_io_w)
 {
 	if (offset & 0x01) { /* tranqgun_audio_w(space, 0, data) */ }
 	if (offset & 0x02)  vicdual_palette_bank_w(space, 0, data);
-	if (offset & 0x08)  assert_coin_status(machine());
+	if (offset & 0x08)  assert_coin_status();
 }
 
 
@@ -987,7 +989,7 @@ WRITE8_MEMBER(vicdual_state::spacetrk_io_w)
 {
 	if (offset & 0x01) { /* &spacetrk_audio_w(space, 0, data) */ }
 	if (offset & 0x02) { /* &spacetrk_audio_w(space, 0, data) */ }
-	if (offset & 0x08)  assert_coin_status(machine());
+	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -996,7 +998,7 @@ WRITE8_MEMBER(vicdual_state::carnival_io_w)
 {
 	if (offset & 0x01)  carnival_audio_1_w(space, 0, data);
 	if (offset & 0x02)  carnival_audio_2_w(space, 0, data);
-	if (offset & 0x08)  assert_coin_status(machine());
+	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -1005,7 +1007,7 @@ WRITE8_MEMBER(vicdual_state::brdrline_io_w)
 {
 	if (offset & 0x01) { /* brdrline_audio_w(space, 0, data) */ }
 	if (offset & 0x02)  vicdual_palette_bank_w(space, 0, data);
-	if (offset & 0x08)  assert_coin_status(machine());
+	if (offset & 0x08)  assert_coin_status();
 }
 
 
@@ -1013,7 +1015,7 @@ WRITE8_MEMBER(vicdual_state::pulsar_io_w)
 {
 	if (offset & 0x01)  pulsar_audio_1_w(space, 0, data);
 	if (offset & 0x02)  pulsar_audio_2_w(space, 0, data);
-	if (offset & 0x08)  assert_coin_status(machine());
+	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -1021,14 +1023,8 @@ WRITE8_MEMBER(vicdual_state::pulsar_io_w)
 WRITE8_MEMBER(vicdual_state::heiankyo_io_w)
 {
 	if (offset & 0x01) { /* heiankyo_audio_1_w(0, data) */ }
-
-	if (offset & 0x02)
-	{
-		vicdual_palette_bank_w(space, 0, data >> 6);
-		/* heiankyo_audio_2_w(0, data & 0x3f); */
-	}
-
-	if (offset & 0x08)  assert_coin_status(machine());
+	if (offset & 0x02) { /* heiankyo_audio_2_w(0, data) */ }
+	if (offset & 0x08)  assert_coin_status();
 }
 
 
@@ -1036,7 +1032,7 @@ WRITE8_MEMBER(vicdual_state::alphaho_io_w)
 {
 	if (offset & 0x01) { /* headon_audio_w(0, data) */ }
 	if (offset & 0x02) { /* alphaf_audio_w(0, data) */ }
-	if (offset & 0x08)  assert_coin_status(machine());
+	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -1242,7 +1238,7 @@ static INPUT_PORTS_START( invho2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 
 	PORT_START("FAKE_LIVES1")
 	PORT_DIPNAME( 0x03, 0x01, "Head On 2 Lives" )	PORT_DIPLOCATION("SW1:1,2")
@@ -1305,7 +1301,7 @@ static INPUT_PORTS_START( invds )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 
 	// SW1 @ C1, 6-pos (where are 5 & 6?)
 	PORT_START("FAKE_LIVES1")
@@ -1367,7 +1363,7 @@ static INPUT_PORTS_START( sspacaho )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 
 	PORT_START("FAKE_LIVES1")
 	PORT_DIPNAME( 0x03, 0x03, "Space Attack Lives" )	PORT_DIPLOCATION("SW1:1,2")
@@ -1425,7 +1421,7 @@ static INPUT_PORTS_START( tranqgun )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
@@ -1476,7 +1472,7 @@ static INPUT_PORTS_START( spacetrk )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
@@ -1548,7 +1544,7 @@ static INPUT_PORTS_START( carnival )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
@@ -1609,7 +1605,7 @@ static INPUT_PORTS_START( brdrline )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 
 	PORT_START("FAKE_LIVES1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:2,3")
@@ -1663,7 +1659,7 @@ static INPUT_PORTS_START( starrkr )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 
 	PORT_START("FAKE_LIVES1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:2,3")
@@ -1717,7 +1713,7 @@ static INPUT_PORTS_START( pulsar )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 
 	PORT_START("FAKE_LIVES1")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW1:1,2")
@@ -1775,7 +1771,7 @@ static INPUT_PORTS_START( heiankyo )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
@@ -1822,7 +1818,7 @@ static INPUT_PORTS_START( alphaho )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 
 	PORT_START("FAKE_LIVES1")
 	PORT_DIPNAME( 0x03, 0x03, "Alpha Fighter Lives" )	PORT_DIPLOCATION("SW1:1,2")
@@ -1989,7 +1985,7 @@ CUSTOM_INPUT_MEMBER(vicdual_state::samurai_protection_r)
 WRITE8_MEMBER(vicdual_state::samurai_io_w)
 {
 	if (offset & 0x02) { /* samurai_audio_w(0, data) */ }
-	if (offset & 0x08)  assert_coin_status(machine());
+	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -2064,7 +2060,7 @@ static INPUT_PORTS_START( samurai )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
@@ -2101,7 +2097,7 @@ READ8_MEMBER(vicdual_state::nsub_io_r)
 
 WRITE8_MEMBER(vicdual_state::nsub_io_w)
 {
-	if (offset & 0x01)  assert_coin_status(machine());
+	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02) { /* nsub_audio_w(0, data) */ }
 	if (offset & 0x04)  vicdual_palette_bank_w(space, 0, data);
 }
@@ -2136,7 +2132,6 @@ static INPUT_PORTS_START( nsub )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY
 
-	// according to the manual, there's also an 8-pos dipswitch for coinage settings (MT 4717), where is it read?
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_composite_blank_comp, NULL)
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -2159,7 +2154,7 @@ static INPUT_PORTS_START( nsub )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_read_coin_status, NULL)
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
@@ -2197,7 +2192,7 @@ READ8_MEMBER(vicdual_state::invinco_io_r)
 
 WRITE8_MEMBER(vicdual_state::invinco_io_w)
 {
-	if (offset & 0x01)  assert_coin_status(machine());
+	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02)  invinco_audio_w(space, 0, data);
 	if (offset & 0x04)  vicdual_palette_bank_w(space, 0, data);
 }
@@ -2257,7 +2252,7 @@ static INPUT_PORTS_START( invinco )
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_read_coin_status, NULL)
 
-	PORT_COIN
+	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
@@ -2672,13 +2667,13 @@ ROM_END
 /* this one is the same PCB but does show the Sidam copyright */
 ROM_START( headonsa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "10305.0.9a",         0x0000, 0x0400, CRC(9a37407b) SHA1(3cd3dbd13c76d01b7541307de92f69d6779046f5) )
-	ROM_LOAD( "10305.1.8a",         0x0400, 0x0400, CRC(aeac8c5f) SHA1(ef9ad63d13076a559ba12c6421ad61de21dd4c90) )
-	ROM_LOAD( "10305.2.7a",         0x0800, 0x0400, CRC(f1a0cb72) SHA1(540b30225ef176c416ea5b142fe7dbb67b7a78fb) )
-	ROM_LOAD( "10305.3.6a",         0x0c00, 0x0400, CRC(ae33fcc4) SHA1(7e0a27f1f502c5293f294875b49186e800a2c749) )
-	ROM_LOAD( "10305.4.5a",         0x1000, 0x0400, CRC(e87f6fd8) SHA1(7fc1ade66c6783861ab310790f023b02a8db7e08) )
-	ROM_LOAD( "10305.5.4a",         0x1400, 0x0400, CRC(387e2eba) SHA1(9feca874e795710884d17ca5122280c30c6b6af0) )
-	ROM_LOAD( "10305.6b.3a",        0x1800, 0x0400, CRC(18749071) SHA1(6badb5cf6f6017d884492e9ef16195f1112d23b5) )
+	ROM_LOAD( "10305.0.9a",      0x0000, 0x0400, CRC(9a37407b) SHA1(3cd3dbd13c76d01b7541307de92f69d6779046f5) )
+	ROM_LOAD( "10305.1.8a",      0x0400, 0x0400, CRC(aeac8c5f) SHA1(ef9ad63d13076a559ba12c6421ad61de21dd4c90) )
+	ROM_LOAD( "10305.2.7a",      0x0800, 0x0400, CRC(f1a0cb72) SHA1(540b30225ef176c416ea5b142fe7dbb67b7a78fb) )
+	ROM_LOAD( "10305.3.6a",      0x0c00, 0x0400, CRC(ae33fcc4) SHA1(7e0a27f1f502c5293f294875b49186e800a2c749) )
+	ROM_LOAD( "10305.4.5a",      0x1000, 0x0400, CRC(e87f6fd8) SHA1(7fc1ade66c6783861ab310790f023b02a8db7e08) )
+	ROM_LOAD( "10305.5.4a",      0x1400, 0x0400, CRC(387e2eba) SHA1(9feca874e795710884d17ca5122280c30c6b6af0) )
+	ROM_LOAD( "10305.6b.3a",     0x1800, 0x0400, CRC(18749071) SHA1(6badb5cf6f6017d884492e9ef16195f1112d23b5) )
 
 	ROM_REGION( 0x0040, "user1", 0 )	/* timing PROMs */
 	ROM_LOAD( "10303.3e", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )	/* control PROM */
@@ -2742,13 +2737,13 @@ This PCB is a bootleg of Sidam's Head On bootleg manufactured in Torino (Italy) 
 
 ROM_START( hocrash )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1-0s.0s",         0x0000, 0x0400, CRC(4bb51259) SHA1(43411ffda3fe03b1d694f70791b0bab5786759c0) )
-	ROM_LOAD( "2-0r.0r",         0x0400, 0x0400, CRC(aeac8c5f) SHA1(ef9ad63d13076a559ba12c6421ad61de21dd4c90) )
-	ROM_LOAD( "3-0p.0p",         0x0800, 0x0400, CRC(f1a0cb72) SHA1(540b30225ef176c416ea5b142fe7dbb67b7a78fb) )
-	ROM_LOAD( "4-0m.0m",         0x0c00, 0x0400, CRC(fd67208d) SHA1(539b0db174aef66ac7d8137e4eca4e3237bc7a82) )
-	ROM_LOAD( "5-0l.0l",         0x1000, 0x0400, CRC(069e839e) SHA1(e1ed68573c13c0c88a2bb7b2096860523de952c0) )
-	ROM_LOAD( "6-0k.0k",         0x1400, 0x0400, CRC(11960190) SHA1(f3908fece95b7e5468ae4bba5a9f2d2482ed6656) )
-	ROM_LOAD( "7-0j.0j",         0x1800, 0x0400, CRC(d3782c1d) SHA1(340782374b7015a0aaf98aeb6503b759e199a58a) )
+	ROM_LOAD( "1-0s.0s",      0x0000, 0x0400, CRC(4bb51259) SHA1(43411ffda3fe03b1d694f70791b0bab5786759c0) )
+	ROM_LOAD( "2-0r.0r",      0x0400, 0x0400, CRC(aeac8c5f) SHA1(ef9ad63d13076a559ba12c6421ad61de21dd4c90) )
+	ROM_LOAD( "3-0p.0p",      0x0800, 0x0400, CRC(f1a0cb72) SHA1(540b30225ef176c416ea5b142fe7dbb67b7a78fb) )
+	ROM_LOAD( "4-0m.0m",      0x0c00, 0x0400, CRC(fd67208d) SHA1(539b0db174aef66ac7d8137e4eca4e3237bc7a82) )
+	ROM_LOAD( "5-0l.0l",      0x1000, 0x0400, CRC(069e839e) SHA1(e1ed68573c13c0c88a2bb7b2096860523de952c0) )
+	ROM_LOAD( "6-0k.0k",      0x1400, 0x0400, CRC(11960190) SHA1(f3908fece95b7e5468ae4bba5a9f2d2482ed6656) )
+	ROM_LOAD( "7-0j.0j",      0x1800, 0x0400, CRC(d3782c1d) SHA1(340782374b7015a0aaf98aeb6503b759e199a58a) )
 
 	ROM_REGION( 0x0040, "user1", 0 )	/* timing PROMs */
 	ROM_LOAD( "316-0043.u87", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )	/* control PROM */
@@ -3230,18 +3225,18 @@ ROM_START( brdrlins )
 	ROM_LOAD( "16.1",       0x3c00, 0x0400, CRC(cc138bed) SHA1(7d3eebdeaff19783d5ef20a7ececec00773434fc) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "5610.49",   0x0000, 0x0020, CRC(bc6be94e) SHA1(34e113ec25e19212b74907d35be5cb8714a8249c) )
+	ROM_LOAD( "5610.49",    0x0000, 0x0020, CRC(bc6be94e) SHA1(34e113ec25e19212b74907d35be5cb8714a8249c) )
 
 	ROM_REGION( 0x0800, "cpu1", 0 )	/* sound ROM */
-	ROM_LOAD( "au.bin",       0x0000, 0x0400, CRC(a23e1d9f) SHA1(ce209571f6341aa6f036a015e666673098bc98ea) )
+	ROM_LOAD( "au.bin",     0x0000, 0x0400, CRC(a23e1d9f) SHA1(ce209571f6341aa6f036a015e666673098bc98ea) )
 
 	ROM_REGION( 0x0100, "user1", 0 )	/* misc PROM */
-	ROM_LOAD( "82s123.bin",   0x0000, 0x0020, CRC(c128d0ba) SHA1(0ce9febbb7e2f5388ed999a479e3d385dba0b342) )
-	ROM_LOAD( "5610.15",  0x0000, 0x0020, CRC(6449e678) SHA1(421c45c8fba3c2bc2a7ebbea2c837c8fa1a5a2f3) )
-	ROM_LOAD( "5610.14",  0x0000, 0x0020, CRC(55dcdef1) SHA1(6fbd041edc258b7e1b99bbe9526612cfb1b541f8) )
+	ROM_LOAD( "82s123.bin", 0x0000, 0x0020, CRC(c128d0ba) SHA1(0ce9febbb7e2f5388ed999a479e3d385dba0b342) )
+	ROM_LOAD( "5610.15",    0x0000, 0x0020, CRC(6449e678) SHA1(421c45c8fba3c2bc2a7ebbea2c837c8fa1a5a2f3) )
+	ROM_LOAD( "5610.14",    0x0000, 0x0020, CRC(55dcdef1) SHA1(6fbd041edc258b7e1b99bbe9526612cfb1b541f8) )
 	/* following 2 from sound board */
-	ROM_LOAD( "93427.1", 0x0000, 0x0100, CRC(64b98dc7) SHA1(f0bb7d0b4b56cc2936ce4cbec165394f3026ed6d) )
-	ROM_LOAD( "93427.2", 0x0000, 0x0100, CRC(bda82367) SHA1(1c96453c2ae372892c39b5657cf2b252a90a10a9) )
+	ROM_LOAD( "93427.1",    0x0000, 0x0100, CRC(64b98dc7) SHA1(f0bb7d0b4b56cc2936ce4cbec165394f3026ed6d) )
+	ROM_LOAD( "93427.2",    0x0000, 0x0100, CRC(bda82367) SHA1(1c96453c2ae372892c39b5657cf2b252a90a10a9) )
 ROM_END
 
 ROM_START( brdrlinb )
@@ -3325,12 +3320,14 @@ ROM_START( heiankyo )
 	ROM_LOAD( "ha7.u7",       0x2400, 0x0400, CRC(6d2f9527) SHA1(4e51c5404d0302547c1ae85b27ffe4de11d68224) )
 	ROM_LOAD( "ha6.u6",       0x2800, 0x0400, CRC(e467c353) SHA1(a76b4f6d9702f760f287b5285f76ea4206c6934a) )
 	ROM_LOAD( "ha3.u3",       0x2c00, 0x0400, CRC(6a55eda8) SHA1(f526ebf18a33271b798e53cfcadb27e4c3a03466) )
-	/* 3000-37ff empty */
+	ROM_FILL(                 0x3000, 0x0400, 0 )
+	ROM_FILL(                 0x3400, 0x0400, 0 )
 	ROM_LOAD( "ha2.u2",       0x3800, 0x0400, CRC(056b3b8b) SHA1(3cce6c928599604ffdcdb767caa7b32d8ec1e03d) )
 	ROM_LOAD( "ha1.u1",       0x3c00, 0x0400, CRC(b8da2b5e) SHA1(70d97b89cb3162bd479203c53148319179a9873f) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "316-138.u49",  0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )
+	ROM_LOAD( "316-138.u49",  0x0010, 0x0010, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )
+	ROM_CONTINUE(             0x0000, 0x0010 )
 
 	ROM_REGION( 0x0040, "user1", 0 )	/* misc PROMs */
 	ROM_LOAD( "316-0043.u87", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )	/* control PROM */

@@ -40,6 +40,9 @@ public:
 	UINT8 m_palette_bank;
 	UINT8 m_samurai_protection_data;
 
+	void coin_in();
+	void assert_coin_status();
+	
 	DECLARE_WRITE8_MEMBER(vicdual_videoram_w);
 	DECLARE_WRITE8_MEMBER(vicdual_characterram_w);
 	DECLARE_READ8_MEMBER(depthch_io_r);
