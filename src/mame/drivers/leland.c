@@ -700,9 +700,9 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_SINGLE_OUTPUT,
 	{1000, 0, 0},
-	DEVCB_HANDLER(leland_sound_port_r),
+	DEVCB_DRIVER_MEMBER(leland_state, leland_sound_port_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(leland_sound_port_w),
+	DEVCB_DRIVER_MEMBER(leland_state, leland_sound_port_w),
 	DEVCB_NULL
 };
 

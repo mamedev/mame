@@ -69,6 +69,15 @@ public:
 	UINT32 screen_update_carpolo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_carpolo(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(carpolo_timer_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(coin1_interrupt_clear_w);
+	DECLARE_WRITE_LINE_MEMBER(coin2_interrupt_clear_w);
+	DECLARE_WRITE_LINE_MEMBER(coin3_interrupt_clear_w);
+	DECLARE_WRITE_LINE_MEMBER(coin4_interrupt_clear_w);
+	DECLARE_WRITE8_MEMBER(pia_0_port_a_w);
+	DECLARE_WRITE8_MEMBER(pia_0_port_b_w);
+	DECLARE_READ8_MEMBER(pia_0_port_b_r);
+	DECLARE_READ8_MEMBER(pia_1_port_a_r);
+	DECLARE_READ8_MEMBER(pia_1_port_b_r);
 };
 
 

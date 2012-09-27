@@ -35,19 +35,6 @@ enum {
 	A_Y,
 };
 
-
-/*********************************************************************
-
-   Prototypes
-
-*********************************************************************/
-
-static DECLARE_WRITE8_DEVICE_HANDLER (v_via_pa_w);
-static DECLARE_WRITE8_DEVICE_HANDLER(v_via_pb_w);
-static DECLARE_WRITE8_DEVICE_HANDLER (v_via_ca2_w);
-static DECLARE_WRITE8_DEVICE_HANDLER (v_via_cb2_w);
-
-
 /*********************************************************************
 
    Local variables
@@ -56,10 +43,10 @@ static DECLARE_WRITE8_DEVICE_HANDLER (v_via_cb2_w);
 
 const via6522_interface vectrex_via6522_interface =
 {
-	DEVCB_HANDLER(vectrex_via_pa_r), DEVCB_HANDLER(vectrex_via_pb_r),         /* read PA/B */
+	DEVCB_DRIVER_MEMBER(vectrex_state,vectrex_via_pa_r), DEVCB_DRIVER_MEMBER(vectrex_state,vectrex_via_pb_r),         /* read PA/B */
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,                     /* read ca1, cb1, ca2, cb2 */
-	DEVCB_HANDLER(v_via_pa_w), DEVCB_HANDLER(v_via_pb_w),         /* write PA/B */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(v_via_ca2_w), DEVCB_HANDLER(v_via_cb2_w), /* write ca1, cb1, ca2, cb2 */
+	DEVCB_DRIVER_MEMBER(vectrex_state,v_via_pa_w), DEVCB_DRIVER_MEMBER(vectrex_state,v_via_pb_w),         /* write PA/B */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(vectrex_state,v_via_ca2_w), DEVCB_DRIVER_MEMBER(vectrex_state,v_via_cb2_w), /* write ca1, cb1, ca2, cb2 */
 	DEVCB_LINE(vectrex_via_irq),                      /* IRQ */
 };
 
@@ -317,17 +304,16 @@ static void vectrex_multiplexer(running_machine &machine, int mux)
 }
 
 
-static WRITE8_DEVICE_HANDLER(v_via_pb_w)
+WRITE8_MEMBER(vectrex_state::v_via_pb_w)
 {
-	vectrex_state *state = space.machine().driver_data<vectrex_state>();
 	if (!(data & 0x80))
 	{
 		/* RAMP is active */
-		if ((state->m_ramp & 0x80))
+		if ((m_ramp & 0x80))
 		{
 			/* RAMP was inactive before */
 
-			if (state->m_lightpen_down)
+			if (m_lightpen_down)
 			{
 				/* Simple lin. algebra to check if pen is near
                  * the line defined by (A_X,A_Y).
@@ -348,42 +334,42 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
                  *            a
                  */
 				double a2, b2, ab, d2;
-				ab = (state->m_pen_x - state->m_x_int) * state->m_analog[A_X]
-					+(state->m_pen_y - state->m_y_int) * state->m_analog[A_Y];
+				ab = (m_pen_x - m_x_int) * m_analog[A_X]
+					+(m_pen_y - m_y_int) * m_analog[A_Y];
 				if (ab > 0)
 				{
-					a2 = (double)(state->m_analog[A_X] * state->m_analog[A_X]
-								  +(double)state->m_analog[A_Y] * state->m_analog[A_Y]);
-					b2 = (double)(state->m_pen_x - state->m_x_int) * (state->m_pen_x - state->m_x_int)
-						+(double)(state->m_pen_y - state->m_y_int) * (state->m_pen_y - state->m_y_int);
+					a2 = (double)(m_analog[A_X] * m_analog[A_X]
+								  +(double)m_analog[A_Y] * m_analog[A_Y]);
+					b2 = (double)(m_pen_x - m_x_int) * (m_pen_x - m_x_int)
+						+(double)(m_pen_y - m_y_int) * (m_pen_y - m_y_int);
 					d2 = b2 - ab * ab / a2;
-					if (d2 < 2e10 && state->m_analog[A_Z] * state->m_blank > 0)
-						state->m_lp_t->adjust(attotime::from_double(ab / a2 / (space.machine().device("maincpu")->unscaled_clock() * INT_PER_CLOCK)));
+					if (d2 < 2e10 && m_analog[A_Z] * m_blank > 0)
+						m_lp_t->adjust(attotime::from_double(ab / a2 / (machine().device("maincpu")->unscaled_clock() * INT_PER_CLOCK)));
 				}
 			}
 		}
 
-		if (!(data & 0x1) && (state->m_via_out[PORTB] & 0x1))
+		if (!(data & 0x1) && (m_via_out[PORTB] & 0x1))
 		{
 			/* MUX has been enabled */
-			space.machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_state::update_signal),state));
+			machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_state::update_signal),this));
 		}
 	}
 	else
 	{
 		/* RAMP is inactive */
-		if (!(state->m_ramp & 0x80))
+		if (!(m_ramp & 0x80))
 		{
 			/* Cancel running timer, line already finished */
-			if (state->m_lightpen_down)
-				state->m_lp_t->adjust(attotime::never);
+			if (m_lightpen_down)
+				m_lp_t->adjust(attotime::never);
 		}
 	}
 
 	/* Cartridge bank-switching */
-	if (state->m_64k_cart && ((data ^ state->m_via_out[PORTB]) & 0x40))
+	if (m_64k_cart && ((data ^ m_via_out[PORTB]) & 0x40))
 	{
-		device_t &root_device = space.machine().root_device();
+		device_t &root_device = machine().root_device();
 
 		root_device.membank("bank1")->set_base(root_device.memregion("maincpu")->base() + ((data & 0x40) ? 0x10000 : 0x0000));
 	}
@@ -391,69 +377,66 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 	/* Sound */
 	if (data & 0x10)
 	{
-		device_t *ay8912 = space.machine().device("ay8912");
+		device_t *ay8912 = machine().device("ay8912");
 
 		if (data & 0x08) /* BC1 (do we select a reg or write it ?) */
-			ay8910_address_w(ay8912, space, 0, state->m_via_out[PORTA]);
+			ay8910_address_w(ay8912, space, 0, m_via_out[PORTA]);
 		else
-			ay8910_data_w(ay8912, space, 0, state->m_via_out[PORTA]);
+			ay8910_data_w(ay8912, space, 0, m_via_out[PORTA]);
 	}
 
-	if (!(data & 0x1) && (state->m_via_out[PORTB] & 0x1))
-		vectrex_multiplexer (space.machine(), (data >> 1) & 0x3);
+	if (!(data & 0x1) && (m_via_out[PORTB] & 0x1))
+		vectrex_multiplexer (machine(), (data >> 1) & 0x3);
 
-	state->m_via_out[PORTB] = data;
-	space.machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_state::update_signal),state), data & 0x80, &state->m_ramp);
+	m_via_out[PORTB] = data;
+	machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_state::update_signal),this), data & 0x80, &m_ramp);
 }
 
 
-static WRITE8_DEVICE_HANDLER(v_via_pa_w)
+WRITE8_MEMBER(vectrex_state::v_via_pa_w)
 {
-	vectrex_state *state = space.machine().driver_data<vectrex_state>();
 	/* DAC output always goes to Y integrator */
-	state->m_via_out[PORTA] = data;
-	space.machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_state::update_signal),state), data, &state->m_analog[A_Y]);
+	m_via_out[PORTA] = data;
+	machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_state::update_signal),this), data, &m_analog[A_Y]);
 
-	if (!(state->m_via_out[PORTB] & 0x1))
-		vectrex_multiplexer (space.machine(), (state->m_via_out[PORTB] >> 1) & 0x3);
+	if (!(m_via_out[PORTB] & 0x1))
+		vectrex_multiplexer (machine(), (m_via_out[PORTB] >> 1) & 0x3);
 }
 
 
-static WRITE8_DEVICE_HANDLER(v_via_ca2_w)
+WRITE8_MEMBER(vectrex_state::v_via_ca2_w)
 {
-	vectrex_state *state = space.machine().driver_data<vectrex_state>();
 	if (data == 0)
-		space.machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_state::vectrex_zero_integrators),state));
+		machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_state::vectrex_zero_integrators),this));
 }
 
 
-static WRITE8_DEVICE_HANDLER(v_via_cb2_w)
+WRITE8_MEMBER(vectrex_state::v_via_cb2_w)
 {
-	vectrex_state *state = space.machine().driver_data<vectrex_state>();
 	int dx, dy;
 
-	if (state->m_cb2 != data)
+	if (m_cb2 != data)
 	{
 
 		/* Check lightpen */
-		if (state->m_lightpen_port != 0)
+		if (m_lightpen_port != 0)
 		{
-			state->m_lightpen_down = state->ioport("LPENCONF")->read() & 0x10;
+			m_lightpen_down = ioport("LPENCONF")->read() & 0x10;
 
-			if (state->m_lightpen_down)
+			if (m_lightpen_down)
 			{
-				state->m_pen_x = state->ioport("LPENX")->read() * (state->m_x_max / 0xff);
-				state->m_pen_y = state->ioport("LPENY")->read() * (state->m_y_max / 0xff);
+				m_pen_x = ioport("LPENX")->read() * (m_x_max / 0xff);
+				m_pen_y = ioport("LPENY")->read() * (m_y_max / 0xff);
 
-				dx = abs(state->m_pen_x - state->m_x_int);
-				dy = abs(state->m_pen_y - state->m_y_int);
+				dx = abs(m_pen_x - m_x_int);
+				dy = abs(m_pen_y - m_y_int);
 				if (dx < 500000 && dy < 500000 && data > 0)
-					space.machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(vectrex_state::lightpen_trigger),state));
+					machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(vectrex_state::lightpen_trigger),this));
 			}
 		}
 
-		space.machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(vectrex_state::update_signal),state), data, &state->m_blank);
-		state->m_cb2 = data;
+		machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(vectrex_state::update_signal),this), data, &m_blank);
+		m_cb2 = data;
 	}
 }
 
@@ -466,8 +449,8 @@ static WRITE8_DEVICE_HANDLER(v_via_cb2_w)
 
 const via6522_interface spectrum1_via6522_interface =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(vectrex_via_pa_r), DEVCB_HANDLER(vectrex_s1_via_pb_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(v_via_pa_w), DEVCB_HANDLER(v_via_pb_w), DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(v_via_ca2_w), DEVCB_HANDLER(v_via_cb2_w),
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_DRIVER_MEMBER(vectrex_state,vectrex_via_pa_r), DEVCB_DRIVER_MEMBER(vectrex_state,vectrex_s1_via_pb_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B,CA/B1,CA/B2 */ DEVCB_DRIVER_MEMBER(vectrex_state,v_via_pa_w), DEVCB_DRIVER_MEMBER(vectrex_state,v_via_pb_w), DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(vectrex_state,v_via_ca2_w), DEVCB_DRIVER_MEMBER(vectrex_state,v_via_cb2_w),
 	/*irq                      */ DEVCB_LINE(vectrex_via_irq),
 };
 

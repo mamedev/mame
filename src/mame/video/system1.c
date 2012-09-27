@@ -275,10 +275,9 @@ WRITE8_MEMBER(system1_state::system1_videoram_w)
 		machine().primary_screen->update_now();
 }
 
-WRITE8_DEVICE_HANDLER( system1_videoram_bank_w )
+WRITE8_MEMBER(system1_state::system1_videoram_bank_w)
 {
-	system1_state *state = space.machine().driver_data<system1_state>();
-	state->m_videoram_bank = data;
+	m_videoram_bank = data;
 }
 
 

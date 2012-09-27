@@ -92,5 +92,7 @@ public:
 	INTERRUPT_GEN_MEMBER(m10_interrupt);
 	INTERRUPT_GEN_MEMBER(m15_interrupt);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
+	DECLARE_WRITE8_MEMBER(ic8j1_output_changed);
+	DECLARE_WRITE8_MEMBER(ic8j2_output_changed);
 };
 

@@ -116,6 +116,17 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(williams_count240_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams2_va11_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams2_endscreen_callback);
+	DECLARE_WRITE8_MEMBER(williams_snd_cmd_w);
+	DECLARE_WRITE8_MEMBER(playball_snd_cmd_w);
+	DECLARE_WRITE8_MEMBER(blaster_snd_cmd_w);
+	DECLARE_WRITE8_MEMBER(williams2_snd_cmd_w);
+	DECLARE_WRITE8_MEMBER(williams_port_select_w);
+	DECLARE_READ8_MEMBER(williams_49way_port_0_r);
+	DECLARE_READ8_MEMBER(williams_input_port_49way_0_5_r);
+	DECLARE_WRITE8_MEMBER(lottofun_coin_lock_w);
+	DECLARE_READ8_MEMBER(tshoot_input_port_0_3_r);
+	DECLARE_WRITE8_MEMBER(tshoot_maxvol_w);
+	DECLARE_WRITE8_MEMBER(tshoot_lamp_w);
 };
 
 
@@ -131,6 +142,8 @@ public:
 	DECLARE_MACHINE_START(joust2);
 	DECLARE_MACHINE_RESET(joust2);
 	TIMER_CALLBACK_MEMBER(joust2_deferred_snd_cmd_w);
+	DECLARE_WRITE8_MEMBER(joust2_pia_3_cb1_w);
+	DECLARE_WRITE8_MEMBER(joust2_snd_cmd_w);
 };
 
 /*----------- defined in drivers/williams.c -----------*/

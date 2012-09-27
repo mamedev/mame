@@ -273,8 +273,8 @@ static const ym2203_interface ym2203_interface_2 =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_HANDLER(xxmissio_scroll_x_w),
-		DEVCB_HANDLER(xxmissio_scroll_y_w)
+		DEVCB_DRIVER_MEMBER(xxmissio_state, xxmissio_scroll_x_w),
+		DEVCB_DRIVER_MEMBER(xxmissio_state, xxmissio_scroll_y_w)
 	},
 	DEVCB_NULL
 };

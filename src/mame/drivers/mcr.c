@@ -649,7 +649,7 @@ WRITE8_MEMBER(mcr_state::dotron_op4_w)
  *
  *************************************/
 
-WRITE16_DEVICE_HANDLER( mcr_ipu_sio_transmit )
+WRITE16_MEMBER(mcr_state::mcr_ipu_sio_transmit)
 {
 	logerror("ipu_sio_transmit: %02X\n", data);
 

@@ -72,9 +72,6 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine &machine, const
 extern DECLARE_READ16_HANDLER( megadriv_68k_io_read );
 extern DECLARE_WRITE16_HANDLER( megadriv_68k_io_write );
 
-/* These handlers are needed by puckpkmn.c for his memory map */
-extern DECLARE_READ8_DEVICE_HANDLER( megadriv_68k_YM2612_read);
-extern DECLARE_WRITE8_DEVICE_HANDLER( megadriv_68k_YM2612_write);
 
 /* These are needed to create external input handlers (see e.g. MESS) */
 /* Regs are also used by Megaplay! */
@@ -122,6 +119,8 @@ public:
 	TILE_GET_INFO_MEMBER( get_stampmap_32x32_1x1_tile_info );
 	TILE_GET_INFO_MEMBER( get_stampmap_16x16_16x16_tile_info );
 	TILE_GET_INFO_MEMBER( get_stampmap_32x32_16x16_tile_info );
+	DECLARE_READ8_MEMBER(megadriv_68k_YM2612_read);
+	DECLARE_WRITE8_MEMBER(megadriv_68k_YM2612_write);
 };
 
 class md_boot_state : public md_base_state

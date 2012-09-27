@@ -12,15 +12,13 @@ Video hardware driver by Uki
 #include "includes/xxmissio.h"
 
 
-WRITE8_DEVICE_HANDLER( xxmissio_scroll_x_w )
+WRITE8_MEMBER(xxmissio_state::xxmissio_scroll_x_w)
 {
-	xxmissio_state *state = space.machine().driver_data<xxmissio_state>();
-	state->m_xscroll = data;
+	m_xscroll = data;
 }
-WRITE8_DEVICE_HANDLER( xxmissio_scroll_y_w )
+WRITE8_MEMBER(xxmissio_state::xxmissio_scroll_y_w)
 {
-	xxmissio_state *state = space.machine().driver_data<xxmissio_state>();
-	state->m_yscroll = data;
+	m_yscroll = data;
 }
 
 WRITE8_MEMBER(xxmissio_state::xxmissio_flipscreen_w)

@@ -180,7 +180,7 @@ static const pia6821_interface qixsnd_pia_0_intf =
 	DEVCB_DEVICE_HANDLER("sndpia1", sync_sndpia1_porta_w),			/* port A out */
 	DEVCB_DEVICE_HANDLER("discrete", qix_vol_w),					/* port B out */
 	DEVCB_DEVICE_LINE_MEMBER("sndpia1", pia6821_device, ca1_w),		/* line CA2 out */
-	DEVCB_HANDLER(qix_flip_screen_w),								/* port CB2 out */
+	DEVCB_DRIVER_MEMBER(qix_state,qix_flip_screen_w),								/* port CB2 out */
 	DEVCB_LINE(qix_pia_dint),										/* IRQA */
 	DEVCB_LINE(qix_pia_dint)										/* IRQB */
 };
@@ -228,7 +228,7 @@ static const pia6821_interface slithersnd_pia_0_intf =
 	DEVCB_NULL,		/* port A out */
 	DEVCB_HANDLER(slither_coinctl_w),	/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_HANDLER(qix_flip_screen_w),	/* port CB2 out */
+	DEVCB_DRIVER_MEMBER(qix_state,qix_flip_screen_w),	/* port CB2 out */
 	DEVCB_LINE(qix_pia_dint),			/* IRQA */
 	DEVCB_LINE(qix_pia_dint)			/* IRQB */
 };

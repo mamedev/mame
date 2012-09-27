@@ -372,9 +372,9 @@ static const pia6821_interface pia_4_intf =
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( ic60_74123_output_changed)
+WRITE8_MEMBER(spiders_state::ic60_74123_output_changed)
 {
-	pia6821_device *pia2 = space.machine().device<pia6821_device>("pia2");
+	pia6821_device *pia2 = machine().device<pia6821_device>("pia2");
 	pia2->ca1_w(data);
 }
 
@@ -387,7 +387,7 @@ static const ttl74123_interface ic60_intf =
 	1,					/* A pin - driven by the CRTC */
 	1,					/* B pin - pulled high */
 	1,					/* Clear pin - pulled high */
-	DEVCB_HANDLER(ic60_74123_output_changed)
+	DEVCB_DRIVER_MEMBER(spiders_state,ic60_74123_output_changed)
 };
 
 

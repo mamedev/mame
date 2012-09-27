@@ -471,7 +471,6 @@ static void dakkochn_custom_w(running_machine &machine, UINT8 data, UINT8 prevda
 
 WRITE8_MEMBER(system1_state::sound_control_w)
 {
-	device_t *device = machine().device("ppi8255");
 	/* bit 0 = MUTE (inverted sense on System 2) */
 	machine().sound().system_mute((data ^ m_mute_xor) & 1);
 
@@ -481,7 +480,7 @@ WRITE8_MEMBER(system1_state::sound_control_w)
 	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* remaining bits are used for video RAM banking */
-	system1_videoram_bank_w(device, space, offset, data);
+	system1_videoram_bank_w(space, offset, data);
 }
 
 

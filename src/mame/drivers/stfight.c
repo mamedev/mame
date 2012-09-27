@@ -245,7 +245,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0xc203, 0xc204) AM_READ(stfight_dsw_r)		/* DS0,1 */
 	AM_RANGE(0xc205, 0xc205) AM_READ(stfight_coin_r)	/* coin mech */
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(stfight_fm_w)               /* play fm sound */
-	AM_RANGE(0xc600, 0xc600) AM_DEVWRITE_LEGACY("msm", stfight_adpcm_control_w)    /* voice control */
+	AM_RANGE(0xc600, 0xc600) AM_WRITE(stfight_adpcm_control_w)    /* voice control */
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(stfight_coin_w)             /* coin mech */
 	AM_RANGE(0xc804, 0xc806) AM_WRITENOP                    /* TBD */
 	AM_RANGE(0xc807, 0xc807) AM_WRITE(stfight_sprite_bank_w)

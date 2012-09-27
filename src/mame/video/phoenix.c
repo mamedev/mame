@@ -424,16 +424,14 @@ READ8_MEMBER(phoenix_state::survival_input_port_0_r)
 	return m_survival_input_latches[0];
 }
 
-READ8_DEVICE_HANDLER( survival_protection_r )
+READ8_MEMBER(phoenix_state::survival_protection_r)
 {
-	phoenix_state *state = space.machine().driver_data<phoenix_state>();
-	return state->m_survival_protection_value;
+	return m_survival_protection_value;
 }
 
-READ_LINE_DEVICE_HANDLER( survival_sid_callback )
+READ_LINE_MEMBER(phoenix_state::survival_sid_callback)
 {
-	phoenix_state *state = device->machine().driver_data<phoenix_state>();
-	return state->m_survival_sid_value;
+	return m_survival_sid_value;
 }
 
 

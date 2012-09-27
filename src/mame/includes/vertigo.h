@@ -112,6 +112,8 @@ public:
 	virtual void machine_reset();
 	INTERRUPT_GEN_MEMBER(vertigo_interrupt);
 	TIMER_CALLBACK_MEMBER(sound_command_w);
+	DECLARE_WRITE_LINE_MEMBER(v_irq4_w);
+	DECLARE_WRITE_LINE_MEMBER(v_irq3_w);
 };
 
 /*----------- defined in machine/vertigo.c -----------*/

@@ -735,7 +735,7 @@ MACHINE_CONFIG_END
 
 static SUPERFX_CONFIG( snes_superfx_config )
 {
-	DEVCB_LINE(snes_extern_irq_w)	/* IRQ line from cart */
+	DEVCB_DRIVER_LINE_MEMBER(snes_state,snes_extern_irq_w)	/* IRQ line from cart */
 };
 
 static MACHINE_CONFIG_DERIVED( snessfx, snes )

@@ -103,6 +103,12 @@ public:
 	TIMER_CALLBACK_MEMBER(zwackery_493_off_callback);
 	TIMER_CALLBACK_MEMBER(zwackery_493_callback);
 	TIMER_CALLBACK_MEMBER(counter_fired_callback);
+	DECLARE_READ8_MEMBER(zwackery_port_1_r);
+	DECLARE_READ8_MEMBER(zwackery_port_3_r);
+	DECLARE_WRITE8_MEMBER(zwackery_pia0_w);
+	DECLARE_WRITE8_MEMBER(zwackery_pia1_w);
+	DECLARE_WRITE_LINE_MEMBER(zwackery_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(zwackery_pia_irq);
 };
 
 /*----------- defined in machine/mcr68.c -----------*/

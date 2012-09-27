@@ -19,6 +19,15 @@ public:
 	virtual void machine_start();
 	UINT32 screen_update_beezer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(beezer_interrupt);
+	DECLARE_READ_LINE_MEMBER(b_via_0_ca2_r);
+	DECLARE_READ8_MEMBER(b_via_0_pa_r);
+	DECLARE_READ8_MEMBER(b_via_0_pb_r);
+	DECLARE_WRITE8_MEMBER(b_via_0_pa_w);
+	DECLARE_WRITE8_MEMBER(b_via_0_pb_w);
+	DECLARE_READ8_MEMBER(b_via_1_pa_r);
+	DECLARE_READ8_MEMBER(b_via_1_pb_r);
+	DECLARE_WRITE8_MEMBER(b_via_1_pa_w);
+	DECLARE_WRITE8_MEMBER(b_via_1_pb_w);
 };
 
 

@@ -31,7 +31,7 @@
 
 static MC6845_BEGIN_UPDATE( begin_update );
 static MC6845_UPDATE_ROW( update_row );
-static WRITE_LINE_DEVICE_HANDLER( display_enable_changed );
+
 
 
 
@@ -61,18 +61,17 @@ VIDEO_START_MEMBER(qix_state,qix)
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( display_enable_changed )
+WRITE_LINE_MEMBER(qix_state::display_enable_changed)
 {
-	qix_state *driver_state = device->machine().driver_data<qix_state>();
 
 	/* on the rising edge, latch the scanline */
 	if (state)
 	{
-		UINT16 ma = downcast<mc6845_device *>(device)->get_ma();
-		UINT8 ra = downcast<mc6845_device *>(device)->get_ra();
+		UINT16 ma = downcast<mc6845_device *>(machine().device(MC6845_TAG))->get_ma();
+		UINT8 ra = downcast<mc6845_device *>(machine().device(MC6845_TAG))->get_ra();
 
 		/* RA0-RA2 goes to D0-D2 and MA5-MA9 goes to D3-D7 */
-		*driver_state->m_scanline_latch = ((ma >> 2) & 0xf8) | (ra & 0x07);
+		*m_scanline_latch = ((ma >> 2) & 0xf8) | (ra & 0x07);
 	}
 }
 
@@ -84,11 +83,10 @@ static WRITE_LINE_DEVICE_HANDLER( display_enable_changed )
  *
  *************************************/
 
-WRITE8_DEVICE_HANDLER( qix_flip_screen_w )
+WRITE8_MEMBER(qix_state::qix_flip_screen_w)
 {
-	qix_state *state = space.machine().driver_data<qix_state>();
 
-	state->m_flip = data;
+	m_flip = data;
 }
 
 
@@ -402,10 +400,10 @@ static const mc6845_interface mc6845_intf =
 	begin_update,						/* before pixel update callback */
 	update_row,							/* row update callback */
 	NULL,								/* after pixel update callback */
-	DEVCB_LINE(display_enable_changed),	/* callback for display state changes */
+	DEVCB_DRIVER_LINE_MEMBER(qix_state,display_enable_changed),	/* callback for display state changes */
 	DEVCB_NULL,							/* callback for cursor state changes */
 	DEVCB_NULL,							/* HSYNC callback */
-	DEVCB_LINE(qix_vsync_changed),		/* VSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(qix_state,qix_vsync_changed),		/* VSYNC callback */
 	NULL								/* update address callback */
 };
 

@@ -30,6 +30,7 @@ public:
 	DECLARE_READ8_MEMBER(gfx_rom_r);
 	virtual void machine_start();
 	INTERRUPT_GEN_MEMBER(update_pia_1);
+	DECLARE_WRITE8_MEMBER(ic60_74123_output_changed);
 };
 
 /*----------- defined in audio/spiders.c -----------*/

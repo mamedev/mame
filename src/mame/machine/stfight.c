@@ -210,16 +210,15 @@ void stfight_adpcm_int(device_t *device)
 	state->m_toggle ^= 1;
 }
 
-WRITE8_DEVICE_HANDLER( stfight_adpcm_control_w )
+WRITE8_MEMBER(stfight_state::stfight_adpcm_control_w)
 {
-	stfight_state *state = space.machine().driver_data<stfight_state>();
     if( data < 0x08 )
     {
-        state->m_adpcm_data_offs = sampleLimits[data];
-        state->m_adpcm_data_end = sampleLimits[data+1];
+        m_adpcm_data_offs = sampleLimits[data];
+        m_adpcm_data_end = sampleLimits[data+1];
     }
 
-    msm5205_reset_w( device, data & 0x08 ? 1 : 0 );
+    msm5205_reset_w( machine().device("msm"), data & 0x08 ? 1 : 0 );
 }
 
 WRITE8_MEMBER(stfight_state::stfight_e800_w)

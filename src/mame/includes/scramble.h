@@ -53,6 +53,8 @@ public:
 	DECLARE_DRIVER_INIT(billiard);
 	DECLARE_MACHINE_RESET(scramble);
 	DECLARE_MACHINE_RESET(explorer);
+	DECLARE_WRITE8_MEMBER(scramble_protection_w);
+	DECLARE_READ8_MEMBER(scramble_protection_r);
 };
 
 
@@ -68,8 +70,6 @@ DECLARE_READ8_HANDLER( triplep_pap_r );
 DECLARE_READ8_HANDLER( hunchbks_mirror_r );
 DECLARE_WRITE8_HANDLER( hunchbks_mirror_w );
 
-DECLARE_READ8_DEVICE_HANDLER( scramble_protection_r );
-DECLARE_WRITE8_DEVICE_HANDLER( scramble_protection_w );
 
 
 /*----------- defined in audio/scramble.c -----------*/

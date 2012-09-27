@@ -4,17 +4,6 @@
 #include "includes/beezer.h"
 
 
-static DECLARE_READ8_DEVICE_HANDLER( b_via_0_pa_r );
-static DECLARE_READ8_DEVICE_HANDLER( b_via_0_pb_r );
-static DECLARE_WRITE8_DEVICE_HANDLER( b_via_0_pa_w );
-static DECLARE_WRITE8_DEVICE_HANDLER( b_via_0_pb_w );
-static READ_LINE_DEVICE_HANDLER( b_via_0_ca2_r );
-
-static DECLARE_READ8_DEVICE_HANDLER( b_via_1_pa_r );
-static DECLARE_READ8_DEVICE_HANDLER( b_via_1_pb_r );
-static DECLARE_WRITE8_DEVICE_HANDLER( b_via_1_pa_w );
-static DECLARE_WRITE8_DEVICE_HANDLER( b_via_1_pb_w );
-
 
 /* VIA 0 (aka "PPCNP74", U6 @1C on schematics)
     enabled at CE00-CFFF of main m6809 cpu when bankswitch is set to 0
@@ -41,9 +30,9 @@ static DECLARE_WRITE8_DEVICE_HANDLER( b_via_1_pb_w );
     */
 const via6522_interface b_via_0_interface =
 {
-	/*inputs : A/B         */ DEVCB_HANDLER(b_via_0_pa_r), DEVCB_HANDLER(b_via_0_pb_r),
-	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, read_ca2), DEVCB_LINE(b_via_0_ca2_r), DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, read_ca1),
-	/*outputs: A/B         */ DEVCB_HANDLER(b_via_0_pa_w), DEVCB_HANDLER(b_via_0_pb_w),
+	/*inputs : A/B         */ DEVCB_DRIVER_MEMBER(beezer_state,b_via_0_pa_r), DEVCB_DRIVER_MEMBER(beezer_state,b_via_0_pb_r),
+	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, read_ca2), DEVCB_DRIVER_LINE_MEMBER(beezer_state, b_via_0_ca2_r), DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, read_ca1),
+	/*outputs: A/B         */ DEVCB_DRIVER_MEMBER(beezer_state,b_via_0_pa_w), DEVCB_DRIVER_MEMBER(beezer_state,b_via_0_pb_w),
 	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, write_ca1),
 	/*irq                  */ DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
 };
@@ -73,85 +62,79 @@ const via6522_interface b_via_0_interface =
     */
 const via6522_interface b_via_1_interface =
 {
-	/*inputs : A/B         */ DEVCB_HANDLER(b_via_1_pa_r), DEVCB_HANDLER(b_via_1_pb_r),
+	/*inputs : A/B         */ DEVCB_DRIVER_MEMBER(beezer_state,b_via_1_pa_r), DEVCB_DRIVER_MEMBER(beezer_state,b_via_1_pb_r),
 	/*inputs : CA/B1,CA/B2 */ DEVCB_DEVICE_LINE_MEMBER("via6522_0", via6522_device, read_cb2), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("via6522_0", via6522_device, read_cb1), DEVCB_NULL,
-	/*outputs: A/B         */ DEVCB_HANDLER(b_via_1_pa_w), DEVCB_HANDLER(b_via_1_pb_w),
+	/*outputs: A/B         */ DEVCB_DRIVER_MEMBER(beezer_state,b_via_1_pa_w), DEVCB_DRIVER_MEMBER(beezer_state,b_via_1_pb_w),
 	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("via6522_0", via6522_device, write_cb1), DEVCB_NULL,
 	/*irq                  */ DEVCB_CPU_INPUT_LINE("audiocpu", M6809_IRQ_LINE)
 };
 
-static READ_LINE_DEVICE_HANDLER( b_via_0_ca2_r )
+READ_LINE_MEMBER(beezer_state::b_via_0_ca2_r)
 {
 	return 0; // TODO: TDISP on schematic, same as D5 bit of scanline count from 74LS161 counter at 7A; attach properly
 
 }
 
-static READ8_DEVICE_HANDLER( b_via_0_pa_r )
+READ8_MEMBER(beezer_state::b_via_0_pa_r)
 {
-	beezer_state *state = space.machine().driver_data<beezer_state>();
-	return (state->m_banklatch&0x38)<<2; // return X,Y,Z bits TODO: the Z bit connects somewhere else... where?
+	return (m_banklatch&0x38)<<2; // return X,Y,Z bits TODO: the Z bit connects somewhere else... where?
 }
 
-static READ8_DEVICE_HANDLER( b_via_0_pb_r )
+READ8_MEMBER(beezer_state::b_via_0_pb_r)
 {
-	beezer_state *state = space.machine().driver_data<beezer_state>();
-	return state->m_pbus;
+	return m_pbus;
 }
 
-static WRITE8_DEVICE_HANDLER( b_via_0_pa_w )
+WRITE8_MEMBER(beezer_state::b_via_0_pa_w)
 {
-	beezer_state *state = space.machine().driver_data<beezer_state>();
 	if ((data & 0x08) == 0)
-		space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
 	if ((data & 0x04) == 0)
 	{
 		switch (data & 0x03)
 		{
 		case 0:
-			state->m_pbus = state->ioport("IN0")->read();
+			m_pbus = ioport("IN0")->read();
 			break;
 		case 1:
-			state->m_pbus = state->ioport("IN1")->read() | (state->ioport("IN2")->read() << 4);
+			m_pbus = ioport("IN1")->read() | (ioport("IN2")->read() << 4);
 			break;
 		case 2:
-			state->m_pbus = state->ioport("DSWB")->read();
+			m_pbus = ioport("DSWB")->read();
 			break;
 		case 3:
-			state->m_pbus = state->ioport("DSWA")->read(); // Technically DSWA isn't populated on the board and is pulled to 0xFF with resistor pack, but there IS a DSWA port in the driver so we may as well use it.
+			m_pbus = ioport("DSWA")->read(); // Technically DSWA isn't populated on the board and is pulled to 0xFF with resistor pack, but there IS a DSWA port in the driver so we may as well use it.
 			break;
 		}
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( b_via_0_pb_w )
+WRITE8_MEMBER(beezer_state::b_via_0_pb_w)
 {
-	beezer_state *state = space.machine().driver_data<beezer_state>();
-	state->m_pbus = data;
+	m_pbus = data;
 }
 
-static READ8_DEVICE_HANDLER( b_via_1_pa_r )
+READ8_MEMBER(beezer_state::b_via_1_pa_r)
 {
-	beezer_state *state = space.machine().driver_data<beezer_state>();
-	return state->m_pbus;
+	return m_pbus;
 }
 
-static READ8_DEVICE_HANDLER( b_via_1_pb_r )
+READ8_MEMBER(beezer_state::b_via_1_pb_r)
 {
-	return 0x1F | (beezer_noise_r(space.machine().device("custom"), space, 0)?0x40:0);
+	return 0x1F | (beezer_noise_r(machine().device("custom"), space, 0)?0x40:0);
 }
 
-static WRITE8_DEVICE_HANDLER( b_via_1_pa_w )
+WRITE8_MEMBER(beezer_state::b_via_1_pa_w)
 {
-	beezer_state *state = space.machine().driver_data<beezer_state>();
-	state->m_pbus = data;
+	m_pbus = data;
 }
 
-static WRITE8_DEVICE_HANDLER( b_via_1_pb_w )
+WRITE8_MEMBER(beezer_state::b_via_1_pb_w)
 {
-	beezer_timer1_w(space.machine().device("custom"), space, 0, data&0x80);
+	beezer_timer1_w(machine().device("custom"), space, 0, data&0x80);
 	//if ((data&0x1f) != 0x01)
 	//  popmessage("via1 pb low write of 0x%02x is not supported! contact mamedev!", data&0x1f);
 }

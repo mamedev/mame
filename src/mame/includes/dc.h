@@ -113,6 +113,10 @@ class dc_state : public driver_device
 	TIMER_CALLBACK_MEMBER(endofrender_video);
 	TIMER_CALLBACK_MEMBER(endofrender_tsp);
 	TIMER_CALLBACK_MEMBER(endofrender_isp);
+	DECLARE_READ64_MEMBER(dc_aica_reg_r);
+	DECLARE_WRITE64_MEMBER(dc_aica_reg_w);
+	DECLARE_READ32_MEMBER(dc_arm_aica_r);
+	DECLARE_WRITE32_MEMBER(dc_arm_aica_w);
 };
 
 /*----------- defined in machine/dc.c -----------*/
@@ -132,13 +136,6 @@ DECLARE_READ64_HANDLER( dc_modem_r );
 DECLARE_WRITE64_HANDLER( dc_modem_w );
 DECLARE_READ64_HANDLER( dc_rtc_r );
 DECLARE_WRITE64_HANDLER( dc_rtc_w );
-DECLARE_READ64_DEVICE_HANDLER( dc_aica_reg_r );
-DECLARE_WRITE64_DEVICE_HANDLER( dc_aica_reg_w );
-
-DECLARE_READ32_DEVICE_HANDLER( dc_arm_aica_r );
-DECLARE_WRITE32_DEVICE_HANDLER( dc_arm_aica_w );
-
-
 
 
 int dc_compute_interrupt_level(running_machine &machine);

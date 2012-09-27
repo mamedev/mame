@@ -222,9 +222,9 @@ static ADDRESS_MAP_START( bang_map, AS_PROGRAM, 16, gaelco2_state )
     AM_RANGE(0x300000, 0x300001) AM_READ_PORT("P1")
     AM_RANGE(0x300002, 0x300003) AM_READNOP 																	/* Random number generator? */
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(gaelco2_coin2_w)														/* Coin Counters */
-	AM_RANGE(0x300008, 0x300009) AM_DEVWRITE_LEGACY("eeprom", gaelco2_eeprom_data_w)												/* EEPROM data */
-	AM_RANGE(0x30000a, 0x30000b) AM_DEVWRITE_LEGACY("eeprom", gaelco2_eeprom_sk_w)													/* EEPROM serial clock */
-	AM_RANGE(0x30000c, 0x30000d) AM_DEVWRITE_LEGACY("eeprom", gaelco2_eeprom_cs_w)													/* EEPROM chip select */
+	AM_RANGE(0x300008, 0x300009) AM_WRITE(gaelco2_eeprom_data_w)												/* EEPROM data */
+	AM_RANGE(0x30000a, 0x30000b) AM_WRITE(gaelco2_eeprom_sk_w)													/* EEPROM serial clock */
+	AM_RANGE(0x30000c, 0x30000d) AM_WRITE(gaelco2_eeprom_cs_w)													/* EEPROM chip select */
     AM_RANGE(0x300010, 0x300011) AM_READ_PORT("P2")
     AM_RANGE(0x300020, 0x300021) AM_READ_PORT("COIN")
     AM_RANGE(0x310000, 0x310001) AM_READ(p1_gun_x) AM_WRITE(bang_clr_gun_int_w)									/* Gun 1P X */ /* CLR INT Gun */
@@ -913,9 +913,9 @@ static ADDRESS_MAP_START( snowboar_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")																/* Video Registers */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("P1")
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(gaelco2_coin2_w)																	/* Coin Counters */
-	AM_RANGE(0x300008, 0x300009) AM_DEVWRITE_LEGACY("eeprom", gaelco2_eeprom_data_w)															/* EEPROM data */
-	AM_RANGE(0x30000a, 0x30000b) AM_DEVWRITE_LEGACY("eeprom", gaelco2_eeprom_sk_w)																/* EEPROM serial clock */
-	AM_RANGE(0x30000c, 0x30000d) AM_DEVWRITE_LEGACY("eeprom", gaelco2_eeprom_cs_w)																/* EEPROM chip select */
+	AM_RANGE(0x300008, 0x300009) AM_WRITE(gaelco2_eeprom_data_w)															/* EEPROM data */
+	AM_RANGE(0x30000a, 0x30000b) AM_WRITE(gaelco2_eeprom_sk_w)																/* EEPROM serial clock */
+	AM_RANGE(0x30000c, 0x30000d) AM_WRITE(gaelco2_eeprom_cs_w)																/* EEPROM chip select */
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("P2")
 	AM_RANGE(0x300020, 0x300021) AM_READ_PORT("COIN")
 	AM_RANGE(0x310000, 0x31ffff) AM_READWRITE(snowboar_protection_r,snowboar_protection_w) AM_SHARE("snowboar_prot")	/* Protection */

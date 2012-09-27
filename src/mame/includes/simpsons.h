@@ -43,10 +43,9 @@ public:
 	INTERRUPT_GEN_MEMBER(simpsons_irq);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
+	DECLARE_READ8_MEMBER(simpsons_sound_r);
 };
 
-/*----------- defined in machine/simpsons.c -----------*/
-DECLARE_READ8_DEVICE_HANDLER( simpsons_sound_r );
 
 /*----------- defined in video/simpsons.c -----------*/
 void simpsons_video_banking( running_machine &machine, int select );

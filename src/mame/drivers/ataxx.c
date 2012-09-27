@@ -60,7 +60,7 @@ static ADDRESS_MAP_START( master_map_io, AS_IO, 8, leland_state )
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY("custom", leland_80186_command_hi_w)
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("custom", leland_80186_command_lo_w)
 	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE_LEGACY("custom", ataxx_80186_control_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_LEGACY("eeprom", ataxx_eeprom_r, ataxx_eeprom_w)
+	AM_RANGE(0x20, 0x20) AM_READWRITE(ataxx_eeprom_r, ataxx_eeprom_w)
 	AM_RANGE(0xd0, 0xef) AM_READWRITE(ataxx_mvram_port_r, ataxx_mvram_port_w)
 	AM_RANGE(0xf0, 0xff) AM_READWRITE(ataxx_master_input_r, ataxx_master_output_w)
 ADDRESS_MAP_END

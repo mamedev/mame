@@ -335,9 +335,9 @@ WRITE16_MEMBER(tatsumi_state::tatsumi_v30_68000_w)
 
 // Todo:  Current YM2151 doesn't seem to raise the busy flag quickly enough for the
 // self-test in Tatsumi games.  Needs fixed, but hack it here for now.
-READ8_DEVICE_HANDLER(tatsumi_hack_ym2151_r)
+READ8_MEMBER(tatsumi_state::tatsumi_hack_ym2151_r)
 {
-	int r=ym2151_status_port_r(device,space,0);
+	int r=ym2151_status_port_r(machine().device("ymsnd"),space,0);
 
 	if (space.device().safe_pc()==0x2aca || space.device().safe_pc()==0x29fe
 		|| space.device().safe_pc()==0xf9721
@@ -348,9 +348,9 @@ READ8_DEVICE_HANDLER(tatsumi_hack_ym2151_r)
 
 // Todo:  Tatsumi self-test fails if OKI doesn't respond (when sound off).
 // Mame really should emulate the OKI status reads even with Mame sound off.
-READ8_DEVICE_HANDLER(tatsumi_hack_oki_r)
+READ8_MEMBER(tatsumi_state::tatsumi_hack_oki_r)
 {
-	int r=downcast<okim6295_device *>(device)->read(space,0);
+	int r=downcast<okim6295_device *>(machine().device("oki"))->read(space,0);
 
 	if (space.device().safe_pc()==0x2b70 || space.device().safe_pc()==0x2bb5
 		|| space.device().safe_pc()==0x2acc

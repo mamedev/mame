@@ -106,13 +106,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(dpoker_coin_in_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcr_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcr_ipu_interrupt);
+	DECLARE_WRITE16_MEMBER(mcr_ipu_sio_transmit);
+	DECLARE_WRITE_LINE_MEMBER(ipu_ctc_interrupt);
+	DECLARE_WRITE8_MEMBER(ipu_break_changed);
 };
-
-
-/*----------- defined in drivers/mcr.c -----------*/
-
-DECLARE_WRITE16_DEVICE_HANDLER( mcr_ipu_sio_transmit );
-
 
 /*----------- defined in machine/mcr.c -----------*/
 

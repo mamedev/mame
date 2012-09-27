@@ -21,39 +21,27 @@
 
 static void subtract_from_counter(running_machine &machine, int counter, int count);
 
-
-
-
-static DECLARE_WRITE8_DEVICE_HANDLER( zwackery_pia0_w );
-static DECLARE_WRITE8_DEVICE_HANDLER( zwackery_pia1_w );
-static WRITE_LINE_DEVICE_HANDLER( zwackery_ca2_w );
-static WRITE_LINE_DEVICE_HANDLER( zwackery_pia_irq );
-
-
-
-
-
 /*************************************
  *
  *  6821 PIA declarations
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( zwackery_port_1_r )
+READ8_MEMBER(mcr68_state::zwackery_port_1_r)
 {
-	UINT8 ret = space.machine().root_device().ioport("IN1")->read();
+	UINT8 ret = machine().root_device().ioport("IN1")->read();
 
-	downcast<pia6821_device *>(device)->set_port_a_z_mask(ret);
+	downcast<pia6821_device *>(machine().device("pia1"))->set_port_a_z_mask(ret);
 
 	return ret;
 }
 
 
-static READ8_DEVICE_HANDLER( zwackery_port_3_r )
+READ8_MEMBER(mcr68_state::zwackery_port_3_r)
 {
-	UINT8 ret = space.machine().root_device().ioport("IN3")->read();
+	UINT8 ret = machine().root_device().ioport("IN3")->read();
 
-	downcast<pia6821_device *>(device)->set_port_a_z_mask(ret);
+	downcast<pia6821_device *>(machine().device("pia2"))->set_port_a_z_mask(ret);
 
 	return ret;
 }
@@ -67,26 +55,26 @@ const pia6821_interface zwackery_pia0_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(zwackery_pia0_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(mcr68_state,zwackery_pia0_w),		/* port A out */
 	DEVCB_NULL,		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_LINE(zwackery_pia_irq),		/* IRQA */
-	DEVCB_LINE(zwackery_pia_irq)		/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(mcr68_state,zwackery_pia_irq),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(mcr68_state,zwackery_pia_irq)		/* IRQB */
 };
 
 
 const pia6821_interface zwackery_pia1_intf =
 {
-	DEVCB_HANDLER(zwackery_port_1_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(mcr68_state,zwackery_port_1_r),		/* port A in */
 	DEVCB_DRIVER_MEMBER(mcr68_state, zwackery_port_2_r),		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(zwackery_pia1_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(mcr68_state,zwackery_pia1_w),		/* port A out */
 	DEVCB_NULL,		/* port B out */
-	DEVCB_LINE(zwackery_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mcr68_state,zwackery_ca2_w),		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
 	DEVCB_NULL		/* IRQB */
@@ -95,7 +83,7 @@ const pia6821_interface zwackery_pia1_intf =
 
 const pia6821_interface zwackery_pia2_intf =
 {
-	DEVCB_HANDLER(zwackery_port_3_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(mcr68_state,zwackery_port_3_r),		/* port A in */
 	DEVCB_INPUT_PORT("DSW"),				/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
@@ -263,10 +251,10 @@ TIMER_CALLBACK_MEMBER(mcr68_state::mcr68_493_callback)
  *
  *************************************/
 
-WRITE8_DEVICE_HANDLER( zwackery_pia0_w )
+WRITE8_MEMBER(mcr68_state::zwackery_pia0_w)
 {
 	/* bit 7 is the watchdog */
-	if (!(data & 0x80)) space.machine().watchdog_reset();
+	if (!(data & 0x80)) machine().watchdog_reset();
 
 	/* bits 5 and 6 control hflip/vflip */
 	/* bits 3 and 4 control coin counters? */
@@ -274,27 +262,24 @@ WRITE8_DEVICE_HANDLER( zwackery_pia0_w )
 }
 
 
-WRITE8_DEVICE_HANDLER( zwackery_pia1_w )
+WRITE8_MEMBER(mcr68_state::zwackery_pia1_w)
 {
-	mcr68_state *state = space.machine().driver_data<mcr68_state>();
-	state->m_zwackery_sound_data = (data >> 4) & 0x0f;
+	m_zwackery_sound_data = (data >> 4) & 0x0f;
 }
 
 
-WRITE_LINE_DEVICE_HANDLER( zwackery_ca2_w )
+WRITE_LINE_MEMBER(mcr68_state::zwackery_ca2_w)
 {
-	mcr68_state *drvstate = device->machine().driver_data<mcr68_state>();
-	address_space &space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	drvstate->m_chip_squeak_deluxe->write(space, 0, (state << 4) | drvstate->m_zwackery_sound_data);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	m_chip_squeak_deluxe->write(space, 0, (state << 4) | m_zwackery_sound_data);
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( zwackery_pia_irq )
+WRITE_LINE_MEMBER(mcr68_state::zwackery_pia_irq)
 {
-	mcr68_state *drvstate = device->machine().driver_data<mcr68_state>();
-	pia6821_device *pia = downcast<pia6821_device *>(device);
-	drvstate->m_v493_irq_state = pia->irq_a_state() | pia->irq_b_state();
-	update_mcr68_interrupts(device->machine());
+	pia6821_device *pia = machine().device<pia6821_device>("pia0");
+	m_v493_irq_state = pia->irq_a_state() | pia->irq_b_state();
+	update_mcr68_interrupts(machine());
 }
 
 

@@ -147,6 +147,11 @@ public:
 	TIMER_CALLBACK_MEMBER(ataxx_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	TIMER_CALLBACK_MEMBER(leland_delayed_mvram_w);
+	DECLARE_READ8_MEMBER(ataxx_eeprom_r);
+	DECLARE_WRITE8_MEMBER(ataxx_eeprom_w);
+	DECLARE_READ8_MEMBER(leland_sound_port_r);
+	DECLARE_WRITE8_MEMBER(leland_sound_port_w);
+	DECLARE_WRITE8_MEMBER(leland_gfx_port_w);
 };
 
 
@@ -169,18 +174,6 @@ void ataxx_bankswitch(running_machine &machine);
 
 void leland_init_eeprom(running_machine &machine, UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type);
 void ataxx_init_eeprom(running_machine &machine, const UINT16 *data);
-
-DECLARE_READ8_DEVICE_HANDLER( ataxx_eeprom_r );
-DECLARE_WRITE8_DEVICE_HANDLER( ataxx_eeprom_w );
-
-
-
-
-
-DECLARE_READ8_DEVICE_HANDLER( leland_sound_port_r );
-DECLARE_WRITE8_DEVICE_HANDLER( leland_sound_port_w );
-
-
 
 void leland_rotate_memory(running_machine &machine, const char *cpuname);
 

@@ -551,6 +551,7 @@ public:
 	TIMER_CALLBACK_MEMBER(snes_update_io);
 	TIMER_CALLBACK_MEMBER(snes_scanline_tick);
 	TIMER_CALLBACK_MEMBER(snes_hblank_tick);
+	DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
 };
 
 /* Special chips, checked at init and used in memory handlers */
@@ -627,9 +628,6 @@ extern DECLARE_READ8_HANDLER( superfx_r_bank3 );
 extern DECLARE_WRITE8_HANDLER( superfx_w_bank1 );
 extern DECLARE_WRITE8_HANDLER( superfx_w_bank2 );
 extern DECLARE_WRITE8_HANDLER( superfx_w_bank3 );
-
-WRITE_LINE_DEVICE_HANDLER( snes_extern_irq_w );
-
 
 extern UINT8  *snes_ram;			/* Main memory */
 

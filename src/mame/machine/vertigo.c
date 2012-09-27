@@ -17,8 +17,8 @@
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( v_irq4_w );
-static WRITE_LINE_DEVICE_HANDLER( v_irq3_w );
+
+
 
 
 
@@ -43,11 +43,11 @@ const struct pit8253_config vertigo_pit8254_config =
 		{
 			240000,
 			DEVCB_NULL,
-			DEVCB_LINE(v_irq4_w)
+			DEVCB_DRIVER_LINE_MEMBER(vertigo_state,v_irq4_w)
 		}, {
 			240000,
 			DEVCB_NULL,
-			DEVCB_LINE(v_irq3_w)
+			DEVCB_DRIVER_LINE_MEMBER(vertigo_state,v_irq3_w)
 		}, {
 			240000,
 			DEVCB_NULL,
@@ -87,21 +87,20 @@ static void update_irq_encoder(running_machine &machine, int line, int state)
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( v_irq4_w )
+WRITE_LINE_MEMBER(vertigo_state::v_irq4_w)
 {
-	vertigo_state *drvstate = device->machine().driver_data<vertigo_state>();
-	update_irq_encoder(device->machine(), INPUT_LINE_IRQ4, state);
-	vertigo_vproc(device->machine(), device->machine().device<cpu_device>("maincpu")->attotime_to_cycles(device->machine().time() - drvstate->m_irq4_time), state);
-	drvstate->m_irq4_time = device->machine().time();
+	update_irq_encoder(machine(), INPUT_LINE_IRQ4, state);
+	vertigo_vproc(machine(), machine().device<cpu_device>("maincpu")->attotime_to_cycles(machine().time() - m_irq4_time), state);
+	m_irq4_time = machine().time();
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( v_irq3_w )
+WRITE_LINE_MEMBER(vertigo_state::v_irq3_w)
 {
 	if (state)
-		device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 
-	update_irq_encoder(device->machine(), INPUT_LINE_IRQ3, state);
+	update_irq_encoder(machine(), INPUT_LINE_IRQ3, state);
 }
 
 

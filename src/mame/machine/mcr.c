@@ -33,18 +33,6 @@ UINT32 mcr_sprite_board;
 
 static emu_timer *ipu_watchdog_timer;
 
-
-/*************************************
- *
- *  Function prototypes
- *
- *************************************/
-
-
-static DECLARE_WRITE8_DEVICE_HANDLER( ipu_break_changed );
-
-
-
 /*************************************
  *
  *  Graphics declarations
@@ -132,19 +120,19 @@ Z80PIO_INTERFACE( nflfoot_pio_intf )
 };
 
 
-static WRITE_LINE_DEVICE_HANDLER( ipu_ctc_interrupt )
+WRITE_LINE_MEMBER(mcr_state::ipu_ctc_interrupt)
 {
-	device->machine().device("ipu")->execute().set_input_line(0, state);
+	machine().device("ipu")->execute().set_input_line(0, state);
 }
 
 
 const z80sio_interface nflfoot_sio_intf =
 {
-	DEVCB_LINE(ipu_ctc_interrupt),	/* interrupt handler */
+	DEVCB_DRIVER_LINE_MEMBER(mcr_state,ipu_ctc_interrupt),	/* interrupt handler */
 	DEVCB_NULL,					/* DTR changed handler */
 	DEVCB_NULL,					/* RTS changed handler */
-	DEVCB_HANDLER(ipu_break_changed),	/* BREAK changed handler */
-	DEVCB_HANDLER(mcr_ipu_sio_transmit)/* transmit handler */
+	DEVCB_DRIVER_MEMBER(mcr_state,ipu_break_changed),	/* BREAK changed handler */
+	DEVCB_DRIVER_MEMBER16(mcr_state,mcr_ipu_sio_transmit)/* transmit handler */
 };
 
 
@@ -225,14 +213,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::mcr_ipu_interrupt)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( ipu_break_changed )
+WRITE8_MEMBER(mcr_state::ipu_break_changed)
 {
 	/* channel B is connected to the CED player */
 	if (offset == 1)
 	{
 		logerror("DTR changed -> %d\n", data);
 		if (data == 1)
-			downcast<z80sio_device *>(device)->receive_data(1, 0);
+			downcast<z80sio_device *>(machine().device("ipu_sio"))->receive_data(1, 0);
 	}
 }
 

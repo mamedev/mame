@@ -227,42 +227,39 @@ void vectrex_via_irq(device_t *device, int level)
 }
 
 
-READ8_DEVICE_HANDLER(vectrex_via_pb_r)
+READ8_MEMBER(vectrex_state::vectrex_via_pb_r)
 {
-	vectrex_state *state = space.machine().driver_data<vectrex_state>();
 	int pot;
 	static const char *const ctrlnames[] = { "CONTR1X", "CONTR1Y", "CONTR2X", "CONTR2Y" };
 
-	pot = space.machine().root_device().ioport(ctrlnames[(state->m_via_out[PORTB] & 0x6) >> 1])->read() - 0x80;
+	pot = machine().root_device().ioport(ctrlnames[(m_via_out[PORTB] & 0x6) >> 1])->read() - 0x80;
 
-	if (pot > (signed char)state->m_via_out[PORTA])
-		state->m_via_out[PORTB] |= 0x20;
+	if (pot > (signed char)m_via_out[PORTA])
+		m_via_out[PORTB] |= 0x20;
 	else
-		state->m_via_out[PORTB] &= ~0x20;
+		m_via_out[PORTB] &= ~0x20;
 
-	return state->m_via_out[PORTB];
+	return m_via_out[PORTB];
 }
 
 
-READ8_DEVICE_HANDLER(vectrex_via_pa_r)
+READ8_MEMBER(vectrex_state::vectrex_via_pa_r)
 {
-	vectrex_state *state = space.machine().driver_data<vectrex_state>();
-	if ((!(state->m_via_out[PORTB] & 0x10)) && (state->m_via_out[PORTB] & 0x08))
+	if ((!(m_via_out[PORTB] & 0x10)) && (m_via_out[PORTB] & 0x08))
 		/* BDIR inactive, we can read the PSG. BC1 has to be active. */
 	{
-		device_t *ay = space.machine().device("ay8912");
+		device_t *ay = machine().device("ay8912");
 
-		state->m_via_out[PORTA] = ay8910_r(ay, space, 0)
-			& ~(state->m_imager_pinlevel & 0x80);
+		m_via_out[PORTA] = ay8910_r(ay, space, 0)
+			& ~(m_imager_pinlevel & 0x80);
 	}
-	return state->m_via_out[PORTA];
+	return m_via_out[PORTA];
 }
 
 
-READ8_DEVICE_HANDLER(vectrex_s1_via_pb_r)
+READ8_MEMBER(vectrex_state::vectrex_s1_via_pb_r)
 {
-	vectrex_state *state = space.machine().driver_data<vectrex_state>();
-	return (state->m_via_out[PORTB] & ~0x40) | (state->ioport("COIN")->read() & 0x40);
+	return (m_via_out[PORTB] & ~0x40) | (ioport("COIN")->read() & 0x40);
 }
 
 

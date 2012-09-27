@@ -105,8 +105,9 @@ static DECLARE_WRITE16_HANDLER( megadriv_68k_req_z80_reset );
 
 
 
-READ8_DEVICE_HANDLER( megadriv_68k_YM2612_read)
+READ8_MEMBER(md_base_state::megadriv_68k_YM2612_read)
 {
+	device_t *device = machine().device("ymsnd");
 	//mame_printf_debug("megadriv_68k_YM2612_read %02x %04x\n",offset,mem_mask);
 	if ( (genz80.z80_has_bus==0) && (genz80.z80_is_reset==0) )
 	{
@@ -114,7 +115,7 @@ READ8_DEVICE_HANDLER( megadriv_68k_YM2612_read)
 	}
 	else
 	{
-		logerror("%s: 68000 attempting to access YM2612 (read) without bus\n", space.machine().describe_context());
+		logerror("%s: 68000 attempting to access YM2612 (read) without bus\n", machine().describe_context());
 		return 0;
 	}
 
@@ -122,8 +123,9 @@ READ8_DEVICE_HANDLER( megadriv_68k_YM2612_read)
 }
 
 
-WRITE8_DEVICE_HANDLER( megadriv_68k_YM2612_write)
+WRITE8_MEMBER(md_base_state::megadriv_68k_YM2612_write)
 {
+	device_t *device = machine().device("ymsnd");
 	//mame_printf_debug("megadriv_68k_YM2612_write %02x %04x %04x\n",offset,data,mem_mask);
 	if ( (genz80.z80_has_bus==0) && (genz80.z80_is_reset==0) )
 	{
@@ -131,7 +133,7 @@ WRITE8_DEVICE_HANDLER( megadriv_68k_YM2612_write)
 	}
 	else
 	{
-		logerror("%s: 68000 attempting to access YM2612 (write) without bus\n", space.machine().describe_context());
+		logerror("%s: 68000 attempting to access YM2612 (write) without bus\n", machine().describe_context());
 	}
 }
 
@@ -559,13 +561,13 @@ WRITE16_HANDLER( megadriv_68k_io_write )
 
 
 
-static ADDRESS_MAP_START( megadriv_map, AS_PROGRAM, 16, driver_device )
+static ADDRESS_MAP_START( megadriv_map, AS_PROGRAM, 16, md_base_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	/*      (0x000000 - 0x3fffff) == GAME ROM (4Meg Max, Some games have special banking too) */
 
 	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE_LEGACY(megadriv_68k_read_z80_ram,megadriv_68k_write_z80_ram)
 	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE_LEGACY(megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8_LEGACY("ymsnd", megadriv_68k_YM2612_read,megadriv_68k_YM2612_write, 0xffff)
+	AM_RANGE(0xa04000, 0xa04003) AM_READWRITE8(megadriv_68k_YM2612_read,megadriv_68k_YM2612_write, 0xffff)
 
 	AM_RANGE(0xa06000, 0xa06001) AM_WRITE_LEGACY(megadriv_68k_z80_bank_write)
 
@@ -865,13 +867,13 @@ ADDRESS_MAP_END
 /************************************ Megadrive Bootlegs *************************************/
 
 // smaller ROM region because some bootlegs check for RAM there
-static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, driver_device )
+static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, md_base_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	/* Cartridge Program Rom */
 	AM_RANGE(0x200000, 0x2023ff) AM_RAM // tested
 
 	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE_LEGACY(megadriv_68k_read_z80_ram, megadriv_68k_write_z80_ram)
 	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE_LEGACY(megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8_LEGACY("ymsnd", megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
+	AM_RANGE(0xa04000, 0xa04003) AM_READWRITE8(megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
 	AM_RANGE(0xa06000, 0xa06001) AM_WRITE_LEGACY(megadriv_68k_z80_bank_write)
 
 	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE_LEGACY(megadriv_68k_io_read, megadriv_68k_io_write)

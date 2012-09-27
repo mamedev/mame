@@ -343,7 +343,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_INPUT_PORT("DSW"),
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_HANDLER(homerun_banking_w)
+		DEVCB_DRIVER_MEMBER(homerun_state, homerun_banking_w)
 	},
 	DEVCB_NULL
 };

@@ -128,21 +128,19 @@ Notes (couriersud)
 
 #define LOG(x) do { if (DEBUG) printf x; } while (0)
 
-static WRITE8_DEVICE_HANDLER( ic8j1_output_changed )
+WRITE8_MEMBER(m10_state::ic8j1_output_changed)
 {
-	m10_state *state = space.machine().driver_data<m10_state>();
-	LOG(("ic8j1: %d %d\n", data, space.machine().primary_screen->vpos()));
-	state->m_maincpu->set_input_line(0, !data ? CLEAR_LINE : ASSERT_LINE);
+	LOG(("ic8j1: %d %d\n", data, machine().primary_screen->vpos()));
+	m_maincpu->set_input_line(0, !data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER( ic8j2_output_changed )
+WRITE8_MEMBER(m10_state::ic8j2_output_changed)
 {
-	m10_state *state = space.machine().driver_data<m10_state>();
 
 	/* written from /Q to A with slight delight */
 	LOG(("ic8j2: %d\n", data));
-	ttl74123_a_w(device, space, 0, data);
-	ttl74123_a_w(state->m_ic8j1, space, 0, data);
+	ttl74123_a_w(m_ic8j2, space, 0, data);
+	ttl74123_a_w(m_ic8j1, space, 0, data);
 }
 
 static const ttl74123_interface ic8j1_intf =
@@ -154,7 +152,7 @@ static const ttl74123_interface ic8j1_intf =
 	1,					/* A pin - driven by the CRTC */
 	1,					/* B pin - pulled high */
 	1,					/* Clear pin - pulled high */
-	DEVCB_HANDLER(ic8j1_output_changed)
+	DEVCB_DRIVER_MEMBER(m10_state,ic8j1_output_changed)
 };
 
 static const ttl74123_interface ic8j2_intf =
@@ -166,7 +164,7 @@ static const ttl74123_interface ic8j2_intf =
 	1,					/* A pin - driven by the CRTC */
 	1,					/* B pin - pulled high */
 	1,					/* Clear pin - pulled high */
-	DEVCB_HANDLER(ic8j2_output_changed)
+	DEVCB_DRIVER_MEMBER(m10_state,ic8j2_output_changed)
 };
 
 /*************************************

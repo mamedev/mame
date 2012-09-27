@@ -459,11 +459,10 @@ static WRITE_LINE_DEVICE_HANDLER( ymirq_callback_1 )
 		device->machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),drvstate), YM1IRQ_ASSERT);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( ymirq_callback_2 )
+WRITE_LINE_MEMBER(snk_state::ymirq_callback_2)
 {
-	snk_state *drvstate = device->machine().driver_data<snk_state>();
 	if (state)
-		device->machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),drvstate), YM2IRQ_ASSERT);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM2IRQ_ASSERT);
 }
 
 
@@ -474,7 +473,7 @@ static const ym3526_interface ym3526_config_1 =
 
 static const ym3526_interface ym3526_config_2 =
 {
-	DEVCB_LINE(ymirq_callback_2)
+	DEVCB_DRIVER_LINE_MEMBER(snk_state,ymirq_callback_2)
 };
 
 static const ym3812_interface ym3812_config_1 =
@@ -484,7 +483,7 @@ static const ym3812_interface ym3812_config_1 =
 
 static const y8950_interface y8950_config_2 =
 {
-	DEVCB_LINE(ymirq_callback_2)
+	DEVCB_DRIVER_LINE_MEMBER(snk_state,ymirq_callback_2)
 };
 
 

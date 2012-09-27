@@ -750,10 +750,9 @@ WRITE8_HANDLER( snes_w_io )
 	snes_ram[offset] = data;
 }
 
-WRITE_LINE_DEVICE_HANDLER( snes_extern_irq_w )
+WRITE_LINE_MEMBER(snes_state::snes_extern_irq_w)
 {
-	snes_state *driver_state = device->machine().driver_data<snes_state>();
-	driver_state->m_maincpu->set_input_line(G65816_LINE_IRQ, state);
+	m_maincpu->set_input_line(G65816_LINE_IRQ, state);
 }
 
 /*************************************

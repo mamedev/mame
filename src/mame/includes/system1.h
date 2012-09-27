@@ -110,8 +110,6 @@ public:
 	INTERRUPT_GEN_MEMBER(mcu_irq_assert);
 	TIMER_DEVICE_CALLBACK_MEMBER(soundirq_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_t0_callback);
+	DECLARE_WRITE8_MEMBER(system1_videoram_bank_w);
 };
 
-
-/*----------- defined in video/system1.c -----------*/
-DECLARE_WRITE8_DEVICE_HANDLER( system1_videoram_bank_w );

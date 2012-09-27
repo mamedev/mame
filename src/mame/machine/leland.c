@@ -333,7 +333,7 @@ MACHINE_RESET_MEMBER(leland_state,leland)
 	/* reset globals */
 	m_gfx_control = 0x00;
 	address_space &space = generic_space();
-	leland_sound_port_w(machine().device("ay8910.1"), space, 0, 0xff);
+	leland_sound_port_w(space, 0, 0xff);
 	m_wcol_enable = 0;
 
 	m_dangerz_x = 512;
@@ -817,19 +817,19 @@ void ataxx_init_eeprom(running_machine &machine, const UINT16 *data)
  *
  *************************************/
 
-READ8_DEVICE_HANDLER( ataxx_eeprom_r )
+READ8_MEMBER(leland_state::ataxx_eeprom_r)
 {
-	int port = space.machine().root_device().ioport("IN2")->read();
-	if (LOG_EEPROM) logerror("%s:EE read\n", space.machine().describe_context());
+	int port = machine().root_device().ioport("IN2")->read();
+	if (LOG_EEPROM) logerror("%s:EE read\n", machine().describe_context());
 	return port;
 }
 
 
-WRITE8_DEVICE_HANDLER( ataxx_eeprom_w )
+WRITE8_MEMBER(leland_state::ataxx_eeprom_w)
 {
-	if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", space.machine().describe_context(),
+	if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", machine().describe_context(),
 			(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom_device *eeprom = downcast<eeprom_device *>(machine().device("eeprom"));
 	eeprom->write_bit     ((data & 0x10) >> 4);
 	eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 	eeprom->set_cs_line   ((~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
@@ -1302,29 +1302,27 @@ READ8_MEMBER(leland_state::ataxx_paletteram_and_misc_r)
  *
  *************************************/
 
-READ8_DEVICE_HANDLER( leland_sound_port_r )
+READ8_MEMBER(leland_state::leland_sound_port_r)
 {
-	leland_state *state = space.machine().driver_data<leland_state>();
-	return state->m_gfx_control;
+	return m_gfx_control;
 }
 
 
-WRITE8_DEVICE_HANDLER( leland_sound_port_w )
+WRITE8_MEMBER(leland_state::leland_sound_port_w)
 {
-	leland_state *state = space.machine().driver_data<leland_state>();
 	/* update the graphics banking */
-	leland_gfx_port_w(device, space, 0, data);
+	leland_gfx_port_w(space, 0, data);
 
 	/* set the new value */
-	state->m_gfx_control = data;
-	state->m_dac_control = data & 3;
+	m_gfx_control = data;
+	m_dac_control = data & 3;
 
 	/* some bankswitching occurs here */
 	if (LOG_BANKSWITCHING_M)
-		if ((state->m_sound_port_bank ^ data) & 0x24)
-			logerror("%s:sound_port_bank = %02X\n", space.machine().describe_context(), data & 0x24);
-	state->m_sound_port_bank = data & 0x24;
-	(*state->m_update_master_bank)(space.machine());
+		if ((m_sound_port_bank ^ data) & 0x24)
+			logerror("%s:sound_port_bank = %02X\n", machine().describe_context(), data & 0x24);
+	m_sound_port_bank = data & 0x24;
+	(*m_update_master_bank)(machine());
 }
 
 

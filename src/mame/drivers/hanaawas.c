@@ -178,7 +178,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_INPUT_PORT("DSW"),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(hanaawas_portB_w)
+	DEVCB_DRIVER_MEMBER(hanaawas_state, hanaawas_portB_w)
 };
 
 

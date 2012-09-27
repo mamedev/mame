@@ -110,4 +110,5 @@ public:
 	TIMER_CALLBACK_MEMBER(equites_frq_adjuster_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(equites_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(splndrbt_scanline);
+	DECLARE_WRITE_LINE_MEMBER(equites_msm5232_gate);
 };

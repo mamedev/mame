@@ -85,6 +85,18 @@ public:
 	DECLARE_MACHINE_START(qixmcu);
 	DECLARE_VIDEO_START(qix);
 	TIMER_CALLBACK_MEMBER(pia_w_callback);
+	DECLARE_WRITE_LINE_MEMBER(qix_vsync_changed);
+	DECLARE_READ8_MEMBER(qixmcu_coin_r);
+	DECLARE_WRITE8_MEMBER(qixmcu_coin_w);
+	DECLARE_WRITE8_MEMBER(qixmcu_coinctrl_w);
+	DECLARE_WRITE8_MEMBER(qix_pia_w);
+	DECLARE_WRITE8_MEMBER(qix_coinctl_w);
+	DECLARE_WRITE8_MEMBER(slither_76489_0_w);
+	DECLARE_WRITE8_MEMBER(slither_76489_1_w);
+	DECLARE_READ8_MEMBER(slither_trak_lr_r);
+	DECLARE_READ8_MEMBER(slither_trak_ud_r);
+	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
+	DECLARE_WRITE8_MEMBER(qix_flip_screen_w);
 };
 
 
@@ -98,16 +110,11 @@ extern const pia6821_interface qixmcu_pia_2_intf;
 extern const pia6821_interface slither_pia_1_intf;
 extern const pia6821_interface slither_pia_2_intf;
 
-DECLARE_WRITE8_DEVICE_HANDLER( qix_pia_w );
-WRITE_LINE_DEVICE_HANDLER( qix_vsync_changed );
-
 /*----------- defined in video/qix.c -----------*/
 
 MACHINE_CONFIG_EXTERN( qix_video );
 MACHINE_CONFIG_EXTERN( zookeep_video );
 MACHINE_CONFIG_EXTERN( slither_video );
-
-DECLARE_WRITE8_DEVICE_HANDLER( qix_flip_screen_w );
 
 /*----------- defined in audio/qix.c -----------*/
 

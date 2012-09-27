@@ -19,31 +19,11 @@ static void williams_main_irq(device_t *device, int state);
 static void williams_main_firq(device_t *device, int state);
 static void williams_snd_irq(device_t *device, int state);
 static void williams_snd_irq_b(device_t *device, int state);
-static DECLARE_WRITE8_DEVICE_HANDLER( williams_snd_cmd_w );
-static DECLARE_WRITE8_DEVICE_HANDLER( playball_snd_cmd_w );
-static DECLARE_WRITE8_DEVICE_HANDLER( blaster_snd_cmd_w );
-
-/* input port mapping */
-static DECLARE_WRITE8_DEVICE_HANDLER( williams_port_select_w );
-static DECLARE_READ8_DEVICE_HANDLER( williams_input_port_49way_0_5_r );
-static DECLARE_READ8_DEVICE_HANDLER( williams_49way_port_0_r );
 
 /* newer-Williams routines */
-static DECLARE_WRITE8_DEVICE_HANDLER( williams2_snd_cmd_w );
 static void mysticm_main_irq(device_t *device, int state);
 static void tshoot_main_irq(device_t *device, int state);
 
-/* Lotto Fun-specific code */
-static DECLARE_WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w );
-
-/* Turkey Shoot-specific code */
-static DECLARE_READ8_DEVICE_HANDLER( tshoot_input_port_0_3_r );
-static DECLARE_WRITE8_DEVICE_HANDLER( tshoot_lamp_w );
-static DECLARE_WRITE8_DEVICE_HANDLER( tshoot_maxvol_w );
-
-/* Joust 2-specific code */
-static DECLARE_WRITE8_DEVICE_HANDLER( joust2_snd_cmd_w );
-static DECLARE_WRITE8_DEVICE_HANDLER( joust2_pia_3_cb1_w );
 
 
 /*************************************
@@ -66,14 +46,14 @@ const pia6821_interface williams_pia_0_intf =
 const pia6821_interface williams_muxed_pia_0_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(williams_port_select_w),
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams_port_select_w),
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
 
 /* Generic 49-way joystick PIA 0 for Sinistar/Blaster */
 const pia6821_interface williams_49way_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(williams_49way_port_0_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_DRIVER_MEMBER(williams_state,williams_49way_port_0_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
@@ -81,8 +61,8 @@ const pia6821_interface williams_49way_pia_0_intf =
 /* Muxing 49-way joystick PIA 0 for Blaster kit */
 const pia6821_interface williams_49way_muxed_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(williams_input_port_49way_0_5_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(williams_port_select_w),
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_DRIVER_MEMBER(williams_state,williams_input_port_49way_0_5_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams_port_select_w),
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
 
@@ -90,7 +70,7 @@ const pia6821_interface williams_49way_muxed_pia_0_intf =
 const pia6821_interface williams_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
 };
 
@@ -121,7 +101,7 @@ const pia6821_interface williams_snd_pia_b_intf =
 const pia6821_interface lottofun_pia_0_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DEVICE_MEMBER("ticket", ticket_dispenser_device, write), DEVCB_HANDLER(lottofun_coin_lock_w), DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DEVICE_MEMBER("ticket", ticket_dispenser_device, write), DEVCB_DRIVER_MEMBER(williams_state,lottofun_coin_lock_w), DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
 
@@ -137,7 +117,7 @@ const pia6821_interface sinistar_snd_pia_intf =
 const pia6821_interface playball_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(playball_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,playball_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
 };
 
@@ -145,7 +125,7 @@ const pia6821_interface playball_pia_1_intf =
 const pia6821_interface blaster_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(blaster_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,blaster_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
 };
 
@@ -169,7 +149,7 @@ const pia6821_interface spdball_pia_3_intf =
 const pia6821_interface williams2_muxed_pia_0_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(williams_port_select_w), DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams_port_select_w), DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
 
@@ -177,7 +157,7 @@ const pia6821_interface williams2_muxed_pia_0_intf =
 const pia6821_interface williams2_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("pia_2", pia6821_device, ca1_w),
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("pia_2", pia6821_device, ca1_w),
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
 };
 
@@ -209,15 +189,15 @@ const pia6821_interface mysticm_pia_0_intf =
 const pia6821_interface mysticm_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("pia_2", pia6821_device, ca1_w),
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("pia_2", pia6821_device, ca1_w),
 	/*irqs   : A/B             */ DEVCB_LINE(mysticm_main_irq), DEVCB_LINE(mysticm_main_irq)
 };
 
 /* Turkey Shoot PIA 0 */
 const pia6821_interface tshoot_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(tshoot_input_port_0_3_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(tshoot_lamp_w), DEVCB_HANDLER(williams_port_select_w), DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_DRIVER_MEMBER(williams_state,tshoot_input_port_0_3_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,tshoot_lamp_w), DEVCB_DRIVER_MEMBER(williams_state,williams_port_select_w), DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(tshoot_main_irq), DEVCB_LINE(tshoot_main_irq)
 };
 
@@ -225,7 +205,7 @@ const pia6821_interface tshoot_pia_0_intf =
 const pia6821_interface tshoot_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("pia_2", pia6821_device, ca1_w),
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("pia_2", pia6821_device, ca1_w),
 	/*irqs   : A/B             */ DEVCB_LINE(tshoot_main_irq), DEVCB_LINE(tshoot_main_irq)
 };
 
@@ -233,7 +213,7 @@ const pia6821_interface tshoot_pia_1_intf =
 const pia6821_interface tshoot_snd_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("pia_1", pia6821_device, portb_w), DEVCB_DEVICE_MEMBER("wmsdac", dac_device, write_unsigned8), DEVCB_DEVICE_LINE_MEMBER("pia_1", pia6821_device, cb1_w), DEVCB_HANDLER(tshoot_maxvol_w),
+	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("pia_1", pia6821_device, portb_w), DEVCB_DEVICE_MEMBER("wmsdac", dac_device, write_unsigned8), DEVCB_DEVICE_LINE_MEMBER("pia_1", pia6821_device, cb1_w), DEVCB_DRIVER_MEMBER(williams_state,tshoot_maxvol_w),
 	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq), DEVCB_LINE(williams_snd_irq)
 };
 
@@ -241,7 +221,7 @@ const pia6821_interface tshoot_snd_pia_intf =
 const pia6821_interface joust2_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(joust2_snd_cmd_w), DEVCB_HANDLER(joust2_pia_3_cb1_w), DEVCB_DEVICE_LINE_MEMBER("pia_2", pia6821_device, ca1_w),
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(joust2_state,joust2_snd_cmd_w), DEVCB_DRIVER_MEMBER(joust2_state,joust2_pia_3_cb1_w), DEVCB_DEVICE_LINE_MEMBER("pia_2", pia6821_device, ca1_w),
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
 };
 
@@ -558,17 +538,15 @@ TIMER_CALLBACK_MEMBER(williams_state::williams_deferred_snd_cmd_w)
 	pia_2->cb1_w((param == 0xff) ? 0 : 1);
 }
 
-WRITE8_DEVICE_HANDLER( williams_snd_cmd_w )
+WRITE8_MEMBER(williams_state::williams_snd_cmd_w)
 {
-	williams_state *state = device->machine().driver_data<williams_state>();
 	/* the high two bits are set externally, and should be 1 */
-	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams_deferred_snd_cmd_w),state), data | 0xc0);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams_deferred_snd_cmd_w),this), data | 0xc0);
 }
 
-WRITE8_DEVICE_HANDLER( playball_snd_cmd_w )
+WRITE8_MEMBER(williams_state::playball_snd_cmd_w)
 {
-	williams_state *state = device->machine().driver_data<williams_state>();
-	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams_deferred_snd_cmd_w),state), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams_deferred_snd_cmd_w),this), data);
 }
 
 TIMER_CALLBACK_MEMBER(williams_state::blaster_deferred_snd_cmd_w)
@@ -582,10 +560,9 @@ TIMER_CALLBACK_MEMBER(williams_state::blaster_deferred_snd_cmd_w)
 	pia_2r->portb_w(r_data); pia_2r->cb1_w((r_data == 0xff) ? 0 : 1);
 }
 
-WRITE8_DEVICE_HANDLER( blaster_snd_cmd_w )
+WRITE8_MEMBER(williams_state::blaster_snd_cmd_w)
 {
-	williams_state *state = device->machine().driver_data<williams_state>();
-	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::blaster_deferred_snd_cmd_w),state), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::blaster_deferred_snd_cmd_w),this), data);
 }
 
 
@@ -596,10 +573,9 @@ TIMER_CALLBACK_MEMBER(williams_state::williams2_deferred_snd_cmd_w)
 	pia_2->porta_w(param);
 }
 
-static WRITE8_DEVICE_HANDLER( williams2_snd_cmd_w )
+WRITE8_MEMBER(williams_state::williams2_snd_cmd_w)
 {
-	williams_state *state = device->machine().driver_data<williams_state>();
-	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams2_deferred_snd_cmd_w),state), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams2_deferred_snd_cmd_w),this), data);
 }
 
 
@@ -610,10 +586,9 @@ static WRITE8_DEVICE_HANDLER( williams2_snd_cmd_w )
  *
  *************************************/
 
-WRITE8_DEVICE_HANDLER( williams_port_select_w )
+WRITE8_MEMBER(williams_state::williams_port_select_w)
 {
-	williams_state *state = space.machine().driver_data<williams_state>();
-	state->m_port_select = data;
+	m_port_select = data;
 }
 
 CUSTOM_INPUT_MEMBER(williams_state::williams_mux_r)
@@ -651,20 +626,19 @@ CUSTOM_INPUT_MEMBER(williams_state::williams_mux_r)
  *      1000 = right/down full
  */
 
-READ8_DEVICE_HANDLER( williams_49way_port_0_r )
+READ8_MEMBER(williams_state::williams_49way_port_0_r)
 {
 	static const UINT8 translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
-	return (translate49[space.machine().root_device().ioport("49WAYX")->read() >> 4] << 4) | translate49[space.machine().root_device().ioport("49WAYY")->read() >> 4];
+	return (translate49[machine().root_device().ioport("49WAYX")->read() >> 4] << 4) | translate49[machine().root_device().ioport("49WAYY")->read() >> 4];
 }
 
 
-READ8_DEVICE_HANDLER( williams_input_port_49way_0_5_r )
+READ8_MEMBER(williams_state::williams_input_port_49way_0_5_r)
 {
-	williams_state *state = space.machine().driver_data<williams_state>();
-	if (state->m_port_select)
-		return williams_49way_port_0_r(device, space, 0);
+	if (m_port_select)
+		return williams_49way_port_0_r(space, 0);
 	else
-		return state->ioport("IN3")->read();
+		return ioport("IN3")->read();
 }
 
 
@@ -929,9 +903,9 @@ WRITE8_MEMBER(williams_state::blaster_bank_select_w)
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w )
+WRITE8_MEMBER(williams_state::lottofun_coin_lock_w)
 {
-	coin_lockout_global_w(space.machine(), data & 1); /* bit 5 of PIC control port A */
+	coin_lockout_global_w(machine(), data & 1); /* bit 5 of PIC control port A */
 }
 
 
@@ -942,10 +916,10 @@ static WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w )
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( tshoot_input_port_0_3_r )
+READ8_MEMBER(williams_state::tshoot_input_port_0_3_r)
 {
 	/* merge in the gun inputs with the standard data */
-	int data = space.machine().root_device().ioport("IN0")->read();
+	int data = machine().root_device().ioport("IN0")->read();
 	int gun = (data & 0x3f) ^ ((data & 0x3f) >> 1);
 	return (data & 0xc0) | gun;
 
@@ -954,14 +928,14 @@ static READ8_DEVICE_HANDLER( tshoot_input_port_0_3_r )
 }
 
 
-static WRITE8_DEVICE_HANDLER( tshoot_maxvol_w )
+WRITE8_MEMBER(williams_state::tshoot_maxvol_w)
 {
 	/* something to do with the sound volume */
-	logerror("tshoot maxvol = %d (%s)\n", data, space.machine().describe_context());
+	logerror("tshoot maxvol = %d (%s)\n", data, machine().describe_context());
 }
 
 
-static WRITE8_DEVICE_HANDLER( tshoot_lamp_w )
+WRITE8_MEMBER(williams_state::tshoot_lamp_w)
 {
 	/* set the grenade lamp */
 	output_set_value("Grenade_lamp", (~data & 0x4)>>2 );
@@ -1002,18 +976,16 @@ TIMER_CALLBACK_MEMBER(joust2_state::joust2_deferred_snd_cmd_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( joust2_pia_3_cb1_w )
+WRITE8_MEMBER(joust2_state::joust2_pia_3_cb1_w)
 {
-	joust2_state *state = space.machine().driver_data<joust2_state>();
-	state->m_joust2_current_sound_data = (state->m_joust2_current_sound_data & ~0x100) | ((data << 8) & 0x100);
-	state->m_cvsd_sound->write(space.machine().driver_data()->generic_space(), 0, state->m_joust2_current_sound_data);
+	m_joust2_current_sound_data = (m_joust2_current_sound_data & ~0x100) | ((data << 8) & 0x100);
+	m_cvsd_sound->write(machine().driver_data()->generic_space(), 0, m_joust2_current_sound_data);
 }
 
 
-static WRITE8_DEVICE_HANDLER( joust2_snd_cmd_w )
+WRITE8_MEMBER(joust2_state::joust2_snd_cmd_w)
 {
-	joust2_state *state = space.machine().driver_data<joust2_state>();
-	state->m_joust2_current_sound_data = (state->m_joust2_current_sound_data & ~0xff) | (data & 0xff);
-	state->m_cvsd_sound->write(space.machine().driver_data()->generic_space(), 0, state->m_joust2_current_sound_data);
-	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(joust2_state::joust2_deferred_snd_cmd_w),state), state->m_joust2_current_sound_data);
+	m_joust2_current_sound_data = (m_joust2_current_sound_data & ~0xff) | (data & 0xff);
+	m_cvsd_sound->write(machine().driver_data()->generic_space(), 0, m_joust2_current_sound_data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(joust2_state::joust2_deferred_snd_cmd_w),this), m_joust2_current_sound_data);
 }

@@ -36,6 +36,8 @@ public:
 	DECLARE_PALETTE_INIT(survival);
 	DECLARE_PALETTE_INIT(pleiads);
 	UINT32 screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_READ8_MEMBER(survival_protection_r);
+	DECLARE_READ_LINE_MEMBER(survival_sid_callback);
 };
 
 
@@ -81,7 +83,3 @@ private:
 };
 
 extern const device_type PHOENIX;
-
-/*----------- defined in video/phoenix.c -----------*/
-DECLARE_READ8_DEVICE_HANDLER( survival_protection_r );
-READ_LINE_DEVICE_HANDLER( survival_sid_callback );

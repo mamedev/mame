@@ -53,7 +53,5 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_homerun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE8_MEMBER(homerun_banking_w);
 };
-
-/*----------- defined in video/homerun.c -----------*/
-DECLARE_WRITE8_DEVICE_HANDLER( homerun_banking_w );

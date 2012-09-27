@@ -245,8 +245,8 @@ static ADDRESS_MAP_START( apache3_v20_map, AS_PROGRAM, 8, tatsumi_state )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM
 	AM_RANGE(0x04000, 0x04003) AM_NOP // piu select .. ?
 	AM_RANGE(0x06000, 0x06001) AM_READ_PORT("IN0") // esw
-	AM_RANGE(0x08000, 0x08001) AM_DEVREADWRITE_LEGACY("ymsnd", tatsumi_hack_ym2151_r, ym2151_w)
-	AM_RANGE(0x0a000, 0x0a000) AM_DEVREAD_LEGACY("oki", tatsumi_hack_oki_r) AM_DEVWRITE("oki", okim6295_device, write)
+	AM_RANGE(0x08000, 0x08001) AM_READ(tatsumi_hack_ym2151_r) AM_DEVWRITE_LEGACY("ymsnd", ym2151_w)
+	AM_RANGE(0x0a000, 0x0a000) AM_READ(tatsumi_hack_oki_r) AM_DEVWRITE("oki", okim6295_device, write)
 	AM_RANGE(0x0e000, 0x0e007) AM_READWRITE(apache3_adc_r, apache3_adc_w) //adc select
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -289,8 +289,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( roundup5_z80_map, AS_PROGRAM, 8, tatsumi_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffef) AM_RAM
-	AM_RANGE(0xfff0, 0xfff1) AM_DEVREADWRITE_LEGACY("ymsnd", tatsumi_hack_ym2151_r, ym2151_w)
-	AM_RANGE(0xfff4, 0xfff4) AM_DEVREAD_LEGACY("oki", tatsumi_hack_oki_r) AM_DEVWRITE("oki", okim6295_device, write)
+	AM_RANGE(0xfff0, 0xfff1) AM_READ(tatsumi_hack_ym2151_r) AM_DEVWRITE_LEGACY("ymsnd", ym2151_w)
+	AM_RANGE(0xfff4, 0xfff4) AM_READ(tatsumi_hack_oki_r) AM_DEVWRITE("oki", okim6295_device, write)
 	AM_RANGE(0xfff8, 0xfff8) AM_READ_PORT("IN0")
 	AM_RANGE(0xfff9, 0xfff9) AM_READ_PORT("IN1")
 	AM_RANGE(0xfffc, 0xfffc) AM_READ_PORT("STICKX")
@@ -346,8 +346,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cyclwarr_z80_map, AS_PROGRAM, 8, tatsumi_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffef) AM_RAM
-	AM_RANGE(0xfff0, 0xfff1) AM_DEVREADWRITE_LEGACY("ymsnd", tatsumi_hack_ym2151_r, ym2151_w)
-	AM_RANGE(0xfff4, 0xfff4) AM_DEVREAD_LEGACY("oki", tatsumi_hack_oki_r) AM_DEVWRITE("oki", okim6295_device, write)
+	AM_RANGE(0xfff0, 0xfff1) AM_READ(tatsumi_hack_ym2151_r) AM_DEVWRITE_LEGACY("ymsnd", ym2151_w)
+	AM_RANGE(0xfff4, 0xfff4) AM_READ(tatsumi_hack_oki_r) AM_DEVWRITE("oki", okim6295_device, write)
 	AM_RANGE(0xfffc, 0xfffc) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xfffe, 0xfffe) AM_WRITENOP
 ADDRESS_MAP_END

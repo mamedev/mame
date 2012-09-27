@@ -114,27 +114,24 @@ UINT32 gameplan_state::screen_update_leprechn(screen_device &screen, bitmap_rgb3
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( video_data_w )
+WRITE8_MEMBER(gameplan_state::video_data_w)
 {
-	gameplan_state *state = space.machine().driver_data<gameplan_state>();
 
-	state->m_video_data = data;
+	m_video_data = data;
 }
 
 
-static WRITE8_DEVICE_HANDLER( gameplan_video_command_w )
+WRITE8_MEMBER(gameplan_state::gameplan_video_command_w)
 {
-	gameplan_state *state = space.machine().driver_data<gameplan_state>();
 
-	state->m_video_command = data & 0x07;
+	m_video_command = data & 0x07;
 }
 
 
-static WRITE8_DEVICE_HANDLER( leprechn_video_command_w )
+WRITE8_MEMBER(gameplan_state::leprechn_video_command_w)
 {
-	gameplan_state *state = space.machine().driver_data<gameplan_state>();
 
-	state->m_video_command = (data >> 3) & 0x07;
+	m_video_command = (data >> 3) & 0x07;
 }
 
 
@@ -146,61 +143,60 @@ TIMER_CALLBACK_MEMBER(gameplan_state::clear_screen_done_callback)
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( video_command_trigger_w )
+WRITE_LINE_MEMBER(gameplan_state::video_command_trigger_w)
 {
-	gameplan_state *driver_state = device->machine().driver_data<gameplan_state>();
 
 	if (state == 0)
 	{
-		switch (driver_state->m_video_command)
+		switch (m_video_command)
 		{
 		/* draw pixel */
 		case 0:
 			/* auto-adjust X? */
-			if (driver_state->m_video_data & 0x10)
+			if (m_video_data & 0x10)
 			{
-				if (driver_state->m_video_data & 0x40)
-					driver_state->m_video_x = driver_state->m_video_x - 1;
+				if (m_video_data & 0x40)
+					m_video_x = m_video_x - 1;
 				else
-					driver_state->m_video_x = driver_state->m_video_x + 1;
+					m_video_x = m_video_x + 1;
 			}
 
 			/* auto-adjust Y? */
-			if (driver_state->m_video_data & 0x20)
+			if (m_video_data & 0x20)
 			{
-				if (driver_state->m_video_data & 0x80)
-					driver_state->m_video_y = driver_state->m_video_y - 1;
+				if (m_video_data & 0x80)
+					m_video_y = m_video_y - 1;
 				else
-					driver_state->m_video_y = driver_state->m_video_y + 1;
+					m_video_y = m_video_y + 1;
 			}
 
-			driver_state->m_videoram[driver_state->m_video_y * (HBSTART - HBEND) + driver_state->m_video_x] = driver_state->m_video_data & 0x0f;
+			m_videoram[m_video_y * (HBSTART - HBEND) + m_video_x] = m_video_data & 0x0f;
 
 			break;
 
 		/* load X register */
 		case 1:
-			driver_state->m_video_x = driver_state->m_video_data;
+			m_video_x = m_video_data;
 			break;
 
 		/* load Y register */
 		case 2:
-			driver_state->m_video_y = driver_state->m_video_data;
+			m_video_y = m_video_data;
 			break;
 
 		/* clear screen */
 		case 3:
 			/* indicate that the we are busy */
 			{
-				driver_state->m_via_0->write_ca1(1);
+				m_via_0->write_ca1(1);
 			}
 
-			memset(driver_state->m_videoram, driver_state->m_video_data & 0x0f, driver_state->m_videoram_size);
+			memset(m_videoram, m_video_data & 0x0f, m_videoram_size);
 
 			/* set a timer for an arbitrarily short period.
                The real time it takes to clear to screen is not
                important to the software */
-			device->machine().scheduler().synchronize(timer_expired_delegate(FUNC(gameplan_state::clear_screen_done_callback),driver_state));
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(gameplan_state::clear_screen_done_callback),this));
 
 			break;
 		}
@@ -224,7 +220,7 @@ static void via_irq(device_t *device, int state)
 }
 
 
-static READ8_DEVICE_HANDLER( vblank_r )
+READ8_MEMBER(gameplan_state::vblank_r)
 {
 	/* this is needed for trivia quest */
 	return 0x20;
@@ -233,30 +229,30 @@ static READ8_DEVICE_HANDLER( vblank_r )
 
 const via6522_interface gameplan_via_0_interface =
 {
-	DEVCB_NULL, DEVCB_HANDLER(vblank_r),										/*inputs : A/B         */
+	DEVCB_NULL, DEVCB_DRIVER_MEMBER(gameplan_state,vblank_r),										/*inputs : A/B         */
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,								/*inputs : CA/B1,CA/B2 */
-	DEVCB_HANDLER(video_data_w), DEVCB_HANDLER(gameplan_video_command_w),		/*outputs: A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_LINE(video_command_trigger_w), DEVCB_NULL,	/*outputs: CA/B1,CA/B2 */
+	DEVCB_DRIVER_MEMBER(gameplan_state,video_data_w), DEVCB_DRIVER_MEMBER(gameplan_state,gameplan_video_command_w),		/*outputs: A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(gameplan_state,video_command_trigger_w), DEVCB_NULL,	/*outputs: CA/B1,CA/B2 */
 	DEVCB_LINE(via_irq)															/*irq                  */
 };
 
 
 const via6522_interface leprechn_via_0_interface =
 {
-	DEVCB_NULL, DEVCB_HANDLER(vblank_r),										/*inputs : A/B         */
+	DEVCB_NULL, DEVCB_DRIVER_MEMBER(gameplan_state,vblank_r),										/*inputs : A/B         */
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,								/*inputs : CA/B1,CA/B2 */
-	DEVCB_HANDLER(video_data_w), DEVCB_HANDLER(leprechn_video_command_w),		/*outputs: A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_LINE(video_command_trigger_w), DEVCB_NULL,	/*outputs: CA/B1,CA/B2 */
+	DEVCB_DRIVER_MEMBER(gameplan_state,video_data_w), DEVCB_DRIVER_MEMBER(gameplan_state,leprechn_video_command_w),		/*outputs: A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(gameplan_state,video_command_trigger_w), DEVCB_NULL,	/*outputs: CA/B1,CA/B2 */
 	DEVCB_LINE(via_irq)															/*irq                  */
 };
 
 
 const via6522_interface trvquest_via_0_interface =
 {
-	DEVCB_NULL, DEVCB_HANDLER(vblank_r),										/*inputs : A/B         */
+	DEVCB_NULL, DEVCB_DRIVER_MEMBER(gameplan_state,vblank_r),										/*inputs : A/B         */
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,								/*inputs : CA/B1,CA/B2 */
-	DEVCB_HANDLER(video_data_w), DEVCB_HANDLER(gameplan_video_command_w),		/*outputs: A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_LINE(video_command_trigger_w), DEVCB_NULL,	/*outputs: CA/B1,CA/B2 */
+	DEVCB_DRIVER_MEMBER(gameplan_state,video_data_w), DEVCB_DRIVER_MEMBER(gameplan_state,gameplan_video_command_w),		/*outputs: A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(gameplan_state,video_command_trigger_w), DEVCB_NULL,	/*outputs: CA/B1,CA/B2 */
 	DEVCB_NULL																	/*irq                  */
 };
 

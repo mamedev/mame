@@ -35,20 +35,19 @@ WRITE8_MEMBER(homerun_state::homerun_scrollx_w)
 	m_scrollx = (m_scrollx & 0xff00) | data;
 }
 
-WRITE8_DEVICE_HANDLER(homerun_banking_w)
+WRITE8_MEMBER(homerun_state::homerun_banking_w)
 {
-	homerun_state *state = space.machine().driver_data<homerun_state>();
 
 	// games do mid-screen gfx bank switching
-	int vpos = space.machine().primary_screen->vpos();
-	space.machine().primary_screen->update_partial(vpos);
+	int vpos = machine().primary_screen->vpos();
+	machine().primary_screen->update_partial(vpos);
 
 	// d0-d1: gfx bank
 	// d2-d4: ?
 	// d5-d7: prg bank
-	state->m_gfx_ctrl = data;
-	state->m_tilemap->mark_all_dirty();
-	state->membank("bank1")->set_entry(data >> 5 & 7);
+	m_gfx_ctrl = data;
+	m_tilemap->mark_all_dirty();
+	membank("bank1")->set_entry(data >> 5 & 7);
 }
 
 WRITE8_MEMBER(homerun_state::homerun_videoram_w)

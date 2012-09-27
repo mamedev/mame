@@ -74,6 +74,11 @@ public:
 	TIMER_CALLBACK_MEMBER(clear_screen_done_callback);
 	TIMER_CALLBACK_MEMBER(via_irq_delayed);
 	TIMER_CALLBACK_MEMBER(via_0_ca1_timer_callback);
+	DECLARE_WRITE8_MEMBER(video_data_w);
+	DECLARE_WRITE8_MEMBER(gameplan_video_command_w);
+	DECLARE_WRITE8_MEMBER(leprechn_video_command_w);
+	DECLARE_WRITE_LINE_MEMBER(video_command_trigger_w);
+	DECLARE_READ8_MEMBER(vblank_r);
 };
 
 /*----------- defined in video/gameplan.c -----------*/
