@@ -194,7 +194,7 @@ void sega_hangon_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 		// initialize the end address to the start address
 		data[7] = addr;
 
-		// if hidden, or top greater than/equal to bottom, or invalid bank, punt
+		// if top greater than/equal to bottom, or invalid bank, punt
 		if (top >= bottom || bank == 255)
 			continue;
 
@@ -373,7 +373,7 @@ void sega_sharrier_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 		// initialize the end address to the start address
 		data[7] = addr;
 
-		// if hidden, or top greater than/equal to bottom, or invalid bank, punt
+		// if top greater than/equal to bottom, or invalid bank, punt
 		if (top >= bottom || bank == 255)
 			continue;
 
@@ -553,7 +553,7 @@ void sega_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 		// initialize the end address to the start address
 		data[7] = addr;
 
-		// if hidden, or top greater than/equal to bottom, or invalid bank, punt
+		// if top greater than/equal to bottom, or invalid bank, punt
 		if (top >= bottom || bank == 255)
 			continue;
 
@@ -735,7 +735,7 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 		UINT16 &data7 = data[m_addrmap[7]];
 		data7 = addr;
 
-		// if hidden, or top greater than/equal to bottom, or invalid bank, punt
+		// if top greater than/equal to bottom, or invalid bank, punt
 		if (top >= bottom || bank == 255)
 			continue;
 
@@ -1134,8 +1134,8 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 		// initialize the end address to the start address
 		data[7] = addr;
 
-		// if hidden, or top greater than/equal to bottom, or invalid bank, punt
-		if (hide || height == 0)
+		// if hidden, punt
+		if (hide)
 			continue;
 
 		// clamp to within the memory region size
@@ -1325,7 +1325,7 @@ void sega_yboard_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 		visited[next] = 1;
 		next = data[7] & 0xfff;
 
-		// if hidden, or top greater than/equal to bottom, or invalid bank, punt
+		// if hidden, or invalid height, punt
 		if (hide || height == 0)
 			continue;
 
