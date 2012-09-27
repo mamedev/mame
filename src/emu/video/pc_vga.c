@@ -326,6 +326,8 @@ static struct
 #define LOG_ACCESSES	0
 #define LOG_REGISTERS	0
 
+#define LOG_8514		0
+
 static VIDEO_RESET( vga );
 
 /***************************************************************************
@@ -3018,7 +3020,7 @@ bit 0-1  DAC Register Select Bits. Passed to the RS2 and RS3 pins on the
 					fatalerror("TODO: s3 bank selects above 1M\n");
 				break;
 			default:
-				logerror("S3: 3D4 index %02x write %02x\n",index,data);
+				if(LOG_8514) logerror("S3: 3D4 index %02x write %02x\n",index,data);
 				break;
 		}
 	}
@@ -3377,7 +3379,7 @@ READ16_HANDLER(s3_line_error_r)
 WRITE16_HANDLER(s3_line_error_w)
 {
 	s3.line_errorterm = data;
-	logerror("S3: Line Parameter/Error Term write %04x\n",data);
+	if(LOG_8514) logerror("S3: Line Parameter/Error Term write %04x\n",data);
 }
 
 /*
@@ -3405,7 +3407,7 @@ READ16_HANDLER(ibm8514_gpstatus_r)
 {
 	UINT16 ret = 0x0000;
 
-	//logerror("S3: 9AE8 read\n");
+	//if(LOG_8514) logerror("S3: 9AE8 read\n");
 	if(ibm8514.gpbusy == true)
 		ret |= 0x0200;
 	if(ibm8514.data_avail == true)
@@ -3462,7 +3464,7 @@ READ16_HANDLER(s3_gpstatus_r)
 {
 	UINT16 ret = 0x0000;
 
-	//logerror("S3: 9AE8 read\n");
+	//if(LOG_8514) logerror("S3: 9AE8 read\n");
 	if(s3.enable_8514 != 0)
 	{
 		if(ibm8514.gpbusy == true)
@@ -3573,7 +3575,7 @@ WRITE16_HANDLER(ibm8514_cmd_w)
 	case 0x0000:  // NOP (for "Short Stroke Vectors")
 		ibm8514.state = IBM8514_IDLE;
 		ibm8514.gpbusy = false;
-		logerror("S3: Command (%04x) - NOP (Short Stroke Vector)\n",s3.current_cmd);
+		if(LOG_8514) logerror("S3: Command (%04x) - NOP (Short Stroke Vector)\n",s3.current_cmd);
 		break;
 	case 0x2000:  // Line
 		ibm8514.state = IBM8514_IDLE;
@@ -3584,12 +3586,12 @@ WRITE16_HANDLER(ibm8514_cmd_w)
 			{
 				ibm8514.state = IBM8514_DRAWING_LINE;
 				ibm8514.data_avail = true;
-				logerror("S3: Command (%04x) - Vector Line (WAIT) %i,%i \n",s3.current_cmd,s3.curr_x,s3.curr_y);
+				if(LOG_8514) logerror("S3: Command (%04x) - Vector Line (WAIT) %i,%i \n",s3.current_cmd,s3.curr_x,s3.curr_y);
 			}
 			else
 			{
 				ibm8514_draw_vector(s3.rect_width,(data & 0x00e0) >> 5,(data & 0010) ? true : false);
-				logerror("S3: Command (%04x) - Vector Line - %i,%i \n",s3.current_cmd,s3.curr_x,s3.curr_y);
+				if(LOG_8514) logerror("S3: Command (%04x) - Vector Line - %i,%i \n",s3.current_cmd,s3.curr_x,s3.curr_y);
 			}
 		}
 		else
@@ -3603,7 +3605,7 @@ WRITE16_HANDLER(ibm8514_cmd_w)
 			int count = 0;
 			INT16 temp;
 
-			logerror("S3: Command (%04x) - Line (Bresenham) - %i,%i  Axial %i, Diagonal %i, Error %i, Major Axis %i, Minor Axis %i\n",s3.current_cmd,
+			if(LOG_8514) logerror("S3: Command (%04x) - Line (Bresenham) - %i,%i  Axial %i, Diagonal %i, Error %i, Major Axis %i, Minor Axis %i\n",s3.current_cmd,
 				s3.curr_x,s3.curr_y,s3.line_axial_step,s3.line_diagonal_step,s3.line_errorterm,s3.rect_width,s3.rect_height);
 
 			if((data & 0x0040))
@@ -3635,11 +3637,11 @@ WRITE16_HANDLER(ibm8514_cmd_w)
 			//ibm8514.gpbusy = true;  // DirectX 5 keeps waiting for the busy bit to be clear...
 			s3.bus_size = (data & 0x0600) >> 9;
 			ibm8514.data_avail = true;
-			logerror("S3: Command (%04x) - Rectangle Fill (WAIT) %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,
+			if(LOG_8514) logerror("S3: Command (%04x) - Rectangle Fill (WAIT) %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,
 					s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
 			break;
 		}
-		logerror("S3: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,
+		if(LOG_8514) logerror("S3: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,
 				s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
 		off = 0;
 		off += (VGA_LINE_LENGTH * s3.curr_y);
@@ -3688,7 +3690,7 @@ WRITE16_HANDLER(ibm8514_cmd_w)
 		ibm8514.gpbusy = false;
 		break;
 	case 0xc000:  // BitBLT
-		logerror("S3: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",s3.current_cmd,
+		if(LOG_8514) logerror("S3: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",s3.current_cmd,
 				s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
 		off = 0;
 		off += (VGA_LINE_LENGTH * s3.dest_y);
@@ -3746,7 +3748,7 @@ WRITE16_HANDLER(ibm8514_cmd_w)
 		ibm8514.gpbusy = false;
 		break;
 	case 0xe000:  // Pattern Fill
-		logerror("S3: Command (%04x) - Pattern Fill - source %i,%i  dest %i,%i  Width: %i Height: %i\n",s3.current_cmd,
+		if(LOG_8514) logerror("S3: Command (%04x) - Pattern Fill - source %i,%i  dest %i,%i  Width: %i Height: %i\n",s3.current_cmd,
 				s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
 		off = 0;
 		off += (VGA_LINE_LENGTH * s3.dest_y);
@@ -3817,7 +3819,7 @@ WRITE16_HANDLER(ibm8514_cmd_w)
 	default:
 		ibm8514.state = IBM8514_IDLE;
 		ibm8514.gpbusy = false;
-		logerror("S3: Unknown command: %04x\n",data);
+		if(LOG_8514) logerror("S3: Unknown command: %04x\n",data);
 	}
 }
 
@@ -3847,7 +3849,7 @@ WRITE16_HANDLER( s3_8ae8_w )
 {
 	s3.line_axial_step = data;
 	s3.dest_y = data;
-	logerror("S3: Line Axial Step / Destination Y write %04x\n",data);
+	if(LOG_8514) logerror("S3: Line Axial Step / Destination Y write %04x\n",data);
 }
 
 /*
@@ -3872,7 +3874,7 @@ WRITE16_HANDLER( s3_8ee8_w )
 {
 	s3.line_diagonal_step = data;
 	s3.dest_x = data;
-	logerror("S3: Line Diagonal Step / Destination X write %04x\n",data);
+	if(LOG_8514) logerror("S3: Line Diagonal Step / Destination X write %04x\n",data);
 }
 
 /*
@@ -4024,7 +4026,7 @@ WRITE16_HANDLER(ibm8514_ssv_w)
 		ibm8514_draw_ssv(data >> 8);
 		ibm8514_draw_ssv(data & 0xff);
 	}
-	logerror("8514/A: Short Stroke Vector write %04x\n",data);
+	if(LOG_8514) logerror("8514/A: Short Stroke Vector write %04x\n",data);
 }
 
 static void ibm8514_wait_draw_vector()
@@ -4114,7 +4116,7 @@ READ16_HANDLER( s3_width_r )
 WRITE16_HANDLER( s3_width_w )
 {
 	s3.rect_width = data & 0x1fff;
-	logerror("S3: Major Axis Pixel Count / Rectangle Width write %04x\n",data);
+	if(LOG_8514) logerror("S3: Major Axis Pixel Count / Rectangle Width write %04x\n",data);
 }
 
 READ16_HANDLER(s3_currentx_r)
@@ -4126,7 +4128,7 @@ WRITE16_HANDLER(s3_currentx_w)
 {
 	s3.curr_x = data;
 	s3.prev_x = data;
-	logerror("S3: Current X set to %04x (%i)\n",data,s3.curr_x);
+	if(LOG_8514) logerror("S3: Current X set to %04x (%i)\n",data,s3.curr_x);
 }
 
 READ16_HANDLER(s3_currenty_r)
@@ -4138,7 +4140,7 @@ WRITE16_HANDLER(s3_currenty_w)
 {
 	s3.curr_y = data;
 	s3.prev_y = data;
-	logerror("S3: Current Y set to %04x (%i)\n",data,s3.curr_y);
+	if(LOG_8514) logerror("S3: Current Y set to %04x (%i)\n",data,s3.curr_y);
 }
 
 READ16_HANDLER(s3_fgcolour_r)
@@ -4149,7 +4151,7 @@ READ16_HANDLER(s3_fgcolour_r)
 WRITE16_HANDLER(s3_fgcolour_w)
 {
 	s3.fgcolour = data;
-	logerror("S3: Foreground Colour write %04x\n",data);
+	if(LOG_8514) logerror("S3: Foreground Colour write %04x\n",data);
 }
 
 READ16_HANDLER(s3_bgcolour_r)
@@ -4160,7 +4162,7 @@ READ16_HANDLER(s3_bgcolour_r)
 WRITE16_HANDLER(s3_bgcolour_w)
 {
 	s3.bgcolour = data;
-	logerror("S3: Background Colour write %04x\n",data);
+	if(LOG_8514) logerror("S3: Background Colour write %04x\n",data);
 }
 
 READ16_HANDLER( s3_multifunc_r )
@@ -4179,7 +4181,7 @@ READ16_HANDLER( s3_multifunc_r )
 		return s3.scissors_right;
 		// TODO: remaining functions
 	default:
-		logerror("S3: Unimplemented multifunction register %i selected\n",s3.multifunc_sel);
+		if(LOG_8514) logerror("S3: Unimplemented multifunction register %i selected\n",s3.multifunc_sel);
 		return 0xff;
 	}
 }
@@ -4196,7 +4198,7 @@ bit  0-10  (911/924) Rectangle Height. Height of BITBLT or rectangle command.
 */
 	case 0x0000:
 		s3.rect_height = data & 0x0fff;
-		logerror("S3: Minor Axis Pixel Count / Rectangle Height write %04x\n",data);
+		if(LOG_8514) logerror("S3: Minor Axis Pixel Count / Rectangle Height write %04x\n",data);
 		break;
 /*
 BEE8h index 01h W(R/W):  Top Scissors Register (SCISSORS_T).
@@ -4221,19 +4223,19 @@ bit  0-10  (911,924) Clipping Right Limit. Defines the right bound of the
  */
 	case 0x1000:
 		s3.scissors_top = data & 0x0fff;
-		logerror("S3: Scissors Top write %04x\n",data);
+		if(LOG_8514) logerror("S3: Scissors Top write %04x\n",data);
 		break;
 	case 0x2000:
 		s3.scissors_left = data & 0x0fff;
-		logerror("S3: Scissors Left write %04x\n",data);
+		if(LOG_8514) logerror("S3: Scissors Left write %04x\n",data);
 		break;
 	case 0x3000:
 		s3.scissors_bottom = data & 0x0fff;
-		logerror("S3: Scissors Bottom write %04x\n",data);
+		if(LOG_8514) logerror("S3: Scissors Bottom write %04x\n",data);
 		break;
 	case 0x4000:
 		s3.scissors_right = data & 0x0fff;
-		logerror("S3: Scissors Right write %04x\n",data);
+		if(LOG_8514) logerror("S3: Scissors Right write %04x\n",data);
 		break;
 /*
 BEE8h index 0Ah W(R/W):  Pixel Control Register (PIX_CNTL).
@@ -4247,7 +4249,7 @@ BIT     2  (911-928) Pack Data. If set image read data is a monochrome bitmap,
  */
 	case 0xa000:
 		s3.pixel_control = data;
-		logerror("S3: Pixel control write %04x\n",data);
+		if(LOG_8514) logerror("S3: Pixel control write %04x\n",data);
 		break;
 /*
 BEE8h index 0Fh W(W):  Read Register Select Register (READ_SEL)    (801/5,928)
@@ -4269,9 +4271,9 @@ bit   0-2  (911-928) READ-REG-SEL. Read Register Select. Selects the register
  */
 	case 0xf000:
 		s3.multifunc_sel = data & 0x000f;
-		logerror("S3: Multifunction select write %04x\n",data);
+		if(LOG_8514) logerror("S3: Multifunction select write %04x\n",data);
 	default:
-		logerror("S3: Unimplemented multifunction register %i write %03x\n",data >> 12,data & 0x0fff);
+		if(LOG_8514) logerror("S3: Unimplemented multifunction register %i write %03x\n",data >> 12,data & 0x0fff);
 	}
 }
 
@@ -4467,7 +4469,7 @@ READ16_HANDLER(s3_backmix_r)
 WRITE16_HANDLER(s3_backmix_w)
 {
 	s3.bgmix = data;
-	logerror("S3: BG Mix write %04x\n",data);
+	if(LOG_8514) logerror("S3: BG Mix write %04x\n",data);
 }
 
 READ16_HANDLER(s3_foremix_r)
@@ -4478,7 +4480,7 @@ READ16_HANDLER(s3_foremix_r)
 WRITE16_HANDLER(s3_foremix_w)
 {
 	s3.fgmix = data;
-	logerror("S3: FG Mix write %04x\n",data);
+	if(LOG_8514) logerror("S3: FG Mix write %04x\n",data);
 }
 
 READ16_HANDLER(s3_pixel_xfer_r)
@@ -4505,7 +4507,7 @@ WRITE16_HANDLER(s3_pixel_xfer_w)
 	if(ibm8514.state == IBM8514_DRAWING_LINE)
 		ibm8514_wait_draw_vector();
 
-	logerror("S3: Pixel Transfer = %08x\n",s3.pixel_xfer);
+	if(LOG_8514) logerror("S3: Pixel Transfer = %08x\n",s3.pixel_xfer);
 }
 
 READ8_HANDLER( s3_mem_r )
@@ -4739,7 +4741,7 @@ WRITE8_HANDLER( s3_mem_w )
 			s3_multifunc_w(space,0,s3.mmio_bee8,0xffff);
 			break;
 		default:
-			logerror("S3: MMIO offset %05x write %02x\n",offset+0xa0000,data);
+			if(LOG_8514) logerror("S3: MMIO offset %05x write %02x\n",offset+0xa0000,data);
 		}
 		return;
 	}
@@ -5106,7 +5108,7 @@ WRITE16_HANDLER(ibm8514_htotal_w)
 {
 	ibm8514.htotal = data & 0x01ff;
 	//vga.crtc.horz_total = data & 0x01ff;
-	logerror("8514/A: Horizontal total write %04x\n",data);
+	if(LOG_8514) logerror("8514/A: Horizontal total write %04x\n",data);
 }
 
 /*
@@ -5158,7 +5160,7 @@ WRITE16_HANDLER(ibm8514_subcontrol_w)
 {
 	ibm8514.subctrl = data;
 	ibm8514.substatus &= ~(data & 0x0f);  // reset interrupts
-//  logerror("8514/A: Subsystem control write %04x\n",data);
+//  if(LOG_8514) logerror("8514/A: Subsystem control write %04x\n",data);
 }
 
 READ16_HANDLER(ibm8514_subcontrol_r)
@@ -5180,7 +5182,7 @@ WRITE16_HANDLER(ibm8514_vtotal_w)
 {
 	ibm8514.vtotal = data;
 //  vga.crtc.vert_total = data;
-	logerror("8514/A: Vertical total write %04x\n",data);
+	if(LOG_8514) logerror("8514/A: Vertical total write %04x\n",data);
 }
 
 READ16_HANDLER(ibm8514_vdisp_r)
@@ -5192,7 +5194,7 @@ WRITE16_HANDLER(ibm8514_vdisp_w)
 {
 	ibm8514.vdisp = data;
 //  vga.crtc.vert_disp_end = data >> 3;
-	logerror("8514/A: Vertical Displayed write %04x\n",data);
+	if(LOG_8514) logerror("8514/A: Vertical Displayed write %04x\n",data);
 }
 
 READ16_HANDLER(ibm8514_vsync_r)
@@ -5203,7 +5205,7 @@ READ16_HANDLER(ibm8514_vsync_r)
 WRITE16_HANDLER(ibm8514_vsync_w)
 {
 	ibm8514.vsync = data;
-	logerror("8514/A: Vertical Sync write %04x\n",data);
+	if(LOG_8514) logerror("8514/A: Vertical Sync write %04x\n",data);
 }
 
 READ16_HANDLER(mach8_ec0_r)
@@ -5214,7 +5216,7 @@ READ16_HANDLER(mach8_ec0_r)
 WRITE16_HANDLER(mach8_ec0_w)
 {
 	ibm8514.ec0 = data;
-	logerror("8514/A: Extended configuration 0 write %04x\n",data);
+	if(LOG_8514) logerror("8514/A: Extended configuration 0 write %04x\n",data);
 }
 
 READ16_HANDLER(mach8_ec1_r)
@@ -5225,7 +5227,7 @@ READ16_HANDLER(mach8_ec1_r)
 WRITE16_HANDLER(mach8_ec1_w)
 {
 	ibm8514.ec1 = data;
-	logerror("8514/A: Extended configuration 1 write %04x\n",data);
+	if(LOG_8514) logerror("8514/A: Extended configuration 1 write %04x\n",data);
 }
 
 READ16_HANDLER(mach8_ec2_r)
@@ -5236,7 +5238,7 @@ READ16_HANDLER(mach8_ec2_r)
 WRITE16_HANDLER(mach8_ec2_w)
 {
 	ibm8514.ec2 = data;
-	logerror("8514/A: Extended configuration 2 write %04x\n",data);
+	if(LOG_8514) logerror("8514/A: Extended configuration 2 write %04x\n",data);
 }
 
 READ16_HANDLER(mach8_ec3_r)
@@ -5247,7 +5249,7 @@ READ16_HANDLER(mach8_ec3_r)
 WRITE16_HANDLER(mach8_ec3_w)
 {
 	ibm8514.ec3 = data;
-	logerror("8514/A: Extended configuration 3 write %04x\n",data);
+	if(LOG_8514) logerror("8514/A: Extended configuration 3 write %04x\n",data);
 }
 
 READ16_HANDLER(mach8_ext_fifo_r)
@@ -5258,7 +5260,7 @@ READ16_HANDLER(mach8_ext_fifo_r)
 WRITE16_HANDLER(mach8_linedraw_index_w)
 {
 	ati.linedraw = data & 0x07;
-	logerror("Mach8: Line Draw Index write %04x\n",data);
+	if(LOG_8514) logerror("Mach8: Line Draw Index write %04x\n",data);
 }
 
 READ16_HANDLER(mach8_bresenham_count_r)
@@ -5269,7 +5271,7 @@ READ16_HANDLER(mach8_bresenham_count_r)
 WRITE16_HANDLER(mach8_bresenham_count_w)
 {
 	s3.rect_width = data & 0x1fff;
-	logerror("Mach8: Bresenham count write %04x\n",data);
+	if(LOG_8514) logerror("Mach8: Bresenham count write %04x\n",data);
 }
 
 WRITE16_HANDLER(mach8_linedraw_w)
@@ -5313,7 +5315,7 @@ READ16_HANDLER(mach8_scratch0_r)
 WRITE16_HANDLER(mach8_scratch0_w)
 {
 	ati.scratch0 = data;
-	logerror("Mach8: Scratch Pad 0 write %04x\n",data);
+	if(LOG_8514) logerror("Mach8: Scratch Pad 0 write %04x\n",data);
 }
 
 READ16_HANDLER(mach8_scratch1_r)
@@ -5324,7 +5326,7 @@ READ16_HANDLER(mach8_scratch1_r)
 WRITE16_HANDLER(mach8_scratch1_w)
 {
 	ati.scratch1 = data;
-	logerror("Mach8: Scratch Pad 1 write %04x\n",data);
+	if(LOG_8514) logerror("Mach8: Scratch Pad 1 write %04x\n",data);
 }
 
 /*
