@@ -39,6 +39,7 @@
         * A few of the games have an extra 18K pull-up resistor on the
           blue color gun, Carnival, for example.
           Colors inaccurate?  Blue background?
+        * Do other games have coinage hardware like nsub?
         * DIP switches need verifying in most of the games
         * DIP switch locations need to be added to some
 
@@ -75,7 +76,7 @@
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(vicdual_state::clear_coin_status)
+TIMER_DEVICE_CALLBACK_MEMBER(vicdual_state::clear_coin_status)
 {
 	m_coin_status = 0;
 }
@@ -97,7 +98,7 @@ void vicdual_state::coin_in()
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 		/* simulate the coin switch being closed for a while */
-		machine().scheduler().timer_set(4 * machine().primary_screen->frame_period(), timer_expired_delegate(FUNC(vicdual_state::clear_coin_status),this));
+		m_coinstate_timer->adjust(attotime::from_msec(50));
 }
 
 INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
@@ -218,10 +219,26 @@ WRITE8_MEMBER(vicdual_state::vicdual_characterram_w)
  *
  *************************************/
 
+void vicdual_state::machine_start()
+{
+	m_coin_status = 0;
+	m_palette_bank = 0;
+
+	save_item(NAME(m_coin_status));
+	save_item(NAME(m_palette_bank));
+}
+
+void vicdual_state::machine_reset()
+{
+}
+
+
 static MACHINE_CONFIG_START( vicdual_root, vicdual_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, VICDUAL_MAIN_CPU_CLOCK)
+
+	MCFG_TIMER_DRIVER_ADD("coinstate", vicdual_state, clear_coin_status)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -490,6 +507,7 @@ static MACHINE_CONFIG_DERIVED( frogs, vicdual_root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(frogs_map)
 	MCFG_CPU_IO_MAP(frogs_io_map)
+
 	MCFG_MACHINE_START_OVERRIDE(vicdual_state,frogs_audio)
 
 	/* video hardware */
@@ -2080,12 +2098,22 @@ static INPUT_PORTS_START( samurai )
 INPUT_PORTS_END
 
 
+MACHINE_START_MEMBER(vicdual_state,samurai)
+{
+	m_samurai_protection_data = 0;
+	save_item(NAME(m_samurai_protection_data));
+
+	machine_start();
+}
+
 static MACHINE_CONFIG_DERIVED( samurai, vicdual_root )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(samurai_map)
 	MCFG_CPU_IO_MAP(samurai_io_map)
+
+	MCFG_MACHINE_START_OVERRIDE(vicdual_state,samurai)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2137,6 +2165,60 @@ static ADDRESS_MAP_START( nsub_io_map, AS_IO, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
+// coinage is handled by extra hardware on a daughterboard, put before the coin-in pin on the main logic board
+// IC board "COIN CALCULATOR" (97201-P): two 74191 counters, a 555 timer, coin meters, and lots of other TTL
+TIMER_DEVICE_CALLBACK_MEMBER(vicdual_state::nsub_coin_pulse)
+{
+	if (m_nsub_play_counter > 0)
+	{
+		m_nsub_play_counter--;
+		coin_in();
+	}
+}
+
+INPUT_CHANGED_MEMBER(vicdual_state::nsub_coin_in)
+{
+	if (newval)
+	{
+		int which = (int)(FPTR)param;
+		int coinage = ioport("COINAGE")->read();
+
+		switch (which)
+		{
+			// normal coin
+			case 0: case 1:
+				if (which && ~coinage & 0x40)
+				{
+					// x credits per coin
+					m_nsub_play_counter += (coinage >> 3 & 7);
+				}
+				else
+				{
+					// x coins per credit
+					if (--m_nsub_coin_counter == 0)
+					{
+						m_nsub_coin_counter = coinage & 7;
+						m_nsub_play_counter++;
+					}
+				}
+				
+				// increment coin counter
+				coin_counter_w(machine(), which, 1);
+				coin_counter_w(machine(), which, 0);
+				break;
+
+			// service coin
+			case 2:
+				m_nsub_play_counter++;
+				break;
+			
+			default:
+				break;
+		}
+	}
+}
+
+
 static INPUT_PORTS_START( nsub )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -2150,29 +2232,57 @@ static INPUT_PORTS_START( nsub )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_composite_blank_comp, NULL)
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME(0x08,  0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME(0x10,  0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME(0x20,  0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME(0x40,  0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_read_coin_status, NULL)
 
-	PORT_COIN_DEFAULT
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vicdual_state,nsub_coin_in, (void*)0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vicdual_state,nsub_coin_in, (void*)1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CHANGED_MEMBER(DEVICE_SELF, vicdual_state,nsub_coin_in, (void*)2)
+
+	PORT_START("COINAGE") // "OPTION SW." on daughterboard
+	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW:1,2,3")
+	PORT_DIPSETTING(    0x07, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
+//	PORT_DIPSETTING(    0x00, DEF_STR( 0C_1C ) ) // invalid
+	PORT_DIPNAME( 0x78, 0x08, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW:4,5,6,7")
+	PORT_DIPSETTING(    0x40, "Shared With Coin A" )
+//	PORT_DIPSETTING(    0x00, DEF_STR( 1C_0C ) ) // invalid
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_7C ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW:8" )
 INPUT_PORTS_END
 
+
+MACHINE_START_MEMBER(vicdual_state,nsub)
+{
+	m_nsub_play_counter = 0;
+	save_item(NAME(m_nsub_coin_counter));
+	save_item(NAME(m_nsub_play_counter));
+
+	machine_start();
+
+	// playcounter 555 timer frequency is unknown
+	// keep in mind that intervals need to be longer than the main coin_in timeout
+	m_nsub_coinage_timer->adjust(attotime::zero, 0, attotime::from_msec(150));
+}
+
+MACHINE_RESET_MEMBER(vicdual_state,nsub)
+{
+	m_nsub_coin_counter = ioport("COINAGE")->read() & 7;
+	
+	machine_reset();
+}
 
 static MACHINE_CONFIG_DERIVED( nsub, vicdual_root )
 
@@ -2180,6 +2290,11 @@ static MACHINE_CONFIG_DERIVED( nsub, vicdual_root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nsub_map)
 	MCFG_CPU_IO_MAP(nsub_io_map)
+
+	MCFG_TIMER_DRIVER_ADD("nsub_coin", vicdual_state, nsub_coin_pulse)
+
+	MCFG_MACHINE_START_OVERRIDE(vicdual_state,nsub)
+	MCFG_MACHINE_RESET_OVERRIDE(vicdual_state,nsub)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

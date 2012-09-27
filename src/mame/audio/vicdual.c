@@ -139,6 +139,8 @@ static TIMER_CALLBACK( frogs_croak_callback )
 MACHINE_START_MEMBER(vicdual_state,frogs_audio)
 {
 	frogs_croak_timer = machine().scheduler().timer_alloc(FUNC(frogs_croak_callback));
+
+	machine_start();
 }
 
 
