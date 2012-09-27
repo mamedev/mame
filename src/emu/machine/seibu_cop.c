@@ -20,16 +20,18 @@ const device_type SEIBU_COP = &device_creator<seibu_cop_device>;
 
 
 static ADDRESS_MAP_START( seibu_cop_io, AS_0, 16, seibu_cop_device )
-	AM_RANGE(0x0028, 0x0029) AM_WRITE(dma_fill_val_lo_w)
-	AM_RANGE(0x002a, 0x002b) AM_WRITE(dma_fill_val_hi_w)
-	AM_RANGE(0x005a, 0x005b) AM_WRITE(pal_brightness_val_w)
-	AM_RANGE(0x005c, 0x005d) AM_WRITE(pal_brightness_mode_w)
-	AM_RANGE(0x0074, 0x0075) AM_WRITE(dma_unk_param_w)
-	AM_RANGE(0x0076, 0x0077) AM_WRITE(dma_pal_fade_table_w)
-	AM_RANGE(0x0078, 0x0079) AM_WRITE(dma_src_w)
-	AM_RANGE(0x007a, 0x007b) AM_WRITE(dma_size_w)
-	AM_RANGE(0x007c, 0x007d) AM_WRITE(dma_dst_w)
-	AM_RANGE(0x007e, 0x007f) AM_WRITE(dma_trigger_w)
+	AM_RANGE(0x0428, 0x0429) AM_WRITE(dma_fill_val_lo_w)
+	AM_RANGE(0x042a, 0x042b) AM_WRITE(dma_fill_val_hi_w)
+
+	AM_RANGE(0x045a, 0x045b) AM_WRITE(pal_brightness_val_w)
+	AM_RANGE(0x045c, 0x045d) AM_WRITE(pal_brightness_mode_w)
+
+	AM_RANGE(0x0474, 0x0475) AM_WRITE(dma_unk_param_w)
+	AM_RANGE(0x0476, 0x0477) AM_WRITE(dma_pal_fade_table_w)
+	AM_RANGE(0x0478, 0x0479) AM_WRITE(dma_src_w)
+	AM_RANGE(0x047a, 0x047b) AM_WRITE(dma_size_w)
+	AM_RANGE(0x047c, 0x047d) AM_WRITE(dma_dst_w)
+	AM_RANGE(0x047e, 0x047f) AM_WRITE(dma_trigger_w)
 ADDRESS_MAP_END
 
 
@@ -204,10 +206,10 @@ WRITE16_MEMBER(seibu_cop_device::dma_trigger_w)
 
 READ16_MEMBER( seibu_cop_device::read )
 {
-	return read_word(offset);
+	return read_word(offset + (0x400/2));
 }
 
 WRITE16_MEMBER( seibu_cop_device::write )
 {
-	write_word(offset,data);
+	write_word(offset + (0x400/2),data);
 }
