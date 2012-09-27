@@ -43,6 +43,8 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset();
 private:
+	UINT8 m_porta;
+	UINT8 m_portb;
 	UINT8 m_t_c;
 	UINT8 m_out_offs;
 };
@@ -58,6 +60,44 @@ static ADDRESS_MAP_START( spectra_map, AS_PROGRAM, 8, spectra_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( spectra )
+	PORT_START("X0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_START("X1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_START("X2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_START("X3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_TILT)
+	PORT_DIPNAME( 0x60, 0x60, "Test Switch" ) // 3-position slide switch
+	PORT_DIPSETTING(    0x60, "Play" )
+	PORT_DIPSETTING(    0x20, "Setup" )
+	PORT_DIPSETTING(    0x40, "Test" )
 INPUT_PORTS_END
 
 void spectra_state::machine_reset()
@@ -66,21 +106,30 @@ void spectra_state::machine_reset()
 }
 
 READ8_MEMBER( spectra_state::porta_r )
-{printf("ReadA ");
-	return 0;
+{
+	char kbdrow[6];
+	sprintf(kbdrow,"X%X",(m_porta & 0x18) >> 3);
+	UINT8 data = ioport(kbdrow)->read();
+	return ((BIT(data, m_porta & 7)) ? 0x40 : 0) | (m_porta & 0xbf);
 }
 
 READ8_MEMBER( spectra_state::portb_r )
-{printf("ReadB ");
-	return 0x5a;
+{
+	if (m_p_ram[0xf0] != 1)
+		return 0x5a; // factory reset if first time
+	else
+		return m_portb;
 }
 
 WRITE8_MEMBER( spectra_state::porta_w )
-{printf("A=%X ",data);
+{
+	m_porta = data;
 }
 
+// sound port
 WRITE8_MEMBER( spectra_state::portb_w )
-{printf("B=%X ",data);
+{
+	m_portb = data;
 }
 
 
@@ -101,13 +150,20 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::nmitimer)
 		m_t_c++;
 }
 
+// 00-27 displays
+// 40-6F lamps
+// 70-7F solenoids (73=outhole) no knocker
 TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x38, 0x63, 0x01, 0x40, 0x08, 0 }; // 74C912
+	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x5c, 0x63, 0x01, 0x40, 0x08, 0 }; // 74C912
 	m_out_offs++;
 
 	if (m_out_offs < 0x28)
-		output_set_digit_value(m_out_offs, patterns[m_p_ram[m_out_offs]&15]);
+	{
+		UINT8 data = m_p_ram[m_out_offs];
+		UINT8 segments = patterns[data&15] | (BIT(data, 4) ? 0x80 : 0);
+		output_set_digit_value(m_out_offs, segments);
+	}
 	else
 		m_out_offs = 0xff;
 }
@@ -117,7 +173,7 @@ static MACHINE_CONFIG_START( spectra, spectra_state )
 	MCFG_CPU_ADD("maincpu", M6502, 3579545/4)  // actually a 6503
 	MCFG_CPU_PROGRAM_MAP(spectra_map)
 	MCFG_RIOT6532_ADD("riot", 3579545/4, riot6532_intf) // R6532
-	MCFG_NVRAM_ADD_0FILL("ram")
+	MCFG_NVRAM_ADD_1FILL("ram")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", spectra_state, nmitimer, attotime::from_hz(120))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("outtimer", spectra_state, outtimer, attotime::from_hz(1200))
 
