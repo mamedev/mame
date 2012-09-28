@@ -66,6 +66,10 @@ public:
 	DECLARE_VIDEO_START(cinemat_qb3color);
 	UINT32 screen_update_cinemat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_READ8_MEMBER(sound_porta_r);
+	DECLARE_READ8_MEMBER(sound_portb_r);
+	DECLARE_WRITE8_MEMBER(sound_portb_w);
+	DECLARE_WRITE8_MEMBER(sound_output_w);
 };
 
 /*----------- defined in audio/cinemat.c -----------*/

@@ -102,6 +102,14 @@ public:
 	INTERRUPT_GEN_MEMBER(segag80r_vblank_start);
 	INTERRUPT_GEN_MEMBER(sindbadm_vblank_start);
 	TIMER_CALLBACK_MEMBER(vblank_latch_clear);
+	DECLARE_WRITE8_MEMBER(sega005_sound_a_w);
+	DECLARE_WRITE8_MEMBER(sega005_sound_b_w);
+	DECLARE_WRITE8_MEMBER(monsterb_sound_a_w);
+	DECLARE_WRITE8_MEMBER(monsterb_sound_b_w);
+	DECLARE_READ8_MEMBER(n7751_status_r);
+	DECLARE_WRITE8_MEMBER(n7751_command_w);
+	DECLARE_WRITE8_MEMBER(n7751_rom_control_w);
+	DECLARE_WRITE8_MEMBER(n7751_p2_w);
 };
 
 

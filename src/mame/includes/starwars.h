@@ -63,6 +63,9 @@ public:
 	DECLARE_DRIVER_INIT(starwars);
 	virtual void machine_reset();
 	TIMER_CALLBACK_MEMBER(math_run_clear);
+	DECLARE_READ8_MEMBER(r6532_porta_r);
+	DECLARE_WRITE8_MEMBER(r6532_porta_w);
+	DECLARE_WRITE_LINE_MEMBER(snd_interrupt);
 };
 
 

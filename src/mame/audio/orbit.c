@@ -13,26 +13,26 @@
  *
  *************************************/
 
-WRITE8_DEVICE_HANDLER( orbit_note_w )
+WRITE8_MEMBER(orbit_state::orbit_note_w)
 {
-	discrete_sound_w(device, space, ORBIT_NOTE_FREQ, (~data) & 0xff);
+	discrete_sound_w(m_discrete, space, ORBIT_NOTE_FREQ, (~data) & 0xff);
 }
 
-WRITE8_DEVICE_HANDLER( orbit_note_amp_w )
+WRITE8_MEMBER(orbit_state::orbit_note_amp_w)
 {
-	discrete_sound_w(device, space, ORBIT_ANOTE1_AMP, data & 0x0f);
-	discrete_sound_w(device, space, ORBIT_ANOTE2_AMP, data >> 4);
+	discrete_sound_w(m_discrete, space, ORBIT_ANOTE1_AMP, data & 0x0f);
+	discrete_sound_w(m_discrete, space, ORBIT_ANOTE2_AMP, data >> 4);
 }
 
-WRITE8_DEVICE_HANDLER( orbit_noise_amp_w )
+WRITE8_MEMBER(orbit_state::orbit_noise_amp_w)
 {
-	discrete_sound_w(device, space, ORBIT_NOISE1_AMP, data & 0x0f);
-	discrete_sound_w(device, space, ORBIT_NOISE2_AMP, data >> 4);
+	discrete_sound_w(m_discrete, space, ORBIT_NOISE1_AMP, data & 0x0f);
+	discrete_sound_w(m_discrete, space, ORBIT_NOISE2_AMP, data >> 4);
 }
 
-WRITE8_DEVICE_HANDLER( orbit_noise_rst_w )
+WRITE8_MEMBER(orbit_state::orbit_noise_rst_w)
 {
-	discrete_sound_w(device, space, ORBIT_NOISE_EN, 0);
+	discrete_sound_w(m_discrete, space, ORBIT_NOISE_EN, 0);
 }
 
 

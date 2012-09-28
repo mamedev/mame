@@ -83,6 +83,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_senjyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(senjyo_interrupt);
+	DECLARE_READ8_MEMBER(pio_pa_r);
 };
 
 /*----------- defined in audio/senjyo.c -----------*/

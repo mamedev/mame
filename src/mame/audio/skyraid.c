@@ -283,7 +283,7 @@ DISCRETE_SOUND_START( skyraid )
 DISCRETE_SOUND_END
 
 
-WRITE8_DEVICE_HANDLER( skyraid_sound_w )
+WRITE8_MEMBER(skyraid_state::skyraid_sound_w)
 {
 	/* BIT0 => PLANE SWEEP */
 	/* BIT1 => MISSILE     */
@@ -292,10 +292,10 @@ WRITE8_DEVICE_HANDLER( skyraid_sound_w )
 	/* BIT4 => PLANE ON    */
 	/* BIT5 => ATTRACT     */
 
-	discrete_sound_w(device, space, SKYRAID_PLANE_SWEEP_EN, data & 0x01);
-	discrete_sound_w(device, space, SKYRAID_MISSILE_EN, data & 0x02);
-	discrete_sound_w(device, space, SKYRAID_EXPLOSION_EN, data & 0x04);
-	set_led_status(space.machine(), 0, !(data & 0x08));
-	discrete_sound_w(device, space, SKYRAID_PLANE_ON_EN, data & 0x10);
-	discrete_sound_w(device, space, SKYRAID_ATTRACT_EN, data & 0x20);
+	discrete_sound_w(m_discrete, space, SKYRAID_PLANE_SWEEP_EN, data & 0x01);
+	discrete_sound_w(m_discrete, space, SKYRAID_MISSILE_EN, data & 0x02);
+	discrete_sound_w(m_discrete, space, SKYRAID_EXPLOSION_EN, data & 0x04);
+	set_led_status(machine(), 0, !(data & 0x08));
+	discrete_sound_w(m_discrete, space, SKYRAID_PLANE_ON_EN, data & 0x10);
+	discrete_sound_w(m_discrete, space, SKYRAID_ATTRACT_EN, data & 0x20);
 }

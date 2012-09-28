@@ -9,7 +9,8 @@ public:
 		m_pos_h_ram(*this, "pos_h_ram"),
 		m_pos_v_ram(*this, "pos_v_ram"),
 		m_pos_d_ram(*this, "pos_d_ram"),
-		m_team(*this, "team"){ }
+		m_team(*this, "team"),
+		m_discrete(*this, "discrete"){ }
 
 	int m_steer_dir[8];
 	int m_steer_flag[8];
@@ -21,6 +22,7 @@ public:
 	required_shared_ptr<UINT8> m_pos_v_ram;
 	required_shared_ptr<UINT8> m_pos_d_ram;
 	required_shared_ptr<UINT8> m_team;
+	required_device<discrete_device> m_discrete;
 	tilemap_t* m_tilemap1;
 	tilemap_t* m_tilemap2;
 	bitmap_ind16 m_helper1;
@@ -39,6 +41,10 @@ public:
 	void screen_eof_sprint8(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(sprint8_collision_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(input_callback);
+	DECLARE_WRITE8_MEMBER(sprint8_crash_w);
+	DECLARE_WRITE8_MEMBER(sprint8_screech_w);
+	DECLARE_WRITE8_MEMBER(sprint8_attract_w);
+	DECLARE_WRITE8_MEMBER(sprint8_motor_w);
 };
 
 /*----------- defined in drivers/sprint8.c -----------*/
@@ -47,8 +53,3 @@ void sprint8_set_collision(running_machine &machine, int n);
 /*----------- defined in audio/sprint8.c -----------*/
 
 DISCRETE_SOUND_EXTERN( sprint8 );
-
-DECLARE_WRITE8_DEVICE_HANDLER( sprint8_crash_w );
-DECLARE_WRITE8_DEVICE_HANDLER( sprint8_screech_w );
-DECLARE_WRITE8_DEVICE_HANDLER( sprint8_attract_w );
-DECLARE_WRITE8_DEVICE_HANDLER( sprint8_motor_w );

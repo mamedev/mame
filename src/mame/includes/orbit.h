@@ -21,11 +21,14 @@ public:
 	orbit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_playfield_ram(*this, "playfield_ram"),
-		m_sprite_ram(*this, "sprite_ram"){ }
+		m_sprite_ram(*this, "sprite_ram"),
+		m_discrete(*this, "discrete"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_playfield_ram;
 	required_shared_ptr<UINT8> m_sprite_ram;
+	
+	required_device<discrete_device> m_discrete;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -36,7 +39,6 @@ public:
 
 	/* devices */
 	cpu_device *m_maincpu;
-	device_t *m_discrete;
 	DECLARE_WRITE8_MEMBER(orbit_misc_w);
 	DECLARE_WRITE8_MEMBER(orbit_playfield_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -47,10 +49,11 @@ public:
 	INTERRUPT_GEN_MEMBER(orbit_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_off);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_32v);
+	DECLARE_WRITE8_MEMBER(orbit_note_w);
+	DECLARE_WRITE8_MEMBER(orbit_note_amp_w);
+	DECLARE_WRITE8_MEMBER(orbit_noise_amp_w);
+	DECLARE_WRITE8_MEMBER(orbit_noise_rst_w);
 };
 /*----------- defined in audio/orbit.c -----------*/
-DECLARE_WRITE8_DEVICE_HANDLER( orbit_note_w );
-DECLARE_WRITE8_DEVICE_HANDLER( orbit_note_amp_w );
-DECLARE_WRITE8_DEVICE_HANDLER( orbit_noise_amp_w );
-DECLARE_WRITE8_DEVICE_HANDLER( orbit_noise_rst_w );
+
 DISCRETE_SOUND_EXTERN( orbit );

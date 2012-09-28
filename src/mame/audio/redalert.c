@@ -40,7 +40,7 @@
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( redalert_analog_w )
+WRITE8_MEMBER(redalert_state::redalert_analog_w)
 {
 	/* this port triggers analog sounds
        D0 = Formation Aircraft?
@@ -74,9 +74,9 @@ WRITE8_MEMBER(redalert_state::redalert_audio_command_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( redalert_AY8910_w )
+WRITE8_MEMBER(redalert_state::redalert_AY8910_w)
 {
-	redalert_state *state = space.machine().driver_data<redalert_state>();
+	device_t *device = machine().device("aysnd");
 	/* BC2 is connected to a pull-up resistor, so BC2=1 always */
 	switch (data & 0x03)
 	{
@@ -86,7 +86,7 @@ static WRITE8_DEVICE_HANDLER( redalert_AY8910_w )
 
 		/* BC1=1, BDIR=0 : read from PSG */
 		case 0x01:
-			state->m_ay8910_latch_1 = ay8910_r(device, space, 0);
+			m_ay8910_latch_1 = ay8910_r(device, space, 0);
 			break;
 
 		/* BC1=0, BDIR=1 : write to PSG */
@@ -94,7 +94,7 @@ static WRITE8_DEVICE_HANDLER( redalert_AY8910_w )
 		case 0x02:
 		case 0x03:
 		default:
-			ay8910_data_address_w(device, space, data, state->m_ay8910_latch_2);
+			ay8910_data_address_w(device, space, data, m_ay8910_latch_2);
 			break;
 	}
 }
@@ -119,14 +119,14 @@ static const ay8910_interface redalert_ay8910_interface =
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,		/* port A/B read */
 	DEVCB_NULL,
-	DEVCB_HANDLER(redalert_analog_w)	/* port A/B write */
+	DEVCB_DRIVER_MEMBER(redalert_state,redalert_analog_w)	/* port A/B write */
 };
 
 
 static ADDRESS_MAP_START( redalert_audio_map, AS_PROGRAM, 8, redalert_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0ffe) AM_READNOP AM_DEVWRITE_LEGACY("aysnd", redalert_AY8910_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0ffe) AM_READNOP AM_WRITE(redalert_AY8910_w)
 	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x0ffe) AM_READWRITE(redalert_ay8910_latch_1_r, redalert_ay8910_latch_2_w)
 	AM_RANGE(0x2000, 0x6fff) AM_NOP
 	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_ROM
@@ -159,15 +159,15 @@ WRITE8_MEMBER(redalert_state::redalert_voice_command_w)
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( sod_callback )
+WRITE_LINE_MEMBER(redalert_state::sod_callback)
 {
-	hc55516_digit_w(device->machine().device("cvsd"), state);
+	hc55516_digit_w(machine().device("cvsd"), state);
 }
 
 
-static READ_LINE_DEVICE_HANDLER( sid_callback )
+READ_LINE_MEMBER(redalert_state::sid_callback)
 {
-	return hc55516_clock_state_r(device->machine().device("cvsd"));
+	return hc55516_clock_state_r(machine().device("cvsd"));
 }
 
 
@@ -175,8 +175,8 @@ static I8085_CONFIG( redalert_voice_i8085_config )
 {
 	DEVCB_NULL,					/* STATUS changed callback */
 	DEVCB_NULL,					/* INTE changed callback */
-	DEVCB_LINE(sid_callback),	/* SID changed callback (8085A only) */
-	DEVCB_LINE(sod_callback)	/* SOD changed callback (8085A only) */
+	DEVCB_DRIVER_LINE_MEMBER(redalert_state,sid_callback),	/* SID changed callback (8085A only) */
+	DEVCB_DRIVER_LINE_MEMBER(redalert_state,sod_callback)	/* SOD changed callback (8085A only) */
 };
 
 
@@ -286,57 +286,54 @@ WRITE8_MEMBER(redalert_state::demoneye_audio_command_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( demoneye_ay8910_latch_1_w )
+WRITE8_MEMBER(redalert_state::demoneye_ay8910_latch_1_w)
 {
-	redalert_state *state = space.machine().driver_data<redalert_state>();
-	state->m_ay8910_latch_1 = data;
+	m_ay8910_latch_1 = data;
 }
 
 
-static READ8_DEVICE_HANDLER( demoneye_ay8910_latch_2_r )
+READ8_MEMBER(redalert_state::demoneye_ay8910_latch_2_r)
 {
-	redalert_state *state = space.machine().driver_data<redalert_state>();
-	return state->m_ay8910_latch_2;
+	return m_ay8910_latch_2;
 }
 
 
-static WRITE8_DEVICE_HANDLER( demoneye_ay8910_data_w )
+WRITE8_MEMBER(redalert_state::demoneye_ay8910_data_w)
 {
-	redalert_state *state = space.machine().driver_data<redalert_state>();
-	device_t *ay1 = space.machine().device("ay1");
-	device_t *ay2 = space.machine().device("ay2");
+	device_t *ay1 = machine().device("ay1");
+	device_t *ay2 = machine().device("ay2");
 
-	switch (state->m_ay8910_latch_1 & 0x03)
+	switch (m_ay8910_latch_1 & 0x03)
 	{
 		case 0x00:
-			if (state->m_ay8910_latch_1 & 0x10)
+			if (m_ay8910_latch_1 & 0x10)
 				ay8910_data_w(ay1, space, 0, data);
 
-			if (state->m_ay8910_latch_1 & 0x20)
+			if (m_ay8910_latch_1 & 0x20)
 				ay8910_data_w(ay2, space, 0, data);
 
 			break;
 
 		case 0x01:
-			if (state->m_ay8910_latch_1 & 0x10)
-				state->m_ay8910_latch_2 = ay8910_r(ay1, space, 0);
+			if (m_ay8910_latch_1 & 0x10)
+				m_ay8910_latch_2 = ay8910_r(ay1, space, 0);
 
-			if (state->m_ay8910_latch_1 & 0x20)
-				state->m_ay8910_latch_2 = ay8910_r(ay2, space, 0);
+			if (m_ay8910_latch_1 & 0x20)
+				m_ay8910_latch_2 = ay8910_r(ay2, space, 0);
 
 			break;
 
 		case 0x03:
-			if (state->m_ay8910_latch_1 & 0x10)
+			if (m_ay8910_latch_1 & 0x10)
 				ay8910_address_w(ay1, space, 0, data);
 
-			if (state->m_ay8910_latch_1 & 0x20)
+			if (m_ay8910_latch_1 & 0x20)
 				ay8910_address_w(ay2, space, 0, data);
 
 			break;
 
 		default:
-			logerror("demoneye_ay8910_data_w called with latch %02X  data %02X\n", state->m_ay8910_latch_1, data);
+			logerror("demoneye_ay8910_data_w called with latch %02X  data %02X\n", m_ay8910_latch_1, data);
 			break;
 	}
 }
@@ -363,14 +360,14 @@ static const ay8910_interface demoneye_ay8910_interface =
 
 static const pia6821_interface demoneye_pia_intf =
 {
-	DEVCB_HANDLER(demoneye_ay8910_latch_2_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(redalert_state,demoneye_ay8910_latch_2_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(demoneye_ay8910_data_w),			/* port A out */
-	DEVCB_HANDLER(demoneye_ay8910_latch_1_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(redalert_state,demoneye_ay8910_data_w),			/* port A out */
+	DEVCB_DRIVER_MEMBER(redalert_state,demoneye_ay8910_latch_1_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */

@@ -36,9 +36,9 @@ DISCRETE_SOUND_START(blockade)
 	DISCRETE_OUTPUT(NODE_10, 7500)
 DISCRETE_SOUND_END
 
-WRITE8_DEVICE_HANDLER( blockade_sound_freq_w )
+WRITE8_MEMBER(blockade_state::blockade_sound_freq_w)
 {
-	discrete_sound_w(device,space,BLOCKADE_NOTE_DATA, data);
+	discrete_sound_w(m_discrete,space,BLOCKADE_NOTE_DATA, data);
 	return;
 }
 

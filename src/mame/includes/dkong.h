@@ -82,7 +82,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this,"video_ram"),
 		m_sprite_ram(*this,"sprite_ram"),
-		m_vidhw(DKONG_BOARD) { }
+		m_vidhw(DKONG_BOARD),
+		m_discrete(*this, "discrete") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_video_ram;
@@ -108,7 +109,8 @@ public:
 	const UINT8 *     m_color_codes;
 	emu_timer *       m_scanline_timer;
 	INT8              m_vidhw;			/* Selected video hardware RS Conversion / TKG04 */
-
+	
+	required_device<discrete_device> m_discrete;
 	/* radar scope */
 
 	UINT8 *           m_gfx4;
@@ -218,6 +220,10 @@ public:
 	INTERRUPT_GEN_MEMBER(s2650_interrupt);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
+	DECLARE_WRITE8_MEMBER(M58817_command_w);
+	DECLARE_READ8_MEMBER(dkong_voice_status_r);
+	DECLARE_READ8_MEMBER(dkong_tune_r);
+	DECLARE_WRITE8_MEMBER(dkong_p1_w);
 };
 
 /*----------- defined in audio/dkong.c -----------*/

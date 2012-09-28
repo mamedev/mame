@@ -311,9 +311,6 @@ void dragrace_state::palette_init()
 
 void dragrace_state::machine_start()
 {
-
-	m_discrete = machine().device("discrete");
-
 	save_item(NAME(m_misc_flags));
 	save_item(NAME(m_gear));
 }

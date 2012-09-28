@@ -279,9 +279,9 @@ WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_2_w)
 	m_port_2_last_extra = data;
 }
 
-WRITE8_DEVICE_HANDLER( indianbt_sh_port_3_w )
+WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_3_w)
 {
-	discrete_sound_w(device, space, INDIANBT_MUSIC_DATA, data);
+	discrete_sound_w(m_discrete, space, INDIANBT_MUSIC_DATA, data);
 }
 
 
@@ -597,50 +597,49 @@ DISCRETE_SOUND_START(polaris)
 
 DISCRETE_SOUND_END
 
-WRITE8_DEVICE_HANDLER( polaris_sh_port_1_w )
+WRITE8_MEMBER(_8080bw_state::polaris_sh_port_1_w)
 {
-	discrete_sound_w(device, space, POLARIS_MUSIC_DATA, data);
+	discrete_sound_w(m_discrete, space, POLARIS_MUSIC_DATA, data);
 }
 
-WRITE8_DEVICE_HANDLER( polaris_sh_port_2_w )
+WRITE8_MEMBER(_8080bw_state::polaris_sh_port_2_w)
 {
 	/* 0x01 - SX0 - Shot */
-	discrete_sound_w(device, space, POLARIS_SX0_EN, data & 0x01);
+	discrete_sound_w(m_discrete, space, POLARIS_SX0_EN, data & 0x01);
 
 	/* 0x02 - SX1 - Ship Hit (Sub) */
-	discrete_sound_w(device, space, POLARIS_SX1_EN, data & 0x02);
+	discrete_sound_w(m_discrete, space, POLARIS_SX1_EN, data & 0x02);
 
 	/* 0x04 - SX2 - Ship */
-	discrete_sound_w(device, space, POLARIS_SX2_EN, data & 0x04);
+	discrete_sound_w(m_discrete, space, POLARIS_SX2_EN, data & 0x04);
 
 	/* 0x08 - SX3 - Explosion */
-	discrete_sound_w(device, space, POLARIS_SX3_EN, data & 0x08);
+	discrete_sound_w(m_discrete, space, POLARIS_SX3_EN, data & 0x08);
 
 	/* 0x10 - SX4 */
 
 	/* 0x20 - SX5 - Sound Enable */
-	discrete_sound_w(device, space, POLARIS_SX5_EN, data & 0x20);
+	discrete_sound_w(m_discrete, space, POLARIS_SX5_EN, data & 0x20);
 }
 
-WRITE8_DEVICE_HANDLER( polaris_sh_port_3_w )
+WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
 {
-	_8080bw_state *state = space.machine().driver_data<_8080bw_state>();
 
-	coin_lockout_global_w(space.machine(), data & 0x04);  /* SX8 */
+	coin_lockout_global_w(machine(), data & 0x04);  /* SX8 */
 
-	state->m_c8080bw_flip_screen = data & 0x20;		/* SX11 */
+	m_c8080bw_flip_screen = data & 0x20;		/* SX11 */
 
 	/* 0x01 - SX6 - Plane Down */
-	discrete_sound_w(device, space, POLARIS_SX6_EN, data & 0x01);
+	discrete_sound_w(m_discrete, space, POLARIS_SX6_EN, data & 0x01);
 
 	/* 0x02 - SX7 - Plane Up */
-	discrete_sound_w(device, space, POLARIS_SX7_EN, data & 0x02);
+	discrete_sound_w(m_discrete, space, POLARIS_SX7_EN, data & 0x02);
 
 	/* 0x08 - SX9 - Hit */
-	discrete_sound_w(device, space, POLARIS_SX9_EN, data & 0x08);
+	discrete_sound_w(m_discrete, space, POLARIS_SX9_EN, data & 0x08);
 
 	/* 0x10 - SX10 - Hit */
-	discrete_sound_w(device, space, POLARIS_SX10_EN, data & 0x10);
+	discrete_sound_w(m_discrete, space, POLARIS_SX10_EN, data & 0x10);
 }
 
 

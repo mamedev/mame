@@ -73,17 +73,14 @@ public:
 	UINT32 screen_update_razmataz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_congo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_int);
+	DECLARE_WRITE8_MEMBER(zaxxon_sound_a_w);
+	DECLARE_WRITE8_MEMBER(zaxxon_sound_b_w);
+	DECLARE_WRITE8_MEMBER(zaxxon_sound_c_w);
+	DECLARE_WRITE8_MEMBER(congo_sound_b_w);
+	DECLARE_WRITE8_MEMBER(congo_sound_c_w);
 };
 
 
 /*----------- defined in audio/zaxxon.c -----------*/
-
-DECLARE_WRITE8_DEVICE_HANDLER( zaxxon_sound_a_w );
-DECLARE_WRITE8_DEVICE_HANDLER( zaxxon_sound_b_w );
-DECLARE_WRITE8_DEVICE_HANDLER( zaxxon_sound_c_w );
-
-DECLARE_WRITE8_DEVICE_HANDLER( congo_sound_b_w );
-DECLARE_WRITE8_DEVICE_HANDLER( congo_sound_c_w );
-
 MACHINE_CONFIG_EXTERN( zaxxon_samples );
 MACHINE_CONFIG_EXTERN( congo_samples );

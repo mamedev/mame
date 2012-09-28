@@ -6,7 +6,7 @@
 
 #include "sound/dac.h"
 #include "sound/sn76496.h"
-
+#include "sound/discrete.h"
 class circusc_state : public driver_device
 {
 public:
@@ -19,7 +19,8 @@ public:
 		m_spriteram_2(*this, "spriteram_2"),
 		m_spriteram(*this, "spriteram"),
 		m_sn_1(*this, "sn1"),
-		m_sn_2(*this, "sn2"){ }
+		m_sn_2(*this, "sn2"),
+		m_discrete(*this, "discrete"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spritebank;
@@ -40,7 +41,7 @@ public:
 	required_device<sn76496_new_device> m_sn_1;
 	required_device<sn76496_new_device> m_sn_2;
 	dac_device *m_dac;
-	device_t *m_discrete;
+	required_device<discrete_device> m_discrete;
 
 	UINT8          m_irq_mask;
 	DECLARE_READ8_MEMBER(circusc_sh_timer_r);

@@ -1,6 +1,8 @@
 #ifndef MARIO_H_
 #define MARIO_H_
 
+#include "sound/discrete.h"
+
 /*
  * From the schematics:
  *
@@ -36,7 +38,8 @@ public:
 	mario_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_spriteram(*this, "spriteram"),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_discrete(*this, "discrete"){ }
 
 	/* memory pointers */
 
@@ -57,6 +60,7 @@ public:
 
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
+	required_device<discrete_device> m_discrete;
 	tilemap_t *m_bg_tilemap;
 	int m_monitor;
 
@@ -83,13 +87,12 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_mario(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE8_MEMBER(mario_sh_sound_w);
+	DECLARE_WRITE8_MEMBER(mario_sh1_w);
+	DECLARE_WRITE8_MEMBER(mario_sh2_w);
 };
 
 /*----------- defined in audio/mario.c -----------*/
-
-DECLARE_WRITE8_DEVICE_HANDLER( mario_sh1_w );
-DECLARE_WRITE8_DEVICE_HANDLER( mario_sh2_w );
-
 
 MACHINE_CONFIG_EXTERN( mario_audio );
 MACHINE_CONFIG_EXTERN( masao_audio );

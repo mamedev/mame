@@ -884,11 +884,11 @@ INPUT_PORTS_END
 static I8255A_INTERFACE( zaxxon_ppi_intf )
 {
 	DEVCB_NULL,							/* Port A read */
-	DEVCB_HANDLER(zaxxon_sound_a_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(zaxxon_state, zaxxon_sound_a_w),	/* Port A write */
 	DEVCB_NULL,							/* Port B read */
-	DEVCB_HANDLER(zaxxon_sound_b_w),	/* Port B write */
+	DEVCB_DRIVER_MEMBER(zaxxon_state, zaxxon_sound_b_w),	/* Port B write */
 	DEVCB_NULL,							/* Port C read */
-	DEVCB_HANDLER(zaxxon_sound_c_w)		/* Port C write */
+	DEVCB_DRIVER_MEMBER(zaxxon_state, zaxxon_sound_c_w)		/* Port C write */
 };
 
 static I8255A_INTERFACE( congo_ppi_intf )
@@ -896,9 +896,9 @@ static I8255A_INTERFACE( congo_ppi_intf )
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),	/* Port A read */
 	DEVCB_NULL,						/* Port A write */
 	DEVCB_NULL,						/* Port B read */
-	DEVCB_HANDLER(congo_sound_b_w),	/* Port B write */
+	DEVCB_DRIVER_MEMBER(zaxxon_state, congo_sound_b_w),	/* Port B write */
 	DEVCB_NULL,						/* Port C read */
-	DEVCB_HANDLER(congo_sound_c_w)	/* Port C write */
+	DEVCB_DRIVER_MEMBER(zaxxon_state, congo_sound_c_w)	/* Port C write */
 };
 
 

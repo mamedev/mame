@@ -21,7 +21,8 @@ public:
 	nitedrvr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_videoram(*this, "videoram"),
-		m_hvc(*this, "hvc"){ }
+		m_hvc(*this, "hvc"),
+		m_discrete(*this, "discrete"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -43,7 +44,7 @@ public:
 
 	/* devices */
 	cpu_device *m_maincpu;
-	device_t *m_discrete;
+	required_device<discrete_device> m_discrete;
 	DECLARE_READ8_MEMBER(nitedrvr_steering_reset_r);
 	DECLARE_WRITE8_MEMBER(nitedrvr_steering_reset_w);
 	DECLARE_READ8_MEMBER(nitedrvr_in0_r);

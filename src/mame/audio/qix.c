@@ -18,22 +18,22 @@
 #define QIX_VOL_DATA_R		NODE_04
 
 
-static WRITE_LINE_DEVICE_HANDLER( qix_pia_dint );
-static WRITE_LINE_DEVICE_HANDLER( qix_pia_sint );
+
+
 
 
 /***************************************************************************
 Audio handlers
 ***************************************************************************/
 
-static WRITE8_DEVICE_HANDLER( qix_dac_w )
+WRITE8_MEMBER(qix_state::qix_dac_w)
 {
-	discrete_sound_w(device, space, QIX_DAC_DATA, data);
+	discrete_sound_w(m_discrete, space, QIX_DAC_DATA, data);
 }
 
-static WRITE8_DEVICE_HANDLER( qix_vol_w )
+WRITE8_MEMBER(qix_state::qix_vol_w)
 {
-	discrete_sound_w(device, space, QIX_VOL_DATA, data);
+	discrete_sound_w(m_discrete, space, QIX_VOL_DATA, data);
 }
 
 
@@ -93,7 +93,7 @@ DISCRETE_SOUND_END
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( sndpia_2_warning_w )
+WRITE8_MEMBER(qix_state::sndpia_2_warning_w)
 {
 	popmessage("PIA 5 write!!");
 }
@@ -106,17 +106,18 @@ static TIMER_CALLBACK( deferred_sndpia1_porta_w )
 }
 
 
-static WRITE8_DEVICE_HANDLER( sync_sndpia1_porta_w )
+WRITE8_MEMBER(qix_state::sync_sndpia1_porta_w)
 {
+	device_t *device = machine().device("sndpia1");
 	/* we need to synchronize this so the sound CPU doesn't drop anything important */
-	space.machine().scheduler().synchronize(FUNC(deferred_sndpia1_porta_w), data, (void *)downcast<pia6821_device *>(device));
+	machine().scheduler().synchronize(FUNC(deferred_sndpia1_porta_w), data, (void *)downcast<pia6821_device *>(device));
 }
 
 
-static WRITE8_DEVICE_HANDLER( slither_coinctl_w )
+WRITE8_MEMBER(qix_state::slither_coinctl_w)
 {
-	coin_lockout_w(space.machine(), 0, (~data >> 6) & 1);
-	coin_counter_w(space.machine(), 0, (data >> 5) & 1);
+	coin_lockout_w(machine(), 0, (~data >> 6) & 1);
+	coin_counter_w(machine(), 0, (data >> 5) & 1);
 }
 
 
@@ -127,23 +128,23 @@ static WRITE8_DEVICE_HANDLER( slither_coinctl_w )
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( qix_pia_dint )
+WRITE_LINE_MEMBER(qix_state::qix_pia_dint)
 {
-	pia6821_device *pia = downcast<pia6821_device *>(device);
+	pia6821_device *pia = downcast<pia6821_device *>(machine().device("sndpia0"));
 	int combined_state = pia->irq_a_state() | pia->irq_b_state();
 
 	/* DINT is connected to the data CPU's IRQ line */
-	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( qix_pia_sint )
+WRITE_LINE_MEMBER(qix_state::qix_pia_sint)
 {
-	pia6821_device *pia = downcast<pia6821_device *>(device);
+	pia6821_device *pia = downcast<pia6821_device *>(machine().device("sndpia1"));
 	int combined_state = pia->irq_a_state() | pia->irq_b_state();
 
 	/* SINT is connected to the sound CPU's IRQ line */
-	device->machine().device("audiocpu")->execute().set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -177,12 +178,12 @@ static const pia6821_interface qixsnd_pia_0_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DEVICE_HANDLER("sndpia1", sync_sndpia1_porta_w),			/* port A out */
-	DEVCB_DEVICE_HANDLER("discrete", qix_vol_w),					/* port B out */
+	DEVCB_DRIVER_MEMBER(qix_state,sync_sndpia1_porta_w),			/* port A out */
+	DEVCB_DRIVER_MEMBER(qix_state,qix_vol_w),					/* port B out */
 	DEVCB_DEVICE_LINE_MEMBER("sndpia1", pia6821_device, ca1_w),		/* line CA2 out */
 	DEVCB_DRIVER_MEMBER(qix_state,qix_flip_screen_w),								/* port CB2 out */
-	DEVCB_LINE(qix_pia_dint),										/* IRQA */
-	DEVCB_LINE(qix_pia_dint)										/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(qix_state,qix_pia_dint),										/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(qix_state,qix_pia_dint)										/* IRQB */
 };
 
 static const pia6821_interface qixsnd_pia_1_intf =
@@ -194,11 +195,11 @@ static const pia6821_interface qixsnd_pia_1_intf =
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DEVICE_MEMBER("sndpia0", pia6821_device, porta_w),			/* port A out */
-	DEVCB_DEVICE_HANDLER("discrete", qix_dac_w),				/* port B out */
+	DEVCB_DRIVER_MEMBER(qix_state,qix_dac_w),				/* port B out */
 	DEVCB_DEVICE_LINE_MEMBER("sndpia0", pia6821_device, ca1_w),	/* line CA2 out */
 	DEVCB_NULL,		/* line CB2 out */
-	DEVCB_LINE(qix_pia_sint),								/* IRQA */
-	DEVCB_LINE(qix_pia_sint)								/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(qix_state,qix_pia_sint),								/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(qix_state,qix_pia_sint)								/* IRQB */
 };
 
 static const pia6821_interface qixsnd_pia_2_intf =
@@ -209,10 +210,10 @@ static const pia6821_interface qixsnd_pia_2_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(sndpia_2_warning_w),	/* port A out */
-	DEVCB_HANDLER(sndpia_2_warning_w),	/* port B out */
-	DEVCB_HANDLER(sndpia_2_warning_w),	/* line CA2 out */
-	DEVCB_HANDLER(sndpia_2_warning_w),	/* line CB2 out */
+	DEVCB_DRIVER_MEMBER(qix_state,sndpia_2_warning_w),	/* port A out */
+	DEVCB_DRIVER_MEMBER(qix_state,sndpia_2_warning_w),	/* port B out */
+	DEVCB_DRIVER_MEMBER(qix_state,sndpia_2_warning_w),	/* line CA2 out */
+	DEVCB_DRIVER_MEMBER(qix_state,sndpia_2_warning_w),	/* line CB2 out */
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -226,11 +227,11 @@ static const pia6821_interface slithersnd_pia_0_intf =
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_HANDLER(slither_coinctl_w),	/* port B out */
+	DEVCB_DRIVER_MEMBER(qix_state,slither_coinctl_w),	/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_DRIVER_MEMBER(qix_state,qix_flip_screen_w),	/* port CB2 out */
-	DEVCB_LINE(qix_pia_dint),			/* IRQA */
-	DEVCB_LINE(qix_pia_dint)			/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(qix_state,qix_pia_dint),			/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(qix_state,qix_pia_dint)			/* IRQB */
 };
 
 

@@ -282,11 +282,11 @@ static I8255_INTERFACE(turbo_8255_intf_1)
 static I8255_INTERFACE(turbo_8255_intf_2)
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(turbo_sound_a_w),
+	DEVCB_DRIVER_MEMBER(turbo_state,turbo_sound_a_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(turbo_sound_b_w),
+	DEVCB_DRIVER_MEMBER(turbo_state,turbo_sound_b_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(turbo_sound_c_w)
+	DEVCB_DRIVER_MEMBER(turbo_state,turbo_sound_c_w)
 };
 
 static I8255_INTERFACE(turbo_8255_intf_3)
@@ -355,11 +355,11 @@ static I8255_INTERFACE(subroc3d_8255_intf_0)
 static I8255_INTERFACE(subroc3d_8255_intf_1)
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(subroc3d_sound_a_w),
+	DEVCB_DRIVER_MEMBER(turbo_state,subroc3d_sound_a_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(subroc3d_sound_b_w),
+	DEVCB_DRIVER_MEMBER(turbo_state,subroc3d_sound_b_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(subroc3d_sound_c_w)
+	DEVCB_DRIVER_MEMBER(turbo_state,subroc3d_sound_c_w)
 };
 
 
@@ -424,9 +424,9 @@ static I8255_INTERFACE(buckrog_8255_intf_0)
 static I8255_INTERFACE(buckrog_8255_intf_1)
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(buckrog_sound_a_w),
+	DEVCB_DRIVER_MEMBER(turbo_state,buckrog_sound_a_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(buckrog_sound_b_w),
+	DEVCB_DRIVER_MEMBER(turbo_state,buckrog_sound_b_w),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(turbo_state,buckrog_ppi1c_w)
 };

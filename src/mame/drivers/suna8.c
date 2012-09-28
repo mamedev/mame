@@ -1607,8 +1607,8 @@ static const ay8910_interface hardhead_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("samples", suna8_play_samples_w),
-	DEVCB_DEVICE_HANDLER("samples", suna8_samples_number_w)
+	DEVCB_DRIVER_MEMBER(suna8_state, suna8_play_samples_w),
+	DEVCB_DRIVER_MEMBER(suna8_state, suna8_samples_number_w)
 };
 
 static const samples_interface suna8_samples_interface =
@@ -1676,8 +1676,8 @@ static const ym2203_interface rranger_ym2203_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("samples", rranger_play_samples_w),
-	DEVCB_DEVICE_HANDLER("samples", suna8_samples_number_w),
+	DEVCB_DRIVER_MEMBER(suna8_state, rranger_play_samples_w),
+	DEVCB_DRIVER_MEMBER(suna8_state, suna8_samples_number_w),
 	},
 	DEVCB_NULL
 };
@@ -1856,8 +1856,8 @@ static const ay8910_interface starfigh_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("samples", suna8_play_samples_w),
-	DEVCB_DEVICE_HANDLER("samples", suna8_samples_number_w)
+	DEVCB_DRIVER_MEMBER(suna8_state, suna8_play_samples_w),
+	DEVCB_DRIVER_MEMBER(suna8_state, suna8_samples_number_w)
 };
 
 static MACHINE_CONFIG_START( starfigh, suna8_state )

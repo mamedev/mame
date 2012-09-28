@@ -266,7 +266,6 @@ void circus_state::machine_start()
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_samples = machine().device<samples_device>("samples");
-	m_discrete = machine().device("discrete");
 
 	save_item(NAME(m_clown_x));
 	save_item(NAME(m_clown_y));

@@ -16,13 +16,14 @@ public:
 	_8080bw_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mw8080bw_state(mconfig, type, tag),
 		m_schaser_effect_555_timer(*this, "schaser_sh_555"),
-		m_claybust_gun_on(*this, "claybust_gun")
+		m_claybust_gun_on(*this, "claybust_gun"),
+		m_discrete(*this, "discrete")
 	{ }
 
 	/* devices/memory pointers */
 	optional_device<timer_device> m_schaser_effect_555_timer;
 	optional_device<timer_device> m_claybust_gun_on;
-
+	required_device<discrete_device> m_discrete;
 	device_t *m_speaker;
 
 
@@ -108,18 +109,17 @@ public:
 	INTERRUPT_GEN_MEMBER(polaris_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(claybust_gun_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(schaser_effect_555_cb);
+	DECLARE_WRITE8_MEMBER(indianbt_sh_port_3_w);
+	DECLARE_WRITE8_MEMBER(polaris_sh_port_1_w);
+	DECLARE_WRITE8_MEMBER(polaris_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(polaris_sh_port_3_w);
 };
 
 
 /*----------- defined in audio/8080bw.c -----------*/
 extern const samples_interface lrescue_samples_interface;
 
-DECLARE_WRITE8_DEVICE_HANDLER( indianbt_sh_port_3_w );
 DISCRETE_SOUND_EXTERN( indianbt );
-
-DECLARE_WRITE8_DEVICE_HANDLER( polaris_sh_port_1_w );
-DECLARE_WRITE8_DEVICE_HANDLER( polaris_sh_port_2_w );
-DECLARE_WRITE8_DEVICE_HANDLER( polaris_sh_port_3_w );
 DISCRETE_SOUND_EXTERN( polaris );
 
 extern const sn76477_interface schaser_sn76477_interface;

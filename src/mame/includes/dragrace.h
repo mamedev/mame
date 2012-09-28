@@ -28,7 +28,8 @@ public:
 	dragrace_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_playfield_ram(*this, "playfield_ram"),
-		m_position_ram(*this, "position_ram"){ }
+		m_position_ram(*this, "position_ram"),
+		m_discrete(*this, "discrete"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_playfield_ram;
@@ -42,7 +43,7 @@ public:
 	int       m_gear[2];
 
 	/* devices */
-	device_t *m_discrete;
+	required_device<discrete_device> m_discrete;
 	DECLARE_WRITE8_MEMBER(dragrace_misc_w);
 	DECLARE_WRITE8_MEMBER(dragrace_misc_clear_w);
 	DECLARE_READ8_MEMBER(dragrace_input_r);

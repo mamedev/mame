@@ -43,7 +43,8 @@ public:
 		m_blink(*this, "blink"),
 		m_drone_x(*this, "drone_x"),
 		m_drone_y(*this, "drone_y"),
-		m_drone_rot(*this, "drone_rot"){ }
+		m_drone_rot(*this, "drone_rot"),
+		m_discrete(*this, "discrete"){ }
 
 	UINT8 m_in_service_mode;
 	UINT32 m_dial[2];
@@ -59,6 +60,7 @@ public:
 	optional_shared_ptr<UINT8> m_drone_x;
 	optional_shared_ptr<UINT8> m_drone_y;
 	optional_shared_ptr<UINT8> m_drone_rot;
+	required_device<discrete_device> m_discrete;
 	UINT8 m_flash;
 	UINT8 m_crash[2];
 	UINT8 m_skid[2];
@@ -106,18 +108,18 @@ public:
 	UINT32 screen_update_montecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(firetrk_interrupt);
 	TIMER_CALLBACK_MEMBER(periodic_callback);
+	DECLARE_WRITE8_MEMBER(firetrk_skid_reset_w);
+	DECLARE_WRITE8_MEMBER(montecar_skid_reset_w);
+	DECLARE_WRITE8_MEMBER(firetrk_crash_snd_w);
+	DECLARE_WRITE8_MEMBER(firetrk_skid_snd_w);
+	DECLARE_WRITE8_MEMBER(firetrk_motor_snd_w);
+	DECLARE_WRITE8_MEMBER(superbug_motor_snd_w);
+	DECLARE_WRITE8_MEMBER(firetrk_xtndply_w);
 };
 
 
 /*----------- defined in audio/firetrk.c -----------*/
 
-DECLARE_WRITE8_DEVICE_HANDLER( firetrk_skid_reset_w );
-DECLARE_WRITE8_DEVICE_HANDLER( montecar_skid_reset_w );
-DECLARE_WRITE8_DEVICE_HANDLER( firetrk_crash_snd_w );
-DECLARE_WRITE8_DEVICE_HANDLER( firetrk_skid_snd_w );
-DECLARE_WRITE8_DEVICE_HANDLER( firetrk_motor_snd_w );
-DECLARE_WRITE8_DEVICE_HANDLER( superbug_motor_snd_w );
-DECLARE_WRITE8_DEVICE_HANDLER( firetrk_xtndply_w );
 
 DISCRETE_SOUND_EXTERN( firetrk );
 DISCRETE_SOUND_EXTERN( superbug );

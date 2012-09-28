@@ -126,7 +126,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( main_io_map, AS_IO, 8, blockade_state )
     AM_RANGE(0x01, 0x01) AM_READWRITE(blockade_input_port_0_r, blockade_coin_latch_w)
     AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
-    AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("discrete", blockade_sound_freq_w)
+    AM_RANGE(0x02, 0x02) AM_WRITE(blockade_sound_freq_w)
     AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2")
     AM_RANGE(0x04, 0x04) AM_WRITE(blockade_env_on_w)
     AM_RANGE(0x08, 0x08) AM_WRITE(blockade_env_off_w)

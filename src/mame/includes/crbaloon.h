@@ -4,6 +4,7 @@ Crazy Ballooon
 
 *************************************************************************/
 
+#include "sound/discrete.h"
 
 #define CRBALOON_MASTER_XTAL	(XTAL_9_987MHz)
 
@@ -16,12 +17,14 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
-		m_pc3092_data(*this, "pc3092_data"){ }
+		m_pc3092_data(*this, "pc3092_data"),
+		m_discrete(*this, "discrete"){ }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_pc3092_data;
+	required_device<discrete_device> m_discrete;	
 	UINT16 m_collision_address;
 	UINT8 m_collision_address_clear;
 	tilemap_t *m_bg_tilemap;
@@ -38,17 +41,17 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_crbaloon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE8_MEMBER(crbaloon_audio_set_music_freq);
+	DECLARE_WRITE8_MEMBER(crbaloon_audio_set_music_enable);
+	DECLARE_WRITE8_MEMBER(crbaloon_audio_set_laugh_enable);
 };
 
 
 /*----------- defined in audio/crbaloon.c -----------*/
 
-DECLARE_WRITE8_DEVICE_HANDLER( crbaloon_audio_set_music_freq );
-DECLARE_WRITE8_DEVICE_HANDLER( crbaloon_audio_set_music_enable );
 void crbaloon_audio_set_explosion_enable(device_t *sn, int enabled);
 void crbaloon_audio_set_breath_enable(device_t *sn, int enabled);
 void crbaloon_audio_set_appear_enable(device_t *sn, int enabled);
-DECLARE_WRITE8_DEVICE_HANDLER( crbaloon_audio_set_laugh_enable );
 MACHINE_CONFIG_EXTERN( crbaloon_audio );
 
 /*----------- defined in video/crbaloon.c -----------*/

@@ -326,8 +326,8 @@ static const pia6821_interface pia_3_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DEVICE_HANDLER("discrete", spiders_audio_ctrl_w),		/* port A out */
-	DEVCB_DEVICE_HANDLER("pia4", spiders_audio_command_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(spiders_state, spiders_audio_ctrl_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(spiders_state, spiders_audio_command_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq),		/* IRQA */
@@ -350,8 +350,8 @@ static const pia6821_interface pia_4_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DEVICE_HANDLER("discrete", spiders_audio_a_w),		/* port A out */
-	DEVCB_DEVICE_HANDLER("discrete", spiders_audio_b_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(spiders_state, spiders_audio_a_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(spiders_state, spiders_audio_b_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_DRIVER_LINE_MEMBER(spiders_state,audio_cpu_irq),		/* IRQA */

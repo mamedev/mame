@@ -117,6 +117,7 @@ public:
 	INTERRUPT_GEN_MEMBER(micro3d_vblank);
 	TIMER_CALLBACK_MEMBER(mac_done_callback);
 	TIMER_CALLBACK_MEMBER(adc_done_callback);
+	DECLARE_WRITE8_MEMBER(micro3d_upd7759_w);
 };
 
 struct micro3d_vtx
@@ -133,8 +134,6 @@ void micro3d_duart_output_w(device_t *device, UINT8 data);
 void micro3d_duart_tx(device_t *device, int channel, UINT8 data);
 
 /*----------- defined in audio/micro3d.c -----------*/
-
-DECLARE_WRITE8_DEVICE_HANDLER( micro3d_upd7759_w );
 
 void micro3d_noise_sh_w(running_machine &machine, UINT8 data);
 

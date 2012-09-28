@@ -220,6 +220,7 @@ public:
 	INTERRUPT_GEN_MEMBER(hd68k_irq_gen);
 	TIMER_CALLBACK_MEMBER(deferred_adsp_bank_switch);
 	TIMER_CALLBACK_MEMBER(rddsp32_sync_cb);
+	DECLARE_WRITE16_MEMBER(hdsnddsp_dac_w);
 };
 
 
@@ -342,8 +343,6 @@ DECLARE_READ16_HANDLER( hdds3_speedup_r );
 /*----------- defined in audio/harddriv.c -----------*/
 
 void hdsnd_init(running_machine &machine);
-DECLARE_WRITE16_DEVICE_HANDLER( hdsnddsp_dac_w );
-
 
 /*----------- defined in video/harddriv.c -----------*/
 

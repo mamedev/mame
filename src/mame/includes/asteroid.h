@@ -12,10 +12,12 @@ public:
 	asteroid_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_ram1(*this, "ram1"),
-		m_ram2(*this, "ram2"){ }
+		m_ram2(*this, "ram2"),
+		m_discrete(*this, "discrete") { }
 
 	optional_shared_ptr<UINT8> m_ram1;
 	optional_shared_ptr<UINT8> m_ram2;
+	required_device<discrete_device> m_discrete;
 	DECLARE_WRITE8_MEMBER(astdelux_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(llander_led_w);
 	DECLARE_READ8_MEMBER(asteroid_IN0_r);
@@ -32,6 +34,13 @@ public:
 	INTERRUPT_GEN_MEMBER(asteroid_interrupt);
 	INTERRUPT_GEN_MEMBER(asterock_interrupt);
 	INTERRUPT_GEN_MEMBER(llander_interrupt);
+	DECLARE_WRITE8_MEMBER(asteroid_explode_w);
+	DECLARE_WRITE8_MEMBER(asteroid_thump_w);
+	DECLARE_WRITE8_MEMBER(asteroid_sounds_w);
+	DECLARE_WRITE8_MEMBER(astdelux_sounds_w);
+	DECLARE_WRITE8_MEMBER(asteroid_noise_reset_w);
+	DECLARE_WRITE8_MEMBER(llander_snd_reset_w);
+	DECLARE_WRITE8_MEMBER(llander_sounds_w);
 };
 
 /*----------- defined in audio/asteroid.c -----------*/
@@ -39,16 +48,6 @@ public:
 DISCRETE_SOUND_EXTERN( asteroid );
 DISCRETE_SOUND_EXTERN( astdelux );
 
-DECLARE_WRITE8_DEVICE_HANDLER( asteroid_explode_w );
-DECLARE_WRITE8_DEVICE_HANDLER( asteroid_thump_w );
-DECLARE_WRITE8_DEVICE_HANDLER( asteroid_sounds_w );
-DECLARE_WRITE8_DEVICE_HANDLER( asteroid_noise_reset_w );
-DECLARE_WRITE8_DEVICE_HANDLER( astdelux_sounds_w );
-
-
 /*----------- defined in audio/llander.c -----------*/
 
 DISCRETE_SOUND_EXTERN( llander );
-
-DECLARE_WRITE8_DEVICE_HANDLER( llander_snd_reset_w );
-DECLARE_WRITE8_DEVICE_HANDLER( llander_sounds_w );

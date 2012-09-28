@@ -12,10 +12,12 @@ class avalnche_state : public driver_device
 public:
 	avalnche_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_discrete(*this, "discrete") { }
 
 	/* video-related */
 	required_shared_ptr<UINT8> m_videoram;
+	required_device<discrete_device> m_discrete;
 
 	UINT8    m_avalance_video_inverted;
 	DECLARE_WRITE8_MEMBER(avalance_video_invert_w);
@@ -26,13 +28,12 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_avalnche(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE8_MEMBER(avalnche_noise_amplitude_w);
+	DECLARE_WRITE8_MEMBER(avalnche_attract_enable_w);
+	DECLARE_WRITE8_MEMBER(avalnche_audio_w);
+	DECLARE_WRITE8_MEMBER(catch_audio_w);
 };
 
 /*----------- defined in audio/avalnche.c -----------*/
-
 DISCRETE_SOUND_EXTERN( avalnche );
-DECLARE_WRITE8_DEVICE_HANDLER( avalnche_noise_amplitude_w );
-DECLARE_WRITE8_DEVICE_HANDLER( avalnche_attract_enable_w );
-DECLARE_WRITE8_DEVICE_HANDLER( avalnche_audio_w );
 
-DECLARE_WRITE8_HANDLER( catch_audio_w );

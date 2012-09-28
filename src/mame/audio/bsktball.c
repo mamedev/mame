@@ -10,20 +10,20 @@
 /***************************************************************************
 Sound handlers
 ***************************************************************************/
-WRITE8_DEVICE_HANDLER( bsktball_bounce_w )
+WRITE8_MEMBER(bsktball_state::bsktball_bounce_w)
 {
-	discrete_sound_w(device, space, BSKTBALL_CROWD_DATA, data & 0x0f);	// Crowd
-	discrete_sound_w(device, space, BSKTBALL_BOUNCE_EN, data & 0x10);	// Bounce
+	discrete_sound_w(m_discrete, space, BSKTBALL_CROWD_DATA, data & 0x0f);	// Crowd
+	discrete_sound_w(m_discrete, space, BSKTBALL_BOUNCE_EN, data & 0x10);	// Bounce
 }
 
-WRITE8_DEVICE_HANDLER( bsktball_note_w )
+WRITE8_MEMBER(bsktball_state::bsktball_note_w)
 {
-	discrete_sound_w(device, space, BSKTBALL_NOTE_DATA, data);	// Note
+	discrete_sound_w(m_discrete, space, BSKTBALL_NOTE_DATA, data);	// Note
 }
 
-WRITE8_DEVICE_HANDLER( bsktball_noise_reset_w )
+WRITE8_MEMBER(bsktball_state::bsktball_noise_reset_w)
 {
-	discrete_sound_w(device, space, BSKTBALL_NOISE_EN, offset & 0x01);
+	discrete_sound_w(m_discrete, space, BSKTBALL_NOISE_EN, offset & 0x01);
 }
 
 

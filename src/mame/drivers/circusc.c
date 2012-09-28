@@ -61,7 +61,6 @@ void circusc_state::machine_start()
 
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_dac = machine().device<dac_device>("dac");
-	m_discrete = machine().device("fltdisc");
 
 	save_item(NAME(m_sn_latch));
 }

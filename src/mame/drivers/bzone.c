@@ -311,7 +311,7 @@ static ADDRESS_MAP_START( bzone_map, AS_PROGRAM, 8, bzone_state )
 	AM_RANGE(0x1810, 0x1810) AM_DEVREAD_LEGACY("mathbox", mathbox_lo_r)
 	AM_RANGE(0x1818, 0x1818) AM_DEVREAD_LEGACY("mathbox", mathbox_hi_r)
 	AM_RANGE(0x1820, 0x182f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0x1840, 0x1840) AM_DEVWRITE_LEGACY("discrete", bzone_sounds_w)
+	AM_RANGE(0x1840, 0x1840) AM_WRITE(bzone_sounds_w)
 	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE_LEGACY("mathbox", mathbox_go_w)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM

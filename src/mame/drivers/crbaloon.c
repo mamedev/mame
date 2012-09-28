@@ -156,7 +156,6 @@ READ8_MEMBER(crbaloon_state::pc3259_r)
 
 WRITE8_MEMBER(crbaloon_state::port_sound_w)
 {
-	device_t *discrete = machine().device("discrete");
 	device_t *sn = machine().device("snsnd");
 
 	/* D0 - interrupt enable - also goes to PC3259 as /HTCTRL */
@@ -167,7 +166,7 @@ WRITE8_MEMBER(crbaloon_state::port_sound_w)
 	machine().sound().system_enable((data & 0x02) ? TRUE : FALSE);
 
 	/* D2 - unlabeled - music enable */
-	crbaloon_audio_set_music_enable(discrete, space, 0, (data & 0x04) ? TRUE : FALSE);
+	crbaloon_audio_set_music_enable(space, 0, (data & 0x04) ? TRUE : FALSE);
 
 	/* D3 - EXPLOSION */
 	crbaloon_audio_set_explosion_enable(sn, (data & 0x08) ? TRUE : FALSE);
@@ -179,7 +178,7 @@ WRITE8_MEMBER(crbaloon_state::port_sound_w)
 	crbaloon_audio_set_appear_enable(sn, (data & 0x20) ? TRUE : FALSE);
 
 	/* D6 - unlabeled - laugh enable */
-	crbaloon_audio_set_laugh_enable(discrete, space, 0, (data & 0x40) ? TRUE : FALSE);
+	crbaloon_audio_set_laugh_enable(space, 0, (data & 0x40) ? TRUE : FALSE);
 
 	/* D7 - unlabeled - goes to PC3259 pin 16 */
 
@@ -221,7 +220,7 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, crbaloon_state )
 	AM_RANGE(0x00, 0x00) AM_WRITENOP	/* not connected */
 	AM_RANGE(0x01, 0x01) AM_WRITENOP /* watchdog */
 	AM_RANGE(0x02, 0x04) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY("discrete", crbaloon_audio_set_music_freq)
+	AM_RANGE(0x05, 0x05) AM_WRITE(crbaloon_audio_set_music_freq)
 	AM_RANGE(0x06, 0x06) AM_WRITE(port_sound_w)
 	AM_RANGE(0x07, 0x0b) AM_WRITE(pc3092_w) AM_SHARE("pc3092_data")
 	AM_RANGE(0x0c, 0x0c) AM_WRITENOP /* MSK - to PC3259 */
@@ -340,11 +339,10 @@ GFXDECODE_END
 void crbaloon_state::machine_reset()
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_IO);
-	device_t *discrete = machine().device("discrete");
 
 	pc3092_reset();
 	port_sound_w(space, 0, 0);
-	crbaloon_audio_set_music_freq(discrete, space, 0, 0);
+	crbaloon_audio_set_music_freq(space, 0, 0);
 }
 
 

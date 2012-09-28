@@ -293,13 +293,12 @@ READ16_MEMBER(harddriv_state::hdsnddsp_get_bio)
  *
  *************************************/
 
-WRITE16_DEVICE_HANDLER( hdsnddsp_dac_w )
+WRITE16_MEMBER(harddriv_state::hdsnddsp_dac_w)
 {
-	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 
 	/* DAC L */
-	if (!state->m_dacmute)
-		downcast<dac_device *>(device)->write_signed16(data ^ 0x8000);
+	if (!m_dacmute)
+		downcast<dac_device *>(machine().device("dac"))->write_signed16(data ^ 0x8000);
 }
 
 

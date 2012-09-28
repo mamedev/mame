@@ -293,22 +293,22 @@ DISCRETE_SOUND_START( sprint8 )
 DISCRETE_SOUND_END
 
 
-WRITE8_DEVICE_HANDLER( sprint8_crash_w )
+WRITE8_MEMBER(sprint8_state::sprint8_crash_w)
 {
-	discrete_sound_w(device, space, SPRINT8_CRASH_EN, data & 0x01);
+	discrete_sound_w(m_discrete, space, SPRINT8_CRASH_EN, data & 0x01);
 }
 
-WRITE8_DEVICE_HANDLER( sprint8_screech_w )
+WRITE8_MEMBER(sprint8_state::sprint8_screech_w)
 {
-	discrete_sound_w(device, space, SPRINT8_SCREECH_EN, data & 0x01);
+	discrete_sound_w(m_discrete, space, SPRINT8_SCREECH_EN, data & 0x01);
 }
 
-WRITE8_DEVICE_HANDLER( sprint8_attract_w )
+WRITE8_MEMBER(sprint8_state::sprint8_attract_w)
 {
-	discrete_sound_w(device, space, SPRINT8_ATTRACT_EN, data & 0x01);
+	discrete_sound_w(m_discrete, space, SPRINT8_ATTRACT_EN, data & 0x01);
 }
 
-WRITE8_DEVICE_HANDLER( sprint8_motor_w )
+WRITE8_MEMBER(sprint8_state::sprint8_motor_w)
 {
-	discrete_sound_w(device, space, NODE_RELATIVE(SPRINT8_MOTOR1_EN, offset & 0x07), data & 0x01);
+	discrete_sound_w(m_discrete, space, NODE_RELATIVE(SPRINT8_MOTOR1_EN, offset & 0x07), data & 0x01);
 }

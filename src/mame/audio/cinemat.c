@@ -1331,42 +1331,39 @@ static void demon_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_
 }
 
 
-static READ8_DEVICE_HANDLER( sound_porta_r )
+READ8_MEMBER(cinemat_state::sound_porta_r)
 {
-	cinemat_state *state = space.machine().driver_data<cinemat_state>();
 	/* bits 0-3 are the sound data; bit 4 is the data ready */
-	return state->m_sound_fifo[state->m_sound_fifo_out] | ((state->m_sound_fifo_in != state->m_sound_fifo_out) << 4);
+	return m_sound_fifo[m_sound_fifo_out] | ((m_sound_fifo_in != m_sound_fifo_out) << 4);
 }
 
 
-static READ8_DEVICE_HANDLER( sound_portb_r )
+READ8_MEMBER(cinemat_state::sound_portb_r)
 {
-	cinemat_state *state = space.machine().driver_data<cinemat_state>();
-	return state->m_last_portb_write;
+	return m_last_portb_write;
 }
 
 
-static WRITE8_DEVICE_HANDLER( sound_portb_w )
+WRITE8_MEMBER(cinemat_state::sound_portb_w)
 {
-	cinemat_state *state = space.machine().driver_data<cinemat_state>();
 	/* watch for a 0->1 edge on bit 0 ("shift out") to advance the data pointer */
-	if ((data & 1) != (state->m_last_portb_write & 1) && (data & 1) != 0)
-		state->m_sound_fifo_out = (state->m_sound_fifo_out + 1) % 16;
+	if ((data & 1) != (m_last_portb_write & 1) && (data & 1) != 0)
+		m_sound_fifo_out = (m_sound_fifo_out + 1) % 16;
 
 	/* watch for a 0->1 edge of bit 1 ("hard reset") to reset the FIFO */
-	if ((data & 2) != (state->m_last_portb_write & 2) && (data & 2) != 0)
-		state->m_sound_fifo_in = state->m_sound_fifo_out = 0;
+	if ((data & 2) != (m_last_portb_write & 2) && (data & 2) != 0)
+		m_sound_fifo_in = m_sound_fifo_out = 0;
 
 	/* bit 2 controls the global mute */
-	if ((data & 4) != (state->m_last_portb_write & 4))
-		space.machine().sound().system_mute(data & 4);
+	if ((data & 4) != (m_last_portb_write & 4))
+		machine().sound().system_mute(data & 4);
 
 	/* remember the last value written */
-	state->m_last_portb_write = data;
+	m_last_portb_write = data;
 }
 
 
-static WRITE8_DEVICE_HANDLER( sound_output_w )
+WRITE8_MEMBER(cinemat_state::sound_output_w)
 {
 	logerror("sound_output = %02X\n", data);
 }
@@ -1376,10 +1373,10 @@ static const ay8910_interface demon_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(sound_porta_r),
-	DEVCB_HANDLER(sound_portb_r),
+	DEVCB_DRIVER_MEMBER(cinemat_state,sound_porta_r),
+	DEVCB_DRIVER_MEMBER(cinemat_state,sound_portb_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(sound_portb_w)
+	DEVCB_DRIVER_MEMBER(cinemat_state,sound_portb_w)
 };
 
 static const ay8910_interface demon_ay8910_interface_3 =
@@ -1389,7 +1386,7 @@ static const ay8910_interface demon_ay8910_interface_3 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(sound_output_w)
+	DEVCB_DRIVER_MEMBER(cinemat_state,sound_output_w)
 };
 
 

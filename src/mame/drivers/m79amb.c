@@ -58,31 +58,6 @@ and two large (paddles pretending to be) guns.
 #include "includes/m79amb.h"
 #include "cpu/i8085/i8085.h"
 
-class m79amb_state : public driver_device
-{
-public:
-	m79amb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_videoram(*this, "videoram"),
-		m_mask(*this, "mask"){ }
-
-	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_mask;
-
-	/* misc */
-	UINT8 m_lut_gun1[0x100];
-	UINT8 m_lut_gun2[0x100];
-	DECLARE_WRITE8_MEMBER(ramtek_videoram_w);
-	DECLARE_READ8_MEMBER(gray5bit_controller0_r);
-	DECLARE_READ8_MEMBER(gray5bit_controller1_r);
-	DECLARE_WRITE8_MEMBER(m79amb_8002_w);
-	DECLARE_DRIVER_INIT(m79amb);
-	UINT32 screen_update_ramtek(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(m79amb_interrupt);
-};
-
-
 WRITE8_MEMBER(m79amb_state::ramtek_videoram_w)
 {
 	m_videoram[offset] = data & ~*m_mask;
@@ -141,10 +116,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, m79amb_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(ramtek_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x6000, 0x63ff) AM_RAM					/* ?? */
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("8000") AM_DEVWRITE_LEGACY("discrete", m79amb_8000_w)
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("8000") AM_WRITE(m79amb_8000_w)
 	AM_RANGE(0x8001, 0x8001) AM_WRITEONLY AM_SHARE("mask")
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("8002") AM_WRITE(m79amb_8002_w)
-	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE_LEGACY("discrete", m79amb_8003_w)
+	AM_RANGE(0x8003, 0x8003) AM_WRITE(m79amb_8003_w)
 	AM_RANGE(0x8004, 0x8004) AM_READ(gray5bit_controller0_r)
 	AM_RANGE(0x8005, 0x8005) AM_READ(gray5bit_controller1_r)
 	AM_RANGE(0xc000, 0xc07f) AM_RAM					/* ?? */

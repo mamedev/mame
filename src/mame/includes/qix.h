@@ -9,7 +9,7 @@
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "sound/sn76496.h"
-
+#include "sound/discrete.h"
 
 #define MAIN_CLOCK_OSC			20000000	/* 20 MHz */
 #define SLITHER_CLOCK_OSC		21300000	/* 21.3 MHz */
@@ -33,7 +33,8 @@ public:
 		m_videoram_address(*this, "videoram_addr"),
 		m_videoram_mask(*this, "videoram_mask"),
 		m_paletteram(*this, "paletteram"),
-		m_scanline_latch(*this, "scanline_latch") { }
+		m_scanline_latch(*this, "scanline_latch"),
+		m_discrete(*this, "discrete") { }
 
 	/* devices */
 	optional_device<sn76489_new_device> m_sn1;
@@ -54,6 +55,7 @@ public:
 	UINT8  m_palette_bank;
 	UINT8  m_leds;
 	required_shared_ptr<UINT8> m_scanline_latch;
+	required_device<discrete_device> m_discrete;
 	pen_t m_pens[NUM_PENS];
 	DECLARE_WRITE8_MEMBER(zookeep_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(qix_data_firq_w);
@@ -97,6 +99,13 @@ public:
 	DECLARE_READ8_MEMBER(slither_trak_ud_r);
 	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
 	DECLARE_WRITE8_MEMBER(qix_flip_screen_w);
+	DECLARE_WRITE8_MEMBER(qix_dac_w);
+	DECLARE_WRITE8_MEMBER(qix_vol_w);
+	DECLARE_WRITE8_MEMBER(sndpia_2_warning_w);
+	DECLARE_WRITE8_MEMBER(sync_sndpia1_porta_w);
+	DECLARE_WRITE8_MEMBER(slither_coinctl_w);
+	DECLARE_WRITE_LINE_MEMBER(qix_pia_dint);
+	DECLARE_WRITE_LINE_MEMBER(qix_pia_sint);
 };
 
 

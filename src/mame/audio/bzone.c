@@ -387,12 +387,12 @@ static const pokey_interface bzone_pokey_interface =
 	DEVCB_INPUT_PORT("IN3")
 };
 
-WRITE8_DEVICE_HANDLER( bzone_sounds_w )
+WRITE8_MEMBER(bzone_state::bzone_sounds_w)
 {
-	discrete_sound_w(device, space, BZ_INPUT, data);
+	discrete_sound_w(m_discrete, space, BZ_INPUT, data);
 
 	output_set_value("startled", (data >> 6) & 1);
-	space.machine().sound().system_enable(data & 0x20);
+	machine().sound().system_enable(data & 0x20);
 }
 
 

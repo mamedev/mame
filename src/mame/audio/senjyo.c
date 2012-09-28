@@ -12,17 +12,16 @@ const z80_daisy_config senjyo_daisy_chain[] =
 
 /* z80 pio */
 
-static READ8_DEVICE_HANDLER( pio_pa_r )
+READ8_MEMBER(senjyo_state::pio_pa_r)
 {
-	senjyo_state *state = space.machine().driver_data<senjyo_state>();
 
-	return state->m_sound_cmd;
+	return m_sound_cmd;
 }
 
 Z80PIO_INTERFACE( senjyo_pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE("sub", INPUT_LINE_IRQ0),
-	DEVCB_HANDLER(pio_pa_r),
+	DEVCB_DRIVER_MEMBER(senjyo_state,pio_pa_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

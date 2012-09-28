@@ -277,7 +277,6 @@ void nitedrvr_state::machine_start()
 {
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_discrete = machine().device("discrete");
 
 	save_item(NAME(m_gear));
 	save_item(NAME(m_track));

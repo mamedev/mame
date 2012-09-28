@@ -20,33 +20,33 @@
   Avalanche memory audio output handlers
 ***************************************************************************/
 
-WRITE8_DEVICE_HANDLER( avalnche_noise_amplitude_w )
+WRITE8_MEMBER(avalnche_state::avalnche_noise_amplitude_w)
 {
-	discrete_sound_w(device, space, AVALNCHE_SOUNDLVL_DATA, data & 0x3f);
+	discrete_sound_w(m_discrete, space, AVALNCHE_SOUNDLVL_DATA, data & 0x3f);
 }
 
-WRITE8_DEVICE_HANDLER( avalnche_attract_enable_w )
+WRITE8_MEMBER(avalnche_state::avalnche_attract_enable_w)
 {
-	discrete_sound_w(device, space, AVALNCHE_ATTRACT_EN, data & 0x01);
+	discrete_sound_w(m_discrete, space, AVALNCHE_ATTRACT_EN, data & 0x01);
 }
 
-WRITE8_DEVICE_HANDLER( avalnche_audio_w )
+WRITE8_MEMBER(avalnche_state::avalnche_audio_w)
 {
 	int bit = data & 0x01;
 
 	switch (offset & 0x07)
 	{
 	case 0x00:		/* AUD0 */
-		discrete_sound_w(device, space, AVALNCHE_AUD0_EN, bit);
+		discrete_sound_w(m_discrete, space, AVALNCHE_AUD0_EN, bit);
 		break;
 
 	case 0x01:		/* AUD1 */
-		discrete_sound_w(device, space, AVALNCHE_AUD1_EN, bit);
+		discrete_sound_w(m_discrete, space, AVALNCHE_AUD1_EN, bit);
 		break;
 
 	case 0x02:		/* AUD2 */
 	default:
-		discrete_sound_w(device, space, AVALNCHE_AUD2_EN, bit);
+		discrete_sound_w(m_discrete, space, AVALNCHE_AUD2_EN, bit);
 		break;
 	}
 }
@@ -128,7 +128,7 @@ DISCRETE_SOUND_END
   Catch memory audio output handlers
 ***************************************************************************/
 
-WRITE8_HANDLER( catch_audio_w )
+WRITE8_MEMBER(avalnche_state::catch_audio_w)
 {
 	/* Different from avalnche, it plays a sound (offset 0/1/2) on data bit 0 rising edge.
     There's no indication that the game silences sound, it's probably done automatically. */

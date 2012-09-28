@@ -679,7 +679,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( driversnd_dsp_io_map, AS_IO, 16, harddriv_state )
-	AM_RANGE(0, 0) AM_READ(hdsnddsp_rom_r) AM_DEVWRITE_LEGACY("dac", hdsnddsp_dac_w)
+	AM_RANGE(0, 0) AM_READWRITE(hdsnddsp_rom_r, hdsnddsp_dac_w)
 	AM_RANGE(1, 1) AM_READ(hdsnddsp_comram_r)
 	AM_RANGE(2, 2) AM_READ(hdsnddsp_compare_r)
 	AM_RANGE(1, 2) AM_WRITENOP

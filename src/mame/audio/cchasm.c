@@ -96,25 +96,23 @@ READ16_MEMBER(cchasm_state::cchasm_io_r)
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_timer_1_w )
+WRITE_LINE_MEMBER(cchasm_state::ctc_timer_1_w)
 {
-	cchasm_state *drvstate = device->machine().driver_data<cchasm_state>();
 	if (state) /* rising edge */
 	{
-		drvstate->m_output[0] ^= 0x7f;
-		drvstate->m_channel_active[0] = 1;
-		device->machine().device<dac_device>("dac1")->write_unsigned8(drvstate->m_output[0]);
+		m_output[0] ^= 0x7f;
+		m_channel_active[0] = 1;
+		machine().device<dac_device>("dac1")->write_unsigned8(m_output[0]);
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_timer_2_w )
+WRITE_LINE_MEMBER(cchasm_state::ctc_timer_2_w)
 {
-	cchasm_state *drvstate = device->machine().driver_data<cchasm_state>();
 	if (state) /* rising edge */
 	{
-		drvstate->m_output[1] ^= 0x7f;
-		drvstate->m_channel_active[1] = 1;
-		device->machine().device<dac_device>("dac2")->write_unsigned8(drvstate->m_output[0]);
+		m_output[1] ^= 0x7f;
+		m_channel_active[1] = 1;
+		machine().device<dac_device>("dac2")->write_unsigned8(m_output[0]);
 	}
 }
 
@@ -122,8 +120,8 @@ Z80CTC_INTERFACE( cchasm_ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),   /* interrupt handler */
 	DEVCB_NULL,					/* ZC/TO0 callback */
-	DEVCB_LINE(ctc_timer_1_w),	/* ZC/TO1 callback */
-	DEVCB_LINE(ctc_timer_2_w)	/* ZC/TO2 callback */
+	DEVCB_DRIVER_LINE_MEMBER(cchasm_state,ctc_timer_1_w),	/* ZC/TO1 callback */
+	DEVCB_DRIVER_LINE_MEMBER(cchasm_state,ctc_timer_2_w)	/* ZC/TO2 callback */
 };
 
 SOUND_START( cchasm )

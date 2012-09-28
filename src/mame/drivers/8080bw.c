@@ -470,8 +470,8 @@ static ADDRESS_MAP_START( astropal_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_READ_PORT("IN3")
 
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("discrete", invaders_audio_1_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY("discrete", invaders_audio_2_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(invaders_audio_1_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(invaders_audio_2_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
@@ -1393,11 +1393,11 @@ MACHINE_START_MEMBER(_8080bw_state,polaris)
 static ADDRESS_MAP_START( polaris_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_DEVWRITE_LEGACY("discrete", polaris_sh_port_1_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(polaris_sh_port_1_w)
 	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE_LEGACY("mb14241", mb14241_shift_result_r, mb14241_shift_data_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("discrete", polaris_sh_port_2_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(polaris_sh_port_2_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("discrete", polaris_sh_port_3_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(polaris_sh_port_3_w)
 ADDRESS_MAP_END
 
 
@@ -1748,7 +1748,7 @@ static ADDRESS_MAP_START( indianbt_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(indianbt_sh_port_2_w)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP /* sound ? */
-	AM_RANGE(0x07, 0x07) AM_DEVWRITE_LEGACY("discrete", indianbt_sh_port_3_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(indianbt_sh_port_3_w)
 ADDRESS_MAP_END
 
 
@@ -2103,9 +2103,9 @@ static ADDRESS_MAP_START( vortex_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r)
 
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("discrete", invaders_audio_1_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(invaders_audio_1_w)
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
-	AM_RANGE(0x07, 0x07) AM_DEVWRITE_LEGACY("discrete", invaders_audio_2_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(invaders_audio_2_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 

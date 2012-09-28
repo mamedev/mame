@@ -110,13 +110,13 @@ static ADDRESS_MAP_START( sprint8_map, AS_PROGRAM, 8, sprint8_state )
 	AM_RANGE(0x1c20, 0x1c2f) AM_WRITEONLY AM_SHARE("pos_d_ram")
 	AM_RANGE(0x1c30, 0x1c37) AM_WRITE(sprint8_lockout_w)
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(sprint8_int_reset_w)
-	AM_RANGE(0x1d01, 0x1d01) AM_DEVWRITE_LEGACY("discrete", sprint8_crash_w)
-	AM_RANGE(0x1d02, 0x1d02) AM_DEVWRITE_LEGACY("discrete", sprint8_screech_w)
+	AM_RANGE(0x1d01, 0x1d01) AM_WRITE(sprint8_crash_w)
+	AM_RANGE(0x1d02, 0x1d02) AM_WRITE(sprint8_screech_w)
 	AM_RANGE(0x1d03, 0x1d03) AM_WRITENOP
 	AM_RANGE(0x1d04, 0x1d04) AM_WRITENOP
 	AM_RANGE(0x1d05, 0x1d05) AM_WRITEONLY AM_SHARE("team")
-	AM_RANGE(0x1d06, 0x1d06) AM_DEVWRITE_LEGACY("discrete", sprint8_attract_w)
-	AM_RANGE(0x1e00, 0x1e07) AM_DEVWRITE_LEGACY("discrete", sprint8_motor_w)
+	AM_RANGE(0x1d06, 0x1d06) AM_WRITE(sprint8_attract_w)
+	AM_RANGE(0x1e00, 0x1e07) AM_WRITE(sprint8_motor_w)
 	AM_RANGE(0x1f00, 0x1f00) AM_WRITENOP /* probably a watchdog, disabled in service mode */
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_ROM

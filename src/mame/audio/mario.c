@@ -492,9 +492,9 @@ READ8_MEMBER(mario_state::mario_sh_tune_r)
 		return (SND[(0x1000 + (p2 & 0x0f) * 256 + offset) & mask]);
 }
 
-static WRITE8_DEVICE_HANDLER( mario_sh_sound_w )
+WRITE8_MEMBER(mario_state::mario_sh_sound_w)
 {
-	discrete_sound_w(device, space, DS_DAC, data);
+	discrete_sound_w(m_discrete, space, DS_DAC, data);
 }
 
 WRITE8_MEMBER(mario_state::mario_sh_p1_w)
@@ -534,15 +534,15 @@ WRITE8_MEMBER(mario_state::mario_sh_tuneselect_w)
 /* Sound 0 and 1 are pulsed !*/
 
 /* Mario running sample */
-WRITE8_DEVICE_HANDLER( mario_sh1_w )
+WRITE8_MEMBER(mario_state::mario_sh1_w)
 {
-	discrete_sound_w(device, space, DS_SOUND0_INP, 0);
+	discrete_sound_w(m_discrete, space, DS_SOUND0_INP, 0);
 }
 
 /* Luigi running sample */
-WRITE8_DEVICE_HANDLER( mario_sh2_w )
+WRITE8_MEMBER(mario_state::mario_sh2_w)
 {
-	discrete_sound_w(device, space, DS_SOUND1_INP, 0);
+	discrete_sound_w(m_discrete, space, DS_SOUND1_INP, 0);
 }
 
 /* Misc samples */
@@ -593,7 +593,7 @@ static ADDRESS_MAP_START( mario_sound_map, AS_PROGRAM, 8, mario_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mario_sound_io_map, AS_IO, 8, mario_state )
-	AM_RANGE(0x00, 0xff) AM_READ(mario_sh_tune_r) AM_DEVWRITE_LEGACY("discrete", mario_sh_sound_w)
+	AM_RANGE(0x00, 0xff) AM_READ(mario_sh_tune_r) AM_WRITE(mario_sh_sound_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mario_sh_p1_r, mario_sh_p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mario_sh_p2_r, mario_sh_p2_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(mario_sh_t0_r)
