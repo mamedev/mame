@@ -4,7 +4,13 @@
 
     Rotating game, like Midway's "Rotation VIII".
 
+    2012-09-28 System working [Robbbert]
+
     Schematic and PinMAME used as references.
+    Code for the sn76477 sound was derived from PinMAME.
+
+    There is a bug - if you score 1000 and had less than 100, the hundreds digit will
+    be blank. It will of course fix itself during the course of the game.
 
 
 *******************************************************************************************/
@@ -14,6 +20,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/6532riot.h"
 #include "machine/nvram.h"
+#include "sound/sn76477.h"
 #include "spectra.lh"
 
 
@@ -23,6 +30,7 @@ public:
 	spectra_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
+	m_snsnd(*this, "snsnd"),
 	m_p_ram(*this, "ram"),
 	m_samples(*this, "samples")
 	{ }
@@ -37,6 +45,7 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<sn76477_device> m_snsnd;
 	required_shared_ptr<UINT8> m_p_ram;
 	required_device<samples_device> m_samples;
 
@@ -137,6 +146,17 @@ WRITE8_MEMBER( spectra_state::porta_w )
 WRITE8_MEMBER( spectra_state::portb_w )
 {
 	m_portb = data;
+	float vco = 5.0;
+	if (BIT(data, 0)) vco -= 0.3125;
+	if (BIT(data, 1)) vco -= 0.625;
+	if (BIT(data, 2)) vco -= 1.25;
+	if (BIT(data, 3)) vco -= 2.5;
+	sn76477_vco_voltage_w(m_snsnd, 5.4 - vco);
+	sn76477_enable_w(m_snsnd, !BIT(data, 4)); // strobe: toggles enable
+	sn76477_envelope_1_w(m_snsnd, !BIT(data, 5)); //decay: toggles envelope
+	sn76477_vco_w(m_snsnd, BIT(data, 6)); // "phaser" sound: VCO toggled
+	sn76477_mixer_b_w(m_snsnd, BIT(data, 7)); // "pulse" sound: pins 25 & 27 changed
+	sn76477_mixer_c_w(m_snsnd, BIT(data, 7)); // "pulse" sound: pins 25 & 27 changed
 }
 
 
@@ -159,7 +179,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::nmitimer)
 
 // 00-27 displays
 // 40-6F lamps
-// 70-7F solenoids (73=outhole) no knocker
+// 70-7F solenoids - no knocker
 TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 {
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x5c, 0x63, 0x01, 0x40, 0x08, 0 }; // 74C912
@@ -190,6 +210,34 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 		m_out_offs = 0xff;
 }
 
+static const sn76477_interface sn76477_intf =
+{
+	RES_M(1000),	/*	4  noise_res		*/
+	RES_M(1000),	/*	5  filter_res		*/
+	CAP_N(0),	/*	6  filter_cap		*/
+	RES_K(470),	/*	7  decay_res		*/
+	CAP_N(1),	/*	8  attack_decay_cap */
+	RES_K(22),	/* 10  attack_res		*/
+	RES_K(100),	/* 11  amplitude_res	*/
+	RES_K(52),	/* 12  feedback_res 	*/
+	5.0,	/* 16  vco_voltage		*/
+	CAP_U(0.01),	/* 17  vco_cap			*/
+	RES_K(390),	/* 18  vco_res			*/
+	0.0,  /* 19  pitch_voltage	*/
+	RES_M(1),	/* 20  slf_res			*/
+	CAP_U(0.1),	/* 21  slf_cap			*/
+	CAP_U(0.47),	/* 23  oneshot_cap		*/
+	RES_K(470),		/* 24  oneshot_res	*/
+	0,			    /* 22  vco (variable)               */
+	0,			    /* 26  mixer A (grounded)           */
+	0,			    /* 25  mixer B (variable)           */
+	0,			    /* 27  mixer C (variable)           */
+	0,			    /* 1   envelope 1 (variable)        */
+	0,			    /* 28  envelope 2 (grounded)        */
+	1			    /* 9   enable (variable)            */
+};
+
+
 static MACHINE_CONFIG_START( spectra, spectra_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 3579545/4)  // actually a 6503
@@ -204,6 +252,9 @@ static MACHINE_CONFIG_START( spectra, spectra_state )
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
+	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_SOUND_CONFIG(sn76477_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /*--------------------------------
@@ -218,4 +269,4 @@ ROM_START(spectra)
 ROM_END
 
 
-GAME(1979,  spectra,  0,  spectra,  spectra, driver_device, 0,  ROT0,  "Valley", "Spectra IV", GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,  spectra,  0,  spectra,  spectra, driver_device, 0,  ROT0,  "Valley", "Spectra IV", GAME_MECHANICAL)
