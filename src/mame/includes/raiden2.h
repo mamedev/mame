@@ -21,6 +21,7 @@ public:
 	DECLARE_WRITE16_MEMBER( cop_dma_dst_w );
 	DECLARE_READ16_MEMBER( cop_dma_mode_r );
 	DECLARE_WRITE16_MEMBER( cop_dma_mode_w );
+	DECLARE_WRITE16_MEMBER( cop_pal_brightness_val_w );
 	DECLARE_READ16_MEMBER ( cop_reg_high_r );
 	DECLARE_WRITE16_MEMBER( cop_reg_high_w );
 	DECLARE_READ16_MEMBER ( cop_reg_low_r );
@@ -89,6 +90,7 @@ public:
 	UINT8 cop_itoa_digits[10];
 	UINT16 cop_dma_mode, cop_dma_src[0x200], cop_dma_dst[0x200], cop_dma_size[0x200], cop_dma_v1, cop_dma_v2, cop_dma_adr_rel;
 	UINT16 sprites_cur_start;
+	UINT16 pal_brightness_val;
 
 	UINT16 cop_func_trigger[0x100/8];		/* function trigger */
 	UINT16 cop_func_value[0x100/8];			/* function value (?) */

@@ -294,6 +294,20 @@ WRITE16_MEMBER(raiden2_state::cop_dma_size_w)
 	COMBINE_DATA(&cop_dma_size[cop_dma_mode]);
 }
 
+WRITE16_MEMBER(raiden2_state::cop_pal_brightness_val_w)
+{
+	COMBINE_DATA(&pal_brightness_val);
+}
+
+/* RE from Seibu Cup Soccer bootleg */
+static const UINT8 fade_table(int v)
+{
+    int low  = v & 0x001f;
+    int high = v & 0x03e0;
+
+    return (low * (high | (high >> 5)) + 0x210) >> 10;
+}
+
 WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 {
 	//  logerror("COP DMA mode=%x adr=%x size=%x vals=%x %x %x\n", cop_dma_mode, cop_dma_src[cop_dma_mode], cop_dma_size[cop_dma_mode], cop_dma_v1[cop_dma_mode], cop_dma_v2[cop_dma_mode], cop_dma_dst[cop_dma_mode]);
@@ -321,16 +335,35 @@ WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 		UINT32 src,dst,size;
 		int i;
 
-		src = (cop_dma_src[cop_dma_mode] << 6) + (cop_dma_adr_rel * 0x400);
+		src = (cop_dma_src[cop_dma_mode] << 6);
 		dst = (cop_dma_dst[cop_dma_mode] << 6);
 		size = ((cop_dma_size[cop_dma_mode] << 5) - (cop_dma_dst[cop_dma_mode] << 6) + 0x20)/2;
 
 		//printf("%08x %08x %08x\n",src,dst,size);
-		/* TODO: palette brightness */
 
 		for(i = 0;i < size;i++)
 		{
-			space.write_word(dst, space.read_word(src));
+			UINT16 pal_val;
+			int r,g,b;
+			int rt,gt,bt;
+
+			bt = (space.read_word(src + (cop_dma_adr_rel * 0x400)) & 0x7c00) >> 5;
+			bt = fade_table(bt|(pal_brightness_val ^ 0));
+			b = ((space.read_word(src)) & 0x7c00) >> 5;
+			b = fade_table(b|(pal_brightness_val ^ 0x1f));
+			pal_val = ((b + bt) & 0x1f) << 10;
+			gt = (space.read_word(src + (cop_dma_adr_rel * 0x400)) & 0x03e0);
+			gt = fade_table(gt|(pal_brightness_val ^ 0));
+			g = ((space.read_word(src)) & 0x03e0);
+			g = fade_table(g|(pal_brightness_val ^ 0x1f));
+			pal_val |= ((g + gt) & 0x1f) << 5;
+			rt = (space.read_word(src + (cop_dma_adr_rel * 0x400)) & 0x001f) << 5;
+			rt = fade_table(rt|(pal_brightness_val ^ 0));
+			r = ((space.read_word(src)) & 0x001f) << 5;
+			r = fade_table(r|(pal_brightness_val ^ 0x1f));
+			pal_val |= ((r + rt) & 0x1f);
+
+			space.write_word(dst, pal_val);
 			src+=2;
 			dst+=2;
 		}
@@ -1370,7 +1403,7 @@ static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00454, 0x00455) AM_WRITE(cop_sort_lookup_hi_w)
 	AM_RANGE(0x00456, 0x00457) AM_WRITE(cop_sort_lookup_lo_w)
 	AM_RANGE(0x00458, 0x00459) AM_WRITE(cop_sort_param_w)
-	AM_RANGE(0x0045a, 0x0045b) AM_WRITENOP //palette DMA brightness val, used by X Se Dae / Zero Team
+	AM_RANGE(0x0045a, 0x0045b) AM_WRITE(cop_pal_brightness_val_w) //palette DMA brightness val, used by X Se Dae / Zero Team
 	AM_RANGE(0x0045c, 0x0045d) AM_WRITENOP //palette DMA brightness mode, used by X Se Dae / Zero Team (sets to 5)
 	AM_RANGE(0x00470, 0x00471) AM_READWRITE(cop_tile_bank_2_r,cop_tile_bank_2_w)
 
