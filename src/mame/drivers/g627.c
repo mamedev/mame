@@ -22,7 +22,7 @@ Machine Operation:
 3. Hold X and start game. When 00 is flashing, release X
 4. Press any of QWERYUIOASDFGHJKLZ-='; to simulate scoring shots (T will tilt)
 5. Press and hold X to simulate losing the ball
-6. When score starts flashing, release X and go to step 5 to play next ball
+6. When score starts flashing, release X and go to step 4 to play next ball
 
 Note: You can start play at any of the 4 stations, and the table will rotate
       as needed. Multiplayer works as well.
