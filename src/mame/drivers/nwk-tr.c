@@ -631,7 +631,7 @@ static INPUT_PORTS_START( nwktr )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_START("ANALOG1")		// Steering
-	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_INVERT
+	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START("ANALOG2")		// Acceleration pedal
 	PORT_BIT( 0xfff, 0x000, IPT_PEDAL ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
@@ -928,10 +928,10 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1998, racingj,    0,       nwktr,   nwktr, nwktr_state, nwktr, ROT0, "Konami", "Racing Jam (JAC)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1999, racingj2,   racingj, nwktr,   nwktr, nwktr_state, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (EAE)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1999, racingj2j,  racingj, nwktr,   nwktr, nwktr_state, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (JAE)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1998, thrilld,    0,       thrilld, nwktr, nwktr_state, nwktr, ROT0, "Konami", "Thrill Drive (JAE)", GAME_IMPERFECT_SOUND )
-GAME( 1998, thrilldb,   thrilld, thrilld, nwktr, nwktr_state, nwktr, ROT0, "Konami", "Thrill Drive (JAB)", GAME_IMPERFECT_SOUND )
-GAME( 1998, thrilldae,  thrilld, thrilld, nwktr, nwktr_state, nwktr, ROT0, "Konami", "Thrill Drive (EAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1998, racingj,    0,       nwktr,   nwktr, nwktr_state, nwktr, ROT0, "Konami", "Racing Jam (JAC)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1999, racingj2,   racingj, nwktr,   nwktr, nwktr_state, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (EAE)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1999, racingj2j,  racingj, nwktr,   nwktr, nwktr_state, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (JAE)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1998, thrilld,    0,       thrilld, nwktr, nwktr_state, nwktr, ROT0, "Konami", "Thrill Drive (JAE)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, thrilldb,   thrilld, thrilld, nwktr, nwktr_state, nwktr, ROT0, "Konami", "Thrill Drive (JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, thrilldae,  thrilld, thrilld, nwktr, nwktr_state, nwktr, ROT0, "Konami", "Thrill Drive (EAA)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
