@@ -1334,12 +1334,6 @@ static GFXDECODE_START( vboy )
 	GFXDECODE_ENTRY( "pcg",     0x00000, vboy_pcg_8x8,      0, 1 )
 GFXDECODE_END
 
-struct vboy_pcb
-{
-	const char              *pcb_name;
-	int                     pcb_id;
-};
-
 READ32_MEMBER(vboy_state::sram_r)
 {
 	return m_vboy_sram[offset];
@@ -1348,29 +1342,6 @@ READ32_MEMBER(vboy_state::sram_r)
 WRITE32_MEMBER(vboy_state::sram_w)
 {
 	COMBINE_DATA(&m_vboy_sram[offset]);
-}
-
-#define VBOY_CHIP_NONE 0
-#define	VBOY_CHIP_SRAM 1
-
-static const vboy_pcb pcb_list[] =
-{
-	{"No",    VBOY_CHIP_NONE},
-	{"Yes",   VBOY_CHIP_SRAM}
-};
-
-
-static int vboy_get_pcb_id(const char *pcb)
-{
-	int	i;
-
-	for (i = 0; i < ARRAY_LENGTH(pcb_list); i++)
-	{
-		if (!mame_stricmp(pcb_list[i].pcb_name, pcb))
-			return pcb_list[i].pcb_id;
-	}
-
-	return 0;
 }
 
 
@@ -1389,19 +1360,15 @@ static DEVICE_IMAGE_LOAD( vboy_cart )
 	}
 	else
 	{
-		const char *pcb_name;
 		cart_size = image.get_software_region_length("rom");
 		memcpy(ROM, image.get_software_region("rom"), cart_size);
 
-		pcb_name = image.get_feature("eeprom");
-		if (pcb_name == NULL)
-			chip = 0;
-		else
-			chip = vboy_get_pcb_id(pcb_name);
-
+		UINT8 *tmp_eeprom = image.get_software_region("eeprom");
+		if (tmp_eeprom)
+			chip = 1;
 	}
 
-	if(chip & VBOY_CHIP_SRAM)
+	if (chip)
 	{
 		state->m_nvptr = (UINT8 *)&state->m_vboy_sram;
 
