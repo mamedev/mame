@@ -78,10 +78,10 @@ void isa16_svga_s3_device::device_start()
 	m_isa->install_device(0x03b0, 0x03bf, 0, 0, FUNC(s3_port_03b0_r), FUNC(s3_port_03b0_w));
 	m_isa->install_device(0x03c0, 0x03cf, 0, 0, FUNC(s3_port_03c0_r), FUNC(s3_port_03c0_w));
 	m_isa->install_device(0x03d0, 0x03df, 0, 0, FUNC(s3_port_03d0_r), FUNC(s3_port_03d0_w));
-	m_isa->install16_device(0x82e8, 0x82eb, 0, 0, FUNC(s3_currenty_r), FUNC(s3_currenty_w));
-	m_isa->install16_device(0x86e8, 0x86eb, 0, 0, FUNC(s3_currentx_r), FUNC(s3_currentx_w));
-	m_isa->install16_device(0x8ae8, 0x8aeb, 0, 0, FUNC(s3_8ae8_r), FUNC(s3_8ae8_w));
-	m_isa->install16_device(0x8ee8, 0x8eeb, 0, 0, FUNC(s3_8ee8_r), FUNC(s3_8ee8_w));
+	m_isa->install16_device(0x82e8, 0x82eb, 0, 0, FUNC(ibm8514_currenty_r), FUNC(ibm8514_currenty_w));
+	m_isa->install16_device(0x86e8, 0x86eb, 0, 0, FUNC(ibm8514_currentx_r), FUNC(ibm8514_currentx_w));
+	m_isa->install16_device(0x8ae8, 0x8aeb, 0, 0, FUNC(ibm8514_desty_r), FUNC(ibm8514_desty_w));
+	m_isa->install16_device(0x8ee8, 0x8eeb, 0, 0, FUNC(ibm8514_destx_r), FUNC(ibm8514_destx_w));
 	m_isa->install16_device(0x92e8, 0x92eb, 0, 0, FUNC(s3_line_error_r), FUNC(s3_line_error_w));
 	m_isa->install16_device(0x96e8, 0x96eb, 0, 0, FUNC(s3_width_r), FUNC(s3_width_w));
 	m_isa->install16_device(0x9ae8, 0x9aeb, 0, 0, FUNC(s3_gpstatus_r), FUNC(s3_cmd_w));

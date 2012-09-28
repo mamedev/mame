@@ -97,10 +97,10 @@ void isa16_vga_gfxultra_device::device_start()
 	m_isa->install16_device(0x56ec, 0x56ef, 0, 0, FUNC(mach8_scratch0_r), FUNC(mach8_scratch0_w));
 	m_isa->install16_device(0x5ae8, 0x5aeb, 0, 0, FUNC(mach8_ec2_r), FUNC(mach8_ec2_w));
 	m_isa->install16_device(0x5ee8, 0x5eeb, 0, 0, FUNC(mach8_ec3_r), FUNC(mach8_ec3_w));
-	m_isa->install16_device(0x82e8, 0x82eb, 0, 0, FUNC(s3_currenty_r), FUNC(s3_currenty_w));
-	m_isa->install16_device(0x86e8, 0x86eb, 0, 0, FUNC(s3_currentx_r), FUNC(s3_currentx_w));
-	m_isa->install16_device(0x8ae8, 0x8aeb, 0, 0, FUNC(s3_8ae8_r), FUNC(s3_8ae8_w));
-	m_isa->install16_device(0x8ee8, 0x8eeb, 0, 0, FUNC(s3_8ee8_r), FUNC(s3_8ee8_w));
+	m_isa->install16_device(0x82e8, 0x82eb, 0, 0, FUNC(ibm8514_currenty_r), FUNC(ibm8514_currenty_w));
+	m_isa->install16_device(0x86e8, 0x86eb, 0, 0, FUNC(ibm8514_currentx_r), FUNC(ibm8514_currentx_w));
+	m_isa->install16_device(0x8ae8, 0x8aeb, 0, 0, FUNC(ibm8514_desty_r), FUNC(ibm8514_desty_w));
+	m_isa->install16_device(0x8ee8, 0x8eeb, 0, 0, FUNC(ibm8514_destx_r), FUNC(ibm8514_destx_w));
 	m_isa->install16_device(0x92e8, 0x92eb, 0, 0, FUNC(s3_line_error_r), FUNC(s3_line_error_w));
 	m_isa->install16_device(0x96e8, 0x96eb, 0, 0, FUNC(s3_width_r), FUNC(s3_width_w));
 	m_isa->install16_device(0x96ec, 0x96ef, 0, 0, FUNC(mach8_bresenham_count_r), FUNC(mach8_bresenham_count_w));

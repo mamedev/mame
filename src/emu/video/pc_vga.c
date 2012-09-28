@@ -208,17 +208,8 @@ static struct
 	UINT8 enable_8514;
 	UINT8 cr53;
 	UINT16 current_cmd;
-	INT16 dest_x;
-	INT16 dest_y;
-	INT16 curr_x;
-	INT16 curr_y;
-	INT16 prev_x;
-	INT16 prev_y;
 	UINT16 src_x;
 	UINT16 src_y;
-	INT16 line_axial_step;
-	INT16 line_diagonal_step;
-	INT16 line_errorterm;
 	UINT16 rect_width;
 	UINT16 rect_height;
 	UINT32 fgcolour;
@@ -277,6 +268,15 @@ static struct
 	UINT16 ec3;
 	bool gpbusy;
 	bool data_avail;
+	INT16 dest_x;
+	INT16 dest_y;
+	INT16 curr_x;
+	INT16 curr_y;
+	INT16 prev_x;
+	INT16 prev_y;
+	INT16 line_axial_step;
+	INT16 line_diagonal_step;
+	INT16 line_errorterm;
 	int state;
 
 	UINT8 wait_vector_len;
@@ -3151,7 +3151,7 @@ static void s3_write_fg(UINT32 offset)
 	UINT8 src = 0;
 
 	// check clipping rectangle
-	if(s3.curr_x < s3.scissors_left || s3.curr_x > s3.scissors_right || s3.curr_y < s3.scissors_top || s3.curr_y > s3.scissors_bottom)
+	if(ibm8514.curr_x < s3.scissors_left || ibm8514.curr_x > s3.scissors_right || ibm8514.curr_y < s3.scissors_top || ibm8514.curr_y > s3.scissors_bottom)
 		return;  // do nothing
 
 	// determine source
@@ -3168,7 +3168,7 @@ static void s3_write_fg(UINT32 offset)
 		break;
 	case 0x0060:
 		// video memory - presume the memory is sourced from the current X/Y co-ords
-		src = vga.memory[((s3.curr_y * VGA_LINE_LENGTH) + s3.curr_x) % vga.svga_intf.vram_size];
+		src = vga.memory[((ibm8514.curr_y * VGA_LINE_LENGTH) + ibm8514.curr_x) % vga.svga_intf.vram_size];
 		break;
 	}
 
@@ -3232,7 +3232,7 @@ static void s3_write_bg(UINT32 offset)
 	UINT8 src = 0;
 
 	// check clipping rectangle
-	if(s3.curr_x < s3.scissors_left || s3.curr_x > s3.scissors_right || s3.curr_y < s3.scissors_top || s3.curr_y > s3.scissors_bottom)
+	if(ibm8514.curr_x < s3.scissors_left || ibm8514.curr_x > s3.scissors_right || ibm8514.curr_y < s3.scissors_top || ibm8514.curr_y > s3.scissors_bottom)
 		return;  // do nothing
 
 	// determine source
@@ -3249,7 +3249,7 @@ static void s3_write_bg(UINT32 offset)
 		break;
 	case 0x0060:
 		// video memory - presume the memory is sourced from the current X/Y co-ords
-		src = vga.memory[((s3.curr_y * VGA_LINE_LENGTH) + s3.curr_x) % vga.svga_intf.vram_size];
+		src = vga.memory[((ibm8514.curr_y * VGA_LINE_LENGTH) + ibm8514.curr_x) % vga.svga_intf.vram_size];
 		break;
 	}
 
@@ -3316,7 +3316,7 @@ void s3_write(UINT32 offset, UINT32 src)
 	{
 	case 0x0000:  // Foreground Mix only
 		// check clipping rectangle
-		if(s3.curr_x < s3.scissors_left || s3.curr_x > s3.scissors_right || s3.curr_y < s3.scissors_top || s3.curr_y > s3.scissors_bottom)
+		if(ibm8514.curr_x < s3.scissors_left || ibm8514.curr_x > s3.scissors_right || ibm8514.curr_y < s3.scissors_top || ibm8514.curr_y > s3.scissors_bottom)
 			return;  // do nothing
 		s3_write_fg(offset);
 		break;
@@ -3373,12 +3373,12 @@ bit  0-12  (911/924) LINE PARAMETER/ERROR TERM. For Line Drawing this is the
  */
 READ16_HANDLER(s3_line_error_r)
 {
-	return s3.line_errorterm;
+	return ibm8514.line_errorterm;
 }
 
 WRITE16_HANDLER(s3_line_error_w)
 {
-	s3.line_errorterm = data;
+	ibm8514.line_errorterm = data;
 	if(LOG_8514) logerror("S3: Line Parameter/Error Term write %04x\n",data);
 }
 
@@ -3422,38 +3422,38 @@ static void ibm8514_draw_vector(UINT8 len, UINT8 dir, bool draw)
 
 	while(x <= len)
 	{
-		offset = (s3.curr_y * VGA_LINE_LENGTH) + s3.curr_x;
+		offset = (ibm8514.curr_y * VGA_LINE_LENGTH) + ibm8514.curr_x;
 		if(draw)
 			s3_write(offset,offset);
 		switch(dir)
 		{
 		case 0:  // 0 degrees
-			s3.curr_x++;
+			ibm8514.curr_x++;
 			break;
 		case 1:  // 45 degrees
-			s3.curr_x++;
-			s3.curr_y--;
+			ibm8514.curr_x++;
+			ibm8514.curr_y--;
 			break;
 		case 2:  // 90 degrees
-			s3.curr_y--;
+			ibm8514.curr_y--;
 			break;
 		case 3:  // 135 degrees
-			s3.curr_y--;
-			s3.curr_x--;
+			ibm8514.curr_y--;
+			ibm8514.curr_x--;
 			break;
 		case 4:  // 180 degrees
-			s3.curr_x--;
+			ibm8514.curr_x--;
 			break;
 		case 5:  // 225 degrees
-			s3.curr_x--;
-			s3.curr_y++;
+			ibm8514.curr_x--;
+			ibm8514.curr_y++;
 			break;
 		case 6:  // 270 degrees
-			s3.curr_y++;
+			ibm8514.curr_y++;
 			break;
 		case 7:  // 315 degrees
-			s3.curr_y++;
-			s3.curr_x++;
+			ibm8514.curr_y++;
+			ibm8514.curr_x++;
 			break;
 		}
 		x++;
@@ -3586,27 +3586,27 @@ WRITE16_HANDLER(ibm8514_cmd_w)
 			{
 				ibm8514.state = IBM8514_DRAWING_LINE;
 				ibm8514.data_avail = true;
-				if(LOG_8514) logerror("S3: Command (%04x) - Vector Line (WAIT) %i,%i \n",s3.current_cmd,s3.curr_x,s3.curr_y);
+				if(LOG_8514) logerror("S3: Command (%04x) - Vector Line (WAIT) %i,%i \n",s3.current_cmd,ibm8514.curr_x,ibm8514.curr_y);
 			}
 			else
 			{
 				ibm8514_draw_vector(s3.rect_width,(data & 0x00e0) >> 5,(data & 0010) ? true : false);
-				if(LOG_8514) logerror("S3: Command (%04x) - Vector Line - %i,%i \n",s3.current_cmd,s3.curr_x,s3.curr_y);
+				if(LOG_8514) logerror("S3: Command (%04x) - Vector Line - %i,%i \n",s3.current_cmd,ibm8514.curr_x,ibm8514.curr_y);
 			}
 		}
 		else
 		{
 			// Not perfect, but will do for now.
 			INT16 dx = s3.rect_width;
-			INT16 dy = s3.line_axial_step >> 1;
-			INT16 err = s3.line_errorterm;
+			INT16 dy = ibm8514.line_axial_step >> 1;
+			INT16 err = ibm8514.line_errorterm;
 			int sx = (data & 0x0020) ? 1 : -1;
 			int sy = (data & 0x0080) ? 1 : -1;
 			int count = 0;
 			INT16 temp;
 
 			if(LOG_8514) logerror("S3: Command (%04x) - Line (Bresenham) - %i,%i  Axial %i, Diagonal %i, Error %i, Major Axis %i, Minor Axis %i\n",s3.current_cmd,
-				s3.curr_x,s3.curr_y,s3.line_axial_step,s3.line_diagonal_step,s3.line_errorterm,s3.rect_width,s3.rect_height);
+				ibm8514.curr_x,ibm8514.curr_y,ibm8514.line_axial_step,ibm8514.line_diagonal_step,ibm8514.line_errorterm,s3.rect_width,s3.rect_height);
 
 			if((data & 0x0040))
 			{
@@ -3614,18 +3614,18 @@ WRITE16_HANDLER(ibm8514_cmd_w)
 			}
 			for(;;)
 			{
-				s3_write(s3.curr_x + (s3.curr_y * VGA_LINE_LENGTH),s3.curr_x + (s3.curr_y * VGA_LINE_LENGTH));
+				s3_write(ibm8514.curr_x + (ibm8514.curr_y * VGA_LINE_LENGTH),ibm8514.curr_x + (ibm8514.curr_y * VGA_LINE_LENGTH));
 				if (count > s3.rect_width) break;
 				count++;
 				if((err*2) > -dy)
 				{
 					err -= dy;
-					s3.curr_x += sx;
+					ibm8514.curr_x += sx;
 				}
 				if((err*2) < dx)
 				{
 					err += dx;
-					s3.curr_y += sy;
+					ibm8514.curr_y += sy;
 				}
 			}
 		}
@@ -3637,15 +3637,15 @@ WRITE16_HANDLER(ibm8514_cmd_w)
 			//ibm8514.gpbusy = true;  // DirectX 5 keeps waiting for the busy bit to be clear...
 			s3.bus_size = (data & 0x0600) >> 9;
 			ibm8514.data_avail = true;
-			if(LOG_8514) logerror("S3: Command (%04x) - Rectangle Fill (WAIT) %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,
-					s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
+			if(LOG_8514) logerror("S3: Command (%04x) - Rectangle Fill (WAIT) %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,ibm8514.curr_x,
+					ibm8514.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
 			break;
 		}
-		if(LOG_8514) logerror("S3: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,
-				s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
+		if(LOG_8514) logerror("S3: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,ibm8514.curr_x,
+				ibm8514.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
 		off = 0;
-		off += (VGA_LINE_LENGTH * s3.curr_y);
-		off += s3.curr_x;
+		off += (VGA_LINE_LENGTH * ibm8514.curr_y);
+		off += ibm8514.curr_x;
 		for(y=0;y<=s3.rect_height;y++)
 		{
 			for(x=0;x<=s3.rect_width;x++)
@@ -3656,28 +3656,28 @@ WRITE16_HANDLER(ibm8514_cmd_w)
 					s3_write((off-x) % vga.svga_intf.vram_size,(off-x) % vga.svga_intf.vram_size);
 				if(s3.current_cmd & 0x0020)
 				{
-					s3.curr_x++;
-					if(s3.curr_x > s3.prev_x + s3.rect_width)
+					ibm8514.curr_x++;
+					if(ibm8514.curr_x > ibm8514.prev_x + s3.rect_width)
 					{
-						s3.curr_x = s3.prev_x;
+						ibm8514.curr_x = ibm8514.prev_x;
 						s3.src_x = 0;
 						if(s3.current_cmd & 0x0080)
-							s3.curr_y++;
+							ibm8514.curr_y++;
 						else
-							s3.curr_y--;
+							ibm8514.curr_y--;
 					}
 				}
 				else
 				{
-					s3.curr_x--;
-					if(s3.curr_x < s3.prev_x - s3.rect_width)
+					ibm8514.curr_x--;
+					if(ibm8514.curr_x < ibm8514.prev_x - s3.rect_width)
 					{
-						s3.curr_x = s3.prev_x;
+						ibm8514.curr_x = ibm8514.prev_x;
 						s3.src_x = 0;
 						if(s3.current_cmd & 0x0080)
-							s3.curr_y++;
+							ibm8514.curr_y++;
 						else
-							s3.curr_y--;
+							ibm8514.curr_y--;
 					}
 				}
 			}
@@ -3691,13 +3691,13 @@ WRITE16_HANDLER(ibm8514_cmd_w)
 		break;
 	case 0xc000:  // BitBLT
 		if(LOG_8514) logerror("S3: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",s3.current_cmd,
-				s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
+				ibm8514.curr_x,ibm8514.curr_y,ibm8514.dest_x,ibm8514.dest_y,s3.rect_width,s3.rect_height);
 		off = 0;
-		off += (VGA_LINE_LENGTH * s3.dest_y);
-		off += s3.dest_x;
+		off += (VGA_LINE_LENGTH * ibm8514.dest_y);
+		off += ibm8514.dest_x;
 		src = 0;
-		src += (VGA_LINE_LENGTH * s3.curr_y);
-		src += s3.curr_x;
+		src += (VGA_LINE_LENGTH * ibm8514.curr_y);
+		src += ibm8514.curr_x;
 		for(y=0;y<=s3.rect_height;y++)
 		{
 			for(x=0;x<=s3.rect_width;x++)
@@ -3708,28 +3708,28 @@ WRITE16_HANDLER(ibm8514_cmd_w)
 					vga.memory[(off-x) % vga.svga_intf.vram_size] = vga.memory[(src-x) % vga.svga_intf.vram_size];
 				if(s3.current_cmd & 0x0020)
 				{
-					s3.curr_x++;
-					if(s3.curr_x > s3.prev_x + s3.rect_width)
+					ibm8514.curr_x++;
+					if(ibm8514.curr_x > ibm8514.prev_x + s3.rect_width)
 					{
-						s3.curr_x = s3.prev_x;
+						ibm8514.curr_x = ibm8514.prev_x;
 						s3.src_x = 0;
 						if(s3.current_cmd & 0x0080)
-							s3.curr_y++;
+							ibm8514.curr_y++;
 						else
-							s3.curr_y--;
+							ibm8514.curr_y--;
 					}
 				}
 				else
 				{
-					s3.curr_x--;
-					if(s3.curr_x < s3.prev_x - s3.rect_width)
+					ibm8514.curr_x--;
+					if(ibm8514.curr_x < ibm8514.prev_x - s3.rect_width)
 					{
-						s3.curr_x = s3.prev_x;
+						ibm8514.curr_x = ibm8514.prev_x;
 						s3.src_x = 0;
 						if(s3.current_cmd & 0x0080)
-							s3.curr_y++;
+							ibm8514.curr_y++;
 						else
-							s3.curr_y--;
+							ibm8514.curr_y--;
 					}
 				}
 			}
@@ -3749,13 +3749,13 @@ WRITE16_HANDLER(ibm8514_cmd_w)
 		break;
 	case 0xe000:  // Pattern Fill
 		if(LOG_8514) logerror("S3: Command (%04x) - Pattern Fill - source %i,%i  dest %i,%i  Width: %i Height: %i\n",s3.current_cmd,
-				s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
+				ibm8514.curr_x,ibm8514.curr_y,ibm8514.dest_x,ibm8514.dest_y,s3.rect_width,s3.rect_height);
 		off = 0;
-		off += (VGA_LINE_LENGTH * s3.dest_y);
-		off += s3.dest_x;
+		off += (VGA_LINE_LENGTH * ibm8514.dest_y);
+		off += ibm8514.dest_x;
 		src = 0;
-		src += (VGA_LINE_LENGTH * s3.curr_y);
-		src += s3.curr_x;
+		src += (VGA_LINE_LENGTH * ibm8514.curr_y);
+		src += ibm8514.curr_x;
 		if(data & 0x0020)
 			pattern_x = 0;
 		else
@@ -3840,16 +3840,16 @@ bit  0-11  DESTINATION Y-POSITION. During BITBLT operations this is the Y
      0-13  (80 x+) LINE PARAMETER AXIAL STEP CONSTANT. Se above
 
  */
-READ16_HANDLER( s3_8ae8_r )
+READ16_HANDLER( ibm8514_desty_r )
 {
-	return s3.line_axial_step;
+	return ibm8514.line_axial_step;
 }
 
-WRITE16_HANDLER( s3_8ae8_w )
+WRITE16_HANDLER( ibm8514_desty_w )
 {
-	s3.line_axial_step = data;
-	s3.dest_y = data;
-	if(LOG_8514) logerror("S3: Line Axial Step / Destination Y write %04x\n",data);
+	ibm8514.line_axial_step = data;
+	ibm8514.dest_y = data;
+	if(LOG_8514) logerror("8514/A: Line Axial Step / Destination Y write %04x\n",data);
 }
 
 /*
@@ -3865,16 +3865,16 @@ bit  0-11  DESTINATION X-POSITION. During BITBLT operations this is the X
      0-13  (80x +) LINE PARAMETER DIAGONAL STEP CONSTANT. Se above
 
  */
-READ16_HANDLER( s3_8ee8_r )
+READ16_HANDLER( ibm8514_destx_r )
 {
-	return s3.line_diagonal_step;
+	return ibm8514.line_diagonal_step;
 }
 
-WRITE16_HANDLER( s3_8ee8_w )
+WRITE16_HANDLER( ibm8514_destx_w )
 {
-	s3.line_diagonal_step = data;
-	s3.dest_x = data;
-	if(LOG_8514) logerror("S3: Line Diagonal Step / Destination X write %04x\n",data);
+	ibm8514.line_diagonal_step = data;
+	ibm8514.dest_x = data;
+	if(LOG_8514) logerror("8514/A: Line Diagonal Step / Destination X write %04x\n",data);
 }
 
 /*
@@ -3949,38 +3949,38 @@ static void ibm8514_wait_draw_ssv()
 
 		if(ibm8514.state == IBM8514_DRAWING_SSV_1 || ibm8514.state == IBM8514_DRAWING_SSV_2)
 		{
-			offset = (s3.curr_y * VGA_LINE_LENGTH) + s3.curr_x;
+			offset = (ibm8514.curr_y * VGA_LINE_LENGTH) + ibm8514.curr_x;
 			if(draw)
 				s3_write(offset,offset);
 			switch(dir)
 			{
 			case 0:  // 0 degrees
-				s3.curr_x++;
+				ibm8514.curr_x++;
 				break;
 			case 1:  // 45 degrees
-				s3.curr_x++;
-				s3.curr_y--;
+				ibm8514.curr_x++;
+				ibm8514.curr_y--;
 				break;
 			case 2:  // 90 degrees
-				s3.curr_y--;
+				ibm8514.curr_y--;
 				break;
 			case 3:  // 135 degrees
-				s3.curr_y--;
-				s3.curr_x--;
+				ibm8514.curr_y--;
+				ibm8514.curr_x--;
 				break;
 			case 4:  // 180 degrees
-				s3.curr_x--;
+				ibm8514.curr_x--;
 				break;
 			case 5:  // 225 degrees
-				s3.curr_x--;
-				s3.curr_y++;
+				ibm8514.curr_x--;
+				ibm8514.curr_y++;
 				break;
 			case 6:  // 270 degrees
-				s3.curr_y++;
+				ibm8514.curr_y++;
 				break;
 			case 7:  // 315 degrees
-				s3.curr_y++;
-				s3.curr_x++;
+				ibm8514.curr_y++;
+				ibm8514.curr_x++;
 				break;
 			}
 		}
@@ -4061,38 +4061,38 @@ static void ibm8514_wait_draw_vector()
 
 		if(ibm8514.state == IBM8514_DRAWING_LINE)
 		{
-			offset = (s3.curr_y * VGA_LINE_LENGTH) + s3.curr_x;
+			offset = (ibm8514.curr_y * VGA_LINE_LENGTH) + ibm8514.curr_x;
 			if(draw)
 				s3_write(offset,offset);
 			switch(dir)
 			{
 			case 0:  // 0 degrees
-				s3.curr_x++;
+				ibm8514.curr_x++;
 				break;
 			case 1:  // 45 degrees
-				s3.curr_x++;
-				s3.curr_y--;
+				ibm8514.curr_x++;
+				ibm8514.curr_y--;
 				break;
 			case 2:  // 90 degrees
-				s3.curr_y--;
+				ibm8514.curr_y--;
 				break;
 			case 3:  // 135 degrees
-				s3.curr_y--;
-				s3.curr_x--;
+				ibm8514.curr_y--;
+				ibm8514.curr_x--;
 				break;
 			case 4:  // 180 degrees
-				s3.curr_x--;
+				ibm8514.curr_x--;
 				break;
 			case 5:  // 225 degrees
-				s3.curr_x--;
-				s3.curr_y++;
+				ibm8514.curr_x--;
+				ibm8514.curr_y++;
 				break;
 			case 6:  // 270 degrees
-				s3.curr_y++;
+				ibm8514.curr_y++;
 				break;
 			case 7:  // 315 degrees
-				s3.curr_y++;
-				s3.curr_x++;
+				ibm8514.curr_y++;
+				ibm8514.curr_x++;
 				break;
 			}
 		}
@@ -4119,28 +4119,28 @@ WRITE16_HANDLER( s3_width_w )
 	if(LOG_8514) logerror("S3: Major Axis Pixel Count / Rectangle Width write %04x\n",data);
 }
 
-READ16_HANDLER(s3_currentx_r)
+READ16_HANDLER(ibm8514_currentx_r)
 {
-	return s3.curr_x;
+	return ibm8514.curr_x;
 }
 
-WRITE16_HANDLER(s3_currentx_w)
+WRITE16_HANDLER(ibm8514_currentx_w)
 {
-	s3.curr_x = data;
-	s3.prev_x = data;
-	if(LOG_8514) logerror("S3: Current X set to %04x (%i)\n",data,s3.curr_x);
+	ibm8514.curr_x = data;
+	ibm8514.prev_x = data;
+	if(LOG_8514) logerror("8514/A: Current X set to %04x (%i)\n",data,ibm8514.curr_x);
 }
 
-READ16_HANDLER(s3_currenty_r)
+READ16_HANDLER(ibm8514_currenty_r)
 {
-	return s3.curr_y;
+	return ibm8514.curr_y;
 }
 
-WRITE16_HANDLER(s3_currenty_w)
+WRITE16_HANDLER(ibm8514_currenty_w)
 {
-	s3.curr_y = data;
-	s3.prev_y = data;
-	if(LOG_8514) logerror("S3: Current Y set to %04x (%i)\n",data,s3.curr_y);
+	ibm8514.curr_y = data;
+	ibm8514.prev_y = data;
+	if(LOG_8514) logerror("8514/A: Current Y set to %04x (%i)\n",data,ibm8514.curr_y);
 }
 
 READ16_HANDLER(s3_fgcolour_r)
@@ -4290,8 +4290,8 @@ static void s3_wait_draw()
 	if(s3.bus_size == 2)  // 32-bit
 		data_size = 32;
 	off = 0;
-	off += (VGA_LINE_LENGTH * s3.curr_y);
-	off += s3.curr_x;
+	off += (VGA_LINE_LENGTH * ibm8514.curr_y);
+	off += ibm8514.curr_x;
 	if(s3.current_cmd & 0x02) // "across plane mode"
 	{
 		for(x=0;x<data_size;x++)
@@ -4300,15 +4300,15 @@ static void s3_wait_draw()
 			if(s3.current_cmd & 0x0020)
 			{
 				off++;
-				s3.curr_x++;
-				if(s3.curr_x > s3.prev_x + s3.rect_width)
+				ibm8514.curr_x++;
+				if(ibm8514.curr_x > ibm8514.prev_x + s3.rect_width)
 				{
-					s3.curr_x = s3.prev_x;
+					ibm8514.curr_x = ibm8514.prev_x;
 					s3.src_x = 0;
 					if(s3.current_cmd & 0x0080)
 					{
-						s3.curr_y++;
-						if(s3.curr_y > s3.prev_y + s3.rect_height)
+						ibm8514.curr_y++;
+						if(ibm8514.curr_y > ibm8514.prev_y + s3.rect_height)
 						{
 							ibm8514.state = IBM8514_IDLE;
 							ibm8514.data_avail = false;
@@ -4317,8 +4317,8 @@ static void s3_wait_draw()
 					}
 					else
 					{
-						s3.curr_y--;
-						if(s3.curr_y < s3.prev_y - s3.rect_height)
+						ibm8514.curr_y--;
+						if(ibm8514.curr_y < ibm8514.prev_y - s3.rect_height)
 						{
 							ibm8514.state = IBM8514_IDLE;
 							ibm8514.data_avail = false;
@@ -4331,15 +4331,15 @@ static void s3_wait_draw()
 			else
 			{
 				off--;
-				s3.curr_x--;
-				if(s3.curr_x < s3.prev_x - s3.rect_width)
+				ibm8514.curr_x--;
+				if(ibm8514.curr_x < ibm8514.prev_x - s3.rect_width)
 				{
-					s3.curr_x = s3.prev_x;
+					ibm8514.curr_x = ibm8514.prev_x;
 					s3.src_x = 0;
 					if(s3.current_cmd & 0x0080)
 					{
-						s3.curr_y++;
-						if(s3.curr_y > s3.prev_y + s3.rect_height)
+						ibm8514.curr_y++;
+						if(ibm8514.curr_y > ibm8514.prev_y + s3.rect_height)
 						{
 							ibm8514.state = IBM8514_IDLE;
 							ibm8514.gpbusy = false;
@@ -4348,8 +4348,8 @@ static void s3_wait_draw()
 					}
 					else
 					{
-						s3.curr_y--;
-						if(s3.curr_y < s3.prev_y - s3.rect_height)
+						ibm8514.curr_y--;
+						if(ibm8514.curr_y < ibm8514.prev_y - s3.rect_height)
 						{
 							ibm8514.state = IBM8514_IDLE;
 							ibm8514.gpbusy = false;
@@ -4371,15 +4371,15 @@ static void s3_wait_draw()
 			if(s3.current_cmd & 0x0020)
 			{
 				off++;
-				s3.curr_x++;
-				if(s3.curr_x > s3.prev_x + s3.rect_width)
+				ibm8514.curr_x++;
+				if(ibm8514.curr_x > ibm8514.prev_x + s3.rect_width)
 				{
-					s3.curr_x = s3.prev_x;
+					ibm8514.curr_x = ibm8514.prev_x;
 					s3.src_x = 0;
 					if(s3.current_cmd & 0x0080)
 					{
-						s3.curr_y++;
-						if(s3.curr_y > s3.prev_y + s3.rect_height)
+						ibm8514.curr_y++;
+						if(ibm8514.curr_y > ibm8514.prev_y + s3.rect_height)
 						{
 							ibm8514.state = IBM8514_IDLE;
 							ibm8514.gpbusy = false;
@@ -4388,8 +4388,8 @@ static void s3_wait_draw()
 					}
 					else
 					{
-						s3.curr_y--;
-						if(s3.curr_y < s3.prev_y - s3.rect_height)
+						ibm8514.curr_y--;
+						if(ibm8514.curr_y < ibm8514.prev_y - s3.rect_height)
 						{
 							ibm8514.state = IBM8514_IDLE;
 							ibm8514.gpbusy = false;
@@ -4402,15 +4402,15 @@ static void s3_wait_draw()
 			else
 			{
 				off--;
-				s3.curr_x--;
-				if(s3.curr_x < s3.prev_x - s3.rect_width)
+				ibm8514.curr_x--;
+				if(ibm8514.curr_x < ibm8514.prev_x - s3.rect_width)
 				{
-					s3.curr_x = s3.prev_x;
+					ibm8514.curr_x = ibm8514.prev_x;
 					s3.src_x = 0;
 					if(s3.current_cmd & 0x0080)
 					{
-						s3.curr_y++;
-						if(s3.curr_y > s3.prev_y + s3.rect_height)
+						ibm8514.curr_y++;
+						if(ibm8514.curr_y > ibm8514.prev_y + s3.rect_height)
 						{
 							ibm8514.state = IBM8514_IDLE;
 							ibm8514.gpbusy = false;
@@ -4419,8 +4419,8 @@ static void s3_wait_draw()
 					}
 					else
 					{
-						s3.curr_y--;
-						if(s3.curr_y < s3.prev_y - s3.rect_height)
+						ibm8514.curr_y--;
+						if(ibm8514.curr_y < ibm8514.prev_y - s3.rect_height)
 						{
 							ibm8514.state = IBM8514_IDLE;
 							ibm8514.gpbusy = false;
@@ -4589,43 +4589,43 @@ WRITE8_HANDLER( s3_mem_w )
 		{
 		case 0x8100:
 		case 0x82e8:
-			s3.curr_y = (s3.curr_y & 0xff00) | data;
-			s3.prev_y = (s3.prev_y & 0xff00) | data;
+			ibm8514.curr_y = (ibm8514.curr_y & 0xff00) | data;
+			ibm8514.prev_y = (ibm8514.prev_y & 0xff00) | data;
 			break;
 		case 0x8101:
 		case 0x82e9:
-			s3.curr_y = (s3.curr_y & 0x00ff) | (data << 8);
-			s3.prev_y = (s3.prev_y & 0x00ff) | (data << 8);
+			ibm8514.curr_y = (ibm8514.curr_y & 0x00ff) | (data << 8);
+			ibm8514.prev_y = (ibm8514.prev_y & 0x00ff) | (data << 8);
 			break;
 		case 0x8102:
 		case 0x86e8:
-			s3.curr_x = (s3.curr_x & 0xff00) | data;
-			s3.prev_x = (s3.prev_x & 0xff00) | data;
+			ibm8514.curr_x = (ibm8514.curr_x & 0xff00) | data;
+			ibm8514.prev_x = (ibm8514.prev_x & 0xff00) | data;
 			break;
 		case 0x8103:
 		case 0x86e9:
-			s3.curr_x = (s3.curr_x & 0x00ff) | (data << 8);
-			s3.prev_x = (s3.prev_x & 0x00ff) | (data << 8);
+			ibm8514.curr_x = (ibm8514.curr_x & 0x00ff) | (data << 8);
+			ibm8514.prev_x = (ibm8514.prev_x & 0x00ff) | (data << 8);
 			break;
 		case 0x8108:
 		case 0x8ae8:
-			s3.line_axial_step = (s3.line_axial_step & 0xff00) | data;
-			s3.dest_y = (s3.dest_y & 0xff00) | data;
+			ibm8514.line_axial_step = (ibm8514.line_axial_step & 0xff00) | data;
+			ibm8514.dest_y = (ibm8514.dest_y & 0xff00) | data;
 			break;
 		case 0x8109:
 		case 0x8ae9:
-			s3.line_axial_step = (s3.line_axial_step & 0x00ff) | ((data & 0x3f) << 8);
-			s3.dest_y = (s3.dest_y & 0x00ff) | (data << 8);
+			ibm8514.line_axial_step = (ibm8514.line_axial_step & 0x00ff) | ((data & 0x3f) << 8);
+			ibm8514.dest_y = (ibm8514.dest_y & 0x00ff) | (data << 8);
 			break;
 		case 0x810a:
 		case 0x8ee8:
-			s3.line_diagonal_step = (s3.line_diagonal_step & 0xff00) | data;
-			s3.dest_x = (s3.dest_x & 0xff00) | data;
+			ibm8514.line_diagonal_step = (ibm8514.line_diagonal_step & 0xff00) | data;
+			ibm8514.dest_x = (ibm8514.dest_x & 0xff00) | data;
 			break;
 		case 0x810b:
 		case 0x8ee9:
-			s3.line_diagonal_step = (s3.line_diagonal_step & 0x00ff) | ((data & 0x3f) << 8);
-			s3.dest_x = (s3.dest_x & 0x00ff) | (data << 8);
+			ibm8514.line_diagonal_step = (ibm8514.line_diagonal_step & 0x00ff) | ((data & 0x3f) << 8);
+			ibm8514.dest_x = (ibm8514.dest_x & 0x00ff) | (data << 8);
 			break;
 		case 0x8118:
 		case 0x9ae8:
@@ -5280,27 +5280,27 @@ WRITE16_HANDLER(mach8_linedraw_w)
 	switch(ati.linedraw)
 	{
 	case 0:  // Set current X
-		s3.curr_x = data;
+		ibm8514.curr_x = data;
 		ati.linedraw++;
 		break;
 	case 1:  // Set current Y
-		s3.curr_y = data;
+		ibm8514.curr_y = data;
 		ati.linedraw++;
 		break;
 	case 2:  // Line end X
-		s3.curr_x = data;
+		ibm8514.curr_x = data;
 		ati.linedraw++;
 		break;
 	case 3:  // Line end Y
-		s3.curr_y = data;
+		ibm8514.curr_y = data;
 		ati.linedraw = 2;
 		break;
 	case 4:  // Set current X
-		s3.curr_x = data;
+		ibm8514.curr_x = data;
 		ati.linedraw++;
 		break;
 	case 5:  // Set current Y
-		s3.curr_y = data;
+		ibm8514.curr_y = data;
 		ati.linedraw = 4;
 		break;
 	}
