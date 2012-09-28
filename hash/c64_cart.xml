@@ -4744,6 +4744,19 @@
 		</part>
 	</software>
 
+	<software name="deadtest">
+		<description>C-64 Dead Test</description>
+		<year>1988</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="1" />
+			<feature name="game" value="0" />
+			<dataarea name="romh" size="0x2000">
+				<rom name="c64_dead_test_cartridge.bin" size="0x2000" crc="459fc13e" sha1="3bc1222252faa645f2485cbe16352fe23039cac3" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="c64diag">
 		<description>C-64 Diagnostic r.586220</description>
 		<year>19??</year>
