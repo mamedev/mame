@@ -2116,7 +2116,7 @@ READ8_MEMBER(taitotz_state::tlcs900_port_read)
 		case 0xe: return ioport("INPUTS4")->read();
 
 		default:
-			printf("tlcs900_port_read %02X\n", offset);
+			//printf("tlcs900_port_read %02X\n", offset);
 			break;
 	}
 
