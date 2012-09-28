@@ -1103,7 +1103,7 @@ static MACHINE_CONFIG_START( scorpion1, bfm_sc1_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_DEFAULT_LAYOUT(layout_bfm_sc1)
+	MCFG_DEFAULT_LAYOUT(layout_sc1_vfd)
 MACHINE_CONFIG_END
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1115,7 +1115,7 @@ static MACHINE_CONFIG_DERIVED( scorpion1_adder2, scorpion1 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sc1_adder2)				// setup read and write memorymap
 
-	MCFG_DEFAULT_LAYOUT(layout_bfm_sc1)
+	MCFG_DEFAULT_LAYOUT(layout_sc1_vid)
 	MCFG_SCREEN_ADD("adder", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE( 400, 300)
