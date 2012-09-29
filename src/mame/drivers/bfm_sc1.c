@@ -97,7 +97,9 @@ Optional (on expansion card) (Viper)
 #include "sound/upd7759.h"
 #include "machine/nvram.h"
 #include "machine/bfm_comn.h"
-#include "bfm_sc1.lh"
+
+#include "sc1_vfd.lh"
+#include "sc1_vid.lh"
 
 class bfm_sc1_state : public driver_device
 {
