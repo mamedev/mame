@@ -100,7 +100,7 @@ public:
 	int m_slot_expanded[4];
 	UINT8 m_primary_slot;
 	UINT8 m_secondary_slot[4];
-	UINT8 m_superloadrunner_bank;
+	UINT8 m_superloderunner_bank;
 	UINT8 m_korean90in1_bank;
 	UINT8 *m_top_page;
 	int m_port_c_old;

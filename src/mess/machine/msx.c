@@ -103,6 +103,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 		{
 			static const struct { const char *mapper_name; int mapper_type; } mapper_types[] =
 			{
+				{ "NOMAPPER",			SLOT_EMPTY },
 				{ "M60002-0125SP",		SLOT_ASCII8 },
 				{ "LZ93A13",			SLOT_ASCII8 },
 				{ "LZ93A13-16",			SLOT_ASCII16 },
@@ -115,8 +116,8 @@ DEVICE_IMAGE_LOAD (msx_cart)
 				{ "BS6101-16",			SLOT_ASCII16 },
 				{ "KONAMI-SCC",			SLOT_KONAMI_SCC },
 				{ "KONAMI",				SLOT_KONAMI },
-				{ "SUPERLODE",			SLOT_MAJUTSUSHI },
-				{ "MAJUTSUSHI",			SLOT_SUPERLOADRUNNER },
+				{ "SUPERLODE",			SLOT_SUPERLODERUNNER },
+				{ "MAJUTSUSHI",			SLOT_MAJUTSUSHI },
 			};
 			
 			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && type < 0; i++)
@@ -1016,8 +1017,8 @@ WRITE8_MEMBER( msx_state::msx_page0_w )
 {
 	if ( offset == 0 )
 	{
-		m_superloadrunner_bank = data;
-		if (m_slot[2]->slot_type == SLOT_SUPERLOADRUNNER)
+		m_superloderunner_bank = data;
+		if (m_slot[2]->slot_type == SLOT_SUPERLODERUNNER)
 			m_slot[2]->map (machine(), m_state[2], 2);
 	}
 

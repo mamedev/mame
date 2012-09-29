@@ -64,7 +64,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
-				<rom name="nc81820-g30" size="131072" crc="a27787af" sha1="0733cd627467a866846e15caf1770a5594eaf4cc" offset="0" />
+				<rom name="nc81820-g30 japan 8649" size="131072" crc="a27787af" sha1="0733cd627467a866846e15caf1770a5594eaf4cc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -78,8 +78,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
-				<!-- ENIX WING2 RP231024D 0408 -->
-				<rom name="rp231024d" size="131072" crc="5c9d8f62" sha1="818d91505ad39bba2eaf7f4857c7d41e95fcb233" offset="0" />
+				<rom name="enix wing2 rp231024d 0408" size="131072" crc="5c9d8f62" sha1="818d91505ad39bba2eaf7f4857c7d41e95fcb233" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -177,7 +176,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 			<feature name="pcb" value="2M-8KB" />
 			<feature name="mapper" value="NEOS MR6401" />
 			<dataarea name="rom" size="262144">
-				<rom name="lh53210a" size="262144" crc="91955bcd" sha1="89073c052b0fe29b6de077c8bdf5373474081edf" offset="0" />
+				<rom name="lh53210a game arts" size="262144" crc="91955bcd" sha1="89073c052b0fe29b6de077c8bdf5373474081edf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -199,7 +198,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 	<software name="xanadu">
 		<description>Xanadu</description>
 		<year>1987</year>
-		<publisher>Falcom</publisher>
+		<publisher>Nihon Falcom</publisher>
 		<info name="alt_title" value="ザナドゥ" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621 KAGA" />
@@ -241,7 +240,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="sangokua" cloneof="sangoku">
-		<description>Sangokushi (alt)</description>
+		<description>Sangokushi (Alt)</description>
 		<year>1986</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="三國志" />
@@ -274,7 +273,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 	<software name="shougun">
 		<description>Shougun</description>
 		<year></year>
-		<publisher>Dexter Nippon</publisher>
+		<publisher>Nihon Dexter</publisher>
 		<info name="alt_title" value="将軍" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-621-64K" />
@@ -292,7 +291,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 	<software name="synthsau">
 		<description>Synth Saurus</description>
 		<year></year>
-		<publisher>Bit2</publisher>
+		<publisher>Bit²</publisher>
 		<info name="alt_title" value="シンセサウルス" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M-008S" />
@@ -306,9 +305,9 @@ Unless otherwise noted, the information in this list has not been verified by op
 
 <!--
 	<software name="synthsaua">
-		<description>Synth Saurus (alt)</description>
+		<description>Synth Saurus (Alt)</description>
 		<year></year>
-		<publisher>Bit2</publisher>
+		<publisher>Bit²</publisher>
 		<info name="alt_title" value="シンセサウルス" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-2M008-E2M" />
@@ -424,7 +423,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 	<software name="megamit">
 		<description>Digital Devil Monogatari - Megami Tensei</description>
 		<year>1987</year>
-		<publisher>Telenet</publisher>
+		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="デジタルデビル物語 女神転生" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
@@ -466,7 +465,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 	<software name="dslayer4">
 		<description>Dragon Slayer IV - Drasle Family</description>
 		<year>1987</year>
-		<publisher>Falcom</publisher>
+		<publisher>Nihon Falcom</publisher>
 		<info name="alt_title" value="ドラゴンスレイヤーIV" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
@@ -487,8 +486,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 			<feature name="pcb" value="MSX WRITE 900178B" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="524288">
-				<!-- 225 AA 8716 ZOO -->
-				<rom name="225_aa_8716_zoo" size="524288" crc="ef02e4f3" sha1="4180544158a57c99162269e33e4f2c77c9fce84e" offset="0" />
+				<rom name="225 aa 8716 zoo" size="524288" crc="ef02e4f3" sha1="4180544158a57c99162269e33e4f2c77c9fce84e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -550,7 +548,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 			<feature name="pcb" value="TAS-4M008M" />
 			<feature name="mapper" value="LZ93A13" />
 			<dataarea name="rom" size="524288">
-				<rom name="hydlide3_4m-rom" size="524288" crc="00c5d5b5" sha1="74e9ea381e2fed07d989d1056002de5737125aaf" offset="0" />
+				<rom name="hydlide3 4m-rom" size="524288" crc="00c5d5b5" sha1="74e9ea381e2fed07d989d1056002de5737125aaf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -558,7 +556,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 	<software name="hajafuin">
 		<description>Haja no Fuuin</description>
 		<year>1987</year>
-		<publisher>Kagado</publisher>
+		<publisher>Kogado</publisher>
 		<info name="alt_title" value="覇邪の封印" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
@@ -572,7 +570,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 	<software name="fzone">
 		<description>Final Zone</description>
 		<year>1986</year>
-		<publisher>Telenet</publisher>
+		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="ファイナル・ゾーン" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
@@ -620,8 +618,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
-				<!-- COMPILE IA-8701 -->
-				<rom name="compile_ia" size="131072" crc="5eac55df" sha1="7a4126934f9e68c34bf00dd3d9a9e753c05ee73f" offset="0" />
+				<rom name="compile ia-8701" size="131072" crc="5eac55df" sha1="7a4126934f9e68c34bf00dd3d9a9e753c05ee73f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -643,14 +640,13 @@ Unless otherwise noted, the information in this list has not been verified by op
 	<software name="valis">
 		<description>Mugen Senshi Valis</description>
 		<year>1986</year>
-		<publisher>Telenet</publisher>
+		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="夢幻戦士ヴァリス" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
-				<!-- 831000-440 20 BK Z86 -->
-				<rom name="831000" size="131072" crc="309d996c" sha1="2b10234debd2a6a9a02e0750ba6563768bc4a2f3" offset="0" />
+				<rom name="831000-440 20 bk z86" size="131072" crc="309d996c" sha1="2b10234debd2a6a9a02e0750ba6563768bc4a2f3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -664,7 +660,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 			<feature name="pcb" value="1M-16KB" />
 			<feature name="mapper" value="MR6401" />	<!-- NEOS MR6401 -->
 			<dataarea name="rom" size="131072">
-				<rom name="dempa_labyrinth_rp231024d" size="131072" crc="2c2020a0" sha1="0cb11c766bd357d203879bd6bee041a4690cc3df" offset="0" />
+				<rom name="dempa labyrinth rp231024d" size="131072" crc="2c2020a0" sha1="0cb11c766bd357d203879bd6bee041a4690cc3df" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -714,13 +710,13 @@ Unless otherwise noted, the information in this list has not been verified by op
 	<software name="romancia">
 		<description>Romancia</description>
 		<year>1987</year>
-		<publisher>Falcom</publisher>
+		<publisher>Nihon Falcom</publisher>
 		<info name="alt_title" value="ロマンシア" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="" />
 			<feature name="mapper" value="BS6101-16" />
 			<dataarea name="rom" size="131072">
-				<rom name="831000_20" size="131072" crc="387c1de7" sha1="2f0db48fbcf3444f52b9c7c76ba9c4bd38bc2a15" offset="0" />
+				<rom name="831000-20" size="131072" crc="387c1de7" sha1="2f0db48fbcf3444f52b9c7c76ba9c4bd38bc2a15" offset="0" />
 			</dataarea>
 		</part>
 	</software>

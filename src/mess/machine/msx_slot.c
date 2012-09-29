@@ -1805,15 +1805,15 @@ MSX_SLOT_SAVESRAM(fmpac)
 	return 1;
 }
 
-MSX_SLOT_INIT(superloadrunner)
+MSX_SLOT_INIT(superloderunner)
 {
 	if (size != 0x20000)
 	{
-		logerror ("superloadrunner: error: rom file should be exactly "
+		logerror ("superloderunner: error: rom file should be exactly "
 				  "128kb\n");
 		return 1;
 	}
-	state->m_type = SLOT_SUPERLOADRUNNER;
+	state->m_type = SLOT_SUPERLODERUNNER;
 	state->m_mem = mem;
 	state->m_size = size;
 	state->m_start_page = page;
@@ -1822,19 +1822,19 @@ MSX_SLOT_INIT(superloadrunner)
 	return 0;
 }
 
-MSX_SLOT_RESET(superloadrunner)
+MSX_SLOT_RESET(superloderunner)
 {
 	msx_state *drvstate = machine.driver_data<msx_state>();
-	drvstate->m_superloadrunner_bank = 0;
+	drvstate->m_superloderunner_bank = 0;
 }
 
-MSX_SLOT_MAP(superloadrunner)
+MSX_SLOT_MAP(superloderunner)
 {
 	msx_state *drvstate = machine.driver_data<msx_state>();
 	if (page == 2)
 	{
 		UINT8 *mem = state->m_mem +
-				(drvstate->m_superloadrunner_bank & state->m_bank_mask) * 0x4000;
+				(drvstate->m_superloderunner_bank & state->m_bank_mask) * 0x4000;
 
 		msx_cpu_setbank (machine, 5, mem);
 		msx_cpu_setbank (machine, 6, mem + 0x2000);
@@ -2471,7 +2471,7 @@ MSX_SLOT_START
 	MSX_SLOT (SLOT_RTYPE, rtype)
 	MSX_SLOT (SLOT_MAJUTSUSHI, majutsushi)
 	MSX_SLOT_SRAM (SLOT_FMPAC, fmpac)
-	MSX_SLOT_ROM (SLOT_SUPERLOADRUNNER, superloadrunner)
+	MSX_SLOT_ROM (SLOT_SUPERLODERUNNER, superloderunner)
 	MSX_SLOT (SLOT_SYNTHESIZER, synthesizer)
 	MSX_SLOT (SLOT_CROSS_BLAIM, crossblaim)
 	MSX_SLOT (SLOT_DISK_ROM, diskrom)
