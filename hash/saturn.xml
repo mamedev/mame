@@ -31811,7 +31811,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Jonah Lomu Rugby v1.100 (1997)(Sports Master)(PAL)(M4)[!]... -->
 	<software name="jonahlom" supported="no">
-		<description> Jonah Lomu Rugby (Euro)</description>
+		<description>Jonah Lomu Rugby (Euro)</description>
 		<!-- or is it  Jonah Lomu Rugby (United Kingdom) [T-12003H-05]  -->
 		<year>1997</year>
 		<publisher>Sports Master</publisher>
@@ -32833,7 +32833,7 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Riven - The Sequel to Myst v1.003 (1998)(Sega)(PAL)(Disc 3 of 4)[!]... -->
   <!-- Identifying Riven - The Sequel to Myst v1.003 (1998)(Sega)(PAL)(Disc 4 of 4)[!]... -->
 	<software name="rivene" supported="no">
-		<description> Riven - The Sequel to Myst (Euro)</description>
+		<description>Riven - The Sequel to Myst (Euro)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81801-50"/>
