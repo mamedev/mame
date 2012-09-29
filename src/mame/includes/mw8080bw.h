@@ -46,7 +46,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_main_ram;
 	optional_shared_ptr<UINT8> m_colorram;
-	required_device<discrete_device> m_discrete;
+	optional_device<discrete_device> m_discrete;
 	
 	/* sound-related */
 	UINT8       m_port_1_last;

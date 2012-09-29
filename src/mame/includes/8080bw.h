@@ -23,7 +23,7 @@ public:
 	/* devices/memory pointers */
 	optional_device<timer_device> m_schaser_effect_555_timer;
 	optional_device<timer_device> m_claybust_gun_on;
-	required_device<discrete_device> m_discrete;
+	optional_device<discrete_device> m_discrete;
 	device_t *m_speaker;
 
 
