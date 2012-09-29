@@ -1979,8 +1979,8 @@ $(DRIVERS)/balsente.o:	$(LAYOUT)/stocker.lh
 
 $(DRIVERS)/beaminv.o:	$(LAYOUT)/beaminv.lh
 
-$(DRIVERS)/bfm_sc1.o:	$(LAYOUT)/sc1_vfd.lh \
-			$(LAYOUT)/sc1_vid.lh
+#$(DRIVERS)/bfm_sc1.o:	$(LAYOUT)/sc1_vfd.lh \
+#			$(LAYOUT)/sc1_vid.lh
 			
 $(DRIVERS)/bfm_sc2.o:	$(LAYOUT)/sc2_vfd.lh \
 			$(LAYOUT)/sc2_dmd.lh \
