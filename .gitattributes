@@ -2680,6 +2680,7 @@ src/mame/drivers/galpanic.c svneol=native#text/plain
 src/mame/drivers/galspnbl.c svneol=native#text/plain
 src/mame/drivers/gamecstl.c svneol=native#text/plain
 src/mame/drivers/gameplan.c svneol=native#text/plain
+src/mame/drivers/gammagic.c svneol=native#text/plain
 src/mame/drivers/gamtor.c svneol=native#text/plain
 src/mame/drivers/gaplus.c svneol=native#text/plain
 src/mame/drivers/gatron.c svneol=native#text/plain

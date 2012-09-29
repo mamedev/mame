@@ -1775,6 +1775,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/galaxi.o \
 	$(DRIVERS)/galgame.o \
 	$(DRIVERS)/gamecstl.o \
+	$(DRIVERS)/gammagic.o \
 	$(DRIVERS)/gei.o \
 	$(DRIVERS)/globalfr.o \
 	$(DRIVERS)/goldngam.o \
