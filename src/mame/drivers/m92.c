@@ -2174,7 +2174,6 @@ DRIVER_INIT_MEMBER(m92_state,m92_alt)
 /* different vector base, different address map (no bank1) */
 DRIVER_INIT_MEMBER(m92_state,lethalth)
 {
-
 	m_game_kludge = 0;
 	m_irq_vectorbase = 0x20;
 }
@@ -2227,7 +2226,7 @@ GAME( 1991, lethalth, 0,        lethalth,      lethalth, m92_state, lethalth, RO
 GAME( 1991, thndblst, lethalth, lethalth,      lethalth, m92_state, lethalth, ROT270, "Irem",         "Thunder Blaster (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1992, uccops,   0,        uccops,        uccops, m92_state,   m92,      ROT0,   "Irem",         "Undercover Cops (World)", GAME_SUPPORTS_SAVE )
 GAME( 1992, uccopsu,  uccops,   uccops,        uccops, m92_state,   m92,      ROT0,   "Irem",         "Undercover Cops (US)", GAME_SUPPORTS_SAVE )
-GAME( 1992, uccopsar, uccops,   uccops,        uccops, m92_state,   m92,      ROT0,   "Irem",         "Undercover Cops (Alpha Renewal Version)", GAME_SUPPORTS_SAVE )
+GAME( 1992, uccopsar, uccops,   uccops,        uccops, m92_state,   m92,      ROT0,   "Irem",         "Undercover Cops - Alpha Renewal Version", GAME_SUPPORTS_SAVE )
 GAME( 1992, uccopsj,  uccops,   uccops,        uccops, m92_state,   m92,      ROT0,   "Irem",         "Undercover Cops (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1992, mysticri, 0,        mysticri,      mysticri, m92_state, m92,      ROT0,   "Irem",         "Mystic Riders (World)", GAME_SUPPORTS_SAVE )
 GAME( 1992, gunhohki, mysticri, mysticri,      mysticri, m92_state, m92,      ROT0,   "Irem",         "Mahou Keibitai Gun Hohki (Japan)", GAME_SUPPORTS_SAVE )
@@ -2250,7 +2249,7 @@ GAME( 1993, kaiteids, inthunt,  inthunt,       inthunt, m92_state,  m92,      RO
 GAME( 1993, nbbatman, 0,        nbbatman,      nbbatman, m92_state, m92_bank, ROT0,   "Irem",         "Ninja Baseball Bat Man (World)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, nbbatmanu,nbbatman, nbbatman,      nbbatman, m92_state, m92_bank, ROT0,   "Irem America", "Ninja Baseball Bat Man (US)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, leaguemn, nbbatman, nbbatman,      nbbatman, m92_state, m92_bank, ROT0,   "Irem",         "Yakyuu Kakutou League-Man (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, nbbatman2bl,nbbatman,nbbatman2bl,  nbbatman, m92_state, m92_bank, ROT0,   "bootleg",      "Ninja Baseball Bat Man II (bootleg/hack)", GAME_NO_SOUND | GAME_NOT_WORKING ) // different sprite system, MCU as soundcpu, OKI samples for music/sound
+GAME( 1993, nbbatman2bl,nbbatman,nbbatman2bl,  nbbatman, m92_state, m92_bank, ROT0,   "bootleg",      "Ninja Baseball Bat Man II (bootleg)", GAME_NO_SOUND | GAME_NOT_WORKING ) // different sprite system, MCU as soundcpu, OKI samples for music/sound
 GAME( 1993, ssoldier, 0,        psoldier,      psoldier, m92_state, m92_alt,  ROT0,   "Irem America", "Superior Soldiers (US)", GAME_SUPPORTS_SAVE )
 GAME( 1993, psoldier, ssoldier, psoldier,      psoldier, m92_state, m92_alt,  ROT0,   "Irem",         "Perfect Soldiers (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1994, dsoccr94j,dsoccr94, dsoccr94j,     dsoccr94j, m92_state,m92_bank, ROT0,   "Irem",         "Dream Soccer '94 (Japan, M92 hardware)", GAME_SUPPORTS_SAVE )
