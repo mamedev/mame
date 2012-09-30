@@ -71,7 +71,7 @@ static struct
 	struct
 	{
 		UINT8 index;
-		UINT8 *data;
+		UINT8 data[0x100];
 		UINT8 map_mask;
 		struct
 		{
@@ -83,7 +83,7 @@ static struct
 	struct
 	{
 		UINT8 index;
-		UINT8 *data;
+		UINT8 data[0x100];
 		UINT16 horz_total;
 		UINT16 horz_disp_end;
 /**/	UINT8 horz_blank_start;
@@ -1892,9 +1892,9 @@ void pc_vga_reset(running_machine &machine)
 	vga.miscellaneous_output = 0;
 	vga.feature_control = 0;
 	vga.sequencer.index = 0;
-	memset(vga.sequencer.data, 0, vga.svga_intf.seq_regcount * sizeof(*vga.sequencer.data));
+	memset(vga.sequencer.data, 0, sizeof(vga.sequencer.data));
 	vga.crtc.index = 0;
-	memset(vga.crtc.data, 0, vga.svga_intf.crtc_regcount * sizeof(*vga.crtc.data));
+	memset(vga.crtc.data, 0, sizeof(vga.crtc.data));
 	vga.gc.index = 0;
 	memset(vga.gc.latch, 0, sizeof(vga.gc.latch));
 	memset(&vga.attribute, 0, sizeof(vga.attribute));
@@ -2026,13 +2026,7 @@ void pc_vga_init(running_machine &machine, read8_delegate read_dipswitch)
 	vga.svga_intf.seq_regcount = 0x05;
 	vga.svga_intf.crtc_regcount = 0x19;
 
-	vga.memory			= auto_alloc_array(machine, UINT8, vga.svga_intf.vram_size);
-	vga.sequencer.data	= auto_alloc_array(machine, UINT8, vga.svga_intf.seq_regcount);
-	vga.crtc.data		= auto_alloc_array(machine, UINT8, 0x100);
-	memset(vga.memory, '\0', vga.svga_intf.vram_size);
-	memset(vga.sequencer.data, '\0', vga.svga_intf.seq_regcount);
-	memset(vga.crtc.data, '\0', 0x100);
-
+	vga.memory			= auto_alloc_array_clear(machine, UINT8, vga.svga_intf.vram_size);
 	pc_vga_reset(machine);
 
 }
@@ -2047,13 +2041,8 @@ void pc_vga_cirrus_init(running_machine &machine, read8_delegate read_dipswitch)
 	vga.svga_intf.seq_regcount = 0x08;
 	vga.svga_intf.crtc_regcount = 0x19;
 
-	vga.memory			= auto_alloc_array(machine, UINT8, vga.svga_intf.vram_size);
-	vga.sequencer.data	= auto_alloc_array(machine, UINT8, vga.svga_intf.seq_regcount);
-	vga.crtc.data		= auto_alloc_array(machine, UINT8, 0x100);
-	memset(vga.memory, '\0', vga.svga_intf.vram_size);
-	memset(vga.sequencer.data, '\0', vga.svga_intf.seq_regcount);
-	memset(vga.crtc.data, '\0', 0x100);
-
+	vga.memory			= auto_alloc_array_clear(machine, UINT8, vga.svga_intf.vram_size);
+	
 	pc_vga_reset(machine);
 
 }
