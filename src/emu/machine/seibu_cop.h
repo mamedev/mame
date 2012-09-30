@@ -61,6 +61,7 @@ public:
 	DECLARE_WRITE16_MEMBER(dma_src_w);
 	DECLARE_WRITE16_MEMBER(dma_size_w);
 	DECLARE_WRITE16_MEMBER(dma_dst_w);
+	DECLARE_READ16_MEMBER(dma_trigger_r);
 	DECLARE_WRITE16_MEMBER(dma_trigger_w);
 
 protected:

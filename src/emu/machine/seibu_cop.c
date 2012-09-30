@@ -31,7 +31,7 @@ static ADDRESS_MAP_START( seibu_cop_io, AS_0, 16, seibu_cop_device )
 	AM_RANGE(0x0478, 0x0479) AM_WRITE(dma_src_w)
 	AM_RANGE(0x047a, 0x047b) AM_WRITE(dma_size_w)
 	AM_RANGE(0x047c, 0x047d) AM_WRITE(dma_dst_w)
-	AM_RANGE(0x047e, 0x047f) AM_WRITE(dma_trigger_w)
+	AM_RANGE(0x047e, 0x047f) AM_READWRITE(dma_trigger_r, dma_trigger_w)
 ADDRESS_MAP_END
 
 
@@ -209,6 +209,11 @@ WRITE16_MEMBER(seibu_cop_device::dma_dst_w)
 	COMBINE_DATA(&m_dma_dst[m_dma_trigger]);
 }
 
+READ16_MEMBER(seibu_cop_device::dma_trigger_r)
+{
+	return m_dma_exec_param;
+}
+
 WRITE16_MEMBER(seibu_cop_device::dma_trigger_w)
 {
 	COMBINE_DATA(&m_dma_exec_param);
@@ -377,7 +382,7 @@ void seibu_cop_device::fill_dword_transfer(void)
 
 WRITE16_MEMBER( seibu_cop_device::dma_write_trigger_w )
 {
-	switch(m_dma_exec_param & 0x1f8)
+	switch(m_dma_exec_param & 0xfff8)
 	{
 		case 0x008: normal_dma_transfer(); break;
 		case 0x010: break; // private buffer copy, TODO
