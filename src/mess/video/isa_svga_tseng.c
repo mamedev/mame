@@ -65,7 +65,7 @@ void isa8_svga_et4k_device::device_start()
 
 	video_start_vga( machine() );
 
-	pc_vga_init(machine(), read8_delegate(FUNC(isa8_svga_et4k_device::input_port_0_r),this), NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(isa8_svga_et4k_device::input_port_0_r),this));
 
 	int i;
 	for (i = 0; i < 0x100; i++)

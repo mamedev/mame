@@ -795,7 +795,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(gammagic_state,gammagic)
 {
-	pc_vga_init(machine(), read8_delegate(FUNC(gammagic_state::vga_setting),this), NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(gammagic_state::vga_setting),this));
 	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, gammagic_set_keyb_int);
 	kbdc8042_init(machine(), &at8042);

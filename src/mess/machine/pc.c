@@ -1422,7 +1422,7 @@ DRIVER_INIT_MEMBER(pc_state,pc_vga)
 {
 	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 
-	pc_vga_init(machine(), read8_delegate(FUNC(pc_state::input_port_0_r),this), NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(pc_state::input_port_0_r),this));
 	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 

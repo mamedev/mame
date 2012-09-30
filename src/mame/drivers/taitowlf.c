@@ -710,7 +710,7 @@ DRIVER_INIT_MEMBER(taitowlf_state,taitowlf)
 
 	kbdc8042_init(machine(), &at8042);
 	#if ENABLE_VGA
-	pc_vga_init(machine(), read8_delegate(FUNC(taitowlf_state::vga_setting),this), NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(taitowlf_state::vga_setting),this));
 	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 	#endif
 }

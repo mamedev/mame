@@ -427,7 +427,7 @@ DRIVER_INIT_MEMBER(pcat_nit_state,pcat_nit)
 	m_banked_nvram = auto_alloc_array(machine(), UINT8, 0x2000);
 	machine().device<nvram_device>("nvram")->set_base(m_banked_nvram, 0x2000);
 
-	pc_vga_init(machine(), read8_delegate(FUNC(pcat_nit_state::vga_setting),this), NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(pcat_nit_state::vga_setting),this));
 	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 

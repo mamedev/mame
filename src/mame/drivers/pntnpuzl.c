@@ -385,7 +385,7 @@ DRIVER_INIT_MEMBER(pntnpuzl_state,pip)
 //  UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 //  rom[0x2696/2] = 0x4e71;
 //  rom[0x26a0/2] = 0x4e71;
-	pc_vga_init(machine(), read8_delegate(FUNC(pntnpuzl_state::vga_setting),this), NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(pntnpuzl_state::vga_setting),this));
 	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0x3a0000, machine().device("maincpu")->memory().space(AS_PROGRAM), 0x3c0000);
 
 }

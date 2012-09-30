@@ -67,65 +67,6 @@
 
 #define LOG_PCIACCESS	0
 
-static void cirrus_update_8bpp(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	UINT32 *line;
-	const UINT8 *vram;
-	int y, x;
-
-	vram = (const UINT8 *) pc_vga_memory();
-
-	for (y = 0; y < 480; y++)
-	{
-		line = &bitmap.pix32(y);
-
-		for (x = 0; x < 640; x++)
-			*line++ = machine.pens[*vram++];
-	}
-}
-
-
-
-static void cirrus_update_16bpp(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	fatalerror("NYI\n");
-}
-
-
-
-static void cirrus_update_24bpp(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	fatalerror("NYI\n");
-}
-
-
-
-static void cirrus_update_32bpp(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	fatalerror("NYI\n");
-}
-
-
-
-static void cirrus_choosevideomode(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT8 *sequencer,
-	const UINT8 *crtc, int *width, int *height)
-{
-	if ((sequencer[0x06] == 0x12) && (sequencer[0x07] & 0x01))
-	{
-		*width = 640;
-		*height = 480;
-
-		switch(sequencer[0x07] & 0x0E)
-		{
-			case 0x00:	cirrus_update_8bpp(machine, bitmap, cliprect); break;
-			case 0x02:	cirrus_update_16bpp(machine, bitmap, cliprect); break;
-			case 0x04:	cirrus_update_24bpp(machine, bitmap, cliprect); break;
-			case 0x06:	cirrus_update_16bpp(machine, bitmap, cliprect); break;
-			case 0x08:	cirrus_update_32bpp(machine, bitmap, cliprect); break;
-		}
-	}
-}
-
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -146,24 +87,14 @@ cirrus_device::cirrus_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-const struct pc_svga_interface cirrus_svga_interface =
-{
-	2 * 1024 * 1024,	/* 2 megs vram */
-	8,					/* 8 sequencer registers */
-	10,					/* 10 gc registers */
-	25,					/* 25 crtc registers */
-	cirrus_choosevideomode
-};
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void cirrus_device::device_start()
 {
-	pc_vga_init(machine(), read8_delegate(), &cirrus_svga_interface);
-	pc_vga_io_init(machine(), machine().device("ppc1")->memory().space(AS_PROGRAM), 0xC00A0000, machine().device("ppc1")->memory().space(AS_PROGRAM), 0x80000000);
+	pc_vga_cirrus_init(machine(), read8_delegate());
+	pc_svga_cirrus_io_init(machine(), machine().device("ppc1")->memory().space(AS_PROGRAM), 0xC00A0000, machine().device("ppc1")->memory().space(AS_PROGRAM), 0x80000000);
 }
 
 //-------------------------------------------------

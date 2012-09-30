@@ -84,7 +84,7 @@ READ8_MEMBER(indiana_state::indiana_vga_setting)
 
 DRIVER_INIT_MEMBER(indiana_state,indiana)
 {
-	pc_vga_init(machine(), read8_delegate(FUNC(indiana_state::indiana_vga_setting),this), NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(indiana_state::indiana_vga_setting),this));
 	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0x7f7a0000, machine().device("maincpu")->memory().space(AS_PROGRAM), 0x7f600000);
 }
 

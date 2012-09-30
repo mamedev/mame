@@ -801,7 +801,7 @@ DRIVER_INIT_MEMBER(voyager_state,voyager)
 {
 	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x20000/4);
 
-	pc_vga_init(machine(), read8_delegate(FUNC(voyager_state::vga_setting),this), NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(voyager_state::vga_setting),this));
 	pc_svga_trident_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, voyager_set_keyb_int);
 

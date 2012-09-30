@@ -15,20 +15,12 @@ MACHINE_CONFIG_EXTERN( pcvideo_s3_isa );
 MACHINE_CONFIG_EXTERN( pcvideo_ati_isa );
 
 VIDEO_START( vga );
-
-struct pc_svga_interface
-{
-	size_t vram_size;
-	int seq_regcount;
-	int gc_regcount;
-	int crtc_regcount;
-	void (*choosevideomode)(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT8 *sequencer, const UINT8 *crtc, int *width, int *height);
-};
-
-void pc_vga_init(running_machine &machine, read8_delegate read_dipswitch, const struct pc_svga_interface *svga_intf);
+void pc_vga_init(running_machine &machine, read8_delegate read_dipswitch);
+void pc_vga_cirrus_init(running_machine &machine, read8_delegate read_dipswitch);
 void pc_vga_io_init(running_machine &machine, address_space &mem_space, offs_t mem_offset, address_space &io_space, offs_t port_offset);
 void pc_vga_gamtor_io_init(running_machine &machine, address_space &mem_space, offs_t mem_offset, address_space &io_space, offs_t port_offset);
 void pc_svga_trident_io_init(running_machine &machine, address_space &mem_space, offs_t mem_offset, address_space &io_space, offs_t port_offset);
+void pc_svga_cirrus_io_init(running_machine &machine, address_space &mem_space, offs_t mem_offset, address_space &io_space, offs_t port_offset);
 void pc_vga_reset(running_machine &machine);
 void *pc_vga_memory(void);
 size_t pc_vga_memory_size(void);

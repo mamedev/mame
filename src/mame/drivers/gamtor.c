@@ -1254,7 +1254,7 @@ READ8_MEMBER(gaminator_state::vga_setting ) { return 0xff; } // hard-code to col
 
 DRIVER_INIT_MEMBER(gaminator_state,gaminator)
 {
-	pc_vga_init(machine(), read8_delegate(FUNC(gaminator_state::vga_setting),this), NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(gaminator_state::vga_setting),this));
 	pc_vga_gamtor_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0x44000000, machine().device("maincpu")->memory().space(AS_PROGRAM), 0x40000000);
 }
 

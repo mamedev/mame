@@ -55,7 +55,12 @@
 static struct
 {
 	read8_delegate read_dipswitch;
-	struct pc_svga_interface svga_intf;
+	struct
+	{
+		size_t vram_size;
+		int seq_regcount;
+		int crtc_regcount;
+	} svga_intf;
 
 	UINT8 *memory;
 	UINT32 pens[16]; /* the current 16 pens */
@@ -888,11 +893,7 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine)
 			}
 		}
 
-		if (vga.svga_intf.choosevideomode) // TODO: remove this hack
-		{
-			return SVGA_HACK;
-		}
-		else if (svga.rgb32_en)
+		if (svga.rgb32_en)
 		{
 			return RGB32_MODE;
 		}
@@ -951,10 +952,7 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine)
 
 SCREEN_UPDATE_RGB32( pc_video )
 {
-	UINT8 cur_mode = 0;
-	int w = 0, h = 0;
-
-	cur_mode = pc_vga_choosevideomode(screen.machine());
+	UINT8 cur_mode = pc_vga_choosevideomode(screen.machine());
 
 	//popmessage("%02x %02x",cur_mode,vga.attribute.data[0x13]);
 	//popmessage("%d",vga.attribute.pel_shift);
@@ -973,7 +971,6 @@ SCREEN_UPDATE_RGB32( pc_video )
 		case RGB16_MODE:   svga_vh_rgb16(screen.machine(), bitmap, cliprect); break;
 		case RGB24_MODE:   svga_vh_rgb24(screen.machine(), bitmap, cliprect); break;
 		case RGB32_MODE:   svga_vh_rgb32(screen.machine(), bitmap, cliprect); break;
-		case SVGA_HACK:    vga.svga_intf.choosevideomode(screen.machine(), bitmap, cliprect, vga.sequencer.data, vga.crtc.data, &w, &h); break;
 	}
 
 	return 0;
@@ -2019,27 +2016,36 @@ WRITE8_HANDLER(vga_mem_w)
 	}
 }
 
-void pc_vga_init(running_machine &machine, read8_delegate read_dipswitch, const struct pc_svga_interface *svga_intf)
+void pc_vga_init(running_machine &machine, read8_delegate read_dipswitch)
+{
+	memset(&vga, 0, sizeof(vga));
+
+	/* copy over interfaces */
+	vga.read_dipswitch = read_dipswitch;	
+	vga.svga_intf.vram_size = 0x100000;
+	vga.svga_intf.seq_regcount = 0x05;
+	vga.svga_intf.crtc_regcount = 0x19;
+
+	vga.memory			= auto_alloc_array(machine, UINT8, vga.svga_intf.vram_size);
+	vga.sequencer.data	= auto_alloc_array(machine, UINT8, vga.svga_intf.seq_regcount);
+	vga.crtc.data		= auto_alloc_array(machine, UINT8, 0x100);
+	memset(vga.memory, '\0', vga.svga_intf.vram_size);
+	memset(vga.sequencer.data, '\0', vga.svga_intf.seq_regcount);
+	memset(vga.crtc.data, '\0', 0x100);
+
+	pc_vga_reset(machine);
+
+}
+
+void pc_vga_cirrus_init(running_machine &machine, read8_delegate read_dipswitch)
 {
 	memset(&vga, 0, sizeof(vga));
 
 	/* copy over interfaces */
 	vga.read_dipswitch = read_dipswitch;
-	if (svga_intf)
-	{
-		vga.svga_intf = *svga_intf;
-
-		if (vga.svga_intf.seq_regcount < 0x05)
-			fatalerror("Invalid SVGA sequencer register count\n");
-		if (vga.svga_intf.crtc_regcount < 0x19)
-			fatalerror("Invalid SVGA CRTC register count\n");
-	}
-	else
-	{
-		vga.svga_intf.vram_size = 0x100000;
-		vga.svga_intf.seq_regcount = 0x05;
-		vga.svga_intf.crtc_regcount = 0x19;
-	}
+	vga.svga_intf.vram_size = 0x200000;
+	vga.svga_intf.seq_regcount = 0x08;
+	vga.svga_intf.crtc_regcount = 0x19;
 
 	vga.memory			= auto_alloc_array(machine, UINT8, vga.svga_intf.vram_size);
 	vga.sequencer.data	= auto_alloc_array(machine, UINT8, vga.svga_intf.seq_regcount);
@@ -5360,3 +5366,136 @@ READ16_HANDLER(mach8_config2_r)
 	return 0x0002;
 }
 
+/******************************************
+
+Cirrus SVGA card implementation
+
+******************************************/
+
+static void cirrus_define_video_mode(running_machine &machine)
+{
+	svga.rgb8_en = 0;
+	svga.rgb15_en = 0;
+	svga.rgb16_en = 0;
+	svga.rgb24_en = 0;
+	svga.rgb32_en = 0;
+	if ((vga.sequencer.data[0x06] == 0x12) && (vga.sequencer.data[0x07] & 0x01))
+	{
+		switch(vga.sequencer.data[0x07] & 0x0E)
+		{
+			case 0x00:	svga.rgb8_en = 1; break;
+			case 0x02:	svga.rgb16_en = 1; break; //double VCLK
+			case 0x04:	svga.rgb24_en = 1; break;
+			case 0x06:	svga.rgb16_en = 1; break;
+			case 0x08:	svga.rgb32_en = 1; break;
+		}
+	}
+}
+
+static UINT8 cirrus_seq_reg_read(running_machine &machine, UINT8 index)
+{
+	UINT8 res;
+
+	res = 0xff;
+
+	if(index <= 0x04)
+		res = vga.sequencer.data[index];
+	else
+	{
+		switch(index)
+		{
+			case 0x06:
+			case 0x07:
+				//printf("%02x\n",index);
+				res = vga.sequencer.data[index];
+				break;
+		}
+	}
+
+	return res;
+}
+
+static void cirrus_seq_reg_write(running_machine &machine, UINT8 index, UINT8 data)
+{
+	if(index <= 0x04)
+	{
+		vga.sequencer.data[vga.sequencer.index] = data;
+		seq_reg_write(machine,vga.sequencer.index,data);
+	}
+	else
+	{
+		switch(index)
+		{
+			case 0x06:
+			case 0x07:
+				//printf("%02x %02x\n",index,data);
+				vga.sequencer.data[vga.sequencer.index] = data;
+				break;
+		}
+	}
+}
+READ8_HANDLER(cirrus_03c0_r)
+{
+	UINT8 res;
+
+	switch(offset)
+	{
+		case 0x05:
+			res = cirrus_seq_reg_read(space.machine(),vga.sequencer.index);
+			break;
+		default:
+			res = vga_port_03c0_r(space,offset);
+			break;
+	}
+
+	return res;
+}
+
+WRITE8_HANDLER(cirrus_03c0_w)
+{
+	switch(offset)
+	{
+		case 0x05:
+			cirrus_seq_reg_write(space.machine(),vga.sequencer.index,data);
+			break;
+		default:
+			vga_port_03c0_w(space,offset,data);
+			break;
+	}
+	cirrus_define_video_mode(space.machine());
+}
+
+void pc_svga_cirrus_io_init(running_machine &machine, address_space &mem_space, offs_t mem_offset, address_space &io_space, offs_t port_offset)
+{
+	int buswidth;
+	UINT64 mask = 0;
+
+	buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
+	switch(buswidth)
+	{
+		case 8:
+			mask = 0;
+			break;
+
+		case 16:
+			mask = 0xffff;
+			break;
+
+		case 32:
+			mask = 0xffffffff;
+			break;
+
+		case 64:
+			mask = -1;
+			break;
+
+		default:
+			fatalerror("VGA: Bus width %d not supported\n", buswidth);
+			break;
+	}
+	io_space.install_legacy_readwrite_handler(port_offset + 0x3b0, port_offset + 0x3bf, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w), mask);
+	io_space.install_legacy_readwrite_handler(port_offset + 0x3c0, port_offset + 0x3cf, FUNC(cirrus_03c0_r), FUNC(cirrus_03c0_w), mask);
+	io_space.install_legacy_readwrite_handler(port_offset + 0x3d0, port_offset + 0x3df, FUNC(vga_port_03d0_r), FUNC(vga_port_03d0_w), mask);
+
+	mem_space.install_legacy_readwrite_handler(mem_offset + 0x00000, mem_offset + 0x1ffff, FUNC(vga_mem_r), FUNC(vga_mem_w), mask);
+}

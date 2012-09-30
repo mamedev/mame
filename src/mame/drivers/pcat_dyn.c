@@ -197,7 +197,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(pcat_dyn_state,pcat_dyn)
 {
-	pc_vga_init(machine(), read8_delegate(FUNC(pcat_dyn_state::vga_setting),this), NULL);
+	pc_vga_init(machine(), read8_delegate(FUNC(pcat_dyn_state::vga_setting),this));
 	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
