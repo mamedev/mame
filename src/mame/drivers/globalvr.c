@@ -148,11 +148,11 @@ GAME( 2001, gvrxpsys,  0, globalvr, globalvr, driver_device, 0, ROT0, "Global VR
 GAME( 2002, gvrxpsup,  0, globalvr, globalvr, driver_device, 0, ROT0, "Global VR", "Global VR XP OS Update/Install - 06/11/02", GAME_IS_SKELETON )
 
 /* Game Installer CDs */
-GAME( 2000, bhead2k,   0, globalvr, globalvr, driver_device, 0, ROT0, "Gloval VR", "Beach Head 2000 Install - 05/27/03", GAME_IS_SKELETON )
-GAME( 2000, bhead2ka,  0, globalvr, globalvr, driver_device, 0, ROT0, "Gloval VR", "Beach Head 2000 Install - 09/16/01", GAME_IS_SKELETON )
-GAME( 2002, bhead2k2,  0, globalvr, globalvr, driver_device, 0, ROT0, "Gloval VR", "Beach Head 2002 Install - 05/27/03", GAME_IS_SKELETON )
-GAME( 2003, bhead2k3,  0, globalvr, globalvr, driver_device, 0, ROT0, "Gloval VR", "Beach Head 2003 Desert War Install - 05/27/03", GAME_IS_SKELETON )
-GAME( 2005, nfsug,     0, globalvr, globalvr, driver_device, 0, ROT0, "Gloval VR", "Need For Speed: Underground Install (2 Discs) (v1.1)", GAME_IS_SKELETON )
+GAME( 2000, bhead2k,   0, globalvr, globalvr, driver_device, 0, ROT0, "Global VR", "Beach Head 2000 Install - 05/27/03", GAME_IS_SKELETON )
+GAME( 2000, bhead2ka,  0, globalvr, globalvr, driver_device, 0, ROT0, "Global VR", "Beach Head 2000 Install - 09/16/01", GAME_IS_SKELETON )
+GAME( 2002, bhead2k2,  0, globalvr, globalvr, driver_device, 0, ROT0, "Global VR", "Beach Head 2002 Install - 05/27/03", GAME_IS_SKELETON )
+GAME( 2003, bhead2k3,  0, globalvr, globalvr, driver_device, 0, ROT0, "Global VR", "Beach Head 2003 Desert War Install - 05/27/03", GAME_IS_SKELETON )
+GAME( 2005, nfsug,     0, globalvr, globalvr, driver_device, 0, ROT0, "Global VR", "Need For Speed: Underground Install (2 Discs) (v1.1)", GAME_IS_SKELETON )
 
 
 
