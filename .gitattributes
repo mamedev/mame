@@ -5724,6 +5724,7 @@ src/mess/drivers/kaypro.c svneol=native#text/plain
 src/mess/drivers/kc.c svneol=native#text/plain
 src/mess/drivers/kim1.c svneol=native#text/plain
 src/mess/drivers/konin.c svneol=native#text/plain
+src/mess/drivers/korgm1.c svneol=native#text/plain
 src/mess/drivers/kramermc.c svneol=native#text/plain
 src/mess/drivers/kyocera.c svneol=native#text/plain
 src/mess/drivers/lc80.c svneol=native#text/plain
