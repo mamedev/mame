@@ -5,6 +5,17 @@ Free Kick  - (c) 1987 Sega / Nihon System (made by Nihon, licensed to Sega)
 Driver by Tomasz Slanina  dox@space.pl
 based on initial work made by David Haywood
 
+Z80 @ 3MHz (12.000/4)
+IRQ frequency 120Hz, low for 4.02us, high for 8.1879ms
+4*SN76489AN @ 3MHz (12.000/4)
+
+12MHz pixel clock (mclk)
+263 scanlines per frame - 224 visible + 39 blanking+sync;
+16 lines bottom border, 7 lines vsync, 16 lines top border
+768 mclks scanline - 512 mclks visible, 256 mclks blanking+sync;
+96 mclks left border, 96 mclks right border, 64 mclks sync
+
+
 Notes:
 - Quite interestingly, Free Kick's sound ROM contains a Z80 program, but
   there isn't a sound CPU and that program isn't executed. Instead, the main
@@ -628,9 +639,9 @@ MACHINE_RESET_MEMBER(freekick_state,oigas)
 static MACHINE_CONFIG_START( base, freekick_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6) // confirmed
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)
 	MCFG_CPU_PROGRAM_MAP(pbillrd_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // frequency confirmed
+	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 
 	/* video hardware */
@@ -648,19 +659,19 @@ static MACHINE_CONFIG_START( base, freekick_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76496_NEW, 12000000/4)
+	MCFG_SOUND_ADD("sn1", SN76489A_NEW, XTAL_12MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn2", SN76496_NEW, 12000000/4)
+	MCFG_SOUND_ADD("sn2", SN76489A_NEW, XTAL_12MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn3", SN76496_NEW, 12000000/4)
+	MCFG_SOUND_ADD("sn3", SN76489A_NEW, XTAL_12MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn4", SN76496_NEW, 12000000/4)
+	MCFG_SOUND_ADD("sn4", SN76489A_NEW, XTAL_12MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
