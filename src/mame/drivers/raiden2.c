@@ -3152,4 +3152,4 @@ GAME( 1993, zeroteamd,zeroteam,zeroteam, zeroteam, raiden2_state,  zeroteam,  RO
 GAME( 1993, zeroteams,zeroteam,zeroteam, zeroteam, raiden2_state,  zeroteam,  ROT0,   "Seibu Kaihatsu", "Zero Team Selection", GAME_NOT_WORKING)
 GAME( 1993, zeroteamsr,zeroteam,zeroteam, zeroteam, raiden2_state,  zeroteam,  ROT0,  "Seibu Kaihatsu", "Zero Team Suicide Revival Kit", GAME_NOT_WORKING) // reprograms the sprite decrypt data of the SEI251 only, no game code
 
-GAME( 1995, xsedae,   0,       xsedae,   xsedae, raiden2_state,  xsedae,   ROT0,   "Dream Island",   "X Se Dae Quiz", GAME_NOT_WORKING)
+GAME( 1995, xsedae,   0,       xsedae,   xsedae, raiden2_state,  xsedae,   ROT0,   "Dream Island",   "X Se Dae Quiz (Korea)", GAME_NOT_WORKING)
