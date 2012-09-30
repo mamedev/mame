@@ -6,7 +6,7 @@ Preliminary driver by Grull Osgo
 
 Game Magic
 
-Is a Mutigame machine build on a Bally's V8000 platform.
+Is a Multigame machine build on a Bally's V8000 platform.
 
 This is the first PC based gaming machine developed by Bally Gaming.
 

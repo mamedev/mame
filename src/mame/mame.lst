@@ -11497,7 +11497,7 @@ pongf			// (c) 1972 Atari - no subcycles
 
 /* Drivers below are _mostly_ mechanical games, usually with no video display, requiring external artwork to function. */
 
-/* fruit machine drivers */
+/* [BEGIN] fruit machine drivers */
 
 /* JPM */
 
@@ -26720,9 +26720,11 @@ spss4240
 //unkfr
 //unkfra
 
+/* [END] fruit machine drivers */
 
 
-/* pinball drivers */
+
+/* [BEGIN] pinball drivers */
 
 // allied.c
 allied
@@ -28280,12 +28282,15 @@ spacecty
 strike
 
 
+/* [END] pinball drivers */
+
+
+
+/* Below are misc lazy adds, or yet to be sorted out... */
+
 // VLC Nevada
 nevada
 
 //Bally Gaming Co.
 gammagic
 99bottles
-
-/* Below are misc lazy adds, or yet to be sorted out... */
-
