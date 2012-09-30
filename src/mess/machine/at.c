@@ -187,12 +187,13 @@ WRITE8_MEMBER(at_state::pc_dma_write_byte)
 
 READ8_MEMBER(at_state::pc_dma_read_word)
 {
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
 		return 0xff;
 	UINT16 result;
 	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFE0000;
 
-	result = space.read_word(page_offset + ( offset << 1 ) );
+	result = prog_space.read_word(page_offset + ( offset << 1 ) );
 	m_dma_high_byte = result & 0xFF00;
 
 	return result & 0xFF;
@@ -201,11 +202,12 @@ READ8_MEMBER(at_state::pc_dma_read_word)
 
 WRITE8_MEMBER(at_state::pc_dma_write_word)
 {
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
 		return;
 	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFE0000;
 
-	space.write_word(page_offset + ( offset << 1 ), m_dma_high_byte | data);
+	prog_space.write_word(page_offset + ( offset << 1 ), m_dma_high_byte | data);
 }
 
 READ8_MEMBER( at_state::pc_dma8237_0_dack_r ) { return m_isabus->dack_r(0); }
