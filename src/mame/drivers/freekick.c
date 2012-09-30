@@ -9,7 +9,7 @@ Z80 @ 3MHz (12.000/4)
 IRQ frequency 120Hz, low for 4.02us, high for 8.1879ms
 4*SN76489AN @ 3MHz (12.000/4)
 
-12MHz pixel clock (mclk)
+12MHz (mclk), 6MHz pixel clock (12.000/2)
 263 scanlines per frame - 224 visible + 39 blanking+sync;
 16 lines bottom border, 7 lines vsync, 16 lines top border
 768 mclks scanline - 512 mclks visible, 256 mclks blanking+sync;
@@ -595,7 +595,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(freekick_state,freekick)
 {
-
 	save_item(NAME(m_romaddr));
 	save_item(NAME(m_spinner));
 	save_item(NAME(m_nmi_en));
@@ -604,7 +603,6 @@ MACHINE_START_MEMBER(freekick_state,freekick)
 
 MACHINE_RESET_MEMBER(freekick_state,freekick)
 {
-
 	m_romaddr = 0;
 	m_spinner = 0;
 	m_nmi_en = 0;
