@@ -12,7 +12,8 @@
 		</part>
 	</software>
 
-	<software name="airzonk">
+<!-- The game freezes when you move -->
+	<software name="airzonk" supported="no">
 		<description>Air Zonk</description>
 		<year>1992</year>
 		<publisher>Hudson Soft</publisher>
@@ -155,7 +156,7 @@
 		</part>
 	</software>
 
-	<software name="cadash">
+	<software name="cadash" supported="partial">
 		<description>Cadash</description>
 		<year>1991</year>
 		<publisher>Working Designs</publisher>
@@ -375,7 +376,8 @@
 		</part>
 	</software>
 
-	<software name="ghostman">
+<!-- The game freezes randomly -->
+	<software name="ghostman" supported="no">
 		<description>Ghost Manor</description>
 		<year>1992</year>
 		<publisher>TTI</publisher>
@@ -629,7 +631,7 @@
 	</software>
 
 	<software name="pacland">
-		<description>Pac-land</description>
+		<description>Pac-Land</description>
 		<year>1990</year>
 		<publisher>NEC</publisher>
 		<part name="cart" interface="tg16_cart">

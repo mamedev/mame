@@ -3183,7 +3183,7 @@
 		</part>
 	</software>
 
-	<software name="cliffh">
+	<software name="cliffh" supported="partial">
 		<description>Cliffhanger (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -3276,7 +3276,7 @@
 		</part>
 	</software>
 
-	<software name="coolhanda" cloneof="coolhand">
+	<software name="coolhanda" cloneof="coolhand" supported="partial">
 		<description>Cool Hand (Euro, French / German)</description>
 		<year>1998</year>
 		<publisher>Take-Two Interactive</publisher>
@@ -3288,7 +3288,7 @@
 		</part>
 	</software>
 
-	<software name="coolhand">
+	<software name="coolhand" supported="partial">
 		<description>Cool Hand (Euro)</description>
 		<year>1998</year>
 		<publisher>Take-Two Interactive</publisher>
@@ -7839,12 +7839,12 @@
 	</software>
 
 	<software name="connorsj" cloneof="connors">
-		<description>Jimmy Connors no Pro Tennis Tour (Jpn)</description>
+		<description>Jimmy Connors Tennis (Jpn)</description>
 		<year>1993</year>
 		<publisher>Misawa</publisher>
 		<info name="serial" value="DMG-JCA"/>
 		<info name="release" value="19930723"/>
-		<info name="alt_title" value="ジミーコナーズのプロテニスツアー"/>
+		<info name="alt_title" value="ジミーコナーズのプロテニスツアー ~ Jimmy Connors no Pro Tennis Tour (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="jimmy connors no pro tennis tour (japan).bin" size="65536" crc="18671602" sha1="43ae08919dccb5129e17a3fdac553901fb6e3918" offset="000000" />
@@ -17584,7 +17584,7 @@
 		</part>
 	</software>
 
-	<software name="sdkong">
+	<software name="sdkong" cloneof="dkland">
 		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
 		<description>Super Donkey Kong GB (Jpn)</description>
 		<year>1995</year>

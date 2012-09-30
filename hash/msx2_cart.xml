@@ -978,13 +978,13 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<!-- Looks like a bad dump: contains "mega rom loader" messages -->
-	<software name="pacmania" supported="no">
+	<software name="pacmania">
 		<description>Pac-Mania (Jpn)</description>
 		<year>1989</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M016-03M" />
-			<feature name="mapper" value="LZ93A13-16" />
+			<feature name="mapper" value="LZ93A13" />
 			<dataarea name="rom" size="262144">
 				<rom name="sharp msx2 pn 8929 d" size="262144" crc="7df16fc8" sha1="d5902afbd8dfb1ea96fc8cf4d62cf6e4fa40d4f7" offset="0" status="baddump" />
 			</dataarea>
@@ -2772,11 +2772,13 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="wizardry" supported="no">
-		<description>Wizardry - Proving Grounds Of Mad Overlord! (Jpn)</description>
+	<!-- the Japanese text only works fine on Japanese machines, like hbf1 or hbf12 -->
+	<software name="wizardry" supported="partial">
+		<description>Wizardry - Proving Grounds of Mad Overlord! (Jpn)</description>
 		<year>1988</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="ウィザードリィ" />
+		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="524288">
@@ -2826,13 +2828,13 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="zombihun" supported="no">
+	<software name="zombihun">
 		<description>Zombie Hunter (Jpn)</description>
 		<year>1989</year>
 		<publisher>Hi-Score Software</publisher>
 		<info name="alt_title" value="ゾンビハンター" />
 		<part name="cart" interface="msx_cart">
-			<feature name="mapper" value="KONAMI" />
+			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="zombie hunter (japan).rom" size="131072" crc="a29e6ab4" sha1="a322d4e572467be5e1b452214143f88db526b49f" status="baddump" offset="0" />
 			</dataarea>

@@ -29853,7 +29853,7 @@
 		</part>
 	</software>
 
-	<software name="shirenmn">
+	<software name="shirenmn" supported="partial">
 		<description>Shiren Monsters Netsal (Jpn)</description>
 		<year>2004</year>
 		<publisher>ChunSoft</publisher>
@@ -29946,7 +29946,8 @@
 		</part>
 	</software>
 
-	<software name="shrekslm">
+<!-- cracking sound -->
+	<software name="shrekslm" supported="partial">
 		<description>Shrek - Super Slam (Euro)</description>
 		<year>2005</year>
 		<publisher>Activision</publisher>
@@ -29959,7 +29960,8 @@
 		</part>
 	</software>
 
-	<software name="shrekslmu" cloneof="shrekslm">
+<!-- cracking sound -->
+	<software name="shrekslmu" cloneof="shrekslm" supported="partial">
 		<description>Shrek - Super Slam (USA)</description>
 		<year>2005</year>
 		<publisher>Activision</publisher>
@@ -29972,7 +29974,7 @@
 		</part>
 	</software>
 
-	<software name="shreksks">
+	<software name="shreksks" supported="partial">
 		<description>Shrek - Swamp Kart Speedway (Euro, USA)</description>
 		<year>2002</year>
 		<publisher>TDK Mediactive</publisher>
@@ -30216,7 +30218,7 @@
 		</part>
 	</software>
 
-	<software name="simpsrra" cloneof="simpsrr">
+	<software name="simpsrra" cloneof="simpsrr" supported="partial">
 		<description>The Simpsons - Road Rage (Euro, English / French / German / Italian / Spanish)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
@@ -30227,7 +30229,7 @@
 		</part>
 	</software>
 
-	<software name="simpsrr">
+	<software name="simpsrr" supported="partial">
 		<description>The Simpsons - Road Rage (Euro, USA)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
@@ -30239,7 +30241,7 @@
 		</part>
 	</software>
 
-	<software name="sims2">
+	<software name="sims2" supported="no">
 		<description>The Sims 2 (Euro, USA)</description>
 		<year>2005</year>
 		<publisher>Electronic Arts</publisher>
@@ -30252,7 +30254,7 @@
 		</part>
 	</software>
 
-	<software name="sims2peta" cloneof="sims2pet">
+	<software name="sims2peta" cloneof="sims2pet" supported="partial">
 		<description>The Sims 2 - Pets (Euro, English / French / German / Italian / Spanish / Dutch)</description>
 		<year>2006</year>
 		<publisher>Electronic Arts</publisher>
@@ -30264,7 +30266,7 @@
 		</part>
 	</software>
 
-	<software name="sims2pet">
+	<software name="sims2pet" supported="partial">
 		<description>The Sims 2 - Pets (Euro, USA)</description>
 		<year>2006</year>
 		<publisher>Electronic Arts</publisher>
@@ -31129,7 +31131,7 @@
 	</software>
 
 	<software name="spiritgp" cloneof="spirit">
-		<description>Spirit - Der Wilde Mustang - Auf der Suche nach Homeland (Ger, Prototype)</description>
+		<description>Spirit - Der Wilde Mustang (Ger, Prototype)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -31140,9 +31142,10 @@
 	</software>
 
 	<software name="spiritg" cloneof="spirit">
-		<description>Spirit - Der Wilde Mustang - Auf der Suche nach Homeland (Ger)</description>
+		<description>Spirit - Der Wilde Mustang (Ger)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
+		<info name="alt_title" value="Spirit - Der Wilde Mustang - Auf der Suche nach Homeland (Box)"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="spirit - der wilde mustang - auf der suche nach homeland (germany).bin" size="4194304" crc="4785eee0" sha1="ce8f271e143456616a9649fee7d47ef1602ee497" offset="000000" />
@@ -31151,9 +31154,10 @@
 	</software>
 
 	<software name="spiritf" cloneof="spirit">
-		<description>Spirit - L'Etalon des Plaines - A la Recherche de la Terre Natale (Fra)</description>
+		<description>Spirit - L'Etalon des Plaines (Fra)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
+		<info name="alt_title" value="Spirit - L'Etalon des Plaines - A la Recherche de la Terre Natale (Box)"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="spirit - l'etalon des plaines - a la recherche de la terre natale (france).bin" size="4194304" crc="c8c76255" sha1="0aa4fedc71f168f19e3263e7c0347a6ca81b80d0" offset="000000" />
@@ -31162,10 +31166,11 @@
 	</software>
 
 	<software name="spirit">
-		<description>Spirit - Stallion of the Cimarron - Search for Homeland (Euro)</description>
+		<description>Spirit - Stallion of the Cimarron (Euro)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="AGB-AC6P"/>
+		<info name="alt_title" value="Spirit - Stallion of the Cimarron - Search for Homeland (Box)"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="spirit - stallion of the cimarron - search for homeland (europe).bin" size="4194304" crc="aee21783" sha1="9158b8a2998c6bb78df8904c2e230b51f82c9531" offset="000000" />
@@ -31174,10 +31179,11 @@
 	</software>
 
 	<software name="spiritu" cloneof="spirit">
-		<description>Spirit - Stallion of the Cimarron - Search for Homeland (USA)</description>
+		<description>Spirit - Stallion of the Cimarron (USA)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="AGB-AC6E-USA"/>
+		<info name="alt_title" value="Spirit - Stallion of the Cimarron - Search for Homeland (Box)"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="spirit - stallion of the cimarron - search for homeland (usa).bin" size="4194304" crc="9a457633" sha1="220791a2a4db7d45fc6fb0bd259cf7a8d24e3a6d" offset="000000" />
