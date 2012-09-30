@@ -609,7 +609,6 @@ MACHINE_START_MEMBER(freekick_state,pbillrd)
 
 MACHINE_START_MEMBER(freekick_state,oigas)
 {
-
 	save_item(NAME(m_inval));
 	save_item(NAME(m_outval));
 	save_item(NAME(m_cnt));
@@ -619,7 +618,6 @@ MACHINE_START_MEMBER(freekick_state,oigas)
 
 MACHINE_RESET_MEMBER(freekick_state,oigas)
 {
-
 	MACHINE_RESET_CALL_MEMBER(freekick);
 
 	m_inval = 0;
@@ -629,13 +627,13 @@ MACHINE_RESET_MEMBER(freekick_state,oigas)
 
 static MACHINE_CONFIG_START( base, freekick_state )
 
-	MCFG_CPU_ADD("maincpu",Z80, 18432000/6)	//confirmed
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6) // confirmed
 	MCFG_CPU_PROGRAM_MAP(pbillrd_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold,  50*3) //??
+	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // frequency confirmed
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 
-	MCFG_GFXDECODE(freekick)
-
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -643,9 +641,9 @@ static MACHINE_CONFIG_START( base, freekick_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_pbillrd)
 
+	MCFG_GFXDECODE(freekick)
 	MCFG_PALETTE_LENGTH(0x200)
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -669,12 +667,14 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pbillrd, base )
 
+	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,pbillrd)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( freekickb, base )
 
+	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(freekickb_map)
 	MCFG_CPU_IO_MAP(freekickb_io_map)
@@ -685,12 +685,14 @@ static MACHINE_CONFIG_DERIVED( freekickb, base )
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
+	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_freekick)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gigas, base )
 
+	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gigas_map)
 	MCFG_CPU_IO_MAP(gigas_io_map)
@@ -698,11 +700,14 @@ static MACHINE_CONFIG_DERIVED( gigas, base )
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 
+	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_gigas)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( oigas, gigas )
+
+	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(oigas_io_map)
 
