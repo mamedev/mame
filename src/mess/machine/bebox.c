@@ -617,22 +617,53 @@ void bebox_ide_interrupt(device_t *device, int state)
  *  Video card (Cirrus Logic CL-GD5430)
  *
  *************************************/
-
+/*
 static READ64_HANDLER( bebox_video_r )
 {
-	const UINT64 *mem = (const UINT64 *) pc_vga_memory();
-	return BIG_ENDIANIZE_INT64(mem[offset]);
+	UINT64 result = 0;
+	mem_mask = FLIPENDIAN_INT64(mem_mask);
+	if (ACCESSING_BITS_0_7)
+		result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 0, mem_mask >> 0) << 0;
+	if (ACCESSING_BITS_8_15)
+		result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 1, mem_mask >> 8) << 8;
+	if (ACCESSING_BITS_16_23)
+		result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 2, mem_mask >> 16) << 16;
+	if (ACCESSING_BITS_24_31)
+		result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 3, mem_mask >> 24) << 24;
+	if (ACCESSING_BITS_32_39)
+		result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 4, mem_mask >> 32) << 32;
+	if (ACCESSING_BITS_40_47)
+		result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 5, mem_mask >> 40) << 40;
+	if (ACCESSING_BITS_48_55)
+		result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 6, mem_mask >> 48) << 48;
+	if (ACCESSING_BITS_56_63)
+		result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 7, mem_mask >> 56) << 56;
+	return FLIPENDIAN_INT64(result);
 }
 
 
 static WRITE64_HANDLER( bebox_video_w )
 {
-	UINT64 *mem = (UINT64 *) pc_vga_memory();
-	data = BIG_ENDIANIZE_INT64(data);
-	mem_mask = BIG_ENDIANIZE_INT64(mem_mask);
-	COMBINE_DATA(&mem[offset]);
+	data = FLIPENDIAN_INT64(data);
+	mem_mask = FLIPENDIAN_INT64(mem_mask);
+	if (ACCESSING_BITS_0_7)
+		vga_mem_linear_w(space, offset * 8 + 0, data >> 0 , mem_mask >> 0);
+	if (ACCESSING_BITS_8_15)                       
+		vga_mem_linear_w(space, offset * 8 + 1, data >> 8 , mem_mask >> 8);
+	if (ACCESSING_BITS_16_23)                      
+		vga_mem_linear_w(space, offset * 8 + 2, data >> 16, mem_mask >> 16);
+	if (ACCESSING_BITS_24_31)                      
+		vga_mem_linear_w(space, offset * 8 + 3, data >> 24, mem_mask >> 24);
+	if (ACCESSING_BITS_32_39)                      
+		vga_mem_linear_w(space, offset * 8 + 4, data >> 32, mem_mask >> 32);
+	if (ACCESSING_BITS_40_47)                      
+		vga_mem_linear_w(space, offset * 8 + 5, data >> 40, mem_mask >> 40);
+	if (ACCESSING_BITS_48_55)                      
+		vga_mem_linear_w(space, offset * 8 + 6, data >> 48, mem_mask >> 48);
+	if (ACCESSING_BITS_56_63)                      
+		vga_mem_linear_w(space, offset * 8 + 7, data >> 56, mem_mask >> 56);
 }
-
+*/
 /*************************************
  *
  *  8237 DMA
@@ -1060,8 +1091,6 @@ DRIVER_INIT_MEMBER(bebox_state,bebox)
 {
 	address_space &space_0 = machine().device("ppc1")->memory().space(AS_PROGRAM);
 	address_space &space_1 = machine().device("ppc2")->memory().space(AS_PROGRAM);
-	offs_t vram_begin;
-	offs_t vram_end;
 
 	/* set up boot and flash ROM */
 	membank("bank2")->set_base(machine().root_device().memregion("user2")->base());
@@ -1072,12 +1101,6 @@ DRIVER_INIT_MEMBER(bebox_state,bebox)
 	membank("bank3")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 
 	kbdc8042_init(machine(), &bebox_8042_interface);
-
-	/* install VGA memory */
-	vram_begin = 0xC1000000;
-	vram_end = vram_begin + pc_vga_memory_size() - 1;
-	space_0.install_legacy_readwrite_handler(vram_begin, vram_end, FUNC(bebox_video_r), FUNC(bebox_video_w));
-	space_1.install_legacy_readwrite_handler(vram_begin, vram_end, FUNC(bebox_video_r), FUNC(bebox_video_w));
 
 	/* The following is a verrrry ugly hack put in to support NetBSD for
      * NetBSD.  When NetBSD/bebox it does most of its work on CPU #0 and then

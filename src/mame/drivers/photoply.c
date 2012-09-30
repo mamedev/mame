@@ -240,7 +240,7 @@ static const struct pit8253_config at_pit8254_config =
 
 static ADDRESS_MAP_START( photoply_map, AS_PROGRAM, 32, photoply_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM // VGA RAM
+	AM_RANGE(0x000a0000, 0x000bffff) AM_READWRITE8_LEGACY(vga_mem_r,vga_mem_w, 0xffffffff) // VGA RAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0) //???
 	AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000d0000, 0x000dffff) AM_RAM AM_REGION("ex_bios", 0)
@@ -262,7 +262,10 @@ static ADDRESS_MAP_START( photoply_io, AS_IO, 32, photoply_state )
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
 	AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
-	AM_RANGE(0x03bc, 0x03bf) AM_RAM //parallel port 3
+	//AM_RANGE(0x03bc, 0x03bf) AM_RAM //parallel port 3
+	AM_RANGE(0x03b0, 0x03bf) AM_READWRITE8_LEGACY(vga_port_03b0_r, vga_port_03b0_w, 0xffffffff)
+	AM_RANGE(0x03c0, 0x03cf) AM_READWRITE8_LEGACY(vga_port_03c0_r, vga_port_03c0_w, 0xffffffff)
+	AM_RANGE(0x03d0, 0x03df) AM_READWRITE8_LEGACY(vga_port_03d0_r, vga_port_03d0_w, 0xffffffff)	
 //  AM_RANGE(0x03f4, 0x03f7) AM_READ_LEGACY(kludge_r) // fdc
 ADDRESS_MAP_END
 
@@ -379,7 +382,6 @@ ROM_END
 DRIVER_INIT_MEMBER(photoply_state,photoply)
 {
 	pc_vga_init(machine(), read8_delegate(FUNC(photoply_state::vga_setting),this));
-	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 GAME( 199?, photoply,  0,   photoply, photoply, photoply_state, photoply, ROT0, "Funworld", "Photo Play 2000 (v2.01)", GAME_NOT_WORKING|GAME_NO_SOUND )

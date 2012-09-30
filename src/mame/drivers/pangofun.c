@@ -113,7 +113,7 @@ public:
 
 static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, pangofun_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
+	AM_RANGE(0x000a0000, 0x000bffff) AM_READWRITE8_LEGACY(vga_mem_r,vga_mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("bios", 0 )
 	AM_RANGE(0x00100000, 0x00ffffff) AM_NOP
@@ -124,6 +124,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pcat_io, AS_IO, 32, pangofun_state )
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
+	AM_RANGE(0x03b0, 0x03bf) AM_READWRITE8_LEGACY(vga_port_03b0_r, vga_port_03b0_w, 0xffffffff)
+	AM_RANGE(0x03c0, 0x03cf) AM_READWRITE8_LEGACY(vga_port_03c0_r, vga_port_03c0_w, 0xffffffff)
+	AM_RANGE(0x03d0, 0x03df) AM_READWRITE8_LEGACY(vga_port_03d0_r, vga_port_03d0_w, 0xffffffff)		
 ADDRESS_MAP_END
 
 #define AT_KEYB_HELPER(bit, text, key1) \
@@ -245,7 +248,6 @@ ROM_END
 DRIVER_INIT_MEMBER(pangofun_state,pangofun)
 {
 	pc_vga_init(machine(), read8_delegate(FUNC(pangofun_state::vga_setting),this));
-	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 GAME( 1995, pangofun,  0,   pangofun, pangofun, pangofun_state, pangofun, ROT0, "InfoCube", "Pango Fun (Italy)", GAME_NOT_WORKING|GAME_NO_SOUND )

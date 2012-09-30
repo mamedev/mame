@@ -17,13 +17,7 @@ MACHINE_CONFIG_EXTERN( pcvideo_ati_isa );
 VIDEO_START( vga );
 void pc_vga_init(running_machine &machine, read8_delegate read_dipswitch);
 void pc_vga_cirrus_init(running_machine &machine, read8_delegate read_dipswitch);
-void pc_vga_io_init(running_machine &machine, address_space &mem_space, offs_t mem_offset, address_space &io_space, offs_t port_offset);
-void pc_vga_gamtor_io_init(running_machine &machine, address_space &mem_space, offs_t mem_offset, address_space &io_space, offs_t port_offset);
-void pc_svga_trident_io_init(running_machine &machine, address_space &mem_space, offs_t mem_offset, address_space &io_space, offs_t port_offset);
-void pc_svga_cirrus_io_init(running_machine &machine, address_space &mem_space, offs_t mem_offset, address_space &io_space, offs_t port_offset);
 void pc_vga_reset(running_machine &machine);
-void *pc_vga_memory(void);
-size_t pc_vga_memory_size(void);
 void pc_video_start(running_machine &machine);
 void s3_video_start(running_machine &machine);
 
@@ -31,10 +25,12 @@ DECLARE_READ8_HANDLER(vga_port_03b0_r);
 DECLARE_READ8_HANDLER(vga_port_03c0_r);
 DECLARE_READ8_HANDLER(vga_port_03d0_r);
 DECLARE_READ8_HANDLER(vga_mem_r);
+DECLARE_READ8_HANDLER(vga_mem_linear_r);
 DECLARE_WRITE8_HANDLER(vga_port_03b0_w);
 DECLARE_WRITE8_HANDLER(vga_port_03c0_w);
 DECLARE_WRITE8_HANDLER(vga_port_03d0_w);
 DECLARE_WRITE8_HANDLER(vga_mem_w);
+DECLARE_WRITE8_HANDLER(vga_mem_linear_w);
 
 /* per-device implementations */
 DECLARE_READ8_HANDLER(tseng_et4k_03b0_r);
@@ -129,7 +125,17 @@ DECLARE_WRITE16_HANDLER(mach8_ec3_w);
 DECLARE_READ8_HANDLER(ati_mem_r);
 DECLARE_WRITE8_HANDLER(ati_mem_w);
 
+DECLARE_READ8_HANDLER(cirrus_03c0_r);
+DECLARE_WRITE8_HANDLER(cirrus_03c0_w);
 
+DECLARE_READ8_HANDLER(vga_gamtor_mem_r);
+DECLARE_WRITE8_HANDLER(vga_gamtor_mem_w);
+DECLARE_READ8_HANDLER(vga_port_gamtor_03b0_r);
+DECLARE_WRITE8_HANDLER(vga_port_gamtor_03b0_w);
+DECLARE_READ8_HANDLER(vga_port_gamtor_03c0_r);
+DECLARE_WRITE8_HANDLER(vga_port_gamtor_03c0_w);
+DECLARE_READ8_HANDLER(vga_port_gamtor_03d0_r);
+DECLARE_WRITE8_HANDLER(vga_port_gamtor_03d0_w);
 /*
   pega notes (paradise)
   build in amstrad pc1640

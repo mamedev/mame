@@ -94,7 +94,6 @@ cirrus_device::cirrus_device(const machine_config &mconfig, const char *tag, dev
 void cirrus_device::device_start()
 {
 	pc_vga_cirrus_init(machine(), read8_delegate());
-	pc_svga_cirrus_io_init(machine(), machine().device("ppc1")->memory().space(AS_PROGRAM), 0xC00A0000, machine().device("ppc1")->memory().space(AS_PROGRAM), 0x80000000);
 }
 
 //-------------------------------------------------

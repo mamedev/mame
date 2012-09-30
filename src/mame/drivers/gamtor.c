@@ -53,8 +53,12 @@ static ADDRESS_MAP_START( gaminator_map, AS_PROGRAM, 32, gaminator_state )
 	AM_RANGE(0x20000000, 0x2003ffff) AM_RAM
 
 	/* standard VGA */
-//  AM_RANGE(0x40000000, 0x40000fff) AM_RAM // regs
-	AM_RANGE(0x44000000, 0x4401ffff) AM_RAM // VRAM
+	//AM_RANGE(0x40000000, 0x40000fff) AM_RAM // regs
+	AM_RANGE(0x400003b0, 0x400003bf) AM_READWRITE8_LEGACY(vga_port_gamtor_03b0_r, vga_port_gamtor_03b0_w, 0xffffffff)
+	AM_RANGE(0x400003c0, 0x400003cf) AM_READWRITE8_LEGACY(vga_port_gamtor_03c0_r, vga_port_gamtor_03c0_w, 0xffffffff)
+	AM_RANGE(0x400003d0, 0x400003df) AM_READWRITE8_LEGACY(vga_port_gamtor_03d0_r, vga_port_gamtor_03d0_w, 0xffffffff)
+
+	AM_RANGE(0x44000000, 0x4401ffff) AM_READWRITE8_LEGACY(vga_gamtor_mem_r,vga_gamtor_mem_w, 0xffffffff) // VRAM
 //  AM_RANGE(0x44000000, 0x44007fff) AM_RAM AM_SHARE("tmapram1") // puts strings here, looks almost like a tilemap, but where are the tiles?
 //  AM_RANGE(0x440a0000, 0x440a1fff) AM_RAM AM_SHARE("tmapram2") // beetlem (like above, mirror?)
 
@@ -1255,7 +1259,6 @@ READ8_MEMBER(gaminator_state::vga_setting ) { return 0xff; } // hard-code to col
 DRIVER_INIT_MEMBER(gaminator_state,gaminator)
 {
 	pc_vga_init(machine(), read8_delegate(FUNC(gaminator_state::vga_setting),this));
-	pc_vga_gamtor_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0x44000000, machine().device("maincpu")->memory().space(AS_PROGRAM), 0x40000000);
 }
 
 

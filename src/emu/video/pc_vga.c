@@ -2058,41 +2058,6 @@ void pc_vga_cirrus_init(running_machine &machine, read8_delegate read_dipswitch)
 
 }
 
-void pc_vga_io_init(running_machine &machine, address_space &mem_space, offs_t mem_offset, address_space &io_space, offs_t port_offset)
-{
-	int buswidth;
-	UINT64 mask = 0;
-
-	buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
-	switch(buswidth)
-	{
-		case 8:
-			mask = 0;
-			break;
-
-		case 16:
-			mask = 0xffff;
-			break;
-
-		case 32:
-			mask = 0xffffffff;
-			break;
-
-		case 64:
-			mask = -1;
-			break;
-
-		default:
-			fatalerror("VGA: Bus width %d not supported\n", buswidth);
-			break;
-	}
-	io_space.install_legacy_readwrite_handler(port_offset + 0x3b0, port_offset + 0x3bf, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w), mask);
-	io_space.install_legacy_readwrite_handler(port_offset + 0x3c0, port_offset + 0x3cf, FUNC(vga_port_03c0_r), FUNC(vga_port_03c0_w), mask);
-	io_space.install_legacy_readwrite_handler(port_offset + 0x3d0, port_offset + 0x3df, FUNC(vga_port_03d0_r), FUNC(vga_port_03d0_w), mask);
-
-	mem_space.install_legacy_readwrite_handler(mem_offset + 0x00000, mem_offset + 0x1ffff, FUNC(vga_mem_r), FUNC(vga_mem_w), mask);
-}
-
 VIDEO_START( vga )
 {
 	int i;
@@ -2106,17 +2071,16 @@ static VIDEO_RESET( vga )
 	pc_vga_reset(machine);
 }
 
-
-
-void *pc_vga_memory(void)
+READ8_HANDLER(vga_mem_linear_r)
 {
-	return vga.memory;
+	return vga.memory[offset];
 }
 
-size_t pc_vga_memory_size(void)
+WRITE8_HANDLER(vga_mem_linear_w)
 {
-	return vga.svga_intf.vram_size;
+	vga.memory[offset] = data;
 }
+
 
 static struct eeprom_interface ati_eeprom_interface =
 {
@@ -2503,45 +2467,6 @@ WRITE8_HANDLER( tseng_mem_w )
 Trident implementation
 
 ******************************************/
-
-void pc_svga_trident_io_init(running_machine &machine, address_space &mem_space, offs_t mem_offset, address_space &io_space, offs_t port_offset)
-{
-	int buswidth;
-	UINT64 mask = 0;
-
-	buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
-	switch(buswidth)
-	{
-		case 8:
-			mask = 0;
-			break;
-
-		case 16:
-			mask = 0xffff;
-			break;
-
-		case 32:
-			mask = 0xffffffff;
-			break;
-
-		case 64:
-			mask = -1;
-			break;
-
-		default:
-			fatalerror("VGA: Bus width %d not supported\n", buswidth);
-			break;
-	}
-	io_space.install_legacy_readwrite_handler(port_offset + 0x3b0, port_offset + 0x3bf, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w), mask);
-	io_space.install_legacy_readwrite_handler(port_offset + 0x3c0, port_offset + 0x3cf, FUNC(trident_03c0_r), FUNC(trident_03c0_w), mask);
-	io_space.install_legacy_readwrite_handler(port_offset + 0x3d0, port_offset + 0x3df, FUNC(trident_03d0_r), FUNC(trident_03d0_w), mask);
-
-	mem_space.install_legacy_readwrite_handler(mem_offset + 0x00000, mem_offset + 0x1ffff, FUNC(trident_mem_r), FUNC(trident_mem_w), mask);
-
-	// D3h = TGUI9660XGi
-	svga.id = 0xd3; // TODO: hardcoded for California Chase
-}
-
 static UINT8 trident_seq_reg_read(running_machine &machine, UINT8 index)
 {
 	UINT8 res;
@@ -4863,40 +4788,6 @@ WRITE8_HANDLER(vga_port_gamtor_03d0_w)
 	}
 }
 
-void pc_vga_gamtor_io_init(running_machine &machine, address_space &mem_space, offs_t mem_offset, address_space &io_space, offs_t port_offset)
-{
-	int buswidth;
-	UINT64 mask = 0;
-
-	buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
-	switch(buswidth)
-	{
-		case 8:
-			mask = 0;
-			break;
-
-		case 16:
-			mask = 0xffff;
-			break;
-
-		case 32:
-			mask = 0xffffffff;
-			break;
-
-		case 64:
-			mask = -1;
-			break;
-
-		default:
-			fatalerror("VGA: Bus width %d not supported\n", buswidth);
-			break;
-	}
-	io_space.install_legacy_readwrite_handler(port_offset + 0x3b0, port_offset + 0x3bf, FUNC(vga_port_gamtor_03b0_r), FUNC(vga_port_gamtor_03b0_w), mask);
-	io_space.install_legacy_readwrite_handler(port_offset + 0x3c0, port_offset + 0x3cf, FUNC(vga_port_gamtor_03c0_r), FUNC(vga_port_gamtor_03c0_w), mask);
-	io_space.install_legacy_readwrite_handler(port_offset + 0x3d0, port_offset + 0x3df, FUNC(vga_port_gamtor_03d0_r), FUNC(vga_port_gamtor_03d0_w), mask);
-
-	mem_space.install_legacy_readwrite_handler(mem_offset + 0x00000, mem_offset + 0x1ffff, FUNC(vga_gamtor_mem_r), FUNC(vga_gamtor_mem_w), mask);
-}
 
 static void ati_define_video_mode(running_machine &machine)
 {
@@ -5463,39 +5354,4 @@ WRITE8_HANDLER(cirrus_03c0_w)
 			break;
 	}
 	cirrus_define_video_mode(space.machine());
-}
-
-void pc_svga_cirrus_io_init(running_machine &machine, address_space &mem_space, offs_t mem_offset, address_space &io_space, offs_t port_offset)
-{
-	int buswidth;
-	UINT64 mask = 0;
-
-	buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
-	switch(buswidth)
-	{
-		case 8:
-			mask = 0;
-			break;
-
-		case 16:
-			mask = 0xffff;
-			break;
-
-		case 32:
-			mask = 0xffffffff;
-			break;
-
-		case 64:
-			mask = -1;
-			break;
-
-		default:
-			fatalerror("VGA: Bus width %d not supported\n", buswidth);
-			break;
-	}
-	io_space.install_legacy_readwrite_handler(port_offset + 0x3b0, port_offset + 0x3bf, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w), mask);
-	io_space.install_legacy_readwrite_handler(port_offset + 0x3c0, port_offset + 0x3cf, FUNC(cirrus_03c0_r), FUNC(cirrus_03c0_w), mask);
-	io_space.install_legacy_readwrite_handler(port_offset + 0x3d0, port_offset + 0x3df, FUNC(vga_port_03d0_r), FUNC(vga_port_03d0_w), mask);
-
-	mem_space.install_legacy_readwrite_handler(mem_offset + 0x00000, mem_offset + 0x1ffff, FUNC(vga_mem_r), FUNC(vga_mem_w), mask);
 }

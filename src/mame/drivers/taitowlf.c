@@ -456,7 +456,11 @@ static I8237_INTERFACE( dma8237_2_config )
 
 static ADDRESS_MAP_START( taitowlf_map, AS_PROGRAM, 32, taitowlf_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
+	#if ENABLE_VGA
+	AM_RANGE(0x000a0000, 0x000bffff) AM_READWRITE8_LEGACY(vga_mem_r,vga_mem_w, 0xffffffff)
+	#else
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
+	#endif
 	#if ENABLE_VGA
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
 	#else
@@ -483,6 +487,11 @@ static ADDRESS_MAP_START(taitowlf_io, AS_IO, 32, taitowlf_state )
 	AM_RANGE(0x0300, 0x03af) AM_NOP
 	AM_RANGE(0x03b0, 0x03df) AM_NOP
 	AM_RANGE(0x0278, 0x027b) AM_WRITE(pnp_config_w)
+	#if ENABLE_VGA
+	AM_RANGE(0x03b0, 0x03bf) AM_READWRITE8_LEGACY(vga_port_03b0_r, vga_port_03b0_w, 0xffffffff)
+	AM_RANGE(0x03c0, 0x03cf) AM_READWRITE8_LEGACY(vga_port_03c0_r, vga_port_03c0_w, 0xffffffff)
+	AM_RANGE(0x03d0, 0x03df) AM_READWRITE8_LEGACY(vga_port_03d0_r, vga_port_03d0_w, 0xffffffff)		
+	#endif
 	AM_RANGE(0x03f0, 0x03ff) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITE(pnp_data_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
@@ -711,7 +720,6 @@ DRIVER_INIT_MEMBER(taitowlf_state,taitowlf)
 	kbdc8042_init(machine(), &at8042);
 	#if ENABLE_VGA
 	pc_vga_init(machine(), read8_delegate(FUNC(taitowlf_state::vga_setting),this));
-	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 	#endif
 }
 

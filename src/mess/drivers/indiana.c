@@ -35,7 +35,11 @@ static ADDRESS_MAP_START(indiana_mem, AS_PROGRAM, 32, indiana_state)
 	AM_RANGE(0x00500000, 0x005fffff) AM_MIRROR(0x7f800000) AM_RAM // 16 bit PC MEM
 	AM_RANGE(0x00600000, 0x006fffff) AM_MIRROR(0x7f800000) AM_RAM // 8 bit PC IO
 	AM_RANGE(0x00700000, 0x007fffff) AM_MIRROR(0x7f800000) AM_RAM // 8 bit PC MEM
-	AM_RANGE(0x80000000, 0x803fffff) AM_MIRROR(0x7fc00000) AM_RAM // 4 MB RAM
+	AM_RANGE(0x7f6003b0, 0x7f6003bf) AM_READWRITE8_LEGACY(vga_port_03b0_r, vga_port_03b0_w, 0xffffffff)
+	AM_RANGE(0x7f6003c0, 0x7f6003cf) AM_READWRITE8_LEGACY(vga_port_03c0_r, vga_port_03c0_w, 0xffffffff)
+	AM_RANGE(0x7f6003d0, 0x7f6003df) AM_READWRITE8_LEGACY(vga_port_03d0_r, vga_port_03d0_w, 0xffffffff)	
+	AM_RANGE(0x7f7a0000, 0x7f7bffff) AM_READWRITE8_LEGACY(vga_mem_r,vga_mem_w, 0xffffffff)	
+	AM_RANGE(0x80000000, 0x803fffff) AM_MIRROR(0x7fc00000) AM_RAM // 4 MB RAM	
 ADDRESS_MAP_END
 
 
@@ -85,7 +89,6 @@ READ8_MEMBER(indiana_state::indiana_vga_setting)
 DRIVER_INIT_MEMBER(indiana_state,indiana)
 {
 	pc_vga_init(machine(), read8_delegate(FUNC(indiana_state::indiana_vga_setting),this));
-	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0x7f7a0000, machine().device("maincpu")->memory().space(AS_PROGRAM), 0x7f600000);
 }
 
 /* ROM definition */
