@@ -98,7 +98,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(midqslvr_pic8259_1_set_int_line);
 	virtual void machine_start();
 	virtual void machine_reset();
-	DECLARE_READ8_MEMBER(vga_setting);
 };
 
 
@@ -535,7 +534,7 @@ static I8237_INTERFACE( dma8237_2_config )
 
 static ADDRESS_MAP_START(midqslvr_map, AS_PROGRAM, 32, midqslvr_state)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_READWRITE8_LEGACY(vga_mem_r,vga_mem_w, 0xffffffff)
+	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c3fff) AM_ROMBANK("video_bank1") AM_WRITE(isa_ram1_w)
 	AM_RANGE(0x000c4000, 0x000c7fff) AM_ROMBANK("video_bank2") AM_WRITE(isa_ram2_w)
 	AM_RANGE(0x000e0000, 0x000e3fff) AM_ROMBANK("bios_ext1") AM_WRITE(bios_ext1_ram_w)
@@ -559,9 +558,9 @@ static ADDRESS_MAP_START(midqslvr_io, AS_IO, 32, midqslvr_state)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 
 	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
-	AM_RANGE(0x03b0, 0x03bf) AM_READWRITE8_LEGACY(vga_port_03b0_r, vga_port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_READWRITE8_LEGACY(vga_port_03c0_r, vga_port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_READWRITE8_LEGACY(vga_port_03d0_r, vga_port_03d0_w, 0xffffffff)	
+	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
+	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(fdc_r, fdc_w)
 
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
@@ -656,8 +655,6 @@ static void ide_interrupt(device_t *device, int state)
 	pic8259_ir6_w(drvstate->m_pic8259_2, state);
 }
 
-READ8_MEMBER( midqslvr_state::vga_setting ) { return 0xff; } // hard-code to color
-
 void midqslvr_state::machine_start()
 {
 
@@ -675,7 +672,6 @@ void midqslvr_state::machine_start()
 	intel82439tx_init(machine());
 
 	kbdc8042_init(machine(), &at8042);
-	pc_vga_init(machine(), read8_delegate(FUNC(midqslvr_state::vga_setting),this));
 }
 
 void midqslvr_state::machine_reset()

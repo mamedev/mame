@@ -100,7 +100,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(at_com_interrupt_1);
 	DECLARE_DRIVER_INIT(magtouch);
 	virtual void machine_start();
-	DECLARE_READ8_MEMBER(vga_setting);
 };
 
 
@@ -169,7 +168,7 @@ WRITE8_MEMBER(magtouch_state::magtouch_io_w)
 
 static ADDRESS_MAP_START( magtouch_map, AS_PROGRAM, 32, magtouch_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_READWRITE8_LEGACY(vga_mem_r,vga_mem_w, 0xffffffff)
+	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000d8000, 0x000dffff) AM_ROMBANK("rombank")
 	AM_RANGE(0x000f0000, 0x000fffff) AM_RAM AM_REGION("bios", 0 )
@@ -180,9 +179,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( magtouch_io, AS_IO, 32, magtouch_state )
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x02e0, 0x02e7) AM_READWRITE8(magtouch_io_r, magtouch_io_w, 0xffffffff)
-	AM_RANGE(0x03b0, 0x03bf) AM_READWRITE8_LEGACY(vga_port_03b0_r, vga_port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_READWRITE8_LEGACY(vga_port_03c0_r, vga_port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_READWRITE8_LEGACY(vga_port_03d0_r, vga_port_03d0_w, 0xffffffff)		
+	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
+	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)	
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ns16450_device, ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
@@ -199,8 +198,6 @@ static void magtouch_set_keyb_int(running_machine &machine, int state)
 {
 	pic8259_ir1_w(machine.device("pic8259_1"), state);
 }
-
-READ8_MEMBER( magtouch_state::vga_setting ) { return 0xff; } // hard-code to color
 
 void magtouch_state::machine_start()
 {
@@ -252,7 +249,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(magtouch_state,magtouch)
 {
-	pc_vga_init(machine(), read8_delegate(FUNC(magtouch_state::vga_setting),this));
 }
+
 
 GAME( 1995, magtouch,   0,         magtouch,  magtouch, magtouch_state, magtouch, ROT0, "Micro Manufacturing",     "Magical Touch", GAME_NOT_WORKING | GAME_NO_SOUND )

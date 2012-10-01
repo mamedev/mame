@@ -20,6 +20,15 @@ ROM_END
 
 const device_type ISA8_SVGA_CIRRUS = &device_creator<isa8_svga_cirrus_device>;
 
+static MACHINE_CONFIG_FRAGMENT( vga_cirrus )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_vga_device, screen_update)
+
+	MCFG_PALETTE_LENGTH(0x100)
+	
+	MCFG_DEVICE_ADD("vga", CIRRUS_VGA, 0)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -28,7 +37,7 @@ const device_type ISA8_SVGA_CIRRUS = &device_creator<isa8_svga_cirrus_device>;
 
 machine_config_constructor isa8_svga_cirrus_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( pcvideo_vga_isa );
+	return MACHINE_CONFIG_NAME( vga_cirrus );
 }
 
 //-------------------------------------------------
@@ -64,23 +73,16 @@ void isa8_svga_cirrus_device::device_start()
 {
 	set_isa_device();
 
-	video_start_vga( machine() );
-
-	pc_vga_init(machine(), read8_delegate(FUNC(isa8_svga_cirrus_device::input_port_0_r),this));
-
-	int i;
-	for (i = 0; i < 0x100; i++)
-		palette_set_color_rgb(machine(), i, 0, 0, 0);
-	pc_video_start(machine());
-
+	m_vga = subdevice<cirrus_vga_device>("vga");
+	
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "svga", "dm_clgd5430");
 
-	m_isa->install_device(0x03b0, 0x03bf, 0, 0, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w));
-	m_isa->install_device(0x03c0, 0x03cf, 0, 0, FUNC(vga_port_03c0_r), FUNC(vga_port_03c0_w));
-	m_isa->install_device(0x03d0, 0x03df, 0, 0, FUNC(vga_port_03d0_r), FUNC(vga_port_03d0_w));
-//  m_isa->install_device(0x9ae8, 0x9aeb, 0, 0, FUNC(s3_port_9ae8_r), FUNC(s3_port_9ae8_w));
+	m_isa->install_device(0x03b0, 0x03bf, 0, 0, read8_delegate(FUNC(cirrus_vga_device::port_03b0_r),m_vga), write8_delegate(FUNC(cirrus_vga_device::port_03b0_w),m_vga));
+	m_isa->install_device(0x03c0, 0x03cf, 0, 0, read8_delegate(FUNC(cirrus_vga_device::port_03c0_r),m_vga), write8_delegate(FUNC(cirrus_vga_device::port_03c0_w),m_vga));
+	m_isa->install_device(0x03d0, 0x03df, 0, 0, read8_delegate(FUNC(cirrus_vga_device::port_03d0_r),m_vga), write8_delegate(FUNC(cirrus_vga_device::port_03d0_w),m_vga));
+//  m_isa->install_device(0x9ae8, 0x9aeb, 0, 0, read8_delegate(FUNC(cirrus_vga_device::s3_port_9ae8_r),m_vga), write8_delegate(FUNC(cirrus_vga_device::s3_port_9ae8_w),m_vga));
 
-	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, FUNC(vga_mem_r), FUNC(vga_mem_w));
+	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, read8_delegate(FUNC(cirrus_vga_device::mem_r),m_vga), write8_delegate(FUNC(cirrus_vga_device::mem_w),m_vga));
 }
 
 //-------------------------------------------------
@@ -89,5 +91,4 @@ void isa8_svga_cirrus_device::device_start()
 
 void isa8_svga_cirrus_device::device_reset()
 {
-	pc_vga_reset(machine());
 }

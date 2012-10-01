@@ -35,7 +35,6 @@ public:
 		: driver_device(mconfig, type, tag){ }
 	DECLARE_WRITE32_MEMBER(gamtor_unk_w);
 	DECLARE_DRIVER_INIT(gaminator);
-	DECLARE_READ8_MEMBER(vga_setting);
 };
 
 WRITE32_MEMBER(gaminator_state::gamtor_unk_w)
@@ -54,11 +53,11 @@ static ADDRESS_MAP_START( gaminator_map, AS_PROGRAM, 32, gaminator_state )
 
 	/* standard VGA */
 	//AM_RANGE(0x40000000, 0x40000fff) AM_RAM // regs
-	AM_RANGE(0x400003b0, 0x400003bf) AM_READWRITE8_LEGACY(vga_port_gamtor_03b0_r, vga_port_gamtor_03b0_w, 0xffffffff)
-	AM_RANGE(0x400003c0, 0x400003cf) AM_READWRITE8_LEGACY(vga_port_gamtor_03c0_r, vga_port_gamtor_03c0_w, 0xffffffff)
-	AM_RANGE(0x400003d0, 0x400003df) AM_READWRITE8_LEGACY(vga_port_gamtor_03d0_r, vga_port_gamtor_03d0_w, 0xffffffff)
+	AM_RANGE(0x400003b0, 0x400003bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
+	AM_RANGE(0x400003c0, 0x400003cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
+	AM_RANGE(0x400003d0, 0x400003df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
 
-	AM_RANGE(0x44000000, 0x4401ffff) AM_READWRITE8_LEGACY(vga_gamtor_mem_r,vga_gamtor_mem_w, 0xffffffff) // VRAM
+	AM_RANGE(0x44000000, 0x4401ffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff) // VRAM
 //  AM_RANGE(0x44000000, 0x44007fff) AM_RAM AM_SHARE("tmapram1") // puts strings here, looks almost like a tilemap, but where are the tiles?
 //  AM_RANGE(0x440a0000, 0x440a1fff) AM_RAM AM_SHARE("tmapram2") // beetlem (like above, mirror?)
 
@@ -77,7 +76,7 @@ static MACHINE_CONFIG_START( gaminator, gaminator_state )
 	MCFG_CPU_PROGRAM_MAP(gaminator_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaminator_state,  irq6_line_hold) // irq6 seems to be needed to get past the ROM checking
 
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	MCFG_FRAGMENT_ADD( pcvideo_gamtor_vga )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */
@@ -1253,12 +1252,8 @@ ROM_START( llcharma )
 	ROM_LOAD( "llc_92_5.6-0", 0x0000, 0x2000000, CRC(c8c2a5d3) SHA1(ec23eff63871cc515ec58a894446d4d639d864e4) )
 ROM_END
 
-READ8_MEMBER(gaminator_state::vga_setting ) { return 0xff; } // hard-code to color
-
-
 DRIVER_INIT_MEMBER(gaminator_state,gaminator)
 {
-	pc_vga_init(machine(), read8_delegate(FUNC(gaminator_state::vga_setting),this));
 }
 
 

@@ -5,6 +5,7 @@
 
 #include "emu.h"
 #include "machine/isa.h"
+#include "video/pc_vga.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -29,6 +30,8 @@ protected:
         // device-level overrides
         virtual void device_start();
         virtual void device_reset();
+private:		
+		tseng_vga_device *m_vga;
 };
 
 

@@ -83,7 +83,6 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER(vga_setting);
 };
 
 #if !ENABLE_VGA
@@ -457,7 +456,7 @@ static I8237_INTERFACE( dma8237_2_config )
 static ADDRESS_MAP_START( taitowlf_map, AS_PROGRAM, 32, taitowlf_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	#if ENABLE_VGA
-	AM_RANGE(0x000a0000, 0x000bffff) AM_READWRITE8_LEGACY(vga_mem_r,vga_mem_w, 0xffffffff)
+	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	#else
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
 	#endif
@@ -488,9 +487,9 @@ static ADDRESS_MAP_START(taitowlf_io, AS_IO, 32, taitowlf_state )
 	AM_RANGE(0x03b0, 0x03df) AM_NOP
 	AM_RANGE(0x0278, 0x027b) AM_WRITE(pnp_config_w)
 	#if ENABLE_VGA
-	AM_RANGE(0x03b0, 0x03bf) AM_READWRITE8_LEGACY(vga_port_03b0_r, vga_port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_READWRITE8_LEGACY(vga_port_03c0_r, vga_port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_READWRITE8_LEGACY(vga_port_03d0_r, vga_port_03d0_w, 0xffffffff)		
+	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
+	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)	
 	#endif
 	AM_RANGE(0x03f0, 0x03ff) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITE(pnp_data_w)
@@ -705,10 +704,6 @@ static void taitowlf_set_keyb_int(running_machine &machine, int state)
 	pic8259_ir1_w(drvstate->m_pic8259_1, state);
 }
 
-#if ENABLE_VGA
-READ8_MEMBER(taitowlf_state::vga_setting ) { return 0xff; } // hard-code to color
-#endif
-
 DRIVER_INIT_MEMBER(taitowlf_state,taitowlf)
 {
 	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
@@ -718,9 +713,6 @@ DRIVER_INIT_MEMBER(taitowlf_state,taitowlf)
 	intel82439tx_init(machine());
 
 	kbdc8042_init(machine(), &at8042);
-	#if ENABLE_VGA
-	pc_vga_init(machine(), read8_delegate(FUNC(taitowlf_state::vga_setting),this));
-	#endif
 }
 
 /*****************************************************************************/

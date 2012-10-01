@@ -81,7 +81,6 @@ public:
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	virtual void machine_start();
 	virtual void machine_reset();
-	DECLARE_READ8_MEMBER(vga_setting);
 };
 
 
@@ -93,7 +92,7 @@ public:
 
 static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, su2000_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("mem_bank")
-	AM_RANGE(0x000a0000, 0x000bffff) AM_READWRITE8_LEGACY(vga_mem_r,vga_mem_w, 0xffffffff)
+	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0x0f0000)
@@ -101,9 +100,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pcat_io, AS_IO, 32, su2000_state )
 	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x03b0, 0x03bf) AM_READWRITE8_LEGACY(vga_port_03b0_r, vga_port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_READWRITE8_LEGACY(vga_port_03c0_r, vga_port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_READWRITE8_LEGACY(vga_port_03d0_r, vga_port_03d0_w, 0xffffffff)		
+	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
+	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)	
 ADDRESS_MAP_END
 
 
@@ -167,18 +166,6 @@ static void ide_interrupt(device_t *device, int state)
 }
 #endif
 
-
-/*************************************************************
- *
- * VGA
- *
- *************************************************************/
-
-READ8_MEMBER(su2000_state::vga_setting )
-{
-	/* TODO */
-	return 0xff;
-}
 
 /*************************************************************
  *
@@ -290,8 +277,6 @@ void su2000_state::machine_start()
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, su2000_set_keyb_int);
 
 	kbdc8042_init(machine(), &at8042);
-
-	pc_vga_init(machine(), read8_delegate(FUNC(su2000_state::vga_setting),this));
 }
 
 void su2000_state::machine_reset()

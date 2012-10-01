@@ -10,132 +10,319 @@
 #define PC_VGA_H
 
 MACHINE_CONFIG_EXTERN( pcvideo_vga );
-MACHINE_CONFIG_EXTERN( pcvideo_vga_isa );
-MACHINE_CONFIG_EXTERN( pcvideo_s3_isa );
-MACHINE_CONFIG_EXTERN( pcvideo_ati_isa );
+MACHINE_CONFIG_EXTERN( pcvideo_trident_vga );
+MACHINE_CONFIG_EXTERN( pcvideo_gamtor_vga );
+MACHINE_CONFIG_EXTERN( pcvideo_cirrus_vga );
 
-VIDEO_START( vga );
-void pc_vga_init(running_machine &machine, read8_delegate read_dipswitch);
-void pc_vga_cirrus_init(running_machine &machine, read8_delegate read_dipswitch);
-void pc_vga_reset(running_machine &machine);
-void pc_video_start(running_machine &machine);
-void s3_video_start(running_machine &machine);
+// ======================> vga_device
 
-DECLARE_READ8_HANDLER(vga_port_03b0_r);
-DECLARE_READ8_HANDLER(vga_port_03c0_r);
-DECLARE_READ8_HANDLER(vga_port_03d0_r);
-DECLARE_READ8_HANDLER(vga_mem_r);
-DECLARE_READ8_HANDLER(vga_mem_linear_r);
-DECLARE_WRITE8_HANDLER(vga_port_03b0_w);
-DECLARE_WRITE8_HANDLER(vga_port_03c0_w);
-DECLARE_WRITE8_HANDLER(vga_port_03d0_w);
-DECLARE_WRITE8_HANDLER(vga_mem_w);
-DECLARE_WRITE8_HANDLER(vga_mem_linear_w);
+class vga_device :  public device_t
+{
+public:
+    // construction/destruction
+    vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
-/* per-device implementations */
-DECLARE_READ8_HANDLER(tseng_et4k_03b0_r);
-DECLARE_WRITE8_HANDLER(tseng_et4k_03b0_w);
-DECLARE_READ8_HANDLER(tseng_et4k_03c0_r);
-DECLARE_WRITE8_HANDLER(tseng_et4k_03c0_w);
-DECLARE_READ8_HANDLER(tseng_et4k_03d0_r);
-DECLARE_WRITE8_HANDLER(tseng_et4k_03d0_w);
-DECLARE_READ8_HANDLER(tseng_mem_r);
-DECLARE_WRITE8_HANDLER(tseng_mem_w);
 
-DECLARE_READ8_HANDLER(trident_03c0_r);
-DECLARE_WRITE8_HANDLER(trident_03c0_w);
-DECLARE_READ8_HANDLER(trident_03d0_r);
-DECLARE_WRITE8_HANDLER(trident_03d0_w);
-DECLARE_READ8_HANDLER(trident_mem_r);
-DECLARE_WRITE8_HANDLER(trident_mem_w);
+	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	
+	virtual READ8_MEMBER(port_03b0_r);
+	virtual WRITE8_MEMBER(port_03b0_w);
+	virtual READ8_MEMBER(port_03c0_r);
+	virtual WRITE8_MEMBER(port_03c0_w);
+	virtual READ8_MEMBER(port_03d0_r);
+	virtual WRITE8_MEMBER(port_03d0_w);
+	virtual READ8_MEMBER(mem_r);
+	virtual WRITE8_MEMBER(mem_w);
+	virtual READ8_MEMBER(mem_linear_r);
+	virtual WRITE8_MEMBER(mem_linear_w);
+protected:
+    // device-level overrides
+    virtual void device_start();
+    virtual void device_reset();
 
-DECLARE_READ8_HANDLER(s3_port_03b0_r);
-DECLARE_WRITE8_HANDLER(s3_port_03b0_w);
-DECLARE_READ8_HANDLER(s3_port_03c0_r);
-DECLARE_WRITE8_HANDLER(s3_port_03c0_w);
-DECLARE_READ8_HANDLER(s3_port_03d0_r);
-DECLARE_WRITE8_HANDLER(s3_port_03d0_w);
-DECLARE_READ16_HANDLER(s3_gpstatus_r);
-DECLARE_WRITE16_HANDLER(s3_cmd_w);
-DECLARE_READ16_HANDLER(ibm8514_ssv_r);
-DECLARE_WRITE16_HANDLER(ibm8514_ssv_w);
-DECLARE_READ16_HANDLER(ibm8514_desty_r);
-DECLARE_WRITE16_HANDLER(ibm8514_desty_w);
-DECLARE_READ16_HANDLER(ibm8514_destx_r);
-DECLARE_WRITE16_HANDLER(ibm8514_destx_w);
-DECLARE_READ16_HANDLER(ibm8514_currentx_r);
-DECLARE_WRITE16_HANDLER(ibm8514_currentx_w);
-DECLARE_READ16_HANDLER(ibm8514_currenty_r);
-DECLARE_WRITE16_HANDLER(ibm8514_currenty_w);
-DECLARE_READ16_HANDLER(s3_line_error_r);
-DECLARE_WRITE16_HANDLER(s3_line_error_w);
-DECLARE_READ16_HANDLER(s3_width_r);
-DECLARE_WRITE16_HANDLER(s3_width_w);
-DECLARE_READ16_HANDLER(s3_multifunc_r);
-DECLARE_WRITE16_HANDLER(s3_multifunc_w);
-DECLARE_READ16_HANDLER(s3_fgcolour_r);
-DECLARE_WRITE16_HANDLER(s3_fgcolour_w);
-DECLARE_READ16_HANDLER(s3_bgcolour_r);
-DECLARE_WRITE16_HANDLER(s3_bgcolour_w);
-DECLARE_READ16_HANDLER(s3_backmix_r);
-DECLARE_WRITE16_HANDLER(s3_backmix_w);
-DECLARE_READ16_HANDLER(s3_foremix_r);
-DECLARE_WRITE16_HANDLER(s3_foremix_w);
-DECLARE_READ16_HANDLER(s3_pixel_xfer_r);
-DECLARE_WRITE16_HANDLER(s3_pixel_xfer_w);
-DECLARE_READ8_HANDLER(s3_mem_r);
-DECLARE_WRITE8_HANDLER(s3_mem_w);
+	void vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect);
+	void vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void vga_vh_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void vga_vh_mono(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual UINT8 pc_vga_choosevideomode();	
+	void recompute_params_clock(int divisor, int xtal);
+	UINT8 crtc_reg_read(UINT8 index);
+	void recompute_params();
+	void crtc_reg_write(UINT8 index, UINT8 data);
+	void seq_reg_write(UINT8 index, UINT8 data);
+	UINT8 vga_vblank();
+	READ8_MEMBER(vga_crtc_r);
+	WRITE8_MEMBER(vga_crtc_w);
+	UINT8 gc_reg_read(UINT8 index);
+	void attribute_reg_write(UINT8 index, UINT8 data);
+	void gc_reg_write(UINT8 index,UINT8 data);
+private:
+	inline UINT8 rotate_right(UINT8 val);
+	inline UINT8 vga_logical_op(UINT8 data, UINT8 plane, UINT8 mask);
+	inline UINT8 vga_latch_write(int offs, UINT8 data);
+};
 
-DECLARE_READ8_HANDLER( ati_port_03c0_r );
-DECLARE_READ8_DEVICE_HANDLER(ati_port_ext_r);
-DECLARE_WRITE8_DEVICE_HANDLER(ati_port_ext_w);
-DECLARE_READ16_HANDLER(ibm8514_gpstatus_r);
-DECLARE_WRITE16_HANDLER(ibm8514_cmd_w);
-DECLARE_READ16_HANDLER(mach8_ext_fifo_r);
-DECLARE_WRITE16_HANDLER(mach8_linedraw_index_w);
-DECLARE_READ16_HANDLER(mach8_bresenham_count_r);
-DECLARE_WRITE16_HANDLER(mach8_bresenham_count_w);
-DECLARE_READ16_HANDLER(mach8_scratch0_r);
-DECLARE_WRITE16_HANDLER(mach8_scratch0_w);
-DECLARE_READ16_HANDLER(mach8_scratch1_r);
-DECLARE_WRITE16_HANDLER(mach8_scratch1_w);
-DECLARE_READ16_HANDLER(mach8_config1_r);
-DECLARE_READ16_HANDLER(mach8_config2_r);
-DECLARE_READ16_HANDLER(ibm8514_status_r);
-DECLARE_READ16_HANDLER(ibm8514_substatus_r);
-DECLARE_WRITE16_HANDLER(ibm8514_subcontrol_w);
-DECLARE_READ16_HANDLER(ibm8514_subcontrol_r);
-DECLARE_READ16_HANDLER(ibm8514_htotal_r);
-DECLARE_WRITE16_HANDLER(ibm8514_htotal_w);
-DECLARE_READ16_HANDLER(ibm8514_vtotal_r);
-DECLARE_WRITE16_HANDLER(ibm8514_vtotal_w);
-DECLARE_READ16_HANDLER(ibm8514_vdisp_r);
-DECLARE_WRITE16_HANDLER(ibm8514_vdisp_w);
-DECLARE_READ16_HANDLER(ibm8514_vsync_r);
-DECLARE_WRITE16_HANDLER(ibm8514_vsync_w);
-DECLARE_WRITE16_HANDLER(mach8_linedraw_w);
-DECLARE_READ16_HANDLER(mach8_ec0_r);
-DECLARE_WRITE16_HANDLER(mach8_ec0_w);
-DECLARE_READ16_HANDLER(mach8_ec1_r);
-DECLARE_WRITE16_HANDLER(mach8_ec1_w);
-DECLARE_READ16_HANDLER(mach8_ec2_r);
-DECLARE_WRITE16_HANDLER(mach8_ec2_w);
-DECLARE_READ16_HANDLER(mach8_ec3_r);
-DECLARE_WRITE16_HANDLER(mach8_ec3_w);
-DECLARE_READ8_HANDLER(ati_mem_r);
-DECLARE_WRITE8_HANDLER(ati_mem_w);
 
-DECLARE_READ8_HANDLER(cirrus_03c0_r);
-DECLARE_WRITE8_HANDLER(cirrus_03c0_w);
+// device type definition
+extern const device_type VGA;
 
-DECLARE_READ8_HANDLER(vga_gamtor_mem_r);
-DECLARE_WRITE8_HANDLER(vga_gamtor_mem_w);
-DECLARE_READ8_HANDLER(vga_port_gamtor_03b0_r);
-DECLARE_WRITE8_HANDLER(vga_port_gamtor_03b0_w);
-DECLARE_READ8_HANDLER(vga_port_gamtor_03c0_r);
-DECLARE_WRITE8_HANDLER(vga_port_gamtor_03c0_w);
-DECLARE_READ8_HANDLER(vga_port_gamtor_03d0_r);
-DECLARE_WRITE8_HANDLER(vga_port_gamtor_03d0_w);
+// ======================> svga_device
+
+class svga_device :  public vga_device
+{
+public:
+    // construction/destruction
+	svga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);	
+
+	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+protected:
+	void svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual UINT8 pc_vga_choosevideomode();
+private:
+};
+
+// ======================> tseng_vga_device
+
+class tseng_vga_device :  public svga_device
+{
+public:
+    // construction/destruction
+    tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual READ8_MEMBER(port_03b0_r);
+	virtual WRITE8_MEMBER(port_03b0_w);
+	virtual READ8_MEMBER(port_03c0_r);
+	virtual WRITE8_MEMBER(port_03c0_w);
+	virtual READ8_MEMBER(port_03d0_r);
+	virtual WRITE8_MEMBER(port_03d0_w);
+	virtual READ8_MEMBER(mem_r);
+	virtual WRITE8_MEMBER(mem_w);
+
+protected:
+
+private:
+	void tseng_define_video_mode();
+	UINT8 tseng_crtc_reg_read(UINT8 index);
+	void tseng_crtc_reg_write(UINT8 index, UINT8 data);
+	UINT8 tseng_seq_reg_read(UINT8 index);
+	void tseng_seq_reg_write(UINT8 index, UINT8 data);
+
+};
+
+
+// device type definition
+extern const device_type TSENG_VGA;
+
+// ======================> trident_vga_device
+
+class trident_vga_device :  public svga_device
+{
+public:
+    // construction/destruction
+    trident_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual READ8_MEMBER(port_03c0_r);
+	virtual WRITE8_MEMBER(port_03c0_w);
+	virtual READ8_MEMBER(port_03d0_r);
+	virtual WRITE8_MEMBER(port_03d0_w);
+	virtual READ8_MEMBER(mem_r);
+	virtual WRITE8_MEMBER(mem_w);
+
+protected:
+
+private:
+	UINT8 trident_seq_reg_read(UINT8 index);
+	void trident_seq_reg_write(UINT8 index, UINT8 data);
+
+};
+
+
+// device type definition
+extern const device_type TRIDENT_VGA;
+
+
+// ======================> s3_vga_device
+
+class s3_vga_device :  public svga_device
+{
+public:
+    // construction/destruction
+    s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s3_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual READ8_MEMBER(port_03b0_r);
+	virtual WRITE8_MEMBER(port_03b0_w);
+	virtual READ8_MEMBER(port_03c0_r);
+	virtual WRITE8_MEMBER(port_03c0_w);
+	virtual READ8_MEMBER(port_03d0_r);
+	virtual WRITE8_MEMBER(port_03d0_w);
+	virtual READ8_MEMBER(mem_r);
+	virtual WRITE8_MEMBER(mem_w);
+	
+	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	
+	READ16_MEMBER(s3_line_error_r);
+	WRITE16_MEMBER(s3_line_error_w);
+	READ16_MEMBER(ibm8514_gpstatus_r);
+	READ16_MEMBER(s3_gpstatus_r);
+	WRITE16_MEMBER(ibm8514_cmd_w);
+	WRITE16_MEMBER(s3_cmd_w);
+	READ16_MEMBER(ibm8514_desty_r);
+	WRITE16_MEMBER(ibm8514_desty_w);
+	READ16_MEMBER(ibm8514_destx_r);
+	WRITE16_MEMBER(ibm8514_destx_w);
+	READ16_MEMBER(ibm8514_ssv_r);
+	WRITE16_MEMBER(ibm8514_ssv_w);
+	READ16_MEMBER(s3_width_r);
+	WRITE16_MEMBER(s3_width_w);
+	READ16_MEMBER(ibm8514_currentx_r);
+	WRITE16_MEMBER(ibm8514_currentx_w);
+	READ16_MEMBER(ibm8514_currenty_r);
+	WRITE16_MEMBER(ibm8514_currenty_w);
+	READ16_MEMBER(s3_fgcolour_r);
+	WRITE16_MEMBER(s3_fgcolour_w);
+	READ16_MEMBER(s3_bgcolour_r);
+	WRITE16_MEMBER(s3_bgcolour_w);
+	READ16_MEMBER(s3_multifunc_r);
+	WRITE16_MEMBER(s3_multifunc_w);
+	READ16_MEMBER(s3_backmix_r);
+	WRITE16_MEMBER(s3_backmix_w);
+	READ16_MEMBER(s3_foremix_r);
+	WRITE16_MEMBER(s3_foremix_w);
+	READ16_MEMBER(s3_pixel_xfer_r);
+	WRITE16_MEMBER(s3_pixel_xfer_w);
+	
+protected:
+    // device-level overrides
+    virtual void device_start();
+
+private:
+	UINT8 s3_crtc_reg_read(UINT8 index);
+	void s3_define_video_mode(void);
+	void s3_crtc_reg_write(UINT8 index, UINT8 data);
+	void s3_write_fg(UINT32 offset);
+	void s3_write_bg(UINT32 offset);
+	void s3_write(UINT32 offset, UINT32 src);
+	void ibm8514_draw_vector(UINT8 len, UINT8 dir, bool draw);
+	void ibm8514_wait_draw_ssv();
+	void ibm8514_draw_ssv(UINT8 data);
+	void ibm8514_wait_draw_vector();
+	void s3_wait_draw();
+};
+
+
+// device type definition
+extern const device_type S3_VGA;
+
+
+// ======================> gamtor_vga_device
+
+class gamtor_vga_device :  public svga_device
+{
+public:
+    // construction/destruction
+    gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+
+	virtual READ8_MEMBER(port_03b0_r);
+	virtual WRITE8_MEMBER(port_03b0_w);
+	virtual READ8_MEMBER(port_03c0_r);
+	virtual WRITE8_MEMBER(port_03c0_w);
+	virtual READ8_MEMBER(port_03d0_r);
+	virtual WRITE8_MEMBER(port_03d0_w);
+	virtual READ8_MEMBER(mem_r);
+	virtual WRITE8_MEMBER(mem_w);
+	
+protected:
+private:
+};
+
+
+// device type definition
+extern const device_type GAMTOR_VGA;
+
+// ======================> ati_vga_device
+
+class ati_vga_device :  public s3_vga_device
+{
+public:
+    // construction/destruction
+    ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual READ8_MEMBER(mem_r);
+	virtual WRITE8_MEMBER(mem_w);
+	virtual READ8_MEMBER(port_03c0_r);
+	READ8_MEMBER(ati_port_ext_r);
+	WRITE8_MEMBER(ati_port_ext_w);
+	READ16_MEMBER(ibm8514_status_r);
+	WRITE16_MEMBER(ibm8514_htotal_w);
+	READ16_MEMBER(ibm8514_substatus_r);
+	WRITE16_MEMBER(ibm8514_subcontrol_w);
+	READ16_MEMBER(ibm8514_subcontrol_r);
+	READ16_MEMBER(ibm8514_htotal_r);
+	READ16_MEMBER(ibm8514_vtotal_r);
+	WRITE16_MEMBER(ibm8514_vtotal_w);
+	READ16_MEMBER(ibm8514_vdisp_r);
+	WRITE16_MEMBER(ibm8514_vdisp_w);
+	READ16_MEMBER(ibm8514_vsync_r);
+	WRITE16_MEMBER(ibm8514_vsync_w);
+	READ16_MEMBER(mach8_ec0_r);
+	WRITE16_MEMBER(mach8_ec0_w);
+	READ16_MEMBER(mach8_ec1_r);
+	WRITE16_MEMBER(mach8_ec1_w);
+	READ16_MEMBER(mach8_ec2_r);
+	WRITE16_MEMBER(mach8_ec2_w);
+	READ16_MEMBER(mach8_ec3_r);
+	WRITE16_MEMBER(mach8_ec3_w);
+	READ16_MEMBER(mach8_ext_fifo_r);
+	WRITE16_MEMBER(mach8_linedraw_index_w);
+	READ16_MEMBER(mach8_bresenham_count_r);
+	WRITE16_MEMBER(mach8_bresenham_count_w);
+	WRITE16_MEMBER(mach8_linedraw_w);
+	READ16_MEMBER(mach8_scratch0_r);
+	WRITE16_MEMBER(mach8_scratch0_w);
+	READ16_MEMBER(mach8_scratch1_r);
+	WRITE16_MEMBER(mach8_scratch1_w);
+	READ16_MEMBER(mach8_config1_r);
+	READ16_MEMBER(mach8_config2_r);	
+protected:
+   virtual machine_config_constructor device_mconfig_additions() const;
+private:
+	void ati_define_video_mode();
+
+};
+
+
+// device type definition
+extern const device_type ATI_VGA;
+
+// ======================> cirrus_vga_device
+
+class cirrus_vga_device :  public svga_device
+{
+public:
+    // construction/destruction
+    cirrus_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual READ8_MEMBER(port_03c0_r);
+	virtual WRITE8_MEMBER(port_03c0_w);
+protected:
+	// device-level overrides
+    virtual void device_start();
+private:
+	void cirrus_define_video_mode();
+	UINT8 cirrus_seq_reg_read(UINT8 index);
+	void cirrus_seq_reg_write(UINT8 index, UINT8 data);
+};
+
+// device type definition
+extern const device_type CIRRUS_VGA;
 /*
   pega notes (paradise)
   build in amstrad pc1640

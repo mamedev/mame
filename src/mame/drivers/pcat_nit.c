@@ -112,7 +112,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(at_com_interrupt_1);
 	DECLARE_DRIVER_INIT(pcat_nit);
 	virtual void machine_start();
-	DECLARE_READ8_MEMBER(vga_setting);
 };
 
 WRITE_LINE_MEMBER(pcat_nit_state::microtouch_out)
@@ -183,7 +182,7 @@ WRITE8_MEMBER(pcat_nit_state::pcat_nit_rombank_w)
 
 static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, pcat_nit_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_READWRITE8_LEGACY(vga_mem_r,vga_mem_w, 0xffffffff)
+	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0) AM_WRITENOP
 	AM_RANGE(0x000d0000, 0x000d3fff) AM_RAM AM_REGION("disk_bios", 0)
 	AM_RANGE(0x000d7000, 0x000d7003) AM_WRITE8(pcat_nit_rombank_w, 0xff)
@@ -211,9 +210,9 @@ static ADDRESS_MAP_START( pcat_nit_io, AS_IO, 32, pcat_nit_state )
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x0278, 0x027f) AM_READ8(pcat_nit_io_r, 0xffffffff) AM_WRITENOP
 	AM_RANGE(0x0280, 0x0283) AM_READNOP
-	AM_RANGE(0x03b0, 0x03bf) AM_READWRITE8_LEGACY(vga_port_03b0_r, vga_port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_READWRITE8_LEGACY(vga_port_03c0_r, vga_port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_READWRITE8_LEGACY(vga_port_03d0_r, vga_port_03d0_w, 0xffffffff)		
+	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
+	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)	
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ns16450_device, ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
@@ -230,8 +229,6 @@ static void streetg2_set_keyb_int(running_machine &machine, int state)
 {
 	pic8259_ir1_w(machine.device("pic8259_1"), state);
 }
-
-READ8_MEMBER(pcat_nit_state::vga_setting ) { return 0xff; } // hard-code to color
 
 void pcat_nit_state::machine_start()
 {
@@ -429,8 +426,6 @@ DRIVER_INIT_MEMBER(pcat_nit_state,pcat_nit)
 {
 	m_banked_nvram = auto_alloc_array(machine(), UINT8, 0x2000);
 	machine().device<nvram_device>("nvram")->set_base(m_banked_nvram, 0x2000);
-
-	pc_vga_init(machine(), read8_delegate(FUNC(pcat_nit_state::vga_setting),this));
 }
 
 GAME( 1993, bonanza,    0,		   pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Bonanza (Revision 3)", GAME_NOT_WORKING|GAME_NO_SOUND )

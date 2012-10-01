@@ -93,7 +93,6 @@ cirrus_device::cirrus_device(const machine_config &mconfig, const char *tag, dev
 
 void cirrus_device::device_start()
 {
-	pc_vga_cirrus_init(machine(), read8_delegate());
 }
 
 //-------------------------------------------------
@@ -159,5 +158,5 @@ void cirrus_device::pci_write(pci_bus_device *pcibus, int function, int offset, 
 WRITE8_DEVICE_HANDLER( cirrus_42E8_w )
 {
 	if (data & 0x80)
-		pc_vga_reset(space.machine());
+		device->machine().device("vga")->reset();
 }

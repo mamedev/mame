@@ -103,7 +103,6 @@ public:
 	UINT8 m_atapi_data[ATAPI_DATA_SIZE];
 	
 	DECLARE_DRIVER_INIT(gammagic);
-	DECLARE_READ8_MEMBER(vga_setting);
 };
 
 //static void atapi_irq(running_machine &machine, int state);
@@ -545,7 +544,7 @@ static WRITE32_HANDLER( atapi_w )
 // Memory is mostly handled by the chipset
 static ADDRESS_MAP_START( gammagic_map, AS_PROGRAM, 32, gammagic_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_READWRITE8_LEGACY(vga_mem_r,vga_mem_w, 0xffffffff)
+	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM
 	AM_RANGE(0x08000000, 0xfffdffff) AM_NOP
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("user", 0x20000)/* System BIOS */
@@ -564,9 +563,9 @@ static ADDRESS_MAP_START( gammagic_io, AS_IO, 32, gammagic_state)
 	AM_RANGE(0x00f0, 0x01ef) AM_NOP
 	//AM_RANGE(0x01f0, 0x01f7) AM_READWRITE_LEGACY(atapi_r, atapi_w)
 	AM_RANGE(0x01f8, 0x03ef) AM_NOP
-	AM_RANGE(0x03b0, 0x03bf) AM_READWRITE8_LEGACY(vga_port_03b0_r, vga_port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_READWRITE8_LEGACY(vga_port_03c0_r, vga_port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_READWRITE8_LEGACY(vga_port_03d0_r, vga_port_03d0_w, 0xffffffff)	
+	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
+	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
 	AM_RANGE(0x03f0, 0x0cf7) AM_NOP
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
 	AM_RANGE(0x0400, 0xffff) AM_NOP
@@ -628,8 +627,6 @@ static IRQ_CALLBACK(irq_callback)
 	gammagic_state *state = device->machine().driver_data<gammagic_state>();
 	return pic8259_acknowledge( state->m_pic8259_1);
 }
-
-READ8_MEMBER( gammagic_state::vga_setting ) { return 0xff; } // hard-code to color
 
 static MACHINE_START(gammagic)
 {
@@ -798,7 +795,6 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(gammagic_state,gammagic)
 {
-	pc_vga_init(machine(), read8_delegate(FUNC(gammagic_state::vga_setting),this));
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, gammagic_set_keyb_int);
 	kbdc8042_init(machine(), &at8042);
 	atapi_init(machine());	
