@@ -59,7 +59,7 @@ static ADDRESS_MAP_START( mtx_io, AS_IO, 8, mtx_state )
 	AM_RANGE(0x00, 0x00) AM_DEVREAD_LEGACY(CENTRONICS_TAG, mtx_strobe_r) AM_WRITE(mtx_bankswitch_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("tms9929a", tms9929a_device, vram_read, vram_write)
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("tms9929a", tms9929a_device, register_read, register_write)
-	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY(SN76489A_TAG, mtx_sound_strobe_r) AM_DEVWRITE_LEGACY(CASSETTE_TAG, mtx_cst_w)
+	AM_RANGE(0x03, 0x03) AM_READ(mtx_sound_strobe_r) AM_DEVWRITE_LEGACY(CASSETTE_TAG, mtx_cst_w)
 	AM_RANGE(0x04, 0x04) AM_DEVREAD_LEGACY(CENTRONICS_TAG, mtx_prt_r)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(mtx_key_lo_r, mtx_sense_w)
@@ -334,6 +334,16 @@ static TMS9928A_INTERFACE(mtx_tms9928a_interface)
     DEVCB_LINE(mtx_tms9929a_interrupt)
 };
 
+/*-------------------------------------------------
+    sn76496_config psg_intf
+-------------------------------------------------*/
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
@@ -360,7 +370,8 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL_4MHz)
+	MCFG_SOUND_ADD(SN76489A_TAG, SN76489A_NEW, XTAL_4MHz)
+	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */

@@ -114,11 +114,9 @@ WRITE8_MEMBER(mtx_state::mtx_bankswitch_w)
     mtx_sound_strobe_r - sound strobe
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( mtx_sound_strobe_r )
+READ8_MEMBER(mtx_state::mtx_sound_strobe_r)
 {
-	mtx_state *state = space.machine().driver_data<mtx_state>();
-
-	sn76496_w(device, space, 0, state->m_sound_latch);
+	m_sn->write(space, 0, m_sound_latch);
 
 	return 0xff;
 }
@@ -129,7 +127,6 @@ READ8_DEVICE_HANDLER( mtx_sound_strobe_r )
 
 WRITE8_MEMBER(mtx_state::mtx_sound_latch_w)
 {
-
 	m_sound_latch = data;
 }
 
@@ -191,7 +188,6 @@ READ8_DEVICE_HANDLER( mtx_prt_r )
 
 WRITE8_MEMBER(mtx_state::mtx_sense_w)
 {
-
 	m_key_sense = data;
 }
 
@@ -201,7 +197,6 @@ WRITE8_MEMBER(mtx_state::mtx_sense_w)
 
 READ8_MEMBER(mtx_state::mtx_key_lo_r)
 {
-
 	UINT8 data = 0xff;
 
 	if (!(m_key_sense & 0x01)) data &= ioport("ROW0")->read();
@@ -222,7 +217,6 @@ READ8_MEMBER(mtx_state::mtx_key_lo_r)
 
 READ8_MEMBER(mtx_state::mtx_key_hi_r)
 {
-
 	UINT8 data = ioport("country_code")->read();
 
 	if (!(m_key_sense & 0x01)) data &= ioport("ROW0")->read() >> 8;
