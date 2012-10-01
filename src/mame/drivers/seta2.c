@@ -41,6 +41,9 @@ B0-010A                 2001    Wing Shooting Championship              Sammy
 B0-010A                 2002    Trophy Hunting - Bear & Moose           Sammy
 -------------------------------------------------------------------------------------------
 
+* Not dumped: Endless Riches by <unknown> 8-liner gambler on modified Reel'N Quake PCB that
+              uses an 8-liner harness instead of a JAMMA connector.
+
 TODO:
 
 - Proper emulation of the TMP68301 CPU, in a core file.
