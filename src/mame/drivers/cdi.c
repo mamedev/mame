@@ -372,16 +372,17 @@ struct cdrom_interface cdi_cdrom =
 };
 
 // Standard CD-i system, with CD-ROM image device (MESS) and Software List (MESS)
-static MACHINE_CONFIG_DERIVED( cdimono1, cdi )
+static MACHINE_CONFIG_DERIVED( cdi_base, cdi )
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, cdi )
 
 	MCFG_CDROM_ADD( "cdrom", cdi_cdrom )
+MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( cdimono1, cdi_base )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
 MACHINE_CONFIG_END
 
-
-static MACHINE_CONFIG_DERIVED( quizard, cdi )
+static MACHINE_CONFIG_DERIVED( quizard, cdi_base )
     MCFG_CPU_MODIFY("maincpu")
     MCFG_CPU_PROGRAM_MAP(cdimono1_mem)
     MCFG_CPU_VBLANK_INT("screen", scc68070_mcu_frame)
@@ -455,6 +456,25 @@ ROM_START( cdimono1 )
 ROM_END
 
 
+ROM_START( cdibios )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_SYSTEM_BIOS( 0, "mcdi200", "Magnavox CD-i 200" )
+	ROMX_LOAD( "cdi200.rom", 0x000000, 0x80000, CRC(40c4e6b9) SHA1(d961de803c89b3d1902d656ceb9ce7c02dccb40a), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "pcdi220", "Philips CD-i 220 F2" )
+	ROMX_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e), ROM_BIOS(2) )
+	// This one is a Mono-IV board, needs to be a separate driver
+	//ROM_SYSTEM_BIOS( 2, "pcdi490", "Philips CD-i 490" )
+	//ROMX_LOAD( "cdi490.rom", 0x000000, 0x80000, CRC(e115f45b) SHA1(f71be031a5dfa837de225081b2ddc8dcb74a0552), ROM_BIOS(3) )
+	// This one is a Mini-MMC board, needs to be a separate driver
+	//ROM_SYSTEM_BIOS( 3, "pcdi910m", "Philips CD-i 910" )
+	//ROMX_LOAD( "cdi910.rom", 0x000000, 0x80000,  CRC(8ee44ed6) SHA1(3fcdfa96f862b0cb7603fb6c2af84cac59527b05), ROM_BIOS(4) )
+
+    ROM_REGION(0x2000, "cdic", 0)
+    ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+
+    ROM_REGION(0x2000, "slave", 0)
+    ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+ROM_END
 ROM_START( quizard )
     ROM_REGION(0x80000, "maincpu", 0)
     ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
@@ -601,22 +621,23 @@ ROM_END
 *************************/
 
 // BIOS / System
-CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      driver_device, 0,        "Philips",  "CD-i (Mono-I) (PAL)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE | GAME_IS_BIOS_ROOT )
+CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      driver_device, 0,        "Philips",  "CD-i (Mono-I) (PAL)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 
 // The Quizard games are RETAIL CD-i units, with additional JAMMA adapters & dongles for protection, hence being 'clones' of the system.
 
+GAME( 1995, cdibios,  0,     		 cdi_base,      quizard, driver_device,      0, ROT0,     "Philips",  	  "CD-i Bios", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_IS_BIOS_ROOT )
 // Working
-GAME( 1995, quizrd12, cdimono1,      quizrd12,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 1.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd17, cdimono1,      quizrd17,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 1.7", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd22, cdimono1,      quizrd22,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd12, cdibios,      quizrd12,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 1.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd17, cdibios,      quizrd17,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 1.7", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd22, cdibios,      quizrd22,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 
-GAME( 1995, quizrd18, cdimono1,      quizrd18,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 1.8", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd23, cdimono1,      quizrd23,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2.3", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd34, cdimono1,      quizrd34,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 3.4", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd18, cdibios,      quizrd18,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 1.8", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd23, cdibios,      quizrd23,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2.3", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd34, cdibios,      quizrd34,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 3.4", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 
 // Partially working
-GAME( 1996, quizard,  cdimono1,      quizrd32,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 3.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1997, quizrr40, cdimono1,      quizrr40,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.0", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1998, quizrr41, cdimono1,      quizrr41,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.1", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1998, quizrr42, cdimono1,      quizrr42,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1996, quizard,  cdibios,      quizrd32,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 3.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1997, quizrr40, cdibios,      quizrr40,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.0", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1998, quizrr41, cdibios,      quizrr41,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.1", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1998, quizrr42, cdibios,      quizrr42,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 

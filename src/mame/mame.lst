@@ -9305,7 +9305,7 @@ mquake			// (c) 1987
 upscope			// (c) 1986 Grand products
 
 // Cubo32 (Commodore CD32-based HW)
-cd32			// Base unit
+cd32bios		// Base unit
 cndypuzl		// (c) 1995
 haremchl		// (c) 1995
 lsrquiz			// (c) 1995
@@ -11348,7 +11348,7 @@ cashtrn		//
 
 // TAB Austria
 // Quizard (Philips CD-I based HW)
-cdimono1		// Base unit
+cdibios			// Base unit
 quizard			// (c) TAB Austria 1996
 quizrd12		// (c) TAB Austria 1996
 quizrd17		// (c) TAB Austria 1996
@@ -11374,7 +11374,7 @@ raaspec			// (c) Roy Abel & Associates 1984
 
 // Matsushita 3DO
 // (used by Orbatak prototype, and Beavis + Butthead prototype)
-3do
+3dobios
 //3do_pal
 orbatak
 
