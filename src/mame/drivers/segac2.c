@@ -1366,6 +1366,11 @@ static const sega315_5124_interface sms_vdp_ntsc_intf =
 	DEVCB_NULL,
 };
 
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( segac, segac2_state )
 
 	/* basic machine hardware */
@@ -1408,7 +1413,8 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	/* right channel not connected */
 
-	MCFG_SOUND_ADD("snsnd", SN76496, XL2_CLOCK/15)
+	MCFG_SOUND_ADD("snsnd", SN76496_NEW, XL2_CLOCK/15)
+	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

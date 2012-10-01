@@ -602,7 +602,7 @@ ADDRESS_MAP_END
 /* basically from src/drivers/segasyse.c */
 static ADDRESS_MAP_START( megaplay_bios_io_map, AS_IO, 8, mplay_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE_LEGACY("sn2", sn76496_w)	/* SN76489 */
+	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("sn2", sn76496_new_device, write)	/* SN76489 */
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE_LEGACY(sms_vdp_data_r, sms_vdp_data_w)	/* VDP */
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE_LEGACY(sms_vdp_ctrl_r, sms_vdp_ctrl_w)	/* VDP */
 ADDRESS_MAP_END
@@ -644,6 +644,11 @@ void mplay_state::screen_eof_megaplay(screen_device &screen, bool state)
 	SCREEN_VBLANK_CALL(megatech_bios);
 }
 
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( megaplay, mplay_state )
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(md_ntsc)
@@ -658,7 +663,8 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
+	MCFG_SOUND_ADD("sn2", SN76496_NEW, MASTER_CLOCK/15)
+	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 
