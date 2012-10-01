@@ -4449,6 +4449,7 @@ src/mame/layout/videodad.lay svneol=native#text/plain
 src/mame/layout/videopin.lay svneol=native#text/plain
 src/mame/layout/videopkr.lay svneol=native#text/plain
 src/mame/layout/wecleman.lay svneol=native#text/plain
+src/mame/layout/wico.lay svneol=native#text/plain
 src/mame/layout/wildone.lay svneol=native#text/plain
 src/mame/layout/wldarrow.lay svneol=native#text/plain
 src/mame/layout/zac_1.lay svneol=native#text/plain

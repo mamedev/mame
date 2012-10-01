@@ -13,7 +13,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/nvram.h"
 #include "sound/sn76496.h"
-//#include "wico.lh"
+#include "wico.lh"
 
 
 class wico_state : public driver_device
@@ -27,6 +27,12 @@ public:
 	m_samples(*this, "samples")
 	{ }
 
+	DECLARE_READ8_MEMBER(lampst_r);
+	DECLARE_READ8_MEMBER(switch_r);
+	DECLARE_WRITE8_MEMBER(muxen_w);
+	DECLARE_WRITE8_MEMBER(muxld_w);
+	DECLARE_WRITE8_MEMBER(dled0_w);
+	DECLARE_WRITE8_MEMBER(dled1_w);
 	DECLARE_WRITE8_MEMBER(zcres_w);
 	DECLARE_WRITE8_MEMBER(wdogcl_w);
 	DECLARE_READ8_MEMBER(gentmrcl_r);
@@ -45,7 +51,10 @@ protected:
 private:
 	bool m_zcen;
 	bool m_gten;
+	bool m_disp_on;
+	bool m_diag_on;
 	UINT8 m_firqtimer;
+	UINT8 m_digit;
 public:
 	DECLARE_DRIVER_INIT(wico);
 };
@@ -53,44 +62,44 @@ public:
 // housekeeping cpu
 static ADDRESS_MAP_START( hcpu_map, AS_PROGRAM, 8, wico_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("sharedram")
-	//AM_RANGE(0x1fe0, 0x1fe0) AM_NOP //AM_WRITE(muxld_w)
+	AM_RANGE(0x1fe0, 0x1fe0) AM_WRITE(muxld_w)
 	//AM_RANGE(0x1fe1, 0x1fe1) AM_WRITE(store_w)
-	//AM_RANGE(0x1fe2, 0x1fe2) AM_WRITE(muxen_w)
+	AM_RANGE(0x1fe2, 0x1fe2) AM_WRITE(muxen_w)
 	//AM_RANGE(0x1fe3, 0x1fe3) AM_WRITE(csols_w)
-	//AM_RANGE(0x1fe4, 0x1fe4) AM_READWRITE(msols_r,msols_w)
+	AM_RANGE(0x1fe4, 0x1fe4) AM_READNOP //AM_WRITE(msols_w)
 	AM_RANGE(0x1fe5, 0x1fe5) AM_DEVWRITE("sn76494", sn76494_new_device, write)
 	AM_RANGE(0x1fe6, 0x1fe6) AM_WRITE(wdogcl_w)
 	AM_RANGE(0x1fe7, 0x1fe7) AM_WRITE(zcres_w)
-	//AM_RANGE(0x1fe8, 0x1fe8) AM_WRITE(dled0_w)
-	//AM_RANGE(0x1fe9, 0x1fe9) AM_WRITE(dled1_w)
+	AM_RANGE(0x1fe8, 0x1fe8) AM_WRITE(dled0_w)
+	AM_RANGE(0x1fe9, 0x1fe9) AM_WRITE(dled1_w)
 	AM_RANGE(0x1fea, 0x1fea) AM_READ(gentmrcl_r)
-	//AM_RANGE(0x1feb, 0x1feb) AM_READ(lampst_r)
+	AM_RANGE(0x1feb, 0x1feb) AM_READ(lampst_r)
 	//AM_RANGE(0x1fec, 0x1fec) AM_READ(sast_r)
 	//AM_RANGE(0x1fed, 0x1fed) AM_READ(solst1_r)
 	//AM_RANGE(0x1fee, 0x1fee) AM_READ(solst0_r)
-	//AM_RANGE(0x1fef, 0x1fef) AM_READ(switch_r)
+	AM_RANGE(0x1fef, 0x1fef) AM_READ(switch_r)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 // command cpu
 static ADDRESS_MAP_START( ccpu_map, AS_PROGRAM, 8, wico_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("sharedram") // 2128  2k RAM
-	//AM_RANGE(0x1fe0, 0x1fe0) AM_WRITE(muxld_w) // to display module
+	AM_RANGE(0x1fe0, 0x1fe0) AM_WRITE(muxld_w) // to display module
 	//AM_RANGE(0x1fe1, 0x1fe1) AM_WRITE(store_w) // enable save to nvram
-	//AM_RANGE(0x1fe2, 0x1fe2) AM_WRITE(muxen_w) // digit to display on diagnostic LED; d0=L will disable main displays
+	AM_RANGE(0x1fe2, 0x1fe2) AM_WRITE(muxen_w) // digit to display on diagnostic LED; d0=L will disable main displays
 	//AM_RANGE(0x1fe3, 0x1fe3) AM_WRITE(csols_w) // solenoid column
-	//AM_RANGE(0x1fe4, 0x1fe4) AM_WRITE(msols_w) // solenoid row
+	//AM_RANGE(0x1fe4, 0x1fe4) AM_READNOP AM_WRITE(msols_w) // solenoid row
 	AM_RANGE(0x1fe5, 0x1fe5) AM_DEVWRITE("sn76494", sn76494_new_device, write)
 	AM_RANGE(0x1fe6, 0x1fe6) AM_WRITE(wdogcl_w) // watchdog clear
 	AM_RANGE(0x1fe7, 0x1fe7) AM_WRITE(zcres_w) // enable IRQ on hcpu
-	//AM_RANGE(0x1fe8, 0x1fe8) AM_WRITE(dled0_w) // turn off diagnostic LED
-	//AM_RANGE(0x1fe9, 0x1fe9) AM_WRITE(dled1_w) // turn on diagnostic LED
+	AM_RANGE(0x1fe8, 0x1fe8) AM_WRITE(dled0_w) // turn off diagnostic LED
+	AM_RANGE(0x1fe9, 0x1fe9) AM_WRITE(dled1_w) // turn on diagnostic LED
 	AM_RANGE(0x1fea, 0x1fea) AM_READ(gentmrcl_r) // enable IRQ on ccpu
-	//AM_RANGE(0x1feb, 0x1feb) AM_READ(lampst_r) // lamps?
+	AM_RANGE(0x1feb, 0x1feb) AM_READ(lampst_r) // lamps?
 	//AM_RANGE(0x1fec, 0x1fec) AM_READ(sast_r) // a pwron pulse to d0 L->H
 	//AM_RANGE(0x1fed, 0x1fed) AM_READ(solst1_r) // switches
 	//AM_RANGE(0x1fee, 0x1fee) AM_READ(solst0_r) // switches
-	//AM_RANGE(0x1fef, 0x1fef) AM_READ(switch_r) // switches
+	AM_RANGE(0x1fef, 0x1fef) AM_READ(switch_r) // switches
 	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram") // X2212 4bit x 256 NVRAM, stores only when store_w is active
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -120,7 +129,7 @@ static INPUT_PORTS_START( wico )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Oil Pit Release") PORT_CODE(KEYCODE_Z)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Oil Pit Target") PORT_CODE(KEYCODE_C)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Waterhole Release") PORT_CODE(KEYCODE_V)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X) // not working
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Spinner") PORT_CODE(KEYCODE_B)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Rollunder") PORT_CODE(KEYCODE_N)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Spinner") PORT_CODE(KEYCODE_M)
@@ -128,12 +137,12 @@ static INPUT_PORTS_START( wico )
 	PORT_START("X6")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L SLingshot") PORT_CODE(KEYCODE_COMMA)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Slingshot") PORT_CODE(KEYCODE_STOP)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Drop Bank E")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Drop Bank P")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Drop Bank A")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Drop Bank C")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Drop Bank S")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Drop Bank E")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Drop Bank E") PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Drop Bank P") PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Drop Bank A") PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Drop Bank C") PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Drop Bank S") PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Drop Bank E") PORT_CODE(KEYCODE_H)
 	PORT_START("X7")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Target Zone E")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Target Zone D")
@@ -144,17 +153,17 @@ static INPUT_PORTS_START( wico )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Target Zone A")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Target Zone F")
 	PORT_START("X8")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Outlane Target")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Outlane Target")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Rollover R Outlane")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Rollover M Outlane")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Rollover L Outlane")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Rollover R Outlane")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Rollover M Outlane")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Rollover L Outlane")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Outlane Target") PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Outlane Target") PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Rollover R Outlane") PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Rollover M Outlane") PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Rollover L Outlane") PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Rollover R Outlane") PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Rollover M Outlane") PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L Rollover L Outlane") PORT_CODE(KEYCODE_SLASH)
 	PORT_START("X9")
 	PORT_START("XA")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Door Slam") PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Door Slam")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_TILT) PORT_NAME("Playfield Tilt")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Pendulum Tilt")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("R Flipper Lane Change")
@@ -276,23 +285,74 @@ void wico_state::machine_reset()
 	m_zcen = 0;
 	m_gten = 0;
 	m_firqtimer = 0;
+	m_digit = 0;
+	m_disp_on = 0;
+	m_diag_on = 0;
 }
 
 DRIVER_INIT_MEMBER(wico_state,wico)
 {
 }
 
+// diagnostic display off
+WRITE8_MEMBER( wico_state::dled0_w )
+{
+	m_diag_on = 0;
+}
+
+// diagnostic display on
+WRITE8_MEMBER( wico_state::dled1_w )
+{
+	m_diag_on = 1;
+}
+
+// write to diagnostic display
+WRITE8_MEMBER( wico_state::muxen_w )
+{
+	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 }; // MC14495
+	UINT8 segments = 0;
+	if (m_diag_on)
+		segments = patterns[data>>4];
+	output_set_digit_value(41, segments);
+}
+
+// reset digit/scan counter
+WRITE8_MEMBER( wico_state::muxld_w )
+{
+	m_digit = 0;
+}
+
+// enable zero-crossing interrupt
 WRITE8_MEMBER( wico_state::zcres_w )
 {
 	m_zcen = 1;
 }
 
+// enable firq
 READ8_MEMBER( wico_state::gentmrcl_r )
 {
 	m_gten = 1;
 	return 0xff;
 }
 
+// read a switch row
+READ8_MEMBER( wico_state::switch_r )
+{
+	char kbdrow[8];
+	sprintf(kbdrow,"X%X",m_shared_ram[0x95]);
+	return ioport(kbdrow)->read();
+}
+
+// write digits in main display
+READ8_MEMBER( wico_state::lampst_r )
+{
+	UINT8 i;
+	for (i = 0; i < 5; i++)
+		output_set_digit_value(i * 10 + (m_shared_ram[0x96] & 7), m_shared_ram[0x7f9 + i]);
+	return 0xff;
+}
+
+// reset watchdog and enable housekeeping cpu
 WRITE8_MEMBER( wico_state::wdogcl_w )
 {
 	m_hcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -341,12 +401,12 @@ static MACHINE_CONFIG_START( wico, wico_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	//MCFG_DEFAULT_LAYOUT(layout_wico)
+	MCFG_DEFAULT_LAYOUT(layout_wico)
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SOUND_ADD("sn76494", SN76494_NEW, 10000000 / 64)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 

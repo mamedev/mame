@@ -2270,6 +2270,8 @@ $(DRIVERS)/warpwarp.o:	$(LAYOUT)/geebee.lh \
 
 $(DRIVERS)/wecleman.o:	$(LAYOUT)/wecleman.lh
 
+$(DRIVERS)/wico.o:	$(LAYOUT)/wico.lh
+
 $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
 
 $(DRIVERS)/zac_1.o:	$(LAYOUT)/zac_1.lh
