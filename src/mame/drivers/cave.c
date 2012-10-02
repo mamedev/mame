@@ -28,7 +28,7 @@ Year + Game           License       PCB         Tilemaps        Sprites         
 96 Hotdog Storm       Marble        ASTC9501    038 9341EX702   013             Z80
 96 Pac-Slot           Namco         A0442       038 9444WX010   013 9345E7006
 97 Dodonpachi         Atlus         ATC03D2     038             013
-98 Dangan Feveron     Nihon System  CV01        038 9808WX003   013 9807EX004
+98 Dangun Feveron     Nihon System  CV01        038 9808WX003   013 9807EX004
 98 ESP Ra.De.         Atlus         ATC04       038 9841WX002   013 9838EX002
 98 Uo Poko            Jaleco        CV02        038 9749WX001   013 9749EX004
 99 Guwange            Atlus         ATC05       038 9919WX004   013
@@ -426,7 +426,7 @@ static const eeprom_interface eeprom_interface_93C46_pacslot =
     AFAIK)  */
 
 /***************************************************************************
-                                Dangan Feveron
+                                Dangun Feveron
 ***************************************************************************/
 
 static ADDRESS_MAP_START( dfeveron_map, AS_PROGRAM, 16, cave_state )
@@ -1634,7 +1634,7 @@ static const gfx_layout layout_sprites =
 #endif
 
 /***************************************************************************
-                                Dangan Feveron
+                                Dangun Feveron
 ***************************************************************************/
 
 static GFXDECODE_START( dfeveron )
@@ -1843,7 +1843,7 @@ static const ym2203_interface ym2203_config =
 };
 
 /***************************************************************************
-                                Dangan Feveron
+                                Dangun Feveron
 ***************************************************************************/
 
 static MACHINE_CONFIG_START( dfeveron, cave_state )
@@ -2763,7 +2763,7 @@ ROM_END
 
 /***************************************************************************
 
-              Fever SOS (International) / Dangan Feveron (Japan)
+              Fever SOS (International) / Dangun Feveron (Japan)
 
 Board:  CV01
 OSC:    28.0, 16.0, 16.9 MHz
@@ -2797,7 +2797,7 @@ ROM_END
 Fever SOS
 
   The program code checks for 0x05 & 0x19 at the 17th & 18th byte in the EEPROM.  Therefore
-  you cannot convert a Dangan Feveron over to a Fever SOS by changing the 2 program roms
+  you cannot convert a Dangun Feveron over to a Fever SOS by changing the 2 program roms
 
 Jumper JP1:
 INT Version - 2 & 3
@@ -4795,7 +4795,7 @@ GAME( 1996, pacslot,    0,        pacslot,  pacslot, cave_state,  tjumpman, ROT0
 GAME( 1997, ddonpach,   0,        ddonpach, cave, cave_state,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (International, Master Ver. 97/02/05)", GAME_SUPPORTS_SAVE )
 GAME( 1997, ddonpachj,  ddonpach, ddonpach, cave, cave_state,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (Japan, Master Ver. 97/02/05)",         GAME_SUPPORTS_SAVE )
 
-GAME( 1998, dfeveron,   feversos, dfeveron, cave, cave_state,     dfeveron, ROT270, "Cave (Nihon System license)",            "Dangan Feveron (Japan, Ver. 98/09/17)",    GAME_SUPPORTS_SAVE )
+GAME( 1998, dfeveron,   feversos, dfeveron, cave, cave_state,     dfeveron, ROT270, "Cave (Nihon System license)",            "Dangun Feveron (Japan, Ver. 98/09/17)",    GAME_SUPPORTS_SAVE )
 GAME( 1998, feversos,   0,        dfeveron, cave, cave_state,     feversos, ROT270, "Cave (Nihon System license)",            "Fever SOS (International, Ver. 98/09/25)", GAME_SUPPORTS_SAVE )
 
 GAME( 1998, esprade,    0,        esprade,  cave, cave_state,     esprade,  ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (International, Ver. 98/04/22)", GAME_SUPPORTS_SAVE )
@@ -4810,10 +4810,10 @@ GAME( 1999, guwanges,   guwange,  guwange,  guwange, cave_state,  guwange,  ROT2
 
 GAME( 1999, gaia,       0,        gaia,     gaia, cave_state,     gaia,     ROT0,   "Noise Factory",                          "Gaia Crusaders", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // cuts out occasionally
 
-GAME( 2001, theroes,    0,        gaia,     theroes, cave_state,  gaia,     ROT0,   "Primetek Investments",                   "Thunder Heroes",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // cuts out occasionally
-
 GAME( 1999, korokoro,   0,        korokoro, korokoro, cave_state, korokoro, ROT0,   "Takumi",                                 "Koro Koro Quest (Japan)", GAME_SUPPORTS_SAVE )
 
 GAME( 1999, crusherm,   0,        crusherm, korokoro, cave_state, korokoro, ROT0,   "Takumi",                                 "Crusher Makochan (Japan)", GAME_SUPPORTS_SAVE )
 
 GAME( 1999, tjumpman,   0,        tjumpman, tjumpman, cave_state, tjumpman, ROT0,   "Namco",                                  "Tobikose! Jumpman", GAME_SUPPORTS_SAVE )
+
+GAME( 2001, theroes,    0,        gaia,     theroes, cave_state,  gaia,     ROT0,   "Primetek Investments",                   "Thunder Heroes",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // cuts out occasionally
