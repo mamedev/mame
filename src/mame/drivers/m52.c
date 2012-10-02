@@ -547,4 +547,4 @@ ROM_END
 
 GAME( 1982, mpatrol,  0,        m52,      mpatrol, driver_device,  0, ROT0, "Irem", "Moon Patrol", GAME_SUPPORTS_SAVE )
 GAME( 1982, mpatrolw, mpatrol,  m52,      mpatrolw, driver_device, 0, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)", GAME_SUPPORTS_SAVE )
-GAME( 1988, alpha1v,  0,        alpha1v,  alpha1v, driver_device,  0, ROT0, "Vision Electronics", "Alpha One (Vision Electronics / Kyle Hodgetts)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_SUPPORTS_SAVE )
+GAME( 1988, alpha1v,  0,        alpha1v,  alpha1v, driver_device,  0, ROT0, "Vision Electronics / Kyle Hodgetts", "Alpha One (Vision Electronics / Kyle Hodgetts)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_SUPPORTS_SAVE )
