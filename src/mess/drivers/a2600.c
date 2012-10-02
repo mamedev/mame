@@ -136,6 +136,8 @@ protected:
 	void mode3E_RAM_switch(UINT16 offset, UINT8 data);
 	void modeFV_switch(UINT16 offset, UINT8 data);
 	void modeJVP_switch(UINT16 offset, UINT8 data);
+	void modeFE_switch(UINT16 offset, UINT8 data);
+	void install_banks(int count, unsigned init);
 
 	UINT8	*m_cart;
 };
@@ -1160,27 +1162,26 @@ DIRECT_UPDATE_MEMBER(a2600_state::modeFE_opbase_handler)
 	return address;
 }
 
-static void modeFE_switch(running_machine &machine,UINT16 offset, UINT8 data)
+void a2600_state::modeFE_switch(UINT16 offset, UINT8 data)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
-	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/* Retrieve last byte read by the cpu (for this mapping scheme this
        should be the last byte that was on the data bus
     */
-	state->m_FETimer = 1;
-	state->m_FE_old_opbase_handler = space.set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeFE_opbase_handler), state));
+	m_FETimer = 1;
+	m_FE_old_opbase_handler = space.set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeFE_opbase_handler), this));
 }
 
 READ8_MEMBER(a2600_state::modeFE_switch_r)
 {
-	modeFE_switch(machine(),offset, 0 );
+	modeFE_switch(offset, 0 );
 	return space.read_byte(0xFE );
 }
 
 WRITE8_MEMBER(a2600_state::modeFE_switch_w)
 {
 	space.write_byte(0xFE, data );
-	modeFE_switch(machine(),offset, 0 );
+	modeFE_switch(offset, 0 );
 }
 
 READ8_MEMBER(a2600_state::current_bank_r)
@@ -1291,11 +1292,9 @@ static const riot6532_interface r6532_interface =
 };
 
 
-static void install_banks(running_machine &machine, int count, unsigned init)
+void a2600_state::install_banks(int count, unsigned init)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	int i;
-	UINT8 *cart = CART;
 
 	for (i = 0; i < count; i++)
 	{
@@ -1307,12 +1306,12 @@ static void install_banks(running_machine &machine, int count, unsigned init)
 			"bank4",
 		};
 
-		machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(
 			0x1000 + (i + 0) * 0x1000 / count - 0,
 			0x1000 + (i + 1) * 0x1000 / count - 1, handler[i]);
 
-		state->m_bank_base[i + 1] = cart + init;
-		state->membank(handler[i])->set_base(state->m_bank_base[i + 1]);
+		m_bank_base[i + 1] = m_cart + init;
+		membank(handler[i])->set_base(m_bank_base[i + 1]);
 	}
 }
 
@@ -1824,86 +1823,86 @@ void a2600_state::machine_reset()
 	switch (m_banking_mode)
 	{
 	case mode2K:
-		install_banks(machine(), 2, 0x0000);
+		install_banks(2, 0x0000);
 		break;
 
 	case mode4K:
-		install_banks(machine(), 1, 0x0000);
+		install_banks(1, 0x0000);
 		break;
 
 	case modeF8:
 		if (!memcmp(&CART_MEMBER[0x1ffc],snowwhite,sizeof(snowwhite)))
 		{
-			install_banks(machine(), 1, 0x0000);
+			install_banks(1, 0x0000);
 		}
 		else
 		{
-			install_banks(machine(), 1, 0x1000);
+			install_banks(1, 0x1000);
 		}
 		break;
 
 	case modeFA:
-		install_banks(machine(), 1, 0x2000);
+		install_banks(1, 0x2000);
 		break;
 
 	case modeF6:
-		install_banks(machine(), 1, 0x0000);
+		install_banks(1, 0x0000);
 		break;
 
 	case modeF4:
-		install_banks(machine(), 1, 0x7000);
+		install_banks(1, 0x7000);
 		break;
 
 	case modeFE:
-		install_banks(machine(), 1, 0x0000);
+		install_banks(1, 0x0000);
 		break;
 
 	case modeE0:
-		install_banks(machine(), 4, 0x1c00);
+		install_banks(4, 0x1c00);
 		break;
 
 	case mode3F:
-		install_banks(machine(), 2, m_cart_size - 0x800);
+		install_banks(2, m_cart_size - 0x800);
 		m_number_banks = m_cart_size / 0x800;
 		break;
 
 	case modeUA:
-		install_banks(machine(), 1, 0x1000);
+		install_banks(1, 0x1000);
 		break;
 
 	case modeE7:
-		install_banks(machine(), 2, 0x3800);
+		install_banks(2, 0x3800);
 		break;
 
 	case modeDC:
-		install_banks(machine(), 1, 0x1000 * m_current_bank);
+		install_banks(1, 0x1000 * m_current_bank);
 		break;
 
 	case modeCV:
-		install_banks(machine(), 2, 0x0000);
+		install_banks(2, 0x0000);
 		break;
 
 	case mode3E:
-		install_banks(machine(), 2, m_cart_size - 0x800);
+		install_banks(2, m_cart_size - 0x800);
 		m_number_banks = m_cart_size / 0x800;
 		m_mode3E_ram_enabled = 0;
 		break;
 
 	case modeSS:
-		install_banks(machine(), 2, 0x0000);
+		install_banks(2, 0x0000);
 		break;
 
 	case modeFV:
-		install_banks(machine(), 1, 0x0000);
+		install_banks(1, 0x0000);
 		m_current_bank = 0;
 		break;
 
 	case modeDPC:
-		install_banks(machine(), 1, 0x0000);
+		install_banks(1, 0x0000);
 		break;
 
 	case mode32in1:
-		install_banks(machine(), 2, 0x0000);
+		install_banks(2, 0x0000);
 		m_current_reset_bank_counter = m_current_reset_bank_counter & 0x1F;
 		break;
 
@@ -1912,7 +1911,7 @@ void a2600_state::machine_reset()
 		if ( m_cart_size == 0x2000 )
 			m_current_reset_bank_counter = 0;
 		m_current_bank = m_current_reset_bank_counter * 2;
-		install_banks(machine(), 1, 0x1000 * m_current_bank);
+		install_banks(1, 0x1000 * m_current_bank);
 		break;
 	}
 
