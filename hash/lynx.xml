@@ -1041,7 +1041,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="dragnet">
-		<description>Dragnet</description>
+		<description>Dragnet Sound Demo</description>
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -1051,10 +1051,12 @@ Known undumped prototypes:
 		</part>
 	</software>
 
+<!-- Quoting the dev: "Zow started as a collection of sound and graphics demos.  It was killed when someone who had no right to, released a version to the 'net" -->
 	<software name="conquest">
 		<description>Conquest of Zow</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Harry Dodgson" />
 		<part name="cart" interface="lynx_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="conquest of zow (1996).bin" size="262144" crc="b02821fa" sha1="87b683653dfe76af02a1920582b6362ee11a3715" offset="000000" />
@@ -1063,7 +1065,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="lynx2tst">
-		<description>Lynx II Production Test Program V0.02 (USA, Prototype)</description>
+		<description>Lynx II Production Test Program V0.02 (Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="lynx_cart">

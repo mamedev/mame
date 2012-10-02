@@ -81,7 +81,7 @@
       Alien Trilogy (Japan) [T-8113G]                                                       | (alientrij)
       Alone in the Dark 2 (Japan) [T-10602G]                                                | (aitd2j)
       Amagi Shien (Japan) [T-1513G]                                                         | (amagishi)      gets stuck on sega logo
-      America Oudan Ultra Quiz (Japan) [T-6004G]                                            | (aouquiz)
+      America Oudan Ultra Quiz (Japan) [T-6004G]                                            | (amoudan)
       AMOK (Japan) [T-7637G]                                                                | (amokj)         playable?
       AnEarth Fantasy Stories: The First Volume (Japan) [T-27801G]                          | (anearth)
       Angel Graffiti S: Anata e no Profile (Japan) [T-7308G]                                | (angelgs)
@@ -2616,7 +2616,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying America Oudan Ultra Quiz (Japan)... -->
-	<software name="aouquiz" supported="no">
+	<software name="amoudan" supported="no">
 		<description>America Oudan Ultra Quiz (Jpn)</description>
 		<year>1995</year>
 		<publisher>Victor Entertainment</publisher>
@@ -14899,7 +14899,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying America Oudan Ultra Quiz (J) (T-6004G)... -->
-	<software name="aouquiza" cloneof="aouquiz" supported="no">
+	<software name="amoudana" cloneof="amoudan" supported="no">
 		<description>America Oudan Ultra Quiz (Jpn, Alt)</description>
 		<year>1995</year>
 		<publisher>Victor Entertainment</publisher>

@@ -5977,6 +5977,18 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- This dump comes from an internal "Confidential Preview" cart at Acclaim USA -->
+	<software name="cutthrp" cloneof="cutthr">
+		<description>CutThroat Island (Prototye)</description>
+		<year>1995</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="cipreview.bin" size="2097152" crc="7f4939f2" sha1="63bac68f944214cbab90a61dc8fe78314ba4716e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cyberbal">
 		<description>CyberBall (World)</description>
 		<year>1990</year>
@@ -26085,10 +26097,12 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="yasech">
+<!-- Freezes during the intro sequence... -->
+	<software name="yasech" supported="no">
 		<description>Ya Se Chuan Shuo (Chi)</description>
 		<year>1995</year>
 		<publisher>Chuanpu Technologies</publisher>
+		<info name="alt_title" value="亚瑟传说"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="ya se chuan shuo (chi) (unl).bin" size="2097152" crc="095b9a15" sha1="8fe0806427e123717ba20478ab1410c25fa942e6" offset="000000" loadflag="load16_word_swap" />
