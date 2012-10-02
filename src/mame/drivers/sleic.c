@@ -1,9 +1,28 @@
-/**********************************************************************************
+/**************************************************************************************
 
-Pinball
-Sleic
+    Pinball
+    Sleic made a number of pinball machines (Pinball, Bike Race, Dona Elvira 2,
+    Super Pang, Io Moon) but seems only Pinball is dumped. The only manual I could
+    find is in Spanish and has no schematics.
 
-***********************************************************************************/
+    Principal components:
+    80C188-10
+    80C39-11
+    27C64
+    27C040
+    27C010
+    28C64A
+    6376 (Voice Synthesiser by OKI)
+    YM3812 (Sound Generator by Yamaha)
+    YM3014 (DAC Sounds by Yamaha)
+    X9103 NVRAM
+    Z80A
+    27C256
+    PinMAME also has a PIC8259.
+
+    The only real source of info is PinMAME, but the game only partially works there.
+
+****************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
@@ -29,7 +48,6 @@ public:
 
 
 static ADDRESS_MAP_START( sleic_map, AS_PROGRAM, 8, sleic_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
