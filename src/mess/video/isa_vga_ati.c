@@ -103,18 +103,18 @@ void isa16_vga_gfxultra_device::device_start()
 	m_isa->install16_device(0x86e8, 0x86eb, 0, 0, read16_delegate(FUNC(ati_vga_device::ibm8514_currentx_r),m_vga), write16_delegate(FUNC(ati_vga_device::ibm8514_currentx_w),m_vga));
 	m_isa->install16_device(0x8ae8, 0x8aeb, 0, 0, read16_delegate(FUNC(ati_vga_device::ibm8514_desty_r),m_vga), write16_delegate(FUNC(ati_vga_device::ibm8514_desty_w),m_vga));
 	m_isa->install16_device(0x8ee8, 0x8eeb, 0, 0, read16_delegate(FUNC(ati_vga_device::ibm8514_destx_r),m_vga), write16_delegate(FUNC(ati_vga_device::ibm8514_destx_w),m_vga));
-	m_isa->install16_device(0x92e8, 0x92eb, 0, 0, read16_delegate(FUNC(ati_vga_device::s3_line_error_r),m_vga), write16_delegate(FUNC(ati_vga_device::s3_line_error_w),m_vga));
-	m_isa->install16_device(0x96e8, 0x96eb, 0, 0, read16_delegate(FUNC(ati_vga_device::s3_width_r),m_vga), write16_delegate(FUNC(ati_vga_device::s3_width_w),m_vga));
+	m_isa->install16_device(0x92e8, 0x92eb, 0, 0, read16_delegate(FUNC(ati_vga_device::ibm8514_line_error_r),m_vga), write16_delegate(FUNC(ati_vga_device::ibm8514_line_error_w),m_vga));
+	m_isa->install16_device(0x96e8, 0x96eb, 0, 0, read16_delegate(FUNC(ati_vga_device::ibm8514_width_r),m_vga), write16_delegate(FUNC(ati_vga_device::ibm8514_width_w),m_vga));
 	m_isa->install16_device(0x96ec, 0x96ef, 0, 0, read16_delegate(FUNC(ati_vga_device::mach8_bresenham_count_r),m_vga), write16_delegate(FUNC(ati_vga_device::mach8_bresenham_count_w),m_vga));
 	m_isa->install16_device(0x9ae8, 0x9aeb, 0, 0, read16_delegate(FUNC(ati_vga_device::ibm8514_gpstatus_r),m_vga), write16_delegate(FUNC(ati_vga_device::ibm8514_cmd_w),m_vga));
 	m_isa->install16_device(0x9aec, 0x9aef, 0, 0, read16_delegate(FUNC(ati_vga_device::mach8_ext_fifo_r),m_vga), write16_delegate(FUNC(ati_vga_device::mach8_linedraw_index_w),m_vga));
 	m_isa->install16_device(0x9ee8, 0x9eeb, 0, 0, read16_delegate(FUNC(ati_vga_device::ibm8514_ssv_r),m_vga), write16_delegate(FUNC(ati_vga_device::ibm8514_ssv_w),m_vga));
-	m_isa->install16_device(0xa2e8, 0xa2eb, 0, 0, read16_delegate(FUNC(ati_vga_device::s3_bgcolour_r),m_vga), write16_delegate(FUNC(ati_vga_device::s3_bgcolour_w),m_vga));
-	m_isa->install16_device(0xa6e8, 0xa6eb, 0, 0, read16_delegate(FUNC(ati_vga_device::s3_fgcolour_r),m_vga), write16_delegate(FUNC(ati_vga_device::s3_fgcolour_w),m_vga));
-	m_isa->install16_device(0xb6e8, 0xb6eb, 0, 0, read16_delegate(FUNC(ati_vga_device::s3_backmix_r),m_vga), write16_delegate(FUNC(ati_vga_device::s3_backmix_w),m_vga));
-	m_isa->install16_device(0xbae8, 0xbaeb, 0, 0, read16_delegate(FUNC(ati_vga_device::s3_foremix_r),m_vga), write16_delegate(FUNC(ati_vga_device::s3_foremix_w),m_vga));
-	m_isa->install16_device(0xbee8, 0xbeeb, 0, 0, read16_delegate(FUNC(ati_vga_device::s3_multifunc_r),m_vga), write16_delegate(FUNC(ati_vga_device::s3_multifunc_w),m_vga));
-	m_isa->install16_device(0xe2e8, 0xe2eb, 0, 0, read16_delegate(FUNC(ati_vga_device::s3_pixel_xfer_r),m_vga), write16_delegate(FUNC(ati_vga_device::s3_pixel_xfer_w),m_vga));
+	m_isa->install16_device(0xa2e8, 0xa2eb, 0, 0, read16_delegate(FUNC(ati_vga_device::ibm8514_bgcolour_r),m_vga), write16_delegate(FUNC(ati_vga_device::ibm8514_bgcolour_w),m_vga));
+	m_isa->install16_device(0xa6e8, 0xa6eb, 0, 0, read16_delegate(FUNC(ati_vga_device::ibm8514_fgcolour_r),m_vga), write16_delegate(FUNC(ati_vga_device::ibm8514_fgcolour_w),m_vga));
+	m_isa->install16_device(0xb6e8, 0xb6eb, 0, 0, read16_delegate(FUNC(ati_vga_device::ibm8514_backmix_r),m_vga), write16_delegate(FUNC(ati_vga_device::ibm8514_backmix_w),m_vga));
+	m_isa->install16_device(0xbae8, 0xbaeb, 0, 0, read16_delegate(FUNC(ati_vga_device::ibm8514_foremix_r),m_vga), write16_delegate(FUNC(ati_vga_device::ibm8514_foremix_w),m_vga));
+	m_isa->install16_device(0xbee8, 0xbeeb, 0, 0, read16_delegate(FUNC(ati_vga_device::ibm8514_multifunc_r),m_vga), write16_delegate(FUNC(ati_vga_device::ibm8514_multifunc_w),m_vga));
+	m_isa->install16_device(0xe2e8, 0xe2eb, 0, 0, read16_delegate(FUNC(ati_vga_device::ibm8514_pixel_xfer_r),m_vga), write16_delegate(FUNC(ati_vga_device::ibm8514_pixel_xfer_w),m_vga));
 	m_isa->install16_device(0xfeec, 0xfeef, 0, 0, read16_delegate(), write16_delegate(FUNC(ati_vga_device::mach8_linedraw_w),m_vga));
 
 	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, read8_delegate(FUNC(ati_vga_device::mem_r),m_vga), write8_delegate(FUNC(ati_vga_device::mem_w),m_vga));

@@ -11,7 +11,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> isa8_vga_device
+// ======================> isa16_vga_device
 
 class isa16_svga_s3_device :
 		public device_t,

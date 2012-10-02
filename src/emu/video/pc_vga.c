@@ -103,7 +103,7 @@ enum
 #define LOG_ACCESSES	0
 #define LOG_REGISTERS	0
 
-#define LOG_8514		0
+#define LOG_8514		1
 
 /***************************************************************************
 
@@ -144,13 +144,8 @@ trident_vga_device::trident_vga_device(const machine_config &mconfig, const char
 {
 }
 
-s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-    : svga_device(mconfig, type, name, tag, owner, clock)
-{
-}
-
 s3_vga_device::s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : svga_device(mconfig, S3_VGA, "S3_VGA", tag, owner, clock)
+    : ati_vga_device(mconfig, S3_VGA, "S3_VGA", tag, owner, clock)
 {
 }
 
@@ -160,9 +155,15 @@ gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, const char *
 }
 
 ati_vga_device::ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : s3_vga_device(mconfig, ATI_VGA, "ATI_VGA", tag, owner, clock)
+    : svga_device(mconfig, ATI_VGA, "ATI_VGA", tag, owner, clock)
 {
 }
+
+ati_vga_device::ati_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+    : svga_device(mconfig, type, name, tag, owner, clock)
+{
+}
+
 cirrus_vga_device::cirrus_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : svga_device(mconfig, CIRRUS_VGA, "CIRRUS_VGA", tag, owner, clock)
 {
@@ -2670,7 +2671,6 @@ void s3_vga_device::s3_crtc_reg_write(UINT8 index, UINT8 data)
 				{
 					ibm8514.state = IBM8514_IDLE;
 					ibm8514.gpbusy = false;
-					s3.write_count = 0;
 				}
 				break;
 /*
@@ -2972,26 +2972,26 @@ READ8_MEMBER(ati_vga_device::port_03c0_r)
 
 /* accelerated ports, TBD ... */
 
-void s3_vga_device::s3_write_fg(UINT32 offset)
+void ati_vga_device::ibm8514_write_fg(UINT32 offset)
 {
 	UINT8 dst = vga.memory[offset];
 	UINT8 src = 0;
 
 	// check clipping rectangle
-	if(ibm8514.curr_x < s3.scissors_left || ibm8514.curr_x > s3.scissors_right || ibm8514.curr_y < s3.scissors_top || ibm8514.curr_y > s3.scissors_bottom)
+	if(ibm8514.curr_x < ibm8514.scissors_left || ibm8514.curr_x > ibm8514.scissors_right || ibm8514.curr_y < ibm8514.scissors_top || ibm8514.curr_y > ibm8514.scissors_bottom)
 		return;  // do nothing
 
 	// determine source
-	switch(s3.fgmix & 0x0060)
+	switch(ibm8514.fgmix & 0x0060)
 	{
 	case 0x0000:
-		src = s3.bgcolour;
+		src = ibm8514.bgcolour;
 		break;
 	case 0x0020:
-		src = s3.fgcolour;
+		src = ibm8514.fgcolour;
 		break;
 	case 0x0040:
-		src = s3.pixel_xfer;
+		src = ibm8514.pixel_xfer;
 		break;
 	case 0x0060:
 		// video memory - presume the memory is sourced from the current X/Y co-ords
@@ -3000,7 +3000,7 @@ void s3_vga_device::s3_write_fg(UINT32 offset)
 	}
 
 	// write the data
-	switch(s3.fgmix & 0x000f)
+	switch(ibm8514.fgmix & 0x000f)
 	{
 	case 0x0000:
 		vga.memory[offset] = ~dst;
@@ -3053,26 +3053,26 @@ void s3_vga_device::s3_write_fg(UINT32 offset)
 	}
 }
 
-void s3_vga_device::s3_write_bg(UINT32 offset)
+void ati_vga_device::ibm8514_write_bg(UINT32 offset)
 {
 	UINT8 dst = vga.memory[offset];
 	UINT8 src = 0;
 
 	// check clipping rectangle
-	if(ibm8514.curr_x < s3.scissors_left || ibm8514.curr_x > s3.scissors_right || ibm8514.curr_y < s3.scissors_top || ibm8514.curr_y > s3.scissors_bottom)
+	if(ibm8514.curr_x < ibm8514.scissors_left || ibm8514.curr_x > ibm8514.scissors_right || ibm8514.curr_y < ibm8514.scissors_top || ibm8514.curr_y > ibm8514.scissors_bottom)
 		return;  // do nothing
 
 	// determine source
-	switch(s3.bgmix & 0x0060)
+	switch(ibm8514.bgmix & 0x0060)
 	{
 	case 0x0000:
-		src = s3.bgcolour;
+		src = ibm8514.bgcolour;
 		break;
 	case 0x0020:
-		src = s3.fgcolour;
+		src = ibm8514.fgcolour;
 		break;
 	case 0x0040:
-		src = s3.pixel_xfer;
+		src = ibm8514.pixel_xfer;
 		break;
 	case 0x0060:
 		// video memory - presume the memory is sourced from the current X/Y co-ords
@@ -3081,7 +3081,7 @@ void s3_vga_device::s3_write_bg(UINT32 offset)
 	}
 
 	// write the data
-	switch(s3.bgmix & 0x000f)
+	switch(ibm8514.bgmix & 0x000f)
 	{
 	case 0x0000:
 		vga.memory[offset] = ~dst;
@@ -3134,56 +3134,56 @@ void s3_vga_device::s3_write_bg(UINT32 offset)
 	}
 }
 
-void s3_vga_device::s3_write(UINT32 offset, UINT32 src)
+void ati_vga_device::ibm8514_write(UINT32 offset, UINT32 src)
 {
 	int data_size = 8;
 	UINT32 xfer = 0;
 
-	switch(s3.pixel_control & 0x00c0)
+	switch(ibm8514.pixel_control & 0x00c0)
 	{
 	case 0x0000:  // Foreground Mix only
 		// check clipping rectangle
-		if(ibm8514.curr_x < s3.scissors_left || ibm8514.curr_x > s3.scissors_right || ibm8514.curr_y < s3.scissors_top || ibm8514.curr_y > s3.scissors_bottom)
+		if(ibm8514.curr_x < ibm8514.scissors_left || ibm8514.curr_x > ibm8514.scissors_right || ibm8514.curr_y < ibm8514.scissors_top || ibm8514.curr_y > ibm8514.scissors_bottom)
 			return;  // do nothing
-		s3_write_fg(offset);
+		ibm8514_write_fg(offset);
 		break;
 	case 0x0040:  // fixed pattern (?)
 		// TODO
 		break;
 	case 0x0080:  // use pixel transfer register
-		if(s3.bus_size == 0)  // 8-bit
+		if(ibm8514.bus_size == 0)  // 8-bit
 			data_size = 8;
-		if(s3.bus_size == 1)  // 16-bit
+		if(ibm8514.bus_size == 1)  // 16-bit
 			data_size = 16;
-		if(s3.bus_size == 2)  // 32-bit
+		if(ibm8514.bus_size == 2)  // 32-bit
 			data_size = 32;
-		if((s3.current_cmd & 0x1000) && (data_size != 8))
+		if((ibm8514.current_cmd & 0x1000) && (data_size != 8))
 		{
-			xfer = ((s3.pixel_xfer & 0x000000ff) << 8) | ((s3.pixel_xfer & 0x0000ff00) >> 8)
-				 | ((s3.pixel_xfer & 0x00ff0000) << 8) | ((s3.pixel_xfer & 0xff000000) >> 8);
+			xfer = ((ibm8514.pixel_xfer & 0x000000ff) << 8) | ((ibm8514.pixel_xfer & 0x0000ff00) >> 8)
+				 | ((ibm8514.pixel_xfer & 0x00ff0000) << 8) | ((ibm8514.pixel_xfer & 0xff000000) >> 8);
 		}
 		else
-			xfer = s3.pixel_xfer;
-		if(s3.current_cmd & 0x0002)
+			xfer = ibm8514.pixel_xfer;
+		if(ibm8514.current_cmd & 0x0002)
 		{
-			if((xfer & ((1<<(data_size-1))>>s3.src_x)) != 0)
-				s3_write_fg(offset);
+			if((xfer & ((1<<(data_size-1))>>ibm8514.src_x)) != 0)
+				ibm8514_write_fg(offset);
 			else
-				s3_write_bg(offset);
+				ibm8514_write_bg(offset);
 		}
 		else
 		{
-			s3_write_fg(offset);
+			ibm8514_write_fg(offset);
 		}
-		s3.src_x++;
-		if(s3.src_x >= data_size)
-			s3.src_x = 0;
+		ibm8514.src_x++;
+		if(ibm8514.src_x >= data_size)
+			ibm8514.src_x = 0;
 		break;
 	case 0x00c0:  // use source plane
 		if(vga.memory[(src) % vga.svga_intf.vram_size] != 0x00)
-			s3_write_fg(offset);
+			ibm8514_write_fg(offset);
 		else
-			s3_write_bg(offset);
+			ibm8514_write_bg(offset);
 		break;
 	}
 }
@@ -3198,15 +3198,15 @@ bit  0-12  (911/924) LINE PARAMETER/ERROR TERM. For Line Drawing this is the
             the major or independent axis).
      0-13  (80x +) LINE PARAMETER/ERROR TERM. See above.
  */
-READ16_MEMBER(s3_vga_device::s3_line_error_r)
+READ16_MEMBER(ati_vga_device::ibm8514_line_error_r)
 {
 	return ibm8514.line_errorterm;
 }
 
-WRITE16_MEMBER(s3_vga_device::s3_line_error_w)
+WRITE16_MEMBER(ati_vga_device::ibm8514_line_error_w)
 {
 	ibm8514.line_errorterm = data;
-	if(LOG_8514) logerror("S3: Line Parameter/Error Term write %04x\n",data);
+	if(LOG_8514) logerror("8514/A: Line Parameter/Error Term write %04x\n",data);
 }
 
 /*
@@ -3230,7 +3230,7 @@ bit   0-7  Queue State.
             available, Fh for 9 words, 7 for 10 words, 3 for 11 words, 1 for
             12 words and 0 for 13 words available.
  */
-READ16_MEMBER(s3_vga_device::ibm8514_gpstatus_r)
+READ16_MEMBER(ati_vga_device::ibm8514_gpstatus_r)
 {
 	UINT16 ret = 0x0000;
 
@@ -3242,7 +3242,7 @@ READ16_MEMBER(s3_vga_device::ibm8514_gpstatus_r)
 	return ret;
 }
 
-void s3_vga_device::ibm8514_draw_vector(UINT8 len, UINT8 dir, bool draw)
+void ati_vga_device::ibm8514_draw_vector(UINT8 len, UINT8 dir, bool draw)
 {
 	UINT32 offset;
 	int x = 0;
@@ -3251,7 +3251,7 @@ void s3_vga_device::ibm8514_draw_vector(UINT8 len, UINT8 dir, bool draw)
 	{
 		offset = (ibm8514.curr_y * VGA_LINE_LENGTH) + ibm8514.curr_x;
 		if(draw)
-			s3_write(offset,offset);
+			ibm8514_write(offset,offset);
 		switch(dir)
 		{
 		case 0:  // 0 degrees
@@ -3387,22 +3387,22 @@ bit     0  (911-928) ~RD/WT. Read/Write Data. If set VRAM write operations are
                 rectangle, which is copied repeatably to the destination
                 rectangle.
  */
-WRITE16_MEMBER(s3_vga_device::ibm8514_cmd_w)
+WRITE16_MEMBER(ati_vga_device::ibm8514_cmd_w)
 {
 	int x,y;
 	int pattern_x,pattern_y;
 	UINT32 off,src;
 
-	s3.current_cmd = data;
-	s3.src_x = 0;
-	s3.src_y = 0;
-	s3.bus_size = (data & 0x0600) >> 9;
+	ibm8514.current_cmd = data;
+	ibm8514.src_x = 0;
+	ibm8514.src_y = 0;
+	ibm8514.bus_size = (data & 0x0600) >> 9;
 	switch(data & 0xe000)
 	{
 	case 0x0000:  // NOP (for "Short Stroke Vectors")
 		ibm8514.state = IBM8514_IDLE;
 		ibm8514.gpbusy = false;
-		if(LOG_8514) logerror("S3: Command (%04x) - NOP (Short Stroke Vector)\n",s3.current_cmd);
+		if(LOG_8514) logerror("S3: Command (%04x) - NOP (Short Stroke Vector)\n",ibm8514.current_cmd);
 		break;
 	case 0x2000:  // Line
 		ibm8514.state = IBM8514_IDLE;
@@ -3413,18 +3413,18 @@ WRITE16_MEMBER(s3_vga_device::ibm8514_cmd_w)
 			{
 				ibm8514.state = IBM8514_DRAWING_LINE;
 				ibm8514.data_avail = true;
-				if(LOG_8514) logerror("S3: Command (%04x) - Vector Line (WAIT) %i,%i \n",s3.current_cmd,ibm8514.curr_x,ibm8514.curr_y);
+				if(LOG_8514) logerror("S3: Command (%04x) - Vector Line (WAIT) %i,%i \n",ibm8514.current_cmd,ibm8514.curr_x,ibm8514.curr_y);
 			}
 			else
 			{
-				ibm8514_draw_vector(s3.rect_width,(data & 0x00e0) >> 5,(data & 0010) ? true : false);
-				if(LOG_8514) logerror("S3: Command (%04x) - Vector Line - %i,%i \n",s3.current_cmd,ibm8514.curr_x,ibm8514.curr_y);
+				ibm8514_draw_vector(ibm8514.rect_width,(data & 0x00e0) >> 5,(data & 0010) ? true : false);
+				if(LOG_8514) logerror("S3: Command (%04x) - Vector Line - %i,%i \n",ibm8514.current_cmd,ibm8514.curr_x,ibm8514.curr_y);
 			}
 		}
 		else
 		{
 			// Not perfect, but will do for now.
-			INT16 dx = s3.rect_width;
+			INT16 dx = ibm8514.rect_width;
 			INT16 dy = ibm8514.line_axial_step >> 1;
 			INT16 err = ibm8514.line_errorterm;
 			int sx = (data & 0x0020) ? 1 : -1;
@@ -3432,8 +3432,8 @@ WRITE16_MEMBER(s3_vga_device::ibm8514_cmd_w)
 			int count = 0;
 			INT16 temp;
 
-			if(LOG_8514) logerror("S3: Command (%04x) - Line (Bresenham) - %i,%i  Axial %i, Diagonal %i, Error %i, Major Axis %i, Minor Axis %i\n",s3.current_cmd,
-				ibm8514.curr_x,ibm8514.curr_y,ibm8514.line_axial_step,ibm8514.line_diagonal_step,ibm8514.line_errorterm,s3.rect_width,s3.rect_height);
+			if(LOG_8514) logerror("S3: Command (%04x) - Line (Bresenham) - %i,%i  Axial %i, Diagonal %i, Error %i, Major Axis %i, Minor Axis %i\n",ibm8514.current_cmd,
+				ibm8514.curr_x,ibm8514.curr_y,ibm8514.line_axial_step,ibm8514.line_diagonal_step,ibm8514.line_errorterm,ibm8514.rect_width,ibm8514.rect_height);
 
 			if((data & 0x0040))
 			{
@@ -3441,8 +3441,8 @@ WRITE16_MEMBER(s3_vga_device::ibm8514_cmd_w)
 			}
 			for(;;)
 			{
-				s3_write(ibm8514.curr_x + (ibm8514.curr_y * VGA_LINE_LENGTH),ibm8514.curr_x + (ibm8514.curr_y * VGA_LINE_LENGTH));
-				if (count > s3.rect_width) break;
+				ibm8514_write(ibm8514.curr_x + (ibm8514.curr_y * VGA_LINE_LENGTH),ibm8514.curr_x + (ibm8514.curr_y * VGA_LINE_LENGTH));
+				if (count > ibm8514.rect_width) break;
 				count++;
 				if((err*2) > -dy)
 				{
@@ -3462,33 +3462,33 @@ WRITE16_MEMBER(s3_vga_device::ibm8514_cmd_w)
 		{
 			ibm8514.state = IBM8514_DRAWING_RECT;
 			//ibm8514.gpbusy = true;  // DirectX 5 keeps waiting for the busy bit to be clear...
-			s3.bus_size = (data & 0x0600) >> 9;
+			ibm8514.bus_size = (data & 0x0600) >> 9;
 			ibm8514.data_avail = true;
-			if(LOG_8514) logerror("S3: Command (%04x) - Rectangle Fill (WAIT) %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,ibm8514.curr_x,
-					ibm8514.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
+			if(LOG_8514) logerror("S3: Command (%04x) - Rectangle Fill (WAIT) %i,%i Width: %i Height: %i Colour: %08x\n",ibm8514.current_cmd,ibm8514.curr_x,
+					ibm8514.curr_y,ibm8514.rect_width,ibm8514.rect_height,ibm8514.fgcolour);
 			break;
 		}
-		if(LOG_8514) logerror("S3: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,ibm8514.curr_x,
-				ibm8514.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
+		if(LOG_8514) logerror("S3: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",ibm8514.current_cmd,ibm8514.curr_x,
+				ibm8514.curr_y,ibm8514.rect_width,ibm8514.rect_height,ibm8514.fgcolour);
 		off = 0;
 		off += (VGA_LINE_LENGTH * ibm8514.curr_y);
 		off += ibm8514.curr_x;
-		for(y=0;y<=s3.rect_height;y++)
+		for(y=0;y<=ibm8514.rect_height;y++)
 		{
-			for(x=0;x<=s3.rect_width;x++)
+			for(x=0;x<=ibm8514.rect_width;x++)
 			{
 				if(data & 0x0020)  // source pattern is always based on current X/Y?
-					s3_write((off+x) % vga.svga_intf.vram_size,(off+x) % vga.svga_intf.vram_size);
+					ibm8514_write((off+x) % vga.svga_intf.vram_size,(off+x) % vga.svga_intf.vram_size);
 				else
-					s3_write((off-x) % vga.svga_intf.vram_size,(off-x) % vga.svga_intf.vram_size);
-				if(s3.current_cmd & 0x0020)
+					ibm8514_write((off-x) % vga.svga_intf.vram_size,(off-x) % vga.svga_intf.vram_size);
+				if(ibm8514.current_cmd & 0x0020)
 				{
 					ibm8514.curr_x++;
-					if(ibm8514.curr_x > ibm8514.prev_x + s3.rect_width)
+					if(ibm8514.curr_x > ibm8514.prev_x + ibm8514.rect_width)
 					{
 						ibm8514.curr_x = ibm8514.prev_x;
-						s3.src_x = 0;
-						if(s3.current_cmd & 0x0080)
+						ibm8514.src_x = 0;
+						if(ibm8514.current_cmd & 0x0080)
 							ibm8514.curr_y++;
 						else
 							ibm8514.curr_y--;
@@ -3497,11 +3497,11 @@ WRITE16_MEMBER(s3_vga_device::ibm8514_cmd_w)
 				else
 				{
 					ibm8514.curr_x--;
-					if(ibm8514.curr_x < ibm8514.prev_x - s3.rect_width)
+					if(ibm8514.curr_x < ibm8514.prev_x - ibm8514.rect_width)
 					{
 						ibm8514.curr_x = ibm8514.prev_x;
-						s3.src_x = 0;
-						if(s3.current_cmd & 0x0080)
+						ibm8514.src_x = 0;
+						if(ibm8514.current_cmd & 0x0080)
 							ibm8514.curr_y++;
 						else
 							ibm8514.curr_y--;
@@ -3517,30 +3517,30 @@ WRITE16_MEMBER(s3_vga_device::ibm8514_cmd_w)
 		ibm8514.gpbusy = false;
 		break;
 	case 0xc000:  // BitBLT
-		if(LOG_8514) logerror("S3: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",s3.current_cmd,
-				ibm8514.curr_x,ibm8514.curr_y,ibm8514.dest_x,ibm8514.dest_y,s3.rect_width,s3.rect_height);
+		if(LOG_8514) logerror("S3: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",ibm8514.current_cmd,
+				ibm8514.curr_x,ibm8514.curr_y,ibm8514.dest_x,ibm8514.dest_y,ibm8514.rect_width,ibm8514.rect_height);
 		off = 0;
 		off += (VGA_LINE_LENGTH * ibm8514.dest_y);
 		off += ibm8514.dest_x;
 		src = 0;
 		src += (VGA_LINE_LENGTH * ibm8514.curr_y);
 		src += ibm8514.curr_x;
-		for(y=0;y<=s3.rect_height;y++)
+		for(y=0;y<=ibm8514.rect_height;y++)
 		{
-			for(x=0;x<=s3.rect_width;x++)
+			for(x=0;x<=ibm8514.rect_width;x++)
 			{
 				if(data & 0x0020)
 					vga.memory[(off+x) % vga.svga_intf.vram_size] = vga.memory[(src+x) % vga.svga_intf.vram_size];
 				else
 					vga.memory[(off-x) % vga.svga_intf.vram_size] = vga.memory[(src-x) % vga.svga_intf.vram_size];
-				if(s3.current_cmd & 0x0020)
+				if(ibm8514.current_cmd & 0x0020)
 				{
 					ibm8514.curr_x++;
-					if(ibm8514.curr_x > ibm8514.prev_x + s3.rect_width)
+					if(ibm8514.curr_x > ibm8514.prev_x + ibm8514.rect_width)
 					{
 						ibm8514.curr_x = ibm8514.prev_x;
-						s3.src_x = 0;
-						if(s3.current_cmd & 0x0080)
+						ibm8514.src_x = 0;
+						if(ibm8514.current_cmd & 0x0080)
 							ibm8514.curr_y++;
 						else
 							ibm8514.curr_y--;
@@ -3549,11 +3549,11 @@ WRITE16_MEMBER(s3_vga_device::ibm8514_cmd_w)
 				else
 				{
 					ibm8514.curr_x--;
-					if(ibm8514.curr_x < ibm8514.prev_x - s3.rect_width)
+					if(ibm8514.curr_x < ibm8514.prev_x - ibm8514.rect_width)
 					{
 						ibm8514.curr_x = ibm8514.prev_x;
-						s3.src_x = 0;
-						if(s3.current_cmd & 0x0080)
+						ibm8514.src_x = 0;
+						if(ibm8514.current_cmd & 0x0080)
 							ibm8514.curr_y++;
 						else
 							ibm8514.curr_y--;
@@ -3575,8 +3575,8 @@ WRITE16_MEMBER(s3_vga_device::ibm8514_cmd_w)
 		ibm8514.gpbusy = false;
 		break;
 	case 0xe000:  // Pattern Fill
-		if(LOG_8514) logerror("S3: Command (%04x) - Pattern Fill - source %i,%i  dest %i,%i  Width: %i Height: %i\n",s3.current_cmd,
-				ibm8514.curr_x,ibm8514.curr_y,ibm8514.dest_x,ibm8514.dest_y,s3.rect_width,s3.rect_height);
+		if(LOG_8514) logerror("S3: Command (%04x) - Pattern Fill - source %i,%i  dest %i,%i  Width: %i Height: %i\n",ibm8514.current_cmd,
+				ibm8514.curr_x,ibm8514.curr_y,ibm8514.dest_x,ibm8514.dest_y,ibm8514.rect_width,ibm8514.rect_height);
 		off = 0;
 		off += (VGA_LINE_LENGTH * ibm8514.dest_y);
 		off += ibm8514.dest_x;
@@ -3592,20 +3592,20 @@ WRITE16_MEMBER(s3_vga_device::ibm8514_cmd_w)
 		else
 			pattern_y = 7;
 
-		for(y=0;y<=s3.rect_height;y++)
+		for(y=0;y<=ibm8514.rect_height;y++)
 		{
-			for(x=0;x<=s3.rect_width;x++)
+			for(x=0;x<=ibm8514.rect_width;x++)
 			{
 				if(data & 0x0020)
 				{
-					s3_write(off+x,src+pattern_x);
+					ibm8514_write(off+x,src+pattern_x);
 					pattern_x++;
 					if(pattern_x >= 8)
 						pattern_x = 0;
 				}
 				else
 				{
-					s3_write(off-x,src-pattern_x);
+					ibm8514_write(off-x,src-pattern_x);
 					pattern_x--;
 					if(pattern_x < 0)
 						pattern_x = 7;
@@ -3667,12 +3667,12 @@ bit  0-11  DESTINATION Y-POSITION. During BITBLT operations this is the Y
      0-13  (80 x+) LINE PARAMETER AXIAL STEP CONSTANT. Se above
 
  */
-READ16_MEMBER(s3_vga_device::ibm8514_desty_r)
+READ16_MEMBER(ati_vga_device::ibm8514_desty_r)
 {
 	return ibm8514.line_axial_step;
 }
 
-WRITE16_MEMBER(s3_vga_device::ibm8514_desty_w)
+WRITE16_MEMBER(ati_vga_device::ibm8514_desty_w)
 {
 	ibm8514.line_axial_step = data;
 	ibm8514.dest_y = data;
@@ -3692,12 +3692,12 @@ bit  0-11  DESTINATION X-POSITION. During BITBLT operations this is the X
      0-13  (80x +) LINE PARAMETER DIAGONAL STEP CONSTANT. Se above
 
  */
-READ16_MEMBER(s3_vga_device::ibm8514_destx_r)
+READ16_MEMBER(ati_vga_device::ibm8514_destx_r)
 {
 	return ibm8514.line_diagonal_step;
 }
 
-WRITE16_MEMBER(s3_vga_device::ibm8514_destx_w)
+WRITE16_MEMBER(ati_vga_device::ibm8514_destx_w)
 {
 	ibm8514.line_diagonal_step = data;
 	ibm8514.dest_x = data;
@@ -3726,7 +3726,7 @@ Note: The upper byte must be written for the SSV command to be executed.
       9EE9h before execution starts. A single 16bit write will do.
       If only one SSV is desired the other byte can be set to 0.
  */
-void s3_vga_device::ibm8514_wait_draw_ssv()
+void ati_vga_device::ibm8514_wait_draw_ssv()
 {
 	UINT8 len = ibm8514.wait_vector_len;
 	UINT8 dir = ibm8514.wait_vector_dir;
@@ -3736,7 +3736,7 @@ void s3_vga_device::ibm8514_wait_draw_ssv()
 	int x;
 	int data_size;
 
-	switch(s3.bus_size)
+	switch(ibm8514.bus_size)
 	{
 	case 0:
 		data_size = 8;
@@ -3778,7 +3778,7 @@ void s3_vga_device::ibm8514_wait_draw_ssv()
 		{
 			offset = (ibm8514.curr_y * VGA_LINE_LENGTH) + ibm8514.curr_x;
 			if(draw)
-				s3_write(offset,offset);
+				ibm8514_write(offset,offset);
 			switch(dir)
 			{
 			case 0:  // 0 degrees
@@ -3814,7 +3814,7 @@ void s3_vga_device::ibm8514_wait_draw_ssv()
 	}
 }
 
-void s3_vga_device::ibm8514_draw_ssv(UINT8 data)
+void ati_vga_device::ibm8514_draw_ssv(UINT8 data)
 {
 	UINT8 len = data & 0x0f;
 	UINT8 dir = (data & 0xe0) >> 5;
@@ -3823,16 +3823,16 @@ void s3_vga_device::ibm8514_draw_ssv(UINT8 data)
 	ibm8514_draw_vector(len,dir,draw);
 }
 
-READ16_MEMBER(s3_vga_device::ibm8514_ssv_r)
+READ16_MEMBER(ati_vga_device::ibm8514_ssv_r)
 {
 	return ibm8514.ssv;
 }
 
-WRITE16_MEMBER(s3_vga_device::ibm8514_ssv_w)
+WRITE16_MEMBER(ati_vga_device::ibm8514_ssv_w)
 {
 	ibm8514.ssv = data;
 
-	if(s3.current_cmd & 0x0100)
+	if(ibm8514.current_cmd & 0x0100)
 	{
 		ibm8514.state = IBM8514_DRAWING_SSV_1;
 		ibm8514.data_avail = true;
@@ -3843,7 +3843,7 @@ WRITE16_MEMBER(s3_vga_device::ibm8514_ssv_w)
 		return;
 	}
 
-	if(s3.current_cmd & 0x1000)  // byte sequence
+	if(ibm8514.current_cmd & 0x1000)  // byte sequence
 	{
 		ibm8514_draw_ssv(data & 0xff);
 		ibm8514_draw_ssv(data >> 8);
@@ -3856,7 +3856,7 @@ WRITE16_MEMBER(s3_vga_device::ibm8514_ssv_w)
 	if(LOG_8514) logerror("8514/A: Short Stroke Vector write %04x\n",data);
 }
 
-void s3_vga_device::ibm8514_wait_draw_vector()
+void ati_vga_device::ibm8514_wait_draw_vector()
 {
 	UINT8 len = ibm8514.wait_vector_len;
 	UINT8 dir = ibm8514.wait_vector_dir;
@@ -3866,11 +3866,11 @@ void s3_vga_device::ibm8514_wait_draw_vector()
 	UINT8 data_size = 0;
 	int x;
 
-	if(s3.bus_size == 0)  // 8-bit
+	if(ibm8514.bus_size == 0)  // 8-bit
 		data_size = 8;
-	if(s3.bus_size == 1)  // 16-bit
+	if(ibm8514.bus_size == 1)  // 16-bit
 		data_size = 16;
-	if(s3.bus_size == 2)  // 32-bit
+	if(ibm8514.bus_size == 2)  // 32-bit
 		data_size = 32;
 
 	for(x=0;x<data_size;x++)
@@ -3890,7 +3890,7 @@ void s3_vga_device::ibm8514_wait_draw_vector()
 		{
 			offset = (ibm8514.curr_y * VGA_LINE_LENGTH) + ibm8514.curr_x;
 			if(draw)
-				s3_write(offset,offset);
+				ibm8514_write(offset,offset);
 			switch(dir)
 			{
 			case 0:  // 0 degrees
@@ -3935,85 +3935,85 @@ bit  0-10  (911/924)  RECTANGLE WIDTH/LINE PARAMETER MAX. For BITBLT and
             independent axis). Must be positive.
      0-11  (80x +) RECTANGLE WIDTH/LINE PARAMETER MAX. See above
  */
-READ16_MEMBER(s3_vga_device::s3_width_r)
+READ16_MEMBER(ati_vga_device::ibm8514_width_r)
 {
-	return s3.rect_width;
+	return ibm8514.rect_width;
 }
 
-WRITE16_MEMBER(s3_vga_device::s3_width_w)
+WRITE16_MEMBER(ati_vga_device::ibm8514_width_w)
 {
-	s3.rect_width = data & 0x1fff;
+	ibm8514.rect_width = data & 0x1fff;
 	if(LOG_8514) logerror("S3: Major Axis Pixel Count / Rectangle Width write %04x\n",data);
 }
 
-READ16_MEMBER(s3_vga_device::ibm8514_currentx_r)
+READ16_MEMBER(ati_vga_device::ibm8514_currentx_r)
 {
 	return ibm8514.curr_x;
 }
 
-WRITE16_MEMBER(s3_vga_device::ibm8514_currentx_w)
+WRITE16_MEMBER(ati_vga_device::ibm8514_currentx_w)
 {
 	ibm8514.curr_x = data;
 	ibm8514.prev_x = data;
 	if(LOG_8514) logerror("8514/A: Current X set to %04x (%i)\n",data,ibm8514.curr_x);
 }
 
-READ16_MEMBER(s3_vga_device::ibm8514_currenty_r)
+READ16_MEMBER(ati_vga_device::ibm8514_currenty_r)
 {
 	return ibm8514.curr_y;
 }
 
-WRITE16_MEMBER(s3_vga_device::ibm8514_currenty_w)
+WRITE16_MEMBER(ati_vga_device::ibm8514_currenty_w)
 {
 	ibm8514.curr_y = data;
 	ibm8514.prev_y = data;
 	if(LOG_8514) logerror("8514/A: Current Y set to %04x (%i)\n",data,ibm8514.curr_y);
 }
 
-READ16_MEMBER(s3_vga_device::s3_fgcolour_r)
+READ16_MEMBER(ati_vga_device::ibm8514_fgcolour_r)
 {
-	return s3.fgcolour;
+	return ibm8514.fgcolour;
 }
 
-WRITE16_MEMBER(s3_vga_device::s3_fgcolour_w)
+WRITE16_MEMBER(ati_vga_device::ibm8514_fgcolour_w)
 {
-	s3.fgcolour = data;
+	ibm8514.fgcolour = data;
 	if(LOG_8514) logerror("S3: Foreground Colour write %04x\n",data);
 }
 
-READ16_MEMBER(s3_vga_device::s3_bgcolour_r)
+READ16_MEMBER(ati_vga_device::ibm8514_bgcolour_r)
 {
-	return s3.bgcolour;
+	return ibm8514.bgcolour;
 }
 
-WRITE16_MEMBER(s3_vga_device::s3_bgcolour_w)
+WRITE16_MEMBER(ati_vga_device::ibm8514_bgcolour_w)
 {
-	s3.bgcolour = data;
+	ibm8514.bgcolour = data;
 	if(LOG_8514) logerror("S3: Background Colour write %04x\n",data);
 }
 
-READ16_MEMBER(s3_vga_device::s3_multifunc_r )
+READ16_MEMBER(ati_vga_device::ibm8514_multifunc_r )
 {
-	switch(s3.multifunc_sel)
+	switch(ibm8514.multifunc_sel)
 	{
 	case 0:
-		return s3.rect_height;
+		return ibm8514.rect_height;
 	case 1:
-		return s3.scissors_top;
+		return ibm8514.scissors_top;
 	case 2:
-		return s3.scissors_left;
+		return ibm8514.scissors_left;
 	case 3:
-		return s3.scissors_bottom;
+		return ibm8514.scissors_bottom;
 	case 4:
-		return s3.scissors_right;
+		return ibm8514.scissors_right;
 		// TODO: remaining functions
 	default:
-		if(LOG_8514) logerror("S3: Unimplemented multifunction register %i selected\n",s3.multifunc_sel);
+		if(LOG_8514) logerror("8514/A: Unimplemented multifunction register %i selected\n",ibm8514.multifunc_sel);
 		return 0xff;
 	}
 }
 
-WRITE16_MEMBER(s3_vga_device::s3_multifunc_w )
+WRITE16_MEMBER(ati_vga_device::ibm8514_multifunc_w )
 {
 	switch(data & 0xf000)
 	{
@@ -4024,8 +4024,8 @@ bit  0-10  (911/924) Rectangle Height. Height of BITBLT or rectangle command.
      0-11  (80x +) Rectangle Height. See above
 */
 	case 0x0000:
-		s3.rect_height = data & 0x0fff;
-		if(LOG_8514) logerror("S3: Minor Axis Pixel Count / Rectangle Height write %04x\n",data);
+		ibm8514.rect_height = data & 0x0fff;
+		if(LOG_8514) logerror("8514/A: Minor Axis Pixel Count / Rectangle Height write %04x\n",data);
 		break;
 /*
 BEE8h index 01h W(R/W):  Top Scissors Register (SCISSORS_T).
@@ -4049,19 +4049,19 @@ bit  0-10  (911,924) Clipping Right Limit. Defines the right bound of the
      0-11  (80x +) Clipping Bottom Limit. See above.
  */
 	case 0x1000:
-		s3.scissors_top = data & 0x0fff;
+		ibm8514.scissors_top = data & 0x0fff;
 		if(LOG_8514) logerror("S3: Scissors Top write %04x\n",data);
 		break;
 	case 0x2000:
-		s3.scissors_left = data & 0x0fff;
+		ibm8514.scissors_left = data & 0x0fff;
 		if(LOG_8514) logerror("S3: Scissors Left write %04x\n",data);
 		break;
 	case 0x3000:
-		s3.scissors_bottom = data & 0x0fff;
+		ibm8514.scissors_bottom = data & 0x0fff;
 		if(LOG_8514) logerror("S3: Scissors Bottom write %04x\n",data);
 		break;
 	case 0x4000:
-		s3.scissors_right = data & 0x0fff;
+		ibm8514.scissors_right = data & 0x0fff;
 		if(LOG_8514) logerror("S3: Scissors Right write %04x\n",data);
 		break;
 /*
@@ -4075,7 +4075,7 @@ BIT     2  (911-928) Pack Data. If set image read data is a monochrome bitmap,
              3  Video memory determines the Mix register used.
  */
 	case 0xa000:
-		s3.pixel_control = data;
+		ibm8514.pixel_control = data;
 		if(LOG_8514) logerror("S3: Pixel control write %04x\n",data);
 		break;
 /*
@@ -4097,45 +4097,45 @@ bit   0-2  (911-928) READ-REG-SEL. Read Register Select. Selects the register
             10: Read will return contents of BEE8h index 0Dh
  */
 	case 0xf000:
-		s3.multifunc_sel = data & 0x000f;
+		ibm8514.multifunc_sel = data & 0x000f;
 		if(LOG_8514) logerror("S3: Multifunction select write %04x\n",data);
 	default:
 		if(LOG_8514) logerror("S3: Unimplemented multifunction register %i write %03x\n",data >> 12,data & 0x0fff);
 	}
 }
 
-void s3_vga_device::s3_wait_draw()
+void ati_vga_device::ibm8514_wait_draw()
 {
 	int x, data_size = 8;
 	UINT32 off;
 
 	// the data in the pixel transfer register or written to VRAM masks the rectangle output
-	if(s3.bus_size == 0)  // 8-bit
+	if(ibm8514.bus_size == 0)  // 8-bit
 		data_size = 8;
-	if(s3.bus_size == 1)  // 16-bit
+	if(ibm8514.bus_size == 1)  // 16-bit
 		data_size = 16;
-	if(s3.bus_size == 2)  // 32-bit
+	if(ibm8514.bus_size == 2)  // 32-bit
 		data_size = 32;
 	off = 0;
 	off += (VGA_LINE_LENGTH * ibm8514.curr_y);
 	off += ibm8514.curr_x;
-	if(s3.current_cmd & 0x02) // "across plane mode"
+	if(ibm8514.current_cmd & 0x02) // "across plane mode"
 	{
 		for(x=0;x<data_size;x++)
 		{
-			s3_write(off % vga.svga_intf.vram_size,off % vga.svga_intf.vram_size);
-			if(s3.current_cmd & 0x0020)
+			ibm8514_write(off % vga.svga_intf.vram_size,off % vga.svga_intf.vram_size);
+			if(ibm8514.current_cmd & 0x0020)
 			{
 				off++;
 				ibm8514.curr_x++;
-				if(ibm8514.curr_x > ibm8514.prev_x + s3.rect_width)
+				if(ibm8514.curr_x > ibm8514.prev_x + ibm8514.rect_width)
 				{
 					ibm8514.curr_x = ibm8514.prev_x;
-					s3.src_x = 0;
-					if(s3.current_cmd & 0x0080)
+					ibm8514.src_x = 0;
+					if(ibm8514.current_cmd & 0x0080)
 					{
 						ibm8514.curr_y++;
-						if(ibm8514.curr_y > ibm8514.prev_y + s3.rect_height)
+						if(ibm8514.curr_y > ibm8514.prev_y + ibm8514.rect_height)
 						{
 							ibm8514.state = IBM8514_IDLE;
 							ibm8514.data_avail = false;
@@ -4145,7 +4145,7 @@ void s3_vga_device::s3_wait_draw()
 					else
 					{
 						ibm8514.curr_y--;
-						if(ibm8514.curr_y < ibm8514.prev_y - s3.rect_height)
+						if(ibm8514.curr_y < ibm8514.prev_y - ibm8514.rect_height)
 						{
 							ibm8514.state = IBM8514_IDLE;
 							ibm8514.data_avail = false;
@@ -4159,14 +4159,14 @@ void s3_vga_device::s3_wait_draw()
 			{
 				off--;
 				ibm8514.curr_x--;
-				if(ibm8514.curr_x < ibm8514.prev_x - s3.rect_width)
+				if(ibm8514.curr_x < ibm8514.prev_x - ibm8514.rect_width)
 				{
 					ibm8514.curr_x = ibm8514.prev_x;
-					s3.src_x = 0;
-					if(s3.current_cmd & 0x0080)
+					ibm8514.src_x = 0;
+					if(ibm8514.current_cmd & 0x0080)
 					{
 						ibm8514.curr_y++;
-						if(ibm8514.curr_y > ibm8514.prev_y + s3.rect_height)
+						if(ibm8514.curr_y > ibm8514.prev_y + ibm8514.rect_height)
 						{
 							ibm8514.state = IBM8514_IDLE;
 							ibm8514.gpbusy = false;
@@ -4176,7 +4176,7 @@ void s3_vga_device::s3_wait_draw()
 					else
 					{
 						ibm8514.curr_y--;
-						if(ibm8514.curr_y < ibm8514.prev_y - s3.rect_height)
+						if(ibm8514.curr_y < ibm8514.prev_y - ibm8514.rect_height)
 						{
 							ibm8514.state = IBM8514_IDLE;
 							ibm8514.gpbusy = false;
@@ -4193,20 +4193,20 @@ void s3_vga_device::s3_wait_draw()
 		// "through plane" mode (single pixel)
 		for(x=0;x<data_size;x+=8)
 		{
-			s3_write(off % vga.svga_intf.vram_size,off % vga.svga_intf.vram_size);
+			ibm8514_write(off % vga.svga_intf.vram_size,off % vga.svga_intf.vram_size);
 
-			if(s3.current_cmd & 0x0020)
+			if(ibm8514.current_cmd & 0x0020)
 			{
 				off++;
 				ibm8514.curr_x++;
-				if(ibm8514.curr_x > ibm8514.prev_x + s3.rect_width)
+				if(ibm8514.curr_x > ibm8514.prev_x + ibm8514.rect_width)
 				{
 					ibm8514.curr_x = ibm8514.prev_x;
-					s3.src_x = 0;
-					if(s3.current_cmd & 0x0080)
+					ibm8514.src_x = 0;
+					if(ibm8514.current_cmd & 0x0080)
 					{
 						ibm8514.curr_y++;
-						if(ibm8514.curr_y > ibm8514.prev_y + s3.rect_height)
+						if(ibm8514.curr_y > ibm8514.prev_y + ibm8514.rect_height)
 						{
 							ibm8514.state = IBM8514_IDLE;
 							ibm8514.gpbusy = false;
@@ -4216,7 +4216,7 @@ void s3_vga_device::s3_wait_draw()
 					else
 					{
 						ibm8514.curr_y--;
-						if(ibm8514.curr_y < ibm8514.prev_y - s3.rect_height)
+						if(ibm8514.curr_y < ibm8514.prev_y - ibm8514.rect_height)
 						{
 							ibm8514.state = IBM8514_IDLE;
 							ibm8514.gpbusy = false;
@@ -4230,14 +4230,14 @@ void s3_vga_device::s3_wait_draw()
 			{
 				off--;
 				ibm8514.curr_x--;
-				if(ibm8514.curr_x < ibm8514.prev_x - s3.rect_width)
+				if(ibm8514.curr_x < ibm8514.prev_x - ibm8514.rect_width)
 				{
 					ibm8514.curr_x = ibm8514.prev_x;
-					s3.src_x = 0;
-					if(s3.current_cmd & 0x0080)
+					ibm8514.src_x = 0;
+					if(ibm8514.current_cmd & 0x0080)
 					{
 						ibm8514.curr_y++;
-						if(ibm8514.curr_y > ibm8514.prev_y + s3.rect_height)
+						if(ibm8514.curr_y > ibm8514.prev_y + ibm8514.rect_height)
 						{
 							ibm8514.state = IBM8514_IDLE;
 							ibm8514.gpbusy = false;
@@ -4247,7 +4247,7 @@ void s3_vga_device::s3_wait_draw()
 					else
 					{
 						ibm8514.curr_y--;
-						if(ibm8514.curr_y < ibm8514.prev_y - s3.rect_height)
+						if(ibm8514.curr_y < ibm8514.prev_y - ibm8514.rect_height)
 						{
 							ibm8514.state = IBM8514_IDLE;
 							ibm8514.gpbusy = false;
@@ -4288,45 +4288,45 @@ bit   0-3  Background MIX (BACKMIX).
              2  BSS is Pixel Data from the PIX_TRANS register (E2E8h)
              3  BSS is Bitmap Data (Source data from display buffer).
  */
-READ16_MEMBER(s3_vga_device::s3_backmix_r)
+READ16_MEMBER(ati_vga_device::ibm8514_backmix_r)
 {
-	return s3.bgmix;
+	return ibm8514.bgmix;
 }
 
-WRITE16_MEMBER(s3_vga_device::s3_backmix_w)
+WRITE16_MEMBER(ati_vga_device::ibm8514_backmix_w)
 {
-	s3.bgmix = data;
-	if(LOG_8514) logerror("S3: BG Mix write %04x\n",data);
+	ibm8514.bgmix = data;
+	if(LOG_8514) logerror("8514/A: BG Mix write %04x\n",data);
 }
 
-READ16_MEMBER(s3_vga_device::s3_foremix_r)
+READ16_MEMBER(ati_vga_device::ibm8514_foremix_r)
 {
-	return s3.fgmix;
+	return ibm8514.fgmix;
 }
 
-WRITE16_MEMBER(s3_vga_device::s3_foremix_w)
+WRITE16_MEMBER(ati_vga_device::ibm8514_foremix_w)
 {
-	s3.fgmix = data;
-	if(LOG_8514) logerror("S3: FG Mix write %04x\n",data);
+	ibm8514.fgmix = data;
+	if(LOG_8514) logerror("8514/A: FG Mix write %04x\n",data);
 }
 
-READ16_MEMBER(s3_vga_device::s3_pixel_xfer_r)
+READ16_MEMBER(ati_vga_device::ibm8514_pixel_xfer_r)
 {
 	if(offset == 1)
-		return (s3.pixel_xfer & 0xffff0000) >> 16;
+		return (ibm8514.pixel_xfer & 0xffff0000) >> 16;
 	else
-		return s3.pixel_xfer & 0x0000ffff;
+		return ibm8514.pixel_xfer & 0x0000ffff;
 }
 
-WRITE16_MEMBER(s3_vga_device::s3_pixel_xfer_w)
+WRITE16_MEMBER(ati_vga_device::ibm8514_pixel_xfer_w)
 {
 	if(offset == 1)
-		s3.pixel_xfer = (s3.pixel_xfer & 0x0000ffff) | (data << 16);
+		ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0x0000ffff) | (data << 16);
 	else
-		s3.pixel_xfer = (s3.pixel_xfer & 0xffff0000) | data;
+		ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xffff0000) | data;
 
 	if(ibm8514.state == IBM8514_DRAWING_RECT)
-		s3_wait_draw();
+		ibm8514_wait_draw();
 
 	if(ibm8514.state == IBM8514_DRAWING_SSV_1 || ibm8514.state == IBM8514_DRAWING_SSV_2)
 		ibm8514_wait_draw_ssv();
@@ -4334,7 +4334,7 @@ WRITE16_MEMBER(s3_vga_device::s3_pixel_xfer_w)
 	if(ibm8514.state == IBM8514_DRAWING_LINE)
 		ibm8514_wait_draw_vector();
 
-	if(LOG_8514) logerror("S3: Pixel Transfer = %08x\n",s3.pixel_xfer);
+	if(LOG_8514) logerror("S3: Pixel Transfer = %08x\n",ibm8514.pixel_xfer);
 }
 
 READ8_MEMBER(s3_vga_device::mem_r)
@@ -4371,42 +4371,42 @@ WRITE8_MEMBER(s3_vga_device::mem_w)
 		if(offset < 0x8000)
 		{
 			// pass through to the pixel transfer register (DirectX 5 wants this)
-			if(s3.bus_size == 0)
+			if(ibm8514.bus_size == 0)
 			{
-				s3.pixel_xfer = (s3.pixel_xfer & 0xffffff00) | data;
-				s3_wait_draw();
+				ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xffffff00) | data;
+				ibm8514_wait_draw();
 			}
-			if(s3.bus_size == 1)
+			if(ibm8514.bus_size == 1)
 			{
 				switch(offset & 0x0001)
 				{
 				case 0:
 				default:
-					s3.pixel_xfer = (s3.pixel_xfer & 0xffffff00) | data;
+					ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xffffff00) | data;
 					break;
 				case 1:
-					s3.pixel_xfer = (s3.pixel_xfer & 0xffff00ff) | (data << 8);
-					s3_wait_draw();
+					ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xffff00ff) | (data << 8);
+					ibm8514_wait_draw();
 					break;
 				}
 			}
-			if(s3.bus_size == 2)
+			if(ibm8514.bus_size == 2)
 			{
 				switch(offset & 0x0003)
 				{
 				case 0:
 				default:
-					s3.pixel_xfer = (s3.pixel_xfer & 0xffffff00) | data;
+					ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xffffff00) | data;
 					break;
 				case 1:
-					s3.pixel_xfer = (s3.pixel_xfer & 0xffff00ff) | (data << 8);
+					ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xffff00ff) | (data << 8);
 					break;
 				case 2:
-					s3.pixel_xfer = (s3.pixel_xfer & 0xff00ffff) | (data << 16);
+					ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xff00ffff) | (data << 16);
 					break;
 				case 3:
-					s3.pixel_xfer = (s3.pixel_xfer & 0x00ffffff) | (data << 24);
-					s3_wait_draw();
+					ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0x00ffffff) | (data << 24);
+					ibm8514_wait_draw();
 					break;
 				}
 			}
@@ -4465,107 +4465,107 @@ WRITE8_MEMBER(s3_vga_device::mem_w)
 			break;
 		case 0x8120:
 		case 0xa2e8:
-			s3.bgcolour = (s3.bgcolour & 0xff00) | data;
+			ibm8514.bgcolour = (ibm8514.bgcolour & 0xff00) | data;
 			break;
 		case 0x8121:
 		case 0xa2e9:
-			s3.bgcolour = (s3.bgcolour & 0x00ff) | (data << 8);
+			ibm8514.bgcolour = (ibm8514.bgcolour & 0x00ff) | (data << 8);
 			break;
 		case 0x8124:
 		case 0xa6e8:
-			s3.fgcolour = (s3.fgcolour & 0xff00) | data;
+			ibm8514.fgcolour = (ibm8514.fgcolour & 0xff00) | data;
 			break;
 		case 0x8125:
 		case 0xa6e9:
-			s3.fgcolour = (s3.fgcolour & 0x00ff) | (data << 8);
+			ibm8514.fgcolour = (ibm8514.fgcolour & 0x00ff) | (data << 8);
 			break;
 		case 0xb6e8:
 		case 0x8134:
-			s3.bgmix = (s3.bgmix & 0xff00) | data;
+			ibm8514.bgmix = (ibm8514.bgmix & 0xff00) | data;
 			break;
 		case 0x8135:
 		case 0xb6e9:
-			s3.bgmix = (s3.bgmix & 0x00ff) | (data << 8);
+			ibm8514.bgmix = (ibm8514.bgmix & 0x00ff) | (data << 8);
 			break;
 		case 0x8136:
 		case 0xbae8:
-			s3.fgmix = (s3.fgmix & 0xff00) | data;
+			ibm8514.fgmix = (ibm8514.fgmix & 0xff00) | data;
 			break;
 		case 0x8137:
 		case 0xbae9:
-			s3.fgmix = (s3.fgmix & 0x00ff) | (data << 8);
+			ibm8514.fgmix = (ibm8514.fgmix & 0x00ff) | (data << 8);
 			break;
 		case 0x8138:
-			s3.scissors_top = (s3.scissors_top & 0xff00) | data;
+			ibm8514.scissors_top = (ibm8514.scissors_top & 0xff00) | data;
 			break;
 		case 0x8139:
-			s3.scissors_top = (s3.scissors_top & 0x00ff) | (data << 8);
+			ibm8514.scissors_top = (ibm8514.scissors_top & 0x00ff) | (data << 8);
 			break;
 		case 0x813a:
-			s3.scissors_left = (s3.scissors_left & 0xff00) | data;
+			ibm8514.scissors_left = (ibm8514.scissors_left & 0xff00) | data;
 			break;
 		case 0x813b:
-			s3.scissors_left = (s3.scissors_left & 0x00ff) | (data << 8);
+			ibm8514.scissors_left = (ibm8514.scissors_left & 0x00ff) | (data << 8);
 			break;
 		case 0x813c:
-			s3.scissors_bottom = (s3.scissors_bottom & 0xff00) | data;
+			ibm8514.scissors_bottom = (ibm8514.scissors_bottom & 0xff00) | data;
 			break;
 		case 0x813d:
-			s3.scissors_bottom = (s3.scissors_bottom & 0x00ff) | (data << 8);
+			ibm8514.scissors_bottom = (ibm8514.scissors_bottom & 0x00ff) | (data << 8);
 			break;
 		case 0x813e:
-			s3.scissors_right = (s3.scissors_right & 0xff00) | data;
+			ibm8514.scissors_right = (ibm8514.scissors_right & 0xff00) | data;
 			break;
 		case 0x813f:
-			s3.scissors_right = (s3.scissors_right & 0x00ff) | (data << 8);
+			ibm8514.scissors_right = (ibm8514.scissors_right & 0x00ff) | (data << 8);
 			break;
 		case 0x8140:
-			s3.pixel_control = (s3.pixel_control & 0xff00) | data;
+			ibm8514.pixel_control = (ibm8514.pixel_control & 0xff00) | data;
 			break;
 		case 0x8141:
-			s3.pixel_control = (s3.pixel_control & 0x00ff) | (data << 8);
+			ibm8514.pixel_control = (ibm8514.pixel_control & 0x00ff) | (data << 8);
 			break;
 		case 0x8146:
-			s3.multifunc_sel = (s3.multifunc_sel & 0xff00) | data;
+			ibm8514.multifunc_sel = (ibm8514.multifunc_sel & 0xff00) | data;
 			break;
 		case 0x8148:
-			s3.rect_height = (s3.rect_height & 0xff00) | data;
+			ibm8514.rect_height = (ibm8514.rect_height & 0xff00) | data;
 			break;
 		case 0x8149:
-			s3.rect_height = (s3.rect_height & 0x00ff) | (data << 8);
+			ibm8514.rect_height = (ibm8514.rect_height & 0x00ff) | (data << 8);
 			break;
 		case 0x814a:
-			s3.rect_width = (s3.rect_width & 0xff00) | data;
+			ibm8514.rect_width = (ibm8514.rect_width & 0xff00) | data;
 			break;
 		case 0x814b:
-			s3.rect_width = (s3.rect_width & 0x00ff) | (data << 8);
+			ibm8514.rect_width = (ibm8514.rect_width & 0x00ff) | (data << 8);
 			break;
 		case 0x8150:
-			s3.pixel_xfer = (s3.pixel_xfer & 0xffffff00) | data;
+			ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xffffff00) | data;
 			if(ibm8514.state == IBM8514_DRAWING_RECT)
-				s3_wait_draw();
+				ibm8514_wait_draw();
 			break;
 		case 0x8151:
-			s3.pixel_xfer = (s3.pixel_xfer & 0xffff00ff) | (data << 8);
+			ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xffff00ff) | (data << 8);
 			if(ibm8514.state == IBM8514_DRAWING_RECT)
-				s3_wait_draw();
+				ibm8514_wait_draw();
 			break;
 		case 0x8152:
-			s3.pixel_xfer = (s3.pixel_xfer & 0xff00ffff) | (data << 16);
+			ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xff00ffff) | (data << 16);
 			if(ibm8514.state == IBM8514_DRAWING_RECT)
-				s3_wait_draw();
+				ibm8514_wait_draw();
 			break;
 		case 0x8153:
-			s3.pixel_xfer = (s3.pixel_xfer & 0x00ffffff) | (data << 24);
+			ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0x00ffffff) | (data << 24);
 			if(ibm8514.state == IBM8514_DRAWING_RECT)
-				s3_wait_draw();
+				ibm8514_wait_draw();
 			break;
 		case 0xbee8:
 			s3.mmio_bee8 = (s3.mmio_bee8 & 0xff00) | data;
 			break;
 		case 0xbee9:
 			s3.mmio_bee8 = (s3.mmio_bee8 & 0x00ff) | (data << 8);
-			s3_multifunc_w(space,0,s3.mmio_bee8,0xffff);
+			ibm8514_multifunc_w(space,0,s3.mmio_bee8,0xffff);
 			break;
 		default:
 			if(LOG_8514) logerror("S3: MMIO offset %05x write %02x\n",offset+0xa0000,data);
@@ -5058,12 +5058,12 @@ WRITE16_MEMBER(ati_vga_device::mach8_linedraw_index_w)
 
 READ16_MEMBER(ati_vga_device::mach8_bresenham_count_r)
 {
-	return s3.rect_width & 0x1fff;
+	return ibm8514.rect_width & 0x1fff;
 }
 
 WRITE16_MEMBER(ati_vga_device::mach8_bresenham_count_w)
 {
-	s3.rect_width = data & 0x1fff;
+	ibm8514.rect_width = data & 0x1fff;
 	if(LOG_8514) logerror("Mach8: Bresenham count write %04x\n",data);
 }
 
