@@ -6,6 +6,24 @@
     Schematic and PinMAME used as references.
     Code for the interrupts/timers was derived from PinMAME.
 
+    Af-Tor was the first pinball to use alphanumeric displays.
+    Each display has 12 segments, but are programmed with 8-bit codes.
+    This makes some of the letters look rather odd, but it is still
+    readable.
+
+         a a
+         _ _
+       f/_/_/ b    g = 2 middle horizontal segments
+      e/_/_/ c     h = 2 middle vertical segments
+        d d
+
+
+ToDo:
+- Outhole doesn't work
+- Add mechanical sounds
+- Fix failures in test mode
+- Find and add Clear and Advance buttons (behind front door)
+
 
 ***************************************************************************/
 
@@ -54,9 +72,6 @@ private:
 	bool m_disp_on;
 	bool m_diag_on;
 	UINT8 m_firqtimer;
-	UINT8 m_digit;
-public:
-	DECLARE_DRIVER_INIT(wico);
 };
 
 // housekeeping cpu
@@ -198,7 +213,7 @@ static INPUT_PORTS_START( wico )
 	PORT_DIPNAME( 0x40, 0x00, "Fast Ride Lights Extra Ball" )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x40, "3" )
-	PORT_DIPNAME( 0x80, 0x80, "Free Play" )
+	PORT_DIPNAME( 0x80, 0x00, "Free Play" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 	PORT_START("XD")
@@ -285,13 +300,8 @@ void wico_state::machine_reset()
 	m_zcen = 0;
 	m_gten = 0;
 	m_firqtimer = 0;
-	m_digit = 0;
 	m_disp_on = 0;
 	m_diag_on = 0;
-}
-
-DRIVER_INIT_MEMBER(wico_state,wico)
-{
 }
 
 // diagnostic display off
@@ -313,13 +323,13 @@ WRITE8_MEMBER( wico_state::muxen_w )
 	UINT8 segments = 0;
 	if (m_diag_on)
 		segments = patterns[data>>4];
-	output_set_digit_value(41, segments);
+	output_set_digit_value(9, segments);
+	m_disp_on = BIT(data, 0);
 }
 
 // reset digit/scan counter
 WRITE8_MEMBER( wico_state::muxld_w )
 {
-	m_digit = 0;
 }
 
 // enable zero-crossing interrupt
@@ -346,9 +356,15 @@ READ8_MEMBER( wico_state::switch_r )
 // write digits in main display
 READ8_MEMBER( wico_state::lampst_r )
 {
-	UINT8 i;
+	int i, j;
 	for (i = 0; i < 5; i++)
-		output_set_digit_value(i * 10 + (m_shared_ram[0x96] & 7), m_shared_ram[0x7f9 + i]);
+	{
+		if (m_disp_on)
+			j = m_shared_ram[0x7f9 + i];
+		else
+			j = 0;
+		output_set_digit_value(i * 10 + (m_shared_ram[0x96] & 7), BITSWAP16(j, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0));
+	}
 	return 0xff;
 }
 
@@ -426,4 +442,4 @@ ROM_END
 / Big Top  (1977)
 /-------------------------------------------------------------------*/
 
-GAME(1984,  aftor,  0,  wico,  wico, wico_state,  wico,  ROT0,  "Wico", "Af-Tor", GAME_IS_SKELETON_MECHANICAL)
+GAME(1984,  aftor,  0,  wico,  wico, driver_device,  0,  ROT0,  "Wico", "Af-Tor", GAME_MECHANICAL)
