@@ -113,13 +113,31 @@ public:
 	void modeDPC_decrement_counter(UINT8 data_fetcher);
 	virtual void machine_reset();
 	DECLARE_MACHINE_START(a2600);
-	DECLARE_MACHINE_START(a2600p);
 	TIMER_CALLBACK_MEMBER(modeDPC_timer_callback);
 	DECLARE_WRITE8_MEMBER(switch_A_w);
 	DECLARE_READ8_MEMBER(switch_A_r);
 	DECLARE_WRITE8_MEMBER(switch_B_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_callback);
 	DECLARE_READ8_MEMBER(riot_input_port_8_r);
+
+protected:
+	int next_bank();
+	void modeF8_switch(UINT16 offset, UINT8 data);
+	void modeFA_switch(UINT16 offset, UINT8 data);
+	void modeF6_switch(UINT16 offset, UINT8 data);
+	void modeF4_switch(UINT16 offset, UINT8 data);
+	void mode3F_switch(UINT16 offset, UINT8 data);
+	void modeUA_switch(UINT16 offset, UINT8 data);
+	void modeE0_switch(UINT16 offset, UINT8 data);
+	void modeE7_switch(UINT16 offset, UINT8 data);
+	void modeE7_RAM_switch(UINT16 offset, UINT8 data);
+	void modeDC_switch(UINT16 offset, UINT8 data);
+	void mode3E_switch(UINT16 offset, UINT8 data);
+	void mode3E_RAM_switch(UINT16 offset, UINT8 data);
+	void modeFV_switch(UINT16 offset, UINT8 data);
+	void modeJVP_switch(UINT16 offset, UINT8 data);
+
+	UINT8	*m_cart;
 };
 
 
@@ -579,198 +597,196 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 }
 
 
-static int next_bank(a2600_state *state)
+int a2600_state::next_bank()
 {
-	return state->m_current_bank = (state->m_current_bank + 1) % 16;
+	return m_current_bank = (m_current_bank + 1) % 16;
 }
 
 
-static void modeF8_switch(running_machine &machine, UINT16 offset, UINT8 data)
+void a2600_state::modeF8_switch(UINT16 offset, UINT8 data)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
-	state->m_bank_base[1] = CART + 0x1000 * offset;
-	state->membank("bank1")->set_base(state->m_bank_base[1]);
+	m_bank_base[1] = m_cart + 0x1000 * offset;
+	membank("bank1")->set_base(m_bank_base[1]);
 }
-static void modeFA_switch(running_machine &machine, UINT16 offset, UINT8 data)
+
+void a2600_state::modeFA_switch(UINT16 offset, UINT8 data)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
-	state->m_bank_base[1] = CART + 0x1000 * offset;
-	state->membank("bank1")->set_base(state->m_bank_base[1]);
+	m_bank_base[1] = m_cart + 0x1000 * offset;
+	membank("bank1")->set_base(m_bank_base[1]);
 }
-static void modeF6_switch(running_machine &machine, UINT16 offset, UINT8 data)
+
+void a2600_state::modeF6_switch(UINT16 offset, UINT8 data)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
-	state->m_bank_base[1] = CART + 0x1000 * offset;
-	state->membank("bank1")->set_base(state->m_bank_base[1]);
+	m_bank_base[1] = m_cart + 0x1000 * offset;
+	membank("bank1")->set_base(m_bank_base[1]);
 }
-static void modeF4_switch(running_machine &machine, UINT16 offset, UINT8 data)
+
+void a2600_state::modeF4_switch(UINT16 offset, UINT8 data)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
-	state->m_bank_base[1] = CART + 0x1000 * offset;
-	state->membank("bank1")->set_base(state->m_bank_base[1]);
+	m_bank_base[1] = m_cart + 0x1000 * offset;
+	membank("bank1")->set_base(m_bank_base[1]);
 }
-static void mode3F_switch(running_machine &machine, UINT16 offset, UINT8 data)
+
+void a2600_state::mode3F_switch(UINT16 offset, UINT8 data)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
-	state->m_bank_base[1] = CART + 0x800 * (data & (state->m_number_banks - 1));
-	state->membank("bank1")->set_base(state->m_bank_base[1]);
+	m_bank_base[1] = m_cart + 0x800 * (data & (m_number_banks - 1));
+	membank("bank1")->set_base(m_bank_base[1]);
 }
-static void modeUA_switch(running_machine &machine, UINT16 offset, UINT8 data)
+
+void a2600_state::modeUA_switch(UINT16 offset, UINT8 data)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
-	state->m_bank_base[1] = CART + (offset >> 6) * 0x1000;
-	state->membank("bank1")->set_base(state->m_bank_base[1]);
+	m_bank_base[1] = m_cart + (offset >> 6) * 0x1000;
+	membank("bank1")->set_base(m_bank_base[1]);
 }
-static void modeE0_switch(running_machine &machine, UINT16 offset, UINT8 data)
+
+void a2600_state::modeE0_switch(UINT16 offset, UINT8 data)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	int bank = 1 + (offset >> 3);
 	char bank_name[10];
 	sprintf(bank_name,"bank%d",bank);
-	state->m_bank_base[bank] = CART + 0x400 * (offset & 7);
-	state->membank(bank_name)->set_base(state->m_bank_base[bank]);
+	m_bank_base[bank] = m_cart + 0x400 * (offset & 7);
+	membank(bank_name)->set_base(m_bank_base[bank]);
 }
-static void modeE7_switch(running_machine &machine, UINT16 offset, UINT8 data)
+
+void a2600_state::modeE7_switch(UINT16 offset, UINT8 data)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
-	state->m_bank_base[1] = CART + 0x800 * offset;
-	state->membank("bank1")->set_base(state->m_bank_base[1]);
+	m_bank_base[1] = m_cart + 0x800 * offset;
+	membank("bank1")->set_base(m_bank_base[1]);
 }
-static void modeE7_RAM_switch(running_machine &machine, UINT16 offset, UINT8 data)
+
+void a2600_state::modeE7_RAM_switch(UINT16 offset, UINT8 data)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
-	state->membank("bank9")->set_base(state->m_extra_RAM->base() + (4 + offset) * 256 );
+	membank("bank9")->set_base(m_extra_RAM->base() + (4 + offset) * 256 );
 }
-static void modeDC_switch(running_machine &machine, UINT16 offset, UINT8 data)
+
+void a2600_state::modeDC_switch(UINT16 offset, UINT8 data)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
-	state->m_bank_base[1] = CART + 0x1000 * next_bank(state);
-	state->membank("bank1")->set_base(state->m_bank_base[1]);
+	m_bank_base[1] = m_cart + 0x1000 * next_bank();
+	membank("bank1")->set_base(m_bank_base[1]);
 }
-static void mode3E_switch(running_machine &machine, UINT16 offset, UINT8 data)
+
+void a2600_state::mode3E_switch(UINT16 offset, UINT8 data)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
-	state->m_bank_base[1] = CART + 0x800 * (data & (state->m_number_banks - 1));
-	state->membank("bank1")->set_base(state->m_bank_base[1]);
-	state->m_mode3E_ram_enabled = 0;
+	m_bank_base[1] = m_cart + 0x800 * (data & (m_number_banks - 1));
+	membank("bank1")->set_base(m_bank_base[1]);
+	m_mode3E_ram_enabled = 0;
 }
-static void mode3E_RAM_switch(running_machine &machine, UINT16 offset, UINT8 data)
+
+void a2600_state::mode3E_RAM_switch(UINT16 offset, UINT8 data)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
-	state->m_ram_base = state->m_extra_RAM->base() + 0x200 * ( data & 0x3F );
-	state->membank("bank1")->set_base(state->m_ram_base );
-	state->m_mode3E_ram_enabled = 1;
+	m_ram_base = m_extra_RAM->base() + 0x200 * ( data & 0x3F );
+	membank("bank1")->set_base(m_ram_base);
+	m_mode3E_ram_enabled = 1;
 }
-static void modeFV_switch(running_machine &machine, UINT16 offset, UINT8 data)
+
+void a2600_state::modeFV_switch(UINT16 offset, UINT8 data)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
-	//printf("ModeFV %04x\n",offset);
-	if (!state->m_FVlocked && ( machine.device("maincpu")->safe_pc() & 0x1F00 ) == 0x1F00 )
+	if (!m_FVlocked && ( machine().device("maincpu")->safe_pc() & 0x1F00 ) == 0x1F00 )
 	{
-		state->m_FVlocked = 1;
-		state->m_current_bank = state->m_current_bank ^ 0x01;
-		state->m_bank_base[1] = CART + 0x1000 * state->m_current_bank;
-		state->membank("bank1")->set_base(state->m_bank_base[1]);
+		m_FVlocked = 1;
+		m_current_bank = m_current_bank ^ 0x01;
+		m_bank_base[1] = m_cart + 0x1000 * m_current_bank;
+		membank("bank1")->set_base(m_bank_base[1]);
 	}
 }
-static void modeJVP_switch(running_machine &machine, UINT16 offset, UINT8 data)
+
+void a2600_state::modeJVP_switch(UINT16 offset, UINT8 data)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	switch( offset )
 	{
 	case 0x00:
 	case 0x20:
-		state->m_current_bank ^= 1;
+		m_current_bank ^= 1;
 		break;
 	default:
-		printf("%04X: write to unknown mapper address %02X\n", machine.device("maincpu")->safe_pc(), 0xfa0 + offset );
+		printf("%04X: write to unknown mapper address %02X\n", machine().device("maincpu")->safe_pc(), 0xfa0 + offset );
 		break;
 	}
-	state->m_bank_base[1] = CART + 0x1000 * state->m_current_bank;
-	state->membank("bank1")->set_base(state->m_bank_base[1] );
+	m_bank_base[1] = m_cart + 0x1000 * m_current_bank;
+	membank("bank1")->set_base(m_bank_base[1] );
 }
 
 
 /* These read handlers will return the byte from the new bank */
 READ8_MEMBER(a2600_state::modeF8_switch_r)
 {
-	modeF8_switch(machine(), offset, 0);
+	modeF8_switch(offset, 0);
 	return m_bank_base[1][0xff8 + offset];
 }
 
 READ8_MEMBER(a2600_state::modeFA_switch_r)
 {
-	modeFA_switch(machine(), offset, 0);
+	modeFA_switch(offset, 0);
 	return m_bank_base[1][0xff8 + offset];
 }
 
 READ8_MEMBER(a2600_state::modeF6_switch_r)
 {
-	modeF6_switch(machine(), offset, 0);
+	modeF6_switch(offset, 0);
 	return m_bank_base[1][0xff6 + offset];
 }
 
 READ8_MEMBER(a2600_state::modeF4_switch_r)
 {
-	modeF4_switch(machine(), offset, 0);
+	modeF4_switch(offset, 0);
 	return m_bank_base[1][0xff4 + offset];
 }
 
 READ8_MEMBER(a2600_state::modeE0_switch_r)
 {
-	modeE0_switch(machine(), offset, 0);
+	modeE0_switch(offset, 0);
 	return m_bank_base[4][0x3e0 + offset];
 }
 
 READ8_MEMBER(a2600_state::modeE7_switch_r)
 {
-	modeE7_switch(machine(), offset, 0);
+	modeE7_switch(offset, 0);
 	return m_bank_base[1][0xfe0 + offset];
 }
 
 READ8_MEMBER(a2600_state::modeE7_RAM_switch_r)
 {
-	modeE7_RAM_switch(machine(), offset, 0);
+	modeE7_RAM_switch(offset, 0);
 	return 0;
 }
 
 READ8_MEMBER(a2600_state::modeUA_switch_r)
 {
-	modeUA_switch(machine(), offset, 0);
+	modeUA_switch(offset, 0);
 	return 0;
 }
 
 READ8_MEMBER(a2600_state::modeDC_switch_r)
 {
-	modeDC_switch(machine(), offset, 0);
+	modeDC_switch(offset, 0);
 	return m_bank_base[1][0xff0 + offset];
 }
 
 READ8_MEMBER(a2600_state::modeFV_switch_r)
 {
-	modeFV_switch(machine(), offset, 0);
+	modeFV_switch(offset, 0);
 	return m_bank_base[1][0xfd0 + offset];
 }
 
 READ8_MEMBER(a2600_state::modeJVP_switch_r)
 {
-	modeJVP_switch(machine(), offset, 0);
+	modeJVP_switch(offset, 0);
 	return m_riot_ram[ 0x20 + offset ];
 }
 
 
-WRITE8_MEMBER(a2600_state::modeF8_switch_w){ modeF8_switch(machine(), offset, data); }
-WRITE8_MEMBER(a2600_state::modeFA_switch_w){ modeFA_switch(machine(), offset, data); }
-WRITE8_MEMBER(a2600_state::modeF6_switch_w){ modeF6_switch(machine(), offset, data); }
-WRITE8_MEMBER(a2600_state::modeF4_switch_w){ modeF4_switch(machine(), offset, data); }
-WRITE8_MEMBER(a2600_state::modeE0_switch_w){ modeE0_switch(machine(), offset, data); }
-WRITE8_MEMBER(a2600_state::modeE7_switch_w){ modeE7_switch(machine(), offset, data); }
-WRITE8_MEMBER(a2600_state::modeE7_RAM_switch_w){ modeE7_RAM_switch(machine(), offset, data); }
-WRITE8_MEMBER(a2600_state::mode3F_switch_w){ mode3F_switch(machine(), offset, data); }
-WRITE8_MEMBER(a2600_state::modeUA_switch_w){ modeUA_switch(machine(), offset, data); }
-WRITE8_MEMBER(a2600_state::modeDC_switch_w){ modeDC_switch(machine(), offset, data); }
-WRITE8_MEMBER(a2600_state::mode3E_switch_w){ mode3E_switch(machine(), offset, data); }
-WRITE8_MEMBER(a2600_state::mode3E_RAM_switch_w){ mode3E_RAM_switch(machine(), offset, data); }
+WRITE8_MEMBER(a2600_state::modeF8_switch_w){ modeF8_switch(offset, data); }
+WRITE8_MEMBER(a2600_state::modeFA_switch_w){ modeFA_switch(offset, data); }
+WRITE8_MEMBER(a2600_state::modeF6_switch_w){ modeF6_switch(offset, data); }
+WRITE8_MEMBER(a2600_state::modeF4_switch_w){ modeF4_switch(offset, data); }
+WRITE8_MEMBER(a2600_state::modeE0_switch_w){ modeE0_switch(offset, data); }
+WRITE8_MEMBER(a2600_state::modeE7_switch_w){ modeE7_switch(offset, data); }
+WRITE8_MEMBER(a2600_state::modeE7_RAM_switch_w){ modeE7_RAM_switch(offset, data); }
+WRITE8_MEMBER(a2600_state::mode3F_switch_w){ mode3F_switch(offset, data); }
+WRITE8_MEMBER(a2600_state::modeUA_switch_w){ modeUA_switch(offset, data); }
+WRITE8_MEMBER(a2600_state::modeDC_switch_w){ modeDC_switch(offset, data); }
+WRITE8_MEMBER(a2600_state::mode3E_switch_w){ mode3E_switch(offset, data); }
+WRITE8_MEMBER(a2600_state::mode3E_RAM_switch_w){ mode3E_RAM_switch(offset, data); }
 WRITE8_MEMBER(a2600_state::mode3E_RAM_w)
 {
 	if ( m_mode3E_ram_enabled )
@@ -778,10 +794,10 @@ WRITE8_MEMBER(a2600_state::mode3E_RAM_w)
 		m_ram_base[offset] = data;
 	}
 }
-WRITE8_MEMBER(a2600_state::modeFV_switch_w){ modeFV_switch(machine(), offset, data); }
+WRITE8_MEMBER(a2600_state::modeFV_switch_w){ modeFV_switch(offset, data); }
 WRITE8_MEMBER(a2600_state::modeJVP_switch_w)
 {
-	modeJVP_switch(machine(), offset, data); m_riot_ram[ 0x20 + offset ] = data;
+	modeJVP_switch(offset, data); m_riot_ram[ 0x20 + offset ] = data;
 }
 
 
@@ -1585,26 +1601,17 @@ static const tia_interface a2600_tia_interface_pal =
 };
 
 
-static void common_init(running_machine &machine)
-{
-	a2600_state *state = machine.driver_data<a2600_state>();
-	screen_device *screen = machine.first_screen();
-	state->m_current_screen_height = screen->height();
-	state->m_extra_RAM = machine.memory().region_alloc("user2", 0x8600, 1, ENDIANNESS_LITTLE);
-	memset( state->m_riot_ram, 0x00, 0x80 );
-	state->m_current_reset_bank_counter = 0xFF;
-	state->m_dpc.oscillator = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_state::modeDPC_timer_callback),state));
-}
-
 MACHINE_START_MEMBER(a2600_state,a2600)
 {
-	common_init(machine());
+	screen_device *screen = machine().first_screen();
+	m_current_screen_height = screen->height();
+	m_extra_RAM = machine().memory().region_alloc("user2", 0x8600, 1, ENDIANNESS_LITTLE);
+	memset( m_riot_ram, 0x00, 0x80 );
+	m_current_reset_bank_counter = 0xFF;
+	m_dpc.oscillator = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_state::modeDPC_timer_callback),this));
+	m_cart = CART_MEMBER;
 }
 
-MACHINE_START_MEMBER(a2600_state,a2600p)
-{
-	common_init(machine());
-}
 
 #ifdef UNUSED_FUNCTIONS
 // try to detect 2600 controller setup. returns 32bits with left/right controller info
@@ -2269,7 +2276,7 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK_PAL / 3)    /* actually M6507 */
 	MCFG_CPU_PROGRAM_MAP(a2600_mem)
 
-	MCFG_MACHINE_START_OVERRIDE(a2600_state,a2600p)
+	MCFG_MACHINE_START_OVERRIDE(a2600_state,a2600)
 
 	/* video hardware */
 	MCFG_TIA_VIDEO_ADD("tia_video", a2600_tia_interface_pal)
