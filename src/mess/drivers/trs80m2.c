@@ -562,25 +562,24 @@ INPUT_PORTS_END
 static MC6845_UPDATE_ROW( trs80m2_update_row )
 {
 	trs80m2_state *state = device->machine().driver_data<trs80m2_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+
+	int x = 0;
 
 	for (int column = 0; column < x_count; column++)
 	{
-		int bit;
+		UINT8 code = state->m_video_ram[(ma + column) & 0x7ff];
+		offs_t address = ((code & 0x7f) << 4) | (ra & 0x0f);
+		UINT8 data = state->m_char_rom[address];
 
-		UINT16 address = (state->m_video_ram[(ma + column) & 0x7ff] << 4) | (ra & 0x0f);
-		UINT8 data = state->m_char_rom[address & 0x7ff];
+		int dcursor = (column == cursor_x);
+		int drevid = BIT(code, 7);
 
-		if (column == cursor_x)
+		for (int bit = 0; bit < 8; bit++)
 		{
-			data = 0xff;
-		}
+			int dout = BIT(data, 7);
+			int color = dcursor ^ drevid ^ dout;
 
-		for (bit = 0; bit < 8; bit++)
-		{
-			int x = (column * 8) + bit;
-
-			bitmap.pix32(y, x) = palette[BIT(data, 7)];
+			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[color];
 
 			data <<= 1;
 		}
@@ -633,7 +632,7 @@ UINT32 trs80m2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 {
 	if (m_blnkvid)
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(RGB_BLACK, cliprect);
 	}
 	else
 	{
@@ -1055,9 +1054,6 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(monochrome_green)
-
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_12_48MHz/8, mc6845_intf)
 
 	// devices
@@ -1164,7 +1160,7 @@ ROM_END
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
 COMP( 1979, trs80m2,	0,			0,		trs80m2,	trs80m2, driver_device,		0,		"Tandy Radio Shack",	"TRS-80 Model II",	GAME_NO_SOUND_HW | GAME_IMPERFECT_KEYBOARD )
-COMP( 1982, trs80m16,	trs80m2,	0,		trs80m16,	trs80m2, driver_device,	0,		"Tandy Radio Shack",	"TRS-80 Model 16",	GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
-//COMP( 1983, trs80m12, trs80m2,    0,      trs80m16,   trs80m2, driver_device,    0,      "Tandy Radio Shack",    "TRS-80 Model 12",  GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
-//COMP( 1984, trs80m16b,trs80m2,    0,      trs80m16,   trs80m2, driver_device,    0,      "Tandy Radio Shack",    "TRS-80 Model 16B", GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
-//COMP( 1985, tandy6k,  trs80m2,    0,      tandy6k,    trs80m2, driver_device,         0,      "Tandy Radio Shack",    "Tandy 6000 HD",    GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
+COMP( 1982, trs80m16,	trs80m2,	0,		trs80m16,	trs80m2, driver_device,		0,		"Tandy Radio Shack",	"TRS-80 Model 16",	GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
+//COMP( 1983, trs80m12, trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 12",  GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
+//COMP( 1984, trs80m16b,trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 16B", GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
+//COMP( 1985, tandy6k,  trs80m2,    0,      tandy6k,    trs80m2, driver_device,     0,      "Tandy Radio Shack",    "Tandy 6000 HD",    GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
