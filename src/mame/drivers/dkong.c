@@ -412,7 +412,6 @@ static void dkong_init_device_driver_data( running_machine &machine )
 
 MACHINE_START_MEMBER(dkong_state,dkong2b)
 {
-
 	dkong_init_device_driver_data(machine());
 	m_hardware_type = HARDWARE_TKG04;
 
@@ -455,7 +454,6 @@ MACHINE_START_MEMBER(dkong_state,s2650)
 
 MACHINE_START_MEMBER(dkong_state,radarscp)
 {
-
     MACHINE_START_CALL_MEMBER(dkong2b);
     m_hardware_type = HARDWARE_TRS02;
     m_vidhw = DKONG_BOARD;
@@ -463,7 +461,6 @@ MACHINE_START_MEMBER(dkong_state,radarscp)
 
 MACHINE_START_MEMBER(dkong_state,radarscp1)
 {
-
     MACHINE_START_CALL_MEMBER(dkong2b);
     m_hardware_type = HARDWARE_TRS01;
     m_vidhw = DKONG_BOARD;
@@ -471,7 +468,6 @@ MACHINE_START_MEMBER(dkong_state,radarscp1)
 
 MACHINE_START_MEMBER(dkong_state,dkong3)
 {
-
 	dkong_init_device_driver_data(machine());
 	m_hardware_type = HARDWARE_TKG04;
 }
@@ -607,7 +603,6 @@ WRITE8_MEMBER(dkong_state::s2650_mirror_w)
 
 READ8_MEMBER(dkong_state::epos_decrypt_rom)
 {
-
     if (offset & 0x01)
     {
         m_decrypt_counter = m_decrypt_counter - 1;
@@ -703,7 +698,6 @@ READ8_MEMBER(dkong_state::s2650_port1_r)
 
 WRITE8_MEMBER(dkong_state::dkong3_2a03_reset_w)
 {
-
 	if (data & 1)
 	{
 		m_dev_n2a03a->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -1642,7 +1636,6 @@ static void braze_decrypt_rom(running_machine &machine, UINT8 *dest)
 
 INTERRUPT_GEN_MEMBER(dkong_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -1669,40 +1662,39 @@ static MACHINE_CONFIG_START( dkong_base, dkong_state )
 
     MCFG_PALETTE_INIT_OVERRIDE(dkong_state,dkong2b)
     MCFG_VIDEO_START_OVERRIDE(dkong_state,dkong)
-
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( radarscp, dkong_base )
 
+	/* basic machine hardware */
     MCFG_MACHINE_START_OVERRIDE(dkong_state,radarscp)
     MCFG_PALETTE_LENGTH(RS_PALETTE_LENGTH)
     MCFG_PALETTE_INIT_OVERRIDE(dkong_state,radarscp)
 
     /* sound hardware */
     MCFG_FRAGMENT_ADD(radarscp_audio)
-
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( radarscp1, dkong_base )
 
+	/* basic machine hardware */
     MCFG_MACHINE_START_OVERRIDE(dkong_state,radarscp1)
     MCFG_PALETTE_LENGTH(RS_PALETTE_LENGTH)
     MCFG_PALETTE_INIT_OVERRIDE(dkong_state,radarscp1)
 
     /* sound hardware */
     MCFG_FRAGMENT_ADD(radarscp1_audio)
-
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( dkong2b, dkong_base )
 
+	/* basic machine hardware */
     MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
     MCFG_PALETTE_LENGTH(DK2B_PALETTE_LENGTH)
 
     /* sound hardware */
     MCFG_FRAGMENT_ADD(dkong2b_audio)
-
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( braze, dkong2b )
@@ -1744,17 +1736,16 @@ static MACHINE_CONFIG_DERIVED( dkongjr, dkong_base )
 
     /* sound hardware */
     MCFG_FRAGMENT_ADD(dkongjr_audio)
-
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pestplce, dkongjr )
 
+    /* video hardware */
     MCFG_GFXDECODE(pestplce)
     MCFG_PALETTE_LENGTH(DK2B_PALETTE_LENGTH)
     MCFG_PALETTE_INIT_OVERRIDE(dkong_state,dkong2b)  /* wrong! */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_pestplce)
-
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dkong3b, dkongjr )
@@ -1781,7 +1772,6 @@ static MACHINE_CONFIG_DERIVED( s2650, dkong2b )
     MCFG_DEVICE_CONFIG(hb_dma)
 
     MCFG_MACHINE_START_OVERRIDE(dkong_state,s2650)
-
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( spclforc, s2650 )
@@ -1792,7 +1782,6 @@ static MACHINE_CONFIG_DERIVED( spclforc, s2650 )
     /* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_spclforc)
-
 MACHINE_CONFIG_END
 
 /*************************************
@@ -1804,7 +1793,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( strtheat, dkong2b )
 
 	/* basic machine hardware */
-
     MCFG_CPU_MODIFY("maincpu")
     MCFG_CPU_IO_MAP(epos_readport)
 
@@ -1814,7 +1802,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( drakton, dkong2b )
 
 	/* basic machine hardware */
-
     MCFG_CPU_MODIFY("maincpu")
     MCFG_CPU_IO_MAP(epos_readport)
 
@@ -1824,7 +1811,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( drktnjr, dkongjr )
 
 	/* basic machine hardware */
-
     MCFG_CPU_MODIFY("maincpu")
     MCFG_CPU_IO_MAP(epos_readport)
 

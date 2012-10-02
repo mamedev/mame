@@ -83,7 +83,8 @@ public:
 		m_video_ram(*this,"video_ram"),
 		m_sprite_ram(*this,"sprite_ram"),
 		m_vidhw(DKONG_BOARD),
-		m_discrete(*this, "discrete") { }
+		m_discrete(*this, "discrete")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_video_ram;
@@ -110,7 +111,7 @@ public:
 	emu_timer *       m_scanline_timer;
 	INT8              m_vidhw;			/* Selected video hardware RS Conversion / TKG04 */
 	
-	required_device<discrete_device> m_discrete;
+	optional_device<discrete_device> m_discrete;
 	/* radar scope */
 
 	UINT8 *           m_gfx4;
