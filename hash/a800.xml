@@ -171,8 +171,6 @@ Compiled by K1W1
 
    - Beaumont                        ER       PUP (Primary Utility Pack)
 
-   - Chalkboard Inc.                 ER       Leo's Links
-
    - Elcomp                          ER       Atext-1 (Word Processor)
    - Elcomp                          ER       Atmas (Macro Assembler)
    - Elcomp                          ER       Atmona-1 (Machine Language Monitor)
@@ -407,7 +405,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="1400 super salt rev.c01.rom" size="16384" crc="10cb0520" sha1="994e48b05d2190e341d463696eff96c6e68eb843" offset="0" />
+				<rom name="1400 super salt rev.c01.rom" size="16384" crc="10cb0520" sha1="994e48b05d2190e341d463696eff96c6e68eb843" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -499,7 +497,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="oss 034m" />
 			<dataarea name="rom" size="16384">
-				<rom name="action! programming language v3.6 (alt).rom" size="16384" crc="eb905cb4" sha1="a9db2200bda7980436461e2d48d02f2a3f3b54ac" offset="0" />
+				<rom name="action! programming language v3.6 (alt).rom" size="16384" crc="eb905cb4" sha1="a9db2200bda7980436461e2d48d02f2a3f3b54ac" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -897,33 +895,33 @@ Compiled by K1W1
 	</software>
 
 	<software name="awriterc" supported="partial">
-		<description>AtariWriter (Version C)</description>
+		<description>AtariWriter (Rev. C)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8084" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="atariwriter (ver. c).rom" size="16384" crc="b4ddbec7" sha1="3b6ced3aeb08dafeac0b8c7f22d3c8b1aa6eebde" offset="0" /> <!-- Verified -->
+				<rom name="atariwriter (rev. c).rom" size="16384" crc="b4ddbec7" sha1="3b6ced3aeb08dafeac0b8c7f22d3c8b1aa6eebde" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="awriterb" cloneof="awriterc" supported="partial">
-		<description>AtariWriter (Version B)</description>
+		<description>AtariWriter (Rev. B)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8084" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="atariwriter (ver. b).rom" size="16384" crc="7be4533d" sha1="69a842a3b89e3f4780f3266262a4dabb57b2afb0" offset="0" />
+				<rom name="atariwriter (rev. b).rom" size="16384" crc="7be4533d" sha1="69a842a3b89e3f4780f3266262a4dabb57b2afb0" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="awritera" cloneof="awriterc" supported="partial">
-		<description>AtariWriter (Version A)</description>
+		<description>AtariWriter (Rev. A)</description>
 		<!-- Contains a joystick-checking routine at $8563. While in the main menu, it checks if the value under $8278 (stick 0) equals $8.
 		     If so, it displays the author's name on the screen. However, the author's name (stored at $8585) is erased from this image, so nothing gets displayed.
 		     It appears Atari noticed the easter egg and removed it in later version. -->
@@ -933,7 +931,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="atariwriter (ver. a).rom" size="16384" crc="1c2498a4" sha1="a13863ad3ec72a92744b6e4d0e6c17faf51d17a8" offset="0" /> <!-- Verified -->
+				<rom name="atariwriter (rev. a).rom" size="16384" crc="1c2498a4" sha1="a13863ad3ec72a92744b6e4d0e6c17faf51d17a8" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1082,20 +1080,6 @@ Compiled by K1W1
 			<feature name="cart_type" value="oss 043m" />
 			<dataarea name="rom" size="16384">
 				<rom name="basic xl programming language v1.02 (alt).rom" size="16384" crc="5752d29f" sha1="787402aa14379f70e5102a066473a0bdd490d834" offset="0" /> <!-- Verified -->
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="beefdrop" supported="partial">
-		<description>Beef Drop</description>
-		<!-- This is the last WIP version by Ken Siders, dated 2005-02-16. It is here as a placeholder until the dump of the final release version by Atari Age becomes avaialable. -->
-		<year>2005</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Ken Siders" />
-		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="xegs_cart" />
-			<dataarea name="rom" size="32768">
-				<rom name="beef drop (wip 2005-02-16).rom" size="32768" crc="6dd9e838" sha1="e95467917f873820580b5aca6b683bd0d13f1df6" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1253,7 +1237,20 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="bbsb" />
 			<dataarea name="rom" size="40960">
-				<rom name="bounty bob strikes back!.rom" size="40960" crc="0d00f072" sha1="57e3856b6b00e94490350156620dc61cf0669c17" offset="0" />
+				<rom name="bounty bob strikes back!.rom" size="40960" crc="cc7912ed" sha1="5a064551c22a267879c69b7cc97ea3c67f21b851" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbsba">
+		<description>Bounty Bob Strikes Back! (Alt)</description>
+		 <!-- Identical to the image contained in Bill Hogue's emulator. http://www.bigfivesoftware.com/Emulator/emulator.htm. -->
+		<year>1984</year>
+		<publisher>Big Five Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="bbsb" />
+			<dataarea name="rom" size="40960">
+				<rom name="bounty bob strikes back! (alt).rom" size="40960" crc="0d00f072" sha1="57e3856b6b00e94490350156620dc61cf0669c17" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1267,18 +1264,6 @@ Compiled by K1W1
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="bristles.rom" size="16384" crc="4263d64d" sha1="80a041bceb499e1466516488013aa4439b3db6f2" offset="0" /> <!-- Verified -->
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="brucelee" supported="no">
-		<description>Bruce Lee (Reproduction)</description>
-		<year>1984</year>
-		<publisher>Video 61 / Datasoft</publisher>
-		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="xegs_cart" />
-			<dataarea name="rom" size="65536">
-				<rom name="bruce lee (proto).rom" size="65536" crc="255dfc59" sha1="cad3ca79d8233df5068f3af99666889603c6dab2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1402,18 +1387,6 @@ Compiled by K1W1
 			<feature name="cart_type" value="blizzard 16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="selinger cartridge system turbo 2000.rom" size="16384" crc="f80b8c8c" sha1="ecc35ccf7ac95a70799a905d2a3238331a9bb02f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ccrisis" supported="partial">
-		<description>Castle Crisis</description>
-		<year>2003</year>
-		<publisher>Atari Age</publisher>
-		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="xegs_cart" />
-			<dataarea name="rom" size="32768">
-				<rom name="castle crisis.rom" size="32768" crc="7bc6e6dc" sha1="a8e73ef44a1a95ff21e763c9118a1ef49f178132" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3595,17 +3568,6 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="midimaze" supported="no">
-		<description>MIDI Maze (Reproduction)</description>
-		<year>199?</year>
-		<publisher>Video 61 / Atari</publisher>
-		<part name="cart" interface="xegs_cart">
-			<dataarea name="rom" size="131072">
-				<rom name="midi maze.rom" size="131072" crc="4695522f" sha1="8ed0e6b7afad565ea3adc8844a2e6840f7393b73" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="millpedp" cloneof="milliped">
 		<description>Millipede (Prototype)</description>
 		<year>1983</year>
@@ -3963,6 +3925,18 @@ Compiled by K1W1
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
 					<rom name="pastfinder.rom" size="16384" crc="14fddfb8" sha1="5fa7c9c35ee8b1a844222f035ab4e99a0eb7f9fd" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="explorer" cloneof="pastfind">
+		<description>Explorer (Prototype)</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 16k" />
+			<dataarea name="rom" size="16384">
+					<rom name="explorer (proto).rom" size="16384" crc="98a4e5b7" sha1="c00061d53278403e846cf3d008cbc2e2b862081e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4390,6 +4364,18 @@ Compiled by K1W1
 		</part>
 	</software>
 
+	<software name="risk">
+		<description>Risk (Prototype)</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 8k" />
+			<dataarea name="rom" size="8192">
+				<rom name="risk (proto).rom" size="8192" crc="688b0a0c" sha1="a69ea43c39f8db965fe2b421f4ae3a817bad30d4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="riveraid">
 		<description>River Raid</description>
 		<year>1983</year>
@@ -4528,17 +4514,6 @@ Compiled by K1W1
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="silicon warrior.rom" size="16384" crc="a7ecc8f7" sha1="e8d3fd99c5aba88688f2e9023ff06e62fd5267db" offset="0" /> <!-- Verified -->
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sinistar" supported="no">
-		<description>Sinistar (Reproduction)</description>
-		<year>199?</year>
-		<publisher>Video 61 / Atari</publisher>
-		<part name="cart" interface="xegs_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="sinistar.rom" size="32768" crc="6092c611" sha1="3993362cc0efa2325a5d72484bb05bb398e2655a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5149,18 +5124,6 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="tapper" supported="no">
-		<description>Tapper (Reproduction)</description>
-		<year>20??</year>
-		<publisher>Video 61 / Bally Midway</publisher>
-		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="xegs_cart" />
-			<dataarea name="rom" size="65536">
-				<rom name="tapper.rom" size="65536" crc="eff12440" sha1="f1be77d3b2e8e46a4b8acafe3a599341e308fb46" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="target">
 		<description>Target Electronic Banking</description>
 		<year>1986</year>
@@ -5710,18 +5673,6 @@ Compiled by K1W1
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="up up and away (proto).rom" size="16384" crc="a8261044" sha1="5d9988c4305213356f9459a900bcd411a5db43cb" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="vanguard" supported="no">
-		<description>Vanguard (5200 Conversion)</description>
-		<year>199?</year>
-		<publisher>Video 61 / Atari</publisher>
-		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="xegs_cart" />
-			<dataarea name="rom" size="65536">
-				<rom name="vanguard.rom" size="65536" crc="688ef8bd" sha1="3a47fc61a9f4c1a22c9fe180da3fd5057f186d67" offset="0" />
 			</dataarea>
 		</part>
 	</software>

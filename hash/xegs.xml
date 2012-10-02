@@ -86,6 +86,30 @@ Compiled by K1W1
 		</part>
 	</software>
 
+	<software name="beefdrop" supported="partial">
+		<description>Beef Drop</description>
+		<!-- This is the last WIP version by Ken Siders, dated 2005-02-16. It is here as a placeholder until the dump of the final release version by Atari Age becomes avaialable. -->
+		<year>2005</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Ken Siders" />
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="beef drop (wip 2005-02-16).rom" size="32768" crc="6dd9e838" sha1="e95467917f873820580b5aca6b683bd0d13f1df6" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brucelee">
+		<description>Bruce Lee (Reproduction)</description>
+		<year>1984</year>
+		<publisher>Video 61 / Datasoft</publisher>
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="bruce lee (proto).rom" size="65536" crc="255dfc59" sha1="cad3ca79d8233df5068f3af99666889603c6dab2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bzone">
 		<description>BattleZone</description>
 		<year>1987</year>
@@ -119,6 +143,17 @@ Compiled by K1W1
 			<feature name="peripheral" value="lightgun" /> <!-- Uses Lightgun -->
 			<dataarea name="rom" size="65536">
 				<rom name="bug hunt (atari)(1987)(rx8087).rom" size="65536" crc="246f3872" sha1="48eeec190dbb27e1311938498b087088077dd530" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccrisis">
+		<description>Castle Crisis</description>
+		<year>2003</year>
+		<publisher>Atari Age</publisher>
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="castle crisis.rom" size="32768" crc="7bc6e6dc" sha1="a8e73ef44a1a95ff21e763c9118a1ef49f178132" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -362,7 +397,18 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="midimaze" supported="partial">
+	<software name="midimaze">
+		<description>MIDI Maze (Reproduction)</description>
+		<year>199?</year>
+		<publisher>Video 61 / Atari</publisher>
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="midi maze.rom" size="131072" crc="4695522f" sha1="8ed0e6b7afad565ea3adc8844a2e6840f7393b73" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midimazep" cloneof="midimaze" supported="partial">
 		<description>MIDI Maze (Prototype)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
@@ -409,6 +455,17 @@ Compiled by K1W1
 		</part>
 	</software>
 
+	<software name="sinistar">
+		<description>Sinistar (Reproduction)</description>
+		<year>199?</year>
+		<publisher>Video 61 / Atari</publisher>
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="sinistar.rom" size="32768" crc="6092c611" sha1="3993362cc0efa2325a5d72484bb05bb398e2655a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starrai2">
 		<description>Star Raiders II</description>
 		<year>1987</year>
@@ -429,6 +486,17 @@ Compiled by K1W1
 		<part name="cart" interface="xegs_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="summer games (atari)(1987)(rx8098).rom" size="131072" crc="95e6932d" sha1="7082c5304cfdb2ecc2421a4feb36f4dfc0c62132" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tapper">
+		<description>Tapper (Reproduction)</description>
+		<year>20??</year>
+		<publisher>Video 61 / Bally Midway</publisher>
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="tapper.rom" size="65536" crc="eff12440" sha1="f1be77d3b2e8e46a4b8acafe3a599341e308fb46" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -456,7 +524,19 @@ Compiled by K1W1
 		</part>
 	</software>
 
-		<software name="xenophob">
+	<software name="vanguard">
+		<description>Vanguard (5200 Conversion)</description>
+		<year>199?</year>
+		<publisher>Video 61 / Atari</publisher>
+		<part name="cart" interface="xegs_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="vanguard.rom" size="65536" crc="688ef8bd" sha1="3a47fc61a9f4c1a22c9fe180da3fd5057f186d67" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="xenophob">
 		<description>Xenophobe (Reproduction)</description>
 		<year>2010</year>
 		<publisher>Video 61 / Atari</publisher>
