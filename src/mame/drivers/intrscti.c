@@ -202,7 +202,8 @@ DRIVER_INIT_MEMBER(intrscti_state,intrscti)
 		cpu[i+0x8000]=0xc9; // ret
 
 	/*
-    0x8208 -> string copy
+    0x8208 -> string copy (hl = pointer to videoram, de = pointer to epoxy block ROM)
+
     */
 
 	/* one of the protection sub-routines does this */
