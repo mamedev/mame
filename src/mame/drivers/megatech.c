@@ -539,7 +539,7 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 	MCFG_SCREEN_VBLANK_DRIVER(mtech_state, screen_eof_mtnew)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("sn2", SN76496_NEW, MASTER_CLOCK/15)
+	MCFG_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)

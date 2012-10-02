@@ -29,9 +29,9 @@ public:
     // optional information overrides
     virtual machine_config_constructor device_mconfig_additions() const;
 
-    required_device<sn76489_new_device> m_sn1;
-    required_device<sn76489_new_device> m_sn2;
-    required_device<sn76489_new_device> m_sn3;
+    required_device<sn76489_device> m_sn1;
+    required_device<sn76489_device> m_sn2;
+    required_device<sn76489_device> m_sn3;
 
 protected:
     virtual void device_start();

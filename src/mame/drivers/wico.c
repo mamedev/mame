@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( hcpu_map, AS_PROGRAM, 8, wico_state )
 	AM_RANGE(0x1fe2, 0x1fe2) AM_WRITE(muxen_w)
 	//AM_RANGE(0x1fe3, 0x1fe3) AM_WRITE(csols_w)
 	AM_RANGE(0x1fe4, 0x1fe4) AM_READNOP //AM_WRITE(msols_w)
-	AM_RANGE(0x1fe5, 0x1fe5) AM_DEVWRITE("sn76494", sn76494_new_device, write)
+	AM_RANGE(0x1fe5, 0x1fe5) AM_DEVWRITE("sn76494", sn76494_device, write)
 	AM_RANGE(0x1fe6, 0x1fe6) AM_WRITE(wdogcl_w)
 	AM_RANGE(0x1fe7, 0x1fe7) AM_WRITE(zcres_w)
 	AM_RANGE(0x1fe8, 0x1fe8) AM_WRITE(dled0_w)
@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( ccpu_map, AS_PROGRAM, 8, wico_state )
 	AM_RANGE(0x1fe2, 0x1fe2) AM_WRITE(muxen_w) // digit to display on diagnostic LED; d0=L will disable main displays
 	//AM_RANGE(0x1fe3, 0x1fe3) AM_WRITE(csols_w) // solenoid column
 	//AM_RANGE(0x1fe4, 0x1fe4) AM_READNOP AM_WRITE(msols_w) // solenoid row
-	AM_RANGE(0x1fe5, 0x1fe5) AM_DEVWRITE("sn76494", sn76494_new_device, write)
+	AM_RANGE(0x1fe5, 0x1fe5) AM_DEVWRITE("sn76494", sn76494_device, write)
 	AM_RANGE(0x1fe6, 0x1fe6) AM_WRITE(wdogcl_w) // watchdog clear
 	AM_RANGE(0x1fe7, 0x1fe7) AM_WRITE(zcres_w) // enable IRQ on hcpu
 	AM_RANGE(0x1fe8, 0x1fe8) AM_WRITE(dled0_w) // turn off diagnostic LED
@@ -405,7 +405,7 @@ static MACHINE_CONFIG_START( wico, wico_state )
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
-	MCFG_SOUND_ADD("sn76494", SN76494_NEW, 10000000 / 64)
+	MCFG_SOUND_ADD("sn76494", SN76494, 10000000 / 64)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END

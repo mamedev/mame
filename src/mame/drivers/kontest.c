@@ -167,8 +167,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kontest_io, AS_IO, 8, kontest_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("sn1", sn76489a_new_device, write)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("sn2", sn76489a_new_device, write)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("sn1", sn76489a_device, write)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("sn2", sn76489a_device, write)
 	AM_RANGE(0x08, 0x08) AM_WRITE(control_w)
 	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("IN0")
 	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("IN1")
@@ -280,11 +280,11 @@ static MACHINE_CONFIG_START( kontest, kontest_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("sn1", SN76489A_NEW, MAIN_CLOCK/16)
+	MCFG_SOUND_ADD("sn1", SN76489A, MAIN_CLOCK/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn2", SN76489A_NEW, MAIN_CLOCK/16)
+	MCFG_SOUND_ADD("sn2", SN76489A, MAIN_CLOCK/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END

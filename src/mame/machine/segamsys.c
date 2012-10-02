@@ -1649,12 +1649,12 @@ static void megatech_set_genz80_as_sms_standard_ports(running_machine &machine, 
 	/* INIT THE PORTS *********************************************************************************************/
 
 	address_space &io = machine.device(tag)->memory().space(AS_IO);
-	sn76496_new_device *sn = machine.device<sn76496_new_device>("snsnd");
+	sn76496_device *sn = machine.device<sn76496_device>("snsnd");
 
 	io.install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_port_r), FUNC(z80_unmapped_port_w));
 
 	io.install_legacy_read_handler      (0x7e, 0x7e, FUNC(md_sms_vdp_vcounter_r));
-	io.install_write_handler            (0x7e, 0x7f, write8_delegate(FUNC(sn76496_new_device::write),sn));
+	io.install_write_handler            (0x7e, 0x7f, write8_delegate(FUNC(sn76496_device::write),sn));
 	io.install_legacy_readwrite_handler (0xbe, 0xbe, FUNC(md_sms_vdp_data_r), FUNC(md_sms_vdp_data_w));
 	io.install_legacy_readwrite_handler (0xbf, 0xbf, FUNC(md_sms_vdp_ctrl_r), FUNC(md_sms_vdp_ctrl_w));
 
@@ -1747,7 +1747,7 @@ MACHINE_CONFIG_START( sms, driver_device )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76496_NEW, 3579540)
+	MCFG_SOUND_ADD("snsnd", SN76496, 3579540)
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

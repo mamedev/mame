@@ -924,11 +924,11 @@ static ADDRESS_MAP_START( lucky74_map, AS_PROGRAM, 8, lucky74_state )
 	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)		/* Input Ports 0 & 1 */
 	AM_RANGE(0xf080, 0xf083) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)		/* DSW 1, 2 & 3 */
 	AM_RANGE(0xf0c0, 0xf0c3) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)		/* DSW 4 */
-	AM_RANGE(0xf100, 0xf100) AM_DEVWRITE("sn1", sn76489_new_device, write)						/* SN76489 #1 */
+	AM_RANGE(0xf100, 0xf100) AM_DEVWRITE("sn1", sn76489_device, write)						/* SN76489 #1 */
 	AM_RANGE(0xf200, 0xf203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)		/* Input Ports 2 & 4 */
-	AM_RANGE(0xf300, 0xf300) AM_DEVWRITE("sn2", sn76489_new_device, write)						/* SN76489 #2 */
+	AM_RANGE(0xf300, 0xf300) AM_DEVWRITE("sn2", sn76489_device, write)						/* SN76489 #2 */
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)					/* YM2149 control */
-	AM_RANGE(0xf500, 0xf500) AM_DEVWRITE("sn3", sn76489_new_device, write)						/* SN76489 #3 */
+	AM_RANGE(0xf500, 0xf500) AM_DEVWRITE("sn3", sn76489_device, write)						/* SN76489 #3 */
 	AM_RANGE(0xf600, 0xf600) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)		/* YM2149 (Input Port 1) */
 	AM_RANGE(0xf700, 0xf701) AM_READWRITE(usart_8251_r, usart_8251_w)						/* USART 8251 port */
 	AM_RANGE(0xf800, 0xf803) AM_READWRITE(copro_sm7831_r, copro_sm7831_w)					/* SM7831 Co-Processor */
@@ -1388,15 +1388,15 @@ static MACHINE_CONFIG_START( lucky74, lucky74_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489_NEW, C_06B49P_CLKOUT_03)	/* 3 MHz. */
+	MCFG_SOUND_ADD("sn1", SN76489, C_06B49P_CLKOUT_03)	/* 3 MHz. */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn2", SN76489_NEW, C_06B49P_CLKOUT_03)	/* 3 MHz. */
+	MCFG_SOUND_ADD("sn2", SN76489, C_06B49P_CLKOUT_03)	/* 3 MHz. */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn3", SN76489_NEW, C_06B49P_CLKOUT_03)	/* 3 MHz. */
+	MCFG_SOUND_ADD("sn3", SN76489, C_06B49P_CLKOUT_03)	/* 3 MHz. */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 	MCFG_SOUND_CONFIG(psg_intf)
 

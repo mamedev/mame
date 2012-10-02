@@ -80,7 +80,7 @@ public:
 		m_sn(*this, "snsnd") { }
 
 	/* devices */
-	required_device<sn76489_new_device> m_sn;
+	required_device<sn76489_device> m_sn;
 
 	struct ef9369 m_pal;
 	emu_timer *m_fdc_timer;
@@ -833,7 +833,7 @@ static MACHINE_CONFIG_START( guab, guab_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* TODO: Verify clock */
-	MCFG_SOUND_ADD("snsnd", SN76489_NEW, 2000000)
+	MCFG_SOUND_ADD("snsnd", SN76489, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_CONFIG(psg_intf)
 

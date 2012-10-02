@@ -17,9 +17,9 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 
-	required_device<sn76496_new_device> m_sn1;
-    required_device<sn76496_new_device> m_sn2;
-    required_device<sn76496_new_device> m_sn3;
+	required_device<sn76496_device> m_sn1;
+    required_device<sn76496_device> m_sn2;
+    required_device<sn76496_device> m_sn3;
 
 	int m_sn76496_latch;
 	int m_sn76496_select;

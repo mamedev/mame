@@ -36,7 +36,7 @@ public:
 	m_sn(*this, "sn1")
 	{ }
 
-	optional_device<sn76489a_new_device> m_sn;
+	optional_device<sn76489a_device> m_sn;
 	UINT16 m_cursor_addr;
 	UINT16 m_cursor_raster;
 	UINT8 m_keyb_press;
@@ -1102,7 +1102,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A_NEW, MASTER_CLOCK) // unknown clock / divider
+	MCFG_SOUND_ADD("sn1", SN76489A, MASTER_CLOCK) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_CONFIG(psg_intf)
 

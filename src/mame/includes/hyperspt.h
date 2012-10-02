@@ -18,7 +18,7 @@ public:
 	required_shared_ptr<UINT8> m_scroll;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-	optional_device<sn76496_new_device> m_sn;
+	optional_device<sn76496_device> m_sn;
 	UINT8 *  m_scroll2;
 	UINT8 *  m_spriteram2;
 

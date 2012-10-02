@@ -100,7 +100,7 @@ const rom_entry *wangpc_keyboard_device::device_rom_region() const
 static ADDRESS_MAP_START( wangpc_keyboard_io, AS_IO, 8, wangpc_keyboard_device )
     //AM_RANGE(0x0000, 0xfeff) AM_READNOP
     AM_RANGE(0x47, 0x58) AM_MIRROR(0xff00) AM_READNOP
-    AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_DEVWRITE(SN76496_TAG, sn76496_new_device, write)
+    AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_DEVWRITE(SN76496_TAG, sn76496_device, write)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(kb_p1_r, kb_p1_w)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(kb_p2_w)
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE(kb_p3_w)
@@ -127,7 +127,7 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_keyboard )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76496_TAG, SN76496_NEW, 2000000) // ???
+	MCFG_SOUND_ADD(SN76496_TAG, SN76496, 2000000) // ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
     MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END

@@ -31,7 +31,7 @@ public:
 		m_sn(*this, SN76489A_TAG)
 	{ }
 
-	required_device<sn76489a_new_device> m_sn;
+	required_device<sn76489a_device> m_sn;
 
 	/* keyboard state */
 	UINT8 m_key_sense;

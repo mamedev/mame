@@ -116,8 +116,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sbugger_io_map, AS_IO, 8, sbugger_state )
 	AM_RANGE(0xe0, 0xe7) AM_DEVREADWRITE("i8156", i8155_device, io_r, io_w)
-	AM_RANGE(0xe8, 0xe8) AM_DEVWRITE("sn76489.1", sn76489_new_device, write)
-	AM_RANGE(0xe9, 0xe9) AM_DEVWRITE("sn76489.2", sn76489_new_device, write)
+	AM_RANGE(0xe8, 0xe8) AM_DEVWRITE("sn76489.1", sn76489_device, write)
+	AM_RANGE(0xe9, 0xe9) AM_DEVWRITE("sn76489.2", sn76489_device, write)
 ADDRESS_MAP_END
 
 
@@ -262,11 +262,11 @@ static MACHINE_CONFIG_START( sbugger, sbugger_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn76489.1", SN76489_NEW, 3000000)
+	MCFG_SOUND_ADD("sn76489.1", SN76489, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn76489.2", SN76489_NEW, 3000000)
+	MCFG_SOUND_ADD("sn76489.2", SN76489, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END

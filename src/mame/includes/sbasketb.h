@@ -22,7 +22,7 @@ public:
 	required_shared_ptr<UINT8> m_palettebank;
 	required_shared_ptr<UINT8> m_spriteram_select;
 	required_shared_ptr<UINT8> m_scroll;
-	optional_device<sn76489_new_device> m_sn;
+	optional_device<sn76489_device> m_sn;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

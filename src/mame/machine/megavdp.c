@@ -855,7 +855,7 @@ WRITE16_MEMBER( sega_genesis_vdp_device::megadriv_vdp_w )
 		case 0x14:
 		case 0x16:
 		{
-			// accessed by either segapsg_new_device or sn76496_new_device
+			// accessed by either segapsg_device or sn76496_device
 			sn76496_base_device *sn = space.machine().device<sn76496_base_device>(":snsnd");
 			if (ACCESSING_BITS_0_7) sn->write(space, 0, data & 0xff);
 			//if (ACCESSING_BITS_8_15) sn->write(space, 0, (data>>8) & 0xff);

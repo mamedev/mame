@@ -41,8 +41,8 @@ public:
 	/* devices */
 	cpu_device *m_maincpu;
 	cpu_device *m_audiocpu;
-	optional_device<sn76489_new_device> m_sn_1;
-	optional_device<sn76489_new_device> m_sn_2;
+	optional_device<sn76489_device> m_sn_1;
+	optional_device<sn76489_device> m_sn_2;
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(pinbo_sound_command_w);
 	DECLARE_READ8_MEMBER(sound_status_r);

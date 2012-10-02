@@ -28,7 +28,7 @@ public:
 	optional_shared_ptr<UINT8> m_soundlatch;
 
 	/* devices */
-	required_device<sn76489a_new_device> m_sn;
+	required_device<sn76489a_device> m_sn;
 
 	/* video-related */
 	tilemap_t * m_bg_tilemap;

@@ -35,7 +35,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<sn76489_new_device> m_sn;
+	optional_device<sn76489_device> m_sn;
 	required_device<saa5050_device> m_trom;
 
 	void check_interrupts();

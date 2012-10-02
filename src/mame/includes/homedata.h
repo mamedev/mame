@@ -40,7 +40,7 @@ public:
 	cpu_device *m_audiocpu;
 	dac_device *m_dac;
 	device_t *m_ym;
-	sn76489a_new_device *m_sn;
+	sn76489a_device *m_sn;
 	UINT8 m_prot_data;
 	DECLARE_READ8_MEMBER(mrokumei_keyboard_r);
 	DECLARE_WRITE8_MEMBER(mrokumei_keyboard_select_w);

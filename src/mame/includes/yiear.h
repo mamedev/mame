@@ -15,7 +15,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_spriteram2;
 	required_shared_ptr<UINT8> m_videoram;
-	optional_device<sn76489a_new_device> m_sn;
+	optional_device<sn76489a_device> m_sn;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

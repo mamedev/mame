@@ -50,8 +50,8 @@ public:
 	required_device<z80pio_device> m_pio;
 	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_fdc;
-	required_device<sn76489a_new_device> m_sn1;
-	required_device<sn76489a_new_device> m_sn2;
+	required_device<sn76489a_device> m_sn1;
+	required_device<sn76489a_device> m_sn2;
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(pasopia7_memory_ctrl_w);
@@ -1018,10 +1018,10 @@ static MACHINE_CONFIG_START( p7_base, pasopia7_state )
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn1", SN76489A_NEW, 1996800) // unknown clock / divider
+	MCFG_SOUND_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_CONFIG(psg_intf)
-	MCFG_SOUND_ADD("sn2", SN76489A_NEW, 1996800) // unknown clock / divider
+	MCFG_SOUND_ADD("sn2", SN76489A, 1996800) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_CONFIG(psg_intf)
 

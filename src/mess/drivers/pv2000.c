@@ -190,7 +190,7 @@ static ADDRESS_MAP_START( pv2000_io_map, AS_IO, 8, pv2000_state )
 	AM_RANGE(0x20, 0x20) AM_READWRITE(pv2000_keys_lo_r, pv2000_keys_w)
 
 	//sn76489a
-	AM_RANGE(0x40, 0x40) AM_READ(pv2000_keys_mod_r) AM_DEVWRITE("sn76489a", sn76489a_new_device, write)
+	AM_RANGE(0x40, 0x40) AM_READ(pv2000_keys_mod_r) AM_DEVWRITE("sn76489a", sn76489a_device, write)
 
 	/* Cassette input. Gets hit a lot after a GLOAD command */
 	AM_RANGE(0x60, 0x60) AM_READWRITE(cass_in,cass_out)
@@ -434,7 +434,7 @@ static MACHINE_CONFIG_START( pv2000, pv2000_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489a", SN76489A_NEW, XTAL_7_15909MHz/2)	/* 3.579545 MHz */
+	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	/* 3.579545 MHz */
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)

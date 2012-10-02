@@ -822,7 +822,7 @@ static WRITE8_HANDLER( megadriv_z80_vdp_write )
 		case 0x13:
 		case 0x15:
 		case 0x17:
-			// accessed by either segapsg_new_device or sn76496_new_device
+			// accessed by either segapsg_device or sn76496_device
 			space.machine().device<sn76496_base_device>("snsnd")->write(space, 0, data);
 			break;
 
@@ -1201,7 +1201,7 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("snsnd", SEGAPSG_NEW, MASTER_CLOCK_NTSC/15)
+	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
@@ -1256,7 +1256,7 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("snsnd", SEGAPSG_NEW, MASTER_CLOCK_PAL/15)
+	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_PAL/15)
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
@@ -1283,7 +1283,7 @@ MACHINE_CONFIG_DERIVED( genesis_32x, megadriv )
 	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("snsnd", SEGAPSG_NEW, MASTER_CLOCK_NTSC/15)
+	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
@@ -1305,7 +1305,7 @@ MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("snsnd", SEGAPSG_NEW, MASTER_CLOCK_NTSC/15)
+	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
