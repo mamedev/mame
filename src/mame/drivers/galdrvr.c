@@ -6644,7 +6644,7 @@ GAME( 1985, superbon,  0,        scobra,   superbon, galaxian_state,  superbon, 
 //GAME( 1983, ozon1,    0,        ozon1,    ozon1, galaxold_state,    galaxian, ROT90,  "Proma", "Ozon I", GAME_SUPPORTS_SAVE )
 //GAME( 1983, ladybugg, ladybug,  galaxian/*batman2*/,  ladybugg, XXX_CLASS, ladybugg, ROT270, "bootleg", "Lady Bug (bootleg on Galaxian hardware)", GAME_SUPPORTS_SAVE )
 //GAME( 1980, vpool,    hustler,  mooncrst, vpool, galaxian_state,    galaxian, ROT90,  "bootleg", "Video Pool (bootleg on Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
-//GAME( 1984, drivfrcg, drivfrcp, drivfrcg, drivfrcg, galaxold_state, galaxian, ROT90,  "Shinkai Inc. (Magic Eletronics USA license)", "Driving Force (Galaxian conversion)", GAME_SUPPORTS_SAVE )
+//GAME( 1984, drivfrcg, drivfrcp, drivfrcg, drivfrcg, galaxold_state, galaxian, ROT90,  "Shinkai Inc. (Magic Electronics USA license)", "Driving Force (Galaxian conversion)", GAME_SUPPORTS_SAVE )
 //GAME( 1985, drivfrcb, drivfrcp, drivfrcg, drivfrcg, galaxold_state, galaxian, ROT90,  "bootleg", "Driving Force (Galaxian conversion bootleg)", GAME_SUPPORTS_SAVE )
 //GAME( 1983, bongo,    0,        bongo,    bongo, galaxold_state,    galaxian, ROT90,  "Jetsoft", "Bongo", GAME_SUPPORTS_SAVE )
 //GAME( 1983, hunchbkg, hunchbak,   hunchbkg, hunchbkg, galaxold_state, galaxian, ROT90,  "Century Electronics", "Hunchback (Galaxian hardware)", GAME_SUPPORTS_SAVE )

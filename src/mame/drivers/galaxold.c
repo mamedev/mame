@@ -3232,7 +3232,7 @@ GAME( 1983, harem,    0,        harem,    harem, driver_device,    0,        ROT
 
 /* S2650 games */
 GAME( 1983, hunchbkg, hunchbak,	hunchbkg, hunchbkg, driver_device, 0,        ROT90,  "Century Electronics", "Hunchback (Galaxian hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1984, drivfrcg, drivfrcp, drivfrcg, drivfrcg, driver_device, 0,        ROT90,  "Shinkai Inc. (Magic Eletronics USA license)", "Driving Force (Galaxian conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1984, drivfrcg, drivfrcp, drivfrcg, drivfrcg, driver_device, 0,        ROT90,  "Shinkai Inc. (Magic Electronics USA license)", "Driving Force (Galaxian conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1984, drivfrct, drivfrcp, drivfrcg, drivfrcg, driver_device, 0,        ROT90,  "bootleg (EMT Germany)", "Top Racer (bootleg of Driving Force)", GAME_SUPPORTS_SAVE ) // Video Klein PCB
 GAME( 1985, drivfrcb, drivfrcp, drivfrcg, drivfrcg, driver_device, 0,        ROT90,  "bootleg (Elsys Software)", "Driving Force (Galaxian conversion bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1986, racknrol, 0,        racknrol, racknrol, driver_device, 0,	      ROT0,   "Senko Industries (Status license from Shinkai Inc.)", "Rack + Roll", GAME_SUPPORTS_SAVE )
