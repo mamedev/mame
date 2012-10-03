@@ -2158,6 +2158,8 @@ $(DRIVERS)/neogeo.o:	$(LAYOUT)/neogeo.lh
 $(DRIVERS)/norautp.o:	$(LAYOUT)/noraut11.lh \
 			$(LAYOUT)/noraut12.lh
 
+$(DRIVERS)/nsm.o:	$(LAYOUT)/nsm.lh
+
 $(DRIVERS)/overdriv.o:	$(LAYOUT)/overdriv.lh
 
 $(DRIVERS)/peplus.o:	$(LAYOUT)/peplus.lh \
