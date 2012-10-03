@@ -667,7 +667,6 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, UINT
 
 	// determine the current fraction of a sample
 	UINT32 basefrac = (basetime - basesample * input_stream.m_attoseconds_per_sample) / ((input_stream.m_attoseconds_per_sample + FRAC_ONE - 1) >> FRAC_BITS);
-	assert(basefrac >= 0);
 	assert(basefrac < FRAC_ONE);
 
 	// compute the stepping fraction

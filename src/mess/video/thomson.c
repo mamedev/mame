@@ -1215,7 +1215,7 @@ PALETTE_INIT ( thom )
 /* write to video memory through addresses 0x4000-0x5fff */
 WRITE8_HANDLER ( to7_vram_w )
 {
-	assert( offset >= 0 && offset < 0x2000 );
+	assert( offset < 0x2000 );
 	/* force two topmost color bits to 1 */
 	if ( thom_mode_point )
 		data |= 0xc0;
@@ -1254,7 +1254,7 @@ unsigned to7_lightpen_gpl ( running_machine &machine, int decx, int decy )
    or 0x0000-0x1fff (MO) */
 WRITE8_HANDLER ( to770_vram_w )
 {
-	assert( offset >= 0 && offset < 0x2000 );
+	assert( offset < 0x2000 );
 	if ( thom_vram[ offset + thom_mode_point ] == data )
 		return;
 	thom_vram[ offset + thom_mode_point ] = data;
@@ -1274,7 +1274,7 @@ WRITE8_HANDLER ( to770_vram_w )
 WRITE8_HANDLER ( to8_sys_lo_w )
 {
 	UINT8* dst = thom_vram + offset + 0x6000;
-	assert( offset >= 0 && offset < 0x2000 );
+	assert( offset < 0x2000 );
 	if ( *dst == data )
 		return;
 	*dst = data;
@@ -1287,7 +1287,7 @@ WRITE8_HANDLER ( to8_sys_lo_w )
 WRITE8_HANDLER ( to8_sys_hi_w )
 {
 	UINT8* dst = thom_vram + offset + 0x4000;
-	assert( offset >= 0 && offset < 0x2000 );
+	assert( offset < 0x2000 );
 	if ( *dst == data ) return;
 	*dst = data;
 	/* dirty whole scanline */
@@ -1301,7 +1301,7 @@ WRITE8_HANDLER ( to8_sys_hi_w )
 WRITE8_HANDLER ( to8_data_lo_w )
 {
 	UINT8* dst = thom_vram + offset + 0x4000 * to8_data_vpage + 0x2000;
-	assert( offset >= 0 && offset < 0x2000 );
+	assert( offset < 0x2000 );
 	if ( *dst == data )
 		return;
 	*dst = data;
@@ -1316,7 +1316,7 @@ WRITE8_HANDLER ( to8_data_lo_w )
 WRITE8_HANDLER ( to8_data_hi_w )
 {
 	UINT8* dst = thom_vram + offset + 0x4000 * to8_data_vpage;
-	assert( offset >= 0 && offset < 0x2000 );
+	assert( offset < 0x2000 );
 	if ( *dst == data )
 		return;
 	*dst = data;
@@ -1332,7 +1332,7 @@ WRITE8_HANDLER ( to8_data_hi_w )
 WRITE8_HANDLER ( to8_vcart_w )
 {
 	UINT8* dst = thom_vram + offset + 0x4000 * to8_cart_vpage;
-	assert( offset>=0 && offset < 0x4000 );
+	assert( offset < 0x4000 );
 	if ( *dst == data )
 		return;
 	*dst = data;

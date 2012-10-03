@@ -111,9 +111,9 @@ private:
 		// getters
 		be_parameter_type type() const { return m_type; }
 		UINT64 immediate() const { assert(m_type == PTYPE_IMMEDIATE); return m_value; }
-		int ireg() const { assert(m_type == PTYPE_INT_REGISTER); assert(m_value >= 0 && m_value < x64emit::REG_MAX); return m_value; }
-		int freg() const { assert(m_type == PTYPE_FLOAT_REGISTER); assert(m_value >= 0 && m_value < x64emit::REG_MAX); return m_value; }
-		int vreg() const { assert(m_type == PTYPE_VECTOR_REGISTER); assert(m_value >= 0 && m_value < x64emit::REG_MAX); return m_value; }
+		int ireg() const { assert(m_type == PTYPE_INT_REGISTER); assert(m_value < x64emit::REG_MAX); return m_value; }
+		int freg() const { assert(m_type == PTYPE_FLOAT_REGISTER); assert(m_value < x64emit::REG_MAX); return m_value; }
+		int vreg() const { assert(m_type == PTYPE_VECTOR_REGISTER); assert(m_value < x64emit::REG_MAX); return m_value; }
 		void *memory() const { assert(m_type == PTYPE_MEMORY); return reinterpret_cast<void *>(m_value); }
 
 		// type queries
