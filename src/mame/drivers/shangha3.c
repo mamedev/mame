@@ -21,7 +21,7 @@ blocken:
 - attract mode tries to read at 0x80000-0xfffff area, returning 0 in there
   freezes the demo play for some frames (MT #00985). For now I've returned $ff,
   but needs HW tests to check out what lies in there (maybe a ROM mirror).
-- how to play screen is bogus, it basically doesn't follow the ball at all.
+- how to play screen is bogus, it basically loses sync pretty soon.
 
 ***************************************************************************/
 
@@ -60,14 +60,6 @@ READ16_MEMBER(shangha3_state::shangha3_prot_r)
 WRITE16_MEMBER(shangha3_state::shangha3_prot_w)
 {
 	logerror("PC %04x: write %02x to 20004e\n",space.device().safe_pc(),data);
-}
-
-
-READ16_MEMBER(shangha3_state::heberpop_gfxrom_r)
-{
-	UINT8 *ROM = memregion("gfx1")->base();
-
-	return ROM[2*offset] | (ROM[2*offset+1] << 8);
 }
 
 
@@ -157,7 +149,7 @@ static ADDRESS_MAP_START( heberpop_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram")	/* gfx & work ram */
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(shangha3_flipscreen_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(shangha3_gfxlist_addr_w)
-	AM_RANGE(0x800000, 0xb7ffff) AM_READ(heberpop_gfxrom_r)
+	AM_RANGE(0x800000, 0xb7ffff) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blocken_map, AS_PROGRAM, 16, shangha3_state )
@@ -173,7 +165,7 @@ static ADDRESS_MAP_START( blocken_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram")	/* gfx & work ram */
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(shangha3_flipscreen_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(shangha3_gfxlist_addr_w)
-	AM_RANGE(0x800000, 0xb7ffff) AM_READ(heberpop_gfxrom_r)
+	AM_RANGE(0x800000, 0xb7ffff) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END
 
 
@@ -616,7 +608,7 @@ ROM_START( heberpop )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "hbpic34.bin",  0x0000, 0x10000, CRC(0cf056c6) SHA1(9992cd3879d9a57fcb784fc1e11d6b6d87e5a366) )
 
-	ROM_REGION( 0x380000, "gfx1", 0 )	/* don't dispose, read during tests */
+	ROM_REGION( 0x380000, "gfx1", ROMREGION_ERASEFF )
 	ROM_LOAD( "hbpic98.bin",  0x000000, 0x80000, CRC(a599100a) SHA1(f2e517256a42b3fa4a047bbe742d714f568cc117) )
 	ROM_LOAD( "hbpic99.bin",  0x080000, 0x80000, CRC(fb8bb12f) SHA1(78c1fec1371d312e113d92803dd59acc36604989) )
 	ROM_LOAD( "hbpic100.bin", 0x100000, 0x80000, CRC(05a0f765) SHA1(4f44cf367c3697eb6c245297c9d05160d7d94e24) )
@@ -637,7 +629,7 @@ ROM_START( blocken )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ic34.bin",     0x0000, 0x10000, CRC(23e446ff) SHA1(82c03b45b337696b0f8293c446544d7ee080d415) )
 
-	ROM_REGION( 0x380000, "gfx1", 0 )	/* don't dispose, read during tests */
+	ROM_REGION( 0x380000, "gfx1", ROMREGION_ERASEFF )
 	ROM_LOAD( "ic98j.bin",    0x000000, 0x80000, CRC(35dda273) SHA1(95850d12ca1557c14bc471ddf925aaf423313ff0) )
 	ROM_LOAD( "ic99j.bin",    0x080000, 0x80000, CRC(ce43762b) SHA1(e1c51ea0b54b5febdee127619e15f1cda650cb4c) )
 	/* 100000-1fffff empty */

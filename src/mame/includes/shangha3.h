@@ -16,7 +16,6 @@ public:
 	UINT8 m_drawmode_table[16];
 	DECLARE_READ16_MEMBER(shangha3_prot_r);
 	DECLARE_WRITE16_MEMBER(shangha3_prot_w);
-	DECLARE_READ16_MEMBER(heberpop_gfxrom_r);
 	DECLARE_WRITE16_MEMBER(shangha3_coinctrl_w);
 	DECLARE_WRITE16_MEMBER(heberpop_coinctrl_w);
 	DECLARE_WRITE16_MEMBER(blocken_coinctrl_w);
