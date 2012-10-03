@@ -223,9 +223,9 @@ void pes_state::machine_reset()
 /******************************************************************************
  Driver Init and Timer Callbacks
 ******************************************************************************/
-/*static TIMER_CALLBACK( serial_read_cb )
+/*static TIMER_CALLBACK_MEMBER(pes_state::serial_read_cb )
 {
-    machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(outfifo_read_cb));
+    machine().scheduler().timer_set(attotime::from_hz(10000), FUNC(outfifo_read_cb));
 }*/
 
 DRIVER_INIT_MEMBER(pes_state,pes)

@@ -146,6 +146,8 @@ public:
 	DECLARE_MACHINE_RESET(tm990_189_v);
 	
 	TIMER_DEVICE_CALLBACK_MEMBER(display_callback);
+	TIMER_CALLBACK_MEMBER(clear_load);
+	void hold_load();
 private:
 	void draw_digit(void);
 	void led_set(int number, bool state);
@@ -156,16 +158,11 @@ private:
 
 #define displayena_duration attotime::from_usec(4500)	/* Can anyone confirm this? 74LS123 connected to C=0.1uF and R=100kOhm */
 
-
-static void hold_load(running_machine &machine);
-
-
-
 MACHINE_RESET_MEMBER(tm990189_state,tm990_189)
 {
 	m_tms9980a->set_ready(ASSERT_LINE);
 	m_tms9980a->set_hold(CLEAR_LINE);
-	hold_load(machine());
+	hold_load();
 }
 
 MACHINE_START_MEMBER(tm990189_state,tm990_189)
@@ -195,7 +192,7 @@ MACHINE_RESET_MEMBER(tm990189_state,tm990_189_v)
 {
 	m_tms9980a->set_ready(ASSERT_LINE);
 	m_tms9980a->set_hold(CLEAR_LINE);
-	hold_load(machine());
+	hold_load();
 }
 
 /*
@@ -210,20 +207,18 @@ READ8_MEMBER( tm990189_state::interrupt_level )
     hold and debounce load line (emulation is inaccurate)
 */
 
-static TIMER_CALLBACK(clear_load)
+TIMER_CALLBACK_MEMBER(tm990189_state::clear_load)
 {
-	tm990189_state *state = machine.driver_data<tm990189_state>();
-	state->m_load_state = FALSE;
-	state->m_tms9980a->set_input_line(0, CLEAR_LINE);
+	m_load_state = FALSE;
+	m_tms9980a->set_input_line(0, CLEAR_LINE);
 }
 
-static void hold_load(running_machine &machine)
+void tm990189_state::hold_load()
 {
-	tm990189_state *state = machine.driver_data<tm990189_state>();
-	state->m_load_state = TRUE;
-	state->m_ic_state = 2;		// LOAD interrupt
-	state->m_tms9980a->set_input_line(0, ASSERT_LINE);
-	machine.scheduler().timer_set(attotime::from_msec(100), FUNC(clear_load));
+	m_load_state = TRUE;
+	m_ic_state = 2;		// LOAD interrupt
+	m_tms9980a->set_input_line(0, ASSERT_LINE);
+	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(tm990189_state::clear_load),this));
 }
 
 /*
@@ -232,7 +227,7 @@ static void hold_load(running_machine &machine)
 INPUT_CHANGED_MEMBER( tm990189_state::load_interrupt )
 {
 	// When depressed, fire LOAD (neg logic)
-	if (newval==CLEAR_LINE) hold_load(machine());
+	if (newval==CLEAR_LINE) hold_load();
 }
 
 
@@ -558,7 +553,7 @@ WRITE8_MEMBER( tm990189_state::external_operation )
 		m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		break;
 	case 7: // LREX: trigger LOAD
-		hold_load(machine());
+		hold_load();
 		break;
 	default: // undefined
 		break;

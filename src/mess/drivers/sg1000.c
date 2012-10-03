@@ -1020,7 +1020,7 @@ static const sn76496_config psg_intf =
 ***************************************************************************/
 
 /*-------------------------------------------------
-    TIMER_CALLBACK( lightgun_tick )
+    TIMER_CALLBACK_MEMBER( lightgun_tick )
 -------------------------------------------------*/
 
 TIMER_CALLBACK_MEMBER(sg1000_state::lightgun_tick)

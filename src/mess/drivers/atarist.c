@@ -476,7 +476,7 @@ void st_state::mouse_tick()
 
 
 //-------------------------------------------------
-//  TIMER_CALLBACK( st_mouse_tick )
+//  TIMER_CALLBACK_MEMBER( st_mouse_tick )
 //-------------------------------------------------
 
 TIMER_CALLBACK_MEMBER(st_state::st_mouse_tick)
@@ -772,7 +772,7 @@ void ste_state::dmasound_tick()
 
 
 //-------------------------------------------------
-//  TIMER_CALLBACK( atariste_dmasound_tick )
+//  TIMER_CALLBACK_MEMBER( atariste_dmasound_tick )
 //-------------------------------------------------
 
 TIMER_CALLBACK_MEMBER(ste_state::atariste_dmasound_tick)
@@ -1022,7 +1022,7 @@ void ste_state::microwire_tick()
 
 
 //-------------------------------------------------
-//  TIMER_CALLBACK( atariste_microwire_tick )
+//  TIMER_CALLBACK_MEMBER( atariste_microwire_tick )
 //-------------------------------------------------
 
 TIMER_CALLBACK_MEMBER(ste_state::atariste_microwire_tick)
