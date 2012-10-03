@@ -165,7 +165,7 @@ VIDEO_START_MEMBER(ninjakd2_state,arkarea)
 
 VIDEO_START_MEMBER(ninjakd2_state,robokid)
 {
-	m_bank_mask = 1;
+	m_vram_bank_mask = 1;
 
 	videoram_alloc(machine(), 0x0800);
 
@@ -184,7 +184,7 @@ VIDEO_START_MEMBER(ninjakd2_state,robokid)
 
 VIDEO_START_MEMBER(ninjakd2_state,omegaf)
 {
-	m_bank_mask = 7;
+	m_vram_bank_mask = 7;
 
 	videoram_alloc(machine(), 0x2000);
 
@@ -226,17 +226,17 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_fgvideoram_w)
 
 WRITE8_MEMBER(ninjakd2_state::robokid_bg0_bank_w)
 {
-	m_robokid_bg0_bank = data & m_bank_mask;
+	m_robokid_bg0_bank = data & m_vram_bank_mask;
 }
 
 WRITE8_MEMBER(ninjakd2_state::robokid_bg1_bank_w)
 {
-	m_robokid_bg1_bank = data & m_bank_mask;
+	m_robokid_bg1_bank = data & m_vram_bank_mask;
 }
 
 WRITE8_MEMBER(ninjakd2_state::robokid_bg2_bank_w)
 {
-	m_robokid_bg2_bank = data & m_bank_mask;
+	m_robokid_bg2_bank = data & m_vram_bank_mask;
 }
 
 READ8_MEMBER(ninjakd2_state::robokid_bg0_videoram_r)
