@@ -1165,8 +1165,8 @@ static int x,ret;
 	} else if ((offset >= 0x00600000/4) && (offset < 0x00601000/4)) {
 		ret=pcrtc[offset-0x00600000/4];
 		logerror("NV_2A: read PCRTC[%06X] value %08X\n",offset*4-0x00600000,ret);
-	} else if ((offset >= 0x00000000/4) && (offset < 0x00001000/4)) {
-		ret=pmc[offset-0x00000000/4];
+	} else if (                             offset < 0x00001000/4) {
+		ret=pmc[offset];
 		logerror("NV_2A: read PMC[%06X] value %08X\n",offset*4-0x00000000,ret);
 	} else if ((offset >= 0x00800000/4) && (offset < 0x00900000/4)) {
 		// 32 channels size 0x10000 each, 8 subchannels per channel size 0x2000 each
@@ -1200,8 +1200,8 @@ WRITE32_MEMBER( nv2a_renderer::geforce_w )
 	} else if ((offset >= 0x00600000/4) && (offset < 0x00601000/4)) {
 		COMBINE_DATA(pcrtc+offset-0x00600000/4);
 		logerror("NV_2A: write PCRTC[%06X]=%08X\n",offset*4-0x00600000,data & mem_mask);
-	} else if ((offset >= 0x00000000/4) && (offset < 0x00001000/4)) {
-		COMBINE_DATA(pmc+offset-0x00000000/4);
+	} else if (                             offset < 0x00001000/4) {
+		COMBINE_DATA(pmc+offset);
 		logerror("NV_2A: write PMC[%06X]=%08X\n",offset*4-0x00000000,data & mem_mask);
 	} else if ((offset >= 0x00800000/4) && (offset < 0x00900000/4)) {
 		// 32 channels size 0x10000 each, 8 subchannels per channel size 0x2000 each

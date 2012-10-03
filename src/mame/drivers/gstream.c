@@ -237,9 +237,9 @@ WRITE32_MEMBER(gstream_state::gstream_vram_w)
 
 	if (ACCESSING_BITS_24_31)
 	{
-		if (offset >= 0x000 / 4 && offset < 0x400 / 4)
+		if (offset < 0x400 / 4)
 		{
-			m_tilemap1->mark_tile_dirty(offset - (0x000 / 4));
+			m_tilemap1->mark_tile_dirty(offset);
 		}
 		else if (offset >= 0x400 / 4 && offset < 0x800 / 4)
 		{

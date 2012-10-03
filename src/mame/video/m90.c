@@ -278,7 +278,7 @@ static void markdirty(tilemap_t *tmap,int page,offs_t offset)
 {
 	offset -= page * 0x2000;
 
-	if (offset >= 0 && offset < 0x2000)
+	if (offset < 0x2000)
 		tmap->mark_tile_dirty(offset/2);
 }
 

@@ -23,7 +23,7 @@ INLINE UINT16 *address_to_vram(artmagic_state *state, offs_t *address)
 {
 	offs_t original = *address;
 	*address = TOWORD(original & 0x001fffff);
-	if (original >= 0x00000000 && original < 0x001fffff)
+	if (original < 0x001fffff)
 		return state->m_vram0;
 	else if (original >= 0x00400000 && original < 0x005fffff)
 		return state->m_vram1;

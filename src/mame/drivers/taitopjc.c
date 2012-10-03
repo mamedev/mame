@@ -110,7 +110,6 @@ UINT32 taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_rgb3
 				tile &= 0xff;
 				tile -= 0x40;
 
-				if (tile < 0) tile = 0;
 				if (tile > 127) tile = 127;
 
 				for (y=0; y < 16; y++)

@@ -430,7 +430,7 @@ static READ8_HANDLER( bank_r )
 	UINT8* bank = state->memregion("mtbios")->base();
 	UINT32 fulladdress = state->m_mp_bios_bank_addr + offset;
 
-	if ((fulladdress >= 0x000000) && (fulladdress <= 0x3fffff)) // ROM Addresses
+	if (fulladdress <= 0x3fffff) // ROM Addresses
 	{
 		if (state->m_bios_mode & MP_ROM)
 		{
@@ -470,7 +470,7 @@ static WRITE8_HANDLER( bank_w )
 	mplay_state *state = space.machine().driver_data<mplay_state>();
 	UINT32 fulladdress = state->m_mp_bios_bank_addr + offset;
 
-	if ((fulladdress >= 0x000000) && (fulladdress <= 0x3fffff)) // ROM / Megaplay Custom Addresses
+	if (fulladdress <= 0x3fffff) // ROM / Megaplay Custom Addresses
 	{
 		if (offset <= 0x1fff && (state->m_bios_width & 0x08))
 		{

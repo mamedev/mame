@@ -841,7 +841,7 @@ READ32_MEMBER(firebeat_state::soundflash_r)
 {
 	UINT32 r = 0;
 	fujitsu_29f016a_device *chip;
-	if (offset >= 0 && offset < 0x200000/4)
+	if (offset < 0x200000/4)
 	{
 		chip = m_flash[1];
 	}
@@ -874,7 +874,7 @@ READ32_MEMBER(firebeat_state::soundflash_r)
 WRITE32_MEMBER(firebeat_state::soundflash_w)
 {
 	fujitsu_29f016a_device *chip;
-	if (offset >= 0 && offset < 0x200000/4)
+	if (offset < 0x200000/4)
 	{
 		chip = m_flash[1];
 	}
@@ -1802,7 +1802,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(firebeat_state::soundram_r)
 {
-	if (offset >= 0 && offset < 0x200000)
+	if (offset < 0x200000)
 	{
 		return m_flash[1]->read(offset & 0x1fffff);
 	}

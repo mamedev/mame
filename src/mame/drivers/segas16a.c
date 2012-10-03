@@ -585,7 +585,7 @@ READ8_MEMBER( segas16a_state::mcu_io_r )
 	{
 		case 0:
 			// access watchdog? (unsure about this one)
-			if (offset >= 0x0000 && offset < 0x3fff)
+			if (                         offset < 0x3fff)
 				return watchdog_reset_r(space, 0);
 
 			// access main work RAM

@@ -174,7 +174,7 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 				cx += incxx;
 				cy += incxy;
 
-				if (offs<0 || offs>=src_size)
+				if (offs>=src_size)
 					continue;
 
 				if (srcx < src_minx || srcx > src_maxx || srcy < src_miny || srcy > src_maxy)
@@ -244,7 +244,7 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 				cx += incxx;
 				cy += incxy;
 
-				if (offs<0 || offs>=src_size)
+				if (offs>=src_size)
 					continue;
 
 				if (srcx < src_minx || srcx > src_maxx || srcy < src_miny || srcy > src_maxy)
