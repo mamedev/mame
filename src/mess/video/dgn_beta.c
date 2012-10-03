@@ -294,8 +294,7 @@ void dgnbeta_vid_set_gctrl(running_machine &machine, int data)
 
 
 /* Write handler for colour, pallate ram */
-WRITE8_HANDLER(dgnbeta_colour_ram_w)
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_colour_ram_w)
 {
-	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
-	state->m_ColourRAM[offset]=data&0x0f;			/* Colour ram 4 bit and write only to CPU */
+	m_ColourRAM[offset]=data&0x0f;			/* Colour ram 4 bit and write only to CPU */
 }

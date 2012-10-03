@@ -160,13 +160,6 @@ public:
 	TIMER_CALLBACK_MEMBER(keyscan_callback);
 };
 
-/* IO chips */
-
-
-struct msm_rx_t
-{
-};
-
 /*----------- defined in drivers/mbc55x.c -----------*/
 
 extern const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3];
@@ -179,9 +172,6 @@ extern const struct pic8259_interface mbc55x_pic8259_config;
 extern const i8255_interface mbc55x_ppi8255_interface;
 extern const i8251_interface mbc55x_i8251a_interface;
 extern const i8251_interface mbc55x_i8251b_interface;
-
-
-
 
 
 /* Memory controller */
@@ -204,10 +194,6 @@ extern const i8251_interface mbc55x_i8251b_interface;
 #define RAM_BANK_SIZE	(64*1024)
 #define RAM_BANK_COUNT	15
 
-
-DECLARE_READ8_HANDLER(ppi8255_r);
-DECLARE_WRITE8_HANDLER(ppi8255_w);
-
 /* Floppy drive interface */
 
 #define FDC_PAUSE				10000
@@ -218,9 +204,6 @@ extern const wd17xx_interface mbc55x_wd17xx_interface;
 /*----------- defined in video/mbc55x.c -----------*/
 
 extern const mc6845_interface mb55x_mc6845_intf;
-
-DECLARE_READ16_HANDLER (mbc55x_video_io_r);
-DECLARE_WRITE16_HANDLER (mbc55x_video_io_w);
 
 
 #define RED                     0

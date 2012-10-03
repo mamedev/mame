@@ -194,65 +194,59 @@ static void bebox_mbreg32_w(UINT32 *target, UINT64 data, UINT64 mem_mask)
 }
 
 
-READ64_HANDLER( bebox_cpu0_imask_r )
+READ64_MEMBER(bebox_state::bebox_cpu0_imask_r )
 {
-	bebox_state *state = space.machine().driver_data<bebox_state>();
-	return ((UINT64) state->m_cpu_imask[0]) << 32;
+	return ((UINT64) m_cpu_imask[0]) << 32;
 }
 
-READ64_HANDLER( bebox_cpu1_imask_r )
+READ64_MEMBER(bebox_state::bebox_cpu1_imask_r )
 {
-	bebox_state *state = space.machine().driver_data<bebox_state>();
-	return ((UINT64) state->m_cpu_imask[1]) << 32;
+	return ((UINT64) m_cpu_imask[1]) << 32;
 }
 
-READ64_HANDLER( bebox_interrupt_sources_r )
+READ64_MEMBER(bebox_state::bebox_interrupt_sources_r )
 {
-	bebox_state *state = space.machine().driver_data<bebox_state>();
-	return ((UINT64) state->m_interrupts) << 32;
+	return ((UINT64) m_interrupts) << 32;
 }
 
-WRITE64_HANDLER( bebox_cpu0_imask_w )
+WRITE64_MEMBER(bebox_state::bebox_cpu0_imask_w )
 {
-	bebox_state *state = space.machine().driver_data<bebox_state>();
-	UINT32 old_imask = state->m_cpu_imask[0];
+	UINT32 old_imask = m_cpu_imask[0];
 
-	bebox_mbreg32_w(&state->m_cpu_imask[0], data, mem_mask);
+	bebox_mbreg32_w(&m_cpu_imask[0], data, mem_mask);
 
-	if (old_imask != state->m_cpu_imask[0])
+	if (old_imask != m_cpu_imask[0])
 	{
 		if (LOG_CPUIMASK)
 		{
 			logerror("BeBox CPU #0 pc=0x%08X imask=0x%08x\n",
-				(unsigned) space.device().safe_pc( ), state->m_cpu_imask[0]);
+				(unsigned) space.device().safe_pc( ), m_cpu_imask[0]);
 		}
 		bebox_update_interrupts(space.machine());
 	}
 }
 
-WRITE64_HANDLER( bebox_cpu1_imask_w )
-{
-	bebox_state *state = space.machine().driver_data<bebox_state>();
-	UINT32 old_imask = state->m_cpu_imask[1];
+WRITE64_MEMBER(bebox_state::bebox_cpu1_imask_w )
+{	
+	UINT32 old_imask = m_cpu_imask[1];
 
-	bebox_mbreg32_w(&state->m_cpu_imask[1], data, mem_mask);
+	bebox_mbreg32_w(&m_cpu_imask[1], data, mem_mask);
 
-	if (old_imask != state->m_cpu_imask[1])
+	if (old_imask != m_cpu_imask[1])
 	{
 		if (LOG_CPUIMASK)
 		{
 			logerror("BeBox CPU #1 pc=0x%08X imask=0x%08x\n",
-				(unsigned) space.device() .safe_pc( ), state->m_cpu_imask[1]);
+				(unsigned) space.device() .safe_pc( ), m_cpu_imask[1]);
 		}
 		bebox_update_interrupts(space.machine());
 	}
 }
 
-READ64_HANDLER( bebox_crossproc_interrupts_r )
+READ64_MEMBER(bebox_state::bebox_crossproc_interrupts_r )
 {
-	bebox_state *state = space.machine().driver_data<bebox_state>();
 	UINT32 result;
-	result = state->m_crossproc_interrupts;
+	result = m_crossproc_interrupts;
 
 	/* return a different result depending on which CPU is accessing this handler */
 	if (&space != &space.machine().device("ppc1")->memory().space(AS_PROGRAM))
@@ -263,9 +257,8 @@ READ64_HANDLER( bebox_crossproc_interrupts_r )
 	return ((UINT64) result) << 32;
 }
 
-WRITE64_HANDLER( bebox_crossproc_interrupts_w )
+WRITE64_MEMBER(bebox_state::bebox_crossproc_interrupts_w )
 {
-	bebox_state *state = space.machine().driver_data<bebox_state>();
 	static const struct
 	{
 		UINT32 mask;
@@ -280,16 +273,16 @@ WRITE64_HANDLER( bebox_crossproc_interrupts_w )
 		{ 0x04000000, 1, 0, 0/*PPC_INPUT_LINE_TLBISYNC*/ }
 	};
 	int i, line;
-	UINT32 old_crossproc_interrupts = state->m_crossproc_interrupts;
+	UINT32 old_crossproc_interrupts = m_crossproc_interrupts;
 	static const char *const cputags[] = { "ppc1", "ppc2" };
 
-	bebox_mbreg32_w(&state->m_crossproc_interrupts, data, mem_mask);
+	bebox_mbreg32_w(&m_crossproc_interrupts, data, mem_mask);
 
 	for (i = 0; i < ARRAY_LENGTH(crossproc_map); i++)
 	{
-		if ((old_crossproc_interrupts ^ state->m_crossproc_interrupts) & crossproc_map[i].mask)
+		if ((old_crossproc_interrupts ^ m_crossproc_interrupts) & crossproc_map[i].mask)
 		{
-			if (state->m_crossproc_interrupts & crossproc_map[i].mask)
+			if (m_crossproc_interrupts & crossproc_map[i].mask)
 				line = crossproc_map[i].active_high ? ASSERT_LINE : CLEAR_LINE;
 			else
 				line = crossproc_map[i].active_high ? CLEAR_LINE : ASSERT_LINE;
@@ -308,7 +301,7 @@ WRITE64_HANDLER( bebox_crossproc_interrupts_w )
 	}
 }
 
-WRITE64_HANDLER( bebox_processor_resets_w )
+WRITE64_MEMBER(bebox_state::bebox_processor_resets_w )
 {
 	UINT8 b = (UINT8) (data >> 56);
 
@@ -505,11 +498,10 @@ static const struct pc_fdc_interface bebox_fdc_interface =
  *
  *************************************/
 
-READ64_HANDLER( bebox_interrupt_ack_r )
+READ64_MEMBER(bebox_state::bebox_interrupt_ack_r )
 {
-	bebox_state *state = space.machine().driver_data<bebox_state>();
 	int result;
-	result = pic8259_acknowledge( state->m_devices.pic8259_master );
+	result = pic8259_acknowledge( m_devices.pic8259_master );
 	bebox_set_irq_bit(space.machine(), 5, 0);	/* HACK */
 	return ((UINT64) result) << 56;
 }
@@ -566,10 +558,10 @@ static device_t *ide_device(running_machine &machine)
 	return machine.device("ide");
 }
 
-READ8_HANDLER( bebox_800001F0_r ) { return ide_controller_r(ide_device(space.machine()), offset + 0x1F0, 1); }
-WRITE8_HANDLER( bebox_800001F0_w ) { ide_controller_w(ide_device(space.machine()), offset + 0x1F0, 1, data); }
+READ8_MEMBER(bebox_state::bebox_800001F0_r ) { return ide_controller_r(ide_device(space.machine()), offset + 0x1F0, 1); }
+WRITE8_MEMBER(bebox_state::bebox_800001F0_w ) { ide_controller_w(ide_device(space.machine()), offset + 0x1F0, 1, data); }
 
-READ64_HANDLER( bebox_800003F0_r )
+READ64_MEMBER(bebox_state::bebox_800003F0_r )
 {
 	UINT64 result = read64be_with_read8_handler(pc_fdc_r, space, offset, mem_mask | 0xFFFF);
 
@@ -588,7 +580,7 @@ READ64_HANDLER( bebox_800003F0_r )
 }
 
 
-WRITE64_HANDLER( bebox_800003F0_w )
+WRITE64_MEMBER(bebox_state::bebox_800003F0_w )
 {
 	write64be_with_write8_handler(pc_fdc_w, space, offset, data, mem_mask | 0xFFFF);
 
@@ -616,7 +608,7 @@ void bebox_ide_interrupt(device_t *device, int state)
  *
  *************************************/
 /*
-static READ64_HANDLER( bebox_video_r )
+static READ64_MEMBER(bebox_state::bebox_video_r )
 {
 	UINT64 result = 0;
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
@@ -640,7 +632,7 @@ static READ64_HANDLER( bebox_video_r )
 }
 
 
-static WRITE64_HANDLER( bebox_video_w )
+static WRITE64_MEMBER(bebox_state::bebox_video_w )
 {
 	data = FLIPENDIAN_INT64(data);
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
@@ -669,83 +661,80 @@ static WRITE64_HANDLER( bebox_video_w )
  *************************************/
 
 
-READ8_HANDLER(bebox_page_r)
-{
-	bebox_state *state = space.machine().driver_data<bebox_state>();
-	UINT8 data = state->m_at_pages[offset % 0x10];
+READ8_MEMBER(bebox_state::bebox_page_r)
+{	
+	UINT8 data = m_at_pages[offset % 0x10];
 
 	switch(offset % 8)
 	{
 		case 1:
-			data = state->m_dma_offset[(offset / 8) & 1][2];
+			data = m_dma_offset[(offset / 8) & 1][2];
 			break;
 		case 2:
-			data = state->m_dma_offset[(offset / 8) & 1][3];
+			data = m_dma_offset[(offset / 8) & 1][3];
 			break;
 		case 3:
-			data = state->m_dma_offset[(offset / 8) & 1][1];
+			data = m_dma_offset[(offset / 8) & 1][1];
 			break;
 		case 7:
-			data = state->m_dma_offset[(offset / 8) & 1][0];
+			data = m_dma_offset[(offset / 8) & 1][0];
 			break;
 	}
 	return data;
 }
 
 
-WRITE8_HANDLER(bebox_page_w)
-{
-	bebox_state *state = space.machine().driver_data<bebox_state>();
-	state->m_at_pages[offset % 0x10] = data;
+WRITE8_MEMBER(bebox_state::bebox_page_w)
+{	
+	m_at_pages[offset % 0x10] = data;
 
 	switch(offset % 8)
 	{
 		case 1:
-			state->m_dma_offset[(offset / 8) & 1][2] &= 0xFF00;
-			state->m_dma_offset[(offset / 8) & 1][2] |= ((UINT16 ) data) << 0;
+			m_dma_offset[(offset / 8) & 1][2] &= 0xFF00;
+			m_dma_offset[(offset / 8) & 1][2] |= ((UINT16 ) data) << 0;
 			break;
 		case 2:
-			state->m_dma_offset[(offset / 8) & 1][3] &= 0xFF00;
-			state->m_dma_offset[(offset / 8) & 1][3] |= ((UINT16 ) data) << 0;
+			m_dma_offset[(offset / 8) & 1][3] &= 0xFF00;
+			m_dma_offset[(offset / 8) & 1][3] |= ((UINT16 ) data) << 0;
 			break;
 		case 3:
-			state->m_dma_offset[(offset / 8) & 1][1] &= 0xFF00;
-			state->m_dma_offset[(offset / 8) & 1][1] |= ((UINT16 ) data) << 0;
+			m_dma_offset[(offset / 8) & 1][1] &= 0xFF00;
+			m_dma_offset[(offset / 8) & 1][1] |= ((UINT16 ) data) << 0;
 			break;
 		case 7:
-			state->m_dma_offset[(offset / 8) & 1][0] &= 0xFF00;
-			state->m_dma_offset[(offset / 8) & 1][0] |= ((UINT16 ) data) << 0;
+			m_dma_offset[(offset / 8) & 1][0] &= 0xFF00;
+			m_dma_offset[(offset / 8) & 1][0] |= ((UINT16 ) data) << 0;
 			break;
 	}
 }
 
 
-WRITE8_HANDLER(bebox_80000480_w)
-{
-	bebox_state *state = space.machine().driver_data<bebox_state>();
+WRITE8_MEMBER(bebox_state::bebox_80000480_w)
+{	
 	switch(offset % 8)
 	{
 		case 1:
-			state->m_dma_offset[(offset / 8) & 1][2] &= 0x00FF;
-			state->m_dma_offset[(offset / 8) & 1][2] |= ((UINT16 ) data) << 8;
+			m_dma_offset[(offset / 8) & 1][2] &= 0x00FF;
+			m_dma_offset[(offset / 8) & 1][2] |= ((UINT16 ) data) << 8;
 			break;
 		case 2:
-			state->m_dma_offset[(offset / 8) & 1][3] &= 0x00FF;
-			state->m_dma_offset[(offset / 8) & 1][3] |= ((UINT16 ) data) << 8;
+			m_dma_offset[(offset / 8) & 1][3] &= 0x00FF;
+			m_dma_offset[(offset / 8) & 1][3] |= ((UINT16 ) data) << 8;
 			break;
 		case 3:
-			state->m_dma_offset[(offset / 8) & 1][1] &= 0x00FF;
-			state->m_dma_offset[(offset / 8) & 1][1] |= ((UINT16 ) data) << 8;
+			m_dma_offset[(offset / 8) & 1][1] &= 0x00FF;
+			m_dma_offset[(offset / 8) & 1][1] |= ((UINT16 ) data) << 8;
 			break;
 		case 7:
-			state->m_dma_offset[(offset / 8) & 1][0] &= 0x00FF;
-			state->m_dma_offset[(offset / 8) & 1][0] |= ((UINT16 ) data) << 8;
+			m_dma_offset[(offset / 8) & 1][0] &= 0x00FF;
+			m_dma_offset[(offset / 8) & 1][0] |= ((UINT16 ) data) << 8;
 			break;
 	}
 }
 
 
-READ8_HANDLER(bebox_80000480_r)
+READ8_MEMBER(bebox_state::bebox_80000480_r)
 {
 	fatalerror("NYI\n");
 }
@@ -760,21 +749,21 @@ WRITE_LINE_MEMBER(bebox_state::bebox_dma_hrq_changed)
 }
 
 
-static READ8_HANDLER( bebox_dma_read_byte )
+READ8_MEMBER(bebox_state::bebox_dma_read_byte )
 {
-	bebox_state *state = space.machine().driver_data<bebox_state>();
-	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	address_space& prog_space = machine().device<cpu_device>("ppc1")->space(AS_PROGRAM); // get the right address space
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0x7FFF0000;
-	return space.read_byte(page_offset + offset);
+	return prog_space.read_byte(page_offset + offset);
 }
 
 
-static WRITE8_HANDLER( bebox_dma_write_byte )
+WRITE8_MEMBER(bebox_state::bebox_dma_write_byte )
 {
-	bebox_state *state = space.machine().driver_data<bebox_state>();
-	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	address_space& prog_space = machine().device<cpu_device>("ppc1")->space(AS_PROGRAM); // get the right address space
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0x7FFF0000;
-	space.write_byte(page_offset + offset, data);
+	prog_space.write_byte(page_offset + offset, data);
 }
 
 
@@ -808,8 +797,8 @@ I8237_INTERFACE( bebox_dma8237_1_config )
 {
 	DEVCB_DRIVER_LINE_MEMBER(bebox_state,bebox_dma_hrq_changed),
 	DEVCB_DRIVER_LINE_MEMBER(bebox_state,bebox_dma8237_out_eop),
-	DEVCB_MEMORY_HANDLER("ppc1", PROGRAM, bebox_dma_read_byte),
-	DEVCB_MEMORY_HANDLER("ppc1", PROGRAM, bebox_dma_write_byte),
+	DEVCB_DRIVER_MEMBER(bebox_state, bebox_dma_read_byte),
+	DEVCB_DRIVER_MEMBER(bebox_state, bebox_dma_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(bebox_state,bebox_dma8237_fdc_dack_r), DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(bebox_state,bebox_dma8237_fdc_dack_w), DEVCB_NULL },
 	{ DEVCB_DRIVER_LINE_MEMBER(bebox_state,pc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(bebox_state,pc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(bebox_state,pc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(bebox_state,pc_dack3_w) }
@@ -869,7 +858,7 @@ const struct pit8253_config bebox_pit8254_config =
  *
  *************************************/
 
-READ8_HANDLER( bebox_flash_r )
+READ8_MEMBER(bebox_state::bebox_flash_r )
 {
 	fujitsu_29f016a_device *flash = space.machine().device<fujitsu_29f016a_device>("flash");
 	offset = (offset & ~7) | (7 - (offset & 7));
@@ -877,7 +866,7 @@ READ8_HANDLER( bebox_flash_r )
 }
 
 
-WRITE8_HANDLER( bebox_flash_w )
+WRITE8_MEMBER(bebox_state::bebox_flash_w )
 {
 	fujitsu_29f016a_device *flash = space.machine().device<fujitsu_29f016a_device>("flash");
 	offset = (offset & ~7) | (7 - (offset & 7));
@@ -920,67 +909,65 @@ static const struct kbdc8042_interface bebox_8042_interface =
  *************************************/
 
 
-static READ64_HANDLER( scsi53c810_r )
-{
-	bebox_state *state = space.machine().driver_data<bebox_state>();
+READ64_MEMBER(bebox_state::scsi53c810_r )
+{	
 	int reg = offset*8;
 	UINT64 r = 0;
 	if (!(mem_mask & U64(0xff00000000000000))) {
-		r |= (UINT64)state->m_lsi53c810->lsi53c810_reg_r(reg+0) << 56;
+		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+0) << 56;
 	}
 	if (!(mem_mask & U64(0x00ff000000000000))) {
-		r |= (UINT64)state->m_lsi53c810->lsi53c810_reg_r(reg+1) << 48;
+		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+1) << 48;
 	}
 	if (!(mem_mask & U64(0x0000ff0000000000))) {
-		r |= (UINT64)state->m_lsi53c810->lsi53c810_reg_r(reg+2) << 40;
+		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+2) << 40;
 	}
 	if (!(mem_mask & U64(0x000000ff00000000))) {
-		r |= (UINT64)state->m_lsi53c810->lsi53c810_reg_r(reg+3) << 32;
+		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+3) << 32;
 	}
 	if (!(mem_mask & U64(0x00000000ff000000))) {
-		r |= (UINT64)state->m_lsi53c810->lsi53c810_reg_r(reg+4) << 24;
+		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+4) << 24;
 	}
 	if (!(mem_mask & U64(0x0000000000ff0000))) {
-		r |= (UINT64)state->m_lsi53c810->lsi53c810_reg_r(reg+5) << 16;
+		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+5) << 16;
 	}
 	if (!(mem_mask & U64(0x000000000000ff00))) {
-		r |= (UINT64)state->m_lsi53c810->lsi53c810_reg_r(reg+6) << 8;
+		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+6) << 8;
 	}
 	if (!(mem_mask & U64(0x00000000000000ff))) {
-		r |= (UINT64)state->m_lsi53c810->lsi53c810_reg_r(reg+7) << 0;
+		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+7) << 0;
 	}
 
 	return r;
 }
 
 
-static WRITE64_HANDLER( scsi53c810_w )
-{
-	bebox_state *state = space.machine().driver_data<bebox_state>();
+WRITE64_MEMBER(bebox_state::scsi53c810_w )
+{	
 	int reg = offset*8;
 	if (!(mem_mask & U64(0xff00000000000000))) {
-		state->m_lsi53c810->lsi53c810_reg_w(reg+0, data >> 56);
+		m_lsi53c810->lsi53c810_reg_w(reg+0, data >> 56);
 	}
 	if (!(mem_mask & U64(0x00ff000000000000))) {
-		state->m_lsi53c810->lsi53c810_reg_w(reg+1, data >> 48);
+		m_lsi53c810->lsi53c810_reg_w(reg+1, data >> 48);
 	}
 	if (!(mem_mask & U64(0x0000ff0000000000))) {
-		state->m_lsi53c810->lsi53c810_reg_w(reg+2, data >> 40);
+		m_lsi53c810->lsi53c810_reg_w(reg+2, data >> 40);
 	}
 	if (!(mem_mask & U64(0x000000ff00000000))) {
-		state->m_lsi53c810->lsi53c810_reg_w(reg+3, data >> 32);
+		m_lsi53c810->lsi53c810_reg_w(reg+3, data >> 32);
 	}
 	if (!(mem_mask & U64(0x00000000ff000000))) {
-		state->m_lsi53c810->lsi53c810_reg_w(reg+4, data >> 24);
+		m_lsi53c810->lsi53c810_reg_w(reg+4, data >> 24);
 	}
 	if (!(mem_mask & U64(0x0000000000ff0000))) {
-		state->m_lsi53c810->lsi53c810_reg_w(reg+5, data >> 16);
+		m_lsi53c810->lsi53c810_reg_w(reg+5, data >> 16);
 	}
 	if (!(mem_mask & U64(0x000000000000ff00))) {
-		state->m_lsi53c810->lsi53c810_reg_w(reg+6, data >> 8);
+		m_lsi53c810->lsi53c810_reg_w(reg+6, data >> 8);
 	}
 	if (!(mem_mask & U64(0x00000000000000ff))) {
-		state->m_lsi53c810->lsi53c810_reg_w(reg+7, data >> 0);
+		m_lsi53c810->lsi53c810_reg_w(reg+7, data >> 0);
 	}
 }
 
@@ -1040,8 +1027,7 @@ void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, i
 						address_space &space = device->machine().device("ppc1")->memory().space(AS_PROGRAM);
 
 						addr = (state->m_scsi53c810_data[5] | 0xC0000000) & ~0xFF;
-						space.install_legacy_read_handler(addr, addr + 0xFF, FUNC(scsi53c810_r));
-						space.install_legacy_write_handler(addr, addr + 0xFF, FUNC(scsi53c810_w));
+						space.install_readwrite_handler(addr, addr + 0xFF, read64_delegate(FUNC(bebox_state::scsi53c810_r),state), write64_delegate(FUNC(bebox_state::scsi53c810_w),state));
 					}
 				}
 				break;

@@ -54,6 +54,33 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
 	DECLARE_WRITE_LINE_MEMBER(bebox_timer0_w);
+	DECLARE_READ64_MEMBER(bebox_cpu0_imask_r);
+	DECLARE_READ64_MEMBER(bebox_cpu1_imask_r);
+	DECLARE_READ64_MEMBER(bebox_interrupt_sources_r);
+	DECLARE_READ64_MEMBER(bebox_crossproc_interrupts_r);
+	DECLARE_READ8_MEMBER(bebox_800001F0_r);
+	DECLARE_READ64_MEMBER(bebox_800003F0_r);
+	DECLARE_READ64_MEMBER(bebox_interrupt_ack_r);
+	DECLARE_READ8_MEMBER(bebox_page_r);
+	DECLARE_READ8_MEMBER(bebox_80000480_r);
+	DECLARE_READ8_MEMBER(bebox_flash_r);
+
+	DECLARE_WRITE64_MEMBER(bebox_cpu0_imask_w);
+	DECLARE_WRITE64_MEMBER(bebox_cpu1_imask_w);
+	DECLARE_WRITE64_MEMBER(bebox_crossproc_interrupts_w);
+	DECLARE_WRITE64_MEMBER(bebox_processor_resets_w);
+	DECLARE_WRITE8_MEMBER(bebox_800001F0_w);
+	DECLARE_WRITE64_MEMBER(bebox_800003F0_w);
+	DECLARE_WRITE8_MEMBER(bebox_page_w);
+	DECLARE_WRITE8_MEMBER(bebox_80000480_w);
+	DECLARE_WRITE8_MEMBER(bebox_flash_w);
+	DECLARE_READ8_MEMBER(at_dma8237_1_r);
+	DECLARE_WRITE8_MEMBER(at_dma8237_1_w);
+	DECLARE_READ8_MEMBER(bebox_dma_read_byte);
+	DECLARE_WRITE8_MEMBER(bebox_dma_write_byte);
+	DECLARE_READ64_MEMBER(scsi53c810_r);
+	DECLARE_WRITE64_MEMBER(scsi53c810_w);
+	DECLARE_READ64_MEMBER(bb_slave_64be_r);
 };
 
 
@@ -68,30 +95,6 @@ extern const ins8250_interface bebox_uart_inteface_0;
 extern const ins8250_interface bebox_uart_inteface_1;
 extern const ins8250_interface bebox_uart_inteface_2;
 extern const ins8250_interface bebox_uart_inteface_3;
-
-
-
-
-DECLARE_READ64_HANDLER( bebox_cpu0_imask_r );
-DECLARE_READ64_HANDLER( bebox_cpu1_imask_r );
-DECLARE_READ64_HANDLER( bebox_interrupt_sources_r );
-DECLARE_READ64_HANDLER( bebox_crossproc_interrupts_r );
-DECLARE_READ8_HANDLER( bebox_800001F0_r );
-DECLARE_READ64_HANDLER( bebox_800003F0_r );
-DECLARE_READ64_HANDLER( bebox_interrupt_ack_r );
-DECLARE_READ8_HANDLER( bebox_page_r );
-DECLARE_READ8_HANDLER( bebox_80000480_r );
-DECLARE_READ8_HANDLER( bebox_flash_r );
-
-DECLARE_WRITE64_HANDLER( bebox_cpu0_imask_w );
-DECLARE_WRITE64_HANDLER( bebox_cpu1_imask_w );
-DECLARE_WRITE64_HANDLER( bebox_crossproc_interrupts_w );
-DECLARE_WRITE64_HANDLER( bebox_processor_resets_w );
-DECLARE_WRITE8_HANDLER( bebox_800001F0_w );
-DECLARE_WRITE64_HANDLER( bebox_800003F0_w );
-DECLARE_WRITE8_HANDLER( bebox_page_w );
-DECLARE_WRITE8_HANDLER( bebox_80000480_w );
-DECLARE_WRITE8_HANDLER( bebox_flash_w );
 
 void bebox_ide_interrupt(device_t *device, int state);
 void bebox_set_irq_bit(running_machine &machine, unsigned int interrupt_bit, int val);

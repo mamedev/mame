@@ -326,28 +326,26 @@ static void SetDefaultTask(running_machine &machine)
 }
 
 // Return the value of a page register
-READ8_HANDLER( dgn_beta_page_r )
+READ8_MEMBER(dgn_beta_state::dgn_beta_page_r)
 {
-	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
-	return state->m_PageRegs[state->m_PIATaskReg][offset].value;
+	return m_PageRegs[m_PIATaskReg][offset].value;
 }
 
 // Write to a page register, writes to the register, and then checks to see
 // if memory banking is active, if it is, it calls UpdateBanks, to actually
 // setup the mappings.
 
-WRITE8_HANDLER( dgn_beta_page_w )
+WRITE8_MEMBER(dgn_beta_state::dgn_beta_page_w )
 {
-	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
-	state->m_PageRegs[state->m_PIATaskReg][offset].value=data;
+	m_PageRegs[m_PIATaskReg][offset].value=data;
 
-	LOG_PAGE_WRITE(("PageRegWrite : task=$%X  offset=$%X value=$%X\n",state->m_PIATaskReg,offset,data));
+	LOG_PAGE_WRITE(("PageRegWrite : task=$%X  offset=$%X value=$%X\n",m_PIATaskReg,offset,data));
 
-	if (state->m_EnableMapRegs)
+	if (m_EnableMapRegs)
 	{
-		UpdateBanks(space.machine(), offset,offset);
+		UpdateBanks(machine(), offset,offset);
 		if (offset==15)
-			UpdateBanks(space.machine(), offset+1,offset+1);
+			UpdateBanks(machine(), offset+1,offset+1);
 	}
 }
 
@@ -887,7 +885,7 @@ const wd17xx_interface dgnbeta_wd17xx_interface =
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
-READ8_HANDLER(dgnbeta_wd2797_r)
+READ8_MEMBER(dgn_beta_state::dgnbeta_wd2797_r)
 {
 	int result = 0;
 	device_t *fdc = space.machine().device(FDC_TAG);
@@ -914,12 +912,11 @@ READ8_HANDLER(dgnbeta_wd2797_r)
 	return result;
 }
 
-WRITE8_HANDLER(dgnbeta_wd2797_w)
+WRITE8_MEMBER(dgn_beta_state::dgnbeta_wd2797_w)
 {
-	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
 	device_t *fdc = space.machine().device(FDC_TAG);
 
-    state->m_wd2797_written=1;
+    m_wd2797_written=1;
 
     switch(offset & 0x3)
 	{

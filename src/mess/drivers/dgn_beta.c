@@ -158,12 +158,12 @@ static ADDRESS_MAP_START( dgnbeta_map, AS_PROGRAM, 8, dgn_beta_state )
 	AM_RANGE(0xfc80, 0xfc80)    AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xfc81, 0xfc81)    AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0xfc82, 0xfC9F)	AM_NOP
-	AM_RANGE(0xFCA0, 0xFCA3)	AM_READNOP AM_WRITE_LEGACY(dgnbeta_colour_ram_w)		    /* 4x4bit colour ram for graphics modes */
+	AM_RANGE(0xFCA0, 0xFCA3)	AM_READNOP AM_WRITE(dgnbeta_colour_ram_w)		    /* 4x4bit colour ram for graphics modes */
 	AM_RANGE(0xFCC0, 0xFCC3)	AM_DEVREADWRITE(PIA_2_TAG, pia6821_device, read, write)
 	AM_RANGE(0xfcC4, 0xfcdf)	AM_NOP
-	AM_RANGE(0xfce0, 0xfce3)	AM_READWRITE_LEGACY(dgnbeta_wd2797_r	,dgnbeta_wd2797_w)	/* Onboard disk interface */
+	AM_RANGE(0xfce0, 0xfce3)	AM_READWRITE(dgnbeta_wd2797_r	,dgnbeta_wd2797_w)	/* Onboard disk interface */
 	AM_RANGE(0xfce4, 0xfdff)	AM_NOP
-	AM_RANGE(0xFE00, 0xFE0F)	AM_READWRITE_LEGACY(dgn_beta_page_r	,dgn_beta_page_w)
+	AM_RANGE(0xFE00, 0xFE0F)	AM_READWRITE(dgn_beta_page_r	,dgn_beta_page_w)
 	AM_RANGE(0xfe10, 0xfEff)	AM_NOP
 	AM_RANGE(0xFF00, 0xFFFF)	AM_RAMBANK("bank17")
 

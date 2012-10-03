@@ -37,50 +37,50 @@
 #include "formats/pc_dsk.h"
 #include "machine/ram.h"
 
-static READ8_HANDLER(at_dma8237_1_r)  { return i8237_r(space.machine().device("dma8237_2"), space, offset / 2); }
-static WRITE8_HANDLER(at_dma8237_1_w) { i8237_w(space.machine().device("dma8237_2"), space, offset / 2, data); }
+READ8_MEMBER(bebox_state::at_dma8237_1_r)  { return i8237_r(machine().device("dma8237_2"), space, offset / 2); }
+WRITE8_MEMBER(bebox_state::at_dma8237_1_w) { i8237_w(machine().device("dma8237_2"), space, offset / 2, data); }
 
 static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
-	AM_RANGE(0x7FFFF0F0, 0x7FFFF0F7) AM_READWRITE_LEGACY(bebox_cpu0_imask_r, bebox_cpu0_imask_w )
-	AM_RANGE(0x7FFFF1F0, 0x7FFFF1F7) AM_READWRITE_LEGACY(bebox_cpu1_imask_r, bebox_cpu1_imask_w )
-	AM_RANGE(0x7FFFF2F0, 0x7FFFF2F7) AM_READ_LEGACY(bebox_interrupt_sources_r )
-	AM_RANGE(0x7FFFF3F0, 0x7FFFF3F7) AM_READWRITE_LEGACY(bebox_crossproc_interrupts_r, bebox_crossproc_interrupts_w )
-	AM_RANGE(0x7FFFF4F0, 0x7FFFF4F7) AM_WRITE_LEGACY(bebox_processor_resets_w )
+	AM_RANGE(0x7FFFF0F0, 0x7FFFF0F7) AM_READWRITE(bebox_cpu0_imask_r, bebox_cpu0_imask_w )
+	AM_RANGE(0x7FFFF1F0, 0x7FFFF1F7) AM_READWRITE(bebox_cpu1_imask_r, bebox_cpu1_imask_w )
+	AM_RANGE(0x7FFFF2F0, 0x7FFFF2F7) AM_READ(bebox_interrupt_sources_r )
+	AM_RANGE(0x7FFFF3F0, 0x7FFFF3F7) AM_READWRITE(bebox_crossproc_interrupts_r, bebox_crossproc_interrupts_w )
+	AM_RANGE(0x7FFFF4F0, 0x7FFFF4F7) AM_WRITE(bebox_processor_resets_w )
 
 	AM_RANGE(0x80000000, 0x8000001F) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000020, 0x8000003F) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000040, 0x8000005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000060, 0x8000006F) AM_READWRITE8_LEGACY(kbdc8042_8_r, kbdc8042_8_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000070, 0x8000007F) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000080, 0x8000009F) AM_READWRITE8_LEGACY(bebox_page_r, bebox_page_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x80000080, 0x8000009F) AM_READWRITE8(bebox_page_r, bebox_page_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800000A0, 0x800000BF) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x800000C0, 0x800000DF) AM_READWRITE8_LEGACY(at_dma8237_1_r, at_dma8237_1_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x800001F0, 0x800001F7) AM_READWRITE8_LEGACY(bebox_800001F0_r, bebox_800001F0_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x800000C0, 0x800000DF) AM_READWRITE8(at_dma8237_1_r, at_dma8237_1_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x800001F0, 0x800001F7) AM_READWRITE8(bebox_800001F0_r, bebox_800001F0_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800002F8, 0x800002FF) AM_DEVREADWRITE8( "ns16550_1", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000380, 0x80000387) AM_DEVREADWRITE8( "ns16550_2", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000388, 0x8000038F) AM_DEVREADWRITE8( "ns16550_3", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800003b0, 0x800003bf) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03b0_r, port_03b0_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x800003c0, 0x800003cf) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03c0_r, port_03c0_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x800003d0, 0x800003df) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03d0_r, port_03d0_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x800003F0, 0x800003F7) AM_READWRITE_LEGACY(bebox_800003F0_r, bebox_800003F0_w )
+	AM_RANGE(0x800003F0, 0x800003F7) AM_READWRITE(bebox_800003F0_r, bebox_800003F0_w )
 	AM_RANGE(0x800003F8, 0x800003FF) AM_DEVREADWRITE8( "ns16550_0",ns16550_device,  ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000480, 0x8000048F) AM_READWRITE8_LEGACY(bebox_80000480_r, bebox_80000480_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x80000480, 0x8000048F) AM_READWRITE8(bebox_80000480_r, bebox_80000480_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000CF8, 0x80000CFF) AM_DEVREADWRITE("pcibus", pci_bus_device, read_64be, write_64be )
 	//AM_RANGE(0x800042E8, 0x800042EF) AM_DEVWRITE8_LEGACY("cirrus", cirrus_42E8_w, U64(0xffffffffffffffff) )
 
-	AM_RANGE(0xBFFFFFF0, 0xBFFFFFFF) AM_READ_LEGACY(bebox_interrupt_ack_r )
+	AM_RANGE(0xBFFFFFF0, 0xBFFFFFFF) AM_READ(bebox_interrupt_ack_r )
 	AM_RANGE(0xC00A0000, 0XC00BFFFF) AM_DEVREADWRITE8("vga", cirrus_vga_device, mem_r, mem_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0xC1000000, 0XC11FFFFF) AM_DEVREADWRITE8("vga", cirrus_vga_device, mem_linear_r, mem_linear_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0xFFF00000, 0xFFF03FFF) AM_ROMBANK("bank2")
-	AM_RANGE(0xFFF04000, 0xFFFFFFFF) AM_READWRITE8_LEGACY(bebox_flash_r, bebox_flash_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0xFFF04000, 0xFFFFFFFF) AM_READWRITE8(bebox_flash_r, bebox_flash_w, U64(0xffffffffffffffff) )
 ADDRESS_MAP_END
 
 // The following is a gross hack to let the BeBox boot ROM identify the processors correctly.
 // This needs to be done in a better way if someone comes up with one.
 
-static READ64_HANDLER(bb_slave_64be_r)
+READ64_MEMBER(bebox_state::bb_slave_64be_r)
 {
-	pci_bus_device *device = space.machine().device<pci_bus_device>("pcibus");
+	pci_bus_device *device = machine().device<pci_bus_device>("pcibus");
 
 	// 2e94 is the real address, 2e84 is where the PC appears to be under full DRC
 	if ((space.device().safe_pc() == 0xfff02e94) || (space.device().safe_pc() == 0xfff02e84))
@@ -92,7 +92,7 @@ static READ64_HANDLER(bb_slave_64be_r)
 }
 
 static ADDRESS_MAP_START( bebox_slave_mem, AS_PROGRAM, 64, bebox_state )
-	AM_RANGE(0x80000cf8, 0x80000cff) AM_READ_LEGACY(bb_slave_64be_r)
+	AM_RANGE(0x80000cf8, 0x80000cff) AM_READ(bb_slave_64be_r)
 	AM_RANGE(0x80000cf8, 0x80000cff) AM_DEVWRITE("pcibus", pci_bus_device, write_64be )
 	AM_IMPORT_FROM(bebox_mem)
 ADDRESS_MAP_END

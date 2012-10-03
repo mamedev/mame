@@ -183,6 +183,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dgnbeta_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(dgnbeta_fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(dgnbeta_vsync_changed);
+	/* 74HC670 4x4bit colour ram */
+	DECLARE_WRITE8_MEMBER(dgnbeta_colour_ram_w);
+	// Page IO at FE00
+	DECLARE_READ8_MEMBER(dgn_beta_page_r);
+	DECLARE_WRITE8_MEMBER(dgn_beta_page_w);
+
+	/*  WD2797 FDC */
+	DECLARE_READ8_HANDLER(dgnbeta_wd2797_r);
+	DECLARE_WRITE8_HANDLER(dgnbeta_wd2797_w);
 };
 
 
@@ -192,16 +201,6 @@ extern const wd17xx_interface dgnbeta_wd17xx_interface;
 extern const pia6821_interface dgnbeta_pia_intf[];
 
 
-
-
-// Page IO at FE00
-DECLARE_READ8_HANDLER( dgn_beta_page_r );
-DECLARE_WRITE8_HANDLER( dgn_beta_page_w );
-
-/*  WD2797 FDC */
-DECLARE_READ8_HANDLER(dgnbeta_wd2797_r);
-DECLARE_WRITE8_HANDLER(dgnbeta_wd2797_w);
-
 void dgn_beta_frame_interrupt (running_machine &machine, int data);
 
 
@@ -209,9 +208,6 @@ void dgn_beta_frame_interrupt (running_machine &machine, int data);
 
 /* mc6845 video display generator */
 void dgnbeta_vid_set_gctrl(running_machine &machine, int data);
-
-/* 74HC670 4x4bit colour ram */
-DECLARE_WRITE8_HANDLER(dgnbeta_colour_ram_w);
 
 extern const mc6845_interface dgnbeta_crtc6845_interface;
 
