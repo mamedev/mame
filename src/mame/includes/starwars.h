@@ -58,6 +58,7 @@ public:
 	DECLARE_READ8_MEMBER(starwars_main_ready_flag_r);
 	DECLARE_WRITE8_MEMBER(starwars_main_wr_w);
 	DECLARE_WRITE8_MEMBER(starwars_soundrst_w);
+	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
 	DECLARE_DIRECT_UPDATE_MEMBER(esb_setdirect);
 	DECLARE_DRIVER_INIT(esb);
 	DECLARE_DRIVER_INIT(starwars);

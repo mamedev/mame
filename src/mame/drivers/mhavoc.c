@@ -193,6 +193,29 @@
 #include "machine/nvram.h"
 #include "includes/mhavoc.h"
 
+READ8_MEMBER(mhavoc_state::quad_pokeyn_r)
+{
+	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
+	int pokey_num = (offset >> 3) & ~0x04;
+	int control = (offset & 0x20) >> 2;
+	int pokey_reg = (offset % 8) | control;
+	pokey_device *pokey = machine().device<pokey_device>(devname[pokey_num]);
+
+	return pokey->read(pokey_reg);
+}
+
+WRITE8_MEMBER(mhavoc_state::quad_pokeyn_w)
+{
+	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
+    int pokey_num = (offset >> 3) & ~0x04;
+    int control = (offset & 0x20) >> 2;
+    int pokey_reg = (offset % 8) | control;
+	pokey_device *pokey = machine().device<pokey_device>(devname[pokey_num]);
+
+    pokey->write(pokey_reg, data);
+}
+
+
 /*************************************
  *
  *  Alpha One: dual POKEY?
@@ -265,7 +288,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gamma_map, AS_PROGRAM, 8, mhavoc_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM								/* Program RAM (2K) */
     AM_RANGE(0x0800, 0x0fff) AM_RAM AM_MIRROR (0x1800)
-	AM_RANGE(0x2000, 0x203f) AM_READWRITE_LEGACY(quad_pokeyn_r, quad_pokeyn_w)	/* Quad Pokey read  */
+	AM_RANGE(0x2000, 0x203f) AM_READWRITE(quad_pokeyn_r, quad_pokeyn_w)	/* Quad Pokey read  */
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("IN1")				/* Gamma Input Port */
 	AM_RANGE(0x3000, 0x3000) AM_READ(mhavoc_alpha_r)			/* Alpha Comm. Read Port*/
 	AM_RANGE(0x3800, 0x3803) AM_READ_PORT("DIAL")				/* Roller Controller Input*/

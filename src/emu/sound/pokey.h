@@ -345,10 +345,4 @@ private:
 // device type definition
 extern const device_type POKEY;
 
-
-/* fix me: eventually this should be a single device with pokey subdevices */
-DECLARE_READ8_HANDLER( quad_pokeyn_r );
-DECLARE_WRITE8_HANDLER( quad_pokeyn_w );
-
-
 #endif	/* __POKEY_H__ */
