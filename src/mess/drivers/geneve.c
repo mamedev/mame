@@ -219,10 +219,10 @@
 #define SRAM_SIZE 384*1024   // maximum SRAM expansion on-board
 #define DRAM_SIZE 512*1024
 
-class geneve : public driver_device
+class geneve_state : public driver_device
 {
 public:
-	geneve(const machine_config &mconfig, device_type type, const char *tag)
+	geneve_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
 	// CRU (Communication Register Unit) handling
@@ -281,7 +281,7 @@ private:
     Memory map
 */
 
-static ADDRESS_MAP_START(memmap, AS_PROGRAM, 8, geneve)
+static ADDRESS_MAP_START(memmap, AS_PROGRAM, 8, geneve_state)
 	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(GMAPPER_TAG, geneve_mapper_device, readm, writem)
 ADDRESS_MAP_END
 
@@ -293,7 +293,7 @@ ADDRESS_MAP_END
     TODO: Check whether A0-A2 are available for CRU addressing since those
     bits are usually routed through the mapper first.
 */
-static ADDRESS_MAP_START(crumap, AS_IO, 8, geneve)
+static ADDRESS_MAP_START(crumap, AS_IO, 8, geneve_state)
 	AM_RANGE(0x0000, 0x0003) AM_DEVREAD(TMS9901_TAG, tms9901_device, read)
 	AM_RANGE(0x0000, 0x0fff) AM_READ( cruread )
 
@@ -337,7 +337,7 @@ INPUT_PORTS_END
 #define CRU_CONTROL_BASE 0x1ee0
 #define CRU_SSTEP_BASE 0x13c0
 
-WRITE8_MEMBER ( geneve::cruwrite )
+WRITE8_MEMBER ( geneve_state::cruwrite )
 {
 	int addroff = offset << 1;
 
@@ -407,7 +407,7 @@ WRITE8_MEMBER ( geneve::cruwrite )
 	}
 }
 
-READ8_MEMBER( geneve::cruread )
+READ8_MEMBER( geneve_state::cruread )
 {
 	UINT8 value = 0;
 	int addroff = offset << 4;
@@ -433,7 +433,7 @@ READ8_MEMBER( geneve::cruread )
     CRU callbacks
 ***********************************************************************/
 
-READ8_MEMBER( geneve::read_by_9901 )
+READ8_MEMBER( geneve_state::read_by_9901 )
 {
 	int answer = 0;
 
@@ -495,7 +495,7 @@ READ8_MEMBER( geneve::read_by_9901 )
 /*
     Write PE bus reset line
 */
-WRITE_LINE_MEMBER( geneve::peripheral_bus_reset )
+WRITE_LINE_MEMBER( geneve_state::peripheral_bus_reset )
 {
 	if (VERBOSE>0) LOG("geneve: peripheral bus reset request; not implemented yet.\n");
 }
@@ -503,7 +503,7 @@ WRITE_LINE_MEMBER( geneve::peripheral_bus_reset )
 /*
     Write VDP reset line
 */
-WRITE_LINE_MEMBER( geneve::VDP_reset )
+WRITE_LINE_MEMBER( geneve_state::VDP_reset )
 {
 	if (VERBOSE>0) LOG("geneve: Video reset request; not implemented yet.\n");
 }
@@ -511,7 +511,7 @@ WRITE_LINE_MEMBER( geneve::VDP_reset )
 /*
     Write joystick select line. 1 selects joystick 1 (pin 7), 0 selects joystick 2 (pin 2)
 */
-WRITE_LINE_MEMBER( geneve::joystick_select )
+WRITE_LINE_MEMBER( geneve_state::joystick_select )
 {
 	m_joyport->write_port((state==ASSERT_LINE)? 1:2);
 }
@@ -519,7 +519,7 @@ WRITE_LINE_MEMBER( geneve::joystick_select )
 /*
     Write external mem cycles (0=long, 1=short)
 */
-WRITE_LINE_MEMBER( geneve::extbus_wait_states )
+WRITE_LINE_MEMBER( geneve_state::extbus_wait_states )
 {
 	if (VERBOSE>0) LOG("geneve: external bus wait states set to %d, not implemented yet.\n", state);
 }
@@ -528,7 +528,7 @@ WRITE_LINE_MEMBER( geneve::extbus_wait_states )
     Write vdp wait cycles (1=add 14 cycles, 0=add none)
     see above for waitstate handling
 */
-WRITE_LINE_MEMBER( geneve::video_wait_states )
+WRITE_LINE_MEMBER( geneve_state::video_wait_states )
 {
 	if (VERBOSE>1) LOG("geneve: video wait states set to %d\n", state);
 	m_mapper->set_video_waitstates(state==ASSERT_LINE);
@@ -541,7 +541,7 @@ WRITE_LINE_MEMBER( geneve::video_wait_states )
     but again it is ignored. Anyway, the TMS9995 has only two external inputs
     (INT1 and INT4).
 */
-WRITE8_MEMBER( geneve::tms9901_interrupt )
+WRITE8_MEMBER( geneve_state::tms9901_interrupt )
 {
 	/* INTREQ is connected to INT1. */
 	m_cpu->set_input_line(INPUT_LINE_99XX_INT1, data);
@@ -553,19 +553,19 @@ const tms9901_interface tms9901_wiring_geneve =
 	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INT8 | TMS9901_INTB | TMS9901_INTC,	/* only input pins whose state is always known */
 
 	// read handler
-	DEVCB_DRIVER_MEMBER(geneve, read_by_9901),
+	DEVCB_DRIVER_MEMBER(geneve_state, read_by_9901),
 
 	{	/* write handlers */
-		DEVCB_DRIVER_LINE_MEMBER(geneve, peripheral_bus_reset),
-		DEVCB_DRIVER_LINE_MEMBER(geneve, VDP_reset),
-		DEVCB_DRIVER_LINE_MEMBER(geneve, joystick_select),
+		DEVCB_DRIVER_LINE_MEMBER(geneve_state, peripheral_bus_reset),
+		DEVCB_DRIVER_LINE_MEMBER(geneve_state, VDP_reset),
+		DEVCB_DRIVER_LINE_MEMBER(geneve_state, joystick_select),
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_DEVICE_LINE_MEMBER(GKEYBOARD_TAG, geneve_keyboard_device, reset_line),
-		DEVCB_DRIVER_LINE_MEMBER(geneve, extbus_wait_states),
+		DEVCB_DRIVER_LINE_MEMBER(geneve_state, extbus_wait_states),
 		DEVCB_NULL,
-		DEVCB_DRIVER_LINE_MEMBER(geneve, video_wait_states),
+		DEVCB_DRIVER_LINE_MEMBER(geneve_state, video_wait_states),
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_NULL,
@@ -575,7 +575,7 @@ const tms9901_interface tms9901_wiring_geneve =
 	},
 
 	/* interrupt handler */
-	DEVCB_DRIVER_MEMBER(geneve, tms9901_interrupt)
+	DEVCB_DRIVER_MEMBER(geneve_state, tms9901_interrupt)
 };
 
 /*******************************************************************
@@ -584,7 +584,7 @@ const tms9901_interface tms9901_wiring_geneve =
 /*
     inta is connected to both tms9901 IRQ1 line and to tms9995 INT4/EC line.
 */
-WRITE_LINE_MEMBER( geneve::inta )
+WRITE_LINE_MEMBER( geneve_state::inta )
 {
 	m_inta = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_single_int(1, state);
@@ -594,20 +594,20 @@ WRITE_LINE_MEMBER( geneve::inta )
 /*
     intb is connected to tms9901 IRQ12 line.
 */
-WRITE_LINE_MEMBER( geneve::intb )
+WRITE_LINE_MEMBER( geneve_state::intb )
 {
 	m_intb = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_single_int(12, state);
 }
 
-WRITE_LINE_MEMBER( geneve::ext_ready )
+WRITE_LINE_MEMBER( geneve_state::ext_ready )
 {
 	if (VERBOSE>6) LOG("ti99_8: READY level (ext) =%02x\n", state);
 	m_ready_line = state;
 	m_cpu->set_ready((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( geneve::mapper_ready )
+WRITE_LINE_MEMBER( geneve_state::mapper_ready )
 {
 	if (VERBOSE>6) LOG("geneve: READY level (mapper) = %02x\n", state);
 	m_ready_line1 = state;
@@ -617,7 +617,7 @@ WRITE_LINE_MEMBER( geneve::mapper_ready )
 /*
     set the state of int2 (called by the v9938 core)
 */
-void geneve::set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state)
+void geneve_state::set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state)
 {
 	m_int2 = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_single_int(2, state);
@@ -626,7 +626,7 @@ void geneve::set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state)
 /*
     Interrupt from the keyboard.
 */
-WRITE_LINE_MEMBER( geneve::keyboard_interrupt )
+WRITE_LINE_MEMBER( geneve_state::keyboard_interrupt )
 {
 	m_keyint = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_single_int(8, state);
@@ -635,7 +635,7 @@ WRITE_LINE_MEMBER( geneve::keyboard_interrupt )
 /*
     scanline interrupt
 */
-TIMER_DEVICE_CALLBACK_MEMBER(geneve::geneve_hblank_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(geneve_state::geneve_hblank_interrupt)
 {
 	int scanline = param;
 
@@ -653,7 +653,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(geneve::geneve_hblank_interrupt)
 	}
 }
 
-WRITE8_MEMBER( geneve::external_operation )
+WRITE8_MEMBER( geneve_state::external_operation )
 {
 	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (VERBOSE>1)
@@ -663,16 +663,16 @@ WRITE8_MEMBER( geneve::external_operation )
 /*
     Clock line from the CPU. Used to control wait state generation.
 */
-WRITE_LINE_MEMBER( geneve::clock_out )
+WRITE_LINE_MEMBER( geneve_state::clock_out )
 {
 	m_mapper->clock_in(state);
 }
 
 static TMS9995_CONFIG( geneve_processor_config )
 {
-	DEVCB_DRIVER_MEMBER(geneve, external_operation),
+	DEVCB_DRIVER_MEMBER(geneve_state, external_operation),
 	DEVCB_NULL,			// Instruction acquisition
-	DEVCB_DRIVER_LINE_MEMBER(geneve, clock_out),
+	DEVCB_DRIVER_LINE_MEMBER(geneve_state, clock_out),
 	DEVCB_NULL,			// wait
 	DEVCB_NULL,			// HOLDA
 	INTERNAL_RAM,		// use internal RAM
@@ -681,7 +681,7 @@ static TMS9995_CONFIG( geneve_processor_config )
 
 static TI_SOUND_CONFIG( sound_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(geneve, ext_ready)	// READY
+	DEVCB_DRIVER_LINE_MEMBER(geneve_state, ext_ready)	// READY
 };
 
 static const mm58274c_interface geneve_mm58274c_interface =
@@ -692,20 +692,20 @@ static const mm58274c_interface geneve_mm58274c_interface =
 
 static GENEVE_KEYBOARD_CONFIG( geneve_keyb_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(geneve, keyboard_interrupt)
+	DEVCB_DRIVER_LINE_MEMBER(geneve_state, keyboard_interrupt)
 };
 
 static PERIBOX_CONFIG( peribox_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(geneve, inta),			// INTA
-	DEVCB_DRIVER_LINE_MEMBER(geneve, intb),			// INTB
-	DEVCB_DRIVER_LINE_MEMBER(geneve, ext_ready),	// READY
+	DEVCB_DRIVER_LINE_MEMBER(geneve_state, inta),			// INTA
+	DEVCB_DRIVER_LINE_MEMBER(geneve_state, intb),			// INTB
+	DEVCB_DRIVER_LINE_MEMBER(geneve_state, ext_ready),	// READY
 	0x00000											// Address bus prefix (Mapper will produce prefixes)
 };
 
 static GENEVE_MAPPER_CONFIG( mapper_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(geneve, mapper_ready)	// READY
+	DEVCB_DRIVER_LINE_MEMBER(geneve_state, mapper_ready)	// READY
 };
 
 static JOYPORT_CONFIG( joyport_60 )
@@ -714,11 +714,11 @@ static JOYPORT_CONFIG( joyport_60 )
 	60
 };
 
-DRIVER_INIT_MEMBER(geneve,geneve)
+DRIVER_INIT_MEMBER(geneve_state,geneve)
 {
 }
 
-void geneve::machine_start()
+void geneve_state::machine_start()
 {
 	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
 	m_mapper = static_cast<geneve_mapper_device*>(machine().device(GMAPPER_TAG));
@@ -732,7 +732,7 @@ void geneve::machine_start()
 /*
     Reset the machine.
 */
-void geneve::machine_reset()
+void geneve_state::machine_reset()
 {
 	m_inta = CLEAR_LINE;	// flag reflecting the INTA line
 	m_intb = CLEAR_LINE;	// flag reflecting the INTB line
@@ -750,7 +750,7 @@ void geneve::machine_reset()
 	m_joyport->write_port(0x01);	// select Joystick 1
 }
 
-static MACHINE_CONFIG_START( geneve_60hz, geneve )
+static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	MCFG_TMS9995_ADD("maincpu", TMS9995, 12000000, memmap, crumap, geneve_processor_config)
@@ -762,8 +762,8 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve )
 	// interlace mode, but in non-interlace modes only half of the lines are
 	// painted. Accordingly, the full set of lines is refreshed at 30 Hz,
 	// not 60 Hz. This should be fixed in the v9938 emulation.
-	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, DEVICE_SELF, geneve, set_tms9901_INT2_from_v9938)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", geneve, geneve_hblank_interrupt, SCREEN_TAG, 0, 1) /* 262.5 in 60Hz, 312.5 in 50Hz */
+	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, DEVICE_SELF, geneve_state, set_tms9901_INT2_from_v9938)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", geneve_state, geneve_hblank_interrupt, SCREEN_TAG, 0, 1) /* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	// Main board components
 	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_geneve, 3000000)
@@ -802,4 +802,4 @@ ROM_START(geneve)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT    INIT       COMPANY     FULLNAME */
-COMP( 1987,geneve,   0,		0,		geneve_60hz,  geneve, geneve,  geneve,		"Myarc",	"Geneve 9640" , 0)
+COMP( 1987,geneve,   0,		0,		geneve_60hz,  geneve, geneve_state,  geneve,		"Myarc",	"Geneve 9640" , 0)

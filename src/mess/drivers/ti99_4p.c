@@ -57,10 +57,10 @@
 #define VERBOSE 1
 #define LOG logerror
 
-class ti99_4p : public driver_device
+class ti99_4p_state : public driver_device
 {
 public:
-	ti99_4p(const machine_config &mconfig, device_type type, const char *tag)
+	ti99_4p_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_WRITE_LINE_MEMBER( console_ready );
@@ -168,11 +168,11 @@ private:
 
 };
 
-static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti99_4p)
+static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti99_4p_state)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE( memread, memwrite )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti99_4p)
+static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti99_4p_state)
 	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TMS9901_TAG, tms9901_device, read)
 	AM_RANGE(0x0000, 0x01ff) AM_READ( cruread )
 
@@ -260,7 +260,7 @@ INPUT_PORTS_END
 /*
     Memory access
 */
-READ16_MEMBER( ti99_4p::memread )
+READ16_MEMBER( ti99_4p_state::memread )
 {
 	int addroff = offset << 1;
 	if (m_rom0 == NULL) return 0;	// premature access
@@ -336,7 +336,7 @@ READ16_MEMBER( ti99_4p::memread )
 	return value;
 }
 
-WRITE16_MEMBER( ti99_4p::memwrite )
+WRITE16_MEMBER( ti99_4p_state::memwrite )
 {
 //  m_cpu->execute().adjust_icount(-4);
 
@@ -416,7 +416,7 @@ WRITE16_MEMBER( ti99_4p::memwrite )
     The datamux is connected to the clock line in order to operate
     the wait state counter.
 */
-void ti99_4p::clock_in(int clock)
+void ti99_4p_state::clock_in(int clock)
 {
 	if (clock==ASSERT_LINE && m_waitcount!=0)
 	{
@@ -426,7 +426,7 @@ void ti99_4p::clock_in(int clock)
 }
 
 
-READ16_MEMBER( ti99_4p::datamux_read )
+READ16_MEMBER( ti99_4p_state::datamux_read )
 {
 	UINT8 hbyte = 0;
 	UINT16 addroff = (offset << 1);
@@ -451,7 +451,7 @@ READ16_MEMBER( ti99_4p::datamux_read )
     Write access.
     TODO: use the 16-bit expansion in the box for suitable cards
 */
-WRITE16_MEMBER( ti99_4p::datamux_write )
+WRITE16_MEMBER( ti99_4p_state::datamux_write )
 {
 	UINT16 addroff = (offset << 1);
 //  printf("write address = %04x, value = %04x, memmask = %4x\n", addroff, data, mem_mask);
@@ -479,7 +479,7 @@ WRITE16_MEMBER( ti99_4p::datamux_write )
 /*
     CRU write
 */
-WRITE8_MEMBER( ti99_4p::cruwrite )
+WRITE8_MEMBER( ti99_4p_state::cruwrite )
 {
 	int addroff = offset<<1;
 
@@ -503,7 +503,7 @@ WRITE8_MEMBER( ti99_4p::cruwrite )
 	m_peribox->cruwrite(addroff, data);
 }
 
-READ8_MEMBER( ti99_4p::cruread )
+READ8_MEMBER( ti99_4p_state::cruread )
 {
 	UINT8 value = 0;
 	m_peribox->crureadz(offset<<4, &value);
@@ -519,7 +519,7 @@ READ8_MEMBER( ti99_4p::cruread )
     0x2000-0x3fff and 0xa000-0xffff, and the mapper area is at 0x4000-0x401e
     (only even addresses).
 */
-READ16_MEMBER( ti99_4p::samsmem_read )
+READ16_MEMBER( ti99_4p_state::samsmem_read )
 {
 	UINT32 address = 0;
 	int addroff = offset << 1;
@@ -536,7 +536,7 @@ READ16_MEMBER( ti99_4p::samsmem_read )
 /*
     Memory write
 */
-WRITE16_MEMBER( ti99_4p::samsmem_write )
+WRITE16_MEMBER( ti99_4p_state::samsmem_write )
 {
 	UINT32 address = 0;
 	int addroff = offset << 1;
@@ -555,7 +555,7 @@ WRITE16_MEMBER( ti99_4p::samsmem_write )
 ****************************************************************************/
 static const char *const column[] = { "COL0", "COL1", "COL2", "COL3", "COL4", "COL5" };
 
-READ8_MEMBER( ti99_4p::read_by_9901 )
+READ8_MEMBER( ti99_4p_state::read_by_9901 )
 {
 	int answer=0;
 
@@ -613,7 +613,7 @@ READ8_MEMBER( ti99_4p::read_by_9901 )
 /*
     WRITE key column select (P2-P4)
 */
-void ti99_4p::set_keyboard_column(int number, int data)
+void ti99_4p_state::set_keyboard_column(int number, int data)
 {
 	if (data!=0)	m_keyboard_column |= 1 << number;
 	else			m_keyboard_column &= ~(1 << number);
@@ -624,17 +624,17 @@ void ti99_4p::set_keyboard_column(int number, int data)
 	}
 }
 
-WRITE_LINE_MEMBER( ti99_4p::keyC0 )
+WRITE_LINE_MEMBER( ti99_4p_state::keyC0 )
 {
 	set_keyboard_column(0, state);
 }
 
-WRITE_LINE_MEMBER( ti99_4p::keyC1 )
+WRITE_LINE_MEMBER( ti99_4p_state::keyC1 )
 {
 	set_keyboard_column(1, state);
 }
 
-WRITE_LINE_MEMBER( ti99_4p::keyC2 )
+WRITE_LINE_MEMBER( ti99_4p_state::keyC2 )
 {
 	set_keyboard_column(2, state);
 }
@@ -642,7 +642,7 @@ WRITE_LINE_MEMBER( ti99_4p::keyC2 )
 /*
     WRITE alpha lock line (P5)
 */
-WRITE_LINE_MEMBER( ti99_4p::alphaW )
+WRITE_LINE_MEMBER( ti99_4p_state::alphaW )
 {
 	m_check_alphalock = (state==0);
 }
@@ -650,7 +650,7 @@ WRITE_LINE_MEMBER( ti99_4p::alphaW )
 /*
     command CS1 (only) tape unit motor (P6)
 */
-WRITE_LINE_MEMBER( ti99_4p::cs_motor )
+WRITE_LINE_MEMBER( ti99_4p_state::cs_motor )
 {
 	m_cassette->change_state((state!=0)? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
@@ -664,14 +664,14 @@ WRITE_LINE_MEMBER( ti99_4p::cs_motor )
     We do not really need to emulate this as the tape recorder generates sound
     on its own.
 */
-WRITE_LINE_MEMBER( ti99_4p::audio_gate )
+WRITE_LINE_MEMBER( ti99_4p_state::audio_gate )
 {
 }
 
 /*
     tape output (P9)
 */
-WRITE_LINE_MEMBER( ti99_4p::cassette_output )
+WRITE_LINE_MEMBER( ti99_4p_state::cassette_output )
 {
 	m_cassette->output((state!=0)? +1 : -1);
 }
@@ -682,19 +682,19 @@ const tms9901_interface tms9901_wiring_sgcpu =
 	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC,	/* only input pins whose state is always known */
 
 	// read handler
-	DEVCB_DRIVER_MEMBER(ti99_4p, read_by_9901),
+	DEVCB_DRIVER_MEMBER(ti99_4p_state, read_by_9901),
 
 	{	// write handlers
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_DRIVER_LINE_MEMBER(ti99_4p, keyC0),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_4p, keyC1),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_4p, keyC2),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_4p, alphaW),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_4p, cs_motor),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, keyC0),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, keyC1),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, keyC2),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, alphaW),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, cs_motor),
 		DEVCB_NULL,
-		DEVCB_DRIVER_LINE_MEMBER(ti99_4p, audio_gate),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_4p, cassette_output),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, audio_gate),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, cassette_output),
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_NULL,
@@ -704,7 +704,7 @@ const tms9901_interface tms9901_wiring_sgcpu =
 	},
 
 	/* interrupt handler */
-	DEVCB_DRIVER_MEMBER(ti99_4p, tms9901_interrupt)
+	DEVCB_DRIVER_MEMBER(ti99_4p_state, tms9901_interrupt)
 };
 
 /***************************************************************************
@@ -717,7 +717,7 @@ const tms9901_interface tms9901_wiring_sgcpu =
     no chance to make another device pull down the same line; the CPU just
     won't access any other device in this time.
 */
-WRITE_LINE_MEMBER( ti99_4p::console_ready )
+WRITE_LINE_MEMBER( ti99_4p_state::console_ready )
 {
 	m_ready_line = state;
 	int combined = (m_ready_line == ASSERT_LINE && m_ready_line_dmux == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE;
@@ -735,7 +735,7 @@ WRITE_LINE_MEMBER( ti99_4p::console_ready )
     the READY line, and the datamux raises READY depending on the clock pulse.
     So we must make sure this does not interfere.
 */
-WRITE_LINE_MEMBER( ti99_4p::console_ready_dmux )
+WRITE_LINE_MEMBER( ti99_4p_state::console_ready_dmux )
 {
 	m_ready_line_dmux = state;
 	int combined = (m_ready_line == ASSERT_LINE && m_ready_line_dmux == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE;
@@ -749,14 +749,14 @@ WRITE_LINE_MEMBER( ti99_4p::console_ready_dmux )
 }
 
 
-WRITE_LINE_MEMBER( ti99_4p::extint )
+WRITE_LINE_MEMBER( ti99_4p_state::extint )
 {
 	if (VERBOSE>6) LOG("ti99_4p: EXTINT level = %02x\n", state);
 	if (m_tms9901 != NULL)
 		m_tms9901->set_single_int(1, state);
 }
 
-WRITE_LINE_MEMBER( ti99_4p::notconnected )
+WRITE_LINE_MEMBER( ti99_4p_state::notconnected )
 {
 	if (VERBOSE>6) LOG("ti99_4p: Setting a not connected line ... ignored\n");
 }
@@ -764,12 +764,12 @@ WRITE_LINE_MEMBER( ti99_4p::notconnected )
 /*
     Clock line from the CPU. Used to control wait state generation.
 */
-WRITE_LINE_MEMBER( ti99_4p::clock_out )
+WRITE_LINE_MEMBER( ti99_4p_state::clock_out )
 {
 	clock_in(state);
 }
 
-WRITE8_MEMBER( ti99_4p::tms9901_interrupt )
+WRITE8_MEMBER( ti99_4p_state::tms9901_interrupt )
 {
 	// offset contains the interrupt level (0-15)
 	// However, the TI board just ignores that level and hardwires it to 1
@@ -777,14 +777,14 @@ WRITE8_MEMBER( ti99_4p::tms9901_interrupt )
 	m_cpu->set_input_line(INPUT_LINE_99XX_INTREQ, data);
 }
 
-READ8_MEMBER( ti99_4p::interrupt_level )
+READ8_MEMBER( ti99_4p_state::interrupt_level )
 {
 	// On the TI-99 systems these IC lines are not used; the input lines
 	// at the CPU are hardwired to level 1.
 	return 1;
 }
 
-WRITE8_MEMBER( ti99_4p::external_operation )
+WRITE8_MEMBER( ti99_4p_state::external_operation )
 {
 	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (VERBOSE>1) LOG("External operation %s not implemented on the SGCPU board\n", extop[offset]);
@@ -794,23 +794,23 @@ WRITE8_MEMBER( ti99_4p::external_operation )
 
 static PERIBOX_CONFIG( peribox_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4p, extint),			// INTA
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4p, notconnected),	// INTB
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4p, console_ready),	// READY
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, extint),			// INTA
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, notconnected),	// INTB
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, console_ready),	// READY
 	0x70000												// Address bus prefix (AMA/AMB/AMC)
 };
 
 static TMS99xx_CONFIG( sgcpu_cpuconf )
 {
-	DEVCB_DRIVER_MEMBER(ti99_4p, external_operation),
-	DEVCB_DRIVER_MEMBER(ti99_4p, interrupt_level),
+	DEVCB_DRIVER_MEMBER(ti99_4p_state, external_operation),
+	DEVCB_DRIVER_MEMBER(ti99_4p_state, interrupt_level),
 	DEVCB_NULL,		// Instruction acquisition
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4p, clock_out),
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, clock_out),
 	DEVCB_NULL,		// wait
 	DEVCB_NULL		// Hold acknowledge
 };
 
-void ti99_4p::machine_start()
+void ti99_4p_state::machine_start()
 {
 
 	m_cpu = static_cast<tms9900_device*>(machine().device("maincpu"));
@@ -841,14 +841,14 @@ void ti99_4p::machine_start()
 /*
     set the state of int2 (called by the v9938)
 */
-void ti99_4p::set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state)
+void ti99_4p_state::set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state)
 {
 	m_tms9901->set_single_int(2, state);
 }
 
 static TI_SOUND_CONFIG( sound_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4p, console_ready)	// READY
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, console_ready)	// READY
 };
 
 static JOYPORT_CONFIG( joyport4a_60 )
@@ -860,7 +860,7 @@ static JOYPORT_CONFIG( joyport4a_60 )
 /*
     Reset the machine.
 */
-MACHINE_RESET_MEMBER(ti99_4p,ti99_4p)
+MACHINE_RESET_MEMBER(ti99_4p_state,ti99_4p)
 {
 	m_tms9901->set_single_int(12, 0);
 
@@ -868,7 +868,7 @@ MACHINE_RESET_MEMBER(ti99_4p,ti99_4p)
 	m_cpu->set_hold(CLEAR_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(ti99_4p::sgcpu_hblank_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(ti99_4p_state::sgcpu_hblank_interrupt)
 {
 	machine().device<v9938_device>(VDP_TAG)->interrupt();
 }
@@ -876,7 +876,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ti99_4p::sgcpu_hblank_interrupt)
 /*
     Machine description.
 */
-static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p )
+static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, sgcpu_cpuconf)
@@ -887,8 +887,8 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p )
 	// interlace mode, but in non-interlace modes only half of the lines are
 	// painted. Accordingly, the full set of lines is refreshed at 30 Hz,
 	// not 60 Hz. This should be fixed in the v9938 emulation.
-	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, DEVICE_SELF, ti99_4p, set_tms9901_INT2_from_v9938)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ti99_4p, sgcpu_hblank_interrupt, SCREEN_TAG, 0, 1)
+	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, DEVICE_SELF, ti99_4p_state, set_tms9901_INT2_from_v9938)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ti99_4p_state, sgcpu_hblank_interrupt, SCREEN_TAG, 0, 1)
 
 	// tms9901
 	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_sgcpu, 3000000)

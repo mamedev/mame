@@ -217,10 +217,10 @@ Known Issues (MZ, 2010-11-07)
 #define VERBOSE 0
 #define LOG logerror
 
-class ti99_8 : public driver_device
+class ti99_8_state : public driver_device
 {
 public:
-	ti99_8(const machine_config &mconfig, device_type type, const char *tag)
+	ti99_8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
 	// CRU (Communication Register Unit) handling
@@ -279,7 +279,7 @@ private:
     Memory map. We have a configurable mapper, so we need to delegate the
     job to the mapper completely.
 */
-static ADDRESS_MAP_START(memmap, AS_PROGRAM, 8, ti99_8)
+static ADDRESS_MAP_START(memmap, AS_PROGRAM, 8, ti99_8_state)
 	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(MAPPER_TAG, ti998_mapper_device, readm, writem )
 ADDRESS_MAP_END
 
@@ -290,7 +290,7 @@ ADDRESS_MAP_END
     (decoded by the "Vaquerro" chip, signal NNOICS*)
 */
 
-static ADDRESS_MAP_START(crumap, AS_IO, 8, ti99_8)
+static ADDRESS_MAP_START(crumap, AS_IO, 8, ti99_8_state)
 	AM_RANGE(0x0000, 0x0003) AM_DEVREAD(TMS9901_TAG, tms9901_device, read)
 	AM_RANGE(0x0000, 0x02ff) AM_READ(cruread)
 
@@ -406,17 +406,17 @@ INPUT_PORTS_END
 
 static GROM_CONFIG(grom0_config)
 {
-	false, 0, region_grom, 0x0000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready), GROMFREQ
+	false, 0, region_grom, 0x0000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ
 };
 
 static GROM_CONFIG(grom1_config)
 {
-	false, 1, region_grom, 0x2000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready), GROMFREQ
+	false, 1, region_grom, 0x2000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ
 };
 
 static GROM_CONFIG(grom2_config)
 {
-	false, 2, region_grom, 0x4000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready), GROMFREQ
+	false, 2, region_grom, 0x4000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ
 };
 
 /****************************************************
@@ -447,21 +447,21 @@ static GROM_CONFIG(grom2_config)
 
 #define GROM_LIBRARY_CONFIG(_conf, _region) \
 static GROM_CONFIG(_conf##0) \
-{	false, 0, _region, 0x0000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready), GROMFREQ }; \
+{	false, 0, _region, 0x0000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
 static GROM_CONFIG(_conf##1) \
-{	false, 1, _region, 0x2000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready), GROMFREQ }; \
+{	false, 1, _region, 0x2000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
 static GROM_CONFIG(_conf##2) \
-{	false, 2, _region, 0x4000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready), GROMFREQ }; \
+{	false, 2, _region, 0x4000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
 static GROM_CONFIG(_conf##3) \
-{	false, 3, _region, 0x6000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready), GROMFREQ }; \
+{	false, 3, _region, 0x6000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
 static GROM_CONFIG(_conf##4) \
-{	false, 4, _region, 0x8000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready), GROMFREQ }; \
+{	false, 4, _region, 0x8000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
 static GROM_CONFIG(_conf##5) \
-{	false, 5, _region, 0xa000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready), GROMFREQ }; \
+{	false, 5, _region, 0xa000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
 static GROM_CONFIG(_conf##6) \
-{	false, 6, _region, 0xc000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready), GROMFREQ }; \
+{	false, 6, _region, 0xc000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
 static GROM_CONFIG(_conf##7) \
-{	false, 7, _region, 0xe000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready), GROMFREQ };
+{	false, 7, _region, 0xe000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ };
 
 GROM_LIBRARY_CONFIG(pascal0, pascal0_region)
 GROM_LIBRARY_CONFIG(pascal1, pascal12_region)
@@ -469,19 +469,19 @@ GROM_LIBRARY_CONFIG(pascal2, pascal12_region)
 
 static GROMPORT_CONFIG(console_cartslot)
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready),
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_reset)
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready),
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_reset)
 };
 
 static PERIBOX_CONFIG( peribox_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8, extint),			// INTA
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8, notconnected),		// INTB
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready),	// READY
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, extint),			// INTA
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, notconnected),		// INTB
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready),	// READY
 	0x70000												// Address bus prefix (AMA/AMB/AMC)
 };
 
-READ8_MEMBER( ti99_8::cruread )
+READ8_MEMBER( ti99_8_state::cruread )
 {
 //  if (VERBOSE>6) LOG("read access to CRU address %04x\n", offset << 4);
 	UINT8 value = 0;
@@ -497,7 +497,7 @@ READ8_MEMBER( ti99_8::cruread )
 	return value;
 }
 
-WRITE8_MEMBER( ti99_8::cruwrite )
+WRITE8_MEMBER( ti99_8_state::cruwrite )
 {
 	if (VERBOSE>8) LOG("ti99_8: CRU %04x <- %x\n", offset<<1, data);
 	m_mapper->cruwrite(offset<<1, data);
@@ -518,7 +518,7 @@ static const char *const column[] = {
 	"COL8", "COL9", "COL10", "COL11", "COL12", "COL13"
 };
 
-READ8_MEMBER( ti99_8::read_by_9901 )
+READ8_MEMBER( ti99_8_state::read_by_9901 )
 {
 	int answer=0;
 	UINT8 joyst;
@@ -590,7 +590,7 @@ READ8_MEMBER( ti99_8::read_by_9901 )
 /*
     WRITE key column select (P2-P4), TI-99/8
 */
-void ti99_8::set_keyboard_column(int number, int data)
+void ti99_8_state::set_keyboard_column(int number, int data)
 {
 	if (data != 0)		m_keyboard_column |= 1 << number;
 	else				m_keyboard_column &= ~(1 << number);
@@ -601,22 +601,22 @@ void ti99_8::set_keyboard_column(int number, int data)
 	}
 }
 
-WRITE_LINE_MEMBER( ti99_8::keyC0 )
+WRITE_LINE_MEMBER( ti99_8_state::keyC0 )
 {
 	set_keyboard_column(0, state);
 }
 
-WRITE_LINE_MEMBER( ti99_8::keyC1 )
+WRITE_LINE_MEMBER( ti99_8_state::keyC1 )
 {
 	set_keyboard_column(1, state);
 }
 
-WRITE_LINE_MEMBER( ti99_8::keyC2 )
+WRITE_LINE_MEMBER( ti99_8_state::keyC2 )
 {
 	set_keyboard_column(2, state);
 }
 
-WRITE_LINE_MEMBER( ti99_8::keyC3 )
+WRITE_LINE_MEMBER( ti99_8_state::keyC3 )
 {
 	set_keyboard_column(3, state);
 }
@@ -624,7 +624,7 @@ WRITE_LINE_MEMBER( ti99_8::keyC3 )
 /*
     Set 99/4A compatibility mode (CRUS=1)
 */
-WRITE_LINE_MEMBER( ti99_8::CRUS )
+WRITE_LINE_MEMBER( ti99_8_state::CRUS )
 {
 	m_mapper->CRUS_set(state==ASSERT_LINE);
 }
@@ -632,7 +632,7 @@ WRITE_LINE_MEMBER( ti99_8::CRUS )
 /*
     Set mapper /PTGEN. This is negative logic; we use PTGE as the positive logic signal.
 */
-WRITE_LINE_MEMBER( ti99_8::PTGEN )
+WRITE_LINE_MEMBER( ti99_8_state::PTGEN )
 {
 	m_mapper->PTGE_set(state==CLEAR_LINE);
 }
@@ -640,7 +640,7 @@ WRITE_LINE_MEMBER( ti99_8::PTGEN )
 /*
     Control cassette tape unit motor (P6)
 */
-WRITE_LINE_MEMBER( ti99_8::cassette_motor )
+WRITE_LINE_MEMBER( ti99_8_state::cassette_motor )
 {
 	cassette_image_device *img = machine().device<cassette_image_device>(CASSETTE_TAG);
 	img->change_state(state==ASSERT_LINE? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
@@ -653,7 +653,7 @@ WRITE_LINE_MEMBER( ti99_8::cassette_motor )
     We do not really need to emulate this as the tape recorder generates sound
     on its own.
 */
-WRITE_LINE_MEMBER( ti99_8::audio_gate )
+WRITE_LINE_MEMBER( ti99_8_state::audio_gate )
 {
 }
 
@@ -661,12 +661,12 @@ WRITE_LINE_MEMBER( ti99_8::audio_gate )
     Tape output (P9)
     I think polarity is correct, but don't take my word for it.
 */
-WRITE_LINE_MEMBER( ti99_8::cassette_output )
+WRITE_LINE_MEMBER( ti99_8_state::cassette_output )
 {
 	machine().device<cassette_image_device>(CASSETTE_TAG)->output(state==ASSERT_LINE? +1 : -1);
 }
 
-WRITE8_MEMBER( ti99_8::tms9901_interrupt )
+WRITE8_MEMBER( ti99_8_state::tms9901_interrupt )
 {
 	m_cpu->set_input_line(INPUT_LINE_99XX_INT1, data);
 }
@@ -676,20 +676,20 @@ const tms9901_interface tms9901_wiring_ti99_8 =
 	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC,
 
 	// read handler
-	DEVCB_DRIVER_MEMBER(ti99_8, read_by_9901),
+	DEVCB_DRIVER_MEMBER(ti99_8_state, read_by_9901),
 
 	// write handlers
 	{
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8, keyC0),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8, keyC1),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8, keyC2),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8, keyC3),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8, CRUS),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8, PTGEN),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8, cassette_motor),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, keyC0),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, keyC1),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, keyC2),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, keyC3),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, CRUS),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, PTGEN),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, cassette_motor),
 		DEVCB_NULL,
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8, audio_gate),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8, cassette_output),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, audio_gate),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, cassette_output),
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_NULL,
@@ -698,7 +698,7 @@ const tms9901_interface tms9901_wiring_ti99_8 =
 		DEVCB_NULL
 	},
 
-	DEVCB_DRIVER_MEMBER(ti99_8, tms9901_interrupt)
+	DEVCB_DRIVER_MEMBER(ti99_8_state, tms9901_interrupt)
 };
 
 /*****************************************************************************/
@@ -706,7 +706,7 @@ const tms9901_interface tms9901_wiring_ti99_8 =
 /*
     set the state of TMS9901's INT2 (called by the tms9928 core)
 */
-WRITE_LINE_MEMBER( ti99_8::set_tms9901_INT2 )
+WRITE_LINE_MEMBER( ti99_8_state::set_tms9901_INT2 )
 {
 	if (VERBOSE>6) LOG("ti99_8: VDP int 2 on tms9901, level=%02x\n", state);
 	m_tms9901->set_single_int(2, state);
@@ -717,7 +717,7 @@ WRITE_LINE_MEMBER( ti99_8::set_tms9901_INT2 )
 ***********************************************************/
 
 
-WRITE_LINE_MEMBER( ti99_8::console_ready )
+WRITE_LINE_MEMBER( ti99_8_state::console_ready )
 {
 	if (VERBOSE>6) LOG("ti99_8: READY level=%02x\n", state);
 	m_ready_line = state;
@@ -728,7 +728,7 @@ WRITE_LINE_MEMBER( ti99_8::console_ready )
 /*
     The RESET line leading to a reset of the CPU.
 */
-WRITE_LINE_MEMBER( ti99_8::console_reset )
+WRITE_LINE_MEMBER( ti99_8_state::console_reset )
 {
 	if (machine().phase() != MACHINE_PHASE_INIT)
 	{
@@ -742,21 +742,21 @@ WRITE_LINE_MEMBER( ti99_8::console_reset )
     the READY line, and the mapper raises READY depending on the clock pulse.
     So we must make sure this does not interfere.
 */
-WRITE_LINE_MEMBER( ti99_8::console_ready_mapper )
+WRITE_LINE_MEMBER( ti99_8_state::console_ready_mapper )
 {
 	if (VERBOSE>6) LOG("ti99_8: READY level (mapper) = %02x\n", state);
 	m_ready_line1 = state;
 	m_cpu->set_ready((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( ti99_8::extint )
+WRITE_LINE_MEMBER( ti99_8_state::extint )
 {
 	if (VERBOSE>6) LOG("ti99_8: EXTINT level = %02x\n", state);
 	if (m_tms9901 != NULL)
 		m_tms9901->set_single_int(1, state);
 }
 
-WRITE_LINE_MEMBER( ti99_8::notconnected )
+WRITE_LINE_MEMBER( ti99_8_state::notconnected )
 {
 	if (VERBOSE>6) LOG("ti99_8: Setting a not connected line ... ignored\n");
 }
@@ -765,10 +765,10 @@ static TMS9928A_INTERFACE(ti99_8_tms9118a_interface)
 {
 	SCREEN_TAG,
 	0x4000,
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8, set_tms9901_INT2)
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, set_tms9901_INT2)
 };
 
-WRITE8_MEMBER( ti99_8::external_operation )
+WRITE8_MEMBER( ti99_8_state::external_operation )
 {
 	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (VERBOSE>1) LOG("External operation %s not implemented on TI-99 board\n", extop[offset]);
@@ -777,7 +777,7 @@ WRITE8_MEMBER( ti99_8::external_operation )
 /*
     Clock line from the CPU. Used to control wait state generation.
 */
-WRITE_LINE_MEMBER( ti99_8::clock_out )
+WRITE_LINE_MEMBER( ti99_8_state::clock_out )
 {
 	m_mapper->clock_in(state);
 }
@@ -791,9 +791,9 @@ WRITE_LINE_MEMBER( ti99_8::clock_out )
 */
 static TMS9995_CONFIG( ti99_8_processor_config )
 {
-	DEVCB_DRIVER_MEMBER(ti99_8, external_operation),
+	DEVCB_DRIVER_MEMBER(ti99_8_state, external_operation),
 	DEVCB_NULL,		// Instruction acquisition
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8, clock_out),
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, clock_out),
 	DEVCB_NULL,		// wait
 	DEVCB_NULL,		// HOLDA
 	NO_INTERNAL_RAM,
@@ -802,7 +802,7 @@ static TMS9995_CONFIG( ti99_8_processor_config )
 
 static TI_SOUND_CONFIG( sound_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready)	// READY
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready)	// READY
 };
 
 /*
@@ -902,13 +902,13 @@ static const mapper8_list_entry mapper_devices[] =
 
 static MAPPER8_CONFIG( mapper_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready_mapper),	// READY
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_mapper),	// READY
 	mapper_devices
 };
 
 static SPEECH8_CONFIG( speech_config )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready),	// READY
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready),	// READY
 };
 
 static JOYPORT_CONFIG( joyport8_60 )
@@ -923,7 +923,7 @@ static JOYPORT_CONFIG( joyport8_50 )
 	50
 };
 
-void ti99_8::machine_start()
+void ti99_8_state::machine_start()
 {
 	m_cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
 	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
@@ -938,7 +938,7 @@ void ti99_8::machine_start()
 	m_firstjoy = 14;
 }
 
-void ti99_8::machine_reset()
+void ti99_8_state::machine_reset()
 {
 
 	m_cpu->set_hold(CLEAR_LINE);
@@ -957,7 +957,7 @@ void ti99_8::machine_reset()
 	m_ready_line = m_ready_line1 = ASSERT_LINE;
 }
 
-static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8 )
+static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
 	MCFG_TMS9995_ADD("maincpu", TMS9995, 10738635, memmap, crumap, ti99_8_processor_config)
@@ -1001,7 +1001,7 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8 )
+static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
 	MCFG_TMS9995_ADD("maincpu", TMS9995, 10738635, memmap, crumap, ti99_8_processor_config)
