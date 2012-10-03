@@ -25,6 +25,7 @@
 #include "cpu/arm7/arm7core.h"
 #include "sound/aica.h"
 #include "includes/dc.h"
+#include "includes/dccons.h"
 #include "imagedev/chd_cd.h"
 #include "machine/maple-dc.h"
 #include "machine/dc-ctrl.h"
@@ -40,45 +41,44 @@ extern DECLARE_WRITE64_HANDLER( dc_mess_gdrom_w );
 extern DECLARE_READ64_HANDLER( dc_mess_g1_ctrl_r );
 extern DECLARE_WRITE64_HANDLER( dc_mess_g1_ctrl_w );
 
-static READ64_HANDLER( dcus_idle_skip_r )
+READ64_MEMBER(dc_cons_state::dcus_idle_skip_r )
 {
 	if (space.device().safe_pc()==0xc0ba52a)
 		space.device().execute().spin_until_time(attotime::from_usec(2500));
 	//  device_spinuntil_int(&space.device());
 
-	return space.machine().driver_data<dc_state>()->dc_ram[0x2303b0/8];
+	return dc_ram[0x2303b0/8];
 }
 
-static READ64_HANDLER( dcjp_idle_skip_r )
+READ64_MEMBER(dc_cons_state::dcjp_idle_skip_r )
 {
 	if (space.device().safe_pc()==0xc0bac62)
 		space.device().execute().spin_until_time(attotime::from_usec(2500));
 	//  device_spinuntil_int(&space.device());
 
-	return space.machine().driver_data<dc_state>()->dc_ram[0x2302f8/8];
+	return dc_ram[0x2302f8/8];
 }
 
-DRIVER_INIT_MEMBER(dc_state,dc)
+DRIVER_INIT_MEMBER(dc_cons_state,dc)
 {
 	dreamcast_atapi_init(machine());
 }
 
-DRIVER_INIT_MEMBER(dc_state,dcus)
+DRIVER_INIT_MEMBER(dc_cons_state,dcus)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xc2303b0, 0xc2303b7, FUNC(dcus_idle_skip_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc2303b0, 0xc2303b7, read64_delegate(FUNC(dc_cons_state::dcus_idle_skip_r),this));
 
 	DRIVER_INIT_CALL(dc);
 }
 
-DRIVER_INIT_MEMBER(dc_state,dcjp)
+DRIVER_INIT_MEMBER(dc_cons_state,dcjp)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xc2302f8, 0xc2302ff, FUNC(dcjp_idle_skip_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc2302f8, 0xc2302ff, read64_delegate(FUNC(dc_cons_state::dcjp_idle_skip_r),this));
 
 	DRIVER_INIT_CALL(dc);
 }
 
-static UINT64 PDTRA, PCTRA;
-static READ64_HANDLER( dc_pdtra_r )
+READ64_MEMBER(dc_cons_state::dc_pdtra_r )
 {
 	UINT64 out = PCTRA<<32;
 
@@ -102,62 +102,54 @@ static READ64_HANDLER( dc_pdtra_r )
 	return out;
 }
 
-static WRITE64_HANDLER( dc_pdtra_w )
+WRITE64_MEMBER(dc_cons_state::dc_pdtra_w )
 {
 	PCTRA = (data>>16) & 0xffff;
 	PDTRA = (data & 0xffff);
 }
 
-static READ64_HANDLER( dc_arm_r )
+READ64_MEMBER(dc_cons_state::dc_arm_r )
 {
-	dc_state *state = space.machine().driver_data<dc_state>();
-
-	return *((UINT64 *)state->dc_sound_ram.target()+offset);
+	return *((UINT64 *)dc_sound_ram.target()+offset);
 }
 
-static WRITE64_HANDLER( dc_arm_w )
+WRITE64_MEMBER(dc_cons_state::dc_arm_w )
 {
-	dc_state *state = space.machine().driver_data<dc_state>();
-
-	COMBINE_DATA((UINT64 *)state->dc_sound_ram.target() + offset);
+	COMBINE_DATA((UINT64 *)dc_sound_ram.target() + offset);
 }
 
 
  // SB_LMMODE0
- static WRITE64_HANDLER( ta_texture_directpath0_w )
+WRITE64_MEMBER(dc_cons_state::ta_texture_directpath0_w )
  {
-	dc_state *state = space.machine().driver_data<dc_state>();
-
-	int mode = state->pvrctrl_regs[SB_LMMODE0]&1;
+	int mode = pvrctrl_regs[SB_LMMODE0]&1;
 	if (mode&1)
 	{
 		printf("ta_texture_directpath0_w 32-bit access!\n");
-		COMBINE_DATA(&state->dc_framebuffer_ram[offset]);
+		COMBINE_DATA(&dc_framebuffer_ram[offset]);
 	}
 	else
 	{
-		COMBINE_DATA(&state->dc_texture_ram[offset]);
+		COMBINE_DATA(&dc_texture_ram[offset]);
 	}
  }
 
  // SB_LMMODE1
- static WRITE64_HANDLER( ta_texture_directpath1_w )
+WRITE64_MEMBER(dc_cons_state::ta_texture_directpath1_w )
  {
-	dc_state *state = space.machine().driver_data<dc_state>();
-
-	int mode = state->pvrctrl_regs[SB_LMMODE1]&1;
+	int mode = pvrctrl_regs[SB_LMMODE1]&1;
 	if (mode&1)
 	{
 		printf("ta_texture_directpath1_w 32-bit access!\n");
-		COMBINE_DATA(&state->dc_framebuffer_ram[offset]);
+		COMBINE_DATA(&dc_framebuffer_ram[offset]);
 	}
 	else
 	{
-		COMBINE_DATA(&state->dc_texture_ram[offset]);
+		COMBINE_DATA(&dc_texture_ram[offset]);
 	}
  }
 
-static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_state )
+static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM	AM_WRITENOP				// BIOS
 	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("maincpu", 0x200000)	// flash
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w )
@@ -170,7 +162,7 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_state )
 	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE_LEGACY(dc_modem_r, dc_modem_w )
 	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE(dc_aica_reg_r, dc_aica_reg_w )
 	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE_LEGACY(dc_rtc_r, dc_rtc_w )
-	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE_LEGACY(dc_arm_r, dc_arm_w )
+	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE(dc_arm_r, dc_arm_w )
 
 	/* Area 1 */
 	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
@@ -185,34 +177,32 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_state )
 	/* Area 4 */
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE_LEGACY(ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE_LEGACY(ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x117fffff) AM_WRITE_LEGACY(ta_texture_directpath0_w ) AM_MIRROR(0x00800000)  // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
+	AM_RANGE(0x11000000, 0x117fffff) AM_WRITE(ta_texture_directpath0_w ) AM_MIRROR(0x00800000)  // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
 
 	AM_RANGE(0x12000000, 0x127fffff) AM_WRITE_LEGACY(ta_fifo_poly_w )
 	AM_RANGE(0x12800000, 0x12ffffff) AM_WRITE_LEGACY(ta_fifo_yuv_w )
-	AM_RANGE(0x13000000, 0x137fffff) AM_WRITE_LEGACY(ta_texture_directpath1_w ) AM_MIRROR(0x00800000) // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
+	AM_RANGE(0x13000000, 0x137fffff) AM_WRITE(ta_texture_directpath1_w ) AM_MIRROR(0x00800000) // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
 
 	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE("dc_ram")	// another RAM mirror
 
 	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dc_port, AS_IO, 64, dc_state )
-	AM_RANGE(0x00000000, 0x00000007) AM_READWRITE_LEGACY(dc_pdtra_r, dc_pdtra_w )
+static ADDRESS_MAP_START( dc_port, AS_IO, 64, dc_cons_state )
+	AM_RANGE(0x00000000, 0x00000007) AM_READWRITE(dc_pdtra_r, dc_pdtra_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32, dc_state )
+static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32, dc_cons_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("dc_sound_ram")		/* shared with SH-4 */
 	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE(dc_arm_aica_r, dc_arm_aica_w)
 ADDRESS_MAP_END
 
-static MACHINE_RESET( dc_console )
+MACHINE_RESET_MEMBER(dc_cons_state,dc_console)
 {
-	dc_state *state = machine.driver_data<dc_state>();
-
-	device_t *aica = machine.device("aica");
-	state->machine_reset();
-	aica_set_ram_base(aica, state->dc_sound_ram, 2*1024*1024);
-	dreamcast_atapi_reset(machine);
+	device_t *aica = machine().device("aica");
+	dc_state::machine_reset();
+	aica_set_ram_base(aica, dc_sound_ram, 2*1024*1024);
+	dreamcast_atapi_reset(machine());
 }
 
 static void aica_irq(device_t *device, int irq)
@@ -229,7 +219,7 @@ static const aica_interface dc_aica_interface =
 
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
-static MACHINE_CONFIG_START( dc, dc_state )
+static MACHINE_CONFIG_START( dc, dc_cons_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
 	MCFG_CPU_CONFIG(sh4cpu_config)
@@ -239,7 +229,7 @@ static MACHINE_CONFIG_START( dc, dc_state )
 	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
 
-	MCFG_MACHINE_RESET( dc_console )
+	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
 
 	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
 	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, "P1:0", "P1:1", "P1:A0", "P1:A1", "P1:A2", "P1:A3", "P1:A4", "P1:A5")
@@ -253,7 +243,7 @@ static MACHINE_CONFIG_START( dc, dc_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dc_state, screen_update_dc)
+	MCFG_SCREEN_UPDATE_DRIVER(dc_cons_state, screen_update_dc)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -383,9 +373,9 @@ INPUT_PORTS_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT      COMPANY FULLNAME */
-CONS( 1999, dc,     dcjp,   0,      dc,     dc, dc_state,     dcus,   "Sega", "Dreamcast (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1998, dcjp,   0,      0,      dc,     dc, dc_state,     dcjp,   "Sega", "Dreamcast (Japan, NTSC)", GAME_NOT_WORKING )
-CONS( 1999, dceu,   dcjp,   0,      dc,     dc, dc_state,     dcus,   "Sega", "Dreamcast (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1998, dcdev,  dcjp,   0,      dc,     dc, dc_state,     dc,     "Sega", "HKT-0120 Sega Dreamcast Development Box", GAME_NOT_WORKING )
-CONS( 1998, dcprt,  dcjp,   0,      dc,     dc, dc_state,     dcjp,   "Sega", "Katana Set 5 Prototype", GAME_NOT_WORKING )
+CONS( 1999, dc,     dcjp,   0,      dc,     dc, dc_cons_state,     dcus,   "Sega", "Dreamcast (USA, NTSC)", GAME_NOT_WORKING )
+CONS( 1998, dcjp,   0,      0,      dc,     dc, dc_cons_state,     dcjp,   "Sega", "Dreamcast (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1999, dceu,   dcjp,   0,      dc,     dc, dc_cons_state,     dcus,   "Sega", "Dreamcast (Europe, PAL)", GAME_NOT_WORKING )
+CONS( 1998, dcdev,  dcjp,   0,      dc,     dc, dc_cons_state,     dc,     "Sega", "HKT-0120 Sega Dreamcast Development Box", GAME_NOT_WORKING )
+CONS( 1998, dcprt,  dcjp,   0,      dc,     dc, dc_cons_state,     dcjp,   "Sega", "Katana Set 5 Prototype", GAME_NOT_WORKING )
 
