@@ -337,13 +337,13 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_led_callback)
 }
 
 // 4 channel DMA controller (Hitachi HD63450)
-WRITE16_HANDLER(x68k_state::x68k_dmac_w)
+WRITE16_MEMBER(x68k_state::x68k_dmac_w)
 {
 	device_t* device = machine().device("hd63450");
 	hd63450_w(device, space, offset, data, mem_mask);
 }
 
-READ16_HANDLER(x68k_state::x68k_dmac_r)
+READ16_MEMBER(x68k_state::x68k_dmac_r)
 {
 	device_t* device = machine().device("hd63450");
 	return hd63450_r(device, space, offset, mem_mask);
