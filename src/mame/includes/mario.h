@@ -60,7 +60,7 @@ public:
 
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
-	required_device<discrete_device> m_discrete;
+	optional_device<discrete_device> m_discrete;
 	tilemap_t *m_bg_tilemap;
 	int m_monitor;
 

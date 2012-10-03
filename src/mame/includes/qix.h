@@ -55,7 +55,7 @@ public:
 	UINT8  m_palette_bank;
 	UINT8  m_leds;
 	required_shared_ptr<UINT8> m_scanline_latch;
-	required_device<discrete_device> m_discrete;
+	optional_device<discrete_device> m_discrete;
 	pen_t m_pens[NUM_PENS];
 	DECLARE_WRITE8_MEMBER(zookeep_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(qix_data_firq_w);

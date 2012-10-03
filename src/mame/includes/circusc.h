@@ -20,7 +20,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_sn_1(*this, "sn1"),
 		m_sn_2(*this, "sn2"),
-		m_discrete(*this, "discrete"){ }
+		m_discrete(*this, "fltdisc"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spritebank;

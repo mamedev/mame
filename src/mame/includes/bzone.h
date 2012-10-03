@@ -17,7 +17,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_discrete(*this, "discrete") { }
 
-	required_device<discrete_device> m_discrete;
+	optional_device<discrete_device> m_discrete;
 	
 	UINT8 m_analog_data;
 	UINT8 m_rb_input_select;
