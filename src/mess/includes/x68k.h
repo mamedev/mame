@@ -297,34 +297,79 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mfp_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_drq);
+	
+	void mfp_init();
+	void x68k_keyboard_ctrl_w(int data);
+	int x68k_keyboard_pop_scancode();
+	void x68k_keyboard_push_scancode(unsigned char code);
+	int x68k_read_mouse();
+	void x68k_set_adpcm();
+	UINT8 md_3button_r(int port);
+	void md_6button_init();
+	UINT8 md_6button_r(int port);
+	UINT8 xpd1lr_r(int port);
+	
+	DECLARE_WRITE_LINE_MEMBER(x68k_fm_irq);
+	DECLARE_WRITE_LINE_MEMBER(x68k_irq2_line);
+
+	DECLARE_WRITE16_MEMBER(x68k_dmac_w);
+	DECLARE_READ16_MEMBER(x68k_dmac_r);
+	DECLARE_WRITE16_MEMBER(x68k_scc_w);
+	DECLARE_WRITE16_MEMBER(x68k_fdc_w);
+	DECLARE_READ16_MEMBER(x68k_fdc_r);
+	DECLARE_WRITE16_MEMBER(x68k_fm_w);
+	DECLARE_READ16_MEMBER(x68k_fm_r);
+	DECLARE_WRITE16_MEMBER(x68k_ioc_w);
+	DECLARE_READ16_MEMBER(x68k_ioc_r);
+	DECLARE_WRITE16_MEMBER(x68k_sysport_w);
+	DECLARE_READ16_MEMBER(x68k_sysport_r);
+	DECLARE_READ16_MEMBER(x68k_mfp_r);
+	DECLARE_WRITE16_MEMBER(x68k_mfp_w);
+	DECLARE_WRITE16_MEMBER(x68k_ppi_w);
+	DECLARE_READ16_MEMBER(x68k_ppi_r);
+	DECLARE_READ16_MEMBER(x68k_rtc_r);
+	DECLARE_WRITE16_MEMBER(x68k_rtc_w);
+	DECLARE_WRITE16_MEMBER(x68k_sram_w);
+	DECLARE_READ16_MEMBER(x68k_sram_r);
+	DECLARE_READ32_MEMBER(x68k_sram32_r);
+	DECLARE_WRITE32_MEMBER(x68k_sram32_w);
+	DECLARE_WRITE16_MEMBER(x68k_vid_w);
+	DECLARE_READ16_MEMBER(x68k_vid_r);
+	DECLARE_READ16_MEMBER(x68k_areaset_r);
+	DECLARE_WRITE16_MEMBER(x68k_areaset_w);
+	DECLARE_WRITE16_MEMBER(x68k_enh_areaset_w);
+	DECLARE_READ16_MEMBER(x68k_rom0_r);
+	DECLARE_WRITE16_MEMBER(x68k_rom0_w);
+	DECLARE_READ16_MEMBER(x68k_emptyram_r);
+	DECLARE_WRITE16_MEMBER(x68k_emptyram_w);
+	DECLARE_READ16_MEMBER(x68k_exp_r);
+	DECLARE_WRITE16_MEMBER(x68k_exp_w);
+	DECLARE_READ16_MEMBER(x68k_scc_r);
+	
+	DECLARE_READ16_MEMBER(x68k_spritereg_r);
+	DECLARE_WRITE16_MEMBER(x68k_spritereg_w);
+	DECLARE_READ16_MEMBER(x68k_spriteram_r);
+	DECLARE_WRITE16_MEMBER(x68k_spriteram_w);
+	DECLARE_WRITE16_MEMBER(x68k_crtc_w);
+	DECLARE_READ16_MEMBER(x68k_crtc_r);
+	DECLARE_WRITE16_MEMBER(x68k_gvram_w);
+	DECLARE_READ16_MEMBER(x68k_gvram_r);
+	DECLARE_WRITE16_MEMBER(x68k_tvram_w);
+	DECLARE_READ16_MEMBER(x68k_tvram_r);
+	DECLARE_WRITE32_MEMBER(x68k_gvram32_w);
+	DECLARE_READ32_MEMBER(x68k_gvram32_r);
+	DECLARE_WRITE32_MEMBER(x68k_tvram32_w);
+	DECLARE_READ32_MEMBER(x68k_tvram32_r);
+private:
+	inline void x68k_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
+	void x68k_crtc_text_copy(int src, int dest);
+	void x68k_crtc_refresh_mode();
+	void x68k_draw_text(bitmap_ind16 &bitmap, int xscr, int yscr, rectangle rect);
+	void x68k_draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority);
+	void x68k_draw_gfx(bitmap_ind16 &bitmap,rectangle cliprect);
+	void x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);	
 };
 
-
-/*----------- defined in drivers/x68k.c -----------*/
-
-#ifdef UNUSED_FUNCTION
-void mfp_trigger_irq(int);
-TIMER_CALLBACK(mfp_timer_a_callback);
-TIMER_CALLBACK(mfp_timer_b_callback);
-TIMER_CALLBACK(mfp_timer_c_callback);
-TIMER_CALLBACK(mfp_timer_d_callback);
-#endif
-
-/*----------- defined in video/x68k.c -----------*/
-DECLARE_READ16_HANDLER( x68k_spritereg_r );
-DECLARE_WRITE16_HANDLER( x68k_spritereg_w );
-DECLARE_READ16_HANDLER( x68k_spriteram_r );
-DECLARE_WRITE16_HANDLER( x68k_spriteram_w );
-DECLARE_WRITE16_HANDLER( x68k_crtc_w );
-DECLARE_READ16_HANDLER( x68k_crtc_r );
-DECLARE_WRITE16_HANDLER( x68k_gvram_w );
-DECLARE_READ16_HANDLER( x68k_gvram_r );
-DECLARE_WRITE16_HANDLER( x68k_tvram_w );
-DECLARE_READ16_HANDLER( x68k_tvram_r );
-DECLARE_WRITE32_HANDLER( x68k_gvram32_w );
-DECLARE_READ32_HANDLER( x68k_gvram32_r );
-DECLARE_WRITE32_HANDLER( x68k_tvram32_w );
-DECLARE_READ32_HANDLER( x68k_tvram32_r );
 
 
 #endif /* X68K_H_ */

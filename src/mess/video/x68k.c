@@ -33,9 +33,7 @@
 
 
 
-static void x68k_crtc_refresh_mode(running_machine &machine);
-
-INLINE void x68k_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+inline void x68k_state::x68k_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	bitmap.pix16(y, x) = (UINT16)color;
 }
@@ -78,7 +76,7 @@ static bitmap_ind16* x68k_get_gfx_page(int pri,int type)
     return NULL;  // should never reach here either.
 }
 */
-static void x68k_crtc_text_copy(x68k_state *state, int src, int dest)
+void x68k_state::x68k_crtc_text_copy(int src, int dest)
 {
 	// copys one raster in T-VRAM to another raster
 	UINT16* tvram;
@@ -86,10 +84,10 @@ static void x68k_crtc_text_copy(x68k_state *state, int src, int dest)
 	int dest_ram = dest * 256;
 	int line;
 
-	if(state->m_is_32bit)
-		tvram = (UINT16*)state->m_tvram32.target();
+	if(m_is_32bit)
+		tvram = (UINT16*)m_tvram32.target();
 	else
-		tvram = (UINT16*)state->m_tvram16.target();
+		tvram = (UINT16*)m_tvram16.target();
 
 	if(dest > 250)
 		return;  // for some reason, Salamander causes a SIGSEGV in a debug build in this function.
@@ -114,48 +112,47 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_operation_end)
 	m_crtc.operation &= ~bit;
 }
 
-static void x68k_crtc_refresh_mode(running_machine &machine)
+void x68k_state::x68k_crtc_refresh_mode()
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
 //  rectangle rect;
 //  double scantime;
 	rectangle scr,visiblescr;
 	int length;
 
 	// Calculate data from register values
-	state->m_crtc.vmultiple = 1;
-	if((state->m_crtc.reg[20] & 0x10) != 0 && (state->m_crtc.reg[20] & 0x0c) == 0)
-		state->m_crtc.vmultiple = 2;  // 31.5kHz + 256 lines = doublescan
-	if(state->m_crtc.interlace != 0)
-		state->m_crtc.vmultiple = 0.5f;  // 31.5kHz + 1024 lines or 15kHz + 512 lines = interlaced
-	state->m_crtc.htotal = (state->m_crtc.reg[0] + 1) * 8;
-	state->m_crtc.vtotal = (state->m_crtc.reg[4] + 1) / state->m_crtc.vmultiple; // default is 567 (568 scanlines)
-	state->m_crtc.hbegin = (state->m_crtc.reg[2] * 8) + 1;
-	state->m_crtc.hend = (state->m_crtc.reg[3] * 8);
-	state->m_crtc.vbegin = (state->m_crtc.reg[6]) / state->m_crtc.vmultiple;
-	state->m_crtc.vend = (state->m_crtc.reg[7] - 1) / state->m_crtc.vmultiple;
-	state->m_crtc.hsync_end = (state->m_crtc.reg[1]) * 8;
-	state->m_crtc.vsync_end = (state->m_crtc.reg[5]) / state->m_crtc.vmultiple;
-	state->m_crtc.hsyncadjust = state->m_crtc.reg[8];
-	scr.set(0, state->m_crtc.htotal - 8, 0, state->m_crtc.vtotal);
-	if(scr.max_y <= state->m_crtc.vend)
-		scr.max_y = state->m_crtc.vend + 2;
-	if(scr.max_x <= state->m_crtc.hend)
-		scr.max_x = state->m_crtc.hend + 2;
-	visiblescr.set(state->m_crtc.hbegin, state->m_crtc.hend, state->m_crtc.vbegin, state->m_crtc.vend);
+	m_crtc.vmultiple = 1;
+	if((m_crtc.reg[20] & 0x10) != 0 && (m_crtc.reg[20] & 0x0c) == 0)
+		m_crtc.vmultiple = 2;  // 31.5kHz + 256 lines = doublescan
+	if(m_crtc.interlace != 0)
+		m_crtc.vmultiple = 0.5f;  // 31.5kHz + 1024 lines or 15kHz + 512 lines = interlaced
+	m_crtc.htotal = (m_crtc.reg[0] + 1) * 8;
+	m_crtc.vtotal = (m_crtc.reg[4] + 1) / m_crtc.vmultiple; // default is 567 (568 scanlines)
+	m_crtc.hbegin = (m_crtc.reg[2] * 8) + 1;
+	m_crtc.hend = (m_crtc.reg[3] * 8);
+	m_crtc.vbegin = (m_crtc.reg[6]) / m_crtc.vmultiple;
+	m_crtc.vend = (m_crtc.reg[7] - 1) / m_crtc.vmultiple;
+	m_crtc.hsync_end = (m_crtc.reg[1]) * 8;
+	m_crtc.vsync_end = (m_crtc.reg[5]) / m_crtc.vmultiple;
+	m_crtc.hsyncadjust = m_crtc.reg[8];
+	scr.set(0, m_crtc.htotal - 8, 0, m_crtc.vtotal);
+	if(scr.max_y <= m_crtc.vend)
+		scr.max_y = m_crtc.vend + 2;
+	if(scr.max_x <= m_crtc.hend)
+		scr.max_x = m_crtc.hend + 2;
+	visiblescr.set(m_crtc.hbegin, m_crtc.hend, m_crtc.vbegin, m_crtc.vend);
 
 	// expand visible area to the size indicated by CRTC reg 20
-	length = state->m_crtc.hend - state->m_crtc.hbegin;
-	if (length < state->m_crtc.width)
+	length = m_crtc.hend - m_crtc.hbegin;
+	if (length < m_crtc.width)
 	{
-		visiblescr.min_x = state->m_crtc.hbegin - ((state->m_crtc.width - length)/2);
-		visiblescr.max_x = state->m_crtc.hend + ((state->m_crtc.width - length)/2);
+		visiblescr.min_x = m_crtc.hbegin - ((m_crtc.width - length)/2);
+		visiblescr.max_x = m_crtc.hend + ((m_crtc.width - length)/2);
 	}
-	length = state->m_crtc.vend - state->m_crtc.vbegin;
-	if (length < state->m_crtc.height)
+	length = m_crtc.vend - m_crtc.vbegin;
+	if (length < m_crtc.height)
 	{
-		visiblescr.min_y = state->m_crtc.vbegin - ((state->m_crtc.height - length)/2);
-		visiblescr.max_y = state->m_crtc.vend + ((state->m_crtc.height - length)/2);
+		visiblescr.min_y = m_crtc.vbegin - ((m_crtc.height - length)/2);
+		visiblescr.max_y = m_crtc.vend + ((m_crtc.height - length)/2);
 	}
 	// bounds check
 	if(visiblescr.min_x < 0)
@@ -167,10 +164,10 @@ static void x68k_crtc_refresh_mode(running_machine &machine)
 	if(visiblescr.max_y >= scr.max_y - 1)
 		visiblescr.max_y = scr.max_y - 2;
 
-//  logerror("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i\n",state->m_crtc.reg[0],state->m_crtc.reg[1],state->m_crtc.reg[2],state->m_crtc.reg[3],
-//      state->m_crtc.reg[4],state->m_crtc.reg[5],state->m_crtc.reg[6],state->m_crtc.reg[7],state->m_crtc.reg[8],state->m_crtc.reg[9]);
+//  logerror("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i\n",m_crtc.reg[0],m_crtc.reg[1],m_crtc.reg[2],m_crtc.reg[3],
+//      m_crtc.reg[4],m_crtc.reg[5],m_crtc.reg[6],m_crtc.reg[7],m_crtc.reg[8],m_crtc.reg[9]);
 	logerror("video_screen_configure(machine.primary_screen,%i,%i,[%i,%i,%i,%i],55.45)\n",scr.max_x,scr.max_y,visiblescr.min_x,visiblescr.min_y,visiblescr.max_x,visiblescr.max_y);
-	machine.primary_screen->configure(scr.max_x,scr.max_y,visiblescr,HZ_TO_ATTOSECONDS(55.45));
+	machine().primary_screen->configure(scr.max_x,scr.max_y,visiblescr,HZ_TO_ATTOSECONDS(55.45));
 }
 
 TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
@@ -370,10 +367,9 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_vblank_irq)
  *    Operation Port bits are cleared automatically when the requested
  *    operation is completed.
  */
-WRITE16_HANDLER( x68k_crtc_w )
+WRITE16_MEMBER(x68k_state::x68k_crtc_w )
 {
-	x68k_state *state = space.machine().driver_data<x68k_state>();
-	COMBINE_DATA(state->m_crtc.reg+offset);
+	COMBINE_DATA(m_crtc.reg+offset);
 	switch(offset)
 	{
 	case 0:
@@ -385,83 +381,82 @@ WRITE16_HANDLER( x68k_crtc_w )
 	case 6:
 	case 7:
 	case 8:
-		x68k_crtc_refresh_mode(space.machine());
+		x68k_crtc_refresh_mode();
 		break;
 	case 9:  // CRTC raster IRQ (GPIP6)
 		{
 			attotime irq_time;
-			irq_time = space.machine().primary_screen->time_until_pos((data) / state->m_crtc.vmultiple,2);
+			irq_time = machine().primary_screen->time_until_pos((data) / m_crtc.vmultiple,2);
 
 			if(irq_time.as_double() > 0)
-				state->m_raster_irq->adjust(irq_time, (data) / state->m_crtc.vmultiple);
+				m_raster_irq->adjust(irq_time, (data) / m_crtc.vmultiple);
 		}
 		logerror("CRTC: Write to raster IRQ register - %i\n",data);
 		break;
 	case 20:
 		if(ACCESSING_BITS_0_7)
 		{
-			state->m_crtc.interlace = 0;
+			m_crtc.interlace = 0;
 			switch(data & 0x0c)
 			{
 			case 0x00:
-				state->m_crtc.height = 256;
+				m_crtc.height = 256;
 				break;
 			case 0x08:
 			case 0x0c:  // TODO: 1024 vertical, if horizontal freq = 31kHz
-				state->m_crtc.height = 512;
-				state->m_crtc.interlace = 1;  // if 31kHz, 1024 lines = interlaced
+				m_crtc.height = 512;
+				m_crtc.interlace = 1;  // if 31kHz, 1024 lines = interlaced
 				break;
 			case 0x04:
-				state->m_crtc.height = 512;
-				if(!(state->m_crtc.reg[20] & 0x0010))  // if 15kHz, 512 lines = interlaced
-					state->m_crtc.interlace = 1;
+				m_crtc.height = 512;
+				if(!(m_crtc.reg[20] & 0x0010))  // if 15kHz, 512 lines = interlaced
+					m_crtc.interlace = 1;
 				break;
 			}
 			switch(data & 0x03)
 			{
 			case 0x00:
-				state->m_crtc.width = 256;
+				m_crtc.width = 256;
 				break;
 			case 0x01:
-				state->m_crtc.width = 512;
+				m_crtc.width = 512;
 				break;
 			case 0x02:
 			case 0x03:  // 0x03 = 50MHz clock mode (XVI only)
-				state->m_crtc.width = 768;
+				m_crtc.width = 768;
 				break;
 			}
 		}
 /*      if(ACCESSING_BITS_8_15)
         {
-            state->m_crtc.interlace = 0;
+            m_crtc.interlace = 0;
             if(data & 0x0400)
-                state->m_crtc.interlace = 1;
+                m_crtc.interlace = 1;
         }*/
-		x68k_crtc_refresh_mode(space.machine());
+		x68k_crtc_refresh_mode();
 		break;
 	case 576:  // operation register
-		state->m_crtc.operation = data;
+		m_crtc.operation = data;
 		if(data & 0x08)  // text screen raster copy
 		{
-			x68k_crtc_text_copy(state, (state->m_crtc.reg[22] & 0xff00) >> 8,(state->m_crtc.reg[22] & 0x00ff));
-			space.machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(x68k_state::x68k_crtc_operation_end),state), 0x02);  // time taken to do operation is a complete guess.
+			x68k_crtc_text_copy((m_crtc.reg[22] & 0xff00) >> 8,(m_crtc.reg[22] & 0x00ff));
+			machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(x68k_state::x68k_crtc_operation_end),this), 0x02);  // time taken to do operation is a complete guess.
 		}
 		if(data & 0x02)  // high-speed graphic screen clear
 		{
-			if(state->m_is_32bit)
-				memset(state->m_gvram32,0,0x40000);
+			if(m_is_32bit)
+				memset(m_gvram32,0,0x40000);
 			else
-				memset(state->m_gvram16,0,0x40000);
-			space.machine().scheduler().timer_set(attotime::from_msec(10), timer_expired_delegate(FUNC(x68k_state::x68k_crtc_operation_end),state), 0x02);  // time taken to do operation is a complete guess.
+				memset(m_gvram16,0,0x40000);
+			machine().scheduler().timer_set(attotime::from_msec(10), timer_expired_delegate(FUNC(x68k_state::x68k_crtc_operation_end),this), 0x02);  // time taken to do operation is a complete guess.
 		}
 		break;
 	}
-//  logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",space.machine().device("maincpu")->safe_pc(),data,offset);
+//  logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",machine().device("maincpu")->safe_pc(),data,offset);
 }
 
-READ16_HANDLER( x68k_crtc_r )
+READ16_MEMBER(x68k_state::x68k_crtc_r )
 {
-	x68k_state *state = space.machine().driver_data<x68k_state>();
 #if 0
 	switch(offset)
 	{
@@ -473,7 +468,7 @@ READ16_HANDLER( x68k_crtc_r )
 
 	if(offset < 24)
 	{
-//      logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",space.machine().device("maincpu")->safe_pc(),state->m_crtc.reg[offset],offset);
+//      logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",machine().device("maincpu")->safe_pc(),m_crtc.reg[offset],offset);
 		switch(offset)
 		{
 		case 9:
@@ -482,27 +477,26 @@ READ16_HANDLER( x68k_crtc_r )
 		case 11:
 		case 12:  // Graphic layer 0 scroll
 		case 13:
-			return state->m_crtc.reg[offset] & 0x3ff;
+			return m_crtc.reg[offset] & 0x3ff;
 		case 14:  // Graphic layer 1 scroll
 		case 15:
 		case 16:  // Graphic layer 2 scroll
 		case 17:
 		case 18:  // Graphic layer 3 scroll
 		case 19:
-			return state->m_crtc.reg[offset] & 0x1ff;
+			return m_crtc.reg[offset] & 0x1ff;
 		default:
-			return state->m_crtc.reg[offset];
+			return m_crtc.reg[offset];
 		}
 	}
 	if(offset == 576) // operation port, operation bits are set to 0 when operation is complete
-		return state->m_crtc.operation;
+		return m_crtc.operation;
 //  logerror("CRTC: [%08x] Read from unknown CRTC register %i\n",activecpu_get_pc(),offset);
 	return 0xffff;
 }
 
-WRITE16_HANDLER( x68k_gvram_w )
+WRITE16_MEMBER(x68k_state::x68k_gvram_w )
 {
-	x68k_state *state = space.machine().driver_data<x68k_state>();
 	UINT16* gvram;
 //  int xloc,yloc,pageoffset;
 	/*
@@ -520,20 +514,20 @@ WRITE16_HANDLER( x68k_gvram_w )
        Page 3 - 0xd00000-0xd7ffff    Page 4 - 0xd80000-0xdfffff
     */
 
-	if(state->m_is_32bit)
-		gvram = (UINT16*)state->m_gvram32.target();
+	if(m_is_32bit)
+		gvram = (UINT16*)m_gvram32.target();
 	else
-		gvram = (UINT16*)state->m_gvram16.target();
+		gvram = (UINT16*)m_gvram16.target();
 
 	// handle different G-VRAM page setups
-	if(state->m_crtc.reg[20] & 0x08)  // G-VRAM set to buffer
+	if(m_crtc.reg[20] & 0x08)  // G-VRAM set to buffer
 	{
 		if(offset < 0x40000)
 			COMBINE_DATA(gvram+offset);
 	}
 	else
 	{
-		switch(state->m_crtc.reg[20] & 0x0300)
+		switch(m_crtc.reg[20] & 0x0300)
 		{
 			case 0x0300:
 				if(offset < 0x40000)
@@ -573,29 +567,28 @@ WRITE16_HANDLER( x68k_gvram_w )
 	}
 }
 
-WRITE16_HANDLER( x68k_tvram_w )
+WRITE16_MEMBER(x68k_state::x68k_tvram_w )
 {
-	x68k_state *state = space.machine().driver_data<x68k_state>();
 	UINT16* tvram;
 	UINT16 text_mask;
 
-	if(state->m_is_32bit)
-		tvram = (UINT16*)state->m_tvram32.target();
+	if(m_is_32bit)
+		tvram = (UINT16*)m_tvram32.target();
 	else
-		tvram = (UINT16*)state->m_tvram16.target();
+		tvram = (UINT16*)m_tvram16.target();
 
-	text_mask = ~(state->m_crtc.reg[23]) & mem_mask;
+	text_mask = ~(m_crtc.reg[23]) & mem_mask;
 
-	if(!(state->m_crtc.reg[21] & 0x0200)) // text access mask enable
+	if(!(m_crtc.reg[21] & 0x0200)) // text access mask enable
 		text_mask = 0xffff & mem_mask;
 
 	mem_mask = text_mask;
 
-	if(state->m_crtc.reg[21] & 0x0100)
+	if(m_crtc.reg[21] & 0x0100)
 	{  // simultaneous T-VRAM plane access (I think ;))
 		int plane,wr;
 		offset = offset & 0x00ffff;
-		wr = (state->m_crtc.reg[21] & 0x00f0) >> 4;
+		wr = (m_crtc.reg[21] & 0x00f0) >> 4;
 		for(plane=0;plane<4;plane++)
 		{
 			if(wr & (1 << plane))
@@ -610,21 +603,20 @@ WRITE16_HANDLER( x68k_tvram_w )
 	}
 }
 
-READ16_HANDLER( x68k_gvram_r )
+READ16_MEMBER(x68k_state::x68k_gvram_r )
 {
-	x68k_state *state = space.machine().driver_data<x68k_state>();
 	const UINT16* gvram;
 	UINT16 ret = 0;
 
-	if(state->m_is_32bit)
-		gvram = (const UINT16*)state->m_gvram32.target();
+	if(m_is_32bit)
+		gvram = (const UINT16*)m_gvram32.target();
 	else
-		gvram = (const UINT16*)state->m_gvram16.target();
+		gvram = (const UINT16*)m_gvram16.target();
 
-	if(state->m_crtc.reg[20] & 0x08)  // G-VRAM set to buffer
+	if(m_crtc.reg[20] & 0x08)  // G-VRAM set to buffer
 		return gvram[offset];
 
-	switch(state->m_crtc.reg[20] & 0x0300)  // colour setup determines G-VRAM use
+	switch(m_crtc.reg[20] & 0x0300)  // colour setup determines G-VRAM use
 	{
 		case 0x0300: // 65,536 colour (RGB) - 16-bits per word
 			if(offset < 0x40000)
@@ -658,20 +650,19 @@ READ16_HANDLER( x68k_gvram_r )
 	return ret;
 }
 
-READ16_HANDLER( x68k_tvram_r )
+READ16_MEMBER(x68k_state::x68k_tvram_r )
 {
-	x68k_state *state = space.machine().driver_data<x68k_state>();
 	const UINT16* tvram;
 
-	if(state->m_is_32bit)
-		tvram = (const UINT16*)state->m_tvram32.target();
+	if(m_is_32bit)
+		tvram = (const UINT16*)m_tvram32.target();
 	else
-		tvram = (const UINT16*)state->m_tvram16.target();
+		tvram = (const UINT16*)m_tvram16.target();
 
 	return tvram[offset];
 }
 
-READ32_HANDLER( x68k_tvram32_r )
+READ32_MEMBER(x68k_state::x68k_tvram32_r )
 {
 	UINT32 ret = 0;
 
@@ -683,7 +674,7 @@ READ32_HANDLER( x68k_tvram32_r )
 	return ret;
 }
 
-READ32_HANDLER( x68k_gvram32_r )
+READ32_MEMBER(x68k_state::x68k_gvram32_r )
 {
 	UINT32 ret = 0;
 
@@ -695,7 +686,7 @@ READ32_HANDLER( x68k_gvram32_r )
 	return ret;
 }
 
-WRITE32_HANDLER( x68k_tvram32_w )
+WRITE32_MEMBER(x68k_state::x68k_tvram32_w )
 {
 	if(ACCESSING_BITS_0_7)
 		x68k_tvram_w(space,(offset*2)+1,data,0x00ff);
@@ -707,7 +698,7 @@ WRITE32_HANDLER( x68k_tvram32_w )
 		x68k_tvram_w(space,offset*2,data >> 16,0xff00);
 }
 
-WRITE32_HANDLER( x68k_gvram32_w )
+WRITE32_MEMBER(x68k_state::x68k_gvram32_w )
 {
 	if(ACCESSING_BITS_0_7)
 		x68k_gvram_w(space,(offset*2)+1,data,0x00ff);
@@ -719,112 +710,107 @@ WRITE32_HANDLER( x68k_gvram32_w )
 		x68k_gvram_w(space,offset*2,data >> 16,0xff00);
 }
 
-WRITE16_HANDLER( x68k_spritereg_w )
+WRITE16_MEMBER(x68k_state::x68k_spritereg_w )
 {
-	x68k_state *state = space.machine().driver_data<x68k_state>();
-	COMBINE_DATA(state->m_spritereg+offset);
+	COMBINE_DATA(m_spritereg+offset);
 	switch(offset)
 	{
 	case 0x400:
-		state->m_bg0_8->set_scrollx(0,(data - state->m_crtc.hbegin - state->m_crtc.bg_hshift) & 0x3ff);
-		state->m_bg0_16->set_scrollx(0,(data - state->m_crtc.hbegin - state->m_crtc.bg_hshift) & 0x3ff);
+		m_bg0_8->set_scrollx(0,(data - m_crtc.hbegin - m_crtc.bg_hshift) & 0x3ff);
+		m_bg0_16->set_scrollx(0,(data - m_crtc.hbegin - m_crtc.bg_hshift) & 0x3ff);
 		break;
 	case 0x401:
-		state->m_bg0_8->set_scrolly(0,(data - state->m_crtc.vbegin) & 0x3ff);
-		state->m_bg0_16->set_scrolly(0,(data - state->m_crtc.vbegin) & 0x3ff);
+		m_bg0_8->set_scrolly(0,(data - m_crtc.vbegin) & 0x3ff);
+		m_bg0_16->set_scrolly(0,(data - m_crtc.vbegin) & 0x3ff);
 		break;
 	case 0x402:
-		state->m_bg1_8->set_scrollx(0,(data - state->m_crtc.hbegin - state->m_crtc.bg_hshift) & 0x3ff);
-		state->m_bg1_16->set_scrollx(0,(data - state->m_crtc.hbegin - state->m_crtc.bg_hshift) & 0x3ff);
+		m_bg1_8->set_scrollx(0,(data - m_crtc.hbegin - m_crtc.bg_hshift) & 0x3ff);
+		m_bg1_16->set_scrollx(0,(data - m_crtc.hbegin - m_crtc.bg_hshift) & 0x3ff);
 		break;
 	case 0x403:
-		state->m_bg1_8->set_scrolly(0,(data - state->m_crtc.vbegin) & 0x3ff);
-		state->m_bg1_16->set_scrolly(0,(data - state->m_crtc.vbegin) & 0x3ff);
+		m_bg1_8->set_scrolly(0,(data - m_crtc.vbegin) & 0x3ff);
+		m_bg1_16->set_scrolly(0,(data - m_crtc.vbegin) & 0x3ff);
 		break;
 	case 0x406:  // BG H-DISP (normally equals CRTC reg 2 value + 4)
 		if(data != 0x00ff)
 		{
-			state->m_crtc.bg_visible_width = (state->m_crtc.reg[3] - ((data & 0x003f) - 4)) * 8;
-			state->m_crtc.bg_hshift = ((data - (state->m_crtc.reg[2]+4)) * 8);
-			if(state->m_crtc.bg_hshift > 0)
-				state->m_crtc.bg_hshift = 0;
+			m_crtc.bg_visible_width = (m_crtc.reg[3] - ((data & 0x003f) - 4)) * 8;
+			m_crtc.bg_hshift = ((data - (m_crtc.reg[2]+4)) * 8);
+			if(m_crtc.bg_hshift > 0)
+				m_crtc.bg_hshift = 0;
 		}
 		break;
 	case 0x407:  // BG V-DISP (like CRTC reg 6)
-		state->m_crtc.bg_vshift = state->m_crtc.vshift;
+		m_crtc.bg_vshift = m_crtc.vshift;
 		break;
 	case 0x408:  // BG H/V-Res
-		state->m_crtc.bg_hvres = data & 0x1f;
+		m_crtc.bg_hvres = data & 0x1f;
 		if(data != 0xff)
 		{  // Handle when the PCG is using 256 and the CRTC is using 512
-			if((state->m_crtc.bg_hvres & 0x0c) == 0x00 && (state->m_crtc.reg[20] & 0x0c) == 0x04)
-				state->m_crtc.bg_double = 2;
+			if((m_crtc.bg_hvres & 0x0c) == 0x00 && (m_crtc.reg[20] & 0x0c) == 0x04)
+				m_crtc.bg_double = 2;
 			else
-				state->m_crtc.bg_double = 1;
+				m_crtc.bg_double = 1;
 		}
 		else
-			state->m_crtc.bg_double = 1;
+			m_crtc.bg_double = 1;
 		break;
 	}
 }
 
-READ16_HANDLER( x68k_spritereg_r )
+READ16_MEMBER(x68k_state::x68k_spritereg_r )
 {
-	x68k_state *state = space.machine().driver_data<x68k_state>();
 	if(offset >= 0x400 && offset < 0x404)
-		return state->m_spritereg[offset] & 0x3ff;
-	return state->m_spritereg[offset];
+		return m_spritereg[offset] & 0x3ff;
+	return m_spritereg[offset];
 }
 
-WRITE16_HANDLER( x68k_spriteram_w )
+WRITE16_MEMBER(x68k_state::x68k_spriteram_w )
 {
-	x68k_state *state = space.machine().driver_data<x68k_state>();
-	COMBINE_DATA(state->m_spriteram+offset);
-	state->m_video.tile8_dirty[offset / 16] = 1;
-	state->m_video.tile16_dirty[offset / 64] = 1;
+	COMBINE_DATA(m_spriteram+offset);
+	m_video.tile8_dirty[offset / 16] = 1;
+	m_video.tile16_dirty[offset / 64] = 1;
 	if(offset < 0x2000)
 	{
-        state->m_bg1_8->mark_all_dirty();
-        state->m_bg1_16->mark_all_dirty();
-        state->m_bg0_8->mark_all_dirty();
-        state->m_bg0_16->mark_all_dirty();
+        m_bg1_8->mark_all_dirty();
+        m_bg1_16->mark_all_dirty();
+        m_bg0_8->mark_all_dirty();
+        m_bg0_16->mark_all_dirty();
     }
     if(offset >= 0x2000 && offset < 0x3000)
     {
-        state->m_bg1_8->mark_tile_dirty(offset & 0x0fff);
-        state->m_bg1_16->mark_tile_dirty(offset & 0x0fff);
+        m_bg1_8->mark_tile_dirty(offset & 0x0fff);
+        m_bg1_16->mark_tile_dirty(offset & 0x0fff);
     }
     if(offset >= 0x3000)
     {
-        state->m_bg0_8->mark_tile_dirty(offset & 0x0fff);
-        state->m_bg0_16->mark_tile_dirty(offset & 0x0fff);
+        m_bg0_8->mark_tile_dirty(offset & 0x0fff);
+        m_bg0_16->mark_tile_dirty(offset & 0x0fff);
     }
 }
 
-READ16_HANDLER( x68k_spriteram_r )
+READ16_MEMBER(x68k_state::x68k_spriteram_r )
 {
-	x68k_state *state = space.machine().driver_data<x68k_state>();
-	return state->m_spriteram[offset];
+	return m_spriteram[offset];
 }
 
-static void x68k_draw_text(running_machine &machine,bitmap_ind16 &bitmap, int xscr, int yscr, rectangle rect)
+void x68k_state::x68k_draw_text(bitmap_ind16 &bitmap, int xscr, int yscr, rectangle rect)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
 	const UINT16* tvram;
 	unsigned int line,pixel; // location on screen
 	UINT32 loc;  // location in TVRAM
 	UINT32 colour;
 	int bit;
 
-	if(state->m_is_32bit)
-		tvram = (const UINT16*)state->m_tvram32.target();
+	if(m_is_32bit)
+		tvram = (const UINT16*)m_tvram32.target();
 	else
-		tvram = (const UINT16*)state->m_tvram16.target();
+		tvram = (const UINT16*)m_tvram16.target();
 
 	for(line=rect.min_y;line<=rect.max_y;line++)  // per scanline
 	{
 		// adjust for scroll registers
-		loc = (((line - state->m_crtc.vbegin) + yscr) & 0x3ff) * 64;
+		loc = (((line - m_crtc.vbegin) + yscr) & 0x3ff) * 64;
 		loc += (xscr / 16) & 0x7f;
 		loc &= 0xffff;
 		bit = 15 - (xscr & 0x0f);
@@ -834,14 +820,14 @@ static void x68k_draw_text(running_machine &machine,bitmap_ind16 &bitmap, int xs
 				+ (((tvram[loc+0x10000] >> bit) & 0x01) ? 2 : 0)
 				+ (((tvram[loc+0x20000] >> bit) & 0x01) ? 4 : 0)
 				+ (((tvram[loc+0x30000] >> bit) & 0x01) ? 8 : 0);
-			if(state->m_video.text_pal[colour] != 0x0000)  // any colour but black
+			if(m_video.text_pal[colour] != 0x0000)  // any colour but black
 			{
 				// Colour 0 is displayable if the text layer is at the priority level 2
-				if(colour == 0 && (state->m_video.reg[1] & 0x0c00) == 0x0800)
-					bitmap.pix16(line, pixel) = 512 + (state->m_video.text_pal[colour] >> 1);
+				if(colour == 0 && (m_video.reg[1] & 0x0c00) == 0x0800)
+					bitmap.pix16(line, pixel) = 512 + (m_video.text_pal[colour] >> 1);
 				else
 					if(colour != 0)
-						bitmap.pix16(line, pixel) = 512 + (state->m_video.text_pal[colour] >> 1);
+						bitmap.pix16(line, pixel) = 512 + (m_video.text_pal[colour] >> 1);
 			}
 			bit--;
 			if(bit < 0)
@@ -854,9 +840,8 @@ static void x68k_draw_text(running_machine &machine,bitmap_ind16 &bitmap, int xs
 	}
 }
 
-static void x68k_draw_gfx_scanline(running_machine &machine, bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority)
+void x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
 	const UINT16* gvram;
 	int pixel;
 	int page;
@@ -867,23 +852,23 @@ static void x68k_draw_gfx_scanline(running_machine &machine, bitmap_ind16 &bitma
 	int shift;
 	int scanline;
 
-	if(state->m_is_32bit)
-		gvram = (const UINT16*)state->m_gvram32.target();
+	if(m_is_32bit)
+		gvram = (const UINT16*)m_gvram32.target();
 	else
-		gvram = (const UINT16*)state->m_gvram16.target();
+		gvram = (const UINT16*)m_gvram16.target();
 
 	for(scanline=cliprect.min_y;scanline<=cliprect.max_y;scanline++)  // per scanline
 	{
-		if(state->m_crtc.reg[20] & 0x0400)  // 1024x1024 "real" screen size - use 1024x1024 16-colour gfx layer
+		if(m_crtc.reg[20] & 0x0400)  // 1024x1024 "real" screen size - use 1024x1024 16-colour gfx layer
 		{
 			// adjust for scroll registers
-			if(state->m_video.reg[2] & 0x0010 && priority == state->m_video.gfxlayer_pri[0])
+			if(m_video.reg[2] & 0x0010 && priority == m_video.gfxlayer_pri[0])
 			{
-				xscr = (state->m_crtc.reg[12] & 0x3ff);
-				yscr = (state->m_crtc.reg[13] & 0x3ff);
-				lineoffset = (((scanline - state->m_crtc.vbegin) + yscr) & 0x3ff) * 1024;
+				xscr = (m_crtc.reg[12] & 0x3ff);
+				yscr = (m_crtc.reg[13] & 0x3ff);
+				lineoffset = (((scanline - m_crtc.vbegin) + yscr) & 0x3ff) * 1024;
 				loc = xscr & 0x3ff;
-				for(pixel=state->m_crtc.hbegin;pixel<=state->m_crtc.hend;pixel++)
+				for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
 				{
 					switch(lineoffset & 0xc0000)
 					{
@@ -901,7 +886,7 @@ static void x68k_draw_gfx_scanline(running_machine &machine, bitmap_ind16 &bitma
 						break;
 					}
 					if(colour != 0)
-						bitmap.pix16(scanline, pixel) = 512 + (state->m_video.gfx_pal[colour] >> 1);
+						bitmap.pix16(scanline, pixel) = 512 + (m_video.gfx_pal[colour] >> 1);
 					loc++;
 					loc &= 0x3ff;
 				}
@@ -909,23 +894,23 @@ static void x68k_draw_gfx_scanline(running_machine &machine, bitmap_ind16 &bitma
 		}
 		else  // else 512x512 "real" screen size
 		{
-			if(state->m_video.reg[2] & (1 << priority))
+			if(m_video.reg[2] & (1 << priority))
 			{
-				page = state->m_video.gfxlayer_pri[priority];
+				page = m_video.gfxlayer_pri[priority];
 				// adjust for scroll registers
-				switch(state->m_video.reg[0] & 0x03)
+				switch(m_video.reg[0] & 0x03)
 				{
 				case 0x00: // 16 colours
-					xscr = ((state->m_crtc.reg[12+(page*2)])) & 0x1ff;
-					yscr = ((state->m_crtc.reg[13+(page*2)])) & 0x1ff;
-					lineoffset = (((scanline - state->m_crtc.vbegin) + yscr) & 0x1ff) * 512;
+					xscr = ((m_crtc.reg[12+(page*2)])) & 0x1ff;
+					yscr = ((m_crtc.reg[13+(page*2)])) & 0x1ff;
+					lineoffset = (((scanline - m_crtc.vbegin) + yscr) & 0x1ff) * 512;
 					loc = xscr & 0x1ff;
 					shift = 4;
-					for(pixel=state->m_crtc.hbegin;pixel<=state->m_crtc.hend;pixel++)
+					for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
 					{
 						colour = ((gvram[lineoffset + loc] >> page*shift) & 0x000f);
 						if(colour != 0)
-							bitmap.pix16(scanline, pixel) = 512 + (state->m_video.gfx_pal[colour & 0x0f] >> 1);
+							bitmap.pix16(scanline, pixel) = 512 + (m_video.gfx_pal[colour & 0x0f] >> 1);
 						loc++;
 						loc &= 0x1ff;
 					}
@@ -933,27 +918,27 @@ static void x68k_draw_gfx_scanline(running_machine &machine, bitmap_ind16 &bitma
 				case 0x01: // 256 colours
 					if(page == 0 || page == 2)
 					{
-						xscr = ((state->m_crtc.reg[12+(page*2)])) & 0x1ff;
-						yscr = ((state->m_crtc.reg[13+(page*2)])) & 0x1ff;
-						lineoffset = (((scanline - state->m_crtc.vbegin) + yscr) & 0x1ff) * 512;
+						xscr = ((m_crtc.reg[12+(page*2)])) & 0x1ff;
+						yscr = ((m_crtc.reg[13+(page*2)])) & 0x1ff;
+						lineoffset = (((scanline - m_crtc.vbegin) + yscr) & 0x1ff) * 512;
 						loc = xscr & 0x1ff;
 						shift = 4;
-						for(pixel=state->m_crtc.hbegin;pixel<=state->m_crtc.hend;pixel++)
+						for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
 						{
 							colour = ((gvram[lineoffset + loc] >> page*shift) & 0x00ff);
 							if(colour != 0)
-								bitmap.pix16(scanline, pixel) = 512 + (state->m_video.gfx_pal[colour & 0xff] >> 1);
+								bitmap.pix16(scanline, pixel) = 512 + (m_video.gfx_pal[colour & 0xff] >> 1);
 							loc++;
 							loc &= 0x1ff;
 						}
 					}
 					break;
 				case 0x03: // 65536 colours
-					xscr = ((state->m_crtc.reg[12])) & 0x1ff;
-					yscr = ((state->m_crtc.reg[13])) & 0x1ff;
-					lineoffset = (((scanline - state->m_crtc.vbegin) + yscr) & 0x1ff) * 512;
+					xscr = ((m_crtc.reg[12])) & 0x1ff;
+					yscr = ((m_crtc.reg[13])) & 0x1ff;
+					lineoffset = (((scanline - m_crtc.vbegin) + yscr) & 0x1ff) * 512;
 					loc = xscr & 0x1ff;
-					for(pixel=state->m_crtc.hbegin;pixel<=state->m_crtc.hend;pixel++)
+					for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
 					{
 						colour = gvram[lineoffset + loc];
 						if(colour != 0)
@@ -968,27 +953,25 @@ static void x68k_draw_gfx_scanline(running_machine &machine, bitmap_ind16 &bitma
 	}
 }
 
-static void x68k_draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,rectangle cliprect)
+void x68k_state::x68k_draw_gfx(bitmap_ind16 &bitmap,rectangle cliprect)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
 	int priority;
 	//rectangle rect;
 	//int xscr,yscr;
 	//int gpage;
 
-	if(state->m_crtc.reg[20] & 0x0800)  // if graphic layers are set to buffer, then they aren't visible
+	if(m_crtc.reg[20] & 0x0800)  // if graphic layers are set to buffer, then they aren't visible
 		return;
 
 	for(priority=3;priority>=0;priority--)
 	{
-		x68k_draw_gfx_scanline(machine, bitmap,cliprect,priority);
+		x68k_draw_gfx_scanline(bitmap,cliprect,priority);
 	}
 }
 
 // Sprite controller "Cynthia" at 0xeb0000
-static void x68k_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, int priority, rectangle cliprect)
+void x68k_state::x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
 	/*
        0xeb0000 - 0xeb07ff - Sprite registers (up to 128)
            + 00 : b9-0,  Sprite X position
@@ -1022,29 +1005,29 @@ static void x68k_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, in
 
 	for(ptr=508;ptr>=0;ptr-=4)  // stepping through sprites
 	{
-		pri = state->m_spritereg[ptr+3] & 0x03;
+		pri = m_spritereg[ptr+3] & 0x03;
 #ifdef MAME_DEBUG
-		if(!(machine.input().code_pressed(KEYCODE_I)))
+		if(!(machine().input().code_pressed(KEYCODE_I)))
 #endif
 		if(pri == priority)
 		{  // if at the right priority level, draw the sprite
 			rectangle rect;
-			int code = state->m_spritereg[ptr+2] & 0x00ff;
-			int colour = (state->m_spritereg[ptr+2] & 0x0f00) >> 8;
-			int xflip = state->m_spritereg[ptr+2] & 0x4000;
-			int yflip = state->m_spritereg[ptr+2] & 0x8000;
-			int sx = (state->m_spritereg[ptr+0] & 0x3ff) - 16;
-			int sy = (state->m_spritereg[ptr+1] & 0x3ff) - 16;
+			int code = m_spritereg[ptr+2] & 0x00ff;
+			int colour = (m_spritereg[ptr+2] & 0x0f00) >> 8;
+			int xflip = m_spritereg[ptr+2] & 0x4000;
+			int yflip = m_spritereg[ptr+2] & 0x8000;
+			int sx = (m_spritereg[ptr+0] & 0x3ff) - 16;
+			int sy = (m_spritereg[ptr+1] & 0x3ff) - 16;
 
-			rect.min_x=state->m_crtc.hshift;
-			rect.min_y=state->m_crtc.vshift;
-			rect.max_x=rect.min_x + state->m_crtc.visible_width-1;
-			rect.max_y=rect.min_y + state->m_crtc.visible_height-1;
+			rect.min_x=m_crtc.hshift;
+			rect.min_y=m_crtc.vshift;
+			rect.max_x=rect.min_x + m_crtc.visible_width-1;
+			rect.max_y=rect.min_y + m_crtc.visible_height-1;
 
-			sx += state->m_crtc.bg_hshift;
-			sx += state->m_sprite_shift;
+			sx += m_crtc.bg_hshift;
+			sx += m_sprite_shift;
 
-			drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1],code,colour+0x10,xflip,yflip,state->m_crtc.hbegin+sx,state->m_crtc.vbegin+(sy*state->m_crtc.bg_double),0x10000,0x10000*state->m_crtc.bg_double,0x00);
+			drawgfxzoom_transpen(bitmap,cliprect,machine().gfx[1],code,colour+0x10,xflip,yflip,m_crtc.hbegin+sx,m_crtc.vbegin+(sy*m_crtc.bg_double),0x10000,0x10000*m_crtc.bg_double,0x00);
 		}
 	}
 }
@@ -1214,12 +1197,12 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_ind16 &bit
 	{
 		// Graphics screen(s)
 		if(priority == m_video.gfx_pri)
-			x68k_draw_gfx(machine(),bitmap,rect);
+			x68k_draw_gfx(bitmap,rect);
 
 		// Sprite / BG Tiles
 		if(priority == m_video.sprite_pri /*&& (m_spritereg[0x404] & 0x0200)*/ && (m_video.reg[2] & 0x0040))
 		{
-			x68k_draw_sprites(machine(), bitmap,1,rect);
+			x68k_draw_sprites(bitmap,1,rect);
 			if((m_spritereg[0x404] & 0x0008))
 			{
 				if((m_spritereg[0x404] & 0x0030) == 0x10)  // BG1 TXSEL
@@ -1235,7 +1218,7 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_ind16 &bit
 					x68k_bg1->draw(bitmap,rect,0,0);
 				}
 			}
-			x68k_draw_sprites(machine(),bitmap,2,rect);
+			x68k_draw_sprites(bitmap,2,rect);
 			if((m_spritereg[0x404] & 0x0001))
 			{
 				if((m_spritereg[0x404] & 0x0006) == 0x02)  // BG0 TXSEL
@@ -1251,7 +1234,7 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_ind16 &bit
 					x68k_bg1->draw(bitmap,rect,0,0);
 				}
 			}
-			x68k_draw_sprites(machine(),bitmap,3,rect);
+			x68k_draw_sprites(bitmap,3,rect);
 		}
 
 		// Text screen
@@ -1260,7 +1243,7 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_ind16 &bit
 			xscr = (m_crtc.reg[10] & 0x3ff);
 			yscr = (m_crtc.reg[11] & 0x3ff);
 			if(!(m_crtc.reg[20] & 0x1000))  // if text layer is set to buffer, then it's not visible
-				x68k_draw_text(machine(),bitmap,xscr,yscr,rect);
+				x68k_draw_text(bitmap,xscr,yscr,rect);
 		}
 	}
 
