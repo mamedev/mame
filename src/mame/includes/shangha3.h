@@ -24,6 +24,7 @@ public:
 	DECLARE_WRITE16_MEMBER(shangha3_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(shangha3_gfxlist_addr_w);
 	DECLARE_WRITE16_MEMBER(shangha3_blitter_go_w);
+	DECLARE_WRITE16_MEMBER(shangha3_irq_ack_w);
 	DECLARE_DRIVER_INIT(shangha3);
 	DECLARE_DRIVER_INIT(heberpop);
 	virtual void video_start();
