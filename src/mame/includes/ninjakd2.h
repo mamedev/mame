@@ -59,6 +59,8 @@ public:
 	DECLARE_DRIVER_INIT(mnight);
 	DECLARE_DRIVER_INIT(ninjakd2);
 	DECLARE_DRIVER_INIT(bootleg);
+	DECLARE_DRIVER_INIT(robokid);
+	DECLARE_DRIVER_INIT(robokidj);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(ninjakd2_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(mnight_get_bg_tile_info);

@@ -1467,6 +1467,29 @@ DRIVER_INIT_MEMBER(ninjakd2_state,mnight)
 }
 
 
+static void robokid_motion_error_kludge(UINT8 *ROM)
+{
+	// patch out rare "5268 MOTION ERROR" (MT 05024)
+	// It looks like it's due to a buggy random number generator,
+	// then it possibly happens on the real arcade cabinet too.
+	// I doubt it is protection related, but you can never be sure.
+	ROM[0] = 0xe6;
+	ROM[1] = 0x03; // and 3
+	ROM[2] = 0x18;
+	ROM[3] = 0xf6; // jr $-8
+}
+
+DRIVER_INIT_MEMBER(ninjakd2_state,robokid)
+{
+	robokid_motion_error_kludge(memregion("maincpu")->base() + 0x5247);
+}
+
+DRIVER_INIT_MEMBER(ninjakd2_state,robokidj)
+{
+	robokid_motion_error_kludge(memregion("maincpu")->base() + 0x5266);
+}
+
+
 
 /*************************************
  *
@@ -1481,8 +1504,8 @@ GAME( 1987, ninjakd2b, ninjakd2, ninjakd2, rdaction, ninjakd2_state, bootleg,  R
 GAME( 1987, rdaction,  ninjakd2, ninjakd2, rdaction, ninjakd2_state, ninjakd2, ROT0,   "UPL (World Games license)", "Rad Action / NinjaKun Ashura no Shou", 0 )
 GAME( 1987, mnight,    0,        mnight,   mnight,   ninjakd2_state, mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night", 0 )
 GAME( 1988, arkarea,   0,        arkarea,  arkarea,  ninjakd2_state, mnight,   ROT0,   "UPL", "Ark Area", 0 )
-GAME( 1988, robokid,   0,        robokid,  robokid,  driver_device,  0,        ROT0,   "UPL", "Atomic Robo-kid", 0 )
-GAME( 1988, robokidj,  robokid,  robokid,  robokidj, driver_device,  0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 1)", 0 )
-GAME( 1988, robokidj2, robokid,  robokid,  robokidj, driver_device,  0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 2)", 0 )
+GAME( 1988, robokid,   0,        robokid,  robokid,  ninjakd2_state, robokid,  ROT0,   "UPL", "Atomic Robo-kid", 0 )
+GAME( 1988, robokidj,  robokid,  robokid,  robokidj, ninjakd2_state, robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, set 1)", 0 )
+GAME( 1988, robokidj2, robokid,  robokid,  robokidj, ninjakd2_state, robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, set 2)", 0 )
 GAME( 1989, omegaf,    0,        omegaf,   omegaf,   driver_device,  0,        ROT270, "UPL", "Omega Fighter", 0 )
 GAME( 1989, omegafs,   omegaf,   omegaf,   omegaf,   driver_device,  0,        ROT270, "UPL", "Omega Fighter Special", 0 )
