@@ -306,33 +306,33 @@ static INPUT_PORTS_START( gg )
 INPUT_PORTS_END
 
 
-static WRITE_LINE_DEVICE_HANDLER( sms_int_callback )
+WRITE_LINE_MEMBER(sms_state::sms_int_callback)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, state);
+	machine().device("maincpu")->execute().set_input_line(0, state);
 }
 
 static const sega315_5124_interface _315_5124_ntsc_intf =
 {
 	false,
 	"screen",
-	DEVCB_LINE(sms_int_callback),
-	DEVCB_LINE(sms_pause_callback)
+	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_int_callback),
+	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_pause_callback)
 };
 
 static const sega315_5124_interface _315_5124_pal_intf =
 {
 	true,
 	"screen",
-	DEVCB_LINE(sms_int_callback),
-	DEVCB_LINE(sms_pause_callback)
+	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_int_callback),
+	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_pause_callback)
 };
 
 static const sega315_5124_interface sms_store_intf =
 {
 	false,
 	"screen",
-	DEVCB_LINE(sms_store_int_callback),
-	DEVCB_LINE(sms_pause_callback)
+	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_store_int_callback),
+	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_pause_callback)
 };
 
 

@@ -12,32 +12,30 @@
 #include "includes/kramermc.h"
 
 
-static READ8_DEVICE_HANDLER (kramermc_port_a_r)
+READ8_MEMBER(kramermc_state::kramermc_port_a_r)
 {
 	return 0xff;
 }
 
-static READ8_DEVICE_HANDLER (kramermc_port_b_r)
+READ8_MEMBER(kramermc_state::kramermc_port_b_r)
 {
-	kramermc_state *state = space.machine().driver_data<kramermc_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
-	return space.machine().root_device().ioport(keynames[state->m_key_row])->read();
+	return machine().root_device().ioport(keynames[m_key_row])->read();
 }
 
-static WRITE8_DEVICE_HANDLER (kramermc_port_a_w)
+WRITE8_MEMBER(kramermc_state::kramermc_port_a_w)
 {
-	kramermc_state *state = space.machine().driver_data<kramermc_state>();
-	state->m_key_row = ((data >> 1) & 0x07);
+	m_key_row = ((data >> 1) & 0x07);
 }
 
 Z80PIO_INTERFACE( kramermc_z80pio_intf )
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
-	DEVCB_HANDLER(kramermc_port_a_r),
-	DEVCB_HANDLER(kramermc_port_a_w),
+	DEVCB_DRIVER_MEMBER(kramermc_state,kramermc_port_a_r),
+	DEVCB_DRIVER_MEMBER(kramermc_state,kramermc_port_a_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(kramermc_port_b_r),
+	DEVCB_DRIVER_MEMBER(kramermc_state,kramermc_port_b_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

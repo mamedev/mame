@@ -70,31 +70,30 @@ static void c65_nmi( running_machine &machine )
  *  see machine/cbm.c
  */
 
-static READ8_DEVICE_HANDLER( c65_cia0_port_a_r )
+READ8_MEMBER(c65_state::c65_cia0_port_a_r)
 {
-	UINT8 cia0portb = mos6526_pb_r(space.machine().device("cia_0"), space, 0);
+	UINT8 cia0portb = mos6526_pb_r(machine().device("cia_0"), space, 0);
 
-	return cbm_common_cia0_port_a_r(device, cia0portb);
+	return cbm_common_cia0_port_a_r(machine().device("cia_0"), cia0portb);
 }
 
-static READ8_DEVICE_HANDLER( c65_cia0_port_b_r )
+READ8_MEMBER(c65_state::c65_cia0_port_b_r)
 {
-	c65_state *state = space.machine().driver_data<c65_state>();
 	UINT8 value = 0xff;
-	UINT8 cia0porta = mos6526_pa_r(space.machine().device("cia_0"), space, 0);
+	UINT8 cia0porta = mos6526_pa_r(machine().device("cia_0"), space, 0);
 
-	value &= cbm_common_cia0_port_b_r(device, cia0porta);
+	value &= cbm_common_cia0_port_b_r(machine().device("cia_0"), cia0porta);
 
-	if (!(state->m_6511_port & 0x02))
-		value &= state->m_keyline;
+	if (!(m_6511_port & 0x02))
+		value &= m_keyline;
 
 	return value;
 }
 
-static WRITE8_DEVICE_HANDLER( c65_cia0_port_b_w )
+WRITE8_MEMBER(c65_state::c65_cia0_port_b_w)
 {
 //  was there lightpen support in c65 video chip?
-//  device_t *vic3 = space.machine().device("vic3");
+//  device_t *vic3 = machine().device("vic3");
 //  vic3_lightpen_write(vic3, data & 0x10);
 }
 
@@ -136,10 +135,10 @@ const mos6526_interface c65_cia0 =
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(c65_cia0_port_a_r),
+	DEVCB_DRIVER_MEMBER(c65_state,c65_cia0_port_a_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(c65_cia0_port_b_r),
-	DEVCB_HANDLER(c65_cia0_port_b_w)
+	DEVCB_DRIVER_MEMBER(c65_state,c65_cia0_port_b_r),
+	DEVCB_DRIVER_MEMBER(c65_state,c65_cia0_port_b_w)
 };
 
 /*
@@ -165,45 +164,43 @@ const mos6526_interface c65_cia0 =
  * flag restore key or rs232 received data input
  * irq to nmi connected ?
  */
-static READ8_DEVICE_HANDLER( c65_cia1_port_a_r )
+READ8_MEMBER(c65_state::c65_cia1_port_a_r)
 {
-	c65_state *state = space.machine().driver_data<c65_state>();
 	UINT8 value = 0xff;
 
-	if (!state->m_iec->clk_r())
+	if (!m_iec->clk_r())
 		value &= ~0x40;
 
-	if (!state->m_iec->data_r())
+	if (!m_iec->data_r())
 		value &= ~0x80;
 
 	return value;
 }
 
-static WRITE8_DEVICE_HANDLER( c65_cia1_port_a_w )
+WRITE8_MEMBER(c65_state::c65_cia1_port_a_w)
 {
-	c65_state *state = space.machine().driver_data<c65_state>();
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
 
-	state->m_iec->atn_w(!BIT(data, 3));
-	state->m_iec->clk_w(!BIT(data, 4));
-	state->m_iec->data_w(!BIT(data, 5));
+	m_iec->atn_w(!BIT(data, 3));
+	m_iec->clk_w(!BIT(data, 4));
+	m_iec->data_w(!BIT(data, 5));
 
-	state->m_vicaddr = state->m_memory + helper[data & 0x03];
+	m_vicaddr = m_memory + helper[data & 0x03];
 }
 
-static WRITE_LINE_DEVICE_HANDLER( c65_cia1_interrupt )
+WRITE_LINE_MEMBER(c65_state::c65_cia1_interrupt)
 {
-	c65_nmi(device->machine());
+	c65_nmi(machine());
 }
 
 const mos6526_interface c65_cia1 =
 {
-	DEVCB_LINE(c65_cia1_interrupt),
+	DEVCB_DRIVER_LINE_MEMBER(c65_state,c65_cia1_interrupt),
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(c65_cia1_port_a_r),
-	DEVCB_HANDLER(c65_cia1_port_a_w),
+	DEVCB_DRIVER_MEMBER(c65_state,c65_cia1_port_a_r),
+	DEVCB_DRIVER_MEMBER(c65_state,c65_cia1_port_a_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

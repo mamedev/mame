@@ -649,10 +649,10 @@ void portfolio_state::palette_init()
 //  HD61830_INTERFACE( lcdc_intf )
 //-------------------------------------------------
 
-static READ8_DEVICE_HANDLER( hd61830_rd_r )
+READ8_MEMBER(portfolio_state::hd61830_rd_r)
 {
 	UINT16 address = ((offset & 0xff) << 3) | ((offset >> 12) & 0x07);
-	UINT8 data = space.machine().root_device().memregion(HD61830_TAG)->base()[address];
+	UINT8 data = machine().root_device().memregion(HD61830_TAG)->base()[address];
 
 	return data;
 }
@@ -660,7 +660,7 @@ static READ8_DEVICE_HANDLER( hd61830_rd_r )
 static HD61830_INTERFACE( lcdc_intf )
 {
 	SCREEN_TAG,
-	DEVCB_HANDLER(hd61830_rd_r)
+	DEVCB_DRIVER_MEMBER(portfolio_state,hd61830_rd_r)
 };
 
 //-------------------------------------------------

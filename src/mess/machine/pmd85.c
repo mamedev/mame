@@ -238,45 +238,41 @@ static void c2717_update_memory(running_machine &machine)
 
 *******************************************************************************/
 
-static  READ8_DEVICE_HANDLER ( pmd85_ppi_0_porta_r )
+READ8_MEMBER(pmd85_state::pmd85_ppi_0_porta_r)
 {
 	return 0xff;
 }
 
-static  READ8_DEVICE_HANDLER ( pmd85_ppi_0_portb_r )
+READ8_MEMBER(pmd85_state::pmd85_ppi_0_portb_r)
 {
-	pmd85_state *state = device->machine().driver_data<pmd85_state>();
 	static const char *const keynames[] = {
 		"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
 		"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15"
 	};
 
-	return device->machine().root_device().ioport(keynames[(state->m_ppi_port_outputs[0][0] & 0x0f)])->read() & device->machine().root_device().ioport("KEY15")->read();
+	return machine().root_device().ioport(keynames[(m_ppi_port_outputs[0][0] & 0x0f)])->read() & machine().root_device().ioport("KEY15")->read();
 }
 
-static  READ8_DEVICE_HANDLER ( pmd85_ppi_0_portc_r )
+READ8_MEMBER(pmd85_state::pmd85_ppi_0_portc_r)
 {
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER ( pmd85_ppi_0_porta_w )
+WRITE8_MEMBER(pmd85_state::pmd85_ppi_0_porta_w)
 {
-	pmd85_state *state = space.machine().driver_data<pmd85_state>();
-	state->m_ppi_port_outputs[0][0] = data;
+	m_ppi_port_outputs[0][0] = data;
 }
 
-static WRITE8_DEVICE_HANDLER ( pmd85_ppi_0_portb_w )
+WRITE8_MEMBER(pmd85_state::pmd85_ppi_0_portb_w)
 {
-	pmd85_state *state = space.machine().driver_data<pmd85_state>();
-	state->m_ppi_port_outputs[0][1] = data;
+	m_ppi_port_outputs[0][1] = data;
 }
 
-static WRITE8_DEVICE_HANDLER ( pmd85_ppi_0_portc_w )
+WRITE8_MEMBER(pmd85_state::pmd85_ppi_0_portc_w)
 {
-	pmd85_state *state = space.machine().driver_data<pmd85_state>();
-	state->m_ppi_port_outputs[0][2] = data;
-	set_led_status(space.machine(), PMD85_LED_2, (data & 0x08) ? 1 : 0);
-	set_led_status(space.machine(), PMD85_LED_3, (data & 0x04) ? 1 : 0);
+	m_ppi_port_outputs[0][2] = data;
+	set_led_status(machine(), PMD85_LED_2, (data & 0x08) ? 1 : 0);
+	set_led_status(machine(), PMD85_LED_3, (data & 0x04) ? 1 : 0);
 }
 
 /*******************************************************************************
@@ -287,32 +283,30 @@ static WRITE8_DEVICE_HANDLER ( pmd85_ppi_0_portc_w )
 
 *******************************************************************************/
 
-static  READ8_DEVICE_HANDLER ( mato_ppi_0_portb_r )
+READ8_MEMBER(pmd85_state::mato_ppi_0_portb_r)
 {
-	pmd85_state *state = device->machine().driver_data<pmd85_state>();
 	int i;
 	UINT8 data = 0xff;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 
 	for (i = 0; i < 8; i++)
 	{
-		if (!BIT(state->m_ppi_port_outputs[0][0], i))
-			data &= device->machine().root_device().ioport(keynames[i])->read();
+		if (!BIT(m_ppi_port_outputs[0][0], i))
+			data &= machine().root_device().ioport(keynames[i])->read();
 	}
 	return data;
 }
 
-static  READ8_DEVICE_HANDLER ( mato_ppi_0_portc_r )
+READ8_MEMBER(pmd85_state::mato_ppi_0_portc_r)
 {
-	return device->machine().root_device().ioport("KEY8")->read() | 0x8f;
+	return machine().root_device().ioport("KEY8")->read() | 0x8f;
 }
 
-static WRITE8_DEVICE_HANDLER ( mato_ppi_0_portc_w )
+WRITE8_MEMBER(pmd85_state::mato_ppi_0_portc_w)
 {
-	pmd85_state *state = space.machine().driver_data<pmd85_state>();
-	state->m_ppi_port_outputs[0][2] = data;
-	set_led_status(space.machine(), PMD85_LED_2, BIT(data, 3));
-	set_led_status(space.machine(), PMD85_LED_3, BIT(data, 2));
+	m_ppi_port_outputs[0][2] = data;
+	set_led_status(machine(), PMD85_LED_2, BIT(data, 3));
+	set_led_status(machine(), PMD85_LED_3, BIT(data, 2));
 }
 
 /*******************************************************************************
@@ -323,37 +317,34 @@ static WRITE8_DEVICE_HANDLER ( mato_ppi_0_portc_w )
 
 *******************************************************************************/
 
-static READ8_DEVICE_HANDLER ( pmd85_ppi_1_porta_r )
+READ8_MEMBER(pmd85_state::pmd85_ppi_1_porta_r)
 {
 	return 0xff;
 }
 
-static READ8_DEVICE_HANDLER ( pmd85_ppi_1_portb_r )
+READ8_MEMBER(pmd85_state::pmd85_ppi_1_portb_r)
 {
 	return 0xff;
 }
 
-static READ8_DEVICE_HANDLER ( pmd85_ppi_1_portc_r )
+READ8_MEMBER(pmd85_state::pmd85_ppi_1_portc_r)
 {
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER ( pmd85_ppi_1_porta_w )
+WRITE8_MEMBER(pmd85_state::pmd85_ppi_1_porta_w)
 {
-	pmd85_state *state = space.machine().driver_data<pmd85_state>();
-	state->m_ppi_port_outputs[1][0] = data;
+	m_ppi_port_outputs[1][0] = data;
 }
 
-static WRITE8_DEVICE_HANDLER ( pmd85_ppi_1_portb_w )
+WRITE8_MEMBER(pmd85_state::pmd85_ppi_1_portb_w)
 {
-	pmd85_state *state = space.machine().driver_data<pmd85_state>();
-	state->m_ppi_port_outputs[1][1] = data;
+	m_ppi_port_outputs[1][1] = data;
 }
 
-static WRITE8_DEVICE_HANDLER ( pmd85_ppi_1_portc_w )
+WRITE8_MEMBER(pmd85_state::pmd85_ppi_1_portc_w)
 {
-	pmd85_state *state = space.machine().driver_data<pmd85_state>();
-	state->m_ppi_port_outputs[1][2] = data;
+	m_ppi_port_outputs[1][2] = data;
 }
 
 /*******************************************************************************
@@ -368,37 +359,34 @@ static WRITE8_DEVICE_HANDLER ( pmd85_ppi_1_portc_w )
 
 *******************************************************************************/
 
-static READ8_DEVICE_HANDLER ( pmd85_ppi_2_porta_r )
+READ8_MEMBER(pmd85_state::pmd85_ppi_2_porta_r)
 {
 	return 0xff;
 }
 
-static READ8_DEVICE_HANDLER ( pmd85_ppi_2_portb_r )
+READ8_MEMBER(pmd85_state::pmd85_ppi_2_portb_r)
 {
 	return 0xff;
 }
 
-static READ8_DEVICE_HANDLER ( pmd85_ppi_2_portc_r )
+READ8_MEMBER(pmd85_state::pmd85_ppi_2_portc_r)
 {
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER ( pmd85_ppi_2_porta_w )
+WRITE8_MEMBER(pmd85_state::pmd85_ppi_2_porta_w)
 {
-	pmd85_state *state = space.machine().driver_data<pmd85_state>();
-	state->m_ppi_port_outputs[2][0] = data;
+	m_ppi_port_outputs[2][0] = data;
 }
 
-static WRITE8_DEVICE_HANDLER ( pmd85_ppi_2_portb_w )
+WRITE8_MEMBER(pmd85_state::pmd85_ppi_2_portb_w)
 {
-	pmd85_state *state = space.machine().driver_data<pmd85_state>();
-	state->m_ppi_port_outputs[2][1] = data;
+	m_ppi_port_outputs[2][1] = data;
 }
 
-static WRITE8_DEVICE_HANDLER ( pmd85_ppi_2_portc_w )
+WRITE8_MEMBER(pmd85_state::pmd85_ppi_2_portc_w)
 {
-	pmd85_state *state = space.machine().driver_data<pmd85_state>();
-	state->m_ppi_port_outputs[2][2] = data;
+	m_ppi_port_outputs[2][2] = data;
 }
 
 /*******************************************************************************
@@ -456,41 +444,37 @@ const struct pit8253_config pmd85_pit8253_interface =
 
 *******************************************************************************/
 
-static READ8_DEVICE_HANDLER ( pmd85_ppi_3_porta_r )
+READ8_MEMBER(pmd85_state::pmd85_ppi_3_porta_r)
 {
-	pmd85_state *state = space.machine().driver_data<pmd85_state>();
-	if (state->memregion("user1")->base() != NULL)
-		return state->memregion("user1")->base()[state->m_ppi_port_outputs[3][1] | (state->m_ppi_port_outputs[3][2] << 8)];
+	if (memregion("user1")->base() != NULL)
+		return memregion("user1")->base()[m_ppi_port_outputs[3][1] | (m_ppi_port_outputs[3][2] << 8)];
 	else
 		return 0;
 }
 
-static READ8_DEVICE_HANDLER ( pmd85_ppi_3_portb_r )
+READ8_MEMBER(pmd85_state::pmd85_ppi_3_portb_r)
 {
 	return 0xff;
 }
 
-static READ8_DEVICE_HANDLER ( pmd85_ppi_3_portc_r )
+READ8_MEMBER(pmd85_state::pmd85_ppi_3_portc_r)
 {
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER ( pmd85_ppi_3_porta_w )
+WRITE8_MEMBER(pmd85_state::pmd85_ppi_3_porta_w)
 {
-	pmd85_state *state = space.machine().driver_data<pmd85_state>();
-	state->m_ppi_port_outputs[3][0] = data;
+	m_ppi_port_outputs[3][0] = data;
 }
 
-static WRITE8_DEVICE_HANDLER ( pmd85_ppi_3_portb_w )
+WRITE8_MEMBER(pmd85_state::pmd85_ppi_3_portb_w)
 {
-	pmd85_state *state = space.machine().driver_data<pmd85_state>();
-	state->m_ppi_port_outputs[3][1] = data;
+	m_ppi_port_outputs[3][1] = data;
 }
 
-static WRITE8_DEVICE_HANDLER ( pmd85_ppi_3_portc_w )
+WRITE8_MEMBER(pmd85_state::pmd85_ppi_3_portc_w)
 {
-	pmd85_state *state = space.machine().driver_data<pmd85_state>();
-	state->m_ppi_port_outputs[3][2] = data;
+	m_ppi_port_outputs[3][2] = data;
 }
 
 /*******************************************************************************
@@ -715,75 +699,75 @@ WRITE8_MEMBER(pmd85_state::mato_io_w)
 const i8255_interface pmd85_ppi8255_interface[4] =
 {
 	{
-		DEVCB_HANDLER(pmd85_ppi_0_porta_r),
-		DEVCB_HANDLER(pmd85_ppi_0_porta_w),
-		DEVCB_HANDLER(pmd85_ppi_0_portb_r),
-		DEVCB_HANDLER(pmd85_ppi_0_portb_w),
-		DEVCB_HANDLER(pmd85_ppi_0_portc_r),
-		DEVCB_HANDLER(pmd85_ppi_0_portc_w)
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_0_porta_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_0_porta_w),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_0_portb_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_0_portb_w),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_0_portc_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_0_portc_w)
 	},
 	{
-		DEVCB_HANDLER(pmd85_ppi_1_porta_r),
-		DEVCB_HANDLER(pmd85_ppi_1_porta_w),
-		DEVCB_HANDLER(pmd85_ppi_1_portb_r),
-		DEVCB_HANDLER(pmd85_ppi_1_portb_w),
-		DEVCB_HANDLER(pmd85_ppi_1_portc_r),
-		DEVCB_HANDLER(pmd85_ppi_1_portc_w)
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_1_porta_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_1_porta_w),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_1_portb_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_1_portb_w),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_1_portc_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_1_portc_w)
 	},
 	{
-		DEVCB_HANDLER(pmd85_ppi_2_porta_r),
-		DEVCB_HANDLER(pmd85_ppi_2_porta_w),
-		DEVCB_HANDLER(pmd85_ppi_2_portb_r),
-		DEVCB_HANDLER(pmd85_ppi_2_portb_w),
-		DEVCB_HANDLER(pmd85_ppi_2_portc_r),
-		DEVCB_HANDLER(pmd85_ppi_2_portc_w)
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_2_porta_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_2_porta_w),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_2_portb_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_2_portb_w),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_2_portc_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_2_portc_w)
 	},
 	{
-		DEVCB_HANDLER(pmd85_ppi_3_porta_r),
-		DEVCB_HANDLER(pmd85_ppi_3_porta_w),
-		DEVCB_HANDLER(pmd85_ppi_3_portb_r),
-		DEVCB_HANDLER(pmd85_ppi_3_portb_w),
-		DEVCB_HANDLER(pmd85_ppi_3_portc_r),
-		DEVCB_HANDLER(pmd85_ppi_3_portc_w)
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_3_porta_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_3_porta_w),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_3_portb_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_3_portb_w),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_3_portc_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_3_portc_w)
 	}
 };
 
 const i8255_interface alfa_ppi8255_interface[3] =
 {
 	{
-		DEVCB_HANDLER(pmd85_ppi_0_porta_r),
-		DEVCB_HANDLER(pmd85_ppi_0_porta_w),
-		DEVCB_HANDLER(pmd85_ppi_0_portb_r),
-		DEVCB_HANDLER(pmd85_ppi_0_portb_w),
-		DEVCB_HANDLER(pmd85_ppi_0_portc_r),
-		DEVCB_HANDLER(pmd85_ppi_0_portc_w)
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_0_porta_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_0_porta_w),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_0_portb_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_0_portb_w),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_0_portc_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_0_portc_w)
 	},
 	{
-		DEVCB_HANDLER(pmd85_ppi_1_porta_r),
-		DEVCB_HANDLER(pmd85_ppi_1_porta_w),
-		DEVCB_HANDLER(pmd85_ppi_1_portb_r),
-		DEVCB_HANDLER(pmd85_ppi_1_portb_w),
-		DEVCB_HANDLER(pmd85_ppi_1_portc_r),
-		DEVCB_HANDLER(pmd85_ppi_1_portc_w)
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_1_porta_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_1_porta_w),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_1_portb_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_1_portb_w),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_1_portc_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_1_portc_w)
 	},
 	{
-		DEVCB_HANDLER(pmd85_ppi_2_porta_r),
-		DEVCB_HANDLER(pmd85_ppi_2_porta_w),
-		DEVCB_HANDLER(pmd85_ppi_2_portb_r),
-		DEVCB_HANDLER(pmd85_ppi_2_portb_w),
-		DEVCB_HANDLER(pmd85_ppi_2_portc_r),
-		DEVCB_HANDLER(pmd85_ppi_2_portc_w)
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_2_porta_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_2_porta_w),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_2_portb_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_2_portb_w),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_2_portc_r),
+		DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_2_portc_w)
 	}
 };
 
 I8255_INTERFACE( mato_ppi8255_interface )
 {
-	DEVCB_HANDLER(pmd85_ppi_0_porta_r),
-	DEVCB_HANDLER(pmd85_ppi_0_porta_w),
-	DEVCB_HANDLER(mato_ppi_0_portb_r),
-	DEVCB_HANDLER(pmd85_ppi_0_portb_w),
-	DEVCB_HANDLER(mato_ppi_0_portc_r),
-	DEVCB_HANDLER(mato_ppi_0_portc_w)
+	DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_0_porta_r),
+	DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_0_porta_w),
+	DEVCB_DRIVER_MEMBER(pmd85_state,mato_ppi_0_portb_r),
+	DEVCB_DRIVER_MEMBER(pmd85_state,pmd85_ppi_0_portb_w),
+	DEVCB_DRIVER_MEMBER(pmd85_state,mato_ppi_0_portc_r),
+	DEVCB_DRIVER_MEMBER(pmd85_state,mato_ppi_0_portc_w)
 };
 
 

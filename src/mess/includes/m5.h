@@ -70,6 +70,7 @@ public:
 	int m_obfa;
 	DECLARE_DRIVER_INIT(pal);
 	DECLARE_DRIVER_INIT(ntsc);
+	DECLARE_WRITE_LINE_MEMBER(sordm5_video_interrupt_callback);
 };
 
 #endif

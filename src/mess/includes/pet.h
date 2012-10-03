@@ -60,6 +60,20 @@ public:
 	TIMER_CALLBACK_MEMBER(pet_interrupt);
 	TIMER_CALLBACK_MEMBER(pet_tape1_timer);
 	TIMER_CALLBACK_MEMBER(pet_tape2_timer);
+	DECLARE_READ8_MEMBER(pia0_pa_r);
+	DECLARE_WRITE8_MEMBER(pia0_pa_w);
+	DECLARE_READ8_MEMBER(kin_r);
+	DECLARE_READ8_MEMBER(petb_kin_r);
+	DECLARE_READ8_MEMBER(cass1_r);
+	DECLARE_WRITE8_MEMBER(cass1_motor_w);
+	DECLARE_WRITE_LINE_MEMBER(pia0_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(pia1_irq_w);
+	DECLARE_READ8_MEMBER(via_pb_r);
+	DECLARE_READ_LINE_MEMBER(cass2_r);
+	DECLARE_WRITE8_MEMBER(via_pb_w);
+	DECLARE_WRITE_LINE_MEMBER(gb_w);
+	DECLARE_WRITE_LINE_MEMBER(via_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(pet_display_enable_changed);
 };
 
 /*----------- defined in video/pet.c -----------*/
@@ -71,7 +85,6 @@ void superpet_vh_init (running_machine &machine);
 
 MC6845_UPDATE_ROW( pet40_update_row );
 MC6845_UPDATE_ROW( pet80_update_row );
-WRITE_LINE_DEVICE_HANDLER( pet_display_enable_changed );
 
 
 /*----------- defined in machine/pet.c -----------*/

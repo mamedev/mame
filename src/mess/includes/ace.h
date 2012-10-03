@@ -60,6 +60,16 @@ public:
 	UINT32 screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(set_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(clear_irq);
+	DECLARE_READ8_MEMBER(pio_ad_r);
+	DECLARE_READ8_MEMBER(pio_bd_r);
+	DECLARE_READ8_MEMBER(pio_ac_r);
+	DECLARE_READ8_MEMBER(pio_bc_r);
+	DECLARE_WRITE8_MEMBER(pio_ad_w);
+	DECLARE_WRITE8_MEMBER(pio_bd_w);
+	DECLARE_WRITE8_MEMBER(pio_ac_w);
+	DECLARE_WRITE8_MEMBER(pio_bc_w);
+	DECLARE_READ8_MEMBER(sby_r);
+	DECLARE_WRITE8_MEMBER(ald_w);
 };
 
 #endif /* ACE_H_ */

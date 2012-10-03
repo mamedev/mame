@@ -165,15 +165,13 @@ INPUT_PORTS_END
 
 /* Interrupts */
 
-static WRITE_LINE_DEVICE_HANDLER(coleco_vdp_interrupt)
+WRITE_LINE_MEMBER(coleco_state::coleco_vdp_interrupt)
 {
-	coleco_state *drvstate = device->machine().driver_data<coleco_state>();
-
     // NMI on rising edge
-	if (state && !drvstate->m_last_nmi_state)
-		drvstate->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && !m_last_nmi_state)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
-	drvstate->m_last_nmi_state = state;
+	m_last_nmi_state = state;
 }
 
 TIMER_CALLBACK_MEMBER(coleco_state::paddle_d7reset_callback)
@@ -240,7 +238,7 @@ static TMS9928A_INTERFACE(coleco_tms9928a_interface)
 {
 	"screen",
 	0x4000,
-	DEVCB_LINE(coleco_vdp_interrupt)
+	DEVCB_DRIVER_LINE_MEMBER(coleco_state,coleco_vdp_interrupt)
 };
 
 

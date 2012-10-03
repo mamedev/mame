@@ -1269,13 +1269,15 @@ static const cassette_interface kc85_cassette_interface =
 	NULL
 };
 
-static WRITE_LINE_DEVICE_HANDLER( kc85_sod_w )
+WRITE_LINE_MEMBER(kc85_state::kc85_sod_w)
 {
+	device_t *device = machine().device(CASSETTE_TAG);
 	dynamic_cast<cassette_image_device *>(device)->output(state ? +1.0 : -1.0);
 }
 
-static READ_LINE_DEVICE_HANDLER( kc85_sid_r )
+READ_LINE_MEMBER(kc85_state::kc85_sid_r)
 {
+	device_t *device = machine().device(CASSETTE_TAG);
 	return dynamic_cast<cassette_image_device *>(device)->input() > 0.0;
 }
 
@@ -1283,8 +1285,8 @@ static I8085_CONFIG( kc85_i8085_config )
 {
 	DEVCB_NULL,				/* STATUS changed callback */
 	DEVCB_NULL,				/* INTE changed callback */
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, kc85_sid_r),	/* SID changed callback (I8085A only) */
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, kc85_sod_w)	/* SOD changed callback (I8085A only) */
+	DEVCB_DRIVER_LINE_MEMBER(kc85_state,kc85_sid_r),	/* SID changed callback (I8085A only) */
+	DEVCB_DRIVER_LINE_MEMBER(kc85_state,kc85_sod_w)	/* SOD changed callback (I8085A only) */
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(tandy200_state::tandy200_tp_tick)

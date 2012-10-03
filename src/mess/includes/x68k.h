@@ -285,6 +285,18 @@ public:
 	TIMER_CALLBACK_MEMBER(x68k_crtc_raster_end);
 	TIMER_CALLBACK_MEMBER(x68k_crtc_raster_irq);
 	TIMER_CALLBACK_MEMBER(x68k_crtc_vblank_irq);
+	DECLARE_READ8_MEMBER(ppi_port_a_r);
+	DECLARE_READ8_MEMBER(ppi_port_b_r);
+	DECLARE_READ8_MEMBER(ppi_port_c_r);
+	DECLARE_WRITE8_MEMBER(ppi_port_c_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
+	DECLARE_WRITE8_MEMBER(x68k_ct_w);
+	DECLARE_WRITE_LINE_MEMBER(x68k_rtc_alarm_irq);
+	DECLARE_WRITE8_MEMBER(x68030_adpcm_w);
+	DECLARE_WRITE_LINE_MEMBER(mfp_irq_callback);
+	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_irq);
+	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_drq);
 };
 
 

@@ -28,6 +28,18 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_lviv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(lviv_reset);
+	DECLARE_READ8_MEMBER(lviv_ppi_0_porta_r);
+	DECLARE_READ8_MEMBER(lviv_ppi_0_portb_r);
+	DECLARE_READ8_MEMBER(lviv_ppi_0_portc_r);
+	DECLARE_WRITE8_MEMBER(lviv_ppi_0_porta_w);
+	DECLARE_WRITE8_MEMBER(lviv_ppi_0_portb_w);
+	DECLARE_WRITE8_MEMBER(lviv_ppi_0_portc_w);
+	DECLARE_READ8_MEMBER(lviv_ppi_1_porta_r);
+	DECLARE_READ8_MEMBER(lviv_ppi_1_portb_r);
+	DECLARE_READ8_MEMBER(lviv_ppi_1_portc_r);
+	DECLARE_WRITE8_MEMBER(lviv_ppi_1_porta_w);
+	DECLARE_WRITE8_MEMBER(lviv_ppi_1_portb_w);
+	DECLARE_WRITE8_MEMBER(lviv_ppi_1_portc_w);
 };
 
 

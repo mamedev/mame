@@ -20,6 +20,9 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_kramermc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);	
+	DECLARE_READ8_MEMBER(kramermc_port_a_r);
+	DECLARE_READ8_MEMBER(kramermc_port_b_r);
+	DECLARE_WRITE8_MEMBER(kramermc_port_a_w);
 };
 
 

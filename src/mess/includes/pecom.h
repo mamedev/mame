@@ -41,6 +41,10 @@ public:
 	DECLARE_VIDEO_START(pecom);
 	DECLARE_INPUT_CHANGED_MEMBER(ef_w);
 	TIMER_CALLBACK_MEMBER(reset_tick);
+	DECLARE_READ_LINE_MEMBER(clear_r);
+	DECLARE_READ_LINE_MEMBER(ef2_r);
+	DECLARE_WRITE_LINE_MEMBER(pecom64_q_w);
+	DECLARE_WRITE_LINE_MEMBER(pecom_prd_w);
 };
 
 /*----------- defined in machine/pecom.c -----------*/

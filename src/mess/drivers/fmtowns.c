@@ -133,7 +133,7 @@ enum
 };
 
 
-static WRITE_LINE_DEVICE_HANDLER( towns_pic_irq );
+
 
 INLINE UINT8 byte_to_bcd(UINT8 val)
 {
@@ -1892,18 +1892,16 @@ static void towns_scsi_dma_w(running_machine &machine, UINT16 data)
 	state->m_scsi->fmscsi_data_w(data & 0xff);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( towns_scsi_irq )
+WRITE_LINE_MEMBER(towns_state::towns_scsi_irq)
 {
-	towns_state* tstate = device->machine().driver_data<towns_state>();
-	pic8259_ir0_w(tstate->m_pic_slave, state);
+	pic8259_ir0_w(m_pic_slave, state);
 	if(IRQ_LOG)
 		logerror("PIC: IRQ8 (SCSI) set to %i\n",state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( towns_scsi_drq )
+WRITE_LINE_MEMBER(towns_state::towns_scsi_drq)
 {
-	towns_state* tstate = device->machine().driver_data<towns_state>();
-	upd71071_dmarq(tstate->m_dma_1,state,1);  // SCSI HDs use channel 1
+	upd71071_dmarq(m_dma_1,state,1);  // SCSI HDs use channel 1
 }
 
 
@@ -2002,42 +2000,40 @@ static void towns_pcm_irq(device_t* device, int channel)
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( towns_pic_irq )
+WRITE_LINE_MEMBER(towns_state::towns_pic_irq)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 //  logerror("PIC#1: set IRQ line to %i\n",interrupt);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( towns_pit_out0_changed )
+WRITE_LINE_MEMBER(towns_state::towns_pit_out0_changed)
 {
-	towns_state* tstate = device->machine().driver_data<towns_state>();
-	device_t* dev = tstate->m_pic_master;
+	device_t* dev = m_pic_master;
 
-	if(tstate->m_towns_timer_mask & 0x01)
+	if(m_towns_timer_mask & 0x01)
 	{
-		tstate->m_timer0 = state;
+		m_timer0 = state;
 		if(IRQ_LOG) logerror("PIC: IRQ0 (PIT Timer ch0) set to %i\n",state);
 	}
 	else
-		tstate->m_timer0 = 0;
+		m_timer0 = 0;
 
-	pic8259_ir0_w(dev, tstate->m_timer0 || tstate->m_timer1);
+	pic8259_ir0_w(dev, m_timer0 || m_timer1);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( towns_pit_out1_changed )
+WRITE_LINE_MEMBER(towns_state::towns_pit_out1_changed)
 {
-	towns_state* tstate = device->machine().driver_data<towns_state>();
-	device_t* dev = tstate->m_pic_master;
+	device_t* dev = m_pic_master;
 
-	if(tstate->m_towns_timer_mask & 0x02)
+	if(m_towns_timer_mask & 0x02)
 	{
-		tstate->m_timer1 = state;
+		m_timer1 = state;
 		if(IRQ_LOG) logerror("PIC: IRQ0 (PIT Timer ch1) set to %i\n",state);
 	}
 	else
-		tstate->m_timer1 = 0;
+		m_timer1 = 0;
 
-	pic8259_ir0_w(dev, tstate->m_timer0 || tstate->m_timer1);
+	pic8259_ir0_w(dev, m_timer0 || m_timer1);
 }
 
 WRITE_LINE_MEMBER( towns_state::pit_out2_changed )
@@ -2515,12 +2511,12 @@ static const struct pit8253_config towns_pit8253_config =
 		{
 			307200,
 			DEVCB_NULL,
-			DEVCB_LINE(towns_pit_out0_changed)
+			DEVCB_DRIVER_LINE_MEMBER(towns_state,towns_pit_out0_changed)
 		},
 		{
 			307200,
 			DEVCB_NULL,
-			DEVCB_LINE(towns_pit_out1_changed)
+			DEVCB_DRIVER_LINE_MEMBER(towns_state,towns_pit_out1_changed)
 		},
 		{
 			307200,
@@ -2551,19 +2547,18 @@ static const struct pit8253_config towns_pit8253_config_2 =
 	}
 };
 
-static READ8_DEVICE_HANDLER( get_slave_ack )
+READ8_MEMBER(towns_state::get_slave_ack)
 {
-	towns_state* state = space.machine().driver_data<towns_state>();
 	if (offset==7) { // IRQ = 7
-		return pic8259_acknowledge(state->m_pic_slave);
+		return pic8259_acknowledge(m_pic_slave);
 	}
 	return 0x00;
 }
 static const struct pic8259_interface towns_pic8259_master_config =
 {
-	DEVCB_LINE(towns_pic_irq),
+	DEVCB_DRIVER_LINE_MEMBER(towns_state,towns_pic_irq),
 	DEVCB_LINE_VCC,
-	DEVCB_HANDLER(get_slave_ack)
+	DEVCB_DRIVER_MEMBER(towns_state,get_slave_ack)
 };
 
 
@@ -2624,8 +2619,8 @@ static const rf5c68_interface rf5c68_intf =
 
 static const FMSCSIinterface towns_scsi_config =
 {
-	DEVCB_LINE(towns_scsi_irq),
-	DEVCB_LINE(towns_scsi_drq)
+	DEVCB_DRIVER_LINE_MEMBER(towns_state,towns_scsi_irq),
+	DEVCB_DRIVER_LINE_MEMBER(towns_state,towns_scsi_drq)
 };
 
 static const gfx_layout fnt_chars_16x16 =

@@ -52,6 +52,9 @@ public:
 	TIMER_CALLBACK_MEMBER(apple1_kbd_strobe_end);
 	TIMER_CALLBACK_MEMBER(apple1_dsp_ready_start);
 	TIMER_CALLBACK_MEMBER(apple1_dsp_ready_end);
+	DECLARE_READ8_MEMBER(apple1_pia0_kbdin);
+	DECLARE_WRITE8_MEMBER(apple1_pia0_dspout);
+	DECLARE_WRITE8_MEMBER(apple1_pia0_dsp_write_signal);
 };
 
 

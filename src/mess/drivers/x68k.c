@@ -856,56 +856,53 @@ static UINT8 xpd1lr_r(device_t* device, int port)
 }
 
 // Judging from the XM6 source code, PPI ports A and B are joystick inputs
-static READ8_DEVICE_HANDLER( ppi_port_a_r )
+READ8_MEMBER(x68k_state::ppi_port_a_r)
 {
-	x68k_state *state = space.machine().driver_data<x68k_state>();
-	int ctrl = space.machine().root_device().ioport("ctrltype")->read() & 0x0f;
+	int ctrl = machine().root_device().ioport("ctrltype")->read() & 0x0f;
 
 	switch(ctrl)
 	{
 		case 0x00:  // standard MSX/FM-Towns joystick
-			if(state->m_joy.joy1_enable == 0)
-				return state->ioport("joy1")->read();
+			if(m_joy.joy1_enable == 0)
+				return ioport("joy1")->read();
 			else
 				return 0xff;
 		case 0x01:  // 3-button Megadrive gamepad
-			return md_3button_r(device,1);
+			return md_3button_r(machine().device("ppi8255"),1);
 		case 0x02:  // 6-button Megadrive gamepad
-			return md_6button_r(device,1);
+			return md_6button_r(machine().device("ppi8255"),1);
 		case 0x03:  // XPD-1LR
-			return xpd1lr_r(device,1);
+			return xpd1lr_r(machine().device("ppi8255"),1);
 	}
 
 	return 0xff;
 }
 
-static READ8_DEVICE_HANDLER( ppi_port_b_r )
+READ8_MEMBER(x68k_state::ppi_port_b_r)
 {
-	x68k_state *state = space.machine().driver_data<x68k_state>();
-	int ctrl = space.machine().root_device().ioport("ctrltype")->read() & 0xf0;
+	int ctrl = machine().root_device().ioport("ctrltype")->read() & 0xf0;
 
 	switch(ctrl)
 	{
 		case 0x00:  // standard MSX/FM-Towns joystick
-			if(state->m_joy.joy2_enable == 0)
-				return state->ioport("joy2")->read();
+			if(m_joy.joy2_enable == 0)
+				return ioport("joy2")->read();
 			else
 				return 0xff;
 		case 0x10:  // 3-button Megadrive gamepad
-			return md_3button_r(device,2);
+			return md_3button_r(machine().device("ppi8255"),2);
 		case 0x20:  // 6-button Megadrive gamepad
-			return md_6button_r(device,2);
+			return md_6button_r(machine().device("ppi8255"),2);
 		case 0x30:  // XPD-1LR
-			return xpd1lr_r(device,2);
+			return xpd1lr_r(machine().device("ppi8255"),2);
 	}
 
 	return 0xff;
 }
 
-static READ8_DEVICE_HANDLER( ppi_port_c_r )
+READ8_MEMBER(x68k_state::ppi_port_c_r)
 {
-	x68k_state *state = space.machine().driver_data<x68k_state>();
-	return state->m_ppi_port[2];
+	return m_ppi_port[2];
 }
 
 /* PPI port C (Joystick control, R/W)
@@ -916,41 +913,40 @@ static READ8_DEVICE_HANDLER( ppi_port_c_r )
    bits 3,2 - ADPCM Sample rate
    bits 1,0 - ADPCM Pan
 */
-static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
+WRITE8_MEMBER(x68k_state::ppi_port_c_w)
 {
-	x68k_state *state = space.machine().driver_data<x68k_state>();
 	// ADPCM / Joystick control
-	device_t *oki = space.machine().device("okim6258");
+	device_t *oki = machine().device("okim6258");
 
-	state->m_ppi_port[2] = data;
-	if((data & 0x0f) != (state->m_ppi_prev & 0x0f))
+	m_ppi_port[2] = data;
+	if((data & 0x0f) != (m_ppi_prev & 0x0f))
 	{
-		state->m_adpcm.pan = data & 0x03;
-		state->m_adpcm.rate = data & 0x0c;
-		x68k_set_adpcm(space.machine());
+		m_adpcm.pan = data & 0x03;
+		m_adpcm.rate = data & 0x0c;
+		x68k_set_adpcm(machine());
 		okim6258_set_divider(oki, (data >> 2) & 3);
 	}
 
 	// The joystick enable bits also handle the multiplexer for various controllers
-	state->m_joy.joy1_enable = data & 0x10;
-	state->m_mdctrl.mux1 = data & 0x10;
-	if((state->m_ppi_prev & 0x10) == 0x00 && (data & 0x10) == 0x10)
+	m_joy.joy1_enable = data & 0x10;
+	m_mdctrl.mux1 = data & 0x10;
+	if((m_ppi_prev & 0x10) == 0x00 && (data & 0x10) == 0x10)
 	{
-		state->m_mdctrl.seq1++;
-		state->m_mdctrl.io_timeout1->adjust(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+		m_mdctrl.seq1++;
+		m_mdctrl.io_timeout1->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 	}
 
-	state->m_joy.joy2_enable = data & 0x20;
-	state->m_mdctrl.mux2 = data & 0x20;
-	if((state->m_ppi_prev & 0x20) == 0x00 && (data & 0x20) == 0x20)
+	m_joy.joy2_enable = data & 0x20;
+	m_mdctrl.mux2 = data & 0x20;
+	if((m_ppi_prev & 0x20) == 0x00 && (data & 0x20) == 0x20)
 	{
-		state->m_mdctrl.seq2++;
-		state->m_mdctrl.io_timeout2->adjust(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+		m_mdctrl.seq2++;
+		m_mdctrl.io_timeout2->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 	}
-	state->m_ppi_prev = data;
+	m_ppi_prev = data;
 
-	state->m_joy.ioc6 = data & 0x40;
-	state->m_joy.ioc7 = data & 0x80;
+	m_joy.ioc6 = data & 0x40;
+	m_joy.ioc7 = data & 0x80;
 }
 
 
@@ -1073,16 +1069,15 @@ static READ16_HANDLER( x68k_fdc_r )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( fdc_irq )
+WRITE_LINE_MEMBER(x68k_state::fdc_irq)
 {
-	x68k_state *drvstate = device->machine().driver_data<x68k_state>();
-	if((drvstate->m_ioc.irqstatus & 0x04) && state == ASSERT_LINE)
+	if((m_ioc.irqstatus & 0x04) && state == ASSERT_LINE)
 	{
-		drvstate->m_current_vector[1] = drvstate->m_ioc.fdcvector;
-		drvstate->m_ioc.irqstatus |= 0x80;
-		drvstate->m_current_irq_line = 1;
+		m_current_vector[1] = m_ioc.fdcvector;
+		m_ioc.irqstatus |= 0x80;
+		m_current_irq_line = 1;
 		logerror("FDC: IRQ triggered\n");
-		device->machine().device("maincpu")->execute().set_input_line_and_vector(1, ASSERT_LINE, drvstate->m_current_vector[1]);
+		machine().device("maincpu")->execute().set_input_line_and_vector(1, ASSERT_LINE, m_current_vector[1]);
 	}
 }
 
@@ -1104,10 +1099,9 @@ static void x68k_fdc_write_byte(running_machine &machine,int addr, int data)
 	upd765_dack_w(fdc, machine.driver_data()->generic_space(), 0, data);
 }
 
-static WRITE_LINE_DEVICE_HANDLER ( fdc_drq )
+WRITE_LINE_MEMBER(x68k_state::fdc_drq)
 {
-	x68k_state *drvstate = device->machine().driver_data<x68k_state>();
-	drvstate->m_fdc.drq_state = state;
+	m_fdc.drq_state = state;
 }
 
 static WRITE16_HANDLER( x68k_fm_w )
@@ -1129,18 +1123,17 @@ static READ16_HANDLER( x68k_fm_r )
 	return 0xffff;
 }
 
-static WRITE8_DEVICE_HANDLER( x68k_ct_w )
+WRITE8_MEMBER(x68k_state::x68k_ct_w)
 {
-	x68k_state *state = space.machine().driver_data<x68k_state>();
-	device_t *fdc = space.machine().device("upd72065");
-	device_t *okim = space.machine().device("okim6258");
+	device_t *fdc = machine().device("upd72065");
+	device_t *okim = machine().device("okim6258");
 
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
 	// CT2 - 1 = Set ready state of FDC
 	upd765_ready_w(fdc,data & 0x01);
-	state->m_adpcm.clock = data & 0x02;
-	x68k_set_adpcm(space.machine());
+	m_adpcm.clock = data & 0x02;
+	x68k_set_adpcm(machine());
 	okim6258_set_clock(okim, data & 0x02 ? 4000000 : 8000000);
 }
 
@@ -1503,16 +1496,14 @@ static WRITE16_HANDLER( x68k_rtc_w )
 	state->m_rtc->write(space, offset, data);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( x68k_rtc_alarm_irq )
+WRITE_LINE_MEMBER(x68k_state::x68k_rtc_alarm_irq)
 {
-	x68k_state *drvstate = device->machine().driver_data<x68k_state>();
-
-	if(drvstate->m_mfp.aer & 0x01)
+	if(m_mfp.aer & 0x01)
 	{
 		if(state == 1)
 		{
-			drvstate->m_mfp.gpio |= 0x01;
-			drvstate->m_mfpdev->i0_w(1);
+			m_mfp.gpio |= 0x01;
+			m_mfpdev->i0_w(1);
 			//mfp_trigger_irq(MFP_IRQ_GPIP0);  // RTC ALARM
 		}
 	}
@@ -1520,8 +1511,8 @@ static WRITE_LINE_DEVICE_HANDLER( x68k_rtc_alarm_irq )
 	{
 		if(state == 0)
 		{
-			drvstate->m_mfp.gpio &= ~0x01;
-			drvstate->m_mfpdev->i0_w(0);
+			m_mfp.gpio &= ~0x01;
+			m_mfpdev->i0_w(0);
 			//mfp_trigger_irq(MFP_IRQ_GPIP0);  // RTC ALARM
 		}
 	}
@@ -1858,8 +1849,9 @@ READ8_MEMBER( x68k_state::mfp_gpio_r )
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( x68030_adpcm_w )
+WRITE8_MEMBER(x68k_state::x68030_adpcm_w)
 {
+	device_t *device = machine().device("okim6258");
 	switch(offset)
 	{
 		case 0x00:
@@ -1871,18 +1863,17 @@ static WRITE8_DEVICE_HANDLER( x68030_adpcm_w )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( mfp_irq_callback )
+WRITE_LINE_MEMBER(x68k_state::mfp_irq_callback)
 {
-	x68k_state *drvstate = device->machine().driver_data<x68k_state>();
-	if(drvstate->m_mfp_prev == CLEAR_LINE && state == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
+	if(m_mfp_prev == CLEAR_LINE && state == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
 		return;
 	if(state != CLEAR_LINE)
 		state = HOLD_LINE;  // to get around erroneous spurious interrupt
-//  if((state->m_ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
+//  if((m_ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
 //      return;
-	device->machine().device("maincpu")->execute().set_input_line(6, state);
-	drvstate->m_current_vector[6] = 0;
-	drvstate->m_mfp_prev = state;
+	machine().device("maincpu")->execute().set_input_line(6, state);
+	m_current_vector[6] = 0;
+	m_mfp_prev = state;
 }
 
 INTERRUPT_GEN_MEMBER(x68k_state::x68k_vsync_irq)
@@ -1933,19 +1924,18 @@ static IRQ_CALLBACK(x68k_int_ack)
 	return state->m_current_vector[irqline];
 }
 
-static WRITE_LINE_DEVICE_HANDLER( x68k_scsi_irq )
+WRITE_LINE_MEMBER(x68k_state::x68k_scsi_irq)
 {
-	x68k_state *tstate = device->machine().driver_data<x68k_state>();
 	// TODO : Internal SCSI IRQ vector 0x6c, External SCSI IRQ vector 0xf6, IRQs go through the IOSC (IRQ line 1)
 	if(state != 0)
 	{
-		tstate->m_current_vector[1] = 0x6c;
-		tstate->m_current_irq_line = 1;
-		device->machine().device("maincpu")->execute().set_input_line_and_vector(1,ASSERT_LINE,tstate->m_current_vector[1]);
+		m_current_vector[1] = 0x6c;
+		m_current_irq_line = 1;
+		machine().device("maincpu")->execute().set_input_line_and_vector(1,ASSERT_LINE,m_current_vector[1]);
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( x68k_scsi_drq )
+WRITE_LINE_MEMBER(x68k_state::x68k_scsi_drq)
 {
 	// TODO
 }
@@ -2042,7 +2032,7 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE_LEGACY(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE16_LEGACY(x68k_sysport_r, x68k_sysport_w,0xffffffff)
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE16_LEGACY(x68k_fm_r, x68k_fm_w,0xffffffff)
-	AM_RANGE(0xe92000, 0xe92003) AM_DEVREADWRITE8_LEGACY("okim6258", okim6258_status_r, x68030_adpcm_w, 0x00ff00ff)
+	AM_RANGE(0xe92000, 0xe92003) AM_DEVREAD8_LEGACY("okim6258", okim6258_status_r, 0x00ff00ff) AM_WRITE8(x68030_adpcm_w, 0x00ff00ff)
 	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE16_LEGACY(x68k_fdc_r, x68k_fdc_w,0xffffffff)
 //  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE16_LEGACY("x68k_hdc",x68k_hdc_r, x68k_hdc_w,0xffffffff)
 	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8("scsi:mb89352",mb89352_device,mb89352_r,mb89352_w,0x00ff00ff)
@@ -2074,7 +2064,7 @@ static MC68901_INTERFACE( mfp_interface )
 	4000000,											/* timer clock */
 	0,													/* receive clock */
 	0,													/* transmit clock */
-	DEVCB_LINE(mfp_irq_callback),						/* interrupt */
+	DEVCB_DRIVER_LINE_MEMBER(x68k_state,mfp_irq_callback),						/* interrupt */
 	DEVCB_DRIVER_MEMBER(x68k_state, mfp_gpio_r),		/* GPIO read */
 	DEVCB_NULL,											/* GPIO write */
 	DEVCB_NULL,											/* TAO */
@@ -2089,12 +2079,12 @@ static MC68901_INTERFACE( mfp_interface )
 
 static I8255A_INTERFACE( ppi_interface )
 {
-	DEVCB_HANDLER(ppi_port_a_r),
+	DEVCB_DRIVER_MEMBER(x68k_state,ppi_port_a_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(ppi_port_b_r),
+	DEVCB_DRIVER_MEMBER(x68k_state,ppi_port_b_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(ppi_port_c_r),
-	DEVCB_HANDLER(ppi_port_c_w)
+	DEVCB_DRIVER_MEMBER(x68k_state,ppi_port_c_r),
+	DEVCB_DRIVER_MEMBER(x68k_state,ppi_port_c_w)
 };
 
 static const hd63450_intf dmac_interface =
@@ -2112,8 +2102,8 @@ static const hd63450_intf dmac_interface =
 
 static const upd765_interface fdc_interface =
 {
-	DEVCB_LINE(fdc_irq),
-	DEVCB_LINE(fdc_drq),
+	DEVCB_DRIVER_LINE_MEMBER(x68k_state,fdc_irq),
+	DEVCB_DRIVER_LINE_MEMBER(x68k_state,fdc_drq),
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
@@ -2122,7 +2112,7 @@ static const upd765_interface fdc_interface =
 static const ym2151_interface x68k_ym2151_interface =
 {
 	DEVCB_LINE(x68k_fm_irq),
-	DEVCB_HANDLER(x68k_ct_w)  // CT1, CT2 from YM2151 port 0x1b
+	DEVCB_DRIVER_MEMBER(x68k_state,x68k_ct_w)  // CT1, CT2 from YM2151 port 0x1b
 };
 
 static const okim6258_interface x68k_okim6258_interface =
@@ -2134,7 +2124,7 @@ static const okim6258_interface x68k_okim6258_interface =
 
 static RP5C15_INTERFACE( rtc_intf )
 {
-	DEVCB_LINE(x68k_rtc_alarm_irq),
+	DEVCB_DRIVER_LINE_MEMBER(x68k_state,x68k_rtc_alarm_irq),
 	DEVCB_NULL
 };
 
@@ -2519,8 +2509,8 @@ static const floppy_interface x68k_floppy_interface =
 
 static const mb89352_interface x68k_scsi_intf =
 {
-	DEVCB_LINE(x68k_scsi_irq),
-	DEVCB_LINE(x68k_scsi_drq)
+	DEVCB_DRIVER_LINE_MEMBER(x68k_state,x68k_scsi_irq),
+	DEVCB_DRIVER_LINE_MEMBER(x68k_state,x68k_scsi_drq)
 };
 
 static X68K_EXPANSION_INTERFACE(x68k_exp_intf)

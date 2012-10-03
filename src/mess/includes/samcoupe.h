@@ -86,6 +86,12 @@ public:
 	TIMER_CALLBACK_MEMBER(irq_off);
 	TIMER_CALLBACK_MEMBER(samcoupe_mouse_reset);
 	TIMER_CALLBACK_MEMBER(sam_video_update_callback);
+	DECLARE_READ8_MEMBER(samcoupe_lpt1_busy_r);
+	DECLARE_WRITE8_MEMBER(samcoupe_lpt1_strobe_w);
+	DECLARE_READ8_MEMBER(samcoupe_lpt2_busy_r);
+	DECLARE_WRITE8_MEMBER(samcoupe_lpt2_strobe_w);
+	DECLARE_READ8_MEMBER(samcoupe_rtc_r);
+	DECLARE_WRITE8_MEMBER(samcoupe_rtc_w);
 };
 
 

@@ -83,6 +83,14 @@ public:
 	TIMER_CALLBACK_MEMBER(nc_keyboard_timer_callback);
 	TIMER_CALLBACK_MEMBER(nc_serial_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(dummy_timer_callback);
+	DECLARE_WRITE_LINE_MEMBER(nc100_tc8521_alarm_callback);
+	DECLARE_WRITE_LINE_MEMBER(nc100_txrdy_callback);
+	DECLARE_WRITE_LINE_MEMBER(nc100_rxrdy_callback);
+	DECLARE_WRITE_LINE_MEMBER(nc100_centronics_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(nc200_centronics_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(nc200_txrdy_callback);
+	DECLARE_WRITE_LINE_MEMBER(nc200_rxrdy_callback);
+	DECLARE_WRITE_LINE_MEMBER(nc200_fdc_interrupt);
 };
 
 

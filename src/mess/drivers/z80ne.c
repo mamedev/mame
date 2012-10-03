@@ -171,7 +171,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80netf_io, AS_IO, 8, z80ne_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xd0, 0xd7) AM_DEVREADWRITE_LEGACY("wd1771", lx390_fdc_r, lx390_fdc_w)
+	AM_RANGE(0xd0, 0xd7) AM_READWRITE(lx390_fdc_r, lx390_fdc_w)
 	AM_RANGE(0xea, 0xea) AM_READ(lx388_data_r )
 	AM_RANGE(0xeb, 0xeb) AM_READ(lx388_read_field_sync )
 	AM_RANGE(0xee, 0xee) AM_READWRITE(lx385_data_r, lx385_data_w )
@@ -455,7 +455,7 @@ static const floppy_interface z80netf_floppy_interface =
 static const mc6847_interface z80net_mc6847_intf =
 {
 	"lx388",
-	DEVCB_HANDLER(lx388_mc6847_videoram_r),
+	DEVCB_DRIVER_MEMBER(z80ne_state, lx388_mc6847_videoram_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 

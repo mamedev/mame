@@ -22,6 +22,10 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_ac1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ac1_32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_READ8_MEMBER(ac1_port_b_r);
+	DECLARE_READ8_MEMBER(ac1_port_a_r);
+	DECLARE_WRITE8_MEMBER(ac1_port_a_w);
+	DECLARE_WRITE8_MEMBER(ac1_port_b_w);
 };
 
 

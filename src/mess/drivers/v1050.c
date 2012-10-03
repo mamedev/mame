@@ -594,17 +594,17 @@ INPUT_PORTS_END
 
 // 8214 Interface
 
-static WRITE_LINE_DEVICE_HANDLER( pic_int_w )
+WRITE_LINE_MEMBER(v1050_state::pic_int_w)
 {
 	if (state == ASSERT_LINE)
 	{
-		device->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
 }
 
 static I8214_INTERFACE( pic_intf )
 {
-	DEVCB_DEVICE_LINE(Z80_TAG, pic_int_w),
+	DEVCB_DRIVER_LINE_MEMBER(v1050_state,pic_int_w),
 	DEVCB_NULL
 };
 
@@ -617,8 +617,9 @@ static MSM58321_INTERFACE( rtc_intf )
 
 // Display 8255A Interface
 
-static WRITE8_DEVICE_HANDLER( disp_ppi_pc_w )
+WRITE8_MEMBER(v1050_state::disp_ppi_pc_w)
 {
+	device_t *device = machine().device(I8255A_M6502_TAG);
 	i8255_device *ppi = static_cast<i8255_device*>(device);
 
 	ppi->pc2_w(BIT(data, 6));
@@ -632,11 +633,12 @@ static I8255A_INTERFACE( disp_ppi_intf )
 	DEVCB_NULL,							// Port B read
 	DEVCB_NULL,							// Port B write
 	DEVCB_NULL,							// Port C read
-	DEVCB_DEVICE_HANDLER(I8255A_M6502_TAG, disp_ppi_pc_w)		// Port C write
+	DEVCB_DRIVER_MEMBER(v1050_state,disp_ppi_pc_w)		// Port C write
 };
 
-static WRITE8_DEVICE_HANDLER( m6502_ppi_pc_w )
+WRITE8_MEMBER(v1050_state::m6502_ppi_pc_w)
 {
+	device_t *device = machine().device(I8255A_DISP_TAG);
 	i8255_device *ppi = static_cast<i8255_device*>(device);
 
 	ppi->pc2_w(BIT(data, 7));
@@ -650,7 +652,7 @@ static I8255A_INTERFACE( m6502_ppi_intf )
 	DEVCB_NULL,							// Port B read
 	DEVCB_NULL,							// Port B write
 	DEVCB_NULL,							// Port C read
-	DEVCB_DEVICE_HANDLER(I8255A_DISP_TAG, m6502_ppi_pc_w)	// Port C write
+	DEVCB_DRIVER_MEMBER(v1050_state,m6502_ppi_pc_w)	// Port C write
 };
 
 // Miscellanous 8255A Interface
@@ -693,13 +695,13 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pa_w )
 	wd17xx_dden_w(m_fdc, BIT(data, 7));
 }
 
-static WRITE8_DEVICE_HANDLER( misc_ppi_pb_w )
+WRITE8_MEMBER(v1050_state::misc_ppi_pb_w)
 {
-	centronics_device *centronics = space.machine().device<centronics_device>(CENTRONICS_TAG);
-	centronics->write( space.machine().driver_data()->generic_space() , 0, ~data & 0xff);
+	centronics_device *centronics = machine().device<centronics_device>(CENTRONICS_TAG);
+	centronics->write( machine().driver_data()->generic_space() , 0, ~data & 0xff);
 }
 
-static READ8_DEVICE_HANDLER( misc_ppi_pc_r )
+READ8_MEMBER(v1050_state::misc_ppi_pc_r)
 {
 	/*
 
@@ -717,7 +719,7 @@ static READ8_DEVICE_HANDLER( misc_ppi_pc_r )
     */
 
 	UINT8 data = 0;
-	centronics_device *centronics = space.machine().device<centronics_device>(CENTRONICS_TAG);
+	centronics_device *centronics = machine().device<centronics_device>(CENTRONICS_TAG);
 	data |= centronics->not_busy_r() << 4;
 	data |= centronics->pe_r() << 5;
 
@@ -779,8 +781,8 @@ static I8255A_INTERFACE( misc_ppi_intf )
 	DEVCB_NULL,							// Port A read
 	DEVCB_DRIVER_MEMBER(v1050_state, misc_ppi_pa_w),		// Port A write
 	DEVCB_NULL,							// Port B read
-	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, misc_ppi_pb_w),		// Port B write
-	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, misc_ppi_pc_r),		// Port C read
+	DEVCB_DRIVER_MEMBER(v1050_state,misc_ppi_pb_w),		// Port B write
+	DEVCB_DRIVER_MEMBER(v1050_state,misc_ppi_pc_r),		// Port C read
 	DEVCB_DRIVER_MEMBER(v1050_state, misc_ppi_pc_w)		// Port C write
 };
 

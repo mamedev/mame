@@ -69,6 +69,13 @@ public:
 	DECLARE_READ8_MEMBER(concept_hdc_reg_r);
 	DECLARE_WRITE8_MEMBER(concept_hdc_reg_w);
 	DECLARE_READ8_MEMBER(concept_hdc_rom_r);	
+	DECLARE_READ8_MEMBER(via_in_a);
+	DECLARE_WRITE8_MEMBER(via_out_a);
+	DECLARE_READ8_MEMBER(via_in_b);
+	DECLARE_WRITE8_MEMBER(via_out_b);
+	DECLARE_WRITE8_MEMBER(via_out_cb2);
+	DECLARE_WRITE_LINE_MEMBER(concept_fdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(concept_fdc_drq_w);
 };
 
 

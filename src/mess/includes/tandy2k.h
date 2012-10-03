@@ -136,6 +136,8 @@ public:
 	/* sound state */
 	int m_outspkr;
 	int m_spkrdata;
+	DECLARE_READ8_MEMBER(fldtc_r);
+	DECLARE_WRITE8_MEMBER(fldtc_w);
 };
 
 #endif

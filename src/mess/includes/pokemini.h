@@ -73,14 +73,12 @@ public:
 	TIMER_CALLBACK_MEMBER(pokemini_timer3_callback);
 	TIMER_CALLBACK_MEMBER(pokemini_timer3_hi_callback);
 	TIMER_CALLBACK_MEMBER(pokemini_prc_counter_callback);
+	DECLARE_WRITE8_MEMBER(pokemini_hwreg_w);
+	DECLARE_READ8_MEMBER(pokemini_hwreg_r);
 };
 
 
 /*----------- defined in machine/pokemini.c -----------*/
-
-DECLARE_WRITE8_DEVICE_HANDLER( pokemini_hwreg_w );
-DECLARE_READ8_DEVICE_HANDLER( pokemini_hwreg_r );
-
 DEVICE_IMAGE_LOAD( pokemini_cart );
 
 #endif /* POKEMINI_H */

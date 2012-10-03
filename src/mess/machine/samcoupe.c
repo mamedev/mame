@@ -158,18 +158,18 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_ext_mem_w)
     REAL TIME CLOCK
 ***************************************************************************/
 
-static READ8_DEVICE_HANDLER( samcoupe_rtc_r )
+READ8_MEMBER(samcoupe_state::samcoupe_rtc_r)
 {
-	address_space &spaceio = space.machine().device("maincpu")->memory().space(AS_IO);
-	msm6242_device *rtc = dynamic_cast<msm6242_device*>(device);
+	address_space &spaceio = machine().device("maincpu")->memory().space(AS_IO);
+	msm6242_device *rtc = dynamic_cast<msm6242_device*>(machine().device("sambus_clock"));
 	return rtc->read(spaceio,offset >> 12);
 }
 
 
-static WRITE8_DEVICE_HANDLER( samcoupe_rtc_w )
+WRITE8_MEMBER(samcoupe_state::samcoupe_rtc_w)
 {
-	address_space &spaceio = space.machine().device("maincpu")->memory().space(AS_IO);
-	msm6242_device *rtc = dynamic_cast<msm6242_device*>(device);
+	address_space &spaceio = machine().device("maincpu")->memory().space(AS_IO);
+	msm6242_device *rtc = dynamic_cast<msm6242_device*>(machine().device("sambus_clock"));
 	rtc->write(spaceio,offset >> 12, data);
 }
 
@@ -261,8 +261,7 @@ void samcoupe_state::machine_reset()
 	if (machine().root_device().ioport("config")->read() & 0x01)
 	{
 		/* install RTC */
-		device_t *rtc = machine().device("sambus_clock");
-		spaceio.install_legacy_readwrite_handler(*rtc, 0xef, 0xef, 0xffff, 0xff00, FUNC(samcoupe_rtc_r), FUNC(samcoupe_rtc_w));
+		spaceio.install_readwrite_handler(0xef, 0xef, 0xffff, 0xff00, read8_delegate(FUNC(samcoupe_state::samcoupe_rtc_r),this), write8_delegate(FUNC(samcoupe_state::samcoupe_rtc_w),this));
 	}
 	else
 	{

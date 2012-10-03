@@ -467,31 +467,27 @@ static void apple3_via_out(running_machine &machine, UINT8 *var, UINT8 data)
 
 
 /* these are here to appease the Apple /// confidence tests */
-static READ8_DEVICE_HANDLER(apple3_via_1_in_a) { return ~0; }
-static READ8_DEVICE_HANDLER(apple3_via_1_in_b) { return ~0; }
+READ8_MEMBER(apple3_state::apple3_via_1_in_a){ return ~0; }
+READ8_MEMBER(apple3_state::apple3_via_1_in_b){ return ~0; }
 
-static WRITE8_DEVICE_HANDLER(apple3_via_0_out_a)
+WRITE8_MEMBER(apple3_state::apple3_via_0_out_a)
 {
-	apple3_state *state = space.machine().driver_data<apple3_state>();
-	apple3_via_out(space.machine(), &state->m_via_0_a, data);
+	apple3_via_out(machine(), &m_via_0_a, data);
 }
 
-static WRITE8_DEVICE_HANDLER(apple3_via_0_out_b)
+WRITE8_MEMBER(apple3_state::apple3_via_0_out_b)
 {
-	apple3_state *state = space.machine().driver_data<apple3_state>();
-	apple3_via_out(space.machine(), &state->m_via_0_b, data);
+	apple3_via_out(machine(), &m_via_0_b, data);
 }
 
-static WRITE8_DEVICE_HANDLER(apple3_via_1_out_a)
+WRITE8_MEMBER(apple3_state::apple3_via_1_out_a)
 {
-	apple3_state *state = space.machine().driver_data<apple3_state>();
-	apple3_via_out(space.machine(), &state->m_via_1_a, data);
+	apple3_via_out(machine(), &m_via_1_a, data);
 }
 
-static WRITE8_DEVICE_HANDLER(apple3_via_1_out_b)
+WRITE8_MEMBER(apple3_state::apple3_via_1_out_b)
 {
-	apple3_state *state = space.machine().driver_data<apple3_state>();
-	apple3_via_out(space.machine(), &state->m_via_1_b, data);
+	apple3_via_out(machine(), &m_via_1_b, data);
 }
 
 static void apple2_via_1_irq_func(device_t *device, int state)
@@ -513,8 +509,8 @@ const via6522_interface apple3_via_0_intf =
 	DEVCB_NULL,					/* in_cb1_func */
 	DEVCB_NULL,					/* in_ca2_func */
 	DEVCB_NULL,					/* in_cb2_func */
-	DEVCB_HANDLER(apple3_via_0_out_a),		/* out_a_func */
-	DEVCB_HANDLER(apple3_via_0_out_b),		/* out_b_func */
+	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_0_out_a),		/* out_a_func */
+	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_0_out_b),		/* out_b_func */
 	DEVCB_NULL,					/* out_ca1_func */
 	DEVCB_NULL,					/* out_cb1_func */
 	DEVCB_NULL,					/* out_ca2_func */
@@ -524,14 +520,14 @@ const via6522_interface apple3_via_0_intf =
 
 const via6522_interface apple3_via_1_intf =
 {
-	DEVCB_HANDLER(apple3_via_1_in_a),		/* in_a_func */
-	DEVCB_HANDLER(apple3_via_1_in_b),		/* in_b_func */
+	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_1_in_a),		/* in_a_func */
+	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_1_in_b),		/* in_b_func */
 	DEVCB_NULL,					/* in_ca1_func */
 	DEVCB_NULL,					/* in_cb1_func */
 	DEVCB_NULL,					/* in_ca2_func */
 	DEVCB_NULL,					/* in_cb2_func */
-	DEVCB_HANDLER(apple3_via_1_out_a),		/* out_a_func */
-	DEVCB_HANDLER(apple3_via_1_out_b),		/* out_b_func */
+	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_1_out_a),		/* out_a_func */
+	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_1_out_b),		/* out_b_func */
 	DEVCB_NULL,					/* out_ca1_func */
 	DEVCB_NULL,					/* out_cb1_func */
 	DEVCB_NULL,					/* out_ca2_func */

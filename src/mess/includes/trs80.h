@@ -125,6 +125,7 @@ public:
 	INTERRUPT_GEN_MEMBER(trs80_rtc_interrupt);
 	INTERRUPT_GEN_MEMBER(trs80_fdc_interrupt);
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);
+	DECLARE_WRITE_LINE_MEMBER(trs80_fdc_intrq_w);
 };
 
 

@@ -232,6 +232,16 @@ public:
 	TIMER_CALLBACK_MEMBER(dma_timer_callback);
 	TIMER_CALLBACK_MEMBER(keyscan_callback);
 	TIMER_CALLBACK_MEMBER(mouse_callback);
+	DECLARE_WRITE_LINE_MEMBER(sio_interrupt);
+	DECLARE_WRITE8_MEMBER(sio_dtr_w);
+	DECLARE_WRITE16_MEMBER(sio_serial_transmit);
+	DECLARE_READ16_MEMBER(sio_serial_receive);
+	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_drq_w);
+	DECLARE_READ8_MEMBER(nimbus_via_read_portb);
+	DECLARE_WRITE8_MEMBER(nimbus_via_write_portb);
+	DECLARE_WRITE_LINE_MEMBER(nimbus_via_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(nimbus_ack_w);
 };
 
 
@@ -434,8 +444,6 @@ enum
 #define	VIA_INT					0x03
 
 extern const via6522_interface nimbus_via;
-
-WRITE_LINE_DEVICE_HANDLER(nimbus_ack_w);
 
 
 /*----------- defined in video/rmnimbus.c -----------*/

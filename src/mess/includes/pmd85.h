@@ -43,6 +43,33 @@ public:
 	TIMER_CALLBACK_MEMBER(pmd85_cassette_timer_callback);
 	TIMER_CALLBACK_MEMBER(pmd_reset);
 	TIMER_CALLBACK_MEMBER(setup_machine_state);
+	DECLARE_READ8_MEMBER(pmd85_ppi_0_porta_r);
+	DECLARE_READ8_MEMBER(pmd85_ppi_0_portb_r);
+	DECLARE_READ8_MEMBER(pmd85_ppi_0_portc_r);
+	DECLARE_WRITE8_MEMBER(pmd85_ppi_0_porta_w);
+	DECLARE_WRITE8_MEMBER(pmd85_ppi_0_portb_w);
+	DECLARE_WRITE8_MEMBER(pmd85_ppi_0_portc_w);
+	DECLARE_READ8_MEMBER(mato_ppi_0_portb_r);
+	DECLARE_READ8_MEMBER(mato_ppi_0_portc_r);
+	DECLARE_WRITE8_MEMBER(mato_ppi_0_portc_w);
+	DECLARE_READ8_MEMBER(pmd85_ppi_1_porta_r);
+	DECLARE_READ8_MEMBER(pmd85_ppi_1_portb_r);
+	DECLARE_READ8_MEMBER(pmd85_ppi_1_portc_r);
+	DECLARE_WRITE8_MEMBER(pmd85_ppi_1_porta_w);
+	DECLARE_WRITE8_MEMBER(pmd85_ppi_1_portb_w);
+	DECLARE_WRITE8_MEMBER(pmd85_ppi_1_portc_w);
+	DECLARE_READ8_MEMBER(pmd85_ppi_2_porta_r);
+	DECLARE_READ8_MEMBER(pmd85_ppi_2_portb_r);
+	DECLARE_READ8_MEMBER(pmd85_ppi_2_portc_r);
+	DECLARE_WRITE8_MEMBER(pmd85_ppi_2_porta_w);
+	DECLARE_WRITE8_MEMBER(pmd85_ppi_2_portb_w);
+	DECLARE_WRITE8_MEMBER(pmd85_ppi_2_portc_w);
+	DECLARE_READ8_MEMBER(pmd85_ppi_3_porta_r);
+	DECLARE_READ8_MEMBER(pmd85_ppi_3_portb_r);
+	DECLARE_READ8_MEMBER(pmd85_ppi_3_portc_r);
+	DECLARE_WRITE8_MEMBER(pmd85_ppi_3_porta_w);
+	DECLARE_WRITE8_MEMBER(pmd85_ppi_3_portb_w);
+	DECLARE_WRITE8_MEMBER(pmd85_ppi_3_portc_w);
 };
 
 

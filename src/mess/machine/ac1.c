@@ -11,12 +11,11 @@
 #include "imagedev/cassette.h"
 #include "includes/ac1.h"
 
-static READ8_DEVICE_HANDLER (ac1_port_b_r)
+READ8_MEMBER(ac1_state::ac1_port_b_r)
 {
-	ac1_state *state = space.machine().driver_data<ac1_state>();
 	UINT8 data = 0x7f;
 
-	if (state->m_cassette->input() > 0.03)
+	if (m_cassette->input() > 0.03)
 		data |= 0x80;
 
 	return data;
@@ -24,15 +23,15 @@ static READ8_DEVICE_HANDLER (ac1_port_b_r)
 
 #define BNOT(x) ((x) ? 0 : 1)
 
-static READ8_DEVICE_HANDLER (ac1_port_a_r)
+READ8_MEMBER(ac1_state::ac1_port_a_r)
 {
-	UINT8 line0 = space.machine().root_device().ioport("LINE0")->read();
-	UINT8 line1 = space.machine().root_device().ioport("LINE1")->read();
-	UINT8 line2 = space.machine().root_device().ioport("LINE2")->read();
-	UINT8 line3 = space.machine().root_device().ioport("LINE3")->read();
-	UINT8 line4 = space.machine().root_device().ioport("LINE4")->read();
-	UINT8 line5 = space.machine().root_device().ioport("LINE5")->read();
-	UINT8 line6 = space.machine().root_device().ioport("LINE6")->read();
+	UINT8 line0 = machine().root_device().ioport("LINE0")->read();
+	UINT8 line1 = machine().root_device().ioport("LINE1")->read();
+	UINT8 line2 = machine().root_device().ioport("LINE2")->read();
+	UINT8 line3 = machine().root_device().ioport("LINE3")->read();
+	UINT8 line4 = machine().root_device().ioport("LINE4")->read();
+	UINT8 line5 = machine().root_device().ioport("LINE5")->read();
+	UINT8 line6 = machine().root_device().ioport("LINE6")->read();
 
 	UINT8 SH    = BNOT(BIT(line6,0));
 	UINT8 CTRL  = BNOT(BIT(line6,1));
@@ -74,11 +73,11 @@ static READ8_DEVICE_HANDLER (ac1_port_a_r)
 	return td0 + (td1 << 1) +(td2 << 2) +(td3 << 3) +(td4 << 4) +(td5 << 5) +(td6 << 6) +(tast << 7);
 }
 
-static WRITE8_DEVICE_HANDLER (ac1_port_a_w)
+WRITE8_MEMBER(ac1_state::ac1_port_a_w)
 {
 }
 
-static WRITE8_DEVICE_HANDLER (ac1_port_b_w)
+WRITE8_MEMBER(ac1_state::ac1_port_b_w)
 {
 	/*
 
@@ -94,18 +93,17 @@ static WRITE8_DEVICE_HANDLER (ac1_port_b_w)
         7       cassette in
 
     */
-	ac1_state *state = space.machine().driver_data<ac1_state>();
-	state->m_cassette->output((data & 0x40) ? -1.0 : +1.0);
+	m_cassette->output((data & 0x40) ? -1.0 : +1.0);
 }
 
 Z80PIO_INTERFACE( ac1_z80pio_intf )
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
-	DEVCB_HANDLER(ac1_port_a_r),
-	DEVCB_HANDLER(ac1_port_a_w),
+	DEVCB_DRIVER_MEMBER(ac1_state,ac1_port_a_r),
+	DEVCB_DRIVER_MEMBER(ac1_state,ac1_port_a_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(ac1_port_b_r),
-	DEVCB_HANDLER(ac1_port_b_w),
+	DEVCB_DRIVER_MEMBER(ac1_state,ac1_port_b_r),
+	DEVCB_DRIVER_MEMBER(ac1_state,ac1_port_b_w),
 	DEVCB_NULL
 };
 

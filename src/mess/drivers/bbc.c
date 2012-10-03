@@ -717,25 +717,24 @@ static const cassette_interface bbc_cassette_interface =
 };
 
 
-static WRITE_LINE_DEVICE_HANDLER(bbcb_ack_w)
+WRITE_LINE_MEMBER(bbc_state::bbcb_ack_w)
 {
-	via6522_device *via_1 = device->machine().device<via6522_device>("via6522_1");
+	via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
 	via_1->write_ca1(!state); /* ack seems to be inverted? */
 }
 
 static const centronics_interface bbcb_centronics_config =
 {
-	DEVCB_DEVICE_LINE("via6522_1",bbcb_ack_w),
+	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbcb_ack_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
 
-static WRITE_LINE_DEVICE_HANDLER( bbcb_acia6850_irq_w )
+WRITE_LINE_MEMBER(bbc_state::bbcb_acia6850_irq_w)
 {
-	bbc_state *driver_state = device->machine().driver_data<bbc_state>();
-	driver_state->m_acia_irq = state;
+	m_acia_irq = state;
 
-	driver_state->check_interrupts();
+	check_interrupts();
 }
 
 static ACIA6850_INTERFACE( bbc_acia6850_interface )
@@ -747,7 +746,7 @@ static ACIA6850_INTERFACE( bbc_acia6850_interface )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(bbcb_acia6850_irq_w)
+	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbcb_acia6850_irq_w)
 };
 
 static LEGACY_FLOPPY_OPTIONS_START(bbc)
@@ -798,15 +797,16 @@ static const sn76496_config psg_intf =
     DEVCB_NULL
 };
 
-static WRITE_LINE_DEVICE_HANDLER( econet_clk_w )
+WRITE_LINE_MEMBER(bbc_state::econet_clk_w)
 {
+	device_t *device = machine().device("mc6854");
 	mc6854_rxc_w(device, state);
 	mc6854_txc_w(device, state);
 }
 
 static ECONET_INTERFACE( econet_intf )
 {
-	DEVCB_DEVICE_LINE("mc6854", econet_clk_w),
+	DEVCB_DRIVER_LINE_MEMBER(bbc_state,econet_clk_w),
 	DEVCB_NULL
 };
 

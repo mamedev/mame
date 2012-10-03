@@ -27,9 +27,9 @@
     mtx_strobe_r - centronics strobe
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( mtx_strobe_r )
+READ8_MEMBER(mtx_state::mtx_strobe_r)
 {
-	centronics_device *centronics = space.machine().device<centronics_device>(CENTRONICS_TAG);
+	centronics_device *centronics = machine().device<centronics_device>(CENTRONICS_TAG);
 	/* set STROBE low */
 	centronics->strobe_w(FALSE);
 
@@ -117,7 +117,6 @@ WRITE8_MEMBER(mtx_state::mtx_bankswitch_w)
 READ8_MEMBER(mtx_state::mtx_sound_strobe_r)
 {
 	m_sn->write(space, 0, m_sound_latch);
-
 	return 0xff;
 }
 
@@ -134,18 +133,18 @@ WRITE8_MEMBER(mtx_state::mtx_sound_latch_w)
     mtx_cst_w - cassette write
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( mtx_cst_w )
+WRITE8_MEMBER(mtx_state::mtx_cst_w)
 {
-	dynamic_cast<cassette_image_device *>(device)->output( BIT(data, 0) ? -1 : 1);
+	dynamic_cast<cassette_image_device *>(machine().device(CASSETTE_TAG))->output( BIT(data, 0) ? -1 : 1);
 }
 
 /*-------------------------------------------------
     mtx_prt_r - centronics status
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( mtx_prt_r )
+READ8_MEMBER(mtx_state::mtx_prt_r)
 {
-	centronics_device *centronics = space.machine().device<centronics_device>(CENTRONICS_TAG);
+	centronics_device *centronics = machine().device<centronics_device>(CENTRONICS_TAG);
 
 	/*
 

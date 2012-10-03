@@ -80,6 +80,9 @@ public:
 	UINT32 screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(kay_kbd_interrupt);
 	TIMER_CALLBACK_MEMBER(kaypro_timer_callback);
+	DECLARE_WRITE_LINE_MEMBER(kaypro_interrupt);
+	DECLARE_READ8_MEMBER(kaypro_sio_r);
+	DECLARE_WRITE8_MEMBER(kaypro_sio_w);
 };
 
 
@@ -99,9 +102,6 @@ extern const z80pio_interface kayproii_pio_s_intf;
 extern const z80pio_interface kaypro4_pio_s_intf;
 extern const z80sio_interface kaypro_sio_intf;
 extern const wd17xx_interface kaypro_wd1793_interface;
-
-DECLARE_READ8_DEVICE_HANDLER( kaypro_sio_r );
-DECLARE_WRITE8_DEVICE_HANDLER( kaypro_sio_w );
 
 
 QUICKLOAD_LOAD( kayproii );

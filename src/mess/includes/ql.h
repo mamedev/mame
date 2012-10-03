@@ -133,6 +133,9 @@ public:
 	int		m_disk_io_base;
 	UINT8	m_disk_io_byte;
 	UINT8	m_printer_char;
+	DECLARE_READ_LINE_MEMBER(disk_io_dden_r);
+	DECLARE_WRITE_LINE_MEMBER(disk_io_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(disk_io_drq_w);
 };
 
 #endif

@@ -45,6 +45,7 @@ public:
 	UINT32 screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mc8030(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(mc8020_kbd);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 };
 
 

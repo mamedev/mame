@@ -70,17 +70,15 @@ static CDP1869_PCB_READ( pecom_pcb_r )
 	return BIT(pmd, 7);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pecom_prd_w )
+WRITE_LINE_MEMBER(pecom_state::pecom_prd_w)
 {
-	pecom_state *driver_state = device->machine().driver_data<pecom_state>();
-
 	// every other PRD triggers a DMAOUT request
-	if (driver_state->m_dma)
+	if (m_dma)
 	{
-		device->machine().device(CDP1802_TAG)->execute().set_input_line(COSMAC_INPUT_LINE_DMAOUT, HOLD_LINE);
+		machine().device(CDP1802_TAG)->execute().set_input_line(COSMAC_INPUT_LINE_DMAOUT, HOLD_LINE);
 	}
 
-	driver_state->m_dma = !driver_state->m_dma;
+	m_dma = !m_dma;
 }
 
 static CDP1869_INTERFACE( pecom_cdp1869_intf )
@@ -91,7 +89,7 @@ static CDP1869_INTERFACE( pecom_cdp1869_intf )
 	pecom_pcb_r,
 	pecom_char_ram_r,
 	pecom_char_ram_w,
-	DEVCB_LINE(pecom_prd_w)
+	DEVCB_DRIVER_LINE_MEMBER(pecom_state,pecom_prd_w)
 };
 
 VIDEO_START_MEMBER(pecom_state,pecom)

@@ -145,6 +145,9 @@ public:
 	TIMER_CALLBACK_MEMBER(apple2gs_clock_tick);
 	TIMER_CALLBACK_MEMBER(apple2gs_qsecond_tick);
 	TIMER_CALLBACK_MEMBER(apple2gs_scanline_tick);
+	DECLARE_WRITE8_MEMBER(a2bus_irq_w);
+	DECLARE_WRITE8_MEMBER(a2bus_nmi_w);
+	DECLARE_WRITE8_MEMBER(a2bus_inh_w);
 };
 
 

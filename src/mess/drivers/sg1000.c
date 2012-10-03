@@ -517,16 +517,16 @@ INPUT_PORTS_END
     TMS9928a_interface tms9928a_interface
 -------------------------------------------------*/
 
-static WRITE_LINE_DEVICE_HANDLER(sg1000_vdp_interrupt)
+WRITE_LINE_MEMBER(sg1000_state::sg1000_vdp_interrupt)
 {
-	device->machine().device(Z80_TAG)->execute().set_input_line(INPUT_LINE_IRQ0, state);
+	machine().device(Z80_TAG)->execute().set_input_line(INPUT_LINE_IRQ0, state);
 }
 
 static TMS9928A_INTERFACE(sg1000_tms9918a_interface)
 {
 	"screen",
 	0x4000,
-	DEVCB_LINE(sg1000_vdp_interrupt)
+	DEVCB_DRIVER_LINE_MEMBER(sg1000_state,sg1000_vdp_interrupt)
 };
 
 /*-------------------------------------------------
@@ -984,11 +984,9 @@ LEGACY_FLOPPY_OPTIONS_END
     sf7000_fdc_index_callback -
 -------------------------------------------------*/
 
-static WRITE_LINE_DEVICE_HANDLER(sf7000_fdc_index_callback)
+WRITE_LINE_MEMBER(sf7000_state::sf7000_fdc_index_callback)
 {
-	sf7000_state *driver_state = device->machine().driver_data<sf7000_state>();
-
-	driver_state->m_fdc_index = state;
+	m_fdc_index = state;
 }
 
 /*-------------------------------------------------
@@ -997,7 +995,7 @@ static WRITE_LINE_DEVICE_HANDLER(sf7000_fdc_index_callback)
 
 static const floppy_interface sf7000_floppy_interface =
 {
-	DEVCB_LINE(sf7000_fdc_index_callback),
+	DEVCB_DRIVER_LINE_MEMBER(sf7000_state,sf7000_fdc_index_callback),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

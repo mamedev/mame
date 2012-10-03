@@ -13,7 +13,7 @@ The LCD is likely to be a SSD1828 LCD.
 static ADDRESS_MAP_START( pokemini_mem_map, AS_PROGRAM, 8, pokemini_state )
 	AM_RANGE( 0x000000, 0x000FFF )  AM_ROM							/* bios */
 	AM_RANGE( 0x001000, 0x001FFF )	AM_RAM AM_SHARE("p_ram")				/* VRAM/RAM */
-	AM_RANGE( 0x002000, 0x0020FF )  AM_DEVREADWRITE_LEGACY("i2cmem", pokemini_hwreg_r, pokemini_hwreg_w )	/* hardware registers */
+	AM_RANGE( 0x002000, 0x0020FF )  AM_READWRITE(pokemini_hwreg_r, pokemini_hwreg_w )	/* hardware registers */
 	AM_RANGE( 0x002100, 0x1FFFFF )  AM_ROM							/* cartridge area */
 ADDRESS_MAP_END
 

@@ -27,33 +27,30 @@
 
 
 
-static READ8_DEVICE_HANDLER (orion_romdisk_porta_r )
+READ8_MEMBER(orion_state::orion_romdisk_porta_r)
 {
-	orion_state *state = space.machine().driver_data<orion_state>();
-	UINT8 *romdisk = state->memregion("maincpu")->base() + 0x10000;
-	return romdisk[state->m_romdisk_msb*256+state->m_romdisk_lsb];
+	UINT8 *romdisk = memregion("maincpu")->base() + 0x10000;
+	return romdisk[m_romdisk_msb*256+m_romdisk_lsb];
 }
 
-static WRITE8_DEVICE_HANDLER (orion_romdisk_portb_w )
+WRITE8_MEMBER(orion_state::orion_romdisk_portb_w)
 {
-	orion_state *state = space.machine().driver_data<orion_state>();
-	state->m_romdisk_lsb = data;
+	m_romdisk_lsb = data;
 }
 
-static WRITE8_DEVICE_HANDLER (orion_romdisk_portc_w )
+WRITE8_MEMBER(orion_state::orion_romdisk_portc_w)
 {
-	orion_state *state = space.machine().driver_data<orion_state>();
-	state->m_romdisk_msb = data;
+	m_romdisk_msb = data;
 }
 
 I8255A_INTERFACE( orion128_ppi8255_interface_1)
 {
-	DEVCB_HANDLER(orion_romdisk_porta_r),
+	DEVCB_DRIVER_MEMBER(orion_state,orion_romdisk_porta_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(orion_romdisk_portb_w),
+	DEVCB_DRIVER_MEMBER(orion_state,orion_romdisk_portb_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(orion_romdisk_portc_w)
+	DEVCB_DRIVER_MEMBER(orion_state,orion_romdisk_portc_w)
 };
 
 

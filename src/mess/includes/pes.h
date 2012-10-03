@@ -39,6 +39,7 @@ public:
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_READ8_MEMBER(port3_r);
 	DECLARE_DRIVER_INIT(pes);
+	DECLARE_WRITE8_MEMBER(pes_kbd_input);
 };
 
 

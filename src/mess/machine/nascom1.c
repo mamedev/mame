@@ -39,23 +39,21 @@
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( nascom2_fdc_intrq_w )
+WRITE_LINE_MEMBER(nascom1_state::nascom2_fdc_intrq_w)
 {
-	nascom1_state *drvstate = device->machine().driver_data<nascom1_state>();
-	drvstate->m_nascom2_fdc.irq = state;
+	m_nascom2_fdc.irq = state;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( nascom2_fdc_drq_w )
+WRITE_LINE_MEMBER(nascom1_state::nascom2_fdc_drq_w)
 {
-	nascom1_state *drvstate = device->machine().driver_data<nascom1_state>();
-	drvstate->m_nascom2_fdc.drq = state;
+	m_nascom2_fdc.drq = state;
 }
 
 const wd17xx_interface nascom2_wd17xx_interface =
 {
 	DEVCB_LINE_VCC,
-	DEVCB_LINE(nascom2_fdc_intrq_w),
-	DEVCB_LINE(nascom2_fdc_drq_w),
+	DEVCB_DRIVER_LINE_MEMBER(nascom1_state,nascom2_fdc_intrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(nascom1_state,nascom2_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
@@ -170,13 +168,13 @@ READ8_MEMBER(nascom1_state::nascom1_port_02_r)
 }
 
 
-READ8_DEVICE_HANDLER( nascom1_hd6402_si )
+READ8_MEMBER(nascom1_state::nascom1_hd6402_si)
 {
 	return 1;
 }
 
 
-WRITE8_DEVICE_HANDLER( nascom1_hd6402_so )
+WRITE8_MEMBER(nascom1_state::nascom1_hd6402_so)
 {
 }
 

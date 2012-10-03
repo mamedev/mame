@@ -157,9 +157,9 @@ static ADDRESS_MAP_START(mc1502_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x0068, 0x006B) AM_DEVREADWRITE("ppi8255n2", i8255_device, read, write)	// keyboard poll
-	AM_RANGE(0x0100, 0x0100) AM_DEVREADWRITE_LEGACY("vg93", mc1502_wd17xx_aux_r, mc1502_wd17xx_aux_w)
-	AM_RANGE(0x0108, 0x0108) AM_DEVREAD_LEGACY("vg93", mc1502_wd17xx_drq_r)			// blocking read!
-	AM_RANGE(0x010a, 0x010a) AM_DEVREAD_LEGACY("vg93", mc1502_wd17xx_motor_r)
+	AM_RANGE(0x0100, 0x0100) AM_READWRITE(mc1502_wd17xx_aux_r, mc1502_wd17xx_aux_w)
+	AM_RANGE(0x0108, 0x0108) AM_READ(mc1502_wd17xx_drq_r)			// blocking read!
+	AM_RANGE(0x010a, 0x010a) AM_READ(mc1502_wd17xx_motor_r)
 	AM_RANGE(0x010c, 0x010c) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_status_r, wd17xx_command_w)
 	AM_RANGE(0x010d, 0x010d) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_track_r, wd17xx_track_w)
 	AM_RANGE(0x010e, 0x010e) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_sector_r, wd17xx_sector_w)

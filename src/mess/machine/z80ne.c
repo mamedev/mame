@@ -609,18 +609,17 @@ WRITE8_MEMBER(z80ne_state::lx385_ctrl_w)
 	}
 }
 
-READ8_DEVICE_HANDLER( lx388_mc6847_videoram_r )
+READ8_MEMBER(z80ne_state::lx388_mc6847_videoram_r)
 {
-	z80ne_state *state = space.machine().driver_data<z80ne_state>();
 	if (offset == ~0) return 0xff;
 
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int d6 = BIT(videoram[offset], 6);
 	int d7 = BIT(videoram[offset], 7);
 
-	state->m_vdg->inv_w(d6 && d7);
-	state->m_vdg->as_w(!d6 && d7);
-	state->m_vdg->intext_w(!d6 && d7);
+	m_vdg->inv_w(d6 && d7);
+	m_vdg->as_w(!d6 && d7);
+	m_vdg->intext_w(!d6 && d7);
 
 	return videoram[offset];
 }
@@ -648,9 +647,8 @@ READ8_MEMBER(z80ne_state::lx388_read_field_sync)
  *
  */
 
-WRITE8_DEVICE_HANDLER(lx390_motor_w)
+WRITE8_MEMBER(z80ne_state::lx390_motor_w)
 {
-	z80ne_state *state = space.machine().driver_data<z80ne_state>();
 	/* Selection of drive and parameters
      A write also causes the selected drive motor to turn on for about 3 seconds.
      When the motor turns off, the drive is deselected.
@@ -677,11 +675,11 @@ WRITE8_DEVICE_HANDLER(lx390_motor_w)
 		if (data & 8)
 			drive = 3;
 
-		state->m_wd17xx_state.head = (data & 32) ? 1 : 0;
-		state->m_wd17xx_state.drive = data & 0x0F;
+		m_wd17xx_state.head = (data & 32) ? 1 : 0;
+		m_wd17xx_state.drive = data & 0x0F;
 
 		/* no drive selected, turn off all leds */
-		if (!state->m_wd17xx_state.drive)
+		if (!m_wd17xx_state.drive)
 		{
 			output_set_value("drv0", 0);
 			output_set_value("drv1", 0);
@@ -690,23 +688,22 @@ WRITE8_DEVICE_HANDLER(lx390_motor_w)
 		if (drive < 4)
 		{
 			LOG(("lx390_motor_w, set drive %1d\n", drive));
-			wd17xx_set_drive(device,drive);
-			LOG(("lx390_motor_w, set side %1d\n", state->m_wd17xx_state.head));
-			wd17xx_set_side(device, state->m_wd17xx_state.head);
+			wd17xx_set_drive(machine().device("wd1771"),drive);
+			LOG(("lx390_motor_w, set side %1d\n", m_wd17xx_state.head));
+			wd17xx_set_side(machine().device("wd1771"), m_wd17xx_state.head);
 		}
 }
 
-READ8_DEVICE_HANDLER(lx390_reset_bank)
+READ8_MEMBER(z80ne_state::lx390_reset_bank)
 {
-	z80ne_state *state = space.machine().driver_data<z80ne_state>();
 	offs_t pc;
 
 	/* if PC is not in range, we are under integrated debugger control, DON'T SWAP */
-	pc = space.machine().device("z80ne")->safe_pc();
+	pc = machine().device("z80ne")->safe_pc();
 	if((pc >= 0xf000) && (pc <=0xffff))
 	{
 		LOG(("lx390_reset_bank, reset memory bank 1\n"));
-		state->membank("bank1")->set_entry(0); /* RAM at 0x0000 (bank 1) */
+		membank("bank1")->set_entry(0); /* RAM at 0x0000 (bank 1) */
 	}
 	else
 	{
@@ -715,34 +712,34 @@ READ8_DEVICE_HANDLER(lx390_reset_bank)
 	return 0xff;
 }
 
-READ8_DEVICE_HANDLER(lx390_fdc_r)
+READ8_MEMBER(z80ne_state::lx390_fdc_r)
 {
 	UINT8 d;
 
 	switch(offset)
 	{
 	case 0:
-		d = wd17xx_status_r(device, space, 0) ^ 0xff;
+		d = wd17xx_status_r(machine().device("wd1771"), space, 0) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx status: %02x\n", d));
 		break;
 	case 1:
-		d = wd17xx_track_r(device, space, 0) ^ 0xff;
+		d = wd17xx_track_r(machine().device("wd1771"), space, 0) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx track:  %02x\n", d));
 		break;
 	case 2:
-		d = wd17xx_sector_r(device, space, 0) ^ 0xff;
+		d = wd17xx_sector_r(machine().device("wd1771"), space, 0) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx sector: %02x\n", d));
 		break;
 	case 3:
-		d = wd17xx_data_r(device, space, 0) ^ 0xff;
+		d = wd17xx_data_r(machine().device("wd1771"), space, 0) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx data3:  %02x\n", d));
 		break;
 	case 6:
 		d = 0xff;
-		lx390_reset_bank(device, space, 0);
+		lx390_reset_bank(space, 0);
 		break;
 	case 7:
-		d = wd17xx_data_r(device, space, 3) ^ 0xff;
+		d = wd17xx_data_r(machine().device("wd1771"), space, 3) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx data7, force:  %02x\n", d));
 		break;
 	default:
@@ -751,9 +748,8 @@ READ8_DEVICE_HANDLER(lx390_fdc_r)
 	return d;
 }
 
-WRITE8_DEVICE_HANDLER(lx390_fdc_w)
+WRITE8_MEMBER(z80ne_state::lx390_fdc_w)
 {
-	z80ne_state *state = space.machine().driver_data<z80ne_state>();
 	UINT8 d;
 
 	d = data;
@@ -761,31 +757,31 @@ WRITE8_DEVICE_HANDLER(lx390_fdc_w)
 	{
 	case 0:
 		LOG(("lx390_fdc_w, WD17xx command: %02x\n", d));
-		wd17xx_command_w(device, space, offset, d ^ 0xff);
-		if (state->m_wd17xx_state.drive & 1)
+		wd17xx_command_w(machine().device("wd1771"), space, offset, d ^ 0xff);
+		if (m_wd17xx_state.drive & 1)
 			output_set_value("drv0", 2);
-		else if (state->m_wd17xx_state.drive & 2)
+		else if (m_wd17xx_state.drive & 2)
 			output_set_value("drv1", 2);
 		break;
 	case 1:
 		LOG(("lx390_fdc_w, WD17xx track:   %02x\n", d));
-		wd17xx_track_w(device, space, offset, d ^ 0xff);
+		wd17xx_track_w(machine().device("wd1771"), space, offset, d ^ 0xff);
 		break;
 	case 2:
 		LOG(("lx390_fdc_w, WD17xx sector:  %02x\n", d));
-		wd17xx_sector_w(device, space, offset, d ^ 0xff);
+		wd17xx_sector_w(machine().device("wd1771"), space, offset, d ^ 0xff);
 		break;
 	case 3:
-		wd17xx_data_w(device, space, 0, d ^ 0xff);
+		wd17xx_data_w(machine().device("wd1771"), space, 0, d ^ 0xff);
 		LOG(("lx390_fdc_w, WD17xx data3:   %02x\n", d));
 		break;
 	case 6:
 		LOG(("lx390_fdc_w, motor_w:   %02x\n", d));
-		lx390_motor_w(device, space, 0, d);
+		lx390_motor_w(space, 0, d);
 		break;
 	case 7:
 		LOG(("lx390_fdc_w, WD17xx data7, force:   %02x\n", d));
-		wd17xx_data_w(device, space, 3, d ^ 0xff);
+		wd17xx_data_w(machine().device("wd1771"), space, 3, d ^ 0xff);
 		break;
 	}
 }

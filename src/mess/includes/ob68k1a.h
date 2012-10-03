@@ -41,6 +41,8 @@ public:
 	DECLARE_WRITE8_MEMBER( com8116_w );
 	DECLARE_READ8_MEMBER( pia_r );
 	DECLARE_WRITE8_MEMBER( pia_w );
+	DECLARE_WRITE_LINE_MEMBER(rx_tx_0_w);
+	DECLARE_WRITE_LINE_MEMBER(rx_tx_1_w);
 };
 
 #endif

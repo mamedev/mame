@@ -39,6 +39,7 @@ public:
 	TIMER_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_CALLBACK_MEMBER(poly88_cassette_timer_callback);
 	TIMER_CALLBACK_MEMBER(setup_machine_state);
+	DECLARE_WRITE_LINE_MEMBER(poly88_usart_rxready);
 };
 
 

@@ -73,6 +73,7 @@ public:
 	/* TV Draw state */
 	UINT8 m_tvdraw_data;
 	TIMER_CALLBACK_MEMBER(lightgun_tick);
+	DECLARE_WRITE_LINE_MEMBER(sg1000_vdp_interrupt);
 };
 
 class sc3000_state : public sg1000_state
@@ -114,6 +115,7 @@ public:
 	DECLARE_READ8_MEMBER( ppi_pa_r );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	DECLARE_WRITE_LINE_MEMBER(sf7000_fdc_index_callback);
 
 	/* floppy state */
 	int m_fdc_irq;

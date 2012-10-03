@@ -126,6 +126,9 @@ public:
 	UINT32 screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nes_irq_callback);
 	TIMER_CALLBACK_MEMBER(lightgun_tick);
+	DECLARE_READ8_MEMBER(psg_4015_r);
+	DECLARE_WRITE8_MEMBER(psg_4015_w);
+	DECLARE_WRITE8_MEMBER(psg_4017_w);
 };
 
 /*----------- defined in machine/nes.c -----------*/

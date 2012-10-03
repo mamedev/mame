@@ -94,6 +94,7 @@ public:
 	int m_exrdy1;
 	int m_exrdy2;
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
+	DECLARE_WRITE_LINE_MEMBER(dart_rxtxca_w);
 };
 
 class bulletf_state : public bullet_state

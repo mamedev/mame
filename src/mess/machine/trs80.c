@@ -667,26 +667,25 @@ INTERRUPT_GEN_MEMBER(trs80_state::trs80_fdc_interrupt)/* not used - should it be
 	trs80_fdc_interrupt_internal(machine());
 }
 
-static WRITE_LINE_DEVICE_HANDLER( trs80_fdc_intrq_w )
+WRITE_LINE_MEMBER(trs80_state::trs80_fdc_intrq_w)
 {
-	trs80_state *drvstate = device->machine().driver_data<trs80_state>();
 	if (state)
 	{
-		trs80_fdc_interrupt_internal(device->machine());
+		trs80_fdc_interrupt_internal(machine());
 	}
 	else
 	{
-		if (drvstate->m_model4)
-			drvstate->m_nmi_data = 0;
+		if (m_model4)
+			m_nmi_data = 0;
 		else
-			drvstate->m_irq &= ~IRQ_M1_FDC;
+			m_irq &= ~IRQ_M1_FDC;
 	}
 }
 
 const wd17xx_interface trs80_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE(trs80_fdc_intrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(trs80_state,trs80_fdc_intrq_w),
 	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };

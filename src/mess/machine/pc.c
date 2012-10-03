@@ -53,7 +53,7 @@
 		if(VERBOSE_PIO>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",machine.time().as_double(),(char*)M ); \
+				logerror("%11.6f: %-24s",machine().time().as_double(),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -168,10 +168,10 @@ WRITE8_MEMBER(pc_state::pc_page_w)
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
+WRITE_LINE_MEMBER(pc_state::pc_dma_hrq_changed)
 {
-	pc_state *st = device->machine().driver_data<pc_state>();
-	st->m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	device_t *device = machine().device("dma8237");
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w( device, state );
@@ -200,63 +200,62 @@ WRITE8_MEMBER(pc_state::pc_dma_write_byte)
 }
 
 
-static READ8_DEVICE_HANDLER( pc_dma8237_fdc_dack_r )
+READ8_MEMBER(pc_state::pc_dma8237_fdc_dack_r)
 {
-	return pc_fdc_dack_r(space.machine(), space);
+	return pc_fdc_dack_r(machine(), space);
 }
 
 
-static READ8_DEVICE_HANDLER( pc_dma8237_hdc_dack_r )
+READ8_MEMBER(pc_state::pc_dma8237_hdc_dack_r)
 {
 	return 0xff;
 }
 
 
-static WRITE8_DEVICE_HANDLER( pc_dma8237_fdc_dack_w )
+WRITE8_MEMBER(pc_state::pc_dma8237_fdc_dack_w)
 {
-	pc_fdc_dack_w( space.machine(), space, data );
+	pc_fdc_dack_w( machine(), space, data );
 }
 
 
-static WRITE8_DEVICE_HANDLER( pc_dma8237_hdc_dack_w )
+WRITE8_MEMBER(pc_state::pc_dma8237_hdc_dack_w)
 {
 }
 
 
-static WRITE8_DEVICE_HANDLER( pc_dma8237_0_dack_w )
+WRITE8_MEMBER(pc_state::pc_dma8237_0_dack_w)
 {
-	pc_state *st = space.machine().driver_data<pc_state>();
-	st->m_u73_q2 = 0;
-	i8237_dreq0_w( st->m_dma8237, st->m_u73_q2 );
+	m_u73_q2 = 0;
+	i8237_dreq0_w( m_dma8237, m_u73_q2 );
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( pc_dma8237_out_eop )
+WRITE_LINE_MEMBER(pc_state::pc_dma8237_out_eop)
 {
-	pc_fdc_set_tc_state( device->machine(), state == ASSERT_LINE ? 0 : 1 );
+	pc_fdc_set_tc_state( machine(), state == ASSERT_LINE ? 0 : 1 );
 }
 
-static void set_dma_channel(device_t *device, int channel, int state)
+static void set_dma_channel(running_machine &machine, int channel, int state)
 {
-	pc_state *st = device->machine().driver_data<pc_state>();
+	pc_state *st = machine.driver_data<pc_state>();
 
 	if (!state) st->m_dma_channel = channel;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { set_dma_channel(device, 1, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { set_dma_channel(device, 2, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { set_dma_channel(device, 3, state); }
+WRITE_LINE_MEMBER(pc_state::pc_dack0_w){ set_dma_channel(machine(), 0, state); }
+WRITE_LINE_MEMBER(pc_state::pc_dack1_w){ set_dma_channel(machine(), 1, state); }
+WRITE_LINE_MEMBER(pc_state::pc_dack2_w){ set_dma_channel(machine(), 2, state); }
+WRITE_LINE_MEMBER(pc_state::pc_dack3_w){ set_dma_channel(machine(), 3, state); }
 
 I8237_INTERFACE( ibm5150_dma8237_config )
 {
-	DEVCB_DEVICE_LINE("dma8237", pc_dma_hrq_changed),
-	DEVCB_DEVICE_LINE("dma8237", pc_dma8237_out_eop),
+	DEVCB_DRIVER_LINE_MEMBER(pc_state,pc_dma_hrq_changed),
+	DEVCB_DRIVER_LINE_MEMBER(pc_state,pc_dma8237_out_eop),
 	DEVCB_DRIVER_MEMBER(pc_state, pc_dma_read_byte),
 	DEVCB_DRIVER_MEMBER(pc_state, pc_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER("dma8237", pc_dma8237_fdc_dack_r), DEVCB_DEVICE_HANDLER("dma8237", pc_dma8237_hdc_dack_r) },
-	{ DEVCB_DEVICE_HANDLER("dma8237", pc_dma8237_0_dack_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("dma8237", pc_dma8237_fdc_dack_w), DEVCB_DEVICE_HANDLER("dma8237", pc_dma8237_hdc_dack_w) },
-	{ DEVCB_DEVICE_LINE("dma8237", pc_dack0_w), DEVCB_DEVICE_LINE("dma8237", pc_dack1_w), DEVCB_DEVICE_LINE("dma8237", pc_dack2_w), DEVCB_DEVICE_LINE("dma8237", pc_dack3_w) }
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc_state,pc_dma8237_fdc_dack_r), DEVCB_DRIVER_MEMBER(pc_state, pc_dma8237_hdc_dack_r) },
+	{ DEVCB_DRIVER_MEMBER(pc_state, pc_dma8237_0_dack_w), DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc_state,pc_dma8237_fdc_dack_w), DEVCB_DRIVER_MEMBER(pc_state, pc_dma8237_hdc_dack_w) },
+	{ DEVCB_DRIVER_LINE_MEMBER(pc_state,pc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(pc_state, pc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(pc_state, pc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(pc_state, pc_dack3_w) }
 };
 
 
@@ -296,21 +295,21 @@ TIMER_CALLBACK_MEMBER(pc_state::pcjr_delayed_pic8259_irq)
     machine().firstcpu->set_input_line(0, param ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pcjr_pic8259_set_int_line )
+WRITE_LINE_MEMBER(pc_state::pcjr_pic8259_set_int_line)
 {
-	if ( device->machine().firstcpu->pc() == 0xF0454 )
+	if ( machine().firstcpu->pc() == 0xF0454 )
 	{
-		pc_int_delay_timer->adjust( device->machine().firstcpu->cycles_to_attotime(1), state );
+		pc_int_delay_timer->adjust( machine().firstcpu->cycles_to_attotime(1), state );
 	}
 	else
 	{
-		device->machine().firstcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+		machine().firstcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
 const struct pic8259_interface pcjr_pic8259_config =
 {
-	DEVCB_LINE(pcjr_pic8259_set_int_line),
+	DEVCB_DRIVER_LINE_MEMBER(pc_state,pcjr_pic8259_set_int_line),
 	DEVCB_LINE_VCC,
 	DEVCB_NULL
 };
@@ -352,22 +351,21 @@ void pc_speaker_set_input(running_machine &machine, UINT8 data)
  *
  *************************************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( ibm5150_pit8253_out1_changed )
+WRITE_LINE_MEMBER(pc_state::ibm5150_pit8253_out1_changed)
 {
-	pc_state *st = device->machine().driver_data<pc_state>();
 	/* Trigger DMA channel #0 */
-	if ( st->m_out1 == 0 && state == 1 && st->m_u73_q2 == 0 )
+	if ( m_out1 == 0 && state == 1 && m_u73_q2 == 0 )
 	{
-		st->m_u73_q2 = 1;
-		i8237_dreq0_w( st->m_dma8237, st->m_u73_q2 );
+		m_u73_q2 = 1;
+		i8237_dreq0_w( m_dma8237, m_u73_q2 );
 	}
-	st->m_out1 = state;
+	m_out1 = state;
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( ibm5150_pit8253_out2_changed )
+WRITE_LINE_MEMBER(pc_state::ibm5150_pit8253_out2_changed)
 {
-	pc_speaker_set_input( device->machine(), state );
+	pc_speaker_set_input( machine(), state );
 }
 
 
@@ -381,11 +379,11 @@ const struct pit8253_config ibm5150_pit8253_config =
 		}, {
 			XTAL_14_31818MHz/12,				/* dram refresh */
 			DEVCB_NULL,
-			DEVCB_LINE(ibm5150_pit8253_out1_changed)
+			DEVCB_DRIVER_LINE_MEMBER(pc_state,ibm5150_pit8253_out1_changed)
 		}, {
 			XTAL_14_31818MHz/12,				/* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
-			DEVCB_LINE(ibm5150_pit8253_out2_changed)
+			DEVCB_DRIVER_LINE_MEMBER(pc_state,ibm5150_pit8253_out2_changed)
 		}
 	}
 };
@@ -411,7 +409,7 @@ const struct pit8253_config pcjr_pit8253_config =
 		}, {
 			XTAL_14_31818MHz/12,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
-			DEVCB_LINE(ibm5150_pit8253_out2_changed)
+			DEVCB_DRIVER_LINE_MEMBER(pc_state,ibm5150_pit8253_out2_changed)
 		}
 	}
 };
@@ -432,7 +430,7 @@ const struct pit8253_config mc1502_pit8253_config =
 		}, {
 			XTAL_16MHz/12,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
-			DEVCB_LINE(ibm5150_pit8253_out2_changed)
+			DEVCB_DRIVER_LINE_MEMBER(pc_state,ibm5150_pit8253_out2_changed)
 		}
 	}
 };
@@ -444,16 +442,14 @@ const struct pit8253_config mc1502_pit8253_config =
  **********************************************************/
 
 /* called when a interrupt is set/cleared from com hardware */
-static WRITE_LINE_DEVICE_HANDLER( pc_com_interrupt_1 )
+WRITE_LINE_MEMBER(pc_state::pc_com_interrupt_1)
 {
-	pc_state *st = device->machine().driver_data<pc_state>();
-	pic8259_ir4_w(st->m_pic8259, state);
+	pic8259_ir4_w(m_pic8259, state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pc_com_interrupt_2 )
+WRITE_LINE_MEMBER(pc_state::pc_com_interrupt_2)
 {
-	pc_state *st = device->machine().driver_data<pc_state>();
-	pic8259_ir3_w(st->m_pic8259, state);
+	pic8259_ir3_w(m_pic8259, state);
 }
 
 const ins8250_interface ibm5150_com_interface[4]=
@@ -462,7 +458,7 @@ const ins8250_interface ibm5150_com_interface[4]=
 		DEVCB_DEVICE_LINE_MEMBER("serport0", serial_port_device, tx),
 		DEVCB_DEVICE_LINE_MEMBER("serport0", rs232_port_device, dtr_w),
 		DEVCB_DEVICE_LINE_MEMBER("serport0", rs232_port_device, rts_w),
-		DEVCB_LINE(pc_com_interrupt_1),
+		DEVCB_DRIVER_LINE_MEMBER(pc_state,pc_com_interrupt_1),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
@@ -470,7 +466,7 @@ const ins8250_interface ibm5150_com_interface[4]=
 		DEVCB_DEVICE_LINE_MEMBER("serport1", serial_port_device, tx),
 		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, dtr_w),
 		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, rts_w),
-		DEVCB_LINE(pc_com_interrupt_2),
+		DEVCB_DRIVER_LINE_MEMBER(pc_state,pc_com_interrupt_2),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
@@ -478,7 +474,7 @@ const ins8250_interface ibm5150_com_interface[4]=
 		DEVCB_DEVICE_LINE_MEMBER("serport2", serial_port_device, tx),
 		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, dtr_w),
 		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, rts_w),
-		DEVCB_LINE(pc_com_interrupt_1),
+		DEVCB_DRIVER_LINE_MEMBER(pc_state,pc_com_interrupt_1),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
@@ -486,7 +482,7 @@ const ins8250_interface ibm5150_com_interface[4]=
 		DEVCB_DEVICE_LINE_MEMBER("serport3", serial_port_device, tx),
 		DEVCB_DEVICE_LINE_MEMBER("serport3", rs232_port_device, dtr_w),
 		DEVCB_DEVICE_LINE_MEMBER("serport3", rs232_port_device, rts_w),
-		DEVCB_LINE(pc_com_interrupt_2),
+		DEVCB_DRIVER_LINE_MEMBER(pc_state,pc_com_interrupt_2),
 		DEVCB_NULL,
 		DEVCB_NULL
 	}
@@ -756,14 +752,11 @@ WRITE_LINE_MEMBER( pc_state::keyboard_data_w )
 }
 
 
-static READ8_DEVICE_HANDLER (ibm5160_ppi_porta_r)
+READ8_MEMBER(pc_state::ibm5160_ppi_porta_r)
 {
 	int data = 0xFF;
-	running_machine &machine = space.machine();
-	pc_state *st = space.machine().driver_data<pc_state>();
-
 	/* KB port A */
-	if (st->m_ppi_keyboard_clear)
+	if (m_ppi_keyboard_clear)
 	{
 		/*   0  0 - no floppy drives
          *   1  Not used
@@ -774,42 +767,40 @@ static READ8_DEVICE_HANDLER (ibm5160_ppi_porta_r)
          *      01 - color 40x25
          * 6-7  The number of floppy disk drives
          */
-		data = space.machine().root_device().ioport("DSW0")->read();
+		data = machine().root_device().ioport("DSW0")->read();
 	}
 	else
 	{
-		data = st->m_ppi_shift_register;
+		data = m_ppi_shift_register;
 	}
     PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
     return data;
 }
 
 
-static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
+READ8_MEMBER(pc_state::ibm5160_ppi_portc_r)
 {
-	pc_state *st = space.machine().driver_data<pc_state>();
-	int timer2_output = pit8253_get_output( st->m_pit8253, 2 );
+	int timer2_output = pit8253_get_output( m_pit8253, 2 );
 	int data=0xff;
-	running_machine &machine = space.machine();
 
 	data&=~0x80; // no parity error
 	data&=~0x40; // no error on expansion board
 	/* KB port C: equipment flags */
 //  if (pc_port[0x61] & 0x08)
-	if (st->m_ppi_portc_switch_high)
+	if (m_ppi_portc_switch_high)
 	{
 		/* read hi nibble of S2 */
-		data = (data & 0xf0) | ((space.machine().root_device().ioport("DSW0")->read() >> 4) & 0x0f);
+		data = (data & 0xf0) | ((machine().root_device().ioport("DSW0")->read() >> 4) & 0x0f);
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
 	}
 	else
 	{
 		/* read lo nibble of S2 */
-		data = (data & 0xf0) | (space.machine().root_device().ioport("DSW0")->read() & 0x0f);
+		data = (data & 0xf0) | (machine().root_device().ioport("DSW0")->read() & 0x0f);
 		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
 	}
 
-	if ( st->m_ppi_portb & 0x01 )
+	if ( m_ppi_portb & 0x01 )
 	{
 		data = ( data & ~0x10 ) | ( timer2_output ? 0x10 : 0x00 );
 	}
@@ -819,50 +810,46 @@ static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 }
 
 
-static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
+WRITE8_MEMBER(pc_state::ibm5160_ppi_portb_w)
 {
-	pc_state *st = space.machine().driver_data<pc_state>();
-
 	/* PPI controller port B*/
-	st->m_ppi_portb = data;
-	st->m_ppi_portc_switch_high = data & 0x08;
-	st->m_ppi_keyboard_clear = data & 0x80;
-	st->m_ppi_keyb_clock = data & 0x40;
-	pit8253_gate2_w(st->m_pit8253, BIT(data, 0));
-	pc_speaker_set_spkrdata( space.machine(), data & 0x02 );
+	m_ppi_portb = data;
+	m_ppi_portc_switch_high = data & 0x08;
+	m_ppi_keyboard_clear = data & 0x80;
+	m_ppi_keyb_clock = data & 0x40;
+	pit8253_gate2_w(m_pit8253, BIT(data, 0));
+	pc_speaker_set_spkrdata( machine(), data & 0x02 );
 
-	st->m_ppi_clock_signal = ( st->m_ppi_keyb_clock ) ? 1 : 0;
-	st->m_pc_kbdc->clock_write_from_mb(st->m_ppi_clock_signal);
+	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
+	m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */
-	if ( st->m_ppi_keyboard_clear )
+	if ( m_ppi_keyboard_clear )
 	{
-		pic8259_ir1_w(st->m_pic8259, 0);
-		st->m_ppi_shift_register = 0;
-		st->m_ppi_shift_enable = 1;
+		pic8259_ir1_w(m_pic8259, 0);
+		m_ppi_shift_register = 0;
+		m_ppi_shift_enable = 1;
 	}
 }
 
 
 I8255_INTERFACE( ibm5160_ppi8255_interface )
 {
-	DEVCB_HANDLER(ibm5160_ppi_porta_r),
+	DEVCB_DRIVER_MEMBER(pc_state,ibm5160_ppi_porta_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(ibm5160_ppi_portb_w),
-	DEVCB_HANDLER(ibm5160_ppi_portc_r),
+	DEVCB_DRIVER_MEMBER(pc_state,ibm5160_ppi_portb_w),
+	DEVCB_DRIVER_MEMBER(pc_state,ibm5160_ppi_portc_r),
 	DEVCB_NULL
 };
 
 
-static READ8_DEVICE_HANDLER (pc_ppi_porta_r)
+READ8_MEMBER(pc_state::pc_ppi_porta_r)
 {
 	int data = 0xFF;
-	running_machine &machine = space.machine();
-	pc_state *st = space.machine().driver_data<pc_state>();
 
 	/* KB port A */
-	if (st->m_ppi_keyboard_clear)
+	if (m_ppi_keyboard_clear)
 	{
 		/*   0  0 - no floppy drives
          *   1  Not used
@@ -873,7 +860,7 @@ static READ8_DEVICE_HANDLER (pc_ppi_porta_r)
          *      01 - color 40x25
          * 6-7  The number of floppy disk drives
          */
-		data = space.machine().root_device().ioport("DSW0")->read();
+		data = machine().root_device().ioport("DSW0")->read();
 	}
 	else
 	{
@@ -884,30 +871,29 @@ static READ8_DEVICE_HANDLER (pc_ppi_porta_r)
 }
 
 
-static WRITE8_DEVICE_HANDLER( pc_ppi_portb_w )
+WRITE8_MEMBER(pc_state::pc_ppi_portb_w)
 {
-	pc_state *st = space.machine().driver_data<pc_state>();
 	/* PPI controller port B*/
-	st->m_ppi_portb = data;
-	st->m_ppi_portc_switch_high = data & 0x08;
-	st->m_ppi_keyboard_clear = data & 0x80;
-	st->m_ppi_keyb_clock = data & 0x40;
-	pit8253_gate2_w(st->m_pit8253, BIT(data, 0));
-	pc_speaker_set_spkrdata( space.machine(), data & 0x02 );
-	pc_keyb_set_clock( st->m_ppi_keyb_clock );
+	m_ppi_portb = data;
+	m_ppi_portc_switch_high = data & 0x08;
+	m_ppi_keyboard_clear = data & 0x80;
+	m_ppi_keyb_clock = data & 0x40;
+	pit8253_gate2_w(m_pit8253, BIT(data, 0));
+	pc_speaker_set_spkrdata( machine(), data & 0x02 );
+	pc_keyb_set_clock( m_ppi_keyb_clock );
 
-	if ( st->m_ppi_keyboard_clear )
+	if ( m_ppi_keyboard_clear )
 		pc_keyb_clear();
 }
 
 
 I8255_INTERFACE( pc_ppi8255_interface )
 {
-	DEVCB_HANDLER(pc_ppi_porta_r),
+	DEVCB_DRIVER_MEMBER(pc_state,pc_ppi_porta_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(pc_ppi_portb_w),
-	DEVCB_HANDLER(ibm5160_ppi_portc_r),
+	DEVCB_DRIVER_MEMBER(pc_state,pc_ppi_portb_w),
+	DEVCB_DRIVER_MEMBER(pc_state,ibm5160_ppi_portc_r),
 	DEVCB_NULL
 };
 
@@ -958,123 +944,106 @@ TIMER_CALLBACK_MEMBER(pc_state::mc1502_keyb_signal_callback)
 	}
 }
 
-static READ8_DEVICE_HANDLER ( mc1502_ppi_porta_r )
+READ8_MEMBER(pc_state::mc1502_ppi_porta_r)
 {
-	running_machine &machine = space.machine();
-
-	DBG_LOG(1,"mc1502_ppi_porta_r",("= %02X\n", mc1502_keyb.latch));
+//	DBG_LOG(1,"mc1502_ppi_porta_r",("= %02X\n", mc1502_keyb.latch));
 	return mc1502_keyb.latch;
 }
 
-static WRITE8_DEVICE_HANDLER ( mc1502_ppi_porta_w )
+WRITE8_MEMBER(pc_state::mc1502_ppi_porta_w)
 {
-	pc_state *st = space.machine().driver_data<pc_state>();
-	running_machine &machine = space.machine();
-
-	DBG_LOG(1,"mc1502_ppi_porta_w",("( %02X )\n", data));
+//	DBG_LOG(1,"mc1502_ppi_porta_w",("( %02X )\n", data));
 	mc1502_keyb.latch = data;
 	if (mc1502_keyb.pulsing)
 		mc1502_keyb.pulsing--;
-	pic8259_ir1_w(st->m_pic8259, 0);
+	pic8259_ir1_w(m_pic8259, 0);
 }
 
-static WRITE8_DEVICE_HANDLER ( mc1502_ppi_portb_w )
+WRITE8_MEMBER(pc_state::mc1502_ppi_portb_w)
 {
-	pc_state *st = space.machine().driver_data<pc_state>();
-	running_machine &machine = space.machine();
-
-	DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
-	st->m_ppi_portb = data;
-	pit8253_gate2_w(space.machine().device("pit8253"), BIT(data, 0));
-	pc_speaker_set_spkrdata( space.machine(), data & 0x02 );
+//	DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
+	m_ppi_portb = data;
+	pit8253_gate2_w(machine().device("pit8253"), BIT(data, 0));
+	pc_speaker_set_spkrdata( machine(), data & 0x02 );
 }
 
-static READ8_DEVICE_HANDLER ( mc1502_ppi_portc_r )
+READ8_MEMBER(pc_state::mc1502_ppi_portc_r)
 {
-	running_machine &machine = space.machine();
-	pc_state *st = space.machine().driver_data<pc_state>();
-	int timer2_output = pit8253_get_output( space.machine().device("pit8253"), 2 );
+	int timer2_output = pit8253_get_output( machine().device("pit8253"), 2 );
 	int data = 0xff;
-	double tap_val = (space.machine().device<cassette_image_device>(CASSETTE_TAG)->input());
+	double tap_val = (machine().device<cassette_image_device>(CASSETTE_TAG)->input());
 
 //  0x80 -- serial RxD
 //  0x40 -- CASS IN, also loops back T2OUT (gated by CASWR)
-	data = ( data & ~0x40 ) | ( tap_val < 0 ? 0x40 : 0x00 ) | ( (BIT(st->m_ppi_portb, 7) && timer2_output) ? 0x40 : 0x00 );
+	data = ( data & ~0x40 ) | ( tap_val < 0 ? 0x40 : 0x00 ) | ( (BIT(m_ppi_portb, 7) && timer2_output) ? 0x40 : 0x00 );
 //  0x20 -- T2OUT
 	data = ( data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
 //  0x10 -- SNDOUT
-	data = ( data & ~0x10 ) | ( (BIT(st->m_ppi_portb, 1) && timer2_output) ? 0x10 : 0x00 );
+	data = ( data & ~0x10 ) | ( (BIT(m_ppi_portb, 1) && timer2_output) ? 0x10 : 0x00 );
 
-	DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n",
-		data, tap_val, timer2_output, machine.describe_context()));
+//	DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n",
+//		data, tap_val, timer2_output, machine().describe_context()));
 	return data;
 }
 
-static READ8_DEVICE_HANDLER ( mc1502_kppi_porta_r )
+READ8_MEMBER(pc_state::mc1502_kppi_porta_r)
 {
-	running_machine &machine = space.machine();
 	UINT8 key = 0;
 
-	if (mc1502_keyb.mask & 0x0001) { key |= machine.root_device().ioport("Y1")->read(); }
-	if (mc1502_keyb.mask & 0x0002) { key |= machine.root_device().ioport("Y2")->read(); }
-	if (mc1502_keyb.mask & 0x0004) { key |= machine.root_device().ioport("Y3")->read(); }
-	if (mc1502_keyb.mask & 0x0008) { key |= machine.root_device().ioport("Y4")->read(); }
-	if (mc1502_keyb.mask & 0x0010) { key |= machine.root_device().ioport("Y5")->read(); }
-	if (mc1502_keyb.mask & 0x0020) { key |= machine.root_device().ioport("Y6")->read(); }
-	if (mc1502_keyb.mask & 0x0040) { key |= machine.root_device().ioport("Y7")->read(); }
-	if (mc1502_keyb.mask & 0x0080) { key |= machine.root_device().ioport("Y8")->read(); }
-	if (mc1502_keyb.mask & 0x0100) { key |= machine.root_device().ioport("Y9")->read(); }
-	if (mc1502_keyb.mask & 0x0200) { key |= machine.root_device().ioport("Y10")->read(); }
-	if (mc1502_keyb.mask & 0x0400) { key |= machine.root_device().ioport("Y11")->read(); }
-	if (mc1502_keyb.mask & 0x0800) { key |= machine.root_device().ioport("Y12")->read(); }
+	if (mc1502_keyb.mask & 0x0001) { key |= machine().root_device().ioport("Y1")->read(); }
+	if (mc1502_keyb.mask & 0x0002) { key |= machine().root_device().ioport("Y2")->read(); }
+	if (mc1502_keyb.mask & 0x0004) { key |= machine().root_device().ioport("Y3")->read(); }
+	if (mc1502_keyb.mask & 0x0008) { key |= machine().root_device().ioport("Y4")->read(); }
+	if (mc1502_keyb.mask & 0x0010) { key |= machine().root_device().ioport("Y5")->read(); }
+	if (mc1502_keyb.mask & 0x0020) { key |= machine().root_device().ioport("Y6")->read(); }
+	if (mc1502_keyb.mask & 0x0040) { key |= machine().root_device().ioport("Y7")->read(); }
+	if (mc1502_keyb.mask & 0x0080) { key |= machine().root_device().ioport("Y8")->read(); }
+	if (mc1502_keyb.mask & 0x0100) { key |= machine().root_device().ioport("Y9")->read(); }
+	if (mc1502_keyb.mask & 0x0200) { key |= machine().root_device().ioport("Y10")->read(); }
+	if (mc1502_keyb.mask & 0x0400) { key |= machine().root_device().ioport("Y11")->read(); }
+	if (mc1502_keyb.mask & 0x0800) { key |= machine().root_device().ioport("Y12")->read(); }
 	key ^= 0xff;
-	DBG_LOG(2,"mc1502_kppi_porta_r",("= %02X\n", key));
+//	DBG_LOG(2,"mc1502_kppi_porta_r",("= %02X\n", key));
 	return key;
 }
 
-static WRITE8_DEVICE_HANDLER ( mc1502_kppi_portb_w )
+WRITE8_MEMBER(pc_state::mc1502_kppi_portb_w)
 {
-	running_machine &machine = space.machine();
-
 	mc1502_keyb.mask &= ~255;
 	mc1502_keyb.mask |= data ^ 255;
 	if (!BIT(data, 0))
 		mc1502_keyb.mask |= 1 << 11;
 	else
 		mc1502_keyb.mask &= ~(1 << 11);
-	DBG_LOG(2,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, mc1502_keyb.mask));
+//	DBG_LOG(2,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, mc1502_keyb.mask));
 }
 
-static WRITE8_DEVICE_HANDLER ( mc1502_kppi_portc_w )
+WRITE8_MEMBER(pc_state::mc1502_kppi_portc_w)
 {
-	running_machine &machine = space.machine();
-
 	mc1502_keyb.mask &= ~(7 << 8);
 	mc1502_keyb.mask |= ((data ^ 7) & 7) << 8;
-	DBG_LOG(2,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, mc1502_keyb.mask));
+//	DBG_LOG(2,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, mc1502_keyb.mask));
 }
 
 
-static WRITE8_DEVICE_HANDLER ( pcjr_ppi_portb_w )
+WRITE8_MEMBER(pc_state::pcjr_ppi_portb_w)
 {
-	pc_state *st = space.machine().driver_data<pc_state>();
 	/* KB controller port B */
-	st->m_ppi_portb = data;
-	st->m_ppi_portc_switch_high = data & 0x08;
-	pit8253_gate2_w(space.machine().device("pit8253"), BIT(data, 0));
-	pc_speaker_set_spkrdata( space.machine(), data & 0x02 );
+	m_ppi_portb = data;
+	m_ppi_portc_switch_high = data & 0x08;
+	pit8253_gate2_w(machine().device("pit8253"), BIT(data, 0));
+	pc_speaker_set_spkrdata( machine(), data & 0x02 );
 
-	space.machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+	machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 }
 
 
 /*
  * On a PCJR none of the port A bits are connected.
  */
-static READ8_DEVICE_HANDLER (pcjr_ppi_porta_r )
+READ8_MEMBER(pc_state::pcjr_ppi_porta_r)
 {
 	int data;
-	running_machine &machine = space.machine();
 
 	data = 0xff;
 	PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
@@ -1093,20 +1062,19 @@ static READ8_DEVICE_HANDLER (pcjr_ppi_porta_r )
  * PC6 - KYBD IN
  * PC7 - (keyboard) CABLE CONNECTED
  */
-static READ8_DEVICE_HANDLER ( pcjr_ppi_portc_r )
+READ8_MEMBER(pc_state::pcjr_ppi_portc_r)
 {
-	pc_state *st = space.machine().driver_data<pc_state>();
-	int timer2_output = pit8253_get_output( space.machine().device("pit8253"), 2 );
+	int timer2_output = pit8253_get_output( machine().device("pit8253"), 2 );
 	int data=0xff;
 
 	data&=~0x80;
 	data &= ~0x04;		/* floppy drive installed */
-	if ( space.machine().device<ram_device>(RAM_TAG)->size() > 64 * 1024 )	/* more than 64KB ram installed */
+	if ( machine().device<ram_device>(RAM_TAG)->size() > 64 * 1024 )	/* more than 64KB ram installed */
 		data &= ~0x08;
 	data = ( data & ~0x01 ) | ( pcjr_keyb.latch ? 0x01: 0x00 );
-	if ( ! ( st->m_ppi_portb & 0x08 ) )
+	if ( ! ( m_ppi_portb & 0x08 ) )
 	{
-		double tap_val = (space.machine().device<cassette_image_device>(CASSETTE_TAG)->input());
+		double tap_val = (machine().device<cassette_image_device>(CASSETTE_TAG)->input());
 
 		if ( tap_val < 0 )
 		{
@@ -1119,7 +1087,7 @@ static READ8_DEVICE_HANDLER ( pcjr_ppi_portc_r )
 	}
 	else
 	{
-		if ( st->m_ppi_portb & 0x01 )
+		if ( m_ppi_portb & 0x01 )
 		{
 			data = ( data & ~0x10 ) | ( timer2_output ? 0x10 : 0x00 );
 		}
@@ -1133,32 +1101,32 @@ static READ8_DEVICE_HANDLER ( pcjr_ppi_portc_r )
 
 I8255_INTERFACE( pcjr_ppi8255_interface )
 {
-	DEVCB_HANDLER(pcjr_ppi_porta_r),
+	DEVCB_DRIVER_MEMBER(pc_state,pcjr_ppi_porta_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(pcjr_ppi_portb_w),
-	DEVCB_HANDLER(pcjr_ppi_portc_r),
+	DEVCB_DRIVER_MEMBER(pc_state,pcjr_ppi_portb_w),
+	DEVCB_DRIVER_MEMBER(pc_state,pcjr_ppi_portc_r),
 	DEVCB_NULL
 };
 
 I8255_INTERFACE( mc1502_ppi8255_interface )
 {
-	DEVCB_HANDLER(mc1502_ppi_porta_r),
-	DEVCB_HANDLER(mc1502_ppi_porta_w),
+	DEVCB_DRIVER_MEMBER(pc_state,mc1502_ppi_porta_r),
+	DEVCB_DRIVER_MEMBER(pc_state,mc1502_ppi_porta_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(mc1502_ppi_portb_w),
-	DEVCB_HANDLER(mc1502_ppi_portc_r),
+	DEVCB_DRIVER_MEMBER(pc_state,mc1502_ppi_portb_w),
+	DEVCB_DRIVER_MEMBER(pc_state,mc1502_ppi_portc_r),
 	DEVCB_NULL
 };
 
 I8255_INTERFACE( mc1502_ppi8255_interface_2 )
 {
-	DEVCB_HANDLER(mc1502_kppi_porta_r),
+	DEVCB_DRIVER_MEMBER(pc_state,mc1502_kppi_porta_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(mc1502_kppi_portb_w),
+	DEVCB_DRIVER_MEMBER(pc_state,mc1502_kppi_portb_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(mc1502_kppi_portc_w)
+	DEVCB_DRIVER_MEMBER(pc_state,mc1502_kppi_portc_w)
 };
 
 
@@ -1232,7 +1200,7 @@ static void pc_set_keyb_int(running_machine &machine, int state)
  * MC1502 uses a FD1793 clone instead of uPD765
  */
 
-READ8_DEVICE_HANDLER( mc1502_wd17xx_aux_r )
+READ8_MEMBER(pc_state::mc1502_wd17xx_aux_r)
 {
 	UINT8 data;
 
@@ -1241,39 +1209,39 @@ READ8_DEVICE_HANDLER( mc1502_wd17xx_aux_r )
 	return data;
 }
 
-WRITE8_DEVICE_HANDLER( mc1502_wd17xx_aux_w )
+WRITE8_MEMBER(pc_state::mc1502_wd17xx_aux_w)
 {
 	// master reset
-	wd17xx_mr_w(device, BIT(data, 0));
+	wd17xx_mr_w(machine().device("vg93"), BIT(data, 0));
 
 	// SIDE ONE
-	wd17xx_set_side(device, BIT(data, 1));
+	wd17xx_set_side(machine().device("vg93"), BIT(data, 1));
 
 	// bits 2, 3 -- motor on (drive 0, 1)
 
 	// DRIVE SEL
-	wd17xx_set_drive(device, BIT(data, 4));
+	wd17xx_set_drive(machine().device("vg93"), BIT(data, 4));
 }
 
 /*
  * Accesses to this port block (halt the CPU until DRQ, INTRQ or MOTOR ON)
  */
-READ8_DEVICE_HANDLER( mc1502_wd17xx_drq_r )
+READ8_MEMBER(pc_state::mc1502_wd17xx_drq_r)
 {
 	UINT8 data;
 	UINT64 newpc;
 
-	data = wd17xx_drq_r(device);
-	if (!data && !wd17xx_intrq_r(device)) {
+	data = wd17xx_drq_r(machine().device("vg93"));
+	if (!data && !wd17xx_intrq_r(machine().device("vg93"))) {
 		/* fake cpu halt by resetting PC one insn back */
-		newpc = space.machine().firstcpu->pc();
-		space.machine().firstcpu->set_pc( newpc - 1 );
+		newpc = machine().firstcpu->pc();
+		machine().firstcpu->set_pc( newpc - 1 );
 	}
 
 	return data;
 }
 
-READ8_DEVICE_HANDLER( mc1502_wd17xx_motor_r )
+READ8_MEMBER(pc_state::mc1502_wd17xx_motor_r)
 {
 	UINT8 data;
 

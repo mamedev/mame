@@ -541,8 +541,9 @@ static Z80DART_INTERFACE( sio_intf )
 
 /* PIT8253 Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( pit_out0_w )
+WRITE_LINE_MEMBER(bw12_state::pit_out0_w)
 {
+	device_t *device = machine().device("DEVCB_DRIVER_LINE_MEMBER(Z80SIO_TAG, bw12_state,pit_out0_w)");
 	z80dart_txca_w(device, state);
 	z80dart_rxca_w(device, state);
 }
@@ -558,7 +559,7 @@ static const struct pit8253_config pit_intf =
 		{
 			XTAL_1_8432MHz,
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE(Z80SIO_TAG, pit_out0_w)
+			DEVCB_DRIVER_LINE_MEMBER(bw12_state,pit_out0_w)
 		},
 		{
 			XTAL_1_8432MHz,

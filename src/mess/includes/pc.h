@@ -91,6 +91,41 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(pc_frame_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc_vga_frame_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(pcjr_frame_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
+	DECLARE_READ8_MEMBER(pc_dma8237_fdc_dack_r);
+	DECLARE_READ8_MEMBER(pc_dma8237_hdc_dack_r);
+	DECLARE_WRITE8_MEMBER(pc_dma8237_fdc_dack_w);
+	DECLARE_WRITE8_MEMBER(pc_dma8237_hdc_dack_w);
+	DECLARE_WRITE8_MEMBER(pc_dma8237_0_dack_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dma8237_out_eop);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
+	DECLARE_WRITE_LINE_MEMBER(pcjr_pic8259_set_int_line);
+	DECLARE_WRITE_LINE_MEMBER(ibm5150_pit8253_out1_changed);
+	DECLARE_WRITE_LINE_MEMBER(ibm5150_pit8253_out2_changed);
+	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_1);
+	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_2);
+	DECLARE_READ8_MEMBER(ibm5160_ppi_porta_r);
+	DECLARE_READ8_MEMBER(ibm5160_ppi_portc_r);
+	DECLARE_WRITE8_MEMBER(ibm5160_ppi_portb_w);
+	DECLARE_READ8_MEMBER(pc_ppi_porta_r);
+	DECLARE_WRITE8_MEMBER(pc_ppi_portb_w);
+	DECLARE_READ8_MEMBER(mc1502_ppi_porta_r);
+	DECLARE_WRITE8_MEMBER(mc1502_ppi_porta_w);
+	DECLARE_WRITE8_MEMBER(mc1502_ppi_portb_w);
+	DECLARE_READ8_MEMBER(mc1502_ppi_portc_r);
+	DECLARE_READ8_MEMBER(mc1502_kppi_porta_r);
+	DECLARE_WRITE8_MEMBER(mc1502_kppi_portb_w);
+	DECLARE_WRITE8_MEMBER(mc1502_kppi_portc_w);
+	DECLARE_WRITE8_MEMBER(pcjr_ppi_portb_w);
+	DECLARE_READ8_MEMBER(pcjr_ppi_porta_r);
+	DECLARE_READ8_MEMBER(pcjr_ppi_portc_r);
+	DECLARE_READ8_MEMBER(mc1502_wd17xx_aux_r);
+	DECLARE_WRITE8_MEMBER(mc1502_wd17xx_aux_w);
+	DECLARE_READ8_MEMBER(mc1502_wd17xx_drq_r);
+	DECLARE_READ8_MEMBER(mc1502_wd17xx_motor_r);
 };
 
 /*----------- defined in machine/pc.c -----------*/
@@ -116,12 +151,6 @@ void pc_speaker_set_input(running_machine &machine, UINT8 data);
 
 void mess_init_pc_common( running_machine &machine, UINT32 flags, void (*set_keyb_int_func)(running_machine &, int), void (*set_hdc_int_func)(running_machine &,int,int));
 
-
-
-DECLARE_READ8_DEVICE_HANDLER( mc1502_wd17xx_drq_r );
-DECLARE_READ8_DEVICE_HANDLER( mc1502_wd17xx_aux_r );
-DECLARE_READ8_DEVICE_HANDLER( mc1502_wd17xx_motor_r );
-DECLARE_WRITE8_DEVICE_HANDLER( mc1502_wd17xx_aux_w );
 
 DEVICE_IMAGE_LOAD( pcjr_cartridge );
 

@@ -161,6 +161,28 @@ public:
 	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bE_w);
 	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bF_w);
 	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bG_w);
+	DECLARE_READ8_MEMBER(d_pia0_pa_r);
+	DECLARE_WRITE8_MEMBER(d_pia0_pa_w);
+	DECLARE_READ8_MEMBER(d_pia0_pb_r);
+	DECLARE_WRITE8_MEMBER(d_pia0_pb_w);
+	DECLARE_WRITE8_MEMBER(d_pia0_cb2_w);
+	DECLARE_WRITE_LINE_MEMBER(d_pia0_irq_a);
+	DECLARE_WRITE_LINE_MEMBER(d_pia0_irq_b);
+	DECLARE_READ8_MEMBER(d_pia1_pa_r);
+	DECLARE_WRITE8_MEMBER(d_pia1_pa_w);
+	DECLARE_READ8_MEMBER(d_pia1_pb_r);
+	DECLARE_WRITE8_MEMBER(d_pia1_pb_w);
+	DECLARE_WRITE_LINE_MEMBER(d_pia1_irq_a);
+	DECLARE_WRITE_LINE_MEMBER(d_pia1_irq_b);
+	DECLARE_READ8_MEMBER(d_pia2_pa_r);
+	DECLARE_WRITE8_MEMBER(d_pia2_pa_w);
+	DECLARE_READ8_MEMBER(d_pia2_pb_r);
+	DECLARE_WRITE8_MEMBER(d_pia2_pb_w);
+	DECLARE_WRITE_LINE_MEMBER(d_pia2_irq_a);
+	DECLARE_WRITE_LINE_MEMBER(d_pia2_irq_b);
+	DECLARE_WRITE_LINE_MEMBER(dgnbeta_fdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(dgnbeta_fdc_drq_w);
+	DECLARE_WRITE_LINE_MEMBER(dgnbeta_vsync_changed);
 };
 
 

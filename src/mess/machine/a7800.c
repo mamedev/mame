@@ -38,29 +38,28 @@
     6532 RIOT
 ***************************************************************************/
 
-static READ8_DEVICE_HANDLER( riot_joystick_r )
+READ8_MEMBER(a7800_state::riot_joystick_r)
 {
-	return space.machine().root_device().ioport("joysticks")->read();
+	return machine().root_device().ioport("joysticks")->read();
 }
 
-static READ8_DEVICE_HANDLER( riot_console_button_r )
+READ8_MEMBER(a7800_state::riot_console_button_r)
 {
-	return space.machine().root_device().ioport("console_buttons")->read();
+	return machine().root_device().ioport("console_buttons")->read();
 }
 
-static WRITE8_DEVICE_HANDLER( riot_button_pullup_w )
+WRITE8_MEMBER(a7800_state::riot_button_pullup_w)
 {
-	a7800_state *state = space.machine().driver_data<a7800_state>();
-	state->m_p1_one_button = data & 0x04; // pin 6 of the controller port is held high by the riot chip when reading two-button controllers (from schematic)
-	state->m_p2_one_button = data & 0x10;
+	m_p1_one_button = data & 0x04; // pin 6 of the controller port is held high by the riot chip when reading two-button controllers (from schematic)
+	m_p2_one_button = data & 0x10;
 }
 
 const riot6532_interface a7800_r6532_interface =
 {
-	DEVCB_HANDLER(riot_joystick_r),
-	DEVCB_HANDLER(riot_console_button_r),
+	DEVCB_DRIVER_MEMBER(a7800_state,riot_joystick_r),
+	DEVCB_DRIVER_MEMBER(a7800_state,riot_console_button_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(riot_button_pullup_w),
+	DEVCB_DRIVER_MEMBER(a7800_state,riot_button_pullup_w),
 	DEVCB_NULL
 };
 

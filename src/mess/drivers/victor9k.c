@@ -123,11 +123,11 @@ static const mc6845_interface hd46505s_intf =
 
 // Intel 8253 Interface
 
-static WRITE_LINE_DEVICE_HANDLER( mux_serial_b_w )
+WRITE_LINE_MEMBER(victor9k_state::mux_serial_b_w)
 {
 }
 
-static WRITE_LINE_DEVICE_HANDLER( mux_serial_a_w )
+WRITE_LINE_MEMBER(victor9k_state::mux_serial_a_w)
 {
 }
 
@@ -137,11 +137,11 @@ static const struct pit8253_config pit_intf =
 		{
 			2500000,
 			DEVCB_LINE_VCC,
-			DEVCB_LINE(mux_serial_b_w)
+			DEVCB_DRIVER_LINE_MEMBER(victor9k_state,mux_serial_b_w)
 		}, {
 			2500000,
 			DEVCB_LINE_VCC,
-			DEVCB_LINE(mux_serial_a_w)
+			DEVCB_DRIVER_LINE_MEMBER(victor9k_state,mux_serial_a_w)
 		}, {
 			100000,
 			DEVCB_LINE_VCC,

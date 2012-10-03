@@ -1312,54 +1312,52 @@ static const struct pc_fdc_interface pcw16_fdc_interface=
 };
 
 
-static WRITE_LINE_DEVICE_HANDLER( pcw16_com_interrupt_1 )
+WRITE_LINE_MEMBER(pcw16_state::pcw16_com_interrupt_1)
 {
-	pcw16_state *drvstate = device->machine().driver_data<pcw16_state>();
-	drvstate->m_system_status &= ~(1 << 4);
+	m_system_status &= ~(1 << 4);
 
 	if ( state ) {
-		drvstate->m_system_status |= (1 << 4);
+		m_system_status |= (1 << 4);
 	}
 
-	drvstate->pcw16_refresh_ints();
+	pcw16_refresh_ints();
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( pcw16_com_interrupt_2 )
+WRITE_LINE_MEMBER(pcw16_state::pcw16_com_interrupt_2)
 {
-	pcw16_state *drvstate = device->machine().driver_data<pcw16_state>();
-	drvstate->m_system_status &= ~(1 << 3);
+	m_system_status &= ~(1 << 3);
 
 	if ( state ) {
-		drvstate->m_system_status |= (1 << 3);
+		m_system_status |= (1 << 3);
 	}
 
-	drvstate->pcw16_refresh_ints();
+	pcw16_refresh_ints();
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pcw16_com_tx_0 ) { }
-static WRITE_LINE_DEVICE_HANDLER( pcw16_com_dtr_0 ) { }
-static WRITE_LINE_DEVICE_HANDLER( pcw16_com_rts_0 ) { }
+WRITE_LINE_MEMBER(pcw16_state::pcw16_com_tx_0){ }
+WRITE_LINE_MEMBER(pcw16_state::pcw16_com_dtr_0){ }
+WRITE_LINE_MEMBER(pcw16_state::pcw16_com_rts_0){ }
 
-static WRITE_LINE_DEVICE_HANDLER( pcw16_com_tx_1 ) { }
-static WRITE_LINE_DEVICE_HANDLER( pcw16_com_dtr_1 ) { }
-static WRITE_LINE_DEVICE_HANDLER( pcw16_com_rts_1 ) { }
+WRITE_LINE_MEMBER(pcw16_state::pcw16_com_tx_1){ }
+WRITE_LINE_MEMBER(pcw16_state::pcw16_com_dtr_1){ }
+WRITE_LINE_MEMBER(pcw16_state::pcw16_com_rts_1){ }
 
 static const ins8250_interface pcw16_com_interface[2]=
 {
 	{
-		DEVCB_LINE(pcw16_com_tx_0),
-		DEVCB_LINE(pcw16_com_dtr_0),
-		DEVCB_LINE(pcw16_com_rts_0),
-		DEVCB_LINE(pcw16_com_interrupt_1),
+		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_tx_0),
+		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_dtr_0),
+		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_rts_0),
+		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_interrupt_1),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
 	{
-		DEVCB_LINE(pcw16_com_tx_1),
-		DEVCB_LINE(pcw16_com_dtr_1),
-		DEVCB_LINE(pcw16_com_rts_1),
-		DEVCB_LINE(pcw16_com_interrupt_2),
+		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_tx_1),
+		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_dtr_1),
+		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_rts_1),
+		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_interrupt_2),
 		DEVCB_NULL,
 		DEVCB_NULL
 	}

@@ -12,9 +12,8 @@ WRITE8_MEMBER( super80_state::pio_port_a_w )
 	m_keylatch = data;
 };
 
-static READ8_DEVICE_HANDLER( pio_port_b_r ) // cannot be modernised yet as super80 hangs at start
+READ8_MEMBER(super80_state::pio_port_b_r)// cannot be modernised yet as super80 hangs at start
 {
-	super80_state *state = space.machine().driver_data<super80_state>();
 	char kbdrow[6];
 	UINT8 i;
 	UINT8 data = 0xff;
@@ -22,7 +21,7 @@ static READ8_DEVICE_HANDLER( pio_port_b_r ) // cannot be modernised yet as super
 	for (i = 0; i < 8; i++)
 	{
 		sprintf(kbdrow,"X%d",i);
-		if (!BIT(state->m_keylatch, i)) data &= state->ioport(kbdrow)->read();
+		if (!BIT(m_keylatch, i)) data &= ioport(kbdrow)->read();
 	}
 
 	return data;
@@ -34,7 +33,7 @@ Z80PIO_INTERFACE( super80_pio_intf )
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(super80_state, pio_port_a_w),
 	DEVCB_NULL,			/* portA ready active callback (not used in super80) */
-	DEVCB_HANDLER(pio_port_b_r),
+	DEVCB_DRIVER_MEMBER(super80_state,pio_port_b_r),
 	DEVCB_NULL,
 	DEVCB_NULL			/* portB ready active callback (not used in super80) */
 };
@@ -93,7 +92,7 @@ TIMER_CALLBACK_MEMBER(super80_state::super80_timer)
 		m_cass_data[1] = 0;
 	}
 
-	m_pio->port_b_write(pio_port_b_r(m_pio,generic_space(),0,0xff));
+	m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
 }
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */

@@ -64,6 +64,9 @@ public:
 	DECLARE_MACHINE_RESET(orionpro);
 	UINT32 screen_update_orion128(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(orionz80_interrupt);
+	DECLARE_READ8_MEMBER(orion_romdisk_porta_r);
+	DECLARE_WRITE8_MEMBER(orion_romdisk_portb_w);
+	DECLARE_WRITE8_MEMBER(orion_romdisk_portc_w);
 };
 
 /*----------- defined in machine/orion.c -----------*/

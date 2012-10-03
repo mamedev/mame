@@ -74,13 +74,14 @@ public:
 	INTERRUPT_GEN_MEMBER(cgenie_timer_interrupt);
 	INTERRUPT_GEN_MEMBER(cgenie_frame_interrupt);
 	TIMER_CALLBACK_MEMBER(handle_cassette_input);
+	DECLARE_WRITE_LINE_MEMBER(cgenie_fdc_intrq_w);
+	DECLARE_READ8_MEMBER(cgenie_sh_control_port_r);
+	DECLARE_WRITE8_MEMBER(cgenie_sh_control_port_w);
 };
 
 
 /*----------- defined in machine/cgenie.c -----------*/
 
-DECLARE_READ8_DEVICE_HANDLER( cgenie_sh_control_port_r );
-DECLARE_WRITE8_DEVICE_HANDLER( cgenie_sh_control_port_w );
 
 extern const wd17xx_interface cgenie_wd17xx_interface;
 

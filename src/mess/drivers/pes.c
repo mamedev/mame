@@ -65,14 +65,13 @@ Address map:
 #include "machine/terminal.h"
 
 /* Devices */
-static WRITE8_DEVICE_HANDLER( pes_kbd_input )
+WRITE8_MEMBER(pes_state::pes_kbd_input)
 {
-	pes_state *state = space.machine().driver_data<pes_state>();
 #ifdef DEBUG_FIFO
 	fprintf(stderr,"keyboard input: %c, ", data);
 #endif
 	// if fifo is full (head ptr = tail ptr-1), do not increment the head ptr and do not store the data
-	if (((state->m_infifo_tail_ptr-1)&0x1F) == state->m_infifo_head_ptr)
+	if (((m_infifo_tail_ptr-1)&0x1F) == m_infifo_head_ptr)
 	{
 		logerror("infifo was full, write ignored!\n");
 #ifdef DEBUG_FIFO
@@ -80,20 +79,20 @@ static WRITE8_DEVICE_HANDLER( pes_kbd_input )
 #endif
 		return;
 	}
-	state->m_infifo[state->m_infifo_head_ptr] = data;
-	state->m_infifo_head_ptr++;
-	state->m_infifo_head_ptr&=0x1F;
+	m_infifo[m_infifo_head_ptr] = data;
+	m_infifo_head_ptr++;
+	m_infifo_head_ptr&=0x1F;
 #ifdef DEBUG_FIFO
-	fprintf(stderr,"kb input fifo fullness: %d\n",(state->m_infifo_head_ptr-state->m_infifo_tail_ptr)&0x1F);
+	fprintf(stderr,"kb input fifo fullness: %d\n",(m_infifo_head_ptr-m_infifo_tail_ptr)&0x1F);
 #endif
 	// todo: following two should be set so clear happens after one cpu cycle
-	space.machine().device("maincpu")->execute().set_input_line(MCS51_RX_LINE, ASSERT_LINE);
-	space.machine().device("maincpu")->execute().set_input_line(MCS51_RX_LINE, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(MCS51_RX_LINE, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 }
 
 static GENERIC_TERMINAL_INTERFACE( pes_terminal_intf )
 {
-	DEVCB_HANDLER(pes_kbd_input)
+	DEVCB_DRIVER_MEMBER(pes_state,pes_kbd_input)
 };
 
 /* Helper Functions */

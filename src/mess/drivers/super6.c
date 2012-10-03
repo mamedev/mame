@@ -509,14 +509,14 @@ static const z80_daisy_config super6_daisy_chain[] =
 //  GENERIC_TERMINAL_INTERFACE( terminal_intf )
 //-------------------------------------------------
 
-static WRITE8_DEVICE_HANDLER( dummy_w )
+WRITE8_MEMBER(super6_state::dummy_w)
 {
 	// handled in Z80DART_INTERFACE
 }
 
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_HANDLER(dummy_w)
+	DEVCB_DRIVER_MEMBER(super6_state,dummy_w)
 };
 
 

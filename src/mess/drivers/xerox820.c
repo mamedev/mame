@@ -557,22 +557,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(xerox820_state::ctc_tick)
 	m_ctc->trg0(0);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
+WRITE_LINE_MEMBER(xerox820_state::ctc_z0_w)
 {
+//	device_t *device = machine().device(Z80CTC_TAG);
 //  z80ctc_trg1_w(device, state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
+WRITE_LINE_MEMBER(xerox820_state::ctc_z2_w)
 {
+//	device_t *device = machine().device(Z80CTC_TAG);
+
 //  z80ctc_trg3_w(device, state);
 }
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_DEVICE_LINE(Z80CTC_TAG, ctc_z0_w),		/* ZC/TO0 callback */
+	DEVCB_DRIVER_LINE_MEMBER(xerox820_state,ctc_z0_w),		/* ZC/TO0 callback */
 	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg2),	/* ZC/TO1 callback */
-	DEVCB_DEVICE_LINE(Z80CTC_TAG, ctc_z2_w)		/* ZC/TO2 callback */
+	DEVCB_DRIVER_LINE_MEMBER(xerox820_state,ctc_z2_w)		/* ZC/TO2 callback */
 };
 
 /* Z80 Daisy Chain */

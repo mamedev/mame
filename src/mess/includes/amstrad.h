@@ -173,35 +173,27 @@ public:
 	TIMER_CALLBACK_MEMBER(amstrad_pc2_low);
 	TIMER_CALLBACK_MEMBER(amstrad_video_update_timer);
 	TIMER_CALLBACK_MEMBER(cb_set_resolution);
+	DECLARE_WRITE_LINE_MEMBER(aleste_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(amstrad_hsync_changed);
+	DECLARE_WRITE_LINE_MEMBER(amstrad_plus_hsync_changed);
+	DECLARE_WRITE_LINE_MEMBER(amstrad_vsync_changed);
+	DECLARE_WRITE_LINE_MEMBER(amstrad_plus_vsync_changed);
+	DECLARE_WRITE_LINE_MEMBER(amstrad_de_changed);
+	DECLARE_WRITE_LINE_MEMBER(amstrad_plus_de_changed);
+	DECLARE_READ8_MEMBER(amstrad_ppi_porta_r);
+	DECLARE_WRITE8_MEMBER(amstrad_ppi_porta_w);
+	DECLARE_READ8_MEMBER(amstrad_ppi_portb_r);
+	DECLARE_WRITE8_MEMBER(amstrad_ppi_portc_w);
 };
 
 
 /*----------- defined in machine/amstrad.c -----------*/
 
 
-
-DECLARE_READ8_DEVICE_HANDLER( amstrad_ppi_porta_r );
-DECLARE_READ8_DEVICE_HANDLER( amstrad_ppi_portb_r );
-DECLARE_WRITE8_DEVICE_HANDLER( amstrad_ppi_porta_w );
-DECLARE_WRITE8_DEVICE_HANDLER( amstrad_ppi_portc_w );
-
-
-WRITE_LINE_DEVICE_HANDLER( aleste_interrupt );
 WRITE_LINE_DEVICE_HANDLER( cpc_irq_w );
 WRITE_LINE_DEVICE_HANDLER( cpc_nmi_w );
 WRITE_LINE_DEVICE_HANDLER( cpc_romdis );
 WRITE_LINE_DEVICE_HANDLER( cpc_romen );
-
-
-
-
-
-
-
-
-
-
-
 
 SNAPSHOT_LOAD( amstrad );
 

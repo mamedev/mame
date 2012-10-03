@@ -247,11 +247,11 @@ UINT32 amu880_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 /* Z80-CTC Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
+WRITE_LINE_MEMBER(amu880_state::ctc_z0_w)
 {
 }
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
+WRITE_LINE_MEMBER(amu880_state::ctc_z2_w)
 {
 	/* cassette transmit/receive clock */
 }
@@ -259,9 +259,9 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_LINE(ctc_z0_w),	/* ZC/TO0 callback */
+	DEVCB_DRIVER_LINE_MEMBER(amu880_state,ctc_z0_w),	/* ZC/TO0 callback */
 	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_rxtxcb_w),	/* ZC/TO1 callback */
-	DEVCB_LINE(ctc_z2_w)	/* ZC/TO2 callback */
+	DEVCB_DRIVER_LINE_MEMBER(amu880_state,ctc_z2_w)	/* ZC/TO2 callback */
 };
 
 /* Z80-PIO Interface */
@@ -290,14 +290,16 @@ static Z80PIO_INTERFACE( pio2_intf )
 
 /* Z80-SIO Interface */
 
-static READ_LINE_DEVICE_HANDLER( cassette_r )
+READ_LINE_MEMBER(amu880_state::cassette_r)
 {
+	device_t *device = machine().device(CASSETTE_TAG);
 	cassette_image_device* dev = dynamic_cast<cassette_image_device*>(device);
 	return dev->input() < 0.0;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( cassette_w )
+WRITE_LINE_MEMBER(amu880_state::cassette_w)
 {
+	device_t *device = machine().device(CASSETTE_TAG);
 	cassette_image_device* dev = dynamic_cast<cassette_image_device*>(device);
 	dev->output(state ? -1.0 : +1.0);
 }
@@ -306,8 +308,8 @@ static Z80DART_INTERFACE( sio_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, cassette_r),
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, cassette_w),
+	DEVCB_DRIVER_LINE_MEMBER(amu880_state, cassette_r),
+	DEVCB_DRIVER_LINE_MEMBER(amu880_state, cassette_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

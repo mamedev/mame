@@ -48,6 +48,10 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_ssystem3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE8_MEMBER(ssystem3_via_write_a);
+	DECLARE_READ8_MEMBER(ssystem3_via_read_a);
+	DECLARE_READ8_MEMBER(ssystem3_via_read_b);
+	DECLARE_WRITE8_MEMBER(ssystem3_via_write_b);
 };
 
 

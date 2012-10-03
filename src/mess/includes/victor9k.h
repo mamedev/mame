@@ -125,6 +125,8 @@ public:
 	int m_se[2];						/* stepper enable */
 	int m_drive;						/* selected drive */
 	int m_side;							/* selected side */
+	DECLARE_WRITE_LINE_MEMBER(mux_serial_b_w);
+	DECLARE_WRITE_LINE_MEMBER(mux_serial_a_w);
 };
 
 #endif

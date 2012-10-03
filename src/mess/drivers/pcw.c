@@ -113,7 +113,7 @@
 static const UINT8 half_step_table[4] = { 0x01, 0x02, 0x04, 0x08 };
 static const UINT8 full_step_table[4] = { 0x03, 0x06, 0x0c, 0x09 };
 
-static WRITE_LINE_DEVICE_HANDLER( pcw_fdc_interrupt );
+
 
 static void pcw_update_interrupt_counter(pcw_state *state)
 {
@@ -129,7 +129,7 @@ static void pcw_update_interrupt_counter(pcw_state *state)
 /NMI depending on choice (see system control below) */
 static const upd765_interface pcw_upd765_interface =
 {
-	DEVCB_LINE(pcw_fdc_interrupt),
+	DEVCB_DRIVER_LINE_MEMBER(pcw_state,pcw_fdc_interrupt),
 	DEVCB_NULL,
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
@@ -179,16 +179,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(pcw_state::pcw_timer_interrupt)
 }
 
 /* fdc interrupt callback. set/clear fdc int */
-static WRITE_LINE_DEVICE_HANDLER( pcw_fdc_interrupt )
+WRITE_LINE_MEMBER(pcw_state::pcw_fdc_interrupt)
 {
-	pcw_state *drvstate = device->machine().driver_data<pcw_state>();
 	if (state == CLEAR_LINE)
-		drvstate->m_system_status &= ~(1<<5);
+		m_system_status &= ~(1<<5);
 	else
 	{
-		drvstate->m_system_status |= (1<<5);
-		if(drvstate->m_fdc_interrupt_code == 0)  // NMI is held until interrupt type is changed
-			drvstate->m_nmi_flag = 1;
+		m_system_status |= (1<<5);
+		if(m_fdc_interrupt_code == 0)  // NMI is held until interrupt type is changed
+			m_nmi_flag = 1;
 	}
 }
 

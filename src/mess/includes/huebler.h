@@ -52,6 +52,10 @@ public:
 	required_shared_ptr<UINT8> m_video_ram;
 	const UINT8 *m_char_rom;
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
+	DECLARE_READ_LINE_MEMBER(cassette_r);
+	DECLARE_WRITE_LINE_MEMBER(cassette_w);
 };
 
 #endif

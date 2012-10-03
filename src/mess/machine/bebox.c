@@ -521,37 +521,35 @@ READ64_HANDLER( bebox_interrupt_ack_r )
  *
  *************************************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( bebox_pic8259_master_set_int_line )
+WRITE_LINE_MEMBER(bebox_state::bebox_pic8259_master_set_int_line)
 {
-	bebox_set_irq_bit(device->machine(), 5, state);
+	bebox_set_irq_bit(machine(), 5, state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( bebox_pic8259_slave_set_int_line )
+WRITE_LINE_MEMBER(bebox_state::bebox_pic8259_slave_set_int_line)
 {
-	bebox_state *drvstate = device->machine().driver_data<bebox_state>();
-	if (drvstate->m_devices.pic8259_master)
-		pic8259_ir2_w(drvstate->m_devices.pic8259_master, state);
+	if (m_devices.pic8259_master)
+		pic8259_ir2_w(m_devices.pic8259_master, state);
 }
 
-static READ8_DEVICE_HANDLER( get_slave_ack )
+READ8_MEMBER(bebox_state::get_slave_ack)
 {
-	bebox_state *state = space.machine().driver_data<bebox_state>();
 	if (offset==2) { // IRQ = 2
-		return pic8259_acknowledge(state->m_devices.pic8259_slave);
+		return pic8259_acknowledge(m_devices.pic8259_slave);
 	}
 	return 0x00;
 }
 
 const struct pic8259_interface bebox_pic8259_master_config =
 {
-	DEVCB_LINE(bebox_pic8259_master_set_int_line),
+	DEVCB_DRIVER_LINE_MEMBER(bebox_state,bebox_pic8259_master_set_int_line),
 	DEVCB_LINE_VCC,
-	DEVCB_HANDLER(get_slave_ack)
+	DEVCB_DRIVER_MEMBER(bebox_state,get_slave_ack)
 };
 
 const struct pic8259_interface bebox_pic8259_slave_config =
 {
-	DEVCB_LINE(bebox_pic8259_slave_set_int_line),
+	DEVCB_DRIVER_LINE_MEMBER(bebox_state,bebox_pic8259_slave_set_int_line),
 	DEVCB_LINE_GND,
 	DEVCB_NULL
 };
@@ -753,12 +751,12 @@ READ8_HANDLER(bebox_80000480_r)
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( bebox_dma_hrq_changed )
+WRITE_LINE_MEMBER(bebox_state::bebox_dma_hrq_changed)
 {
-	device->machine().device("ppc1")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("ppc1")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	i8237_hlda_w( device, state );
+	i8237_hlda_w( machine().device("dma8237_1"), state );
 }
 
 
@@ -780,41 +778,41 @@ static WRITE8_HANDLER( bebox_dma_write_byte )
 }
 
 
-static READ8_DEVICE_HANDLER( bebox_dma8237_fdc_dack_r ) {
-	return pc_fdc_dack_r(space.machine(),space);
+READ8_MEMBER(bebox_state::bebox_dma8237_fdc_dack_r){
+	return pc_fdc_dack_r(machine(),space);
 }
 
 
-static WRITE8_DEVICE_HANDLER( bebox_dma8237_fdc_dack_w ) {
-	pc_fdc_dack_w( space.machine(), space, data );
+WRITE8_MEMBER(bebox_state::bebox_dma8237_fdc_dack_w){
+	pc_fdc_dack_w( machine(), space, data );
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( bebox_dma8237_out_eop ) {
-	pc_fdc_set_tc_state( device->machine(), state );
+WRITE_LINE_MEMBER(bebox_state::bebox_dma8237_out_eop){
+	pc_fdc_set_tc_state( machine(), state );
 }
 
-static void set_dma_channel(device_t *device, int channel, int state)
+static void set_dma_channel(running_machine &machine, int channel, int state)
 {
-	bebox_state *drvstate = device->machine().driver_data<bebox_state>();
+	bebox_state *drvstate = machine.driver_data<bebox_state>();
 	if (!state) drvstate->m_dma_channel = channel;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { set_dma_channel(device, 1, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { set_dma_channel(device, 2, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { set_dma_channel(device, 3, state); }
+WRITE_LINE_MEMBER(bebox_state::pc_dack0_w){ set_dma_channel(machine(), 0, state); }
+WRITE_LINE_MEMBER(bebox_state::pc_dack1_w){ set_dma_channel(machine(), 1, state); }
+WRITE_LINE_MEMBER(bebox_state::pc_dack2_w){ set_dma_channel(machine(), 2, state); }
+WRITE_LINE_MEMBER(bebox_state::pc_dack3_w){ set_dma_channel(machine(), 3, state); }
 
 
 I8237_INTERFACE( bebox_dma8237_1_config )
 {
-	DEVCB_LINE(bebox_dma_hrq_changed),
-	DEVCB_LINE(bebox_dma8237_out_eop),
+	DEVCB_DRIVER_LINE_MEMBER(bebox_state,bebox_dma_hrq_changed),
+	DEVCB_DRIVER_LINE_MEMBER(bebox_state,bebox_dma8237_out_eop),
 	DEVCB_MEMORY_HANDLER("ppc1", PROGRAM, bebox_dma_read_byte),
 	DEVCB_MEMORY_HANDLER("ppc1", PROGRAM, bebox_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(bebox_dma8237_fdc_dack_r), DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(bebox_dma8237_fdc_dack_w), DEVCB_NULL },
-	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(bebox_state,bebox_dma8237_fdc_dack_r), DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(bebox_state,bebox_dma8237_fdc_dack_w), DEVCB_NULL },
+	{ DEVCB_DRIVER_LINE_MEMBER(bebox_state,pc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(bebox_state,pc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(bebox_state,pc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(bebox_state,pc_dack3_w) }
 };
 
 
@@ -836,11 +834,10 @@ I8237_INTERFACE( bebox_dma8237_2_config )
  *
  *************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( bebox_timer0_w )
+WRITE_LINE_MEMBER(bebox_state::bebox_timer0_w)
 {
-	bebox_state *drvstate = device->machine().driver_data<bebox_state>();
-	if (drvstate->m_devices.pic8259_master)
-		pic8259_ir0_w(drvstate->m_devices.pic8259_master, state);
+	if (m_devices.pic8259_master)
+		pic8259_ir0_w(m_devices.pic8259_master, state);
 }
 
 
@@ -850,7 +847,7 @@ const struct pit8253_config bebox_pit8254_config =
 		{
 			4772720/4,				/* heartbeat IRQ */
 			DEVCB_NULL,
-			DEVCB_LINE(bebox_timer0_w)
+			DEVCB_DRIVER_LINE_MEMBER(bebox_state,bebox_timer0_w)
 		},
 		{
 			4772720/4,				/* dram refresh */

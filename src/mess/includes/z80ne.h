@@ -108,15 +108,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(z80ne_nmi);
 	TIMER_CALLBACK_MEMBER(z80ne_cassette_tc);
 	TIMER_CALLBACK_MEMBER(z80ne_kbd_scan);
+	DECLARE_READ8_MEMBER(lx388_mc6847_videoram_r);
+	DECLARE_WRITE8_MEMBER(lx390_motor_w);
+	DECLARE_READ8_MEMBER(lx390_reset_bank);
+	DECLARE_READ8_MEMBER(lx390_fdc_r);
+	DECLARE_WRITE8_MEMBER(lx390_fdc_w);
 };
-
-
-/*----------- defined in machine/z80ne.c -----------*/
-
-DECLARE_READ8_DEVICE_HANDLER(lx388_mc6847_videoram_r);
-DECLARE_READ8_DEVICE_HANDLER(lx390_fdc_r);
-DECLARE_WRITE8_DEVICE_HANDLER(lx390_fdc_w);
-DECLARE_READ8_DEVICE_HANDLER(lx390_reset_bank);
-DECLARE_WRITE8_DEVICE_HANDLER(lx390_motor_w);
 
 #endif /* Z80NE_H_ */

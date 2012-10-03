@@ -432,14 +432,12 @@ static const cassette_interface cassette_intf =
 //  TMS9928a_interface vdp_intf
 //-------------------------------------------------
 
-static WRITE_LINE_DEVICE_HANDLER(sordm5_video_interrupt_callback)
+WRITE_LINE_MEMBER(m5_state::sordm5_video_interrupt_callback)
 {
-	m5_state *driver_state = device->machine().driver_data<m5_state>();
-
 	if (state)
 	{
-		driver_state->m_ctc->trg3(1);
-		driver_state->m_ctc->trg3(0);
+		m_ctc->trg3(1);
+		m_ctc->trg3(0);
 	}
 }
 
@@ -447,7 +445,7 @@ static TMS9928A_INTERFACE(m5_tms9928a_interface)
 {
 	"screen",
 	0x4000,
-	DEVCB_LINE(sordm5_video_interrupt_callback)
+	DEVCB_DRIVER_LINE_MEMBER(m5_state,sordm5_video_interrupt_callback)
 };
 
 

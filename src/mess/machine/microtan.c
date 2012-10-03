@@ -161,66 +161,66 @@ static cassette_image_device *cassette_device_image(running_machine &machine)
 /**************************************************************
  * VIA callback functions for VIA #0
  **************************************************************/
-static READ8_DEVICE_HANDLER (via_0_in_a )
+READ8_MEMBER(microtan_state::via_0_in_a)
 {
-    int data = space.machine().root_device().ioport("JOY")->read();
+    int data = machine().root_device().ioport("JOY")->read();
     LOG(("microtan_via_0_in_a %02X\n", data));
     return data;
 }
 
-static READ8_DEVICE_HANDLER ( via_0_in_b )
+READ8_MEMBER(microtan_state::via_0_in_b)
 {
     int data = 0xff;
     LOG(("microtan_via_0_in_b %02X\n", data));
     return data;
 }
 
-static READ8_DEVICE_HANDLER ( via_0_in_ca1 )
+READ8_MEMBER(microtan_state::via_0_in_ca1)
 {
     int data = 1;
     LOG(("microtan_via_0_in_ca1 %d\n", data));
     return data;
 }
 
-static READ8_DEVICE_HANDLER ( via_0_in_cb1 )
+READ8_MEMBER(microtan_state::via_0_in_cb1)
 {
     int data = 1;
     LOG(("microtan_via_0_in_cb1 %d\n", data));
     return data;
 }
 
-static READ8_DEVICE_HANDLER ( via_0_in_ca2 )
+READ8_MEMBER(microtan_state::via_0_in_ca2)
 {
     int data = 1;
     LOG(("microtan_via_0_in_ca2 %d\n", data));
     return data;
 }
 
-static READ8_DEVICE_HANDLER ( via_0_in_cb2 )
+READ8_MEMBER(microtan_state::via_0_in_cb2)
 {
     int data = 1;
     LOG(("microtan_via_0_in_cb2 %d\n", data));
     return data;
 }
 
-static WRITE8_DEVICE_HANDLER ( via_0_out_a )
+WRITE8_MEMBER(microtan_state::via_0_out_a)
 {
     LOG(("microtan_via_0_out_a %02X\n", data));
 }
 
-static WRITE8_DEVICE_HANDLER (via_0_out_b )
+WRITE8_MEMBER(microtan_state::via_0_out_b)
 {
     LOG(("microtan_via_0_out_b %02X\n", data));
     /* bit #7 is the cassette output signal */
-    cassette_device_image(space.machine())->output(data & 0x80 ? +1.0 : -1.0);
+    cassette_device_image(machine())->output(data & 0x80 ? +1.0 : -1.0);
 }
 
-static WRITE8_DEVICE_HANDLER ( via_0_out_ca2 )
+WRITE8_MEMBER(microtan_state::via_0_out_ca2)
 {
     LOG(("microtan_via_0_out_ca2 %d\n", data));
 }
 
-static WRITE8_DEVICE_HANDLER (via_0_out_cb2 )
+WRITE8_MEMBER(microtan_state::via_0_out_cb2)
 {
     LOG(("microtan_via_0_out_cb2 %d\n", data));
 }
@@ -236,64 +236,64 @@ static void via_0_irq(device_t *device, int state)
 /**************************************************************
  * VIA callback functions for VIA #1
  **************************************************************/
-static READ8_DEVICE_HANDLER ( via_1_in_a )
+READ8_MEMBER(microtan_state::via_1_in_a)
 {
     int data = 0xff;
     LOG(("microtan_via_1_in_a %02X\n", data));
     return data;
 }
 
-static READ8_DEVICE_HANDLER ( via_1_in_b )
+READ8_MEMBER(microtan_state::via_1_in_b)
 {
     int data = 0xff;
     LOG(("microtan_via_1_in_b %02X\n", data));
     return data;
 }
 
-static READ8_DEVICE_HANDLER ( via_1_in_ca1 )
+READ8_MEMBER(microtan_state::via_1_in_ca1)
 {
     int data = 1;
     LOG(("microtan_via_1_in_ca1 %d\n", data));
     return data;
 }
 
-static READ8_DEVICE_HANDLER ( via_1_in_cb1 )
+READ8_MEMBER(microtan_state::via_1_in_cb1)
 {
     int data = 1;
     LOG(("microtan_via_1_in_cb1 %d\n", data));
     return data;
 }
 
-static READ8_DEVICE_HANDLER ( via_1_in_ca2 )
+READ8_MEMBER(microtan_state::via_1_in_ca2)
 {
     int data = 1;
     LOG(("microtan_via_1_in_ca2 %d\n", data));
     return data;
 }
 
-static READ8_DEVICE_HANDLER ( via_1_in_cb2 )
+READ8_MEMBER(microtan_state::via_1_in_cb2)
 {
     int data = 1;
     LOG(("microtan_via_1_in_cb2 %d\n", data));
     return data;
 }
 
-static WRITE8_DEVICE_HANDLER ( via_1_out_a )
+WRITE8_MEMBER(microtan_state::via_1_out_a)
 {
     LOG(("microtan_via_1_out_a %02X\n", data));
 }
 
-static WRITE8_DEVICE_HANDLER ( via_1_out_b )
+WRITE8_MEMBER(microtan_state::via_1_out_b)
 {
     LOG(("microtan_via_1_out_b %02X\n", data));
 }
 
-static WRITE8_DEVICE_HANDLER (via_1_out_ca2 )
+WRITE8_MEMBER(microtan_state::via_1_out_ca2)
 {
     LOG(("microtan_via_1_out_ca2 %d\n", data));
 }
 
-static WRITE8_DEVICE_HANDLER ( via_1_out_cb2 )
+WRITE8_MEMBER(microtan_state::via_1_out_cb2)
 {
     LOG(("microtan_via_1_out_cb2 %d\n", data));
 }
@@ -312,24 +312,24 @@ static void via_1_irq(device_t *device, int state)
 const via6522_interface microtan_via6522_0 =
 {
 	/* VIA#1 at bfc0-bfcf*/
-	DEVCB_HANDLER(via_0_in_a),   DEVCB_HANDLER(via_0_in_b),
-	DEVCB_HANDLER(via_0_in_ca1), DEVCB_HANDLER(via_0_in_cb1),
-	DEVCB_HANDLER(via_0_in_ca2), DEVCB_HANDLER(via_0_in_cb2),
-	DEVCB_HANDLER(via_0_out_a),  DEVCB_HANDLER(via_0_out_b),
+	DEVCB_DRIVER_MEMBER(microtan_state,via_0_in_a),   DEVCB_DRIVER_MEMBER(microtan_state,via_0_in_b),
+	DEVCB_DRIVER_MEMBER(microtan_state,via_0_in_ca1), DEVCB_DRIVER_MEMBER(microtan_state,via_0_in_cb1),
+	DEVCB_DRIVER_MEMBER(microtan_state,via_0_in_ca2), DEVCB_DRIVER_MEMBER(microtan_state,via_0_in_cb2),
+	DEVCB_DRIVER_MEMBER(microtan_state,via_0_out_a),  DEVCB_DRIVER_MEMBER(microtan_state,via_0_out_b),
 	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_HANDLER(via_0_out_ca2),DEVCB_HANDLER(via_0_out_cb2),
+	DEVCB_DRIVER_MEMBER(microtan_state,via_0_out_ca2),DEVCB_DRIVER_MEMBER(microtan_state,via_0_out_cb2),
 	DEVCB_LINE(via_0_irq)
 };
 
 const via6522_interface microtan_via6522_1 =
 {
 	/* VIA#1 at bfe0-bfef*/
-	DEVCB_HANDLER(via_1_in_a),   DEVCB_HANDLER(via_1_in_b),
-	DEVCB_HANDLER(via_1_in_ca1), DEVCB_HANDLER(via_1_in_cb1),
-	DEVCB_HANDLER(via_1_in_ca2), DEVCB_HANDLER(via_1_in_cb2),
-	DEVCB_HANDLER(via_1_out_a),  DEVCB_HANDLER(via_1_out_b),
+	DEVCB_DRIVER_MEMBER(microtan_state,via_1_in_a),   DEVCB_DRIVER_MEMBER(microtan_state,via_1_in_b),
+	DEVCB_DRIVER_MEMBER(microtan_state,via_1_in_ca1), DEVCB_DRIVER_MEMBER(microtan_state,via_1_in_cb1),
+	DEVCB_DRIVER_MEMBER(microtan_state,via_1_in_ca2), DEVCB_DRIVER_MEMBER(microtan_state,via_1_in_cb2),
+	DEVCB_DRIVER_MEMBER(microtan_state,via_1_out_a),  DEVCB_DRIVER_MEMBER(microtan_state,via_1_out_b),
 	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_HANDLER(via_1_out_ca2),DEVCB_HANDLER(via_1_out_cb2),
+	DEVCB_DRIVER_MEMBER(microtan_state,via_1_out_ca2),DEVCB_DRIVER_MEMBER(microtan_state,via_1_out_cb2),
 	DEVCB_LINE(via_1_irq)
 };
 

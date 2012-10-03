@@ -251,8 +251,16 @@ static ACIA6850_INTERFACE( acia1_intf )
 //  COM8116_INTERFACE( dbrg_intf )
 //-------------------------------------------------
 
-static WRITE_LINE_DEVICE_HANDLER( rx_tx_w )
+WRITE_LINE_MEMBER(ob68k1a_state::rx_tx_0_w)
 {
+	device_t *device = machine().device(MC6850_0_TAG);
+	downcast<acia6850_device *>(device)->rx_clock_in();
+	downcast<acia6850_device *>(device)->tx_clock_in();
+}
+
+WRITE_LINE_MEMBER(ob68k1a_state::rx_tx_1_w)
+{
+	device_t *device = machine().device(MC6850_1_TAG);
 	downcast<acia6850_device *>(device)->rx_clock_in();
 	downcast<acia6850_device *>(device)->tx_clock_in();
 }
@@ -260,8 +268,8 @@ static WRITE_LINE_DEVICE_HANDLER( rx_tx_w )
 static COM8116_INTERFACE( dbrg_intf )
 {
 	DEVCB_NULL,		/* fX/4 output */
-	DEVCB_DEVICE_LINE(MC6850_0_TAG, rx_tx_w),
-	DEVCB_DEVICE_LINE(MC6850_1_TAG, rx_tx_w),
+	DEVCB_DRIVER_LINE_MEMBER(ob68k1a_state,rx_tx_0_w),
+	DEVCB_DRIVER_LINE_MEMBER(ob68k1a_state,rx_tx_1_w),
 	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },			/* receiver divisor ROM */
 	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },			/* transmitter divisor ROM */
 };

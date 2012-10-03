@@ -46,6 +46,14 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_pk8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pk8020_interrupt);
+	DECLARE_READ8_MEMBER(pk8020_porta_r);
+	DECLARE_WRITE8_MEMBER(pk8020_portc_w);
+	DECLARE_WRITE8_MEMBER(pk8020_portb_w);
+	DECLARE_READ8_MEMBER(pk8020_portc_r);
+	DECLARE_WRITE8_MEMBER(pk8020_2_portc_w);
+	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out0);
+	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out1);
+	DECLARE_WRITE_LINE_MEMBER(pk8020_pic_set_int_line);
 };
 
 

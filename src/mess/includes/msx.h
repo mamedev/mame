@@ -126,6 +126,10 @@ public:
 	DECLARE_MACHINE_RESET(msx2);
 	INTERRUPT_GEN_MEMBER(msx_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(msx2_interrupt);
+	DECLARE_WRITE8_MEMBER(msx_ay8910_w);
+	DECLARE_WRITE8_MEMBER(msx_printer_strobe_w);
+	DECLARE_WRITE8_MEMBER(msx_printer_data_w);
+	DECLARE_READ8_MEMBER(msx_printer_status_r);
 };
 
 
@@ -141,9 +145,5 @@ DEVICE_IMAGE_UNLOAD( msx_cart );
 void msx_vdp_interrupt(device_t *, v99x8_device &device, int i);
 
 /* I/O functions */
-DECLARE_READ8_DEVICE_HANDLER( msx_printer_status_r );
-DECLARE_WRITE8_DEVICE_HANDLER( msx_printer_strobe_w );
-DECLARE_WRITE8_DEVICE_HANDLER( msx_printer_data_w );
-
 
 #endif /* __MSX_H__ */

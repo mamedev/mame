@@ -162,6 +162,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(sasi_rst_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_8251_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(sio_8251_tick);
+	DECLARE_WRITE_LINE_MEMBER(pic_int_w);
+	DECLARE_WRITE8_MEMBER(disp_ppi_pc_w);
+	DECLARE_WRITE8_MEMBER(m6502_ppi_pc_w);
+	DECLARE_WRITE8_MEMBER(misc_ppi_pb_w);
+	DECLARE_READ8_MEMBER(misc_ppi_pc_r);
 };
 
 //----------- defined in video/v1050.c -----------

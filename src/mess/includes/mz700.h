@@ -83,6 +83,14 @@ public:
 	UINT32 screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne556_cursor_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne556_other_callback);
+	DECLARE_WRITE_LINE_MEMBER(pit_out0_changed);
+	DECLARE_WRITE_LINE_MEMBER(pit_irq_2);
+	DECLARE_READ8_MEMBER(pio_port_b_r);
+	DECLARE_READ8_MEMBER(pio_port_c_r);
+	DECLARE_WRITE8_MEMBER(pio_port_a_w);
+	DECLARE_WRITE8_MEMBER(pio_port_c_w);
+	DECLARE_READ8_MEMBER(mz800_z80pio_port_a_r);
+	DECLARE_WRITE8_MEMBER(mz800_z80pio_port_a_w);
 };
 
 

@@ -26,8 +26,9 @@ DRIVER_INIT_MEMBER(partner_state,partner)
 	m_tape_value = 0x80;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( partner_wd17xx_drq_w )
+WRITE_LINE_MEMBER(partner_state::partner_wd17xx_drq_w)
 {
+	device_t *device = machine().device("dma8257");
 	if (state)
 		i8257_drq0_w(device, 1);
 }
@@ -36,7 +37,7 @@ const wd17xx_interface partner_wd17xx_interface =
 {
 	DEVCB_LINE_GND,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE("dma8257", partner_wd17xx_drq_w),
+	DEVCB_DRIVER_LINE_MEMBER(partner_state,partner_wd17xx_drq_w),
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
@@ -357,13 +358,13 @@ WRITE8_MEMBER(partner_state::partner_mem_page_w)
 	partner_bank_switch(machine());
 }
 
-static WRITE_LINE_DEVICE_HANDLER( hrq_w )
+WRITE_LINE_MEMBER(partner_state::hrq_w)
 {
 	/* HACK - this should be connected to the BUSREQ line of Z80 */
-	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state);
 
 	/* HACK - this should be connected to the BUSACK line of Z80 */
-	i8257_hlda_w(device, state);
+	i8257_hlda_w(machine().device("dma8257"), state);
 }
 
 static UINT8 memory_read_byte(address_space &space, offs_t address, UINT8 mem_mask) { return space.read_byte(address); }
@@ -371,7 +372,7 @@ static void memory_write_byte(address_space &space, offs_t address, UINT8 data, 
 
 I8257_INTERFACE( partner_dma )
 {
-	DEVCB_LINE(hrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(partner_state,hrq_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),

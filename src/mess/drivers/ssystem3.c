@@ -117,51 +117,49 @@ static void ssystem3_playfield_read(running_machine &machine, int *on, int *read
 	*ready=FALSE;
 }
 
-static WRITE8_DEVICE_HANDLER(ssystem3_via_write_a)
+WRITE8_MEMBER(ssystem3_state::ssystem3_via_write_a)
 {
-	ssystem3_state *state = space.machine().driver_data<ssystem3_state>();
-	state->m_porta=data;
+	m_porta=data;
   //  logerror("%.4x via port a write %02x\n",(int)activecpu_get_pc(), data);
 }
 
-static READ8_DEVICE_HANDLER(ssystem3_via_read_a)
+READ8_MEMBER(ssystem3_state::ssystem3_via_read_a)
 {
-	ssystem3_state *state = space.machine().driver_data<ssystem3_state>();
   UINT8 data=0xff;
 #if 1 // time switch
-  if (!(state->m_porta&0x10)) data&=space.machine().root_device().ioport("matrix1")->read()|0xf1;
-  if (!(state->m_porta&0x20)) data&=space.machine().root_device().ioport("matrix2")->read()|0xf1;
-  if (!(state->m_porta&0x40)) data&=space.machine().root_device().ioport("matrix3")->read()|0xf1;
-  if (!(state->m_porta&0x80)) data&=space.machine().root_device().ioport("matrix4")->read()|0xf1;
+  if (!(m_porta&0x10)) data&=machine().root_device().ioport("matrix1")->read()|0xf1;
+  if (!(m_porta&0x20)) data&=machine().root_device().ioport("matrix2")->read()|0xf1;
+  if (!(m_porta&0x40)) data&=machine().root_device().ioport("matrix3")->read()|0xf1;
+  if (!(m_porta&0x80)) data&=machine().root_device().ioport("matrix4")->read()|0xf1;
 #else
-  if (!(state->m_porta&0x10)) data&=space.machine().root_device().ioport("matrix1")->read()|0xf0;
-  if (!(state->m_porta&0x20)) data&=space.machine().root_device().ioport("matrix2")->read()|0xf0;
-  if (!(state->m_porta&0x40)) data&=space.machine().root_device().ioport("matrix3")->read()|0xf0;
-  if (!(state->m_porta&0x80)) data&=space.machine().root_device().ioport("matrix4")->read()|0xf0;
+  if (!(m_porta&0x10)) data&=machine().root_device().ioport("matrix1")->read()|0xf0;
+  if (!(m_porta&0x20)) data&=machine().root_device().ioport("matrix2")->read()|0xf0;
+  if (!(m_porta&0x40)) data&=machine().root_device().ioport("matrix3")->read()|0xf0;
+  if (!(m_porta&0x80)) data&=machine().root_device().ioport("matrix4")->read()|0xf0;
 #endif
-  if (!(state->m_porta&1)) {
-    if (!(space.machine().root_device().ioport("matrix1")->read()&1)) data&=~0x10;
-    if (!(space.machine().root_device().ioport("matrix2")->read()&1)) data&=~0x20;
-    if (!(space.machine().root_device().ioport("matrix3")->read()&1)) data&=~0x40;
-    if (!(state->ioport("matrix4")->read()&1)) data&=~0x80;
+  if (!(m_porta&1)) {
+    if (!(machine().root_device().ioport("matrix1")->read()&1)) data&=~0x10;
+    if (!(machine().root_device().ioport("matrix2")->read()&1)) data&=~0x20;
+    if (!(machine().root_device().ioport("matrix3")->read()&1)) data&=~0x40;
+    if (!(ioport("matrix4")->read()&1)) data&=~0x80;
   }
-  if (!(state->m_porta&2)) {
-    if (!(space.machine().root_device().ioport("matrix1")->read()&2)) data&=~0x10;
-    if (!(space.machine().root_device().ioport("matrix2")->read()&2)) data&=~0x20;
-    if (!(space.machine().root_device().ioport("matrix3")->read()&2)) data&=~0x40;
-    if (!(space.machine().root_device().ioport("matrix4")->read()&2)) data&=~0x80;
+  if (!(m_porta&2)) {
+    if (!(machine().root_device().ioport("matrix1")->read()&2)) data&=~0x10;
+    if (!(machine().root_device().ioport("matrix2")->read()&2)) data&=~0x20;
+    if (!(machine().root_device().ioport("matrix3")->read()&2)) data&=~0x40;
+    if (!(machine().root_device().ioport("matrix4")->read()&2)) data&=~0x80;
   }
-  if (!(state->m_porta&4)) {
-    if (!(space.machine().root_device().ioport("matrix1")->read()&4)) data&=~0x10;
-    if (!(space.machine().root_device().ioport("matrix2")->read()&4)) data&=~0x20;
-    if (!(space.machine().root_device().ioport("matrix3")->read()&4)) data&=~0x40;
-    if (!(space.machine().root_device().ioport("matrix4")->read()&4)) data&=~0x80;
+  if (!(m_porta&4)) {
+    if (!(machine().root_device().ioport("matrix1")->read()&4)) data&=~0x10;
+    if (!(machine().root_device().ioport("matrix2")->read()&4)) data&=~0x20;
+    if (!(machine().root_device().ioport("matrix3")->read()&4)) data&=~0x40;
+    if (!(machine().root_device().ioport("matrix4")->read()&4)) data&=~0x80;
   }
-  if (!(state->m_porta&8)) {
-    if (!(space.machine().root_device().ioport("matrix1")->read()&8)) data&=~0x10;
-    if (!(space.machine().root_device().ioport("matrix2")->read()&8)) data&=~0x20;
-    if (!(space.machine().root_device().ioport("matrix3")->read()&8)) data&=~0x40;
-    if (!(space.machine().root_device().ioport("matrix4")->read()&8)) data&=~0x80;
+  if (!(m_porta&8)) {
+    if (!(machine().root_device().ioport("matrix1")->read()&8)) data&=~0x10;
+    if (!(machine().root_device().ioport("matrix2")->read()&8)) data&=~0x20;
+    if (!(machine().root_device().ioport("matrix3")->read()&8)) data&=~0x40;
+    if (!(machine().root_device().ioport("matrix4")->read()&8)) data&=~0x80;
   }
   //  logerror("%.4x via port a read %02x\n",(int)activecpu_get_pc(), data);
   return data;
@@ -189,25 +187,25 @@ static READ8_DEVICE_HANDLER(ssystem3_via_read_a)
    bit 5: input low x/$37 4 (else 1)
 
  */
-static READ8_DEVICE_HANDLER(ssystem3_via_read_b)
+READ8_MEMBER(ssystem3_state::ssystem3_via_read_b)
 {
 	UINT8 data=0xff;
 	int on, ready;
-	ssystem3_playfield_read(space.machine(), &on, &ready);
+	ssystem3_playfield_read(machine(), &on, &ready);
 	if (!on) data&=~0x20;
 	if (!ready) data&=~0x10;
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER(ssystem3_via_write_b)
+WRITE8_MEMBER(ssystem3_state::ssystem3_via_write_b)
 {
-	via6522_device *via_0 = space.machine().device<via6522_device>("via6522_0");
+	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 	UINT8 d;
 
-	ssystem3_playfield_write(space.machine(), data&1, data&8);
-	ssystem3_lcd_write(space.machine(), data&4, data&2);
+	ssystem3_playfield_write(machine(), data&1, data&8);
+	ssystem3_lcd_write(machine(), data&4, data&2);
 
-	d=ssystem3_via_read_b(via_0, space, 0, mem_mask)&~0x40;
+	d=ssystem3_via_read_b(space, 0, mem_mask)&~0x40;
 	if (data&0x80) d|=0x40;
 	//  d&=~0x8f;
 	via_0->write_portb(space,0, d );
@@ -215,14 +213,14 @@ static WRITE8_DEVICE_HANDLER(ssystem3_via_write_b)
 
 static const via6522_interface ssystem3_via_config=
 {
-	DEVCB_HANDLER(ssystem3_via_read_a),//read8_machine_func in_a_func;
-	DEVCB_HANDLER(ssystem3_via_read_b),//read8_machine_func in_b_func;
+	DEVCB_DRIVER_MEMBER(ssystem3_state,ssystem3_via_read_a),//read8_machine_func in_a_func;
+	DEVCB_DRIVER_MEMBER(ssystem3_state,ssystem3_via_read_b),//read8_machine_func in_b_func;
 	DEVCB_NULL,//read8_machine_func in_ca1_func;
 	DEVCB_NULL,//read8_machine_func in_cb1_func;
 	DEVCB_NULL,//read8_machine_func in_ca2_func;
 	DEVCB_NULL,//read8_machine_func in_cb2_func;
-	DEVCB_HANDLER(ssystem3_via_write_a),//write8_machine_func out_a_func;
-	DEVCB_HANDLER(ssystem3_via_write_b),//write8_machine_func out_b_func;
+	DEVCB_DRIVER_MEMBER(ssystem3_state,ssystem3_via_write_a),//write8_machine_func out_a_func;
+	DEVCB_DRIVER_MEMBER(ssystem3_state,ssystem3_via_write_b),//write8_machine_func out_b_func;
 	DEVCB_NULL,//write8_machine_func out_ca2_func;
 	DEVCB_NULL,//write8_machine_func out_cb2_func;
 	DEVCB_NULL,//void (*irq_func)(int state);

@@ -61,6 +61,12 @@ public:
 	DECLARE_VIDEO_START(apple3);
 	UINT32 screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(apple3_interrupt);
+	DECLARE_READ8_MEMBER(apple3_via_1_in_a);
+	DECLARE_READ8_MEMBER(apple3_via_1_in_b);
+	DECLARE_WRITE8_MEMBER(apple3_via_0_out_a);
+	DECLARE_WRITE8_MEMBER(apple3_via_0_out_b);
+	DECLARE_WRITE8_MEMBER(apple3_via_1_out_a);
+	DECLARE_WRITE8_MEMBER(apple3_via_1_out_b);
 };
 
 

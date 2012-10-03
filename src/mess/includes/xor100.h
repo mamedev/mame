@@ -66,6 +66,13 @@ public:
 	int m_fdc_irq;
 	int m_fdc_drq;
 	int m_fdc_dden;
+	DECLARE_WRITE_LINE_MEMBER(com5016_fr_w);
+	DECLARE_WRITE_LINE_MEMBER(com5016_ft_w);
+	DECLARE_READ8_MEMBER(i8255_pc_r);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
+	DECLARE_WRITE8_MEMBER(xor100_kbd_put);
 };
 
 #endif

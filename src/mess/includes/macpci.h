@@ -159,6 +159,12 @@ public:
 	emu_timer *m_scanline_timer;
 	UINT32 screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
+	DECLARE_READ8_MEMBER(mac_via_in_a);
+	DECLARE_READ8_MEMBER(mac_via_in_b);
+	DECLARE_WRITE8_MEMBER(mac_via_out_a);
+	DECLARE_WRITE8_MEMBER(mac_via_out_b);
+	DECLARE_READ8_MEMBER(mac_adb_via_in_cb2);
+	DECLARE_WRITE8_MEMBER(mac_adb_via_out_cb2);
 };
 
 #endif /* PCIMAC_H_ */

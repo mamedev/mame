@@ -276,10 +276,9 @@ static MC6845_UPDATE_ROW( vid_update_row )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( bbc_vsync )
+WRITE_LINE_MEMBER(bbc_state::bbc_vsync)
 {
-	bbc_state *bstate = device->machine().driver_data<bbc_state>();
-	bstate->m_trom->dew_w(state);
+	m_trom->dew_w(state);
 }
 
 
@@ -293,7 +292,7 @@ const mc6845_interface bbc_mc6845_intf =
 	DEVCB_NULL,						/* on_de_changed */
 	DEVCB_NULL,						/* on_cur_changed */
 	DEVCB_NULL,						/* on_hsync_changed */
-	DEVCB_LINE(bbc_vsync),			/* on_vsync_changed */
+	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbc_vsync),			/* on_vsync_changed */
 	NULL
 };
 

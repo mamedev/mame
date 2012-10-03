@@ -67,10 +67,6 @@ even if you have to use unusual geometry to do so !
 
 #include "includes/rmnimbus.h"
 
-static WRITE_LINE_DEVICE_HANDLER( sio_interrupt );
-//static DECLARE_WRITE8_DEVICE_HANDLER( sio_dtr_w );
-static DECLARE_WRITE16_DEVICE_HANDLER( sio_serial_transmit );
-static DECLARE_READ16_DEVICE_HANDLER( sio_serial_receive );
 
 
 /*-------------------------------------------------------------------------*/
@@ -113,24 +109,24 @@ static DECLARE_READ16_DEVICE_HANDLER( sio_serial_receive );
 
 const z80sio_interface nimbus_sio_intf =
 {
-	DEVCB_LINE(sio_interrupt),			/* interrupt handler */
+	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state,sio_interrupt),			/* interrupt handler */
 	DEVCB_NULL, //sio_dtr_w,             /* DTR changed handler */
 	DEVCB_NULL,						/* RTS changed handler */
 	DEVCB_NULL,						/* BREAK changed handler */
-	DEVCB_HANDLER(sio_serial_transmit),	/* transmit handler */
-	DEVCB_HANDLER(sio_serial_receive)		/* receive handler */
+	DEVCB_DRIVER_MEMBER16(rmnimbus_state,sio_serial_transmit),	/* transmit handler */
+	DEVCB_DRIVER_MEMBER16(rmnimbus_state,sio_serial_receive)		/* receive handler */
 };
 
 /* Floppy drives WD2793 */
 
-static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_intrq_w );
-static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_drq_w );
+
+
 
 const wd17xx_interface nimbus_wd17xx_interface =
 {
 	DEVCB_LINE_GND,
-	DEVCB_LINE(nimbus_fdc_intrq_w),
-	DEVCB_LINE(nimbus_fdc_drq_w),
+	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state,nimbus_fdc_intrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state,nimbus_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
@@ -2182,24 +2178,23 @@ Z80SIO, used for the keyboard interface
 
 /* Z80 SIO/2 */
 
-static WRITE_LINE_DEVICE_HANDLER( sio_interrupt )
+WRITE_LINE_MEMBER(rmnimbus_state::sio_interrupt)
 {
-	rmnimbus_state *drvstate = device->machine().driver_data<rmnimbus_state>();
     if(LOG_SIO)
         logerror("SIO Interrupt state=%02X\n",state);
 
     // Don't re-trigger if already active !
-    if(state!=drvstate->m_sio_int_state)
+    if(state!=m_sio_int_state)
     {
-        drvstate->m_sio_int_state=state;
+        m_sio_int_state=state;
 
         if(state)
-            external_int(device->machine(),0,EXTERNAL_INT_Z80SIO);
+            external_int(machine(),0,EXTERNAL_INT_Z80SIO);
     }
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE8_DEVICE_HANDLER( sio_dtr_w )
+WRITE8_MEMBER(rmnimbus_state::sio_dtr_w)
 {
 	if (offset == 1)
 	{
@@ -2207,15 +2202,15 @@ WRITE8_DEVICE_HANDLER( sio_dtr_w )
 }
 #endif
 
-static WRITE16_DEVICE_HANDLER( sio_serial_transmit )
+WRITE16_MEMBER(rmnimbus_state::sio_serial_transmit)
 {
 }
 
-static READ16_DEVICE_HANDLER( sio_serial_receive )
+READ16_MEMBER(rmnimbus_state::sio_serial_receive)
 {
     if(offset==0)
     {
-        return keyboard_queue_read(space.machine());
+        return keyboard_queue_read(machine());
     }
     else
         return -1;
@@ -2250,20 +2245,18 @@ static void set_disk_int(running_machine &machine, int state)
     }
 }
 
-static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_intrq_w )
+WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_intrq_w)
 {
-    set_disk_int(device->machine(),state);
+    set_disk_int(machine(),state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_drq_w )
+WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_drq_w)
 {
-	rmnimbus_state *drvstate = device->machine().driver_data<rmnimbus_state>();
-
     if(LOG_DISK)
         logerror("nimbus_drives_drq_w(%d)\n", state);
 
-    if(state && FDC_DRQ_ENABLED(drvstate))
-        drq_callback(device->machine(),1);
+    if(state && FDC_DRQ_ENABLED(this))
+        drq_callback(machine(),1);
 }
 
 static UINT8 fdc_driveno(UINT8 drivesel)
@@ -3017,41 +3010,41 @@ collector output only. It usially acts as the printer strobe line.
 ***********************************************************************/
 
 /* USER VIA 6522 port B is connected to the BBC user port */
-static READ8_DEVICE_HANDLER( nimbus_via_read_portb )
+READ8_MEMBER(rmnimbus_state::nimbus_via_read_portb)
 {
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( nimbus_via_write_portb )
+WRITE8_MEMBER(rmnimbus_state::nimbus_via_write_portb)
 {
 }
 
-static WRITE_LINE_DEVICE_HANDLER( nimbus_via_irq_w )
+WRITE_LINE_MEMBER(rmnimbus_state::nimbus_via_irq_w)
 {
 	if(state)
-		external_int(device->machine(),VIA_INT,0x00);
+		external_int(machine(),VIA_INT,0x00);
 }
 
 const via6522_interface nimbus_via =
 {
 	DEVCB_NULL,	//via_user_read_porta,
-	DEVCB_HANDLER(nimbus_via_read_portb),
+	DEVCB_DRIVER_MEMBER(rmnimbus_state,nimbus_via_read_portb),
 	DEVCB_NULL,	//via_user_read_ca1,
 	DEVCB_NULL,	//via_user_read_cb1,
 	DEVCB_NULL,	//via_user_read_ca2,
 	DEVCB_NULL,	//via_user_read_cb2,
 	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),
-	DEVCB_HANDLER(nimbus_via_write_portb),
+	DEVCB_DRIVER_MEMBER(rmnimbus_state,nimbus_via_write_portb),
 	DEVCB_NULL, //via_user_write_ca1
 	DEVCB_NULL, //via_user_write_cb1
 	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, strobe_w),
 	DEVCB_NULL,	//via_user_write_cb2,
-	DEVCB_LINE(nimbus_via_irq_w)
+	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state,nimbus_via_irq_w)
 };
 
-WRITE_LINE_DEVICE_HANDLER(nimbus_ack_w)
+WRITE_LINE_MEMBER(rmnimbus_state::nimbus_ack_w)
 {
-	via6522_device *via_1 = device->machine().device<via6522_device>(VIA_TAG);
+	via6522_device *via_1 = machine().device<via6522_device>(VIA_TAG);
 	via_1->write_ca1(!state); /* ack seems to be inverted? */
 }
 

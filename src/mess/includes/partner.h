@@ -26,6 +26,8 @@ public:
 	DECLARE_DRIVER_INIT(partner);
 	DECLARE_MACHINE_START(partner);
 	DECLARE_MACHINE_RESET(partner);
+	DECLARE_WRITE_LINE_MEMBER(partner_wd17xx_drq_w);
+	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 };
 
 

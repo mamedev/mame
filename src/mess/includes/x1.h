@@ -205,6 +205,7 @@ public:
 	TIMER_CALLBACK_MEMBER(x1_rtc_increment);
 	TIMER_DEVICE_CALLBACK_MEMBER(x1_cmt_wind_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(x1_keyboard_callback);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 };
 
 /*----------- defined in machine/x1.c -----------*/

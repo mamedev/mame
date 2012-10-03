@@ -39,22 +39,17 @@ enum
 /*static int ready;*/			/* ready line from monochip, role unknown */
 
 /* Via */
-static DECLARE_READ8_DEVICE_HANDLER(via_in_a);
-static DECLARE_WRITE8_DEVICE_HANDLER(via_out_a);
-static DECLARE_READ8_DEVICE_HANDLER(via_in_b);
-static DECLARE_WRITE8_DEVICE_HANDLER(via_out_b);
-static DECLARE_WRITE8_DEVICE_HANDLER(via_out_cb2);
 static void via_irq_func(device_t *device, int state);
 
 
 const via6522_interface concept_via6522_intf =
 {	/* main via */
-	DEVCB_HANDLER(via_in_a), DEVCB_HANDLER(via_in_b),
+	DEVCB_DRIVER_MEMBER(concept_state,via_in_a), DEVCB_DRIVER_MEMBER(concept_state,via_in_b),
 	DEVCB_NULL, DEVCB_NULL,
 	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_HANDLER(via_out_a), DEVCB_HANDLER(via_out_b),
+	DEVCB_DRIVER_MEMBER(concept_state,via_out_a), DEVCB_DRIVER_MEMBER(concept_state,via_out_b),
 	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_HANDLER(via_out_cb2),
+	DEVCB_NULL, DEVCB_DRIVER_MEMBER(concept_state,via_out_cb2),
 	DEVCB_LINE(via_irq_func)
 };
 
@@ -195,13 +190,13 @@ INTERRUPT_GEN_MEMBER(concept_state::concept_interrupt)
     6: DCD1 (I)
     7: IOX (O)
 */
-static  READ8_DEVICE_HANDLER(via_in_a)
+READ8_MEMBER(concept_state::via_in_a)
 {
 	LOG(("via_in_a: VIA port A (Omninet and COMM port status) read\n"));
 	return 1;		/* omninet ready always 1 */
 }
 
-static WRITE8_DEVICE_HANDLER(via_out_a)
+WRITE8_MEMBER(concept_state::via_out_a)
 {
 	LOG(("via_out_a: VIA port A status written: data=0x%2.2x\n", data));
 	/*iox = (data & 0x80) != 0;*/
@@ -219,16 +214,16 @@ static WRITE8_DEVICE_HANDLER(via_out_a)
     6: boot switch 0 (I)
     7: boot switch 1 (I)
 */
-static READ8_DEVICE_HANDLER(via_in_b)
+READ8_MEMBER(concept_state::via_in_b)
 {
 	UINT8 status;
 
-	status = ((space.machine().root_device().ioport("DSW0")->read() & 0x80) >> 1) | ((space.machine().root_device().ioport("DSW0")->read() & 0x40) << 1);
+	status = ((machine().root_device().ioport("DSW0")->read() & 0x80) >> 1) | ((machine().root_device().ioport("DSW0")->read() & 0x40) << 1);
 	LOG(("via_in_b: VIA port B (DIP switches, Video, Comm Rate) - status: 0x%2.2x\n", status));
 	return status;
 }
 
-static WRITE8_DEVICE_HANDLER(via_out_b)
+WRITE8_MEMBER(concept_state::via_out_b)
 {
 	VLOG(("via_out_b: VIA port B (Video Control and COMM rate select) written: data=0x%2.2x\n", data));
 }
@@ -236,7 +231,7 @@ static WRITE8_DEVICE_HANDLER(via_out_b)
 /*
     VIA CB2: used as sound output
 */
-static WRITE8_DEVICE_HANDLER(via_out_cb2)
+WRITE8_MEMBER(concept_state::via_out_cb2)
 {
 	LOG(("via_out_cb2: Sound control written: data=0x%2.2x\n", data));
 }
@@ -551,29 +546,27 @@ void concept_state::concept_fdc_init(int slot)
 	install_expansion_slot(slot, read8_delegate(FUNC(concept_state::concept_fdc_reg_r),this), write8_delegate(FUNC(concept_state::concept_fdc_reg_w),this), read8_delegate(FUNC(concept_state::concept_fdc_rom_r),this), write8_delegate());
 }
 
-static WRITE_LINE_DEVICE_HANDLER( concept_fdc_intrq_w )
+WRITE_LINE_MEMBER(concept_state::concept_fdc_intrq_w)
 {
-	concept_state *drvstate = device->machine().driver_data<concept_state>();
 	if (state)
-		drvstate->m_fdc_local_status |= LS_INT_mask;
+		m_fdc_local_status |= LS_INT_mask;
 	else
-		drvstate->m_fdc_local_status &= ~LS_INT_mask;
+		m_fdc_local_status &= ~LS_INT_mask;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( concept_fdc_drq_w )
+WRITE_LINE_MEMBER(concept_state::concept_fdc_drq_w)
 {
-	concept_state *drvstate = device->machine().driver_data<concept_state>();
 	if (state)
-		drvstate->m_fdc_local_status |= LS_DRQ_mask;
+		m_fdc_local_status |= LS_DRQ_mask;
 	else
-		drvstate->m_fdc_local_status &= ~LS_DRQ_mask;
+		m_fdc_local_status &= ~LS_DRQ_mask;
 }
 
 const wd17xx_interface concept_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE(concept_fdc_intrq_w),
-	DEVCB_LINE(concept_fdc_drq_w),
+	DEVCB_DRIVER_LINE_MEMBER(concept_state,concept_fdc_intrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(concept_state,concept_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

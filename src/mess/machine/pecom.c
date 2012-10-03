@@ -111,16 +111,15 @@ READ8_MEMBER(pecom_state::pecom_keyboard_r)
 
 /* CDP1802 Interface */
 
-static READ_LINE_DEVICE_HANDLER( clear_r )
+READ_LINE_MEMBER(pecom_state::clear_r)
 {
-	pecom_state *state = device->machine().driver_data<pecom_state>();
-
-	return state->m_reset;
+	return m_reset;
 }
 
-static READ_LINE_DEVICE_HANDLER( ef2_r )
+READ_LINE_MEMBER(pecom_state::ef2_r)
 {
-	int shift = BIT(device->machine().root_device().ioport("CNT")->read(), 1);
+	device_t *device = machine().device(CASSETTE_TAG);
+	int shift = BIT(machine().root_device().ioport("CNT")->read(), 1);
 	double cas = dynamic_cast<cassette_image_device *>(device)->input();
 
 	return (cas > 0.0) | shift;
@@ -148,8 +147,9 @@ static COSMAC_EF_READ( pecom64_ef_r )
     return flags;
 }
 */
-static WRITE_LINE_DEVICE_HANDLER( pecom64_q_w )
+WRITE_LINE_MEMBER(pecom_state::pecom64_q_w)
 {
+	device_t *device = machine().device(CASSETTE_TAG);
 	dynamic_cast<cassette_image_device *>(device)->output(state ? -1.0 : +1.0);
 }
 
@@ -176,12 +176,12 @@ static COSMAC_SC_WRITE( pecom64_sc_w )
 COSMAC_INTERFACE( pecom64_cdp1802_config )
 {
 	DEVCB_LINE_VCC,
-	DEVCB_LINE(clear_r),
+	DEVCB_DRIVER_LINE_MEMBER(pecom_state,clear_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, ef2_r),
+	DEVCB_DRIVER_LINE_MEMBER(pecom_state,ef2_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, pecom64_q_w),
+	DEVCB_DRIVER_LINE_MEMBER(pecom_state,pecom64_q_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	pecom64_sc_w,

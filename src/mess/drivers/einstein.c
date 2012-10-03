@@ -132,10 +132,9 @@ static MC6845_UPDATE_ROW( einstein_6845_update_row )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( einstein_6845_de_changed )
+WRITE_LINE_MEMBER(einstein_state::einstein_6845_de_changed)
 {
-	einstein_state *einstein = device->machine().driver_data<einstein_state>();
-	einstein->m_de=state;
+	m_de=state;
 }
 
 /* bit 0 - latched display enabled (DE) from 6845
@@ -236,31 +235,30 @@ READ8_MEMBER(einstein_state::einstein_keyboard_data_read)
     FLOPPY DRIVES
 ***************************************************************************/
 
-static WRITE8_DEVICE_HANDLER( einstein_drsel_w )
+WRITE8_MEMBER(einstein_state::einstein_drsel_w)
 {
-	einstein_state *einstein = space.machine().driver_data<einstein_state>();
 	if(VERBOSE_DISK)
-		logerror("%s: einstein_drsel_w %02x\n", space.machine().describe_context(), data);
+		logerror("%s: einstein_drsel_w %02x\n", machine().describe_context(), data);
 
 	/* bit 0 to 3 select the drive */
 	static const char *names[] = { "fd0", "fd1", "fd2", "fd3" };
 	floppy_image_device *floppy = 0;
 	for(int i=0; i<4; i++) {
 		if(BIT(data, i)) {
-			floppy_connector *con = space.machine().device<floppy_connector>(names[i]);
+			floppy_connector *con = machine().device<floppy_connector>(names[i]);
 			if(con)
 				floppy = con->get_device();
 		}
 	}
 
 	/* double sided drive connected? */
-	if (space.machine().root_device().ioport("config")->read() & data)
+	if (machine().root_device().ioport("config")->read() & data)
 	{
 		/* bit 4 selects the side then */
 		//floppy->ss_w(BIT(data, 4));
 	}
 	if (floppy) floppy->ss_w(0);
-	einstein->m_fdc->set_floppy(floppy);
+	m_fdc->set_floppy(floppy);
 }
 
 
@@ -283,15 +281,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(einstein_state::einstein_ctc_trigger_callback)
     UART
 ***************************************************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( einstein_serial_transmit_clock )
+WRITE_LINE_MEMBER(einstein_state::einstein_serial_transmit_clock)
 {
-	i8251_device *uart = device->machine().device<i8251_device>(IC_I060);
+	i8251_device *uart = machine().device<i8251_device>(IC_I060);
 	uart->transmit_clock();
 }
 
-static WRITE_LINE_DEVICE_HANDLER( einstein_serial_receive_clock )
+WRITE_LINE_MEMBER(einstein_state::einstein_serial_receive_clock)
 {
-	i8251_device *uart = device->machine().device<i8251_device>(IC_I060);
+	i8251_device *uart = machine().device<i8251_device>(IC_I060);
 	uart->receive_clock();
 }
 
@@ -521,7 +519,7 @@ static ADDRESS_MAP_START( einstein_io, AS_IO, 8, einstein_state )
 	/* block 4, internal controls */
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_READWRITE(einstein_kybintmsk_r, einstein_kybintmsk_w)
 	AM_RANGE(0x21, 0x21) AM_MIRROR(0xff00) AM_WRITE(einstein_adcintmsk_w)
-	AM_RANGE(0x23, 0x23) AM_MIRROR(0xff00) AM_DEVWRITE_LEGACY(IC_I042, einstein_drsel_w)
+	AM_RANGE(0x23, 0x23) AM_MIRROR(0xff00) AM_WRITE(einstein_drsel_w)
 	AM_RANGE(0x24, 0x24) AM_MIRROR(0xff00) AM_WRITE(einstein_rom_w)
 	AM_RANGE(0x25, 0x25) AM_MIRROR(0xff00) AM_WRITE(einstein_fire_int_w)
 	/* block 5, z80ctc */
@@ -692,8 +690,8 @@ INPUT_PORTS_END
 static Z80CTC_INTERFACE( einstein_ctc_intf )
 {
 	DEVCB_NULL,
-	DEVCB_LINE(einstein_serial_transmit_clock),
-	DEVCB_LINE(einstein_serial_receive_clock),
+	DEVCB_DRIVER_LINE_MEMBER(einstein_state,einstein_serial_transmit_clock),
+	DEVCB_DRIVER_LINE_MEMBER(einstein_state,einstein_serial_receive_clock),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg3)
 };
 
@@ -733,7 +731,7 @@ static const mc6845_interface einstein_crtc6845_interface =
 	NULL,
 	einstein_6845_update_row,
 	NULL,
-	DEVCB_LINE(einstein_6845_de_changed),
+	DEVCB_DRIVER_LINE_MEMBER(einstein_state,einstein_6845_de_changed),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

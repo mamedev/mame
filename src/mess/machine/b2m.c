@@ -143,10 +143,9 @@ static void b2m_set_bank(running_machine &machine,int bank)
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER(bm2_pit_out1)
+WRITE_LINE_MEMBER(b2m_state::bm2_pit_out1)
 {
-	b2m_state *st =  device->machine().driver_data<b2m_state>();
-	speaker_level_w(st->m_speaker, state);
+	speaker_level_w(m_speaker, state);
 }
 
 const struct pit8253_config b2m_pit8253_intf =
@@ -160,7 +159,7 @@ const struct pit8253_config b2m_pit8253_intf =
 		{
 			2000000,
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE("pit8253", bm2_pit_out1)
+			DEVCB_DRIVER_LINE_MEMBER(b2m_state,bm2_pit_out1)
 		},
 		{
 			2000000,
@@ -170,65 +169,59 @@ const struct pit8253_config b2m_pit8253_intf =
 	}
 };
 
-static WRITE8_DEVICE_HANDLER (b2m_8255_porta_w )
+WRITE8_MEMBER(b2m_state::b2m_8255_porta_w)
 {
-	b2m_state *state = space.machine().driver_data<b2m_state>();
-	state->m_b2m_8255_porta = data;
+	m_b2m_8255_porta = data;
 }
-static WRITE8_DEVICE_HANDLER (b2m_8255_portb_w )
+WRITE8_MEMBER(b2m_state::b2m_8255_portb_w)
 {
-	b2m_state *state = space.machine().driver_data<b2m_state>();
-	state->m_b2m_video_scroll = data;
+	m_b2m_video_scroll = data;
 }
 
-static WRITE8_DEVICE_HANDLER (b2m_8255_portc_w )
+WRITE8_MEMBER(b2m_state::b2m_8255_portc_w)
 {
-	b2m_state *state = space.machine().driver_data<b2m_state>();
-
-	state->m_b2m_8255_portc = data;
-	b2m_set_bank(space.machine(), state->m_b2m_8255_portc & 7);
-	state->m_b2m_video_page = (state->m_b2m_8255_portc >> 7) & 1;
+	m_b2m_8255_portc = data;
+	b2m_set_bank(machine(), m_b2m_8255_portc & 7);
+	m_b2m_video_page = (m_b2m_8255_portc >> 7) & 1;
 }
 
-static READ8_DEVICE_HANDLER (b2m_8255_portb_r )
+READ8_MEMBER(b2m_state::b2m_8255_portb_r)
 {
-	b2m_state *state = space.machine().driver_data<b2m_state>();
-	return state->m_b2m_video_scroll;
+	return m_b2m_video_scroll;
 }
 
 I8255A_INTERFACE( b2m_ppi8255_interface_1 )
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("ppi8255_1", b2m_8255_porta_w),
-	DEVCB_DEVICE_HANDLER("ppi8255_1", b2m_8255_portb_r),
-	DEVCB_DEVICE_HANDLER("ppi8255_1", b2m_8255_portb_w),
+	DEVCB_DRIVER_MEMBER(b2m_state,b2m_8255_porta_w),
+	DEVCB_DRIVER_MEMBER(b2m_state,b2m_8255_portb_r),
+	DEVCB_DRIVER_MEMBER(b2m_state,b2m_8255_portb_w),
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("ppi8255_1", b2m_8255_portc_w)
+	DEVCB_DRIVER_MEMBER(b2m_state,b2m_8255_portc_w)
 };
 
 
 
-static WRITE8_DEVICE_HANDLER (b2m_ext_8255_portc_w )
+WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
 {
 	UINT8 drive = ((data >> 1) & 1) ^ 1;
 	UINT8 side  = (data  & 1) ^ 1;
-	b2m_state *state = space.machine().driver_data<b2m_state>();
-	floppy_mon_w(floppy_get_device(space.machine(), 0), 1);
-	floppy_mon_w(floppy_get_device(space.machine(), 1), 1);
+	floppy_mon_w(floppy_get_device(machine(), 0), 1);
+	floppy_mon_w(floppy_get_device(machine(), 1), 1);
 
-	if (state->m_b2m_drive!=drive) {
-		wd17xx_set_drive(state->m_fdc,drive);
-		floppy_mon_w(floppy_get_device(space.machine(), 0), 0);
-		floppy_drive_set_ready_state(floppy_get_device(space.machine(), 0), 1, 1);
-		state->m_b2m_drive = drive;
+	if (m_b2m_drive!=drive) {
+		wd17xx_set_drive(m_fdc,drive);
+		floppy_mon_w(floppy_get_device(machine(), 0), 0);
+		floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1, 1);
+		m_b2m_drive = drive;
 	}
-	if (state->m_b2m_side!=side) {
-		wd17xx_set_side(state->m_fdc,side);
-		floppy_mon_w(floppy_get_device(space.machine(), 1), 0);
-		floppy_drive_set_ready_state(floppy_get_device(space.machine(), 1), 1, 1);
-		state->m_b2m_side = side;
+	if (m_b2m_side!=side) {
+		wd17xx_set_side(m_fdc,side);
+		floppy_mon_w(floppy_get_device(machine(), 1), 0);
+		floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 1, 1);
+		m_b2m_side = side;
 	}
-	wd17xx_dden_w(state->m_fdc, 0);
+	wd17xx_dden_w(m_fdc, 0);
 }
 
 I8255A_INTERFACE( b2m_ppi8255_interface_2 )
@@ -238,42 +231,38 @@ I8255A_INTERFACE( b2m_ppi8255_interface_2 )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("ppi8255_2", b2m_ext_8255_portc_w)
+	DEVCB_DRIVER_MEMBER(b2m_state,b2m_ext_8255_portc_w)
 };
 
-static READ8_DEVICE_HANDLER (b2m_romdisk_porta_r )
+READ8_MEMBER(b2m_state::b2m_romdisk_porta_r)
 {
-	b2m_state *state = space.machine().driver_data<b2m_state>();
-
-	UINT8 *romdisk = state->memregion("maincpu")->base() + 0x12000;
-	return romdisk[state->m_b2m_romdisk_msb*256+state->m_b2m_romdisk_lsb];
+	UINT8 *romdisk = memregion("maincpu")->base() + 0x12000;
+	return romdisk[m_b2m_romdisk_msb*256+m_b2m_romdisk_lsb];
 }
 
-static WRITE8_DEVICE_HANDLER (b2m_romdisk_portb_w )
+WRITE8_MEMBER(b2m_state::b2m_romdisk_portb_w)
 {
-	b2m_state *state = space.machine().driver_data<b2m_state>();
-	state->m_b2m_romdisk_lsb = data;
+	m_b2m_romdisk_lsb = data;
 }
 
-static WRITE8_DEVICE_HANDLER (b2m_romdisk_portc_w )
+WRITE8_MEMBER(b2m_state::b2m_romdisk_portc_w)
 {
-	b2m_state *state = space.machine().driver_data<b2m_state>();
-	state->m_b2m_romdisk_msb = data & 0x7f;
+	m_b2m_romdisk_msb = data & 0x7f;
 }
 
 I8255A_INTERFACE( b2m_ppi8255_interface_3 )
 {
-	DEVCB_DEVICE_HANDLER("ppi8255_3", b2m_romdisk_porta_r),
+	DEVCB_DRIVER_MEMBER(b2m_state,b2m_romdisk_porta_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("ppi8255_3", b2m_romdisk_portb_w),
+	DEVCB_DRIVER_MEMBER(b2m_state,b2m_romdisk_portb_w),
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("ppi8255_3", b2m_romdisk_portc_w)
+	DEVCB_DRIVER_MEMBER(b2m_state,b2m_romdisk_portc_w)
 };
 
-static WRITE_LINE_DEVICE_HANDLER( b2m_pic_set_int_line )
+WRITE_LINE_MEMBER(b2m_state::b2m_pic_set_int_line)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, state ?  HOLD_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, state ?  HOLD_LINE : CLEAR_LINE);
 }
 
 /* Driver initialization */
@@ -352,7 +341,7 @@ static IRQ_CALLBACK(b2m_irq_callback)
 
 const struct pic8259_interface b2m_pic8259_config =
 {
-	DEVCB_LINE(b2m_pic_set_int_line),
+	DEVCB_DRIVER_LINE_MEMBER(b2m_state,b2m_pic_set_int_line),
 	DEVCB_LINE_VCC,
 	DEVCB_NULL
 };

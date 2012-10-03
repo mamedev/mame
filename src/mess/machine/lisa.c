@@ -91,23 +91,17 @@ the drive type (TWIGGY or 3.5'')) */
     a hard disk
 */
 
-static DECLARE_READ8_DEVICE_HANDLER(COPS_via_in_b);
-static DECLARE_WRITE8_DEVICE_HANDLER(COPS_via_out_a);
-static DECLARE_WRITE8_DEVICE_HANDLER(COPS_via_out_b);
-static DECLARE_WRITE8_DEVICE_HANDLER(COPS_via_out_ca2);
-static DECLARE_WRITE8_DEVICE_HANDLER(COPS_via_out_cb2);
 static void COPS_via_irq_func(device_t *device, int val);
-static DECLARE_READ8_DEVICE_HANDLER(parallel_via_in_b);
 
 
 const via6522_interface lisa_via6522_0_intf =
 {
 	/* COPS via */
-	DEVCB_NULL, DEVCB_HANDLER(COPS_via_in_b),
+	DEVCB_NULL, DEVCB_DRIVER_MEMBER(lisa_state,COPS_via_in_b),
 	DEVCB_NULL, DEVCB_NULL,
 	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_HANDLER(COPS_via_out_a), DEVCB_HANDLER(COPS_via_out_b),
-	DEVCB_HANDLER(COPS_via_out_ca2), DEVCB_HANDLER(COPS_via_out_cb2),
+	DEVCB_DRIVER_MEMBER(lisa_state,COPS_via_out_a), DEVCB_DRIVER_MEMBER(lisa_state,COPS_via_out_b),
+	DEVCB_DRIVER_MEMBER(lisa_state,COPS_via_out_ca2), DEVCB_DRIVER_MEMBER(lisa_state,COPS_via_out_cb2),
 	DEVCB_NULL, DEVCB_NULL,
 	DEVCB_LINE(COPS_via_irq_func),
 };
@@ -115,7 +109,7 @@ const via6522_interface lisa_via6522_0_intf =
 const via6522_interface lisa_via6522_1_intf =
 {
 	/* parallel interface via - incomplete */
-	DEVCB_NULL, DEVCB_HANDLER(parallel_via_in_b),
+	DEVCB_NULL, DEVCB_DRIVER_MEMBER(lisa_state,parallel_via_in_b),
 	DEVCB_NULL, DEVCB_NULL,
 	DEVCB_NULL, DEVCB_NULL,
 	DEVCB_NULL, DEVCB_NULL,
@@ -676,22 +670,20 @@ static void init_COPS(running_machine &machine)
     CA1 (I) : COPS sending valid data
     CA2 (O) : VIA -> COPS handshake
 */
-static WRITE8_DEVICE_HANDLER(COPS_via_out_a)
+WRITE8_MEMBER(lisa_state::COPS_via_out_a)
 {
-	lisa_state *state = space.machine().driver_data<lisa_state>();
 //    printf("VIA A = %02x\n", data);
-    state->m_COPS_command = data;
+    m_COPS_command = data;
 }
 
-static WRITE8_DEVICE_HANDLER(COPS_via_out_ca2)
+WRITE8_MEMBER(lisa_state::COPS_via_out_ca2)
 {
-	lisa_state *state = space.machine().driver_data<lisa_state>();
-	state->m_hold_COPS_data = data;
+	m_hold_COPS_data = data;
 
 	/*logerror("COPS CA2 line state : %d\n", val);*/
 
 	/*logerror("COPS_via_out_ca2 : trying to send data to VIA\n");*/
-	COPS_send_data_if_possible(space.machine());
+	COPS_send_data_if_possible(machine());
 }
 
 /*
@@ -708,50 +700,48 @@ static WRITE8_DEVICE_HANDLER(COPS_via_out_ca2)
     CB1 : not used
     CB2 (O) : sound output
 */
-static READ8_DEVICE_HANDLER(COPS_via_in_b)
+READ8_MEMBER(lisa_state::COPS_via_in_b)
 {
-	lisa_state *state = space.machine().driver_data<lisa_state>();
 	int val = 0;
 
-	if (state->m_COPS_Ready)
+	if (m_COPS_Ready)
 		val |= 0x40;
 
-	if (state->m_FDIR)
+	if (m_FDIR)
 		val |= 0x10;
 
 	return val;
 }
 
-static WRITE8_DEVICE_HANDLER(COPS_via_out_b)
+WRITE8_MEMBER(lisa_state::COPS_via_out_b)
 {
-	lisa_state *state = space.machine().driver_data<lisa_state>();
-	via6522_device *via_0 = space.machine().device<via6522_device>("via6522_0");
+	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 
 	/* pull-up */
 	data |= (~ via_0->read(space,VIA_DDRA)) & 0x01;
 
 	if (data & 0x01)
 	{
-		if (state->m_COPS_force_unplug)
+		if (m_COPS_force_unplug)
 		{
-			state->m_COPS_force_unplug = 0;
-			plug_keyboard(space.machine());
+			m_COPS_force_unplug = 0;
+			plug_keyboard(machine());
 		}
 	}
 	else
 	{
-		if (! state->m_COPS_force_unplug)
+		if (! m_COPS_force_unplug)
 		{
-			state->m_COPS_force_unplug = 1;
-			unplug_keyboard(space.machine());
+			m_COPS_force_unplug = 1;
+			unplug_keyboard(machine());
 			//reset_COPS(state);
 		}
 	}
 }
 
-static WRITE8_DEVICE_HANDLER(COPS_via_out_cb2)
+WRITE8_MEMBER(lisa_state::COPS_via_out_cb2)
 {
-	device_t *speaker = space.machine().device(SPEAKER_TAG);
+	device_t *speaker = machine().device(SPEAKER_TAG);
 	speaker_level_w(speaker, data);
 }
 
@@ -785,12 +775,11 @@ static void COPS_via_irq_func(device_t *device, int val)
     CB1 : not used
     CB2 (I) : current parity latch value
 */
-static READ8_DEVICE_HANDLER(parallel_via_in_b)
+READ8_MEMBER(lisa_state::parallel_via_in_b)
 {
-	lisa_state *state = space.machine().driver_data<lisa_state>();
 	int val = 0;
 
-	if (state->m_DISK_DIAG)
+	if (m_DISK_DIAG)
 		val |= 0x40;
 
 	/* tell there is no hard disk : */
@@ -1067,8 +1056,7 @@ void lisa_state::machine_reset()
 	init_COPS(machine());
 
 	{
-		via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-		COPS_via_out_ca2(via_0, generic_space(), 0, 0);	/* VIA core forgets to do so */
+		COPS_via_out_ca2(generic_space(), 0, 0);	/* VIA core forgets to do so */
 	}
 
 	/* initialize floppy */

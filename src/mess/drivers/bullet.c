@@ -683,8 +683,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(bullet_state::ctc_tick)
 	m_ctc->trg2(0);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( dart_rxtxca_w )
+WRITE_LINE_MEMBER(bullet_state::dart_rxtxca_w)
 {
+	device_t *device = machine().device(Z80DART_TAG);
 	z80dart_txca_w(device, state);
 	z80dart_rxca_w(device, state);
 }
@@ -692,7 +693,7 @@ static WRITE_LINE_DEVICE_HANDLER( dart_rxtxca_w )
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		// interrupt handler
-	DEVCB_DEVICE_LINE(Z80DART_TAG, dart_rxtxca_w),		// ZC/TO0 callback
+	DEVCB_DRIVER_LINE_MEMBER(bullet_state,dart_rxtxca_w),		// ZC/TO0 callback
 	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rxtxcb_w),	// ZC/TO1 callback
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg3)							// ZC/TO2 callback
 };

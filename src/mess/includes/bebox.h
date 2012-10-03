@@ -42,6 +42,18 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	TIMER_CALLBACK_MEMBER(bebox_get_devices);
+	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_master_set_int_line);
+	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_slave_set_int_line);
+	DECLARE_READ8_MEMBER(get_slave_ack);
+	DECLARE_WRITE_LINE_MEMBER(bebox_dma_hrq_changed);
+	DECLARE_READ8_MEMBER(bebox_dma8237_fdc_dack_r);
+	DECLARE_WRITE8_MEMBER(bebox_dma8237_fdc_dack_w);
+	DECLARE_WRITE_LINE_MEMBER(bebox_dma8237_out_eop);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
+	DECLARE_WRITE_LINE_MEMBER(bebox_timer0_w);
 };
 
 

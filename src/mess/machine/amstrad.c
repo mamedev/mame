@@ -215,13 +215,12 @@ PALETTE_INIT_MEMBER(amstrad_state,amstrad_cpc_green)
 }
 
 
-WRITE_LINE_DEVICE_HANDLER( aleste_interrupt )
+WRITE_LINE_MEMBER(amstrad_state::aleste_interrupt)
 {
-	amstrad_state *drvstate = device->machine().driver_data<amstrad_state>();
 	if(state == CLEAR_LINE)
-		drvstate->m_aleste_fdc_int = 0;
+		m_aleste_fdc_int = 0;
 	else
-		drvstate->m_aleste_fdc_int = 1;
+		m_aleste_fdc_int = 1;
 }
 
 
@@ -827,237 +826,231 @@ INLINE void amstrad_plus_update_video_sprites( running_machine &machine )
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( amstrad_hsync_changed )
+WRITE_LINE_MEMBER(amstrad_state::amstrad_hsync_changed)
 {
-	amstrad_state *drvstate = device->machine().driver_data<amstrad_state>();
-	amstrad_update_video(device->machine());
+	amstrad_update_video(machine());
 
 	/* The gate array reacts to de-assertion of the hsycnc 6845 line */
-	if ( drvstate->m_gate_array.hsync && !state )
+	if ( m_gate_array.hsync && !state )
 	{
-		drvstate->m_gate_array.hsync_counter++;
+		m_gate_array.hsync_counter++;
 		/* Advance to next drawing line */
-		drvstate->m_gate_array.y++;
-		drvstate->m_gate_array.line_ticks = 0;
-		if ( drvstate->m_gate_array.y >= 0 && drvstate->m_gate_array.y < drvstate->m_gate_array.bitmap->height() )
+		m_gate_array.y++;
+		m_gate_array.line_ticks = 0;
+		if ( m_gate_array.y >= 0 && m_gate_array.y < m_gate_array.bitmap->height() )
 		{
-			drvstate->m_gate_array.draw_p = &drvstate->m_gate_array.bitmap->pix16(drvstate->m_gate_array.y);
+			m_gate_array.draw_p = &m_gate_array.bitmap->pix16(m_gate_array.y);
 		}
 		else
 		{
-			drvstate->m_gate_array.draw_p = NULL;
+			m_gate_array.draw_p = NULL;
 		}
 
-		if ( drvstate->m_gate_array.hsync_after_vsync_counter != 0 )  // counters still operate regardless of PRI state
+		if ( m_gate_array.hsync_after_vsync_counter != 0 )  // counters still operate regardless of PRI state
 		{
-			drvstate->m_gate_array.hsync_after_vsync_counter--;
+			m_gate_array.hsync_after_vsync_counter--;
 
-			if (drvstate->m_gate_array.hsync_after_vsync_counter == 0)
+			if (m_gate_array.hsync_after_vsync_counter == 0)
 			{
-				if (drvstate->m_gate_array.hsync_counter >= 32)
+				if (m_gate_array.hsync_counter >= 32)
 				{
-					device->machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+					machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 				}
-				drvstate->m_gate_array.hsync_counter = 0;
+				m_gate_array.hsync_counter = 0;
 			}
 		}
 
-		if ( drvstate->m_gate_array.hsync_counter >= 52 )
+		if ( m_gate_array.hsync_counter >= 52 )
 		{
-			drvstate->m_gate_array.hsync_counter = 0;
-			device->machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+			m_gate_array.hsync_counter = 0;
+			machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 		}
 	}
-	drvstate->m_gate_array.hsync = state ? 1 : 0;
+	m_gate_array.hsync = state ? 1 : 0;
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_hsync_changed )
+WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_hsync_changed)
 {
-	amstrad_state *drvstate = device->machine().driver_data<amstrad_state>();
-	amstrad_plus_update_video(device->machine());
+	amstrad_plus_update_video(machine());
 
-	if ( drvstate->m_gate_array.hsync && !state )
+	if ( m_gate_array.hsync && !state )
 	{
-		drvstate->m_gate_array.hsync_counter++;
+		m_gate_array.hsync_counter++;
 		/* Advance to next drawing line */
-		drvstate->m_gate_array.y++;
-		drvstate->m_gate_array.line_ticks = 0;
-		if ( drvstate->m_gate_array.y >= 0 && drvstate->m_gate_array.y < drvstate->m_gate_array.bitmap->height() )
+		m_gate_array.y++;
+		m_gate_array.line_ticks = 0;
+		if ( m_gate_array.y >= 0 && m_gate_array.y < m_gate_array.bitmap->height() )
 		{
-			drvstate->m_gate_array.draw_p = &drvstate->m_gate_array.bitmap->pix16(drvstate->m_gate_array.y);
+			m_gate_array.draw_p = &m_gate_array.bitmap->pix16(m_gate_array.y);
 		}
 		else
 		{
-			drvstate->m_gate_array.draw_p = NULL;
+			m_gate_array.draw_p = NULL;
 		}
 
-		if ( drvstate->m_gate_array.hsync_after_vsync_counter != 0 )  // counters still operate regardless of PRI state
+		if ( m_gate_array.hsync_after_vsync_counter != 0 )  // counters still operate regardless of PRI state
 		{
-			drvstate->m_gate_array.hsync_after_vsync_counter--;
+			m_gate_array.hsync_after_vsync_counter--;
 
-			if (drvstate->m_gate_array.hsync_after_vsync_counter == 0)
+			if (m_gate_array.hsync_after_vsync_counter == 0)
 			{
-				if (drvstate->m_gate_array.hsync_counter >= 32)
+				if (m_gate_array.hsync_counter >= 32)
 				{
-					if( drvstate->m_asic.pri == 0 || drvstate->m_asic.enabled == 0)
+					if( m_asic.pri == 0 || m_asic.enabled == 0)
 					{
-						device->machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+						machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 					}
 				}
-				drvstate->m_gate_array.hsync_counter = 0;
+				m_gate_array.hsync_counter = 0;
 			}
 		}
 
-		if ( drvstate->m_gate_array.hsync_counter >= 52 )
+		if ( m_gate_array.hsync_counter >= 52 )
 		{
-			drvstate->m_gate_array.hsync_counter = 0;
-			if ( drvstate->m_asic.pri == 0 || drvstate->m_asic.enabled == 0 )
+			m_gate_array.hsync_counter = 0;
+			if ( m_asic.pri == 0 || m_asic.enabled == 0 )
 			{
-				device->machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+				machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 			}
 		}
 
-		if ( drvstate->m_asic.enabled )
+		if ( m_asic.enabled )
 		{
 			// CPC+/GX4000 Programmable Raster Interrupt (disabled if &6800 in ASIC RAM is 0)
-			if ( drvstate->m_asic.pri != 0 )
+			if ( m_asic.pri != 0 )
 			{
-				if ( drvstate->m_asic.pri == drvstate->m_asic.vpos - 1 )
+				if ( m_asic.pri == m_asic.vpos - 1 )
 				{
-					logerror("PRI: triggered, scanline %d\n",drvstate->m_asic.pri);
-					device->machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
-					drvstate->m_plus_irq_cause = 0x06;  // raster interrupt vector
-					drvstate->m_gate_array.hsync_counter &= ~0x20;  // ASIC PRI resets the MSB of the raster counter
+					logerror("PRI: triggered, scanline %d\n",m_asic.pri);
+					machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+					m_plus_irq_cause = 0x06;  // raster interrupt vector
+					m_gate_array.hsync_counter &= ~0x20;  // ASIC PRI resets the MSB of the raster counter
 				}
 			}
 			// CPC+/GX4000 Split screen registers  (disabled if &6801 in ASIC RAM is 0)
-			if(drvstate->m_asic.ram[0x2801] != 0)
+			if(m_asic.ram[0x2801] != 0)
 			{
-				if ( drvstate->m_asic.ram[0x2801] == drvstate->m_asic.vpos - 1 )	// split occurs here (hopefully)
+				if ( m_asic.ram[0x2801] == m_asic.vpos - 1 )	// split occurs here (hopefully)
 				{
-					logerror("SSCR: Split screen occurred at scanline %d\n",drvstate->m_asic.ram[0x2801]);
+					logerror("SSCR: Split screen occurred at scanline %d\n",m_asic.ram[0x2801]);
 				}
 			}
 			// CPC+/GX4000 DMA channels
-			amstrad_plus_handle_dma(device->machine());  // a DMA command is handled at the leading edge of HSYNC (every 64us)
-			if(drvstate->m_asic.de_start != 0)
-				drvstate->m_asic.vpos++;
+			amstrad_plus_handle_dma(machine());  // a DMA command is handled at the leading edge of HSYNC (every 64us)
+			if(m_asic.de_start != 0)
+				m_asic.vpos++;
 		}
 	}
-	drvstate->m_gate_array.hsync = state ? 1 : 0;
+	m_gate_array.hsync = state ? 1 : 0;
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( amstrad_vsync_changed )
+WRITE_LINE_MEMBER(amstrad_state::amstrad_vsync_changed)
 {
-	amstrad_state *drvstate = device->machine().driver_data<amstrad_state>();
-	amstrad_update_video(device->machine());
+	amstrad_update_video(machine());
 
-	if ( ! drvstate->m_gate_array.vsync && state )
+	if ( ! m_gate_array.vsync && state )
 	{
 		/* Reset the amstrad_CRTC_HS_After_VS_Counter */
-		drvstate->m_gate_array.hsync_after_vsync_counter = 3;
+		m_gate_array.hsync_after_vsync_counter = 3;
 
 		/* Start of new frame */
-		drvstate->m_gate_array.y = -1;
-		drvstate->m_asic.vpos = 1;
-		drvstate->m_asic.de_start = 0;
+		m_gate_array.y = -1;
+		m_asic.vpos = 1;
+		m_asic.de_start = 0;
 	}
 
-	drvstate->m_gate_array.vsync = state ? 1 : 0;
+	m_gate_array.vsync = state ? 1 : 0;
 
 	/* Schedule a write to PC2 */
-	device->machine().scheduler().timer_set( attotime::zero, timer_expired_delegate(FUNC(amstrad_state::amstrad_pc2_low),drvstate));
+	machine().scheduler().timer_set( attotime::zero, timer_expired_delegate(FUNC(amstrad_state::amstrad_pc2_low),this));
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_vsync_changed )
+WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_vsync_changed)
 {
-	amstrad_state *drvstate = device->machine().driver_data<amstrad_state>();
-	amstrad_plus_update_video(device->machine());
+	amstrad_plus_update_video(machine());
 
-	if ( ! drvstate->m_gate_array.vsync && state )
+	if ( ! m_gate_array.vsync && state )
 	{
 		/* Reset the amstrad_CRTC_HS_After_VS_Counter */
-		drvstate->m_gate_array.hsync_after_vsync_counter = 3;
+		m_gate_array.hsync_after_vsync_counter = 3;
 
 		/* Start of new frame */
-		drvstate->m_gate_array.y = -1;
-		drvstate->m_asic.vpos = 1;
-		drvstate->m_asic.de_start = 0;
+		m_gate_array.y = -1;
+		m_asic.vpos = 1;
+		m_asic.de_start = 0;
 	}
 
-	drvstate->m_gate_array.vsync = state ? 1 : 0;
+	m_gate_array.vsync = state ? 1 : 0;
 
 	/* Schedule a write to PC2 */
-	device->machine().scheduler().timer_set( attotime::zero, timer_expired_delegate(FUNC(amstrad_state::amstrad_pc2_low),drvstate));
+	machine().scheduler().timer_set( attotime::zero, timer_expired_delegate(FUNC(amstrad_state::amstrad_pc2_low),this));
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( amstrad_de_changed )
+WRITE_LINE_MEMBER(amstrad_state::amstrad_de_changed)
 {
-	amstrad_state *drvstate = device->machine().driver_data<amstrad_state>();
-	amstrad_update_video(device->machine());
+	amstrad_update_video(machine());
 
-	if ( ! drvstate->m_gate_array.de && state )
+	if ( ! m_gate_array.de && state )
 	{
 		/* DE became active, store the starting MA and RA signals */
-		mc6845_device *mc6845 = drvstate->m_crtc;
+		mc6845_device *mc6845 = m_crtc;
 
-		drvstate->m_gate_array.ma = mc6845->get_ma();
-		drvstate->m_gate_array.ra = mc6845->get_ra();
-logerror("y = %d; ma = %02x; ra = %02x, address = %04x\n", drvstate->m_gate_array.y, drvstate->m_gate_array.ma, drvstate->m_gate_array.ra, ( ( drvstate->m_gate_array.ma & 0x3000 ) << 2 ) | ( ( drvstate->m_gate_array.ra & 0x07 ) << 11 ) | ( ( drvstate->m_gate_array.ma & 0x3ff ) << 1 ) );
-		amstrad_gate_array_get_video_data(device->machine());
-		drvstate->m_asic.de_start = 1;
+		m_gate_array.ma = mc6845->get_ma();
+		m_gate_array.ra = mc6845->get_ra();
+logerror("y = %d; ma = %02x; ra = %02x, address = %04x\n", m_gate_array.y, m_gate_array.ma, m_gate_array.ra, ( ( m_gate_array.ma & 0x3000 ) << 2 ) | ( ( m_gate_array.ra & 0x07 ) << 11 ) | ( ( m_gate_array.ma & 0x3ff ) << 1 ) );
+		amstrad_gate_array_get_video_data(machine());
+		m_asic.de_start = 1;
 	}
 
-	drvstate->m_gate_array.de = state ? 1 : 0;
+	m_gate_array.de = state ? 1 : 0;
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_de_changed )
+WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_de_changed)
 {
-	amstrad_state *drvstate = device->machine().driver_data<amstrad_state>();
-	amstrad_plus_update_video(device->machine());
+	amstrad_plus_update_video(machine());
 
-	if ( ! drvstate->m_gate_array.de && state )
+	if ( ! m_gate_array.de && state )
 	{
 		/* DE became active, store the starting MA and RA signals */
-		mc6845_device *mc6845 = drvstate->m_crtc;
+		mc6845_device *mc6845 = m_crtc;
 
-		drvstate->m_gate_array.ma = mc6845->get_ma();
-		drvstate->m_gate_array.ra = mc6845->get_ra();
-		drvstate->m_asic.h_start = drvstate->m_gate_array.line_ticks;
-		drvstate->m_asic.de_start = 1;
+		m_gate_array.ma = mc6845->get_ma();
+		m_gate_array.ra = mc6845->get_ra();
+		m_asic.h_start = m_gate_array.line_ticks;
+		m_asic.de_start = 1;
 
 		/* Start of screen */
-		if ( drvstate->m_asic.vpos == 1 )
+		if ( m_asic.vpos == 1 )
 		{
-			drvstate->m_asic.split_ma_base = 0x0000;
-			drvstate->m_asic.split_ma_started = 0x0000;
+			m_asic.split_ma_base = 0x0000;
+			m_asic.split_ma_started = 0x0000;
 		}
 		/* Start of split screen section */
-		else if ( drvstate->m_asic.enabled && drvstate->m_asic.ram[0x2801] != 0 && drvstate->m_asic.ram[0x2801] == drvstate->m_asic.vpos - 1 )
+		else if ( m_asic.enabled && m_asic.ram[0x2801] != 0 && m_asic.ram[0x2801] == m_asic.vpos - 1 )
 		{
-			drvstate->m_asic.split_ma_started = drvstate->m_gate_array.ma;
-			drvstate->m_asic.split_ma_base = ( drvstate->m_asic.ram[0x2802] << 8 ) | drvstate->m_asic.ram[0x2803];
+			m_asic.split_ma_started = m_gate_array.ma;
+			m_asic.split_ma_base = ( m_asic.ram[0x2802] << 8 ) | m_asic.ram[0x2803];
 		}
 
-		drvstate->m_gate_array.colour = drvstate->m_asic.ram[0x2420] + ( drvstate->m_asic.ram[0x2421] << 8 );
-		drvstate->m_asic.hscroll = drvstate->m_asic.ram[0x2804] & 0x0f;
+		m_gate_array.colour = m_asic.ram[0x2420] + ( m_asic.ram[0x2421] << 8 );
+		m_asic.hscroll = m_asic.ram[0x2804] & 0x0f;
 
-		if ( drvstate->m_asic.hscroll == 0 )
-			amstrad_plus_gate_array_get_video_data(device->machine());
+		if ( m_asic.hscroll == 0 )
+			amstrad_plus_gate_array_get_video_data(machine());
 	}
 
-	if ( drvstate->m_gate_array.de && ! state )
+	if ( m_gate_array.de && ! state )
 	{
-		drvstate->m_asic.h_end = drvstate->m_gate_array.line_ticks;
-		amstrad_plus_update_video_sprites(device->machine());
+		m_asic.h_end = m_gate_array.line_ticks;
+		amstrad_plus_update_video_sprites(machine());
 	}
 
-	drvstate->m_gate_array.de = state ? 1 : 0;
+	m_gate_array.de = state ? 1 : 0;
 }
 
 
@@ -1086,10 +1079,10 @@ const mc6845_interface amstrad_mc6845_intf =
 	NULL,									/* begin_update */
 	NULL,									/* update_row */
 	NULL,									/* end_update */
-	DEVCB_LINE(amstrad_de_changed),			/* on_de_changed */
+	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_de_changed),			/* on_de_changed */
 	DEVCB_NULL,								/* on_cur_changed */
-	DEVCB_LINE(amstrad_hsync_changed),		/* on_hsync_changed */
-	DEVCB_LINE(amstrad_vsync_changed),		/* on_vsync_changed */
+	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_hsync_changed),		/* on_hsync_changed */
+	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_vsync_changed),		/* on_vsync_changed */
 	NULL
 };
 
@@ -1101,10 +1094,10 @@ const mc6845_interface amstrad_plus_mc6845_intf =
 	NULL,										/* begin_update */
 	NULL,										/* update_row */
 	NULL,										/* end_update */
-	DEVCB_LINE(amstrad_plus_de_changed),		/* on_de_changed */
+	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_plus_de_changed),		/* on_de_changed */
 	DEVCB_NULL,									/* on_cur_changed */
-	DEVCB_LINE(amstrad_plus_hsync_changed),		/* on_hsync_changed */
-	DEVCB_LINE(amstrad_plus_vsync_changed),		/* on_vsync_changed */
+	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_plus_hsync_changed),		/* on_hsync_changed */
+	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_plus_vsync_changed),		/* on_vsync_changed */
 	NULL
 };
 
@@ -2505,19 +2498,17 @@ static void update_psg(running_machine &machine)
 
 
 /* Read/Write 8255 PPI port A (connected to AY-3-8912 databus) */
-READ8_DEVICE_HANDLER ( amstrad_ppi_porta_r )
+READ8_MEMBER(amstrad_state::amstrad_ppi_porta_r)
 {
-	amstrad_state *state = space.machine().driver_data<amstrad_state>();
-	update_psg(space.machine());
-	return state->m_ppi_port_inputs[amstrad_ppi_PortA];
+	update_psg(machine());
+	return m_ppi_port_inputs[amstrad_ppi_PortA];
 }
 
 
-WRITE8_DEVICE_HANDLER ( amstrad_ppi_porta_w )
+WRITE8_MEMBER(amstrad_state::amstrad_ppi_porta_w)
 {
-	amstrad_state *state = space.machine().driver_data<amstrad_state>();
-	state->m_ppi_port_outputs[amstrad_ppi_PortA] = data;
-	update_psg(space.machine());
+	m_ppi_port_outputs[amstrad_ppi_PortA] = data;
+	update_psg(machine());
 }
 
 
@@ -2547,33 +2538,32 @@ Note:
 */
 
 
-READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
+READ8_MEMBER(amstrad_state::amstrad_ppi_portb_r)
 {
-	amstrad_state *state = space.machine().driver_data<amstrad_state>();
 	int data = 0;
 /* Set b7 with cassette tape input */
-	if(state->m_system_type != SYSTEM_GX4000)
+	if(m_system_type != SYSTEM_GX4000)
 	{
-		if (state->m_cassette->input() > 0.03)
+		if (m_cassette->input() > 0.03)
 		{
 			data |= (1<<7);
 		}
 	}
 /* Set b6 with Parallel/Printer port ready */
-	if(state->m_system_type != SYSTEM_GX4000)
+	if(m_system_type != SYSTEM_GX4000)
 	{
-		centronics_device *printer = state->m_centronics;
+		centronics_device *printer = m_centronics;
 		data |= printer->busy_r() << 6;
 	}
 /* Set b4-b1 50Hz/60Hz state and manufacturer name defined by links on PCB */
-	data |= (state->m_ppi_port_inputs[amstrad_ppi_PortB] & 0x1e);
+	data |= (m_ppi_port_inputs[amstrad_ppi_PortB] & 0x1e);
 
 /*  Set b0 with VSync state from the CRTC */
-	data |= state->m_gate_array.vsync;
+	data |= m_gate_array.vsync;
 
-	if(state->m_aleste_mode & 0x04)
+	if(m_aleste_mode & 0x04)
 	{
-		if(state->m_aleste_fdc_int == 0)
+		if(m_aleste_fdc_int == 0)
 			data &= ~0x02;
 		else
 			data |= 0x02;
@@ -2581,7 +2571,7 @@ READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 
 logerror("amstrad_ppi_portb_r\n");
 	/* Schedule a write to PC2 */
-	space.machine().scheduler().timer_set( attotime::zero, timer_expired_delegate(FUNC(amstrad_state::amstrad_pc2_low),state));
+	machine().scheduler().timer_set( attotime::zero, timer_expired_delegate(FUNC(amstrad_state::amstrad_pc2_low),this));
 
 	return data;
 }
@@ -2601,41 +2591,40 @@ Bit Description  Usage
 
 /* previous_ppi_portc_w value */
 
-WRITE8_DEVICE_HANDLER ( amstrad_ppi_portc_w )
+WRITE8_MEMBER(amstrad_state::amstrad_ppi_portc_w)
 {
-	amstrad_state *state = space.machine().driver_data<amstrad_state>();
 	int changed_data;
 
-	state->m_previous_ppi_portc_w = state->m_ppi_port_outputs[amstrad_ppi_PortC];
+	m_previous_ppi_portc_w = m_ppi_port_outputs[amstrad_ppi_PortC];
 /* Write the data to Port C */
-	changed_data = state->m_previous_ppi_portc_w^data;
+	changed_data = m_previous_ppi_portc_w^data;
 
-	state->m_ppi_port_outputs[amstrad_ppi_PortC] = data;
+	m_ppi_port_outputs[amstrad_ppi_PortC] = data;
 
 /* get b7 and b6 (PSG Function Selected */
-	state->m_Psg_FunctionSelected = ((data & 0xC0)>>6);
+	m_Psg_FunctionSelected = ((data & 0xC0)>>6);
 
 	/* MC146818 function */
-	state->m_aleste_rtc_function = data & 0x07;
+	m_aleste_rtc_function = data & 0x07;
 
 	/* Perform PSG function */
-	update_psg(space.machine());
+	update_psg(machine());
 
 	/* b5 Cassette Write data */
-	if(state->m_system_type != SYSTEM_GX4000)
+	if(m_system_type != SYSTEM_GX4000)
 	{
 		if ((changed_data & 0x20) != 0)
 		{
-			state->m_cassette->output(((data & 0x20) ? -1.0 : +1.0));
+			m_cassette->output(((data & 0x20) ? -1.0 : +1.0));
 		}
 	}
 
 	/* b4 Cassette Motor Control */
-	if(state->m_system_type != SYSTEM_GX4000)
+	if(m_system_type != SYSTEM_GX4000)
 	{
 		if ((changed_data & 0x10) != 0)
 		{
-			state->m_cassette->change_state(
+			m_cassette->change_state(
 					((data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED),
 					CASSETTE_MASK_MOTOR);
 		}

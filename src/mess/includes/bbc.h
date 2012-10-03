@@ -286,6 +286,24 @@ public:
 	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
 	INTERRUPT_GEN_MEMBER(bbcm_keyscan);
 	TIMER_CALLBACK_MEMBER(bbc_tape_timer_cb);
+	DECLARE_WRITE_LINE_MEMBER(bbcb_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(bbcb_acia6850_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(econet_clk_w);
+	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_porta);
+	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_portb);
+	DECLARE_READ8_MEMBER(bbcb_via_system_read_porta);
+	DECLARE_READ8_MEMBER(bbcb_via_system_read_portb);
+	DECLARE_READ8_MEMBER(bbcb_via_system_read_ca1);
+	DECLARE_READ8_MEMBER(bbcb_via_system_read_cb1);
+	DECLARE_READ8_MEMBER(bbcb_via_system_read_ca2);
+	DECLARE_READ8_MEMBER(bbcb_via_system_read_cb2);
+	DECLARE_WRITE_LINE_MEMBER(bbcb_via_system_irq_w);
+	DECLARE_READ8_MEMBER(bbcb_via_user_read_portb);
+	DECLARE_WRITE8_MEMBER(bbcb_via_user_write_portb);
+	DECLARE_WRITE_LINE_MEMBER(bbcb_via_user_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_drq_w);
+	DECLARE_WRITE_LINE_MEMBER(bbc_vsync);
 };
 
 

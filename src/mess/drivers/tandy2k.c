@@ -195,16 +195,18 @@ WRITE16_MEMBER( tandy2k_state::vpac_w )
 	}
 }
 
-static READ8_DEVICE_HANDLER( fldtc_r )
+READ8_MEMBER(tandy2k_state::fldtc_r)
 {
+	device_t *device = machine().device("AM_RANGE(0x00004, 0x00005) AM_READWRITE8(I8272A_TAG, fldtc_r, fldtc_w, 0x00ff)");
 	upd765_tc_w(device, 1);
 	upd765_tc_w(device, 0);
 
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER( fldtc_w )
+WRITE8_MEMBER(tandy2k_state::fldtc_w)
 {
+	device_t *device = machine().device(I8272A_TAG);
 	upd765_tc_w(device, 1);
 	upd765_tc_w(device, 0);
 }
@@ -269,7 +271,7 @@ static ADDRESS_MAP_START( tandy2k_io, AS_IO, 16, tandy2k_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x00001) AM_READWRITE8(enable_r, enable_w, 0x00ff)
 	AM_RANGE(0x00002, 0x00003) AM_WRITE8(dma_mux_w, 0x00ff)
-	AM_RANGE(0x00004, 0x00005) AM_DEVREADWRITE8_LEGACY(I8272A_TAG, fldtc_r, fldtc_w, 0x00ff)
+	AM_RANGE(0x00004, 0x00005) AM_READWRITE8(fldtc_r, fldtc_w, 0x00ff)
 	AM_RANGE(0x00010, 0x00013) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0x00030, 0x00031) AM_DEVREAD8_LEGACY(I8272A_TAG, upd765_status_r, 0x00ff)
 	AM_RANGE(0x00032, 0x00033) AM_DEVREADWRITE8_LEGACY(I8272A_TAG, upd765_data_r, upd765_data_w, 0x00ff)

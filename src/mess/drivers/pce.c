@@ -501,16 +501,16 @@ UINT32 pce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( pce_irq_changed )
+WRITE_LINE_MEMBER(pce_state::pce_irq_changed)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, state);
+	machine().device("maincpu")->execute().set_input_line(0, state);
 }
 
 
 static const huc6270_interface pce_huc6270_config =
 {
 	0x10000,
-	DEVCB_LINE(pce_irq_changed)
+	DEVCB_DRIVER_LINE_MEMBER(pce_state,pce_irq_changed)
 };
 
 
@@ -527,14 +527,14 @@ static const huc6260_interface pce_huc6260_config =
 static const huc6270_interface sgx_huc6270_0_config =
 {
 	0x10000,
-	DEVCB_LINE(pce_irq_changed)
+	DEVCB_DRIVER_LINE_MEMBER(pce_state,pce_irq_changed)
 };
 
 
 static const huc6270_interface sgx_huc6270_1_config =
 {
 	0x10000,
-	DEVCB_LINE(pce_irq_changed)
+	DEVCB_DRIVER_LINE_MEMBER(pce_state,pce_irq_changed)
 };
 
 

@@ -246,6 +246,10 @@ public:
 	TIMER_CALLBACK_MEMBER(fm7_keyboard_poll);
 	TIMER_CALLBACK_MEMBER(fm77av_alu_task_end);
 	TIMER_CALLBACK_MEMBER(fm77av_vsync);
+	DECLARE_WRITE_LINE_MEMBER(fm7_fdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(fm7_fdc_drq_w);
+	DECLARE_READ8_MEMBER(fm77av_joy_1_r);
+	DECLARE_READ8_MEMBER(fm77av_joy_2_r);
 };
 
 #endif /*FM7_H_*/

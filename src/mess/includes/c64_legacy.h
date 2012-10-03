@@ -91,15 +91,17 @@ public:
 	DECLARE_DRIVER_INIT( c64gs );
 	DECLARE_DRIVER_INIT( sx64 );
 	INTERRUPT_GEN_MEMBER(c64_frame_interrupt);
+	DECLARE_READ8_MEMBER(c64_cia0_port_a_r);
+	DECLARE_READ8_MEMBER(c64_cia0_port_b_r);
+	DECLARE_WRITE8_MEMBER(c64_cia0_port_b_w);
+	DECLARE_READ8_MEMBER(c64_cia1_port_a_r);
+	DECLARE_WRITE8_MEMBER(c64_cia1_port_a_w);
 };
 
 
 /*----------- defined in machine/c64.c -----------*/
 
 /* private area */
-
-extern DECLARE_READ8_DEVICE_HANDLER(c64_m6510_port_read);
-extern DECLARE_WRITE8_DEVICE_HANDLER(c64_m6510_port_write);
 
 DECLARE_READ8_HANDLER ( c64_colorram_read );
 DECLARE_WRITE8_HANDLER ( c64_colorram_write );

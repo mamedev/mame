@@ -127,19 +127,19 @@ static NECDSP_INTERFACE( upd7720_config )
 /*****************************************************************************
  USART 8251 and Terminal stuff
 *****************************************************************************/
-static WRITE_LINE_DEVICE_HANDLER( i8251_rxrdy_int )
+WRITE_LINE_MEMBER(tsispch_state::i8251_rxrdy_int)
 {
-	pic8259_ir1_w(device->machine().device("pic8259"), state);
+	pic8259_ir1_w(machine().device("pic8259"), state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( i8251_txempty_int )
+WRITE_LINE_MEMBER(tsispch_state::i8251_txempty_int)
 {
-	pic8259_ir2_w(device->machine().device("pic8259"), state);
+	pic8259_ir2_w(machine().device("pic8259"), state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( i8251_txrdy_int )
+WRITE_LINE_MEMBER(tsispch_state::i8251_txrdy_int)
 {
-	pic8259_ir3_w(device->machine().device("pic8259"), state);
+	pic8259_ir3_w(machine().device("pic8259"), state);
 }
 
 const i8251_interface i8251_config =
@@ -149,9 +149,9 @@ const i8251_interface i8251_config =
 	DEVCB_NULL, // in dsr
 	DEVCB_NULL, // out dtr
 	DEVCB_NULL, // out rts
-	DEVCB_LINE(i8251_rxrdy_int), // out rxrdy
-	DEVCB_LINE(i8251_txrdy_int), // out txrdy
-	DEVCB_LINE(i8251_txempty_int), // out txempty
+	DEVCB_DRIVER_LINE_MEMBER(tsispch_state,i8251_rxrdy_int), // out rxrdy
+	DEVCB_DRIVER_LINE_MEMBER(tsispch_state,i8251_txrdy_int), // out txrdy
+	DEVCB_DRIVER_LINE_MEMBER(tsispch_state,i8251_txempty_int), // out txempty
 	DEVCB_NULL  // out syndet
 };
 
@@ -168,14 +168,14 @@ static GENERIC_TERMINAL_INTERFACE( tsispch_terminal_intf )
 /*****************************************************************************
  PIC 8259 stuff
 *****************************************************************************/
-static WRITE_LINE_DEVICE_HANDLER( pic8259_set_int_line )
+WRITE_LINE_MEMBER(tsispch_state::pic8259_set_int_line)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface pic8259_config =
 {
-	DEVCB_LINE(pic8259_set_int_line),
+	DEVCB_DRIVER_LINE_MEMBER(tsispch_state,pic8259_set_int_line),
 	DEVCB_LINE_VCC,
 	DEVCB_NULL
 };

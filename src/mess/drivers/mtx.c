@@ -56,11 +56,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mtx_io, AS_IO, 8, mtx_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD_LEGACY(CENTRONICS_TAG, mtx_strobe_r) AM_WRITE(mtx_bankswitch_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(mtx_strobe_r, mtx_bankswitch_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("tms9929a", tms9929a_device, vram_read, vram_write)
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("tms9929a", tms9929a_device, register_read, register_write)
-	AM_RANGE(0x03, 0x03) AM_READ(mtx_sound_strobe_r) AM_DEVWRITE_LEGACY(CASSETTE_TAG, mtx_cst_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD_LEGACY(CENTRONICS_TAG, mtx_prt_r)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(mtx_sound_strobe_r, mtx_cst_w)
+	AM_RANGE(0x04, 0x04) AM_READ(mtx_prt_r)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(mtx_key_lo_r, mtx_sense_w)
 	AM_RANGE(0x06, 0x06) AM_READWRITE(mtx_key_hi_r, mtx_sound_latch_w)
@@ -218,24 +218,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::ctc_tick)
 	m_z80ctc->trg2(0);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_trg1_w )
+WRITE_LINE_MEMBER(mtx_state::ctc_trg1_w)
 {
-	mtx_state *driver_state = device->machine().driver_data<mtx_state>();
-
-	if (driver_state->m_z80dart != NULL)
+	if (m_z80dart != NULL)
 	{
-		z80dart_rxca_w(driver_state->m_z80dart, state);
-		z80dart_txca_w(driver_state->m_z80dart, state);
+		z80dart_rxca_w(m_z80dart, state);
+		z80dart_txca_w(m_z80dart, state);
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_trg2_w )
+WRITE_LINE_MEMBER(mtx_state::ctc_trg2_w)
 {
-	mtx_state *driver_state = device->machine().driver_data<mtx_state>();
-
-	if (driver_state->m_z80dart != NULL)
+	if (m_z80dart != NULL)
 	{
-		z80dart_rxtxcb_w(driver_state->m_z80dart, state);
+		z80dart_rxtxcb_w(m_z80dart, state);
 	}
 }
 
@@ -243,8 +239,8 @@ static Z80CTC_INTERFACE( ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
 	DEVCB_NULL,
-	DEVCB_LINE(ctc_trg1_w),
-	DEVCB_LINE(ctc_trg2_w)
+	DEVCB_DRIVER_LINE_MEMBER(mtx_state,ctc_trg1_w),
+	DEVCB_DRIVER_LINE_MEMBER(mtx_state,ctc_trg2_w)
 };
 
 /*-------------------------------------------------
@@ -320,18 +316,16 @@ static const cassette_interface mtx_cassette_interface =
     mtx_tms9928a_interface
 -------------------------------------------------*/
 
-static WRITE_LINE_DEVICE_HANDLER(mtx_tms9929a_interrupt)
+WRITE_LINE_MEMBER(mtx_state::mtx_tms9929a_interrupt)
 {
-    mtx_state *drv_state = device->machine().driver_data<mtx_state>();
-
-    drv_state->m_z80ctc->trg0(state ? 0 : 1);
+	m_z80ctc->trg0(state ? 0 : 1);
 }
 
 static TMS9928A_INTERFACE(mtx_tms9928a_interface)
 {
 	"screen",
     0x4000,
-    DEVCB_LINE(mtx_tms9929a_interrupt)
+    DEVCB_DRIVER_LINE_MEMBER(mtx_state,mtx_tms9929a_interrupt)
 };
 
 /*-------------------------------------------------

@@ -51,16 +51,6 @@
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 
-
-
-
-static DECLARE_READ8_DEVICE_HANDLER( apple1_pia0_kbdin );
-static DECLARE_WRITE8_DEVICE_HANDLER( apple1_pia0_dspout );
-static DECLARE_WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal );
-
-
-
-
 /*****************************************************************************
 **  Structures
 *****************************************************************************/
@@ -72,16 +62,16 @@ static DECLARE_WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal );
 
 const pia6821_interface apple1_pia0 =
 {
-	DEVCB_DEVICE_HANDLER("pia", apple1_pia0_kbdin),				/* Port A input (keyboard) */
+	DEVCB_DRIVER_MEMBER(apple1_state,apple1_pia0_kbdin),				/* Port A input (keyboard) */
 	DEVCB_NULL,										/* Port B input (display status) */
 	DEVCB_NULL,										/* CA1 input (key pressed) */
 	DEVCB_NULL,										/* CB1 input (display ready) */
 	DEVCB_NULL,										/* CA2 not used as input */
 	DEVCB_NULL,										/* CB2 not used as input */
 	DEVCB_NULL,										/* Port A not used as output */
-	DEVCB_DEVICE_HANDLER("pia", apple1_pia0_dspout),				/* Port B output (display) */
+	DEVCB_DRIVER_MEMBER(apple1_state,apple1_pia0_dspout),				/* Port B output (display) */
 	DEVCB_NULL,										/* CA2 not used as output */
-	DEVCB_DEVICE_HANDLER("pia", apple1_pia0_dsp_write_signal),	/* CB2 output (display write) */
+	DEVCB_DRIVER_MEMBER(apple1_state,apple1_pia0_dsp_write_signal),	/* CB2 output (display write) */
 	DEVCB_NULL,										/* IRQA not connected */
 	DEVCB_NULL										/* IRQB not connected */
 };
@@ -381,22 +371,22 @@ TIMER_CALLBACK_MEMBER(apple1_state::apple1_kbd_strobe_end)
 /*****************************************************************************
 **  READ/WRITE HANDLERS
 *****************************************************************************/
-static READ8_DEVICE_HANDLER( apple1_pia0_kbdin )
+READ8_MEMBER(apple1_state::apple1_pia0_kbdin)
 {
-	apple1_state *state = space.machine().driver_data<apple1_state>();
 	/* Bit 7 of the keyboard input is permanently wired high.  This is
        what the ROM Monitor software expects. */
-	return state->m_kbd_data | 0x80;
+	return m_kbd_data | 0x80;
 }
 
-static WRITE8_DEVICE_HANDLER( apple1_pia0_dspout )
+WRITE8_MEMBER(apple1_state::apple1_pia0_dspout)
 {
 	/* Send an ASCII character to the video hardware. */
-	apple1_vh_dsp_w(space.machine(), data);
+	apple1_vh_dsp_w(machine(), data);
 }
 
-static WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal )
+WRITE8_MEMBER(apple1_state::apple1_pia0_dsp_write_signal)
 {
+	device_t *device = machine().device("pia");
 	/* PIA output CB2 is inverted to become the DA signal, used to
        signal a display write to the video hardware. */
 
@@ -411,9 +401,8 @@ static WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal )
        Only then will it assert \RDA to signal readiness for another
        write.  Thus the write delay depends on the cursor position and
        where the display is in the refresh cycle. */
-	apple1_state *state = space.machine().driver_data<apple1_state>();	   
 	if (!data)
-		space.machine().scheduler().timer_set(apple1_vh_dsp_time_to_ready(space.machine()), timer_expired_delegate(FUNC(apple1_state::apple1_dsp_ready_start),state));
+		machine().scheduler().timer_set(apple1_vh_dsp_time_to_ready(machine()), timer_expired_delegate(FUNC(apple1_state::apple1_dsp_ready_start),this));
 }
 
 TIMER_CALLBACK_MEMBER(apple1_state::apple1_dsp_ready_start)

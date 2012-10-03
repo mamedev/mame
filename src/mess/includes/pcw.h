@@ -106,6 +106,7 @@ public:
 	TIMER_CALLBACK_MEMBER(pcw_pins_callback);
 	TIMER_CALLBACK_MEMBER(setup_beep);
 	TIMER_DEVICE_CALLBACK_MEMBER(pcw_timer_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(pcw_fdc_interrupt);
 };
 
 #endif /* PCW_H_ */

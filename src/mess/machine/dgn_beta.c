@@ -92,25 +92,7 @@ static void execute_beta_key_dump(running_machine &machine, int ref, int params,
 
 /* Debugging variables */
 
-static DECLARE_READ8_DEVICE_HANDLER(d_pia0_pa_r);
-static DECLARE_WRITE8_DEVICE_HANDLER(d_pia0_pa_w);
-static DECLARE_READ8_DEVICE_HANDLER(d_pia0_pb_r);
-static DECLARE_WRITE8_DEVICE_HANDLER(d_pia0_pb_w);
-static DECLARE_WRITE8_DEVICE_HANDLER(d_pia0_cb2_w);
-static WRITE_LINE_DEVICE_HANDLER(d_pia0_irq_a);
-static WRITE_LINE_DEVICE_HANDLER(d_pia0_irq_b);
-static DECLARE_READ8_DEVICE_HANDLER(d_pia1_pa_r);
-static DECLARE_WRITE8_DEVICE_HANDLER(d_pia1_pa_w);
-static DECLARE_READ8_DEVICE_HANDLER(d_pia1_pb_r);
-static DECLARE_WRITE8_DEVICE_HANDLER(d_pia1_pb_w);
-static WRITE_LINE_DEVICE_HANDLER(d_pia1_irq_a);
-static WRITE_LINE_DEVICE_HANDLER(d_pia1_irq_b);
-static DECLARE_READ8_DEVICE_HANDLER(d_pia2_pa_r);
-static DECLARE_WRITE8_DEVICE_HANDLER(d_pia2_pa_w);
-static DECLARE_READ8_DEVICE_HANDLER(d_pia2_pb_r);
-static DECLARE_WRITE8_DEVICE_HANDLER(d_pia2_pb_w);
-static WRITE_LINE_DEVICE_HANDLER(d_pia2_irq_a);
-static WRITE_LINE_DEVICE_HANDLER(d_pia2_irq_b);
+
 
 static void cpu0_recalc_irq(running_machine &machine, int state);
 static void cpu0_recalc_firq(running_machine &machine, int state);
@@ -128,39 +110,39 @@ const pia6821_interface dgnbeta_pia_intf[] =
 	/* PIA 0 at $FC20-$FC23 I46 */
 	{
 		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_HANDLER(d_pia0_pa_r),
-		DEVCB_HANDLER(d_pia0_pb_r),
+		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia0_pa_r),
+		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia0_pb_r),
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_NULL,
 		/*outputs: A/B,CA/B2       */
-		DEVCB_HANDLER(d_pia0_pa_w),
-		DEVCB_HANDLER(d_pia0_pb_w),
+		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia0_pa_w),
+		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia0_pb_w),
 		DEVCB_NULL,
-		DEVCB_HANDLER(d_pia0_cb2_w),
+		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia0_cb2_w),
 		/*irqs   : A/B         */
-		DEVCB_LINE(d_pia0_irq_a),
-		DEVCB_LINE(d_pia0_irq_b)
+		DEVCB_DRIVER_LINE_MEMBER(dgn_beta_state,d_pia0_irq_a),
+		DEVCB_DRIVER_LINE_MEMBER(dgn_beta_state,d_pia0_irq_b)
 	},
 
 	/* PIA 1 at $FC24-$FC27 I63 */
 	{
 		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_HANDLER(d_pia1_pa_r),
-		DEVCB_HANDLER(d_pia1_pb_r),
+		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia1_pa_r),
+		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia1_pb_r),
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_NULL,
 		/*outputs: A/B,CA/B2       */
-		DEVCB_HANDLER(d_pia1_pa_w),
-		DEVCB_HANDLER(d_pia1_pb_w),
+		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia1_pa_w),
+		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia1_pb_w),
 		DEVCB_NULL,
 		DEVCB_NULL,
 		/*irqs   : A/B         */
-		DEVCB_LINE(d_pia1_irq_a),
-		DEVCB_LINE(d_pia1_irq_b)
+		DEVCB_DRIVER_LINE_MEMBER(dgn_beta_state,d_pia1_irq_a),
+		DEVCB_DRIVER_LINE_MEMBER(dgn_beta_state,d_pia1_irq_b)
 	},
 
 	/* PIA 2 at FCC0-FCC3 I28 */
@@ -168,20 +150,20 @@ const pia6821_interface dgnbeta_pia_intf[] =
 	/* from the WD2797 */
 	{
 		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_HANDLER(d_pia2_pa_r),
-		DEVCB_HANDLER(d_pia2_pb_r),
+		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia2_pa_r),
+		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia2_pb_r),
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_NULL,
 		/*outputs: A/B,CA/B2       */
-		DEVCB_HANDLER(d_pia2_pa_w),
-		DEVCB_HANDLER(d_pia2_pb_w),
+		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia2_pa_w),
+		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia2_pb_w),
 		DEVCB_NULL,
 		DEVCB_NULL,
 		/*irqs   : A/B         */
-		DEVCB_LINE(d_pia2_irq_a),
-		DEVCB_LINE(d_pia2_irq_b)
+		DEVCB_DRIVER_LINE_MEMBER(dgn_beta_state,d_pia2_irq_a),
+		DEVCB_DRIVER_LINE_MEMBER(dgn_beta_state,d_pia2_irq_b)
 	}
 };
 
@@ -534,18 +516,17 @@ static int GetKeyRow(dgn_beta_state *state, int RowNo)
         CB1 I36/39/6845(Horz Sync)
         CB2 Keyboard (out) Low loads input shift reg
 */
-static READ8_DEVICE_HANDLER(d_pia0_pa_r)
+READ8_MEMBER(dgn_beta_state::d_pia0_pa_r)
 {
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER(d_pia0_pa_w)
+WRITE8_MEMBER(dgn_beta_state::d_pia0_pa_w)
 {
 }
 
-static READ8_DEVICE_HANDLER(d_pia0_pb_r)
+READ8_MEMBER(dgn_beta_state::d_pia0_pb_r)
 {
-	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
 	int RetVal;
 	int Idx;
 	int Selected;
@@ -556,38 +537,37 @@ static READ8_DEVICE_HANDLER(d_pia0_pb_r)
 
 	LOG_KEYBOARD(("PB Read\n"));
 
-	state->m_KAny_next = 0;
+	m_KAny_next = 0;
 
-	Selected = SelectedKeyrow(state, state->m_RowShifter);
+	Selected = SelectedKeyrow(this, m_RowShifter);
 
 	/* Scan the whole keyboard, if output shifter is all low */
 	/* This actually scans in the keyboard */
-	if(state->m_RowShifter == 0x00)
+	if(m_RowShifter == 0x00)
 	{
 		for(Idx=0; Idx<NoKeyrows; Idx++)
 		{
-			state->m_Keyboard[Idx] = space.machine().root_device().ioport(keynames[Idx])->read();
+			m_Keyboard[Idx] = machine().root_device().ioport(keynames[Idx])->read();
 
-			if(state->m_Keyboard[Idx] != 0x7F)
-				state->m_KAny_next = 1;
+			if(m_Keyboard[Idx] != 0x7F)
+				m_KAny_next = 1;
 		}
 	}
 	else	/* Just scan current row, from previously read values */
 	{
-		if(GetKeyRow(state, Selected) != NO_KEY_PRESSED)
-			state->m_KAny_next = 1;
+		if(GetKeyRow(this, Selected) != NO_KEY_PRESSED)
+			m_KAny_next = 1;
 	}
 
-	RetVal = (state->m_KInDat_next<<5) | (state->m_KAny_next<<2);
+	RetVal = (m_KInDat_next<<5) | (m_KAny_next<<2);
 
-	LOG_KEYBOARD(("FC22=$%02X KAny=%d\n", RetVal, state->m_KAny_next));
+	LOG_KEYBOARD(("FC22=$%02X KAny=%d\n", RetVal, m_KAny_next));
 
 	return RetVal;
 }
 
-static WRITE8_DEVICE_HANDLER(d_pia0_pb_w)
+WRITE8_MEMBER(dgn_beta_state::d_pia0_pb_w)
 {
-	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
 	int	InClkState;
 	//int   OutClkState;
 
@@ -596,55 +576,54 @@ static WRITE8_DEVICE_HANDLER(d_pia0_pb_w)
 	InClkState	= data & KInClk;
 	//OutClkState   = data & KOutClk;
 
-	LOG_KEYBOARD(("InClkState=$%02X OldInClkState=$%02X Keyrow=$%02X ",InClkState,(state->m_d_pia0_pb_last & KInClk),state->m_Keyrow));
+	LOG_KEYBOARD(("InClkState=$%02X OldInClkState=$%02X Keyrow=$%02X ",InClkState,(m_d_pia0_pb_last & KInClk),m_Keyrow));
 
 	/* Input clock bit has changed state */
-	if ((InClkState) != (state->m_d_pia0_pb_last & KInClk))
+	if ((InClkState) != (m_d_pia0_pb_last & KInClk))
 	{
 		/* Clock in bit */
 		if(InClkState)
 		{
-			state->m_KInDat_next=(~state->m_Keyrow & 0x40)>>6;
-			state->m_Keyrow = ((state->m_Keyrow<<1) | 0x01) & 0x7F ;
-			LOG_KEYBOARD(("Keyrow=$%02X KInDat_next=%X\n",state->m_Keyrow,state->m_KInDat_next));
+			m_KInDat_next=(~m_Keyrow & 0x40)>>6;
+			m_Keyrow = ((m_Keyrow<<1) | 0x01) & 0x7F ;
+			LOG_KEYBOARD(("Keyrow=$%02X KInDat_next=%X\n",m_Keyrow,m_KInDat_next));
 		}
 	}
 
-	state->m_d_pia0_pb_last=data;
+	m_d_pia0_pb_last=data;
 }
 
-static WRITE8_DEVICE_HANDLER(d_pia0_cb2_w)
+WRITE8_MEMBER(dgn_beta_state::d_pia0_cb2_w)
 {
-	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
 	int	RowNo;
 	LOG_KEYBOARD(("\nCB2 Write\n"));
 
 	/* load keyrow on rising edge of CB2 */
-	if((data==1) && (state->m_d_pia0_cb2_last==0))
+	if((data==1) && (m_d_pia0_cb2_last==0))
 	{
-		RowNo=SelectedKeyrow(state, state->m_RowShifter);
-		state->m_Keyrow=GetKeyRow(state, RowNo);
+		RowNo=SelectedKeyrow(this, m_RowShifter);
+		m_Keyrow=GetKeyRow(this, RowNo);
 
 		/* Output clock rising edge, clock CB2 value into rowshifterlow to high transition */
 		/* In the beta the shift registers are a cmos 4015, and a cmos 4013 in series */
-		state->m_RowShifter = (state->m_RowShifter<<1) | ((state->m_d_pia0_pb_last & KOutDat)>>4);
-		state->m_RowShifter &= 0x3FF;
-		LOG_KEYBOARD(("Rowshifter=$%02X Keyrow=$%02X\n",state->m_RowShifter,state->m_Keyrow));
-		if (VERBOSE) debug_console_printf(space.machine(), "rowshifter clocked, value=%3X, RowNo=%d, Keyrow=%2X\n",state->m_RowShifter,RowNo,state->m_Keyrow);
+		m_RowShifter = (m_RowShifter<<1) | ((m_d_pia0_pb_last & KOutDat)>>4);
+		m_RowShifter &= 0x3FF;
+		LOG_KEYBOARD(("Rowshifter=$%02X Keyrow=$%02X\n",m_RowShifter,m_Keyrow));
+		if (VERBOSE) debug_console_printf(machine(), "rowshifter clocked, value=%3X, RowNo=%d, Keyrow=%2X\n",m_RowShifter,RowNo,m_Keyrow);
 	}
 
-	state->m_d_pia0_cb2_last=data;
+	m_d_pia0_cb2_last=data;
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( d_pia0_irq_a )
+WRITE_LINE_MEMBER(dgn_beta_state::d_pia0_irq_a)
 {
-	cpu0_recalc_irq(device->machine(), state);
+	cpu0_recalc_irq(machine(), state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( d_pia0_irq_b )
+WRITE_LINE_MEMBER(dgn_beta_state::d_pia0_irq_b)
 {
-	cpu0_recalc_firq(device->machine(), state);
+	cpu0_recalc_firq(machine(), state);
 }
 
 /* PIA #1 at $FC24-$FC27 I63
@@ -657,19 +636,18 @@ static WRITE_LINE_DEVICE_HANDLER( d_pia0_irq_b )
         Baud rate               PB1..PB5 ????
 */
 
-static READ8_DEVICE_HANDLER(d_pia1_pa_r)
+READ8_MEMBER(dgn_beta_state::d_pia1_pa_r)
 {
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
+WRITE8_MEMBER(dgn_beta_state::d_pia1_pa_w)
 {
-	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
 	int	HALT_DMA;
-	device_t *fdc = space.machine().device(FDC_TAG);
+	device_t *fdc = machine().device(FDC_TAG);
 
 	/* Only play with halt line if halt bit changed since last write */
-	if((data & 0x80) != state->m_d_pia1_pa_last)
+	if((data & 0x80) != m_d_pia1_pa_last)
 	{
 		/* Bit 7 of $FF24, seems to control HALT on second CPU (through an inverter) */
 		if(data & 0x80)
@@ -678,13 +656,13 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 			HALT_DMA = CLEAR_LINE;
 
 		LOG_HALT(("DMA_CPU HALT=%d\n", HALT_DMA));
-		space.machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_HALT, HALT_DMA);
+		machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_HALT, HALT_DMA);
 
 		/* CPU un-halted let it run ! */
 		if (HALT_DMA == CLEAR_LINE)
-			space.machine().device(MAINCPU_TAG)->execute().yield();
+			machine().device(MAINCPU_TAG)->execute().yield();
 
-		state->m_d_pia1_pa_last = data & 0x80;
+		m_d_pia1_pa_last = data & 0x80;
 	}
 
 	/* Drive selects are binary encoded on PA0 & PA1 */
@@ -695,18 +673,17 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 	LOG_DISK(("Set density %s\n", BIT(data, 6) ? "low" : "high"));
 }
 
-static READ8_DEVICE_HANDLER(d_pia1_pb_r)
+READ8_MEMBER(dgn_beta_state::d_pia1_pb_r)
 {
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER(d_pia1_pb_w)
+WRITE8_MEMBER(dgn_beta_state::d_pia1_pb_w)
 {
-	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
 	int	HALT_CPU;
 
 	/* Only play with halt line if halt bit changed since last write */
-	if((data & 0x02) != state->m_d_pia1_pb_last)
+	if((data & 0x02) != m_d_pia1_pb_last)
 	{
 		/* Bit 1 of $FF26, seems to control HALT on primary CPU */
 		if(data & 0x02)
@@ -715,24 +692,24 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pb_w)
 			HALT_CPU = ASSERT_LINE;
 
 		LOG_HALT(("MAIN_CPU HALT=%d\n", HALT_CPU));
-		space.machine().device(MAINCPU_TAG)->execute().set_input_line(INPUT_LINE_HALT, HALT_CPU);
+		machine().device(MAINCPU_TAG)->execute().set_input_line(INPUT_LINE_HALT, HALT_CPU);
 
-		state->m_d_pia1_pb_last = data & 0x02;
+		m_d_pia1_pb_last = data & 0x02;
 
 		/* CPU un-halted let it run ! */
 		if (HALT_CPU == CLEAR_LINE)
-			space.machine().device(DMACPU_TAG)->execute().yield();
+			machine().device(DMACPU_TAG)->execute().yield();
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( d_pia1_irq_a )
+WRITE_LINE_MEMBER(dgn_beta_state::d_pia1_irq_a)
 {
-	cpu0_recalc_irq(device->machine(), state);
+	cpu0_recalc_irq(machine(), state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( d_pia1_irq_b )
+WRITE_LINE_MEMBER(dgn_beta_state::d_pia1_irq_b)
 {
-	cpu0_recalc_irq(device->machine(), state);
+	cpu0_recalc_irq(machine(), state);
 }
 
 /* PIA #2 at FCC0-FCC3 I28
@@ -744,14 +721,13 @@ static WRITE_LINE_DEVICE_HANDLER( d_pia1_irq_b )
         Graphics control PB0..PB7 ???
         VSYNC intutrupt CB2
 */
-static READ8_DEVICE_HANDLER(d_pia2_pa_r)
+READ8_MEMBER(dgn_beta_state::d_pia2_pa_r)
 {
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
+WRITE8_MEMBER(dgn_beta_state::d_pia2_pa_w)
 {
-	dgn_beta_state *state = space.machine().driver_data<dgn_beta_state>();
 	int OldTask;
 	int OldEnableMap;
 	int NMI;
@@ -762,78 +738,78 @@ static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
 	NMI=(data & 0x80);
 
 	/* only take action if NMI changed */
-	if(NMI != state->m_DMA_NMI_LAST)
+	if(NMI != m_DMA_NMI_LAST)
 	{
 		LOG_INTS(("cpu1 NMI : %d\n", NMI));
 		if(!NMI)
 		{
-			space.machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+			machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 			logerror("device_yield()\n");
-			space.machine().device(DMACPU_TAG)->execute().yield();	/* Let DMA CPU run */
+			machine().device(DMACPU_TAG)->execute().yield();	/* Let DMA CPU run */
 		}
 		else
 		{
-			space.machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+			machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		}
 
-		state->m_DMA_NMI_LAST = NMI;	/* Save it for next time */
+		m_DMA_NMI_LAST = NMI;	/* Save it for next time */
 	}
 
-	OldEnableMap = state->m_EnableMapRegs;
+	OldEnableMap = m_EnableMapRegs;
 	/* Bit 6 seems to enable memory paging */
 	if(data & 0x40)
-		state->m_EnableMapRegs = 0;
+		m_EnableMapRegs = 0;
 	else
-		state->m_EnableMapRegs = 1;
+		m_EnableMapRegs = 1;
 
 	/* Bits 0..3 seem to control which task register is selected */
-	OldTask = state->m_PIATaskReg;
-	state->m_PIATaskReg = data & 0x0F;
+	OldTask = m_PIATaskReg;
+	m_PIATaskReg = data & 0x0F;
 
-	LOG_TASK(("OldTask=$%02X EnableMapRegs=%d OldEnableMap=%d\n", OldTask, state->m_EnableMapRegs, OldEnableMap));
+	LOG_TASK(("OldTask=$%02X EnableMapRegs=%d OldEnableMap=%d\n", OldTask, m_EnableMapRegs, OldEnableMap));
 
 	// Maping was enabled or disabled, select apropreate task reg
 	// and map it in
-	if (state->m_EnableMapRegs != OldEnableMap)
+	if (m_EnableMapRegs != OldEnableMap)
 	{
-		if(state->m_EnableMapRegs)
-			state->m_TaskReg = state->m_PIATaskReg;
+		if(m_EnableMapRegs)
+			m_TaskReg = m_PIATaskReg;
 		else
-			state->m_TaskReg = NoPagingTask;
+			m_TaskReg = NoPagingTask;
 
-		UpdateBanks(space.machine(), 0, IOPage + 1);
+		UpdateBanks(machine(), 0, IOPage + 1);
 	}
 	else
 	{
 		// Update ram banks only if task reg changed and mapping enabled
-		if ((state->m_PIATaskReg != OldTask) && (state->m_EnableMapRegs))
+		if ((m_PIATaskReg != OldTask) && (m_EnableMapRegs))
 		{
-			state->m_TaskReg = state->m_PIATaskReg;
-			UpdateBanks(space.machine(), 0, IOPage + 1);
+			m_TaskReg = m_PIATaskReg;
+			UpdateBanks(machine(), 0, IOPage + 1);
 		}
 	}
-	LOG_TASK(("TaskReg=$%02X PIATaskReg=$%02X\n", state->m_TaskReg, state->m_PIATaskReg));
+	LOG_TASK(("TaskReg=$%02X PIATaskReg=$%02X\n", m_TaskReg, m_PIATaskReg));
 }
 
-static READ8_DEVICE_HANDLER(d_pia2_pb_r)
+READ8_MEMBER(dgn_beta_state::d_pia2_pb_r)
 {
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER(d_pia2_pb_w)
+WRITE8_MEMBER(dgn_beta_state::d_pia2_pb_w)
 {
 	/* Update top video address lines */
-	dgnbeta_vid_set_gctrl(space.machine(), data);
+	dgnbeta_vid_set_gctrl(machine(), data);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( d_pia2_irq_a )
+WRITE_LINE_MEMBER(dgn_beta_state::d_pia2_irq_a)
 {
-	cpu0_recalc_irq(device->machine(), state);
+	cpu0_recalc_irq(machine(), state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( d_pia2_irq_b )
+WRITE_LINE_MEMBER(dgn_beta_state::d_pia2_irq_b)
 {
-	cpu0_recalc_irq(device->machine(), state);
+	cpu0_recalc_irq(machine(), state);
 }
 
 /************************************ Recalculate CPU inturrupts ****************************/
@@ -888,26 +864,26 @@ static void cpu1_recalc_firq(running_machine &machine, int state)
 /********************************************************************************************/
 
 /* The INTRQ line goes through pia2 ca1, in exactly the same way as DRQ from DragonDos does */
-static WRITE_LINE_DEVICE_HANDLER( dgnbeta_fdc_intrq_w )
+WRITE_LINE_MEMBER(dgn_beta_state::dgnbeta_fdc_intrq_w)
 {
-	dgn_beta_state *drvstate = device->machine().driver_data<dgn_beta_state>();
+	device_t *device = machine().device(PIA_2_TAG);
 	LOG_DISK(("dgnbeta_fdc_intrq_w(%d)\n", state));
-    if(drvstate->m_wd2797_written)
+    if(m_wd2797_written)
        downcast<pia6821_device *>(device)->ca1_w(state);
 }
 
 /* DRQ is routed through various logic to the FIRQ inturrupt line on *BOTH* CPUs */
-static WRITE_LINE_DEVICE_HANDLER( dgnbeta_fdc_drq_w )
+WRITE_LINE_MEMBER(dgn_beta_state::dgnbeta_fdc_drq_w)
 {
 	LOG_DISK(("dgnbeta_fdc_drq_w(%d)\n", state));
-	cpu1_recalc_firq(device->machine(), state);
+	cpu1_recalc_firq(machine(), state);
 }
 
 const wd17xx_interface dgnbeta_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(PIA_2_TAG, dgnbeta_fdc_intrq_w),
-	DEVCB_LINE(dgnbeta_fdc_drq_w),
+	DEVCB_DRIVER_LINE_MEMBER(dgn_beta_state,dgnbeta_fdc_intrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(dgn_beta_state,dgnbeta_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

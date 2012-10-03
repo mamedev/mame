@@ -218,11 +218,10 @@ INTERRUPT_GEN_MEMBER(poly88_state::poly88_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( poly88_usart_rxready )
+WRITE_LINE_MEMBER(poly88_state::poly88_usart_rxready)
 {
-	//poly88_state *drvstate = device->machine().driver_data<poly88_state>();
-	//drvstate->m_int_vector = 0xe7;
-	//device->execute().set_input_line(0, HOLD_LINE);
+	//drvm_int_vector = 0xe7;
+	//execute().set_input_line(0, HOLD_LINE);
 }
 
 const i8251_interface poly88_usart_interface=
@@ -232,7 +231,7 @@ const i8251_interface poly88_usart_interface=
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(poly88_usart_rxready),
+	DEVCB_DRIVER_LINE_MEMBER(poly88_state,poly88_usart_rxready),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

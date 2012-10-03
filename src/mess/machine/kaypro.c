@@ -13,9 +13,9 @@
 
 ************************************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( kaypro_interrupt )
+WRITE_LINE_MEMBER(kaypro_state::kaypro_interrupt)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, state);
+	machine().device("maincpu")->execute().set_input_line(0, state);
 }
 
 READ8_MEMBER( kaypro_state::pio_system_r )
@@ -227,7 +227,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 
 const z80sio_interface kaypro_sio_intf =
 {
-	DEVCB_LINE(kaypro_interrupt),	/* interrupt handler */
+	DEVCB_DRIVER_LINE_MEMBER(kaypro_state,kaypro_interrupt),	/* interrupt handler */
 	DEVCB_NULL,			/* DTR changed handler */
 	DEVCB_NULL,			/* RTS changed handler */
 	DEVCB_NULL,			/* BREAK changed handler */
@@ -235,35 +235,35 @@ const z80sio_interface kaypro_sio_intf =
 	DEVCB_NULL			/* receive handler - which channel is this for? */
 };
 
-READ8_DEVICE_HANDLER( kaypro_sio_r )
+READ8_MEMBER(kaypro_state::kaypro_sio_r)
 {
 	if (!offset)
-		return dynamic_cast<z80sio_device*>(device)->data_read(0);
+		return dynamic_cast<z80sio_device*>(machine().device("z80sio"))->data_read(0);
 	else
 	if (offset == 1)
-//      return z80sio_d_r(device, 1);
-		return kay_kbd_d_r(space.machine());
+//      return z80sio_d_r(machine().device("z80sio"), 1);
+		return kay_kbd_d_r(machine());
 	else
 	if (offset == 2)
-		return dynamic_cast<z80sio_device*>(device)->control_read(0);
+		return dynamic_cast<z80sio_device*>(machine().device("z80sio"))->control_read(0);
 	else
-//      return z80sio_c_r(device, 1);
-		return kay_kbd_c_r(space.machine());
+//      return z80sio_c_r(machine().device("z80sio"), 1);
+		return kay_kbd_c_r(machine());
 }
 
-WRITE8_DEVICE_HANDLER( kaypro_sio_w )
+WRITE8_MEMBER(kaypro_state::kaypro_sio_w)
 {
 	if (!offset)
-		dynamic_cast<z80sio_device*>(device)->data_write(0, data);
+		dynamic_cast<z80sio_device*>(machine().device("z80sio"))->data_write(0, data);
 	else
 	if (offset == 1)
-//      z80sio_d_w(device, 1, data);
-		kay_kbd_d_w(space.machine(), data);
+//      z80sio_d_w(machine().device("z80sio"), 1, data);
+		kay_kbd_d_w(machine(), data);
 	else
 	if (offset == 2)
-		dynamic_cast<z80sio_device*>(device)->control_write(0, data);
+		dynamic_cast<z80sio_device*>(machine().device("z80sio"))->control_write(0, data);
 	else
-		dynamic_cast<z80sio_device*>(device)->control_write(1, data);
+		dynamic_cast<z80sio_device*>(machine().device("z80sio"))->control_write(1, data);
 }
 
 

@@ -396,16 +396,14 @@ WRITE8_MEMBER(fm7_state::fm7_init_en_w)
  *  Main CPU: I/O ports 0xfd18 - 0xfd1f
  *  Floppy Disk Controller (MB8877A)
  */
-static WRITE_LINE_DEVICE_HANDLER( fm7_fdc_intrq_w )
+WRITE_LINE_MEMBER(fm7_state::fm7_fdc_intrq_w)
 {
-	fm7_state *drvstate = device->machine().driver_data<fm7_state>();
-	drvstate->m_fdc_irq_flag = state;
+	m_fdc_irq_flag = state;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( fm7_fdc_drq_w )
+WRITE_LINE_MEMBER(fm7_state::fm7_fdc_drq_w)
 {
-	fm7_state *drvstate = device->machine().driver_data<fm7_state>();
-	drvstate->m_fdc_drq_flag = state;
+	m_fdc_drq_flag = state;
 }
 
 READ8_MEMBER(fm7_state::fm7_fdc_r)
@@ -940,14 +938,14 @@ READ8_MEMBER(fm7_state::fm7_fmirq_r)
 	return ret;
 }
 
-static READ8_DEVICE_HANDLER( fm77av_joy_1_r )
+READ8_MEMBER(fm7_state::fm77av_joy_1_r)
 {
-	return space.machine().root_device().ioport("joy1")->read();
+	return machine().root_device().ioport("joy1")->read();
 }
 
-static READ8_DEVICE_HANDLER( fm77av_joy_2_r )
+READ8_MEMBER(fm7_state::fm77av_joy_2_r)
 {
-	return space.machine().root_device().ioport("joy2")->read();
+	return machine().root_device().ioport("joy2")->read();
 }
 
 READ8_MEMBER(fm7_state::fm7_unknown_r)
@@ -1971,8 +1969,8 @@ void fm7_state::machine_reset()
 static const wd17xx_interface fm7_mb8877a_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE(fm7_fdc_intrq_w),
-	DEVCB_LINE(fm7_fdc_drq_w),
+	DEVCB_DRIVER_LINE_MEMBER(fm7_state,fm7_fdc_intrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(fm7_state,fm7_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
@@ -1991,8 +1989,8 @@ static const ym2203_interface fm7_ym_intf =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_HANDLER(fm77av_joy_1_r),
-		DEVCB_HANDLER(fm77av_joy_2_r),
+		DEVCB_DRIVER_MEMBER(fm7_state,fm77av_joy_1_r),
+		DEVCB_DRIVER_MEMBER(fm7_state,fm77av_joy_2_r),
 		DEVCB_NULL,					/* portA write */
 		DEVCB_NULL					/* portB write */
 	},

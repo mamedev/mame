@@ -48,6 +48,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_irisha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(irisha_key);
+	DECLARE_WRITE_LINE_MEMBER(irisha_pic_set_int_line);
 };
 
 

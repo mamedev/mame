@@ -160,23 +160,27 @@ WRITE8_MEMBER( ace_state::ppi_control_w )
 //   pio_r -
 //-------------------------------------------------
 
-static READ8_DEVICE_HANDLER( pio_ad_r )
+READ8_MEMBER(ace_state::pio_ad_r)
 {
+	device_t *device = machine().device(Z80PIO_TAG);
 	return dynamic_cast<z80pio_device*>(device)->data_read(0);
 }
 
-static READ8_DEVICE_HANDLER( pio_bd_r )
+READ8_MEMBER(ace_state::pio_bd_r)
 {
+	device_t *device = machine().device(Z80PIO_TAG);
 	return dynamic_cast<z80pio_device*>(device)->data_read(1);
 }
 
-static READ8_DEVICE_HANDLER( pio_ac_r )
+READ8_MEMBER(ace_state::pio_ac_r)
 {
+	device_t *device = machine().device(Z80PIO_TAG);
 	return dynamic_cast<z80pio_device*>(device)->control_read();
 }
 
-static READ8_DEVICE_HANDLER( pio_bc_r )
+READ8_MEMBER(ace_state::pio_bc_r)
 {
+	device_t *device = machine().device(Z80PIO_TAG);
 	return dynamic_cast<z80pio_device*>(device)->control_read();
 }
 
@@ -185,23 +189,27 @@ static READ8_DEVICE_HANDLER( pio_bc_r )
 //   pio_w -
 //-------------------------------------------------
 
-static WRITE8_DEVICE_HANDLER( pio_ad_w )
+WRITE8_MEMBER(ace_state::pio_ad_w)
 {
+	device_t *device = machine().device(Z80PIO_TAG);
 	dynamic_cast<z80pio_device*>(device)->data_write(0, data);
 }
 
-static WRITE8_DEVICE_HANDLER( pio_bd_w )
+WRITE8_MEMBER(ace_state::pio_bd_w)
 {
+	device_t *device = machine().device(Z80PIO_TAG);
 	dynamic_cast<z80pio_device*>(device)->data_write(1, data);
 }
 
-static WRITE8_DEVICE_HANDLER( pio_ac_w )
+WRITE8_MEMBER(ace_state::pio_ac_w)
 {
+	device_t *device = machine().device(Z80PIO_TAG);
 	dynamic_cast<z80pio_device*>(device)->control_write(0, data);
 }
 
-static WRITE8_DEVICE_HANDLER( pio_bc_w )
+WRITE8_MEMBER(ace_state::pio_bc_w)
 {
+	device_t *device = machine().device(Z80PIO_TAG);
 	dynamic_cast<z80pio_device*>(device)->control_write(1, data);
 }
 
@@ -235,10 +243,10 @@ static ADDRESS_MAP_START( ace_io, AS_IO, 8, ace_state )
 	AM_RANGE(0x43, 0x43) AM_MIRROR(0xff80) AM_READWRITE(ppi_pb_r, ppi_pb_w)
 	AM_RANGE(0x45, 0x45) AM_MIRROR(0xff80) AM_READWRITE(ppi_pc_r, ppi_pc_w)
 	AM_RANGE(0x47, 0x47) AM_MIRROR(0xff80) AM_READWRITE(ppi_control_r, ppi_control_w)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0xff38) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, pio_ad_r, pio_ad_w)
-	AM_RANGE(0x83, 0x83) AM_MIRROR(0xff38) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, pio_bd_r, pio_bd_w)
-	AM_RANGE(0x85, 0x85) AM_MIRROR(0xff38) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, pio_ac_r, pio_ac_w)
-	AM_RANGE(0x87, 0x87) AM_MIRROR(0xff38) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, pio_bc_r, pio_bc_w)
+	AM_RANGE(0x81, 0x81) AM_MIRROR(0xff38) AM_READWRITE(pio_ad_r, pio_ad_w)
+	AM_RANGE(0x83, 0x83) AM_MIRROR(0xff38) AM_READWRITE(pio_bd_r, pio_bd_w)
+	AM_RANGE(0x85, 0x85) AM_MIRROR(0xff38) AM_READWRITE(pio_ac_r, pio_ac_w)
+	AM_RANGE(0x87, 0x87) AM_MIRROR(0xff38) AM_READWRITE(pio_bc_r, pio_bc_w)
 	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_DEVWRITE_LEGACY(AY8910_TAG, ay8910_address_w)
 	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(AY8910_TAG, ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
@@ -468,8 +476,9 @@ static const sp0256_interface sp0256_intf =
 //  I8255A_INTERFACE( ppi_intf )
 //-------------------------------------------------
 
-static READ8_DEVICE_HANDLER( sby_r )
+READ8_MEMBER(ace_state::sby_r)
 {
+	device_t *device = machine().device(SP0256AL2_TAG);
 	/*
 
         bit     description
@@ -488,8 +497,9 @@ static READ8_DEVICE_HANDLER( sby_r )
 	return sp0256_sby_r(device);
 }
 
-static WRITE8_DEVICE_HANDLER( ald_w )
+WRITE8_MEMBER(ace_state::ald_w)
 {
+	device_t *device = machine().device(SP0256AL2_TAG);
 	/*
 
         bit     description
@@ -515,8 +525,8 @@ static I8255A_INTERFACE( ppi_intf )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(SP0256AL2_TAG, sby_r),
-	DEVCB_DEVICE_HANDLER(SP0256AL2_TAG, ald_w),
+	DEVCB_DRIVER_MEMBER(ace_state,sby_r),
+	DEVCB_DRIVER_MEMBER(ace_state,ald_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

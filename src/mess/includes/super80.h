@@ -89,6 +89,7 @@ public:
 	TIMER_CALLBACK_MEMBER(super80_timer);
 	TIMER_CALLBACK_MEMBER(super80_reset);
 	TIMER_CALLBACK_MEMBER(super80_halfspeed);
+	DECLARE_READ8_MEMBER(pio_port_b_r);
 };
 
 

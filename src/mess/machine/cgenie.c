@@ -419,31 +419,30 @@ INTERRUPT_GEN_MEMBER(cgenie_state::cgenie_timer_interrupt)
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( cgenie_fdc_intrq_w )
+WRITE_LINE_MEMBER(cgenie_state::cgenie_fdc_intrq_w)
 {
-	cgenie_state *drvstate = device->machine().driver_data<cgenie_state>();
 	/* if disc hardware is not enabled, do not cause an int */
-	if (!( drvstate->ioport("DSW0")->read() & 0x80 ))
+	if (!( ioport("DSW0")->read() & 0x80 ))
 		return;
 
 	if (state)
 	{
-		if( (drvstate->m_irq_status & IRQ_FDC) == 0 )
+		if( (m_irq_status & IRQ_FDC) == 0 )
 		{
-			drvstate->m_irq_status |= IRQ_FDC;
-			device->machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+			m_irq_status |= IRQ_FDC;
+			machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 		}
 	}
 	else
 	{
-		drvstate->m_irq_status &= ~IRQ_FDC;
+		m_irq_status &= ~IRQ_FDC;
 	}
 }
 
 const wd17xx_interface cgenie_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE(cgenie_fdc_intrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(cgenie_state,cgenie_fdc_intrq_w),
 	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
@@ -601,15 +600,13 @@ INTERRUPT_GEN_MEMBER(cgenie_state::cgenie_frame_interrupt)
 }
 
 
-READ8_DEVICE_HANDLER( cgenie_sh_control_port_r )
+READ8_MEMBER(cgenie_state::cgenie_sh_control_port_r)
 {
-	cgenie_state *state = space.machine().driver_data<cgenie_state>();
-	return state->m_control_port;
+	return m_control_port;
 }
 
-WRITE8_DEVICE_HANDLER( cgenie_sh_control_port_w )
+WRITE8_MEMBER(cgenie_state::cgenie_sh_control_port_w)
 {
-	cgenie_state *state = space.machine().driver_data<cgenie_state>();
-	state->m_control_port = data;
-	ay8910_address_w(device, space, offset, data);
+	m_control_port = data;
+	ay8910_address_w(machine().device("ay8910"), space, offset, data);
 }

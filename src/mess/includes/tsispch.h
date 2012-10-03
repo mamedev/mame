@@ -43,6 +43,10 @@ public:
 	DECLARE_READ16_MEMBER(dsp_status_r);
 	DECLARE_WRITE16_MEMBER(dsp_status_w);
 	DECLARE_DRIVER_INIT(prose2k);
+	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
+	DECLARE_WRITE_LINE_MEMBER(i8251_txempty_int);
+	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);
+	DECLARE_WRITE_LINE_MEMBER(pic8259_set_int_line);
 };
 
 

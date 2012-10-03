@@ -260,16 +260,16 @@ static const ay8910_interface svi318_ay8910_interface =
 	DEVCB_DRIVER_MEMBER(svi318_state, svi318_psg_port_b_w)
 };
 
-static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
+WRITE_LINE_MEMBER(svi318_state::vdp_interrupt)
 {
-    device->machine().device("maincpu")->execute().set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
+    machine().device("maincpu")->execute().set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
 static TMS9928A_INTERFACE(svi318_tms9928a_interface)
 {
 	"screen",
     0x4000,
-    DEVCB_LINE(vdp_interrupt)
+    DEVCB_DRIVER_LINE_MEMBER(svi318_state,vdp_interrupt)
 };
 
 static const cassette_interface svi318_cassette_interface =

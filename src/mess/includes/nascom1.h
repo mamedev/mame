@@ -50,6 +50,10 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_nascom1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_nascom2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(nascom2_fdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(nascom2_fdc_drq_w);
+	DECLARE_READ8_MEMBER(nascom1_hd6402_si);
+	DECLARE_WRITE8_MEMBER(nascom1_hd6402_so);
 };
 
 
@@ -60,8 +64,4 @@ extern const wd17xx_interface nascom2_wd17xx_interface;
 DEVICE_IMAGE_LOAD( nascom1_cassette );
 DEVICE_IMAGE_UNLOAD( nascom1_cassette );
 SNAPSHOT_LOAD( nascom1 );
-
-DECLARE_READ8_DEVICE_HANDLER( nascom1_hd6402_si );
-DECLARE_WRITE8_DEVICE_HANDLER( nascom1_hd6402_so );
-
 #endif /* NASCOM1_H_ */

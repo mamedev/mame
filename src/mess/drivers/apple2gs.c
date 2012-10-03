@@ -182,39 +182,35 @@ static ADDRESS_MAP_START( apple2gs_map, AS_PROGRAM, 8, apple2gs_state )
 	/* nothing in the address map - everything is added dynamically */
 ADDRESS_MAP_END
 
-static WRITE8_DEVICE_HANDLER(a2bus_irq_w)
+WRITE8_MEMBER(apple2gs_state::a2bus_irq_w)
 {
     if (data)
     {
-        apple2gs_add_irq(space.machine(), IRQ_SLOT);
+        apple2gs_add_irq(machine(), IRQ_SLOT);
     }
     else
     {
-        apple2gs_remove_irq(space.machine(), IRQ_SLOT);
+        apple2gs_remove_irq(machine(), IRQ_SLOT);
     }
 }
 
-static WRITE8_DEVICE_HANDLER(a2bus_nmi_w)
+WRITE8_MEMBER(apple2gs_state::a2bus_nmi_w)
 {
-    apple2gs_state *a2 = space.machine().driver_data<apple2gs_state>();
-
-    a2->m_maincpu->set_input_line(INPUT_LINE_NMI, data);
+    m_maincpu->set_input_line(INPUT_LINE_NMI, data);
 }
 
-static WRITE8_DEVICE_HANDLER(a2bus_inh_w)
+WRITE8_MEMBER(apple2gs_state::a2bus_inh_w)
 {
-    apple2_state *a2 = space.machine().driver_data<apple2_state>();
-
-    a2->m_inh_slot = data;
-    apple2_update_memory(space.machine());
+    m_inh_slot = data;
+    apple2_update_memory(machine());
 }
 
 static const struct a2bus_interface a2bus_intf =
 {
     // interrupt lines
-    DEVCB_HANDLER(a2bus_irq_w),
-    DEVCB_HANDLER(a2bus_nmi_w),
-    DEVCB_HANDLER(a2bus_inh_w)
+    DEVCB_DRIVER_MEMBER(apple2gs_state,a2bus_irq_w),
+    DEVCB_DRIVER_MEMBER(apple2gs_state,a2bus_nmi_w),
+    DEVCB_DRIVER_MEMBER(apple2gs_state,a2bus_inh_w)
 };
 
 static SLOT_INTERFACE_START(apple2_cards)

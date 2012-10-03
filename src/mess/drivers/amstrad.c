@@ -126,12 +126,12 @@ Some bugs left :
    -----------------------------*/
 static I8255_INTERFACE( amstrad_ppi8255_interface )
 {
-	DEVCB_HANDLER(amstrad_ppi_porta_r),	/* port A read */
-	DEVCB_HANDLER(amstrad_ppi_porta_w),	/* port A write */
-	DEVCB_HANDLER(amstrad_ppi_portb_r),	/* port B read */
+	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_porta_r),	/* port A read */
+	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_porta_w),	/* port A write */
+	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_portb_r),	/* port B read */
 	DEVCB_NULL,							/* port B write */
 	DEVCB_NULL,							/* port C read */
-	DEVCB_HANDLER(amstrad_ppi_portc_w)	/* port C write */
+	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_portc_w)	/* port C write */
 };
 
 
@@ -148,7 +148,7 @@ static const upd765_interface amstrad_upd765_interface =
 /* Aleste uses an 8272A, with the interrupt flag visible on PPI port B */
 static const upd765_interface aleste_8272_interface =
 {
-	DEVCB_LINE(aleste_interrupt),
+	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,aleste_interrupt),
 	DEVCB_NULL,
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,

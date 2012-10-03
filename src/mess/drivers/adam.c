@@ -1497,23 +1497,21 @@ INPUT_PORTS_END
 //  TMS9928a_interface tms9928a_interface
 //-------------------------------------------------
 
-static WRITE_LINE_DEVICE_HANDLER(adam_vdp_interrupt)
+WRITE_LINE_MEMBER(adam_state::adam_vdp_interrupt)
 {
-	adam_state *driver_state = device->machine().driver_data<adam_state>();
-
-	if (state && !driver_state->m_vdp_nmi)
+	if (state && !m_vdp_nmi)
 	{
-		device->machine().device(Z80_TAG)->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		machine().device(Z80_TAG)->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 
-	driver_state->m_vdp_nmi = state;
+	m_vdp_nmi = state;
 }
 
 static TMS9928A_INTERFACE(adam_tms9928a_interface)
 {
 	"screen",
 	0x4000,
-	DEVCB_LINE(adam_vdp_interrupt)
+	DEVCB_DRIVER_LINE_MEMBER(adam_state,adam_vdp_interrupt)
 };
 
 //-------------------------------------------------

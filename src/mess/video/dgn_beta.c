@@ -240,22 +240,20 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 
 }
 
-static WRITE_LINE_DEVICE_HANDLER( dgnbeta_vsync_changed )
+WRITE_LINE_MEMBER(dgn_beta_state::dgnbeta_vsync_changed)
 {
-	dgn_beta_state *st = device->machine().driver_data<dgn_beta_state>();
-
-	st->m_beta_VSync=state;
-	if (!st->m_beta_VSync)
+	m_beta_VSync=state;
+	if (!m_beta_VSync)
 	{
-		st->m_FlashCount++;
-		if(st->m_FlashCount==10)
+		m_FlashCount++;
+		if(m_FlashCount==10)
 		{
-			st->m_FlashCount=0;			// Reset counter
-			st->m_FlashBit=(!st->m_FlashBit) & 0x01;	// Invert flash bit.
+			m_FlashCount=0;			// Reset counter
+			m_FlashBit=(!m_FlashBit) & 0x01;	// Invert flash bit.
 		}
 	}
 
-	dgn_beta_frame_interrupt(device->machine(), state);
+	dgn_beta_frame_interrupt(machine(), state);
 }
 
 const mc6845_interface dgnbeta_crtc6845_interface =
@@ -268,7 +266,7 @@ const mc6845_interface dgnbeta_crtc6845_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(dgnbeta_vsync_changed),
+	DEVCB_DRIVER_LINE_MEMBER(dgn_beta_state,dgnbeta_vsync_changed),
 	NULL
 };
 

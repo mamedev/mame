@@ -34,12 +34,11 @@ static void svi318_set_banks(running_machine &machine);
 
 /* Serial ports */
 
-static WRITE_LINE_DEVICE_HANDLER( svi318_ins8250_interrupt )
+WRITE_LINE_MEMBER(svi318_state::svi318_ins8250_interrupt)
 {
-	svi318_state *drvstate = device->machine().driver_data<svi318_state>();
-	if (drvstate->m_svi.bankLow != SVI_CART)
+	if (m_svi.bankLow != SVI_CART)
 	{
-		device->machine().device("maincpu")->execute().set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
+		machine().device("maincpu")->execute().set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
 	}
 }
 #if 0
@@ -55,7 +54,7 @@ const ins8250_interface svi318_ins8250_interface[2]=
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_LINE(svi318_ins8250_interrupt),
+		DEVCB_DRIVER_LINE_MEMBER(svi318_state,svi318_ins8250_interrupt),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
@@ -63,7 +62,7 @@ const ins8250_interface svi318_ins8250_interface[2]=
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_LINE(svi318_ins8250_interrupt),
+		DEVCB_DRIVER_LINE_MEMBER(svi318_state,svi318_ins8250_interrupt),
 		DEVCB_NULL,
 		DEVCB_NULL
 	}
@@ -144,15 +143,15 @@ DEVICE_IMAGE_UNLOAD( svi318_cart )
   8  CASR     Cassette, Read data
 */
 
-static READ8_DEVICE_HANDLER ( svi318_ppi_port_a_r )
+READ8_MEMBER(svi318_state::svi318_ppi_port_a_r)
 {
 	int data = 0x0f;
 
-	if ((space.machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0038)
+	if ((machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0038)
 		data |= 0x80;
-	if (!svi318_cassette_present(space.machine(), 0))
+	if (!svi318_cassette_present(machine(), 0))
 		data |= 0x40;
-	data |= space.machine().root_device().ioport("BUTTONS")->read() & 0x30;
+	data |= machine().root_device().ioport("BUTTONS")->read() & 0x30;
 
 	return data;
 }
@@ -170,18 +169,17 @@ static READ8_DEVICE_HANDLER ( svi318_ppi_port_a_r )
   8  IN7  Keyboard, Column status of selected line
 */
 
-static READ8_DEVICE_HANDLER ( svi318_ppi_port_b_r )
+READ8_MEMBER(svi318_state::svi318_ppi_port_b_r)
 {
-	svi318_state *state = space.machine().driver_data<svi318_state>();
 	int row;
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5",
 		"LINE6", "LINE7", "LINE8", "LINE9", "LINE10"
 	};
 
-	row = state->m_svi.keyboard_row;
+	row = m_svi.keyboard_row;
 	if (row <= 10)
-		return space.machine().root_device().ioport(keynames[row])->read();
+		return machine().root_device().ioport(keynames[row])->read();
 
 	return 0xff;
 }
@@ -199,39 +197,38 @@ static READ8_DEVICE_HANDLER ( svi318_ppi_port_b_r )
   8  SOUND  Keyboard, Click sound bit (pulse)
 */
 
-static WRITE8_DEVICE_HANDLER ( svi318_ppi_port_c_w )
+WRITE8_MEMBER(svi318_state::svi318_ppi_port_c_w)
 {
-	svi318_state *state = space.machine().driver_data<svi318_state>();
 	int val;
 
 	/* key click */
 	val = (data & 0x80) ? 0x3e : 0;
 	val += (data & 0x40) ? 0x3e : 0;
-	space.machine().device<dac_device>("dac")->write_signed8(val);
+	machine().device<dac_device>("dac")->write_signed8(val);
 
 	/* cassette motor on/off */
-	if (svi318_cassette_present(space.machine(), 0))
+	if (svi318_cassette_present(machine(), 0))
 	{
 
-			space.machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(
+			machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(
 			(data & 0x10) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,
 			CASSETTE_MOTOR_DISABLED);
 	}
 
 	/* cassette signal write */
-	space.machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x20) ? -1.0 : +1.0);
+	machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x20) ? -1.0 : +1.0);
 
-	state->m_svi.keyboard_row = data & 0x0F;
+	m_svi.keyboard_row = data & 0x0F;
 }
 
 I8255_INTERFACE( svi318_ppi8255_interface )
 {
-	DEVCB_HANDLER(svi318_ppi_port_a_r),
+	DEVCB_DRIVER_MEMBER(svi318_state,svi318_ppi_port_a_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(svi318_ppi_port_b_r),
+	DEVCB_DRIVER_MEMBER(svi318_state,svi318_ppi_port_b_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(svi318_ppi_port_c_w)
+	DEVCB_DRIVER_MEMBER(svi318_state,svi318_ppi_port_c_w)
 };
 
 WRITE8_MEMBER(svi318_state::svi318_ppi_w)
@@ -288,23 +285,21 @@ WRITE8_MEMBER(svi318_state::svi318_psg_port_b_w)
 
 /* Disk drives  */
 
-static WRITE_LINE_DEVICE_HANDLER( svi_fdc_intrq_w )
+WRITE_LINE_MEMBER(svi318_state::svi_fdc_intrq_w)
 {
-	svi318_state *drvstate = device->machine().driver_data<svi318_state>();
-	drvstate->m_fdc.irq = state;
+	m_fdc.irq = state;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( svi_fdc_drq_w )
+WRITE_LINE_MEMBER(svi318_state::svi_fdc_drq_w)
 {
-	svi318_state *drvstate = device->machine().driver_data<svi318_state>();
-	drvstate->m_fdc.drq = state;
+	m_fdc.drq = state;
 }
 
 const wd17xx_interface svi_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE(svi_fdc_intrq_w),
-	DEVCB_LINE(svi_fdc_drq_w),
+	DEVCB_DRIVER_LINE_MEMBER(svi318_state,svi_fdc_intrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(svi318_state,svi_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 

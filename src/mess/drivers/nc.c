@@ -837,50 +837,48 @@ WRITE8_MEMBER(nc_state::nc100_uart_control_w)
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER(nc100_tc8521_alarm_callback)
+WRITE_LINE_MEMBER(nc_state::nc100_tc8521_alarm_callback)
 {
 	// TODO
 }
 
-static WRITE_LINE_DEVICE_HANDLER( nc100_txrdy_callback )
+WRITE_LINE_MEMBER(nc_state::nc100_txrdy_callback)
 {
-	nc_state *drvstate = device->machine().driver_data<nc_state>();
-	drvstate->m_irq_latch &= ~(1 << 1);
+	m_irq_latch &= ~(1 << 1);
 
 	/* uart on? */
-	if ((drvstate->m_uart_control & (1 << 3)) == 0)
+	if ((m_uart_control & (1 << 3)) == 0)
 	{
 		if (state)
 		{
 			logerror("tx ready\n");
-			drvstate->m_irq_latch |= (1 << 1);
+			m_irq_latch |= (1 << 1);
 		}
 	}
 
-	nc_update_interrupts(device->machine());
+	nc_update_interrupts(machine());
 }
 
-static WRITE_LINE_DEVICE_HANDLER( nc100_rxrdy_callback )
+WRITE_LINE_MEMBER(nc_state::nc100_rxrdy_callback)
 {
-	nc_state *drvstate = device->machine().driver_data<nc_state>();
-	drvstate->m_irq_latch &= ~(1<<0);
+	m_irq_latch &= ~(1<<0);
 
-	if ((drvstate->m_uart_control & (1<<3))==0)
+	if ((m_uart_control & (1<<3))==0)
 	{
 		if (state)
 		{
 			logerror("rx ready\n");
-			drvstate->m_irq_latch |= (1<<0);
+			m_irq_latch |= (1<<0);
 		}
 	}
 
-	nc_update_interrupts(device->machine());
+	nc_update_interrupts(machine());
 }
 
 
 static RP5C01_INTERFACE( rtc_intf )
 {
-	DEVCB_LINE(nc100_tc8521_alarm_callback)
+	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc100_tc8521_alarm_callback)
 };
 
 static const i8251_interface nc100_uart_interface =
@@ -890,28 +888,27 @@ static const i8251_interface nc100_uart_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(nc100_rxrdy_callback),
-	DEVCB_LINE(nc100_txrdy_callback),
+	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc100_rxrdy_callback),
+	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc100_txrdy_callback),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
 
 
-static WRITE_LINE_DEVICE_HANDLER( nc100_centronics_ack_w )
+WRITE_LINE_MEMBER(nc_state::nc100_centronics_ack_w)
 {
-	nc_state *drvstate = device->machine().driver_data<nc_state>();
 	if (state)
-		drvstate->m_irq_status |= 0x04;
+		m_irq_status |= 0x04;
 	else
-		drvstate->m_irq_status &= ~0x04;
+		m_irq_status &= ~0x04;
 
 	/* trigger an int if the irq is set */
-	nc_update_interrupts(device->machine());
+	nc_update_interrupts(machine());
 }
 
 static const centronics_interface nc100_centronics_config =
 {
-	DEVCB_LINE(nc100_centronics_ack_w),
+	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc100_centronics_ack_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -1183,21 +1180,20 @@ WRITE8_MEMBER(nc_state::nc200_display_memory_start_w)
 #endif
 
 
-static WRITE_LINE_DEVICE_HANDLER( nc200_centronics_ack_w )
+WRITE_LINE_MEMBER(nc_state::nc200_centronics_ack_w)
 {
-	nc_state *drvstate = device->machine().driver_data<nc_state>();
 	if (state)
-		drvstate->m_irq_status |= 0x01;
+		m_irq_status |= 0x01;
 	else
-		drvstate->m_irq_status &= ~0x01;
+		m_irq_status &= ~0x01;
 
 	/* trigger an int if the irq is set */
-	nc_update_interrupts(device->machine());
+	nc_update_interrupts(machine());
 }
 
 static const centronics_interface nc200_centronics_config =
 {
-	DEVCB_LINE(nc200_centronics_ack_w),
+	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc200_centronics_ack_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -1222,30 +1218,29 @@ static void nc200_refresh_uart_interrupt(running_machine &machine)
 	nc_update_interrupts(machine);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( nc200_txrdy_callback )
+WRITE_LINE_MEMBER(nc_state::nc200_txrdy_callback)
 {
-	//nc_state *drvstate = machine.driver_data<nc_state>();
-//  drvstate->m_nc200_uart_interrupt_irq &=~(1<<0);
+	//nc_state *drvstate = machine().driver_data<nc_state>();
+//  m_nc200_uart_interrupt_irq &=~(1<<0);
 //
 //  if (state)
 //  {
-//      drvstate->m_nc200_uart_interrupt_irq |=(1<<0);
+//      m_nc200_uart_interrupt_irq |=(1<<0);
 //  }
 //
-//  nc200_refresh_uart_interrupt(device->machine());
+//  nc200_refresh_uart_interrupt(machine());
 }
 
-static WRITE_LINE_DEVICE_HANDLER( nc200_rxrdy_callback )
+WRITE_LINE_MEMBER(nc_state::nc200_rxrdy_callback)
 {
-	nc_state *drvstate = device->machine().driver_data<nc_state>();
-	drvstate->m_nc200_uart_interrupt_irq &=~(1<<1);
+	m_nc200_uart_interrupt_irq &=~(1<<1);
 
 	if (state)
 	{
-		drvstate->m_nc200_uart_interrupt_irq |=(1<<1);
+		m_nc200_uart_interrupt_irq |=(1<<1);
 	}
 
-	nc200_refresh_uart_interrupt(device->machine());
+	nc200_refresh_uart_interrupt(machine());
 }
 
 static const i8251_interface nc200_uart_interface=
@@ -1255,37 +1250,36 @@ static const i8251_interface nc200_uart_interface=
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(nc200_rxrdy_callback),
-	DEVCB_LINE(nc200_txrdy_callback),
+	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc200_rxrdy_callback),
+	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc200_txrdy_callback),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
 
 
-static WRITE_LINE_DEVICE_HANDLER( nc200_fdc_interrupt )
+WRITE_LINE_MEMBER(nc_state::nc200_fdc_interrupt)
 {
-	nc_state *drvstate = device->machine().driver_data<nc_state>();
 #if 0
-    drvstate->m_irq_latch &=~(1<<5);
+    m_irq_latch &=~(1<<5);
 
     if (state)
     {
-            drvstate->m_irq_latch |=(1<<5);
+            m_irq_latch |=(1<<5);
     }
 #endif
-    drvstate->m_irq_status &=~(1<<5);
+    m_irq_status &=~(1<<5);
 
     if (state)
     {
-            drvstate->m_irq_status |=(1<<5);
+            m_irq_status |=(1<<5);
     }
 
-    nc_update_interrupts(device->machine());
+    nc_update_interrupts(machine());
 }
 
 static const upd765_interface nc200_upd765_interface=
 {
-    DEVCB_LINE(nc200_fdc_interrupt),
+    DEVCB_DRIVER_LINE_MEMBER(nc_state,nc200_fdc_interrupt),
     DEVCB_NULL,
     NULL,
     UPD765_RDY_PIN_CONNECTED,

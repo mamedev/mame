@@ -281,6 +281,12 @@ public:
 	TIMER_CALLBACK_MEMBER(towns_delay_cdda);
 	TIMER_CALLBACK_MEMBER(towns_sprite_done);
 	TIMER_CALLBACK_MEMBER(towns_vblank_end);
+	DECLARE_WRITE_LINE_MEMBER(towns_scsi_irq);
+	DECLARE_WRITE_LINE_MEMBER(towns_scsi_drq);
+	DECLARE_WRITE_LINE_MEMBER(towns_pic_irq);
+	DECLARE_WRITE_LINE_MEMBER(towns_pit_out0_changed);
+	DECLARE_WRITE_LINE_MEMBER(towns_pit_out1_changed);
+	DECLARE_READ8_MEMBER(get_slave_ack);
 };
 
 class marty_state : public towns_state

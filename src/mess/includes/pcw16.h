@@ -101,6 +101,14 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(pcw16_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(pcw16_keyboard_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_timer_callback);
+	DECLARE_WRITE_LINE_MEMBER(pcw16_com_interrupt_1);
+	DECLARE_WRITE_LINE_MEMBER(pcw16_com_interrupt_2);
+	DECLARE_WRITE_LINE_MEMBER(pcw16_com_tx_0);
+	DECLARE_WRITE_LINE_MEMBER(pcw16_com_dtr_0);
+	DECLARE_WRITE_LINE_MEMBER(pcw16_com_rts_0);
+	DECLARE_WRITE_LINE_MEMBER(pcw16_com_tx_1);
+	DECLARE_WRITE_LINE_MEMBER(pcw16_com_dtr_1);
+	DECLARE_WRITE_LINE_MEMBER(pcw16_com_rts_1);
 };
 
 #endif /* PCW16_H_ */

@@ -50,6 +50,16 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_b2m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(b2m_vblank_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(bm2_pit_out1);
+	DECLARE_WRITE8_MEMBER(b2m_8255_porta_w);
+	DECLARE_WRITE8_MEMBER(b2m_8255_portb_w);
+	DECLARE_WRITE8_MEMBER(b2m_8255_portc_w);
+	DECLARE_READ8_MEMBER(b2m_8255_portb_r);
+	DECLARE_WRITE8_MEMBER(b2m_ext_8255_portc_w);
+	DECLARE_READ8_MEMBER(b2m_romdisk_porta_r);
+	DECLARE_WRITE8_MEMBER(b2m_romdisk_portb_w);
+	DECLARE_WRITE8_MEMBER(b2m_romdisk_portc_w);
+	DECLARE_WRITE_LINE_MEMBER(b2m_pic_set_int_line);
 };
 
 /*----------- defined in machine/b2m.c -----------*/

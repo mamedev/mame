@@ -222,26 +222,20 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #define PADDLE_SENSITIVITY      10
 #define PADDLE_AUTOCENTER       0
 
-static WRITE8_DEVICE_HANDLER(a2bus_irq_w)
+WRITE8_MEMBER(apple2_state::a2bus_irq_w)
 {
-    apple2_state *a2 = space.machine().driver_data<apple2_state>();
-
-    a2->m_maincpu->set_input_line(M6502_IRQ_LINE, data);
+    m_maincpu->set_input_line(M6502_IRQ_LINE, data);
 }
 
-static WRITE8_DEVICE_HANDLER(a2bus_nmi_w)
+WRITE8_MEMBER(apple2_state::a2bus_nmi_w)
 {
-    apple2_state *a2 = space.machine().driver_data<apple2_state>();
-
-    a2->m_maincpu->set_input_line(INPUT_LINE_NMI, data);
+    m_maincpu->set_input_line(INPUT_LINE_NMI, data);
 }
 
-static WRITE8_DEVICE_HANDLER(a2bus_inh_w)
+WRITE8_MEMBER(apple2_state::a2bus_inh_w)
 {
-    apple2_state *a2 = space.machine().driver_data<apple2_state>();
-
-    a2->m_inh_slot = data;
-    apple2_update_memory(space.machine());
+    m_inh_slot = data;
+    apple2_update_memory(machine());
 }
 
 /***************************************************************************
@@ -596,16 +590,16 @@ static const cassette_interface apple2_cassette_interface =
 static const struct a2bus_interface a2bus_intf =
 {
 	// interrupt lines
-	DEVCB_HANDLER(a2bus_irq_w),
-	DEVCB_HANDLER(a2bus_nmi_w),
-    DEVCB_HANDLER(a2bus_inh_w)
+	DEVCB_DRIVER_MEMBER(apple2_state,a2bus_irq_w),
+	DEVCB_DRIVER_MEMBER(apple2_state,a2bus_nmi_w),
+    DEVCB_DRIVER_MEMBER(apple2_state,a2bus_inh_w)
 };
 
 static const struct a2eauxslot_interface a2eauxbus_intf =
 {
 	// interrupt lines
-	DEVCB_HANDLER(a2bus_irq_w),
-	DEVCB_HANDLER(a2bus_nmi_w)
+	DEVCB_DRIVER_MEMBER(apple2_state,a2bus_irq_w),
+	DEVCB_DRIVER_MEMBER(apple2_state,a2bus_nmi_w)
 };
 
 static SLOT_INTERFACE_START(apple2_slot0_cards)

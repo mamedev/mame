@@ -127,6 +127,7 @@ public:
 	int m_wr1;
 	int m_track;
 	TIMER_DEVICE_CALLBACK_MEMBER(paddle_tick);
+	DECLARE_WRITE_LINE_MEMBER(adam_vdp_interrupt);
 };
 
 #endif

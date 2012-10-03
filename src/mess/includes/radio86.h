@@ -40,6 +40,16 @@ public:
 	DECLARE_PALETTE_INIT(radio86);
 	UINT32 screen_update_radio86(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(radio86_reset);
+	DECLARE_READ8_MEMBER(radio86_8255_portb_r2);
+	DECLARE_READ8_MEMBER(radio86_8255_portc_r2);
+	DECLARE_WRITE8_MEMBER(radio86_8255_porta_w2);
+	DECLARE_WRITE8_MEMBER(radio86_8255_portc_w2);
+	DECLARE_READ8_MEMBER(rk7007_8255_portc_r);
+	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	DECLARE_READ8_MEMBER(radio86_romdisk_porta_r);
+	DECLARE_WRITE8_MEMBER(radio86_romdisk_portb_w);
+	DECLARE_WRITE8_MEMBER(radio86_romdisk_portc_w);
+	DECLARE_WRITE8_MEMBER(mikrosha_8255_font_page_w);
 };
 
 

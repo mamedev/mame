@@ -115,6 +115,8 @@ public:
 	int m_bell;				/* bell output */
 
 	DECLARE_PALETTE_INIT(kc85);
+	DECLARE_WRITE_LINE_MEMBER(kc85_sod_w);
+	DECLARE_READ_LINE_MEMBER(kc85_sid_r);
 };
 
 class trsm100_state : public kc85_state

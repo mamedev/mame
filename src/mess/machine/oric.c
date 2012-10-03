@@ -134,36 +134,33 @@ WRITE8_MEMBER(oric_state::oric_psg_porta_write)
 /* bit 0 = BC1 state */
 
 /* this port is also used to read printer data */
-static READ8_DEVICE_HANDLER ( oric_via_in_a_func )
+READ8_MEMBER(oric_state::oric_via_in_a_func)
 {
-	oric_state *state = space.machine().driver_data<oric_state>();
-
 	/*logerror("port a read\r\n"); */
 
 	/* access psg? */
-	if (state->m_psg_control!=0)
+	if (m_psg_control!=0)
 	{
 		/* if psg is in read register state return reg data */
-		if (state->m_psg_control==0x01)
-			return ay8910_r(space.machine().device("ay8912"), space, 0);
+		if (m_psg_control==0x01)
+			return ay8910_r(machine().device("ay8912"), space, 0);
 
 		/* return high-impedance */
 		return 0x0ff;
 	}
 
 	/* correct?? */
-	return state->m_via_port_a_data;
+	return m_via_port_a_data;
 }
 
-static READ8_DEVICE_HANDLER ( oric_via_in_b_func )
+READ8_MEMBER(oric_state::oric_via_in_b_func)
 {
-	oric_state *state = space.machine().driver_data<oric_state>();
 	int data;
 
-	oric_keyboard_sense_refresh(space.machine());
+	oric_keyboard_sense_refresh(machine());
 
-	data = state->m_key_sense_bit;
-	data |= state->m_keyboard_line & 0x07;
+	data = m_key_sense_bit;
+	data |= m_keyboard_line & 0x07;
 
 	return data;
 }
@@ -209,19 +206,18 @@ static void oric_psg_connection_refresh(address_space &space)
 	}
 }
 
-static WRITE8_DEVICE_HANDLER ( oric_via_out_a_func )
+WRITE8_MEMBER(oric_state::oric_via_out_a_func)
 {
-	oric_state *state = space.machine().driver_data<oric_state>();
-	state->m_via_port_a_data = data;
+	m_via_port_a_data = data;
 
 	oric_psg_connection_refresh(space);
 
 
-	if (state->m_psg_control==0)
+	if (m_psg_control==0)
 	{
 		/* if psg not selected, write to printer */
-		centronics_device *centronics = space.machine().device<centronics_device>("centronics");
-		centronics->write(space.machine().driver_data()->generic_space(), 0, data);
+		centronics_device *centronics = machine().device<centronics_device>("centronics");
+		centronics->write(machine().driver_data()->generic_space(), 0, data);
 	}
 }
 
@@ -281,61 +277,56 @@ TIMER_CALLBACK_MEMBER(oric_state::oric_refresh_tape)
 	via_0->write_cb1(data);
 }
 
-static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
+WRITE8_MEMBER(oric_state::oric_via_out_b_func)
 {
-	oric_state *state = space.machine().driver_data<oric_state>();
-	centronics_device *centronics = space.machine().device<centronics_device>("centronics");
+	centronics_device *centronics = machine().device<centronics_device>("centronics");
 
 	/* KEYBOARD */
-	state->m_keyboard_line = data & 0x07;
+	m_keyboard_line = data & 0x07;
 
 	/* CASSETTE */
 	/* cassette motor control */
-	cassette_device_image(space.machine())->change_state(
+	cassette_device_image(machine())->change_state(
 		(data & 0x40) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MOTOR_DISABLED);
 
 	/* cassette data out */
-	cassette_device_image(space.machine())->output((data & (1<<7)) ? -1.0 : +1.0);
+	cassette_device_image(machine())->output((data & (1<<7)) ? -1.0 : +1.0);
 
 	/* centronics STROBE is connected to PB4 */
 	centronics->strobe_w(BIT(data, 4));
 
 	oric_psg_connection_refresh(space);
-	state->m_previous_portb_data = data;
+	m_previous_portb_data = data;
 }
 
 
-static READ8_DEVICE_HANDLER ( oric_via_in_ca2_func )
+READ8_MEMBER(oric_state::oric_via_in_ca2_func)
 {
-	oric_state *state = space.machine().driver_data<oric_state>();
-	return state->m_psg_control & 1;
+	return m_psg_control & 1;
 }
 
-static READ8_DEVICE_HANDLER ( oric_via_in_cb2_func )
+READ8_MEMBER(oric_state::oric_via_in_cb2_func)
 {
-	oric_state *state = space.machine().driver_data<oric_state>();
-	return (state->m_psg_control>>1) & 1;
+	return (m_psg_control>>1) & 1;
 }
 
-static WRITE8_DEVICE_HANDLER ( oric_via_out_ca2_func )
+WRITE8_MEMBER(oric_state::oric_via_out_ca2_func)
 {
-	oric_state *state = space.machine().driver_data<oric_state>();
-	state->m_psg_control &=~1;
+	m_psg_control &=~1;
 
 	if (data)
-		state->m_psg_control |=1;
+		m_psg_control |=1;
 
 	oric_psg_connection_refresh(space);
 }
 
-static WRITE8_DEVICE_HANDLER ( oric_via_out_cb2_func )
+WRITE8_MEMBER(oric_state::oric_via_out_cb2_func)
 {
-	oric_state *state = space.machine().driver_data<oric_state>();
-	state->m_psg_control &=~2;
+	m_psg_control &=~2;
 
 	if (data)
-		state->m_psg_control |=2;
+		m_psg_control |=2;
 
 	oric_psg_connection_refresh(space);
 }
@@ -394,18 +385,18 @@ CB2
 
 const via6522_interface oric_6522_interface=
 {
-	DEVCB_HANDLER(oric_via_in_a_func),
-	DEVCB_HANDLER(oric_via_in_b_func),
+	DEVCB_DRIVER_MEMBER(oric_state,oric_via_in_a_func),
+	DEVCB_DRIVER_MEMBER(oric_state,oric_via_in_b_func),
 	DEVCB_NULL,				/* printer acknowledge - handled by callback*/
 	DEVCB_NULL,				/* tape input - handled by timer */
-	DEVCB_HANDLER(oric_via_in_ca2_func),
-	DEVCB_HANDLER(oric_via_in_cb2_func),
-	DEVCB_HANDLER(oric_via_out_a_func),
-	DEVCB_HANDLER(oric_via_out_b_func),
+	DEVCB_DRIVER_MEMBER(oric_state,oric_via_in_ca2_func),
+	DEVCB_DRIVER_MEMBER(oric_state,oric_via_in_cb2_func),
+	DEVCB_DRIVER_MEMBER(oric_state,oric_via_out_a_func),
+	DEVCB_DRIVER_MEMBER(oric_state,oric_via_out_b_func),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(oric_via_out_ca2_func),
-	DEVCB_HANDLER(oric_via_out_cb2_func),
+	DEVCB_DRIVER_MEMBER(oric_state,oric_via_out_ca2_func),
+	DEVCB_DRIVER_MEMBER(oric_state,oric_via_out_cb2_func),
 	DEVCB_LINE(oric_via_irq_func),
 };
 
@@ -658,15 +649,14 @@ static void oric_jasmin_set_mem_0x0c000(running_machine &machine)
 }
 
 /* DRQ is connected to interrupt */
-static WRITE_LINE_DEVICE_HANDLER( oric_jasmin_wd179x_drq_w )
+WRITE_LINE_MEMBER(oric_state::oric_jasmin_wd179x_drq_w)
 {
-	oric_state *drvstate = device->machine().driver_data<oric_state>();
 	if (state)
-		drvstate->m_irqs |= (1<<1);
+		m_irqs |= (1<<1);
 	else
-		drvstate->m_irqs &=~(1<<1);
+		m_irqs &=~(1<<1);
 
-	oric_refresh_ints(device->machine());
+	oric_refresh_ints(machine());
 }
 
 READ8_MEMBER(oric_state::oric_jasmin_r)
@@ -795,26 +785,24 @@ static void oric_microdisc_refresh_wd179x_ints(running_machine &machine)
 	oric_refresh_ints(machine);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( oric_microdisc_wd179x_intrq_w )
+WRITE_LINE_MEMBER(oric_state::oric_microdisc_wd179x_intrq_w)
 {
-	oric_state *drvstate = device->machine().driver_data<oric_state>();
-	drvstate->m_wd179x_int_state = state;
+	m_wd179x_int_state = state;
 
 	if (state)
-		drvstate->m_port_314_r &= ~(1<<7);
+		m_port_314_r &= ~(1<<7);
 	else
-		drvstate->m_port_314_r |=(1<<7);
+		m_port_314_r |=(1<<7);
 
-	oric_microdisc_refresh_wd179x_ints(device->machine());
+	oric_microdisc_refresh_wd179x_ints(machine());
 }
 
-static WRITE_LINE_DEVICE_HANDLER( oric_microdisc_wd179x_drq_w )
+WRITE_LINE_MEMBER(oric_state::oric_microdisc_wd179x_drq_w)
 {
-	oric_state *drvstate = device->machine().driver_data<oric_state>();
 	if (state)
-		drvstate->m_port_318_r &=~(1<<7);
+		m_port_318_r &=~(1<<7);
 	else
-		drvstate->m_port_318_r |= (1<<7);
+		m_port_318_r |= (1<<7);
 }
 
 static void oric_microdisc_set_mem_0x0c000(running_machine &machine)
@@ -999,25 +987,25 @@ static void oric_install_microdisc_interface(running_machine &machine)
 
 /*********************************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( oric_wd179x_intrq_w )
+WRITE_LINE_MEMBER(oric_state::oric_wd179x_intrq_w)
 {
-	if ((device->machine().root_device().ioport("FLOPPY")->read() & 0x07) == ORIC_FLOPPY_INTERFACE_MICRODISC)
-		oric_microdisc_wd179x_intrq_w(device, state);
+	if ((machine().root_device().ioport("FLOPPY")->read() & 0x07) == ORIC_FLOPPY_INTERFACE_MICRODISC)
+		oric_microdisc_wd179x_intrq_w(state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( oric_wd179x_drq_w )
+WRITE_LINE_MEMBER(oric_state::oric_wd179x_drq_w)
 {
-	switch (device->machine().root_device().ioport("FLOPPY")->read() &  0x07)
+	switch (machine().root_device().ioport("FLOPPY")->read() &  0x07)
 	{
 		default:
 		case ORIC_FLOPPY_INTERFACE_NONE:
 		case ORIC_FLOPPY_INTERFACE_APPLE2:
 			return;
 		case ORIC_FLOPPY_INTERFACE_MICRODISC:
-			oric_microdisc_wd179x_drq_w(device, state);
+			oric_microdisc_wd179x_drq_w(state);
 			return;
 		case ORIC_FLOPPY_INTERFACE_JASMIN:
-			oric_jasmin_wd179x_drq_w(device, state);
+			oric_jasmin_wd179x_drq_w(state);
 			return;
 	}
 }
@@ -1025,8 +1013,8 @@ static WRITE_LINE_DEVICE_HANDLER( oric_wd179x_drq_w )
 const wd17xx_interface oric_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE(oric_wd179x_intrq_w),
-	DEVCB_LINE(oric_wd179x_drq_w),
+	DEVCB_DRIVER_LINE_MEMBER(oric_state,oric_wd179x_intrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(oric_state,oric_wd179x_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
@@ -1278,55 +1266,51 @@ static void telestrat_refresh_mem(running_machine &machine)
 	}
 }
 
-static READ8_DEVICE_HANDLER(telestrat_via2_in_a_func)
+READ8_MEMBER(oric_state::telestrat_via2_in_a_func)
 {
-	oric_state *state = space.machine().driver_data<oric_state>();
-	//logerror("via 2 - port a %02x\n",state->m_telestrat_via2_port_a_data);
-	return state->m_telestrat_via2_port_a_data;
+	//logerror("via 2 - port a %02x\n",m_telestrat_via2_port_a_data);
+	return m_telestrat_via2_port_a_data;
 }
 
 
-static WRITE8_DEVICE_HANDLER(telestrat_via2_out_a_func)
+WRITE8_MEMBER(oric_state::telestrat_via2_out_a_func)
 {
-	oric_state *state = space.machine().driver_data<oric_state>();
 	//logerror("via 2 - port a w: %02x\n",data);
 
-	state->m_telestrat_via2_port_a_data = data;
+	m_telestrat_via2_port_a_data = data;
 
-	if (((data^state->m_telestrat_bank_selection) & 0x07)!=0)
+	if (((data^m_telestrat_bank_selection) & 0x07)!=0)
 	{
-		state->m_telestrat_bank_selection = data & 0x07;
+		m_telestrat_bank_selection = data & 0x07;
 
-		telestrat_refresh_mem(space.machine());
+		telestrat_refresh_mem(machine());
 	}
 }
 
-static READ8_DEVICE_HANDLER(telestrat_via2_in_b_func)
+READ8_MEMBER(oric_state::telestrat_via2_in_b_func)
 {
-	oric_state *state = space.machine().driver_data<oric_state>();
 	unsigned char data = 0x01f;
 
 	/* left joystick selected? */
-	if (state->m_telestrat_via2_port_b_data & (1<<6))
+	if (m_telestrat_via2_port_b_data & (1<<6))
 	{
-		data &= state->ioport("JOY0")->read();
+		data &= ioport("JOY0")->read();
 	}
 
 	/* right joystick selected? */
-	if (state->m_telestrat_via2_port_b_data & (1<<7))
+	if (m_telestrat_via2_port_b_data & (1<<7))
 	{
-		data &= space.machine().root_device().ioport("JOY1")->read();
+		data &= machine().root_device().ioport("JOY1")->read();
 	}
 
-	data |= state->m_telestrat_via2_port_b_data & ((1<<7) | (1<<6) | (1<<5));
+	data |= m_telestrat_via2_port_b_data & ((1<<7) | (1<<6) | (1<<5));
 
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER(telestrat_via2_out_b_func)
+WRITE8_MEMBER(oric_state::telestrat_via2_out_b_func)
 {
-	oric_state *state = space.machine().driver_data<oric_state>();
-	state->m_telestrat_via2_port_b_data = data;
+	m_telestrat_via2_port_b_data = data;
 }
 
 
@@ -1347,14 +1331,14 @@ static void telestrat_via2_irq_func(device_t *device, int state)
 
 const via6522_interface telestrat_via2_interface=
 {
-	DEVCB_HANDLER(telestrat_via2_in_a_func),
-	DEVCB_HANDLER(telestrat_via2_in_b_func),
+	DEVCB_DRIVER_MEMBER(oric_state,telestrat_via2_in_a_func),
+	DEVCB_DRIVER_MEMBER(oric_state,telestrat_via2_in_b_func),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(telestrat_via2_out_a_func),
-	DEVCB_HANDLER(telestrat_via2_out_b_func),
+	DEVCB_DRIVER_MEMBER(oric_state,telestrat_via2_out_a_func),
+	DEVCB_DRIVER_MEMBER(oric_state,telestrat_via2_out_b_func),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

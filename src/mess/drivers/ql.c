@@ -364,22 +364,20 @@ void ql_state::sandy_set_control(UINT8 data)
 	}
 }
 
-static READ_LINE_DEVICE_HANDLER( disk_io_dden_r )
+READ_LINE_MEMBER(ql_state::disk_io_dden_r)
 {
-	ql_state *state = device->machine().driver_data<ql_state>();
-
-	if(state->m_disk_type==DISK_TYPE_SANDY)
-		return ((state->m_disk_io_byte & SANDY_DDEN_MASK) >> SANDY_DDEN_SHIFT);
+	if(m_disk_type==DISK_TYPE_SANDY)
+		return ((m_disk_io_byte & SANDY_DDEN_MASK) >> SANDY_DDEN_SHIFT);
 	else
 		return 0;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( disk_io_intrq_w )
+WRITE_LINE_MEMBER(ql_state::disk_io_intrq_w)
 {
 	//logerror("DiskIO:intrq = %d\n",state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( disk_io_drq_w )
+WRITE_LINE_MEMBER(ql_state::disk_io_drq_w)
 {
 	//logerror("DiskIO:drq = %d\n",state);
 }
@@ -846,9 +844,9 @@ static const floppy_interface ql_floppy_interface =
 
 wd17xx_interface ql_wd17xx_interface =
 {
-	DEVCB_LINE(disk_io_dden_r),
-	DEVCB_LINE(disk_io_intrq_w),
-	DEVCB_LINE(disk_io_drq_w),
+	DEVCB_DRIVER_LINE_MEMBER(ql_state,disk_io_dden_r),
+	DEVCB_DRIVER_LINE_MEMBER(ql_state,disk_io_intrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(ql_state,disk_io_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

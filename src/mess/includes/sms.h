@@ -190,15 +190,13 @@ public:
 	TIMER_CALLBACK_MEMBER(lightgun_tick);
 	TIMER_CALLBACK_MEMBER(lphaser_1_callback);
 	TIMER_CALLBACK_MEMBER(lphaser_2_callback);
+	DECLARE_WRITE_LINE_MEMBER(sms_int_callback);
+	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
+	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
 };
 
 
 /*----------- defined in machine/sms.c -----------*/
-
-/* Function prototypes */
-
-WRITE_LINE_DEVICE_HANDLER( sms_pause_callback );
-WRITE_LINE_DEVICE_HANDLER( sms_store_int_callback );
 
 DEVICE_START( sms_cart );
 DEVICE_IMAGE_LOAD( sms_cart );

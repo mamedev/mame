@@ -45,9 +45,8 @@
   cb1 video sync in
   cb2 cassette 1 motor out
 */
-static READ8_DEVICE_HANDLER( pia0_pa_r )
+READ8_MEMBER(pet_state::pia0_pa_r)
 {
-	pet_state *state = space.machine().driver_data<pet_state>();
 	/*
 
         bit     description
@@ -66,16 +65,16 @@ static READ8_DEVICE_HANDLER( pia0_pa_r )
 	UINT8 data = 0;
 
 	/* key */
-	data |= state->m_keyline_select;
+	data |= m_keyline_select;
 
 	/* #1 cassette switch */
-	data |= ((space.machine().device<cassette_image_device>(CASSETTE_TAG)->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 4;
+	data |= ((machine().device<cassette_image_device>(CASSETTE_TAG)->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 4;
 
 	/* #2 cassette switch */
-	data |= ((space.machine().device<cassette_image_device>(CASSETTE2_TAG)->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 5;
+	data |= ((machine().device<cassette_image_device>(CASSETTE2_TAG)->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 5;
 
 	/* end or identify in */
-	data |= state->m_ieee->eoi_r() << 6;
+	data |= m_ieee->eoi_r() << 6;
 
 	/* diagnostic jumper */
 	data |= 0x80;
@@ -83,9 +82,8 @@ static READ8_DEVICE_HANDLER( pia0_pa_r )
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( pia0_pa_w )
+WRITE8_MEMBER(pet_state::pia0_pa_w)
 {
-	pet_state *state = space.machine().driver_data<pet_state>();
 	/*
 
         bit     description
@@ -102,13 +100,12 @@ static WRITE8_DEVICE_HANDLER( pia0_pa_w )
     */
 
 	/* key */
-	state->m_keyline_select = data & 0x0f;
+	m_keyline_select = data & 0x0f;
 }
 
 /* Keyboard reading/handling for regular keyboard */
-static READ8_DEVICE_HANDLER( kin_r )
+READ8_MEMBER(pet_state::kin_r)
 {
-	pet_state *state = space.machine().driver_data<pet_state>();
 	/*
 
         bit     description
@@ -130,107 +127,103 @@ static READ8_DEVICE_HANDLER( kin_r )
 		"ROW5", "ROW6", "ROW7", "ROW8", "ROW9"
 	};
 
-	if (state->m_keyline_select < 10)
+	if (m_keyline_select < 10)
 	{
-		data = space.machine().root_device().ioport(keynames[state->m_keyline_select])->read();
+		data = machine().root_device().ioport(keynames[m_keyline_select])->read();
 		/* Check for left-shift lock */
-		if ((state->m_keyline_select == 8) && (space.machine().root_device().ioport("SPECIAL")->read() & 0x80))
+		if ((m_keyline_select == 8) && (machine().root_device().ioport("SPECIAL")->read() & 0x80))
 			data &= 0xfe;
 	}
 	return data;
 }
 
 /* Keyboard handling for business keyboard */
-static READ8_DEVICE_HANDLER( petb_kin_r )
+READ8_MEMBER(pet_state::petb_kin_r)
 {
 	UINT8 data = 0xff;
-	pet_state *state = space.machine().driver_data<pet_state>();
 	static const char *const keynames[] = {
 		"ROW0", "ROW1", "ROW2", "ROW3", "ROW4",
 		"ROW5", "ROW6", "ROW7", "ROW8", "ROW9"
 	};
 
-	if (state->m_keyline_select < 10)
+	if (m_keyline_select < 10)
 	{
-		data = space.machine().root_device().ioport(keynames[state->m_keyline_select])->read();
+		data = machine().root_device().ioport(keynames[m_keyline_select])->read();
 		/* Check for left-shift lock */
 		/* 2008-05 FP: For some reason, superpet read it in the opposite way!! */
 		/* While waiting for confirmation from docs, we add a workaround here. */
-		if (state->m_superpet)
+		if (m_superpet)
 		{
-			if ((state->m_keyline_select == 6) && !(space.machine().root_device().ioport("SPECIAL")->read() & 0x80))
+			if ((m_keyline_select == 6) && !(machine().root_device().ioport("SPECIAL")->read() & 0x80))
 				data &= 0xfe;
 		}
 		else
 		{
-			if ((state->m_keyline_select == 6) && (space.machine().root_device().ioport("SPECIAL")->read() & 0x80))
+			if ((m_keyline_select == 6) && (machine().root_device().ioport("SPECIAL")->read() & 0x80))
 				data &= 0xfe;
 		}
 	}
 	return data;
 }
 
-static READ8_DEVICE_HANDLER( cass1_r )
+READ8_MEMBER(pet_state::cass1_r)
 {
 	// cassette 1 read
-	return (space.machine().device<cassette_image_device>(CASSETTE_TAG)->input() > +0.0) ? 1 : 0;
+	return (machine().device<cassette_image_device>(CASSETTE_TAG)->input() > +0.0) ? 1 : 0;
 }
 
-static WRITE8_DEVICE_HANDLER( cass1_motor_w )
+WRITE8_MEMBER(pet_state::cass1_motor_w)
 {
-	pet_state *state = space.machine().driver_data<pet_state>();
 	if (!data)
 	{
-		space.machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-		state->m_datasette1_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
+		machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		m_datasette1_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
-		space.machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
-		state->m_datasette1_timer->reset();
+		machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+		m_datasette1_timer->reset();
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pia0_irq_w )
+WRITE_LINE_MEMBER(pet_state::pia0_irq_w)
 {
-	pet_state *driver_state = device->machine().driver_data<pet_state>();
+	m_pia0_irq = state;
+	int level = (m_pia0_irq | m_pia1_irq | m_via_irq) ? ASSERT_LINE : CLEAR_LINE;
 
-	driver_state->m_pia0_irq = state;
-	int level = (driver_state->m_pia0_irq | driver_state->m_pia1_irq | driver_state->m_via_irq) ? ASSERT_LINE : CLEAR_LINE;
-
-	device->machine().firstcpu->set_input_line(INPUT_LINE_IRQ0, level);
+	machine().firstcpu->set_input_line(INPUT_LINE_IRQ0, level);
 }
 
 const pia6821_interface pet_pia0 =
 {
-	DEVCB_HANDLER(pia0_pa_r),		/* in_a_func */
-	DEVCB_HANDLER(kin_r),			/* in_b_func */
-	DEVCB_HANDLER(cass1_r),			/* in_ca1_func */
+	DEVCB_DRIVER_MEMBER(pet_state,pia0_pa_r),		/* in_a_func */
+	DEVCB_DRIVER_MEMBER(pet_state,kin_r),			/* in_b_func */
+	DEVCB_DRIVER_MEMBER(pet_state,cass1_r),			/* in_ca1_func */
 	DEVCB_NULL,						/* in_cb1_func */
 	DEVCB_NULL,						/* in_ca2_func */
 	DEVCB_NULL,						/* in_cb2_func */
-	DEVCB_HANDLER(pia0_pa_w),		/* out_a_func */
+	DEVCB_DRIVER_MEMBER(pet_state,pia0_pa_w),		/* out_a_func */
 	DEVCB_NULL,						/* out_b_func */
 	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, eoi_w),			/* out_ca2_func */
-	DEVCB_HANDLER(cass1_motor_w),	/* out_cb2_func */
-	DEVCB_LINE(pia0_irq_w),			/* irq_a_func */
-	DEVCB_LINE(pia0_irq_w)			/* irq_b_func */
+	DEVCB_DRIVER_MEMBER(pet_state,cass1_motor_w),	/* out_cb2_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia0_irq_w),			/* irq_a_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia0_irq_w)			/* irq_b_func */
 };
 
 const pia6821_interface petb_pia0 =
 {
-	DEVCB_HANDLER(pia0_pa_r),		/* in_a_func */
-	DEVCB_HANDLER(petb_kin_r),		/* in_b_func */
-	DEVCB_HANDLER(cass1_r),			/* in_ca1_func */
+	DEVCB_DRIVER_MEMBER(pet_state,pia0_pa_r),		/* in_a_func */
+	DEVCB_DRIVER_MEMBER(pet_state,petb_kin_r),		/* in_b_func */
+	DEVCB_DRIVER_MEMBER(pet_state,cass1_r),			/* in_ca1_func */
 	DEVCB_NULL,						/* in_cb1_func */
 	DEVCB_NULL,						/* in_ca2_func */
 	DEVCB_NULL,						/* in_cb2_func */
-	DEVCB_HANDLER(pia0_pa_w),		/* out_a_func */
+	DEVCB_DRIVER_MEMBER(pet_state,pia0_pa_w),		/* out_a_func */
 	DEVCB_NULL,						/* out_b_func */
 	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, eoi_w),			/* out_ca2_func */
-	DEVCB_HANDLER(cass1_motor_w),	/* out_cb2_func */
-	DEVCB_LINE(pia0_irq_w),			/* irq_a_func */
-	DEVCB_LINE(pia0_irq_w)			/* irq_b_func */
+	DEVCB_DRIVER_MEMBER(pet_state,cass1_motor_w),	/* out_cb2_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia0_irq_w),			/* irq_a_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia0_irq_w)			/* irq_b_func */
 };
 
 /* pia at 0xe820 (ieee488)
@@ -242,14 +235,12 @@ const pia6821_interface petb_pia0 =
   cb2 dav out
  */
 
-static WRITE_LINE_DEVICE_HANDLER( pia1_irq_w )
+WRITE_LINE_MEMBER(pet_state::pia1_irq_w)
 {
-	pet_state *driver_state = device->machine().driver_data<pet_state>();
+	m_pia1_irq = state;
+	int level = (m_pia0_irq | m_pia1_irq | m_via_irq) ? ASSERT_LINE : CLEAR_LINE;
 
-	driver_state->m_pia1_irq = state;
-	int level = (driver_state->m_pia0_irq | driver_state->m_pia1_irq | driver_state->m_via_irq) ? ASSERT_LINE : CLEAR_LINE;
-
-	device->machine().firstcpu->set_input_line(INPUT_LINE_IRQ0, level);
+	machine().firstcpu->set_input_line(INPUT_LINE_IRQ0, level);
 }
 
 const pia6821_interface pet_pia1 =
@@ -264,8 +255,8 @@ const pia6821_interface pet_pia1 =
 	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_w),					/* out_b_func */
 	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ndac_w),					/* out_ca2_func */
 	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, dav_w),					/* out_cb2_func */
-	DEVCB_LINE(pia1_irq_w),					/* irq_a_func */
-	DEVCB_LINE(pia1_irq_w)					/* irq_b_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia1_irq_w),					/* irq_a_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia1_irq_w)					/* irq_b_func */
 };
 
 /* userport, cassettes, rest ieee488
@@ -285,7 +276,7 @@ const pia6821_interface pet_pia1 =
    cb1 cassettes
    cb2 user port
  */
-static READ8_DEVICE_HANDLER( via_pb_r )
+READ8_MEMBER(pet_state::via_pb_r)
 {
 	/*
 
@@ -302,30 +293,29 @@ static READ8_DEVICE_HANDLER( via_pb_r )
 
     */
 
-	pet_state *state = space.machine().driver_data<pet_state>();
 	UINT8 data = 0;
 
 	/* not data accepted in */
-	data |= state->m_ieee->ndac_r();
+	data |= m_ieee->ndac_r();
 
 	/* sync in */
 
 	/* not ready for data in */
-	data |= state->m_ieee->nrfd_r() << 6;
+	data |= m_ieee->nrfd_r() << 6;
 
 	/* data valid in */
-	data |= state->m_ieee->dav_r() << 7;
+	data |= m_ieee->dav_r() << 7;
 
 	return data;
 }
 
-static READ_LINE_DEVICE_HANDLER( cass2_r )
+READ_LINE_MEMBER(pet_state::cass2_r)
 {
 	// cassette 2 read
-	return (device->machine().device<cassette_image_device>(CASSETTE2_TAG)->input() > +0.0) ? 1 : 0;
+	return (machine().device<cassette_image_device>(CASSETTE2_TAG)->input() > +0.0) ? 1 : 0;
 }
 
-static WRITE8_DEVICE_HANDLER( via_pb_w )
+WRITE8_MEMBER(pet_state::via_pb_w)
 {
 	/*
 
@@ -342,64 +332,59 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 
     */
 
-	pet_state *state = space.machine().driver_data<pet_state>();
-
 	/* not ready for data out */
-	state->m_ieee->nrfd_w(BIT(data, 1));
+	m_ieee->nrfd_w(BIT(data, 1));
 
 	/* attention out */
-	state->m_ieee->atn_w(BIT(data, 2));
+	m_ieee->atn_w(BIT(data, 2));
 
 	/* cassette write */
-	space.machine().device<cassette_image_device>(CASSETTE_TAG)->output(BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
-	space.machine().device<cassette_image_device>(CASSETTE2_TAG)->output(BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	machine().device<cassette_image_device>(CASSETTE_TAG)->output(BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	machine().device<cassette_image_device>(CASSETTE2_TAG)->output(BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 
 	/* #2 cassette motor */
 	if (BIT(data, 4))
 	{
-		space.machine().device<cassette_image_device>(CASSETTE2_TAG)->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		state->m_datasette2_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
+		machine().device<cassette_image_device>(CASSETTE2_TAG)->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		m_datasette2_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
-		space.machine().device<cassette_image_device>(CASSETTE2_TAG)->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		state->m_datasette2_timer->reset();
+		machine().device<cassette_image_device>(CASSETTE2_TAG)->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		m_datasette2_timer->reset();
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( gb_w )
+WRITE_LINE_MEMBER(pet_state::gb_w)
 {
-	pet_state *drvstate = device->machine().driver_data<pet_state>();
-	DBG_LOG(device->machine(), 1, "address line", ("%d\n", state));
-	if (state) drvstate->m_font |= 1;
-	else drvstate->m_font &= ~1;
+	DBG_LOG(machine(), 1, "address line", ("%d\n", state));
+	if (state) m_font |= 1;
+	else m_font &= ~1;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( via_irq_w )
+WRITE_LINE_MEMBER(pet_state::via_irq_w)
 {
-	pet_state *driver_state = device->machine().driver_data<pet_state>();
+	m_via_irq = state;
+	int level = (m_pia0_irq | m_pia1_irq | m_via_irq) ? ASSERT_LINE : CLEAR_LINE;
 
-	driver_state->m_via_irq = state;
-	int level = (driver_state->m_pia0_irq | driver_state->m_pia1_irq | driver_state->m_via_irq) ? ASSERT_LINE : CLEAR_LINE;
-
-	device->machine().firstcpu->set_input_line(INPUT_LINE_IRQ0, level);
+	machine().firstcpu->set_input_line(INPUT_LINE_IRQ0, level);
 }
 
 const via6522_interface pet_via =
 {
 	DEVCB_NULL,					/* in_a_func */
-	DEVCB_HANDLER(via_pb_r),	/* in_b_func */
+	DEVCB_DRIVER_MEMBER(pet_state,via_pb_r),	/* in_b_func */
 	DEVCB_NULL,					/* in_ca1_func */
-	DEVCB_LINE(cass2_r),		/* in_cb1_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,cass2_r),		/* in_cb1_func */
 	DEVCB_NULL,					/* in_ca2_func */
 	DEVCB_NULL,					/* in_cb2_func */
 	DEVCB_NULL,					/* out_a_func */
-	DEVCB_HANDLER(via_pb_w),	/* out_b_func */
+	DEVCB_DRIVER_MEMBER(pet_state,via_pb_w),	/* out_b_func */
 	DEVCB_NULL,					/* out_ca1_func */
-	DEVCB_LINE(gb_w),			/* out_ca2_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,gb_w),			/* out_ca2_func */
 	DEVCB_NULL,					/* out_ca2_func */
 	DEVCB_NULL,					/* out_cb2_func */
-	DEVCB_LINE(via_irq_w)		/* out_irq_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,via_irq_w)		/* out_irq_func */
 };
 
 
