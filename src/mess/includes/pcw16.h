@@ -95,6 +95,7 @@ public:
 	UINT8 read_bank_data(UINT8 type, UINT16 offset);
 	void write_bank_data(UINT8 type, UINT16 offset, UINT8 data);
 	virtual void machine_start();
+	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_pcw16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
