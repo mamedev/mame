@@ -183,6 +183,7 @@ WRITE16_MEMBER(shangha3_state::shangha3_blitter_go_w)
 					{
 						int dx,dy,tile;
 
+						/* TODO: zooming algo is definitely wrong for Blocken here */
 						if (condensed)
 						{
 							int addr = ((y+srcy) & 0x1f) +
