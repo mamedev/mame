@@ -220,15 +220,14 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_pcm_play_w)
  *
  *************************************/
 
-static void omegaf_io_protection_reset(running_machine &machine)
+void ninjakd2_state::omegaf_io_protection_reset()
 {
-	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
 	// make sure protection starts in a known state
-	state->m_omegaf_io_protection[0] = 0;
-	state->m_omegaf_io_protection[1] = 0;
-	state->m_omegaf_io_protection[2] = 0;
-	state->m_omegaf_io_protection_input = 0;
-	state->m_omegaf_io_protection_tic = 0;
+	m_omegaf_io_protection[0] = 0;
+	m_omegaf_io_protection[1] = 0;
+	m_omegaf_io_protection[2] = 0;
+	m_omegaf_io_protection_input = 0;
+	m_omegaf_io_protection_tic = 0;
 }
 
 READ8_MEMBER(ninjakd2_state::omegaf_io_protection_r)
@@ -916,7 +915,7 @@ void ninjakd2_state::machine_reset()
 
 MACHINE_RESET_MEMBER(ninjakd2_state,omegaf)
 {
-	omegaf_io_protection_reset(machine());
+	omegaf_io_protection_reset();
 	
 	machine_reset();
 }
@@ -1393,7 +1392,7 @@ ROM_END
 
 /*************************************
  *
- *  Gfx ROM swizzling
+ *  Driver initialization
  *
  *************************************/
 
@@ -1410,24 +1409,17 @@ by one place all the intervening bits.
 static void lineswap_gfx_roms(running_machine &machine, const char *region, const int bit)
 {
 	const int length = machine.root_device().memregion(region)->bytes();
-
 	UINT8* const src = machine.root_device().memregion(region)->base();
-
 	UINT8* const temp = auto_alloc_array(machine, UINT8, length);
-
 	const int mask = (1 << (bit + 1)) - 1;
 
-	int sa;
-
-	for (sa = 0; sa < length; sa++)
+	for (int sa = 0; sa < length; sa++)
 	{
 		const int da = (sa & ~mask) | ((sa << 1) & mask) | ((sa >> bit) & 1);
-
 		temp[da] = src[sa];
 	}
 
 	memcpy(src, temp, length);
-
 	auto_free(machine, temp);
 }
 
@@ -1438,13 +1430,6 @@ static void gfx_unscramble(running_machine &machine)
 	lineswap_gfx_roms(machine, "gfx3", 14);		// bg tiles
 }
 
-
-
-/*************************************
- *
- *  Driver initialization
- *
- *************************************/
 
 DRIVER_INIT_MEMBER(ninjakd2_state,ninjakd2)
 {
@@ -1466,27 +1451,38 @@ DRIVER_INIT_MEMBER(ninjakd2_state,mnight)
 	gfx_unscramble(machine());
 }
 
+/*****************************************************************************/
 
-static void robokid_motion_error_kludge(UINT8 *ROM)
+READ8_MEMBER(ninjakd2_state::robokid_motion_error_verbose_r)
+{
+	popmessage("%s MOTION ERROR, contact MAMEdev", machine().system().name);
+	logerror("maincpu %04x MOTION ERROR\n", space.device().safe_pc());
+	return 0xe6;
+}
+
+void ninjakd2_state::robokid_motion_error_kludge(UINT16 offset)
 {
 	// patch out rare "5268 MOTION ERROR" (MT 05024)
 	// It looks like it's due to a buggy random number generator,
 	// then it possibly happens on the real arcade cabinet too.
 	// I doubt it is protection related, but you can never be sure.
+	UINT8 *ROM = memregion("maincpu")->base() + offset;
 	ROM[0] = 0xe6;
 	ROM[1] = 0x03; // and 3
 	ROM[2] = 0x18;
 	ROM[3] = 0xf6; // jr $-8
+	
+	m_maincpu->space(AS_PROGRAM).install_read_handler(offset, offset, read8_delegate(FUNC(ninjakd2_state::robokid_motion_error_verbose_r), this));
 }
 
 DRIVER_INIT_MEMBER(ninjakd2_state,robokid)
 {
-	robokid_motion_error_kludge(memregion("maincpu")->base() + 0x5247);
+	robokid_motion_error_kludge(0x5247);
 }
 
 DRIVER_INIT_MEMBER(ninjakd2_state,robokidj)
 {
-	robokid_motion_error_kludge(memregion("maincpu")->base() + 0x5266);
+	robokid_motion_error_kludge(0x5266);
 }
 
 
