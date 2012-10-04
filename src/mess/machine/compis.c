@@ -1302,9 +1302,9 @@ static void compis_cpu_init(running_machine &machine)
 	state->m_i186.timer[0].int_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::internal_timer_int),state));
 	state->m_i186.timer[1].int_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::internal_timer_int),state));
 	state->m_i186.timer[2].int_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::internal_timer_int),state));
-	state->m_i186.timer[0].time_timer = machine.scheduler().timer_alloc(timer_expired_delegate());
-	state->m_i186.timer[1].time_timer = machine.scheduler().timer_alloc(timer_expired_delegate());
-	state->m_i186.timer[2].time_timer = machine.scheduler().timer_alloc(timer_expired_delegate());
+	state->m_i186.timer[0].time_timer = machine.scheduler().timer_alloc(FUNC_NULL);
+	state->m_i186.timer[1].time_timer = machine.scheduler().timer_alloc(FUNC_NULL);
+	state->m_i186.timer[2].time_timer = machine.scheduler().timer_alloc(FUNC_NULL);
 	state->m_i186.dma[0].finish_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::dma_timer_callback),state));
 	state->m_i186.dma[1].finish_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::dma_timer_callback),state));
 }

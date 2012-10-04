@@ -543,7 +543,7 @@ static Z80DART_INTERFACE( sio_intf )
 
 WRITE_LINE_MEMBER(bw12_state::pit_out0_w)
 {
-	device_t *device = machine().device("DEVCB_DRIVER_LINE_MEMBER(Z80SIO_TAG, bw12_state,pit_out0_w)");
+	device_t *device = machine().device(Z80SIO_TAG);
 	z80dart_txca_w(device, state);
 	z80dart_rxca_w(device, state);
 }
