@@ -2044,30 +2044,19 @@ Y = collides between 0xd0 and 0x30 (not inclusive)
 */
 static void cop_take_hit_box_params(UINT8 offs)
 {
-	INT16 start_x,start_y,end_x,end_y;
+	INT16 start_x,start_y,height,width;
 
-	/* TODO: hack for SD Gundam */
-	#if 0
-	if(cop_collision_info[offs].hitbox_y == 0x2800 && cop_collision_info[offs].hitbox_x == 0xa000)
 	{
-		end_y = 0xff;
-		start_y = -16;
-		end_x = 0xff;
-		start_x = 0;
-	}
-	else
-	#endif
-	{
-		end_y = INT8(cop_collision_info[offs].hitbox_y >> 8);
-		start_y = INT8(cop_collision_info[offs].hitbox_y);
-		end_x = INT8(cop_collision_info[offs].hitbox_x >> 8);
-		start_x = INT8(cop_collision_info[offs].hitbox_x);
-	}
+		height = UINT8(cop_collision_info[offs].hitbox_y >> 8);
+ 		start_y = INT8(cop_collision_info[offs].hitbox_y);
+		width = UINT8(cop_collision_info[offs].hitbox_x >> 8);
+ 		start_x = INT8(cop_collision_info[offs].hitbox_x);
+ 	}
 
-	cop_collision_info[offs].min_x = start_x + (cop_collision_info[offs].x >> 16);
-	cop_collision_info[offs].min_y = start_y + (cop_collision_info[offs].y >> 16);
-	cop_collision_info[offs].max_x = end_x + (cop_collision_info[offs].x >> 16);
-	cop_collision_info[offs].max_y = end_y + (cop_collision_info[offs].y >> 16);
+	cop_collision_info[offs].min_x = (cop_collision_info[offs].x >> 16) + start_x;
+	cop_collision_info[offs].max_x = cop_collision_info[offs].min_x + width;
+	cop_collision_info[offs].min_y = (cop_collision_info[offs].y >> 16) + start_y;
+	cop_collision_info[offs].max_y = cop_collision_info[offs].min_y + height;
 }
 
 
@@ -2755,7 +2744,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				/* 0xc [1] */
 
 				cur_angle = space.read_byte(cop_register[1] + (0xc ^ 3));
-				space.write_byte(cop_register[1] + (0^3),space.read_byte(cop_register[1] + (0^3)) & 0xfb); //correct?
+				//space.write_byte(cop_register[1] + (0^3),space.read_byte(cop_register[1] + (0^3)) & 0xfb); //correct?
 
 				if(cur_angle >= cop_angle_compare)
 				{
@@ -2763,7 +2752,7 @@ static WRITE16_HANDLER( generic_cop_w )
 					if(cur_angle <= cop_angle_compare)
 					{
 						cur_angle = cop_angle_compare;
-						space.write_byte(cop_register[1] + (0^3),space.read_byte(cop_register[1] + (0^3)) | 2);
+						//space.write_byte(cop_register[1] + (0^3),space.read_byte(cop_register[1] + (0^3)) | 2);
 					}
 				}
 				else if(cur_angle <= cop_angle_compare)
@@ -2772,7 +2761,7 @@ static WRITE16_HANDLER( generic_cop_w )
 					if(cur_angle >= cop_angle_compare)
 					{
 						cur_angle = cop_angle_compare;
-						space.write_byte(cop_register[1] + (0^3),space.read_byte(cop_register[1] + (0^3)) | 2);
+						//space.write_byte(cop_register[1] + (0^3),space.read_byte(cop_register[1] + (0^3)) | 2);
 					}
 				}
 
