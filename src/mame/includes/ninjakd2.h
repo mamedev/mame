@@ -43,8 +43,10 @@ public:
 	UINT8* m_robokid_bg2_videoram;
 	UINT8 m_rom_bank_mask;
 
+	void omegaf_io_protection_start();
 	void omegaf_io_protection_reset();
 	void robokid_motion_error_kludge(UINT16 offset);
+	void video_init_common(UINT32 vram_alloc_size);
 	
 	DECLARE_WRITE8_MEMBER(ninjakd2_bankselect_w);
 	DECLARE_WRITE8_MEMBER(ninjakd2_soundreset_w);
@@ -81,11 +83,13 @@ public:
 	TILE_GET_INFO_MEMBER(robokid_get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(robokid_get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(robokid_get_bg2_tile_info);
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_VIDEO_START(mnight);
 	DECLARE_VIDEO_START(arkarea);
 	DECLARE_VIDEO_START(robokid);
+	DECLARE_MACHINE_START(omegaf);
 	DECLARE_MACHINE_RESET(omegaf);
 	DECLARE_VIDEO_START(omegaf);
 	UINT32 screen_update_ninjakd2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -1,6 +1,8 @@
 /******************************************************************************
 
     UPL "sprite framebuffer" hardware
+    
+    Functions to emulate the video hardware
 
 ******************************************************************************/
 
@@ -108,18 +110,35 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::robokid_get_bg2_tile_info)
  *
  *************************************/
 
-static void videoram_alloc(running_machine& machine, int const size)
+void ninjakd2_state::video_init_common(UINT32 vram_alloc_size)
 {
-	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
-	if (size)
+	// create video ram
+	if (vram_alloc_size)
 	{
-		/* create video ram */
-		state->m_robokid_bg0_videoram = auto_alloc_array_clear(machine, UINT8, size);
-		state->m_robokid_bg1_videoram = auto_alloc_array_clear(machine, UINT8, size);
-		state->m_robokid_bg2_videoram = auto_alloc_array_clear(machine, UINT8, size);
+		m_robokid_bg0_videoram = auto_alloc_array_clear(machine(), UINT8, vram_alloc_size);
+		m_robokid_bg1_videoram = auto_alloc_array_clear(machine(), UINT8, vram_alloc_size);
+		m_robokid_bg2_videoram = auto_alloc_array_clear(machine(), UINT8, vram_alloc_size);
+		
+		save_pointer(NAME(m_robokid_bg0_videoram), vram_alloc_size);
+		save_pointer(NAME(m_robokid_bg1_videoram), vram_alloc_size);
+		save_pointer(NAME(m_robokid_bg2_videoram), vram_alloc_size);
 	}
 
-	machine.primary_screen->register_screen_bitmap(state->m_sprites_bitmap);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap->set_transparent_pen(0xf);
+
+	machine().primary_screen->register_screen_bitmap(m_sprites_bitmap);
+
+	m_sprites_updated = 0;
+	m_robokid_sprites = 0;
+	m_vram_bank_mask = 0;
+
+	// register for save states
+	save_item(NAME(m_sprites_updated));
+	save_item(NAME(m_next_sprite_overdraw_enabled));
+	save_item(NAME(m_robokid_bg0_bank));
+	save_item(NAME(m_robokid_bg1_bank));
+	save_item(NAME(m_robokid_bg2_bank));
 }
 
 static int stencil_ninjakd2( UINT16 pal );
@@ -130,79 +149,61 @@ static int stencil_omegaf(   UINT16 pal );
 
 void ninjakd2_state::video_start()
 {
-	videoram_alloc(machine(), 0);
+	video_init_common(0);
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::ninjakd2_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::ninjakd2_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	m_fg_tilemap->set_transparent_pen(0xf);
-
-	m_robokid_sprites = 0;
 	m_stencil_compare_function = stencil_ninjakd2;
 }
 
 VIDEO_START_MEMBER(ninjakd2_state,mnight)
 {
-	videoram_alloc(machine(), 0);
+	video_init_common(0);
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::mnight_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::mnight_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	m_fg_tilemap->set_transparent_pen(0xf);
-
-	m_robokid_sprites = 0;
 	m_stencil_compare_function = stencil_mnight;
 }
 
 VIDEO_START_MEMBER(ninjakd2_state,arkarea)
 {
-	videoram_alloc(machine(), 0);
+	video_init_common(0);
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::mnight_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::mnight_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	m_fg_tilemap->set_transparent_pen(0xf);
-
-	m_robokid_sprites = 0;
 	m_stencil_compare_function = stencil_arkarea;
 }
 
 VIDEO_START_MEMBER(ninjakd2_state,robokid)
 {
+	video_init_common(0x0800);
 	m_vram_bank_mask = 1;
+	m_robokid_sprites = 1;
 
-	videoram_alloc(machine(), 0x0800);
+	m_bg0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg0_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::robokid_bg_scan),this), 16, 16, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::robokid_bg_scan),this), 16, 16, 32, 32);
+	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::robokid_bg_scan),this), 16, 16, 32, 32);
 
-	m_fg_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
-	m_bg0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg0_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::robokid_bg_scan),this),    16, 16, 32, 32);
-	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::robokid_bg_scan),this),    16, 16, 32, 32);
-	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::robokid_bg_scan),this),    16, 16, 32, 32);
-
-	m_fg_tilemap->set_transparent_pen(0xf);
 	m_bg1_tilemap->set_transparent_pen(0xf);
 	m_bg2_tilemap->set_transparent_pen(0xf);
 
-	m_robokid_sprites = 1;
 	m_stencil_compare_function = stencil_robokid;
 }
 
 VIDEO_START_MEMBER(ninjakd2_state,omegaf)
 {
+	video_init_common(0x2000);
 	m_vram_bank_mask = 7;
+	m_robokid_sprites = 1;
 
-	videoram_alloc(machine(), 0x2000);
+	m_bg0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg0_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::omegaf_bg_scan),this), 16, 16, 128, 32);
+	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::omegaf_bg_scan),this), 16, 16, 128, 32);
+	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::omegaf_bg_scan),this), 16, 16, 128, 32);
 
-	m_fg_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS,   8,  8,  32, 32);
-	m_bg0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg0_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::omegaf_bg_scan),this),     16, 16, 128, 32);
-	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::omegaf_bg_scan),this),     16, 16, 128, 32);
-	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(ninjakd2_state::omegaf_bg_scan),this),     16, 16, 128, 32);
-
-	m_fg_tilemap->set_transparent_pen(0xf);
 	m_bg0_tilemap->set_transparent_pen(0xf);
 	m_bg1_tilemap->set_transparent_pen(0xf);
 	m_bg2_tilemap->set_transparent_pen(0xf);
 
-	m_robokid_sprites = 1;
 	m_stencil_compare_function = stencil_omegaf;
 }
 
@@ -225,7 +226,6 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_fgvideoram_w)
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
-
 
 
 WRITE8_MEMBER(ninjakd2_state::robokid_bg0_bank_w)
@@ -281,7 +281,6 @@ WRITE8_MEMBER(ninjakd2_state::robokid_bg2_videoram_w)
 	m_robokid_bg2_videoram[address] = data;
 	m_bg2_tilemap->mark_tile_dirty(address >> 1);
 }
-
 
 
 static void bg_ctrl(int offset, int data, tilemap_t* tilemap)
@@ -346,13 +345,14 @@ static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap)
 	UINT8* sprptr = &state->m_spriteram[11];
 	int sprites_drawn = 0;
 
-	// the sprite generator draws exactly 96 16x16 sprites per frame. When big
-	// (32x32) sprites are drawn, this counts for 4 sprites drawn, so the sprite
-	// list is reduced accordingly (i.e. three slots at the end of the list will
-	// be ignored). Note that a disabled sprite, even if it is not drawn, still
-	// counts as one sprite drawn.
-	// This is proven by Mutant Night, which doesn't work correctly (leaves shots
-	// on screen) if we don't take big sprites into account.
+    /* The sprite generator draws exactly 96 16x16 sprites per frame. When big
+       (32x32) sprites are drawn, this counts for 4 sprites drawn, so the sprite
+       list is reduced accordingly (i.e. three slots at the end of the list will
+       be ignored). Note that a disabled sprite, even if it is not drawn, still
+       counts as one sprite drawn.
+       This is proven by Mutant Night, which doesn't work correctly (leaves shots
+       on screen) if we don't take big sprites into account.
+	*/
 
 	for (;;)
 	{
@@ -444,7 +444,6 @@ static void erase_sprites(running_machine& machine, bitmap_ind16 &bitmap)
 			for (int x = 0; x < state->m_sprites_bitmap.width(); ++x)
 			{
 				UINT16* const ptr = &state->m_sprites_bitmap.pix16(y, x);
-
 				if ( (*state->m_stencil_compare_function)(*ptr) ) *ptr = 0xf;
 			}
 		}
