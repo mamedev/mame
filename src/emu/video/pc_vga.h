@@ -18,6 +18,8 @@ MACHINE_CONFIG_EXTERN( pcvideo_cirrus_vga );
 
 class vga_device :  public device_t
 {
+	friend class ibm8514a_device;
+
 public:
     // construction/destruction
     vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -204,6 +206,7 @@ protected:
 	void svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual UINT8 pc_vga_choosevideomode();
+	virtual void device_start();
 	struct
 	{
 		UINT8 bank_r,bank_w;
@@ -216,6 +219,187 @@ protected:
 	}svga;
 private:
 };
+
+// ======================> ibm8514_device
+
+class ibm8514a_device :  public device_t
+{
+public:
+	ibm8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	void set_vga(const char* tag) { m_vga_tag.cpy(tag); }
+	void set_vga_owner() { m_vga = dynamic_cast<vga_device*>(owner()); }
+
+	void enabled();
+
+	READ16_MEMBER(ibm8514_gpstatus_r);
+	WRITE16_MEMBER(ibm8514_cmd_w);
+	READ16_MEMBER(ibm8514_line_error_r);
+	WRITE16_MEMBER(ibm8514_line_error_w);
+	READ16_MEMBER(ibm8514_status_r);
+	WRITE16_MEMBER(ibm8514_htotal_w);
+	READ16_MEMBER(ibm8514_substatus_r);
+	WRITE16_MEMBER(ibm8514_subcontrol_w);
+	READ16_MEMBER(ibm8514_subcontrol_r);
+	READ16_MEMBER(ibm8514_htotal_r);
+	READ16_MEMBER(ibm8514_vtotal_r);
+	WRITE16_MEMBER(ibm8514_vtotal_w);
+	READ16_MEMBER(ibm8514_vdisp_r);
+	WRITE16_MEMBER(ibm8514_vdisp_w);
+	READ16_MEMBER(ibm8514_vsync_r);
+	WRITE16_MEMBER(ibm8514_vsync_w);
+	READ16_MEMBER(ibm8514_desty_r);
+	WRITE16_MEMBER(ibm8514_desty_w);
+	READ16_MEMBER(ibm8514_destx_r);
+	WRITE16_MEMBER(ibm8514_destx_w);
+	READ16_MEMBER(ibm8514_ssv_r);
+	WRITE16_MEMBER(ibm8514_ssv_w);
+	READ16_MEMBER(ibm8514_currentx_r);
+	WRITE16_MEMBER(ibm8514_currentx_w);
+	READ16_MEMBER(ibm8514_currenty_r);
+	WRITE16_MEMBER(ibm8514_currenty_w);
+	READ16_MEMBER(ibm8514_width_r);
+	WRITE16_MEMBER(ibm8514_width_w);
+	READ16_MEMBER(ibm8514_fgcolour_r);
+	WRITE16_MEMBER(ibm8514_fgcolour_w);
+	READ16_MEMBER(ibm8514_bgcolour_r);
+	WRITE16_MEMBER(ibm8514_bgcolour_w);
+	READ16_MEMBER(ibm8514_multifunc_r);
+	WRITE16_MEMBER(ibm8514_multifunc_w);
+	READ16_MEMBER(ibm8514_backmix_r);
+	WRITE16_MEMBER(ibm8514_backmix_w);
+	READ16_MEMBER(ibm8514_foremix_r);
+	WRITE16_MEMBER(ibm8514_foremix_w);
+	READ16_MEMBER(ibm8514_pixel_xfer_r);
+	WRITE16_MEMBER(ibm8514_pixel_xfer_w);
+	void ibm8514_wait_draw();
+	struct
+	{
+		UINT16 htotal;  // Horizontal total (9 bits)
+		UINT16 vtotal;  // Vertical total adjust (3 bits), Vertical total base (9 bit)
+		UINT16 vdisp;
+		UINT16 vsync;
+		UINT16 subctrl;
+		UINT16 substatus;
+		UINT16 ssv;
+		UINT16 ec0;
+		UINT16 ec1;
+		UINT16 ec2;
+		UINT16 ec3;
+		bool gpbusy;
+		bool data_avail;
+		INT16 dest_x;
+		INT16 dest_y;
+		INT16 curr_x;
+		INT16 curr_y;
+		INT16 prev_x;
+		INT16 prev_y;
+		INT16 line_axial_step;
+		INT16 line_diagonal_step;
+		INT16 line_errorterm;
+		UINT16 current_cmd;
+		UINT16 src_x;
+		UINT16 src_y;
+		INT16 scissors_left;
+		INT16 scissors_right;
+		INT16 scissors_top;
+		INT16 scissors_bottom;
+		UINT16 rect_width;
+		UINT16 rect_height;
+		UINT32 fgcolour;
+		UINT32 bgcolour;
+		UINT16 fgmix;
+		UINT16 bgmix;
+		UINT32 pixel_xfer;
+		UINT16 pixel_control;
+		UINT8 bus_size;
+		UINT8 multifunc_sel;
+
+		int state;
+		UINT8 wait_vector_len;
+		UINT8 wait_vector_dir;
+		bool wait_vector_draw;
+		UINT8 wait_vector_count;
+
+	} ibm8514;
+protected:
+	virtual void device_start();
+	virtual void device_config_complete();
+private:
+	void ibm8514_draw_vector(UINT8 len, UINT8 dir, bool draw);
+	void ibm8514_wait_draw_ssv();
+	void ibm8514_draw_ssv(UINT8 data);
+	void ibm8514_wait_draw_vector();
+	void ibm8514_write_fg(UINT32 offset);
+	void ibm8514_write_bg(UINT32 offset);
+	void ibm8514_write(UINT32 offset, UINT32 src);
+
+	vga_device* m_vga;  // for pass-through
+	astring m_vga_tag;  // pass-through device tag
+	UINT8* m_vram;  // the original 8514/A has it's own VRAM, but most VGA+8514 combination cards will have
+					// only one set of VRAM, so this will only be needed in standalone 8514/A cards
+	UINT32 m_vramsize;
+};
+
+// device type definition
+extern const device_type IBM8514A;
+
+#define MCFG_8514A_ADD(_tag, _param) \
+		MCFG_DEVICE_ADD(_tag, IBM8514A, 0) \
+		downcast<ibm8514a_device*>(device)->set_vga(_param);
+
+#define MCFG_8514A_ADD_OWNER(_tag) \
+		MCFG_DEVICE_ADD(_tag, IBM8514A, 0) \
+		downcast<ibm8514a_device*>(device)->set_vga_owner();
+
+
+class mach8_device :  public ibm8514a_device
+{
+public:
+	mach8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	READ16_MEMBER(mach8_ec0_r);
+	WRITE16_MEMBER(mach8_ec0_w);
+	READ16_MEMBER(mach8_ec1_r);
+	WRITE16_MEMBER(mach8_ec1_w);
+	READ16_MEMBER(mach8_ec2_r);
+	WRITE16_MEMBER(mach8_ec2_w);
+	READ16_MEMBER(mach8_ec3_r);
+	WRITE16_MEMBER(mach8_ec3_w);
+	READ16_MEMBER(mach8_ext_fifo_r);
+	WRITE16_MEMBER(mach8_linedraw_index_w);
+	READ16_MEMBER(mach8_bresenham_count_r);
+	WRITE16_MEMBER(mach8_bresenham_count_w);
+	WRITE16_MEMBER(mach8_linedraw_w);
+	READ16_MEMBER(mach8_linedraw_r);
+	READ16_MEMBER(mach8_scratch0_r);
+	WRITE16_MEMBER(mach8_scratch0_w);
+	READ16_MEMBER(mach8_scratch1_r);
+	WRITE16_MEMBER(mach8_scratch1_w);
+	READ16_MEMBER(mach8_config1_r);
+	READ16_MEMBER(mach8_config2_r);
+protected:
+	virtual void device_start();
+	struct
+	{
+		UINT16 scratch0;
+		UINT16 scratch1;
+		UINT16 linedraw;
+	} mach8;
+};
+
+// device type definition
+extern const device_type MACH8;
+
+#define MCFG_MACH8_ADD(_tag, _param) \
+		MCFG_DEVICE_ADD(_tag, MACH8, 0) \
+		downcast<mach8_device*>(device)->set_vga(_param);
+
+#define MCFG_MACH8_ADD_OWNER(_tag) \
+		MCFG_DEVICE_ADD(_tag, MACH8, 0) \
+		downcast<mach8_device*>(device)->set_vga_owner();
 
 // ======================> tseng_vga_device
 
@@ -235,6 +419,7 @@ public:
 	virtual WRITE8_MEMBER(mem_w);
 
 protected:
+	virtual void device_start();
 
 private:
 	void tseng_define_video_mode();
@@ -304,137 +489,19 @@ public:
 	READ8_MEMBER(ati_port_ext_r);
 	WRITE8_MEMBER(ati_port_ext_w);
 
-	// TODO: move 8514/A registers to their own device
-	READ16_MEMBER(ibm8514_gpstatus_r);
-	WRITE16_MEMBER(ibm8514_cmd_w);
-	READ16_MEMBER(ibm8514_line_error_r);
-	WRITE16_MEMBER(ibm8514_line_error_w);
-	READ16_MEMBER(ibm8514_status_r);
-	WRITE16_MEMBER(ibm8514_htotal_w);
-	READ16_MEMBER(ibm8514_substatus_r);
-	WRITE16_MEMBER(ibm8514_subcontrol_w);
-	READ16_MEMBER(ibm8514_subcontrol_r);
-	READ16_MEMBER(ibm8514_htotal_r);
-	READ16_MEMBER(ibm8514_vtotal_r);
-	WRITE16_MEMBER(ibm8514_vtotal_w);
-	READ16_MEMBER(ibm8514_vdisp_r);
-	WRITE16_MEMBER(ibm8514_vdisp_w);
-	READ16_MEMBER(ibm8514_vsync_r);
-	WRITE16_MEMBER(ibm8514_vsync_w);
-	READ16_MEMBER(ibm8514_desty_r);
-	WRITE16_MEMBER(ibm8514_desty_w);
-	READ16_MEMBER(ibm8514_destx_r);
-	WRITE16_MEMBER(ibm8514_destx_w);
-	READ16_MEMBER(ibm8514_ssv_r);
-	WRITE16_MEMBER(ibm8514_ssv_w);
-	READ16_MEMBER(ibm8514_currentx_r);
-	WRITE16_MEMBER(ibm8514_currentx_w);
-	READ16_MEMBER(ibm8514_currenty_r);
-	WRITE16_MEMBER(ibm8514_currenty_w);
-	READ16_MEMBER(ibm8514_width_r);
-	WRITE16_MEMBER(ibm8514_width_w);
-	READ16_MEMBER(ibm8514_fgcolour_r);
-	WRITE16_MEMBER(ibm8514_fgcolour_w);
-	READ16_MEMBER(ibm8514_bgcolour_r);
-	WRITE16_MEMBER(ibm8514_bgcolour_w);
-	READ16_MEMBER(ibm8514_multifunc_r);
-	WRITE16_MEMBER(ibm8514_multifunc_w);
-	READ16_MEMBER(ibm8514_backmix_r);
-	WRITE16_MEMBER(ibm8514_backmix_w);
-	READ16_MEMBER(ibm8514_foremix_r);
-	WRITE16_MEMBER(ibm8514_foremix_w);
-	READ16_MEMBER(ibm8514_pixel_xfer_r);
-	WRITE16_MEMBER(ibm8514_pixel_xfer_w);
-
-	// extra registers for the Mach8
-	READ16_MEMBER(mach8_ec0_r);
-	WRITE16_MEMBER(mach8_ec0_w);
-	READ16_MEMBER(mach8_ec1_r);
-	WRITE16_MEMBER(mach8_ec1_w);
-	READ16_MEMBER(mach8_ec2_r);
-	WRITE16_MEMBER(mach8_ec2_w);
-	READ16_MEMBER(mach8_ec3_r);
-	WRITE16_MEMBER(mach8_ec3_w);
-	READ16_MEMBER(mach8_ext_fifo_r);
-	WRITE16_MEMBER(mach8_linedraw_index_w);
-	READ16_MEMBER(mach8_bresenham_count_r);
-	WRITE16_MEMBER(mach8_bresenham_count_w);
-	WRITE16_MEMBER(mach8_linedraw_w);
-	READ16_MEMBER(mach8_scratch0_r);
-	WRITE16_MEMBER(mach8_scratch0_w);
-	READ16_MEMBER(mach8_scratch1_r);
-	WRITE16_MEMBER(mach8_scratch1_w);
-	READ16_MEMBER(mach8_config1_r);
-	READ16_MEMBER(mach8_config2_r);
-protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
-	void ibm8514_wait_draw();
-	struct
-	{
-		UINT16 htotal;  // Horizontal total (9 bits)
-		UINT16 vtotal;  // Vertical total adjust (3 bits), Vertical total base (9 bit)
-		UINT16 vdisp;
-		UINT16 vsync;
-		UINT16 subctrl;
-		UINT16 substatus;
-		UINT16 ssv;
-		UINT16 ec0;
-		UINT16 ec1;
-		UINT16 ec2;
-		UINT16 ec3;
-		bool gpbusy;
-		bool data_avail;
-		INT16 dest_x;
-		INT16 dest_y;
-		INT16 curr_x;
-		INT16 curr_y;
-		INT16 prev_x;
-		INT16 prev_y;
-		INT16 line_axial_step;
-		INT16 line_diagonal_step;
-		INT16 line_errorterm;
-		UINT16 current_cmd;
-		UINT16 src_x;
-		UINT16 src_y;
-		INT16 scissors_left;
-		INT16 scissors_right;
-		INT16 scissors_top;
-		INT16 scissors_bottom;
-		UINT16 rect_width;
-		UINT16 rect_height;
-		UINT32 fgcolour;
-		UINT32 bgcolour;
-		UINT16 fgmix;
-		UINT16 bgmix;
-		UINT32 pixel_xfer;
-		UINT16 pixel_control;
-		UINT8 bus_size;
-		UINT8 multifunc_sel;
 
-		int state;
-		UINT8 wait_vector_len;
-		UINT8 wait_vector_dir;
-		bool wait_vector_draw;
-		UINT8 wait_vector_count;
-
-	} ibm8514;
+	mach8_device* get_8514() { return m_8514; }
+protected:
+    virtual void device_start();
 private:
 	void ati_define_video_mode();
-	void ibm8514_draw_vector(UINT8 len, UINT8 dir, bool draw);
-	void ibm8514_wait_draw_ssv();
-	void ibm8514_draw_ssv(UINT8 data);
-	void ibm8514_wait_draw_vector();
 	struct
 	{
 		UINT8 ext_reg[64];
 		UINT8 ext_reg_select;
-		UINT16 scratch0;
-		UINT16 scratch1;
-		UINT16 linedraw;
 	} ati;
-	void ibm8514_write_fg(UINT32 offset);
-	void ibm8514_write_bg(UINT32 offset);
-	void ibm8514_write(UINT32 offset, UINT32 src);
+	mach8_device* m_8514;
 };
 
 // device type definition
@@ -457,12 +524,12 @@ public:
 	virtual WRITE8_MEMBER(port_03d0_w);
 	virtual READ8_MEMBER(mem_r);
 	virtual WRITE8_MEMBER(mem_w);
-	
+
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
-	READ16_MEMBER(s3_gpstatus_r);
-	WRITE16_MEMBER(s3_cmd_w);
-	
+
+	virtual machine_config_constructor device_mconfig_additions() const;
+
+	ibm8514a_device* get_8514() { return m_8514; }
 protected:
     // device-level overrides
     virtual void device_start();
@@ -492,13 +559,13 @@ protected:
 		UINT8 cursor_fg_ptr;
 		UINT8 cursor_bg_ptr;
 		UINT8 extended_dac_ctrl;
-	} s3;	
+	} s3;
 private:
 	UINT8 s3_crtc_reg_read(UINT8 index);
 	void s3_define_video_mode(void);
 	void s3_crtc_reg_write(UINT8 index, UINT8 data);
+	ibm8514a_device* m_8514;
 };
-
 
 // device type definition
 extern const device_type S3_VGA;
@@ -590,6 +657,7 @@ extern const device_type CIRRUS_VGA;
 
   ROM_LOAD("oakvga.bin", 0xc0000, 0x8000, CRC(318c5f43))
 */
+
 
 #endif /* PC_VGA_H */
 

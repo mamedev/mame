@@ -38,7 +38,8 @@ protected:
         virtual void device_start();
         virtual void device_reset();
 private:		
-		ati_vga_device *m_vga;		
+		ati_vga_device *m_vga;
+		mach8_device *m_8514;
 };
 
 

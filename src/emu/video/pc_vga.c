@@ -79,6 +79,8 @@ enum
 #define VGA_START_ADDRESS (vga.crtc.start_addr)
 #define VGA_LINE_LENGTH (vga.crtc.offset<<3)
 
+#define IBM8514_LINE_LENGTH (m_vga->vga.crtc.offset << 3)
+
 #define CHAR_WIDTH ((vga.sequencer.data[1]&1)?8:9)
 
 #define TEXT_COLUMNS (vga.crtc.horz_disp_end+1)
@@ -118,6 +120,8 @@ const device_type S3_VGA = &device_creator<s3_vga_device>;
 const device_type GAMTOR_VGA = &device_creator<gamtor_vga_device>;
 const device_type ATI_VGA = &device_creator<ati_vga_device>;
 const device_type CIRRUS_VGA = &device_creator<cirrus_vga_device>;
+const device_type IBM8514A = &device_creator<ibm8514a_device>;
+const device_type MACH8 = &device_creator<mach8_device>;
 
 vga_device::vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, type, name, tag, owner, clock)
@@ -169,6 +173,25 @@ cirrus_vga_device::cirrus_vga_device(const machine_config &mconfig, const char *
 {
 }
 
+ibm8514a_device::ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, IBM8514A, "IBM8514A", tag, owner, clock)
+{
+}
+
+ibm8514a_device::ibm8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, type, name, tag, owner, clock)
+{
+}
+
+mach8_device::mach8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: ibm8514a_device(mconfig, type, name, tag, owner, clock)
+{
+}
+
+mach8_device::mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ibm8514a_device(mconfig, MACH8, "MACH8", tag, owner, clock)
+{
+}
 
 void vga_device::device_start()
 {
@@ -191,9 +214,16 @@ void vga_device::device_start()
 	vga.memory	= auto_alloc_array_clear(machine(), UINT8, vga.svga_intf.vram_size);	
 }
 
+void svga_device::device_start()
+{
+	vga_device::device_start();
+	memset(&svga, 0, sizeof(svga));
+}
+
 void cirrus_vga_device::device_start()
 {
 	memset(&vga, 0, sizeof(vga));
+	memset(&svga, 0, sizeof(svga));
 
 	int i;
 	for (i = 0; i < 0x100; i++)
@@ -212,9 +242,17 @@ void cirrus_vga_device::device_start()
 	vga.memory	= auto_alloc_array_clear(machine(), UINT8, vga.svga_intf.vram_size);	
 }
 
+void ati_vga_device::device_start()
+{
+	svga_device::device_start();
+	memset(&ati, 0, sizeof(ati));
+	m_8514 = subdevice<mach8_device>("8514a");
+}
+
 void s3_vga_device::device_start()
 {
-	vga_device::device_start();	
+	svga_device::device_start();
+	memset(&s3, 0, sizeof(s3));
 	int x;
 	// Initialise hardware graphics cursor colours, Windows 95 doesn't touch the registers for some reason
 	for(x=0;x<4;x++)
@@ -222,6 +260,32 @@ void s3_vga_device::device_start()
 		s3.cursor_fg[x] = 0xff;
 		s3.cursor_bg[x] = 0x00;
 	}
+	m_8514 = subdevice<ibm8514a_device>("8514a");
+}
+
+void tseng_vga_device::device_start()
+{
+	svga_device::device_start();
+	memset(&et4k, 0, sizeof(et4k));
+}
+
+void ibm8514a_device::device_start()
+{
+	memset(&ibm8514, 0, sizeof(ibm8514));
+}
+
+void ibm8514a_device::device_config_complete()
+{
+	if(m_vga_tag.len() != 0)
+	{
+		m_vga = machine().device<vga_device>(m_vga_tag);
+	}
+}
+
+void mach8_device::device_start()
+{
+	ibm8514a_device::device_start();
+	memset(&mach8, 0, sizeof(mach8));
 }
 
 void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -2014,7 +2078,12 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_s3_isa )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( ati_vga )
+	MCFG_MACH8_ADD_OWNER("8514a")
 	MCFG_EEPROM_ADD("ati_eeprom",ati_eeprom_interface)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_FRAGMENT( s3_764 )
+	MCFG_8514A_ADD_OWNER("8514a")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -2025,6 +2094,11 @@ MACHINE_CONFIG_END
 machine_config_constructor ati_vga_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( ati_vga );
+}
+
+machine_config_constructor s3_vga_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( s3_764 );
 }
 
 /******************************************
@@ -2667,11 +2741,6 @@ void s3_vga_device::s3_crtc_reg_write(UINT8 index, UINT8 data)
 				break;
 			case 0x40:
 				s3.enable_8514 = data & 0x01;  // enable 8514/A registers (x2e8, x6e8, xae8, xee8)
-				if(data & 0x01)
-				{
-					ibm8514.state = IBM8514_IDLE;
-					ibm8514.gpbusy = false;
-				}
 				break;
 /*
 3d4h index 45h (R/W):  CR45 Hardware Graphics Cursor Mode
@@ -2972,9 +3041,10 @@ READ8_MEMBER(ati_vga_device::port_03c0_r)
 
 /* accelerated ports, TBD ... */
 
-void ati_vga_device::ibm8514_write_fg(UINT32 offset)
+void ibm8514a_device::ibm8514_write_fg(UINT32 offset)
 {
-	UINT8 dst = vga.memory[offset];
+	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 dst = m_vga->mem_linear_r(space,offset,0xff);
 	UINT8 src = 0;
 
 	// check clipping rectangle
@@ -2995,7 +3065,7 @@ void ati_vga_device::ibm8514_write_fg(UINT32 offset)
 		break;
 	case 0x0060:
 		// video memory - presume the memory is sourced from the current X/Y co-ords
-		src = vga.memory[((ibm8514.curr_y * VGA_LINE_LENGTH) + ibm8514.curr_x) % vga.svga_intf.vram_size];
+		src = m_vga->mem_linear_r(space,((ibm8514.curr_y * IBM8514_LINE_LENGTH) + ibm8514.curr_x),0xff);
 		break;
 	}
 
@@ -3003,59 +3073,60 @@ void ati_vga_device::ibm8514_write_fg(UINT32 offset)
 	switch(ibm8514.fgmix & 0x000f)
 	{
 	case 0x0000:
-		vga.memory[offset] = ~dst;
+		m_vga->mem_linear_w(space,offset,~dst,0xff);
 		break;
 	case 0x0001:
-		vga.memory[offset] = 0x00;
+		m_vga->mem_linear_w(space,offset,0x00,0xff);
 		break;
 	case 0x0002:
-		vga.memory[offset] = 0xff;
+		m_vga->mem_linear_w(space,offset,0xff,0xff);
 		break;
 	case 0x0003:
 		// change nothing, pixel is unchanged
 		break;
 	case 0x0004:
-		vga.memory[offset] = ~src;
+		m_vga->mem_linear_w(space,offset,~src,0xff);
 		break;
 	case 0x0005:
-		vga.memory[offset] = src ^ dst;
+		m_vga->mem_linear_w(space,offset,src ^ dst,0xff);
 		break;
 	case 0x0006:
-		vga.memory[offset] = ~(src ^ dst);
+		m_vga->mem_linear_w(space,offset,~(src ^ dst),0xff);
 		break;
 	case 0x0007:
-		vga.memory[offset] = src;
+		m_vga->mem_linear_w(space,offset,src,0xff);
 		break;
 	case 0x0008:
-		vga.memory[offset] = ~(src & dst);
+		m_vga->mem_linear_w(space,offset,~(src & dst),0xff);
 		break;
 	case 0x0009:
-		vga.memory[offset] = (~src) | dst;
+		m_vga->mem_linear_w(space,offset,(~src) | dst,0xff);
 		break;
 	case 0x000a:
-		vga.memory[offset] = src | (~dst);
+		m_vga->mem_linear_w(space,offset,src | (~dst),0xff);
 		break;
 	case 0x000b:
-		vga.memory[offset] = src | dst;
+		m_vga->mem_linear_w(space,offset,src | dst,0xff);
 		break;
 	case 0x000c:
-		vga.memory[offset] = src & dst;
+		m_vga->mem_linear_w(space,offset,src & dst,0xff);
 		break;
 	case 0x000d:
-		vga.memory[offset] = src & (~dst);
+		m_vga->mem_linear_w(space,offset,src & (~dst),0xff);
 		break;
 	case 0x000e:
-		vga.memory[offset] = (~src) & dst;
+		m_vga->mem_linear_w(space,offset,(~src) & dst,0xff);
 		break;
 	case 0x000f:
-		vga.memory[offset] = ~(src | dst);
+		m_vga->mem_linear_w(space,offset,~(src | dst),0xff);
 		break;
 	}
 }
 
-void ati_vga_device::ibm8514_write_bg(UINT32 offset)
+void ibm8514a_device::ibm8514_write_bg(UINT32 offset)
 {
-	UINT8 dst = vga.memory[offset];
+	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 dst = m_vga->mem_linear_r(space,offset,0xff);
 	UINT8 src = 0;
 
 	// check clipping rectangle
@@ -3076,7 +3147,7 @@ void ati_vga_device::ibm8514_write_bg(UINT32 offset)
 		break;
 	case 0x0060:
 		// video memory - presume the memory is sourced from the current X/Y co-ords
-		src = vga.memory[((ibm8514.curr_y * VGA_LINE_LENGTH) + ibm8514.curr_x) % vga.svga_intf.vram_size];
+		src = m_vga->mem_linear_r(space,((ibm8514.curr_y * IBM8514_LINE_LENGTH) + ibm8514.curr_x),0xff);
 		break;
 	}
 
@@ -3084,60 +3155,61 @@ void ati_vga_device::ibm8514_write_bg(UINT32 offset)
 	switch(ibm8514.bgmix & 0x000f)
 	{
 	case 0x0000:
-		vga.memory[offset] = ~dst;
+		m_vga->mem_linear_w(space,offset,~dst,0xff);
 		break;
 	case 0x0001:
-		vga.memory[offset] = 0x00;
+		m_vga->mem_linear_w(space,offset,0x00,0xff);
 		break;
 	case 0x0002:
-		vga.memory[offset] = 0xff;
+		m_vga->mem_linear_w(space,offset,0xff,0xff);
 		break;
 	case 0x0003:
 		// change nothing, pixel is unchanged
 		break;
 	case 0x0004:
-		vga.memory[offset] = ~src;
+		m_vga->mem_linear_w(space,offset,~src,0xff);
 		break;
 	case 0x0005:
-		vga.memory[offset] = src ^ dst;
+		m_vga->mem_linear_w(space,offset,src ^ dst,0xff);
 		break;
 	case 0x0006:
-		vga.memory[offset] = ~(src ^ dst);
+		m_vga->mem_linear_w(space,offset,~(src ^ dst),0xff);
 		break;
 	case 0x0007:
-		vga.memory[offset] = src;
+		m_vga->mem_linear_w(space,offset,src,0xff);
 		break;
 	case 0x0008:
-		vga.memory[offset] = ~(src & dst);
+		m_vga->mem_linear_w(space,offset,~(src & dst),0xff);
 		break;
 	case 0x0009:
-		vga.memory[offset] = (~src) | dst;
+		m_vga->mem_linear_w(space,offset,(~src) | dst,0xff);
 		break;
 	case 0x000a:
-		vga.memory[offset] = src | (~dst);
+		m_vga->mem_linear_w(space,offset,src | (~dst),0xff);
 		break;
 	case 0x000b:
-		vga.memory[offset] = src | dst;
+		m_vga->mem_linear_w(space,offset,src | dst,0xff);
 		break;
 	case 0x000c:
-		vga.memory[offset] = src & dst;
+		m_vga->mem_linear_w(space,offset,src & dst,0xff);
 		break;
 	case 0x000d:
-		vga.memory[offset] = src & (~dst);
+		m_vga->mem_linear_w(space,offset,src & (~dst),0xff);
 		break;
 	case 0x000e:
-		vga.memory[offset] = (~src) & dst;
+		m_vga->mem_linear_w(space,offset,(~src) & dst,0xff);
 		break;
 	case 0x000f:
-		vga.memory[offset] = ~(src | dst);
+		m_vga->mem_linear_w(space,offset,~(src | dst),0xff);
 		break;
 	}
 }
 
-void ati_vga_device::ibm8514_write(UINT32 offset, UINT32 src)
+void ibm8514a_device::ibm8514_write(UINT32 offset, UINT32 src)
 {
 	int data_size = 8;
 	UINT32 xfer = 0;
+	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch(ibm8514.pixel_control & 0x00c0)
 	{
@@ -3180,7 +3252,7 @@ void ati_vga_device::ibm8514_write(UINT32 offset, UINT32 src)
 			ibm8514.src_x = 0;
 		break;
 	case 0x00c0:  // use source plane
-		if(vga.memory[(src) % vga.svga_intf.vram_size] != 0x00)
+		if(m_vga->mem_linear_r(space,src,0xff) != 0x00)
 			ibm8514_write_fg(offset);
 		else
 			ibm8514_write_bg(offset);
@@ -3198,12 +3270,12 @@ bit  0-12  (911/924) LINE PARAMETER/ERROR TERM. For Line Drawing this is the
             the major or independent axis).
      0-13  (80x +) LINE PARAMETER/ERROR TERM. See above.
  */
-READ16_MEMBER(ati_vga_device::ibm8514_line_error_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_line_error_r)
 {
 	return ibm8514.line_errorterm;
 }
 
-WRITE16_MEMBER(ati_vga_device::ibm8514_line_error_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_line_error_w)
 {
 	ibm8514.line_errorterm = data;
 	if(LOG_8514) logerror("8514/A: Line Parameter/Error Term write %04x\n",data);
@@ -3230,7 +3302,7 @@ bit   0-7  Queue State.
             available, Fh for 9 words, 7 for 10 words, 3 for 11 words, 1 for
             12 words and 0 for 13 words available.
  */
-READ16_MEMBER(ati_vga_device::ibm8514_gpstatus_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_gpstatus_r)
 {
 	UINT16 ret = 0x0000;
 
@@ -3242,14 +3314,14 @@ READ16_MEMBER(ati_vga_device::ibm8514_gpstatus_r)
 	return ret;
 }
 
-void ati_vga_device::ibm8514_draw_vector(UINT8 len, UINT8 dir, bool draw)
+void ibm8514a_device::ibm8514_draw_vector(UINT8 len, UINT8 dir, bool draw)
 {
 	UINT32 offset;
 	int x = 0;
 
 	while(x <= len)
 	{
-		offset = (ibm8514.curr_y * VGA_LINE_LENGTH) + ibm8514.curr_x;
+		offset = (ibm8514.curr_y * IBM8514_LINE_LENGTH) + ibm8514.curr_x;
 		if(draw)
 			ibm8514_write(offset,offset);
 		switch(dir)
@@ -3285,23 +3357,6 @@ void ati_vga_device::ibm8514_draw_vector(UINT8 len, UINT8 dir, bool draw)
 		}
 		x++;
 	}
-}
-
-READ16_MEMBER(s3_vga_device::s3_gpstatus_r)
-{
-	UINT16 ret = 0x0000;
-
-	//if(LOG_8514) logerror("S3: 9AE8 read\n");
-	if(s3.enable_8514 != 0)
-	{
-		if(ibm8514.gpbusy == true)
-			ret |= 0x0200;
-		if(ibm8514.data_avail == true)
-			ret |= 0x0100;
-		return ret;
-	}
-	else
-		return 0xffff;
 }
 
 /*
@@ -3387,7 +3442,7 @@ bit     0  (911-928) ~RD/WT. Read/Write Data. If set VRAM write operations are
                 rectangle, which is copied repeatably to the destination
                 rectangle.
  */
-WRITE16_MEMBER(ati_vga_device::ibm8514_cmd_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_cmd_w)
 {
 	int x,y;
 	int pattern_x,pattern_y;
@@ -3402,7 +3457,7 @@ WRITE16_MEMBER(ati_vga_device::ibm8514_cmd_w)
 	case 0x0000:  // NOP (for "Short Stroke Vectors")
 		ibm8514.state = IBM8514_IDLE;
 		ibm8514.gpbusy = false;
-		if(LOG_8514) logerror("S3: Command (%04x) - NOP (Short Stroke Vector)\n",ibm8514.current_cmd);
+		if(LOG_8514) logerror("8514/A: Command (%04x) - NOP (Short Stroke Vector)\n",ibm8514.current_cmd);
 		break;
 	case 0x2000:  // Line
 		ibm8514.state = IBM8514_IDLE;
@@ -3413,12 +3468,12 @@ WRITE16_MEMBER(ati_vga_device::ibm8514_cmd_w)
 			{
 				ibm8514.state = IBM8514_DRAWING_LINE;
 				ibm8514.data_avail = true;
-				if(LOG_8514) logerror("S3: Command (%04x) - Vector Line (WAIT) %i,%i \n",ibm8514.current_cmd,ibm8514.curr_x,ibm8514.curr_y);
+				if(LOG_8514) logerror("8514/A: Command (%04x) - Vector Line (WAIT) %i,%i \n",ibm8514.current_cmd,ibm8514.curr_x,ibm8514.curr_y);
 			}
 			else
 			{
 				ibm8514_draw_vector(ibm8514.rect_width,(data & 0x00e0) >> 5,(data & 0010) ? true : false);
-				if(LOG_8514) logerror("S3: Command (%04x) - Vector Line - %i,%i \n",ibm8514.current_cmd,ibm8514.curr_x,ibm8514.curr_y);
+				if(LOG_8514) logerror("8514/A: Command (%04x) - Vector Line - %i,%i \n",ibm8514.current_cmd,ibm8514.curr_x,ibm8514.curr_y);
 			}
 		}
 		else
@@ -3432,7 +3487,7 @@ WRITE16_MEMBER(ati_vga_device::ibm8514_cmd_w)
 			int count = 0;
 			INT16 temp;
 
-			if(LOG_8514) logerror("S3: Command (%04x) - Line (Bresenham) - %i,%i  Axial %i, Diagonal %i, Error %i, Major Axis %i, Minor Axis %i\n",ibm8514.current_cmd,
+			if(LOG_8514) logerror("8514/A: Command (%04x) - Line (Bresenham) - %i,%i  Axial %i, Diagonal %i, Error %i, Major Axis %i, Minor Axis %i\n",ibm8514.current_cmd,
 				ibm8514.curr_x,ibm8514.curr_y,ibm8514.line_axial_step,ibm8514.line_diagonal_step,ibm8514.line_errorterm,ibm8514.rect_width,ibm8514.rect_height);
 
 			if((data & 0x0040))
@@ -3441,7 +3496,7 @@ WRITE16_MEMBER(ati_vga_device::ibm8514_cmd_w)
 			}
 			for(;;)
 			{
-				ibm8514_write(ibm8514.curr_x + (ibm8514.curr_y * VGA_LINE_LENGTH),ibm8514.curr_x + (ibm8514.curr_y * VGA_LINE_LENGTH));
+				ibm8514_write(ibm8514.curr_x + (ibm8514.curr_y * IBM8514_LINE_LENGTH),ibm8514.curr_x + (ibm8514.curr_y * IBM8514_LINE_LENGTH));
 				if (count > ibm8514.rect_width) break;
 				count++;
 				if((err*2) > -dy)
@@ -3464,23 +3519,23 @@ WRITE16_MEMBER(ati_vga_device::ibm8514_cmd_w)
 			//ibm8514.gpbusy = true;  // DirectX 5 keeps waiting for the busy bit to be clear...
 			ibm8514.bus_size = (data & 0x0600) >> 9;
 			ibm8514.data_avail = true;
-			if(LOG_8514) logerror("S3: Command (%04x) - Rectangle Fill (WAIT) %i,%i Width: %i Height: %i Colour: %08x\n",ibm8514.current_cmd,ibm8514.curr_x,
+			if(LOG_8514) logerror("8514/A: Command (%04x) - Rectangle Fill (WAIT) %i,%i Width: %i Height: %i Colour: %08x\n",ibm8514.current_cmd,ibm8514.curr_x,
 					ibm8514.curr_y,ibm8514.rect_width,ibm8514.rect_height,ibm8514.fgcolour);
 			break;
 		}
-		if(LOG_8514) logerror("S3: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",ibm8514.current_cmd,ibm8514.curr_x,
+		if(LOG_8514) logerror("8514/A: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",ibm8514.current_cmd,ibm8514.curr_x,
 				ibm8514.curr_y,ibm8514.rect_width,ibm8514.rect_height,ibm8514.fgcolour);
 		off = 0;
-		off += (VGA_LINE_LENGTH * ibm8514.curr_y);
+		off += (IBM8514_LINE_LENGTH * ibm8514.curr_y);
 		off += ibm8514.curr_x;
 		for(y=0;y<=ibm8514.rect_height;y++)
 		{
 			for(x=0;x<=ibm8514.rect_width;x++)
 			{
 				if(data & 0x0020)  // source pattern is always based on current X/Y?
-					ibm8514_write((off+x) % vga.svga_intf.vram_size,(off+x) % vga.svga_intf.vram_size);
+					ibm8514_write((off+x) % m_vga->vga.svga_intf.vram_size,(off+x) % m_vga->vga.svga_intf.vram_size);
 				else
-					ibm8514_write((off-x) % vga.svga_intf.vram_size,(off-x) % vga.svga_intf.vram_size);
+					ibm8514_write((off-x) % m_vga->vga.svga_intf.vram_size,(off-x) % m_vga->vga.svga_intf.vram_size);
 				if(ibm8514.current_cmd & 0x0020)
 				{
 					ibm8514.curr_x++;
@@ -3509,30 +3564,30 @@ WRITE16_MEMBER(ati_vga_device::ibm8514_cmd_w)
 				}
 			}
 			if(data & 0x0080)
-				off += VGA_LINE_LENGTH;
+				off += IBM8514_LINE_LENGTH;
 			else
-				off -= VGA_LINE_LENGTH;
+				off -= IBM8514_LINE_LENGTH;
 		}
 		ibm8514.state = IBM8514_IDLE;
 		ibm8514.gpbusy = false;
 		break;
 	case 0xc000:  // BitBLT
-		if(LOG_8514) logerror("S3: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",ibm8514.current_cmd,
+		if(LOG_8514) logerror("8514/A: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",ibm8514.current_cmd,
 				ibm8514.curr_x,ibm8514.curr_y,ibm8514.dest_x,ibm8514.dest_y,ibm8514.rect_width,ibm8514.rect_height);
 		off = 0;
-		off += (VGA_LINE_LENGTH * ibm8514.dest_y);
+		off += (IBM8514_LINE_LENGTH * ibm8514.dest_y);
 		off += ibm8514.dest_x;
 		src = 0;
-		src += (VGA_LINE_LENGTH * ibm8514.curr_y);
+		src += (IBM8514_LINE_LENGTH * ibm8514.curr_y);
 		src += ibm8514.curr_x;
 		for(y=0;y<=ibm8514.rect_height;y++)
 		{
 			for(x=0;x<=ibm8514.rect_width;x++)
 			{
 				if(data & 0x0020)
-					vga.memory[(off+x) % vga.svga_intf.vram_size] = vga.memory[(src+x) % vga.svga_intf.vram_size];
+					m_vga->mem_linear_w(space,(off+x),m_vga->mem_linear_r(space,(src+x),0xff),0xff);
 				else
-					vga.memory[(off-x) % vga.svga_intf.vram_size] = vga.memory[(src-x) % vga.svga_intf.vram_size];
+					m_vga->mem_linear_w(space,(off-x),m_vga->mem_linear_r(space,(src-x),0xff),0xff);
 				if(ibm8514.current_cmd & 0x0020)
 				{
 					ibm8514.curr_x++;
@@ -3562,26 +3617,26 @@ WRITE16_MEMBER(ati_vga_device::ibm8514_cmd_w)
 			}
 			if(data & 0x0080)
 			{
-				src += VGA_LINE_LENGTH;
-				off += VGA_LINE_LENGTH;
+				src += IBM8514_LINE_LENGTH;
+				off += IBM8514_LINE_LENGTH;
 			}
 			else
 			{
-				src -= VGA_LINE_LENGTH;
-				off -= VGA_LINE_LENGTH;
+				src -= IBM8514_LINE_LENGTH;
+				off -= IBM8514_LINE_LENGTH;
 			}
 		}
 		ibm8514.state = IBM8514_IDLE;
 		ibm8514.gpbusy = false;
 		break;
 	case 0xe000:  // Pattern Fill
-		if(LOG_8514) logerror("S3: Command (%04x) - Pattern Fill - source %i,%i  dest %i,%i  Width: %i Height: %i\n",ibm8514.current_cmd,
+		if(LOG_8514) logerror("8514/A: Command (%04x) - Pattern Fill - source %i,%i  dest %i,%i  Width: %i Height: %i\n",ibm8514.current_cmd,
 				ibm8514.curr_x,ibm8514.curr_y,ibm8514.dest_x,ibm8514.dest_y,ibm8514.rect_width,ibm8514.rect_height);
 		off = 0;
-		off += (VGA_LINE_LENGTH * ibm8514.dest_y);
+		off += (IBM8514_LINE_LENGTH * ibm8514.dest_y);
 		off += ibm8514.dest_x;
 		src = 0;
-		src += (VGA_LINE_LENGTH * ibm8514.curr_y);
+		src += (IBM8514_LINE_LENGTH * ibm8514.curr_y);
 		src += ibm8514.curr_x;
 		if(data & 0x0020)
 			pattern_x = 0;
@@ -3620,24 +3675,24 @@ WRITE16_MEMBER(ati_vga_device::ibm8514_cmd_w)
 			if(data & 0x0080)
 			{
 				pattern_y++;
-				src += VGA_LINE_LENGTH;
+				src += IBM8514_LINE_LENGTH;
 				if(pattern_y >= 8)
 				{
 					pattern_y = 0;
-					src -= (VGA_LINE_LENGTH * 8);  // move src pointer back to top of pattern
+					src -= (IBM8514_LINE_LENGTH * 8);  // move src pointer back to top of pattern
 				}
-				off += VGA_LINE_LENGTH;
+				off += IBM8514_LINE_LENGTH;
 			}
 			else
 			{
 				pattern_y--;
-				src -= VGA_LINE_LENGTH;
+				src -= IBM8514_LINE_LENGTH;
 				if(pattern_y < 0)
 				{
 					pattern_y = 7;
-					src += (VGA_LINE_LENGTH * 8);  // move src pointer back to bottom of pattern
+					src += (IBM8514_LINE_LENGTH * 8);  // move src pointer back to bottom of pattern
 				}
-				off -= VGA_LINE_LENGTH;
+				off -= IBM8514_LINE_LENGTH;
 			}
 		}
 		ibm8514.state = IBM8514_IDLE;
@@ -3646,15 +3701,10 @@ WRITE16_MEMBER(ati_vga_device::ibm8514_cmd_w)
 	default:
 		ibm8514.state = IBM8514_IDLE;
 		ibm8514.gpbusy = false;
-		if(LOG_8514) logerror("S3: Unknown command: %04x\n",data);
+		if(LOG_8514) logerror("8514/A: Unknown command: %04x\n",data);
 	}
 }
 
-WRITE16_MEMBER(s3_vga_device::s3_cmd_w)
-{
-	if(s3.enable_8514 != 0)
-		ibm8514_cmd_w(space,offset,data,mem_mask);
-}
 /*
 8AE8h W(R/W):  Destination Y Position & Axial Step Constant Register
                (DESTY_AXSTP)
@@ -3667,12 +3717,12 @@ bit  0-11  DESTINATION Y-POSITION. During BITBLT operations this is the Y
      0-13  (80 x+) LINE PARAMETER AXIAL STEP CONSTANT. Se above
 
  */
-READ16_MEMBER(ati_vga_device::ibm8514_desty_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_desty_r)
 {
 	return ibm8514.line_axial_step;
 }
 
-WRITE16_MEMBER(ati_vga_device::ibm8514_desty_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_desty_w)
 {
 	ibm8514.line_axial_step = data;
 	ibm8514.dest_y = data;
@@ -3692,12 +3742,12 @@ bit  0-11  DESTINATION X-POSITION. During BITBLT operations this is the X
      0-13  (80x +) LINE PARAMETER DIAGONAL STEP CONSTANT. Se above
 
  */
-READ16_MEMBER(ati_vga_device::ibm8514_destx_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_destx_r)
 {
 	return ibm8514.line_diagonal_step;
 }
 
-WRITE16_MEMBER(ati_vga_device::ibm8514_destx_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_destx_w)
 {
 	ibm8514.line_diagonal_step = data;
 	ibm8514.dest_x = data;
@@ -3726,7 +3776,7 @@ Note: The upper byte must be written for the SSV command to be executed.
       9EE9h before execution starts. A single 16bit write will do.
       If only one SSV is desired the other byte can be set to 0.
  */
-void ati_vga_device::ibm8514_wait_draw_ssv()
+void ibm8514a_device::ibm8514_wait_draw_ssv()
 {
 	UINT8 len = ibm8514.wait_vector_len;
 	UINT8 dir = ibm8514.wait_vector_dir;
@@ -3776,7 +3826,7 @@ void ati_vga_device::ibm8514_wait_draw_ssv()
 
 		if(ibm8514.state == IBM8514_DRAWING_SSV_1 || ibm8514.state == IBM8514_DRAWING_SSV_2)
 		{
-			offset = (ibm8514.curr_y * VGA_LINE_LENGTH) + ibm8514.curr_x;
+			offset = (ibm8514.curr_y * IBM8514_LINE_LENGTH) + ibm8514.curr_x;
 			if(draw)
 				ibm8514_write(offset,offset);
 			switch(dir)
@@ -3814,7 +3864,7 @@ void ati_vga_device::ibm8514_wait_draw_ssv()
 	}
 }
 
-void ati_vga_device::ibm8514_draw_ssv(UINT8 data)
+void ibm8514a_device::ibm8514_draw_ssv(UINT8 data)
 {
 	UINT8 len = data & 0x0f;
 	UINT8 dir = (data & 0xe0) >> 5;
@@ -3823,12 +3873,12 @@ void ati_vga_device::ibm8514_draw_ssv(UINT8 data)
 	ibm8514_draw_vector(len,dir,draw);
 }
 
-READ16_MEMBER(ati_vga_device::ibm8514_ssv_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_ssv_r)
 {
 	return ibm8514.ssv;
 }
 
-WRITE16_MEMBER(ati_vga_device::ibm8514_ssv_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_ssv_w)
 {
 	ibm8514.ssv = data;
 
@@ -3856,7 +3906,7 @@ WRITE16_MEMBER(ati_vga_device::ibm8514_ssv_w)
 	if(LOG_8514) logerror("8514/A: Short Stroke Vector write %04x\n",data);
 }
 
-void ati_vga_device::ibm8514_wait_draw_vector()
+void ibm8514a_device::ibm8514_wait_draw_vector()
 {
 	UINT8 len = ibm8514.wait_vector_len;
 	UINT8 dir = ibm8514.wait_vector_dir;
@@ -3888,7 +3938,7 @@ void ati_vga_device::ibm8514_wait_draw_vector()
 
 		if(ibm8514.state == IBM8514_DRAWING_LINE)
 		{
-			offset = (ibm8514.curr_y * VGA_LINE_LENGTH) + ibm8514.curr_x;
+			offset = (ibm8514.curr_y * IBM8514_LINE_LENGTH) + ibm8514.curr_x;
 			if(draw)
 				ibm8514_write(offset,offset);
 			switch(dir)
@@ -3935,64 +3985,64 @@ bit  0-10  (911/924)  RECTANGLE WIDTH/LINE PARAMETER MAX. For BITBLT and
             independent axis). Must be positive.
      0-11  (80x +) RECTANGLE WIDTH/LINE PARAMETER MAX. See above
  */
-READ16_MEMBER(ati_vga_device::ibm8514_width_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_width_r)
 {
 	return ibm8514.rect_width;
 }
 
-WRITE16_MEMBER(ati_vga_device::ibm8514_width_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_width_w)
 {
 	ibm8514.rect_width = data & 0x1fff;
-	if(LOG_8514) logerror("S3: Major Axis Pixel Count / Rectangle Width write %04x\n",data);
+	if(LOG_8514) logerror("8514/A: Major Axis Pixel Count / Rectangle Width write %04x\n",data);
 }
 
-READ16_MEMBER(ati_vga_device::ibm8514_currentx_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_currentx_r)
 {
 	return ibm8514.curr_x;
 }
 
-WRITE16_MEMBER(ati_vga_device::ibm8514_currentx_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_currentx_w)
 {
 	ibm8514.curr_x = data;
 	ibm8514.prev_x = data;
 	if(LOG_8514) logerror("8514/A: Current X set to %04x (%i)\n",data,ibm8514.curr_x);
 }
 
-READ16_MEMBER(ati_vga_device::ibm8514_currenty_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_currenty_r)
 {
 	return ibm8514.curr_y;
 }
 
-WRITE16_MEMBER(ati_vga_device::ibm8514_currenty_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_currenty_w)
 {
 	ibm8514.curr_y = data;
 	ibm8514.prev_y = data;
 	if(LOG_8514) logerror("8514/A: Current Y set to %04x (%i)\n",data,ibm8514.curr_y);
 }
 
-READ16_MEMBER(ati_vga_device::ibm8514_fgcolour_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_fgcolour_r)
 {
 	return ibm8514.fgcolour;
 }
 
-WRITE16_MEMBER(ati_vga_device::ibm8514_fgcolour_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_fgcolour_w)
 {
 	ibm8514.fgcolour = data;
-	if(LOG_8514) logerror("S3: Foreground Colour write %04x\n",data);
+	if(LOG_8514) logerror("8514/A: Foreground Colour write %04x\n",data);
 }
 
-READ16_MEMBER(ati_vga_device::ibm8514_bgcolour_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_bgcolour_r)
 {
 	return ibm8514.bgcolour;
 }
 
-WRITE16_MEMBER(ati_vga_device::ibm8514_bgcolour_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_bgcolour_w)
 {
 	ibm8514.bgcolour = data;
-	if(LOG_8514) logerror("S3: Background Colour write %04x\n",data);
+	if(LOG_8514) logerror("8514/A: Background Colour write %04x\n",data);
 }
 
-READ16_MEMBER(ati_vga_device::ibm8514_multifunc_r )
+READ16_MEMBER(ibm8514a_device::ibm8514_multifunc_r )
 {
 	switch(ibm8514.multifunc_sel)
 	{
@@ -4013,7 +4063,7 @@ READ16_MEMBER(ati_vga_device::ibm8514_multifunc_r )
 	}
 }
 
-WRITE16_MEMBER(ati_vga_device::ibm8514_multifunc_w )
+WRITE16_MEMBER(ibm8514a_device::ibm8514_multifunc_w )
 {
 	switch(data & 0xf000)
 	{
@@ -4104,7 +4154,7 @@ bit   0-2  (911-928) READ-REG-SEL. Read Register Select. Selects the register
 	}
 }
 
-void ati_vga_device::ibm8514_wait_draw()
+void ibm8514a_device::ibm8514_wait_draw()
 {
 	int x, data_size = 8;
 	UINT32 off;
@@ -4117,13 +4167,13 @@ void ati_vga_device::ibm8514_wait_draw()
 	if(ibm8514.bus_size == 2)  // 32-bit
 		data_size = 32;
 	off = 0;
-	off += (VGA_LINE_LENGTH * ibm8514.curr_y);
+	off += (IBM8514_LINE_LENGTH * ibm8514.curr_y);
 	off += ibm8514.curr_x;
 	if(ibm8514.current_cmd & 0x02) // "across plane mode"
 	{
 		for(x=0;x<data_size;x++)
 		{
-			ibm8514_write(off % vga.svga_intf.vram_size,off % vga.svga_intf.vram_size);
+			ibm8514_write(off,off);
 			if(ibm8514.current_cmd & 0x0020)
 			{
 				off++;
@@ -4193,7 +4243,7 @@ void ati_vga_device::ibm8514_wait_draw()
 		// "through plane" mode (single pixel)
 		for(x=0;x<data_size;x+=8)
 		{
-			ibm8514_write(off % vga.svga_intf.vram_size,off % vga.svga_intf.vram_size);
+			ibm8514_write(off,off);
 
 			if(ibm8514.current_cmd & 0x0020)
 			{
@@ -4288,29 +4338,29 @@ bit   0-3  Background MIX (BACKMIX).
              2  BSS is Pixel Data from the PIX_TRANS register (E2E8h)
              3  BSS is Bitmap Data (Source data from display buffer).
  */
-READ16_MEMBER(ati_vga_device::ibm8514_backmix_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_backmix_r)
 {
 	return ibm8514.bgmix;
 }
 
-WRITE16_MEMBER(ati_vga_device::ibm8514_backmix_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_backmix_w)
 {
 	ibm8514.bgmix = data;
 	if(LOG_8514) logerror("8514/A: BG Mix write %04x\n",data);
 }
 
-READ16_MEMBER(ati_vga_device::ibm8514_foremix_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_foremix_r)
 {
 	return ibm8514.fgmix;
 }
 
-WRITE16_MEMBER(ati_vga_device::ibm8514_foremix_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_foremix_w)
 {
 	ibm8514.fgmix = data;
 	if(LOG_8514) logerror("8514/A: FG Mix write %04x\n",data);
 }
 
-READ16_MEMBER(ati_vga_device::ibm8514_pixel_xfer_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_pixel_xfer_r)
 {
 	if(offset == 1)
 		return (ibm8514.pixel_xfer & 0xffff0000) >> 16;
@@ -4318,7 +4368,7 @@ READ16_MEMBER(ati_vga_device::ibm8514_pixel_xfer_r)
 		return ibm8514.pixel_xfer & 0x0000ffff;
 }
 
-WRITE16_MEMBER(ati_vga_device::ibm8514_pixel_xfer_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_pixel_xfer_w)
 {
 	if(offset == 1)
 		ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0x0000ffff) | (data << 16);
@@ -4364,6 +4414,7 @@ READ8_MEMBER(s3_vga_device::mem_r)
 
 WRITE8_MEMBER(s3_vga_device::mem_w)
 {
+	ibm8514a_device* dev = get_8514();
 	// bit 4 of CR53 enables memory-mapped I/O
 	// 0xA0000-0xA7ffff maps to port 0xE2E8 (pixel transfer)
 	if(s3.cr53 & 0x10)
@@ -4371,42 +4422,42 @@ WRITE8_MEMBER(s3_vga_device::mem_w)
 		if(offset < 0x8000)
 		{
 			// pass through to the pixel transfer register (DirectX 5 wants this)
-			if(ibm8514.bus_size == 0)
+			if(dev->ibm8514.bus_size == 0)
 			{
-				ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xffffff00) | data;
-				ibm8514_wait_draw();
+				dev->ibm8514.pixel_xfer = (dev->ibm8514.pixel_xfer & 0xffffff00) | data;
+				dev->ibm8514_wait_draw();
 			}
-			if(ibm8514.bus_size == 1)
+			if(dev->ibm8514.bus_size == 1)
 			{
 				switch(offset & 0x0001)
 				{
 				case 0:
 				default:
-					ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xffffff00) | data;
+					dev->ibm8514.pixel_xfer = (dev->ibm8514.pixel_xfer & 0xffffff00) | data;
 					break;
 				case 1:
-					ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xffff00ff) | (data << 8);
-					ibm8514_wait_draw();
+					dev->ibm8514.pixel_xfer = (dev->ibm8514.pixel_xfer & 0xffff00ff) | (data << 8);
+					dev->ibm8514_wait_draw();
 					break;
 				}
 			}
-			if(ibm8514.bus_size == 2)
+			if(dev->ibm8514.bus_size == 2)
 			{
 				switch(offset & 0x0003)
 				{
 				case 0:
 				default:
-					ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xffffff00) | data;
+					dev->ibm8514.pixel_xfer = (dev->ibm8514.pixel_xfer & 0xffffff00) | data;
 					break;
 				case 1:
-					ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xffff00ff) | (data << 8);
+					dev->ibm8514.pixel_xfer = (dev->ibm8514.pixel_xfer & 0xffff00ff) | (data << 8);
 					break;
 				case 2:
-					ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xff00ffff) | (data << 16);
+					dev->ibm8514.pixel_xfer = (dev->ibm8514.pixel_xfer & 0xff00ffff) | (data << 16);
 					break;
 				case 3:
-					ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0x00ffffff) | (data << 24);
-					ibm8514_wait_draw();
+					dev->ibm8514.pixel_xfer = (dev->ibm8514.pixel_xfer & 0x00ffffff) | (data << 24);
+					dev->ibm8514_wait_draw();
 					break;
 				}
 			}
@@ -4416,43 +4467,43 @@ WRITE8_MEMBER(s3_vga_device::mem_w)
 		{
 		case 0x8100:
 		case 0x82e8:
-			ibm8514.curr_y = (ibm8514.curr_y & 0xff00) | data;
-			ibm8514.prev_y = (ibm8514.prev_y & 0xff00) | data;
+			dev->ibm8514.curr_y = (dev->ibm8514.curr_y & 0xff00) | data;
+			dev->ibm8514.prev_y = (dev->ibm8514.prev_y & 0xff00) | data;
 			break;
 		case 0x8101:
 		case 0x82e9:
-			ibm8514.curr_y = (ibm8514.curr_y & 0x00ff) | (data << 8);
-			ibm8514.prev_y = (ibm8514.prev_y & 0x00ff) | (data << 8);
+			dev->ibm8514.curr_y = (dev->ibm8514.curr_y & 0x00ff) | (data << 8);
+			dev->ibm8514.prev_y = (dev->ibm8514.prev_y & 0x00ff) | (data << 8);
 			break;
 		case 0x8102:
 		case 0x86e8:
-			ibm8514.curr_x = (ibm8514.curr_x & 0xff00) | data;
-			ibm8514.prev_x = (ibm8514.prev_x & 0xff00) | data;
+			dev->ibm8514.curr_x = (dev->ibm8514.curr_x & 0xff00) | data;
+			dev->ibm8514.prev_x = (dev->ibm8514.prev_x & 0xff00) | data;
 			break;
 		case 0x8103:
 		case 0x86e9:
-			ibm8514.curr_x = (ibm8514.curr_x & 0x00ff) | (data << 8);
-			ibm8514.prev_x = (ibm8514.prev_x & 0x00ff) | (data << 8);
+			dev->ibm8514.curr_x = (dev->ibm8514.curr_x & 0x00ff) | (data << 8);
+			dev->ibm8514.prev_x = (dev->ibm8514.prev_x & 0x00ff) | (data << 8);
 			break;
 		case 0x8108:
 		case 0x8ae8:
-			ibm8514.line_axial_step = (ibm8514.line_axial_step & 0xff00) | data;
-			ibm8514.dest_y = (ibm8514.dest_y & 0xff00) | data;
+			dev->ibm8514.line_axial_step = (dev->ibm8514.line_axial_step & 0xff00) | data;
+			dev->ibm8514.dest_y = (dev->ibm8514.dest_y & 0xff00) | data;
 			break;
 		case 0x8109:
 		case 0x8ae9:
-			ibm8514.line_axial_step = (ibm8514.line_axial_step & 0x00ff) | ((data & 0x3f) << 8);
-			ibm8514.dest_y = (ibm8514.dest_y & 0x00ff) | (data << 8);
+			dev->ibm8514.line_axial_step = (dev->ibm8514.line_axial_step & 0x00ff) | ((data & 0x3f) << 8);
+			dev->ibm8514.dest_y = (dev->ibm8514.dest_y & 0x00ff) | (data << 8);
 			break;
 		case 0x810a:
 		case 0x8ee8:
-			ibm8514.line_diagonal_step = (ibm8514.line_diagonal_step & 0xff00) | data;
-			ibm8514.dest_x = (ibm8514.dest_x & 0xff00) | data;
+			dev->ibm8514.line_diagonal_step = (dev->ibm8514.line_diagonal_step & 0xff00) | data;
+			dev->ibm8514.dest_x = (dev->ibm8514.dest_x & 0xff00) | data;
 			break;
 		case 0x810b:
 		case 0x8ee9:
-			ibm8514.line_diagonal_step = (ibm8514.line_diagonal_step & 0x00ff) | ((data & 0x3f) << 8);
-			ibm8514.dest_x = (ibm8514.dest_x & 0x00ff) | (data << 8);
+			dev->ibm8514.line_diagonal_step = (dev->ibm8514.line_diagonal_step & 0x00ff) | ((data & 0x3f) << 8);
+			dev->ibm8514.dest_x = (dev->ibm8514.dest_x & 0x00ff) | (data << 8);
 			break;
 		case 0x8118:
 		case 0x9ae8:
@@ -4461,111 +4512,111 @@ WRITE8_MEMBER(s3_vga_device::mem_w)
 		case 0x8119:
 		case 0x9ae9:
 			s3.mmio_9ae8 = (s3.mmio_9ae8 & 0x00ff) | (data << 8);
-			s3_cmd_w(space,0,s3.mmio_9ae8,0xffff);
+			dev->ibm8514_cmd_w(space,0,s3.mmio_9ae8,0xffff);
 			break;
 		case 0x8120:
 		case 0xa2e8:
-			ibm8514.bgcolour = (ibm8514.bgcolour & 0xff00) | data;
+			dev->ibm8514.bgcolour = (dev->ibm8514.bgcolour & 0xff00) | data;
 			break;
 		case 0x8121:
 		case 0xa2e9:
-			ibm8514.bgcolour = (ibm8514.bgcolour & 0x00ff) | (data << 8);
+			dev->ibm8514.bgcolour = (dev->ibm8514.bgcolour & 0x00ff) | (data << 8);
 			break;
 		case 0x8124:
 		case 0xa6e8:
-			ibm8514.fgcolour = (ibm8514.fgcolour & 0xff00) | data;
+			dev->ibm8514.fgcolour = (dev->ibm8514.fgcolour & 0xff00) | data;
 			break;
 		case 0x8125:
 		case 0xa6e9:
-			ibm8514.fgcolour = (ibm8514.fgcolour & 0x00ff) | (data << 8);
+			dev->ibm8514.fgcolour = (dev->ibm8514.fgcolour & 0x00ff) | (data << 8);
 			break;
 		case 0xb6e8:
 		case 0x8134:
-			ibm8514.bgmix = (ibm8514.bgmix & 0xff00) | data;
+			dev->ibm8514.bgmix = (dev->ibm8514.bgmix & 0xff00) | data;
 			break;
 		case 0x8135:
 		case 0xb6e9:
-			ibm8514.bgmix = (ibm8514.bgmix & 0x00ff) | (data << 8);
+			dev->ibm8514.bgmix = (dev->ibm8514.bgmix & 0x00ff) | (data << 8);
 			break;
 		case 0x8136:
 		case 0xbae8:
-			ibm8514.fgmix = (ibm8514.fgmix & 0xff00) | data;
+			dev->ibm8514.fgmix = (dev->ibm8514.fgmix & 0xff00) | data;
 			break;
 		case 0x8137:
 		case 0xbae9:
-			ibm8514.fgmix = (ibm8514.fgmix & 0x00ff) | (data << 8);
+			dev->ibm8514.fgmix = (dev->ibm8514.fgmix & 0x00ff) | (data << 8);
 			break;
 		case 0x8138:
-			ibm8514.scissors_top = (ibm8514.scissors_top & 0xff00) | data;
+			dev->ibm8514.scissors_top = (dev->ibm8514.scissors_top & 0xff00) | data;
 			break;
 		case 0x8139:
-			ibm8514.scissors_top = (ibm8514.scissors_top & 0x00ff) | (data << 8);
+			dev->ibm8514.scissors_top = (dev->ibm8514.scissors_top & 0x00ff) | (data << 8);
 			break;
 		case 0x813a:
-			ibm8514.scissors_left = (ibm8514.scissors_left & 0xff00) | data;
+			dev->ibm8514.scissors_left = (dev->ibm8514.scissors_left & 0xff00) | data;
 			break;
 		case 0x813b:
-			ibm8514.scissors_left = (ibm8514.scissors_left & 0x00ff) | (data << 8);
+			dev->ibm8514.scissors_left = (dev->ibm8514.scissors_left & 0x00ff) | (data << 8);
 			break;
 		case 0x813c:
-			ibm8514.scissors_bottom = (ibm8514.scissors_bottom & 0xff00) | data;
+			dev->ibm8514.scissors_bottom = (dev->ibm8514.scissors_bottom & 0xff00) | data;
 			break;
 		case 0x813d:
-			ibm8514.scissors_bottom = (ibm8514.scissors_bottom & 0x00ff) | (data << 8);
+			dev->ibm8514.scissors_bottom = (dev->ibm8514.scissors_bottom & 0x00ff) | (data << 8);
 			break;
 		case 0x813e:
-			ibm8514.scissors_right = (ibm8514.scissors_right & 0xff00) | data;
+			dev->ibm8514.scissors_right = (dev->ibm8514.scissors_right & 0xff00) | data;
 			break;
 		case 0x813f:
-			ibm8514.scissors_right = (ibm8514.scissors_right & 0x00ff) | (data << 8);
+			dev->ibm8514.scissors_right = (dev->ibm8514.scissors_right & 0x00ff) | (data << 8);
 			break;
 		case 0x8140:
-			ibm8514.pixel_control = (ibm8514.pixel_control & 0xff00) | data;
+			dev->ibm8514.pixel_control = (dev->ibm8514.pixel_control & 0xff00) | data;
 			break;
 		case 0x8141:
-			ibm8514.pixel_control = (ibm8514.pixel_control & 0x00ff) | (data << 8);
+			dev->ibm8514.pixel_control = (dev->ibm8514.pixel_control & 0x00ff) | (data << 8);
 			break;
 		case 0x8146:
-			ibm8514.multifunc_sel = (ibm8514.multifunc_sel & 0xff00) | data;
+			dev->ibm8514.multifunc_sel = (dev->ibm8514.multifunc_sel & 0xff00) | data;
 			break;
 		case 0x8148:
-			ibm8514.rect_height = (ibm8514.rect_height & 0xff00) | data;
+			dev->ibm8514.rect_height = (dev->ibm8514.rect_height & 0xff00) | data;
 			break;
 		case 0x8149:
-			ibm8514.rect_height = (ibm8514.rect_height & 0x00ff) | (data << 8);
+			dev->ibm8514.rect_height = (dev->ibm8514.rect_height & 0x00ff) | (data << 8);
 			break;
 		case 0x814a:
-			ibm8514.rect_width = (ibm8514.rect_width & 0xff00) | data;
+			dev->ibm8514.rect_width = (dev->ibm8514.rect_width & 0xff00) | data;
 			break;
 		case 0x814b:
-			ibm8514.rect_width = (ibm8514.rect_width & 0x00ff) | (data << 8);
+			dev->ibm8514.rect_width = (dev->ibm8514.rect_width & 0x00ff) | (data << 8);
 			break;
 		case 0x8150:
-			ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xffffff00) | data;
-			if(ibm8514.state == IBM8514_DRAWING_RECT)
-				ibm8514_wait_draw();
+			dev->ibm8514.pixel_xfer = (dev->ibm8514.pixel_xfer & 0xffffff00) | data;
+			if(dev->ibm8514.state == IBM8514_DRAWING_RECT)
+				dev->ibm8514_wait_draw();
 			break;
 		case 0x8151:
-			ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xffff00ff) | (data << 8);
-			if(ibm8514.state == IBM8514_DRAWING_RECT)
-				ibm8514_wait_draw();
+			dev->ibm8514.pixel_xfer = (dev->ibm8514.pixel_xfer & 0xffff00ff) | (data << 8);
+			if(dev->ibm8514.state == IBM8514_DRAWING_RECT)
+				dev->ibm8514_wait_draw();
 			break;
 		case 0x8152:
-			ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0xff00ffff) | (data << 16);
-			if(ibm8514.state == IBM8514_DRAWING_RECT)
-				ibm8514_wait_draw();
+			dev->ibm8514.pixel_xfer = (dev->ibm8514.pixel_xfer & 0xff00ffff) | (data << 16);
+			if(dev->ibm8514.state == IBM8514_DRAWING_RECT)
+				dev->ibm8514_wait_draw();
 			break;
 		case 0x8153:
-			ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0x00ffffff) | (data << 24);
-			if(ibm8514.state == IBM8514_DRAWING_RECT)
-				ibm8514_wait_draw();
+			dev->ibm8514.pixel_xfer = (dev->ibm8514.pixel_xfer & 0x00ffffff) | (data << 24);
+			if(dev->ibm8514.state == IBM8514_DRAWING_RECT)
+				dev->ibm8514_wait_draw();
 			break;
 		case 0xbee8:
 			s3.mmio_bee8 = (s3.mmio_bee8 & 0xff00) | data;
 			break;
 		case 0xbee9:
 			s3.mmio_bee8 = (s3.mmio_bee8 & 0x00ff) | (data << 8);
-			ibm8514_multifunc_w(space,0,s3.mmio_bee8,0xffff);
+			dev->ibm8514_multifunc_w(space,0,s3.mmio_bee8,0xffff);
 			break;
 		default:
 			if(LOG_8514) logerror("S3: MMIO offset %05x write %02x\n",offset+0xa0000,data);
@@ -4892,12 +4943,12 @@ bit     0  SENSE is the result of a wired-OR of 3 comparators, one
            This bit toggles every time a HSYNC pulse starts
      3-15  Reserved(0)
  */
-READ16_MEMBER(ati_vga_device::ibm8514_status_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_status_r)
 {
-	return vga_vblank() << 1;
+	return m_vga->vga_vblank() << 1;
 }
 
-WRITE16_MEMBER(ati_vga_device::ibm8514_htotal_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_htotal_w)
 {
 	ibm8514.htotal = data & 0x01ff;
 	//vga.crtc.horz_total = data & 0x01ff;
@@ -4924,10 +4975,10 @@ bit   0-3  Interrupt requests. These bits show the state of internal interrupt
      8-11  CHIP_REV. Chip revision number.
     12-15  (CT82c480) CHIP_ID. 0=CT 82c480.
  */
-READ16_MEMBER(ati_vga_device::ibm8514_substatus_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_substatus_r)
 {
 	// TODO:
-	if(vga_vblank() != 0)  // not correct, but will do for now
+	if(m_vga->vga_vblank() != 0)  // not correct, but will do for now
 		ibm8514.substatus |= 0x01;
 	return ibm8514.substatus;
 }
@@ -4949,176 +5000,187 @@ bit   0-3  Interrupt Reset. Write 1 to a bit to reset the interrupt.
     12-13  CHPTEST. Used for chip testing.
     14-15  Graphics Processor Control (GPCTRL).
  */
-WRITE16_MEMBER(ati_vga_device::ibm8514_subcontrol_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_subcontrol_w)
 {
 	ibm8514.subctrl = data;
 	ibm8514.substatus &= ~(data & 0x0f);  // reset interrupts
 //  if(LOG_8514) logerror("8514/A: Subsystem control write %04x\n",data);
 }
 
-READ16_MEMBER(ati_vga_device::ibm8514_subcontrol_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_subcontrol_r)
 {
 	return ibm8514.subctrl;
 }
 
-READ16_MEMBER(ati_vga_device::ibm8514_htotal_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_htotal_r)
 {
 	return ibm8514.htotal;
 }
 
-READ16_MEMBER(ati_vga_device::ibm8514_vtotal_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_vtotal_r)
 {
 	return ibm8514.vtotal;
 }
 
-WRITE16_MEMBER(ati_vga_device::ibm8514_vtotal_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_vtotal_w)
 {
 	ibm8514.vtotal = data;
 //  vga.crtc.vert_total = data;
 	if(LOG_8514) logerror("8514/A: Vertical total write %04x\n",data);
 }
 
-READ16_MEMBER(ati_vga_device::ibm8514_vdisp_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_vdisp_r)
 {
 	return ibm8514.vdisp;
 }
 
-WRITE16_MEMBER(ati_vga_device::ibm8514_vdisp_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_vdisp_w)
 {
 	ibm8514.vdisp = data;
 //  vga.crtc.vert_disp_end = data >> 3;
 	if(LOG_8514) logerror("8514/A: Vertical Displayed write %04x\n",data);
 }
 
-READ16_MEMBER(ati_vga_device::ibm8514_vsync_r)
+READ16_MEMBER(ibm8514a_device::ibm8514_vsync_r)
 {
 	return ibm8514.vsync;
 }
 
-WRITE16_MEMBER(ati_vga_device::ibm8514_vsync_w)
+WRITE16_MEMBER(ibm8514a_device::ibm8514_vsync_w)
 {
 	ibm8514.vsync = data;
 	if(LOG_8514) logerror("8514/A: Vertical Sync write %04x\n",data);
 }
 
-READ16_MEMBER(ati_vga_device::mach8_ec0_r)
+void ibm8514a_device::enabled()
+{
+	ibm8514.state = IBM8514_IDLE;
+	ibm8514.gpbusy = false;
+}
+
+READ16_MEMBER(mach8_device::mach8_ec0_r)
 {
 	return ibm8514.ec0;
 }
 
-WRITE16_MEMBER(ati_vga_device::mach8_ec0_w)
+WRITE16_MEMBER(mach8_device::mach8_ec0_w)
 {
 	ibm8514.ec0 = data;
 	if(LOG_8514) logerror("8514/A: Extended configuration 0 write %04x\n",data);
 }
 
-READ16_MEMBER(ati_vga_device::mach8_ec1_r)
+READ16_MEMBER(mach8_device::mach8_ec1_r)
 {
 	return ibm8514.ec1;
 }
 
-WRITE16_MEMBER(ati_vga_device::mach8_ec1_w)
+WRITE16_MEMBER(mach8_device::mach8_ec1_w)
 {
 	ibm8514.ec1 = data;
 	if(LOG_8514) logerror("8514/A: Extended configuration 1 write %04x\n",data);
 }
 
-READ16_MEMBER(ati_vga_device::mach8_ec2_r)
+READ16_MEMBER(mach8_device::mach8_ec2_r)
 {
 	return ibm8514.ec2;
 }
 
-WRITE16_MEMBER(ati_vga_device::mach8_ec2_w)
+WRITE16_MEMBER(mach8_device::mach8_ec2_w)
 {
 	ibm8514.ec2 = data;
 	if(LOG_8514) logerror("8514/A: Extended configuration 2 write %04x\n",data);
 }
 
-READ16_MEMBER(ati_vga_device::mach8_ec3_r)
+READ16_MEMBER(mach8_device::mach8_ec3_r)
 {
 	return ibm8514.ec3;
 }
 
-WRITE16_MEMBER(ati_vga_device::mach8_ec3_w)
+WRITE16_MEMBER(mach8_device::mach8_ec3_w)
 {
 	ibm8514.ec3 = data;
 	if(LOG_8514) logerror("8514/A: Extended configuration 3 write %04x\n",data);
 }
 
-READ16_MEMBER(ati_vga_device::mach8_ext_fifo_r)
+READ16_MEMBER(mach8_device::mach8_ext_fifo_r)
 {
 	return 0x00;  // for now, report all FIFO slots at free
 }
 
-WRITE16_MEMBER(ati_vga_device::mach8_linedraw_index_w)
+WRITE16_MEMBER(mach8_device::mach8_linedraw_index_w)
 {
-	ati.linedraw = data & 0x07;
+	mach8.linedraw = data & 0x07;
 	if(LOG_8514) logerror("Mach8: Line Draw Index write %04x\n",data);
 }
 
-READ16_MEMBER(ati_vga_device::mach8_bresenham_count_r)
+READ16_MEMBER(mach8_device::mach8_bresenham_count_r)
 {
 	return ibm8514.rect_width & 0x1fff;
 }
 
-WRITE16_MEMBER(ati_vga_device::mach8_bresenham_count_w)
+WRITE16_MEMBER(mach8_device::mach8_bresenham_count_w)
 {
 	ibm8514.rect_width = data & 0x1fff;
 	if(LOG_8514) logerror("Mach8: Bresenham count write %04x\n",data);
 }
 
-WRITE16_MEMBER(ati_vga_device::mach8_linedraw_w)
+READ16_MEMBER(mach8_device::mach8_linedraw_r)
+{
+	return 0xff;
+}
+
+WRITE16_MEMBER(mach8_device::mach8_linedraw_w)
 {
 	// TODO: actually draw the lines
-	switch(ati.linedraw)
+	switch(mach8.linedraw)
 	{
 	case 0:  // Set current X
 		ibm8514.curr_x = data;
-		ati.linedraw++;
+		mach8.linedraw++;
 		break;
 	case 1:  // Set current Y
 		ibm8514.curr_y = data;
-		ati.linedraw++;
+		mach8.linedraw++;
 		break;
 	case 2:  // Line end X
 		ibm8514.curr_x = data;
-		ati.linedraw++;
+		mach8.linedraw++;
 		break;
 	case 3:  // Line end Y
 		ibm8514.curr_y = data;
-		ati.linedraw = 2;
+		mach8.linedraw = 2;
 		break;
 	case 4:  // Set current X
 		ibm8514.curr_x = data;
-		ati.linedraw++;
+		mach8.linedraw++;
 		break;
 	case 5:  // Set current Y
 		ibm8514.curr_y = data;
-		ati.linedraw = 4;
+		mach8.linedraw = 4;
 		break;
 	}
-	logerror("ATI: Linedraw register write %04x, mode %i\n",data,ati.linedraw);
+	logerror("ATI: Linedraw register write %04x, mode %i\n",data,mach8.linedraw);
 }
 
-READ16_MEMBER(ati_vga_device::mach8_scratch0_r)
+READ16_MEMBER(mach8_device::mach8_scratch0_r)
 {
-	return ati.scratch0;
+	return mach8.scratch0;
 }
 
-WRITE16_MEMBER(ati_vga_device::mach8_scratch0_w)
+WRITE16_MEMBER(mach8_device::mach8_scratch0_w)
 {
-	ati.scratch0 = data;
+	mach8.scratch0 = data;
 	if(LOG_8514) logerror("Mach8: Scratch Pad 0 write %04x\n",data);
 }
 
-READ16_MEMBER(ati_vga_device::mach8_scratch1_r)
+READ16_MEMBER(mach8_device::mach8_scratch1_r)
 {
-	return ati.scratch1;
+	return mach8.scratch1;
 }
 
-WRITE16_MEMBER(ati_vga_device::mach8_scratch1_w)
+WRITE16_MEMBER(mach8_device::mach8_scratch1_w)
 {
-	ati.scratch1 = data;
+	mach8.scratch1 = data;
 	if(LOG_8514) logerror("Mach8: Scratch Pad 1 write %04x\n",data);
 }
 
@@ -5135,7 +5197,7 @@ bit    0  CLK_MODE. Set to use clock chip, clear to use crystals.
     9-15  ROM_LOCATION. If bit 2 and 3 are 0 the ROM will be at this location:
            0: C000h, 1: C080h, 2: C100h, .. 127: FF80h (unlikely)
  */
-READ16_MEMBER(ati_vga_device::mach8_config1_r)
+READ16_MEMBER(mach8_device::mach8_config1_r)
 {
 	return 0x0082;
 }
@@ -5148,7 +5210,7 @@ bit    0  SHARE_CLOCK. If set the Mach8 shares clock with the VGA
        3  WRITE_PER_BIT. Write masked VRAM operations supported if set
        4  FLASH_ENA. Flash page writes supported if set
  */
-READ16_MEMBER(ati_vga_device::mach8_config2_r)
+READ16_MEMBER(mach8_device::mach8_config2_r)
 {
 	return 0x0002;
 }

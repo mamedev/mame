@@ -32,6 +32,7 @@ protected:
         virtual void device_reset();
 private:		
 		s3_vga_device *m_vga;
+		ibm8514a_device *m_8514;
 };
 
 
