@@ -1,6 +1,6 @@
 /***************************************************************************
 
- scsihle.c - Base class for scsi devices.
+ scsihle.c - Base class for HLE'd SCSI devices.
 
 ***************************************************************************/
 
@@ -8,7 +8,7 @@
 #include "machine/scsihle.h"
 
 scsihle_device::scsihle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, type, name, tag, owner, clock)
+	scsidev_device(mconfig, type, name, tag, owner, clock)
 {
 }
 

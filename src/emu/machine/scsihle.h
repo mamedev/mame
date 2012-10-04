@@ -4,11 +4,13 @@
 
 ***************************************************************************/
 
-#ifndef _SCSIDEV_H_
-#define _SCSIDEV_H_
+#ifndef _SCSIHLE_H_
+#define _SCSIHLE_H_
+
+#include "machine/scsidev.h"
 
 // base handler
-class scsihle_device : public device_t
+class scsihle_device : public scsidev_device
 {
 public:
 	// construction/destruction
