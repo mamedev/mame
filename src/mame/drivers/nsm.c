@@ -6,8 +6,12 @@
     Schematic and PinMAME used as references
 
     Everything in this machine is controlled by a serial bus based on the
-    processor's CRU pins (serial i/o). It needs a T.I. specialist to get this
-    working.
+    processor's CRU pins (serial i/o).
+
+ToDo:
+- Inputs (i have no idea how CRU inputs work)
+- Mechanical sounds
+- Further testing, etc
 
 *********************************************************************************/
 
@@ -39,8 +43,6 @@ protected:
 private:
 	UINT8 m_cru_data[9];
 	UINT8 m_cru_count;
-public:
-	DECLARE_DRIVER_INIT(nsm);
 };
 
 
@@ -62,7 +64,7 @@ static ADDRESS_MAP_START( nsm_io_map, AS_IO, 8, nsm_state )
 	AM_RANGE(0x0040, 0x0041) AM_READ(ff_r) // service plug
 	AM_RANGE(0x0050, 0x0051) AM_READ(ff_r) // test of internal battery
 	AM_RANGE(0x0060, 0x0061) AM_READ(ff_r) // sum of analog outputs of ay2
-	AM_RANGE(0x0070, 0x0071) AM_READNOP // serial data in
+	//AM_RANGE(0x0070, 0x0071) AM_READNOP // serial data in
 	AM_RANGE(0x0f70, 0x0f7d) AM_WRITENOP
 	AM_RANGE(0x0fe4, 0x0fff) AM_READNOP
 	AM_RANGE(0x7fb0, 0x7fbf) AM_WRITE(cru_w)
@@ -76,24 +78,25 @@ READ8_MEMBER( nsm_state::ff_r ) { return 1; }
 
 WRITE8_MEMBER( nsm_state::oe_w )
 {
-	m_cru_count = 0;
+	m_cru_count = 9;
 }
 
 WRITE8_MEMBER( nsm_state::cru_w )
 {
+	offset &= 7;
+	if (!offset)
+	{
+		m_cru_count--;
+		m_cru_data[m_cru_count] = 0;
+	}
+	m_cru_data[m_cru_count] |= (data << offset);
+	
 	UINT8 i,j;
 	int segments;
-	for (i = 1; i < 9;i++)
-		m_cru_data[i] = (m_cru_data[i] >> 1) | (BIT(m_cru_data[i-1], 0) ? 0x80 : 0);
-
-	m_cru_data[0] = (m_cru_data[0] >> 1) | (BIT(data, 0) ? 0x80 : 0);
-
-	m_cru_count++;
-
-	if (m_cru_count == 72)
+	if (!m_cru_count && (offset == 7))
 	{
-		m_cru_count = 0;
-		//for (i = 0; i < 8; i++) printf("%02X ",m_cru_data[i]);printf("\n");
+		m_cru_count = 9;
+		//for (i = 0; i < 9; i++) printf("%02X ",m_cru_data[i]);printf("\n");
 		for (i = 0; i < 8; i++)
 		{
 			if (BIT(m_cru_data[0], i))
@@ -101,7 +104,7 @@ WRITE8_MEMBER( nsm_state::cru_w )
 				for (j = 0; j < 5; j++)
 				{
 					segments = m_cru_data[8-j]^0xff;
-					output_set_digit_value(j * 10 + i, BITSWAP16(segments, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0));
+					output_set_digit_value(j * 10 + i, BITSWAP16(segments, 8, 8, 8, 8, 8, 8, 0, 0, 1, 1, 2, 3, 4, 5, 6, 7));
 				}
 			}
 		}
@@ -109,13 +112,7 @@ WRITE8_MEMBER( nsm_state::cru_w )
 }
 
 
-
-
 void nsm_state::machine_reset()
-{
-}
-
-DRIVER_INIT_MEMBER(nsm_state,nsm)
 {
 }
 
@@ -158,4 +155,4 @@ ROM_END
 / The Games (1985)
 /-------------------------------------------------------------------*/
 
-GAME(1985,  firebird,  0,  nsm,  nsm, nsm_state, nsm,  ROT0, "NSM", "Hot Fire Birds", GAME_NOT_WORKING | GAME_MECHANICAL)
+GAME(1985,  firebird,  0,  nsm,  nsm, driver_device, 0,  ROT0, "NSM", "Hot Fire Birds", GAME_NOT_WORKING | GAME_MECHANICAL)
