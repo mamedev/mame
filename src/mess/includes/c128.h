@@ -17,11 +17,11 @@
 #include "emu.h"
 #include "formats/cbm_snqk.h"
 #include "includes/cbm.h"
-#include "machine/6526cia.h"
 #include "machine/c64exp.h"
 #include "machine/c64user.h"
 #include "machine/cbmiec.h"
 #include "machine/cbmipt.h"
+#include "machine/mos6526.h"
 #include "machine/mos8722.h"
 #include "machine/petcass.h"
 #include "machine/pla.h"
@@ -213,6 +213,7 @@ public:
 	int m_va1617;
 	int m_nmilevel;
 	int m_z80en;
+	int m_cia1_irq;
 	DECLARE_DRIVER_INIT(c128pal);
 	DECLARE_DRIVER_INIT(c128dcrp);
 	DECLARE_DRIVER_INIT(c128dcr);

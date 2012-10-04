@@ -93,7 +93,7 @@ int c65_dma_read_color(running_machine &machine, int offset);
 void c65_vic_interrupt(running_machine &machine, int level);
 void c65_bankswitch_interface(running_machine &machine, int value);
 
-extern const mos6526_interface c65_cia0;
-extern const mos6526_interface c65_cia1;
+extern const legacy_mos6526_interface c65_cia0;
+extern const legacy_mos6526_interface c65_cia1;
 
 #endif /* C65_H_ */

@@ -6,10 +6,11 @@
 
 #include "emu.h"
 #include "includes/cbm.h"
-#include "machine/6526cia.h"
 #include "machine/cbmipt.h"
+#include "machine/mos6526.h"
 #include "machine/petcass.h"
 #include "machine/ram.h"
+#include "machine/vcsctrl.h"
 #include "sound/dac.h"
 #include "sound/sid6581.h"
 #include "video/mos6566.h"
@@ -20,6 +21,8 @@
 #define MOS6526_TAG		"u9"
 #define SCREEN_TAG		"screen"
 #define TIMER_C1531_TAG	"c1531"
+#define CONTROL1_TAG	"joy1"
+#define CONTROL2_TAG	"joy2"
 
 class vic10_state : public driver_device
 {
@@ -30,6 +33,8 @@ public:
 		  m_vic(*this, MOS6566_TAG),
 		  m_sid(*this, MOS6581_TAG),
 		  m_cia(*this, MOS6526_TAG),
+		  m_joy1(*this, CONTROL1_TAG),
+		  m_joy2(*this, CONTROL2_TAG),
 		  m_exp(*this, VIC10_EXPANSION_SLOT_TAG),
 		  m_ram(*this, RAM_TAG),
 		  m_cassette(*this, PET_DATASSETTE_PORT_TAG),
@@ -42,6 +47,8 @@ public:
 	required_device<mos6566_device> m_vic;
 	required_device<sid6581_device> m_sid;
 	required_device<mos6526_device> m_cia;
+	required_device<vcs_control_port_device> m_joy1;
+	required_device<vcs_control_port_device> m_joy2;
 	required_device<vic10_expansion_slot_device> m_exp;
 	required_device<ram_device> m_ram;
 	optional_device<pet_datassette_port_device> m_cassette;

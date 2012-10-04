@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( c1571_mem, AS_PROGRAM, 8, base_c1571_device )
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x03f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x03f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE_LEGACY(WD1770_TAG, wd17xx_r, wd17xx_w)
-	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x3ff0) AM_DEVREADWRITE_LEGACY(M6526_TAG, mos6526_r, mos6526_w)
+	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x3ff0) AM_DEVREADWRITE(M6526_TAG, mos6526_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
 ADDRESS_MAP_END
 
@@ -445,7 +445,7 @@ static const via6522_interface via1_intf =
 
 
 //-------------------------------------------------
-//  mos6526_interface cia_intf
+//  MOS6526_INTERFACE( cia_intf )
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( base_c1571_device::cia_irq_w )
@@ -603,7 +603,7 @@ static MACHINE_CONFIG_FRAGMENT( c1571 )
 
 	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, via0_intf)
 	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, via1_intf)
-	MCFG_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/16, 0, cia_intf)
+	MCFG_MOS6526_ADD(M6526_TAG, XTAL_16MHz/16, 0, cia_intf)
 	MCFG_WD1770_ADD(WD1770_TAG, /* XTAL_16MHz/2, */ fdc_intf)
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_interface)
@@ -622,7 +622,7 @@ static MACHINE_CONFIG_FRAGMENT( c1570 )
 
 	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, via0_intf)
 	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, via1_intf)
-	MCFG_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/16, 0, cia_intf)
+	MCFG_MOS6526_ADD(M6526_TAG, XTAL_16MHz/16, 0, cia_intf)
 	MCFG_WD1770_ADD(WD1770_TAG, /* XTAL_16MHz/2, */ fdc_intf)
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1570_floppy_interface)

@@ -256,7 +256,7 @@ READ8_MEMBER(ami1200_state::a1200_cia_0_portA_r)
 }
 
 
-static const mos6526_interface a1200_cia_0_intf =
+static const legacy_mos6526_interface a1200_cia_0_intf =
 {
 	DEVCB_DEVICE_LINE("cia_0", amiga_cia_0_irq),									/* irq_func */
 	DEVCB_NULL,	/* pc_func */
@@ -268,7 +268,7 @@ static const mos6526_interface a1200_cia_0_intf =
 	DEVCB_DRIVER_MEMBER(ami1200_state,ami1200_cia_0_portb_w)		/* port B */
 };
 
-static const mos6526_interface a1200_cia_1_intf =
+static const legacy_mos6526_interface a1200_cia_1_intf =
 {
 	DEVCB_DEVICE_LINE("cia_1", amiga_cia_1_irq),									/* irq_func */
 	DEVCB_NULL,	/* pc_func */
@@ -317,8 +317,8 @@ static MACHINE_CONFIG_START( a1200n, ami1200_state )
 	MCFG_SOUND_ROUTE(3, "lspeaker", 0.25)
 
 	/* cia */
-	MCFG_MOS8520_ADD("cia_0", AMIGA_68EC020_NTSC_CLOCK / 10, 0, a1200_cia_0_intf)
-	MCFG_MOS8520_ADD("cia_1", AMIGA_68EC020_NTSC_CLOCK / 10, 0, a1200_cia_1_intf)
+	MCFG_LEGACY_MOS8520_ADD("cia_0", AMIGA_68EC020_NTSC_CLOCK / 10, 0, a1200_cia_0_intf)
+	MCFG_LEGACY_MOS8520_ADD("cia_1", AMIGA_68EC020_NTSC_CLOCK / 10, 0, a1200_cia_1_intf)
 
 	/* fdc */
 	MCFG_AMIGA_FDC_ADD("fdc", AMIGA_68EC020_NTSC_CLOCK/2)

@@ -43,35 +43,32 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MOS6526R1_ADD(_tag, _clock, _tod_clock, _config) \
-	MCFG_DEVICE_ADD(_tag, MOS6526R1, _clock) \
+#define MCFG_LEGACY_MOS6526R1_ADD(_tag, _clock, _tod_clock, _config) \
+	MCFG_DEVICE_ADD(_tag, LEGACY_MOS6526R1, _clock) \
 	MCFG_DEVICE_CONFIG(_config) \
-	mos6526_device::static_set_tod_clock(*device, _tod_clock);
+	legacy_mos6526_device::static_set_tod_clock(*device, _tod_clock);
 
-#define MCFG_MOS6526R2_ADD(_tag, _clock, _tod_clock, _config) \
-	MCFG_DEVICE_ADD(_tag, MOS6526R2, _clock) \
+#define MCFG_LEGACY_MOS6526R2_ADD(_tag, _clock, _tod_clock, _config) \
+	MCFG_DEVICE_ADD(_tag, LEGACY_MOS6526R2, _clock) \
 	MCFG_DEVICE_CONFIG(_config) \
-	mos6526_device::static_set_tod_clock(*device, _tod_clock);
+	legacy_mos6526_device::static_set_tod_clock(*device, _tod_clock);
 
-#define MCFG_MOS8520_ADD(_tag, _clock, _tod_clock, _config) \
-	MCFG_DEVICE_ADD(_tag, MOS8520, _clock) \
+#define MCFG_LEGACY_MOS8520_ADD(_tag, _clock, _tod_clock, _config) \
+	MCFG_DEVICE_ADD(_tag, LEGACY_MOS8520, _clock) \
 	MCFG_DEVICE_CONFIG(_config) \
-	mos6526_device::static_set_tod_clock(*device, _tod_clock);
+	legacy_mos6526_device::static_set_tod_clock(*device, _tod_clock);
 
-#define MCFG_MOS5710_ADD(_tag, _clock, _tod_clock, _config) \
-	MCFG_DEVICE_ADD(_tag, MOS5710, _clock) \
+#define MCFG_LEGACY_MOS5710_ADD(_tag, _clock, _tod_clock, _config) \
+	MCFG_DEVICE_ADD(_tag, LEGACY_MOS5710, _clock) \
 	MCFG_DEVICE_CONFIG(_config) \
-	mos6526_device::static_set_tod_clock(*device, _tod_clock);
+	legacy_mos6526_device::static_set_tod_clock(*device, _tod_clock);
 
 
-#define MOS6526_INTERFACE(name) \
-	const mos6526_interface (name)=
+#define LEGACY_MOS6526_INTERFACE(name) \
+	const legacy_mos6526_interface (name)=
 
-#define MOS8520_INTERFACE(name) \
-	const mos6526_interface (name)=
-
-#define MOS5710_INTERFACE(name) \
-	const mos6526_interface (name)=
+#define LEGACY_MOS8520_INTERFACE(name) \
+	const legacy_mos6526_interface (name)=
 
 
 
@@ -80,9 +77,9 @@
 ***************************************************************************/
 
 
-// ======================> mos6526_interface
+// ======================> legacy_mos6526_interface
 
-struct mos6526_interface
+struct legacy_mos6526_interface
 {
 	devcb_write_line	m_out_irq_cb;
 	devcb_write_line	m_out_pc_cb;
@@ -98,14 +95,14 @@ struct mos6526_interface
 
 
 
-// ======================> mos6526_device
+// ======================> legacy_mos6526_device
 
-class mos6526_device :  public device_t,
-                        public mos6526_interface
+class legacy_mos6526_device :  public device_t,
+                        public legacy_mos6526_interface
 {
 protected:
     // construction/destruction
-    mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+    legacy_mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 public:
 	// inline configuration
@@ -182,7 +179,7 @@ private:
 		UINT8			m_mode;
 		UINT8			m_irq;
 		emu_timer*		m_timer;
-		mos6526_device*	m_cia;
+		legacy_mos6526_device*	m_cia;
 	};
 
 	struct cia_port
@@ -230,36 +227,36 @@ private:
 	emu_timer *m_tod_timer;
 };
 
-class mos6526r1_device : public mos6526_device
+class legacy_mos6526r1_device : public legacy_mos6526_device
 {
 public:
-	mos6526r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	legacy_mos6526r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-class mos6526r2_device : public mos6526_device
+class legacy_mos6526r2_device : public legacy_mos6526_device
 {
 public:
-	mos6526r2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	legacy_mos6526r2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-class mos8520_device : public mos6526_device
+class legacy_mos8520_device : public legacy_mos6526_device
 {
 public:
-	mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	legacy_mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-class mos5710_device : public mos6526_device
+class legacy_mos5710_device : public legacy_mos6526_device
 {
 public:
-	mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	legacy_mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 // device type definition
-extern const device_type MOS6526R1;
-extern const device_type MOS6526R2;
-extern const device_type MOS8520;
-extern const device_type MOS5710;
+extern const device_type LEGACY_MOS6526R1;
+extern const device_type LEGACY_MOS6526R2;
+extern const device_type LEGACY_MOS8520;
+extern const device_type LEGACY_MOS5710;
 
 
 

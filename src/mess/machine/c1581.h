@@ -17,8 +17,8 @@
 #include "cpu/m6502/m6502.h"
 #include "imagedev/flopdrv.h"
 #include "formats/d81_dsk.h"
-#include "machine/6526cia.h"
 #include "machine/cbmiec.h"
+#include "machine/mos6526.h"
 #include "machine/wd17xx.h"
 
 

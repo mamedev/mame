@@ -725,7 +725,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const mos6526_interface cia_0_intf =
+static const legacy_mos6526_interface cia_0_intf =
 {
 	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
 	DEVCB_NULL,	/* pc_func */
@@ -737,7 +737,7 @@ static const mos6526_interface cia_0_intf =
 	DEVCB_DRIVER_MEMBER(cd32_state,cd32_cia_0_portb_w)		/* port B */
 };
 
-static const mos6526_interface cia_1_intf =
+static const legacy_mos6526_interface cia_1_intf =
 {
 	DEVCB_LINE(amiga_cia_1_irq),									/* irq_func */
 	DEVCB_NULL,	/* pc_func */
@@ -800,8 +800,8 @@ static MACHINE_CONFIG_START( cd32base, cd32_state )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
 
 	/* cia */
-	MCFG_MOS8520_ADD("cia_0", AMIGA_68EC020_PAL_CLOCK / 10, 0, cia_0_intf)
-	MCFG_MOS8520_ADD("cia_1", AMIGA_68EC020_PAL_CLOCK / 10, 0, cia_1_intf)
+	MCFG_LEGACY_MOS8520_ADD("cia_0", AMIGA_68EC020_PAL_CLOCK / 10, 0, cia_0_intf)
+	MCFG_LEGACY_MOS8520_ADD("cia_1", AMIGA_68EC020_PAL_CLOCK / 10, 0, cia_1_intf)
 
 	MCFG_MICROTOUCH_ADD( "microtouch", cd32_microtouch_config )
 

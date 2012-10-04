@@ -90,21 +90,19 @@ static const int c128_mmu_helper[4] =
 
 void c128_state::nmi()
 {
-	int cia1irq = mos6526_irq_r(m_cia2);
-
-	if (m_nmilevel != (ioport("SPECIAL")->read() & 0x80) || cia1irq)	/* KEY_RESTORE */
+	if (m_nmilevel != (ioport("SPECIAL")->read() & 0x80) || m_cia1_irq)	/* KEY_RESTORE */
 	{
 		if (1) // this was never valid, there is no active CPU during a timer firing!  cpu_getactivecpu() == 0)
 		{
 			/* z80 */
-			m_maincpu->set_input_line(INPUT_LINE_NMI, (ioport("SPECIAL")->read() & 0x80) || cia1irq);
+			m_maincpu->set_input_line(INPUT_LINE_NMI, (ioport("SPECIAL")->read() & 0x80) || m_cia1_irq);
 		}
 		else
 		{
-			m_subcpu->set_input_line(INPUT_LINE_NMI, (ioport("SPECIAL")->read() & 0x80) || cia1irq);
+			m_subcpu->set_input_line(INPUT_LINE_NMI, (ioport("SPECIAL")->read() & 0x80) || m_cia1_irq);
 		}
 
-		m_nmilevel = (ioport("SPECIAL")->read() & 0x80) || cia1irq;
+		m_nmilevel = (ioport("SPECIAL")->read() & 0x80) || m_cia1_irq;
 	}
 }
 
@@ -126,7 +124,7 @@ void c128_state::nmi()
 
 READ8_MEMBER( c128_state::cia1_pa_r )
 {
-	UINT8 cia0portb = mos6526_pb_r(m_cia1, space, 0);
+	UINT8 cia0portb = m_cia1->pb_r();
 
 	return cbm_common_cia0_port_a_r(m_cia1, cia0portb);
 }
@@ -134,7 +132,7 @@ READ8_MEMBER( c128_state::cia1_pa_r )
 READ8_MEMBER( c128_state::cia1_pb_r )
 {
 	UINT8 value = 0xff;
-	UINT8 cia0porta = mos6526_pa_r(m_cia1, space, 0);
+	UINT8 cia0porta = m_cia1->pa_r();
 	//vic2e_device_interface *intf = dynamic_cast<vic2e_device_interface*>(&m_vic);
 
 	value &= cbm_common_cia0_port_b_r(m_cia1, cia0porta);
@@ -175,6 +173,8 @@ void c128_state::irq(int level)
 
 WRITE_LINE_MEMBER( c128_state::cia1_irq_w )
 {
+	m_cia1_irq = state;
+
 	irq(state || m_vicirq);
 }
 
@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER( c128_state::vic_interrupt )
 {
 	if (state  != m_vicirq)
 	{
-		irq(state || mos6526_irq_r(m_cia1));
+		irq(state || m_cia1_irq);
 		m_vicirq = state;
 	}
 }
@@ -237,12 +237,12 @@ const mos6526_interface c128_cia1_intf =
 
 WRITE_LINE_MEMBER( c128_state::iec_srq_w )
 {
-	mos6526_cnt_w(m_cia1, MMU_FSDIR || state);
+	m_cia1->cnt_w(MMU_FSDIR || state);
 }
 
 WRITE_LINE_MEMBER( c128_state::iec_data_w )
 {
-	mos6526_sp_w(m_cia1, MMU_FSDIR || state);
+	m_cia1->sp_w(MMU_FSDIR || state);
 }
 
 /*
@@ -370,10 +370,10 @@ WRITE8_MEMBER( c128_state::write_d000 )
 				m_colorram[(offset & 0x3ff)|((c64_port6510&3)<<10)] = data | 0xf0; // maybe all 8 bit connected!
 		    break;
 		case 0xc:
-			mos6526_w(m_cia1, space, offset, data);
+			m_cia1->write(space, offset & 0x0f, data);
 			break;
 		case 0xd:
-			mos6526_w(m_cia2, space, offset, data);
+			m_cia2->write(space, offset & 0x0f, data);
 			break;
 		case 0xf:
 			dma8726_port_w(space, offset&0xff,data);
@@ -404,18 +404,18 @@ READ8_MEMBER( c128_state::read_io )
 		return m_colorram[offset & 0x3ff];
 	else if (offset == 0xc00)
 		{
-			cia_set_port_mask_value(m_cia1, 0, ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[8] : c64_keyline[9] );
-			return mos6526_r(m_cia1, space, offset);
+			//cia_set_port_mask_value(m_cia1, 0, ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[8] : c64_keyline[9] );
+			return m_cia1->read(space, offset & 0x0f);
 		}
 	else if (offset == 0xc01)
 		{
-			cia_set_port_mask_value(m_cia1, 1, ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[9] : c64_keyline[8] );
-			return mos6526_r(m_cia1, space, offset);
+			//cia_set_port_mask_value(m_cia1, 1, ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[9] : c64_keyline[8] );
+			return m_cia1->read(space, offset & 0x0f);
 		}
 	else if (offset < 0xd00)
-		return mos6526_r(m_cia1, space, offset);
+		return m_cia1->read(space, offset & 0x0f);
 	else if (offset < 0xe00)
-		return mos6526_r(m_cia2, space, offset);
+		return m_cia2->read(space, offset & 0x0f);
 	else if ((offset >= 0xf00) & (offset <= 0xfff))
 		return dma8726_port_r(space, offset&0xff);
 	DBG_LOG(machine(), 1, "io read", ("%.3x\n", offset));
@@ -799,8 +799,8 @@ WRITE8_MEMBER( c128_state::mmu8722_port_w )
 		bankswitch(0);
 		iec_srq_out_w();
 		iec_data_out_w();
-		mos6526_cnt_w(m_cia1, MMU_FSDIR || m_iec->srq_r());
-		mos6526_sp_w(m_cia1, MMU_FSDIR || m_iec->data_r());
+		m_cia1->cnt_w(MMU_FSDIR || m_iec->srq_r());
+		m_cia1->sp_w(MMU_FSDIR || m_iec->data_r());
 		break;
 	case 0:
 	case 6:

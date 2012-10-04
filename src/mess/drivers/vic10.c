@@ -68,7 +68,7 @@ READ8_MEMBER( vic10_state::read )
 	}
 	else if (offset >= 0xdc00 && offset < 0xe000)
 	{
-		data = mos6526_r(m_cia, space, offset & 0x0f);
+		data = m_cia->read(space, offset & 0x0f);
 	}
 	else if (offset >= 0xe000)
 	{
@@ -111,7 +111,7 @@ WRITE8_MEMBER( vic10_state::write )
 	}
 	else if (offset >= 0xdc00 && offset < 0xe000)
 	{
-		mos6526_w(m_cia, space, offset & 0x0f, data);
+		m_cia->write(space, offset & 0x0f, data);
 	}
 
 	m_exp->cd_w(space, offset, data, lorom, uprom, exram);
@@ -251,127 +251,34 @@ static MOS6566_INTERFACE( vic_intf )
 //  sid6581_interface sid_intf
 //-------------------------------------------------
 
-UINT8 vic10_state::paddle_read(address_space &space, int which)
-{
-	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
-	UINT8 cia0porta = mos6526_pa_r(m_cia, space, 0);
-	int controller1 = ioport("CTRLSEL")->read() & 0x07;
-	int controller2 = ioport("CTRLSEL")->read() & 0x70;
-	// Notice that only a single input is defined for Mouse & Lightpen in both ports
-	switch (controller1)
-	{
-		case 0x01:
-			if (which)
-				pot2 = ioport("PADDLE2")->read();
-			else
-				pot1 = ioport("PADDLE1")->read();
-			break;
-
-		case 0x02:
-			if (which)
-				pot2 = ioport("TRACKY")->read();
-			else
-				pot1 = ioport("TRACKX")->read();
-			break;
-
-		case 0x03:
-			if (which && (ioport("JOY1_2B")->read() & 0x20))	// Joy1 Button 2
-				pot1 = 0x00;
-			break;
-
-		case 0x04:
-			if (which)
-				pot2 = ioport("LIGHTY")->read();
-			else
-				pot1 = ioport("LIGHTX")->read();
-			break;
-
-		case 0x06:
-			if (which && (ioport("OTHER")->read() & 0x04))	// Lightpen Signal
-				pot2 = 0x00;
-			break;
-
-		case 0x00:
-		case 0x07:
-			break;
-
-		default:
-			logerror("Invalid Controller Setting %d\n", controller1);
-			break;
-	}
-
-	switch (controller2)
-	{
-		case 0x10:
-			if (which)
-				pot4 = ioport("PADDLE4")->read();
-			else
-				pot3 = ioport("PADDLE3")->read();
-			break;
-
-		case 0x20:
-			if (which)
-				pot4 = ioport("TRACKY")->read();
-			else
-				pot3 = ioport("TRACKX")->read();
-			break;
-
-		case 0x30:
-			if (which && (ioport("JOY2_2B")->read() & 0x20))	// Joy2 Button 2
-				pot4 = 0x00;
-			break;
-
-		case 0x40:
-			if (which)
-				pot4 = ioport("LIGHTY")->read();
-			else
-				pot3 = ioport("LIGHTX")->read();
-			break;
-
-		case 0x60:
-			if (which && (ioport("OTHER")->read() & 0x04))	// Lightpen Signal
-				pot4 = 0x00;
-			break;
-
-		case 0x00:
-		case 0x70:
-			break;
-
-		default:
-			logerror("Invalid Controller Setting %d\n", controller1);
-			break;
-	}
-
-	if (ioport("CTRLSEL")->read() & 0x80)		// Swap
-	{
-		temp = pot1; pot1 = pot3; pot3 = temp;
-		temp = pot2; pot2 = pot4; pot4 = temp;
-	}
-
-	switch (cia0porta & 0xc0)
-	{
-		case 0x40:
-			return which ? pot2 : pot1;
-
-		case 0x80:
-			return which ? pot4 : pot3;
-
-		case 0xc0:
-			return which ? pot2 : pot1;
-
-		default:
-			return 0;
-	}
-}
-
 READ8_MEMBER( vic10_state::sid_potx_r )
 {
-	return paddle_read(space, 0);
+	UINT8 cia_pa = m_cia->pa_r();
+	
+	int sela = BIT(cia_pa, 6);
+	int selb = BIT(cia_pa, 7);
+
+	UINT8 data = 0;
+
+	if (sela) data = m_joy1->pot_x_r();
+	if (selb) data = m_joy2->pot_x_r();
+
+	return data;
 }
 
 READ8_MEMBER( vic10_state::sid_poty_r )
 {
-	return paddle_read(space, 1);
+	UINT8 cia_pa = m_cia->pa_r();
+	
+	int sela = BIT(cia_pa, 6);
+	int selb = BIT(cia_pa, 7);
+
+	UINT8 data = 0;
+
+	if (sela) data = m_joy1->pot_y_r();
+	if (selb) data = m_joy2->pot_y_r();
+
+	return data;
 }
 
 static MOS6581_INTERFACE( sid_intf )
@@ -382,7 +289,7 @@ static MOS6581_INTERFACE( sid_intf )
 
 
 //-------------------------------------------------
-//  mos6526_interface cia_intf
+//  MOS6526_INTERFACE( cia_intf )
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( vic10_state::cia_irq_w )
@@ -409,7 +316,7 @@ READ8_MEMBER( vic10_state::cia_pa_r )
 
     */
 
-	UINT8 cia0portb = mos6526_pb_r(m_cia, space, 0);
+	UINT8 cia0portb = m_cia->pb_r();
 
 	return cbm_common_cia0_port_a_r(m_cia, cia0portb);
 }
@@ -431,7 +338,7 @@ READ8_MEMBER( vic10_state::cia_pb_r )
 
     */
 
-	UINT8 cia0porta = mos6526_pa_r(m_cia, space, 0);
+	UINT8 cia0porta = m_cia->pa_r();
 
 	return cbm_common_cia0_port_b_r(m_cia, cia0porta);
 }
@@ -456,7 +363,7 @@ WRITE8_MEMBER( vic10_state::cia_pb_w )
 	m_vic->lp_w(BIT(data, 4));
 }
 
-static const mos6526_interface cia_intf =
+static MOS6526_INTERFACE( cia_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(vic10_state, cia_irq_w),
 	DEVCB_NULL,
@@ -543,7 +450,7 @@ static M6510_INTERFACE( cpu_intf )
 
 static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 {
-	DEVCB_DEVICE_LINE(MOS6526_TAG, mos6526_flag_w)
+	DEVCB_DEVICE_LINE_MEMBER(MOS6526_TAG, mos6526_device, flag_w)
 };
 
 
@@ -561,8 +468,8 @@ WRITE_LINE_MEMBER( vic10_state::exp_irq_w )
 static VIC10_EXPANSION_INTERFACE( expansion_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(vic10_state, exp_irq_w),
-	DEVCB_DEVICE_LINE(MOS6526_TAG, mos6526_sp_w),
-	DEVCB_DEVICE_LINE(MOS6526_TAG, mos6526_cnt_w),
+	DEVCB_DEVICE_LINE_MEMBER(MOS6526_TAG, mos6526_device, sp_w),
+	DEVCB_DEVICE_LINE_MEMBER(MOS6526_TAG, mos6526_device, cnt_w),
 	DEVCB_CPU_INPUT_LINE(M6510_TAG, INPUT_LINE_RESET)
 };
 
@@ -629,8 +536,10 @@ static MACHINE_CONFIG_START( vic10, vic10_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_MOS6526R1_ADD(MOS6526_TAG, VIC6566_CLOCK, 60, cia_intf)
+	MCFG_MOS6526_ADD(MOS6526_TAG, VIC6566_CLOCK, 60, cia_intf)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VIC10_EXPANSION_SLOT_ADD(VIC10_EXPANSION_SLOT_TAG, VIC6566_CLOCK, expansion_intf, vic10_expansion_cards, NULL, NULL)
 
 	// software list

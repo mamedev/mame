@@ -20,9 +20,9 @@
 #include "formats/g64_dsk.h"
 #include "machine/64h156.h"
 #include "machine/6522via.h"
-#include "machine/6526cia.h"
 #include "machine/c64_bn1541.h"
 #include "machine/cbmiec.h"
+#include "machine/mos6526.h"
 #include "machine/wd17xx.h"
 
 

@@ -555,8 +555,8 @@ static ADDRESS_MAP_START( z80_io, AS_IO, 8, c128_state )
 	AM_RANGE(0xd500, 0xd5ff) AM_READWRITE(mmu8722_port_r, mmu8722_port_w)
 	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x1fe) AM_DEVREADWRITE(MOS8563_TAG, mos8563_device, status_r, address_w)
 	AM_RANGE(0xd601, 0xd601) AM_MIRROR(0x1fe) AM_DEVREADWRITE(MOS8563_TAG, mos8563_device, register_r, register_w)
-	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE_LEGACY(MOS6526_1_TAG, mos6526_r, mos6526_w)
-	AM_RANGE(0xdd00, 0xddff) AM_DEVREADWRITE_LEGACY(MOS6526_2_TAG, mos6526_r, mos6526_w)
+	AM_RANGE(0xdc00, 0xdc0f) AM_MIRROR(0xf0) AM_DEVREADWRITE(MOS6526_1_TAG, mos6526_device, read, write)
+	AM_RANGE(0xdd00, 0xdd0f) AM_MIRROR(0xf0) AM_DEVREADWRITE(MOS6526_2_TAG, mos6526_device, read, write)
 /*  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE_LEGACY(dma_port_r, dma_port_w) */
 ADDRESS_MAP_END
 
@@ -968,7 +968,7 @@ static const mc6845_interface vdc_intf =
 
 READ8_MEMBER( c128_state::sid_potx_r )
 {
-	UINT8 cia1_pa = mos6526_pa_r(m_cia1, space, 0);
+	UINT8 cia1_pa = m_cia1->pa_r();
 	
 	int sela = BIT(cia1_pa, 6);
 	int selb = BIT(cia1_pa, 7);
@@ -983,7 +983,7 @@ READ8_MEMBER( c128_state::sid_potx_r )
 
 READ8_MEMBER( c128_state::sid_poty_r )
 {
-	UINT8 cia1_pa = mos6526_pa_r(m_cia1, space, 0);
+	UINT8 cia1_pa = m_cia1->pa_r();
 	
 	int sela = BIT(cia1_pa, 6);
 	int selb = BIT(cia1_pa, 7);
@@ -1038,7 +1038,7 @@ static CBM_IEC_INTERFACE( cbm_iec_intf )
 
 static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 {
-	DEVCB_DEVICE_LINE(MOS6526_1_TAG, mos6526_flag_w)
+	DEVCB_DEVICE_LINE_MEMBER(MOS6526_1_TAG, mos6526_device, flag_w)
 };
 
 
@@ -1109,8 +1109,8 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	// devices
 	MCFG_MOS8722_ADD(MOS8722_TAG, mmu_intf)
 	MCFG_MOS8721_ADD(MOS8721_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6567_CLOCK, 60, c128_cia1_intf)
-	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6567_CLOCK, 60, c128_cia2_intf)
+	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6567_CLOCK, 60, c128_cia1_intf)
+	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6567_CLOCK, 60, c128_cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
@@ -1216,8 +1216,8 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	// devices
 	MCFG_MOS8722_ADD(MOS8722_TAG, mmu_intf)
 	MCFG_MOS8721_ADD(MOS8721_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, 50, c128_cia1_intf)
-	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, c128_cia2_intf)
+	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6569_CLOCK, 50, c128_cia1_intf)
+	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, c128_cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)

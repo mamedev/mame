@@ -287,7 +287,7 @@ MACHINE_RESET_MEMBER(cdtv_state,cdtv)
 	MACHINE_RESET_CALL_LEGACY( amigacd );
 }
 
-static const mos6526_interface cia_0_ntsc_intf =
+static const legacy_mos6526_interface cia_0_ntsc_intf =
 {
 	DEVCB_DEVICE_LINE("cia_0", amiga_cia_0_irq),							/* irq_func */
 	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, strobe_w),	/* pc_func */
@@ -299,7 +299,7 @@ static const mos6526_interface cia_0_ntsc_intf =
 	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write)	/* port B */
 };
 
-static const mos6526_interface cia_0_pal_intf =
+static const legacy_mos6526_interface cia_0_pal_intf =
 {
 	DEVCB_DEVICE_LINE("cia_0", amiga_cia_0_irq),							/* irq_func */
 	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, strobe_w),	/* pc_func */
@@ -311,7 +311,7 @@ static const mos6526_interface cia_0_pal_intf =
 	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write)	/* port B */
 };
 
-static const mos6526_interface cia_1_intf =
+static const legacy_mos6526_interface cia_1_intf =
 {
 	DEVCB_DEVICE_LINE("cia_1", amiga_cia_1_irq),							/* irq_func */
 	DEVCB_NULL,												/* pc_func */
@@ -323,7 +323,7 @@ static const mos6526_interface cia_1_intf =
 	DEVCB_DEVICE_MEMBER("fdc", amiga_fdc, ciaaprb_w)		/* port B */
 };
 
-static const mos6526_interface cia_0_cdtv_intf =
+static const legacy_mos6526_interface cia_0_cdtv_intf =
 {
 	DEVCB_DEVICE_LINE("cia_0", amiga_cia_0_irq),							/* irq_func */
 	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, strobe_w),	/* pc_func */
@@ -335,7 +335,7 @@ static const mos6526_interface cia_0_cdtv_intf =
 	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write)	/* port B */
 };
 
-static const mos6526_interface cia_1_cdtv_intf =
+static const legacy_mos6526_interface cia_1_cdtv_intf =
 {
 	DEVCB_DEVICE_LINE("cia_1", amiga_cia_1_irq),							/* irq_func */
 	DEVCB_NULL,	/* pc_func */
@@ -415,8 +415,8 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 	MCFG_SOUND_ROUTE(3, "lspeaker", 0.50)
 
 	/* cia */
-	MCFG_MOS8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, 60, cia_0_ntsc_intf)
-	MCFG_MOS8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK, 0, cia_1_intf)
+	MCFG_LEGACY_MOS8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, 60, cia_0_ntsc_intf)
+	MCFG_LEGACY_MOS8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK, 0, cia_1_intf)
 
 	/* fdc */
 	MCFG_AMIGA_FDC_ADD("fdc", AMIGA_68000_NTSC_CLOCK)
@@ -474,8 +474,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( cdtv, ntsc, cdtv_state)
 	/* cia */
 	MCFG_DEVICE_REMOVE("cia_0")
 	MCFG_DEVICE_REMOVE("cia_1")
-	MCFG_MOS8520_ADD("cia_0", CDTV_CLOCK_X1 / 40, 0, cia_0_cdtv_intf)
-	MCFG_MOS8520_ADD("cia_1", CDTV_CLOCK_X1 / 4, 0, cia_1_cdtv_intf)
+	MCFG_LEGACY_MOS8520_ADD("cia_0", CDTV_CLOCK_X1 / 40, 0, cia_0_cdtv_intf)
+	MCFG_LEGACY_MOS8520_ADD("cia_1", CDTV_CLOCK_X1 / 4, 0, cia_1_cdtv_intf)
 
 	/* fdc */
 	MCFG_DEVICE_MODIFY("fdc")
@@ -498,7 +498,7 @@ static MACHINE_CONFIG_DERIVED( pal, ntsc )
 
 	/* cia */
 	MCFG_DEVICE_REMOVE("cia_0")
-	MCFG_MOS8520_ADD("cia_0", AMIGA_68000_PAL_CLOCK / 10, 50, cia_0_pal_intf)
+	MCFG_LEGACY_MOS8520_ADD("cia_0", AMIGA_68000_PAL_CLOCK / 10, 50, cia_0_pal_intf)
 
 	/* fdc */
 	MCFG_DEVICE_MODIFY("fdc")

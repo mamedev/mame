@@ -1431,7 +1431,7 @@ static const tpi6525_interface p500_tpi2_intf =
 
 
 //-------------------------------------------------
-//  mos6526_interface cia_intf
+//  MOS6526_INTERFACE( cia_intf )
 //-------------------------------------------------
 
 READ8_MEMBER( cbm2_state::cia_pa_r )
@@ -1542,7 +1542,7 @@ WRITE8_MEMBER( cbm2_state::cia_pb_w )
 	//m_user->data2_w(data);
 }
 
-static const mos6526_interface cia_intf =
+static MOS6526_INTERFACE( cia_intf )
 {
 	DEVCB_DEVICE_LINE_MEMBER(MOS6525_1_TAG, tpi6525_device, i2_w),
 	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER(CBM2_USER_PORT_TAG, cbm2_user_port_device, pc_w),
@@ -1563,7 +1563,7 @@ WRITE_LINE_MEMBER( cbm2_state::tape_read_w )
 {
 	m_cass_rd = state;
 
-	mos6526_flag_w(m_cia, m_cass_rd && m_user_flag);
+	m_cia->flag_w(m_cass_rd && m_user_flag);
 }
 
 static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
@@ -1837,7 +1837,7 @@ static MACHINE_CONFIG_START( p500_ntsc, p500_state )
 	MCFG_TPI6525_ADD(MOS6525_1_TAG, p500_tpi1_intf)
 	MCFG_TPI6525_ADD(MOS6525_2_TAG, p500_tpi2_intf)
 	MCFG_ACIA6551_ADD(MOS6551A_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_TAG, VIC6567_CLOCK, 60, cia_intf)
+	MCFG_MOS6526_ADD(MOS6526_TAG, VIC6567_CLOCK, 60, cia_intf)
 	MCFG_DS75160A_ADD(DS75160A_TAG, ds75160a_intf)
 	MCFG_DS75161A_ADD(DS75161A_TAG, ds75161a_intf)
 	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
@@ -1887,7 +1887,7 @@ static MACHINE_CONFIG_START( p500_pal, p500_state )
 	MCFG_TPI6525_ADD(MOS6525_1_TAG, p500_tpi1_intf)
 	MCFG_TPI6525_ADD(MOS6525_2_TAG, p500_tpi2_intf)
 	MCFG_ACIA6551_ADD(MOS6551A_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_TAG, VIC6569_CLOCK, 50, cia_intf)
+	MCFG_MOS6526_ADD(MOS6526_TAG, VIC6569_CLOCK, 50, cia_intf)
 	MCFG_DS75160A_ADD(DS75160A_TAG, ds75160a_intf)
 	MCFG_DS75161A_ADD(DS75161A_TAG, ds75161a_intf)
 	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
@@ -1944,7 +1944,7 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	MCFG_TPI6525_ADD(MOS6525_1_TAG, tpi1_intf)
 	MCFG_TPI6525_ADD(MOS6525_2_TAG, tpi2_intf)
 	MCFG_ACIA6551_ADD(MOS6551A_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_TAG, XTAL_18MHz/9, 60, cia_intf)
+	MCFG_MOS6526_ADD(MOS6526_TAG, XTAL_18MHz/9, 60, cia_intf)
 	MCFG_DS75160A_ADD(DS75160A_TAG, ds75160a_intf)
 	MCFG_DS75161A_ADD(DS75161A_TAG, ds75161a_intf)
 	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
@@ -1991,7 +1991,7 @@ static MACHINE_CONFIG_START( cbm2lp_pal, cbm2_state )
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
 
 	MCFG_DEVICE_REMOVE(MOS6526_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_TAG, XTAL_18MHz/9, 50, cia_intf)
+	MCFG_MOS6526_ADD(MOS6526_TAG, XTAL_18MHz/9, 50, cia_intf)
 MACHINE_CONFIG_END
 
 
@@ -2077,7 +2077,7 @@ static MACHINE_CONFIG_START( cbm2hp_pal, cbm2hp_state )
 	MCFG_TPI6525_ADD(MOS6525_2_TAG, hp_tpi2_intf)
 
 	MCFG_DEVICE_REMOVE(MOS6526_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_TAG, XTAL_18MHz/9, 50, cia_intf)
+	MCFG_MOS6526_ADD(MOS6526_TAG, XTAL_18MHz/9, 50, cia_intf)
 MACHINE_CONFIG_END
 
 

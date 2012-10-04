@@ -129,7 +129,7 @@ void c65_vic_interrupt( running_machine &machine, int level )
 #endif
 }
 
-const mos6526_interface c65_cia0 =
+const legacy_mos6526_interface c65_cia0 =
 {
 	DEVCB_LINE(c65_cia0_interrupt),
 	DEVCB_NULL,	/* pc_func */
@@ -193,7 +193,7 @@ WRITE_LINE_MEMBER(c65_state::c65_cia1_interrupt)
 	c65_nmi(machine());
 }
 
-const mos6526_interface c65_cia1 =
+const legacy_mos6526_interface c65_cia1 =
 {
 	DEVCB_DRIVER_LINE_MEMBER(c65_state,c65_cia1_interrupt),
 	DEVCB_NULL,	/* pc_func */

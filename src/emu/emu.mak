@@ -219,6 +219,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/mccs1850.o	\
 	$(EMUMACHINE)/mm74c922.o	\
 	$(EMUMACHINE)/microtch.o	\
+	$(EMUMACHINE)/mos6526.o		\
 	$(EMUMACHINE)/mos6529.o		\
 	$(EMUMACHINE)/msm5832.o		\
 	$(EMUMACHINE)/msm58321.o	\
