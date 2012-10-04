@@ -222,7 +222,7 @@ const char *running_machine::describe_context()
 	device_execute_interface *executing = m_scheduler.currently_executing();
 	if (executing != NULL)
 	{
-		cpu_device *cpu = downcast<cpu_device *>(&executing->device());
+		cpu_device *cpu = dynamic_cast<cpu_device *>(&executing->device());
 		if (cpu != NULL)
 			m_context.printf("'%s' (%s)", cpu->tag(), core_i64_format(cpu->pc(), cpu->space(AS_PROGRAM).logaddrchars(), cpu->is_octal()));
 	}
