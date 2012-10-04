@@ -598,7 +598,7 @@ WRITE_LINE_MEMBER(v1050_state::pic_int_w)
 {
 	if (state == ASSERT_LINE)
 	{
-		machine().device(Z80_TAG)->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
 }
 

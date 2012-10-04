@@ -25,6 +25,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
 		  m_pia(*this, PIA6821_TAG),
+		  m_sio(*this, Z80SIO_TAG),
 		  m_fdc(*this, UPD765_TAG),
 		  m_kbc(*this, AY3600PRO002_TAG),
 		  m_crtc(*this, MC6845_TAG),
@@ -38,6 +39,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
+	required_device<z80dart_device> m_sio;
 	required_device<device_t> m_fdc;
 	required_device<ay3600_device> m_kbc;
 	required_device<mc6845_device> m_crtc;
