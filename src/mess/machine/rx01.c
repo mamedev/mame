@@ -176,7 +176,7 @@ UINT16 rx01_device::status_read()
 
 void rx01_device::data_write(UINT16 data)
 {
-	printf("data_write %04x\n",data);
+//	printf("data_write %04x\n",data);
 	// data can be written only if TR is set
 	if (BIT(m_rxcs,7)) m_rxdb = data;
 	machine().scheduler().timer_set(attotime::from_msec(100), FUNC(command_execution_callback), 0, this);
@@ -185,7 +185,7 @@ void rx01_device::data_write(UINT16 data)
 UINT16 rx01_device::data_read()
 {
 	if (m_state==RX01_EMPTY && BIT(m_rxcs,7)) m_rxcs &= (1<<7); // clear TR bit;
-	printf("data_read %04x\n",m_rxdb);
+//	printf("data_read %04x\n",m_rxdb);
 	return m_rxdb;
 }
 
