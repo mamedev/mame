@@ -922,8 +922,8 @@ READ8_HANDLER( snes_r_bank2 )
 		{
 			/* Donkey Kong Country checks this and detects a copier if 0x800 is not masked out due to sram size */
 			/* OTOH Secret of Mana does not work properly if sram is not mirrored on later banks */
-			int mask = (state->m_cart[0].sram - 1) | 0xffe000; /* Limit SRAM size to what's actually present */
-			value = snes_ram[0x300000 + (offset & mask)];
+			int mask = (state->m_cart[0].sram - 1) & 0x7fff; /* Limit SRAM size to what's actually present */
+			value = snes_ram[0x306000 + ((offset - 0x6000) & mask)];
 		}
 		else
 		{
@@ -1082,8 +1082,8 @@ READ8_HANDLER( snes_r_bank6 )
 				value = space.read_byte(offset);
 			else if ((offset >= 0x300000) && (state->m_cart[0].sram > 0))
 			{
-				int mask = (state->m_cart[0].sram - 1) | 0xff0000; /* Limit SRAM size to what's actually present */
-				value = snes_ram[0x800000 + (offset & mask)];
+				int mask = (state->m_cart[0].sram - 1) & 0x7fff; /* Limit SRAM size to what's actually present */
+				value = snes_ram[0xb06000 + ((offset - 0x6000) & mask)];
 			}
 			else						/* Area 0x6000-0x8000 with offset < 0x300000 is reserved */
 			{
@@ -1249,8 +1249,8 @@ WRITE8_HANDLER( snes_w_bank2 )
 		{
 			/* Donkey Kong Country checks this and detects a copier if 0x800 is not masked out due to sram size */
 			/* OTOH Secret of Mana does not work properly if sram is not mirrored on later banks */
-			int mask = (state->m_cart[0].sram - 1) | 0xffe000; /* Limit SRAM size to what's actually present */
-			snes_ram[0x300000 + (offset & mask)] = data;
+			int mask = (state->m_cart[0].sram - 1) & 0x7fff; /* Limit SRAM size to what's actually present */
+			snes_ram[0x306000 + ((offset - 0x6000) & mask)] = data;
 		}
 		else
 			logerror("snes_w_bank2: Attempt to write to reserved address: %X = %02x\n", offset + 0x300000, data);
@@ -1353,8 +1353,8 @@ WRITE8_HANDLER( snes_w_bank6 )
 				space.write_byte(offset, data);
 			else if ((offset >= 0x300000) && (state->m_cart[0].sram > 0))
 			{
-				int mask = (state->m_cart[0].sram - 1) | 0xff0000; /* Limit SRAM size to what's actually present */
-				snes_ram[0x800000 + (offset & mask)] = data;
+				int mask = (state->m_cart[0].sram - 1) & 0x7fff; /* Limit SRAM size to what's actually present */
+				snes_ram[0xb06000 + ((offset - 0x6000) & mask)] = data;
 			}
 			else	/* Area in 0x6000-0x8000 && offset < 0x300000 is Reserved! */
 				logerror("snes_w_bank6: Attempt to write to reserved address: %X = %02x\n", offset + 0x800000, data);
