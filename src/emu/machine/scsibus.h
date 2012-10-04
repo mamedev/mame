@@ -9,7 +9,7 @@
 #define _SCSIBUS_H_
 
 #include "machine/scsicb.h"
-#include "machine/scsidev.h"
+#include "machine/scsihle.h"
 
 
 /***************************************************************************
@@ -141,7 +141,7 @@ private:
 	void dump_data_bytes(int count);
 	void dump_bytes(UINT8 *buff, int count);
 
-	scsidev_device          *devices[8];
+	scsihle_device          *devices[8];
 	scsicb_device *m_scsicb;
 
 	UINT8       linestate;

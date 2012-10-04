@@ -5,14 +5,14 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "scsidev.h"
+#include "machine/scsihle.h"
 
-scsidev_device::scsidev_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+scsihle_device::scsihle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, type, name, tag, owner, clock)
 {
 }
 
-void scsidev_device::device_start()
+void scsihle_device::device_start()
 {
 	save_item( NAME( command ) );
 	save_item( NAME( commandLength ) );
@@ -21,7 +21,7 @@ void scsidev_device::device_start()
 
 #define SCSI_SENSE_SIZE				4
 
-void scsidev_device::ExecCommand( int *transferLength )
+void scsihle_device::ExecCommand( int *transferLength )
 {
 	UINT8 *command;
 	int commandLength;
@@ -56,7 +56,7 @@ void scsidev_device::ExecCommand( int *transferLength )
 	}
 }
 
-void scsidev_device::ReadData( UINT8 *data, int dataLength )
+void scsihle_device::ReadData( UINT8 *data, int dataLength )
 {
 	UINT8 *command;
 	int commandLength;
@@ -76,7 +76,7 @@ void scsidev_device::ReadData( UINT8 *data, int dataLength )
 	}
 }
 
-void scsidev_device::WriteData( UINT8 *data, int dataLength )
+void scsihle_device::WriteData( UINT8 *data, int dataLength )
 {
 	UINT8 *command;
 	int commandLength;
@@ -93,17 +93,17 @@ void scsidev_device::WriteData( UINT8 *data, int dataLength )
 	}
 }
 
-void scsidev_device::SetPhase( int _phase )
+void scsihle_device::SetPhase( int _phase )
 {
 	phase = _phase;
 }
 
-void scsidev_device::GetPhase( int *_phase)
+void scsihle_device::GetPhase( int *_phase)
 {
 	*_phase = phase;
 }
 
-void scsidev_device::SetCommand( UINT8 *_command, int _commandLength )
+void scsihle_device::SetCommand( UINT8 *_command, int _commandLength )
 {
 	if( _commandLength > sizeof( command ) )
 	{
@@ -117,25 +117,25 @@ void scsidev_device::SetCommand( UINT8 *_command, int _commandLength )
 	SetPhase( SCSI_PHASE_COMMAND );
 }
 
-void scsidev_device::GetCommand( UINT8 **_command, int *_commandLength )
+void scsihle_device::GetCommand( UINT8 **_command, int *_commandLength )
 {
 	*_command = command;
 	*_commandLength = commandLength;
 }
 
-int scsidev_device::GetDeviceID()
+int scsihle_device::GetDeviceID()
 {
 	return scsiID;
 }
 
-int scsidev_device::GetSectorBytes()
+int scsihle_device::GetSectorBytes()
 {
 	return 0;
 }
 
-void scsidev_device::static_set_deviceid( device_t &device, int _scsiID )
+void scsihle_device::static_set_deviceid( device_t &device, int _scsiID )
 {
-	scsidev_device &scsidev = downcast<scsidev_device &>(device);
+	scsihle_device &scsidev = downcast<scsihle_device &>(device);
 	scsidev.scsiID = _scsiID;
 }
 

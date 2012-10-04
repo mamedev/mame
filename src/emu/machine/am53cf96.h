@@ -6,7 +6,7 @@
 #ifndef _AM53CF96_H_
 #define _AM53CF96_H_
 
-#include "scsidev.h"
+#include "machine/scsihle.h"
 
 struct AM53CF96interface
 {
@@ -61,7 +61,7 @@ protected:
 private:
 	static const device_timer_id TIMER_TRANSFER = 0;
 
-	scsidev_device *devices[8];
+	scsihle_device *devices[8];
 
 	UINT8 scsi_regs[32];
 	UINT8 fifo[16];

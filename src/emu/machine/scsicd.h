@@ -7,10 +7,10 @@
 #ifndef _SCSICD_H_
 #define _SCSICD_H_
 
-#include "machine/scsidev.h"
+#include "machine/scsihle.h"
 #include "cdrom.h"
 
-class scsicd_device : public scsidev_device
+class scsicd_device : public scsihle_device
 {
 public:
 	// construction/destruction

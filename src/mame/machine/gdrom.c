@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/scsidev.h"
+#include "machine/scsihle.h"
 #include "cdrom.h"
 #include "sound/cdda.h"
 #include "imagedev/chd_cd.h"
@@ -29,7 +29,7 @@ static void phys_frame_to_msf(int phys_frame, int *m, int *s, int *f)
 const device_type GDROM = &device_creator<gdrom_device>;
 
 gdrom_device::gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: scsidev_device(mconfig, GDROM, "GDROM", tag, owner, clock)
+	: scsihle_device(mconfig, GDROM, "GDROM", tag, owner, clock)
 {
 }
 
@@ -46,7 +46,7 @@ void gdrom_device::device_start()
 
 void gdrom_device::device_reset()
 {
-	scsidev_device::device_reset();
+	scsihle_device::device_reset();
 
 	is_file = TRUE;
 	cdrom = subdevice<cdrom_image_device>("image")->get_cdrom_file();
@@ -434,7 +434,7 @@ void gdrom_device::ExecCommand( int *transferLength )
 			break;
 
 		default:
-			scsidev_device::ExecCommand( transferLength );
+			scsihle_device::ExecCommand( transferLength );
 			break;
 	}
 }
@@ -786,7 +786,7 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 			break;
 
 		default:
-			scsidev_device::ReadData( data, dataLength );
+			scsihle_device::ReadData( data, dataLength );
 			break;
 	}
 }
@@ -834,7 +834,7 @@ void gdrom_device::WriteData( UINT8 *data, int dataLength )
 			break;
 
 		default:
-			scsidev_device::WriteData( data, dataLength );
+			scsihle_device::WriteData( data, dataLength );
 			break;
 	}
 }

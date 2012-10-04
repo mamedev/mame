@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "scsidev.h"
+#include "machine/scsihle.h"
 #include "harddisk.h"
 #include "imagedev/harddriv.h"
 #include "scsihd.h"
@@ -14,12 +14,12 @@
 const device_type SCSIHD = &device_creator<scsihd_device>;
 
 scsihd_device::scsihd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: scsidev_device(mconfig, SCSIHD, "SCSIHD", tag, owner, clock)
+	: scsihle_device(mconfig, SCSIHD, "SCSIHD", tag, owner, clock)
 {
 }
 
 scsihd_device::scsihd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-	scsidev_device(mconfig, type, name, tag, owner, clock)
+	scsihle_device(mconfig, type, name, tag, owner, clock)
 {
 }
 
@@ -31,7 +31,7 @@ void scsihd_device::device_start()
 
 void scsihd_device::device_reset()
 {
-	scsidev_device::device_reset();
+	scsihle_device::device_reset();
 
 	is_image_device = true;
 	disk = subdevice<harddisk_image_device>("image")->get_hard_disk_file();
@@ -174,7 +174,7 @@ void scsihd_device::ExecCommand( int *transferLength )
 			break;
 
 		default:
-			scsidev_device::ExecCommand( transferLength );
+			scsihle_device::ExecCommand( transferLength );
 			break;
 	}
 }
@@ -272,7 +272,7 @@ void scsihd_device::ReadData( UINT8 *data, int dataLength )
 			break;
 
 		default:
-			scsidev_device::ReadData( data, dataLength );
+			scsihle_device::ReadData( data, dataLength );
 			break;
 	}
 }
@@ -309,7 +309,7 @@ void scsihd_device::WriteData( UINT8 *data, int dataLength )
 			break;
 
 		default:
-			scsidev_device::WriteData( data, dataLength );
+			scsihle_device::WriteData( data, dataLength );
 			break;
 	}
 }

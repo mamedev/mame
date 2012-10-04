@@ -252,8 +252,8 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/scsicb.o		\
 	$(EMUMACHINE)/scsibus.o		\
 	$(EMUMACHINE)/scsicd.o		\
-	$(EMUMACHINE)/scsidev.o		\
 	$(EMUMACHINE)/scsihd.o		\
+	$(EMUMACHINE)/scsihle.o		\
 	$(EMUMACHINE)/secflash.o	\
 	$(EMUMACHINE)/seibu_cop.o	\
 	$(EMUMACHINE)/smc91c9x.o	\

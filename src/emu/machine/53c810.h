@@ -1,7 +1,7 @@
 #ifndef LSI53C810_H
 #define LSI53C810_H
 
-#include "scsidev.h"
+#include "machine/scsihle.h"
 
 struct LSI53C810interface
 {
@@ -62,7 +62,7 @@ private:
 	UINT32 lsi53c810_dasm_fetch(UINT32 pc);
 	unsigned lsi53c810_dasm(char *buf, UINT32 pc);
 
-	scsidev_device *devices[8];	/* SCSI IDs 0-7 */
+	scsihle_device *devices[8];	/* SCSI IDs 0-7 */
 	UINT8 last_id;
 
 	UINT8 scntl0;

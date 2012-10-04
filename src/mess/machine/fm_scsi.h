@@ -8,7 +8,7 @@
 #ifndef FM_SCSI_H_
 #define FM_SCSI_H_
 
-#include "machine/scsidev.h"
+#include "machine/scsihle.h"
 
 // SCSI input lines (from target)
 #define FMSCSI_LINE_REQ   0x80
@@ -83,7 +83,7 @@ private:
     devcb_resolved_write_line m_irq_func;
     devcb_resolved_write_line m_drq_func;
 
-    scsidev_device* m_SCSIdevices[8];
+    scsihle_device* m_SCSIdevices[8];
     UINT8 m_command[32];
     UINT8 m_result[32];
     UINT8 m_command_index;

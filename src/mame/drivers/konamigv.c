@@ -323,7 +323,7 @@ MACHINE_RESET_MEMBER(konamigv_state,konamigv)
 {
 	/* also hook up CDDA audio to the CD-ROM drive */
 	void *cdrom;
-	scsidev_device *scsidev = machine().device<scsidev_device>("scsi:cdrom");
+	scsihle_device *scsidev = machine().device<scsihle_device>("scsi:cdrom");
 	scsidev->GetDevice( &cdrom );
 	cdda_set_cdrom(machine().device("cdda"), cdrom);
 }

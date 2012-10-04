@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "am53cf96.h"
-#include "machine/scsidev.h"
+#include "machine/scsihle.h"
 
 READ8_MEMBER( am53cf96_device::read )
 {
@@ -180,7 +180,7 @@ void am53cf96_device::device_start()
 	// try to open the devices
 	for( device_t *device = owner()->first_subdevice(); device != NULL; device = device->next() )
 	{
-		scsidev_device *scsidev = dynamic_cast<scsidev_device *>(device);
+		scsihle_device *scsidev = dynamic_cast<scsihle_device *>(device);
 		if( scsidev != NULL )
 		{
 			devices[scsidev->GetDeviceID()] = scsidev;

@@ -6,7 +6,7 @@
 #ifndef _NCR539x_H_
 #define _NCR539x_H_
 
-#include "machine/scsidev.h"
+#include "machine/scsihle.h"
 
 struct NCR539Xinterface
 {
@@ -51,7 +51,7 @@ private:
     void exec_fifo();
     void update_fifo_internal_state(int bytes);
 
-	scsidev_device *m_scsi_devices[8];
+	scsihle_device *m_scsi_devices[8];
 
     UINT32 m_xfer_count;
     UINT32 m_dma_size;

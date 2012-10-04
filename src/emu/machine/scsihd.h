@@ -7,10 +7,10 @@
 #ifndef _SCSIHD_H_
 #define _SCSIHD_H_
 
-#include "machine/scsidev.h"
+#include "machine/scsihle.h"
 #include "harddisk.h"
 
-class scsihd_device : public scsidev_device
+class scsihd_device : public scsihle_device
 {
 public:
 	// construction/destruction

@@ -6,7 +6,7 @@
 #ifndef _NCR5380_H_
 #define _NCR5380_H_
 
-#include "machine/scsidev.h"
+#include "machine/scsihle.h"
 
 struct NCR5380interface
 {
@@ -62,7 +62,7 @@ protected:
 	virtual void device_config_complete();
 
 private:
-	scsidev_device *m_scsi_devices[8];
+	scsihle_device *m_scsi_devices[8];
 
 	UINT8 m_5380_Registers[8];
 	UINT8 m_last_id;

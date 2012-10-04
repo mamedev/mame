@@ -2,7 +2,7 @@
 
 #include "emu.h"
 #include "53c810.h"
-#include "machine/scsidev.h"
+#include "machine/scsihle.h"
 
 #define DMA_MAX_ICOUNT	512		/* Maximum number of DMA Scripts opcodes to run */
 #define DASM_OPCODES 0
@@ -664,7 +664,7 @@ void lsi53c810_device::device_start()
 	// try to open the devices
 	for( device_t *device = owner()->first_subdevice(); device != NULL; device = device->next() )
 	{
-		scsidev_device *scsidev = dynamic_cast<scsidev_device *>(device);
+		scsihle_device *scsidev = dynamic_cast<scsihle_device *>(device);
 		if( scsidev != NULL )
 		{
 			devices[scsidev->GetDeviceID()] = scsidev;

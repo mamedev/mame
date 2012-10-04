@@ -8,11 +8,11 @@
 #define _SCSIDEV_H_
 
 // base handler
-class scsidev_device : public device_t
+class scsihle_device : public device_t
 {
 public:
 	// construction/destruction
-	scsidev_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	scsihle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void SetDevice( void *device ) = 0;
 	virtual void GetDevice( void **device ) = 0;
@@ -104,6 +104,6 @@ enum
 
 #define MCFG_SCSIDEV_ADD(_tag, _type, _id) \
 	MCFG_DEVICE_ADD(_tag, _type, 0) \
-	scsidev_device::static_set_deviceid(*device, _id);
+	scsihle_device::static_set_deviceid(*device, _id);
 
 #endif

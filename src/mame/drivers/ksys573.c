@@ -488,8 +488,8 @@ public:
 	UINT32 m_control;
 
 	emu_timer *m_atapi_timer;
-	scsidev_device *m_inserted_cdrom;
-	scsidev_device *m_available_cdroms[ 2 ];
+	scsihle_device *m_inserted_cdrom;
+	scsihle_device *m_available_cdroms[ 2 ];
 	int m_atapi_data_ptr;
 	int m_atapi_data_len;
 	int m_atapi_xferlen;
@@ -1134,10 +1134,10 @@ static void atapi_init(running_machine &machine)
 	state->m_atapi_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(ksys573_state::atapi_xfer_end),state));
 	state->m_atapi_timer->adjust(attotime::never);
 
-	state->m_available_cdroms[ 0 ] = machine.device<scsidev_device>( ":cdrom0" );
+	state->m_available_cdroms[ 0 ] = machine.device<scsihle_device>( ":cdrom0" );
 	if( get_disk_handle( machine, ":cdrom1" ) != NULL )
 	{
-		state->m_available_cdroms[ 1 ] = machine.device<scsidev_device>( ":cdrom1" );
+		state->m_available_cdroms[ 1 ] = machine.device<scsihle_device>( ":cdrom1" );
 	}
 	else
 	{
@@ -1365,7 +1365,7 @@ static void update_mode( running_machine &machine )
 	ksys573_state *state = machine.driver_data<ksys573_state>();
 	int cart = state->ioport("CART")->read();
 	int cd = state->ioport( "CD" )->read();
-	scsidev_device *new_cdrom;
+	scsihle_device *new_cdrom;
 
 	if( state->machine().device<device_secure_serial_flash>("game_eeprom") )
 	{

@@ -6,7 +6,7 @@
 #ifndef _WD33C93_H_
 #define _WD33C93_H_
 
-#include "scsidev.h"
+#include "machine/scsihle.h"
 
 struct WD33C93interface
 {
@@ -93,7 +93,7 @@ private:
 	void xferinfo_cmd();
 	void dispatch_command();
 
-	scsidev_device *devices[8];	// SCSI IDs 0-7
+	scsihle_device *devices[8];	// SCSI IDs 0-7
 
 	UINT8		sasr;
 	UINT8		regs[WD_AUXILIARY_STATUS+1];

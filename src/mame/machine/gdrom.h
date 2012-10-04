@@ -7,10 +7,10 @@
 #ifndef _GDROM_H_
 #define _GDROM_H_
 
-#include "machine/scsidev.h"
+#include "machine/scsihle.h"
 
 // Sega GD-ROM handler
-class gdrom_device : public scsidev_device
+class gdrom_device : public scsihle_device
 {
 public:
 	// construction/destruction

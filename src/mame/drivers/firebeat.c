@@ -158,7 +158,7 @@ public:
 	int m_tick;
 	int m_layer;
 	UINT8 m_atapi_regs[16];
-	scsidev_device *m_atapi_device_data[2];
+	scsihle_device *m_atapi_device_data[2];
 	UINT16 m_atapi_data[32*1024];
 	UINT8 m_atapi_scsi_packet[32*1024];
 	int m_atapi_data_ptr;
@@ -962,8 +962,8 @@ static void atapi_init(running_machine &machine)
 	state->m_atapi_data_ptr = 0;
 	state->m_atapi_cdata_wait = 0;
 
-	state->m_atapi_device_data[0] = machine.device<scsidev_device>( "scsi0" );
-	state->m_atapi_device_data[1] = machine.device<scsidev_device>( "scsi1" );
+	state->m_atapi_device_data[0] = machine.device<scsihle_device>( "scsi0" );
+	state->m_atapi_device_data[1] = machine.device<scsihle_device>( "scsi1" );
 }
 
 static void atapi_reset(running_machine &machine)

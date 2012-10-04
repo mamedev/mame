@@ -157,7 +157,7 @@ void mb89352_device::device_start()
 	// try to open the devices
 	for( device_t *device = owner()->first_subdevice(); device != NULL; device = device->next() )
 	{
-		scsidev_device *scsidev = dynamic_cast<scsidev_device *>(device);
+		scsihle_device *scsidev = dynamic_cast<scsihle_device *>(device);
 		if( scsidev != NULL )
 		{
 			m_SCSIdevices[scsidev->GetDeviceID()] = scsidev;
