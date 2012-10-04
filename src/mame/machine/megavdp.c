@@ -10,7 +10,7 @@
 #include "sound/sn76496.h"
 
 extern cpu_device *_svp_cpu;
-extern int segacd_wordram_mapped;
+extern int sega_cd_connected;
 extern timer_device* megadriv_scanline_timer;
 
 
@@ -490,7 +490,7 @@ UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source
 
 		// likewise segaCD, at least when reading wordram?
 		// we might need to check what mode we're in here..
-		if (segacd_wordram_mapped)
+		if (sega_cd_connected)
 		{
 			source -= 2;
 		}

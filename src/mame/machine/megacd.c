@@ -6,8 +6,24 @@
 
 // the main MD emulation needs to know the state of these because it appears in the MD regs / affect DMA operations
 int sega_cd_connected = 0x00;
-int segacd_wordram_mapped = 0;
 
+
+// not in the state because the IRQ_CALLBACK needs it, and that can't be a member function?
+UINT16 a12000_halt_reset_reg = 0x0000;
+
+/* Callback when the genesis enters interrupt code */
+// needs to be a member
+static IRQ_CALLBACK(segacd_sub_int_callback)
+{
+	if (irqline==2)
+	{
+		// clear this bit
+		a12000_halt_reset_reg &= ~0x0100;
+		device->machine().device(":segacd:segacd_68k")->execute().set_input_line(2, CLEAR_LINE);
+	}
+
+	return (0x60+irqline*4)/4; // vector address
+}
 
 
 
@@ -41,6 +57,95 @@ sega_segacd_europe_device::sega_segacd_europe_device(const machine_config &mconf
 }
 
 
+
+TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::segacd_irq3_timer_callback )
+{
+	CHECK_SCD_LV3_INTERRUPT
+	segacd_irq3_timer->adjust(SEGACD_IRQ3_TIMER_SPEED);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::scd_dma_timer_callback )
+{
+	// todo: accurate timing of this!
+
+	#define RATE 256
+	CDC_Do_DMA(machine(), RATE);
+
+	// timed reset of flags
+	scd_mode_dmna_ret_flags |= 0x0021;
+
+	scd_dma_timer->adjust(attotime::from_hz(megadriv_framerate) / megadrive_total_scanlines);
+
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::segacd_access_timer_callback )
+{
+	CheckCommand(machine());
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::segacd_gfx_conversion_timer_callback )
+{
+	//printf("segacd_gfx_conversion_timer_callback\n");
+
+	CHECK_SCD_LV1_INTERRUPT
+
+	segacd_conversion_active = 0;
+
+	// this ends up as 0 after processing (soniccd bonus stage)
+	segacd_imagebuffer_vdot_size = 0;
+}
+
+
+
+
+ADDRESS_MAP_START( segacd_map, AS_PROGRAM, 16, sega_segacd_device )
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_SHARE("segacd_program")
+
+	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_SHARE("dataram")
+	AM_RANGE(0x0c0000, 0x0dffff) AM_READWRITE(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) //AM_SHARE("dataram2")
+
+	AM_RANGE(0xfe0000, 0xfe3fff) AM_READWRITE(segacd_backupram_r,segacd_backupram_w) AM_SHARE("backupram") // backup RAM, odd bytes only!
+
+	AM_RANGE(0xff0000, 0xff001f) AM_DEVWRITE8_LEGACY("rfsnd", rf5c68_w, 0x00ff)  // PCM, RF5C164
+	AM_RANGE(0xff0020, 0xff003f) AM_DEVREAD8_LEGACY("rfsnd", rf5c68_r, 0x00ff)
+	AM_RANGE(0xff2000, 0xff3fff) AM_DEVREADWRITE8_LEGACY("rfsnd", rf5c68_mem_r, rf5c68_mem_w,0x00ff)  // PCM, RF5C164
+
+
+	AM_RANGE(0xff8000 ,0xff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
+	AM_RANGE(0xff8002 ,0xff8003) AM_READWRITE(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
+
+	AM_RANGE(0xff8004 ,0xff8005) AM_READWRITE(segacd_cdc_mode_address_r, segacd_cdc_mode_address_w)
+	AM_RANGE(0xff8006 ,0xff8007) AM_READWRITE(segacd_cdc_data_r, segacd_cdc_data_w)
+	AM_RANGE(0xff8008, 0xff8009) AM_READ(cdc_data_sub_r)
+	AM_RANGE(0xff800a, 0xff800b) AM_READWRITE(cdc_dmaaddr_r,cdc_dmaaddr_w) // CDC DMA Address
+	AM_RANGE(0xff800c, 0xff800d) AM_READWRITE(segacd_stopwatch_timer_r, segacd_stopwatch_timer_w)// Stopwatch timer
+	AM_RANGE(0xff800e ,0xff800f) AM_READWRITE(segacd_comms_flags_r, segacd_comms_flags_subcpu_w)
+	AM_RANGE(0xff8010 ,0xff801f) AM_READWRITE(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
+	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
+	AM_RANGE(0xff8030, 0xff8031) AM_READWRITE(segacd_irq3timer_r, segacd_irq3timer_w) // Timer W/INT3
+	AM_RANGE(0xff8032, 0xff8033) AM_READWRITE(segacd_irq_mask_r,segacd_irq_mask_w)
+	AM_RANGE(0xff8034, 0xff8035) AM_READWRITE(segacd_cdfader_r,segacd_cdfader_w) // CD Fader
+	AM_RANGE(0xff8036, 0xff8037) AM_READWRITE(segacd_cdd_ctrl_r,segacd_cdd_ctrl_w)
+	AM_RANGE(0xff8038, 0xff8041) AM_READ8(segacd_cdd_rx_r,0xffff)
+	AM_RANGE(0xff8042, 0xff804b) AM_WRITE8(segacd_cdd_tx_w,0xffff)
+	AM_RANGE(0xff804c, 0xff804d) AM_READWRITE(segacd_font_color_r, segacd_font_color_w)
+	AM_RANGE(0xff804e, 0xff804f) AM_RAM AM_SHARE("segacd_font")
+	AM_RANGE(0xff8050, 0xff8057) AM_READ(segacd_font_converted_r)
+	AM_RANGE(0xff8058, 0xff8059) AM_READWRITE(segacd_stampsize_r, segacd_stampsize_w) // Stamp size
+	AM_RANGE(0xff805a, 0xff805b) AM_READWRITE(segacd_stampmap_base_address_r, segacd_stampmap_base_address_w) // Stamp map base address
+	AM_RANGE(0xff805c, 0xff805d) AM_READWRITE(segacd_imagebuffer_vcell_size_r, segacd_imagebuffer_vcell_size_w)// Image buffer V cell size
+	AM_RANGE(0xff805e, 0xff805f) AM_READWRITE(segacd_imagebuffer_start_address_r, segacd_imagebuffer_start_address_w) // Image buffer start address
+	AM_RANGE(0xff8060, 0xff8061) AM_READWRITE(segacd_imagebuffer_offset_r, segacd_imagebuffer_offset_w)
+	AM_RANGE(0xff8062, 0xff8063) AM_READWRITE(segacd_imagebuffer_hdot_size_r, segacd_imagebuffer_hdot_size_w) // Image buffer H dot size
+	AM_RANGE(0xff8064, 0xff8065) AM_READWRITE(segacd_imagebuffer_vdot_size_r, segacd_imagebuffer_vdot_size_w ) // Image buffer V dot size
+	AM_RANGE(0xff8066, 0xff8067) AM_WRITE(segacd_trace_vector_base_address_w)// Trace vector base address
+//  AM_RANGE(0xff8068, 0xff8069) // Subcode address
+
+//  AM_RANGE(0xff8100, 0xff817f) // Subcode buffer area
+//  AM_RANGE(0xff8180, 0xff81ff) // mirror of subcode buffer area
+
+ADDRESS_MAP_END
+
 static MACHINE_CONFIG_FRAGMENT( segacd_fragment )
 
 	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
@@ -49,6 +154,12 @@ static MACHINE_CONFIG_FRAGMENT( segacd_fragment )
 	MCFG_DEVICE_ADD("cdc", LC89510, 0) // cd controller
 
 	MCFG_TIMER_ADD_NONE("sw_timer") //stopwatch timer
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("hock_timer", sega_segacd_device, segacd_access_timer_callback, attotime::from_hz(75))
+	MCFG_TIMER_DRIVER_ADD("irq3_timer", sega_segacd_device, segacd_irq3_timer_callback)
+	MCFG_TIMER_DRIVER_ADD("stamp_timer", sega_segacd_device, segacd_gfx_conversion_timer_callback)
+	MCFG_TIMER_DRIVER_ADD("scd_dma_timer", sega_segacd_device, scd_dma_timer_callback)
+
+	
 
 	MCFG_DEFAULT_LAYOUT( layout_megacd )
 
@@ -60,7 +171,6 @@ static MACHINE_CONFIG_FRAGMENT( segacd_fragment )
 	MCFG_SOUND_ROUTE( 0, ":lspeaker", 0.50 )
 	MCFG_SOUND_ROUTE( 1, ":rspeaker", 0.50 )
 
-	MCFG_TIMER_ADD("scd_dma_timer", scd_dma_timer_callback)
 
 	MCFG_NVRAM_HANDLER_CLEAR()
 	MCFG_NVRAM_ADD_0FILL("backupram")
@@ -76,186 +186,10 @@ machine_config_constructor sega_segacd_device::device_mconfig_additions() const
 }
 
 
-/* Sega CD stuff */
-cpu_device *_segacd_68k_cpu;
-
-UINT16 segacd_irq_mask;
-static UINT16 *segacd_backupram;
-static timer_device *stopwatch_timer;
-static UINT8 segacd_font_color;
-static UINT16* segacd_font_bits;
-static UINT16 scd_rammode;
-static UINT32 scd_mode_dmna_ret_flags ;
-
-static emu_timer *segacd_gfx_conversion_timer;
-//static emu_timer *segacd_dmna_ret_timer;
-static emu_timer *segacd_irq3_timer;
-static emu_timer *segacd_hock_timer;
-static UINT8 hock_cmd;
-static TIMER_CALLBACK( segacd_irq3_timer_callback );
-timer_device* scd_dma_timer;
-
-static void segacd_mark_tiles_dirty(running_machine& machine, int offset);
-
-
-/*************************************************************************************************
- Sega CD related
-*************************************************************************************************/
-
-// The perfect syncs should make this unnecessary: forcing syncs on reads is a flawed design pattern anyway,
-// because the sync will only happen AFTER the read, by which time it's too late.
-#define SEGACD_FORCE_SYNCS 0
-
-static UINT8 segacd_ram_writeprotect_bits;
-//int segacd_ram_mode;
-//static int segacd_ram_mode_old;
-
-//static int segacd_maincpu_has_ram_access = 0;
-static int segacd_4meg_prgbank = 0; // which bank the MainCPU can see of the SubCPU PrgRAM
-static int segacd_memory_priority_mode = 0;
-static int segacd_stampsize;
-//int segacd_dmna = 0;
-//int segacd_ret = 0;
-
-#define READ_MAIN (0x0200)
-#define READ_SUB  (0x0300)
-#define DMA_PCM  (0x0400)
-#define DMA_PRG  (0x0500)
-#define DMA_WRAM (0x0700)
-
-#define REG_W_SBOUT  (0x0)
-#define REG_W_IFCTRL (0x1)
-#define REG_W_DBCL   (0x2)
-#define REG_W_DBCH   (0x3)
-#define REG_W_DACL   (0x4)
-#define REG_W_DACH   (0x5)
-#define REG_W_DTTRG  (0x6)
-#define REG_W_DTACK  (0x7)
-#define REG_W_WAL    (0x8)
-#define REG_W_WAH    (0x9)
-#define REG_W_CTRL0  (0xA)
-#define REG_W_CTRL1  (0xB)
-#define REG_W_PTL    (0xC)
-#define REG_W_PTH    (0xD)
-#define REG_W_CTRL2  (0xE)
-#define REG_W_RESET  (0xF)
-
-#define REG_R_COMIN  (0x0)
-#define REG_R_IFSTAT (0x1)
-#define REG_R_DBCL   (0x2)
-#define REG_R_DBCH   (0x3)
-#define REG_R_HEAD0  (0x4)
-#define REG_R_HEAD1  (0x5)
-#define REG_R_HEAD2  (0x6)
-#define REG_R_HEAD3  (0x7)
-#define REG_R_PTL    (0x8)
-#define REG_R_PTH    (0x9)
-#define REG_R_WAL    (0xa)
-#define REG_R_WAH    (0xb)
-#define REG_R_STAT0  (0xc)
-#define REG_R_STAT1  (0xd)
-#define REG_R_STAT2  (0xe)
-#define REG_R_STAT3  (0xf)
-
-#define CMD_STATUS   (0x0)
-#define CMD_STOPALL  (0x1)
-#define CMD_GETTOC   (0x2)
-#define CMD_READ     (0x3)
-#define CMD_SEEK     (0x4)
-//                   (0x5)
-#define CMD_STOP     (0x6)
-#define CMD_RESUME   (0x7)
-#define CMD_FF       (0x8)
-#define CMD_RW       (0x9)
-#define CMD_INIT     (0xa)
-//                   (0xb)
-#define CMD_CLOSE    (0xc)
-#define CMD_OPEN     (0xd)
-//                   (0xe)
-//                   (0xf)
-
-
-#define TOCCMD_CURPOS    (0x0)
-#define TOCCMD_TRKPOS	 (0x1)
-#define TOCCMD_CURTRK    (0x2)
-#define TOCCMD_LENGTH    (0x3)
-#define TOCCMD_FIRSTLAST (0x4)
-#define TOCCMD_TRACKADDR (0x5)
-
-struct segacd_t
-{
-	cdrom_file	*cd;
-	const cdrom_toc   *toc;
-	UINT32 current_frame;
-};
-
-segacd_t segacd;
-
-#define SECTOR_SIZE (2352)
-
-#define SET_CDD_DATA_MODE \
-	CDD_CONTROL |= 0x0100; \
-
-#define SET_CDD_AUDIO_MODE \
-	CDD_CONTROL &= ~0x0100; \
-
-#define STOP_CDC_READ \
-	SCD_STATUS_CDC &= ~0x01; \
-
-#define SET_CDC_READ \
-	SCD_STATUS_CDC |= 0x01; \
-
-#define SET_CDC_DMA \
-	SCD_STATUS_CDC |= 0x08; \
-
-#define STOP_CDC_DMA \
-	SCD_STATUS_CDC &= ~0x08; \
-
-#define SCD_READ_ENABLED \
-	(SCD_STATUS_CDC & 1)
-
-#define SCD_DMA_ENABLED \
-	(SCD_STATUS_CDC & 0x08)
-
-#define CLEAR_CDD_RESULT \
-	CDD_MIN = CDD_SEC = CDD_FRAME = CDD_EXT = 0; \
-
-#define CHECK_SCD_LV5_INTERRUPT \
-	if (segacd_irq_mask & 0x20) \
-	{ \
-		machine.device(":segacd:segacd_68k")->execute().set_input_line(5, HOLD_LINE); \
-	} \
-
-#define CHECK_SCD_LV4_INTERRUPT \
-	if (segacd_irq_mask & 0x10) \
-	{ \
-		machine.device(":segacd:segacd_68k")->execute().set_input_line(4, HOLD_LINE); \
-	} \
-
-#define CHECK_SCD_LV3_INTERRUPT \
-	if (segacd_irq_mask & 0x08) \
-	{ \
-		machine.device(":segacd:segacd_68k")->execute().set_input_line(3, HOLD_LINE); \
-	} \
-
-#define CHECK_SCD_LV2_INTERRUPT \
-	if (segacd_irq_mask & 0x04) \
-	{ \
-		machine.device(":segacd:segacd_68k")->execute().set_input_line(2, HOLD_LINE); \
-	} \
-
-#define CHECK_SCD_LV1_INTERRUPT \
-	if (segacd_irq_mask & 0x02) \
-	{ \
-		machine.device(":segacd:segacd_68k")->execute().set_input_line(1, HOLD_LINE); \
-	} \
-
-#define CURRENT_TRACK_IS_DATA \
-	(segacd.toc->tracks[SCD_CURTRK - 1].trktype != CD_TRACK_AUDIO) \
 
 
 
-INLINE int to_bcd(int val, bool byte)
+inline int sega_segacd_device::to_bcd(int val, bool byte)
 {
 	if (val > 99) val = 99;
 
@@ -265,15 +199,11 @@ INLINE int to_bcd(int val, bool byte)
 
 
 
-UINT16* segacd_4meg_prgram;  // pointer to SubCPU PrgRAM
-UINT16* segacd_dataram;
-
-#define RAM_MODE_2MEG (0)
-#define RAM_MODE_1MEG (2)
 
 
 
-INLINE void write_pixel(running_machine& machine, UINT8 pix, int pixeloffset )
+
+inline void sega_segacd_device::write_pixel(running_machine& machine, UINT8 pix, int pixeloffset )
 {
 
 	int shift = 12-(4*(pixeloffset&0x3));
@@ -321,7 +251,7 @@ INLINE void write_pixel(running_machine& machine, UINT8 pix, int pixeloffset )
 // Wily Beamish and Citizen X appear to rely on this
 // however, it breaks the megacdj bios (megacd2j still works!)
 //  (maybe that's a timing issue instead?)
-UINT16 segacd_1meg_mode_word_read(int offset, UINT16 mem_mask)
+UINT16 sega_segacd_device::segacd_1meg_mode_word_read(int offset, UINT16 mem_mask)
 {
 	offset *= 2;
 
@@ -334,7 +264,7 @@ UINT16 segacd_1meg_mode_word_read(int offset, UINT16 mem_mask)
 }
 
 
-void segacd_1meg_mode_word_write(running_machine& machine, int offset, UINT16 data, UINT16 mem_mask, int use_pm)
+void sega_segacd_device::segacd_1meg_mode_word_write(running_machine& machine, int offset, UINT16 data, UINT16 mem_mask, int use_pm)
 {
 	offset *= 2;
 
@@ -393,50 +323,8 @@ void segacd_1meg_mode_word_write(running_machine& machine, int offset, UINT16 da
 }
 
 
-static UINT16* segacd_dataram2;
 
-UINT8    SCD_BUFFER[2560];
-UINT32   SCD_STATUS;
-UINT32   SCD_STATUS_CDC;
-INT32    SCD_CURLBA;
-UINT8    SCD_CURTRK;
-
-UINT16 CDC_DECODE;
-INT16 CDC_DMACNT; // can go negative
-UINT16 CDC_DMA_ADDRC;
-UINT16 CDC_PT;
-UINT16 CDC_WA;
-UINT16 CDC_REG0;
-UINT16 CDC_REG1;
-UINT16 CDC_DMA_ADDR;
-UINT16 CDC_IFSTAT;
-UINT8 CDC_HEADB0;
-UINT8 CDC_HEADB1;
-UINT8 CDC_HEADB2;
-UINT8 CDC_HEADB3;
-UINT8 CDC_STATB0;
-UINT8 CDC_STATB1;
-UINT8 CDC_STATB2;
-UINT8 CDC_STATB3;
-UINT16 CDC_SBOUT;
-UINT16 CDC_IFCTRL;
-UINT8 CDC_CTRLB0;
-UINT8 CDC_CTRLB1;
-UINT8 CDC_CTRLB2;
-UINT8 CDC_BUFFER[(32 * 1024 * 2) + SECTOR_SIZE];
-
-UINT32 CDD_STATUS;
-UINT32 CDD_MIN;
-UINT32 CDD_SEC;
-
-UINT8 CDD_RX[10];
-UINT8 CDD_TX[10];
-UINT32 CDD_FRAME;
-UINT32 CDD_EXT;
-UINT16 CDD_CONTROL;
-INT16  CDD_DONE;
-
-static void set_data_audio_mode(void)
+void sega_segacd_device::set_data_audio_mode(void)
 {
 	if (CURRENT_TRACK_IS_DATA)
 	{
@@ -449,12 +337,7 @@ static void set_data_audio_mode(void)
 	}
 }
 
-
-#define CDD_PLAYINGCDDA	0x0100
-#define CDD_READY		0x0400
-#define CDD_STOPPED		0x0900
-
-void CDD_DoChecksum(void)
+void sega_segacd_device::CDD_DoChecksum(void)
 {
 	int checksum =
 		CDD_RX[0] +
@@ -473,7 +356,7 @@ void CDD_DoChecksum(void)
 	CDD_RX[8] = checksum;
 }
 
-void CDD_Export(void)
+void sega_segacd_device::CDD_Export(void)
 {
 	CDD_RX[0] = (CDD_STATUS  & 0x00ff)>>0;
 	CDD_RX[1] = (CDD_STATUS  & 0xff00)>>8;
@@ -494,7 +377,7 @@ void CDD_Export(void)
 
 
 
-void CDC_UpdateHEAD(void)
+void sega_segacd_device::CDC_UpdateHEAD(void)
 {
 	if (CDC_CTRLB1 & 0x01)
 	{
@@ -511,7 +394,7 @@ void CDC_UpdateHEAD(void)
 }
 
 
-void scd_ctrl_checks(running_machine& machine)
+void sega_segacd_device::scd_ctrl_checks(running_machine& machine)
 {
 	CDC_STATB0 = 0x80;
 
@@ -526,7 +409,7 @@ void scd_ctrl_checks(running_machine& machine)
 	}
 }
 
-void scd_advance_current_readpos(void)
+void sega_segacd_device::scd_advance_current_readpos(void)
 {
 	SCD_CURLBA++;
 
@@ -537,7 +420,7 @@ void scd_advance_current_readpos(void)
 	CDC_PT &= 0x7fff;
 }
 
-int Read_LBA_To_Buffer(running_machine& machine)
+int sega_segacd_device::Read_LBA_To_Buffer(running_machine& machine)
 {
 	bool data_track = false;
 	if (CDD_CONTROL & 0x0100) data_track = true;
@@ -579,7 +462,7 @@ int Read_LBA_To_Buffer(running_machine& machine)
 	return 0;
 }
 
-static void CheckCommand(running_machine& machine)
+void sega_segacd_device::CheckCommand(running_machine& machine)
 {
 	if (CDD_DONE)
 	{
@@ -596,7 +479,7 @@ static void CheckCommand(running_machine& machine)
 }
 
 
-void CDD_GetStatus(void)
+void sega_segacd_device::CDD_GetStatus(void)
 {
 	UINT16 s = (CDD_STATUS & 0x0f00);
 
@@ -605,7 +488,7 @@ void CDD_GetStatus(void)
 }
 
 
-void CDD_Stop(running_machine &machine)
+void sega_segacd_device::CDD_Stop(running_machine &machine)
 {
 	CLEAR_CDD_RESULT
 	STOP_CDC_READ
@@ -616,7 +499,7 @@ void CDD_Stop(running_machine &machine)
 }
 
 
-void CDD_GetPos(void)
+void sega_segacd_device::CDD_GetPos(void)
 {
 	CLEAR_CDD_RESULT
 	UINT32 msf;
@@ -630,7 +513,7 @@ void CDD_GetPos(void)
 	CDD_FRAME = to_bcd(((msf & 0x000000ff)>>0),false);
 }
 
-void CDD_GetTrackPos(void)
+void sega_segacd_device::CDD_GetTrackPos(void)
 {
 	CLEAR_CDD_RESULT
 	int elapsedlba;
@@ -648,7 +531,7 @@ void CDD_GetTrackPos(void)
 	CDD_FRAME = to_bcd(((msf & 0x000000ff)>>0),false);
 }
 
-void CDD_GetTrack(void)
+void sega_segacd_device::CDD_GetTrack(void)
 {
 	CLEAR_CDD_RESULT
 	CDD_STATUS &= 0xFF;
@@ -659,7 +542,7 @@ void CDD_GetTrack(void)
 	CDD_MIN = to_bcd(SCD_CURTRK, false);
 }
 
-void CDD_Length(void)
+void sega_segacd_device::CDD_Length(void)
 {
 	CLEAR_CDD_RESULT
 	CDD_STATUS &= 0xFF;
@@ -676,7 +559,7 @@ void CDD_Length(void)
 }
 
 
-void CDD_FirstLast(void)
+void sega_segacd_device::CDD_FirstLast(void)
 {
 	CLEAR_CDD_RESULT
 	CDD_STATUS &= 0xFF;
@@ -687,7 +570,7 @@ void CDD_FirstLast(void)
 	CDD_SEC = to_bcd(cdrom_get_last_track(segacd.cd),false); // last
 }
 
-void CDD_GetTrackAdr(void)
+void sega_segacd_device::CDD_GetTrackAdr(void)
 {
 	CLEAR_CDD_RESULT
 
@@ -717,7 +600,7 @@ void CDD_GetTrackAdr(void)
 		CDD_FRAME |= 0x0800;
 }
 
-static UINT32 getmsf_from_regs(void)
+UINT32 sega_segacd_device::getmsf_from_regs(void)
 {
 	UINT32 msf = 0;
 
@@ -728,7 +611,7 @@ static UINT32 getmsf_from_regs(void)
 	return msf;
 }
 
-void CDD_Play(running_machine &machine)
+void sega_segacd_device::CDD_Play(running_machine &machine)
 {
 	CLEAR_CDD_RESULT
 	UINT32 msf = getmsf_from_regs();
@@ -747,7 +630,7 @@ void CDD_Play(running_machine &machine)
 }
 
 
-void CDD_Seek(void)
+void sega_segacd_device::CDD_Seek(void)
 {
 	CLEAR_CDD_RESULT
 	UINT32 msf = getmsf_from_regs();
@@ -761,7 +644,7 @@ void CDD_Seek(void)
 }
 
 
-void CDD_Pause(running_machine &machine)
+void sega_segacd_device::CDD_Pause(running_machine &machine)
 {
 	CLEAR_CDD_RESULT
 	STOP_CDC_READ
@@ -774,7 +657,7 @@ void CDD_Pause(running_machine &machine)
 	cdda_pause_audio( machine.device( ":segacd:cdda" ), 1 );
 }
 
-void CDD_Resume(running_machine &machine)
+void sega_segacd_device::CDD_Resume(running_machine &machine)
 {
 	CLEAR_CDD_RESULT
 	STOP_CDC_READ
@@ -789,33 +672,33 @@ void CDD_Resume(running_machine &machine)
 }
 
 
-void CDD_FF(running_machine &machine)
+void sega_segacd_device::CDD_FF(running_machine &machine)
 {
 	fatalerror("Fast Forward unsupported\n");
 }
 
 
-void CDD_RW(running_machine &machine)
+void sega_segacd_device::CDD_RW(running_machine &machine)
 {
 	fatalerror("Fast Rewind unsupported\n");
 }
 
 
-void CDD_Open(void)
+void sega_segacd_device::CDD_Open(void)
 {
 	fatalerror("Close Tray unsupported\n");
 	/* TODO: re-read CD-ROM buffer here (Mega CD has multi disc games iirc?) */
 }
 
 
-void CDD_Close(void)
+void sega_segacd_device::CDD_Close(void)
 {
 	fatalerror("Open Tray unsupported\n");
 	/* TODO: clear CD-ROM buffer here */
 }
 
 
-void CDD_Init(void)
+void sega_segacd_device::CDD_Init(void)
 {
 	CLEAR_CDD_RESULT
 	STOP_CDC_READ
@@ -826,14 +709,14 @@ void CDD_Init(void)
 }
 
 
-void CDD_Default(void)
+void sega_segacd_device::CDD_Default(void)
 {
 	CLEAR_CDD_RESULT
 	CDD_STATUS = SCD_STATUS;
 }
 
 
-static void CDD_Reset(void)
+void sega_segacd_device::CDD_Reset(void)
 {
 	CLEAR_CDD_RESULT
 	CDD_CONTROL = CDD_STATUS = 0;
@@ -847,7 +730,7 @@ static void CDD_Reset(void)
 	SCD_STATUS = CDD_READY;
 }
 
-static void CDC_Reset(void)
+void sega_segacd_device::CDC_Reset(void)
 {
 	memset(CDC_BUFFER, 0x00, ((16 * 1024 * 2) + SECTOR_SIZE));
 	CDC_UpdateHEAD();
@@ -862,7 +745,7 @@ static void CDC_Reset(void)
 }
 
 
-void lc89510_Reset(void)
+void sega_segacd_device::lc89510_Reset(void)
 {
 	CDD_Reset();
 	CDC_Reset();
@@ -870,7 +753,7 @@ void lc89510_Reset(void)
 	CDC_REG0 = CDC_REG1 = CDC_DMA_ADDR = SCD_STATUS_CDC = CDD_DONE = 0;
 }
 
-void CDC_End_Transfer(running_machine& machine)
+void sega_segacd_device::CDC_End_Transfer(running_machine& machine)
 {
 	STOP_CDC_DMA
 	CDC_REG0 |= 0x8000;
@@ -884,7 +767,7 @@ void CDC_End_Transfer(running_machine& machine)
 	}
 }
 
-void CDC_Do_DMA(running_machine& machine, int rate)
+void sega_segacd_device::CDC_Do_DMA(running_machine& machine, int rate)
 {
 	address_space& space = machine.device(":segacd:segacd_68k")->memory().space(AS_PROGRAM);
 
@@ -1018,7 +901,7 @@ void CDC_Do_DMA(running_machine& machine, int rate)
 
 
 
-UINT16 CDC_Host_r(running_machine& machine, UINT16 type)
+UINT16 sega_segacd_device::CDC_Host_r(running_machine& machine, UINT16 type)
 {
 	UINT16 destination = CDC_REG0 & 0x0700;
 
@@ -1046,7 +929,7 @@ UINT16 CDC_Host_r(running_machine& machine, UINT16 type)
 }
 
 
-UINT8 CDC_Reg_r(void)
+UINT8 sega_segacd_device::CDC_Reg_r(void)
 {
 	int reg = CDC_REG0 & 0xF;
 	UINT8 ret = 0;
@@ -1092,7 +975,7 @@ UINT8 CDC_Reg_r(void)
 	return ret;
 }
 
-void CDC_Reg_w(UINT8 data)
+void sega_segacd_device::CDC_Reg_w(UINT8 data)
 {
 	int reg = CDC_REG0 & 0xF;
 
@@ -1144,13 +1027,13 @@ void CDC_Reg_w(UINT8 data)
 	}
 }
 
-void CDD_Process(running_machine& machine, int reason)
+void sega_segacd_device::CDD_Process(running_machine& machine, int reason)
 {
 	CDD_Export();
 	CHECK_SCD_LV4_INTERRUPT
 }
 
-void CDD_Handle_TOC_Commands(void)
+void sega_segacd_device::CDD_Handle_TOC_Commands(void)
 {
 	int subcmd = CDD_TX[2];
 	CDD_STATUS = (CDD_STATUS & 0xFF00) | subcmd;
@@ -1187,7 +1070,7 @@ static const char *const CDD_import_cmdnames[] =
 	"<undefined>"			// F
 };
 
-void CDD_Import(running_machine& machine)
+void sega_segacd_device::CDD_Import(running_machine& machine)
 {
 	if(CDD_TX[1] != 2 && CDD_TX[1] != 0)
 		printf("%s\n",CDD_import_cmdnames[CDD_TX[1]]);
@@ -1215,25 +1098,9 @@ void CDD_Import(running_machine& machine)
 
 
 
-
-static UINT16 segacd_hint_register;
-static UINT16 segacd_imagebuffer_vdot_size;
-static UINT16 segacd_imagebuffer_vcell_size;
-static UINT16 segacd_imagebuffer_hdot_size;
-
-static UINT16 a12000_halt_reset_reg = 0x0000;
-int segacd_conversion_active = 0;
-static UINT16 segacd_stampmap_base_address;
-static UINT16 segacd_imagebuffer_start_address;
-static UINT16 segacd_imagebuffer_offset;
-static tilemap_t    *segacd_stampmap[4];
-//static void segacd_mark_stampmaps_dirty(void);
-
-
-
-static WRITE16_HANDLER( scd_a12000_halt_reset_w )
+WRITE16_MEMBER( sega_segacd_device::scd_a12000_halt_reset_w )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 
 	UINT16 old_halt = a12000_halt_reset_reg;
 
@@ -1284,10 +1151,8 @@ static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 	}
 }
 
-static READ16_HANDLER( scd_a12000_halt_reset_r )
+READ16_MEMBER( sega_segacd_device::scd_a12000_halt_reset_r )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
-
 	return a12000_halt_reset_reg;
 }
 
@@ -1303,9 +1168,9 @@ static READ16_HANDLER( scd_a12000_halt_reset_r )
 //
 
 
-static READ16_HANDLER( scd_a12002_memory_mode_r )
+READ16_MEMBER( sega_segacd_device::scd_a12002_memory_mode_r )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 
 	int temp = scd_rammode;
 	int temp2 = 0;
@@ -1330,7 +1195,7 @@ static READ16_HANDLER( scd_a12002_memory_mode_r )
 // RET = Return access (bit 1)
 
 
-static WRITE8_HANDLER( scd_a12002_memory_mode_w_8_15 )
+WRITE8_MEMBER( sega_segacd_device::scd_a12002_memory_mode_w_8_15 )
 {
 	if (data & 0xff00)
 	{
@@ -1341,9 +1206,9 @@ static WRITE8_HANDLER( scd_a12002_memory_mode_w_8_15 )
 }
 
 
-static WRITE8_HANDLER( scd_a12002_memory_mode_w_0_7 )
+WRITE8_MEMBER( sega_segacd_device::scd_a12002_memory_mode_w_0_7 )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 
 
 	//printf("scd_a12002_memory_mode_w_0_7 %04x\n",data);
@@ -1367,9 +1232,9 @@ static WRITE8_HANDLER( scd_a12002_memory_mode_w_0_7 )
 }
 
 
-static WRITE16_HANDLER( scd_a12002_memory_mode_w )
+WRITE16_MEMBER( sega_segacd_device::scd_a12002_memory_mode_w )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 
 	if (ACCESSING_BITS_8_15)
 		scd_a12002_memory_mode_w_8_15(space, 0, data>>8, mem_mask>>8);
@@ -1381,9 +1246,9 @@ static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 
 
 
-static READ16_HANDLER( segacd_sub_memory_mode_r )
+READ16_MEMBER( sega_segacd_device::segacd_sub_memory_mode_r )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 
 	int temp = scd_rammode;
 	int temp2 = 0;
@@ -1396,16 +1261,16 @@ static READ16_HANDLER( segacd_sub_memory_mode_r )
 }
 
 
-WRITE8_HANDLER( segacd_sub_memory_mode_w_8_15 )
+WRITE8_MEMBER( sega_segacd_device::segacd_sub_memory_mode_w_8_15 )
 {
 	/* setting write protect bits from sub-cpu has no effect? */
 }
 
 
 
-WRITE8_HANDLER( segacd_sub_memory_mode_w_0_7 )
+WRITE8_MEMBER( sega_segacd_device::segacd_sub_memory_mode_w_0_7 )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 
 
 	segacd_memory_priority_mode = (data&0x0018)>>3;
@@ -1462,10 +1327,10 @@ WRITE8_HANDLER( segacd_sub_memory_mode_w_0_7 )
 	}
 }
 
-static WRITE16_HANDLER( segacd_sub_memory_mode_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_sub_memory_mode_w )
 {
 	//printf("segacd_sub_memory_mode_w %04x %04x\n", data, mem_mask);
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 
 	if (ACCESSING_BITS_8_15)
 		segacd_sub_memory_mode_w_8_15(space, 0, data>>8, mem_mask>>8);
@@ -1484,17 +1349,16 @@ static WRITE16_HANDLER( segacd_sub_memory_mode_w )
   - main / sub sides differ in which bits are write only
 ********************************************************************************/
 
-static UINT16 segacd_comms_flags = 0x0000;
 
-static READ16_HANDLER( segacd_comms_flags_r )
+READ16_MEMBER( sega_segacd_device::segacd_comms_flags_r )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 	return segacd_comms_flags;
 }
 
-static WRITE16_HANDLER( segacd_comms_flags_subcpu_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_comms_flags_subcpu_w )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 
 	if (ACCESSING_BITS_8_15) // Dragon's Lair
 	{
@@ -1508,9 +1372,9 @@ static WRITE16_HANDLER( segacd_comms_flags_subcpu_w )
 	}
 }
 
-static WRITE16_HANDLER( segacd_comms_flags_maincpu_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_comms_flags_maincpu_w )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -1524,14 +1388,14 @@ static WRITE16_HANDLER( segacd_comms_flags_maincpu_w )
 	}
 }
 
-static READ16_HANDLER( scd_4m_prgbank_ram_r )
+READ16_MEMBER( sega_segacd_device::scd_4m_prgbank_ram_r )
 {
 	UINT16 realoffset = ((segacd_4meg_prgbank * 0x20000)/2) + offset;
 	return segacd_4meg_prgram[realoffset];
 
 }
 
-static WRITE16_HANDLER( scd_4m_prgbank_ram_w )
+WRITE16_MEMBER( sega_segacd_device::scd_4m_prgbank_ram_w )
 {
 	UINT16 realoffset = ((segacd_4meg_prgbank * 0x20000)/2) + offset;
 
@@ -1543,66 +1407,51 @@ static WRITE16_HANDLER( scd_4m_prgbank_ram_w )
 }
 
 
-/* Callback when the genesis enters interrupt code */
-static IRQ_CALLBACK(segacd_sub_int_callback)
+
+READ16_MEMBER( sega_segacd_device::segacd_comms_main_part1_r )
 {
-	if (irqline==2)
-	{
-		// clear this bit
-		a12000_halt_reset_reg &= ~0x0100;
-		device->machine().device(":segacd:segacd_68k")->execute().set_input_line(2, CLEAR_LINE);
-	}
-
-	return (0x60+irqline*4)/4; // vector address
-}
-
-UINT16 segacd_comms_part1[0x8];
-UINT16 segacd_comms_part2[0x8];
-
-static READ16_HANDLER( segacd_comms_main_part1_r )
-{
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 	return segacd_comms_part1[offset];
 }
 
-static WRITE16_HANDLER( segacd_comms_main_part1_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_comms_main_part1_w )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 	COMBINE_DATA(&segacd_comms_part1[offset]);
 }
 
-static READ16_HANDLER( segacd_comms_main_part2_r )
+READ16_MEMBER( sega_segacd_device::segacd_comms_main_part2_r )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 	return segacd_comms_part2[offset];
 }
 
-static WRITE16_HANDLER( segacd_comms_main_part2_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_comms_main_part2_w )
 {
 	printf("Sega CD main CPU attempting to write to read only comms regs\n");
 }
 
 
-static READ16_HANDLER( segacd_comms_sub_part1_r )
+READ16_MEMBER( sega_segacd_device::segacd_comms_sub_part1_r )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 	return segacd_comms_part1[offset];
 }
 
-static WRITE16_HANDLER( segacd_comms_sub_part1_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_comms_sub_part1_w )
 {
 	printf("Sega CD sub CPU attempting to write to read only comms regs\n");
 }
 
-static READ16_HANDLER( segacd_comms_sub_part2_r )
+READ16_MEMBER( sega_segacd_device::segacd_comms_sub_part2_r )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 	return segacd_comms_part2[offset];
 }
 
-static WRITE16_HANDLER( segacd_comms_sub_part2_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_comms_sub_part2_w )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 	COMBINE_DATA(&segacd_comms_part2[offset]);
 }
 
@@ -1612,17 +1461,17 @@ static WRITE16_HANDLER( segacd_comms_sub_part2_w )
 
 
 
-static WRITE16_HANDLER( segacd_cdc_mode_address_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_cdc_mode_address_w )
 {
 	COMBINE_DATA(&CDC_REG0);
 }
 
-static READ16_HANDLER( segacd_cdc_mode_address_r )
+READ16_MEMBER( sega_segacd_device::segacd_cdc_mode_address_r )
 {
 	return CDC_REG0;
 }
 
-static WRITE16_HANDLER( segacd_cdc_data_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_cdc_data_w )
 {
 	COMBINE_DATA(&CDC_REG1);
 
@@ -1630,7 +1479,7 @@ static WRITE16_HANDLER( segacd_cdc_data_w )
 		CDC_Reg_w(data);
 }
 
-static READ16_HANDLER( segacd_cdc_data_r )
+READ16_MEMBER( sega_segacd_device::segacd_cdc_data_r )
 {
 	UINT16 retdat = 0x0000;
 
@@ -1644,7 +1493,7 @@ static READ16_HANDLER( segacd_cdc_data_r )
 
 
 
-static READ16_HANDLER( segacd_main_dataram_part1_r )
+READ16_MEMBER( sega_segacd_device::segacd_main_dataram_part1_r )
 {
 	if ((scd_rammode&2)==RAM_MODE_2MEG)
 	{
@@ -1712,7 +1561,7 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 	return 0x0000;
 }
 
-static WRITE16_HANDLER( segacd_main_dataram_part1_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_main_dataram_part1_w )
 {
 	if ((scd_rammode&2)==RAM_MODE_2MEG)
 	{
@@ -1752,7 +1601,7 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 	}
 }
 
-static READ16_HANDLER( scd_hint_vector_r )
+READ16_MEMBER( sega_segacd_device::scd_hint_vector_r )
 {
 //  printf("read HINT offset %d\n", offset);
 
@@ -1769,217 +1618,24 @@ static READ16_HANDLER( scd_hint_vector_r )
 
 }
 
-static READ16_HANDLER( scd_a12006_hint_register_r )
+READ16_MEMBER( sega_segacd_device::scd_a12006_hint_register_r )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 	return segacd_hint_register;
 }
 
-static WRITE16_HANDLER( scd_a12006_hint_register_w )
+WRITE16_MEMBER( sega_segacd_device::scd_a12006_hint_register_w )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 	COMBINE_DATA(&segacd_hint_register);
 }
 
 
-static TIMER_CALLBACK( segacd_gfx_conversion_timer_callback )
-{
-	//printf("segacd_gfx_conversion_timer_callback\n");
-
-	CHECK_SCD_LV1_INTERRUPT
-
-	segacd_conversion_active = 0;
-
-	// this ends up as 0 after processing (soniccd bonus stage)
-	segacd_imagebuffer_vdot_size = 0;
-
-}
-
-
-// the tiles in RAM are 8x8 tiles
-// they are referenced in the cell look-up map as either 16x16 or 32x32 tiles (made of 4 / 16 8x8 tiles)
-
-#define SEGACD_BYTES_PER_TILE16 (128)
-#define SEGACD_BYTES_PER_TILE32 (512)
-
-#define SEGACD_NUM_TILES16 (0x40000/SEGACD_BYTES_PER_TILE16)
-#define SEGACD_NUM_TILES32 (0x40000/SEGACD_BYTES_PER_TILE32)
-
-/*
-static const gfx_layout sega_8x8_layout =
-{
-    8,8,
-    SEGACD_NUM_TILES16,
-    4,
-    { 0,1,2,3 },
-    { 8,12,0,4,24,28,16,20 },
-    { 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-    8*32
-};
-*/
-
-/* also create pre-rotated versions.. - it might still be possible to use these decodes with our own copying routines */
-
-
-#define _16x16_SEQUENCE_1  { 8,12,0,4,24,28,16,20, 512+8, 512+12, 512+0, 512+4, 512+24, 512+28, 512+16, 512+20 },
-#define _16x16_SEQUENCE_1_FLIP  { 512+20,512+16,512+28,512+24,512+4,512+0, 512+12,512+8, 20,16,28,24,4,0,12,8 },
-
-#define _16x16_SEQUENCE_2  { 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32 },
-#define _16x16_SEQUENCE_2_FLIP  { 15*32, 14*32, 13*32, 12*32, 11*32, 10*32, 9*32, 8*32, 7*32, 6*32, 5*32, 4*32, 3*32, 2*32, 1*32, 0*32 },
-
-
-#define _16x16_START \
-{ \
-	16,16, \
-	SEGACD_NUM_TILES16, \
-	4, \
-	{ 0,1,2,3 }, \
-
-#define _16x16_END \
-		8*128 \
-}; \
-
-#define _32x32_START \
-{ \
-	32,32, \
-	SEGACD_NUM_TILES32, \
-	4, \
-	{ 0,1,2,3 }, \
-
-
-#define _32x32_END \
-	8*512 \
-}; \
 
 
 
-#define _32x32_SEQUENCE_1 \
-	{ 8,12,0,4,24,28,16,20, \
-	1024+8, 1024+12, 1024+0, 1024+4, 1024+24, 1024+28, 1024+16, 1024+20, \
-	2048+8, 2048+12, 2048+0, 2048+4, 2048+24, 2048+28, 2048+16, 2048+20, \
-	3072+8, 3072+12, 3072+0, 3072+4, 3072+24, 3072+28, 3072+16, 3072+20  \
-	}, \
 
-#define _32x32_SEQUENCE_1_FLIP \
-{ 3072+20, 3072+16, 3072+28, 3072+24, 3072+4, 3072+0, 3072+12, 3072+8, \
-  2048+20, 2048+16, 2048+28, 2048+24, 2048+4, 2048+0, 2048+12, 2048+8, \
-  1024+20, 1024+16, 1024+28, 1024+24, 1024+4, 1024+0, 1024+12, 1024+8, \
-  20, 16, 28, 24, 4, 0, 12, 8}, \
-
-
-#define _32x32_SEQUENCE_2 \
-		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, \
-    	8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32, \
-	 16*32,17*32,18*32,19*32,20*32,21*32,22*32,23*32, \
-	 24*32,25*32, 26*32, 27*32, 28*32, 29*32, 30*32, 31*32}, \
-
-#define _32x32_SEQUENCE_2_FLIP \
-{ 31*32, 30*32, 29*32, 28*32, 27*32, 26*32, 25*32, 24*32, \
-  23*32, 22*32, 21*32, 20*32, 19*32, 18*32, 17*32, 16*32, \
-  15*32, 14*32, 13*32, 12*32, 11*32, 10*32, 9*32 , 8*32 , \
-  7*32 , 6*32 , 5*32 , 4*32 , 3*32 , 2*32 , 1*32 , 0*32}, \
-
-
-/* 16x16 decodes */
-static const gfx_layout sega_16x16_r00_f0_layout =
-_16x16_START
-	_16x16_SEQUENCE_1
-	_16x16_SEQUENCE_2
-_16x16_END
-
-static const gfx_layout sega_16x16_r01_f0_layout =
-_16x16_START
-	_16x16_SEQUENCE_2
-	_16x16_SEQUENCE_1_FLIP
-_16x16_END
-
-static const gfx_layout sega_16x16_r10_f0_layout =
-_16x16_START
-	_16x16_SEQUENCE_1_FLIP
-	_16x16_SEQUENCE_2_FLIP
-_16x16_END
-
-static const gfx_layout sega_16x16_r11_f0_layout =
-_16x16_START
-	_16x16_SEQUENCE_2_FLIP
-	_16x16_SEQUENCE_1
-_16x16_END
-
-static const gfx_layout sega_16x16_r00_f1_layout =
-_16x16_START
-	_16x16_SEQUENCE_1_FLIP
-	_16x16_SEQUENCE_2
-_16x16_END
-
-static const gfx_layout sega_16x16_r01_f1_layout =
-_16x16_START
-	_16x16_SEQUENCE_2
-	_16x16_SEQUENCE_1
-_16x16_END
-
-static const gfx_layout sega_16x16_r10_f1_layout =
-_16x16_START
-	_16x16_SEQUENCE_1
-	_16x16_SEQUENCE_2_FLIP
-_16x16_END
-
-static const gfx_layout sega_16x16_r11_f1_layout =
-_16x16_START
-	_16x16_SEQUENCE_2_FLIP
-	_16x16_SEQUENCE_1_FLIP
-_16x16_END
-
-/* 32x32 decodes */
-static const gfx_layout sega_32x32_r00_f0_layout =
-_32x32_START
-	_32x32_SEQUENCE_1
-	_32x32_SEQUENCE_2
-_32x32_END
-
-static const gfx_layout sega_32x32_r01_f0_layout =
-_32x32_START
-	_32x32_SEQUENCE_2
-	_32x32_SEQUENCE_1_FLIP
-_32x32_END
-
-static const gfx_layout sega_32x32_r10_f0_layout =
-_32x32_START
-	_32x32_SEQUENCE_1_FLIP
-	_32x32_SEQUENCE_2_FLIP
-_32x32_END
-
-static const gfx_layout sega_32x32_r11_f0_layout =
-_32x32_START
-	_32x32_SEQUENCE_2_FLIP
-	_32x32_SEQUENCE_1
-_32x32_END
-
-static const gfx_layout sega_32x32_r00_f1_layout =
-_32x32_START
-	_32x32_SEQUENCE_1_FLIP
-	_32x32_SEQUENCE_2
-_32x32_END
-
-static const gfx_layout sega_32x32_r01_f1_layout =
-_32x32_START
-	_32x32_SEQUENCE_2
-	_32x32_SEQUENCE_1
-_32x32_END
-
-static const gfx_layout sega_32x32_r10_f1_layout =
-_32x32_START
-	_32x32_SEQUENCE_1
-	_32x32_SEQUENCE_2_FLIP
-_32x32_END
-
-static const gfx_layout sega_32x32_r11_f1_layout =
-_32x32_START
-	_32x32_SEQUENCE_2_FLIP
-	_32x32_SEQUENCE_1_FLIP
-_32x32_END
-
-
-static void segacd_mark_tiles_dirty(running_machine& machine, int offset)
+void sega_segacd_device::segacd_mark_tiles_dirty(running_machine& machine, int offset)
 {
 	machine.gfx[0]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
 	machine.gfx[1]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
@@ -2002,24 +1658,14 @@ static void segacd_mark_tiles_dirty(running_machine& machine, int offset)
 
 
 // mame specific.. map registers to which tilemap cache we use
-static int segacd_get_active_stampmap_tilemap(void)
+int sega_segacd_device::segacd_get_active_stampmap_tilemap(void)
 {
 	return (segacd_stampsize & 0x6)>>1;
 }
 
-#if 0
-static void segacd_mark_stampmaps_dirty(void)
-{
-	segacd_stampmap[segacd_get_active_stampmap_tilemap(->mark_all_dirty()]);
 
-	//segacd_stampmap[0]->mark_all_dirty();
-	//segacd_stampmap[1]->mark_all_dirty();
-	//segacd_stampmap[2]->mark_all_dirty();
-	//segacd_stampmap[3]->mark_all_dirty();
-}
-#endif
 
-void SCD_GET_TILE_INFO_16x16_1x1( int& tile_region, int& tileno, int tile_index )
+void sega_segacd_device::SCD_GET_TILE_INFO_16x16_1x1( int& tile_region, int& tileno, int tile_index )
 {
 	tile_region = 0; // 16x16 tiles
 	int tile_base = (segacd_stampmap_base_address & 0xff80) * 4;
@@ -2033,7 +1679,7 @@ void SCD_GET_TILE_INFO_16x16_1x1( int& tile_region, int& tileno, int tile_index 
 	tile_region+=roll;
 }
 
-void SCD_GET_TILE_INFO_32x32_1x1( int& tile_region, int& tileno, int tile_index )
+void sega_segacd_device::SCD_GET_TILE_INFO_32x32_1x1( int& tile_region, int& tileno, int tile_index )
 {
 	tile_region = 8; // 32x32 tiles
 	int tile_base = (segacd_stampmap_base_address & 0xffe0) * 4;
@@ -2048,7 +1694,7 @@ void SCD_GET_TILE_INFO_32x32_1x1( int& tile_region, int& tileno, int tile_index 
 }
 
 
-void SCD_GET_TILE_INFO_16x16_16x16( int& tile_region, int& tileno, int tile_index )
+void sega_segacd_device::SCD_GET_TILE_INFO_16x16_16x16( int& tile_region, int& tileno, int tile_index )
 {
 	tile_region = 0; // 16x16 tiles
 	int tile_base = (0x8000) * 4; // fixed address in this mode
@@ -2063,7 +1709,7 @@ void SCD_GET_TILE_INFO_16x16_16x16( int& tile_region, int& tileno, int tile_inde
 }
 
 
-void SCD_GET_TILE_INFO_32x32_16x16( int& tile_region, int& tileno, int tile_index )
+void sega_segacd_device::SCD_GET_TILE_INFO_32x32_16x16( int& tile_region, int& tileno, int tile_index )
 {
 	tile_region = 8; // 32x32 tiles
 	int tile_base = (segacd_stampmap_base_address & 0xe000) * 4;
@@ -2081,14 +1727,14 @@ void SCD_GET_TILE_INFO_32x32_16x16( int& tile_region, int& tileno, int tile_inde
 
 
 
-TILE_GET_INFO_MEMBER( md_base_state::get_stampmap_16x16_1x1_tile_info )
+TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_16x16_1x1_tile_info )
 {
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_16x16_1x1(tile_region,tileno,(int)tile_index);
 	SET_TILE_INFO_MEMBER(tile_region, tileno, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER( md_base_state::get_stampmap_32x32_1x1_tile_info )
+TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_32x32_1x1_tile_info )
 {
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_1x1(tile_region,tileno,(int)tile_index);
@@ -2096,14 +1742,14 @@ TILE_GET_INFO_MEMBER( md_base_state::get_stampmap_32x32_1x1_tile_info )
 }
 
 
-TILE_GET_INFO_MEMBER( md_base_state::get_stampmap_16x16_16x16_tile_info )
+TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_16x16_16x16_tile_info )
 {
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_16x16_16x16(tile_region,tileno,(int)tile_index);
 	SET_TILE_INFO_MEMBER(tile_region, tileno, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER( md_base_state::get_stampmap_32x32_16x16_tile_info )
+TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_32x32_16x16_tile_info )
 {
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_16x16(tile_region,tileno,(int)tile_index);
@@ -2112,7 +1758,7 @@ TILE_GET_INFO_MEMBER( md_base_state::get_stampmap_32x32_16x16_tile_info )
 
 // non-tilemap functions to get a pixel from a 'tilemap' based on the above, but looking up each pixel, as to avoid the heavy cache bitmap
 
-INLINE UINT8 get_stampmap_16x16_1x1_tile_info_pixel(running_machine& machine, int xpos, int ypos)
+inline UINT8 sega_segacd_device::get_stampmap_16x16_1x1_tile_info_pixel(running_machine& machine, int xpos, int ypos)
 {
 	const int tilesize = 4; // 0xf pixels
 	const int tilemapsize = 0x0f;
@@ -2151,7 +1797,7 @@ INLINE UINT8 get_stampmap_16x16_1x1_tile_info_pixel(running_machine& machine, in
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-INLINE UINT8 get_stampmap_32x32_1x1_tile_info_pixel(running_machine& machine, int xpos, int ypos)
+inline UINT8 sega_segacd_device::get_stampmap_32x32_1x1_tile_info_pixel(running_machine& machine, int xpos, int ypos)
 {
 	const int tilesize = 5; // 0x1f pixels
 	const int tilemapsize = 0x07;
@@ -2190,7 +1836,7 @@ INLINE UINT8 get_stampmap_32x32_1x1_tile_info_pixel(running_machine& machine, in
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-INLINE UINT8 get_stampmap_16x16_16x16_tile_info_pixel(running_machine& machine, int xpos, int ypos)
+inline UINT8 sega_segacd_device::get_stampmap_16x16_16x16_tile_info_pixel(running_machine& machine, int xpos, int ypos)
 {
 	const int tilesize = 4; // 0xf pixels
 	const int tilemapsize = 0xff;
@@ -2229,7 +1875,7 @@ INLINE UINT8 get_stampmap_16x16_16x16_tile_info_pixel(running_machine& machine, 
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-INLINE UINT8 get_stampmap_32x32_16x16_tile_info_pixel(running_machine& machine, int xpos, int ypos)
+inline UINT8 sega_segacd_device::get_stampmap_32x32_16x16_tile_info_pixel(running_machine& machine, int xpos, int ypos)
 {
 	const int tilesize = 5; // 0x1f pixels
 	const int tilemapsize = 0x7f;
@@ -2268,24 +1914,20 @@ INLINE UINT8 get_stampmap_32x32_16x16_tile_info_pixel(running_machine& machine, 
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-static TIMER_CALLBACK( segacd_access_timer_callback )
-{
-	CheckCommand(machine);
-}
 
-READ16_HANDLER( cdc_data_sub_r )
+READ16_MEMBER( sega_segacd_device::cdc_data_sub_r )
 {
 	return CDC_Host_r(space.machine(), READ_SUB);
 }
 
-READ16_HANDLER( cdc_data_main_r )
+READ16_MEMBER( sega_segacd_device::cdc_data_main_r )
 {
 	return CDC_Host_r(space.machine(), READ_MAIN);
 }
 
 
 
-WRITE16_HANDLER( segacd_stopwatch_timer_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_stopwatch_timer_w )
 {
 	if(data == 0)
 		stopwatch_timer->reset();
@@ -2293,7 +1935,7 @@ WRITE16_HANDLER( segacd_stopwatch_timer_w )
 		printf("Stopwatch timer %04x\n",data);
 }
 
-READ16_HANDLER( segacd_stopwatch_timer_r )
+READ16_MEMBER( sega_segacd_device::segacd_stopwatch_timer_r )
 {
 	INT32 result = (stopwatch_timer->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(30.72))).as_double();
 
@@ -2301,165 +1943,12 @@ READ16_HANDLER( segacd_stopwatch_timer_r )
 }
 
 
-/* main CPU map set up in INIT */
-void segacd_init_main_cpu( running_machine& machine )
-{
-	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	
-	segacd_font_bits = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:segacd_font")->ptr());
-	segacd_backupram = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:backupram")->ptr());
-	segacd_dataram = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:dataram")->ptr());
-	segacd_dataram2 = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:dataram2")->ptr());
-	segacd_4meg_prgram = reinterpret_cast<UINT16 *>(machine.root_device().memshare(":segacd:segacd_program")->ptr());
-	
-	segacd_4meg_prgbank = 0;
-
-
-	space.unmap_readwrite        (0x020000,0x3fffff);
-
-//  space.install_read_bank(0x0020000, 0x003ffff, "scd_4m_prgbank");
-//  space.machine().root_device().membank("scd_4m_prgbank")->set_base(segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
-	space.install_legacy_read_handler (0x0020000, 0x003ffff, FUNC(scd_4m_prgbank_ram_r) );
-	space.install_legacy_write_handler (0x0020000, 0x003ffff, FUNC(scd_4m_prgbank_ram_w) );
-	segacd_wordram_mapped = 1;
-
-
-	space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x200000, 0x23ffff, FUNC(segacd_main_dataram_part1_r), FUNC(segacd_main_dataram_part1_w)); // RAM shared with sub
-
-	space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xa12000, 0xa12001, FUNC(scd_a12000_halt_reset_r), FUNC(scd_a12000_halt_reset_w)); // sub-cpu control
-	space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xa12002, 0xa12003, FUNC(scd_a12002_memory_mode_r), FUNC(scd_a12002_memory_mode_w)); // memory mode / write protect
-	//space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xa12004, 0xa12005, FUNC(segacd_cdc_mode_address_r), FUNC(segacd_cdc_mode_address_w));
-	space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xa12006, 0xa12007, FUNC(scd_a12006_hint_register_r), FUNC(scd_a12006_hint_register_w)); // where HINT points on main CPU
-	//space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler     (0xa12008, 0xa12009, FUNC(cdc_data_main_r));
-
-
-	space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xa1200c, 0xa1200d, FUNC(segacd_stopwatch_timer_r), FUNC(segacd_stopwatch_timer_w)); // starblad
-
-	space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xa1200e, 0xa1200f, FUNC(segacd_comms_flags_r), FUNC(segacd_comms_flags_maincpu_w)); // communication flags block
-
-	space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xa12010, 0xa1201f, FUNC(segacd_comms_main_part1_r), FUNC(segacd_comms_main_part1_w));
-	space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xa12020, 0xa1202f, FUNC(segacd_comms_main_part2_r), FUNC(segacd_comms_main_part2_w));
-
-
-
-	machine.device(":segacd:segacd_68k")->execute().set_irq_acknowledge_callback(segacd_sub_int_callback);
-
-	space.install_legacy_read_handler (0x0000070, 0x0000073, FUNC(scd_hint_vector_r) );
-
-	segacd_gfx_conversion_timer = machine.scheduler().timer_alloc(FUNC(segacd_gfx_conversion_timer_callback));
-	segacd_gfx_conversion_timer->adjust(attotime::never);
-
-	//segacd_dmna_ret_timer = machine.scheduler().timer_alloc(FUNC(segacd_dmna_ret_timer_callback));
-	segacd_gfx_conversion_timer->adjust(attotime::never);
-
-	segacd_hock_timer = machine.scheduler().timer_alloc(FUNC(segacd_access_timer_callback));
-//  segacd_hock_timer->adjust( attotime::from_nsec(20000000), 0, attotime::from_nsec(20000000));
-	segacd_hock_timer->adjust( attotime::from_hz(75),0, attotime::from_hz(75));
-
-	segacd_irq3_timer = machine.scheduler().timer_alloc(FUNC(segacd_irq3_timer_callback));
-	segacd_irq3_timer->adjust(attotime::never);
-
-
-
-	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[0] = auto_alloc(machine, gfx_element(machine, sega_16x16_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
-	machine.gfx[1] = auto_alloc(machine, gfx_element(machine, sega_16x16_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
-	machine.gfx[2] = auto_alloc(machine, gfx_element(machine, sega_16x16_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
-	machine.gfx[3] = auto_alloc(machine, gfx_element(machine, sega_16x16_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
-	machine.gfx[4] = auto_alloc(machine, gfx_element(machine, sega_16x16_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
-	machine.gfx[5] = auto_alloc(machine, gfx_element(machine, sega_16x16_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
-	machine.gfx[6] = auto_alloc(machine, gfx_element(machine, sega_16x16_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
-	machine.gfx[7] = auto_alloc(machine, gfx_element(machine, sega_16x16_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
-
-	machine.gfx[8] = auto_alloc(machine, gfx_element(machine, sega_32x32_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
-	machine.gfx[9] = auto_alloc(machine, gfx_element(machine, sega_32x32_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
-	machine.gfx[10]= auto_alloc(machine, gfx_element(machine, sega_32x32_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
-	machine.gfx[11]= auto_alloc(machine, gfx_element(machine, sega_32x32_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
-	machine.gfx[12]= auto_alloc(machine, gfx_element(machine, sega_32x32_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
-	machine.gfx[13]= auto_alloc(machine, gfx_element(machine, sega_32x32_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
-	machine.gfx[14]= auto_alloc(machine, gfx_element(machine, sega_32x32_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
-	machine.gfx[15]= auto_alloc(machine, gfx_element(machine, sega_32x32_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
-
-	md_base_state *state = machine.driver_data<md_base_state>();
-	segacd_stampmap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(md_base_state::get_stampmap_16x16_1x1_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	segacd_stampmap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(md_base_state::get_stampmap_32x32_1x1_tile_info),state), TILEMAP_SCAN_ROWS, 32, 32, 8, 8);
-	segacd_stampmap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(md_base_state::get_stampmap_16x16_16x16_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 256, 256); // 128kb!
-	segacd_stampmap[3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(md_base_state::get_stampmap_32x32_16x16_tile_info),state), TILEMAP_SCAN_ROWS, 32, 32, 128, 128); // 32kb!
-}
 
 
 
 
-TIMER_DEVICE_CALLBACK( scd_dma_timer_callback )
-{
-	// todo: accurate timing of this!
 
-	#define RATE 256
-	if (sega_cd_connected)
-		CDC_Do_DMA(timer.machine(), RATE);
-
-	// timed reset of flags
-	scd_mode_dmna_ret_flags |= 0x0021;
-
-	scd_dma_timer->adjust(attotime::from_hz(megadriv_framerate) / megadrive_total_scanlines);
-}
-
-
-MACHINE_RESET( segacd )
-{
-	_segacd_68k_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	_segacd_68k_cpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-
-	segacd_hint_register = 0xffff; // -1
-
-	/* init cd-rom device */
-
-	lc89510_Reset();
-
-	{
-		cdrom_image_device *device = machine.device<cdrom_image_device>("cdrom");
-		if ( device )
-		{
-			segacd.cd = device->get_cdrom_file();
-			if ( segacd.cd )
-			{
-				segacd.toc = cdrom_get_toc( segacd.cd );
-				cdda_set_cdrom( machine.device(":segacd:cdda"), segacd.cd );
-				cdda_stop_audio( machine.device( ":segacd:cdda" ) ); //stop any pending CD-DA
-			}
-		}
-	}
-
-
-	if (segacd.cd)
-		printf("cd found\n");
-
-	scd_rammode = 0;
-	scd_mode_dmna_ret_flags = 0x5421;
-
-
-	hock_cmd = 0;
-	stopwatch_timer = machine.device<timer_device>(":segacd:sw_timer");
-
-	scd_dma_timer->adjust(attotime::zero);
-
-
-	// HACK!!!! timegal, anettfut, roadaven end up with the SubCPU waiting in a loop for *something*
-	// overclocking the CPU, even at the point where the game is hung, allows them to continue and boot
-	// I'm not sure what the source of this timing problem is, it's not using IRQ3 or StopWatch at the
-	// time.  Changing the CDHock timer to 50hz from 75hz also stops the hang, but then the video is
-	// too slow and has bad sound.  -- Investigate!
-
-	_segacd_68k_cpu->set_clock_scale(1.5000f);
-
-}
-
-
-static int segacd_redled = 0;
-static int segacd_greenled = 0;
-static int segacd_ready = 1; // actually set 100ms after startup?
-
-static READ16_HANDLER( segacd_sub_led_ready_r )
+READ16_MEMBER( sega_segacd_device::segacd_sub_led_ready_r )
 {
 	UINT16 retdata = 0x0000;
 
@@ -2477,7 +1966,7 @@ static READ16_HANDLER( segacd_sub_led_ready_r )
 	return retdata;
 }
 
-static WRITE16_HANDLER( segacd_sub_led_ready_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_sub_led_ready_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -2501,7 +1990,7 @@ static WRITE16_HANDLER( segacd_sub_led_ready_w )
 
 
 
-static READ16_HANDLER( segacd_sub_dataram_part1_r )
+READ16_MEMBER( sega_segacd_device::segacd_sub_dataram_part1_r )
 {
 	if ((scd_rammode&2)==RAM_MODE_2MEG)
 	{
@@ -2543,7 +2032,7 @@ static READ16_HANDLER( segacd_sub_dataram_part1_r )
 	return 0x0000;
 }
 
-static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_sub_dataram_part1_w )
 {
 	if ((scd_rammode&2)==RAM_MODE_2MEG)
 	{
@@ -2589,7 +2078,7 @@ static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
 	}
 }
 
-static READ16_HANDLER( segacd_sub_dataram_part2_r )
+READ16_MEMBER( sega_segacd_device::segacd_sub_dataram_part2_r )
 {
 	if ((scd_rammode&2)==RAM_MODE_2MEG)
 	{
@@ -2614,7 +2103,7 @@ static READ16_HANDLER( segacd_sub_dataram_part2_r )
 	return 0x0000;
 }
 
-static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_sub_dataram_part2_w )
 {
 	if ((scd_rammode&2)==RAM_MODE_2MEG)
 	{
@@ -2638,18 +2127,18 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 
 
 
-static READ16_HANDLER( segacd_irq_mask_r )
+READ16_MEMBER( sega_segacd_device::segacd_irq_mask_r )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 	return segacd_irq_mask;
 }
 
-static WRITE16_HANDLER( segacd_irq_mask_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_irq_mask_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		UINT16 control = CDD_CONTROL;
-		if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+		
 	//  printf("segacd_irq_mask_w %04x %04x (CDD control is %04x)\n",data, mem_mask, control);
 
 		if (data & 0x10)
@@ -2675,19 +2164,19 @@ static WRITE16_HANDLER( segacd_irq_mask_w )
 	}
 }
 
-static READ16_HANDLER( segacd_cdd_ctrl_r )
+READ16_MEMBER( sega_segacd_device::segacd_cdd_ctrl_r )
 {
-	if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+	
 	return CDD_CONTROL;
 }
 
 
-static WRITE16_HANDLER( segacd_cdd_ctrl_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_cdd_ctrl_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		UINT16 control = CDD_CONTROL;
-		if (SEGACD_FORCE_SYNCS) space.machine().scheduler().synchronize();
+		
 
 		//printf("segacd_cdd_ctrl_w %04x %04x (control %04x irq %04x\n", data, mem_mask, control, segacd_irq_mask);
 
@@ -2714,12 +2203,12 @@ static WRITE16_HANDLER( segacd_cdd_ctrl_w )
 
 
 
-static READ8_HANDLER( segacd_cdd_rx_r )
+READ8_MEMBER( sega_segacd_device::segacd_cdd_rx_r )
 {
 	return CDD_RX[offset^1];
 }
 
-static WRITE8_HANDLER( segacd_cdd_tx_w )
+WRITE8_MEMBER( sega_segacd_device::segacd_cdd_tx_w )
 {
 	CDD_TX[offset^1] = data;
 
@@ -2731,7 +2220,7 @@ static WRITE8_HANDLER( segacd_cdd_tx_w )
 
 
 
-static READ16_HANDLER( segacd_stampsize_r )
+READ16_MEMBER( sega_segacd_device::segacd_stampsize_r )
 {
 	UINT16 retdata = 0x0000;
 
@@ -2743,7 +2232,7 @@ static READ16_HANDLER( segacd_stampsize_r )
 
 }
 
-static WRITE16_HANDLER( segacd_stampsize_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_stampsize_w )
 {
 	//printf("segacd_stampsize_w %04x %04x\n",data, mem_mask);
 	if (ACCESSING_BITS_0_7)
@@ -2773,7 +2262,7 @@ static WRITE16_HANDLER( segacd_stampsize_w )
 // the lower 3 bits of segacd_imagebuffer_hdot_size are set
 
 // this really needs to be doing it's own lookups rather than depending on the inefficient MAME cache..
-INLINE UINT8 read_pixel_from_stampmap( running_machine& machine, bitmap_ind16* srcbitmap, int x, int y)
+inline UINT8 sega_segacd_device::read_pixel_from_stampmap( running_machine& machine, bitmap_ind16* srcbitmap, int x, int y)
 {
 /*
     if (!srcbitmap)
@@ -2805,7 +2294,7 @@ INLINE UINT8 read_pixel_from_stampmap( running_machine& machine, bitmap_ind16* s
 
 
 // this triggers the conversion operation, which will cause an IRQ1 when finished
-WRITE16_HANDLER( segacd_trace_vector_base_address_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_trace_vector_base_address_w )
 {
 	if ((scd_rammode&2)==RAM_MODE_1MEG)
 	{
@@ -2891,12 +2380,12 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 }
 
 // actually just the low 8 bits?
-READ16_HANDLER( segacd_imagebuffer_vdot_size_r )
+READ16_MEMBER( sega_segacd_device::segacd_imagebuffer_vdot_size_r )
 {
 	return segacd_imagebuffer_vdot_size;
 }
 
-WRITE16_HANDLER( segacd_imagebuffer_vdot_size_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_imagebuffer_vdot_size_w )
 {
 	//printf("segacd_imagebuffer_vdot_size_w %04x %04x\n",data,mem_mask);
 	COMBINE_DATA(&segacd_imagebuffer_vdot_size);
@@ -2904,7 +2393,7 @@ WRITE16_HANDLER( segacd_imagebuffer_vdot_size_w )
 
 
 // basically the 'tilemap' base address, for the 16x16 / 32x32 source tiles
-static READ16_HANDLER( segacd_stampmap_base_address_r )
+READ16_MEMBER( sega_segacd_device::segacd_stampmap_base_address_r )
 {
 	// different bits are valid in different modes, but I'm guessing the register
 	// always returns all the bits set, even if they're not used?
@@ -2912,7 +2401,7 @@ static READ16_HANDLER( segacd_stampmap_base_address_r )
 
 }
 
-static WRITE16_HANDLER( segacd_stampmap_base_address_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_stampmap_base_address_w )
 { // WORD ACCESS
 
 	// low 3 bitsa aren't used, are they stored?
@@ -2920,12 +2409,12 @@ static WRITE16_HANDLER( segacd_stampmap_base_address_w )
 }
 
 // destination for 'rendering' the section of the tilemap(stampmap) requested
-static READ16_HANDLER( segacd_imagebuffer_start_address_r )
+READ16_MEMBER( sega_segacd_device::segacd_imagebuffer_start_address_r )
 {
 	return segacd_imagebuffer_start_address;
 }
 
-static WRITE16_HANDLER( segacd_imagebuffer_start_address_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_imagebuffer_start_address_w )
 {
 	COMBINE_DATA(&segacd_imagebuffer_start_address);
 
@@ -2933,48 +2422,47 @@ static WRITE16_HANDLER( segacd_imagebuffer_start_address_w )
 	//printf("segacd_imagebuffer_start_address_w %04x %04x (actual base = %06x)\n", data, segacd_imagebuffer_start_address, base);
 }
 
-static READ16_HANDLER( segacd_imagebuffer_offset_r )
+READ16_MEMBER( sega_segacd_device::segacd_imagebuffer_offset_r )
 {
 	return segacd_imagebuffer_offset;
 }
 
-static WRITE16_HANDLER( segacd_imagebuffer_offset_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_imagebuffer_offset_w )
 {
 	COMBINE_DATA(&segacd_imagebuffer_offset);
 //  printf("segacd_imagebuffer_offset_w %04x\n", segacd_imagebuffer_offset);
 }
 
-static READ16_HANDLER( segacd_imagebuffer_vcell_size_r )
+READ16_MEMBER( sega_segacd_device::segacd_imagebuffer_vcell_size_r )
 {
 	return segacd_imagebuffer_vcell_size;
 }
 
-static WRITE16_HANDLER( segacd_imagebuffer_vcell_size_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_imagebuffer_vcell_size_w )
 {
 	COMBINE_DATA(&segacd_imagebuffer_vcell_size);
 }
 
 
-static READ16_HANDLER( segacd_imagebuffer_hdot_size_r )
+READ16_MEMBER( sega_segacd_device::segacd_imagebuffer_hdot_size_r )
 {
 	return segacd_imagebuffer_hdot_size;
 }
 
-static WRITE16_HANDLER( segacd_imagebuffer_hdot_size_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_imagebuffer_hdot_size_w )
 {
 	COMBINE_DATA(&segacd_imagebuffer_hdot_size);
 }
 
-static UINT16 segacd_irq3_timer_reg;
 
-static READ16_HANDLER( segacd_irq3timer_r )
+
+READ16_MEMBER( sega_segacd_device::segacd_irq3timer_r )
 {
 	return segacd_irq3_timer_reg; // always returns value written, not current counter!
 }
 
-#define SEGACD_IRQ3_TIMER_SPEED (attotime::from_nsec(segacd_irq3_timer_reg*30720))
 
-static WRITE16_HANDLER( segacd_irq3timer_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_irq3timer_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -2993,31 +2481,25 @@ static WRITE16_HANDLER( segacd_irq3timer_w )
 
 
 
-static TIMER_CALLBACK( segacd_irq3_timer_callback )
-{
-	CHECK_SCD_LV3_INTERRUPT
-
-	segacd_irq3_timer->adjust(SEGACD_IRQ3_TIMER_SPEED);
-}
 
 
 
-READ16_HANDLER( cdc_dmaaddr_r )
+READ16_MEMBER( sega_segacd_device::cdc_dmaaddr_r )
 {
 	return CDC_DMA_ADDR;
 }
 
-WRITE16_HANDLER( cdc_dmaaddr_w )
+WRITE16_MEMBER( sega_segacd_device::cdc_dmaaddr_w )
 {
 	COMBINE_DATA(&CDC_DMA_ADDR);
 }
 
-READ16_HANDLER( segacd_cdfader_r )
+READ16_MEMBER( sega_segacd_device::segacd_cdfader_r )
 {
 	return 0;
 }
 
-WRITE16_HANDLER( segacd_cdfader_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_cdfader_w )
 {
 	static double cdfader_vol;
 	if(data & 0x800f)
@@ -3035,7 +2517,7 @@ WRITE16_HANDLER( segacd_cdfader_w )
 	cdda_set_volume(space.machine().device(":segacd:cdda"), cdfader_vol);
 }
 
-READ16_HANDLER( segacd_backupram_r )
+READ16_MEMBER( sega_segacd_device::segacd_backupram_r )
 {
 	if(ACCESSING_BITS_8_15 && !(space.debugger_access()))
 		printf("Warning: read to backupram even bytes! [%04x]\n",offset);
@@ -3043,7 +2525,7 @@ READ16_HANDLER( segacd_backupram_r )
 	return segacd_backupram[offset] & 0xff;
 }
 
-WRITE16_HANDLER( segacd_backupram_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_backupram_w )
 {
 	if(ACCESSING_BITS_0_7)
 		segacd_backupram[offset] = data;
@@ -3052,12 +2534,12 @@ WRITE16_HANDLER( segacd_backupram_w )
 		printf("Warning: write to backupram even bytes! [%04x] %02x\n",offset,data);
 }
 
-READ16_HANDLER( segacd_font_color_r )
+READ16_MEMBER( sega_segacd_device::segacd_font_color_r )
 {
 	return segacd_font_color;
 }
 
-WRITE16_HANDLER( segacd_font_color_w )
+WRITE16_MEMBER( sega_segacd_device::segacd_font_color_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -3065,7 +2547,7 @@ WRITE16_HANDLER( segacd_font_color_w )
 	}
 }
 
-READ16_HANDLER( segacd_font_converted_r )
+READ16_MEMBER( sega_segacd_device::segacd_font_converted_r )
 {
 	int scbg = (segacd_font_color & 0x0f);
 	int scfg = (segacd_font_color & 0xf0)>>4;
@@ -3083,53 +2565,6 @@ READ16_HANDLER( segacd_font_converted_r )
 	return retdata;
 }
 
-ADDRESS_MAP_START( segacd_map, AS_PROGRAM, 16, driver_device )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_SHARE("segacd_program")
-
-	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE_LEGACY(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_SHARE("dataram")
-	AM_RANGE(0x0c0000, 0x0dffff) AM_READWRITE_LEGACY(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) AM_SHARE("dataram2")
-
-	AM_RANGE(0xfe0000, 0xfe3fff) AM_READWRITE_LEGACY(segacd_backupram_r,segacd_backupram_w) AM_SHARE("backupram") // backup RAM, odd bytes only!
-
-	AM_RANGE(0xff0000, 0xff001f) AM_DEVWRITE8_LEGACY("rfsnd", rf5c68_w, 0x00ff)  // PCM, RF5C164
-	AM_RANGE(0xff0020, 0xff003f) AM_DEVREAD8_LEGACY("rfsnd", rf5c68_r, 0x00ff)
-	AM_RANGE(0xff2000, 0xff3fff) AM_DEVREADWRITE8_LEGACY("rfsnd", rf5c68_mem_r, rf5c68_mem_w,0x00ff)  // PCM, RF5C164
-
-
-	AM_RANGE(0xff8000 ,0xff8001) AM_READWRITE_LEGACY(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
-	AM_RANGE(0xff8002 ,0xff8003) AM_READWRITE_LEGACY(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
-
-	AM_RANGE(0xff8004 ,0xff8005) AM_READWRITE_LEGACY(segacd_cdc_mode_address_r, segacd_cdc_mode_address_w)
-	AM_RANGE(0xff8006 ,0xff8007) AM_READWRITE_LEGACY(segacd_cdc_data_r, segacd_cdc_data_w)
-	AM_RANGE(0xff8008, 0xff8009) AM_READ_LEGACY(cdc_data_sub_r)
-	AM_RANGE(0xff800a, 0xff800b) AM_READWRITE_LEGACY(cdc_dmaaddr_r,cdc_dmaaddr_w) // CDC DMA Address
-	AM_RANGE(0xff800c, 0xff800d) AM_READWRITE_LEGACY(segacd_stopwatch_timer_r, segacd_stopwatch_timer_w)// Stopwatch timer
-	AM_RANGE(0xff800e ,0xff800f) AM_READWRITE_LEGACY(segacd_comms_flags_r, segacd_comms_flags_subcpu_w)
-	AM_RANGE(0xff8010 ,0xff801f) AM_READWRITE_LEGACY(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
-	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE_LEGACY(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
-	AM_RANGE(0xff8030, 0xff8031) AM_READWRITE_LEGACY(segacd_irq3timer_r, segacd_irq3timer_w) // Timer W/INT3
-	AM_RANGE(0xff8032, 0xff8033) AM_READWRITE_LEGACY(segacd_irq_mask_r,segacd_irq_mask_w)
-	AM_RANGE(0xff8034, 0xff8035) AM_READWRITE_LEGACY(segacd_cdfader_r,segacd_cdfader_w) // CD Fader
-	AM_RANGE(0xff8036, 0xff8037) AM_READWRITE_LEGACY(segacd_cdd_ctrl_r,segacd_cdd_ctrl_w)
-	AM_RANGE(0xff8038, 0xff8041) AM_READ8_LEGACY(segacd_cdd_rx_r,0xffff)
-	AM_RANGE(0xff8042, 0xff804b) AM_WRITE8_LEGACY(segacd_cdd_tx_w,0xffff)
-	AM_RANGE(0xff804c, 0xff804d) AM_READWRITE_LEGACY(segacd_font_color_r, segacd_font_color_w)
-	AM_RANGE(0xff804e, 0xff804f) AM_RAM AM_SHARE("segacd_font")
-	AM_RANGE(0xff8050, 0xff8057) AM_READ_LEGACY(segacd_font_converted_r)
-	AM_RANGE(0xff8058, 0xff8059) AM_READWRITE_LEGACY(segacd_stampsize_r, segacd_stampsize_w) // Stamp size
-	AM_RANGE(0xff805a, 0xff805b) AM_READWRITE_LEGACY(segacd_stampmap_base_address_r, segacd_stampmap_base_address_w) // Stamp map base address
-	AM_RANGE(0xff805c, 0xff805d) AM_READWRITE_LEGACY(segacd_imagebuffer_vcell_size_r, segacd_imagebuffer_vcell_size_w)// Image buffer V cell size
-	AM_RANGE(0xff805e, 0xff805f) AM_READWRITE_LEGACY(segacd_imagebuffer_start_address_r, segacd_imagebuffer_start_address_w) // Image buffer start address
-	AM_RANGE(0xff8060, 0xff8061) AM_READWRITE_LEGACY(segacd_imagebuffer_offset_r, segacd_imagebuffer_offset_w)
-	AM_RANGE(0xff8062, 0xff8063) AM_READWRITE_LEGACY(segacd_imagebuffer_hdot_size_r, segacd_imagebuffer_hdot_size_w) // Image buffer H dot size
-	AM_RANGE(0xff8064, 0xff8065) AM_READWRITE_LEGACY(segacd_imagebuffer_vdot_size_r, segacd_imagebuffer_vdot_size_w ) // Image buffer V dot size
-	AM_RANGE(0xff8066, 0xff8067) AM_WRITE_LEGACY(segacd_trace_vector_base_address_w)// Trace vector base address
-//  AM_RANGE(0xff8068, 0xff8069) // Subcode address
-
-//  AM_RANGE(0xff8100, 0xff817f) // Subcode buffer area
-//  AM_RANGE(0xff8180, 0xff81ff) // mirror of subcode buffer area
-
-ADDRESS_MAP_END
 
 
 
@@ -3137,10 +2572,156 @@ ADDRESS_MAP_END
 void sega_segacd_device::device_start()
 {
 
+	_segacd_68k_cpu = machine().device<cpu_device>(":segacd:segacd_68k");
+	sega_cd_connected = 1;
+
+	scd_dma_timer = machine().device<timer_device>(":segacd:scd_dma_timer");
+	segacd_gfx_conversion_timer = machine().device<timer_device>(":segacd:stamp_timer");
+	segacd_irq3_timer = machine().device<timer_device>(":segacd:irq3_timer");
+
+	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	
+	segacd_font_bits = reinterpret_cast<UINT16 *>(machine().root_device().memshare(":segacd:segacd_font")->ptr());
+	segacd_backupram = reinterpret_cast<UINT16 *>(machine().root_device().memshare(":segacd:backupram")->ptr());
+	segacd_dataram = reinterpret_cast<UINT16 *>(machine().root_device().memshare(":segacd:dataram")->ptr());
+//	segacd_dataram2 = reinterpret_cast<UINT16 *>(machine().root_device().memshare(":segacd:dataram2")->ptr());
+	segacd_4meg_prgram = reinterpret_cast<UINT16 *>(machine().root_device().memshare(":segacd:segacd_program")->ptr());
+	
+	segacd_4meg_prgbank = 0;
+
+
+	space.unmap_readwrite        (0x020000,0x3fffff);
+
+
+	space.install_read_handler (0x0020000, 0x003ffff, read16_delegate(FUNC(sega_segacd_device::scd_4m_prgbank_ram_r),this) );
+	space.install_write_handler (0x0020000, 0x003ffff, write16_delegate(FUNC(sega_segacd_device::scd_4m_prgbank_ram_w),this) );
+
+
+	space.install_readwrite_handler(0x200000, 0x23ffff, read16_delegate(FUNC(sega_segacd_device::segacd_main_dataram_part1_r),this), write16_delegate(FUNC(sega_segacd_device::segacd_main_dataram_part1_w),this)); // RAM shared with sub
+	space.install_readwrite_handler(0xa12000, 0xa12001, read16_delegate(FUNC(sega_segacd_device::scd_a12000_halt_reset_r),this), write16_delegate(FUNC(sega_segacd_device::scd_a12000_halt_reset_w),this)); // sub-cpu control
+	space.install_readwrite_handler(0xa12002, 0xa12003, read16_delegate(FUNC(sega_segacd_device::scd_a12002_memory_mode_r),this), write16_delegate(FUNC(sega_segacd_device::scd_a12002_memory_mode_w),this)); // memory mode / write protect
+	//space.install_readwrite_handler(0xa12004, 0xa12005, read16_delegate(FUNC(sega_segacd_device::segacd_cdc_mode_address_r),this), write16_delegate(FUNC(sega_segacd_device::segacd_cdc_mode_address_w),this));
+	space.install_readwrite_handler(0xa12006, 0xa12007, read16_delegate(FUNC(sega_segacd_device::scd_a12006_hint_register_r),this), write16_delegate(FUNC(sega_segacd_device::scd_a12006_hint_register_w),this)); // where HINT points on main CPU
+	//space.install_read_handler     (0xa12008, 0xa12009, read16_delegate(FUNC(sega_segacd_device::cdc_data_main_r),this));
+
+
+	space.install_readwrite_handler(0xa1200c, 0xa1200d, read16_delegate(FUNC(sega_segacd_device::segacd_stopwatch_timer_r),this), write16_delegate(FUNC(sega_segacd_device::segacd_stopwatch_timer_w),this)); // starblad
+
+	space.install_readwrite_handler(0xa1200e, 0xa1200f, read16_delegate(FUNC(sega_segacd_device::segacd_comms_flags_r),this), write16_delegate(FUNC(sega_segacd_device::segacd_comms_flags_maincpu_w),this)); // communication flags block
+
+	space.install_readwrite_handler(0xa12010, 0xa1201f, read16_delegate(FUNC(sega_segacd_device::segacd_comms_main_part1_r),this), write16_delegate(FUNC(sega_segacd_device::segacd_comms_main_part1_w),this));
+	space.install_readwrite_handler(0xa12020, 0xa1202f, read16_delegate(FUNC(sega_segacd_device::segacd_comms_main_part2_r),this), write16_delegate(FUNC(sega_segacd_device::segacd_comms_main_part2_w),this));
+
+
+
+	machine().device(":segacd:segacd_68k")->execute().set_irq_acknowledge_callback(segacd_sub_int_callback);
+
+	space.install_read_handler (0x0000070, 0x0000073, read16_delegate(FUNC(sega_segacd_device::scd_hint_vector_r),this) );
+
+	
+
+
+
+	/* create the char set (gfx will then be updated dynamically from RAM) */
+	machine().gfx[0] = auto_alloc(machine(), gfx_element(machine(), sega_16x16_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine().gfx[1] = auto_alloc(machine(), gfx_element(machine(), sega_16x16_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine().gfx[2] = auto_alloc(machine(), gfx_element(machine(), sega_16x16_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine().gfx[3] = auto_alloc(machine(), gfx_element(machine(), sega_16x16_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine().gfx[4] = auto_alloc(machine(), gfx_element(machine(), sega_16x16_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine().gfx[5] = auto_alloc(machine(), gfx_element(machine(), sega_16x16_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine().gfx[6] = auto_alloc(machine(), gfx_element(machine(), sega_16x16_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine().gfx[7] = auto_alloc(machine(), gfx_element(machine(), sega_16x16_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
+
+	machine().gfx[8] = auto_alloc(machine(), gfx_element(machine(), sega_32x32_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine().gfx[9] = auto_alloc(machine(), gfx_element(machine(), sega_32x32_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine().gfx[10]= auto_alloc(machine(), gfx_element(machine(), sega_32x32_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine().gfx[11]= auto_alloc(machine(), gfx_element(machine(), sega_32x32_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine().gfx[12]= auto_alloc(machine(), gfx_element(machine(), sega_32x32_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine().gfx[13]= auto_alloc(machine(), gfx_element(machine(), sega_32x32_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine().gfx[14]= auto_alloc(machine(), gfx_element(machine(), sega_32x32_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine().gfx[15]= auto_alloc(machine(), gfx_element(machine(), sega_32x32_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
+
+	segacd_stampmap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_16x16_1x1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	segacd_stampmap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_32x32_1x1_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 8, 8);
+	segacd_stampmap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_16x16_16x16_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 256, 256); // 128kb!
+	segacd_stampmap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_32x32_16x16_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 128, 128); // 32kb!
+
+	// todo register save state stuff
 }
 
 void sega_segacd_device::device_reset()
 {
+
+	_segacd_68k_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	_segacd_68k_cpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+
+	segacd_hint_register = 0xffff; // -1
+
+	/* init cd-rom device */
+
+	lc89510_Reset();
+
+	{
+		cdrom_image_device *cddevice = machine().device<cdrom_image_device>("cdrom");
+		if ( cddevice )
+		{
+			segacd.cd = cddevice->get_cdrom_file();
+			if ( segacd.cd )
+			{
+				segacd.toc = cdrom_get_toc( segacd.cd );
+				cdda_set_cdrom( machine().device(":segacd:cdda"), segacd.cd );
+				cdda_stop_audio( machine().device( ":segacd:cdda" ) ); //stop any pending CD-DA
+			}
+		}
+	}
+
+
+	if (segacd.cd)
+		printf("cd found\n");
+
+	scd_rammode = 0;
+	scd_mode_dmna_ret_flags = 0x5421;
+
+
+	stopwatch_timer = machine().device<timer_device>(":segacd:sw_timer");
+
+	scd_dma_timer->adjust(attotime::zero);
+
+
+	// HACK!!!! timegal, anettfut, roadaven end up with the SubCPU waiting in a loop for *something*
+	// overclocking the CPU, even at the point where the game is hung, allows them to continue and boot
+	// I'm not sure what the source of this timing problem is, it's not using IRQ3 or StopWatch at the
+	// time.  Changing the CDHock timer to 50hz from 75hz also stops the hang, but then the video is
+	// too slow and has bad sound.  -- Investigate!
+
+	_segacd_68k_cpu->set_clock_scale(1.5000f);
+
+
+	// initialize some stuff on reset
+	
+	segacd_ram_writeprotect_bits = 0;
+	segacd_4meg_prgbank = 0;
+	segacd_memory_priority_mode = 0;
+	segacd_stampsize = 0;
+
+	segacd_imagebuffer_vdot_size = 0;
+	segacd_imagebuffer_vcell_size = 0;
+	segacd_imagebuffer_hdot_size = 0;
+
+	segacd_conversion_active = 0;
+	segacd_stampmap_base_address = 0;
+	segacd_imagebuffer_start_address = 0;
+	segacd_imagebuffer_offset = 0;
+
+	segacd_comms_flags = 0x0000;
+
+	segacd_redled = 0;
+	segacd_greenled = 0;
+	segacd_ready = 1; // actually set 100ms after startup?
+	segacd_irq3_timer_reg = 0;
+
+	segacd_gfx_conversion_timer->adjust(attotime::never);
+	segacd_irq3_timer->adjust(attotime::never);
 
 }
 

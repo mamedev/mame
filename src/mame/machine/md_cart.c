@@ -1049,7 +1049,7 @@ enum STMSTATE
 	IDLE = 0,
 	CMD_WRSR,
 	CMD_RDSR,
-	CMD_READ,
+	M95320_CMD_READ,
 	CMD_WRITE,
 	READING,
 	WRITING
@@ -1129,7 +1129,7 @@ void stm95_device::set_sck_line(int state)
 								WEL = 0;
 								break;
 							case 0x03:	// read
-								stm_state = CMD_READ;
+								stm_state = M95320_CMD_READ;
 								stream_data = 0;
 								break;
 							case 0x04:	// write disable
@@ -1164,7 +1164,7 @@ void stm95_device::set_sck_line(int state)
 						stream_pos = 0;
 					}
 					break;
-				case CMD_READ:
+				case M95320_CMD_READ:
 					stream_data = (stream_data << 1) | (latch ? 1 : 0);
 					stream_pos++;
 					if (stream_pos == 16)

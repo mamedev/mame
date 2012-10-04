@@ -1028,10 +1028,7 @@ MACHINE_RESET( megadriv )
 		_32x_slave_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
-	if (_segacd_68k_cpu != NULL )
-	{
-		MACHINE_RESET_CALL( segacd );
-	}
+
 
 }
 
@@ -1377,20 +1374,6 @@ static void megadriv_init_common(running_machine &machine)
 	if (_32x_slave_cpu != NULL)
 	{
 		printf("32x SLAVE SH2 cpu found '%s'\n", _32x_slave_cpu->tag() );
-	}
-
-
-
-	sega_cd_connected = 0;
-	segacd_wordram_mapped = 0;
-	_segacd_68k_cpu = machine.device<cpu_device>(":segacd:segacd_68k");
-	if (_segacd_68k_cpu != NULL)
-	{
-		printf("Sega CD secondary 68k cpu found '%s'\n", _segacd_68k_cpu->tag() );
-		sega_cd_connected = 1;
-		segacd_init_main_cpu(machine);
-		scd_dma_timer = machine.device<timer_device>(":segacd:scd_dma_timer");
-
 	}
 
 	_svp_cpu = machine.device<cpu_device>("svp");

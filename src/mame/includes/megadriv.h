@@ -31,6 +31,8 @@
 
 #define MD_CPU_REGION_SIZE (MAX_MD_CART_SIZE + VIRGIN_COPY_GEN)
 
+extern int sega_cd_connected;
+
 
 /*----------- defined in machine/megadriv.c -----------*/
 
@@ -105,7 +107,9 @@ public:
 	: driver_device(mconfig, type, tag),
 		m_vdp(*this,"gen_vdp"),
 		m_megadrive_ram(*this,"megadrive_ram")
-	{ }
+	{ 
+		sega_cd_connected = 0;
+	}
 	required_device<sega_genesis_vdp_device> m_vdp;
 	optional_shared_ptr<UINT16> m_megadrive_ram;
 
@@ -115,10 +119,6 @@ public:
 	DECLARE_DRIVER_INIT(megadrij);
 	DECLARE_DRIVER_INIT(mpnew);
 
-	TILE_GET_INFO_MEMBER( get_stampmap_16x16_1x1_tile_info );
-	TILE_GET_INFO_MEMBER( get_stampmap_32x32_1x1_tile_info );
-	TILE_GET_INFO_MEMBER( get_stampmap_16x16_16x16_tile_info );
-	TILE_GET_INFO_MEMBER( get_stampmap_32x32_16x16_tile_info );
 	DECLARE_READ8_MEMBER(megadriv_68k_YM2612_read);
 	DECLARE_WRITE8_MEMBER(megadriv_68k_YM2612_write);
 };
@@ -453,20 +453,10 @@ class segacd_state : public _32x_state	// use _32x_state as base to make easier 
 {
 public:
 	segacd_state(const machine_config &mconfig, device_type type, const char *tag)
-	: _32x_state(mconfig, type, tag),
-	  m_font_bits(*this,"segacd_font") { }
-
-	required_shared_ptr<UINT16> m_font_bits;
+	: _32x_state(mconfig, type, tag)
+	  { }
 };
 
-extern int sega_cd_connected;
-extern int segacd_wordram_mapped;
-extern cpu_device *_segacd_68k_cpu;
-extern MACHINE_RESET( segacd );
-ADDRESS_MAP_EXTERN( segacd_map, driver_device);
-extern TIMER_DEVICE_CALLBACK( scd_dma_timer_callback );
-extern timer_device* scd_dma_timer;
-extern void segacd_init_main_cpu( running_machine& machine );
 
 /*----------- defined in machine/md_cart.c -----------*/
 
