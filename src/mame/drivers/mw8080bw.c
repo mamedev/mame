@@ -3181,7 +3181,7 @@ ROM_END
 /* 610 */ GAMEL(1976, 280zzzap, 0,        zzzap,    zzzap, driver_device,    0, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", GAME_NO_SOUND | GAME_SUPPORTS_SAVE , layout_280zzzap )
 /* 611 */ GAMEL(1976, maze,     0,        maze,     maze, driver_device,     0, ROT0,   "Midway", "Amazing Maze", GAME_SUPPORTS_SAVE , layout_ho4f893d )
 /* 612 */ GAME( 1977, boothill, 0,        boothill, boothill, driver_device, 0, ROT0,   "Midway", "Boot Hill", GAME_SUPPORTS_SAVE  )
-/* 615 */ GAME( 1977, checkmat, 0,        checkmat, checkmat, driver_device, 0, ROT0,   "Midway", "Checkmate", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
+/* 615 */ GAME( 1977, checkmat, 0,        checkmat, checkmat, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Checkmate", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 618 */ GAME( 1977, desertgu, 0,        desertgu, desertgu, driver_device, 0, ROT0,   "Midway", "Desert Gun", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 618 */ GAME( 1977, roadrunm, desertgu, desertgu, desertgu, driver_device, 0, ROT0,   "Midway", "Road Runner (Midway)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 /* 619 */ GAME( 1977, dplay,    0,        dplay,    dplay, driver_device,    0, ROT0,   "Midway", "Double Play", GAME_SUPPORTS_SAVE  )
