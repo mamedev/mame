@@ -3172,13 +3172,13 @@ ROM_END
 
 /* PCB #              rom       parent    machine   inp */
 
-/* 596 */ GAME( 1976, seawolf,  0,        seawolf,  seawolf, driver_device,  0, ROT0,   "Midway", "Sea Wolf (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-/* 596 */ GAME( 1976, seawolfo, seawolf,  seawolf,  seawolf, driver_device,  0, ROT0,   "Midway", "Sea Wolf (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-/* 597 */ GAMEL(1975, gunfight, 0,        gunfight, gunfight, driver_device, 0, ROT0,   "Midway", "Gun Fight (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_hoffff20 )
-/* 597 */ GAMEL(1975, gunfighto,gunfight, gunfight, gunfight, driver_device, 0, ROT0,   "Midway", "Gun Fight (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_hoffff20 )
+/* 596 */ GAME( 1976, seawolf,  0,        seawolf,  seawolf, driver_device,  0, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+/* 596 */ GAME( 1976, seawolfo, seawolf,  seawolf,  seawolf, driver_device,  0, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+/* 597 */ GAMEL(1975, gunfight, 0,        gunfight, gunfight, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_hoffff20 )
+/* 597 */ GAMEL(1975, gunfighto,gunfight, gunfight, gunfight, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_hoffff20 )
 /* 604 Gun Fight (cocktail, dump does not exist) */
 /* 605 */ GAME( 1976, tornbase, 0,        tornbase, tornbase, driver_device, 0, ROT0,   "Midway / Taito", "Tornado Baseball / Ball Park", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
-/* 610 */ GAMEL(1976, 280zzzap, 0,        zzzap,    zzzap, driver_device,    0, ROT0,   "Midway", "280-ZZZAP", GAME_NO_SOUND | GAME_SUPPORTS_SAVE , layout_280zzzap )
+/* 610 */ GAMEL(1976, 280zzzap, 0,        zzzap,    zzzap, driver_device,    0, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", GAME_NO_SOUND | GAME_SUPPORTS_SAVE , layout_280zzzap )
 /* 611 */ GAMEL(1976, maze,     0,        maze,     maze, driver_device,     0, ROT0,   "Midway", "Amazing Maze", GAME_SUPPORTS_SAVE , layout_ho4f893d )
 /* 612 */ GAME( 1977, boothill, 0,        boothill, boothill, driver_device, 0, ROT0,   "Midway", "Boot Hill", GAME_SUPPORTS_SAVE  )
 /* 615 */ GAME( 1977, checkmat, 0,        checkmat, checkmat, driver_device, 0, ROT0,   "Midway", "Checkmate", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
