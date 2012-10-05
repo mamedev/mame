@@ -721,67 +721,100 @@ void a2600_state::modeJVP_switch(UINT16 offset, UINT8 data)
 /* These read handlers will return the byte from the new bank */
 READ8_MEMBER(a2600_state::modeF8_switch_r)
 {
-	modeF8_switch(offset, 0);
+	if ( !space.debugger_access() )
+	{
+		modeF8_switch(offset, 0);
+	}
 	return m_bank_base[1][0xff8 + offset];
 }
 
 READ8_MEMBER(a2600_state::modeFA_switch_r)
 {
-	modeFA_switch(offset, 0);
+	if ( !space.debugger_access() )
+	{
+		modeFA_switch(offset, 0);
+	}
 	return m_bank_base[1][0xff8 + offset];
 }
 
 READ8_MEMBER(a2600_state::modeF6_switch_r)
 {
-	modeF6_switch(offset, 0);
+	if ( ! space.debugger_access() )
+	{
+		modeF6_switch(offset, 0);
+	}
 	return m_bank_base[1][0xff6 + offset];
 }
 
 READ8_MEMBER(a2600_state::modeF4_switch_r)
 {
-	modeF4_switch(offset, 0);
+	if ( ! space.debugger_access() )
+	{
+		modeF4_switch(offset, 0);
+	}
 	return m_bank_base[1][0xff4 + offset];
 }
 
 READ8_MEMBER(a2600_state::modeE0_switch_r)
 {
-	modeE0_switch(offset, 0);
+	if ( ! space.debugger_access() )
+	{
+		modeE0_switch(offset, 0);
+	}
 	return m_bank_base[4][0x3e0 + offset];
 }
 
 READ8_MEMBER(a2600_state::modeE7_switch_r)
 {
-	modeE7_switch(offset, 0);
+	if ( ! space.debugger_access() )
+	{
+		modeE7_switch(offset, 0);
+	}
 	return m_bank_base[1][0xfe0 + offset];
 }
 
 READ8_MEMBER(a2600_state::modeE7_RAM_switch_r)
 {
-	modeE7_RAM_switch(offset, 0);
+	if ( ! space.debugger_access() )
+	{
+		modeE7_RAM_switch(offset, 0);
+	}
 	return 0;
 }
 
 READ8_MEMBER(a2600_state::modeUA_switch_r)
 {
-	modeUA_switch(offset, 0);
+	if ( ! space.debugger_access() )
+	{
+		modeUA_switch(offset, 0);
+	}
 	return 0;
 }
 
 READ8_MEMBER(a2600_state::modeDC_switch_r)
 {
-	modeDC_switch(offset, 0);
+	if ( ! space.debugger_access() )
+	{
+		modeDC_switch(offset, 0);
+	}
 	return m_bank_base[1][0xff0 + offset];
 }
 
 READ8_MEMBER(a2600_state::modeFV_switch_r)
 {
-	modeFV_switch(offset, 0);
+	if ( ! space.debugger_access() )
+	{
+		modeFV_switch(offset, 0);
+	}
 	return m_bank_base[1][0xfd0 + offset];
 }
 
 READ8_MEMBER(a2600_state::modeJVP_switch_r)
 {
-	modeJVP_switch(offset, 0);
+	if ( ! space.debugger_access() )
+	{
+		modeJVP_switch(offset, 0);
+	}
 	return m_riot_ram[ 0x20 + offset ];
 }
 
