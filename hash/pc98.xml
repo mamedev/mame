@@ -13,4 +13,86 @@
 		</part>
 	</software>
 
+<!--
+PC-9821Xw System Restore startup disk
+
+this is a System Restore startup disk for PC-9821Xw 
+but not a Windows install source(need more disk?) 
+
+only have some part of Windows file and a Video driver(CLGD?).
+-->
+	<software name="sysrest">
+		<description>System Restore Disk</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="system install disk.fdi" size="1265664" crc="963126cd" sha1="9e7c6dec4a454e630cb7c40dea3f40206e6b4cfb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cddriver">
+		<description>CD-ROM Driver</description>
+		<year>19??</year>
+		<publisher>NEC</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="cd-rom driver.fdi" size="1265664" crc="eae95078" sha1="bc55f59e5c60f5a3d296d79ca2413eaaf7369e2f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc98demo">
+		<description>PC-9800 Series Demonstration Program</description>
+		<year>1994</year>
+		<publisher>NEC ~ Gakken</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="pc-9800 series demonstration program.fdi" size="1265664" crc="e17f9350" sha1="58cd7e146f1a43b435f56bd7f3115fc6fc3e3dda" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win30">
+		<description>EPSON Microsoft Windows 3.0</description>
+		<year>1991</year>
+		<publisher>EPSON / Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk1.fdi" size="1265664" crc="60b79fe9" sha1="cfcbeec33ab0ff55c175dbd40f0740aadbeab8f5" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk2.fdi" size="1265664" crc="59345a15" sha1="dc9de31b300a5006198f4f44473a7f013adf84ca" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk3.fdi" size="1265664" crc="8009aa28" sha1="ae407c7e7ba2cf5929b90e9d9c707a223a686593" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk4.fdi" size="1265664" crc="b2b40985" sha1="681b30f45b1998cfd34b1d8ec9b5216e360a25e5" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk5.fdi" size="1265664" crc="08ed9fc5" sha1="ce8b7661914891b1a8d497ee68f6e3f046e6dbab" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="games.fdi" size="1265664" crc="06a5aadb" sha1="a1897adeaa65c23e0bd9c3177379d164d4a21600" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
