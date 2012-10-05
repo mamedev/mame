@@ -61,7 +61,6 @@
 
 INTERRUPT_GEN_MEMBER(timeplt_state::timeplt_interrupt)
 {
-
 	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
@@ -95,7 +94,6 @@ READ8_MEMBER(timeplt_state::psurge_protection_r)
 // chkun has access to an extra soundchip via ay2 port a
 WRITE8_MEMBER(timeplt_state::chkun_sound_w)
 {
-
 	// d0-d3: P0-P3
 	// d5: /R (unused?)
 	// d6: /W
@@ -454,13 +452,11 @@ GFXDECODE_END
 
 void timeplt_state::machine_start()
 {
-
 	save_item(NAME(m_nmi_enable));
 }
 
 void timeplt_state::machine_reset()
 {
-
 	m_nmi_enable = 0;
 }
 
@@ -470,7 +466,6 @@ static MACHINE_CONFIG_START( timeplt, timeplt_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)	/* not confirmed, but common for Konami games of the era */
 	MCFG_CPU_PROGRAM_MAP(timeplt_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", timeplt_state,  timeplt_interrupt)
-
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
@@ -483,7 +478,6 @@ static MACHINE_CONFIG_START( timeplt, timeplt_state )
 
 	MCFG_GFXDECODE(timeplt)
 	MCFG_PALETTE_LENGTH(32*4+64*4)
-
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(timeplt_sound)
@@ -712,7 +706,7 @@ GAME( 1982, timeplt,  0,       timeplt, timeplt, driver_device, 0, ROT90,  "Kona
 GAME( 1982, timepltc, timeplt, timeplt, timeplt, driver_device, 0, ROT90,  "Konami (Centuri license)", "Time Pilot (Centuri)", GAME_SUPPORTS_SAVE )
 GAME( 1982, timeplta, timeplt, timeplt, timeplt, driver_device, 0, ROT90,  "Konami (Atari license)", "Time Pilot (Atari)", GAME_SUPPORTS_SAVE )
 GAME( 1982, spaceplt, timeplt, timeplt, timeplt, driver_device, 0, ROT90,  "bootleg", "Space Pilot", GAME_SUPPORTS_SAVE )
-GAME( 1988, psurge,   0,       psurge,  psurge, driver_device,  0, ROT270, "Vision Electronics / Kyle Hodgetts", "Power Surge", GAME_SUPPORTS_SAVE )
+GAME( 1988, psurge,   0,       psurge,  psurge, driver_device,  0, ROT270, "Vision Electronics", "Power Surge", GAME_SUPPORTS_SAVE )
 // ROM says manufactured by Peni Soft for these two ... no, I'm not going to add THAT -.-"
 GAME( 1988, chkun,    0,       chkun,   chkun, driver_device,   0, ROT90,  "<unknown>", "Chance Kun (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1987, bikkuric, 0,       bikkuric,bikkuric, driver_device,0, ROT90,  "<unknown>", "Bikkuri Card (Japan)", GAME_SUPPORTS_SAVE )
