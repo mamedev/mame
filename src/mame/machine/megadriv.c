@@ -1309,30 +1309,27 @@ MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 
 MACHINE_CONFIG_END
 
-
-MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
-MACHINE_CONFIG_END
-
 struct cdrom_interface scd_cdrom =
 {
 	"scd_cdrom",
 	NULL
 };
 
+MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
+	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
+	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
+MACHINE_CONFIG_END
+
 /* Different Softlists for different regions (for now at least) */
 MACHINE_CONFIG_DERIVED( genesis_scd_scd, genesis_scd )
-	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","segacd")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( genesis_scd_mcd, genesis_scd )
-	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","megacd")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( genesis_scd_mcdj, genesis_scd )
-	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","megacdj")
 MACHINE_CONFIG_END
 
