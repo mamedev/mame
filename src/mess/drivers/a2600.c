@@ -13,7 +13,11 @@
 #include "imagedev/cassette.h"
 #include "formats/a26_cas.h"
 #include "video/tia.h"
+#include "machine/vcsctrl.h"
 #include "hashfile.h"
+
+#define CONTROL1_TAG	"joyport1"
+#define CONTROL2_TAG	"joyport2"
 
 struct df_t {
 	UINT8	top;
@@ -41,8 +45,11 @@ class a2600_state : public driver_device
 {
 public:
 	a2600_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_riot_ram(*this, "riot_ram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_riot_ram(*this, "riot_ram")
+//		, m_joy1(*this, CONTROL1_TAG)
+//		, m_joy2(*this, CONTROL2_TAG)
+		{ }
 
 	dpc_t m_dpc;
 	memory_region* m_extra_RAM;
@@ -121,6 +128,8 @@ public:
 	DECLARE_READ8_MEMBER(riot_input_port_8_r);
 
 protected:
+//	required_device<vcs_control_port_device> m_joy1;
+//	required_device<vcs_control_port_device> m_joy2;
 	int next_bank();
 	void modeF8_switch(UINT16 offset, UINT8 data);
 	void modeFA_switch(UINT16 offset, UINT8 data);
@@ -1193,7 +1202,7 @@ static ADDRESS_MAP_START(a2600_mem, AS_PROGRAM, 8, a2600_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007F) AM_MIRROR(0x0F00) AM_DEVREADWRITE("tia_video", tia_video_device, read, write)
 	AM_RANGE(0x0080, 0x00FF) AM_MIRROR(0x0D00) AM_RAM AM_SHARE("riot_ram")
-	AM_RANGE(0x0280, 0x029F) AM_MIRROR(0x0D00) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x0280, 0x029F) AM_MIRROR(0x0D00) AM_DEVREADWRITE("riot", riot6532_device, read, write)
 	AM_RANGE(0x1000, 0x1FFF)                   AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -1228,6 +1237,7 @@ READ8_MEMBER(a2600_state::switch_A_r)
 	case 0x00:  /* Joystick */
 	case 0x05:	/* Joystick w/Boostergrip */
 		val |= machine().root_device().ioport("SWA_JOY")->read() & 0xF0;
+//		val |= ( m_joy1->joy_r() & 0x0F ) << 4;
 		break;
 	case 0x01:  /* Paddle */
 		val |= machine().root_device().ioport("SWA_PAD")->read() & 0xF0;
@@ -2264,6 +2274,10 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 
 	/* devices */
 	MCFG_RIOT6532_ADD("riot", MASTER_CLOCK_NTSC / 3, r6532_interface)
+
+//	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
+//	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
+
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, a2600_cassette_interface )
@@ -2296,6 +2310,10 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 
 	/* devices */
 	MCFG_RIOT6532_ADD("riot", MASTER_CLOCK_PAL / 3, r6532_interface)
+
+//	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
+//	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
+
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, a2600_cassette_interface )
