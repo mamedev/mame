@@ -251,6 +251,6 @@ ROM_START(granny)
 ROM_END
 
 
-GAME( 1982, babypac,  0,        by133,  by133, driver_device,  0,  ROT90, "Bally",    "Baby Pac-Man (set 1)",     GAME_IS_SKELETON_MECHANICAL)
-GAME( 1982, babypac2, babypac,  by133,  by133, driver_device,  0,  ROT90, "Bally",    "Baby Pac-Man (set 2)",     GAME_IS_SKELETON_MECHANICAL)
+GAME( 1982, babypac,  0,        by133,  by133, driver_device,  0,  ROT90, "Dave Nutting Associates / Bally",    "Baby Pac-Man (set 1)",     GAME_IS_SKELETON_MECHANICAL)
+GAME( 1982, babypac2, babypac,  by133,  by133, driver_device,  0,  ROT90, "Dave Nutting Associates / Bally",    "Baby Pac-Man (set 2)",     GAME_IS_SKELETON_MECHANICAL)
 GAME( 1984, granny,   0,        by133,  by133, driver_device,  0,  ROT0,  "Bally",    "Granny and the Gators",    GAME_IS_SKELETON_MECHANICAL)
