@@ -531,6 +531,6 @@ void riot6532_device::device_reset()
 
 	/* reset timer states */
 	m_timershift = 0;
-	m_timerstate = TIMER_FINISHING;
+	m_timerstate = TIMER_COUNTING;
 	m_timer->adjust(attotime::from_ticks(256, clock()));
 }
