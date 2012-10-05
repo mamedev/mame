@@ -4186,7 +4186,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="demodrby">
+	<software name="demohrby">
 		<description>Demolition Herby</description>
 		<year>1983</year>
 		<publisher>Telesys</publisher>
@@ -4197,7 +4197,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="demodrbye" cloneof="demodrby">
+	<software name="demohrbye" cloneof="demohrby">
 		<description>Demolition Herby (PAL)</description>
 		<year>1983</year>
 		<publisher>Telesys</publisher>
@@ -4208,7 +4208,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="demodrbye1" cloneof="demodrby">
+	<software name="demohrbye1" cloneof="demohrby">
 		<description>Demolition Herby (PAL) (Unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

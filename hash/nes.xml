@@ -56531,6 +56531,22 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
+	<software name="smaruo">
+		<description>Super Maruo (Jpn)</description>
+		<year>1986</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="スーパーマルオ"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-CNROM" />
+			<dataarea name="chr" size="16384">
+				<rom name="super maruo.chr" size="16384" crc="5e3e5461" sha1="9d8eccd82987c090cb5924bf73fc67d4cd2b8452" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="super maruo.prg" size="32768" crc="778bcd22" sha1="e5b851f1cb3dc76d824ab69af988e35907be80b8" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="supshin">
 		<description>The Super Shinobi (Asia)</description>
 		<year>19??</year>
@@ -62813,10 +62829,10 @@ Other
 	</software>
 
 	<software name="angrybr2" cloneof="moaikun">
-		<description>Angry Bird 2 (Moai Kun pirate, Ripped from multicart)</description>
+		<description>Angry Birds 2 (Moai Kun pirate, Ripped from multicart)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
-		<info name="alt_title" value="愤怒的小鸟"/>
+		<info name="alt_title" value="愤怒的小鸟2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -62825,6 +62841,38 @@ Other
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="angry bird 2 (from multicart) (unl).prg" size="32768" crc="4fbc2f39" sha1="d20d48b2e90c987deaff83a867fee8c019d44e4b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="angrybr3">
+		<description>Angry Birds 3 (Chi)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="alt_title" value="愤怒的小鸟3"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="32768">
+				<rom name="angry bird 3.chr" size="32768" crc="03c91a82" sha1="40ffdbd7de4004534065e286e9084844c17d9a5c" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="angry bird 3.prg" size="65536" crc="d3dea6b3" sha1="162262daa614c8b75edf8eb7b31cf0fac427a59f" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="angrybr4" cloneof="tnzs">
+		<description>Angry Birds 4 (The New Zealand Story pirate)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="alt_title" value="愤怒的小鸟4"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="angry bird 4.chr" size="131072" crc="29ec2535" sha1="93328fa78f52f71afa2723e53f03d93f978f9d76" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="angry bird 4.prg" size="131072" crc="74b39f6a" sha1="df22008dc1505651cc963524282a4ffb0763b8e8" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -63808,6 +63856,22 @@ resulting in tons of glitches? -->
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="poke tetris (unl) [bad rom].prg" size="32768" crc="a2e3783c" sha1="f9fed28d36c028af6c60da75f71c019d424e150b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plantzom" supported="partial">
+		<description>Plants Vs. Zombies (Chi)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="alt_title" value="植物大战僵尸"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-AOROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="plants vs zomb.chr" size="131072" crc="b41a1d2e" sha1="599a24f0b1eda249b24825afeedef8901f12207a" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="plants vs zomb.prg" size="131072" crc="76dcd3aa" sha1="556dc7fd25a85cfdc5611c7e2b0ef26d6d6f7bf2" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

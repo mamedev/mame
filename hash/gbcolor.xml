@@ -16,14 +16,12 @@ Undumped:
 - Dragon Warrior Monsters DMG-AWQP-UKV
 - Elmo's 123s DMG-AE3P-EUR
 - Elmo's ABCs DMG-AEAP-EUR
-- Heroes of Might and Magic CGB-AUHP-EUR/EUU
 - Hot Wheels - Stunt Track Driver DMG-AHEP-EUR
 - Joust &amp; Defender DMG-AAOP-EUR
 - The Lion King - Simba's Mighty Adventure CGB-BLKP-UKV
 - Mary-Kate and Ashley - Crush Course CGB-BCVP-UKV
 - Mary-Kate and Ashley - Pocket Planner DMG-BMAP-EUR
 - Mickey's Racing Adventure CGB-ARNP-EUR
-- Microsoft Pinball Arcade CGB-BMQP-EUR
 - MTV Sports - Skateboarding featuring Andy MacDonald CGB-BMTP-EUR
 - NHL 2000 DMG-ANRP-EUR
 - Rampage 2 - Universal Tour CGB-AUTP-EUR
@@ -6533,6 +6531,19 @@ Undumped Pirates:
 
 	<software name="mightmag">
 		<!-- Notes: GBC only -->
+		<description>Heroes of Might and Magic (Euro)</description>
+		<year>2000</year>
+		<publisher>3DO</publisher>
+		<info name="serial" value="CGB-AUHP-EUR"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="heroesmmauhp.bin" size="1048576" crc="e0b9fd3b" sha1="d6471849187edcf68e61ed98558d9326a44cf2dc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mightmagu" cloneof="mightmag">
+		<!-- Notes: GBC only -->
 		<description>Heroes of Might and Magic (USA)</description>
 		<year>2000</year>
 		<publisher>3DO</publisher>
@@ -10154,6 +10165,19 @@ Undumped Pirates:
 	</software>
 
 	<software name="mspinb">
+		<!-- Notes: GBC only -->
+		<description>Microsoft Pinball Arcade (Euro)</description>
+		<year>2001</year>
+		<publisher>Cryo Interactive</publisher>
+		<info name="serial" value="CGB-BMQP-EUR"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="mspinballbmqp.bin" size="1048576" crc="4eb7db14" sha1="f2874f0f3023d96edbdb94e5c0dc181d8baa3efb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mspinbu" cloneof="mspinb">
 		<!-- Notes: GBC only -->
 		<description>Microsoft Pinball Arcade (USA)</description>
 		<year>2001</year>
@@ -19079,6 +19103,31 @@ Undumped Pirates:
 
 
 <!-- Other Asian Pirate dumps -->
+
+	<software name="smbl3">
+		<description>Shu Ma Bao Long 3 - Shui Jing Ban (Chi)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="數碼暴龍3-水晶版"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="shu ma bao long 3 - shui jing ban (unlicensed, chinese) [raw dump].bin" size="2097152" crc="8bfbe00a" sha1="ca35357c3be6c55ca1ec692203ce0944f5082c4c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smbl9">
+		<description>Shu Ma Bao Long 9 - Bao Long Pian 2002 (Chi)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="CK019-1"/>
+		<info name="alt_title" value="數碼暴龍3-水晶版"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="shu ma bao long 9 - bao long pian 2002 (unlicensed, chinese) [raw dump].bin" size="4194304" crc="76ab97f6" sha1="c3d9e17c9b01959b64a7c662479c755f757f58c9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 <!-- 1byte difference between this and the hacked version... check what is about! -->
 	<software name="chongwu" supported="no">

@@ -4154,7 +4154,7 @@
 		</part>
 	</software>
 
-	<software name="ddragon3">
+	<software name="ddragon3" supported="no">
 		<!-- Alt. Title: Double Dragon 3 - The Arcade Game (Box) -->
 		<description>Double Dragon 3 (Euro, USA)</description>
 		<year>1992</year>
@@ -4355,7 +4355,7 @@
 		</part>
 	</software>
 
-	<software name="dbzgeki">
+	<software name="dbzgeki" supported="partial">
 		<!-- Notes: SGB enhanced -->
 		<description>Dragon Ball Z - Gokuu Gekitouden (Jpn)</description>
 		<year>1995</year>
