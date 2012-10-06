@@ -84,7 +84,7 @@ protected:
 	required_device<device_t> m_adlc;
 	required_device<mc146818_device> m_rtc;
 	required_device<ram_device> m_ram;
-	required_device<scsibus_device> m_scsibus;
+	required_device<scsicb_device> m_scsibus;
 
 	inline void update_interrupts();
 	inline void network_irq_enable(int enabled);

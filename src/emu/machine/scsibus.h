@@ -92,31 +92,11 @@ public:
 
 	UINT8 scsi_data_r();
 	void scsi_data_w( UINT8 data );
-	DECLARE_READ8_MEMBER( scsi_data_r );
-	DECLARE_WRITE8_MEMBER( scsi_data_w );
 
 	/* Get/Set lines */
 
 	UINT8 get_scsi_line(UINT8 lineno);
 	void set_scsi_line(UINT8 line, UINT8 state);
-
-	DECLARE_READ_LINE_MEMBER( scsi_bsy_r );
-	DECLARE_READ_LINE_MEMBER( scsi_sel_r );
-	DECLARE_READ_LINE_MEMBER( scsi_cd_r );
-	DECLARE_READ_LINE_MEMBER( scsi_io_r );
-	DECLARE_READ_LINE_MEMBER( scsi_msg_r );
-	DECLARE_READ_LINE_MEMBER( scsi_req_r );
-	DECLARE_READ_LINE_MEMBER( scsi_ack_r );
-	DECLARE_READ_LINE_MEMBER( scsi_rst_r );
-
-	DECLARE_WRITE_LINE_MEMBER( scsi_bsy_w );
-	DECLARE_WRITE_LINE_MEMBER( scsi_sel_w );
-	DECLARE_WRITE_LINE_MEMBER( scsi_cd_w );
-	DECLARE_WRITE_LINE_MEMBER( scsi_io_w );
-	DECLARE_WRITE_LINE_MEMBER( scsi_msg_w );
-	DECLARE_WRITE_LINE_MEMBER( scsi_req_w );
-	DECLARE_WRITE_LINE_MEMBER( scsi_ack_w );
-	DECLARE_WRITE_LINE_MEMBER( scsi_rst_w );
 
 protected:
 	// device-level overrides

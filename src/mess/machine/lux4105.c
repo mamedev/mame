@@ -178,7 +178,7 @@ inline void luxor_4105_device::update_trrq_int()
 luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, LUXOR_4105, "Luxor 4105", tag, owner, clock),
 	  device_abc1600bus_card_interface(mconfig, *this),
-	  m_sasibus(*this, SASIBUS_TAG),
+	  m_sasibus(*this, SASIBUS_TAG ":host"),
 	  m_io(1)
 {
 }

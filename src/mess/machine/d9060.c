@@ -424,14 +424,14 @@ WRITE_LINE_MEMBER( base_d9060_device::enable_w )
 
 static const via6522_interface via_intf =
 {
-	DEVCB_DEVICE_MEMBER(SASIBUS_TAG, scsibus_device, scsi_data_r),
+	DEVCB_DEVICE_MEMBER(SASIBUS_TAG ":host", scsicb_device, scsi_data_r),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, via_pb_r),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, req_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_MEMBER(SASIBUS_TAG, scsibus_device, scsi_data_w),
+	DEVCB_DEVICE_MEMBER(SASIBUS_TAG ":host", scsicb_device, scsi_data_w),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, via_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -514,7 +514,7 @@ base_d9060_device::base_d9060_device(const machine_config &mconfig, device_type 
 	  m_riot0(*this, M6532_0_TAG),
 	  m_riot1(*this, M6532_1_TAG),
 	  m_via(*this, M6522_TAG),
-	  m_sasibus(*this, SASIBUS_TAG),
+	  m_sasibus(*this, SASIBUS_TAG ":host"),
 	  m_rfdo(1),
 	  m_daco(1),
 	  m_atna(1),

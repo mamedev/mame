@@ -74,7 +74,7 @@ public:
 		  m_timer_sio(*this, TIMER_SIO_TAG),
 		  m_timer_ack(*this, TIMER_ACK_TAG),
 		  m_timer_rst(*this, TIMER_RST_TAG),
-		  m_sasibus(*this, SASIBUS_TAG)
+		  m_sasibus(*this, SASIBUS_TAG ":host")
 	,
 		m_video_ram(*this, "video_ram"){ }
 
@@ -93,7 +93,7 @@ public:
 	required_device<timer_device> m_timer_sio;
 	required_device<timer_device> m_timer_ack;
 	required_device<timer_device> m_timer_rst;
-	required_device<scsibus_device> m_sasibus;
+	required_device<scsicb_device> m_sasibus;
 
 	virtual void machine_start();
 	virtual void machine_reset();

@@ -102,10 +102,10 @@ class bulletf_state : public bullet_state
 public:
 	bulletf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: bullet_state(mconfig, type, tag),
-		  m_scsibus(*this, SCSIBUS_TAG)
+		  m_scsibus(*this, SCSIBUS_TAG ":host")
 	{ }
 
-	required_device<scsibus_device> m_scsibus;
+	required_device<scsicb_device> m_scsibus;
 
 	virtual void machine_start();
 	virtual void machine_reset();

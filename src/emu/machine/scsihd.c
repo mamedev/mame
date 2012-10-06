@@ -25,6 +25,8 @@ scsihd_device::scsihd_device(const machine_config &mconfig, device_type type, co
 
 void scsihd_device::device_start()
 {
+	scsihle_device::device_start();
+
 	save_item( NAME( lba ) );
 	save_item( NAME( blocks ) );
 }

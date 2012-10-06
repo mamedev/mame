@@ -446,7 +446,7 @@ static ADDRESS_MAP_START( v1050_io, AS_IO, 8, v1050_state )
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(dint_clr_r, dint_clr_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(v1050_i8214_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(bank_w)
-	AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE(SASIBUS_TAG, scsibus_device, scsi_data_r, scsi_data_w)
+	AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE(SASIBUS_TAG ":host", scsicb_device, scsi_data_r, scsi_data_w)
 	AM_RANGE(0xe1, 0xe1) AM_READWRITE(sasi_status_r, sasi_ctrl_w)
 ADDRESS_MAP_END
 
