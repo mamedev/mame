@@ -29,25 +29,25 @@ void scsicb_device::device_start()
 
 UINT8 scsicb_device::scsi_data_r()
 {
-	scsibus_device *m_scsibus = reinterpret_cast<scsibus_device *>( owner() );
+	scsibus_device *m_scsibus = downcast<scsibus_device *>( owner() );
 	return m_scsibus->scsi_data_r();
 }
 
 void scsicb_device::scsi_data_w( UINT8 data )
 {
-	scsibus_device *m_scsibus = reinterpret_cast<scsibus_device *>( owner() );
+	scsibus_device *m_scsibus = downcast<scsibus_device *>( owner() );
 	m_scsibus->scsi_data_w( data );
 }
 
 UINT8 scsicb_device::get_scsi_line( UINT8 line )
 {
-	scsibus_device *m_scsibus = reinterpret_cast<scsibus_device *>( owner() );
+	scsibus_device *m_scsibus = downcast<scsibus_device *>( owner() );
 	return m_scsibus->get_scsi_line( line );
 }
 
 void scsicb_device::set_scsi_line( UINT8 line, UINT8 state )
 {
-	scsibus_device *m_scsibus = reinterpret_cast<scsibus_device *>( owner() );
+	scsibus_device *m_scsibus = downcast<scsibus_device *>( owner() );
 	m_scsibus->set_scsi_line( line, state );
 }
 
