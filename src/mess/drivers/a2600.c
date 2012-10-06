@@ -1195,24 +1195,13 @@ depending on last byte & 0x20 -> 0x00 -> switch to bank #1
 
 DIRECT_UPDATE_MEMBER(a2600_state::modeFE_opbase_handler)
 {
-	if ( ! direct.space().debugger_access() )
-	{
-		if ( ! m_FETimer )
-		{
-			/* Still cheating a bit here by looking bit 13 of the address..., but the high byte of the
-               cpu should be the last byte that was on the data bus and so should determine the bank
-               we should switch in. */
-			m_bank_base[1] = memregion("user1")->base() + 0x1000 * ( ( address & 0x2000 ) ? 0 : 1 );
-			membank("bank1")->set_base(m_bank_base[1] );
-			/* and restore old opbase handler */
-			machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(m_FE_old_opbase_handler);
-		}
-		else
-		{
-			/* Wait for one memory access to have passed (reading of new PCH either from code or from stack) */
-			m_FETimer--;
-		}
-	}
+	/* Still cheating a bit here by looking bit 13 of the address..., but the high byte of the
+       cpu should be the last byte that was on the data bus and so should determine the bank
+       we should switch in. */
+	m_bank_base[1] = memregion("user1")->base() + 0x1000 * ( ( machine().device("maincpu")->safe_pc() & 0x2000 ) ? 0 : 1 );
+	membank("bank1")->set_base(m_bank_base[1] );
+	/* and restore old opbase handler */
+	machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(m_FE_old_opbase_handler);
 	return address;
 }
 
@@ -1222,20 +1211,25 @@ void a2600_state::modeFE_switch(UINT16 offset, UINT8 data)
 	/* Retrieve last byte read by the cpu (for this mapping scheme this
        should be the last byte that was on the data bus
     */
-	m_FETimer = 1;
 	m_FE_old_opbase_handler = space.set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeFE_opbase_handler), this));
 }
 
 READ8_MEMBER(a2600_state::modeFE_switch_r)
 {
-	modeFE_switch(offset, 0 );
-	return space.read_byte(0xFE );
+	if ( ! space.debugger_access() )
+	{
+		modeFE_switch(offset, 0 );
+	}
+	return space.read_byte(0xFE);
 }
 
 WRITE8_MEMBER(a2600_state::modeFE_switch_w)
 {
 	space.write_byte(0xFE, data );
-	modeFE_switch(offset, 0 );
+	if ( ! space.debugger_access() )
+	{
+		modeFE_switch(offset, 0 );
+	}
 }
 
 READ8_MEMBER(a2600_state::current_bank_r)
