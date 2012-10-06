@@ -848,3 +848,8 @@ void gdrom_device::SetDevice( void *_cdrom )
 {
 	cdrom = (cdrom_file *) _cdrom;
 }
+
+int gdrom_device::GetSectorBytes()
+{
+	return bytes_per_sector;
+}

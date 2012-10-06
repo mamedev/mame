@@ -22,6 +22,7 @@ public:
 	virtual void ExecCommand( int *transferLength );
 	virtual void WriteData( UINT8 *data, int dataLength );
 	virtual void ReadData( UINT8 *data, int dataLength );
+	virtual int GetSectorBytes();
 
 	static struct cdrom_interface cd_intf;
 
