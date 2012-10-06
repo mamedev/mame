@@ -849,7 +849,10 @@ DIRECT_UPDATE_MEMBER(a2600_state::modeF6_opbase)
 {
 	if ( ( address & 0x1FFF ) >= 0x1FF6 && ( address & 0x1FFF ) <= 0x1FF9 )
 	{
-		modeF6_switch_w(machine().device("maincpu")->memory().space(AS_PROGRAM), ( address & 0x1FFF ) - 0x1FF6, 0 );
+		if ( ! direct.space().debugger_access() )
+		{
+			modeF6_switch_w(machine().device("maincpu")->memory().space(AS_PROGRAM), ( address & 0x1FFF ) - 0x1FF6, 0 );
+		}
 	}
 	return address;
 }
@@ -858,15 +861,18 @@ DIRECT_UPDATE_MEMBER(a2600_state::modeSS_opbase)
 {
 	if ( address & 0x1000 )
 	{
-		if ( address & 0x800 )
+		if ( ! direct.space().debugger_access() )
 		{
-			direct.explicit_configure(( address & 0xf800 ), ( address & 0xf800 ) | 0x7ff, 0x7ff, m_bank_base[2]);
+			if ( address & 0x800 )
+			{
+				direct.explicit_configure(( address & 0xf800 ), ( address & 0xf800 ) | 0x7ff, 0x7ff, m_bank_base[2]);
+			}
+			else
+			{
+				direct.explicit_configure(( address & 0xf800 ), ( address & 0xf800 ) | 0x7ff, 0x7ff, m_bank_base[1]);
+			}
+			return ~0;
 		}
-		else
-		{
-			direct.explicit_configure(( address & 0xf800 ), ( address & 0xf800 ) | 0x7ff, 0x7ff, m_bank_base[1]);
-		}
-		return ~0;
 	}
 	return address;
 }
@@ -1039,11 +1045,14 @@ TIMER_CALLBACK_MEMBER(a2600_state::modeDPC_timer_callback)
 
 DIRECT_UPDATE_MEMBER(a2600_state::modeDPC_opbase_handler)
 {
-	UINT8	new_bit;
-	new_bit = ( m_dpc.shift_reg & 0x80 ) ^ ( ( m_dpc.shift_reg & 0x20 ) << 2 );
-	new_bit = new_bit ^ ( ( ( m_dpc.shift_reg & 0x10 ) << 3 ) ^ ( ( m_dpc.shift_reg & 0x08 ) << 4 ) );
-	new_bit = new_bit ^ 0x80;
-	m_dpc.shift_reg = new_bit | ( m_dpc.shift_reg >> 1 );
+	if ( ! direct.space().debugger_access() )
+	{
+		UINT8	new_bit;
+		new_bit = ( m_dpc.shift_reg & 0x80 ) ^ ( ( m_dpc.shift_reg & 0x20 ) << 2 );
+		new_bit = new_bit ^ ( ( ( m_dpc.shift_reg & 0x10 ) << 3 ) ^ ( ( m_dpc.shift_reg & 0x08 ) << 4 ) );
+		new_bit = new_bit ^ 0x80;
+		m_dpc.shift_reg = new_bit | ( m_dpc.shift_reg >> 1 );
+	}
 	return address;
 }
 
@@ -1186,20 +1195,23 @@ depending on last byte & 0x20 -> 0x00 -> switch to bank #1
 
 DIRECT_UPDATE_MEMBER(a2600_state::modeFE_opbase_handler)
 {
-	if ( ! m_FETimer )
+	if ( ! direct.space().debugger_access() )
 	{
-		/* Still cheating a bit here by looking bit 13 of the address..., but the high byte of the
-           cpu should be the last byte that was on the data bus and so should determine the bank
-           we should switch in. */
-		m_bank_base[1] = memregion("user1")->base() + 0x1000 * ( ( address & 0x2000 ) ? 0 : 1 );
-		membank("bank1")->set_base(m_bank_base[1] );
-		/* and restore old opbase handler */
-		machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(m_FE_old_opbase_handler);
-	}
-	else
-	{
-		/* Wait for one memory access to have passed (reading of new PCH either from code or from stack) */
-		m_FETimer--;
+		if ( ! m_FETimer )
+		{
+			/* Still cheating a bit here by looking bit 13 of the address..., but the high byte of the
+               cpu should be the last byte that was on the data bus and so should determine the bank
+               we should switch in. */
+			m_bank_base[1] = memregion("user1")->base() + 0x1000 * ( ( address & 0x2000 ) ? 0 : 1 );
+			membank("bank1")->set_base(m_bank_base[1] );
+			/* and restore old opbase handler */
+			machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(m_FE_old_opbase_handler);
+		}
+		else
+		{
+			/* Wait for one memory access to have passed (reading of new PCH either from code or from stack) */
+			m_FETimer--;
+		}
 	}
 	return address;
 }
