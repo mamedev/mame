@@ -506,7 +506,7 @@ static void video_update_common(screen_device &screen, bitmap_ind16 &bitmap, con
 		UINT16 *sprbase = &state->m_sprite_bitmap->pix16(y & 0xff);
 		UINT16 *dstbase = &bitmap.pix16(y);
 		int bgy = (y + bgyscroll) & 0x1ff;
-		int bgxscroll = bgrowscroll[y / 8];
+		int bgxscroll = bgrowscroll[y >> 3 & 0x1f];
 		UINT16 *bgbase[2];
 
 		/* get the base of the left and right pixmaps for the effective background Y */
