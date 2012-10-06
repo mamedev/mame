@@ -255,10 +255,10 @@ READ8_DEVICE_HANDLER( riot6532_r )
 
 READ8_MEMBER( riot6532_device::read )
 {
-	return reg_r(offset);
+	return reg_r(offset, space.debugger_access());
 }
 
-UINT8 riot6532_device::reg_r(UINT8 offset)
+UINT8 riot6532_device::reg_r(UINT8 offset, bool debugger_access)
 {
 	UINT8 val = 0;
 
@@ -267,9 +267,12 @@ UINT8 riot6532_device::reg_r(UINT8 offset)
 	{
 		val = m_irqstate;
 
-		/* implicitly clears the PA7 flag */
-		m_irqstate &= ~PA7_FLAG;
-		update_irqstate();
+		if ( ! debugger_access )
+		{
+			/* implicitly clears the PA7 flag */
+			m_irqstate &= ~PA7_FLAG;
+			update_irqstate();
+		}
 	}
 
 	/* if A2 == 1 and A0 == 0, we are reading the timer */
@@ -277,22 +280,25 @@ UINT8 riot6532_device::reg_r(UINT8 offset)
 	{
 		val = get_timer();
 
-		/* A3 contains the timer IRQ enable */
-		if (offset & 8)
+		if ( ! debugger_access )
 		{
-			m_irqenable |= TIMER_FLAG;
-		}
-		else
-		{
-			m_irqenable &= ~TIMER_FLAG;
-		}
+			/* A3 contains the timer IRQ enable */
+			if (offset & 8)
+			{
+				m_irqenable |= TIMER_FLAG;
+			}
+			else
+			{
+				m_irqenable &= ~TIMER_FLAG;
+			}
 
-		/* implicitly clears the timer flag */
-		if (m_timerstate != TIMER_FINISHING || val != 0xff)
-		{
-			m_irqstate &= ~TIMER_FLAG;
+			/* implicitly clears the timer flag */
+			if (m_timerstate != TIMER_FINISHING || val != 0xff)
+			{
+				m_irqstate &= ~TIMER_FLAG;
+			}
+			update_irqstate();
 		}
-		update_irqstate();
 	}
 
 	/* if A2 == 0 and A0 == anything, we are reading from ports */
@@ -318,7 +324,10 @@ UINT8 riot6532_device::reg_r(UINT8 offset)
 				/* changes to port A need to update the PA7 state */
 				if (port == &m_port[0])
 				{
-					update_pa7_state();
+					if ( ! debugger_access )
+					{
+						update_pa7_state();
+					}
 				}
 			}
 

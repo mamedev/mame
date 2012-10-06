@@ -53,7 +53,7 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-    UINT8 reg_r(UINT8 offset);
+    UINT8 reg_r(UINT8 offset, bool debugger_access = false);
     void reg_w(UINT8 offset, UINT8 data);
 
     void porta_in_set(UINT8 data, UINT8 mask);
