@@ -62,6 +62,7 @@ even if you have to use unusual geometry to do so !
 #include "machine/i8251.h"
 #include "machine/ctronics.h"
 #include "machine/6522via.h"
+#include "machine/scsibus.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 
@@ -2292,7 +2293,6 @@ READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
 {
 	int result = 0;
 	device_t *fdc = machine().device(FDC_TAG);
-	scsibus_device *hdc = machine().device<scsibus_device>(SCSIBUS_TAG);
 
 	int pc=space.device().safe_pc();
 	rmnimbus_state *state = machine().driver_data<rmnimbus_state>();
@@ -2323,7 +2323,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
 			result=m_nimbus_drives.reg410_in ^ INV_BITS_410;
 			break;
 		case 0x18 :
-			result = hdc->scsi_data_r();
+			result = m_scsibus->scsi_data_r();
 			hdc_post_rw(machine());
 		default:
 			break;
@@ -2360,7 +2360,6 @@ READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
 WRITE8_MEMBER(rmnimbus_state::nimbus_disk_w)
 {
 	device_t *fdc = machine().device(FDC_TAG);
-	scsibus_device *hdc = machine().device<scsibus_device>(SCSIBUS_TAG);
     int                 pc=space.device().safe_pc();
     UINT8               reg400_old = m_nimbus_drives.reg400;
 
@@ -2403,7 +2402,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_disk_w)
             break;
 
         case 0x18 :
-            hdc->scsi_data_w(data);
+            m_scsibus->scsi_data_w(data);
             hdc_post_rw(machine());
             break;
 	}
@@ -2412,14 +2411,13 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_disk_w)
 static void hdc_reset(running_machine &machine)
 {
 	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	scsibus_device *hdc = machine.device<scsibus_device>(SCSIBUS_TAG);
 
     state->m_nimbus_drives.reg410_in=0;
-    state->m_nimbus_drives.reg410_in |= (hdc->get_scsi_line(SCSI_LINE_REQ) ? HDC_REQ_MASK : 0);
-    state->m_nimbus_drives.reg410_in |= (hdc->get_scsi_line(SCSI_LINE_CD)  ? HDC_CD_MASK  : 0);
-    state->m_nimbus_drives.reg410_in |= (hdc->get_scsi_line(SCSI_LINE_IO)  ? HDC_IO_MASK  : 0);
-    state->m_nimbus_drives.reg410_in |= (hdc->get_scsi_line(SCSI_LINE_BSY) ? HDC_BSY_MASK : 0);
-    state->m_nimbus_drives.reg410_in |= (hdc->get_scsi_line(SCSI_LINE_MSG) ? HDC_MSG_MASK : 0);
+    state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_req_r() ? HDC_REQ_MASK : 0);
+    state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_cd_r()  ? HDC_CD_MASK  : 0);
+    state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_io_r()  ? HDC_IO_MASK  : 0);
+    state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_bsy_r() ? HDC_BSY_MASK : 0);
+    state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_msg_r() ? HDC_MSG_MASK : 0);
 
     state->m_nimbus_drives.drq_ff=0;
 }
@@ -2427,7 +2425,6 @@ static void hdc_reset(running_machine &machine)
 static void hdc_ctrl_write(running_machine &machine, UINT8 data)
 {
 	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	scsibus_device *hdc = machine.device<scsibus_device>(SCSIBUS_TAG);
 
     // If we enable the HDC interupt, and an interrupt is pending, go deal with it.
     if(((data & HDC_IRQ_MASK) && (~state->m_nimbus_drives.reg410_out & HDC_IRQ_MASK)) &&
@@ -2436,17 +2433,16 @@ static void hdc_ctrl_write(running_machine &machine, UINT8 data)
 
     state->m_nimbus_drives.reg410_out=data;
 
-    hdc->set_scsi_line(SCSI_LINE_RESET, (data & HDC_RESET_MASK) ? 0 : 1);
-    hdc->set_scsi_line(SCSI_LINE_SEL, (data & HDC_SEL_MASK) ? 0 : 1);
+    state->m_scsibus->scsi_rst_w((data & HDC_RESET_MASK) ? 0 : 1);
+    state->m_scsibus->scsi_sel_w((data & HDC_SEL_MASK) ? 0 : 1);
 }
 
 static void hdc_post_rw(running_machine &machine)
 {
 	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	scsibus_device *hdc = machine.device<scsibus_device>(SCSIBUS_TAG);
 
     if((state->m_nimbus_drives.reg410_in & HDC_REQ_MASK)==0)
-        hdc->set_scsi_line(SCSI_LINE_ACK,0);
+        state->m_scsibus->scsi_ack_w(0);
 
     state->m_nimbus_drives.drq_ff=0;
 }
@@ -2500,8 +2496,7 @@ void nimbus_scsi_linechange(device_t *device, UINT8 line, UINT8 state)
         }
         else
 		{
-			scsibus_device *hdc = downcast<scsibus_device *>(device);
-			hdc->set_scsi_line(SCSI_LINE_ACK,1);
+			drvstate->m_scsibus->scsi_ack_w(1);
 		}
     }
 }

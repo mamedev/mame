@@ -8,7 +8,7 @@
 
 #include "machine/z80sio.h"
 #include "machine/wd17xx.h"
-#include "machine/scsibus.h"
+#include "machine/scsicb.h"
 #include "machine/6522via.h"
 
 #define MAINCPU_TAG "maincpu"
@@ -169,79 +169,6 @@ struct mouse_joy_state
 	UINT8   m_reg0a4;
 
 	emu_timer   *m_mouse_timer;
-};
-
-
-class rmnimbus_state : public driver_device
-{
-public:
-	rmnimbus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
-	UINT32 m_debug_machine;
-	i186_state m_i186;
-	keyboard_t m_keyboard;
-	nimbus_drives_t m_nimbus_drives;
-	ipc_interface_t m_ipc_interface;
-	UINT8 m_mcu_reg080;
-	UINT8 m_iou_reg092;
-	UINT8 m_last_playmode;
-	mouse_joy_state m_nimbus_mouse;
-	UINT8 m_ay8910_a;
-	UINT16 m_IOPorts[num_ioports];
-	UINT8 m_sio_int_state;
-	UINT8 m_video_mem[SCREEN_WIDTH_PIXELS][SCREEN_HEIGHT_LINES];
-	UINT16 m_vidregs[NO_VIDREGS];
-	UINT8 m_bpp;
-	UINT16 m_pixel_mask;
-	UINT8 m_hs_count;
-	UINT32 m_debug_video;
-	DECLARE_READ16_MEMBER(nimbus_i186_internal_port_r);
-	DECLARE_WRITE16_MEMBER(nimbus_i186_internal_port_w);
-	DECLARE_READ8_MEMBER(nimbus_mcu_r);
-	DECLARE_WRITE8_MEMBER(nimbus_mcu_w);
-	DECLARE_READ16_MEMBER(nimbus_io_r);
-	DECLARE_WRITE16_MEMBER(nimbus_io_w);
-	DECLARE_READ8_MEMBER(nimbus_disk_r);
-	DECLARE_WRITE8_MEMBER(nimbus_disk_w);
-	DECLARE_READ8_MEMBER(nimbus_pc8031_r);
-	DECLARE_WRITE8_MEMBER(nimbus_pc8031_w);
-	DECLARE_READ8_MEMBER(nimbus_pc8031_iou_r);
-	DECLARE_WRITE8_MEMBER(nimbus_pc8031_iou_w);
-	DECLARE_READ8_MEMBER(nimbus_pc8031_port_r);
-	DECLARE_WRITE8_MEMBER(nimbus_pc8031_port_w);
-	DECLARE_READ8_MEMBER(nimbus_iou_r);
-	DECLARE_WRITE8_MEMBER(nimbus_iou_w);
-	DECLARE_READ8_MEMBER(nimbus_sound_ay8910_r);
-	DECLARE_WRITE8_MEMBER(nimbus_sound_ay8910_w);
-	DECLARE_WRITE8_MEMBER(nimbus_sound_ay8910_porta_w);
-	DECLARE_WRITE8_MEMBER(nimbus_sound_ay8910_portb_w);
-	DECLARE_READ8_MEMBER(nimbus_mouse_js_r);
-	DECLARE_WRITE8_MEMBER(nimbus_mouse_js_w);
-	DECLARE_READ16_MEMBER(nimbus_video_io_r);
-	DECLARE_WRITE16_MEMBER(nimbus_video_io_w);
-	DECLARE_DRIVER_INIT(nimbus);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
-	virtual void video_reset();
-	virtual void palette_init();
-	UINT32 screen_update_nimbus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_nimbus(screen_device &screen, bool state);
-	TIMER_CALLBACK_MEMBER(internal_timer_int);
-	TIMER_CALLBACK_MEMBER(dma_timer_callback);
-	TIMER_CALLBACK_MEMBER(keyscan_callback);
-	TIMER_CALLBACK_MEMBER(mouse_callback);
-	DECLARE_WRITE_LINE_MEMBER(sio_interrupt);
-	DECLARE_WRITE8_MEMBER(sio_dtr_w);
-	DECLARE_WRITE16_MEMBER(sio_serial_transmit);
-	DECLARE_READ16_MEMBER(sio_serial_receive);
-	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_drq_w);
-	DECLARE_READ8_MEMBER(nimbus_via_read_portb);
-	DECLARE_WRITE8_MEMBER(nimbus_via_write_portb);
-	DECLARE_WRITE_LINE_MEMBER(nimbus_via_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(nimbus_ack_w);
 };
 
 
@@ -461,3 +388,79 @@ extern const via6522_interface nimbus_via;
 #define LINEAR_ADDR(seg,ofs)    ((seg<<4)+ofs)
 
 #define OUTPUT_SEGOFS(mess,seg,ofs)  logerror("%s=%04X:%04X [%08X]\n",mess,seg,ofs,((seg<<4)+ofs))
+
+class rmnimbus_state : public driver_device
+{
+public:
+	rmnimbus_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		  m_scsibus(*this, SCSIBUS_TAG ":host")
+	{
+	}
+
+	required_device<scsicb_device> m_scsibus;
+	UINT32 m_debug_machine;
+	i186_state m_i186;
+	keyboard_t m_keyboard;
+	nimbus_drives_t m_nimbus_drives;
+	ipc_interface_t m_ipc_interface;
+	UINT8 m_mcu_reg080;
+	UINT8 m_iou_reg092;
+	UINT8 m_last_playmode;
+	mouse_joy_state m_nimbus_mouse;
+	UINT8 m_ay8910_a;
+	UINT16 m_IOPorts[num_ioports];
+	UINT8 m_sio_int_state;
+	UINT8 m_video_mem[SCREEN_WIDTH_PIXELS][SCREEN_HEIGHT_LINES];
+	UINT16 m_vidregs[NO_VIDREGS];
+	UINT8 m_bpp;
+	UINT16 m_pixel_mask;
+	UINT8 m_hs_count;
+	UINT32 m_debug_video;
+	DECLARE_READ16_MEMBER(nimbus_i186_internal_port_r);
+	DECLARE_WRITE16_MEMBER(nimbus_i186_internal_port_w);
+	DECLARE_READ8_MEMBER(nimbus_mcu_r);
+	DECLARE_WRITE8_MEMBER(nimbus_mcu_w);
+	DECLARE_READ16_MEMBER(nimbus_io_r);
+	DECLARE_WRITE16_MEMBER(nimbus_io_w);
+	DECLARE_READ8_MEMBER(nimbus_disk_r);
+	DECLARE_WRITE8_MEMBER(nimbus_disk_w);
+	DECLARE_READ8_MEMBER(nimbus_pc8031_r);
+	DECLARE_WRITE8_MEMBER(nimbus_pc8031_w);
+	DECLARE_READ8_MEMBER(nimbus_pc8031_iou_r);
+	DECLARE_WRITE8_MEMBER(nimbus_pc8031_iou_w);
+	DECLARE_READ8_MEMBER(nimbus_pc8031_port_r);
+	DECLARE_WRITE8_MEMBER(nimbus_pc8031_port_w);
+	DECLARE_READ8_MEMBER(nimbus_iou_r);
+	DECLARE_WRITE8_MEMBER(nimbus_iou_w);
+	DECLARE_READ8_MEMBER(nimbus_sound_ay8910_r);
+	DECLARE_WRITE8_MEMBER(nimbus_sound_ay8910_w);
+	DECLARE_WRITE8_MEMBER(nimbus_sound_ay8910_porta_w);
+	DECLARE_WRITE8_MEMBER(nimbus_sound_ay8910_portb_w);
+	DECLARE_READ8_MEMBER(nimbus_mouse_js_r);
+	DECLARE_WRITE8_MEMBER(nimbus_mouse_js_w);
+	DECLARE_READ16_MEMBER(nimbus_video_io_r);
+	DECLARE_WRITE16_MEMBER(nimbus_video_io_w);
+	DECLARE_DRIVER_INIT(nimbus);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void video_reset();
+	virtual void palette_init();
+	UINT32 screen_update_nimbus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_nimbus(screen_device &screen, bool state);
+	TIMER_CALLBACK_MEMBER(internal_timer_int);
+	TIMER_CALLBACK_MEMBER(dma_timer_callback);
+	TIMER_CALLBACK_MEMBER(keyscan_callback);
+	TIMER_CALLBACK_MEMBER(mouse_callback);
+	DECLARE_WRITE_LINE_MEMBER(sio_interrupt);
+	DECLARE_WRITE8_MEMBER(sio_dtr_w);
+	DECLARE_WRITE16_MEMBER(sio_serial_transmit);
+	DECLARE_READ16_MEMBER(sio_serial_receive);
+	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_drq_w);
+	DECLARE_READ8_MEMBER(nimbus_via_read_portb);
+	DECLARE_WRITE8_MEMBER(nimbus_via_write_portb);
+	DECLARE_WRITE_LINE_MEMBER(nimbus_via_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(nimbus_ack_w);
+};
