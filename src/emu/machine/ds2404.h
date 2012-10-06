@@ -6,6 +6,8 @@
 
 **********************************************************************/
 
+#pragma once
+
 #ifndef __DS2404_H__
 #define __DS2404_H__
 
@@ -53,14 +55,14 @@ public:
 	static void static_set_ref_day(device_t &device, UINT8 m_ref_day);
 
 	/* 1-wire interface reset  */
-	void ds2404_1w_reset_w(UINT32 offset, UINT8 data);
+	DECLARE_WRITE8_MEMBER(ds2404_1w_reset_w);
 
 	/* 3-wire interface reset  */
-	void ds2404_3w_reset_w(UINT32 offset, UINT8 data);
+	DECLARE_WRITE8_MEMBER(ds2404_3w_reset_w);
 
-	UINT8 ds2404_data_r(UINT32 offset);
-	void ds2404_data_w(UINT32 offset, UINT8 data);
-	void ds2404_clk_w(UINT32 offset, UINT8 data);
+	DECLARE_READ8_MEMBER(ds2404_data_r);
+	DECLARE_WRITE8_MEMBER(ds2404_data_w);
+	DECLARE_WRITE8_MEMBER(ds2404_clk_w);
 
 	void ds2404_tick();
 
@@ -122,19 +124,4 @@ private:
 extern const device_type DS2404;
 
 
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-/* 1-wire interface reset */
-DECLARE_WRITE8_DEVICE_HANDLER( ds2404_1w_reset_w );
-
-/* 3-wire interface reset  */
-DECLARE_WRITE8_DEVICE_HANDLER( ds2404_3w_reset_w );
-
-DECLARE_READ8_DEVICE_HANDLER( ds2404_data_r );
-DECLARE_WRITE8_DEVICE_HANDLER( ds2404_data_w );
-DECLARE_WRITE8_DEVICE_HANDLER( ds2404_clk_w );
-
-#endif
+#endif /* __DS2404_H__ */

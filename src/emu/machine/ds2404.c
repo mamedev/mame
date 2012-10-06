@@ -171,19 +171,19 @@ void ds2404_device::ds2404_writemem(UINT8 value)
 	}
 }
 
-WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_1w_reset_w)
+WRITE8_MEMBER( ds2404_device::ds2404_1w_reset_w )
 {
 	m_state[0] = DS2404_STATE_IDLE;
 	m_state_ptr = 0;
 }
 
-WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_3w_reset_w)
+WRITE8_MEMBER( ds2404_device::ds2404_3w_reset_w )
 {
 	m_state[0] = DS2404_STATE_COMMAND;
 	m_state_ptr = 0;
 }
 
-READ8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_data_r)
+READ8_MEMBER( ds2404_device::ds2404_data_r )
 {
 	UINT8 value = 0;
 	switch(m_state[m_state_ptr])
@@ -217,7 +217,7 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_data_r)
 	return value;
 }
 
-WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_data_w)
+WRITE8_MEMBER( ds2404_device::ds2404_data_w )
 {
 	switch( m_state[m_state_ptr] )
 	{
@@ -310,7 +310,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_data_w)
 	}
 }
 
-WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_clk_w)
+WRITE8_MEMBER( ds2404_device::ds2404_clk_w )
 {
 	switch( m_state[m_state_ptr] )
 	{
