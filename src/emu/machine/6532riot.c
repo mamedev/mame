@@ -539,7 +539,7 @@ void riot6532_device::device_reset()
 	m_pa7prev = 0;
 
 	/* reset timer states */
-	m_timershift = 0;
+	m_timershift = 10;
 	m_timerstate = TIMER_COUNTING;
-	m_timer->adjust(attotime::from_ticks(256, clock()));
+	m_timer->adjust(attotime::from_ticks(256 << m_timershift, clock()));
 }
