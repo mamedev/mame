@@ -51,7 +51,8 @@
           short supply in Japan. The game is called "Space Invaders M"
           The M stands for Midway.
         * "Gun Fight" (Midway) is ported version of "Western Gun" (Taito)
-        * Taito released "Tornado Baseball" as "Ball Park" in Japan
+        * in Japan, Taito released "Tornado Baseball" as "Ball Park",
+          "Extra Inning" as "Ball Park II".
 
     Known issues/to-do's:
         * Space Encounters: verify trench colors
@@ -616,7 +617,6 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_score_input_r)
 
 WRITE8_MEMBER(mw8080bw_state::tornbase_io_w)
 {
-
 	if (offset & 0x01)
 		tornbase_audio_w(space, 0, data);
 
@@ -769,7 +769,7 @@ static INPUT_PORTS_START( zzzap )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_TOGGLE PORT_NAME("P1 Shift") PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )	/* not connected */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START1 )	/* start button, but never used? */
 
 	PORT_START("IN1")	/* steering wheel */
 	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_MINMAX(0x01,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
@@ -802,17 +802,9 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( lagunar )
-	PORT_START("IN0")
-	PORT_BIT( 0x0f, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(64) PORT_PLAYER(1)   /* accelerator */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_TOGGLE PORT_NAME("P1 Shift") PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )	/* not connected */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )	/* start button, but never used */
+	PORT_INCLUDE( zzzap )
 
-	PORT_START("IN1")	/* steering wheel */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x01,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
-
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("E3:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -882,7 +874,6 @@ TIMER_CALLBACK_MEMBER(mw8080bw_state::maze_tone_timing_timer_callback)
 
 MACHINE_START_MEMBER(mw8080bw_state,maze)
 {
-
 	/* create astable timer for IC B1 */
 	machine().scheduler().timer_pulse(MAZE_555_B1_PERIOD, timer_expired_delegate(FUNC(mw8080bw_state::maze_tone_timing_timer_callback),this));
 
@@ -974,7 +965,6 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(mw8080bw_state,boothill)
 {
-
 	/* setup for save states */
 	save_item(NAME(m_rev_shift_res));
 
@@ -1068,7 +1058,6 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(mw8080bw_state::checkmat_io_w)
 {
-
 	if (offset & 0x01)  checkmat_audio_w(space, 0, data);
 
 	if (offset & 0x02)  watchdog_reset_w(space, 0, data);
@@ -1174,7 +1163,6 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(mw8080bw_state,desertgu)
 {
-
 	/* setup for save states */
 	save_item(NAME(m_desertgun_controller_select));
 
@@ -1499,7 +1487,6 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(mw8080bw_state,gmissile)
 {
-
 	/* setup for save states */
 	save_item(NAME(m_rev_shift_res));
 
@@ -1594,7 +1581,6 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(mw8080bw_state,m4)
 {
-
 	/* setup for save states */
 	save_item(NAME(m_rev_shift_res));
 
@@ -1691,7 +1677,6 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(mw8080bw_state,clowns)
 {
-
 	/* setup for save states */
 	save_item(NAME(m_clowns_controller_select));
 
@@ -2124,7 +2109,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(mw8080bw_state::spcenctr_strobe_timer_callback)
 
 MACHINE_START_MEMBER(mw8080bw_state,spcenctr)
 {
-
 	/* setup for save states */
 	save_item(NAME(m_spcenctr_strobe_state));
 	save_item(NAME(m_spcenctr_trench_width));
@@ -2285,7 +2269,6 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(mw8080bw_state,phantom2)
 {
-
 	/* setup for save states */
 	save_item(NAME(m_phantom2_cloud_counter));
 
@@ -2508,7 +2491,6 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(mw8080bw_state,invaders)
 {
-
 	/* setup for save states */
 	save_item(NAME(m_invaders_flip_screen));
 
@@ -3177,7 +3159,7 @@ ROM_END
 /* 597 */ GAMEL(1975, gunfight, 0,        gunfight, gunfight, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_hoffff20 )
 /* 597 */ GAMEL(1975, gunfighto,gunfight, gunfight, gunfight, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_hoffff20 )
 /* 604 Gun Fight (cocktail, dump does not exist) */
-/* 605 */ GAME( 1976, tornbase, 0,        tornbase, tornbase, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // is Taito's Ball Park really the same? (see Gun Fight and Guided Missile)
+/* 605 */ GAME( 1976, tornbase, 0,        tornbase, tornbase, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 /* 610 */ GAMEL(1976, 280zzzap, 0,        zzzap,    zzzap,    driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_280zzzap )
 /* 611 */ GAMEL(1976, maze,     0,        maze,     maze,     driver_device, 0, ROT0,   "Midway", "Amazing Maze", GAME_SUPPORTS_SAVE, layout_ho4f893d )
 /* 612 */ GAME( 1977, boothill, 0,        boothill, boothill, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Boot Hill", GAME_SUPPORTS_SAVE )
@@ -3191,7 +3173,7 @@ ROM_END
 /* 630 */ GAMEL(1978, clowns,   0,        clowns,   clowns,   driver_device, 0, ROT0,   "Midway", "Clowns (rev. 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_clowns )
 /* 630 */ GAMEL(1978, clowns1,  clowns,   clowns,   clowns1,  driver_device, 0, ROT0,   "Midway", "Clowns (rev. 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_clowns )
 /* 640 */ GAMEL(1978, spacwalk, 0,        spacwalk, spacwalk, driver_device, 0, ROT0,   "Midway", "Space Walk", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_spacwalk )
-/* 642 */ GAME( 1978, einning,  0,        dplay,    einning,  driver_device, 0, ROT0,   "Midway", "Extra Inning", GAME_SUPPORTS_SAVE )
+/* 642 */ GAME( 1978, einning,  0,        dplay,    einning,  driver_device, 0, ROT0,   "Midway / Taito", "Extra Inning / Ball Park II", GAME_SUPPORTS_SAVE )
 /* 643 */ GAME( 1978, shuffle,  0,        shuffle,  shuffle,  driver_device, 0, ROT90,  "Midway", "Shuffleboard", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 /* 644 */ GAME( 1977, dogpatch, 0,        dogpatch, dogpatch, driver_device, 0, ROT0,   "Midway", "Dog Patch", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 /* 645 */ GAME( 1980, spcenctr, 0,        spcenctr, spcenctr, driver_device, 0, ROT0,   "Midway", "Space Encounters", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
