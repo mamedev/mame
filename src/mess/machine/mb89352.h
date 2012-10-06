@@ -48,10 +48,6 @@
 #define SERR_SCSI_PAR   0x80
 
 
-// these aren't defined in scsi.h
-#define SCSI_PHASE_BUS_FREE 8
-#define SCSI_PHASE_SELECT   9
-
 struct mb89352_interface
 {
 	devcb_write_line irq_callback;	/* irq callback */

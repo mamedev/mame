@@ -30,10 +30,6 @@
 #define FMSCSI_LINE_DMAE  0x02
 #define FMSCSI_LINE_RST   0x01
 
-// these aren't defined in scsi.h
-#define SCSI_PHASE_BUS_FREE 8
-#define SCSI_PHASE_SELECT   9
-
 struct FMSCSIinterface
 {
 	devcb_write_line irq_callback;	/* irq callback */

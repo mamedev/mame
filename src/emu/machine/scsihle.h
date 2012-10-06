@@ -51,6 +51,8 @@ extern int SCSILengthFromUINT16( UINT8 *length );
 #define SCSI_PHASE_STATUS ( 3 )
 #define SCSI_PHASE_MESSAGE_OUT ( 6 )
 #define SCSI_PHASE_MESSAGE_IN ( 7 )
+#define SCSI_PHASE_BUS_FREE ( 8 )
+#define SCSI_PHASE_SELECT ( 9 )
 
 #define SCSI_CMD_TEST_UNIT_READY ( 0x00 )
 #define SCSI_CMD_RECALIBRATE ( 0x01 )

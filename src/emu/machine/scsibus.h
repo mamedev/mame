@@ -33,10 +33,6 @@
 #define SCSI_LINE_MSG   6
 #define SCSI_LINE_RESET 7
 
-// Perhaps thse should be in scsi.h ?
-#define SCSI_PHASE_BUS_FREE 8
-#define SCSI_PHASE_SELECT   9
-
 #define REQ_DELAY_NS    90
 #define ACK_DELAY_NS    90
 #define BSY_DELAY_NS	50
