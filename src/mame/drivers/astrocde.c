@@ -122,8 +122,9 @@
 #include "sound/astrocde.h"
 #include "sound/ay8910.h"
 
-#include "tenpindx.lh"
 #include "gorf.lh"
+#include "spacezap.lh"
+#include "tenpindx.lh"
 
 
 /*************************************
@@ -1844,7 +1845,7 @@ GAME( 1978, seawolf2, 0,    seawolf2, seawolf2, astrocde_state, seawolf2, ROT0, 
 GAME( 1980, ebases,   0,    ebases,   ebases, astrocde_state,   ebases,   ROT0,   "Dave Nutting Associates / Midway", "Extra Bases", GAME_SUPPORTS_SAVE )
 
 /* 91354 CPU board + 90706 game board + 91356 RAM board + 91355 pattern board */
-GAME( 1980, spacezap, 0,    spacezap, spacezap, astrocde_state, spacezap, ROT0,   "Midway", "Space Zap", GAME_SUPPORTS_SAVE )
+GAMEL(1980, spacezap, 0,    spacezap, spacezap, astrocde_state, spacezap, ROT0,   "Midway", "Space Zap", GAME_SUPPORTS_SAVE, layout_spacezap )
 
 /* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91397 memory board */
 GAME( 1980, wow,      0,    wow,      wow, astrocde_state,      wow,      ROT0,   "Dave Nutting Associates / Midway", "Wizard of Wor", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

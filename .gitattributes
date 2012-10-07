@@ -4422,6 +4422,7 @@ src/mame/layout/snookr10.lay svneol=native#text/plain
 src/mame/layout/solarq.lay svneol=native#text/plain
 src/mame/layout/sos.lay svneol=native#text/plain
 src/mame/layout/spacewin.lay -text svneol=native#plain/text
+src/mame/layout/spacezap.lay svneol=native#text/plain
 src/mame/layout/spacwalk.lay svneol=native#text/plain
 src/mame/layout/spectra.lay svneol=native#text/plain
 src/mame/layout/splus.lay svneol=native#text/plain

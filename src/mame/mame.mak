@@ -1969,6 +1969,7 @@ $(DRIVERS)/aristmk4.o:	$(LAYOUT)/aristmk4.lh \
 			$(LAYOUT)/gldnpkr.lh \
 
 $(DRIVERS)/astrocde.o:	$(LAYOUT)/gorf.lh \
+			$(LAYOUT)/spacezap.lh \
 			$(LAYOUT)/tenpindx.lh
 
 $(DRIVERS)/atarifb.o:	$(LAYOUT)/atarifb.lh \
