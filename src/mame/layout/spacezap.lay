@@ -1,18 +1,142 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
-	<element name="overlay">
-		<rect>
-			<bounds left="0" top="0" right="400" bottom="300" />
-			<color red="1" green="1" blue="1" />
-		</rect>
+
+<!-- define elements -->
+
+	<element name="blue_blob">
+		<disk>
+			<color red="0.0" green="0.85" blue="0.20" />
+			<bounds left="0" top="0" right="1000" bottom="1000" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.30" />
+			<bounds left="15" top="15" right="985" bottom="985" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.40" />
+			<bounds left="30" top="30" right="970" bottom="970" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.50" />
+			<bounds left="45" top="45" right="955" bottom="955" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.60" />
+			<bounds left="60" top="60" right="940" bottom="940" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.70" />
+			<bounds left="75" top="75" right="925" bottom="925" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.80" />
+			<bounds left="90" top="90" right="910" bottom="910" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.90" />
+			<bounds left="105" top="105" right="895" bottom="895" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="1.0" />
+			<bounds left="120" top="120" right="880" bottom="880" />
+		</disk>
 	</element>
 
+<!-- note: yellow blob should be a more diamond shape, -->
+<!-- see MT 1064, but MAME internal layout can't do that -->
+	<element name="yellow_blob">
+		<disk>
+			<color red="0.0" green="0.85" blue="0.2" />
+			<bounds left="0" top="0" right="1000" bottom="1000" />
+		</disk>
+		<disk>
+			<color red="0.15" green="0.85" blue="0.2" />
+			<bounds left="10" top="10" right="990" bottom="990" />
+		</disk>
+		<disk>
+			<color red="0.30" green="0.85" blue="0.2" />
+			<bounds left="20" top="20" right="980" bottom="980" />
+		</disk>
+		<disk>
+			<color red="0.45" green="0.85" blue="0.2" />
+			<bounds left="30" top="30" right="970" bottom="970" />
+		</disk>
+		<disk>
+			<color red="0.60" green="0.85" blue="0.2" />
+			<bounds left="40" top="40" right="960" bottom="960" />
+		</disk>
+		<disk>
+			<color red="0.75" green="0.85" blue="0.2" />
+			<bounds left="50" top="50" right="950" bottom="950" />
+		</disk>
+		<disk>
+			<color red="0.90" green="0.85" blue="0.2" />
+			<bounds left="60" top="60" right="940" bottom="940" />
+		</disk>
+		<disk>
+			<color red="1.0" green="0.85" blue="0.2" />
+			<bounds left="70" top="70" right="930" bottom="930" />
+		</disk>
+	</element>
+
+	<element name="negative_blob">
+		<rect>
+			<color red="0.0" green="0.85" blue="0.2" />
+			<bounds x="0" y="0" width="400" height="300" />
+		</rect>
+
+		<disk>
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="100" y="50" width="200" height="200" />
+		</disk>
+
+		<disk>
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="-100" y="-150" width="250" height="250" />
+		</disk>
+		<disk>
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="-100" y="200" width="250" height="250" />
+		</disk>
+		<disk>
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="250" y="-150" width="250" height="250" />
+		</disk>
+		<disk>
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="250" y="200" width="250" height="250" />
+		</disk>
+	</element>
+
+
+<!-- overlay -->
+
 	<view name="Color Overlay">
+		<bounds left="0" top="0" right="400" bottom="300" />
 		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
+			<bounds left="0" top="0" right="400" bottom="300" />
 		</screen>
-		<overlay name="overlay" element="overlay">
-			<bounds left="0" top="0" right="4" bottom="3" />
+
+		<overlay element="blue_blob">
+			<bounds x="-100" y="-150" width="250" height="250" />
 		</overlay>
+		<overlay element="blue_blob">
+			<bounds x="-100" y="200" width="250" height="250" />
+		</overlay>
+		<overlay element="blue_blob">
+			<bounds x="250" y="-150" width="250" height="250" />
+		</overlay>
+		<overlay element="blue_blob">
+			<bounds x="250" y="200" width="250" height="250" />
+		</overlay>
+
+		<overlay element="yellow_blob">
+			<bounds x="100" y="50" width="200" height="200" />
+		</overlay>
+
+		<overlay element="negative_blob">
+			<bounds x="-100" y="-150" width="600" height="600" />
+		</overlay>
+
 	</view>
 </mamelayout>
