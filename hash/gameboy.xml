@@ -4015,7 +4015,7 @@
 		</part>
 	</software>
 
-	<software name="dorakart">
+	<software name="dorakart" supported="partial">
 		<!-- Notes: SGB enhanced, also released by NP in 2000-08 -->
 		<description>Doraemon Kart (Jpn)</description>
 		<year>1998</year>
@@ -20925,7 +20925,7 @@
 
 	<software name="duckadv">
 		<description>Duck Adventures (ripped from 4-in-1 4B-001)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">

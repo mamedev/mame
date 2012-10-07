@@ -610,7 +610,7 @@
                                                                                  [T-14324G] |~~~~~~
       Koi no Summer Fantasy: in Miyazaki Seagaia (Japan) [T-23407G]                         | (ksumfant)
       Konami Antiques MSX Collection Ultra Pack (Japan) [T-9530G]                           | (konmsx)
-      Konoyo no Hate de Koi o Utau Shoujo YU-NO (Japan) [T-28004G]                          | (konoyono)
+      Konoyo no Hate de Koi o Utau Shoujo YU-NO (Japan) [T-28004G]                          | (yuno)
       Konoyo no Hate de Koi o Utau Shoujo YU-NO (Japan) (Shuttle Mouse fu Genteiban)        |  ??
                                                                                  [T-28005G] |~~~~~~
       Kouryuu Sangoku Engi (Japan) [T-26104G]                                               | (kouryuu)
@@ -806,7 +806,7 @@
       Olympic Soccer (Japan) [T-7304G]                                                      | (olympsocj)
       Omakase! Taimagyou Savers (Japan) [GS-9030]                                           | (omakases)
       Ooedo Renaissance (Japan) [T-9104G]                                                   | (ooedoren)
-      Oracle no Houseki (Japan) [T-1511G]                                                   | (oracleno
+      Oracle no Houseki (Japan) [T-1511G]                                                   | (jeworaclj)
       Ousama Game (Japan) [T-21904G]                                                        | (ousamaga)
       OutRun (Japan) (Sega Ages) [GS-9110]                                                  | (outrun)
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -919,7 +919,7 @@
       Riglordsaga (Japan) [GS-9021]                                                         | (riglord)
       Riglordsaga 2 (Japan) [GS-9084]                                                       | (riglord2)
       Rise of the Robots 2 (Japan) [T-8104G]                                                | (rise2j)
-      Riven: The Sequel to Myst (Japan) [T-35503G]                                          | (riven)
+      Riven: The Sequel to Myst (Japan) [T-35503G]                                          | (rivenj)
       Road Rash (Japan) [T-10609G]                                                          | (roadrashj)
       Robo Pit (Japan) [T-16603G]                                                           | (robopitj)
       RockMan 8: Metal Heroes (Japan) [T-1214G]                                             | (rockman8)
@@ -966,7 +966,7 @@
       Samurai Spirits: Amakusa Kourin (Japan) (Doukonban) [T-3118G]                         |  @@
       Samurai Spirits: Zankurou Musouken (Japan) [T-3106G]                                  | (samsho3)
       Samurai Spirits: Zankurou Musouken (Japan) (Doukonban) [T-3104G]                      |  ==
-      Sangokushi Eiketsuden (Japan) [T-7613G]                                               | (snageike)
+      Sangokushi Eiketsuden (Japan) [T-7613G]                                               | (sangeike)
       Sangokushi Eiketsuden (Japan) (Premium Pack) [T-7652G]                                |  @@
       Sangokushi IV (Japan) [T-7601G]                                                       | (sangoku4)
       Sangokushi IV (Japan) (Koei the Best) [T-7669G]                                       |  @@
@@ -1069,7 +1069,7 @@
       Shiroki Majo: Mouhitotsu no Eiyuu Densetsu (Japan) [T-14322G]                         | (shirokim)
       Shougi Matsuri (Japan) [T-16502G]                                                     | (shougima)
       Shoujo Kakumei Utena: Itsuka Kakumei Sareru Monogatari (Japan) [GS-9182]              | (utena)
-      Shouryuu Sangokuengi (Japan) [T-15009G]                                               | (syouryus)
+      Shouryuu Sangokuengi (Japan) [T-15009G]                                               | (shoryuse)
       Shukudai ga Tant-R (Japan) (Sega Ages) [GS-9042]                                      | (tantr)
       Shunsai: Keiba Data Stable (Japan) [T-18703G]                                         | (shunsai)
       Shusse Mahjong Daisettai (Japan) [T-24902G]                                           | (shussemj)
@@ -1108,7 +1108,7 @@
       Soukuu no Tsubasa: Gotha World (Japan) [T-2205G]                                      | (gothawld)
       Soukyuu Gurentai (Japan) [T-10616G]                                                   | (soukyuug)
       Soukyuu Gurentai Otokuyou (Japan) [T-10626G]                                          | (soukygo)
-      Sound Novel Machi (Japan) [T-34001G]                                                  | (snovelmb)
+      Sound Novel Machi (Japan) [T-34001G]                                                  | (machi)
       Sound Novel Tsukuru 2 (Japan) [T-2108G]                                               | (snovelt2)
       Soviet Strike (Japan) [T-10621G]                                                      | ########MISSING########
       Space Harrier (Japan) (Sega Ages) [GS-9108]                                           | (sharrier)
@@ -8095,7 +8095,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Sound Novel Machi (Japan) (Disc 1) (10.11-10.13 INCL.)... -->
   <!-- Identifying Sound Novel Machi (Japan) (Disc 2) (10.13-10.15 INCL.)... -->
-	<software name="snovelm" supported="no">
+	<software name="machi" supported="no">
 		<description>Sound Novel Machi (Jpn)</description>
 		<year>1998</year>
 		<publisher>Chun Soft</publisher>
@@ -8444,8 +8444,8 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Syouryu Sangoku Engi (Japan)... -->
-	<software name="syouryus" supported="no">
-		<description>Syouryu Sangoku Engi (Jpn)</description>
+	<software name="shoryuse" supported="no">
+		<description>Shouryuu Sangoku Engi (Jpn)</description>
 		<year>1996</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="T-15009G"/>
@@ -8739,7 +8739,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Touge King the Spirits (Japan)... -->
 	<software name="touge" cloneof="highvelo" supported="no">
-		<description>Touge King the Spirits (Jpn)</description>
+		<description>Touge King - The Spirits (Jpn)</description>
 		<year>1995</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="T-14401G"/>
@@ -8755,7 +8755,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Touge King the Spirits 2 (Japan)... -->
 	<software name="touge2" supported="no">
-		<description>Touge King the Spirits 2 (Jpn)</description>
+		<description>Touge King - The Spirits 2 (Jpn)</description>
 		<year>1997</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="T-14412G"/>
@@ -11541,7 +11541,7 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Kono Yo no Hate de Koi wo Utau Shoujo Yu-No (Disc 1 of 3) (JAP) (DW0938)... -->
   <!-- Identifying Kono Yo no Hate de Koi wo Utau Shoujo Yu-No (Disc 2 of 3) (JAP) (DW0938)... -->
   <!-- Identifying Kono Yo no Hate de Koi wo Utau Shoujo Yu-No (Disc 3 of 3) (JAP) (DW0938)... -->
-	<software name="konoyono" supported="no">
+	<software name="yuno" supported="no">
 		<description>Kono Yo no Hate de Koi wo Utau Shoujo Yu-No (Jpn)</description>
 		<year>1997</year>
 		<publisher>Elf</publisher>
@@ -11804,7 +11804,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Machi Sample (JAP) (DW0904)... -->
-	<software name="machisam" cloneof="snovelm" supported="no">
+	<software name="machisam" cloneof="machi" supported="no">
 		<description>Machi Sample (Jpn)</description>
 		<year>1998</year>
 		<publisher>Chun Soft</publisher>
@@ -13208,7 +13208,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Sound Novel Machi (Disc 1 of 2) (JAP) (DW0481)... -->
   <!-- Identifying Sound Novel Machi (Disc 2 of 2) (JAP) (DW0481)... -->
-	<software name="snovelma" cloneof="snovelm" supported="no">
+	<software name="machia" cloneof="machi" supported="no">
 		<description>Sound Novel Machi (Jpn, Alt)</description>
 		<year>1998</year>
 		<publisher>Chun Soft</publisher>
@@ -13905,7 +13905,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Touge - King The Spirits 2 Mihonhin (JAP) (DW0930)... -->
 	<software name="touge2mih" cloneof="touge2" supported="no">
-		<description>Touge King The Spirits 2 Mihonhin (Jpn)</description>
+		<description>Touge King - The Spirits 2 Mihonhin (Jpn)</description>
 		<year>1997</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="610-6539"/>
@@ -15668,7 +15668,7 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Choujikuu Yousei Macross - Ai Oboete Imasu ka Disc 1 (T-23403G)... -->
   <!-- Identifying Choujikuu Yousei Macross - Ai Oboete Imasu ka Disc 2 (T-23403G)... -->
 	<software name="cmacrossb" cloneof="cmacross" supported="no">
-		<description>Chou Jikuu Yousei Macross - Ai Oboete Imasu ka (Jpn)</description>
+		<description>Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Jpn, Alt 2)</description>
 		<year>1997</year>
 		<publisher>Bandai Visual</publisher>
 		<info name="serial" value="T-23403G"/>
@@ -16287,7 +16287,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Dennou Senki Virtual-On for SegaNet (GS-7106)... -->
-	<software name="vonjsnet" cloneof="von" supported="no">
+	<software name="vonjsn" cloneof="von" supported="no">
 		<description>Dennou Senki Virtual-On for SegaNet (Jpn)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -20587,8 +20587,8 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Syouryu Sangoku Engi (J) (T-15009G)... -->
-	<software name="syouryusa" cloneof="syouryus" supported="no">
-		<description>Syouryu Sangoku Engi (Jpn, Alt)</description>
+	<software name="shoryusea" cloneof="shoryuse" supported="no">
+		<description>Shouryuu Sangoku Engi (Jpn, Alt)</description>
 		<year>1996</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="T-15009G"/>
@@ -21375,7 +21375,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Touge King the Spirits (T-14401G)... -->
 	<software name="tougea" cloneof="highvelo" supported="no">
-		<description>Touge King the Spirits (Jpn, Alt)</description>
+		<description>Touge King - The Spirits (Jpn, Alt)</description>
 		<year>1995</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="T-14401G"/>
@@ -22732,7 +22732,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="dmsilk" supported="no">
 		<description>Dragon Master Silk (Jpn)</description>
 		<year>1997</year>
-		<publisher>DATAM Polystar</publisher>
+		<publisher>Datam Polystar</publisher>
 		<info name="serial" value="T-19503G"/>
 		<info name="release" value="19970328"/>
 		<info name="alt_title" value="ドラゴンマスターシルク"/>
@@ -24885,7 +24885,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Okedera Yasuhikono Sekaiwo Mezase Soccer Kids (J) (T-26001G)... -->
 	<software name="socrkids" supported="no">
-		<description>Okedera Yasuhiko no Sekai wo Mezase! Soccer Kids - Nyuumon-hen (Jpn)</description>
+		<description>Okudera Yasuhiko no Sekai wo Mezase! Soccer Kids - Nyuumon-hen (Jpn)</description>
 		<year>1996</year>
 		<publisher>Fujitsu Parex</publisher>
 		<info name="serial" value="T-26001G"/>
@@ -25283,7 +25283,7 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Riven The Sequel to Myst Disc 2 (T-35503G)... -->
   <!-- Identifying Riven The Sequel to Myst Disc 3 (T-35503G)... -->
   <!-- Identifying Riven The Sequel to Myst Disc 4 (T-35503G)... -->
-	<software name="riven" supported="no">
+	<software name="rivenj" cloneof="riven" supported="no">
 		<description>Riven - The Sequel to Myst (Jpn)</description>
 		<year>1998</year>
 		<publisher>Enix</publisher>
@@ -25644,7 +25644,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="pitgraph" supported="no">
 		<description>Shichuu Suimei Pitagraph (Jpn)</description>
 		<year>1996</year>
-		<publisher>DATAM Polystar</publisher>
+		<publisher>Datam Polystar</publisher>
 		<info name="serial" value="T-19501G"/>
 		<info name="release" value="19960223"/>
 		<info name="alt_title" value="四柱推命ピタグラフ"/>
@@ -25872,7 +25872,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Sound Novel Machi Disc 1 (J) (T-34001G)... -->
   <!-- Identifying Sound Novel Machi Disc 2 (J) (T-34001G)... -->
-	<software name="snovelmb" cloneof="snovelm" supported="no">
+	<software name="machib" cloneof="machi" supported="no">
 		<description>Sound Novel Machi (Jpn, Alt 2)</description>
 		<year>1998</year>
 		<publisher>Chun Soft</publisher>
@@ -25976,7 +25976,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="drgmstsi" supported="no">
 		<description>Sugobencha - Dragon Master Silk Gaiden (Jpn)</description>
 		<year>1998</year>
-		<publisher>DATAM Polystar</publisher>
+		<publisher>Datam Polystar</publisher>
 		<info name="serial" value="T-19505G"/>
 		<info name="release" value="19980219"/>
 		<info name="alt_title" value="すごべんちゃー 〜ドラゴンマスターシルク外伝〜"/>
@@ -27460,7 +27460,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="rmate" supported="no">
 		<description>Roommate (Jpn)</description>
 		<year>1997</year>
-		<publisher>DATAM Polystar</publisher>
+		<publisher>Datam Polystar</publisher>
 		<info name="serial" value="T-19502G"/>
 		<info name="release" value="19970214"/>
 		<info name="alt_title" value="ルームメイト ～井上涼子～"/>
@@ -27476,7 +27476,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<software name="rmatesv" supported="no">
 		<description>Roommate - Ryoko in Summer Vacation (Jpn, Shokai Genteiban)</description>
 		<year>1997</year>
-		<publisher>DATAM Polystar</publisher>
+		<publisher>Datam Polystar</publisher>
 		<info name="serial" value="T-19504G"/>
 		<info name="release" value="19970925"/>
 		<info name="alt_title" value="ルームメイト ～涼子 イン サマーバケーション～ (初回限定版)"/>
@@ -29003,8 +29003,11 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Motteke Tamago with Ganbare! Kamonohashi (HKS)... -->
 	<software name="motteke" supported="no">
 		<description>Motteke Tamago with Ganbare! Kamonohashi (HKS)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Naxat Soft</publisher>
+		<info name="serial" value="T-18712G"/>
+		<info name="release" value="19980702"/>
+		<info name="alt_title" value="もってけたまご with がんばれ！かものはし"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -29147,7 +29150,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
   <!-- Identifying Oracle no Houseki (T-1511G)... -->
-	<software name="oracleno" supported="no">
+	<software name="jeworaclj" cloneof="jeworacl" supported="no">
 		<description>Oracle no Houseki (Jpn)</description>
 		<year>1996</year>
 		<publisher>Sunsoft</publisher>
@@ -29181,8 +29184,10 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Pict Flash Don Don... -->
 	<software name="pictflas" supported="no">
 		<description>Pict Flash Don Don</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Hitachi</publisher>
+		<info name="serial" value="T-17811G"/>
+		<info name="alt_title" value=" ピクト　フラッシュ　どんどん"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -32832,7 +32837,7 @@ Olympic Soccer (Fra) T-7904H-09
   <!-- Identifying Riven - The Sequel to Myst v1.003 (1998)(Sega)(PAL)(Disc 2 of 4)[!]... -->
   <!-- Identifying Riven - The Sequel to Myst v1.003 (1998)(Sega)(PAL)(Disc 3 of 4)[!]... -->
   <!-- Identifying Riven - The Sequel to Myst v1.003 (1998)(Sega)(PAL)(Disc 4 of 4)[!]... -->
-	<software name="rivene" supported="no">
+	<software name="riven" supported="no">
 		<description>Riven - The Sequel to Myst (Euro)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
