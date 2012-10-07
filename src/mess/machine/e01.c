@@ -335,9 +335,9 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( e01 )
-    // basic machine hardware
+	// basic machine hardware
 	MCFG_CPU_ADD(R65C102_TAG, M65C02, XTAL_8MHz/4) // Rockwell R65C102P3
-    MCFG_CPU_PROGRAM_MAP(e01_mem)
+	MCFG_CPU_PROGRAM_MAP(e01_mem)
 
 	MCFG_MC146818_IRQ_ADD(HD146818_TAG, MC146818_STANDARD, rtc_intf)
 
@@ -348,7 +348,7 @@ static MACHINE_CONFIG_FRAGMENT( e01 )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(e01_floppy_interface)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, e01_centronics_intf)
 
-	//MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
+	MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
 	MCFG_SCSICB_ADD(SCSIBUS_TAG ":host", scsi_intf)
 

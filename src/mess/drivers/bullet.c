@@ -1155,10 +1155,10 @@ void bulletf_state::machine_reset()
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( bullet, bullet_state )
-    // basic machine hardware
-    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
-    MCFG_CPU_PROGRAM_MAP(bullet_mem)
-    MCFG_CPU_IO_MAP(bullet_io)
+	// basic machine hardware
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+	MCFG_CPU_PROGRAM_MAP(bullet_mem)
+	MCFG_CPU_IO_MAP(bullet_io)
 	MCFG_CPU_CONFIG(daisy_chain)
 
 	// devices
@@ -1186,10 +1186,10 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( bulletf, bulletf_state )
-    // basic machine hardware
-    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
-    MCFG_CPU_PROGRAM_MAP(bulletf_mem)
-    MCFG_CPU_IO_MAP(bulletf_io)
+	// basic machine hardware
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+	MCFG_CPU_PROGRAM_MAP(bulletf_mem)
+	MCFG_CPU_IO_MAP(bulletf_io)
 	MCFG_CPU_CONFIG(daisy_chain)
 
 	// devices
@@ -1203,7 +1203,7 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 4800)
 
-	//MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
+	MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
 	MCFG_SCSICB_ADD(SCSIBUS_TAG ":host", scsi_intf)
 

@@ -10,6 +10,7 @@
 #include "machine/ctronics.h"
 #include "machine/ram.h"
 #include "machine/scsicb.h"
+#include "machine/scsibus.h"
 #include "machine/terminal.h"
 #include "machine/wd17xx.h"
 #include "machine/z80ctc.h"
