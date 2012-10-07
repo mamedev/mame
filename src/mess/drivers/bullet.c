@@ -1040,13 +1040,13 @@ WRITE_LINE_MEMBER( bulletf_state::req_w )
 
 static const SCSICB_interface scsi_intf =
 {
-	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(bulletf_state, req_w),
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 

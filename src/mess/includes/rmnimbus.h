@@ -264,8 +264,6 @@ extern const wd17xx_interface nimbus_wd17xx_interface;
 /* SASI harddisk interface */
 #define SCSIBUS_TAG             "scsibus"
 
-void nimbus_scsi_linechange(device_t *device, UINT8 line, UINT8 state);
-
 /* Masks for writes to port 0x400 */
 #define FDC_DRIVE0_MASK 0x01
 #define FDC_DRIVE1_MASK 0x02
@@ -305,7 +303,7 @@ void nimbus_scsi_linechange(device_t *device, UINT8 line, UINT8 state);
 #define HDC_RESET_MASK  0x01
 #define HDC_SEL_MASK    0x02
 #define HDC_IRQ_MASK    0x04
-#define HDC_IRQ_ENABLED(state)   ((state->m_nimbus_drives.reg410_out & HDC_IRQ_MASK) ? 1 : 0)
+#define HDC_IRQ_ENABLED()   ((m_nimbus_drives.reg410_out & HDC_IRQ_MASK) ? 1 : 0)
 
 
 #define SCSI_ID_NONE    0x80
@@ -463,4 +461,10 @@ public:
 	DECLARE_WRITE8_MEMBER(nimbus_via_write_portb);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_via_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(nimbus_scsi_bsy_w);
+	DECLARE_WRITE_LINE_MEMBER(nimbus_scsi_cd_w);
+	DECLARE_WRITE_LINE_MEMBER(nimbus_scsi_io_w);
+	DECLARE_WRITE_LINE_MEMBER(nimbus_scsi_msg_w);
+	DECLARE_WRITE_LINE_MEMBER(nimbus_scsi_req_w);
+	void nimbus_scsi_linechange( UINT8 mask, UINT8 state );
 };

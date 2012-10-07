@@ -2456,47 +2456,61 @@ static void hdc_drq(running_machine &machine)
     }
 }
 
-void nimbus_scsi_linechange(device_t *device, UINT8 line, UINT8 state)
+WRITE_LINE_MEMBER( rmnimbus_state::nimbus_scsi_bsy_w )
 {
-	rmnimbus_state *drvstate = device->machine().driver_data<rmnimbus_state>();
-    UINT8   mask = 0;
+	nimbus_scsi_linechange( HDC_BSY_MASK, state );
+}
+
+WRITE_LINE_MEMBER( rmnimbus_state::nimbus_scsi_cd_w )
+{
+	nimbus_scsi_linechange( HDC_CD_MASK, state );
+}
+
+WRITE_LINE_MEMBER( rmnimbus_state::nimbus_scsi_io_w )
+{
+	nimbus_scsi_linechange( HDC_IO_MASK, state );
+}
+
+WRITE_LINE_MEMBER( rmnimbus_state::nimbus_scsi_msg_w )
+{
+	nimbus_scsi_linechange( HDC_MSG_MASK, state );
+}
+
+WRITE_LINE_MEMBER( rmnimbus_state::nimbus_scsi_req_w )
+{
+	nimbus_scsi_linechange( HDC_REQ_MASK, state );
+}
+
+void rmnimbus_state::nimbus_scsi_linechange( UINT8 mask, UINT8 state )
+{
     UINT8   last = 0;
 
-    switch (line)
-    {
-        case SCSI_LINE_REQ   : mask=HDC_REQ_MASK; break;
-        case SCSI_LINE_CD    : mask=HDC_CD_MASK; break;
-        case SCSI_LINE_IO    : mask=HDC_IO_MASK; break;
-        case SCSI_LINE_BSY   : mask=HDC_BSY_MASK; break;
-        case SCSI_LINE_MSG   : mask=HDC_MSG_MASK; break;
-    }
-
-    last=drvstate->m_nimbus_drives.reg410_in & mask;
+    last=m_nimbus_drives.reg410_in & mask;
 
     if(state)
-        drvstate->m_nimbus_drives.reg410_in|=mask;
+        m_nimbus_drives.reg410_in|=mask;
     else
-        drvstate->m_nimbus_drives.reg410_in&=~mask;
+        m_nimbus_drives.reg410_in&=~mask;
 
 
-    if(HDC_IRQ_ENABLED(drvstate) && ((~drvstate->m_nimbus_drives.reg410_in & HDC_INT_TRIGGER)==HDC_INT_TRIGGER))
-        set_disk_int(device->machine(),1);
+    if(HDC_IRQ_ENABLED() && ((~m_nimbus_drives.reg410_in & HDC_INT_TRIGGER)==HDC_INT_TRIGGER))
+        set_disk_int(machine(),1);
     else
-        set_disk_int(device->machine(),0);
+        set_disk_int(machine(),0);
 
-    if(line==SCSI_LINE_REQ)
+    if( mask == HDC_REQ_MASK )
     {
         if (state==0)
         {
-            if(((drvstate->m_nimbus_drives.reg410_in & HDC_CD_MASK)==HDC_CD_MASK) && (last!=0))
+            if(((m_nimbus_drives.reg410_in & HDC_CD_MASK)==HDC_CD_MASK) && (last!=0))
             {
-                drvstate->m_nimbus_drives.drq_ff=1;
-                hdc_drq(device->machine());
+                m_nimbus_drives.drq_ff=1;
+                hdc_drq(machine());
             }
         }
         else
 		{
-			drvstate->m_scsibus->scsi_ack_w(1);
+			m_scsibus->scsi_ack_w(1);
 		}
     }
 }

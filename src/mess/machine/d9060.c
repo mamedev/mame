@@ -148,13 +148,13 @@ WRITE_LINE_MEMBER( base_d9060_device::req_w )
 
 static const SCSICB_interface sasi_intf =
 {
-	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER("^^", base_d9060_device, req_w),
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 

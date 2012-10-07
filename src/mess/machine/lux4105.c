@@ -66,13 +66,13 @@ WRITE_LINE_MEMBER( luxor_4105_device::sasi_req_w )
 
 static const SCSICB_interface sasi_intf =
 {
-	NULL,
 	DEVCB_DEVICE_LINE_MEMBER("^^", luxor_4105_device, sasi_bsy_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER("^^", luxor_4105_device, sasi_io_w),
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER("^^", luxor_4105_device, sasi_req_w),
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 

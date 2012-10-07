@@ -24,6 +24,7 @@ void scsicb_device::device_start()
 	out_io_func.resolve(_out_io_func, *this);
 	out_msg_func.resolve(_out_msg_func, *this);
 	out_req_func.resolve(_out_req_func, *this);
+	out_ack_func.resolve(_out_ack_func, *this);
 	out_rst_func.resolve(_out_rst_func, *this);
 }
 

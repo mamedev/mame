@@ -86,7 +86,7 @@ static const z80_daisy_config daisy_chain[] =
 
 static const SCSICB_interface sasi_intf =
 {
-	NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

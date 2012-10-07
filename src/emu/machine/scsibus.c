@@ -491,9 +491,6 @@ void scsibus_device::scsi_out_line_change_now(UINT8 line, UINT8 state)
 
 	if(m_scsicb != NULL)
 	{
-		if(m_scsicb->line_change_cb!=NULL)
-			m_scsicb->line_change_cb(this, line,state);
-
 		switch (line)
 		{
 		case SCSI_LINE_BSY: m_scsicb->out_bsy_func(state); break;
@@ -502,6 +499,7 @@ void scsibus_device::scsi_out_line_change_now(UINT8 line, UINT8 state)
 		case SCSI_LINE_IO: m_scsicb->out_io_func(state); break;
 		case SCSI_LINE_MSG: m_scsicb->out_msg_func(state); break;
 		case SCSI_LINE_REQ: m_scsicb->out_req_func(state); break;
+		case SCSI_LINE_ACK: m_scsicb->out_ack_func(state); break;
 		case SCSI_LINE_RESET: m_scsicb->out_rst_func(state); break;
 		}
 	}

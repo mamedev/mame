@@ -86,7 +86,14 @@ static const msm5205_interface msm5205_config =
 
 static const SCSICB_interface scsibus_config =
 {
-	&nimbus_scsi_linechange
+	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state, nimbus_scsi_bsy_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state, nimbus_scsi_cd_w),
+	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state, nimbus_scsi_io_w),
+	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state, nimbus_scsi_msg_w),
+	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state, nimbus_scsi_req_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const centronics_interface nimbus_centronics_config =

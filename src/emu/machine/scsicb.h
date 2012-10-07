@@ -25,14 +25,13 @@
 
 struct SCSICB_interface
 {
-	void (*line_change_cb)(device_t *, UINT8 line, UINT8 state);
-
 	devcb_write_line _out_bsy_func;
 	devcb_write_line _out_sel_func;
 	devcb_write_line _out_cd_func;
 	devcb_write_line _out_io_func;
 	devcb_write_line _out_msg_func;
 	devcb_write_line _out_req_func;
+	devcb_write_line _out_ack_func;
 	devcb_write_line _out_rst_func;
 };
 
@@ -49,6 +48,7 @@ public:
 	devcb_resolved_write_line out_io_func;
 	devcb_resolved_write_line out_msg_func;
 	devcb_resolved_write_line out_req_func;
+	devcb_resolved_write_line out_ack_func;
 	devcb_resolved_write_line out_rst_func;
 
 	UINT8 scsi_data_r();

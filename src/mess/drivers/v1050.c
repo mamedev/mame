@@ -986,7 +986,7 @@ static const floppy_interface v1050_floppy_interface =
 
 static const SCSICB_interface sasi_intf =
 {
-	NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
