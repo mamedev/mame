@@ -134,9 +134,9 @@
 		</bezel>
 		<bezel element="P0"><bounds left="200" right="258" top="330" bottom="342" /></bezel>
 		<bezel element="P1"><bounds left="30" right="88" top="330" bottom="342" /></bezel>
-		<bezel element="P3"><bounds left="100" right="180" top="30" bottom="42" /></bezel>
-		<bezel element="P4"><bounds left="100" right="180" top="90" bottom="102" /></bezel>
-		<bezel element="P5"><bounds left="100" right="180" top="150" bottom="162" /></bezel>
-		<bezel element="P6"><bounds left="100" right="180" top="210" bottom="222" /></bezel>
+		<bezel name="text3" element="P3"><bounds left="100" right="180" top="30" bottom="42" /></bezel>
+		<bezel name="text2" element="P4"><bounds left="100" right="180" top="90" bottom="102" /></bezel>
+		<bezel name="text1" element="P5"><bounds left="100" right="180" top="150" bottom="162" /></bezel>
+		<bezel name="text0" element="P6"><bounds left="100" right="180" top="210" bottom="222" /></bezel>
 	</view>
 </mamelayout>

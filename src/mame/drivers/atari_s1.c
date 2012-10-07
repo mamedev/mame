@@ -79,18 +79,20 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( atari_s1 )
 	// need to fix these, the manual has a lot of mistakes
 	PORT_START("INP00")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Test") PORT_CODE(KEYCODE_0)
+	PORT_DIPNAME( 0x80, 0x80, "2000" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_START("INP01")
-	PORT_DIPNAME( 0x80, 0x80, "Spelling Award" )
+	PORT_DIPNAME( 0x80, 0x80, "Spelling Award" ) // actually = coins
 	PORT_DIPSETTING(    0x80, "Extra Ball" )
 	PORT_DIPSETTING(    0x00, "20,000 points" )
 	PORT_START("INP02")
-	PORT_DIPNAME( 0x80, 0x80, "Last Ball double bonus" )
+	PORT_DIPNAME( 0x80, 0x80, "Last Ball double bonus" ) // actually = match
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_START("INP03")
 	// This switch together with INP4C thru 4F, sets the scores at which a replay is awarded
-	PORT_DIPNAME( 0x80, 0x80, "Replay score" )
+	PORT_DIPNAME( 0x80, 0x80, "Replay score" ) // actually = number of balls
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	// These 2 dips control max number of credits (both off = 8; then 12, 15, both on=20)
@@ -295,14 +297,23 @@ READ8_MEMBER( atari_s1_state::switch_r )
 
 TIMER_DEVICE_CALLBACK_MEMBER( atari_s1_state::nmi )
 {
+	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
 	m_bit6++;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
 	m_out_offs++;
 	m_out_offs &= 0x1f;
-	output_set_digit_value(m_out_offs << 1, patterns[m_p_ram[m_out_offs]>>4]);
-	output_set_digit_value((m_out_offs << 1)+1, patterns[m_p_ram[m_out_offs]&15]);
+	if ((m_out_offs & 3) == 3)
+	{
+		char wordnum[8];
+		sprintf(wordnum,"text%d",m_out_offs>>2);
+		output_set_value(wordnum, !(m_p_ram[m_out_offs]==8));
+	}
+	else
+	{
+		output_set_digit_value(m_out_offs << 1, patterns[m_p_ram[m_out_offs]>>4]);
+		output_set_digit_value((m_out_offs << 1)+1, patterns[m_p_ram[m_out_offs]&15]);
+	}
 }
 
 static MACHINE_CONFIG_START( atari_s1, atari_s1_state )
