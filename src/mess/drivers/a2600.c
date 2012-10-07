@@ -2015,7 +2015,8 @@ void a2600_state::machine_reset()
 		space.install_read_handler(0x1fe0, 0x1fe7, read8_delegate(FUNC(a2600_state::modeE7_switch_r),this));
 		space.install_write_handler(0x1fe8, 0x1feb, write8_delegate(FUNC(a2600_state::modeE7_RAM_switch_w),this));
 		space.install_read_handler(0x1fe8, 0x1feb, read8_delegate(FUNC(a2600_state::modeE7_RAM_switch_r),this));
-		space.install_readwrite_bank(0x1800, 0x18ff, "bank9");
+		space.install_write_bank(0x1800, 0x18ff, "bank9");
+		space.install_read_bank(0x1900, 0x19ff, "bank9");
 		membank("bank9")->set_base(m_extra_RAM->base() + 4 * 256 );
 		break;
 
