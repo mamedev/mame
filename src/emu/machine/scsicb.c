@@ -25,6 +25,7 @@ void scsicb_device::device_start()
 	out_msg_func.resolve(_out_msg_func, *this);
 	out_req_func.resolve(_out_req_func, *this);
 	out_ack_func.resolve(_out_ack_func, *this);
+	out_atn_func.resolve(_out_atn_func, *this);
 	out_rst_func.resolve(_out_rst_func, *this);
 }
 
@@ -69,7 +70,8 @@ READ_LINE_MEMBER( scsicb_device::scsi_io_r ) { return get_scsi_line(SCSI_LINE_IO
 READ_LINE_MEMBER( scsicb_device::scsi_msg_r ) { return get_scsi_line(SCSI_LINE_MSG); }
 READ_LINE_MEMBER( scsicb_device::scsi_req_r ) { return get_scsi_line(SCSI_LINE_REQ); }
 READ_LINE_MEMBER( scsicb_device::scsi_ack_r ) { return get_scsi_line(SCSI_LINE_ACK); }
-READ_LINE_MEMBER( scsicb_device::scsi_rst_r ) { return get_scsi_line(SCSI_LINE_RESET); }
+READ_LINE_MEMBER( scsicb_device::scsi_atn_r ) { return get_scsi_line(SCSI_LINE_ATN); }
+READ_LINE_MEMBER( scsicb_device::scsi_rst_r ) { return get_scsi_line(SCSI_LINE_RST); }
 
 WRITE_LINE_MEMBER( scsicb_device::scsi_bsy_w ) { set_scsi_line(SCSI_LINE_BSY, state); }
 WRITE_LINE_MEMBER( scsicb_device::scsi_sel_w ) { set_scsi_line(SCSI_LINE_SEL, state); }
@@ -78,6 +80,7 @@ WRITE_LINE_MEMBER( scsicb_device::scsi_io_w ) { set_scsi_line(SCSI_LINE_IO, stat
 WRITE_LINE_MEMBER( scsicb_device::scsi_msg_w ) { set_scsi_line(SCSI_LINE_MSG, state); }
 WRITE_LINE_MEMBER( scsicb_device::scsi_req_w ) { set_scsi_line(SCSI_LINE_REQ, state); }
 WRITE_LINE_MEMBER( scsicb_device::scsi_ack_w ) { set_scsi_line(SCSI_LINE_ACK, state); }
-WRITE_LINE_MEMBER( scsicb_device::scsi_rst_w ) { set_scsi_line(SCSI_LINE_RESET, state); }
+WRITE_LINE_MEMBER( scsicb_device::scsi_atn_w ) { set_scsi_line(SCSI_LINE_ATN, state); }
+WRITE_LINE_MEMBER( scsicb_device::scsi_rst_w ) { set_scsi_line(SCSI_LINE_RST, state); }
 
 const device_type SCSICB = &device_creator<scsicb_device>;

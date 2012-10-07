@@ -168,14 +168,15 @@ UINT8 scsibus_device::get_scsi_line(UINT8 lineno)
 
 	switch (lineno)
 	{
-		case SCSI_LINE_SEL:   result=(linestate & (1<<SCSI_LINE_SEL)) >> SCSI_LINE_SEL; break;
 		case SCSI_LINE_BSY:   result=(linestate & (1<<SCSI_LINE_BSY)) >> SCSI_LINE_BSY; break;
-		case SCSI_LINE_REQ:   result=(linestate & (1<<SCSI_LINE_REQ)) >> SCSI_LINE_REQ; break;
-		case SCSI_LINE_ACK:   result=(linestate & (1<<SCSI_LINE_ACK)) >> SCSI_LINE_ACK; break;
+		case SCSI_LINE_SEL:   result=(linestate & (1<<SCSI_LINE_SEL)) >> SCSI_LINE_SEL; break;
 		case SCSI_LINE_CD:    result=(linestate & (1<<SCSI_LINE_CD )) >> SCSI_LINE_CD; break;
 		case SCSI_LINE_IO:    result=(linestate & (1<<SCSI_LINE_IO )) >> SCSI_LINE_IO; break;
 		case SCSI_LINE_MSG:   result=(linestate & (1<<SCSI_LINE_MSG)) >> SCSI_LINE_MSG; break;
-		case SCSI_LINE_RESET: result=(linestate & (1<<SCSI_LINE_RESET)) >> SCSI_LINE_RESET; break;
+		case SCSI_LINE_REQ:   result=(linestate & (1<<SCSI_LINE_REQ)) >> SCSI_LINE_REQ; break;
+		case SCSI_LINE_ACK:   result=(linestate & (1<<SCSI_LINE_ACK)) >> SCSI_LINE_ACK; break;
+		case SCSI_LINE_ATN:   result=(linestate & (1<<SCSI_LINE_ATN)) >> SCSI_LINE_MSG; break;
+		case SCSI_LINE_RST:   result=(linestate & (1<<SCSI_LINE_RST)) >> SCSI_LINE_RST; break;
 	}
 
 	LOG(3,"get_scsi_line(%s)=%d\n",linenames[lineno],result);
@@ -328,7 +329,7 @@ void scsibus_device::scsi_in_line_changed(UINT8 line, UINT8 state)
 	void *hdfile;
 
 	// Reset aborts and returns to bus free
-	if((line==SCSI_LINE_RESET) && (state==0))
+	if((line==SCSI_LINE_RST) && (state==0))
 	{
 		scsi_change_phase(SCSI_PHASE_BUS_FREE);
 		cmd_idx=0;
@@ -500,7 +501,8 @@ void scsibus_device::scsi_out_line_change_now(UINT8 line, UINT8 state)
 		case SCSI_LINE_MSG: m_scsicb->out_msg_func(state); break;
 		case SCSI_LINE_REQ: m_scsicb->out_req_func(state); break;
 		case SCSI_LINE_ACK: m_scsicb->out_ack_func(state); break;
-		case SCSI_LINE_RESET: m_scsicb->out_rst_func(state); break;
+		case SCSI_LINE_ATN: m_scsicb->out_atn_func(state); break;
+		case SCSI_LINE_RST: m_scsicb->out_rst_func(state); break;
 		}
 	}
 }

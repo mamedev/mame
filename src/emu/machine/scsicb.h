@@ -32,6 +32,7 @@ struct SCSICB_interface
 	devcb_write_line _out_msg_func;
 	devcb_write_line _out_req_func;
 	devcb_write_line _out_ack_func;
+	devcb_write_line _out_atn_func;
 	devcb_write_line _out_rst_func;
 };
 
@@ -49,6 +50,7 @@ public:
 	devcb_resolved_write_line out_msg_func;
 	devcb_resolved_write_line out_req_func;
 	devcb_resolved_write_line out_ack_func;
+	devcb_resolved_write_line out_atn_func;
 	devcb_resolved_write_line out_rst_func;
 
 	UINT8 scsi_data_r();
@@ -67,6 +69,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( scsi_msg_r );
 	DECLARE_READ_LINE_MEMBER( scsi_req_r );
 	DECLARE_READ_LINE_MEMBER( scsi_ack_r );
+	DECLARE_READ_LINE_MEMBER( scsi_atn_r );
 	DECLARE_READ_LINE_MEMBER( scsi_rst_r );
 
 	DECLARE_WRITE_LINE_MEMBER( scsi_bsy_w );
@@ -76,6 +79,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( scsi_msg_w );
 	DECLARE_WRITE_LINE_MEMBER( scsi_req_w );
 	DECLARE_WRITE_LINE_MEMBER( scsi_ack_w );
+	DECLARE_WRITE_LINE_MEMBER( scsi_atn_w );
 	DECLARE_WRITE_LINE_MEMBER( scsi_rst_w );
 
 protected:

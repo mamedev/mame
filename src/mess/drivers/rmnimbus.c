@@ -93,6 +93,7 @@ static const SCSICB_interface scsibus_config =
 	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state, nimbus_scsi_msg_w),
 	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state, nimbus_scsi_req_w),
 	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 

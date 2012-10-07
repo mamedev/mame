@@ -292,6 +292,7 @@ static const SCSICB_interface scsi_intf =
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER("^^", e01_device, scsi_req_w),
 	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 

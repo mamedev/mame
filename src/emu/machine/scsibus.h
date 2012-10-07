@@ -24,14 +24,15 @@
     CONSTANTS
 ***************************************************************************/
 
-#define SCSI_LINE_SEL   0
-#define SCSI_LINE_BSY   1
-#define SCSI_LINE_REQ   2
-#define SCSI_LINE_ACK   3
-#define SCSI_LINE_CD    4
-#define SCSI_LINE_IO    5
-#define SCSI_LINE_MSG   6
-#define SCSI_LINE_RESET 7
+#define SCSI_LINE_BSY   0
+#define SCSI_LINE_SEL   1
+#define SCSI_LINE_CD    2
+#define SCSI_LINE_IO    3
+#define SCSI_LINE_MSG   4
+#define SCSI_LINE_REQ   5
+#define SCSI_LINE_ACK   6
+#define SCSI_LINE_ATN   7
+#define SCSI_LINE_RST   8
 
 #define REQ_DELAY_NS    90
 #define ACK_DELAY_NS    90

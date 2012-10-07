@@ -100,6 +100,7 @@ static const SCSICB_interface sasi_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
