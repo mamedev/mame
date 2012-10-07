@@ -247,12 +247,14 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="8in1" supported="no">
+	<!-- Known 'feature': Centipede doesn't work -->
+	<software name="8in1">
 		<description>8 in 1 - Asteroids + Centipede + BattleZone + SwordQuest - EarthWorld + SwordQuest - FireWorld + RealSports Soccer + RealSports Tennis + Yars' Revenge (Prototype 19920116)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26193" />
 		<part name="cart" interface="a2600_cart">
+			<feature name="mapper" value="8in1" />
 			<dataarea name="rom" size="65536">
 				<rom name="8 in 1 (prototype).bin" size="65536" crc="5ddf79f5" sha1="c066942446c3fc7075ee8430a381d5da4adaec41" offset="0" />
 			</dataarea>

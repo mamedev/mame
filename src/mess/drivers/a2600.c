@@ -2,6 +2,10 @@
 
   Atari VCS 2600 driver
 
+TODO:
+- Move the 2 32-in-1 rom dumps into their own driver
+- Add 128-in-1 driver
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -193,7 +197,8 @@ enum
 	modeFV,
 	modeDPC,
 	mode32in1,
-	modeJVP
+	modeJVP,
+	mode8in1
 };
 
 static const UINT16 supported_screen_heights[4] = { 262, 312, 328, 342 };
@@ -591,9 +596,31 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 	state->m_current_bank = 0;
 
 	if (image.software_entry() == NULL)
+	{
 		image.fread(cart, state->m_cart_size);
+	}
 	else
+	{
 		memcpy(cart, image.get_software_region("rom"), state->m_cart_size);
+
+		const char *mapper = software_part_get_feature((software_part*)image.part_entry(), "mapper");
+
+		if ( mapper != NULL )
+		{
+			static const struct { const char *mapper_name; int mapper_type; } mapper_types[] =
+			{
+				 { "8in1", mode8in1 },
+			};
+
+			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && state->m_banking_mode == 0xff; i++)
+			{
+				if (!mame_stricmp(mapper, mapper_types[i].mapper_name))
+				{
+					state->m_banking_mode = mapper_types[i].mapper_type;
+				}
+			}
+		}
+	}
 
 	if (!(state->m_cart_size == 0x4000 && detect_modef6(image.device().machine())))
 	{
@@ -616,7 +643,7 @@ int a2600_state::next_bank()
 
 void a2600_state::modeF8_switch(UINT16 offset, UINT8 data)
 {
-	m_bank_base[1] = m_cart + 0x1000 * offset;
+	m_bank_base[1] = m_cart + 0x2000 * m_current_reset_bank_counter + 0x1000 * offset;
 	membank("bank1")->set_base(m_bank_base[1]);
 }
 
@@ -1879,7 +1906,21 @@ void a2600_state::machine_reset()
 		install_banks(1, 0x0000);
 		break;
 
+	case mode8in1:
+		m_current_reset_bank_counter = m_current_reset_bank_counter & 0x07;
+		if ( m_current_reset_bank_counter == 7 )
+		{
+			/* Special case for Yar's Revenge */
+			install_banks(1, 0x2000 * m_current_reset_bank_counter + 0x0000);
+		}
+		else
+		{
+			install_banks(1, 0x2000 * m_current_reset_bank_counter + 0x1000);
+		}
+		break;
+
 	case modeF8:
+		m_current_reset_bank_counter = 0;
 		if (!memcmp(&CART_MEMBER[0x1ffc],snowwhite,sizeof(snowwhite)))
 		{
 			install_banks(1, 0x0000);
@@ -1976,6 +2017,7 @@ void a2600_state::machine_reset()
 	switch (m_banking_mode)
 	{
 	case modeF8:
+	case mode8in1:
 		space.install_write_handler(0x1ff8, 0x1ff9, write8_delegate(FUNC(a2600_state::modeF8_switch_w),this));
 		space.install_read_handler(0x1ff8, 0x1ff9, read8_delegate(FUNC(a2600_state::modeF8_switch_r),this));
 		break;
