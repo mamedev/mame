@@ -54,6 +54,7 @@
 */
 
 #include "e01.h"
+#include "machine/scsibus.h"
 #include "machine/scsicb.h"
 #include "machine/scsihd.h"
 
@@ -335,9 +336,9 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( e01 )
-	// basic machine hardware
+    // basic machine hardware
 	MCFG_CPU_ADD(R65C102_TAG, M65C02, XTAL_8MHz/4) // Rockwell R65C102P3
-	MCFG_CPU_PROGRAM_MAP(e01_mem)
+    MCFG_CPU_PROGRAM_MAP(e01_mem)
 
 	MCFG_MC146818_IRQ_ADD(HD146818_TAG, MC146818_STANDARD, rtc_intf)
 

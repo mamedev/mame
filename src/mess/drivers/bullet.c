@@ -58,6 +58,7 @@ Notes:
 */
 
 #include "includes/bullet.h"
+#include "machine/scsibus.h"
 #include "machine/scsicb.h"
 #include "machine/scsihd.h"
 
@@ -1155,10 +1156,10 @@ void bulletf_state::machine_reset()
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( bullet, bullet_state )
-	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
-	MCFG_CPU_PROGRAM_MAP(bullet_mem)
-	MCFG_CPU_IO_MAP(bullet_io)
+    // basic machine hardware
+    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+    MCFG_CPU_PROGRAM_MAP(bullet_mem)
+    MCFG_CPU_IO_MAP(bullet_io)
 	MCFG_CPU_CONFIG(daisy_chain)
 
 	// devices
@@ -1186,10 +1187,10 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( bulletf, bulletf_state )
-	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
-	MCFG_CPU_PROGRAM_MAP(bulletf_mem)
-	MCFG_CPU_IO_MAP(bulletf_io)
+    // basic machine hardware
+    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+    MCFG_CPU_PROGRAM_MAP(bulletf_mem)
+    MCFG_CPU_IO_MAP(bulletf_io)
 	MCFG_CPU_CONFIG(daisy_chain)
 
 	// devices

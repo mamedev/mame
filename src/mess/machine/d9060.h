@@ -30,8 +30,6 @@
 #include "machine/6532riot.h"
 #include "machine/ieee488.h"
 #include "machine/scsicb.h"
-#include "machine/scsibus.h"
-
 
 
 
