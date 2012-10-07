@@ -1,115 +1,210 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
 
-<!-- define elements -->
+	<element name="overlay">
 
-	<element name="blue_blob">
+<!-- backdrop -->
+
+		<rect>
+			<color red="0.0" green="0.85" blue="0.20" />
+			<bounds x="0" y="0" width="6000" height="6000" />
+		</rect>
+
+<!-- top-left blob -->
+
 		<disk>
 			<color red="0.0" green="0.85" blue="0.20" />
-			<bounds left="0" top="0" right="1000" bottom="1000" />
+			<bounds x="0" y="0" width="2500" height="2500" />
 		</disk>
 		<disk>
 			<color red="0.0" green="0.85" blue="0.30" />
-			<bounds left="15" top="15" right="985" bottom="985" />
+			<bounds x="38" y="38" width="2424" height="2424" />
 		</disk>
 		<disk>
 			<color red="0.0" green="0.85" blue="0.40" />
-			<bounds left="30" top="30" right="970" bottom="970" />
+			<bounds x="76" y="76" width="2348" height="2348" />
 		</disk>
 		<disk>
 			<color red="0.0" green="0.85" blue="0.50" />
-			<bounds left="45" top="45" right="955" bottom="955" />
+			<bounds x="114" y="114" width="2272" height="2272" />
 		</disk>
 		<disk>
 			<color red="0.0" green="0.85" blue="0.60" />
-			<bounds left="60" top="60" right="940" bottom="940" />
+			<bounds x="152" y="152" width="2196" height="2196" />
 		</disk>
 		<disk>
 			<color red="0.0" green="0.85" blue="0.70" />
-			<bounds left="75" top="75" right="925" bottom="925" />
+			<bounds x="190" y="190" width="2120" height="2120" />
 		</disk>
 		<disk>
 			<color red="0.0" green="0.85" blue="0.80" />
-			<bounds left="90" top="90" right="910" bottom="910" />
+			<bounds x="228" y="228" width="2044" height="2044" />
 		</disk>
 		<disk>
 			<color red="0.0" green="0.85" blue="0.90" />
-			<bounds left="105" top="105" right="895" bottom="895" />
+			<bounds x="266" y="266" width="1968" height="1968" />
 		</disk>
 		<disk>
 			<color red="0.0" green="0.85" blue="1.0" />
-			<bounds left="120" top="120" right="880" bottom="880" />
+			<bounds x="304" y="304" width="1892" height="1892" />
 		</disk>
-	</element>
 
-<!-- note: yellow blob should be a more diamond shape, -->
+<!-- top-right blob -->
+
+		<disk>
+			<color red="0.0" green="0.85" blue="0.20" />
+			<bounds x="3500" y="0" width="2500" height="2500" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.30" />
+			<bounds x="3538" y="38" width="2424" height="2424" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.40" />
+			<bounds x="3576" y="76" width="2348" height="2348" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.50" />
+			<bounds x="3614" y="114" width="2272" height="2272" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.60" />
+			<bounds x="3652" y="152" width="2196" height="2196" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.70" />
+			<bounds x="3690" y="190" width="2120" height="2120" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.80" />
+			<bounds x="3728" y="228" width="2044" height="2044" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.90" />
+			<bounds x="3766" y="266" width="1968" height="1968" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="1.0" />
+			<bounds x="3804" y="304" width="1892" height="1892" />
+		</disk>
+
+<!-- bottom-left blob -->
+
+		<disk>
+			<color red="0.0" green="0.85" blue="0.20" />
+			<bounds x="0" y="3500" width="2500" height="2500" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.30" />
+			<bounds x="38" y="3538" width="2424" height="2424" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.40" />
+			<bounds x="76" y="3576" width="2348" height="2348" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.50" />
+			<bounds x="114" y="3614" width="2272" height="2272" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.60" />
+			<bounds x="152" y="3652" width="2196" height="2196" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.70" />
+			<bounds x="190" y="3690" width="2120" height="2120" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.80" />
+			<bounds x="228" y="3728" width="2044" height="2044" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.90" />
+			<bounds x="266" y="3766" width="1968" height="1968" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="1.0" />
+			<bounds x="304" y="3804" width="1892" height="1892" />
+		</disk>
+
+<!-- bottom-right blob -->
+
+		<disk>
+			<color red="0.0" green="0.85" blue="0.20" />
+			<bounds x="3500" y="3500" width="2500" height="2500" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.30" />
+			<bounds x="3538" y="3538" width="2424" height="2424" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.40" />
+			<bounds x="3576" y="3576" width="2348" height="2348" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.50" />
+			<bounds x="3614" y="3614" width="2272" height="2272" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.60" />
+			<bounds x="3652" y="3652" width="2196" height="2196" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.70" />
+			<bounds x="3690" y="3690" width="2120" height="2120" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.80" />
+			<bounds x="3728" y="3728" width="2044" height="2044" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="0.90" />
+			<bounds x="3766" y="3766" width="1968" height="1968" />
+		</disk>
+		<disk>
+			<color red="0.0" green="0.85" blue="1.0" />
+			<bounds x="3804" y="3804" width="1892" height="1892" />
+		</disk>
+
+<!-- middle blob - note: it should be a more diamond shape, -->
 <!-- see MT 1064, but MAME internal layout can't do that -->
-	<element name="yellow_blob">
+
 		<disk>
 			<color red="0.0" green="0.85" blue="0.2" />
-			<bounds left="0" top="0" right="1000" bottom="1000" />
+			<bounds x="2000" y="2000" width="2000" height="2000" />
 		</disk>
 		<disk>
 			<color red="0.15" green="0.85" blue="0.2" />
-			<bounds left="10" top="10" right="990" bottom="990" />
+			<bounds x="2020" y="2020" width="1960" height="1960" />
 		</disk>
 		<disk>
 			<color red="0.30" green="0.85" blue="0.2" />
-			<bounds left="20" top="20" right="980" bottom="980" />
+			<bounds x="2040" y="2040" width="1920" height="1920" />
 		</disk>
 		<disk>
 			<color red="0.45" green="0.85" blue="0.2" />
-			<bounds left="30" top="30" right="970" bottom="970" />
+			<bounds x="2060" y="2060" width="1880" height="1880" />
 		</disk>
 		<disk>
 			<color red="0.60" green="0.85" blue="0.2" />
-			<bounds left="40" top="40" right="960" bottom="960" />
+			<bounds x="2080" y="2080" width="1840" height="1840" />
 		</disk>
 		<disk>
 			<color red="0.75" green="0.85" blue="0.2" />
-			<bounds left="50" top="50" right="950" bottom="950" />
+			<bounds x="2100" y="2100" width="1800" height="1800" />
 		</disk>
 		<disk>
 			<color red="0.90" green="0.85" blue="0.2" />
-			<bounds left="60" top="60" right="940" bottom="940" />
+			<bounds x="2120" y="2120" width="1760" height="1760" />
 		</disk>
 		<disk>
 			<color red="1.0" green="0.85" blue="0.2" />
-			<bounds left="70" top="70" right="930" bottom="930" />
-		</disk>
-	</element>
-
-	<element name="negative_blob">
-		<rect>
-			<color red="0.0" green="0.85" blue="0.2" />
-			<bounds x="0" y="0" width="400" height="300" />
-		</rect>
-
-		<disk>
-			<color red="1.0" green="1.0" blue="1.0" />
-			<bounds x="100" y="50" width="200" height="200" />
+			<bounds x="2140" y="2140" width="1720" height="1720" />
 		</disk>
 
-		<disk>
-			<color red="1.0" green="1.0" blue="1.0" />
-			<bounds x="-100" y="-150" width="250" height="250" />
-		</disk>
-		<disk>
-			<color red="1.0" green="1.0" blue="1.0" />
-			<bounds x="-100" y="200" width="250" height="250" />
-		</disk>
-		<disk>
-			<color red="1.0" green="1.0" blue="1.0" />
-			<bounds x="250" y="-150" width="250" height="250" />
-		</disk>
-		<disk>
-			<color red="1.0" green="1.0" blue="1.0" />
-			<bounds x="250" y="200" width="250" height="250" />
-		</disk>
 	</element>
 
 
-<!-- overlay -->
 
 	<view name="Color Overlay">
 		<bounds left="0" top="0" right="400" bottom="300" />
@@ -117,24 +212,7 @@
 			<bounds left="0" top="0" right="400" bottom="300" />
 		</screen>
 
-		<overlay element="blue_blob">
-			<bounds x="-100" y="-150" width="250" height="250" />
-		</overlay>
-		<overlay element="blue_blob">
-			<bounds x="-100" y="200" width="250" height="250" />
-		</overlay>
-		<overlay element="blue_blob">
-			<bounds x="250" y="-150" width="250" height="250" />
-		</overlay>
-		<overlay element="blue_blob">
-			<bounds x="250" y="200" width="250" height="250" />
-		</overlay>
-
-		<overlay element="yellow_blob">
-			<bounds x="100" y="50" width="200" height="200" />
-		</overlay>
-
-		<overlay element="negative_blob">
+		<overlay name="overlay" element="overlay">
 			<bounds x="-100" y="-150" width="600" height="600" />
 		</overlay>
 
