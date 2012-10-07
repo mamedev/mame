@@ -247,7 +247,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="8in1">
+	<software name="8in1" supported="no">
 		<description>8 in 1 - Asteroids + Centipede + BattleZone + SwordQuest - EarthWorld + SwordQuest - FireWorld + RealSports Soccer + RealSports Tennis + Yars' Revenge (Prototype 19920116)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
@@ -355,7 +355,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="decathln" supported="no">
+	<software name="decathln"> 
 		<description>The Activision Decathlon</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
@@ -597,7 +597,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="abwerniee" cloneof="abwernie" supported="no">
+	<software name="abwerniee" cloneof="abwernie"> 
 	<!-- controller not emulated -->
 		<description>Alpha Beam with Ernie (PAL)</description>
 		<year>1983</year>
@@ -613,7 +613,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="abwernie" supported="no">
+	<software name="abwernie">
 		<description>Alpha Beam with Ernie</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -628,7 +628,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="abwerniep" cloneof="abwernie" supported="no">
+	<software name="abwerniep" cloneof="abwernie">
 		<description>Alpha Beam with Ernie (Prototype 19831222)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -643,7 +643,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="abwernieep" cloneof="abwernie" supported="no">
+	<software name="abwernieep" cloneof="abwernie">
 		<description>Alpha Beam with Ernie (PAL) (Prototype 19830603)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -686,7 +686,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="andrmanp" supported="no">
+	<software name="andrmanp">
 	<!-- No display-->
 		<description>AndroMan on the Moon (Prototype)</description>
 		<year>1984</year>
@@ -1219,7 +1219,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="zoofun" supported="no">
+	<software name="zoofun">
 		<description>Zoo Fun</description>
 		<year>1983</year>
 		<publisher>HomeVision</publisher>
@@ -1440,7 +1440,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="basprog" supported="no">
+	<software name="basprog">
 		<description>BASIC Programming</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
@@ -3350,7 +3350,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="compumat">
+	<software name="compumat" supported="no">
 		<description>CompuMate (PAL)</description>
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
@@ -6100,7 +6100,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="gameline">
+	<software name="gameline" supported="no">
 		<description>GameLine Master Module ROM</description>
 		<year>1983</year>
 		<publisher>Control Video Corporation</publisher>
