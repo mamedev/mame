@@ -15,7 +15,7 @@
 #include "machine/i8255.h"
 #include "machine/msm58321.h"
 #include "machine/ram.h"
-#include "machine/scsibus.h"
+#include "machine/scsicb.h"
 #include "machine/v1050kb.h"
 #include "machine/wd17xx.h"
 #include "video/mc6845.h"
