@@ -4257,6 +4257,7 @@ src/mame/layout/arcwins.lay svneol=native#text/plain
 src/mame/layout/arimk4nz.lay svneol=native#text/plain
 src/mame/layout/aristmk4.lay svneol=native#text/plain
 src/mame/layout/armora.lay svneol=native#text/plain
+src/mame/layout/atari_s1.lay svneol=native#text/plain
 src/mame/layout/atarifb.lay svneol=native#text/plain
 src/mame/layout/atarifb4.lay svneol=native#text/plain
 src/mame/layout/avalnche.lay svneol=native#text/plain
