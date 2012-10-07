@@ -217,6 +217,7 @@ Info from Atariage and Atarimania
 		<info name="serial" value="CX26137" /> <!-- Not Sure About it. -->
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
+			<feature name="mapper" value="4in1" />
 			<dataarea name="rom" size="8192">
 				<rom name="4 in 1 - canyon bomber, home run, night driver, sky diver (02-19-1987) (atari) (cx26137) (prototype).bin" size="8192" crc="8b304851" sha1="bc60987b668d6fa26c49f5aba5815622710140d9" offset="0" />
 			</dataarea>
@@ -230,17 +231,20 @@ Info from Atariage and Atarimania
 		<info name="serial" value="P460" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
+			<feature name="mapper" value="4in1" />
 			<dataarea name="rom" size="16384">
 				<rom name="4 game in one - rodeo champ, open sesame, bobby is going home, festival.bin" size="16384" crc="69ca1a92" sha1="b6193826df511f39077013369e625e56577f2f36" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="4game1a" supported="no">
+	<software name="4game1a">
 		<description>4 Game in One - Ice Hockey + Phantom UFO + Spy Vs. Spy + Cosmic Avenger</description>
 		<year>198?</year>
 		<publisher>Bitcorp</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
+			<feature name="mapper" value="4in1" />
 			<dataarea name="rom" size="16384">
 				<rom name="4 game in one - ice hockey, phantom ufo, spy vs. spy, cosmic avenger.bin" size="16384" crc="caf86fa7" sha1="724c1ce352d0219699892f7c78083f825a71ac1a" offset="0" />
 			</dataarea>

@@ -198,7 +198,8 @@ enum
 	modeDPC,
 	mode32in1,
 	modeJVP,
-	mode8in1
+	mode8in1,
+	mode4in1
 };
 
 static const UINT16 supported_screen_heights[4] = { 262, 312, 328, 342 };
@@ -609,7 +610,8 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 		{
 			static const struct { const char *mapper_name; int mapper_type; } mapper_types[] =
 			{
-				 { "8in1", mode8in1 },
+				{ "4in1", mode4in1 },
+				{ "8in1", mode8in1 },
 			};
 
 			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && state->m_banking_mode == 0xff; i++)
@@ -1904,6 +1906,11 @@ void a2600_state::machine_reset()
 
 	case mode4K:
 		install_banks(1, 0x0000);
+		break;
+
+	case mode4in1:
+		m_current_reset_bank_counter = m_current_reset_bank_counter & 0x03;
+		install_banks(1, m_current_reset_bank_counter * 0x1000);
 		break;
 
 	case mode8in1:
