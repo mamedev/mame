@@ -107,14 +107,12 @@ READ8_MEMBER( suna8_state::banked_paletteram_r )
 
 READ8_MEMBER(suna8_state::suna8_banked_spriteram_r)
 {
-
 	offset += m_spritebank * 0x2000;
 	return m_spriteram[offset];
 }
 
 WRITE8_MEMBER(suna8_state::suna8_spriteram_w)
 {
-
 	m_spriteram[offset] = data;
 #if TILEMAPS
 	m_bg_tilemap->mark_tile_dirty(offset/2);
@@ -123,7 +121,6 @@ WRITE8_MEMBER(suna8_state::suna8_spriteram_w)
 
 WRITE8_MEMBER(suna8_state::suna8_banked_spriteram_w)
 {
-
 	offset += m_spritebank * 0x2000;
 	m_spriteram[offset] = data;
 #if TILEMAPS
@@ -188,26 +185,31 @@ static void suna8_vh_start_common(running_machine &machine, int dim)
 
 	state->m_text_dim		=	dim;
 	state->m_spritebank		=	0;
+	state->m_gfxbank		=	0;
+	state->m_use_gfxbank	=	0;
 	state->m_palettebank	=	0;
 
 	if (!state->m_text_dim)
 	{
 		state->m_generic_paletteram_8.allocate(0x200 * 2);
 		state->m_spriteram.allocate(0x2000 * 2);
+		memset(state->m_spriteram,0,0x2000 * 2);	// helps debugging
 	}
 
 #if TILEMAPS
 	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(suna8_state::get_tile_info),state), TILEMAP_SCAN_COLS,
 
-								8, 8, 0x20*((state->m_text_dim > 0)?4:8), 0x20);
+								8, 8, 0x20*(state->m_text_dim ? 4 : 8), 0x20);
 
 	state->m_bg_tilemap->set_transparent_pen(15);
 #endif
 }
 
-VIDEO_START_MEMBER(suna8_state,suna8_textdim0){ suna8_vh_start_common(machine(), 0);  }
-VIDEO_START_MEMBER(suna8_state,suna8_textdim8){ suna8_vh_start_common(machine(), 8);  }
-VIDEO_START_MEMBER(suna8_state,suna8_textdim12){ suna8_vh_start_common(machine(), 12); }
+VIDEO_START_MEMBER(suna8_state,suna8_textdim0)	{ suna8_vh_start_common(machine(),  0); }
+VIDEO_START_MEMBER(suna8_state,suna8_textdim8)	{ suna8_vh_start_common(machine(),  8); }
+VIDEO_START_MEMBER(suna8_state,suna8_textdim12)	{ suna8_vh_start_common(machine(), 12); }
+
+VIDEO_START_MEMBER(suna8_state,suna8_textdim0_gfxbank)	{ suna8_vh_start_common(machine(),  0); m_use_gfxbank = 1; }
 
 /***************************************************************************
 
@@ -237,9 +239,9 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 		int x		=	spriteram[i + 2];
 		int bank	=	spriteram[i + 3];
 
-		if (state->m_text_dim > 0)
+		if (state->m_text_dim)
 		{
-			/* Older, simpler hardware */
+			// Older, simpler hardware: hardhead, rranger
 			flipx = 0;
 			flipy = 0;
 			gfxbank = bank & 0x3f;
@@ -261,7 +263,7 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 		}
 		else
 		{
-			/* Newer, more complex hardware (not finished yet!) */
+			// Newer, more complex hardware: brickzn, hardhea2, sparkman?, starfigh
 			switch( code & 0xc0 )
 			{
 			case 0xc0:
@@ -287,8 +289,24 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 				flipx = code & 0x01;
 				flipy = bank & 0x10;
 				srcy  = (((bank & 0x80)>>4) + (bank & 0x04) + ((~bank >> 4)&2)) * 2;
-				srcpg = (code >> 4) & 7;
-				gfxbank = (bank & 0x3) + (srcpg & 4);	// brickzn: 06,a6,a2,b2->6. starfigh: 01->01,4->0
+				srcpg = ((code >> 4) & 3) + 4;
+				gfxbank = (bank & 0x3) + 4;	// brickzn: 06,a6,a2,b2->6
+				if (state->m_use_gfxbank)
+				{
+					// starfigh: boss 2 head, should be p7 g7 x8/c y4:
+					//		67 74 88 03
+					//		67 76 ac 03
+					// starfigh: boss 2 chainguns should be p6 g7:
+					//		a8 68/a/c/e 62 23
+					//		48 68/a/c/e 62 23
+					// starfigh: player, p4 g0:
+					//		64 40 d3 20
+					// starfigh: title star, p5 g1 / p7 g0:
+					//		70 56/8/a/c 0e 01 (gfxhi=1)
+					//		6f 78/a/c/e 0f 04 ""
+					gfxbank = (bank & 0x3);
+					if (gfxbank == 3)	gfxbank += state->m_gfxbank;
+				}
 				colorbank = (bank & 8) >> 3;
 				break;
 			case 0x00:
@@ -297,9 +315,15 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 				srcx  = (code & 0xf) * 2;
 				flipx = 0;
 				flipy = 0;
-				gfxbank = bank & 0x03;
 				srcy  = (((bank & 0x80)>>4) + (bank & 0x04) + ((~bank >> 4)&3)) * 2;
 				srcpg = (code >> 4) & 3;
+				gfxbank = bank & 0x03;
+				if (state->m_use_gfxbank)
+				{
+					// starfigh: boss 2 tail, p2 g7:
+					//		61 20 1b 27
+					if (gfxbank == 3)	gfxbank += state->m_gfxbank;
+				}
 				break;
 			}
 			multisprite = ((code & 0x80) && (bank & 0x80));
@@ -361,7 +385,7 @@ static void draw_text_sprites(running_machine &machine, bitmap_ind16 &bitmap,con
 	int max_y = machine.primary_screen->height() - 8;
 
 	/* Earlier games only */
-	if (!(state->m_text_dim > 0))	return;
+	if (!state->m_text_dim)	return;
 
 	for (i = 0x1900; i < 0x19ff; i += 4)
 	{
@@ -446,7 +470,7 @@ UINT32 suna8_state::screen_update_suna8(screen_device &screen, bitmap_ind16 &bit
 		if (machine().input().code_pressed_once(KEYCODE_S))	{ m_trombank++;	machine().tilemap().mark_all_dirty();	}
 
 		m_rombank  &= 0xf;
-		m_page  &= (m_text_dim > 0)?3:7;
+		m_page  &= m_text_dim ? 3 : 7;
 		m_tiles %= max_tiles;
 		if (m_tiles < 0) m_tiles += max_tiles;
 

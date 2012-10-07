@@ -19,7 +19,10 @@ public:
 	optional_shared_ptr<UINT8> m_wram;
 
 	UINT8 m_rombank;
+	UINT8 m_rombank_latch;
 	UINT8 m_spritebank;
+	UINT8 m_gfxbank;		// starfigh
+	UINT8 m_use_gfxbank;	// ""
 	UINT8 m_palettebank;
 	UINT8 m_paletteram_enab;
 	UINT8 m_prot2;
@@ -72,8 +75,15 @@ public:
 	DECLARE_WRITE8_MEMBER(hardhea2_spritebank_1_w);
 	DECLARE_WRITE8_MEMBER(hardhea2_rambank_0_w);
 	DECLARE_WRITE8_MEMBER(hardhea2_rambank_1_w);
+
+	// starfigh
+	DECLARE_WRITE8_MEMBER(starfigh_rombank_latch_w);
 	DECLARE_WRITE8_MEMBER(starfigh_spritebank_latch_w);
+	DECLARE_WRITE8_MEMBER(starfigh_sound_latch_w);
 	DECLARE_WRITE8_MEMBER(starfigh_spritebank_w);
+	DECLARE_READ8_MEMBER(starfigh_cheats_r);
+	DECLARE_WRITE8_MEMBER(starfigh_leds_w);
+
 	DECLARE_WRITE8_MEMBER(sparkman_cmd_prot_w);
 	DECLARE_WRITE8_MEMBER(suna8_wram_w);
 	DECLARE_WRITE8_MEMBER(sparkman_flipscreen_w);
@@ -102,6 +112,7 @@ public:
 	DECLARE_VIDEO_START(suna8_textdim8);
 	DECLARE_MACHINE_RESET(brickzn);
 	DECLARE_VIDEO_START(suna8_textdim0);
+	DECLARE_VIDEO_START(suna8_textdim0_gfxbank);
 	DECLARE_MACHINE_RESET(hardhea2);
 	UINT32 screen_update_suna8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(brickzn_interrupt);
