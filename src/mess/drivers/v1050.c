@@ -345,6 +345,28 @@ WRITE8_MEMBER( v1050_state::dvint_clr_w )
 	m_subcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
+WRITE8_MEMBER( v1050_state::sasi_data_w )
+{
+	data_out = data;
+
+	if( m_sasibus->scsi_io_r() != 0 )
+	{
+		m_sasibus->scsi_data_w( data );
+	}
+}
+
+WRITE_LINE_MEMBER( v1050_state::sasi_io_w )
+{
+	if( state != 0 )
+	{
+		m_sasibus->scsi_data_w( data_out );
+	}
+	else
+	{
+		m_sasibus->scsi_data_w( 0xff );
+	}
+}
+
 READ8_MEMBER( v1050_state::sasi_status_r )
 {
 	/*
@@ -447,7 +469,7 @@ static ADDRESS_MAP_START( v1050_io, AS_IO, 8, v1050_state )
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(dint_clr_r, dint_clr_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(v1050_i8214_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(bank_w)
-	AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE(SASIBUS_TAG ":host", scsicb_device, scsi_data_r, scsi_data_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(sasi_data_w) AM_DEVREAD(SASIBUS_TAG ":host", scsicb_device, scsi_data_r)
 	AM_RANGE(0xe1, 0xe1) AM_READWRITE(sasi_status_r, sasi_ctrl_w)
 ADDRESS_MAP_END
 
@@ -989,7 +1011,7 @@ static const SCSICB_interface sasi_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(v1050_state, sasi_io_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

@@ -128,6 +128,8 @@ public:
 	DECLARE_READ8_MEMBER( videoram_r );
 	DECLARE_WRITE8_MEMBER( videoram_w );
 	DECLARE_WRITE_LINE_MEMBER( crtc_vs_w );
+	DECLARE_WRITE8_MEMBER(sasi_data_w);
+	DECLARE_WRITE_LINE_MEMBER(sasi_io_w);
 	DECLARE_READ8_MEMBER( sasi_status_r );
 	DECLARE_WRITE8_MEMBER( sasi_ctrl_w );
 
@@ -157,6 +159,10 @@ public:
 	required_shared_ptr<UINT8> m_video_ram; 			// video RAM
 	UINT8 *m_attr_ram;			// attribute RAM
 	UINT8 m_attr;				// attribute latch
+
+	// sasi state
+	UINT8 data_out;
+
 	TIMER_DEVICE_CALLBACK_MEMBER(v1050_keyboard_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(sasi_ack_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(sasi_rst_tick);
