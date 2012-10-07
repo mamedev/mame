@@ -1,15 +1,17 @@
-/***************************************************************************
+/*
 
- scsihle.h
+scsihle.h
 
-***************************************************************************/
+Base class for HLE'd SCSI devices.
+
+*/
 
 #ifndef _SCSIHLE_H_
 #define _SCSIHLE_H_
 
+#include "machine/scsibus.h"
 #include "machine/scsidev.h"
 
-// base handler
 class scsihle_device : public scsidev_device
 {
 public:
@@ -26,7 +28,9 @@ public:
 	virtual void SetPhase( int phase );
 	virtual void GetPhase( int *phase );
 	virtual int GetDeviceID();
-	virtual int GetSectorBytes();
+	virtual int GetSectorBytes() = 0;
+
+	virtual void scsi_in( UINT32 data, UINT32 mask );
 
 	// configuration helpers
 	static void static_set_deviceid(device_t &device, int _scsiID);
@@ -34,9 +38,35 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	UINT8 command[16];
+	void scsi_change_phase(UINT8 newphase);
+	int get_scsi_cmd_len(int cbyte);
+	UINT8 scsibus_driveno(UINT8  drivesel);
+	void scsibus_read_data();
+	void scsibus_write_data();
+	void scsibus_exec_command();
+	void check_process_dataout();
+	void dump_command_bytes();
+	void dump_data_bytes(int count);
+	void dump_bytes(UINT8 *buff, int count);
+
+	//emu_timer *req_timer;
+	//emu_timer *ack_timer;
+	emu_timer *sel_timer;
+	emu_timer *dataout_timer;
+
+	UINT8 command[ 32 ];
+	UINT8 cmd_idx;
+	UINT8 is_linked;
+
+	UINT8 buffer[ 1024 ];
+	UINT16 data_idx;
+	int bytes_left;
+	int data_last;
+	int sectorbytes;
+
 	int commandLength;
 	int phase;
 	int scsiID;
@@ -64,34 +94,34 @@ extern int SCSILengthFromUINT16( UINT8 *length );
 // Status / Sense data taken from Adaptec ACB40x0 documentation.
 //
 
-#define SCSI_STATUS_OK				0x00
-#define SCSI_STATUS_CHECK			0x02
-#define SCSI_STATUS_EQUAL			0x04
-#define SCSI_STATUS_BUSY			0x08
+#define SCSI_STATUS_OK              0x00
+#define SCSI_STATUS_CHECK           0x02
+#define SCSI_STATUS_EQUAL           0x04
+#define SCSI_STATUS_BUSY            0x08
 
-#define SCSI_SENSE_ADDR_VALID		0x80
-#define SCSI_SENSE_NO_SENSE			0x00
-#define SCSI_SENSE_NO_INDEX			0x01
-#define SCSI_SENSE_SEEK_NOT_COMP	0x02
-#define SCSI_SENSE_WRITE_FAULT		0x03
-#define SCSI_SENSE_DRIVE_NOT_READY	0x04
-#define SCSI_SENSE_NO_TRACK0		0x06
-#define SCSI_SENSE_ID_CRC_ERROR		0x10
-#define SCSI_SENSE_UNCORRECTABLE	0x11
-#define SCSI_SENSE_ADDRESS_NF		0x12
-#define SCSI_SENSE_RECORD_NOT_FOUND	0x14
-#define SCSI_SENSE_SEEK_ERROR		0x15
-#define SCSI_SENSE_DATA_CHECK_RETRY	0x18
-#define SCSI_SENSE_ECC_VERIFY		0x19
-#define SCSI_SENSE_INTERLEAVE_ERROR	0x1A
-#define SCSI_SENSE_UNFORMATTED		0x1C
-#define SCSI_SENSE_ILLEGAL_COMMAND	0x20
-#define SCSI_SENSE_ILLEGAL_ADDRESS	0x21
-#define SCSI_SENSE_VOLUME_OVERFLOW	0x23
-#define SCSI_SENSE_BAD_ARGUMENT		0x24
-#define SCSI_SENSE_INVALID_LUN		0x25
-#define SCSI_SENSE_CART_CHANGED		0x28
-#define SCSI_SENSE_ERROR_OVERFLOW	0x2C
+#define SCSI_SENSE_ADDR_VALID       0x80
+#define SCSI_SENSE_NO_SENSE         0x00
+#define SCSI_SENSE_NO_INDEX         0x01
+#define SCSI_SENSE_SEEK_NOT_COMP    0x02
+#define SCSI_SENSE_WRITE_FAULT      0x03
+#define SCSI_SENSE_DRIVE_NOT_READY  0x04
+#define SCSI_SENSE_NO_TRACK0        0x06
+#define SCSI_SENSE_ID_CRC_ERROR     0x10
+#define SCSI_SENSE_UNCORRECTABLE    0x11
+#define SCSI_SENSE_ADDRESS_NF       0x12
+#define SCSI_SENSE_RECORD_NOT_FOUND 0x14
+#define SCSI_SENSE_SEEK_ERROR       0x15
+#define SCSI_SENSE_DATA_CHECK_RETRY 0x18
+#define SCSI_SENSE_ECC_VERIFY       0x19
+#define SCSI_SENSE_INTERLEAVE_ERROR 0x1A
+#define SCSI_SENSE_UNFORMATTED      0x1C
+#define SCSI_SENSE_ILLEGAL_COMMAND  0x20
+#define SCSI_SENSE_ILLEGAL_ADDRESS  0x21
+#define SCSI_SENSE_VOLUME_OVERFLOW  0x23
+#define SCSI_SENSE_BAD_ARGUMENT     0x24
+#define SCSI_SENSE_INVALID_LUN      0x25
+#define SCSI_SENSE_CART_CHANGED     0x28
+#define SCSI_SENSE_ERROR_OVERFLOW   0x2C
 
 // SCSI IDs
 enum
