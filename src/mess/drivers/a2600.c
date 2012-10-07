@@ -2069,7 +2069,7 @@ void a2600_state::machine_reset()
 				m_dpc.df[data_fetcher].music_mode = 0;
 			}
 		}
-		m_dpc.oscillator->adjust(attotime::from_hz(42000), 0, attotime::from_hz(42000));
+		m_dpc.oscillator->adjust(attotime::from_hz(18400), 0, attotime::from_hz(18400));
 		break;
 
 	case mode32in1:
