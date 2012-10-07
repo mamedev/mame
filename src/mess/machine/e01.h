@@ -21,7 +21,7 @@
 #include "machine/mc146818.h"
 #include "machine/mc6854.h"
 #include "machine/ram.h"
-#include "machine/scsibus.h"
+#include "machine/scsicb.h"
 #include "machine/wd17xx.h"
 
 class e01_device : public device_t,

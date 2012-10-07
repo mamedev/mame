@@ -29,7 +29,7 @@
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
 #include "machine/ieee488.h"
-#include "machine/scsibus.h"
+#include "machine/scsicb.h"
 
 
 

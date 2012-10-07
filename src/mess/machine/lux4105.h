@@ -15,7 +15,7 @@
 
 #include "emu.h"
 #include "abc1600_bus.h"
-#include "machine/scsibus.h"
+#include "machine/scsicb.h"
 
 
 
