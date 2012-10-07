@@ -12,10 +12,10 @@
         * Monopoly Deluxe
 
     Known Issues:
-        * Some features used by the AWP games such as reels and meters 
-		are not emulated.
-		* Timing for reels, and other opto devices is controlled by the same clock
-		as the lamps, in a weird daisychain setup.
+        * Some features used by the AWP games such as reels and meters
+        are not emulated.
+        * Timing for reels, and other opto devices is controlled by the same clock
+        as the lamps, in a weird daisychain setup.
 
     AWP game notes:
       The byte at 0x81 of the EVEN 68k rom appears to be some kind of
@@ -766,7 +766,7 @@ READ16_MEMBER(jpmsys5_state::coins_awp_r)
 	{
 		case 2:
 		{
-			return ioport("COINS")->read() << 8;	
+			return ioport("COINS")->read() << 8;
 		}
 		break;
 		default:
@@ -856,7 +856,7 @@ static INPUT_PORTS_START( popeye )
 	PORT_CONFSETTING(	0x02, "13")
 	PORT_CONFSETTING(	0x01, "14")
 	PORT_CONFSETTING(	0x00, "15")
-		
+
 	PORT_START("DIRECT")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door") PORT_CODE(KEYCODE_T) PORT_TOGGLE

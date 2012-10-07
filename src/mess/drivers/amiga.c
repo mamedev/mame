@@ -424,7 +424,7 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 	MCFG_FLOPPY_DRIVE_ADD("fd1", amiga_floppies, 0,      0, amiga_fdc::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd2", amiga_floppies, 0,      0, amiga_fdc::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd3", amiga_floppies, 0,      0, amiga_fdc::floppy_formats)
-	
+
 	MCFG_AMIGA_KEYBOARD_ADD("kbd")
 MACHINE_CONFIG_END
 

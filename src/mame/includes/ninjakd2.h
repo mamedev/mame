@@ -47,7 +47,7 @@ public:
 	void omegaf_io_protection_reset();
 	void robokid_motion_error_kludge(UINT16 offset);
 	void video_init_common(UINT32 vram_alloc_size);
-	
+
 	DECLARE_WRITE8_MEMBER(ninjakd2_bankselect_w);
 	DECLARE_WRITE8_MEMBER(ninjakd2_soundreset_w);
 	DECLARE_WRITE8_MEMBER(ninjakd2_pcm_play_w);

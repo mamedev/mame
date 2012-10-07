@@ -924,8 +924,8 @@ TIMER_CALLBACK_MEMBER(pc_state::mc1502_keyb_signal_callback)
 	key |= machine().root_device().ioport("Y10")->read();
 	key |= machine().root_device().ioport("Y11")->read();
 	key |= machine().root_device().ioport("Y12")->read();
-//	DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, mc1502_keyb.pulsing,
-//		(key || mc1502_keyb.pulsing) ? " will IRQ" : ""));
+//  DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, mc1502_keyb.pulsing,
+//      (key || mc1502_keyb.pulsing) ? " will IRQ" : ""));
 
 	/*
        If a key is pressed and we're not pulsing yet, start pulsing the IRQ1;
@@ -946,13 +946,13 @@ TIMER_CALLBACK_MEMBER(pc_state::mc1502_keyb_signal_callback)
 
 READ8_MEMBER(pc_state::mc1502_ppi_porta_r)
 {
-//	DBG_LOG(1,"mc1502_ppi_porta_r",("= %02X\n", mc1502_keyb.latch));
+//  DBG_LOG(1,"mc1502_ppi_porta_r",("= %02X\n", mc1502_keyb.latch));
 	return mc1502_keyb.latch;
 }
 
 WRITE8_MEMBER(pc_state::mc1502_ppi_porta_w)
 {
-//	DBG_LOG(1,"mc1502_ppi_porta_w",("( %02X )\n", data));
+//  DBG_LOG(1,"mc1502_ppi_porta_w",("( %02X )\n", data));
 	mc1502_keyb.latch = data;
 	if (mc1502_keyb.pulsing)
 		mc1502_keyb.pulsing--;
@@ -961,7 +961,7 @@ WRITE8_MEMBER(pc_state::mc1502_ppi_porta_w)
 
 WRITE8_MEMBER(pc_state::mc1502_ppi_portb_w)
 {
-//	DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
+//  DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
 	m_ppi_portb = data;
 	pit8253_gate2_w(machine().device("pit8253"), BIT(data, 0));
 	pc_speaker_set_spkrdata( machine(), data & 0x02 );
@@ -981,8 +981,8 @@ READ8_MEMBER(pc_state::mc1502_ppi_portc_r)
 //  0x10 -- SNDOUT
 	data = ( data & ~0x10 ) | ( (BIT(m_ppi_portb, 1) && timer2_output) ? 0x10 : 0x00 );
 
-//	DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n",
-//		data, tap_val, timer2_output, machine().describe_context()));
+//  DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n",
+//      data, tap_val, timer2_output, machine().describe_context()));
 	return data;
 }
 
@@ -1003,7 +1003,7 @@ READ8_MEMBER(pc_state::mc1502_kppi_porta_r)
 	if (mc1502_keyb.mask & 0x0400) { key |= machine().root_device().ioport("Y11")->read(); }
 	if (mc1502_keyb.mask & 0x0800) { key |= machine().root_device().ioport("Y12")->read(); }
 	key ^= 0xff;
-//	DBG_LOG(2,"mc1502_kppi_porta_r",("= %02X\n", key));
+//  DBG_LOG(2,"mc1502_kppi_porta_r",("= %02X\n", key));
 	return key;
 }
 
@@ -1015,14 +1015,14 @@ WRITE8_MEMBER(pc_state::mc1502_kppi_portb_w)
 		mc1502_keyb.mask |= 1 << 11;
 	else
 		mc1502_keyb.mask &= ~(1 << 11);
-//	DBG_LOG(2,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, mc1502_keyb.mask));
+//  DBG_LOG(2,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, mc1502_keyb.mask));
 }
 
 WRITE8_MEMBER(pc_state::mc1502_kppi_portc_w)
 {
 	mc1502_keyb.mask &= ~(7 << 8);
 	mc1502_keyb.mask |= ((data ^ 7) & 7) << 8;
-//	DBG_LOG(2,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, mc1502_keyb.mask));
+//  DBG_LOG(2,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, mc1502_keyb.mask));
 }
 
 

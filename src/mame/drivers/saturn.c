@@ -1986,7 +1986,7 @@ WRITE32_MEMBER(saturn_state::saturn_cs1_w)
 MACHINE_RESET_MEMBER(saturn_state,saturn)
 {
 	m_scsp_last_line = 0;
-	
+
 	// don't let the slave cpu and the 68k go anywhere
 	machine().device("slave")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -2067,7 +2067,7 @@ MACHINE_RESET_MEMBER(saturn_state,saturn)
 MACHINE_RESET_MEMBER(saturn_state,stv)
 {
 	m_scsp_last_line = 0;
-	
+
 	// don't let the slave cpu and the 68k go anywhere
 	machine().device("slave")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

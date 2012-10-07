@@ -559,13 +559,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(xerox820_state::ctc_tick)
 
 WRITE_LINE_MEMBER(xerox820_state::ctc_z0_w)
 {
-//	device_t *device = machine().device(Z80CTC_TAG);
+//  device_t *device = machine().device(Z80CTC_TAG);
 //  z80ctc_trg1_w(device, state);
 }
 
 WRITE_LINE_MEMBER(xerox820_state::ctc_z2_w)
 {
-//	device_t *device = machine().device(Z80CTC_TAG);
+//  device_t *device = machine().device(Z80CTC_TAG);
 
 //  z80ctc_trg3_w(device, state);
 }

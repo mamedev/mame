@@ -212,7 +212,7 @@ protected:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-public:	
+public:
 	UINT32 screen_update_magictg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 

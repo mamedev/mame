@@ -2048,10 +2048,10 @@ static void cop_take_hit_box_params(UINT8 offs)
 
 	{
 		height = UINT8(cop_collision_info[offs].hitbox_y >> 8);
- 		start_y = INT8(cop_collision_info[offs].hitbox_y);
+		start_y = INT8(cop_collision_info[offs].hitbox_y);
 		width = UINT8(cop_collision_info[offs].hitbox_x >> 8);
- 		start_x = INT8(cop_collision_info[offs].hitbox_x);
- 	}
+		start_x = INT8(cop_collision_info[offs].hitbox_x);
+	}
 
 	cop_collision_info[offs].min_x = (cop_collision_info[offs].x >> 16) + start_x;
 	cop_collision_info[offs].max_x = cop_collision_info[offs].min_x + width;
@@ -2089,8 +2089,8 @@ static UINT8 cop_calculate_collsion_detection(running_machine &machine)
 
 	//if(res == 0)
 	//popmessage("0:%08x %08x %08x 1:%08x %08x %08x\n",cop_collision_info[0].x,cop_collision_info[0].y,cop_collision_info[0].hitbox,cop_collision_info[1].x,cop_collision_info[1].y,cop_collision_info[1].hitbox);
-//	popmessage("0:%08x %08x %08x %08x 1:%08x %08x %08x %08x\n",cop_collision_info[0].min_x,cop_collision_info[0].max_x,cop_collision_info[0].min_y, cop_collision_info[0].max_y,
-//	                                                 cop_collision_info[1].min_x,cop_collision_info[1].max_x,cop_collision_info[1].min_y, cop_collision_info[1].max_y);
+//  popmessage("0:%08x %08x %08x %08x 1:%08x %08x %08x %08x\n",cop_collision_info[0].min_x,cop_collision_info[0].max_x,cop_collision_info[0].min_y, cop_collision_info[0].max_y,
+//                                                   cop_collision_info[1].min_x,cop_collision_info[1].max_x,cop_collision_info[1].min_y, cop_collision_info[1].max_y);
 
 	return res;
 }
@@ -2779,15 +2779,15 @@ static WRITE16_HANDLER( generic_cop_w )
 				cur_angle = INT8(space.read_byte(cop_register[0] + (0x34 ^ 3)));
 				//space.write_byte(cop_register[0] + (0^3),space.read_byte(cop_register[0] + (0^3)) & 0xfb); //correct?
 				/*
-				0x00      0x00          0x60            0x00
-				0x00      0x20          0x60            0x20
-				0x00      0x40          0x60            0x60
-				0x00      0x60          0x60            0x60
-				0x00      0x80          0x60            0xa0
-				0x00      0xa0          0x60            0xa0
-				0x00      0xc0          0x60            0xc0
-				0x00      0xe0          0x60            0xe0
-				*/
+                0x00      0x00          0x60            0x00
+                0x00      0x20          0x60            0x20
+                0x00      0x40          0x60            0x60
+                0x00      0x60          0x60            0x60
+                0x00      0x80          0x60            0xa0
+                0x00      0xa0          0x60            0xa0
+                0x00      0xc0          0x60            0xc0
+                0x00      0xe0          0x60            0xe0
+                */
 
 				if(cur_angle > cop_angle_compare)
 				{

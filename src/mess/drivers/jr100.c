@@ -265,11 +265,11 @@ static const via6522_interface jr100_via_intf =
 	DEVCB_NULL,     									/* in_ca2_func */
 	DEVCB_NULL,     									/* in_cb2_func */
 	DEVCB_DRIVER_MEMBER(jr100_state,jr100_via_write_a),					/* out_a_func */
-	DEVCB_DRIVER_MEMBER(jr100_state,jr100_via_write_b),   				/* out_b_func */
+	DEVCB_DRIVER_MEMBER(jr100_state,jr100_via_write_b), 				/* out_b_func */
 	DEVCB_NULL,     									/* out_ca1_func */
 	DEVCB_NULL,											/* out_cb1_func */
 	DEVCB_NULL,     									/* out_ca2_func */
-	DEVCB_DRIVER_LINE_MEMBER(jr100_state, jr100_via_write_cb2),    				/* out_cb2_func */
+	DEVCB_DRIVER_LINE_MEMBER(jr100_state, jr100_via_write_cb2), 				/* out_cb2_func */
 	DEVCB_NULL  										/* irq_func */
 };
 static const cassette_interface jr100_cassette_interface =

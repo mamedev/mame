@@ -2348,8 +2348,8 @@ static void pc8801_sound_irq( device_t *device, int irq )
 /*
 TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::pc8801_rtc_irq)
 {
-	if(m_timer_irq_mask)
-		pc8801_raise_irq(machine(),1<<(2),1);
+    if(m_timer_irq_mask)
+        pc8801_raise_irq(machine(),1<<(2),1);
 }
 */
 

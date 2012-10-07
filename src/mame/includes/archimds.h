@@ -68,7 +68,7 @@ public:
 	UINT8 m_ioc_regs[0x80/4];
 	UINT8 m_vidc_bpp_mode;
 	UINT8 m_vidc_interlace;
-		
+
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 private:
@@ -77,13 +77,13 @@ private:
 	static const device_timer_id TIMER_VIDEO = 1;
 	static const device_timer_id TIMER_AUDIO = 2;
 	static const device_timer_id TIMER_IOC = 3;
-	
+
 	void vidc_vblank();
 	void vidc_video_tick();
 	void vidc_audio_tick();
 	void ioc_timer(int param);
-	
-	void vidc_dynamic_res_change();	
+
+	void vidc_dynamic_res_change();
 	void latch_timer_cnt(int tmr);
 	void a310_set_timer(int tmr);
 	DECLARE_READ32_MEMBER(ioc_ctrl_r);
@@ -99,7 +99,7 @@ private:
 	UINT8 m_vidc_pixel_clk;
 	UINT8 m_vidc_stereo_reg[8];
 	emu_timer *m_timer[4], *m_snd_timer, *m_vid_timer;
-	emu_timer *m_vbl_timer;	
+	emu_timer *m_vbl_timer;
 };
 
 /* IOC registers */

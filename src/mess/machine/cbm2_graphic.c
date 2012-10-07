@@ -9,10 +9,10 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- version A (EF9365, 512x512 interlaced, 1 page)
-	- version B (EF9366, 512x256 non-interlaced, 2 pages)
+    - version A (EF9365, 512x512 interlaced, 1 page)
+    - version B (EF9366, 512x256 non-interlaced, 2 pages)
 
 */
 
@@ -41,7 +41,7 @@ const device_type CBM2_GRAPHIC = &device_creator<cbm2_graphic_cartridge_device>;
 //  ef9345_interface gdp_intf
 //-------------------------------------------------
 
-static const ef9345_interface gdp_intf = 
+static const ef9345_interface gdp_intf =
 {
 	SCREEN_TAG
 };
@@ -145,19 +145,19 @@ UINT8 cbm2_graphic_cartridge_device::cbm2_bd_r(address_space &space, offs_t offs
 		else if (offset == 0x7f90)
 		{
 			/*
-			
-			    bit     description
-			
-			    0       light pen
-			    1       
-			    2       
-			    3       
-			    4       
-			    5       
-			    6       
-			    7       
-			
-			*/
+
+                bit     description
+
+                0       light pen
+                1
+                2
+                3
+                4
+                5
+                6
+                7
+
+            */
 		}
 		else if (offset == 0x7fb0)
 		{
@@ -184,19 +184,19 @@ void cbm2_graphic_cartridge_device::cbm2_bd_w(address_space &space, offs_t offse
 		if (offset == 0x7f80)
 		{
 			/*
-			
-			    bit     description
-			
-			    0       hard copy (0=active)
-			    1       operating page select (version B)
-			    2       
-			    3       read-modify-write (1=active)
-			    4       display switch (1=graphic)
-			    5       display page select (version B)
-			    6       
-			    7       
-			
-			*/
+
+                bit     description
+
+                0       hard copy (0=active)
+                1       operating page select (version B)
+                2
+                3       read-modify-write (1=active)
+                4       display switch (1=graphic)
+                5       display page select (version B)
+                6
+                7
+
+            */
 		}
 		else if (offset >= 0x7ff0)
 		{

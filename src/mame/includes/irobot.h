@@ -74,7 +74,7 @@ public:
 	DECLARE_READ8_MEMBER(irobot_status_r);
 	DECLARE_WRITE8_MEMBER(irobot_paletteram_w);
 	DECLARE_READ8_MEMBER(quad_pokeyn_r);
-	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);	
+	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
 	DECLARE_DRIVER_INIT(irobot);
 	virtual void machine_reset();
 	virtual void video_start();

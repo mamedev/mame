@@ -119,7 +119,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 				{ "SUPERLODE",			SLOT_SUPERLODERUNNER },
 				{ "MAJUTSUSHI",			SLOT_MAJUTSUSHI },
 			};
-			
+
 			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && type < 0; i++)
 			{
 				if (!mame_stricmp(mapper, mapper_types[i].mapper_name))

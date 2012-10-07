@@ -104,7 +104,7 @@
   frequency register, while the others have 0x400 as before. Should fix a bug
   or two on sega games, particularly Vigilante on Sega Master System. Verified
   on SMS hardware.
-  
+
   27/06/2012: Michael Zapf
   Converted to modern device, legacy devices were gradually removed afterwards.
 

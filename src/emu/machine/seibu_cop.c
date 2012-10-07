@@ -178,13 +178,13 @@ WRITE16_MEMBER(seibu_cop_device::pal_brightness_mode_w)
 WRITE16_MEMBER(seibu_cop_device::dma_unk_param_w)
 {
 	/*
-		This sets up a DMA mode of some sort
-			0x0e00: grainbow, cupsoc
-			0x0a00: legionna, godzilla, denjinmk
-			0x0600: heatbrl
-			0x1e00: zeroteam, xsedae
-		raiden2 and raidendx doesn't set this up, this could indicate that this is related to the non-private buffer DMAs
-	    (both only uses 0x14 and 0x15 as DMAs afaik)
+        This sets up a DMA mode of some sort
+            0x0e00: grainbow, cupsoc
+            0x0a00: legionna, godzilla, denjinmk
+            0x0600: heatbrl
+            0x1e00: zeroteam, xsedae
+        raiden2 and raidendx doesn't set this up, this could indicate that this is related to the non-private buffer DMAs
+        (both only uses 0x14 and 0x15 as DMAs afaik)
     */
 	COMBINE_DATA(&m_dma_unk_param);
 }
@@ -271,7 +271,7 @@ void seibu_cop_device::palette_dma_transfer(void)
              0x86 is used by Seibu Cup Soccer
              0x87 is used by Denjin Makai
 
-   			TODO:
+            TODO:
              - Denjin Makai mode 4 is totally guessworked.
              - SD Gundam doesn't fade colors correctly, it should have the text layer / sprites with normal gradient and the rest dimmed in most cases,
                presumably bad RAM table or bad algorithm

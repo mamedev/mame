@@ -406,7 +406,7 @@ void scsibus_device::scsi_in_line_changed(UINT8 line, UINT8 state)
 				if(state)
 				{
 					data_idx++;
-					
+
 					// If the data buffer is full flush it to the SCSI disk
 
 					data_last = (bytes_left >= sectorbytes) ? sectorbytes : bytes_left;

@@ -27,7 +27,7 @@ static MACHINE_CONFIG_FRAGMENT( vga_s3 )
 	MCFG_SCREEN_UPDATE_DEVICE("vga", s3_vga_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(0x100)
-	
+
 	MCFG_DEVICE_ADD("vga", S3_VGA, 0)
 MACHINE_CONFIG_END
 

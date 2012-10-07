@@ -7,8 +7,8 @@
 
     This is a primitive handler for generating reels with multiple symbols visible
     hanging off steppers.c .
-	
-	TODO: Add any lamping persistance simulations we need.
+
+    TODO: Add any lamping persistance simulations we need.
 
 **************************************************************************************/
 

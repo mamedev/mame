@@ -56,7 +56,7 @@ public:
 
 	int m_chk41addr;
 	bool m_dochk41;
-	
+
 	UINT16 m_mainram[0x10000/2];
 
 

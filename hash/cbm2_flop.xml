@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="cbm2_flop" description="Commodore CBM-II diskettes">
-	
+
 	<software name="burnin">
 		<description>Factory Burn In Diagnostics for B Series</description>
 		<year>1983</year>
@@ -13,7 +13,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="termv2">
 		<description>Terminal Version 2.0 for B Series</description>
 		<year>1983</year>

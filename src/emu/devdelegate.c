@@ -42,8 +42,8 @@
 
 //-------------------------------------------------
 //  bound_object - use the device name to locate
-//	a device relative to the given search root;
-//	fatal error if not found
+//  a device relative to the given search root;
+//  fatal error if not found
 //-------------------------------------------------
 
 delegate_late_bind &device_delegate_helper::bound_object(device_t &search_root)
@@ -57,7 +57,7 @@ delegate_late_bind &device_delegate_helper::bound_object(device_t &search_root)
 
 //-------------------------------------------------
 //  safe_tag - return a tag string or (unknown) if
-//	the object is not valid
+//  the object is not valid
 //-------------------------------------------------
 
 const char *device_delegate_helper::safe_tag(device_t *object)

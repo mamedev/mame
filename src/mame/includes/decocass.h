@@ -210,7 +210,7 @@ public:
 	DECLARE_WRITE8_MEMBER(decocass_center_v_shift_w);
 
 	void decocass_video_state_save_init();
-	
+
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_WRITE8_MEMBER(charram_w);
 	DECLARE_WRITE8_MEMBER(fgvideoram_w);
@@ -239,16 +239,16 @@ private:
 	DECLARE_READ8_MEMBER(decocass_type5_r);
 	DECLARE_WRITE8_MEMBER(decocass_type5_w);
 	DECLARE_READ8_MEMBER(decocass_nodong_r);
-	
+
 	void draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_center(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mark_bg_tile_dirty(offs_t offset);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int color,
 					int sprite_y_adjust, int sprite_y_adjust_flip_screen,
 					UINT8 *sprite_ram, int interleave);
-					
+
 	void draw_missiles(bitmap_ind16 &bitmap, const rectangle &cliprect,
 					int missile_y_adjust, int missile_y_adjust_flip_screen,
-					UINT8 *missile_ram, int interleave);							
+					UINT8 *missile_ram, int interleave);
 };
 

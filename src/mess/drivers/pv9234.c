@@ -79,10 +79,10 @@ WRITE32_MEMBER( pv9234_state::debug1_w )
 		{
 			j = (data & 0xff000000) >> 24;
 			data <<= 8;
-//			printf("%c",j); // this prints 'OFF' to the console.
+//          printf("%c",j); // this prints 'OFF' to the console.
 			logerror("debug1=%02x %c\n",j,j);
 		}
-//		printf("\n");
+//      printf("\n");
 	}
 }
 

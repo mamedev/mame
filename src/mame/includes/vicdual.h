@@ -33,7 +33,7 @@ public:
 
 	void coin_in();
 	void assert_coin_status();
-	
+
 	DECLARE_WRITE8_MEMBER(vicdual_videoram_w);
 	DECLARE_WRITE8_MEMBER(vicdual_characterram_w);
 	DECLARE_READ8_MEMBER(depthch_io_r);

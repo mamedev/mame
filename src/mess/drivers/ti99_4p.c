@@ -96,7 +96,7 @@ public:
 	virtual void machine_start();
 	DECLARE_MACHINE_RESET(ti99_4p);
 	TIMER_DEVICE_CALLBACK_MEMBER(sgcpu_hblank_interrupt);
-	
+
 	void set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state);
 
 	tms9900_device*			m_cpu;

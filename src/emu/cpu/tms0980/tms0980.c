@@ -269,7 +269,7 @@ struct tms0980_state
 	const tms0980_config	*config;
 	address_space *program;
 	address_space *data;
-	
+
 	devcb_resolved_read8 m_read_k;
 	devcb_resolved_write16 m_write_o;
 	devcb_resolved_write16 m_write_r;
@@ -509,7 +509,7 @@ static void cpu_init_tms_common( legacy_cpu_device *device, const UINT32* decode
 
 	cpustate->program = &device->space( AS_PROGRAM );
 	cpustate->data = &device->space( AS_PROGRAM );
-	
+
 	cpustate->m_read_k.resolve(cpustate->config->read_k, *device);
 	cpustate->m_write_o.resolve(cpustate->config->write_o, *device);
 	cpustate->m_write_r.resolve(cpustate->config->write_r, *device);

@@ -9,17 +9,17 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- pass Lorenz test suite 2.15
-		- ICR01
-		- IMR
-		- CIA1TA/TB
-		- CIA2TA/TB
-	- pass VICE cia tests
-	- 8520 read/write
-	- 5710 read/write
-	- optimize
+    - pass Lorenz test suite 2.15
+        - ICR01
+        - IMR
+        - CIA1TA/TB
+        - CIA2TA/TB
+    - pass VICE cia tests
+    - 8520 read/write
+    - 5710 read/write
+    - optimize
 
 */
 
@@ -49,7 +49,7 @@ enum
 	SDR,
 	ICR, IMR = ICR,
 	CRA,
-	CRB	
+	CRB
 };
 
 
@@ -79,13 +79,13 @@ enum
 
 #define CRA_START		0x01
 #define CRA_STARTED		BIT(m_cra, 0)
-#define CRA_PBON 		BIT(m_cra, 1)
+#define CRA_PBON		BIT(m_cra, 1)
 #define CRA_OUTMODE 	BIT(m_cra, 2)
 #define CRA_RUNMODE 	BIT(m_cra, 3)
 #define CRA_LOAD		BIT(m_cra, 4)
-#define CRA_INMODE	 	BIT(m_cra, 5)
-#define CRA_SPMODE 		BIT(m_cra, 6)
-#define CRA_TODIN 		BIT(m_cra, 7)
+#define CRA_INMODE		BIT(m_cra, 5)
+#define CRA_SPMODE		BIT(m_cra, 6)
+#define CRA_TODIN		BIT(m_cra, 7)
 
 
 // control register B
@@ -99,12 +99,12 @@ enum
 
 #define CRB_START		0x01
 #define CRB_STARTED		BIT(m_crb, 0)
-#define CRB_PBON 		BIT(m_crb, 1)
+#define CRB_PBON		BIT(m_crb, 1)
 #define CRB_OUTMODE 	BIT(m_crb, 2)
 #define CRB_RUNMODE 	BIT(m_crb, 3)
-#define CRB_LOAD 		BIT(m_crb, 4)
-#define CRB_INMODE 		((m_crb & 0x60) >> 5)
-#define CRB_ALARM	 	BIT(m_crb, 7)
+#define CRB_LOAD		BIT(m_crb, 4)
+#define CRB_INMODE		((m_crb & 0x60) >> 5)
+#define CRB_ALARM		BIT(m_crb, 7)
 
 
 
@@ -253,7 +253,7 @@ inline UINT8 mos6526_device::bcd_increment(UINT8 value)
 
 	if ((value & 0x0f) >= 0x0a)
 		value += 0x10 - 0x0a;
-	
+
 	return value;
 }
 
@@ -270,7 +270,7 @@ inline void mos6526_device::clock_tod()
 	UINT8 hour		= (UINT8) (m_tod >> 24);
 
 	m_tod_count++;
-	
+
 	if (m_tod_count == (CRA_TODIN ? 5 : 6))
 	{
 		m_tod_count = 0;
@@ -531,7 +531,7 @@ inline void mos6526_device::clock_pipeline()
 {
 	// timer A pipeline
 	m_count_a3 = m_count_a2;
-	
+
 	switch (CRA_INMODE)
 	{
 	case CRA_INMODE_PHI2:
@@ -566,11 +566,11 @@ inline void mos6526_device::clock_pipeline()
 	case CRB_INMODE_CNT:
 		m_count_b2 = m_count_b1;
 		break;
-		
+
 	case CRB_INMODE_TA:
 		m_count_b2 = m_ta_out;
 		break;
-		
+
 	case CRB_INMODE_CNT_TA:
 		m_count_b2 = m_ta_out && m_cnt;
 		break;
@@ -594,7 +594,7 @@ inline void mos6526_device::clock_pipeline()
 
 
 //-------------------------------------------------
-//  synchronize - 
+//  synchronize -
 //-------------------------------------------------
 
 inline void mos6526_device::synchronize()
@@ -709,7 +709,7 @@ void mos6526_device::device_start()
 	save_item(NAME(m_tb_latch));
 	save_item(NAME(m_cra));
 	save_item(NAME(m_crb));
-	
+
 	save_item(NAME(m_tod_count));
 	save_item(NAME(m_tod));
 	save_item(NAME(m_tod_latch));
@@ -838,7 +838,7 @@ READ8_MEMBER( mos6526_device::read )
 
 	case PRB:
 		data = (m_in_pb_func(0) & ~m_ddrb) | (m_prb & m_ddrb);
-		
+
 		if (CRA_PBON)
 		{
 			int pb6 = CRA_OUTMODE ? m_ta_pb6 : m_ta_out;
@@ -854,49 +854,49 @@ READ8_MEMBER( mos6526_device::read )
 			data &= ~0x80;
 			data |= pb7 << 7;
 		}
-		
+
 		m_pc = 0;
 		m_out_pc_func(m_pc);
 		break;
-		
+
 	case DDRA:
 		data = m_ddra;
 		break;
-		
+
 	case DDRB:
 		data = m_ddrb;
 		break;
-		
+
 	case TA_LO:
 		data = m_ta & 0xff;
 		break;
-		
+
 	case TA_HI:
 		data = m_ta >> 8;
 		break;
-		
+
 	case TB_LO:
 		data = m_tb & 0xff;
 		break;
-		
+
 	case TB_HI:
 		data = m_tb >> 8;
 		break;
-		
+
 	case TOD_10THS:
 		data = read_tod(0);
 
 		m_tod_latched = false;
 		break;
-		
+
 	case TOD_SEC:
 		data = read_tod(1);
 		break;
-		
+
 	case TOD_MIN:
 		data = read_tod(2);
 		break;
-		
+
 	case TOD_HR:
 		if (!m_tod_latched)
 		{
@@ -906,11 +906,11 @@ READ8_MEMBER( mos6526_device::read )
 
 		data = read_tod(3);
 		break;
-		
+
 	case SDR:
 		data = m_sdr;
 		break;
-		
+
 	case ICR:
 		data = (m_ir1 << 7) | m_icr;
 
@@ -922,11 +922,11 @@ READ8_MEMBER( mos6526_device::read )
 		m_irq = false;
 		m_out_irq_func(CLEAR_LINE);
 		break;
-		
+
 	case CRA:
 		data = m_cra;
 		break;
-		
+
 	case CRB:
 		data = m_crb;
 		break;
@@ -952,21 +952,21 @@ WRITE8_MEMBER( mos6526_device::write )
 	case PRB:
 		m_prb = data;
 		update_pb();
-		
+
 		m_pc = 0;
 		m_out_pc_func(m_pc);
 		break;
-		
+
 	case DDRA:
 		m_ddra = data;
 		update_pa();
 		break;
-		
+
 	case DDRB:
 		m_ddrb = data;
 		update_pb();
 		break;
-		
+
 	case TA_LO:
 		m_ta_latch = (m_ta_latch & 0xff00) | data;
 
@@ -975,7 +975,7 @@ WRITE8_MEMBER( mos6526_device::write )
 			m_ta = (m_ta & 0xff00) | data;
 		}
 		break;
-		
+
 	case TA_HI:
 		m_ta_latch = (data << 8) | (m_ta_latch & 0xff);
 
@@ -989,7 +989,7 @@ WRITE8_MEMBER( mos6526_device::write )
 			m_ta = (data << 8) | (m_ta & 0xff);
 		}
 		break;
-		
+
 	case TB_LO:
 		m_tb_latch = (m_tb_latch & 0xff00) | data;
 
@@ -998,7 +998,7 @@ WRITE8_MEMBER( mos6526_device::write )
 			m_tb = (m_tb & 0xff00) | data;
 		}
 		break;
-		
+
 	case TB_HI:
 		m_tb_latch = (data << 8) | (m_tb_latch & 0xff);
 
@@ -1012,21 +1012,21 @@ WRITE8_MEMBER( mos6526_device::write )
 			m_tb = (data << 8) | (m_tb & 0xff);
 		}
 		break;
-		
+
 	case TOD_10THS:
 		write_tod(0, data);
 
 		m_tod_stopped = false;
 		break;
-		
+
 	case TOD_SEC:
 		write_tod(1, data);
 		break;
-		
+
 	case TOD_MIN:
 		write_tod(2, data);
 		break;
-		
+
 	case TOD_HR:
 		m_tod_stopped = true;
 
@@ -1038,12 +1038,12 @@ WRITE8_MEMBER( mos6526_device::write )
 
 		write_tod(3, data);
 		break;
-		
+
 	case SDR:
 		m_sdr = data;
 		m_sdr_empty = false;
 		break;
-		
+
 	case IMR:
 		if (IMR_SET)
 		{
@@ -1059,11 +1059,11 @@ WRITE8_MEMBER( mos6526_device::write )
 			m_ir0 = 1;
 		}
 		break;
-		
+
 	case CRA:
 		set_cra(data);
 		break;
-		
+
 	case CRB:
 		set_crb(data);
 		break;
@@ -1134,7 +1134,7 @@ WRITE_LINE_MEMBER( mos6526_device::cnt_w )
 		m_count_a0 = 1;
 		m_count_b0 = 1;
 	}
-	
+
 	m_cnt = state;
 }
 

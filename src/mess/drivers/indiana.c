@@ -37,8 +37,8 @@ static ADDRESS_MAP_START(indiana_mem, AS_PROGRAM, 32, indiana_state)
 	AM_RANGE(0x7f6003b0, 0x7f6003bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x7f6003c0, 0x7f6003cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
 	AM_RANGE(0x7f6003d0, 0x7f6003df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
-	AM_RANGE(0x7f7a0000, 0x7f7bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)	
-	AM_RANGE(0x80000000, 0x803fffff) AM_MIRROR(0x7fc00000) AM_RAM // 4 MB RAM	
+	AM_RANGE(0x7f7a0000, 0x7f7bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
+	AM_RANGE(0x80000000, 0x803fffff) AM_MIRROR(0x7fc00000) AM_RAM // 4 MB RAM
 ADDRESS_MAP_END
 
 

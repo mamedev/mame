@@ -130,7 +130,7 @@ private:
 
     void update_kbd_irq();
 	virtual void machine_reset();
-public:	
+public:
 	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);

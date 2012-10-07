@@ -311,10 +311,10 @@ static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16, pntnpuzl_state )
 	AM_RANGE(0x28001a, 0x28001b) AM_WRITENOP
 
 	/* standard VGA */
-	AM_RANGE(0x3a0000, 0x3bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffff)	
+	AM_RANGE(0x3a0000, 0x3bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffff)
 	AM_RANGE(0x3c03b0, 0x3c03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffff)
 	AM_RANGE(0x3c03c0, 0x3c03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffff)
-	AM_RANGE(0x3c03d0, 0x3c03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffff)	
+	AM_RANGE(0x3c03d0, 0x3c03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffff)
 
 	AM_RANGE(0x400000, 0x407fff) AM_RAM
 ADDRESS_MAP_END

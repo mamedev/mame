@@ -133,12 +133,12 @@ WRITE8_MEMBER(jack_state::joinem_scroll_w)
 		case 0:
 			m_bg_tilemap->set_scrolly(offset >> 2, -data);
 			break;
-		
+
 		// byte 1/2/3: no effect?
 		default:
 			break;
 	}
-	
+
 	m_scrollram[offset] = data;
 }
 

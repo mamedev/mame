@@ -47,7 +47,7 @@ public:
 	required_shared_ptr<UINT8> m_main_ram;
 	optional_shared_ptr<UINT8> m_colorram;
 	optional_device<discrete_device> m_discrete;
-	
+
 	/* sound-related */
 	UINT8       m_port_1_last;
 	UINT8       m_port_2_last;
@@ -78,7 +78,7 @@ public:
 	samples_device *m_samples2;
 	device_t *m_sn1;
 	device_t *m_sn2;
-	device_t *m_sn;	
+	device_t *m_sn;
 
 	DECLARE_READ8_MEMBER(mw8080bw_shift_result_rev_r);
 	DECLARE_READ8_MEMBER(mw8080bw_reversable_shift_result_r);

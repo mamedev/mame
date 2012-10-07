@@ -217,7 +217,7 @@ public:
 	DECLARE_WRITE32_MEMBER(lamp_output3_ppp_w);
 	DECLARE_READ32_MEMBER(ppc_spu_share_r);
 	DECLARE_WRITE32_MEMBER(ppc_spu_share_w);
-	DECLARE_READ16_MEMBER(spu_unk_r);	
+	DECLARE_READ16_MEMBER(spu_unk_r);
 	TIMER_CALLBACK_MEMBER(keyboard_timer_callback);
 };
 

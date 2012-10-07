@@ -108,7 +108,7 @@ INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
 		/* increment the coin counter */
 		coin_counter_w(machine(), 0, 1);
 		coin_counter_w(machine(), 0, 0);
-		
+
 		coin_in();
 	}
 }
@@ -460,7 +460,7 @@ static INPUT_PORTS_START( frogs )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("DOOR:1") // 1 switch located on the inside of the coin door
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	
+
 	// There is no dipswitch: on a physical level, these settings are applied by grounding
 	// otherwise floating pins (ground wires are provided on pin 1/30)
 	PORT_DIPNAME( 0x10, 0x10, "Allow Free Game" )		PORT_DIPLOCATION("PIN:5") // 26
@@ -921,7 +921,7 @@ static INPUT_PORTS_START( digger )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN2")
-//	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_timer_value, NULL)			// it's like this according to the schematics, but gameplay speed is too fast;
+//  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_timer_value, NULL)          // it's like this according to the schematics, but gameplay speed is too fast;
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_composite_blank_comp, NULL) // gameplay speed is correct now, there's likely an error in the schematics then...
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_read_coin_status, NULL)
@@ -1278,7 +1278,7 @@ static INPUT_PORTS_START( invho2 )
 	PORT_DIPNAME( 0x03, 0x01, "Head On 2 Lives" )	PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
-//	PORT_DIPSETTING(    0x02, "3" ) // dupe
+//  PORT_DIPSETTING(    0x02, "3" ) // dupe
 	PORT_DIPSETTING(    0x03, "4" )
 
 	/* There's probably a bug in the Invinco game code:
@@ -1290,8 +1290,8 @@ static INPUT_PORTS_START( invho2 )
 	PORT_DIPNAME( 0x03, 0x03, "Invinco Lives" )		PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
-//	PORT_DIPSETTING(    0x01, "5" ) // results in 3, see above
-//	PORT_DIPSETTING(    0x00, "6" ) // results in 4, see above
+//  PORT_DIPSETTING(    0x01, "5" ) // results in 3, see above
+//  PORT_DIPSETTING(    0x00, "6" ) // results in 4, see above
 
 INPUT_PORTS_END
 
@@ -1646,7 +1646,7 @@ static INPUT_PORTS_START( brdrline )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
-//	PORT_DIPSETTING(    0x03, "5" ) // dupe
+//  PORT_DIPSETTING(    0x03, "5" ) // dupe
 INPUT_PORTS_END
 
 
@@ -1700,7 +1700,7 @@ static INPUT_PORTS_START( starrkr )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
-//	PORT_DIPSETTING(    0x03, "5" ) // dupe
+//  PORT_DIPSETTING(    0x03, "5" ) // dupe
 INPUT_PORTS_END
 
 
@@ -2064,7 +2064,7 @@ static INPUT_PORTS_START( samurai )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,samurai_protection_r, (void *)1)
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) 			PORT_DIPLOCATION("SW1:2") // unknown, but used
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:2") // unknown, but used
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_composite_blank_comp, NULL)
@@ -2201,7 +2201,7 @@ INPUT_CHANGED_MEMBER(vicdual_state::nsub_coin_in)
 						m_nsub_play_counter++;
 					}
 				}
-				
+
 				// increment coin counter
 				coin_counter_w(machine(), which, 1);
 				coin_counter_w(machine(), which, 0);
@@ -2211,7 +2211,7 @@ INPUT_CHANGED_MEMBER(vicdual_state::nsub_coin_in)
 			case 2:
 				m_nsub_play_counter++;
 				break;
-			
+
 			default:
 				break;
 		}
@@ -2249,10 +2249,10 @@ static INPUT_PORTS_START( nsub )
 	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( 0C_1C ) ) // invalid
+//  PORT_DIPSETTING(    0x00, DEF_STR( 0C_1C ) ) // invalid
 	PORT_DIPNAME( 0x78, 0x08, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW:4,5,6,7")
 	PORT_DIPSETTING(    0x40, "Shared With Coin A" )
-//	PORT_DIPSETTING(    0x00, DEF_STR( 1C_0C ) ) // invalid
+//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_0C ) ) // invalid
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_3C ) )
@@ -2280,7 +2280,7 @@ MACHINE_START_MEMBER(vicdual_state,nsub)
 MACHINE_RESET_MEMBER(vicdual_state,nsub)
 {
 	m_nsub_coin_counter = ioport("COINAGE")->read() & 7;
-	
+
 	machine_reset();
 }
 

@@ -24,7 +24,7 @@ public:
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_pc3092_data;
-	required_device<discrete_device> m_discrete;	
+	required_device<discrete_device> m_discrete;
 	UINT16 m_collision_address;
 	UINT8 m_collision_address_clear;
 	tilemap_t *m_bg_tilemap;

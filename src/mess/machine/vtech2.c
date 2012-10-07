@@ -146,7 +146,7 @@ WRITE8_MEMBER(vtech2_state::laser_bank_select_w)
 				write8_delegate(FUNC(vtech2_state::mwa_bank3), this),
 				write8_delegate(FUNC(vtech2_state::mwa_bank4), this),
 			};
-		
+
 			machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(offset * 0x4000, offset * 0x4000 + 0x3fff, mra_bank_soft[offset], mwa_bank_soft[offset]);
 		}
 		else

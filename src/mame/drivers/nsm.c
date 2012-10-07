@@ -90,7 +90,7 @@ WRITE8_MEMBER( nsm_state::cru_w )
 		m_cru_data[m_cru_count] = 0;
 	}
 	m_cru_data[m_cru_count] |= (data << offset);
-	
+
 	UINT8 i,j;
 	int segments;
 	if (!m_cru_count && (offset == 7))

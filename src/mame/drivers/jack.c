@@ -74,7 +74,7 @@ Stephh's Notes:
     - When On  (0x80), lives are set to 255 (0xff) but they are NOT infinite
 
   Other bits from DSW2 (but bit 5) don't seem to be read / tested at all ...
-  
+
 
 ***************************************************************************/
 
@@ -146,7 +146,7 @@ WRITE8_MEMBER(jack_state::joinem_control_w)
 	// d0: related to test mode?
 	// d1: unused?
 	// d2: ?
-	
+
 	// d3-d4: palette bank
 	int palette_bank = data & (machine().total_colors() - 1) >> 3 & 0x18;
 	if (m_joinem_palette_bank != palette_bank)
@@ -157,7 +157,7 @@ WRITE8_MEMBER(jack_state::joinem_control_w)
 
 	// d5: assume nmi enable
 	m_joinem_nmi_enable = data & 0x20;
-	
+
 	// d6: unused?
 
 	// d7: flip screen
@@ -890,7 +890,7 @@ MACHINE_RESET_MEMBER(jack_state,striv)
 MACHINE_START_MEMBER(jack_state,joinem)
 {
 	m_joinem_palette_bank = 0;
-	
+
 	save_item(NAME(m_joinem_nmi_enable));
 	save_item(NAME(m_joinem_palette_bank));
 }

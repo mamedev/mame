@@ -27,7 +27,7 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_playfield_ram;
 	required_shared_ptr<UINT8> m_sprite_ram;
-	
+
 	required_device<discrete_device> m_discrete;
 
 	/* video-related */

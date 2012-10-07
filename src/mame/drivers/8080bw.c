@@ -2343,7 +2343,7 @@ Claybuster is on the same hardware, PCB labels CS 235A and CS 238A as well
 
 TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::claybust_gun_callback)
 {
-	
+
 	// reset gun latch
 	m_claybust_gun_pos = 0;
 }
@@ -2358,23 +2358,23 @@ INPUT_CHANGED_MEMBER(_8080bw_state::claybust_gun_trigger)
 	if (newval)
 	{
 		/*
-			The game registers a valid shot after the gun trigger is pressed, and IN1 d0 is high.
-			It latches the gun position and then compares it with VRAM contents: 1 byte/8 pixels, 0 means miss.
-			IN1 d0 probably indicates if the latch is ready or not (glitches happen otherwise)
+            The game registers a valid shot after the gun trigger is pressed, and IN1 d0 is high.
+            It latches the gun position and then compares it with VRAM contents: 1 byte/8 pixels, 0 means miss.
+            IN1 d0 probably indicates if the latch is ready or not (glitches happen otherwise)
 
-			in   $06
-			cpi  $04
-			rc
-			mov  h,a
-			in   $02
-			mov  l,a
-			lxi  d,$1ffe  <-- this is where the +2 comes from
-			dad  d
-			out  $00
-			mov  a,m
-			ana  a
-			rz
-		*/
+            in   $06
+            cpi  $04
+            rc
+            mov  h,a
+            in   $02
+            mov  l,a
+            lxi  d,$1ffe  <-- this is where the +2 comes from
+            dad  d
+            out  $00
+            mov  a,m
+            ana  a
+            rz
+        */
 		UINT8 gunx = ioport("GUNX")->read_safe(0x00);
 		UINT8 guny = ioport("GUNY")->read_safe(0x20);
 		m_claybust_gun_pos = ((gunx >> 3) | (guny << 5)) + 2;
@@ -2426,7 +2426,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gunchamp )
 	PORT_INCLUDE( claybust )
-	
+
 	PORT_MODIFY("IN1")
 
 	// switch is 6-pos, but DNS06:5 and DNS06:6 are not connected
@@ -2461,7 +2461,7 @@ MACHINE_CONFIG_DERIVED_CLASS( claybust, invaders, _8080bw_state )
 
 	MCFG_TIMER_DRIVER_ADD("claybust_gun", _8080bw_state, claybust_gun_callback)
 
-	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, claybust) 
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, claybust)
 
 	/* sound hardware */
 	// TODO: discrete sound

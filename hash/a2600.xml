@@ -355,7 +355,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="decathln"> 
+	<software name="decathln">
 		<description>The Activision Decathlon</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
@@ -597,7 +597,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="abwerniee" cloneof="abwernie"> 
+	<software name="abwerniee" cloneof="abwernie">
 	<!-- controller not emulated -->
 		<description>Alpha Beam with Ernie (PAL)</description>
 		<year>1983</year>

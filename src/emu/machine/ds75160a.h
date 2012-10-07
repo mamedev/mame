@@ -81,7 +81,7 @@ private:
 	devcb_resolved_write8	m_out_bus_func;
 
 	UINT8 m_data;
-	
+
 	int m_te;
 	int m_pe;
 };

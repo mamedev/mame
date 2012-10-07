@@ -227,7 +227,7 @@ WRITE64_MEMBER(bebox_state::bebox_cpu0_imask_w )
 }
 
 WRITE64_MEMBER(bebox_state::bebox_cpu1_imask_w )
-{	
+{
 	UINT32 old_imask = m_cpu_imask[1];
 
 	bebox_mbreg32_w(&m_cpu_imask[1], data, mem_mask);
@@ -610,48 +610,48 @@ void bebox_ide_interrupt(device_t *device, int state)
 /*
 static READ64_MEMBER(bebox_state::bebox_video_r )
 {
-	UINT64 result = 0;
-	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	if (ACCESSING_BITS_0_7)
-		result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 0, mem_mask >> 0) << 0;
-	if (ACCESSING_BITS_8_15)
-		result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 1, mem_mask >> 8) << 8;
-	if (ACCESSING_BITS_16_23)
-		result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 2, mem_mask >> 16) << 16;
-	if (ACCESSING_BITS_24_31)
-		result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 3, mem_mask >> 24) << 24;
-	if (ACCESSING_BITS_32_39)
-		result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 4, mem_mask >> 32) << 32;
-	if (ACCESSING_BITS_40_47)
-		result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 5, mem_mask >> 40) << 40;
-	if (ACCESSING_BITS_48_55)
-		result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 6, mem_mask >> 48) << 48;
-	if (ACCESSING_BITS_56_63)
-		result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 7, mem_mask >> 56) << 56;
-	return FLIPENDIAN_INT64(result);
+    UINT64 result = 0;
+    mem_mask = FLIPENDIAN_INT64(mem_mask);
+    if (ACCESSING_BITS_0_7)
+        result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 0, mem_mask >> 0) << 0;
+    if (ACCESSING_BITS_8_15)
+        result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 1, mem_mask >> 8) << 8;
+    if (ACCESSING_BITS_16_23)
+        result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 2, mem_mask >> 16) << 16;
+    if (ACCESSING_BITS_24_31)
+        result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 3, mem_mask >> 24) << 24;
+    if (ACCESSING_BITS_32_39)
+        result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 4, mem_mask >> 32) << 32;
+    if (ACCESSING_BITS_40_47)
+        result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 5, mem_mask >> 40) << 40;
+    if (ACCESSING_BITS_48_55)
+        result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 6, mem_mask >> 48) << 48;
+    if (ACCESSING_BITS_56_63)
+        result |= (UINT64)vga_mem_linear_r(space, offset * 8 + 7, mem_mask >> 56) << 56;
+    return FLIPENDIAN_INT64(result);
 }
 
 
 static WRITE64_MEMBER(bebox_state::bebox_video_w )
 {
-	data = FLIPENDIAN_INT64(data);
-	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	if (ACCESSING_BITS_0_7)
-		vga_mem_linear_w(space, offset * 8 + 0, data >> 0 , mem_mask >> 0);
-	if (ACCESSING_BITS_8_15)                       
-		vga_mem_linear_w(space, offset * 8 + 1, data >> 8 , mem_mask >> 8);
-	if (ACCESSING_BITS_16_23)                      
-		vga_mem_linear_w(space, offset * 8 + 2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_BITS_24_31)                      
-		vga_mem_linear_w(space, offset * 8 + 3, data >> 24, mem_mask >> 24);
-	if (ACCESSING_BITS_32_39)                      
-		vga_mem_linear_w(space, offset * 8 + 4, data >> 32, mem_mask >> 32);
-	if (ACCESSING_BITS_40_47)                      
-		vga_mem_linear_w(space, offset * 8 + 5, data >> 40, mem_mask >> 40);
-	if (ACCESSING_BITS_48_55)                      
-		vga_mem_linear_w(space, offset * 8 + 6, data >> 48, mem_mask >> 48);
-	if (ACCESSING_BITS_56_63)                      
-		vga_mem_linear_w(space, offset * 8 + 7, data >> 56, mem_mask >> 56);
+    data = FLIPENDIAN_INT64(data);
+    mem_mask = FLIPENDIAN_INT64(mem_mask);
+    if (ACCESSING_BITS_0_7)
+        vga_mem_linear_w(space, offset * 8 + 0, data >> 0 , mem_mask >> 0);
+    if (ACCESSING_BITS_8_15)
+        vga_mem_linear_w(space, offset * 8 + 1, data >> 8 , mem_mask >> 8);
+    if (ACCESSING_BITS_16_23)
+        vga_mem_linear_w(space, offset * 8 + 2, data >> 16, mem_mask >> 16);
+    if (ACCESSING_BITS_24_31)
+        vga_mem_linear_w(space, offset * 8 + 3, data >> 24, mem_mask >> 24);
+    if (ACCESSING_BITS_32_39)
+        vga_mem_linear_w(space, offset * 8 + 4, data >> 32, mem_mask >> 32);
+    if (ACCESSING_BITS_40_47)
+        vga_mem_linear_w(space, offset * 8 + 5, data >> 40, mem_mask >> 40);
+    if (ACCESSING_BITS_48_55)
+        vga_mem_linear_w(space, offset * 8 + 6, data >> 48, mem_mask >> 48);
+    if (ACCESSING_BITS_56_63)
+        vga_mem_linear_w(space, offset * 8 + 7, data >> 56, mem_mask >> 56);
 }
 */
 /*************************************
@@ -662,7 +662,7 @@ static WRITE64_MEMBER(bebox_state::bebox_video_w )
 
 
 READ8_MEMBER(bebox_state::bebox_page_r)
-{	
+{
 	UINT8 data = m_at_pages[offset % 0x10];
 
 	switch(offset % 8)
@@ -685,7 +685,7 @@ READ8_MEMBER(bebox_state::bebox_page_r)
 
 
 WRITE8_MEMBER(bebox_state::bebox_page_w)
-{	
+{
 	m_at_pages[offset % 0x10] = data;
 
 	switch(offset % 8)
@@ -711,7 +711,7 @@ WRITE8_MEMBER(bebox_state::bebox_page_w)
 
 
 WRITE8_MEMBER(bebox_state::bebox_80000480_w)
-{	
+{
 	switch(offset % 8)
 	{
 		case 1:
@@ -910,7 +910,7 @@ static const struct kbdc8042_interface bebox_8042_interface =
 
 
 READ64_MEMBER(bebox_state::scsi53c810_r )
-{	
+{
 	int reg = offset*8;
 	UINT64 r = 0;
 	if (!(mem_mask & U64(0xff00000000000000))) {
@@ -943,7 +943,7 @@ READ64_MEMBER(bebox_state::scsi53c810_r )
 
 
 WRITE64_MEMBER(bebox_state::scsi53c810_w )
-{	
+{
 	int reg = offset*8;
 	if (!(mem_mask & U64(0xff00000000000000))) {
 		m_lsi53c810->lsi53c810_reg_w(reg+0, data >> 56);

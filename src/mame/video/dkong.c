@@ -129,7 +129,7 @@ static const res_net_info radarscp_net_info =
 	{
 		{ RES_NET_AMP_DARLINGTON, 470 * TRS_J1, 470*(1-TRS_J1), 3, { 1000, 470, 220 } },
 		{ RES_NET_AMP_DARLINGTON, 470 * TRS_J1, 470*(1-TRS_J1), 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_EMITTER, 	  680 * TRS_J1, 680*(1-TRS_J1), 2, {  470, 220,   0 } }    /*  radarscp */
+		{ RES_NET_AMP_EMITTER,	  680 * TRS_J1, 680*(1-TRS_J1), 2, {  470, 220,   0 } }    /*  radarscp */
 	}
 };
 
@@ -139,7 +139,7 @@ static const res_net_info radarscp_net_bck_info =
 	{
 		{ RES_NET_AMP_DARLINGTON, 470, 4700, 0, { 0 } },
 		{ RES_NET_AMP_DARLINGTON, 470, 4700, 0, { 0 } },
-		{ RES_NET_AMP_EMITTER, 	  470, 4700, 0, { 0 } }    /*  radarscp */
+		{ RES_NET_AMP_EMITTER,	  470, 4700, 0, { 0 } }    /*  radarscp */
 	}
 };
 
@@ -713,9 +713,9 @@ static void radarscp_step(running_machine &machine, int line_cnt)
 	int sig;
 
 	/* vsync is divided by 2 by a LS161
-	 * The resulting 30 Hz signal clocks a LFSR (LS164) operating as a
-	 * random number generator.
-	 */
+     * The resulting 30 Hz signal clocks a LFSR (LS164) operating as a
+     * random number generator.
+     */
 
 	if ( line_cnt == 0)
 	{

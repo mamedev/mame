@@ -370,7 +370,7 @@ public:
 	UINT16 segacd_imagebuffer_start_address;
 	UINT16 segacd_imagebuffer_offset;
 
-	
+
 	UINT16 segacd_comms_flags;// = 0x0000;
 	UINT16 segacd_comms_part1[0x8];
 	UINT16 segacd_comms_part2[0x8];
@@ -422,7 +422,7 @@ public:
 	UINT32 CDD_EXT;
 	UINT16 CDD_CONTROL;
 	INT16  CDD_DONE;
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER( segacd_irq3_timer_callback );
 	TIMER_DEVICE_CALLBACK_MEMBER( scd_dma_timer_callback );
 	TIMER_DEVICE_CALLBACK_MEMBER( segacd_access_timer_callback );
@@ -480,7 +480,7 @@ public:
 	void SCD_GET_TILE_INFO_32x32_1x1( int& tile_region, int& tileno, int tile_index );
 	void SCD_GET_TILE_INFO_16x16_16x16( int& tile_region, int& tileno, int tile_index );
 	void SCD_GET_TILE_INFO_32x32_16x16( int& tile_region, int& tileno, int tile_index );
-	
+
 	TILE_GET_INFO_MEMBER( get_stampmap_16x16_1x1_tile_info );
 	TILE_GET_INFO_MEMBER( get_stampmap_32x32_1x1_tile_info );
 	TILE_GET_INFO_MEMBER( get_stampmap_16x16_16x16_tile_info );
@@ -556,9 +556,9 @@ public:
 	WRITE16_MEMBER( segacd_stampmap_base_address_w );
 	READ16_MEMBER( segacd_imagebuffer_start_address_r );
 	WRITE16_MEMBER( segacd_imagebuffer_start_address_w );
-	READ16_MEMBER( segacd_imagebuffer_offset_r );	
+	READ16_MEMBER( segacd_imagebuffer_offset_r );
 	WRITE16_MEMBER( segacd_imagebuffer_offset_w );
-	READ16_MEMBER( segacd_imagebuffer_vcell_size_r );	
+	READ16_MEMBER( segacd_imagebuffer_vcell_size_r );
 	WRITE16_MEMBER( segacd_imagebuffer_vcell_size_w );
 	READ16_MEMBER( segacd_imagebuffer_hdot_size_r );
 	WRITE16_MEMBER( segacd_imagebuffer_hdot_size_w );
@@ -569,7 +569,7 @@ public:
 	READ16_MEMBER( segacd_cdfader_r );
 	WRITE16_MEMBER( segacd_cdfader_w );
 	READ16_MEMBER( segacd_backupram_r );
-	WRITE16_MEMBER( segacd_backupram_w );	
+	WRITE16_MEMBER( segacd_backupram_w );
 	READ16_MEMBER( segacd_font_color_r );
 	WRITE16_MEMBER( segacd_font_color_w );
 	READ16_MEMBER( segacd_font_converted_r );

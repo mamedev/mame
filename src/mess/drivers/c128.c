@@ -969,7 +969,7 @@ static const mc6845_interface vdc_intf =
 READ8_MEMBER( c128_state::sid_potx_r )
 {
 	UINT8 cia1_pa = m_cia1->pa_r();
-	
+
 	int sela = BIT(cia1_pa, 6);
 	int selb = BIT(cia1_pa, 7);
 
@@ -984,7 +984,7 @@ READ8_MEMBER( c128_state::sid_potx_r )
 READ8_MEMBER( c128_state::sid_poty_r )
 {
 	UINT8 cia1_pa = m_cia1->pa_r();
-	
+
 	int sela = BIT(cia1_pa, 6);
 	int selb = BIT(cia1_pa, 7);
 

@@ -57,7 +57,7 @@ class device_delegate_helper
 protected:
 	// constructor
 	device_delegate_helper(const char *devname) : m_device_name(devname) { }
-	
+
 	// internal helpers
 	delegate_late_bind &bound_object(device_t &search_root);
 	static const char *safe_tag(device_t *object);

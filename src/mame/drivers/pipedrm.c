@@ -191,7 +191,7 @@ static WRITE8_HANDLER( pipedrm_bankswitch_w )
 	state->membank("bank1")->set_entry(data & 0x7);
 
 	/* map to the fromance gfx register */
-	state->fromance_gfxreg_w(space, offset, ((data >> 6) & 0x01) | 	/* flipscreen */
+	state->fromance_gfxreg_w(space, offset, ((data >> 6) & 0x01) |	/* flipscreen */
 							  ((~data >> 2) & 0x02));	/* videoram select */
 }
 

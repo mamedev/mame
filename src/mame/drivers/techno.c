@@ -49,7 +49,7 @@ protected:
 private:
 	bool m_digwait;
 	UINT8 m_keyrow;
-public:	
+public:
 	INTERRUPT_GEN_MEMBER(techno_intgen);
 };
 

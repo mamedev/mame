@@ -3,12 +3,12 @@
     a2arcadeboard.c
 
     Implementation of the Third Millenium Engineering Arcade Board
- 
+
     TODO:
         - VDPTEST program seems to want more than 16K of RAM, but docs/ads/press releases say 16k, period
         - MLDEMO program needs vsync IRQ from the TMS but doesn't program the registers the way our emulation
           wants to enable IRQs
- 
+
 *********************************************************************/
 
 #include "emu.h"
@@ -120,7 +120,7 @@ void a2bus_arcboard_device::device_reset()
         case 1:
             return m_tms->register_read(space, 0);
 
-        case 6: 
+        case 6:
             return ay8910_r(m_ay, space, 0);
     }
 
@@ -146,7 +146,7 @@ void a2bus_arcboard_device::write_c0nx(address_space &space, UINT8 offset, UINT8
         case 6:
             ay8910_data_w(m_ay, space, 0, data);
             break;
-    }       
+    }
 }
 
 WRITE_LINE_MEMBER( a2bus_arcboard_device::tms_irq_w )

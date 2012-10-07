@@ -17,7 +17,7 @@ class astrocde_mess_state : public astrocde_state
 {
 public:
 	astrocde_mess_state(const machine_config &mconfig, device_type type, const char *tag)
-		: astrocde_state(mconfig, type, tag) 
+		: astrocde_state(mconfig, type, tag)
 		{ }
 
 	void get_ram_expansion_settings(int &ram_expansion_installed, int &write_protect_on, int &expansion_ram_start, int &expansion_ram_end, int &shadow_ram_end);

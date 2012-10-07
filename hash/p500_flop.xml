@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="p500_flop" description="Commodore P500 diskettes">
-	
+
 	<software name="burnin">
 		<description>Factory Burn In Diagnostics for P500</description>
 		<year>1983</year>

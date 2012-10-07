@@ -254,7 +254,7 @@ static MOS6566_INTERFACE( vic_intf )
 READ8_MEMBER( vic10_state::sid_potx_r )
 {
 	UINT8 cia_pa = m_cia->pa_r();
-	
+
 	int sela = BIT(cia_pa, 6);
 	int selb = BIT(cia_pa, 7);
 
@@ -269,7 +269,7 @@ READ8_MEMBER( vic10_state::sid_potx_r )
 READ8_MEMBER( vic10_state::sid_poty_r )
 {
 	UINT8 cia_pa = m_cia->pa_r();
-	
+
 	int sela = BIT(cia_pa, 6);
 	int selb = BIT(cia_pa, 7);
 

@@ -26,7 +26,7 @@ static MACHINE_CONFIG_FRAGMENT( vga_cirrus )
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_vga_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(0x100)
-	
+
 	MCFG_DEVICE_ADD("vga", CIRRUS_VGA, 0)
 MACHINE_CONFIG_END
 
@@ -74,7 +74,7 @@ void isa8_svga_cirrus_device::device_start()
 	set_isa_device();
 
 	m_vga = subdevice<cirrus_vga_device>("vga");
-	
+
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "svga", "dm_clgd5430");
 
 	m_isa->install_device(0x03b0, 0x03bf, 0, 0, read8_delegate(FUNC(cirrus_vga_device::port_03b0_r),m_vga), write8_delegate(FUNC(cirrus_vga_device::port_03b0_w),m_vga));

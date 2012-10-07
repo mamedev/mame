@@ -47,8 +47,8 @@ public:
 	a2600_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_riot_ram(*this, "riot_ram")
-//		, m_joy1(*this, CONTROL1_TAG)
-//		, m_joy2(*this, CONTROL2_TAG)
+//      , m_joy1(*this, CONTROL1_TAG)
+//      , m_joy2(*this, CONTROL2_TAG)
 		{ }
 
 	dpc_t m_dpc;
@@ -128,8 +128,8 @@ public:
 	DECLARE_READ8_MEMBER(riot_input_port_8_r);
 
 protected:
-//	required_device<vcs_control_port_device> m_joy1;
-//	required_device<vcs_control_port_device> m_joy2;
+//  required_device<vcs_control_port_device> m_joy1;
+//  required_device<vcs_control_port_device> m_joy2;
 	int next_bank();
 	void modeF8_switch(UINT16 offset, UINT8 data);
 	void modeFA_switch(UINT16 offset, UINT8 data);
@@ -1276,7 +1276,7 @@ READ8_MEMBER(a2600_state::switch_A_r)
 	case 0x00:  /* Joystick */
 	case 0x05:	/* Joystick w/Boostergrip */
 		val |= machine().root_device().ioport("SWA_JOY")->read() & 0xF0;
-//		val |= ( m_joy1->joy_r() & 0x0F ) << 4;
+//      val |= ( m_joy1->joy_r() & 0x0F ) << 4;
 		break;
 	case 0x01:  /* Paddle */
 		val |= machine().root_device().ioport("SWA_PAD")->read() & 0xF0;
@@ -2315,8 +2315,8 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 	/* devices */
 	MCFG_RIOT6532_ADD("riot", MASTER_CLOCK_NTSC / 3, r6532_interface)
 
-//	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
-//	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
+//  MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
+//  MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
 
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
@@ -2351,8 +2351,8 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	/* devices */
 	MCFG_RIOT6532_ADD("riot", MASTER_CLOCK_PAL / 3, r6532_interface)
 
-//	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
-//	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
+//  MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
+//  MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
 
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")

@@ -297,7 +297,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mfp_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_drq);
-	
+
 	void mfp_init();
 	void x68k_keyboard_ctrl_w(int data);
 	int x68k_keyboard_pop_scancode();
@@ -308,7 +308,7 @@ public:
 	void md_6button_init();
 	UINT8 md_6button_r(int port);
 	UINT8 xpd1lr_r(int port);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(x68k_fm_irq);
 	DECLARE_WRITE_LINE_MEMBER(x68k_irq2_line);
 
@@ -345,7 +345,7 @@ public:
 	DECLARE_READ16_MEMBER(x68k_exp_r);
 	DECLARE_WRITE16_MEMBER(x68k_exp_w);
 	DECLARE_READ16_MEMBER(x68k_scc_r);
-	
+
 	DECLARE_READ16_MEMBER(x68k_spritereg_r);
 	DECLARE_WRITE16_MEMBER(x68k_spritereg_w);
 	DECLARE_READ16_MEMBER(x68k_spriteram_r);
@@ -367,7 +367,7 @@ private:
 	void x68k_draw_text(bitmap_ind16 &bitmap, int xscr, int yscr, rectangle rect);
 	void x68k_draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority);
 	void x68k_draw_gfx(bitmap_ind16 &bitmap,rectangle cliprect);
-	void x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);	
+	void x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
 };
 
 

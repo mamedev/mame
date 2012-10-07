@@ -867,8 +867,8 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 			case VIDC_HCR:  m_vidc_regs[VIDC_HCR] =  ((val >> 14)<<1)+1;	break;
 //          case VIDC_HSWR: m_vidc_regs[VIDC_HSWR] = (val >> 14)+1;   break;
 			case VIDC_HBSR: m_vidc_regs[VIDC_HBSR] = ((val >> 14)<<1)+1;	break;
-			case VIDC_HDSR: m_vidc_regs[VIDC_HDSR] = (val >> 14); 	break;
-			case VIDC_HDER: m_vidc_regs[VIDC_HDER] = (val >> 14); 	break;
+			case VIDC_HDSR: m_vidc_regs[VIDC_HDSR] = (val >> 14);	break;
+			case VIDC_HDER: m_vidc_regs[VIDC_HDER] = (val >> 14);	break;
 			case VIDC_HBER: m_vidc_regs[VIDC_HBER] = ((val >> 14)<<1)+1;	break;
 //          #define VIDC_HCSR       0x98
 //          #define VIDC_HIR        0x9c

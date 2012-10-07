@@ -911,21 +911,21 @@ void ninjakd2_state::machine_reset()
 	int num_banks = (machine().root_device().memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 	machine().root_device().membank("bank1")->configure_entries(0, num_banks, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 	machine().root_device().membank("bank1")->set_entry(0);
-	
+
 	m_rom_bank_mask = num_banks - 1;
 }
 
 MACHINE_START_MEMBER(ninjakd2_state,omegaf)
 {
 	omegaf_io_protection_start();
-	
+
 	machine_start();
 }
 
 MACHINE_RESET_MEMBER(ninjakd2_state,omegaf)
 {
 	omegaf_io_protection_reset();
-	
+
 	machine_reset();
 }
 
@@ -1481,7 +1481,7 @@ void ninjakd2_state::robokid_motion_error_kludge(UINT16 offset)
 	ROM[1] = 0x03; // and 3
 	ROM[2] = 0x18;
 	ROM[3] = 0xf6; // jr $-8
-	
+
 	m_maincpu->space(AS_PROGRAM).install_read_handler(offset, offset, read8_delegate(FUNC(ninjakd2_state::robokid_motion_error_verbose_r), this));
 }
 

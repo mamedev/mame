@@ -21,7 +21,7 @@ public:
 
 WRITE8_MEMBER( t400_test_suite_state::port_l_w )
 {
-//	printf("L: %u\n", data);
+//  printf("L: %u\n", data);
 }
 
 static ADDRESS_MAP_START( cop_io, AS_IO, 8, t400_test_suite_state )

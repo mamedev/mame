@@ -252,7 +252,7 @@ class towns_state : public driver_device
 	void poll_keyboard();
 	void mouse_timeout();
 	void wait_end();
-public:	
+public:
 	INTERRUPT_GEN_MEMBER(towns_vsync_irq);
 	TIMER_CALLBACK_MEMBER(towns_cd_status_ready);
 	TIMER_CALLBACK_MEMBER(towns_cdrom_read_byte);

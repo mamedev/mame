@@ -1,7 +1,7 @@
 /******************************************************************************
 
     UPL "sprite framebuffer" hardware
-    
+
     Functions to emulate the video hardware
 
 ******************************************************************************/
@@ -118,7 +118,7 @@ void ninjakd2_state::video_init_common(UINT32 vram_alloc_size)
 		m_robokid_bg0_videoram = auto_alloc_array_clear(machine(), UINT8, vram_alloc_size);
 		m_robokid_bg1_videoram = auto_alloc_array_clear(machine(), UINT8, vram_alloc_size);
 		m_robokid_bg2_videoram = auto_alloc_array_clear(machine(), UINT8, vram_alloc_size);
-		
+
 		save_pointer(NAME(m_robokid_bg0_videoram), vram_alloc_size);
 		save_pointer(NAME(m_robokid_bg1_videoram), vram_alloc_size);
 		save_pointer(NAME(m_robokid_bg2_videoram), vram_alloc_size);
@@ -352,7 +352,7 @@ static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap)
        counts as one sprite drawn.
        This is proven by Mutant Night, which doesn't work correctly (leaves shots
        on screen) if we don't take big sprites into account.
-	*/
+    */
 
 	for (;;)
 	{

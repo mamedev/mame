@@ -27,7 +27,7 @@ public:
 
 
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	virtual READ8_MEMBER(port_03b0_r);
 	virtual WRITE8_MEMBER(port_03b0_w);
 	virtual READ8_MEMBER(port_03c0_r);
@@ -48,7 +48,7 @@ protected:
 	void vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vga_vh_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vga_vh_mono(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual UINT8 pc_vga_choosevideomode();	
+	virtual UINT8 pc_vga_choosevideomode();
 	void recompute_params_clock(int divisor, int xtal);
 	UINT8 crtc_reg_read(UINT8 index);
 	void recompute_params();
@@ -64,7 +64,7 @@ private:
 	inline UINT8 rotate_right(UINT8 val);
 	inline UINT8 vga_logical_op(UINT8 data, UINT8 plane, UINT8 mask);
 	inline UINT8 vga_latch_write(int offs, UINT8 data);
-	
+
 protected:
 	struct
 	{
@@ -183,7 +183,7 @@ protected:
 
 		/* oak vga */
 		struct { UINT8 reg; } oak;
-	} vga;	
+	} vga;
 };
 
 
@@ -196,7 +196,7 @@ class svga_device :  public vga_device
 {
 public:
     // construction/destruction
-	svga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);	
+	svga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 protected:
@@ -588,7 +588,7 @@ public:
 	virtual WRITE8_MEMBER(port_03d0_w);
 	virtual READ8_MEMBER(mem_r);
 	virtual WRITE8_MEMBER(mem_w);
-	
+
 protected:
 private:
 };

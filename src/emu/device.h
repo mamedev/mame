@@ -987,7 +987,7 @@ inline device_t *device_t::siblingdevice(const char *tag) const
 	// query relative to the parent, if we have one
 	if (m_owner != NULL)
 		return m_owner->subdevice(tag);
-	
+
 	// otherwise, it's NULL unless the tag is absolute
 	return (tag[0] == ':') ? subdevice(tag) : NULL;
 }

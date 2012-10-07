@@ -78,7 +78,7 @@ private:
 	UINT8 m_portb;
 	virtual void machine_start();
 	virtual void machine_reset();
-public:	
+public:
 	UINT32 screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(d6800_p);
 };

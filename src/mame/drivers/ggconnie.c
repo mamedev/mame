@@ -30,7 +30,7 @@ public:
 		: pce_common_state(mconfig, type, tag) { }
 
 	DECLARE_WRITE8_MEMBER(lamp_w);
-	DECLARE_WRITE8_MEMBER(output_w);	
+	DECLARE_WRITE8_MEMBER(output_w);
 };
 
 

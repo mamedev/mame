@@ -110,7 +110,7 @@ public:
 	const UINT8 *     m_color_codes;
 	emu_timer *       m_scanline_timer;
 	INT8              m_vidhw;			/* Selected video hardware RS Conversion / TKG04 */
-	
+
 	optional_device<discrete_device> m_discrete;
 	/* radar scope */
 

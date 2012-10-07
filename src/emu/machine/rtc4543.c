@@ -2,9 +2,9 @@
 
     rtc4543.c - Epson R4543 real-time clock chip emulation
     by R. Belmont
- 
+
     TODO: writing (not done by System 12 or 23 so no test case)
- 
+
 **********************************************************************/
 
 #include "rtc4543.h"
@@ -93,8 +93,8 @@ void rtc4543_device::rtc_clock_updated(int year, int month, int day, int day_of_
 {
 	static const int weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
 
-    m_regs[0] = make_bcd(second);               // seconds (BCD, 0-59) in bits 0-6, bit 7 = battery low 
-    m_regs[1] = make_bcd(minute);               // minutes (BCD, 0-59) 
+    m_regs[0] = make_bcd(second);               // seconds (BCD, 0-59) in bits 0-6, bit 7 = battery low
+    m_regs[1] = make_bcd(minute);               // minutes (BCD, 0-59)
     m_regs[2] = make_bcd(hour);                 // hour (BCD, 0-23)
     m_regs[3] = make_bcd(weekday[day_of_week]);	// low nibble = day of the week
     m_regs[3] |= (make_bcd(day) & 0x0f)<<4;	    // high nibble = low digit of day

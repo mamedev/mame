@@ -91,7 +91,7 @@ public:
     DECLARE_READ_LINE_MEMBER( eoi_r );
     DECLARE_READ_LINE_MEMBER( atn_r );
     DECLARE_READ_LINE_MEMBER( srq_r );
-    
+
     DECLARE_WRITE_LINE_MEMBER( ren_w );
     DECLARE_WRITE_LINE_MEMBER( ifc_w );
     DECLARE_WRITE_LINE_MEMBER( ndac_w );

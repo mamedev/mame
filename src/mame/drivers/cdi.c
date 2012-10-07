@@ -625,7 +625,7 @@ CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      driver_device, 0, 
 
 // The Quizard games are RETAIL CD-i units, with additional JAMMA adapters & dongles for protection, hence being 'clones' of the system.
 
-GAME( 1995, cdibios,  0,     		 cdi_base,      quizard, driver_device,      0, ROT0,     "Philips",  	  "CD-i Bios", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_IS_BIOS_ROOT )
+GAME( 1995, cdibios,  0,    		 cdi_base,      quizard, driver_device,      0, ROT0,     "Philips",	  "CD-i Bios", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_IS_BIOS_ROOT )
 // Working
 GAME( 1995, quizrd12, cdibios,      quizrd12,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 1.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 GAME( 1995, quizrd17, cdibios,      quizrd17,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 1.7", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )

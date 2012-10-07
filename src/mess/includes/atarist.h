@@ -333,7 +333,7 @@ public:
 
 	TIMER_CALLBACK_MEMBER(atariste_dmasound_tick);
 	TIMER_CALLBACK_MEMBER(atariste_microwire_tick);
-	
+
 	void dmasound_set_state(int level);
 	void dmasound_tick();
 	void microwire_shift();

@@ -97,7 +97,7 @@ tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type typ
 {
 	m_50hz = is_50hz;
 	m_reva = is_reva;
-//	static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
+//  static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
 
 
@@ -108,7 +108,7 @@ tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag
 {
 	m_50hz = false;
 	m_reva = true;
-//	static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
+//  static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
 
 

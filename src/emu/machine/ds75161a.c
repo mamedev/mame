@@ -95,7 +95,7 @@ void ds75161a_device::device_start()
 	m_in_eoi_func.resolve(m_in_eoi_cb, *this);
 	m_in_atn_func.resolve(m_in_atn_cb, *this);
 	m_in_srq_func.resolve(m_in_srq_cb, *this);
-	
+
 	m_out_ren_func.resolve(m_out_ren_cb, *this);
 	m_out_ifc_func.resolve(m_out_ifc_cb, *this);
 	m_out_ndac_func.resolve(m_out_ndac_cb, *this);

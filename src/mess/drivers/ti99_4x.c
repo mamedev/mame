@@ -88,7 +88,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
 	TIMER_DEVICE_CALLBACK_MEMBER(ti99_4ev_hblank_interrupt);
-	
+
 	// Some values to keep
 	tms9900_device*		m_cpu;
 	tms9901_device*		m_tms9901;

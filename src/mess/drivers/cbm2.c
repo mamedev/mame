@@ -2,15 +2,15 @@
 
     TODO:
 
-	- CIA timers fail in burn-in test
-	- NTSC variants unable to load from disk
-	- shift lock
-	- Hungarian keyboard
-	- cbm620hu charom banking?
-	- read VIC video/color RAM thru PLA (Sphi2 = 1, AE = 0)
-	- user port
-	- co-processor bus
-	- 8088 co-processor board
+    - CIA timers fail in burn-in test
+    - NTSC variants unable to load from disk
+    - shift lock
+    - Hungarian keyboard
+    - cbm620hu charom banking?
+    - read VIC video/color RAM thru PLA (Sphi2 = 1, AE = 0)
+    - user port
+    - co-processor bus
+    - 8088 co-processor board
 
 */
 
@@ -45,7 +45,7 @@
 //  read_pla - low profile PLA read
 //-------------------------------------------------
 
-void cbm2_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas, int busy2, 
+void cbm2_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas, int busy2,
 	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4)
 {
 	UINT32 input = P0 << 15 | P1 << 14 | P2 << 13 | P3 << 12 | busy2 << 11 | eras << 10 | ecas << 9 | refen << 8 | cas << 7 | ras << 6;
@@ -66,7 +66,7 @@ void cbm2_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, 
 //  read_pla - high profile PLA read
 //-------------------------------------------------
 
-void cbm2hp_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas, int busy2, 
+void cbm2hp_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas, int busy2,
 	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4)
 {
 	UINT32 input = ras << 13 | cas << 12 | refen << 11 | eras << 10 | ecas << 9 | busy2 << 8 | P3 << 3 | P2 << 2 | P1 << 1 | P0;
@@ -88,7 +88,7 @@ void cbm2hp_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras
 //-------------------------------------------------
 
 void cbm2_state::bankswitch(offs_t offset, int busy2, int eras, int ecas, int refen, int cas, int ras, int *sysioen, int *dramen,
-	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *buframcs, int *extbufcs, int *vidramcs, 
+	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *buframcs, int *extbufcs, int *vidramcs,
 	int *diskromcs, int *csbank1, int *csbank2, int *csbank3, int *basiccs, int *knbcs, int *kernalcs,
 	int *crtccs, int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs)
 {
@@ -333,7 +333,7 @@ void p500_state::read_pla1(offs_t offset, int bras, int busy2, int sphi2, int cl
 {
 	UINT32 input = P0 << 15 | P2 << 14 | bras << 13 | P1 << 12 | P3 << 11 | busy2 << 10 | m_statvid << 9 | sphi2 << 8 |
 			clrnibcsb << 7 | m_dramon << 6 | procvid << 5 | refen << 4 | m_vicdotsel << 3 | ba << 2 | aec << 1 | srw;
-	
+
 	UINT32 data = m_pla1->read(input);
 
 	*datxen = BIT(data, 0);
@@ -356,7 +356,7 @@ void p500_state::read_pla2(offs_t offset, offs_t va, int ba, int sphi2, int vice
 {
 	UINT32 input = VA12 << 15 | ba << 14 | A13 << 13 | A15 << 12 | A14 << 11 | A11 << 10 | A10 << 9 | A12 << 8 |
 			sphi2 << 7 | vicen << 6 | m_statvid << 5 | m_vicdotsel << 4 | ae << 3 | segf << 2 | bcas << 1 | bank0;
-	
+
 	UINT32 data = m_pla2->read(input);
 
 	*clrnibcsb = BIT(data, 0);
@@ -385,7 +385,7 @@ void p500_state::bankswitch(offs_t offset, offs_t va, int srw, int sphi0, int sp
 
 	int clrnibcsb = 1, procvid = 1, segf = 1;
 
-	read_pla1(offset, bras, busy2, sphi2, clrnibcsb, procvid, refen, ba, *aec, srw, 
+	read_pla1(offset, bras, busy2, sphi2, clrnibcsb, procvid, refen, ba, *aec, srw,
 		datxen, dramxen, clrniben, &segf, _64kcasen, casenb, viddaten, viddat_tr);
 
 	int bank0 = 1, vicen = 1;
@@ -429,7 +429,7 @@ void p500_state::bankswitch(offs_t offset, offs_t va, int srw, int sphi0, int sp
 	*clrnibcs = clrnibcsb || bcas;
 	*vidmatcs = vidmatcsb || bcas;
 
-	read_pla1(offset, bras, busy2, sphi2, clrnibcsb, procvid, refen, ba, *aec, srw, 
+	read_pla1(offset, bras, busy2, sphi2, clrnibcsb, procvid, refen, ba, *aec, srw,
 		datxen, dramxen, clrniben, &segf, _64kcasen, casenb, viddaten, viddat_tr);
 }
 
@@ -441,7 +441,7 @@ void p500_state::bankswitch(offs_t offset, offs_t va, int srw, int sphi0, int sp
 UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, int sphi0, int sphi1, int sphi2, int ba, int ae, int bras, int bcas, UINT8 *clrnib)
 {
 	int srw = 1, busy2 = 1, refen = 0;
-	
+
 	int datxen = 1, dramxen = 1, clrniben = 1, _64kcasen = 1, casenb = 1, viddaten = 1, viddat_tr = 1;
 	int clrnibcs = 1, extbufcs = 1, discromcs = 1, buframcs = 1, charomcs = 1, viccs = 1, vidmatcs = 1;
 	int csbank1 = 1, csbank2 = 1, csbank3 = 1, basiclocs = 1, basichics = 1, kernalcs = 1;
@@ -476,7 +476,7 @@ UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, in
 			data = m_charom[va & 0xfff];
 		}
 	}
-	
+
 	if (clrniben)
 	{
 		if (!clrnibcs && !vsysaden)
@@ -564,7 +564,7 @@ void p500_state::write_memory(address_space &space, offs_t offset, UINT8 data, i
 {
 	int srw = 0, busy2 = 1, refen = 0;
 	offs_t va = 0xffff;
-	
+
 	int datxen = 1, dramxen = 1, clrniben = 1, _64kcasen = 1, casenb = 1, viddaten = 1, viddat_tr = 1;
 	int clrnibcs = 1, extbufcs = 1, discromcs = 1, buframcs = 1, charomcs = 1, viccs = 1, vidmatcs = 1;
 	int csbank1 = 1, csbank2 = 1, csbank3 = 1, basiclocs = 1, basichics = 1, kernalcs = 1;
@@ -675,25 +675,25 @@ WRITE8_MEMBER( p500_state::write )
 READ8_MEMBER( p500_state::vic_videoram_r )
 {
 	/*
-	int sphi0 = 0, sphi1 = 1, sphi2 = 0, ba = 1, ae = 0, bras = 0, bcas = 0;
-	offs_t va = offset;
+    int sphi0 = 0, sphi1 = 1, sphi2 = 0, ba = 1, ae = 0, bras = 0, bcas = 0;
+    offs_t va = offset;
 
-	return read_memory(space, 0, va, sphi0, sphi1, sphi2, ba, ae, bras, bcas);
-	*/
+    return read_memory(space, 0, va, sphi0, sphi1, sphi2, ba, ae, bras, bcas);
+    */
 	/*
-	int ba = 1, ae = 0, bras = 1, bcas = 0;
-	UINT8 clrnib = 0xf;
+    int ba = 1, ae = 0, bras = 1, bcas = 0;
+    UINT8 clrnib = 0xf;
 
-	if (offset < 0x1000)
-	{
-		return read_memory(space, 0, offset, 0, 1, 0, ba, ae, bras, bcas, &clrnib);
-	}
-	else
-	{
-		return read_memory(space, 0, offset, 1, 0, 1, ba, ae, bras, bcas, &clrnib);
-	}
-	*/
-	
+    if (offset < 0x1000)
+    {
+        return read_memory(space, 0, offset, 0, 1, 0, ba, ae, bras, bcas, &clrnib);
+    }
+    else
+    {
+        return read_memory(space, 0, offset, 1, 0, 1, ba, ae, bras, bcas, &clrnib);
+    }
+    */
+
 	if (offset < 0x1000)
 	{
 		return m_charom[offset & 0xfff];
@@ -961,7 +961,7 @@ static MC6845_UPDATE_ROW( lp_crtc_update_row )
 		{
 			int color = BIT(data, 7) ^ BIT(code, 7) ^ BIT(ma, 13);
 			if (cursor_x == column) color ^= 1;
-			
+
 			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[color];
 
 			data <<= 1;
@@ -1000,7 +1000,7 @@ static MC6845_UPDATE_ROW( hp_crtc_update_row )
 		{
 			int color = BIT(data, 7) ^ BIT(code, 7) ^ BIT(ma, 13);
 			if (cursor_x == column) color ^= 1;
-			
+
 			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[color];
 
 			data <<= 1;
@@ -1106,19 +1106,19 @@ WRITE_LINE_MEMBER( p500_state::tpi1_irq_w )
 READ8_MEMBER( cbm2_state::tpi1_pa_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       0
-	    1       0
-	    2       REN
-	    3       ATN
-	    4       DAV
-	    5       EOI
-	    6       NDAC
-	    7       NRFD
-	
-	*/
+
+        bit     description
+
+        0       0
+        1       0
+        2       REN
+        3       ATN
+        4       DAV
+        5       EOI
+        6       NDAC
+        7       NRFD
+
+    */
 
 	UINT8 data = 0;
 
@@ -1136,19 +1136,19 @@ READ8_MEMBER( cbm2_state::tpi1_pa_r )
 WRITE8_MEMBER( cbm2_state::tpi1_pa_w )
 {
 	/*
-	
-	    bit     description
-	
-	    0       75161A DC
-	    1       75161A TE
-	    2       REN
-	    3       ATN
-	    4       DAV
-	    5       EOI
-	    6       NDAC
-	    7       NRFD
-	
-	*/
+
+        bit     description
+
+        0       75161A DC
+        1       75161A TE
+        2       REN
+        3       ATN
+        4       DAV
+        5       EOI
+        6       NDAC
+        7       NRFD
+
+    */
 
 	// IEEE-488
 	m_ieee2->dc_w(BIT(data, 0));
@@ -1167,26 +1167,26 @@ WRITE8_MEMBER( cbm2_state::tpi1_pa_w )
 READ8_MEMBER( cbm2_state::tpi1_pb_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       IFC
-	    1       SRQ
-	    2       user port PB2
-	    3       user port PB3
-	    4       
-	    5       
-	    6       
-	    7       CASS SW
-	
-	*/
+
+        bit     description
+
+        0       IFC
+        1       SRQ
+        2       user port PB2
+        3       user port PB3
+        4
+        5
+        6
+        7       CASS SW
+
+    */
 
 	UINT8 data = 0;
 
 	// IEEE-488
 	data |= m_ieee2->ifc_r();
 	data |= m_ieee2->srq_r() << 1;
-	
+
 	// user port
 	//data |= m_user->pb2_r() << 2;
 	//data |= m_user->pb3_r() << 3;
@@ -1200,23 +1200,23 @@ READ8_MEMBER( cbm2_state::tpi1_pb_r )
 WRITE8_MEMBER( cbm2_state::tpi1_pb_w )
 {
 	/*
-	
-	    bit     description
-	
-	    0       IFC
-	    1       SRQ
-	    2       user port PB2
-	    3       user port PB3
-	    4       DRAMON
-	    5       CASS WRT
-	    6       CASS MTR
-	    7       
-	
-	*/
+
+        bit     description
+
+        0       IFC
+        1       SRQ
+        2       user port PB2
+        3       user port PB3
+        4       DRAMON
+        5       CASS WRT
+        6       CASS MTR
+        7
+
+    */
 
 	// IEEE-488
-   	m_ieee2->ifc_w(BIT(data, 0));
-   	m_ieee2->srq_w(BIT(data, 1));
+	m_ieee2->ifc_w(BIT(data, 0));
+	m_ieee2->srq_w(BIT(data, 1));
 
 	// user port
 	//m_user->pb2_w(BIT(data, 2));
@@ -1313,19 +1313,19 @@ WRITE8_MEMBER( cbm2_state::tpi2_pb_w )
 READ8_MEMBER( cbm2_state::tpi2_pc_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       COLUMN 0
-	    1       COLUMN 1
-	    2       COLUMN 2
-	    3       COLUMN 3
-	    4       COLUMN 4
-	    5       COLUMN 5
-	    6       0=PAL, 1=NTSC
-	    7       0
-	
-	*/
+
+        bit     description
+
+        0       COLUMN 0
+        1       COLUMN 1
+        2       COLUMN 2
+        3       COLUMN 3
+        4       COLUMN 4
+        5       COLUMN 5
+        6       0=PAL, 1=NTSC
+        7       0
+
+    */
 
 	return (m_ntsc << 6) | (read_keyboard() & 0x3f);
 }
@@ -1333,19 +1333,19 @@ READ8_MEMBER( cbm2_state::tpi2_pc_r )
 READ8_MEMBER( cbm2hp_state::tpi2_pc_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       COLUMN 0
-	    1       COLUMN 1
-	    2       COLUMN 2
-	    3       COLUMN 3
-	    4       COLUMN 4
-	    5       COLUMN 5
-	    6       1
-	    7       1
-	
-	*/
+
+        bit     description
+
+        0       COLUMN 0
+        1       COLUMN 1
+        2       COLUMN 2
+        3       COLUMN 3
+        4       COLUMN 4
+        5       COLUMN 5
+        6       1
+        7       1
+
+    */
 
 	return read_keyboard();
 }
@@ -1353,19 +1353,19 @@ READ8_MEMBER( cbm2hp_state::tpi2_pc_r )
 READ8_MEMBER( p500_state::tpi2_pc_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       COLUMN 0
-	    1       COLUMN 1
-	    2       COLUMN 2
-	    3       COLUMN 3
-	    4       COLUMN 4
-	    5       COLUMN 5
-	    6       0
-	    7       0
-	
-	*/
+
+        bit     description
+
+        0       COLUMN 0
+        1       COLUMN 1
+        2       COLUMN 2
+        3       COLUMN 3
+        4       COLUMN 4
+        5       COLUMN 5
+        6       0
+        7       0
+
+    */
 
 	return read_keyboard();
 }
@@ -1373,19 +1373,19 @@ READ8_MEMBER( p500_state::tpi2_pc_r )
 WRITE8_MEMBER( p500_state::tpi2_pc_w )
 {
 	/*
-	
-	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       VICBNKSEL0
-	    7       VICBNKSEL1
-	
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3
+        4
+        5
+        6       VICBNKSEL0
+        7       VICBNKSEL1
+
+    */
 
 	m_vicbnksel = data >> 6;
 }
@@ -1437,19 +1437,19 @@ static const tpi6525_interface p500_tpi2_intf =
 READ8_MEMBER( cbm2_state::cia_pa_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       IEEE-488 D0, user port 1D0
-	    1       IEEE-488 D1, user port 1D1
-	    2       IEEE-488 D2, user port 1D2
-	    3       IEEE-488 D3, user port 1D3
-	    4       IEEE-488 D4, user port 1D4
-	    5       IEEE-488 D5, user port 1D5
-	    6       IEEE-488 D6, user port 1D6, LTPN 
-	    7       IEEE-488 D7, user port 1D7, GAME TRIGGER 24
-	
-	*/
+
+        bit     description
+
+        0       IEEE-488 D0, user port 1D0
+        1       IEEE-488 D1, user port 1D1
+        2       IEEE-488 D2, user port 1D2
+        3       IEEE-488 D3, user port 1D3
+        4       IEEE-488 D4, user port 1D4
+        5       IEEE-488 D5, user port 1D5
+        6       IEEE-488 D6, user port 1D6, LTPN
+        7       IEEE-488 D7, user port 1D7, GAME TRIGGER 24
+
+    */
 
 	UINT8 data = 0;
 
@@ -1469,19 +1469,19 @@ READ8_MEMBER( cbm2_state::cia_pa_r )
 WRITE8_MEMBER( cbm2_state::cia_pa_w )
 {
 	/*
-	
-	    bit     description
-	
-	    0       IEEE-488 D0, user port 1D0
-	    1       IEEE-488 D1, user port 1D1
-	    2       IEEE-488 D2, user port 1D2
-	    3       IEEE-488 D3, user port 1D3
-	    4       IEEE-488 D4, user port 1D4
-	    5       IEEE-488 D5, user port 1D5
-	    6       IEEE-488 D6, user port 1D6
-	    7       IEEE-488 D7, user port 1D7
-	
-	*/
+
+        bit     description
+
+        0       IEEE-488 D0, user port 1D0
+        1       IEEE-488 D1, user port 1D1
+        2       IEEE-488 D2, user port 1D2
+        3       IEEE-488 D3, user port 1D3
+        4       IEEE-488 D4, user port 1D4
+        5       IEEE-488 D5, user port 1D5
+        6       IEEE-488 D6, user port 1D6
+        7       IEEE-488 D7, user port 1D7
+
+    */
 
 	// IEEE-488
 	m_ieee1->write(space, 0, data);
@@ -1496,19 +1496,19 @@ WRITE8_MEMBER( cbm2_state::cia_pa_w )
 READ8_MEMBER( cbm2_state::cia_pb_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       user port 2D0, GAME10
-	    1       user port 2D1, GAME11
-	    2       user port 2D2, GAME12
-	    3       user port 2D3, GAME13
-	    4       user port 2D4, GAME20
-	    5       user port 2D5, GAME21
-	    6       user port 2D6, GAME22
-	    7       user port 2D7, GAME23
-	
-	*/
+
+        bit     description
+
+        0       user port 2D0, GAME10
+        1       user port 2D1, GAME11
+        2       user port 2D2, GAME12
+        3       user port 2D3, GAME13
+        4       user port 2D4, GAME20
+        5       user port 2D5, GAME21
+        6       user port 2D6, GAME22
+        7       user port 2D7, GAME23
+
+    */
 
 	UINT8 data = 0;
 
@@ -1525,19 +1525,19 @@ READ8_MEMBER( cbm2_state::cia_pb_r )
 WRITE8_MEMBER( cbm2_state::cia_pb_w )
 {
 	/*
-	
-	    bit     description
-	
-	    0       user port 2D0
-	    1       user port 2D1
-	    2       user port 2D2
-	    3       user port 2D3
-	    4       user port 2D4
-	    5       user port 2D5
-	    6       user port 2D6
-	    7       user port 2D7
-	
-	*/
+
+        bit     description
+
+        0       user port 2D0
+        1       user port 2D1
+        2       user port 2D2
+        3       user port 2D3
+        4       user port 2D4
+        5       user port 2D5
+        6       user port 2D6
+        7       user port 2D7
+
+    */
 
 	//m_user->data2_w(data);
 }

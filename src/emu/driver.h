@@ -166,7 +166,7 @@ typedef void   (*legacy_callback_func)(running_machine &machine);
 // ======================> driver_device
 
 // base class for machine driver-specific devices
-class driver_device : 	public device_t,
+class driver_device :	public device_t,
 						public device_memory_interface
 {
 public:
@@ -204,7 +204,7 @@ public:
 
 	// dummy driver_init callbacks
 	void init_0() { }
-	
+
 	// memory helpers
 	address_space &generic_space() const { return space(AS_PROGRAM); }
 

@@ -107,7 +107,7 @@ public:
 	: driver_device(mconfig, type, tag),
 		m_vdp(*this,"gen_vdp"),
 		m_megadrive_ram(*this,"megadrive_ram")
-	{ 
+	{
 		sega_cd_connected = 0;
 	}
 	required_device<sega_genesis_vdp_device> m_vdp;
@@ -273,7 +273,7 @@ public:
 	DECLARE_VIDEO_START(segac2_new);
 	DECLARE_MACHINE_START(segac2);
 	DECLARE_MACHINE_RESET(segac2);
-	
+
 	UINT32 screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
@@ -313,7 +313,7 @@ public:
 	DECLARE_DRIVER_INIT(megaplay);
 	DECLARE_VIDEO_START(megplay);
 	DECLARE_MACHINE_RESET(megaplay);
-	
+
 	UINT32 screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_megaplay(screen_device &screen, bool state);
 };

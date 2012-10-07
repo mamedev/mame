@@ -436,7 +436,7 @@ int x68k_state::x68k_keyboard_pop_scancode()
 }
 
 void x68k_state::x68k_keyboard_push_scancode(unsigned char code)
-{	
+{
 	m_keyboard.keynum++;
 	if(m_keyboard.keynum >= 1)
 	{ // keyboard buffer full

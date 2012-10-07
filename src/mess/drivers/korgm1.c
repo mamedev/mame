@@ -1,11 +1,11 @@
 /***************************************************************************
 
-	Korg M1 (c) 1988
+    Korg M1 (c) 1988
 
-	skeleton driver
+    skeleton driver
 
-	Note: driver isn't yet hooked up to mess.lst / mess.mak, until a ROM
-	dump is found.
+    Note: driver isn't yet hooked up to mess.lst / mess.mak, until a ROM
+    dump is found.
 
 ***************************************************************************/
 
@@ -51,24 +51,24 @@ UINT32 korgm1_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap,
 
 static ADDRESS_MAP_START( korgm1_map, AS_PROGRAM, 16, korgm1_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM // 64 KB
-//	AM_RANGE(0x50000, 0x57fff) AM_RAM // memory card 32 KB
+//  AM_RANGE(0x50000, 0x57fff) AM_RAM // memory card 32 KB
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( korgm1_io, AS_IO, 16, korgm1_state )
-//	AM_RANGE(0x0000, 0x00ff) internal peripheral (?)
-//	AM_RANGE(0x0100, 0x01ff) VDF 1 (MB87404)
-//	AM_RANGE(0x0200, 0x02ff) VDF 2 (MB87404)
-//	AM_RANGE(0x0500, 0x0503) MDE (MB87405)
-//	AM_RANGE(0x0600, 0x0601) OPZ 1 (8-bit port)
-//	AM_RANGE(0x0700, 0x0701) OPZ 2 (8-bit port)
-//	AM_RANGE(0x0800, 0x0801) SCAN (8-bit port) (keyboard)
-//	AM_RANGE(0x0900, 0x09??) A/D Converter (M58990P, Joystick, "value" and After Touch routes here) **
-//	AM_RANGE(0x0a00, 0x0a03) PPI (CXD1095, presumably i8255 compatible, LCD, LED and SW routes here) *
-//	AM_RANGE(0x0b00, 0x0b01) LCDC (8-bit port)
-//	AM_RANGE(0x1000, 0x11ff) TG (MB87402)
-//	AM_RANGE(0x2000, 0x23ff) SCSI
-//	AM_RANGE(0x3000, 0x33ff) FDC
+//  AM_RANGE(0x0000, 0x00ff) internal peripheral (?)
+//  AM_RANGE(0x0100, 0x01ff) VDF 1 (MB87404)
+//  AM_RANGE(0x0200, 0x02ff) VDF 2 (MB87404)
+//  AM_RANGE(0x0500, 0x0503) MDE (MB87405)
+//  AM_RANGE(0x0600, 0x0601) OPZ 1 (8-bit port)
+//  AM_RANGE(0x0700, 0x0701) OPZ 2 (8-bit port)
+//  AM_RANGE(0x0800, 0x0801) SCAN (8-bit port) (keyboard)
+//  AM_RANGE(0x0900, 0x09??) A/D Converter (M58990P, Joystick, "value" and After Touch routes here) **
+//  AM_RANGE(0x0a00, 0x0a03) PPI (CXD1095, presumably i8255 compatible, LCD, LED and SW routes here) *
+//  AM_RANGE(0x0b00, 0x0b01) LCDC (8-bit port)
+//  AM_RANGE(0x1000, 0x11ff) TG (MB87402)
+//  AM_RANGE(0x2000, 0x23ff) SCSI
+//  AM_RANGE(0x3000, 0x33ff) FDC
 //  TG 2?
 ADDRESS_MAP_END
 
@@ -145,7 +145,7 @@ static const gfx_layout charlayout =
 #endif
 
 static GFXDECODE_START( korgm1 )
-//	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
+//  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
 
@@ -202,7 +202,7 @@ ROM_START( korgm1 )
 	ROM_REGION( 0x200000, "pcm", ROMREGION_ERASE00 )
 	ROM_LOAD( "pcm.rom", 0x00000, 0x200000, NO_DUMP )
 
-//	ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 )
+//  ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 )
 ROM_END
 
 GAME( 1988, korgm1,  0,   korgm1,  korgm1,  0,       ROT0, "Korg",      "M1", GAME_IS_SKELETON )

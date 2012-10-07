@@ -53,7 +53,7 @@ protected:
 
 	virtual void video_start();
 	virtual void palette_init();
-public:	
+public:
 	INTERRUPT_GEN_MEMBER(kontest_interrupt);
 };
 

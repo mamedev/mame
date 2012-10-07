@@ -14,7 +14,7 @@ public:
 	required_shared_ptr<UINT8> m_mask;
 
 	required_device<discrete_device> m_discrete;
-	
+
 	/* misc */
 	UINT8 m_lut_gun1[0x100];
 	UINT8 m_lut_gun2[0x100];

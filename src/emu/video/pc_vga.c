@@ -203,15 +203,15 @@ void vga_device::device_start()
 
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
 	vga.crtc.maximum_scan_line = 1;
-	
 
-	// copy over interfaces 
-	vga.read_dipswitch = read8_delegate(); //read_dipswitch;	
+
+	// copy over interfaces
+	vga.read_dipswitch = read8_delegate(); //read_dipswitch;
 	vga.svga_intf.vram_size = 0x100000;
 	vga.svga_intf.seq_regcount = 0x05;
 	vga.svga_intf.crtc_regcount = 0x19;
 
-	vga.memory	= auto_alloc_array_clear(machine(), UINT8, vga.svga_intf.vram_size);	
+	vga.memory	= auto_alloc_array_clear(machine(), UINT8, vga.svga_intf.vram_size);
 }
 
 void svga_device::device_start()
@@ -231,15 +231,15 @@ void cirrus_vga_device::device_start()
 
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
 	vga.crtc.maximum_scan_line = 1;
-	
 
-	// copy over interfaces 
-	vga.read_dipswitch = read8_delegate(); //read_dipswitch;	
+
+	// copy over interfaces
+	vga.read_dipswitch = read8_delegate(); //read_dipswitch;
 	vga.svga_intf.vram_size = 0x200000;
 	vga.svga_intf.seq_regcount = 0x08;
 	vga.svga_intf.crtc_regcount = 0x19;
 
-	vga.memory	= auto_alloc_array_clear(machine(), UINT8, vga.svga_intf.vram_size);	
+	vga.memory	= auto_alloc_array_clear(machine(), UINT8, vga.svga_intf.vram_size);
 }
 
 void ati_vga_device::device_start()
@@ -1599,25 +1599,25 @@ READ8_MEMBER(vga_device::port_03c0_r)
 				case 3:
 					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch(space, 0, mem_mask) & 0x01)
 						data |= 0x10;
-					else 
+					else
 						data |= 0x10;
 					break;
 				case 2:
 					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch(space, 0, mem_mask) & 0x02)
 						data |= 0x10;
-					else 
+					else
 						data |= 0x10;
 					break;
 				case 1:
 					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch(space, 0, mem_mask) & 0x04)
 						data |= 0x10;
-					else 
+					else
 						data |= 0x10;
 					break;
 				case 0:
 					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch(space, 0, mem_mask) & 0x08)
 						data |= 0x10;
-					else 
+					else
 						data |= 0x10;
 					break;
 			}
@@ -2045,7 +2045,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_trident_vga )
 	MCFG_SCREEN_UPDATE_DEVICE("vga", trident_vga_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(0x100)
-	
+
 	MCFG_DEVICE_ADD("vga", TRIDENT_VGA, 0)
 MACHINE_CONFIG_END
 
@@ -2055,7 +2055,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_cirrus_vga )
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_vga_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(0x100)
-	
+
 	MCFG_DEVICE_ADD("vga", CIRRUS_VGA, 0)
 MACHINE_CONFIG_END
 

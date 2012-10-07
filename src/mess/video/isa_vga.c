@@ -62,7 +62,7 @@ READ8_MEMBER( isa8_vga_device::input_port_0_r ) { return 0xff; } //return space.
 void isa8_vga_device::device_start()
 {
 	set_isa_device();
-	
+
 	m_vga = subdevice<vga_device>("vga");
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "ibm_vga", "ibm_vga");

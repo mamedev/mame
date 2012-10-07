@@ -90,12 +90,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( intrscti_sub_map, AS_PROGRAM, 8, intrscti_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-//	AM_RANGE(0x0000, 0xffff) AM_WRITENOP
+//  AM_RANGE(0x0000, 0xffff) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( intrscti_sub_io_map, AS_IO, 8, intrscti_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x00, 0xff) AM_NOP
+//  AM_RANGE(0x00, 0xff) AM_NOP
 ADDRESS_MAP_END
 
 

@@ -111,7 +111,7 @@ protected:
 	virtual void machine_start();
 	virtual void video_start();
 	virtual void palette_init();
-public:	
+public:
 	UINT32 screen_update_bml3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(bml3_irq);
 	INTERRUPT_GEN_MEMBER(bml3_timer_firq);
@@ -893,7 +893,7 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 	MCFG_CPU_ADD("maincpu",M6809, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(bml3_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bml3_state,  bml3_timer_firq)
-//	MCFG_CPU_PERIODIC_INT_DRIVER(bml3_state, bml3_firq, 45)
+//  MCFG_CPU_PERIODIC_INT_DRIVER(bml3_state, bml3_firq, 45)
 
 //  MCFG_MACHINE_RESET_OVERRIDE(bml3_state,bml3)
 

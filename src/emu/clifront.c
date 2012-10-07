@@ -1283,7 +1283,7 @@ void cli_frontend::listsoftware(const char *gamename)
 
 
 /*-------------------------------------------------
-	verifysoftware - verify roms from the software
+    verifysoftware - verify roms from the software
     list of the specified driver(s)
 -------------------------------------------------*/
 void cli_frontend::verifysoftware(const char *gamename)

@@ -202,7 +202,7 @@ public:
 	UINT32 screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_slave_scanline);
-	
+
 	void scu_do_transfer(UINT8 event);
 	void scu_test_pending_irq();
 	DECLARE_READ32_MEMBER(saturn_scu_r);
@@ -233,7 +233,7 @@ public:
 	void saturn_init_driver(int rgn);
 
 	int m_scsp_last_line;
-	
+
 };
 
 #define MASTER_CLOCK_352 57272720

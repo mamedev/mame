@@ -29,7 +29,7 @@ static MACHINE_CONFIG_FRAGMENT( vga_ati )
 	MCFG_SCREEN_UPDATE_DEVICE("vga", ati_vga_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(0x100)
-	
+
 	MCFG_DEVICE_ADD("vga", ATI_VGA, 0)
 MACHINE_CONFIG_END
 
@@ -78,7 +78,7 @@ void isa16_vga_gfxultra_device::device_start()
 
 	m_vga = subdevice<ati_vga_device>("vga");
 	m_8514 = subdevice<mach8_device>("vga:8514a");
-	
+
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "vga", "gfxultra");
 
 	m_isa->install_device(0x1ce, 0x1cf, 0, 0, read8_delegate(FUNC(ati_vga_device::ati_port_ext_r),m_vga), write8_delegate(FUNC(ati_vga_device::ati_port_ext_w),m_vga));
