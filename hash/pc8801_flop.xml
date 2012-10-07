@@ -76,12 +76,12 @@ Are the following undumped or mistranslated (check also if available in TOSEC)?
  - ビデオギャルズ'87 (1987xxxx)
  - Peep Show (198610xx) by Tracers Soft
  - Peep Show 番外編 (1987xxxx) by Tracers Soft
- - 裏ソフト No.9 (1986xxxx) by アダム＆イブ
- - 裏ソフト No.12 (1987xxxx) by アダム＆イブ
- - 裏ソフト No.17 (1987xxxx) by アダム＆イブ
- - 裏ソフト No.19 (1987xxxx) by アダム＆イブ
- - 裏ソフト No.25 (1986xxxx) by アダム＆イブ
- - 裏ソフト No.28 (1987xxxx) by アダム＆イブ
+ - 裏ソフト No.9 (1986xxxx) by アダム&amp;イブ
+ - 裏ソフト No.12 (1987xxxx) by アダム&amp;イブ
+ - 裏ソフト No.17 (1987xxxx) by アダム&amp;イブ
+ - 裏ソフト No.19 (1987xxxx) by アダム&amp;イブ
+ - 裏ソフト No.25 (1986xxxx) by アダム&amp;イブ
+ - 裏ソフト No.28 (1987xxxx) by アダム&amp;イブ
  - レモネード2 (1987xxxx) by Champion Soft
  - Hello!麻衣子 (1987xxxx) by Champion Soft
  - くりもと卓明のファンタジードリーム (1987xxxx) by Aisel
@@ -185,7 +185,7 @@ Are the following undumped or mistranslated (check also if available in TOSEC)?
  - スーパービリヤード (198501xx) by HAL
  - 関ヶ原 (198501xx) by Bandai
  - ドリームパック (198501xx) by Tokuma Shoten
- - ペアーズ＆ローターズ (198501xx) by ASCII
+ - ペアーズ&amp;ローターズ (198501xx) by ASCII
  - 西遊記 (198501xx) by HOT-B
  - Rainbow Walker (1984xxxx) by Kotobuki Raison
  - Dr.猫田の不思議な家 (1984xxxx) by Shinkigensga
@@ -6156,7 +6156,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		<publisher>タカラ (Takara)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198406xx"/>
-		<info name="alt_title" value="チョロＱホリデーズパズル"/>
+		<info name="alt_title" value="チョロQホリデーズパズル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="366256">
 				<rom name="holiday puzzle.d88" size="366256" crc="c0c030a0" sha1="04fc4964805d05a87621a9d3819755c5ddd5f553" offset="0" />
@@ -10723,7 +10723,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ		" -> "duel kawanakajima_02.d88"
 	<software name="dynabowl">
 		<description>Dynamite Bowl</description>
 		<year>1987</year>
-		<publisher>東芝ＥＭＩ (Toshiba EMI)</publisher>
+		<publisher>東芝EMI (Toshiba EMI)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198710xx"/>
 		<info name="alt_title" value="ダイナマイトボール"/>
@@ -19210,7 +19210,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 		<year>1984</year>
 		<publisher>コムパック (Compaq)</publisher>
 		<!-- PC8801 -->
-		<info name="alt_title" value="ラグランジュＬ-2"/>
+		<info name="alt_title" value="ラグランジュL-2"/>
 		<!--combined image-->
 		<!--rom name="lagrange l-2.d88" size="375648" crc="7777b64e" sha1="4979aaf65c6617cfa6c8f35dbf9d2d316f0effdb" offset="0" /-->
 
@@ -24790,7 +24790,7 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 		<publisher>タケル (Takeru)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199001xx"/>
-		<info name="alt_title" value="オペレーションＬ"/>
+		<info name="alt_title" value="オペレーションL"/>
 		<!--combined image-->
 		<!--rom name="operation l.d88" size="699072" crc="89ae1e48" sha1="e97f208cec10f8ff03787fafe52d0271f4be7314" offset="0" /-->
 
@@ -24950,7 +24950,7 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 	<software name="pachicom">
 		<description>Pachi Com</description>
 		<year>1987</year>
-		<publisher>東芝ＥＭＩ (Toshiba EMI)</publisher>
+		<publisher>東芝EMI (Toshiba EMI)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="パチコン"/>
@@ -34898,7 +34898,7 @@ ExtractDisk  [02]"PROGRAM		 " -> "transylvania_02.d88"
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198511xx"/>
-		<info name="alt_title" value="トリビアＱ"/>
+		<info name="alt_title" value="トリビアQ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="396176">
 				<rom name="trivia q (1985)(victor).d88" size="396176" crc="0b285bdc" sha1="337a897e573b8d4fc262d1103b17a6a33ac8027d" offset="0" />
@@ -34909,7 +34909,7 @@ ExtractDisk  [02]"PROGRAM		 " -> "transylvania_02.d88"
 	<software name="trumpaid">
 		<description>Trump Aid</description>
 		<year>1987</year>
-		<publisher>東芝ＥＭＩ (Toshiba EMI)</publisher>
+		<publisher>東芝EMI (Toshiba EMI)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198702xx"/>
 		<info name="alt_title" value="トランプエイド"/>
@@ -48589,7 +48589,7 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		<description>Odori</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="おどり"/>
+		<info name="alt_title" value="おどり"/>
 		<!--combined image-->
 		<!--rom name="odori.d88" size="884176" crc="9850ebda" sha1="ebf586884765f66be683def0cd29dd78d09fa5c4" offset="0" /-->
 
@@ -48612,7 +48612,7 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		<description>Odori (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="おどり"/>
+		<info name="alt_title" value="おどり"/>
 		<!--combined image-->
 		<!--rom name="odori.d88" size="842464" crc="475cd8f6" sha1="6a046e7acf23ba2117b75dc7283a4a022ae39436" offset="0" /-->
 
@@ -50698,7 +50698,7 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		<description>Dance</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ダンス"/>
+		<info name="alt_title" value="ダンス"/>
 		<!--combined image-->
 		<!--rom name="dance.d88" size="842464" crc="ee9081db" sha1="ab6ef5b1377ae3c674bcd1c9d526d9099aea2194" offset="0" /-->
 
