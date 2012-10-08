@@ -26959,6 +26959,7 @@ poto_a32
 play_a24
 robo_a34
 ssvc_a26
+ssvc_b26
 tmac_a24
 tmac_a18
 torp_e21
@@ -27315,11 +27316,14 @@ firebird
 // peyper.c
 odisea
 wolfman
+odin
 odin_dlx
 solarwap
 poleposn
 sonstwar
-
+gamatros
+nemesisp
+sonstwr2
 
 // play_1.c
 bigtown
@@ -27559,6 +27563,7 @@ bushido
 bushidoa
 jolypark
 mach2
+vrnwrld
 
 
 // st_mp100.c

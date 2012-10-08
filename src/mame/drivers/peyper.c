@@ -555,6 +555,15 @@ DRIVER_INIT_MEMBER(peyper_state,peyper)
 /-------------------------------------------------------------------*/
 
 /*-------------------------------------------------------------------
+/ Odin (1985)
+/-------------------------------------------------------------------*/
+ROM_START(odin)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("odin_a.bin", 0x0000, 0x2000, CRC(ac3a7770) SHA1(2409629d3adbae0d7e6e5f9fe6f137c1e5a1bb86))
+	ROM_LOAD("odin_b.bin", 0x2000, 0x2000, CRC(46744695) SHA1(fdbd8a93b3e4a9697e77e7d381759829b86fe28b))
+ROM_END
+
+/*-------------------------------------------------------------------
 / Odin De Luxe (1985)
 /-------------------------------------------------------------------*/
 ROM_START(odin_dlx)
@@ -575,6 +584,11 @@ ROM_END
 /*-------------------------------------------------------------------
 / Gamatron (1986)
 /-------------------------------------------------------------------*/
+ROM_START(gamatros)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gama_a.bin", 0x0000, 0x2000, CRC(1dc2841c) SHA1(27c6a07b1f8bd5e73b425e7dbdcfb1d5233c18b2))
+	ROM_LOAD("gama_b.bin", 0x2000, 0x2000, CRC(56125890) SHA1(8b30a2282df264d798df1b031ecade999d135f81))
+ROM_END
 
 /*-------------------------------------------------------------------
 / Pole Position (1987)
@@ -596,6 +610,12 @@ ROM_START(sonstwar)
 	ROM_LOAD("sw3.bin", 0x4000, 0x2000, CRC(aee516d9) SHA1(b50e54d4d5db59e3fb71fb000f9bc5e34ff7de9c))
 ROM_END
 
+ROM_START(sonstwr2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("stw1i.bin", 0x0000, 0x2000, CRC(416e2a0c) SHA1(74ca550ee9eb83d9762ffab0f085dffae569d4a9))
+	ROM_LOAD("stw2i.bin", 0x2000, 0x2000, CRC(ccbbec46) SHA1(4fd0e48916e8761a7e70300d3ede166f5f04f8ae))
+	ROM_LOAD("sw3.bin",   0x4000, 0x2000, CRC(aee516d9) SHA1(b50e54d4d5db59e3fb71fb000f9bc5e34ff7de9c))
+ROM_END
 /*-------------------------------------------------------------------
 / Hang-On (1988)
 /-------------------------------------------------------------------*/
@@ -612,6 +632,16 @@ ROM_START(odisea)
 ROM_END
 
 /*-------------------------------------------------------------------
+/ Nemesis (1986)
+/-------------------------------------------------------------------*/
+ROM_START(nemesisp)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("nemesisa.bin", 0x0000, 0x2000, CRC(56f13350) SHA1(30907c362f88b48d634e8aaa1e1161852886645c))
+	ROM_LOAD("nemesisb.bin", 0x2000, 0x2000, CRC(a8f3e6c7) SHA1(c25b2271c4de6f4b57c3c850d28a0878ea081c26))
+	ROM_LOAD("memoriac.bin", 0x4000, 0x2000, CRC(468f16f0) SHA1(66ce0464d82331cfc0ac1f6fbd871066e4e57262))
+ROM_END
+
+/*-------------------------------------------------------------------
 / Wolf Man (1987)
 /-------------------------------------------------------------------*/
 ROM_START(wolfman)
@@ -622,10 +652,14 @@ ROM_START(wolfman)
 ROM_END
 
 
+GAME( 1985, odin, 	  0, peyper,   odin_dlx, peyper_state, peyper,   ROT0, "Sonic",  "Odin",          		  GAME_IS_SKELETON_MECHANICAL)
 GAME( 1985, odin_dlx, 0, peyper,   odin_dlx, peyper_state, peyper,   ROT0, "Sonic",  "Odin De Luxe",          GAME_IS_SKELETON_MECHANICAL)
 GAME( 1986, solarwap, 0, peyper,   solarwap, peyper_state, peyper,   ROT0, "Sonic",  "Solar Wars (Sonic)",    GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, gamatros, 0, peyper,   solarwap, peyper_state, peyper,   ROT0, "Sonic",  "Gamatron (Sonic)",    GAME_IS_SKELETON_MECHANICAL)
 GAME( 1987, poleposn, 0, peyper,   poleposn, peyper_state, peyper,   ROT0, "Sonic",  "Pole Position (Sonic)", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1987, sonstwar, 0, peyper,   sonstwar, peyper_state, peyper,   ROT0, "Sonic",  "Star Wars (Sonic)",     GAME_IS_SKELETON_MECHANICAL)
+GAME( 1987, sonstwr2, sonstwar, peyper,   sonstwar, peyper_state, peyper,   ROT0, "Sonic",  "Star Wars (Sonic, alternate set)",     GAME_IS_SKELETON_MECHANICAL)
 
 GAME( 1987, wolfman,  0, peyper,   wolfman, peyper_state,  peyper,   ROT0, "Peyper", "Wolf Man",              GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, nemesisp, 0, peyper,   wolfman, peyper_state,  peyper,   ROT0, "Peyper", "Nemesis",               GAME_IS_SKELETON_MECHANICAL)
 GAME( 1987, odisea,   0, peyper,   odisea, peyper_state,   peyper,   ROT0, "Peyper", "Odisea Paris-Dakar",    GAME_IS_SKELETON_MECHANICAL)

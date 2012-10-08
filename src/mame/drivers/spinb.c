@@ -128,8 +128,28 @@ ROM_END
 /*-------------------------------------------------------------------
 / Verne's World (1996)
 /-------------------------------------------------------------------*/
+ROM_START(vrnwrld)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("vwcpu0.rom", 0x0000, 0x2000, CRC(89c980e7) SHA1(09eeed0232255875cf119d59143d839ff40e30dd))
+	ROM_LOAD("vwcpu1.rom", 0x2000, 0x2000, CRC(a4db4e64) SHA1(fc55781295fc723741de24ad60311b7e33551830))
+	ROM_REGION(0x114000, "cpu2", 0)
+	ROM_LOAD("vwdmd0.rom", 0x00000, 0x10000, CRC(40600060) SHA1(7ad619bcb5e5e50325360f4e946b5bfa072caead))
+	ROM_LOAD("vwdmd1.rom", 0x14000, 0x20000, CRC(de4a1060) SHA1(6b848dfd8aafdbcf7e1593f98bd1c3d69306aa11))
+	ROM_LOAD("vwdmd2.rom", 0x94000, 0x20000, CRC(29fc8da7) SHA1(2704f14a3338a63abda3bcbc56e9f984a679eb38))
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("vws2ic9.rom", 0x00000, 0x2000, CRC(ab8cb4c5) SHA1(92a702c11e2cef703992244529ba86079d5ab9b0))
+	ROM_REGION(0x180000, "user1", 0)
+	ROM_LOAD("vws3ic15.rom", 0x0000, 0x80000, CRC(d62c9443) SHA1(7c6b8662d88ba6592da8b83af11087647105e8dd))
+	ROM_REGION(0x10000, "cpu4", 0)
+	ROM_LOAD("vws4ic30.rom", 0x00000, 0x2000, CRC(ecd18a19) SHA1(558e687e0429d31fafe8db05954d9a8ad90d6aeb))
+	ROM_REGION(0x180000, "user2", 0)
+	ROM_LOAD("vws5ic25.rom", 0x0000, 0x80000, CRC(56d349f0) SHA1(e71d2d03c3e978c552e272de8850cc265255fbd1))
+	ROM_LOAD("vws6ic26.rom", 0x80000, 0x80000, CRC(bee399c1) SHA1(b2c6e4830641ed32b9643dc8c1fa08a2da5a7e9b))
+	ROM_LOAD("vws7ic27.rom", 0x100000, 0x80000, CRC(7335b29c) SHA1(4de6de09f069feecbad2e5ef50032e8d381ff9b1))
+ROM_END
 
 GAME(1993,  bushido,   0,       spinb,  spinb, spinb_state,  spinb,  ROT0,  "Inder/Spinball",    "Bushido (set 1)",			GAME_IS_SKELETON_MECHANICAL)
 GAME(1993,  bushidoa,  bushido, spinb,  spinb, spinb_state,  spinb,  ROT0,  "Inder/Spinball",    "Bushido (set 2)",			GAME_IS_SKELETON_MECHANICAL)
 GAME(1996,  jolypark,  0,       spinb,  spinb, spinb_state,  spinb,  ROT0,  "Spinball",          "Jolly Park",				GAME_IS_SKELETON_MECHANICAL)
 GAME(1995,  mach2,     0,       spinb,  spinb, spinb_state,  spinb,  ROT0,  "Spinball",          "Mach 2",					GAME_IS_SKELETON_MECHANICAL)
+GAME(1996,  vrnwrld,   0,       spinb,  spinb, spinb_state,  spinb,  ROT0,  "Spinball",          "Verne's World",			GAME_IS_SKELETON_MECHANICAL)

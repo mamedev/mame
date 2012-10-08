@@ -162,7 +162,7 @@ ROM_END
 /-------------------------------------------------------------------*/
 ROM_START(petaco2)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("petaco2.dat", 0x0000, 0x2000, NO_DUMP)
+	ROM_LOAD("petaco2.dat", 0x0000, 0x2000, CRC(9a3d6409) SHA1(bca061e254c3214b940080c92d2cf88904f1b81c))
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("jpsonid0.dat", 0x00000, 0x4000, CRC(1bdbdd60) SHA1(903012e58cdb4041e5546a377f5c9df83dc93737))
 	ROM_REGION(0x40000, "sound1", 0)
