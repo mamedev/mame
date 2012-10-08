@@ -216,18 +216,27 @@ int main(int argc, char *argv[])
 		{
 			int spaces = 1;
 
-			while (original[src]==32)
+			while (original[src] == 0x20)
 			{
 				spaces++;
 				src++;
 			}
+
+			/* Remove invisible spaces */
+			if (original[src] == 0x09)
+			{
+				int realign = (col + spaces) % tab_size;
+				removed_spaces += realign;
+				spaces -= realign;
+			}
+
+			col += spaces;
 
 			while (spaces > 0)
 			{
 				modified[dst++] = 0x09;
 				spaces -= tab_size;
 				added_tabs++;
-				col += tab_size;
 			}
 		}
 
