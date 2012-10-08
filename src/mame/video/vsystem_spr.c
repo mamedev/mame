@@ -112,7 +112,7 @@ void draw_sprites_inufuku( UINT16* spriteram1, int spriteram1_bytes, UINT16* spr
 		}
 	}
 }
-	
+
 
 
 /* todo, fix zooming correctly, it's _not_ like aerofgt */

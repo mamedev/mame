@@ -5,8 +5,8 @@
     Quiz & Variety Sukusuku Inufuku (Japan)
     (c)1998 Video System Co.,Ltd.
 
-	3 On 3 Dunk Madness (US, prototype?)
-	(c)1996 Video System Co.,Ltd.
+    3 On 3 Dunk Madness (US, prototype?)
+    (c)1996 Video System Co.,Ltd.
 
     Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2003/08/09 -
 
@@ -130,7 +130,7 @@ CUSTOM_INPUT_MEMBER(inufuku_state::soundflag_r)
 static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16, inufuku_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM			// main rom
 
-//	AM_RANGE(0x100000, 0x100007) AM_WRITENOP	// ?
+//  AM_RANGE(0x100000, 0x100007) AM_WRITENOP    // ?
 
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P1")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("P2")
