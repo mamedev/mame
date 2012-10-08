@@ -5,6 +5,9 @@
     Quiz & Variety Sukusuku Inufuku (Japan)
     (c)1998 Video System Co.,Ltd.
 
+	3 On 3 Dunk Madness (US, prototype?)
+	(c)1996 Video System Co.,Ltd.
+
     Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2003/08/09 -
 
     based on other Video System drivers
@@ -127,7 +130,7 @@ CUSTOM_INPUT_MEMBER(inufuku_state::soundflag_r)
 static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16, inufuku_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM			// main rom
 
-	AM_RANGE(0x100000, 0x100007) AM_WRITENOP	// ?
+//	AM_RANGE(0x100000, 0x100007) AM_WRITENOP	// ?
 
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P1")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("P2")
@@ -143,7 +146,8 @@ static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16, inufuku_state )
 	AM_RANGE(0x380000, 0x3801ff) AM_WRITEONLY AM_SHARE("bg_rasterram")									// bg raster ram
 	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(inufuku_bg_videoram_r, inufuku_bg_videoram_w) AM_SHARE("bg_videoram")		// bg ram
 	AM_RANGE(0x402000, 0x403fff) AM_READWRITE(inufuku_tx_videoram_r, inufuku_tx_videoram_w) AM_SHARE("tx_videoram")		// text ram
-	AM_RANGE(0x580000, 0x580fff) AM_RAM AM_SHARE("spriteram1")							// sprite table + sprite attribute
+	AM_RANGE(0x404000, 0x40ffff) AM_RAM	// ?? mirror (3on3dunk)
+	AM_RANGE(0x580000, 0x581fff) AM_RAM AM_SHARE("spriteram1")							// sprite table + sprite attribute
 	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_SHARE("spriteram2")											// cell table
 
 	AM_RANGE(0x780000, 0x780013) AM_WRITE(inufuku_palettereg_w)	// bg & text palettebank register
@@ -222,16 +226,17 @@ static INPUT_PORTS_START( inufuku )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 
 	PORT_START("EXTRA")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START4 )
-	PORT_DIPNAME( 0x10, 0x10, "3P/4P" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, inufuku_state,soundflag_r, NULL)	// pending sound command
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START4 )
+	PORT_DIPNAME( 0x0010, 0x0010, "3P/4P" )
+	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, inufuku_state,soundflag_r, NULL)	// pending sound command
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN ) // 3on3dunk cares about something in here, possibly a vblank flag
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
@@ -248,6 +253,8 @@ static INPUT_PORTS_START( inufuku )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
 INPUT_PORTS_END
+
+
 
 
 /******************************************************************************
@@ -280,10 +287,29 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
+static const gfx_layout spritelayout_alt =
+{
+	16, 16,
+	RGN_FRAC(1, 1),
+	4,
+	{ 0, 1, 2, 3 },
+	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
+			9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
+	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
+			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	128*8
+};
+
 static GFXDECODE_START( inufuku )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,    0, 256*16 )	// bg
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 256*16 )	// text
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  0, 256*16 )	// sprite
+GFXDECODE_END
+
+static GFXDECODE_START( _3on3dunk )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,    0, 256*16 )	// bg
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 256*16 )	// text
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_alt,  0, 256*16 )	// sprite
 GFXDECODE_END
 
 
@@ -315,7 +341,7 @@ void inufuku_state::machine_start()
 {
 	UINT8 *ROM = memregion("audiocpu")->base();
 
-	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
+	membank("bank1")->configure_entries(0, 4, &ROM[0x00000], 0x8000);
 	membank("bank1")->set_entry(0);
 
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
@@ -361,10 +387,11 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2300))
 	MCFG_SCREEN_SIZE(2048, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319-1, 1, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(inufuku_state, screen_update_inufuku)
+	MCFG_SCREEN_VBLANK_DRIVER(inufuku_state, screen_eof_inufuku)
 
 	MCFG_GFXDECODE(inufuku)
 	MCFG_PALETTE_LENGTH(4096)
@@ -381,6 +408,14 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( _3on3dunk, inufuku )
+	MCFG_GFXDECODE(_3on3dunk)
+MACHINE_CONFIG_END
+
+
+
+
+
 /******************************************************************************
 
     ROM definitions
@@ -393,9 +428,8 @@ ROM_START( inufuku )
 	ROM_LOAD16_WORD_SWAP( "u146.bin",     0x0080000, 0x080000, CRC(e05e9bd4) SHA1(af0fdf31c2bdf851bf15c9de725dcbbb58464d54) )
 	ROM_LOAD16_WORD_SWAP( "lhmn5l28.148", 0x0800000, 0x400000, CRC(802d17e7) SHA1(43b26efea65fd051c094d19784cb977ced39a1a0) )
 
-	ROM_REGION( 0x0030000, "audiocpu", 0 )	// sound cpu
+	ROM_REGION( 0x0020000, "audiocpu", 0 )	// sound cpu
 	ROM_LOAD( "u107.bin", 0x0000000, 0x020000, CRC(1744ef90) SHA1(e019f4ca83e21aa25710cc0ca40ffe765c7486c9) )
-	ROM_RELOAD( 0x010000, 0x020000 )
 
 	ROM_REGION( 0x0400000, "gfx1", 0 )	// bg
 	ROM_LOAD16_WORD_SWAP( "lhmn5ku8.u40", 0x0000000, 0x400000, CRC(8cbca80a) SHA1(063e9be97f5a1f021f8326f2994b51f9af5e1eaf) )
@@ -412,6 +446,37 @@ ROM_START( inufuku )
 	ROM_LOAD( "lhmn5ku6.u53", 0x0000000, 0x400000, CRC(b320c5c9) SHA1(7c99da2d85597a3c008ed61a3aa5f47ad36186ec) )
 ROM_END
 
+ROM_START( 3on3dunk )
+	ROM_REGION( 0x1000000, "maincpu", 0 )	// main cpu + data
+	ROM_LOAD16_WORD_SWAP( "prog0_2_4_usa.u147",     0x0000000, 0x080000, CRC(957924ab) SHA1(6fe8ca711d11239310d58188e9d6d28cd27bc5af) )
+	ROM_LOAD16_WORD_SWAP( "prog1_2_4_usa.u146",     0x0080000, 0x080000, CRC(2479e236) SHA1(729e6c85d34d6925c8d6557b138e2bed43e1de6a) )
+	ROM_LOAD16_WORD_SWAP( "u148", 0x0800000, 0x400000, CRC(aa33e02a) SHA1(86381ecf18fba9065cbc02112751c435bbf8b8b4) )
+
+	ROM_REGION( 0x0020000, "audiocpu", 0 )	// sound cpu
+	ROM_LOAD( "sound_prog_97_1_13.u107", 0x0000000, 0x020000, CRC(d9d42805) SHA1(ab5cb7c141d9c9ed5121ba4dbc1d0fa187bd9f68) )
+
+	ROM_REGION( 0x0400000, "gfx1", 0 )	// bg
+	ROM_LOAD16_WORD_SWAP( "u40", 0x0000000, 0x400000, CRC(aaa426d1) SHA1(2f9a2981f336caf3188baec9a34f61452dee2203) )
+
+	ROM_REGION( 0x0400000, "gfx2", 0 )	// text
+	ROM_LOAD16_WORD_SWAP( "u8",  0x0000000, 0x200000, CRC(2b7be1d8) SHA1(aac274a8f4028db7429478601a1761e61ab4f9a2) )
+
+	ROM_REGION( 0x2000000, "gfx3", 0 )	// sprite
+	ROM_LOAD( "u34", 0x0000000, 0x400000, CRC(7372ce78) SHA1(ed2a861986357fad7ef983750cd906c3d722b862) )
+	ROM_LOAD( "u36", 0x0400000, 0x400000, CRC(247e5741) SHA1(8d71d964791fb4b86e390bcdf7744f616d6357b1) )
+	ROM_LOAD( "u38", 0x0800000, 0x400000, CRC(76449b1e) SHA1(b63d50c6f0dc91dc94dbcdda9842598529c1c26e) )
+	ROM_LOAD( "u20", 0x0c00000, 0x200000, CRC(f457cd3b) SHA1(cc13f5dc44e4675c1074a365b10f34e684817d81) )
+	/*               0x0e00000, 0x200000 empty */
+	ROM_LOAD( "u32", 0x1000000, 0x400000, CRC(bc39e449) SHA1(5aea90b66ee03c70797ddc42dbcb064d83ce8cc7) )
+
+	ROM_REGION( 0x0400000, "ymsnd", 0 )	// adpcm data
+	ROM_LOAD( "u53", 0x0000000, 0x100000, CRC(765d892f) SHA1(9b078c879d0437d1669bf4301fd52a768aa4d293) )
+
+	ROM_REGION( 0x400000, "ymsnd.deltat", 0 ) /* Samples */ // plays speech clips from here
+	ROM_LOAD( "u51", 0x0000000, 0x400000, CRC(153989b1) SHA1(754cce382d9a7bfcebdfd0f23c5e04ee30449aa4) )
+ROM_END
+
+
 
 /******************************************************************************
 
@@ -420,3 +485,4 @@ ROM_END
 ******************************************************************************/
 
 GAME( 1998, inufuku, 0, inufuku, inufuku, driver_device, 0, ROT0, "Video System Co.", "Quiz & Variety Sukusuku Inufuku (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1996, 3on3dunk, 0, _3on3dunk, inufuku, driver_device, 0, ROT0, "Video System Co.", "3 On 3 Dunk Madness (US, prototype?)", GAME_NOT_WORKING )

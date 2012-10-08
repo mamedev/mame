@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "includes/inufuku.h"
+#include "vsystem_spr.h"
 
 
 /******************************************************************************
@@ -56,102 +57,8 @@ WRITE16_MEMBER(inufuku_state::inufuku_scrollreg_w)
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	inufuku_state *state = machine.driver_data<inufuku_state>();
-	int offs;
 
-	for (offs = (state->m_spriteram1.bytes() / 16) - 1; offs >= 0; offs--)
-	{
-		if ((state->m_spriteram1[offs] & 0x8000) == 0x0000)
-		{
-			int attr_start;
-			int map_start;
-			int ox, oy, x, y, xsize, ysize, zoomx, zoomy, flipx, flipy, color;
-			int priority, priority_mask;
-
-			attr_start = 4 * (state->m_spriteram1[offs] & 0x03ff);
-
-			/*
-                attr_start + 0x0000
-                ---- ---x xxxx xxxx oy
-                ---- xxx- ---- ---- ysize
-                xxxx ---- ---- ---- zoomy
-
-                attr_start + 0x0001
-                ---- ---x xxxx xxxx ox
-                ---- xxx- ---- ---- xsize
-                xxxx ---- ---- ---- zoomx
-
-                attr_start + 0x0002
-                -x-- ---- ---- ---- flipx
-                x--- ---- ---- ---- flipy
-                --xx xxxx ---- ---- color
-                --xx ---- ---- ---- priority?
-                ---- ---- xxxx xxxx unused?
-
-                attr_start + 0x0003
-                -xxx xxxx xxxx xxxx map start
-                x--- ---- ---- ---- unused?
-            */
-
-			ox = (state->m_spriteram1[attr_start + 1] & 0x01ff) + 0;
-			xsize = (state->m_spriteram1[attr_start + 1] & 0x0e00) >> 9;
-			zoomx = (state->m_spriteram1[attr_start + 1] & 0xf000) >> 12;
-			oy = (state->m_spriteram1[attr_start + 0] & 0x01ff) + 1;
-			ysize = (state->m_spriteram1[attr_start + 0] & 0x0e00) >> 9;
-			zoomy = (state->m_spriteram1[attr_start + 0] & 0xf000) >> 12;
-			flipx = state->m_spriteram1[attr_start + 2] & 0x4000;
-			flipy = state->m_spriteram1[attr_start + 2] & 0x8000;
-			color = (state->m_spriteram1[attr_start + 2] & 0x3f00) >> 8;
-			priority = (state->m_spriteram1[attr_start + 2] & 0x3000) >> 12;
-			map_start = (state->m_spriteram1[attr_start + 3] & 0x7fff) << 1;
-
-			switch (priority)
-			{
-				default:
-				case 0:	priority_mask = 0x00; break;
-				case 3:	priority_mask = 0xfe; break;
-				case 2:	priority_mask = 0xfc; break;
-				case 1:	priority_mask = 0xf0; break;
-			}
-
-			ox += (xsize * zoomx + 2) / 4;
-			oy += (ysize * zoomy + 2) / 4;
-
-			zoomx = 32 - zoomx;
-			zoomy = 32 - zoomy;
-
-			for (y = 0; y <= ysize; y++)
-			{
-				int sx, sy;
-
-				if (flipy)
-					sy = (oy + zoomy * (ysize - y) / 2 + 16) & 0x1ff;
-				else
-					sy = (oy + zoomy * y / 2 + 16) & 0x1ff;
-
-				for (x = 0; x <= xsize; x++)
-				{
-					int code;
-
-					if (flipx)
-						sx = (ox + zoomx * (xsize - x) / 2 + 16) & 0x1ff;
-					else
-						sx = (ox + zoomx * x / 2 + 16) & 0x1ff;
-
-					code  = ((state->m_spriteram2[map_start] & 0x0007) << 16) + state->m_spriteram2[map_start + 1];
-
-					pdrawgfxzoom_transpen(bitmap, cliprect, machine.gfx[2],
-							code,
-							color,
-							flipx, flipy,
-							sx - 16, sy - 16,
-							zoomx << 11, zoomy << 11,
-							machine.priority_bitmap,priority_mask, 15);
-
-					map_start += 2;
-				}
-			}
-		}
-	}
+	draw_sprites_inufuku( state->m_spriteram1_old, state->m_spriteram1.bytes(), state->m_spriteram2, machine, bitmap, cliprect );
 }
 
 
@@ -216,6 +123,8 @@ void inufuku_state::video_start()
 
 	m_bg_tilemap->set_transparent_pen(255);
 	m_tx_tilemap->set_transparent_pen(255);
+
+	m_spriteram1_old = auto_alloc_array_clear(machine(), UINT16, m_spriteram1.bytes()/2);
 }
 
 
@@ -236,7 +145,7 @@ UINT32 inufuku_state::screen_update_inufuku(screen_device &screen, bitmap_ind16 
 	{
 		m_bg_tilemap->set_scroll_rows(512);
 		for (i = 0; i < 256; i++)
-			m_bg_tilemap->set_scrollx((m_bg_scrolly + i) & 0x1ff, m_bg_rasterram[i]);
+			m_bg_tilemap->set_scrollx((m_bg_scrolly + i) & 0x1ff, m_bg_scrollx+m_bg_rasterram[i]);
 	}
 	else
 	{
@@ -253,3 +162,13 @@ UINT32 inufuku_state::screen_update_inufuku(screen_device &screen, bitmap_ind16 
 	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }
+
+void inufuku_state::screen_eof_inufuku(screen_device &screen, bool state)
+{
+	// rising edge
+	if (state)
+	{
+		memcpy(m_spriteram1_old,m_spriteram1,m_spriteram1.bytes());
+	}
+}
+
