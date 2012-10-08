@@ -29,7 +29,7 @@ $(UME_WINOBJ)/%.res: $(UME_WINSRC)/%.rc
 	@echo Compiling resources $<...
 	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir $(UME_WINOBJ) -o $@ -i $<
 
-	
+
 #-------------------------------------------------
 # rules for resource file
 #-------------------------------------------------

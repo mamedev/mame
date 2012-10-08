@@ -105,7 +105,7 @@ UINT8 scsicb_device::get_scsi_line( UINT32 line )
 {
 	UINT8 result = (int)( ( linestate & line ) != 0 );
 
-//	LOG(3,"get_scsi_line(%s)=%d\n",linenames[lineno],result);
+//  LOG(3,"get_scsi_line(%s)=%d\n",linenames[lineno],result);
 
 	return result;
 }

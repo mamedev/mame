@@ -372,11 +372,11 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 
 	decrypt[0x07c0] = 0xc9;	// c080 bit 7 protection check
 
-//	decrypt[0x083e] = 0x00;	// sound latch disabling
-//	decrypt[0x083f] = 0x00;	// ""
-//	decrypt[0x0840] = 0x00;	// ""
+//  decrypt[0x083e] = 0x00; // sound latch disabling
+//  decrypt[0x083f] = 0x00; // ""
+//  decrypt[0x0840] = 0x00; // ""
 
-//	decrypt[0x0cef] = 0xc9;	// rombank latch check, corrupt d12d
+//  decrypt[0x0cef] = 0xc9; // rombank latch check, corrupt d12d
 
 	decrypt[0x2696] = 0xc9;	// work ram writes disable, corrupt next routine
 	decrypt[0x4e9a] = 0x00;	// work ram writes disable, flip background sprite
@@ -720,7 +720,7 @@ WRITE8_MEMBER(suna8_state::brickzn_prot_w)
 	m_spritebank = (data >> 1) & 1;
 
 	logerror("CPU #0 - PC %04X: protection_val = %02X\n",space.device().safe_pc(),data);
-//	if (data & ~0x03)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",space.device().safe_pc(),data);
+//  if (data & ~0x03)   logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",space.device().safe_pc(),data);
 }
 
 /*
@@ -1012,9 +1012,9 @@ static ADDRESS_MAP_START( starfigh_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc300, 0xc300) AM_WRITE(hardhea2_flipscreen_w			)	// Flip Screen
 	AM_RANGE(0xc380, 0xc3ff) AM_WRITE(starfigh_spritebank_latch_w	)	// Sprite RAM Bank Latch
 	AM_RANGE(0xc400, 0xc47f) AM_WRITE(starfigh_leds_w				)	// Leds + Coin Counter + ROM Bank
-//	c480 write?
+//  c480 write?
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(starfigh_sound_latch_w		)	// To Sound CPU (can be disabled)
-//	(c522 + R & 0x1f) write?
+//  (c522 + R & 0x1f) write?
 
 	AM_RANGE(0xc600, 0xc7ff) AM_READWRITE(banked_paletteram_r, paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram"	)	// Palette (Banked??)
 	AM_RANGE(0xc800, 0xdfff) AM_RAM										// RAM

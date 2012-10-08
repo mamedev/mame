@@ -222,63 +222,63 @@ struct adaptec_sense_t
 
 //static const char *const linenames[] =
 //{
-//	"select", "busy", "request", "acknoledge", "C/D", "I/O", "message", "reset"
+//  "select", "busy", "request", "acknoledge", "C/D", "I/O", "message", "reset"
 //};
 
 //void scsibus_device::set_scsi_line(UINT8 line, UINT8 state)
 //{
-//	UINT8 changed = linestate[line] != state;
+//  UINT8 changed = linestate[line] != state;
 //
-//	LOG(3,"set_scsi_line(%s,%d), changed=%d\n",linenames[line],state,changed);
+//  LOG(3,"set_scsi_line(%s,%d), changed=%d\n",linenames[line],state,changed);
 //
-//	if(changed)
-//	{
-//		if (line==SCSI_LINE_ACK)
-//			set_scsi_line_ack(state);
-//		else
-//			set_scsi_line_now(line,state);
-//	}
+//  if(changed)
+//  {
+//      if (line==SCSI_LINE_ACK)
+//          set_scsi_line_ack(state);
+//      else
+//          set_scsi_line_now(line,state);
+//  }
 //}
 //
 //void scsibus_device::set_scsi_line_now( UINT8 line, UINT8 state )
 //{
-//	if( linestate[ line ] != state )
-//	{
-//		linestate[ line ] = state;
+//  if( linestate[ line ] != state )
+//  {
+//      linestate[ line ] = state;
 //
-//		for( int i = 0; i < deviceCount; i++ )
-//		{
-//			devices[ i ]->scsi_in_line_changed( line, state );
-//		}
-//	}
+//      for( int i = 0; i < deviceCount; i++ )
+//      {
+//          devices[ i ]->scsi_in_line_changed( line, state );
+//      }
+//  }
 //}
 //
 //void scsibus_device::set_scsi_line_ack(UINT8 state)
 //{
-//	ack_timer->adjust(attotime::from_nsec(ACK_DELAY_NS),state);
+//  ack_timer->adjust(attotime::from_nsec(ACK_DELAY_NS),state);
 //}
 //
 //void scsibus_device::scsi_out_line_change(UINT8 line, UINT8 state)
 //{
-//	if(line==SCSI_LINE_REQ)
-//		scsi_out_line_req(state);
-//	else
-//		scsi_out_line_change_now(line,state);
+//  if(line==SCSI_LINE_REQ)
+//      scsi_out_line_req(state);
+//  else
+//      scsi_out_line_change_now(line,state);
 //}
 //
 //void scsibus_device::scsi_out_line_change_now(UINT8 line, UINT8 state)
 //{
-//	if( linestate[ line ] != state )
-//	{
-//		linestate[ line ] = state;
+//  if( linestate[ line ] != state )
+//  {
+//      linestate[ line ] = state;
 //
-//		LOG(3,"scsi_out_line_change(%s,%d)\n",linenames[line],state);
-//	}
+//      LOG(3,"scsi_out_line_change(%s,%d)\n",linenames[line],state);
+//  }
 //}
 //
 //void scsibus_device::scsi_out_line_req(UINT8 state)
 //{
-//	req_timer->adjust(attotime::from_nsec(REQ_DELAY_NS),state);
+//  req_timer->adjust(attotime::from_nsec(REQ_DELAY_NS),state);
 //}
 //
 
@@ -338,13 +338,13 @@ void scsihle_device::device_timer(emu_timer &timer, device_timer_id tid, int par
 {
 	switch( tid )
 	{
-//	case 0:
-//		scsi_out_line_change_now(SCSI_LINE_REQ, param);
-//		break;
+//  case 0:
+//      scsi_out_line_change_now(SCSI_LINE_REQ, param);
+//      break;
 //
-//	case 1:
-//		set_scsi_line_now(SCSI_LINE_ACK, param);
-//		break;
+//  case 1:
+//      set_scsi_line_now(SCSI_LINE_ACK, param);
+//      break;
 
 	case 2:
 		scsi_out(param * SCSI_MASK_BSY, SCSI_MASK_BSY);
@@ -617,7 +617,7 @@ void scsihle_device::scsi_in( UINT32 data, UINT32 mask )
 							dump_data_bytes(4);
 						}
 					}
-					
+
 					// If the data buffer is full flush it to the SCSI disk
 
 					data_last = (bytes_left >= sectorbytes) ? sectorbytes : bytes_left;

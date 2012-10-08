@@ -294,16 +294,16 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 				if (state->m_use_gfxbank)
 				{
 					// starfigh: boss 2 head, should be p7 g7 x8/c y4:
-					//		67 74 88 03
-					//		67 76 ac 03
+					//      67 74 88 03
+					//      67 76 ac 03
 					// starfigh: boss 2 chainguns should be p6 g7:
-					//		a8 68/a/c/e 62 23
-					//		48 68/a/c/e 62 23
+					//      a8 68/a/c/e 62 23
+					//      48 68/a/c/e 62 23
 					// starfigh: player, p4 g0:
-					//		64 40 d3 20
+					//      64 40 d3 20
 					// starfigh: title star, p5 g1 / p7 g0:
-					//		70 56/8/a/c 0e 01 (gfxhi=1)
-					//		6f 78/a/c/e 0f 04 ""
+					//      70 56/8/a/c 0e 01 (gfxhi=1)
+					//      6f 78/a/c/e 0f 04 ""
 					gfxbank = (bank & 0x3);
 					if (gfxbank == 3)	gfxbank += state->m_gfxbank;
 				}
@@ -321,7 +321,7 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 				if (state->m_use_gfxbank)
 				{
 					// starfigh: boss 2 tail, p2 g7:
-					//		61 20 1b 27
+					//      61 20 1b 27
 					if (gfxbank == 3)	gfxbank += state->m_gfxbank;
 				}
 				break;
