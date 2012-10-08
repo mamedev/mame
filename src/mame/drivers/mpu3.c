@@ -1054,6 +1054,12 @@ ROM_START( m3cunlim )
 	ROM_COPY( "maincpu", 0x0000, 0x8000, 0x8000 )
 ROM_END
 
+//VFS conversion based around Chances and Options unlimited
+ROM_START( m3mremon )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "mmchancs.bin", 0x6000, 0x2000, CRC(3eaede51) SHA1(6914fcaed6e51736c6dc725ba82b691803571222) )
+	ROM_COPY( "maincpu", 0x0000, 0x8000, 0x8000 )
+ROM_END
 
 ROM_START( m3chase )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
@@ -1382,6 +1388,13 @@ ROM_START( m3circleb )
 	ROM_COPY( "maincpu", 0x0000, 0x8000, 0x8000 )
 ROM_END
 
+ROM_START( m3scoop )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "scoopv-2.p1", 0x7000, 0x1000, CRC(e937e298) SHA1(edb4dfb5afd6c2640b6bbd83be591987225bd8fc) )
+	ROM_LOAD( "scoopv-2.p2", 0x6000, 0x1000, CRC(2a97a254) SHA1(a249e013d86f7e65e43b07ff916c4d0fd5099f44) )
+	ROM_LOAD( "scoopv-2.p3", 0x5000, 0x1000, CRC(34ab1805) SHA1(1e389e9b47c4b3305ec70c94f49a4e3ca0a6f439) )
+	ROM_COPY( "maincpu", 0x0000, 0x8000, 0x8000 )
+ROM_END
 
 ROM_START( m3spoof )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
@@ -1520,6 +1533,13 @@ ROM_START( m3sweepa )
 	ROM_COPY( "maincpu", 0x0000, 0x8000, 0x8000 )
 ROM_END
 
+ROM_START( m3tlktwn )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "ttown1.bin", 0x7000, 0x1000, CRC(996c435b) SHA1(1fcf5a637cddacd6660da752a1fe10e56a7653c7) )
+	ROM_LOAD( "ttown2.bin", 0x6000, 0x1000, CRC(93bd6446) SHA1(ef271bb45d27844f0ef1437bbc7f4847f4c0c6ee) )
+	ROM_LOAD( "ttown3.bin", 0x5000, 0x1000, CRC(0ca34690) SHA1(1734692d82af89272a2243e2c5f584965bfe197f) )
+	ROM_COPY( "maincpu", 0x0000, 0x8000, 0x8000 )
+ROM_END
 
 ROM_START( m3toplin )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
@@ -1695,8 +1715,12 @@ GAME( 198?, m3gcrown,	0,			mpu3base, mpu3, mpu3_state, m3hprvpr, ROT0, "Mdm","Go
 GAME( 198?, m3tfair,	0,			mpu3base, mpu3, mpu3_state, m3hprvpr, ROT0, "Mdm","Tuppenny Fair (Mdm) (MPU3)",GAME_FLAGS )
 GAME( 198?, m3wacky,	0,			mpu3base, mpu3, mpu3_state, m3hprvpr, ROT0, "Mdm","Wacky Racer (Mdm) (MPU3)",GAME_FLAGS )
 
+/* VFS */
+GAME( 198?, m3oxo,		0,			mpu3base, mpu3, mpu3_state, m3hprvpr, ROT0, "VFS","Noughts 'n' Crosses (VFS) (MPU3)",GAME_FLAGS )
+GAME( 198?, m3mremon,	0,			mpu3base, mpu3, mpu3_state, m3hprvpr, ROT0, "VFS","More Money (VFS) (MPU3)",GAME_FLAGS )
+
 /* Others */
 
 GAME( 198?, m3minmax,	0,			mpu3base, mpu3, mpu3_state, m3hprvpr, ROT0, "Associated Leisure","Mini Max (Associated Leisure) (MPU3)",GAME_FLAGS )
-GAME( 198?, m3oxo,		0,			mpu3base, mpu3, mpu3_state, m3hprvpr, ROT0, "VFS","Noughts 'n' Crosses (VFS) (MPU3)",GAME_FLAGS )
-
+GAME( 198?, m3scoop,	0,			mpu3base, mpu3, mpu3_state, m3hprvpr, ROT0, "Peter Simper","Scoop (Peter Simper, prototype?) (MPU3)",GAME_FLAGS )
+GAME( 198?, m3tlktwn,	0,			mpu3base, mpu3, mpu3_state, m3hprvpr, ROT0, "<unknown>","Talk of the Town (MPU3?)",GAME_FLAGS )

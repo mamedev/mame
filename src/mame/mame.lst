@@ -11503,13 +11503,16 @@ pongf			// (c) 1972 Atari - no subcycles
 
 /* JPM */
 
-// JPM older?
-j_ewnud		// Each Way Nudge
-j_ewnda		// Each Way Nudger
+// JPM SRU?
+j_ewnud		// Each Way Nudger
+j_ewnda	
+j_ewnd20
+j_ews		// Each Way Shifter
+j_ews8a
 j_luckac	// Lucky Aces
 j_super2	// Super 2
 j_plus2		// Plus 2
-
+j_luck2		// Lucky Twos
 
 // JPM System 80
 j80bac		// Bank A Coin (JPM)
@@ -18910,10 +18913,15 @@ m3gcrown	// Golden Crowns (Mdm)
 m3tfair		// Tuppenny Fair (Mdm)
 m3wacky		// Wacky Racer (Mdm)
 
+/* VFS */
+m3oxo		// Noughts 'n' Crosses (VFS)
+m3mremon	// More Money (VFS)
+
 /* Others */
 
 m3minmax	// Mini Max (Associated Leisure)
-m3oxo		// Noughts 'n' Crosses (VFS)
+m3scoop		// Scoop (Peter Simper, prototype?)
+m3tlktwn	// Talk of The Town (Unknown)
 
 // MPU4
 

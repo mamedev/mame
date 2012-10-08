@@ -2,9 +2,6 @@
 
     Maygay M1 A/B driver, (under heavy construction !!!)
 
-    A.G.E Code Copyright J. Wallace and the AGEMAME Development Team.
-    Visit http://agemame.mameworld.info for more information.
-
     M.A.M.E Core Copyright Nicola Salmoria and the MAME Team,
     used under license from http://mamedev.org
 
@@ -116,7 +113,10 @@ public:
 	maygay1b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_vfd(*this, "vfd")
-		{ }
+	{ 
+	
+		m_NMIENABLE = 0;
+	}
 
 	UINT8 m_lamppos;
 	int m_alpha_clock;
@@ -125,6 +125,8 @@ public:
 	int m_PSUrelay;
 	int m_WDOG;
 	int m_SRSEL;
+	int m_NMIENABLE;
+	TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_nmitimer_callback );
 	UINT8 m_Lamps[256];
 	int m_optic_pattern;
 	optional_device<roc10937_t> m_vfd;
@@ -146,6 +148,8 @@ public:
 	DECLARE_WRITE8_MEMBER(m1_pia_porta_w);
 	DECLARE_WRITE8_MEMBER(m1_pia_portb_w);
 	DECLARE_WRITE8_MEMBER(m1_meter_w);
+	DECLARE_READ8_MEMBER(m1_meter_r);
+	DECLARE_READ8_MEMBER(m1_firq_trg_r);
 	DECLARE_DRIVER_INIT(m1);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -155,16 +159,18 @@ public:
 void maygay1b_state::m1_draw_lamps(int data,int strobe, int col)
 {
 	int i;
-	int scramble[8] = { 0x10, 0x20, 0x40, 0x80, 0x01, 0x02, 0x04, 0x08 };
-
-	m_lamppos = strobe + col * 8;
 
 	for ( i = 0; i < 8; i++ )
 	{
-		m_Lamps[m_lamppos] = ( data & scramble[i] );
+		m_lamppos = (strobe*8) + col + i;
+
+		if ((data>>i)&1)
+			m_Lamps[m_lamppos] = 1;
+		else
+			m_Lamps[m_lamppos] = 0;
+
 		output_set_lamp_value(m_lamppos, m_Lamps[m_lamppos]);
 	}
-	m_lamppos++;
 }
 
 
@@ -370,8 +376,9 @@ WRITE8_MEMBER(maygay1b_state::m1_8279_w)
 			m1_draw_lamps(chip->ram[chip->disp_address],chip->disp_address, 0);
 		}
 		chip->ram[chip->disp_address] = data;
+		
 		if ( chip->disp_auto_inc )
-		chip->disp_address ++;
+			chip->disp_address ++;
 	}
 }
 
@@ -521,7 +528,7 @@ WRITE8_MEMBER(maygay1b_state::m1_8279_2_w)
 		}
 		chip->ram[chip->disp_address] = data;
 		if ( chip->disp_auto_inc )
-		chip->disp_address ++;
+			chip->disp_address ++;
 	}
 
 }
@@ -551,39 +558,51 @@ void maygay1b_state::machine_reset()
 
 ///////////////////////////////////////////////////////////////////////////
 
+// IRQ from Duart (hopper?)
 static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, state);
+	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE,  state?ASSERT_LINE:CLEAR_LINE);
 	LOG(("6809 irq%d \n",state));
 }
 
-#if 0
-static void cpu0_firq(int state)
+// FIRQ, related to the sample playback?
+READ8_MEMBER( maygay1b_state::m1_firq_trg_r )
 {
-	cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
-	LOG(("6809 firq%d \n",state));
+	static int i = 0xff;
+	i ^= 0xff;
+	space.machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+	LOG(("6809 firq\n"));
+	return i;
 }
-#endif
 
-static void cpu0_nmi(running_machine &machine, int state)
+// NMI is periodic? or triggered by a write? 
+TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_state::maygay1b_nmitimer_callback )
 {
-	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, state?ASSERT_LINE:CLEAR_LINE);
-	LOG(("6809 nmi%d \n",state));
+	if (m_NMIENABLE)
+	{
+		LOG(("6809 nmi\n"));
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, HOLD_LINE);
+	}
 }
+
+
 
 /***************************************************************************
     6821 PIA
 ***************************************************************************/
 
+// some games might differ..
 WRITE8_MEMBER(maygay1b_state::m1_pia_porta_w)
 {
-	if(!(data & 0x40))
+//	printf("m1_pia_porta_w %02x\n",data);
+
+	if((data & 0x40))
 	{
 		if (m_alpha_clock != (data & 0x20))
 		{
-			if (!m_alpha_clock)//falling edge
+			if (!m_alpha_clock)
 			{
-				m_vfd->shift_data((data & 0x10)?1:0);
+				m_vfd->shift_data((data & 0x10)?0:1);
 			}
 		}
 		m_alpha_clock = (data & 0x20);
@@ -793,7 +812,7 @@ WRITE8_MEMBER(maygay1b_state::reel56_w)
 static UINT8 m1_duart_r (device_t *device)
 {
 	maygay1b_state *state = device->machine().driver_data<maygay1b_state>();
-	return (state->m_optic_pattern);
+	return ~(state->m_optic_pattern);
 }
 
 WRITE8_MEMBER(maygay1b_state::m1_meter_w)
@@ -815,14 +834,8 @@ WRITE8_MEMBER(maygay1b_state::m1_latch_w)
 		m_ALARMEN = (data & 1);
 		break;
 		case 2: // Enable
-	      cpu0_nmi(machine(),1);
-	      cpu0_nmi(machine(),0);
-
-		  //        if ( m1_enable == 0 && ( data & 1 ) && Vmm )
-//      {
-	//      cpu0_nmi(1)
-		//  m1_enable = (data & 1);
-//      }
+		//printf("nmi enable %02x\n",data);
+		m_NMIENABLE = (data & 1);
 		break;
 		case 3: // RTS
 		{
@@ -835,6 +848,8 @@ WRITE8_MEMBER(maygay1b_state::m1_latch_w)
 		m_WDOG = (data & 1);
 		break;
 		case 6: // Srsel
+		// this is the ROM banking?
+		printf("rom bank %02x\n",data);
 		m_SRSEL = (data & 1);
 		break;
 	}
@@ -862,6 +877,12 @@ READ8_MEMBER(maygay1b_state::latch_st_lo)
 	return 0;
 }
 
+READ8_MEMBER(maygay1b_state::m1_meter_r)
+{
+	device_t *ay8910 = machine().device("aysnd");
+	return ~ay8910_read_ym(ay8910);
+}
+ 
 static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 
@@ -869,14 +890,15 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x2010, 0x2010) AM_WRITE(reel34_w)
 	AM_RANGE(0x2020, 0x2020) AM_WRITE(reel56_w)
 
+	// there is actually an 8279 and an 8051..
 	AM_RANGE(0x2030, 0x2031) AM_READWRITE(m1_8279_r,m1_8279_w)
 	AM_RANGE(0x2040, 0x2041) AM_READWRITE(m1_8279_2_r,m1_8279_2_w)
-	AM_RANGE(0x2050, 0x2050)// SCAN on M1B
+//	AM_RANGE(0x2050, 0x2050)// SCAN on M1B
 
 	AM_RANGE(0x2070, 0x207f) AM_DEVREADWRITE_LEGACY("duart68681", duart68681_r, duart68681_w )
 
 	AM_RANGE(0x2090, 0x2091) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x20B0, 0x20B0) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x20B0, 0x20B0) AM_READ(m1_meter_r)
 
 	AM_RANGE(0x20A0, 0x20A3) AM_DEVWRITE("pia", pia6821_device, write)
 	AM_RANGE(0x20A0, 0x20A3) AM_DEVREAD("pia", pia6821_device, read)
@@ -886,6 +908,10 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
 	AM_RANGE(0x2404, 0x2405) AM_READ(latch_st_lo)
 	AM_RANGE(0x2406, 0x2407) AM_READ(latch_st_hi)
+
+	AM_RANGE(0x2412, 0x2412) AM_READ(m1_firq_trg_r) // firq, sample playback?
+
+	
 
 	AM_RANGE(0x2420, 0x2421) AM_WRITE(latch_ch2_w ) // oki
 
@@ -912,6 +938,8 @@ static const duart68681_config maygaym1_duart68681_config =
 
 // machine driver for maygay m1 board /////////////////////////////////
 
+
+
 static MACHINE_CONFIG_START( m1, maygay1b_state )
 
 	MCFG_CPU_ADD("maincpu", M6809, M1_MASTER_CLOCK/2)
@@ -919,7 +947,7 @@ static MACHINE_CONFIG_START( m1, maygay1b_state )
 
 	MCFG_DUART68681_ADD("duart68681", M1_DUART_CLOCK, maygaym1_duart68681_config)
 	MCFG_PIA6821_ADD("pia", m1_pia_intf)
-	MCFG_MSC1937_ADD("vfd",0,LEFT_TO_RIGHT)
+	MCFG_MSC1937_ADD("vfd",0,RIGHT_TO_LEFT)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd",AY8913, M1_MASTER_CLOCK)
 	MCFG_SOUND_CONFIG(ay8910_config)
@@ -929,6 +957,8 @@ static MACHINE_CONFIG_START( m1, maygay1b_state )
 
 	MCFG_SOUND_ADD("msm6376", OKIM6376, M1_MASTER_CLOCK/4) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", maygay1b_state, maygay1b_nmitimer_callback, attotime::from_hz(75)) // freq?
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

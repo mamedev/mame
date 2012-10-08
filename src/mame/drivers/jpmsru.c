@@ -90,7 +90,26 @@ ROM_START( j_ewnda )
 	ROM_LOAD( "ewn3.bin", 0x0800, 0x000400, CRC(bef3a938) SHA1(6a6844203c6361b65f5b07853d9dbe18a29ebc44) )
 ROM_END
 
+ROM_START( j_ewnd20 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ewn20.1", 0x0000, 0x000400, CRC(e90f686b) SHA1(aec88647c6289b01149b2816845a568481b1d37f) )
+	ROM_LOAD( "ewn20.2", 0x0400, 0x000400, CRC(c02a2427) SHA1(57144443a03db56a803b19e14e868b1ccd222f37) )
+	ROM_LOAD( "ewn20.3", 0x0800, 0x000400, CRC(a64e4df7) SHA1(1512c3c85e100dadd5ff67fed731feb69cc8575e) )
+ROM_END
 
+ROM_START( j_ews )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ews13c1.bin", 0x0000, 0x000400, CRC(2eec7c4d) SHA1(a1740d27e60192659392ba7602b9b62947c4f6db) )
+	ROM_LOAD( "ews13b2.bin", 0x0400, 0x000400, CRC(b84b7858) SHA1(90fd64881d52e1f4362ccbcb9434dbf7b25b97f9) )
+	ROM_LOAD( "ews13.3", 	 0x0800, 0x000400, CRC(4d8e197a) SHA1(1569327f0e4b5d7632658b69abf59076effb2600) )
+ROM_END
+
+ROM_START( j_ews8a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ews8a.1", 0x0000, 0x000400, CRC(52e9709a) SHA1(0b437834f48ca7718e0b30303916eed00c7fb4c9) )
+	ROM_LOAD( "ews8a.2", 0x0400, 0x000400, CRC(ee4a4809) SHA1(292a12a5ddc5a22c8568016b34dfec7959f49027) )
+	ROM_LOAD( "ews8a.3", 0x0800, 0x000400, CRC(3700a7a3) SHA1(cf24a54e6aa3a3a86ff75f6e8bcb692d0cfd0e80) )
+ROM_END
 
 ROM_START( j_luckac )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -118,12 +137,24 @@ ROM_START( j_super2 )
 	ROM_LOAD( "super2_3.bin", 0x0800, 0x000400, CRC(ddd998d3) SHA1(5964da70ae4c2f174dc3d1494fc67579c221a7b7) )
 ROM_END
 
+ROM_START( j_luck2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lt_9.1", 0x0000, 0x000400, CRC(97236ce3) SHA1(f71861576f33daec3e1d371c670b535e6fd32b5e) )
+	ROM_LOAD( "lt_9.2", 0x0400, 0x000400, CRC(6e1cd083) SHA1(17edaa9880ae2a6d6d99e771e41b985527d5ed3b) )
+	ROM_LOAD( "lt_9.3", 0x0800, 0x000400, CRC(d6881e6f) SHA1(42a83f01d67a8f530ca2a10ffeff30237bdfba94) )
+ROM_END
 
 
 GAME(198?, j_ewnud	,0			,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 1)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j_ewnda	,j_ewnud	,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 2)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_ewnd20	,j_ewnud	,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 3, version 20?)",			GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_ews	,0			,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Shifter (Barcrest?, set 1, version 16)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_ews8a	,j_ews		,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Shifter (Barcrest?, set 2, version 8a)",						GAME_IS_SKELETON_MECHANICAL )
+
 GAME(198?, j_luckac	,0			,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "<unknown>","Lucky Aces (Unk)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j_super2	,0			,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Super 2 (JPM)",						GAME_IS_SKELETON_MECHANICAL )
+
+GAME(198?, j_luck2	,0			,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "<unknown>","Lucky Twos?",						GAME_IS_SKELETON_MECHANICAL )
 
 // this one is different again?
 GAME(198?, j_plus2	,0			,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Plus 2 (JPM)",						GAME_IS_SKELETON_MECHANICAL )
