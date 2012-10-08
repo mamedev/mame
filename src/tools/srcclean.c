@@ -230,12 +230,11 @@ int main(int argc, char *argv[])
 				spaces -= realign;
 			}
 
-			col += spaces;
-
 			while (spaces > 0)
 			{
 				modified[dst++] = 0x09;
 				spaces -= tab_size;
+				col += tab_size;
 				added_tabs++;
 			}
 		}
