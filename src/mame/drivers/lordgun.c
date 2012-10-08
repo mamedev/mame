@@ -71,11 +71,6 @@ DRIVER_INIT_MEMBER(lordgun_state,lordgun)
 
 		rom[i] = x;
 	}
-
-	// Protection
-
-	rom[0x14832/2]	=	0x6000;		// 014832: 6700 0006  beq     $1483a (protection)
-	rom[0x1587e/2]	=	0x6010;		// 01587E: 6710       beq     $15890 (rom check)
 }
 
 
@@ -133,6 +128,50 @@ DRIVER_INIT_MEMBER(lordgun_state,alienchac)
     Memory Maps - Main
 
 ***************************************************************************/
+
+
+WRITE16_MEMBER(lordgun_state::lordgun_protection_w)
+{
+	switch (offset & 0x60)
+	{
+		// The data written to offsets 0 - 1f is offset * 2
+		// Use this write to increment the counter.
+		case 0x00:
+			m_lordgun_protection_data++;
+		return;
+
+		case 0x20: // unused?
+		case 0x40: // protection results are read back from 40-5f.
+		return;
+
+		case 0x60: // reset / init
+			m_lordgun_protection_data = 0;
+		return;
+	}
+}
+
+READ16_MEMBER(lordgun_state::lordgun_protection_r)
+{
+	// Other offset ranges are not used?
+	if ((offset & 0x60) == 0x40)
+	{
+		// Check to see if counter meets various conditions.
+		// The results may not be 0010, but this is the only bit
+		// that is checked by the 68k.
+		if ((m_lordgun_protection_data & 0x11) == 0x01)
+			return 0x0010;
+
+		if ((m_lordgun_protection_data & 0x06) == 0x02)
+			return 0x0010;
+
+		if ((m_lordgun_protection_data & 0x09) == 0x08)
+			return 0x0010;
+
+		return 0;
+	}
+
+	return 0;
+}
 
 WRITE8_MEMBER(lordgun_state::fake_w)
 {
@@ -286,7 +325,7 @@ static ADDRESS_MAP_START( lordgun_map, AS_PROGRAM, 16, lordgun_state )
 	AM_RANGE(0x504000, 0x504001) AM_WRITE(lordgun_soundlatch_w)
 	AM_RANGE(0x506000, 0x506007) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x508000, 0x508007) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x50a900, 0x50a9ff) AM_RAM	// protection
+	AM_RANGE(0x50a900, 0x50a9ff) AM_READWRITE(lordgun_protection_r, lordgun_protection_w)
 ADDRESS_MAP_END
 
 
@@ -1039,6 +1078,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1994, lordgun,   0,        lordgun,  lordgun, lordgun_state,  lordgun,   ROT0, "IGS", "Lord of Gun (USA)",       GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, lordgun,   0,        lordgun,  lordgun, lordgun_state,  lordgun,   ROT0, "IGS", "Lord of Gun (USA)",       GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, aliencha,  0,        aliencha, aliencha, lordgun_state, aliencha,  ROT0, "IGS", "Alien Challenge (World)", GAME_UNEMULATED_PROTECTION )
 GAME( 1994, alienchac, aliencha, aliencha, aliencha, lordgun_state, alienchac, ROT0, "IGS", "Alien Challenge (China)", GAME_UNEMULATED_PROTECTION )

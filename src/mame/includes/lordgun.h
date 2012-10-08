@@ -37,6 +37,10 @@ public:
 	tilemap_t *m_tilemap[4];
 	bitmap_ind16 *m_bitmaps[5];
 
+	UINT16 m_lordgun_protection_data;
+	DECLARE_WRITE16_MEMBER(lordgun_protection_w);
+	DECLARE_READ16_MEMBER(lordgun_protection_r);
+
 	DECLARE_WRITE16_MEMBER(lordgun_priority_w);
 	DECLARE_READ16_MEMBER(lordgun_gun_0_x_r);
 	DECLARE_READ16_MEMBER(lordgun_gun_0_y_r);
