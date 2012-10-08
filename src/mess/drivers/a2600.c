@@ -610,8 +610,25 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 		{
 			static const struct { const char *mapper_name; int mapper_type; } mapper_types[] =
 			{
-				{ "4in1", mode4in1 },
-				{ "8in1", mode8in1 },
+				{ "F8",    modeF8 },
+				{ "FA",    modeFA },
+				{ "F6",    modeF6 },
+				{ "F4",    modeF4 },
+				{ "FE",    modeFE },
+				{ "E0",    modeE0 },
+				{ "3F",    mode3F },
+				{ "UA",    modeUA },
+				{ "E7",    modeE7 },
+				{ "DC",    modeDC },
+				{ "CV",    modeCV },
+				{ "3E",    mode3E },
+				{ "SS",    modeSS },
+				{ "FV",    modeFV },
+				{ "DPC",   modeDPC },
+				{ "32in1", mode32in1 },
+				{ "JVP",   modeJVP },
+				{ "4in1",  mode4in1 },
+				{ "8in1",  mode8in1 },
 			};
 
 			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && state->m_banking_mode == 0xff; i++)
