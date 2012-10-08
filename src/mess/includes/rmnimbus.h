@@ -14,15 +14,15 @@
 #define MAINCPU_TAG "maincpu"
 #define IOCPU_TAG   "iocpu"
 
-#define num_ioports 			0x80
-#define NIMBUS_KEYROWS      	11
-#define KEYBOARD_QUEUE_SIZE 	32
+#define num_ioports             0x80
+#define NIMBUS_KEYROWS          11
+#define KEYBOARD_QUEUE_SIZE     32
 
 #define SCREEN_WIDTH_PIXELS     640
 #define SCREEN_HEIGHT_LINES     250
 #define SCREEN_NO_COLOURS       16
 
-#define NO_VIDREGS      		(0x30/2)
+#define NO_VIDREGS              (0x30/2)
 
 /* Nimbus sub-bios structures for debugging */
 
@@ -66,56 +66,56 @@ struct t_nimbus_brush
 /* 80186 internal stuff */
 struct mem_state
 {
-	UINT16	    lower;
-	UINT16	    upper;
-	UINT16	    middle;
-	UINT16	    middle_size;
-	UINT16	    peripheral;
+	UINT16      lower;
+	UINT16      upper;
+	UINT16      middle;
+	UINT16      middle_size;
+	UINT16      peripheral;
 };
 
 struct timer_state
 {
-	UINT16	    control;
-	UINT16	    maxA;
-	UINT16	    maxB;
-	UINT16	    count;
+	UINT16      control;
+	UINT16      maxA;
+	UINT16      maxB;
+	UINT16      count;
 	emu_timer   *int_timer;
 	emu_timer   *time_timer;
-	UINT8	    time_timer_active;
-	attotime	last_time;
+	UINT8       time_timer_active;
+	attotime    last_time;
 };
 
 struct dma_state
 {
-	UINT32	    source;
-	UINT32	    dest;
-	UINT16	    count;
-	UINT16	    control;
-	UINT8	    finished;
+	UINT32      source;
+	UINT32      dest;
+	UINT16      count;
+	UINT16      control;
+	UINT8       finished;
 	emu_timer   *finish_timer;
 };
 
 struct intr_state
 {
-	UINT8	pending;
-	UINT16	ack_mask;
-	UINT16	priority_mask;
-	UINT16	in_service;
-	UINT16	request;
-	UINT16	status;
-	UINT16	poll_status;
-	UINT16	timer;
-	UINT16	dma[2];
-	UINT16	ext[4];
+	UINT8   pending;
+	UINT16  ack_mask;
+	UINT16  priority_mask;
+	UINT16  in_service;
+	UINT16  request;
+	UINT16  status;
+	UINT16  poll_status;
+	UINT16  timer;
+	UINT16  dma[2];
+	UINT16  ext[4];
 	UINT16  ext_vector[2]; // external vectors, when in cascade mode
 };
 
 struct i186_state
 {
-	struct timer_state	timer[3];
-	struct dma_state	dma[2];
-	struct intr_state	intr;
-	struct mem_state	mem;
+	struct timer_state  timer[3];
+	struct dma_state    dma[2];
+	struct intr_state   intr;
+	struct mem_state    mem;
 };
 
 struct keyboard_t
@@ -247,14 +247,14 @@ extern const unsigned char nimbus_palette[SCREEN_NO_COLOURS][3];
 
 /* Z80 SIO for keyboard */
 
-#define Z80SIO_TAG		    "z80sio"
+#define Z80SIO_TAG          "z80sio"
 
 extern const z80sio_interface nimbus_sio_intf;
 
 /* Floppy/Fixed drive interface */
 
 #define FDC_TAG                 "wd2793"
-#define FDC_PAUSE				10000
+#define FDC_PAUSE               10000
 
 extern const wd17xx_interface nimbus_wd17xx_interface;
 
@@ -363,10 +363,10 @@ enum
 
 /* Paralell / User port BBC compatible ! */
 
-#define VIA_TAG					"via6522"
-#define CENTRONICS_TAG			"centronics"
+#define VIA_TAG                 "via6522"
+#define CENTRONICS_TAG          "centronics"
 
-#define	VIA_INT					0x03
+#define VIA_INT                 0x03
 
 extern const via6522_interface nimbus_via;
 
@@ -392,7 +392,7 @@ class rmnimbus_state : public driver_device
 public:
 	rmnimbus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_scsibus(*this, SCSIBUS_TAG ":host")
+			m_scsibus(*this, SCSIBUS_TAG ":host")
 	{
 	}
 
