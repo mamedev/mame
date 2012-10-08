@@ -22839,6 +22839,23 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="mode7dem">
+		<description>Squaresoft Mode 7 Demo (USA)</description>
+		<year>199?</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />	<!-- low res picture, might be wrong -->
+			<feature name="u1" value="U1 EPROM (J)" />
+			<feature name="u2" value="U2 EPROM (J)" />		<!-- empty socket-->
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<dataarea name="rom" size="524288">
+				<rom name="u1" size="524288" crc="855907a3" sha1="e90c70ab42e8cf59a6edd4678378ec41f0052ba2" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- End of unconfirmed dumps -->
 
 
@@ -49676,10 +49693,11 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sdropzon">
-		<description>Archer MacLean's Super Dropzone (Euro)</description>
+	<software name="dropzone">
+		<description>Archer Maclean's Dropzone (Euro)</description>
 		<year>1995</year>
 		<publisher>Psygnosis</publisher>
+		<info name="alt_title" value="Archer Maclean's Super Dropzone (Box)" />
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="super dropzone (europe).sfc" size="1048576" crc="e1ccce49" sha1="827232b0665fdb2a6c56e42164e2c334b3ceb9de" offset="0x000000" />

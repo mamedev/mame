@@ -29143,7 +29143,8 @@
 		</part>
 	</software>
 
-	<software name="sennenkz">
+<!-- does this need RTC too? -->
+	<software name="sennenkz" supported="no">
 		<description>Sennen Kazoku (Jpn)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
@@ -32460,12 +32461,12 @@
 		</part>
 	</software>
 
-	<software name="sdropzon">
-		<!-- Alt. Title: Super Dropzone - Intergalactic Rescue Mission (Box) -->
-		<description>Archer Maclean's Super Dropzone (Euro)</description>
+	<software name="dropzone">
+		<description>Archer Maclean's Dropzone (Euro)</description>
 		<year>2003</year>
 		<publisher>Ignition Entertainment</publisher>
 		<info name="serial" value="AGB-AZNP"/>
+		<info name="alt_title" value="Super Dropzone - Intergalactic Rescue Mission (Box)"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="super dropzone - intergalactic rescue mission (europe).bin" size="4194304" crc="bab43d5c" sha1="07bd1fa75c322e682784db7260ea96faba6b9256" offset="000000" />
@@ -32473,12 +32474,12 @@
 		</part>
 	</software>
 
-	<software name="sdropzonu" cloneof="sdropzon">
-		<!-- Alt. Title: Super Dropzone - Intergalactic Rescue Mission (Box) -->
-		<description>Archer Maclean's Super Dropzone (USA)</description>
+	<software name="dropzoneu" cloneof="dropzone">
+		<description>Archer Maclean's Dropzone (USA)</description>
 		<year>2003</year>
 		<publisher>AIA</publisher>
 		<info name="serial" value="AGB-AZNE-USA"/>
+		<info name="alt_title" value="Super Dropzone - Intergalactic Rescue Mission (Box)"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="super dropzone - intergalactic rescue mission (usa).bin" size="4194304" crc="2b4843fe" sha1="3acd2595dbca9802583f9de2c789db2e87561b05" offset="000000" />
@@ -32486,7 +32487,7 @@
 		</part>
 	</software>
 
-	<software name="sdsumos">
+	<software name="sdsumos" supported="partial">
 		<description>Super Duper Sumos (USA)</description>
 		<year>2003</year>
 		<publisher>Midway</publisher>

@@ -4578,7 +4578,7 @@
 	</software>
 
 	<software name="ducktal2j" cloneof="ducktal2">
-		<description>Disney's Duck Tales 2 (Jpn)</description>
+		<description>Disney's DuckTales 2 (Jpn)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="DMG-Z2J (CGB-10)"/>
@@ -4592,7 +4592,7 @@
 	</software>
 
 	<software name="ducktal2u" cloneof="ducktal2">
-		<description>Disney's Duck Tales 2 (USA)</description>
+		<description>Disney's DuckTales 2 (USA)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="DMG-D7-USA"/>
