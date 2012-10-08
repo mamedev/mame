@@ -2110,7 +2110,8 @@ $(DRIVERS)/maygay1b.o:	$(LAYOUT)/maygay1b.lh
 
 $(DRIVERS)/mcr.o:		$(LAYOUT)/dpoker.lh
 
-$(DRIVERS)/mcr3.o:		$(LAYOUT)/turbotag.lh
+$(DRIVERS)/mcr3.o:		$(LAYOUT)/spyhunt.lh \
+			$(LAYOUT)/turbotag.lh
 
 $(DRIVERS)/mpoker.o:	$(LAYOUT)/mpoker.lh
 

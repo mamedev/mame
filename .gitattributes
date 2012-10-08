@@ -4427,6 +4427,7 @@ src/mame/layout/spacezap.lay svneol=native#text/plain
 src/mame/layout/spacwalk.lay svneol=native#text/plain
 src/mame/layout/spectra.lay svneol=native#text/plain
 src/mame/layout/splus.lay svneol=native#text/plain
+src/mame/layout/spyhunt.lay svneol=native#text/plain
 src/mame/layout/sspeedr.lay svneol=native#text/plain
 src/mame/layout/sstrangr.lay svneol=native#text/plain
 src/mame/layout/stactics.lay svneol=native#text/plain
