@@ -394,7 +394,6 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 	  m_buffer_pos(0),
 	  m_bit_pos(0),
 	  m_bit_count(0),
-	  m_stp(-1),
 	  m_mtr(0),
 	  m_accl(1),
 	  m_ds(0),
@@ -450,7 +449,6 @@ void c64h156_device::device_start()
 	save_item(NAME(m_cycles_until_next_bit));
 	save_item(NAME(m_zero_count));
 	save_item(NAME(m_cycles_until_random_flux));
-	save_item(NAME(m_stp));
 	save_item(NAME(m_mtr));
 	save_item(NAME(m_accl));
 	save_item(NAME(m_ds));
@@ -656,19 +654,17 @@ WRITE_LINE_MEMBER( c64h156_device::atna_w )
 
 void c64h156_device::stp_w(int data)
 {
-	if (m_mtr && (m_stp != data))
+	if (m_mtr)
 	{
-		int tracks = 0;
-
-		switch (m_stp)
+		int track = floppy_drive_get_current_track(m_image);
+		int tracks = (data - track) & 0x03;
+		
+		if (tracks == 3)
 		{
-		case 0:	if (data == 1) tracks++; else if (data == 3) tracks--; break;
-		case 1:	if (data == 2) tracks++; else if (data == 0) tracks--; break;
-		case 2: if (data == 3) tracks++; else if (data == 1) tracks--; break;
-		case 3: if (data == 0) tracks++; else if (data == 2) tracks--; break;
+			tracks = -1;
 		}
 
-		if (tracks != 0)
+		if (tracks == -1 || tracks == 1)
 		{
 			// step read/write head
 			floppy_drive_seek(m_image, tracks);
@@ -676,8 +672,6 @@ void c64h156_device::stp_w(int data)
 			// read new track data
 			read_current_track();
 		}
-
-		m_stp = data;
 	}
 }
 

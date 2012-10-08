@@ -144,7 +144,7 @@ private:
 	devcb_resolved_write_line	m_out_sync_func;
 	devcb_resolved_write_line	m_out_byte_func;
 
-	required_device<device_t> m_image;
+	required_device<legacy_floppy_image_device> m_image;
 
 	// track
 	UINT16 m_shift;
@@ -160,7 +160,6 @@ private:
 	int m_cycles_until_random_flux;
 
 	// motors
-	int m_stp;								// stepper motor phase
 	int m_mtr;								// spindle motor on
 
 	// signals
