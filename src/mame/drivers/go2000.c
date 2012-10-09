@@ -177,13 +177,12 @@ void go2000_state::video_start()
 
 UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
 	int count = 0;
 
 	/* 0x600000 - 0x601fff / 0x610000 - 0x611fff */
-	for (x = 0; x < 64; x++)
+	for (int x = 0; x < 64; x++)
 	{
-		for (y = 0; y < 32; y++)
+		for (int y = 0; y < 32; y++)
 		{
 			int tile = m_videoram[count];
 			int attr = m_videoram2[count];
@@ -193,9 +192,9 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 	}
 
 	/* 0x602000 - 0x603fff / 0x612000 - 0x613fff */
-	for (x = 0; x < 64; x++)
+	for (int x = 0; x < 64; x++)
 	{
-		for (y = 0; y < 32; y++)
+		for (int y = 0; y < 32; y++)
 		{
 			int tile = m_videoram[count];
 			int attr = m_videoram2[count];
@@ -205,13 +204,10 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 	}
 
 	/*Sprite RAM code actually copied from video/suna16.c with minor modifications.*/
-	{
-	int offs;
-
 	int max_x = machine().primary_screen->width() - 8;
 	int max_y = machine().primary_screen->height() - 8;
 
-	for (offs = 0xf800 / 2; offs < 0x10000 / 2 ; offs += 4/2)
+	for (int offs = 0xf800 / 2; offs < 0x10000 / 2 ; offs += 4/2)
 	{
 		int srcpg, srcx, srcy, dimx, dimy;
 		int tile_x, tile_xinc, tile_xstart;
@@ -301,8 +297,6 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 
 			tile_y += tile_yinc;
 		}
-
-	}
 	}
 
 	return 0;
