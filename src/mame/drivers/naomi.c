@@ -312,6 +312,7 @@ OutTrigger                                      840-0017C  22163   19 (64Mb)   ?
 Power Stone                                     841-0001C  21597    8 (64Mb)   present  315-6213  317-5046-COM   joystick + 3 buttons
 Power Stone 2                                   841-0008C  23127    9 (64Mb)   present  315-6213  317-5054-COM   joystick + 3 buttons
 Puyo Puyo Da!                                   841-0006C  22206   20 (64Mb)   ?        ?         ?
+Samba de Amigo (prototype)                      840-0020C  proto   16 (64Mb)   ?        315-6213  317-0270-COM   will boot but requires special controller to play it
 Samba de Amigo (Rev B)                          840-0020C  22966B  16 (64Mb)   ?        315-6213  317-0270-COM   will boot but requires special controller to play it
 Sega Marine Fishing                             840-0027C  22221   10 (64Mb)   ?        315-6213  not present    ROM 3&4 not present. Requires special I/O board and fishing controller
 Sega Strike Fighter (Rev A)                     840-0035C  23323A  20 (64Mb)   ?        315-6213  317-0281-COM
@@ -432,7 +433,8 @@ Giga Wing 2                                     841-0014C  22270    5 (128Mb)  3
 Mobile Suit Gundam: Federation Vs. Zeon         841-0017C  23638   10 (128Mb)  ?          ?         ?
 Moero Justice Gakuen / Project Justice (Rev A)  841-0015C  23548A  11 (128Mb)  315-6319A  present   317-5065-COM
 Oinori-daimyoujin Matsuri                       840-0126B  24053    5 (128Mb)  315-6319A  present   not present
-Samba de Amigo Ver.2000                         840-0047C  23600   21 (128Mb)  315-6319A  present   317-0295-COM
+Samba de Amigo Ver. 2000                        840-0047C  23600   21  (64Mb)  315-6319A  present   317-0295-COM
+Star Horse (Rev A)  							 840-0123C  24122A   7 (128Mb)  315-6319A  present   not present   requires an additional middle board n° 837-13785
 Virtua Striker 3 (Rev B)                        840-0061C  23663B  11 (128Mb)  315-6319A  present   317-0310-COM
 Virtua Striker 3 (Rev C)                        840-0061C  23663C  11 (128Mb)  315-6319A  present   317-0310-COM
 Wave Runner GP                                  840-0064C  24059    6 (128Mb)  315-6319A  present   not present
@@ -534,14 +536,14 @@ Notes:
    CN1/2/3  - connectors joining to main board
 
    Games known to use this PCB include....
-                                   Cart  Sticker   FL0-FL3   FLASHROMs   X76F100      EPM7064   EPM7064   315-5581      Game
- Game                              Type  on cart   FLASHROM  # of SOP48  IC @ 1F      IC @ 1H   IC @ 2K   IC @ 1M       code (1)   Notes
-----------------------------------------------------------------------------------------------------------------------------------------------------
+                                    Cart  Sticker   FL0-FL3   FLASHROMs   X76F100      EPM7064   EPM7064   315-5581      Known Game
+ Game                               Type  on cart   FLASHROM  # of SOP48  IC @ 1F      IC @ 1H   IC @ 2K   IC @ 1M       code (1)    Notes
+-----------------------------------------------------------------------------------------------------------------------------------------------------
 /Gun Survivor 2 Biohazard
-\Code: Veronica                    F1X   25709801  1 (64Mb)  14 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5075-COM  BHF1
-/Shin Nihon Prowrestling                                                                                                           /FL0 & FL1 have pin55 raised from PCB.
-\Toukon Retsuden 4 Arcade Edition  F2X   25349801  2 (64Mb)  15 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5040-COM  TRF1Ver.A  \They are connected togheter and go to pin89 on 2K.
-World Kicks                        F2X   25209801  2 (32Mb)  10 (128Mb)  not present  NAODEC2A  NAODEC1A  317-5040-COM  WK2 Ver.A
+\Code: Veronica                     F1X   25709801  1 (64Mb)  14 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5075-COM  BHF1
+/Shin Nihon Prowrestling Toukon                                                                                                      /FL0 & FL1 have pin55 raised from PCB.
+\Retsuden 4 Arcade Edition (Ver.A)  F2X   25349801  2 (64Mb)  15 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5040-COM  TRF1        \They are connected togheter and go to pin89 on 2K.
+World Kicks (Ver.A)                 F2X   25209801  2 (32Mb)  10 (128Mb)  not present  NAODEC2A  NAODEC1A  317-5040-COM  WK2-WK3
 
 (1) note: the number in the game code has the following meaning: 1 = Japan, 2 = Asia, 3 = US, 4 = World.
 
@@ -584,11 +586,12 @@ Notes:
    CN1/2/3  - connectors joining to main board
 
    Games known to use this PCB include....
-                           Cart  Sticker   FL0-FL3   FLASHROMs   X76F100  CY37128  315-5581      Game
- Game                      Type  on cart   FLASHROM  # of SOP48  IC @ 1F  IC @ 3J  IC @ 1M       code (1)    Notes
-----------------------------------------------------------------------------------------------------------------------
-Mazan: Flash of the Blade  F1X   25869812  1 (64Mb)   8 (128Mb)  present  NAODEC3  317-0266-COM  MAZ2 Ver.A
-Ninja Assault              F2X   25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA3 Ver.A
+                                   Cart  Sticker   FL0-FL3   FLASHROMs   X76F100  CY37128  315-5581      Known Game
+ Game                              Type  on cart   FLASHROM  # of SOP48  IC @ 1F  IC @ 3J  IC @ 1M       code (1)    Notes
+-------------------------------------------------------------------------------------------------------------------------------
+Mazan: Flash of the Blade (Ver.A)  F1X   25869812  1 (64Mb)   8 (128Mb)  present  NAODEC3  317-0266-COM  MAZ2
+Ninja Assault (Ver.A)              F2X   25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA3
+Ninja Assault (Ver.A)              F3    25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA4
 
 (1) note: the number in the game code has the following meaning: 1 = Japan, 2 = Asia, 3 = US, 4 = World.
 
@@ -7957,6 +7960,7 @@ ROM_END
 /* 0088 */ GAME( 2001, derbyocw, naomi,    naomi,   naomi, dc_state,    naomi,    ROT0, "Sega", "Derby Owners Club World Edition (JPN, USA, EXP, KOR, AUS) (Rev D)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0088 */ GAME( 2001, drbyocwc, derbyocw, naomi,   naomi, dc_state,    naomi,    ROT0, "Sega", "Derby Owners Club World Edition (JPN, USA, EXP, KOR, AUS) (Rev C)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0098 */ GAME( 2002, shootopl, naomi,    naomim1, naomi, dc_state,    naomi,    ROT0, "Sega", "Shootout Pool", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+// 0123 Star Horse (Rev A)
 /* 0126 */ GAME( 2003, oinori,   naomi,    naomi,   naomi, dc_state,    naomi,    ROT0, "Sega", "Oinori-daimyoujin Matsuri", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0128 */ GAME( 2002, shootpl,  naomi,    naomim1, naomi, dc_state,    naomi,    ROT0, "Sega", "Shootout Pool (JPN, USA, KOR, AUS) / Shootout Pool Prize (EXP)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0140 */ GAME( 2004, kick4csh, naomi,    naomim1, naomi, dc_state,    kick4csh, ROT0, "Sega", "Kick '4' Cash", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
@@ -8014,6 +8018,7 @@ ROM_END
 /* 25209801 */ GAME( 2000, wldkicks, naomi, naomim2, naomi, dc_state,    naomi,    ROT0, "Capcom / Namco", "World Kicks (WK2 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 25349801 */ GAME( 2000, toukon4,  naomi, naomim2, naomi, dc_state,    naomi,    ROT0, "Capcom / Namco", "Shin Nihon Pro Wrestling Toukon Retsuden 4 Arcade Edition (TRF1 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 25469801 */ GAME( 2000, ninjaslt, naomi, naomim2, naomi, dc_state,    naomi,    ROT0, "Capcom / Namco", "Ninja Assault (NJA3 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+// 25469801 Ninja Assault (NJA4 Ver. A)
 /* 25709801 */ GAME( 2001, gunsur2,  naomi, naomi,   naomi, dc_state,    naomi,    ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (BHF1)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 25869812 */ GAME( 2002, mazan,    naomi, naomim2, naomi, dc_state,    naomi,    ROT0, "Capcom / Namco", "Mazan: Flash of the Blade (MAZ2 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 
@@ -8095,7 +8100,6 @@ ROM_END
 // 00??  Dragon Treasure 2
 // 00??  Get Bass 2
 // 00??  Kodai Ouja Kyouryuu King
-// 00??  World Club Champion Football Serie A 2001-2002
 
 /* GDL-xxxx ("licensed by Sega" GD-ROM games) */
 /* 0001  */ GAME( 2001, gundmgd,   naomigd,  naomigd, naomi, dc_state,    naomigd,  ROT0,   "Capcom / Banpresto", "Mobile Suit Gundam: Federation Vs. Zeon (GDL-0001)", GAME_FLAGS )
@@ -8153,6 +8157,30 @@ ROM_END
 /* 0040  */ GAME( 2006, karous,    naomigd,  naomigd, naomi, dc_state,    naomigd,  ROT270, "Milestone",    "Karous (GDL-0040)", GAME_FLAGS )
 /* 0041  */ GAME( 2006, ggxxac,    naomigd,  naomigd, naomi, dc_state,    naomigd,  ROT0,"Arc System Works","Guilty Gear XX Accent Core (GDL-0041)", GAME_FLAGS )
 /* 0042  */ GAME( 2006, takoron,   naomigd,  naomigd, naomi, dc_state,    naomigd,  ROT0,   "Compile",      "Noukone Puzzle Takoron (GDL-0042)", GAME_FLAGS )
+
+/* CDV-xxxxx (CD-ROM and DVD-ROM for Naomi 2 Satellite Terminal) */
+// 10002  CD  - World Club Champion Football Serie A 2002-2003 Ver.2.12 (Sega, 2004)
+// 10008  DVD - World Club Champion Football Serie A 2002-2003 Ver.2.34 (Sega, 2004)
+// 10013  CD  - World Club Champion Football European Clubs 2004-2005 (Sega, 2005)
+// 10015  CD  - World Club Champion Football European Clubs 2004-2005 Ver.1.1 (Sega, 2005)
+// 10015P CD  - World Club Champion Football European Clubs 2004-2005 Ver.3.22 (Sega, 2005)
+// 10027  CD  - World Club Champion Football European Clubs 2005-2006 (Sega, 2006)
+// 10030  DVD - Mobile Suit Gundam 0083 Card Builder (Banpresto, 2007)
+// ?????  ??? - Mobile Suit Gundam 0079 Card Builder (Banpresto, 2005)
+// ?????  ??? - Mobile Suit Gundam 0079 Card Builder (Ver.1.007) (Banpresto, 2006)
+// ?????  ??? - Mobile Suit Gundam 0079 Card Builder (Ver.2.00) (Banpresto, 2006)
+// ?????  ??? - Mobile Suit Gundam 0079 Card Builder (Ver.2.01) (Banpresto, 2006)
+// ?????  ??? - Mobile Suit Gundam 0079 Card Builder (Ver.2.02) (Banpresto, 2006)
+// ?????  ??? - Mobile Suit Gundam 0083 Card Builder Ryouyuu Gekitotsu (Banpresto, 2007)
+// ?????  ??? - World Club Champion Football Serie A 2001-2002 (Sega, 2002)
+// ?????  ??? - World Club Champion Football Serie A 2001-2002 Ver.1.2 (Sega, 2002)
+// ?????  ??? - World Club Champion Football Serie A 2001-2002 Ver.2 (Sega, 2003)
+// ?????  ??? - World Club Champion Football Serie A 2002-2003 (Sega, 2003)
+// ?????  ??? - World Club Champion Football Serie A 2002-2003 Ver.2 (Sega, 2004)
+// ?????  ??? - World Club Champion Football European Clubs 2004-2005 Ver.1.2 (Sega, 2005)
+// ?????  ??? - World Club Champion Football European Clubs 2005-2006 bugfix (Sega, 2006)
+
+
 
 /* Atomiswave */
 GAME( 2001, awbios,   0,        aw2c,    aw2c, dc_state,  atomiswave, ROT0, "Sammy",                           "Atomiswave Bios", GAME_FLAGS|GAME_IS_BIOS_ROOT )
