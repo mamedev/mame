@@ -1044,7 +1044,14 @@ READ8_HANDLER( snes_r_bank5 )
 	}
 	else if ((state->m_cart[0].mode & 5) && (address < 0x8000))		/* Mode 20 & 22 */
 	{
-		if (state->m_cart[0].sram > 0)
+		if (state->m_cart[0].sram > 0x8000)
+		{
+			// In this case, SRAM is mapped in 0x8000 chunks at diff offsets: 0x700000-0x707fff, 0x710000-0x717fff, etc.
+			int mask = (state->m_cart[0].sram << 1) - 1;
+			mask &= ~0x8000;
+			value = snes_ram[0x700000 + (offset & mask)];
+		}
+		else if (state->m_cart[0].sram > 0)
 		{
 			int mask = state->m_cart[0].sram - 1;	/* Limit SRAM size to what's actually present */
 			value = snes_ram[0x700000 + (offset & mask)];
@@ -1320,7 +1327,14 @@ WRITE8_HANDLER( snes_w_bank5 )
 		snes_ram[0xf00000 + offset] = data;
 	else if ((state->m_cart[0].mode & 5) && (address < 0x8000))			/* Mode 20 & 22 */
 	{
-		if (state->m_cart[0].sram > 0)
+		if (state->m_cart[0].sram > 0x8000)
+		{
+			// In this case, SRAM is mapped in 0x8000 chunks at diff offsets: 0x700000-0x707fff, 0x710000-0x717fff, etc.
+			int mask = (state->m_cart[0].sram << 1) - 1;
+			mask &= ~0x8000;
+			snes_ram[0x700000 + (offset & mask)] = data;
+		}
+		else if (state->m_cart[0].sram > 0)
 		{
 			int mask = state->m_cart[0].sram - 1;	/* Limit SRAM size to what's actually present */
 			snes_ram[0x700000 + (offset & mask)] = data;
