@@ -604,7 +604,7 @@ static INPUT_PORTS_START( demoderm )
 INPUT_PORTS_END
 
 
-/* not verified, no manual found */
+/* inputs not verfied yet, DIP switches from manual */
 static INPUT_PORTS_START( sarge )
 	PORT_START("MONO.IP0")	/* J2 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -631,7 +631,10 @@ static INPUT_PORTS_START( sarge )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
-	PORT_START("MONO.IP3")
+	PORT_START("MONO.IP3")	/* DIPSW @ A13 */
+	PORT_DIPUNKNOWN( 0x01, 0x01 ) // used, maybe for the "hidden player incentive" easter egg?
+	PORT_DIPUNKNOWN( 0x02, 0x02 ) // "
+	PORT_DIPUNKNOWN( 0x04, 0x04 ) // "
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -639,8 +642,9 @@ static INPUT_PORTS_START( sarge )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-/* 0x00 says 2 Coins/2 Credits in service mode, but gives 1 Coin/1 Credit */
-	PORT_BIT( 0xc7, IP_ACTIVE_LOW, IPT_UNKNOWN )
+//	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) ) // dupe/invalid
+	PORT_DIPUNUSED( 0x40, 0x40 )
+	PORT_DIPUNUSED( 0x80, 0x80 )
 
 	PORT_START("MONO.IP4")	/* J4 1-7,9 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -673,7 +677,7 @@ static INPUT_PORTS_START( maxrpm )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-/* 0x00 says 2 Coins/2 Credits in service mode, but gives 1 Coin/1 Credit */
+//	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) ) // dupe/invalid
 	PORT_BIT( 0xc7, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("MONO.IP4")	/* J4 1-7,9 */
