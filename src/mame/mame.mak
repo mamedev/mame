@@ -2143,7 +2143,8 @@ $(DRIVERS)/mw8080bw.o:	$(LAYOUT)/280zzzap.lh \
 			$(LAYOUT)/spacwalk.lh
 
 $(DRIVERS)/meadows.o:	$(LAYOUT)/deadeye.lh \
-			$(LAYOUT)/gypsyjug.lh
+			$(LAYOUT)/gypsyjug.lh \
+			$(LAYOUT)/minferno.lh
 
 $(DRIVERS)/meyc8080.o:	$(LAYOUT)/wldarrow.lh \
 			$(LAYOUT)/mdrawpkr.lh \
