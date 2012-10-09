@@ -560,6 +560,8 @@ static MACHINE_CONFIG_START( gstriker, gstriker_state )
 	MCFG_GFXDECODE(gstriker)
 	MCFG_PALETTE_LENGTH(0x800)
 
+	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
+
 	MCFG_VIDEO_START_OVERRIDE(gstriker_state,gstriker)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -597,6 +599,8 @@ static MACHINE_CONFIG_START( vgoal, gstriker_state )
 
 	MCFG_GFXDECODE(gstriker)
 	MCFG_PALETTE_LENGTH(0x2000)
+
+	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 
 	MCFG_VIDEO_START_OVERRIDE(gstriker_state,vgoalsoc)
 

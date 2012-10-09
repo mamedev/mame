@@ -14,13 +14,18 @@ public:
 		m_sp_videoram(*this, "sp_videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_spr_ctrl(*this, "spr_ctrl"),
-		m_screen_vregs(*this, "screen_vregs"){ }
+		m_screen_vregs(*this, "screen_vregs"),
+		m_spr(*this, "vsystem_spr")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_screen_videoram;
 	required_shared_ptr<UINT16> m_bg_videoram;
 	required_shared_ptr<UINT16> m_sp_videoram;
 	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_spr_ctrl;
+	required_shared_ptr<UINT16> m_screen_vregs;
+	required_device<vsystem_spr_device> m_spr;
 //  UINT16 *    m_paletteram; // this currently uses generic palette handling
 
 	/* video-related */
@@ -28,8 +33,6 @@ public:
 	tilemap_t     *m_bg_tilemap;
 	UINT16      m_screen_bank;
 	UINT16      m_bg_bank;
-	required_shared_ptr<UINT16> m_spr_ctrl;
-	required_shared_ptr<UINT16> m_screen_vregs;
 
 	/* misc */
 	int         m_pending_command;

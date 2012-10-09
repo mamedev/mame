@@ -2,8 +2,8 @@
 
 #include "emu.h"
 #include "video/konicdev.h"
-#include "includes/suprslam.h"
 #include "vsystem_spr.h"
+#include "includes/suprslam.h"
 
 /* FG 'SCREEN' LAYER */
 
@@ -64,10 +64,10 @@ UINT32 suprslam_state::screen_update_suprslam(screen_device &screen, bitmap_ind1
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	k053936_zoom_draw(m_k053936, bitmap, cliprect, m_bg_tilemap, 0, 0, 1);
 	if(!(m_spr_ctrl[0] & 8))
-		draw_sprites_suprslam(m_spriteram, m_spriteram.bytes(), m_sp_videoram, machine(), bitmap, cliprect);
+		m_spr->draw_sprites_suprslam(m_spriteram, m_spriteram.bytes(), m_sp_videoram, machine(), bitmap, cliprect);
 	m_screen_tilemap->draw(bitmap, cliprect, 0, 0);
 	if(m_spr_ctrl[0] & 8)
-		draw_sprites_suprslam(m_spriteram, m_spriteram.bytes(), m_sp_videoram, machine(), bitmap, cliprect);
+		m_spr->draw_sprites_suprslam(m_spriteram, m_spriteram.bytes(), m_sp_videoram, machine(), bitmap, cliprect);
 	return 0;
 }
 

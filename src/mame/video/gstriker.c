@@ -318,199 +318,6 @@ WRITE16_MEMBER(gstriker_state::MB60553_1_vram_w)
 
 
 
-/*** Fujitsu CG10103 **********************************************/
-
-/*
-    Fujitsu CG10103 sprite generator
-    --------------------------------
-
-- Tile based
-- 16x16 4bpp tiles
-- Up to 7x7 in each block
-- 5 bit of palette selection for the mixer
-- Scaling (x/y)
-- Flipping
-- Indipendent sorting list
-- 1 bit of priority for the mixer
-
-Note that this chip can be connected to a VS9210 which adds a level of indirection for
-tile numbers. Basically, the VS9210 indirects the tile number through a table in its attached
-memory, before accessing the ROMs.
-
-
-    Sorting list format (VideoRAM offset 0)
-    ---------------------------------------
-
-?e-- ---f ssss ssss
-
-e=end of list
-f=sprite present in this position
-s=sprite index
-?=used together with 'e' almost always
-
-
-    Sprite format (VideoRAM offset 0x400)
-    -------------------------------------
-
-0: nnnn jjjy yyyy yyyy
-1: mmmm iiix xxxx xxxx
-2: fFpc cccc ---- ---t
-3: tttt tttt tttt tttt
-
-t=tile, x=posx, y=posy, i=blockx, j=blocky
-c=color, m=zoomx, n=zoomy, p=priority
-
-The zoom (scaling) is probably non-linear, it would require a hand-made table unless we find the correct
-formula. I'd probably try 1/x. I'm almost sure that it scales between full size (value=0) and half size
-(value=0xF) but I couldn't get much more than that from a soccer game.
-
-
-TODO:
-Priorities should be right, but they probably need to be orthogonal with the mixer priorities.
-Zoom factor is not correct, the scale is probably non-linear
-Horizontal wrapping is just a hack. The chip probably calculates if it needs to draw the sprite at the
-  normal position, or wrapped along X/Y.
-Abstracts the VS9210
-
-*/
-
-
-static void CG10103_draw_sprite(running_machine &machine, bitmap_ind16& screen, const rectangle &cliprect, UINT16* spr, int drawpri)
-{
-	gstriker_state *state = machine.driver_data<gstriker_state>();
-	int ypos = spr[0] & 0x1FF;
-	int xpos = (spr[1] & 0x1FF);
-	UINT32 tile = (spr[3] & 0xFFFF) | ((spr[2] & 1) << 16);
-	int ynum = (spr[0] >> 9) & 0x7;
-	int xnum = (spr[1] >> 9) & 0x7;
-	int color = (spr[2] >> 8) & 0x1F;
-	int flipx = (spr[2] >> 14) & 1;
-	int flipy = (spr[2] >> 15) & 1;
-	int yzoom = (spr[0] >> 12) & 0xF;
-	int xzoom = (spr[1] >> 12) & 0xF;
-	int pri = (spr[2] >> 13) & 1;
-	int x, y;
-	int xstep, ystep;
-	int xfact, yfact;
-
-	// Check if we want to draw this sprite now
-	if (pri != drawpri)
-		return;
-
-	// Convert in fixed point to handle the scaling
-	xpos <<= 16;
-	ypos <<= 16;
-
-	xnum++;
-	ynum++;
-	xstep = ystep = 16;
-
-	// Linear scale, surely wrong
-	xfact = 0x10000 - ((0x8000 * xzoom) / 15);
-	yfact = 0x10000 - ((0x8000 * yzoom) / 15);
-
-	xstep *= xfact;
-	ystep *= yfact;
-
-	// Handle flipping
-	if (flipy)
-	{
-		ypos += (ynum-1) * ystep;
-		ystep = -ystep;
-	}
-
-	if (flipx)
-	{
-		xpos += (xnum-1) * xstep;
-		xstep = -xstep;
-	}
-
-	// @@@ Add here optional connection to the VS9210 for extra level of tile number indirection
-#if 0
-	if (state->m_CG10103_cur_chip->connected_vs9210)
-	{
-		// ...
-	}
-#endif
-
-	// Draw the block
-	for (y=0;y<ynum;y++)
-	{
-		int xp = xpos;
-
-		for (x=0;x<xnum;x++)
-		{
-			// Hack to handle horizontal wrapping
-			drawgfxzoom_transpen(screen, cliprect, machine.gfx[state->m_CG10103_cur_chip->gfx_region], tile, color+state->m_CG10103_cur_chip->pal_base, flipx, flipy, xp>>16, ypos>>16, xfact, yfact, state->m_CG10103_cur_chip->transpen);
-			drawgfxzoom_transpen(screen, cliprect, machine.gfx[state->m_CG10103_cur_chip->gfx_region], tile, color+state->m_CG10103_cur_chip->pal_base, flipx, flipy, (xp>>16) - 0x200, ypos>>16, xfact, yfact, state->m_CG10103_cur_chip->transpen);
-			xp += xstep;
-			tile++;
-		}
-
-		ypos += ystep;
-	}
-}
-
-
-static void CG10103_draw(running_machine &machine, int numchip, bitmap_ind16& screen, const rectangle &cliprect, int priority)
-{
-	gstriker_state *state = machine.driver_data<gstriker_state>();
-	UINT16* splist;
-	int i;
-
-	state->m_CG10103_cur_chip = &state->m_CG10103[numchip];
-
-	splist = state->m_CG10103_cur_chip->vram;
-
-	// Parse the sorting list
-	for (i=0;i<0x400;i++)
-	{
-		UINT16 cmd = *splist++;
-
-		// End of list
-		if (cmd & 0x4000)
-			break;
-
-		// Normal sprite here
-		if (cmd & 0x100)
-		{
-			// Extract sprite index
-			int num = cmd & 0xFF;
-
-			// Draw the sprite
-			CG10103_draw_sprite(machine, screen, cliprect, state->m_CG10103_cur_chip->vram + 0x400 + num*4, priority);
-		}
-	}
-}
-
-static void CG10103_init(int numchips)
-{
-	int i;
-
-	if (numchips > MAX_CG10103)
-		numchips = MAX_CG10103;
-
-	for (i=0;i<numchips;i++)
-	{
-		// No initalization required, as for now. I'll keep the init function in case we later
-		//  need something
-	}
-}
-
-static void CG10103_set_pal_base(gstriker_state *state, int numchip, int pal_base)
-{
-	state->m_CG10103[numchip].pal_base = pal_base;
-}
-
-static void CG10103_set_gfx_region(gstriker_state *state, int numchip, int gfx_region)
-{
-	state->m_CG10103[numchip].gfx_region = gfx_region;
-}
-
-static void CG10103_set_transpen(gstriker_state *state, int numchip, int transpen)
-{
-	state->m_CG10103[numchip].transpen = transpen;
-}
 
 
 /*** VIDEO UPDATE/START **********************************************/
@@ -533,11 +340,11 @@ UINT32 gstriker_state::screen_update_gstriker(screen_device &screen, bitmap_ind1
 	//  needs sprite orthogonality
 	MB60553_draw(machine(), 0, bitmap,cliprect, 0);
 
-	CG10103_draw(machine(), 0, bitmap, cliprect, 0);
+	m_spr->CG10103_draw(machine(), 0, bitmap, cliprect, 0);
 
 	VS920A_draw(this, 0, bitmap, cliprect, 0);
 
-	CG10103_draw(machine(), 0, bitmap, cliprect, 1);
+	m_spr->CG10103_draw(machine(), 0, bitmap, cliprect, 1);
 
 #if 0
 	popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",
@@ -573,10 +380,10 @@ VIDEO_START_MEMBER(gstriker_state,gstriker)
 	MB60553_get_tilemap(this, 0)->set_transparent_pen(0xf);
 
 	// Initialize the sprite generator
-	CG10103_init(1);
-	CG10103_set_gfx_region(this, 0, 2);
-	CG10103_set_pal_base(this, 0, 0x10);
-	CG10103_set_transpen(this, 0, 0x0);
+	m_spr->CG10103_set_ram(m_CG10103_vram);
+	m_spr->CG10103_set_gfx_region(2);
+	m_spr->CG10103_set_pal_base(0x10);
+	m_spr->CG10103_set_transpen(0x0);
 }
 
 VIDEO_START_MEMBER(gstriker_state,twrldc94)
@@ -597,10 +404,10 @@ VIDEO_START_MEMBER(gstriker_state,twrldc94)
 	MB60553_get_tilemap(this, 0)->set_transparent_pen(0xf);
 
 	// Initialize the sprite generator
-	CG10103_init(1);
-	CG10103_set_gfx_region(this, 0, 2);
-	CG10103_set_pal_base(this, 0, 0x60);
-	CG10103_set_transpen(this, 0, 0x0);
+	m_spr->CG10103_set_ram(m_CG10103_vram);
+	m_spr->CG10103_set_gfx_region(2);
+	m_spr->CG10103_set_pal_base(0x60);
+	m_spr->CG10103_set_transpen(0x0);
 }
 
 VIDEO_START_MEMBER(gstriker_state,vgoalsoc)
@@ -621,8 +428,8 @@ VIDEO_START_MEMBER(gstriker_state,vgoalsoc)
 	MB60553_get_tilemap(this, 0)->set_transparent_pen(0xf);
 
 	// Initialize the sprite generator
-	CG10103_init(1);
-	CG10103_set_gfx_region(this, 0, 2);
-	CG10103_set_pal_base(this, 0, 0x00);
-	CG10103_set_transpen(this, 0, 0xf);
+	m_spr->CG10103_set_ram(m_CG10103_vram);
+	m_spr->CG10103_set_gfx_region(2);
+	m_spr->CG10103_set_pal_base(0x00);
+	m_spr->CG10103_set_transpen(0xf);
 }

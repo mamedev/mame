@@ -1,6 +1,8 @@
 #ifndef __GSTRIKER_H
 #define __GSTRIKER_H
 
+#include "video/vsystem_spr.h"
+
 /*** VS920A **********************************************/
 
 #define MAX_VS920A 2
@@ -29,18 +31,7 @@ struct tMB60553
 
 };
 
-/*** CG10103 **********************************************/
 
-#define MAX_CG10103 2
-
-struct tCG10103
-{
-	UINT16* vram;
-	UINT16 pal_base;
-	UINT8 gfx_region;
-	UINT8 transpen;
-
-};
 
 class gstriker_state : public driver_device
 {
@@ -51,31 +42,34 @@ public:
 		m_CG10103_vram(*this, "cg10103_vram"),
 		m_VS920A_vram(*this, "vs920a_vram"),
 		m_work_ram(*this, "work_ram"),
-		m_lineram(*this, "lineram"){ }
+		m_lineram(*this, "lineram"),
+		m_spr(*this, "vsystem_spr")	
+	{ }
 
 	virtual void machine_start()
 	{
 		m_MB60553[0].vram = m_MB60553_vram;
-		m_CG10103[0].vram = m_CG10103_vram;
 		m_VS920A[0].vram = m_VS920A_vram;
 	}
 
 	required_shared_ptr<UINT16> m_MB60553_vram;
 	required_shared_ptr<UINT16> m_CG10103_vram;
 	required_shared_ptr<UINT16> m_VS920A_vram;
+	required_shared_ptr<UINT16> m_work_ram;
+	required_shared_ptr<UINT16> m_lineram;
+	required_device<vsystem_spr_device> m_spr;
+
 	UINT16 m_dmmy_8f_ret;
 	int m_pending_command;
-	required_shared_ptr<UINT16> m_work_ram;
+
 	int m_gametype;
 	UINT16 m_mcu_data;
 	UINT16 m_prot_reg[2];
-	required_shared_ptr<UINT16> m_lineram;
+
 	sVS920A m_VS920A[MAX_VS920A];
 	tMB60553 m_MB60553[MAX_MB60553];
-	tCG10103 m_CG10103[MAX_CG10103];
 	sVS920A* m_VS920A_cur_chip;
 	tMB60553 *m_MB60553_cur_chip;
-	tCG10103* m_CG10103_cur_chip;
 	DECLARE_READ16_MEMBER(dmmy_8f);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_READ16_MEMBER(pending_command_r);

@@ -9,8 +9,8 @@ zooming might be wrong (only used on title logo?)
 */
 
 #include "emu.h"
+#include "vsystem_spr.h"
 #include "includes/taotaido.h"
-
 
 /* sprite tile codes 0x4000 - 0x7fff get remapped according to the content of these registers */
 WRITE16_MEMBER(taotaido_state::taotaido_sprite_character_bank_select_w)
@@ -23,107 +23,6 @@ WRITE16_MEMBER(taotaido_state::taotaido_sprite_character_bank_select_w)
 
 /* sprites are like the other video system / psikyo games, we can merge this with aerofgt and plenty of other
    things eventually */
-
-static void draw_sprite(running_machine &machine, UINT16 spriteno, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	taotaido_state *state = machine.driver_data<taotaido_state>();
-	/*- SPR RAM Format -**
-
-      4 words per sprite
-
-      zzzz sssp  pppp pppp (y zoom, y size, y position)
-      zzzz sssp  pppp pppp (x zoom, x size, x position)
-      yxpc cccc  ---- ---- (flipy, flipx, priority?, colour)
-      -nnn nnnn  nnnn nnnn (tile lookup)
-
-    */
-
-	int x,y;
-
-	UINT16 *source = &state->m_spriteram_older[spriteno*4];
-	gfx_element *gfx = machine.gfx[0];
-
-
-	int yzoom = (source[0] & 0xf000) >> 12;
-	int xzoom = (source[1] & 0xf000) >> 12;
-
-	int ysize = (source[0] & 0x0e00) >> 9;
-	int xsize = (source[1] & 0x0e00) >> 9;
-
-	int ypos = source[0] & 0x01ff;
-	int xpos = source[1] & 0x01ff;
-
-	int yflip = source[2] & 0x8000;
-	int xflip = source[2] & 0x4000;
-	int color = (source[2] & 0x1f00) >> 8;
-
-	int tile = source[3] & 0xffff;
-
-	xpos += (xsize*xzoom+2)/4;
-	ypos += (ysize*yzoom+2)/4;
-
-	xzoom = 32 - xzoom;
-	yzoom = 32 - yzoom;
-
-
-	for (y = 0;y <= ysize;y++)
-	{
-		int sx,sy;
-
-		if (yflip) sy = ((ypos + yzoom * (ysize - y)/2 + 16) & 0x1ff) - 16;
-			else sy = ((ypos + yzoom * y / 2 + 16) & 0x1ff) - 16;
-
-		for (x = 0;x <= xsize;x++)
-		{
-
-			/* this indirection is a bit different to the other video system games */
-			int realtile;
-
-			realtile = state->m_spriteram2_older[tile&0x7fff];
-
-			if (realtile > 0x3fff)
-			{
-				int block;
-
-				block = (realtile & 0x3800)>>11;
-
-				realtile &= 0x07ff;
-				realtile |= state->m_sprite_character_bank_select[block] * 0x800;
-			}
-
-			if (xflip) sx = ((xpos + xzoom * (xsize - x) / 2 + 16) & 0x1ff) - 16;
-				else sx = ((xpos + xzoom * x / 2 + 16) & 0x1ff) - 16;
-
-
-			drawgfxzoom_transpen(bitmap,cliprect,gfx,
-						realtile,
-						color,
-						xflip,yflip,
-						sx,sy,
-						xzoom << 11, yzoom << 11,15);
-
-			tile++;
-
-		}
-	}
-}
-
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	taotaido_state *state = machine.driver_data<taotaido_state>();
-	/* first part of sprite ram is the list of sprites to draw, terminated with 0x4000 */
-	UINT16 *source = state->m_spriteram_older;
-	UINT16 *finish = state->m_spriteram_older + 0x2000/2;
-
-	while( source<finish )
-	{
-		if (source[0] == 0x4000) break;
-
-		draw_sprite(machine, source[0]&0x3ff, bitmap, cliprect);
-
-		source++;
-	}
-}
 
 
 /* the tilemap */
@@ -214,7 +113,7 @@ UINT32 taotaido_state::screen_update_taotaido(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->draw(bitmap, clip, 0,0);
 	}
 
-	draw_sprites(machine(), bitmap,cliprect);
+	m_spr->draw_sprites_taotaido(m_spriteram_older, m_spriteram.bytes(), m_spriteram2_older, m_sprite_character_bank_select, machine(), bitmap,cliprect);
 	return 0;
 }
 

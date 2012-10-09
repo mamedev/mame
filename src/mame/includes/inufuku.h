@@ -8,7 +8,9 @@ public:
 		m_bg_rasterram(*this, "bg_rasterram"),
 		m_tx_videoram(*this, "tx_videoram"),
 		m_spriteram1(*this, "spriteram1"),
-		m_spriteram2(*this, "spriteram2"){ }
+		m_spriteram2(*this, "spriteram2"),
+		m_spr(*this, "vsystem_spr")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_videoram;
@@ -16,6 +18,7 @@ public:
 	required_shared_ptr<UINT16> m_tx_videoram;
 	required_shared_ptr<UINT16> m_spriteram1;
 	required_shared_ptr<UINT16> m_spriteram2;
+	required_device<vsystem_spr_device> m_spr;
 //      UINT16 *  m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */

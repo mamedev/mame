@@ -85,6 +85,7 @@ EB26IC73.BIN    27C240      /  Main Program
 #include "cpu/m68000/m68000.h"
 #include "video/konicdev.h"
 #include "sound/2610intf.h"
+#include "video/vsystem_spr.h"
 #include "includes/suprslam.h"
 
 
@@ -336,6 +337,7 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 
 	MCFG_PALETTE_LENGTH(0x800)
 
+	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 
 	MCFG_K053936_ADD("k053936", suprslam_k053936_intf)
 

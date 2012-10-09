@@ -12,8 +12,8 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/inufuku.h"
 #include "vsystem_spr.h"
+#include "includes/inufuku.h"
 
 
 /******************************************************************************
@@ -58,7 +58,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 {
 	inufuku_state *state = machine.driver_data<inufuku_state>();
 
-	draw_sprites_inufuku( state->m_spriteram1_old, state->m_spriteram1.bytes(), state->m_spriteram2, machine, bitmap, cliprect );
+	state->m_spr->draw_sprites_inufuku( state->m_spriteram1_old, state->m_spriteram1.bytes(), state->m_spriteram2, machine, bitmap, cliprect );
 }
 
 

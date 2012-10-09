@@ -67,6 +67,7 @@ zooming might be wrong
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
+#include "video/vsystem_spr.h"
 #include "includes/taotaido.h"
 
 #define TAOTAIDO_SHOW_ALL_INPUTS	0
@@ -351,6 +352,7 @@ static MACHINE_CONFIG_START( taotaido, taotaido_state )
 
 	MCFG_PALETTE_LENGTH(0x800)
 
+	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

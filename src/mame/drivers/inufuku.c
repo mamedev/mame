@@ -75,6 +75,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
 #include "sound/2610intf.h"
+#include "video/vsystem_spr.h"
 #include "includes/inufuku.h"
 
 
@@ -392,6 +393,8 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319-1, 1, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(inufuku_state, screen_update_inufuku)
 	MCFG_SCREEN_VBLANK_DRIVER(inufuku_state, screen_eof_inufuku)
+
+	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 
 	MCFG_GFXDECODE(inufuku)
 	MCFG_PALETTE_LENGTH(4096)
