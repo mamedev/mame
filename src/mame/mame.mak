@@ -2045,7 +2045,9 @@ $(DRIVERS)/darius.o:	$(LAYOUT)/darius.lh
 
 $(DRIVERS)/destroyr.o:	$(LAYOUT)/destroyr.lh
 
-$(DRIVERS)/dlair.o:	$(LAYOUT)/dlair.lh
+$(DRIVERS)/dlair.o:		$(LAYOUT)/dlair.lh
+
+$(DRIVERS)/dragrace.o:	$(LAYOUT)/dragrace.lh
 
 $(DRIVERS)/firebeat.o:	$(LAYOUT)/firebeat.lh
 

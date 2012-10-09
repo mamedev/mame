@@ -9,6 +9,8 @@ Atari Drag Race Driver
 #include "includes/dragrace.h"
 #include "sound/discrete.h"
 
+#include "dragrace.lh"
+
 
 TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::dragrace_frame_callback)
 {
@@ -88,7 +90,6 @@ static void dragrace_update_misc_flags( address_space &space )
 
 WRITE8_MEMBER(dragrace_state::dragrace_misc_w)
 {
-
 	/* Set/clear individual bit */
 	UINT32 mask = 1 << offset;
 	if (data & 0x01)
@@ -101,7 +102,6 @@ WRITE8_MEMBER(dragrace_state::dragrace_misc_w)
 
 WRITE8_MEMBER(dragrace_state::dragrace_misc_clear_w)
 {
-
 	/* Clear 8 bits */
 	UINT32 mask = 0xff << (((offset >> 3) & 0x03) * 8);
 	m_misc_flags &= (~mask);
@@ -317,7 +317,6 @@ void dragrace_state::machine_start()
 
 void dragrace_state::machine_reset()
 {
-
 	m_misc_flags = 0;
 	m_gear[0] = 0;
 	m_gear[1] = 0;
@@ -330,7 +329,6 @@ static MACHINE_CONFIG_START( dragrace, dragrace_state )
 	MCFG_CPU_PROGRAM_MAP(dragrace_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(dragrace_state, irq0_line_hold,  4*60)
 	MCFG_WATCHDOG_VBLANK_INIT(8)
-
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("frame_timer", dragrace_state, dragrace_frame_callback, attotime::from_hz(60))
 
@@ -358,7 +356,7 @@ ROM_START( dragrace )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "8513.c1", 0x1000, 0x0800, CRC(543bbb30) SHA1(646a41d1124c8365f07a93de38af007895d7d263) )
 	ROM_LOAD( "8514.a1", 0x1800, 0x0800, CRC(ad218690) SHA1(08ba5f4fa4c75d8dad1a7162888d44b3349cbbe4) )
-	ROM_RELOAD(          0xF800, 0x0800 )
+	ROM_RELOAD(          0xf800, 0x0800 )
 
 	ROM_REGION( 0x800, "gfx1", 0 )   /* 2 color tiles */
 	ROM_LOAD( "8519dr.j0", 0x000, 0x200, CRC(aa221ba0) SHA1(450acbf349d77a790a25f3e303c31b38cc426a38) )
@@ -373,4 +371,4 @@ ROM_START( dragrace )
 ROM_END
 
 
-GAME( 1977, dragrace, 0, dragrace, dragrace, driver_device, 0, 0, "Atari (Kee Games)", "Drag Race", GAME_SUPPORTS_SAVE )
+GAMEL(1977, dragrace, 0, dragrace, dragrace, driver_device, 0, 0, "Atari (Kee Games)", "Drag Race", GAME_SUPPORTS_SAVE, layout_dragrace )
