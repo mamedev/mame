@@ -4,7 +4,7 @@
 		<rect>
 			<color red="0.094" green="0.5" blue="1.0" />
 		</rect>
-	</element>	
+	</element>
 
 	<view name="Color Overlay">
 		<screen index="0">
