@@ -2304,6 +2304,7 @@ src/mame/drivers/2mindril.c svneol=native#text/plain
 src/mame/drivers/30test.c svneol=native#text/plain
 src/mame/drivers/39in1.c svneol=native#text/plain
 src/mame/drivers/3do.c svneol=native#text/plain
+src/mame/drivers/3x3puzzl.c svneol=native#text/plain
 src/mame/drivers/40love.c svneol=native#text/plain
 src/mame/drivers/4enraya.c svneol=native#text/plain
 src/mame/drivers/4roses.c svneol=native#text/plain
