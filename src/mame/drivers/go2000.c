@@ -366,4 +366,4 @@ ROM_START( go2000 )
 ROM_END
 
 
-GAME( 2000, go2000,    0, go2000,    go2000, driver_device,    0, ROT0,  "SA", "Go 2000", GAME_SUPPORTS_SAVE )
+GAME( 2000, go2000,    0, go2000,    go2000, driver_device,    0, ROT0,  "SunA?", "Go 2000", GAME_SUPPORTS_SAVE )
