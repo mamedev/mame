@@ -18,7 +18,6 @@ void scsihle_device::device_start()
 	scsidev_device::device_start();
 
 	//req_timer = timer_alloc(0);
-	//ack_timer = timer_alloc(1);
 	sel_timer = timer_alloc(2);
 	dataout_timer = timer_alloc(3);
 
@@ -162,7 +161,6 @@ int SCSILengthFromUINT16( UINT8 *length )
 
 #define BSY_DELAY_NS    50
 //#define REQ_DELAY_NS    90
-//#define ACK_DELAY_NS    90
 
 static const char *const phasenames[] =
 {
@@ -220,60 +218,12 @@ struct adaptec_sense_t
 
 #define LOG(level,...)      if(LOGLEVEL>=level) logerror(__VA_ARGS__)
 
-//static const char *const linenames[] =
-//{
-//  "select", "busy", "request", "acknoledge", "C/D", "I/O", "message", "reset"
-//};
-
-//void scsibus_device::set_scsi_line(UINT8 line, UINT8 state)
-//{
-//  UINT8 changed = linestate[line] != state;
-//
-//  LOG(3,"set_scsi_line(%s,%d), changed=%d\n",linenames[line],state,changed);
-//
-//  if(changed)
-//  {
-//      if (line==SCSI_LINE_ACK)
-//          set_scsi_line_ack(state);
-//      else
-//          set_scsi_line_now(line,state);
-//  }
-//}
-//
-//void scsibus_device::set_scsi_line_now( UINT8 line, UINT8 state )
-//{
-//  if( linestate[ line ] != state )
-//  {
-//      linestate[ line ] = state;
-//
-//      for( int i = 0; i < deviceCount; i++ )
-//      {
-//          devices[ i ]->scsi_in_line_changed( line, state );
-//      }
-//  }
-//}
-//
-//void scsibus_device::set_scsi_line_ack(UINT8 state)
-//{
-//  ack_timer->adjust(attotime::from_nsec(ACK_DELAY_NS),state);
-//}
-//
 //void scsibus_device::scsi_out_line_change(UINT8 line, UINT8 state)
 //{
 //  if(line==SCSI_LINE_REQ)
 //      scsi_out_line_req(state);
 //  else
 //      scsi_out_line_change_now(line,state);
-//}
-//
-//void scsibus_device::scsi_out_line_change_now(UINT8 line, UINT8 state)
-//{
-//  if( linestate[ line ] != state )
-//  {
-//      linestate[ line ] = state;
-//
-//      LOG(3,"scsi_out_line_change(%s,%d)\n",linenames[line],state);
-//  }
 //}
 //
 //void scsibus_device::scsi_out_line_req(UINT8 state)
@@ -340,10 +290,6 @@ void scsihle_device::device_timer(emu_timer &timer, device_timer_id tid, int par
 	{
 //  case 0:
 //      scsi_out_line_change_now(SCSI_LINE_REQ, param);
-//      break;
-//
-//  case 1:
-//      set_scsi_line_now(SCSI_LINE_ACK, param);
 //      break;
 
 	case 2:

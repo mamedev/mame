@@ -53,7 +53,6 @@ private:
 	void dump_bytes(UINT8 *buff, int count);
 
 	//emu_timer *req_timer;
-	//emu_timer *ack_timer;
 	emu_timer *sel_timer;
 	emu_timer *dataout_timer;
 
