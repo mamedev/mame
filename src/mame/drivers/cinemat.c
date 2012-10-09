@@ -37,6 +37,7 @@
 #include "rendlay.h"
 
 #include "armora.lh"
+#include "demon.lh"
 #include "starcas.lh"
 #include "solarq.lh"
 
@@ -1510,5 +1511,5 @@ GAMEL(1981, solarq,   0,       solarq,   solarq, driver_device,   0,        ORIE
 GAME( 1981, boxingb,  0,       boxingb,  boxingb, cinemat_state,  boxingb,  ORIENTATION_FLIP_Y,   "Cinematronics", "Boxing Bugs", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, wotw,     0,       wotw,     wotw, driver_device,     0,        ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, wotwc,    wotw,    wotwc,    wotw, driver_device,     0,        ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds (color)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, demon,    0,       demon,    demon, driver_device,    0,        ORIENTATION_FLIP_Y,   "Rock-Ola", "Demon", GAME_SUPPORTS_SAVE )
+GAMEL(1982, demon,    0,       demon,    demon, driver_device,    0,        ORIENTATION_FLIP_Y,   "Rock-Ola", "Demon", GAME_SUPPORTS_SAVE, layout_demon )
 GAME( 1982, qb3,      0,       qb3,      qb3, cinemat_state,      qb3,      ORIENTATION_FLIP_Y,   "Rock-Ola", "QB-3 (prototype)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

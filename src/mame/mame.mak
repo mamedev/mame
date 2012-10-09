@@ -2026,6 +2026,7 @@ $(DRIVERS)/changela.o:	$(LAYOUT)/changela.lh
 $(DRIVERS)/chqflag.o:	$(LAYOUT)/chqflag.lh
 
 $(DRIVERS)/cinemat.o:	$(LAYOUT)/armora.lh \
+			$(LAYOUT)/demon.lh \
 			$(LAYOUT)/solarq.lh \
 			$(LAYOUT)/starcas.lh
 
