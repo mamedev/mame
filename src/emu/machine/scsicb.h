@@ -69,6 +69,11 @@ protected:
 	virtual void device_start();
 
 private:
+	UINT8 get_scsi_line(UINT32 mask);
+	void set_scsi_line(UINT32 mask, UINT8 state);
+	void trigger_callback(UINT32 update_mask, UINT32 line_mask, devcb_resolved_write_line &write_line);
+	const char *get_line_name(UINT32 mask);
+
 	devcb_resolved_write_line out_bsy_func;
 	devcb_resolved_write_line out_sel_func;
 	devcb_resolved_write_line out_cd_func;
@@ -78,9 +83,6 @@ private:
 	devcb_resolved_write_line out_ack_func;
 	devcb_resolved_write_line out_atn_func;
 	devcb_resolved_write_line out_rst_func;
-
-	UINT8 get_scsi_line(UINT32 mask);
-	void set_scsi_line(UINT32 mask, UINT8 state);
 
 	UINT32 linestate;
 };
