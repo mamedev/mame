@@ -1608,6 +1608,8 @@ DEVICE_IMAGE_LOAD(gb_cart)
 
 	/* Claim memory */
 	state->m_gb_cart = auto_alloc_array(image.device().machine(), UINT8, filesize);
+	state->m_MBCType = MBC_UNKNOWN;
+	state->m_CartType = 0;
 
 	if (image.software_entry() == NULL)
 	{
@@ -1622,7 +1624,57 @@ DEVICE_IMAGE_LOAD(gb_cart)
 		}
 	}
 	else
+	{
 		memcpy(state->m_gb_cart, image.get_software_region("rom") + load_start, filesize);
+
+		const char *mapper = software_part_get_feature((software_part*)image.part_entry(), "mapper");
+		const char *rumble = software_part_get_feature((software_part*)image.part_entry(), "rumble");
+		const char *battery_backed = software_part_get_feature((software_part*)image.part_entry(), "battery_backed");
+
+		if ( mapper != NULL )
+		{
+			static const struct { const char *mapper_name; int mapper_type; } mapper_types[] =
+			{
+				{ "MBC1",     MBC_MBC1 },
+				{ "MBC2",     MBC_MBC2 },
+				{ "MMM01",    MBC_MMM01 },
+				{ "MBC3",     MBC_MBC3 },
+				{ "MBC4",     MBC_MBC4 },
+				{ "MBC5",     MBC_MBC5 },
+				{ "TAMA5",    MBC_TAMA5 },
+				{ "HuC1",     MBC_HUC1 },
+				{ "HuC3",     MBC_HUC3 },
+				{ "MBC6",     MBC_MBC6 },
+				{ "MBC7",     MBC_MBC7 },
+				{ "WISDOM",   MBC_WISDOM },
+				{ "MBC1_KOR", MBC_MBC1_KOR },
+			};
+
+			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && state->m_MBCType == MBC_UNKNOWN; i++)
+			{
+				if (!mame_stricmp(mapper, mapper_types[i].mapper_name))
+				{
+					state->m_MBCType = mapper_types[i].mapper_type;
+				}
+			}
+		}
+
+		if ( rumble != NULL )
+		{
+			if ( !mame_stricmp(rumble, "yes"))
+			{
+				state->m_CartType |= RUMBLE;
+			}
+		}
+
+		if ( battery_backed != NULL )
+		{
+			if ( !mame_stricmp(battery_backed, "yes"))
+			{
+				state->m_CartType |= BATTERY;
+			}
+		}
+	}
 
 	gb_header = state->m_gb_cart;
 	state->m_ROMBank00 = 0;
