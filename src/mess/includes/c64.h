@@ -88,12 +88,9 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	INTERRUPT_GEN_MEMBER( frame_interrupt );
 	DECLARE_READ8_MEMBER( vic_videoram_r );
 	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
-	DECLARE_READ8_MEMBER( vic_lightpen_x_cb );
-	DECLARE_READ8_MEMBER( vic_lightpen_y_cb );
-	DECLARE_READ8_MEMBER( vic_lightpen_button_cb );
-	DECLARE_READ8_MEMBER( vic_rdy_cb );
 
 	DECLARE_READ8_MEMBER( sid_potx_r );
 	DECLARE_READ8_MEMBER( sid_poty_r );
@@ -141,8 +138,6 @@ public:
 	int m_exp_nmi;
 	int m_cass_rd;
 	int m_iec_srq;
-	DECLARE_DRIVER_INIT(c64pal);
-	INTERRUPT_GEN_MEMBER(c64_frame_interrupt);
 };
 
 
@@ -182,8 +177,6 @@ public:
 	DECLARE_WRITE8_MEMBER( cpu_w );
 };
 
-
-int c64_paddle_read (device_t *device, address_space &space, int which);
 
 
 #endif

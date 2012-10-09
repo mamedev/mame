@@ -49,7 +49,7 @@ void c64_state::check_interrupts()
 {
 	int restore = BIT(ioport("SPECIAL")->read(), 7);
 
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_cia1_irq || m_vic_irq || m_exp_irq);
+	m_maincpu->set_input_line(M6510_IRQ_LINE, m_cia1_irq || m_vic_irq || m_exp_irq);
 	m_maincpu->set_input_line(INPUT_LINE_NMI, m_cia2_irq || restore || m_exp_nmi);
 
 	m_cia1->flag_w(m_cass_rd && m_iec_srq);
@@ -58,7 +58,7 @@ void c64_state::check_interrupts()
 
 
 //**************************************************************************
-//  MEMORY MANAGEMENT UNIT
+//  ADDRESS DECODING
 //**************************************************************************
 
 //-------------------------------------------------
@@ -368,9 +368,8 @@ INPUT_PORTS_END
 //  vic2_interface vic_intf
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER(c64_state::c64_frame_interrupt)
+INTERRUPT_GEN_MEMBER( c64_state::frame_interrupt )
 {
-
 	check_interrupts();
 	cbm_common_interrupt(&device);
 }
@@ -382,36 +381,16 @@ WRITE_LINE_MEMBER( c64_state::vic_irq_w )
 	check_interrupts();
 }
 
-READ8_MEMBER( c64_state::vic_lightpen_x_cb )
-{
-	return ioport("LIGHTX")->read() & ~0x01;
-}
-
-READ8_MEMBER( c64_state::vic_lightpen_y_cb )
-{
-	return ioport("LIGHTY")->read() & ~0x01;
-}
-
-READ8_MEMBER( c64_state::vic_lightpen_button_cb )
-{
-	return ioport("OTHER")->read() & 0x04;
-}
-
-READ8_MEMBER( c64_state::vic_rdy_cb )
-{
-	return ioport("CYCLES")->read() & 0x07;
-}
-
 static MOS6567_INTERFACE( vic_intf )
 {
 	SCREEN_TAG,
 	M6510_TAG,
 	DEVCB_DRIVER_LINE_MEMBER(c64_state, vic_irq_w),
 	DEVCB_NULL, // RDY
-	DEVCB_DRIVER_MEMBER(c64_state, vic_lightpen_x_cb),
-	DEVCB_DRIVER_MEMBER(c64_state, vic_lightpen_y_cb),
-	DEVCB_DRIVER_MEMBER(c64_state, vic_lightpen_button_cb),
-	DEVCB_DRIVER_MEMBER(c64_state, vic_rdy_cb)
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -457,7 +436,7 @@ static MOS6581_INTERFACE( sid_intf )
 
 
 //-------------------------------------------------
-//  legacy_mos6526_interface cia1_intf
+//  MOS6526_INTERFACE( cia1_intf )
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( c64_state::cia1_irq_w )
@@ -545,7 +524,7 @@ static MOS6526_INTERFACE( cia1_intf )
 
 
 //-------------------------------------------------
-//  legacy_mos6526_interface cia2_intf
+//  MOS6526_INTERFACE( cia2_intf )
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( c64_state::cia2_irq_w )
@@ -965,6 +944,8 @@ void c64_state::machine_reset()
 {
 	m_maincpu->reset();
 
+	m_cia1->reset();
+	m_cia2->reset();
 	m_iec->reset();
 	m_exp->reset();
 	m_user->reset();
@@ -985,7 +966,7 @@ static MACHINE_CONFIG_START( ntsc, c64_state )
 	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6567_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
 	MCFG_CPU_CONFIG(cpu_intf)
-	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, c64_state,  c64_frame_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, c64_state, frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
@@ -1084,7 +1065,7 @@ static MACHINE_CONFIG_START( pal, c64_state )
 	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6569_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
 	MCFG_CPU_CONFIG(cpu_intf)
-	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, c64_state,  c64_frame_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, c64_state, frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
@@ -1161,7 +1142,7 @@ static MACHINE_CONFIG_START( pal_gs, c64gs_state )
 	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6569_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
 	MCFG_CPU_CONFIG(c64gs_cpu_intf)
-	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, c64_state,  c64_frame_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, c64_state, frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
