@@ -67,10 +67,22 @@ static UINT8 modified[MAX_FILE_SIZE];
 
 int main(int argc, char *argv[])
 {
-	int removed_tabs = 0, added_tabs = 0, removed_spaces = 0, fixed_mac_style = 0, fixed_nix_style = 0, added_newline = 0, removed_newlines = 0;
-	int src = 0, dst = 0, in_c_comment = FALSE, in_cpp_comment = FALSE, in_c_string = FALSE;
+	int removed_tabs = 0;
+	int added_tabs = 0;
+	int removed_spaces = 0;
+	int fixed_mac_style = 0;
+	int fixed_nix_style = 0;
+	int added_newline = 0;
+	int removed_newlines = 0;
+	int src = 0;
+	int dst = 0;
+	bool in_c_comment = false;
+	bool in_cpp_comment = false;
+	int indent_c_comment = 0;
+	int in_c_string = FALSE;
 	int hichars = 0;
-	int is_c_file, is_xml_file;
+	bool is_c_file;
+	bool is_xml_file;
 	const char *ext;
 	FILE *file;
 	int bytes;
@@ -134,13 +146,26 @@ int main(int argc, char *argv[])
 
 				/* track whether or not we are within a C-style comment */
 				if (!in_c_comment && ch == '/' && original[src] == '*')
-					in_c_comment = TRUE;
+				{
+					in_c_comment = true;
+					if (col > 0 && modified[dst-1] == 0x09)
+					{
+						indent_c_comment = col;
+					}
+					else
+					{
+						indent_c_comment = 0;
+					}
+				}
 				else if (in_c_comment && ch == '*' && original[src] == '/')
-					in_c_comment = FALSE;
+				{
+					in_c_comment = false;
+					indent_c_comment = 0;
+				}
 
 				/* track whether or not we are within a C++-style comment */
 				else if (!in_c_comment && ch == '/' && original[src] == '/')
-					in_cpp_comment = TRUE;
+					in_cpp_comment = true;
 				else
 					consume = FALSE;
 
@@ -183,7 +208,7 @@ int main(int argc, char *argv[])
 				fixed_mac_style = 1;
 
 			/* we are no longer in a C++-style comment */
-			in_cpp_comment = FALSE;
+			in_cpp_comment = false;
 
 			if (in_c_string)
 			{
@@ -197,22 +222,27 @@ int main(int argc, char *argv[])
 		{
 			int spaces = tab_size - (col % tab_size);
 
-			col += spaces;
-
-			/* if inside a comment or in the middle of a line, expand it */
-			if (in_c_comment || in_cpp_comment || (col - spaces > 0 && modified[dst-1] != 0x09))
+			/* convert tabs to spaces, if not used for indenting */
+			if ((in_c_comment && col >= indent_c_comment) || (col != 0 && modified[dst-1] != 0x09))
 			{
-				while (spaces--) modified[dst++] = ' ';
+				while (spaces > 0)
+				{
+					modified[dst++] = ' ';
+					col++;
+					spaces--;
+				}
+
 				removed_tabs++;
 			}
 			else
 			{
 				modified[dst++] = ch;
+				col += spaces;
 			}
 		}
 
-		/* convert spaces to tabs at beginning of lines */
-		else if (ch == 0x20 && !in_c_comment && !in_cpp_comment && (col == 0 || modified[dst-1] == 0x09))
+		/* if we hit a space... */
+		else if (ch == 0x20)
 		{
 			int spaces = 1;
 
@@ -230,12 +260,20 @@ int main(int argc, char *argv[])
 				spaces -= realign;
 			}
 
-			while (spaces > 0)
+			/* convert spaces to tabs, if used for indenting */
+			while (spaces > 0 && (!in_c_comment || col < indent_c_comment) && (col == 0 || modified[dst-1] == 0x09))
 			{
 				modified[dst++] = 0x09;
 				spaces -= tab_size;
 				col += tab_size;
 				added_tabs++;
+			}
+
+			while (spaces > 0)
+			{
+				modified[dst++] = ' ';
+				col++;
+				spaces--;
 			}
 		}
 
