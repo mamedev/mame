@@ -110,6 +110,7 @@
 #include "quadhsxs.lh"
 
 // generic color overlay layouts
+#include "ho1880ff.lh"
 #include "ho20ffff.lh"
 #include "ho2eff2e.lh"
 #include "ho4f893d.lh"

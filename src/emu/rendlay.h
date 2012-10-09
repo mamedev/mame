@@ -340,6 +340,7 @@ extern const char layout_triphsxs[];	// triple 4:3 screens side-by-side
 extern const char layout_quadhsxs[];	// quad 4:3 screens side-by-side
 
 // generic color overlay layouts
+extern const char layout_ho1880ff[];	// horizontal 4:3 with 18,80,FF color overlay
 extern const char layout_ho20ffff[];	// horizontal 4:3 with 20,FF,FF color overlay
 extern const char layout_ho2eff2e[];	// horizontal 4:3 with 2E,FF,2E color overlay
 extern const char layout_ho4f893d[];	// horizontal 4:3 with 4F,89,3D color overlay

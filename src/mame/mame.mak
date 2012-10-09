@@ -2209,8 +2209,6 @@ $(DRIVERS)/segasms.o:	$(LAYOUT)/sms1.lh
 
 $(DRIVERS)/segaybd.o:	$(LAYOUT)/pdrift.lh
 
-$(DRIVERS)/skydiver.o:	$(LAYOUT)/skydiver.lh
-
 $(DRIVERS)/snookr10.o:	$(LAYOUT)/snookr10.lh
 
 $(DRIVERS)/spectra.o:	$(LAYOUT)/spectra.lh

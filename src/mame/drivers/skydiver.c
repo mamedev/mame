@@ -87,11 +87,10 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "rendlay.h"
 #include "cpu/m6800/m6800.h"
 #include "includes/skydiver.h"
 #include "sound/discrete.h"
-
-#include "skydiver.lh"
 
 #define MASTER_CLOCK (XTAL_12_096MHz)
 
@@ -434,4 +433,4 @@ ROM_END
  *
  *************************************/
 
-GAMEL(1978, skydiver, 0, skydiver, skydiver, driver_device, 0, ROT0, "Atari", "Sky Diver", 0, layout_skydiver )
+GAMEL(1978, skydiver, 0, skydiver, skydiver, driver_device, 0, ROT0, "Atari", "Sky Diver", 0, layout_ho1880ff )

@@ -392,6 +392,7 @@ $(EMUOBJ)/rendlay.o:	$(EMULAYOUT)/dualhovu.lh \
 						$(EMULAYOUT)/triphsxs.lh \
 						$(EMULAYOUT)/quadhsxs.lh \
 						$(EMULAYOUT)/vertical.lh \
+						$(EMULAYOUT)/ho1880ff.lh \
 						$(EMULAYOUT)/ho20ffff.lh \
 						$(EMULAYOUT)/ho2eff2e.lh \
 						$(EMULAYOUT)/ho4f893d.lh \
