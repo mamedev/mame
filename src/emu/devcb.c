@@ -208,6 +208,12 @@ void devcb_resolved_read_line::resolve(const devcb_read_line &desc, device_t &de
 			m_object.constant = desc.index;
 			*static_cast<devcb_read_line_delegate *>(this) = devcb_read_line_delegate(&devcb_resolved_read_line::from_constant, "constant", this);
 			break;
+
+		case DEVCB_TYPE_UNMAP:
+			m_helper.null_indicator = &s_null;
+			m_object.device = &device;
+			*static_cast<devcb_read_line_delegate *>(this) = devcb_read_line_delegate(&devcb_resolved_read_line::from_unmap, "unmap", this);
+			break;
 	}
 }
 
@@ -244,6 +250,17 @@ int devcb_resolved_read_line::from_constant()
 	return (m_object.constant & 1) ? ASSERT_LINE : CLEAR_LINE;
 }
 
+//-------------------------------------------------
+//  from_constant - helper to convert from a
+//  unmap value to a line value
+//-------------------------------------------------
+
+int devcb_resolved_read_line::from_unmap()
+{
+	logerror("%s: unmapped devcb read\n",
+					m_object.device->tag());
+	return CLEAR_LINE;
+}
 
 
 //**************************************************************************
@@ -303,6 +320,12 @@ void devcb_resolved_write_line::resolve(const devcb_write_line &desc, device_t &
 			m_helper.input_line = desc.index;
 			*static_cast<devcb_write_line_delegate *>(this) = devcb_write_line_delegate(&devcb_resolved_write_line::to_input, desc.tag, this);
 			break;
+
+		case DEVCB_TYPE_UNMAP:
+			m_helper.null_indicator = &s_null;
+			m_object.device = &device;
+			*static_cast<devcb_write_line_delegate *>(this) = devcb_write_line_delegate(&devcb_resolved_write_line::to_unmap, "unmap", this);
+			break;
 	}
 }
 
@@ -315,6 +338,16 @@ void devcb_resolved_write_line::to_null(int state)
 {
 }
 
+//-------------------------------------------------
+//  to_unmap - helper to handle a unmap write
+//-------------------------------------------------
+
+void devcb_resolved_write_line::to_unmap(int state)
+{
+	logerror("%s: unmapped devcb write %s\n",
+					m_object.device->tag(),
+					core_i64_format(state, 2 * sizeof(UINT8),false));
+}
 
 //-------------------------------------------------
 //  to_port - helper to convert to an I/O port
@@ -410,6 +443,12 @@ void devcb_resolved_read8::resolve(const devcb_read8 &desc, device_t &device)
 			m_object.constant = desc.index;
 			*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(&devcb_resolved_read8::from_constant, "constant", this);
 			break;
+
+		case DEVCB_TYPE_UNMAP:
+			m_helper.null_indicator = &s_null;
+			m_object.device = &device;
+			*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(&devcb_resolved_read8::from_unmap, "unmap", this);
+			break;
 	}
 }
 
@@ -468,7 +507,17 @@ UINT8 devcb_resolved_read8::from_constant(offs_t offset, UINT8 mem_mask)
 	return m_object.constant;
 }
 
+//-------------------------------------------------
+//  from_constant - helper to convert from a
+//  unmap value to an 8-bit value
+//-------------------------------------------------
 
+UINT8 devcb_resolved_read8::from_unmap(offs_t offset, UINT8 mem_mask)
+{
+	logerror("%s: unmapped devcb read\n",
+					m_object.device->tag());
+	return 0;
+}
 
 //**************************************************************************
 //  DEVCB RESOLVED WRITE8
@@ -530,6 +579,12 @@ void devcb_resolved_write8::resolve(const devcb_write8 &desc, device_t &device)
 			m_helper.input_line = desc.index;
 			*static_cast<devcb_write8_delegate *>(this) = devcb_write8_delegate(&devcb_resolved_write8::to_input, desc.tag, this);
 			break;
+
+		case DEVCB_TYPE_UNMAP:
+			m_helper.null_indicator = &s_null;
+			m_object.device = &device;
+			*static_cast<devcb_write8_delegate *>(this) = devcb_write8_delegate(&devcb_resolved_write8::to_unmap, "unmap", this);
+			break;
 	}
 }
 
@@ -542,6 +597,17 @@ void devcb_resolved_write8::to_null(offs_t offset, UINT8 data, UINT8 mem_mask)
 {
 }
 
+//-------------------------------------------------
+//  to_unmap - helper to handle a unmap write
+//-------------------------------------------------
+
+void devcb_resolved_write8::to_unmap(offs_t offset, UINT8 data, UINT8 mem_mask)
+{
+	logerror("%s: unmapped devcb write %s & %s\n",
+				m_object.device->tag(),
+				core_i64_format(data, 2 * sizeof(UINT8),false),
+				core_i64_format(mem_mask, 2 * sizeof(UINT8),false));
+}
 
 //-------------------------------------------------
 //  to_port - helper to convert to an I/O port
@@ -658,6 +724,12 @@ void devcb_resolved_read16::resolve(const devcb_read16 &desc, device_t &device)
 			m_object.constant = desc.index;
 			*static_cast<devcb_read16_delegate *>(this) = devcb_read16_delegate(&devcb_resolved_read16::from_constant, "constant", this);
 			break;
+
+		case DEVCB_TYPE_UNMAP:
+			m_helper.null_indicator = &s_null;
+			m_object.device = &device;
+			*static_cast<devcb_read16_delegate *>(this) = devcb_read16_delegate(&devcb_resolved_read16::from_unmap, "unmap", this);
+			break;
 	}
 }
 
@@ -705,7 +777,17 @@ UINT16 devcb_resolved_read16::from_constant(offs_t offset, UINT16 mask)
 	return m_object.constant;
 }
 
+//-------------------------------------------------
+//  from_constant - helper to convert from a
+//  unmap value to a 16-bit value
+//-------------------------------------------------
 
+UINT16 devcb_resolved_read16::from_unmap(offs_t offset, UINT16 mem_mask)
+{
+	logerror("%s: unmapped devcb read\n",
+					m_object.device->tag());
+	return 0;
+}
 
 //**************************************************************************
 //  DEVCB RESOLVED WRITE16
@@ -766,6 +848,12 @@ void devcb_resolved_write16::resolve(const devcb_write16 &desc, device_t &device
 			m_helper.input_line = desc.index;
 			*static_cast<devcb_write16_delegate *>(this) = devcb_write16_delegate(&devcb_resolved_write16::to_input, desc.tag, this);
 			break;
+
+		case DEVCB_TYPE_UNMAP:
+			m_helper.null_indicator = &s_null;
+			m_object.device = &device;
+			*static_cast<devcb_write16_delegate *>(this) = devcb_write16_delegate(&devcb_resolved_write16::to_unmap, "unmap", this);
+			break;
 	}
 }
 
@@ -778,6 +866,18 @@ void devcb_resolved_write16::to_null(offs_t offset, UINT16 data, UINT16 mask)
 {
 }
 
+
+//-------------------------------------------------
+//  to_unmap - helper to handle a unmap write
+//-------------------------------------------------
+
+void devcb_resolved_write16::to_unmap(offs_t offset, UINT16 data, UINT16 mask)
+{
+	logerror("%s: unmapped devcb write %s & %s\n",
+				m_object.device->tag(),
+				core_i64_format(data, 2 * sizeof(UINT16),false),
+				core_i64_format(mask, 2 * sizeof(UINT16),false));
+}
 
 //-------------------------------------------------
 //  to_port - helper to convert to an I/O port

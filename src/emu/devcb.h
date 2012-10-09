@@ -90,7 +90,8 @@ enum
 	DEVCB_TYPE_DEVICE,				// device read/write
 	DEVCB_TYPE_LEGACY_SPACE,		// legacy address space read/write
 	DEVCB_TYPE_INPUT_LINE,			// device input line write
-	DEVCB_TYPE_CONSTANT				// constant value read
+	DEVCB_TYPE_CONSTANT,			// constant value read
+	DEVCB_TYPE_UNMAP				// unmapped line
 };
 
 
@@ -175,6 +176,8 @@ void devcb_stub16(device_t *device, address_space &space, offs_t offset, UINT16 
 #define DEVCB_CONSTANT(value)					{ DEVCB_TYPE_CONSTANT, value, NULL, NULL, NULL, NULL }
 #define DEVCB_LINE_GND							DEVCB_CONSTANT(0)
 #define DEVCB_LINE_VCC							DEVCB_CONSTANT(1)
+
+#define DEVCB_UNMAPPED							{ DEVCB_TYPE_UNMAP, 0, NULL, NULL, NULL, NULL }
 
 // read/write handlers for a given CPU's address space
 #define DEVCB_MEMORY_HANDLER(cpu,space,func)	{ DEVCB_TYPE_LEGACY_SPACE, AS_##space, (cpu), #func, NULL, NULL, func }
@@ -280,6 +283,7 @@ private:
 	int from_port();
 	int from_read8();
 	int from_constant();
+	int from_unmap();
 
 	// internal state
 	devcb_resolved_objects			m_object;
@@ -330,6 +334,7 @@ private:
 	void to_port(int state);
 	void to_write8(int state);
 	void to_input(int state);
+	void to_unmap(int state);
 
 	// internal state
 	devcb_resolved_objects			m_object;
@@ -384,6 +389,7 @@ private:
 	UINT8 from_read8device(offs_t offset, UINT8 mem_mask);
 	UINT8 from_readline(offs_t offset, UINT8 mem_mask);
 	UINT8 from_constant(offs_t offset, UINT8 mem_mask);
+	UINT8 from_unmap(offs_t offset, UINT8 mem_mask);
 
 	// internal state
 	devcb_resolved_objects			m_object;
@@ -439,6 +445,7 @@ private:
 	void to_write8device(offs_t offset, UINT8 data, UINT8 mem_mask);
 	void to_writeline(offs_t offset, UINT8 data, UINT8 mem_mask);
 	void to_input(offs_t offset, UINT8 data, UINT8 mem_mask);
+	void to_unmap(offs_t offset, UINT8 data, UINT8 mem_mask);
 
 	// internal state
 	devcb_resolved_objects			m_object;
@@ -492,6 +499,7 @@ private:
 	UINT16 from_read16(offs_t offset, UINT16 mask);
 	UINT16 from_readline(offs_t offset, UINT16 mask);
 	UINT16 from_constant(offs_t offset, UINT16 mask);
+	UINT16 from_unmap(offs_t offset, UINT16 mask);
 
 	// internal state
 	devcb_resolved_objects			m_object;
@@ -546,6 +554,7 @@ private:
 	void to_write16(offs_t offset, UINT16 data, UINT16 mask);
 	void to_writeline(offs_t offset, UINT16 data, UINT16 mask);
 	void to_input(offs_t offset, UINT16 data, UINT16 mask);
+	void to_unmap(offs_t offset, UINT16 data, UINT16 mask);
 
 	// internal state
 	devcb_resolved_objects			m_object;
