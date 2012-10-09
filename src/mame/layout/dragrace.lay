@@ -33,6 +33,9 @@
 	</element>
 
 
+<!-- NOTE: still need to add the RPM tachometers, -->
+<!-- but first figure out how they're hooked up -->
+
 	<view name="Color Overlay">
 		<screen index="0">
 			<bounds left="0" top="0" right="400" bottom="300" />

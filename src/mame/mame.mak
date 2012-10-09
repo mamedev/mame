@@ -2141,7 +2141,8 @@ $(DRIVERS)/mw8080bw.o:	$(LAYOUT)/280zzzap.lh \
 			$(LAYOUT)/invaders.lh \
 			$(LAYOUT)/invad2ct.lh \
 			$(LAYOUT)/lagunar.lh \
-			$(LAYOUT)/spacwalk.lh
+			$(LAYOUT)/spacwalk.lh \
+			$(LAYOUT)/spcenctr.lh
 
 $(DRIVERS)/meadows.o:	$(LAYOUT)/deadeye.lh \
 			$(LAYOUT)/gypsyjug.lh \
