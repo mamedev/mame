@@ -35,11 +35,11 @@ class _3x3puzzle_state : public driver_device
 public:
 	_3x3puzzle_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_oki(*this, "oki"),
 		  m_videoram1(*this, "videoram1"),
 		  m_videoram2(*this, "videoram2"),
-		  m_videoram3(*this, "videoram3")
+		  m_videoram3(*this, "videoram3"),
+		  m_maincpu(*this, "maincpu"),
+		  m_oki(*this, "oki")
 	{ }
 
 	/* memory pointers */
