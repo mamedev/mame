@@ -1868,7 +1868,7 @@ retofinv2		// bootleg
 fightrol		// (c) 1983 Taito
 rollace			// (c) 1983 Williams
 rollace2		// (c) 1983 Williams
-lgp			// (c) 1983 Taito
+lgp				// (c) 1983 Taito
 vsgongf			// (c) 1984 Kaneko
 ringfgt			// (c) 1984 Taito
 ringfgt2		// (c) 1984 Taito
@@ -2017,8 +2017,8 @@ cadashg			// C21 (c) 1989 Taito Corporation Japan
 parentj			// C42 (c) 199? Taito
 galmedes		// (c) 1992 Visco (Japan)
 earthjkr		// (c) 1993 Visco (Japan)
-eto			// (c) 1994 Visco (Japan)
-wgp			// C32 (c) 1989 Taito America Corporation (US)
+eto				// (c) 1994 Visco (Japan)
+wgp				// C32 (c) 1989 Taito America Corporation (US)
 wgpj			// C32 (c) 1989 Taito Corporation (Japan)
 wgpjoy			// C32 (c) 1989 Taito Corporation (Japan)
 wgpjoya			// C32 (c) 1989 Taito Corporation (Japan)
@@ -2029,6 +2029,7 @@ opwolf3			// D74 (c) 1994 Taito
 opwolf3u		// D74 (c) 1994 Taito
 scessjoe		// ??? (c) 1990 Wave / Taito
 ashnojoe		// ??? (c) 1990 Wave / Taito
+2mindril		// (c) 1993 Taito
 
 // Taito multi-screen games
 ninjaw			// B31 (c) 1987 Taito Corporation Japan (World)
@@ -5616,7 +5617,7 @@ skullfngj		// MCH (c) 1996 Data East Corporation (Japan)
 stadhr96		// MCM (c) 1996 Data East
 stadhr96j		// MCM (c) 1996 Data East
 
-// SemiCom games on "tumblpop"-like hardware
+// SemiCom games on Tumble Pop based hardware
 metlsavr		// (c) 1994 First Amusements
 magicbal		// (c) 1994 SemiCom
 wlstar			// (c) 1995 Mijin
@@ -5694,13 +5695,13 @@ deroon			// (c) 1996 Tecmo
 tkdensho		// (c) 1996 Tecmo
 tkdenshoa		// (c) 1996 Tecmo
 
-// Konami bitmap games
-tutankhm		// GX350 (c) 1982 Konami
-tutankhms		// GX350 (c) 1982 Stern
+// Konami games
+kamikaze		// (c) 1979 Leijac Corporation
+astinvad		// (c) 1980 Stern
+kosmokil		// bootleg
+spcking2		// (c) 1979 Konami
 junofrst		// GX310 (c) 1983 Konami
 junofrstg		// GX310 (c) 1983 Konami + Gottlieb license
-
-// Konami games
 pooyan			// GX320 (c) 1982
 pooyans			// GX320 (c) 1982 Stern
 pootan			// bootleg
@@ -5721,6 +5722,8 @@ gyruss			// GX347 (c) 1983
 gyrussce		// GX347 (c) 1983 + Centuri license
 gyrussb			// bootleg or actual Taito NZ license?
 venus			// bootleg
+tutankhm		// GX350 (c) 1982 Konami
+tutankhms		// GX350 (c) 1982 Stern
 trackfld		// GX361 (c) 1983
 trackfldc		// GX361 (c) 1983 + Centuri license
 trackfldnz		// (c) 1982 Goldberg Enterprizes Inc.
@@ -5843,7 +5846,7 @@ crazycop		// GX878 (c) 1988 (Japan)
 crimfght		// GX821 (c) 1989 (US)
 crimfght2		// GX821 (c) 1989 (World)
 crimfghtj		// GX821 (c) 1989 (Japan)
-spy			// GX857 (c) 1989 (World)
+spy				// GX857 (c) 1989 (World)
 spyu			// GX857 (c) 1989 (US)
 bottom9			// GX891 (c) 1989
 bottom9n		// GX891 (c) 1989
@@ -5915,7 +5918,7 @@ hcrashc			// GX790 (c) 1987
 bubsys
 
 // GX400 BIOS based games
-rf2			// GX561 (c) 1985
+rf2				// GX561 (c) 1985
 twinbee			// GX412 (c) 1985
 gradius			// GX456 (c) 1985
 gwarrior		// GX578 (c) 1985
@@ -5938,7 +5941,7 @@ miaj			// GX808 (c) 1989 (Japan)
 
 // (some) Konami 68000 games
 cuebrick		// GX903 (c) 1989
-mia			// GX808 (c) 1989
+mia				// GX808 (c) 1989
 mia2			// GX808 (c) 1989
 tmnt			// GX963 (c) 1989 (World)
 tmntu			// GX963 (c) 1989 (US)
@@ -6040,7 +6043,7 @@ runguna			// GX247 (c) 1993 (World)
 rungunu			// GX247 (c) 1993 (US)
 rungunua		// GX247 (c) 1993 (US)
 slmdunkj		// GX247 (c) 1993 (Japan)
-dbz			// (c) 1993 Banpresto
+dbz				// (c) 1993 Banpresto
 dbza			// (c) 1993 Banpresto
 dbz2			// (c) 1994 Banpresto
 bishi			// GX575 (c) 1996 (Japan)
@@ -7220,6 +7223,7 @@ meijinsn		// (c) 1986 SNK
 // Technos games
 scregg			// TA-0001 (c) 1983
 eggs			// TA-0002 (c) 1983 Universal USA
+rockduck		// bootleg? 1983 Datel SAS
 dommy			// TA-00?? (c) 1983 (Arcade TV Game List - P.90, Left, 13 from top)
 bigprowr		// TA-0007 (c) 1983
 tagteam			// TA-0007 (c) 1983 + Data East license
@@ -7952,7 +7956,7 @@ rockn4			// (c) 2000 Jaleco
 // Jaleco Mega System 1 games
 lomakai			// (c) 1988 (World)
 makaiden		// (c) 1988 (Japan)
-p47			// (c) 1988
+p47				// (c) 1988
 p47j			// (c) 1988 (Japan)
 kickoff			// (c) 1988 (Japan)
 tshingen		// (c) 1988 (Japan)
@@ -7972,7 +7976,7 @@ rodlandjb		// bootleg
 avspirit		// (c) 1991
 phantasm		// (c) 1991 (Japan)
 monkelf			// bootleg
-edf			// (c) 1991
+edf				// (c) 1991
 edfu			// (c) 1991
 edfbl			// (c) 1991
 64street		// (c) 1991
@@ -8007,7 +8011,7 @@ tp2m32			// (c) 1997
 bnstars			// (c) 1997
 wpksocv2		// (c) 1997
 f1superb		// (c) 1994
-bnstars1		// (c) 1994
+bnstars1		// (c) 1997
 
 // Video System Co. games
 rabiolep		// (c) 1987 V-System Co. (Japan)
@@ -8531,6 +8535,7 @@ blocken			// (c) 1994 KID / Visco
 goindol			// (c) 1987 Sun a Electronics
 goindolu		// (c) 1987 Sun a Electronics
 goindolk		// (c) 1987 Sun a Electronics
+homo			// bootleg
 rranger			// (c) 1988 SunA + Sharp Image license
 sranger			// (c) 1988
 srangerb		// bootleg
@@ -8548,6 +8553,7 @@ bestbest		// (c) 1994 SunA
 sunaq			// (c) 1994 SunA
 bssoccer		// (c) 1996 SunA
 uballoon		// (c) 1996 SunA
+go2000			// (c) 2000 SA
 
 // Dooyong games
 gundealr		// (c) 1990 Dooyong
@@ -9363,10 +9369,6 @@ funlddlx		// (c) 1999
 
 // Other Games
 vega			// (c) 19?? Olympia?
-astinvad		// (c) 1980 Stern
-kosmokil		// bootleg
-kamikaze		// Leijac Corporation
-spcking2		// (c) 1979 Konami
 spaceint		// [1980] Shoei
 spaceintj		// [1980] Shoei
 spacefb			// (c) [1980?] Nintendo
@@ -9392,7 +9394,6 @@ ringking		// (c) 1985 Data East USA
 ringking2		// (c) 1985 Data East USA
 ringking3		// (c) 1985 Data East USA
 ringkingw		// (c) 1985 Wood Place Inc.
-homo			// bootleg
 dlair			// (c) 1983 Cinematronics
 dlairf			// (c) 1983 Cinematronics
 dlaire			// (c) 1983 Cinematronics
@@ -9941,7 +9942,6 @@ mrkicker		// (c) 2001 Semicom
 wyvernwg		// (c) 2001 Semicom / Game Vision
 wyvernwga		// (c) 2001 Semicom / Game Vision
 rbmk			// (c) 1995 GMS
-go2000			// (c) 2000 SA
 mirax			// (c) 1985 Current Technologies
 miraxa			// (c) 1985 Current Technologies
 
@@ -10150,7 +10150,6 @@ altair			// (c) 1981 Cidelsa
 destryer		// (c) 1981 Cidelsa
 destryera		// (c) 1981 Cidelsa
 draco			// (c) 1981 Cidelsa
-rockduck		// (c) 1983 Datel SAS
 tetriskr		// (c) 1988? bootleg
 trvhang			// (c) 1984 SMS MFG CORP
 trvhanga		// (c) 1984 SMS MFG CORP
@@ -10166,7 +10165,6 @@ cowrace			// (c) 20?? hack
 kingdrbb		// (c) 199? hack
 discoboy		// (c) 1993 Soft Art Co.
 pangofun		// (c) 1995 InfoCube
-2mindril		// (c) 1993 Taito
 koikoi			// (c) 1983 Kiwako
 good			// (c) 1998
 filetto			// (c) 1990 Novamatic
