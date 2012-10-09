@@ -12,7 +12,7 @@
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "machine/wd17xx.h"
+#include "machine/wd1772.h"
 #include "machine/pic8259.h"
 #include "machine/i8251.h"
 #include "includes/b2m.h"
@@ -206,22 +206,22 @@ WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
 {
 	UINT8 drive = ((data >> 1) & 1) ^ 1;
 	UINT8 side  = (data  & 1) ^ 1;
-	floppy_mon_w(floppy_get_device(machine(), 0), 1);
-	floppy_mon_w(floppy_get_device(machine(), 1), 1);
+	
+	static const char *names[] = { "fd0", "fd1"};
+	floppy_image_device *floppy = NULL;
+	floppy_connector *con = machine().device<floppy_connector>(names[drive]);
+	if(con)
+		floppy = con->get_device();
 
+	floppy->mon_w(0);
+	m_fdc->set_floppy(floppy);
 	if (m_b2m_drive!=drive) {
-		wd17xx_set_drive(m_fdc,drive);
-		floppy_mon_w(floppy_get_device(machine(), 0), 0);
-		floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1, 1);
 		m_b2m_drive = drive;
 	}
-	if (m_b2m_side!=side) {
-		wd17xx_set_side(m_fdc,side);
-		floppy_mon_w(floppy_get_device(machine(), 1), 0);
-		floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 1, 1);
+	floppy->ss_w(side);
+	if (m_b2m_side!=side) {	
 		m_b2m_side = side;
 	}
-	wd17xx_dden_w(m_fdc, 0);
 }
 
 I8255A_INTERFACE( b2m_ppi8255_interface_2 )
@@ -312,10 +312,8 @@ static void b2m_postload(b2m_state *state)
 void b2m_state::machine_start()
 {
 	m_pic = machine().device("pic8259");
-	m_fdc = machine().device("wd1793");
+	m_fdc = machine().device<wd1773_t>("wd1793");
 	m_speaker = machine().device(SPEAKER_TAG);
-
-	wd17xx_set_pause_time(m_fdc,10);
 
 	/* register for state saving */
 	save_item(NAME(m_b2m_8255_porta));

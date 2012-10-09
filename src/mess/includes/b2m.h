@@ -10,6 +10,7 @@
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
+#include "machine/wd1772.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
 
@@ -35,7 +36,7 @@ public:
 	UINT8 m_vblank_state;
 
 	/* devices */
-	device_t *m_fdc;
+	wd1773_t *m_fdc;
 	device_t *m_pic;
 	device_t *m_speaker;
 	DECLARE_READ8_MEMBER(b2m_keyboard_r);

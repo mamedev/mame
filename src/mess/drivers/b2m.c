@@ -14,9 +14,10 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/i8251.h"
-#include "machine/wd17xx.h"
+#include "formats/hxcmfm_dsk.h"
+#include "formats/mfi_dsk.h"
 #include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "machine/wd1772.h"
 #include "machine/ram.h"
 #include "includes/b2m.h"
 
@@ -39,11 +40,8 @@ static ADDRESS_MAP_START( b2m_io, AS_IO, 8, b2m_state )
 	AM_RANGE(0x10, 0x13) AM_READWRITE(b2m_palette_r,b2m_palette_w)
 	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w )
 	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x19, 0x19)  AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_status_r,wd17xx_command_w)
-	AM_RANGE(0x1d, 0x1d) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_track_r,wd17xx_track_w)
-	AM_RANGE(0x1e, 0x1e) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_sector_r,wd17xx_sector_w)
-	AM_RANGE(0x1f, 0x1f) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_data_r,wd17xx_data_w)
+	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
+	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("wd1793", wd1773_t, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( b2m_rom_io, AS_IO, 8, b2m_state )
@@ -175,7 +173,7 @@ static INPUT_PORTS_START( b2m )
 	PORT_CONFSETTING(	0x01, "Color")
 	PORT_CONFSETTING(	0x00, "B/W")
 INPUT_PORTS_END
-
+/*
 static LEGACY_FLOPPY_OPTIONS_START(b2m)
 	LEGACY_FLOPPY_OPTION(b2m, "cpm", "Bashkiria-2M disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
@@ -184,19 +182,17 @@ static LEGACY_FLOPPY_OPTIONS_START(b2m)
 		SECTOR_LENGTH([1024])
 		FIRST_SECTOR_ID([1]))
 LEGACY_FLOPPY_OPTIONS_END
+*/
 
-static const floppy_interface b2m_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(b2m),
-	NULL,
+static const floppy_format_type floppy_formats[] = {
+	FLOPPY_MFM_FORMAT, FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( b2m_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
+
 
 /* Machine driver */
 static MACHINE_CONFIG_START( b2m, b2m_state )
@@ -236,9 +232,10 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 	/* uart */
 	MCFG_I8251_ADD("uart", default_i8251_interface)
 
-	MCFG_FD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
+	MCFG_WD1773x_ADD("wd1793", XTAL_8MHz )
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(b2m_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", b2m_floppies, "525dd", 0, floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", b2m_floppies, "525dd", 0, floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

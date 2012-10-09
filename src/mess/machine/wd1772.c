@@ -255,6 +255,8 @@ void wd177x_t::seek_continue()
 			break;
 
 		case SEEK_DONE:
+			if (!has_motor()) status |= S_HLD;
+
 			if(command & 0x04) {
 				sub_state = SCAN_ID;
 				counter = 0;

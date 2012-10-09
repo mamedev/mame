@@ -209,9 +209,11 @@ private:
 		S_CRC  = 0x08,
 		S_RNF  = 0x10,
 		S_SPIN = 0x20,
+		S_HLD  = 0x20,
 		S_DDM  = 0x20,
 		S_WP   = 0x40,
-		S_MON  = 0x80
+		S_MON  = 0x80,
+		S_NRDY = 0x80
 	};
 
 	floppy_image_device *floppy;
