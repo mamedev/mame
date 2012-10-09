@@ -91,6 +91,8 @@
 #include "includes/skydiver.h"
 #include "sound/discrete.h"
 
+#include "skydiver.lh"
+
 #define MASTER_CLOCK (XTAL_12_096MHz)
 
 
@@ -432,4 +434,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1978, skydiver, 0, skydiver, skydiver, driver_device, 0, ROT0, "Atari", "Sky Diver", 0 )
+GAMEL(1978, skydiver, 0, skydiver, skydiver, driver_device, 0, ROT0, "Atari", "Sky Diver", 0, layout_skydiver )
