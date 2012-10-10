@@ -214,9 +214,9 @@ struct adaptec_sense_t
         3   2 + line changes
 */
 
-#define LOGLEVEL            2
+#define LOGLEVEL            0
 
-#define LOG(level,...)      if(LOGLEVEL>=level) printf(__VA_ARGS__)
+#define LOG(level,...)      if(LOGLEVEL>=level) logerror(__VA_ARGS__)
 
 void scsihle_device::scsi_out_req_delay(UINT8 state)
 {
