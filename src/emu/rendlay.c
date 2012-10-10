@@ -739,7 +739,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 	else if (strcmp(compnode.name, "rect") == 0)
 	{
 		m_type = CTYPE_RECT;
-		m_foldrect = xml_get_attribute_int_with_subst(machine, compnode, "fold", 0);
+		m_foldrect = (strcmp("yes", xml_get_attribute_string_with_subst(machine, compnode, "fold", "no")) == 0);
 	}
 
 	// disk nodes
