@@ -288,7 +288,7 @@ extern const wd17xx_interface nimbus_wd17xx_interface;
 #define FDC_MOTOR_MASKI 0x04
 #define HDC_MSG_MASK    0x08
 #define HDC_BSY_MASK    0x10
-#define HDC_IO_MASK     0X20
+#define HDC_IO_MASK     0x20
 #define HDC_CD_MASK     0x40
 #define HDC_REQ_MASK    0x80
 

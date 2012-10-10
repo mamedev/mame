@@ -28,7 +28,7 @@
 const unsigned char nimbus_palette[SCREEN_NO_COLOURS][3] =
 {
 	/*normal brightness */
-	{ 0x00,0x00,0x00 },     /* black */
+	{ 0x00,0x00,0x00 },      /* black */
 	{ 0x00,0x00,0x80 },      /* blue */
 	{ 0x80,0x00,0x00 },      /* red */
 	{ 0x80,0x00,0x80 },      /* magenta */
@@ -55,7 +55,7 @@ static const floppy_interface nimbus_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSSD_35,
+	FLOPPY_STANDARD_3_5_DSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(pc),
 	NULL,
 	NULL
@@ -308,8 +308,6 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_CPU_PROGRAM_MAP(nimbus_iocpu_mem)
 	MCFG_CPU_IO_MAP(nimbus_iocpu_io)
 
-
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -324,17 +322,15 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_SCREEN_SIZE(650, 260)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 
-
-
 	/* Backing storage */
 	MCFG_WD2793_ADD(FDC_TAG, nimbus_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(nimbus_floppy_interface)
 
 	MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
-	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", ACB4070, SCSI_ID_0)
-	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk1", S1410, SCSI_ID_1)
-	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk2", SCSIHD, SCSI_ID_2)
-	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk3", SCSIHD, SCSI_ID_3)
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk1", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk2", ACB4070, SCSI_ID_2)
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk3", S1410, SCSI_ID_3)
 	MCFG_SCSICB_ADD(SCSIBUS_TAG ":host", scsibus_config)
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -358,8 +354,6 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_SOUND_ADD(MSM5205_TAG, MSM5205, 384000)
 	MCFG_SOUND_CONFIG(msm5205_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, MONO_TAG, 0.75)
-
-
 MACHINE_CONFIG_END
 
 
@@ -381,7 +375,6 @@ ROM_START( nimbus )
 	ROM_REGION( 0x4000, IOCPU_TAG, 0 )
 	ROM_LOAD("hexec-v1.02u-13488-1985-10-29.rom", 0x0000, 0x1000, CRC(75c6adfd) SHA1(0f11e0b7386c6368d20e1fc7a6196d670f924825))
 ROM_END
-
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT  COMPANY  FULLNAME   FLAGS */
 COMP( 1986, nimbus,     0,      0,      nimbus, nimbus, driver_device, 0,   "Research Machines", "Nimbus", 0)

@@ -41,11 +41,16 @@ After formating, the drives need to have a partition table put on them with
 STAMP.EXE and then formatted in the normal way for a dos system drive with
 Format /s.
 
-The tracks, heads and sectors/track can be used with chdman -createblank
+The tracks, heads and sectors/track can be used with chdman createhd
 to create a blank hard disk which can then be formatted with the RM tools.
 The important thing when doing this is to make sure that if using the Native
 SCSI tools, that the disk has the  same number of blocks as specified above,
 even if you have to use unusual geometry to do so !
+
+for example:
+
+chdman createhd -o ST125N.chd -chs 407,4,26 -ss 512
+
 */
 
 
@@ -2498,8 +2503,9 @@ void rmnimbus_state::nimbus_scsi_linechange( UINT8 mask, UINT8 state )
 	else
 		set_disk_int(machine(),0);
 
-	if( mask == HDC_REQ_MASK )
+	switch( mask )
 	{
+	case HDC_REQ_MASK:
 		if (state==0)
 		{
 			if(((m_nimbus_drives.reg410_in & HDC_CD_MASK)==HDC_CD_MASK) && (last!=0))
@@ -2512,6 +2518,15 @@ void rmnimbus_state::nimbus_scsi_linechange( UINT8 mask, UINT8 state )
 		{
 			m_scsibus->scsi_ack_w(1);
 		}
+		break;
+
+	case HDC_IO_MASK:
+		if (state==0)
+		{
+			printf( "switch to input mode\n" );
+			m_scsibus->scsi_data_w(0xff);
+		}
+		break;
 	}
 }
 
