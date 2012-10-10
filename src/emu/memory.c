@@ -1783,7 +1783,7 @@ void address_space::prepare_map()
 	m_map = global_alloc(address_map(m_device, m_spacenum));
 
 	// merge in the submaps
-	m_map->uplift_submaps(machine(), m_device, endianness());
+	m_map->uplift_submaps(machine(), m_device, machine().root_device(), endianness());
 
 	// extract global parameters specified by the map
 	m_unmap = (m_map->m_unmapval == 0) ? 0 : ~0;
@@ -2251,7 +2251,7 @@ void address_space::unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrm
 void address_space::install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_delegate &delegate, int bits, UINT64 unitmask)
 {
 	address_map map(*this, addrstart, addrend, bits, unitmask, device, delegate);
-	map.uplift_submaps(machine(), m_device, endianness());
+	map.uplift_submaps(machine(), m_device, device, endianness());
 	populate_from_map(&map);
 }
 

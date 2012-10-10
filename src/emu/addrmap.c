@@ -716,7 +716,7 @@ address_map_entry64 *address_map::add(offs_t start, offs_t end, address_map_entr
 //  uplift_submaps - propagate in the device submaps
 //-------------------------------------------------
 
-void address_map::uplift_submaps(running_machine &machine, device_t &device, endianness_t endian)
+void address_map::uplift_submaps(running_machine &machine, device_t &device, device_t &owner, endianness_t endian)
 {
 	address_map_entry *prev = 0;
 	address_map_entry *entry = m_entrylist.first();
@@ -724,15 +724,17 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device, end
 	{
 		if (entry->m_read.m_type == AMH_DEVICE_SUBMAP)
 		{
-			const char *tag = entry->m_read.m_tag;
+			astring tag;
+			owner.subtag(tag, entry->m_read.m_tag);
 			device_t *mapdevice = machine.device(tag);
-			if (mapdevice == NULL)
-				throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", tag, m_spacenum, device.tag());
+			if (mapdevice == NULL) {
+				throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", tag.cstr(), m_spacenum, device.basetag());
+			}
 			// Grab the submap
 			address_map submap(*mapdevice, entry);
 
 			// Recursively uplift it if needed
-			submap.uplift_submaps(machine, *mapdevice, endian);
+			submap.uplift_submaps(machine, device, *mapdevice, endian);
 
 			// Compute the unit repartition characteristics
 			int entry_bits = entry->m_submap_bits;

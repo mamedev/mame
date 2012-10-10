@@ -437,7 +437,7 @@ public:
 	void *install_ram(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, void *baseptr = NULL) { return install_ram_generic(addrstart, addrend, addrmask, addrmirror, ROW_READWRITE, baseptr); }
 
 	// install device memory maps
-	template <typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(address_map &map, const device_t &device), int bits = 0, UINT64 unitmask = 0) {
+	template <typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(address_map &map, device_t &device), int bits = 0, UINT64 unitmask = 0) {
 		address_map_delegate delegate(map, "dynamic_device_install", &device);
 		install_device_delegate(addrstart, addrend, device, delegate, bits, unitmask);
 	}

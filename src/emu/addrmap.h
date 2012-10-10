@@ -365,7 +365,7 @@ public:
 	offs_t					m_globalmask;		// global mask
 	simple_list<address_map_entry> m_entrylist;	// list of entries
 
-	void uplift_submaps(running_machine &machine, device_t &device, endianness_t endian);
+	void uplift_submaps(running_machine &machine, device_t &device, device_t &owner, endianness_t endian);
 };
 
 
