@@ -2099,7 +2099,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 #define SPCENCTR_STROBE_FREQ		(9.00)  /* Hz - calculated from the 555 timer */
-#define SPCENCTR_STROBE_DUTY_CYCLE	(95)	/* % */
+#define SPCENCTR_STROBE_DUTY_CYCLE	(95.0)	/* % */
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(mw8080bw_state::spcenctr_strobe_timer_callback)
@@ -2247,7 +2247,7 @@ static MACHINE_CONFIG_DERIVED( spcenctr, mw8080bw_root )
 	MCFG_TIMER_PARAM(TRUE)	/* indicates strobe ON */
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("strobeoff", mw8080bw_state, spcenctr_strobe_timer_callback, attotime::from_hz(SPCENCTR_STROBE_FREQ))
-	MCFG_TIMER_START_DELAY(attotime::from_hz(SPCENCTR_STROBE_FREQ * 100 / SPCENCTR_STROBE_DUTY_CYCLE))
+	MCFG_TIMER_START_DELAY(attotime::from_hz((SPCENCTR_STROBE_FREQ * 100) * (SPCENCTR_STROBE_DUTY_CYCLE / 100)))
 	MCFG_TIMER_PARAM(FALSE)	/* indicates strobe OFF */
 
 	/* video hardware */
