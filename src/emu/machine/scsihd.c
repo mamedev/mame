@@ -54,7 +54,7 @@ void scsihd_device::device_reset()
 
 	if (!disk)
 	{
-		logerror("SCSIHD: no HD found!\n");
+		logerror("%s SCSIHD: no HD found!\n", tag());
 	}
 	else
 	{
