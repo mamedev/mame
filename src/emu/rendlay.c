@@ -737,10 +737,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 
 	// rect nodes
 	else if (strcmp(compnode.name, "rect") == 0)
-	{
 		m_type = CTYPE_RECT;
-		m_foldrect = (strcmp("yes", xml_get_attribute_string_with_subst(machine, compnode, "fold", "no")) == 0);
-	}
 
 	// disk nodes
 	else if (strcmp(compnode.name, "disk") == 0)
@@ -831,7 +828,6 @@ void layout_element::component::draw(running_machine &machine, bitmap_argb32 &de
 			break;
 
 		case CTYPE_REEL:
-
 			draw_reel(machine, dest, bounds, state);
 			break;
 
@@ -857,12 +853,7 @@ void layout_element::component::draw_rect(bitmap_argb32 &dest, const rectangle &
 	// iterate over X and Y
 	for (UINT32 y = bounds.min_y; y <= bounds.max_y; y++)
 	{
-		// if folded, find the right edge
-		UINT32 max_x = bounds.max_x;
-		if (m_foldrect == 1)
-			max_x = bounds.min_x + ((float)(y - bounds.min_y) / (float)(bounds.max_y - bounds.min_y)) * (float)(bounds.max_x - bounds.min_x) + 0.5;
-
-		for (UINT32 x = bounds.min_x; x <= max_x; x++)
+		for (UINT32 x = bounds.min_x; x <= bounds.max_x; x++)
 		{
 			UINT32 finalr = r;
 			UINT32 finalg = g;

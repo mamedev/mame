@@ -163,7 +163,6 @@ private:
 		astring				m_string;					// string for text components
 		int					m_digits;					// number of digits for simple counters
 		int					m_textalign;				// text alignment to box
-		bool				m_foldrect;					// fold rect diagonally
 		bitmap_argb32		m_bitmap[MAX_BITMAPS];		// source bitmap for images
 		astring				m_dirname;					// directory name of image file (for lazy loading)
 		emu_file *			m_file[MAX_BITMAPS];		// file object for reading image/alpha files
