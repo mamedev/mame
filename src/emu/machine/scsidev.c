@@ -18,7 +18,7 @@ scsidev_device::scsidev_device(const machine_config &mconfig, device_type type, 
 
 void scsidev_device::device_start()
 {
-	data_out = SCSI_MASK_ALL;
+	data_out = 0;
 }
 
 void scsidev_device::scsi_out( UINT32 data, UINT32 mask )

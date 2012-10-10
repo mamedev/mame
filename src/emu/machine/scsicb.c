@@ -45,7 +45,7 @@ void scsicb_device::device_start()
 {
 	scsidev_device::device_start();
 
-	linestate = SCSI_MASK_ALL;
+	linestate = 0;
 
 	out_bsy_func.resolve(_out_bsy_func, *this);
 	out_sel_func.resolve(_out_sel_func, *this);
@@ -118,7 +118,16 @@ WRITE_LINE_MEMBER( scsicb_device::scsi_rst_w ) { set_scsi_line(SCSI_MASK_RST, st
 
 UINT8 scsicb_device::get_scsi_line( UINT32 mask )
 {
-	UINT8 state = (int)( ( linestate & mask ) != 0 );
+	UINT8 state;
+
+	if( ( linestate & mask ) != 0 )
+	{
+		state = 1;
+	}
+	else
+	{
+		state = 0;
+	}
 
 	verboselog( 1, machine(), "%s get_scsi_line %s %d\n", tag(), get_line_name( mask ), state ); 
 
@@ -129,14 +138,30 @@ void scsicb_device::set_scsi_line( UINT32 mask, UINT8 state )
 {
 	verboselog( 1, machine(), "%s set_scsi_line %s %d\n", tag(), get_line_name( mask ), state ); 
 
-	scsi_out( state * mask, mask );
+	if( state )
+	{
+		scsi_out( mask, mask );
+	}
+	else
+	{
+		scsi_out( 0, mask );
+	}
 }
 
 void scsicb_device::trigger_callback( UINT32 update_mask, UINT32 line_mask, devcb_resolved_write_line &write_line )
 {
 	if( ( update_mask & line_mask ) != 0 && !write_line.isnull() )
 	{
-		int state = (int)( ( linestate & line_mask ) != 0 );
+		UINT8 state;
+
+		if( ( linestate & line_mask ) != 0 )
+		{
+			state = 1;
+		}
+		else
+		{
+			state = 0;
+		}
 
 		verboselog( 1, machine(), "%s trigger_callback %s %d\n", tag(), get_line_name( line_mask ), state );
 

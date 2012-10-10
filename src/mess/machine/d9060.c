@@ -143,7 +143,7 @@ ADDRESS_MAP_END
 
 WRITE_LINE_MEMBER( base_d9060_device::req_w )
 {
-	m_via->write_ca1(!state);
+	m_via->write_ca1(state);
 }
 
 static const SCSICB_interface sasi_intf =
@@ -377,10 +377,10 @@ READ8_MEMBER( base_d9060_device::via_pb_r )
 
 	UINT8 data = 0;
 
-	data |= !m_sasibus->scsi_cd_r() << 2;
-	data |= !m_sasibus->scsi_bsy_r() << 3;
-	data |= !m_sasibus->scsi_io_r() << 6;
-	data |= !m_sasibus->scsi_msg_r() << 7;
+	data |= m_sasibus->scsi_cd_r() << 2;
+	data |= m_sasibus->scsi_bsy_r() << 3;
+	data |= m_sasibus->scsi_io_r() << 6;
+	data |= m_sasibus->scsi_msg_r() << 7;
 
 	// drive type
 	data |= (m_variant == TYPE_9060) << 4;
@@ -405,23 +405,42 @@ WRITE8_MEMBER( base_d9060_device::via_pb_w )
 
     */
 
-	m_sasibus->scsi_sel_w(!BIT(data, 0));
-	m_sasibus->scsi_rst_w(!BIT(data, 1));
+	m_sasibus->scsi_sel_w(BIT(data, 0));
+	m_sasibus->scsi_rst_w(BIT(data, 1));
 }
 
 READ_LINE_MEMBER( base_d9060_device::req_r )
 {
-	return !m_sasibus->scsi_req_r();
+	return m_sasibus->scsi_req_r();
 }
 
 WRITE_LINE_MEMBER( base_d9060_device::ack_w )
 {
-	m_sasibus->scsi_ack_w(state);
+	m_sasibus->scsi_ack_w(!state);
 }
 
 WRITE_LINE_MEMBER( base_d9060_device::enable_w )
 {
 	m_enable = state;
+
+	if( !m_enable )
+	{
+		m_sasibus->scsi_data_w( m_data );
+	}
+	else
+	{
+		m_sasibus->scsi_data_w( 0 );
+	}
+}
+
+WRITE8_MEMBER( base_d9060_device::scsi_data_w )
+{
+	m_data = data;
+
+	if( !m_enable )
+	{
+		m_sasibus->scsi_data_w( m_data );
+	}
 }
 
 static const via6522_interface via_intf =
@@ -433,7 +452,7 @@ static const via6522_interface via_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_MEMBER(SASIBUS_TAG ":host", scsicb_device, scsi_data_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, scsi_data_w),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, via_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -520,7 +539,7 @@ base_d9060_device::base_d9060_device(const machine_config &mconfig, device_type 
 	  m_rfdo(1),
 	  m_daco(1),
 	  m_atna(1),
-	  m_enable(1),
+	  m_enable(0),
 	  m_variant(variant)
 {
 }

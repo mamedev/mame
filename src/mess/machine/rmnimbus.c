@@ -2418,11 +2418,11 @@ static void hdc_reset(running_machine &machine)
 	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 
 	state->m_nimbus_drives.reg410_in=0;
-	state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_req_r() ? HDC_REQ_MASK : 0);
-	state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_cd_r()  ? HDC_CD_MASK  : 0);
-	state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_io_r()  ? HDC_IO_MASK  : 0);
-	state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_bsy_r() ? HDC_BSY_MASK : 0);
-	state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_msg_r() ? HDC_MSG_MASK : 0);
+	state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_req_r() ? 0 : HDC_REQ_MASK);
+	state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_cd_r()  ? 0 : HDC_CD_MASK);
+	state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_io_r()  ? 0 : HDC_IO_MASK);
+	state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_bsy_r() ? 0 : HDC_BSY_MASK);
+	state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_msg_r() ? 0 : HDC_MSG_MASK);
 
 	state->m_nimbus_drives.drq_ff=0;
 }
@@ -2438,8 +2438,8 @@ static void hdc_ctrl_write(running_machine &machine, UINT8 data)
 
 	state->m_nimbus_drives.reg410_out=data;
 
-	state->m_scsibus->scsi_rst_w((data & HDC_RESET_MASK) ? 0 : 1);
-	state->m_scsibus->scsi_sel_w((data & HDC_SEL_MASK) ? 0 : 1);
+	state->m_scsibus->scsi_rst_w((data & HDC_RESET_MASK) ? 1 : 0);
+	state->m_scsibus->scsi_sel_w((data & HDC_SEL_MASK) ? 1 : 0);
 }
 
 static void hdc_post_rw(running_machine &machine)
@@ -2447,7 +2447,7 @@ static void hdc_post_rw(running_machine &machine)
 	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 
 	if((state->m_nimbus_drives.reg410_in & HDC_REQ_MASK)==0)
-		state->m_scsibus->scsi_ack_w(0);
+		state->m_scsibus->scsi_ack_w(1);
 
 	state->m_nimbus_drives.drq_ff=0;
 }
@@ -2492,7 +2492,7 @@ void rmnimbus_state::nimbus_scsi_linechange( UINT8 mask, UINT8 state )
 
 	last=m_nimbus_drives.reg410_in & mask;
 
-	if(state)
+	if(!state)
 		m_nimbus_drives.reg410_in|=mask;
 	else
 		m_nimbus_drives.reg410_in&=~mask;
@@ -2506,7 +2506,7 @@ void rmnimbus_state::nimbus_scsi_linechange( UINT8 mask, UINT8 state )
 	switch( mask )
 	{
 	case HDC_REQ_MASK:
-		if (state==0)
+		if (state)
 		{
 			if(((m_nimbus_drives.reg410_in & HDC_CD_MASK)==HDC_CD_MASK) && (last!=0))
 			{
@@ -2516,15 +2516,15 @@ void rmnimbus_state::nimbus_scsi_linechange( UINT8 mask, UINT8 state )
 		}
 		else
 		{
-			m_scsibus->scsi_ack_w(1);
+			m_scsibus->scsi_ack_w(0);
 		}
 		break;
 
 	case HDC_IO_MASK:
-		if (state==0)
+		if (state)
 		{
 			printf( "switch to input mode\n" );
-			m_scsibus->scsi_data_w(0xff);
+			m_scsibus->scsi_data_w(0);
 		}
 		break;
 	}

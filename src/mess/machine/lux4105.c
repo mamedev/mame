@@ -36,20 +36,18 @@ const device_type LUXOR_4105 = &device_creator<luxor_4105_device>;
 
 WRITE_LINE_MEMBER( luxor_4105_device::sasi_bsy_w )
 {
-	if (!state)
+	if (state)
 	{
-		m_sasibus->scsi_sel_w(1);
+		m_sasibus->scsi_sel_w(0);
 	}
 }
 
 WRITE_LINE_MEMBER( luxor_4105_device::sasi_io_w )
 {
-	if (!m_io && state)
+	if (!state)
 	{
 		m_sasibus->scsi_data_w(m_data);
 	}
-
-	m_io = state;
 
 	update_trrq_int();
 }
@@ -58,7 +56,7 @@ WRITE_LINE_MEMBER( luxor_4105_device::sasi_req_w )
 {
 	if (state)
 	{
-		m_sasibus->scsi_ack_w(1);
+		m_sasibus->scsi_ack_w(0);
 	}
 
 	update_trrq_int();
@@ -145,8 +143,8 @@ ioport_constructor luxor_4105_device::device_input_ports() const
 
 inline void luxor_4105_device::update_trrq_int()
 {
-	int cd = m_sasibus->scsi_cd_r();
-	int req = m_sasibus->scsi_req_r();
+	int cd = !m_sasibus->scsi_cd_r();
+	int req = !m_sasibus->scsi_req_r();
 	int trrq = !(cd & !req);
 
 	if (BIT(m_dma, 5))
@@ -180,8 +178,7 @@ inline void luxor_4105_device::update_trrq_int()
 luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, LUXOR_4105, "Luxor 4105", tag, owner, clock),
 	  device_abc1600bus_card_interface(mconfig, *this),
-	  m_sasibus(*this, SASIBUS_TAG ":host"),
-	  m_io(1)
+	  m_sasibus(*this, SASIBUS_TAG ":host")
 {
 }
 
@@ -196,7 +193,6 @@ void luxor_4105_device::device_start()
 
 	// state saving
 	save_item(NAME(m_cs));
-	save_item(NAME(m_io));
 	save_item(NAME(m_data));
 	save_item(NAME(m_dma));
 }
@@ -212,8 +208,8 @@ void luxor_4105_device::device_reset()
 	m_data = 0;
 	m_dma = 0;
 
-	m_sasibus->scsi_rst_w(0);
 	m_sasibus->scsi_rst_w(1);
+	m_sasibus->scsi_rst_w(0);
 
 	m_slot->trrq_w(1);
 }
@@ -279,10 +275,10 @@ UINT8 luxor_4105_device::abc1600bus_stat()
 
         */
 
-		data = !m_sasibus->scsi_bsy_r();
-		data |= !m_sasibus->scsi_req_r() << 2;
-		data |= !m_sasibus->scsi_cd_r() << 3;
-		data |= !m_sasibus->scsi_io_r() << 6;
+		data = m_sasibus->scsi_bsy_r();
+		data |= m_sasibus->scsi_req_r() << 2;
+		data |= m_sasibus->scsi_cd_r() << 3;
+		data |= m_sasibus->scsi_io_r() << 6;
 	}
 
 	return data;
@@ -299,19 +295,19 @@ UINT8 luxor_4105_device::abc1600bus_inp()
 
 	if (m_cs)
 	{
-		if (m_sasibus->scsi_bsy_r())
+		if (!m_sasibus->scsi_bsy_r())
 		{
 			ioport("1E")->read();
 		}
 		else
 		{
-			if (!m_sasibus->scsi_io_r())
+			if (m_sasibus->scsi_io_r())
 			{
 				data = m_sasibus->scsi_data_r();
 
-				if (!m_sasibus->scsi_req_r())
+				if (m_sasibus->scsi_req_r())
 				{
-					m_sasibus->scsi_ack_w(0);
+					m_sasibus->scsi_ack_w(1);
 				}
 			}
 		}
@@ -331,13 +327,13 @@ void luxor_4105_device::abc1600bus_out(UINT8 data)
 	{
 		m_data = data;
 
-		if (m_sasibus->scsi_io_r())
+		if (!m_sasibus->scsi_io_r())
 		{
 			m_sasibus->scsi_data_w(m_data);
 
-			if (!m_sasibus->scsi_req_r())
+			if (m_sasibus->scsi_req_r())
 			{
-				m_sasibus->scsi_ack_w(0);
+				m_sasibus->scsi_ack_w(1);
 			}
 		}
 	}
@@ -352,7 +348,7 @@ void luxor_4105_device::abc1600bus_c1(UINT8 data)
 {
 	if (m_cs)
 	{
-		m_sasibus->scsi_sel_w(0);
+		m_sasibus->scsi_sel_w(1);
 	}
 }
 
@@ -368,8 +364,8 @@ void luxor_4105_device::abc1600bus_c3(UINT8 data)
 		m_data = 0;
 		m_dma = 0;
 
-		m_sasibus->scsi_rst_w(0);
 		m_sasibus->scsi_rst_w(1);
+		m_sasibus->scsi_rst_w(0);
 	}
 }
 

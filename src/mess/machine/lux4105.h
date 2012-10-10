@@ -74,7 +74,6 @@ private:
 	required_device<scsicb_device> m_sasibus;
 
 	int m_cs;
-	int m_io;
 	UINT8 m_data;
 	UINT8 m_dma;
 };

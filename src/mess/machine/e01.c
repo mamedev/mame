@@ -266,17 +266,17 @@ static const wd17xx_interface fdc_intf =
 
 WRITE_LINE_MEMBER( e01_device::scsi_bsy_w )
 {
-	if (!state)
+	if (state)
 	{
-		m_scsibus->scsi_sel_w(1);
+		m_scsibus->scsi_sel_w(0);
 	}
 }
 
 WRITE_LINE_MEMBER( e01_device::scsi_req_w )
 {
-	if (state)
+	if (!state)
 	{
-		m_scsibus->scsi_ack_w(1);
+		m_scsibus->scsi_ack_w(0);
 	}
 
 	m_hdc_irq = !state;
@@ -692,7 +692,7 @@ READ8_MEMBER( e01_device::hdc_data_r )
 {
 	UINT8 data = m_scsibus->scsi_data_r(space, 0);
 
-	m_scsibus->scsi_ack_w(0);
+	m_scsibus->scsi_ack_w(1);
 
 	return data;
 }
@@ -706,7 +706,7 @@ WRITE8_MEMBER( e01_device::hdc_data_w )
 {
 	m_scsibus->scsi_data_w(space, 0, data);
 
-	m_scsibus->scsi_ack_w(0);
+	m_scsibus->scsi_ack_w(1);
 }
 
 
@@ -734,11 +734,11 @@ READ8_MEMBER( e01_device::hdc_status_r )
 	UINT8 data = 0;
 
 	// SCSI bus
-	data |= !m_scsibus->scsi_msg_r();
-	data |= !m_scsibus->scsi_bsy_r() << 1;
-	data |= !m_scsibus->scsi_req_r() << 5;
-	data |= !m_scsibus->scsi_io_r() << 6;
-	data |= !m_scsibus->scsi_cd_r() << 7;
+	data |= m_scsibus->scsi_msg_r();
+	data |= m_scsibus->scsi_bsy_r() << 1;
+	data |= m_scsibus->scsi_req_r() << 5;
+	data |= m_scsibus->scsi_io_r() << 6;
+	data |= m_scsibus->scsi_cd_r() << 7;
 
 	// TODO NIRQ
 
@@ -752,7 +752,7 @@ READ8_MEMBER( e01_device::hdc_status_r )
 
 WRITE8_MEMBER( e01_device::hdc_select_w )
 {
-	m_scsibus->scsi_sel_w(0);
+	m_scsibus->scsi_sel_w(1);
 }
 
 

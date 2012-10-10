@@ -349,7 +349,7 @@ WRITE8_MEMBER( v1050_state::sasi_data_w )
 {
 	data_out = data;
 
-	if( m_sasibus->scsi_io_r() != 0 )
+	if( !m_sasibus->scsi_io_r() )
 	{
 		m_sasibus->scsi_data_w( data );
 	}
@@ -357,13 +357,13 @@ WRITE8_MEMBER( v1050_state::sasi_data_w )
 
 WRITE_LINE_MEMBER( v1050_state::sasi_io_w )
 {
-	if( state != 0 )
+	if( !state )
 	{
 		m_sasibus->scsi_data_w( data_out );
 	}
 	else
 	{
-		m_sasibus->scsi_data_w( 0xff );
+		m_sasibus->scsi_data_w( 0 );
 	}
 }
 
@@ -386,23 +386,23 @@ READ8_MEMBER( v1050_state::sasi_status_r )
 
 	UINT8 data = 0;
 
-	data |= m_sasibus->scsi_req_r();
-	data |= !m_sasibus->scsi_bsy_r() << 1;
-	data |= !m_sasibus->scsi_msg_r() << 2;
-	data |= !m_sasibus->scsi_cd_r() << 3;
-	data |= m_sasibus->scsi_io_r() << 4;
+	data |= !m_sasibus->scsi_req_r();
+	data |= m_sasibus->scsi_bsy_r() << 1;
+	data |= m_sasibus->scsi_msg_r() << 2;
+	data |= m_sasibus->scsi_cd_r() << 3;
+	data |= !m_sasibus->scsi_io_r() << 4;
 
 	return data;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::sasi_ack_tick)
 {
-	m_sasibus->scsi_ack_w(1);
+	m_sasibus->scsi_ack_w(0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::sasi_rst_tick)
 {
-	m_sasibus->scsi_rst_w(1);
+	m_sasibus->scsi_rst_w(0);
 }
 
 WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
@@ -422,12 +422,12 @@ WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
 
     */
 
-	m_sasibus->scsi_sel_w(!BIT(data, 0));
+	m_sasibus->scsi_sel_w(BIT(data, 0));
 
 	if (BIT(data, 1))
 	{
 		// send acknowledge pulse
-		m_sasibus->scsi_ack_w(0);
+		m_sasibus->scsi_ack_w(1);
 
 		m_timer_ack->adjust(attotime::from_nsec(100));
 	}
@@ -435,7 +435,7 @@ WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
 	if (BIT(data, 7))
 	{
 		// send reset pulse
-		m_sasibus->scsi_rst_w(0);
+		m_sasibus->scsi_rst_w(1);
 
 		m_timer_rst->adjust(attotime::from_nsec(100));
 	}

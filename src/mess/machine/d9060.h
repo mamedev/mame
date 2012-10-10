@@ -71,6 +71,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( req_r );
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
 	DECLARE_WRITE_LINE_MEMBER( enable_w );
+	DECLARE_WRITE8_MEMBER( scsi_data_w );
 
 protected:
     // device-level overrides
@@ -99,6 +100,7 @@ private:
 
 	// SASI bus
 	int m_enable;
+	UINT8 m_data;
 
 	int m_variant;
 };

@@ -482,7 +482,7 @@ READ8_MEMBER( bulletf_state::scsi_r )
 {
 	UINT8 data = m_scsibus->scsi_data_r();
 
-	m_scsibus->scsi_ack_w(0);
+	m_scsibus->scsi_ack_w(1);
 
 	m_wack = 0;
 	update_dma_rdy();
@@ -499,7 +499,7 @@ WRITE8_MEMBER( bulletf_state::scsi_w )
 {
 	m_scsibus->scsi_data_w(data);
 
-	m_scsibus->scsi_ack_w(0);
+	m_scsibus->scsi_ack_w(1);
 
 	m_wack = 0;
 	update_dma_rdy();
@@ -928,11 +928,11 @@ READ8_MEMBER( bulletf_state::pio_pa_r )
 
 	UINT8 data = 0;
 
-	data |= !m_scsibus->scsi_bsy_r() << 3;
-	data |= !m_scsibus->scsi_msg_r() << 4;
-	data |= !m_scsibus->scsi_cd_r() << 5;
-	data |= !m_scsibus->scsi_req_r() << 6;
-	data |= !m_scsibus->scsi_io_r() << 7;
+	data |= m_scsibus->scsi_bsy_r() << 3;
+	data |= m_scsibus->scsi_msg_r() << 4;
+	data |= m_scsibus->scsi_cd_r() << 5;
+	data |= m_scsibus->scsi_req_r() << 6;
+	data |= m_scsibus->scsi_io_r() << 7;
 
 	return data;
 }
@@ -954,9 +954,9 @@ WRITE8_MEMBER( bulletf_state::pio_pa_w )
 
     */
 
-	//m_scsibus->scsi_atn_w(!BIT(data, 0));
-	m_scsibus->scsi_rst_w(!BIT(data, 1));
-	m_scsibus->scsi_sel_w(!BIT(data, 2));
+	m_scsibus->scsi_atn_w(BIT(data, 0));
+	m_scsibus->scsi_rst_w(BIT(data, 1));
+	m_scsibus->scsi_sel_w(BIT(data, 2));
 }
 
 WRITE_LINE_MEMBER( bulletf_state::cstrb_w )
@@ -1027,9 +1027,9 @@ static const wd17xx_interface bulletf_fdc_intf =
 
 WRITE_LINE_MEMBER( bulletf_state::req_w )
 {
-	if (state)
+	if (!state)
 	{
-		m_scsibus->scsi_ack_w(1);
+		m_scsibus->scsi_ack_w(0);
 
 		m_wack = 1;
 	}
