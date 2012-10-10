@@ -7,6 +7,12 @@
 TODO:
 - YongYong mapper:
   - During start there are 2 writes to 5000 and 5003, it is still unknown what these do.
+- Story of La Sa Ma mapper:
+  - Does this display Nintendo or Gowin logo on boot?
+  - No clue how the banking works yet
+- ATV Racing/Rocket Games mapper:
+  - How did this overlay the official Nintendo logo at BIOS check time? (Some Sachen titles use a similar trick)
+
 
   Changes:
 
@@ -63,6 +69,8 @@ enum {
 	MBC_WISDOM,		/*    ?? ROM,    ?? RAM - Wisdom tree controller */
 	MBC_MBC1_KOR,	/*   1MB ROM,    ?? RAM - Korean MBC1 variant    */
 	MBC_YONGYONG,	/*    ?? ROM,    ?? RAM - Appears in Sonic 3D Blast 5 pirate */
+	MBC_LASAMA,     /*    ?? ROM,    ?? RAM - Appears in La Sa Ma */
+	MBC_ATVRACIN,
 	MBC_MEGADUCK,	/* MEGADUCK style banking                        */
 	MBC_UNKNOWN,	/* Unknown mapper                                */
 };
@@ -239,6 +247,12 @@ static void gb_init(running_machine &machine)
 		case MBC_YONGYONG:
 			space.install_write_handler( 0x2000, 0x2000, write8_delegate(FUNC(gb_state::gb_rom_bank_yongyong_2000),state) );
 			//space.install_write_handler( 0x5000, 0x5003, write8_delegate(FUNC(gb_state::gb_rom_back_yongyong_5000),state) );
+			break;
+		case MBC_LASAMA:
+			break;
+		case MBC_ATVRACIN:
+			space.install_write_handler( 0x3F00, 0x3F00, write8_delegate(FUNC(gb_state::gb_rom_bank_atvracin_3f00),state) );
+			space.install_write_handler( 0x3FC0, 0x3FC0, write8_delegate(FUNC(gb_state::gb_rom_bank_atvracin_3fc0),state) );
 			break;
 
 		case MBC_MEGADUCK:
@@ -786,6 +800,22 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_yongyong_2000)
 {
 	m_ROMBank = data;
 	gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
+}
+
+WRITE8_MEMBER(gb_state::gb_rom_bank_atvracin_3f00)
+{
+	if ( data == 0 )
+	{
+		data = 1;
+	}
+	m_ROMBank = m_ROMBank00 | data;
+	gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
+}
+
+WRITE8_MEMBER(gb_state::gb_rom_bank_atvracin_3fc0)
+{
+	m_ROMBank00 = data * 16;
+	gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] );
 }
 
 WRITE8_MEMBER(gb_state::gb_io_w)
@@ -1664,6 +1694,8 @@ DEVICE_IMAGE_LOAD(gb_cart)
 				{ "WISDOM",   MBC_WISDOM },
 				{ "MBC1_KOR", MBC_MBC1_KOR },
 				{ "YONGYONG", MBC_YONGYONG },
+				{ "LASAMA",   MBC_LASAMA },
+				{ "ATVRACIN", MBC_ATVRACIN },
 			};
 
 			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && state->m_MBCType == MBC_UNKNOWN; i++)
@@ -1887,7 +1919,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 		S[16] = '\0';
 		logerror("Cart Information\n");
 		logerror("\tName:             %s\n", S);
-		logerror("\tType:             %s [0x%2X]\n", CartTypes[gb_header[0x0147]], gb_header[0x0147] );
+		logerror("\tType:             %s [0x%2X]\n", (gb_header[0x0147] <= 32) ? CartTypes[gb_header[0x0147]] : "", gb_header[0x0147] );
 		logerror("\tGame Boy:         %s\n", (gb_header[0x0143] == 0xc0) ? "No" : "Yes" );
 		logerror("\tSuper GB:         %s [0x%2X]\n", (gb_header[0x0146] == 0x03) ? "Yes" : "No", gb_header[0x0146] );
 		logerror("\tColor GB:         %s [0x%2X]\n", (gb_header[0x0143] == 0x80 || gb_header[0x0143] == 0xc0) ? "Yes" : "No", state->m_gb_cart[0x0143] );

@@ -206,6 +206,8 @@ public:
 	DECLARE_WRITE8_MEMBER(gb_ram_bank_select_mbc1_kor);
 	DECLARE_WRITE8_MEMBER(gb_mem_mode_select_mbc1_kor);
 	DECLARE_WRITE8_MEMBER(gb_rom_bank_yongyong_2000);
+	DECLARE_WRITE8_MEMBER(gb_rom_bank_atvracin_3f00);
+	DECLARE_WRITE8_MEMBER(gb_rom_bank_atvracin_3fc0);
 	DECLARE_WRITE8_MEMBER(gb_io_w);
 	DECLARE_WRITE8_MEMBER(gb_io2_w);
 	DECLARE_WRITE8_MEMBER(sgb_io_w);

@@ -918,9 +918,9 @@ Undumped Pirates:
 		<!-- Notes: GBC only -->
 		<description>ATV Racing &amp; Karate Joe (Euro, Alt)</description>
 		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
+		<publisher>Rocket Games</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="unknown" />
+			<feature name="mapper" value="atvracin" />
 			<dataarea name="rom" size="524288">
 				<rom name="atv racing &amp; karate joe (europe) (alternate) (unl).bin" size="524288" crc="6908f4af" sha1="95287b440139e88d90700f892d1da60aaa4da778" offset="000000" />
 			</dataarea>
@@ -931,9 +931,9 @@ Undumped Pirates:
 		<!-- Notes: GBC only -->
 		<description>ATV Racing &amp; Karate Joe (Euro)</description>
 		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
+		<publisher>Rocket Games</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="unknown" />
+			<feature name="mapper" value="atvracin" />
 			<dataarea name="rom" size="524288">
 				<rom name="atv racing &amp; karate joe (europe) (unl).bin" size="524288" crc="a07b6e79" sha1="3701028d66564625933a3868340813e6d7c36b7b" offset="000000" />
 			</dataarea>
@@ -943,9 +943,9 @@ Undumped Pirates:
 	<software name="atvracin" supported="no">
 		<description>ATV Racing (Euro)</description>
 		<year>2001</year>
-		<publisher>&lt;pirate&gt;</publisher>
+		<publisher>Rocket Games</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="unknown" />
+			<feature name="mapper" value="atvracin" />
 			<dataarea name="rom" size="262144">
 				<rom name="atv racing (europe) (unl).bin" size="262144" crc="7987d5cd" sha1="b3c6c2970c3bfa95fb2eef10e2160f55f52d8e1a" offset="000000" />
 			</dataarea>

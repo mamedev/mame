@@ -23254,7 +23254,7 @@
 		<publisher>GOWIN</publisher>
 		<info name="serial" value="GS-04"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="unknown" />
+			<feature name="mapper" value="LaSaMa" />
 			<dataarea name="rom" size="4194304">
 				<rom name="la sa ma chuan qi - story of lasama (unlicensed) [raw dump].bin" size="4194304" crc="46362c48" sha1="c1d399edc676127be438541a5ce4a7e096e86c39" offset="000000" />
 			</dataarea>
