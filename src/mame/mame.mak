@@ -1981,6 +1981,8 @@ $(DRIVERS)/atarifb.o:	$(LAYOUT)/atarifb.lh \
 
 $(DRIVERS)/atari_s1.o:	$(LAYOUT)/atari_s1.lh
 
+$(DRIVERS)/atari_s2.o:	$(LAYOUT)/atari_s2.lh
+
 $(DRIVERS)/avalnche.o:	$(LAYOUT)/avalnche.lh
 
 $(DRIVERS)/balsente.o:	$(LAYOUT)/stocker.lh
