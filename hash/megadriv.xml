@@ -78,7 +78,6 @@ Known undumped pirates
   * Thunderbolt II - 雷電伝説II
   * Magic 7 Block - 百変七巧板
   * Chinese Battle Chess (?) - 戦 棊
-  * Bomboy (by Gamtek)
   * 16 Tile Mahjong II (by Gamtek)
 
 NOTE
@@ -26947,12 +26946,23 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 <!-- Pirate dumps to be sorted out (a few from HazeMD, others recently dumped by drx) -->
 
+	<software name="bomboy">
+		<description>Bomboy (Tw)</description>
+		<year>1993</year>
+		<publisher>Gamtek</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="bomboy (unl).bin" size="524288" crc="065d2019" sha1="206fff31bccbb9a973de95c9ae780acb462548dd" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="truco96">
 		<description>Truco '96 (Arg)</description>
 		<year>1996</year>
 		<publisher>Miky</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="1048576">
 				<rom name="truco96.bin" size="1048576" crc="cddbecfc" sha1="7a087d08cf7a565c7ad22ca9824971d8cc351ca3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -26964,7 +26974,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="1048576">
 				<rom name="tc2000.bin" size="1048576" crc="cef91bdb" sha1="80a2f21304cea6876bc07a48dcd1f5e53a5b3adb" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>

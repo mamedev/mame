@@ -22058,6 +22058,30 @@ Undumped Pirates:
 
 <!-- Other Asian Pirate dumps -->
 
+	<software name="digisaph" supported="no">
+		<description>2003 Digitmon Sapphire (Chi)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="2003 Digimom Sapphii (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="2003 digimom sapphii (2003 digitmon sapphire) (unlicensed, english) [raw dump].bin" size="2097152" crc="7cff9f0b" sha1="1e42c461e0c6705637a698dbda8b34bc37acc51d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digisaphh" cloneof="digisaph">
+		<description>2003 Digitmon Sapphire (Chi, Hacked)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="2003 Digimom Sapphii (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="2003 digimom sapphii (2003 digitmon sapphire) (unlicensed, english) [fixed].bin" size="4194304" crc="88da70ac" sha1="a5b3a1986e99e9ec916c809562a80fdae0829295" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="smbl3">
 		<description>Shu Ma Bao Long 3 - Shui Jing Ban (Chi)</description>
 		<year>20??</year>
