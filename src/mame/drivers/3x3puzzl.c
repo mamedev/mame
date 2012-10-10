@@ -21,6 +21,13 @@ Additional ROMs with 'a' in label are probably to convert
 the game back to normal version as current set on the PCB
 has adult graphics (sets provided are 'Normal' and 'Enterprise')
 
+
+
+todo:
+ sound banking
+ scrolling?
+ verify dips
+
 ***************************************************************************/
 
 
@@ -66,17 +73,11 @@ public:
 	DECLARE_WRITE16_MEMBER(videoram3_w);
 	TILE_GET_INFO_MEMBER(get_tile3_info);
 
-	DECLARE_READ16_HANDLER(_600000_r);
 	DECLARE_READ16_HANDLER(_880000_r);
 	DECLARE_WRITE16_HANDLER(gfx_ctrl_w);
 
 protected:
-	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
-
 	virtual void video_start();
-	virtual void palette_init();
 };
 
 WRITE16_MEMBER(_3x3puzzle_state::videoram1_w)
@@ -135,11 +136,11 @@ WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
 
 	if ( BIT(data,4) )
 	{
-		machine().primary_screen->set_visible_area(0*8, 64*8-1, 0*8, 32*8-1);
+		machine().primary_screen->set_visible_area(0*8, 64*8-1, 0*8, 30*8-1);
 	}
 	else
 	{
-		machine().primary_screen->set_visible_area(0*8, 40*8-1, 0*8, 32*8-1);
+		machine().primary_screen->set_visible_area(0*8, 40*8-1, 0*8, 30*8-1);
 	}
 }
 
@@ -160,10 +161,6 @@ UINT32 _3x3puzzle_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-READ16_MEMBER(_3x3puzzle_state::_600000_r)
-{
-	return 0xffff; // DSW?
-}
 
 READ16_MEMBER(_3x3puzzle_state::_880000_r)
 {
@@ -181,11 +178,11 @@ static ADDRESS_MAP_START( _3x3puzzle_map, AS_PROGRAM, 16, _3x3puzzle_state )
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP // scroll?
 	AM_RANGE(0x480000, 0x480001) AM_WRITENOP
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")
-	AM_RANGE(0x580000, 0x580001) AM_READ_PORT("P2")
-	AM_RANGE(0x600000, 0x600001) AM_READ(_600000_r)
+	AM_RANGE(0x580000, 0x580001) AM_READ_PORT("SYS")
+	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW01")
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(gfx_ctrl_w)
-	AM_RANGE(0x880000, 0x880001) AM_READ(_880000_r)
+	AM_RANGE(0x880000, 0x880001) AM_READ( _880000_r )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( _3x3puzzle )
@@ -195,16 +192,69 @@ static INPUT_PORTS_START( _3x3puzzle )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // needed for 2nd game
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("SYS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN ) // must be active_low or coins won't work
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // must be active_low or coins won't work
+	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+ 
+    PORT_START("DSW01")
+    PORT_DIPNAME( 0x0001, 0x0001, "DSW0:0" )
+    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0002, 0x0002, "DSW0:1" )
+    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0004, 0x0004, "DSW0:2" )
+    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0008, 0x0008, "DSW0:3" )
+    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0010, 0x0010, "DSW0:4" )
+    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0020, 0x0020, "DSW0:5" )
+    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0040, 0x0040, "DSW0:6" )
+    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0080, 0x0080, "DSW0:7" )
+    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0100, 0x0100, "DSW1:0" ) // coinage
+    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0200, 0x0200, "DSW1:1" ) // coinage
+    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Demo_Sounds ) )
+    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0800, 0x0800, "DSW1:3" )
+    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x1000, 0x1000, "DSW1:4" )
+    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x2000, 0x2000, "DSW1:5" )
+    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x4000, 0x4000, "DSW1:6" )
+    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x8000, 0x8000, "DSW1:7" )
+    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout tiles16x16x8_layout =
@@ -237,20 +287,6 @@ static GFXDECODE_START( _3x3puzzle )
 GFXDECODE_END
 
 
-void _3x3puzzle_state::machine_start()
-{
-}
-
-void _3x3puzzle_state::machine_reset()
-{
-}
-
-
-void _3x3puzzle_state::palette_init()
-{
-
-}
-
 static MACHINE_CONFIG_START( _3x3puzzle, _3x3puzzle_state )
 
 	/* basic machine hardware */
@@ -264,7 +300,7 @@ static MACHINE_CONFIG_START( _3x3puzzle, _3x3puzzle_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_UPDATE_DRIVER(_3x3puzzle_state, screen_update)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 
 	MCFG_GFXDECODE(_3x3puzzle)
 
@@ -338,5 +374,5 @@ ROM_START( 3x3puzzla )
 ROM_END
 
 
-GAME( 199?, 3x3puzzl,  0,          _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace",      "3X3 Puzzle (Enterprise)", 0 )
-GAME( 199?, 3x3puzzla, 3x3puzzl,   _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace",      "3X3 Puzzle (Normal)", 0 )
+GAME( 199?, 3x3puzzl,  0,          _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace",      "3X3 Puzzle (Enterprise)", GAME_IMPERFECT_SOUND )
+GAME( 199?, 3x3puzzla, 3x3puzzl,   _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace",      "3X3 Puzzle (Normal)", GAME_IMPERFECT_SOUND )
