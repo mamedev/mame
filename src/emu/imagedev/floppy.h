@@ -62,8 +62,8 @@ public:
 	void setup_unload_cb(unload_cb cb);
 	void setup_index_pulse_cb(index_pulse_cb cb);
 
-	UINT32* get_buffer() { return image->get_buffer(cyl, ss ^ 1); }
-	UINT32 get_len() { return image->get_track_size(cyl, ss ^ 1); }
+	UINT32* get_buffer() { return image->get_buffer(cyl, ss); }
+	UINT32 get_len() { return image->get_track_size(cyl, ss); }
 
 	void mon_w(int state);
 	bool ready_r();
@@ -71,7 +71,7 @@ public:
 
 	bool wpt_r() { return output_format == 0; }
 	int dskchg_r() { return dskchg; }
-	bool trk00_r() { return cyl != 0; }
+	bool trk00_r() { return cyl != 0 || !image; }
 	int idx_r() { return idx; }
 	bool ss_r() { return ss; }
 

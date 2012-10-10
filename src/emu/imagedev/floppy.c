@@ -369,12 +369,14 @@ void floppy_image_device::stp_w(int state)
     if ( stp != state ) {
 		stp = state;
     	if ( stp == 0 ) {
+			int ocyl = cyl;
 			if ( dir ) {
 				if ( cyl ) cyl--;
 			} else {
 				if ( cyl < tracks-1 ) cyl++;
 			}
-
+			if(ocyl != cyl)
+				logerror("%s: track %d\n", tag(), cyl);
 			/* Update disk detection if applicable */
 			if (exists())
 			{
