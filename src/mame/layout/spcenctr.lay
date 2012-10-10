@@ -32,7 +32,6 @@
 		</screen>
 
 <!-- lamp and strobe reflect onto the inner bezel (and screen) -->
-<!-- NOTE: artwork system can't keep up with the strobe high frequency -->
 		<bezel name="LAMP" element="lamp_red">
 			<bounds left="0" top="0" right="376" bottom="300" />
 			<color alpha="0.2" />
