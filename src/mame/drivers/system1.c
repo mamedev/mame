@@ -465,6 +465,21 @@ static void dakkochn_custom_w(running_machine &machine, UINT8 data, UINT8 prevda
 
 /*************************************
  *
+ *  Shooting Master gun input
+ *
+ *************************************/
+
+READ8_MEMBER(system1_state::shtngmst_gunx_r)
+{
+	// x is slightly offset, and has a range of 00-fe
+	UINT8 x = ioport("GUNX")->read() - 0x12;
+	return (x == 0xff) ? 0xfe : x;
+}
+
+
+
+/*************************************
+ *
  *  Sound I/O
  *
  *************************************/
@@ -669,11 +684,9 @@ READ8_MEMBER(system1_state::nob_mcu_status_r)
 
 /*************************************
  *
- *  Generic port definitions
+ *  nob bootleg protection
  *
  *************************************/
-
-// nobb - these ports are used for some kind of replacement protection system used by the bootleg
 
 READ8_MEMBER(system1_state::nobb_inport1c_r)
 {
@@ -1747,10 +1760,10 @@ static INPUT_PORTS_START( shtngmst )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("GUNX") /* 1c */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(48) PORT_KEYDELTA(8)
 
 	PORT_START("GUNY") /* 1d */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_REVERSE
+	PORT_BIT( 0xff, 0x90, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX(0x20, 0xff) PORT_SENSITIVITY(64) PORT_KEYDELTA(8) PORT_REVERSE
 
 	PORT_START("18") /* 18 */
 	/* what is this? check the game code... */
@@ -4782,7 +4795,7 @@ DRIVER_INIT_MEMBER(system1_state,shtngmst)
 	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
 	iospace.install_read_port(0x12, 0x12, 0x00, 0x00, "TRIGGER");
 	iospace.install_read_port(0x18, 0x18, 0x00, 0x03, "18");
-	iospace.install_read_port(0x1c, 0x1c, 0x00, 0x02, "GUNX");
+	iospace.install_read_handler(0x1c, 0x1c, 0x00, 0x02, read8_delegate(FUNC(system1_state::shtngmst_gunx_r),this));
 	iospace.install_read_port(0x1d, 0x1d, 0x00, 0x02, "GUNY");
 	DRIVER_INIT_CALL(bank0c);
 }

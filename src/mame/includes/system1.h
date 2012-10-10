@@ -50,6 +50,7 @@ public:
 	DECLARE_READ8_MEMBER(nobb_inport23_r);
 	DECLARE_WRITE8_MEMBER(nobb_outport24_w);
 	DECLARE_READ8_MEMBER(nob_start_r);
+	DECLARE_READ8_MEMBER(shtngmst_gunx_r);
 	DECLARE_WRITE8_MEMBER(system1_videomode_w);
 	DECLARE_READ8_MEMBER(system1_mixer_collision_r);
 	DECLARE_WRITE8_MEMBER(system1_mixer_collision_w);
@@ -63,6 +64,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_data_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_status_r);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
+
 	DECLARE_DRIVER_INIT(nobb);
 	DECLARE_DRIVER_INIT(wboy2);
 	DECLARE_DRIVER_INIT(imsorry);
