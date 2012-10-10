@@ -24,7 +24,6 @@ has adult graphics (sets provided are 'Normal' and 'Enterprise')
 
 
 todo:
- sound banking
  scrolling?
  verify dips
 
@@ -73,11 +72,15 @@ public:
 	DECLARE_WRITE16_MEMBER(videoram3_w);
 	TILE_GET_INFO_MEMBER(get_tile3_info);
 
+	int       m_oki_bank;
+
 	DECLARE_READ16_HANDLER(_880000_r);
 	DECLARE_WRITE16_HANDLER(gfx_ctrl_w);
 
 protected:
 	virtual void video_start();
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 WRITE16_MEMBER(_3x3puzzle_state::videoram1_w)
@@ -133,6 +136,7 @@ WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
 	// bit 5 (0x20) cleared when palette is written
 	// bit 4 (0x10) screen width - 1: 512 pixels, 0: 320 pixels
 	// bit 3 (0x08) is set when 0x400000/0x480000 is written
+	// bit 1 (0x02) OKI banking
 
 	if ( BIT(data,4) )
 	{
@@ -141,6 +145,12 @@ WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
 	else
 	{
 		machine().primary_screen->set_visible_area(0*8, 40*8-1, 0*8, 30*8-1);
+	}
+
+	if ( BIT(data, 1) != m_oki_bank )
+	{
+		m_oki_bank = BIT(data,1);
+		m_oki->set_bank_base(m_oki_bank * 0x40000);
 	}
 }
 
@@ -286,6 +296,16 @@ static GFXDECODE_START( _3x3puzzle )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout,     0, 3 )
 GFXDECODE_END
 
+void _3x3puzzle_state::machine_start()
+{
+	save_item(NAME(m_oki_bank));
+}
+
+void _3x3puzzle_state::machine_reset()
+{
+	m_oki_bank = 0;
+}
+
 
 static MACHINE_CONFIG_START( _3x3puzzle, _3x3puzzle_state )
 
@@ -374,5 +394,5 @@ ROM_START( 3x3puzzla )
 ROM_END
 
 
-GAME( 199?, 3x3puzzl,  0,          _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace",      "3X3 Puzzle (Enterprise)", GAME_IMPERFECT_SOUND )
-GAME( 199?, 3x3puzzla, 3x3puzzl,   _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace",      "3X3 Puzzle (Normal)", GAME_IMPERFECT_SOUND )
+GAME( 199?, 3x3puzzl,  0,          _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace",      "3X3 Puzzle (Enterprise)", 0 )
+GAME( 199?, 3x3puzzla, 3x3puzzl,   _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace",      "3X3 Puzzle (Normal)", 0 )
