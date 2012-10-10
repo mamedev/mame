@@ -26,6 +26,7 @@
     - Advanced Fantasian: wants an irq that can't happen (I is equal to 0x3f)
     - American Success: reads the light pen?
     - Balance of Power: uses the SIO port for something ...
+    - Belloncho Shintai Kensa: hangs
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
     - The Black Onyx: writes a katakana msg: "sono kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
     - Campaign Ban Daisenryaku 2: Hangs at title screen?
@@ -40,6 +41,7 @@
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Gegege no Kitarou: title screen text/bitmap contrast is pretty ugly (BTANB?);
     - Grobda: palette is ugly (parent pc8801 only);
+    - Makaimura: after losing a life the game doesn't work properly anymore, copy protection?
     - Music Collection Vol. 2 - Final Fantasy Tokushuu: sound irq dies pretty soon
     - N-BASIC: cursor doesn't show up;
     - Star Cruiser: bad kanji data?
@@ -47,40 +49,42 @@
     - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
     - Xevious: game is too fast (parent pc8801 only)
 
-    list of games/apps that crashes due of floppy issues:
-    - Agni no Ishi
-    - Amazoness no Hihou (takes invalid data from floppy)
+    list of games/apps that crashes due of floppy issues (* -> denotes games fixed with current floppy code, # -> moans at MESS boot regarding the d88 format with
+      current floppy code):
+    * Agni no Ishi
+    # Amazoness no Hihou (takes invalid data from floppy)
     - American Truck / American Truck SR (polls read deleted data command)
-    - Ankokujou
-    - Ao No Sekizou (fdc CPU irq doesn't fire anymore)
-    - Arcus
-    - Attacker
+    * Ankokujou
+    # Ao No Sekizou (fdc CPU irq doesn't fire anymore)
+    # Arcus
+    # Attacker
     - Autumn Park (BASIC error)
-    - Battle Gorilla
-    - Belloncho Shintai Kensa
-    - Bishoujo Noriko Part I (writes to FDC CPU ROM then expects some strict values, taken from floppy image)
-    - Blassty (attempts to read at 0x801b)
+    * Battle Gorilla
+    * Belloncho Shintai Kensa
+    # Bishoujo Noriko Part I (writes to FDC CPU ROM then expects some strict values, taken from floppy image)
+    * Blassty (attempts to read at 0x801b)
     - Bokosuka Wars (polls read ID command)
-    - Boukenshatachi
-    - Can Can Bunny Superior
+    # Boukenshatachi
+    # Can Can Bunny Superior
     - Carmine
-    - Castle Excellent (sets sector 0xf4? Jumps to 0xa100 and it shouldn't)
+    - Castle Excellent (sets sector 0xf4? Jumps to 0xa100 and it shouldn't) (REGRESSED with current floppy code)
     - Card Game Pro 8.8k Plus Unit 1 (prints Disk i/o error 135 in vram, not visible for whatever reason)
     - Championship Lode Runner (fdc CPU irq doesn't fire anymore)
-    - Change Vol. 1 (fdc CPU irq doesn't fire anymore)
-    - Chikyuu Boueigun (disk i/o error during "ESDF SYSTEM LOADING")
-    - Chikyuu Senshi Rayieza (fdc CPU crashes)
+    # Change Vol. 1 (fdc CPU irq doesn't fire anymore)
+    - Chikyuu Boueigun (disk i/o error during "ESDF SYSTEM LOADING") (REGRESSED with current floppy code)
+    * Chikyuu Senshi Rayieza (fdc CPU crashes)
     - Choplifter
     - Columns (code at 0x28c8, copy protection)
-    - Corridor ("THIS SYSTEM NOT KOEI SYSTEM" printed on screen)
-    - Craze (returns to basic after logo pops up, tries to self-modify program data via the window offset?)
-    - Crimson
-    - Crimson 3
-    - Cuby Panic (copy protection routine at 0x911A)
-    - Daidasso (prints "BOOT dekimasen" on screen, can't boot)
+    - Corridor ("THIS SYSTEM NOT KOEI SYSTEM" printed on screen) (REGRESSED with current floppy code)
+    # Craze (returns to basic after logo pops up, tries to self-modify program data via the window offset?)
+    # Crimson
+    * Crimson 3
+    * Cuby Panic (copy protection routine at 0x911A)
+    # Daidasso (prints "BOOT dekimasen" on screen -> can't boot)
+
     - Daikoukai Jidai
     - Databox (app)
-    - Day Dream (hangs at the CrossMedia Soft logo)
+    # Day Dream (hangs at the CrossMedia Soft logo)
     - Demons Ring
     - Dennou Tsuushin
     - Door Door MK-2 (sets up TC in the middle of execution phase read then wants status bit 6 to be low PC=0x7050 of fdc cpu)
@@ -96,7 +100,7 @@
     - F2 Grand Prix ("Boot dekimasen")
     - Fangs - The Saga of Wolf Blood (Crashes at the first random battle)
     - Fantasian
-    - Final Zone
+    * Final Zone
     - Final Zone (demo)
     - Fruit Panic
     - FSD Sample Ongaku Shuu Vol. 1-7
@@ -119,8 +123,8 @@
 
     - Harakiri
     - Kaseijin (app) (code snippet is empty at some point)
-    - MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
-    - Mugen Senshi Valis (at Telenet logo, it also appears to have a nasty copy protection when taking a specific item)
+    * MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
+    * Mugen Senshi Valis (at Telenet logo, it also appears to have a nasty copy protection when taking a specific item (untested))
     - Mr. Pro Yakyuu
     - PC-8034 (app)
     - PC-8037SR (app)
