@@ -1,3 +1,5 @@
+#include "video/vsystem_spr.h"
+#include "video/vsystem_spr2.h"
 
 class aerofgt_state : public driver_device
 {
@@ -11,7 +13,10 @@ public:
 		m_spriteram1(*this, "spriteram1"),
 		m_spriteram2(*this, "spriteram2"),
 		m_spriteram3(*this, "spriteram3"),
-		m_tx_tilemap_ram(*this, "tx_tilemap_ram"){ }
+		m_tx_tilemap_ram(*this, "tx_tilemap_ram"),
+		m_spr(*this, "vsystem_spr"),
+		m_spr_old(*this, "vsystem_spr_old")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg1videoram;
@@ -23,6 +28,11 @@ public:
 	required_shared_ptr<UINT16> m_spriteram3;
 	optional_shared_ptr<UINT16> m_tx_tilemap_ram;
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
+
+	/* devices referenced above */
+	optional_device<vsystem_spr_device> m_spr; // only the aerofgt parent uses this chip
+	optional_device<vsystem_spr2_device> m_spr_old; // every other (non-bootleg) uses this
+
 
 	/* video-related */
 	tilemap_t   *m_bg1_tilemap;
@@ -42,8 +52,10 @@ public:
 	/* misc */
 	int       m_pending_command;
 
-	/* devices */
+	/* other devices */
 	cpu_device *m_audiocpu;
+	
+	/* handlers */
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(turbofrc_sound_command_w);
 	DECLARE_WRITE16_MEMBER(aerfboot_soundlatch_w);

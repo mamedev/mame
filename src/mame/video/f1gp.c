@@ -163,78 +163,6 @@ WRITE16_MEMBER(f1gp_state::f1gp2_gfxctrl_w)
 
 ***************************************************************************/
 
-static void f1gp_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, int primask )
-{
-	f1gp_state *state = machine.driver_data<f1gp_state>();
-	int attr_start, first;
-	UINT16 *spram = chip ? state->m_spr2vram : state->m_spr1vram;
-
-	first = 4 * spram[0x1fe];
-
-	for (attr_start = 0x0200 - 8; attr_start >= first; attr_start -= 4)
-	{
-		int map_start;
-		int ox, oy, x, y, xsize, ysize, zoomx, zoomy, flipx, flipy, color/*, pri*/;
-		/* table hand made by looking at the ship explosion in attract mode */
-		/* it's almost a logarithmic scale but not exactly */
-		static const int zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
-
-		if (!(spram[attr_start + 2] & 0x0080)) continue;
-
-		ox = spram[attr_start + 1] & 0x01ff;
-		xsize = (spram[attr_start + 2] & 0x0700) >> 8;
-		zoomx = (spram[attr_start + 1] & 0xf000) >> 12;
-		oy = spram[attr_start + 0] & 0x01ff;
-		ysize = (spram[attr_start + 2] & 0x7000) >> 12;
-		zoomy = (spram[attr_start + 0] & 0xf000) >> 12;
-		flipx = spram[attr_start + 2] & 0x0800;
-		flipy = spram[attr_start + 2] & 0x8000;
-		color = (spram[attr_start + 2] & 0x000f);// + 16 * spritepalettebank;
-		//pri = spram[attr_start + 2] & 0x0010;
-		map_start = spram[attr_start + 3];
-
-		zoomx = 16 - zoomtable[zoomx] / 8;
-		zoomy = 16 - zoomtable[zoomy] / 8;
-
-		for (y = 0; y <= ysize; y++)
-		{
-			int sx, sy;
-
-			if (flipy) sy = ((oy + zoomy * (ysize - y) + 16) & 0x1ff) - 16;
-			else sy = ((oy + zoomy * y + 16) & 0x1ff) - 16;
-
-			for (x = 0; x <= xsize; x++)
-			{
-				int code;
-
-				if (flipx) sx = ((ox + zoomx * (xsize - x) + 16) & 0x1ff) - 16;
-				else sx = ((ox + zoomx * x + 16) & 0x1ff) - 16;
-
-				if (chip == 0)
-					code = state->m_spr1cgram[map_start % (state->m_spr1cgram.bytes() / 2)];
-				else
-					code = state->m_spr2cgram[map_start % (state->m_spr2cgram.bytes() / 2)];
-
-				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1 + chip],
-						code,
-						color,
-						flipx,flipy,
-						sx,sy,
-						0x1000 * zoomx,0x1000 * zoomy,
-						machine.priority_bitmap,
-//                      pri ? 0 : 0x2);
-						primask,15);
-				map_start++;
-			}
-
-			if (xsize == 2) map_start += 1;
-			if (xsize == 4) map_start += 3;
-			if (xsize == 5) map_start += 2;
-			if (xsize == 6) map_start += 1;
-		}
-	}
-}
-
 
 UINT32 f1gp_state::screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -248,18 +176,58 @@ UINT32 f1gp_state::screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitma
 	/* quick kludge for "continue" screen priority */
 	if (m_gfxctrl == 0x00)
 	{
-		f1gp_draw_sprites(machine(), bitmap, cliprect, 0, 0x02);
-		f1gp_draw_sprites(machine(), bitmap, cliprect, 1, 0x02);
+		m_spr_old->f1gp_draw_sprites(m_spr1vram, m_spr2vram, m_spr1cgram,m_spr1cgram.bytes(), m_spr2cgram, m_spr2cgram.bytes(), machine(), bitmap, cliprect, 0, 0x02);
+		m_spr_old->f1gp_draw_sprites(m_spr1vram, m_spr2vram, m_spr1cgram,m_spr1cgram.bytes(), m_spr2cgram, m_spr2cgram.bytes(), machine(), bitmap, cliprect, 1, 0x02);
 	}
 	else
 	{
-		f1gp_draw_sprites(machine(), bitmap, cliprect, 0, 0x00);
-		f1gp_draw_sprites(machine(), bitmap, cliprect, 1, 0x02);
+		m_spr_old->f1gp_draw_sprites(m_spr1vram, m_spr2vram, m_spr1cgram,m_spr1cgram.bytes(), m_spr2cgram, m_spr2cgram.bytes(), machine(), bitmap, cliprect, 0, 0x00);
+		m_spr_old->f1gp_draw_sprites(m_spr1vram, m_spr2vram, m_spr1cgram,m_spr1cgram.bytes(), m_spr2cgram, m_spr2cgram.bytes(), machine(), bitmap, cliprect, 1, 0x02);
 	}
 	return 0;
 }
 
 
+UINT32 f1gp_state::screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+
+	if (m_gfxctrl & 4)	/* blank screen */
+		bitmap.fill(get_black_pen(machine()), cliprect);
+	else
+	{
+		switch (m_gfxctrl & 3)
+		{
+			case 0:
+				k053936_zoom_draw(m_k053936, bitmap, cliprect, m_roz_tilemap, TILEMAP_DRAW_OPAQUE, 0, 1);
+				m_spr->f1gp2_draw_sprites(m_spritelist, m_sprcgram, m_flipscreen, machine(), bitmap, cliprect);
+				m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+				break;
+			case 1:
+				k053936_zoom_draw(m_k053936, bitmap, cliprect, m_roz_tilemap, TILEMAP_DRAW_OPAQUE, 0, 1);
+				m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+				m_spr->f1gp2_draw_sprites(m_spritelist, m_sprcgram, m_flipscreen, machine(), bitmap, cliprect);
+				break;
+			case 2:
+				m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+				k053936_zoom_draw(m_k053936, bitmap, cliprect, m_roz_tilemap, 0, 0, 1);
+				m_spr->f1gp2_draw_sprites(m_spritelist, m_sprcgram, m_flipscreen, machine(), bitmap, cliprect);
+				break;
+#ifdef MAME_DEBUG
+			case 3:
+				popmessage("unsupported priority 3\n");
+#endif
+		}
+	}
+	return 0;
+}
+
+/***************************************************************************
+
+  BOOTLEG SUPPORT
+
+***************************************************************************/
+
+// BOOTLEG
 static void f1gpb_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
 	f1gp_state *state = machine.driver_data<f1gp_state>();
@@ -328,6 +296,7 @@ static void f1gpb_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,c
 	}
 }
 
+// BOOTLEG
 UINT32 f1gp_state::screen_update_f1gpb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT32 startx, starty;
@@ -355,108 +324,3 @@ UINT32 f1gp_state::screen_update_f1gpb(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-static void f1gp2_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	f1gp_state *state = machine.driver_data<f1gp_state>();
-	int offs;
-
-	offs = 0;
-	while (offs < 0x0400 && (state->m_spritelist[offs] & 0x4000) == 0)
-	{
-		int attr_start;
-		int map_start;
-		int ox, oy, x, y, xsize, ysize, zoomx, zoomy, flipx, flipy, color;
-
-		attr_start = 4 * (state->m_spritelist[offs++] & 0x01ff);
-
-		ox = state->m_spritelist[attr_start + 1] & 0x01ff;
-		xsize = (state->m_spritelist[attr_start + 1] & 0x0e00) >> 9;
-		zoomx = (state->m_spritelist[attr_start + 1] & 0xf000) >> 12;
-		oy = state->m_spritelist[attr_start + 0] & 0x01ff;
-		ysize = (state->m_spritelist[attr_start + 0] & 0x0e00) >> 9;
-		zoomy = (state->m_spritelist[attr_start + 0] & 0xf000) >> 12;
-		flipx = state->m_spritelist[attr_start + 2] & 0x4000;
-		flipy = state->m_spritelist[attr_start + 2] & 0x8000;
-		color = (state->m_spritelist[attr_start + 2] & 0x1f00) >> 8;
-		map_start = state->m_spritelist[attr_start + 3] & 0x7fff;
-
-// aerofgt has the following adjustment, but doing it here would break the title screen
-//      ox += (xsize*zoomx+2)/4;
-//      oy += (ysize*zoomy+2)/4;
-
-		zoomx = 32 - zoomx;
-		zoomy = 32 - zoomy;
-
-		if (state->m_spritelist[attr_start + 2] & 0x20ff)
-			color = machine.rand();
-
-		for (y = 0; y <= ysize; y++)
-		{
-			int sx,sy;
-
-			if (flipy) sy = ((oy + zoomy * (ysize - y)/2 + 16) & 0x1ff) - 16;
-			else sy = ((oy + zoomy * y / 2 + 16) & 0x1ff) - 16;
-
-			for (x = 0; x <= xsize; x++)
-			{
-				int code;
-
-				if (flipx) sx = ((ox + zoomx * (xsize - x) / 2 + 16) & 0x1ff) - 16;
-				else sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
-
-				code = state->m_sprcgram[map_start & 0x3fff];
-				map_start++;
-
-				if (state->m_flipscreen)
-					drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1],
-							code,
-							color,
-							!flipx,!flipy,
-							304-sx,208-sy,
-							zoomx << 11,zoomy << 11,15);
-				else
-					drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1],
-							code,
-							color,
-							flipx,flipy,
-							sx,sy,
-							zoomx << 11,zoomy << 11,15);
-			}
-		}
-	}
-}
-
-
-UINT32 f1gp_state::screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-
-	if (m_gfxctrl & 4)	/* blank screen */
-		bitmap.fill(get_black_pen(machine()), cliprect);
-	else
-	{
-		switch (m_gfxctrl & 3)
-		{
-			case 0:
-				k053936_zoom_draw(m_k053936, bitmap, cliprect, m_roz_tilemap, TILEMAP_DRAW_OPAQUE, 0, 1);
-				f1gp2_draw_sprites(machine(), bitmap, cliprect);
-				m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-				break;
-			case 1:
-				k053936_zoom_draw(m_k053936, bitmap, cliprect, m_roz_tilemap, TILEMAP_DRAW_OPAQUE, 0, 1);
-				m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-				f1gp2_draw_sprites(machine(), bitmap, cliprect);
-				break;
-			case 2:
-				m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-				k053936_zoom_draw(m_k053936, bitmap, cliprect, m_roz_tilemap, 0, 0, 1);
-				f1gp2_draw_sprites(machine(), bitmap, cliprect);
-				break;
-#ifdef MAME_DEBUG
-			case 3:
-				popmessage("unsupported priority 3\n");
-#endif
-		}
-	}
-	return 0;
-}

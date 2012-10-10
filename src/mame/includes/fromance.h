@@ -7,18 +7,24 @@
 
 ***************************************************************************/
 
+#include "video/vsystem_spr2.h"
+
 class fromance_state : public driver_device
 {
 public:
 	fromance_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_videoram(*this, "videoram"),
-		  m_spriteram(*this, "spriteram") { }
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_spr_old(*this, "vsystem_spr_old")
+	{ }
 
 	/* memory pointers (used by pipedrm) */
 	optional_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_spriteram;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
+
+	optional_device<vsystem_spr2_device> m_spr_old; // only used by pipe dream, split this state up and clean things...
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

@@ -27,121 +27,6 @@ WRITE16_MEMBER(welltris_state::welltris_spriteram_w)
 }
 
 
-/* Sprite Drawing is pretty much the same as fromance.c */
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
-{
-	static const UINT8 zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
-	welltris_state *state = machine.driver_data<welltris_state>();
-	int offs;
-	const rectangle &visarea = machine.primary_screen->visible_area();
-
-	/* draw the sprites */
-	for (offs = 0; offs < 0x200 - 4; offs += 4) {
-		int data0 = state->m_spriteram[offs + 0];
-		int data1 = state->m_spriteram[offs + 1];
-		int data2 = state->m_spriteram[offs + 2];
-		int data3 = state->m_spriteram[offs + 3];
-		int code = data3 & 0x1fff;
-		int color = (data2 & 0x0f) + (0x10 * state->m_spritepalettebank);
-		int y = (data0 & 0x1ff) + 1;
-		int x = (data1 & 0x1ff) + 6;
-		int yzoom = (data0 >> 12) & 15;
-		int xzoom = (data1 >> 12) & 15;
-		int zoomed = (xzoom | yzoom);
-		int ytiles = ((data2 >> 12) & 7) + 1;
-		int xtiles = ((data2 >>  8) & 7) + 1;
-		int yflip = (data2 >> 15) & 1;
-		int xflip = (data2 >> 11) & 1;
-		int xt, yt;
-
-		if (!(state->m_spriteram[offs + 2] & 0x0080)) continue;
-
-		/* compute the zoom factor -- stolen from aerofgt.c */
-		xzoom = 16 - zoomtable[xzoom] / 8;
-		yzoom = 16 - zoomtable[yzoom] / 8;
-
-		/* wrap around */
-		if (x > visarea.max_x) x -= 0x200;
-		if (y > visarea.max_y) y -= 0x200;
-
-		/* normal case */
-		if (!xflip && !yflip) {
-			for (yt = 0; yt < ytiles; yt++) {
-				for (xt = 0; xt < xtiles; xt++, code++) {
-					if (!zoomed)
-						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, 0, 0,
-								x + xt * 16, y + yt * 16, 15);
-					else
-						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], code, color, 0, 0,
-								x + xt * xzoom, y + yt * yzoom,
-								0x1000 * xzoom, 0x1000 * yzoom, 15);
-				}
-				if (xtiles == 3) code += 1;
-				if (xtiles == 5) code += 3;
-				if (xtiles == 6) code += 2;
-				if (xtiles == 7) code += 1;
-			}
-		}
-
-		/* xflipped case */
-		else if (xflip && !yflip) {
-			for (yt = 0; yt < ytiles; yt++) {
-				for (xt = 0; xt < xtiles; xt++, code++) {
-					if (!zoomed)
-						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, 1, 0,
-								x + (xtiles - 1 - xt) * 16, y + yt * 16, 15);
-					else
-						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], code, color, 1, 0,
-								x + (xtiles - 1 - xt) * xzoom, y + yt * yzoom,
-								0x1000 * xzoom, 0x1000 * yzoom, 15);
-				}
-				if (xtiles == 3) code += 1;
-				if (xtiles == 5) code += 3;
-				if (xtiles == 6) code += 2;
-				if (xtiles == 7) code += 1;
-			}
-		}
-
-		/* yflipped case */
-		else if (!xflip && yflip) {
-			for (yt = 0; yt < ytiles; yt++) {
-				for (xt = 0; xt < xtiles; xt++, code++) {
-					if (!zoomed)
-						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, 0, 1,
-								x + xt * 16, y + (ytiles - 1 - yt) * 16, 15);
-					else
-						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], code, color, 0, 1,
-								x + xt * xzoom, y + (ytiles - 1 - yt) * yzoom,
-								0x1000 * xzoom, 0x1000 * yzoom, 15);
-				}
-				if (xtiles == 3) code += 1;
-				if (xtiles == 5) code += 3;
-				if (xtiles == 6) code += 2;
-				if (xtiles == 7) code += 1;
-			}
-		}
-
-		/* x & yflipped case */
-		else {
-			for (yt = 0; yt < ytiles; yt++) {
-				for (xt = 0; xt < xtiles; xt++, code++) {
-					if (!zoomed)
-						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, 1, 1,
-								x + (xtiles - 1 - xt) * 16, y + (ytiles - 1 - yt) * 16, 15);
-					else
-						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], code, color, 1, 1,
-								x + (xtiles - 1 - xt) * xzoom, y + (ytiles - 1 - yt) * yzoom,
-								0x1000 * xzoom, 0x1000 * yzoom, 15);
-				}
-				if (xtiles == 3) code += 1;
-				if (xtiles == 5) code += 3;
-				if (xtiles == 6) code += 2;
-				if (xtiles == 7) code += 1;
-			}
-		}
-	}
-}
-
 void welltris_state::setbank(int num, int bank)
 {
 	if (m_gfxbank[num] != bank)
@@ -240,6 +125,6 @@ UINT32 welltris_state::screen_update_welltris(screen_device &screen, bitmap_ind1
 
 	draw_background(machine(), bitmap, cliprect);
 	m_char_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	m_spr_old->welltris_draw_sprites(m_spriteram, m_spritepalettebank, machine(), bitmap, cliprect);
 	return 0;
 }

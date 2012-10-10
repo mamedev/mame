@@ -658,6 +658,8 @@ static MACHINE_CONFIG_START( pipedrm, fromance_state )
 	MCFG_GFXDECODE(pipedrm)
 	MCFG_PALETTE_LENGTH(2048)
 
+	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
+
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,pipedrm)
 
 	/* sound hardware */

@@ -724,6 +724,7 @@ static MACHINE_CONFIG_START( welltris, welltris_state )
 	MCFG_GFXDECODE(welltris)
 	MCFG_PALETTE_LENGTH(2048)
 
+	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

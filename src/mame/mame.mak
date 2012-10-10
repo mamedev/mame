@@ -1593,6 +1593,7 @@ $(MAMEOBJ)/venture.a: \
 
 $(MAMEOBJ)/vsystem.a: \
 	$(VIDEO)/vsystem_spr.o \
+	$(VIDEO)/vsystem_spr2.o \
 	$(DRIVERS)/aerofgt.o $(VIDEO)/aerofgt.o \
 	$(DRIVERS)/crshrace.o $(VIDEO)/crshrace.o \
 	$(DRIVERS)/f1gp.o $(VIDEO)/f1gp.o \

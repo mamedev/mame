@@ -1,3 +1,5 @@
+#include "video/vsystem_spr.h"
+#include "video/vsystem_spr2.h"
 
 class f1gp_state : public driver_device
 {
@@ -15,7 +17,10 @@ public:
 		m_spritelist(*this, "spritelist"),
 		m_spriteram(*this, "spriteram"),
 		m_fgregs(*this, "fgregs"),
-		m_rozregs(*this, "rozregs"){ }
+		m_rozregs(*this, "rozregs"),
+		m_spr_old(*this, "vsystem_spr_old"),
+		m_spr(*this, "vsystem_spr")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_sharedram;
@@ -30,6 +35,12 @@ public:
 	optional_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_fgregs;
 	optional_shared_ptr<UINT16> m_rozregs;
+
+	/* devices referenced above */
+	optional_device<vsystem_spr2_device> m_spr_old; // f1gp
+	optional_device<vsystem_spr_device> m_spr; // f1gp2
+
+
 	UINT16 *  m_zoomdata;
 //      UINT16 *  m_paletteram;    // currently this uses generic palette handling
 

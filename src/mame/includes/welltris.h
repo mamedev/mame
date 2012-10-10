@@ -1,3 +1,5 @@
+#include "video/vsystem_spr2.h"
+
 class welltris_state : public driver_device
 {
 public:
@@ -5,13 +7,18 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_spriteram(*this, "spriteram"),
 		m_pixelram(*this, "pixelram"),
-		m_charvideoram(*this, "charvideoram"){ }
+		m_charvideoram(*this, "charvideoram"),
+		m_spr_old(*this, "vsystem_spr_old")
+	{ }
 
 	int m_pending_command;
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_pixelram;
 	required_shared_ptr<UINT16> m_charvideoram;
+
+	/* devices referenced above */
+	required_device<vsystem_spr2_device> m_spr_old;
 
 	tilemap_t *m_char_tilemap;
 	UINT8 m_gfxbank[8];

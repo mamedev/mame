@@ -1,9 +1,19 @@
 // Video System Sprites
 // todo:
-//  move various vsystem sprite functions here
-//  unify common ones + convert to device  (secondary stage tile lookup differs between games, use callback)
+//  unify these functions (secondary stage tile lookup differs between games, use callback)
 
 //  according to gstriker this is probably the Fujitsu CG10103
+
+// Aero Fighters (newer hardware)
+// Quiz & Variety Sukusuku Inufuku
+// 3 On 3 Dunk Madness
+// Super Slams
+// Formula 1 Grand Prix 2
+// (Lethal) Crash Race
+// Grand Striker
+// V Goal Soccer
+// Tecmo World Cup '94
+// Tao Taido
 
 #include "emu.h"
 #include "vsystem_spr.h"
@@ -399,6 +409,148 @@ void vsystem_spr_device::draw_sprites_crshrace(UINT16* spriteram, int spriteram_
 	}
 }
 
+
+
+void vsystem_spr_device::draw_sprites_aerofght( UINT16* spriteram3, int spriteram_bytes, UINT16* spriteram1, UINT16* spriteram2, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+{
+	int offs;
+	priority <<= 12;
+
+	offs = 0;
+	while (offs < 0x0400 && (spriteram3[offs] & 0x8000) == 0)
+	{
+		int attr_start = 4 * (spriteram3[offs] & 0x03ff);
+
+		/* is the way I handle priority correct? Or should I just check bit 13? */
+		if ((spriteram3[attr_start + 2] & 0x3000) == priority)
+		{
+			int map_start;
+			int ox, oy, x, y, xsize, ysize, zoomx, zoomy, flipx, flipy, color;
+
+			ox = spriteram3[attr_start + 1] & 0x01ff;
+			xsize = (spriteram3[attr_start + 1] & 0x0e00) >> 9;
+			zoomx = (spriteram3[attr_start + 1] & 0xf000) >> 12;
+			oy = spriteram3[attr_start + 0] & 0x01ff;
+			ysize = (spriteram3[attr_start + 0] & 0x0e00) >> 9;
+			zoomy = (spriteram3[attr_start + 0] & 0xf000) >> 12;
+			flipx = spriteram3[attr_start + 2] & 0x4000;
+			flipy = spriteram3[attr_start + 2] & 0x8000;
+			color = (spriteram3[attr_start + 2] & 0x0f00) >> 8;
+			map_start = spriteram3[attr_start + 3] & 0x3fff;
+
+			ox += (xsize * zoomx + 2) / 4;
+			oy += (ysize * zoomy + 2) / 4;
+
+			zoomx = 32 - zoomx;
+			zoomy = 32 - zoomy;
+
+			for (y = 0; y <= ysize; y++)
+			{
+				int sx, sy;
+
+				if (flipy)
+					sy = ((oy + zoomy * (ysize - y)/2 + 16) & 0x1ff) - 16;
+				else
+					sy = ((oy + zoomy * y / 2 + 16) & 0x1ff) - 16;
+
+				for (x = 0; x <= xsize; x++)
+				{
+					int code;
+
+					if (flipx)
+						sx = ((ox + zoomx * (xsize - x) / 2 + 16) & 0x1ff) - 16;
+					else
+						sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
+
+					if (map_start < 0x2000)
+						code = spriteram1[map_start & 0x1fff] & 0x1fff;
+					else
+						code = spriteram2[map_start & 0x1fff] & 0x1fff;
+
+					drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[2 + (map_start >= 0x2000 ? 1 : 0)],
+							code,
+							color,
+							flipx,flipy,
+							sx,sy,
+							zoomx << 11, zoomy << 11,15);
+					map_start++;
+				}
+			}
+		}
+		offs++;
+	}
+}
+
+
+void vsystem_spr_device::f1gp2_draw_sprites(UINT16* spritelist, UINT16* sprcgram, int flipscreen, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	int offs;
+
+	offs = 0;
+	while (offs < 0x0400 && (spritelist[offs] & 0x4000) == 0)
+	{
+		int attr_start;
+		int map_start;
+		int ox, oy, x, y, xsize, ysize, zoomx, zoomy, flipx, flipy, color;
+
+		attr_start = 4 * (spritelist[offs++] & 0x01ff);
+
+		ox = spritelist[attr_start + 1] & 0x01ff;
+		xsize = (spritelist[attr_start + 1] & 0x0e00) >> 9;
+		zoomx = (spritelist[attr_start + 1] & 0xf000) >> 12;
+		oy = spritelist[attr_start + 0] & 0x01ff;
+		ysize = (spritelist[attr_start + 0] & 0x0e00) >> 9;
+		zoomy = (spritelist[attr_start + 0] & 0xf000) >> 12;
+		flipx = spritelist[attr_start + 2] & 0x4000;
+		flipy = spritelist[attr_start + 2] & 0x8000;
+		color = (spritelist[attr_start + 2] & 0x1f00) >> 8;
+		map_start = spritelist[attr_start + 3] & 0x7fff;
+
+// aerofgt has the following adjustment, but doing it here would break the title screen
+//      ox += (xsize*zoomx+2)/4;
+//      oy += (ysize*zoomy+2)/4;
+
+		zoomx = 32 - zoomx;
+		zoomy = 32 - zoomy;
+
+		if (spritelist[attr_start + 2] & 0x20ff)
+			color = machine.rand();
+
+		for (y = 0; y <= ysize; y++)
+		{
+			int sx,sy;
+
+			if (flipy) sy = ((oy + zoomy * (ysize - y)/2 + 16) & 0x1ff) - 16;
+			else sy = ((oy + zoomy * y / 2 + 16) & 0x1ff) - 16;
+
+			for (x = 0; x <= xsize; x++)
+			{
+				int code;
+
+				if (flipx) sx = ((ox + zoomx * (xsize - x) / 2 + 16) & 0x1ff) - 16;
+				else sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
+
+				code = sprcgram[map_start & 0x3fff];
+				map_start++;
+
+				if (flipscreen)
+					drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1],
+							code,
+							color,
+							!flipx,!flipy,
+							304-sx,208-sy,
+							zoomx << 11,zoomy << 11,15);
+				else
+					drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1],
+							code,
+							color,
+							flipx,flipy,
+							sx,sy,
+							zoomx << 11,zoomy << 11,15);
+			}
+		}
+	}
+}
 
 
 /*** Fujitsu CG10103 **********************************************/
