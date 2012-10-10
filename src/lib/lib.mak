@@ -50,6 +50,7 @@ UTILOBJS = \
 	$(LIBOBJ)/util/opresolv.o \
 	$(LIBOBJ)/util/options.o \
 	$(LIBOBJ)/util/palette.o \
+	$(LIBOBJ)/util/plaparse.o \
 	$(LIBOBJ)/util/png.o \
 	$(LIBOBJ)/util/pool.o \
 	$(LIBOBJ)/util/sha1.o \

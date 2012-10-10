@@ -102,6 +102,7 @@
 #include <ctype.h>
 #include "corestr.h"
 #include "jedparse.h"
+#include "plaparse.h"
 
 
 
@@ -949,6 +950,26 @@ static int is_jed_file(const char *file)
            tolower((UINT8)file[len - 3]) == 'j' &&
            tolower((UINT8)file[len - 2]) == 'e' &&
            tolower((UINT8)file[len - 1]) == 'd');
+}
+
+
+
+/*-------------------------------------------------
+    is_pla_file - test if the file extension is
+    that of a Berkeley standard PLA file
+-------------------------------------------------*/
+
+static int is_pla_file(const char *file)
+{
+    int len;
+
+    /* does the source end in '.pla'? */
+    len = strlen(file);
+
+    return (file[len - 4] == '.' &&
+           tolower((UINT8)file[len - 3]) == 'p' &&
+           tolower((UINT8)file[len - 2]) == 'l' &&
+           tolower((UINT8)file[len - 1]) == 'a');
 }
 
 
@@ -2540,8 +2561,9 @@ static int print_usage()
 {
 	fprintf(stderr,
 		"Usage:\n"
-		"  jedutil -convert <source.jed> <target.bin> [fuses] -- convert JED to binary form\n"
-		"  jedutil -convert <source.bin> <target.jed> -- convert binary to JED form\n"
+		"  jedutil -convert <source.jed> <target.bin> [fuses] -- convert JEDEC to binary form\n"
+        "  jedutil -convert <source.pla> <target.bin> [fuses] -- convert Berkeley standard PLA to binary form\n"
+		"  jedutil -convert <source.bin> <target.jed> -- convert binary to JEDEC form\n"
         "  jedutil -view <source.jed> <pal name> -- dump JED logic equations\n"
         "  jedutil -view <source.bin> <pal name> -- dump binary logic equations\n"
         "  jedutil -viewlist -- view list of supported devices\n"
@@ -2559,7 +2581,7 @@ static int print_usage()
 static int command_convert(int argc, char *argv[])
 {
     const char *srcfile, *dstfile;
-	int src_is_jed, dst_is_jed;
+	int src_is_jed, src_is_pla, dst_is_jed;
 	int numfuses = 0;
 	jed_data jed;
 	int err;
@@ -2578,13 +2600,16 @@ static int command_convert(int argc, char *argv[])
 	/* does the source end in '.jed'? */
 	src_is_jed = is_jed_file(srcfile);
 
+    /* does the source end in '.pla'? */
+    src_is_pla = is_pla_file(srcfile);
+
 	/* does the destination end in '.jed'? */
 	dst_is_jed = is_jed_file(dstfile);
 
 	/* error if neither or both are .jed */
-	if (!src_is_jed && !dst_is_jed)
+	if (!src_is_jed && !src_is_pla && !dst_is_jed)
 	{
-		fprintf(stderr, "At least one of the filenames must end in .jed!\n");
+		fprintf(stderr, "At least one of the filenames must end in .jed or .pla!\n");
 		return 1;
 	}
 	if (src_is_jed && dst_is_jed)
@@ -2598,16 +2623,20 @@ static int command_convert(int argc, char *argv[])
 	if (err != 0)
 		return 1;
 
-	/* if the source is JED, convert to binary */
-	if (src_is_jed)
+	/* if the source is JED or PLA, convert to binary */
+	if (src_is_jed || src_is_pla)
 	{
 		printf("Converting '%s' to binary form '%s'\n", srcfile, dstfile);
 
-		/* read the JEDEC data */
-		err = jed_parse(srcbuf, srcbuflen, &jed);
+		/* read the fuse data */
+        if (src_is_jed)
+			err = jed_parse(srcbuf, srcbuflen, &jed);
+        else if (src_is_pla)
+        	err = pla_parse(srcbuf, srcbuflen, &jed);
+
 		switch (err)
 		{
-			case JEDERR_INVALID_DATA:	fprintf(stderr, "Fatal error: Invalid .JED file\n"); return 1;
+			case JEDERR_INVALID_DATA:	fprintf(stderr, "Fatal error: Invalid source file\n"); return 1;
 			case JEDERR_BAD_XMIT_SUM:	fprintf(stderr, "Fatal error: Bad transmission checksum\n"); return 1;
 			case JEDERR_BAD_FUSE_SUM:	fprintf(stderr, "Fatal error: Bad fusemap checksum\n"); return 1;
 		}
