@@ -244,6 +244,7 @@
 #include "video/upd7220.h"
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
+#include "formats/mfi_dsk.h"
 
 #define UPD1990A_TAG "upd1990a"
 #define UPD8251_TAG  "upd8251"
@@ -404,6 +405,13 @@ public:
 	DECLARE_WRITE8_MEMBER(sdip_9_w);
 	DECLARE_WRITE8_MEMBER(sdip_a_w);
 	DECLARE_WRITE8_MEMBER(sdip_b_w);
+
+	void fdc_2hd_irq(bool state);
+	void fdc_2hd_drq(bool state);
+	void fdc_2dd_irq(bool state);
+	void fdc_2dd_drq(bool state);
+
+	void pc9801rs_fdc_irq(bool state);
 
 private:
 	UINT8 m_sdip_read(UINT16 port, UINT8 sdip_offset);
@@ -578,6 +586,14 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	}
 }
 
+static const floppy_format_type pc9801_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
+	NULL
+};
+
+static SLOT_INTERFACE_START( pc9801_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
 
 static UPD7220_INTERFACE( hgdc_1_intf )
 {
@@ -1063,8 +1079,8 @@ READ8_MEMBER(pc9801_state::pc9801_fdc_2hd_r)
 	{
 		switch(offset & 6)
 		{
-			case 0:	return upd765_status_r(machine().device("upd765_2hd"),space, 0);
-			case 2: return upd765_data_r(machine().device("upd765_2hd"),space, 0);
+			case 0:	return machine().device<upd765a_device>("upd765_2hd")->msr_r(space, 0, 0xff);
+			case 2: return machine().device<upd765a_device>("upd765_2hd")->fifo_r(space, 0, 0xff);
 			case 4: return 0x5f; //unknown port meaning
 		}
 	}
@@ -1090,19 +1106,15 @@ WRITE8_MEMBER(pc9801_state::pc9801_fdc_2hd_w)
 		switch(offset & 6)
 		{
 			case 0: printf("Write to undefined port [%02x] <- %02x\n",offset+0x90,data); return;
-			case 2: upd765_data_w(machine().device("upd765_2hd"),space, 0,data); return;
+			case 2: machine().device<upd765a_device>("upd765_2hd")->fifo_w(space, 0, data, 0xff); return;
 			case 4:
 				printf("%02x ctrl\n",data);
 				if(((m_fdc_2hd_ctrl & 0x80) == 0) && (data & 0x80))
-					upd765_reset_w(machine().device("upd765_2hd"),1);
-				if((m_fdc_2hd_ctrl & 0x80) && (!(data & 0x80)))
-					upd765_reset_w(machine().device("upd765_2hd"),0);
+					machine().device<upd765a_device>("upd765_2hd")->reset();
 
 				m_fdc_2hd_ctrl = data;
-				floppy_mon_w(floppy_get_device(machine(), 0), (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
-				floppy_mon_w(floppy_get_device(machine(), 1), (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
-				floppy_drive_set_ready_state(floppy_get_device(machine(), 0), (data & 0x40), 0);
-				floppy_drive_set_ready_state(floppy_get_device(machine(), 1), (data & 0x40), 0);
+				machine().device<floppy_connector>("upd765_2hd:0")->get_device()->mon_w(!(data & 0x40));
+				machine().device<floppy_connector>("upd765_2hd:1")->get_device()->mon_w(!(data & 0x40));
 				break;
 		}
 	}
@@ -1124,8 +1136,8 @@ READ8_MEMBER(pc9801_state::pc9801_fdc_2dd_r)
 	{
 		switch(offset & 6)
 		{
-			case 0:	return upd765_status_r(machine().device("upd765_2dd"),space, 0);
-			case 2: return upd765_data_r(machine().device("upd765_2dd"),space, 0);
+			case 0:	return machine().device<upd765a_device>("upd765_2dd")->msr_r(space, 0, 0xff);
+			case 2: return machine().device<upd765a_device>("upd765_2dd")->fifo_r(space, 0, 0xff);
 			case 4: return 0x40; //unknown port meaning, might be 0x70
 		}
 	}
@@ -1146,13 +1158,11 @@ WRITE8_MEMBER(pc9801_state::pc9801_fdc_2dd_w)
 		switch(offset & 6)
 		{
 			case 0: printf("Write to undefined port [%02x] <- %02x\n",offset+0xc8,data); return;
-			case 2: upd765_data_w(machine().device("upd765_2dd"),space, 0,data); return;
+			case 2: machine().device<upd765a_device>("upd765_2dd")->fifo_w(space, 0, data, 0xff); return;
 			case 4:
 				printf("%02x ctrl\n",data);
 				if(((m_fdc_2dd_ctrl & 0x80) == 0) && (data & 0x80))
-					upd765_reset_w(machine().device("upd765_2dd"),1);
-				if((m_fdc_2dd_ctrl & 0x80) && (!(data & 0x80)))
-					upd765_reset_w(machine().device("upd765_2dd"),0);
+					machine().device<upd765a_device>("upd765_2dd")->reset();
 
 				m_fdc_2dd_ctrl = data;
 				//floppy_mon_w(floppy_get_device(machine(), 0), (data & 8) ? CLEAR_LINE : ASSERT_LINE);
@@ -1436,8 +1446,8 @@ READ8_MEMBER(pc9801_state::pc9801rs_2hd_r)
 	{
 		switch(offset & 6)
 		{
-			case 0:	return upd765_status_r(machine().device("upd765_2hd"),space, 0);
-			case 2: return upd765_data_r(machine().device("upd765_2hd"),space, 0);
+			case 0:	return machine().device<upd765a_device>("upd765_2hd")->msr_r(space, 0, 0xff);
+			case 2: return machine().device<upd765a_device>("upd765_2hd")->fifo_r(space, 0, 0xff);
 			case 4: return 0x40; //2hd flag
 		}
 	}
@@ -1453,7 +1463,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_2hd_w)
 	{
 		switch(offset & 6)
 		{
-			case 2: upd765_data_w(machine().device("upd765_2hd"),space, 0,data); return;
+			case 2: machine().device<upd765a_device>("upd765_2hd")->fifo_w(space, 0, data, 0xff); return;
 			case 4: printf("%02x FDC ctrl\n",data); return;
 		}
 	}
@@ -1471,8 +1481,8 @@ READ8_MEMBER(pc9801_state::pc9801rs_2dd_r)
 	{
 		switch(offset & 6)
 		{
-			case 0:	return upd765_status_r(machine().device("upd765_2hd"),space, 0);
-			case 2: return upd765_data_r(machine().device("upd765_2hd"),space, 0);
+			case 0:	return machine().device<upd765a_device>("upd765_2hd")->msr_r(space, 0, 0xff);
+			case 2: return machine().device<upd765a_device>("upd765_2hd")->fifo_r(space, 0, 0xff);
 			case 4: return 0x70; //2dd flag
 		}
 	}
@@ -1492,7 +1502,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_2dd_w)
 	{
 		switch(offset & 6)
 		{
-			case 2: upd765_data_w(machine().device("upd765_2hd"),space, 0,data); return;
+			case 2: machine().device<upd765a_device>("upd765_2hd")->fifo_w(space, 0, data, 0xff); return;
 			case 4: printf("%02x FDC ctrl\n",data); return;
 		}
 	}
@@ -2429,21 +2439,20 @@ static I8255A_INTERFACE( ppi_fdd_intf )
 *
 ****************************************/
 
-WRITE_LINE_MEMBER(pc9801_state::fdc_2hd_irq)
+void pc9801_state::fdc_2hd_irq(bool state)
 {
 	printf("IRQ %d\n",state);
 	//if(state)
 	//  pic8259_ir3_w(machine().device("pic8259_slave"), state);
 }
 
-WRITE_LINE_MEMBER(pc9801_state::fdc_2hd_drq)
+void pc9801_state::fdc_2hd_drq(bool state)
 {
 	printf("%02x DRQ\n",state);
 }
 
-WRITE_LINE_MEMBER(pc9801_state::fdc_2dd_irq)
+void pc9801_state::fdc_2dd_irq(bool state)
 {
-
 	printf("IRQ %d\n",state);
 
 	if(m_fdc_2dd_ctrl & 8)
@@ -2452,32 +2461,13 @@ WRITE_LINE_MEMBER(pc9801_state::fdc_2dd_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(pc9801_state::fdc_2dd_drq)
+void pc9801_state::fdc_2dd_drq(bool state)
 {
 	printf("%02x DRQ\n",state);
 }
 
-static const struct upd765_interface upd765_2hd_intf =
+void pc9801_state::pc9801rs_fdc_irq(bool state)
 {
-	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, fdc_2hd_irq),
-	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, fdc_2hd_drq), //DRQ, TODO
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
-
-static const struct upd765_interface upd765_2dd_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, fdc_2dd_irq),
-	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, fdc_2dd_drq), //DRQ, TODO
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{NULL, NULL, NULL, NULL}
-};
-
-WRITE_LINE_MEMBER(pc9801_state::pc9801rs_fdc_irq)
-{
-
 	/* 0xffaf8 */
 
 	if(m_fdc_ctrl & 1)
@@ -2485,28 +2475,6 @@ WRITE_LINE_MEMBER(pc9801_state::pc9801rs_fdc_irq)
 	else
 		pic8259_ir2_w(machine().device("pic8259_slave"), state);
 }
-
-static const struct upd765_interface pc9801rs_upd765_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801rs_fdc_irq),
-	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, fdc_2dd_drq), //DRQ, TODO
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
-
-static const floppy_interface pc9801_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_5_25",
-	NULL
-};
 
 static UPD1990A_INTERFACE( pc9801_upd1990a_intf )
 {
@@ -2555,6 +2523,16 @@ MACHINE_START_MEMBER(pc9801_state,pc9801)
 
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
+
+	upd765a_device *fdc;
+	fdc = machine().device<upd765a_device>("upd765_2hd");
+	fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2hd_irq), this));
+	fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2hd_drq), this));
+
+	fdc = machine().device<upd765a_device>("upd765_2dd");
+	fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2dd_irq), this));
+	fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2dd_drq), this));
+
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9801)
@@ -2674,9 +2652,11 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc9801_upd1990a_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
-	MCFG_UPD765A_ADD("upd765_2hd", upd765_2hd_intf)
-	MCFG_UPD765A_ADD("upd765_2dd", upd765_2dd_intf)
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(pc9801_floppy_interface)
+	MCFG_UPD765A_ADD("upd765_2hd", true, true)
+	MCFG_UPD765A_ADD("upd765_2dd", true, true)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, pc9801_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, pc9801_floppy_formats)
+
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc98")
 
 	#if 0
@@ -2737,9 +2717,10 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
-	MCFG_UPD765A_ADD("upd765_2hd", pc9801rs_upd765_intf)
+	MCFG_UPD765A_ADD("upd765_2hd", true, true)
 	//"upd765_2dd"
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(pc9801_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, pc9801_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, pc9801_floppy_formats)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
@@ -2797,9 +2778,10 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
-	MCFG_UPD765A_ADD("upd765_2hd", pc9801rs_upd765_intf)
+	MCFG_UPD765A_ADD("upd765_2hd", true, true)
 	//"upd765_2dd"
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(pc9801_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, pc9801_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, pc9801_floppy_formats)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")

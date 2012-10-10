@@ -48,19 +48,19 @@ protected:
 	virtual void io_write(offs_t offset, UINT8 data);
 
 public:
-	device_t* get_active_fdd() { return m_floppy; }
 	DECLARE_READ8_MEMBER(hw_input_gate_r);
 	DECLARE_WRITE8_MEMBER(fdd_select_w);
 	DECLARE_WRITE8_MEMBER(hw_terminal_count_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(fdc_dma_request);
+
+	void fdc_irq(bool state);
+	void fdc_drq(bool state);
 
 private:
 	static const device_timer_id TIMER_RESET = 0;
 	static const device_timer_id TIMER_TC_CLEAR = 1;
 
 	required_device<cpu_device> m_cpu;
-	required_device<device_t>	m_fdc;
+	required_device<upd765a_device>	m_fdc;
 	required_shared_ptr<UINT8>	m_koppel_ram;
 
 	// internal state
@@ -73,7 +73,8 @@ private:
 	UINT8				m_enabled;
 	UINT8				m_connected;
 	UINT8				m_active_fdd;
-	device_t *			m_floppy;
+
+	floppy_image_device *m_floppy;
 };
 
 

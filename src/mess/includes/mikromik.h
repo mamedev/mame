@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/am9517a.h"
 #include "machine/i8212.h"
@@ -42,8 +41,8 @@ public:
 		  m_mpsc(*this, UPD7201_TAG),
 		  m_hgdc(*this, UPD7220_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
-		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1),
+		  m_floppy0(*this, UPD765_TAG ":0:525qd"),
+		  m_floppy1(*this, UPD765_TAG ":1:525qd"),
 		  m_ram(*this, RAM_TAG),
 		  m_video_ram(*this, "video_ram")
 	{ }
@@ -53,12 +52,12 @@ public:
 	required_device<am9517a_device> m_dmac;
 	required_device<device_t> m_pit;
 	required_device<device_t> m_crtc;
-	required_device<device_t> m_fdc;
+	required_device<upd765a_device> m_fdc;
 	required_device<upd7201_device> m_mpsc;
 	required_device<upd7220_device> m_hgdc;
 	required_device<device_t> m_speaker;
-	required_device<device_t> m_floppy0;
-	required_device<device_t> m_floppy1;
+	required_device<floppy_image_device> m_floppy0;
+	required_device<floppy_image_device> m_floppy1;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<UINT8> m_video_ram;
 
@@ -85,6 +84,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq1_w );
 	DECLARE_READ_LINE_MEMBER( dsra_r );
 	DECLARE_PALETTE_INIT(mm1);
+	DECLARE_READ8_MEMBER(fdc_dma_r);
+	DECLARE_WRITE8_MEMBER(fdc_dma_w);
+
+	void fdc_irq(bool state);
+	void fdc_drq(bool state);
 
 	void scan_keyboard();
 

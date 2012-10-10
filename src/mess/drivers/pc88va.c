@@ -27,7 +27,9 @@
 #include "machine/pit8253.h"
 #include "machine/upd765.h"
 #include "sound/2203intf.h"
-#include "formats/basicdsk.h"
+#include "formats/mfi_dsk.h"
+#include "formats/pc_dsk.h"
+#include "formats/xdf_dsk.h"
 
 struct tsp_t
 {
@@ -119,6 +121,8 @@ public:
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_upd765_interrupt);
+
+	void upd765_interrupt(bool state);
 };
 
 
@@ -954,23 +958,19 @@ READ8_MEMBER(pc88va_state::hdd_status_r)
 
 WRITE8_MEMBER(pc88va_state::upd765_mc_w)
 {
-	floppy_mon_w(floppy_get_device(machine(), 0), (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-	floppy_mon_w(floppy_get_device(machine(), 1), (data & 2) ? CLEAR_LINE : ASSERT_LINE);
-	floppy_drive_set_ready_state(floppy_get_device(machine(), 0), (data & 1), 0);
-	floppy_drive_set_ready_state(floppy_get_device(machine(), 1), (data & 2), 0);
+	machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(!(data & 1));
+	machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(!(data & 2));
 }
 
 TIMER_CALLBACK_MEMBER(pc88va_state::pc8801fd_upd765_tc_to_zero)
 {
-
-	upd765_tc_w(machine().device("upd765"), 0);
+	machine().device<upd765a_device>("upd765")->tc_w(false);
 }
 
 READ8_MEMBER(pc88va_state::upd765_tc_r)
 {
-
-	upd765_tc_w(machine().device("upd765"), 1);
-	machine().scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(pc88va_state::pc8801fd_upd765_tc_to_zero),this));
+	machine().device<upd765a_device>("upd765")->tc_w(true);
+	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(pc88va_state::pc8801fd_upd765_tc_to_zero),this));
 	return 0;
 }
 
@@ -986,8 +986,6 @@ READ8_MEMBER(pc88va_state::pc88va_fdc_r)
 		/* ---x ---- RDY: (0) Busy (1) Ready */
 		case 0x06: // FDC control port 2
 			return 0;
-		case 0x08: return upd765_status_r(machine().device("upd765"), space, 0);
-		case 0x0a: return upd765_data_r(machine().device("upd765"), space, 0);
 	}
 
 	return 0xff;
@@ -1028,8 +1026,6 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 		case 0x06:
 			printf("%02x\n",data);
 			break; // FDC control port 2
-		case 0x08: break; // UPD765 status
-		case 0x0a: upd765_data_w(machine().device("upd765"), space, 0,data); break;
 	}
 }
 
@@ -1154,7 +1150,8 @@ static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16, pc88va_state )
 	AM_RANGE(0x019a, 0x019b) AM_WRITE(backupram_wp_0_w) //Backup RAM write permission
 	AM_RANGE(0x01a0, 0x01a7) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0x00ff)// vTCU (timer counter unit)
 	AM_RANGE(0x01a8, 0x01a9) AM_WRITE8(timer3_ctrl_reg_w,0x00ff) // General-purpose timer 3 control port
-	AM_RANGE(0x01b0, 0x01bb) AM_READWRITE8(pc88va_fdc_r,pc88va_fdc_w,0x00ff)// FDC related (765)
+	AM_RANGE(0x01b0, 0x01b7) AM_READWRITE8(pc88va_fdc_r,pc88va_fdc_w,0x00ff)// FDC related (765)
+	AM_RANGE(0x01b8, 0x01bb) AM_DEVICE8("upd765", upd765a_device, map, 0x00ff)
 //  AM_RANGE(0x01c0, 0x01c1) ?
 	AM_RANGE(0x01c6, 0x01c7) AM_WRITENOP // ???
 	AM_RANGE(0x01c8, 0x01cf) AM_DEVREADWRITE8("d8255_3", i8255_device, read, write,0xff00) //i8255 3 (byte access)
@@ -1187,8 +1184,7 @@ static ADDRESS_MAP_START( pc88va_z80_io_map, AS_IO, 8, pc88va_state )
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(fdc_irq_vector_w) // Interrupt Opcode Port
 //  AM_RANGE(0xf4, 0xf4) // Drive Control Port
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(upd765_tc_r,upd765_mc_w) // (R) Terminal Count Port (W) Motor Control Port
-	AM_RANGE(0xfa, 0xfa) AM_DEVREAD_LEGACY("upd765", upd765_status_r )
-	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE_LEGACY("upd765", upd765_data_r, upd765_data_w )
+	AM_RANGE(0xfa, 0xfb) AM_DEVICE("upd765", upd765a_device, map )
 	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("d8255_2s", i8255_device, read, write)
 ADDRESS_MAP_END
 
@@ -1545,6 +1541,7 @@ void pc88va_state::machine_start()
 
 	m_t3_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc88va_state::t3_mouse_callback),this));
 	m_t3_mouse_timer->adjust(attotime::never);
+	machine().device<upd765a_device>("upd765")->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc88va_state::upd765_interrupt), this));
 }
 
 void pc88va_state::machine_reset()
@@ -1578,30 +1575,6 @@ INTERRUPT_GEN_MEMBER(pc88va_state::pc88va_vrtc_irq)
 	pic8259_ir2_w(machine().device("pic8259_master"), 1);
 }
 
-/* Not sure if parameters are correct for pc88va (copied from x68k) */
-static LEGACY_FLOPPY_OPTIONS_START( pc88va )
-LEGACY_FLOPPY_OPTION( img2d, "xdf,hdm,2hd", "XDF disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-					 HEADS([2])
-					 TRACKS([77])
-					 SECTORS([8])
-					 SECTOR_LENGTH([1024])
-					 FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface pc88va_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(pc88va),
-	"floppy_5_25",
-	NULL
-};
-
-
 WRITE_LINE_MEMBER(pc88va_state::pc88va_pit_out0_changed)
 {
 	pic8259_ir0_w(machine().device("pic8259_master"), 1);
@@ -1632,22 +1605,14 @@ static const struct pit8253_config pc88va_pit8253_config =
 };
 
 
-WRITE_LINE_MEMBER(pc88va_state::pc88va_upd765_interrupt)
+void pc88va_state::upd765_interrupt(bool state)
 {
 	if(m_fdc_mode)
 		pic8259_ir3_w(machine().device( "pic8259_slave"), state);
 	else
 		machine().device("fdccpu")->execute().set_input_line(0, HOLD_LINE);
-};
+}
 
-static const struct upd765_interface pc88va_upd765_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pc88va_state, pc88va_upd765_interrupt),
-	DEVCB_NULL, //DRQ, TODO
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
 
 static const ym2203_interface pc88va_ym2203_intf =
 {
@@ -1661,6 +1626,17 @@ static const ym2203_interface pc88va_ym2203_intf =
 	},
 	DEVCB_NULL
 };
+
+static const floppy_format_type pc88va_floppy_formats[] = {
+	FLOPPY_PC_FORMAT,
+	FLOPPY_XDF_FORMAT,
+	FLOPPY_MFI_FORMAT,
+	NULL
+};
+
+static SLOT_INTERFACE_START( pc88va_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( pc88va, pc88va_state )
 
@@ -1695,8 +1671,9 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_PIC8259_ADD( "pic8259_master", pc88va_pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pc88va_pic8259_slave_config )
 
-	MCFG_UPD765A_ADD("upd765", pc88va_upd765_interface)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(pc88va_floppy_interface)
+	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88va_floppies, "525hd", 0, pc88va_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88va_floppies, "525hd", 0, pc88va_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc88va")
 
     MCFG_PIT8253_ADD("pit8253",pc88va_pit8253_config)

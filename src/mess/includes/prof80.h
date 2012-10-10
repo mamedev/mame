@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/ecbbus.h"
 #include "machine/ecb_grip.h"
@@ -38,17 +37,17 @@ public:
 		  m_rtc(*this, UPD1990A_TAG),
 		  m_fdc(*this, UPD765_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1),
+		  m_floppy0(*this, UPD765_TAG ":0:525hd"),
+		  m_floppy1(*this, UPD765_TAG ":0:525hd"),
 		  m_ecb(*this, ECBBUS_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
-	required_device<device_t> m_fdc;
+	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_floppy0;
-	required_device<device_t> m_floppy1;
+	optional_device<floppy_image_device> m_floppy0;
+	optional_device<floppy_image_device> m_floppy1;
 	required_device<ecbbus_device> m_ecb;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

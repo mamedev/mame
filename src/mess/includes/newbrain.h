@@ -170,14 +170,14 @@ public:
 		  m_ctc(*this, Z80CTC_TAG),
 		  m_acia(*this, MC6850_TAG),
 		  m_fdc(*this, UPD765_TAG),
-		  m_floppy(*this, FLOPPY_0)
+		  m_floppy(*this, UPD765_TAG ":0:525dd")
 	{ }
 
 	required_device<cpu_device> m_fdccpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<acia6850_device> m_acia;
-	required_device<device_t> m_fdc;
-	required_device<device_t> m_floppy;
+	required_device<upd765a_device> m_fdc;
+	required_device<floppy_image_device> m_floppy;
 
 	virtual void machine_start();
 

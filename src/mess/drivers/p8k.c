@@ -49,7 +49,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z8000/z8000.h"
 #include "cpu/z80/z80daisy.h"
-#include "formats/basicdsk.h"
+#include "formats/mfi_dsk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
@@ -82,6 +82,11 @@ public:
 	DECLARE_DRIVER_INIT(p8k);
 	DECLARE_MACHINE_RESET(p8k);
 	DECLARE_MACHINE_RESET(p8k_16);
+
+	void fdc_irq(bool state);
+	void fdc_drq(bool state);
+
+	virtual void machine_start();
 };
 
 /***************************************************************************
@@ -116,8 +121,7 @@ static ADDRESS_MAP_START(p8k_iomap, AS_IO, 8, p8k_state)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("z80pio_0", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("z80pio_1", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_2", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_LEGACY("i8272", upd765_data_r, upd765_data_w)
-	AM_RANGE(0x21, 0x21) AM_DEVREAD_LEGACY("i8272", upd765_status_r)
+	AM_RANGE(0x20, 0x21) AM_DEVICE("i8272", i8272a_device, map)
 	//AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("z80sio_0", z80sio_device, read_alt, write_alt)
 	AM_RANGE(0x24, 0x27) AM_READWRITE(p8k_port24_r,p8k_port24_w)
 	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("z80sio_1", z80sio_device, read_alt, write_alt)
@@ -211,11 +215,8 @@ static WRITE_LINE_DEVICE_HANDLER( p8k_daisy_interrupt )
 
 static WRITE_LINE_DEVICE_HANDLER( p8k_dma_irq_w )
 {
-	if (state)
-	{
-		device_t *i8272 = device->machine().device("i8272");
-		upd765_tc_w(i8272, state);
-	}
+	i8272a_device *i8272 = device->machine().device<i8272a_device>("i8272");
+	i8272->tc_w(state);
 
 	p8k_daisy_interrupt(device, state);
 }
@@ -350,34 +351,34 @@ static const z80_daisy_config p8k_daisy_chain[] =
 
 /* Intel 8272 Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( p8k_i8272_irq_w )
+void p8k_state::fdc_irq(bool state)
 {
-	z80pio_device *z80pio = device->machine().device<z80pio_device>("z80pio_2");
+	z80pio_device *z80pio = machine().device<z80pio_device>("z80pio_2");
 
-	z80pio->port_b_write((state) ? 0x10 : 0x00);
+	z80pio->port_b_write(state ? 0x10 : 0x00);
 }
 
-static const struct upd765_interface p8k_i8272_intf =
+void p8k_state::fdc_drq(bool state)
 {
-	DEVCB_LINE(p8k_i8272_irq_w),
-	DEVCB_DEVICE_LINE("z80dma", z80dma_rdy_w),
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
+	z80dma_device *z80dma = machine().device<z80dma_device>("z80dma");
+	z80dma->rdy_w(state);
+}
 
-static const floppy_interface p8k_floppy_interface =
+void p8k_state::machine_start()
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
+	i8272a_device *fdc = machine().device<i8272a_device>("i8272");
+	fdc->setup_intrq_cb(i8272a_device::line_cb(FUNC(p8k_state::fdc_irq), this));
+	fdc->setup_drq_cb(i8272a_device::line_cb(FUNC(p8k_state::fdc_drq), this));
+}
+
+static const floppy_format_type p8k_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( p8k_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
 
 /* Input ports */
 static INPUT_PORTS_START( p8k )
@@ -726,8 +727,9 @@ static MACHINE_CONFIG_START( p8k, p8k_state )
 	MCFG_Z80PIO_ADD("z80pio_0", 1229000, p8k_pio_0_intf)
 	MCFG_Z80PIO_ADD("z80pio_1", 1229000, p8k_pio_1_intf)
 	MCFG_Z80PIO_ADD("z80pio_2", 1229000, p8k_pio_2_intf)
-	MCFG_UPD765A_ADD("i8272", p8k_i8272_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(p8k_floppy_interface)
+	MCFG_I8272A_ADD("i8272", true)
+	MCFG_FLOPPY_DRIVE_ADD("i8272:0", p8k_floppies, "525hd", 0, p8k_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("i8272:1", p8k_floppies, "525hd", 0, p8k_floppy_formats)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

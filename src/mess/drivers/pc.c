@@ -91,6 +91,7 @@ video HW too.
 #include "imagedev/harddriv.h"
 #include "imagedev/cassette.h"
 #include "imagedev/cartslot.h"
+#include "formats/mfi_dsk.h"
 #include "formats/pc_dsk.h"
 
 #include "machine/8237dma.h"
@@ -206,7 +207,7 @@ static ADDRESS_MAP_START(pc8_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE_LEGACY("lpt_1", pc_lpt_r, pc_lpt_w)
 	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE("ins8250_2", ins8250_device, ins8250_r, ins8250_w)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE_LEGACY(pc_fdc_r,				pc_fdc_w)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE("fdc", pc_fdc_interface, map)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_device, ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
@@ -232,7 +233,7 @@ static ADDRESS_MAP_START(pc16_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8_LEGACY("lpt_1", pc_lpt_r, pc_lpt_w, 0xffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_device, ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8_LEGACY(pc_fdc_r,				pc_fdc_w, 0xffff)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE8("fdc", pc_fdc_interface, map, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
@@ -252,7 +253,7 @@ static ADDRESS_MAP_START(ec1841_io, AS_IO, 16, pc_state)
 //  AM_RANGE(0x02f8, 0x02f8) AM_DEVREADWRITE8_LEGACY("upd8251_1", i8251_device, data_r, data_w, 0x00ff)
 //  AM_RANGE(0x02f9, 0x02f9) AM_DEVREADWRITE8_LEGACY("upd8251_1", i8251_device, status_r, control_w, 0xff00)
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8_LEGACY(pc_fdc_r,				pc_fdc_w, 0xffff)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE8("fdc", pc_fdc_interface, map, 0xffff)
 //  AM_RANGE(0x03f8, 0x03f9) AM_DEVREADWRITE8_LEGACY("upd8251_0", i8251_device, data_r, data_w, 0x00ff)
 //  AM_RANGE(0x03f8, 0x03f9) AM_DEVREADWRITE8_LEGACY("upd8251_0", i8251_device, status_r, control_w, 0xff00)
 ADDRESS_MAP_END
@@ -273,7 +274,7 @@ static ADDRESS_MAP_START(iskr1031_io, AS_IO, 16, pc_state)
 	AM_RANGE(0x0340, 0x0357) AM_NOP /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
 //  AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_device, ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8_LEGACY(pc_fdc_r,				pc_fdc_w, 0xffff)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE8("fdc", pc_fdc_interface, map, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
@@ -307,7 +308,7 @@ static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8_LEGACY("lpt_1", pc_lpt_r, pc_lpt_w, 0xffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_device, ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8_LEGACY(pc_fdc_r,				pc_fdc_w, 0xffff)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE8("fdc", pc_fdc_interface, map, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
@@ -338,7 +339,7 @@ static ADDRESS_MAP_START(europc_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x0378, 0x037b) AM_DEVREADWRITE_LEGACY("lpt_1", pc_lpt_r, pc_lpt_w)
 //  AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE("ins8250_2", ins8250_device, ins8250_r, ins8250_w)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE_LEGACY(pc_fdc_r,				pc_fdc_w)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE("fdc", pc_fdc_interface, map)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_device, ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
@@ -368,7 +369,7 @@ static ADDRESS_MAP_START(tandy1000_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE_LEGACY(pc_t1t_p37x_r,			pc_t1t_p37x_w)
 	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE_LEGACY(pc_fdc_r,					pc_fdc_w)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE("fdc", pc_fdc_interface, map)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_device, ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
@@ -398,7 +399,7 @@ static ADDRESS_MAP_START(tandy1000_16_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE8_LEGACY(pc_t1t_p37x_r,			pc_t1t_p37x_w, 0xffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8_LEGACY(pc_fdc_r,					pc_fdc_w, 0xffff)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE8("fdc", pc_fdc_interface, map, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0xffea, 0xffeb) AM_READWRITE8_LEGACY(tandy1000_bank_r, tandy1000_bank_w, 0xffff)
 ADDRESS_MAP_END
@@ -429,7 +430,7 @@ static ADDRESS_MAP_START(tandy1000_286_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE8_LEGACY(pc_t1t_p37x_r,           pc_t1t_p37x_w, 0xffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8_LEGACY(pc_fdc_r,                    pc_fdc_w, 0xffff)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE8("fdc", pc_fdc_interface, map, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
@@ -455,7 +456,7 @@ static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,				pc_page_w)
 	AM_RANGE(0x00a0, 0x00a0) AM_READWRITE(pcjr_nmi_enable_r, pc_nmi_enable_w )
 	AM_RANGE(0x00c0, 0x00c0) AM_DEVWRITE("sn76496", sn76496_device, write)
-	AM_RANGE(0x00f0, 0x00f7) AM_READWRITE_LEGACY(pc_fdc_r,					pcjr_fdc_w)
+	AM_RANGE(0x00f0, 0x00f7) AM_DEVICE("fdc", pc_fdc_interface, map)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE_LEGACY(pc_JOY_r,					pc_JOY_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE_LEGACY(pc_t1t_p37x_r,			pc_t1t_p37x_w)
@@ -856,18 +857,15 @@ static const pc_lpt_interface pc_lpt_config =
 	DEVCB_CPU_INPUT_LINE("maincpu", 0)
 };
 
-static const floppy_interface ibmpc_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(pc),
-	"floppy_5_25",
+static const floppy_format_type ibmpc_floppy_formats[] = {
+	FLOPPY_PC_FORMAT,
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( ibmpc_floppies )
+	 SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START(ibm5150_com)
 	SLOT_INTERFACE("microsoft_mouse", MSFT_SERIAL_MOUSE)
@@ -996,9 +994,10 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1076,9 +1075,10 @@ static MACHINE_CONFIG_START( europc, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1125,9 +1125,10 @@ static MACHINE_CONFIG_START( t1000hx, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1174,9 +1175,10 @@ static MACHINE_CONFIG_START( t1000_16, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1223,9 +1225,10 @@ static MACHINE_CONFIG_START( t1000_286, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1295,9 +1298,9 @@ static MACHINE_CONFIG_START( ibmpcjr, pc_state )
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, ibm5150_cassette_interface )
 
-	MCFG_UPD765A_ADD("upd765", pcjr_fdc_upd765_interface)
+	MCFG_PC_FDC_JR_ADD("fdc")
 
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, ibmpc_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart1")
@@ -1371,7 +1374,7 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, mc1502_cassette_interface )	// has no motor control
 
 	MCFG_FD1793_ADD( "vg93", default_wd17xx_interface_2_drives )
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1413,9 +1416,10 @@ static MACHINE_CONFIG_START( ec1841, pc_state )
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
 
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
 	/* keyboard -- needs dump */
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
@@ -1472,9 +1476,10 @@ static MACHINE_CONFIG_START( iskr1031, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1525,9 +1530,10 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1579,9 +1585,10 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1632,9 +1639,10 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1685,9 +1693,10 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1738,9 +1747,10 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

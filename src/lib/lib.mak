@@ -93,16 +93,19 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/ioprocs.o		\
 	$(LIBOBJ)/formats/basicdsk.o	\
 	$(LIBOBJ)/formats/a26_cas.o		\
+	$(LIBOBJ)/formats/a5105_dsk.o	\
 	$(LIBOBJ)/formats/ace_tap.o		\
 	$(LIBOBJ)/formats/adam_cas.o	\
 	$(LIBOBJ)/formats/ami_dsk.o		\
 	$(LIBOBJ)/formats/ap2_dsk.o		\
 	$(LIBOBJ)/formats/apf_apt.o		\
 	$(LIBOBJ)/formats/apridisk.o	\
+	$(LIBOBJ)/formats/apollo_dsk.o	\
 	$(LIBOBJ)/formats/ap_dsk35.o	\
 	$(LIBOBJ)/formats/atari_dsk.o	\
 	$(LIBOBJ)/formats/atarist_dsk.o	\
 	$(LIBOBJ)/formats/atom_tap.o	\
+	$(LIBOBJ)/formats/bw12_dsk.o	\
 	$(LIBOBJ)/formats/cbm_tap.o		\
 	$(LIBOBJ)/formats/cgen_cas.o	\
 	$(LIBOBJ)/formats/coco_cas.o	\
@@ -127,14 +130,19 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/gtp_cas.o		\
 	$(LIBOBJ)/formats/hect_dsk.o	\
 	$(LIBOBJ)/formats/hect_tap.o	\
+	$(LIBOBJ)/formats/iq151_dsk.o	\
 	$(LIBOBJ)/formats/imd_dsk.o		\
 	$(LIBOBJ)/formats/ipf_dsk.o		\
 	$(LIBOBJ)/formats/kc_cas.o		\
+	$(LIBOBJ)/formats/kc85_dsk.o	\
 	$(LIBOBJ)/formats/kim1_cas.o	\
 	$(LIBOBJ)/formats/lviv_lvt.o	\
+	$(LIBOBJ)/formats/m5_dsk.o		\
+	$(LIBOBJ)/formats/mm_dsk.o		\
 	$(LIBOBJ)/formats/msx_dsk.o		\
 	$(LIBOBJ)/formats/mfi_dsk.o		\
 	$(LIBOBJ)/formats/mz_cas.o		\
+	$(LIBOBJ)/formats/nanos_dsk.o	\
 	$(LIBOBJ)/formats/nes_dsk.o		\
 	$(LIBOBJ)/formats/orao_cas.o	\
 	$(LIBOBJ)/formats/oric_dsk.o	\
@@ -144,8 +152,10 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/pc_dsk.o		\
 	$(LIBOBJ)/formats/pmd_cas.o		\
 	$(LIBOBJ)/formats/primoptp.o	\
+	$(LIBOBJ)/formats/pyldin_dsk.o	\
 	$(LIBOBJ)/formats/rk_cas.o		\
 	$(LIBOBJ)/formats/sc3000_bit.o	\
+	$(LIBOBJ)/formats/sf7000_dsk.o	\
 	$(LIBOBJ)/formats/smx_dsk.o		\
 	$(LIBOBJ)/formats/sorc_dsk.o	\
 	$(LIBOBJ)/formats/sord_cas.o	\

@@ -27,18 +27,18 @@ public:
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, FLOPPY_0)
+		  m_floppy0(*this, UPD765_TAG ":0:525dd")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fd5cpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<i8255_device> m_ppi;
-	required_device<device_t> m_fdc;
+	required_device<upd765a_device> m_fdc;
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_floppy0;
+	required_device<floppy_image_device> m_floppy0;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -71,6 +71,8 @@ public:
 	DECLARE_DRIVER_INIT(pal);
 	DECLARE_DRIVER_INIT(ntsc);
 	DECLARE_WRITE_LINE_MEMBER(sordm5_video_interrupt_callback);
+
+	void fdc_irq(bool state);
 };
 
 #endif

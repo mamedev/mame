@@ -10,7 +10,7 @@
 #include "machine/mccs1850.h"
 #include "machine/8530scc.h"
 #include "machine/nextkbd.h"
-#include "machine/n82077aa.h"
+#include "machine/upd765.h"
 #include "machine/ncr5390.h"
 #include "machine/mb8795.h"
 #include "machine/nextmo.h"

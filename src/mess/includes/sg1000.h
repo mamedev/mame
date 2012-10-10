@@ -8,7 +8,6 @@
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "imagedev/printer.h"
-#include "formats/basicdsk.h"
 #include "formats/sc3000_bit.h"
 #include "machine/ctronics.h"
 #include "machine/i8255.h"
@@ -105,7 +104,7 @@ public:
 		  m_floppy0(*this, FLOPPY_0)
 	{ }
 
-	required_device<device_t> m_fdc;
+	required_device<upd765a_device> m_fdc;
 	required_device<centronics_device> m_centronics;
 	required_device<device_t> m_floppy0;
 
@@ -114,8 +113,9 @@ public:
 
 	DECLARE_READ8_MEMBER( ppi_pa_r );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER(sf7000_fdc_index_callback);
+
+	void fdc_intrq_w(bool state);
 
 	/* floppy state */
 	int m_fdc_irq;

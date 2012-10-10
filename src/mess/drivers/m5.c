@@ -23,7 +23,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "formats/basicdsk.h"
+#include "formats/mfi_dsk.h"
+#include "formats/m5_dsk.h"
 #include "formats/sord_cas.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
@@ -211,8 +212,7 @@ WRITE8_MEMBER( m5_state::fd5_ctrl_w )
 
     */
 
-	floppy_mon_w(m_floppy0, !BIT(data, 0));
-	floppy_drive_set_ready_state(m_floppy0, 1, 1);
+	m_floppy0->mon_w(!BIT(data, 0));
 }
 
 
@@ -222,8 +222,8 @@ WRITE8_MEMBER( m5_state::fd5_ctrl_w )
 
 WRITE8_MEMBER( m5_state::fd5_tc_w )
 {
-	upd765_tc_w(m_fdc, 1);
-	upd765_tc_w(m_fdc, 0);
+	m_fdc->tc_w(true);
+	m_fdc->tc_w(false);
 }
 
 
@@ -289,8 +289,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fd5_io, AS_IO, 8, m5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD_LEGACY(UPD765_TAG, upd765_status_r)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVICE(UPD765_TAG, upd765a_device, map)
 	AM_RANGE(0x10, 0x10) AM_READWRITE(fd5_data_r, fd5_data_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(fd5_com_w)
 	AM_RANGE(0x30, 0x30) AM_READ(fd5_com_r)
@@ -561,37 +560,20 @@ static I8255_INTERFACE( ppi_intf )
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
-static LEGACY_FLOPPY_OPTIONS_START( m5 )
-	LEGACY_FLOPPY_OPTION( m5, "dsk", "Sord M5 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([18])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface m5_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD_40,
-	LEGACY_FLOPPY_OPTIONS_NAME(m5),
-	NULL,
+static const floppy_format_type m5_floppy_formats[] = {
+	FLOPPY_M5_FORMAT,
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
 
-static const struct upd765_interface fdc_intf =
-{
-	DEVCB_CPU_INPUT_LINE(Z80_FD5_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{ FLOPPY_0, NULL, NULL, NULL }
-};
+static SLOT_INTERFACE_START( m5_floppies )
+	 SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
 
+void m5_state::fdc_irq(bool state)
+{
+	m_fd5cpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+}
 
 //-------------------------------------------------
 //  z80_daisy_config m5_daisy_chain
@@ -630,6 +612,8 @@ void m5_state::machine_start()
 	case 68*1024:
 		break;
 	}
+
+	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(m5_state::fdc_irq), this));
 
 	// register for state saving
 	save_item(NAME(m_fd5_data));
@@ -680,8 +664,8 @@ static MACHINE_CONFIG_START( m5, m5_state )
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cassette_intf)
 	MCFG_I8255_ADD(I8255A_TAG, ppi_intf)
-	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, m5_floppy_interface)
+	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", m5_floppies, "525dd", 0, m5_floppy_formats)
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")

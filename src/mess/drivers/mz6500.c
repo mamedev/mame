@@ -10,6 +10,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/upd765.h"
 #include "video/upd7220.h"
+#include "formats/mfi_dsk.h"
 
 class mz6500_state : public driver_device
 {
@@ -22,13 +23,11 @@ public:
 		m_video_ram(*this, "video_ram"){ }
 
 	required_device<upd7220_device> m_hgdc;
-	required_device<device_t> m_fdc;
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
+	required_device<upd765a_device> m_fdc;
 	DECLARE_READ8_MEMBER(mz6500_vram_r);
 	DECLARE_WRITE8_MEMBER(mz6500_vram_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
+	void fdc_irq(bool state);
+	void fdc_drq(bool state);
 	required_shared_ptr<UINT8> m_video_ram;
 	virtual void machine_reset();
 	virtual void video_start();
@@ -58,17 +57,6 @@ void mz6500_state::video_start()
 }
 
 
-READ8_MEMBER( mz6500_state::fdc_r )
-{
-	return (offset) ? upd765_data_r(m_fdc, space, 0) : upd765_status_r(m_fdc, space, 0);
-}
-
-WRITE8_MEMBER( mz6500_state::fdc_w )
-{
-	if(offset)
-		upd765_data_w(m_fdc, space, 0, data);
-}
-
 READ8_MEMBER( mz6500_state::mz6500_vram_r )
 {
 	return m_video_ram[offset];
@@ -91,7 +79,7 @@ static ADDRESS_MAP_START(mz6500_io, AS_IO, 16, mz6500_state)
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x0000, 0x000f) i8237 dma
 //  AM_RANGE(0x0010, 0x001f) i8255
-	AM_RANGE(0x0020, 0x0021) AM_MIRROR(0xe) AM_READWRITE8(fdc_r,fdc_w,0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_MIRROR(0xe) AM_DEVICE8("upd765", upd765a_device, map, 0xffff)
 //  AM_RANGE(0x0030, 0x003f) i8259 master
 //  AM_RANGE(0x0040, 0x004f) i8259 slave
 //  AM_RANGE(0x0050, 0x0050) segment byte for DMA
@@ -121,38 +109,24 @@ void mz6500_state::machine_reset()
 {
 }
 
-WRITE_LINE_MEMBER( mz6500_state::fdc_irq )
+void mz6500_state::fdc_irq(bool state)
 {
 	//printf("%02x IRQ\n",state);
 }
 
-WRITE_LINE_MEMBER( mz6500_state::fdc_drq )
+void mz6500_state::fdc_drq(bool state)
 {
 	//printf("%02x DRQ\n",state);
 }
 
-static const struct upd765_interface upd765_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(mz6500_state, fdc_irq),
-	DEVCB_DRIVER_LINE_MEMBER(mz6500_state, fdc_drq),
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
-
-static const floppy_interface mz6500_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
+static const floppy_format_type mz6500_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
 
+static SLOT_INTERFACE_START( mz6500_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
 
 static UPD7220_INTERFACE( hgdc_intf )
 {
@@ -187,8 +161,9 @@ static MACHINE_CONFIG_START( mz6500, mz6500_state )
 
 	/* Devices */
 	MCFG_UPD7220_ADD("upd7220", 4000000, hgdc_intf, upd7220_map)
-	MCFG_UPD765A_ADD("upd765", upd765_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mz6500_floppy_interface)
+	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", mz6500_floppies, "525hd", 0, mz6500_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", mz6500_floppies, "525hd", 0, mz6500_floppy_formats)
 MACHINE_CONFIG_END
 
 /* ROM definition */

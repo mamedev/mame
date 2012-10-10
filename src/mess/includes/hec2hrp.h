@@ -39,6 +39,7 @@
 
 #include "machine/upd765.h"
 #include "machine/wd17xx.h"
+#include "imagedev/flopdrv.h"
 
 /* Enum status for high memory bank (c000 - ffff)*/
 enum
@@ -106,8 +107,7 @@ public:
 	UINT8 m_cassette_bit_mem;
 	UINT8 m_Data_K7;
 	int m_counter_write;
-	emu_timer *m_DMA_timer;
-	emu_timer *m_INT_timer;
+	int m_IRQ_current_state;
 	int m_NMI_current_state;
 	int m_hector_cmd[10];
 	int m_hector_nb_cde;
@@ -138,6 +138,9 @@ public:
 	DECLARE_MACHINE_RESET(hec2mdhrx);
 	UINT32 screen_update_hec2hrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(Callback_CK);
+
+	void disc2_fdc_interrupt(bool state);
+	void disc2_fdc_dma_irq(bool state);
 };
 
 /*----------- defined in machine/hec2hrp.c -----------*/
@@ -164,7 +167,6 @@ extern const sn76477_interface hector_sn76477_interface;
 /*----------- defined in machine/hecdisk2.c -----------*/
 
 // disc2 handling
-WRITE_LINE_DEVICE_HANDLER( hector_disk2_fdc_interrupt );
 DECLARE_READ8_HANDLER(  hector_disc2_io00_port_r);
 DECLARE_WRITE8_HANDLER( hector_disc2_io00_port_w);
 DECLARE_READ8_HANDLER(  hector_disc2_io20_port_r);
@@ -175,15 +177,9 @@ DECLARE_READ8_HANDLER(  hector_disc2_io40_port_r);
 DECLARE_WRITE8_HANDLER( hector_disc2_io40_port_w);
 DECLARE_READ8_HANDLER(  hector_disc2_io50_port_r);
 DECLARE_WRITE8_HANDLER( hector_disc2_io50_port_w);
-DECLARE_READ8_HANDLER(  hector_disc2_io61_port_r);
-DECLARE_WRITE8_HANDLER( hector_disc2_io61_port_w);
-DECLARE_READ8_HANDLER(  hector_disc2_io70_port_r);
-DECLARE_WRITE8_HANDLER( hector_disc2_io70_port_w);
 
 void hector_disc2_init( running_machine &machine);
 void hector_minidisc_init( running_machine &machine);
 
-extern const upd765_interface hector_disc2_upd765_interface;
-extern const floppy_interface    hector_disc2_floppy_interface;
 extern const wd17xx_interface hector_wd17xx_interface;  // Special for minidisc
 extern const floppy_interface minidisc_floppy_interface;

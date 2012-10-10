@@ -14,7 +14,8 @@
 #include "machine/z80ctc.h"
 #include "machine/upd765.h"
 #include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "formats/mfi_dsk.h"
+#include "formats/nanos_dsk.h"
 #include "machine/ram.h"
 
 
@@ -43,7 +44,7 @@ public:
 	required_device<z80sio_device> m_sio_1;
 	required_device<z80ctc_device> m_ctc_0;
 	required_device<z80ctc_device> m_ctc_1;
-	required_device<device_t> m_fdc;
+	required_device<upd765a_device> m_fdc;
 	required_device<device_t> m_key_t;
 	const UINT8 *m_p_chargen;
 	UINT8 m_key_command;
@@ -73,7 +74,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(nanos_state::nanos_tc_w)
 {
-	upd765_tc_w(m_fdc, BIT(data,1));
+	m_fdc->tc_w(BIT(data,1));
 }
 
 
@@ -167,8 +168,7 @@ static ADDRESS_MAP_START( nanos_io , AS_IO, 8, nanos_state)
 
 	/* FDC card */
 	AM_RANGE(0x92, 0x92) AM_WRITE(nanos_tc_w)
-	AM_RANGE(0x94, 0x94) AM_DEVREAD_LEGACY("upd765", upd765_status_r)
-	AM_RANGE(0x95, 0x95) AM_DEVREADWRITE_LEGACY("upd765", upd765_data_r, upd765_data_w)
+	AM_RANGE(0x94, 0x95) AM_DEVICE("upd765", upd765a_device, map)
 	/* V24+IFSS card */
 	AM_RANGE(0xA0, 0xA3) AM_DEVREADWRITE("z80sio_0", z80sio_device, read_alt, write_alt)
 	AM_RANGE(0xA4, 0xA7) AM_DEVREADWRITE("z80ctc_1", z80ctc_device, read, write)
@@ -465,37 +465,15 @@ static Z80PIO_INTERFACE( nanos_z80pio_intf )
 	DEVCB_NULL
 };
 
-
-static const upd765_interface nanos_upd765_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL,
-	UPD765_RDY_PIN_NOT_CONNECTED,
-	{FLOPPY_0,FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
-
-static LEGACY_FLOPPY_OPTIONS_START(nanos)
-	LEGACY_FLOPPY_OPTION(nanos, "img", "NANOS disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([5])
-		SECTOR_LENGTH([1024])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface nanos_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(nanos),
-	NULL,
+static const floppy_format_type nanos_floppy_formats[] = {
+	FLOPPY_NANOS_FORMAT,
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( nanos_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
 
 /* F4 Character Displayer */
 static const gfx_layout nanos_charlayout =
@@ -542,9 +520,8 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	MCFG_Z80SIO_ADD( "z80sio_1", XTAL_4MHz, sio_intf)
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_4MHz, nanos_z80pio_intf )
 	/* UPD765 */
-	MCFG_UPD765A_ADD("upd765", nanos_upd765_interface)
-
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(nanos_floppy_interface)
+	MCFG_UPD765A_ADD("upd765", false, true)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", nanos_floppies, "525hd", 0, nanos_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

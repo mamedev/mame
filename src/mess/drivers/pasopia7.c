@@ -22,6 +22,7 @@
 #include "machine/upd765.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
+#include "formats/mfi_dsk.h"
 #include "rendlay.h"
 #include "includes/pasopia.h"
 
@@ -38,6 +39,7 @@ public:
 	m_pio(*this, "z80pio"),
 	m_crtc(*this, "crtc"),
 	m_fdc(*this, "fdc"),
+	m_floppy(*this, "fdc:0:525hd"),
 	m_sn1(*this, "sn1"),
 	m_sn2(*this, "sn2")
 	{ }
@@ -49,21 +51,21 @@ public:
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80pio_device> m_pio;
 	required_device<mc6845_device> m_crtc;
-	required_device<device_t> m_fdc;
+	required_device<upd765a_device> m_fdc;
+	required_device<floppy_image_device> m_floppy;
 	required_device<sn76489a_device> m_sn1;
 	required_device<sn76489a_device> m_sn2;
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(pasopia7_memory_ctrl_w);
-	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(pac2_w);
 	DECLARE_READ8_MEMBER(pac2_r);
 	DECLARE_WRITE8_MEMBER(ram_bank_w);
 	DECLARE_WRITE8_MEMBER(pasopia7_6845_w);
-	DECLARE_READ8_MEMBER(pasopia7_fdc_r);
-	DECLARE_WRITE8_MEMBER(pasopia7_fdc_w);
 	DECLARE_READ8_MEMBER(pasopia7_io_r);
 	DECLARE_WRITE8_MEMBER(pasopia7_io_w);
+	DECLARE_READ8_MEMBER(pasopia7_fdc_r);
+	DECLARE_WRITE8_MEMBER(pasopia7_fdc_w);
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_READ8_MEMBER(keyb_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
@@ -110,6 +112,8 @@ public:
 	DECLARE_PALETTE_INIT(p7_raster);
 	DECLARE_PALETTE_INIT(p7_lcd);
 	UINT32 screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void fdc_irq(bool state);
 };
 
 #define VDP_CLOCK XTAL_3_579545MHz/4
@@ -549,8 +553,8 @@ READ8_MEMBER( pasopia7_state::pasopia7_fdc_r )
 {
 	switch(offset)
 	{
-		case 4: return upd765_status_r(m_fdc, space, 0);
-		case 5: return upd765_data_r(m_fdc, space, 0);
+		case 4: return m_fdc->msr_r(space, 0, 0xff);
+		case 5: return m_fdc->fifo_r(space, 0, 0xff);
 		//case 6: bit 7 interrupt bit
 	}
 
@@ -561,13 +565,13 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_fdc_w )
 {
 	switch(offset)
 	{
-		case 0: upd765_tc_w(m_fdc, 0); break;
-		case 2: upd765_tc_w(m_fdc, 1); break;
-		case 5: upd765_data_w(m_fdc, space, 0, data); break;
+		case 0: m_fdc->tc_w(false); break;
+		case 2: m_fdc->tc_w(true); break;
+		case 5: m_fdc->fifo_w(space, 0, data, 0xff); break;
 		case 6:
-			upd765_reset_w(m_fdc, data & 0x80);
-			floppy_mon_w(floppy_get_device(machine(), 0), (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
-			floppy_drive_set_ready_state(floppy_get_device(machine(), 0), (data & 0x40), 0);
+			if(data & 0x80)
+				m_fdc->reset();
+			m_floppy->mon_w(!(data & 0x40));
 			break;
 	}
 }
@@ -968,28 +972,19 @@ PALETTE_INIT_MEMBER(pasopia7_state,p7_lcd)
 		palette_set_color_rgb(machine(), i, 0x30, 0x38, 0x10);
 }
 
-static const struct upd765_interface pasopia7_upd765_interface =
+void pasopia7_state::fdc_irq(bool state)
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL, //DRQ, TODO
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+}
 
-static const floppy_interface pasopia7_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
+static const floppy_format_type pasopia7_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
 
+static SLOT_INTERFACE_START( pasopia7_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
 
 /*************************************
  *
@@ -1006,7 +1001,6 @@ static const sn76496_config psg_intf =
 {
     DEVCB_NULL
 };
-
 
 static MACHINE_CONFIG_START( p7_base, pasopia7_state )
 	/* basic machine hardware */
@@ -1031,8 +1025,9 @@ static MACHINE_CONFIG_START( p7_base, pasopia7_state )
 	MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
 	MCFG_I8255_ADD( "ppi8255_1", ppi8255_intf_1 )
 	MCFG_I8255_ADD( "ppi8255_2", ppi8255_intf_2 )
-	MCFG_UPD765A_ADD("fdc", pasopia7_upd765_interface)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(pasopia7_floppy_interface)
+	MCFG_UPD765A_ADD("fdc", true, true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pasopia7_floppies, "525hd", 0, pasopia7_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pasopia7_floppies, "525hd", 0, pasopia7_floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( p7_raster, p7_base )

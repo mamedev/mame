@@ -159,12 +159,7 @@ static void compis_keyb_init(compis_state *state)
 /*-------------------------------------------------------------------------*/
 static void compis_fdc_reset(running_machine &machine)
 {
-	device_t *fdc = machine.device("upd765");
-
-	upd765_reset(fdc, 0);
-
-	/* set FDC at reset */
-	upd765_reset_w(fdc, 1);
+	machine.device("upd765")->reset();
 }
 
 void compis_state::compis_fdc_tc(int state)
@@ -172,11 +167,11 @@ void compis_state::compis_fdc_tc(int state)
 	/* Terminal count if iSBX-218A has DMA enabled */
 	if (ioport("DSW1")->read())
 	{
-		upd765_tc_w(m_fdc, state);
+		m_fdc->tc_w(state);
 	}
 }
 
-WRITE_LINE_MEMBER( compis_state::compis_fdc_int )
+void compis_state::fdc_irq(bool state)
 {
 	/* No interrupt requests if iSBX-218A has DMA enabled */
 	if (!ioport("DSW1")->read() && state)
@@ -189,70 +184,14 @@ WRITE_LINE_MEMBER( compis_state::compis_fdc_int )
 	}
 }
 
-WRITE_LINE_MEMBER( compis_state::compis_fdc_dma_drq )
+void compis_state::fdc_drq(bool state)
 {
-	/* DMA requst if iSBX-218A has DMA enabled */
+	/* DMA request if iSBX-218A has DMA enabled */
 	if (ioport("DSW1")->read() && state)
 	{
 		//compis_dma_drq(state, read);
 	}
 }
-
-const upd765_interface compis_fdc_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(compis_state, compis_fdc_int),
-	DEVCB_DRIVER_LINE_MEMBER(compis_state, compis_fdc_dma_drq),
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
-
-READ16_MEMBER( compis_state::compis_fdc_dack_r )
-{
-	UINT16 data;
-	data = 0xffff;
-	/* DMA acknowledge if iSBX-218A has DMA enabled */
-	if (ioport("DSW1")->read())
-	{
-		data = upd765_dack_r(m_fdc, space, 0);
-	}
-
-	return data;
-}
-
-WRITE8_MEMBER( compis_state::compis_fdc_w )
-{
-	switch(offset)
-	{
-		case 2:
-			upd765_data_w(m_fdc, space, 0, data);
-			break;
-		default:
-			printf("FDC Unknown Port Write %04X = %04X\n", offset, data);
-			break;
-	}
-}
-
-READ8_MEMBER( compis_state::compis_fdc_r )
-{
-	UINT16 data;
-	data = 0xffff;
-	switch(offset)
-	{
-		case 0:
-			data = upd765_status_r(m_fdc, space, 0);
-			break;
-		case 2:
-			data = upd765_data_r(m_fdc, space, 0);
-			break;
-		default:
-			printf("FDC Unknown Port Read %04X\n", offset);
-			break;
-	}
-
-	return data;
-}
-
 
 
 /*-------------------------------------------------------------------------*/

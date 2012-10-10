@@ -30,6 +30,7 @@
 
 #include "formats/dsk_dsk.h"
 
+#include "formats/d88_dsk.h"
 #include "formats/pc_dsk.h"
 
 #include "formats/ap_dsk35.h"
@@ -49,6 +50,7 @@ static floppy_format_type floppy_formats[] = {
 
 	FLOPPY_DSK_FORMAT,
 
+	FLOPPY_D88_FORMAT,
 	FLOPPY_PC_FORMAT,
 
 	FLOPPY_DC42_FORMAT,

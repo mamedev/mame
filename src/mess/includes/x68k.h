@@ -10,6 +10,7 @@
 #define X68K_H_
 
 #include "machine/rp5c15.h"
+#include "machine/upd765.h"
 
 #define MC68901_TAG		"mc68901"
 #define RP5C15_TAG		"rp5c15"
@@ -67,6 +68,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( mfp_tdo_w );
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
 
+	void fdc_irq(bool state);
+	void fdc_drq(bool state);
+
+	void floppy_load_unload();
+	int floppy_load(floppy_image_device *dev);
+	void floppy_unload(floppy_image_device *dev);
+
 	struct
 	{
 		int sram_writeprotect;
@@ -77,12 +85,12 @@ public:
 	} m_sysport;
 	struct
 	{
+		upd72065_device *fdc;
+		floppy_image_device *floppy[4];
 		int led_ctrl[4];
 		int led_eject[4];
 		int eject[4];
 		int motor[4];
-		int media_density[4];
-		int disk_inserted[4];
 		int selected_drive;
 		int drq_state;
 	} m_fdc;

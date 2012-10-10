@@ -41,6 +41,7 @@
  ******************************************************************************/
 
 #include "includes/compis.h"
+#include "formats/mfi_dsk.h"
 
 #if 0
 /* TODO: this is likely to come from a RAMdac ... */
@@ -165,8 +166,8 @@ static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
   //AM_RANGE( 0x0288, 0x028f) AM_DEVREADWRITE_LEGACY("pit8254", compis_osp_pit_r, compis_osp_pit_w ) /* PIT 8254 (80150/80130)  */
 	AM_RANGE( 0x0310, 0x031f) AM_READWRITE( compis_usart_r, compis_usart_w )	/* USART 8251 Keyboard      */
 	AM_RANGE( 0x0330, 0x0333) AM_DEVREADWRITE8("upd7220", upd7220_device, read, write, 0x00ff) /* GDC 82720 PCS6:6     */
-	AM_RANGE( 0x0340, 0x0343) AM_READWRITE8( compis_fdc_r, compis_fdc_w, 0xffff )	/* iSBX0 (J8) FDC 8272      */
-	AM_RANGE( 0x0350, 0x0351) AM_READ(compis_fdc_dack_r)	/* iSBX0 (J8) DMA ACK       */
+	AM_RANGE( 0x0340, 0x0343) AM_DEVICE8("i8272a", i8272a_device, map, 0x00ff)	/* iSBX0 (J8) FDC 8272      */
+	AM_RANGE( 0x0350, 0x0351) AM_DEVREADWRITE8("i8272a", i8272a_device, mdma_r, mdma_w, 0x00ff)	/* iSBX0 (J8) DMA ACK       */
 	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( compis_i186_internal_port_r, compis_i186_internal_port_w)/* CPU 80186         */
 //{ 0x0100, 0x017e, compis_null_r },    /* RTC              */
 //{ 0x0180, 0x01ff, compis_null_r },    /* PCS3?            */
@@ -334,18 +335,15 @@ static const mm58274c_interface compis_mm58274c_interface =
 	1   /*  first day of week */
 };
 
-static const floppy_interface compis_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSQD,
-	LEGACY_FLOPPY_OPTIONS_NAME(compis),
-	"floppy_5_25",
+
+static const floppy_format_type compis_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( compis_floppies )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
+SLOT_INTERFACE_END
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, compis_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
@@ -387,8 +385,9 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 	MCFG_I8251_ADD("uart", compis_usart_interface)
 	MCFG_MM58274C_ADD("mm58274c", compis_mm58274c_interface)
-	MCFG_UPD765A_ADD("upd765", compis_fdc_interface)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(compis_floppy_interface)
+	MCFG_I8272A_ADD("i8272a", true)
+	MCFG_FLOPPY_DRIVE_ADD("i8272a:0", compis_floppies, "525qd", 0, compis_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("i8272a:1", compis_floppies, "525qd", 0, compis_floppy_formats)
 	MCFG_COMPIS_KEYBOARD_ADD()
 
 	/* software lists */
@@ -426,8 +425,9 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 	MCFG_I8251_ADD("uart", compis_usart_interface)
 	MCFG_MM58274C_ADD("mm58274c", compis_mm58274c_interface)
-	MCFG_UPD765A_ADD("upd765", compis_fdc_interface)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(compis_floppy_interface)
+	MCFG_I8272A_ADD("i8272a", true)
+	MCFG_FLOPPY_DRIVE_ADD("i8272a:0", compis_floppies, "525qd", 0, compis_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("i8272a:1", compis_floppies, "525qd", 0, compis_floppy_formats)
 	MCFG_COMPIS_KEYBOARD_ADD()
 
 	/* software lists */

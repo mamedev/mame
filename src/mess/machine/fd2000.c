@@ -86,46 +86,14 @@ static const via6522_interface via_intf =
 };
 
 
-//-------------------------------------------------
-//  LEGACY_FLOPPY_OPTIONS( fd2000 )
-//-------------------------------------------------
-
-static LEGACY_FLOPPY_OPTIONS_START( fd2000 )
-	LEGACY_FLOPPY_OPTION( fd2000, "d81", "Commodore 1581 Disk Image", d81_dsk_identify, d81_dsk_construct, NULL, NULL )
-	//LEGACY_FLOPPY_OPTION( fd2000, "d2m", "CMD FD-2000 Disk Image", d2m_dsk_identify, d2m_dsk_construct, NULL, NULL )
-LEGACY_FLOPPY_OPTIONS_END
-
-
-//-------------------------------------------------
-//  floppy_interface fd2000_floppy_interface
-//-------------------------------------------------
-
-static const floppy_interface fd2000_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_3_5_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(fd2000),
-	"floppy_3_5",
+static const floppy_format_type fd2000_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
 
-
-//-------------------------------------------------
-//  upd765_interface fdc_intf
-//-------------------------------------------------
-
-static const struct upd765_interface fdc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{ FLOPPY_0, NULL, NULL, NULL }
-};
+static SLOT_INTERFACE_START( fd2000_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
@@ -137,9 +105,9 @@ static MACHINE_CONFIG_FRAGMENT( fd2000 )
 	MCFG_CPU_PROGRAM_MAP(fd2000_mem)
 
 	MCFG_VIA6522_ADD(M6522_TAG, 2000000, via_intf)
-	MCFG_UPD765A_ADD(DP8473_TAG, fdc_intf)
+	MCFG_UPD765A_ADD(DP8473_TAG, true, true)
 
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, fd2000_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD(DP8473_TAG ":0", fd2000_floppies, "525dd", 0, fd2000_floppy_formats)
 MACHINE_CONFIG_END
 
 

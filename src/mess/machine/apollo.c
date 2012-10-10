@@ -37,7 +37,8 @@
 #include "machine/pic8259.h"
 
 #include "machine/pc_fdc.h"
-#include "formats/basicdsk.h"
+#include "formats/mfi_dsk.h"
+#include "formats/apollo_dsk.h"
 
 #include "cpu/m68000/m68000.h"
 //#include "cpu/m68000/m68kcpu.h"
@@ -526,7 +527,8 @@ static WRITE8_DEVICE_HANDLER( apollo_dma8237_ctape_dack_w ) {
 }
 
 static READ8_DEVICE_HANDLER( apollo_dma8237_fdc_dack_r ) {
-	UINT8 data = pc_fdc_dack_r(space.machine(), space);
+	pc_fdc_at_device *fdc = space.machine().device<pc_fdc_at_device>(APOLLO_FDC_TAG);
+	UINT8 data = fdc->dma_r();
 	//  DLOG2(("dma fdc dack read %02x",data));
 
 	// hack for DN3000: select appropriate DMA channel No.
@@ -536,8 +538,9 @@ static READ8_DEVICE_HANDLER( apollo_dma8237_fdc_dack_r ) {
 }
 
 static WRITE8_DEVICE_HANDLER( apollo_dma8237_fdc_dack_w ) {
+	pc_fdc_at_device *fdc = space.machine().device<pc_fdc_at_device>(APOLLO_FDC_TAG);
 	// DLOG2(("dma fdc dack write %02x", data));
-	pc_fdc_dack_w(space.machine(), space, data);
+	fdc->dma_w(data);
 
 	// hack for DN3000: select appropriate DMA channel No.
 	// Note: too late for this byte, but next bytes will be ok
@@ -556,8 +559,9 @@ static WRITE8_DEVICE_HANDLER( apollo_dma8237_wdc_dack_w ) {
 }
 
 static WRITE_LINE_DEVICE_HANDLER( apollo_dma8237_out_eop ) {
+	pc_fdc_at_device *fdc = device->machine().device<pc_fdc_at_device>(APOLLO_FDC_TAG);
 	DLOG1(("dma out eop state %02x", state));
-	pc_fdc_set_tc_state(device->machine(), state ? 0 : 1);
+	fdc->tc_w(!state);
 	sc499_set_tc_state(&device->machine(), state);
 }
 
@@ -1275,81 +1279,23 @@ static DEVICE_RESET(apollo_sio2)
 #undef VERBOSE
 #define VERBOSE 0
 
-static device_t *apollo_fdc_device = NULL;
-
-static LEGACY_FLOPPY_OPTIONS_START( apollo )
-		LEGACY_FLOPPY_OPTION( img2d, "afd", "Apollo floppy disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([77])
-		SECTORS([8])
-		SECTOR_LENGTH([1024])
-		FIRST_SECTOR_ID([1]))
-		LEGACY_FLOPPY_OPTIONS_END0
-
-static const floppy_interface apollo_fdc_floppy_config = { //
-		DEVCB_NULL, //
-		DEVCB_NULL, //
-		DEVCB_NULL, //
-		DEVCB_NULL, //
-		DEVCB_NULL, //
-		FLOPPY_STANDARD_5_25_DSHD, //
-		LEGACY_FLOPPY_OPTIONS_NAME(apollo), //
-		NULL, //
-		NULL //
+static const floppy_format_type apollo_floppy_formats[] = {
+	FLOPPY_APOLLO_FORMAT,
+	FLOPPY_MFI_FORMAT,
+	NULL
 };
 
-/*************************************
- *  Floppy Disk Controller
- *************************************/
+static SLOT_INTERFACE_START( apollo_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
 
-static void apollo_fdc_interrupt(running_machine &machine, int state) {
-	apollo_pic_set_irq_line( machine.firstcpu, APOLLO_IRQ_FDC, state);
+
+void apollo_state::fdc_interrupt(bool state) {
+	apollo_pic_set_irq_line( machine().firstcpu, APOLLO_IRQ_FDC, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void apollo_fdc_dma_drq(running_machine &machine, int state) {
-	apollo_dma_fdc_drq(machine.firstcpu, state);
-}
-
-static device_t *apollo_fdc_get_image(running_machine &machine,
-		int floppy_index) {
-	return floppy_get_device(machine, 0);
-}
-
-static device_t * apollo_fdc_get_device(running_machine &machine) {
-	return apollo_fdc_device;
-}
-
-static const struct pc_fdc_interface apollo_fdc_interface = {
-		apollo_fdc_interrupt, //
-		apollo_fdc_dma_drq, //
-		apollo_fdc_get_image, //
-		apollo_fdc_get_device //
-};
-
-/*-------------------------------------------------
- FDC upd765 at 0x5f800 - 0x5f807
- -------------------------------------------------*/
-
-static DEVICE_START( apollo_fdc ) {
-	DLOG1(("device_start_apollo_fdc"));
-	apollo_fdc_device = device;
-	pc_fdc_init(device->machine(), &apollo_fdc_interface);
-}
-
-static DEVICE_RESET( apollo_fdc ) {
-	DLOG1(("device_reset_apollo_fdc"));
-	pc_fdc_reset(device->machine());
-}
-
-WRITE8_MEMBER(apollo_state::apollo_fdc_w){
-	SLOG1(("writing FDC upd765 at offset %X = %02x", offset, data));
-	pc_fdc_w(space, offset, data);
-}
-
-READ8_MEMBER(apollo_state::apollo_fdc_r){
-	UINT8 data = pc_fdc_r(space, offset);
-	SLOG1(("reading FDC upd765 at offset %X = %02x", offset, data));
-	return data;
+void apollo_state::fdc_dma_drq(bool state) {
+	apollo_dma_fdc_drq(machine().firstcpu, state);
 }
 
 /***************************************************************************
@@ -1452,8 +1398,8 @@ MACHINE_CONFIG_FRAGMENT( apollo )
     MCFG_DUART68681_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz, apollo_sio_config )
     MCFG_DUART68681_ADD( APOLLO_SIO2_TAG, XTAL_3_6864MHz, apollo_sio2_config )
 
-	MCFG_UPD765A_ADD(APOLLO_FDC_TAG, pc_fdc_upd765_connected_1_drive_interface)
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, apollo_fdc_floppy_config)
+	MCFG_PC_FDC_XT_ADD(APOLLO_FDC_TAG)
+	MCFG_FLOPPY_DRIVE_ADD(APOLLO_FDC_TAG ":0", apollo_floppies, "525hd", 0, apollo_floppy_formats)
 
 	MCFG_OMTI8621_ADD(APOLLO_WDC_TAG, apollo_wdc_config)
 	MCFG_SC499_ADD(APOLLO_CTAPE_TAG, apollo_ctape_config)
@@ -1469,7 +1415,10 @@ MACHINE_START_MEMBER(apollo_state,apollo)
 {
 	//MLOG1(("machine_start_apollo"));
 
-	device_start_apollo_fdc (machine().device(APOLLO_FDC_TAG));
+	pc_fdc_at_device *fdc = machine().device<pc_fdc_at_device>(APOLLO_FDC_TAG);
+	fdc->setup_intrq_cb(pc_fdc_at_device::line_cb(FUNC(apollo_state::fdc_interrupt), this));
+	fdc->setup_drq_cb(pc_fdc_at_device::line_cb(FUNC(apollo_state::fdc_dma_drq), this));
+
 	device_start_apollo_ptm (machine().device(APOLLO_PTM_TAG) );
 	device_start_apollo_sio(machine().device(APOLLO_SIO_TAG));
 	device_start_apollo_sio2(machine().device(APOLLO_SIO2_TAG));
@@ -1498,5 +1447,4 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
 	device_reset_apollo_rtc(machine().device(APOLLO_RTC_TAG));
 	device_reset_apollo_sio(machine().device(APOLLO_SIO_TAG));
 	device_reset_apollo_sio2(machine().device(APOLLO_SIO2_TAG));
-	device_reset_apollo_fdc(apollo_fdc_device);
 }

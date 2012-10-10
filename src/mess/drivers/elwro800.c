@@ -28,6 +28,7 @@
 #include "imagedev/flopdrv.h"
 #include "imagedev/cassette.h"
 #include "formats/tzx_cas.h"
+#include "formats/mfi_dsk.h"
 #include "machine/ram.h"
 
 
@@ -79,27 +80,17 @@ DIRECT_UPDATE_MEMBER(elwro800_state::elwro800_direct_handler)
  *
  *************************************/
 
-static const struct upd765_interface elwro800jr_upd765_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0,FLOPPY_1, NULL, NULL}
-};
-
 WRITE8_MEMBER(elwro800_state::elwro800jr_fdc_control_w)
 {
-	device_t *fdc = machine().device("upd765");
+	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
 
-	floppy_mon_w(floppy_get_device(machine(), 0), !BIT(data, 0));
-	floppy_mon_w(floppy_get_device(machine(), 1), !BIT(data, 1));
-	floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1,1);
-	floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 1,1);
+	machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(!BIT(data, 0));
+	machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(!BIT(data, 1));
 
-	upd765_tc_w(fdc, data & 0x04);
+	fdc->tc_w(data & 0x04);
 
-	upd765_reset_w(fdc, !(data & 0x08));
+	if(!(data & 8))
+		fdc->reset();
 }
 
 /*************************************
@@ -289,14 +280,14 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 	else if (!BIT(cs,3))
 	{
 		// CSFDC
-		device_t *fdc = machine().device("upd765");
+		upd765a_device *fdc = machine().device<upd765a_device>("upd765");
 		if (offset & 1)
 		{
-			return upd765_data_r(fdc,space, 0);
+			return fdc->fifo_r(space, 0, 0xff);
 		}
 		else
 		{
-			return upd765_status_r(fdc,space, 0);
+			return fdc->msr_r(space, 0, 0xff);
 		}
 	}
 	else if (!BIT(cs,4))
@@ -347,10 +338,10 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 	else if (!BIT(cs,3))
 	{
 		// CSFDC
-		device_t *fdc = machine().device("upd765");
+		upd765a_device *fdc = machine().device<upd765a_device>("upd765");
 		if (offset & 1)
 		{
-			upd765_data_w(fdc, space, 0, data);
+			fdc->fifo_w(space, 0, data, 0xff);
 		}
 	}
 	else if (!BIT(cs,4))
@@ -543,18 +534,14 @@ INTERRUPT_GEN_MEMBER(elwro800_state::elwro800jr_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static const floppy_interface elwro800jr_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
+static const floppy_format_type elwro800jr_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( elwro800jr_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
 
 /* F4 Character Displayer */
 static const gfx_layout elwro800_charlayout =
@@ -600,7 +587,7 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 
 	MCFG_VIDEO_START_OVERRIDE(elwro800_state, spectrum )
 
-	MCFG_UPD765A_ADD("upd765", elwro800jr_upd765_interface)
+	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_I8255A_ADD( "ppi8255", elwro800jr_ppi8255_interface)
 
 	/* printer */
@@ -617,7 +604,8 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, elwro800jr_cassette_interface )
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(elwro800jr_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", elwro800jr_floppies, "525hd", 0, elwro800jr_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", elwro800jr_floppies, "525hd", 0, elwro800jr_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

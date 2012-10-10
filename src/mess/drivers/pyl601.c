@@ -37,7 +37,8 @@
 #include "video/mc6845.h"
 #include "sound/speaker.h"
 #include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "formats/mfi_dsk.h"
+#include "formats/pyldin_dsk.h"
 #include "machine/upd765.h"
 #include "machine/ram.h"
 
@@ -77,7 +78,7 @@ public:
 	DECLARE_READ8_MEMBER(floppy_r);
 	UINT8 selectedline(UINT16 data);
 	required_device<device_t> m_speaker;
-	required_device<device_t> m_fdc;
+	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;
 	DECLARE_DRIVER_INIT(pyl601);
 	virtual void machine_reset();
@@ -213,16 +214,6 @@ WRITE8_MEMBER(pyl601_state::led_w)
 //  UINT8 caps_led = BIT(data,4);
 }
 
-INLINE device_t *get_floppy_image(running_machine &machine, int drive)
-{
-	return floppy_get_device(machine, drive);
-}
-
-static UPD765_GET_IMAGE( pyldin_upd765_get_image )
-{
-	return get_floppy_image(device->machine(), (floppy_index & 1)^1);
-}
-
 WRITE8_MEMBER(pyl601_state::floppy_w)
 {
 	// bit 0 is reset (if zero)
@@ -232,13 +223,13 @@ WRITE8_MEMBER(pyl601_state::floppy_w)
 
 	if (BIT(data,0)==0)
 		//reset
-		upd765_reset(m_fdc, 0);
+		m_fdc->reset();
 
-	floppy_mon_w(get_floppy_image(machine(), BIT(data,2)), !BIT(data, 3));
+	floppy_image_device *floppy = machine().device<floppy_connector>(BIT(data,2) ? "upd765:1" : "upd765:0")->get_device();
+	if(floppy)
+		floppy->mon_w(!BIT(data, 3));
 
-	floppy_drive_set_ready_state(get_floppy_image(machine(), 0), BIT(data,2), 0);
-
-	upd765_tc_w(m_fdc, BIT(data, 1));
+	m_fdc->tc_w(BIT(data, 1));
 
 	m_floppy_ctrl = data;
 }
@@ -247,15 +238,6 @@ READ8_MEMBER(pyl601_state::floppy_r)
 {
 	return m_floppy_ctrl;
 }
-
-static const struct upd765_interface pyldin_upd765_interface =
-{
-	DEVCB_NULL,					/* interrupt */
-	DEVCB_NULL,					/* DMA request */
-	pyldin_upd765_get_image,	/* image lookup */
-	UPD765_RDY_PIN_CONNECTED,	/* ready pin */
-	{FLOPPY_0,FLOPPY_1, NULL, NULL}
-};
 
 static ADDRESS_MAP_START(pyl601_mem, AS_PROGRAM, 8, pyl601_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -275,8 +257,7 @@ static ADDRESS_MAP_START(pyl601_mem, AS_PROGRAM, 8, pyl601_state )
 	AM_RANGE( 0xe682, 0xe682 ) AM_WRITE(vdisk_l_w)
 	AM_RANGE( 0xe683, 0xe683 ) AM_READWRITE(vdisk_data_r,vdisk_data_w)
 	AM_RANGE( 0xe6c0, 0xe6c0 ) AM_READWRITE(floppy_r, floppy_w)
-	AM_RANGE( 0xe6d0, 0xe6d0 ) AM_DEVREAD_LEGACY("upd765", upd765_status_r)
-	AM_RANGE( 0xe6d1, 0xe6d1 ) AM_DEVREADWRITE_LEGACY("upd765", upd765_data_r, upd765_data_w)
+	AM_RANGE( 0xe6d0, 0xe6d1 ) AM_DEVICE("upd765", upd765a_device, map)
 	AM_RANGE( 0xe6f0, 0xe6f0 ) AM_READWRITE(rom_page_r, rom_page_w)
 	AM_RANGE( 0xe700, 0xefff ) AM_RAMBANK("bank4")
 	AM_RANGE( 0xf000, 0xffff ) AM_READ_BANK("bank5") AM_WRITE_BANK("bank6")
@@ -522,27 +503,15 @@ INTERRUPT_GEN_MEMBER(pyl601_state::pyl601_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static LEGACY_FLOPPY_OPTIONS_START(pyldin)
-	LEGACY_FLOPPY_OPTION(pyldin, "img", "Pyldin disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface pyldin_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(pyldin),
-	NULL,
+static const floppy_format_type pyl601_floppy_formats[] = {
+	FLOPPY_PYLDIN_FORMAT,
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( pyl601_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
 
 /* F4 Character Displayer */
 static const gfx_layout pyl601_charlayout =
@@ -604,8 +573,9 @@ static MACHINE_CONFIG_START( pyl601, pyl601_state )
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_2MHz, pyl601_crtc6845_interface)
-	MCFG_UPD765A_ADD("upd765", pyldin_upd765_interface)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(pyldin_floppy_interface)
+	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pyl601_floppies, "525hd", 0, pyl601_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pyl601_floppies, "525hd", 0, pyl601_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

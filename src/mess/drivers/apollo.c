@@ -29,6 +29,7 @@
 
 #include "includes/apollo.h"
 #include "machine/apollo_kbd.h"
+#include "machine/pc_fdc.h"
 
 #include "debugger.h"
 
@@ -751,7 +752,7 @@ static ADDRESS_MAP_START(dn3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x04D000, 0x04D007) AM_DEVREADWRITE16_LEGACY(APOLLO_WDC_TAG, omti8621_r, omti8621_w, 0xffffffff)
 		AM_RANGE(0x050000, 0x050007) AM_DEVREADWRITE8_LEGACY(APOLLO_CTAPE_TAG, sc499_r, sc499_w, 0xffffffff)
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
-		AM_RANGE(0x05f800, 0x05f807) AM_READWRITE8(apollo_fdc_r, apollo_fdc_w, 0xffffffff)
+		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_WDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
 		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 		AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
@@ -799,7 +800,7 @@ static ADDRESS_MAP_START(dsp3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x04D000, 0x04D007) AM_DEVREADWRITE16_LEGACY(APOLLO_WDC_TAG, omti8621_r, omti8621_w, 0xffffffff)
 		AM_RANGE(0x050000, 0x050007) AM_DEVREADWRITE8_LEGACY(APOLLO_CTAPE_TAG, sc499_r, sc499_w, 0xffffffff)
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
-		AM_RANGE(0x05f800, 0x05f807) AM_READWRITE8(apollo_fdc_r, apollo_fdc_w, 0xffffffff)
+		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_WDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
 //      AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 //      AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
@@ -838,7 +839,7 @@ static ADDRESS_MAP_START(dn3000_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x04D000, 0x04D007) AM_DEVREADWRITE16_LEGACY(APOLLO_WDC_TAG, omti8621_r, omti8621_w, 0xffffffff)
 		AM_RANGE(0x050000, 0x050007) AM_DEVREADWRITE8_LEGACY(APOLLO_CTAPE_TAG, sc499_r, sc499_w, 0xffffffff)
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
-		AM_RANGE(0x05f800, 0x05f807) AM_READWRITE8(apollo_fdc_r, apollo_fdc_w, 0xffffffff)
+		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_WDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
 		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 		AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
@@ -876,7 +877,7 @@ static ADDRESS_MAP_START(dsp3000_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x04D000, 0x04D007) AM_DEVREADWRITE16_LEGACY(APOLLO_WDC_TAG, omti8621_r, omti8621_w, 0xffffffff)
 		AM_RANGE(0x050000, 0x050007) AM_DEVREADWRITE8_LEGACY(APOLLO_CTAPE_TAG, sc499_r, sc499_w, 0xffffffff)
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
-		AM_RANGE(0x05f800, 0x05f807) AM_READWRITE8(apollo_fdc_r, apollo_fdc_w, 0xffffffff)
+		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_WDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
 //      AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 //      AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
@@ -922,7 +923,7 @@ static ADDRESS_MAP_START(dn5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x04D000, 0x04D007) AM_DEVREADWRITE16_LEGACY(APOLLO_WDC_TAG, omti8621_r, omti8621_w, 0xffffffff)
 		AM_RANGE(0x050000, 0x050007) AM_DEVREADWRITE8_LEGACY(APOLLO_CTAPE_TAG, sc499_r, sc499_w, 0xffffffff)
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
-		AM_RANGE(0x05f800, 0x05f807) AM_READWRITE8(apollo_fdc_r, apollo_fdc_w, 0xffffffff)
+		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_WDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
 		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 		AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
@@ -974,7 +975,7 @@ static ADDRESS_MAP_START(dsp5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x04D000, 0x04D007) AM_DEVREADWRITE16_LEGACY(APOLLO_WDC_TAG, omti8621_r, omti8621_w, 0xffffffff)
 		AM_RANGE(0x050000, 0x050007) AM_DEVREADWRITE8_LEGACY(APOLLO_CTAPE_TAG, sc499_r, sc499_w, 0xffffffff)
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
-		AM_RANGE(0x05f800, 0x05f807) AM_READWRITE8(apollo_fdc_r, apollo_fdc_w, 0xffffffff)
+		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_WDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
 //      AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 //      AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)

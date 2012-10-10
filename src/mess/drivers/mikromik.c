@@ -51,7 +51,8 @@
 */
 
 #include "includes/mikromik.h"
-
+#include "formats/mfi_dsk.h"
+#include "formats/mm_dsk.h"
 
 
 //**************************************************************************
@@ -110,11 +111,11 @@ READ8_MEMBER( mm1_state::mmu_r )
 		case 5:
 			if (BIT(offset, 0))
 			{
-				data = upd765_data_r(m_fdc, space, 0);
+				data = m_fdc->fifo_r(space, 0, 0xff);
 			}
 			else
 			{
-				data = upd765_status_r(m_fdc, space, 0);
+				data = m_fdc->msr_r(space, 0, 0xff);
 			}
 			break;
 
@@ -179,7 +180,7 @@ WRITE8_MEMBER( mm1_state::mmu_w )
 		case 5:
 			if (BIT(offset, 0))
 			{
-				upd765_data_w(m_fdc, space, 0, data);
+				m_fdc->fifo_w(space, 0, data, 0xff);
 			}
 			break;
 
@@ -220,7 +221,8 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 	case 1: // RECALL
 		if (LOG) logerror("RECALL %u\n", d);
 		m_recall = d;
-		upd765_reset_w(m_fdc, d);
+		if(d)
+			m_fdc->reset();
 		break;
 
 	case 2: // _RV28/RX21
@@ -246,12 +248,10 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 
 	case 7: // MOTOR ON
 		if (LOG) logerror("MOTOR %u\n", d);
-		floppy_mon_w(m_floppy0, !d);
-		floppy_mon_w(m_floppy1, !d);
-		floppy_drive_set_ready_state(m_floppy0, d, 1);
-		floppy_drive_set_ready_state(m_floppy1, d, 1);
+		m_floppy0->mon_w(!d);
+		m_floppy1->mon_w(!d);
 
-		if (ioport("T5")->read()) upd765_ready_w(m_fdc, d);
+		if (ioport("T5")->read()) m_fdc->ready_w(d);
 		break;
 	}
 }
@@ -516,7 +516,7 @@ WRITE_LINE_MEMBER( mm1_state::tc_w )
 	if (!m_dack3)
 	{
 		// floppy terminal count
-		upd765_tc_w(m_fdc, !state);
+		m_fdc->tc_w(!state);
 	}
 
 	m_tc = !state;
@@ -531,12 +531,22 @@ WRITE_LINE_MEMBER( mm1_state::dack3_w )
 	if (!m_dack3)
 	{
 		// floppy terminal count
-		upd765_tc_w(m_fdc, m_tc);
+		m_fdc->tc_w(m_tc);
 	}
 }
 
 static UINT8 memory_read_byte(address_space &space, offs_t address, UINT8 mem_mask) { return space.read_byte(address); }
 static void memory_write_byte(address_space &space, offs_t address, UINT8 data, UINT8 mem_mask) { space.write_byte(address, data); }
+
+READ8_MEMBER( mm1_state::fdc_dma_r )
+{
+	return m_fdc->dma_r();
+}
+
+WRITE8_MEMBER( mm1_state::fdc_dma_w )
+{
+	m_fdc->dma_w(data);
+}
 
 static I8237_INTERFACE( dmac_intf )
 {
@@ -544,8 +554,8 @@ static I8237_INTERFACE( dmac_intf )
 	DEVCB_DRIVER_LINE_MEMBER(mm1_state, tc_w),
 	DEVCB_MEMORY_HANDLER(I8085A_TAG, PROGRAM, memory_read_byte),
 	DEVCB_MEMORY_HANDLER(I8085A_TAG, PROGRAM, memory_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_r), DEVCB_DEVICE_HANDLER(UPD765_TAG, upd765_dack_r) },
-	{ DEVCB_DEVICE_HANDLER(I8275_TAG, i8275_dack_w), DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER(UPD765_TAG, upd765_dack_w) },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_r),  DEVCB_DRIVER_MEMBER(mm1_state, fdc_dma_r) },
+	{ DEVCB_DEVICE_HANDLER(I8275_TAG, i8275_dack_w), DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_w), DEVCB_NULL, DEVCB_DRIVER_MEMBER(mm1_state, fdc_dma_w) },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(mm1_state, dack3_w) }
 };
 
@@ -673,53 +683,31 @@ static I8085_CONFIG( i8085_intf )
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
-static LEGACY_FLOPPY_OPTIONS_START( mm1 )
-	LEGACY_FLOPPY_OPTION( mm1_640kb, "dsk", "Nokia MikroMikko 1 640KB disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([8]) // 3:1 sector skew (1,4,7,2,5,8,3,6)
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static LEGACY_FLOPPY_OPTIONS_START( mm2 )
-	LEGACY_FLOPPY_OPTION( mm2_360kb, "dsk", "Nokia MikroMikko 2 360KB disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-
-	LEGACY_FLOPPY_OPTION( mm2_720kb, "dsk", "Nokia MikroMikko 2 720KB disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([18])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface mm1_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSQD,
-	LEGACY_FLOPPY_OPTIONS_NAME(mm1),
-	"floppy_5_25",
+static const floppy_format_type mm1_floppy_formats[] = {
+	FLOPPY_MM1_FORMAT,
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
 
-static const upd765_interface fdc_intf =
-{
-	DEVCB_CPU_INPUT_LINE(I8085A_TAG, I8085_RST55_LINE),
-	DEVCB_DEVICE_LINE_MEMBER(I8237_TAG, am9517a_device, dreq3_w),
-	NULL,
-	UPD765_RDY_PIN_NOT_CONNECTED,
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
+static const floppy_format_type mm2_floppy_formats[] = {
+	FLOPPY_MM2_FORMAT,
+	FLOPPY_MFI_FORMAT,
+	NULL
 };
 
+static SLOT_INTERFACE_START( mm1_floppies )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
+SLOT_INTERFACE_END
+
+void mm1_state::fdc_irq(bool state)
+{
+	m_maincpu->set_input_line(I8085_RST55_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void mm1_state::fdc_drq(bool state)
+{
+	m_dmac->dreq3_w(state);
+}
 
 
 //**************************************************************************
@@ -762,11 +750,10 @@ void mm1_state::machine_reset()
 	for (i = 0; i < 8; i++) ls259_w(program, i, 0);
 
 	// set FDC ready
-	if (!ioport("T5")->read()) upd765_ready_w(m_fdc, 1);
+	if (!ioport("T5")->read()) m_fdc->ready_w(true);
 
 	// reset FDC
-	upd765_reset_w(m_fdc, 1);
-	upd765_reset_w(m_fdc, 0);
+	m_fdc->reset();
 }
 
 
@@ -796,10 +783,11 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 	MCFG_I8212_ADD(I8212_TAG, iop_intf)
 	MCFG_I8237_ADD(I8237_TAG, XTAL_6_144MHz/2, dmac_intf)
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
-	MCFG_UPD765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2 */ fdc_intf)
+	MCFG_UPD765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2 */ true, true)
 	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mpsc_intf)
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mm1_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", mm1_floppies, "525qd", 0, mm1_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", mm1_floppies, "525qd", 0, mm1_floppy_formats)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

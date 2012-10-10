@@ -1,2570 +1,2139 @@
-/***************************************************************************
+#include "debugger.h"
 
-    machine/upd765.c
+#include "upd765.h"
 
-    Functions to emulate a UPD765/Intel 8272 compatible floppy disk controller
+const device_type UPD765A = &device_creator<upd765a_device>;
+const device_type UPD765B = &device_creator<upd765b_device>;
+const device_type I8272A = &device_creator<i8272a_device>;
+const device_type UPD72065 = &device_creator<upd72065_device>;
+const device_type SMC37C78 = &device_creator<smc37c78_device>;
+const device_type N82077AA = &device_creator<n82077aa_device>;
+const device_type PC_FDC_SUPERIO = &device_creator<pc_fdc_superio_device>;
 
-    Code by Kevin Thacker.
+DEVICE_ADDRESS_MAP_START(map, 8, upd765a_device)
+	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
+	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
+ADDRESS_MAP_END
 
-    TODO:
+DEVICE_ADDRESS_MAP_START(map, 8, upd765b_device)
+	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
+	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
+ADDRESS_MAP_END
 
-    - overrun condition
-    - Scan Commands
-    - crc error in id field and crc error in data field errors
-    - disc not present, and no sectors on track for data, deleted data, write, write deleted,
-        read a track etc
-        - end of cylinder condition - almost working, needs fixing  with
-                PCW and PC drivers
-    - resolve "ready" state stuff (ready state when reset for PC, ready state change while processing command AND
-    while idle)
+DEVICE_ADDRESS_MAP_START(map, 8, i8272a_device)
+	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
+	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
+ADDRESS_MAP_END
 
-    Changes:
-    091006 (Mariusz Wojcieszek, changes needed by QX-10):
-    - allowed "Sense Interrupt Status" command when Seek is active
-    - DIO bit in status register (0x40) is cleared when "Read Data" command is executed,
-      it is later set during result phase.
+DEVICE_ADDRESS_MAP_START(map, 8, upd72065_device)
+	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
+	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
+ADDRESS_MAP_END
 
-***************************************************************************/
+DEVICE_ADDRESS_MAP_START(map, 8, smc37c78_device)
+	AM_RANGE(0x2, 0x2) AM_READWRITE(dor_r, dor_w)
+	AM_RANGE(0x3, 0x3) AM_READWRITE(tdr_r, tdr_w)
+	AM_RANGE(0x4, 0x4) AM_READWRITE(msr_r, dsr_w)
+	AM_RANGE(0x5, 0x5) AM_READWRITE(fifo_r, fifo_w)
+	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
+ADDRESS_MAP_END
 
-#include "emu.h"
-#include "machine/upd765.h"
+DEVICE_ADDRESS_MAP_START(map, 8, n82077aa_device)
+	AM_RANGE(0x0, 0x0) AM_READ(sra_r)
+	AM_RANGE(0x1, 0x1) AM_READ(srb_r)
+	AM_RANGE(0x2, 0x2) AM_READWRITE(dor_r, dor_w)
+	AM_RANGE(0x3, 0x3) AM_READWRITE(tdr_r, tdr_w)
+	AM_RANGE(0x4, 0x4) AM_READWRITE(msr_r, dsr_w)
+	AM_RANGE(0x5, 0x5) AM_READWRITE(fifo_r, fifo_w)
+	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
+ADDRESS_MAP_END
+
+DEVICE_ADDRESS_MAP_START(map, 8, pc_fdc_superio_device)
+	AM_RANGE(0x0, 0x0) AM_READ(sra_r)
+	AM_RANGE(0x1, 0x1) AM_READ(srb_r)
+	AM_RANGE(0x2, 0x2) AM_READWRITE(dor_r, dor_w)
+	AM_RANGE(0x3, 0x3) AM_READWRITE(tdr_r, tdr_w)
+	AM_RANGE(0x4, 0x4) AM_READWRITE(msr_r, dsr_w)
+	AM_RANGE(0x5, 0x5) AM_READWRITE(fifo_r, fifo_w)
+	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
+ADDRESS_MAP_END
 
 
-enum UPD765_PHASE
+int upd765_family_device::rates[4] = { 500000, 300000, 250000, 1000000 };
+
+upd765_family_device::upd765_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) : pc_fdc_interface(mconfig, type, name, tag, owner, clock)
 {
-	UPD765_COMMAND_PHASE_FIRST_BYTE,
-	UPD765_COMMAND_PHASE_BYTES,
-	UPD765_RESULT_PHASE,
-	UPD765_EXECUTION_PHASE_READ,
-	UPD765_EXECUTION_PHASE_WRITE
-};
-
-/* supported versions */
-enum UPD765_VERSION
-{
-	TYPE_UPD765A = 0,
-	TYPE_UPD765B = 1,
-	TYPE_SMC37C78 = 2,
-	TYPE_UPD72065 = 3
-};
-
-
-/* uncomment the following line for verbose information */
-#define LOG_VERBOSE		0
-#define LOG_COMMAND		0
-#define LOG_EXTRA		0
-#define LOG_INTERRUPT	0
-
-/* uncomment this to not allow end of cylinder "error" */
-#define NO_END_OF_CYLINDER
-
-
-
-/* state of upd765 Interrupt (INT) output */
-#define UPD765_INT	0x02
-/* data rate for floppy discs (MFM data) */
-#define UPD765_DATA_RATE	32
-/* state of upd765 terminal count input*/
-#define UPD765_TC	0x04
-
-#define UPD765_DMA_MODE 0x08
-
-#define UPD765_SEEK_OPERATION_IS_RECALIBRATE 0x01
-
-#define UPD765_SEEK_ACTIVE 0x010
-/* state of upd765 DMA DRQ output */
-#define UPD765_DMA_DRQ 0x020
-/* state of upd765 FDD READY input */
-#define UPD765_FDD_READY 0x040
-
-#define UPD765_MF	0x40
-#define UPD765_MT	0x80
-
-#define UPD765_RESET 0x080
-
-#define UPD765_BAD_MEDIA 0x100
-
-struct upd765_t
-{
-	devcb_resolved_write_line	out_int_func;
-	devcb_resolved_write_line	out_drq_func;
-
-	unsigned long	sector_counter;
-	/* version of fdc to emulate */
-	UPD765_VERSION version;
-
-	/* main status register */
-	unsigned char    FDC_main;
-	/* data register */
-	unsigned char	upd765_data_reg;
-
-	unsigned char c,h,r,n;
-
-	int sector_id;
-
-	int data_type;
-
-	char format_data[4];
-
-	UPD765_PHASE    upd765_phase;
-	unsigned int    upd765_command_bytes[16];
-	unsigned int    upd765_result_bytes[16];
-	unsigned int    upd765_transfer_bytes_remaining;
-	unsigned int    upd765_transfer_bytes_count;
-	unsigned int    upd765_status[4];
-	/* present cylinder number per drive */
-	unsigned int    pcn[4];
-
-	/* drive being accessed. drive outputs from fdc */
-	unsigned int    drive;
-	/* side being accessed: side output from fdc */
-	unsigned int	side;
-
-
-	/* step rate time in us */
-	unsigned long	srt_in_ms;
-
-	unsigned int	ncn;
-
-//  unsigned int    upd765_id_index;
-	char *execution_phase_data;
-	unsigned int	upd765_flags;
-
-//  unsigned char specify[2];
-//  unsigned char perpendicular_mode[1];
-
-	int command;
-
-	UINT8			ready_changed;
-
-	emu_timer *seek_timer;
-	emu_timer *timer;
-	int timer_type;
-
-	emu_timer *command_timer;
-
-	char *data_buffer;
-	const upd765_interface *intf;
-
-	bool pool;
-};
-
-//static void upd765_setup_data_request(unsigned char Data);
-static void upd765_setup_command(device_t *device);
-static TIMER_CALLBACK(upd765_continue_command);
-static int upd765_sector_count_complete(device_t *device);
-static void upd765_increment_sector(device_t *device);
-static void upd765_update_state(device_t *device);
-static void upd765_set_dma_drq(device_t *device,int state);
-static void upd765_set_int(device_t *device,int state);
-
-static const INT8 upd765_cmd_size[32] =
-{
-	1,1,9,3,2,9,9,2,1,9,2,1,9,6,1,3,
-	1,9,1,1,1,1,9,1,1,9,1,1,1,9,1,1
-};
-
-INLINE upd765_t *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == UPD765A || device->type() == UPD765B ||
-		device->type() == SMC37C78 || device->type() == UPD72065);
-
-	return (upd765_t *)downcast<upd765a_device *>(device)->token();
+	ready_polled = true;
+	ready_connected = true;
+	select_connected = true;
+	external_ready = true;
+	dor_reset = 0x00;
 }
 
-static device_t *current_image(device_t *device)
+void upd765_family_device::set_ready_line_connected(bool _ready)
 {
-	device_t *image = NULL;
-	upd765_t *fdc = get_safe_token(device);
+	ready_connected = _ready;
+}
 
-	if (!fdc->intf->get_image)
-	{
-		if (fdc->intf->floppy_drive_tags[fdc->drive] != NULL)
-		{
-			if (device->owner() != NULL)
-				image = device->owner()->subdevice(fdc->intf->floppy_drive_tags[fdc->drive]);
-			else
-				image = device->machine().device(fdc->intf->floppy_drive_tags[fdc->drive]);
+void upd765_family_device::set_select_lines_connected(bool _select)
+{
+	select_connected = _select;
+}
+
+void upd765_family_device::set_mode(int _mode)
+{
+	// TODO
+}
+
+void upd765_family_device::setup_intrq_cb(line_cb cb)
+{
+	intrq_cb = cb;
+}
+
+void upd765_family_device::setup_drq_cb(line_cb cb)
+{
+	drq_cb = cb;
+}
+
+void upd765_family_device::device_start()
+{
+	for(int i=0; i != 4; i++) {
+		char name[2];
+		flopi[i].tm = timer_alloc(i);
+		flopi[i].id = i;
+		if(select_connected) {
+			name[0] = '0'+i;
+			name[1] = 0;
+			floppy_connector *con = subdevice<floppy_connector>(name);
+			if(con) {
+				flopi[i].dev = con->get_device();
+				flopi[i].dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(upd765_family_device::index_callback), this));
+			} else
+				flopi[i].dev = NULL;
+		} else
+			flopi[i].dev = NULL;
+	}
+	cur_rate = 250000;
+	tc = false;
+
+	// reset at upper levels may cause a write to tc ending up with
+	// live_sync, which will crash if the live structure isn't
+	// initialized enough
+
+	cur_live.tm = attotime::never;
+	cur_live.state = IDLE;
+	cur_live.next_state = -1;
+	cur_live.fi = NULL;
+
+	if(ready_polled) {
+		poll_timer = timer_alloc(TIMER_DRIVE_READY_POLLING);
+		poll_timer->adjust(attotime::from_usec(1024), 0, attotime::from_usec(1024));
+	} else
+		poll_timer = NULL;
+
+	cur_irq = false;
+}
+
+void upd765_family_device::device_reset()
+{
+	main_phase = PHASE_CMD;
+	for(int i=0; i<4; i++) {
+		flopi[i].main_state = IDLE;
+		flopi[i].sub_state = IDLE;
+		flopi[i].irq_seek = false;
+		flopi[i].live = false;
+		flopi[i].ready = !ready_polled;
+		flopi[i].irq_polled = false;
+	}
+	data_irq = false;
+	internal_drq = false;
+	fifo_pos = 0;
+	command_pos = 0;
+	result_pos = 0;
+	fifocfg = FIF_DIS;
+	cur_live.fi = 0;
+	drq = false;
+	cur_live.tm = attotime::never;
+	cur_live.state = IDLE;
+	cur_live.next_state = -1;
+	cur_live.fi = NULL;
+	tc_done = false;
+	st0 = st1 = st2 = st3 = 0x00;
+	dor = dor_reset;
+
+	check_irq();
+	if(ready_polled)
+		poll_timer->adjust(attotime::from_usec(1024), 0, attotime::from_usec(1024));
+}
+
+void upd765_family_device::tc_w(bool _tc)
+{
+	logerror("%s: tc=%d\n", tag(), _tc);
+	if(tc != _tc && _tc) {
+		live_sync();
+		tc_done = true;
+		tc = _tc;
+		if(cur_live.fi)
+			general_continue(*cur_live.fi);
+	} else
+		tc = _tc;
+}
+
+void upd765_family_device::ready_w(bool _ready)
+{
+	external_ready = _ready;
+}
+
+bool upd765_family_device::get_ready(int fid)
+{
+	if(ready_connected)
+		return flopi[fid].dev ? flopi[fid].dev->ready_r() : false;
+	return external_ready;
+}
+
+void upd765_family_device::set_floppy(floppy_image_device *flop)
+{
+	for(int fid=0; fid<4; fid++) {
+		if(flopi[fid].dev)
+			flopi[fid].dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
+		flopi[fid].dev = flop;
+	}
+	if(flop)
+		flop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(upd765_family_device::index_callback), this));
+}
+
+READ8_MEMBER(upd765_family_device::sra_r)
+{
+	UINT8 sra = 0;
+	int fid = dor & 3;
+	floppy_info &fi = flopi[fid];
+	if(fi.dir)
+		sra |= 0x01;
+	if(fi.index)
+		sra |= 0x04;
+	if(cur_rate >= 500000)
+		sra |= 0x08;
+	if(fi.dev && fi.dev->trk00_r())
+		sra |= 0x10;
+	if(fi.main_state == SEEK_WAIT_STEP_SIGNAL_TIME)
+		sra |= 0x20;
+	sra |= 0x40;
+	if(cur_irq)
+		sra |= 0x80;
+	if(mode == MODE_M30)
+		sra ^= 0x1f;
+	return sra;
+}
+
+READ8_MEMBER(upd765_family_device::srb_r)
+{
+	return 0;
+}
+
+READ8_MEMBER(upd765_family_device::dor_r)
+{
+	return dor;
+}
+
+WRITE8_MEMBER(upd765_family_device::dor_w)
+{
+	logerror("%s: dor = %02x\n", tag(), data);
+	UINT8 diff = dor ^ data;
+	dor = data;
+	if(diff & 4) {
+		UINT8 tmp = dor_reset;
+		dor_reset = dor;
+		device_reset();
+		dor_reset = tmp;
+	}
+
+	for(int i=0; i<4; i++) {
+		floppy_info &fi = flopi[i];
+		if(fi.dev)
+			fi.dev->mon_w(!(dor & (0x10 << i)));
+	}
+	check_irq();
+}
+
+READ8_MEMBER(upd765_family_device::tdr_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER(upd765_family_device::tdr_w)
+{
+}
+
+READ8_MEMBER(upd765_family_device::msr_r)
+{
+	UINT32 msr = 0;
+	switch(main_phase) {
+	case PHASE_CMD:
+		msr |= MSR_RQM;
+		if(command_pos)
+			msr |= MSR_CB;
+		break;
+	case PHASE_EXEC:
+		msr |= MSR_CB;
+		if(spec & SPEC_ND)
+			msr |= MSR_EXM;
+		if(internal_drq)
+			msr |= MSR_RQM;
+		break;
+
+	case PHASE_RESULT:
+		msr |= MSR_RQM|MSR_DIO|MSR_CB;
+		break;
+	}
+	for(int i=0; i<4; i++)
+		if(flopi[i].main_state == RECALIBRATE || flopi[i].main_state == SEEK)
+			msr |= 1<<i;
+
+	if(data_irq) {
+		data_irq = false;
+		check_irq();
+	}
+
+	return msr;
+}
+
+WRITE8_MEMBER(upd765_family_device::dsr_w)
+{
+	dsr = data;
+	cur_rate = rates[dsr & 3];
+}
+
+void upd765_family_device::set_rate(int rate)
+{
+	cur_rate = rate;
+}
+
+READ8_MEMBER(upd765_family_device::fifo_r)
+{
+	UINT8 r = 0;
+	switch(main_phase) {
+	case PHASE_EXEC:
+		if(internal_drq)
+			return fifo_pop(false);
+		logerror("%s: fifo_r in phase %d\n", tag(), main_phase);
+		break;
+
+	case PHASE_RESULT:
+		r = result[0];
+		result_pos--;
+		memmove(result, result+1, result_pos);
+		if(!result_pos)
+			main_phase = PHASE_CMD;
+		break;
+	default:
+		logerror("%s: fifo_r in phase %d\n", tag(), main_phase);
+		break;
+	}
+
+	return r;
+}
+
+WRITE8_MEMBER(upd765_family_device::fifo_w)
+{
+	switch(main_phase) {
+	case PHASE_CMD: {
+		command[command_pos++] = data;
+		int cmd = check_command();
+		if(cmd == C_INCOMPLETE)
+			break;
+		if(cmd == C_INVALID) {
+			logerror("%s: Invalid on %02x\n", tag(), command[0]);
+			exit(1);
+			command_pos = 0;
+			return;
+		}
+		start_command(cmd);
+		break;
+	}
+	case PHASE_EXEC:
+		if(internal_drq) {
+			fifo_push(data, false);
+			return;
+		}
+		logerror("%s: fifo_w in phase %d\n", tag(), main_phase);
+		break;
+
+	default:
+		logerror("%s: fifo_w in phase %d\n", tag(), main_phase);
+		break;
+	}
+}
+
+UINT8 upd765_family_device::do_dir_r()
+{
+	floppy_info &fi = flopi[dor & 3];
+	if(fi.dev)
+		return fi.dev->dskchg_r() ? 0x00 : 0x80;
+	return 0x00;
+}
+
+READ8_MEMBER(upd765_family_device::dir_r)
+{
+	return do_dir_r();
+}
+
+WRITE8_MEMBER(upd765_family_device::ccr_w)
+{
+	dsr = (dsr & 0xfc) | (data & 3);
+	cur_rate = rates[data & 3];
+}
+
+void upd765_family_device::set_drq(bool state)
+{
+	if(state != drq) {
+		drq = state;
+		if(!drq_cb.isnull())
+			drq_cb(drq);
+	}
+}
+
+bool upd765_family_device::get_drq() const
+{
+	return drq;
+}
+
+void upd765_family_device::enable_transfer()
+{
+	if(spec & SPEC_ND) {
+		// PIO
+		if(!internal_drq) {
+			internal_drq = true;
+			check_irq();
+		}
+
+	} else {
+		// DMA
+		if(!drq)
+			set_drq(true);
+	}
+}
+
+void upd765_family_device::disable_transfer()
+{
+	if(spec & SPEC_ND) {
+		internal_drq = false;
+		check_irq();
+	} else
+		set_drq(false);
+}
+
+void upd765_family_device::fifo_push(UINT8 data, bool internal)
+{
+	if(fifo_pos == 16) {
+		if(internal)
+			st1 |= ST1_OR;
+		return;
+	}
+	fifo[fifo_pos++] = data;
+	fifo_expected--;
+	
+	int thr = (fifocfg & FIF_THR)+1;
+	if(!fifo_write && (!fifo_expected || fifo_pos >= thr || (fifocfg & FIF_DIS)))
+		enable_transfer();
+	if(fifo_write && (fifo_pos == 16 || !fifo_expected))
+		disable_transfer();
+}
+
+
+UINT8 upd765_family_device::fifo_pop(bool internal)
+{
+	if(!fifo_pos) {
+		if(internal)
+			st1 |= ST1_OR;
+		return 0;
+	}
+	UINT8 r = fifo[0];
+	fifo_pos--;
+	memmove(fifo, fifo+1, fifo_pos);
+	if(!fifo_write && !fifo_pos)
+		disable_transfer();
+	int thr = fifocfg & 15;
+	if(fifo_write && fifo_expected && (fifo_pos <= thr || (fifocfg & 0x20)))
+		enable_transfer();
+	return r;
+}
+
+void upd765_family_device::fifo_expect(int size, bool write)
+{
+	fifo_expected = size;
+	fifo_write = write;
+	if(fifo_write)
+		enable_transfer();
+}
+
+READ8_MEMBER(upd765_family_device::mdma_r)
+{
+	return dma_r();
+}
+
+WRITE8_MEMBER(upd765_family_device::mdma_w)
+{
+	dma_w(data);
+}
+
+UINT8 upd765_family_device::dma_r()
+{
+	return fifo_pop(false);
+}
+
+void upd765_family_device::dma_w(UINT8 data)
+{
+	fifo_push(data, false);
+}
+
+void upd765_family_device::live_start(floppy_info &fi, int state)
+{
+	cur_live.tm = machine().time();
+	cur_live.state = state;
+	cur_live.next_state = -1;
+	cur_live.fi = &fi;
+	cur_live.shift_reg = 0;
+	cur_live.crc = 0xffff;
+	cur_live.bit_counter = 0;
+	cur_live.data_separator_phase = false;
+	cur_live.data_reg = 0;
+	cur_live.previous_type = live_info::PT_NONE;
+	cur_live.data_bit_context = false;
+	cur_live.byte_counter = 0;
+	cur_live.pll.reset(cur_live.tm);
+	cur_live.pll.set_clock(attotime::from_hz(cur_rate*2));
+	checkpoint_live = cur_live;
+	fi.live = true;
+
+	live_run();
+}
+
+void upd765_family_device::checkpoint()
+{
+	if(cur_live.fi)
+		cur_live.pll.commit(cur_live.fi->dev, cur_live.tm);
+	checkpoint_live = cur_live;
+}
+
+void upd765_family_device::rollback()
+{
+	cur_live = checkpoint_live;
+}
+
+void upd765_family_device::live_delay(int state)
+{
+	cur_live.next_state = state;
+	if(cur_live.tm != machine().time())
+		cur_live.fi->tm->adjust(cur_live.tm - machine().time());
+	else
+		live_sync();
+}
+
+void upd765_family_device::live_sync()
+{
+	if(!cur_live.tm.is_never()) {
+		if(cur_live.tm > machine().time()) {
+			rollback();
+			live_run(machine().time());
+			cur_live.pll.commit(cur_live.fi->dev, cur_live.tm);
+		} else {
+			cur_live.pll.commit(cur_live.fi->dev, cur_live.tm);
+			if(cur_live.next_state != -1) {
+				cur_live.state = cur_live.next_state;
+				cur_live.next_state = -1;
+			}
+			if(cur_live.state == IDLE) {
+				cur_live.pll.stop_writing(cur_live.fi->dev, cur_live.tm);
+				cur_live.tm = attotime::never;
+				cur_live.fi->live = false;
+				cur_live.fi = 0;
+			}
+		}
+		cur_live.next_state = -1;
+		checkpoint();
+	}
+}
+
+void upd765_family_device::live_abort()
+{
+	if(!cur_live.tm.is_never() && cur_live.tm > machine().time()) {
+		rollback();
+		live_run(machine().time());
+	}
+
+	if(cur_live.fi) {
+		cur_live.pll.stop_writing(cur_live.fi->dev, cur_live.tm);
+		cur_live.fi->live = false;
+		cur_live.fi = 0;
+	}
+
+	cur_live.tm = attotime::never;
+	cur_live.state = IDLE;
+	cur_live.next_state = -1;
+}
+
+void upd765_family_device::live_run(attotime limit)
+{
+	if(cur_live.state == IDLE || cur_live.next_state != -1)
+		return;
+
+	if(limit == attotime::never) {
+		if(cur_live.fi->dev)
+			limit = cur_live.fi->dev->time_next_index();
+		if(limit == attotime::never) {
+			// Happens when there's no disk or if the fdc is not
+			// connected to a drive, hence no index pulse. Force a
+			// sync from time to time in that case, so that the main
+			// cpu timeout isn't too painful.  Avoids looping into
+			// infinity looking for data too.
+
+			limit = machine().time() + attotime::from_msec(1);
+			cur_live.fi->tm->adjust(attotime::from_msec(1));
 		}
 	}
-	else
-	{
-		image = fdc->intf->get_image(device, fdc->drive);
+
+	for(;;) {
+
+		switch(cur_live.state) {
+		case SEARCH_ADDRESS_MARK_HEADER:
+			if(read_one_bit(limit))
+				return;
+#if 0
+			fprintf(stderr, "%s: shift = %04x data=%02x c=%d\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
+					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
+					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
+					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
+					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
+					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
+					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
+					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
+					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
+					cur_live.bit_counter);
+#endif
+
+			if(cur_live.shift_reg == 0x4489) {
+				cur_live.crc = 0x443b;
+				cur_live.data_separator_phase = false;
+				cur_live.bit_counter = 0;
+				cur_live.state = READ_HEADER_BLOCK_HEADER;
+			}
+			break;
+
+		case READ_HEADER_BLOCK_HEADER: {
+			if(read_one_bit(limit))
+				return;
+#if 0
+			fprintf(stderr, "%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
+					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
+					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
+					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
+					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
+					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
+					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
+					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
+					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
+					cur_live.bit_counter);
+#endif
+			if(cur_live.bit_counter & 15)
+				break;
+
+			int slot = cur_live.bit_counter >> 4;
+
+			if(slot < 3) {
+				if(cur_live.shift_reg != 0x4489)
+					cur_live.state = SEARCH_ADDRESS_MARK_HEADER;
+				break;
+			}
+			if(cur_live.data_reg != 0xfe) {
+				cur_live.state = SEARCH_ADDRESS_MARK_HEADER;
+				break;
+			}
+
+			cur_live.bit_counter = 0;
+			cur_live.state = READ_ID_BLOCK;
+
+			break;
+		}
+
+		case READ_ID_BLOCK: {
+			if(read_one_bit(limit))
+				return;
+			if(cur_live.bit_counter & 15)
+				break;
+			int slot = (cur_live.bit_counter >> 4)-1;
+		   
+			if(0)
+				fprintf(stderr, "%s: slot=%d data=%02x crc=%04x\n", tts(cur_live.tm).cstr(), slot, cur_live.data_reg, cur_live.crc);
+			cur_live.idbuf[slot] = cur_live.data_reg;
+			if(slot == 5) {
+				live_delay(IDLE);
+				return;
+			}
+			break;
+		}
+
+		case SEARCH_ADDRESS_MARK_DATA:
+			if(read_one_bit(limit))
+				return;
+#if 0
+			fprintf(stderr, "%s: shift = %04x data=%02x c=%d.%x\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
+					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
+					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
+					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
+					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
+					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
+					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
+					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
+					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
+					cur_live.bit_counter >> 4, cur_live.bit_counter & 15);
+#endif
+			// Large tolerance due to perpendicular recording at extended density
+			if(cur_live.bit_counter > 62*16) {
+				live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
+				return;
+			}
+
+			if(cur_live.bit_counter >= 28*16 && cur_live.shift_reg == 0x4489) {
+				cur_live.crc = 0x443b;
+				cur_live.data_separator_phase = false;
+				cur_live.bit_counter = 0;
+				cur_live.state = READ_DATA_BLOCK_HEADER;
+			}
+			break;
+
+		case READ_DATA_BLOCK_HEADER: {
+			if(read_one_bit(limit))
+				return;
+#if 0
+			fprintf(stderr, "%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
+					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
+					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
+					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
+					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
+					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
+					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
+					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
+					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
+					cur_live.bit_counter);
+#endif
+			if(cur_live.bit_counter & 15)
+				break;
+
+			int slot = cur_live.bit_counter >> 4;
+
+			if(slot < 3) {
+				if(cur_live.shift_reg != 0x4489) {
+					live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
+					return;
+				}
+				break;
+			}
+			if(cur_live.data_reg != 0xfb && cur_live.data_reg != 0xfd) {
+				live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
+				return;
+			}
+
+			cur_live.bit_counter = 0;
+			cur_live.state = READ_SECTOR_DATA;
+			break;
+		}
+
+		case SEARCH_ADDRESS_MARK_DATA_FAILED:
+			st1 |= ST1_MA;
+			st2 |= ST2_MD;
+			cur_live.state = IDLE;
+			return;
+
+		case READ_SECTOR_DATA: {
+			if(read_one_bit(limit))
+				return;
+			if(cur_live.bit_counter & 15)
+				break;
+			int slot = (cur_live.bit_counter >> 4)-1;
+			if(slot < sector_size) {
+				// Sector data
+				live_delay(READ_SECTOR_DATA_BYTE);
+				return;
+
+			} else if(slot < sector_size+2) {
+				// CRC
+				if(slot == sector_size+1) {
+					live_delay(IDLE);
+					return;
+				}
+			}
+			break;
+		}
+
+		case READ_SECTOR_DATA_BYTE:
+			if(!tc_done)
+				fifo_push(cur_live.data_reg, true);
+			cur_live.state = READ_SECTOR_DATA;
+			checkpoint();
+			break;
+
+		case WRITE_SECTOR_SKIP_GAP2:
+			cur_live.bit_counter = 0;
+			cur_live.byte_counter = 0;
+			cur_live.state = WRITE_SECTOR_SKIP_GAP2_BYTE;
+			checkpoint();
+			break;
+
+		case WRITE_SECTOR_SKIP_GAP2_BYTE:
+			if(read_one_bit(limit))
+				return;
+			if(cur_live.bit_counter != 22*16)
+				break;
+			cur_live.bit_counter = 0;
+			cur_live.byte_counter = 0;
+			live_delay(WRITE_SECTOR_DATA);
+			return;
+
+		case WRITE_SECTOR_DATA:
+			if(cur_live.byte_counter < 12)
+				live_write_mfm(0x00);
+			else if(cur_live.byte_counter < 15)
+				live_write_raw(0x4489);
+			else if(cur_live.byte_counter < 16) {
+				cur_live.crc = 0xcdb4;
+				live_write_mfm(command[0] & 0x08 ? 0xf8 : 0xfb);
+			} else if(cur_live.byte_counter < 16+sector_size)
+				live_write_mfm(tc_done && !fifo_pos? 0x00 : fifo_pop(true));
+			else if(cur_live.byte_counter < 16+sector_size+2)
+				live_write_mfm(cur_live.crc >> 8);
+			else if(cur_live.byte_counter < 16+sector_size+2+command[7])
+				live_write_mfm(0x4e);
+			else {
+				cur_live.pll.stop_writing(cur_live.fi->dev, cur_live.tm);
+				cur_live.state = IDLE;
+				return;
+			}
+			cur_live.state = WRITE_SECTOR_DATA_BYTE;
+			cur_live.bit_counter = 16;
+			checkpoint();
+			break;
+
+		case WRITE_TRACK_PRE_SECTORS:
+			if(!cur_live.byte_counter && command[3])
+				fifo_expect(4, true);
+			if(cur_live.byte_counter < 80)
+				live_write_mfm(0x4e);
+			else if(cur_live.byte_counter < 92)
+				live_write_mfm(0x00);
+			else if(cur_live.byte_counter < 95)
+				live_write_raw(0x5224);
+			else if(cur_live.byte_counter < 96)
+				live_write_mfm(0xfc);
+			else if(cur_live.byte_counter < 146)
+				live_write_mfm(0x4e);
+			else {
+				cur_live.state = WRITE_TRACK_SECTOR;
+				cur_live.byte_counter = 0;
+				break;
+			}
+			cur_live.state = WRITE_TRACK_PRE_SECTORS_BYTE;
+			cur_live.bit_counter = 16;
+			checkpoint();
+			break;
+
+		case WRITE_TRACK_SECTOR:
+			if(!cur_live.byte_counter) {
+				command[3]--;
+				if(command[3])
+					fifo_expect(4, true);
+			}
+			if(cur_live.byte_counter < 12)
+				live_write_mfm(0x00);
+			else if(cur_live.byte_counter < 15)
+				live_write_raw(0x4489);
+			else if(cur_live.byte_counter < 16) {
+				cur_live.crc = 0xcdb4;
+				live_write_mfm(0xfe);
+			} else if(cur_live.byte_counter < 20)
+				live_write_mfm(fifo_pop(true));
+			else if(cur_live.byte_counter < 22)
+				live_write_mfm(cur_live.crc >> 8);
+			else if(cur_live.byte_counter < 44)
+				live_write_mfm(0x4e);
+			else if(cur_live.byte_counter < 56)
+				live_write_mfm(0x00);
+			else if(cur_live.byte_counter < 59)
+				live_write_raw(0x4489);
+			else if(cur_live.byte_counter < 60) {
+				cur_live.crc = 0xcdb4;
+				live_write_mfm(0xfb);
+			} else if(cur_live.byte_counter < 60+sector_size)
+				live_write_mfm(command[5]);
+			else if(cur_live.byte_counter < 62+sector_size)
+				live_write_mfm(cur_live.crc >> 8);
+			else if(cur_live.byte_counter < 62+sector_size+command[4])
+				live_write_mfm(0x4e);
+			else {
+				cur_live.byte_counter = 0;
+				cur_live.state = command[3] ? WRITE_TRACK_SECTOR : WRITE_TRACK_POST_SECTORS;
+				break;
+			}
+			cur_live.state = WRITE_TRACK_SECTOR_BYTE;
+			cur_live.bit_counter = 16;
+			checkpoint();
+			break;
+
+		case WRITE_TRACK_POST_SECTORS:
+			live_write_mfm(0x4e);
+			cur_live.state = WRITE_TRACK_POST_SECTORS_BYTE;
+			cur_live.bit_counter = 16;
+			checkpoint();
+			break;
+
+		case WRITE_TRACK_PRE_SECTORS_BYTE:
+		case WRITE_TRACK_SECTOR_BYTE:
+		case WRITE_TRACK_POST_SECTORS_BYTE:
+		case WRITE_SECTOR_DATA_BYTE:
+			if(write_one_bit(limit))
+				return;
+			if(cur_live.bit_counter == 0) {
+				cur_live.byte_counter++;
+				live_delay(cur_live.state-1);
+				return;
+			}
+			break;
+			
+		default:
+			logerror("%s: Unknown live state %d\n", tts(cur_live.tm).cstr(), cur_live.state);
+			return;
+		}
 	}
-	return image;
 }
 
-static void upd765_setup_drive_and_side(device_t *device)
+int upd765_family_device::check_command()
 {
-	upd765_t *fdc = get_safe_token(device);
-	/* drive index upd765 sees */
-	fdc->drive = fdc->upd765_command_bytes[1] & 0x03;
-	/* side index upd765 sees */
-	fdc->side = (fdc->upd765_command_bytes[1]>>2) & 0x01;
+	// 0.000010 read track
+	// 00000011 specify
+	// 00000100 sense drive status
+	// ..000101 write data
+	// ...00110 read data
+	// 00000111 recalibrate
+	// 00001000 sense interrupt status
+	// ..001001 write deleted data
+	// 0.001010 read id
+	// ...01100 read deleted data
+	// 0.001101 format track
+	// 00001110 dumpreg
+	// 00001111 seek
+	// 00010000 version
+	// ...10001 scan equal
+	// 00010010 perpendicular mode
+	// 00010011 configure
+	// .0010100 lock
+	// ...10110 verify
+	// ...11001 scan low or equal
+	// ...11101 scan high or equal
+	// 1.001111 relative seek
+
+	// MSDOS 6.22 format uses 0xcd to format a track, which makes one
+	// think only the bottom 5 bits are decoded.
+
+	switch(command[0] & 0x1f) {
+	case 0x02:
+		return command_pos == 9 ? C_READ_TRACK         : C_INCOMPLETE;
+
+	case 0x03:
+		return command_pos == 3 ? C_SPECIFY            : C_INCOMPLETE;
+
+	case 0x04:
+		return command_pos == 2 ? C_SENSE_DRIVE_STATUS : C_INCOMPLETE;
+
+	case 0x05:
+	case 0x09:
+		return command_pos == 9 ? C_WRITE_DATA         : C_INCOMPLETE;
+
+	case 0x06:
+	case 0x0c:
+		return command_pos == 9 ? C_READ_DATA          : C_INCOMPLETE;
+
+	case 0x07:
+		return command_pos == 2 ? C_RECALIBRATE        : C_INCOMPLETE;
+
+	case 0x08:
+		return C_SENSE_INTERRUPT_STATUS;
+
+	case 0x0a:
+		return command_pos == 2 ? C_READ_ID            : C_INCOMPLETE;
+
+	case 0x0d:
+		return command_pos == 6 ? C_FORMAT_TRACK       : C_INCOMPLETE;
+
+	case 0x0f:
+		return command_pos == 3 ? C_SEEK               : C_INCOMPLETE;
+
+	case 0x12:
+		return command_pos == 2 ? C_PERPENDICULAR      : C_INCOMPLETE;
+
+	case 0x13:
+		return command_pos == 4 ? C_CONFIGURE          : C_INCOMPLETE;
+
+	default:
+		return C_INVALID;
+	}
 }
 
-
-/* setup status register 0 based on data in status register 1 and 2 */
-static void upd765_setup_st0(device_t *device)
+void upd765_family_device::start_command(int cmd)
 {
-	upd765_t *fdc = get_safe_token(device);
-	/* clear completition status bits, drive bits and side bits */
-	fdc->upd765_status[0] &= ~((1<<7) | (1<<6) | (1<<2) | (1<<1) | (1<<0));
-	/* fill in drive */
-	fdc->upd765_status[0] |= fdc->drive | (fdc->side<<2);
+	command_pos = 0;
+	result_pos = 0;
+	main_phase = PHASE_EXEC;
+	tc_done = false;
+	switch(cmd) {
+	case C_CONFIGURE:
+		logerror("%s: command configure %02x %02x %02x\n",
+				 tag(),
+				 command[1], command[2], command[3]);
+		// byte 1 is ignored, byte 3 is precompensation-related
+		fifocfg = command[2];
+		main_phase = PHASE_CMD;
+		break;
 
-	/* fill in completion status bits based on bits in st0, st1, st2 */
-	/* no error bits set */
-	if ((fdc->upd765_status[1] | fdc->upd765_status[2])==0)
-	{
+	case C_FORMAT_TRACK:
+		format_track_start(flopi[command[1] & 3]);
+		break;
+
+	case C_PERPENDICULAR:
+		logerror("%s: command perpendicular\n", tag());
+		main_phase = PHASE_CMD;
+		break;
+
+	case C_READ_DATA:
+		read_data_start(flopi[command[1] & 3]);
+		break;
+
+	case C_READ_ID:
+		read_id_start(flopi[command[1] & 3]);
+		break;
+
+	case C_READ_TRACK:
+		read_track_start(flopi[command[1] & 3]);
+		break;
+
+	case C_RECALIBRATE:
+		recalibrate_start(flopi[command[1] & 3]);
+		main_phase = PHASE_CMD;
+		break;
+
+	case C_SEEK:
+		seek_start(flopi[command[1] & 3]);
+		main_phase = PHASE_CMD;
+		break;
+
+	case C_SENSE_DRIVE_STATUS: {
+		floppy_info &fi = flopi[command[1] & 3];
+		main_phase = PHASE_RESULT;
+		result[0] = 0x08;
+		if(get_ready(fi.id))
+			result[0] |= 0x20;
+		if(fi.dev)
+			result[0] |=
+				(fi.dev->wpt_r() ? 0x40 : 0x00) |
+				(fi.dev->trk00_r() ? 0x00 : 0x10) |
+				(fi.dev->ss_r() ? 0x04 : 0x00) |
+				(command[1] & 3);
+		logerror("%s: command sense drive status (%02x)\n", tag(), result[0]);
+		result_pos = 1;
+		break;
+	}
+
+	case C_SENSE_INTERRUPT_STATUS: {
+		main_phase = PHASE_RESULT;
+
+		int fid;
+		for(fid=0; fid<4 && !flopi[fid].irq_seek; fid++);
+		if(fid == 4)
+			for(fid=0; fid<4 && !flopi[fid].irq_polled; fid++);
+		if(fid == 4) {
+			st0 = ST0_UNK;
+			result[0] = st0;
+			result[1] = 0x00;
+			result_pos = 2;
+			logerror("%s: command sense interrupt status (%02x %02x)\n", tag(), result[0], result[1]);
+			break;
+		}
+		floppy_info &fi = flopi[fid];
+		if(fi.irq_seek)
+			fi.irq_seek = false;
+
+		else if(fi.irq_polled) {
+			// Documentation is somewhat contradictory w.r.t polling
+			// and irq.  PC bios, especially 5150, requires that only
+			// one irq happens.  That's also wait the ns82077a doc
+			// says it does.  OTOH, a number of docs says you need to
+			// call SIS 4 times, once per drive...
+			//
+			// Let's take the option that allows PC to boot.
+
+			for(int i=0; i<4; i++)
+				flopi[i].irq_polled = false;
+
+			st0 = ST0_ABRT | fid;
+		} else {
+			abort();
+		}
+		result[0] = st0;
+		result[1] = fi.pcn;
+		logerror("%s: command sense interrupt status (fid=%d %02x %02x)\n", tag(), fid, result[0], result[1]);
+		result_pos = 2;
+
+		check_irq();
+		break;
+	}
+
+	case C_SPECIFY:
+		logerror("%s: command specify %02x %02x\n",
+				 tag(),
+				 command[1], command[2]);
+		spec = (command[1] << 8) | command[2];
+		main_phase = PHASE_CMD;
+		break;
+
+	case C_WRITE_DATA:
+		write_data_start(flopi[command[1] & 3]);
+		break;
+
+	default:
+		fprintf(stderr, "start command %d\n", cmd);
+		exit(1);
+	}
+}
+
+void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
+{
+	logerror("%s: command done (%s) -", tag(), data_completion ? "data" : "seek");
+	for(int i=0; i != result_pos; i++)
+		logerror(" %02x", result[i]);
+	logerror("\n");
+	fi.main_state = fi.sub_state = IDLE;
+	if(data_completion)
+		data_irq = true;
+	else
+		fi.irq_seek = true;
+	check_irq();
+}
+
+void upd765_family_device::recalibrate_start(floppy_info &fi)
+{
+	logerror("%s: command recalibrate\n", tag());
+	fi.main_state = RECALIBRATE;
+	fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
+	fi.dir = 1;
+	fi.counter = 77;
+	seek_continue(fi);
+}
+
+void upd765_family_device::seek_start(floppy_info &fi)
+{
+	logerror("%s: command %sseek %d\n", tag(), command[0] & 0x80 ? "relative " : "", command[2]);
+	fi.main_state = SEEK;
+	fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
+	fi.dir = fi.pcn > command[2] ? 1 : 0;
+	seek_continue(fi);
+}
+
+void upd765_family_device::delay_cycles(emu_timer *tm, int cycles)
+{
+	tm->adjust(attotime::from_double(double(cycles)/cur_rate));
+}
+
+void upd765_family_device::seek_continue(floppy_info &fi)
+{
+	for(;;) {
+		switch(fi.sub_state) {
+		case SEEK_MOVE:
+			if(fi.dev) {
+				fi.dev->dir_w(fi.dir);
+				fi.dev->stp_w(0);
+			}
+			fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME;
+			fi.tm->adjust(attotime::from_nsec(2500));
+			return;
+
+		case SEEK_WAIT_STEP_SIGNAL_TIME:
+			return;
+
+		case SEEK_WAIT_STEP_SIGNAL_TIME_DONE:
+			if(fi.dev)
+				fi.dev->stp_w(1);
+
+			if(fi.main_state == SEEK) {
+				if(fi.pcn > command[2])
+					fi.pcn--;
+				else
+					fi.pcn++;
+			}
+			fi.sub_state = SEEK_WAIT_STEP_TIME;
+			delay_cycles(fi.tm, 500*(16-(spec >> 12)));
+			return;
+
+		case SEEK_WAIT_STEP_TIME:
+			return;
+
+		case SEEK_WAIT_STEP_TIME_DONE: {
+			bool done = false;
+			switch(fi.main_state) {
+			case RECALIBRATE:
+				fi.counter--;
+				done = !fi.dev || !fi.dev->trk00_r();
+				if(done)
+					fi.pcn = 0;
+				else if(!fi.counter) {
+					st0 = ST0_FAIL|ST0_SE|ST0_EC;
+					command_end(fi, false);
+					return;
+				}
+				break;
+			case SEEK:
+				done = fi.pcn == command[2];
+				break;
+			}
+			if(done) {
+				st0 = ST0_SE;
+				command_end(fi, false);
+				return;
+			}
+			fi.sub_state = SEEK_MOVE;
+			break;
+		}
+		}
+	}
+}
+
+void upd765_family_device::read_data_start(floppy_info &fi)
+{
+	fi.main_state = READ_DATA;
+	fi.sub_state = HEAD_LOAD_DONE;
+	logerror("%s: command read%s data%s%s%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
+			 tag(),
+			 command[0] & 0x08 ? " deleted" : "",
+			 command[0] & 0x80 ? " mt" : "",
+			 command[0] & 0x40 ? " mfm" : "",
+			 command[0] & 0x20 ? " sk" : "",
+			 fifocfg & 0x40 ? " seek" : "",
+			 command[0],
+			 command[1],
+			 command[2],
+			 command[3],
+			 command[4],
+			 128 << (command[5] & 7),
+			 command[6],
+			 command[7],
+			 command[8],
+			 cur_rate);
+
+	st0 = command[1] & 7;
+	st1 = ST1_MA;
+	st2 = 0x00;
+
+	if(fi.dev)
+		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+	read_data_continue(fi);
+}
+
+void upd765_family_device::read_data_continue(floppy_info &fi)
+{
+	for(;;) {
+		switch(fi.sub_state) {
+		case HEAD_LOAD_DONE:
+			if(fi.pcn == command[2] || !(fifocfg & 0x40)) {
+				fi.sub_state = SEEK_DONE;
+				break;
+			}
+			st0 |= ST0_SE;
+			if(fi.dev) {
+				fi.dev->dir_w(fi.pcn > command[2] ? 1 : 0);
+				fi.dev->stp_w(0);
+			}
+			fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME;
+			fi.tm->adjust(attotime::from_nsec(2500));
+			return;
+
+		case SEEK_WAIT_STEP_SIGNAL_TIME:
+			return;
+
+		case SEEK_WAIT_STEP_SIGNAL_TIME_DONE:
+			if(fi.dev)
+				fi.dev->stp_w(1);
+
+			fi.sub_state = SEEK_WAIT_STEP_TIME;
+			delay_cycles(fi.tm, 500*(16-(spec >> 12)));
+			return;
+
+		case SEEK_WAIT_STEP_TIME:
+			return;
+
+		case SEEK_WAIT_STEP_TIME_DONE:
+			if(fi.pcn > command[2])
+				fi.pcn--;
+			else
+				fi.pcn++;
+			fi.sub_state = HEAD_LOAD_DONE;
+			break;
+
+		case SEEK_DONE:
+			fi.counter = 0;
+			fi.sub_state = SCAN_ID;
+			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+			return;
+
+		case SCAN_ID:
+			if(cur_live.crc) {
+				st0 |= ST0_FAIL;
+				st1 |= ST1_DE|ST1_ND;
+				fi.sub_state = COMMAND_DONE;
+				break;
+			}
+			st1 &= ~ST1_MA;
+			if(!sector_matches()) {
+				if(cur_live.idbuf[0] != command[2]) {
+					if(cur_live.idbuf[0] == 0xff)
+						st2 |= ST2_WC|ST2_BC;
+					else
+						st2 |= ST2_WC;
+					st0 |= ST0_FAIL;
+					fi.sub_state = COMMAND_DONE;
+					break;
+				}
+				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+				return;
+			}
+			logerror("%s: reading sector %02x %02x %02x %02x\n",
+					 tag(),
+					 cur_live.idbuf[0],
+					 cur_live.idbuf[1],
+					 cur_live.idbuf[2],
+					 cur_live.idbuf[3]);
+			sector_size = calc_sector_size(cur_live.idbuf[3]);
+			fifo_expect(sector_size, false);
+			fi.sub_state = SECTOR_READ;
+			live_start(fi, SEARCH_ADDRESS_MARK_DATA);
+			return;
+
+		case SCAN_ID_FAILED:
+			st0 |= ST0_FAIL;
+			st1 |= ST1_ND;
+			fi.sub_state = COMMAND_DONE;
+			break;
+
+		case SECTOR_READ: {
+			if(st2 & ST2_MD) {
+				st0 |= ST0_FAIL;
+				fi.sub_state = COMMAND_DONE;
+				break;
+			}
+			if(cur_live.crc) {
+				st0 |= ST0_FAIL;
+				st1 |= ST1_DE;
+				st2 |= ST2_CM;
+				fi.sub_state = COMMAND_DONE;
+				break;
+			}
+			bool done = tc_done;
+			command[4]++;
+			if(command[4] > command[6]) {
+				command[4] = 1;
+				if(command[0] & 0x80) {
+					command[3] = command[3] ^ 1;
+					if(fi.dev)
+						fi.dev->ss_w(command[3] & 1);
+				}
+				if(!(command[0] & 0x80) || !(command[3] & 1)) {
+					command[2]++;
+					if(!tc_done) {
+						st0 |= ST0_FAIL;
+						st1 |= ST1_EN;
+					}
+					done = true;
+				}
+			}
+			if(!done) {
+				fi.sub_state = SEEK_DONE;
+				break;
+			}
+			fi.sub_state = COMMAND_DONE;
+			break;
+		}
+
+		case COMMAND_DONE:
+			main_phase = PHASE_RESULT;
+			result[0] = st0;
+			result[1] = st1;
+			result[2] = st2;
+			result[3] = command[2];
+			result[4] = command[3];
+			result[5] = command[4];
+			result[6] = command[5];
+			result_pos = 7;
+			command_end(fi, true);
+			return;
+
+		default:
+			logerror("%s: read sector unknown sub-state %d\n", ttsn().cstr(), fi.sub_state);
+			return;
+		}
+	}
+}
+
+void upd765_family_device::write_data_start(floppy_info &fi)
+{
+	fi.main_state = WRITE_DATA;
+	fi.sub_state = HEAD_LOAD_DONE;
+	logerror("%s: command write%s data%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
+			 tag(),
+			 command[0] & 0x08 ? " deleted" : "",
+			 command[0] & 0x80 ? " mt" : "",
+			 command[0] & 0x40 ? " mfm" : "",
+			 command[0],
+			 command[1],
+			 command[2],
+			 command[3],
+			 command[4],
+			 128 << (command[5] & 7),
+			 command[6],
+			 command[7],
+			 command[8],
+			 cur_rate);
+
+	if(fi.dev)
+		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+
+	st0 = command[1] & 7;
+	st1 = ST1_MA;
+	st2 = 0x00;
+
+	write_data_continue(fi);
+}
+
+void upd765_family_device::write_data_continue(floppy_info &fi)
+{
+	for(;;) {
+		switch(fi.sub_state) {
+		case HEAD_LOAD_DONE:
+			fi.counter = 0;
+			fi.sub_state = SCAN_ID;
+			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+			return;
+
+		case SCAN_ID:
+			if(!sector_matches()) {
+				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+				return;
+			}
+			if(cur_live.crc) {
+				fprintf(stderr, "Header CRC error\n");
+				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+				return;
+			}
+			sector_size = calc_sector_size(cur_live.idbuf[3]);
+			fifo_expect(sector_size, true);
+			fi.sub_state = SECTOR_WRITTEN;
+			live_start(fi, WRITE_SECTOR_SKIP_GAP2);
+			return;
+
+		case SCAN_ID_FAILED:
+			st0 |= ST0_FAIL;
+			st1 |= ST1_ND;
+			fi.sub_state = COMMAND_DONE;
+			break;
+
+		case SECTOR_WRITTEN: {
+			bool done = tc_done;
+			command[4]++;
+			if(command[4] > command[6]) {
+				command[4] = 1;
+				if(command[0] & 0x80) {
+					command[3] = command[3] ^ 1;
+					if(fi.dev)
+						fi.dev->ss_w(command[3] & 1);
+				}
+				if(!(command[0] & 0x80) || !(command[3] & 1)) {
+					command[2]++;
+					if(!tc_done) {
+						st0 |= ST0_FAIL;
+						st1 |= ST1_EN;
+					}
+					done = true;
+				}
+			}
+			if(!done) {
+				fi.sub_state = HEAD_LOAD_DONE;
+				break;
+			}
+			fi.sub_state = COMMAND_DONE;
+			break;
+		}
+
+		case COMMAND_DONE:
+			main_phase = PHASE_RESULT;
+			result[0] = st0;
+			result[1] = st1;
+			result[2] = st2;
+			result[3] = command[2];
+			result[4] = command[3];
+			result[5] = command[4];
+			result[6] = command[5];
+			result_pos = 7;
+			command_end(fi, true);
+			return;
+
+		default:
+			logerror("%s: write sector unknown sub-state %d\n", ttsn().cstr(), fi.sub_state);
+			return;
+		}
+	}
+}
+
+void upd765_family_device::read_track_start(floppy_info &fi)
+{
+	fi.main_state = READ_TRACK;
+	fi.sub_state = HEAD_LOAD_DONE;
+
+	logerror("%s: command read track%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
+			 tag(),
+			 command[0] & 0x40 ? " mfm" : "",
+			 command[0],
+			 command[1],
+			 command[2],
+			 command[3],
+			 command[4],
+			 128 << (command[5] & 7),
+			 command[6],
+			 command[7],
+			 command[8],
+			 cur_rate);
+
+	if(fi.dev)
+		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+	read_track_continue(fi);
+}
+
+void upd765_family_device::read_track_continue(floppy_info &fi)
+{
+	for(;;) {
+		switch(fi.sub_state) {
+		case HEAD_LOAD_DONE:
+			if(fi.pcn == command[2] || !(fifocfg & 0x40)) {
+				fi.sub_state = SEEK_DONE;
+				break;
+			}
+			if(fi.dev) {
+				fi.dev->dir_w(fi.pcn > command[2] ? 1 : 0);
+				fi.dev->stp_w(0);
+			}
+			fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME;
+			fi.tm->adjust(attotime::from_nsec(2500));
+			return;
+
+		case SEEK_WAIT_STEP_SIGNAL_TIME:
+			return;
+
+		case SEEK_WAIT_STEP_SIGNAL_TIME_DONE:
+			if(fi.dev)
+				fi.dev->stp_w(1);
+
+			fi.sub_state = SEEK_WAIT_STEP_TIME;
+			delay_cycles(fi.tm, 500*(16-(spec >> 12)));
+			return;
+
+		case SEEK_WAIT_STEP_TIME:
+			return;
+
+		case SEEK_WAIT_STEP_TIME_DONE:
+			if(fi.pcn > command[2])
+				fi.pcn--;
+			else
+				fi.pcn++;
+			fi.sub_state = HEAD_LOAD_DONE;
+			break;
+
+		case SEEK_DONE:
+			fi.counter = 0;
+			fi.sub_state = SCAN_ID;
+			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+			return;
+
+		case SCAN_ID:
+			if(cur_live.crc) {
+				fprintf(stderr, "Header CRC error\n");
+				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+				return;
+			}
+			sector_size = calc_sector_size(cur_live.idbuf[3]);
+			fifo_expect(sector_size, false);
+			fi.sub_state = SECTOR_READ;
+			live_start(fi, SEARCH_ADDRESS_MARK_DATA);
+			return;
+
+		case SCAN_ID_FAILED:
+			fprintf(stderr, "RNF\n");
+			//			command_end(fi, true, 1);
+			return;
+
+		case SECTOR_READ:
+			if(cur_live.crc) {
+				fprintf(stderr, "CRC error\n");
+			}
+			if(command[4] < command[6]) {
+				command[4]++;
+				fi.sub_state = HEAD_LOAD_DONE;
+				break;
+			}
+
+			main_phase = PHASE_RESULT;
+			result[0] = 0x40 | (fi.dev->ss_r() << 2) | fi.id;
+			result[1] = 0;
+			result[2] = 0;
+			result[3] = command[2];
+			result[4] = command[3];
+			result[5] = command[4];
+			result[6] = command[5];
+			result_pos = 7;
+			//			command_end(fi, true, 0);
+			return;
+
+		default:
+			logerror("%s: read track unknown sub-state %d\n", ttsn().cstr(), fi.sub_state);
+			return;
+		}
+	}
+}
+
+int upd765_family_device::calc_sector_size(UINT8 size)
+{
+	return size > 7 ? 16384 : 128 << size;
+}
+
+void upd765_family_device::format_track_start(floppy_info &fi)
+{
+	fi.main_state = FORMAT_TRACK;
+	fi.sub_state = HEAD_LOAD_DONE;
+
+	logerror("%s: command format track %s h=%02x n=%02x sc=%02x gpl=%02x d=%02x\n",
+			 tag(),
+			 command[0] & 0x40 ? "mfm" : "fm",
+			 command[1], command[2], command[3], command[4], command[5]);
+
+	if(fi.dev)
+		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+	sector_size = calc_sector_size(command[2]);
+
+	format_track_continue(fi);
+}
+
+void upd765_family_device::format_track_continue(floppy_info &fi)
+{
+	for(;;) {
+		switch(fi.sub_state) {
+		case HEAD_LOAD_DONE:
+			fi.sub_state = WAIT_INDEX;
+			break;
+
+		case WAIT_INDEX:
+			return;
+
+		case WAIT_INDEX_DONE:
+			logerror("%s: index found, writing track\n", tag());
+			fi.sub_state = TRACK_DONE;
+			cur_live.pll.start_writing(machine().time());
+			live_start(fi, WRITE_TRACK_PRE_SECTORS);
+			return;
+
+		case TRACK_DONE:
+			main_phase = PHASE_RESULT;
+			result[0] = (fi.dev->ss_r() << 2) | fi.id;
+			result[1] = 0;
+			result[2] = 0;
+			result[3] = 0;
+			result[4] = 0;
+			result[5] = 0;
+			result[6] = 0;
+			result_pos = 7;
+			command_end(fi, true);
+			return;
+
+		default:
+			logerror("%s: format track unknown sub-state %d\n", ttsn().cstr(), fi.sub_state);
+			return;
+		}
+	}
+}
+
+void upd765_family_device::read_id_start(floppy_info &fi)
+{
+	fi.main_state = READ_ID;
+	fi.sub_state = HEAD_LOAD_DONE;
+
+	logerror("%s: command read id%s, rate=%d\n",
+			 tag(),
+			 command[0] & 0x40 ? " mfm" : "",
+			 cur_rate);
+
+	if(fi.dev)
+		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+
+	st0 = command[1] & 7;
+	st1 = 0x00;
+	st2 = 0x00;
+
+	for(int i=0; i<4; i++)
+		cur_live.idbuf[i] = 0x00;
+
+	read_id_continue(fi);
+}
+
+void upd765_family_device::read_id_continue(floppy_info &fi)
+{
+	for(;;) {
+		switch(fi.sub_state) {
+		case HEAD_LOAD_DONE:
+			fi.counter = 0;
+			fi.sub_state = SCAN_ID;
+			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+			return;
+
+		case SCAN_ID:
+			if(cur_live.crc) {
+				st0 |= ST0_FAIL;
+				st1 |= ST1_MA|ST1_DE|ST1_ND;
+			}
+			fi.sub_state = COMMAND_DONE;
+			break;
+
+		case SCAN_ID_FAILED:
+			st0 |= ST0_FAIL;
+			st1 |= ST1_ND|ST1_MA;
+			fi.sub_state = COMMAND_DONE;
+			break;
+
+		case COMMAND_DONE:
+			main_phase = PHASE_RESULT;
+			result[0] = st0;
+			result[1] = st1;
+			result[2] = st2;
+			result[3] = cur_live.idbuf[0];
+			result[4] = cur_live.idbuf[1];
+			result[5] = cur_live.idbuf[2];
+			result[6] = cur_live.idbuf[3];
+			result_pos = 7;
+			command_end(fi, true);
+			return;
+
+		default:
+			logerror("%s: read id unknown sub-state %d\n", ttsn().cstr(), fi.sub_state);
+			return;
+		}
+	}
+}
+
+void upd765_family_device::check_irq()
+{
+	bool old_irq = cur_irq;
+	cur_irq = data_irq || internal_drq;
+	for(int i=0; i<4; i++)
+		cur_irq = cur_irq || flopi[i].irq_seek || flopi[i].irq_polled;
+	cur_irq = cur_irq && (dor & 4) && (dor & 8);
+	if(cur_irq != old_irq && !intrq_cb.isnull()) {
+		logerror("%s: irq = %d\n", tag(), cur_irq);
+		intrq_cb(cur_irq);
+	}
+}
+
+bool upd765_family_device::get_irq() const
+{
+	return cur_irq;
+}
+
+astring upd765_family_device::tts(attotime t)
+{
+	char buf[256];
+	const char *sign = "";
+	if(t.seconds < 0) {
+		t = attotime::zero-t;
+		sign = "-";
+	}
+	int nsec = t.attoseconds / ATTOSECONDS_PER_NANOSECOND;
+	sprintf(buf, "%s%04d.%03d,%03d,%03d", sign, int(t.seconds), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
+	return buf;
+}
+
+astring upd765_family_device::ttsn()
+{
+	return tts(machine().time());
+}
+
+void upd765_family_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if(id == TIMER_DRIVE_READY_POLLING) {
+		run_drive_ready_polling();
 		return;
 	}
 
-	fdc->upd765_status[0] |= 0x040;
+	live_sync();
+
+	floppy_info &fi = flopi[id];
+	switch(fi.sub_state) {
+	case SEEK_WAIT_STEP_SIGNAL_TIME:
+		fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME_DONE;
+		break;
+	case SEEK_WAIT_STEP_TIME:
+		fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
+		break;
+	}
+
+	general_continue(fi);
 }
 
-
-static int upd765_n_to_bytes(int n)
+void upd765_family_device::run_drive_ready_polling()
 {
-	/* 0-> 128 bytes, 1->256 bytes, 2->512 bytes etc */
-	/* data_size = ((1<<(N+7)) */
-	return 1<<(n+7);
-}
+	if(main_phase != PHASE_CMD || (fifocfg & FIF_POLL))
+		return;
 
-static void upd765_set_data_request(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-	fdc->FDC_main |= 0x080;
-}
-
-static void upd765_clear_data_request(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-	fdc->FDC_main &= ~0x080;
-}
-
-static int upd765_get_rdy(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-
-	if (fdc->intf->rdy_pin == UPD765_RDY_PIN_CONNECTED)
-	{
-		device_t *img = current_image(device);
-		if (img!=NULL) {
-			return floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY);
-		} else {
-			return 0;
+	bool changed = false;
+	for(int fid=0; fid<4; fid++) {
+		bool ready = get_ready(fid);
+		if(ready != flopi[fid].ready) {
+			logerror("%s: polled %d : %d -> %d\n", tag(), fid, flopi[fid].ready, ready);
+			flopi[fid].ready = ready;
+			flopi[fid].irq_polled = true;
+			changed = true;
 		}
 	}
-	else
-		return 1;
+	if(changed)
+		check_irq();
 }
 
-static void upd765_seek_complete(device_t *device)
+void upd765_family_device::index_callback(floppy_image_device *floppy, int state)
 {
-	/* tested on Amstrad CPC */
+	for(int fid=0; fid<4; fid++) {
+		floppy_info &fi = flopi[fid];
+		if(fi.dev != floppy)
+			continue;
 
-	/* if a seek is done without drive connected: */
-	/*  abnormal termination of command,
-        seek complete,
-        not ready
-    */
+		if(fi.live)
+			live_sync();
+		fi.index = state;
 
-	/* if a seek is done with drive connected, but disc missing: */
-	/* abnormal termination of command,
-        seek complete,
-        not ready */
-
-	/* if a seek is done with drive connected and disc in drive */
-	/* seek complete */
-
-
-	/* On the PC however, it appears that recalibrates and seeks can be performed without
-    a disc in the drive. */
-
-	/* Therefore, the above output is dependant on the state of the drive */
-
-	/* In the Amstrad CPC, the drive select is provided by the UPD765. A single port is also
-    assigned for setting the drive motor state. The motor state controls the motor of the selected
-    drive */
-
-	/* On the PC the drive can be selected with the DIGITAL OUTPUT REGISTER, and the motor of each
-    of the 4 possible drives is also settable using the same register */
-
-	/* Assumption for PC: (NOT TESTED - NEEDS VERIFICATION) */
-
-	/* If a seek is done without drive connected: */
-	/* abnormal termination of command,
-        seek complete,
-        fault
-        */
-
-	/* if a seek is done with drive connected, but disc missing: */
-	/* seek complete */
-
-	/* if a seek is done with drive connected and disc in drive: */
-	/* seek complete */
-
-	/* On Amstrad CPC:
-        If drive not connected, or drive connected but disc not in drive, not ready!
-        If drive connected and drive motor on, ready!
-       On PC:
-        Drive is always ready!
-
-        In 37c78 docs, the ready bits of the upd765 are marked as unused.
-        This indicates it is always ready!!!!!
-    */
-
-	device_t *img = current_image(device);
-	upd765_t *fdc = get_safe_token(device);
-
-	fdc->pcn[fdc->drive] = fdc->ncn;
-
-	fdc->upd765_status[0] = 0x20;
-
-	/* drive ready? */
-	if (img != NULL && upd765_get_rdy(device))
-	{
-		/* recalibrate? */
-		if (fdc->upd765_flags & UPD765_SEEK_OPERATION_IS_RECALIBRATE)
-		{
-			/* not at track 0? */
-			if (fdc->pcn[fdc->drive] != 0)
-				/* no, track 0 failed after 77 steps */
-				fdc->upd765_status[0] |= 0x40 | 0x10;
+		if(!state) {
+			general_continue(fi);
+			continue;
 		}
-	}
-	else
-	{
-		/* abnormal termination, not ready */
-		fdc->upd765_status[0] |= 0x40 | 0x08;
-	}
 
-	/* set drive and side. note: commented out side to avoid problems with the tf20 */
-	fdc->upd765_status[0] |= fdc->drive; //| (fdc->side<<2);
+		switch(fi.sub_state) {
+		case IDLE:
+		case SEEK_MOVE:
+		case SEEK_WAIT_STEP_SIGNAL_TIME:
+		case SEEK_WAIT_STEP_SIGNAL_TIME_DONE:
+		case SEEK_WAIT_STEP_TIME:
+		case SEEK_WAIT_STEP_TIME_DONE:
+		case HEAD_LOAD_DONE:
+		case SCAN_ID_FAILED:
+		case SECTOR_READ:
+			break;
 
-	upd765_set_int(device,0);
-	upd765_set_int(device,1);
+		case WAIT_INDEX:
+			fi.sub_state = WAIT_INDEX_DONE;
+			break;
 
-	fdc->upd765_flags &= ~UPD765_SEEK_ACTIVE;
-
-	upd765_idle(device);
-}
-
-static TIMER_CALLBACK(upd765_seek_timer_callback)
-{
-	device_t *device = (device_t *)ptr;
-	upd765_t *fdc = get_safe_token(device);
-	/* seek complete */
-	upd765_seek_complete(device);
-
-	fdc->seek_timer->reset();
-}
-
-static void upd765_timer_func(device_t *device, int timer_type)
-{
-	upd765_t *fdc = get_safe_token(device);
-	/* type 0 = data transfer mode in execution phase */
-	if (fdc->timer_type == 0)
-	{
-		/* set data request */
-		upd765_set_data_request(device);
-
-		fdc->timer_type = 4;
-
-		if (!(fdc->upd765_flags & UPD765_DMA_MODE))
-		{
-			if (fdc->upd765_command_bytes[0] & UPD765_MF)
-			{
-				/* MFM */
-				fdc->timer->reset(attotime::from_usec(13));
+		case SCAN_ID:
+			fi.counter++;
+			if(fi.counter == 2) {
+				fi.sub_state = SCAN_ID_FAILED;
+				live_abort();
 			}
-			else
-			{
-				/* FM */
-				fdc->timer->reset(attotime::from_usec(27));
-			}
-		}
-		else
-		{
-			upd765_timer_func(device, fdc->timer_type);
-		}
-	}
-	else if (fdc->timer_type==2)
-	{
-		/* result phase begin */
+			break;
 
-		/* generate a int for specific commands */
-		switch (fdc->command) {
-		case 2:		/* read a track */
-		case 5:		/* write data */
-		case 6:		/* read data */
-		case 9:		/* write deleted data */
-		case 10:	/* read id */
-		case 12:	/* read deleted data */
-		case 13:	/* format at track */
-		case 17:	/* scan equal */
-		case 19:	/* scan low or equal */
-		case 29:	/* scan high or equal */
-			upd765_set_int(device,1);
+		case TRACK_DONE:
+			live_abort();
 			break;
 
 		default:
+			logerror("%s: Index pulse on unknown sub-state %d\n", ttsn().cstr(), fi.sub_state);
 			break;
 		}
 
-		upd765_set_data_request(device);
-
-		fdc->timer->reset();
-	}
-	else if (fdc->timer_type == 4)
-	{
-		/* if in dma mode, a int is not generated per byte. If not in  DMA mode
-        a int is generated per byte */
-		if (fdc->upd765_flags & UPD765_DMA_MODE)
-		{
-			upd765_set_dma_drq(device,1);
-		}
-		else
-		{
-			if (fdc->FDC_main & (1<<7))
-			{
-				/* set int to indicate data is ready */
-				upd765_set_int(device,1);
-			}
-		}
-
-		fdc->timer->reset();
-	}
-}
-
-static TIMER_CALLBACK(upd765_timer_callback)
-{
-	device_t *device = (device_t *)ptr;
-	upd765_timer_func(device,param);
-}
-
-/* after (32-27) the DRQ is set, then 27 us later, the int is set.
-I don't know if this is correct, but it is required for the PCW driver.
-In this driver, the first NMI calls the handler function, furthur NMI's are
-effectively disabled by reading the data before the NMI int can be set.
-*/
-
-static void upd765_setup_timed_generic(device_t *device, int timer_type, attotime duration)
-{
-	upd765_t *fdc = get_safe_token(device);
-
-	fdc->timer_type = timer_type;
-
-	if (!(fdc->upd765_flags & UPD765_DMA_MODE))
-	{
-		fdc->timer->adjust(duration);
-	}
-	else
-	{
-		upd765_timer_func(device,fdc->timer_type);
-		fdc->timer->reset();
-	}
-}
-
-/* setup data request */
-static void upd765_setup_timed_data_request(device_t *device, int bytes)
-{
-	/* setup timer to trigger in UPD765_DATA_RATE us */
-	upd765_setup_timed_generic(device, 0, attotime::from_usec(32-27)	/*UPD765_DATA_RATE)*bytes*/);
-}
-
-/* setup result data request */
-static void upd765_setup_timed_result_data_request(device_t *device)
-{
-	upd765_setup_timed_generic(device, 2, attotime::from_usec(UPD765_DATA_RATE*2));
-}
-
-
-/* sets up a timer to issue a seek complete in signed_tracks time */
-static void upd765_setup_timed_int(device_t *device,int signed_tracks)
-{
-	upd765_t *fdc = get_safe_token(device);
-	/* setup timer to signal after seek time is complete */
-	fdc->seek_timer->adjust(attotime::from_double(fdc->srt_in_ms*abs(signed_tracks)*0.001));
-}
-
-static void upd765_seek_setup(device_t *device, int is_recalibrate)
-{
-	device_t *img;
-	int signed_tracks;
-	upd765_t *fdc = get_safe_token(device);
-
-	fdc->upd765_flags |= UPD765_SEEK_ACTIVE;
-
-	if (is_recalibrate)
-	{
-		/* head cannot be specified with recalibrate */
-		fdc->upd765_command_bytes[1] &=~0x04;
-	}
-
-	upd765_setup_drive_and_side(device);
-
-	img = current_image(device);
-
-	fdc->FDC_main |= (1<<fdc->drive);
-	fdc->FDC_main |= 0x20;  // execution phase
-	fdc->FDC_main &= ~0x10;  // not busy, can send another seek/recalibrate
-	                         // for a different drive, or sense int status
-
-	/* recalibrate command? */
-	if (is_recalibrate)
-	{
-		fdc->upd765_flags |= UPD765_SEEK_OPERATION_IS_RECALIBRATE;
-
-		fdc->ncn = 0;
-
-		/* if drive is already at track 0, or drive is not ready */
-		if (img == NULL || floppy_tk00_r(img) == CLEAR_LINE || (!upd765_get_rdy(device)))
-		{
-			/* seek completed */
-//          upd765_seek_complete(device);
-			// delay for the time of 1 step, the PCW does not like immediate recalibrates
-			upd765_setup_timed_int(device,1);
-		}
-		else
-		{
-			/* is drive present? */
-			if (1) //image_slotexists(img)) //fix me
-			{
-				/* yes - calculate real number of tracks to seek */
-
-				int current_track;
-
-				/* get current track */
-				current_track = floppy_drive_get_current_track(img);
-
-				/* get number of tracks to seek */
-				signed_tracks = -current_track;
-			}
-			else
-			{
-				/* no, seek 77 tracks and then stop */
-				/* true for UPD765A, but not for other variants */
-				signed_tracks = -77;
-			}
-
-			/* perform seek - if drive isn't present it will not do anything */
-			floppy_drive_seek(img, signed_tracks);
-
-			if (signed_tracks!=0)
-			{
-				upd765_setup_timed_int(device,signed_tracks);
-			}
-			else
-			{
-				upd765_seek_complete(device);
-			}
-		}
-	}
-	else
-	{
-
-		fdc->upd765_flags &= ~UPD765_SEEK_OPERATION_IS_RECALIBRATE;
-
-		fdc->ncn = fdc->upd765_command_bytes[2];
-
-		/* get signed tracks */
-		signed_tracks = fdc->ncn - fdc->pcn[fdc->drive];
-
-		/* perform seek - if drive isn't present it will not do anything */
-		floppy_drive_seek(img, signed_tracks);
-
-		/* if no tracks to seek, or drive is not ready, seek is complete */
-		if (img == NULL || (signed_tracks==0) || (!upd765_get_rdy(device)))
-		{
-			upd765_seek_complete(device);
-		}
-		else
-		{
-			/* seek complete - issue an interrupt */
-			upd765_setup_timed_int(device,signed_tracks);
-		}
-	}
-//    upd765_idle(device);
-}
-
-
-
-static void upd765_setup_execution_phase_read(device_t *device, char *ptr, int size)
-{
-	upd765_t *fdc = get_safe_token(device);
-
-//  fdc->FDC_main &= ~0x040;                     /* FDC->CPU */
-	fdc->FDC_main |= 0x040;                      /* FDC->CPU */
-
-	fdc->upd765_transfer_bytes_count = 0;
-	fdc->upd765_transfer_bytes_remaining = size;
-	fdc->execution_phase_data = ptr;
-	fdc->upd765_phase = UPD765_EXECUTION_PHASE_READ;
-
-	upd765_setup_timed_data_request(device, 1);
-}
-
-static void upd765_setup_execution_phase_write(device_t *device, char *ptr, int size)
-{
-	upd765_t *fdc = get_safe_token(device);
-
-	fdc->FDC_main &= ~0x040;                     /* FDC->CPU */
-
-	fdc->upd765_transfer_bytes_count = 0;
-	fdc->upd765_transfer_bytes_remaining = size;
-	fdc->execution_phase_data = ptr;
-	fdc->upd765_phase = UPD765_EXECUTION_PHASE_WRITE;
-
-	/* setup a data request with first byte */
-	upd765_setup_timed_data_request(device,1);
-}
-
-
-static void upd765_setup_result_phase(device_t *device, int byte_count)
-{
-	upd765_t *fdc = get_safe_token(device);
-
-	fdc->FDC_main |= 0x040;                     /* FDC->CPU */
-	fdc->FDC_main &= ~0x020;                    /* not execution phase */
-
-	fdc->upd765_transfer_bytes_count = 0;
-	fdc->upd765_transfer_bytes_remaining = byte_count;
-	fdc->upd765_phase = UPD765_RESULT_PHASE;
-
-	upd765_setup_timed_result_data_request(device);
-}
-
-void upd765_idle(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-
-	fdc->FDC_main &= ~0x040;                     /* CPU->FDC */
-	fdc->FDC_main &= ~0x020;                    /* not execution phase */
-	fdc->FDC_main &= ~0x010;                     /* not busy */
-	fdc->upd765_phase = UPD765_COMMAND_PHASE_FIRST_BYTE;
-
-	upd765_set_data_request(device);
-}
-
-
-
-/* change flags */
-static void upd765_change_flags(device_t *device,unsigned int flags, unsigned int mask)
-{
-	unsigned int new_flags;
-	unsigned int changed_flags;
-	upd765_t *fdc = get_safe_token(device);
-
-	assert((flags & ~mask) == 0);
-
-	/* compute the new flags and which ones have changed */
-	new_flags = fdc->upd765_flags & ~mask;
-	new_flags |= flags;
-	changed_flags = fdc->upd765_flags ^ new_flags;
-	fdc->upd765_flags = new_flags;
-
-	/* if interrupt changed, call the handler */
-	if (changed_flags & UPD765_INT)
-		fdc->out_int_func((fdc->upd765_flags & UPD765_INT) ? 1 : 0);
-
-	/* if DRQ changed, call the handler */
-	if (changed_flags & UPD765_DMA_DRQ)
-		fdc->out_drq_func((fdc->upd765_flags & UPD765_DMA_DRQ) ? 1 : 0);
-}
-
-
-
-/* set int output */
-static void upd765_set_int(device_t *device, int state)
-{
-	if (LOG_INTERRUPT)
-		logerror("upd765_set_int(): state=%d\n", state);
-	upd765_change_flags(device, state ? UPD765_INT : 0, UPD765_INT);
-}
-
-
-
-/* set dma request output */
-static void upd765_set_dma_drq(device_t *device, int state)
-{
-	upd765_change_flags(device, state ? UPD765_DMA_DRQ : 0, UPD765_DMA_DRQ);
-}
-
-READ_LINE_DEVICE_HANDLER( upd765_int_r )
-{
-	upd765_t *fdc = get_safe_token(device);
-
-	return (fdc->upd765_flags & UPD765_INT) ? 1 : 0;
-}
-
-READ_LINE_DEVICE_HANDLER( upd765_drq_r )
-{
-	upd765_t *fdc = get_safe_token(device);
-
-	return (fdc->upd765_flags & UPD765_DMA_DRQ) ? 1 : 0;
-}
-
-
-/* Drive ready */
-
-/*
-
-A drive will report ready if:
-- drive is selected
-- disc is in the drive
-- disk is rotating at a constant speed (normally 300rpm)
-
-On more modern PCs, a ready signal is not provided by the drive.
-This signal is not used in the PC design and was eliminated to save costs
-If you look at the datasheets for the modern UPD765 variants, you will see the Ready
-signal is not mentioned.
-
-On the original UPD765A, ready signal is required, and some commands will fail if the drive
-is not ready.
-
-
-
-
-*/
-
-
-
-
-/* done when ready state of drive changes */
-/* this ignores if command is active, in which case command should terminate immediatly
-with error */
-static void upd765_set_ready_change_callback(device_t *controller, device_t *img, int state)
-{
-	upd765_t *fdc = get_safe_token(controller);
-	int drive = floppy_get_drive(img);
-
-	if (LOG_EXTRA)
-		logerror("upd765: ready state change\n");
-
-	/* drive that changed state */
-	fdc->upd765_status[0] = 0x0c0 | drive;
-
-	/* not ready */
-	if (state==0 && fdc->intf->rdy_pin == UPD765_RDY_PIN_CONNECTED )
-		fdc->upd765_status[0] |= 8;
-
-	/* trigger an int */
-	upd765_set_int(controller, 1);
-}
-
-
-/* terminal count input */
-WRITE_LINE_DEVICE_HANDLER( upd765_tc_w )
-{
-	int old_state;
-	upd765_t *fdc = get_safe_token(device);
-
-	old_state = fdc->upd765_flags;
-
-	/* clear drq */
-	upd765_set_dma_drq(device, 0);
-
-	fdc->upd765_flags &= ~UPD765_TC;
-	if (state)
-	{
-		fdc->upd765_flags |= UPD765_TC;
-	}
-
-	/* changed state? */
-	if (((fdc->upd765_flags^old_state) & UPD765_TC)!=0)
-	{
-		/* now set? */
-		if ((fdc->upd765_flags & UPD765_TC)!=0)
-		{
-			/* yes */
-			if (fdc->timer)
-			{
-				if (fdc->timer_type==0)
-				{
-					fdc->timer->reset();
-
-
-				}
-			}
-
-#ifdef NO_END_OF_CYLINDER
-			fdc->command_timer->adjust(attotime::zero);
-#else
-			upd765_update_state(device);
-#endif
-		}
-	}
-}
-
-READ8_DEVICE_HANDLER( upd765_status_r )
-{
-	upd765_t *fdc = get_safe_token(device);
-	if (LOG_EXTRA)
-		logerror("%s: upd765_status_r: %02x\n", space.machine().describe_context(), fdc->FDC_main);
-	return fdc->FDC_main;
-}
-
-
-/* control mark handling code */
-
-/* if SK==1, and we are executing a read data command, and a deleted data mark is found,
-skip it.
-if SK==1, and we are executing a read deleted data command, and a data mark is found,
-skip it. */
-
-static int upd765_read_skip_sector(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-	/* skip set? */
-	if ((fdc->upd765_command_bytes[0] & (1<<5))!=0)
-	{
-		/* read data? */
-		if (fdc->command == 0x06)
-		{
-			/* did we just find a sector with deleted data mark? */
-			if (fdc->data_type == UPD765_DAM_DELETED_DATA)
-			{
-				/* skip it */
-				return TRUE;
-			}
-		}
-		/* deleted data? */
-		else
-		if (fdc->command == 0x0c)
-		{
-			/* did we just find a sector with data mark ? */
-			if (fdc->data_type == UPD765_DAM_DATA)
-			{
-				/* skip it */
-				return TRUE;
-			}
-		}
-	}
-
-	/* do not skip */
-	return FALSE;
-}
-
-/* this is much closer to how the upd765 actually gets sectors */
-/* used by read data, read deleted data, write data, write deleted data */
-/* What the upd765 does:
-
-  - get next sector id from disc
-  - if sector id matches id specified in command, it will
-    search for next data block and read data from it.
-
-  - if the index is seen twice while it is searching for a sector, then the sector cannot be found
-*/
-
-static void upd765_get_next_id(device_t *device, chrn_id *id)
-{
-	upd765_t *fdc = get_safe_token(device);
-	device_t *img = current_image(device);
-
-	/* get next id from disc */
-	floppy_drive_get_next_id(img, fdc->side,id);
-
-	fdc->sector_id = id->data_id;
-
-	/* set correct data type */
-	fdc->data_type = UPD765_DAM_DATA;
-	if (id->flags & ID_FLAG_DELETED_DATA)
-	{
-		fdc->data_type = UPD765_DAM_DELETED_DATA;
-	}
-}
-
-static int upd765_get_matching_sector(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-	device_t *img = current_image(device);
-	chrn_id id;
-
-	/* number of times we have seen index hole */
-	int index_count = 0;
-
-	if (fdc->upd765_flags & UPD765_BAD_MEDIA) {
-		fdc->upd765_status[1] |= 1;
-		return FALSE;
-	}
-
-	/* get sector id's */
-	do
-    {
-		upd765_get_next_id(device, &id);
-
-		/* tested on Amstrad CPC - All bytes must match, otherwise
-        a NO DATA error is reported */
-		if (id.R == fdc->upd765_command_bytes[4])
-		{
-			if (id.C == fdc->upd765_command_bytes[2])
-			{
-				if (id.H == fdc->upd765_command_bytes[3])
-				{
-					if (id.N == fdc->upd765_command_bytes[5])
-					{
-						/* end of cylinder is set if:
-                        1. sector data is read completely (i.e. no other errors occur like
-                        no data.
-                        2. sector being read is same specified by EOT
-                        3. terminal count is not received */
-						if (fdc->upd765_command_bytes[4]==fdc->upd765_command_bytes[6])
-						{
-							/* set end of cylinder */
-							fdc->upd765_status[1] |= UPD765_ST1_END_OF_CYLINDER;
-						}
-
-						return TRUE;
-					}
-				}
-			}
-			else
-			{
-				/* the specified sector ID was found, however, the C value specified
-                in the read/write command did not match the C value read from the disc */
-
-				/* no data - checked on Amstrad CPC */
-				fdc->upd765_status[1] |= UPD765_ST1_NO_DATA;
-				/* bad C value */
-				fdc->upd765_status[2] |= UPD765_ST2_WRONG_CYLINDER;
-
-				if (id.C == 0x0ff)
-				{
-					/* the C value is 0x0ff which indicates a bad track in the IBM soft-sectored
-                    format */
-					fdc->upd765_status[2] |= UPD765_ST2_BAD_CYLINDER;
-				}
-
-				return FALSE;
-			}
-		}
-
-		 /* index set? */
-		if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_INDEX))
-		{
-			index_count++;
-		}
-
-	}
-	while (index_count!=2);
-
-	if (fdc->upd765_command_bytes[4] != fdc->upd765_command_bytes[6])
-	{
-		/* no data - specified sector ID was not found */
-		fdc->upd765_status[1] |= UPD765_ST1_NO_DATA;
-	}
-
-	return 0;
-}
-
-static void upd765_read_complete(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-/* causes problems!!! - need to fix */
-#ifdef NO_END_OF_CYLINDER
-	/* set end of cylinder */
-	fdc->upd765_status[1] &= ~UPD765_ST1_END_OF_CYLINDER;
-#else
-	/* completed read command */
-
-	/* end of cylinder is set when:
-        - a whole sector has been read
-        - terminal count input is not set
-        - AND the the sector specified by EOT was read
-        */
-
-	/* if end of cylinder is set, and we did receive a terminal count, then clear it */
-	if ((fdc->upd765_flags & UPD765_TC)!=0)
-	{
-		/* set end of cylinder */
-		fdc->upd765_status[1] &= ~UPD765_ST1_END_OF_CYLINDER;
-	}
-#endif
-
-	upd765_setup_st0(device);
-
-	fdc->upd765_result_bytes[0] = fdc->upd765_status[0];
-	fdc->upd765_result_bytes[1] = fdc->upd765_status[1];
-	fdc->upd765_result_bytes[2] = fdc->upd765_status[2];
-	fdc->upd765_result_bytes[3] = fdc->upd765_command_bytes[2]; /* C */
-	fdc->upd765_result_bytes[4] = fdc->upd765_command_bytes[3]; /* H */
-	fdc->upd765_result_bytes[5] = fdc->upd765_command_bytes[4]; /* R */
-	fdc->upd765_result_bytes[6] = fdc->upd765_command_bytes[5]; /* N */
-
-	upd765_setup_result_phase(device,7);
-}
-
-static void upd765_read_data(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-	device_t *img = current_image(device);
-
-	if (!upd765_get_rdy(device))
-	{
-		fdc->upd765_status[0] = 0x0c0 | (1<<4) | fdc->drive | (fdc->side<<2);
-		fdc->upd765_status[1] = 0x00;
-		fdc->upd765_status[2] = 0x00;
-
-		fdc->upd765_result_bytes[0] = fdc->upd765_status[0];
-		fdc->upd765_result_bytes[1] = fdc->upd765_status[1];
-		fdc->upd765_result_bytes[2] = fdc->upd765_status[2];
-		fdc->upd765_result_bytes[3] = fdc->upd765_command_bytes[2]; /* C */
-		fdc->upd765_result_bytes[4] = fdc->upd765_command_bytes[3]; /* H */
-		fdc->upd765_result_bytes[5] = fdc->upd765_command_bytes[4]; /* R */
-		fdc->upd765_result_bytes[6] = fdc->upd765_command_bytes[5]; /* N */
-		upd765_setup_result_phase(device,7);
-		return;
-	}
-
-	if (LOG_VERBOSE)
-		logerror("sector c: %02x h: %02x r: %02x n: %02x\n",fdc->upd765_command_bytes[2], fdc->upd765_command_bytes[3],fdc->upd765_command_bytes[4], fdc->upd765_command_bytes[5]);
-
-	/* find a sector to read data from */
-	{
-		int found_sector_to_read;
-
-		found_sector_to_read = 0;
-		/* check for finished reading sectors */
-		do
-		{
-			/* get matching sector */
-			if (upd765_get_matching_sector(device))
-			{
-
-				/* skip it? */
-				if (upd765_read_skip_sector(device))
-				{
-					/* yes */
-
-					/* check that we haven't finished reading all sectors */
-					if (upd765_sector_count_complete(device))
-					{
-						/* read complete */
-						upd765_read_complete(device);
-						return;
-					}
-
-					/* read not finished */
-
-					/* increment sector count */
-					upd765_increment_sector(device);
-				}
-				else
-				{
-					/* found a sector to read */
-					found_sector_to_read = 1;
-				}
-			}
-			else
-			{
-				/* error in finding sector */
-				upd765_read_complete(device);
-				return;
-			}
-		}
-		while (found_sector_to_read==0);
-	}
-
-	{
-		int data_size;
-
-		data_size = upd765_n_to_bytes(fdc->upd765_command_bytes[5]);
-
-		floppy_drive_read_sector_data(img, fdc->side, fdc->sector_id,fdc->data_buffer,data_size);
-
-        upd765_setup_execution_phase_read(device,fdc->data_buffer, data_size);
+		general_continue(fi);
 	}
 }
 
 
-static void upd765_format_track(device_t *device)
+void upd765_family_device::general_continue(floppy_info &fi)
 {
-	upd765_t *fdc = get_safe_token(device);
-	device_t *img = current_image(device);
-
-	/* write protected? */
-	if (floppy_wpt_r(img) == CLEAR_LINE)
-	{
-		fdc->upd765_status[1] |= UPD765_ST1_NOT_WRITEABLE;
-
-		upd765_setup_st0(device);
-		/* TODO: Check result is correct */
-			fdc->upd765_result_bytes[0] = fdc->upd765_status[0];
-            fdc->upd765_result_bytes[1] = fdc->upd765_status[1];
-            fdc->upd765_result_bytes[2] = fdc->upd765_status[2];
-			fdc->upd765_result_bytes[3] = fdc->format_data[0];
-			fdc->upd765_result_bytes[4] = fdc->format_data[1];
-			fdc->upd765_result_bytes[5] = fdc->format_data[2];
-			fdc->upd765_result_bytes[6] = fdc->format_data[3];
-			upd765_setup_result_phase(device,7);
-
-		return;
+	if(fi.live && cur_live.state != IDLE) {
+		live_run();
+		if(cur_live.state != IDLE)
+			return;
 	}
 
-    upd765_setup_execution_phase_write(device, &fdc->format_data[0], 4);
-}
-
-static void upd765_read_a_track(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-	int data_size;
-
-	/* SKIP not allowed with this command! */
-
-	/* get next id */
-	chrn_id id;
-
-	upd765_get_next_id(device, &id);
-
-	/* TO BE CONFIRMED! */
-	/* check id from disc */
-	if (id.C==fdc->upd765_command_bytes[2])
-	{
-		if (id.H==fdc->upd765_command_bytes[3])
-		{
-			if (id.R==fdc->upd765_command_bytes[4])
-			{
-				if (id.N==fdc->upd765_command_bytes[5])
-				{
-					/* if ID found, then no data is not set */
-					/* otherwise no data will remain set */
-					fdc->upd765_status[1] &=~UPD765_ST1_NO_DATA;
-				}
-			}
-		}
-	}
-
-
-	data_size = upd765_n_to_bytes(id.N);
-
-	floppy_drive_read_sector_data(current_image(device), fdc->side, fdc->sector_id,fdc->data_buffer,data_size);
-
-	upd765_setup_execution_phase_read(device,fdc->data_buffer, data_size);
-}
-
-static int upd765_just_read_last_sector_on_track(device_t *device)
-{
-	if (floppy_drive_get_flag_state(current_image(device), FLOPPY_DRIVE_INDEX))
-		return 1;
-	return 0;
-}
-
-static void upd765_write_complete(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-
-/* causes problems!!! - need to fix */
-#ifdef NO_END_OF_CYLINDER
-        /* set end of cylinder */
-        fdc->upd765_status[1] &= ~UPD765_ST1_END_OF_CYLINDER;
-#else
-	/* completed read command */
-
-	/* end of cylinder is set when:
-     - a whole sector has been read
-     - terminal count input is not set
-     - AND the the sector specified by EOT was read
-     */
-
-	/* if end of cylinder is set, and we did receive a terminal count, then clear it */
-	if ((fdc->upd765_flags & UPD765_TC)!=0)
-	{
-		/* set end of cylinder */
-		fdc->upd765_status[1] &= ~UPD765_ST1_END_OF_CYLINDER;
-	}
-#endif
-
-	upd765_setup_st0(device);
-
-    fdc->upd765_result_bytes[0] = fdc->upd765_status[0];
-    fdc->upd765_result_bytes[1] = fdc->upd765_status[1];
-    fdc->upd765_result_bytes[2] = fdc->upd765_status[2];
-    fdc->upd765_result_bytes[3] = fdc->upd765_command_bytes[2]; /* C */
-    fdc->upd765_result_bytes[4] = fdc->upd765_command_bytes[3]; /* H */
-    fdc->upd765_result_bytes[5] = fdc->upd765_command_bytes[4]; /* R */
-    fdc->upd765_result_bytes[6] = fdc->upd765_command_bytes[5]; /* N */
-
-    upd765_setup_result_phase(device,7);
-}
-
-
-static void upd765_write_data(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-	if (!upd765_get_rdy(device))
-	{
-		fdc->upd765_status[0] = 0x0c0 | (1<<4) | fdc->drive | (fdc->side<<2);
-        fdc->upd765_status[1] = 0x00;
-        fdc->upd765_status[2] = 0x00;
-
-        fdc->upd765_result_bytes[0] = fdc->upd765_status[0];
-        fdc->upd765_result_bytes[1] = fdc->upd765_status[1];
-        fdc->upd765_result_bytes[2] = fdc->upd765_status[2];
-        fdc->upd765_result_bytes[3] = fdc->upd765_command_bytes[2]; /* C */
-        fdc->upd765_result_bytes[4] = fdc->upd765_command_bytes[3]; /* H */
-        fdc->upd765_result_bytes[5] = fdc->upd765_command_bytes[4]; /* R */
-        fdc->upd765_result_bytes[6] = fdc->upd765_command_bytes[5]; /* N */
-		upd765_setup_result_phase(device,7);
-		return;
-	}
-
-	/* write protected? */
-	if (floppy_wpt_r(current_image(device)) == CLEAR_LINE)
-	{
-		fdc->upd765_status[1] |= UPD765_ST1_NOT_WRITEABLE;
-
-		upd765_write_complete(device);
-		return;
-	}
-
-	if (upd765_get_matching_sector(device))
-	{
-		int data_size;
-
-		data_size = upd765_n_to_bytes(fdc->upd765_command_bytes[5]);
-
-        upd765_setup_execution_phase_write(device,fdc->data_buffer, data_size);
-	}
-    else
-    {
-        upd765_setup_result_phase(device,7);
-    }
-}
-
-
-/* return true if we have read all sectors, false if not */
-static int upd765_sector_count_complete(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-/* this is not correct?? */
-#if 1
-	/* if terminal count has been set - yes */
-	if (fdc->upd765_flags & UPD765_TC)
-	{
-		/* completed */
-		return 1;
-	}
-
-
-
-	/* multi-track? */
-	if (fdc->upd765_command_bytes[0] & UPD765_MT)
-	{
-		/* it appears that in multi-track mode,
-        the EOT parameter of the command is ignored!? -
-        or is it ignored the first time and not the next, so that
-        if it is started on side 0, it will end at EOT on side 1,
-        but if started on side 1 it will end at end of track????
-
-        PC driver requires this to end at last sector on side 1, and
-        ignore EOT parameter.
-
-        To be checked!!!!
-        */
-
-		/* if just read last sector and on side 1 - finish */
-		if (upd765_just_read_last_sector_on_track(device))
-		{
-			if (floppy_get_heads_per_disk(flopimg_get_image(current_image(device)))==1) {
-				return 2;
-			} else {
-				if (fdc->side==1)
-					return 2;
-				return 1; // do not advance to next cylinder
-			}
-		}
-
-		/* if not on second side then we haven't finished yet */
-		if (fdc->side!=1)
-		{
-			/* haven't finished yet */
-			return 0;
-		}
-	}
-	else
-	{
-		/* sector id == EOT? */
-		if (fdc->upd765_command_bytes[4]==fdc->upd765_command_bytes[6])
-		{
-
-			/* completed */
-			return 2;
-		}
-	}
-#else
-
-	/* if terminal count has been set - yes */
-	if (fdc->upd765_flags & UPD765_TC)
-	{
-		/* completed */
-		return 1;
-	}
-
-	/* Multi-Track operation:
-
-    Verified on Amstrad CPC.
-
-        disc format used:
-            9 sectors per track
-            2 sides
-            Sector IDs: &01, &02, &03, &04, &05, &06, &07, &08, &09
-
-        Command specified:
-            SIDE = 0,
-            C = 0,H = 0,R = 1, N = 2, EOT = 1
-        Sectors read:
-            Sector 1 side 0
-            Sector 1 side 1
-
-        Command specified:
-            SIDE = 0,
-            C = 0,H = 0,R = 1, N = 2, EOT = 3
-        Sectors read:
-            Sector 1 side 0
-            Sector 2 side 0
-            Sector 3 side 0
-            Sector 1 side 1
-            Sector 2 side 1
-            Sector 3 side 1
-
-
-        Command specified:
-            SIDE = 0,
-            C = 0, H = 0, R = 7, N = 2, EOT = 3
-        Sectors read:
-            Sector 7 side 0
-            Sector 8 side 0
-            Sector 9 side 0
-            Sector 10 not found. Error "No Data"
-
-        Command specified:
-            SIDE = 1,
-            C = 0, H = 1, R = 1, N = 2, EOT = 1
-        Sectors read:
-            Sector 1 side 1
-
-        Command specified:
-            SIDE = 1,
-            C = 0, H = 1, R = 1, N = 2, EOT = 2
-        Sectors read:
-            Sector 1 side 1
-            Sector 1 side 2
-
-  */
-
-	/* sector id == EOT? */
-	if ((fdc->upd765_command_bytes[4]==fdc->upd765_command_bytes[6]))
-	{
-		/* multi-track? */
-		if (fdc->upd765_command_bytes[0] & 0x080)
-		{
-			/* if we have reached EOT (fdc->upd765_command_bytes[6])
-            on side 1, then read is complete */
-			if (fdc->side==1)
-				return 1;
-
-			return 0;
-
-		}
-
-		/* completed */
-		return 1;
-	}
-#endif
-	/* not complete */
-	return 0;
-}
-
-static void	upd765_increment_sector(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-
-	/* multi-track? */
-	if (fdc->upd765_command_bytes[0] & UPD765_MT)
-	{
-		/* reached EOT? */
-		if (fdc->upd765_command_bytes[4] == fdc->upd765_command_bytes[6])
-		{
-			if (fdc->side == 1)
-			{
-				fdc->upd765_command_bytes[2]++;
-			}
-
-			fdc->upd765_command_bytes[3] ^= 0x01;
-			fdc->upd765_command_bytes[4] = 1;
-			fdc->side = fdc->upd765_command_bytes[3] & 0x01;
-		}
-		else
-		{
-			fdc->upd765_command_bytes[4]++;
-		}
-	}
-	else
-	{
-		if (fdc->upd765_command_bytes[4] == fdc->upd765_command_bytes[6])
-		{
-			fdc->upd765_command_bytes[2]++;
-			fdc->upd765_command_bytes[4] = 1;
-		}
-		else
-		{
-			fdc->upd765_command_bytes[4]++;
-		}
-	}
-}
-
-/* control mark handling code */
-
-/* if SK==0, and we are executing a read data command, and a deleted data sector is found,
-the data is not skipped. The data is read, but the control mark is set and the read is stopped */
-/* if SK==0, and we are executing a read deleted data command, and a data sector is found,
-the data is not skipped. The data is read, but the control mark is set and the read is stopped */
-static int upd765_read_data_stop(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-	/* skip not set? */
-	if ((fdc->upd765_command_bytes[0] & (1<<5))==0)
-	{
-		/* read data? */
-		if (fdc->command == 0x06)
-		{
-			/* did we just read a sector with deleted data? */
-			if (fdc->data_type == UPD765_DAM_DELETED_DATA)
-			{
-				/* set control mark */
-				fdc->upd765_status[2] |= UPD765_ST2_CONTROL_MARK;
-
-				/* quit */
-				return TRUE;
-			}
-		}
-		/* deleted data? */
-		else
-		if (fdc->command == 0x0c)
-		{
-			/* did we just read a sector with data? */
-			if (fdc->data_type == UPD765_DAM_DATA)
-			{
-				/* set control mark */
-				fdc->upd765_status[2] |= UPD765_ST2_CONTROL_MARK;
-
-				/* quit */
-				return TRUE;
-			}
-		}
-	}
-
-	/* continue */
-	return FALSE;
-}
-
-static TIMER_CALLBACK(upd765_continue_command)
-{
-	device_t *device = (device_t *)ptr;
-	upd765_t *fdc = get_safe_token(device);
-	if ((fdc->upd765_phase == UPD765_EXECUTION_PHASE_READ) ||
-		(fdc->upd765_phase == UPD765_EXECUTION_PHASE_WRITE))
-	{
-		switch (fdc->command)
-        {
-			/* read a track */
-			case 0x02:
-			{
-				fdc->sector_counter++;
-
-				/* sector counter == EOT */
-				if (fdc->sector_counter==fdc->upd765_command_bytes[6])
-				{
-					/* TODO: Add correct info here */
-
-					fdc->upd765_status[1] |= UPD765_ST1_END_OF_CYLINDER;
-
-					upd765_setup_st0(device);
-
-					fdc->upd765_result_bytes[0] = fdc->upd765_status[0];
-					fdc->upd765_result_bytes[1] = fdc->upd765_status[1];
-					fdc->upd765_result_bytes[2] = fdc->upd765_status[2];
-					fdc->upd765_result_bytes[3] = fdc->upd765_command_bytes[2]; /* C */
-					fdc->upd765_result_bytes[4] = fdc->upd765_command_bytes[3]; /* H */
-					fdc->upd765_result_bytes[5] = fdc->upd765_command_bytes[4]; /* R */
-					fdc->upd765_result_bytes[6] = fdc->upd765_command_bytes[5]; /* N */
-
-					upd765_setup_result_phase(device,7);
-				}
-				else
-				{
-					upd765_read_a_track(device);
-				}
-			}
-			break;
-
-			/* format track */
-			case 0x0d:
-			{
-				floppy_drive_format_sector(current_image(device), fdc->side, fdc->sector_counter,
-					fdc->format_data[0], fdc->format_data[1],
-					fdc->format_data[2], fdc->format_data[3],
-					fdc->upd765_command_bytes[5]);
-
-				fdc->sector_counter++;
-
-				/* sector_counter = SC */
-				if (fdc->sector_counter == fdc->upd765_command_bytes[3])
-				{
-					/* TODO: Check result is correct */
-					fdc->upd765_result_bytes[0] = fdc->upd765_status[0];
-					fdc->upd765_result_bytes[1] = fdc->upd765_status[1];
-					fdc->upd765_result_bytes[2] = fdc->upd765_status[2];
-					fdc->upd765_result_bytes[3] = fdc->format_data[0];
-					fdc->upd765_result_bytes[4] = fdc->format_data[1];
-					fdc->upd765_result_bytes[5] = fdc->format_data[2];
-					fdc->upd765_result_bytes[6] = fdc->format_data[3];
-					upd765_setup_result_phase(device,7);
-				}
-				else
-				{
-					upd765_format_track(device);
-				}
-			}
-			break;
-
-			/* write data, write deleted data */
-			case 0x09:
-			case 0x05:
-			{
-				/* sector id == EOT */
-				UINT8 ddam;
-
-				ddam = 0;
-				if (fdc->command == 0x09)
-				{
-					ddam = 1;
-				}
-
-				/* write data to disc */
-				// logerror("floppy_drive_write_sector_data side=%d sector=%d tc=%x\n", fdc->side, fdc->sector_id, fdc->upd765_flags & UPD765_TC);
-				floppy_drive_write_sector_data(current_image(device), fdc->side, fdc->sector_id,fdc->data_buffer,upd765_n_to_bytes(fdc->upd765_command_bytes[5]),ddam);
-
-				/* nothing to write */
-				if ((fdc->upd765_transfer_bytes_remaining==0) && (fdc->upd765_flags & UPD765_DMA_MODE))
-				{
-					if (fdc->upd765_flags & UPD765_TC)
-					{
-						upd765_write_complete(device);
-						break;
-					}
-				}
-
-				if (upd765_sector_count_complete(device))
-				{
-					upd765_increment_sector(device);
-					upd765_write_complete(device);
-				}
-				else
-				{
-					upd765_increment_sector(device);
-					upd765_write_data(device);
-				}
-			}
-			break;
-
-			/* read data, read deleted data */
-			case 0x0c:
-			case 0x06:
-			{
-
-				int cause;
-				/* read all sectors? */
-
-				/* sector id == EOT */
-				if ((cause = upd765_sector_count_complete(device)) || upd765_read_data_stop(device))
-				{
-					if (cause == 2)
-						upd765_increment_sector(device);  // advance to next cylinder if EOT
-
-					upd765_read_complete(device);
-				}
-				else
-				{
-					upd765_increment_sector(device);
-					upd765_read_data(device);
-				}
-			}
-			break;
-
-			default:
-				break;
-		}
-	}
-}
-
-
-static int upd765_get_command_byte_count(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-	fdc->command = fdc->upd765_command_bytes[0] & 0x01f;
-
-	if (fdc->version==TYPE_UPD765A)
-	{
-		 return upd765_cmd_size[fdc->command];
-    }
-	else
-	{
-		if (fdc->version==TYPE_UPD72065)
-		{
-			switch(fdc->upd765_command_bytes[0])
-			{
-				case 0x34: // Reset Standby
-				case 0x35: // Set Standby
-				case 0x36: // Software Reset
-					return 1;
-				default:
-					return upd765_cmd_size[fdc->command];
-			}
-		}
-		if (fdc->version==TYPE_SMC37C78)
-		{
-			switch (fdc->command)
-			{
-				/* version */
-				case 0x010:
-					return 1;
-
-				/* verify */
-				case 0x016:
-					return 9;
-
-				/* configure */
-				case 0x013:
-					return 4;
-
-				/* dumpreg */
-				case 0x0e:
-					return 1;
-
-				/* perpendicular mode */
-				case 0x012:
-					return 1;
-
-				/* lock */
-				case 0x014:
-					return 1;
-
-				/* seek/relative seek are together! */
-
-				default:
-					return upd765_cmd_size[fdc->command];
-			}
-		}
-	}
-
-	return upd765_cmd_size[fdc->command];
-}
-
-
-
-
-
-void upd765_update_state(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-	switch (fdc->upd765_phase) {
-	case UPD765_RESULT_PHASE:
-		/* set data reg */
-		fdc->upd765_data_reg = fdc->upd765_result_bytes[fdc->upd765_transfer_bytes_count];
-
-		if (fdc->upd765_transfer_bytes_count == 0)
-		{
-			/* clear int for specific commands */
-			switch (fdc->command) {
-			case 2:	/* read a track */
-			case 5:	/* write data */
-			case 6:	/* read data */
-			case 9:	/* write deleted data */
-			case 10:	/* read id */
-			case 12:	/* read deleted data */
-			case 13:	/* format at track */
-			case 17:	/* scan equal */
-			case 19:	/* scan low or equal */
-			case 29:	/* scan high or equal */
-				upd765_set_int(device, 0);
-				break;
-
-			default:
-				break;
-			}
-		}
-
-		if (LOG_VERBOSE)
-			logerror("UPD765: RESULT: %02x\n", fdc->upd765_data_reg);
-
-		fdc->upd765_transfer_bytes_count++;
-		fdc->upd765_transfer_bytes_remaining--;
-
-		if (fdc->upd765_transfer_bytes_remaining==0)
-		{
-			upd765_idle(device);
-		}
-		else
-		{
-			upd765_set_data_request(device);
-		}
+	switch(fi.main_state) {
+	case IDLE:
 		break;
 
-	case UPD765_EXECUTION_PHASE_READ:
-		/* setup data register */
-		fdc->upd765_data_reg = fdc->execution_phase_data[fdc->upd765_transfer_bytes_count];
-		fdc->upd765_transfer_bytes_count++;
-		fdc->upd765_transfer_bytes_remaining--;
-
-		if (LOG_EXTRA)
-			logerror("EXECUTION PHASE READ: %02x\n", fdc->upd765_data_reg);
-
-		if ((fdc->upd765_transfer_bytes_remaining==0) || (fdc->upd765_flags & UPD765_TC))
-		{
-			fdc->command_timer->adjust(attotime::zero);
-		}
-		else
-		{
-			/* trigger int */
-			upd765_setup_timed_data_request(device,1);
-		}
+	case RECALIBRATE:
+	case SEEK:
+		seek_continue(fi);
 		break;
 
-	case UPD765_COMMAND_PHASE_FIRST_BYTE:
-		fdc->FDC_main |= 0x10;                      /* set BUSY */
-
-		if (LOG_VERBOSE)
-			logerror("%s: upd765(): command=0x%02x\n", device->machine().describe_context(), fdc->upd765_data_reg);
-
-		/* seek in progress? */
-		if (fdc->upd765_flags & UPD765_SEEK_ACTIVE)
-		{
-			/* any command results in a invalid - I think that seek, recalibrate and
-            sense interrupt status may work*/
-			if (fdc->upd765_data_reg != 8)	/* Sense Interrupt Status */
-				fdc->upd765_data_reg = 0;
-		}
-
-		fdc->upd765_command_bytes[0] = fdc->upd765_data_reg;
-
-		fdc->upd765_transfer_bytes_remaining = upd765_get_command_byte_count(device);
-
-		fdc->upd765_transfer_bytes_count = 1;
-		fdc->upd765_transfer_bytes_remaining--;
-
-		if (fdc->upd765_transfer_bytes_remaining==0)
-		{
-			upd765_setup_command(device);
-		}
-		else
-		{
-			/* request more data */
-			upd765_set_data_request(device);
-			fdc->upd765_phase = UPD765_COMMAND_PHASE_BYTES;
-		}
-        break;
-
-    case UPD765_COMMAND_PHASE_BYTES:
-		if (LOG_VERBOSE)
-			logerror("%s: upd765(): command=0x%02x\n", device->machine().describe_context(), fdc->upd765_data_reg);
-
-		fdc->upd765_command_bytes[fdc->upd765_transfer_bytes_count] = fdc->upd765_data_reg;
-		fdc->upd765_transfer_bytes_count++;
-		fdc->upd765_transfer_bytes_remaining--;
-
-		if (fdc->upd765_transfer_bytes_remaining==0)
-		{
-			upd765_setup_command(device);
-		}
-		else
-		{
-			/* request more data */
-			upd765_set_data_request(device);
-		}
+	case READ_DATA:
+		read_data_continue(fi);
 		break;
 
-    case UPD765_EXECUTION_PHASE_WRITE:
-		fdc->execution_phase_data[fdc->upd765_transfer_bytes_count]=fdc->upd765_data_reg;
-		fdc->upd765_transfer_bytes_count++;
-		fdc->upd765_transfer_bytes_remaining--;
+	case WRITE_DATA:
+		write_data_continue(fi);
+		break;
 
-		if ((fdc->upd765_transfer_bytes_remaining == 0) || (fdc->upd765_flags & UPD765_TC))
-		{
-			fdc->command_timer->adjust(attotime::zero);
-		}
-		else
-		{
-			upd765_setup_timed_data_request(device,1);
-		}
+	case READ_TRACK:
+		read_track_continue(fi);
+		break;
+
+	case FORMAT_TRACK:
+		format_track_continue(fi);
+		break;
+
+	case READ_ID:
+		read_id_continue(fi);
+		break;
+
+	default:
+		logerror("%s: general_continue on unknown main-state %d\n", ttsn().cstr(), fi.main_state);
 		break;
 	}
 }
 
-
-READ8_DEVICE_HANDLER(upd765_data_r)
+bool upd765_family_device::read_one_bit(attotime limit)
 {
-	upd765_t *fdc = get_safe_token(device);
+	int bit = cur_live.pll.get_next_bit(cur_live.tm, cur_live.fi->dev, limit);
+	if(bit < 0)
+		return true;
+	cur_live.shift_reg = (cur_live.shift_reg << 1) | bit;
+	cur_live.bit_counter++;
+	if(cur_live.data_separator_phase) {
+		cur_live.data_reg = (cur_live.data_reg << 1) | bit;
+		if((cur_live.crc ^ (bit ? 0x8000 : 0x0000)) & 0x8000)
+			cur_live.crc = (cur_live.crc << 1) ^ 0x1021;
+		else
+			cur_live.crc = cur_live.crc << 1;
+	}
+	cur_live.data_separator_phase = !cur_live.data_separator_phase;
+	return false;
+}
 
-//  if ((fdc->FDC_main & 0x0c0) == 0x0c0)
-	if ((fdc->FDC_main & 0x080) == 0x080)
-	{
-		if (
-			(fdc->upd765_phase == UPD765_EXECUTION_PHASE_READ) ||
-			(fdc->upd765_phase == UPD765_EXECUTION_PHASE_WRITE))
-		{
+bool upd765_family_device::write_one_bit(attotime limit)
+{
+	bool bit = cur_live.shift_reg & 0x8000;
+	if(cur_live.pll.write_next_bit(bit, cur_live.tm, cur_live.fi->dev, limit))
+		return true;
+	if(cur_live.bit_counter & 1) {
+		if((cur_live.crc ^ (bit ? 0x8000 : 0x0000)) & 0x8000)
+			cur_live.crc = (cur_live.crc << 1) ^ 0x1021;
+		else
+			cur_live.crc = cur_live.crc << 1;
+	}
+	cur_live.shift_reg = cur_live.shift_reg << 1;
+	cur_live.bit_counter--;
+	return false;
+}
 
-			/* reading the data byte clears the interrupt */
-			upd765_set_int(device,CLEAR_LINE);
-		}
+void upd765_family_device::live_write_raw(UINT16 raw)
+{
+	//	logerror("write %04x %04x\n", raw, cur_live.crc);
+	cur_live.shift_reg = raw;
+	cur_live.data_bit_context = raw & 1;
+}
 
-		/* reset data request */
-		upd765_clear_data_request(device);
+void upd765_family_device::live_write_mfm(UINT8 mfm)
+{
+	bool context = cur_live.data_bit_context;
+	UINT16 raw = 0;
+	for(int i=0; i<8; i++) {
+		bool bit = mfm & (0x80 >> i);
+		if(!(bit || context))
+			raw |= 0x8000 >> (2*i);
+		if(bit)
+			raw |= 0x4000 >> (2*i);
+		context = bit;
+	}
+	cur_live.data_reg = mfm;
+	cur_live.shift_reg = raw;
+	cur_live.data_bit_context = context;
+	//	logerror("write %02x   %04x %04x\n", mfm, cur_live.crc, raw);
+}
 
-		/* update state */
-		upd765_update_state(device);
+bool upd765_family_device::sector_matches() const
+{
+	return
+		cur_live.idbuf[0] == command[2] &&
+		cur_live.idbuf[1] == command[3] &&
+		cur_live.idbuf[2] == command[4] &&
+		cur_live.idbuf[3] == command[5];
+}
+
+void upd765_family_device::pll_t::set_clock(attotime _period)
+{
+	period = _period;
+	period_adjust_base = period * 0.05;
+	min_period = period * 0.75;
+	max_period = period * 1.25;
+}
+
+void upd765_family_device::pll_t::reset(attotime when)
+{
+	ctime = when;
+	phase_adjust = attotime::zero;
+	freq_hist = 0;
+	write_position = 0;
+	write_start_time = attotime::never;
+}
+
+void upd765_family_device::pll_t::start_writing(attotime tm)
+{
+	write_start_time = tm;
+	write_position = 0;
+}
+
+void upd765_family_device::pll_t::stop_writing(floppy_image_device *floppy, attotime tm)
+{
+	commit(floppy, tm);
+	write_start_time = attotime::never;
+}
+
+void upd765_family_device::pll_t::commit(floppy_image_device *floppy, attotime tm)
+{
+	if(write_start_time.is_never() || tm == write_start_time)
+		return;
+
+	if(floppy)
+		floppy->write_flux(write_start_time, tm, write_position, write_buffer);
+	write_start_time = tm;
+	write_position = 0;
+}
+
+int upd765_family_device::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit)
+{
+	attotime edge = floppy ? floppy->get_next_transition(ctime) : attotime::never;
+
+	attotime next = ctime + period + phase_adjust;
+
+#if 0
+	if(!edge.is_never())
+		fprintf(stderr, "ctime=%s, transition_time=%s, next=%s, pha=%s\n", tts(ctime).cstr(), tts(edge).cstr(), tts(next).cstr(), tts(phase_adjust).cstr());
+#endif
+
+	if(next > limit)
+		return -1;
+
+	ctime = next;
+
+	if(edge.is_never() || edge >= next) {
+		// No transition in the window means 0 and pll in free run mode
+		phase_adjust = attotime::zero;
+		tm = next;
+		return 0;
 	}
 
-	if (LOG_EXTRA)
-		logerror("DATA R: %02x\n", fdc->upd765_data_reg);
-
-	return fdc->upd765_data_reg;
-}
-
-WRITE8_DEVICE_HANDLER(upd765_data_w)
-{
-	upd765_t *fdc = get_safe_token(device);
-
-	if (LOG_EXTRA)
-		logerror("DATA W: %02x\n", data);
-
-	/* write data to data reg */
-	fdc->upd765_data_reg = data;
-
-	if ((fdc->FDC_main & 0x0c0)==0x080)
-	{
-		if (
-			(fdc->upd765_phase == UPD765_EXECUTION_PHASE_READ) ||
-			(fdc->upd765_phase == UPD765_EXECUTION_PHASE_WRITE))
-		{
-
-			/* reading the data byte clears the interrupt */
-			upd765_set_int(device, CLEAR_LINE);
-		}
-
-		/* reset data request */
-		upd765_clear_data_request(device);
-
-		/* update state */
-		upd765_update_state(device);
-	}
-}
-
-static void upd765_setup_invalid(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-
-	fdc->command = 0;
-	fdc->upd765_result_bytes[0] = 0x080;
-	upd765_setup_result_phase(device,1);
-}
-
-static void upd765_setup_command(device_t *device)
-{
-	upd765_t *fdc = get_safe_token(device);
-
-	static const char *const commands[] =
-	{
-		NULL,						/* [00] */
-		NULL,						/* [01] */
-		"Read Track",				/* [02] */
-		"Specify",					/* [03] */
-		"Sense Drive Status",		/* [04] */
-		"Write Data",				/* [05] */
-		"Read Data",				/* [06] */
-		"Recalibrate",				/* [07] */
-		"Sense Interrupt Status",	/* [08] */
-		"Write Deleted Data",		/* [09] */
-		"Read ID",					/* [0A] */
-		NULL,						/* [0B] */
-		"Read Deleted Data",		/* [0C] */
-		"Format Track",				/* [0D] */
-		"Dump Registers",			/* [0E] */
-		"Seek",						/* [0F] */
-		"Version",					/* [10] */
-		NULL,						/* [11] */
-		"Perpendicular Mode",		/* [12] */
-		"Configure",				/* [13] */
-		"Lock"						/* [14] */
-	};
-
-	device_t *img;
-	const char *cmd = NULL;
-	chrn_id id;
-
-	/* if not in dma mode set execution phase bit */
-	if (!(fdc->upd765_flags & UPD765_DMA_MODE))
-	{
-        fdc->FDC_main |= 0x020;              /* execution phase */
-	}
-
-	if (LOG_COMMAND)
-	{
-		if ((fdc->upd765_command_bytes[0] & 0x1f) < ARRAY_LENGTH(commands))
-			cmd = commands[fdc->upd765_command_bytes[0] & 0x1f];
-		logerror("upd765_setup_command(): Setting up command 0x%02X (%s)\n",
-			fdc->upd765_command_bytes[0] & 0x1f, cmd ? cmd : "???");
-	}
-
-	switch (fdc->upd765_command_bytes[0] & 0x1f)
-	{
-		case 0x03:      /* specify */
-			/* setup step rate */
-			fdc->srt_in_ms = 16-((fdc->upd765_command_bytes[1]>>4) & 0x0f);
-
-			fdc->upd765_flags &= ~UPD765_DMA_MODE;
-
-			if ((fdc->upd765_command_bytes[2] & 0x01)==0)
-			{
-				fdc->upd765_flags |= UPD765_DMA_MODE;
-			}
-
-			upd765_idle(device);
-			break;
-
-		case 0x04:  /* sense drive status */
-			upd765_setup_drive_and_side(device);
-			img = current_image(device);
-
-			fdc->upd765_status[3] = fdc->drive | (fdc->side<<2);
-
-			if (img)
-			{
-				fdc->upd765_status[3] |= !floppy_tk00_r(img) << 4;
-				fdc->upd765_status[3] |= !floppy_wpt_r(img) << 6;
-
-				if (upd765_get_rdy(device))
-				{
-					fdc->upd765_status[3] |= 0x20;
-				}
-			}
-
-			fdc->upd765_status[3] |= 0x08;
-
-			/* two side and fault not set but should be? */
-			fdc->upd765_result_bytes[0] = fdc->upd765_status[3];
-			upd765_setup_result_phase(device,1);
-			break;
-
-		case 0x07:          /* recalibrate */
-			upd765_seek_setup(device, 1);
-			break;
-
-		case 0x0f:          /* seek */
-			upd765_seek_setup(device, 0);
-			break;
-
-		case 0x0a:      /* read id */
-			upd765_setup_drive_and_side(device);
-			img = current_image(device);
-
-			fdc->upd765_status[0] = fdc->drive | (fdc->side<<2);
-			fdc->upd765_status[1] = 0;
-			fdc->upd765_status[2] = 0;
-
-			/* drive ready? */
-			if (upd765_get_rdy(device))
-			{
-				/* is disk inserted? */
-				device_image_interface *image = dynamic_cast<device_image_interface *>( img);
-				if (image!=NULL && image->exists())
-				{
-					int index_count = 0;
-
-					/* floppy drive is ready and disc is inserted */
-
-					/* this is the id that appears when a disc is not formatted */
-					/* to be checked on Amstrad */
-					id.C = 0;
-					id.H = 0;
-					id.R = 0x01;
-					id.N = 0x02;
-
-					/* repeat for two index counts before quitting */
-					do
-					{
-						/* get next id from disc */
-						if (floppy_drive_get_next_id(img, fdc->side, &id))
-						{
-							/* got an id */
-							/* if bad media keep going until failure */
-							if (!(fdc->upd765_flags & UPD765_BAD_MEDIA)) break;
-						}
-
-						if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_INDEX))
-						{
-							/* update index count */
-							index_count++;
-						}
-					}
-					while (index_count!=2);
-
-					if (fdc->upd765_flags & UPD765_BAD_MEDIA)
-					{
-							fdc->upd765_status[0] |= 0x40;
-							fdc->upd765_status[1] |= 1;
-					}
-
-					/* at this point, we have seen a id or two index pulses have occurred! */
-					fdc->upd765_result_bytes[0] = fdc->upd765_status[0];
-					fdc->upd765_result_bytes[1] = fdc->upd765_status[1];
-					fdc->upd765_result_bytes[2] = fdc->upd765_status[2];
-					fdc->upd765_result_bytes[3] = id.C; /* C */
-					fdc->upd765_result_bytes[4] = id.H; /* H */
-					fdc->upd765_result_bytes[5] = id.R; /* R */
-					fdc->upd765_result_bytes[6] = id.N; /* N */
-
-					upd765_setup_result_phase(device,7);
-				}
-				else
-				{
-					/* floppy drive is ready, but no disc is inserted */
-					/* this occurs on the PC */
-					/* in this case, the command never quits! */
-					/* there are no index pulses to stop the command! */
-				}
-			}
-			else
-			{
-				/* what are id values when drive not ready? */
-
-				/* not ready, abnormal termination */
-				fdc->upd765_status[0] |= (1<<3) | (1<<6);
-				fdc->upd765_result_bytes[0] = fdc->upd765_status[0];
-				fdc->upd765_result_bytes[1] = fdc->upd765_status[1];
-				fdc->upd765_result_bytes[2] = fdc->upd765_status[2];
-				fdc->upd765_result_bytes[3] = 0; /* C */
-				fdc->upd765_result_bytes[4] = 0; /* H */
-				fdc->upd765_result_bytes[5] = 0; /* R */
-				fdc->upd765_result_bytes[6] = 0; /* N */
-			}
-			break;
-
-
-		case 0x08: /* sense interrupt status */
-			/* interrupt pending? */
-			if (fdc->upd765_flags & UPD765_INT)
-			{
-				/* clear ready changed bit */
-				fdc->ready_changed &= ~(1 << fdc->drive);
-
-				if (!fdc->pool) {
-					fdc->ready_changed = 0;
-				}
-
-				/* clear drive seek bits */
-				fdc->FDC_main &= ~(1 | 2 | 4 | 8);
-
-				/* return status */
-				fdc->upd765_result_bytes[0] = fdc->upd765_status[0];
-				/* return pcn */
-				fdc->upd765_result_bytes[1] = fdc->pcn[fdc->drive];
-
-				/* return result */
-				upd765_setup_result_phase(device,2);
-
-				if (fdc->ready_changed)
-				{
-					fdc->drive++;
-					fdc->upd765_status[0] = 0xc0 | fdc->drive;
-				}
-				else
-				{
-					/* Clear int */
-					upd765_set_int(device, CLEAR_LINE);
-				}
-			}
-			else
-			{
-				if(fdc->version == TYPE_UPD72065 && (fdc->FDC_main & 0x0f) == 0x00)
-				{  // based on XM6
-					upd765_setup_invalid(device);
-				}
-				else
-				{
-					/* no int */
-					fdc->upd765_result_bytes[0] = 0x80;
-					/* return pcn */
-					fdc->upd765_result_bytes[1] = fdc->pcn[fdc->drive];
-
-					/* return result */
-					upd765_setup_result_phase(device,2);
-				}
-			}
-			break;
-
-		case 0x06:  /* read data */
-			upd765_setup_drive_and_side(device);
-
-			fdc->upd765_status[0] = fdc->drive | (fdc->side<<2);
-			fdc->upd765_status[1] = 0;
-			fdc->upd765_status[2] = 0;
-
-			upd765_read_data(device);
-			break;
-
-		case 0x0c:
-			/* read deleted data */
-			upd765_setup_drive_and_side(device);
-
-			fdc->upd765_status[0] = fdc->drive | (fdc->side<<2);
-			fdc->upd765_status[1] = 0;
-			fdc->upd765_status[2] = 0;
-
-			/* .. for now */
-			upd765_read_data(device);
-			break;
-
-		case 0x09:
-			/* write deleted data */
-			upd765_setup_drive_and_side(device);
-
-			fdc->upd765_status[0] = fdc->drive | (fdc->side<<2);
-			fdc->upd765_status[1] = 0;
-			fdc->upd765_status[2] = 0;
-
-			/* ... for now */
-			upd765_write_data(device);
-			break;
-
-		case 0x02:
-			/* read a track */
-			upd765_setup_drive_and_side(device);
-			img = current_image(device);
-			fdc->upd765_status[0] = fdc->drive | (fdc->side<<2);
-			fdc->upd765_status[1] = 0;
-			fdc->upd765_status[2] = 0;
-
-			fdc->upd765_status[0] |= UPD765_ST1_NO_DATA;
-
-			/* wait for index */
-			do
-			{
-				/* get next id from disc */
-				floppy_drive_get_next_id(img, fdc->side,&id);
-			}
-			while ((floppy_drive_get_flag_state(img, FLOPPY_DRIVE_INDEX))==0);
-
-			fdc->sector_counter = 0;
-
-			upd765_read_a_track(device);
-			break;
-
-		case 0x05:  /* write data */
-			upd765_setup_drive_and_side(device);
-
-			fdc->upd765_status[0] = fdc->drive | (fdc->side<<2);
-			fdc->upd765_status[1] = 0;
-			fdc->upd765_status[2] = 0;
-
-			upd765_write_data(device);
-			break;
-
-		case 0x0d:	/* format a track */
-			upd765_setup_drive_and_side(device);
-
-			fdc->upd765_status[0] = fdc->drive | (fdc->side<<2);
-			fdc->upd765_status[1] = 0;
-			fdc->upd765_status[2] = 0;
-
-			fdc->sector_counter = 0;
-
-			upd765_format_track(device);
-			break;
-
-		default:	/* invalid */
-			switch (fdc->version)
-			{
-				case TYPE_UPD765A:
-					upd765_setup_invalid(device);
-					break;
-
-				case TYPE_UPD765B:
-					/* from upd765b data sheet */
-					if ((fdc->upd765_command_bytes[0] & 0x01f)==0x010)
-					{
-						/* version */
-						fdc->upd765_status[0] = 0x090;
-						fdc->upd765_result_bytes[0] = fdc->upd765_status[0];
-						upd765_setup_result_phase(device,1);
-					}
-					break;
-
-				case TYPE_UPD72065:
-					switch(fdc->upd765_command_bytes[0] & 0x3f)
-					{
-						case 0x36:  // Software Reset
-							upd765_reset(device,0);
-							upd765_idle(device);
-							if(LOG_COMMAND)
-								logerror("upd72065: command - Software Reset\n");
-							break;
-						default:
-							upd765_setup_invalid(device);
-							break;
-					}
-					break;
-
-				case TYPE_SMC37C78:
-					/* TO BE COMPLETED!!! !*/
-					switch (fdc->upd765_command_bytes[0] & 0x1f)
-					{
-						case 0x10:		/* version */
-							fdc->upd765_status[0] = 0x90;
-							fdc->upd765_result_bytes[0] = fdc->upd765_status[0];
-							upd765_setup_result_phase(device,1);
-							break;
-
-						case 0x13:		/* configure */
-							fdc->pool = fdc->upd765_command_bytes[1] & 0x10;
-							upd765_idle(device);
-							break;
-
-						case 0x0e:		/* dump reg */
-							fdc->upd765_result_bytes[0] = fdc->pcn[0];
-							fdc->upd765_result_bytes[1] = fdc->pcn[1];
-							fdc->upd765_result_bytes[2] = fdc->pcn[2];
-							fdc->upd765_result_bytes[3] = fdc->pcn[3];
-
-							upd765_setup_result_phase(device,10);
-							break;
-
-						case 0x12:		/* perpendicular mode */
-							upd765_idle(device);
-							break;
-
-						case 0x14:		/* lock */
-							upd765_setup_result_phase(device,1);
-							break;
-					}
-					break;
-			}
-	}
-}
-
-
-/* dma acknowledge write */
-WRITE8_DEVICE_HANDLER(upd765_dack_w)
-{
-	/* clear request */
-	upd765_set_dma_drq(device, CLEAR_LINE);
-
-	/* write data */
-	upd765_data_w(device, space, offset, data);
-}
-
-READ8_DEVICE_HANDLER(upd765_dack_r)
-{
-	/* clear data request */
-	upd765_set_dma_drq(device,CLEAR_LINE);
-
-	/* read data */
-	return upd765_data_r(device, space, offset);
-}
-
-static TIMER_CALLBACK( interrupt_callback )
-{
-	device_t* device = (device_t*)ptr;
-	upd765_set_int(device, 1);
-}
-
-void upd765_set_bad(device_t *device, int state)
-{
-	upd765_t *fdc = get_safe_token(device);
-	if (state) fdc->upd765_flags |= UPD765_BAD_MEDIA;
-	else fdc->upd765_flags &= ~UPD765_BAD_MEDIA;
-}
-
-void upd765_reset(device_t *device, int offset)
-{
-	upd765_t *fdc = get_safe_token(device);
-
-	/* upd765 in idle state - ready to accept commands */
-	upd765_idle(device);
-
-	/* set int low */
-	upd765_set_int(device, 0);
-	/* set dma drq output */
-	upd765_set_dma_drq(device,0);
-
-	/* tandy 100hx assumes that after NEC is reset, it is in DMA mode */
-	fdc->upd765_flags |= UPD765_DMA_MODE;
-
-	/* if ready input is set during reset generate an int */
-	if (upd765_get_rdy(device))
-	{
-		int i;
-		int a_drive_is_ready;
-
-		fdc->upd765_status[0] = 0x080 | 0x040;
-
-		// HACK signal ready changed for all drives
-		fdc->ready_changed = 0x0f;
-		fdc->drive = 0;
-
-		/* for the purpose of pc-xt. If any of the drives have a disk inserted,
-        do not set not-ready - need to check with pc_fdc.c whether all drives
-        are checked or only the drive selected with the drive select bits?? */
-
-		a_drive_is_ready = 0;
-		for (i = 0; i < 4; i++)
-		{
-			if (fdc->intf->floppy_drive_tags[i]!=NULL)
-			{
-				device_t *img;
-
-				if (device->owner() != NULL)
-					img = device->owner()->subdevice(fdc->intf->floppy_drive_tags[i]);
-				else
-					img = device->machine().device(fdc->intf->floppy_drive_tags[i]);
-
-				device_image_interface *image = dynamic_cast<device_image_interface *>( img);
-				if (image->exists())
-				{
-					a_drive_is_ready = 1;
-					break;
-				}
-			}
-
-		}
-
-		if (!a_drive_is_ready && fdc->intf->rdy_pin == UPD765_RDY_PIN_CONNECTED )
-		{
-			fdc->upd765_status[0] |= 0x08;
-		}
-
-		device->machine().scheduler().timer_set(attotime::from_usec(5), FUNC(interrupt_callback),0,device);
-	}
-}
-
-WRITE_LINE_DEVICE_HANDLER( upd765_reset_w )
-{
-	upd765_t *fdc = get_safe_token(device);
-
-	int flags;
-
-	/* get previous reset state */
-	flags = fdc->upd765_flags;
-
-	/* set new reset state */
-	/* clear reset */
-	fdc->upd765_flags &= ~UPD765_RESET;
-
-	/* reset */
-	if (state)
-	{
-		fdc->upd765_flags |= UPD765_RESET;
-
-		upd765_set_int(device, 0);
-	}
-
-	/* reset changed state? */
-	if (((flags^fdc->upd765_flags) & UPD765_RESET)!=0)
-	{
-		/* yes */
-
-		/* no longer reset */
-		if ((fdc->upd765_flags & UPD765_RESET)==0)
-		{
-			/* reset nec */
-			upd765_reset(device, 0);
-		}
-	}
-}
-
-
-WRITE_LINE_DEVICE_HANDLER( upd765_ready_w )
-{
-	upd765_t *fdc = get_safe_token(device);
-
-	/* clear ready state */
-	fdc->upd765_flags &= ~UPD765_FDD_READY;
-
-	if (state)
-	{
-		fdc->upd765_flags |= UPD765_FDD_READY;
-	}
-}
-
-
-/* Device Interface */
-
-static void common_start(device_t *device, int device_type)
-{
-	upd765_t *fdc = get_safe_token(device);
-	// validate arguments
-
-	assert(device != NULL);
-	assert(device->tag() != NULL);
-	assert(device->static_config() != NULL);
-
-	fdc->intf = (const upd765_interface*)device->static_config();
-
-	fdc->version = (UPD765_VERSION)device_type;
-	fdc->timer = device->machine().scheduler().timer_alloc(FUNC(upd765_timer_callback), (void*)device);
-	fdc->seek_timer = device->machine().scheduler().timer_alloc(FUNC(upd765_seek_timer_callback), (void*)device);
-	fdc->command_timer = device->machine().scheduler().timer_alloc(FUNC(upd765_continue_command), (void*)device);
-
-	fdc->upd765_flags &= UPD765_FDD_READY;
-	fdc->data_buffer = auto_alloc_array(device->machine(), char, 32*1024);
-
-	fdc->out_int_func.resolve(fdc->intf->out_int_func, *device);
-	fdc->out_drq_func.resolve(fdc->intf->out_drq_func, *device);
-
-	// plain upd765 is doing pooling
-	fdc->pool = true;
-	// register for state saving
-	//state_save_register_item(device->machine(), "upd765", device->tag(), 0, upd765->number);
-}
-
-static DEVICE_START( upd765a )
-{
-	common_start(device, TYPE_UPD765A);
-}
-
-static DEVICE_START( upd765b )
-{
-	common_start(device, TYPE_UPD765B);
-}
-
-static DEVICE_START( smc37c78 )
-{
-	common_start(device, TYPE_SMC37C78);
-	// specified in documentation that by default is off
-	upd765_t *fdc = get_safe_token(device);
-	fdc->pool = false;
-}
-
-static DEVICE_START( upd72065 )
-{
-	common_start(device, TYPE_UPD72065);
-}
-
-static DEVICE_RESET( upd765 )
-{
-	int i;
-	upd765_t *fdc = get_safe_token(device);
-	for (i = 0; i < 4; i++) {
-		if (fdc->intf->floppy_drive_tags[i]!=NULL)
-		{
-			device_t *img;
-
-			if (device->owner() != NULL)
-				img = device->owner()->subdevice(fdc->intf->floppy_drive_tags[i]);
-			else
-				img = device->machine().device(fdc->intf->floppy_drive_tags[i]);
-
-			floppy_drive_set_controller(img, device);
-			floppy_drive_set_ready_state_change_callback(img, upd765_set_ready_change_callback);
+	// Transition in the window means 1, and the pll is adjusted
+
+	attotime delta = edge - (next - period/2);
+
+	if(delta.seconds < 0)
+		phase_adjust = attotime::zero - ((attotime::zero - delta)*65)/100;
+	else
+		phase_adjust = (delta*65)/100;
+
+	if(delta < attotime::zero) {
+		if(freq_hist < 0)
+			freq_hist--;
+		else
+			freq_hist = -1;
+	} else if(delta > attotime::zero) {
+		if(freq_hist > 0)
+			freq_hist++;
+		else
+			freq_hist = 1;
+	} else
+		freq_hist = 0;
+
+	if(freq_hist) {
+		int afh = freq_hist < 0 ? -freq_hist : freq_hist;
+		if(afh > 1) {
+			attotime aper = attotime::from_double(period_adjust_base.as_double()*delta.as_double()/period.as_double());
+			period += aper;
+
+			if(period < min_period)
+				period = min_period;
+			else if(period > max_period)
+				period = max_period;
 		}
 	}
 
-	upd765_reset(device,0);
+	return 1;
 }
 
-const device_type UPD765A = &device_creator<upd765a_device>;
-
-upd765a_device::upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, UPD765A, "UPD765A", tag, owner, clock)
+bool upd765_family_device::pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit)
 {
-	m_token = global_alloc_clear(upd765_t);
+	if(write_start_time.is_never()) {
+		write_start_time = ctime;
+		write_position = 0;
+	}
+
+	attotime etime = ctime + period;
+	if(etime > limit)
+		return true;
+
+	if(bit && write_position < ARRAY_LENGTH(write_buffer))
+		write_buffer[write_position++] = ctime + period/2;
+
+	tm = etime;
+	ctime = etime;
+	return false;
 }
-upd765a_device::upd765a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock)
+
+upd765a_device::upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, UPD765A, "UPD765A", tag, owner, clock)
 {
-	m_token = global_alloc_clear(upd765_t);
+	m_shortname = "upd765a";
+	dor_reset = 0x0c;
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void upd765a_device::device_config_complete()
+upd765b_device::upd765b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, UPD765B, "UPD765B", tag, owner, clock)
 {
+	m_shortname = "upd765b";
+	dor_reset = 0x0c;
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void upd765a_device::device_start()
+i8272a_device::i8272a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, I8272A, "I8272A", tag, owner, clock)
 {
-	DEVICE_START_NAME( upd765a )(this);
+	m_shortname = "i8272a";
+	dor_reset = 0x0c;
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void upd765a_device::device_reset()
+upd72065_device::upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, UPD72065, "UPD72065", tag, owner, clock)
 {
-	DEVICE_RESET_NAME( upd765 )(this);
+	m_shortname = "upd72065";
+	dor_reset = 0x0c;
 }
 
-
-const device_type UPD765B = &device_creator<upd765b_device>;
-
-upd765b_device::upd765b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: upd765a_device(mconfig, UPD765B, "UPD765B", tag, owner, clock)
+smc37c78_device::smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, SMC37C78, "SMC37C78", tag, owner, clock)
 {
+	m_shortname = "smc37c78";
+	ready_connected = false;
+	select_connected = true;
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void upd765b_device::device_start()
+n82077aa_device::n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, N82077AA, "N82077AA", tag, owner, clock)
 {
-	DEVICE_START_NAME( upd765b )(this);
+	m_shortname = "n82077aa";
+	ready_connected = false;
+	select_connected = true;
 }
 
-
-const device_type SMC37C78 = &device_creator<smc37c78_device>;
-
-smc37c78_device::smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: upd765a_device(mconfig, SMC37C78, "SMC37C78", tag, owner, clock)
+pc_fdc_superio_device::pc_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "PC FDC SUPERIO", tag, owner, clock)
 {
+	m_shortname = "pc_fdc_superio";
+	ready_polled = false;
+	ready_connected = false;
+	select_connected = true;
 }
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void smc37c78_device::device_start()
-{
-	DEVICE_START_NAME( smc37c78 )(this);
-}
-
-
-const device_type UPD72065 = &device_creator<upd72065_device>;
-
-upd72065_device::upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: upd765a_device(mconfig, UPD72065, "UPD72065", tag, owner, clock)
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void upd72065_device::device_start()
-{
-	DEVICE_START_NAME( upd72065 )(this);
-}
-
-

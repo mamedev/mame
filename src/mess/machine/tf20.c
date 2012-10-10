@@ -16,7 +16,7 @@
 #include "machine/upd7201.h"
 #include "machine/upd765.h"
 #include "imagedev/flopdrv.h"
-
+#include "formats/mfi_dsk.h"
 
 /***************************************************************************
     CONSTANTS
@@ -32,11 +32,16 @@
 
 struct tf20_state
 {
+	device_t *cpu;
 	ram_device *ram;
-	device_t *upd765a;
+	upd765a_device *upd765a;
 	upd7201_device *upd7201;
-	device_t *floppy_0;
-	device_t *floppy_1;
+	floppy_image_device *floppy_0;
+	floppy_image_device *floppy_1;
+
+	void fdc_int(bool state) {
+		cpu->execute().set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+	}
 };
 
 
@@ -89,15 +94,16 @@ static READ8_HANDLER( tf20_dip_r )
 
 static TIMER_CALLBACK( tf20_upd765_tc_reset )
 {
-	upd765_tc_w((device_t *)ptr, CLEAR_LINE);
+	static_cast<upd765a_device *>(ptr)->tc_w(false);
 }
 
 static READ8_DEVICE_HANDLER( tf20_upd765_tc_r )
 {
-	logerror("%s: tf20_upd765_tc_r\n", space.machine().describe_context());
+	tf20_state *tf20 = get_safe_token(device->owner());
+	logerror("%s: tf20_upd765_tc_r\n", device->machine().describe_context());
 
 	/* toggle tc on read */
-	upd765_tc_w(device, ASSERT_LINE);
+	tf20->upd765a->tc_w(true);
 	space.machine().scheduler().timer_set(attotime::zero, FUNC(tf20_upd765_tc_reset), 0, device);
 
 	return 0xff;
@@ -109,8 +115,8 @@ static WRITE8_HANDLER( tf20_fdc_control_w )
 	logerror("%s: tf20_fdc_control_w %02x\n", space.machine().describe_context(), data);
 
 	/* bit 0, motor on signal */
-	floppy_mon_w(tf20->floppy_0, !BIT(data, 0));
-	floppy_mon_w(tf20->floppy_1, !BIT(data, 0));
+	tf20->floppy_0->mon_w(!BIT(data, 0));
+	tf20->floppy_1->mon_w(!BIT(data, 0));
 }
 
 static IRQ_CALLBACK( tf20_irq_ack )
@@ -210,8 +216,7 @@ static ADDRESS_MAP_START( tf20_io, AS_IO, 8, tf20_device )
 	AM_RANGE(0xf6, 0xf6) AM_READ_LEGACY(tf20_rom_disable)
 	AM_RANGE(0xf7, 0xf7) AM_READ_LEGACY(tf20_dip_r)
 	AM_RANGE(0xf8, 0xf8) AM_DEVREAD_LEGACY("5a", tf20_upd765_tc_r) AM_WRITE_LEGACY(tf20_fdc_control_w)
-	AM_RANGE(0xfa, 0xfa) AM_DEVREAD_LEGACY("5a", upd765_status_r)
-	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE_LEGACY("5a", upd765_data_r, upd765_data_w)
+	AM_RANGE(0xfa, 0xfb) AM_DEVICE("5a", upd765a_device, map)
 ADDRESS_MAP_END
 
 
@@ -266,27 +271,14 @@ static UPD7201_INTERFACE( tf20_upd7201_intf )
 	}
 };
 
-static const upd765_interface tf20_upd765a_intf =
-{
-	DEVCB_CPU_INPUT_LINE("tf20", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	NULL,
-	UPD765_RDY_PIN_NOT_CONNECTED,
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
-
-static const floppy_interface tf20_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD_40,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
+static const floppy_format_type tf20_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( tf20_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( tf20 )
 	MCFG_CPU_ADD("tf20", Z80, XTAL_CR1 / 2) /* uPD780C */
@@ -298,14 +290,15 @@ static MACHINE_CONFIG_FRAGMENT( tf20 )
 	MCFG_RAM_DEFAULT_SIZE("64k")
 
 	/* upd765a floppy controller */
-	MCFG_UPD765A_ADD("5a", tf20_upd765a_intf)
+	MCFG_UPD765A_ADD("5a", false, true)
 
 	/* upd7201 serial interface */
 	MCFG_UPD7201_ADD("3a", XTAL_CR1 / 2, tf20_upd7201_intf)
 	MCFG_TIMER_ADD_PERIODIC("serial_timer", serial_clock, attotime::from_hz(XTAL_CR2 / 128))
 
 	/* 2 floppy drives */
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(tf20_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("5a:0", tf20_floppies, "525dd", 0, tf20_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("5a:1", tf20_floppies, "525dd", 0, tf20_floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -326,10 +319,10 @@ ROM_END
 static DEVICE_START( tf20 )
 {
 	tf20_state *tf20 = get_safe_token(device);
-	device_t *cpu = device->subdevice("tf20");
-	address_space &prg = cpu->memory().space(AS_PROGRAM);
+	tf20->cpu = device->subdevice("tf20");
+	address_space &prg = tf20->cpu->memory().space(AS_PROGRAM);
 
-	cpu->execute().set_irq_acknowledge_callback(tf20_irq_ack);
+	tf20->cpu->execute().set_irq_acknowledge_callback(tf20_irq_ack);
 
 	/* ram device */
 	tf20->ram = device->subdevice<ram_device>("ram");
@@ -339,10 +332,13 @@ static DEVICE_START( tf20 )
 		throw device_missing_dependencies();
 
 	/* locate child devices */
-	tf20->upd765a = device->subdevice("5a");
+	tf20->upd765a = device->subdevice<upd765a_device>("5a");
 	tf20->upd7201 = downcast<upd7201_device *>(device->subdevice("3a"));
-	tf20->floppy_0 = device->subdevice(FLOPPY_0);
-	tf20->floppy_1 = device->subdevice(FLOPPY_1);
+	tf20->floppy_0 = device->subdevice<floppy_connector>("5a:0")->get_device();
+	tf20->floppy_1 = device->subdevice<floppy_connector>("5a:1")->get_device();
+
+	/* hookup the irq */
+	tf20->upd765a->setup_intrq_cb(upd765a_device::line_cb(FUNC(tf20_state::fdc_int), tf20));
 
 	/* enable second half of ram */
 	prg.install_ram(0x8000, 0xffff, tf20->ram->pointer() + 0x8000);

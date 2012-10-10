@@ -55,7 +55,7 @@
     RAM : between 1MB and 4MB stock, expandable to 12MB
 
     FDD : 2x 5.25", Compact models use 2x 3.5" drives.
-    FDC : NEC uPD72065  (hopefully backwards compatible enough for the existing uPD765A core :))
+    FDC : NEC uPD72065
 
     HDD : HD models have up to an 81MB HDD.
     HDC : Fujitsu MB89352A (SCSI)
@@ -76,9 +76,6 @@
 
 
     *** Current status (28/12/08)
-    FDC/FDD : Uses the uPD765A code with a small patch to handle Sense Interrupt Status being invalid if not in seek mode
-              Extra uPD72065 commands not yet implemented, although I have yet to see them used.
-
     MFP : Largely works, as far as the X68000 goes.
 
     PPI : Joystick controls work okay.
@@ -129,7 +126,8 @@
 #include "machine/rp5c15.h"
 #include "machine/mb89352.h"
 #include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "formats/mfi_dsk.h"
+#include "formats/xdf_dsk.h"
 #include "formats/dim_dsk.h"
 #include "machine/x68k_hdc.h"
 #include "includes/x68k.h"
@@ -944,15 +942,10 @@ WRITE8_MEMBER(x68k_state::ppi_port_c_w)
 // NEC uPD72065 at 0xe94000
 WRITE16_MEMBER(x68k_state::x68k_fdc_w)
 {
-	device_t *fdc = machine().device("upd72065");
 	unsigned int drive, x;
 	switch(offset)
 	{
-	case 0x00:
-	case 0x01:
-		upd765_data_w(fdc, space, 0,data);
-		break;
-	case 0x02:  // drive option signal control
+	case 0x00:  // drive option signal control
 		x = data & 0x0f;
 		for(drive=0;drive<4;drive++)
 		{
@@ -965,8 +958,8 @@ WRITE16_MEMBER(x68k_state::x68k_fdc_w)
 					output_set_indexed_value("eject_drv",drive,(data & 0x40) ? 1 : 0);
 					if(data & 0x20)  // ejects disk
 					{
-						(dynamic_cast<device_image_interface *>(floppy_get_device(machine(), drive)))->unload();
-						floppy_mon_w(floppy_get_device(machine(), drive), ASSERT_LINE);
+						m_fdc.floppy[drive]->mon_w(false);
+						m_fdc.floppy[drive]->unload();
 					}
 				}
 			}
@@ -974,17 +967,18 @@ WRITE16_MEMBER(x68k_state::x68k_fdc_w)
 		m_fdc.selected_drive = data & 0x0f;
 		logerror("FDC: signal control set to %02x\n",data);
 		break;
-	case 0x03:
-		m_fdc.media_density[data & 0x03] = data & 0x10;
+	case 0x01: {
+		static const int rates[4] = { 500000, 300000, 250000, 125000 };
+		m_fdc.fdc->set_rate(rates[(data >> 4) & 3]);
 		m_fdc.motor[data & 0x03] = data & 0x80;
-		floppy_mon_w(floppy_get_device(machine(), data & 0x03), !BIT(data, 7));
+		m_fdc.floppy[data & 0x03]->mon_w(!BIT(data, 7));
 		if(data & 0x80)
 		{
 			for(drive=0;drive<4;drive++) // enable motor for this drive
 			{
 				if(drive == (data & 0x03))
 				{
-					floppy_mon_w(floppy_get_device(machine(), drive), CLEAR_LINE);
+					m_fdc.floppy[drive]->mon_w(false);
 					output_set_indexed_value("access_drv",drive,0);
 				}
 				else
@@ -995,28 +989,13 @@ WRITE16_MEMBER(x68k_state::x68k_fdc_w)
 		{
 			for(drive=0;drive<4;drive++)
 			{
-				floppy_mon_w(floppy_get_device(machine(), drive), ASSERT_LINE);
+				m_fdc.floppy[drive]->mon_w(true);
 				output_set_indexed_value("access_drv",drive,1);
 			}
 		}
-		floppy_drive_set_ready_state(floppy_get_device(machine(), 0),1,1);
-		floppy_drive_set_ready_state(floppy_get_device(machine(), 1),1,1);
-		floppy_drive_set_ready_state(floppy_get_device(machine(), 2),1,1);
-		floppy_drive_set_ready_state(floppy_get_device(machine(), 3),1,1);
-#if 0
-		for(drive=0;drive<4;drive++)
-		{
-			if(floppy_drive_get_flag_state(floppy_get_device(machine, drive),FLOPPY_DRIVE_MOTOR_ON))
-				output_set_indexed_value("access_drv",drive,0);
-			else
-				output_set_indexed_value("access_drv",drive,1);
-		}
-#endif
 		logerror("FDC: Drive #%i: Drive selection set to %02x\n",data & 0x03,data);
 		break;
-	default:
-//      logerror("FDC: [%08x] Wrote %04x to invalid FDC port %04x\n",space.device().safe_pc(),data,offset);
-		break;
+	}
 	}
 }
 
@@ -1024,22 +1003,17 @@ READ16_MEMBER(x68k_state::x68k_fdc_r)
 {
 	unsigned int ret;
 	int x;
-	device_t *fdc = machine().device("upd72065");
 
 	switch(offset)
 	{
 	case 0x00:
-		return upd765_status_r(fdc, space, 0);
-	case 0x01:
-		return upd765_data_r(fdc, space, 0);
-	case 0x02:
 		ret = 0x00;
 		for(x=0;x<4;x++)
 		{
 			if(m_fdc.selected_drive & (1 << x))
 			{
 				ret = 0x00;
-				if(m_fdc.disk_inserted[x] != 0)
+				if(m_fdc.floppy[x]->exists())
 				{
 					ret |= 0x80;
 				}
@@ -1049,18 +1023,16 @@ READ16_MEMBER(x68k_state::x68k_fdc_r)
 			}
 		}
 		return ret;
-	case 0x03:
+	case 0x01:
 		logerror("FDC: IOC selection is write-only\n");
 		return 0xff;
-	default:
-		logerror("FDC: Read from invalid FDC port %04x\n",offset);
-		return 0xff;
 	}
+	return 0xff;
 }
 
-WRITE_LINE_MEMBER(x68k_state::fdc_irq)
+void x68k_state::fdc_irq(bool state)
 {
-	if((m_ioc.irqstatus & 0x04) && state == ASSERT_LINE)
+	if((m_ioc.irqstatus & 0x04) && state)
 	{
 		m_current_vector[1] = m_ioc.fdcvector;
 		m_ioc.irqstatus |= 0x80;
@@ -1073,22 +1045,16 @@ WRITE_LINE_MEMBER(x68k_state::fdc_irq)
 static int x68k_fdc_read_byte(running_machine &machine,int addr)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-	int data = -1;
-	device_t *fdc = machine.device("upd72065");
-
-	if(state->m_fdc.drq_state != 0)
-		data = upd765_dack_r(fdc, state->generic_space(), 0);
-//  logerror("FDC: DACK reading\n");
-	return data;
+	return state->m_fdc.fdc->dma_r();
 }
 
 static void x68k_fdc_write_byte(running_machine &machine,int addr, int data)
 {
-	device_t *fdc = machine.device("upd72065");
-	upd765_dack_w(fdc, machine.driver_data()->generic_space(), 0, data);
+	x68k_state *state = machine.driver_data<x68k_state>();
+	return state->m_fdc.fdc->dma_w(data);
 }
 
-WRITE_LINE_MEMBER(x68k_state::fdc_drq)
+void x68k_state::fdc_drq(bool state)
 {
 	m_fdc.drq_state = state;
 }
@@ -1114,13 +1080,12 @@ READ16_MEMBER(x68k_state::x68k_fm_r)
 
 WRITE8_MEMBER(x68k_state::x68k_ct_w)
 {
-	device_t *fdc = machine().device("upd72065");
-	device_t *okim = machine().device("okim6258");
+	device_t *okim = space.machine().device("okim6258");
 
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
 	// CT2 - 1 = Set ready state of FDC
-	upd765_ready_w(fdc,data & 0x01);
+	m_fdc.fdc->ready_w(data & 0x01);
 	m_adpcm.clock = data & 0x02;
 	x68k_set_adpcm();
 	okim6258_set_clock(okim, data & 0x02 ? 4000000 : 8000000);
@@ -1923,7 +1888,8 @@ static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE(x68k_fm_r, x68k_fm_w)
 	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8_LEGACY("okim6258", okim6258_status_r, okim6258_ctrl_w, 0x00ff)
 	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8_LEGACY("okim6258", okim6258_status_r, okim6258_data_w, 0x00ff)
-	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
+	AM_RANGE(0xe94000, 0xe94003) AM_DEVICE8("upd72065", upd72065_device, map, 0x00ff)
+	AM_RANGE(0xe94004, 0xe94007) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
 	AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE("x68k_hdc", x68k_hdc_image_device, hdc_r, hdc_w)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
 	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE(x68k_ppi_r, x68k_ppi_w)
@@ -1960,7 +1926,8 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE(x68k_fm_r, x68k_fm_w)
 	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8_LEGACY("okim6258", okim6258_status_r, okim6258_ctrl_w, 0x00ff)
 	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8_LEGACY("okim6258", okim6258_status_r, okim6258_data_w, 0x00ff)
-	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
+	AM_RANGE(0xe94000, 0xe94003) AM_DEVICE8("upd72065", upd72065_device, map, 0x00ff)
+	AM_RANGE(0xe94004, 0xe94007) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
 //  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE_LEGACY("x68k_hdc",x68k_hdc_r, x68k_hdc_w)
 	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8("scsi:mb89352",mb89352_device,mb89352_r,mb89352_w,0x00ff)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
@@ -1998,7 +1965,8 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE16(x68k_sysport_r, x68k_sysport_w,0xffffffff)
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE16(x68k_fm_r, x68k_fm_w,0xffffffff)
 	AM_RANGE(0xe92000, 0xe92003) AM_DEVREAD8_LEGACY("okim6258", okim6258_status_r, 0x00ff00ff) AM_WRITE8(x68030_adpcm_w, 0x00ff00ff)
-	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE16(x68k_fdc_r, x68k_fdc_w,0xffffffff)
+	AM_RANGE(0xe94000, 0xe94003) AM_DEVICE8("upd72065", upd72065_device, map, 0x00ff00ff)
+	AM_RANGE(0xe94004, 0xe94007) AM_READWRITE16(x68k_fdc_r, x68k_fdc_w,0xffffffff)
 //  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE16_LEGACY("x68k_hdc",x68k_hdc_r, x68k_hdc_w,0xffffffff)
 	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8("scsi:mb89352",mb89352_device,mb89352_r,mb89352_w,0x00ff00ff)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE16(x68k_scc_r, x68k_scc_w,0xffffffff)
@@ -2063,15 +2031,6 @@ static const hd63450_intf dmac_interface =
 	{ x68k_fdc_write_byte, 0, 0, 0 }
 //  { 0, 0, 0, 0 },
 //  { 0, 0, 0, 0 }
-};
-
-static const upd765_interface fdc_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(x68k_state,fdc_irq),
-	DEVCB_DRIVER_LINE_MEMBER(x68k_state,fdc_drq),
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 
 static const ym2151_interface x68k_ym2151_interface =
@@ -2400,31 +2359,27 @@ static INPUT_PORTS_START( x68000 )
 
 INPUT_PORTS_END
 
-static void x68k_load_proc(device_image_interface &image)
+void x68k_state::floppy_load_unload()
 {
-	x68k_state *state = image.device().machine().driver_data<x68k_state>();
-	if(state->m_ioc.irqstatus & 0x02)
+	if(m_ioc.irqstatus & 0x02)
 	{
-		state->m_current_vector[1] = 0x61;
-		state->m_ioc.irqstatus |= 0x40;
-		state->m_current_irq_line = 1;
-		image.device().machine().device("maincpu")->execute().set_input_line_and_vector(1,ASSERT_LINE,state->m_current_vector[1]);  // Disk insert/eject interrupt
+		m_current_vector[1] = 0x61;
+		m_ioc.irqstatus |= 0x40;
+		m_current_irq_line = 1;
+		machine().device("maincpu")->execute().set_input_line_and_vector(1,ASSERT_LINE,m_current_vector[1]);  // Disk insert/eject interrupt
 		logerror("IOC: Disk image inserted\n");
 	}
-	state->m_fdc.disk_inserted[floppy_get_drive(&image.device())] = 1;
 }
 
-static void x68k_unload_proc(device_image_interface &image)
+int x68k_state::floppy_load(floppy_image_device *dev)
 {
-	x68k_state *state = image.device().machine().driver_data<x68k_state>();
-	if(state->m_ioc.irqstatus & 0x02)
-	{
-		state->m_current_vector[1] = 0x61;
-		state->m_ioc.irqstatus |= 0x40;
-		state->m_current_irq_line = 1;
-		image.device().machine().device("maincpu")->execute().set_input_line_and_vector(1,ASSERT_LINE,state->m_current_vector[1]);  // Disk insert/eject interrupt
-	}
-	state->m_fdc.disk_inserted[floppy_get_drive(&image.device())] = 0;
+	floppy_load_unload();
+	return IMAGE_INIT_PASS;
+}
+
+void x68k_state::floppy_unload(floppy_image_device *dev)
+{
+	floppy_load_unload();
 }
 
 TIMER_CALLBACK_MEMBER(x68k_state::x68k_net_irq)
@@ -2446,30 +2401,6 @@ WRITE_LINE_MEMBER(x68k_state::x68k_irq2_line)
 	logerror("EXP: IRQ2 set to %i\n",state);
 
 }
-
-static LEGACY_FLOPPY_OPTIONS_START( x68k )
-	LEGACY_FLOPPY_OPTION( img2d, "xdf,hdm,2hd", "XDF disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([77])
-		SECTORS([8])
-		SECTOR_LENGTH([1024])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION( dim, "dim",		"DIM floppy disk image",	dim_dsk_identify, dim_dsk_construct, NULL, NULL)
-LEGACY_FLOPPY_OPTIONS_END
-
-
-static const floppy_interface x68k_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(x68k),
-	"floppy_5_25",
-	NULL
-};
 
 static const mb89352_interface x68k_scsi_intf =
 {
@@ -2506,16 +2437,6 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 	// init keyboard
 	m_keyboard.delay = 500;  // 3*100+200
 	m_keyboard.repeat = 110;  // 4^2*5+30
-
-	// check for disks
-	for(drive=0;drive<4;drive++)
-	{
-		device_image_interface *image = dynamic_cast<device_image_interface *>(floppy_get_device(machine(), drive));
-		if(image->exists())
-			m_fdc.disk_inserted[drive] = 1;
-		else
-			m_fdc.disk_inserted[drive] = 0;
-	}
 
 	// initialise CRTC, set registers to defaults for the standard text mode (768x512)
 	m_crtc.reg[0] = 137;  // Horizontal total  (in characters)
@@ -2555,8 +2476,6 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 		output_set_indexed_value("eject_drv",drive,1);
 		output_set_indexed_value("ctrl_drv",drive,1);
 		output_set_indexed_value("access_drv",drive,1);
-		floppy_install_unload_proc(floppy_get_device(machine(), drive), x68k_unload_proc);
-		floppy_install_load_proc(floppy_get_device(machine(), drive), x68k_load_proc);
 	}
 
 	// reset CPU
@@ -2591,6 +2510,23 @@ MACHINE_START_MEMBER(x68k_state,x68000)
 
 	// start LED timer
 	m_led_timer->adjust(attotime::zero, 0, attotime::from_msec(400));
+
+	// check for disks
+	m_fdc.fdc = machine().device<upd72065_device>("upd72065");
+	m_fdc.fdc->setup_intrq_cb(upd72065_device::line_cb(FUNC(x68k_state::fdc_irq), this));
+	m_fdc.fdc->setup_drq_cb(upd72065_device::line_cb(FUNC(x68k_state::fdc_drq), this));
+
+	for(int drive=0;drive<4;drive++)
+	{
+		char devname[16];
+		sprintf(devname, "upd72065:%d", drive);
+		floppy_image_device *floppy = machine().device<floppy_connector>(devname)->get_device();
+		m_fdc.floppy[drive] = floppy;
+		if(floppy) {
+			floppy->setup_load_cb(floppy_image_device::load_cb(FUNC(x68k_state::floppy_load), this));
+			floppy->setup_unload_cb(floppy_image_device::unload_cb(FUNC(x68k_state::floppy_unload), this));
+		}
+	}
 }
 
 MACHINE_START_MEMBER(x68k_state,x68030)
@@ -2621,6 +2557,23 @@ MACHINE_START_MEMBER(x68k_state,x68030)
 
 	// start LED timer
 	m_led_timer->adjust(attotime::zero, 0, attotime::from_msec(400));
+
+	// check for disks
+	m_fdc.fdc = machine().device<upd72065_device>("upd72065");
+	m_fdc.fdc->setup_intrq_cb(upd72065_device::line_cb(FUNC(x68k_state::fdc_irq), this));
+	m_fdc.fdc->setup_drq_cb(upd72065_device::line_cb(FUNC(x68k_state::fdc_drq), this));
+
+	for(int drive=0;drive<4;drive++)
+	{
+		char devname[16];
+		sprintf(devname, "upd72065:%d", drive);
+		floppy_image_device *floppy = machine().device<floppy_connector>(devname)->get_device();
+		m_fdc.floppy[drive] = floppy;
+		if(floppy) {
+			floppy->setup_load_cb(floppy_image_device::load_cb(FUNC(x68k_state::floppy_load), this));
+			floppy->setup_unload_cb(floppy_image_device::unload_cb(FUNC(x68k_state::floppy_unload), this));
+		}
+	}
 }
 
 DRIVER_INIT_MEMBER(x68k_state,x68000)
@@ -2680,6 +2633,16 @@ DRIVER_INIT_MEMBER(x68k_state,x68030)
 	m_is_32bit = true;
 }
 
+static const floppy_format_type x68k_floppy_formats[] = {
+	FLOPPY_XDF_FORMAT,
+	FLOPPY_MFI_FORMAT,
+	NULL
+};
+
+static SLOT_INTERFACE_START( x68k_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
@@ -2728,8 +2691,12 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_UPD72065_ADD("upd72065", fdc_interface)
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(x68k_floppy_interface)
+	MCFG_UPD72065_ADD("upd72065", true, true)
+	MCFG_FLOPPY_DRIVE_ADD("upd72065:0", x68k_floppies, "525hd", 0, x68k_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd72065:1", x68k_floppies, "525hd", 0, x68k_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd72065:2", x68k_floppies, "525hd", 0, x68k_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd72065:3", x68k_floppies, "525hd", 0, x68k_floppy_formats)
+
 	MCFG_SOFTWARE_LIST_ADD("flop_list","x68k_flop")
 
 	MCFG_X68K_EXPANSION_SLOT_ADD("exp",x68k_exp_intf,x68000_exp_cards,NULL,NULL)

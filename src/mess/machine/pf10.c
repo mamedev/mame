@@ -57,21 +57,12 @@ ADDRESS_MAP_END
     MACHINE CONFIG
 *****************************************************************************/
 
-static const upd765_interface pf10_upd765a_intf =
-{
-	DEVCB_NULL, /* interrupt line */
-	DEVCB_NULL,
-	NULL,
-	UPD765_RDY_PIN_NOT_CONNECTED, /* ??? */
-	{NULL, NULL, NULL, NULL}
-};
-
 static MACHINE_CONFIG_FRAGMENT( pf10 )
 	MCFG_CPU_ADD("pf10", M6803, XTAL_2_4576MHz / 4 /* ??? */) /* HD63A03 */
 	MCFG_CPU_PROGRAM_MAP(pf10_mem)
 	MCFG_CPU_IO_MAP(pf10_io)
 
-	MCFG_UPD765A_ADD("upd765a", pf10_upd765a_intf)
+	MCFG_UPD765A_ADD("upd765a", false, true)
 MACHINE_CONFIG_END
 
 

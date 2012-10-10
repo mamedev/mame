@@ -554,7 +554,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/wd1772.o	\
 	$(MESS_MACHINE)/3c503.o		\
 	$(MESS_FORMATS)/z80bin.o	\
-	$(MESS_MACHINE)/n82077aa.o	\
 	$(MESS_MACHINE)/mb8795.o	\
 	$(MESS_MACHINE)/null_modem.o	\
 	$(MESS_MACHINE)/vcsctrl.o	\

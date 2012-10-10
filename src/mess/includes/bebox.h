@@ -81,6 +81,9 @@ public:
 	DECLARE_READ64_MEMBER(scsi53c810_r);
 	DECLARE_WRITE64_MEMBER(scsi53c810_w);
 	DECLARE_READ64_MEMBER(bb_slave_64be_r);
+
+	void fdc_interrupt(bool state);
+	void fdc_dma_drq(bool state);
 };
 
 

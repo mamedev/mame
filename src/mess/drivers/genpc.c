@@ -2,7 +2,7 @@
 
     drivers/genpc.c
 
-    Driver file for geenric PC machines
+    Driver file for generic PC machines
 
 ***************************************************************************/
 
@@ -98,7 +98,11 @@ static SLOT_INTERFACE_START(pc_isa8_cards)
 	SLOT_INTERFACE("ega", ISA8_EGA)
 	SLOT_INTERFACE("svga_et4k", ISA8_SVGA_ET4K)
 	SLOT_INTERFACE("com", ISA8_COM)
-	SLOT_INTERFACE("fdc", ISA8_FDC)
+	SLOT_INTERFACE("fdc", ISA8_FDC_SUPERIO)
+	SLOT_INTERFACE("fdc_xt", ISA8_FDC_XT)
+	SLOT_INTERFACE("fdc_at", ISA8_FDC_AT)
+	SLOT_INTERFACE("fdc_smc", ISA8_FDC_SMC)
+	SLOT_INTERFACE("fdc_ps2", ISA8_FDC_PS2)
 	SLOT_INTERFACE("finalchs", ISA8_FINALCHS)
 	SLOT_INTERFACE("hdc", ISA8_HDC)
 	SLOT_INTERFACE("adlib", ISA8_ADLIB)

@@ -43,6 +43,10 @@ public:
 private:
 	const format *formats;
 	int find_size(io_generic *io, UINT32 form_factor);
+	int compute_track_size(const format &f) const;
+	void build_sector_description(const format &d, UINT8 *sectdata, desc_s *sectors) const;
+	void check_compatibility(floppy_image *image, int *candidates, int &candidates_count);
+	void extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head);
 };
 
 #endif /* UPD765_DSK_H */

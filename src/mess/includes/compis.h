@@ -152,18 +152,13 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<i8251_device> m_uart;
 	required_device<device_t> m_rtc;
-	required_device<device_t> m_fdc;
+	required_device<upd765a_device> m_fdc;
 	required_device<upd7220_device> m_crtc;
-	DECLARE_READ16_MEMBER(compis_fdc_dack_r);
 	DECLARE_READ16_MEMBER(compis_usart_r);
 	DECLARE_WRITE16_MEMBER(compis_usart_w);
 	DECLARE_READ16_MEMBER(compis_i186_internal_port_r);
 	DECLARE_WRITE16_MEMBER(compis_i186_internal_port_w);
 	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(compis_fdc_w);
-	DECLARE_READ8_MEMBER(compis_fdc_r);
-	DECLARE_WRITE_LINE_MEMBER(compis_fdc_int);
-	DECLARE_WRITE_LINE_MEMBER(compis_fdc_dma_drq);
 	DECLARE_READ8_MEMBER(compis_ppi_port_b_r);
 	DECLARE_WRITE8_MEMBER(compis_ppi_port_c_w);
 	DECLARE_READ16_MEMBER(compis_osp_pit_r);
@@ -180,6 +175,9 @@ public:
 	void internal_timer_sync(int which);
 	void handle_eoi(int data);
 	void compis_fdc_tc(int state);
+
+	void fdc_irq(bool state);
+	void fdc_drq(bool state);
 
 	required_shared_ptr<UINT8> m_video_ram;
 	DECLARE_DRIVER_INIT(compis);
@@ -201,6 +199,5 @@ extern const struct pit8253_config compis_pit8254_config;
 extern const struct pic8259_interface compis_pic8259_master_config;
 extern const struct pic8259_interface compis_pic8259_slave_config;
 extern const i8251_interface compis_usart_interface;
-extern const upd765_interface compis_fdc_interface;
 
 #endif /* COMPIS_H_ */

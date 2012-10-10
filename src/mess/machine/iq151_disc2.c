@@ -6,46 +6,28 @@
 
 #include "emu.h"
 #include "iq151_disc2.h"
+#include "formats/mfi_dsk.h"
+#include "formats/iq151_dsk.h"
 
 
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
 
-static LEGACY_FLOPPY_OPTIONS_START( iq151_disc2 )
-	LEGACY_FLOPPY_OPTION( iq151_disk, "iqd", "IQ-151 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([77])
-		SECTORS([26])
-		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface iq151_disc2_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_8_SSSD,
-	LEGACY_FLOPPY_OPTIONS_NAME(iq151_disc2),
-	"floppy_8",
+static const floppy_format_type iq151_disc2_floppy_formats[] = {
+	FLOPPY_IQ151_FORMAT,
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
 
-static const upd765_interface iq151_disc2_fdc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL,
-	UPD765_RDY_PIN_NOT_CONNECTED,
-	{ NULL, FLOPPY_0, FLOPPY_1, NULL }
-};
+static SLOT_INTERFACE_START( iq151_disc2_floppies )
+	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( iq151_disc2 )
-	MCFG_UPD72065_ADD("fdc", iq151_disc2_fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(iq151_disc2_intf)
+	MCFG_UPD72065_ADD("fdc", false, true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", iq151_disc2_floppies, "8sssd", 0, iq151_disc2_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", iq151_disc2_floppies, "8sssd", 0, iq151_disc2_floppy_formats)
 MACHINE_CONFIG_END
 
 ROM_START( iq151_disc2 )
@@ -129,10 +111,12 @@ void iq151_disc2_device::read(offs_t offset, UINT8 &data)
 
 void iq151_disc2_device::io_read(offs_t offset, UINT8 &data)
 {
+	/* This is gross */
+	address_space *space = NULL;
 	if (offset == 0xaa)
-		data = upd765_status_r(m_fdc, machine().driver_data()->generic_space(), 0);
+		data = m_fdc->msr_r(*space, 0, 0xff);
 	else if (offset == 0xab)
-		data = upd765_data_r(m_fdc, machine().driver_data()->generic_space(), 0);
+		data = m_fdc->fifo_r(*space, 0, 0xff);
 }
 
 //-------------------------------------------------
@@ -141,8 +125,9 @@ void iq151_disc2_device::io_read(offs_t offset, UINT8 &data)
 
 void iq151_disc2_device::io_write(offs_t offset, UINT8 data)
 {
+	address_space *space = NULL;
 	if (offset == 0xab)
-		upd765_data_w(m_fdc, machine().driver_data()->generic_space(), 0, data);
+		m_fdc->fifo_w(*space, 0, data, 0xff);
 	else if (offset == 0xac)
 		m_rom_enabled = (data == 0x01);
 }

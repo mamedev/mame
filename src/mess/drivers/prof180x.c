@@ -26,6 +26,7 @@
 #include "machine/ram.h"
 #include "machine/ctronics.h"
 #include "machine/upd765.h"
+#include "formats/mfi_dsk.h"
 #include "includes/prof180x.h"
 
 UINT32 prof180x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -170,10 +171,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( prof180x_io , AS_IO, 8, prof180x_state )
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_WRITE(flr_w)
 	AM_RANGE(0x09, 0x09) AM_MASK(0xff00) AM_READ(status_r)
-	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(FDC9268_TAG, upd765_dack_r, upd765_dack_w)
+
+// Seriously?
+//	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(FDC9268_TAG, upd765_dack_r, upd765_dack_w)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0xff00) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_DEVREAD_LEGACY(FDC9268_TAG, upd765_status_r)
-	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(FDC9268_TAG, upd765_data_r, upd765_data_w)
+	AM_RANGE(0x0c, 0x0d) AM_MIRROR(0xff00) AM_DEVICE(FDC9268_TAG, upd765a_device, map)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -183,27 +185,14 @@ INPUT_PORTS_END
 
 /* Video */
 
-static const struct upd765_interface fdc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL, // DEVCB_CPU_INPUT_LINE(HD64180_TAG, INPUT_LINE_DREQ1)
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
-
-static const floppy_interface prof180x_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
+static const floppy_format_type prof180x_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( prof180x_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
 
 /*
 static RTC8583_INTERFCE( rtc_intf )
@@ -247,8 +236,12 @@ static MACHINE_CONFIG_START( prof180x, prof180x_state )
     MCFG_PALETTE_INIT(black_and_white)
 
 	/* devices */
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(prof180x_floppy_interface)
-	MCFG_UPD765A_ADD(FDC9268_TAG, fdc_intf)
+	MCFG_UPD765A_ADD(FDC9268_TAG, false, true)
+	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":0", prof180x_floppies, "525hd", 0, prof180x_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":1", prof180x_floppies, "525hd", 0, prof180x_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":2", prof180x_floppies, "525hd", 0, prof180x_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":3", prof180x_floppies, "525hd", 0, prof180x_floppy_formats)
+
 	//MCFG_RTC8583_ADD(MK3835_TAG, rtc_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 

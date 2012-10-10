@@ -126,6 +126,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mc1502_wd17xx_aux_w);
 	DECLARE_READ8_MEMBER(mc1502_wd17xx_drq_r);
 	DECLARE_READ8_MEMBER(mc1502_wd17xx_motor_r);
+
+	void fdc_interrupt(bool state);
+	void fdc_dma_drq(bool state);
 };
 
 /*----------- defined in machine/pc.c -----------*/

@@ -101,9 +101,7 @@ Some bugs left :
 #include "machine/ctronics.h"
 
 /* Devices */
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
-#include "formats/msx_dsk.h"
+#include "formats/mfi_dsk.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
@@ -134,30 +132,9 @@ static I8255_INTERFACE( amstrad_ppi8255_interface )
 	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_portc_w)	/* port C write */
 };
 
-
-/* Amstrad UPD765 interface doesn't use interrupts or DMA! */
-static const upd765_interface amstrad_upd765_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0,FLOPPY_1, NULL, NULL}
-};
-
-/* Aleste uses an 8272A, with the interrupt flag visible on PPI port B */
-static const upd765_interface aleste_8272_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,aleste_interrupt),
-	DEVCB_NULL,
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0,FLOPPY_1, NULL, NULL}
-};
-
-
 DRIVER_INIT_MEMBER(amstrad_state,aleste)
 {
+	m_fdc->setup_intrq_cb(i8272a_device::line_cb(FUNC(amstrad_state::aleste_interrupt), this));
 }
 
 
@@ -829,31 +806,24 @@ static const cassette_interface amstrad_cassette_interface =
 	NULL
 };
 
-static const floppy_interface cpc6128_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_3_SSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_3",
+
+static const floppy_format_type amstrad_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
 
-static const floppy_interface aleste_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(msx),
-	NULL,
+static const floppy_format_type aleste_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( amstrad_floppies )
+	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START( aleste_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
 
 CPC_EXPANSION_INTERFACE(cpc_exp_intf)
 {
@@ -873,7 +843,7 @@ static MACHINE_CONFIG_FRAGMENT( cpcplus_cartslot )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gx4000")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( amstrad, amstrad_state )
+static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	/* Machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
@@ -918,16 +888,21 @@ static MACHINE_CONFIG_START( amstrad, amstrad_state )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, amstrad_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","cpc_cass")
 
-	MCFG_UPD765A_ADD("upd765", amstrad_upd765_interface)
-
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_interface)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
-
 	MCFG_CPC_EXPANSION_SLOT_ADD("exp",cpc_exp_intf,cpc_exp_cards,NULL,NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( amstrad, amstrad_nofdc )
+	MCFG_UPD765A_ADD("upd765", true, true)
+
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", 0, amstrad_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", 0, amstrad_floppy_formats)
+
+	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
 MACHINE_CONFIG_END
 
 
@@ -983,11 +958,12 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, amstrad_cassette_interface )
 
-	MCFG_UPD765A_ADD("upd765", amstrad_upd765_interface)
+	MCFG_UPD765A_ADD("upd765", true, true)
 
 	MCFG_FRAGMENT_ADD(cpcplus_cartslot)
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", 0, amstrad_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", 0, amstrad_floppy_formats)
 
 	MCFG_CPC_EXPANSION_SLOT_ADD("exp",cpc_exp_intf,cpc_exp_cards,NULL,NULL)
 
@@ -1049,9 +1025,11 @@ static MACHINE_CONFIG_DERIVED( aleste, amstrad )
 	MCFG_PALETTE_LENGTH(32+64)
 	MCFG_PALETTE_INIT_OVERRIDE(amstrad_state,aleste)
 	MCFG_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
-	MCFG_UPD765A_MODIFY("upd765", aleste_8272_interface)
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_MODIFY(aleste_floppy_interface)
+	MCFG_I8272A_ADD("upd765", true)
+
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", aleste_floppies, "525hd", 0, aleste_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", aleste_floppies, "525hd", 0, aleste_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

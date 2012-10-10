@@ -79,7 +79,7 @@
 #include "sound/discrete.h"  /* for 1 Bit sound*/
 #include "machine/upd765.h"	/* for floppy disc controller */
 #include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "formats/mfi_dsk.h"
 #include "cpu/z80/z80.h"
 #include "formats/hect_dsk.h"
 #include "includes/hec2hrp.h"
@@ -108,11 +108,8 @@ static ADDRESS_MAP_START( hecdisc2_io , AS_IO, 8, hec2hrp_state )
 	AM_RANGE(0x040,0x04f) AM_READWRITE_LEGACY(hector_disc2_io40_port_r, hector_disc2_io40_port_w )
 	AM_RANGE(0x050,0x05f) AM_READWRITE_LEGACY(hector_disc2_io50_port_r, hector_disc2_io50_port_w )
 	// uPD765 link:
-	AM_RANGE(0x060,0x060) AM_DEVREAD_LEGACY("upd765",upd765_status_r			  )
-//  AM_RANGE(0x061,0x061) AM_DEVREADWRITE_LEGACY("upd765",upd765_data_r,upd765_data_w)
-//  AM_RANGE(0x070,0x07f) AM_DEVREADWRITE_LEGACY("upd765",upd765_dack_r,upd765_dack_w)
-AM_RANGE(0x061,0x061) AM_READWRITE_LEGACY(hector_disc2_io61_port_r, hector_disc2_io61_port_w )//patched version
-AM_RANGE(0x070,0x07F) AM_READWRITE_LEGACY(hector_disc2_io70_port_r, hector_disc2_io70_port_w )//patched version
+	AM_RANGE(0x060,0x061) AM_DEVICE("upd765", upd765a_device, map)
+	AM_RANGE(0x070,0x07f) AM_DEVREADWRITE("upd765", upd765a_device, mdma_r, mdma_w)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -519,6 +516,15 @@ static MACHINE_CONFIG_START( hec2hrp, hec2hrp_state )
 
 MACHINE_CONFIG_END
 
+static const floppy_format_type hector_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
+	NULL
+};
+
+static SLOT_INTERFACE_START( hector_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
+
 /*****************************************************************************/
 static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 /*****************************************************************************/
@@ -532,8 +538,9 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 	MCFG_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_CPU_IO_MAP(hecdisc2_io)
-	MCFG_UPD765A_ADD("upd765", hector_disc2_upd765_interface)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_interface)
+	MCFG_UPD765A_ADD("upd765", false, true)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", 0, hector_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", 0, hector_floppy_formats)
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
 
@@ -583,8 +590,9 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 	MCFG_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_CPU_IO_MAP(hecdisc2_io)
-	MCFG_UPD765A_ADD("upd765", hector_disc2_upd765_interface)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_interface)
+	MCFG_UPD765A_ADD("upd765", false, true)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", 0, hector_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", 0, hector_floppy_formats)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -681,8 +689,9 @@ static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 	MCFG_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_CPU_IO_MAP(hecdisc2_io)
-	MCFG_UPD765A_ADD("upd765", hector_disc2_upd765_interface)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_interface)
+	MCFG_UPD765A_ADD("upd765", false, true)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", 0, hector_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", 0, hector_floppy_formats)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

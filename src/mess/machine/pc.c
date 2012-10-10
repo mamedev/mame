@@ -202,7 +202,7 @@ WRITE8_MEMBER(pc_state::pc_dma_write_byte)
 
 READ8_MEMBER(pc_state::pc_dma8237_fdc_dack_r)
 {
-	return pc_fdc_dack_r(machine(), space);
+	return machine().device<pc_fdc_interface>("fdc")->dma_r();
 }
 
 
@@ -214,7 +214,7 @@ READ8_MEMBER(pc_state::pc_dma8237_hdc_dack_r)
 
 WRITE8_MEMBER(pc_state::pc_dma8237_fdc_dack_w)
 {
-	pc_fdc_dack_w( machine(), space, data );
+	machine().device<pc_fdc_interface>("fdc")->dma_w(data);
 }
 
 
@@ -232,7 +232,7 @@ WRITE8_MEMBER(pc_state::pc_dma8237_0_dack_w)
 
 WRITE_LINE_MEMBER(pc_state::pc_dma8237_out_eop)
 {
-	pc_fdc_set_tc_state( machine(), state == ASSERT_LINE ? 0 : 1 );
+	machine().device<pc_fdc_interface>("fdc")->tc_w(state == ASSERT_LINE);
 }
 
 static void set_dma_channel(running_machine &machine, int channel, int state)
@@ -1136,43 +1136,18 @@ I8255_INTERFACE( mc1502_ppi8255_interface_2 )
  *
  **********************************************************/
 
-static void pc_fdc_interrupt(running_machine &machine, int state)
+void pc_state::fdc_interrupt(bool state)
 {
-	pc_state *st = machine.driver_data<pc_state>();
-	if (st->m_pic8259)
+	if (m_pic8259)
 	{
-		pic8259_ir6_w(st->m_pic8259, state);
+		pic8259_ir6_w(m_pic8259, state);
 	}
 }
 
-static void pc_fdc_dma_drq(running_machine &machine, int state)
+void pc_state::fdc_dma_drq(bool state)
 {
-	pc_state *st = machine.driver_data<pc_state>();
-	i8237_dreq2_w( st->m_dma8237, state);
+	i8237_dreq2_w( m_dma8237, state);
 }
-
-static device_t * pc_get_device(running_machine &machine )
-{
-	return machine.device("upd765");
-}
-
-static const struct pc_fdc_interface fdc_interface_nc =
-{
-	pc_fdc_interrupt,
-	pc_fdc_dma_drq,
-	NULL,
-	pc_get_device
-};
-
-
-static const struct pc_fdc_interface pcjr_fdc_interface_nc =
-{
-	pc_fdc_interrupt,
-	NULL,
-	NULL,
-	pc_get_device
-};
-
 
 static void pc_set_irq_line(running_machine &machine,int irq, int state)
 {
@@ -1396,7 +1371,10 @@ MACHINE_START_MEMBER(pc_state,pc)
 	m_pic8259 = machine().device("pic8259");
 	m_dma8237 = machine().device("dma8237");
 	m_pit8253 = machine().device("pit8253");
-	pc_fdc_init( machine(), &fdc_interface_nc );
+
+	pc_fdc_interface *fdc = machine().device<pc_fdc_interface>("fdc");
+	fdc->setup_intrq_cb(pc_fdc_interface::line_cb(FUNC(pc_state::fdc_interrupt), this));
+	fdc->setup_drq_cb(pc_fdc_interface::line_cb(FUNC(pc_state::fdc_dma_drq), this));
 }
 
 
@@ -1450,8 +1428,8 @@ MACHINE_START_MEMBER(pc_state,mc1502)
 
 MACHINE_START_MEMBER(pc_state,pcjr)
 {
-	pc_fdc_init( machine(), &pcjr_fdc_interface_nc );
-	pcjr_keyb.keyb_signal_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pcjr_keyb_signal_callback),this));
+	pc_fdc_interface *fdc = machine().device<pc_fdc_interface>("fdc");
+	fdc->setup_intrq_cb(pc_fdc_interface::line_cb(FUNC(pc_state::fdc_interrupt), this));
 	pc_int_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pcjr_delayed_pic8259_irq),this));
 	m_maincpu = machine().device<cpu_device>("maincpu" );
 	m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);

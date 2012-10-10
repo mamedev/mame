@@ -527,9 +527,9 @@ static INPUT_PORTS_START( ibm5160_mb )
 	PORT_DIPNAME( 0x02, 0x00, "8087 installed")
 	PORT_DIPSETTING(	0x00, DEF_STR(No) )
 	PORT_DIPSETTING(	0x02, DEF_STR(Yes) )
-	PORT_DIPNAME( 0x01, 0x01, "Any floppy drive installed")
-	PORT_DIPSETTING(	0x00, DEF_STR(No) )
+	PORT_DIPNAME( 0x01, 0x01, "Boot from floppy")
 	PORT_DIPSETTING(	0x01, DEF_STR(Yes) )
+	PORT_DIPSETTING(	0x00, DEF_STR(No) )
 INPUT_PORTS_END
 //-------------------------------------------------
 //  input_ports - device-specific input ports

@@ -54,8 +54,8 @@ public:
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1),
+		  m_floppy0(*this, I8272A_TAG ":0:525qd"),
+		  m_floppy1(*this, I8272A_TAG ":1:525qd"),
 		  m_kb(*this, TANDY2K_KEYBOARD_TAG),
 		  m_kbdclk(0)
 	,
@@ -65,7 +65,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<device_t> m_pit;
-	required_device<device_t> m_fdc;
+	required_device<i8272a_device> m_fdc;
 	required_device<device_t> m_pic0;
 	required_device<device_t> m_pic1;
 	required_device<crt9007_device> m_vpac;
@@ -75,8 +75,8 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<device_t> m_speaker;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_floppy0;
-	required_device<device_t> m_floppy1;
+	required_device<floppy_image_device> m_floppy0;
+	required_device<floppy_image_device> m_floppy1;
 	required_device<tandy2k_keyboard_device> m_kb;
 
 	virtual void machine_start();
@@ -93,8 +93,9 @@ public:
 	DECLARE_READ8_MEMBER( kbint_clr_r );
 	DECLARE_READ16_MEMBER( vpac_r );
 	DECLARE_WRITE16_MEMBER( vpac_w );
+	DECLARE_READ8_MEMBER( fldtc_r );
+	DECLARE_WRITE8_MEMBER( fldtc_w );
 	DECLARE_WRITE8_MEMBER( addr_ctrl_w );
-	DECLARE_WRITE_LINE_MEMBER( busdmarq0_w );
 	DECLARE_WRITE_LINE_MEMBER( rxrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( txrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( outspkr_w );
@@ -107,6 +108,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( vac_ld_ht_w );
 	DECLARE_WRITE_LINE_MEMBER( kbdclk_w );
 	DECLARE_WRITE_LINE_MEMBER( kbddat_w );
+
+	void fdc_irq(bool state);
+	void fdc_drq(bool state);
 
 	/* DMA state */
 	UINT8 m_dma_mux;
@@ -136,8 +140,6 @@ public:
 	/* sound state */
 	int m_outspkr;
 	int m_spkrdata;
-	DECLARE_READ8_MEMBER(fldtc_r);
-	DECLARE_WRITE8_MEMBER(fldtc_w);
 };
 
 #endif

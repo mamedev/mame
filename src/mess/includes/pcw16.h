@@ -110,6 +110,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pcw16_com_tx_1);
 	DECLARE_WRITE_LINE_MEMBER(pcw16_com_dtr_1);
 	DECLARE_WRITE_LINE_MEMBER(pcw16_com_rts_1);
+
+	void trigger_fdc_int();
+	void fdc_interrupt(bool state);
 };
 
 #endif /* PCW16_H_ */

@@ -45,7 +45,6 @@
 #include "sound/wave.h"      /* for K7 sound*/
 #include "sound/discrete.h"  /* for 1 Bit sound*/
 #include "machine/upd765.h"	/* for floppy disc controller */
-#include "formats/basicdsk.h"
 
 #include "formats/hect_tap.h"
 #include "includes/hec2hrp.h"
@@ -876,11 +875,9 @@ void hector_reset(running_machine &machine, int hr, int with_D2 )
 	if (with_D2==1)
 
 	{
+		upd765a_device *fdc = machine.device<upd765a_device>("upd765");
 		machine.device("disc2cpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-		device_t *fdc = machine.device("upd765");
-		machine.device("disc2cpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-		upd765_reset(fdc, 1);
-		upd765_reset_w(fdc, 1);
+		fdc->reset();
 	}
 }
 

@@ -17,7 +17,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/flopdrv.h"
-#include "formats/d81_dsk.h"
+#include "formats/mfi_dsk.h"
 #include "machine/6522via.h"
 #include "machine/cbmiec.h"
 #include "machine/upd765.h"

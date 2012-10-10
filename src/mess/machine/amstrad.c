@@ -215,12 +215,9 @@ PALETTE_INIT_MEMBER(amstrad_state,amstrad_cpc_green)
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::aleste_interrupt)
+void amstrad_state::aleste_interrupt(bool state)
 {
-	if(state == CLEAR_LINE)
-		m_aleste_fdc_int = 0;
-	else
-		m_aleste_fdc_int = 1;
+	m_aleste_fdc_int = state;
 }
 
 
@@ -1857,7 +1854,6 @@ Expansion Peripherals Read/Write -   -   -   -   -   0   -   -   -   -   -   -  
 
 READ8_MEMBER(amstrad_state::amstrad_cpc_io_r)
 {
-	device_t *fdc = m_fdc;
 	mc6845_device *mc6845 = m_crtc;
 
 	unsigned char data = 0xFF;
@@ -1951,10 +1947,10 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 				switch (b8b0)
 				{
 				case 0x02:
-					data = upd765_status_r(fdc, space, 0);
+					data = m_fdc->msr_r(space, 0);
 					break;
 				case 0x03:
-					data = upd765_data_r(fdc, space, 0);
+					data = m_fdc->fifo_r(space, 0);
 					break;
 				default:
 					break;
@@ -1993,7 +1989,6 @@ void amstrad_state::amstrad_plus_seqcheck(int data)
 /* Offset handler for write */
 WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 {
-	device_t *fdc = m_fdc;
 	mc6845_device *mc6845 = m_crtc;
 	cpc_multiface2_device* mface2;
 
@@ -2118,18 +2113,22 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 
 				switch (b8b0)
 				{
-				case 0x00:
+				case 0x00: {
 					/* FDC Motor Control - Bit 0 defines the state of the FDD motor:
                      * "1" the FDD motor will be active.
                      * "0" the FDD motor will be in-active.*/
-					floppy_mon_w(floppy_get_device(machine(), 0), !BIT(data, 0));
-					floppy_mon_w(floppy_get_device(machine(), 1), !BIT(data, 0));
-					floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1,1);
-					floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 1,1);
+					floppy_image_device *floppy;
+					floppy = machine().device<floppy_connector>(":upd765a:0")->get_device();
+					if(floppy)
+						floppy->mon_w(!BIT(data, 0));
+					floppy = machine().device<floppy_connector>(":upd765a:1")->get_device();
+					if(floppy)
+						floppy->mon_w(!BIT(data, 0));
 				  break;
+				}
 
 				case 0x03: /* Write Data register of FDC */
-					upd765_data_w(fdc, space, 0,data);
+					m_fdc->fifo_w(space, 0,data);
 					break;
 
 				default:
@@ -3267,16 +3266,3 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 	auto_free(image.device().machine(), temp_copy);
 	return IMAGE_INIT_PASS;
 }
-
-
-#if 0
-static DEVICE_IMAGE_LOAD( aleste )
-{
-	if (device_load_basicdsk_floppy(image)==IMAGE_INIT_PASS)
-	{
-		basicdsk_set_geometry(image, 80, 2, 9, 512, 0x01, 0, FALSE);
-		return IMAGE_INIT_PASS;
-	}
-	return IMAGE_INIT_FAIL;
-}
-#endif

@@ -65,7 +65,7 @@ Notes:
 
 
 #include "includes/sg1000.h"
-
+#include "formats/mfi_dsk.h"
 
 
 /***************************************************************************
@@ -239,8 +239,7 @@ static ADDRESS_MAP_START( sf7000_io_map, AS_IO, 8, sf7000_state )
 	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
 	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
 	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE(UPD9255_0_TAG, i8255_device, read, write)
-	AM_RANGE(0xe0, 0xe0) AM_DEVREAD_LEGACY(UPD765_TAG, upd765_status_r)
-	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w)
+	AM_RANGE(0xe0, 0xe1) AM_DEVICE(UPD765_TAG, upd765a_device, map)
 	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE(UPD9255_1_TAG, i8255_device, read, write)
 	AM_RANGE(0xe8, 0xe8) AM_DEVREADWRITE(UPD8251_TAG, i8251_device, data_r, data_w)
 	AM_RANGE(0xe9, 0xe9) AM_DEVREADWRITE(UPD8251_TAG, i8251_device, status_r, control_w)
@@ -924,12 +923,12 @@ WRITE8_MEMBER( sf7000_state::ppi_pc_w )
 	floppy_drive_set_ready_state(m_floppy0, 1, 1);
 
 	/* FDC terminal count */
-	upd765_tc_w(m_fdc, BIT(data, 2));
+	m_fdc->tc_w(BIT(data, 2));
 
 	/* FDC reset */
 	if (BIT(data, 3))
 	{
-		upd765_reset(m_fdc, 0);
+		m_fdc->reset();
 	}
 
 	/* ROM selection */
@@ -953,32 +952,10 @@ static I8255_INTERFACE( sf7000_ppi_intf )
     upd765_interface sf7000_upd765_interface
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( sf7000_state::fdc_intrq_w )
+void sf7000_state::fdc_intrq_w(bool state)
 {
 	m_fdc_irq = state;
 }
-
-static const struct upd765_interface sf7000_upd765_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(sf7000_state, fdc_intrq_w),
-	DEVCB_NULL,
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{ FLOPPY_0, NULL, NULL, NULL }
-};
-
-/*-------------------------------------------------
-    LEGACY_FLOPPY_OPTIONS( sf7000 )
--------------------------------------------------*/
-
-static LEGACY_FLOPPY_OPTIONS_START( sf7000 )
-	LEGACY_FLOPPY_OPTION(sf7000, "sf7", "SF7 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
 
 /*-------------------------------------------------
     sf7000_fdc_index_callback -
@@ -993,18 +970,14 @@ WRITE_LINE_MEMBER(sf7000_state::sf7000_fdc_index_callback)
     floppy_interface sf7000_floppy_interface
 -------------------------------------------------*/
 
-static const floppy_interface sf7000_floppy_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(sf7000_state,sf7000_fdc_index_callback),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(sf7000),
-	"floppy_3",
+static const floppy_format_type sf7000_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( sf7000_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
 
 /*-------------------------------------------------
     sn76496_config psg_intf
@@ -1077,6 +1050,8 @@ void sf7000_state::machine_start()
 	membank("bank1")->configure_entry(0, memregion(Z80_TAG)->base());
 	membank("bank1")->configure_entry(1, m_ram->pointer());
 	membank("bank2")->configure_entry(0, m_ram->pointer());
+
+	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(sf7000_state::fdc_intrq_w), this));
 
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
@@ -1218,8 +1193,8 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	MCFG_I8255_ADD(UPD9255_0_TAG, sc3000_ppi_intf)
 	MCFG_I8255_ADD(UPD9255_1_TAG, sf7000_ppi_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, default_i8251_interface)
-	MCFG_UPD765A_ADD(UPD765_TAG, sf7000_upd765_interface)
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, sf7000_floppy_interface)
+	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sf7000_floppies, "525hd", 0, sf7000_floppy_formats)
 //  MCFG_PRINTER_ADD("sp400") /* serial printer */
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_interface)

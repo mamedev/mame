@@ -13,7 +13,7 @@
 #include "machine/upd765.h"
 #include "machine/8237dma.h"
 #include "video/upd7220.h"
-#include "formats/basicdsk.h"
+#include "formats/mfi_dsk.h"
 #include "dmv.lh"
 
 class dmv_state : public driver_device
@@ -24,27 +24,34 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_hgdc(*this, "upd7220"),
 		  m_dmac(*this, "dma8237"),
-		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1),
+		  m_fdc(*this, "upd765"),
+		  m_floppy0(*this, "upd765:0:525dd"),
+		  m_floppy1(*this, "upd765:1:525dd"),
 		  m_video_ram(*this, "video_ram")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7220_device> m_hgdc;
-	required_device<device_t> m_dmac;
-	required_device<device_t> m_floppy0;
-	required_device<device_t> m_floppy1;
+	required_device<i8237_device> m_dmac;
+	required_device<upd765a_device> m_fdc;
+	required_device<floppy_image_device> m_floppy0;
+	required_device<floppy_image_device> m_floppy1;
 
 	virtual void video_start();
+	virtual void machine_start();
 	virtual void machine_reset();
 
 	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 	DECLARE_WRITE8_MEMBER(fdd_motor_w);
 	DECLARE_READ8_MEMBER(sys_status_r);
 	DECLARE_READ8_MEMBER(kb_ctrl_mcu_r);
 	DECLARE_WRITE8_MEMBER(kb_ctrl_mcu_w);
+	DECLARE_READ8_MEMBER(fdc_dma_r);
+	DECLARE_WRITE8_MEMBER(fdc_dma_w);
+
+	void fdc_irq(bool state);
+	void fdc_drq(bool state);
 
 	required_shared_ptr<UINT8> m_video_ram;
 	int 		m_fdc_int_line;
@@ -71,19 +78,32 @@ WRITE8_MEMBER(dmv_state::leds_w)
 		output_set_led_value(8-i, BIT(data, i));
 }
 
-WRITE_LINE_MEMBER(dmv_state::fdc_irq_w)
+void dmv_state::fdc_irq(bool state)
 {
 	m_fdc_int_line = state;
+}
+
+void dmv_state::fdc_drq(bool state)
+{
+	m_dmac->i8237_drq_write(3, state);
+}
+
+READ8_MEMBER(dmv_state::fdc_dma_r)
+{
+	return m_fdc->dma_r();
+}
+
+WRITE8_MEMBER(dmv_state::fdc_dma_w)
+{
+	m_fdc->dma_w(data);
 }
 
 WRITE8_MEMBER(dmv_state::fdd_motor_w)
 {
 	// bit 0 defines the state of the FDD motor
 
-	floppy_mon_w(m_floppy0, BIT(data, 0) ? 0 : 1);
-	floppy_mon_w(m_floppy1, BIT(data, 0) ? 0 : 1);
-	floppy_drive_set_ready_state(m_floppy0, 1, BIT(data, 0));
-	floppy_drive_set_ready_state(m_floppy1, 1, BIT(data, 0));
+	m_floppy0->mon_w(!BIT(data, 0));
+	m_floppy1->mon_w(!BIT(data, 0));
 }
 
 READ8_MEMBER(dmv_state::sys_status_r)
@@ -160,6 +180,15 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	}
 }
 
+static const floppy_format_type dmv_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
+	NULL
+};
+
+static SLOT_INTERFACE_START( dmv_floppies )
+	 SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
+
 static ADDRESS_MAP_START(dmv_mem, AS_PROGRAM, 8, dmv_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_ROM
@@ -174,8 +203,7 @@ static ADDRESS_MAP_START( dmv_io , AS_IO, 8, dmv_state)
 	AM_RANGE(0x14, 0x14) AM_WRITE(fdd_motor_w)
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE_LEGACY("dma8237", i8237_r, i8237_w)
 	AM_RANGE(0x40, 0x41) AM_READWRITE(kb_ctrl_mcu_r, kb_ctrl_mcu_w)
-	AM_RANGE(0x50, 0x50) AM_DEVREAD_LEGACY("upd765", upd765_status_r)
-	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE_LEGACY("upd765", upd765_data_r, upd765_data_w)
+	AM_RANGE(0x50, 0x51) AM_DEVICE("upd765", upd765a_device, map)
 	AM_RANGE(0xa0, 0xa1) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
 
 	//AM_RANGE(0x10, 0x11) boot ROM bankswitch (0x0000-0x1fff)
@@ -203,6 +231,12 @@ ADDRESS_MAP_END
 /* Input ports */
 INPUT_PORTS_START( dmv )
 INPUT_PORTS_END
+
+void dmv_state::machine_start()
+{
+	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(dmv_state::fdc_irq), this));
+	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(dmv_state::fdc_drq), this));
+}
 
 void dmv_state::machine_reset()
 {
@@ -241,29 +275,6 @@ static UPD7220_INTERFACE( hgdc_intf )
 	DEVCB_NULL
 };
 
-static const floppy_interface dmv_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_5_25",
-	NULL
-};
-
-
-static const upd765_interface dmv_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(dmv_state, fdc_irq_w),
-	DEVCB_DEVICE_LINE("dma8237", i8237_dreq3_w),
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
-
 
 //------------------------------------------------------------------------------------
 //   I8237_INTERFACE
@@ -286,8 +297,8 @@ static I8237_INTERFACE( dmv_dma8237_config )
 	DEVCB_NULL,
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER("upd765", upd765_dack_r) },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER("upd765", upd765_dack_w) },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(dmv_state, fdc_dma_r) },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(dmv_state, fdc_dma_w) },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
@@ -321,8 +332,9 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	// devices
 	MCFG_UPD7220_ADD( "upd7220", XTAL_4MHz, hgdc_intf, upd7220_map )
 	MCFG_I8237_ADD( "dma8237", XTAL_4MHz, dmv_dma8237_config )
-	MCFG_UPD765A_ADD( "upd765", dmv_interface )
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD( dmv_floppy_interface )
+	MCFG_UPD765A_ADD( "upd765", true, true )
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", dmv_floppies, "525dd", 0, dmv_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", dmv_floppies, "525dd", 0, dmv_floppy_formats)
 MACHINE_CONFIG_END
 
 /* ROM definition */

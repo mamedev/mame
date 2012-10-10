@@ -108,7 +108,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_ay;
-	optional_device<device_t> m_fdc;  // not on a GX4000
+	optional_device<upd765_family_device> m_fdc;  // not on a GX4000
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;
 	required_device<i8255_device> m_ppi;
@@ -184,6 +184,8 @@ public:
 	DECLARE_WRITE8_MEMBER(amstrad_ppi_porta_w);
 	DECLARE_READ8_MEMBER(amstrad_ppi_portb_r);
 	DECLARE_WRITE8_MEMBER(amstrad_ppi_portc_w);
+
+	void aleste_interrupt(bool state);
 };
 
 

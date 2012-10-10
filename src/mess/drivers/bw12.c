@@ -28,7 +28,7 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
-#include "formats/basicdsk.h"
+#include "formats/mfi_dsk.h"
 #include "machine/6821pia.h"
 #include "machine/ctronics.h"
 #include "machine/upd765.h"
@@ -146,8 +146,7 @@ void bw12_state::ls259_w(int address, int data)
 
 		if (data)
 		{
-			floppy_mon_w(m_floppy0, CLEAR_LINE);
-			floppy_drive_set_ready_state(m_floppy0, 1, 0);
+			m_floppy0->mon_w(false);
 		}
 
 		set_floppy_motor_off_timer();
@@ -158,15 +157,14 @@ void bw12_state::ls259_w(int address, int data)
 
 		if (data)
 		{
-			floppy_mon_w(m_floppy1, CLEAR_LINE);
-			floppy_drive_set_ready_state(m_floppy1, 1, 0);
+			m_floppy1->mon_w(false);
 		}
 
 		set_floppy_motor_off_timer();
 		break;
 
 	case 7: /* FDC TC */
-		upd765_tc_w(m_fdc, data);
+		m_fdc->tc_w(data);
 		break;
 	}
 }
@@ -199,8 +197,7 @@ static ADDRESS_MAP_START( bw12_io, AS_IO, 8, bw12_state )
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(ls259_r, ls259_w)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_DEVREADWRITE(MC6845_TAG, mc6845_device, register_r, register_w)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0e) AM_DEVREAD_LEGACY(UPD765_TAG, upd765_status_r)
-	AM_RANGE(0x21, 0x21) AM_MIRROR(0x0e) AM_DEVREADWRITE_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w)
+	AM_RANGE(0x20, 0x21) AM_MIRROR(0x0e) AM_DEVICE(UPD765_TAG, upd765a_device, map)
 	AM_RANGE(0x30, 0x33) AM_MIRROR(0x0c) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_d_r, z80dart_d_w)
 	AM_RANGE(0x41, 0x41) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_c_r, z80dart_c_w)
@@ -408,36 +405,10 @@ void bw12_state::video_start()
 
 /* UPD765 Interface */
 
-WRITE_LINE_MEMBER( bw12_state::fdc_intrq_w )
+void bw12_state::fdc_intrq_w(bool state)
 {
 	m_fdc_int = state;
 }
-
-static UPD765_GET_IMAGE( bw12_upd765_get_image )
-{
-	bw12_state *state = device->machine().driver_data<bw12_state>();
-
-	switch (floppy_index)
-	{
-	case 1: /* drive A */
-		return state->m_floppy0;
-
-	case 2: /* drive B */
-		return state->m_floppy1;
-
-	default:
-		return NULL;
-	}
-}
-
-static const struct upd765_interface fdc_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(bw12_state, fdc_intrq_w),	/* interrupt */
-	DEVCB_NULL,							/* DMA request */
-	bw12_upd765_get_image,				/* image lookup */
-	UPD765_RDY_PIN_CONNECTED,			/* ready pin */
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
 
 /* PIA6821 Interface */
 
@@ -659,84 +630,21 @@ void bw12_state::machine_reset()
 	}
 }
 
-static LEGACY_FLOPPY_OPTIONS_START( bw12 )
-	LEGACY_FLOPPY_OPTION(bw12, "dsk", "180KB BW 12 SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([18])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
-	LEGACY_FLOPPY_OPTION(bw12, "dsk", "SVI-328 SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([17])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
-	LEGACY_FLOPPY_OPTION(bw12, "dsk", "Kaypro II SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([0]))
-LEGACY_FLOPPY_OPTIONS_END
+static SLOT_INTERFACE_START( bw12_floppies )
+	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
+SLOT_INTERFACE_END
 
-static const floppy_interface bw12_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_SSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(bw12),
-	NULL,
+static const floppy_format_type bw12_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
 
-static LEGACY_FLOPPY_OPTIONS_START( bw14 )
-	LEGACY_FLOPPY_OPTION(bw14, "dsk", "180KB BW 12 SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([18])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
-	LEGACY_FLOPPY_OPTION(bw14, "dsk", "360KB BW 14 DSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([18])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
-	LEGACY_FLOPPY_OPTION(bw14, "dsk", "SVI-328 SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([17])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
-	LEGACY_FLOPPY_OPTION(bw14, "dsk", "SVI-328 DSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([17])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([0]))
-	LEGACY_FLOPPY_OPTION(bw14, "dsk", "Kaypro II SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([0]))
-LEGACY_FLOPPY_OPTIONS_END
+static SLOT_INTERFACE_START( bw14_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
 
-
-static const floppy_interface bw14_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(bw14),
-	NULL,
+static const floppy_format_type bw14_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
 
@@ -788,7 +696,7 @@ static MACHINE_CONFIG_START( common, bw12_state )
 
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD(FLOPPY_TIMER_TAG, bw12_state, floppy_motor_off_tick)
-	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
+	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
 	MCFG_PIA6821_ADD(PIA6821_TAG, pia_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_16MHz/4, sio_intf)
 	MCFG_PIT8253_ADD(PIT8253_TAG, pit_intf)
@@ -800,7 +708,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bw12, common )
 	/* floppy drives */
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bw12_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", bw12_floppies, "525ssdd", 0, bw12_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw12_floppies, "525ssdd", 0, bw12_floppy_formats)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "bw12")
@@ -812,7 +721,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bw14, common )
 	/* floppy drives */
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bw14_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", bw14_floppies, "525hd", 0, bw14_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw14_floppies, "525hd", 0, bw14_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

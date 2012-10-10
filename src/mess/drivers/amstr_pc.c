@@ -55,6 +55,7 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 #include "imagedev/cassette.h"
 #include "imagedev/cartslot.h"
 #include "formats/pc_dsk.h"
+#include "formats/mfi_dsk.h"
 
 #include "machine/8237dma.h"
 #include "sound/sn76496.h"
@@ -95,7 +96,7 @@ static ADDRESS_MAP_START(ppc512_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0378, 0x037b) AM_READ8_LEGACY(pc200_port378_r, 0xffff) AM_DEVWRITE8_LEGACY("lpt_1", pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_device, ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8_LEGACY(pc_fdc_r,					pc_fdc_w, 0xffff)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE8("fdc", pc_fdc_xt_device, map, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
@@ -123,7 +124,7 @@ static ADDRESS_MAP_START(pc200_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0378, 0x037b) AM_READ8_LEGACY(pc200_port378_r, 0xffff) AM_DEVWRITE8_LEGACY("lpt_1", pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_device, ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8_LEGACY(pc_fdc_r,					pc_fdc_w, 0xffff)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE8("fdc", pc_fdc_xt_device, map, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
@@ -219,18 +220,15 @@ static const pc_lpt_interface pc_lpt_config =
 	DEVCB_CPU_INPUT_LINE("maincpu", 0)
 };
 
-static const floppy_interface ibmpc_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(pc),
-	NULL,
+static const floppy_format_type ibmpc_floppy_formats[] = {
+	FLOPPY_PC_FORMAT,
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( ibmpc_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START(amstr_com)
 	SLOT_INTERFACE("microsoft_mouse", MSFT_SERIAL_MOUSE)
@@ -300,9 +298,10 @@ static MACHINE_CONFIG_START( pc200, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -370,9 +369,10 @@ static MACHINE_CONFIG_START( ppc512, pc_state )
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
 

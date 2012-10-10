@@ -25,6 +25,7 @@
 */
 
 #include "includes/tandy2k.h"
+#include "formats/mfi_dsk.h"
 
 enum
 {
@@ -118,7 +119,8 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
 	pit8253_gate2_w(m_pit, BIT(data, 4));
 
 	// FDC reset
-	upd765_reset_w(m_fdc, BIT(data, 5));
+	if(BIT(data, 5))
+		m_fdc->reset();
 
 	// timer 0 enable
 	m_maincpu->set_input_line(INPUT_LINE_TMRIN0, BIT(data, 6));
@@ -195,20 +197,18 @@ WRITE16_MEMBER( tandy2k_state::vpac_w )
 	}
 }
 
-READ8_MEMBER(tandy2k_state::fldtc_r)
+READ8_MEMBER( tandy2k_state::fldtc_r )
 {
-	device_t *device = machine().device("AM_RANGE(0x00004, 0x00005) AM_READWRITE8(I8272A_TAG, fldtc_r, fldtc_w, 0x00ff)");
-	upd765_tc_w(device, 1);
-	upd765_tc_w(device, 0);
+	m_fdc->tc_w(true);
+	m_fdc->tc_w(false);
 
 	return 0;
 }
 
-WRITE8_MEMBER(tandy2k_state::fldtc_w)
+WRITE8_MEMBER( tandy2k_state::fldtc_w )
 {
-	device_t *device = machine().device(I8272A_TAG);
-	upd765_tc_w(device, 1);
-	upd765_tc_w(device, 0);
+	m_fdc->tc_w(true);
+	m_fdc->tc_w(false);
 }
 
 WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
@@ -273,14 +273,13 @@ static ADDRESS_MAP_START( tandy2k_io, AS_IO, 16, tandy2k_state )
 	AM_RANGE(0x00002, 0x00003) AM_WRITE8(dma_mux_w, 0x00ff)
 	AM_RANGE(0x00004, 0x00005) AM_READWRITE8(fldtc_r, fldtc_w, 0x00ff)
 	AM_RANGE(0x00010, 0x00013) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x00030, 0x00031) AM_DEVREAD8_LEGACY(I8272A_TAG, upd765_status_r, 0x00ff)
-	AM_RANGE(0x00032, 0x00033) AM_DEVREADWRITE8_LEGACY(I8272A_TAG, upd765_data_r, upd765_data_w, 0x00ff)
+	AM_RANGE(0x00030, 0x00033) AM_DEVICE8(I8272A_TAG, i8272a_device, map, 0x00ff)
 	AM_RANGE(0x00040, 0x00047) AM_DEVREADWRITE8_LEGACY(I8253_TAG, pit8253_r, pit8253_w, 0x00ff)
 	AM_RANGE(0x00052, 0x00053) AM_READ8(kbint_clr_r, 0x00ff)
 	AM_RANGE(0x00050, 0x00057) AM_DEVREADWRITE8(I8255A_TAG, i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x00060, 0x00063) AM_DEVREADWRITE8_LEGACY(I8259A_0_TAG, pic8259_r, pic8259_w, 0x00ff)
 	AM_RANGE(0x00070, 0x00073) AM_DEVREADWRITE8_LEGACY(I8259A_1_TAG, pic8259_r, pic8259_w, 0x00ff)
-	AM_RANGE(0x00080, 0x00081) AM_DEVREADWRITE8_LEGACY(I8272A_TAG, upd765_dack_r, upd765_dack_w, 0x00ff)
+	AM_RANGE(0x00080, 0x00081) AM_DEVREADWRITE8(I8272A_TAG, i8272a_device, mdma_r, mdma_w, 0x00ff)
 //  AM_RANGE(0x00100, 0x0017f) AM_DEVREADWRITE8(CRT9007_TAG, crt9007_device, read, write, 0x00ff) AM_WRITE8(addr_ctrl_w, 0xff00)
 	AM_RANGE(0x00100, 0x0017f) AM_READWRITE(vpac_r, vpac_w)
 //  AM_RANGE(0x00180, 0x00180) AM_READ8(hires_status_r, 0x00ff)
@@ -614,19 +613,24 @@ static const floppy_interface tandy2k_floppy_interface =
 
 // Intel 8272 Interface
 
-WRITE_LINE_MEMBER( tandy2k_state::busdmarq0_w )
+void tandy2k_state::fdc_irq(bool state)
+{
+	pic8259_ir4_w(m_pic0, state);
+}
+
+void tandy2k_state::fdc_drq(bool state)
 {
 	dma_request(0, state);
 }
 
-static const struct upd765_interface fdc_intf =
-{
-	DEVCB_DEVICE_LINE(I8259A_0_TAG, pic8259_ir4_w),
-	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, busdmarq0_w),
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
+static const floppy_format_type tandy2k_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
+	NULL
 };
+
+static SLOT_INTERFACE_START( tandy2k_floppies )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
+SLOT_INTERFACE_END
 
 // Centronics Interface
 
@@ -677,6 +681,9 @@ void tandy2k_state::machine_start()
 	int ram_size = m_ram->size();
 
 	program.install_ram(0x00000, ram_size - 1, ram);
+
+	m_fdc->setup_intrq_cb(i8272a_device::line_cb(FUNC(tandy2k_state::fdc_irq), this));
+	m_fdc->setup_drq_cb(i8272a_device::line_cb(FUNC(tandy2k_state::fdc_drq), this));
 
 	// patch out i186 relocation register check
 	UINT8 *rom = memregion(I80186_TAG)->base();
@@ -731,8 +738,9 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
 	MCFG_PIC8259_ADD(I8259A_0_TAG, pic0_intf)
 	MCFG_PIC8259_ADD(I8259A_1_TAG, pic1_intf)
-	MCFG_UPD765A_ADD(I8272A_TAG, fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(tandy2k_floppy_interface)
+	MCFG_UPD765A_ADD(I8272A_TAG, true, true)
+	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", 0, tandy2k_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", 0, tandy2k_floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_TANDY2K_KEYBOARD_ADD(kb_intf)
 

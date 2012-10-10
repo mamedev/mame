@@ -11,6 +11,7 @@
 #include "machine/upd765.h"
 #include "imagedev/flopdrv.h"
 #include "machine/terminal.h"
+#include "formats/mfi_dsk.h"
 
 
 class microdec_state : public driver_device
@@ -23,11 +24,13 @@ public:
 	DECLARE_READ8_MEMBER(terminal_status_r);
 	DECLARE_READ8_MEMBER(terminal_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_WRITE_LINE_MEMBER(microdec_irq_w);
 	UINT8 m_term_data;
 
 	required_device<generic_terminal_device> m_terminal;
 	virtual void machine_reset();
+
+	virtual void machine_start();
+	void fdc_irq(bool state);
 };
 
 
@@ -52,8 +55,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(microdec_io, AS_IO, 8, microdec_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xfa, 0xfa) AM_DEVREAD_LEGACY("upd765", upd765_status_r)
-	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE_LEGACY("upd765", upd765_data_r, upd765_data_w)
+	AM_RANGE(0xfa, 0xfb) AM_DEVICE("upd765", upd765a_device, map)
 	AM_RANGE(0xfc, 0xfc) AM_READ(terminal_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
 	AM_RANGE(0xfd, 0xfd) AM_READ(terminal_status_r)
 ADDRESS_MAP_END
@@ -62,6 +64,10 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( microdec )
 INPUT_PORTS_END
 
+void microdec_state::machine_start()
+{
+	machine().device<upd765a_device>("upd765")->setup_intrq_cb(upd765a_device::line_cb(FUNC(microdec_state::fdc_irq), this));
+}
 
 void microdec_state::machine_reset()
 {
@@ -78,31 +84,18 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 	DEVCB_DRIVER_MEMBER(microdec_state, kbd_put)
 };
 
-WRITE_LINE_MEMBER( microdec_state::microdec_irq_w )
+void microdec_state::fdc_irq(bool state)
 {
 }
 
-static const struct upd765_interface microdec_upd765_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(microdec_state, microdec_irq_w), /* interrupt */
-	DEVCB_NULL,					/* DMA request */
-	NULL,	/* image lookup */
-	UPD765_RDY_PIN_CONNECTED,	/* ready pin */
-	{FLOPPY_0,FLOPPY_1, NULL, NULL}
-};
-
-static const floppy_interface microdec_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
+static const floppy_format_type microdec_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( microdec_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( microdec, microdec_state )
 	/* basic machine hardware */
@@ -114,8 +107,9 @@ static MACHINE_CONFIG_START( microdec, microdec_state )
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
-	MCFG_UPD765A_ADD("upd765", microdec_upd765_interface)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(microdec_floppy_interface)
+	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", microdec_floppies, "525hd", 0, microdec_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", microdec_floppies, "525hd", 0, microdec_floppy_formats)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -104,6 +104,8 @@
 // pcw/pcw16 beeper
 #include "sound/beep.h"
 #include "machine/ram.h"
+#include "formats/pc_dsk.h"
+#include "formats/mfi_dsk.h"
 
 #include "pcw.lh"
 
@@ -112,8 +114,6 @@
 
 static const UINT8 half_step_table[4] = { 0x01, 0x02, 0x04, 0x08 };
 static const UINT8 full_step_table[4] = { 0x03, 0x06, 0x0c, 0x09 };
-
-
 
 static void pcw_update_interrupt_counter(pcw_state *state)
 {
@@ -125,16 +125,6 @@ static void pcw_update_interrupt_counter(pcw_state *state)
 	state->m_interrupt_counter++;
 }
 
-/* PCW uses UPD765 in NON-DMA mode. FDC Ints are connected to /INT or
-/NMI depending on choice (see system control below) */
-static const upd765_interface pcw_upd765_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pcw_state,pcw_fdc_interrupt),
-	DEVCB_NULL,
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0,FLOPPY_1, NULL, NULL}
-};
 
 // set/reset INT and NMI lines
 static void pcw_update_irqs(running_machine &machine)
@@ -178,10 +168,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(pcw_state::pcw_timer_interrupt)
 	machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(pcw_state::pcw_timer_pulse),this));
 }
 
-/* fdc interrupt callback. set/clear fdc int */
-WRITE_LINE_MEMBER(pcw_state::pcw_fdc_interrupt)
+/* PCW uses UPD765 in NON-DMA mode. FDC Ints are connected to /INT or
+ * /NMI depending on choice (see system control below)
+ * fdc interrupt callback. set/clear fdc int */
+void pcw_state::pcw_fdc_interrupt(bool state)
 {
-	if (state == CLEAR_LINE)
+	if (!state)
 		m_system_status &= ~(1<<5);
 	else
 	{
@@ -416,7 +408,7 @@ WRITE8_MEMBER(pcw_state::pcw_vdu_video_control_register_w)
 
 WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 {
-	device_t *fdc = machine().device("upd765");
+	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
 	device_t *speaker = machine().device(BEEPER_TAG);
 	LOG(("SYSTEM CONTROL: %d\n",data));
 
@@ -503,14 +495,14 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		/* set fdc terminal count */
 		case 5:
 		{
-			upd765_tc_w(fdc, 1);
+			fdc->tc_w(true);
 		}
 		break;
 
 		/* clear fdc terminal count */
 		case 6:
 		{
-			upd765_tc_w(fdc, 0);
+			fdc->tc_w(false);
 		}
 		break;
 
@@ -532,20 +524,26 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		/* disc motor on */
 		case 9:
 		{
-			floppy_mon_w(floppy_get_device(machine(), 0), CLEAR_LINE);
-			floppy_mon_w(floppy_get_device(machine(), 1), CLEAR_LINE);
-			floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1,1);
-			floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 1,1);
+			floppy_image_device *floppy;
+			floppy = machine().device<floppy_connector>(":upd765:0")->get_device();
+			if(floppy)
+				floppy->mon_w(0);
+			floppy = machine().device<floppy_connector>(":upd765:1")->get_device();
+			if(floppy)
+				floppy->mon_w(0);
 		}
 		break;
 
 		/* disc motor off */
 		case 10:
 		{
-			floppy_mon_w(floppy_get_device(machine(), 0), ASSERT_LINE);
-			floppy_mon_w(floppy_get_device(machine(), 1), ASSERT_LINE);
-			floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 0,1);
-			floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 0,1);
+			floppy_image_device *floppy;
+			floppy = machine().device<floppy_connector>(":upd765:0")->get_device();
+			if(floppy)
+				floppy->mon_w(1);
+			floppy = machine().device<floppy_connector>(":upd765:1")->get_device();
+			if(floppy)
+				floppy->mon_w(1);
 		}
 		break;
 
@@ -630,28 +628,6 @@ the PCW custom ASIC */
 WRITE8_MEMBER(pcw_state::pcw_expansion_w)
 {
 	logerror("pcw expansion w: %04x %02x\n",offset+0x080, data);
-}
-
-READ8_MEMBER(pcw_state::pcw_fdc_r)
-{
-	device_t *fdc = machine().device("upd765");
-	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
-	if (offset & 1)
-	{
-		return upd765_data_r(fdc, space, 0);
-	}
-
-	return upd765_status_r(fdc, space, 0);
-}
-
-WRITE8_MEMBER(pcw_state::pcw_fdc_w)
-{
-	device_t *fdc = machine().device("upd765");
-	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
-	if (offset & 1)
-	{
-		upd765_data_w(fdc, space, 0,data);
-	}
 }
 
 static void pcw_printer_fire_pins(running_machine &machine, UINT16 pins)
@@ -985,7 +961,7 @@ WRITE8_MEMBER(pcw_state::pcw9512_parallel_w)
 
 static ADDRESS_MAP_START(pcw_io, AS_IO, 8, pcw_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000, 0x07f) AM_READWRITE(pcw_fdc_r,					pcw_fdc_w)
+	AM_RANGE(0x000, 0x07f) AM_MIRROR(0xfe) AM_DEVICE("upd765", upd765a_device, map)
 	AM_RANGE(0x080, 0x0ef) AM_READWRITE(pcw_expansion_r,			pcw_expansion_w)
 	AM_RANGE(0x0f0, 0x0f3) AM_WRITE(								pcw_bank_select_w)
 	AM_RANGE(0x0f4, 0x0f4) AM_READWRITE(pcw_interrupt_counter_r,	pcw_bank_force_selection_w)
@@ -1001,7 +977,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pcw9512_io, AS_IO, 8, pcw_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000, 0x07f) AM_READWRITE(pcw_fdc_r,					pcw_fdc_w)
+	AM_RANGE(0x000, 0x07f) AM_MIRROR(0xfe) AM_DEVICE("upd765", upd765a_device, map)
 	AM_RANGE(0x080, 0x0ef) AM_READWRITE(pcw_expansion_r,			pcw_expansion_w)
 	AM_RANGE(0x0f0, 0x0f3) AM_WRITE(								pcw_bank_select_w)
 	AM_RANGE(0x0f4, 0x0f4) AM_READWRITE(pcw_interrupt_counter_r,	pcw_bank_force_selection_w)
@@ -1290,18 +1266,14 @@ static INPUT_PORTS_START(pcw)
 	PORT_BIT( 0xff, 0x00,	 IPT_UNUSED)
 INPUT_PORTS_END
 
-static const floppy_interface pcw_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_5_25",
+static const floppy_format_type pcw_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( pcw_floppies )
+	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
+SLOT_INTERFACE_END
 
 /* PCW8256, PCW8512, PCW9256 */
 static MACHINE_CONFIG_START( pcw, pcw_state )
@@ -1336,9 +1308,11 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_UPD765A_ADD("upd765", pcw_upd765_interface)
+	MCFG_UPD765A_ADD("upd765", true, true)
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(pcw_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pcw_floppies, "3dsdd", 0, pcw_floppy_formats)
+    MCFG_FLOPPY_DRIVE_ADD("upd765:1", pcw_floppies, "3dsdd", 0, pcw_floppy_formats)
+
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pcw")
 
 	/* internal ram */

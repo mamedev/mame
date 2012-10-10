@@ -624,7 +624,7 @@ READ32_MEMBER( next_state::fdc_control_r )
 	// reason.  The kernel otoh behaves as expected.
 
 	if(fdc) {
-		floppy_image_device *fdev = machine().device<floppy_connector>(":fd0")->get_device();
+		floppy_image_device *fdev = machine().device<floppy_connector>(":fdc:0")->get_device();
 		if(fdev->exists()) {
 			UINT32 variant = fdev->get_variant();
 			switch(variant) {
@@ -889,7 +889,7 @@ static ADDRESS_MAP_START( next_0b_nofdc_mem, AS_PROGRAM, 32, next_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( next_fdc_mem, AS_PROGRAM, 32, next_state )
-	AM_RANGE(0x02014100, 0x02014107) AM_MIRROR(0x300000) AM_DEVICE8("fdc", n82077aa_device, amap, 0xffffffff)
+	AM_RANGE(0x02014100, 0x02014107) AM_MIRROR(0x300000) AM_DEVICE8("fdc", n82077aa_device, map, 0xffffffff)
 	AM_RANGE(0x02014108, 0x0201410b) AM_MIRROR(0x300000) AM_READWRITE(fdc_control_r, fdc_control_w)
 
 	AM_IMPORT_FROM(next_mem)
@@ -987,7 +987,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( next_fdc_base, next_base )
 	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
-	MCFG_FLOPPY_DRIVE_ADD("fd0", next_floppies, "35ed", 0, next_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", next_floppies, "35ed", 0, next_state::floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nexts, next_fdc_base )
@@ -1145,19 +1145,3 @@ COMP( 1990, nextst,  0,      0,       nextst,    next, next_state,    nextst,  "
 COMP( 1990, nextstc, nextst, 0,       nextstc,   next, next_state,    nextstc, "Next Software Inc",   "NeXTstation turbo color",	GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( ????, nextct,  nextst, 0,       nextct,    next, next_state,    nextct,  "Next Software Inc",   "NeXT Cube turbo",			GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( ????, nextctc, nextst, 0,       nextctc,   next, next_state,    nextctc, "Next Software Inc",   "NeXT Cube turbo color",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
-		/*
-
-    UINT32 *rom = (UINT32 *)(machine.root_device().memregion("user1")->base());
-    rom[0x3f48/4] = 0x2f017000; // memory test funcall
-    rom[0x3f4c/4] = 0x4e712400;
-    rom[0x00b8/4] = 0x001a4e71; // rom checksum
-    rom[0x00bc/4] = 0x4e714e71;
-
-v74
-    UINT32 *rom = (UINT32 *)(machine.root_device().memregion("user1")->base());
-    rom[0x329c/4] = 0x70004e71; // memory test funcall
-    rom[0x32a0/4] = 0x4e712400;
-    rom[0x03f8/4] = 0x001a4e71; // rom checksum
-    rom[0x03fc/4] = 0x4e714e71;
-        */

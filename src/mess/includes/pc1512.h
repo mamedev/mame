@@ -7,8 +7,8 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
-#include "formats/basicdsk.h"
 #include "formats/pc_dsk.h"
+#include "formats/mfi_dsk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/am9517a.h"
 #include "machine/ctronics.h"
@@ -19,7 +19,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/pc1512kb.h"
-#include "machine/upd765.h"
+#include "machine/pc_fdc.h"
 #include "machine/ram.h"
 #include "sound/speaker.h"
 #include "video/mc6845.h"
@@ -31,7 +31,7 @@
 #define I8259A2_TAG		"ic109"
 #define I8253_TAG		"ic114"
 #define MC146818_TAG	"ic134"
-#define UPD765AC2_TAG	"ic112"
+#define PC_FDC_XT_TAG	"ic112"
 #define INS8250_TAG		"ic106"
 #define AMS40041_TAG	"ic126"
 #define CENTRONICS_TAG	"centronics"
@@ -49,15 +49,15 @@ public:
 		  m_pic(*this, I8259A2_TAG),
 		  m_pit(*this, I8253_TAG),
 		  m_rtc(*this, MC146818_TAG),
-		  m_fdc(*this, UPD765AC2_TAG),
+		  m_fdc(*this, PC_FDC_XT_TAG),
 		  m_uart(*this, INS8250_TAG),
 		  m_vdu(*this, AMS40041_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_kb(*this, PC1512_KEYBOARD_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1),
+		  m_floppy0(*this, PC_FDC_XT_TAG ":0:525dd" ),
+		  m_floppy1(*this, PC_FDC_XT_TAG ":1:525dd" ),
 		  m_bus(*this, ISA_BUS_TAG),
 		  m_pit1(0),
 		  m_pit2(0),
@@ -84,15 +84,15 @@ public:
 	required_device<device_t> m_pic;
 	required_device<device_t> m_pit;
 	required_device<mc146818_device> m_rtc;
-	required_device<device_t> m_fdc;
+	required_device<pc_fdc_xt_device> m_fdc;
 	required_device<ins8250_device> m_uart;
 	required_device<ams40041_device> m_vdu;
 	required_device<centronics_device> m_centronics;
 	required_device<device_t> m_speaker;
 	required_device<pc1512_keyboard_device> m_kb;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_floppy0;
-	optional_device<device_t> m_floppy1;
+	required_device<floppy_image_device> m_floppy0;
+	optional_device<floppy_image_device> m_floppy1;
 	required_device<isa8_device> m_bus;
 
 	virtual void machine_start();
@@ -234,6 +234,7 @@ public:
 	DECLARE_READ8_MEMBER( iga_r );
 	DECLARE_WRITE8_MEMBER( iga_w );
 	DECLARE_READ8_MEMBER( printer_r );
+	DECLARE_READ8_MEMBER( io_unmapped_r );
 
 	// video state
 	int m_opt;
@@ -247,6 +248,8 @@ public:
 	UINT8 m_crtcar;			// CRT controller address register
 	UINT8 m_crtcdr[32];		// CRT controller data registers
 	UINT8 m_plr;			// Plantronics mode register
+
+	bool test_unmapped;     // Temporary for io_r/unmapped_r combination
 };
 
 // ---------- defined in video/pc1512.c ----------

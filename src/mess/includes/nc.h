@@ -73,6 +73,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nc200_uart_control_w);
 	DECLARE_WRITE8_MEMBER(nc200_memory_card_wait_state_w);
 	DECLARE_WRITE8_MEMBER(nc200_poweroff_control_w);
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
@@ -91,6 +92,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nc200_txrdy_callback);
 	DECLARE_WRITE_LINE_MEMBER(nc200_rxrdy_callback);
 	DECLARE_WRITE_LINE_MEMBER(nc200_fdc_interrupt);
+
+	void nc200_fdc_interrupt(bool state);
 };
 
 

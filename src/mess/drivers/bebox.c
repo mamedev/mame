@@ -18,7 +18,7 @@
 #include "machine/ins8250.h"
 #include "machine/pic8259.h"
 #include "machine/mc146818.h"
-#include "machine/pc_fdc.h"
+#include "machine/upd765.h"
 #include "machine/pci.h"
 #include "machine/8237dma.h"
 #include "machine/pckeybrd.h"
@@ -34,6 +34,7 @@
 #include "machine/scsicd.h"
 #include "machine/scsihd.h"
 #include "imagedev/flopdrv.h"
+#include "formats/mfi_dsk.h"
 #include "formats/pc_dsk.h"
 #include "machine/ram.h"
 
@@ -63,6 +64,7 @@ static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
 	AM_RANGE(0x800003c0, 0x800003cf) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03c0_r, port_03c0_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x800003d0, 0x800003df) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03d0_r, port_03d0_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x800003F0, 0x800003F7) AM_READWRITE(bebox_800003F0_r, bebox_800003F0_w )
+	AM_RANGE(0x800003F0, 0x800003F7) AM_DEVICE8( "smc37c78", smc37c78_device, map, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800003F8, 0x800003FF) AM_DEVREADWRITE8( "ns16550_0",ns16550_device,  ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000480, 0x8000048F) AM_READWRITE8(bebox_80000480_r, bebox_80000480_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000CF8, 0x80000CFF) AM_DEVREADWRITE("pcibus", pci_bus_device, read_64be, write_64be )
@@ -129,18 +131,15 @@ static const struct LSI53C810interface lsi53c810_intf =
 };
 
 
-static const floppy_interface bebox_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(pc),
-	NULL,
+static const floppy_format_type bebox_floppy_formats[] = {
+	FLOPPY_PC_FORMAT,
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( bebox_floppies )
+	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
+SLOT_INTERFACE_END
 
 const struct mpc105_interface mpc105_config =
 {
@@ -209,9 +208,8 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	/*MCFG_PCI_BUS_DEVICE(12, NULL, scsi53c810_pci_read, scsi53c810_pci_write)*/
 
-	MCFG_SMC37C78_ADD("smc37c78", pc_fdc_upd765_connected_1_drive_interface)
-
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, bebox_floppy_interface)
+	MCFG_SMC37C78_ADD("smc37c78")
+	MCFG_FLOPPY_DRIVE_ADD("smc37c78:0", bebox_floppies, "35hd", 0, bebox_floppy_formats)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 

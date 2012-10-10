@@ -96,7 +96,7 @@
 #include "video/cirrus.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/ins8250.h"
-#include "machine/pc_fdc.h"
+#include "machine/upd765.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -451,46 +451,21 @@ const ins8250_interface bebox_uart_inteface_3 =
  *
  *************************************/
 
-static void bebox_fdc_interrupt(running_machine &machine, int state)
+void bebox_state::fdc_interrupt(bool state)
 {
-	bebox_state *drvstate = machine.driver_data<bebox_state>();
-	bebox_set_irq_bit(machine, 13, state);
-	if ( drvstate->m_devices.pic8259_master ) {
-		pic8259_ir6_w(drvstate->m_devices.pic8259_master, state);
+	bebox_set_irq_bit(machine(), 13, state);
+	if ( m_devices.pic8259_master ) {
+		pic8259_ir6_w(m_devices.pic8259_master, state);
 	}
 }
 
 
-static void bebox_fdc_dma_drq(running_machine &machine, int state)
+void bebox_state::fdc_dma_drq(bool state)
 {
-	bebox_state *drvstate = machine.driver_data<bebox_state>();
-	if ( drvstate->m_devices.dma8237_1 ) {
-		i8237_dreq2_w(drvstate->m_devices.dma8237_1, state);
+	if ( m_devices.dma8237_1 ) {
+		i8237_dreq2_w(m_devices.dma8237_1, state);
 	}
 }
-
-
-static device_t *bebox_fdc_get_image(running_machine &machine, int floppy_index)
-{
-	/* the BeBox boot ROM seems to query for floppy #1 when it should be
-     * querying for floppy #0 */
-	return floppy_get_device(machine, 0);
-}
-
-static device_t * bebox_get_device(running_machine &machine )
-{
-	return machine.device("smc37c78");
-}
-
-
-static const struct pc_fdc_interface bebox_fdc_interface =
-{
-	bebox_fdc_interrupt,
-	bebox_fdc_dma_drq,
-	bebox_fdc_get_image,
-	bebox_get_device
-};
-
 
 /*************************************
  *
@@ -563,18 +538,11 @@ WRITE8_MEMBER(bebox_state::bebox_800001F0_w ) { ide_controller_w(ide_device(spac
 
 READ64_MEMBER(bebox_state::bebox_800003F0_r )
 {
-	UINT64 result = read64be_with_read8_handler(pc_fdc_r, space, offset, mem_mask | 0xFFFF);
+	UINT64 result = 0;
 
 	if (((mem_mask >> 8) & 0xFF) == 0)
 	{
-		result &= ~(0xFF << 8);
-		result |= ide_controller_r(ide_device(space.machine()), 0x3F6, 1) << 8;
-	}
-
-	if (((mem_mask >> 0) & 0xFF) == 0)
-	{
-		result &= ~(0xFF << 0);
-		result |= ide_controller_r(ide_device(space.machine()), 0x3F7, 1) << 0;
+		result |= ide_controller_r(space.machine().device("ide"), 0x3F6, 1) << 8;
 	}
 	return result;
 }
@@ -582,13 +550,8 @@ READ64_MEMBER(bebox_state::bebox_800003F0_r )
 
 WRITE64_MEMBER(bebox_state::bebox_800003F0_w )
 {
-	write64be_with_write8_handler(pc_fdc_w, space, offset, data, mem_mask | 0xFFFF);
-
 	if (((mem_mask >> 8) & 0xFF) == 0)
-		ide_controller_w(ide_device(space.machine()), 0x3F6, 1, (data >> 8) & 0xFF);
-
-	if (((mem_mask >> 0) & 0xFF) == 0)
-		ide_controller_w(ide_device(space.machine()), 0x3F7, 1, (data >> 0) & 0xFF);
+		ide_controller_w(space.machine().device("ide"), 0x3F6, 1, (data >> 8) & 0xFF);
 }
 
 
@@ -768,17 +731,17 @@ WRITE8_MEMBER(bebox_state::bebox_dma_write_byte )
 
 
 READ8_MEMBER(bebox_state::bebox_dma8237_fdc_dack_r){
-	return pc_fdc_dack_r(machine(),space);
+	return machine().device<smc37c78_device>("smc37c78")->dma_r();
 }
 
 
 WRITE8_MEMBER(bebox_state::bebox_dma8237_fdc_dack_w){
-	pc_fdc_dack_w( machine(), space, data );
+	machine().device<smc37c78_device>("smc37c78")->dma_w(data);
 }
 
 
 WRITE_LINE_MEMBER(bebox_state::bebox_dma8237_out_eop){
-	pc_fdc_set_tc_state( machine(), state );
+	machine().device<smc37c78_device>("smc37c78")->tc_w(state);
 }
 
 static void set_dma_channel(running_machine &machine, int channel, int state)
@@ -1067,7 +1030,9 @@ void bebox_state::machine_reset()
 
 void bebox_state::machine_start()
 {
-	pc_fdc_init(machine(), &bebox_fdc_interface);
+	smc37c78_device *fdc = machine().device<smc37c78_device>("smc37c78");
+	fdc->setup_intrq_cb(smc37c78_device::line_cb(FUNC(bebox_state::fdc_interrupt), this));
+	fdc->setup_drq_cb(smc37c78_device::line_cb(FUNC(bebox_state::fdc_dma_drq), this));
 }
 
 DRIVER_INIT_MEMBER(bebox_state,bebox)

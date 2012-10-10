@@ -504,6 +504,7 @@ bool d88_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	if(!head_count)
 		return false;
 
+	UINT32 *track_data = global_alloc_array(UINT32, cell_count+10000);
 	UINT32 track_pos[164];
 	io_generic_read(io, track_pos, 32, 164*4);
 
@@ -513,7 +514,6 @@ bool d88_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			if(!pos)
 				continue;
 
-			UINT32 track_data[210000];
 			UINT8 sect_data[65536];
 			int tpos = 0;
 
@@ -541,7 +541,6 @@ bool d88_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 					else
 						gap3 = form_factor == floppy_image::FF_35 ? 84 : 80;
 				}
-
 				int cpos;
 				UINT16 crc;
 				// sync and IDAM and gap 2
@@ -561,7 +560,7 @@ bool d88_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				for(int j=0; j<12; j++) mfm_w(track_data, tpos, 8, 0x00);
 				cpos = tpos;
 				for(int j=0; j< 3; j++) raw_w(track_data, tpos, 16, 0x4489);
-				mfm_w(track_data, tpos, 8, 0xfb);
+				mfm_w(track_data, tpos, 8, hs[7] ? 0xf8 : 0xfb);
 				for(int j=0; j<size; j++) mfm_w(track_data, tpos, 8, sect_data[j]);
 				crc = calc_crc_ccitt(track_data, cpos, tpos);
 				mfm_w(track_data, tpos, 16, crc);
@@ -578,6 +577,7 @@ bool d88_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			generate_track_from_levels(track, head, track_data, cell_count, 0, image);
 		}
 
+	global_free(track_data);
 	return true;
 }
 

@@ -1,4 +1,5 @@
 #include "includes/newbrain.h"
+#include "formats/mfi_dsk.h"
 
 /*
 
@@ -582,12 +583,12 @@ WRITE8_MEMBER( newbrain_eim_state::fdc_auxiliary_w )
 
     */
 
-	floppy_mon_w(m_floppy, !BIT(data, 0));
-	floppy_drive_set_ready_state(m_floppy, 1, 0);
+	m_floppy->mon_w(!BIT(data, 0));
 
-	upd765_reset_w(m_fdc, BIT(data, 1));
+	if(BIT(data, 1))
+		m_fdc->reset();
 
-	upd765_tc_w(m_fdc, BIT(data, 2));
+	m_fdc->tc_w(BIT(data, 2));
 }
 
 READ8_MEMBER( newbrain_eim_state::fdc_control_r )
@@ -1048,8 +1049,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( newbrain_fdc_io_map, AS_IO, 8, newbrain_eim_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD_LEGACY(UPD765_TAG, upd765_status_r)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVICE(UPD765_TAG, upd765a_device, map)
 	AM_RANGE(0x20, 0x20) AM_WRITE(fdc_auxiliary_w)
 	AM_RANGE(0x40, 0x40) AM_READ(fdc_control_r)
 ADDRESS_MAP_END
@@ -1187,15 +1187,6 @@ WRITE_LINE_MEMBER( newbrain_eim_state::fdc_interrupt )
 {
 	m_fdc_int = state;
 }
-
-static const upd765_interface fdc_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, fdc_interrupt),
-	DEVCB_NULL,
-	NULL,
-	UPD765_RDY_PIN_NOT_CONNECTED,
-	{FLOPPY_0,FLOPPY_1, NULL, NULL}
-};
 
 WRITE_LINE_MEMBER( newbrain_eim_state::ctc_z0_w )
 {
@@ -1398,22 +1389,14 @@ static MACHINE_CONFIG_START( newbrain_a, newbrain_state )
 	MCFG_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END
 
-static LEGACY_FLOPPY_OPTIONS_START(newbrain)
-	// 180K img
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface newbrain_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(newbrain),
-	NULL,
+static const floppy_format_type newbrain_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( newbrain_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( newbrain_eim, newbrain_a, newbrain_eim_state )
 	// basic system hardware
@@ -1429,8 +1412,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( newbrain_eim, newbrain_a, newbrain_eim_stat
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_c2", newbrain_eim_state, ctc_c2_tick, attotime::from_hz(XTAL_16MHz/4/13))
 	MCFG_ADC0808_ADD(ADC0809_TAG, 500000, adc_intf)
 	MCFG_ACIA6850_ADD(MC6850_TAG, acia_intf)
-	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(newbrain_floppy_interface)
+	MCFG_UPD765A_ADD(UPD765_TAG, false, true)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", newbrain_floppies, "525dd", 0, newbrain_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", newbrain_floppies, "525dd", 0, newbrain_floppy_formats)
 
 	// internal ram
 	MCFG_RAM_MODIFY(RAM_TAG)

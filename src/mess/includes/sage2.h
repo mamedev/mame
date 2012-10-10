@@ -35,8 +35,8 @@ public:
 		  m_usart1(*this, I8251_1_TAG),
 		  m_fdc(*this, UPD765_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1),
+		  m_floppy0(*this, UPD765_TAG ":0:525dd"),
+		  m_floppy1(*this, UPD765_TAG ":1:525dd"),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_ieee488(*this, IEEE488_TAG),
 		  m_terminal(*this, TERMINAL_TAG),
@@ -51,14 +51,15 @@ public:
 	required_device<device_t> m_pic;
 	required_device<i8251_device> m_usart0;
 	required_device<i8251_device> m_usart1;
-	required_device<device_t> m_fdc;
+	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_floppy0;
-	required_device<device_t> m_floppy1;
+	required_device<floppy_image_device> m_floppy0;
+	required_device<floppy_image_device> m_floppy1;
 	required_device<centronics_device> m_centronics;
 	required_device<ieee488_device> m_ieee488;
 	required_device<generic_terminal_device> m_terminal;
 
+	virtual void machine_start();
 	virtual void machine_reset();
 
 	void update_fdc_int();
@@ -70,12 +71,13 @@ public:
 	DECLARE_WRITE8_MEMBER( ppi0_pc_w );
 	DECLARE_READ8_MEMBER( ppi1_pb_r );
 	DECLARE_WRITE8_MEMBER( ppi1_pc_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_int_w );
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
 
 	DECLARE_DIRECT_UPDATE_MEMBER(sage2_direct_update_handler);
+
+	void fdc_irq(bool state);
 
 	int m_reset;
 

@@ -72,8 +72,6 @@ public:
 	DECLARE_READ8_MEMBER(pcw_system_status_r);
 	DECLARE_READ8_MEMBER(pcw_expansion_r);
 	DECLARE_WRITE8_MEMBER(pcw_expansion_w);
-	DECLARE_READ8_MEMBER(pcw_fdc_r);
-	DECLARE_WRITE8_MEMBER(pcw_fdc_w);
 	DECLARE_WRITE8_MEMBER(pcw_printer_data_w);
 	DECLARE_WRITE8_MEMBER(pcw_printer_command_w);
 	DECLARE_READ8_MEMBER(pcw_printer_data_r);
@@ -106,7 +104,8 @@ public:
 	TIMER_CALLBACK_MEMBER(pcw_pins_callback);
 	TIMER_CALLBACK_MEMBER(setup_beep);
 	TIMER_DEVICE_CALLBACK_MEMBER(pcw_timer_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(pcw_fdc_interrupt);
+
+	void pcw_fdc_interrupt(bool state);
 };
 
 #endif /* PCW_H_ */

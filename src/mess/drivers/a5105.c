@@ -21,13 +21,14 @@ ToDo:
 #include "video/upd7220.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
+#include "formats/mfi_dsk.h"
+#include "formats/a5105_dsk.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
 #include "sound/wave.h"
 #include "sound/beep.h"
-#include "formats/basicdsk.h"
 
 
 
@@ -310,14 +311,13 @@ WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 
 WRITE8_MEMBER( a5105_state::a5105_upd765_w )
 {
-	upd765_tc_w(machine().device("upd765"), BIT(data, 4));
+	machine().device<upd765a_device>("upd765")->tc_w(BIT(data, 4));
 }
 
 static ADDRESS_MAP_START(a5105_io, AS_IO, 8, a5105_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD_LEGACY("upd765", upd765_status_r)
-	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE_LEGACY("upd765", upd765_data_r, upd765_data_w)
+	AM_RANGE(0x40, 0x41) AM_DEVICE("upd765a", upd765a_device, map)
 	AM_RANGE(0x48, 0x4f) AM_WRITE(a5105_upd765_w)
 
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
@@ -520,37 +520,15 @@ static ADDRESS_MAP_START( upd7220_map, AS_0, 8, a5105_state)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
-static LEGACY_FLOPPY_OPTIONS_START(a5105)
-	LEGACY_FLOPPY_OPTION(a5105, "img", "A5105 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([5])
-		SECTOR_LENGTH([1024])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface a5105_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(a5105),
-	"floppy_5_25",
+static const floppy_format_type a5105_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
+	FLOPPY_A5105_FORMAT,
 	NULL
 };
 
-
-static const upd765_interface a5105_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL,
-	UPD765_RDY_PIN_NOT_CONNECTED,
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
+static SLOT_INTERFACE_START( a5105_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
 
 static Z80CTC_INTERFACE( a5105_ctc_intf )
 {
@@ -609,8 +587,11 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 
-	MCFG_UPD765A_ADD("upd765", a5105_interface)
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(a5105_floppy_interface)
+	MCFG_UPD765A_ADD("upd765a", false, true)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", a5105_floppies, "525dd", 0, a5105_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", a5105_floppies, "525dd", 0, a5105_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", a5105_floppies, "525dd", 0, a5105_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", a5105_floppies, "525dd", 0, a5105_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

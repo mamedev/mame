@@ -31,7 +31,7 @@
 */
 
 #include "includes/sage2.h"
-
+#include "formats/mfi_dsk.h"
 
 
 //**************************************************************************
@@ -90,8 +90,7 @@ static ADDRESS_MAP_START( sage2_mem, AS_PROGRAM, 16, sage2_state )
 	AM_RANGE(0xffc030, 0xffc031) AM_DEVREADWRITE8(I8251_1_TAG, i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xffc032, 0xffc033) AM_DEVREADWRITE8(I8251_1_TAG, i8251_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0xffc040, 0xffc043) AM_DEVREADWRITE8_LEGACY(I8259_TAG, pic8259_r, pic8259_w, 0x00ff)
-	AM_RANGE(0xffc050, 0xffc051) AM_DEVREAD8_LEGACY(UPD765_TAG, upd765_status_r, 0x00ff)
-	AM_RANGE(0xffc052, 0xffc053) AM_DEVREADWRITE8_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w, 0x00ff)
+	AM_RANGE(0xffc050, 0xffc053) AM_DEVICE8(UPD765_TAG, upd765a_device, map, 0x00ff)
 	AM_RANGE(0xffc060, 0xffc067) AM_DEVREADWRITE8(I8255A_0_TAG, i8255_device, read, write, 0x00ff) // i8255, Printer
 	AM_RANGE(0xffc070, 0xffc071) AM_DEVREAD8(I8251_0_TAG, i8251_device, data_r, 0x00ff) AM_DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write, 0x00ff)
 //  AM_RANGE(0xffc070, 0xffc071) AM_DEVREADWRITE8(I8251_0_TAG, i8251_device, data_r, data_w, 0x00ff)
@@ -238,10 +237,10 @@ WRITE8_MEMBER( sage2_state::ppi0_pc_w )
     */
 
 	// floppy terminal count
-	upd765_tc_w(m_fdc, BIT(data, 0));
+	m_fdc->tc_w(BIT(data, 0));
 
 	// floppy ready
-	upd765_ready_w(m_fdc, BIT(data, 1));
+	m_fdc->ready_w(BIT(data, 1));
 
 	// floppy interrupt enable
 	m_fdie = BIT(data, 2);
@@ -251,12 +250,20 @@ WRITE8_MEMBER( sage2_state::ppi0_pc_w )
 	m_sl0 = BIT(data, 3);
 	m_sl1 = BIT(data, 4);
 
+	if(m_sl0)
+		m_fdc->set_floppy(m_floppy0);
+	else if(m_sl1)
+		m_fdc->set_floppy(m_floppy1);
+	else
+		m_fdc->set_floppy(NULL);
+
 	// floppy motor
-	floppy_mon_w(m_floppy0, BIT(data, 5));
-	floppy_mon_w(m_floppy1, BIT(data, 5));
+	m_floppy0->mon_w(BIT(data, 5));
+	m_floppy1->mon_w(BIT(data, 5));
 
 	// FDC reset
-	upd765_reset_w(m_fdc, BIT(data, 7));
+	if(BIT(data, 7))
+		m_fdc->reset();
 }
 
 static I8255A_INTERFACE( ppi0_intf )
@@ -294,7 +301,7 @@ READ8_MEMBER( sage2_state::ppi1_pb_r )
 	UINT8 data = 0;
 
 	// floppy interrupt
-	data = upd765_int_r(m_fdc);
+	data = m_fdc->get_irq();
 
 	// floppy write protected
 	if (!m_sl0) data |= floppy_wpt_r(m_floppy0) << 1;
@@ -470,49 +477,30 @@ static const i8251_interface usart1_intf =
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
-static const floppy_interface floppy_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_5_25",
+static const floppy_format_type sage2_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( sage2_floppies )
+	 SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
 
 void sage2_state::update_fdc_int()
 {
 	m_maincpu->set_input_line(M68K_IRQ_6, m_fdie & m_fdc_int);
 }
 
-WRITE_LINE_MEMBER( sage2_state::fdc_int_w )
+void sage2_state::fdc_irq(bool state)
 {
 	m_fdc_int = state;
 	update_fdc_int();
 }
 
-static UPD765_GET_IMAGE( fdc_get_image )
+void sage2_state::machine_start()
 {
-	sage2_state *state = device->machine().driver_data<sage2_state>();
-
-	if (!state->m_sl0) return state->m_floppy0;
-	if (!state->m_sl1) return state->m_floppy1;
-
-	return NULL;
+	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(sage2_state::fdc_irq), this));
 }
-
-static const upd765_interface fdc_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(sage2_state, fdc_int_w),
-	DEVCB_NULL,
-	fdc_get_image,
-	UPD765_RDY_PIN_NOT_CONNECTED,
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
-
 
 //-------------------------------------------------
 //  centronics_interface centronics_intf
@@ -606,9 +594,10 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 	MCFG_PIT8253_ADD(I8253_1_TAG, pit1_intf)
 	MCFG_I8251_ADD(I8251_0_TAG, usart0_intf)
 	MCFG_I8251_ADD(I8251_1_TAG, usart1_intf)
-	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
+	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sage2_floppies, "525dd", 0, sage2_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", sage2_floppies, "525dd", 0, sage2_floppy_formats)
 	MCFG_IEEE488_BUS_ADD(ieee488_intf)
 
 	// internal ram

@@ -51,8 +51,8 @@ public:
 		  m_epci(*this, SCN2661_TAG),
 		  m_fdc(*this, UPD765_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1),
+		  m_floppy0(*this, UPD765_TAG ":0:525dd"),
+		  m_floppy1(*this, UPD765_TAG ":1:525dd"),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_kb(*this, WANGPC_KEYBOARD_TAG),
 		  m_bus(*this, WANGPC_BUS_TAG),
@@ -82,10 +82,10 @@ public:
 	required_device<device_t> m_pit;
 	required_device<im6402_device> m_uart;
 	required_device<mc2661_device> m_epci;
-	required_device<device_t> m_fdc;
+	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;
-	required_device<legacy_floppy_image_device> m_floppy0;
-	required_device<legacy_floppy_image_device> m_floppy1;
+	required_device<floppy_image_device> m_floppy0;
+	required_device<floppy_image_device> m_floppy1;
 	required_device<centronics_device> m_centronics;
 	required_device<wangpc_keyboard_device> m_kb;
 	required_device<wangpcbus_device> m_bus;
@@ -161,14 +161,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( uart_dr_w );
 	DECLARE_WRITE_LINE_MEMBER( uart_tbre_w );
 	DECLARE_WRITE_LINE_MEMBER( epci_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_int_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
 	DECLARE_WRITE_LINE_MEMBER( busy_w );
 	DECLARE_WRITE_LINE_MEMBER( bus_irq2_w );
 
-	static void on_disk0_change(device_image_interface &image);
-	static void on_disk1_change(device_image_interface &image);
+	void fdc_irq(bool state);
+	void fdc_drq(bool state);
+
+	int on_disk0_load(floppy_image_device *image);
+	void on_disk0_unload(floppy_image_device *image);
+	int on_disk1_load(floppy_image_device *image);
+	void on_disk1_unload(floppy_image_device *image);
 
 	UINT8 m_dma_page[4];
 	int m_dack;

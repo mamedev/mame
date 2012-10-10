@@ -6,7 +6,6 @@
 #include "emu.h"
 #include "machine/iq151cart.h"
 #include "machine/upd765.h"
-#include "formats/basicdsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -39,7 +38,7 @@ protected:
 
 private:
 
-	required_device<device_t>	m_fdc;
+	required_device<upd765a_device>	m_fdc;
 	UINT8 *		m_rom;
 	bool		m_rom_enabled;
 };

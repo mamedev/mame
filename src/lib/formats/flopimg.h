@@ -683,10 +683,12 @@ public:
 	void set_write_splice_position(int track, int head, UINT32 pos) { write_splice[track][head] = pos; }
 	//! @return the current write splice position.
 	UINT32 get_write_splice_position(int track, int head) const { return write_splice[track][head]; }
-	//! @return the maximal geometry supported by thie format.
+	//! @return the maximal geometry supported by this format.
 	void get_maximal_geometry(int &tracks, int &heads);
+
 	//! @return the current geometry of the loaded image.
 	void get_actual_geometry(int &tracks, int &heads);
+
 	//! Returns the variant name for the particular disk form factor/variant
 	//! @param form_factor
 	//! @param variant

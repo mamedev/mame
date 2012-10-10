@@ -1047,7 +1047,9 @@ const char *floppy_image::get_variant_name(UINT32 form_factor, UINT32 variant)
 	switch(variant) {
 	case SSSD: return "Single side, single density";
 	case SSDD: return "Single side, double density";
+	case SSQD: return "Single side, quad density";
 	case DSDD: return "Double side, double density";
+	case DSQD: return "Double side, quad density";
 	case DSHD: return "Double side, high density";
 	case DSED: return "Double side, extended density";
 	}
@@ -1569,6 +1571,7 @@ void floppy_image_format_t::generate_track_from_levels(int track, int head, UINT
 
 		case MG_W:
 			throw emu_fatalerror("Weak bits not yet handled, track %d head %d\n", track, head);
+
 		case MG_0:
 		case floppy_image::MG_N:
 		case floppy_image::MG_D:
@@ -2202,8 +2205,8 @@ void floppy_image_format_t::extract_sectors_from_bitstream_mfm_pc(const UINT8 *b
 					idblk[idblk_count++] = pos;
 				i = pos-1;
 			}
-			// fa, fb, fc, fd
-			if(header == 0x5544 || header == 0x5545 || header == 0x5553 || header == 0x5551) {
+			// f8, f9, fa, fb
+			if(header == 0x554a || header == 0x5549 || header == 0x5544 || header == 0x5545) {
 				if(dblk_count < 100)
 					dblk[dblk_count++] = pos;
 				i = pos-1;
@@ -2229,13 +2232,14 @@ void floppy_image_format_t::extract_sectors_from_bitstream_mfm_pc(const UINT8 *b
 			continue;
 
 		// Start of IDAM and DAM are supposed to be exactly 704 cells
-		// apart.  Of course the hardware is tolerant.  Accept +/- 128
-		// cells of shift.
+		// apart in normal format or 1008 cells apart in perpendicular
+		// format.  Of course the hardware is tolerant.  Accept +/-
+		// 128 cells of shift.
 
 		int d_index;
 		for(d_index = 0; d_index < dblk_count; d_index++) {
 			int delta = dblk[d_index] - idblk[i];
-			if(delta >= 704-128 && delta <= 704+128)
+			if(delta >= 704-128 && delta <= 1008+128)
 				break;
 		}
 		if(d_index == dblk_count)

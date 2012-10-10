@@ -104,6 +104,7 @@
 #include "machine/upd765.h"		/* for NC200 disk drive interface */
 #include "imagedev/flopdrv.h"	/* for NC200 disk image */
 #include "formats/pc_dsk.h"		/* for NC200 disk image */
+#include "formats/mfi_dsk.h"
 #include "imagedev/cartslot.h"
 #include "sound/beep.h"
 #include "machine/ram.h"
@@ -1257,7 +1258,7 @@ static const i8251_interface nc200_uart_interface=
 };
 
 
-WRITE_LINE_MEMBER(nc_state::nc200_fdc_interrupt)
+void nc_state::nc200_fdc_interrupt(bool state)
 {
 #if 0
     m_irq_latch &=~(1<<5);
@@ -1276,15 +1277,6 @@ WRITE_LINE_MEMBER(nc_state::nc200_fdc_interrupt)
 
     nc_update_interrupts(machine());
 }
-
-static const upd765_interface nc200_upd765_interface=
-{
-    DEVCB_DRIVER_LINE_MEMBER(nc_state,nc200_fdc_interrupt),
-    DEVCB_NULL,
-    NULL,
-    UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0, NULL, NULL, NULL }
-};
 
 #ifdef UNUSED_FUNCTION
 static void nc200_floppy_drive_index_callback(int drive_id)
@@ -1339,6 +1331,7 @@ MACHINE_START_MEMBER(nc_state,nc200)
 
 	/* serial timer */
 	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_serial_timer_callback),this));
+	machine().device<upd765a_device>("upd765")->setup_intrq_cb(upd765a_device::line_cb(FUNC(nc_state::nc200_fdc_interrupt), this));
 }
 
 /*
@@ -1432,13 +1425,13 @@ WRITE8_MEMBER(nc_state::nc200_uart_control_w)
 
 WRITE8_MEMBER(nc_state::nc200_memory_card_wait_state_w)
 {
-	device_t *fdc = machine().device("upd765");
+	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
 	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n", machine().device("maincpu")->safe_pc(), data));
 #if 0
 	floppy_drive_set_motor_state(0, 1);
 	floppy_drive_set_ready_state(0, 1, 1);
 #endif
-	upd765_tc_w(fdc, (data & 0x01));
+	fdc->tc_w(data & 0x01);
 }
 
 /* bit 2: backlight: 1=off, 0=on */
@@ -1468,8 +1461,7 @@ static ADDRESS_MAP_START(nc200_io, AS_IO, 8, nc_state )
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("uart",i8251_device, data_r, data_w)
 	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE("mc", mc146818_device, read, write)
-	AM_RANGE(0xe0, 0xe0) AM_DEVREAD_LEGACY("upd765", upd765_status_r)
-	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE_LEGACY("upd765",upd765_data_r, upd765_data_w)
+	AM_RANGE(0xe0, 0xe1) AM_DEVICE("upd765", upd765a_device, map)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(nc200)
@@ -1636,18 +1628,15 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", nc_state, dummy_timer_callback, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
-static const floppy_interface nc200_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(pc),
-	NULL,
+static const floppy_format_type ibmpc_floppy_formats[] = {
+	FLOPPY_PC_FORMAT,
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( ibmpc_floppies )
+	 SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 
@@ -1674,9 +1663,9 @@ static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 	/* no rtc */
 	MCFG_DEVICE_REMOVE("rtc")
 
-	MCFG_UPD765A_ADD("upd765", nc200_upd765_interface)
-
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, nc200_floppy_interface)
+	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
 	MCFG_MC146818_ADD( "mc", MC146818_STANDARD )
 

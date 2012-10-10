@@ -41,6 +41,7 @@
 #include "video/upd7220.h"
 #include "machine/upd765.h"
 #include "machine/ram.h"
+#include "formats/mfi_dsk.h"
 
 #define MAIN_CLK	15974400
 
@@ -75,7 +76,7 @@ public:
 	required_device<i8255_device> m_ppi;
 	required_device<i8237_device> m_dma_1;
 	required_device<i8237_device> m_dma_2;
-	required_device<device_t> m_fdc;
+	required_device<upd765a_device> m_fdc;
 	required_device<upd7220_device> m_hgdc;
 	required_device<mc146818_device> m_rtc;
 	UINT8 m_vram_bank;
@@ -91,8 +92,10 @@ public:
 	DECLARE_WRITE8_MEMBER( qx10_18_w );
 	DECLARE_WRITE8_MEMBER( prom_sel_w );
 	DECLARE_WRITE8_MEMBER( cmos_sel_w );
-	DECLARE_WRITE_LINE_MEMBER( qx10_upd765_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
+	void qx10_upd765_interrupt(bool state);
+	void drq_w(bool state);
+	DECLARE_READ8_MEMBER( fdc_dma_r );
+	DECLARE_WRITE8_MEMBER( fdc_dma_w );
 	DECLARE_WRITE8_MEMBER( fdd_motor_w );
 	DECLARE_READ8_MEMBER( qx10_30_r );
 	DECLARE_READ8_MEMBER( gdc_dack_r );
@@ -267,6 +270,17 @@ void qx10_state::update_memory_mapping()
 	}
 }
 
+READ8_MEMBER( qx10_state::fdc_dma_r )
+{
+	return m_fdc->dma_r();
+}
+
+WRITE8_MEMBER( qx10_state::fdc_dma_w )
+{
+	m_fdc->dma_w(data);
+}
+
+
 WRITE8_MEMBER( qx10_state::qx10_18_w )
 {
 	m_membank = (data >> 4) & 0x0f;
@@ -289,63 +303,49 @@ WRITE8_MEMBER( qx10_state::cmos_sel_w )
     FDD
 */
 
-static const floppy_interface qx10_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
+static const floppy_format_type qx10_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
 
-WRITE_LINE_MEMBER( qx10_state::qx10_upd765_interrupt )
+static SLOT_INTERFACE_START( qx10_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
+
+void qx10_state::qx10_upd765_interrupt(bool state)
 {
 	m_fdcint = state;
 
 	//logerror("Interrupt from upd765: %d\n", state);
 	// signal interrupt
 	pic8259_ir6_w(m_pic_m, state);
-};
+}
 
-WRITE_LINE_MEMBER( qx10_state::drq_w )
+void qx10_state::drq_w(bool state)
 {
 	i8237_dreq0_w(m_dma_1, !state);
 }
-
-static const struct upd765_interface qx10_upd765_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(qx10_state, qx10_upd765_interrupt),
-	DEVCB_DRIVER_LINE_MEMBER(qx10_state, drq_w),
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0,FLOPPY_1, NULL, NULL}
-};
 
 WRITE8_MEMBER( qx10_state::fdd_motor_w )
 {
 	m_fdcmotor = 1;
 
-	floppy_mon_w(floppy_get_device(machine(), 0), CLEAR_LINE);
-	floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1,1);
+	machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(false);
 	// motor off controlled by clock
-};
+}
 
 READ8_MEMBER( qx10_state::qx10_30_r )
 {
-	floppy_image_legacy *floppy1,*floppy2;
+	floppy_image_device *floppy1,*floppy2;
 
-	floppy1 = flopimg_get_image(floppy_get_device(machine(), 0));
-	floppy2 = flopimg_get_image(floppy_get_device(machine(), 1));
+	floppy1 = machine().device<floppy_connector>("upd765:0")->get_device();
+	floppy2 = machine().device<floppy_connector>("upd765:1")->get_device();
 
 	return m_fdcint |
 		   /*m_fdcmotor*/ 0 << 1 |
 		   ((floppy1 != NULL) || (floppy2 != NULL) ? 1 : 0) << 3 |
 		   m_membank << 4;
-};
+}
 
 /*
     DMA8237
@@ -371,7 +371,7 @@ WRITE8_MEMBER( qx10_state::gdc_dack_w )
 WRITE_LINE_MEMBER( qx10_state::tc_w )
 {
 	/* floppy terminal count */
-	upd765_tc_w(m_fdc, !state);
+	m_fdc->tc_w(!state);
 }
 
 /*
@@ -389,8 +389,8 @@ static I8237_INTERFACE( qx10_dma8237_1_interface )
 	DEVCB_DRIVER_LINE_MEMBER(qx10_state, tc_w),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
-	{ DEVCB_DEVICE_HANDLER("upd765", upd765_dack_r), DEVCB_DRIVER_MEMBER(qx10_state, gdc_dack_r),/*DEVCB_DEVICE_HANDLER("upd7220", upd7220_dack_r)*/ DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_DEVICE_HANDLER("upd765", upd765_dack_w), DEVCB_DRIVER_MEMBER(qx10_state, gdc_dack_w),/*DEVCB_DEVICE_HANDLER("upd7220", upd7220_dack_w)*/ DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_DRIVER_MEMBER(qx10_state, fdc_dma_r), DEVCB_DRIVER_MEMBER(qx10_state, gdc_dack_r),/*DEVCB_DEVICE_HANDLER("upd7220", upd7220_dack_r)*/ DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_DRIVER_MEMBER(qx10_state, fdc_dma_w), DEVCB_DRIVER_MEMBER(qx10_state, gdc_dack_w),/*DEVCB_DEVICE_HANDLER("upd7220", upd7220_dack_w)*/ DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
@@ -431,17 +431,17 @@ static I8255_INTERFACE(qx10_i8255_interface)
 READ8_MEMBER( qx10_state::mc146818_data_r )
 {
 	return m_rtc->read(space, m_mc146818_offset);
-};
+}
 
 WRITE8_MEMBER( qx10_state::mc146818_data_w )
 {
 	m_rtc->write(space, m_mc146818_offset, data);
-};
+}
 
 WRITE8_MEMBER( qx10_state::mc146818_offset_w )
 {
 	m_mc146818_offset = data;
-};
+}
 
 /*
     UPD7201
@@ -675,8 +675,7 @@ static ADDRESS_MAP_START( qx10_io , AS_IO, 8, qx10_state)
 	AM_RANGE(0x2c, 0x2c) AM_READ_PORT("CONFIG")
 	AM_RANGE(0x2d, 0x2d) AM_READWRITE(vram_bank_r,vram_bank_w)
 	AM_RANGE(0x30, 0x33) AM_READWRITE(qx10_30_r, fdd_motor_w)
-	AM_RANGE(0x34, 0x34) AM_DEVREAD_LEGACY("upd765", upd765_status_r)
-	AM_RANGE(0x35, 0x35) AM_DEVREADWRITE_LEGACY("upd765", upd765_data_r, upd765_data_w)
+	AM_RANGE(0x34, 0x35) AM_DEVICE("upd765", upd765a_device, map)
 	AM_RANGE(0x38, 0x39) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
 //  AM_RANGE(0x3a, 0x3a) GDC zoom
 //  AM_RANGE(0x3b, 0x3b) GDC light pen req
@@ -903,6 +902,8 @@ INPUT_PORTS_END
 void qx10_state::machine_start()
 {
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(qx10_state::qx10_upd765_interrupt), this));
+	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(qx10_state::drq_w), this));
 }
 
 void qx10_state::machine_reset()
@@ -1034,8 +1035,9 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
 	MCFG_UPD7220_ADD("upd7220", MAIN_CLK/4, hgdc_intf, upd7220_map)
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
-	MCFG_UPD765A_ADD("upd765", qx10_upd765_interface)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(qx10_floppy_interface)
+	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", qx10_floppies, "525hd", 0, qx10_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", qx10_floppies, "525hd", 0, qx10_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

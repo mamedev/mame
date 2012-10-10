@@ -23,7 +23,7 @@
 */
 
 #include "includes/prof80.h"
-
+#include "formats/mfi_dsk.h"
 
 
 //**************************************************************************
@@ -101,10 +101,10 @@ void prof80_state::bankswitch()
 
 void prof80_state::floppy_motor_off()
 {
-	floppy_mon_w(m_floppy0, 1);
-	floppy_mon_w(m_floppy1, 1);
-	floppy_drive_set_ready_state(m_floppy0, 0, 1);
-	floppy_drive_set_ready_state(m_floppy1, 0, 1);
+	if(m_floppy0)
+		m_floppy0->mon_w(true);
+	if(m_floppy1)
+		m_floppy1->mon_w(true);
 
 	m_motor = 0;
 }
@@ -135,7 +135,7 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 		break;
 
 	case 3:	// READY
-		upd765_ready_w(m_fdc, fa);
+		m_fdc->ready_w(fa);
 		break;
 
 	case 4: // TCK
@@ -157,10 +157,10 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 		else
 		{
 			// turn on floppy motor
-			floppy_mon_w(m_floppy0, 0);
-			floppy_mon_w(m_floppy1, 0);
-			floppy_drive_set_ready_state(m_floppy0, 1, 1);
-			floppy_drive_set_ready_state(m_floppy1, 1, 1);
+			if(m_floppy0)
+				m_floppy0->mon_w(false);
+			if(m_floppy1)
+				m_floppy1->mon_w(false);
 
 			m_motor = 1;
 
@@ -176,7 +176,7 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 	switch (sb)
 	{
 	case 0: // RESF
-		if (fb) upd765_reset(m_fdc, 0);
+		if (fb) m_fdc->reset();
 		break;
 
 	case 1: // MINI
@@ -272,7 +272,11 @@ READ8_MEMBER( prof80_state::status_r )
 	data |= 0x10;
 
 	// floppy index
-	data |= (m_fdc_index << 5);
+	if(m_floppy0)
+		data |= m_floppy0->idx_r() << 5;
+
+	if(m_floppy1)
+		data |= m_floppy1->idx_r() << 5;
 
 	return data;
 }
@@ -404,8 +408,7 @@ static ADDRESS_MAP_START( prof80_io, AS_IO, 8, prof80_state )
 	AM_RANGE(0xd8, 0xd8) AM_MIRROR(0xff00) AM_WRITE(flr_w)
 	AM_RANGE(0xda, 0xda) AM_MIRROR(0xff00) AM_READ(status_r)
 	AM_RANGE(0xdb, 0xdb) AM_MIRROR(0xff00) AM_READ(status2_r)
-	AM_RANGE(0xdc, 0xdc) AM_MIRROR(0xff00) AM_DEVREAD_LEGACY(UPD765_TAG, upd765_status_r)
-	AM_RANGE(0xdd, 0xdd) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w)
+	AM_RANGE(0xdc, 0xdd) AM_MIRROR(0xff00) AM_DEVICE(UPD765_TAG, upd765a_device, map)
 	AM_RANGE(0xde, 0xde) AM_MIRROR(0xff01) AM_MASK(0xff00) AM_WRITE(par_w)
 ADDRESS_MAP_END
 
@@ -504,32 +507,14 @@ static UPD1990A_INTERFACE( rtc_intf )
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( prof80_state::floppy_index_w )
-{
-	m_fdc_index = state;
-}
-
-static const floppy_interface floppy_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(prof80_state, floppy_index_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
+static const floppy_format_type prof80_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
 
-static const struct upd765_interface fdc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL,
-	UPD765_RDY_PIN_NOT_CONNECTED,
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
+static SLOT_INTERFACE_START( prof80_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
@@ -637,8 +622,9 @@ static MACHINE_CONFIG_START( prof80, prof80_state )
 
 	// devices
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, rtc_intf)
-	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
+	MCFG_UPD765A_ADD(UPD765_TAG, false, true)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", prof80_floppies, "525hd", 0, prof80_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", prof80_floppies, "525hd", 0, prof80_floppy_formats)
 
 	// ECB bus
 	MCFG_ECBBUS_ADD(Z80_TAG, ecb_intf)

@@ -140,8 +140,6 @@ public:
 	DECLARE_WRITE8_MEMBER(apollo_dma_write_word);
 	DECLARE_WRITE8_MEMBER(apollo_rtc_w);
 	DECLARE_READ8_MEMBER(apollo_rtc_r);
-	DECLARE_WRITE8_MEMBER(apollo_fdc_w);
-	DECLARE_READ8_MEMBER(apollo_fdc_r);
 	DECLARE_WRITE8_MEMBER(cache_control_register_w);
 	DECLARE_READ8_MEMBER(cache_status_register_r);
 	DECLARE_WRITE8_MEMBER(task_alias_register_w);
@@ -184,6 +182,9 @@ public:
 	virtual void machine_reset();
 	DECLARE_MACHINE_RESET(apollo);
 	DECLARE_MACHINE_START(apollo);
+
+	void fdc_interrupt(bool state);
+	void fdc_dma_drq(bool state);
 };
 
 MACHINE_CONFIG_EXTERN( apollo );

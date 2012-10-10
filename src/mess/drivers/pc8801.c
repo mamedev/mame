@@ -244,7 +244,8 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
-#include "imagedev/cassette.h"
+#include "formats/mfi_dsk.h"
+#include "formats/d88_dsk.h"
 #include "machine/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/upd1990a.h"
@@ -438,6 +439,7 @@ public:
 	void pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,
 	                       UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int width, UINT8 non_special);
 	void draw_text(bitmap_ind16 &bitmap,int y_size, UINT8 width);
+	void fdc_irq_w(bool state);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -1887,24 +1889,23 @@ TIMER_CALLBACK_MEMBER(pc8801_state::pc8801fd_upd765_tc_to_zero)
 {
 
 	//printf("0\n");
-	upd765_tc_w(machine().device("upd765"), 0);
+	machine().device<upd765a_device>("upd765")->tc_w(false);
 }
 
 WRITE8_MEMBER(pc8801_state::upd765_mc_w)
 {
-	floppy_mon_w(floppy_get_device(machine(), 0), (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-	floppy_mon_w(floppy_get_device(machine(), 1), (data & 2) ? CLEAR_LINE : ASSERT_LINE);
-	floppy_drive_set_ready_state(floppy_get_device(machine(), 0), (data & 1), 0);
-	floppy_drive_set_ready_state(floppy_get_device(machine(), 1), (data & 2), 0);
+	machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(!(data & 1));
+	machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(!(data & 2));
 }
 
 READ8_MEMBER(pc8801_state::upd765_tc_r)
 {
 	//printf("%04x 1\n",m_fdccpu->pc());
 
-	upd765_tc_w(machine().device("upd765"), 1);
-	 //TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.
-	machine().scheduler().timer_set(attotime::from_usec(750), timer_expired_delegate(FUNC(pc8801_state::pc8801fd_upd765_tc_to_zero),this));
+	machine().device<upd765a_device>("upd765")->tc_w(true);
+	//TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.
+	//OTOH, 50 seems more than enough for the new upd...
+	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(pc8801_state::pc8801fd_upd765_tc_to_zero),this));
 	return 0xff; // value is meaningless
 }
 
@@ -1916,10 +1917,11 @@ WRITE8_MEMBER(pc8801_state::fdc_irq_vector_w)
 
 WRITE8_MEMBER(pc8801_state::fdc_drive_mode_w)
 {
-	if(data & 5)
-		printf("drive 0 sets up %s floppy format\n",data & 1 ? "2hd" : "2dd");
-	if(data & 0xa)
-		printf("drive 1 sets up %s floppy format\n",data & 2 ? "2hd" : "2dd");
+	logerror("FDC drive mode %02x\n", data);
+	machine().device<floppy_connector>("upd765:0")->get_device()->set_rpm(data & 0x01 ? 360 : 300);
+	machine().device<floppy_connector>("upd765:1")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
+
+	machine().device<upd765a_device>("upd765")->set_rate(data & 0x20 ? 500000 : 250000);
 }
 
 static ADDRESS_MAP_START( pc8801fdc_io, AS_IO, 8, pc8801_state )
@@ -1928,8 +1930,7 @@ static ADDRESS_MAP_START( pc8801fdc_io, AS_IO, 8, pc8801_state )
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(fdc_drive_mode_w) // Drive mode, 2d, 2dd, 2hd
 	AM_RANGE(0xf7, 0xf7) AM_WRITENOP // printer port output
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(upd765_tc_r,upd765_mc_w) // (R) Terminal Count Port (W) Motor Control Port
-	AM_RANGE(0xfa, 0xfa) AM_DEVREAD_LEGACY("upd765", upd765_status_r )
-	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE_LEGACY("upd765", upd765_data_r, upd765_data_w )
+	AM_RANGE(0xfa, 0xfb) AM_DEVICE("upd765", upd765a_device, map )
 	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("d8255_slave", i8255_device, read, write)
 ADDRESS_MAP_END
 
@@ -2261,18 +2262,16 @@ static UPD1990A_INTERFACE( pc8801_upd1990a_intf )
 
 /* Floppy Configuration */
 
-static const floppy_interface pc88_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_5_25",
+
+static const floppy_format_type pc88_floppy_formats[] = {
+	FLOPPY_D88_FORMAT,
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
+
+static SLOT_INTERFACE_START( pc88_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
 
 /* Cassette Configuration */
 
@@ -2433,6 +2432,11 @@ void pc8801_state::machine_start()
 {
 
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pc8801_irq_callback);
+	machine().device<upd765a_device>("upd765")->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc8801_state::fdc_irq_w), this));
+
+	machine().device<floppy_connector>("upd765:0")->get_device()->set_rpm(300);
+	machine().device<floppy_connector>("upd765:1")->get_device()->set_rpm(300);
+	machine().device<upd765a_device>("upd765")->set_rate(250000);
 
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
@@ -2563,14 +2567,10 @@ void pc8801_state::palette_init()
 		palette_set_color_rgb(machine(), i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
-static const struct upd765_interface pc8801_upd765_interface =
+void pc8801_state::fdc_irq_w(bool state)
 {
-	DEVCB_CPU_INPUT_LINE("fdccpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL, //DRQ, TODO
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
+	m_fdccpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+}
 
 /* YM2203 Interface */
 
@@ -2682,7 +2682,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_I8255_ADD( "d8255_master", master_fdd_intf )
 	MCFG_I8255_ADD( "d8255_slave", slave_fdd_intf )
 
-	MCFG_UPD765A_ADD("upd765", pc8801_upd765_interface)
+	MCFG_UPD765A_ADD("upd765", true, true)
 	#ifdef USE_PROPER_I8214
 	MCFG_I8214_ADD(I8214_TAG, MASTER_CLOCK, pic_intf)
 	#endif
@@ -2693,7 +2693,8 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 
 	MCFG_I8251_ADD(I8251_TAG, uart_intf)
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(pc88_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88_floppies, "525hd", 0, pc88_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88_floppies, "525hd", 0, pc88_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc8801_flop")
 
 	/* video hardware */

@@ -95,13 +95,14 @@ TODO:
 /* Components */
 #include "machine/pc_lpt.h"		/* PC-Parallel Port */
 #include "machine/pckeybrd.h"	/* PC-AT keyboard */
-#include "machine/pc_fdc.h"		/* change to superio later */
+#include "machine/upd765.h"		/* FDC superio */
 #include "machine/ins8250.h"	/* pc com port */
 #include "sound/beep.h"			/* pcw/pcw16 beeper */
 #include "machine/intelfsh.h"
 
 /* Devices */
-#include "formats/pc_dsk.h"		/* pc disk images */
+#include "formats/pc_dsk.h"
+#include "formats/mfi_dsk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 
@@ -742,14 +743,13 @@ WRITE8_MEMBER(pcw16_state::rtc_year_w)
 }
 
 
-static void pcw16_trigger_fdc_int(running_machine &machine)
+void pcw16_state::trigger_fdc_int()
 {
-	pcw16_state *drvstate = machine.driver_data<pcw16_state>();
 	int state;
 
-	state = drvstate->m_system_status & (1<<6);
+	state = m_system_status & (1<<6);
 
-	switch (drvstate->m_fdc_int_code)
+	switch (m_fdc_int_code)
 	{
 		/* nmi */
 		case 0:
@@ -760,13 +760,13 @@ static void pcw16_trigger_fdc_int(running_machine &machine)
             is cleared this will not cause another nmi */
 			/* I'll emulate it like this to be sure */
 
-			if (state!=drvstate->m_previous_fdc_int_state)
+			if (state!=m_previous_fdc_int_state)
 			{
 				if (state)
 				{
 					/* I'll pulse it because if I used hold-line I'm not sure
                     it would clear - to be checked */
-					machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+					machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 				}
 			}
 		}
@@ -775,7 +775,7 @@ static void pcw16_trigger_fdc_int(running_machine &machine)
 		/* attach fdc to int */
 		case 1:
 		{
-			drvstate->pcw16_refresh_ints();
+			pcw16_refresh_ints();
 		}
 		break;
 
@@ -784,7 +784,7 @@ static void pcw16_trigger_fdc_int(running_machine &machine)
 			break;
 	}
 
-	drvstate->m_previous_fdc_int_state = state;
+	m_previous_fdc_int_state = state;
 }
 
 READ8_MEMBER(pcw16_state::pcw16_system_status_r)
@@ -854,14 +854,14 @@ WRITE8_MEMBER(pcw16_state::pcw16_system_control_w)
 		/* set terminal count */
 		case 0x05:
 		{
-			pc_fdc_set_tc_state(machine(), 1);
+			machine().device<pc_fdc_superio_device>("fdc")->tc_w(true);
 		}
 		break;
 
 		/* clear terminal count */
 		case 0x06:
 		{
-			pc_fdc_set_tc_state(machine(), 0);
+			machine().device<pc_fdc_superio_device>("fdc")->tc_w(false);
 		}
 		break;
 
@@ -907,70 +907,17 @@ WRITE8_MEMBER(pcw16_state::pcw16_system_control_w)
 	}
 }
 
-/**** SUPER I/O connections */
-
-/* write to Super I/O chip. FDC Data Rate. */
-WRITE8_MEMBER(pcw16_state::pcw16_superio_fdc_datarate_w)
+void pcw16_state::fdc_interrupt(bool state)
 {
-	pc_fdc_w(space, PC_FDC_DATA_RATE_REGISTER,data);
-}
-
-/* write to Super I/O chip. FDC Digital output register */
-WRITE8_MEMBER(pcw16_state::pcw16_superio_fdc_digital_output_register_w)
-{
-	pc_fdc_w(space, PC_FDC_DIGITAL_OUTPUT_REGISTER, data);
-}
-
-/* write to Super I/O chip. FDC Data Register */
-WRITE8_MEMBER(pcw16_state::pcw16_superio_fdc_data_w)
-{
-	pc_fdc_w(space, PC_FDC_DATA_REGISTER, data);
-}
-
-/* write to Super I/O chip. FDC Data Register */
-READ8_MEMBER(pcw16_state::pcw16_superio_fdc_data_r)
-{
-	return pc_fdc_r(space, PC_FDC_DATA_REGISTER);
-}
-
-/* write to Super I/O chip. FDC Main Status Register */
-READ8_MEMBER(pcw16_state::pcw16_superio_fdc_main_status_register_r)
-{
-	return pc_fdc_r(space, PC_FDC_MAIN_STATUS_REGISTER);
-}
-
-READ8_MEMBER(pcw16_state::pcw16_superio_fdc_digital_input_register_r)
-{
-	return pc_fdc_r(space, PC_FDC_DIGITIAL_INPUT_REGISTER);
-}
-
-static void pcw16_fdc_interrupt(running_machine &machine, int state)
-{
-	pcw16_state *drvstate = machine.driver_data<pcw16_state>();
 	/* IRQ6 */
 	/* bit 6 of PCW16 system status indicates floppy ints */
-	drvstate->m_system_status &= ~(1<<6);
-
 	if (state)
-	{
-		drvstate->m_system_status |= (1<<6);
-	}
+		m_system_status |= (1<<6);
+	else
+		m_system_status &= ~(1<<6);
 
-	pcw16_trigger_fdc_int(machine);
+	trigger_fdc_int();
 }
-
-static device_t * pcw16_get_device(running_machine &machine)
-{
-	return machine.device("upd765");
-}
-
-static const struct pc_fdc_interface pcw16_fdc_interface=
-{
-	pcw16_fdc_interrupt,
-	NULL,
-	NULL,
-	pcw16_get_device
-};
 
 
 WRITE_LINE_MEMBER(pcw16_state::pcw16_com_interrupt_1)
@@ -1024,15 +971,21 @@ static const ins8250_interface pcw16_com_interface[2]=
 	}
 };
 
+static const floppy_format_type pcw16_floppy_formats[] = {
+	FLOPPY_PC_FORMAT,
+	FLOPPY_MFI_FORMAT,
+	NULL
+};
+
+static SLOT_INTERFACE_START( pcw16_floppies )
+	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
+SLOT_INTERFACE_END
 
 
 static ADDRESS_MAP_START(pcw16_io, AS_IO, 8, pcw16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* super i/o chip */
-	AM_RANGE(0x01a, 0x01a) AM_WRITE(pcw16_superio_fdc_digital_output_register_w)
-    AM_RANGE(0x01c, 0x01c) AM_READ(pcw16_superio_fdc_main_status_register_r)
-	AM_RANGE(0x01d, 0x01d) AM_READWRITE(pcw16_superio_fdc_data_r, pcw16_superio_fdc_data_w)
-	AM_RANGE(0x01f, 0x01f) AM_READWRITE(pcw16_superio_fdc_digital_input_register_r, pcw16_superio_fdc_datarate_w)
+	AM_RANGE(0x018, 0x01f) AM_DEVICE("fdc", pc_fdc_superio_device, map)
 	AM_RANGE(0x020, 0x027) AM_DEVREADWRITE("ns16550_1", ns16550_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x028, 0x02f) AM_DEVREADWRITE("ns16550_2", ns16550_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x038, 0x03a) AM_DEVREADWRITE_LEGACY("lpt", pc_lpt_r, pc_lpt_w)
@@ -1058,7 +1011,7 @@ void pcw16_state::machine_reset()
 	/* initialise defaults */
 	m_fdc_int_code = 2;
 	/* clear terminal count */
-	pc_fdc_set_tc_state(machine(), 0);
+	machine().device<pc_fdc_superio_device>("fdc")->tc_w(false);
 	/* select first rom page */
 	m_banks[0] = 0;
 //  pcw16_update_memory(machine);
@@ -1084,7 +1037,8 @@ void pcw16_state::machine_start()
 	m_system_status = 0;
 	m_interrupt_counter = 0;
 
-	pc_fdc_init(machine(), &pcw16_fdc_interface);
+	machine().device<pc_fdc_superio_device>("fdc")
+		->setup_intrq_cb(pc_fdc_superio_device::line_cb(FUNC(pcw16_state::fdc_interrupt), this));
 
 	/* initialise keyboard */
 	at_keyboard_init(machine(), AT_KEYBOARD_TYPE_AT);
@@ -1110,19 +1064,6 @@ INPUT_PORTS_END
 static const pc_lpt_interface pcw16_lpt_config =
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", 0)
-};
-
-static const floppy_interface pcw16_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(pc),
-	NULL,
-	NULL
 };
 
 static MACHINE_CONFIG_START( pcw16, pcw16_state )
@@ -1155,8 +1096,9 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt", pcw16_lpt_config)
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_connected_interface)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(pcw16_floppy_interface)
+	MCFG_PC_FDC_SUPERIO_ADD("fdc")
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcw16_floppies, "35hd", 0, pcw16_floppy_formats)
+    MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcw16_floppies, "35hd", 0, pcw16_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

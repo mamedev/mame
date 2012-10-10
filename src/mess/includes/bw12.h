@@ -31,8 +31,8 @@ public:
 		  m_crtc(*this, MC6845_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1),
+		  m_floppy0(*this, UPD765_TAG ":0:525ssdd"),
+		  m_floppy1(*this, UPD765_TAG ":1:525ssdd"),
 		  m_floppy_timer(*this, FLOPPY_TIMER_TAG)
 	,
 		m_video_ram(*this, "video_ram"){ }
@@ -40,13 +40,13 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_device<z80dart_device> m_sio;
-	required_device<device_t> m_fdc;
+	required_device<upd765a_device> m_fdc;
 	required_device<ay3600_device> m_kbc;
 	required_device<mc6845_device> m_crtc;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_floppy0;
-	required_device<device_t> m_floppy1;
+	required_device<floppy_image_device> m_floppy0;
+	required_device<floppy_image_device> m_floppy1;
 	required_device<timer_device> m_floppy_timer;
 
 	virtual void machine_start();
@@ -61,7 +61,7 @@ public:
 
 	DECLARE_READ8_MEMBER( ls259_r );
 	DECLARE_WRITE8_MEMBER( ls259_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	void fdc_intrq_w(bool state);
 	DECLARE_READ8_MEMBER( pia_pa_r );
 	DECLARE_READ_LINE_MEMBER( pia_cb1_r );
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
