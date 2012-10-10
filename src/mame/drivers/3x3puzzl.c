@@ -24,7 +24,6 @@ has adult graphics (sets provided are 'Normal' and 'Enterprise')
 
 
 todo:
- scrolling?
  verify dips
 
 ***************************************************************************/
@@ -76,6 +75,9 @@ public:
 
 	DECLARE_READ16_HANDLER(_880000_r);
 	DECLARE_WRITE16_HANDLER(gfx_ctrl_w);
+	DECLARE_WRITE16_HANDLER(tilemap1_scrollx_w);
+	DECLARE_WRITE16_HANDLER(tilemap1_scrolly_w);
+
 
 protected:
 	virtual void video_start();
@@ -154,6 +156,16 @@ WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
 	}
 }
 
+WRITE16_MEMBER(_3x3puzzle_state::tilemap1_scrollx_w)
+{
+	m_tilemap1->set_scrollx(data);
+};
+
+WRITE16_MEMBER(_3x3puzzle_state::tilemap1_scrolly_w)
+{
+	m_tilemap1->set_scrolly(data);
+}
+
 void _3x3puzzle_state::video_start()
 {
 	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile1_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -185,8 +197,8 @@ static ADDRESS_MAP_START( _3x3puzzle_map, AS_PROGRAM, 16, _3x3puzzle_state )
 	AM_RANGE(0x202000, 0x202fff) AM_WRITE(videoram3_w) AM_SHARE("videoram3")
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("VBLANK")
 	AM_RANGE(0x300000, 0x3005ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x400000, 0x400001) AM_WRITENOP // scroll?
-	AM_RANGE(0x480000, 0x480001) AM_WRITENOP
+	AM_RANGE(0x400000, 0x400001) AM_WRITE(tilemap1_scrollx_w)
+	AM_RANGE(0x480000, 0x480001) AM_WRITE(tilemap1_scrolly_w)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")
 	AM_RANGE(0x580000, 0x580001) AM_READ_PORT("SYS")
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW01")
