@@ -623,7 +623,8 @@ WRITE16_HANDLER( deco16_104_cninja_prot_w )
 
 READ16_HANDLER( deco16_104_cninja_prot_r )
 {
-	switch (offset<<1) {
+	switch (offset<<1)
+	{
 		case 0x80: /* Master level control */
 			return deco16_prot_ram[0];
 
@@ -662,6 +663,69 @@ READ16_HANDLER( deco16_104_cninja_prot_r )
 
 		case 0x22c: /* Player 1 & 2 input ports */
 			return space.machine().root_device().ioport("IN0")->read();
+
+		case 0x2b2: return deco16_prot_ram[0x0fc/2]; // 0xad65
+		case 0x42a: return deco16_prot_ram[0x092/2]; // 0xb2b7
+		case 0x436: return deco16_prot_ram[0x088/2]; // 0xea5a
+		case 0x440: return deco16_prot_ram[0x098/2]; // 0x7aa0
+		case 0x446: return deco16_prot_ram[0x090/2]; // 0x5fdf
+		case 0x458: return deco16_prot_ram[0x082/2]; // 0x108d
+		case 0x480: return deco16_prot_ram[0x09a/2]; // 0xfbe4
+		case 0x48e: return deco16_prot_ram[0x08a/2]; // 0x67a2
+		case 0x49c: return deco16_prot_ram[0x094/2]; // 0xb62a
+		case 0x4b0: return deco16_prot_ram[0x096/2]; // 0x3555
+		case 0x4c0: return deco16_prot_ram[0x09e/2]; // 0x6a34
+		case 0x4c6: return deco16_prot_ram[0x08c/2]; // 0xc6ef
+		case 0x4ea: return deco16_prot_ram[0x086/2]; // 0x9feb
+		case 0x4fa: return deco16_prot_ram[0x09c/2]; // 0x1dcb
+		case 0x508: return deco16_prot_ram[0x08e/2]; // 0xed9c
+		case 0x514: return deco16_prot_ram[0x080/2]; // 0xf6e2
+		case 0x51c: return deco16_prot_ram[0x084/2]; // 0xbdb9
+		case 0x524: return deco16_prot_ram[0x0b8/2]; // 0x5d26
+		case 0x526: return deco16_prot_ram[0x0a2/2]; // 0x4770
+		case 0x552: return deco16_prot_ram[0x0ac/2]; // 0x0843
+		case 0x554: return deco16_prot_ram[0x0ba/2]; // 0x9b79
+		case 0x56e: return deco16_prot_ram[0x0a0/2]; // 0xd1be
+		case 0x570: return deco16_prot_ram[0x0b4/2]; // 0xc950
+		case 0x580: return deco16_prot_ram[0x0b2/2]; // 0xa600
+		case 0x59a: return deco16_prot_ram[0x0ae/2]; // 0x2b24
+		case 0x5d8: return deco16_prot_ram[0x0b6/2]; // 0x17c1
+		case 0x5f4: return deco16_prot_ram[0x0aa/2]; // 0xf152
+		case 0x5f6: return deco16_prot_ram[0x0be/2]; // 0x97ce
+		case 0x5f8: return deco16_prot_ram[0x0bc/2]; // 0xa485
+		case 0x604: return deco16_prot_ram[0x0a4/2]; // 0x0e88
+		case 0x60c: return deco16_prot_ram[0x0b0/2]; // 0xab89
+		case 0x61a: return deco16_prot_ram[0x0a6/2]; // 0x64ba
+		case 0x64a: return deco16_prot_ram[0x0cc/2]; // 0x0ae9
+		case 0x670: return deco16_prot_ram[0x0d4/2]; // 0x4ec2
+		case 0x67e: return deco16_prot_ram[0x0ca/2]; // 0x61c3
+		case 0x694: return deco16_prot_ram[0x0d2/2]; // 0x3b4f
+		case 0x6a8: return deco16_prot_ram[0x0d6/2]; // 0x0c27
+		case 0x6ae: return deco16_prot_ram[0x0da/2]; // 0x3a72
+		case 0x6b4: return deco16_prot_ram[0x0de/2]; // 0x15d2
+		case 0x6c4: return deco16_prot_ram[0x0c8/2]; // 0x5849
+		case 0x6c8: return deco16_prot_ram[0x0d0/2]; // 0x186c
+		case 0x6cc: return deco16_prot_ram[0x0c0/2]; // 0x713e
+		case 0x6de: return deco16_prot_ram[0x0c2/2]; // 0xa87e
+		case 0x6f8: return deco16_prot_ram[0x0d8/2]; // 0x9a31
+		case 0x6fe: return deco16_prot_ram[0x0c6/2]; // 0xec69
+		case 0x700: return deco16_prot_ram[0x0ce/2]; // 0x82d9
+		case 0x70a: return deco16_prot_ram[0x0dc/2]; // 0x628c
+		case 0x714: return deco16_prot_ram[0x0c4/2]; // 0xda45
+		case 0x74c: return deco16_prot_ram[0x0e4/2]; // 0x8e3d
+		case 0x764: return deco16_prot_ram[0x0fe/2]; // 0xdef7
+		case 0x770: return deco16_prot_ram[0x0f4/2]; // 0xe7fe
+		case 0x772: return deco16_prot_ram[0x0ec/2]; // 0x23ca
+		case 0x774: return deco16_prot_ram[0x0e2/2]; // 0xe62c
+		case 0x77e: return deco16_prot_ram[0x0e8/2]; // 0x6683
+		case 0x788: return deco16_prot_ram[0x0e0/2]; // 0xd60b
+		case 0x798: return deco16_prot_ram[0x0fa/2]; // 0x9e1a
+		case 0x7a4: return deco16_prot_ram[0x0f0/2]; // 0x578f
+		case 0x7c2: return deco16_prot_ram[0x0f8/2]; // 0x0503
+		case 0x7ea: return deco16_prot_ram[0x0e6/2]; // 0x8654
+		case 0x7ec: return deco16_prot_ram[0x0f6/2]; // 0xa1e1
+		case 0x7fa: return deco16_prot_ram[0x0ea/2]; // 0x5146
+		case 0x7fe: return deco16_prot_ram[0x0f2/2]; // 0x91d4
 	}
 
 	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",space.device().safe_pc(),offset);

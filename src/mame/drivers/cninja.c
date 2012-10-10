@@ -56,14 +56,12 @@ Note about version levels using Mutant Fighter as the example:
 
 WRITE16_MEMBER(cninja_state::cninja_sound_w)
 {
-
 	soundlatch_byte_w(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE16_MEMBER(cninja_state::stoneage_sound_w)
 {
-
 	soundlatch_byte_w(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -76,7 +74,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(cninja_state::interrupt_gen)
 
 READ16_MEMBER(cninja_state::cninja_irq_r)
 {
-
 	switch (offset)
 	{
 
@@ -95,7 +92,6 @@ READ16_MEMBER(cninja_state::cninja_irq_r)
 
 WRITE16_MEMBER(cninja_state::cninja_irq_w)
 {
-
 	switch (offset)
 	{
 	case 0:
@@ -721,7 +717,6 @@ static void sound_irq2(device_t *device, int state)
 
 WRITE8_MEMBER(cninja_state::sound_bankswitch_w)
 {
-
 	/* the second OKIM6295 ROM is bank switched */
 	m_oki2->set_bank_base((data & 1) * 0x40000);
 }
@@ -869,7 +864,6 @@ static const deco16ic_interface mutantf_deco16ic_tilegen2_intf =
 
 void cninja_state::machine_start()
 {
-
 	save_item(NAME(m_scanline));
 	save_item(NAME(m_irq_mask));
 
@@ -878,7 +872,6 @@ void cninja_state::machine_start()
 
 void cninja_state::machine_reset()
 {
-
 	m_scanline = 0;
 	m_irq_mask = 0;
 }
@@ -950,6 +943,7 @@ static MACHINE_CONFIG_START( cninja, cninja_state )
 	MCFG_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_START( stoneage, cninja_state )
 
@@ -1098,6 +1092,7 @@ static MACHINE_CONFIG_START( edrandy, cninja_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
+
 static MACHINE_CONFIG_START( robocop2, cninja_state )
 
 	/* basic machine hardware */
@@ -1152,6 +1147,7 @@ static MACHINE_CONFIG_START( robocop2, cninja_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_START( mutantf, cninja_state )
 
@@ -2051,38 +2047,9 @@ ROM_END
 
 /**********************************************************************************/
 
-static void cninja_patch( running_machine &machine )
-{
-	UINT16 *RAM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
-	int i;
-
-	for (i = 0; i < 0x80000 / 2; i++)
-	{
-		int aword = RAM[i];
-
-		if (aword == 0x66ff || aword == 0x67ff)
-		{
-			UINT16 doublecheck = RAM[i - 4];
-
-			/* Cmpi + btst controlling opcodes */
-			if (doublecheck == 0xc39 || doublecheck == 0x839)
-			{
-				RAM[i]     = 0x4e71;
-				RAM[i - 1] = 0x4e71;
-				RAM[i - 2] = 0x4e71;
-				RAM[i - 3] = 0x4e71;
-				RAM[i - 4] = 0x4e71;
-			}
-		}
-	}
-}
-
-/**********************************************************************************/
-
 DRIVER_INIT_MEMBER(cninja_state,cninja)
 {
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x1bc0a8, 0x1bc0a9, write16_delegate(FUNC(cninja_state::cninja_sound_w),this));
-	cninja_patch(machine());
 }
 
 DRIVER_INIT_MEMBER(cninja_state,stoneage)
