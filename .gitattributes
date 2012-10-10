@@ -2972,6 +2972,7 @@ src/mame/drivers/moo.c svneol=native#text/plain
 src/mame/drivers/mosaic.c svneol=native#text/plain
 src/mame/drivers/mouser.c svneol=native#text/plain
 src/mame/drivers/mpoker.c svneol=native#text/plain
+src/mame/drivers/mpu12wbk.c svneol=native#text/plain
 src/mame/drivers/mpu2.c svneol=native#text/plain
 src/mame/drivers/mpu3.c svneol=native#text/plain
 src/mame/drivers/mpu4.c svneol=native#text/plain

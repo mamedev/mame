@@ -1935,6 +1935,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/jankenmn.o \
 	$(DRIVERS)/wildpkr.o \
 	$(DRIVERS)/globalvr.o \
+	$(DRIVERS)/mpu12wbk.o \
 
 
 #-------------------------------------------------
