@@ -460,19 +460,19 @@ static INPUT_PORTS_START( frogs )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("DOOR:1") // 1 switch located on the inside of the coin door
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-
-	// There is no dipswitch: on a physical level, these settings are applied by grounding
-	// otherwise floating pins (ground wires are provided on pin 1/30)
-	PORT_DIPNAME( 0x10, 0x10, "Allow Free Game" )		PORT_DIPLOCATION("PIN:5") // 26
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "Time" )					PORT_DIPLOCATION("PIN:4") // 27
-	PORT_DIPSETTING(    0x00, "60" )
-	PORT_DIPSETTING(    0x20, "90" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )		PORT_DIPLOCATION("PIN:3") // 28
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+
+	// There is no dipswitch for these game settings: on a physical level, they are applied
+	// by grounding otherwise floating pins (ground wires are provided on pin 1/30)
+	PORT_CONFNAME( 0x10, 0x10, "Wire pin 5/26: Allow Free Game" )
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_CONFNAME( 0x20, 0x20, "Wire pin 4/27: Game Time" )
+	PORT_CONFSETTING(    0x00, "60" )
+	PORT_CONFSETTING(    0x20, "90" )
+	PORT_CONFNAME( 0x40, 0x40, "Wire pin 3/28: Coinage" )
+	PORT_CONFSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_CONFSETTING(    0x40, DEF_STR( 1C_1C ) )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_64v, NULL)
