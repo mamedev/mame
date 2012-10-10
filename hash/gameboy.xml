@@ -23153,12 +23153,12 @@
 		</part>
 	</software>
 
-	<software name="sonic3d5" supported="no">
+	<software name="sonic3d5">
 		<description>Sonic 3D Blast 5 (Chi)</description>
 		<year>1998</year>
 		<publisher>Yong Yong</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="unknown" />
+			<feature name="mapper" value="YongYong" />
 			<dataarea name="rom" size="262144">
 				<rom name="sonic 3d blast 5 (unl).bin" size="262144" crc="5fed0068" sha1="1eb403ee2550106cbb2e3e1d0715b7c9bc07d6be" offset="000000" />
 			</dataarea>

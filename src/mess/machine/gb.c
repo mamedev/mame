@@ -4,6 +4,10 @@
 
   Machine file to handle emulation of the Nintendo Game Boy.
 
+TODO:
+- YongYong mapper:
+  - During start there are 2 writes to 5000 and 5003, it is still unknown what these do.
+
   Changes:
 
     13/2/2002       AK - MBC2 and MBC3 support and added NVRAM support.
@@ -58,6 +62,7 @@ enum {
 	MBC_MBC7,		/*    ?? ROM,    ?? RAM                          */
 	MBC_WISDOM,		/*    ?? ROM,    ?? RAM - Wisdom tree controller */
 	MBC_MBC1_KOR,	/*   1MB ROM,    ?? RAM - Korean MBC1 variant    */
+	MBC_YONGYONG,	/*    ?? ROM,    ?? RAM - Appears in Sonic 3D Blast 5 pirate */
 	MBC_MEGADUCK,	/* MEGADUCK style banking                        */
 	MBC_UNKNOWN,	/* Unknown mapper                                */
 };
@@ -230,6 +235,10 @@ static void gb_init(running_machine &machine)
 			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc1_kor),state) );
 			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc1_kor),state) );
 			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc1_kor),state) );
+			break;
+		case MBC_YONGYONG:
+			space.install_write_handler( 0x2000, 0x2000, write8_delegate(FUNC(gb_state::gb_rom_bank_yongyong_2000),state) );
+			//space.install_write_handler( 0x5000, 0x5003, write8_delegate(FUNC(gb_state::gb_rom_back_yongyong_5000),state) );
 			break;
 
 		case MBC_MEGADUCK:
@@ -771,6 +780,12 @@ WRITE8_MEMBER(gb_state::gb_mem_mode_select_mbc1_kor)
 {
 	m_MBC1Mode = data & 0x1;
 	gb_set_mbc1_kor_banks(machine());
+}
+
+WRITE8_MEMBER(gb_state::gb_rom_bank_yongyong_2000)
+{
+	m_ROMBank = data;
+	gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
 }
 
 WRITE8_MEMBER(gb_state::gb_io_w)
@@ -1648,6 +1663,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 				{ "MBC7",     MBC_MBC7 },
 				{ "WISDOM",   MBC_WISDOM },
 				{ "MBC1_KOR", MBC_MBC1_KOR },
+				{ "YONGYONG", MBC_YONGYONG },
 			};
 
 			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && state->m_MBCType == MBC_UNKNOWN; i++)
@@ -1739,10 +1755,10 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	case 0x20:	state->m_MBCType = MBC_MBC6;	state->m_CartType = SRAM; break;
 	case 0x22:	state->m_MBCType = MBC_MBC7;	state->m_CartType = SRAM | BATTERY;		break;
 	case 0xBE:	state->m_MBCType = MBC_NONE;	state->m_CartType = 0;				break;	/* used in Flash2Advance GB Bridge boot program */
+	case 0xEA:	state->m_MBCType = MBC_YONGYONG;	state->m_CartType = 0;	break;	/* Found in Sonic 3D Blast 5 pirate */
 	case 0xFD:	state->m_MBCType = MBC_TAMA5;	state->m_CartType = 0 /*RTC | BATTERY?*/;	break;
 	case 0xFE:	state->m_MBCType = MBC_HUC3;	state->m_CartType = 0;				break;
 	case 0xFF:	state->m_MBCType = MBC_HUC1;	state->m_CartType = 0;				break;
-	default:	state->m_MBCType = MBC_UNKNOWN;	state->m_CartType = UNKNOWN;			break;
 	}
 
 	/* Check whether we're dealing with a (possible) Wisdom Tree game here */
