@@ -220,8 +220,6 @@ inline void am9517a_device::dma_read()
 	switch (MODE_TRANSFER_MASK)
 	{
 	case MODE_TRANSFER_VERIFY:
-		break;
-
 	case MODE_TRANSFER_WRITE:
 		m_temp = m_channel[m_current_channel].m_in_ior_func(offset);
 		break;
@@ -243,8 +241,12 @@ inline void am9517a_device::dma_write()
 
 	switch (MODE_TRANSFER_MASK)
 	{
-	case MODE_TRANSFER_VERIFY:
+	case MODE_TRANSFER_VERIFY: {
+		UINT8 v1 = m_in_memr_func(offset);
+		if(0 && m_temp != v1)
+			logerror("%s: verify error %02x vs. %02x\n", tag(), m_temp, v1);
 		break;
+	}
 
 	case MODE_TRANSFER_WRITE:
 		m_out_memw_func(offset, m_temp);
