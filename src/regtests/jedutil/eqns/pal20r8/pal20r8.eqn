@@ -1,0 +1,86 @@
+chip pal20r8 PAL20R8
+
+CLK=1 i2=2 i3=3 i4=4 i5=5 i6=6 i7=7 i8=8 i9=9 i10=10 i11=11 GND=12
+/OE=13 i14=14 rf15=15 rf16=16 rf17=17 rf18=18 rf19=19 rf20=20 rf21=21 rf22=22 i23=23 VCC=24
+
+equations
+
+/rf15 := i2 & i6 & i7 +
+         i6 & rf16 +
+         i3 & /rf16 +
+         i7 +
+         /i4 +
+         i6 & i7 +
+         i4 & i7 +
+         /i23
+rf15.oe = OE
+
+/rf16 := /i3 & /rf17 +
+         /i4 +
+         /i3 +
+         /i3 & i4 +
+         /i7 & rf17 +
+         /i7 +
+         i4 +
+         i23
+rf16.oe = OE
+
+/rf17 := /i2 +
+         /rf18 +
+         i5 +
+         i6 +
+         rf18 +
+         i4 +
+         /i10 +
+         /i23
+rf17.oe = OE
+
+/rf18 := /i2 & i5 & i6 & /i7 +
+         i3 & i6 & i7 +
+         i3 & rf19 +
+         /i2 & /i7 +
+         /i3 & /rf19 +
+         i5 & i6 & /i7 +
+         i7 +
+         /i11
+rf18.oe = OE
+
+/rf19 := i5 & i6 & /i7 +
+         i3 & i6 & i7 +
+         i5 & rf20 +
+         i6 +
+         i7 +
+         /i4 & /rf20 +
+         /i7 +
+         i10
+rf19.oe = OE
+
+/rf20 := i10 & rf17 +
+         /i11 +
+         i4 & /rf17 +
+         i2 +
+         /i6 & /i7 +
+         i8 +
+         /i9 +
+         rf22
+rf20.oe = OE
+
+/rf21 := /i8 +
+         /i2 & rf17 +
+         i11 +
+         /i10 +
+         rf15 +
+         /i14 +
+         /i3 +
+         i8 & i9 & /rf22
+rf21.oe = OE
+
+/rf22 := i14 +
+         /rf15 +
+         i3 & /rf21 +
+         i7 +
+         /i8 & rf21 +
+         i10 +
+         /i9 +
+         i14 & /rf15
+rf22.oe = OE

@@ -1,127 +1,248 @@
 <?xml version="1.0"?>
 <package>
-    <job id="Test"><?job debug="true" error="true"?>
+    <job id="JEDTest"><?job debug="true" error="true"?>
         <runtime>
             <description>This script runs regresion tests on the jedutil tool.</description>
+            
+            <named name="verbose" type="boolean" helpstring="Generate a detailed log." required="false"/>
         </runtime>
 
         <script language="JScript">
             <![CDATA[
                 var g_Verbose = false;
 
-                function diffFiles(file1, file2)
+                function runAndCaptureOutput(command, outputFile)
                 {
+                    var fso = new ActiveXObject("Scripting.FileSystemObject");
                     var WshShell = WScript.CreateObject("WScript.Shell");
-                    var oExec;
+                    var file, oExec;
                     
                     if (g_Verbose)
                     {                    
-                        WScript.Echo("Diff File 1: " + file1);
-                        WScript.Echo("Diff File 2: " + file2);
+                        WScript.Echo("Command:     " + command);
+                        WScript.Echo("Output File: " + outputFile);
                         WScript.Echo();
                     }
                     
-                    oExec = WshShell.Exec("diff " + file1 + " " + file2);
+                    file = fso.CreateTextFile(outputFile, false, false);
+                    
+                    oExec = WshShell.Exec(command);
+                    
+                    if (!oExec.StdOut.AtEndOfStream)
+                    {
+                        file.Write(oExec.StdOut.ReadAll());
+                    }
 
+                    if (!oExec.StdErr.AtEndOfStream)
+                    {
+                        file.Write(oExec.StdErr.ReadAll());
+                    }
+                    
+                    file.Close();
+                    
                     while (!oExec.Status)
                     {
                         WScript.Sleep(100);
                     }
                     
-                    if (g_Verbose)
-                    {
-                        WScript.StdOut.WriteLine(oExec.StdOut.ReadAll());
-                        WScript.StdErr.WriteLine(oExec.StdErr.ReadAll());
-                    }
-
                     return oExec.ExitCode;
                 }
 
-                function runCommandAndCaptureOutput(command, outputFile)
+                function diffFiles(file1, file2, outputFile)
                 {
-                    var WshShell = WScript.CreateObject("WScript.Shell");
-                    var fullCommand;
-                    
-                    fullCommand = "%comspec% /c ";
-                    fullCommand += command;
-                    fullCommand += " > ";
-                    fullCommand += outputFile;
-                    fullCommand += " 2>&1";
+                    var fso = new ActiveXObject("Scripting.FileSystemObject");
+                    var command;
                     
                     if (g_Verbose)
-                    {
-                        WScript.Echo("Running the command : " + command);
-                        WScript.Echo("Output File:          " + outputFile);
+                    {                    
+                        WScript.Echo("Diff File 1: " + file1);
+                        WScript.Echo("Diff File 2: " + file2);
+                        WScript.Echo("Output File: " + outputFile);
                         WScript.Echo();
                     }
 
-                    WshShell.Run(fullCommand, 0, true);
+                    if (!fso.FileExists(file1))
+                    {
+                        if (g_Verbose)
+                        {
+                            WScript.Echo("Diff File 1 does not exist.");
+                            WScript.Echo();
+                        }
+                    
+                        return 1;
+                    }
+                    
+                    if (!fso.FileExists(file2))
+                    {
+                        if (g_Verbose)
+                        {
+                            WScript.Echo("Diff File 2 does not exist.");
+                            WScript.Echo();
+                        }
+                    
+                        return 1;
+                    }
+                    
+                    command = "diff \"" + file1 + "\" \"" + file2 + "\"";
+
+                    return runAndCaptureOutput(command, outputFile);
+                }
+
+                function getFilesInFolder(folder)
+                {
+                    var fso = new ActiveXObject("Scripting.FileSystemObject");
+                    var filesCollection = new Enumerator(folder.files);
+                    var filesArray = new Array();
+
+                    while (!filesCollection.atEnd())
+                    {
+                        ++filesArray.length;
+
+                        filesArray[filesArray.length - 1] = new Object();
+
+                        filesArray[filesArray.length - 1].name = fso.GetBaseName(filesCollection.item().name);
+                        
+                        filesCollection.moveNext();
+                    }
+                    
+                    return filesArray;
                 }
 
                 function findJedTests(jedsPath, baselinePath, outputPath)
                 {
                     var fso = new ActiveXObject("Scripting.FileSystemObject");
                     var folder = fso.GetFolder(jedsPath)
-                    var folderCollection = new Enumerator(folder.files);
+                    var folderCollection = new Enumerator(folder.Subfolders);
                     var jedArray = new Array();
-                    
+                    var filesArray, file;
+
                     while (!folderCollection.atEnd())
                     {
                         ++jedArray.length;
 
                         jedArray[jedArray.length - 1] = new Object;
+
+                        jedArray[jedArray.length - 1].type = folderCollection.item().name;
+                        jedArray[jedArray.length - 1].files = new Array;
+
+                        filesArray = getFilesInFolder(
+                                         fso.GetFolder(
+                                            fso.BuildPath(jedsPath,
+                                                          folderCollection.item().name)));
+
+                        jedArray[jedArray.length - 1].files.length = filesArray.length;
+
+                        for (index = 0; index < filesArray.length; ++index)
+                        {
+                            file = new Object;
+
+                            file.jedFile = fso.BuildPath(jedsPath,
+                                                         folderCollection.item().name);
+                            file.jedFile = fso.BuildPath(file.jedFile,
+                                                         filesArray[index].name);
+                            file.jedFile = file.jedFile + ".jed";
+                            
+                            file.baselineFile = fso.BuildPath(baselinePath,
+                                                              folderCollection.item().name);
+                            file.baselineFile = fso.BuildPath(file.baselineFile,
+                                                              filesArray[index].name);
+                            file.baselineFile = file.baselineFile + ".txt";
+
+                            file.outputFile = fso.BuildPath(outputPath,
+                                                            folderCollection.item().name);
+                            file.outputFile = fso.BuildPath(file.outputFile,
+                                                            filesArray[index].name);
+                            file.outputFile = file.outputFile + ".txt";
+
+                            file.diffFile = fso.BuildPath(outputPath,
+                                                          folderCollection.item().name);
+                            file.diffFile = fso.BuildPath(file.diffFile,
+                                                          filesArray[index].name);
+                            file.diffFile = file.diffFile + ".diff";
+
+                            jedArray[jedArray.length - 1].files[index] = file;
+                        }
                         
-                        jedArray[jedArray.length - 1].name = fso.GetBaseName(folderCollection.item().name);
-                        jedArray[jedArray.length - 1].jedfile = folderCollection.item().path;
-                        jedArray[jedArray.length - 1].baselineFile = baselinePath + "\\" +
-                                                                     jedArray[jedArray.length - 1].name +
-                                                                     ".txt";
-                        jedArray[jedArray.length - 1].outputFile = outputPath + "\\" +
-                                                                   jedArray[jedArray.length - 1].name +
-                                                                   ".txt";
- 
                         folderCollection.moveNext();
                     }
-                    
+                
                     return jedArray;
+                }
+
+                function createJedOutputFolders(outputPath, jedArray)
+                {
+                    var fso = new ActiveXObject("Scripting.FileSystemObject");
+                    
+                    for (index = 0; index < jedArray.length; ++index)
+                    {
+                        fso.CreateFolder(fso.BuildPath(outputPath,
+                                                       jedArray[index].type));
+                    }
                 }
             
                 function runViewJedTests(jedArray, jedUtilApp)
                 {
-                    var command;
+                    var files, file, command;
                 
-                    for (i = 0; i < jedArray.length; ++i)
+                    for (testIndex = 0; testIndex < jedArray.length; ++testIndex)
                     {
-                        command = jedUtilApp + " -view " + jedArray[i].jedfile + " " +
-                                  jedArray[i].name;
-                    
                         if (g_Verbose)
                         {
-                            WScript.Echo("Viewing the JED file: " + jedArray[i].jedfile);
+                            WScript.Echo("Running the view command on the type \"" +
+                                             jedArray[testIndex].type + "\"");
                             WScript.Echo();
                         }
-                    
-                        runCommandAndCaptureOutput(command, jedArray[i].outputFile);
+                        
+                        files = jedArray[testIndex].files;
+                        
+                        for (fileIndex = 0; fileIndex < files.length; ++fileIndex)
+                        {
+                            file = files[fileIndex];
+
+                            if (g_Verbose)
+                            {                            
+                                WScript.Echo("    JED File:      " + file.jedFile);
+                                WScript.Echo("    Baseline File: " + file.baselineFile);
+                                WScript.Echo("    Output File:   " + file.outputFile);
+                                WScript.Echo("    Diff File:     " + file.diffFile);
+                                WScript.Echo();
+                            }
+                            
+                            command = jedUtilApp + " -view \"" + file.jedFile + "\" " +
+                                      jedArray[testIndex].type;
+ 
+                            runAndCaptureOutput(command, file.outputFile);
+                        }
                     }
                 }
                 
                 function runDiffJedTests(jedArray)
                 {
                     var result = true;
+                    var files, file;
                     
-                    for (i = 0; i < jedArray.length; ++i)
+                    for (testIndex = 0; testIndex < jedArray.length; ++testIndex)
                     {
                         if (g_Verbose)
                         {
-                            WScript.Echo("Diffing the output from viewing the JED file: " + jedArray[i].jedfile);
+                            WScript.Echo("Running the diffs on the type \"" +
+                                             jedArray[testIndex].type + "\"");
+                            WScript.Echo();
                         }
+                    
+                        files = jedArray[testIndex].files;
                         
-                        if (diffFiles(jedArray[i].baselineFile, jedArray[i].outputFile))
+                        for (fileIndex = 0; fileIndex < files.length; ++fileIndex)
                         {
-                            WScript.Echo("Results are different for " + jedArray[i].name);
-                            WScript.Echo();                        
+                            file = files[fileIndex];
                             
-                            result = false;
+                            if (diffFiles(file.baselineFile, file.outputFile, file.diffFile))
+                            {
+                                WScript.Echo("Results are different for " + file.jedFile);
+                                WScript.Echo();                        
+                                
+                                result = false;
+                            }
                         }
                     }
                     
@@ -139,6 +260,11 @@
                     var jedUtilApp = WshShell.CurrentDirectory + "\\..\\..\\..\\jedutil.exe";
                     var jedArray = new Array();
 
+                    if (WScript.Arguments.Count() > 0)
+                    {
+                        g_Verbose = true;
+                    }
+
                     if (g_Verbose)
                     {
                         WScript.Echo("JED Path:      " + jedsPath);
@@ -152,27 +278,27 @@
                     {
                         if (g_Verbose)
                         {
-                            WScript.Echo("Emptying the output directory");
+                            WScript.Echo("Removing the existing the output directory");
                             WScript.Echo();
                         }
                     
-                        fso.DeleteFile(outputPath + "\\*.*");
+                        fso.DeleteFolder(outputPath);
                     }
-                    else
+
+                    if (g_Verbose)
                     {
-                        if (g_Verbose)
-                        {
-                            WScript.Echo("Creating the output directory");
-                            WScript.Echo();
-                        }
-                        
-                        fso.CreateFolder(outputPath);
+                        WScript.Echo("Creating the root output directory");
+                        WScript.Echo();
                     }
+                    
+                    fso.CreateFolder(outputPath);
                     
                     jedArray = findJedTests(jedsPath, baselinePath, outputPath);
 
-                    runViewJedTests(jedArray, jedUtilApp);
+                    createJedOutputFolders(outputPath, jedArray);
 
+                    runViewJedTests(jedArray, jedUtilApp);
+                    
                     if (!runDiffJedTests(jedArray))
                     {
                         result = 1;
