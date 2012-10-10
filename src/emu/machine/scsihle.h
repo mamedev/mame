@@ -41,6 +41,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
+	void scsi_out_req_delay(UINT8 state);
 	void scsi_change_phase(UINT8 newphase);
 	int get_scsi_cmd_len(int cbyte);
 	UINT8 scsibus_driveno(UINT8  drivesel);
@@ -52,7 +53,7 @@ private:
 	void dump_data_bytes(int count);
 	void dump_bytes(UINT8 *buff, int count);
 
-	//emu_timer *req_timer;
+	emu_timer *req_timer;
 	emu_timer *sel_timer;
 	emu_timer *dataout_timer;
 

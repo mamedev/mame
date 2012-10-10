@@ -17,9 +17,9 @@ void scsihle_device::device_start()
 {
 	scsidev_device::device_start();
 
-	//req_timer = timer_alloc(0);
-	sel_timer = timer_alloc(2);
-	dataout_timer = timer_alloc(3);
+	req_timer = timer_alloc(0);
+	sel_timer = timer_alloc(1);
+	dataout_timer = timer_alloc(2);
 
 	save_item( NAME( command ) );
 	save_item( NAME( commandLength ) );
@@ -160,7 +160,7 @@ int SCSILengthFromUINT16( UINT8 *length )
 }
 
 #define BSY_DELAY_NS    50
-//#define REQ_DELAY_NS    90
+#define REQ_DELAY_NS    90
 
 static const char *const phasenames[] =
 {
@@ -214,23 +214,14 @@ struct adaptec_sense_t
         3   2 + line changes
 */
 
-#define LOGLEVEL            0
+#define LOGLEVEL            2
 
-#define LOG(level,...)      if(LOGLEVEL>=level) logerror(__VA_ARGS__)
+#define LOG(level,...)      if(LOGLEVEL>=level) printf(__VA_ARGS__)
 
-//void scsibus_device::scsi_out_line_change(UINT8 line, UINT8 state)
-//{
-//  if(line==SCSI_LINE_REQ)
-//      scsi_out_line_req(state);
-//  else
-//      scsi_out_line_change_now(line,state);
-//}
-//
-//void scsibus_device::scsi_out_line_req(UINT8 state)
-//{
-//  req_timer->adjust(attotime::from_nsec(REQ_DELAY_NS),state);
-//}
-//
+void scsihle_device::scsi_out_req_delay(UINT8 state)
+{
+	req_timer->adjust(attotime::from_nsec(REQ_DELAY_NS),state);
+}
 
 void scsihle_device::dump_bytes(UINT8 *buff, int count)
 {
@@ -288,20 +279,22 @@ void scsihle_device::device_timer(emu_timer &timer, device_timer_id tid, int par
 {
 	switch( tid )
 	{
-//  case 0:
-//      scsi_out_line_change_now(SCSI_LINE_REQ, param);
-//      break;
+	case 0:
+		scsi_out(param * SCSI_MASK_REQ, SCSI_MASK_REQ);
+		break;
 
-	case 2:
+	case 1:
 		scsi_out(param * SCSI_MASK_BSY, SCSI_MASK_BSY);
 		break;
 
-	case 3:
+	case 2:
 		// Some drives, notably the ST225N and ST125N, accept fromat unit commands
 		// with flags set indicating that bad block data should be transfered but
 		// don't then implemnt a data in phase, this timeout it to catch these !
 		if(IS_COMMAND(SCSI_CMD_FORMAT_UNIT) && (data_idx==0))
+		{
 			scsi_change_phase(SCSI_PHASE_STATUS);
+		}
 		break;
 	}
 }
@@ -423,28 +416,34 @@ void scsihle_device::scsi_change_phase(UINT8 newphase)
 			break;
 
 		case SCSI_PHASE_COMMAND:
-			scsi_out( SCSI_MASK_DATA | SCSI_MASK_IO | SCSI_MASK_MSG, SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG | SCSI_MASK_REQ );
+			scsi_out( SCSI_MASK_DATA | SCSI_MASK_IO | SCSI_MASK_MSG, SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG );
 			LOG(1,"\nSCSIBUS: Command begin\n");
+			scsi_out_req_delay( 0 );
 			break;
 
 		case SCSI_PHASE_DATAOUT:
-			scsi_out( SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG, SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG | SCSI_MASK_REQ );
+			scsi_out( SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG, SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG );
+			scsi_out_req_delay( 0 );
 			break;
 
 		case SCSI_PHASE_DATAIN:
-			scsi_out( SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_MSG, SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG | SCSI_MASK_REQ );
+			scsi_out( SCSI_MASK_CD | SCSI_MASK_MSG, SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG );
+			scsi_out_req_delay( 0 );
 			break;
 
 		case SCSI_PHASE_STATUS:
-			scsi_out( SCSI_STATUS_OK | SCSI_MASK_MSG, SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG | SCSI_MASK_REQ );
+			scsi_out( SCSI_STATUS_OK | SCSI_MASK_MSG, SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG );
+			scsi_out_req_delay( 0 );
 			break;
 
 		case SCSI_PHASE_MESSAGE_OUT:
-			scsi_out( SCSI_MASK_IO, SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG | SCSI_MASK_REQ );
+			scsi_out( SCSI_MASK_DATA | SCSI_MASK_IO, SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG );
+			scsi_out_req_delay( 0 );
 			break;
 
 		case SCSI_PHASE_MESSAGE_IN:
-			scsi_out( 0, SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG | SCSI_MASK_REQ );// no errors for the time being !
+			scsi_out( 0, SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG );// no errors for the time being !
+			scsi_out_req_delay( 0 );
 			break;
 	}
 }
@@ -469,7 +468,7 @@ void scsihle_device::scsi_in( UINT32 data, UINT32 mask )
 			// only one line active.
 			if( ( mask & SCSI_MASK_SEL ) != 0 && scsibus_driveno(data & SCSI_MASK_DATA) == scsiID)
 			{
-				void *hdfile;
+				void *hdfile = NULL;
 				// Check to see if device had image file mounted, if not, do not set busy,
 				// and stay busfree.
 				GetDevice(&hdfile);
@@ -482,7 +481,7 @@ void scsihle_device::scsi_in( UINT32 data, UINT32 mask )
 					}
 					else
 					{
-						sel_timer->adjust(attotime::from_nsec(BSY_DELAY_NS));
+						sel_timer->adjust(attotime::from_nsec(BSY_DELAY_NS),0);
 					}
 				}
 			}
@@ -502,12 +501,12 @@ void scsihle_device::scsi_in( UINT32 data, UINT32 mask )
 					}
 					else
 					{
-						scsi_out( 0, SCSI_MASK_REQ );
+						scsi_out_req_delay( 0 );
 					}
 				}
 				else
 				{
-					scsi_out( SCSI_MASK_REQ, SCSI_MASK_REQ );
+					scsi_out_req_delay( 1 );
 				}
 			}
 			break;
@@ -530,12 +529,13 @@ void scsihle_device::scsi_in( UINT32 data, UINT32 mask )
 					}
 					else
 					{
-						scsi_out( buffer[ data_idx++ ], SCSI_MASK_DATA | SCSI_MASK_REQ );
+						scsi_out( buffer[ data_idx++ ], SCSI_MASK_DATA );
+						scsi_out_req_delay( 0 );
 					}
 				}
 				else
 				{
-					scsi_out( SCSI_MASK_REQ, SCSI_MASK_REQ );
+					scsi_out_req_delay( 1 );
 				}
 			}
 			break;
@@ -578,12 +578,12 @@ void scsihle_device::scsi_in( UINT32 data, UINT32 mask )
 					}
 					else
 					{
-						scsi_out( 0, SCSI_MASK_REQ );
+						scsi_out_req_delay( 0 );
 					}
 				}
 				else
 				{
-					scsi_out( SCSI_MASK_REQ, SCSI_MASK_REQ );
+					scsi_out_req_delay( 1 );
 				}
 			}
 			break;
@@ -599,13 +599,13 @@ void scsihle_device::scsi_in( UINT32 data, UINT32 mask )
 					}
 					else
 					{
-						scsi_out( 0, SCSI_MASK_REQ );
+						scsi_out_req_delay( 0 );
 					}
 				}
 				else
 				{
 					cmd_idx++;
-					scsi_out( SCSI_MASK_REQ, SCSI_MASK_REQ );
+					scsi_out_req_delay( 1 );
 				}
 			}
 			break;
@@ -624,13 +624,13 @@ void scsihle_device::scsi_in( UINT32 data, UINT32 mask )
 					}
 					else
 					{
-						scsi_out( 0, SCSI_MASK_REQ );
+						scsi_out_req_delay( 0 );
 					}
 				}
 				else
 				{
 					cmd_idx++;
-					scsi_out( SCSI_MASK_REQ, SCSI_MASK_REQ );
+					scsi_out_req_delay( 1 );
 				}
 			}
 			break;
