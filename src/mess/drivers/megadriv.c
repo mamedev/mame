@@ -452,11 +452,25 @@ DRIVER_INIT_MEMBER(md_cons_state,md_jpn)
 
 static MACHINE_CONFIG_DERIVED( ms_32x, genesis_32x )
 	MCFG_FRAGMENT_ADD( _32x_cartslot )
+	MCFG_DEVICE_MODIFY("cart_list")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list","NTSC-U")
+
+	MCFG_NVRAM_HANDLER_CLEAR()
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( ms_32x_jpn, genesis_32x )
+	MCFG_FRAGMENT_ADD( _32x_cartslot )
+	MCFG_DEVICE_MODIFY("cart_list")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list","NTSC-J")
+
 	MCFG_NVRAM_HANDLER_CLEAR()
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ms_32x_pal, genesis_32x_pal )
 	MCFG_FRAGMENT_ADD( _32x_cartslot )
+	MCFG_DEVICE_MODIFY("cart_list")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list","PAL")
+
 	MCFG_NVRAM_HANDLER_CLEAR()
 MACHINE_CONFIG_END
 
@@ -878,9 +892,9 @@ CONS( 1990, mdsvp,      genesis,   0,      ms_megdsvppal,   md, md_cons_state,  
 CONS( 1988, mdsvpj,     genesis,   0,      ms_megdsvp,      md, md_cons_state,     md_jpn,    "Sega",   "Mega Drive (Japan, NTSC, for SVP cart)", 0)
 
 // the 32X plugged in the cart slot, games plugged into the 32x.  Maybe it should be handled as an expansion device?
-CONS( 1994, 32x,        0,         0,      ms_32x,          md, md_cons_state, genesis,      "Sega",   "Genesis with 32X (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1994, 32xe,       32x,       0,      ms_32x_pal,      md, md_cons_state, md_eur,		 "Sega",   "Mega Drive with 32X (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1994, 32xj,       32x,       0,      ms_32x,          md, md_cons_state, md_jpn,		 "Sega",   "Mega Drive with 32X (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1994, 32x,        0,         0,      ms_32x,          md, md_cons_state,     genesis,   "Sega",   "Genesis with 32X (USA, NTSC)", GAME_NOT_WORKING )
+CONS( 1994, 32xe,       32x,       0,      ms_32x_pal,      md, md_cons_state,     md_eur,    "Sega",   "Mega Drive with 32X (Europe, PAL)", GAME_NOT_WORKING )
+CONS( 1994, 32xj,       32x,       0,      ms_32x_jpn,      md, md_cons_state,     md_jpn,    "Sega",   "Mega Drive with 32X (Japan, NTSC)", GAME_NOT_WORKING )
 
 // the SegaCD plugged into the expansion port..
 CONS( 1992, segacd,     0,         0,      genesis_scd_scd, md, md_cons_state,     genesis,   "Sega",   "Sega CD (USA, NTSC)", GAME_NOT_WORKING )

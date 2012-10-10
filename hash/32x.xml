@@ -21,6 +21,7 @@
 		<description>Doom (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<feature name="pcb" value="171-6885A" />
 			<feature name="ic1" value="MPR=17351-F" />
@@ -37,6 +38,7 @@
 		<description>Motocross Championship (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<feature name="pcb" value="171-6884A" />
 			<feature name="ic1" value="MPR-17353-MX" />
@@ -50,6 +52,7 @@
 		<description>Space Harrier (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<feature name="pcb" value="171-6884A" />
 			<feature name="ic1" value="MPR-17525-F" />
@@ -79,6 +82,7 @@
 		<description>Toughman Contest (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<feature name="pcb" value="171-6885A" />
 			<feature name="ic1" value="MPR-17926-MX" />
@@ -95,6 +99,7 @@
 		<description>Virtua Racing Deluxe (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<feature name="pcb" value="171-6885A" />
 			<feature name="ic1" value="MPR-17347 W72" />
@@ -113,6 +118,7 @@
 		<description>After Burner Complete (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="after burner complete (europe).bin" size="2097152" crc="029106f5" sha1="c7d56cc75dc9a5206fda6a080cbedae9f48c82bc" offset="000000" />
@@ -127,6 +133,7 @@
 		<info name="serial" value="GM-4006 (JPN)"/>
 		<info name="release" value="19950113 (JPN)"/>
 		<info name="alt_title" value="アフターバーナー・コンプリート"/>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="after burner complete ~ after burner (japan, usa).bin" size="2097152" crc="204044c4" sha1="9cf575feb036e2f26e78350154d5eb2fd3825325" offset="000000" />
@@ -138,6 +145,7 @@
 		<description>The Amazing Spider-Man - Web of Fire (USA)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="amazing spider-man, the - web of fire (usa).bin" size="3145728" crc="29dce257" sha1="7cc2ea1e10f110338ad880bd3e7ff3bce72e7e9e" offset="000000" />
@@ -149,6 +157,7 @@
 		<description>BC Racers (USA)</description>
 		<year>1995</year>
 		<publisher>Front Street Publishing</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="bc racers (usa).bin" size="3145728" crc="936c3d27" sha1="9b5fd499eaa442d48a2c97fceb1d505dc8e8ddff" offset="000000" />
@@ -160,6 +169,7 @@
 		<description>Blackthorne (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="blackthorne (usa).bin" size="3145728" crc="d1a60a47" sha1="4bf120cf056fe1417ca5b02fa0372ef33cb8ec11" offset="000000" />
@@ -171,6 +181,7 @@
 		<description>Brutal Unleashed - Above the Claw (USA)</description>
 		<year>1995</year>
 		<publisher>GameTek</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="brutal unleashed - above the claw (usa).bin" size="3145728" crc="7a72c939" sha1="40aa2c787f37772cdbd7280b8be06b15421fabae" offset="000000" />
@@ -182,6 +193,7 @@
 		<description>Cosmic Carnage (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="cosmic carnage (europe).bin" size="3145728" crc="9f3fdbc2" sha1="900e8ecdcc4460b4c4af3873e1d6bc83da4aee99" offset="000000" />
@@ -196,6 +208,7 @@
 		<info name="serial" value="GM-4004 (JPN)"/>
 		<info name="release" value="19950127 (JPN)"/>
 		<info name="alt_title" value="サイバーブロール"/>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="cyber brawl ~ cosmic carnage (japan, usa).bin" size="3145728" crc="7c7be6a2" sha1="9a563ed821b483148339561ebd2b876efa58847b" offset="000000" />
@@ -207,6 +220,7 @@
 		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19941011)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="cosmic carnage (prototype - oct 11, 1994).bin" size="3145728" crc="e483498b" sha1="bbdfe2b276c255247225efd1e8348be57a42ef4a" offset="000000" />
@@ -218,6 +232,7 @@
 		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19941007)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="cosmic carnage (prototype - oct 07, 1994).bin" size="3145728" crc="d8b04c24" sha1="c051de6dccc48352d51650f2712dbc7d62a1ec1a" offset="000000" />
@@ -229,6 +244,7 @@
 		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19941005)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="cosmic carnage (prototype - oct 05, 1994).bin" size="3145728" crc="bfe27f56" sha1="99bb4c98c7de0668934ab91a6eb01c9f680918b9" offset="000000" />
@@ -240,6 +256,7 @@
 		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19941004)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="cosmic carnage (prototype - oct 04, 1994).bin" size="3145728" crc="c6867772" sha1="17cf3d4671a3313764df42e0f9a25133b0dc4ec9" offset="000000" />
@@ -251,6 +268,7 @@
 		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19940928)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="cosmic carnage (prototype - sep 28, 1994).bin" size="3145728" crc="cf89175f" sha1="443c961bfc441b4d0ace5f6e0a8d1bb7abf8ac28" offset="000000" />
@@ -262,6 +280,7 @@
 		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19940926)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="cosmic carnage (prototype - sep 26, 1994).bin" size="3145728" crc="f04f4366" sha1="512d3c9b51e2f3015265dc78757363f45fc0a788" offset="000000" />
@@ -273,6 +292,7 @@
 		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19940921)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="cosmic carnage (prototype - sep 21, 1994).bin" size="4194304" crc="7b58141c" sha1="926996f4b1f935ce4c3b46e902171c4b4da16385" offset="000000" />
@@ -284,6 +304,7 @@
 		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA) (Prototype, 19940906)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="cosmic carnage (prototype - sep 06, 1994).bin" size="3145728" crc="d4166241" sha1="f84006cee56748bf2c7249dec3c356409cb0e0a5" offset="000000" />
@@ -295,6 +316,7 @@
 		<description>Darxide (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="darxide (europe) (en,fr,de,es).bin" size="2097152" crc="22d7c906" sha1="108b4ffed8643abdefa921cfb58389b119b47f3d" offset="000000" />
@@ -309,6 +331,7 @@
 		<info name="serial" value="GM-4003 (JPN)"/>
 		<info name="release" value="19941203 (JPN)"/>
 		<info name="alt_title" value="ドゥーム"/>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="doom (japan, usa).bin" size="3145728" crc="208332fd" sha1="b68e9c7af81853b8f05b8696033dfe4c80327e38" offset="000000" />
@@ -320,6 +343,7 @@
 		<description>Doom (Prototype, 19941201)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="doom (prototype - dec 01, 1994).bin" size="3102248" crc="7dcc1c18" sha1="b2349f625ac077222b49f0e507c552b24c824bd2" offset="000000" />
@@ -331,6 +355,7 @@
 		<description>Doom (Euro, Prototype, 19941002)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="doom (prototype - oct 02, 1994).bin" size="4194304" crc="6182e821" sha1="2945da1e6452b194fbbe44a685864a2000ea5cfd" offset="000000" />
@@ -343,6 +368,7 @@
 		<description>Doom (USA, Prototype, 19940928)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="doom (prototype - sep 28, 1994).bin" size="3145728" crc="12991053" sha1="f7539c406821b5ae4bcb0f41fe2839d07ab1fdb2" offset="000000" />
@@ -354,6 +380,7 @@
 		<description>Doom (Prototype, 19940925)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="doom (prototype - sep 25, 1994).bin" size="3145728" crc="b9ae1316" sha1="c3e78c38cfd2516f943a10f435664ba06790f1c4" offset="000000" />
@@ -365,6 +392,7 @@
 		<description>Doom (Prototype, 19940923)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="doom (prototype - sep 23, 1994).bin" size="3145728" crc="abc3eb89" sha1="e472548171a4e6183f16618bfcb5b6c09e7d6744" offset="000000" />
@@ -376,6 +404,7 @@
 		<description>Doom (Prototype, 19940921)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="doom (prototype - sep 21, 1994).bin" size="3507720" crc="2d09b919" sha1="2a2c80adb1cf62a71581400357951b2007770e8b" offset="000000" />
@@ -387,6 +416,7 @@
 		<description>Doom (Prototype, 19940916)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="doom (prototype - sep 16, 1994).bin" size="4194304" crc="b554596f" sha1="0530d326b75e97b04530761f50ced4a226b183d2" offset="000000" />
@@ -398,6 +428,7 @@
 		<description>Doom (Prototype, 19940914)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="doom (prototype - sep 14, 1994).bin" size="3760828" crc="102678b3" sha1="1bf7bc1fc2eafe71d1e72608566d5c0d01d5c79c" offset="000000" />
@@ -409,6 +440,7 @@
 		<description>Doom (Prototype, 19940909)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="doom (prototype - sep 09, 1994).bin" size="3894824" crc="8d757b51" sha1="5697176636df575d8b65480708efa85544d44302" offset="000000" />
@@ -420,6 +452,7 @@
 		<description>Doom (Prototype, 19940906)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="doom (prototype - sep 06, 1994).bin" size="4194304" crc="646d5c47" sha1="4fda0184d688886314d929224d92b4a35c712675" offset="000000" />
@@ -431,6 +464,7 @@
 		<description>Doom RR (USA, Prototype, 19950307)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="doom rr (prototype - mar 07, 1995).bin" size="3145728" crc="955cf84a" sha1="a2d5b5acc7e19abfb927bb0ed110d80d685510c9" offset="000000" />
@@ -442,6 +476,7 @@
 		<description>Doom RR (USA, Prototype, 19950221)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="doom rr (prototype - feb 21, 1995).bin" size="3145728" crc="6f1572f9" sha1="b298ad7bacca89770bcd6dea796e5dbbfb72e642" offset="000000" />
@@ -453,6 +488,7 @@
 		<description>Doom RR (USA, Prototype, 19950215)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="doom rr (prototype - feb 15, 1995).bin" size="3145728" crc="48399bc5" sha1="63568023c907d636133e1a2fd140afbadb910e98" offset="000000" />
@@ -475,6 +511,7 @@
 		<description>FIFA Soccer 96 (Euro)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="fifa soccer '96 (europe) (en,fr,de,es,it,sv).bin" size="3145728" crc="fb14a7c8" sha1="131ebb717dee4dd1d8f5ab2b9393c23785d3a359" offset="000000" />
@@ -486,6 +523,7 @@
 		<description>36 Great Holes Starring Fred Couples (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="golf magazine 36 great holes starring fred couples (europe).bin" size="3145728" crc="6ef99202" sha1="55848f7c54533fd2a19011db661ef261cd8bdb22" offset="000000" />
@@ -500,6 +538,7 @@
 		<info name="serial" value="GM-5002 (JPN)"/>
 		<info name="release" value="19950224 (JPN)"/>
 		<info name="alt_title" value="ゴルフマガジンプレゼンツ 36グレイトホールズ スターリング フレッド コプルス"/>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="golf magazine 36 great holes starring fred couples (japan, usa).bin" size="3145728" crc="d3d0a2fe" sha1="dc77b1e5c888c2c4284766915a5020bb14ee681d" offset="000000" />
@@ -511,6 +550,7 @@
 		<description>36 Great Holes starring Fred Couples (Euro, Prototype, 19941221-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - dec 21, 1994 - b).bin" size="3145728" crc="cc0334bb" sha1="6a1801ef96cc8c4a6896ab55e105f7fa8d707f51" offset="000000" />
@@ -522,6 +562,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941221)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - dec 21, 1994).bin" size="3145728" crc="3893dcfe" sha1="23e84ec4d8cec09992fcff323f32f49f44d23cd2" offset="000000" />
@@ -533,6 +574,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941219)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - dec 19, 1994).bin" size="3145728" crc="c073149f" sha1="e28ab68e8aed7aa8e9f33a6e9c68678272df4d95" offset="000000" />
@@ -544,6 +586,7 @@
 		<description>36 Great Holes starring Fred Couples (Euro, Prototype, 19941214)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - dec 14, 1994).bin" size="3145728" crc="a63b0636" sha1="f78481e57111295c2f5aeb64cd306c3c5fbf6d97" offset="000000" />
@@ -555,6 +598,7 @@
 		<description>36 Great Holes starring Fred Couples (Euro, Prototype, 19941213)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - dec 13, 1994).bin" size="3145728" crc="34bf7c6d" sha1="6398a442595650d70a5ce20a52331899c0dfaf62" offset="000000" />
@@ -566,6 +610,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941206)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - dec 06, 1994).bin" size="3145728" crc="ecfe5a0f" sha1="af8eadcf49d0700c7479648865cc08cd40bc2808" offset="000000" />
@@ -577,6 +622,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941203)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - dec 03, 1994).bin" size="3145728" crc="3f30c0d2" sha1="7ca51ad03ebb95f017a1b900a4a1592876d0d5c2" offset="000000" />
@@ -588,6 +634,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941202)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - dec 02, 1994).bin" size="3145728" crc="323c2935" sha1="5b1140e33357a3d0fdc056ab5a350d588b5e5af9" offset="000000" />
@@ -599,6 +646,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941130)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - nov 30, 1994).bin" size="3145728" crc="41e2d54d" sha1="19681b2e5d1eafaa09401dca296bea884fbc08c1" offset="000000" />
@@ -610,6 +658,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941129)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - nov 29, 1994).bin" size="3145728" crc="9c5011b0" sha1="5658febd37534280962dc6801efc10604b07603f" offset="000000" />
@@ -621,6 +670,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941128-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - nov 28, 1994 - b).bin" size="3145728" crc="8f4f6479" sha1="e341e5fca64def64c019310d4f551ff48908291b" offset="000000" />
@@ -632,6 +682,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941128)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - nov 28, 1994).bin" size="3145728" crc="38d09772" sha1="f0d06074b1b5ce2df77fdaaf74620158efb7f875" offset="000000" />
@@ -643,6 +694,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941127)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - nov 27, 1994).bin" size="3145728" crc="b5e82f07" sha1="afa1f5c2dab7de2114d3a34794785b0d6768d95c" offset="000000" />
@@ -654,6 +706,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941126)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - nov 26, 1994).bin" size="3145728" crc="2ece26db" sha1="541ddfac44323c589ad23f51a5be984ecfa55539" offset="000000" />
@@ -665,6 +718,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941123)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - nov 23, 1994).bin" size="3136724" crc="0b58f6a5" sha1="fa2f2d3887bb3e6010a5c13289f63681cac0404a" offset="000000" />
@@ -676,6 +730,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941122-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - nov 22, 1994 - b).bin" size="3136724" crc="6b656643" sha1="0590ff4405fcd0ca8f2fc5293690330fdf63127a" offset="000000" />
@@ -687,6 +742,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941122)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - nov 22, 1994).bin" size="3136724" crc="e1e98cac" sha1="a6bee7800f73e2ca12381432154b636ddd279412" offset="000000" />
@@ -698,6 +754,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941121)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - nov 21, 1994).bin" size="3136724" crc="8d0713ce" sha1="34d7bf6b86c877ab068390f660073016a95711e3" offset="000000" />
@@ -709,6 +766,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941119-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - nov 19, 1994 - b).bin" size="3145728" crc="8fa32086" sha1="5fc3837ba3b98f9f2c560d3775da969798a150ee" offset="000000" />
@@ -720,6 +778,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941119)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - nov 19, 1994).bin" size="3136736" crc="da1026c8" sha1="2ea5fcdffa9b8f22b1468eeb2e76134d3f1b3be6" offset="000000" />
@@ -731,6 +790,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941118)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - nov 18, 1994).bin" size="3136712" crc="dc4c7c27" sha1="abe1d16dff2b2c1752e2f47bb15f97f049d6bfc0" offset="000000" />
@@ -742,6 +802,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941116)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - nov 16, 1994).bin" size="3136712" crc="ccb9fead" sha1="3bff7d113fa7487d015a54d8f27050f2cf296106" offset="000000" />
@@ -753,6 +814,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941110)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - nov 10, 1994).bin" size="3136712" crc="5226ef71" sha1="33620d0bb49c52a24563958b4caec883b2009a90" offset="000000" />
@@ -764,6 +826,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941108)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - nov 08, 1994).bin" size="3136712" crc="bcaf23fd" sha1="f317903c11777991417abf95cc45d4888bee25d6" offset="000000" />
@@ -776,6 +839,7 @@
 		<description>36 Great Holes starring Fred Couples (USA, Prototype, 19941107)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="36 great holes starring fred couples (prototype - nov 07, 1994).bin" size="3136712" crc="36b1708e" sha1="ea7539dbeaa86fdc36132e85be48f6577fb6dbb9" offset="000000" />
@@ -887,6 +951,7 @@
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="Knuckles' Chaotix (Box)"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="knuckles' chaotix (europe).bin" size="3145728" crc="41d63572" sha1="5c1a2e327a656217604d4bae7e141764a7e59922" offset="000000" />
@@ -901,6 +966,7 @@
 		<info name="serial" value="GM-5003 (JPN)"/>
 		<info name="release" value="19950421 (JPN)"/>
 		<info name="alt_title" value="カオティクス フィーチャリング ナックルズ ザ エキドゥナ, Knuckles' Chaotix (USA Box)"/>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="chaotix ~ knuckles' chaotix (japan, usa).bin" size="3145728" crc="d0b0b842" sha1="0c2fff7bc79ed26507c08ac47464c3af19f7ced7" offset="000000" />
@@ -912,6 +978,7 @@
 		<description>Chaotix (Jpn, USA, Prototype 214, 19950214, 06.46)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="knuckles' chaotix (prototype 214 - feb 14, 1995, 06.46).bin" size="3145728" crc="ba0a1108" sha1="af3bfd9540098581aef08664d625725ffcc90be2" offset="000000" />
@@ -923,6 +990,7 @@
 		<description>Chaotix (Jpn, USA, Prototype 0213, 19950213, 07.30)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="knuckles' chaotix (prototype 0213 - feb 13, 1995, 07.30).bin" size="3145728" crc="14f43e14" sha1="0cbbcc96f23917feb844469163bc8ab14da94816" offset="000000" />
@@ -934,6 +1002,7 @@
 		<description>Chaotix (Jpn, USA, Prototype 213B, 19950213, 06.46)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="knuckles' chaotix (prototype 213b - feb 13, 1995, 06.46).bin" size="3145728" crc="aff06bff" sha1="88b122398c1b25f432ae845b799f1308f51aa055" offset="000000" />
@@ -945,6 +1014,7 @@
 		<description>Chaotix (Jpn, USA, Prototype 210, 19950210, 06.28)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="knuckles' chaotix (prototype 210 - feb 10, 1995, 06.28).bin" size="3145728" crc="7b716175" sha1="4c13842abeda86ce6577da67ba5fc24fbfbdc0de" offset="000000" />
@@ -956,6 +1026,7 @@
 		<description>Chaotix (Jpn, USA, Prototype 209, 19950209, 08.25)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="knuckles' chaotix (prototype 209 - feb 09, 1995, 08.25).bin" size="3145728" crc="e95d7f57" sha1="01c9f4614f282a05b3e86701b4ca18a1a0e1889c" offset="000000" />
@@ -967,6 +1038,7 @@
 		<description>Chaotix (Jpn, USA, Prototype 208, 19950208, 11.17)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="knuckles' chaotix (prototype 208 - feb 08, 1995, 11.17).bin" size="3145728" crc="b099e5f6" sha1="d965d12c8cce09683d80c08d06c74b7c6e7b8dab" offset="000000" />
@@ -978,6 +1050,7 @@
 		<description>Chaotix (Jpn, USA, Prototype 0202, 19950207, 15.25)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="knuckles' chaotix (prototype 0202 - feb 07, 1995, 15.25).bin" size="3145728" crc="7b32e440" sha1="4e4af26f944cf3b5d99f60f37b20dc67207a4fbe" offset="000000" />
@@ -989,6 +1062,7 @@
 		<description>Chaotix (Jpn, USA, Prototype 119, 19950119, 07.04)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="knuckles' chaotix (prototype 119 - jan 19, 1995, 07.04).bin" size="4194304" crc="468ad032" sha1="2b1a5f19113fa4015437ede5a195c5dfb377e5be" offset="000000" />
@@ -1000,6 +1074,7 @@
 		<description>Chaotix (Jpn, USA, Prototype 0111, 19950112, 09.36)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="knuckles' chaotix (prototype 0111 - jan 12, 1995, 09.36).bin" size="4194304" crc="5523ea78" sha1="882ce770f32f4af61ac422accecc8a84e1c52cd3" offset="000000" />
@@ -1011,6 +1086,7 @@
 		<description>Chaotix (Jpn, USA, Prototype 1207, 19941207, 07.15)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="knuckles' chaotix (prototype 1207 - dec 07, 1994, 07.15).bin" size="3145728" crc="d62ae235" sha1="150dace1482ebf38a0f6242be6d8b7ea19f8a737" offset="000000" />
@@ -1022,6 +1098,7 @@
 		<description>Chaotix (Jpn, USA, Prototype 1227, 19941227, 10.28)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="knuckles' chaotix (prototype 1227 - dec 27, 1994, 10.28).bin" size="4194304" crc="4307d738" sha1="c62a8be339ffd9dd182a3f8e60b6e27225cfc5f2" offset="000000" />
@@ -1033,6 +1110,7 @@
 		<description>Chaotix (Jpn, USA, Prototype 1229, 19941230, 15.31)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="knuckles' chaotix (prototype 1229 - dec 30, 1994, 15.31).bin" size="4194304" crc="36a294e0" sha1="883c7748c3c352b44238d2bdc9152ac9651e99fb" offset="000000" />
@@ -1044,6 +1122,7 @@
 		<description>Kolibri (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="kolibri (usa, europe).bin" size="3145728" crc="20ca53ef" sha1="191ae0b525ecf32664086d8d748e0b35f776ddfe" offset="000000" />
@@ -1055,6 +1134,7 @@
 		<description>Mars Check Program Version 1.0 (Jpn, USA, SDK Build Set 1)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="mars check program version 1.0 (japan, usa) (sdk build) (set 1).bin" size="4194304" crc="8f7260fb" sha1="7654c6d3cf2883c30df51cf38d723ab7902280c4" offset="000000" />
@@ -1066,6 +1146,7 @@
 		<description>Mars Check Program Version 1.0 (Jpn, USA, SDK Build Set 2)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="mars check program version 1.0 (japan, usa) (sdk build) (set 2).bin" size="65536" crc="a2da35fd" sha1="bbc6a66ad9268a3bb6e35e565e770581e7fe8ac2" offset="000000" />
@@ -1077,6 +1158,7 @@
 		<description>Mars Sample Program - Gnu Sierra (Jpn, USA, SDK Build)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="mars sample program - gnu sierra (japan, usa) (sdk build).bin" size="655360" crc="5f0df42c" sha1="04efcf2802b11e130378734671ff8cfb78facd67" offset="000000" />
@@ -1088,6 +1170,7 @@
 		<description>Mars Sample Program - Pharaoh (Jpn, USA, SDK Build)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="mars sample program - pharaoh (japan, usa) (sdk build).bin" size="262144" crc="969c80d4" sha1="d038d88cf518116fcb4df72df51dbc0c374792e2" offset="000000" />
@@ -1099,6 +1182,7 @@
 		<description>Mars Sample Program - Runlength Mode Test (Jpn, USA, SDK Build)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="mars sample program - runlength mode test (japan, usa) (sdk build).bin" size="262144" crc="d630e343" sha1="56566575de6d1d42630f688eb0eeb1a93ebe2624" offset="000000" />
@@ -1110,6 +1194,7 @@
 		<description>Mars Sample Program - Texture Test (Jpn, USA, SDK Build)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="mars sample program - texture test (japan, usa) (sdk build).bin" size="24576" crc="9b2ad63f" sha1="885abd1de7b67b115057610d94f24b1b4e294706" offset="000000" />
@@ -1121,6 +1206,7 @@
 		<description>Metal Head (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="metal head (europe) (en,ja).bin" size="3145728" crc="bf9b8376" sha1="2a7767024e23b55fe193d586a96a3ba3c92e7ea8" offset="000000" />
@@ -1135,6 +1221,7 @@
 		<info name="serial" value="GM-4008 (JPN)"/>
 		<info name="release" value="19950224 (JPN)"/>
 		<info name="alt_title" value="メタルヘッド"/>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="metal head (japan, usa) (en,ja).bin" size="3145728" crc="ef5553ff" sha1="4e872fbb44ecb2bd730abd8cc8f32f96b10582c0" offset="000000" />
@@ -1146,6 +1233,7 @@
 		<description>Metal Head (Jpn, USA, Prototype, 19941220)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="metal head (prototype - dec 20, 1994).bin" size="3145728" crc="de99c9ce" sha1="8d7a9f78860342643502e2ba77b445b4dc7e078e" offset="000000" />
@@ -1157,6 +1245,7 @@
 		<description>Metal Head (Jpn, USA, Prototype, 19941213)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="metal head (prototype - dec 13, 1994).bin" size="3145728" crc="3302b1a1" sha1="5a38dce482c7fe38a50c6fd8884b019f1acab2a1" offset="000000" />
@@ -1168,6 +1257,7 @@
 		<description>Metal Head (Jpn, USA, Prototype, 19941209)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="metal head (prototype - dec 09, 1994).bin" size="3145728" crc="5369d23f" sha1="4d795a7ecab65527e6538ef886c3c3783a1ba936" offset="000000" />
@@ -1179,6 +1269,7 @@
 		<description>Metal Head (Jpn, USA, Prototype, 19941207-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="metal head (prototype - dec 07, 1994 - b).bin" size="3145728" crc="476d29b0" sha1="438e172b22ef2b78f5bceb3195da408639ae463c" offset="000000" />
@@ -1190,6 +1281,7 @@
 		<description>Metal Head (Jpn, USA, Prototype, 19941207)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="metal head (prototype - dec 07, 1994).bin" size="3145728" crc="fa0fc326" sha1="d82b26783f0843faabe526167eabf296c84b0c47" offset="000000" />
@@ -1201,6 +1293,7 @@
 		<description>Metal Head (Jpn, USA, Prototype, 19941202)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="metal head (prototype - dec 02, 1994).bin" size="3145728" crc="8b7bc8a4" sha1="194f45a0651a59305e0e727e407801ff09968a62" offset="000000" />
@@ -1213,6 +1306,7 @@
 		<description>Metal Head (Jpn, USA, Prototype, 19941121)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="metal head (prototype - nov 21, 1994).bin" size="3145728" crc="398bcb98" sha1="e7667f4a4342a5a45b0a010f0fe2e61b2bf99fea" offset="000000" />
@@ -1225,6 +1319,7 @@
 		<description>Metal Head (Jpn, USA, Prototype, 19941118)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="metal head (prototype - nov 18, 1994).bin" size="3145728" crc="a0343749" sha1="a943ea135d6c685f87957503697cb9f894e12c52" offset="000000" />
@@ -1237,6 +1332,7 @@
 		<description>Metal Head (Jpn, USA, Prototype, 19941114)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="metal head (prototype - nov 14, 1994).bin" size="3145728" crc="2ea0ff81" sha1="a81db052a095360439a1da6e41ac19b91561ab27" offset="000000" />
@@ -1248,6 +1344,7 @@
 		<description>Mortal Kombat II (Euro)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="mortal kombat ii (europe).bin" size="4194304" crc="211085ce" sha1="f75698de887d0ef980f73e35fc4615887a9ad58f" offset="000000" />
@@ -1262,6 +1359,7 @@
 		<info name="serial" value="T-8104A (JPN)"/>
 		<info name="release" value="19950519 (JPN)"/>
 		<info name="alt_title" value="モータルコンバットII 究極神拳"/>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="mortal kombat ii (japan, usa).bin" size="4194304" crc="773c0a85" sha1="d55964bd935110ac2d9cbd3b085b7e8b71b11df2" offset="000000" />
@@ -1273,6 +1371,7 @@
 		<description>Motocross Championship (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="motocross championship (usa).bin" size="2097152" crc="a21c5761" sha1="5f1a107991aaf9eff0b3ce864b2e3151f56abe7b" offset="000000" />
@@ -1284,6 +1383,7 @@
 		<description>Motocross Championship (USA, Prototype, 19941111)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="motocross championship (prototype - nov 11, 1994).bin" size="2097152" crc="37f78d3d" sha1="45f457930884c7a5ec35361e37b1fd8cd91e4487" offset="000000" />
@@ -1295,6 +1395,7 @@
 		<description>Motocross Championship (USA, Prototype, 19941108)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="motocross championship (prototype - nov 08, 1994).bin" size="2097152" crc="5ff9eab9" sha1="93e13f7d3c4640e9aee7d577e974ab6581c07f91" offset="000000" />
@@ -1306,6 +1407,7 @@
 		<description>Motocross Championship (USA, Prototype, 19941107)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="motocross championship (prototype - nov 07, 1994).bin" size="2097152" crc="63db2fb0" sha1="181a58cfc8348e18e5d34ed0a75e79acedcc004e" offset="000000" />
@@ -1317,6 +1419,7 @@
 		<description>Motocross Championship (USA, Prototype, 19941104)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="motocross championship (prototype - nov 04, 1994).bin" size="2045624" crc="6e12d410" sha1="ca4db761d26328b99445445b99304e90d7279c3e" offset="000000" />
@@ -1328,6 +1431,7 @@
 		<description>Motocross Championship (USA, Prototype, 19941103)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="motocross championship (prototype - nov 03, 1994).bin" size="2045120" crc="c652c802" sha1="5dc89f7f2cc03689991c9325a1a2d08c6df5dc1b" offset="000000" />
@@ -1339,6 +1443,7 @@
 		<description>Motocross Championship (USA, Prototype, 19941102-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="motocross championship (prototype - nov 02, 1994 - b).bin" size="2045684" crc="efe307ff" sha1="3b7cfe05c0a66fc025bbdd3a35ba7828b2fc3c7f" offset="000000" />
@@ -1350,6 +1455,7 @@
 		<description>Motocross Championship (USA, Prototype, 19941102)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="motocross championship (prototype - nov 02, 1994).bin" size="2045684" crc="cefef428" sha1="607b9d89e312294ca4e477de238bec2d1bea2a42" offset="000000" />
@@ -1361,6 +1467,7 @@
 		<description>Motocross Championship (USA, Prototype, 19941101)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="motocross championship (prototype - nov 01, 1994).bin" size="2045468" crc="46970275" sha1="372a43df94cbed3859bbddad4982fa5301416aed" offset="000000" />
@@ -1372,6 +1479,7 @@
 		<description>Motocross Championship (USA, Prototype, 19941028)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="motocross championship (prototype - oct 28, 1994).bin" size="1843436" crc="59107472" sha1="174158dd18a4d243d3c943c9f8cf080acd91cc3b" offset="000000" />
@@ -1383,6 +1491,7 @@
 		<description>Motocross Championship (USA, Prototype, 19941024)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="motocross championship (prototype - oct 24, 1994).bin" size="1736076" crc="20c49183" sha1="d641e7b2fd0a44ad603cdc324921a25f1b897288" offset="000000" />
@@ -1394,6 +1503,7 @@
 		<description>Motocross Championship (USA, Prototype, 19941020)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="motocross championship (prototype - oct 20, 1994).bin" size="1661296" crc="ac6cf708" sha1="95edb6101eee31588e7b0ce0b67d73206070eb81" offset="000000" />
@@ -1405,6 +1515,7 @@
 		<description>Motocross Championship (USA, Prototype, 19941019)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="motocross championship (prototype - oct 19, 1994).bin" size="1644464" crc="385ed8c7" sha1="3862fe8d98a512e3332748b8f73fcdf84faba489" offset="000000" />
@@ -1416,6 +1527,7 @@
 		<description>Motocross Championship (USA, Prototype, 19941018)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="motocross championship (prototype - oct 18, 1994).bin" size="1624764" crc="2c2dc4df" sha1="bafabf4eb40fb1197dd543fa6ae69df1f87e9d02" offset="000000" />
@@ -1427,6 +1539,7 @@
 		<description>Motocross Championship (Prototype, 19941017)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="motocross championship (prototype - oct 17, 1994).bin" size="1608792" crc="f3163d21" sha1="670779a85db5673b23825b91693b1015f841fde3" offset="000000" />
@@ -1438,6 +1551,7 @@
 		<description>Motocross Championship (Prototype, 19941012)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="motocross championship (prototype - oct 12, 1994).bin" size="1690952" crc="0a075812" sha1="102e763c6f4bf65210b307d34d75473fd27d7ae4" offset="000000" />
@@ -1477,6 +1591,7 @@
 		<description>Pitfall - The Mayan Adventure (USA)</description>
 		<year>1995</year>
 		<publisher>Activision</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="pitfall - the mayan adventure (usa).bin" size="3145728" crc="f9126f15" sha1="ee864d1677c6d976d0846eb5f8d8edb839acfb76" offset="000000" />
@@ -1488,6 +1603,7 @@
 		<description>Primal Rage (Euro, USA)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="primal rage (usa, europe).bin" size="4194304" crc="e78a4d28" sha1="5084dcca51d76173c383ab7d04cbc661673545f7" offset="000000" />
@@ -1499,6 +1615,7 @@
 		<description>R.B.I. Baseball '95 (USA)</description>
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="rbi baseball '95 (usa).bin" size="2097152" crc="ff795fdc" sha1="4f90433a4403fd74cafeea49272689046de4ae43" offset="000000" />
@@ -1524,6 +1641,7 @@
 		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="shadow squadron ~ stellar assault (usa, europe).bin" size="2097152" crc="60c49e4d" sha1="561c8c63dbcabc0b1b6f31673ca75a0bde7abc72" offset="000000" />
@@ -1538,6 +1656,7 @@
 		<info name="serial" value="GM-4010 (JPN)"/>
 		<info name="release" value="19950426 (JPN)"/>
 		<info name="alt_title" value="ステラアサルト"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="stellar assault (japan).bin" size="2097152" crc="fce4c8c7" sha1="ff4f1a2dded85f3ad43bf28a85c46ad8595d5614" offset="000000" />
@@ -1549,6 +1668,7 @@
 		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950313-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="shadow squadron (prototype - mar 13, 1995 - b).bin" size="2097152" crc="fd7fedb2" sha1="9875b357fd2d651892054d233c608b6f3bbb40e7" offset="000000" />
@@ -1560,6 +1680,7 @@
 		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950313)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="shadow squadron (prototype - mar 13, 1995).bin" size="2097152" crc="58962105" sha1="9bae40d4d07a096545b11f6b0434db778c238af5" offset="000000" />
@@ -1571,6 +1692,7 @@
 		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950306)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="shadow squadron (prototype - mar 06, 1995).bin" size="2097152" crc="7eec3665" sha1="31a0a0a34719b1259de98458c24cf5eb78f7109c" offset="000000" />
@@ -1582,6 +1704,7 @@
 		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950302)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="shadow squadron (prototype - mar 02, 1995).bin" size="2097152" crc="25bdde61" sha1="5a83e4ebffe8ac7108b45697be7468bd7f111642" offset="000000" />
@@ -1593,6 +1716,7 @@
 		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950222)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="shadow squadron (prototype - feb 22, 1995).bin" size="2097152" crc="48ef9ee9" sha1="9d72335cb0468a9699f7e92927043387091bc0c9" offset="000000" />
@@ -1604,6 +1728,7 @@
 		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950213)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="shadow squadron (prototype - feb 13, 1995).bin" size="2097152" crc="ca0de10e" sha1="71061c0a02b4cc3c3e39d872bf86b190421cb594" offset="000000" />
@@ -1615,6 +1740,7 @@
 		<description>Stellar Assault (Euro) ~ Shadow Squadron (USA) (Prototype, 19950206)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="shadow squadron (prototype - feb 06, 1995).bin" size="2097152" crc="24057310" sha1="6ff8cd79cfa073697dd13cd1c4dc767b4e0c558e" offset="000000" />
@@ -1623,10 +1749,11 @@
 	</software>
 
 	<software name="soulstar">
-    <!-- The dumper also released larger size files, which were this exact dump padded with 0xff up to the end of the file -->
-		<description>SoulStar X (Prototype)</description>
+	<!-- The dumper also released larger size files, which were this exact dump padded with 0xff up to the end of the file -->
+		<description>SoulStar X (USA, Prototype)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="soulstar-x.bin" size="2097152" crc="5ea52f22" sha1="4726988f28c5e49971e1f38e335fecc3f9dd6c1f" offset="000000" />
@@ -1641,6 +1768,7 @@
 		<info name="serial" value="GM-4005 (JPN)"/>
 		<info name="release" value="19941203 (JPN)"/>
 		<info name="alt_title" value="スペースハリアー"/>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="space harrier (japan, usa).bin" size="2097152" crc="86e7f989" sha1="f32a52a7082761982024e40291dbd962a835b231" offset="000000" />
@@ -1652,6 +1780,7 @@
 		<description>Space Harrier (Prototype, 19940920)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="space harrier (prototype - sep 20, 1994).bin" size="2097152" crc="2c65fa40" sha1="05d24d6f6c645866b8b1fde96746e27d0a19bbc6" offset="000000" />
@@ -1663,6 +1792,7 @@
 		<description>Star Trek - Starfleet Academy - Starship Bridge Simulator (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="star trek starfleet academy - starship bridge simulator (usa).bin" size="2097152" crc="dd9708b9" sha1="e5248328b64a1ec4f1079c88ee53ef8d48e99e58" offset="000000" />
@@ -1897,6 +2027,7 @@
 		<description>T-Mek (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="t-mek (usa, europe).bin" size="3145728" crc="66d2c48f" sha1="173c8425921d83db3e8d181158e7599364f4c0f6" offset="000000" />
@@ -1911,6 +2042,7 @@
 		<info name="serial" value="GM-4009 (JPN)"/>
 		<info name="release" value="19950324 (JPN)"/>
 		<info name="alt_title" value="テンポ"/>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="tempo (japan, usa).bin" size="3145728" crc="14e5c575" sha1="6673ba83570b4f2c1b4a22415a56594c3cc6c6a9" offset="000000" />
@@ -1922,6 +2054,7 @@
 		<description>Tempo (USA, Prototype, 19950207)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="tempo (prototype - feb 07, 1995).bin" size="3145728" crc="a2ebc91c" sha1="91bca4f05b97b51b96fb1ddcb9b54165f0b621ae" offset="000000" />
@@ -1933,6 +2066,7 @@
 		<description>Tempo (USA, Prototype, 19950206)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="tempo (prototype - feb 06, 1995).bin" size="3145728" crc="e2502fe6" sha1="2e9724e9b7f2d351ad1ddfb34c43014aff4b07dd" offset="000000" />
@@ -1944,6 +2078,7 @@
 		<description>Tempo (USA, Prototype, 19950206-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="tempo (prototype - feb 06, 1995 - b).bin" size="3145728" crc="6d0775f3" sha1="7c29092fb82711851f1c681fa717cd59b98f531a" offset="000000" />
@@ -1955,6 +2090,7 @@
 		<description>Tempo (USA, Prototype, 19950204)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="tempo (prototype - feb 04, 1995).bin" size="3145728" crc="6e2bcc9f" sha1="73d31074f08d9dd8061bf0996829dbad46b3d784" offset="000000" />
@@ -1966,6 +2102,7 @@
 		<description>Tempo (USA, Prototype, 19950126)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="tempo (prototype - jan 26, 1995).bin" size="3145728" crc="86637ae4" sha1="4ec1dd3abf3e5aa0d1a902f20cfa0d16a224b5bf" offset="000000" />
@@ -1977,6 +2114,7 @@
 		<description>Tempo (USA, Prototype, 19950124)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="tempo (prototype - jan 24, 1995).bin" size="3145728" crc="7a02c17b" sha1="1b8225ae3e688ebdde482015a389a6cebbdbfd5e" offset="000000" />
@@ -1988,6 +2126,7 @@
 		<description>Tempo (Prototype, 19950121)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="tempo (prototype - jan 21, 1995).bin" size="3145728" crc="48cc1645" sha1="55fd5d5410a820867526d5f7f909bf39d25607c2" offset="000000" />
@@ -1999,6 +2138,7 @@
 		<description>Tempo (Prototype, 19941229)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="tempo (prototype - dec 29, 1994).bin" size="3145728" crc="7bfe49a3" sha1="017ee73e0f582893ef3deebfbe74af4babd532a5" offset="000000" />
@@ -2010,6 +2150,7 @@
 		<description>Virtua Fighter (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua fighter (europe).bin" size="4194304" crc="25aea73c" sha1="24b3063284a914c76d8d1f681e3ed6323b0d7d0b" offset="000000" />
@@ -2024,6 +2165,7 @@
 		<info name="serial" value="GM-4013 (JPN)"/>
 		<info name="release" value="19951020 (JPN)"/>
 		<info name="alt_title" value="バーチャファイター"/>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua fighter (japan, usa).bin" size="4194304" crc="b5de9626" sha1="f35754f4bfe3a53722d7a799f88face0fd13c424" offset="000000" />
@@ -2035,6 +2177,7 @@
 		<description>Virtua Fighter (USA, Prototype, 19950725)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua fighter (prototype - jul 25, 1995).bin" size="4194304" crc="aff4d320" sha1="7b881a7849320187389d4af5bd4bf8d3ee6fd796" offset="000000" />
@@ -2046,6 +2189,7 @@
 		<description>Virtua Fighter (USA, Prototype, 19950724)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua fighter (prototype - jul 24, 1995).bin" size="4194304" crc="d4f5484b" sha1="4600fb1c80c968728688269dfbd9c480d4d70abe" offset="000000" />
@@ -2057,6 +2201,7 @@
 		<description>Virtua Fighter (USA, Prototype, 19950721)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua fighter (prototype - jul 21, 1995).bin" size="4194304" crc="1c4c13f3" sha1="d26708a26a3add9e4d6083e6b9ccd48776cd4c56" offset="000000" />
@@ -2068,6 +2213,7 @@
 		<description>Virtua Fighter (USA, Prototype, 19950717)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua fighter (prototype - jul 17, 1995).bin" size="4194304" crc="6a364bce" sha1="c931cd60543b41e8bfb29511dcc70e4648471cbf" offset="000000" />
@@ -2079,6 +2225,7 @@
 		<description>Virtua Fighter (Prototype, 19950630)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua fighter (prototype - jun 30, 1995).bin" size="4194304" crc="3b88f987" sha1="cc6a95d10a95a91337f995a0120cb353196ce080" offset="000000" />
@@ -2090,6 +2237,7 @@
 		<description>Virtua Fighter (Prototype, 19950615)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua fighter (prototype - jun 15, 1995).bin" size="4194304" crc="8df6401c" sha1="28e99cc511e7c539fec66acbf5662f81528389d3" offset="000000" />
@@ -2101,6 +2249,7 @@
 		<description>Virtua Fighter (Prototype, 19950530)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua fighter (prototype - may 30, 1995).bin" size="4194304" crc="46a88625" sha1="fbb0d96c22465abb1702499f0a8c68228dcf8fc6" offset="000000" />
@@ -2112,6 +2261,7 @@
 		<description>Virtua Hamster (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua hamster (usa) (proto).bin" size="2097152" crc="cd54ac37" sha1="c10f98d9db73ae90be5e5d556b663a5aff015cef" offset="000000" />
@@ -2126,6 +2276,7 @@
 		<info name="serial" value="GM-5001 (JPN)"/>
 		<info name="release" value="19941216 (JPN)"/>
 		<info name="alt_title" value="バーチャレーシング デラックス"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="mpr-17503+mpr-17504.bin" size="3145728" crc="0908e888" sha1="1c64e80eb164ca8d6c6587a55ad60385ba1daf27" offset="000000" />
@@ -2137,6 +2288,7 @@
 		<description>Virtua Racing Deluxe (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua racing deluxe (usa).bin" size="3145728" crc="7896b62e" sha1="18dfdeb50780c2623e60a6587d7ed701a1cf81f1" offset="000000" />
@@ -2148,6 +2300,7 @@
 		<description>Virtua Racing Deluxe (USA, Prototype, 19940905)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua racing deluxe (prototype - sep 05, 1994).bin" size="3145728" crc="99f38344" sha1="88b3ef2bb0ccba25f3f83f218ca090e1a89512fe" offset="000000" />
@@ -2159,6 +2312,7 @@
 		<description>Virtua Racing Deluxe (USA, Prototype, 19940829)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua racing deluxe (prototype - aug 29, 1994).bin" size="3145728" crc="86a318de" sha1="b1385111a39795bf2ea57ab50a4feb479d7e502d" offset="000000" />
@@ -2170,6 +2324,7 @@
 		<description>Virtua Racing Deluxe (Prototype, 19940822)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua racing deluxe (prototype - aug 22, 1994).bin" size="3145728" crc="6ebb3eda" sha1="d4e996fd7fb26919017d1056d0de608a34f05184" offset="000000" />
@@ -2181,6 +2336,7 @@
 		<description>World Series Baseball Starring Deion Sanders (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="world series baseball starring deion sanders (usa).bin" size="3145728" crc="6de1bc75" sha1="ab3026eae46a775adb7eaebc13702699557ddc41" offset="000000" />
@@ -2194,6 +2350,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8101A (JPN)"/>
 		<info name="release" value="19950901 (JPN)"/>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="wwf raw (world).bin" size="4194304" crc="8eb7cd2c" sha1="94b974f2f69f0c10bc18b349fa4ff95ca56fa47b" offset="000000" />
@@ -2216,6 +2373,7 @@
 		<description>X-Men (USA, Prototype)</description>
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="x-men (usa) (proto).bin" size="4194304" crc="d61febc0" sha1="cd3fa2ace2fdbf4b6402cb52eeb208010bf31029" offset="000000" />
@@ -2230,6 +2388,7 @@
 		<info name="serial" value="GM-4012 (JPN)"/>
 		<info name="release" value="19950714 (JPN)"/>
 		<info name="alt_title" value="パラスコード"/>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="parasquad ~ zaxxon's motherbase 2000 (japan, usa).bin" size="2097152" crc="447d44be" sha1="60c390f76c394bdd221936c21aecbf98aec49a3d" offset="000000" />
@@ -2241,6 +2400,7 @@
 		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950331)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="zaxxon's motherbase 2000 (prototype - mar 31, 1995).bin" size="2097152" crc="1344f08b" sha1="ed3b31494407f324f18db4f5056ad6df75dc1a10" offset="000000" />
@@ -2252,6 +2412,7 @@
 		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950315)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="zaxxon's motherbase 2000 (prototype - mar 15, 1995).bin" size="2097152" crc="adfd5bc6" sha1="ed9d3414edc90b7fb6a23732038f5c57710de9d3" offset="000000" />
@@ -2263,6 +2424,7 @@
 		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950310)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="zaxxon's motherbase 2000 (prototype - mar 10, 1995).bin" size="2097152" crc="20faf0c3" sha1="df6898e46cba85541bc7f92090bfcf7000c0e648" offset="000000" />
@@ -2274,6 +2436,7 @@
 		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950306)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="zaxxon's motherbase 2000 (prototype - mar 06, 1995).bin" size="2097152" crc="90692a18" sha1="67afaca4956df2120f62259b1147feaad6098a53" offset="000000" />
@@ -2285,6 +2448,7 @@
 		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950303)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="zaxxon's motherbase 2000 (prototype - mar 03, 1995).bin" size="2097152" crc="5856082d" sha1="22dfc9a059657f45c7218d3be84c4a8c257ccc38" offset="000000" />
@@ -2296,6 +2460,7 @@
 		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950227)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="zaxxon's motherbase 2000 (prototype - feb 27, 1995).bin" size="2097152" crc="a1ef9787" sha1="e498f84bea01f073a430d854b47306b7d35ffe08" offset="000000" />
@@ -2307,6 +2472,7 @@
 		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950223)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="zaxxon's motherbase 2000 (prototype - feb 23, 1995).bin" size="2097152" crc="e92b36c5" sha1="6c93f432610908950b594bb8d289fe81de88fbdf" offset="000000" />
@@ -2318,6 +2484,7 @@
 		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950221)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="zaxxon's motherbase 2000 (prototype - feb 21, 1995).bin" size="2097152" crc="061c0cf2" sha1="3a8c794139fe7255e7107877b2d0018a6eaa0300" offset="000000" />
@@ -2329,6 +2496,7 @@
 		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA) (Prototype, 19950210)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="zaxxon's motherbase 2000 (prototype - feb 10, 1995).bin" size="2097152" crc="c65693af" sha1="9db5a93ae5fc4045df342a9f53b904ef130debbf" offset="000000" />
