@@ -22637,13 +22637,28 @@ Undumped Pirates:
 		<!-- Alt. Title: 石器時代 精靈王誕生 (Stone Age - Birth of the Goblin King) -->
 		<description>Shi Qi Shi Dai - Jing Ling Wang Dan Sheng (Chi)</description>
 		<year>20??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>GOWIN</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<!-- cartridge ram -->
 			<feature name="battery_backed" value="yes" />
 			<dataarea name="rom" size="4194304">
 				<rom name="stone age (unl).bin" size="4194304" crc="e7d9d377" sha1="f88f605960c1573aa8bc5fafab19014b0d987729" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sqsdh" cloneof="sqsd" supported="partial">
+		<!-- Alt. Title: 石器時代 精靈王誕生 (Stone Age - Birth of the Goblin King) -->
+		<description>Shi Qi Shi Dai - Jing Ling Wang Dan Sheng (Chi, Hacked?)</description>
+		<year>20??</year>
+		<publisher>GOWIN</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="stone age (unl).bin" size="4194304" crc="2ffe697c" sha1="b992f280b5dd2095c8f430282c5dba69c6a10eb4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

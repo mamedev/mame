@@ -78,7 +78,7 @@ Known undumped pirates
   * Thunderbolt II - 雷電伝説II
   * Magic 7 Block - 百変七巧板
   * Chinese Battle Chess (?) - 戦 棊
-  * 16 Tile Mahjong II (by Gamtek)
+  * 16 Tile Mahjong II (by Gamtec)
 
 NOTE
 
@@ -26949,7 +26949,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="bomboy">
 		<description>Bomboy (Tw)</description>
 		<year>1993</year>
-		<publisher>Gamtek</publisher>
+		<publisher>Gamtec</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="bomboy (unl).bin" size="524288" crc="065d2019" sha1="206fff31bccbb9a973de95c9ae780acb462548dd" offset="000000" loadflag="load16_word_swap" />
