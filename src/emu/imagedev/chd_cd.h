@@ -56,6 +56,7 @@ protected:
 	// device-level overrides
     virtual void device_config_complete();
 	virtual void device_start();
+	virtual void device_stop();
 
 	chd_file	m_self_chd;
 	cdrom_file	*m_cdrom_handle;

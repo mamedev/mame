@@ -49,19 +49,7 @@ void scsicd_device::device_reset()
 {
 	scsihle_device::device_reset();
 
-	is_file = TRUE;
 	cdrom = subdevice<cdrom_image_device>("image")->get_cdrom_file();
-	if( !cdrom )
-	{
-		// try to locate the CHD from a DISK_REGION
-		chd_file *chd = get_disk_handle( machine(), tag() );
-		if( chd != NULL )
-		{
-			is_file = FALSE;
-			cdrom = cdrom_open( chd );
-		}
-	}
-
 	if( !cdrom )
 	{
 		logerror( "SCSICD %s: no CD found!\n", tag() );
@@ -74,17 +62,6 @@ void scsicd_device::device_reset()
 	num_subblocks = 1;
 	cur_subblock = 0;
 	play_err_flag = 0;
-}
-
-void scsicd_device::device_stop()
-{
-	if (!is_file)
-	{
-		if( cdrom )
-		{
-			cdrom_close( cdrom );
-		}
-	}
 }
 
 cdrom_interface scsicd_device::cd_intf = { 0, 0 };

@@ -63,6 +63,7 @@ protected:
 	// device-level overrides
     virtual void device_config_complete();
 	virtual void device_start();
+	virtual void device_stop();
 
 	int internal_load_hd();
 

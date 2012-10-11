@@ -29,14 +29,12 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_stop();
 
 private:
 	UINT32 lba;
 	UINT32 blocks;
 	int sectorbytes;
 	hard_disk_file *disk;
-	bool is_image_device;
 };
 
 // device type definition

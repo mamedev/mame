@@ -35,23 +35,11 @@ void scsihd_device::device_reset()
 {
 	scsihle_device::device_reset();
 
-	is_image_device = true;
-	disk = subdevice<harddisk_image_device>("image")->get_hard_disk_file();
-	if( !disk )
-	{
-		// try to locate the CHD from a DISK_REGION
-		chd_file *handle = get_disk_handle(machine(), tag());
-		if (handle != NULL)
-		{
-			is_image_device = false;
-			disk = hard_disk_open(handle);
-		}
-	}
-
 	lba = 0;
 	blocks = 0;
 	sectorbytes = 512;
 
+	disk = subdevice<harddisk_image_device>("image")->get_hard_disk_file();
 	if (!disk)
 	{
 		logerror("%s SCSIHD: no HD found!\n", tag());
@@ -61,17 +49,6 @@ void scsihd_device::device_reset()
 		// get hard disk sector size from CHD metadata
 		const hard_disk_info *hdinfo = hard_disk_get_info(disk);
 		sectorbytes = hdinfo->sectorbytes;
-	}
-}
-
-void scsihd_device::device_stop()
-{
-	if (!is_image_device)
-	{
-		if( disk )
-		{
-			hard_disk_close( disk );
-		}
 	}
 }
 

@@ -101,7 +101,23 @@ const option_guide *harddisk_image_device::create_option_guide() const
 void harddisk_image_device::device_start()
 {
 	m_chd = NULL;
-	m_hard_disk_handle = NULL;
+
+	// try to locate the CHD from a DISK_REGION
+	chd_file *handle = get_disk_handle(machine(), owner()->tag());
+	if (handle != NULL)
+	{
+		m_hard_disk_handle = hard_disk_open(handle);
+	}
+	else
+	{
+		m_hard_disk_handle = NULL;
+	}
+}
+
+void harddisk_image_device::device_stop()
+{
+	if (m_hard_disk_handle)
+		hard_disk_close(m_hard_disk_handle);
 }
 
 bool harddisk_image_device::call_load()
@@ -223,6 +239,9 @@ int harddisk_image_device::internal_load_hd()
 	chd_error err = CHDERR_NONE;
 
 	m_chd = NULL;
+
+	if (m_hard_disk_handle)
+		hard_disk_close(m_hard_disk_handle);
 
 	/* open the CHD file */
 	if (software_entry() != NULL)

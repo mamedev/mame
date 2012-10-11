@@ -84,7 +84,22 @@ const option_guide *cdrom_image_device::create_option_guide() const
 
 void cdrom_image_device::device_start()
 {
-	m_cdrom_handle = NULL;
+	// try to locate the CHD from a DISK_REGION
+	chd_file *chd = get_disk_handle( machine(), owner()->tag() );
+	if( chd != NULL )
+	{
+		m_cdrom_handle = cdrom_open( chd );
+	}
+	else
+	{
+		m_cdrom_handle = NULL;
+	}
+}
+
+void cdrom_image_device::device_stop()
+{
+	if (m_cdrom_handle)
+		cdrom_close(m_cdrom_handle);
 }
 
 bool cdrom_image_device::call_load()
@@ -92,6 +107,9 @@ bool cdrom_image_device::call_load()
 	chd_error	err = (chd_error)0;
 	chd_file	*chd = NULL;
 	astring tempstring;
+
+	if (m_cdrom_handle)
+		cdrom_close(m_cdrom_handle);
 
 	if (software_entry() == NULL)
 	{

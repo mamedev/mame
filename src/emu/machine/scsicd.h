@@ -31,7 +31,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_stop();
 
 private:
 	UINT32 lba;
@@ -42,7 +41,6 @@ private:
 	UINT32 cur_subblock;
 	UINT32 play_err_flag;
 	cdrom_file *cdrom;
-	bool is_file;
 };
 
 // device type definition
