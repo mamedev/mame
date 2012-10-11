@@ -1874,7 +1874,7 @@ static void apple2gs_setup_memory(running_machine &machine)
  * Driver Init
  * ----------------------------------------------------------------------- */
 
-static READ8_HANDLER( apple2gs_read_vector )
+READ8_MEMBER(apple2gs_state::apple2gs_read_vector)
 {
 	return space.read_byte(offset | 0xFF0000);
 }
@@ -1934,7 +1934,7 @@ MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
 	apple2_init_common(machine());
 
 	/* set up Apple IIgs vectoring */
-	g65816_set_read_vector_callback(machine().device("maincpu"), apple2gs_read_vector);
+	g65816_set_read_vector_callback(machine().device("maincpu"), read8_delegate(FUNC(apple2gs_state::apple2gs_read_vector),this));
 
 	/* setup globals */
 	m_is_rom3 = true;

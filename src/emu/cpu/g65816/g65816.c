@@ -412,7 +412,7 @@ static CPU_SET_INFO( g65816 )
 
 
 
-void g65816_set_read_vector_callback(device_t *device, read8_space_func read_vector)
+void g65816_set_read_vector_callback(device_t *device, read8_delegate read_vector)
 {
 	g65816i_cpu_struct *cpustate = get_safe_token(device);
 	READ_VECTOR = read_vector;

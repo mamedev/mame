@@ -65,7 +65,7 @@ DECLARE_LEGACY_CPU_DEVICE(_5A22, _5a22);
 #define CPU_TYPE_5A22 1
 
 
-void g65816_set_read_vector_callback(device_t *device, read8_space_func read_vector);
+void g65816_set_read_vector_callback(device_t *device, read8_delegate read_vector);
 
 
 /* ======================================================================== */

@@ -148,6 +148,7 @@ public:
 	DECLARE_WRITE8_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE8_MEMBER(a2bus_nmi_w);
 	DECLARE_WRITE8_MEMBER(a2bus_inh_w);
+	DECLARE_READ8_MEMBER(apple2gs_read_vector);
 };
 
 

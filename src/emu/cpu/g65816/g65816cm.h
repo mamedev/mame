@@ -96,7 +96,7 @@ struct g65816i_cpu_struct
 	device_irq_acknowledge_callback int_ack; /* Interrupt Acknowledge */
 	legacy_cpu_device *device;
 	address_space *program;
-	read8_space_func read_vector;	/* Read vector override */
+	read8_delegate read_vector;	/* Read vector override */
 	uint stopped;		/* Sets how the CPU is stopped */
 	void (*const *opcodes)(g65816i_cpu_struct *cpustate);
 	uint (*get_reg)(g65816i_cpu_struct *cpustate, int regnum);
