@@ -292,18 +292,6 @@ void isa8_device::install_space(address_spacenum spacenum, device_t *dev, offs_t
 }
 
 
-void isa8_device::install_memory(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name)
-{
-	install_space(AS_PROGRAM, dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name);
-}
-
-
-void isa8_device::install_memory(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_space_func rhandler, const char* rhandler_name, write8_space_func whandler, const char *whandler_name)
-{
-	install_space(AS_PROGRAM, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name);
-}
-
-
 void isa8_device::install_memory(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler)
 {
 	install_space(AS_PROGRAM, start, end, mask, mirror, rhandler, whandler);
