@@ -560,7 +560,7 @@ READ8_MEMBER( wangpc_state::option_id_r )
 	UINT8 data = 0;
 
 	// FDC interrupt
-	data |= (m_fdc_dd0 | m_fdc_dd1 | m_fdc->get_irq()) << 7;
+	data |= (m_fdc_dd0 | m_fdc_dd1 | (int) m_fdc->get_irq()) << 7;
 
 	return data;
 }
