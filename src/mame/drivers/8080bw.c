@@ -691,9 +691,6 @@ static INPUT_PORTS_START( invrvnge )
 	/* Dummy port for cocktail mode (not used) */
 	PORT_START(CABINET_PORT_TAG)
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	/* Dummy port for cocktail mode */
-//	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
 
@@ -702,6 +699,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( invrvnge, mw8080bw_root, _8080bw_state )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(invrvnge_io_map)
+	
+//	MCFG_CPU_ADD("audiocpu", M6808, 1000000)
+//	MCFG_CPU_PROGRAM_MAP(invrvnge_sound_map)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -713,7 +713,13 @@ static MACHINE_CONFIG_DERIVED_CLASS( invrvnge, mw8080bw_root, _8080bw_state )
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invadpt2)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_FRAGMENT_ADD(invaders_samples_audio) // placeholder
+
+//	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+//	MCFG_SOUND_ADD("ay1", AY8910, 1000000)
+//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+
 MACHINE_CONFIG_END
 
 
@@ -3035,12 +3041,12 @@ ROM_START( invrvnge )
 	ROM_LOAD( "f.ic34",      0x1000, 0x0800, CRC(b3b2749e) SHA1(4f854f981396e2d6a959dd48cff12234074fb69b) )
 	ROM_LOAD( "e.ic33",      0x1800, 0x0800, CRC(d8e75102) SHA1(86d5618944265947e3ce60fdf048d8fff4a55744) )
 
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "snd.2c",      0xf000, 0x0800, CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) )
+	ROM_LOAD( "snd.1c",      0xf800, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
+
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "colour.bin",  0x0000, 0x0800, CRC(7de74988) SHA1(0b8c94b2bfdbc3921d60aad765df8af611f3fdd7) )
-
-	ROM_REGION( 0x1000, "user1", 0 )
-	ROM_LOAD( "snd.1c",      0x0000, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
-	ROM_LOAD( "snd.2c",      0x0800, 0x0800, CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) )
 ROM_END
 
 ROM_START( invrvngea )
@@ -3050,12 +3056,12 @@ ROM_START( invrvngea )
 	ROM_LOAD( "f.ic34",      0x1000, 0x0800, CRC(b3b2749e) SHA1(4f854f981396e2d6a959dd48cff12234074fb69b) )
 	ROM_LOAD( "e.ic33",      0x1800, 0x0800, CRC(d8e75102) SHA1(86d5618944265947e3ce60fdf048d8fff4a55744) )
 
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "snd.2c",      0xf000, 0x0800, CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) )
+	ROM_LOAD( "snd.1c",      0xf800, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
+
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "colour.bin",  0x0000, 0x0800, CRC(7de74988) SHA1(0b8c94b2bfdbc3921d60aad765df8af611f3fdd7) )
-
-	ROM_REGION( 0x1000, "user1", 0 )
-	ROM_LOAD( "snd.1c",      0x0000, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
-	ROM_LOAD( "snd.2c",      0x0800, 0x0800, CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) )
 ROM_END
 
 ROM_START( invrvngeb )
@@ -3065,12 +3071,12 @@ ROM_START( invrvngeb )
 	ROM_LOAD( "f.ic34",      0x1000, 0x0800, CRC(e350de2c) SHA1(e845565e2f96f9dec3242ec5ab75910a515428c9) )
 	ROM_LOAD( "e.ic33",      0x1800, 0x0800, CRC(1ec8dfc8) SHA1(fc8fbe1161958f57c9f4ccbcab8a769184b1c562) )
 
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "snd.2c",      0xf000, 0x0800, BAD_DUMP CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) ) // not dumped, taken from parent
+	ROM_LOAD( "snd.1c",      0xf800, 0x0800, BAD_DUMP CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) ) // not dumped, taken from parent
+
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "colour.bin",  0x0000, 0x0800, BAD_DUMP CRC(7de74988) SHA1(0b8c94b2bfdbc3921d60aad765df8af611f3fdd7) ) // not dumped, taken from parent
-
-	ROM_REGION( 0x1000, "user1", 0 )
-	ROM_LOAD( "snd.1c",      0x0000, 0x0800, BAD_DUMP CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) ) // not dumped, taken from parent
-	ROM_LOAD( "snd.2c",      0x0800, 0x0800, BAD_DUMP CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) ) // not dumped, taken from parent
 ROM_END
 
 ROM_START( invrvngec )
@@ -3080,12 +3086,12 @@ ROM_START( invrvngec )
 	ROM_LOAD( "f.ic34",      0x1000, 0x0800, CRC(78d34d97) SHA1(a50c19df12e75c644b014d74a463094e249db207) )
 	ROM_LOAD( "e.ic33",      0x1800, 0x0800, CRC(30c71887) SHA1(17c9e905eb327435d52b6d51842f7f42a5e6ab7d) )
 
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "snd.2c",      0xf000, 0x0800, CRC(4b67073b) SHA1(ab4cdcdff55bbb187a26fd8acab24692f49beabb) )
+	ROM_LOAD( "snd.1c",      0xf800, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
+
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "colour.bin",  0x0000, 0x0800, CRC(7de74988) SHA1(0b8c94b2bfdbc3921d60aad765df8af611f3fdd7) )
-
-	ROM_REGION( 0x1000, "user1", 0 )
-	ROM_LOAD( "snd.1c",      0x0000, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
-	ROM_LOAD( "snd.2c",      0x0800, 0x0800, CRC(4b67073b) SHA1(ab4cdcdff55bbb187a26fd8acab24692f49beabb) )
 ROM_END
 
 ROM_START( invrvngedu )
@@ -3095,12 +3101,12 @@ ROM_START( invrvngedu )
 	ROM_LOAD( "5p.bin",       0x1000, 0x0800, CRC(6ec5a9ad) SHA1(d1e84d2d60c6128c092f2cd20a2b87216df3034b) )
 	ROM_LOAD( "5r.bin",       0x1800, 0x0800, CRC(74516811) SHA1(0f595c7b0fae5f3f83fdd1ffed5a408ee77c9438) )
 
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "snd.2c",      0xf000, 0x0800, BAD_DUMP CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) ) // not dumped, taken from parent
+	ROM_LOAD( "snd.1c",      0xf800, 0x0800, BAD_DUMP CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) ) // not dumped, taken from parent
+
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "colour.bin",  0x0000, 0x0800, BAD_DUMP CRC(7de74988) SHA1(0b8c94b2bfdbc3921d60aad765df8af611f3fdd7) ) // not dumped, taken from parent
-
-	ROM_REGION( 0x1000, "user1", 0 )
-	ROM_LOAD( "snd.1c",      0x0000, 0x0800, BAD_DUMP CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) ) // not dumped, taken from parent
-	ROM_LOAD( "snd.2c",      0x0800, 0x0800, BAD_DUMP CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) ) // not dumped, taken from parent
 ROM_END
 
 
