@@ -706,6 +706,12 @@ static MACHINE_CONFIG_DERIVED_CLASS( invrvnge, mw8080bw_root, _8080bw_state )
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
 
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invadpt2)
+
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 MACHINE_CONFIG_END
