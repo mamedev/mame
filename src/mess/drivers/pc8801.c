@@ -23,8 +23,10 @@
     - 177: gameplay is too fast (parent pc8801 only);
     - 1942: missing sound, enables a masked irq;
     - Acro Jet: hangs waiting for an irq (floppy issue);
-    - Advanced Fantasian: wants an irq that can't happen (I is equal to 0x3f)
+    - Arcus: doesn't surpass Wolf Team logo;
+    - Advanced Fantasian: garbage during gameplay (floppy?)
     - American Success: reads the light pen?
+    - Attacker: resets after a bunch of animation frames;
     - Balance of Power: uses the SIO port for something ...
     - Belloncho Shintai Kensa: hangs
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
@@ -39,7 +41,7 @@
     - Datenshi Kyouko: gfx garbage on the right edge?
     - Final Crisis: sound stuck with OPNA?
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
-    - Gegege no Kitarou: title screen text/bitmap contrast is pretty ugly (BTANB?);
+    - GeGeGe no Kitarou: title screen text/bitmap contrast is pretty ugly (BTANB?);
     - Grobda: palette is ugly (parent pc8801 only);
     - Makaimura: after losing a life the game doesn't work properly anymore, copy protection?
     - Music Collection Vol. 2 - Final Fantasy Tokushuu: sound irq dies pretty soon
@@ -52,12 +54,12 @@
     list of games/apps that crashes due of floppy issues (* -> denotes games fixed with current floppy code, # -> moans at MESS boot regarding the d88 format with
       current floppy code):
     * Agni no Ishi
-    # Amazoness no Hihou (takes invalid data from floppy)
+    * Amazoness no Hihou (takes invalid data from floppy)
     - American Truck / American Truck SR (polls read deleted data command)
     * Ankokujou
-    # Ao No Sekizou (fdc CPU irq doesn't fire anymore)
-    # Arcus
-    # Attacker
+    * Ao No Sekizou (fdc CPU irq doesn't fire anymore)
+    * Arcus
+    * Attacker
     - Autumn Park (BASIC error)
     * Battle Gorilla
     * Belloncho Shintai Kensa
@@ -81,8 +83,8 @@
     * Crimson 3
     * Cuby Panic (copy protection routine at 0x911A)
     # Daidasso (prints "BOOT dekimasen" on screen -> can't boot)
-
     - Daikoukai Jidai
+
     - Databox (app)
     # Day Dream (hangs at the CrossMedia Soft logo)
     - Demons Ring
