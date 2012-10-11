@@ -738,6 +738,60 @@ void device_image_interface::determine_open_plan(int is_create, UINT32 *open_pla
 }
 
 /*-------------------------------------------------
+    dump_wrong_and_correct_checksums - dump an
+    error message containing the wrong and the
+    correct checksums for a given software item
+-------------------------------------------------*/
+
+static void dump_wrong_and_correct_checksums(const hash_collection &hashes, const hash_collection &acthashes)
+{
+	astring tempstr;
+	mame_printf_error("    EXPECTED: %s\n", hashes.macro_string(tempstr));
+	mame_printf_error("       FOUND: %s\n", acthashes.macro_string(tempstr));
+}
+
+/*-------------------------------------------------
+    verify_length_and_hash - verify the length
+    and hash signatures of a file
+-------------------------------------------------*/
+
+static int verify_length_and_hash(emu_file *file, const char *name, UINT32 explength, const hash_collection &hashes)
+{
+	int retVal = 0;
+	if (file==NULL) return 0;
+
+	/* verify length */
+	UINT32 actlength = file->size();
+	if (explength != actlength)
+	{
+		mame_printf_error("%s WRONG LENGTH (expected: %d found: %d)\n", name, explength, actlength);
+		retVal++;
+	}
+
+	/* If there is no good dump known, write it */
+	astring tempstr;
+	hash_collection &acthashes = file->hashes(hashes.hash_types(tempstr));
+	if (hashes.flag(hash_collection::FLAG_NO_DUMP))
+	{
+		mame_printf_error("%s NO GOOD DUMP KNOWN\n", name);
+	}
+	/* verify checksums */
+	else if (hashes != acthashes)
+	{
+		/* otherwise, it's just bad */
+		mame_printf_error("%s WRONG CHECKSUMS:\n", name);
+		dump_wrong_and_correct_checksums(hashes, acthashes);
+		retVal++;
+	}
+	/* If it matches, but it is actually a bad dump, write it */
+	else if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
+	{
+		mame_printf_error("%s NEEDS REDUMP\n",name);
+	}
+	return retVal;
+}
+
+/*-------------------------------------------------
     load_software - software image loading
 -------------------------------------------------*/
 bool device_image_interface::load_software(char *swlist, char *swname, rom_entry *start)
@@ -746,6 +800,7 @@ bool device_image_interface::load_software(char *swlist, char *swname, rom_entry
 	const rom_entry *region;
 	astring regiontag;
 	bool retVal = FALSE;
+	int warningcount = 0;
 	for (region = start; region != NULL; region = rom_next_region(region))
 	{
 		/* loop until we hit the end of this region */
@@ -831,6 +886,8 @@ bool device_image_interface::load_software(char *swlist, char *swname, rom_entry
 				if ((m_mame_file == NULL) && (tag5.cstr() != NULL))
 					filerr = common_process_file(device().machine().options(), tag5.cstr(), has_crc, crc, romp, &m_mame_file);
 
+				warningcount += verify_length_and_hash(m_mame_file,ROM_GETNAME(romp),ROM_GETLENGTH(romp),hash_collection(ROM_GETHASHDATA(romp)));
+
 				if (filerr == FILERR_NONE)
 				{
 					m_file = *m_mame_file;
@@ -841,6 +898,10 @@ bool device_image_interface::load_software(char *swlist, char *swname, rom_entry
 			}
 			romp++;	/* something else; skip */
 		}
+	}
+	if (warningcount > 0)
+	{
+		mame_printf_error("WARNING: the software item might not run correctly.\n");
 	}
 	return retVal;
 }
