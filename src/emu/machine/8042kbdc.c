@@ -557,7 +557,7 @@ WRITE8_HANDLER(kbdc8042_8_w)
 			/* write output port; next byte written to port 60h is placed on
              * 8042 output port */
 			kbdc8042.operation_write_state = 1;
-			break;
+			return; /* instant delivery */
 		case 0xd2:
 			/* write keyboard output register; on PS/2 systems next port 60h
              * write is written to port 60h output register as if initiated
