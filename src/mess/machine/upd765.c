@@ -289,8 +289,10 @@ READ8_MEMBER(upd765_family_device::msr_r)
 		break;
 	}
 	for(int i=0; i<4; i++)
-		if(flopi[i].main_state == RECALIBRATE || flopi[i].main_state == SEEK)
+		if(flopi[i].main_state == RECALIBRATE || flopi[i].main_state == SEEK) {
 			msr |= 1<<i;
+			msr |= MSR_CB;
+		}
 
 	if(data_irq) {
 		data_irq = false;
