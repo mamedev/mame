@@ -1944,8 +1944,7 @@ $(MAMEOBJ)/misc.a: \
 
 $(DRIVERS)/30test.o:	$(LAYOUT)/30test.lh
 
-$(DRIVERS)/8080bw.o:	$(LAYOUT)/invrvnge.lh \
-			$(LAYOUT)/shuttlei.lh \
+$(DRIVERS)/8080bw.o:	$(LAYOUT)/shuttlei.lh \
 			$(LAYOUT)/cosmicm.lh
 
 $(DRIVERS)/aces1.o:	$(LAYOUT)/aces1.lh

@@ -188,7 +188,6 @@
 #include "sound/speaker.h"
 #include "includes/8080bw.h"
 
-#include "invrvnge.lh"
 #include "shuttlei.lh"
 #include "cosmicm.lh"
 
@@ -3879,8 +3878,8 @@ GAMEL(19??, invasionrza,invaders,invaders,invasion, driver_device, 0, ROT270, "b
 GAME( 19??, darthvdr, invaders, darthvdr, darthvdr, driver_device, 0, ROT270, "bootleg", "Darth Vader", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
 GAME( 1979, moonbase, invadpt2, invadpt2, invadpt2, driver_device, 0, ROT270, "Nichibutsu (Taito license?)", "Moon Base (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // this has a 'Taito Corp' string hidden away in the rom - how do you get it to display?
 GAME( 1979, moonbasea,invadpt2, invadpt2, invadpt2, driver_device, 0, ROT270, "Nichibutsu", "Moon Base (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )                  // this has the same string replaced with Nichibutsu, no other differences
-GAMEL(19??, invrvnge, 0,        invrvnge, invrvnge, driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge",  GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_invrvnge )
-GAMEL(19??, invrvngea,invrvnge, invrvnge, invrvnge, driver_device, 0, ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_invrvnge )
+GAME( 1980, invrvnge, 0,        invrvnge, invrvnge, driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge",  GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1980, invrvngea,invrvnge, invrvnge, invrvnge, driver_device, 0, ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, spclaser, 0,        invadpt2, spclaser, driver_device, 0, ROT270, "Game Plan (Taito license)", "Space Laser", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1980, intruder, spclaser, invadpt2, spclaser, driver_device, 0, ROT270, "Game Plan (Taito license)", "Intruder", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, laser,    spclaser, invadpt2, spclaser, driver_device, 0, ROT270, "bootleg (Leisure Time Electronics Inc.)", "Astro Laser (bootleg of Space Laser)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
