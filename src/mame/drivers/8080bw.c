@@ -158,6 +158,7 @@
 #include "shuttlei.lh"
 #include "cosmicm.lh"
 
+
 /*******************************************************/
 /*                                                     */
 /* Games with additional sound / video hardware        */
@@ -223,6 +224,8 @@ static INPUT_PORTS_START( sicv )
 	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
+
+
 /*******************************************************/
 /*                                                     */
 /* Space Invaders TV Version (Taito)                   */
@@ -239,6 +242,8 @@ static INPUT_PORTS_START( sitv )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 INPUT_PORTS_END
+
+
 
 /*******************************************************/
 /*                                                     */
@@ -287,6 +292,8 @@ static INPUT_PORTS_START( alieninv )
 	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
+
+
 /*******************************************************/
 /*                                                     */
 /* Space Invaders Model Racing                         */
@@ -301,6 +308,8 @@ static INPUT_PORTS_START( invadrmr )
 	PORT_DIPSETTING(    0x00, "1500" )
 	PORT_DIPSETTING(    0x08, "3000" ) /* This is different to invaders */
 INPUT_PORTS_END
+
+
 
 /*******************************************************/
 /*                                                     */
@@ -366,6 +375,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( invadpt2, mw8080bw_root, _8080bw_state )
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 MACHINE_CONFIG_END
 
+
+
 /*******************************************************/
 /*                                                     */
 /* Space Wars (Sanritsu)                               */
@@ -420,6 +431,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( spcewars, mw8080bw_root, _8080bw_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
+
+
 /*******************************************************/
 /*                                                     */
 /* Astro Sidam?                                        */
@@ -469,8 +482,7 @@ static INPUT_PORTS_START( astropal )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
 	/* Dummy port for cocktail mode (not used) */
-	INVADERS_CAB_TYPE_PORT
-	PORT_MODIFY(INVADERS_CAB_TYPE_PORT_TAG)
+	PORT_START(INVADERS_CAB_TYPE_PORT_TAG)
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -480,6 +492,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( astropal, invaders, _8080bw_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(astropal_io_map)
 MACHINE_CONFIG_END
+
+
 
 /*******************************************************/
 /*                                                     */
@@ -538,6 +552,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( cosmo, mw8080bw_root, _8080bw_state )
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 MACHINE_CONFIG_END
 
+
+
 /*******************************************************/
 /*                                                     */
 /* ?????? "Super Earth Invasion"                       */
@@ -565,6 +581,7 @@ static INPUT_PORTS_START( searthin )
 INPUT_PORTS_END
 
 
+
 /*******************************************************/
 /*                                                     */
 /* ?????? "Space Attack II"                            */
@@ -588,6 +605,7 @@ static INPUT_PORTS_START( spaceatt )
 INPUT_PORTS_END
 
 
+
 /*******************************************************/
 /*                                                     */
 /* Zenitone Microsec "Invaders Revenge"                */
@@ -598,8 +616,10 @@ static ADDRESS_MAP_START( invrvnge_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r) AM_WRITE(invrvnge_sh_port_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r) AM_WRITE(invrvnge_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(invrvnge_sh_port_2_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 
@@ -646,9 +666,8 @@ static INPUT_PORTS_START( invrvnge )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) ) // 1 play 10p, 2 play 20p, 6 play 50p
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) ) // 1 play 20p, 2 play 40p, 3 play 50p
 
-	/* Dummy port for cocktail mode (not used) */
-	PORT_START(CABINET_PORT_TAG)
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	/* Dummy port for cocktail mode */
+	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
 
@@ -671,14 +690,12 @@ static MACHINE_CONFIG_DERIVED_CLASS( invrvnge, mw8080bw_root, _8080bw_state )
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invadpt2)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(invaders_samples_audio) // placeholder
-
 //	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 //	MCFG_SOUND_ADD("ay1", AY8910, 1000000)
 //	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-
 MACHINE_CONFIG_END
+
 
 
 /*******************************************************/
@@ -726,6 +743,7 @@ static INPUT_PORTS_START( spclaser )
 INPUT_PORTS_END
 
 
+
 /*******************************************************/
 /*                                                     */
 /* Taito "Galaxy Wars"                                 */
@@ -755,6 +773,7 @@ static INPUT_PORTS_START( galxwars )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 INPUT_PORTS_END
+
 
 
 /*******************************************************/
@@ -811,6 +830,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( lrescue, mw8080bw_root, _8080bw_state )
 MACHINE_CONFIG_END
 
 
+
 /*******************************************************/
 /*                                                     */
 /* Universal "Cosmic Monsters"                         */
@@ -839,6 +859,7 @@ static INPUT_PORTS_START( cosmicmo )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 INPUT_PORTS_END
+
 
 
 /*******************************************************/
@@ -871,6 +892,7 @@ static INPUT_PORTS_START( invasion )
 INPUT_PORTS_END
 
 
+
 /*******************************************************/
 /*                                                     */
 /* bootleg "Super Invaders"                            */
@@ -891,6 +913,7 @@ static INPUT_PORTS_START( superinv )
 	PORT_DIPSETTING(    0x00, "2500" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:8" )
 INPUT_PORTS_END
+
 
 
 /*******************************************************/
@@ -1022,10 +1045,7 @@ static INPUT_PORTS_START( schaser )
 
 	// port 3 (all 8 bits) connected to custom chip MB14241 driven by out port 2 and 4
 	// To get cocktail mode, turn this on, and choose 2 controllers.
-	PORT_START(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
-	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
+	INVADERS_CAB_TYPE_PORT	/* Dummy port for cocktail mode */
 
 	PORT_START("VR1")
 	PORT_ADJUSTER( 70, "VR1 - Music Volume" )
@@ -1080,6 +1100,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( schaser, mw8080bw_root, _8080bw_state )
 	MCFG_SOUND_CONFIG_DISCRETE(schaser)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
+
 
 
 /*******************************************************/
@@ -1160,6 +1181,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( schasercv, mw8080bw_root, _8080bw_state )
 MACHINE_CONFIG_END
 
 
+
 /*******************************************************/
 /*                                                     */
 /* Taito "Straight Flush"                              */
@@ -1232,6 +1254,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( sflush, mw8080bw_root, _8080bw_state )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_sflush)
 MACHINE_CONFIG_END
+
 
 
 /*******************************************************/
@@ -1344,6 +1367,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( lupin3a, mw8080bw_root, _8080bw_state )
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 MACHINE_CONFIG_END
+
 
 
 /*******************************************************/
@@ -1468,6 +1492,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( polaris, mw8080bw_root, _8080bw_state )
 MACHINE_CONFIG_END
 
 
+
 /*******************************************************/
 /*                                                     */
 /* Taito "Ozma Wars"                                   */
@@ -1540,6 +1565,7 @@ static INPUT_PORTS_START( jspecter )
 INPUT_PORTS_END
 
 
+
 /*******************************************************/
 /*                                                     */
 /* Taito "Balloon Bomber"                              */
@@ -1584,6 +1610,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( ballbomb, mw8080bw_root, _8080bw_state )
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 MACHINE_CONFIG_END
+
 
 
 /*******************************************************/
@@ -1651,6 +1678,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( yosakdon, mw8080bw_root, _8080bw_state )
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 MACHINE_CONFIG_END
+
 
 
 /*******************************************************/
@@ -1758,6 +1786,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( indianbt, mw8080bw_root, _8080bw_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
+
+
 /*******************************************************/
 /*                                                     */
 /* Taito "Steel Worker"                                */
@@ -1826,6 +1856,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( steelwkr, mw8080bw_root, _8080bw_state )
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 MACHINE_CONFIG_END
+
+
 
 /*****************************************************
 
@@ -2994,7 +3026,7 @@ ROM_END
 
 ROM_START( invrvnge )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "h.ic36",      0x0000, 0x0800, CRC(cabc3b59) SHA1(02e17bef545ea0baffc45610deeec0f913daf16e) )
+	ROM_LOAD( "h.ic36",      0x0000, 0x0800, CRC(0e229b9f) SHA1(617197bf94e9700cbbb2f32487dc47b318d4f2af) )
 	ROM_LOAD( "g.ic35",      0x0800, 0x0800, CRC(26b38aa4) SHA1(f281c7ec47ce6ab61bfda2e7aa6a5b8a01f2c11e) )
 	ROM_LOAD( "f.ic34",      0x1000, 0x0800, CRC(b3b2749e) SHA1(4f854f981396e2d6a959dd48cff12234074fb69b) )
 	ROM_LOAD( "e.ic33",      0x1800, 0x0800, CRC(d8e75102) SHA1(86d5618944265947e3ce60fdf048d8fff4a55744) )
@@ -3009,13 +3041,13 @@ ROM_END
 
 ROM_START( invrvngea )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "h.ic36",      0x0000, 0x0800, CRC(0e229b9f) SHA1(617197bf94e9700cbbb2f32487dc47b318d4f2af) )
-	ROM_LOAD( "g.ic35",      0x0800, 0x0800, CRC(26b38aa4) SHA1(f281c7ec47ce6ab61bfda2e7aa6a5b8a01f2c11e) )
-	ROM_LOAD( "f.ic34",      0x1000, 0x0800, CRC(b3b2749e) SHA1(4f854f981396e2d6a959dd48cff12234074fb69b) )
-	ROM_LOAD( "e.ic33",      0x1800, 0x0800, CRC(d8e75102) SHA1(86d5618944265947e3ce60fdf048d8fff4a55744) )
+	ROM_LOAD( "h.ic36",      0x0000, 0x0800, CRC(0914b279) SHA1(91e465f56ed0dc8c68e109e33ec9d2bda2616a21) )
+	ROM_LOAD( "g.ic35",      0x0800, 0x0800, CRC(84d9497c) SHA1(fb1b5fc49365fbf89e5418789e64efd186cdeecf) )
+	ROM_LOAD( "f.ic34",      0x1000, 0x0800, CRC(78d34d97) SHA1(a50c19df12e75c644b014d74a463094e249db207) )
+	ROM_LOAD( "e.ic33",      0x1800, 0x0800, CRC(30c71887) SHA1(17c9e905eb327435d52b6d51842f7f42a5e6ab7d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "snd.2c",      0xf000, 0x0800, CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) )
+	ROM_LOAD( "snd.2c",      0xf000, 0x0800, CRC(4b67073b) SHA1(ab4cdcdff55bbb187a26fd8acab24692f49beabb) )
 	ROM_LOAD( "snd.1c",      0xf800, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
@@ -3035,21 +3067,6 @@ ROM_START( invrvngeb )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "colour.bin",  0x0000, 0x0800, BAD_DUMP CRC(7de74988) SHA1(0b8c94b2bfdbc3921d60aad765df8af611f3fdd7) ) // not dumped, taken from parent
-ROM_END
-
-ROM_START( invrvngec )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "h.ic36",      0x0000, 0x0800, CRC(0914b279) SHA1(91e465f56ed0dc8c68e109e33ec9d2bda2616a21) )
-	ROM_LOAD( "g.ic35",      0x0800, 0x0800, CRC(84d9497c) SHA1(fb1b5fc49365fbf89e5418789e64efd186cdeecf) )
-	ROM_LOAD( "f.ic34",      0x1000, 0x0800, CRC(78d34d97) SHA1(a50c19df12e75c644b014d74a463094e249db207) )
-	ROM_LOAD( "e.ic33",      0x1800, 0x0800, CRC(30c71887) SHA1(17c9e905eb327435d52b6d51842f7f42a5e6ab7d) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "snd.2c",      0xf000, 0x0800, CRC(4b67073b) SHA1(ab4cdcdff55bbb187a26fd8acab24692f49beabb) )
-	ROM_LOAD( "snd.1c",      0xf800, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
-
-	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "colour.bin",  0x0000, 0x0800, CRC(7de74988) SHA1(0b8c94b2bfdbc3921d60aad765df8af611f3fdd7) )
 ROM_END
 
 ROM_START( invrvngedu )
@@ -3916,11 +3933,10 @@ GAMEL(19??, invasionrza,invaders, invaders,  invasion,  driver_device, 0, ROT270
 GAME( 19??, darthvdr,   invaders, darthvdr,  darthvdr,  driver_device, 0, ROT270, "bootleg", "Darth Vader", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
 GAME( 1979, moonbase,   invadpt2, invadpt2,  invadpt2,  driver_device, 0, ROT270, "Nichibutsu (Taito license?)", "Moon Base (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // this has a 'Taito Corp' string hidden away in the rom - how do you get it to display?
 GAME( 1979, moonbasea,  invadpt2, invadpt2,  invadpt2,  driver_device, 0, ROT270, "Nichibutsu", "Moon Base (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )                  // this has the same string replaced with Nichibutsu, no other differences
-GAME( 1980, invrvnge,   0,        invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1980, invrvngea,  invrvnge, invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1980, invrvngeb,  invrvnge, invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 3)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1980, invrvngec,  invrvnge, invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 4)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1980, invrvngedu, invrvnge, invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1980, invrvnge,   0,        invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 1)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+GAME( 1980, invrvngea,  invrvnge, invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 2)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+GAME( 1980, invrvngeb,  invrvnge, invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 3)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+GAME( 1980, invrvngedu, invrvnge, invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
 GAME( 1980, spclaser,   0,        invadpt2,  spclaser,  driver_device, 0, ROT270, "Game Plan (Taito license)", "Space Laser", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1980, intruder,   spclaser, invadpt2,  spclaser,  driver_device, 0, ROT270, "Game Plan (Taito license)", "Intruder", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, laser,      spclaser, invadpt2,  spclaser,  driver_device, 0, ROT270, "bootleg (Leisure Time Electronics Inc.)", "Astro Laser (bootleg of Space Laser)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

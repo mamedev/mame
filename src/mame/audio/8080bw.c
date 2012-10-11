@@ -23,6 +23,8 @@ MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_sh)
 	save_item(NAME(m_port_3_last_extra));
 }
 
+
+
 /*******************************************************/
 /*                                                     */
 /* Midway "Space Invaders Part II"                     */
@@ -45,7 +47,6 @@ WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_1_w)
 	machine().sound().system_enable(data & 0x20);
 
 	m_port_1_last_extra = data;
-
 }
 
 WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_2_w)
@@ -71,6 +72,7 @@ WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_2_w)
 }
 
 
+
 /*******************************************************/
 /*                                                     */
 /* Sanritsu "Space War"                                */
@@ -91,6 +93,7 @@ WRITE8_MEMBER(_8080bw_state::spcewars_sh_port_w)
 
 	m_port_1_last_extra = data;
 }
+
 
 
 /*******************************************************/
@@ -156,6 +159,7 @@ WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_2_w)
 }
 
 
+
 /*******************************************************/
 /*                                                     */
 /* Cosmo                                               */
@@ -167,6 +171,7 @@ WRITE8_MEMBER(_8080bw_state::cosmo_sh_port_2_w)
 	/* inverted flip screen bit */
 	invadpt2_sh_port_2_w(space, offset, data ^ 0x20);
 }
+
 
 
 /*******************************************************/
@@ -213,6 +218,7 @@ WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_2_w)
 /* Taito "Indian Battle"                               */
 /* Sept 2005, D.R.                                     */
 /*******************************************************/
+
 static const discrete_dac_r1_ladder indianbt_music_dac =
 	{3, {0, RES_K(47), RES_K(12)}, 0, 0, 0, CAP_U(0.1)};
 
@@ -283,6 +289,7 @@ WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_3_w)
 {
 	discrete_sound_w(m_discrete, space, INDIANBT_MUSIC_DATA, data);
 }
+
 
 
 /*******************************************************************/
@@ -643,6 +650,7 @@ WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
 }
 
 
+
 /*******************************************************/
 /*                                                     */
 /* Taito "Space Chaser"                                */
@@ -849,7 +857,6 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_2_w)
        bit 4 - Field Control B (SX10)
        bit 5 - Flip Screen */
 
-
 	//printf( "schaser_sh_port_2_w: %02x\n", data );
 
 	discrete_sound_w(m_discrete, space, SCHASER_MUSIC_BIT, data & 0x01);
@@ -924,6 +931,28 @@ MACHINE_RESET_MEMBER(_8080bw_state,schaser_sh)
 }
 
 
+
+/*******************************************************/
+/*                                                     */
+/* Zenitone Microsec "Invaders Revenge"                */
+/*                                                     */
+/*******************************************************/
+
+WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_1_w)
+{
+	// probably latch+irq to audiocpu
+}
+
+WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_2_w)
+{
+	m_screen_red = data & 0x10;
+	m_c8080bw_flip_screen = (data & 0x20) && (ioport(CABINET_PORT_TAG)->read() & 0x01);
+
+	// no sound-related writes?
+}
+
+
+
 /****************************************************/
 /* Rolling Crash / Moon Base                        */
 /* - Moon Base uses same ports and bits as invaders */
@@ -941,55 +970,6 @@ WRITE8_MEMBER(_8080bw_state::rollingc_sh_port_w)
 	m_port_3_last_extra = data;
 }
 
-
-/*************************************************************************************/
-/* Invader's Revenge preliminary sound                                               */
-/* Correct samples not available                                                     */
-/* Notes:                                                                            */
-/* Init sequence: 0x01 (20 times), 0x40 (20 times), 0x4c, 0x40, 0x44, 0x40 (9 times).*/
-/* Player 1 start sequence: 0x0c, 0x20, 0x22.                                        */
-/* Start of Attract mode: 0x04.                                                      */
-/* Unknown codes: 0x28, 0x2a, 0x0c, 0x34, 0x2c, 0x2e, 0x1c.                          */
-/*************************************************************************************/
-
-
-WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_w)
-{
-
-	switch (data)
-	{
-		case 0x06:
-			m_samples->start(1, 0);				/* Shoot */
-			break;
-
-		case 0x14:
-			m_samples->start(2, 2);				/* Hit Alien */
-			break;
-
-		case 0x16:
-			m_samples->start(2, 5);				/* Hit Asteroid */
-			break;
-
-		case 0x1e:
-			m_samples->start(3, 1);				/* Death (followed by 0x0a byte), also bit 4 of port 5 */
-			break;
-
-		case 0x18:						/* Fuel Low */
-		case 0x30:						/* Fuel bar filling up */
-			m_samples->start(4, 7);
-			break;
-
-		case 0x02:						/* Coin */
-		case 0x24:						/* Alien dropping to steal fuel */
-		case 0x26:						/* Alien lifting with fuel */
-		case 0x32:						/* UFO drops a bomb */
-			break;
-
-		case 0x3a:						/* Thrust, Docking, extra ship? */
-			m_samples->start(0, 8);
-			break;
-	}
-}
 
 
 /*****************************************/
@@ -1030,6 +1010,7 @@ WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_2_w)
 }
 
 
+
 /*****************************************/
 /* Space Chaser (CV) preliminary sound   */
 /* Much more work needs to be done       */
@@ -1057,6 +1038,7 @@ WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_2_w)
 
 	m_c8080bw_flip_screen = data & 0x20;
 }
+
 
 
 /*******************************************************************/
@@ -1096,6 +1078,7 @@ WRITE8_MEMBER(_8080bw_state::yosakdon_sh_port_2_w)
 }
 
 
+
 /*****************************************/
 /* shuttlei preliminary sound            */
 /* Proper samples are unavailable        */
@@ -1116,7 +1099,6 @@ WRITE8_MEMBER(_8080bw_state::shuttlei_sh_port_1_w)
 
 WRITE8_MEMBER(_8080bw_state::shuttlei_sh_port_2_w)
 {
-
 	switch (data)
 	{
 		case 0x23:
