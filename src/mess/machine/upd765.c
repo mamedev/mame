@@ -132,9 +132,16 @@ void upd765_family_device::device_start()
 		poll_timer = NULL;
 
 	cur_irq = false;
+	locked = false;
 }
 
 void upd765_family_device::device_reset()
+{
+	dor = dor_reset;
+	locked = false;
+}
+
+void upd765_family_device::soft_reset()
 {
 	main_phase = PHASE_CMD;
 	for(int i=0; i<4; i++) {
@@ -150,7 +157,8 @@ void upd765_family_device::device_reset()
 	fifo_pos = 0;
 	command_pos = 0;
 	result_pos = 0;
-	fifocfg = FIF_DIS;
+	if(!locked)
+		fifocfg = FIF_DIS;
 	cur_live.fi = 0;
 	drq = false;
 	cur_live.tm = attotime::never;
@@ -159,7 +167,6 @@ void upd765_family_device::device_reset()
 	cur_live.fi = NULL;
 	tc_done = false;
 	st0 = st1 = st2 = st3 = 0x00;
-	dor = dor_reset;
 
 	check_irq();
 	if(ready_polled)
@@ -240,12 +247,8 @@ WRITE8_MEMBER(upd765_family_device::dor_w)
 	logerror("%s: dor = %02x\n", tag(), data);
 	UINT8 diff = dor ^ data;
 	dor = data;
-	if(diff & 4) {
-		UINT8 tmp = dor_reset;
-		dor_reset = dor;
-		device_reset();
-		dor_reset = tmp;
-	}
+	if(diff & 4)
+		soft_reset();
 
 	for(int i=0; i<4; i++) {
 		floppy_info &fi = flopi[i];
@@ -972,6 +975,9 @@ int upd765_family_device::check_command()
 	case 0x13:
 		return command_pos == 4 ? C_CONFIGURE          : C_INCOMPLETE;
 
+	case 0x14:
+		return C_LOCK;
+
 	default:
 		return C_INVALID;
 	}
@@ -995,6 +1001,14 @@ void upd765_family_device::start_command(int cmd)
 
 	case C_FORMAT_TRACK:
 		format_track_start(flopi[command[1] & 3]);
+		break;
+
+	case C_LOCK:
+		locked = command[0] & 0x80;
+		main_phase = PHASE_RESULT;
+		result[0] = locked ? 0x10 : 0x00;
+		result_pos = 1;
+		logerror("%s: command lock (%s)\n", tag(), locked ? "on" : "off");
 		break;
 
 	case C_PERPENDICULAR:

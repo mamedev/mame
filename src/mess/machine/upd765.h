@@ -284,7 +284,7 @@ protected:
 
 	live_info cur_live, checkpoint_live;
 	line_cb intrq_cb, drq_cb;
-	bool cur_irq, data_irq, drq, internal_drq, tc, tc_done;
+	bool cur_irq, data_irq, drq, internal_drq, tc, tc_done, locked;
 	floppy_info flopi[4];
 
 	int fifo_pos, fifo_expected, command_pos, result_pos;
@@ -304,6 +304,7 @@ protected:
 	enum {
 		C_CONFIGURE,
 		C_FORMAT_TRACK,
+		C_LOCK,
 		C_PERPENDICULAR,
 		C_READ_DATA,
 		C_READ_ID,
@@ -321,6 +322,7 @@ protected:
 
 	void delay_cycles(emu_timer *tm, int cycles);
 	void check_irq();
+	void soft_reset();
 	void fifo_expect(int size, bool write);
 	void fifo_push(UINT8 data, bool internal);
 	UINT8 fifo_pop(bool internal);
