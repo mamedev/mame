@@ -1,26 +1,22 @@
-/****************************************************************************/
-/*                                                                          */
-/*  8080bw.c                                                                */
-/*                                                                          */
-/*  Michael Strutts, Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni         */
-/*  Lee Taylor, Valerio Verrando, Marco Cassili, Zsolt Vasvari and others   */
-/*                                                                          */
-/*                                                                          */
-/*  Notes:                                                                  */
-/*  -----                                                                   */
-/*                                                                          */
-/*  - Space Invaders Deluxe still says Space Invaders Part II,              */
-/*    because according to KLOV, Midway was only allowed to make minor      */
-/*    modifications of the Taito code.                                      */
-/*                                                                          */
-/*  - DIP Locations verified from manual for:                               */
-/*      -sitv                                                               */
-/*      -sicv                                                               */
-/*      -invadpt2                                                           */
-/*      -lrescue                                                            */
-/*      -invasion                                                           */
-/*                                                                          */
-/*  - The Taito Space invaders hardware comes on at least five board types;
+/*****************************************************************************
+
+    8080bw.c
+
+    Michael Strutts, Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni
+    Lee Taylor, Valerio Verrando, Marco Cassili, Zsolt Vasvari and others
+
+
+    Notes:
+    -----
+
+    - Space Invaders Deluxe still says Space Invaders Part II,
+      because according to KLOV, Midway was only allowed to make minor
+      modifications of the Taito code.
+
+    - DIP settings/locations verified from manual for:
+      sitv, sicv, invadpt2, lrescue, invasion, invrvnge
+
+    - The Taito Space invaders hardware comes on at least five board types;
       The Taito manufactured ones are:
       * The "L-shaped" PCB set, Upright, B&W only
       * Three pcbs in a stack, often called the '3 layer pcb set' (most common)
@@ -104,81 +100,52 @@
          UV1, UV2, UV3, UV4, UV5, UV6, UV7, UV8, UV9, UV10 w/proms - undumped (probably same as pvxx set just split differently)
          PV01, PV02, PV03, PV04, PV05 w/proms - invadpt2
 
-      - Midway PCB sets: (cursory descripton)
-         NOTE: The discrete components, particularly for the shot sound, differ between Taito and Midway audio daughterboards.
-         TODO: figure out the difference between the Taito and Midway discrete boards and emulate them both properly. Figure out what the current discrete setup is trying to emulate.
-         * All Midway Space Invaders games ([Space Invader Upright], [Space Invader Cocktail], [Deluxe Space Invaders Upright], [Deluxe Space Invaders Cocktail], and [Space Invaders II]) use the same 8080 mainboard, with no emulation-relevant differences between revisions.
-         * [Space Invaders II] from Midway (only produced as a cocktail) uses an extra sound board for the simultaneous 2 player head-to-head sounds.
-         TODO: remove Space Invader 'invaders' set from mw8080bw.c, it does not belong there at all
+    - Midway PCB sets: (cursory descripton)
+      * All Midway Space Invaders games ([Space Invader Upright], [Space Invader Cocktail],
+        [Deluxe Space Invaders Upright], [Deluxe Space Invaders Cocktail], and [Space Invaders II])
+        use the same 8080 mainboard, with no emulation-relevant differences between revisions.
+      * [Space Invaders II] from Midway (only produced as a cocktail) uses
+        an extra sound board for the simultaneous 2 player head-to-head sounds.
 
-      - Taito-USA-made 'trimline' PCBS do not match the taito pcbs either.
-*/
-/*  To Do:                                                                  */
-/*  -----                                                                   */
-/*                                                                          */
-/*  - Space Chaser (schaser)                                                */
-/*    1. The "missile" sound is incorrect. This is how it should be:        */
-/*       It should be a constant "klunkity-klunk", and should only be       */
-/*       heard while missiles are seen to be moving.  When the red          */
-/*       missiles speed up, there should be more "klunks per second"        */
-/*       with the pitch staying constant.                                   */
-/*      8/8/8 D.R. - Who says?  According to the schematic the sounds are   */
-/*       correct.  Make a video showing otherwise or trace SX0 & SX1 on     */
-/*       a real PCB to find the difference.                                 */
-/*       Currently it beeps every time a player eats a dot.  Seems right.   */
-/*    2. If "Hard" mode is selected, numerous bugs appear which             */
-/*       could be either an emulation fault or a bad rom. Some              */
-/*       bugs are:                                                          */
-/*       a. Graphic error halfway up the left side                          */
-/*       b. Score adds or subtracts random amounts                          */
-/*       c. Score not cleared when starting a new game                      */
-/*       d. Game begins on the wrong level                                  */
-/*                                                                          */
-/*  - Space War (Sanritsu)                                                  */
-/*                                                                          */
-/*    1. I seem to recall that the flashing ufo had its own sample          */
-/*       sound, a sort of rattling noise. Unable to find evidence           */
-/*       of this (so far).                                                  */
-/*                                                                          */
-/*                                                                          */
-/* Change Log:                                                              */
-/* ----------                                                               */
-/*                                                                          */
-/* 24 Dec 1998 - added sitv [LT]                                            */
-/*                                                                          */
-/* 21 Nov 1999 - added spacewar3 [LT]                                       */
-/*                                                                          */
-/* 26 May 2001 - added galxwars                                             */
-/*                     galxwar2 (galxwars2)                                 */
-/*                     jspectr2 (jspecter2)                                 */
-/*                     ozmawar2 (ozmawars2)                                 */
-/*                     spaceatt                                             */
-/*                     sstrangr                                             */
-/*                                                                          */
-/* 26 May 2001 - changed galxwars input port so the new sets work           */
-/*                                                                          */
-/* 30 Jul 2001 - added sstrngr2                                             */
-/*                                                                          */
-/* 17 Jul 2006 - schaser - connect up prom - fix dipswitches                */
-/*               schasrcv (schasercv) - allow bottom line to show on screen */
-/*                                                                          */
-/*                                                                          */
-/* 10 Sep 2006 - invadpt2 - add name reset button                           */
-/*               spcewars - add bitstream circuit, fix dipswitches          */
-/*                                                                          */
-/*                                                                          */
-/* 13 Dec 2006 - add PRELIMINARY sound support and documentation to:        */
-/*               rollingc, spcenctr, gunfight, m4, gmissile,                */
-/*               schasrcv (schasercv), 280zzzap, lagunar, lupin3, phantom2, */
-/*               blueshrk, desertgu, ballbomb, yosakdon/yosakdoa (yosakdona)*/
-/*               shuttlei, invrvnge/invrvnga (invrvngea).                   */
-/*               Documented indianbt sound. Removed NO_SOUND flag from      */
-/*               cosmo and dogpatch as the sound was already working.       */
-/*               [Robert]                                                   */
-/*                                                                          */
-/* 02 May 2007 - Major clean-up of driver and video system                  */
-/*                                                                          */
-/****************************************************************************/
+    - Taito-USA-made 'trimline' PCBS do not match the taito pcbs either.
+
+
+    To Do:
+    -----
+
+    - Midway PCB sets
+      * The discrete components, particularly for the shot sound, differ
+        between Taito and Midway audio daughterboards.
+        + Figure out the difference between the Taito and Midway discrete
+          boards and emulate them both properly.
+        + Figure out what the current discrete setup is trying to emulate.
+      * Remove Space Invaders 'invaders' set from mw8080bw.c, it does not belong
+        there at all
+
+    - Space Chaser (schaser)
+      1. The "missile" sound is incorrect. This is how it should be:
+         It should be a constant "klunkity-klunk", and should only be
+         heard while missiles are seen to be moving.  When the red
+         missiles speed up, there should be more "klunks per second"
+         with the pitch staying constant.
+        8/8/8 D.R. - Who says?  According to the schematic the sounds are
+         correct.  Make a video showing otherwise or trace SX0 & SX1 on
+         a real PCB to find the difference.
+         Currently it beeps every time a player eats a dot.  Seems right.
+      2. If "Hard" mode is selected, numerous bugs appear which
+         could be either an emulation fault or a bad rom. Some
+         bugs are:
+         a. Graphic error halfway up the left side
+         b. Score adds or subtracts random amounts
+         c. Score not cleared when starting a new game
+         d. Game begins on the wrong level
+
+    - Space War (Sanritsu)
+      * I seem to recall that the flashing ufo had its own sample
+        sound, a sort of rattling noise. Unable to find evidence
+        of this (so far).
+
+*****************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -638,14 +605,19 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( invrvnge )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Harder ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( Hardest ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // must be low or game won't boot [code: 0x1a9-1af]
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x80, 0x80, "Fuel Destroyed by Comet" )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x80, "6" )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
@@ -653,7 +625,7 @@ static INPUT_PORTS_START( invrvnge )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_2WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -667,23 +639,9 @@ static INPUT_PORTS_START( invrvnge )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "1500" )
 	PORT_DIPSETTING(    0x08, "2000" )
-
-#if 0
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Harder ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x40, 0x40, "Fuel Destroyed by Comet" )	PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x40, "6" )
-#else
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-#endif
-
-
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) ) // 1 play 10p, 2 play 20p, 6 play 50p
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) ) // 1 play 20p, 2 play 40p, 3 play 50p
