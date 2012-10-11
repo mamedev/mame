@@ -2118,10 +2118,10 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
                      * "1" the FDD motor will be active.
                      * "0" the FDD motor will be in-active.*/
 					floppy_image_device *floppy;
-					floppy = machine().device<floppy_connector>(":upd765a:0")->get_device();
+					floppy = machine().device<floppy_connector>(":upd765:0")->get_device();
 					if(floppy)
 						floppy->mon_w(!BIT(data, 0));
-					floppy = machine().device<floppy_connector>(":upd765a:1")->get_device();
+					floppy = machine().device<floppy_connector>(":upd765:1")->get_device();
 					if(floppy)
 						floppy->mon_w(!BIT(data, 0));
 				  break;

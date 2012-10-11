@@ -1026,6 +1026,7 @@ static MACHINE_CONFIG_DERIVED( aleste, amstrad )
 	MCFG_PALETTE_INIT_OVERRIDE(amstrad_state,aleste)
 	MCFG_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
 
+	MCFG_DEVICE_REMOVE("upd765")
 	MCFG_I8272A_ADD("upd765", true)
 
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", aleste_floppies, "525hd", 0, aleste_floppy_formats)
