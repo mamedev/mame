@@ -311,7 +311,7 @@ WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 
 WRITE8_MEMBER( a5105_state::a5105_upd765_w )
 {
-	machine().device<upd765a_device>("upd765")->tc_w(BIT(data, 4));
+	machine().device<upd765a_device>("upd765a")->tc_w(BIT(data, 4));
 }
 
 static ADDRESS_MAP_START(a5105_io, AS_IO, 8, a5105_state)
