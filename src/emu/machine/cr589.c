@@ -31,10 +31,6 @@ void cr589_device::device_start()
 
 void cr589_device::ExecCommand( int *transferLength )
 {
-	UINT8 *command;
-	int commandLength;
-	GetCommand( &command, &commandLength );
-
 	switch( command[ 0 ] )
 	{
 		case 0x3b: // WRITE BUFFER
@@ -61,10 +57,6 @@ void cr589_device::ExecCommand( int *transferLength )
 
 void cr589_device::ReadData( UINT8 *data, int dataLength )
 {
-	UINT8 *command;
-	int commandLength;
-	GetCommand( &command, &commandLength );
-
 	switch( command[ 0 ] )
 	{
 		case 0x12: // INQUIRY
@@ -93,10 +85,6 @@ void cr589_device::ReadData( UINT8 *data, int dataLength )
 
 void cr589_device::WriteData( UINT8 *data, int dataLength )
 {
-	UINT8 *command;
-	int commandLength;
-	GetCommand( &command, &commandLength );
-
 	switch( command[ 0 ] )
 	{
 		case 0x3b: // WRITE BUFFER

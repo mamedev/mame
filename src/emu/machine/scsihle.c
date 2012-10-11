@@ -33,10 +33,6 @@ void scsihle_device::device_start()
 
 void scsihle_device::ExecCommand( int *transferLength )
 {
-	UINT8 *command;
-	int commandLength;
-	GetCommand( &command, &commandLength );
-
 	switch( command[ 0 ] )
 	{
 	case SCSI_CMD_TEST_UNIT_READY:
@@ -68,10 +64,6 @@ void scsihle_device::ExecCommand( int *transferLength )
 
 void scsihle_device::ReadData( UINT8 *data, int dataLength )
 {
-	UINT8 *command;
-	int commandLength;
-	GetCommand( &command, &commandLength );
-
 	switch( command[ 0 ] )
 	{
 	case SCSI_CMD_REQUEST_SENSE:
@@ -88,10 +80,6 @@ void scsihle_device::ReadData( UINT8 *data, int dataLength )
 
 void scsihle_device::WriteData( UINT8 *data, int dataLength )
 {
-	UINT8 *command;
-	int commandLength;
-	GetCommand( &command, &commandLength );
-
 	switch( command[ 0 ] )
 	{
 	case SCSI_CMD_SEND_DIAGNOSTIC:
@@ -125,12 +113,6 @@ void scsihle_device::SetCommand( UINT8 *_command, int _commandLength )
 	commandLength = _commandLength;
 
 	SetPhase( SCSI_PHASE_COMMAND );
-}
-
-void scsihle_device::GetCommand( UINT8 **_command, int *_commandLength )
-{
-	*_command = command;
-	*_commandLength = commandLength;
 }
 
 int scsihle_device::GetDeviceID()

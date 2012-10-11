@@ -87,10 +87,6 @@ machine_config_constructor scsihd_device::device_mconfig_additions() const
 // scsihd_exec_command
 void scsihd_device::ExecCommand( int *transferLength )
 {
-	UINT8 *command;
-	int commandLength;
-	GetCommand( &command, &commandLength );
-
 	switch ( command[0] )
 	{
 		case 0x03: // REQUEST SENSE
@@ -184,9 +180,6 @@ void scsihd_device::ExecCommand( int *transferLength )
 void scsihd_device::ReadData( UINT8 *data, int dataLength )
 {
 	int i;
-	UINT8 *command;
-	int commandLength;
-	GetCommand( &command, &commandLength );
 
 	// if we're a drive without a disk, return all zeroes
 	if (!disk)
@@ -281,10 +274,6 @@ void scsihd_device::ReadData( UINT8 *data, int dataLength )
 
 void scsihd_device::WriteData( UINT8 *data, int dataLength )
 {
-	UINT8 *command;
-	int commandLength;
-	GetCommand( &command, &commandLength );
-
 	if (!disk)
 	{
 		return;

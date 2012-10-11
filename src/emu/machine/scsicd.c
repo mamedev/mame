@@ -104,12 +104,8 @@ machine_config_constructor scsicd_device::device_mconfig_additions() const
 
 void scsicd_device::ExecCommand( int *transferLength )
 {
-	UINT8 *command;
-	int commandLength;
 	device_t *cdda;
 	int trk;
-
-	GetCommand( &command, &commandLength );
 
 	switch ( command[0] )
 	{
@@ -387,16 +383,11 @@ void scsicd_device::ExecCommand( int *transferLength )
 
 void scsicd_device::ReadData( UINT8 *data, int dataLength )
 {
-	UINT8 *command;
-	int commandLength;
-
 	int i;
 	UINT32 last_phys_frame;
 	UINT32 temp;
 	UINT8 tmp_buffer[2048];
 	device_t *cdda;
-
-	GetCommand( &command, &commandLength );
 
 	switch ( command[0] )
 	{
@@ -724,10 +715,6 @@ void scsicd_device::ReadData( UINT8 *data, int dataLength )
 
 void scsicd_device::WriteData( UINT8 *data, int dataLength )
 {
-	UINT8 *command;
-	int commandLength;
-	GetCommand( &command, &commandLength );
-
 	switch (command[ 0 ])
 	{
 		case 0x15: // MODE SELECT(6)

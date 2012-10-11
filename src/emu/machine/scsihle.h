@@ -21,7 +21,6 @@ public:
 	virtual void SetDevice( void *device ) = 0;
 	virtual void GetDevice( void **device ) = 0;
 	virtual void SetCommand( UINT8 *command, int commandLength );
-	virtual void GetCommand( UINT8 **command, int *commandLength );
 	virtual void ExecCommand( int *transferLength );
 	virtual void WriteData( UINT8 *data, int dataLength );
 	virtual void ReadData( UINT8 *data, int dataLength );
@@ -40,6 +39,9 @@ protected:
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
+	UINT8 command[ 32 ];
+	int commandLength;
+
 private:
 	void scsi_out_req_delay(UINT8 state);
 	void scsi_change_phase(UINT8 newphase);
@@ -57,7 +59,6 @@ private:
 	emu_timer *sel_timer;
 	emu_timer *dataout_timer;
 
-	UINT8 command[ 32 ];
 	UINT8 cmd_idx;
 	UINT8 is_linked;
 
@@ -67,7 +68,6 @@ private:
 	int data_last;
 	int sectorbytes;
 
-	int commandLength;
 	int phase;
 	int scsiID;
 };

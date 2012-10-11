@@ -224,10 +224,6 @@ s1410_device::s1410_device(const machine_config &mconfig, const char *tag, devic
 
 void s1410_device::ExecCommand( int *transferLength )
 {
-	UINT8 *command;
-	int commandLength;
-	GetCommand( &command, &commandLength );
-
 	switch( command[ 0 ] )
 	{
 	case S1410_CMD_INIT_DRIVE_PARAMS:
@@ -266,10 +262,6 @@ void s1410_device::ExecCommand( int *transferLength )
 
 void s1410_device::WriteData( UINT8 *data, int dataLength )
 {
-	UINT8 *command;
-	int commandLength;
-	GetCommand( &command, &commandLength );
-
 	switch( command[ 0 ] )
 	{
 	case S1410_CMD_INIT_DRIVE_PARAMS:

@@ -19,10 +19,6 @@ d9060hd_device::d9060hd_device(const machine_config &mconfig, const char *tag, d
 
 void d9060hd_device::ExecCommand( int *transferLength )
 {
-	UINT8 *command;
-	int commandLength;
-	GetCommand( &command, &commandLength );
-
 	switch( command[ 0 ] )
 	{
 	case D9060HD_CMD_PHYSICAL_DEVICE_ID:

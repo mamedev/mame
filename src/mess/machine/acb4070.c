@@ -21,10 +21,6 @@ acb4070_device::acb4070_device(const machine_config &mconfig, const char *tag, d
 
 void acb4070_device::ExecCommand( int *transferLength )
 {
-	UINT8 *command;
-	int commandLength;
-	GetCommand( &command, &commandLength );
-
 	switch( command[ 0 ] )
 	{
 	case ACB4070_CMD_WRITE_DATA_BUFFER:
