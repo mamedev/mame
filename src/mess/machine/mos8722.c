@@ -168,6 +168,9 @@ void mos8722_device::device_reset()
 
 	m_p0l_written = false;
 	m_p1l_written = false;
+
+	m_out_z80en_func(MCR_8500);
+	m_out_fsdir_func(MCR_FSDIR);
 }
 
 
@@ -220,6 +223,8 @@ WRITE8_MEMBER( mos8722_device::write )
 	{
 		if (!CR_IO && offset >= 0xd500 && offset < 0xd50c)
 		{
+			if (LOG) logerror("MOS8722 '%s' Write %01x : %02x\n", tag(), offset & 0x0f, data);
+
 			m_reg[offset & 0x0f] = data;
 
 			switch (offset & 0x0f)
@@ -248,6 +253,8 @@ WRITE8_MEMBER( mos8722_device::write )
 		}
 		else if (offset >= 0xff00 && offset < 0xff05)
 		{
+			if (LOG) logerror("MOS8722 '%s' Write %01x : %02x\n", tag(), offset & 0x0f, data);
+
 			switch (offset & 0x0f)
 			{
 			case CR:
@@ -279,7 +286,12 @@ READ_LINE_MEMBER( mos8722_device::fsdir_r )
 
 offs_t mos8722_device::ta_r(offs_t offset, int aec, int *ms0, int *ms1, int *ms2, int *ms3, int *cas0, int *cas1)
 {
-	offs_t ta = offset;
+	offs_t ta = offset & 0xff00;
+
+	if (!aec)
+	{
+		ta = 0xf000 | (offset & 0xf00);
+	}
 
 	if (!MCR_C64)
 	{
@@ -289,7 +301,7 @@ offs_t mos8722_device::ta_r(offs_t offset, int aec, int *ms0, int *ms1, int *ms2
 
 		if (offset < 0x1000 && !MCR_8500)
 		{
-			ta = 0xd000 | (offset & 0xfff);
+			ta = 0xd000 | (offset & 0xf00);
 
 			*ms0 = 0;
 			*ms1 = 0;
@@ -321,7 +333,7 @@ offs_t mos8722_device::ta_r(offs_t offset, int aec, int *ms0, int *ms1, int *ms2
 				{
 					if (m_p0l_written && m_reg[P0L])
 					{
-						ta = (m_reg[P0L] << 8) | (offset & 0xff);
+						ta = m_reg[P0L] << 8;
 
 						*cas0 = P0H_A16 ? 1 : 0;
 						*cas1 = P0H_A16 ? 0 : 1;
@@ -331,7 +343,7 @@ offs_t mos8722_device::ta_r(offs_t offset, int aec, int *ms0, int *ms1, int *ms2
 				{
 					if (m_p1l_written && m_reg[P1L])
 					{
-						ta = (m_reg[P1L] << 8) | (offset & 0xff);
+						ta = m_reg[P1L] << 8;
 
 						*cas0 = P1H_A16 ? 1 : 0;
 						*cas1 = P1H_A16 ? 0 : 1;

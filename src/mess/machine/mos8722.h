@@ -79,21 +79,21 @@ class mos8722_device :	public device_t,
                         public mos8722_interface
 {
 public:
-    // construction/destruction
-    mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    UINT8 read(offs_t offset, UINT8 data);
-    DECLARE_WRITE8_MEMBER( write );
+	UINT8 read(offs_t offset, UINT8 data);
+	DECLARE_WRITE8_MEMBER( write );
 
-    DECLARE_READ_LINE_MEMBER( fsdir_r );
+	DECLARE_READ_LINE_MEMBER( fsdir_r );
 
-    offs_t ta_r(offs_t offset, int aec, int *ms0, int *ms1, int *ms2, int *ms3, int *cas0, int *cas1);
+	offs_t ta_r(offs_t offset, int aec, int *ms0, int *ms1, int *ms2, int *ms3, int *cas0, int *cas1);
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
-    virtual void device_reset();
+	virtual void device_start();
+	virtual void device_reset();
 
 private:
 	devcb_resolved_write_line	m_out_z80en_func;
