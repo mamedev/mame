@@ -170,7 +170,7 @@
 /* 13 Dec 2006 - add PRELIMINARY sound support and documentation to:        */
 /*               rollingc, spcenctr, gunfight, m4, gmissile,                */
 /*               schasrcv (schasercv), 280zzzap, lagunar, lupin3, phantom2, */
-/*       blueshrk, desertgu, ballbomb, yosakdon/yosakdoa (yosakdona)*/
+/*               blueshrk, desertgu, ballbomb, yosakdon/yosakdoa (yosakdona)*/
 /*               shuttlei, invrvnge/invrvnga (invrvngea).                   */
 /*               Documented indianbt sound. Removed NO_SOUND flag from      */
 /*               cosmo and dogpatch as the sound was already working.       */
@@ -263,7 +263,6 @@ INPUT_PORTS_END
 /*******************************************************/
 
 /* same as the CV version with a test mode switch */
-
 static INPUT_PORTS_START( sitv )
 	PORT_INCLUDE( sicv )
 
@@ -378,7 +377,6 @@ INPUT_PORTS_END
 
 
 /* same as regular invaders, but with a color board added */
-
 static MACHINE_CONFIG_DERIVED_CLASS( invadpt2, mw8080bw_root, _8080bw_state )
 
 	/* basic machine hardware */
@@ -399,7 +397,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( invadpt2, mw8080bw_root, _8080bw_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
-
 MACHINE_CONFIG_END
 
 /*******************************************************/
@@ -454,7 +451,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( spcewars, mw8080bw_root, _8080bw_state )
 	/* extra audio channel */
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
 MACHINE_CONFIG_END
 
 /*******************************************************/
@@ -509,7 +505,6 @@ static INPUT_PORTS_START( astropal )
 	INVADERS_CAB_TYPE_PORT
 	PORT_MODIFY(INVADERS_CAB_TYPE_PORT_TAG)
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( astropal, invaders, _8080bw_state )
@@ -517,7 +512,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( astropal, invaders, _8080bw_state )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(astropal_io_map)
-
 MACHINE_CONFIG_END
 
 /*******************************************************/
@@ -575,7 +569,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( cosmo, mw8080bw_root, _8080bw_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
-
 MACHINE_CONFIG_END
 
 /*******************************************************/
@@ -695,7 +688,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( invrvnge, mw8080bw_root, _8080bw_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
-
 MACHINE_CONFIG_END
 
 
@@ -706,26 +698,40 @@ MACHINE_CONFIG_END
 /*******************************************************/
 
 static INPUT_PORTS_START( spclaser )
-	PORT_INCLUDE( invrvnge )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	//PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2) /* This is not 2 Player ??? */
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-//  PORT_START("IN2")   /* referenced by invaders_io_map, used in several drivers; this is fairly hacky */
-//  PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) /* This is not 2 Player ??? */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_MODIFY("IN2")
+	PORT_START("IN2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW1:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW1:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:4" )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR(Coinage) )		PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "1 Coin/1 Or 2 Players" )
 	PORT_DIPSETTING(    0x80, "1 Coin/1 Player  2 Coins/2 Players" )   /* Irrelevant, causes bugs */
 
 	/* Dummy port for cocktail mode (not used) */
-	PORT_MODIFY(CABINET_PORT_TAG)
+	PORT_START(CABINET_PORT_TAG)
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -812,7 +818,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( lrescue, mw8080bw_root, _8080bw_state )
 	/* extra audio channel */
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
 MACHINE_CONFIG_END
 
 
@@ -926,7 +931,7 @@ static INPUT_PORTS_START( rollingc )
 	PORT_INCLUDE( sicv )
 
 	PORT_MODIFY("IN0")
-        /* Duplicate control required (both must be mapped to same key for input to work for game select and in-game) */
+	/* Duplicate control required (both must be mapped to same key for input to work for game select and in-game) */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) /* Game Select */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) /* Game Select */
 
@@ -957,7 +962,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( rollingc, mw8080bw_root, _8080bw_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
-
 MACHINE_CONFIG_END
 
 
@@ -1085,7 +1089,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( schaser, mw8080bw_root, _8080bw_state )
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(schaser)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
 MACHINE_CONFIG_END
 
 
@@ -1106,15 +1109,27 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( schasercv )
-	PORT_INCLUDE( invrvnge )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_MODIFY("IN1")
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
 
-	PORT_MODIFY("IN2")
+	PORT_START("IN2")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )									PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
@@ -1127,6 +1142,9 @@ static INPUT_PORTS_START( schasercv )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)	PORT_DIPLOCATION("SW1:6")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:8" )
+
+	/* Dummy port for cocktail mode */
+	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( schasercv, mw8080bw_root, _8080bw_state )
@@ -1149,7 +1167,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( schasercv, mw8080bw_root, _8080bw_state )
 
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
 MACHINE_CONFIG_END
 
 
@@ -1224,7 +1241,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( sflush, mw8080bw_root, _8080bw_state )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_sflush)
-
 MACHINE_CONFIG_END
 
 
@@ -1246,10 +1262,9 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( lupin3 )
-	PORT_INCLUDE( invrvnge )
-
-	PORT_MODIFY("IN0")
-	PORT_BIT( 0x03, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
@@ -1257,15 +1272,22 @@ static INPUT_PORTS_START( lupin3 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 
-	PORT_MODIFY("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
 
-	PORT_MODIFY("IN2")
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
@@ -1278,44 +1300,22 @@ static INPUT_PORTS_START( lupin3 )
 	PORT_DIPNAME(0x80,  0x00, "Invulnerability (Cheat)") PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	/* Dummy port for cocktail mode */
+	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lupin3a )
-	PORT_INCLUDE( invrvnge )
+	PORT_INCLUDE( lupin3 )
 
-	PORT_MODIFY("IN0")
+	//PORT_MODIFY("IN0")
 	//PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* selects color mode (dynamic vs. static) */
 	//PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* something has to do with sound */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x08, 0x00, "Bags To Collect" )		PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x00, "8" )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Japanese ) )
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW1:6" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW1:7" )
-	PORT_DIPNAME(0x80,  0x00, "Invulnerability (Cheat)") PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( lupin3, mw8080bw_root, _8080bw_state )
@@ -1334,7 +1334,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( lupin3, mw8080bw_root, _8080bw_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
-
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( lupin3a, mw8080bw_root, _8080bw_state )
@@ -1354,7 +1353,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( lupin3a, mw8080bw_root, _8080bw_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
-
 MACHINE_CONFIG_END
 
 
@@ -1477,7 +1475,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( polaris, mw8080bw_root, _8080bw_state )
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(polaris)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
 MACHINE_CONFIG_END
 
 
@@ -1596,7 +1593,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( ballbomb, mw8080bw_root, _8080bw_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
-
 MACHINE_CONFIG_END
 
 
@@ -1664,7 +1660,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( yosakdon, mw8080bw_root, _8080bw_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
-
 MACHINE_CONFIG_END
 
 
@@ -1771,7 +1766,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( indianbt, mw8080bw_root, _8080bw_state )
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(indianbt)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
 MACHINE_CONFIG_END
 
 /*******************************************************/
@@ -1841,7 +1835,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( steelwkr, mw8080bw_root, _8080bw_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
-
 MACHINE_CONFIG_END
 
 /*****************************************************
@@ -1976,7 +1969,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( shuttlei, mw8080bw_root, _8080bw_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
-
 MACHINE_CONFIG_END
 
 
@@ -2078,7 +2070,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( darthvdr, mw8080bw_root, _8080bw_state )
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,darthvdr)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,darthvdr)
-
 MACHINE_CONFIG_END
 
 
@@ -2160,7 +2151,6 @@ MACHINE_CONFIG_DERIVED_CLASS( vortex, mw8080bw_root, _8080bw_state )
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(invaders_audio)
-
 MACHINE_CONFIG_END
 
 /* decrypt function for vortex */
@@ -2464,7 +2454,6 @@ MACHINE_CONFIG_DERIVED_CLASS( claybust, invaders, _8080bw_state )
 
 	/* sound hardware */
 	// TODO: discrete sound
-
 MACHINE_CONFIG_END
 
 
@@ -2652,7 +2641,6 @@ MACHINE_CONFIG_DERIVED_CLASS( invmulti, invaders, _8080bw_state )
 	MCFG_EEPROM_93C46_8BIT_ADD("eeprom")
 
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,invmulti)
-
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(_8080bw_state,invmulti)
@@ -3827,7 +3815,7 @@ GAME( 1979, lrescue,  0,        lrescue,  lrescue, driver_device,  0, ROT270, "T
 GAME( 1980, mlander,  lrescue,  lrescue,  lrescue, driver_device,  0, ROT270, "bootleg (Leisure Time Electronics)", "Moon Lander (bootleg of Lunar Rescue)", GAME_SUPPORTS_SAVE )
 GAME( 1978, lrescuem, lrescue,  lrescue,  lrescue, driver_device,  0, ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, grescue,  lrescue,  lrescue,  lrescue, driver_device,  0, ROT270, "Taito (Universal license?)", "Galaxy Rescue", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, driver_device, 0, ROT270, "bootleg", "Destination Earth", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1979, desterth, lrescue,  lrescue,  lrescue, driver_device,  0, ROT270, "bootleg", "Destination Earth", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, invadpt2, 0,        invadpt2, invadpt2, driver_device, 0, ROT270, "Taito", "Space Invaders Part II (Taito)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, invadpt2br,invadpt2,invadpt2, invadpt2, driver_device, 0, ROT270, "Taito do Brasil", "Space Invaders Part II (Brazil)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, invaddlx, invadpt2, invaders, invadpt2, driver_device, 0, ROT270, "Taito (Midway license)", "Space Invaders Deluxe", GAME_SUPPORTS_SAVE )
