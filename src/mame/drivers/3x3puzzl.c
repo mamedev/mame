@@ -3,7 +3,7 @@
 3x3 Puzzle
 Ace
 
-Driver by Mariusz Wojcieszek and David Haywood
+Driver by Mariusz Wojcieszek, David Haywood and Stephh
 
 Typical and simple Korean hardware.....
 
@@ -21,10 +21,6 @@ Additional ROMs with 'a' in label are probably to convert
 the game back to normal version as current set on the PCB
 has adult graphics (sets provided are 'Normal' and 'Enterprise')
 
-
-
-todo:
- verify dips
 
 ***************************************************************************/
 
@@ -73,7 +69,6 @@ public:
 
 	int       m_oki_bank;
 
-	DECLARE_READ16_HANDLER(_880000_r);
 	DECLARE_WRITE16_HANDLER(gfx_ctrl_w);
 	DECLARE_WRITE16_HANDLER(tilemap1_scrollx_w);
 	DECLARE_WRITE16_HANDLER(tilemap1_scrolly_w);
@@ -137,7 +132,7 @@ WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
 {
 	// bit 5 (0x20) cleared when palette is written
 	// bit 4 (0x10) screen width - 1: 512 pixels, 0: 320 pixels
-	// bit 3 (0x08) is set when 0x400000/0x480000 is written
+	// bit 3 (0x08) is set when tilemap scroll registers are written
 	// bit 1 (0x02) OKI banking
 
 	if ( BIT(data,4) )
@@ -183,12 +178,6 @@ UINT32 _3x3puzzle_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-
-READ16_MEMBER(_3x3puzzle_state::_880000_r)
-{
-	return 0xffff; // ???
-}
-
 static ADDRESS_MAP_START( _3x3puzzle_map, AS_PROGRAM, 16, _3x3puzzle_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
@@ -204,24 +193,33 @@ static ADDRESS_MAP_START( _3x3puzzle_map, AS_PROGRAM, 16, _3x3puzzle_state )
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW01")
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(gfx_ctrl_w)
-	AM_RANGE(0x880000, 0x880001) AM_READ( _880000_r )
+	AM_RANGE(0x880000, 0x880001) AM_READNOP // read, but no tested afterwards
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( _3x3puzzle )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // needed for 2nd game
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN ) // must be active_low or coins won't work
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // must be active_low or coins won't work
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -229,52 +227,50 @@ static INPUT_PORTS_START( _3x3puzzle )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
  
     PORT_START("DSW01")
-    PORT_DIPNAME( 0x0001, 0x0001, "DSW0:0" )
+    PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ) )
     PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0002, 0x0002, "DSW0:1" )
+    PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unused ) )
     PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0004, 0x0004, "DSW0:2" )
+    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) )
     PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0008, 0x0008, "DSW0:3" )
+    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unused ) )
     PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0010, 0x0010, "DSW0:4" )
+    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unused ) )
     PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0020, 0x0020, "DSW0:5" )
+    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unused ) )
     PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0040, 0x0040, "DSW0:6" )
+    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) )
     PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0080, 0x0080, "DSW0:7" )
+    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) )
     PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0100, 0x0100, "DSW1:0" ) // coinage
-    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0200, 0x0200, "DSW1:1" ) // coinage
-    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Demo_Sounds ) )
     PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0800, 0x0800, "DSW1:3" )
-    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x1000, 0x1000, "DSW1:4" )
-    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x2000, 0x2000, "DSW1:5" )
+	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x1800, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Easiest ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hard ) )
+    PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unused ) )
     PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x4000, 0x4000, "DSW1:6" )
+    PORT_DIPNAME( 0x4000, 0x4000, "Free Play / Debug mode" )
     PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x8000, 0x8000, "DSW1:7" )
+    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unused ) )
     PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
