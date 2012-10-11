@@ -677,7 +677,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( invrvnge, mw8080bw_root, _8080bw_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(invrvnge_io_map)
 	
-//	MCFG_CPU_ADD("audiocpu", M6808, 1000000)
+//	MCFG_CPU_ADD("audiocpu", M6808, XTAL_4MHz/x)
 //	MCFG_CPU_PROGRAM_MAP(invrvnge_sound_map)
 
 	/* add shifter */
@@ -692,7 +692,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( invrvnge, mw8080bw_root, _8080bw_state )
 	/* sound hardware */
 //	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-//	MCFG_SOUND_ADD("ay1", AY8910, 1000000)
+//	MCFG_SOUND_ADD("ay1", AY8910, XTAL_4MHz/x)
 //	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3933,10 +3933,10 @@ GAMEL(19??, invasionrza,invaders, invaders,  invasion,  driver_device, 0, ROT270
 GAME( 19??, darthvdr,   invaders, darthvdr,  darthvdr,  driver_device, 0, ROT270, "bootleg", "Darth Vader", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
 GAME( 1979, moonbase,   invadpt2, invadpt2,  invadpt2,  driver_device, 0, ROT270, "Nichibutsu (Taito license?)", "Moon Base (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // this has a 'Taito Corp' string hidden away in the rom - how do you get it to display?
 GAME( 1979, moonbasea,  invadpt2, invadpt2,  invadpt2,  driver_device, 0, ROT270, "Nichibutsu", "Moon Base (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )                  // this has the same string replaced with Nichibutsu, no other differences
-GAME( 1980, invrvnge,   0,        invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 1)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
-GAME( 1980, invrvngea,  invrvnge, invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 2)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
-GAME( 1980, invrvngeb,  invrvnge, invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 3)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
-GAME( 1980, invrvngedu, invrvnge, invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+GAME( 1980?,invrvnge,   0,        invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 1)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND ) // copyright is either late-1980, or early-1981
+GAME( 1980?,invrvngea,  invrvnge, invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 2)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+GAME( 1980?,invrvngeb,  invrvnge, invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 3)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+GAME( 1980?,invrvngedu, invrvnge, invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
 GAME( 1980, spclaser,   0,        invadpt2,  spclaser,  driver_device, 0, ROT270, "Game Plan (Taito license)", "Space Laser", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1980, intruder,   spclaser, invadpt2,  spclaser,  driver_device, 0, ROT270, "Game Plan (Taito license)", "Intruder", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, laser,      spclaser, invadpt2,  spclaser,  driver_device, 0, ROT270, "bootleg (Leisure Time Electronics Inc.)", "Astro Laser (bootleg of Space Laser)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
