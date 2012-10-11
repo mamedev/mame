@@ -2623,6 +2623,8 @@ static int command_convert(int argc, char *argv[])
 	if (err != 0)
 		return 1;
 
+	memset(&jed, 0, sizeof(jed));
+
 	/* if the source is JED or PLA, convert to binary */
 	if (src_is_jed || src_is_pla)
 	{
