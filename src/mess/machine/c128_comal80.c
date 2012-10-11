@@ -64,7 +64,7 @@ UINT8 c128_comal80_cartridge_device::c64_cd_r(address_space &space, offs_t offse
 	if (!romh)
 	{
 		offs_t addr = (m_bank << 14) | (offset & 0x3fff);
-		data = m_roml[addr];
+		data = m_romh[addr];
 	}
 
 	return data;

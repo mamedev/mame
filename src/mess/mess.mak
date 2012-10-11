@@ -842,6 +842,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64_pagefox.o	\
 	$(MESS_MACHINE)/c64_prophet64.o	\
 	$(MESS_MACHINE)/c64_ps64.o	\
+	$(MESS_MACHINE)/c64_reu.o	\
 	$(MESS_MACHINE)/c64_rex.o	\
 	$(MESS_MACHINE)/c64_rex_ep256.o	\
 	$(MESS_MACHINE)/c64_ross.o	\
@@ -914,6 +915,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/64h156.o	\
 	$(MESS_MACHINE)/petcass.o	\
 	$(MESS_MACHINE)/mos8722.o	\
+	$(MESS_MACHINE)/mos8726.o	\
 	$(MESS_MACHINE)/c2n.o		\
 	$(MESS_VIDEO)/vdc8563.o		\
 	$(MESS_VIDEO)/vic6567.o		\
