@@ -1,12 +1,15 @@
-/***********************************************************************************
+/****************************************************************************************
 
     Pinball
-    Atari Generation/System 2
+    Atari Generation/System 2 and 3
 
-    Manuals and PinMAME used as references (couldn't find full schematics).
+    System 2 : Manuals and PinMAME used as references (couldn't find full schematics).
+    System 3 : PinMAME used as reference (couldn't find anything else).
+
+    The only difference seems to be an extra bank of inputs (or something) at 2008-200B.
 
 
-************************************************************************************/
+*****************************************************************************************/
 
 #include "machine/genpin.h"
 #include "cpu/m6800/m6800.h"
@@ -67,6 +70,30 @@ static ADDRESS_MAP_START( atari_s2_map, AS_PROGRAM, 8, atari_s2_state )
 	AM_RANGE(0x2800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( atari_s3_map, AS_PROGRAM, 8, atari_s2_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM
+	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("nvram") // battery backed
+	AM_RANGE(0x1000, 0x1007) AM_MIRROR(0x07F8) AM_READ(switch_r)
+	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x071F) AM_WRITE(sound0_w)
+	AM_RANGE(0x1820, 0x1820) AM_MIRROR(0x071F) AM_WRITE(sound1_w)
+	AM_RANGE(0x1840, 0x1847) AM_MIRROR(0x0718) AM_WRITE(display_w)
+	AM_RANGE(0x1860, 0x1867) AM_MIRROR(0x0718) AM_WRITE(lamp_w)
+	AM_RANGE(0x1880, 0x1880) AM_MIRROR(0x071F) AM_WRITE(sol0_w)
+	AM_RANGE(0x18a0, 0x18a7) AM_MIRROR(0x0718) AM_WRITE(sol1_w)
+	AM_RANGE(0x18c0, 0x18c0) AM_MIRROR(0x071F) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x18e0, 0x18e0) AM_MIRROR(0x071F) AM_WRITE(intack_w)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x07F4) AM_READ_PORT("DSW0")
+	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x07F4) AM_READ_PORT("DSW1")
+	AM_RANGE(0x2002, 0x2002) AM_MIRROR(0x07F4) AM_READ_PORT("DSW2")
+	AM_RANGE(0x2003, 0x2003) AM_MIRROR(0x07F4) AM_READ_PORT("DSW3")
+	AM_RANGE(0x2008, 0x2008) AM_MIRROR(0x07F4) AM_READ_PORT("DSW4")
+	AM_RANGE(0x2009, 0x2009) AM_MIRROR(0x07F4) AM_READ_PORT("DSW5")
+	AM_RANGE(0x200a, 0x200a) AM_MIRROR(0x07F4) AM_READ_PORT("DSW6")
+	AM_RANGE(0x200b, 0x200b) AM_MIRROR(0x07F4) AM_READ_PORT("DSW7")
+	AM_RANGE(0x2800, 0x3fff) AM_ROM
+ADDRESS_MAP_END
+
 static INPUT_PORTS_START( atari_s2 )
 	// dipswitches still to be described
 	PORT_START("DSW0")
@@ -79,6 +106,18 @@ static INPUT_PORTS_START( atari_s2 )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW5")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW6")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW7")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X0") // 1000
@@ -205,6 +244,12 @@ static MACHINE_CONFIG_START( atari_s2, atari_s2_state )
 	MCFG_DEFAULT_LAYOUT(layout_atari_s2)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( atari_s3, atari_s2 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(atari_s3_map)
+MACHINE_CONFIG_END
+
+
 /*-------------------------------------------------------------------
 / Superman (03/1979)
 /-------------------------------------------------------------------*/
@@ -231,6 +276,19 @@ ROM_START(hercules)
 	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 ROM_END
 
+/*-------------------------------------------------------------------
+/ Road Runner (??/1979)
+/-------------------------------------------------------------------*/
+ROM_START(roadrunr)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("0000.716", 0x2800, 0x0800, CRC(62f5f394) SHA1(ff91066d43d788119e3337788abd86e5c0bf2d92))
+	ROM_LOAD("3000.716", 0x3000, 0x0800, CRC(2fc01359) SHA1(d3df20c764bb68a5316367bb18d34a03293e7fa6))
+	ROM_LOAD("3800.716", 0x3800, 0x0800, CRC(77262408) SHA1(3045a732c39c96002f495f64ed752279f7d43ee7))
+	ROM_REGION(0x1000, "sound1", 0)
+	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
+ROM_END
 
-GAME( 1979, supermap,  0,  atari_s2,  atari_s2, driver_device, 0,  ROT0, "Atari", "Superman (Pinball)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1979, hercules,  0,  atari_s2,  atari_s2, driver_device, 0,  ROT0, "Atari", "Hercules", GAME_IS_SKELETON_MECHANICAL)
+
+GAME( 1979, supermap,  0,  atari_s2,  atari_s2, driver_device, 0,  ROT0, "Atari", "Superman (Pinball)", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME( 1979, hercules,  0,  atari_s2,  atari_s2, driver_device, 0,  ROT0, "Atari", "Hercules", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME( 1979, roadrunr,  0,  atari_s3,  atari_s2, driver_device, 0,  ROT0, "Atari", "Road Runner", GAME_MECHANICAL | GAME_NO_SOUND)

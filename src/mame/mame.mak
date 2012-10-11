@@ -1628,7 +1628,6 @@ $(MAMEOBJ)/pinball.a: \
 	$(DRIVERS)/alvg.o  \
 	$(DRIVERS)/atari_s1.o  \
 	$(DRIVERS)/atari_s2.o  \
-	$(DRIVERS)/atari_s3.o  \
 	$(DRIVERS)/bingo.o  \
 	$(DRIVERS)/by17.o  \
 	$(DRIVERS)/by35.o  \
