@@ -658,22 +658,42 @@ static INPUT_PORTS_START( invrvnge )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )									PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )										PORT_DIPLOCATION("SW1:3")
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:4" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)					PORT_DIPLOCATION("SW1:5")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)	PORT_DIPLOCATION("SW1:6")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)	PORT_DIPLOCATION("SW1:7")
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )									PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, "1500" )
+	PORT_DIPSETTING(    0x08, "2000" )
+
+#if 0
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Harder ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x40, 0x40, "Fuel Destroyed by Comet" )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x40, "6" )
+#else
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+#endif
+
+
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) ) // 1 play 10p, 2 play 20p, 6 play 50p
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) ) // 1 play 20p, 2 play 40p, 3 play 50p
+
+	/* Dummy port for cocktail mode (not used) */
+	PORT_START(CABINET_PORT_TAG)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	/* Dummy port for cocktail mode */
-	INVADERS_CAB_TYPE_PORT
+//	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
 
@@ -1025,7 +1045,7 @@ static INPUT_PORTS_START( schaser )
 	// Name Reset - if name of high scorer was rude, owner can press this button
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Name Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_DIPNAME( 0x40, 0x00, "Number Of Controllers" )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x40, 0x00, "Number of Controllers" )	PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1425,7 +1445,7 @@ static INPUT_PORTS_START( polaris )
 	/* 0x04 should be Cabinet - Upright/Cocktail,
        but until the cocktail hack is changed,
        this will have to do. */
-	PORT_DIPNAME( 0x04, 0x00, "Number Of Controls" )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, "Number of Controls" )	PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPNAME( 0x08, 0x00, "Invincible Test" )		PORT_DIPLOCATION("SW1:4")
@@ -3004,19 +3024,79 @@ ROM_END
 
 ROM_START( invrvnge )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "invrvnge.h",   0x0000, 0x0800, CRC(aca41bbb) SHA1(ca71f792abd6d9a44d15b19d2ccf678e82ccba4f) )
-	ROM_LOAD( "invrvnge.g",   0x0800, 0x0800, CRC(cfe89dad) SHA1(218b6a0b636c49c4cdc3667e8b1387ef0e257115) )
-	ROM_LOAD( "invrvnge.f",   0x1000, 0x0800, CRC(e350de2c) SHA1(e845565e2f96f9dec3242ec5ab75910a515428c9) )
-	ROM_LOAD( "invrvnge.e",   0x1800, 0x0800, CRC(1ec8dfc8) SHA1(fc8fbe1161958f57c9f4ccbcab8a769184b1c562) )
+	ROM_LOAD( "h.ic36",      0x0000, 0x0800, CRC(cabc3b59) SHA1(02e17bef545ea0baffc45610deeec0f913daf16e) )
+	ROM_LOAD( "g.ic35",      0x0800, 0x0800, CRC(26b38aa4) SHA1(f281c7ec47ce6ab61bfda2e7aa6a5b8a01f2c11e) )
+	ROM_LOAD( "f.ic34",      0x1000, 0x0800, CRC(b3b2749e) SHA1(4f854f981396e2d6a959dd48cff12234074fb69b) )
+	ROM_LOAD( "e.ic33",      0x1800, 0x0800, CRC(d8e75102) SHA1(86d5618944265947e3ce60fdf048d8fff4a55744) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "colour.bin",  0x0000, 0x0800, CRC(7de74988) SHA1(0b8c94b2bfdbc3921d60aad765df8af611f3fdd7) )
+
+	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_LOAD( "snd.1c",      0x0000, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
+	ROM_LOAD( "snd.2c",      0x0800, 0x0800, CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) )
 ROM_END
 
 ROM_START( invrvngea )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "h.ic36",      0x0000, 0x0800, CRC(0e229b9f) SHA1(617197bf94e9700cbbb2f32487dc47b318d4f2af) )
+	ROM_LOAD( "g.ic35",      0x0800, 0x0800, CRC(26b38aa4) SHA1(f281c7ec47ce6ab61bfda2e7aa6a5b8a01f2c11e) )
+	ROM_LOAD( "f.ic34",      0x1000, 0x0800, CRC(b3b2749e) SHA1(4f854f981396e2d6a959dd48cff12234074fb69b) )
+	ROM_LOAD( "e.ic33",      0x1800, 0x0800, CRC(d8e75102) SHA1(86d5618944265947e3ce60fdf048d8fff4a55744) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "colour.bin",  0x0000, 0x0800, CRC(7de74988) SHA1(0b8c94b2bfdbc3921d60aad765df8af611f3fdd7) )
+
+	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_LOAD( "snd.1c",      0x0000, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
+	ROM_LOAD( "snd.2c",      0x0800, 0x0800, CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) )
+ROM_END
+
+ROM_START( invrvngeb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "h.ic36",      0x0000, 0x0800, CRC(aca41bbb) SHA1(ca71f792abd6d9a44d15b19d2ccf678e82ccba4f) )
+	ROM_LOAD( "g.ic35",      0x0800, 0x0800, CRC(cfe89dad) SHA1(218b6a0b636c49c4cdc3667e8b1387ef0e257115) )
+	ROM_LOAD( "f.ic34",      0x1000, 0x0800, CRC(e350de2c) SHA1(e845565e2f96f9dec3242ec5ab75910a515428c9) )
+	ROM_LOAD( "e.ic33",      0x1800, 0x0800, CRC(1ec8dfc8) SHA1(fc8fbe1161958f57c9f4ccbcab8a769184b1c562) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "colour.bin",  0x0000, 0x0800, BAD_DUMP CRC(7de74988) SHA1(0b8c94b2bfdbc3921d60aad765df8af611f3fdd7) ) // not dumped, taken from parent
+
+	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_LOAD( "snd.1c",      0x0000, 0x0800, BAD_DUMP CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) ) // not dumped, taken from parent
+	ROM_LOAD( "snd.2c",      0x0800, 0x0800, BAD_DUMP CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) ) // not dumped, taken from parent
+ROM_END
+
+ROM_START( invrvngec )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "h.ic36",      0x0000, 0x0800, CRC(0914b279) SHA1(91e465f56ed0dc8c68e109e33ec9d2bda2616a21) )
+	ROM_LOAD( "g.ic35",      0x0800, 0x0800, CRC(84d9497c) SHA1(fb1b5fc49365fbf89e5418789e64efd186cdeecf) )
+	ROM_LOAD( "f.ic34",      0x1000, 0x0800, CRC(78d34d97) SHA1(a50c19df12e75c644b014d74a463094e249db207) )
+	ROM_LOAD( "e.ic33",      0x1800, 0x0800, CRC(30c71887) SHA1(17c9e905eb327435d52b6d51842f7f42a5e6ab7d) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "colour.bin",  0x0000, 0x0800, CRC(7de74988) SHA1(0b8c94b2bfdbc3921d60aad765df8af611f3fdd7) )
+
+	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_LOAD( "snd.1c",      0x0000, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
+	ROM_LOAD( "snd.2c",      0x0800, 0x0800, CRC(4b67073b) SHA1(ab4cdcdff55bbb187a26fd8acab24692f49beabb) )
+ROM_END
+
+ROM_START( invrvngedu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "5m.bin",       0x0000, 0x0800, CRC(b145cb71) SHA1(127eb11de7ab9835f06510fb12838c0b728c0d42) )
 	ROM_LOAD( "5n.bin",       0x0800, 0x0800, CRC(660e8af3) SHA1(bd52eadf4ee3d717fd5bd7206e1e87d729250c92) )
 	ROM_LOAD( "5p.bin",       0x1000, 0x0800, CRC(6ec5a9ad) SHA1(d1e84d2d60c6128c092f2cd20a2b87216df3034b) )
 	ROM_LOAD( "5r.bin",       0x1800, 0x0800, CRC(74516811) SHA1(0f595c7b0fae5f3f83fdd1ffed5a408ee77c9438) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "colour.bin",  0x0000, 0x0800, BAD_DUMP CRC(7de74988) SHA1(0b8c94b2bfdbc3921d60aad765df8af611f3fdd7) ) // not dumped, taken from parent
+
+	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_LOAD( "snd.1c",      0x0000, 0x0800, BAD_DUMP CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) ) // not dumped, taken from parent
+	ROM_LOAD( "snd.2c",      0x0800, 0x0800, BAD_DUMP CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) ) // not dumped, taken from parent
 ROM_END
+
 
 ROM_START( spclaser )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3866,8 +3946,11 @@ GAMEL(19??, invasionrza,invaders,invaders,invasion, driver_device, 0, ROT270, "b
 GAME( 19??, darthvdr, invaders, darthvdr, darthvdr, driver_device, 0, ROT270, "bootleg", "Darth Vader", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
 GAME( 1979, moonbase, invadpt2, invadpt2, invadpt2, driver_device, 0, ROT270, "Nichibutsu (Taito license?)", "Moon Base (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // this has a 'Taito Corp' string hidden away in the rom - how do you get it to display?
 GAME( 1979, moonbasea,invadpt2, invadpt2, invadpt2, driver_device, 0, ROT270, "Nichibutsu", "Moon Base (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )                  // this has the same string replaced with Nichibutsu, no other differences
-GAME( 1980, invrvnge, 0,        invrvnge, invrvnge, driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge",  GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1980, invrvngea,invrvnge, invrvnge, invrvnge, driver_device, 0, ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1980, invrvnge, 0,        invrvnge, invrvnge, driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1980, invrvngea,invrvnge, invrvnge, invrvnge, driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1980, invrvngeb,invrvnge, invrvnge, invrvnge, driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 3)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1980, invrvngec,invrvnge, invrvnge, invrvnge, driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 4)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1980, invrvngedu,invrvnge, invrvnge, invrvnge, driver_device, 0, ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, spclaser, 0,        invadpt2, spclaser, driver_device, 0, ROT270, "Game Plan (Taito license)", "Space Laser", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1980, intruder, spclaser, invadpt2, spclaser, driver_device, 0, ROT270, "Game Plan (Taito license)", "Intruder", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, laser,    spclaser, invadpt2, spclaser, driver_device, 0, ROT270, "bootleg (Leisure Time Electronics Inc.)", "Astro Laser (bootleg of Space Laser)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
