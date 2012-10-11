@@ -30,8 +30,13 @@ const device_type MOS8721 = &device_creator<mos8721_device>;
 
 inline void pla_device::parse_fusemap()
 {
+	memory_region *region = machine().root_device().memregion(tag());
 	jed_data jed;
-	jedbin_parse(machine().root_device().memregion(tag())->base(), machine().root_device().memregion(tag())->bytes(), &jed);
+	
+	jedbin_parse(region->base(), region->bytes(), &jed);
+
+	//logerror("PLA '%s' %u fuses\n", tag(), jed.numfuses);
+
 	UINT32 fusenum = 0;
 	m_xor = 0;
 
@@ -51,12 +56,16 @@ inline void pla_device::parse_fusemap()
 		{
 			m_or[term] |= !jed_get_fuse(&jed, fusenum++) << f;
 		}
+
+		//logerror("PLA '%s' %3u COMP %08x TRUE %08x OR %08x\n", tag(), term, m_and_comp[term], m_and_true[term], m_or[term]);
 	}
 
 	for (int f = 0; f < m_outputs; f++)
 	{
 		m_xor |= jed_get_fuse(&jed, fusenum++) << f;
 	}
+
+	//logerror("PLA '%s' XOR %08x\n", tag(), m_xor);
 }
 
 
@@ -66,10 +75,12 @@ inline void pla_device::parse_fusemap()
 
 inline bool pla_device::get_product(int term)
 {
-	UINT32 input_true = m_and_true[term] | m_i;
 	UINT32 input_comp = m_and_comp[term] | ~m_i;
+	UINT32 input_true = m_and_true[term] | m_i;
 
-	return ((input_true & input_comp) & m_output_mask) == m_output_mask;
+	//logerror("PLA '%s' %3u COMP %08x TRUE %08x OR %08x : %u\n", tag(), term, ~input_comp & m_output_mask, ~input_true & m_output_mask, m_or[term], (((input_comp & input_true) & m_output_mask) == m_output_mask));
+
+	return ((input_comp & input_true) & m_output_mask) == m_output_mask;
 }
 
 
@@ -115,7 +126,7 @@ pls100_device::pls100_device(const machine_config &mconfig, const char *tag, dev
 }
 
 mos8721_device::mos8721_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : pla_device(mconfig, MOS8721, "MOS8721", tag, owner, clock, 27, 18, 48, 0x7ffffff)
+    : pla_device(mconfig, MOS8721, "MOS8721", tag, owner, clock, 27, 18, 379, 0x7ffffff) // TODO actual number of terms is unknown
 {
 }
 
