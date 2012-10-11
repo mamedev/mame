@@ -472,14 +472,14 @@ static void cfunc_get_cop0_reg(void *param)
 	{
 		if(dest)
 		{
-			rsp->r[dest] = (rsp->config->sp_reg_r)(rsp->device, *rsp->program, reg, 0x00000000);
+			rsp->r[dest] = (rsp->sp_reg_r_func)(reg, 0x00000000);
 		}
 	}
 	else if (reg >= 8 && reg < 16)
 	{
 		if(dest)
 		{
-			rsp->r[dest] = (rsp->config->dp_reg_r)(rsp->device, *rsp->program, reg - 8, 0x00000000);
+			rsp->r[dest] = (rsp->dp_reg_r_func)(reg - 8, 0x00000000);
 		}
 	}
 	else
@@ -496,11 +496,11 @@ static void cfunc_set_cop0_reg(void *param)
 
 	if (reg >= 0 && reg < 8)
 	{
-		(rsp->config->sp_reg_w)(rsp->device, *rsp->program, reg, data, 0x00000000);
+		(rsp->sp_reg_w_func)(reg, data, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		(rsp->config->dp_reg_w)(rsp->device, *rsp->program, reg - 8, data, 0x00000000);
+		(rsp->dp_reg_w_func)(reg - 8, data, 0x00000000);
 	}
 	else
 	{
@@ -585,7 +585,14 @@ static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_ac
 
 	memset(rsp, 0, sizeof(*rsp));
 
-	rsp->config = (const rsp_config *)device->static_config();
+	const rsp_config *config = (const rsp_config *)device->static_config();
+	// resolve callbacks
+	rsp->dp_reg_r_func.resolve(config->dp_reg_r_cb, *device);
+	rsp->dp_reg_w_func.resolve(config->dp_reg_w_cb, *device);
+	rsp->sp_reg_r_func.resolve(config->sp_reg_r_cb, *device);
+	rsp->sp_reg_w_func.resolve(config->sp_reg_w_cb, *device);
+	rsp->sp_set_status_func.resolve(config->sp_set_status_cb, *device);
+	
 	rsp->irq_callback = irqcallback;
 	rsp->device = device;
 	rsp->program = &device->space(AS_PROGRAM);
@@ -3371,7 +3378,7 @@ INLINE void cfunc_rsp_vrsqh(void *param)
 static void cfunc_sp_set_status_cb(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
-	(rsp->config->sp_set_status)(rsp->device, rsp->impstate->arg0);
+	(rsp->sp_set_status_func)(0, rsp->impstate->arg0);
 }
 
 static CPU_EXECUTE( rsp )

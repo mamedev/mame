@@ -182,11 +182,11 @@ static UINT32 get_cop0_reg(rsp_state *rsp, int reg)
 	reg &= 0xf;
 	if (reg < 8)
 	{
-		return (rsp->config->sp_reg_r)(rsp->device, reg, 0x00000000);
+		return (rsp->sp_reg_r_func)(reg, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		return (rsp->config->dp_reg_r)(rsp->device, reg - 8, 0x00000000);
+		return (rsp->dp_reg_r_func)(reg - 8, 0x00000000);
 	}
 
 	return 0;
@@ -197,11 +197,11 @@ static void set_cop0_reg(rsp_state *rsp, int reg, UINT32 data)
 	reg &= 0xf;
 	if (reg < 8)
 	{
-		(rsp->config->sp_reg_w)(rsp->device, reg, data, 0x00000000);
+		(rsp->sp_reg_w_func)(reg, data, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		(rsp->config->dp_reg_w)(rsp->device, reg - 8, data, 0x00000000);
+		(rsp->dp_reg_w_func)(reg - 8, data, 0x00000000);
 	}
 }
 
@@ -274,7 +274,13 @@ static CPU_INIT( rsp )
 	rsp_state *rsp = get_safe_token(device);
 	int regIdx;
 	int accumIdx;
-	rsp->config = (const rsp_config *)device->static_config();
+	const rsp_config *config = (const rsp_config *)device->static_config();
+	// resolve callbacks
+	rsp->dp_reg_r_func.resolve(config->dp_reg_r_cb, *device);
+	rsp->dp_reg_w_func.resolve(config->dp_reg_w_cb, *device);
+	rsp->sp_reg_r_func.resolve(config->sp_reg_r_cb, *device);
+	rsp->sp_reg_w_func.resolve(config->sp_reg_w_cb, *device);
+	rsp->sp_set_status_func.resolve(config->sp_set_status_cb, *device);
 
 	if (LOG_INSTRUCTION_EXECUTION)
 		rsp->exec_output = fopen("rsp_execute.txt", "wt");
@@ -2715,7 +2721,7 @@ static CPU_EXECUTE( rsp )
 					case 0x09:	/* JALR */		JUMP_PC_L(RSVAL, RDREG); break;
 					case 0x0d:	/* BREAK */
 					{
-						(rsp->config->sp_set_status)(rsp->device, 0x3);
+						(rsp->sp_set_status_func)(0, 0x3);
 						rsp->icount = MIN(rsp->icount, 1);
 
 						if (LOG_INSTRUCTION_EXECUTION) fprintf(rsp->exec_output, "\n---------- break ----------\n\n");

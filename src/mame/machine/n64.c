@@ -553,9 +553,9 @@ void n64_periphs::sp_dma(int direction)
 	}
 }
 
-static void sp_set_status(device_t *device, UINT32 status)
+static WRITE32_DEVICE_HANDLER(sp_set_status)
 {
-	device->machine().device<n64_periphs>("rcp")->sp_set_status(status);
+	device->machine().device<n64_periphs>("rcp")->sp_set_status(data);
 }
 
 void n64_periphs::sp_set_status(UINT32 status)
@@ -991,11 +991,11 @@ WRITE32_DEVICE_HANDLER( n64_dp_reg_w )
 
 const rsp_config n64_rsp_config =
 {
-	n64_dp_reg_r,
-	n64_dp_reg_w,
-	n64_sp_reg_r,
-	n64_sp_reg_w,
-	sp_set_status
+	DEVCB_DEVICE_HANDLER("rcp",n64_dp_reg_r),
+	DEVCB_DEVICE_HANDLER("rcp",n64_dp_reg_w),
+	DEVCB_DEVICE_HANDLER("rcp",n64_sp_reg_r),
+	DEVCB_DEVICE_HANDLER("rcp",n64_sp_reg_w),
+	DEVCB_DEVICE_HANDLER("rcp",sp_set_status)
 };
 
 TIMER_CALLBACK_MEMBER(n64_periphs::vi_scanline_callback)

@@ -68,15 +68,13 @@ enum
     STRUCTURES
 ***************************************************************************/
 
-typedef void (*rsp_set_status_func)(device_t *device, UINT32 status);
-
 struct rsp_config
 {
-	read32_device_func dp_reg_r;
-	write32_device_func dp_reg_w;
-	read32_device_func sp_reg_r;
-	write32_device_func sp_reg_w;
-	rsp_set_status_func sp_set_status;
+	devcb_read32 dp_reg_r_cb;
+	devcb_write32 dp_reg_w_cb;
+	devcb_read32 sp_reg_r_cb;
+	devcb_write32 sp_reg_w_cb;
+	devcb_write32 sp_set_status_cb;
 };
 
 
@@ -156,7 +154,6 @@ union ACCUMULATOR_REG
 struct rspimp_state;
 struct rsp_state
 {
-	const rsp_config *config;
 	FILE *exec_output;
 
 	UINT32 pc;
@@ -191,6 +188,12 @@ struct rsp_state
 	UINT8 *imem8;
 
 	rspimp_state* impstate;
+	
+	devcb_resolved_read32 dp_reg_r_func;
+	devcb_resolved_write32 dp_reg_w_func;
+	devcb_resolved_read32 sp_reg_r_func;
+	devcb_resolved_write32 sp_reg_w_func;
+	devcb_resolved_write32 sp_set_status_func;	
 };
 
 DECLARE_LEGACY_CPU_DEVICE(RSP, rsp);
