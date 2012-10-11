@@ -50,6 +50,10 @@
         write8_device_func:     (device, offset, data)
         read16_device_func:      (device, offset)
         write16_device_func:     (device, offset, data)
+        read32_device_func:      (device, offset)
+        write32_device_func:     (device, offset, data)
+        read64_device_func:      (device, offset)
+        write64_device_func:     (device, offset, data)
 
     The adapted callback types supported are:
 
@@ -65,6 +69,14 @@
         write16_device_func:    (device, offset, data)
         read16_space_func:      (space, offset)
         write16_space_func:     (space, offset, data)
+        read32_device_func:     (device, offset)
+        write32_device_func:    (device, offset, data)
+        read32_space_func:      (space, offset)
+        write32_space_func:     (space, offset, data)
+        read64_device_func:     (device, offset)
+        write64_device_func:    (device, offset, data)
+        read64_space_func:      (space, offset)
+        write64_space_func:     (space, offset, data)
 
 ***************************************************************************/
 
@@ -127,6 +139,22 @@ UINT16 devcb_stub16(device_t *device, address_space &space, offs_t offset, UINT1
 	return (target->*_Function)(space, offset, mem_mask);
 }
 
+// static template for a read32 stub function that calls through a given READ32_MEMBER
+template<class _Class, UINT32 (_Class::*_Function)(address_space &, offs_t, UINT32)>
+UINT32 devcb_stub32(device_t *device, address_space &space, offs_t offset, UINT32 mem_mask)
+{
+	_Class *target = downcast<_Class *>(device);
+	return (target->*_Function)(space, offset, mem_mask);
+}
+
+// static template for a read64 stub function that calls through a given READ64_MEMBER
+template<class _Class, UINT64 (_Class::*_Function)(address_space &, offs_t, UINT64)>
+UINT64 devcb_stub64(device_t *device, address_space &space, offs_t offset, UINT64 mem_mask)
+{
+	_Class *target = downcast<_Class *>(device);
+	return (target->*_Function)(space, offset, mem_mask);
+}
+
 // static template for a write_line stub function that calls through a given WRITE_LINE_MEMBER
 template<class _Class, void (_Class::*_Function)(int state)>
 void devcb_line_stub(device_t *device, int state)
@@ -151,6 +179,22 @@ void devcb_stub16(device_t *device, address_space &space, offs_t offset, UINT16 
 	(target->*_Function)(space, offset, data, mem_mask);
 }
 
+// static template for a write32 stub function that calls through a given WRITE32_MEMBER
+template<class _Class, void (_Class::*_Function)(address_space &, offs_t, UINT32, UINT32)>
+void devcb_stub32(device_t *device, address_space &space, offs_t offset, UINT32 data, UINT32 mem_mask)
+{
+	_Class *target = downcast<_Class *>(device);
+	(target->*_Function)(space, offset, data, mem_mask);
+}
+
+// static template for a write64 stub function that calls through a given WRITE64_MEMBER
+template<class _Class, void (_Class::*_Function)(address_space &, offs_t, UINT64, UINT64)>
+void devcb_stub64(device_t *device, address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
+{
+	_Class *target = downcast<_Class *>(device);
+	(target->*_Function)(space, offset, data, mem_mask);
+}
+
 #define DEVCB_NULL								{ DEVCB_TYPE_NULL }
 
 // standard line or read/write handlers with the calling device passed
@@ -159,11 +203,15 @@ void devcb_stub16(device_t *device, address_space &space, offs_t offset, UINT16 
 #define DEVCB_HANDLER(func)						{ DEVCB_TYPE_DEVICE, 0, "", #func, NULL, func, NULL }
 #define DEVCB_MEMBER(cls,memb)					{ DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
 #define DEVCB_MEMBER16(cls,memb)				{ DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, NULL, &devcb_stub16<cls, &cls::memb>, NULL }
+#define DEVCB_MEMBER32(cls,memb)				{ DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, NULL, &devcb_stub32<cls, &cls::memb>, NULL }
+#define DEVCB_MEMBER64(cls,memb)				{ DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, NULL, &devcb_stub64<cls, &cls::memb>, NULL }
 
 // line or read/write handlers for the driver device
 #define DEVCB_DRIVER_LINE_MEMBER(cls,memb)		{ DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
 #define DEVCB_DRIVER_MEMBER(cls,memb)			{ DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
 #define DEVCB_DRIVER_MEMBER16(cls,memb)			{ DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub16<cls, &cls::memb>, NULL }
+#define DEVCB_DRIVER_MEMBER32(cls,memb)			{ DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub32<cls, &cls::memb>, NULL }
+#define DEVCB_DRIVER_MEMBER64(cls,memb)			{ DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub64<cls, &cls::memb>, NULL }
 
 // line or read/write handlers for another device
 #define DEVCB_DEVICE_LINE(tag,func)				{ DEVCB_TYPE_DEVICE, 0, tag, #func, func, NULL, NULL }
@@ -171,6 +219,8 @@ void devcb_stub16(device_t *device, address_space &space, offs_t offset, UINT16 
 #define DEVCB_DEVICE_HANDLER(tag,func)			{ DEVCB_TYPE_DEVICE, 0, tag, #func, NULL, func, NULL }
 #define DEVCB_DEVICE_MEMBER(tag,cls,memb)		{ DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
 #define DEVCB_DEVICE_MEMBER16(tag,cls,memb)		{ DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub16<cls, &cls::memb>, NULL }
+#define DEVCB_DEVICE_MEMBER32(tag,cls,memb)		{ DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub32<cls, &cls::memb>, NULL }
+#define DEVCB_DEVICE_MEMBER64(tag,cls,memb)		{ DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub64<cls, &cls::memb>, NULL }
 
 // constant values
 #define DEVCB_CONSTANT(value)					{ DEVCB_TYPE_CONSTANT, value, NULL, NULL, NULL, NULL }
@@ -228,6 +278,10 @@ union devcb_resolved_read_helpers
 	read8_space_func		read8_space;
 	read16_device_func		read16_device;
 	read16_space_func		read16_space;
+	read32_device_func		read32_device;
+	read32_space_func		read32_space;
+	read64_device_func		read64_device;
+	read64_space_func		read64_space;
 };
 
 union devcb_resolved_write_helpers
@@ -238,6 +292,10 @@ union devcb_resolved_write_helpers
 	write8_space_func		write8_space;
 	write16_device_func		write16_device;
 	write16_space_func		write16_space;
+	write32_device_func		write32_device;
+	write32_space_func		write32_space;
+	write64_device_func		write64_device;
+	write64_space_func		write64_space;
 	int						input_line;
 };
 
@@ -471,7 +529,7 @@ struct devcb_read16
 
 // ======================> devcb_resolved_read16
 
-// base delegate type for a write8
+// base delegate type for a write16
 typedef delegate<UINT16 (offs_t, UINT16)> devcb_read16_delegate;
 
 // class which wraps resolving a devcb_read16 into a delegate
@@ -525,7 +583,7 @@ struct devcb_write16
 
 // ======================> devcb_resolved_write16
 
-// base delegate type for a write8
+// base delegate type for a write16
 typedef delegate<void (offs_t, UINT16, UINT16)> devcb_write16_delegate;
 
 // class which wraps resolving a devcb_write16 into a delegate
@@ -562,5 +620,220 @@ private:
 	static UINT8					s_null;
 };
 
+// ======================> devcb_read32
+
+// static structure used for device configuration when the desired callback type is a read32_device_func
+struct devcb_read32
+{
+	UINT16					type;			// one of the special DEVCB_TYPE values
+	UINT16					index;			// index related to the above types
+	const char *			tag;			// tag of target, where appropriate
+	const char *			name;			// name of the target function
+	read_line_device_func	readline;		// read line function
+	read32_device_func		readdevice;		// read device function
+	read32_space_func		readspace;		// read space function
+};
+
+
+// ======================> devcb_resolved_read32
+
+// base delegate type for a write32
+typedef delegate<UINT32 (offs_t, UINT32)> devcb_read32_delegate;
+
+// class which wraps resolving a devcb_read32 into a delegate
+class devcb_resolved_read32 : public devcb_read32_delegate
+{
+	DISABLE_COPYING(devcb_resolved_read32);
+
+public:
+	// construction/destruction
+	devcb_resolved_read32();
+	devcb_resolved_read32(const devcb_read32 &desc, device_t &device) { resolve(desc, device); }
+
+	// resolution
+	void resolve(const devcb_read32 &desc, device_t &device);
+
+	// override parent class' notion of NULL
+	bool isnull() const { return m_helper.null_indicator == &s_null; }
+
+	// provide default for mem_mask
+	UINT32 operator()(offs_t offset, UINT32 mem_mask = 0xffff) const { return devcb_read32_delegate::operator()(offset, mem_mask); }
+
+private:
+	// internal helpers
+	UINT32 from_port(offs_t offset, UINT32 mask);
+	UINT32 from_read32(offs_t offset, UINT32 mask);
+	UINT32 from_readline(offs_t offset, UINT32 mask);
+	UINT32 from_constant(offs_t offset, UINT32 mask);
+	UINT32 from_unmap(offs_t offset, UINT32 mask);
+
+	// internal state
+	devcb_resolved_objects			m_object;
+	devcb_resolved_read_helpers 	m_helper;
+	static UINT8					s_null;
+};
+
+
+// ======================> devcb_write32
+
+// static structure used for device configuration when the desired callback type is a write32_device_func
+struct devcb_write32
+{
+	UINT16					type;			// one of the special DEVCB_TYPE values
+	UINT16					index;			// index related to the above types
+	const char *			tag;			// tag of target, where appropriate
+	const char *			name;			// name of the target function
+	write_line_device_func	writeline;		// write line function
+	write32_device_func		writedevice;	// write device function
+	write32_space_func		writespace;		// write space function
+};
+
+
+// ======================> devcb_resolved_write32
+
+// base delegate type for a write32
+typedef delegate<void (offs_t, UINT32, UINT32)> devcb_write32_delegate;
+
+// class which wraps resolving a devcb_write32 into a delegate
+class devcb_resolved_write32 : public devcb_write32_delegate
+{
+	DISABLE_COPYING(devcb_resolved_write32);
+
+public:
+	// construction/destruction
+	devcb_resolved_write32();
+	devcb_resolved_write32(const devcb_write32 &desc, device_t &device) { resolve(desc, device); }
+
+	// resolution
+	void resolve(const devcb_write32 &desc, device_t &device);
+
+	// override parent class' notion of NULL
+	bool isnull() const { return m_helper.null_indicator == &s_null; }
+
+	// provide default for mem_mask
+	void operator()(offs_t offset, UINT32 data, UINT32 mem_mask = 0xffff) const { devcb_write32_delegate::operator()(offset, data, mem_mask); }
+
+private:
+	// internal helpers
+	void to_null(offs_t offset, UINT32 data, UINT32 mask);
+	void to_port(offs_t offset, UINT32 data, UINT32 mask);
+	void to_write32(offs_t offset, UINT32 data, UINT32 mask);
+	void to_writeline(offs_t offset, UINT32 data, UINT32 mask);
+	void to_input(offs_t offset, UINT32 data, UINT32 mask);
+	void to_unmap(offs_t offset, UINT32 data, UINT32 mask);
+
+	// internal state
+	devcb_resolved_objects			m_object;
+	devcb_resolved_write_helpers	m_helper;
+	static UINT8					s_null;
+};
+
+// ======================> devcb_read64
+
+// static structure used for device configuration when the desired callback type is a read64_device_func
+struct devcb_read64
+{
+	UINT16					type;			// one of the special DEVCB_TYPE values
+	UINT16					index;			// index related to the above types
+	const char *			tag;			// tag of target, where appropriate
+	const char *			name;			// name of the target function
+	read_line_device_func	readline;		// read line function
+	read64_device_func		readdevice;		// read device function
+	read64_space_func		readspace;		// read space function
+};
+
+
+// ======================> devcb_resolved_read64
+
+// base delegate type for a write64
+typedef delegate<UINT64 (offs_t, UINT64)> devcb_read64_delegate;
+
+// class which wraps resolving a devcb_read64 into a delegate
+class devcb_resolved_read64 : public devcb_read64_delegate
+{
+	DISABLE_COPYING(devcb_resolved_read64);
+
+public:
+	// construction/destruction
+	devcb_resolved_read64();
+	devcb_resolved_read64(const devcb_read64 &desc, device_t &device) { resolve(desc, device); }
+
+	// resolution
+	void resolve(const devcb_read64 &desc, device_t &device);
+
+	// override parent class' notion of NULL
+	bool isnull() const { return m_helper.null_indicator == &s_null; }
+
+	// provide default for mem_mask
+	UINT64 operator()(offs_t offset, UINT64 mem_mask = 0xffff) const { return devcb_read64_delegate::operator()(offset, mem_mask); }
+
+private:
+	// internal helpers
+	UINT64 from_port(offs_t offset, UINT64 mask);
+	UINT64 from_read64(offs_t offset, UINT64 mask);
+	UINT64 from_readline(offs_t offset, UINT64 mask);
+	UINT64 from_constant(offs_t offset, UINT64 mask);
+	UINT64 from_unmap(offs_t offset, UINT64 mask);
+
+	// internal state
+	devcb_resolved_objects			m_object;
+	devcb_resolved_read_helpers 	m_helper;
+	static UINT8					s_null;
+};
+
+
+// ======================> devcb_write64
+
+// static structure used for device configuration when the desired callback type is a write64_device_func
+struct devcb_write64
+{
+	UINT16					type;			// one of the special DEVCB_TYPE values
+	UINT16					index;			// index related to the above types
+	const char *			tag;			// tag of target, where appropriate
+	const char *			name;			// name of the target function
+	write_line_device_func	writeline;		// write line function
+	write64_device_func		writedevice;	// write device function
+	write64_space_func		writespace;		// write space function
+};
+
+
+// ======================> devcb_resolved_write64
+
+// base delegate type for a write64
+typedef delegate<void (offs_t, UINT64, UINT64)> devcb_write64_delegate;
+
+// class which wraps resolving a devcb_write64 into a delegate
+class devcb_resolved_write64 : public devcb_write64_delegate
+{
+	DISABLE_COPYING(devcb_resolved_write64);
+
+public:
+	// construction/destruction
+	devcb_resolved_write64();
+	devcb_resolved_write64(const devcb_write64 &desc, device_t &device) { resolve(desc, device); }
+
+	// resolution
+	void resolve(const devcb_write64 &desc, device_t &device);
+
+	// override parent class' notion of NULL
+	bool isnull() const { return m_helper.null_indicator == &s_null; }
+
+	// provide default for mem_mask
+	void operator()(offs_t offset, UINT64 data, UINT64 mem_mask = 0xffff) const { devcb_write64_delegate::operator()(offset, data, mem_mask); }
+
+private:
+	// internal helpers
+	void to_null(offs_t offset, UINT64 data, UINT64 mask);
+	void to_port(offs_t offset, UINT64 data, UINT64 mask);
+	void to_write64(offs_t offset, UINT64 data, UINT64 mask);
+	void to_writeline(offs_t offset, UINT64 data, UINT64 mask);
+	void to_input(offs_t offset, UINT64 data, UINT64 mask);
+	void to_unmap(offs_t offset, UINT64 data, UINT64 mask);
+
+	// internal state
+	devcb_resolved_objects			m_object;
+	devcb_resolved_write_helpers	m_helper;
+	static UINT8					s_null;
+};
 
 #endif	// __DEVCB_H__
