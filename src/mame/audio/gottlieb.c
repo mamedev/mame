@@ -206,7 +206,7 @@ static const char *const reactor_sample_names[] =
 	"fx_39j", /* "45000" */
 	"fx_39k", /* "50000" */
 	"fx_39l", /* "55000" */
-     0	/* end of array */
+	0	/* end of array */
 };
 
 static const char *const qbert_sample_names[] =
@@ -256,7 +256,6 @@ static const char *const qbert_sample_names[] =
 	"fx_23", /* O1 with varying voice clock */
 	"fx_28",
 	"fx_36",
-	"knocker",
 	0	/* end of array */
 };
 
@@ -283,6 +282,47 @@ MACHINE_CONFIG_FRAGMENT( qbert_samples )
 MACHINE_CONFIG_END
 
 #endif
+
+
+
+//**************************************************************************
+//  QBERT MECHANICAL KNOCKER
+//**************************************************************************
+
+//-------------------------------------------------
+//  qbert cabinets have a mechanical knocker near the floor,
+//  MAME simulates this with a sample.
+//  (like all MAME samples, it is optional. If you actually have
+//   a real kicker/knocker, hook it up via output "knocker0")
+//-------------------------------------------------
+
+void gottlieb_state::qbert_knocker(UINT8 knock)
+{
+	output_set_value("knocker0", knock);
+	
+	// start sound on rising edge
+	if (knock & ~m_knocker_prev)
+		m_knocker_sample->start(0, 0);
+	m_knocker_prev = knock;
+}
+
+static const char *const qbert_knocker_names[] =
+{
+	"*qbert",
+	"knocker",
+	0	/* end of array */
+};
+
+static const samples_interface qbert_knocker_interface =
+{
+	1,	/* one channel */
+	qbert_knocker_names
+};
+
+MACHINE_CONFIG_FRAGMENT( qbert_knocker )
+	MCFG_SAMPLES_ADD("knocker", qbert_knocker_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 
