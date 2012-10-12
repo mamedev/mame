@@ -10441,8 +10441,7 @@ autmoon			// (c) 1999
 coralr2			// (c) 2002
 
 // Aristocrat Mk5 hardware
-aristmk5		// (c) 1995
-
+aristmk5		// (c) 1995, USA platform set chips
 swthrt2v		// (c) 1995
 enchfrst		// (c) 1995
 dolphntr		// (c) 1996
@@ -10460,6 +10459,7 @@ wtiger			// (c) 2001
 
 // Aristocrat Mk6 hardware
 aristmk6
+mk6nsw11
 antcleo			// (c) 2004
 50lions			// (c) 2002
 50lionsa		// (c) 2003

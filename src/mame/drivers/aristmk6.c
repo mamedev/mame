@@ -155,6 +155,12 @@ ROM_START( aristmk6 )
 	ROM_LOAD32_WORD("15011025.left",  0x0000002, 0x0200000, CRC(c02e14b0) SHA1(6bf98927813519dfe60e582dbe5be3ccd87f7c91) )
 ROM_END
 
+ROM_START( mk6nsw11 )
+	ROM_REGION( 0x0400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("11011901.right", 0x0000000, 0x0200000, CRC(73dcb11c) SHA1(69ae4f32a0c9141b2a82ff3935b0cd20333d2964) )
+	ROM_LOAD32_WORD("11011901.left",  0x0000002, 0x0200000, CRC(d3dd2210) SHA1(3548f8cc39859d3f44a55f6bae48966a2d48e0eb) )
+ROM_END
+
 ROM_START( antcleo )
 	ROM_REGION( 0x1800000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("10177211.u86", 0x0000000, 0x0400000, CRC(4897f4ed) SHA1(0a071528b0c2cb4c42d4535bed406849a6187d9d) )
@@ -231,7 +237,8 @@ ROM_START( thaiprin )
 	ROM_LOAD32_WORD("30127721.u72", 0x0800002, 0x0100000, BAD_DUMP CRC(613cea6b) SHA1(f04a3ee53074b7cd84879d752df5dbb80437475e) ) // wrong size?!
 ROM_END
 
-GAME( 200?, aristmk6,  0,          aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Aristocrat MK-6 Base (15011025)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IS_BIOS_ROOT)	// Possibly Malaysia/ASP (Asia/South Pacific)
+GAME( 200?, aristmk6,  0,          aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Aristocrat MK6 Base (15011025, Malaysia)",           GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IS_BIOS_ROOT)
+GAME( 200?, mk6nsw11,  0,          aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Aristocrat MK6 Base (11011901, NSW/ACT)",            GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IS_BIOS_ROOT)
 
 // Dates listed below are for the combination (reel layout), not release dates
 GAME( 2004, antcleo,   aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Antony and Cleopatra (10177211, Malaysia)",          GAME_NOT_WORKING | GAME_NO_SOUND )	// 754,    B - 12/07/04
@@ -250,6 +257,7 @@ List of known MK6 games, excluding Hyperlink variations
 
 5 Dragons
 5 Koi - Power Pay           Same gameplay as 5 Dragons
+50 Dragons                  Same gameplay as 50 Lions
 50 Lions
 100 Lions
 African Dusk - Mr. Cashman      Black Rhino with a bonus feature
@@ -273,9 +281,12 @@ Black Rhino - Power Pay
 Brazil
 Buccaneer
 Buffalo
+Burning Desire
+Bushranger
 Cactus Corral               Same gameplay as Shaman's Magic
 Canary Riches               Identical to Golden Canaries
 Cash Carousel
+Cashman Tonight             4-in-1 multi-game with a bonus feature and jackpot
 Centurion
 Cheeky Monkey               Same gameplay as Mystic Mermaid
 Choy Sun Doa
@@ -287,6 +298,7 @@ Crystal Springs
 Deep Freeze
 Desert Gold
 Diamond Eyes
+Diamonds Forever
 Diamonds & Hearts - Power Pay
 Dinosaur
 Double Dolphins
@@ -305,6 +317,7 @@ Good Fortune
 Golden Archer
 Golden Canaries II - Lucky Devil
 Golden Incas
+Golden Samurai              Same gameplay as Big Red 2
 Grizzly
 Heart of Gold               Same gameplay as 50 Lions
 Helen of Troy               Same gameplay as Peacock Flutter
@@ -315,18 +328,21 @@ Inca Chief
 Indian Dreaming - Lady Luck
 Indian Princess
 Island Delight
-Jailbird - Mr. Cashman
+Jailbird - Mr. Cashman  K.G. Bird with a bonus feature
+Jailbreak               K.G. Bird style game, updated graphics
 Kakadu Dreaming
 Kenyan Gold             Similar to Show Me The Money
 King Neptune
 King of Asia                Identical to Choy Sun Doa
+King of Asia II         Identical to Fortune King
 King of the Nile
+King Penguin
 Kirin Warriors
 Knight's Challenge          Similar to Queen of the Nile, added jackpot bonus
 L.A. Gator              Same gameplay as 50 Lions
 Ladies Day              Similar to Spring Carnival
 Lady of Fortune
-Let's Go Fish'n
+Let's Go Fish'n         Same gameplay as Where's The Gold
 Line King               Similar to 50 Lions
 Louie's Gold - Mr. Cashman      Loco Loot with a bonus feature
 Love Stuck              Same gameplay as Sun Queen
@@ -354,11 +370,14 @@ Owl Capone
 Paris Lights
 Peacock Magic
 Pelican Pete
+Pharaoh's Fortune
 Phoenix Fantasy             Same gameplay as Tiki Torch
 Pirates
-Player's Choice By Demand       Player's Choice is a series of 4-in-1 multi-game machines
-Player's Choice Platinum
-Player's Choice Super
+Player's Choice - By Demand       Player's Choice is a series of 4-in-1 multi-game machines
+Player's Choice - Favouries
+Player's Choice - Original
+Player's Choice - Platinum
+Player's Choice - Super
 Pompeii                 Same gameplay as Indian Dreaming
 Pride of Africa             Same gameplay as Indian Dreaming
 Prophecy
@@ -371,6 +390,7 @@ Reelin' N Boppin'
 Roamin' Italy
 Roll Up! Roll Up!!          Same gameplay as Spring Carnival
 Ruby Magic              Same gameplay as Wild Ways
+Rumble Reels
 Scatter Magic II
 Seal the Deal               Same gameplay as Helen of Troy
 Shaman's Magic
@@ -382,6 +402,7 @@ Snap Shot
 Spring Carnival
 Spring Festival
 Star Drifter                Same gameplay as 50 Lions
+Star Quest
 Sun & Moon
 Sun Chief
 Sun King
@@ -401,6 +422,7 @@ Tiki Torch
 Timber Wolf
 Torch of the Gods           Identical to Adonis
 Turtle Treasure
+Unicorn Moon                Identical to Unicorn Dreaming
 Viking Riches
 Water Margin
 Whale of a Time             Identical to Whales of Cash
@@ -437,8 +459,8 @@ Dolphin Treasure
 Enchantress
 Flame of Olympus            Identical to Adonis
 Golden Pyramids             Identical to Queen of the Nile
-Inca Sun                Cabinet photo noted, MK6 version never seen in the wild yet
-Indian Dreaming             Two formats exist, Reel Power (243 Ways) and Multi-line (usually 20 lines). Both game types play differenly but feature identicla graphics.
+Inca Sun
+Indian Dreaming             Two formats exist, Reel Power (243 Ways) and Multi-line (usually 20 lines). Both game types play differenly but feature identical graphics.
 Koala Mint
 Money Tree
 Panther Magic
@@ -448,5 +470,5 @@ Return of the Samurai
 Super Bucks III             Only seen in a multi-game system, 'Player's Choice By Demand'
 Sweet Hearts II
 Venetian Nights             MK5 version is possibly rare
-Wicked Winnings             Only seen a Cash Express Hyperlink version so far
+Wicked Winnings             Only seen a Cash Express Hyperlink version so far, not to be confused with the more common 'Wicked Winnings II - Power Pay'
 */
