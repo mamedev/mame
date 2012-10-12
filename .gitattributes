@@ -131,6 +131,7 @@ hash/pc98.xml svneol=native#text/xml
 hash/pce.xml svneol=native#text/xml
 hash/pcecd.xml svneol=native#text/xml
 hash/pcw.xml svneol=native#text/xml
+hash/pcw16.xml svneol=native#text/xml
 hash/pico.xml svneol=native#text/xml
 hash/pippin.xml svneol=native#text/xml
 hash/pippin_flop.xml svneol=native#text/xml

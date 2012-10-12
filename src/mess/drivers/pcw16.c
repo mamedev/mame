@@ -1100,6 +1100,8 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcw16_floppies, "35hd", 0, pcw16_floppy_formats)
     MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcw16_floppies, "35hd", 0, pcw16_floppy_formats)
 
+	MCFG_SOFTWARE_LIST_ADD("disk_list","pcw16")
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
