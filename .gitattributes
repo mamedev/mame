@@ -2387,7 +2387,6 @@ src/mame/drivers/astropc.c svneol=native#text/plain
 src/mame/drivers/asuka.c svneol=native#text/plain
 src/mame/drivers/atari_s1.c svneol=native#text/plain
 src/mame/drivers/atari_s2.c svneol=native#text/plain
-src/mame/drivers/atari_s3.c svneol=native#text/plain
 src/mame/drivers/atarifb.c svneol=native#text/plain
 src/mame/drivers/atarig1.c svneol=native#text/plain
 src/mame/drivers/atarig42.c svneol=native#text/plain

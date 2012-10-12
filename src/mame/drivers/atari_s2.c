@@ -29,7 +29,7 @@ public:
 	DECLARE_WRITE8_HANDLER(sound0_w) { };
 	DECLARE_WRITE8_HANDLER(sound1_w) { };
 	DECLARE_WRITE8_HANDLER(lamp_w) { };
-	DECLARE_WRITE8_HANDLER(sol0_w) { };
+	DECLARE_WRITE8_HANDLER(sol0_w);
 	DECLARE_WRITE8_HANDLER(sol1_w) { };
 	DECLARE_WRITE8_HANDLER(intack_w);
 	DECLARE_WRITE8_HANDLER(display_w);
@@ -277,6 +277,43 @@ static INPUT_PORTS_START( atari_s2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
+/* solenoids hercules
+   4,5 = bumpers
+   8,9 = slings
+    15 = outhole
+   6,7 = coin counters
+    14 = total plays counter
+
+   solenoids superman
+   4,5,8,11 = bumpers
+   9,10     = slings
+        15  = outhole
+       6,7  = coin counters
+        12  = drop target
+        13  = drop hole kicker
+        14  = total plays counter
+*/
+
+WRITE8_HANDLER( atari_s2_state::sol0_w )
+{
+	switch (data)
+	{
+		case 15:
+			m_samples->start(0, 5);
+			break;
+		case 4:
+		case 5:
+			m_samples->start(1, 0);
+			break;
+		case 8:
+		case 9:
+			//m_samples->start(1, 7);
+			break;
+		//default:
+			//if (data) printf("%X ",data);
+	}
+}
 
 WRITE8_MEMBER( atari_s2_state::display_w )
 {
