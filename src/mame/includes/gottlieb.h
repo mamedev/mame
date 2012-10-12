@@ -239,7 +239,7 @@ public:
 		  m_laserdisc(*this, "laserdisc"),
 		  m_r1_sound(*this, "r1sound"),
 		  m_r2_sound(*this, "r2sound"),
-		  m_knocker_sample(*this, "knocker"),
+		  m_knocker_sample(*this, "knocker_sam"),
 		  m_videoram(*this, "videoram"),
 		  m_charram(*this, "charram"),
 		  m_spriteram(*this, "spriteram")

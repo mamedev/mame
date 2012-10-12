@@ -320,8 +320,10 @@ static const samples_interface qbert_knocker_interface =
 };
 
 MACHINE_CONFIG_FRAGMENT( qbert_knocker )
-	MCFG_SAMPLES_ADD("knocker", qbert_knocker_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_ADD("knocker", 0.0, 0.0, 1.0)
+
+	MCFG_SAMPLES_ADD("knocker_sam", qbert_knocker_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "knocker", 1.0)
 MACHINE_CONFIG_END
 
 
