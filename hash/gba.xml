@@ -30623,6 +30623,8 @@
 		</part>
 	</software>
 
+<!-- This comes from a proto cart: it is mostly similar to the final release, with single byte differences
+The cart also contained a non-empty SRAM save which we currently include in the set, even if we don't load it. -->
 	<software name="sonicup" cloneof="sonic" supported="partial">
 		<description>Sonic Advance (USA, Prototype)</description>
 		<year>2002</year>
@@ -30631,6 +30633,9 @@
 			<feature name="pcb_type" value="GBA-FLASH" />
 			<dataarea name="rom" size="8388608">
 				<rom name="sonicadvance_asoe00_prototype.bin" size="8388608" crc="a80de3b2" sha1="aae6516f72309920acd9fafd03a9d09e35cf755f" offset="000000" />
+			</dataarea>
+			<dataarea name="flash" size="65536">
+				<rom name="sonicadvance_asoe00_prototype.sav" size="65536" crc="fd8ddede" sha1="028c52d3de49dfe2a178fcd6fa2183da5d1a5a0c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -30676,6 +30681,7 @@
 		</part>
 	</software>
 
+<!-- This comes from a proto cart: first half is the final release; second half is generic padding. not very interesting, sadly. -->
 	<software name="sonic2up" cloneof="sonic2" supported="partial">
 		<description>Sonic Advance 2 (USA, Prototype)</description>
 		<year>2003</year>
@@ -30683,7 +30689,7 @@
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-FLASH-512" />
 			<dataarea name="rom" size="33554432">
-				<rom name="sonic advance 2 (usa) (en,ja,fr,de,es,it).bin" size="33554432" crc="6d7567ed" sha1="2f9f54dae081f2155aab3753c779a9631f0af433" offset="000000" />
+				<rom name="sadv2p.bin" size="33554432" crc="6d7567ed" sha1="2f9f54dae081f2155aab3753c779a9631f0af433" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

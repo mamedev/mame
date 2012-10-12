@@ -12,7 +12,6 @@ Undumped:
 - Bionic Command CGB-AV4P-AUS
 - Caterpillar Construction Zone DMG-AR4P-EUU? [unclear pic]
 - Daffy Duck - Fowl Play DMG-AD7P-UKV
-- Dexter's Laboratory - Robot Rampage CGB-BROP-EUR
 - Dragon Warrior Monsters DMG-AWQP-UKV
 - Elmo's 123s DMG-AE3P-EUR
 - Elmo's ABCs DMG-AEAP-EUR
@@ -22,7 +21,6 @@ Undumped:
 - Mary-Kate and Ashley - Crush Course CGB-BCVP-UKV
 - Mary-Kate and Ashley - Pocket Planner DMG-BMAP-EUR
 - Mickey's Racing Adventure CGB-ARNP-EUR
-- MTV Sports - Skateboarding featuring Andy MacDonald CGB-BMTP-EUR
 - NHL 2000 DMG-ANRP-EUR
 - Rampage 2 - Universal Tour CGB-AUTP-EUR
 - Rocket Power - Gettin' Air CGB-BRUP-EUR
@@ -3837,10 +3835,10 @@ Undumped Pirates:
 
 	<software name="dexterlb" cloneof="elevator">
 		<!-- Notes: GBC only -->
-		<description>Dexter's Laboratory - Robot Rampage (USA)</description>
+		<description>Dexter's Laboratory - Robot Rampage (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>BAM! Entertainment</publisher>
-		<info name="serial" value="CGB-BROE-USA"/>
+		<info name="serial" value="CGB-BROE-USA, CGB-BROP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="1048576">
@@ -12462,10 +12460,10 @@ Undumped Pirates:
 
 	<software name="mtvskate">
 		<!-- Notes: GBC only -->
-		<description>MTV Sports - Skateboarding featuring Andy MacDonald (USA)</description>
+		<description>MTV Sports - Skateboarding featuring Andy MacDonald (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="CGB-BMTE-USA"/>
+		<info name="serial" value="CGB-BMTE-USA, CGB-BMTP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="1048576">
