@@ -241,7 +241,8 @@ public:
 		  m_r2_sound(*this, "r2sound"),
 		  m_videoram(*this, "videoram"),
 		  m_charram(*this, "charram"),
-		  m_spriteram(*this, "spriteram") { }
+		  m_spriteram(*this, "spriteram")
+	{ }
 
 	// devices
 	required_device<i8088_device> m_maincpu;
@@ -275,10 +276,12 @@ public:
 	UINT8 m_transparent0;
 	tilemap_t *m_bg_tilemap;
 	double m_weights[4];
+
 	DECLARE_WRITE8_MEMBER(gottlieb_analog_reset_w);
 	DECLARE_WRITE8_MEMBER(general_output_w);
 	DECLARE_WRITE8_MEMBER(reactor_output_w);
 	DECLARE_WRITE8_MEMBER(stooges_output_w);
+	DECLARE_WRITE8_MEMBER(qbertqub_output_w);
 	DECLARE_READ8_MEMBER(laserdisc_status_r);
 	DECLARE_WRITE8_MEMBER(laserdisc_select_w);
 	DECLARE_WRITE8_MEMBER(laserdisc_command_w);
@@ -295,6 +298,7 @@ public:
 	DECLARE_DRIVER_INIT(vidvince);
 	DECLARE_DRIVER_INIT(ramtiles);
 	DECLARE_DRIVER_INIT(stooges);
+	DECLARE_DRIVER_INIT(qbertqub);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_screwloo_bg_tile_info);
 	virtual void machine_start();

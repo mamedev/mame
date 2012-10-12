@@ -324,19 +324,30 @@ WRITE8_MEMBER(gottlieb_state::general_output_w)
 	/* bit 7 controls the optional coin lockout; it appears that no games used this */
 }
 
-
+// custom overrides
 WRITE8_MEMBER(gottlieb_state::reactor_output_w)
 {
 	general_output_w(space, offset, data & ~0xe0);
+
 	set_led_status(machine(), 0, data & 0x20);
 	set_led_status(machine(), 1, data & 0x40);
 	set_led_status(machine(), 2, data & 0x80);
 }
 
+WRITE8_MEMBER(gottlieb_state::qbertqub_output_w)
+{
+	// coincounter is on bit 5 instead
+	general_output_w(space, offset, (data >> 1 & 0x10) | (data & ~0x30));
+
+	// bit 4 controls the sprite bank
+	m_spritebank = (data & 0x10) >> 4;
+}
 
 WRITE8_MEMBER(gottlieb_state::stooges_output_w)
 {
 	general_output_w(space, offset, data & ~0x60);
+
+	// bit 5,6: joystick input multiplexer
 	m_joystick_select = (data >> 5) & 0x03;
 }
 
@@ -2430,10 +2441,17 @@ DRIVER_INIT_MEMBER(gottlieb_state,romtiles)
 }
 
 
+DRIVER_INIT_MEMBER(gottlieb_state,qbertqub)
+{
+	DRIVER_INIT_CALL(romtiles);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::qbertqub_output_w),this));
+}
+
+
 DRIVER_INIT_MEMBER(gottlieb_state,stooges)
 {
 	DRIVER_INIT_CALL(ramtiles);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x05803, 0x05803, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::stooges_output_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::stooges_output_w),this));
 }
 
 
@@ -2474,7 +2492,7 @@ GAME( 1983, mplanetsuk,mplanets, gottlieb1, mplanets, gottlieb_state, romtiles, 
 GAME( 1983, krull,     0,        gottlieb1, krull,    gottlieb_state, ramtiles, ROT270, "Gottlieb", "Krull", 0 )
 GAME( 1983, kngtmare,  0,        gottlieb1, kngtmare, gottlieb_state, romtiles, ROT0,   "Gottlieb", "Knightmare (prototype)", GAME_NO_SOUND )
 GAME( 1983, sqbert,    0,        qbert,     qbert,    gottlieb_state, romtiles, ROT270, "Mylstar", "Faster, Harder, More Challenging Q*bert (prototype)", GAME_IMPERFECT_SOUND )
-GAME( 1983, qbertqub,  0,        qbert,     qbertqub, gottlieb_state, romtiles, ROT270, "Mylstar", "Q*bert's Qubes", GAME_IMPERFECT_SOUND )
+GAME( 1983, qbertqub,  0,        qbert,     qbertqub, gottlieb_state, qbertqub, ROT270, "Mylstar", "Q*bert's Qubes", GAME_IMPERFECT_SOUND )
 GAME( 1984, curvebal,  0,        gottlieb1, curvebal, gottlieb_state, romtiles, ROT270, "Mylstar", "Curve Ball", 0 )
 
 /* games using rev 2 sound board */

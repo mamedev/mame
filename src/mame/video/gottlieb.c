@@ -63,15 +63,11 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_video_control_w)
 		flip_screen_y_set(data & 0x04);
 		machine().tilemap().mark_all_dirty();
 	}
-
-	/* in Q*Bert Qubes only, bit 4 controls the sprite bank */
-	m_spritebank = (data & 0x10) >> 4;
 }
 
 
 WRITE8_MEMBER(gottlieb_state::gottlieb_laserdisc_video_control_w)
 {
-
 	/* bit 0 works like the other games */
 	gottlieb_video_control_w(space, offset, data & 0x01);
 
