@@ -40,6 +40,32 @@ void vsystem_spr2_device::device_reset()
 }
 
 
+int vsystem_spr2_device::get_sprite_attributes(UINT16* ram)
+{
+	// sprite is disabled
+	if (!(ram[2] & 0x0080))
+		return 0;
+
+	curr_sprite.oy    =  (ram[0] & 0x01ff);
+	curr_sprite.zoomy =  (ram[0] & 0xf000) >> 12;
+
+	curr_sprite.ox =     (ram[1] & 0x01ff);
+	curr_sprite.zoomx =  (ram[1] & 0xf000) >> 12;
+
+	curr_sprite.xsize =  (ram[2] & 0x0700) >> 8;
+	curr_sprite.flipx =  (ram[2] & 0x0800);
+
+	curr_sprite.ysize =  (ram[2] & 0x7000) >> 12;
+	curr_sprite.flipy =  (ram[2] & 0x8000);
+
+	curr_sprite.color =  (ram[2] & 0x000f);
+	curr_sprite.pri =    (ram[2] & 0x0010);
+
+	curr_sprite.map =    (ram[3]);
+
+	return 1;
+}
+
 
 
 template<class _BitmapClass>
@@ -51,78 +77,69 @@ void vsystem_spr2_device::turbofrc_draw_sprites_common( UINT16* spriteram3,  int
 
 	for (attr_start = base + 0x0200 - 8; attr_start >= first + base; attr_start -= 4)
 	{
-		int map_start;
-		int ox, oy, x, y, xsize, ysize, zoomx, zoomy, flipx, flipy, color, pri;
+		int x, y;
 // some other drivers still use this wrong table, they have to be upgraded
 //      int zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 
-		if (!(spriteram3[attr_start + 2] & 0x0080))
+
+		if (!get_sprite_attributes(&spriteram3[attr_start]))
 			continue;
 
-		pri = spriteram3[attr_start + 2] & 0x0010;
 
-		if ( chip_disabled_pri & !pri)
+		if ( chip_disabled_pri & !curr_sprite.pri)
 			continue;
 
-		if ((!chip_disabled_pri) & (pri >> 4))
+		if ((!chip_disabled_pri) & (curr_sprite.pri >> 4))
 			continue;
 
-		ox = spriteram3[attr_start + 1] & 0x01ff;
-		xsize = (spriteram3[attr_start + 2] & 0x0700) >> 8;
-		zoomx = (spriteram3[attr_start + 1] & 0xf000) >> 12;
-		oy = spriteram3[attr_start + 0] & 0x01ff;
-		ysize = (spriteram3[attr_start + 2] & 0x7000) >> 12;
-		zoomy = (spriteram3[attr_start + 0] & 0xf000) >> 12;
-		flipx = spriteram3[attr_start + 2] & 0x0800;
-		flipy = spriteram3[attr_start + 2] & 0x8000;
-		color = (spriteram3[attr_start + 2] & 0x000f) + 16 * spritepalettebank;
 
-		map_start = spriteram3[attr_start + 3];
+
+		curr_sprite.color += 16 * spritepalettebank;
 
 // aerofgt has this adjustment, but doing it here would break turbo force title screen
-//      ox += (xsize*zoomx+2)/4;
-//      oy += (ysize*zoomy+2)/4;
+//      curr_sprite.ox += (curr_sprite.xsize*curr_sprite.zoomx+2)/4;
+//      curr_sprite.oy += (curr_sprite.ysize*curr_sprite.zoomy+2)/4;
 
-		zoomx = 32 - zoomx;
-		zoomy = 32 - zoomy;
+		curr_sprite.zoomx = 32 - curr_sprite.zoomx;
+		curr_sprite.zoomy = 32 - curr_sprite.zoomy;
 
-		for (y = 0; y <= ysize; y++)
+		for (y = 0; y <= curr_sprite.ysize; y++)
 		{
 			int sx, sy;
 
-			if (flipy)
-				sy = ((oy + zoomy * (ysize - y)/2 + 16) & 0x1ff) - 16;
+			if (curr_sprite.flipy)
+				sy = ((curr_sprite.oy + curr_sprite.zoomy * (curr_sprite.ysize - y)/2 + 16) & 0x1ff) - 16;
 			else
-				sy = ((oy + zoomy * y / 2 + 16) & 0x1ff) - 16;
+				sy = ((curr_sprite.oy + curr_sprite.zoomy * y / 2 + 16) & 0x1ff) - 16;
 
-			for (x = 0; x <= xsize; x++)
+			for (x = 0; x <= curr_sprite.xsize; x++)
 			{
-				int code;
+				int curr;
 
-				if (flipx)
-					sx = ((ox + zoomx * (xsize - x) / 2 + 16) & 0x1ff) - 16;
+				if (curr_sprite.flipx)
+					sx = ((curr_sprite.ox + curr_sprite.zoomx * (curr_sprite.xsize - x) / 2 + 16) & 0x1ff) - 16;
 				else
-					sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
+					sx = ((curr_sprite.ox + curr_sprite.zoomx * x / 2 + 16) & 0x1ff) - 16;
 
 				if (chip == 0)
-					code = spriteram1[map_start % (spriteram1_bytes/2)];
+					curr = spriteram1[curr_sprite.map % (spriteram1_bytes/2)];
 				else
-					code = spriteram2[map_start % (spriteram2_bytes/2)];
+					curr = spriteram2[curr_sprite.map % (spriteram2_bytes/2)];
 
 				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[sprite_gfx + chip],
-							 code,
-							 color,
-							 flipx,flipy,
+							 curr,
+							 curr_sprite.color,
+							 curr_sprite.flipx,curr_sprite.flipy,
 							 sx,sy,
-							 zoomx << 11, zoomy << 11,
-							 machine.priority_bitmap,pri ? 0 : 2,15);
-				map_start++;
+							 curr_sprite.zoomx << 11, curr_sprite.zoomy << 11,
+							 machine.priority_bitmap,curr_sprite.pri ? 0 : 2,15);
+				curr_sprite.map++;
 			}
 
-			if (xsize == 2) map_start += 1;
-			if (xsize == 4) map_start += 3;
-			if (xsize == 5) map_start += 2;
-			if (xsize == 6) map_start += 1;
+			if (curr_sprite.xsize == 2) curr_sprite.map += 1;
+			if (curr_sprite.xsize == 4) curr_sprite.map += 3;
+			if (curr_sprite.xsize == 5) curr_sprite.map += 2;
+			if (curr_sprite.xsize == 6) curr_sprite.map += 1;
 		}
 	}
 }
@@ -143,77 +160,67 @@ void vsystem_spr2_device::spinlbrk_draw_sprites_common( UINT16* spriteram3,  int
 
 	for (attr_start = base + 0x0200-8; attr_start >= first + base; attr_start -= 4)
 	{
-		int map_start;
-		int ox, oy, x, y, xsize, ysize, zoomx, zoomy, flipx, flipy, color, pri;
+		int x, y;
 // some other drivers still use this wrong table, they have to be upgraded
 //      int zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 
-		if (!(spriteram3[attr_start + 2] & 0x0080))
+
+		if (!get_sprite_attributes(&spriteram3[attr_start]))
 			continue;
 
-		pri = spriteram3[attr_start + 2] & 0x0010;
 
-		if ( chip_disabled_pri & !pri)
+		if ( chip_disabled_pri & !curr_sprite.pri)
 			continue;
-		if ((!chip_disabled_pri) & (pri >> 4))
+		if ((!chip_disabled_pri) & (curr_sprite.pri >> 4))
 			continue;
 
-		ox = spriteram3[attr_start + 1] & 0x01ff;
-		xsize = (spriteram3[attr_start + 2] & 0x0700) >> 8;
-		zoomx = (spriteram3[attr_start + 1] & 0xf000) >> 12;
-		oy = spriteram3[attr_start + 0] & 0x01ff;
-		ysize = (spriteram3[attr_start + 2] & 0x7000) >> 12;
-		zoomy = (spriteram3[attr_start + 0] & 0xf000) >> 12;
-		flipx = spriteram3[attr_start + 2] & 0x0800;
-		flipy = spriteram3[attr_start + 2] & 0x8000;
-		color = (spriteram3[attr_start + 2] & 0x000f) + 16 * spritepalettebank;
 
-		map_start = spriteram3[attr_start + 3];
+		curr_sprite.color += 16 * spritepalettebank;
 
 // aerofgt has this adjustment, but doing it here would break turbo force title screen
-//      ox += (xsize*zoomx+2)/4;
-//      oy += (ysize*zoomy+2)/4;
+//      curr_sprite.ox += (curr_sprite.xsize*curr_sprite.zoomx+2)/4;
+//      curr_sprite.oy += (curr_sprite.ysize*curr_sprite.zoomy+2)/4;
 
-		zoomx = 32 - zoomx;
-		zoomy = 32 - zoomy;
+		curr_sprite.zoomx = 32 - curr_sprite.zoomx;
+		curr_sprite.zoomy = 32 - curr_sprite.zoomy;
 
-		for (y = 0; y <= ysize; y++)
+		for (y = 0; y <= curr_sprite.ysize; y++)
 		{
 			int sx, sy;
 
-			if (flipy)
-				sy = ((oy + zoomy * (ysize - y)/2 + 16) & 0x1ff) - 16;
+			if (curr_sprite.flipy)
+				sy = ((curr_sprite.oy + curr_sprite.zoomy * (curr_sprite.ysize - y)/2 + 16) & 0x1ff) - 16;
 			else
-				sy = ((oy + zoomy * y / 2 + 16) & 0x1ff) - 16;
+				sy = ((curr_sprite.oy + curr_sprite.zoomy * y / 2 + 16) & 0x1ff) - 16;
 
-			for (x = 0; x <= xsize; x++)
+			for (x = 0; x <= curr_sprite.xsize; x++)
 			{
-				int code;
+				int curr;
 
-				if (flipx)
-					sx = ((ox + zoomx * (xsize - x) / 2 + 16) & 0x1ff) - 16;
+				if (curr_sprite.flipx)
+					sx = ((curr_sprite.ox + curr_sprite.zoomx * (curr_sprite.xsize - x) / 2 + 16) & 0x1ff) - 16;
 				else
-					sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
+					sx = ((curr_sprite.ox + curr_sprite.zoomx * x / 2 + 16) & 0x1ff) - 16;
 
 				if (chip == 0)
-					code = spriteram1[map_start % (spriteram1_bytes/2)];
+					curr = spriteram1[curr_sprite.map % (spriteram1_bytes/2)];
 				else
-					code = spriteram2[map_start % (spriteram2_bytes/2)];
+					curr = spriteram2[curr_sprite.map % (spriteram2_bytes/2)];
 
 				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[sprite_gfx + chip],
-							 code,
-							 color,
-							 flipx,flipy,
+							 curr,
+							 curr_sprite.color,
+							 curr_sprite.flipx,curr_sprite.flipy,
 							 sx,sy,
-							 zoomx << 11, zoomy << 11,
-							 machine.priority_bitmap,pri ? 2 : 0,15);
-				map_start++;
+							 curr_sprite.zoomx << 11, curr_sprite.zoomy << 11,
+							 machine.priority_bitmap,curr_sprite.pri ? 2 : 0,15);
+				curr_sprite.map++;
 			}
 
-			if (xsize == 2) map_start += 1;
-			if (xsize == 4) map_start += 3;
-			if (xsize == 5) map_start += 2;
-			if (xsize == 6) map_start += 1;
+			if (curr_sprite.xsize == 2) curr_sprite.map += 1;
+			if (curr_sprite.xsize == 4) curr_sprite.map += 3;
+			if (curr_sprite.xsize == 5) curr_sprite.map += 2;
+			if (curr_sprite.xsize == 6) curr_sprite.map += 1;
 		}
 	}
 }
@@ -234,107 +241,101 @@ void vsystem_spr2_device::welltris_draw_sprites( UINT16* spriteram, int spritepa
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	/* draw the sprites */
-	for (offs = 0; offs < 0x200 - 4; offs += 4) {
-		int data0 = spriteram[offs + 0];
-		int data1 = spriteram[offs + 1];
-		int data2 = spriteram[offs + 2];
-		int data3 = spriteram[offs + 3];
-		int code = data3 & 0x1fff;
-		int color = (data2 & 0x0f) + (0x10 * spritepalettebank);
-		int y = (data0 & 0x1ff) + 1;
-		int x = (data1 & 0x1ff) + 6;
-		int yzoom = (data0 >> 12) & 15;
-		int xzoom = (data1 >> 12) & 15;
-		int zoomed = (xzoom | yzoom);
-		int ytiles = ((data2 >> 12) & 7) + 1;
-		int xtiles = ((data2 >>  8) & 7) + 1;
-		int yflip = (data2 >> 15) & 1;
-		int xflip = (data2 >> 11) & 1;
+	for (offs = 0; offs < 0x200 - 4; offs += 4)
+	{
+		if (!get_sprite_attributes(&spriteram[offs]))
+			continue;
+
+		curr_sprite.map&=0x1fff;
+		curr_sprite.ysize++;
+		curr_sprite.xsize++;
+		curr_sprite.color += (0x10 * spritepalettebank);
+
+		int zoomed = (curr_sprite.zoomx | curr_sprite.zoomy);
 		int xt, yt;
 
-		if (!(spriteram[offs + 2] & 0x0080)) continue;
 
 		/* compute the zoom factor -- stolen from aerofgt.c */
-		xzoom = 16 - zoomtable[xzoom] / 8;
-		yzoom = 16 - zoomtable[yzoom] / 8;
+		curr_sprite.zoomx = 16 - zoomtable[curr_sprite.zoomx] / 8;
+		curr_sprite.zoomy = 16 - zoomtable[curr_sprite.zoomy] / 8;
 
 		/* wrap around */
-		if (x > visarea.max_x) x -= 0x200;
-		if (y > visarea.max_y) y -= 0x200;
+		if (curr_sprite.ox > visarea.max_x) curr_sprite.ox -= 0x200;
+		if (curr_sprite.oy > visarea.max_y) curr_sprite.oy -= 0x200;
 
 		/* normal case */
-		if (!xflip && !yflip) {
-			for (yt = 0; yt < ytiles; yt++) {
-				for (xt = 0; xt < xtiles; xt++, code++) {
+		if (!curr_sprite.flipx && !curr_sprite.flipy) {
+			for (yt = 0; yt < curr_sprite.ysize; yt++) {
+				for (xt = 0; xt < curr_sprite.xsize; xt++, curr_sprite.map++) {
 					if (!zoomed)
-						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, 0, 0,
-								x + xt * 16, y + yt * 16, 15);
+						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], curr_sprite.map, curr_sprite.color, 0, 0,
+								curr_sprite.ox + xt * 16, curr_sprite.oy + yt * 16, 15);
 					else
-						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], code, color, 0, 0,
-								x + xt * xzoom, y + yt * yzoom,
-								0x1000 * xzoom, 0x1000 * yzoom, 15);
+						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], curr_sprite.map, curr_sprite.color, 0, 0,
+								curr_sprite.ox + xt * curr_sprite.zoomx, curr_sprite.oy + yt * curr_sprite.zoomy,
+								0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
 				}
-				if (xtiles == 3) code += 1;
-				if (xtiles == 5) code += 3;
-				if (xtiles == 6) code += 2;
-				if (xtiles == 7) code += 1;
+				if (curr_sprite.xsize == 3) curr_sprite.map += 1;
+				if (curr_sprite.xsize == 5) curr_sprite.map += 3;
+				if (curr_sprite.xsize == 6) curr_sprite.map += 2;
+				if (curr_sprite.xsize == 7) curr_sprite.map += 1;
 			}
 		}
 
-		/* xflipped case */
-		else if (xflip && !yflip) {
-			for (yt = 0; yt < ytiles; yt++) {
-				for (xt = 0; xt < xtiles; xt++, code++) {
+		/* curr_sprite.flipxped case */
+		else if (curr_sprite.flipx && !curr_sprite.flipy) {
+			for (yt = 0; yt < curr_sprite.ysize; yt++) {
+				for (xt = 0; xt < curr_sprite.xsize; xt++, curr_sprite.map++) {
 					if (!zoomed)
-						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, 1, 0,
-								x + (xtiles - 1 - xt) * 16, y + yt * 16, 15);
+						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], curr_sprite.map, curr_sprite.color, 1, 0,
+								curr_sprite.ox + (curr_sprite.xsize - 1 - xt) * 16, curr_sprite.oy + yt * 16, 15);
 					else
-						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], code, color, 1, 0,
-								x + (xtiles - 1 - xt) * xzoom, y + yt * yzoom,
-								0x1000 * xzoom, 0x1000 * yzoom, 15);
+						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], curr_sprite.map, curr_sprite.color, 1, 0,
+								curr_sprite.ox + (curr_sprite.xsize - 1 - xt) * curr_sprite.zoomx, curr_sprite.oy + yt * curr_sprite.zoomy,
+								0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
 				}
-				if (xtiles == 3) code += 1;
-				if (xtiles == 5) code += 3;
-				if (xtiles == 6) code += 2;
-				if (xtiles == 7) code += 1;
+				if (curr_sprite.xsize == 3) curr_sprite.map += 1;
+				if (curr_sprite.xsize == 5) curr_sprite.map += 3;
+				if (curr_sprite.xsize == 6) curr_sprite.map += 2;
+				if (curr_sprite.xsize == 7) curr_sprite.map += 1;
 			}
 		}
 
-		/* yflipped case */
-		else if (!xflip && yflip) {
-			for (yt = 0; yt < ytiles; yt++) {
-				for (xt = 0; xt < xtiles; xt++, code++) {
+		/* curr_sprite.flipyped case */
+		else if (!curr_sprite.flipx && curr_sprite.flipy) {
+			for (yt = 0; yt < curr_sprite.ysize; yt++) {
+				for (xt = 0; xt < curr_sprite.xsize; xt++, curr_sprite.map++) {
 					if (!zoomed)
-						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, 0, 1,
-								x + xt * 16, y + (ytiles - 1 - yt) * 16, 15);
+						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], curr_sprite.map, curr_sprite.color, 0, 1,
+								curr_sprite.ox + xt * 16, curr_sprite.oy + (curr_sprite.ysize - 1 - yt) * 16, 15);
 					else
-						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], code, color, 0, 1,
-								x + xt * xzoom, y + (ytiles - 1 - yt) * yzoom,
-								0x1000 * xzoom, 0x1000 * yzoom, 15);
+						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], curr_sprite.map, curr_sprite.color, 0, 1,
+								curr_sprite.ox + xt * curr_sprite.zoomx, curr_sprite.oy + (curr_sprite.ysize - 1 - yt) * curr_sprite.zoomy,
+								0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
 				}
-				if (xtiles == 3) code += 1;
-				if (xtiles == 5) code += 3;
-				if (xtiles == 6) code += 2;
-				if (xtiles == 7) code += 1;
+				if (curr_sprite.xsize == 3) curr_sprite.map += 1;
+				if (curr_sprite.xsize == 5) curr_sprite.map += 3;
+				if (curr_sprite.xsize == 6) curr_sprite.map += 2;
+				if (curr_sprite.xsize == 7) curr_sprite.map += 1;
 			}
 		}
 
-		/* x & yflipped case */
+		/* x & curr_sprite.flipyped case */
 		else {
-			for (yt = 0; yt < ytiles; yt++) {
-				for (xt = 0; xt < xtiles; xt++, code++) {
+			for (yt = 0; yt < curr_sprite.ysize; yt++) {
+				for (xt = 0; xt < curr_sprite.xsize; xt++, curr_sprite.map++) {
 					if (!zoomed)
-						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, 1, 1,
-								x + (xtiles - 1 - xt) * 16, y + (ytiles - 1 - yt) * 16, 15);
+						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], curr_sprite.map, curr_sprite.color, 1, 1,
+								curr_sprite.ox + (curr_sprite.xsize - 1 - xt) * 16, curr_sprite.oy + (curr_sprite.ysize - 1 - yt) * 16, 15);
 					else
-						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], code, color, 1, 1,
-								x + (xtiles - 1 - xt) * xzoom, y + (ytiles - 1 - yt) * yzoom,
-								0x1000 * xzoom, 0x1000 * yzoom, 15);
+						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], curr_sprite.map, curr_sprite.color, 1, 1,
+								curr_sprite.ox + (curr_sprite.xsize - 1 - xt) * curr_sprite.zoomx, curr_sprite.oy + (curr_sprite.ysize - 1 - yt) * curr_sprite.zoomy,
+								0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
 				}
-				if (xtiles == 3) code += 1;
-				if (xtiles == 5) code += 3;
-				if (xtiles == 6) code += 2;
-				if (xtiles == 7) code += 1;
+				if (curr_sprite.xsize == 3) curr_sprite.map += 1;
+				if (curr_sprite.xsize == 5) curr_sprite.map += 3;
+				if (curr_sprite.xsize == 6) curr_sprite.map += 2;
+				if (curr_sprite.xsize == 7) curr_sprite.map += 1;
 			}
 		}
 	}
@@ -351,64 +352,53 @@ void vsystem_spr2_device::f1gp_draw_sprites( UINT16* spr1vram, UINT16* spr2vram,
 
 	for (attr_start = 0x0200 - 8; attr_start >= first; attr_start -= 4)
 	{
-		int map_start;
-		int ox, oy, x, y, xsize, ysize, zoomx, zoomy, flipx, flipy, color/*, pri*/;
+		int x, y;
 		/* table hand made by looking at the ship explosion in attract mode */
 		/* it's almost a logarithmic scale but not exactly */
 		static const int zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 
-		if (!(spram[attr_start + 2] & 0x0080)) continue;
 
-		ox = spram[attr_start + 1] & 0x01ff;
-		xsize = (spram[attr_start + 2] & 0x0700) >> 8;
-		zoomx = (spram[attr_start + 1] & 0xf000) >> 12;
-		oy = spram[attr_start + 0] & 0x01ff;
-		ysize = (spram[attr_start + 2] & 0x7000) >> 12;
-		zoomy = (spram[attr_start + 0] & 0xf000) >> 12;
-		flipx = spram[attr_start + 2] & 0x0800;
-		flipy = spram[attr_start + 2] & 0x8000;
-		color = (spram[attr_start + 2] & 0x000f);// + 16 * spritepalettebank;
-		//pri = spram[attr_start + 2] & 0x0010;
-		map_start = spram[attr_start + 3];
+		if (!get_sprite_attributes(&spram[attr_start]))
+			continue;
 
-		zoomx = 16 - zoomtable[zoomx] / 8;
-		zoomy = 16 - zoomtable[zoomy] / 8;
+		curr_sprite.zoomx = 16 - zoomtable[curr_sprite.zoomx] / 8;
+		curr_sprite.zoomy = 16 - zoomtable[curr_sprite.zoomy] / 8;
 
-		for (y = 0; y <= ysize; y++)
+		for (y = 0; y <= curr_sprite.ysize; y++)
 		{
 			int sx, sy;
 
-			if (flipy) sy = ((oy + zoomy * (ysize - y) + 16) & 0x1ff) - 16;
-			else sy = ((oy + zoomy * y + 16) & 0x1ff) - 16;
+			if (curr_sprite.flipy) sy = ((curr_sprite.oy + curr_sprite.zoomy * (curr_sprite.ysize - y) + 16) & 0x1ff) - 16;
+			else sy = ((curr_sprite.oy + curr_sprite.zoomy * y + 16) & 0x1ff) - 16;
 
-			for (x = 0; x <= xsize; x++)
+			for (x = 0; x <= curr_sprite.xsize; x++)
 			{
-				int code;
+				int curr;
 
-				if (flipx) sx = ((ox + zoomx * (xsize - x) + 16) & 0x1ff) - 16;
-				else sx = ((ox + zoomx * x + 16) & 0x1ff) - 16;
+				if (curr_sprite.flipx) sx = ((curr_sprite.ox + curr_sprite.zoomx * (curr_sprite.xsize - x) + 16) & 0x1ff) - 16;
+				else sx = ((curr_sprite.ox + curr_sprite.zoomx * x + 16) & 0x1ff) - 16;
 
 				if (chip == 0)
-					code = spr1cgram[map_start % (spr1cgram_bytes / 2)];
+					curr = spr1cgram[curr_sprite.map % (spr1cgram_bytes / 2)];
 				else
-					code = spr2cgram[map_start % (spr2cgram_bytes / 2)];
+					curr = spr2cgram[curr_sprite.map % (spr2cgram_bytes / 2)];
 
 				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1 + chip],
-						code,
-						color,
-						flipx,flipy,
+						curr,
+						curr_sprite.color,
+						curr_sprite.flipx,curr_sprite.flipy,
 						sx,sy,
-						0x1000 * zoomx,0x1000 * zoomy,
+						0x1000 * curr_sprite.zoomx,0x1000 * curr_sprite.zoomy,
 						machine.priority_bitmap,
 //                      pri ? 0 : 0x2);
 						primask,15);
-				map_start++;
+				curr_sprite.map++;
 			}
 
-			if (xsize == 2) map_start += 1;
-			if (xsize == 4) map_start += 3;
-			if (xsize == 5) map_start += 2;
-			if (xsize == 6) map_start += 1;
+			if (curr_sprite.xsize == 2) curr_sprite.map += 1;
+			if (curr_sprite.xsize == 4) curr_sprite.map += 3;
+			if (curr_sprite.xsize == 5) curr_sprite.map += 2;
+			if (curr_sprite.xsize == 6) curr_sprite.map += 1;
 		}
 	}
 }
@@ -428,97 +418,96 @@ void vsystem_spr2_device::draw_sprites_pipedrm( UINT8* spriteram, int spriteram_
 		int priority = (data2 >> 4) & 1;
 
 		/* turns out the sprites are the same as in aerofgt.c */
-		if ((data2 & 0x80) && priority == draw_priority)
+		if (priority == draw_priority)
 		{
-			int data0 = spriteram[offs + 0] | (spriteram[offs + 1] << 8);
-			int data1 = spriteram[offs + 2] | (spriteram[offs + 3] << 8);
-			int data3 = spriteram[offs + 6] | (spriteram[offs + 7] << 8);
-			int code = data3 & 0xfff;
-			int color = data2 & 0x0f;
-			int y = (data0 & 0x1ff) - 6;
-			int x = (data1 & 0x1ff) - 13;
-			int yzoom = (data0 >> 12) & 15;
-			int xzoom = (data1 >> 12) & 15;
-			int zoomed = (xzoom | yzoom);
-			int ytiles = ((data2 >> 12) & 7) + 1;
-			int xtiles = ((data2 >> 8) & 7) + 1;
-			int yflip = (data2 >> 15) & 1;
-			int xflip = (data2 >> 11) & 1;
+			if (!get_sprite_attributes((UINT16*)&spriteram[offs]))
+				continue;
+			
+			curr_sprite.ysize++;
+			curr_sprite.xsize++;
+			curr_sprite.oy -= 6;
+			curr_sprite.ox -= 13;
+
+
+			
 			int xt, yt;
 
+
+			int zoomed = (curr_sprite.zoomx | curr_sprite.zoomy);
+
 			/* compute the zoom factor -- stolen from aerofgt.c */
-			xzoom = 16 - zoomtable[xzoom] / 8;
-			yzoom = 16 - zoomtable[yzoom] / 8;
+			curr_sprite.zoomx = 16 - zoomtable[curr_sprite.zoomx] / 8;
+			curr_sprite.zoomy = 16 - zoomtable[curr_sprite.zoomy] / 8;
 
 			/* wrap around */
-			if (x > visarea.max_x)
-				x -= 0x200;
-			if (y > visarea.max_y)
-				y -= 0x200;
+			if (curr_sprite.ox > visarea.max_x)
+				curr_sprite.ox -= 0x200;
+			if (curr_sprite.oy > visarea.max_y)
+				curr_sprite.oy -= 0x200;
 
 			/* flip ? */
 			if (flipscreen)
 			{
-				y = visarea.max_y - y - 16 * ytiles - 4;
-				x = visarea.max_x - x - 16 * xtiles - 24;
-				xflip=!xflip;
-				yflip=!yflip;
+				curr_sprite.oy = visarea.max_y - curr_sprite.oy - 16 * curr_sprite.ysize - 4;
+				curr_sprite.ox = visarea.max_x - curr_sprite.ox - 16 * curr_sprite.xsize - 24;
+				curr_sprite.flipx=!curr_sprite.flipx;
+				curr_sprite.flipy=!curr_sprite.flipy;
 			}
 
 			/* normal case */
-			if (!xflip && !yflip)
+			if (!curr_sprite.flipx && !curr_sprite.flipy)
 			{
-				for (yt = 0; yt < ytiles; yt++)
-					for (xt = 0; xt < xtiles; xt++, code++)
+				for (yt = 0; yt < curr_sprite.ysize; yt++)
+					for (xt = 0; xt < curr_sprite.xsize; xt++, curr_sprite.map++)
 						if (!zoomed)
-							drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], code, color, 0, 0,
-									x + xt * 16, y + yt * 16, 15);
+							drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], curr_sprite.map, curr_sprite.color, 0, 0,
+									curr_sprite.ox + xt * 16, curr_sprite.oy + yt * 16, 15);
 						else
-							drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], code, color, 0, 0,
-									x + xt * xzoom, y + yt * yzoom,
-									0x1000 * xzoom, 0x1000 * yzoom, 15);
+							drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], curr_sprite.map, curr_sprite.color, 0, 0,
+									curr_sprite.ox + xt * curr_sprite.zoomx, curr_sprite.oy + yt * curr_sprite.zoomy,
+									0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
 			}
 
-			/* xflipped case */
-			else if (xflip && !yflip)
+			/* curr_sprite.flipxped case */
+			else if (curr_sprite.flipx && !curr_sprite.flipy)
 			{
-				for (yt = 0; yt < ytiles; yt++)
-					for (xt = 0; xt < xtiles; xt++, code++)
+				for (yt = 0; yt < curr_sprite.ysize; yt++)
+					for (xt = 0; xt < curr_sprite.xsize; xt++, curr_sprite.map++)
 						if (!zoomed)
-							drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], code, color, 1, 0,
-									x + (xtiles - 1 - xt) * 16, y + yt * 16, 15);
+							drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], curr_sprite.map, curr_sprite.color, 1, 0,
+									curr_sprite.ox + (curr_sprite.xsize - 1 - xt) * 16, curr_sprite.oy + yt * 16, 15);
 						else
-							drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], code, color, 1, 0,
-									x + (xtiles - 1 - xt) * xzoom, y + yt * yzoom,
-									0x1000 * xzoom, 0x1000 * yzoom, 15);
+							drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], curr_sprite.map, curr_sprite.color, 1, 0,
+									curr_sprite.ox + (curr_sprite.xsize - 1 - xt) * curr_sprite.zoomx, curr_sprite.oy + yt * curr_sprite.zoomy,
+									0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
 			}
 
-			/* yflipped case */
-			else if (!xflip && yflip)
+			/* curr_sprite.flipyped case */
+			else if (!curr_sprite.flipx && curr_sprite.flipy)
 			{
-				for (yt = 0; yt < ytiles; yt++)
-					for (xt = 0; xt < xtiles; xt++, code++)
+				for (yt = 0; yt < curr_sprite.ysize; yt++)
+					for (xt = 0; xt < curr_sprite.xsize; xt++, curr_sprite.map++)
 						if (!zoomed)
-							drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], code, color, 0, 1,
-									x + xt * 16, y + (ytiles - 1 - yt) * 16, 15);
+							drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], curr_sprite.map, curr_sprite.color, 0, 1,
+									curr_sprite.ox + xt * 16, curr_sprite.oy + (curr_sprite.ysize - 1 - yt) * 16, 15);
 						else
-							drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], code, color, 0, 1,
-									x + xt * xzoom, y + (ytiles - 1 - yt) * yzoom,
-									0x1000 * xzoom, 0x1000 * yzoom, 15);
+							drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], curr_sprite.map, curr_sprite.color, 0, 1,
+									curr_sprite.ox + xt * curr_sprite.zoomx, curr_sprite.oy + (curr_sprite.ysize - 1 - yt) * curr_sprite.zoomy,
+									0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
 			}
 
-			/* x & yflipped case */
+			/* x & curr_sprite.flipyped case */
 			else
 			{
-				for (yt = 0; yt < ytiles; yt++)
-					for (xt = 0; xt < xtiles; xt++, code++)
+				for (yt = 0; yt < curr_sprite.ysize; yt++)
+					for (xt = 0; xt < curr_sprite.xsize; xt++, curr_sprite.map++)
 						if (!zoomed)
-							drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], code, color, 1, 1,
-									x + (xtiles - 1 - xt) * 16, y + (ytiles - 1 - yt) * 16, 15);
+							drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], curr_sprite.map, curr_sprite.color, 1, 1,
+									curr_sprite.ox + (curr_sprite.xsize - 1 - xt) * 16, curr_sprite.oy + (curr_sprite.ysize - 1 - yt) * 16, 15);
 						else
-							drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], code, color, 1, 1,
-									x + (xtiles - 1 - xt) * xzoom, y + (ytiles - 1 - yt) * yzoom,
-									0x1000 * xzoom, 0x1000 * yzoom, 15);
+							drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], curr_sprite.map, curr_sprite.color, 1, 1,
+									curr_sprite.ox + (curr_sprite.xsize - 1 - xt) * curr_sprite.zoomx, curr_sprite.oy + (curr_sprite.ysize - 1 - yt) * curr_sprite.zoomy,
+									0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
 			}
 		}
 	}

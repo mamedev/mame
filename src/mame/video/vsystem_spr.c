@@ -1,6 +1,6 @@
 // Video System Sprites
 // todo:
-//  unify these functions (secondary stage tile lookup differs between games, use callback)
+//  unify these functions (secondary stage lookup differs between games, use callback)
 
 //  according to gstriker this is probably the Fujitsu CG10103
 
@@ -38,7 +38,47 @@ void vsystem_spr_device::device_reset()
 
 }
 
+void vsystem_spr_device::get_sprite_attributes(UINT16* ram)
+{
+		/*
+            attr_start + 0x0000
+            ---- ---x xxxx xxxx oy
+            ---- xxx- ---- ---- ysize
+            xxxx ---- ---- ---- zoomy
 
+            attr_start + 0x0001
+            ---- ---x xxxx xxxx ox
+            ---- xxx- ---- ---- xsize
+            xxxx ---- ---- ---- zoomx
+
+            attr_start + 0x0002
+            -x-- ---- ---- ---- flipx
+            x--- ---- ---- ---- flipy
+            --xx xxxx ---- ---- color
+            --xx ---- ---- ---- priority? (upper color bits)
+            ---- ---- ---- ---x map start (msb)
+
+            attr_start + 0x0003
+            xxxx xxxx xxxx xxxx map start (lsb)
+        */
+
+		curr_sprite.oy =    (ram[0] & 0x01ff);
+		curr_sprite.ysize = (ram[0] & 0x0e00) >> 9;
+		curr_sprite.zoomy = (ram[0] & 0xf000) >> 12;
+
+		curr_sprite.ox =    (ram[1] & 0x01ff);
+		curr_sprite.xsize = (ram[1] & 0x0e00) >> 9;
+		curr_sprite.zoomx = (ram[1] & 0xf000) >> 12;
+
+		curr_sprite.flipx = (ram[2] & 0x4000);
+		curr_sprite.flipy = (ram[2] & 0x8000);
+		curr_sprite.color = (ram[2] & 0x3f00) >> 8;
+		curr_sprite.pri   = (ram[2] & 0x3000) >> 12;
+		curr_sprite.map   = (ram[2] & 0x0001) << 16;
+
+		curr_sprite.map  |= (ram[3] & 0xffff);
+
+}
 
 // zooming is wrong for 3on3dunk ... suprslam implementation is probably better
 void vsystem_spr_device::draw_sprites_inufuku( UINT16* spriteram, int spriteram_bytes, UINT16* spriteram2, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -57,48 +97,17 @@ void vsystem_spr_device::draw_sprites_inufuku( UINT16* spriteram, int spriteram_
 		if ((spriteram[offs] & 0x8000) == 0x0000)
 		{
 			int attr_start;
-			int map_start;
-			int ox, oy, x, y, xsize, ysize, zoomx, zoomy, flipx, flipy, color;
-			int priority, priority_mask;
+			int x, y;
+			int priority_mask;
 
 			attr_start = 4 * (spriteram[offs] & 0x03ff);
 
-			/*
-                attr_start + 0x0000
-                ---- ---x xxxx xxxx oy
-                ---- xxx- ---- ---- ysize
-                xxxx ---- ---- ---- zoomy
+			get_sprite_attributes(&spriteram[attr_start]);
 
-                attr_start + 0x0001
-                ---- ---x xxxx xxxx ox
-                ---- xxx- ---- ---- xsize
-                xxxx ---- ---- ---- zoomx
+			curr_sprite.oy += 1;
+			curr_sprite.map &= 0x7fff;
 
-                attr_start + 0x0002
-                -x-- ---- ---- ---- flipx
-                x--- ---- ---- ---- flipy
-                --xx xxxx ---- ---- color
-                --xx ---- ---- ---- priority?
-                ---- ---- xxxx xxxx unused?
-
-                attr_start + 0x0003
-                -xxx xxxx xxxx xxxx map start
-                x--- ---- ---- ---- unused?
-            */
-
-			ox = (spriteram[attr_start + 1] & 0x01ff) + 0;
-			xsize = (spriteram[attr_start + 1] & 0x0e00) >> 9;
-			zoomx = (spriteram[attr_start + 1] & 0xf000) >> 12;
-			oy = (spriteram[attr_start + 0] & 0x01ff) + 1;
-			ysize = (spriteram[attr_start + 0] & 0x0e00) >> 9;
-			zoomy = (spriteram[attr_start + 0] & 0xf000) >> 12;
-			flipx = spriteram[attr_start + 2] & 0x4000;
-			flipy = spriteram[attr_start + 2] & 0x8000;
-			color = (spriteram[attr_start + 2] & 0x3f00) >> 8;
-			priority = (spriteram[attr_start + 2] & 0x3000) >> 12;
-			map_start = (spriteram[attr_start + 3] & 0x7fff) << 1;
-
-			switch (priority)
+			switch (curr_sprite.pri)
 			{
 				default:
 				case 0:	priority_mask = 0x00; break;
@@ -107,41 +116,41 @@ void vsystem_spr_device::draw_sprites_inufuku( UINT16* spriteram, int spriteram_
 				case 1:	priority_mask = 0xf0; break;
 			}
 
-			ox += (xsize * zoomx + 2) / 4;
-			oy += (ysize * zoomy + 2) / 4;
+			curr_sprite.ox += (curr_sprite.xsize * curr_sprite.zoomx + 2) / 4;
+			curr_sprite.oy += (curr_sprite.ysize * curr_sprite.zoomy + 2) / 4;
 
-			zoomx = 32 - zoomx;
-			zoomy = 32 - zoomy;
+			curr_sprite.zoomx = 32 - curr_sprite.zoomx;
+			curr_sprite.zoomy = 32 - curr_sprite.zoomy;
 
-			for (y = 0; y <= ysize; y++)
+			for (y = 0; y <= curr_sprite.ysize; y++)
 			{
 				int sx, sy;
 
-				if (flipy)
-					sy = (oy + zoomy * (ysize - y) / 2 + 16) & 0x1ff;
+				if (curr_sprite.flipy)
+					sy = (curr_sprite.oy + curr_sprite.zoomy * (curr_sprite.ysize - y) / 2 + 16) & 0x1ff;
 				else
-					sy = (oy + zoomy * y / 2 + 16) & 0x1ff;
+					sy = (curr_sprite.oy + curr_sprite.zoomy * y / 2 + 16) & 0x1ff;
 
-				for (x = 0; x <= xsize; x++)
+				for (x = 0; x <= curr_sprite.xsize; x++)
 				{
 					int code;
 
-					if (flipx)
-						sx = (ox + zoomx * (xsize - x) / 2 + 16) & 0x1ff;
+					if (curr_sprite.flipx)
+						sx = (curr_sprite.ox + curr_sprite.zoomx * (curr_sprite.xsize - x) / 2 + 16) & 0x1ff;
 					else
-						sx = (ox + zoomx * x / 2 + 16) & 0x1ff;
+						sx = (curr_sprite.ox + curr_sprite.zoomx * x / 2 + 16) & 0x1ff;
 
-					code  = ((spriteram2[map_start] & 0x0007) << 16) + spriteram2[map_start + 1];
+					code  = ((spriteram2[curr_sprite.map*2] & 0x0007) << 16) + spriteram2[(curr_sprite.map*2)+ 1];
 
 					pdrawgfxzoom_transpen(bitmap, cliprect, machine.gfx[2],
 							code,
-							color,
-							flipx, flipy,
+							curr_sprite.color,
+							curr_sprite.flipx, curr_sprite.flipy,
 							sx - 16, sy - 16,
-							zoomx << 11, zoomy << 11,
+							curr_sprite.zoomx << 11, curr_sprite.zoomy << 11,
 							machine.priority_bitmap,priority_mask, 15);
 
-					map_start += 2;
+					curr_sprite.map ++;
 				}
 			}
 		}
@@ -153,28 +162,6 @@ void vsystem_spr_device::draw_sprites_inufuku( UINT16* spriteram, int spriteram_
 /* todo, fix zooming correctly, it's _not_ like aerofgt */
 void vsystem_spr_device::draw_sprites_suprslam( UINT16* spriteram, int spriteram_bytes, UINT16* spriteram2, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	/* SPRITE INFO
-
-    Video System hardware, like aerofgt etc.
-
-    the sprites use 2 areas of ram, one containing a spritelist + sprite attributes, the other
-    contains the sprite tile #'s to use
-
-    sprite attribute info (4 words per sprite)
-
-    |  ZZZZ hhhy yyyy yyyy  |  zzzz wwwx xxxx xxxx  |  -fpp pppp ---- ----  |  -ooo oooo oooo oooo  |
-
-    x  = x position
-    y  = y position
-    w  = width
-    h  = height
-    zZ = y zoom / x zoom
-    f  = xflip
-    p  = palette / colour
-    o  = offset to tile data in other ram area
-
-    */
-
 	gfx_element *gfx = machine.gfx[1];
 	UINT16 *source = spriteram;
 	UINT16 *source2 = spriteram;
@@ -190,47 +177,38 @@ void vsystem_spr_device::draw_sprites_suprslam( UINT16* spriteram, int spriteram
 		source++;
 		/* DRAW START */
 		{
-			int ypos = source2[sprnum + 0] & 0x1ff;
-			int high = (source2[sprnum + 0] & 0x0e00) >> 9;
-			int yzoom = (source2[sprnum + 0] & 0xf000) >> 12;
+			get_sprite_attributes(&source2[sprnum]);
 
-			int xpos = source2[sprnum + 1] & 0x1ff;
-			int wide = (source2[sprnum + 1] & 0x0e00) >> 9;
-			int xzoom = (source2[sprnum + 1] & 0xf000) >> 12;
-
-			int col = (source2[sprnum + 2] & 0x3f00) >> 8;
-			int flipx = (source2[sprnum + 2] & 0x4000) >> 14;
-//          int flipy = (source2[sprnum + 2] & 0x8000) >> 15;
-
-			int word_offset = source2[sprnum + 3] & 0x7fff;
+			curr_sprite.map &= 0x7fff;
+									
 			int xcnt, ycnt;
 
 			int loopno = 0;
 
-			xzoom = 32 - xzoom;
-			yzoom = 32 - yzoom;
+			curr_sprite.zoomx = 32 - curr_sprite.zoomx;
+			curr_sprite.zoomy = 32 - curr_sprite.zoomy;
 
-			if (ypos > 0xff) ypos -=0x200;
+			if (curr_sprite.oy > 0xff) curr_sprite.oy -=0x200;
 
-			for (ycnt = 0; ycnt < high+1; ycnt ++)
+			for (ycnt = 0; ycnt < curr_sprite.ysize+1; ycnt ++)
 			{
-				if (!flipx)
+				if (!curr_sprite.flipx)
 				{
-					for (xcnt = 0; xcnt < wide+1; xcnt ++)
+					for (xcnt = 0; xcnt < curr_sprite.xsize+1; xcnt ++)
 					{
-						int tileno = spriteram2[word_offset + loopno];
-						drawgfxzoom_transpen(bitmap, cliprect, gfx, tileno, col, 0, 0,xpos + xcnt * xzoom/2, ypos + ycnt * yzoom/2,xzoom << 11, yzoom << 11, 15);
-						drawgfxzoom_transpen(bitmap, cliprect, gfx, tileno, col, 0, 0,-0x200+xpos + xcnt * xzoom/2, ypos + ycnt * yzoom/2,xzoom << 11, yzoom << 11, 15);
+						int startno = spriteram2[curr_sprite.map + loopno];
+						drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color, 0, 0,curr_sprite.ox + xcnt * curr_sprite.zoomx/2, curr_sprite.oy + ycnt * curr_sprite.zoomy/2,curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, 15);
+						drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color, 0, 0,-0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, curr_sprite.oy + ycnt * curr_sprite.zoomy/2,curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, 15);
 						loopno ++;
 					}
 				}
 				else
 				{
-					for (xcnt = wide; xcnt >= 0; xcnt --)
+					for (xcnt = curr_sprite.xsize; xcnt >= 0; xcnt --)
 					{
-						int tileno = spriteram2[word_offset + loopno];
-						drawgfxzoom_transpen(bitmap, cliprect, gfx, tileno, col, 1, 0,xpos + xcnt * xzoom/2, ypos + ycnt * yzoom/2,xzoom << 11, yzoom << 11, 15);
-						drawgfxzoom_transpen(bitmap, cliprect, gfx, tileno, col, 1, 0,-0x200+xpos + xcnt * xzoom/2, ypos + ycnt * yzoom/2,xzoom << 11, yzoom << 11, 15);
+						int startno = spriteram2[curr_sprite.map + loopno];
+						drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color, 1, 0,curr_sprite.ox + xcnt * curr_sprite.zoomx/2, curr_sprite.oy + ycnt * curr_sprite.zoomy/2,curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, 15);
+						drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color, 1, 0,-0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, curr_sprite.oy + ycnt * curr_sprite.zoomy/2,curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, 15);
 						loopno ++;
 					}
 				}
@@ -241,7 +219,7 @@ void vsystem_spr_device::draw_sprites_suprslam( UINT16* spriteram, int spriteram
 
 
 
-static void draw_sprite_taotaido( UINT16* spriteram, int spriteram_bytes, UINT16* spriteram2, UINT16* spriteram3, running_machine &machine, UINT16 spriteno, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void vsystem_spr_device::draw_sprite_taotaido( UINT16* spriteram, int spriteram_bytes, UINT16* spriteram2, UINT16* spriteram3, running_machine &machine, UINT16 spriteno, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	/*- SPR RAM Format -**
 
@@ -249,8 +227,8 @@ static void draw_sprite_taotaido( UINT16* spriteram, int spriteram_bytes, UINT16
 
       zzzz sssp  pppp pppp (y zoom, y size, y position)
       zzzz sssp  pppp pppp (x zoom, x size, x position)
-      yxpc cccc  ---- ---- (flipy, flipx, priority?, colour)
-      -nnn nnnn  nnnn nnnn (tile lookup)
+      yxpc cccc  ---- ---- (flipy, >flipx, priority?, color)
+      -nnn nnnn  nnnn nnnn (map_start lookup)
 
     */
 
@@ -259,66 +237,55 @@ static void draw_sprite_taotaido( UINT16* spriteram, int spriteram_bytes, UINT16
 	UINT16 *source = &spriteram[spriteno*4];
 	gfx_element *gfx = machine.gfx[0];
 
+	get_sprite_attributes(&source[0]);
 
-	int yzoom = (source[0] & 0xf000) >> 12;
-	int xzoom = (source[1] & 0xf000) >> 12;
+	curr_sprite.map &= 0xffff;
+	curr_sprite.color &= 0x1f;
 
-	int ysize = (source[0] & 0x0e00) >> 9;
-	int xsize = (source[1] & 0x0e00) >> 9;
+	curr_sprite.ox += (curr_sprite.xsize*curr_sprite.zoomx+2)/4;
+	curr_sprite.oy += (curr_sprite.ysize*curr_sprite.zoomy+2)/4;
 
-	int ypos = source[0] & 0x01ff;
-	int xpos = source[1] & 0x01ff;
-
-	int yflip = source[2] & 0x8000;
-	int xflip = source[2] & 0x4000;
-	int color = (source[2] & 0x1f00) >> 8;
-
-	int tile = source[3] & 0xffff;
-
-	xpos += (xsize*xzoom+2)/4;
-	ypos += (ysize*yzoom+2)/4;
-
-	xzoom = 32 - xzoom;
-	yzoom = 32 - yzoom;
+	curr_sprite.zoomx = 32 - curr_sprite.zoomx;
+	curr_sprite.zoomy = 32 - curr_sprite.zoomy;
 
 
-	for (y = 0;y <= ysize;y++)
+	for (y = 0;y <= curr_sprite.ysize;y++)
 	{
 		int sx,sy;
 
-		if (yflip) sy = ((ypos + yzoom * (ysize - y)/2 + 16) & 0x1ff) - 16;
-			else sy = ((ypos + yzoom * y / 2 + 16) & 0x1ff) - 16;
+		if (curr_sprite.flipy) sy = ((curr_sprite.oy + curr_sprite.zoomy * (curr_sprite.ysize - y)/2 + 16) & 0x1ff) - 16;
+			else sy = ((curr_sprite.oy + curr_sprite.zoomy * y / 2 + 16) & 0x1ff) - 16;
 
-		for (x = 0;x <= xsize;x++)
+		for (x = 0;x <= curr_sprite.xsize;x++)
 		{
 
 			/* this indirection is a bit different to the other video system games */
-			int realtile;
+			int realstart;
 
-			realtile = spriteram2[tile&0x7fff];
+			realstart = spriteram2[curr_sprite.map&0x7fff];
 
-			if (realtile > 0x3fff)
+			if (realstart > 0x3fff)
 			{
 				int block;
 
-				block = (realtile & 0x3800)>>11;
+				block = (realstart & 0x3800)>>11;
 
-				realtile &= 0x07ff;
-				realtile |= spriteram3[block] * 0x800;
+				realstart &= 0x07ff;
+				realstart |= spriteram3[block] * 0x800;
 			}
 
-			if (xflip) sx = ((xpos + xzoom * (xsize - x) / 2 + 16) & 0x1ff) - 16;
-				else sx = ((xpos + xzoom * x / 2 + 16) & 0x1ff) - 16;
+			if (curr_sprite.flipx) sx = ((curr_sprite.ox + curr_sprite.zoomx * (curr_sprite.xsize - x) / 2 + 16) & 0x1ff) - 16;
+				else sx = ((curr_sprite.ox + curr_sprite.zoomx * x / 2 + 16) & 0x1ff) - 16;
 
 
 			drawgfxzoom_transpen(bitmap,cliprect,gfx,
-						realtile,
-						color,
-						xflip,yflip,
+						realstart,
+						curr_sprite.color,
+						curr_sprite.flipx,curr_sprite.flipy,
 						sx,sy,
-						xzoom << 11, yzoom << 11,15);
+						curr_sprite.zoomx << 11, curr_sprite.zoomy << 11,15);
 
-			tile++;
+			curr_sprite.map++;
 
 		}
 	}
@@ -349,61 +316,54 @@ void vsystem_spr_device::draw_sprites_crshrace(UINT16* spriteram, int spriteram_
 	while (offs < 0x0400 && (spriteram[offs] & 0x4000) == 0)
 	{
 		int attr_start;
-		int map_start;
-		int ox, oy, x, y, xsize, ysize, zoomx, zoomy, flipx, flipy, color;
+		int x, y;
 		/* table hand made by looking at the ship explosion in aerofgt attract mode */
 		/* it's almost a logarithmic scale but not exactly */
 		static const int zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 
 		attr_start = 4 * (spriteram[offs++] & 0x03ff);
 
-		ox = spriteram[attr_start + 1] & 0x01ff;
-		xsize = (spriteram[attr_start + 1] & 0x0e00) >> 9;
-		zoomx = (spriteram[attr_start + 1] & 0xf000) >> 12;
-		oy = spriteram[attr_start + 0] & 0x01ff;
-		ysize = (spriteram[attr_start + 0] & 0x0e00) >> 9;
-		zoomy = (spriteram[attr_start + 0] & 0xf000) >> 12;
-		flipx = spriteram[attr_start + 2] & 0x4000;
-		flipy = spriteram[attr_start + 2] & 0x8000;
-		color = (spriteram[attr_start + 2] & 0x1f00) >> 8;
-		map_start = spriteram[attr_start + 3] & 0x7fff;
+		get_sprite_attributes(&spriteram[attr_start]);
 
-		zoomx = 16 - zoomtable[zoomx] / 8;
-		zoomy = 16 - zoomtable[zoomy] / 8;
+		curr_sprite.color &= 0x1f;
+		curr_sprite.map &= 0x7fff;
 
-		if (spriteram[attr_start + 2] & 0x20ff) color = machine.rand();
+		curr_sprite.zoomx = 16 - zoomtable[curr_sprite.zoomx] / 8;
+		curr_sprite.zoomy = 16 - zoomtable[curr_sprite.zoomy] / 8;
 
-		for (y = 0; y <= ysize; y++)
+		if (spriteram[attr_start + 2] & 0x20ff) curr_sprite.color = machine.rand();
+
+		for (y = 0; y <= curr_sprite.ysize; y++)
 		{
 			int sx,sy;
 
-			if (flipy) sy = ((oy + zoomy * (ysize - y) + 16) & 0x1ff) - 16;
-			else sy = ((oy + zoomy * y + 16) & 0x1ff) - 16;
+			if (curr_sprite.flipy) sy = ((curr_sprite.oy + curr_sprite.zoomy * (curr_sprite.ysize - y) + 16) & 0x1ff) - 16;
+			else sy = ((curr_sprite.oy + curr_sprite.zoomy * y + 16) & 0x1ff) - 16;
 
-			for (x = 0; x <= xsize; x++)
+			for (x = 0; x <= curr_sprite.xsize; x++)
 			{
 				int code;
 
-				if (flipx) sx = ((ox + zoomx * (xsize - x) + 16) & 0x1ff) - 16;
-				else sx = ((ox + zoomx * x + 16) & 0x1ff) - 16;
+				if (curr_sprite.flipx) sx = ((curr_sprite.ox + curr_sprite.zoomx * (curr_sprite.xsize - x) + 16) & 0x1ff) - 16;
+				else sx = ((curr_sprite.ox + curr_sprite.zoomx * x + 16) & 0x1ff) - 16;
 
-				code = spriteram2[map_start & 0x7fff];
-				map_start++;
+				code = spriteram2[curr_sprite.map & 0x7fff];
+				curr_sprite.map++;
 
 				if (flipscreen)
 					drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[2],
 							code,
-							color,
-							!flipx,!flipy,
+							curr_sprite.color,
+							!curr_sprite.flipx,!curr_sprite.flipy,
 							304-sx,208-sy,
-							0x1000 * zoomx,0x1000 * zoomy,15);
+							0x1000 * curr_sprite.zoomx,0x1000 * curr_sprite.zoomy,15);
 				else
 					drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[2],
 							code,
-							color,
-							flipx,flipy,
+							curr_sprite.color,
+							curr_sprite.flipx,curr_sprite.flipy,
 							sx,sy,
-							0x1000 * zoomx,0x1000 * zoomy,15);
+							0x1000 * curr_sprite.zoomx,0x1000 * curr_sprite.zoomy,15);
 			}
 		}
 	}
@@ -411,69 +371,61 @@ void vsystem_spr_device::draw_sprites_crshrace(UINT16* spriteram, int spriteram_
 
 
 
-void vsystem_spr_device::draw_sprites_aerofght( UINT16* spriteram3, int spriteram_bytes, UINT16* spriteram1, UINT16* spriteram2, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+void vsystem_spr_device::draw_sprites_aerofght( UINT16* spriteram3, int spriteram_bytes, UINT16* spriteram1, UINT16* spriteram2, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	int offs;
-	priority <<= 12;
+	pri <<= 12;
 
 	offs = 0;
 	while (offs < 0x0400 && (spriteram3[offs] & 0x8000) == 0)
 	{
 		int attr_start = 4 * (spriteram3[offs] & 0x03ff);
 
-		/* is the way I handle priority correct? Or should I just check bit 13? */
-		if ((spriteram3[attr_start + 2] & 0x3000) == priority)
+		/* is the way I handle pri correct? Or should I just check bit 13? */
+		if ((spriteram3[attr_start + 2] & 0x3000) == pri)
 		{
-			int map_start;
-			int ox, oy, x, y, xsize, ysize, zoomx, zoomy, flipx, flipy, color;
+			int x, y;
 
-			ox = spriteram3[attr_start + 1] & 0x01ff;
-			xsize = (spriteram3[attr_start + 1] & 0x0e00) >> 9;
-			zoomx = (spriteram3[attr_start + 1] & 0xf000) >> 12;
-			oy = spriteram3[attr_start + 0] & 0x01ff;
-			ysize = (spriteram3[attr_start + 0] & 0x0e00) >> 9;
-			zoomy = (spriteram3[attr_start + 0] & 0xf000) >> 12;
-			flipx = spriteram3[attr_start + 2] & 0x4000;
-			flipy = spriteram3[attr_start + 2] & 0x8000;
-			color = (spriteram3[attr_start + 2] & 0x0f00) >> 8;
-			map_start = spriteram3[attr_start + 3] & 0x3fff;
+			get_sprite_attributes(&spriteram3[attr_start]);
 
-			ox += (xsize * zoomx + 2) / 4;
-			oy += (ysize * zoomy + 2) / 4;
+			curr_sprite.color &=0xf;
+			curr_sprite.map &= 0x3fff;
+			curr_sprite.ox += (curr_sprite.xsize * curr_sprite.zoomx + 2) / 4;
+			curr_sprite.oy += (curr_sprite.ysize * curr_sprite.zoomy + 2) / 4;
 
-			zoomx = 32 - zoomx;
-			zoomy = 32 - zoomy;
+			curr_sprite.zoomx = 32 - curr_sprite.zoomx;
+			curr_sprite.zoomy = 32 - curr_sprite.zoomy;
 
-			for (y = 0; y <= ysize; y++)
+			for (y = 0; y <= curr_sprite.ysize; y++)
 			{
 				int sx, sy;
 
-				if (flipy)
-					sy = ((oy + zoomy * (ysize - y)/2 + 16) & 0x1ff) - 16;
+				if (curr_sprite.flipy)
+					sy = ((curr_sprite.oy + curr_sprite.zoomy * (curr_sprite.ysize - y)/2 + 16) & 0x1ff) - 16;
 				else
-					sy = ((oy + zoomy * y / 2 + 16) & 0x1ff) - 16;
+					sy = ((curr_sprite.oy + curr_sprite.zoomy * y / 2 + 16) & 0x1ff) - 16;
 
-				for (x = 0; x <= xsize; x++)
+				for (x = 0; x <= curr_sprite.xsize; x++)
 				{
 					int code;
 
-					if (flipx)
-						sx = ((ox + zoomx * (xsize - x) / 2 + 16) & 0x1ff) - 16;
+					if (curr_sprite.flipx)
+						sx = ((curr_sprite.ox + curr_sprite.zoomx * (curr_sprite.xsize - x) / 2 + 16) & 0x1ff) - 16;
 					else
-						sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
+						sx = ((curr_sprite.ox + curr_sprite.zoomx * x / 2 + 16) & 0x1ff) - 16;
 
-					if (map_start < 0x2000)
-						code = spriteram1[map_start & 0x1fff] & 0x1fff;
+					if (curr_sprite.map < 0x2000)
+						code = spriteram1[curr_sprite.map & 0x1fff] & 0x1fff;
 					else
-						code = spriteram2[map_start & 0x1fff] & 0x1fff;
+						code = spriteram2[curr_sprite.map & 0x1fff] & 0x1fff;
 
-					drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[2 + (map_start >= 0x2000 ? 1 : 0)],
+					drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[2 + (curr_sprite.map >= 0x2000 ? 1 : 0)],
 							code,
-							color,
-							flipx,flipy,
+							curr_sprite.color,
+							curr_sprite.flipx,curr_sprite.flipy,
 							sx,sy,
-							zoomx << 11, zoomy << 11,15);
-					map_start++;
+							curr_sprite.zoomx << 11, curr_sprite.zoomy << 11,15);
+					curr_sprite.map++;
 				}
 			}
 		}
@@ -490,63 +442,56 @@ void vsystem_spr_device::f1gp2_draw_sprites(UINT16* spritelist, UINT16* sprcgram
 	while (offs < 0x0400 && (spritelist[offs] & 0x4000) == 0)
 	{
 		int attr_start;
-		int map_start;
-		int ox, oy, x, y, xsize, ysize, zoomx, zoomy, flipx, flipy, color;
+		int x, y;
 
 		attr_start = 4 * (spritelist[offs++] & 0x01ff);
 
-		ox = spritelist[attr_start + 1] & 0x01ff;
-		xsize = (spritelist[attr_start + 1] & 0x0e00) >> 9;
-		zoomx = (spritelist[attr_start + 1] & 0xf000) >> 12;
-		oy = spritelist[attr_start + 0] & 0x01ff;
-		ysize = (spritelist[attr_start + 0] & 0x0e00) >> 9;
-		zoomy = (spritelist[attr_start + 0] & 0xf000) >> 12;
-		flipx = spritelist[attr_start + 2] & 0x4000;
-		flipy = spritelist[attr_start + 2] & 0x8000;
-		color = (spritelist[attr_start + 2] & 0x1f00) >> 8;
-		map_start = spritelist[attr_start + 3] & 0x7fff;
+		get_sprite_attributes(&spritelist[attr_start]);
+
+		curr_sprite.color &= 0x1f;
+		curr_sprite.map &= 0x7fff;
 
 // aerofgt has the following adjustment, but doing it here would break the title screen
-//      ox += (xsize*zoomx+2)/4;
-//      oy += (ysize*zoomy+2)/4;
+//      curr_sprite.ox += (curr_sprite.xsize*curr_sprite.zoomx+2)/4;
+//      curr_sprite.oy += (curr_sprite.ysize*curr_sprite.zoomy+2)/4;
 
-		zoomx = 32 - zoomx;
-		zoomy = 32 - zoomy;
+		curr_sprite.zoomx = 32 - curr_sprite.zoomx;
+		curr_sprite.zoomy = 32 - curr_sprite.zoomy;
 
 		if (spritelist[attr_start + 2] & 0x20ff)
-			color = machine.rand();
+			curr_sprite.color = machine.rand();
 
-		for (y = 0; y <= ysize; y++)
+		for (y = 0; y <= curr_sprite.ysize; y++)
 		{
 			int sx,sy;
 
-			if (flipy) sy = ((oy + zoomy * (ysize - y)/2 + 16) & 0x1ff) - 16;
-			else sy = ((oy + zoomy * y / 2 + 16) & 0x1ff) - 16;
+			if (curr_sprite.flipy) sy = ((curr_sprite.oy + curr_sprite.zoomy * (curr_sprite.ysize - y)/2 + 16) & 0x1ff) - 16;
+			else sy = ((curr_sprite.oy + curr_sprite.zoomy * y / 2 + 16) & 0x1ff) - 16;
 
-			for (x = 0; x <= xsize; x++)
+			for (x = 0; x <= curr_sprite.xsize; x++)
 			{
 				int code;
 
-				if (flipx) sx = ((ox + zoomx * (xsize - x) / 2 + 16) & 0x1ff) - 16;
-				else sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
+				if (curr_sprite.flipx) sx = ((curr_sprite.ox + curr_sprite.zoomx * (curr_sprite.xsize - x) / 2 + 16) & 0x1ff) - 16;
+				else sx = ((curr_sprite.ox + curr_sprite.zoomx * x / 2 + 16) & 0x1ff) - 16;
 
-				code = sprcgram[map_start & 0x3fff];
-				map_start++;
+				code = sprcgram[curr_sprite.map & 0x3fff];
+				curr_sprite.map++;
 
 				if (flipscreen)
 					drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1],
 							code,
-							color,
-							!flipx,!flipy,
+							curr_sprite.color,
+							!curr_sprite.flipx,!curr_sprite.flipy,
 							304-sx,208-sy,
-							zoomx << 11,zoomy << 11,15);
+							curr_sprite.zoomx << 11,curr_sprite.zoomy << 11,15);
 				else
 					drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1],
 							code,
-							color,
-							flipx,flipy,
+							curr_sprite.color,
+							curr_sprite.flipx,curr_sprite.flipy,
 							sx,sy,
-							zoomx << 11,zoomy << 11,15);
+							curr_sprite.zoomx << 11,curr_sprite.zoomy << 11,15);
 			}
 		}
 	}
@@ -566,38 +511,22 @@ void vsystem_spr_device::f1gp2_draw_sprites(UINT16* spritelist, UINT16* sprcgram
 - Scaling (x/y)
 - Flipping
 - Indipendent sorting list
-- 1 bit of priority for the mixer
+- 1 bit of pri for the mixer
 
 Note that this chip can be connected to a VS9210 which adds a level of indirection for
-tile numbers. Basically, the VS9210 indirects the tile number through a table in its attached
+tile numbers. Basically, the VS9210 indirects the tilet number through a table in its attached
 memory, before accessing the ROMs.
 
 
     Sorting list format (VideoRAM offset 0)
     ---------------------------------------
 
-?e-- ---f ssss ssss
+de-- ---f ssss ssss
 
 e=end of list
 f=sprite present in this position
 s=sprite index
-?=used together with 'e' almost always
-
-
-    Sprite format (VideoRAM offset 0x400)
-    -------------------------------------
-
-0: nnnn jjjy yyyy yyyy
-1: mmmm iiix xxxx xxxx
-2: fFpc cccc ---- ---t
-3: tttt tttt tttt tttt
-
-t=tile, x=posx, y=posy, i=blockx, j=blocky
-c=color, m=zoomx, n=zoomy, p=priority
-
-The zoom (scaling) is probably non-linear, it would require a hand-made table unless we find the correct
-formula. I'd probably try 1/x. I'm almost sure that it scales between full size (value=0) and half size
-(value=0xF) but I couldn't get much more than that from a soccer game.
+d=disable sprite?
 
 
 TODO:
@@ -612,81 +541,71 @@ Abstracts the VS9210
 
 void vsystem_spr_device::CG10103_draw_sprite(running_machine &machine, bitmap_ind16& screen, const rectangle &cliprect, UINT16* spr, int drawpri)
 {
-	int ypos = spr[0] & 0x1FF;
-	int xpos = (spr[1] & 0x1FF);
-	UINT32 tile = (spr[3] & 0xFFFF) | ((spr[2] & 1) << 16);
-	int ynum = (spr[0] >> 9) & 0x7;
-	int xnum = (spr[1] >> 9) & 0x7;
-	int color = (spr[2] >> 8) & 0x1F;
-	int flipx = (spr[2] >> 14) & 1;
-	int flipy = (spr[2] >> 15) & 1;
-	int yzoom = (spr[0] >> 12) & 0xF;
-	int xzoom = (spr[1] >> 12) & 0xF;
-	int pri = (spr[2] >> 13) & 1;
+	get_sprite_attributes(&spr[0]);
+	curr_sprite.color &=0x1f;
+	curr_sprite.pri >>= 1;
+
 	int x, y;
 	int xstep, ystep;
 	int xfact, yfact;
 
+
 	// Check if we want to draw this sprite now
-	if (pri != drawpri)
+	if (curr_sprite.pri != drawpri)
 		return;
 
 	// Convert in fixed point to handle the scaling
-	xpos <<= 16;
-	ypos <<= 16;
+	curr_sprite.ox <<= 16;
+	curr_sprite.oy <<= 16;
 
-	xnum++;
-	ynum++;
+	curr_sprite.xsize++;
+	curr_sprite.ysize++;
 	xstep = ystep = 16;
 
 	// Linear scale, surely wrong
-	xfact = 0x10000 - ((0x8000 * xzoom) / 15);
-	yfact = 0x10000 - ((0x8000 * yzoom) / 15);
+	xfact = 0x10000 - ((0x8000 * curr_sprite.zoomx) / 15);
+	yfact = 0x10000 - ((0x8000 * curr_sprite.zoomy) / 15);
 
 	xstep *= xfact;
 	ystep *= yfact;
 
 	// Handle flipping
-	if (flipy)
+	if (curr_sprite.flipy)
 	{
-		ypos += (ynum-1) * ystep;
+		curr_sprite.oy += (curr_sprite.ysize-1) * ystep;
 		ystep = -ystep;
 	}
 
-	if (flipx)
+	if (curr_sprite.flipx)
 	{
-		xpos += (xnum-1) * xstep;
+		curr_sprite.ox += (curr_sprite.xsize-1) * xstep;
 		xstep = -xstep;
 	}
 
-	// @@@ Add here optional connection to the VS9210 for extra level of tile number indirection
-#if 0
-	if (m_CG10103_cur_chip->connected_vs9210)
-	{
-		// ...
-	}
-#endif
-
 	// Draw the block
-	for (y=0;y<ynum;y++)
+	for (y=0;y<curr_sprite.ysize;y++)
 	{
-		int xp = xpos;
+		int xp = curr_sprite.ox;
 
-		for (x=0;x<xnum;x++)
+		for (x=0;x<curr_sprite.xsize;x++)
 		{
 			// Hack to handle horizontal wrapping
-			drawgfxzoom_transpen(screen, cliprect, machine.gfx[m_CG10103_cur_chip->gfx_region], tile, color+m_CG10103_cur_chip->pal_base, flipx, flipy, xp>>16, ypos>>16, xfact, yfact, m_CG10103_cur_chip->transpen);
-			drawgfxzoom_transpen(screen, cliprect, machine.gfx[m_CG10103_cur_chip->gfx_region], tile, color+m_CG10103_cur_chip->pal_base, flipx, flipy, (xp>>16) - 0x200, ypos>>16, xfact, yfact, m_CG10103_cur_chip->transpen);
+			drawgfxzoom_transpen(screen, cliprect, machine.gfx[m_CG10103_cur_chip->gfx_region], curr_sprite.map, curr_sprite.color+m_CG10103_cur_chip->pal_base, curr_sprite.flipx, curr_sprite.flipy, xp>>16, curr_sprite.oy>>16, xfact, yfact, m_CG10103_cur_chip->transpen);
+			drawgfxzoom_transpen(screen, cliprect, machine.gfx[m_CG10103_cur_chip->gfx_region], curr_sprite.map, curr_sprite.color+m_CG10103_cur_chip->pal_base, curr_sprite.flipx, curr_sprite.flipy, (xp>>16) - 0x200, curr_sprite.oy>>16, xfact, yfact, m_CG10103_cur_chip->transpen);
+
+			drawgfxzoom_transpen(screen, cliprect, machine.gfx[m_CG10103_cur_chip->gfx_region], curr_sprite.map, curr_sprite.color+m_CG10103_cur_chip->pal_base, curr_sprite.flipx, curr_sprite.flipy, xp>>16, (curr_sprite.oy>>16)-0x200, xfact, yfact, m_CG10103_cur_chip->transpen);
+			drawgfxzoom_transpen(screen, cliprect, machine.gfx[m_CG10103_cur_chip->gfx_region], curr_sprite.map, curr_sprite.color+m_CG10103_cur_chip->pal_base, curr_sprite.flipx, curr_sprite.flipy, (xp>>16) - 0x200, (curr_sprite.oy>>16)-0x200, xfact, yfact, m_CG10103_cur_chip->transpen);
+
 			xp += xstep;
-			tile++;
+			curr_sprite.map++;
 		}
 
-		ypos += ystep;
+		curr_sprite.oy += ystep;
 	}
 }
 
 
-void vsystem_spr_device::CG10103_draw(running_machine &machine, int numchip, bitmap_ind16& screen, const rectangle &cliprect, int priority)
+void vsystem_spr_device::CG10103_draw(running_machine &machine, int numchip, bitmap_ind16& screen, const rectangle &cliprect, int pri)
 {
 	UINT16* splist;
 	int i;
@@ -704,14 +623,13 @@ void vsystem_spr_device::CG10103_draw(running_machine &machine, int numchip, bit
 		if (cmd & 0x4000)
 			break;
 
-		// Normal sprite here
-		if (cmd & 0x100)
+		if (!(cmd & 0x8000))
 		{
 			// Extract sprite index
-			int num = cmd & 0xFF;
+			int num = cmd & 0x3FF;
 
 			// Draw the sprite
-			CG10103_draw_sprite(machine, screen, cliprect, m_CG10103_cur_chip->vram + 0x400 + num*4, priority);
+			CG10103_draw_sprite(machine, screen, cliprect, m_CG10103_cur_chip->vram + num*4, pri);
 		}
 	}
 }

@@ -21,8 +21,26 @@ public:
 	tCG10103 m_CG10103;
 	tCG10103* m_CG10103_cur_chip;
 
+	struct vsystem_sprite_attributes
+	{
+		int ox;
+		int xsize;
+		int zoomx;
+		int oy;
+		int ysize;
+		int zoomy;
+		int flipx;
+		int flipy;
+		int color;
+		int pri;
+		UINT32 map;
+	} curr_sprite;
+
+	void get_sprite_attributes(UINT16* ram);
+
 	void draw_sprites_inufuku(  UINT16* spriteram, int spriteram_bytes, UINT16* spriteram2, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites_suprslam( UINT16* spriteram, int spriteram_bytes, UINT16* spriteram2, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprite_taotaido( UINT16* spriteram, int spriteram_bytes, UINT16* spriteram2, UINT16* spriteram3, running_machine &machine, UINT16 spriteno, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites_taotaido( UINT16* spriteram, int spriteram_bytes, UINT16* spriteram2, UINT16* spriteram3, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites_crshrace( UINT16* spriteram, int spriteram_bytes, UINT16* spriteram2, running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int flipscreen);
 	void draw_sprites_aerofght( UINT16* spriteram3, int spriteram_bytes, UINT16* spriteram1, UINT16* spriteram2, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );

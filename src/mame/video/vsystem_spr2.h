@@ -6,6 +6,24 @@ class vsystem_spr2_device : public device_t
 public:
 	vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
+	struct vsystem_sprite_attributes
+	{
+		int ox;
+		int xsize;
+		int zoomx;
+		int oy;
+		int ysize;
+		int zoomy;
+		int flipx;
+		int flipy;
+		int color;
+		int pri;
+		UINT32 map;
+	} curr_sprite;
+
+	int get_sprite_attributes(UINT16* ram);
+
+
 	template<class _BitmapClass>
 	void turbofrc_draw_sprites_common( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, UINT16* spriteram2, int spriteram2_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri );
 	
