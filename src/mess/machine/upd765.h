@@ -292,6 +292,7 @@ protected:
 	UINT8 dor, dsr, msr, fifo[16], command[16], result[16];
 	UINT8 st0, st1, st2, st3;
 	UINT8 fifocfg, dor_reset;
+	UINT8 precomp, perpmode;
 	UINT16 spec;
 	int sector_size;
 	int cur_rate;
@@ -303,6 +304,7 @@ protected:
 
 	enum {
 		C_CONFIGURE,
+		C_DUMP_REG,
 		C_FORMAT_TRACK,
 		C_LOCK,
 		C_PERPENDICULAR,

@@ -971,6 +971,9 @@ int upd765_family_device::check_command()
 	case 0x0d:
 		return command_pos == 6 ? C_FORMAT_TRACK       : C_INCOMPLETE;
 
+	case 0x0e:
+		return command_pos == 2 ? C_DUMP_REG           : C_INCOMPLETE;
+
 	case 0x0f:
 		return command_pos == 3 ? C_SEEK               : C_INCOMPLETE;
 
@@ -1001,7 +1004,24 @@ void upd765_family_device::start_command(int cmd)
 				 command[1], command[2], command[3]);
 		// byte 1 is ignored, byte 3 is precompensation-related
 		fifocfg = command[2];
+		precomp = command[3];
 		main_phase = PHASE_CMD;
+		break;
+
+	case C_DUMP_REG:
+		main_phase = PHASE_RESULT;
+		result[0] = flopi[0].pcn;
+		result[1] = flopi[1].pcn;
+		result[2] = flopi[2].pcn;
+		result[3] = flopi[3].pcn;
+		result[4] = (spec & 0xff00) >> 8;
+		result[5] = (spec & 0x00ff);
+		result[6] = sector_size;
+		result[7] = locked ? 0x80 : 0x00;
+		result[7] |= (perpmode & 0x30);
+		result[8] = fifocfg;
+		result[9] = precomp;
+		result_pos = 10;
 		break;
 
 	case C_FORMAT_TRACK:
@@ -1018,6 +1038,7 @@ void upd765_family_device::start_command(int cmd)
 
 	case C_PERPENDICULAR:
 		logerror("%s: command perpendicular\n", tag());
+		perpmode = command[1];
 		main_phase = PHASE_CMD;
 		break;
 
