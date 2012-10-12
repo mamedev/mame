@@ -5118,7 +5118,7 @@
 		</part>
 	</software>
 
-	<software name="exodus">
+	<software name="exodus" supported="no">
 		<description>Exodus - Journey to the Promised Land (USA)</description>
 		<year>1992</year>
 		<publisher>Wisdom Tree</publisher>
@@ -5143,7 +5143,7 @@
 		</part>
 	</software>
 
-	<software name="f1race">
+	<software name="f1race" supported="partial">
 		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>F-1 Race (World, Rev. A)</description>
 		<year>1990</year>
@@ -5160,7 +5160,7 @@
 		</part>
 	</software>
 
-	<software name="f1racea" cloneof="f1race">
+	<software name="f1racea" cloneof="f1race" supported="partial">
 		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>F-1 Race (World)</description>
 		<year>1990</year>
@@ -5220,7 +5220,7 @@
 		</part>
 	</software>
 
-	<software name="f1polepo">
+	<software name="f1polepo" supported="partial">
 		<description>F1 Pole Position (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Ubi Soft</publisher>
@@ -12470,7 +12470,7 @@
 		</part>
 	</software>
 
-	<software name="f1herogb">
+	<software name="f1herogb" supported="partial">
 		<description>Nakajima Satoru F-1 Hero GB - World Championship '91 (Jpn)</description>
 		<year>1991</year>
 		<publisher>Varie</publisher>
@@ -12485,7 +12485,7 @@
 		</part>
 	</software>
 
-	<software name="f1hero92" cloneof="f1polepo">
+	<software name="f1hero92" cloneof="f1polepo" supported="partial">
 		<description>Nakajima Satoru Kanshuu F-1 Hero GB '92 - The Graded Driver (Jpn)</description>
 		<year>1992</year>
 		<publisher>Varie</publisher>

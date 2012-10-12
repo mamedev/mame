@@ -28393,7 +28393,7 @@
 		</part>
 	</software>
 
-	<software name="sabrina">
+	<software name="sabrina" supported="no">
 		<description>Sabrina - The Teenage Witch - Potion Commotion (Euro)</description>
 		<year>2002</year>
 		<publisher>Ubi Soft</publisher>
@@ -28404,7 +28404,7 @@
 		</part>
 	</software>
 
-	<software name="sabrinau" cloneof="sabrina">
+	<software name="sabrinau" cloneof="sabrina" supported="no">
 		<description>Sabrina - The Teenage Witch - Potion Commotion (USA)</description>
 		<year>2002</year>
 		<publisher>Ubi Soft</publisher>
@@ -28776,7 +28776,7 @@
 		</part>
 	</software>
 
-	<software name="scoobymm">
+	<software name="scoobymm" supported="partial">
 		<description>Scooby-Doo! - Mystery Mayhem (Euro)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
@@ -28789,7 +28789,7 @@
 		</part>
 	</software>
 
-	<software name="scoobymmu" cloneof="scoobymm">
+	<software name="scoobymmu" cloneof="scoobymm" supported="partial">
 		<description>Scooby-Doo! - Mystery Mayhem (USA)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
@@ -28802,7 +28802,7 @@
 		</part>
 	</software>
 
-	<software name="scoobyum">
+	<software name="scoobyum" supported="partial">
 		<description>Scooby-Doo! - Unmasked (Euro, English / French)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
@@ -28813,7 +28813,7 @@
 		</part>
 	</software>
 
-	<software name="scoobyuma" cloneof="scoobyum">
+	<software name="scoobyuma" cloneof="scoobyum" supported="partial">
 		<description>Scooby-Doo! - Unmasked (Euro, Italian / Spanish)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
@@ -28824,7 +28824,7 @@
 		</part>
 	</software>
 
-	<software name="scoobyumu" cloneof="scoobyum">
+	<software name="scoobyumu" cloneof="scoobyum" supported="partial">
 		<description>Scooby-Doo! - Unmasked (USA)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
@@ -28907,7 +28907,7 @@
 		</part>
 	</software>
 
-	<software name="screwbrk" cloneof="drilldoz">
+	<software name="screwbrk" cloneof="drilldoz" supported="partial">
 		<description>Screw Breaker - Goushin DoriRureRo (Jpn)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
@@ -29481,7 +29481,7 @@
 		</part>
 	</software>
 
-	<software name="sboktai">
+	<software name="sboktai" supported="partial">
 		<description>Shin Bokura no Taiyou - Gyakushuu no Sabata (Jpn)</description>
 		<year>2005</year>
 		<publisher>Konami</publisher>
@@ -30623,6 +30623,18 @@
 		</part>
 	</software>
 
+	<software name="sonicup" cloneof="sonic" supported="partial">
+		<description>Sonic Advance (USA, Prototype)</description>
+		<year>2002</year>
+		<publisher>Infogrames</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-FLASH" />
+			<dataarea name="rom" size="8388608">
+				<rom name="sonicadvance_asoe00_prototype.bin" size="8388608" crc="a80de3b2" sha1="aae6516f72309920acd9fafd03a9d09e35cf755f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sonic2" supported="partial">
 		<description>Sonic Advance 2 (Euro)</description>
 		<year>2003</year>
@@ -30660,6 +30672,18 @@
 			<feature name="pcb_type" value="GBA-FLASH-512" />
 			<dataarea name="rom" size="16777216">
 				<rom name="sonic advance 2 (usa) (en,ja,fr,de,es,it).bin" size="16777216" crc="7efee7f7" sha1="7bcd6a07af7c894746fa28073fe0c0e34408022d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonic2up" cloneof="sonic2" supported="partial">
+		<description>Sonic Advance 2 (USA, Prototype)</description>
+		<year>2003</year>
+		<publisher>THQ</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-FLASH-512" />
+			<dataarea name="rom" size="33554432">
+				<rom name="sonic advance 2 (usa) (en,ja,fr,de,es,it).bin" size="33554432" crc="6d7567ed" sha1="2f9f54dae081f2155aab3753c779a9631f0af433" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -32286,7 +32310,7 @@
 		</part>
 	</software>
 
-	<software name="sblkbassj" cloneof="sblkbass">
+	<software name="sblkbassj" cloneof="sblkbass" supported="no">
 		<description>Super Black Bass Advance (Jpn)</description>
 		<year>2001</year>
 		<publisher>Starfish</publisher>
