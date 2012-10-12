@@ -670,7 +670,7 @@ static const cassette_interface spectrum_cassette_interface =
 	tzx_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL,
+	"spectrum_cass",
 	NULL
 };
 
@@ -738,6 +738,7 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 	MCFG_SNAPSHOT_ADD("snapshot", spectrum, "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", 0)
 	MCFG_QUICKLOAD_ADD("quickload", spectrum, "raw,scr", 2) // The delay prevents the screen from being cleared by the RAM test at boot
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, spectrum_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","spectrum_cass")
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

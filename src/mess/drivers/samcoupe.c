@@ -295,10 +295,10 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_lpt2_strobe_w)
 ***************************************************************************/
 
 static ADDRESS_MAP_START( samcoupe_mem, AS_PROGRAM, 8, samcoupe_state )
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_READWRITE(sam_bank1_r, sam_bank1_w) // AM_RAMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_READWRITE(sam_bank2_r, sam_bank2_w) // AM_RAMBANK("bank2")
+	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_READWRITE(sam_bank3_r, sam_bank3_w) // AM_RAMBANK("bank3")
+	AM_RANGE(0xc000, 0xffff) AM_RAM AM_READWRITE(sam_bank4_r, sam_bank4_w) // AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( samcoupe_io, AS_IO, 8, samcoupe_state )
@@ -505,7 +505,7 @@ static const cassette_interface samcoupe_cassette_interface =
 	tzx_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL,
+	"samcoupe_cass",
 	NULL
 };
 
@@ -544,9 +544,12 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	MCFG_CENTRONICS_PRINTER_ADD("lpt2", standard_centronics)
 	MCFG_MSM6242_ADD("sambus_clock", samcoupe_rtc_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, samcoupe_cassette_interface)
+	MCFG_SOFTWARE_LIST_ADD("cass_list","samcoupe_cass")
+
 	MCFG_WD1772x_ADD("wd1772", SAMCOUPE_XTAL_X1/3)
 	MCFG_FLOPPY_DRIVE_ADD("fd0", samcoupe_floppies, "35dd", 0, samcoupe_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", samcoupe_floppies, "35dd", 0, samcoupe_floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","samcoupe_flop")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

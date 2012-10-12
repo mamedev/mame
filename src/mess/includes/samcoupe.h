@@ -35,7 +35,17 @@ class samcoupe_state :  public driver_device
 {
 public:
 	samcoupe_state(const machine_config &mconfig, device_type type, const char *tag)
-			: driver_device(mconfig, type, tag) { }
+			: driver_device(mconfig, type, tag)
+	{
+		sam_bank_read_ptr[0] = NULL;
+		sam_bank_write_ptr[0] = NULL;
+		sam_bank_read_ptr[1] = NULL;
+		sam_bank_write_ptr[1] = NULL;
+		sam_bank_read_ptr[2] = NULL;
+		sam_bank_write_ptr[2] = NULL;
+		sam_bank_read_ptr[3] = NULL;
+		sam_bank_write_ptr[3] = NULL;	
+	}
 
 	virtual void video_start();
 
@@ -92,6 +102,19 @@ public:
 	DECLARE_WRITE8_MEMBER(samcoupe_lpt2_strobe_w);
 	DECLARE_READ8_MEMBER(samcoupe_rtc_r);
 	DECLARE_WRITE8_MEMBER(samcoupe_rtc_w);
+
+	DECLARE_READ8_MEMBER(sam_bank1_r);
+	DECLARE_WRITE8_MEMBER(sam_bank1_w);
+	DECLARE_READ8_MEMBER(sam_bank2_r);
+	DECLARE_WRITE8_MEMBER(sam_bank2_w);
+	DECLARE_READ8_MEMBER(sam_bank3_r);
+	DECLARE_WRITE8_MEMBER(sam_bank3_w);
+	DECLARE_READ8_MEMBER(sam_bank4_r);
+	DECLARE_WRITE8_MEMBER(sam_bank4_w);
+
+	UINT8* sam_bank_read_ptr[4];
+	UINT8* sam_bank_write_ptr[4];
+
 };
 
 

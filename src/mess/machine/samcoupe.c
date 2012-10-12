@@ -22,11 +22,79 @@
     MEMORY BANKING
 ***************************************************************************/
 
+READ8_MEMBER(samcoupe_state::sam_bank1_r)
+{
+	if (sam_bank_read_ptr[0])
+		return sam_bank_read_ptr[0][offset];
+
+	return 0xff;
+}
+
+WRITE8_MEMBER(samcoupe_state::sam_bank1_w)
+{
+	if (sam_bank_write_ptr[0])
+		sam_bank_write_ptr[0][offset] = data;
+}
+
+
+READ8_MEMBER(samcoupe_state::sam_bank2_r)
+{
+	if (sam_bank_read_ptr[1])
+		return sam_bank_read_ptr[1][offset];
+
+	return 0xff;
+}
+
+WRITE8_MEMBER(samcoupe_state::sam_bank2_w)
+{
+	if (sam_bank_write_ptr[1])
+		sam_bank_write_ptr[1][offset] = data;
+}
+
+
+READ8_MEMBER(samcoupe_state::sam_bank3_r)
+{
+	if (sam_bank_read_ptr[2])
+		return sam_bank_read_ptr[2][offset];
+
+	return 0xff;
+}
+
+WRITE8_MEMBER(samcoupe_state::sam_bank3_w)
+{
+	if (sam_bank_write_ptr[2])
+		sam_bank_write_ptr[2][offset] = data;
+}
+
+
+READ8_MEMBER(samcoupe_state::sam_bank4_r)
+{
+	if (sam_bank_read_ptr[3])
+		return sam_bank_read_ptr[3][offset];
+
+	return 0xff;
+}
+
+WRITE8_MEMBER(samcoupe_state::sam_bank4_w)
+{
+	if (sam_bank_write_ptr[3])
+		sam_bank_write_ptr[3][offset] = data;
+}
+
 static void samcoupe_update_bank(address_space &space, int bank_num, UINT8 *memory, int is_readonly)
 {
+	samcoupe_state *state = space.machine().driver_data<samcoupe_state>();
+
+	state->sam_bank_read_ptr[bank_num-1] = memory;
+	if (!is_readonly)
+		state->sam_bank_write_ptr[bank_num-1] = memory;
+	else
+		state->sam_bank_write_ptr[bank_num-1] = NULL;
+
+	// installing banks on the fly is too slow (20% speed in Manic Miner gameplay vs 300% speed)
+#if 0
 	char bank[10];
 	sprintf(bank,"bank%d",bank_num);
-	samcoupe_state *state = space.machine().driver_data<samcoupe_state>();
 	if (memory)
 	{
 		state->membank(bank)->set_base(memory);
@@ -39,6 +107,7 @@ static void samcoupe_update_bank(address_space &space, int bank_num, UINT8 *memo
 	} else {
 		space.nop_readwrite(((bank_num-1) * 0x4000), ((bank_num-1) * 0x4000) + 0x3FFF);
 	}
+#endif
 }
 
 
