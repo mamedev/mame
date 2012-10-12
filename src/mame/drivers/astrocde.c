@@ -123,6 +123,7 @@
 #include "sound/ay8910.h"
 
 #include "gorf.lh"
+#include "seawolf2.lh"
 #include "spacezap.lh"
 #include "tenpindx.lh"
 
@@ -1839,7 +1840,7 @@ DRIVER_INIT_MEMBER(astrocde_state,tenpindx)
  *************************************/
 
 /* 90002 CPU board + 90700 game board + 91312 "characterization card" */
-GAME( 1978, seawolf2, 0,    seawolf2, seawolf2, astrocde_state, seawolf2, ROT0,   "Dave Nutting Associates / Midway", "Seawolf II", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAMEL(1978, seawolf2, 0,    seawolf2, seawolf2, astrocde_state, seawolf2, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf II", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_seawolf2 )
 
 /* 91354 CPU board + 90700 game board + 91356 RAM board */
 GAME( 1980, ebases,   0,    ebases,   ebases, astrocde_state,   ebases,   ROT0,   "Dave Nutting Associates / Midway", "Extra Bases", GAME_SUPPORTS_SAVE )

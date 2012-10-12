@@ -1971,6 +1971,7 @@ $(DRIVERS)/aristmk4.o:	$(LAYOUT)/aristmk4.lh \
 			$(LAYOUT)/gldnpkr.lh \
 
 $(DRIVERS)/astrocde.o:	$(LAYOUT)/gorf.lh \
+			$(LAYOUT)/seawolf2.lh \
 			$(LAYOUT)/spacezap.lh \
 			$(LAYOUT)/tenpindx.lh
 
@@ -2143,6 +2144,7 @@ $(DRIVERS)/mw8080bw.o:	$(LAYOUT)/280zzzap.lh \
 			$(LAYOUT)/invaders.lh \
 			$(LAYOUT)/invad2ct.lh \
 			$(LAYOUT)/lagunar.lh \
+			$(LAYOUT)/seawolf.lh \
 			$(LAYOUT)/spacwalk.lh \
 			$(LAYOUT)/spcenctr.lh
 
