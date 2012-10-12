@@ -863,7 +863,7 @@ static CPU_EXECUTE( superfx )
 			case 0x04: // ROL
 			{
 				UINT16 carry = *(cpustate->sreg) & 0x8000;
-				superfx_gpr_write(cpustate, cpustate->dreg_idx, (*(cpustate->sreg) << 1) | (SUPERFX_SFR_CY_SET ? 1 : 0));
+				superfx_gpr_write(cpustate, cpustate->dreg_idx, (*(cpustate->sreg) << 1) | SUPERFX_SFR_CY_SET);
 				cpustate->sfr &= ~SUPERFX_SFR_CY;
 				cpustate->sfr |= carry ? SUPERFX_SFR_CY : 0;
 				superfx_dreg_sfr_sz_update(cpustate);
@@ -1103,7 +1103,7 @@ static CPU_EXECUTE( superfx )
 						cpustate->sfr |= (~(*(cpustate->sreg) ^ cpustate->r[op & 0xf]) & (cpustate->r[op & 0xf] ^ r) & 0x8000) ? SUPERFX_SFR_OV : 0;
 						break;
 					case SUPERFX_SFR_ALT1: // ADC
-						r += cpustate->r[op & 0xf] + ((cpustate->sfr & SUPERFX_SFR_CY) ? 1 : 0);
+						r += cpustate->r[op & 0xf] + SUPERFX_SFR_CY_SET;
 						cpustate->sfr |= (~(*(cpustate->sreg) ^ cpustate->r[op & 0xf]) & (cpustate->r[op & 0xf] ^ r) & 0x8000) ? SUPERFX_SFR_OV : 0;
 						break;
 					case SUPERFX_SFR_ALT2: // ADDI
@@ -1111,7 +1111,7 @@ static CPU_EXECUTE( superfx )
 						cpustate->sfr |= (~(*(cpustate->sreg) ^ (op & 0xf)) & ((op & 0xf) ^ r) & 0x8000) ? SUPERFX_SFR_OV : 0;
 						break;
 					case SUPERFX_SFR_ALT3: // ADCI
-						r += (op & 0xf) + ((cpustate->sfr & SUPERFX_SFR_CY) ? 1 : 0);
+						r += (op & 0xf) + SUPERFX_SFR_CY_SET;
 						cpustate->sfr |= (~(*(cpustate->sreg) ^ (op & 0xf)) & ((op & 0xf) ^ r) & 0x8000) ? SUPERFX_SFR_OV : 0;
 						break;
 				}
@@ -1137,7 +1137,7 @@ static CPU_EXECUTE( superfx )
 						superfx_gpr_write(cpustate, cpustate->dreg_idx, r);
 						break;
 					case SUPERFX_SFR_ALT1: // SBC
-						r = *(cpustate->sreg) - cpustate->r[op & 0xf] - ((cpustate->sfr & SUPERFX_SFR_CY) ? 0 : 1);
+						r = *(cpustate->sreg) - cpustate->r[op & 0xf] - SUPERFX_SFR_CY_CLEAR;
 						cpustate->sfr |= ((*(cpustate->sreg) ^ cpustate->r[op & 0xf]) & (*(cpustate->sreg) ^ r) & 0x8000) ? SUPERFX_SFR_OV : 0;
 						superfx_gpr_write(cpustate, cpustate->dreg_idx, r);
 						break;

@@ -2525,11 +2525,11 @@ MACHINE_START_MEMBER(pc9801_state,pc9801)
 	m_rtc->oe_w(1);
 
 	upd765a_device *fdc;
-	fdc = machine().device<upd765a_device>("upd765_2hd");
+	fdc = machine().device<upd765a_device>(":upd765_2hd");
 	fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2hd_irq), this));
 	fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2hd_drq), this));
 
-	fdc = machine().device<upd765a_device>("upd765_2dd");
+	fdc = machine().device<upd765a_device>(":upd765_2dd");
 	fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2dd_irq), this));
 	fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2dd_drq), this));
 
@@ -2562,10 +2562,13 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
 	MACHINE_RESET_CALL_MEMBER(pc9801);
 
 	/* 2dd interface ready line is ON by default */
-	floppy_mon_w(floppy_get_device(machine(), 0), CLEAR_LINE);
-	floppy_mon_w(floppy_get_device(machine(), 1), CLEAR_LINE);
-	floppy_drive_set_ready_state(floppy_get_device(machine(), 0), (1), 0);
-	floppy_drive_set_ready_state(floppy_get_device(machine(), 1), (1), 0);
+	floppy_image_device *floppy;
+	floppy = machine().device<floppy_connector>(":upd765_2hd:0")->get_device();
+	if (floppy)
+		floppy->mon_w(CLEAR_LINE);
+	floppy = machine().device<floppy_connector>(":upd765_2hd:1")->get_device();
+	if (floppy)
+		floppy->mon_w(CLEAR_LINE);
 
 	{
 		UINT8 op_mode;
