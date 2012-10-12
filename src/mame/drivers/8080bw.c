@@ -3893,15 +3893,15 @@ GAMEL(1978, sitv,       invaders, invaders,  sitv,      driver_device, 0, ROT270
 GAME( 1979, sicv,       invaders, invadpt2,  sicv,      driver_device, 0, ROT270, "Taito", "Space Invaders (CV Version)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1978, sisv,       invaders, invadpt2,  sicv,      driver_device, 0, ROT270, "Taito", "Space Invaders (SV Version)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1978, sisv2,      invaders, invadpt2,  sicv,      driver_device, 0, ROT270, "Taito", "Space Invaders (SV Version 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAMEL(1978, spcewars,   invaders, spcewars,  spcewars,  driver_device, 0, ROT270, "Taito (Sanritsu license?)", "Space War (Sanritsu)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_invaders ) // or bootleg?
-GAMEL(1978, spceking,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "Taito (Leijac Corporation license?)", "Space King", GAME_SUPPORTS_SAVE, layout_invaders ) // or bootleg?
-GAMEL(1979, cosmicmo,   invaders, invaders,  cosmicmo,  driver_device, 0, ROT270, "Taito (Universal license?)", "Cosmic Monsters", GAME_SUPPORTS_SAVE, layout_cosmicm ) // or bootleg?
-GAMEL(1979, cosmicm2,   invaders, invaders,  cosmicmo,  driver_device, 0, ROT270, "Taito (Universal license?)", "Cosmic Monsters 2", GAME_SUPPORTS_SAVE, layout_cosmicm ) // or bootleg?
-GAMEL(1980?,sinvzen,    invaders, invaders,  spaceatt,  driver_device, 0, ROT270, "Taito (Zenitone-Microsec Ltd. license?)", "Super Invaders (Zenitone-Microsec)", GAME_SUPPORTS_SAVE, layout_invaders ) // or bootleg?
+GAMEL(1978, invadrmr,   invaders, invaders,  invadrmr,  driver_device, 0, ROT270, "Model Racing", "Space Invaders (Model Racing)", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
+GAMEL(1978, invaderl,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "Logitec", "Space Invaders (Logitec)", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
+GAMEL(1978, spcewars,   invaders, spcewars,  spcewars,  driver_device, 0, ROT270, "Sanritsu", "Space War (Sanritsu)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
+GAMEL(1978, spceking,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "Leijac Corporation", "Space King", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
+GAMEL(1979, cosmicmo,   invaders, invaders,  cosmicmo,  driver_device, 0, ROT270, "Universal", "Cosmic Monsters", GAME_SUPPORTS_SAVE, layout_cosmicm ) // unclassified, licensed or bootleg?
+GAMEL(1979, cosmicm2,   invaders, invaders,  cosmicmo,  driver_device, 0, ROT270, "Universal", "Cosmic Monsters 2", GAME_SUPPORTS_SAVE, layout_cosmicm ) // unclassified, licensed or bootleg?
+GAMEL(1980?,sinvzen,    invaders, invaders,  spaceatt,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Super Invaders (Zenitone-Microsec)", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1978, spaceatt,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Video Games GmbH)", "Space Attack (bootleg of Space Invaders)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1980, spaceat2,   invaders, invaders,  spaceatt,  driver_device, 0, ROT270, "bootleg (Video Games UK)", "Space Attack II (bootleg of Super Invaders)", GAME_SUPPORTS_SAVE, layout_invaders ) // bootleg of Zenitone-Microsec Super Invaders
-GAMEL(1978, invadrmr,   invaders, invaders,  invadrmr,  driver_device, 0, ROT270, "bootleg? (Model Racing)", "Space Invaders (Model Racing)", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1978, invaderl,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg? (Logitec)", "Space Invaders (Logitec)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAME( 1978, spacerng,   invaders, invadpt2,  sitv,      driver_device, 0, ROT270, "bootleg (Leisure Time Electronics)", "Space Ranger (bootleg of Space Invaders)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // many modifications
 GAMEL(19??, invasion,   invaders, invaders,  invasion,  driver_device, 0, ROT270, "bootleg (Sidam)", "Invasion (Sidam)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, invasiona,  invaders, invaders,  invasion,  driver_device, 0, ROT270, "bootleg", "Invasion (bootleg set 1, normal graphics)", GAME_SUPPORTS_SAVE, layout_invaders ) // has Sidam replaced with 'Ufo Monster Attack' and standard GFX
