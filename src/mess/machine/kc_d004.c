@@ -366,7 +366,7 @@ WRITE8_MEMBER(kc_d004_device::fdd_select_w)
 
 WRITE8_MEMBER(kc_d004_device::hw_terminal_count_w)
 {
-	m_fdc->tc_w(false);
+	m_fdc->tc_w(true);
 
 	m_tc_clear_timer->adjust(attotime::from_nsec(200));
 }
