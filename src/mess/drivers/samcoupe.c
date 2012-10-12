@@ -65,7 +65,7 @@ READ8_MEMBER(samcoupe_state::samcoupe_disk_r)
 	wd1772_t *fdc = machine().device<wd1772_t>("wd1772");
 
 	/* drive and side is encoded into bit 5 and 3 */
-	floppy_connector *con = machine().device<floppy_connector>(BIT(offset, 4) ? "fd1" : "fd0");
+	floppy_connector *con = machine().device<floppy_connector>(BIT(offset, 4) ? "wd1772:1" : "wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : 0;
 
 	if(floppy)
@@ -89,7 +89,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
 	wd1772_t *fdc = machine().device<wd1772_t>("wd1772");
 
 	/* drive and side is encoded into bit 5 and 3 */
-	floppy_connector *con = machine().device<floppy_connector>(BIT(offset, 4) ? "fd1" : "fd0");
+	floppy_connector *con = machine().device<floppy_connector>(BIT(offset, 4) ? "wd1772:1" : "wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : 0;
 
 	if(floppy)
@@ -547,8 +547,8 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","samcoupe_cass")
 
 	MCFG_WD1772x_ADD("wd1772", SAMCOUPE_XTAL_X1/3)
-	MCFG_FLOPPY_DRIVE_ADD("fd0", samcoupe_floppies, "35dd", 0, samcoupe_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", samcoupe_floppies, "35dd", 0, samcoupe_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", samcoupe_floppies, "35dd", 0, samcoupe_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", samcoupe_floppies, "35dd", 0, samcoupe_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","samcoupe_flop")
 
 	/* sound hardware */

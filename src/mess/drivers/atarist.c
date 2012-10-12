@@ -2211,7 +2211,7 @@ void st_state::machine_start()
 	// register for state saving
 	state_save();
 
-	static const char *names[] = { "fd0", "fd1" };
+	static const char *names[] = { WD1772_TAG ":0", WD1772_TAG ":1" };
 	for(int i=0; i != 2; i++) {
 		floppy_connector *con = machine().device<floppy_connector>(names[i]);
 		if(con)
@@ -2350,8 +2350,8 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, mfp_intf)
 	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
 
-	MCFG_FLOPPY_DRIVE_ADD("fd0", atari_floppies, "35dd", 0, st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", atari_floppies, 0,      0, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
 
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 
@@ -2400,8 +2400,8 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, mfp_intf)
 	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
-	MCFG_FLOPPY_DRIVE_ADD("fd0", atari_floppies, "35dd", 0, st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", atari_floppies, 0,      0, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
 
@@ -2458,8 +2458,8 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, atariste_mfp_intf)
 	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
-	MCFG_FLOPPY_DRIVE_ADD("fd0", atari_floppies, "35dd", 0, st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", atari_floppies, 0,      0, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 
 	// cartridge
@@ -2526,8 +2526,8 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 	MCFG_MC68901_ADD(MC68901_TAG, U517/8, stbook_mfp_intf)
 	MCFG_WD1772x_ADD(WD1772_TAG, U517/2)
-	MCFG_FLOPPY_DRIVE_ADD("fd0", atari_floppies, "35dd", 0, st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", atari_floppies, 0,      0, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 
 	// cartridge

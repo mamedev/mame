@@ -495,7 +495,7 @@ static MACHINE_CONFIG_DERIVED(eps, vfx)
     MCFG_ESQ1x22_ADD("epsvfd")
 
     MCFG_WD1772x_ADD("wd1772", 8000000)
-	MCFG_FLOPPY_DRIVE_ADD("fd0", ensoniq_floppies, "35dd", 0, esq5505_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", 0, esq5505_state::floppy_formats)
 
 	MCFG_HD63450_ADD( "mc68450", dmac_interface )   // MC68450 compatible
 MACHINE_CONFIG_END
@@ -505,7 +505,7 @@ static MACHINE_CONFIG_DERIVED(vfxsd, vfx)
 	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
 
     MCFG_WD1772x_ADD("wd1772", 8000000)
-	MCFG_FLOPPY_DRIVE_ADD("fd0", ensoniq_floppies, "35dd", 0, esq5505_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", 0, esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( vfx )
@@ -606,7 +606,7 @@ DRIVER_INIT_MEMBER(esq5505_state,common)
     m_system_type = GENERIC;
     m_duart_io = 0;
 
-	floppy_connector *con = machine().device<floppy_connector>("fd0");
+	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : 0;
     if (floppy)
     {

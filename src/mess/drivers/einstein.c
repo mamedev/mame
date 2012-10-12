@@ -241,7 +241,7 @@ WRITE8_MEMBER(einstein_state::einstein_drsel_w)
 		logerror("%s: einstein_drsel_w %02x\n", machine().describe_context(), data);
 
 	/* bit 0 to 3 select the drive */
-	static const char *names[] = { "fd0", "fd1", "fd2", "fd3" };
+	static const char *names[] = { IC_I042 ":0", IC_I042 ":1", IC_I042 ":2", IC_I042 ":3" };
 	floppy_image_device *floppy = 0;
 	for(int i=0; i<4; i++) {
 		if(BIT(data, i)) {
@@ -803,10 +803,10 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 
 	MCFG_WD1770x_ADD(IC_I042, XTAL_X002)
 
-	MCFG_FLOPPY_DRIVE_ADD("fd0", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd2", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd3", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":1", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":2", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":3", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","einstein")

@@ -109,7 +109,7 @@ static void duart_output(device_t *device, UINT8 data)
 {
 	ht68k_state *state = device->machine().driver_data<ht68k_state>();
 
-	static const char *names[] = { "fd0", "fd1", "fd2", "fd3" };
+	static const char *names[] = { "wd1770:0", "wd1770:1", "wd1770:2", "wd1770:3" };
 	floppy_image_device *floppy = 0;
 	for(int i=0; i<4; i++) {
 		if(BIT(data, 7-i)==0) {
@@ -159,10 +159,10 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 
 	MCFG_WD1770x_ADD("wd1770", XTAL_8MHz )
 
-	MCFG_FLOPPY_DRIVE_ADD("fd0", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd2", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd3", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:2", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:3", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
 MACHINE_CONFIG_END
 
 /* ROM definition */
