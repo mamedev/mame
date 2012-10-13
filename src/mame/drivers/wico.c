@@ -34,15 +34,14 @@ ToDo:
 #include "wico.lh"
 
 
-class wico_state : public driver_device
+class wico_state : public genpin_class
 {
 public:
 	wico_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: genpin_class(mconfig, type, tag),
 	m_ccpu(*this, "ccpu"),
 	m_hcpu(*this, "hcpu"),
-	m_shared_ram(*this, "sharedram"),
-	m_samples(*this, "samples")
+	m_shared_ram(*this, "sharedram")
 	{ }
 
 	DECLARE_READ8_MEMBER(lampst_r);
@@ -62,7 +61,6 @@ protected:
 	required_device<cpu_device> m_ccpu;
 	required_device<cpu_device> m_hcpu;
 	required_shared_ptr<UINT8> m_shared_ram;
-	required_device<samples_device> m_samples;
 
 	// driver_device overrides
 	virtual void machine_reset();
@@ -421,6 +419,7 @@ static MACHINE_CONFIG_START( wico, wico_state )
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sn76494", SN76494, 10000000 / 64)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MCFG_SOUND_CONFIG(psg_intf)

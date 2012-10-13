@@ -22,13 +22,12 @@
 #include "machine/nvram.h"
 #include "flicker.lh"
 
-class flicker_state : public driver_device
+class flicker_state : public genpin_class
 {
 public:
 	flicker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_samples(*this, "samples")
+		: genpin_class(mconfig, type, tag),
+	m_maincpu(*this, "maincpu")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(port00_w);
@@ -40,7 +39,6 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<samples_device> m_samples;
 
 private:
 	UINT8 m_out_data;

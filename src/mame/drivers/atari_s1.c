@@ -46,14 +46,13 @@ ToDo:
 #define NMI_INT DMA_INT / 16
 //#define BIT6_CLK NMI_INT / 4
 
-class atari_s1_state : public driver_device
+class atari_s1_state : public genpin_class
 {
 public:
 	atari_s1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: genpin_class(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_p_ram(*this, "ram"),
-	m_samples(*this, "samples")
+	m_p_ram(*this, "ram")
 	{ }
 
 	DECLARE_READ8_MEMBER(switch_r);
@@ -68,7 +67,6 @@ protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_p_ram;
-	required_device<samples_device> m_samples;
 
 	// driver_device overrides
 	virtual void machine_reset();

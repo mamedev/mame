@@ -45,13 +45,12 @@ ToDo:
 #include "g627.lh"
 
 
-class g627_state : public driver_device
+class g627_state : public genpin_class
 {
 public:
 	g627_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_samples(*this, "samples")
+		: genpin_class(mconfig, type, tag),
+	m_maincpu(*this, "maincpu")
 	{ }
 
 	DECLARE_READ8_MEMBER(porta_r);
@@ -64,7 +63,6 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<samples_device> m_samples;
 
 private:
 	UINT8 m_seg[6];
@@ -289,6 +287,7 @@ static MACHINE_CONFIG_START( g627, g627_state )
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("astrocade",  ASTROCADE, 14138000/8) // 0066-117XX audio chip
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

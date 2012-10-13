@@ -24,15 +24,14 @@
 #include "spectra.lh"
 
 
-class spectra_state : public driver_device
+class spectra_state : public genpin_class
 {
 public:
 	spectra_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: genpin_class(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_snsnd(*this, "snsnd"),
-	m_p_ram(*this, "ram"),
-	m_samples(*this, "samples")
+	m_p_ram(*this, "ram")
 	{ }
 
 	DECLARE_READ8_MEMBER(porta_r);
@@ -47,7 +46,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<sn76477_device> m_snsnd;
 	required_shared_ptr<UINT8> m_p_ram;
-	required_device<samples_device> m_samples;
 
 	// driver_device overrides
 	virtual void machine_reset();
@@ -252,6 +250,7 @@ static MACHINE_CONFIG_START( spectra, spectra_state )
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
 	MCFG_SOUND_CONFIG(sn76477_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

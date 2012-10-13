@@ -32,14 +32,13 @@ ToDo:
 #include "machine/nvram.h"
 #include "zac_1.lh"
 
-class zac_1_state : public driver_device
+class zac_1_state : public genpin_class
 {
 public:
 	zac_1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: genpin_class(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_p_ram(*this, "ram"),
-	m_samples(*this, "samples")
+	m_p_ram(*this, "ram")
 	{ }
 
 	DECLARE_READ8_MEMBER(ctrl_r);
@@ -48,20 +47,19 @@ public:
 	DECLARE_WRITE8_MEMBER(serial_w);
 	DECLARE_READ8_MEMBER(reset_int_r);
 	DECLARE_WRITE8_MEMBER(reset_int_w);
-	UINT8 m_t_c;
-	UINT8 m_out_offs;
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_p_ram;
-	required_device<samples_device> m_samples;
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_outtimer);
 protected:
 
 	// devices
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_p_ram;
 
 	// driver_device overrides
 	virtual void machine_reset();
 private:
+	UINT8 m_t_c;
+	UINT8 m_out_offs;
 	UINT8 m_input_line;
 };
 

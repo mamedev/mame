@@ -17,13 +17,12 @@
 #include "atari_s2.lh"
 
 
-class atari_s2_state : public driver_device
+class atari_s2_state : public genpin_class
 {
 public:
 	atari_s2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_samples(*this, "samples")
+		: genpin_class(mconfig, type, tag),
+	m_maincpu(*this, "maincpu")
 	{ }
 
 	DECLARE_WRITE8_HANDLER(sound0_w) { };
@@ -40,7 +39,6 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<samples_device> m_samples;
 
 	// driver_device overrides
 	virtual void machine_reset();

@@ -30,4 +30,16 @@ static const samples_interface genpin_samples_intf =
 MACHINE_CONFIG_EXTERN( genpin_audio );
 
 
+class genpin_class : public driver_device
+{
+public:
+	genpin_class(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+	m_samples(*this, "samples")
+	{ }
+
+	required_device<samples_device> m_samples;
+};
+
+
 #endif /* GENPIN_H_ */
