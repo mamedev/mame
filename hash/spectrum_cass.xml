@@ -7,13 +7,35 @@
 
 <!-- to load software in 16/48K mode you must use the following sequence at the prompt
 
-     "J" "shift+P" "shift+P" "enter"
+     "J" "shift+P" "shift+P" "enter"  (in non-MESS emulators this is often "ctrl+P")
 
      this will enter the command LOAD "" and execute it
 
      You must then of course play the tape from the menu in MESS (you'll need to turn SCRLOCK off and hit TAB to get the MESS menu)
 
 -->
+
+<!-- COMPATIBILITY
+     The MESS emulation at the time of writing isn't very good, the following emulators are used to determine how things should work
+     
+      Fuse (Free Unix Spectrum Emulator) - Free, High Compatibility can run some of the trickier images, Windows port available - http://fuse-emulator.sourceforge.net/
+      Spectaculator                      - Commercial, a bit more user friendly than above, similar compatibility               - http://www.spectaculator.com/
+     
+     Note, even with those emulators you'll have to turn off some of the speed cheats on loading to get good compatibilty for example, in Fuse
+      Use Tape Traps
+      Fastloading
+      Detect Loaders
+      Accelerate Loaders
+     
+     MESS doesn't have any accelerated loading so some games which require the tricks to be disabled in other emulators work in MESS without trickery, eg Xanthius
+     
+     http://newton.sunderland.ac.uk/~specfreak/Schemes/schemes.html is a rather outdated guide mentioning some of the custom loaders, and showing disassemblies of them.
+     
+
+     legacy emulators including Real Spectrum ( http://zxm.speccy.cz/realspec/ ) appear to struggle with some of the more complex tape protections
+
+-->
+
 
 <!-- Example Software List for ZX Spectrum Cassettes -->
 <!-- NC128 = Not Compatible with 128K Mode, must be loaded in 48K Mode -->

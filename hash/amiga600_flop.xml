@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- This list contains the system floppies distributed with the Amiga 600, it is not a general purpose Software List -->
+
+<softwarelist name="amiga600_flop" description="Amiga 600 System Floppies">
+
+	<software name="wb205">
+		<description>Workbench v2.05 rev 37.71</description>
+		<year>1991</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Workbench" />
+			<dataarea name="flop" size="901120">
+				<rom name="workbench v2.05 rev 37.71 (1992)(commodore)(disk 1 of 4)(workbench).adf" size="901120" crc="be1cc8b9" sha1="4d5c1830e04d1302fdad1eb85638104ab94fb353" offset="0"/>
+			</dataarea>
+		</part> 
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Extras" />
+			<dataarea name="flop" size="901120">
+				<rom name="workbench v2.05 rev 37.71 (1992)(commodore)(disk 2 of 4)(extras)[!].adf" size="901120" crc="86daec05" sha1="96bcab8d0d5f05d5fac879436bcc85514d912acc" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Fonts" />
+			<dataarea name="flop" size="901120">
+				<rom name="workbench v2.05 rev 37.71 (1992)(commodore)(disk 3 of 4)(fonts)[!].adf" size="901120" crc="7401aba4" sha1="21124a9695f90b926184ee00ac575217a6373c3d" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Install" />
+			<dataarea name="flop" size="901120">
+				<rom name="workbench v2.05 rev 37.71 (1992)(commodore)(disk 4 of 4)(install).adf" size="901120" crc="c285c0aa" sha1="87e0fe6dd39af7b77d8f4809f588f4823a805720" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
+

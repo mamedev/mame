@@ -514,6 +514,49 @@ static MACHINE_CONFIG_DERIVED( a1000p, pal )
 	MCFG_CPU_PROGRAM_MAP(a1000_mem)
 MACHINE_CONFIG_END
 
+/* Machine definitions with Software List associations for system software */
+
+/* Amiga 1000 */
+
+static MACHINE_CONFIG_DERIVED( ami1000, a1000p )
+	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga1000_flop")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( ami1000n, a1000n )
+	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga1000_flop")
+MACHINE_CONFIG_END
+
+/* Amiga 500 */
+
+static MACHINE_CONFIG_DERIVED( ami500, a500p )
+	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga500_flop")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( ami500n, a500n )
+	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga500_flop")
+MACHINE_CONFIG_END
+
+/* Amiga 500 Plus */
+
+static MACHINE_CONFIG_DERIVED( ami500pls, a500p )
+	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga500plus_flop")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( ami500plsn, a500n )
+	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga500plus_flop")
+MACHINE_CONFIG_END
+
+/* Amiga 600 */
+
+static MACHINE_CONFIG_DERIVED( ami600, a500p )
+	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga600_flop")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( ami600n, a500n )
+	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga600_flop")
+MACHINE_CONFIG_END
+
+
 /***************************************************************************
 
   Amiga specific stuff
@@ -686,17 +729,35 @@ DRIVER_INIT_MEMBER(amiga_state,cdtv)
     ROM DEFINITIONS
 ***************************************************************************/
 
-ROM_START( a500n )
+ROM_START( ami1000 )
+	ROM_REGION16_BE(0x080000, "user1", 0)
+	ROM_LOAD16_BYTE("252179-01.u5n", 0x000000, 0x001000, CRC(42553bc4) SHA1(8855a97f7a44e3f62d1c88d938fee1f4c606af5b))
+	ROM_LOAD16_BYTE("252180-01.u5p", 0x000001, 0x001000, CRC(8e5b9a37) SHA1(d10f1564b99f5ffe108fa042362e877f569de2c3))
+
+	/* Kickstart needed to be loaded from floppy */
+
+	/* keyboard controller, mos 6500/1 mcu */
+	ROM_REGION(0x800, "keyboard", 0)
+	ROM_LOAD("328191-01.bin", 0x000, 0x800, NO_DUMP)
+ROM_END
+
+#define rom_ami1000n    rom_ami1000
+
+
+
+ROM_START( ami500 )
 	ROM_REGION16_BE(0x080000, "user1", 0)
 	ROM_DEFAULT_BIOS("kick13")
+
+	/* early models had Kickstart 1.2 */
 	ROM_SYSTEM_BIOS(0, "kick12",  "Kickstart 1.2 (33.180)")
 	ROMX_LOAD("315093-01.u6", 0x000000, 0x040000, CRC(a6ce1636) SHA1(11f9e62cf299f72184835b7b2a70a16333fc0d88), ROM_GROUPWORD | ROM_BIOS(1))
+	/* most models had Kickstart 1.3 */
 	ROM_SYSTEM_BIOS(1, "kick13",  "Kickstart 1.3 (34.5)")
 	ROMX_LOAD("315093-02.u6", 0x000000, 0x040000, CRC(c4f0f55f) SHA1(891e9a547772fe0c6c19b610baf8bc4ea7fcb785), ROM_GROUPWORD | ROM_BIOS(2))
 	ROM_COPY("user1", 0x000000, 0x040000, 0x040000)
-	ROM_SYSTEM_BIOS(2, "kick204", "Kickstart 2.04 (37.175)")
-	ROMX_LOAD("390979-01.u6", 0x000000, 0x080000, CRC(c3bdb240) SHA1(c5839f5cb98a7a8947065c3ed2f14f5f42e334a1), ROM_GROUPWORD | ROM_BIOS(3))	/* identical to 363968.01 */
-	ROM_SYSTEM_BIOS(3, "kick31",  "Kickstart 3.1 (40.63)")
+	/* why would you run kick31 on an a500? */
+	ROM_SYSTEM_BIOS(2, "kick31",  "Kickstart 3.1 (40.63)")
 	ROMX_LOAD("kick40063.u6", 0x000000, 0x080000, CRC(fc24ae0d) SHA1(3b7f1493b27e212830f989f26ca76c02049f09ca), ROM_GROUPWORD | ROM_BIOS(4))	/* part number? */
 
 	/* action replay cartridge */
@@ -708,20 +769,50 @@ ROM_START( a500n )
 	ROM_LOAD("328191-02.ic1", 0x000, 0x800, NO_DUMP)
 ROM_END
 
-#define rom_a500p    rom_a500n
+#define rom_ami500n    rom_ami500
 
-
-ROM_START( a1000n )
+ROM_START( ami500pl )
 	ROM_REGION16_BE(0x080000, "user1", 0)
-	ROM_LOAD16_BYTE("252179-01.u5n", 0x000000, 0x001000, CRC(42553bc4) SHA1(8855a97f7a44e3f62d1c88d938fee1f4c606af5b))
-	ROM_LOAD16_BYTE("252180-01.u5p", 0x000001, 0x001000, CRC(8e5b9a37) SHA1(d10f1564b99f5ffe108fa042362e877f569de2c3))
+	ROM_DEFAULT_BIOS("kick204")
+
+	ROM_SYSTEM_BIOS(0, "kick204", "Kickstart 2.04 (37.175)")
+	ROMX_LOAD("390979-01.u6", 0x000000, 0x080000, CRC(c3bdb240) SHA1(c5839f5cb98a7a8947065c3ed2f14f5f42e334a1), ROM_GROUPWORD | ROM_BIOS(0))	/* identical to 363968.01 */
+
+	/* action replay cartridge */
+	ROM_REGION16_BE(0x080000, "user2", ROMREGION_ERASEFF )
+	ROM_CART_LOAD("cart", 0x0000, 0x080000, ROM_NOMIRROR | ROM_OPTIONAL)
 
 	/* keyboard controller, mos 6500/1 mcu */
 	ROM_REGION(0x800, "keyboard", 0)
-	ROM_LOAD("328191-01.bin", 0x000, 0x800, NO_DUMP)
+	ROM_LOAD("328191-02.ic1", 0x000, 0x800, NO_DUMP)
 ROM_END
 
-#define rom_a1000p    rom_a1000n
+#define rom_ami500pln    rom_ami500pl
+
+ROM_START( ami600 )
+	ROM_REGION16_BE(0x080000, "user1", 0)
+	ROM_DEFAULT_BIOS("kick205")
+
+	ROM_SYSTEM_BIOS(0, "kick205", "Kickstart 2.05 (37.299)")
+	ROMX_LOAD("kickstart v2.05 r37.299 (1991)(commodore)(a600)[!].rom", 0x000000, 0x080000, CRC(83028fb5) SHA1(87508de834dc7eb47359cede72d2e3c8a2e5d8db), ROM_GROUPWORD | ROM_BIOS(0))
+
+	// from A600HD (had HDD by default)
+	ROM_SYSTEM_BIOS(1, "kick205a", "Kickstart 2.05 (37.300)")
+	ROMX_LOAD("kickstart v2.05 r37.300 (1991)(commodore)(a600hd).rom",  0x000000, 0x080000, CRC(64466c2a) SHA1(f72d89148dac39c696e30b10859ebc859226637b), ROM_GROUPWORD | ROM_BIOS(1)) 
+	ROM_SYSTEM_BIOS(2, "kick205b", "Kickstart 2.05 (37.300)")
+	ROMX_LOAD("kickstart v2.05 r37.350 (1992)(commodore)(a600hd)[!].rom", 0x000000, 0x080000, CRC(43b0df7b) SHA1(02843c4253bbd29aba535b0aa3bd9a85034ecde4), ROM_GROUPWORD | ROM_BIOS(2))
+
+	/* action replay cartridge */
+	ROM_REGION16_BE(0x080000, "user2", ROMREGION_ERASEFF )
+	ROM_CART_LOAD("cart", 0x0000, 0x080000, ROM_NOMIRROR | ROM_OPTIONAL)
+
+	/* keyboard controller, mos 6500/1 mcu */
+	ROM_REGION(0x800, "keyboard", 0)
+	ROM_LOAD("328191-02.ic1", 0x000, 0x800, NO_DUMP)
+ROM_END
+
+#define rom_ami600n    rom_ami600
+
 
 
 ROM_START( cdtv )
@@ -746,8 +837,35 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                             FULLNAME                 FLAGS */
-COMP( 1985, a1000n, 0,      0,      a1000n, amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 1000 (NTSC)",     GAME_IMPERFECT_GRAPHICS )
-COMP( 1985, a1000p, a1000n, 0,      a1000p, amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 1000 (PAL)",      GAME_IMPERFECT_GRAPHICS )
-COMP( 1987, a500n,  0,      0,      a500n,  amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 500 (NTSC, OCS)", GAME_IMPERFECT_GRAPHICS )
-COMP( 1987, a500p,  a500n,  0,      a500p,  amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 500 (PAL, OCS)",  GAME_IMPERFECT_GRAPHICS )
-COMP( 1991, cdtv,   0,      0,      cdtv,   cdtv, amiga_state,   cdtv,   "Commodore Business Machines",  "CDTV (NTSC)",           GAME_IMPERFECT_GRAPHICS )
+
+/* High-end market line */
+
+COMP( 1985, ami1000,   0,        0,      ami1000,  amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 1000 (PAL)",      GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+COMP( 1985, ami1000n,  ami1000,  0,      ami1000n, amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 1000 (NTSC)",     GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+
+
+/* Amiga 2000 - similar to 1000 */
+/* Amiga 1500 - Amiga 2000 with two floppy drives (2nd replacing the HDD) */
+/* Amiga 2500 - Amiga 2000 with 68020 accelerator card */
+
+/* Amiga 3000 - ECS chipset, 68030 CPU - skeleton driver a3000.c */
+
+/* Amiga 4000 - AGA chipset, 68040 / 68060 CPU */
+
+/* Low-end market line */
+
+COMP( 1987, ami500,    0,        0,      ami500,      amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 500 (PAL, OCS)",  GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+COMP( 1987, ami500n,   ami500,   0,      ami500n,     amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 500 (NTSC, OCS)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+
+COMP( 1991, ami500pl,  0,        0,      ami500pls,   amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 500+ (PAL, ECS)",  GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+COMP( 1991, ami500pln, ami500pl, 0,      ami500plsn,  amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 500+ (NTSC, ECS)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+
+COMP( 1992, ami600,    0,        0,      ami600,      amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 600 (PAL, ECS)",  GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+COMP( 1992, ami600n,   ami600,   0,      ami600n,     amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 600 (NTSC, ECS)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+
+/* Amiga 1200 - see ami1200.c */
+
+
+COMP( 1991, cdtv,   0,      0,      cdtv,   cdtv, amiga_state,   cdtv,   "Commodore Business Machines",  "CDTV (NTSC)",           GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+
+/* CD32 - see cd32.c */
