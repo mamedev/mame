@@ -647,11 +647,17 @@ c128drit  // Commodore 128DCR - PAL (Italian)
 c128drsw  // Commodore 128DCR - PAL (Swedish)
 c128d81   // Commodore 128D/81
 
-a500n	 // Commodore Amiga 500 - NTSC
-a500p	 // Commodore Amiga 500 - PAL
-a1000n	// Commodore Amiga 1000 - NTSC
-a1000p	// Commodore Amiga 1000 - PAL
+
+ami1000	  // Commodore Amiga 1000
+ami1000n  //
+ami500	  // Commodore Amiga 500
+ami500n	  //
+ami500pl  // Commodore Amiga 500+
+ami500pln //
+ami600    // Commodore Amiga 600
+ami600n   //
 cdtv	  // Commodore CDTV
+
 a3000	 // Commodore Amiga 3000
 a1200n	// Commodore Amiga 1200 - NTSC
 a1200p	// Commodore Amiga 1200 - PAL
