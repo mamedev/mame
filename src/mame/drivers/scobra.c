@@ -1097,6 +1097,26 @@ ROM_START( billiard )
 	ROM_LOAD( "hustler.clr",  0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
 ROM_END
 
+ROM_START( billiard2 ) /* has a "decoder" prom, apparently, which needs to be hooked up and maincpu roms decoded */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "billiard.ic4", 0x0000, 0x2000, CRC(545a27fd) SHA1(8b064dd6a9a82248301e0f53dc1c4fd91e506025) )
+	ROM_LOAD( "billiard.ic3", 0x2000, 0x2000, CRC(bec503b1) SHA1(cdbe650b829cd4424141058467cd64cfffe1b1e1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "hustler.6",    0x0000, 0x0800, BAD_DUMP CRC(7a946544) SHA1(7ee2ad3fdf996f08534fb87fc02b619c168f420c) ) // not found on board - taken from parent
+	ROM_LOAD( "hustler.7",    0x0800, 0x0800, BAD_DUMP CRC(3db57351) SHA1(e5075a7130a80d2bf24f0556c2589dff0625ee60) ) // not found on board - taken from parent
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "hustler.5f",   0x0000, 0x0800, CRC(0bdfad0e) SHA1(8e6f1737604f3801c03fa2e9a5e6a2778b54bae8) ) // billiard.ic11
+	ROM_LOAD( "hustler.5h",   0x0800, 0x0800, CRC(8e062177) SHA1(7e52a1669804b6c2f694cfc64b04abc8246bb0c2) ) // billiard.ic12
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "hustler.clr",  0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) ) // billiard.ic10
+
+	ROM_REGION( 0x0020, "user1", 0 ) /* decode PROMs */
+	ROM_LOAD( "billiard.ic7", 0x0000, 0x0020, CRC(4ac17114) SHA1(1fa34a556fe445a6bdabfe75b4b679cab6553c8b) )
+ROM_END
+
 /* this is identical to billiard, but with a different memory map */
 ROM_START( hustlerb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1197,6 +1217,7 @@ GAME( 1983, minefld,   0,        minefld,   minefld, scramble_state,   minefld, 
 GAME( 1981, hustler,   0,        hustler,   hustler, scramble_state,   hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
 GAME( 1981, hustlerd,  hustler,  hustler,   hustler, scramble_state,   hustlerd,     ROT90,  "Konami (Dynamo Games license)", "Video Hustler (Dynamo Games)", GAME_SUPPORTS_SAVE )
 GAME( 1981, billiard,  hustler,  hustler,   hustler, scramble_state,   billiard,     ROT90,  "bootleg", "The Billiards (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, billiard2, hustler,  hustler,   hustler, scramble_state,   billiard,     ROT90,  "bootleg", "The Billiards (Video Hustler bootleg) - Set 2", GAME_SUPPORTS_SAVE )
 GAME( 1981, hustlerb,  hustler,  hustlerb,  hustler, scramble_state,   scramble_ppi, ROT90,  "bootleg (Digimatic)", "Video Hustler (bootleg)", GAME_NOT_WORKING ) // broken?
 GAME( 1981, hustlerb2, hustler,  hustler,   hustler, scramble_state,   scramble_ppi, ROT90,  "bootleg", "Fatsy Gambler (Video Hustler bootleg)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, mimonkey,  0,        mimonkey,  mimonkey, scramble_state,  mimonkey,     ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
