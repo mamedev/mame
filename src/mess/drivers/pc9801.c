@@ -245,6 +245,7 @@
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 #include "formats/mfi_dsk.h"
+#include "formats/d88_dsk.h"
 
 #define UPD1990A_TAG "upd1990a"
 #define UPD8251_TAG  "upd8251"
@@ -258,8 +259,7 @@ public:
 		  m_rtc(*this, UPD1990A_TAG),
 		  m_sio(*this, UPD8251_TAG),
 		  m_hgdc1(*this, "upd7220_chr"),
-		  m_hgdc2(*this, "upd7220_btm")
-	,
+		  m_hgdc2(*this, "upd7220_btm"),
 		m_video_ram_1(*this, "video_ram_1"),
 		m_video_ram_2(*this, "video_ram_2"){ }
 
@@ -587,6 +587,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 }
 
 static const floppy_format_type pc9801_floppy_formats[] = {
+	FLOPPY_D88_FORMAT,
 	FLOPPY_MFI_FORMAT,
 	NULL
 };
@@ -2526,12 +2527,18 @@ MACHINE_START_MEMBER(pc9801_state,pc9801)
 
 	upd765a_device *fdc;
 	fdc = machine().device<upd765a_device>(":upd765_2hd");
-	fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2hd_irq), this));
-	fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2hd_drq), this));
+	if (fdc)
+	{
+		fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2hd_irq), this));
+		fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2hd_drq), this));
+	}
 
 	fdc = machine().device<upd765a_device>(":upd765_2dd");
-	fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2dd_irq), this));
-	fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2dd_drq), this));
+	if (fdc)
+	{
+		fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2dd_irq), this));
+		fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2dd_drq), this));
+	}
 
 }
 
