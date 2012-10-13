@@ -47898,8 +47898,8 @@ Alternate board (XL-1)
 	<software name="smashten">
 		<description>Smash Tennis (Euro)</description>
 		<year>1993</year>
-		<sharedfeat name="compatibility" value="PAL"/>
 		<publisher>Virgin Interactive</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="smash tennis (europe).sfc" size="1048576" crc="6f7d1745" sha1="c1a782a4012e15c33b04d61c92144eab3db1fdee" offset="0x000000" />

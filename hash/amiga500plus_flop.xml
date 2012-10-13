@@ -18,8 +18,8 @@
 		</part> 
 
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="901120">
 			<feature name="part_id" value="Extras" />
+			<dataarea name="flop" size="901120">
 				<rom name="workbench v2.04 rev 37.67 (1991)(commodore)(disk 2 of 4)(extras).adf"    size="901120" crc="a019b6b9" sha1="dc6a940c3474a1d90856541c179f4105eadadbbf" offset="0"/>
 			</dataarea>
 		</part>
