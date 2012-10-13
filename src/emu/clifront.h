@@ -77,6 +77,7 @@
 #define CLICOMMAND_LISTSOFTWARE			"listsoftware"
 #define CLICOMMAND_VERIFYSOFTWARE		"verifysoftware"
 #define CLICOMMAND_GETSOFTLIST			"getsoftlist"
+#define CLICOMMAND_VERIFYSOFTLIST		"verifysoftlist"
 
 
 
@@ -126,6 +127,7 @@ public:
 	void verifysamples(const char *gamename = "*");
 	void romident(const char *filename);
 	void getsoftlist(const char *gamename = "*");
+	void verifysoftlist(const char *gamename = "*");
 
 private:
 	// internal helpers
