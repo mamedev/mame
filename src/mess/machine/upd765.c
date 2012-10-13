@@ -139,6 +139,7 @@ void upd765_family_device::device_reset()
 {
 	dor = dor_reset;
 	locked = false;
+	soft_reset();
 }
 
 void upd765_family_device::soft_reset()
