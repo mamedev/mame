@@ -1940,6 +1940,25 @@ ROM_START( megat5nj ) /* Dallas DS1204V security key at U5 labeled 9255-60-01 U5
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
+ROM_START( megat5t ) /* Dallas DS1204V security key at U5 labeled 9255-70-01 U5-RO C1997 MII */
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD( "9255-60-01_u32-r0",  0x000000, 0x100000, CRC(f8f7f48e) SHA1(1bebe1f8898c60b795a0f794ca9b79e03d2744e4) )
+	ROM_LOAD( "qs9255-05_u36-r0",   0x100000, 0x80000,  CRC(0bed9e27) SHA1(1414385ce562b127e1ddeccc20ea4ff2a7098b7e) )
+	ROM_RELOAD(                     0x180000, 0x80000)
+	ROM_LOAD( "qs9255-05_u37-r0",   0x200000, 0x80000,  CRC(b713a1c5) SHA1(d6ccba2ea90fd0e2ecf15249514231eed54000c1) )
+	ROM_RELOAD(                     0x280000, 0x80000)
+	ROM_LOAD( "9255-70-01_u38-r0c", 0x300000, 0x100000, CRC(e4d71764) SHA1(7c4e8b484dc744a93ce42e24f3b6d5bb2a7c09e4) ) /* Location U38, 09/30/1997 12:13:24 - Standard version */
+
+	ROM_REGION( 0x8000, "nvram", 0 ) // DS1644 nv ram
+	ROM_LOAD( "mt5t_ds1644.u31",  0x00000,  0x8000,   CRC(d1b91acf) SHA1(5ae3449d83b35ba5b20f7ff60eba4359f29cb744) ) /* No actual label, so use a unique name for this set */
+
+	ROM_REGION( 0x1000, "user2", 0 ) // PALs
+	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
+	ROM_LOAD( "sc3944-0a.u19",  0x000, 0x2dd, CRC(4cc46c5e) SHA1(0bab970df1539ce905f43603ad13171b05449a01) )
+	ROM_LOAD( "sc3980.u40",     0x000, 0x117, CRC(ee0cdab5) SHA1(216fef50a8a0f6a33b704d3501a4c5c3cbac2bad) )
+	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
+ROM_END
+
 ROM_START( megat5tg ) /* Dallas DS1204V security key at U5 labeled 9255-70-50 U5-C-RO1 C1998 MII */
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "9255-70-50_u32-r0",  0x000000, 0x100000, CRC(f57e4d36) SHA1(c16587c95fa1abe2e7df37027deb2cfbadb27038) )
@@ -2163,5 +2182,6 @@ GAME( 1996, megat4stg, megat4, meritm_crt260, meritm_crt260, meritm_state, megat
 GAME( 1997, megat5,    0,      meritm_crt260, meritm_crt260, meritm_state, megat5,   ROT0, "Merit", "Megatouch 5 (9255-60-01 ROI, Standard version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, megat5a,   megat5, meritm_crt260, meritm_crt260, meritm_state, megat5,   ROT0, "Merit", "Megatouch 5 (9255-60-01 ROC, Standard version)", GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
 GAME( 1998, megat5nj,  megat5, meritm_crt260, meritm_crt260, meritm_state, megat5,   ROT0, "Merit", "Megatouch 5 (9255-60-07 RON, New Jersey version)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, megat5t,   megat5, meritm_crt260, meritm_crt260, meritm_state, megat5t,  ROT0, "Merit", "Megatouch 5 Tournament Edition (9255-70-01 ROC, Standard version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, megat5tg,  megat5, meritm_crt260, meritm_crt260, meritm_state, megat5t,  ROT0, "Merit", "Megatouch 5 Turnier Version (9255-70-50 ROD, Bi-Lingual GER/ENG version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, megat6,    0,      meritm_crt260, meritm_crt260, meritm_state, megat6,   ROT0, "Merit", "Megatouch 6 (9255-80-01 ROA, Standard version)", GAME_IMPERFECT_GRAPHICS )
