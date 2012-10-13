@@ -1411,7 +1411,20 @@ MACHINE_CONFIG_FRAGMENT( snes_cartslot )
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("snes_cart")
 	MCFG_CARTSLOT_LOAD(snes_cart)
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list","snes")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list","NTSC")
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_FRAGMENT( snesp_cartslot )
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("sfc,smc,fig,swc,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("snes_cart")
+	MCFG_CARTSLOT_LOAD(snes_cart)
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list","snes")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list","PAL")
 MACHINE_CONFIG_END
 
 // This (hackily) emulates a SNES unit with a Sufami Turbo Unit cart inserted:
