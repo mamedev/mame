@@ -216,7 +216,7 @@ WRITE8_MEMBER(gstriker_state::gs_sh_bankswitch_w)
 	UINT8 *RAM = memregion("audiocpu")->base();
 	int bankaddress;
 
-	bankaddress = 0x10000 + (data & 0x03) * 0x8000;
+	bankaddress = (data & 0x07) * 0x8000;
 	membank("bank1")->set_base(&RAM[bankaddress]);
 }
 
@@ -625,7 +625,6 @@ ROM_START( gstriker )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )
 	ROM_LOAD( "human-3_27c1001.u87",  0x00000, 0x20000, CRC(2f28c01e) SHA1(63829ad7969d197b2f2c87cb88bdb9e9880ed2d6) )
-	ROM_RELOAD(               0x10000, 0x20000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) // score tilemap
 	ROM_LOAD( "human-2_27c1024.u79",  0x00000, 0x20000, CRC(a981993b) SHA1(ed92c7581d2b84a8628744dd5f8a2266c45dcd5b) )
@@ -661,7 +660,6 @@ ROM_START( gstrikera )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )
 	ROM_LOAD( "human-3_27c1001.u87",  0x00000, 0x20000, CRC(2f28c01e) SHA1(63829ad7969d197b2f2c87cb88bdb9e9880ed2d6) )
-	ROM_RELOAD(               0x10000, 0x20000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) // score tilemap
 	ROM_LOAD( "human-2_27c1024.u79",  0x00000, 0x20000, CRC(a981993b) SHA1(ed92c7581d2b84a8628744dd5f8a2266c45dcd5b) )

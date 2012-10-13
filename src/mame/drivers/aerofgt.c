@@ -288,8 +288,7 @@ static ADDRESS_MAP_START( aerofgt_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x1b0ff0, 0x1b0fff) AM_RAM	/* stack area during boot */
 	AM_RANGE(0x1b2000, 0x1b3fff) AM_RAM_WRITE(aerofgt_bg1videoram_w) AM_SHARE("bg1videoram")
 	AM_RANGE(0x1b4000, 0x1b5fff) AM_RAM_WRITE(aerofgt_bg2videoram_w) AM_SHARE("bg2videoram")
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("spriteram1")
-	AM_RANGE(0x1c4000, 0x1c7fff) AM_RAM AM_SHARE("spriteram2")
+	AM_RANGE(0x1c0000, 0x1c7fff) AM_RAM AM_SHARE("spriteram1")
 	AM_RANGE(0x1d0000, 0x1d1fff) AM_RAM AM_SHARE("spriteram3")
 	AM_RANGE(0xfef000, 0xffefff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff80, 0xffff87) AM_WRITE(aerofgt_gfxbank_w)
@@ -1254,8 +1253,7 @@ GFXDECODE_END
 static GFXDECODE_START( aerofgt )
 	GFXDECODE_ENTRY( "gfx1", 0, aerofgt_charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, aerofgt_charlayout,   256, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, aerofgt_spritelayout, 512, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, aerofgt_spritelayout, 768, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, aerofgt_spritelayout, 512, 32 )
 GFXDECODE_END
 
 static GFXDECODE_START( aerfboot )
@@ -2321,11 +2319,9 @@ ROM_START( aerofgt )
 	ROM_LOAD( "538a54.124",   0x000000, 0x80000, CRC(4d2c4df2) SHA1(f51c2b3135f0a921ac1a79e63d6878c03cb6254b) )
 	ROM_LOAD( "1538a54.124",  0x080000, 0x80000, CRC(286d109e) SHA1(3a5f3d2d89cf58f6ef15e4bd3f570b84e8e695b2) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD( "538a53.u9",    0x000000, 0x100000, CRC(630d8e0b) SHA1(5a0c252ccd53c5199a695909d25ecb4e53dc15b9) )
-
-	ROM_REGION( 0x080000, "gfx3", 0 )
-	ROM_LOAD( "534g8f.u18",   0x000000, 0x80000, CRC(76ce0926) SHA1(5ef4cec215d4dd600d8fcd1bd9a4c09081d59e33) )
+	ROM_LOAD( "534g8f.u18",   0x200000, 0x080000, CRC(76ce0926) SHA1(5ef4cec215d4dd600d8fcd1bd9a4c09081d59e33) )
 
 	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-01",     0x00000, 0x40000, CRC(6d42723d) SHA1(57c59234e9925430a4c687733682efed06d7eed1) )
