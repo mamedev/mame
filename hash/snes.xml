@@ -22220,7 +22220,7 @@ Alternate board (XL-1)
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1572864">
 				<rom name="shvc-qj-1 p0.u1" size="1048576" crc="372d5191" sha1="dac89e3ff4ed29f0c27eb82a4287aa717086673b" offset="0x000000" />
-				<rom name="shvc-qj-0 p1.u2" size="524288"  crc="3768be60" sha1="1c3926dec80f9ab5d1ea783d581d706e4b19ce04" offset="0x100000" />
+				<rom name="shvc-qj-1 p1.u2" size="524288"  crc="3768be60" sha1="1c3926dec80f9ab5d1ea783d581d706e4b19ce04" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -22830,7 +22830,7 @@ Alternate board (XL-1)
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="がんばれゴエモン3 獅子重禄兵衛のからくり卍固め" />
-		<!--info name="alt_title" value="RS035 がんばれゴエモン3 室用 SAMPLE 94 10 24 0079" /-->
+		<!--info name="alt_title" value="RS035 がんばれゴエモン3 広報宣伝室用 SAMPLE 94 10 24 0079" /--> <!-- this is the cartridge label -->
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
@@ -23024,12 +23024,14 @@ Alternate board (XL-1)
 		<year>199?</year>
 		<publisher>Square</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-2P3B-01" />	<!-- low res picture, might be wrong -->
-			<feature name="u1" value="U1 EPROM (J)" />
-			<feature name="u2" value="U2 EPROM (J)" />		<!-- empty socket-->
+			<!-- the following cartridge seen on an auction in 2010 is assumed to contain the rom which was floating around since the mid 1990
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J)" />
+			<feature name="u2" value="U2 EPROM(J)" /> <!- - empty socket- ->
 			<feature name="u3" value="U3 SRAM" />
 			<feature name="u4" value="U4 74F139" />
 			<feature name="u5" value="U5 CIC" />
+			-->
 			<dataarea name="rom" size="524288">
 				<rom name="u1" size="524288" crc="855907a3" sha1="e90c70ab42e8cf59a6edd4678378ec41f0052ba2" offset="0x000000" />
 			</dataarea>
