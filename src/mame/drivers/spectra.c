@@ -19,7 +19,6 @@
 #include "machine/genpin.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6532riot.h"
-#include "machine/nvram.h"
 #include "sound/sn76477.h"
 #include "spectra.lh"
 

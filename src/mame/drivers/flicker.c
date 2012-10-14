@@ -19,7 +19,6 @@
 
 #include "machine/genpin.h"
 #include "cpu/i4004/i4004.h"
-#include "machine/nvram.h"
 #include "flicker.lh"
 
 class flicker_state : public genpin_class

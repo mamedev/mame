@@ -29,7 +29,6 @@ ToDo:
 
 #include "machine/genpin.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/nvram.h"
 #include "sound/sn76496.h"
 #include "wico.lh"
 

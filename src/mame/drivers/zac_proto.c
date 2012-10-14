@@ -1,11 +1,13 @@
 /*********************************************************************
+
+    Pinball
     Zaccaria Prototype
 
- These use the INS8060 (SC/MP) processor, and are Zaccaria's first
- digital machines.
+    These use the INS8060 (SC/MP) processor, and are Zaccaria's first
+    digital machines.
 
-The inputs work with 'strike' and 'skijump'.
-The playboard inputs are unknown.
+    The inputs work with 'strike' and 'skijump'.
+    The playboard inputs are unknown.
 
 ToDo:
 - Mirrors of ram and switches
@@ -16,9 +18,8 @@ ToDo:
 
 **********************************************************************/
 
-#include "emu.h"
+#include "machine/genpin.h"
 #include "cpu/scmp/scmp.h"
-#include "machine/nvram.h"
 #include "zac_proto.lh"
 
 class zac_proto_state : public driver_device

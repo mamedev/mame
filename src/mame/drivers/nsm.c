@@ -15,10 +15,9 @@ ToDo:
 
 *********************************************************************************/
 
-#include "emu.h"
+#include "machine/genpin.h"
 #include "cpu/tms9900/tms9900l.h"
 #include "sound/ay8910.h"
-#include "machine/nvram.h"
 #include "nsm.lh"
 
 

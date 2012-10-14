@@ -40,7 +40,6 @@ ToDo:
 #include "machine/genpin.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8155.h"
-#include "machine/nvram.h"
 #include "sound/astrocde.h"
 #include "g627.lh"
 
