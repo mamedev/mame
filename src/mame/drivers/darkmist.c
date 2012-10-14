@@ -250,8 +250,8 @@ static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 14318180/4)	/* 3.579545 MHz */
-	MCFG_SOUND_CONFIG(t5182_ym2151_interface)
+	MCFG_YM2151_ADD("ymsnd", 14318180/4)	/* 3.579545 MHz */
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<t5182_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 

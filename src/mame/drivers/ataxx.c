@@ -347,7 +347,7 @@ static MACHINE_CONFIG_DERIVED( wsf, ataxx )
 	/* basic machine hardware */
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("ymsnd", YM2151, 4000000)
+	MCFG_YM2151_ADD("ymsnd", 4000000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 MACHINE_CONFIG_END

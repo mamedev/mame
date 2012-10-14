@@ -64,6 +64,7 @@ public:
 	device_t *m_sub_cpu;
 	device_t *m_adpcm_1;
 	device_t *m_adpcm_2;
+	DECLARE_WRITE_LINE_MEMBER(irq_handler);
 	DECLARE_WRITE8_MEMBER(ddragon_bgvideoram_w);
 	DECLARE_WRITE8_MEMBER(ddragon_fgvideoram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(sub_cpu_busy);

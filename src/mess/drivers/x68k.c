@@ -1065,7 +1065,7 @@ WRITE16_MEMBER(x68k_state::x68k_fm_w)
 	{
 	case 0x00:
 	case 0x01:
-		ym2151_w(machine().device("ym2151"), space, offset, data);
+		machine().device<ym2151_device>("ym2151")->write(space, offset, data);
 		break;
 	}
 }
@@ -1073,7 +1073,7 @@ WRITE16_MEMBER(x68k_state::x68k_fm_w)
 READ16_MEMBER(x68k_state::x68k_fm_r)
 {
 	if(offset == 0x01)
-		return ym2151_r(machine().device("ym2151"), space, 1);
+		return machine().device<ym2151_device>("ym2151")->read(space, 1);
 
 	return 0xffff;
 }
@@ -2033,12 +2033,6 @@ static const hd63450_intf dmac_interface =
 //  { 0, 0, 0, 0 }
 };
 
-static const ym2151_interface x68k_ym2151_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(x68k_state,x68k_fm_irq),
-	DEVCB_DRIVER_MEMBER(x68k_state,x68k_ct_w)  // CT1, CT2 from YM2151 port 0x1b
-};
-
 static const okim6258_interface x68k_okim6258_interface =
 {
 	FOSC_DIV_BY_512,
@@ -2682,8 +2676,9 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ym2151", YM2151, 4000000)
-	MCFG_SOUND_CONFIG(x68k_ym2151_interface)
+	MCFG_YM2151_ADD("ym2151", 4000000)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(x68k_state,x68k_fm_irq))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(x68k_state,x68k_ct_w))  // CT1, CT2 from YM2151 port 0x1b
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 	MCFG_SOUND_ADD("okim6258", OKIM6258, 4000000)

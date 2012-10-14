@@ -1681,8 +1681,8 @@ READ8_MEMBER( x1_state::x1turbo_io_r )
 	m_io_bank_mode = 0; //any read disables the extended mode.
 
 	// a * at the end states devices used on plain X1 too
-	if(offset == 0x0700)							{ return (ym2151_r(machine().device("ym"), space, offset-0x0700) & 0x7f) | (ioport("SOUND_SW")->read() & 0x80); }
-	else if(offset == 0x0701)		                { return ym2151_r(machine().device("ym"), space, offset-0x0700); }
+	if(offset == 0x0700)							{ return (machine().device<ym2151_device>("ym")->read(space, offset-0x0700) & 0x7f) | (ioport("SOUND_SW")->read() & 0x80); }
+	else if(offset == 0x0701)		                { return machine().device<ym2151_device>("ym")->read(space, offset-0x0700); }
 	//0x704 is FM sound detection port on X1 turboZ
 	else if(offset >= 0x0704 && offset <= 0x0707)   { return m_ctc->read(space,offset-0x0704); }
 	else if(offset == 0x0801)						{ printf("Color image board read\n"); return 0xff; } // *
@@ -1727,7 +1727,7 @@ WRITE8_MEMBER( x1_state::x1turbo_io_w )
 {
 	// a * at the end states devices used on plain X1 too
 	if(m_io_bank_mode == 1)                    { x1_ex_gfxram_w(space, offset, data); }
-	else if(offset == 0x0700 || offset == 0x0701)	{ ym2151_w(machine().device("ym"), space, offset-0x0700,data); }
+	else if(offset == 0x0700 || offset == 0x0701)	{ machine().device<ym2151_device>("ym")->write(space, offset-0x0700,data); }
 	//0x704 is FM sound detection port on X1 turboZ
 	else if(offset >= 0x0704 && offset <= 0x0707)	{ m_ctc->write(space,offset-0x0704,data); }
 	else if(offset == 0x0800)						{ printf("Color image board write %02x\n",data); } // *
@@ -2635,8 +2635,7 @@ static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
 	MCFG_DEVICE_REMOVE("fdc")
 	MCFG_MB8877_ADD("fdc",x1turbo_mb8877a_interface)
 
-	MCFG_SOUND_ADD("ym", YM2151, MAIN_CLOCK/8) //option board
-//  MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_YM2151_ADD("ym", MAIN_CLOCK/8) //option board
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker",  0.50)
 MACHINE_CONFIG_END

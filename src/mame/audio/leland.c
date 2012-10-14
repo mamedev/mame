@@ -2204,7 +2204,7 @@ static READ16_DEVICE_HANDLER( peripheral_r )
 			if (!state->m_has_ym2151)
 				return pit8254_r(device, space, offset | 0x40, mem_mask);
 			else
-				return ym2151_r(space.machine().device("ymsnd"), space, offset);
+				return space.machine().device<ym2151_device>("ymsnd")->read(space, offset);
 
 		case 4:
 			if (state->m_is_redline)
@@ -2241,7 +2241,7 @@ static WRITE16_DEVICE_HANDLER( peripheral_w )
 			if (!state->m_has_ym2151)
 				pit8254_w(device, space, offset | 0x40, data, mem_mask);
 			else
-				ym2151_w(space.machine().device("ymsnd"), space, offset, data);
+				space.machine().device<ym2151_device>("ymsnd")->write(space, offset, data);
 			break;
 
 		case 4:

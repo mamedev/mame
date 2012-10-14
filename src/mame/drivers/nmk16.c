@@ -4685,7 +4685,7 @@ static ADDRESS_MAP_START( afega_sound_cpu, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM									// RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)					// From Main CPU
-	AM_RANGE(0xf808, 0xf809) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	// YM2151
+	AM_RANGE(0xf808, 0xf809) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)	// YM2151
 	AM_RANGE(0xf80a, 0xf80a) AM_DEVREADWRITE("oki1", okim6295_device, read, write)		// M6295
 ADDRESS_MAP_END
 
@@ -4799,17 +4799,6 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void irq_handler(device_t *device, int irq)
-{
-	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
-}
-
-static const ym2151_interface afega_ym2151_intf =
-{
-	DEVCB_LINE(irq_handler)
-};
-
-
 static MACHINE_CONFIG_START( stagger1, nmk16_state )
 
 	/* basic machine hardware */
@@ -4837,8 +4826,8 @@ static MACHINE_CONFIG_START( stagger1, nmk16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_4MHz) /* verified on pcb */
-	MCFG_SOUND_CONFIG(afega_ym2151_intf)
+	MCFG_YM2151_ADD("ymsnd", XTAL_4MHz) /* verified on pcb */
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 

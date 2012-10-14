@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( gradius3_s_map, AS_PROGRAM, 8, gradius3_state )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_bank_w)				/* 007232 bankswitch */
 	AM_RANGE(0xf010, 0xf010) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf020, 0xf02d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
-	AM_RANGE(0xf030, 0xf031) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xf030, 0xf031) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -348,7 +348,7 @@ static MACHINE_CONFIG_START( gradius3, gradius3_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

@@ -201,7 +201,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bssoccer_sound_map, AS_PROGRAM, 8, suna16_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	// ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM	// RAM
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	// YM2151
+	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)	// YM2151
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(soundlatch_byte_r)	// From Main CPU
 	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(soundlatch2_byte_w)	// To PCM Z80 #1
 	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(soundlatch3_byte_w)	// To PCM Z80 #2
@@ -214,7 +214,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( uballoon_sound_map, AS_PROGRAM, 8, suna16_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM	// ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM	// RAM
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	// YM2151
+	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)	// YM2151
 	AM_RANGE(0xfc00, 0xfc00) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w)	// To PCM Z80
 ADDRESS_MAP_END
 
@@ -225,7 +225,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sunaq_sound_map, AS_PROGRAM, 8, suna16_state )
 	AM_RANGE(0x0000, 0xe82f) AM_ROM	// ROM
 	AM_RANGE(0xe830, 0xf7ff) AM_RAM	// RAM (writes to efxx, could be a program bug tho)
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	// YM2151
+	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)	// YM2151
 	AM_RANGE(0xfc00, 0xfc00) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w)	// To PCM Z80
 ADDRESS_MAP_END
 
@@ -799,7 +799,7 @@ static MACHINE_CONFIG_START( bssoccer, suna16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
@@ -857,7 +857,7 @@ static MACHINE_CONFIG_START( uballoon, suna16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -905,7 +905,7 @@ static MACHINE_CONFIG_START( sunaq, suna16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 14318000/4)
+	MCFG_YM2151_ADD("ymsnd", 14318000/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 

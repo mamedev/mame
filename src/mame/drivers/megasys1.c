@@ -371,10 +371,10 @@ ADDRESS_MAP_END
 */
 
 /* YM2151 IRQ */
-static void megasys1_sound_irq(device_t *device, int irq)
+WRITE_LINE_MEMBER(megasys1_state::sound_irq)
 {
-	if (irq)
-		device->machine().device("soundcpu")->execute().set_input_line(4, HOLD_LINE);
+	if (state)
+		subdevice("soundcpu")->execute().set_input_line(4, HOLD_LINE);
 }
 
 READ8_MEMBER(megasys1_state::oki_status_1_r)
@@ -403,7 +403,7 @@ static ADDRESS_MAP_START( megasys1A_sound_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_READ(soundlatch_word_r)
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w)	// to main cpu
-	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r,ym2151_w, 0x00ff)
+	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ8(oki_status_1_r, 0x00ff)
 	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ8(oki_status_2_r, 0x00ff)
@@ -421,7 +421,7 @@ static ADDRESS_MAP_START( megasys1B_sound_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_READWRITE(soundlatch_word_r,soundlatch2_word_w)	/* from/to main cpu */
 	AM_RANGE(0x060000, 0x060001) AM_READWRITE(soundlatch_word_r,soundlatch2_word_w)	/* from/to main cpu */
-	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r,ym2151_w, 0x00ff)
+	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ8(oki_status_1_r, 0x00ff)
 	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ8(oki_status_2_r, 0x00ff)
@@ -1456,11 +1456,6 @@ GFXDECODE_END
 
 /* Provided by Jim Hernandez: 3.5MHz for FM, 30KHz (!) for ADPCM */
 
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(megasys1_sound_irq)
-};
-
 static MACHINE_CONFIG_START( system_A, megasys1_state )
 
 	/* basic machine hardware */
@@ -1493,8 +1488,8 @@ static MACHINE_CONFIG_START( system_A, megasys1_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(megasys1_state,sound_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 

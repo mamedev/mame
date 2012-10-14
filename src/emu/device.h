@@ -75,6 +75,16 @@
 	device_t::static_set_input_default(*device, DEVICE_INPUT_DEFAULTS_NAME(_config)); \
 
 
+// macros for defining read_line/write_line functions
+#define READ_LINE_DEVICE_HANDLER(name)		int  name(ATTR_UNUSED device_t *device)
+#define WRITE_LINE_DEVICE_HANDLER(name) 	void name(ATTR_UNUSED device_t *device, ATTR_UNUSED int state)
+
+#define DECLARE_READ_LINE_MEMBER(name)		int  name()
+#define READ_LINE_MEMBER(name)				int  name()
+#define DECLARE_WRITE_LINE_MEMBER(name) 	void name(ATTR_UNUSED int state)
+#define WRITE_LINE_MEMBER(name)				void name(ATTR_UNUSED int state)
+
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

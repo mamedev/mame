@@ -393,7 +393,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hyperpac_sound_map, AS_PROGRAM, 8, snowbros_state )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
@@ -1504,13 +1504,6 @@ static const ym3812_interface ym3812_config =
 	irqhandler
 };
 
-/* SemiCom Sound */
-
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(irqhandler)
-};
-
 
 MACHINE_RESET_MEMBER(snowbros_state,semiprot)
 {
@@ -1603,7 +1596,7 @@ static MACHINE_CONFIG_DERIVED( semicom, snowbros )
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 
@@ -1745,7 +1738,7 @@ static MACHINE_CONFIG_DERIVED( finalttr, semicom )
 	MCFG_MACHINE_RESET_OVERRIDE (snowbros_state, finalttr )
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.08)
 	MCFG_SOUND_ROUTE(1, "mono", 0.08)
 

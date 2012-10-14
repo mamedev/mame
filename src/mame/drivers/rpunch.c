@@ -122,11 +122,10 @@
  *
  *************************************/
 
-static void ym2151_irq_gen(device_t *device, int state)
+WRITE_LINE_MEMBER(rpunch_state::ym2151_irq_gen)
 {
-	rpunch_state *drvstate = device->machine().driver_data<rpunch_state>();
-	drvstate->m_ym2151_irq = state;
-	device->machine().device("audiocpu")->execute().set_input_line(0, (drvstate->m_ym2151_irq | drvstate->m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	m_ym2151_irq = state;
+	subdevice("audiocpu")->execute().set_input_line(0, (m_ym2151_irq | m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -251,7 +250,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, rpunch_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xf200, 0xf200) AM_READ(sound_command_r)
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(upd_control_w)
 	AM_RANGE(0xf600, 0xf600) AM_WRITE(upd_data_w)
@@ -443,19 +442,6 @@ GFXDECODE_END
 
 /*************************************
  *
- *  Sound definitions
- *
- *************************************/
-
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(ym2151_irq_gen)
-};
-
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -484,8 +470,8 @@ static MACHINE_CONFIG_START( rpunch, rpunch_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, MASTER_CLOCK/4)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", MASTER_CLOCK/4)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(rpunch_state,ym2151_irq_gen))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 

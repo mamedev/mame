@@ -293,13 +293,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantland_sound_iomap, AS_IO, 8, fantland_state )
 	AM_RANGE( 0x0080, 0x0080 ) AM_READ(soundlatch_byte_r )
-	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w )
+	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE( 0x0180, 0x0180 ) AM_DEVWRITE("dac", dac_device, write_unsigned8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( galaxygn_sound_iomap, AS_IO, 8, fantland_state )
 	AM_RANGE( 0x0080, 0x0080 ) AM_READ(soundlatch_byte_r )
-	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w )
+	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -873,7 +873,7 @@ static MACHINE_CONFIG_START( fantland, fantland_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3000000)
+	MCFG_YM2151_ADD("ymsnd", 3000000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
 	MCFG_SOUND_ROUTE(1, "mono", 0.35)
 
@@ -882,16 +882,10 @@ static MACHINE_CONFIG_START( fantland, fantland_state )
 MACHINE_CONFIG_END
 
 
-static void galaxygn_sound_irq( device_t *device, int line )
+WRITE_LINE_MEMBER(fantland_state::galaxygn_sound_irq)
 {
-	fantland_state *state = device->machine().driver_data<fantland_state>();
-	state->m_audio_cpu->execute().set_input_line_and_vector(0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
+	m_audio_cpu->execute().set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
 }
-
-static const ym2151_interface galaxygn_ym2151_interface =
-{
-	DEVCB_LINE(galaxygn_sound_irq)
-};
 
 static MACHINE_CONFIG_START( galaxygn, fantland_state )
 
@@ -922,8 +916,8 @@ static MACHINE_CONFIG_START( galaxygn, fantland_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3000000)
-	MCFG_SOUND_CONFIG(galaxygn_ym2151_interface)
+	MCFG_YM2151_ADD("ymsnd", 3000000)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(fantland_state, galaxygn_sound_irq))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_CONFIG_END

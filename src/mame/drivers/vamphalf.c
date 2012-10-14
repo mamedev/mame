@@ -428,8 +428,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vamphalf_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x0c0, 0x0c1) AM_NOP // return 0, when oki chip is read / written
 	AM_RANGE(0x0c2, 0x0c3) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x140, 0x143) AM_DEVWRITE8_LEGACY("ymsnd", ym2151_register_port_w, 0x00ff)
-	AM_RANGE(0x146, 0x147) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
+	AM_RANGE(0x140, 0x143) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
+	AM_RANGE(0x146, 0x147) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
 	AM_RANGE(0x1c0, 0x1c3) AM_READ(eeprom_r)
 	AM_RANGE(0x240, 0x243) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x600, 0x603) AM_READ_PORT("SYSTEM")
@@ -453,8 +453,8 @@ static ADDRESS_MAP_START( coolmini_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x308, 0x30b) AM_WRITE(eeprom_w)
 	AM_RANGE(0x4c0, 0x4c1) AM_NOP // return 0, when oki chip is read / written
 	AM_RANGE(0x4c2, 0x4c3) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x540, 0x543) AM_DEVWRITE8_LEGACY("ymsnd", ym2151_register_port_w, 0x00ff)
-	AM_RANGE(0x544, 0x547) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
+	AM_RANGE(0x540, 0x543) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
+	AM_RANGE(0x544, 0x547) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
 	AM_RANGE(0x7c0, 0x7c3) AM_READ(eeprom_r)
 ADDRESS_MAP_END
 
@@ -464,8 +464,8 @@ static ADDRESS_MAP_START( suplup_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x060, 0x063) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x080, 0x081) AM_NOP // return 0, when oki chip is read / written
 	AM_RANGE(0x082, 0x083) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8_LEGACY("ymsnd", ym2151_register_port_w, 0x00ff)
-	AM_RANGE(0x0c4, 0x0c7) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
+	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
+	AM_RANGE(0x0c4, 0x0c7) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
 	AM_RANGE(0x100, 0x103) AM_READ(eeprom_r)
 ADDRESS_MAP_END
 
@@ -483,7 +483,7 @@ static ADDRESS_MAP_START( finalgdr_io, AS_IO, 32, vamphalf_state )
 	AM_RANGE(0x2400, 0x2403) AM_READ(finalgdr_prot_r)
 	AM_RANGE(0x2800, 0x2803) AM_WRITE(finalgdr_backupram_bank_w)
 	AM_RANGE(0x2c00, 0x2dff) AM_READWRITE(finalgdr_backupram_r, finalgdr_backupram_w)
-	AM_RANGE(0x3000, 0x3007) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r, ym2151_w, 0x0000ff00)
+	AM_RANGE(0x3000, 0x3007) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x0000ff00)
 	AM_RANGE(0x3800, 0x3803) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x0000ff00)
 	AM_RANGE(0x3c00, 0x3c03) AM_READ_PORT("SYSTEM")
@@ -504,7 +504,7 @@ static ADDRESS_MAP_START( mrkicker_io, AS_IO, 32, vamphalf_state )
 	AM_RANGE(0x4084, 0x4087) AM_WRITENOP //?
 	AM_RANGE(0x40a0, 0x40a3) AM_WRITE(finalgdr_oki_bank_w)
 	AM_RANGE(0x6400, 0x6403) AM_READ(finalgdr_prot_r)
-	AM_RANGE(0x7000, 0x7007) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r, ym2151_w, 0x0000ff00)
+	AM_RANGE(0x7000, 0x7007) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x0000ff00)
 	AM_RANGE(0x7400, 0x7403) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x0000ff00)
 	AM_RANGE(0x7800, 0x7803) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x7c00, 0x7c03) AM_READ_PORT("SYSTEM")
@@ -519,8 +519,8 @@ static ADDRESS_MAP_START( jmpbreak_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x440, 0x441) AM_NOP // return 0, when oki chip is read / written
 	AM_RANGE(0x442, 0x443) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x540, 0x543) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x680, 0x683) AM_DEVWRITE8_LEGACY("ymsnd", ym2151_register_port_w, 0x00ff)
-	AM_RANGE(0x684, 0x687) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
+	AM_RANGE(0x680, 0x683) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
+	AM_RANGE(0x684, 0x687) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrdig_io, AS_IO, 16, vamphalf_state )
@@ -530,8 +530,8 @@ static ADDRESS_MAP_START( mrdig_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x080, 0x081) AM_NOP // return 0, when oki chip is read / written
 	AM_RANGE(0x082, 0x083) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x280, 0x283) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8_LEGACY("ymsnd", ym2151_register_port_w, 0x00ff)
-	AM_RANGE(0x0c4, 0x0c7) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
+	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
+	AM_RANGE(0x0c4, 0x0c7) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aoh_map, AS_PROGRAM, 32, vamphalf_state )
@@ -547,7 +547,7 @@ static ADDRESS_MAP_START( aoh_io, AS_IO, 32, vamphalf_state )
 	AM_RANGE(0x0480, 0x0483) AM_WRITE(eeprom32_w)
 	AM_RANGE(0x0620, 0x0623) AM_DEVREADWRITE8("oki_2", okim6295_device, read, write, 0x0000ff00)
 	AM_RANGE(0x0660, 0x0663) AM_DEVREADWRITE8("oki_1", okim6295_device, read, write, 0x0000ff00)
-	AM_RANGE(0x0640, 0x0647) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r, ym2151_w, 0x0000ff00)
+	AM_RANGE(0x0640, 0x0647) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x0000ff00)
 	AM_RANGE(0x0680, 0x0683) AM_WRITE(aoh_oki_bank_w)
 ADDRESS_MAP_END
 
@@ -563,8 +563,8 @@ static ADDRESS_MAP_START( boonggab_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x600, 0x603) AM_WRITE(boonggab_oki_bank_w)
 	AM_RANGE(0x700, 0x701) AM_NOP // return 0, when oki chip is read / written
 	AM_RANGE(0x702, 0x703) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x740, 0x743) AM_DEVWRITE8_LEGACY("ymsnd", ym2151_register_port_w, 0x00ff)
-	AM_RANGE(0x744, 0x747) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
+	AM_RANGE(0x740, 0x743) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
+	AM_RANGE(0x744, 0x747) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
 ADDRESS_MAP_END
 
 /*
@@ -1004,7 +1004,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( sound_ym_oki )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 28000000/8)
+	MCFG_YM2151_ADD("ymsnd", 28000000/8)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1016,7 +1016,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( sound_suplup )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 14318180/4)
+	MCFG_YM2151_ADD("ymsnd", 14318180/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1134,7 +1134,7 @@ static MACHINE_CONFIG_START( aoh, vamphalf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

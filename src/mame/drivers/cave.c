@@ -1149,7 +1149,7 @@ static ADDRESS_MAP_START( metmqstr_sound_portmap, AS_IO, 8, cave_state )
 	AM_RANGE(0x20, 0x20) AM_READ(soundflags_r)							// Communication
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)						// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r)						//
-	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	// YM2151
+	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)	// YM2151
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE("oki1", okim6295_device, write)				// M6295 #0
 	AM_RANGE(0x70, 0x70) AM_WRITE(metmqstr_okibank0_w)					// Samples Bank #0
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("oki2", okim6295_device, write)				// M6295 #1
@@ -1241,7 +1241,7 @@ static ADDRESS_MAP_START( sailormn_sound_portmap, AS_IO, 8, cave_state )
 	AM_RANGE(0x20, 0x20) AM_READ(soundflags_r)								// Communication
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)							// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r)							//
-	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)		// YM2151
+	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)		// YM2151
 	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE("oki1", okim6295_device, read, write)	// M6295 #0
 	AM_RANGE(0x70, 0x70) AM_WRITE(sailormn_okibank0_w)						// Samples Bank #0
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki2", okim6295_device, read, write)	// M6295 #1
@@ -1827,11 +1827,6 @@ static void irqhandler(device_t *device, int irq)
 	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(irqhandler)
-};
-
 static const ym2203_interface ym2203_config =
 {
 	{
@@ -2299,8 +2294,8 @@ static MACHINE_CONFIG_START( metmqstr, cave_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_16MHz / 4)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz / 4)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.20)
 
@@ -2472,8 +2467,8 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_16MHz/4)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 

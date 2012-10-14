@@ -833,7 +833,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, atarisy2_state )
 	AM_RANGE(0x1810, 0x1813) AM_MIRROR(0x278c) AM_READ(leta_r)
 	AM_RANGE(0x1830, 0x183f) AM_MIRROR(0x2780) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
 	AM_RANGE(0x1840, 0x1840) AM_MIRROR(0x278f) AM_READ(switch_6502_r)
-	AM_RANGE(0x1850, 0x1851) AM_MIRROR(0x278e) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x1850, 0x1851) AM_MIRROR(0x278e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x1860, 0x1860) AM_MIRROR(0x278f) AM_READ(sound_6502_r)
 	AM_RANGE(0x1870, 0x1870) AM_MIRROR(0x2781) AM_WRITE(tms5220_w)
 	AM_RANGE(0x1872, 0x1873) AM_MIRROR(0x2780) AM_WRITE(tms5220_strobe_w)
@@ -1283,7 +1283,7 @@ static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK/4)
+	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 

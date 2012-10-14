@@ -314,9 +314,9 @@ void seibu_ym3812_irqhandler(device_t *device, int linestate)
 	update_irq_lines(device->machine(), linestate ? RST10_ASSERT : RST10_CLEAR);
 }
 
-void seibu_ym2151_irqhandler(device_t *device, int linestate)
+WRITE_LINE_DEVICE_HANDLER( seibu_ym2151_irqhandler )
 {
-	update_irq_lines(device->machine(), linestate ? RST10_ASSERT : RST10_CLEAR);
+	update_irq_lines(device->machine(), state ? RST10_ASSERT : RST10_CLEAR);
 }
 
 void seibu_ym2203_irqhandler(device_t *device, int linestate)
@@ -450,11 +450,6 @@ const ym3812_interface seibu_ym3812_interface =
 	seibu_ym3812_irqhandler
 };
 
-const ym2151_interface seibu_ym2151_interface =
-{
-	DEVCB_LINE(seibu_ym2151_irqhandler)
-};
-
 const ym2203_interface seibu_ym2203_interface =
 {
 	{
@@ -493,7 +488,7 @@ ADDRESS_MAP_START( seibu2_airraid_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x4002, 0x4002) AM_WRITE_LEGACY(seibu_rst10_ack_w)
 	AM_RANGE(0x4003, 0x4003) AM_WRITE_LEGACY(seibu_rst18_ack_w)
 	AM_RANGE(0x4007, 0x4007) AM_WRITENOP // bank, always 0
-	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x4010, 0x4011) AM_READ_LEGACY(seibu_soundlatch_r)
 	AM_RANGE(0x4012, 0x4012) AM_READ_LEGACY(seibu_main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
@@ -511,7 +506,7 @@ ADDRESS_MAP_START( seibu2_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x4002, 0x4002) AM_WRITE_LEGACY(seibu_rst10_ack_w)
 	AM_RANGE(0x4003, 0x4003) AM_WRITE_LEGACY(seibu_rst18_ack_w)
 	AM_RANGE(0x4007, 0x4007) AM_WRITE_LEGACY(seibu_bank_w)
-	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x4010, 0x4011) AM_READ_LEGACY(seibu_soundlatch_r)
 	AM_RANGE(0x4012, 0x4012) AM_READ_LEGACY(seibu_main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
@@ -528,7 +523,7 @@ ADDRESS_MAP_START( seibu2_raiden2_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x4001, 0x4001) AM_WRITE_LEGACY(seibu_irq_clear_w)
 	AM_RANGE(0x4002, 0x4002) AM_WRITE_LEGACY(seibu_rst10_ack_w)
 	AM_RANGE(0x4003, 0x4003) AM_WRITE_LEGACY(seibu_rst18_ack_w)
-	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x4010, 0x4011) AM_READ_LEGACY(seibu_soundlatch_r)
 	AM_RANGE(0x4012, 0x4012) AM_READ_LEGACY(seibu_main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")

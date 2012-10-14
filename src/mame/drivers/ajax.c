@@ -55,7 +55,7 @@ static ADDRESS_MAP_START( ajax_sound_map, AS_PROGRAM, 8, ajax_state )
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232_2", k007232_r, k007232_w)		/* 007232 registers (chip 2) */
 	AM_RANGE(0xb80c, 0xb80c) AM_WRITE(k007232_extvol_w)			/* extra volume, goes to the 007232 w/ A11 */
 																/* selecting a different latch for the external port */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)		/* YM2151 */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)		/* YM2151 */
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)				/* soundlatch_byte_r */
 ADDRESS_MAP_END
 
@@ -241,7 +241,7 @@ static MACHINE_CONFIG_START( ajax, ajax_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

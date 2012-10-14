@@ -347,7 +347,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gauntlet_state )
 	AM_RANGE(0x1020, 0x102f) AM_MIRROR(0x27c0) AM_READ_PORT("COIN") AM_WRITE(mixer_w)
 	AM_RANGE(0x1030, 0x103f) AM_MIRROR(0x27c0) AM_READWRITE(switch_6502_r, sound_ctl_w)
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x27c0) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0x1810, 0x1811) AM_MIRROR(0x27ce) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x1810, 0x1811) AM_MIRROR(0x27ce) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x1820, 0x182f) AM_MIRROR(0x27c0) AM_DEVWRITE_LEGACY("tms", tms5220_data_w)
 	AM_RANGE(0x1830, 0x183f) AM_MIRROR(0x27c0) AM_READWRITE_LEGACY(atarigen_6502_irq_ack_r, atarigen_6502_irq_ack_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -539,7 +539,7 @@ static MACHINE_CONFIG_START( gauntlet, gauntlet_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
+	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.48)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.48)
 

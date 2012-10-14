@@ -103,7 +103,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( crimfght_sound_map, AS_PROGRAM, 8, crimfght_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM									/* ROM 821l01.h4 */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM									/* RAM */
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)		/* YM2151 */
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)		/* YM2151 */
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)						/* soundlatch_byte_r */
 	AM_RANGE(0xe000, 0xe00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)	/* 007232 registers */
 ADDRESS_MAP_END
@@ -223,12 +223,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(crimfght_state,crimfght_snd_bankswitch_w)
-};
-
 static void volume_callback( device_t *device, int v )
 {
 	k007232_set_volume(device, 0, (v & 0x0f) * 0x11, 0);
@@ -306,8 +300,8 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz)	/* verified on pcb */
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)	/* verified on pcb */
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(crimfght_state,crimfght_snd_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

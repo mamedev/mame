@@ -57,6 +57,7 @@ public:
 	segas24_sprite *vsprite;
 	segas24_mixer *vmixer;
 
+	DECLARE_WRITE_LINE_MEMBER(irq_ym);
 	DECLARE_READ16_MEMBER(  sys16_paletteram_r );
 	DECLARE_WRITE16_MEMBER( sys16_paletteram_w );
 	DECLARE_READ16_MEMBER(  irq_r );

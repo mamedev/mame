@@ -221,7 +221,7 @@ static ADDRESS_MAP_START( zeropnt2_map, AS_PROGRAM, 32, unico_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM												// ROM
 	AM_RANGE(0x800018, 0x80001b) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x800024, 0x800027) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff0000	)	// Sound
-	AM_RANGE(0x800028, 0x80002f) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r, ym2151_w, 0x00ff0000)	//
+	AM_RANGE(0x800028, 0x80002f) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff0000)	//
 	AM_RANGE(0x800030, 0x800033) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff0000	)	//
 	AM_RANGE(0x800034, 0x800037) AM_WRITE(zeropnt2_sound_bank_w				)	//
 	AM_RANGE(0x800038, 0x80003b) AM_WRITE(zeropnt2_leds_w					)	// ?
@@ -700,7 +700,7 @@ static MACHINE_CONFIG_START( zeropnt2, unico_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
 

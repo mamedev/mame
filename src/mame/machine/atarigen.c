@@ -626,11 +626,10 @@ WRITE8_HANDLER( atarigen_6502_irq_ack_w )
     IRQ line.
 ---------------------------------------------------------------*/
 
-void atarigen_ym2151_irq_gen(device_t *device, int irq)
+WRITE_LINE_MEMBER( atarigen_state::ym2151_irq_gen )
 {
-	atarigen_state *state = device->machine().driver_data<atarigen_state>();
-	state->m_ym2151_int = irq;
-	update_6502_irq(device->machine());
+	m_ym2151_int = state;
+	update_6502_irq(machine());
 }
 
 

@@ -1004,7 +1004,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, deco32_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_byte_r)
@@ -1024,7 +1024,7 @@ READ8_MEMBER(deco32_state::latch_r)
 static ADDRESS_MAP_START( nslasher_sound, AS_PROGRAM, 8, deco32_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
 	AM_RANGE(0xd000, 0xd000) AM_READ(latch_r)
@@ -1621,20 +1621,14 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-static void sound_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(deco32_state::sound_irq_nslasher)
 {
-	device->machine().device("audiocpu")->execute().set_input_line(1, state); /* IRQ 2 */
-}
-
-static void sound_irq_nslasher(device_t *device, int state)
-{
-	deco32_state *drvstate = device->machine().driver_data<deco32_state>();
 	/* bit 0 of nslasher_sound_irq specifies IRQ from sound chip */
 	if (state)
-		drvstate->m_nslasher_sound_irq |= 0x01;
+		m_nslasher_sound_irq |= 0x01;
 	else
-		drvstate->m_nslasher_sound_irq &= ~0x01;
-	device->machine().device("audiocpu")->execute().set_input_line(0, (drvstate->m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+		m_nslasher_sound_irq &= ~0x01;
+	subdevice("audiocpu")->execute().set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(deco32_state::sound_bankswitch_w)
@@ -1644,18 +1638,6 @@ WRITE8_MEMBER(deco32_state::sound_bankswitch_w)
 	oki1->set_bank_base(((data >> 0)& 1) * 0x40000);
 	oki2->set_bank_base(((data >> 1)& 1) * 0x40000);
 }
-
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(sound_irq),
-	DEVCB_DRIVER_MEMBER(deco32_state,sound_bankswitch_w)
-};
-
-static const ym2151_interface ym2151_interface_nslasher =
-{
-	DEVCB_LINE(sound_irq_nslasher),
-	DEVCB_DRIVER_MEMBER(deco32_state,sound_bankswitch_w)
-};
 
 static const eeprom_interface eeprom_interface_tattass =
 {
@@ -1767,8 +1749,9 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_32_22MHz/9) /* verified on pcb */
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", XTAL_32_22MHz/9) /* verified on pcb */
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
@@ -1815,8 +1798,9 @@ static MACHINE_CONFIG_START( fghthist, deco32_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 32220000/9)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
@@ -1861,8 +1845,9 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 32220000/9)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
@@ -1974,8 +1959,9 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 32220000/9)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
@@ -2049,8 +2035,9 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 32220000/9)
-	MCFG_SOUND_CONFIG(ym2151_interface_nslasher)
+	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(deco32_state,sound_irq_nslasher))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
@@ -2068,7 +2055,7 @@ static MACHINE_CONFIG_DERIVED( lockloadu, lockload )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_SOUND_MODIFY("ymsnd")
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
 
 MACHINE_CONFIG_END
 
@@ -2176,8 +2163,9 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 32220000/9)
-	MCFG_SOUND_CONFIG(ym2151_interface_nslasher)
+	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(deco32_state,sound_irq_nslasher))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 

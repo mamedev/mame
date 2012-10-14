@@ -392,7 +392,7 @@ static ADDRESS_MAP_START( NAME##_mcu_map, AS_PROGRAM, 8, namcos86_state )	\
 	AM_RANGE(0x0080, 0x00ff) AM_RAM														\
 	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */	\
 	AM_RANGE(0x1400, 0x1fff) AM_RAM														\
-	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	\
+	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)	\
 	AM_RANGE(ADDR_INPUT+0x20, ADDR_INPUT+0x20) AM_READ_PORT("IN0")						\
 	AM_RANGE(ADDR_INPUT+0x21, ADDR_INPUT+0x21) AM_READ_PORT("IN1")						\
 	AM_RANGE(ADDR_INPUT+0x30, ADDR_INPUT+0x30) AM_READ(dsw0_r)							\
@@ -1022,7 +1022,7 @@ static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579580)
+	MCFG_YM2151_ADD("ymsnd", 3579580)
 	MCFG_SOUND_ROUTE(0, "mono", 0.0)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)	/* only right channel is connected */
 

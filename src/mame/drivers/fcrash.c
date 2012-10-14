@@ -801,7 +801,7 @@ static MACHINE_CONFIG_START( kodb, cps_state )
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")
 
-//  MCFG_SOUND_ADD("2151", YM2151, 3579545)
+//  MCFG_YM2151_ADD("2151", 3579545)
 //  MCFG_SOUND_CONFIG(ym2151_config)
 //  MCFG_SOUND_ROUTE(0, "mono", 0.35)
 //  MCFG_SOUND_ROUTE(1, "mono", 0.35)

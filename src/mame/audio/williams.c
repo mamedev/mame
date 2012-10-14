@@ -222,7 +222,7 @@ WRITE_LINE_MEMBER(williams_cvsd_sound_device::pia_irqb)
 
 static ADDRESS_MAP_START( williams_cvsd_map, AS_PROGRAM, 8, williams_cvsd_sound_device )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE_LEGACY("ym2151", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x07ff) AM_WRITE(cvsd_digit_clock_clear_w)
 	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07ff) AM_WRITE(cvsd_clock_set_w)
@@ -253,16 +253,6 @@ static const pia6821_interface cvsd_pia_intf =
 
 
 //-------------------------------------------------
-//  YM2151 configuration
-//-------------------------------------------------
-
-static const ym2151_interface cvsd_ym2151_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, williams_cvsd_sound_device, ym2151_irq_w)
-};
-
-
-//-------------------------------------------------
 //  machine configuration
 //-------------------------------------------------
 
@@ -272,8 +262,8 @@ static MACHINE_CONFIG_FRAGMENT( williams_cvsd_sound )
 
 	MCFG_PIA6821_ADD("pia", cvsd_pia_intf)
 
-	MCFG_SOUND_ADD("ym2151", YM2151, CVSD_FM_CLOCK)
-	MCFG_SOUND_CONFIG(cvsd_ym2151_interface)
+	MCFG_YM2151_ADD("ym2151", CVSD_FM_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(williams_cvsd_sound_device, ym2151_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.10)
 
 	MCFG_DAC_ADD("dac")
@@ -566,7 +556,7 @@ WRITE_LINE_MEMBER(williams_narc_sound_device::ym2151_irq_w)
 
 static ADDRESS_MAP_START( williams_narc_master_map, AS_PROGRAM, 8, williams_narc_sound_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x03fe) AM_DEVREADWRITE_LEGACY("ym2151", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_WRITE(master_talkback_w)
 	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_WRITE(command2_w)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
@@ -597,16 +587,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  YM2151 configuration
-//-------------------------------------------------
-
-static const ym2151_interface narc_ym2151_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, williams_narc_sound_device, ym2151_irq_w)
-};
-
-
-//-------------------------------------------------
 //  machine configuration
 //-------------------------------------------------
 
@@ -617,8 +597,8 @@ static MACHINE_CONFIG_FRAGMENT( williams_narc_sound )
 	MCFG_CPU_ADD("cpu1", M6809E, NARC_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(williams_narc_slave_map)
 
-	MCFG_SOUND_ADD("ym2151", YM2151, NARC_FM_CLOCK)
-	MCFG_SOUND_CONFIG(narc_ym2151_interface)
+	MCFG_YM2151_ADD("ym2151", NARC_FM_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(williams_narc_sound_device, ym2151_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.10)
 
 	MCFG_DAC_ADD("dac1")
@@ -859,7 +839,7 @@ WRITE_LINE_MEMBER(williams_adpcm_sound_device::ym2151_irq_w)
 static ADDRESS_MAP_START( williams_adpcm_map, AS_PROGRAM, 8, williams_adpcm_sound_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_WRITE(bank_select_w)
-	AM_RANGE(0x2400, 0x2401) AM_MIRROR(0x03fe) AM_DEVREADWRITE_LEGACY("ym2151", ym2151_r, ym2151_w)
+	AM_RANGE(0x2400, 0x2401) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_READ(command_r)
@@ -881,16 +861,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  YM2151 configuration
-//-------------------------------------------------
-
-static const ym2151_interface adpcm_ym2151_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, williams_adpcm_sound_device, ym2151_irq_w)
-};
-
-
-//-------------------------------------------------
 //  machine configuration
 //-------------------------------------------------
 
@@ -898,8 +868,8 @@ static MACHINE_CONFIG_FRAGMENT( williams_adpcm_sound )
 	MCFG_CPU_ADD("cpu", M6809E, ADPCM_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(williams_adpcm_map)
 
-	MCFG_SOUND_ADD("ym2151", YM2151, ADPCM_FM_CLOCK)
-	MCFG_SOUND_CONFIG(adpcm_ym2151_interface)
+	MCFG_YM2151_ADD("ym2151", ADPCM_FM_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(williams_adpcm_sound_device, ym2151_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.10)
 
 	MCFG_DAC_ADD("dac")

@@ -173,8 +173,8 @@ static ADDRESS_MAP_START( gbusters_sound_map, AS_PROGRAM, 8, gbusters_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM													/* RAM */
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)									/* soundlatch_byte_r */
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)		/* 007232 registers */
-	AM_RANGE(0xc001, 0xc001) AM_DEVREAD_LEGACY("ymsnd", ym2151_status_port_r)					/* YM 2151 */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)				/* YM 2151 */
+	AM_RANGE(0xc001, 0xc001) AM_DEVREAD("ymsnd", ym2151_device, status_r)					/* YM 2151 */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)				/* YM 2151 */
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(gbusters_snd_bankswitch_w)		/* 007232 bankswitch? */
 ADDRESS_MAP_END
 
@@ -327,7 +327,7 @@ static MACHINE_CONFIG_START( gbusters, gbusters_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 

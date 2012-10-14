@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( rockrage_sound_map, AS_PROGRAM, 8, rockrage_state )
 	AM_RANGE(0x3000, 0x3000) AM_READ(rockrage_VLM5030_busy_r)			/* VLM5030 */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(rockrage_speech_w)				/* VLM5030 */
 	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_byte_r)								/* soundlatch_byte_r */
-	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)			/* YM 2151 */
+	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)			/* YM 2151 */
 	AM_RANGE(0x7000, 0x77ff) AM_RAM												/* RAM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM												/* ROM */
 ADDRESS_MAP_END
@@ -286,7 +286,7 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 

@@ -143,7 +143,7 @@ READ8_MEMBER(rbmk_state::rbmk_mcu_io_r)
 {
 	if(m_mux_data & 8)
 	{
-		return ym2151_r(machine().device("ymsnd"), space, offset & 1);
+		return machine().device<ym2151_device>("ymsnd")->read(space, offset & 1);
 	}
 	else if(m_mux_data & 4)
 	{
@@ -159,7 +159,7 @@ READ8_MEMBER(rbmk_state::rbmk_mcu_io_r)
 
 WRITE8_MEMBER(rbmk_state::rbmk_mcu_io_w)
 {
-	if(m_mux_data & 8) { ym2151_w(machine().device("ymsnd"), space, offset & 1, data); }
+	if(m_mux_data & 8) { machine().device<ym2151_device>("ymsnd")->write(space, offset & 1, data); }
 	else if(m_mux_data & 4)
 	{
 		//printf("%02x %02x W\n",offset,data);
@@ -565,7 +565,7 @@ static MACHINE_CONFIG_START( rbmk, rbmk_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 22000000 / 8)
+	MCFG_YM2151_ADD("ymsnd", 22000000 / 8)
 //  MCFG_SOUND_CONFIG(ym2151_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)

@@ -716,7 +716,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( ym2151_ctl_w )
+WRITE8_DEVICE_HANDLER( ym2151_ctl_w )
 {
 	ym2151_ct1 = data&0x1;
 	ym2151_ct2 = (data&0x2)>>1;
@@ -750,7 +750,7 @@ static void update_all_volumes(running_machine &machine )
 
 static ADDRESS_MAP_START( atarijsa1_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE_LEGACY(jsa1_io_r, jsa1_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -758,7 +758,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atarijsa2_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE_LEGACY(jsa2_io_r, jsa2_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -767,7 +767,7 @@ ADDRESS_MAP_END
 /* full map verified from schematics and Batman GALs */
 static ADDRESS_MAP_START( atarijsa3_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x2800, 0x2fff) AM_READWRITE_LEGACY(jsa3_io_r, jsa3_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -775,24 +775,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atarijsa3s_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x2800, 0x2fff) AM_READWRITE_LEGACY(jsa3s_io_r, jsa3s_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
-
-
-
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
-
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(atarigen_ym2151_irq_gen),
-	DEVCB_HANDLER(ym2151_ctl_w)
-};
 
 
 
@@ -813,8 +799,9 @@ MACHINE_CONFIG_FRAGMENT( jsa_i_stereo )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, JSA_MASTER_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", JSA_MASTER_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(atarigen_state, ym2151_irq_gen))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(driver_device, member_wrapper8<ym2151_ctl_w>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_CONFIG_END
@@ -826,8 +813,8 @@ MACHINE_CONFIG_DERIVED( jsa_i_stereo_swapped, jsa_i_stereo )
 	/* basic machine hardware */
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, JSA_MASTER_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_DEVICE_MODIFY("ymsnd")
+	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.60)
 MACHINE_CONFIG_END
@@ -856,8 +843,9 @@ MACHINE_CONFIG_FRAGMENT( jsa_i_mono_speech )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, JSA_MASTER_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", JSA_MASTER_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(atarigen_state, ym2151_irq_gen))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(driver_device, member_wrapper8<ym2151_ctl_w>))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
@@ -877,8 +865,9 @@ MACHINE_CONFIG_FRAGMENT( jsa_ii_mono )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, JSA_MASTER_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", JSA_MASTER_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(atarigen_state, ym2151_irq_gen))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(driver_device, member_wrapper8<ym2151_ctl_w>))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
@@ -920,8 +909,9 @@ MACHINE_CONFIG_FRAGMENT( jsa_iiis_stereo )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, JSA_MASTER_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", JSA_MASTER_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(atarigen_state, ym2151_irq_gen))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(driver_device, member_wrapper8<ym2151_ctl_w>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 

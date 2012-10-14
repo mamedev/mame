@@ -1,8 +1,8 @@
 /***************************************************************************
 
-  2151intf.c
+	2151intf.c
 
-  Support interface YM2151(OPM)
+	Support interface YM2151(OPM)
 
 ***************************************************************************/
 
@@ -12,130 +12,60 @@
 #include "ym2151.h"
 
 
-struct ym2151_state
-{
-	sound_stream *			stream;
-	emu_timer *				timer[2];
-	void *					chip;
-	UINT8					lastreg;
-	devcb_resolved_write_line irqhandler;
-	devcb_resolved_write8 portwritehandler;
-};
+
+const device_type YM2151 = &device_creator<ym2151_device>;
 
 
-INLINE ym2151_state *get_safe_token(device_t *device)
+//-------------------------------------------------
+//  ym2151_device - constructor
+//-------------------------------------------------
+
+ym2151_device::ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, YM2151, "YM2151", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_irqhandler(*this),
+	  m_portwritehandler(*this)
 {
-	assert(device != NULL);
-	assert(device->type() == YM2151);
-	return (ym2151_state *)downcast<ym2151_device *>(device)->token();
 }
 
 
-static STREAM_UPDATE( ym2151_update )
+//-------------------------------------------------
+//  read - read from the device
+//-------------------------------------------------
+
+READ8_MEMBER( ym2151_device::read )
 {
-	ym2151_state *info = (ym2151_state *)param;
-	ym2151_update_one(info->chip, outputs, samples);
-}
-
-static void ym2151_irq_frontend(device_t *device, int irq)
-{
-	ym2151_state *info = get_safe_token(device);
-	info->irqhandler(irq);
-}
-
-static void ym2151_port_write_frontend(device_t *device, offs_t offset, UINT8 data)
-{
-	ym2151_state *info = get_safe_token(device);
-	info->portwritehandler(offset, data);
-}
-
-static DEVICE_START( ym2151 )
-{
-	static const ym2151_interface dummy = { DEVCB_NULL };
-	ym2151_state *info = get_safe_token(device);
-	int rate;
-
-	const ym2151_interface *intf = device->static_config() ? (const ym2151_interface *)device->static_config() : &dummy;
-	info->irqhandler.resolve(intf->irqhandler, *device);
-	info->portwritehandler.resolve(intf->portwritehandler, *device);
-
-	rate = device->clock()/64;
-
-	/* stream setup */
-	info->stream = device->machine().sound().stream_alloc(*device,0,2,rate,info,ym2151_update);
-
-	info->chip = ym2151_init(device,device->clock(),rate);
-	assert_always(info->chip != NULL, "Error creating YM2151 chip");
-
-	ym2151_set_irq_handler(info->chip,ym2151_irq_frontend);
-	ym2151_set_port_write_handler(info->chip,ym2151_port_write_frontend);
-}
-
-
-static DEVICE_STOP( ym2151 )
-{
-	ym2151_state *info = get_safe_token(device);
-	ym2151_shutdown(info->chip);
-}
-
-static DEVICE_RESET( ym2151 )
-{
-	ym2151_state *info = get_safe_token(device);
-	ym2151_reset_chip(info->chip);
-}
-
-
-READ8_DEVICE_HANDLER( ym2151_r )
-{
-	ym2151_state *token = get_safe_token(device);
-
 	if (offset & 1)
 	{
-		token->stream->update();
-		return ym2151_read_status(token->chip);
+		m_stream->update();
+		return ym2151_read_status(m_chip);
 	}
 	else
 		return 0xff;	/* confirmed on a real YM2151 */
 }
 
-WRITE8_DEVICE_HANDLER( ym2151_w )
-{
-	ym2151_state *token = get_safe_token(device);
 
+//-------------------------------------------------
+//  write - write from the device
+//-------------------------------------------------
+
+WRITE8_MEMBER( ym2151_device::write )
+{
 	if (offset & 1)
 	{
-		token->stream->update();
-		ym2151_write_reg(token->chip, token->lastreg, data);
+		m_stream->update();
+		ym2151_write_reg(m_chip, m_lastreg, data);
 	}
 	else
-		token->lastreg = data;
+		m_lastreg = data;
 }
 
 
-READ8_DEVICE_HANDLER( ym2151_status_port_r ) { return ym2151_r(device, space, 1); }
+READ8_MEMBER( ym2151_device::status_r ) { return read(space, 1); }
 
-WRITE8_DEVICE_HANDLER( ym2151_register_port_w ) { ym2151_w(device, space, 0, data); }
-WRITE8_DEVICE_HANDLER( ym2151_data_port_w ) { ym2151_w(device, space, 1, data); }
+WRITE8_MEMBER( ym2151_device::register_w ) { write(space, 0, data); }
+WRITE8_MEMBER( ym2151_device::data_w ) { write(space, 1, data); }
 
-
-const device_type YM2151 = &device_creator<ym2151_device>;
-
-ym2151_device::ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, YM2151, "YM2151", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(ym2151_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ym2151_device::device_config_complete()
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -143,8 +73,20 @@ void ym2151_device::device_config_complete()
 
 void ym2151_device::device_start()
 {
-	DEVICE_START_NAME( ym2151 )(this);
+	m_irqhandler.resolve_safe();
+	m_portwritehandler.resolve_safe();
+	
+	// stream setup
+	int rate = clock() / 64;
+	m_stream = stream_alloc(0, 2, rate);
+
+	m_chip = ym2151_init(this, clock(), rate);
+	assert_always(m_chip != NULL, "Error creating YM2151 chip");
+
+	ym2151_set_irq_handler(m_chip, irq_frontend);
+	ym2151_set_port_write_handler(m_chip, port_write_frontend);
 }
+
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -152,8 +94,9 @@ void ym2151_device::device_start()
 
 void ym2151_device::device_reset()
 {
-	DEVICE_RESET_NAME( ym2151 )(this);
+	ym2151_reset_chip(m_chip);
 }
+
 
 //-------------------------------------------------
 //  device_stop - device-specific stop
@@ -161,8 +104,9 @@ void ym2151_device::device_reset()
 
 void ym2151_device::device_stop()
 {
-	DEVICE_STOP_NAME( ym2151 )(this);
+	ym2151_shutdown(m_chip);
 }
+
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -170,8 +114,16 @@ void ym2151_device::device_stop()
 
 void ym2151_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	ym2151_update_one(m_chip, outputs, samples);
 }
 
 
+void ym2151_device::irq_frontend(device_t *device, int irq)
+{
+	downcast<ym2151_device *>(device)->m_irqhandler(irq);
+}
+
+void ym2151_device::port_write_frontend(device_t *device, offs_t offset, UINT8 data)
+{
+	downcast<ym2151_device *>(device)->m_portwritehandler(offset, data);
+}

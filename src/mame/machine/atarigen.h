@@ -119,6 +119,8 @@ public:
 	DECLARE_WRITE8_MEMBER( earom_w );
 	DECLARE_WRITE8_MEMBER( earom_control_w );
 
+	DECLARE_WRITE_LINE_MEMBER( ym2151_irq_gen );
+
 	// vector and early raster EAROM interface
 	optional_device<er2055_device> m_earom;
 	UINT8				m_earom_data;
@@ -261,8 +263,6 @@ void atarigen_sound_io_reset(device_t *device);
 INTERRUPT_GEN( atarigen_6502_irq_gen );
 DECLARE_READ8_HANDLER( atarigen_6502_irq_ack_r );
 DECLARE_WRITE8_HANDLER( atarigen_6502_irq_ack_w );
-
-void atarigen_ym2151_irq_gen(device_t *device, int irq);
 
 DECLARE_WRITE16_HANDLER( atarigen_sound_w );
 DECLARE_READ16_HANDLER( atarigen_sound_r );

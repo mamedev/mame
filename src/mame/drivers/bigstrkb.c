@@ -213,7 +213,7 @@ static MACHINE_CONFIG_START( bigstrkb, bigstrkb_state )
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-//  MCFG_SOUND_ADD("ymsnd", YM2151, ym2151_config)
+//  MCFG_YM2151_ADD("ymsnd", ym2151_config)
 
 	MCFG_OKIM6295_ADD("oki1", 4000000, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)

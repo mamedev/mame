@@ -339,21 +339,6 @@ void segaxbd_state::sound_data_w(UINT8 data)
 
 
 //**************************************************************************
-//  YM2151 CHIP CALLBACKS
-//**************************************************************************
-
-//-------------------------------------------------
-//  sound_cpu_irq - signal an IRQ to the sound CPU
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( segaxbd_state::sound_cpu_irq )
-{
-	m_soundcpu->set_input_line(0, state);
-}
-
-
-
-//**************************************************************************
 //  MAIN CPU READ/WRITE CALLBACKS
 //**************************************************************************
 
@@ -983,7 +968,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segaxbd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
 
@@ -1551,11 +1536,6 @@ INPUT_PORTS_END
 //  SOUND DEFINITIONS
 //**************************************************************************
 
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(segaxbd_state, sound_cpu_irq)
-};
-
 static const sega_pcm_interface segapcm_interface =
 {
 	BANK_512
@@ -1618,8 +1598,8 @@ static MACHINE_CONFIG_START( xboard, segaxbd_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK/4)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 

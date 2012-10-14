@@ -18,4 +18,4 @@ DECLARE_WRITE8_HANDLER(t5182_sharedram_semaphore_main_release_w);
 DECLARE_READ8_HANDLER( t5182_sharedram_r );
 DECLARE_WRITE8_HANDLER( t5182_sharedram_w );
 
-extern const ym2151_interface t5182_ym2151_interface;
+WRITE_LINE_DEVICE_HANDLER(t5182_ym2151_irq_handler);

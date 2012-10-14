@@ -1043,7 +1043,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rtype_sound_portmap, AS_IO, 8, m72_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)
 	AM_RANGE(0x84, 0x84) AM_DEVREAD_LEGACY("m72", m72_sample_r)
@@ -1051,7 +1051,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, m72_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE_LEGACY("m72", m72_sample_w)
@@ -1060,7 +1060,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rtype2_sound_portmap, AS_IO, 8, m72_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("m72", rtype2_sample_addr_w)
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE_LEGACY("m72", m72_sample_w)
@@ -1072,7 +1072,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( poundfor_sound_portmap, AS_IO, 8, m72_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVWRITE_LEGACY("m72", poundfor_sample_addr_w)
-	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x42, 0x42) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x42, 0x42) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)
 ADDRESS_MAP_END
@@ -1791,13 +1791,6 @@ GFXDECODE_END
 
 
 
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(m72_ym2151_irq_handler)
-};
-
-
-
 static MACHINE_CONFIG_START( m72_base, m72_state )
 
 	/* basic machine hardware */
@@ -1827,8 +1820,8 @@ static MACHINE_CONFIG_START( m72_base, m72_state )
 
 	MCFG_SOUND_ADD("m72", M72, 0);
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1882,8 +1875,8 @@ static MACHINE_CONFIG_START( rtype, m72_state )
 
 	MCFG_SOUND_ADD("m72", M72, 0);
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1919,8 +1912,8 @@ static MACHINE_CONFIG_START( xmultipl, m72_state )
 
 	MCFG_SOUND_ADD("m72", M72, 0);
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1960,8 +1953,8 @@ static MACHINE_CONFIG_START( xmultiplm72, m72_state )
 
 	MCFG_SOUND_ADD("m72", M72, 0);
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2001,8 +1994,8 @@ static MACHINE_CONFIG_START( dbreed, m72_state )
 
 	MCFG_SOUND_ADD("m72", M72, 0);
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2042,8 +2035,8 @@ static MACHINE_CONFIG_START( dbreedm72, m72_state )
 
 	MCFG_SOUND_ADD("m72", M72, 0);
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2083,8 +2076,8 @@ static MACHINE_CONFIG_START( rtype2, m72_state )
 
 	MCFG_SOUND_ADD("m72", M72, 0);
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2124,8 +2117,8 @@ static MACHINE_CONFIG_START( majtitle, m72_state )
 
 	MCFG_SOUND_ADD("m72", M72, 0);
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2165,8 +2158,8 @@ static MACHINE_CONFIG_START( hharry, m72_state )
 
 	MCFG_SOUND_ADD("m72", M72, 0);
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2206,8 +2199,8 @@ static MACHINE_CONFIG_START( hharryu, m72_state )
 
 	MCFG_SOUND_ADD("m72", M72, 0);
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2247,8 +2240,8 @@ static MACHINE_CONFIG_START( dkgenm72, m72_state )
 
 	MCFG_SOUND_ADD("m72", M72, 0);
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2288,8 +2281,8 @@ static MACHINE_CONFIG_START( poundfor, m72_state )
 
 	MCFG_SOUND_ADD("m72", M72, 0);
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2329,8 +2322,8 @@ static MACHINE_CONFIG_START( cosmccop, m72_state )
 
 	MCFG_SOUND_ADD("m72", M72, 0);
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

@@ -139,12 +139,12 @@ static DEVICE_RESET( m72_audio )
 	setvector_callback(device->machine(), state, VECTOR_INIT);
 }
 
-void m72_ym2151_irq_handler(device_t *device, int irq)
+WRITE_LINE_DEVICE_HANDLER(m72_ym2151_irq_handler)
 {
 	device_t *audio = device->machine().device("m72");
-	m72_audio_state *state = get_safe_token(audio);
+	m72_audio_state *audstate = get_safe_token(audio);
 
-	device->machine().scheduler().synchronize(FUNC(setvector_callback), irq ? YM2151_ASSERT : YM2151_CLEAR, state);
+	device->machine().scheduler().synchronize(FUNC(setvector_callback), state ? YM2151_ASSERT : YM2151_CLEAR, audstate);
 }
 
 WRITE16_DEVICE_HANDLER( m72_sound_command_w )

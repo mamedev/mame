@@ -911,7 +911,7 @@ static ADDRESS_MAP_START( jpopnics_sub_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("subbank")
 
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(jpopnics_subbankswitch_w)
-	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN1")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN2")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSWA")
@@ -1920,7 +1920,7 @@ static MACHINE_CONFIG_START( jpopnics, tnzs_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_12MHz/4) /* Not verified - Main board Crystal is 12MHz */
+	MCFG_YM2151_ADD("ymsnd", XTAL_12MHz/4) /* Not verified - Main board Crystal is 12MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

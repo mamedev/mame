@@ -56,6 +56,7 @@ public:
 
 	int m_mcu_hs;
 	UINT16 m_mcu_hs_ram[0x10];
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_READ16_MEMBER(ip_select_r);
 	DECLARE_WRITE16_MEMBER(ip_select_w);
 	DECLARE_READ16_MEMBER(protection_peekaboo_r);

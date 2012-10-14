@@ -406,13 +406,13 @@ WRITE8_MEMBER(metro_state::daitorid_portb_w)
 		if (!BIT(data, 2))
 		{
 			/* write */
-			ym2151_w(m_ymsnd, space, BIT(data, 1), m_porta);
+			downcast<ym2151_device *>(m_ymsnd.target())->write(space, BIT(data, 1), m_porta);
 		}
 
 		if (!BIT(data, 3))
 		{
 			/* read */
-			m_porta = ym2151_r(m_ymsnd, space, BIT(data, 1));
+			m_porta = downcast<ym2151_device *>(m_ymsnd.target())->read(space, BIT(data, 1));
 		}
 
 		m_portb = data;
@@ -435,18 +435,6 @@ WRITE8_MEMBER(metro_state::daitorid_portb_w)
 
 	m_portb = data;
 }
-
-static void metro_sound_irq_handler( device_t *device, int state )
-{
-	metro_state *driver_state = device->machine().driver_data<metro_state>();
-	driver_state->m_audiocpu->set_input_line(UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(metro_sound_irq_handler)	/* irq handler */
-};
-
 
 static const ymf278b_interface ymf278b_config =
 {
@@ -3610,8 +3598,8 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
@@ -4091,8 +4079,8 @@ static MACHINE_CONFIG_START( pururun, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz)	/* Confirmed match to reference video */
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)	/* Confirmed match to reference video */
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 

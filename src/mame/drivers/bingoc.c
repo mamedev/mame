@@ -127,7 +127,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io, AS_IO, 8, bingoc_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_WRITE(bingoc_play_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("upd", upd7759_port_w)
 #if !SOUND_TEST
@@ -168,7 +168,7 @@ static MACHINE_CONFIG_START( bingoc, bingoc_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") //might just be mono...
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 7159160/2)
+	MCFG_YM2151_ADD("ymsnd", 7159160/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

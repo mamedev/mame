@@ -120,7 +120,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_IO, 8, isa8_ibm_mfc_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ym2151", ym2151_r, ym2151_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("d71051", i8251_device, data_r, data_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("d71051", i8251_device, status_r, control_w)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("d71055c_1", i8255_device, read, write)
@@ -330,12 +330,6 @@ WRITE_LINE_MEMBER(isa8_ibm_mfc_device::ibm_mfc_ym_irq)
 	set_z80_interrupt(Z80_IRQ_YM, state);
 }
 
-static const ym2151_interface ibm_mfc_ym2151_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ibm_mfc_device, ibm_mfc_ym_irq),
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  Machine config
@@ -352,8 +346,8 @@ static MACHINE_CONFIG_FRAGMENT( ibm_mfc )
 	MCFG_PIT8253_ADD("d8253", d8253_intf)
 
 	MCFG_SPEAKER_STANDARD_STEREO("ymleft", "ymright")
-	MCFG_SOUND_ADD("ym2151", YM2151, XTAL_4MHz)
-	MCFG_SOUND_CONFIG(ibm_mfc_ym2151_interface)
+	MCFG_YM2151_ADD("ym2151", XTAL_4MHz)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(isa8_ibm_mfc_device, ibm_mfc_ym_irq))
 	MCFG_SOUND_ROUTE(0, "ymleft", 1.00)
 	MCFG_SOUND_ROUTE(1, "ymright", 1.00)
 MACHINE_CONFIG_END

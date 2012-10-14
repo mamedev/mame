@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( overdriv_slave_map, AS_PROGRAM, 16, overdriv_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( overdriv_sound_map, AS_PROGRAM, 8, overdriv_state )
-	AM_RANGE(0x0200, 0x0201) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)
+	AM_RANGE(0x0200, 0x0201) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0x0400, 0x042f) AM_DEVREADWRITE_LEGACY("k053260_1", k053260_r, k053260_w)
 	AM_RANGE(0x0600, 0x062f) AM_DEVREADWRITE_LEGACY("k053260_2", k053260_r, k053260_w)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
@@ -370,7 +370,7 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 

@@ -337,7 +337,7 @@ WRITE16_MEMBER(tatsumi_state::tatsumi_v30_68000_w)
 // self-test in Tatsumi games.  Needs fixed, but hack it here for now.
 READ8_MEMBER(tatsumi_state::tatsumi_hack_ym2151_r)
 {
-	int r=ym2151_status_port_r(machine().device("ymsnd"),space,0);
+	int r=machine().device<ym2151_device>("ymsnd")->status_r(space,0);
 
 	if (space.device().safe_pc()==0x2aca || space.device().safe_pc()==0x29fe
 		|| space.device().safe_pc()==0xf9721

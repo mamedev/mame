@@ -104,12 +104,6 @@ WRITE16_MEMBER(dbz_state::dbz_sound_cause_nmi)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void dbz_sound_irq( device_t *device, int irq )
-{
-	dbz_state *state = device->machine().driver_data<dbz_state>();
-
-	state->m_audiocpu->set_input_line(0, (irq) ? ASSERT_LINE : CLEAR_LINE);
-}
 
 static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16, dbz_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
@@ -151,7 +145,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dbz_sound_map, AS_PROGRAM, 8, dbz_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xd000, 0xd002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xe000, 0xe001) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
@@ -275,13 +269,6 @@ static INPUT_PORTS_START( dbz2 )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
-
-/**********************************************************************************/
-
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(dbz_sound_irq)
-};
 
 /**********************************************************************************/
 
@@ -413,8 +400,8 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

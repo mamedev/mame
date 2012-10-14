@@ -77,6 +77,7 @@ public:
 	cpu_device *m_maincpu;
 	cpu_device *m_audiocpu;
 	device_t *m_deco_tilegen1;
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_READ16_MEMBER(dblewing_prot_r);
 	DECLARE_WRITE16_MEMBER(dblewing_prot_w);
 	DECLARE_READ8_MEMBER(irq_latch_r);
@@ -351,7 +352,7 @@ READ8_MEMBER(dblewing_state::irq_latch_r)
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dblewing_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_status_port_r,ym2151_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, status_r, write)
 	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(irq_latch_r) //timing? sound latch?
@@ -530,22 +531,15 @@ static INPUT_PORTS_START( dblewing )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static void sound_irq( device_t *device, int state )
+WRITE_LINE_MEMBER(dblewing_state::sound_irq)
 {
-	dblewing_state *driver_state = device->machine().driver_data<dblewing_state>();
-
 	/* bit 0 of dblewing_sound_irq specifies IRQ from sound chip */
 	if (state)
-		driver_state->m_sound_irq |= 0x01;
+		m_sound_irq |= 0x01;
 	else
-		driver_state->m_sound_irq &= ~0x01;
-	driver_state->m_audiocpu->set_input_line(0, (driver_state->m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+		m_sound_irq &= ~0x01;
+	m_audiocpu->set_input_line(0, (m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
-
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(sound_irq)
-};
 
 static int dblewing_bank_callback( const int bank )
 {
@@ -669,8 +663,8 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 32220000/9)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(dblewing_state, sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_OKIM6295_ADD("oki", 32220000/32, OKIM6295_PIN7_HIGH)

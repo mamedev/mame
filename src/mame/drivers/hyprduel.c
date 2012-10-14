@@ -444,7 +444,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hyprduel_map2, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("sharedram1")						/* shadow ($c00000 - $c03fff : vector) */
 	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE("sharedram3")			/* shadow ($fe4000 - $fe7fff : read only) */
-	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r, ym2151_w, 0x00ff )
+	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff )
 	AM_RANGE(0x400004, 0x400005) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_NOP
 	AM_RANGE(0xc00000, 0xc07fff) AM_RAM AM_SHARE("sharedram1")
@@ -613,21 +613,6 @@ static GFXDECODE_START( 14220 )
 GFXDECODE_END
 
 /***************************************************************************
-                            Sound Communication
-***************************************************************************/
-
-static void sound_irq( device_t *device, int state )
-{
-	hyprduel_state *hyprduel = device->machine().driver_data<hyprduel_state>();
-	hyprduel->m_subcpu->set_input_line(1, HOLD_LINE);
-}
-
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(sound_irq)
-};
-
-/***************************************************************************
                                 Machine Drivers
 ***************************************************************************/
 
@@ -693,8 +678,8 @@ static MACHINE_CONFIG_START( hyprduel, hyprduel_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("sub", 1))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 

@@ -145,7 +145,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, blockout_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
@@ -260,16 +260,10 @@ INPUT_PORTS_END
  *************************************/
 
 /* handler called by the 2151 emulator when the internal timers cause an IRQ */
-static void blockout_irq_handler(device_t *device, int irq)
+WRITE_LINE_MEMBER(blockout_state::irq_handler)
 {
-	blockout_state *state = device->machine().driver_data<blockout_state>();
-	state->m_audiocpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
-
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(blockout_irq_handler)
-};
 
 
 /*************************************
@@ -329,8 +323,8 @@ static MACHINE_CONFIG_START( blockout, blockout_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, AUDIO_CLOCK)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", AUDIO_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(blockout_state,irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 

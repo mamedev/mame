@@ -129,7 +129,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( snd_portmap, AS_IO, 8, aquarium_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(aquarium_oki_r, aquarium_oki_w)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x06, 0x06) AM_WRITE(aquarium_snd_ack_w)
@@ -288,18 +288,6 @@ static GFXDECODE_START( aquarium )
 	GFXDECODE_ENTRY( "gfx4", 0, char5bpplayout,   0x400, 32 )
 GFXDECODE_END
 
-static void irq_handler( device_t *device, int irq )
-{
-	aquarium_state *state = device->machine().driver_data<aquarium_state>();
-	state->m_audiocpu->set_input_line(0 , irq ? ASSERT_LINE : CLEAR_LINE);
-}
-
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(irq_handler)
-};
-
-
 void aquarium_state::machine_start()
 {
 
@@ -340,8 +328,8 @@ static MACHINE_CONFIG_START( aquarium, aquarium_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_14_31818MHz/4) // clock not verified on pcb
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4) // clock not verified on pcb
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 

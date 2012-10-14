@@ -232,9 +232,9 @@ static WRITE8_HANDLER( t5182_cpu_irq_ack_w )
 	space.machine().scheduler().synchronize(FUNC(setirq_callback), CPU_CLEAR);
 }
 
-static void t5182_ym2151_irq_handler(device_t *device, int irq)
+WRITE_LINE_DEVICE_HANDLER(t5182_ym2151_irq_handler)
 {
-	if (irq)
+	if (state)
 		device->machine().scheduler().synchronize(FUNC(setirq_callback), YM2151_ASSERT);
 	else
 		device->machine().scheduler().synchronize(FUNC(setirq_callback), YM2151_CLEAR);
@@ -273,12 +273,6 @@ static READ8_HANDLER(t5182_sharedram_semaphore_main_r)
 {
 	return semaphore_main | (irqstate & 2);
 }
-
-
-const ym2151_interface t5182_ym2151_interface =
-{
-	DEVCB_LINE(t5182_ym2151_irq_handler)
-};
 
 
 
@@ -320,7 +314,7 @@ ADDRESS_MAP_END
 	// 50  W test mode status flags (bit 0 = ROM test fail, bit 1 = RAM test fail, bit 2 = YM2151 IRQ not received)
 ADDRESS_MAP_START( t5182_io, AS_IO, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(t5182_sharedram_semaphore_snd_acquire_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE_LEGACY(t5182_sharedram_semaphore_snd_release_w)
 	AM_RANGE(0x12, 0x12) AM_WRITE_LEGACY(t5182_ym2151_irq_ack_w)

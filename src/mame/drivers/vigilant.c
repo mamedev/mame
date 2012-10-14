@@ -109,7 +109,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, vigilant_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x81) AM_READ(soundlatch_byte_r) AM_DEVWRITE_LEGACY("m72", vigilant_sample_addr_w)	/* STL / STH */
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE_LEGACY("m72", m72_sample_w)			/* COUNT UP */
 	AM_RANGE(0x83, 0x83) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)	/* IRQ clear */
@@ -461,11 +461,6 @@ GFXDECODE_END
 
 
 
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(m72_ym2151_irq_handler)
-};
-
 static const ym2203_interface ym2203_config =
 {
 	{
@@ -507,8 +502,8 @@ static MACHINE_CONFIG_START( vigilant, vigilant_state )
 
 	MCFG_SOUND_ADD("m72", M72, 0)
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579645)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", 3579645)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
 
@@ -603,8 +598,8 @@ static MACHINE_CONFIG_START( kikcubic, vigilant_state )
 
 	MCFG_SOUND_ADD("m72", M72, 0)
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579645)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", 3579645)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
 

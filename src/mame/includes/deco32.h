@@ -61,6 +61,7 @@ public:
 	device_t *m_deco_tilegen1;
 	device_t *m_deco_tilegen2;
 	UINT8 m_irq_source;
+	DECLARE_WRITE_LINE_MEMBER(sound_irq_nslasher);
 	DECLARE_READ32_MEMBER(deco32_irq_controller_r);
 	DECLARE_WRITE32_MEMBER(deco32_irq_controller_w);
 	DECLARE_WRITE32_MEMBER(deco32_sound_w);

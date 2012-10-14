@@ -129,7 +129,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m90_sound_cpu_io_map, AS_IO, 8, m90_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("m72", rtype2_sample_addr_w)
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE_LEGACY("m72", m72_sample_w)
@@ -139,7 +139,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dynablsb_sound_cpu_io_map, AS_IO, 8, m90_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE("dac", dac_device, write_signed8)
 ADDRESS_MAP_END
@@ -147,7 +147,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( m99_sound_cpu_io_map, AS_IO, 8, m90_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", poundfor_sample_addr_w)
-	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x42, 0x42) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x42, 0x42) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)
 ADDRESS_MAP_END
@@ -666,17 +666,6 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(m72_ym2151_irq_handler)
-};
-
-/* this bootleg polls the YM2151 instead of taking interrupts from it */
-static const ym2151_interface dynablsb_ym2151_config =
-{
-	DEVCB_NULL
-};
-
 INTERRUPT_GEN_MEMBER(m90_state::fake_nmi)
 {
 	address_space &space = machine().firstcpu->space(AS_PROGRAM);
@@ -741,8 +730,8 @@ static MACHINE_CONFIG_START( m90, m90_state )
 
 	MCFG_SOUND_ADD("m72", M72, 0)
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz) /* verified on pcb */
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 
@@ -842,7 +831,7 @@ static MACHINE_CONFIG_DERIVED( dynablsb, m90 )
 	MCFG_DEVICE_REMOVE("m72")
 
 	MCFG_SOUND_MODIFY("ymsnd")
-	MCFG_SOUND_CONFIG(dynablsb_ym2151_config)
+	MCFG_YM2151_IRQ_HANDLER(NULL) /* this bootleg polls the YM2151 instead of taking interrupts from it */
 MACHINE_CONFIG_END
 
 

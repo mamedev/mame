@@ -1,46 +1,83 @@
+/***************************************************************************
+
+    2151intf.h
+
+    MAME interface to YM2151 emulator.
+
+***************************************************************************/
+
 #pragma once
 
 #ifndef __2151INTF_H__
 #define __2151INTF_H__
 
-#include "devlegcy.h"
 
-struct ym2151_interface
-{
-	devcb_write_line irqhandler;
-	devcb_write8 portwritehandler;
-};
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
 
-DECLARE_READ8_DEVICE_HANDLER( ym2151_r );
-DECLARE_WRITE8_DEVICE_HANDLER( ym2151_w );
+#define MCFG_YM2151_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, YM2151, _clock)
 
-DECLARE_READ8_DEVICE_HANDLER( ym2151_status_port_r );
-DECLARE_WRITE8_DEVICE_HANDLER( ym2151_register_port_w );
-DECLARE_WRITE8_DEVICE_HANDLER( ym2151_data_port_w );
+#define MCFG_YM2151_IRQ_HANDLER(_devcb) \
+	devcb = &ym2151_device::set_irq_handler(*device, DEVCB2_##_devcb); \
 
-class ym2151_device : public device_t,
-                                  public device_sound_interface
+#define MCFG_YM2151_PORT_WRITE_HANDLER(_devcb) \
+	devcb = &ym2151_device::set_port_write_handler(*device, DEVCB2_##_devcb); \
+
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+
+// ======================> ym2151_device
+
+class ym2151_device : 	public device_t,
+						public device_sound_interface
 {
 public:
+	// construction/destruction
 	ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~ym2151_device() { global_free(m_token); }
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<ym2151_device &>(device).m_irqhandler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_port_write_handler(device_t &device, _Object object) { return downcast<ym2151_device &>(device).m_portwritehandler.set_callback(object); }
+
+	// read/write
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	
+	DECLARE_READ8_MEMBER( status_r );
+	DECLARE_WRITE8_MEMBER( register_w );
+	DECLARE_WRITE8_MEMBER( data_w );
+
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_stop();
 	virtual void device_reset();
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
 private:
+	// internal helpers
+	static void irq_frontend(device_t *device, int irq);
+	static void port_write_frontend(device_t *device, offs_t offset, UINT8 data);
+
 	// internal state
-	void *m_token;
+	sound_stream *			m_stream;
+	emu_timer *				m_timer[2];
+	void *					m_chip;
+	UINT8					m_lastreg;
+	devcb2_write_line		m_irqhandler;
+	devcb2_write8			m_portwritehandler;
 };
 
+
+// device type definition
 extern const device_type YM2151;
 
 

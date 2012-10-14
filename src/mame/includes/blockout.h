@@ -25,6 +25,7 @@ public:
 	/* devices */
 	cpu_device *m_maincpu;
 	cpu_device *m_audiocpu;
+	DECLARE_WRITE_LINE_MEMBER(irq_handler);
 	DECLARE_WRITE16_MEMBER(blockout_sound_command_w);
 	DECLARE_WRITE16_MEMBER(blockout_irq6_ack_w);
 	DECLARE_WRITE16_MEMBER(blockout_irq5_ack_w);

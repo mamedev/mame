@@ -97,7 +97,7 @@ static ADDRESS_MAP_START( surpratk_map, AS_PROGRAM, 8, surpratk_state )
 	AM_RANGE(0x5fa0, 0x5faf) AM_DEVREADWRITE_LEGACY("k053244", k053244_r, k053244_w)
 	AM_RANGE(0x5fb0, 0x5fbf) AM_DEVWRITE_LEGACY("k053251", k053251_w)
 	AM_RANGE(0x5fc0, 0x5fc0) AM_READ(watchdog_reset_r) AM_WRITE(surpratk_5fc0_w)
-	AM_RANGE(0x5fd0, 0x5fd1) AM_DEVWRITE_LEGACY("ymsnd", ym2151_w)
+	AM_RANGE(0x5fd0, 0x5fd1) AM_DEVWRITE("ymsnd", ym2151_device, write)
 	AM_RANGE(0x5fc4, 0x5fc4) AM_WRITE(surpratk_videobank_w)
 	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM					/* ROM */
@@ -154,19 +154,6 @@ static INPUT_PORTS_START( surpratk )
 	PORT_SERVICE_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW3:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW3:4" )
 INPUT_PORTS_END
-
-
-
-static void irqhandler( device_t *device, int linestate )
-{
-	surpratk_state *state = device->machine().driver_data<surpratk_state>();
-	state->m_maincpu->set_input_line(KONAMI_FIRQ_LINE, linestate);
-}
-
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(irqhandler)
-};
 
 
 
@@ -251,8 +238,8 @@ static MACHINE_CONFIG_START( surpratk, surpratk_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

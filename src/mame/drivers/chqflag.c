@@ -185,7 +185,7 @@ static ADDRESS_MAP_START( chqflag_sound_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE_LEGACY("k007232_1", k007232_r, k007232_w)	/* 007232 (chip 1) */
 	AM_RANGE(0xa01c, 0xa01c) AM_WRITE(k007232_extvolume_w)	/* extra volume, goes to the 007232 w/ A11 */
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232_2", k007232_r, k007232_w)	/* 007232 (chip 2) */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	/* YM2151 */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)	/* YM2151 */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)			/* soundlatch_byte_r */
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch2_byte_r)         /* engine sound volume */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP					/* ??? */
@@ -255,18 +255,6 @@ static INPUT_PORTS_START( chqflagj )
 INPUT_PORTS_END
 
 
-
-static void chqflag_ym2151_irq_w( device_t *device, int data )
-{
-	chqflag_state *state = device->machine().driver_data<chqflag_state>();
-	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(chqflag_ym2151_irq_w)
-};
 
 static void volume_callback0( device_t *device, int v )
 {
@@ -385,8 +373,8 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz) /* verified on pcb */
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 

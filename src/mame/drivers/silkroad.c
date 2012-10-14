@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, silkroad_state )
 	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("DSW")
 	AM_RANGE(0xc00024, 0xc00027) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff0000)
-	AM_RANGE(0xc00028, 0xc0002f) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r, ym2151_w, 0x00ff0000)
+	AM_RANGE(0xc00028, 0xc0002f) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff0000)
 	AM_RANGE(0xc00030, 0xc00033) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff0000)
 	AM_RANGE(0xc00034, 0xc00037) AM_WRITE(silk_6295_bank_w)
 	AM_RANGE(0xc00038, 0xc0003b) AM_WRITE(silk_coin_counter_w)
@@ -300,7 +300,7 @@ static MACHINE_CONFIG_START( silkroad, silkroad_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

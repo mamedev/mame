@@ -202,6 +202,28 @@ public:
 		(machine.driver_data<_DriverClass>()->*_Function)();
 	}
 
+	// member-to-legacy-static wrappers	
+	template<read_line_device_func _Func>
+	DECLARE_READ_LINE_MEMBER( member_wrapper_line ) { return (*_Func)(this); }
+	template<write_line_device_func _Func>
+	DECLARE_WRITE_LINE_MEMBER( member_wrapper_line ) { (*_Func)(this, state); }
+	template<read8_device_func _Func>
+	DECLARE_READ8_MEMBER( member_wrapper8 ) { return (*_Func)(this, space, offset, mem_mask); }
+	template<write8_device_func _Func>
+	DECLARE_WRITE8_MEMBER( member_wrapper8 ) { (*_Func)(this, space, offset, data, mem_mask); }
+	template<read16_device_func _Func>
+	DECLARE_READ16_MEMBER( member_wrapper16 ) { return (*_Func)(this, space, offset, mem_mask); }
+	template<write16_device_func _Func>
+	DECLARE_WRITE16_MEMBER( member_wrapper16 ) { (*_Func)(this, space, offset, data, mem_mask); }
+	template<read32_device_func _Func>
+	DECLARE_READ32_MEMBER( member_wrapper32 ) { return (*_Func)(this, space, offset, mem_mask); }
+	template<write32_device_func _Func>
+	DECLARE_WRITE32_MEMBER( member_wrapper32 ) { (*_Func)(this, space, offset, data, mem_mask); }
+	template<read64_device_func _Func>
+	DECLARE_READ64_MEMBER( member_wrapper64 ) { return (*_Func)(this, space, offset, mem_mask); }
+	template<write64_device_func _Func>
+	DECLARE_WRITE64_MEMBER( member_wrapper64 ) { (*_Func)(this, space, offset, data, mem_mask); }
+
 	// dummy driver_init callbacks
 	void init_0() { }
 

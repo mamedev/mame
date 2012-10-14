@@ -203,9 +203,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(exterm_state::master_sound_nmi_callback)
 
 WRITE8_MEMBER(exterm_state::ym2151_data_latch_w)
 {
-	device_t *device = machine().device("ymsnd");
+	ym2151_device *device = machine().device<ym2151_device>("ymsnd");
 	/* bit 7 of the sound control selects which port */
-	ym2151_w(device, space, m_sound_control >> 7, data);
+	device->write(space, m_sound_control >> 7, data);
 }
 
 
@@ -472,7 +472,7 @@ static MACHINE_CONFIG_START( exterm, exterm_state )
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 4000000)
+	MCFG_YM2151_ADD("ymsnd", 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

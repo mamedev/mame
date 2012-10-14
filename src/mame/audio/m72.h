@@ -4,7 +4,7 @@
 
 ****************************************************************************/
 
-void m72_ym2151_irq_handler(device_t *device, int irq);
+WRITE_LINE_DEVICE_HANDLER(m72_ym2151_irq_handler);
 DECLARE_WRITE8_DEVICE_HANDLER( m72_sound_command_byte_w );
 DECLARE_WRITE16_DEVICE_HANDLER( m72_sound_command_w );
 DECLARE_WRITE8_DEVICE_HANDLER( m72_sound_irq_ack_w );

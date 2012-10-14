@@ -654,7 +654,7 @@ static ADDRESS_MAP_START( fncywld_main_map, AS_PROGRAM, 16, tumbleb_state )
 #if FNCYWLD_HACK
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITEONLY	/* To write levels modifications */
 #endif
-	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r, ym2151_w, 0x00ff)
+	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
 	AM_RANGE(0x100004, 0x100005) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram") /* sprites */
@@ -755,7 +755,7 @@ WRITE8_MEMBER(tumbleb_state::oki_sound_bank_w)
 static ADDRESS_MAP_START( semicom_sound_map, AS_PROGRAM, 8, tumbleb_state )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	//AM_RANGE(0xf006, 0xf006) ??
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_byte_r)
@@ -2109,7 +2109,7 @@ static MACHINE_CONFIG_START( fncywld, tumbleb_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 32220000/9)
+	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
@@ -2119,18 +2119,6 @@ static MACHINE_CONFIG_START( fncywld, tumbleb_state )
 MACHINE_CONFIG_END
 
 
-
-static void semicom_irqhandler( device_t *device, int irq )
-{
-	tumbleb_state *state = device->machine().driver_data<tumbleb_state>();
-	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-static const ym2151_interface semicom_ym2151_interface =
-{
-	DEVCB_LINE(semicom_irqhandler)
-};
 
 MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
 {
@@ -2178,8 +2166,8 @@ static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 	/* sound hardware - same as hyperpac */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3427190)
-	MCFG_SOUND_CONFIG(semicom_ym2151_interface)
+	MCFG_YM2151_ADD("ymsnd", 3427190)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
 
@@ -2210,7 +2198,7 @@ static MACHINE_CONFIG_DERIVED( bcstory, htchctch )
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_bcstory)
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 3427190)
-	MCFG_SOUND_CONFIG(semicom_ym2151_interface)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
 MACHINE_CONFIG_END
@@ -2230,7 +2218,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( metlsavr, cookbib )
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 3427190)
-	MCFG_SOUND_CONFIG(semicom_ym2151_interface)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
 MACHINE_CONFIG_END

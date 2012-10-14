@@ -179,7 +179,7 @@ static ADDRESS_MAP_START( m6502_a_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x0100, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x02ff) AM_RAM
 	AM_RANGE(0x0300, 0x030f) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x3c01, 0x3c01) AM_WRITEONLY
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -417,7 +417,7 @@ static MACHINE_CONFIG_START( tceptor, tceptor_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 14318180/4)
+	MCFG_YM2151_ADD("ymsnd", 14318180/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

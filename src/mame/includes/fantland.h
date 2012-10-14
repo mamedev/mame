@@ -31,6 +31,7 @@ public:
 	device_t *m_msm4;
 	optional_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_spriteram2;
+	DECLARE_WRITE_LINE_MEMBER(galaxygn_sound_irq);
 	DECLARE_WRITE8_MEMBER(fantland_nmi_enable_w);
 	DECLARE_WRITE16_MEMBER(fantland_nmi_enable_16_w);
 	DECLARE_WRITE8_MEMBER(fantland_soundlatch_w);

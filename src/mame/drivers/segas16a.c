@@ -1030,7 +1030,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas16a_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_WRITE(n7751_command_w)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
@@ -1917,18 +1917,6 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//  SOUND CONFIGURATIONS
-//**************************************************************************
-
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(segas16a_state, n7751_control_w)
-};
-
-
-
-//**************************************************************************
 //  GRAPHICS DECODING
 //**************************************************************************
 
@@ -1977,8 +1965,8 @@ static MACHINE_CONFIG_START( system16a, segas16a_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(segas16a_state, n7751_control_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
 
 	MCFG_DAC_ADD("dac")

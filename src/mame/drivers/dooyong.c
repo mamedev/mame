@@ -303,7 +303,7 @@ static ADDRESS_MAP_START( bluehawk_sound_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xf808, 0xf809) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xf808, 0xf809) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xf80a, 0xf80a) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
@@ -773,11 +773,6 @@ READ8_MEMBER(dooyong_state::unk_r)
 	return 0;
 }
 
-static void irqhandler(device_t *device, int irq)
-{
-	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
-}
-
 static void irqhandler_2203_1(device_t *device, int irq)
 {
 	dooyong_state *state = device->machine().driver_data<dooyong_state>();
@@ -812,11 +807,6 @@ static const ym2203_interface ym2203_interface_2 =
 	DEVCB_LINE(irqhandler_2203_2)
 };
 
-static const ym2151_interface ym2151_config =
-{
-	DEVCB_LINE(irqhandler)
-};
-
 /***************************************************************************
 
     Machine driver(s)
@@ -839,8 +829,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( sound_2151 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
@@ -851,8 +841,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( sound_2151_m68k )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
