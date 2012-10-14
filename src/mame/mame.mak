@@ -2270,6 +2270,8 @@ $(DRIVERS)/umipoker.o:	$(LAYOUT)/saiyukip.lh
 
 $(DRIVERS)/undrfire.o:	$(LAYOUT)/cbombers.lh
 
+$(DRIVERS)/vd.o:	$(LAYOUT)/vd.lh
+
 $(DRIVERS)/vicdual.o:	$(LAYOUT)/depthch.lh
 
 $(DRIVERS)/videopin.o:	$(LAYOUT)/videopin.lh

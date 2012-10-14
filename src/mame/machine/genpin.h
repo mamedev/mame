@@ -4,7 +4,7 @@
 
 #include "emu.h"
 #include "sound/samples.h"
-
+#include "machine/nvram.h"
 
 
 static const char *const genpin_sample_names[] =
