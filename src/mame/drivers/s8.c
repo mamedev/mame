@@ -88,5 +88,18 @@ ROM_START(pfevr_p3)
 	ROM_RELOAD(0x8000, 0x4000)
 ROM_END
 
+/*--------------------
+/ Still Crazy
+/--------------------*/
+ROM_START(stillcra)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("ic20.bin", 0x6000, 0x2000, CRC(b0df42e6) SHA1(bb10268d7b820d1de0c20e1b79aba558badd072b) )
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("ic49.bin", 0xc000, 0x4000, CRC(bcc8ccc4) SHA1(2312f9cc4f5a2dadfbfa61d13c31bb5838adf152) )
+	ROM_RELOAD(0x8000, 0x4000)
+ROM_END
+
 GAME(1984,pfevr_l2, 0,        williams_s8, williams_s8, williams_s8_state, williams_s8, ROT0, "Williams", "Pennant Fever (L-2)", GAME_IS_SKELETON_MECHANICAL)
 GAME(1984,pfevr_p3, pfevr_l2, williams_s8, williams_s8, williams_s8_state, williams_s8, ROT0, "Williams", "Pennant Fever (P-3)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1984,stillcra, 0,        williams_s8, williams_s8, williams_s8_state, williams_s8, ROT0, "Williams", "Still Crazy", GAME_IS_SKELETON_MECHANICAL)
