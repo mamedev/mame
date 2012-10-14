@@ -4291,6 +4291,7 @@ src/mame/layout/atarifb4.lay svneol=native#text/plain
 src/mame/layout/avalnche.lay svneol=native#text/plain
 src/mame/layout/babydad.lay svneol=native#text/plain
 src/mame/layout/babypkr.lay svneol=native#text/plain
+src/mame/layout/barricad.lay svneol=native#text/plain
 src/mame/layout/barrier.lay svneol=native#text/plain
 src/mame/layout/beaminv.lay svneol=native#text/plain
 src/mame/layout/bfm_sc4.lay svneol=native#text/native

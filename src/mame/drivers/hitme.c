@@ -19,6 +19,8 @@
 #include "includes/hitme.h"
 #include "sound/discrete.h"
 
+#include "barricad.lh"
+
 #define MASTER_CLOCK (XTAL_8_945MHz) /* confirmed on schematic */
 
 
@@ -691,7 +693,7 @@ ROM_END
 
 GAME( 1976, hitme,    0,        hitme,    hitme, driver_device,    0, ROT0, "RamTek", "Hit Me (set 1)",  GAME_SUPPORTS_SAVE )	// 05/1976
 GAME( 1976, hitme1,   hitme,    hitme,    hitme, driver_device,    0, ROT0, "RamTek", "Hit Me (set 2)",  GAME_SUPPORTS_SAVE )
-GAME( 1976, m21,      hitme,    hitme,    hitme, driver_device,    0, ROT0, "Mirco Games",  "21 (Mirco)", GAME_SUPPORTS_SAVE )	// 08/1976, licensed?
-GAME( 1978, super21,  0,        hitme,    super21, driver_device,  0, ROT0, "Mirco Games",  "Super Twenty One", GAME_SUPPORTS_SAVE )
-GAME( 1976, barricad, 0,        barricad, barricad, driver_device, 0, ROT0, "RamTek", "Barricade",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1976, brickyrd, barricad, barricad, barricad, driver_device, 0, ROT0, "RamTek", "Brickyard",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1976, m21,      hitme,    hitme,    hitme, driver_device,    0, ROT0, "Mirco Games", "21 (Mirco)", GAME_SUPPORTS_SAVE )	// 08/1976, licensed?
+GAME( 1978, super21,  0,        hitme,    super21, driver_device,  0, ROT0, "Mirco Games", "Super Twenty One", GAME_SUPPORTS_SAVE )
+GAMEL(1976, barricad, 0,        barricad, barricad, driver_device, 0, ROT0, "RamTek", "Barricade",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_barricad )
+GAMEL(1976, brickyrd, barricad, barricad, barricad, driver_device, 0, ROT0, "RamTek", "Brickyard",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_barricad )
