@@ -172,7 +172,7 @@ static ADDRESS_MAP_START( hustler_map, AS_PROGRAM, 8, scobra_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hustlerb_map, AS_PROGRAM, 8, scobra_state )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
@@ -187,6 +187,40 @@ static ADDRESS_MAP_START( hustlerb_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xc100, 0xc103) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0xc200, 0xc203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hustlerb3_map, AS_PROGRAM, 8, scobra_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
+
+	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x9860, 0x987f) AM_RAM AM_SHARE("bulletsram")
+	AM_RANGE(0x9880, 0x98ff) AM_RAM
+
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(galaxold_nmi_enable_w)
+
+//a000
+//a800
+//b000
+
+
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0") // coin
+//	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN0")
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("IN2") // dips
+
+
+	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
+
+//	AM_RANGE(0xc100, 0xc103) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+//	AM_RANGE(0xc200, 0xc203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hustlerb3_sound_map, AS_PROGRAM, 8, scobra_state )
+	AM_RANGE(0x0000, 0xffff) AM_NOP
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( mimonkey_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -210,13 +244,11 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(scobra_state::scobra_soundram_r)
 {
-
 	return m_soundram[offset & 0x03ff];
 }
 
 WRITE8_MEMBER(scobra_state::scobra_soundram_w)
 {
-
 	m_soundram[offset & 0x03ff] = data;
 }
 
@@ -819,7 +851,6 @@ static MACHINE_CONFIG_START( hustler, scobra_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_DERIVED( hustlerb, hustler )
 
 	/* basic machine hardware */
@@ -829,6 +860,16 @@ static MACHINE_CONFIG_DERIVED( hustlerb, hustler )
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(hustlerb_sound_map)
 	MCFG_CPU_IO_MAP(hustlerb_sound_io_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( hustlerb3, hustler )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(hustlerb3_map)
+
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(hustlerb3_sound_map)
 MACHINE_CONFIG_END
 
 
@@ -1097,26 +1138,6 @@ ROM_START( billiard )
 	ROM_LOAD( "hustler.clr",  0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
 ROM_END
 
-ROM_START( billiard2 ) /* has a "decoder" prom, apparently, which needs to be hooked up and maincpu roms decoded */
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "billiard.ic4", 0x0000, 0x2000, CRC(545a27fd) SHA1(8b064dd6a9a82248301e0f53dc1c4fd91e506025) )
-	ROM_LOAD( "billiard.ic3", 0x2000, 0x2000, CRC(bec503b1) SHA1(cdbe650b829cd4424141058467cd64cfffe1b1e1) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "hustler.6",    0x0000, 0x0800, BAD_DUMP CRC(7a946544) SHA1(7ee2ad3fdf996f08534fb87fc02b619c168f420c) ) // not found on board - taken from parent
-	ROM_LOAD( "hustler.7",    0x0800, 0x0800, BAD_DUMP CRC(3db57351) SHA1(e5075a7130a80d2bf24f0556c2589dff0625ee60) ) // not found on board - taken from parent
-
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "hustler.5f",   0x0000, 0x0800, CRC(0bdfad0e) SHA1(8e6f1737604f3801c03fa2e9a5e6a2778b54bae8) ) // billiard.ic11
-	ROM_LOAD( "hustler.5h",   0x0800, 0x0800, CRC(8e062177) SHA1(7e52a1669804b6c2f694cfc64b04abc8246bb0c2) ) // billiard.ic12
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "hustler.clr",  0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) ) // billiard.ic10
-
-	ROM_REGION( 0x0020, "user1", 0 ) /* decode PROMs */
-	ROM_LOAD( "billiard.ic7", 0x0000, 0x0020, CRC(4ac17114) SHA1(1fa34a556fe445a6bdabfe75b4b679cab6553c8b) )
-ROM_END
-
 /* this is identical to billiard, but with a different memory map */
 ROM_START( hustlerb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1154,6 +1175,26 @@ ROM_START( hustlerb2 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "27s19.bin",  0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
+ROM_END
+
+ROM_START( hustlerb3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "billiard_ic4.a4", 0x0000, 0x2000, CRC(545a27fd) SHA1(8b064dd6a9a82248301e0f53dc1c4fd91e506025) )
+	ROM_LOAD( "billiard_ic3.a3", 0x2000, 0x2000, CRC(bec503b1) SHA1(cdbe650b829cd4424141058467cd64cfffe1b1e1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "hustler.6",    0x0000, 0x0800, BAD_DUMP CRC(7a946544) SHA1(7ee2ad3fdf996f08534fb87fc02b619c168f420c) ) // not found on board - taken from parent
+	ROM_LOAD( "hustler.7",    0x0800, 0x0800, BAD_DUMP CRC(3db57351) SHA1(e5075a7130a80d2bf24f0556c2589dff0625ee60) ) // not found on board - taken from parent
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "billiard_ic11.d1",   0x0000, 0x0800, CRC(0bdfad0e) SHA1(8e6f1737604f3801c03fa2e9a5e6a2778b54bae8) )
+	ROM_LOAD( "billiard_ic12.d2",   0x0800, 0x0800, CRC(8e062177) SHA1(7e52a1669804b6c2f694cfc64b04abc8246bb0c2) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "ic10.c3",  0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
+
+	ROM_REGION( 0x0020, "user1", 0 ) /* decode PROMs */
+	ROM_LOAD( "ic7.b3", 0x0000, 0x0020, CRC(4ac17114) SHA1(1fa34a556fe445a6bdabfe75b4b679cab6553c8b) )
 ROM_END
 
 ROM_START( mimonkey )
@@ -1217,9 +1258,9 @@ GAME( 1983, minefld,   0,        minefld,   minefld, scramble_state,   minefld, 
 GAME( 1981, hustler,   0,        hustler,   hustler, scramble_state,   hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
 GAME( 1981, hustlerd,  hustler,  hustler,   hustler, scramble_state,   hustlerd,     ROT90,  "Konami (Dynamo Games license)", "Video Hustler (Dynamo Games)", GAME_SUPPORTS_SAVE )
 GAME( 1981, billiard,  hustler,  hustler,   hustler, scramble_state,   billiard,     ROT90,  "bootleg", "The Billiards (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, billiard2, hustler,  hustler,   hustler, scramble_state,   billiard,     ROT90,  "bootleg", "The Billiards (Video Hustler bootleg) - Set 2", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerb,  hustler,  hustlerb,  hustler, scramble_state,   scramble_ppi, ROT90,  "bootleg (Digimatic)", "Video Hustler (bootleg)", GAME_NOT_WORKING ) // broken?
+GAME( 1981, hustlerb,  hustler,  hustlerb,  hustler, scramble_state,   scramble_ppi, ROT90,  "bootleg (Digimatic)", "Video Hustler (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1981, hustlerb2, hustler,  hustler,   hustler, scramble_state,   scramble_ppi, ROT90,  "bootleg", "Fatsy Gambler (Video Hustler bootleg)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1981, hustlerb3, hustler,  hustlerb3, hustler, scramble_state,   scramble_ppi, ROT90,  "bootleg (Videotron)", "Video Pool (Video Hustler bootleg)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1982, mimonkey,  0,        mimonkey,  mimonkey, scramble_state,  mimonkey,     ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
 GAME( 1982, mimonsco,  mimonkey, mimonkey,  mimonsco, scramble_state,  mimonsco,     ROT90,  "bootleg", "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
 
