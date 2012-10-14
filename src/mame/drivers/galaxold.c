@@ -3213,7 +3213,7 @@ ROM_START( bullsdrtg )
 ROM_END
 
 /* Z80 games */
-GAME( 1980, vpool,    hustler,  mooncrst, vpool, driver_device,    0,        ROT90,  "bootleg", "Video Pool (bootleg on Moon Cresta hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1981, vpool,    hustler,  mooncrst, vpool, driver_device,    0,        ROT90,  "bootleg", "Video Pool (bootleg on Moon Cresta hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1981, rockclim, 0,        rockclim, rockclim, driver_device, 0,	      ROT180, "Taito", "Rock Climber", GAME_SUPPORTS_SAVE )
 GAME( 1981, ckongg,   ckong,    ckongg,   ckongg, driver_device,   0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1981, ckongmc,  ckong,    ckongmc,  ckongmc, driver_device,  0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Moon Cresta hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // set was marked as 'King Kong on Galaxian'
