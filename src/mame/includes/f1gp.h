@@ -19,6 +19,7 @@ public:
 		m_fgregs(*this, "fgregs"),
 		m_rozregs(*this, "rozregs"),
 		m_spr_old(*this, "vsystem_spr_old"),
+		m_spr_old2(*this, "vsystem_spr_ol2"),
 		m_spr(*this, "vsystem_spr")
 	{ }
 
@@ -38,6 +39,7 @@ public:
 
 	/* devices referenced above */
 	optional_device<vsystem_spr2_device> m_spr_old; // f1gp
+	optional_device<vsystem_spr2_device> m_spr_old2; // f1gp
 	optional_device<vsystem_spr_device> m_spr; // f1gp2
 
 

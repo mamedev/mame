@@ -109,12 +109,27 @@ const device_type VSYSTEM_SPR = &device_creator<vsystem_spr_device>;
 vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VSYSTEM_SPR, "vsystem_spr_device", tag, owner, clock)
 {
-	m_CG10103.transpen = 15;
-	m_CG10103.pal_base = 0;
-
+	m_transpen = 15;
+	m_pal_base = 0;
+	m_xoffs = 0;
+	m_yoffs = 0;
+	m_pdraw = false;
 }
 
+// static
+void vsystem_spr_device::set_offsets(device_t &device, int xoffs, int yoffs)
+{
+	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
+	dev.m_xoffs = xoffs;
+	dev.m_yoffs = yoffs;
+}
 
+// static
+void vsystem_spr_device::set_pdraw(device_t &device, bool pdraw)
+{
+	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
+	dev.m_pdraw = pdraw;
+}
 
 void vsystem_spr_device::device_start()
 {
@@ -171,6 +186,22 @@ void vsystem_spr_device::get_sprite_attributes(UINT16* ram)
 void vsystem_spr_device::common_sprite_drawgfx(int gfxrgn, UINT16* spriteram2, UINT16* spriteram3, vsystem_spr_tile_indirection_callback tilecb, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = machine.gfx[gfxrgn];
+	int priority_mask = 0x00;
+
+	curr_sprite.oy += m_yoffs;
+	curr_sprite.ox += m_xoffs;
+
+	if (m_pdraw)
+	{
+		switch (curr_sprite.pri)
+		{
+			default:
+			case 0:	priority_mask = 0x00; break;
+			case 3:	priority_mask = 0xfe; break;
+			case 2:	priority_mask = 0xfc; break;
+			case 1:	priority_mask = 0xf0; break;
+		}
+	}
 
 	curr_sprite.zoomx = 32 - curr_sprite.zoomx;
 	curr_sprite.zoomy = 32 - curr_sprite.zoomy;
@@ -192,10 +223,20 @@ void vsystem_spr_device::common_sprite_drawgfx(int gfxrgn, UINT16* spriteram2, U
 		while (xcnt != xend)
 		{
 			int startno = tilecb(curr_sprite.map++, spriteram2, spriteram3);
-			drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_CG10103.pal_base, curr_sprite.flipx, curr_sprite.flipy, curr_sprite.ox + xcnt * curr_sprite.zoomx/2,        curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, m_CG10103.transpen);
-			drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_CG10103.pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, m_CG10103.transpen);		
-			drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_CG10103.pal_base, curr_sprite.flipx, curr_sprite.flipy, curr_sprite.ox + xcnt * curr_sprite.zoomx/2,        -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, m_CG10103.transpen);
-			drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_CG10103.pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, m_CG10103.transpen);		
+			if (m_pdraw)
+			{
+				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, curr_sprite.ox + xcnt * curr_sprite.zoomx/2,        curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_transpen);
+				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_transpen);		
+				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, curr_sprite.ox + xcnt * curr_sprite.zoomx/2,        -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_transpen);
+				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_transpen);		
+			}
+			else
+			{
+				drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, curr_sprite.ox + xcnt * curr_sprite.zoomx/2,        curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, m_transpen);
+				drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, m_transpen);		
+				drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, curr_sprite.ox + xcnt * curr_sprite.zoomx/2,        -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, m_transpen);
+				drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, m_transpen);		
+			}
 			xcnt+=xinc;
 		}
 		ycnt+=yinc;
@@ -203,51 +244,6 @@ void vsystem_spr_device::common_sprite_drawgfx(int gfxrgn, UINT16* spriteram2, U
 	
 }
 
-// same as above but for pdrawgfx implementations
-void vsystem_spr_device::common_sprite_pdrawgfx(int gfxrgn, UINT16* spriteram2, UINT16* spriteram3, vsystem_spr_tile_indirection_callback tilecb, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	gfx_element *gfx = machine.gfx[gfxrgn];
-	int priority_mask;
-
-	switch (curr_sprite.pri)
-	{
-		default:
-		case 0:	priority_mask = 0x00; break;
-		case 3:	priority_mask = 0xfe; break;
-		case 2:	priority_mask = 0xfc; break;
-		case 1:	priority_mask = 0xf0; break;
-	}
-
-
-	curr_sprite.zoomx = 32 - curr_sprite.zoomx;
-	curr_sprite.zoomy = 32 - curr_sprite.zoomy;
-
-	int ystart, yend, yinc;
-	
-	if (!curr_sprite.flipy)	{ ystart = 0; yend = curr_sprite.ysize+1; yinc = 1; }
-	else                    { ystart = curr_sprite.ysize; yend = -1; yinc = -1; }
-
-	int ycnt = ystart;
-	while (ycnt != yend)
-	{
-		int xstart, xend, xinc;
-
-		if (!curr_sprite.flipx)	{ xstart = 0; xend = curr_sprite.xsize+1; xinc = 1; }
-		else                    { xstart = curr_sprite.xsize; xend = -1; xinc = -1; }
-
-		int xcnt = xstart;
-		while (xcnt != xend)
-		{
-			int startno = tilecb(curr_sprite.map++, spriteram2, spriteram3);	
-			pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_CG10103.pal_base, curr_sprite.flipx, curr_sprite.flipy, curr_sprite.ox + xcnt * curr_sprite.zoomx/2,        curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_CG10103.transpen);
-			pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_CG10103.pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_CG10103.transpen);		
-			pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_CG10103.pal_base, curr_sprite.flipx, curr_sprite.flipy, curr_sprite.ox + xcnt * curr_sprite.zoomx/2,        -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_CG10103.transpen);
-			pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_CG10103.pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_CG10103.transpen);		
-			xcnt+=xinc;
-		}
-		ycnt+=yinc;
-	}
-}
 
 
 void vsystem_spr_device::draw_sprites_inufuku( UINT16* spriteram, int spriteram_bytes, UINT16* spriteram2, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -271,10 +267,9 @@ void vsystem_spr_device::draw_sprites_inufuku( UINT16* spriteram, int spriteram_
 
 			get_sprite_attributes(&spriteram[attr_start]);
 
-//			curr_sprite.oy += 1;
 			curr_sprite.map &= 0x7fff;
 
-			common_sprite_pdrawgfx(2, spriteram2, NULL, inufuku_tile_callback, machine, bitmap, cliprect);
+			common_sprite_drawgfx(2, spriteram2, NULL, inufuku_tile_callback, machine, bitmap, cliprect);
 		}
 	}
 }
@@ -412,7 +407,7 @@ void vsystem_spr_device::CG10103_draw_sprite(running_machine &machine, bitmap_in
 	if (curr_sprite.pri != drawpri)
 		return;
 
-	common_sprite_drawgfx(m_CG10103.gfx_region, NULL, NULL, gstriker_tile_callback, machine, bitmap, cliprect);
+	common_sprite_drawgfx(m_gfx_region, NULL, NULL, gstriker_tile_callback, machine, bitmap, cliprect);
 }
 
 
@@ -421,7 +416,7 @@ void vsystem_spr_device::CG10103_draw(running_machine &machine, int numchip, bit
 	UINT16* splist;
 	int i;
 
-	splist = m_CG10103.vram;
+	splist = m_vram;
 
 	// Parse the sorting list
 	for (i=0;i<0x400;i++)
@@ -438,7 +433,7 @@ void vsystem_spr_device::CG10103_draw(running_machine &machine, int numchip, bit
 			int num = cmd & 0x3FF;
 
 			// Draw the sprite
-			CG10103_draw_sprite(machine, screen, cliprect, m_CG10103.vram + num*4, pri);
+			CG10103_draw_sprite(machine, screen, cliprect, m_vram + num*4, pri);
 		}
 	}
 }
@@ -447,20 +442,20 @@ void vsystem_spr_device::CG10103_draw(running_machine &machine, int numchip, bit
 
 void vsystem_spr_device::CG10103_set_pal_base(int pal_base)
 {
-	m_CG10103.pal_base = pal_base;
+	m_pal_base = pal_base;
 }
 
 void vsystem_spr_device::CG10103_set_gfx_region(int gfx_region)
 {
-	m_CG10103.gfx_region = gfx_region;
+	m_gfx_region = gfx_region;
 }
 
 void vsystem_spr_device::CG10103_set_transpen(int transpen)
 {
-	m_CG10103.transpen = transpen;
+	m_transpen = transpen;
 }
 
 void vsystem_spr_device::CG10103_set_ram(UINT16* vram)
 {
-	m_CG10103.vram = vram;
+	m_vram = vram;
 }

@@ -477,6 +477,7 @@ static MACHINE_CONFIG_START( f1gp, f1gp_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
+	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 
 	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gp)
 

@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16, inufuku_state )
 
 	AM_RANGE(0x780000, 0x780013) AM_WRITE(inufuku_palettereg_w)	// bg & text palettebank register
 	AM_RANGE(0x7a0000, 0x7a0023) AM_WRITE(inufuku_scrollreg_w)	// bg & text scroll register
-	AM_RANGE(0x7e0000, 0x7e0001) AM_WRITENOP					// ?
+//	AM_RANGE(0x7e0000, 0x7e0001) AM_WRITENOP					// ?
 
 	AM_RANGE(0x800000, 0xbfffff) AM_ROM	// data rom
 	AM_RANGE(0xfd0000, 0xfdffff) AM_RAM // work ram
@@ -390,11 +390,13 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2300))
 	MCFG_SCREEN_SIZE(2048, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319-1, 1, 224-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(inufuku_state, screen_update_inufuku)
 	MCFG_SCREEN_VBLANK_DRIVER(inufuku_state, screen_eof_inufuku)
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
+	vsystem_spr_device::set_offsets(*device, 0,1); // reference videos confirm at least the +1 against tilemaps in 3on3dunk (the highscore header text and black box are meant to be 1 pixel misaligned, although there is currently a priority bug there too)
+	vsystem_spr_device::set_pdraw(*device, true);
 
 	MCFG_GFXDECODE(inufuku)
 	MCFG_PALETTE_LENGTH(4096)
@@ -488,4 +490,4 @@ ROM_END
 ******************************************************************************/
 
 GAME( 1998, inufuku, 0, inufuku, inufuku, driver_device, 0, ROT0, "Video System Co.", "Quiz & Variety Sukusuku Inufuku (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1996, 3on3dunk, 0, _3on3dunk, inufuku, driver_device, 0, ROT0, "Video System Co.", "3 On 3 Dunk Madness (US, prototype? 1997/02/04)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1996, 3on3dunk, 0, _3on3dunk, inufuku, driver_device, 0, ROT0, "Video System Co.", "3 On 3 Dunk Madness (US, prototype? 1997/02/04)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // tilemap priority is wrong in places (basketball before explosion in attract, highscores)

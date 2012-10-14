@@ -69,10 +69,10 @@ int vsystem_spr2_device::get_sprite_attributes(UINT16* ram)
 
 
 template<class _BitmapClass>
-void vsystem_spr2_device::turbofrc_draw_sprites_common( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, UINT16* spriteram2, int spriteram2_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri )
+void vsystem_spr2_device::turbofrc_draw_sprites_common( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, int chip_disabled_pri )
 {
 	int attr_start, base, first;
-	base = chip * 0x0200;
+	base = 0;//chip * 0x0200;
 	first = 4 * spriteram3[0x1fe + base];
 
 	for (attr_start = base + 0x0200 - 8; attr_start >= first + base; attr_start -= 4)
@@ -121,12 +121,9 @@ void vsystem_spr2_device::turbofrc_draw_sprites_common( UINT16* spriteram3,  int
 				else
 					sx = ((curr_sprite.ox + curr_sprite.zoomx * x / 2 + 16) & 0x1ff) - 16;
 
-				if (chip == 0)
-					curr = spriteram1[curr_sprite.map % (spriteram1_bytes/2)];
-				else
-					curr = spriteram2[curr_sprite.map % (spriteram2_bytes/2)];
-
-				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[sprite_gfx + chip],
+				curr = spriteram1[curr_sprite.map % (spriteram1_bytes/2)];
+	
+				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[sprite_gfx],
 							 curr,
 							 curr_sprite.color,
 							 curr_sprite.flipx,curr_sprite.flipy,
@@ -144,18 +141,18 @@ void vsystem_spr2_device::turbofrc_draw_sprites_common( UINT16* spriteram3,  int
 	}
 }
 
-void vsystem_spr2_device::turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, UINT16* spriteram2, int spriteram2_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri )
-{ turbofrc_draw_sprites_common( spriteram3, spriteram3_bytes, spriteram1, spriteram1_bytes, spriteram2, spriteram2_bytes, sprite_gfx, spritepalettebank, machine, bitmap, cliprect, chip, chip_disabled_pri ); }
+void vsystem_spr2_device::turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip_disabled_pri )
+{ turbofrc_draw_sprites_common( spriteram3, spriteram3_bytes, spriteram1, spriteram1_bytes, sprite_gfx, spritepalettebank, machine, bitmap, cliprect, chip_disabled_pri ); }
 
-void vsystem_spr2_device::turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, UINT16* spriteram2, int spriteram2_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri )
-{ turbofrc_draw_sprites_common( spriteram3, spriteram3_bytes, spriteram1, spriteram1_bytes, spriteram2, spriteram2_bytes, sprite_gfx, spritepalettebank, machine, bitmap, cliprect, chip, chip_disabled_pri ); }
+void vsystem_spr2_device::turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int chip_disabled_pri )
+{ turbofrc_draw_sprites_common( spriteram3, spriteram3_bytes, spriteram1, spriteram1_bytes, sprite_gfx, spritepalettebank, machine, bitmap, cliprect, chip_disabled_pri ); }
 
 
 template<class _BitmapClass>
-void vsystem_spr2_device::spinlbrk_draw_sprites_common( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, UINT16* spriteram2, int spriteram2_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri )
+void vsystem_spr2_device::spinlbrk_draw_sprites_common( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, int chip_disabled_pri )
 {
 	int attr_start, base, first;
-	base = chip * 0x0200;
+	base = 0;//chip * 0x0200;
 	first = 4 * spriteram3[0x1fe + base];
 
 	for (attr_start = base + 0x0200-8; attr_start >= first + base; attr_start -= 4)
@@ -202,12 +199,9 @@ void vsystem_spr2_device::spinlbrk_draw_sprites_common( UINT16* spriteram3,  int
 				else
 					sx = ((curr_sprite.ox + curr_sprite.zoomx * x / 2 + 16) & 0x1ff) - 16;
 
-				if (chip == 0)
-					curr = spriteram1[curr_sprite.map % (spriteram1_bytes/2)];
-				else
-					curr = spriteram2[curr_sprite.map % (spriteram2_bytes/2)];
-
-				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[sprite_gfx + chip],
+				curr = spriteram1[curr_sprite.map % (spriteram1_bytes/2)];
+	
+				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[sprite_gfx],
 							 curr,
 							 curr_sprite.color,
 							 curr_sprite.flipx,curr_sprite.flipy,
@@ -225,11 +219,11 @@ void vsystem_spr2_device::spinlbrk_draw_sprites_common( UINT16* spriteram3,  int
 	}
 }
 
-void vsystem_spr2_device::spinlbrk_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, UINT16* spriteram2, int spriteram2_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri )
-{ spinlbrk_draw_sprites_common( spriteram3, spriteram3_bytes, spriteram1, spriteram1_bytes, spriteram2, spriteram2_bytes, sprite_gfx, spritepalettebank, machine, bitmap, cliprect, chip, chip_disabled_pri ); }
+void vsystem_spr2_device::spinlbrk_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip_disabled_pri )
+{ spinlbrk_draw_sprites_common( spriteram3, spriteram3_bytes, spriteram1, spriteram1_bytes, sprite_gfx, spritepalettebank, machine, bitmap, cliprect, chip_disabled_pri ); }
 
-void vsystem_spr2_device::spinlbrk_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, UINT16* spriteram2, int spriteram2_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri )
-{ spinlbrk_draw_sprites_common( spriteram3, spriteram3_bytes, spriteram1, spriteram1_bytes, spriteram2, spriteram2_bytes, sprite_gfx, spritepalettebank, machine, bitmap, cliprect, chip, chip_disabled_pri ); }
+void vsystem_spr2_device::spinlbrk_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int chip_disabled_pri )
+{ spinlbrk_draw_sprites_common( spriteram3, spriteram3_bytes, spriteram1, spriteram1_bytes, sprite_gfx, spritepalettebank, machine, bitmap, cliprect, chip_disabled_pri ); }
 
 
 
@@ -343,10 +337,10 @@ void vsystem_spr2_device::welltris_draw_sprites( UINT16* spriteram, int spritepa
 
 
 
-void vsystem_spr2_device::f1gp_draw_sprites( UINT16* spr1vram, UINT16* spr2vram, UINT16* spr1cgram, int spr1cgram_bytes, UINT16* spr2cgram, int spr2cgram_bytes, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, int primask )
+void vsystem_spr2_device::f1gp_draw_sprites( int gfxrgn, UINT16* sprvram, UINT16* sprcgram, int sprcgram_bytes, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask )
 {
 	int attr_start, first;
-	UINT16 *spram = chip ? spr2vram : spr1vram;
+	UINT16 *spram = sprvram;
 
 	first = 4 * spram[0x1fe];
 
@@ -378,12 +372,9 @@ void vsystem_spr2_device::f1gp_draw_sprites( UINT16* spr1vram, UINT16* spr2vram,
 				if (curr_sprite.flipx) sx = ((curr_sprite.ox + curr_sprite.zoomx * (curr_sprite.xsize - x) + 16) & 0x1ff) - 16;
 				else sx = ((curr_sprite.ox + curr_sprite.zoomx * x + 16) & 0x1ff) - 16;
 
-				if (chip == 0)
-					curr = spr1cgram[curr_sprite.map % (spr1cgram_bytes / 2)];
-				else
-					curr = spr2cgram[curr_sprite.map % (spr2cgram_bytes / 2)];
+				curr = sprcgram[curr_sprite.map % (sprcgram_bytes / 2)];
 
-				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1 + chip],
+				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[gfxrgn],
 						curr,
 						curr_sprite.color,
 						curr_sprite.flipx,curr_sprite.flipy,

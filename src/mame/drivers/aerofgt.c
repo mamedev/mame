@@ -1484,6 +1484,7 @@ static MACHINE_CONFIG_START( karatblz, aerofgt_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
+	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
 
@@ -1525,6 +1526,7 @@ static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
+	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,spinlbrk)
 
@@ -1566,6 +1568,7 @@ static MACHINE_CONFIG_START( turbofrc, aerofgt_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
+	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
@@ -1608,6 +1611,7 @@ static MACHINE_CONFIG_START( aerofgtb, aerofgt_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
+	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 	
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 

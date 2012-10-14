@@ -15,7 +15,8 @@ public:
 		m_spriteram3(*this, "spriteram3"),
 		m_tx_tilemap_ram(*this, "tx_tilemap_ram"),
 		m_spr(*this, "vsystem_spr"),
-		m_spr_old(*this, "vsystem_spr_old")
+		m_spr_old(*this, "vsystem_spr_old"),
+		m_spr_old2(*this, "vsystem_spr_ol2")
 	{ }
 
 	/* memory pointers */
@@ -32,6 +33,7 @@ public:
 	/* devices referenced above */
 	optional_device<vsystem_spr_device> m_spr; // only the aerofgt parent uses this chip
 	optional_device<vsystem_spr2_device> m_spr_old; // every other (non-bootleg) uses this
+	optional_device<vsystem_spr2_device> m_spr_old2; //  or a pair of them..
 
 
 	/* video-related */
