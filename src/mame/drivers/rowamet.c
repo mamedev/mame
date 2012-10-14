@@ -33,23 +33,21 @@ public:
 	DECLARE_WRITE8_MEMBER(mute_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
-	UINT8 m_out_offs;
-	UINT8 m_sndcmd;
-	UINT8 m_io[16];
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_cpu2;
-	required_shared_ptr<UINT8> m_p_ram;
+	TIMER_DEVICE_CALLBACK_MEMBER(rowamet_timer);
 
 protected:
 
 	// devices
-
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_cpu2;
+	required_shared_ptr<UINT8> m_p_ram;
 
 	// driver_device overrides
 	virtual void machine_reset();
-public:
-	DECLARE_DRIVER_INIT(rowamet);
-	TIMER_DEVICE_CALLBACK_MEMBER(rowamet_timer);
+private:
+	UINT8 m_out_offs;
+	UINT8 m_sndcmd;
+	UINT8 m_io[16];
 };
 
 
@@ -116,10 +114,6 @@ void rowamet_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(rowamet_state,rowamet)
-{
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(rowamet_state::rowamet_timer)
 {
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
@@ -170,4 +164,4 @@ ROM_END
 /-------------------------------------------------------------------*/
 
 
-GAME(198?,  heavymtl,  0,  rowamet,  rowamet, rowamet_state,  rowamet,  ROT0,  "Rowamet",    "Heavy Metal",      GAME_IS_SKELETON_MECHANICAL)
+GAME(198?, heavymtl, 0, rowamet, rowamet, driver_device, 0,  ROT0,  "Rowamet", "Heavy Metal", GAME_IS_SKELETON_MECHANICAL)
