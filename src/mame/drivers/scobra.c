@@ -193,34 +193,23 @@ static ADDRESS_MAP_START( hustlerb3_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-
 	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
 	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9860, 0x987f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x9880, 0x98ff) AM_RAM
-
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(galaxold_nmi_enable_w)
-
-//a000
-//a800
-//b000
-
-
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0") // coin
-//	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN0")
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("IN2") // dips
-
-
+	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_flip_screen_y_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE(galaxold_flip_screen_x_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("IN2")
 	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
 
-//	AM_RANGE(0xc100, 0xc103) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-//	AM_RANGE(0xc200, 0xc203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	// NOTE: hardware does not have any 8255 chip. Is this handled through TTL, or a leftover?
+	// Is b800 the actual sound comms? The soundroms are not dumped, so we can't know...
+//	AM_RANGE(0xb800, 0xb800) AM_WRITENOP
+	AM_RANGE(0xc200, 0xc203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hustlerb3_sound_map, AS_PROGRAM, 8, scobra_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
-ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( mimonkey_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -260,13 +249,6 @@ static ADDRESS_MAP_START( scobra_sound_map, AS_PROGRAM, 8, scobra_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hustlerb_sound_map, AS_PROGRAM, 8, scobra_state )
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(frogger_filter_w)
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_READ(scobra_soundram_r) AM_SHARE("soundram")  /* only here to initialize pointer */
-ADDRESS_MAP_END
-
-
 static ADDRESS_MAP_START( scobra_sound_io_map, AS_IO, 8, scobra_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
@@ -288,11 +270,18 @@ static ADDRESS_MAP_START( hustler_sound_io_map, AS_IO, 8, scobra_state )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( hustlerb_sound_map, AS_PROGRAM, 8, scobra_state )
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x6000, 0x6fff) AM_WRITE(frogger_filter_w)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_READ(scobra_soundram_r) AM_SHARE("soundram")  /* only here to initialize pointer */
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( hustlerb_sound_io_map, AS_IO, 8, scobra_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
+
 
 /* stratgyx coinage DIPs are spread across two input ports */
 CUSTOM_INPUT_MEMBER(scobra_state::stratgyx_coinage_r)
@@ -593,7 +582,7 @@ static INPUT_PORTS_START( hustler )
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
-	PORT_DIPSETTING(    0x03, "Infinite (Test)" )
+	PORT_DIPSETTING(    0x03, "Infinite (Cheat)" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -616,6 +605,57 @@ static INPUT_PORTS_START( hustler )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( hustlerb3 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	
+	// 6-pos dipswitch on mainboard K4
+	PORT_DIPNAME( 0x40, 0x00, "Half Coinage" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )	PORT_CONDITION("IN1", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )	PORT_CONDITION("IN1", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )	PORT_CONDITION("IN1", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_6C ) )	PORT_CONDITION("IN1", 0x40, EQUALS, 0x00)
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )	PORT_CONDITION("IN1", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )	PORT_CONDITION("IN1", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )	PORT_CONDITION("IN1", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_6C ) )	PORT_CONDITION("IN1", 0x40, EQUALS, 0x00)
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x0c, "Infinite (Cheat)" )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( mimonkey )
 	PORT_START("IN0")
@@ -867,9 +907,6 @@ static MACHINE_CONFIG_DERIVED( hustlerb3, hustler )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hustlerb3_map)
-
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(hustlerb3_sound_map)
 MACHINE_CONFIG_END
 
 
@@ -1246,21 +1283,21 @@ ROM_START( mimonsco )
 ROM_END
 
 
-GAME( 1981, stratgyx,  0,        stratgyx,  stratgyx, scramble_state,  stratgyx,     ROT0,   "Konami", "Strategy X", GAME_SUPPORTS_SAVE )
-GAME( 1981, stratgys,  stratgyx, stratgyx,  stratgyx, scramble_state,  stratgyx,     ROT0,   "Konami (Stern Electronics license)", "Strategy X (Stern Electronics)", GAME_SUPPORTS_SAVE )
-GAME( 1982, strongx,   stratgyx, stratgyx,  stratgyx, scramble_state,  stratgyx,     ROT0,   "bootleg", "Strong X", GAME_SUPPORTS_SAVE )
-GAME( 1982, darkplnt,  0,        darkplnt,  darkplnt, scramble_state,  darkplnt,     ROT180, "Stern Electronics", "Dark Planet", GAME_SUPPORTS_SAVE )
-GAME( 1982, tazmani2,  tazmania, type2,     tazmania, scramble_state,  tazmani2,     ROT90,  "Stern Electronics", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, rescue,    0,        rescue,    rescue, scramble_state,    rescue,       ROT90,  "Stern Electronics", "Rescue", GAME_SUPPORTS_SAVE )
-GAME( 1982, rescueb,   rescue,   rescue,    rescue, scramble_state,    rescue,       ROT90,  "bootleg (Videl Games)", "Rescue (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1982, aponow,    rescue,   rescue,    rescue, scramble_state,    rescue,       ROT90,  "bootleg", "Apocaljpse Now", GAME_SUPPORTS_SAVE )
-GAME( 1983, minefld,   0,        minefld,   minefld, scramble_state,   minefld,      ROT90,  "Stern Electronics", "Minefield", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustler,   0,        hustler,   hustler, scramble_state,   hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerd,  hustler,  hustler,   hustler, scramble_state,   hustlerd,     ROT90,  "Konami (Dynamo Games license)", "Video Hustler (Dynamo Games)", GAME_SUPPORTS_SAVE )
-GAME( 1981, billiard,  hustler,  hustler,   hustler, scramble_state,   billiard,     ROT90,  "bootleg", "The Billiards (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerb,  hustler,  hustlerb,  hustler, scramble_state,   scramble_ppi, ROT90,  "bootleg (Digimatic)", "Video Hustler (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerb2, hustler,  hustler,   hustler, scramble_state,   scramble_ppi, ROT90,  "bootleg", "Fatsy Gambler (Video Hustler bootleg)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerb3, hustler,  hustlerb3, hustler, scramble_state,   scramble_ppi, ROT90,  "bootleg (Videotron)", "Video Pool (Video Hustler bootleg)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1982, mimonkey,  0,        mimonkey,  mimonkey, scramble_state,  mimonkey,     ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
-GAME( 1982, mimonsco,  mimonkey, mimonkey,  mimonsco, scramble_state,  mimonsco,     ROT90,  "bootleg", "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1981, stratgyx,  0,        stratgyx,  stratgyx,  scramble_state,  stratgyx,     ROT0,   "Konami", "Strategy X", GAME_SUPPORTS_SAVE )
+GAME( 1981, stratgys,  stratgyx, stratgyx,  stratgyx,  scramble_state,  stratgyx,     ROT0,   "Konami (Stern Electronics license)", "Strategy X (Stern Electronics)", GAME_SUPPORTS_SAVE )
+GAME( 1982, strongx,   stratgyx, stratgyx,  stratgyx,  scramble_state,  stratgyx,     ROT0,   "bootleg", "Strong X", GAME_SUPPORTS_SAVE )
+GAME( 1982, darkplnt,  0,        darkplnt,  darkplnt,  scramble_state,  darkplnt,     ROT180, "Stern Electronics", "Dark Planet", GAME_SUPPORTS_SAVE )
+GAME( 1982, tazmani2,  tazmania, type2,     tazmania,  scramble_state,  tazmani2,     ROT90,  "Stern Electronics", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, rescue,    0,        rescue,    rescue,    scramble_state,  rescue,       ROT90,  "Stern Electronics", "Rescue", GAME_SUPPORTS_SAVE )
+GAME( 1982, rescueb,   rescue,   rescue,    rescue,    scramble_state,  rescue,       ROT90,  "bootleg (Videl Games)", "Rescue (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1982, aponow,    rescue,   rescue,    rescue,    scramble_state,  rescue,       ROT90,  "bootleg", "Apocaljpse Now", GAME_SUPPORTS_SAVE )
+GAME( 1983, minefld,   0,        minefld,   minefld,   scramble_state,  minefld,      ROT90,  "Stern Electronics", "Minefield", GAME_SUPPORTS_SAVE )
+GAME( 1981, hustler,   0,        hustler,   hustler,   scramble_state,  hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
+GAME( 1981, hustlerd,  hustler,  hustler,   hustler,   scramble_state,  hustlerd,     ROT90,  "Konami (Dynamo Games license)", "Video Hustler (Dynamo Games)", GAME_SUPPORTS_SAVE )
+GAME( 1981, billiard,  hustler,  hustler,   hustler,   scramble_state,  billiard,     ROT90,  "bootleg", "The Billiards (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, hustlerb,  hustler,  hustlerb,  hustler,   driver_device,   0,            ROT90,  "bootleg (Digimatic)", "Video Hustler (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, hustlerb2, hustler,  hustler,   hustler,   scramble_state,  hustlerd,     ROT90,  "bootleg", "Fatsy Gambler (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, hustlerb3, hustler,  hustlerb3, hustlerb3, scramble_state,  hustlerd,     ROT90,  "bootleg (Videotron)", "Video Pool (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1982, mimonkey,  0,        mimonkey,  mimonkey,  scramble_state,  mimonkey,     ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
+GAME( 1982, mimonsco,  mimonkey, mimonkey,  mimonsco,  scramble_state,  mimonsco,     ROT90,  "bootleg", "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
 
