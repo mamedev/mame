@@ -220,7 +220,7 @@
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 
-#include "rendlay.h"
+#include "omegrace.lh"
 
 
 class omegrace_state : public driver_device
@@ -609,6 +609,6 @@ DRIVER_INIT_MEMBER(omegrace_state,omegrace)
  *
  *************************************/
 
-GAMEL(1981, omegrace,  0,        omegrace, omegrace, omegrace_state, omegrace, ROT0, "Midway", "Omega Race (set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE, layout_hoffe457 )
-GAMEL(1981, omegrace2, omegrace, omegrace, omegrace, omegrace_state, omegrace, ROT0, "Midway", "Omega Race (set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE, layout_hoffe457 )
-GAMEL(1981, deltrace,  omegrace, omegrace, omegrace, omegrace_state, omegrace, ROT0, "bootleg (Allied Leisure)", "Delta Race", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE, layout_hoffe457 )
+GAMEL(1981, omegrace,  0,        omegrace, omegrace, omegrace_state, omegrace, ROT0, "Midway", "Omega Race (set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE, layout_omegrace )
+GAMEL(1981, omegrace2, omegrace, omegrace, omegrace, omegrace_state, omegrace, ROT0, "Midway", "Omega Race (set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE, layout_omegrace )
+GAMEL(1981, deltrace,  omegrace, omegrace, omegrace, omegrace_state, omegrace, ROT0, "bootleg (Allied Leisure)", "Delta Race", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE, layout_omegrace )

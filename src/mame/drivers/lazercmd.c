@@ -225,8 +225,8 @@
 #include "sound/dac.h"
 #include "includes/lazercmd.h"
 
-#include "rendlay.h"
 #include "lazercmd.lh"
+#include "medlanes.lh"
 
 #define MASTER_CLOCK XTAL_8MHz
 
@@ -863,5 +863,5 @@ DRIVER_INIT_MEMBER(lazercmd_state,bbonk)
 
 
 GAMEL( 1976, lazercmd, 0, lazercmd, lazercmd, lazercmd_state, lazercmd, ROT0, "Meadows Games, Inc.", "Lazer Command", GAME_SUPPORTS_SAVE, layout_lazercmd )
-GAMEL( 1977, medlanes, 0, medlanes, medlanes, lazercmd_state, medlanes, ROT0, "Meadows Games, Inc.", "Meadows Lanes", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_ho2eff2e )
+GAMEL( 1977, medlanes, 0, medlanes, medlanes, lazercmd_state, medlanes, ROT0, "Meadows Games, Inc.", "Meadows Lanes", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_medlanes )
 GAME ( 1976, bbonk,    0, bbonk,    bbonk, lazercmd_state,    bbonk,    ROT0, "Meadows Games, Inc.", "Bigfoot Bonkers", GAME_SUPPORTS_SAVE )

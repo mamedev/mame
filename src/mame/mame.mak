@@ -1947,7 +1947,9 @@ $(DRIVERS)/30test.o:	$(LAYOUT)/30test.lh
 $(DRIVERS)/8080bw.o:	$(LAYOUT)/shuttlei.lh \
 			$(LAYOUT)/cosmicm.lh
 
-$(DRIVERS)/aces1.o:	$(LAYOUT)/aces1.lh
+$(DRIVERS)/ace.o:		$(LAYOUT)/ace.lh
+
+$(DRIVERS)/aces1.o:		$(LAYOUT)/aces1.lh
 
 $(DRIVERS)/acefruit.o:	$(LAYOUT)/sidewndr.lh
 
@@ -1969,6 +1971,8 @@ $(DRIVERS)/aristmk4.o:	$(LAYOUT)/aristmk4.lh \
 			$(LAYOUT)/topgear.lh \
 			$(LAYOUT)/wildone.lh \
 			$(LAYOUT)/gldnpkr.lh \
+
+$(DRIVERS)/asteroid.o:	$(LAYOUT)/astdelux.lh
 
 $(DRIVERS)/astrocde.o:	$(LAYOUT)/gorf.lh \
 			$(LAYOUT)/seawolf2.lh \
@@ -2017,11 +2021,12 @@ $(DRIVERS)/blockade.o:	$(LAYOUT)/blockade.lh
 
 $(DRIVERS)/buggychl.o:	$(LAYOUT)/buggychl.lh
 
-$(DRIVERS)/bzone.o:	$(LAYOUT)/bzone.lh
+$(DRIVERS)/bzone.o:		$(LAYOUT)/bzone.lh \
+			$(LAYOUT)/redbaron.lh
 
 $(DRIVERS)/cardline.o:	$(LAYOUT)/cardline.lh
 
-$(DRIVERS)/cdi.o:	$(LAYOUT)/cdi.lh
+$(DRIVERS)/cdi.o:		$(LAYOUT)/cdi.lh
 
 $(DRIVERS)/chance32.o:	$(LAYOUT)/chance32.lh
 
@@ -2032,7 +2037,9 @@ $(DRIVERS)/chqflag.o:	$(LAYOUT)/chqflag.lh
 $(DRIVERS)/cinemat.o:	$(LAYOUT)/armora.lh \
 			$(LAYOUT)/demon.lh \
 			$(LAYOUT)/solarq.lh \
-			$(LAYOUT)/starcas.lh
+			$(LAYOUT)/starcas.lh \
+			$(LAYOUT)/sundance.lh \
+			$(LAYOUT)/tailg.lh
 
 $(DRIVERS)/cischeat.o:	$(LAYOUT)/cischeat.lh \
 			$(LAYOUT)/f1gpstar.lh
@@ -2100,7 +2107,8 @@ $(DRIVERS)/kingdrby.o:	$(LAYOUT)/kingdrby.lh
 
 $(DRIVERS)/kungfur.o:	$(LAYOUT)/kungfur.lh
 
-$(DRIVERS)/lazercmd.o:	$(LAYOUT)/lazercmd.lh
+$(DRIVERS)/lazercmd.o:	$(LAYOUT)/lazercmd.lh \
+			$(LAYOUT)/medlanes.lh
 
 $(DRIVERS)/luckgrln.o:	$(LAYOUT)/luckgrln.lh
 
@@ -2136,14 +2144,16 @@ $(DRIVERS)/mpu4vid.o:	$(LAYOUT)/crmaze2p.lh \
 
 $(DRIVERS)/mpu4plasma.o:	$(LAYOUT)/mpu4plasma.lh \
 
-
 $(DRIVERS)/mw18w.o:		$(LAYOUT)/18w.lh
 
 $(DRIVERS)/mw8080bw.o:	$(LAYOUT)/280zzzap.lh \
 			$(LAYOUT)/clowns.lh \
+			$(LAYOUT)/gunfight.lh \
 			$(LAYOUT)/invaders.lh \
 			$(LAYOUT)/invad2ct.lh \
 			$(LAYOUT)/lagunar.lh \
+			$(LAYOUT)/maze.lh \
+			$(LAYOUT)/phantom2.lh \
 			$(LAYOUT)/seawolf.lh \
 			$(LAYOUT)/spacwalk.lh \
 			$(LAYOUT)/spcenctr.lh
@@ -2175,6 +2185,8 @@ $(DRIVERS)/norautp.o:	$(LAYOUT)/noraut11.lh \
 
 $(DRIVERS)/nsm.o:	$(LAYOUT)/nsm.lh
 
+$(DRIVERS)/omegrace.o:	$(LAYOUT)/omegrace.lh
+
 $(DRIVERS)/overdriv.o:	$(LAYOUT)/overdriv.lh
 
 $(DRIVERS)/peplus.o:	$(LAYOUT)/peplus.lh \
@@ -2189,13 +2201,13 @@ $(DRIVERS)/polepos.o:	$(LAYOUT)/polepos.lh \
 
 $(DRIVERS)/proconn.o:	$(LAYOUT)/proconn.lh
 
-$(DRIVERS)/qix.o:	$(LAYOUT)/elecyoyo.lh
+$(DRIVERS)/qix.o:		$(LAYOUT)/elecyoyo.lh
 
 $(DRIVERS)/quizshow.o:	$(LAYOUT)/quizshow.lh
 
-$(DRIVERS)/re900.o:	$(LAYOUT)/re900.lh
+$(DRIVERS)/re900.o:		$(LAYOUT)/re900.lh
 
-$(DRIVERS)/roul.o:	$(LAYOUT)/roul.lh
+$(DRIVERS)/roul.o:		$(LAYOUT)/roul.lh
 
 $(DRIVERS)/rowamet.o:	$(LAYOUT)/rowamet.lh
 
@@ -2213,11 +2225,13 @@ $(DRIVERS)/segasms.o:	$(LAYOUT)/sms1.lh
 
 $(DRIVERS)/segaybd.o:	$(LAYOUT)/pdrift.lh
 
+$(DRIVERS)/skydiver.o:	$(LAYOUT)/skydiver.lh
+
 $(DRIVERS)/snookr10.o:	$(LAYOUT)/snookr10.lh
 
 $(DRIVERS)/spectra.o:	$(LAYOUT)/spectra.lh
 
-$(DRIVERS)/splus.o:	$(LAYOUT)/splus.lh
+$(DRIVERS)/splus.o:		$(LAYOUT)/splus.lh
 
 $(DRIVERS)/sspeedr.o:	$(LAYOUT)/sspeedr.lh
 

@@ -38,8 +38,9 @@ A1                   2101            2101
 ****************************************************************************/
 
 #include "emu.h"
-#include "rendlay.h"
 #include "cpu/i8085/i8085.h"
+
+#include "ace.lh"
 
 #define MASTER_CLOCK XTAL_18MHz
 
@@ -382,4 +383,4 @@ ROM_START( ace )
 ROM_END
 
 
-GAMEL(1976, ace, 0, ace, ace, driver_device, 0, ROT0, "Allied Leisure", "Ace", GAME_SUPPORTS_SAVE | GAME_NO_SOUND, layout_ho1880ff ) // color overlay assumed from flyer
+GAMEL(1976, ace, 0, ace, ace, driver_device, 0, ROT0, "Allied Leisure", "Ace", GAME_SUPPORTS_SAVE | GAME_NO_SOUND, layout_ace ) // color overlay assumed from flyer

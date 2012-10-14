@@ -109,17 +109,6 @@
 // quad screen layouts
 #include "quadhsxs.lh"
 
-// generic color overlay layouts
-#include "ho1880ff.lh"
-#include "ho20ffff.lh"
-#include "ho2eff2e.lh"
-#include "ho4f893d.lh"
-#include "ho88ffff.lh"
-#include "hoa0a0ff.lh"
-#include "hoffe457.lh"
-#include "voffff20.lh"
-#include "hoffff20.lh"
-
 // LCD screen layouts
 #include "lcd.lh"
 #include "lcd_rot.lh"

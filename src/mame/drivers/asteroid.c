@@ -185,13 +185,14 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "rendlay.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "machine/atari_vg.h"
 #include "includes/asteroid.h"
 #include "sound/discrete.h"
 #include "sound/pokey.h"
+
+#include "astdelux.lh"
 
 #define MASTER_CLOCK (XTAL_12_096MHz)
 #define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
@@ -978,8 +979,8 @@ GAME( 1979, asterockv, asteroid,  asterock,  asterock,  asteroid_state, asterock
 GAME( 1979, meteorts,  asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "bootleg (VGG)",       "Meteorites (bootleg of Asteroids)", GAME_SUPPORTS_SAVE )
 GAME( 1979, meteorho,  asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "bootleg (Hoei)",      "Meteor (bootleg of Asteroids)",     GAME_SUPPORTS_SAVE )
 GAME( 1979, hyperspc,  asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "bootleg (Rumiano)",   "Hyperspace (bootleg of Asteroids)", GAME_SUPPORTS_SAVE )
-GAMEL(1980, astdelux,  0,         astdelux,  astdelux,  driver_device,  0,         ROT0, "Atari",   "Asteroids Deluxe (rev 3)", GAME_SUPPORTS_SAVE, layout_ho88ffff )
-GAMEL(1980, astdelux2, astdelux,  astdelux,  astdelux,  driver_device,  0,         ROT0, "Atari",   "Asteroids Deluxe (rev 2)", GAME_SUPPORTS_SAVE, layout_ho88ffff )
-GAMEL(1980, astdelux1, astdelux,  astdelux,  astdelux,  driver_device,  0,         ROT0, "Atari",   "Asteroids Deluxe (rev 1)", GAME_SUPPORTS_SAVE, layout_ho88ffff )
+GAMEL(1980, astdelux,  0,         astdelux,  astdelux,  driver_device,  0,         ROT0, "Atari",   "Asteroids Deluxe (rev 3)", GAME_SUPPORTS_SAVE, layout_astdelux )
+GAMEL(1980, astdelux2, astdelux,  astdelux,  astdelux,  driver_device,  0,         ROT0, "Atari",   "Asteroids Deluxe (rev 2)", GAME_SUPPORTS_SAVE, layout_astdelux )
+GAMEL(1980, astdelux1, astdelux,  astdelux,  astdelux,  driver_device,  0,         ROT0, "Atari",   "Asteroids Deluxe (rev 1)", GAME_SUPPORTS_SAVE, layout_astdelux )
 GAME( 1979, llander,   0,         llander,   llander,   driver_device,  0,         ROT0, "Atari",   "Lunar Lander (rev 2)",     GAME_SUPPORTS_SAVE )
 GAME( 1979, llander1,  llander,   llander,   llander1,  driver_device,  0,         ROT0, "Atari",   "Lunar Lander (rev 1)",     GAME_SUPPORTS_SAVE )

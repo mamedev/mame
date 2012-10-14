@@ -147,16 +147,18 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "rendlay.h"
 #include "machine/rescap.h"
 #include "machine/mb14241.h"
 #include "includes/mw8080bw.h"
 
 #include "280zzzap.lh"
 #include "clowns.lh"
+#include "gunfight.lh"
 #include "invaders.lh"
 #include "invad2ct.lh"
 #include "lagunar.lh"
+#include "maze.lh"
+#include "phantom2.lh"
 #include "seawolf.lh"
 #include "spacwalk.lh"
 #include "spcenctr.lh"
@@ -3158,12 +3160,12 @@ ROM_END
 
 /* 596 */ GAMEL(1976, seawolf,  0,        seawolf,  seawolf,  driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_seawolf )
 /* 596 */ GAMEL(1976, seawolfo, seawolf,  seawolf,  seawolf,  driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_seawolf )
-/* 597 */ GAMEL(1975, gunfight, 0,        gunfight, gunfight, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_hoffff20 )
-/* 597 */ GAMEL(1975, gunfighto,gunfight, gunfight, gunfight, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_hoffff20 )
+/* 597 */ GAMEL(1975, gunfight, 0,        gunfight, gunfight, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_gunfight )
+/* 597 */ GAMEL(1975, gunfighto,gunfight, gunfight, gunfight, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_gunfight )
 /* 604 Gun Fight (cocktail, dump does not exist) */
 /* 605 */ GAME( 1976, tornbase, 0,        tornbase, tornbase, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 /* 610 */ GAMEL(1976, 280zzzap, 0,        zzzap,    zzzap,    driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_280zzzap )
-/* 611 */ GAMEL(1976, maze,     0,        maze,     maze,     driver_device, 0, ROT0,   "Midway", "Amazing Maze", GAME_SUPPORTS_SAVE, layout_ho4f893d )
+/* 611 */ GAMEL(1976, maze,     0,        maze,     maze,     driver_device, 0, ROT0,   "Midway", "Amazing Maze", GAME_SUPPORTS_SAVE, layout_maze )
 /* 612 */ GAME( 1977, boothill, 0,        boothill, boothill, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Boot Hill", GAME_SUPPORTS_SAVE )
 /* 615 */ GAME( 1977, checkmat, 0,        checkmat, checkmat, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Checkmate", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 /* 618 */ GAME( 1977, desertgu, 0,        desertgu, desertgu, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Desert Gun", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
@@ -3179,7 +3181,7 @@ ROM_END
 /* 643 */ GAME( 1978, shuffle,  0,        shuffle,  shuffle,  driver_device, 0, ROT90,  "Midway", "Shuffleboard", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 /* 644 */ GAME( 1977, dogpatch, 0,        dogpatch, dogpatch, driver_device, 0, ROT0,   "Midway", "Dog Patch", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 /* 645 */ GAMEL(1980, spcenctr, 0,        spcenctr, spcenctr, driver_device, 0, ROT0,   "Midway", "Space Encounters", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_spcenctr )
-/* 652 */ GAMEL(1979, phantom2, 0,        phantom2, phantom2, driver_device, 0, ROT0,   "Midway", "Phantom II", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_hoa0a0ff )
+/* 652 */ GAMEL(1979, phantom2, 0,        phantom2, phantom2, driver_device, 0, ROT0,   "Midway", "Phantom II", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_phantom2 )
 /* 730 */ GAME( 1978, bowler,   0,        bowler,   bowler,   driver_device, 0, ROT90,  "Midway", "Bowling Alley", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 /* 739 */ GAMEL(1978, invaders, 0,        invaders, invaders, driver_device, 0, ROT270, "Taito / Midway", "Space Invaders / Space Invaders M", GAME_SUPPORTS_SAVE, layout_invaders )
 /* 742 */ GAME( 1978, blueshrk, 0,        blueshrk, blueshrk, driver_device, 0, ROT0,   "Midway", "Blue Shark", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
