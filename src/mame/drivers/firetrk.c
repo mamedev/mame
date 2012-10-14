@@ -10,6 +10,8 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 #include "includes/firetrk.h"
 #include "sound/discrete.h"
 
+#include "superbug.lh"
+
 #define MASTER_CLOCK (XTAL_12_096MHz)
 
 
@@ -1020,6 +1022,6 @@ ROM_START( montecar )
 ROM_END
 
 
-GAME( 1977, superbug, 0, superbug, superbug, driver_device, 0, ROT270, "Atari (Kee Games)", "Super Bug", 0 )
+GAMEL(1977, superbug, 0, superbug, superbug, driver_device, 0, ROT270, "Atari (Kee Games)", "Super Bug", 0, layout_superbug )
 GAME( 1978, firetrk,  0, firetrk,  firetrk, driver_device,  0, ROT270, "Atari", "Fire Truck / Smokey Joe", 0 )
 GAME( 1979, montecar, 0, montecar, montecar, driver_device, 0, ROT270, "Atari", "Monte Carlo", 0 )

@@ -2063,6 +2063,8 @@ $(DRIVERS)/dragrace.o:	$(LAYOUT)/dragrace.lh
 
 $(DRIVERS)/firebeat.o:	$(LAYOUT)/firebeat.lh
 
+$(DRIVERS)/firetrk.o:	$(LAYOUT)/superbug.lh
+
 $(DRIVERS)/flicker.o:	$(LAYOUT)/flicker.lh
 
 $(DRIVERS)/fortecar.o:	$(LAYOUT)/fortecrd.lh

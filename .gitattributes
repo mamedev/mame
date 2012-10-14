@@ -4479,6 +4479,7 @@ src/mame/layout/stisub.lay svneol=native#text/plain
 src/mame/layout/stocker.lay svneol=native#text/plain
 src/mame/layout/subroc3d.lay svneol=native#text/plain
 src/mame/layout/sundance.lay svneol=native#text/plain
+src/mame/layout/superbug.lay svneol=native#text/plain
 src/mame/layout/superchs.lay svneol=native#text/plain
 src/mame/layout/suprstar.lay svneol=native#text/plain
 src/mame/layout/tailg.lay svneol=native#text/plain
