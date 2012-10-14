@@ -41,6 +41,7 @@
 #include "cpu/m6805/m6805.h"
 #include "machine/6522via.h"
 #include "sound/asc.h"
+#include "includes/mac.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -122,14 +123,20 @@ void cuda_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 			{
 /*                if (data & 0x80)
                 {
-                    printf("CU ADB: 1->0 time %lld\n", m_maincpu->total_cycles()-last_adb_time);
+                    printf("CU ADB: 1->0 time %lld\n", machine().time().as_ticks(1000000) - last_adb_time);
                 }
                 else
                 {
-                    printf("CU ADB: 0->1 time %lld\n", m_maincpu->total_cycles()-last_adb_time);
-                }                      */
+                    printf("CU ADB: 0->1 time %lld\n", machine().time().as_ticks(1000000) - last_adb_time);
+                }*/
+
+                adb_in = (data & 0x80) ? true : false;
+
+				mac_state *mac = machine().driver_data<mac_state>();
+				mac->adb_linechange(((data & 0x80) >> 7) ^ 1, (int)(machine().time().as_ticks(1000000) - last_adb_time));
+
 				last_adb = data & 0x80;
-				last_adb_time = m_maincpu->total_cycles();
+				last_adb_time = machine().time().as_ticks(1000000);
 			}
 			break;
 
@@ -207,8 +214,6 @@ READ8_MEMBER( cuda_device::ports_r )
 	switch (offset)
 	{
 		case 0: 	// port A
-//          incoming |= adb_in ? 0x40 : 0;
-
 			if (cuda_controls_power)
 			{
 				incoming = 0x20; // pull up + chassis switch (which is 0 = on)
@@ -217,6 +222,11 @@ READ8_MEMBER( cuda_device::ports_r )
 			{
 				incoming = 0x02 | 0x01;   // pull-up + PFW
 			}
+
+            if (adb_in)
+            {
+                incoming |= 0x40;
+            }
 			break;
 
         case 1:		// port B

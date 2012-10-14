@@ -84,6 +84,7 @@ public:
     UINT8 get_via_data() { return via_data; }
     void set_via_data(UINT8 dat) { via_data = dat; }
     UINT8 get_via_clock() { return via_clock; }
+    void set_adb_line(int linestate) { adb_in = (linestate == ASSERT_LINE) ? true : false; }
 
     int rom_offset;
 

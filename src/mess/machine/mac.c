@@ -1886,7 +1886,7 @@ void mac_state::machine_reset()
 	}
 
 	m_scsi_interrupt = 0;
-	if (machine().device<cpu_device>("maincpu")->debug())
+	if ((machine().device<cpu_device>("maincpu")->debug()) && (m_model < MODEL_MAC_POWERMAC_6100))
 	{
 		machine().device<cpu_device>("maincpu")->debug()->set_dasm_override(mac_dasm_override);
 	}
