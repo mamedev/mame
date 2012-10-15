@@ -700,6 +700,7 @@ $(MAMEOBJ)/eolith.a: \
 $(MAMEOBJ)/excelent.a: \
 	$(DRIVERS)/aquarium.o $(VIDEO)/aquarium.o \
 	$(DRIVERS)/d9final.o \
+	$(DRIVERS)/dblcrown.o \
 	$(DRIVERS)/gcpinbal.o $(VIDEO)/gcpinbal.o \
 	$(DRIVERS)/lastbank.o \
 	$(DRIVERS)/vmetal.o \

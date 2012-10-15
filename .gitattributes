@@ -2569,6 +2569,7 @@ src/mame/drivers/darius.c svneol=native#text/plain
 src/mame/drivers/darkmist.c svneol=native#text/plain
 src/mame/drivers/darkseal.c svneol=native#text/plain
 src/mame/drivers/dassault.c svneol=native#text/plain
+src/mame/drivers/dblcrown.c svneol=native#text/plain
 src/mame/drivers/dblewing.c svneol=native#text/plain
 src/mame/drivers/dbz.c svneol=native#text/plain
 src/mame/drivers/dcheese.c svneol=native#text/plain
