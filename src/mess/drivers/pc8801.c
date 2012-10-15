@@ -31,10 +31,12 @@
     - Belloncho Shintai Kensa: hangs
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
     - The Black Onyx: writes a katakana msg: "sono kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
+    - Boukenshatachi: dies after the intro.
     - Campaign Ban Daisenryaku 2: Hangs at title screen?
     - Carigraph: inputs doesn't work?
     - Can Can Bunny: bitmap artifacts on intro, caused by a fancy usage of the attribute vram;
     - Can Can Bunny: no sound (regression);
+    - Can Can Bunny Superior: black screen during the intro
     - Chou Bishoujo Densetsu CROQUIS: accesses ports 0xa0-0xa3 and 0xc2-0xc3
     - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
     - Cranston Manor (actually N88-Basic demo): no sound
@@ -51,8 +53,7 @@
     - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
     - Xevious: game is too fast (parent pc8801 only)
 
-    list of games/apps that crashes due of floppy issues (* -> denotes games fixed with current floppy code, # -> moans at MESS boot regarding the d88 format with
-      current floppy code):
+    list of games/apps that crashes due of floppy issues (* -> denotes games fixed with current floppy code, # -> regressed with current floppy code):
     * Agni no Ishi
     * Amazoness no Hihou (takes invalid data from floppy)
     - American Truck / American Truck SR (polls read deleted data command)
@@ -63,11 +64,11 @@
     - Autumn Park (BASIC error)
     * Battle Gorilla
     * Belloncho Shintai Kensa
-    # Bishoujo Noriko Part I (writes to FDC CPU ROM then expects some strict values, taken from floppy image)
+    - Bishoujo Noriko Part I (writes to FDC CPU ROM then expects some strict values, taken from floppy image)
     * Blassty (attempts to read at 0x801b)
     - Bokosuka Wars (polls read ID command)
-    # Boukenshatachi
-    # Can Can Bunny Superior
+    * Boukenshatachi
+    * Can Can Bunny Superior
     - Carmine
     - Castle Excellent (sets sector 0xf4? Jumps to 0xa100 and it shouldn't) (REGRESSED with current floppy code)
     - Card Game Pro 8.8k Plus Unit 1 (prints Disk i/o error 135 in vram, not visible for whatever reason)
