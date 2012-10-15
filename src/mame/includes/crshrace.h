@@ -33,6 +33,7 @@ public:
 	int       m_roz_bank;
 	int       m_gfxctrl;
 	int       m_flipscreen;
+	UINT32 crshrace_tile_callback( UINT32 code );
 
 	/* misc */
 	int m_pending_command;

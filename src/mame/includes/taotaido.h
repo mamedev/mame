@@ -17,6 +17,7 @@ public:
 	required_shared_ptr<UINT16> m_bgram;
 	required_device<vsystem_spr_device> m_spr;
 
+	UINT32 taotaido_tile_callback( UINT32 code );
 	UINT16 m_sprite_character_bank_select[8];
 	UINT16 m_video_bank_select[8];
 	tilemap_t *m_bg_tilemap;

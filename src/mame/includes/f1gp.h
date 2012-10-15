@@ -53,6 +53,7 @@ public:
 	int       m_flipscreen;
 	int       m_gfxctrl;
 	int       m_scroll[2];
+	UINT32 f1gp2_tile_callback( UINT32 code );
 
 	/* misc */
 	int       m_pending_command;

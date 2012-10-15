@@ -330,6 +330,8 @@ static const ym2610_interface ym2610_config =
 	irqhandler
 };
 
+
+
 static MACHINE_CONFIG_START( taotaido, taotaido_state )
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)

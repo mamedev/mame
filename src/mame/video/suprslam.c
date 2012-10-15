@@ -48,6 +48,13 @@ TILE_GET_INFO_MEMBER(suprslam_state::get_suprslam_bg_tile_info)
 }
 
 
+UINT32 suprslam_state::suprslam_tile_callback( UINT32 code )
+{
+	return m_sp_videoram[code];
+}
+
+
+
 void suprslam_state::video_start()
 {
 
@@ -55,6 +62,8 @@ void suprslam_state::video_start()
 	m_screen_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_screen_tilemap->set_transparent_pen(15);
+
+	vsystem_spr_device::set_tile_indirect_callback(m_spr, vsystem_tile_indirection_delegate(FUNC(suprslam_state::suprslam_tile_callback), this)); // can this be moved to the MACHINE_CONFIG?
 }
 
 UINT32 suprslam_state::screen_update_suprslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -64,10 +73,10 @@ UINT32 suprslam_state::screen_update_suprslam(screen_device &screen, bitmap_ind1
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	k053936_zoom_draw(m_k053936, bitmap, cliprect, m_bg_tilemap, 0, 0, 1);
 	if(!(m_spr_ctrl[0] & 8))
-		m_spr->draw_sprites_suprslam(m_spriteram, m_spriteram.bytes(), m_sp_videoram, machine(), bitmap, cliprect);
+		m_spr->draw_sprites_suprslam(m_spriteram, m_spriteram.bytes(), machine(), bitmap, cliprect);
 	m_screen_tilemap->draw(bitmap, cliprect, 0, 0);
 	if(m_spr_ctrl[0] & 8)
-		m_spr->draw_sprites_suprslam(m_spriteram, m_spriteram.bytes(), m_sp_videoram, machine(), bitmap, cliprect);
+		m_spr->draw_sprites_suprslam(m_spriteram, m_spriteram.bytes(), machine(), bitmap, cliprect);
 	return 0;
 }
 

@@ -62,46 +62,9 @@ Abstracts the VS9210
 #include "emu.h"
 #include "vsystem_spr.h"
 
-/* game specific tile indirection callbacks for different HW hookups */
-UINT32 inufuku_tile_callback( UINT32 code, UINT16* lookupram1, UINT16* lookupram2 )
-{
-	return ((lookupram1[code*2] & 0x0007) << 16) + lookupram1[(code*2)+ 1];
-}
 
-UINT32 suprslam_tile_callback( UINT32 code, UINT16* lookupram1, UINT16* lookupram2 )
-{
-	return lookupram1[code];
-}
 
-UINT32 crshrace_tile_callback( UINT32 code, UINT16* lookupram1, UINT16* lookupram2 )
-{
-	return lookupram1[code&0x7fff];
-}
 
-UINT32 f1gp2_tile_callback( UINT32 code, UINT16* lookupram1, UINT16* lookupram2 )
-{
-	return lookupram1[code&0x3fff];
-}
-
-UINT32 gstriker_tile_callback( UINT32 code, UINT16* lookupram1, UINT16* lookupram2 )
-{
-	// straight through
-	return code;
-}
-
-UINT32 taotaido_tile_callback( UINT32 code, UINT16* lookupram1, UINT16* lookupram2 )
-{
-	code = lookupram1[code&0x7fff];
-
-	if (code > 0x3fff)
-	{
-		int block = (code & 0x3800)>>11;
-		code &= 0x07ff;
-		code |= lookupram2[block] * 0x800;
-	}
-
-	return code;
-}
 
 
 const device_type VSYSTEM_SPR = &device_creator<vsystem_spr_device>;
@@ -114,7 +77,23 @@ vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char
 	m_xoffs = 0;
 	m_yoffs = 0;
 	m_pdraw = false;
+
+	m_newtilecb =  vsystem_tile_indirection_delegate(FUNC(vsystem_spr_device::tile_callback_noindirect), this);
 }
+
+UINT32 vsystem_spr_device::tile_callback_noindirect(UINT32 tile)
+{
+	return tile;
+}
+
+
+// static
+void vsystem_spr_device::set_tile_indirect_callback(device_t &device,vsystem_tile_indirection_delegate newtilecb)
+{
+	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
+	dev.m_newtilecb = newtilecb;
+}
+
 
 // static
 void vsystem_spr_device::set_offsets(device_t &device, int xoffs, int yoffs)
@@ -183,7 +162,7 @@ void vsystem_spr_device::get_sprite_attributes(UINT16* ram)
 }
 
 
-void vsystem_spr_device::common_sprite_drawgfx(int gfxrgn, UINT16* spriteram2, UINT16* spriteram3, vsystem_spr_tile_indirection_callback tilecb, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void vsystem_spr_device::common_sprite_drawgfx(int gfxrgn, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = machine.gfx[gfxrgn];
 	int priority_mask = 0x00;
@@ -222,7 +201,7 @@ void vsystem_spr_device::common_sprite_drawgfx(int gfxrgn, UINT16* spriteram2, U
 		int xcnt = xstart;
 		while (xcnt != xend)
 		{
-			int startno = tilecb(curr_sprite.map++, spriteram2, spriteram3);
+			int startno = m_newtilecb(curr_sprite.map++);
 			if (m_pdraw)
 			{
 				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, curr_sprite.ox + xcnt * curr_sprite.zoomx/2,        curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_transpen);
@@ -246,7 +225,7 @@ void vsystem_spr_device::common_sprite_drawgfx(int gfxrgn, UINT16* spriteram2, U
 
 
 
-void vsystem_spr_device::draw_sprites_inufuku( UINT16* spriteram, int spriteram_bytes, UINT16* spriteram2, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void vsystem_spr_device::draw_sprites_inufuku( UINT16* spriteram, int spriteram_bytes, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
 	int end = 0;
@@ -269,13 +248,13 @@ void vsystem_spr_device::draw_sprites_inufuku( UINT16* spriteram, int spriteram_
 
 			curr_sprite.map &= 0x7fff;
 
-			common_sprite_drawgfx(2, spriteram2, NULL, inufuku_tile_callback, machine, bitmap, cliprect);
+			common_sprite_drawgfx(2, machine, bitmap, cliprect);
 		}
 	}
 }
 
 
-void vsystem_spr_device::draw_sprites_suprslam( UINT16* spriteram, int spriteram_bytes, UINT16* spriteram2, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void vsystem_spr_device::draw_sprites_suprslam( UINT16* spriteram, int spriteram_bytes, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT16 *source = spriteram;
 	UINT16 *source2 = spriteram;
@@ -293,13 +272,13 @@ void vsystem_spr_device::draw_sprites_suprslam( UINT16* spriteram, int spriteram
 
 		curr_sprite.map &= 0x7fff;					
 
-		common_sprite_drawgfx(1, spriteram2, NULL, suprslam_tile_callback, machine, bitmap, cliprect);
+		common_sprite_drawgfx(1, machine, bitmap, cliprect);
 	}
 }
 
 
 
-void vsystem_spr_device::draw_sprite_taotaido( UINT16* spriteram, int spriteram_bytes, UINT16* spriteram2, UINT16* spriteram3, running_machine &machine, UINT16 spriteno, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void vsystem_spr_device::draw_sprite_taotaido( UINT16* spriteram, int spriteram_bytes, running_machine &machine, UINT16 spriteno, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT16 *source = &spriteram[spriteno*4];
 
@@ -308,10 +287,10 @@ void vsystem_spr_device::draw_sprite_taotaido( UINT16* spriteram, int spriteram_
 	curr_sprite.map &= 0xffff;
 	curr_sprite.color &= 0x1f;
 
-	common_sprite_drawgfx(0, spriteram2, spriteram3, taotaido_tile_callback, machine, bitmap, cliprect);
+	common_sprite_drawgfx(0, machine, bitmap, cliprect);
 }
 
-void vsystem_spr_device::draw_sprites_taotaido( UINT16* spriteram, int spriteram_bytes, UINT16* spriteram2, UINT16* spriteram3, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void vsystem_spr_device::draw_sprites_taotaido( UINT16* spriteram, int spriteram_bytes, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT16 *source = spriteram;
 	UINT16 *finish = spriteram + spriteram_bytes/2;
@@ -320,7 +299,7 @@ void vsystem_spr_device::draw_sprites_taotaido( UINT16* spriteram, int spriteram
 	{
 		if (source[0] == 0x4000) break;
 
-		draw_sprite_taotaido(spriteram, spriteram_bytes, spriteram2, spriteram3, machine, source[0]&0x3ff, bitmap, cliprect);
+		draw_sprite_taotaido(spriteram, spriteram_bytes, machine, source[0]&0x3ff, bitmap, cliprect);
 
 		source++;
 	}
@@ -328,7 +307,7 @@ void vsystem_spr_device::draw_sprites_taotaido( UINT16* spriteram, int spriteram
 
 
 
-void vsystem_spr_device::draw_sprites_crshrace(UINT16* spriteram, int spriteram_bytes, UINT16* spriteram2, running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int flipscreen)
+void vsystem_spr_device::draw_sprites_crshrace(UINT16* spriteram, int spriteram_bytes, running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int flipscreen)
 {
 	int offs;
 
@@ -344,13 +323,13 @@ void vsystem_spr_device::draw_sprites_crshrace(UINT16* spriteram, int spriteram_
 		curr_sprite.color &= 0x1f;
 		curr_sprite.map &= 0x7fff;
 
-		common_sprite_drawgfx(2, spriteram2, NULL, crshrace_tile_callback, machine, bitmap, cliprect);
+		common_sprite_drawgfx(2, machine, bitmap, cliprect);
 	}
 }
 
 
 
-void vsystem_spr_device::draw_sprites_aerofght( UINT16* spriteram3, int spriteram_bytes, UINT16* spriteram1, UINT16* spriteram2, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
+void vsystem_spr_device::draw_sprites_aerofght( UINT16* spriteram3, int spriteram_bytes, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	int offs;
 	pri <<= 12;
@@ -368,7 +347,7 @@ void vsystem_spr_device::draw_sprites_aerofght( UINT16* spriteram3, int spritera
 			curr_sprite.color &=0x1f;
 			curr_sprite.map &= 0x3fff;
 	
-			common_sprite_drawgfx(2, spriteram1, NULL, crshrace_tile_callback, machine, bitmap, cliprect);
+			common_sprite_drawgfx(2, machine, bitmap, cliprect);
 
 		}
 		offs++;
@@ -376,7 +355,7 @@ void vsystem_spr_device::draw_sprites_aerofght( UINT16* spriteram3, int spritera
 }
 
 
-void vsystem_spr_device::f1gp2_draw_sprites(UINT16* spritelist, UINT16* sprcgram, int flipscreen, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void vsystem_spr_device::f1gp2_draw_sprites(UINT16* spritelist, int flipscreen, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
 
@@ -392,7 +371,7 @@ void vsystem_spr_device::f1gp2_draw_sprites(UINT16* spritelist, UINT16* sprcgram
 		curr_sprite.color &= 0x1f;
 		curr_sprite.map &= 0x7fff;
 
-		common_sprite_drawgfx(1, sprcgram, NULL, f1gp2_tile_callback, machine, bitmap, cliprect);
+		common_sprite_drawgfx(1, machine, bitmap, cliprect);
 	}
 }
 
@@ -407,7 +386,7 @@ void vsystem_spr_device::CG10103_draw_sprite(running_machine &machine, bitmap_in
 	if (curr_sprite.pri != drawpri)
 		return;
 
-	common_sprite_drawgfx(m_gfx_region, NULL, NULL, gstriker_tile_callback, machine, bitmap, cliprect);
+	common_sprite_drawgfx(m_gfx_region, machine, bitmap, cliprect);
 }
 
 

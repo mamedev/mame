@@ -54,12 +54,6 @@ WRITE16_MEMBER(inufuku_state::inufuku_scrollreg_w)
 
 ******************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	inufuku_state *state = machine.driver_data<inufuku_state>();
-
-	state->m_spr->draw_sprites_inufuku( state->m_spriteram1_old, state->m_spriteram1.bytes(), state->m_spriteram2, machine, bitmap, cliprect );
-}
 
 
 /******************************************************************************
@@ -109,6 +103,12 @@ WRITE16_MEMBER(inufuku_state::inufuku_tx_videoram_w)
 }
 
 
+UINT32 inufuku_state::inufuku_tile_callback( UINT32 code )
+{
+	return ((m_spriteram2[code*2] & 0x0007) << 16) + m_spriteram2[(code*2)+ 1];
+}
+
+
 /******************************************************************************
 
     Start the video hardware emulation
@@ -125,6 +125,8 @@ void inufuku_state::video_start()
 	m_tx_tilemap->set_transparent_pen(255);
 
 	m_spriteram1_old = auto_alloc_array_clear(machine(), UINT16, m_spriteram1.bytes()/2);
+
+	vsystem_spr_device::set_tile_indirect_callback(m_spr, vsystem_tile_indirection_delegate(FUNC(inufuku_state::inufuku_tile_callback), this)); // can this be moved to the MACHINE_CONFIG?
 }
 
 
@@ -159,7 +161,7 @@ UINT32 inufuku_state::screen_update_inufuku(screen_device &screen, bitmap_ind16 
 	m_tx_tilemap->set_scrolly(0, m_tx_scrolly);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
-	draw_sprites(machine(), bitmap, cliprect);
+	m_spr->draw_sprites_inufuku( m_spriteram1_old, m_spriteram1.bytes(), machine(), bitmap, cliprect );
 	return 0;
 }
 

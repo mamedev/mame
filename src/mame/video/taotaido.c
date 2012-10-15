@@ -79,6 +79,22 @@ TILEMAP_MAPPER_MEMBER(taotaido_state::taotaido_tilemap_scan_rows)
 	return row*0x40 + (col&0x3f) + ((col&0x40)<<6);
 }
 
+
+UINT32 taotaido_state::taotaido_tile_callback( UINT32 code )
+{
+	code = m_spriteram2_older[code&0x7fff];
+
+	if (code > 0x3fff)
+	{
+		int block = (code & 0x3800)>>11;
+		code &= 0x07ff;
+		code |= m_sprite_character_bank_select[block] * 0x800;
+	}
+
+	return code;
+}
+
+
 void taotaido_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(taotaido_state::taotaido_bg_tile_info),this),tilemap_mapper_delegate(FUNC(taotaido_state::taotaido_tilemap_scan_rows),this),16,16,128,64);
@@ -88,6 +104,8 @@ void taotaido_state::video_start()
 
 	m_spriteram2_old = auto_alloc_array(machine(), UINT16, 0x10000/2);
 	m_spriteram2_older = auto_alloc_array(machine(), UINT16, 0x10000/2);
+
+	vsystem_spr_device::set_tile_indirect_callback(m_spr, vsystem_tile_indirection_delegate(FUNC(taotaido_state::taotaido_tile_callback), this)); // can this be moved to the MACHINE_CONFIG?
 }
 
 
@@ -113,7 +131,7 @@ UINT32 taotaido_state::screen_update_taotaido(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->draw(bitmap, clip, 0,0);
 	}
 
-	m_spr->draw_sprites_taotaido(m_spriteram_older, m_spriteram.bytes(), m_spriteram2_older, m_sprite_character_bank_select, machine(), bitmap,cliprect);
+	m_spr->draw_sprites_taotaido(m_spriteram_older, m_spriteram.bytes(), machine(), bitmap,cliprect);
 	return 0;
 }
 

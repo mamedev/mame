@@ -1655,7 +1655,7 @@ static MACHINE_CONFIG_START( aerofgt, aerofgt_state )
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,aerofgt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
