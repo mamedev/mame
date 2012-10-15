@@ -569,7 +569,7 @@ static void execute_one(i8085_state *cpustate, int opcode)
 		case 0x25:	M_DCR(cpustate->HL.b.h);							break;	/* DCR  H */
 		case 0x26:	M_MVI(cpustate->HL.b.h);							break;	/* MVI  H,nn */
 		case 0x27:	cpustate->WZ.b.h = cpustate->AF.b.h;						/* DAA  */
-					if (cpustate->AF.b.l&VF) {
+					if (IS_8085(cpustate) && cpustate->AF.b.l&VF) {
 						if ((cpustate->AF.b.l&HF) | ((cpustate->AF.b.h&0xf)>9)) cpustate->WZ.b.h-=6;
 						if ((cpustate->AF.b.l&CF) | (cpustate->AF.b.h>0x99)) cpustate->WZ.b.h-=0x60;
 					}
@@ -580,8 +580,6 @@ static void execute_one(i8085_state *cpustate, int opcode)
 
 					cpustate->AF.b.l=(cpustate->AF.b.l&3) | (cpustate->AF.b.h&0x28) | (cpustate->AF.b.h>0x99) | ((cpustate->AF.b.h^cpustate->WZ.b.h)&0x10) | ZSP[cpustate->WZ.b.h];
 					cpustate->AF.b.h=cpustate->WZ.b.h;
-
-					if (IS_8080(cpustate)) cpustate->AF.b.l &= 0xd5; // Ignore not used flags
 					break;
 
 		case 0x28:	if (IS_8085(cpustate)) {									/* LDEH nn */
@@ -888,7 +886,8 @@ static void execute_one(i8085_state *cpustate, int opcode)
 		case 0xf2:	M_JMP( !(cpustate->AF.b.l & SF) );					break;	/* JP   nnnn */
 		case 0xf3:	set_inte(cpustate, 0);								break;	/* DI   */
 		case 0xf4:	M_CALL( !(cpustate->AF.b.l & SF) );					break;	/* CP   nnnn */
-		case 0xf5:	M_PUSH(AF);											break;	/* PUSH A */
+		case 0xf5:	if (IS_8080(cpustate)) cpustate->AF.b.l = (cpustate->AF.b.l&~(X3F|X5F))|VF; // on 8080, VF=1 and X3F=0 and X5F=0 always! (we don't have to check for it elsewhere)
+					M_PUSH(AF);											break;	/* PUSH A */
 		case 0xf6:	cpustate->WZ.b.l = ARG(cpustate); M_ORA(cpustate->WZ.b.l); break; /* ORI  nn */
 		case 0xf7:	M_RST(6);											break;	/* RST  6 */
 
