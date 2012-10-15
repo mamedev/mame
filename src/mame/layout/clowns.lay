@@ -1,5 +1,5 @@
+<?xml version="1.0"?>
 <mamelayout version="2">
-
 	<element name="overlay">
 		<rect>
 			<bounds left="0" top="0" right="256" bottom="29" />
@@ -31,5 +31,4 @@
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</overlay>
 	</view>
-
 </mamelayout>
