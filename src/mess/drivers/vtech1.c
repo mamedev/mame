@@ -688,8 +688,7 @@ DRIVER_INIT_MEMBER(vtech1_state,vtech1h)
 	DRIVER_INIT_CALL(vtech1);
 
 	/* the SHRG mod replaces the standard videoram chip with an 8k chip */
-	//m_videoram_size = 0x2000;
-	//m_videoram = auto_alloc_array(machine(), UINT8, m_videoram_size);
+	m_videoram.allocate(0x2000);
 
 	prg.install_readwrite_bank(0x7000, 0x77ff, "bank4");
 	membank("bank4")->configure_entries(0, 4, m_videoram, 0x800);
