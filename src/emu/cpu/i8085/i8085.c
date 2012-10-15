@@ -78,14 +78,12 @@
  * Revisions:
  *
  * xx-xx-2002 Acho A. Tang
- *
  * - 8085 emulation was in fact never used. It's been treated as a plain 8080.
  * - protected IRQ0 vector from being overwritten
  * - modified interrupt handler to properly process 8085-specific IRQ's
  * - corrected interrupt masking, RIM and SIM behaviors according to Intel's documentation
  *
  * 20-Jul-2002 Krzysztof Strzecha
- *
  * - SBB r instructions should affect parity flag.
  *   Fixed only for non x86 asm version (#define i8080_EXACT 1).
  *   There are probably more opcodes which should affect this flag, but don't.
@@ -98,30 +96,24 @@
  *   Thanks for the info go to Anton V. Ignatichev.
  *
  * 08-Dec-2002 Krzysztof Strzecha
- *
  * - ADC r instructions should affect parity flag.
  *   Fixed only for non x86 asm version (#define i8080_EXACT 1).
  *   There are probably more opcodes which should affect this flag, but don't.
  *
  * 05-Sep-2003 Krzysztof Strzecha
- *
  * - INR r, DCR r, ADD r, SUB r, CMP r instructions should affect parity flag.
  *   Fixed only for non x86 asm version (#define i8080_EXACT 1).
  *
  * 23-Dec-2006 Tomasz Slanina
- *
  * - SIM fixed
  *
  * 28-Jan-2007 Zsolt Vasvari
- *
  * - Removed archaic i8080_EXACT flag.
  *
  * 08-June-2008 Miodrag Milanovic
- *
  * - Flag setting fix for some instructions and cycle count update
  *
  * August 2009, hap
- *
  * - removed DAA table
  * - fixed accidental double memory reads due to macro overuse
  * - fixed cycle deduction on unconditional CALL / RET
@@ -133,9 +125,14 @@
  *   fixed X5 / V flags where accidentally broken due to flag names confusion
  *
  * 21-Aug-2009, Curt Coder
- *
  * - added 8080A variant
  * - refactored callbacks to use devcb
+ *
+ * October 2012, hap
+ * - fixed H flag on subtraction opcodes
+ * - on 8080, don't push the unsupported flags(X5, X3, V) to stack
+ * - 8080 passes on 8080/8085 CPU Exerciser, 8085 errors only on the DAA test
+ *   (ref: http://www.idb.me.uk/sunhillow/8080.html - tests only 8080 opcodes)
  *
  *****************************************************************************/
 

@@ -85,19 +85,19 @@
 
 #define M_SUB(R) {																	\
 	int q = cpustate->AF.b.h-R;														\
-	cpustate->AF.b.l=ZSP[q&255]|((q>>8)&CF)|((cpustate->AF.b.h^q^R)&HF)|VF;			\
+	cpustate->AF.b.l=ZSP[q&255]|((q>>8)&CF)|(~(cpustate->AF.b.h^q^R)&HF)|VF;		\
 	cpustate->AF.b.h=q;																\
 }
 
 #define M_SBB(R) {																	\
 	int q = cpustate->AF.b.h-R-(cpustate->AF.b.l&CF);								\
-	cpustate->AF.b.l=ZSP[q&255]|((q>>8)&CF)|((cpustate->AF.b.h^q^R)&HF)|VF;			\
+	cpustate->AF.b.l=ZSP[q&255]|((q>>8)&CF)|(~(cpustate->AF.b.h^q^R)&HF)|VF;		\
 	cpustate->AF.b.h=q;																\
 }
 
 #define M_CMP(R) {																	\
 	int q = cpustate->AF.b.h-R;														\
-	cpustate->AF.b.l=ZSP[q&255]|((q>>8)&CF)|((cpustate->AF.b.h^q^R)&HF)|VF;			\
+	cpustate->AF.b.l=ZSP[q&255]|((q>>8)&CF)|(~(cpustate->AF.b.h^q^R)&HF)|VF;		\
 }
 
 #define M_DAD(R) {																	\
@@ -106,6 +106,7 @@
 	cpustate->HL.w.l = q;															\
 }
 
+// DSUB is 8085-only, not sure if H flag handling is correct
 #define M_DSUB(cpustate) {															\
 	int q = cpustate->HL.b.l-cpustate->BC.b.l;										\
 	cpustate->AF.b.l=ZS[q&255]|((q>>8)&CF)|VF|										\
