@@ -4,12 +4,47 @@
 
   Machine file to handle emulation of the Nintendo Game Boy.
 
+Cardridge port pinouts:
+Pin  Name     Description
+1    VCC      +5 VDC
+2    PHI      CPU clock ?
+3    /WR      Write
+4    /RD      Read
+5    /CS      SRAM select
+6    A0       Address 0
+7    A1       Address 1
+8    A2       Address 2
+9    A3       Address 3
+10   A4       Address 4
+11   A5       Address 5
+12   A6       Address 6
+13   A7       Address 7
+14   A8       Address 8
+15   A9       Address 9
+16   A10      Address 10
+17   A11      Address 11
+18   A12      Address 12
+19   A13      Address 13
+20   A14      Address 14
+21   A15      Address 15
+22   D0       Data 0
+23   D1       Data 1
+24   D2       Data 2
+25   D3       Data 3
+26   D4       Data 4
+27   D5       Data 5
+28   D6       Data 6
+29   D7       Data 7
+30   /RST     Reset
+31   AUDIOIN  Never used ?
+32   GND      Ground
+
+
 TODO:
 - YongYong mapper:
   - During start there are 2 writes to 5000 and 5003, it is still unknown what these do.
 - Story of La Sa Ma mapper:
-  - Does this display Nintendo or Gowin logo on boot?
-  - No clue how the banking works yet
+  - This should display the Gowin logo on boot on both DMG and CGB (Not implemented yet)
 - ATV Racing/Rocket Games mapper:
   - How did this overlay the official Nintendo logo at BIOS check time? (Some Sachen titles use a similar trick)
 
@@ -95,29 +130,6 @@ enum {
 
 
 static void gb_machine_stop(running_machine &machine);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 static void gb_timer_increment( running_machine &machine );
 
 #ifdef MAME_DEBUG
@@ -249,6 +261,8 @@ static void gb_init(running_machine &machine)
 			//space.install_write_handler( 0x5000, 0x5003, write8_delegate(FUNC(gb_state::gb_rom_back_yongyong_5000),state) );
 			break;
 		case MBC_LASAMA:
+			space.install_write_handler( 0x2080, 0x2080, write8_delegate(FUNC(gb_state::gb_rom_bank_lasama_2080),state) );
+			space.install_write_handler( 0x6000, 0x6000, write8_delegate(FUNC(gb_state::gb_rom_bank_lasama_6000),state) );
 			break;
 		case MBC_ATVRACIN:
 			space.install_write_handler( 0x3F00, 0x3F00, write8_delegate(FUNC(gb_state::gb_rom_bank_atvracin_3f00),state) );
@@ -800,6 +814,26 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_yongyong_2000)
 {
 	m_ROMBank = data;
 	gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
+}
+
+WRITE8_MEMBER(gb_state::gb_rom_bank_lasama_2080)
+{
+	// Actual banking?
+	m_ROMBank = m_ROMBank00 | ( data & 0x03 );
+	gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
+}
+
+WRITE8_MEMBER(gb_state::gb_rom_bank_lasama_6000)
+{
+	// On boot the following two get written right after each other:
+	// 02
+	// BE
+	// Disable logo switching?
+	if ( ! ( data & 0x80 ) )
+	{
+		m_ROMBank00 = ( data & 0x02 ) << 1;
+		gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] );
+	}
 }
 
 WRITE8_MEMBER(gb_state::gb_rom_bank_atvracin_3f00)
