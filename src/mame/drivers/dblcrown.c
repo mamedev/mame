@@ -202,6 +202,9 @@ ROM_START( dblcrown )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD("2.u43", 0x00000, 0x80000, CRC(58200bd4) SHA1(2795cfc41056111f66bfb82916343d1c733baa83) )
+	
+	ROM_REGION( 0x0bf1, "pals", 0 ) // in Jedec format
+	ROM_LOAD("palce16v8h.u39", 0x0000, 0x0bf1, CRC(997b0ba9) SHA1(1c121ab74f33d5162b619740b08cc7bc694c257d) )
 ROM_END
 
-GAME( 199?, dblcrown,  0,   dblcrown,  dblcrown,  driver_device, 0,       ROT0, "Excellent Systems",      "Double Crown", GAME_IS_SKELETON )
+GAME( 199?, dblcrown,  0,   dblcrown,  dblcrown,  driver_device, 0,       ROT0, "Excellent System",      "Double Crown", GAME_IS_SKELETON )
