@@ -23255,8 +23255,8 @@
 		<info name="serial" value="GS-04"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="LaSaMa" />
-			<dataarea name="rom" size="4194304">
-				<rom name="la sa ma chuan qi - story of lasama (unlicensed) [raw dump].bin" size="4194304" crc="46362c48" sha1="c1d399edc676127be438541a5ce4a7e096e86c39" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="la sa ma chuan qi - story of lasama (unlicensed) [raw dump].bin" size="131072" crc="989a5fe0" sha1="00f139a63c0dd6cdaeac77c6747772ac394c0a79" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
