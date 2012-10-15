@@ -30,10 +30,6 @@
 const device_type LUXOR_4105 = &device_creator<luxor_4105_device>;
 
 
-//-------------------------------------------------
-//  SCSICB_interface sasi_intf
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( luxor_4105_device::sasi_bsy_w )
 {
 	if (state)
@@ -62,19 +58,6 @@ WRITE_LINE_MEMBER( luxor_4105_device::sasi_req_w )
 	update_trrq_int();
 }
 
-static const SCSICB_interface sasi_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER("^^", luxor_4105_device, sasi_bsy_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("^^", luxor_4105_device, sasi_io_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("^^", luxor_4105_device, sasi_req_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  MACHINE_DRIVER( luxor_4105 )
@@ -83,7 +66,10 @@ static const SCSICB_interface sasi_intf =
 static MACHINE_CONFIG_FRAGMENT( luxor_4105 )
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", S1410, SCSI_ID_0)
-	MCFG_SCSICB_ADD(SASIBUS_TAG ":host", sasi_intf)
+	MCFG_SCSICB_ADD(SASIBUS_TAG ":host")
+	MCFG_SCSICB_BSY_HANDLER(DEVWRITELINE("^", luxor_4105_device, sasi_bsy_w))
+	MCFG_SCSICB_IO_HANDLER(DEVWRITELINE("^", luxor_4105_device, sasi_io_w))
+	MCFG_SCSICB_REQ_HANDLER(DEVWRITELINE("^", luxor_4105_device, sasi_req_w))
 MACHINE_CONFIG_END
 
 

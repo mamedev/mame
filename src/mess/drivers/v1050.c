@@ -1002,23 +1002,6 @@ static const floppy_interface v1050_floppy_interface =
 };
 
 
-//-------------------------------------------------
-//  SCSICB_interface sasi_intf
-//-------------------------------------------------
-
-static const SCSICB_interface sasi_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(v1050_state, sasi_io_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 // Machine Initialization
 
 static IRQ_CALLBACK( v1050_int_ack )
@@ -1128,7 +1111,8 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	// SASI bus
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", S1410, SCSI_ID_0)
-	MCFG_SCSICB_ADD(SASIBUS_TAG ":host", sasi_intf)
+	MCFG_SCSICB_ADD(SASIBUS_TAG ":host")
+	MCFG_SCSICB_IO_HANDLER(DEVWRITELINE("^", v1050_state, sasi_io_w))
 
 	MCFG_TIMER_DRIVER_ADD(TIMER_ACK_TAG, v1050_state, sasi_ack_tick)
 	MCFG_TIMER_DRIVER_ADD(TIMER_RST_TAG, v1050_state, sasi_rst_tick)

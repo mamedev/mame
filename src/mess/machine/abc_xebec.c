@@ -81,24 +81,6 @@ static const z80_daisy_config daisy_chain[] =
 
 
 //-------------------------------------------------
-//  SCSICB_interface sasi_intf
-//-------------------------------------------------
-
-static const SCSICB_interface sasi_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( abc_xebec )
 //-------------------------------------------------
 
@@ -110,7 +92,7 @@ static MACHINE_CONFIG_FRAGMENT( abc_xebec )
 
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
-	MCFG_SCSICB_ADD(SASIBUS_TAG ":host", sasi_intf)
+	MCFG_SCSICB_ADD(SASIBUS_TAG ":host")
 MACHINE_CONFIG_END
 
 

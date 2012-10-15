@@ -1020,11 +1020,6 @@ static const wd17xx_interface bulletf_fdc_intf =
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
-
-//-------------------------------------------------
-//  SCSICB_interface scsi_intf
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( bulletf_state::req_w )
 {
 	if (!state)
@@ -1037,19 +1032,6 @@ WRITE_LINE_MEMBER( bulletf_state::req_w )
 	m_wrdy = !state;
 	update_dma_rdy();
 }
-
-static const SCSICB_interface scsi_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(bulletf_state, req_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 
 static serial_terminal_interface terminal_intf =
@@ -1207,7 +1189,8 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 
 	MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
-	MCFG_SCSICB_ADD(SCSIBUS_TAG ":host", scsi_intf)
+	MCFG_SCSICB_ADD(SCSIBUS_TAG ":host")
+	MCFG_SCSICB_REQ_HANDLER(DEVWRITELINE("^", bulletf_state, req_w))
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "wmbullet")

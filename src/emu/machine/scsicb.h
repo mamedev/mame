@@ -15,25 +15,22 @@ controler chip such as the RM Nimbus, which implements it as a bunch of
 
 #include "scsidev.h"
 
-struct SCSICB_interface
-{
-	devcb_write_line _out_bsy_func;
-	devcb_write_line _out_sel_func;
-	devcb_write_line _out_cd_func;
-	devcb_write_line _out_io_func;
-	devcb_write_line _out_msg_func;
-	devcb_write_line _out_req_func;
-	devcb_write_line _out_ack_func;
-	devcb_write_line _out_atn_func;
-	devcb_write_line _out_rst_func;
-};
-
-class scsicb_device : public scsidev_device,
-					  public SCSICB_interface
+class scsicb_device : public scsidev_device
 {
 public:
 	// construction/destruction
 	scsicb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_bsy_handler(device_t &device, _Object object) { return downcast<scsicb_device &>(device).m_bsy_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_sel_handler(device_t &device, _Object object) { return downcast<scsicb_device &>(device).m_sel_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_cd_handler(device_t &device, _Object object) { return downcast<scsicb_device &>(device).m_cd_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_io_handler(device_t &device, _Object object) { return downcast<scsicb_device &>(device).m_io_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_msg_handler(device_t &device, _Object object) { return downcast<scsicb_device &>(device).m_msg_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_req_handler(device_t &device, _Object object) { return downcast<scsicb_device &>(device).m_req_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_ack_handler(device_t &device, _Object object) { return downcast<scsicb_device &>(device).m_ack_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_atn_handler(device_t &device, _Object object) { return downcast<scsicb_device &>(device).m_atn_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_rst_handler(device_t &device, _Object object) { return downcast<scsicb_device &>(device).m_rst_handler.set_callback(object); }
 
 	virtual void scsi_in( UINT32 data, UINT32 mask );
 
@@ -65,31 +62,56 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 private:
 	UINT8 get_scsi_line(UINT32 mask);
 	void set_scsi_line(UINT32 mask, UINT8 state);
-	void trigger_callback(UINT32 update_mask, UINT32 line_mask, devcb_resolved_write_line &write_line);
+	void trigger_callback(UINT32 update_mask, UINT32 line_mask, devcb2_write_line &write_line);
 	const char *get_line_name(UINT32 mask);
 
-	devcb_resolved_write_line out_bsy_func;
-	devcb_resolved_write_line out_sel_func;
-	devcb_resolved_write_line out_cd_func;
-	devcb_resolved_write_line out_io_func;
-	devcb_resolved_write_line out_msg_func;
-	devcb_resolved_write_line out_req_func;
-	devcb_resolved_write_line out_ack_func;
-	devcb_resolved_write_line out_atn_func;
-	devcb_resolved_write_line out_rst_func;
+	devcb2_write_line m_bsy_handler;
+	devcb2_write_line m_sel_handler;
+	devcb2_write_line m_cd_handler;
+	devcb2_write_line m_io_handler;
+	devcb2_write_line m_msg_handler;
+	devcb2_write_line m_req_handler;
+	devcb2_write_line m_ack_handler;
+	devcb2_write_line m_atn_handler;
+	devcb2_write_line m_rst_handler;
 
 	UINT32 linestate;
 };
 
-#define MCFG_SCSICB_ADD(_tag, _intf) \
-	MCFG_DEVICE_ADD(_tag, SCSICB, 0) \
-	MCFG_DEVICE_CONFIG(_intf)
+#define MCFG_SCSICB_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SCSICB, 0)
+
+#define MCFG_SCSICB_BSY_HANDLER(_devcb) \
+	devcb = &scsicb_device::set_bsy_handler(*device, DEVCB2_##_devcb); \
+
+#define MCFG_SCSICB_SEL_HANDLER(_devcb) \
+	devcb = &scsicb_device::set_sel_handler(*device, DEVCB2_##_devcb); \
+
+#define MCFG_SCSICB_CD_HANDLER(_devcb) \
+	devcb = &scsicb_device::set_cd_handler(*device, DEVCB2_##_devcb); \
+
+#define MCFG_SCSICB_IO_HANDLER(_devcb) \
+	devcb = &scsicb_device::set_io_handler(*device, DEVCB2_##_devcb); \
+
+#define MCFG_SCSICB_MSG_HANDLER(_devcb) \
+	devcb = &scsicb_device::set_msg_handler(*device, DEVCB2_##_devcb); \
+
+#define MCFG_SCSICB_REQ_HANDLER(_devcb) \
+	devcb = &scsicb_device::set_req_handler(*device, DEVCB2_##_devcb); \
+
+#define MCFG_SCSICB_ACK_HANDLER(_devcb) \
+	devcb = &scsicb_device::set_ack_handler(*device, DEVCB2_##_devcb); \
+
+#define MCFG_SCSICB_ATN_HANDLER(_devcb) \
+	devcb = &scsicb_device::set_atn_handler(*device, DEVCB2_##_devcb); \
+
+#define MCFG_SCSICB_RST_HANDLER(_devcb) \
+	devcb = &scsicb_device::set_rst_handler(*device, DEVCB2_##_devcb); \
 
 // device type definition
 extern const device_type SCSICB;

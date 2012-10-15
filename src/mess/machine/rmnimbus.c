@@ -2523,7 +2523,6 @@ void rmnimbus_state::nimbus_scsi_linechange( UINT8 mask, UINT8 state )
 	case HDC_IO_MASK:
 		if (state)
 		{
-			printf( "switch to input mode\n" );
 			m_scsibus->scsi_data_w(0);
 		}
 		break;

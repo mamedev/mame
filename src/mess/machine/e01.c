@@ -260,10 +260,6 @@ static const wd17xx_interface fdc_intf =
 };
 
 
-//-------------------------------------------------
-//  SCSICB_interface scsi_intf
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( e01_device::scsi_bsy_w )
 {
 	if (state)
@@ -282,19 +278,6 @@ WRITE_LINE_MEMBER( e01_device::scsi_req_w )
 	m_hdc_irq = !state;
 	update_interrupts();
 }
-
-static const SCSICB_interface scsi_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER("^^", e01_device, scsi_bsy_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("^^", e01_device, scsi_req_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 
 //-------------------------------------------------
@@ -352,7 +335,9 @@ static MACHINE_CONFIG_FRAGMENT( e01 )
 
 	MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
-	MCFG_SCSICB_ADD(SCSIBUS_TAG ":host", scsi_intf)
+	MCFG_SCSICB_ADD(SCSIBUS_TAG ":host")
+	MCFG_SCSICB_BSY_HANDLER(DEVWRITELINE("^", e01_device, scsi_bsy_w))
+	MCFG_SCSICB_REQ_HANDLER(DEVWRITELINE("^", e01_device, scsi_req_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

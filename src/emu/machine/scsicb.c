@@ -27,18 +27,17 @@ INLINE void ATTR_PRINTF( 3, 4 ) verboselog( int n_level, running_machine &machin
 }
 
 scsicb_device::scsicb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : scsidev_device(mconfig, SCSICB, "SCSI callback", tag, owner, clock)
+    : scsidev_device(mconfig, SCSICB, "SCSI callback", tag, owner, clock),
+	m_bsy_handler(*this),
+	m_sel_handler(*this),
+	m_cd_handler(*this),
+	m_io_handler(*this),
+	m_msg_handler(*this),
+	m_req_handler(*this),
+	m_ack_handler(*this),
+	m_atn_handler(*this),
+	m_rst_handler(*this)
 {
-}
-
-void scsicb_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const SCSICB_interface *intf = reinterpret_cast<const SCSICB_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<SCSICB_interface *>(this) = *intf;
-	}
 }
 
 void scsicb_device::device_start()
@@ -47,30 +46,30 @@ void scsicb_device::device_start()
 
 	linestate = 0;
 
-	out_bsy_func.resolve(_out_bsy_func, *this);
-	out_sel_func.resolve(_out_sel_func, *this);
-	out_cd_func.resolve(_out_cd_func, *this);
-	out_io_func.resolve(_out_io_func, *this);
-	out_msg_func.resolve(_out_msg_func, *this);
-	out_req_func.resolve(_out_req_func, *this);
-	out_ack_func.resolve(_out_ack_func, *this);
-	out_atn_func.resolve(_out_atn_func, *this);
-	out_rst_func.resolve(_out_rst_func, *this);
+	m_bsy_handler.resolve_safe();
+	m_sel_handler.resolve_safe();
+	m_cd_handler.resolve_safe();
+	m_io_handler.resolve_safe();
+	m_msg_handler.resolve_safe();
+	m_req_handler.resolve_safe();
+	m_ack_handler.resolve_safe();
+	m_atn_handler.resolve_safe();
+	m_rst_handler.resolve_safe();
 }
 
 void scsicb_device::scsi_in( UINT32 data, UINT32 mask )
 {
 	linestate = data;
 
-	trigger_callback( mask, SCSI_MASK_BSY, out_bsy_func );
-	trigger_callback( mask, SCSI_MASK_SEL, out_sel_func );
-	trigger_callback( mask, SCSI_MASK_CD, out_cd_func );
-	trigger_callback( mask, SCSI_MASK_IO, out_io_func );
-	trigger_callback( mask, SCSI_MASK_MSG, out_msg_func );
-	trigger_callback( mask, SCSI_MASK_REQ, out_req_func );
-	trigger_callback( mask, SCSI_MASK_ACK, out_ack_func );
-	trigger_callback( mask, SCSI_MASK_ATN, out_atn_func );
-	trigger_callback( mask, SCSI_MASK_RST, out_rst_func );
+	trigger_callback( mask, SCSI_MASK_BSY, m_bsy_handler );
+	trigger_callback( mask, SCSI_MASK_SEL, m_sel_handler );
+	trigger_callback( mask, SCSI_MASK_CD, m_cd_handler );
+	trigger_callback( mask, SCSI_MASK_IO, m_io_handler );
+	trigger_callback( mask, SCSI_MASK_MSG, m_msg_handler );
+	trigger_callback( mask, SCSI_MASK_REQ, m_req_handler );
+	trigger_callback( mask, SCSI_MASK_ACK, m_ack_handler );
+	trigger_callback( mask, SCSI_MASK_ATN, m_atn_handler );
+	trigger_callback( mask, SCSI_MASK_RST, m_rst_handler );
 }
 
 UINT8 scsicb_device::scsi_data_r()
@@ -148,7 +147,7 @@ void scsicb_device::set_scsi_line( UINT32 mask, UINT8 state )
 	}
 }
 
-void scsicb_device::trigger_callback( UINT32 update_mask, UINT32 line_mask, devcb_resolved_write_line &write_line )
+void scsicb_device::trigger_callback( UINT32 update_mask, UINT32 line_mask, devcb2_write_line &write_line )
 {
 	if( ( update_mask & line_mask ) != 0 && !write_line.isnull() )
 	{

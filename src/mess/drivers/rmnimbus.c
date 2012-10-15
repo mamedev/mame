@@ -80,23 +80,6 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B      /* 8 kHz */
 };
 
-//-------------------------------------------------
-//  SCSICB_interface sasi_intf
-//-------------------------------------------------
-
-static const SCSICB_interface scsibus_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state, nimbus_scsi_bsy_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state, nimbus_scsi_cd_w),
-	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state, nimbus_scsi_io_w),
-	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state, nimbus_scsi_msg_w),
-	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state, nimbus_scsi_req_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const centronics_interface nimbus_centronics_config =
 {
 	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state, nimbus_ack_w),
@@ -331,7 +314,12 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk1", SCSIHD, SCSI_ID_1)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk2", ACB4070, SCSI_ID_2)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk3", S1410, SCSI_ID_3)
-	MCFG_SCSICB_ADD(SCSIBUS_TAG ":host", scsibus_config)
+	MCFG_SCSICB_ADD(SCSIBUS_TAG ":host")
+	MCFG_SCSICB_BSY_HANDLER(DEVWRITELINE("^", rmnimbus_state, nimbus_scsi_bsy_w))
+	MCFG_SCSICB_CD_HANDLER(DEVWRITELINE("^", rmnimbus_state, nimbus_scsi_cd_w))
+	MCFG_SCSICB_IO_HANDLER(DEVWRITELINE("^", rmnimbus_state, nimbus_scsi_io_w))
+	MCFG_SCSICB_MSG_HANDLER(DEVWRITELINE("^", rmnimbus_state, nimbus_scsi_msg_w))
+	MCFG_SCSICB_REQ_HANDLER(DEVWRITELINE("^", rmnimbus_state, nimbus_scsi_req_w))
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1536K")
