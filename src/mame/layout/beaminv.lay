@@ -7,15 +7,15 @@
 		</rect>
 		<rect>
 			<bounds left="0" top="0" right="216" bottom="26" />
-			<color red="0.160" green="0.578" blue="0.738" />
+			<color red="0.2" green="0.8" blue="1" />
 		</rect>
 		<rect>
 			<bounds left="0" top="26" right="216" bottom="217" />
-			<color red="0.675" green="0.351" blue="0.480" />
+			<color red="1" green="0.4" blue="0.7" />
 		</rect>
 		<rect>
 			<bounds left="0" top="217" right="216" bottom="248" />
-			<color red="0.160" green="0.578" blue="0.738" />
+			<color red="0.2" green="0.8" blue="1" />
 		</rect>
 	</element>
 
