@@ -6557,7 +6557,6 @@ src/mess/machine/bebox.c svneol=native#text/plain
 src/mess/machine/beta.c svneol=native#text/plain
 src/mess/machine/beta.h svneol=native#text/plain
 src/mess/machine/bk.c svneol=native#text/plain
-src/mess/machine/c128.c svneol=native#text/plain
 src/mess/machine/c128_comal80.c svneol=native#text/plain
 src/mess/machine/c128_comal80.h svneol=native#text/plain
 src/mess/machine/c1541.c svneol=native#text/plain

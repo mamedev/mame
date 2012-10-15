@@ -1,213 +1,25 @@
-/***************************************************************************
-    commodore c128 home computer
-
-    PeT mess@utanet.at
-
-    documentation:
-     iDOC (http://www.softwolves.pp.se/idoc)
-           Christian Janoff  mepk@c64.org
-***************************************************************************/
-
-/*
-
-2008 - Driver Updates
----------------------
-
-(most of the informations are taken from http://www.zimmers.net/cbmpics/ )
-
-
-[CBM systems which belong to this driver]
-
-* Commodore 128 (1985)
-
-CPU: CSG 8502 (1 or 2 MHz), Z80 (~3 MHz)
-RAM: 128 kilobytes
-ROM: 72 kilobytes expandable
-Video: MOS 8564 "VIC-IIE", MOS 8563 "VDC" CTRC (40/80 columns text; Palette of 16
-    colors; Hires modes 320 x 200, 640 x 200, 16k of dedicated VDC RAM)
-Sound: MOS 8580 "SID" (3 voice stereo synthesizer/digital sound
-    capabilities)
-Ports: MOS 6526 CIA x2 (2 Joystick/Mouse ports; CBM Serial port; CBM
-    Datasette port; parallel programmable "User" port; CBM Monitor port;
-    C64 expansion port; Warm reset switch; Keyboard port; Power switch)
-Keyboard: Full-sized 93 key QWERTY (14 key numeric keypad; 8 programmable
-    function keys + HELP; 4 direction 4-key cursor-pad)
-
-Upgrade kits were sold to upgrade the VDC RAM to 64k using a passthrough board
-that the VDC sat in.
-
-
-* Commodore 128CR (prototype from June, 1986)
-
-  Basically, a C128 in a redesigned board to reduce production costs. It's
-not clear when it's been produced, nor if it has ever been produced on
-large scale. Its BIOS is an intermediate revision between rev. 0 and rev. 1
-in the main C128.
-A picture of the PCB can be found here:
-http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/c128/c128cr.jpg
-
-Appears to be functionally identical to the original c128, has 16k VDC ram, and a
-?prototype? VDC labeled 2568R1X. Has 6526A-1 CIAs, 8721R3 and 8722R2 gate
-arrays, 8580R5 sid, and 8502R0 processor.
-
-
-* Commodore 128D (1985)
-
-  Designed in the US, but only sold in Europe, it is a C128 in a desktop
-case, with built-in 1571 disk drive (upgraded with a special software to
-discourage pirating software). Some NTSC prototypes exist.
-
-CPU: CSG 8502 (1 or 2 MHz), Z80 (~3 MHz), 6502 (co-processor for disk
-    drive)
-RAM: 128 kilobytes
-ROM: 72 kilobytes expandable
-Video: MOS 8564 "VIC-IIE", MOS 8563 "VDC" CTRC (40/80 columns text; Palette of 16
-    colors; Hires modes 320 x 200, 640 x 200, 64k of dedicated VDC RAM)
-Sound: MOS 8580 "SID" (3 voice stereo synthesizer/digital sound
-    capabilities)
-Ports: MOS 6526 CIA x2 (2 Joystick/Mouse ports; CBM Serial port; CBM
-    Datasette port; parallel programmable "User" port; CBM Monitor port;
-    C64 expansion port; Warm reset switch; Keyboard port; Power switch)
-Keyboard: Full-sized 93 key QWERTY (14 key numeric keypad; 8 programmable
-    function keys + HELP; 4 direction 4-key cursor-pad)
-Additional Hardware: Internal 1571 disk drive (Double sided/Double Density
-    360k; capable of reading GCR and MFM formats)
-
-
-* Commodore 128DCR (1986)
-
-  Basically, a C128D in a redesigned board to reduce production costs. It's
-the only model sold in the US, but it's quite possible that it came later
-in Europe as well (being cheaper to produce).
-
-
-* Commodore "128D/81" (198?)
-
-  NTSC prototype for an improved version of C128D, featuring a built-in 1581
-disk drive in place of the 1571 used in C128D / C128DCR. The prototype has no
-given name, so C128D/81 is just a reasonable way to indicate it. The case is
-from a PAL C128D and the board is a heavily modified PAL board with hand
-soldered connections to make it NTSC.
-
-
-[TO DO]
-
-* C64 Mode
-
-  See [TO DO] in drivers/c64.c for the missing features.
-
-
-* C/PM Mode
-
-  It should work if you put the CP/M disk in drive 8 and enter BOOT. Better
-disk emulation would be of help, anyway.
-
-* C128 Mode
-
-  Various missing features (e.g. no cpu clock doubling; no internal function
-rom; serial bus doesn't support printer or other devices; no C128 cart
-expansions are supported; no userport; no rs232/v.24 interface)
-
-* Informations / BIOS / Supported Sets:
-
-- Was C128D using rev. 1 BIOS in 4 ROMs? I guessed so because the board has the
-same desing as a C128, and later C128DCR still used rev. 1 BIOS (only contained
-in two ROMs)
-
-- Is it possible to track down and dump properly C128 PAL BIOSes? Current sets
-are mostly tagged as bad dumps because obtained by extracting the content in
-pieces. I'd like to have confirmation that the common parts are really the same
-before removing the flag.
-
-- PAL BIOSes are from C128? C128D? or C128DCR? Were there differences in the
-contents between them, except for being splitted in 2 or 4 parts? Were all
-versions sold in each country? Right now we choose to support the following sets
-(more to be added if BIOS content confirmed):
-
-+ German, Italian and Swedish dumps are known to come from a C128DCR. Therefore,
-we support c128drde, c128drit and c128drsw.
-
-+ We also have a dump of the German C128, therefore we support the c128ger, even
-if it's not clear which BASIC version it was shipped with. We assumed the older
-kernal to be shipped with rev. 0 and the newer with rev. 1.
-
-+ The Finnish, French and Norwegian dumps came with no notes (or these have been
-lost). Therefore we support only the c128 for these, i.e. c128fin, c128fre and
-c128nor.
-
-+ Character ROM for Belgium, Italy and French was the same (I/F/B on the label,
-and indeed it turned out to be the same on both the Italian and French C128)
-
-- Also, the italian C128DCR was found with a rev. 0 BASIC on it. Were both rev. 0
-and rev. 1 used in the CR version? When did Commodore switch between the two?
-
-[Notes about dumping BIOS]
-
-Dumping roms with eeprom reader
--------------------------------
-
-c128 / c128d
-
-    U18       (read compatible 2764?) 8kB c64 character rom, c128 character rom
-    U32 23128 (read compatible 27128?) 16kB c64 Basic, c64 Kernel
-    U33 23128 (read compatible 27128?) 16kB c128 Basic at 0x4000
-    U34 23128 (read compatible 27128?) 16kB c128 Basic at 0x8000
-    U35 23128 (read compatible 27128?) 16kB c128 Editor, Z80BIOS, c128 Kernel
-
-c128cr / c128dcr
-
-    U18       (read compatible 2764?) 8kB c64 character rom, c128 character rom
-    U32 23256 (read compatible 27256?) 32kB c64 Basic + Kernel, c128 Editor, Z80BIOS, c128 Kernel
-    U34 23256 (read compatible 27256?) 32kB c128 Basic
-
-c128d / c128dcr also need:
-
-    U102 23256 (read compatible 27256?) 32kB 1571 system rom
-
-
-It would be also possible to dump the BIOS in monitor, but it would be preferable
-to use an EEPROM reader, in order to obtain a dump of the whole content.
-*/
-
 /*
 
     TODO:
 
-    - connect to PLA
-    - clean up ROMs
-    - wire up function ROM softlist
-    - remove banking code from machine/c128.h
-    - inherit from c64_state and use common members from there
-    - clean up inputs
+	- C64 mode charrom read
     - fix fast serial
+    - K0-K2 key line read
+    - clean up inputs
+    - expansion DMA
+    - inherit from c64_state and use common members from there
 
 */
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m6502/m6502.h"
-#include "sound/sid6581.h"
-#include "sound/dac.h"
-#include "machine/6526cia.h"
-
-#include "machine/cbmipt.h"
-#include "video/mos6566.h"
-#include "video/mc6845.h"
-
-
-/* devices config */
-#include "includes/cbm.h"
-#include "formats/cbm_snqk.h"
-#include "machine/cbmiec.h"
-
 #include "includes/c128.h"
-#include "includes/c64_legacy.h"
 
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
+
+#define LOG 0
 
 #define A15 BIT(offset, 15)
 #define A14 BIT(offset, 14)
@@ -219,42 +31,70 @@ to use an EEPROM reader, in order to obtain a dump of the whole content.
 #define VMA4 BIT(vma, 12)
 
 
-/*************************************
- *
- *  Main CPU memory handlers
- *
- *************************************/
+
+//**************************************************************************
+//  INTERRUPTS
+//**************************************************************************
+
+//-------------------------------------------------
+//  check_interrupts -
+//-------------------------------------------------
+
+inline void c128_state::check_interrupts()
+{
+	int restore = BIT(ioport("SPECIAL")->read(), 7);
+
+	int irq = m_cia1_irq || m_vic_irq || m_exp_irq;
+	int nmi = m_cia2_irq || restore || m_exp_nmi;
+
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, irq);
+
+	m_subcpu->set_input_line(M8502_IRQ_LINE, irq);
+	m_subcpu->set_input_line(INPUT_LINE_NMI, nmi);
+
+	int flag = m_cass_rd && m_iec_srq;
+
+	m_cia1->flag_w(flag);
+}
 
 
-/* shares ram with m8502
- * how to bankswitch ?
- * bank 0
- * 0x0000, 0x03ff bios rom
- * 0x1400, 0x1bff vdc videoram
- * 0x1c00, 0x23ff vdc colorram
- * 0x2c00, 0x2fff vic2e videoram
- * 0xff00, 0xff04 mmu registers
- * else ram (dram bank 0?)
- * bank 1
- * 0x0000-0xedff ram (dram bank 1?)
- * 0xe000-0xffff ram as bank 0
- */
 
-void c128_state::bankswitch_pla(offs_t offset, offs_t ta, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0,
+//**************************************************************************
+//  ADDRESS DECODING
+//**************************************************************************
+
+//-------------------------------------------------
+//  read_pla -
+//-------------------------------------------------
+
+void c128_state::read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0,
 		int *sden, int *dir, int *gwe, int *rom1, int *rom2, int *rom3, int *rom4, int *charom, int *colorram, int *vic,
 		int *from1, int *romh, int *roml, int *dwe, int *ioacc, int *clrbank, int *iocs, int *casenb)
 {
 	int _128_256 = 1;
 	int dmaack = 1;
-	int vicfix = 0;
-	int game = m_exp->game_r(ta, ba, rw, m_hiram);
-	int exrom = m_exp->exrom_r(ta, ba, rw, m_hiram);
+	int vicfix = 1;
 	int clk = 1;
 
-	UINT32 input = clk << 26 | m_va14 << 25 | m_charen << 24 |
+	m_game = m_exp->game_r(ca, ba, rw, m_hiram);
+	m_exrom = m_exp->exrom_r(ca, ba, rw, m_hiram);
+
+	UINT32 input = clk << 26 | !m_va14 << 25 | m_charen << 24 |
 		m_hiram << 23 | m_loram << 22 | ba << 21 | VMA5 << 20 | VMA4 << 19 | ms0 << 18 | ms1 << 17 | ms2 << 16 |
-		exrom << 15 | game << 14 | rw << 13 | aec << 12 | A10 << 11 | A11 << 10 | A12 << 9 | A13 << 8 |
+		m_exrom << 15 | m_game << 14 | rw << 13 | aec << 12 | A10 << 11 | A11 << 10 | A12 << 9 | A13 << 8 |
 		A14 << 7 | A15 << 6 | z80io << 5 | m_z80en << 4 | ms3 << 3 | vicfix << 2 | dmaack << 1 | _128_256;
+
+	/*
+	000000000001111111112222222
+	012345678901234567890123456
+	--11--------0------10---0-- 000000000000000001
+	---0--------0-1----10----1- 000000000000000001
+	---0--------0--0---10----1- 000000000000000001
+	---0--1101--111-------1-0-- 000000000000000001
+	---0--1101--111--------10-- 000000000000000001
+	---0--1101--11-0-------10-- 000000000000000001
+	---11-1101--11--100-------- 000000000000000001
+	*/
 
 	UINT32 data = m_pla->read(input);
 
@@ -276,7 +116,14 @@ void c128_state::bankswitch_pla(offs_t offset, offs_t ta, offs_t vma, int ba, in
 	*gwe = BIT(data, 15);
 	*colorram = BIT(data, 16);
 	*charom = BIT(data, 17);
+
+	m_clrbank = *clrbank;
 }
+
+
+//-------------------------------------------------
+//  read_memory -
+//-------------------------------------------------
 
 UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io)
 {
@@ -285,67 +132,73 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 		from1 = 1, romh = 1, roml = 1, dwe = 1, ioacc = 1, clrbank = 1, iocs = 1, casenb = 1;
 	int io1 = 1, io2 = 1;
 
-	offs_t ta = m_mmu->ta_r(offset, aec, &ms0, &ms1, &ms2, &ms3, &cas0, &cas1);
-
-	bankswitch_pla(offset, ta, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0,
-		&sden, &dir, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic,
-		&from1, &romh, &roml, &dwe, &ioacc, &clrbank, &iocs, &casenb);
-
 	UINT8 data = 0xff;
 
-	if (ba)
+	offs_t ta = m_mmu->ta_r(offset, aec, &ms0, &ms1, &ms2, &ms3, &cas0, &cas1);
+	offs_t ma = 0;
+	offs_t sa = 0;
+
+	if (aec)
 	{
 		data = m_vic->bus_r();
+		ma = ta | (offset & 0xff);
+		sa = offset & 0xff;
+	}
+	else
+	{
+		ta |= (vma & 0xf00);
+		ma = (!m_va15 << 15) | (!m_va14 << 14) | vma;
+		sa = vma & 0xff;
 	}
 
+	offs_t ca = ta | (offset & 0xff);
+
+	read_pla(offset, ca, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0,
+		&sden, &dir, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic,
+		&from1, &romh, &roml, &dwe, &ioacc, &clrbank, &iocs, &casenb);
+/*
+	if (!space.debugger_access() && !ba)
+	logerror("read %04x %04x %04x - %u %u %u %u %u %u %u %u %u %u - %u %u %u %u %u %u %u %u %u %u - %u %u %u %u %u %u %u %u\n",
+		offset, ta, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0, cas1, cas0,
+		sden, dir, gwe, rom1, rom2, rom3, rom4, charom, colorram, vic,
+		from1, romh, roml, dwe, ioacc, clrbank, iocs, casenb);
+*/
 	if (!casenb)
 	{
 		if (!cas0)
 		{
-			data = m_ram->pointer()[(ta & 0xff00) | (offset & 0xff)];
+			data = m_ram->pointer()[ma];
 		}
 		else if (!cas1)
 		{
-			data = m_ram->pointer()[0x10000 | (ta & 0xff00) | (offset & 0xff)];
+			data = m_ram->pointer()[0x10000 | ma];
 		}
 	}
 	else if (!rom1)
 	{
-		if (m_rom3)
-		{
-			data = m_rom1[((BIT(ta, 14) && BIT(offset, 13)) << 13) | (ta & 0x1000) | (offset & 0xfff)];
-		}
-		else
-		{
-			data = m_rom1[(ms3 << 14) | ((BIT(ta, 14) && BIT(offset, 13)) << 13) | (ta & 0x1000) | (offset & 0xfff)];
-		}
+		// CR: data = m_rom1[(ms3 << 14) | ((BIT(ta, 14) && BIT(offset, 13)) << 13) | (ta & 0x1000) | (offset & 0xfff)];
+		data = m_rom1[((BIT(ta, 14) && BIT(offset, 13)) << 13) | (ta & 0x1000) | (offset & 0xfff)];
 	}
-	else if (!rom2 && m_rom3)
+	else if (!rom2)
 	{
 		data = m_rom2[offset & 0x3fff];
 	}
 	else if (!rom3)
 	{
-		if (m_rom3)
-		{
-			data = m_rom3[offset & 0x3fff];
-		}
-		else
-		{
-			data = m_rom2[(BIT(offset, 15) << 14) | (offset & 0x3fff)];
-		}
+		// CR: data = m_rom3[(BIT(offset, 15) << 14) | (offset & 0x3fff)];
+		data = m_rom3[offset & 0x3fff];
 	}
-	else if (!rom4 && m_rom3)
+	else if (!rom4)
 	{
 		data = m_rom4[(ta & 0x1000) | (offset & 0x2fff)];
 	}
 	else if (!charom)
 	{
-		data = m_charom[(ms3 << 12) | (ta & 0xf00) | (offset & 0xff)];
+		data = m_charom[(ms3 << 12) | (ta & 0xf00) | sa];
 	}
 	else if (!colorram)
 	{
-		data = m_color_ram[(clrbank << 10) | (ta & 0x300) | (offset & 0xff)] & 0x0f;
+		data = m_color_ram[(clrbank << 10) | (ta & 0x300) | sa] & 0x0f;
 	}
 	else if (!vic)
 	{
@@ -392,10 +245,15 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 		}
 	}
 
-	data = m_exp->cd_r(space, ta, data, ba, roml, romh, io1, io2);
+	data = m_exp->cd_r(space, ca, data, ba, roml, romh, io1, io2);
 
 	return m_mmu->read(offset, data);
 }
+
+
+//-------------------------------------------------
+//  write_memory -
+//-------------------------------------------------
 
 void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, UINT8 data, int ba, int aec, int z80io)
 {
@@ -405,8 +263,11 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, U
 	int io1 = 1, io2 = 1;
 
 	offs_t ta = m_mmu->ta_r(offset, aec, &ms0, &ms1, &ms2, &ms3, &cas0, &cas1);
+	offs_t ca = ta | (offset & 0xff);
+	offs_t ma = ta | (offset & 0xff);
+	offs_t sa = offset & 0xff;
 
-	bankswitch_pla(offset, ta, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0,
+	read_pla(offset, ca, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0,
 		&sden, &dir, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic,
 		&from1, &romh, &roml, &dwe, &ioacc, &clrbank, &iocs, &casenb);
 
@@ -414,16 +275,16 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, U
 	{
 		if (!cas0)
 		{
-			m_ram->pointer()[(ta & 0xff00) | (offset & 0xff)] = data;
+			m_ram->pointer()[ma] = data;
 		}
 		else if (!cas1)
 		{
-			m_ram->pointer()[0x10000 | (ta & 0xff00) | (offset & 0xff)] = data;
+			m_ram->pointer()[0x10000 | ma] = data;
 		}
 	}
 	else if (!colorram && !gwe)
 	{
-		m_color_ram[(clrbank << 10) | (ta & 0x300) | (offset & 0xff)] = data | 0xf0;
+		m_color_ram[(clrbank << 10) | (ta & 0x300) | sa] = data | 0xf0;
 	}
 	else if (!vic)
 	{
@@ -466,10 +327,15 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, U
 		}
 	}
 
-	m_exp->cd_w(space, ta, data, ba, roml, romh, io1, io2);
+	m_exp->cd_w(space, ca, data, ba, roml, romh, io1, io2);
 
 	m_mmu->write(space, offset, data);
 }
+
+
+//-------------------------------------------------
+//  z80_r -
+//-------------------------------------------------
 
 READ8_MEMBER( c128_state::z80_r )
 {
@@ -479,6 +345,11 @@ READ8_MEMBER( c128_state::z80_r )
 	return read_memory(space, offset, vma, ba, aec, z80io);
 }
 
+
+//-------------------------------------------------
+//  z80_w -
+//-------------------------------------------------
+
 WRITE8_MEMBER( c128_state::z80_w )
 {
 	int ba = 1, aec = 1, z80io = 1;
@@ -486,6 +357,11 @@ WRITE8_MEMBER( c128_state::z80_w )
 
 	write_memory(space, offset, vma, data, ba, aec, z80io);
 }
+
+
+//-------------------------------------------------
+//  z80_io_r -
+//-------------------------------------------------
 
 READ8_MEMBER( c128_state::z80_io_r )
 {
@@ -495,6 +371,11 @@ READ8_MEMBER( c128_state::z80_io_r )
 	return read_memory(space, offset, vma, ba, aec, z80io);
 }
 
+
+//-------------------------------------------------
+//  z80_io_w -
+//-------------------------------------------------
+
 WRITE8_MEMBER( c128_state::z80_io_w )
 {
 	int ba = 1, aec = 1, z80io = 0;
@@ -503,13 +384,23 @@ WRITE8_MEMBER( c128_state::z80_io_w )
 	write_memory(space, offset, vma, data, ba, aec, z80io);
 }
 
+
+//-------------------------------------------------
+//  read -
+//-------------------------------------------------
+
 READ8_MEMBER( c128_state::read )
 {
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	return read_memory(space, vma, offset, ba, aec, z80io);
+	return read_memory(space, offset, vma, ba, aec, z80io);
 }
+
+
+//-------------------------------------------------
+//  write -
+//-------------------------------------------------
 
 WRITE8_MEMBER( c128_state::write )
 {
@@ -519,12 +410,26 @@ WRITE8_MEMBER( c128_state::write )
 	write_memory(space, offset, vma, data, ba, aec, z80io);
 }
 
+
+//-------------------------------------------------
+//  vic_videoram_r -
+//-------------------------------------------------
+
 READ8_MEMBER( c128_state::vic_videoram_r )
 {
 	int ba = 0, aec = 0, z80io = 1;
-	offs_t vma = 0;
 
-	return read_memory(space, offset, vma, ba, aec, z80io);
+	return read_memory(space, 0, offset, ba, aec, z80io);
+}
+
+
+//-------------------------------------------------
+//  vic_colorram_r -
+//-------------------------------------------------
+
+READ8_MEMBER( c128_state::vic_colorram_r )
+{
+	return m_color_ram[(m_clrbank << 10) | offset];
 }
 
 
@@ -538,9 +443,7 @@ READ8_MEMBER( c128_state::vic_videoram_r )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8, c128_state )
-	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bank10") AM_WRITE(write_0000)
-	AM_RANGE(0x1000, 0xbfff) AM_READ_BANK("bank11") AM_WRITE(write_1000)
-	AM_RANGE(0xc000, 0xffff) AM_RAM
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(z80_r, z80_w)
 ADDRESS_MAP_END
 
 
@@ -549,15 +452,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( z80_io, AS_IO, 8, c128_state )
-	AM_RANGE(0x1000, 0x13ff) AM_READWRITE_LEGACY(c64_colorram_read, c64_colorram_write)
-	AM_RANGE(0xd000, 0xd3ff) AM_DEVREADWRITE(MOS8564_TAG, mos6566_device, read, write)
-	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE(MOS6581_TAG, sid6581_device, read, write)
-	AM_RANGE(0xd500, 0xd5ff) AM_READWRITE(mmu8722_port_r, mmu8722_port_w)
-	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x1fe) AM_DEVREADWRITE(MOS8563_TAG, mos8563_device, status_r, address_w)
-	AM_RANGE(0xd601, 0xd601) AM_MIRROR(0x1fe) AM_DEVREADWRITE(MOS8563_TAG, mos8563_device, register_r, register_w)
-	AM_RANGE(0xdc00, 0xdc0f) AM_MIRROR(0xf0) AM_DEVREADWRITE(MOS6526_1_TAG, mos6526_device, read, write)
-	AM_RANGE(0xdd00, 0xdd0f) AM_MIRROR(0xf0) AM_DEVREADWRITE(MOS6526_2_TAG, mos6526_device, read, write)
-/*  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE_LEGACY(dma_port_r, dma_port_w) */
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(z80_io_r, z80_io_w)
 ADDRESS_MAP_END
 
 
@@ -566,22 +461,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( m8502_mem, AS_PROGRAM, 8, c128_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAMBANK("bank1")
-	AM_RANGE(0x0100, 0x01ff) AM_RAMBANK("bank2")
-	AM_RANGE(0x0200, 0x03ff) AM_RAMBANK("bank3")
-	AM_RANGE(0x0400, 0x0fff) AM_RAMBANK("bank4")
-	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK("bank5")
-	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank6")
-
-	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK( "bank7") AM_WRITE(write_4000 )
-	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK( "bank8") AM_WRITE(write_8000 )
-	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK( "bank9") AM_WRITE(write_a000 )
-
-	AM_RANGE(0xc000, 0xcfff) AM_READ_BANK( "bank12") AM_WRITE(write_c000 )
-	AM_RANGE(0xd000, 0xdfff) AM_READ_BANK( "bank13") AM_WRITE(write_d000)
-	AM_RANGE(0xe000, 0xfeff) AM_READ_BANK( "bank14") AM_WRITE(write_e000 )
-	AM_RANGE(0xff00, 0xff04) AM_READ_BANK( "bank15") AM_WRITE(write_ff00 )	   /* mmu c128 modus */
-	AM_RANGE(0xff05, 0xffff) AM_READ_BANK( "bank16") AM_WRITE(write_ff05 )
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
 
@@ -590,7 +470,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( vic_videoram_map, AS_0, 8, c128_state )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_dma_read)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
 ADDRESS_MAP_END
 
 
@@ -599,7 +479,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( vic_colorram_map, AS_1, 8, c128_state )
-	AM_RANGE(0x000, 0x3ff) AM_READ(vic_dma_read_color)
+	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
 ADDRESS_MAP_END
 
 
@@ -709,7 +589,7 @@ INPUT_PORTS_END
 //-------------------------------------------------
 //  INPUT_PORTS( c128fra )
 //-------------------------------------------------
-
+#ifdef UNUSED_CODE
 static INPUT_PORTS_START( c128fra )
 	PORT_INCLUDE( c128 )
 
@@ -761,12 +641,12 @@ static INPUT_PORTS_START( c128fra )
 	PORT_CONFSETTING(	0x00, "ASCII" )
 	PORT_CONFSETTING(	0x20, "?French?" )
 INPUT_PORTS_END
-
+#endif
 
 //-------------------------------------------------
 //  INPUT_PORTS( c128ita )
 //-------------------------------------------------
-
+#ifdef UNUSED_CODE
 static INPUT_PORTS_START( c128ita )
 	PORT_INCLUDE( c128 )
 
@@ -815,7 +695,7 @@ static INPUT_PORTS_START( c128ita )
 	PORT_CONFSETTING( 0x00, "ASCII" )
 	PORT_CONFSETTING( 0x20, DEF_STR( Italian ) )
 INPUT_PORTS_END
-
+#endif
 
 //-------------------------------------------------
 //  INPUT_PORTS( c128swe )
@@ -865,13 +745,20 @@ WRITE_LINE_MEMBER( c128_state::mmu_z80en_w )
 {
 	if (state)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+
+		if (m_reset)
+		{
+			m_subcpu->reset();
+			//m_subcpu->set_state_int(M8502_PC, 0xff3d);
+			m_reset = 0;
+		}
 	}
 	else
 	{
-		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
 	m_z80en = state;
@@ -879,21 +766,22 @@ WRITE_LINE_MEMBER( c128_state::mmu_z80en_w )
 
 WRITE_LINE_MEMBER( c128_state::mmu_fsdir_w )
 {
+	update_iec();
 }
 
 READ_LINE_MEMBER( c128_state::mmu_game_r )
 {
-	return 1;
+	return m_game;
 }
 
 READ_LINE_MEMBER( c128_state::mmu_exrom_r )
 {
-	return 1;
+	return m_exrom;
 }
 
 READ_LINE_MEMBER( c128_state::mmu_sense40_r )
 {
-	return 1;
+	return !BIT(ioport("SPECIAL")->read(), 4);
 }
 
 static MOS8722_INTERFACE( mmu_intf )
@@ -910,36 +798,46 @@ static MOS8722_INTERFACE( mmu_intf )
 //  MOS8564_INTERFACE( vic_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::vic_lightpen_x_cb )
+INTERRUPT_GEN_MEMBER( c128_state::frame_interrupt )
 {
-	return ioport("LIGHTX")->read() & ~0x01;
+	static const char *const c128ports[] = { "KP0", "KP1", "KP2" };
+
+	check_interrupts();
+
+	/* common keys input ports */
+	cbm_common_interrupt(&device);
+
+	/* Fix Me! Currently, neither left Shift nor Shift Lock work in c128, but reading the correspondent input produces a bug!
+    Hence, we overwrite the actual reading as it never happens */
+	if ((ioport("SPECIAL")->read() & 0x40))	//
+		c64_keyline[1] |= 0x80;
+
+	/* c128 specific: keypad input ports */
+	for (int i = 0; i < 3; i++)
+	{
+		UINT8 value = 0xff;
+		value &= ~ioport(c128ports[i])->read();
+		m_keyline[i] = value;
+	}
 }
 
-READ8_MEMBER( c128_state::vic_lightpen_y_cb )
+WRITE_LINE_MEMBER( c128_state::vic_irq_w )
 {
-	return ioport("LIGHTY")->read() & ~0x01;
-}
+	m_vic_irq = state;
 
-READ8_MEMBER( c128_state::vic_lightpen_button_cb )
-{
-	return ioport("OTHER")->read() & 0x04;
-}
-
-READ8_MEMBER( c128_state::vic_rdy_cb )
-{
-	return ioport("CTRLSEL")->read() & 0x08;
+	check_interrupts();
 }
 
 static MOS8564_INTERFACE( vic_intf )
 {
 	SCREEN_VIC_TAG,
 	Z80A_TAG,
-	DEVCB_DRIVER_LINE_MEMBER(c128_state, vic_interrupt),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, vic_irq_w),
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(c128_state, vic_lightpen_x_cb),
-	DEVCB_DRIVER_MEMBER(c128_state, vic_lightpen_y_cb),
-	DEVCB_DRIVER_MEMBER(c128_state, vic_lightpen_button_cb),
-	DEVCB_DRIVER_MEMBER(c128_state, vic_rdy_cb)
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -1004,15 +902,265 @@ static MOS6581_INTERFACE( sid_intf )
 
 
 //-------------------------------------------------
+//  MOS6526_INTERFACE( cia1_intf )
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( c128_state::cia1_irq_w )
+{
+	m_cia1_irq = state;
+
+	check_interrupts();
+}
+
+READ8_MEMBER( c128_state::cia1_pa_r )
+{
+	/*
+
+        bit     description
+
+        PA0     COL0, JOY B0
+        PA1     COL1, JOY B1
+        PA2     COL2, JOY B2
+        PA3     COL3, JOY B3
+        PA4     COL4, BTNB
+        PA5     COL5
+        PA6     COL6
+        PA7     COL7
+
+    */
+
+	UINT8 cia0portb = m_cia1->pb_r();
+
+	return cbm_common_cia0_port_a_r(m_cia1, cia0portb);
+}
+
+READ8_MEMBER( c128_state::cia1_pb_r )
+{
+	/*
+
+        bit     description
+
+        PB0     JOY A0
+        PB1     JOY A1
+        PB2     JOY A2
+        PB3     JOY A3
+        PB4     BTNA/_LP
+        PB5
+        PB6
+        PB7
+
+    */
+
+	UINT8 data = 0xff;
+	UINT8 cia0porta = m_cia1->pa_r();
+	//vic2e_device_interface *intf = dynamic_cast<vic2e_device_interface*>(&m_vic);
+
+	data &= cbm_common_cia0_port_b_r(m_cia1, cia0porta);
+/*
+    if (!intf->k0_r()) data &= m_keyline[0];
+    if (!intf->k1_r()) data &= m_keyline[1];
+    if (!intf->k2_r()) data &= m_keyline[2];
+*/
+	return data;
+}
+
+WRITE8_MEMBER( c128_state::cia1_pb_w )
+{
+	/*
+
+        bit     description
+
+        PB0     ROW0
+        PB1     ROW1
+        PB2     ROW2
+        PB3     ROW3
+        PB4     ROW4
+        PB5     ROW5
+        PB6     ROW6
+        PB7     ROW7
+
+    */
+
+   	m_vic->lp_w(BIT(data, 4));
+}
+
+WRITE_LINE_MEMBER( c128_state::cia1_cnt_w )
+{
+	m_cnt1 = state;
+
+	update_iec();
+}
+
+WRITE_LINE_MEMBER( c128_state::cia1_sp_w )
+{
+	m_sp1 = state;
+
+	update_iec();
+}
+
+static MOS6526_INTERFACE( cia1_intf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia1_irq_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia1_cnt_w),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia1_sp_w),
+	DEVCB_DRIVER_MEMBER(c128_state, cia1_pa_r),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(c128_state, cia1_pb_r),
+	DEVCB_DRIVER_MEMBER(c128_state, cia1_pb_w)
+};
+
+
+//-------------------------------------------------
+//  MOS6526_INTERFACE( cia2_intf )
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( c128_state::cia2_irq_w )
+{
+	m_cia2_irq = state;
+
+	check_interrupts();
+}
+
+READ8_MEMBER( c128_state::cia2_pa_r )
+{
+	/*
+
+        bit     description
+
+        PA0
+        PA1
+        PA2     USER PORT
+        PA3
+        PA4
+        PA5
+        PA6     CLK
+        PA7     DATA
+
+    */
+
+	UINT8 data = 0;
+
+	// user port
+	data |= m_user->pa2_r() << 2;
+
+	// IEC bus
+	data |= m_iec->clk_r() << 6;
+	data |= m_iec->data_r() << 7;
+
+	return data;
+}
+
+WRITE8_MEMBER( c128_state::cia2_pa_w )
+{
+	/*
+
+        bit     description
+
+        PA0     _VA14
+        PA1     _VA15
+        PA2     USER PORT
+        PA3     ATN OUT
+        PA4     CLK OUT
+        PA5     DATA OUT
+        PA6
+        PA7
+
+    */
+
+	// VIC banking
+	m_va14 = BIT(data, 0);
+	m_va15 = BIT(data, 1);
+
+	// user port
+	m_user->pa2_w(BIT(data, 2));
+
+	// IEC bus
+	m_iec->atn_w(!BIT(data, 3));
+	m_iec->clk_w(!BIT(data, 4));
+	m_iec_data_out = BIT(data, 5);
+	
+	update_iec();
+}
+
+static MOS6526_INTERFACE( cia2_intf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia2_irq_w),
+	DEVCB_DEVICE_LINE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, pc2_w),
+	DEVCB_DEVICE_LINE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, sp2_w),
+	DEVCB_DEVICE_LINE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, cnt2_w),
+	DEVCB_DRIVER_MEMBER(c128_state, cia2_pa_r),
+	DEVCB_DRIVER_MEMBER(c128_state, cia2_pa_w),
+	DEVCB_DEVICE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, pb_r),
+	DEVCB_DEVICE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, pb_w)
+};
+
+
+//-------------------------------------------------
 //  M6510_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
+READ8_MEMBER( c128_state::cpu_r)
+{
+	/*
+
+        bit     description
+
+        P0      1
+        P1      1
+        P2      1
+        P3      
+        P4		CASS SENSE
+        P5      
+        P6		CAPS LOCK
+
+    */
+
+	UINT8 data = 0x07;
+
+	// cassette sense
+	data |= m_cassette->sense_r() << 4;
+
+	// CAPS LOCK
+	data |= !BIT(ioport("SPECIAL")->read(), 5) << 6;
+
+	return data;
+}
+
+WRITE8_MEMBER( c128_state::cpu_w )
+{
+	/*
+
+        bit     description
+
+        P0      LORAM
+        P1      HIRAM
+        P2      CHAREN
+        P3      CASS WRT
+        P4
+        P5      CASS MOTOR
+        P6
+
+    */
+
+    // memory banking
+	m_loram = BIT(data, 0);
+	m_hiram = BIT(data, 1);
+	m_charen = BIT(data, 2);
+
+	// cassette write
+	m_cassette->write(BIT(data, 3));
+
+	// cassette motor
+	m_cassette->motor_w(BIT(data, 5));
+}
+
 static M6510_INTERFACE( cpu_intf )
 {
-	DEVCB_NULL,					/* read_indexed_func */
-	DEVCB_NULL,					/* write_indexed_func */
-	DEVCB_DRIVER_MEMBER(c128_state, cpu_r),	/* port_read_func */
-	DEVCB_DRIVER_MEMBER(c128_state, cpu_w),	/* port_write_func */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(c128_state, cpu_r),
+	DEVCB_DRIVER_MEMBER(c128_state, cpu_w),
 	0x07,
 	0x20
 };
@@ -1021,6 +1169,45 @@ static M6510_INTERFACE( cpu_intf )
 //-------------------------------------------------
 //  CBM_IEC_INTERFACE( cbm_iec_intf )
 //-------------------------------------------------
+
+inline void c128_state::update_iec()
+{
+	int fsdir = m_mmu->fsdir_r();
+
+	// fast serial data in
+	int data_in = m_iec->data_r();
+
+	m_cia1->sp_w(fsdir || data_in);
+
+	// fast serial data out
+	int data_out = !m_iec_data_out;
+
+	if (fsdir) data_out &= m_sp1;
+
+	m_iec->data_w(data_out);
+
+	// fast serial clock in
+	int srq_in = m_iec->srq_r();
+
+	m_cia1->cnt_w(fsdir || srq_in);
+
+	// fast serial clock out
+	int srq_out = 1;
+
+	if (fsdir) srq_out &= m_cnt1;
+
+	m_iec->srq_w(srq_out);
+}
+
+WRITE_LINE_MEMBER( c128_state::iec_srq_w )
+{
+	update_iec();
+}
+
+WRITE_LINE_MEMBER( c128_state::iec_data_w )
+{
+	update_iec();
+}
 
 static CBM_IEC_INTERFACE( cbm_iec_intf )
 {
@@ -1036,9 +1223,16 @@ static CBM_IEC_INTERFACE( cbm_iec_intf )
 //  PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( c128_state::tape_read_w )
+{
+	m_cass_rd = state;
+
+	check_interrupts();
+}
+
 static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 {
-	DEVCB_DEVICE_LINE_MEMBER(MOS6526_1_TAG, mos6526_device, flag_w)
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, tape_read_w),
 };
 
 
@@ -1046,14 +1240,51 @@ static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 //  C64_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
+READ8_MEMBER( c128_state::exp_dma_r )
+{
+	return m_subcpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+WRITE8_MEMBER( c128_state::exp_dma_w )
+{
+	m_subcpu->space(AS_PROGRAM).write_byte(offset, data);
+}
+
+WRITE_LINE_MEMBER( c128_state::exp_irq_w )
+{
+	m_exp_irq = state;
+
+	check_interrupts();
+}
+
+WRITE_LINE_MEMBER( c128_state::exp_nmi_w )
+{
+	m_exp_nmi = state;
+
+	check_interrupts();
+}
+
+WRITE_LINE_MEMBER( c128_state::exp_dma_w )
+{
+	// TODO
+}
+
+WRITE_LINE_MEMBER( c128_state::exp_reset_w )
+{
+	if (state == ASSERT_LINE)
+	{
+		machine_reset();
+	}
+}
+
 static C64_EXPANSION_INTERFACE( expansion_intf )
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DRIVER_MEMBER(c128_state, exp_dma_r),
+	DEVCB_DRIVER_MEMBER(c128_state, exp_dma_w),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, exp_irq_w),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, exp_nmi_w),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, exp_dma_w),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, exp_reset_w)
 };
 
 
@@ -1063,13 +1294,61 @@ static C64_EXPANSION_INTERFACE( expansion_intf )
 
 static C64_USER_PORT_INTERFACE( user_intf )
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DEVICE_LINE_MEMBER(MOS6526_1_TAG, mos6526_device, sp_w),
+	DEVCB_DEVICE_LINE_MEMBER(MOS6526_1_TAG, mos6526_device, cnt_w),
+	DEVCB_DEVICE_LINE_MEMBER(MOS6526_2_TAG, mos6526_device, sp_w),
+	DEVCB_DEVICE_LINE_MEMBER(MOS6526_2_TAG, mos6526_device, cnt_w),
+	DEVCB_DEVICE_LINE_MEMBER(MOS6526_2_TAG, mos6526_device, flag_w),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, exp_reset_w)
 };
+
+
+//**************************************************************************
+//  MACHINE INITIALIZATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  MACHINE_START( c64 )
+//-------------------------------------------------
+
+void c128_state::machine_start()
+{
+	cbm_common_init();
+	m_keyline[0] = m_keyline[1] = m_keyline[2] = 0xff;
+
+	// find memory regions
+	m_rom1 = memregion(M8502_TAG)->base();
+	m_rom2 = m_rom1 + 0x4000;
+	m_rom3 = m_rom1 + 0x8000;
+	m_rom4 = m_rom1 + 0xc000;
+	m_from = memregion("from")->base();
+	m_charom = memregion("charom")->base();
+
+	// allocate memory
+	m_color_ram.allocate(0x800);
+}
+
+
+//-------------------------------------------------
+//  MACHINE_RESET( c64 )
+//-------------------------------------------------
+
+void c128_state::machine_reset()
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+
+	m_maincpu->reset();
+	m_reset = 1;
+
+	m_mmu->reset();
+	m_cia1->reset();
+	m_cia2->reset();
+	m_iec->reset();
+	m_exp->reset();
+	m_user->reset();
+}
+
 
 
 //**************************************************************************
@@ -1085,13 +1364,13 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	MCFG_CPU_ADD(Z80A_TAG, Z80, VIC6567_CLOCK)
 	MCFG_CPU_PROGRAM_MAP( z80_mem)
 	MCFG_CPU_IO_MAP( z80_io)
-	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_VIC_TAG, c128_state,  c128_frame_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_VIC_TAG, c128_state, frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(Z80A_TAG)
 
 	MCFG_CPU_ADD(M8502_TAG, M8502, VIC6567_CLOCK)
 	MCFG_CPU_PROGRAM_MAP( m8502_mem)
 	MCFG_CPU_CONFIG( cpu_intf )
-	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_VIC_TAG, c128_state,  c128_frame_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_VIC_TAG, c128_state, frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(M8502_TAG)
 
 	// video hardware
@@ -1109,8 +1388,8 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	// devices
 	MCFG_MOS8722_ADD(MOS8722_TAG, mmu_intf)
 	MCFG_MOS8721_ADD(MOS8721_TAG)
-	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6567_CLOCK, 60, c128_cia1_intf)
-	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6567_CLOCK, 60, c128_cia2_intf)
+	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6567_CLOCK, 60, cia1_intf)
+	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6567_CLOCK, 60, cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
@@ -1132,6 +1411,11 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	MCFG_SOFTWARE_LIST_ADD("from_list", "c128_rom")
 	MCFG_SOFTWARE_LIST_FILTER("from_list", "NTSC")
 
+	// function ROM
+	MCFG_CARTSLOT_ADD("from")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_INTERFACE("c128_rom")
+
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -1150,6 +1434,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 //  MACHINE_CONFIG( c128d )
 //-------------------------------------------------
+
 static MACHINE_CONFIG_DERIVED( c128d, ntsc )
 	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1571")
 MACHINE_CONFIG_END
@@ -1192,13 +1477,13 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	MCFG_CPU_ADD(Z80A_TAG, Z80, VIC6569_CLOCK)
 	MCFG_CPU_PROGRAM_MAP( z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)
-	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_VIC_TAG, c128_state,  c128_frame_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_VIC_TAG, c128_state, frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(Z80A_TAG)
 
 	MCFG_CPU_ADD(M8502_TAG, M8502, VIC6569_CLOCK)
 	MCFG_CPU_PROGRAM_MAP( m8502_mem)
 	MCFG_CPU_CONFIG( cpu_intf )
-	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_VIC_TAG, c128_state,  c128_frame_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_VIC_TAG, c128_state, frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(M8502_TAG)
 
 	// video hardware
@@ -1216,8 +1501,8 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	// devices
 	MCFG_MOS8722_ADD(MOS8722_TAG, mmu_intf)
 	MCFG_MOS8721_ADD(MOS8721_TAG)
-	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6569_CLOCK, 50, c128_cia1_intf)
-	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, c128_cia2_intf)
+	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6569_CLOCK, 50, cia1_intf)
+	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
@@ -1238,6 +1523,11 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	MCFG_SOFTWARE_LIST_FILTER("disk_list_c128", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("from_list", "c128_rom")
 	MCFG_SOFTWARE_LIST_FILTER("from_list", "PAL")
+
+	// function ROM
+	MCFG_CARTSLOT_ADD("from")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_INTERFACE("c128_rom")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1287,52 +1577,31 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( c128 )
-	ROM_REGION( 0x132800, Z80A_TAG, 0 )
-	ROM_DEFAULT_BIOS("r1")
-	ROM_SYSTEM_BIOS( 0, "r0", "rev. 0" )
-	ROMX_LOAD( "318018-02.bin", 0x100000, 0x4000, CRC(2ee6e2fa) SHA1(60e1491e1d5782e3cf109f518eb73427609badc6), ROM_BIOS(1) )			// BASIC lo
-	ROMX_LOAD( "318019-02.bin", 0x104000, 0x4000, CRC(d551fce0) SHA1(4d223883e866645328f86a904b221464682edc4f), ROM_BIOS(1) )			// BASIC hi
-	ROMX_LOAD( "318020-03.bin", 0x10c000, 0x4000, CRC(1e94bb02) SHA1(e80ffbafae068cc0e42698ec5c5c39af46ac612a), ROM_BIOS(1) )			// Kernal
-	ROM_SYSTEM_BIOS( 1, "r1", "rev. 1" )
-	ROMX_LOAD( "318018-04.bin", 0x100000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441), ROM_BIOS(2) )			// BASIC lo
-	ROMX_LOAD( "318019-04.bin", 0x104000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(2) )			// BASIC hi
-	ROMX_LOAD( "318020-05.bin", 0x10c000, 0x4000, CRC(ba456b8e) SHA1(ceb6e1a1bf7e08eb9cbc651afa29e26adccf38ab), ROM_BIOS(2) )			// Kernal
+	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_DEFAULT_BIOS("r4")
+	ROM_LOAD( "251913-01.u32", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )
+	ROM_SYSTEM_BIOS( 0, "r2", "Revision 2" )
+	ROMX_LOAD( "318018-02.u33", 0x4000, 0x4000, CRC(2ee6e2fa) SHA1(60e1491e1d5782e3cf109f518eb73427609badc6), ROM_BIOS(1) )
+	ROMX_LOAD( "318019-02.u34", 0x8000, 0x4000, CRC(d551fce0) SHA1(4d223883e866645328f86a904b221464682edc4f), ROM_BIOS(1) )
+	ROMX_LOAD( "318020-03.u35", 0xc000, 0x4000, CRC(1e94bb02) SHA1(e80ffbafae068cc0e42698ec5c5c39af46ac612a), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
+	ROMX_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441), ROM_BIOS(2) )
+	ROMX_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(2) )
+	ROMX_LOAD( "318020-05.u35", 0xc000, 0x4000, CRC(ba456b8e) SHA1(ceb6e1a1bf7e08eb9cbc651afa29e26adccf38ab), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "318018-04.bin", 0x100000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441), ROM_BIOS(3) )			// BASIC lo
-	ROMX_LOAD( "318019-04.bin", 0x104000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(3) )			// BASIC hi
-	ROMX_LOAD( "jiffydos c128.bin", 0x10c000, 0x4000, CRC(4b7964de) SHA1(7d1898f32beae4b2ae610d469ce578a588efaa7c), ROM_BIOS(3) )			// Kernal
+	ROMX_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441), ROM_BIOS(3) )
+	ROMX_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(3) )
+	ROMX_LOAD( "jiffydos c128.u35", 0xc000, 0x4000, CRC(4b7964de) SHA1(7d1898f32beae4b2ae610d469ce578a588efaa7c), ROM_BIOS(3) )
 
-	ROM_LOAD( "251913-01.bin", 0x108000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )		// C64 OS ROM
-	ROM_LOAD( "390059-01.bin", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )		// Character
+	ROM_REGION( 0x8000, "from", 0 )
+	ROM_CART_LOAD( "from", 0x0000, 0x8000, ROM_NOMIRROR )
 
-	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "390059-01.u18", 0x0000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )
 
-	ROM_REGION( 0x100, MOS8721_TAG, 0 )
-	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
-ROM_END
-
-
-//-------------------------------------------------
-//  ROM( c128cr )
-//-------------------------------------------------
-
-ROM_START( c128cr )
-	/* C128CR prototype, owned by Bo Zimmers
-       PCB markings: "COMMODORE 128CR REV.3 // PCB NO.252270" and "PCB ASSY NO.250783"
-           Sticker on rom cart shield: "C128CR  No.2 // ENG. SAMPLE // Jun/9/'86   KNT"
-       3 ROMs (combined basic, combined c64/kernal, plain character rom)
-       6526A-1 CIAs
-       ?prototype? 2568R1X VDC w/ 1186 datecode
-    */
-	ROM_REGION( 0x132800, Z80A_TAG, 0 )
-	ROM_LOAD( "252343-03.u34", 0x100000, 0x8000, CRC(bc07ed87) SHA1(0eec437994a3f2212343a712847213a8a39f4a7b) )			// BASIC lo + hi, "252343-03 // U34"
-	ROM_LOAD( "252343-04.u32", 0x108000, 0x8000, CRC(cc6bdb69) SHA1(36286b2e8bea79f7767639fd85e12c5447c7041b) )			// C64 OS ROM + Kernal, "252343-04 // US // U32"
-	ROM_LOAD( "390059-01.u18", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )			// Character, "MOS // (C)1985 CBM // 390059-01 // M468613 8547H"
-
-	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x100, MOS8721_TAG, 0 )
-	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
+	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
+	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
+	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, BAD_DUMP CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
 ROM_END
 
 
@@ -1341,23 +1610,27 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( c128ger )
-	ROM_REGION( 0x132800, Z80A_TAG, 0 )
-	ROM_SYSTEM_BIOS( 0, "default", "rev. 1" )
-	ROMX_LOAD( "318018-04.bin", 0x100000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441), ROM_BIOS(1) )			// BASIC lo
-	ROMX_LOAD( "318019-04.bin", 0x104000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(1) )			// BASIC hi
-	ROMX_LOAD( "315078-02.bin", 0x10c000, 0x4000, CRC(b275bb2e) SHA1(78ac5dcdd840b092ba1ee6d19b33af079613291f), ROM_BIOS(1) )			// Kernal
-	ROM_SYSTEM_BIOS( 1, "rev0", "rev. 0" )
-	ROMX_LOAD( "318018-02.bin", 0x100000, 0x4000, CRC(2ee6e2fa) SHA1(60e1491e1d5782e3cf109f518eb73427609badc6), ROM_BIOS(2) )			// BASIC lo
-	ROMX_LOAD( "318019-02.bin", 0x104000, 0x4000, CRC(d551fce0) SHA1(4d223883e866645328f86a904b221464682edc4f), ROM_BIOS(2) )			// BASIC hi
-	ROMX_LOAD( "315078-01.bin", 0x10c000, 0x4000, CRC(a51e2168) SHA1(bcf82a89a8fc5d086bec2ff3bcbdecc8af2be3af), ROM_BIOS(2) )			// Kernal
+	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_DEFAULT_BIOS("r4")
+	ROM_LOAD( "251913-01.u32", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )
+	ROM_SYSTEM_BIOS( 0, "r2", "Revision 2" )
+	ROMX_LOAD( "318018-02.u33", 0x4000, 0x4000, CRC(2ee6e2fa) SHA1(60e1491e1d5782e3cf109f518eb73427609badc6), ROM_BIOS(1) )
+	ROMX_LOAD( "318019-02.u34", 0x8000, 0x4000, CRC(d551fce0) SHA1(4d223883e866645328f86a904b221464682edc4f), ROM_BIOS(1) )
+	ROMX_LOAD( "315078-01.u35", 0xc000, 0x4000, CRC(a51e2168) SHA1(bcf82a89a8fc5d086bec2ff3bcbdecc8af2be3af), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
+	ROMX_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441), ROM_BIOS(2) )
+	ROMX_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(2) )
+	ROMX_LOAD( "315078-02.u35", 0xc000, 0x4000, CRC(b275bb2e) SHA1(78ac5dcdd840b092ba1ee6d19b33af079613291f), ROM_BIOS(2) )
 
-	ROM_LOAD( "251913-01.bin", 0x108000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )		// C64 OS ROM
-	ROM_LOAD( "390059-01.bin", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )		// Character
+	ROM_REGION( 0x8000, "from", 0 )
+	ROM_CART_LOAD( "from", 0x0000, 0x8000, ROM_NOMIRROR )
 
-	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "390059-01.u18", 0x00000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )
 
-	ROM_REGION( 0x100, MOS8721_TAG, 0 )
-	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
+	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
+	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
+	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, BAD_DUMP CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
 ROM_END
 
 
@@ -1366,62 +1639,21 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( c128sfi )
-	ROM_REGION( 0x132800, Z80A_TAG, 0 )
-	ROM_LOAD( "318018-02.u33", 0x100000, 0x4000, CRC(2ee6e2fa) SHA1(60e1491e1d5782e3cf109f518eb73427609badc6) )
-	ROM_LOAD( "318019-02.u34", 0x104000, 0x4000, CRC(d551fce0) SHA1(4d223883e866645328f86a904b221464682edc4f) )
-	ROM_LOAD( "325182-01.u32", 0x108000, 0x4000, CRC(2aff27d3) SHA1(267654823c4fdf2167050f41faa118218d2569ce) ) // C128 64 Sw/Fi
-	ROM_LOAD( "325189-01.u35", 0x10c000, 0x4000, CRC(9526fac4) SHA1(a01dd871241c801db51e8ebc30fedfafd8cc506b) ) // C128 Ker Sw/Fi
+	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_LOAD( "325182-01.u32", 0x0000, 0x4000, CRC(2aff27d3) SHA1(267654823c4fdf2167050f41faa118218d2569ce) ) // "C128 64 Sw/Fi"
+	ROM_LOAD( "318018-02.u33", 0x4000, 0x4000, CRC(2ee6e2fa) SHA1(60e1491e1d5782e3cf109f518eb73427609badc6) )
+	ROM_LOAD( "318019-02.u34", 0x8000, 0x4000, CRC(d551fce0) SHA1(4d223883e866645328f86a904b221464682edc4f) )
+	ROM_LOAD( "325189-01.u35", 0xc000, 0x4000, CRC(9526fac4) SHA1(a01dd871241c801db51e8ebc30fedfafd8cc506b) ) // "C128 Ker Sw/Fi"
 
-	/* This was not included in the submission, unfortunately */
-	ROM_LOAD( "325181-02.u18", 0x120000, 0x2000, BAD_DUMP CRC(7a70d9b8) SHA1(aca3f7321ee7e6152f1f0afad646ae41964de4fb) ) // C128 Char Sw/Fi
+	ROM_REGION( 0x8000, "from", 0 )
+	ROM_CART_LOAD( "from", 0x0000, 0x8000, ROM_NOMIRROR )
 
-	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "325181-01.bin", 0x0000, 0x2000, CRC(7a70d9b8) SHA1(aca3f7321ee7e6152f1f0afad646ae41964de4fb) ) // "C128 Char Sw/Fi"
 
-	ROM_REGION( 0x100, MOS8721_TAG, 0 )
-	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
-ROM_END
-
-
-//-------------------------------------------------
-//  ROM( c128fra )
-//-------------------------------------------------
-
-ROM_START( c128fra )
-	ROM_REGION( 0x132800, Z80A_TAG, 0 )
-	ROM_LOAD( "318018-04.bin", 0x100000, 0x4000, BAD_DUMP CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441) )			// BASIC lo
-	ROM_LOAD( "318019-04.bin", 0x104000, 0x4000, BAD_DUMP CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0) )			// BASIC hi
-	ROM_LOAD( "251913-01.bin", 0x108000, 0x4000, BAD_DUMP CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )			// C64 OS ROM
-	ROM_LOAD( "editor.french.bin", 0x10c000, 0x1000, BAD_DUMP CRC(3e086a24) SHA1(0a2f67455166f8dac101f8f8564a1c0364cb456a) )
-	ROM_LOAD( "z80bios.bin", 0x10d000, 0x1000, BAD_DUMP CRC(c38d83c6) SHA1(38662a024f1de2f4417a5f9df4898a9985503e06) )
-	ROM_LOAD( "kernalpart.french.bin", 0x10e000, 0x2000, BAD_DUMP CRC(ca5e1179) SHA1(d234a031caf59a0f66871f2babe1644783e66cf7) )
-	ROM_LOAD( "325167-01.bin", 0x120000, 0x2000, BAD_DUMP CRC(bad36b88) SHA1(9119b27a1bf885fa4c76fff5d858c74c194dd2b8) )
-
-	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x100, MOS8721_TAG, 0 )
-	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
-ROM_END
-
-
-//-------------------------------------------------
-//  ROM( c128nor )
-//-------------------------------------------------
-
-ROM_START( c128nor )
-	ROM_REGION( 0x132800, Z80A_TAG, 0 )
-	ROM_LOAD( "318018-04.bin", 0x100000, 0x4000, BAD_DUMP CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441) )			// BASIC lo
-	ROM_LOAD( "318019-04.bin", 0x104000, 0x4000, BAD_DUMP CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0) )			// BASIC hi
-	ROM_LOAD( "251913-01.bin", 0x108000, 0x4000, BAD_DUMP CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )			// C64 OS ROM
-	ROM_LOAD( "editor.norwegian.bin", 0x10c000, 0x1000, BAD_DUMP CRC(84c55911) SHA1(22f6c5f40d4e895ea51e8432b30c219eacb75778) )
-	ROM_LOAD( "z80bios.bin", 0x10d000, 0x1000, BAD_DUMP CRC(c38d83c6) SHA1(38662a024f1de2f4417a5f9df4898a9985503e06) )
-	ROM_LOAD( "kernalpart.norwegian.bin", 0x10e000, 0x2000, BAD_DUMP CRC(3ba48012) SHA1(21a90256a3572a890f8027a085d851bf818b0dda) )
-	/* standard vic20 based norwegian */
-	ROM_LOAD( "char.nor", 0x120000, 0x2000, BAD_DUMP CRC(ba95c625) SHA1(5a87faa457979e7b6f434251a9e32f4483b337b3) )
-
-	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x100, MOS8721_TAG, 0 )
-	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
+	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
+	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
+	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, BAD_DUMP CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
 ROM_END
 
 
@@ -1429,44 +1661,64 @@ ROM_END
 //  ROM( c128d )
 //-------------------------------------------------
 
-/* C128D Board is basically the same as C128 + a second board for the disk drive */
-ROM_START( c128d )
-	ROM_REGION( 0x132800, Z80A_TAG, 0 )
-	ROM_LOAD( "318018-04.bin", 0x100000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441) )			// BASIC lo
-	ROM_LOAD( "318019-04.bin", 0x104000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0) )			// BASIC hi
-	ROM_LOAD( "251913-01.bin", 0x108000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )			// C64 OS ROM
-	ROM_LOAD( "318020-05.bin", 0x10c000, 0x4000, CRC(ba456b8e) SHA1(ceb6e1a1bf7e08eb9cbc651afa29e26adccf38ab) )			// Kernal
-	ROM_LOAD( "390059-01.bin", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )
-
-	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x100, MOS8721_TAG, 0 )
-	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
-ROM_END
+#define rom_c128d               rom_c128
 
 
 //-------------------------------------------------
 //  ROM( c128dpr )
 //-------------------------------------------------
 
-#define rom_c128dpr		rom_c128d
+#define rom_c128dpr             rom_c128d
+
+
+//-------------------------------------------------
+//  ROM( c128cr )
+//-------------------------------------------------
+
+ROM_START( c128cr )
+	/* C128CR prototype, owned by Bo Zimmers
+	PCB markings: "COMMODORE 128CR REV.3 // PCB NO.252270" and "PCB	ASSY NO.250783"
+	Sticker on rom cart shield: "C128CR  No.2 // ENG. SAMPLE //	Jun/9/'86   KNT"
+	3 ROMs (combined basic, combined c64/kernal, plain character rom)
+	6526A-1 CIAs
+	?prototype? 2568R1X VDC w/ 1186 datecode
+	*/
+	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_LOAD( "252343-03.u34", 0x4000, 0x8000, CRC(bc07ed87) SHA1(0eec437994a3f2212343a712847213a8a39f4a7b) ) // "252343-03 // U34"
+	ROM_LOAD( "252343-04.u32", 0x0000, 0x4000, CRC(cc6bdb69) SHA1(36286b2e8bea79f7767639fd85e12c5447c7041b) ) // "252343-04 // US // U32"
+	ROM_CONTINUE(              0xc000, 0x4000 )
+
+	ROM_REGION( 0x8000, "from", 0 )
+	ROM_CART_LOAD( "from", 0x0000, 0x8000, ROM_NOMIRROR )
+
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "390059-01.u18", 0x0000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) ) // "MOS // (C)1985 CBM // 390059-01 // M468613 8547H"
+
+	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
+	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
+	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, BAD_DUMP CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
+ROM_END
 
 
 //-------------------------------------------------
 //  ROM( c128dcr )
 //-------------------------------------------------
 
-/* This BIOS is exactly the same as C128 rev. 1, but on two ROMs only */
 ROM_START( c128dcr )
-	ROM_REGION( 0x132800, Z80A_TAG, 0 )
-	ROM_LOAD( "318022-02.bin", 0x100000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )			// BASIC lo + hi
-	ROM_LOAD( "318023-02.bin", 0x108000, 0x8000, CRC(eedc120a) SHA1(f98c5a986b532c78bb68df9ec6dbcf876913b99f) )			// C64 OS ROM + Kernal
-	ROM_LOAD( "390059-01.bin", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )			// Character
+	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_LOAD( "318022-02.u34", 0x4000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )
+	ROM_LOAD( "318023-02.u32", 0x0000, 0x4000, CRC(eedc120a) SHA1(f98c5a986b532c78bb68df9ec6dbcf876913b99f) )
+	ROM_CONTINUE(              0xc000, 0x4000 )
 
-	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "from", 0 )
+	ROM_CART_LOAD( "from", 0x0000, 0x8000, ROM_NOMIRROR )
 
-	ROM_REGION( 0x100, MOS8721_TAG, 0 )
-	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "390059-01.u18", 0x0000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )
+
+	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
+	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
+	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, BAD_DUMP CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
 ROM_END
 
 
@@ -1475,15 +1727,20 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( c128drde )
-	ROM_REGION( 0x132800, Z80A_TAG, 0 )
-	ROM_LOAD( "318022-02.bin", 0x100000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )			// BASIC lo + hi
-	ROM_LOAD( "318077-01.bin", 0x108000, 0x8000, CRC(eb6e2c8f) SHA1(6b3d891fedabb5335f388a5d2a71378472ea60f4) )			// C64 OS ROM + Kernal Ger
-	ROM_LOAD( "315079-01.bin", 0x120000, 0x2000, CRC(fe5a2db1) SHA1(638f8aff51c2ac4f99a55b12c4f8c985ef4bebd3) )
+	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_LOAD( "318022-02.u34", 0x4000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )
+	ROM_LOAD( "318077-01.u32", 0x0000, 0x4000, CRC(eb6e2c8f) SHA1(6b3d891fedabb5335f388a5d2a71378472ea60f4) )
+	ROM_CONTINUE(              0xc000, 0x4000 )
 
-	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "from", 0 )
+	ROM_CART_LOAD( "from", 0x0000, 0x8000, ROM_NOMIRROR )
 
-	ROM_REGION( 0x100, MOS8721_TAG, 0 )
-	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "315079-01.u18", 0x0000, 0x2000, CRC(fe5a2db1) SHA1(638f8aff51c2ac4f99a55b12c4f8c985ef4bebd3) )
+
+	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
+	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
+	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, BAD_DUMP CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
 ROM_END
 
 
@@ -1492,35 +1749,20 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( c128drsw )
-	ROM_REGION( 0x132800, Z80A_TAG, 0 )
-	ROM_LOAD( "318022-02.bin", 0x100000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )			// BASIC lo + hi
-	ROM_LOAD( "318034-01.bin", 0x108000, 0x8000, CRC(cb4e1719) SHA1(9b0a0cef56d00035c611e07170f051ee5e63aa3a) )			// C64 OS ROM + Kernal Sw/Fi
-	ROM_LOAD( "325181-01.bin", 0x120000, 0x2000, CRC(7a70d9b8) SHA1(aca3f7321ee7e6152f1f0afad646ae41964de4fb) )
+	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_LOAD( "318022-02.u34", 0x4000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )
+	ROM_LOAD( "318034-01.u32", 0x0000, 0x4000, CRC(cb4e1719) SHA1(9b0a0cef56d00035c611e07170f051ee5e63aa3a) )
+	ROM_CONTINUE(              0xc000, 0x4000 )
 
-	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "from", 0 )
+	ROM_CART_LOAD( "from", 0x0000, 0x8000, ROM_NOMIRROR )
 
-	ROM_REGION( 0x100, MOS8721_TAG, 0 )
-	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
-ROM_END
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "325181-01.u18", 0x0000, 0x2000, CRC(7a70d9b8) SHA1(aca3f7321ee7e6152f1f0afad646ae41964de4fb) )
 
-
-//-------------------------------------------------
-//  ROM( c128drit )
-//-------------------------------------------------
-
-ROM_START( c128drit )
-	ROM_REGION( 0x132800, Z80A_TAG, 0 )
-	ROM_LOAD( "318022-01.bin", 0x100000, 0x8000, CRC(e857df90) SHA1(5c2d7bbda2c3f9a926bd76ad19dc0c8c733c41cd) )			// BASIC lo + hi - based on BASIC rev.0
-	ROM_LOAD( "251913-01.bin", 0x108000, 0x4000, BAD_DUMP CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )			// C64 OS ROM
-	ROM_LOAD( "editor.italian.bin", 0x10c000, 0x1000, BAD_DUMP CRC(8df58148) SHA1(39add4c0adda7a64f68a09ae8742599091228017) )
-	ROM_LOAD( "z80bios.bin", 0x10d000, 0x1000, BAD_DUMP CRC(c38d83c6) SHA1(38662a024f1de2f4417a5f9df4898a9985503e06) )
-	ROM_LOAD( "kernalpart.italian.bin", 0x10e000, 0x2000, BAD_DUMP CRC(7b0d2140) SHA1(f5d604d89daedb47a1abe4b0aa41ea762829e71e) )
-	ROM_LOAD( "325167-01.bin", 0x120000, 0x2000, BAD_DUMP CRC(bad36b88) SHA1(9119b27a1bf885fa4c76fff5d858c74c194dd2b8) )
-
-	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x100, MOS8721_TAG, 0 )
-	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
+	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
+	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
+	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, BAD_DUMP CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
 ROM_END
 
 
@@ -1528,19 +1770,7 @@ ROM_END
 //  ROM( c128d81 )
 //-------------------------------------------------
 
-ROM_START( c128d81 )
-	ROM_REGION( 0x132800, Z80A_TAG, 0 )
-	ROM_LOAD( "318018-04.bin", 0x100000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441) )			// BASIC lo
-	ROM_LOAD( "318019-04.bin", 0x104000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0) )			// BASIC hi
-	ROM_LOAD( "251913-01.bin", 0x108000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )			// C64 OS ROM
-	ROM_LOAD( "318020-05.bin", 0x10c000, 0x4000, CRC(ba456b8e) SHA1(ceb6e1a1bf7e08eb9cbc651afa29e26adccf38ab) )			// Kernal
-	ROM_LOAD( "390059-01.bin", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )
-
-	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x100, MOS8721_TAG, 0 )
-	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
-ROM_END
+#define rom_c128d81             rom_c128d
 
 
 
@@ -1549,24 +1779,17 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY                        FULLNAME                                     FLAGS
-COMP( 1985, c128,      0,     0,   c128,     c128, c128_state,    c128,     "Commodore Business Machines", "Commodore 128 (NTSC)", 0)
-COMP( 1985, c128cr,    c128,  0,   c128,     c128, c128_state,    c128,     "Commodore Business Machines", "Commodore 128CR (NTSC, prototype?)", 0)
+COMP( 1985, c128,      0,     0,   c128,     c128, driver_device,    0,     "Commodore Business Machines", "Commodore 128 (NTSC)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1985, c128sfi,   c128,  0,   c128pal,  c128swe, driver_device, 0,  "Commodore Business Machines", "Commodore 128 (Sweden/Finland)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+//COMP( 1985, c128fra,   c128,  0,   c128pal,  c128fra, driver_device, 0,  "Commodore Business Machines", "Commodore 128 (France)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1985, c128ger,   c128,  0,   c128pal,  c128ger, driver_device, 0,  "Commodore Business Machines", "Commodore 128 (Germany)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+//COMP( 1985, c128nor,   c128,  0,   c128pal,  c128ita, driver_device, 0,  "Commodore Business Machines", "Commodore 128 (Norway)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1985, c128dpr,   c128,  0,   c128d,    c128, driver_device,    0,   "Commodore Business Machines", "Commodore 128D (NTSC, prototype)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1985, c128d,     c128,  0,   c128dpal, c128, driver_device,    0,"Commodore Business Machines", "Commodore 128D (PAL)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
-COMP( 1985, c128sfi,   c128,  0,   c128pal,  c128swe, c128_state, c128pal,  "Commodore Business Machines", "Commodore 128 (Sweden/Finland)", 0)
-COMP( 1985, c128fra,   c128,  0,   c128pal,  c128fra, c128_state, c128pal,  "Commodore Business Machines", "Commodore 128 (France)", 0)
-COMP( 1985, c128ger,   c128,  0,   c128pal,  c128ger, c128_state, c128pal,  "Commodore Business Machines", "Commodore 128 (Germany)", 0)
-COMP( 1985, c128nor,   c128,  0,   c128pal,  c128ita, c128_state, c128pal,  "Commodore Business Machines", "Commodore 128 (Norway)", 0)
-// we miss other countries: Spain, Belgium, etc.
-
-// the following drivers use a 1571 floppy drive
-COMP( 1985, c128dpr,   c128,  0,   c128d,    c128, c128_state,    c128d,   "Commodore Business Machines", "Commodore 128D (NTSC, prototype)", GAME_NOT_WORKING )
-COMP( 1985, c128d,     c128,  0,   c128dpal, c128, c128_state,    c128dpal,"Commodore Business Machines", "Commodore 128D (PAL)", GAME_NOT_WORKING )
-
-// the following drivers use a 1571CR floppy drive
-COMP( 1986, c128dcr,   c128,  0,   c128dcr,  c128, c128_state,    c128dcr, "Commodore Business Machines", "Commodore 128DCR (NTSC)", GAME_NOT_WORKING)
-COMP( 1986, c128drde,  c128,  0,   c128dcrp, c128ger, c128_state, c128dcrp,"Commodore Business Machines", "Commodore 128DCR (Germany)", GAME_NOT_WORKING)
-COMP( 1986, c128drit,  c128,  0,   c128dcrp, c128ita, c128_state, c128dcrp,"Commodore Business Machines", "Commodore 128DCR (Italy)", GAME_NOT_WORKING)
-COMP( 1986, c128drsw,  c128,  0,   c128dcrp, c128swe, c128_state, c128dcrp,"Commodore Business Machines", "Commodore 128DCR (Sweden/Finland)", GAME_NOT_WORKING)
-
-// the following driver is a c128 with 1581 floppy drive. it allows us to document 1581 firmware dumps, but it does not do much more
-COMP( 1986, c128d81,   c128,  0,   c128d81,  c128, c128_state,    c128d81, "Commodore Business Machines", "Commodore 128D/81 (NTSC, prototype)", GAME_NOT_WORKING)
+COMP( 1985, c128cr,    c128,  0,   c128,     c128, driver_device,    0,     "Commodore Business Machines", "Commodore 128CR (NTSC, prototype?)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1986, c128dcr,   c128,  0,   c128dcr,  c128, driver_device,    0, "Commodore Business Machines", "Commodore 128DCR (NTSC)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1986, c128drde,  c128,  0,   c128dcrp, c128ger, driver_device, 0,"Commodore Business Machines", "Commodore 128DCR (Germany)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+//COMP( 1986, c128drit,  c128,  0,   c128dcrp, c128ita, driver_device, 0,"Commodore Business Machines", "Commodore 128DCR (Italy)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1986, c128drsw,  c128,  0,   c128dcrp, c128swe, driver_device, 0,"Commodore Business Machines", "Commodore 128DCR (Sweden/Finland)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1986, c128d81,   c128,  0,   c128d81,  c128, driver_device,    0, "Commodore Business Machines", "Commodore 128D/81 (NTSC, prototype)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
