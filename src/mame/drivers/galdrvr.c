@@ -6382,7 +6382,7 @@ GAME( 1979, galaxianmo, galaxian, galaxian, galaxian, galaxian_state, galaxian, 
 GAME( 1979, galaxiant,  galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "Namco (Taito license)", "Galaxian (Taito)", GAME_SUPPORTS_SAVE )
 
 /* straight Galaxian ripoffs on basic galaxian hardware */
-GAME( 1979, moonaln,  galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "Nichibutsu (Karateco license)", "Moon Alien", GAME_SUPPORTS_SAVE )
+GAME( 1979, moonaln,  galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "Namco / Nichibutsu (Karateco license?)", "Moon Alien", GAME_SUPPORTS_SAVE ) // or bootleg?
 GAME( 1979, superg,   galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "hack", "Super Galaxians (galaxiana hack)", GAME_SUPPORTS_SAVE )
 GAME( 1979, galturbo, galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "hack", "Galaxian Turbo (superg hack)", GAME_SUPPORTS_SAVE )
 GAME( 1979, galapx,   galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "hack", "Galaxian Part X (moonaln hack)", GAME_SUPPORTS_SAVE )
@@ -6392,7 +6392,7 @@ GAME( 1979, swarm,    galaxian, galaxian, swarm, galaxian_state,    galaxian, RO
 GAME( 1979, zerotime, galaxian, galaxian, zerotime, galaxian_state, galaxian, ROT90,  "bootleg? (Petaco S.A.)", "Zero Time", GAME_SUPPORTS_SAVE )
 GAME( 1979, starfght, galaxian, galaxian, swarm, galaxian_state,    galaxian, ROT90,  "bootleg (Jeutel)", "Star Fighter", GAME_SUPPORTS_SAVE )
 GAME( 1979, galaxbsf, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "bootleg", "Galaxian (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1980, supergx,  galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "Nichibutsu", "Super GX", GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1980, supergx,  galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "Namco / Nichibutsu", "Super GX", GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 19??, tst_galx, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "<unknown>", "Galaxian Test ROM", GAME_SUPPORTS_SAVE )
 
 /* other games on basic galaxian hardware */
@@ -6488,8 +6488,8 @@ GAME( 1980, spcdraga, mooncrst, mooncrst, smooncrs, galaxian_state, mooncrsu, RO
 GAME( 1980, stera,    mooncrst, mooncrst, smooncrs, galaxian_state, mooncrsu, ROT90,  "bootleg", "Steraranger (Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrgx, mooncrst, galaxian, mooncrgx, galaxian_state, mooncrgx, ROT270, "bootleg", "Moon Cresta (Galaxian hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1980, moonqsr,  0,        mooncrst, moonqsr, galaxian_state,  moonqsr,  ROT90,  "Nichibutsu", "Moon Quasar", GAME_SUPPORTS_SAVE )
-GAME( 1980, moonal2,  galaxian, mooncrst, moonal2, galaxian_state,  galaxian, ROT90,  "Nichibutsu", "Moon Alien Part 2", GAME_SUPPORTS_SAVE )
-GAME( 1980, moonal2b, galaxian, mooncrst, moonal2, galaxian_state,  galaxian, ROT90,  "Nichibutsu", "Moon Alien Part 2 (older version)", GAME_SUPPORTS_SAVE )
+GAME( 1980, moonal2,  galaxian, mooncrst, moonal2, galaxian_state,  galaxian, ROT90,  "Namco / Nichibutsu", "Moon Alien Part 2", GAME_SUPPORTS_SAVE )
+GAME( 1980, moonal2b, galaxian, mooncrst, moonal2, galaxian_state,  galaxian, ROT90,  "Namco / Nichibutsu", "Moon Alien Part 2 (older version)", GAME_SUPPORTS_SAVE )
 
 /* larger romspace, interrupt enable moved */
 GAME( 198?, thepitm,  thepit,   mooncrst, thepitm, galaxian_state,  thepitm,  ROT90,  "bootleg (KZH)", "The Pit (bootleg on Moon Quasar hardware)", GAME_SUPPORTS_SAVE ) // on an original MQ-2FJ pcb, even if the memory map appears closer to Moon Cresta
