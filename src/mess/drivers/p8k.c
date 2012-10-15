@@ -367,8 +367,11 @@ void p8k_state::fdc_drq(bool state)
 void p8k_state::machine_start()
 {
 	i8272a_device *fdc = machine().device<i8272a_device>("i8272");
-	fdc->setup_intrq_cb(i8272a_device::line_cb(FUNC(p8k_state::fdc_irq), this));
-	fdc->setup_drq_cb(i8272a_device::line_cb(FUNC(p8k_state::fdc_drq), this));
+	if (fdc)
+	{
+		fdc->setup_intrq_cb(i8272a_device::line_cb(FUNC(p8k_state::fdc_irq), this));
+		fdc->setup_drq_cb(i8272a_device::line_cb(FUNC(p8k_state::fdc_drq), this));
+	}
 }
 
 static const floppy_format_type p8k_floppy_formats[] = {

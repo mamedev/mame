@@ -159,7 +159,7 @@ static void compis_keyb_init(compis_state *state)
 /*-------------------------------------------------------------------------*/
 static void compis_fdc_reset(running_machine &machine)
 {
-	machine.device("upd765")->reset();
+	machine.device("i8272a")->reset();
 }
 
 void compis_state::compis_fdc_tc(int state)

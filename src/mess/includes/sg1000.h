@@ -101,12 +101,12 @@ public:
 		: sc3000_state(mconfig, type, tag),
 		  m_fdc(*this, UPD765_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
-		  m_floppy0(*this, FLOPPY_0)
+		  m_floppy0(*this, UPD765_TAG ":0:525hd")
 	{ }
 
 	required_device<upd765a_device> m_fdc;
 	required_device<centronics_device> m_centronics;
-	required_device<device_t> m_floppy0;
+	required_device<floppy_image_device> m_floppy0;
 
 	virtual void machine_start();
 	virtual void machine_reset();

@@ -139,7 +139,7 @@ public:
 	m_centronics(*this, "centronics"),
 	m_uart(*this, "uart"),
 	m_rtc(*this, "mm58274c"),
-	m_fdc(*this, "upd765"),
+	m_fdc(*this, "i8272a"),
 	m_crtc(*this, "upd7220"),
 	m_video_ram(*this, "video_ram") { }
 
@@ -152,7 +152,7 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<i8251_device> m_uart;
 	required_device<device_t> m_rtc;
-	required_device<upd765a_device> m_fdc;
+	required_device<i8272a_device> m_fdc;
 	required_device<upd7220_device> m_crtc;
 	DECLARE_READ16_MEMBER(compis_usart_r);
 	DECLARE_WRITE16_MEMBER(compis_usart_w);
