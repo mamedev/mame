@@ -3,13 +3,13 @@
 	<element name="overlay_green">
 		<rect>
 			<bounds left="0" top="0" right="4" bottom="3" />
-			<color red="0.25" green="1.0" blue="0.125" />
+			<color red="0.25" green="1.0" blue="0.2" />
 		</rect>
 	</element>
 	<element name="overlay_yellow">
 		<rect>
 			<bounds left="0" top="0" right="4" bottom="3" />
-			<color red="1.0" green="1.0" blue="0.125" />
+			<color red="1.0" green="1.0" blue="0.25" />
 		</rect>
 	</element>
 

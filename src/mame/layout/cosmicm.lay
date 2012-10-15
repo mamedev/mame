@@ -3,15 +3,15 @@
 	<element name="overlay">
 		<rect>
 			<bounds left="0" top="0" right="224" bottom="260" />
-			<color red="0.9" green="0.5" blue="0.9" />
+			<color red="1" green="0.55" blue="1" />
 		</rect>
 		<rect>
 			<bounds left="0" top="184" right="224" bottom="260" />
-			<color red="1" green="1" blue="0.125" />
+			<color red="1" green="1" blue="0.15" />
 		</rect>
 		<rect>
-			<bounds left="0" top="0" right="224" bottom="64" />
-			<color red="0.125" green="1" blue="0.125" />
+			<bounds left="0" top="0" right="224" bottom="63" />
+			<color red="0.15" green="1" blue="0.15" />
 		</rect>
 	</element>
 
