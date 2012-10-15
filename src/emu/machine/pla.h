@@ -39,6 +39,7 @@
 //**************************************************************************
 
 #define MAX_TERMS       512
+#define CACHE_SIZE      8
 
 
 
@@ -71,21 +72,24 @@ protected:
     // device-level overrides
     virtual void device_start();
 
-	inline void parse_fusemap();
-	inline bool get_product(int term);
-	inline void update_outputs();
+	void parse_fusemap();
 
     int m_inputs;
     int m_outputs;
     int m_terms;
-    UINT32 m_output_mask;
+    UINT64 m_input_mask;
+	UINT64 m_xor;
 
-	UINT32 m_i;
-	UINT32 m_s;
-	UINT32 m_and_true[MAX_TERMS];
-	UINT32 m_and_comp[MAX_TERMS];
-	UINT32 m_or[MAX_TERMS];
-	UINT32 m_xor;
+    struct term
+    {
+        UINT64 m_and;
+        UINT64 m_or;
+    };
+
+    term m_term[MAX_TERMS];
+
+    UINT64 m_cache[CACHE_SIZE];
+    UINT8 m_cache_ptr;
 };
 
 

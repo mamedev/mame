@@ -12,94 +12,11 @@
 
 
 //**************************************************************************
-//  DEVICE TYPE DEFINITION
+//  DEVICE TYPE DEFINITIONS
 //**************************************************************************
 
 const device_type PLS100 = &device_creator<pls100_device>;
 const device_type MOS8721 = &device_creator<mos8721_device>;
-
-
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  parse_fusemap -
-//-------------------------------------------------
-
-inline void pla_device::parse_fusemap()
-{
-	memory_region *region = machine().root_device().memregion(tag());
-	jed_data jed;
-	
-	jedbin_parse(region->base(), region->bytes(), &jed);
-
-	//logerror("PLA '%s' %u fuses\n", tag(), jed.numfuses);
-
-	UINT32 fusenum = 0;
-	m_xor = 0;
-
-	for (int term = 0; term < m_terms; term++)
-	{
-		m_and_comp[term] = 0;
-		m_and_true[term] = 0;
-		m_or[term] = 0;
-
-		for (int i = 0; i < m_inputs; i++)
-		{
-			m_and_comp[term] |= jed_get_fuse(&jed, fusenum++) << i;
-			m_and_true[term] |= jed_get_fuse(&jed, fusenum++) << i;
-		}
-
-		for (int f = 0; f < m_outputs; f++)
-		{
-			m_or[term] |= !jed_get_fuse(&jed, fusenum++) << f;
-		}
-
-		//logerror("PLA '%s' %3u COMP %08x TRUE %08x OR %08x\n", tag(), term, m_and_comp[term], m_and_true[term], m_or[term]);
-	}
-
-	for (int f = 0; f < m_outputs; f++)
-	{
-		m_xor |= jed_get_fuse(&jed, fusenum++) << f;
-	}
-
-	//logerror("PLA '%s' XOR %08x\n", tag(), m_xor);
-}
-
-
-//-------------------------------------------------
-//  get_product -
-//-------------------------------------------------
-
-inline bool pla_device::get_product(int term)
-{
-	UINT32 input_comp = m_and_comp[term] | ~m_i;
-	UINT32 input_true = m_and_true[term] | m_i;
-
-	//logerror("PLA '%s' %3u COMP %08x TRUE %08x OR %08x : %u\n", tag(), term, ~input_comp & m_output_mask, ~input_true & m_output_mask, m_or[term], (((input_comp & input_true) & m_output_mask) == m_output_mask));
-
-	return ((input_comp & input_true) & m_output_mask) == m_output_mask;
-}
-
-
-//-------------------------------------------------
-//  update_outputs -
-//-------------------------------------------------
-
-inline void pla_device::update_outputs()
-{
-	m_s = 0;
-
-	for (int term = 0; term < m_terms; term++)
-	{
-		if (get_product(term))
-		{
-			m_s |= m_or[term];
-		}
-	}
-}
 
 
 
@@ -111,12 +28,12 @@ inline void pla_device::update_outputs()
 //  pla_device - constructor
 //-------------------------------------------------
 
-pla_device::pla_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int inputs, int outputs, int terms, UINT32 output_mask)
+pla_device::pla_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int inputs, int outputs, int terms, UINT32 input_mask)
 	: device_t(mconfig, type, name, tag, owner, clock),
 	  m_inputs(inputs),
 	  m_outputs(outputs),
 	  m_terms(terms),
-	  m_output_mask(output_mask)
+	  m_input_mask(((UINT64)input_mask << 32) | input_mask)
 {
 }
 
@@ -137,13 +54,70 @@ mos8721_device::mos8721_device(const machine_config &mconfig, const char *tag, d
 
 void pla_device::device_start()
 {
-	// parse fusemap
 	assert(machine().root_device().memregion(tag()) != NULL);
+
+	// parse fusemap
 	parse_fusemap();
 
-	// register for state saving
-	save_item(NAME(m_i));
-	save_item(NAME(m_s));
+	// clear cache
+	for (int i = 0; i < CACHE_SIZE; i++)
+	{
+		m_cache[i] = 0;
+	}
+
+	m_cache_ptr = 0;
+}
+
+
+//-------------------------------------------------
+//  parse_fusemap -
+//-------------------------------------------------
+
+void pla_device::parse_fusemap()
+{
+	memory_region *region = machine().root_device().memregion(tag());
+	jed_data jed;
+	
+	jedbin_parse(region->base(), region->bytes(), &jed);
+
+	UINT32 fusenum = 0;
+
+	for (int p = 0; p < m_terms; p++)
+	{
+		term *term = &m_term[p];
+
+		// AND mask
+		term->m_and = 0;
+
+		for (int i = 0; i < m_inputs; i++)
+		{
+			// complement
+			term->m_and |= (UINT64)jed_get_fuse(&jed, fusenum++) << (i + 32);
+
+			// true
+			term->m_and |= (UINT64)jed_get_fuse(&jed, fusenum++) << i;
+		}
+
+		// OR mask
+		term->m_or = 0;
+
+		for (int f = 0; f < m_outputs; f++)
+		{
+			term->m_or |= !jed_get_fuse(&jed, fusenum++) << f;
+		}
+
+		term->m_or <<= 32;
+	}
+
+	// XOR mask
+	m_xor = 0;
+
+	for (int f = 0; f < m_outputs; f++)
+	{
+		m_xor |= jed_get_fuse(&jed, fusenum++) << f;
+	}
+
+	m_xor <<= 32;
 }
 
 
@@ -153,9 +127,37 @@ void pla_device::device_start()
 
 UINT32 pla_device::read(UINT32 input)
 {
-	m_i = input;
+	// try the cache first
+	for (int i = 0; i < CACHE_SIZE; ++i)
+	{
+		UINT64 cache_entry = m_cache[i];
 
-	update_outputs();
+		if ((UINT32)cache_entry == input)
+		{
+			// cache hit
+			return cache_entry >> 32;
+		}
+	}
 
-	return m_s ^ m_xor;
+	// cache miss, process terms
+	UINT64 inputs = ((~(UINT64)input << 32) | input) & m_input_mask;
+	UINT64 s = 0;
+
+	for (int i = 0; i < m_terms; ++i)
+	{
+		term term = m_term[i];
+
+		if ((term.m_and | inputs) == m_input_mask)
+		{
+			s |= term.m_or;
+		}
+	}
+
+	s ^= m_xor;
+
+	// store output in cache
+	m_cache[m_cache_ptr] = s | input;
+	++m_cache_ptr &= (CACHE_SIZE - 1);
+
+	return s >> 32;
 }
