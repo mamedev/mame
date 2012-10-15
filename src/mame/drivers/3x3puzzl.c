@@ -1,7 +1,7 @@
 /***************************************************************************
 
 3x3 Puzzle
-Ace
+Ace Enterprise
 
 Driver by Mariusz Wojcieszek, David Haywood and Stephh
 
@@ -402,5 +402,5 @@ ROM_START( 3x3puzzla )
 ROM_END
 
 
-GAME( 199?, 3x3puzzl,  0,          _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace",      "3X3 Puzzle (Enterprise)", 0 )
-GAME( 199?, 3x3puzzla, 3x3puzzl,   _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace",      "3X3 Puzzle (Normal)", 0 )
+GAME( 1998, 3x3puzzl,  0,          _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Enterprise)", 0 ) // 1998. 5. 28
+GAME( 1998, 3x3puzzla, 3x3puzzl,   _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Normal)", 0 ) // 1998. 5. 28
