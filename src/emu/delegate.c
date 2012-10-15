@@ -53,7 +53,7 @@
 //  return the actual final code pointer
 //-------------------------------------------------
 
-delegate_generic_function delegate_internal_mfp::convert_to_generic(delegate_generic_class *&object) const
+delegate_generic_function delegate_mfp::convert_to_generic(delegate_generic_class *&object) const
 {
 	// apply the "this" delta to the object first
 	object = reinterpret_cast<delegate_generic_class *>(reinterpret_cast<UINT8 *>(object) + m_this_delta);
