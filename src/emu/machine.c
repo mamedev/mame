@@ -277,7 +277,11 @@ void running_machine::start()
 	// these operations must proceed in this order
 	rom_init(*this);
 	m_memory.initialize();
+
+	// initialize the watchdog
 	m_watchdog_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::watchdog_fired), this));
+	if (config().m_watchdog_vblank_count != 0 && primary_screen != NULL)
+		primary_screen->register_vblank_callback(vblank_state_delegate(FUNC(running_machine::watchdog_vblank), this));
 	save().save_item(NAME(m_watchdog_enabled));
 	save().save_item(NAME(m_watchdog_counter));
 
@@ -842,12 +846,7 @@ void running_machine::watchdog_reset()
 
 	// VBLANK-based watchdog?
 	else if (config().m_watchdog_vblank_count != 0)
-	{
-		// register a VBLANK callback for the primary screen
 		m_watchdog_counter = config().m_watchdog_vblank_count;
-		if (primary_screen != NULL)
-			primary_screen->register_vblank_callback(vblank_state_delegate(FUNC(running_machine::watchdog_vblank), this));
-	}
 
 	// timer-based watchdog?
 	else if (config().m_watchdog_time != attotime::zero)
