@@ -29,6 +29,8 @@ MAXIM MAX693ACPE is a "Microprocessor Supervisory Circuit", for watchdog? and fo
 
 #define MAIN_CLOCK XTAL_28_63636MHz
 
+#define DEBUG_VRAM
+
 class dblcrown_state : public driver_device
 {
 public:
@@ -45,11 +47,20 @@ public:
 
 	UINT8 m_bank;
 	UINT8 m_irq_src;
+	UINT8 *m_pal_ram;
+	UINT8 *m_vram;
+	UINT8 m_vram_bank[2];
 
 	DECLARE_READ8_MEMBER(bank_r);
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_READ8_MEMBER(irq_source_r);
 	DECLARE_WRITE8_MEMBER(irq_source_w);
+	DECLARE_READ8_MEMBER(palette_r);
+	DECLARE_WRITE8_MEMBER(palette_w);
+	DECLARE_READ8_MEMBER(vram_r);
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_READ8_MEMBER(vram_bank_r);
+	DECLARE_WRITE8_MEMBER(vram_bank_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_irq_scanline);
 
@@ -64,7 +75,10 @@ protected:
 
 void dblcrown_state::video_start()
 {
+	m_pal_ram = auto_alloc_array(machine(), UINT8, 0x200*2);
+	m_vram = auto_alloc_array(machine(), UINT8, 0x1000*0x10);
 
+	state_save_register_global_pointer(machine(), m_vram, 0x1000*0x10);
 }
 
 UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -93,19 +107,80 @@ WRITE8_MEMBER( dblcrown_state::irq_source_w)
 	m_irq_src = data; // this effectively acks the irq, by writing 0
 }
 
+READ8_MEMBER( dblcrown_state::palette_r)
+{
+	if(m_bank & 8) /* TODO: verify this */
+		offset+=0x200;
+
+	return m_pal_ram[offset];
+}
+
+WRITE8_MEMBER( dblcrown_state::palette_w)
+{
+	int r,g,b,datax;
+
+	if(m_bank & 8) /* TODO: verify this */
+		offset+=0x200;
+
+	m_pal_ram[offset] = data;
+	offset>>=1;
+	datax = m_pal_ram[offset*2] + 256*m_pal_ram[offset*2 + 1];
+
+	r = ((datax)&0x000f)>>0;
+	g = ((datax)&0x00f0)>>4;
+	b = ((datax)&0x0f00)>>8;
+
+	palette_set_color_rgb(machine(), offset, pal4bit(r), pal4bit(g), pal4bit(b));
+}
+
+
+READ8_MEMBER( dblcrown_state::vram_r)
+{
+	UINT32 hi_offs;
+	hi_offs = m_vram_bank[offset & 0x1000 >> 12] << 12;
+
+	return m_vram[(offset & 0xfff) | hi_offs];
+}
+
+WRITE8_MEMBER( dblcrown_state::vram_w)
+{
+	UINT32 hi_offs;
+	hi_offs = m_vram_bank[(offset & 0x1000) >> 12] << 12;
+
+	m_vram[(offset & 0xfff) | hi_offs] = data;
+
+	#ifdef DEBUG_VRAM
+	{
+		UINT8 *VRAM = memregion("vram")->base();
+
+		VRAM[(offset & 0xfff) | hi_offs] = data;
+		machine().gfx[0]->mark_dirty(((offset & 0xfff) | hi_offs) / 32);
+	}
+	#endif
+}
+
+READ8_MEMBER( dblcrown_state::vram_bank_r)
+{
+	return m_vram_bank[offset];
+}
+
+WRITE8_MEMBER( dblcrown_state::vram_bank_w)
+{
+	m_vram_bank[offset] = data & 0xf;
+
+	if(data & 0xf0)
+		printf("vram bank = %02x\n",data);
+}
 
 static ADDRESS_MAP_START( dblcrown_map, AS_PROGRAM, 8, dblcrown_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("rom_bank")
 	AM_RANGE(0xa000, 0xb7ff) AM_RAM // work ram
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM // vram
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_le_w) AM_SHARE("paletteram") // TODO: correct bit order
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(vram_r, vram_w)
+	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE(palette_r, palette_w) //AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_le_w) AM_SHARE("paletteram") // TODO: correct bit order
 	AM_RANGE(0xfe00, 0xfeff) AM_RAM // ???
-	// 0xff00 - 0xff01 RAM banks for 0xd000
+	AM_RANGE(0xff00, 0xff01) AM_READWRITE(vram_bank_r, vram_bank_w)
 	AM_RANGE(0xff04, 0xff04) AM_READWRITE(irq_source_r,irq_source_w)
 
 	AM_RANGE(0xff00, 0xffff) AM_RAM // ???, intentional fall-through
@@ -172,6 +247,16 @@ static INPUT_PORTS_START( dblcrown )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static const gfx_layout char_8x8_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ 4,0, 12,8, 20,16, 28,24 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	32*8
+};
 
 static const gfx_layout char_16x16_layout =
 {
@@ -186,7 +271,10 @@ static const gfx_layout char_16x16_layout =
 
 
 static GFXDECODE_START( dblcrown )
-	GFXDECODE_ENTRY( "gfx1", 0, char_16x16_layout, 0, 16*4 )
+#ifdef DEBUG_VRAM
+	GFXDECODE_ENTRY( "vram", 0, char_8x8_layout, 0, 0x20 )
+#endif
+	GFXDECODE_ENTRY( "gfx1", 0, char_16x16_layout, 0, 0x20 )
 GFXDECODE_END
 
 
@@ -217,7 +305,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_state::dblcrown_irq_scanline)
 	}
 
 	/* TODO: unknown source */
-	if (scanline == 0)
+	if (scanline == 128)
 	{
 		m_maincpu->set_input_line(0, HOLD_LINE);
 		m_irq_src = 4;
@@ -243,7 +331,7 @@ static MACHINE_CONFIG_START( dblcrown, dblcrown_state )
 
 	MCFG_GFXDECODE(dblcrown)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -266,6 +354,10 @@ ROM_START( dblcrown )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD("2.u43", 0x00000, 0x80000, CRC(58200bd4) SHA1(2795cfc41056111f66bfb82916343d1c733baa83) )
+
+#ifdef DEBUG_VRAM
+	ROM_REGION( 0x1000*0x10, "vram", ROMREGION_ERASE00 )
+#endif
 
 	ROM_REGION( 0x0bf1, "pals", 0 ) // in Jedec format
 	ROM_LOAD("palce16v8h.u39", 0x0000, 0x0bf1, CRC(997b0ba9) SHA1(1c121ab74f33d5162b619740b08cc7bc694c257d) )
