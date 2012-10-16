@@ -655,7 +655,7 @@ static DEVICE_IMAGE_LOAD( ngp_cart )
 	{
 		filesize = image.length();
 
-		if (filesize != 0x80000 && filesize != 0x100000 && filesize != 0x200000 && filesize != 0x400000)
+		if (filesize != 0x8000 && filesize != 0x80000 && filesize != 0x100000 && filesize != 0x200000 && filesize != 0x400000)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size");
 			return IMAGE_INIT_FAIL;
@@ -678,6 +678,7 @@ static DEVICE_IMAGE_LOAD( ngp_cart )
 	state->m_flash_chip[0].manufacturer_id = 0x98;
 	switch( filesize )
 	{
+	case 0x8000:
 	case 0x80000:
 		state->m_flash_chip[0].device_id = 0xab;
 		break;
