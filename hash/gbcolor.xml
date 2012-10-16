@@ -22656,7 +22656,7 @@ Undumped Pirates:
 			<!-- cartridge ram -->
 			<feature name="battery_backed" value="yes" />
 			<dataarea name="rom" size="4194304">
-				<rom name="stone age (unl).bin" size="4194304" crc="2ffe697c" sha1="b992f280b5dd2095c8f430282c5dba69c6a10eb4" offset="000000" />
+				<rom name="stone age (unl)(hacked).bin" size="4194304" crc="2ffe697c" sha1="b992f280b5dd2095c8f430282c5dba69c6a10eb4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
