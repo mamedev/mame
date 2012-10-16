@@ -53,6 +53,9 @@ struct tlcs900_state
 	UINT8	tff1;
 	UINT8	tff3;
 	int		timer_change[4];
+	bool	prefetch_clear;
+	UINT8	prefetch_index;
+	UINT8	prefetch[4];
 
 	/* Current state of input levels */
 	int		level[TLCS900_NUM_INPUTS];
@@ -199,11 +202,34 @@ struct tlcs900_state
 
 #define RDMEM(addr)			cpustate->program->read_byte( addr )
 #define WRMEM(addr,data)	cpustate->program->write_byte( addr, data )
-#define RDOP()				RDMEM( cpustate->pc.d ); cpustate->pc.d++
 #define RDMEMW(addr)			( RDMEM(addr) | ( RDMEM(addr+1) << 8 ) )
 #define RDMEML(addr)			( RDMEMW(addr) | ( RDMEMW(addr+2) << 16 ) )
 #define WRMEMW(addr,data)		{ UINT16 dw = data; WRMEM(addr,dw & 0xff); WRMEM(addr+1,(dw >> 8 )); }
 #define WRMEML(addr,data)		{ UINT32 dl = data; WRMEMW(addr,dl); WRMEMW(addr+2,(dl >> 16)); }
+
+
+INLINE UINT8 RDOP( tlcs900_state *cpustate )
+{
+	UINT8 data;
+
+	if ( cpustate->prefetch_clear )
+	{
+		for ( int i = 0; i < 4; i++ )
+		{
+			cpustate->prefetch[ i ] = RDMEM( cpustate->pc.d + i );
+		}
+		cpustate->prefetch_index = 0;
+		cpustate->prefetch_clear = false;
+	}
+	else
+	{
+		cpustate->prefetch[ cpustate->prefetch_index ] = RDMEM( cpustate->pc.d + 3 );
+		cpustate->prefetch_index = ( cpustate->prefetch_index + 1 ) & 0x03;
+	}
+	data = cpustate->prefetch[ cpustate->prefetch_index ];
+	cpustate->pc.d++;
+	return data;
+}
 
 
 INLINE tlcs900_state *get_safe_token( device_t *device )
@@ -256,6 +282,9 @@ static CPU_INIT( tlcs900 )
 	device->save_item( NAME(cpustate->check_irqs) );
 	device->save_item( NAME(cpustate->ad_cycles_left) );
 	device->save_item( NAME(cpustate->nmi_state) );
+	device->save_item( NAME(cpustate->prefetch_clear) );
+	device->save_item( NAME(cpustate->prefetch_index) );
+	device->save_item( NAME(cpustate->prefetch) );
 }
 
 
@@ -345,6 +374,7 @@ static CPU_RESET( tlcs900 )
 	{
 		cpustate->level[i] = CLEAR_LINE;
 	}
+	cpustate->prefetch_clear = true;
 }
 
 
@@ -551,6 +581,7 @@ INLINE void tlcs900_check_irqs( tlcs900_state *cpustate )
 		WRMEMW( cpustate->xssp.d, cpustate->sr.w.l );
 		cpustate->pc.d = RDMEML( 0xffff00 + 0x20 );
 		cpustate->cycles += 18;
+		cpustate->prefetch_clear = true;
 
 		cpustate->halted = 0;
 
@@ -601,6 +632,7 @@ INLINE void tlcs900_check_irqs( tlcs900_state *cpustate )
 
 		cpustate->pc.d = RDMEML( 0xffff00 + vector );
 		cpustate->cycles += 18;
+		cpustate->prefetch_clear = true;
 
 		cpustate->halted = 0;
 
@@ -882,7 +914,7 @@ static CPU_EXECUTE( tlcs900 )
 		}
 		else
 		{
-			cpustate->op = RDOP();
+			cpustate->op = RDOP( cpustate );
 			inst = &mnemonic[cpustate->op];
 			prepare_operands( cpustate, inst );
 
@@ -1614,6 +1646,7 @@ INLINE void tmp95c063_check_irqs( tlcs900_state *cpustate )
 		WRMEMW( cpustate->xssp.d, cpustate->sr.w.l );
 		cpustate->pc.d = RDMEML( 0xffff00 + 0x20 );
 		cpustate->cycles += 18;
+		cpustate->prefetch_clear = true;
 
 		cpustate->halted = 0;
 
@@ -1664,6 +1697,7 @@ INLINE void tmp95c063_check_irqs( tlcs900_state *cpustate )
 
 		cpustate->pc.d = RDMEML( 0xffff00 + vector );
 		cpustate->cycles += 18;
+		cpustate->prefetch_clear = true;
 
 		cpustate->halted = 0;
 
@@ -1936,7 +1970,7 @@ static CPU_EXECUTE( tmp95c063 )
 		}
 		else
 		{
-			cpustate->op = RDOP();
+			cpustate->op = RDOP( cpustate );
 			inst = &mnemonic[cpustate->op];
 			prepare_operands( cpustate, inst );
 

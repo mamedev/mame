@@ -1590,6 +1590,7 @@ static void _CALLI(tlcs900_state *cpustate)
 	cpustate->xssp.d -= 4;
 	WRMEML( cpustate->xssp.d, cpustate->pc.d );
 	cpustate->pc.d = cpustate->imm1.d;
+	cpustate->prefetch_clear = true;
 }
 
 
@@ -1601,6 +1602,7 @@ static void _CALLM(tlcs900_state *cpustate)
 		WRMEML( cpustate->xssp.d, cpustate->pc.d );
 		cpustate->pc.d = cpustate->ea2.d;
 		cpustate->cycles += 6;
+		cpustate->prefetch_clear = true;
 	}
 }
 
@@ -1610,6 +1612,7 @@ static void _CALR(tlcs900_state *cpustate)
 	cpustate->xssp.d -= 4;
 	WRMEML( cpustate->xssp.d, cpustate->pc.d );
 	cpustate->pc.d = cpustate->ea1.d;
+	cpustate->prefetch_clear = true;
 }
 
 
@@ -1743,6 +1746,7 @@ static void _CPDR(tlcs900_state *cpustate)
 	{
 		cpustate->pc.d -= 2;
 		cpustate->cycles += 4;
+		cpustate->prefetch_clear = true;
 	}
 }
 
@@ -1768,6 +1772,7 @@ static void _CPDRW(tlcs900_state *cpustate)
 	{
 		cpustate->pc.d -= 2;
 		cpustate->cycles += 4;
+		cpustate->prefetch_clear = true;
 	}
 }
 
@@ -1793,6 +1798,7 @@ static void _CPIR(tlcs900_state *cpustate)
 	{
 		cpustate->pc.d -= 2;
 		cpustate->cycles += 4;
+		cpustate->prefetch_clear = true;
 	}
 }
 
@@ -1818,6 +1824,7 @@ static void _CPIRW(tlcs900_state *cpustate)
 	{
 		cpustate->pc.d -= 2;
 		cpustate->cycles += 4;
+		cpustate->prefetch_clear = true;
 	}
 }
 
@@ -2030,6 +2037,7 @@ static void _DJNZB(tlcs900_state *cpustate)
 	{
 		cpustate->pc.d = cpustate->ea2.d;
 		cpustate->cycles += 4;
+		cpustate->prefetch_clear = true;
 	}
 }
 
@@ -2041,6 +2049,7 @@ static void _DJNZW(tlcs900_state *cpustate)
 	{
 		cpustate->pc.d = cpustate->ea2.d;
 		cpustate->cycles += 4;
+		cpustate->prefetch_clear = true;
 	}
 }
 
@@ -2174,6 +2183,7 @@ static void _INCF(tlcs900_state *cpustate)
 static void _JPI(tlcs900_state *cpustate)
 {
 	cpustate->pc.d = cpustate->imm1.d;
+	cpustate->prefetch_clear = true;
 }
 
 
@@ -2183,6 +2193,7 @@ static void _JPM(tlcs900_state *cpustate)
 	{
 		cpustate->pc.d = cpustate->ea2.d;
 		cpustate->cycles += 4;
+		cpustate->prefetch_clear = true;
 	}
 }
 
@@ -2193,6 +2204,7 @@ static void _JR(tlcs900_state *cpustate)
 	{
 		cpustate->pc.d = cpustate->ea2.d;
 		cpustate->cycles += 4;
+		cpustate->prefetch_clear = true;
 	}
 }
 
@@ -2203,6 +2215,7 @@ static void _JRL(tlcs900_state *cpustate)
 	{
 		cpustate->pc.d = cpustate->ea2.d;
 		cpustate->cycles += 4;
+		cpustate->prefetch_clear = true;
 	}
 }
 
@@ -2399,6 +2412,7 @@ static void _LDDR(tlcs900_state *cpustate)
 		cpustate->sr.b.l |= FLAG_VF;
 		cpustate->pc.d -= 2;
 		cpustate->cycles += 4;
+		cpustate->prefetch_clear = true;
 	}
 }
 
@@ -2417,6 +2431,7 @@ static void _LDDRW(tlcs900_state *cpustate)
 		cpustate->sr.b.l |= FLAG_VF;
 		cpustate->pc.d -= 2;
 		cpustate->cycles += 4;
+		cpustate->prefetch_clear = true;
 	}
 }
 
@@ -2474,6 +2489,7 @@ static void _LDIR(tlcs900_state *cpustate)
 		cpustate->sr.b.l |= FLAG_VF;
 		cpustate->pc.d -= 2;
 		cpustate->cycles += 4;
+		cpustate->prefetch_clear = true;
 	}
 }
 
@@ -2492,6 +2508,7 @@ static void _LDIRW(tlcs900_state *cpustate)
 		cpustate->sr.b.l |= FLAG_VF;
 		cpustate->pc.d -= 2;
 		cpustate->cycles += 4;
+		cpustate->prefetch_clear = true;
 	}
 }
 
@@ -2516,11 +2533,11 @@ static void _LDX(tlcs900_state *cpustate)
 {
 	UINT8	a, b;
 
-	RDOP();
-	a = RDOP();
-	RDOP();
-	b = RDOP();
-	RDOP();
+	RDOP( cpustate );
+	a = RDOP( cpustate );
+	RDOP( cpustate );
+	b = RDOP( cpustate );
+	RDOP( cpustate );
 	WRMEM( a, b );
 }
 
@@ -2975,6 +2992,7 @@ static void _RET(tlcs900_state *cpustate)
 {
 	cpustate->pc.d = RDMEML( cpustate->xssp.d );
 	cpustate->xssp.d += 4;
+	cpustate->prefetch_clear = true;
 }
 
 
@@ -2985,6 +3003,7 @@ static void _RETCC(tlcs900_state *cpustate)
 		cpustate->pc.d = RDMEML( cpustate->xssp.d );
 		cpustate->xssp.d += 4;
 		cpustate->cycles += 6;
+		cpustate->prefetch_clear = true;
 	}
 }
 
@@ -2993,6 +3012,7 @@ static void _RETD(tlcs900_state *cpustate)
 {
 	cpustate->pc.d = RDMEML( cpustate->xssp.d );
 	cpustate->xssp.d += 4 + cpustate->imm1.sw.l;
+	cpustate->prefetch_clear = true;
 }
 
 
@@ -3004,6 +3024,7 @@ static void _RETI(tlcs900_state *cpustate)
 	cpustate->xssp.d += 4;
 	cpustate->regbank = cpustate->sr.b.h & 0x03;
 	cpustate->check_irqs = 1;
+	cpustate->prefetch_clear = true;
 }
 
 
@@ -3683,6 +3704,7 @@ static void _SWI(tlcs900_state *cpustate)
 	cpustate->xssp.d -= 2;
 	WRMEMW( cpustate->xssp.d, cpustate->sr.w.l );
 	cpustate->pc.d = RDMEML( 0x00ffff00 + 4 * cpustate->imm1.b.l );
+	cpustate->prefetch_clear = true;
 }
 
 
@@ -3887,7 +3909,7 @@ static void prepare_operands(tlcs900_state *cpustate, const tlcs900inst *inst)
 		cpustate->p1_reg32 = get_reg32_current( cpustate, cpustate->op );
 		break;
 	case _CR8:
-		cpustate->imm1.d = RDOP();
+		cpustate->imm1.d = RDOP( cpustate );
 		switch( cpustate->imm1.d )
 		{
 		case 0x22:
@@ -3908,7 +3930,7 @@ static void prepare_operands(tlcs900_state *cpustate, const tlcs900inst *inst)
 		}
 		break;
 	case _CR16:
-		cpustate->imm1.d = RDOP();
+		cpustate->imm1.d = RDOP( cpustate );
 		switch( cpustate->imm1.d )
 		{
 		case 0x20:
@@ -3929,7 +3951,7 @@ static void prepare_operands(tlcs900_state *cpustate, const tlcs900inst *inst)
 		}
 		break;
 	case _CR32:
-		cpustate->imm1.d = RDOP();
+		cpustate->imm1.d = RDOP( cpustate );
 		switch( cpustate->imm1.d )
 		{
 		case 0x00:
@@ -3962,44 +3984,44 @@ static void prepare_operands(tlcs900_state *cpustate, const tlcs900inst *inst)
 		}
 		break;
 	case _D8:
-		cpustate->ea1.d = RDOP();
+		cpustate->ea1.d = RDOP( cpustate );
 		cpustate->ea1.d = cpustate->pc.d + cpustate->ea1.sb.l;
 		break;
 	case _D16:
-		cpustate->ea1.d = RDOP();
-		cpustate->ea1.b.h = RDOP();
+		cpustate->ea1.d = RDOP( cpustate );
+		cpustate->ea1.b.h = RDOP( cpustate );
 		cpustate->ea1.d = cpustate->pc.d + cpustate->ea1.sw.l;
 		break;
 	case _I3:
 		cpustate->imm1.d = cpustate->op & 0x07;
 		break;
 	case _I8:
-		cpustate->imm1.d = RDOP();
+		cpustate->imm1.d = RDOP( cpustate );
 		break;
 	case _I16:
-		cpustate->imm1.d = RDOP();
-		cpustate->imm1.b.h = RDOP();
+		cpustate->imm1.d = RDOP( cpustate );
+		cpustate->imm1.b.h = RDOP( cpustate );
 		break;
 	case _I24:
-		cpustate->imm1.d = RDOP();
-		cpustate->imm1.b.h = RDOP();
-		cpustate->imm1.b.h2 = RDOP();
+		cpustate->imm1.d = RDOP( cpustate );
+		cpustate->imm1.b.h = RDOP( cpustate );
+		cpustate->imm1.b.h2 = RDOP( cpustate );
 		break;
 	case _I32:
-		cpustate->imm1.d = RDOP();
-		cpustate->imm1.b.h = RDOP();
-		cpustate->imm1.b.h2 = RDOP();
-		cpustate->imm1.b.h3 = RDOP();
+		cpustate->imm1.d = RDOP( cpustate );
+		cpustate->imm1.b.h = RDOP( cpustate );
+		cpustate->imm1.b.h2 = RDOP( cpustate );
+		cpustate->imm1.b.h3 = RDOP( cpustate );
 		break;
 	case _M:
 		cpustate->ea1.d = cpustate->ea2.d;
 		break;
 	case _M8:
-		cpustate->ea1.d = RDOP();
+		cpustate->ea1.d = RDOP( cpustate );
 		break;
 	case _M16:
-		cpustate->ea1.d = RDOP();
-		cpustate->ea1.b.h = RDOP();
+		cpustate->ea1.d = RDOP( cpustate );
+		cpustate->ea1.b.h = RDOP( cpustate );
 		break;
 	case _R:
 		cpustate->p1_reg8 = cpustate->p2_reg8;
@@ -4029,7 +4051,7 @@ static void prepare_operands(tlcs900_state *cpustate, const tlcs900inst *inst)
 		cpustate->p2_reg32 = get_reg32_current( cpustate, cpustate->op );
 		break;
 	case _CR8:
-		cpustate->imm1.d = RDOP();
+		cpustate->imm1.d = RDOP( cpustate );
 		switch( cpustate->imm1.d )
 		{
 		case 0x22:
@@ -4050,7 +4072,7 @@ static void prepare_operands(tlcs900_state *cpustate, const tlcs900inst *inst)
 		}
 		break;
 	case _CR16:
-		cpustate->imm1.d = RDOP();
+		cpustate->imm1.d = RDOP( cpustate );
 		switch( cpustate->imm1.d )
 		{
 		case 0x20:
@@ -4071,7 +4093,7 @@ static void prepare_operands(tlcs900_state *cpustate, const tlcs900inst *inst)
 		}
 		break;
 	case _CR32:
-		cpustate->imm1.d = RDOP();
+		cpustate->imm1.d = RDOP( cpustate );
 		switch( cpustate->imm1.d )
 		{
 		case 0x00:
@@ -4104,36 +4126,36 @@ static void prepare_operands(tlcs900_state *cpustate, const tlcs900inst *inst)
 		}
 		break;
 	case _D8:
-		cpustate->ea2.d = RDOP();
+		cpustate->ea2.d = RDOP( cpustate );
 		cpustate->ea2.d = cpustate->pc.d + cpustate->ea2.sb.l;
 		break;
 	case _D16:
-		cpustate->ea2.d = RDOP();
-		cpustate->ea2.b.h = RDOP();
+		cpustate->ea2.d = RDOP( cpustate );
+		cpustate->ea2.b.h = RDOP( cpustate );
 		cpustate->ea2.d = cpustate->pc.d + cpustate->ea2.sw.l;
 		break;
 	case _I3:
 		cpustate->imm2.d = cpustate->op & 0x07;
 		break;
 	case _I8:
-		cpustate->imm2.d = RDOP();
+		cpustate->imm2.d = RDOP( cpustate );
 		break;
 	case _I16:
-		cpustate->imm2.d = RDOP();
-		cpustate->imm2.b.h = RDOP();
+		cpustate->imm2.d = RDOP( cpustate );
+		cpustate->imm2.b.h = RDOP( cpustate );
 		break;
 	case _I32:
-		cpustate->imm2.d = RDOP();
-		cpustate->imm2.b.h = RDOP();
-		cpustate->imm2.b.h2 = RDOP();
-		cpustate->imm2.b.h3 = RDOP();
+		cpustate->imm2.d = RDOP( cpustate );
+		cpustate->imm2.b.h = RDOP( cpustate );
+		cpustate->imm2.b.h2 = RDOP( cpustate );
+		cpustate->imm2.b.h3 = RDOP( cpustate );
 		break;
 	case _M8:
-		cpustate->ea2.d = RDOP();
+		cpustate->ea2.d = RDOP( cpustate );
 		break;
 	case _M16:
-		cpustate->ea2.d = RDOP();
-		cpustate->ea2.b.h = RDOP();
+		cpustate->ea2.d = RDOP( cpustate );
+		cpustate->ea2.b.h = RDOP( cpustate );
 		break;
 	}
 }
@@ -5325,7 +5347,7 @@ static void _80(tlcs900_state *cpustate)
 	cpustate->p2_reg32 = get_reg32_current( cpustate, cpustate->op );
 
 	cpustate->ea2.d = *get_reg32_current( cpustate, cpustate->op );
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	inst = &mnemonic_80[cpustate->op];
 	prepare_operands( cpustate, inst );
 	inst->opfunc( cpustate );
@@ -5343,10 +5365,10 @@ static void _88(tlcs900_state *cpustate)
 	cpustate->p2_reg32 = get_reg32_current( cpustate, cpustate->op );
 
 	cpustate->ea2.d = *get_reg32_current( cpustate, cpustate->op );
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	cpustate->ea2.d += (INT8)cpustate->op;
 	cpustate->cycles += 2;
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	inst = &mnemonic_80[cpustate->op];
 	prepare_operands( cpustate, inst );
 	inst->opfunc( cpustate );
@@ -5364,7 +5386,7 @@ static void _90(tlcs900_state *cpustate)
 	cpustate->p2_reg32 = get_reg32_current( cpustate, cpustate->op );
 
 	cpustate->ea2.d = *get_reg32_current( cpustate, cpustate->op );
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	inst = &mnemonic_90[cpustate->op];
 	prepare_operands( cpustate, inst );
 	inst->opfunc( cpustate );
@@ -5378,10 +5400,10 @@ static void _98(tlcs900_state *cpustate)
 	const tlcs900inst *inst;
 
 	cpustate->ea2.d = *get_reg32_current( cpustate, cpustate->op );
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	cpustate->ea2.d += (INT8)cpustate->op;
 	cpustate->cycles += 2;
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	inst = &mnemonic_98[cpustate->op];
 	prepare_operands( cpustate, inst );
 	inst->opfunc( cpustate );
@@ -5395,7 +5417,7 @@ static void _A0(tlcs900_state *cpustate)
 	const tlcs900inst *inst;
 
 	cpustate->ea2.d = *get_reg32_current( cpustate, cpustate->op );
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	inst = &mnemonic_a0[cpustate->op];
 	prepare_operands( cpustate, inst );
 	inst->opfunc( cpustate );
@@ -5409,10 +5431,10 @@ static void _A8(tlcs900_state *cpustate)
 	const tlcs900inst *inst;
 
 	cpustate->ea2.d = *get_reg32_current( cpustate, cpustate->op );
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	cpustate->ea2.d += (INT8)cpustate->op;
 	cpustate->cycles += 2;
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	inst = &mnemonic_a0[cpustate->op];
 	prepare_operands( cpustate, inst );
 	inst->opfunc( cpustate );
@@ -5426,7 +5448,7 @@ static void _B0(tlcs900_state *cpustate)
 	const tlcs900inst *inst;
 
 	cpustate->ea2.d = *get_reg32_current( cpustate, cpustate->op );
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	inst = &mnemonic_b0[cpustate->op];
 	prepare_operands( cpustate, inst );
 	inst->opfunc( cpustate );
@@ -5440,10 +5462,10 @@ static void _B8(tlcs900_state *cpustate)
 	const tlcs900inst *inst;
 
 	cpustate->ea2.d = *get_reg32_current( cpustate, cpustate->op );
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	cpustate->ea2.d += (INT8)cpustate->op;
 	cpustate->cycles += 2;
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	inst = &mnemonic_b8[cpustate->op];
 	prepare_operands( cpustate, inst );
 	inst->opfunc( cpustate );
@@ -5460,25 +5482,25 @@ static void _C0(tlcs900_state *cpustate)
 	switch ( cpustate->op & 0x07 )
 	{
 	case 0x00:	/* (n) */
-		cpustate->ea2.d = RDOP();
+		cpustate->ea2.d = RDOP( cpustate );
 		cpustate->cycles += 2;
 		break;
 
 	case 0x01:	/* (nn) */
-		cpustate->ea2.d = RDOP();
-		cpustate->ea2.b.h = RDOP();
+		cpustate->ea2.d = RDOP( cpustate );
+		cpustate->ea2.b.h = RDOP( cpustate );
 		cpustate->cycles += 2;
 		break;
 
 	case 0x02:	/* (nnn) */
-		cpustate->ea2.d = RDOP();
-		cpustate->ea2.b.h = RDOP();
-		cpustate->ea2.b.h2 = RDOP();
+		cpustate->ea2.d = RDOP( cpustate );
+		cpustate->ea2.b.h = RDOP( cpustate );
+		cpustate->ea2.b.h2 = RDOP( cpustate );
 		cpustate->cycles += 3;
 		break;
 
 	case 0x03:
-		cpustate->op = RDOP();
+		cpustate->op = RDOP( cpustate );
 		switch ( cpustate->op & 0x03 )
 		{
 		/* (xrr) */
@@ -5489,8 +5511,8 @@ static void _C0(tlcs900_state *cpustate)
 
 		/* (xrr+d16) */
 		case 0x01:
-			cpustate->ea2.b.l = RDOP();
-			cpustate->ea2.b.h = RDOP();
+			cpustate->ea2.b.l = RDOP( cpustate );
+			cpustate->ea2.b.h = RDOP( cpustate );
 			cpustate->ea2.d = *get_reg32( cpustate, cpustate->op ) + cpustate->ea2.sw.l;
 			cpustate->cycles += 5;
 			break;
@@ -5504,26 +5526,26 @@ static void _C0(tlcs900_state *cpustate)
 			{
 			/* (xrr+r8) */
 			case 0x03:
-				cpustate->op = RDOP();
+				cpustate->op = RDOP( cpustate );
 				cpustate->ea2.d = *get_reg32( cpustate, cpustate->op );
-				cpustate->op = RDOP();
+				cpustate->op = RDOP( cpustate );
 				cpustate->ea2.d += (INT8) *get_reg8( cpustate, cpustate->op );
 				cpustate->cycles += 8;
 				break;
 
 			/* (xrr+r16) */
 			case 0x07:
-				cpustate->op = RDOP();
+				cpustate->op = RDOP( cpustate );
 				cpustate->ea2.d = *get_reg32( cpustate, cpustate->op );
-				cpustate->op = RDOP();
+				cpustate->op = RDOP( cpustate );
 				cpustate->ea2.d += (INT16) *get_reg16( cpustate, cpustate->op );
 				cpustate->cycles += 8;
 				break;
 
 			/* (pc+d16) */
 			case 0x13:
-				cpustate->ea2.b.l = RDOP();
-				cpustate->ea2.b.h = RDOP();
+				cpustate->ea2.b.l = RDOP( cpustate );
+				cpustate->ea2.b.h = RDOP( cpustate );
 				cpustate->ea2.d = cpustate->pc.d + cpustate->ea2.sw.l;
 				cpustate->cycles += 5;
 				break;
@@ -5532,7 +5554,7 @@ static void _C0(tlcs900_state *cpustate)
 		break;
 
 	case 0x04:	/* (-xrr) */
-		cpustate->op = RDOP();
+		cpustate->op = RDOP( cpustate );
 		reg = get_reg32( cpustate, cpustate->op );
 		*reg -= ( 1 << ( cpustate->op & 0x03 ) );
 		cpustate->ea2.d = *reg;
@@ -5540,14 +5562,14 @@ static void _C0(tlcs900_state *cpustate)
 		break;
 
 	case 0x05:	/* (xrr+) */
-		cpustate->op = RDOP();
+		cpustate->op = RDOP( cpustate );
 		reg = get_reg32( cpustate, cpustate->op );
 		cpustate->ea2.d = *reg;
 		*reg += ( 1 << ( cpustate->op & 0x03 ) );
 		cpustate->cycles += 3;
 		break;
 	}
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	inst = &mnemonic_c0[cpustate->op];
 	prepare_operands( cpustate, inst );
 	inst->opfunc( cpustate );
@@ -5567,12 +5589,12 @@ static void oC8(tlcs900_state *cpustate)
 	}
 	else
 	{
-		cpustate->op = RDOP();
+		cpustate->op = RDOP( cpustate );
 		cpustate->p2_reg8 = get_reg8( cpustate, cpustate->op );
 		/* For MUL and DIV operations */
 		cpustate->p2_reg16 = get_reg16( cpustate, cpustate->op );
 	}
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	inst = &mnemonic_c8[cpustate->op];
 	prepare_operands( cpustate, inst );
 	inst->opfunc( cpustate );
@@ -5589,25 +5611,25 @@ static void _D0(tlcs900_state *cpustate)
 	switch ( cpustate->op & 0x07 )
 	{
 	case 0x00:	/* (n) */
-		cpustate->ea2.d = RDOP();
+		cpustate->ea2.d = RDOP( cpustate );
 		cpustate->cycles += 2;
 		break;
 
 	case 0x01:	/* (nn) */
-		cpustate->ea2.d = RDOP();
-		cpustate->ea2.b.h = RDOP();
+		cpustate->ea2.d = RDOP( cpustate );
+		cpustate->ea2.b.h = RDOP( cpustate );
 		cpustate->cycles += 2;
 		break;
 
 	case 0x02:	/* (nnn) */
-		cpustate->ea2.d = RDOP();
-		cpustate->ea2.b.h = RDOP();
-		cpustate->ea2.b.h2 = RDOP();
+		cpustate->ea2.d = RDOP( cpustate );
+		cpustate->ea2.b.h = RDOP( cpustate );
+		cpustate->ea2.b.h2 = RDOP( cpustate );
 		cpustate->cycles += 3;
 		break;
 
 	case 0x03:
-		cpustate->op = RDOP();
+		cpustate->op = RDOP( cpustate );
 		switch ( cpustate->op & 0x03 )
 		{
 		/* (xrr) */
@@ -5618,8 +5640,8 @@ static void _D0(tlcs900_state *cpustate)
 
 		/* (xrr+d16) */
 		case 0x01:
-			cpustate->ea2.b.l = RDOP();
-			cpustate->ea2.b.h = RDOP();
+			cpustate->ea2.b.l = RDOP( cpustate );
+			cpustate->ea2.b.h = RDOP( cpustate );
 			cpustate->ea2.d = *get_reg32( cpustate, cpustate->op ) + cpustate->ea2.sw.l;
 			cpustate->cycles += 5;
 			break;
@@ -5633,26 +5655,26 @@ static void _D0(tlcs900_state *cpustate)
 			{
 			/* (xrr+r8) */
 			case 0x03:
-				cpustate->op = RDOP();
+				cpustate->op = RDOP( cpustate );
 				cpustate->ea2.d = *get_reg32( cpustate, cpustate->op );
-				cpustate->op = RDOP();
+				cpustate->op = RDOP( cpustate );
 				cpustate->ea2.d += (INT8) *get_reg8( cpustate, cpustate->op );
 				cpustate->cycles += 8;
 				break;
 
 			/* (xrr+r16) */
 			case 0x07:
-				cpustate->op = RDOP();
+				cpustate->op = RDOP( cpustate );
 				cpustate->ea2.d = *get_reg32( cpustate, cpustate->op );
-				cpustate->op = RDOP();
+				cpustate->op = RDOP( cpustate );
 				cpustate->ea2.d += (INT16) *get_reg16( cpustate, cpustate->op );
 				cpustate->cycles += 8;
 				break;
 
 			/* (pc+d16) */
 			case 0x13:
-				cpustate->ea2.b.l = RDOP();
-				cpustate->ea2.b.h = RDOP();
+				cpustate->ea2.b.l = RDOP( cpustate );
+				cpustate->ea2.b.h = RDOP( cpustate );
 				cpustate->ea2.d = cpustate->pc.d + cpustate->ea2.sw.l;
 				cpustate->cycles += 5;
 				break;
@@ -5661,7 +5683,7 @@ static void _D0(tlcs900_state *cpustate)
 		break;
 
 	case 0x04:	/* (-xrr) */
-		cpustate->op = RDOP();
+		cpustate->op = RDOP( cpustate );
 		reg = get_reg32( cpustate, cpustate->op );
 		*reg -= ( 1 << ( cpustate->op & 0x03 ) );
 		cpustate->ea2.d = *reg;
@@ -5669,14 +5691,14 @@ static void _D0(tlcs900_state *cpustate)
 		break;
 
 	case 0x05:	/* (xrr+) */
-		cpustate->op = RDOP();
+		cpustate->op = RDOP( cpustate );
 		reg = get_reg32( cpustate, cpustate->op );
 		cpustate->ea2.d = *reg;
 		*reg += ( 1 << ( cpustate->op & 0x03 ) );
 		cpustate->cycles += 3;
 		break;
 	}
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	inst = &mnemonic_d0[cpustate->op];
 	prepare_operands( cpustate, inst );
 	inst->opfunc( cpustate );
@@ -5695,11 +5717,11 @@ static void oD8(tlcs900_state *cpustate)
 	}
 	else
 	{
-		cpustate->op = RDOP();
+		cpustate->op = RDOP( cpustate );
 		cpustate->p2_reg16 = get_reg16( cpustate, cpustate->op );
 		cpustate->p2_reg32 = get_reg32( cpustate, cpustate->op );
 	}
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	inst = &mnemonic_d8[cpustate->op];
 	prepare_operands( cpustate, inst );
 	inst->opfunc( cpustate );
@@ -5716,25 +5738,25 @@ static void _E0(tlcs900_state *cpustate)
 	switch ( cpustate->op & 0x07 )
 	{
 	case 0x00:	/* (n) */
-		cpustate->ea2.d = RDOP();
+		cpustate->ea2.d = RDOP( cpustate );
 		cpustate->cycles += 2;
 		break;
 
 	case 0x01:	/* (nn) */
-		cpustate->ea2.d = RDOP();
-		cpustate->ea2.b.h = RDOP();
+		cpustate->ea2.d = RDOP( cpustate );
+		cpustate->ea2.b.h = RDOP( cpustate );
 		cpustate->cycles += 2;
 		break;
 
 	case 0x02:	/* (nnn) */
-		cpustate->ea2.d = RDOP();
-		cpustate->ea2.b.h = RDOP();
-		cpustate->ea2.b.h2 = RDOP();
+		cpustate->ea2.d = RDOP( cpustate );
+		cpustate->ea2.b.h = RDOP( cpustate );
+		cpustate->ea2.b.h2 = RDOP( cpustate );
 		cpustate->cycles += 3;
 		break;
 
 	case 0x03:
-		cpustate->op = RDOP();
+		cpustate->op = RDOP( cpustate );
 		switch ( cpustate->op & 0x03 )
 		{
 		/* (xrr) */
@@ -5745,8 +5767,8 @@ static void _E0(tlcs900_state *cpustate)
 
 		/* (xrr+d16) */
 		case 0x01:
-			cpustate->ea2.b.l = RDOP();
-			cpustate->ea2.b.h = RDOP();
+			cpustate->ea2.b.l = RDOP( cpustate );
+			cpustate->ea2.b.h = RDOP( cpustate );
 			cpustate->ea2.d = *get_reg32( cpustate, cpustate->op ) + cpustate->ea2.sw.l;
 			cpustate->cycles += 5;
 			break;
@@ -5760,26 +5782,26 @@ static void _E0(tlcs900_state *cpustate)
 			{
 			/* (xrr+r8) */
 			case 0x03:
-				cpustate->op = RDOP();
+				cpustate->op = RDOP( cpustate );
 				cpustate->ea2.d = *get_reg32( cpustate, cpustate->op );
-				cpustate->op = RDOP();
+				cpustate->op = RDOP( cpustate );
 				cpustate->ea2.d += (INT8) *get_reg8( cpustate, cpustate->op );
 				cpustate->cycles += 8;
 				break;
 
 			/* (xrr+r16) */
 			case 0x07:
-				cpustate->op = RDOP();
+				cpustate->op = RDOP( cpustate );
 				cpustate->ea2.d = *get_reg32( cpustate, cpustate->op );
-				cpustate->op = RDOP();
+				cpustate->op = RDOP( cpustate );
 				cpustate->ea2.d += (INT16) *get_reg16( cpustate, cpustate->op );
 				cpustate->cycles += 8;
 				break;
 
 			/* (pc+d16) */
 			case 0x13:
-				cpustate->ea2.b.l = RDOP();
-				cpustate->ea2.b.h = RDOP();
+				cpustate->ea2.b.l = RDOP( cpustate );
+				cpustate->ea2.b.h = RDOP( cpustate );
 				cpustate->ea2.d = cpustate->pc.d + cpustate->ea2.sw.l;
 				cpustate->cycles += 5;
 				break;
@@ -5788,7 +5810,7 @@ static void _E0(tlcs900_state *cpustate)
 		break;
 
 	case 0x04:	/* (-xrr) */
-		cpustate->op = RDOP();
+		cpustate->op = RDOP( cpustate );
 		reg = get_reg32( cpustate, cpustate->op );
 		*reg -= ( 1 << ( cpustate->op & 0x03 ) );
 		cpustate->ea2.d = *reg;
@@ -5796,14 +5818,14 @@ static void _E0(tlcs900_state *cpustate)
 		break;
 
 	case 0x05:	/* (xrr+) */
-		cpustate->op = RDOP();
+		cpustate->op = RDOP( cpustate );
 		reg = get_reg32( cpustate, cpustate->op );
 		cpustate->ea2.d = *reg;
 		*reg += ( 1 << ( cpustate->op & 0x03 ) );
 		cpustate->cycles += 3;
 		break;
 	}
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	inst = &mnemonic_e0[cpustate->op];
 	prepare_operands( cpustate, inst );
 	inst->opfunc( cpustate );
@@ -5821,10 +5843,10 @@ static void _E8(tlcs900_state *cpustate)
 	}
 	else
 	{
-		cpustate->op = RDOP();
+		cpustate->op = RDOP( cpustate );
 		cpustate->p2_reg32 = get_reg32( cpustate, cpustate->op );
 	}
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	inst = &mnemonic_e8[cpustate->op];
 	prepare_operands( cpustate, inst );
 	inst->opfunc( cpustate );
@@ -5841,25 +5863,25 @@ static void _F0(tlcs900_state *cpustate)
 	switch ( cpustate->op & 0x07 )
 	{
 	case 0x00:	/* (n) */
-		cpustate->ea2.d = RDOP();
+		cpustate->ea2.d = RDOP( cpustate );
 		cpustate->cycles += 2;
 		break;
 
 	case 0x01:	/* (nn) */
-		cpustate->ea2.d = RDOP();
-		cpustate->ea2.b.h = RDOP();
+		cpustate->ea2.d = RDOP( cpustate );
+		cpustate->ea2.b.h = RDOP( cpustate );
 		cpustate->cycles += 2;
 		break;
 
 	case 0x02:	/* (nnn) */
-		cpustate->ea2.d = RDOP();
-		cpustate->ea2.b.h = RDOP();
-		cpustate->ea2.b.h2 = RDOP();
+		cpustate->ea2.d = RDOP( cpustate );
+		cpustate->ea2.b.h = RDOP( cpustate );
+		cpustate->ea2.b.h2 = RDOP( cpustate );
 		cpustate->cycles += 3;
 		break;
 
 	case 0x03:
-		cpustate->op = RDOP();
+		cpustate->op = RDOP( cpustate );
 		switch ( cpustate->op & 0x03 )
 		{
 		/* (xrr) */
@@ -5870,8 +5892,8 @@ static void _F0(tlcs900_state *cpustate)
 
 		/* (xrr+d16) */
 		case 0x01:
-			cpustate->ea2.b.l = RDOP();
-			cpustate->ea2.b.h = RDOP();
+			cpustate->ea2.b.l = RDOP( cpustate );
+			cpustate->ea2.b.h = RDOP( cpustate );
 			cpustate->ea2.d = *get_reg32( cpustate, cpustate->op ) + cpustate->ea2.sw.l;
 			cpustate->cycles += 5;
 			break;
@@ -5885,26 +5907,26 @@ static void _F0(tlcs900_state *cpustate)
 			{
 			/* (xrr+r8) */
 			case 0x03:
-				cpustate->op = RDOP();
+				cpustate->op = RDOP( cpustate );
 				cpustate->ea2.d = *get_reg32( cpustate, cpustate->op );
-				cpustate->op = RDOP();
+				cpustate->op = RDOP( cpustate );
 				cpustate->ea2.d += (INT8) *get_reg8( cpustate, cpustate->op );
 				cpustate->cycles += 8;
 				break;
 
 			/* (xrr+r16) */
 			case 0x07:
-				cpustate->op = RDOP();
+				cpustate->op = RDOP( cpustate );
 				cpustate->ea2.d = *get_reg32( cpustate, cpustate->op );
-				cpustate->op = RDOP();
+				cpustate->op = RDOP( cpustate );
 				cpustate->ea2.d += (INT16) *get_reg16( cpustate, cpustate->op );
 				cpustate->cycles += 8;
 				break;
 
 			/* (pc+d16) */
 			case 0x13:
-				cpustate->ea2.b.l = RDOP();
-				cpustate->ea2.b.h = RDOP();
+				cpustate->ea2.b.l = RDOP( cpustate );
+				cpustate->ea2.b.h = RDOP( cpustate );
 				cpustate->ea2.d = cpustate->pc.d + cpustate->ea2.sw.l;
 				cpustate->cycles += 5;
 				break;
@@ -5913,7 +5935,7 @@ static void _F0(tlcs900_state *cpustate)
 		break;
 
 	case 0x04:	/* (-xrr) */
-		cpustate->op = RDOP();
+		cpustate->op = RDOP( cpustate );
 		reg = get_reg32( cpustate, cpustate->op );
 		*reg -= ( 1 << ( cpustate->op & 0x03 ) );
 		cpustate->ea2.d = *reg;
@@ -5921,7 +5943,7 @@ static void _F0(tlcs900_state *cpustate)
 		break;
 
 	case 0x05:	/* (xrr+) */
-		cpustate->op = RDOP();
+		cpustate->op = RDOP( cpustate );
 		reg = get_reg32( cpustate, cpustate->op );
 		cpustate->ea2.d = *reg;
 		*reg += ( 1 << ( cpustate->op & 0x03 ) );
@@ -5929,7 +5951,7 @@ static void _F0(tlcs900_state *cpustate)
 		break;
 	}
 
-	cpustate->op = RDOP();
+	cpustate->op = RDOP( cpustate );
 	inst = &mnemonic_f0[cpustate->op];
 	prepare_operands( cpustate, inst );
 	inst->opfunc( cpustate );
