@@ -122,7 +122,12 @@ class ngp_state : public driver_device
 {
 public:
 	ngp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		, m_tlcs900( *this, "maincpu" )
+		, m_z80( *this, "soundcpu" )
+		, m_dac_l( *this, "dac_l" )
+		, m_dac_r( *this, "dac_r" )
+		{ }
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -141,11 +146,11 @@ public:
 		UINT8	command[2];
 	} m_flash_chip[2];
 
-	device_t *m_tlcs900;
-	device_t *m_z80;
+	required_device<cpu_device> m_tlcs900;
+	required_device<cpu_device> m_z80;
 	device_t *m_t6w28;
-	dac_device *m_dac_l;
-	dac_device *m_dac_r;
+	required_device<dac_device> m_dac_l;
+	required_device<dac_device> m_dac_r;
 	device_t *m_k1ge;
 
 	DECLARE_READ8_MEMBER( ngp_io_r );
@@ -260,18 +265,18 @@ WRITE8_MEMBER( ngp_state::ngp_io_w )
 		switch( data )
 		{
 		case 0x55:		/* Enable Z80 */
-			m_z80->execute().resume(SUSPEND_REASON_HALT );
+			m_z80->resume(SUSPEND_REASON_HALT );
 			m_z80->reset();
-			m_z80->execute().set_input_line(0, CLEAR_LINE );
+			m_z80->set_input_line(0, CLEAR_LINE );
 			break;
 		case 0xAA:		/* Disable Z80 */
-			m_z80->execute().suspend(SUSPEND_REASON_HALT, 1 );
+			m_z80->suspend(SUSPEND_REASON_HALT, 1 );
 			break;
 		}
 		break;
 
 	case 0x3a:	/* Trigger Z80 NMI */
-		m_z80->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+		m_z80->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 		break;
 	}
 	m_io_reg[offset] = data;
@@ -527,7 +532,7 @@ WRITE8_MEMBER( ngp_state::ngp_z80_comm_w )
 
 WRITE8_MEMBER( ngp_state::ngp_z80_signal_main_w )
 {
-	m_tlcs900->execute().set_input_line(TLCS900_INT5, ASSERT_LINE );
+	m_tlcs900->set_input_line(TLCS900_INT5, ASSERT_LINE );
 }
 
 
@@ -541,10 +546,10 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER( ngp_state::ngp_z80_clear_irq )
 {
-	m_z80->execute().set_input_line(0, CLEAR_LINE );
+	m_z80->set_input_line(0, CLEAR_LINE );
 
 	/* I am not exactly sure what causes the maincpu INT5 signal to be cleared. This will do for now. */
-	m_tlcs900->execute().set_input_line(TLCS900_INT5, CLEAR_LINE );
+	m_tlcs900->set_input_line(TLCS900_INT5, CLEAR_LINE );
 }
 
 
@@ -558,8 +563,7 @@ INPUT_CHANGED_MEMBER(ngp_state::power_callback)
 
 	if ( m_io_reg[0x33] & 0x04 )
 	{
-		m_tlcs900->execute().set_input_line(TLCS900_NMI,
-			(machine().root_device().ioport("Power")->read() & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
+		m_tlcs900->set_input_line(TLCS900_NMI, (machine().root_device().ioport("Power")->read() & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 	}
 }
 
@@ -582,20 +586,20 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER( ngp_state::ngp_vblank_pin_w )
 {
-	m_tlcs900->execute().set_input_line(TLCS900_INT4, data ? ASSERT_LINE : CLEAR_LINE );
+	m_tlcs900->set_input_line(TLCS900_INT4, data ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
 WRITE8_MEMBER( ngp_state::ngp_hblank_pin_w )
 {
-	m_tlcs900->execute().set_input_line(TLCS900_TIO, data ? ASSERT_LINE : CLEAR_LINE );
+	m_tlcs900->set_input_line(TLCS900_TIO, data ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
 WRITE8_MEMBER( ngp_state::ngp_tlcs900_to3 )
 {
 	if ( data && ! m_old_to3 )
-		m_z80->execute().set_input_line(0, ASSERT_LINE );
+		m_z80->set_input_line(0, ASSERT_LINE );
 
 	m_old_to3 = data;
 }
@@ -611,15 +615,11 @@ void ngp_state::machine_start()
 void ngp_state::machine_reset()
 {
 	m_old_to3 = 0;
-	m_tlcs900 = machine().device( "maincpu" );
-	m_z80 = machine().device( "soundcpu" );
 	m_t6w28 = machine().device( "t6w28" );
-	m_dac_l = machine().device<dac_device>( "dac_l" );
-	m_dac_r = machine().device<dac_device>( "dac_r" );
 	m_k1ge = machine().device( "k1ge" );
 
-	m_z80->execute().suspend(SUSPEND_REASON_HALT, 1 );
-	m_z80->execute().set_input_line(0, CLEAR_LINE );
+	m_z80->suspend(SUSPEND_REASON_HALT, 1 );
+	m_z80->set_input_line(0, CLEAR_LINE );
 }
 
 
