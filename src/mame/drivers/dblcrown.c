@@ -154,21 +154,21 @@ static INPUT_PORTS_START( dblcrown )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-/* TODO */
-static const gfx_layout char_8x8_layout =
+
+static const gfx_layout char_16x16_layout =
 {
-	8,8,
+	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	8*8*4
+	{ 0,1,2,3 },
+	{ 4,0, 12,8, 20,16, 28,24, 36,32, 44,40, 52,48, 60,56 },
+	{ STEP16(0,8*8) },
+	8*8*16
 };
 
 
 static GFXDECODE_START( dblcrown )
-	GFXDECODE_ENTRY( "gfx1", 0, char_8x8_layout, 0, 16*4 )
+	GFXDECODE_ENTRY( "gfx1", 0, char_16x16_layout, 0, 16*4 )
 GFXDECODE_END
 
 
@@ -234,4 +234,4 @@ ROM_START( dblcrown )
 	ROM_LOAD("palce16v8h.u39", 0x0000, 0x0bf1, CRC(997b0ba9) SHA1(1c121ab74f33d5162b619740b08cc7bc694c257d) )
 ROM_END
 
-GAME( 199?, dblcrown,  0,   dblcrown,  dblcrown,  driver_device, 0,       ROT0, "Excellent System",      "Double Crown", GAME_IS_SKELETON )
+GAME( 199?, dblcrown,  0,   dblcrown,  dblcrown,  driver_device, 0,       ROT0, "Excellent System",      "Double Crown", GAME_IS_SKELETON ) // 1997 DYNA copyright in tile GFX
