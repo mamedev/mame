@@ -125,6 +125,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_tlcs900( *this, "maincpu" )
 		, m_z80( *this, "soundcpu" )
+		, m_t6w28( *this, "t6w28" )
 		, m_dac_l( *this, "dac_l" )
 		, m_dac_r( *this, "dac_r" )
 		{ }
@@ -148,7 +149,7 @@ public:
 
 	required_device<cpu_device> m_tlcs900;
 	required_device<cpu_device> m_z80;
-	device_t *m_t6w28;
+	required_device<t6w28_device> m_t6w28;
 	required_device<dac_device> m_dac_l;
 	required_device<dac_device> m_dac_r;
 	device_t *m_k1ge;
@@ -236,7 +237,7 @@ WRITE8_MEMBER( ngp_state::ngp_io_w )
 	case 0x21:		/* t6w28 "left" */
 		if ( m_io_reg[0x38] == 0x55 && m_io_reg[0x39] == 0xAA )
 		{
-			t6w28_w( m_t6w28, space, 0, data );
+			m_t6w28->write( space, 0, data );
 		}
 		break;
 
@@ -538,7 +539,7 @@ WRITE8_MEMBER( ngp_state::ngp_z80_signal_main_w )
 
 static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8, ngp_state )
 	AM_RANGE( 0x0000, 0x0FFF )	AM_RAM AM_SHARE("share1")								/* shared with tlcs900 */
-	AM_RANGE( 0x4000, 0x4001 )	AM_DEVWRITE_LEGACY("t6w28", t6w28_w )					/* sound chip (right, left) */
+	AM_RANGE( 0x4000, 0x4001 )	AM_DEVWRITE("t6w28", t6w28_device, write )					/* sound chip (right, left) */
 	AM_RANGE( 0x8000, 0x8000 )	AM_READWRITE( ngp_z80_comm_r, ngp_z80_comm_w )	/* main-sound communication */
 	AM_RANGE( 0xc000, 0xc000 )	AM_WRITE( ngp_z80_signal_main_w )				/* signal irq to main cpu */
 ADDRESS_MAP_END
@@ -615,7 +616,6 @@ void ngp_state::machine_start()
 void ngp_state::machine_reset()
 {
 	m_old_to3 = 0;
-	m_t6w28 = machine().device( "t6w28" );
 	m_k1ge = machine().device( "k1ge" );
 
 	m_z80->suspend(SUSPEND_REASON_HALT, 1 );

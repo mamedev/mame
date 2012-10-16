@@ -3,29 +3,38 @@
 #ifndef __T6W28_H__
 #define __T6W28_H__
 
-#include "devlegcy.h"
-
-DECLARE_WRITE8_DEVICE_HANDLER( t6w28_w );
-
 class t6w28_device : public device_t,
                                   public device_sound_interface
 {
 public:
 	t6w28_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~t6w28_device() { global_free(m_token); }
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_WRITE8_MEMBER( write );
+
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+	void set_gain(int gain);
+
 private:
-	// internal state
-	void *m_token;
+	sound_stream *m_channel;
+	int m_sample_rate;
+	int m_vol_table[16];	/* volume table         */
+	INT32 m_register[16];	/* registers */
+	INT32 m_last_register[2];	/* last register written */
+	INT32 m_volume[8];	/* volume of voice 0-2 and noise */
+	UINT32 m_rng[2];		/* noise generator      */
+	INT32 m_noise_mode[2];	/* active noise mode */
+	INT32 m_feedback_mask;     /* mask for feedback */
+	INT32 m_whitenoise_taps;   /* mask for white noise taps */
+	INT32 m_whitenoise_invert; /* white noise invert flag */
+	INT32 m_period[8];
+	INT32 m_count[8];
+	INT32 m_output[8];
 };
 
 extern const device_type T6W28;
