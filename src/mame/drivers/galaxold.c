@@ -774,12 +774,12 @@ static ADDRESS_MAP_START( harem_cpu1, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4fff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP
-	AM_RANGE(0x5800, 0x5800) AM_READNOP AM_WRITE(harem_nmi_mask_w)
+	AM_RANGE(0x5800, 0x5800) AM_READNOP AM_WRITE(harem_nmi_mask_w) // or is nmi mask 5801 like other games?
 	AM_RANGE(0x5801, 0x5807) AM_WRITENOP
 	AM_RANGE(0x6101, 0x6101) AM_READ_PORT("IN0")
 	AM_RANGE(0x6102, 0x6102) AM_READ_PORT("IN1")
-	AM_RANGE(0x6103, 0x6103) AM_WRITENOP
-	AM_RANGE(0x6200, 0x6203) AM_WRITENOP AM_SHARE("attributesram")
+	AM_RANGE(0x6103, 0x6103) AM_WRITENOP // 6100-6103 should be a 8255 ppi
+	AM_RANGE(0x6200, 0x6203) AM_WRITENOP AM_SHARE("attributesram") // 6200-6203 a 2nd 8255 chip
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xffe6, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -2956,6 +2956,8 @@ ROM_START( harem )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "p0_ic85.bin",  0x0000, 0x2000, CRC(4521b753) SHA1(9033f9c3be8fec1e5ff251e9f60faaf3848a1a1e) )
 	ROM_LOAD( "p1_ic87.bin",  0x8000, 0x2000, BAD_DUMP CRC(3cc5d1e8) SHA1(827e2d20de2a00ec016ead249ed3afdccd0c856c) ) // encrypted?
+	// looks like a bitswap on data, call addresses from $0000-$1fff to here tell that $99 is near certainly $c9(ret)
+	// Other values with a pretty good chance: $40 is $10(djnz), $dd is $dd(ix prefix)
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "s1_ic12.bin",  0x0000, 0x2000, CRC(b54799dd) SHA1(b6aeb010257cba48a52afd33b4f8031c7d99550c) )
