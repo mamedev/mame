@@ -10,7 +10,6 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
   * Due to OS & hardware differences the following programs will only run on the CoCo 3: -
 
     - A Mazing World of Malcom Mortar
-    - Alphabet Zoo
     - Castle of Tharoggad
     - GFL Championship Football II
     - RAD Warrior
@@ -21,7 +20,6 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
     - Springster
     - Super Pitfall
     - Thexder
-    - TypeMate
 
   * Missing/Undumped Cartridges
 
@@ -36,35 +34,37 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 	- Color File II		26-3110	(1986)
 	- Color Term Plus			(1983)
 	- ColorCom/E
-	- Predator			26-3165	(1989)	CoCo 3 Only
 	- Astroblast						Dragon only
 
-  * These ROM's Appear to have been dumped from RAM and have been marked as "Bad Dumps"
+  * These ROMs appear to have been dumped from RAM and have been marked as "Bad Dumps"
 
-	- Alphabet Zoo
-	- FORTH
+	- Alphabet Zoo  proper size is 16K, not dumped from RAM
 	- Demon Attack
-	- Doodle Bug
+	- Doodle Bug    pad to 16K works fine.. obviously different version from other alts
 	- Dragon Fire
-	- JDOS v1.23
-	- Spectaculator
+	- JDOS v1.23    overdumped, trim to 8K works fine
+	- Spectaculator proper dump is 8K
 	- Cumana DOS v2.0
+	
+  * Notes: Mindroll, Robocop and Predator all have banking.
+           (see https://archive.org/stream/rainbowmagazine-1990-06/The_Rainbow_Magazine_06_1990#page/n59/mode/1up
+           for technique for the latter two)
+           Mindroll selects based on detecting CoCo1/2 or 3
 -->
 <softwarelist name="coco_cart" description="Tandy Radio Shack Color Computer cartridges">
 
-	<!--software name="alphazoo">
+	<software name="alphazoo">
 		<description>Alphabet Zoo</description>
 		<year>1984</year>
 		<publisher>Tandy</publisher>
 		<info name="developer" value="Spinnaker" />
 		<info name="serial" value="26-3170" />
-		<info name="usage" value="CoCo 3 Only" />
 		<part name="cart" interface="coco_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="alphabet zoo (1984)(26-3170)(spinnaker).rom" size="32768" crc="a8a83f53" sha1="b6c8048549c60909c6a9e8e808df342d6491eae2" status="baddump" offset="0" />
+			<dataarea name="rom" size="16384">
+				<rom name="alphabet zoo (1984)(26-3170)(spinnaker).rom" size="16384" crc="dae0e23d" sha1="f27b97b81eccd0314f71894cbd2e0aed7ccab525" offset="0" />
 			</dataarea>
 		</part>
-	</software-->
+	</software>
 
 	<software name="amazing">
 		<description>A Mazing World of Malcom Mortar</description>
