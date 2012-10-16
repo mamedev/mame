@@ -44,9 +44,14 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	UINT8 m_bank;
+	UINT8 m_irq_src;
 
 	DECLARE_READ8_MEMBER(bank_r);
 	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_READ8_MEMBER(irq_source_r);
+	DECLARE_WRITE8_MEMBER(irq_source_w);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_irq_scanline);
 
 protected:
 	// driver_device overrides
@@ -78,6 +83,16 @@ WRITE8_MEMBER( dblcrown_state::bank_w)
 	membank("rom_bank")->set_entry(m_bank & 0x1f);
 }
 
+READ8_MEMBER( dblcrown_state::irq_source_r)
+{
+	return m_irq_src;
+}
+
+WRITE8_MEMBER( dblcrown_state::irq_source_w)
+{
+	m_irq_src = data; // this effectively acks the irq, by writing 0
+}
+
 
 static ADDRESS_MAP_START( dblcrown_map, AS_PROGRAM, 8, dblcrown_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -89,8 +104,11 @@ static ADDRESS_MAP_START( dblcrown_map, AS_PROGRAM, 8, dblcrown_state )
 	AM_RANGE(0xc800, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM // vram
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_le_w) AM_SHARE("paletteram") // TODO: correct bit order
-	AM_RANGE(0xfe00, 0xfeff) AM_RAM // ??? - both of these seems TC0091LVC-ish ...
-	AM_RANGE(0xff00, 0xffff) AM_RAM // ??? /
+	AM_RANGE(0xfe00, 0xfeff) AM_RAM // ???
+	// 0xff00 - 0xff01 RAM banks for 0xd000
+	AM_RANGE(0xff04, 0xff04) AM_READWRITE(irq_source_r,irq_source_w)
+
+	AM_RANGE(0xff00, 0xffff) AM_RAM // ???, intentional fall-through
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dblcrown_io, AS_IO, 8, dblcrown_state )
@@ -188,13 +206,32 @@ void dblcrown_state::palette_init()
 {
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_state::dblcrown_irq_scanline)
+{
+	int scanline = param;
+
+	if (scanline == 240)
+	{
+		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_irq_src = 2;
+	}
+
+	/* TODO: unknown source */
+	if (scanline == 0)
+	{
+		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_irq_src = 4;
+	}
+}
+
+
 static MACHINE_CONFIG_START( dblcrown, dblcrown_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(dblcrown_map)
 	MCFG_CPU_IO_MAP(dblcrown_io)
-	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dblcrown_state, dblcrown_irq_scanline, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
