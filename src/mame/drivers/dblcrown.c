@@ -9,6 +9,7 @@
 	  it's just sloppy code?)
 	- Bogus "Hole" in main screen display
 	- Is the background pen really black?
+	- Lots of unmapped I/Os (game doesn't make much use of the HW)
 
 ============================================================================
 	Excellent System
@@ -119,7 +120,7 @@ UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	{
 		for (x=0;x<64;x++)
 		{
-			UINT16 tile = m_vram[count];
+			UINT16 tile = ((m_vram[count])|(m_vram[count+1]<<8)) & 0xfff;
 			UINT8 col = 0x10; // TODO
 
 			drawgfx_transpen(bitmap,cliprect,gfx,tile,col,0,0,x*8,y*8,0);
