@@ -918,12 +918,12 @@ READ8_MEMBER(fidelz80_state::exp_i8243_p2_r)
 	if (m_kp_matrix & 0x80)
 		data &= ioport("LINE8")->read();
 
-	return (m_i8243->i8243_p2_r(offset)&0x0f) | (data&0xf0);
+	return (m_i8243->i8243_p2_r(space, offset)&0x0f) | (data&0xf0);
 }
 
 WRITE8_MEMBER(fidelz80_state::exp_i8243_p2_w)
 {
-	m_i8243->i8243_p2_w(offset, data&0x0f);
+	m_i8243->i8243_p2_w(space, offset, data&0x0f);
 }
 
 // probably related to the card scanner
@@ -941,28 +941,26 @@ READ8_MEMBER(fidelz80_state::rand_r)
     I8243 expander
 ******************************************************************************/
 
-static WRITE8_DEVICE_HANDLER( digit_w )
+WRITE8_MEMBER(fidelz80_state::digit_w)
 {
-	fidelz80_state *state = space.machine().driver_data<fidelz80_state>();
-
-	if (state->m_digit_line_status[offset])
+	if (m_digit_line_status[offset])
 		return;
 
-	state->m_digit_line_status[offset&3] = 1;
+	m_digit_line_status[offset&3] = 1;
 
 	switch (offset)
 	{
 	case 0:
-		state->m_digit_data = (state->m_digit_data&(~0x000f)) | ((data<<0)&0x000f);
+		m_digit_data = (m_digit_data&(~0x000f)) | ((data<<0)&0x000f);
 		break;
 	case 1:
-		state->m_digit_data = (state->m_digit_data&(~0x00f0)) | ((data<<4)&0x00f0);
+		m_digit_data = (m_digit_data&(~0x00f0)) | ((data<<4)&0x00f0);
 		break;
 	case 2:
-		state->m_digit_data = (state->m_digit_data&(~0x0f00)) | ((data<<8)&0x0f00);
+		m_digit_data = (m_digit_data&(~0x0f00)) | ((data<<8)&0x0f00);
 		break;
 	case 3:
-		state->m_digit_data = (state->m_digit_data&(~0xf000)) | ((data<<12)&0xf000);
+		m_digit_data = (m_digit_data&(~0xf000)) | ((data<<12)&0xf000);
 		break;
 	}
 }
@@ -1072,7 +1070,7 @@ static ADDRESS_MAP_START(abc_mcu_io, AS_IO, 8, fidelz80_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(kp_matrix_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(exp_i8243_p2_r, exp_i8243_p2_w)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE_LEGACY("i8243", i8243_prog_w)
+	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("i8243", i8243_device, i8243_prog_w)
 
 	// related to the card scanner, probably clock and data optical
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(unknown_r)
@@ -1358,7 +1356,7 @@ static MACHINE_CONFIG_START( abc, fidelz80_state )
 	MCFG_CPU_ADD("mcu", I8041, XTAL_5MHz) // 5MHz
 	MCFG_CPU_IO_MAP(abc_mcu_io)
 
-	MCFG_I8243_ADD("i8243", NULL, digit_w)
+	MCFG_I8243_ADD("i8243", NOOP, WRITE8(fidelz80_state,digit_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )

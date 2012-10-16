@@ -90,6 +90,7 @@ public:
 	DECLARE_READ8_MEMBER(n7751_command_r);
 	DECLARE_READ8_MEMBER(n7751_t1_r);
 	DECLARE_WRITE8_MEMBER(n7751_p2_w);
+	DECLARE_WRITE8_MEMBER(n7751_rom_control_w);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void palette_init();
@@ -250,10 +251,8 @@ static ADDRESS_MAP_START( audio_portmap, AS_IO, 8, othello_state )
 	AM_RANGE(0x08, 0x08) AM_WRITE(ay_select_w)
 ADDRESS_MAP_END
 
-static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
+WRITE8_MEMBER(othello_state::n7751_rom_control_w)
 {
-	othello_state *state = space.machine().driver_data<othello_state>();
-
 	/* P4 - address lines 0-3 */
 	/* P5 - address lines 4-7 */
 	/* P6 - address lines 8-11 */
@@ -261,25 +260,25 @@ static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 	switch (offset)
 	{
 		case 0:
-			state->m_sound_addr = (state->m_sound_addr & ~0x00f) | ((data & 0x0f) << 0);
+			m_sound_addr = (m_sound_addr & ~0x00f) | ((data & 0x0f) << 0);
 			break;
 
 		case 1:
-			state->m_sound_addr = (state->m_sound_addr & ~0x0f0) | ((data & 0x0f) << 4);
+			m_sound_addr = (m_sound_addr & ~0x0f0) | ((data & 0x0f) << 4);
 			break;
 
 		case 2:
-			state->m_sound_addr = (state->m_sound_addr & ~0xf00) | ((data & 0x0f) << 8);
+			m_sound_addr = (m_sound_addr & ~0xf00) | ((data & 0x0f) << 8);
 			break;
 
 		case 3:
-			state->m_sound_addr &= 0xfff;
+			m_sound_addr &= 0xfff;
 			{
 
-				if (!BIT(data, 0)) state->m_sound_addr |= 0x0000;
-				if (!BIT(data, 1)) state->m_sound_addr |= 0x1000;
-				if (!BIT(data, 2)) state->m_sound_addr |= 0x2000;
-				if (!BIT(data, 3)) state->m_sound_addr |= 0x3000;
+				if (!BIT(data, 0)) m_sound_addr |= 0x0000;
+				if (!BIT(data, 1)) m_sound_addr |= 0x1000;
+				if (!BIT(data, 2)) m_sound_addr |= 0x2000;
+				if (!BIT(data, 3)) m_sound_addr |= 0x3000;
 			}
 			break;
 	}
@@ -297,10 +296,10 @@ READ8_MEMBER(othello_state::n7751_command_r)
 
 WRITE8_MEMBER(othello_state::n7751_p2_w)
 {
-	device_t *device = machine().device("n7751_8243");
+	i8243_device *device = machine().device<i8243_device>("n7751_8243");
 
 	/* write to P2; low 4 bits go to 8243 */
-	i8243_p2_w(device, space, offset, data & 0x0f);
+	device->i8243_p2_w(space, offset, data & 0x0f);
 
 	/* output of bit $80 indicates we are ready (1) or busy (0) */
 	/* no other outputs are used */
@@ -319,7 +318,7 @@ static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8, othello_state )
 	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ(n7751_rom_r)
 	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_WRITE(n7751_p2_w)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE_LEGACY("n7751_8243", i8243_prog_w)
+	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("n7751_8243", i8243_device, i8243_prog_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( othello )
@@ -426,7 +425,7 @@ static MACHINE_CONFIG_START( othello, othello_state )
 	MCFG_CPU_ADD("n7751", N7751, XTAL_6MHz)
 	MCFG_CPU_IO_MAP(n7751_portmap)
 
-	MCFG_I8243_ADD("n7751_8243", NULL, n7751_rom_control_w)
+	MCFG_I8243_ADD("n7751_8243", NOOP, WRITE8(othello_state,n7751_rom_control_w))
 
 
 	/* video hardware */

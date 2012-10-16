@@ -91,7 +91,6 @@ public:
 	DECLARE_WRITE8_MEMBER( n7751_command_w );
 	DECLARE_WRITE8_MEMBER( n7751_control_w );
 	DECLARE_WRITE8_MEMBER( n7751_rom_offset_w );
-	static DECLARE_WRITE8_DEVICE_HANDLER( static_n7751_rom_offset_w );
 
 	// N7751 sound generator CPU read/write handlers
 	DECLARE_READ8_MEMBER( n7751_rom_r );

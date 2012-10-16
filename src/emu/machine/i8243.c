@@ -24,55 +24,11 @@ const device_type I8243 = &device_creator<i8243_device>;
 //-------------------------------------------------
 
 i8243_device::i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, I8243, "I8243", tag, owner, clock)
+    : device_t(mconfig, I8243, "I8243", tag, owner, clock),
+	  m_readhandler(*this),
+	  m_writehandler(*this)
 {
-
 }
-
-
-//-------------------------------------------------
-//  static_set_read_handler - configuration helper
-//  to set the read handler
-//-------------------------------------------------
-
-void i8243_device::static_set_read_handler(device_t &device, read8_device_func callback)
-{
-	i8243_device &i8243 = downcast<i8243_device &>(device);
-	if(callback != NULL)
-	{
-		i8243.m_readhandler_cb.type = DEVCB_TYPE_DEVICE;
-		i8243.m_readhandler_cb.index = 0;
-		i8243.m_readhandler_cb.tag = "";
-		i8243.m_readhandler_cb.readdevice = callback;
-	}
-	else
-	{
-		i8243.m_readhandler_cb.type = DEVCB_TYPE_NULL;
-	}
-}
-
-
-//-------------------------------------------------
-//  static_set_write_handler - configuration helper
-//  to set the write handler
-//-------------------------------------------------
-
-void i8243_device::static_set_write_handler(device_t &device, write8_device_func callback)
-{
-	i8243_device &i8243 = downcast<i8243_device &>(device);
-	if(callback != NULL)
-	{
-		i8243.m_writehandler_cb.type = DEVCB_TYPE_DEVICE;
-		i8243.m_writehandler_cb.index = 0;
-		i8243.m_writehandler_cb.tag = "";
-		i8243.m_writehandler_cb.writedevice = callback;
-	}
-	else
-	{
-		i8243.m_writehandler_cb.type = DEVCB_TYPE_NULL;
-	}
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -80,8 +36,8 @@ void i8243_device::static_set_write_handler(device_t &device, write8_device_func
 
 void i8243_device::device_start()
 {
-	m_readhandler.resolve(m_readhandler_cb, *this);
-	m_writehandler.resolve(m_writehandler_cb, *this);
+	m_readhandler.resolve_safe(0);
+	m_writehandler.resolve_safe();
 }
 
 
@@ -101,7 +57,7 @@ void i8243_device::device_reset()
     i8243_p2_r - handle a read from port 2
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER_TRAMPOLINE(i8243, i8243_p2_r)
+READ8_MEMBER(i8243_device::i8243_p2_r)
 {
 	return m_p2out;
 }
@@ -111,7 +67,7 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(i8243, i8243_p2_r)
     i8243_p2_r - handle a write to port 2
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER_TRAMPOLINE(i8243, i8243_p2_w)
+WRITE8_MEMBER(i8243_device::i8243_p2_w)
 {
 	m_p2 = data & 0x0f;
 }
@@ -122,7 +78,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(i8243, i8243_p2_w)
     line state
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER_TRAMPOLINE(i8243, i8243_prog_w)
+WRITE8_MEMBER(i8243_device::i8243_prog_w)
 {
 	/* only care about low bit */
 	data &= 1;
@@ -150,17 +106,17 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(i8243, i8243_prog_w)
 		{
 			case MCS48_EXPANDER_OP_WRITE:
 				m_p[m_opcode & 3] = m_p2 & 0x0f;
-				m_writehandler(m_opcode & 3, m_p[m_opcode & 3]);
+				m_writehandler((UINT8)(m_opcode & 3), (UINT8)(m_p[m_opcode & 3]));
 				break;
 
 			case MCS48_EXPANDER_OP_OR:
 				m_p[m_opcode & 3] |= m_p2 & 0x0f;
-				m_writehandler(m_opcode & 3, m_p[m_opcode & 3]);
+				m_writehandler((UINT8)(m_opcode & 3), (UINT8)(m_p[m_opcode & 3]));
 				break;
 
 			case MCS48_EXPANDER_OP_AND:
 				m_p[m_opcode & 3] &= m_p2 & 0x0f;
-				m_writehandler(m_opcode & 3, m_p[m_opcode & 3]);
+				m_writehandler((UINT8)(m_opcode & 3), (UINT8)(m_p[m_opcode & 3]));
 				break;
 		}
 	}

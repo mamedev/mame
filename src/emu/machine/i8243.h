@@ -27,11 +27,11 @@
 	MCFG_I8243_READHANDLER(_read) \
 	MCFG_I8243_WRITEHANDLER(_write) \
 
-#define MCFG_I8243_READHANDLER(_read) \
-	i8243_device::static_set_read_handler(*device, _read); \
+#define MCFG_I8243_READHANDLER(_devcb) \
+	devcb = &i8243_device::set_read_handler(*device, DEVCB2_##_devcb); \
 
-#define MCFG_I8243_WRITEHANDLER(_write) \
-	i8243_device::static_set_write_handler(*device, _write); \
+#define MCFG_I8243_WRITEHANDLER(_devcb) \
+	devcb = &i8243_device::set_write_handler(*device, DEVCB2_##_devcb); \
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -46,15 +46,14 @@ public:
     // construction/destruction
     i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// inline configuration helpers
-	static void static_set_read_handler(device_t &device, read8_device_func callback);
-	static void static_set_write_handler(device_t &device, write8_device_func callback);
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_read_handler(device_t &device, _Object object) { return downcast<i8243_device &>(device).m_readhandler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_write_handler(device_t &device, _Object object) { return downcast<i8243_device &>(device).m_writehandler.set_callback(object); }
+ 
+	DECLARE_READ8_MEMBER(i8243_p2_r);
+	DECLARE_WRITE8_MEMBER(i8243_p2_w);
 
-
-	UINT8 i8243_p2_r(UINT32 offset);
-	void i8243_p2_w(UINT32 offset, UINT8 data);
-
-	void i8243_prog_w(UINT32 offset, UINT8 data);
+	DECLARE_WRITE8_MEMBER(i8243_prog_w);
 
 protected:
     // device-level overrides
@@ -71,27 +70,12 @@ private:
 	UINT8		m_opcode;			/* latched opcode */
 	UINT8		m_prog;				/* previous PROG state */
 
-	devcb_read8		m_readhandler_cb;
-	devcb_write8	m_writehandler_cb;
-
-	devcb_resolved_read8	m_readhandler;
-	devcb_resolved_write8	m_writehandler;
+	devcb2_read8	m_readhandler;
+	devcb2_write8	m_writehandler;
 };
 
 
 // device type definition
 extern const device_type I8243;
-
-
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-DECLARE_READ8_DEVICE_HANDLER( i8243_p2_r );
-DECLARE_WRITE8_DEVICE_HANDLER( i8243_p2_w );
-
-DECLARE_WRITE8_DEVICE_HANDLER( i8243_prog_w );
-
 
 #endif  /* __I8243_H__ */

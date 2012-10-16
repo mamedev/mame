@@ -66,6 +66,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(fidelz80_trigger_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(abc_trigger_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
+	
+	DECLARE_WRITE8_MEMBER(digit_w);
 };
 
 
