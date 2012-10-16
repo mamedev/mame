@@ -439,6 +439,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/cloak.o $(VIDEO)/cloak.o \
 	$(DRIVERS)/cloud9.o $(VIDEO)/cloud9.o \
 	$(DRIVERS)/cmmb.o \
+	$(DRIVERS)/cops.o \
 	$(DRIVERS)/copsnrob.o $(AUDIO)/copsnrob.o $(VIDEO)/copsnrob.o \
 	$(DRIVERS)/cyberbal.o $(AUDIO)/cyberbal.o $(VIDEO)/cyberbal.o \
 	$(DRIVERS)/destroyr.o \
@@ -2048,6 +2049,8 @@ $(DRIVERS)/cischeat.o:	$(LAYOUT)/cischeat.lh \
 
 $(DRIVERS)/circus.o:	$(LAYOUT)/circus.lh \
 			$(LAYOUT)/crash.lh
+
+$(DRIVERS)/cops.o:		$(LAYOUT)/cops.lh
 
 $(DRIVERS)/copsnrob.o:	$(LAYOUT)/copsnrob.lh
 
