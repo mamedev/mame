@@ -46,7 +46,6 @@ WRITE8_MEMBER(sidearms_state::sidearms_bankswitch_w)
 	int bankaddress;
 	UINT8 *RAM = memregion("maincpu")->base();
 
-
 	/* bits 0 and 1 select the ROM bank */
 	bankaddress = 0x10000 + (data & 0x0f) * 0x4000;
 	membank("bank1")->set_base(&RAM[bankaddress]);
@@ -634,7 +633,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 WRITE_LINE_MEMBER( sidearms_state::irqhandler )
 {
-	subdevice("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -714,7 +713,6 @@ static MACHINE_CONFIG_START( turtship, sidearms_state )
 	MCFG_GFXDECODE(turtship)
 	MCFG_PALETTE_LENGTH(1024)
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -759,7 +757,6 @@ static MACHINE_CONFIG_START( whizz, sidearms_state )
 
 	MCFG_GFXDECODE(turtship)
 	MCFG_PALETTE_LENGTH(1024)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1138,25 +1135,21 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sidearms_state,sidearms)
 {
-
 	m_gameid = 0;
 }
 
 DRIVER_INIT_MEMBER(sidearms_state,turtship)
 {
-
 	m_gameid = 1;
 }
 
 DRIVER_INIT_MEMBER(sidearms_state,dyger)
 {
-
 	m_gameid = 2;
 }
 
 DRIVER_INIT_MEMBER(sidearms_state,whizz)
 {
-
 	m_gameid = 3;
 }
 
