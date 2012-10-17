@@ -2012,6 +2012,7 @@ void a2600_state::machine_reset()
 		break;
 
 	case modeDPC:
+		m_current_reset_bank_counter = 0;
 		install_banks(1, 0x0000);
 		break;
 
