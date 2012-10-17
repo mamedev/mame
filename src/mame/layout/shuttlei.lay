@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <mamelayout version="2">
 	<element name="overlay">
 		<rect>
@@ -13,6 +14,7 @@
 			<color red="1" green="0.125" blue="0.125" />
 		</rect>
 	</element>
+
 	<view name="Color_Overlay">
 		<screen index="0">
 			<bounds x="0" y="0" width="3" height="4" />
