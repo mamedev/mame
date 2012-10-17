@@ -15,7 +15,9 @@
 	- at POST the SW tries to write to the palette RAM in a banking fashion.
 	  I think it's just an HW left-over.
 	- there are various bogus checks to ROM region throughout the whole SW
-	  (0x0030-0x0031? O.o)
+	  (0x0030-0x0033? O.o), trying to change the values of these ones changes
+	  the functionality of the game, almost like that the DSWs are tied to
+	  these ...
 
 ============================================================================
 	Excellent System
@@ -589,6 +591,7 @@ MACHINE_CONFIG_END
 ROM_START( dblcrown )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD("1.u33", 0x00000, 0x40000, CRC(5df95a9c) SHA1(799333206089989c25ff9f167363073d4cf64bd2) )
+//	ROM_FILL( 0x0030, 4, 0xff )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD("2.u43", 0x00000, 0x80000, CRC(58200bd4) SHA1(2795cfc41056111f66bfb82916343d1c733baa83) )
