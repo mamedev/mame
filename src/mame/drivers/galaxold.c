@@ -762,45 +762,6 @@ static ADDRESS_MAP_START( ozon1_io_map, AS_IO, 8, galaxold_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(galaxold_state::harem_nmi_mask_w)
-{
-
-	m_nmi_mask = data & 1;
-}
-
-static ADDRESS_MAP_START( harem_cpu1, AS_PROGRAM, 8, galaxold_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4fff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x5000) AM_WRITENOP
-	AM_RANGE(0x5800, 0x5800) AM_READNOP AM_WRITE(harem_nmi_mask_w) // or is nmi mask 5801 like other games?
-	AM_RANGE(0x5801, 0x5807) AM_WRITENOP
-	AM_RANGE(0x6101, 0x6101) AM_READ_PORT("IN0")
-	AM_RANGE(0x6102, 0x6102) AM_READ_PORT("IN1")
-	AM_RANGE(0x6103, 0x6103) AM_WRITENOP // 6100-6103 should be a 8255 ppi
-	AM_RANGE(0x6200, 0x6203) AM_WRITENOP AM_SHARE("attributesram") // 6200-6203 a 2nd 8255 chip
-	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xffe6, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( harem_cpu2, AS_PROGRAM, 8, galaxold_state )
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_WRITENOP
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( harem_cpu2_io, AS_IO, 8, galaxold_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("ay3", ay8910_address_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("ay3", ay8910_data_w)
-	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( hunchbkg, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1480, 0x14bf) AM_MIRROR(0x6000) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
@@ -1727,61 +1688,6 @@ static INPUT_PORTS_START( ladybugg )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( harem )
-	PORT_START("IN0")//Change tag when major usage uncovered.
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
-
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
-INPUT_PORTS_END
-
-
 static INPUT_PORTS_START( hunchbkg )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -2384,41 +2290,6 @@ static MACHINE_CONFIG_DERIVED( hunchbkg, galaxold_base )
 	MCFG_FRAGMENT_ADD(galaxian_audio)
 MACHINE_CONFIG_END
 
-INTERRUPT_GEN_MEMBER(galaxold_state::vblank_irq)
-{
-
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-static MACHINE_CONFIG_DERIVED( harem, galaxold_base )
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(harem_cpu1)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  vblank_irq)
-
-	MCFG_CPU_ADD("audiocpu", Z80, 1620000) //?
-	MCFG_CPU_PROGRAM_MAP(harem_cpu2)
-	MCFG_CPU_IO_MAP(harem_cpu2_io)
-
-	MCFG_MACHINE_RESET(0)
-
-	MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,rockclim)
-	MCFG_PALETTE_LENGTH(32)
-
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,galaxold_plain)
-
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000) //?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33/3)
-
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000) //?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33/3)
-
-	MCFG_SOUND_ADD("ay3", AY8910, 2000000) //?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33/3)
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_DERIVED( tazzmang, galaxian )
 
 	/* basic machine hardware */
@@ -2952,28 +2823,6 @@ ROM_START( vstars )
 	ROM_LOAD( "k.bin",     0x0000, 0x0020, CRC(d46ed869) SHA1(9c0a11df11b1a24ee933d1aa435337b78c3ca643) )
 ROM_END
 
-ROM_START( harem )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "p0_ic85.bin",  0x0000, 0x2000, CRC(4521b753) SHA1(9033f9c3be8fec1e5ff251e9f60faaf3848a1a1e) )
-	ROM_LOAD( "p1_ic87.bin",  0x8000, 0x2000, BAD_DUMP CRC(3cc5d1e8) SHA1(827e2d20de2a00ec016ead249ed3afdccd0c856c) ) // encrypted?
-	// looks like a bitswap on data, call addresses from $0000-$1fff to here tell that $99 is near certainly $c9(ret)
-	// Other values with a pretty good chance: $40 is $10(djnz), $dd is $dd(ix prefix)
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "s1_ic12.bin",  0x0000, 0x2000, CRC(b54799dd) SHA1(b6aeb010257cba48a52afd33b4f8031c7d99550c) )
-	ROM_LOAD( "s2_ic13.bin",  0x2000, 0x1000, CRC(2d5573a4) SHA1(1fdcd99d89e078509634742b2116a35bb199fe4b) )
-
-	ROM_REGION( 0x2000, "unknown", 0 ) /* TMS-based ROM? */
-	ROM_LOAD( "a1_ic25.bin",  0x0000, 0x2000, CRC(279f923a) SHA1(166b1b625997766f0de7cc18af52c42268022fcb) )
-
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "m0_ic36.bin",  0x0000, 0x2000, CRC(64b3c6d6) SHA1(e71092585f7ffdae85b2a4c9add1bc71e5a608a8) )
-	ROM_LOAD( "m1_ic37.bin",  0x2000, 0x2000, CRC(cb0324fb) SHA1(61612f683810339d5d5f31daa4c475d0338d446f) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "harem.clr",    0x0000, 0x0020, CRC(c9a2bf73) SHA1(dad65ebf43a5df147e334afd552e67f5fcd26df7) )
-ROM_END
-
 ROM_START( hunchbkg )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "gal_hb_1",     0x0000, 0x0800, CRC(46590e9b) SHA1(5d26578c91adec20d8d8a17d5dade9ef2febcbe5) )
@@ -3230,7 +3079,6 @@ GAME( 1983, bongo,    0,        bongo,    bongo, driver_device,    0,	      ROT9
 GAME( 1983, ozon1,    0,        ozon1,    ozon1, driver_device,    0,	      ROT90,  "Proma", "Ozon I", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1983, ladybugg, ladybug,  batman2,  ladybugg, galaxold_state, ladybugg, ROT270, "bootleg", "Lady Bug (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1982, vstars,   0,        mooncrst, porter, driver_device,   0,        ROT90,  "Competitive Video?", "Video Stars", GAME_NOT_WORKING )
-GAME( 1983, harem,    0,        harem,    harem, driver_device,    0,        ROT90,  "I.G.R.", "Harem", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 /* S2650 games */
 GAME( 1983, hunchbkg, hunchbak,	hunchbkg, hunchbkg, driver_device, 0,        ROT90,  "Century Electronics", "Hunchback (Galaxian hardware)", GAME_SUPPORTS_SAVE )

@@ -58,6 +58,32 @@ static ADDRESS_MAP_START( scramble_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x8200, 0x8203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 ADDRESS_MAP_END
 
+READ8_MEMBER(scramble_state::scramble_soundram_r)
+{
+	return m_soundram[offset & 0x03ff];
+}
+
+WRITE8_MEMBER(scramble_state::scramble_soundram_w)
+{
+	m_soundram[offset & 0x03ff] = data;
+}
+
+static ADDRESS_MAP_START( scramble_sound_map, AS_PROGRAM, 8, scramble_state )
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(scramble_soundram_r, scramble_soundram_w)
+	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_SHARE("soundram")  /* only here to initialize pointer */
+	AM_RANGE(0x9000, 0x9fff) AM_WRITE(scramble_filter_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( scramble_sound_io_map, AS_IO, 8, scramble_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("8910.1", ay8910_address_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_LEGACY("8910.1", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("8910.2", ay8910_address_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_LEGACY("8910.2", ay8910_r, ay8910_data_w)
+ADDRESS_MAP_END
+
+
 
 static ADDRESS_MAP_START( turpins_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
@@ -89,6 +115,8 @@ static ADDRESS_MAP_START( turpins_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0xf000, 0xffff) AM_READONLY
 ADDRESS_MAP_END
 
+
+
 static ADDRESS_MAP_START( ckongs_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
@@ -105,6 +133,7 @@ static ADDRESS_MAP_START( ckongs_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0xa807, 0xa807) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
+
 
 
 READ8_MEMBER(scramble_state::mars_ppi8255_0_r)
@@ -149,6 +178,7 @@ static ADDRESS_MAP_START( mars_map, AS_PROGRAM, 8, scramble_state )
 ADDRESS_MAP_END
 
 
+
 static ADDRESS_MAP_START( newsin7_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
@@ -171,6 +201,7 @@ static ADDRESS_MAP_START( newsin7_map, AS_PROGRAM, 8, scramble_state )
 ADDRESS_MAP_END
 
 
+
 static ADDRESS_MAP_START( mrkougar_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
@@ -189,6 +220,7 @@ static ADDRESS_MAP_START( mrkougar_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x8100, 0x810f) AM_READWRITE(mars_ppi8255_0_r, mars_ppi8255_0_w)
 	AM_RANGE(0x8200, 0x820f) AM_READWRITE(mars_ppi8255_1_r, mars_ppi8255_1_w)
 ADDRESS_MAP_END
+
 
 
 static ADDRESS_MAP_START( hotshock_map, AS_PROGRAM, 8, scramble_state )
@@ -215,6 +247,7 @@ static ADDRESS_MAP_START( hotshock_map, AS_PROGRAM, 8, scramble_state )
 ADDRESS_MAP_END
 
 
+
 static ADDRESS_MAP_START( hunchbks_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1210, 0x1213) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
@@ -238,6 +271,7 @@ static ADDRESS_MAP_START( hunchbks_map, AS_PROGRAM, 8, scramble_state )
 ADDRESS_MAP_END
 
 
+
 static ADDRESS_MAP_START( mimonscr_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w)	/* mirror address?, probably not */
@@ -256,6 +290,7 @@ static ADDRESS_MAP_START( mimonscr_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x8200, 0x8203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
+
 
 
 static ADDRESS_MAP_START( ad2083_map, AS_PROGRAM, 8, scramble_state )
@@ -285,6 +320,7 @@ static ADDRESS_MAP_START( ad2083_map, AS_PROGRAM, 8, scramble_state )
 ADDRESS_MAP_END
 
 
+
 static ADDRESS_MAP_START( triplep_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
@@ -303,7 +339,6 @@ static ADDRESS_MAP_START( triplep_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x8100, 0x8103) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( triplep_io_map, AS_IO, 8, scramble_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("8910.1", ay8910_data_address_w)
@@ -320,6 +355,8 @@ static ADDRESS_MAP_START( hotshock_sound_io_map, AS_IO, 8, scramble_state )
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("8910.2", ay8910_address_w)
 ADDRESS_MAP_END
 
+
+
 READ8_MEMBER(scramble_state::hncholms_prot_r)
 {
 	if(space.device().safe_pc() == 0x2b || space.device().safe_pc() == 0xa27)
@@ -332,6 +369,47 @@ static ADDRESS_MAP_START( hunchbks_readport, AS_IO, 8, scramble_state )
 	AM_RANGE(0x00, 0x00) AM_READ(hncholms_prot_r)
     AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
+
+
+
+static ADDRESS_MAP_START( harem_map, AS_PROGRAM, 8, scramble_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+	AM_RANGE(0x4800, 0x4fff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x5000, 0x5000) AM_WRITENOP
+	AM_RANGE(0x5800, 0x5800) AM_READ(watchdog_reset_r) AM_WRITE(galaxold_nmi_enable_w) // or is nmi mask 5801 like other games?
+	AM_RANGE(0x5801, 0x5807) AM_WRITENOP
+	AM_RANGE(0x6100, 0x6103) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x6200, 0x6203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0x8000, 0x9fff) AM_ROM
+
+	// placeholders
+	AM_RANGE(0xff00, 0xff3f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
+	AM_RANGE(0xff40, 0xff5f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xff60, 0xff7f) AM_RAM AM_SHARE("bulletsram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( harem_sound_map, AS_PROGRAM, 8, scramble_state )
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_RAM
+	AM_RANGE(0xa000, 0xa000) AM_WRITENOP
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( harem_sound_io_map, AS_IO, 8, scramble_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("8910.1", ay8910_address_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE_LEGACY("8910.1", ay8910_data_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("8910.2", ay8910_address_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("8910.2", ay8910_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("8910.3", ay8910_address_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("8910.3", ay8910_data_w)
+	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)
+ADDRESS_MAP_END
+
+
+
+/**************************************************************************/
 
 static INPUT_PORTS_START( scramble )
 	PORT_START("IN0")
@@ -506,7 +584,6 @@ CUSTOM_INPUT_MEMBER(scramble_state::ckongs_coinage_r)
 	int bit_mask = (FPTR)param;
 	return (ioport("FAKE")->read() & bit_mask) ? 0x01 : 0x00;
 }
-
 
 static INPUT_PORTS_START( ckongs )
 	PORT_START("IN0")
@@ -1065,6 +1142,114 @@ static INPUT_PORTS_START( ad2083 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( harem )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+
+/**************************************************************************/
+
+static const gfx_layout scramble_charlayout =
+{
+	8,8,
+	RGN_FRAC(1,2),
+	2,
+	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+static const gfx_layout scramble_spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,2),
+	2,
+	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
+			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
+	32*8
+};
+
 static const gfx_layout devilfsh_charlayout =
 {
 	8,8,	/* 8*8 characters */
@@ -1156,6 +1341,10 @@ static const gfx_layout ad2083_spritelayout =
 	32*8	/* every sprite takes 32 consecutive bytes */
 };
 
+static GFXDECODE_START( scramble )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, scramble_charlayout,   0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, scramble_spritelayout, 0, 8 )
+GFXDECODE_END
 
 static GFXDECODE_START( devilfsh )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, devilfsh_charlayout,   0, 8 )
@@ -1261,60 +1450,8 @@ static const ay8910_interface triplep_ay8910_interface =
 };
 
 
-static const gfx_layout scramble_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,2),
-	2,
-	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-static const gfx_layout scramble_spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,2),
-	2,
-	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	32*8
-};
 
-static GFXDECODE_START( scramble )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, scramble_charlayout,   0, 8 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, scramble_spritelayout, 0, 8 )
-GFXDECODE_END
-
-
-
-READ8_MEMBER(scramble_state::scramble_soundram_r)
-{
-	return m_soundram[offset & 0x03ff];
-}
-
-WRITE8_MEMBER(scramble_state::scramble_soundram_w)
-{
-	m_soundram[offset & 0x03ff] = data;
-}
-
-static ADDRESS_MAP_START( scramble_sound_map, AS_PROGRAM, 8, scramble_state )
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(scramble_soundram_r, scramble_soundram_w)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_SHARE("soundram")  /* only here to initialize pointer */
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(scramble_filter_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( scramble_sound_io_map, AS_IO, 8, scramble_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("8910.1", ay8910_address_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_LEGACY("8910.1", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("8910.2", ay8910_address_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_LEGACY("8910.2", ay8910_r, ay8910_data_w)
-ADDRESS_MAP_END
+/**************************************************************************/
 
 static MACHINE_CONFIG_START( scramble, scramble_state )
 
@@ -1592,6 +1729,24 @@ static MACHINE_CONFIG_DERIVED( turpins, scramble )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(turpins_map)
 
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( harem, scramble )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(harem_map)
+
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(harem_sound_map)
+	MCFG_CPU_IO_MAP(harem_sound_io_map)
+
+	/* sound hardware */
+	MCFG_SOUND_MODIFY("8910.2")
+	MCFG_SOUND_CONFIG(triplep_ay8910_interface)
+
+	MCFG_SOUND_ADD("8910.3", AY8910, 14318000/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -2051,6 +2206,29 @@ ROM_START( turpins )
 	ROM_LOAD( "turtles.clr",     0x0000, 0x0020, CRC(f3ef02dd) SHA1(09fd795170d7d30f101d579f57553da5ff3800ab) )
 ROM_END
 
+ROM_START( harem )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "p0_ic85.bin",  0x0000, 0x2000, CRC(4521b753) SHA1(9033f9c3be8fec1e5ff251e9f60faaf3848a1a1e) )
+	ROM_LOAD( "p1_ic87.bin",  0x8000, 0x2000, BAD_DUMP CRC(3cc5d1e8) SHA1(827e2d20de2a00ec016ead249ed3afdccd0c856c) ) // encrypted?
+	// looks like a bitswap on data, call addresses from $0000-$1fff to here tell that $99 is near certainly $c9(ret)
+	// Other values with a pretty good chance: $40 is $10(djnz), $dd is $dd(ix prefix)
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "s1_ic12.bin",  0x0000, 0x2000, CRC(b54799dd) SHA1(b6aeb010257cba48a52afd33b4f8031c7d99550c) )
+	ROM_LOAD( "s2_ic13.bin",  0x2000, 0x1000, CRC(2d5573a4) SHA1(1fdcd99d89e078509634742b2116a35bb199fe4b) )
+
+	ROM_REGION( 0x2000, "unknown", 0 ) /* TMS-based ROM? */
+	ROM_LOAD( "a1_ic25.bin",  0x0000, 0x2000, CRC(279f923a) SHA1(166b1b625997766f0de7cc18af52c42268022fcb) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "m0_ic36.bin",  0x0000, 0x2000, CRC(64b3c6d6) SHA1(e71092585f7ffdae85b2a4c9add1bc71e5a608a8) )
+	ROM_LOAD( "m1_ic37.bin",  0x2000, 0x2000, CRC(cb0324fb) SHA1(61612f683810339d5d5f31daa4c475d0338d446f) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "harem.clr",    0x0000, 0x0020, CRC(c9a2bf73) SHA1(dad65ebf43a5df147e334afd552e67f5fcd26df7) )
+ROM_END
+
+
 GAME( 1982, triplep,  0,        triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "K.K. International", "Triple Punch", GAME_SUPPORTS_SAVE )
 GAME( 1982, knockout, triplep,  triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "bootleg? (KKK)", "Knock Out!! (bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mariner,  0,        mariner,  scramble, scramble_state, mariner,      ROT90, "Amenip", "Mariner", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
@@ -2072,3 +2250,4 @@ GAME( 1983, cavelon,  0,        cavelon,  cavelon,  scramble_state, cavelon,    
 GAME( 1982, mimonscr, mimonkey, mimonscr, mimonscr, scramble_state, mimonscr,     ROT90, "bootleg", "Mighty Monkey (bootleg on Scramble hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1983, ad2083,   0,        ad2083,   ad2083,   scramble_state, ad2083,       ROT90, "Midcoin", "A. D. 2083", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
 GAME( 1981, turpins,  turtles,  turpins,  turpins,  driver_device,  0,            ROT90, "bootleg", "Turpin (bootleg on Scramble hardware)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // haven't hooked up the sound CPU yet
+GAME( 1983, harem,    0,        harem,    harem,    scramble_state, harem,        ROT90, "I.G.R.", "Harem", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

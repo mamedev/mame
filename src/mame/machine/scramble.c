@@ -620,3 +620,7 @@ DRIVER_INIT_MEMBER(scramble_state,ad2083)
 		ROM[i] = c;
 	}
 }
+
+DRIVER_INIT_MEMBER(scramble_state,harem)
+{
+}

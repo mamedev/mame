@@ -8,14 +8,17 @@ public:
 		: galaxold_state(mconfig, type, tag),
 		  m_ppi8255_0(*this, "ppi8255_0"),
 		  m_ppi8255_1(*this, "ppi8255_1"),
-		  m_soundram(*this, "soundram") { }
+		  m_soundram(*this, "soundram")
+	{ }
 
 	optional_device<i8255_device>  m_ppi8255_0;
 	optional_device<i8255_device>  m_ppi8255_1;
 	optional_shared_ptr<UINT8> m_soundram;
+
 	UINT8 m_cavelon_bank;
 	UINT8 m_security_2B_counter;
 	UINT8 m_xb;
+
 	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_custom_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ckongs_coinage_r);
 	DECLARE_READ8_MEMBER(hncholms_prot_r);
@@ -28,6 +31,7 @@ public:
 	DECLARE_WRITE8_MEMBER(frogger_filter_w);
 	DECLARE_WRITE8_MEMBER(mars_ppi8255_0_w);
 	DECLARE_WRITE8_MEMBER(mars_ppi8255_1_w);
+
 	DECLARE_DRIVER_INIT(cavelon);
 	DECLARE_DRIVER_INIT(mariner);
 	DECLARE_DRIVER_INIT(mrkougb);
@@ -39,6 +43,7 @@ public:
 	DECLARE_DRIVER_INIT(ad2083);
 	DECLARE_DRIVER_INIT(devilfsh);
 	DECLARE_DRIVER_INIT(mrkougar);
+	DECLARE_DRIVER_INIT(harem);
 
 	DECLARE_DRIVER_INIT(scobra);
 	DECLARE_DRIVER_INIT(stratgyx);
