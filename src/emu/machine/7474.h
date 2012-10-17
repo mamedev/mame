@@ -50,26 +50,21 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_7474_ADD(_tag, _target_tag, _output_cb, _comp_output_cb) \
+#define MCFG_7474_ADD(_tag, _output_cb, _comp_output_cb) \
     MCFG_DEVICE_ADD(_tag, MACHINE_TTL7474, 0) \
-    MCFG_7474_TARGET_TAG(_target_tag) \
     MCFG_7474_OUTPUT_CB(_output_cb) \
     MCFG_7474_COMP_OUTPUT_CB(_comp_output_cb)
 
-#define MCFG_7474_REPLACE(_tag, _target_tag, _output_cb, _comp_output_cb) \
+#define MCFG_7474_REPLACE(_tag, _output_cb, _comp_output_cb) \
     MCFG_DEVICE_REPLACE(_tag, TTL7474, 0) \
-    MCFG_7474_TARGET_TAG(_target_tag) \
     MCFG_7474_OUTPUT_CB(_output_cb) \
     MCFG_7474_COMP_OUTPUT_CB(_comp_output_cb)
 
-#define MCFG_7474_TARGET_TAG(_target_tag) \
-	ttl7474_device::static_set_target_tag(*device, _target_tag); \
+#define MCFG_7474_OUTPUT_CB(_devcb) \
+	devcb = &ttl7474_device::set_output_cb(*device, DEVCB2_##_devcb); \
 
-#define MCFG_7474_OUTPUT_CB(_cb) \
-	ttl7474_device::static_set_output_cb(*device, _cb); \
-
-#define MCFG_7474_COMP_OUTPUT_CB(_cb) \
-	ttl7474_device::static_set_comp_output_cb(*device, _cb); \
+#define MCFG_7474_COMP_OUTPUT_CB(_devcb) \
+	devcb = &ttl7474_device::set_comp_output_cb(*device, DEVCB2_##_devcb); \
 
 
 
@@ -85,10 +80,9 @@ public:
     // construction/destruction
     ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// inline configuration helpers
-	static void static_set_target_tag(device_t &device, const char *tag);
-	static void static_set_output_cb(device_t &device, write_line_device_func callback);
-	static void static_set_comp_output_cb(device_t &device, write_line_device_func callback);
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_output_cb(device_t &device, _Object object) { return downcast<ttl7474_device &>(device).m_output_func.set_callback(object); }
+	template<class _Object> static devcb2_base &set_comp_output_cb(device_t &device, _Object object) { return downcast<ttl7474_device &>(device).m_comp_output_func.set_callback(object); }
 
 	// public interfaces
     DECLARE_WRITE_LINE_MEMBER( clear_w );
@@ -104,15 +98,10 @@ protected:
     virtual void device_reset();
     virtual void device_post_load() { }
     virtual void device_clock_changed() { }
-
-    // configuration state
-    devcb_write_line m_output_cb;
-    devcb_write_line m_comp_output_cb;
-
 private:
     // callbacks
-    devcb_resolved_write_line m_output_func;
-    devcb_resolved_write_line m_comp_output_func;
+    devcb2_write_line m_output_func;
+    devcb2_write_line m_comp_output_func;
 
     // inputs
     UINT8 m_clear;              // pin 1/13

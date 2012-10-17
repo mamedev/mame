@@ -28,18 +28,17 @@ static IRQ_CALLBACK(hunchbkg_irq_callback)
 }
 
 /* FIXME: remove trampoline */
-WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_2_q_callback )
+WRITE_LINE_MEMBER(galaxold_state::galaxold_7474_9m_2_q_callback)
 {
 	/* Q bar clocks the other flip-flop,
        Q is VBLANK (not visible to the CPU) */
-	downcast<ttl7474_device *>(device)->clock_w(state);
+	downcast<ttl7474_device *>(machine().device("7474_9m_1"))->clock_w(state);
 }
 
-WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_1_callback )
+WRITE_LINE_MEMBER(galaxold_state::galaxold_7474_9m_1_callback)
 {
-	galaxold_state *drvstate = device->machine().driver_data<galaxold_state>();
 	/* Q goes to the NMI line */
-	device->machine().device("maincpu")->execute().set_input_line(drvstate->m_irq_line, state ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(m_irq_line, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER(galaxold_state::galaxold_nmi_enable_w)

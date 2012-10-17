@@ -54,64 +54,12 @@ const device_type MACHINE_TTL7474 = &device_creator<ttl7474_device>;
 //-------------------------------------------------
 
 ttl7474_device::ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, MACHINE_TTL7474, "7474", tag, owner, clock)
+    : device_t(mconfig, MACHINE_TTL7474, "7474", tag, owner, clock),
+	  m_output_func(*this),
+	  m_comp_output_func(*this)
 {
-	memset(&m_output_cb, 0, sizeof(m_output_cb));
-	memset(&m_comp_output_cb, 0, sizeof(m_comp_output_cb));
     init();
 }
-
-
-//-------------------------------------------------
-//  static_set_target_tag - configuration helper
-//  to set the target tag
-//-------------------------------------------------
-
-void ttl7474_device::static_set_target_tag(device_t &device, const char *tag)
-{
-	ttl7474_device &ttl7474 = downcast<ttl7474_device &>(device);
-	ttl7474.m_output_cb.tag = tag;
-	ttl7474.m_comp_output_cb.tag = tag;
-}
-
-
-//-------------------------------------------------
-//  static_set_output_cb - configuration helper
-//  to set the output callback
-//-------------------------------------------------
-
-void ttl7474_device::static_set_output_cb(device_t &device, write_line_device_func callback)
-{
-	ttl7474_device &ttl7474 = downcast<ttl7474_device &>(device);
-	if (callback != NULL)
-	{
-		ttl7474.m_output_cb.type = DEVCB_TYPE_DEVICE;
-		ttl7474.m_output_cb.index = 0;
-		ttl7474.m_output_cb.writeline = callback;
-	}
-	else
-		ttl7474.m_output_cb.type = DEVCB_TYPE_NULL;
-}
-
-
-//-------------------------------------------------
-//  static_set_comp_output_cb - configuration
-//  helper to set the comp. output callback
-//-------------------------------------------------
-
-void ttl7474_device::static_set_comp_output_cb(device_t &device, write_line_device_func callback)
-{
-	ttl7474_device &ttl7474 = downcast<ttl7474_device &>(device);
-	if (callback != NULL)
-	{
-		ttl7474.m_comp_output_cb.type = DEVCB_TYPE_DEVICE;
-		ttl7474.m_comp_output_cb.index = 0;
-		ttl7474.m_comp_output_cb.writeline = callback;
-	}
-	else
-		ttl7474.m_comp_output_cb.type = DEVCB_TYPE_NULL;
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -129,8 +77,8 @@ void ttl7474_device::device_start()
     save_item(NAME(m_last_output));
     save_item(NAME(m_last_output_comp));
 
-	m_output_func.resolve(m_output_cb, *this);
-	m_comp_output_func.resolve(m_comp_output_cb, *this);
+	m_output_func.resolve_safe();
+	m_comp_output_func.resolve_safe();
 }
 
 

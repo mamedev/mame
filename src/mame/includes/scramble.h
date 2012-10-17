@@ -55,6 +55,7 @@ public:
 	DECLARE_MACHINE_RESET(explorer);
 	DECLARE_WRITE8_MEMBER(scramble_protection_w);
 	DECLARE_READ8_MEMBER(scramble_protection_r);
+	DECLARE_WRITE_LINE_MEMBER(scramble_sh_7474_q_callback);
 };
 
 
@@ -75,7 +76,6 @@ DECLARE_WRITE8_HANDLER( hunchbks_mirror_w );
 /*----------- defined in audio/scramble.c -----------*/
 
 void scramble_sh_init(running_machine &machine);
-WRITE_LINE_DEVICE_HANDLER( scramble_sh_7474_q_callback );
 
 
 DECLARE_READ8_DEVICE_HANDLER( scramble_portB_r );

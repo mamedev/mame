@@ -183,16 +183,15 @@ public:
 	TIMER_CALLBACK_MEMBER(stars_blink_callback);
 	TIMER_CALLBACK_MEMBER(stars_scroll_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(galaxold_interrupt_timer);
+	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_2_q_callback);
+	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_1_callback);
+
+
 };
 
 /*----------- defined in video/galaxold.c -----------*/
 void galaxold_init_stars(running_machine &machine, int colors_offset);
 void galaxold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-/*----------- defined in machine/galaxold.c -----------*/
-
-WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_2_q_callback );
-WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_1_callback );
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w
 

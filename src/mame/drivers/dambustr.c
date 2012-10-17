@@ -251,8 +251,8 @@ static MACHINE_CONFIG_START( dambustr, dambustr_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(dambustr_state,galaxold)
 
-	MCFG_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
-	MCFG_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
+	MCFG_7474_ADD("7474_9m_1", WRITELINE(dambustr_state,galaxold_7474_9m_1_callback), NOOP)
+	MCFG_7474_ADD("7474_9m_2", NOOP, WRITELINE(dambustr_state,galaxold_7474_9m_2_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", dambustr_state, galaxold_interrupt_timer)
 

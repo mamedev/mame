@@ -1326,10 +1326,10 @@ static MACHINE_CONFIG_START( scramble, scramble_state )
 	MCFG_CPU_PROGRAM_MAP(scramble_sound_map)
 	MCFG_CPU_IO_MAP(scramble_sound_io_map)
 
-	MCFG_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
-	MCFG_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
+	MCFG_7474_ADD("7474_9m_1", WRITELINE(scramble_state,galaxold_7474_9m_1_callback), NOOP)
+	MCFG_7474_ADD("7474_9m_2", NOOP, WRITELINE(scramble_state,galaxold_7474_9m_2_q_callback))
 
-	MCFG_7474_ADD("konami_7474", "konami_7474", NULL, scramble_sh_7474_q_callback)
+	MCFG_7474_ADD("konami_7474", NOOP, WRITELINE(scramble_state,scramble_sh_7474_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
@@ -1558,9 +1558,9 @@ static MACHINE_CONFIG_START( ad2083, scramble_state )
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(ad2083_map)
 
-	MCFG_7474_ADD("konami_7474", "konami_7474", NULL, scramble_sh_7474_q_callback)
-	MCFG_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
-	MCFG_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
+	MCFG_7474_ADD("konami_7474", NOOP, WRITELINE(scramble_state,scramble_sh_7474_q_callback))
+	MCFG_7474_ADD("7474_9m_1", WRITELINE(scramble_state,galaxold_7474_9m_1_callback), NOOP)
+	MCFG_7474_ADD("7474_9m_2", NOOP, WRITELINE(scramble_state,galaxold_7474_9m_2_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
