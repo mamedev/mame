@@ -10,6 +10,7 @@ public:
 	t6w28_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE8_MEMBER( write );
+	void set_enable( bool enable );
 
 protected:
 	// device-level overrides
@@ -35,6 +36,7 @@ private:
 	INT32 m_period[8];
 	INT32 m_count[8];
 	INT32 m_output[8];
+	bool m_enabled;
 };
 
 extern const device_type T6W28;

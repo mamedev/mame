@@ -256,8 +256,10 @@ WRITE8_MEMBER( ngp_state::ngp_io_w )
 		switch( data )
 		{
 		case 0x55:		/* Enabled sound */
+			m_t6w28->set_enable( true );
 			break;
 		case 0xAA:		/* Disable sound */
+			m_t6w28->set_enable( false );
 			break;
 		}
 		break;

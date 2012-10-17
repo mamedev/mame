@@ -233,11 +233,19 @@ void t6w28_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 			left -= nextevent;
 		} while (left > 0);
 
-		out0 = vol[4] * m_volume[4] + vol[5] * m_volume[5] +
-				vol[6] * m_volume[6] + vol[3] * m_volume[7];
+		if (m_enabled)
+		{
+			out0 = vol[4] * m_volume[4] + vol[5] * m_volume[5] +
+					vol[6] * m_volume[6] + vol[3] * m_volume[7];
 
-		out1 = vol[4] * m_volume[0] + vol[5] * m_volume[1] +
-				vol[6] * m_volume[2] + vol[3] * m_volume[3];
+			out1 = vol[4] * m_volume[0] + vol[5] * m_volume[1] +
+					vol[6] * m_volume[2] + vol[3] * m_volume[3];
+		}
+		else
+		{
+			out0 = 0;
+			out1 = 0;
+		}
 
 		if (out0 > MAX_OUTPUT * STEP) out0 = MAX_OUTPUT * STEP;
 		if (out1 > MAX_OUTPUT * STEP) out1 = MAX_OUTPUT * STEP;
@@ -328,6 +336,13 @@ void t6w28_device::device_start()
 	save_item(NAME(m_period));
 	save_item(NAME(m_count));
 	save_item(NAME(m_output));
+	save_item(NAME(m_enabled));
+}
+
+
+void t6w28_device::set_enable(bool enable)
+{
+	m_enabled = enable;
 }
 
 const device_type T6W28 = &device_creator<t6w28_device>;
