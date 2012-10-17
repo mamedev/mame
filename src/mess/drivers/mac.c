@@ -68,6 +68,7 @@
 #include "video/nubus_radiustpd.h"
 #include "video/nubus_wsportrait.h"
 #include "machine/nubus_asntmc3b.h"
+#include "video/nubus_m2video.h"
 #include "includes/mac.h"
 #include "mac.lh"
 
@@ -841,6 +842,7 @@ static const struct nbbus_interface nubus_intf =
 };
 
 static SLOT_INTERFACE_START(mac_nubus_cards)
+    SLOT_INTERFACE("m2video", NUBUS_M2VIDEO)    /* Apple Macintosh II Video Card */
 	SLOT_INTERFACE("48gc", NUBUS_48GC)		/* Apple 4*8 Graphics Card */
 	SLOT_INTERFACE("824gc", NUBUS_824GC)	/* Apple 8*24 Graphics Card */
 	SLOT_INTERFACE("cb264", NUBUS_CB264)	/* RasterOps ColorBoard 264 */
