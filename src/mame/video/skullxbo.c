@@ -176,7 +176,7 @@ WRITE16_HANDLER( skullxbo_mobmsb_w )
 WRITE16_HANDLER( skullxbo_playfieldlatch_w )
 {
 	skullxbo_state *state = space.machine().driver_data<skullxbo_state>();
-	atarigen_set_playfield_latch(state, data);
+	state->set_playfield_latch(data);
 }
 
 

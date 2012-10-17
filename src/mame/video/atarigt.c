@@ -80,7 +80,7 @@ VIDEO_START_MEMBER(atarigt_state,atarigt)
 	int i, width, height;
 
 	/* blend the playfields and free the temporary one */
-	atarigen_blend_gfx(machine(), 0, 2, 0x0f, 0x30);
+	blend_gfx(0, 2, 0x0f, 0x30);
 
 	/* initialize the playfield */
 	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarigt_state::get_playfield_tile_info),this), tilemap_mapper_delegate(FUNC(atarigt_state::atarigt_playfield_scan),this),  8,8, 128,64);

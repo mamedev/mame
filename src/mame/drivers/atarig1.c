@@ -204,21 +204,21 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig1_state )
 	AM_RANGE(0x040000, 0x077fff) AM_ROM
 	AM_RANGE(0x078000, 0x07ffff) AM_ROM	/* hydra slapstic goes here */
 	AM_RANGE(0xf80000, 0xf80001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0xf88000, 0xf8ffff) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
+	AM_RANGE(0xf88000, 0xf8ffff) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0xf90000, 0xf90001) AM_WRITE8(sound_w, 0xff00)
 	AM_RANGE(0xf98000, 0xf98001) AM_WRITE(sound_reset_w)
 	AM_RANGE(0xfa0000, 0xfa0001) AM_WRITE(mo_control_w)
-	AM_RANGE(0xfb0000, 0xfb0001) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
+	AM_RANGE(0xfb0000, 0xfb0001) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(special_port0_r)
 	AM_RANGE(0xfc8000, 0xfc8007) AM_READWRITE(a2d_data_r, a2d_select_w)
 	AM_RANGE(0xfd0000, 0xfd0001) AM_READ8(sound_r, 0xff00)
-	AM_RANGE(0xfd8000, 0xfdffff) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
+	AM_RANGE(0xfd8000, 0xfdffff) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ_LEGACY(from_r)*/
-	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_WRITE_LEGACY(atarigen_666_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff0000, 0xff0fff) AM_DEVREADWRITE_LEGACY("rle", atarirle_spriteram_r, atarirle_spriteram_w)
 	AM_RANGE(0xff2000, 0xff2001) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
-	AM_RANGE(0xff4000, 0xff5fff) AM_WRITE_LEGACY(atarigen_playfield_w) AM_SHARE("playfield")
-	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE_LEGACY(atarigen_alpha_w) AM_SHARE("alpha")
+	AM_RANGE(0xff4000, 0xff5fff) AM_WRITE(playfield_w) AM_SHARE("playfield")
+	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(alpha_w) AM_SHARE("alpha")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -445,7 +445,7 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
 
 	MCFG_MACHINE_START_OVERRIDE(atarig1_state,atarig1)
 	MCFG_MACHINE_RESET_OVERRIDE(atarig1_state,atarig1)

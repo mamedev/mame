@@ -323,68 +323,50 @@ WRITE16_MEMBER(atarigen_state::scanline_int_ack_w)
 
 
 //-------------------------------------------------
-//  atarigen_sound_int_gen: Standard interrupt routine which
+//  sound_int_gen: Standard interrupt routine which
 //  sets the sound interrupt state.
 //-------------------------------------------------
 
-INTERRUPT_GEN( atarigen_sound_int_gen )
+INTERRUPT_GEN_MEMBER(atarigen_state::sound_int_gen)
 {
-	atarigen_state *state = device->machine().driver_data<atarigen_state>();
-	state->m_sound_int_state = 1;
-	state->update_interrupts();
+	m_sound_int_state = 1;
+	update_interrupts();
 }
 
 
 //-------------------------------------------------
-//  atarigen_sound_int_ack_w: Resets the state of the sound
+//  sound_int_ack_w: Resets the state of the sound
 //  interrupt.
 //-------------------------------------------------
 
-WRITE16_HANDLER( atarigen_sound_int_ack_w )
+WRITE16_MEMBER(atarigen_state::sound_int_ack_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	state->m_sound_int_state = 0;
-	state->update_interrupts();
-}
-
-WRITE32_HANDLER( atarigen_sound_int_ack32_w )
-{
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	state->m_sound_int_state = 0;
-	state->update_interrupts();
+	m_sound_int_state = 0;
+	update_interrupts();
 }
 
 
 //-------------------------------------------------
-//  atarigen_video_int_gen: Standard interrupt routine which
+//  video_int_gen: Standard interrupt routine which
 //  sets the video interrupt state.
 //-------------------------------------------------
 
-INTERRUPT_GEN( atarigen_video_int_gen )
+INTERRUPT_GEN_MEMBER(atarigen_state::video_int_gen)
 {
-	atarigen_state *state = device->machine().driver_data<atarigen_state>();
-	state->m_video_int_state = 1;
-	state->update_interrupts();
+	m_video_int_state = 1;
+	update_interrupts();
 }
 
 
 //-------------------------------------------------
-//  atarigen_video_int_ack_w: Resets the state of the video
+//  video_int_ack_w: Resets the state of the video
 //  interrupt.
 //-------------------------------------------------
 
-WRITE16_HANDLER( atarigen_video_int_ack_w )
+WRITE16_MEMBER(atarigen_state::video_int_ack_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	state->m_video_int_state = 0;
-	state->update_interrupts();
-}
-
-WRITE32_HANDLER( atarigen_video_int_ack32_w )
-{
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	state->m_video_int_state = 0;
-	state->update_interrupts();
+	m_video_int_state = 0;
+	update_interrupts();
 }
 
 
@@ -394,78 +376,59 @@ WRITE32_HANDLER( atarigen_video_int_ack32_w )
 ***************************************************************************/
 
 //-------------------------------------------------
-//  atarigen_eeprom_enable_w: Any write to this handler will
+//  eeprom_enable_w: Any write to this handler will
 //  allow one byte to be written to the EEPROM data area the
 //  next time.
 //-------------------------------------------------
 
-WRITE16_HANDLER( atarigen_eeprom_enable_w )
+WRITE16_MEMBER(atarigen_state::eeprom_enable_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	state->m_eeprom_unlocked = true;
-}
-
-WRITE32_HANDLER( atarigen_eeprom_enable32_w )
-{
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	state->m_eeprom_unlocked = true;
+	m_eeprom_unlocked = true;
 }
 
 
 //-------------------------------------------------
-//  atarigen_eeprom_w: Writes a "word" to the EEPROM, which is
+//  eeprom_w: Writes a "word" to the EEPROM, which is
 //  almost always accessed via the low byte of the word only.
 //  If the EEPROM hasn't been unlocked, the write attempt is
 //  ignored.
 //-------------------------------------------------
 
-WRITE16_HANDLER( atarigen_eeprom_w )
+WRITE16_MEMBER(atarigen_state::eeprom_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-
-	if (!state->m_eeprom_unlocked)
+	if (!m_eeprom_unlocked)
 		return;
 
-	COMBINE_DATA(&state->m_eeprom[offset]);
-	state->m_eeprom_unlocked = false;
+	COMBINE_DATA(&m_eeprom[offset]);
+	m_eeprom_unlocked = false;
 }
 
-WRITE32_HANDLER( atarigen_eeprom32_w )
+WRITE32_MEMBER(atarigen_state::eeprom32_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-
-	if (!state->m_eeprom_unlocked)
+	if (!m_eeprom_unlocked)
 		return;
 
-	COMBINE_DATA(&state->m_eeprom[offset * 2 + 1]);
+	COMBINE_DATA(&m_eeprom[offset * 2 + 1]);
 	data >>= 16;
 	mem_mask >>= 16;
-	COMBINE_DATA(&state->m_eeprom[offset * 2]);
-	state->m_eeprom_unlocked = false;
+	COMBINE_DATA(&m_eeprom[offset * 2]);
+	m_eeprom_unlocked = false;
 }
 
 
 //-------------------------------------------------
-//  atarigen_eeprom_r: Reads a "word" from the EEPROM, which is
+//  eeprom_r: Reads a "word" from the EEPROM, which is
 //  almost always accessed via the low byte of the word only.
 //-------------------------------------------------
 
-READ16_HANDLER( atarigen_eeprom_r )
+READ16_MEMBER(atarigen_state::eeprom_r)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	return state->m_eeprom[offset] | 0xff00;
+	return m_eeprom[offset] | 0xff00;
 }
 
-READ16_HANDLER( atarigen_eeprom_upper_r )
+READ32_MEMBER(atarigen_state::eeprom_upper32_r)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	return state->m_eeprom[offset] | 0x00ff;
-}
-
-READ32_HANDLER( atarigen_eeprom_upper32_r )
-{
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	return (state->m_eeprom[offset * 2] << 16) | state->m_eeprom[offset * 2 + 1] | 0x00ff00ff;
+	return (m_eeprom[offset * 2] << 16) | m_eeprom[offset * 2 + 1] | 0x00ff00ff;
 }
 
 
@@ -691,7 +654,7 @@ WRITE8_MEMBER(atarigen_state::sound_w)
 READ8_MEMBER(atarigen_state::sound_r)
 {
 	m_sound_to_cpu_ready = 0;
-	atarigen_sound_int_ack_w(space, 0, 0, 0xffff);
+	sound_int_ack_w(space, 0, 0);
 	return m_sound_to_cpu;
 }
 
@@ -753,7 +716,7 @@ void atarigen_state::delayed_sound_reset(int param)
 
 	// reset the sound write state
 	m_sound_to_cpu_ready = 0;
-	atarigen_sound_int_ack_w(m_sound_cpu->space(AS_PROGRAM), 0, 0, 0xffff);
+	sound_int_ack_w(m_sound_cpu->space(AS_PROGRAM), 0, 0);
 
 	// allocate a high frequency timer until a response is generated
 	// the main CPU is *very* sensistive to the timing of the response
@@ -797,7 +760,7 @@ void atarigen_state::delayed_6502_write(int data)
 	// set up the states and signal the sound interrupt to the main CPU
 	m_sound_to_cpu = data;
 	m_sound_to_cpu_ready = 1;
-	atarigen_sound_int_gen(machine().device("maincpu"));
+	sound_int_gen(*machine().device("maincpu"));
 }
 
 
@@ -943,24 +906,22 @@ void atarigen_state::atarivc_eof_update(emu_timer &timer, screen_device &screen)
 //  atarivc_reset: Initializes the video controller.
 //-------------------------------------------------
 
-void atarivc_reset(screen_device &screen, UINT16 *eof_data, int playfields)
+void atarigen_state::atarivc_reset(screen_device &screen, UINT16 *eof_data, int playfields)
 {
-	atarigen_state *state = screen.machine().driver_data<atarigen_state>();
-
 	// this allows us to manually reset eof_data to NULL if it's not used
-	state->m_atarivc_eof_data.set_target(eof_data, 0x100);
-	state->m_atarivc_playfields = playfields;
+	m_atarivc_eof_data.set_target(eof_data, 0x100);
+	m_atarivc_playfields = playfields;
 
 	// clear the RAM we use
-	memset(state->m_atarivc_data, 0, 0x40);
-	memset(&state->m_atarivc_state, 0, sizeof(state->m_atarivc_state));
+	memset(m_atarivc_data, 0, 0x40);
+	memset(&m_atarivc_state, 0, sizeof(m_atarivc_state));
 
 	// reset the latches
-	state->m_atarivc_state.latch1 = state->m_atarivc_state.latch2 = -1;
-	state->m_actual_vc_latch0 = state->m_actual_vc_latch1 = -1;
+	m_atarivc_state.latch1 = m_atarivc_state.latch2 = -1;
+	m_actual_vc_latch0 = m_actual_vc_latch1 = -1;
 
 	// start a timer to go off a little before scanline 0
-	if (state->m_atarivc_eof_data)
+	if (m_atarivc_eof_data != NULL)
 		get_screen_timer(screen)->atarivc_eof_update_timer->adjust(screen.time_until_pos(0));
 }
 
@@ -969,10 +930,9 @@ void atarivc_reset(screen_device &screen, UINT16 *eof_data, int playfields)
 //  atarivc_w: Handles an I/O write to the video controller.
 //-------------------------------------------------
 
-void atarivc_w(screen_device &screen, offs_t offset, UINT16 data, UINT16 mem_mask)
+void atarigen_state::atarivc_w(screen_device &screen, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
-	atarigen_state *state = screen.machine().driver_data<atarigen_state>();
-	int oldword = state->m_atarivc_data[offset];
+	int oldword = m_atarivc_data[offset];
 	int newword = oldword;
 
 	COMBINE_DATA(&newword);
@@ -986,11 +946,10 @@ void atarivc_w(screen_device &screen, offs_t offset, UINT16 data, UINT16 mem_mas
 //  write.
 //-------------------------------------------------
 
-static void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newword)
+void atarigen_state::atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newword)
 {
-	atarigen_state *state = screen.machine().driver_data<atarigen_state>();
-	int oldword = state->m_atarivc_data[offset];
-	state->m_atarivc_data[offset] = newword;
+	int oldword = m_atarivc_data[offset];
+	m_atarivc_data[offset] = newword;
 
 	// switch off the offset
 	switch (offset)
@@ -1005,24 +964,24 @@ static void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newwor
 		// set the scanline interrupt here
 		case 0x03:
 			if (oldword != newword)
-				state->scanline_int_set(screen, newword & 0x1ff);
+				scanline_int_set(screen, newword & 0x1ff);
 			break;
 
 		// latch enable
 		case 0x0a:
 
 			// reset the latches when disabled
-			atarigen_set_playfield_latch(state, (newword & 0x0080) ? state->m_actual_vc_latch0 : -1);
-			atarigen_set_playfield2_latch(state, (newword & 0x0080) ? state->m_actual_vc_latch1 : -1);
+			set_playfield_latch((newword & 0x0080) ? m_actual_vc_latch0 : -1);
+			set_playfield2_latch((newword & 0x0080) ? m_actual_vc_latch1 : -1);
 
 			// check for rowscroll enable
-			state->m_atarivc_state.rowscroll_enable = (newword & 0x2000) >> 13;
+			m_atarivc_state.rowscroll_enable = (newword & 0x2000) >> 13;
 
 			// check for palette banking
-			if (state->m_atarivc_state.palette_bank != (((newword & 0x0400) >> 10) ^ 1))
+			if (m_atarivc_state.palette_bank != (((newword & 0x0400) >> 10) ^ 1))
 			{
 				screen.update_partial(screen.vpos());
-				state->m_atarivc_state.palette_bank = ((newword & 0x0400) >> 10) ^ 1;
+				m_atarivc_state.palette_bank = ((newword & 0x0400) >> 10) ^ 1;
 			}
 			break;
 
@@ -1033,53 +992,53 @@ static void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newwor
 			switch (newword & 15)
 			{
 				case 9:
-					state->m_atarivc_state.mo_xscroll = (newword >> 7) & 0x1ff;
+					m_atarivc_state.mo_xscroll = (newword >> 7) & 0x1ff;
 					break;
 
 				case 10:
-					state->m_atarivc_state.pf1_xscroll_raw = (newword >> 7) & 0x1ff;
-					atarivc_update_pf_xscrolls(state);
+					m_atarivc_state.pf1_xscroll_raw = (newword >> 7) & 0x1ff;
+					atarivc_update_pf_xscrolls();
 					break;
 
 				case 11:
-					state->m_atarivc_state.pf0_xscroll_raw = (newword >> 7) & 0x1ff;
-					atarivc_update_pf_xscrolls(state);
+					m_atarivc_state.pf0_xscroll_raw = (newword >> 7) & 0x1ff;
+					atarivc_update_pf_xscrolls();
 					break;
 
 				case 13:
-					state->m_atarivc_state.mo_yscroll = (newword >> 7) & 0x1ff;
+					m_atarivc_state.mo_yscroll = (newword >> 7) & 0x1ff;
 					break;
 
 				case 14:
-					state->m_atarivc_state.pf1_yscroll = (newword >> 7) & 0x1ff;
+					m_atarivc_state.pf1_yscroll = (newword >> 7) & 0x1ff;
 					break;
 
 				case 15:
-					state->m_atarivc_state.pf0_yscroll = (newword >> 7) & 0x1ff;
+					m_atarivc_state.pf0_yscroll = (newword >> 7) & 0x1ff;
 					break;
 			}
 			break;
 
 		// latch 1 value
 		case 0x1c:
-			state->m_actual_vc_latch0 = -1;
-			state->m_actual_vc_latch1 = newword;
-			atarigen_set_playfield_latch(state, (state->m_atarivc_data[0x0a] & 0x80) ? state->m_actual_vc_latch0 : -1);
-			atarigen_set_playfield2_latch(state, (state->m_atarivc_data[0x0a] & 0x80) ? state->m_actual_vc_latch1 : -1);
+			m_actual_vc_latch0 = -1;
+			m_actual_vc_latch1 = newword;
+			set_playfield_latch((m_atarivc_data[0x0a] & 0x80) ? m_actual_vc_latch0 : -1);
+			set_playfield2_latch((m_atarivc_data[0x0a] & 0x80) ? m_actual_vc_latch1 : -1);
 			break;
 
 		// latch 2 value
 		case 0x1d:
-			state->m_actual_vc_latch0 = newword;
-			state->m_actual_vc_latch1 = -1;
-			atarigen_set_playfield_latch(state, (state->m_atarivc_data[0x0a] & 0x80) ? state->m_actual_vc_latch0 : -1);
-			atarigen_set_playfield2_latch(state, (state->m_atarivc_data[0x0a] & 0x80) ? state->m_actual_vc_latch1 : -1);
+			m_actual_vc_latch0 = newword;
+			m_actual_vc_latch1 = -1;
+			set_playfield_latch((m_atarivc_data[0x0a] & 0x80) ? m_actual_vc_latch0 : -1);
+			set_playfield2_latch((m_atarivc_data[0x0a] & 0x80) ? m_actual_vc_latch1 : -1);
 			break;
 
 		// scanline IRQ ack here
 		case 0x1e:
 			// hack: this should be a device
-			state->scanline_int_ack_w(screen.machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
+			scanline_int_ack_w(screen.machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
 			break;
 
 		// log anything else
@@ -1096,10 +1055,8 @@ static void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newwor
 //  atarivc_r: Handles an I/O read from the video controller.
 //-------------------------------------------------
 
-UINT16 atarivc_r(screen_device &screen, offs_t offset)
+UINT16 atarigen_state::atarivc_r(screen_device &screen, offs_t offset)
 {
-	atarigen_state *state = screen.machine().driver_data<atarigen_state>();
-
 	logerror("vc_r(%02X)\n", offset);
 
 	// a read from offset 0 returns the current scanline
@@ -1116,7 +1073,7 @@ UINT16 atarivc_r(screen_device &screen, offs_t offset)
 		return result;
 	}
 	else
-		return state->m_atarivc_data[offset];
+		return m_atarivc_data[offset];
 }
 
 
@@ -1126,88 +1083,82 @@ UINT16 atarivc_r(screen_device &screen, offs_t offset)
 ***************************************************************************/
 
 //-------------------------------------------------
-//  atarigen_alpha_w: Generic write handler for alpha RAM.
+//  alpha_w: Generic write handler for alpha RAM.
 //-------------------------------------------------
 
-WRITE16_HANDLER( atarigen_alpha_w )
+WRITE16_MEMBER(atarigen_state::alpha_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	COMBINE_DATA(&state->m_alpha[offset]);
-	state->m_alpha_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_alpha[offset]);
+	m_alpha_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE32_HANDLER( atarigen_alpha32_w )
+WRITE32_MEMBER(atarigen_state::alpha32_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	COMBINE_DATA(&state->m_alpha32[offset]);
+	COMBINE_DATA(&m_alpha32[offset]);
 	if (ACCESSING_BITS_16_31)
-		state->m_alpha_tilemap->mark_tile_dirty(offset * 2);
+		m_alpha_tilemap->mark_tile_dirty(offset * 2);
 	if (ACCESSING_BITS_0_15)
-		state->m_alpha_tilemap->mark_tile_dirty(offset * 2 + 1);
+		m_alpha_tilemap->mark_tile_dirty(offset * 2 + 1);
 }
 
-WRITE16_HANDLER( atarigen_alpha2_w )
+WRITE16_MEMBER(atarigen_state::alpha2_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	COMBINE_DATA(&state->m_alpha2[offset]);
-	state->m_alpha2_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_alpha2[offset]);
+	m_alpha2_tilemap->mark_tile_dirty(offset);
 }
 
 
 
 //-------------------------------------------------
-//  atarigen_set_playfield_latch: Sets the latch for the latched
+//  set_playfield_latch: Sets the latch for the latched
 //  playfield handlers below.
 //-------------------------------------------------
 
-void atarigen_set_playfield_latch(atarigen_state *state, int data)
+void atarigen_state::set_playfield_latch(int data)
 {
-	state->m_playfield_latch = data;
+	m_playfield_latch = data;
 }
 
-void atarigen_set_playfield2_latch(atarigen_state *state, int data)
+void atarigen_state::set_playfield2_latch(int data)
 {
-	state->m_playfield2_latch = data;
+	m_playfield2_latch = data;
 }
 
 
 
 //-------------------------------------------------
-//  atarigen_playfield_w: Generic write handler for PF RAM.
+//  playfield_w: Generic write handler for PF RAM.
 //-------------------------------------------------
 
-WRITE16_HANDLER( atarigen_playfield_w )
+WRITE16_MEMBER(atarigen_state::playfield_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	COMBINE_DATA(&state->m_playfield[offset]);
-	state->m_playfield_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_playfield[offset]);
+	m_playfield_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE32_HANDLER( atarigen_playfield32_w )
+WRITE32_MEMBER(atarigen_state::playfield32_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	COMBINE_DATA(&state->m_playfield32[offset]);
+	COMBINE_DATA(&m_playfield32[offset]);
 	if (ACCESSING_BITS_16_31)
-		state->m_playfield_tilemap->mark_tile_dirty(offset * 2);
+		m_playfield_tilemap->mark_tile_dirty(offset * 2);
 	if (ACCESSING_BITS_0_15)
-		state->m_playfield_tilemap->mark_tile_dirty(offset * 2 + 1);
+		m_playfield_tilemap->mark_tile_dirty(offset * 2 + 1);
 }
 
-WRITE16_HANDLER( atarigen_playfield2_w )
+WRITE16_MEMBER(atarigen_state::playfield2_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	COMBINE_DATA(&state->m_playfield2[offset]);
-	state->m_playfield2_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_playfield2[offset]);
+	m_playfield2_tilemap->mark_tile_dirty(offset);
 }
 
 
 
 //-------------------------------------------------
-//  atarigen_playfield_large_w: Generic write handler for
+//  playfield_large_w: Generic write handler for
 //  large (2-word) playfield RAM.
 //-------------------------------------------------
 
-WRITE16_HANDLER( atarigen_playfield_large_w )
+WRITE16_MEMBER(atarigen_state::playfield_large_w)
 {
 	atarigen_state *state = space.machine().driver_data<atarigen_state>();
 	COMBINE_DATA(&state->m_playfield[offset]);
@@ -1217,11 +1168,11 @@ WRITE16_HANDLER( atarigen_playfield_large_w )
 
 
 //-------------------------------------------------
-//  atarigen_playfield_upper_w: Generic write handler for
+//  playfield_upper_w: Generic write handler for
 //  upper word of split playfield RAM.
 //-------------------------------------------------
 
-WRITE16_HANDLER( atarigen_playfield_upper_w )
+WRITE16_MEMBER(atarigen_state::playfield_upper_w)
 {
 	atarigen_state *state = space.machine().driver_data<atarigen_state>();
 	COMBINE_DATA(&state->m_playfield_upper[offset]);
@@ -1231,11 +1182,11 @@ WRITE16_HANDLER( atarigen_playfield_upper_w )
 
 
 //-------------------------------------------------
-//  atarigen_playfield_dual_upper_w: Generic write handler for
+//  playfield_dual_upper_w: Generic write handler for
 //  upper word of split dual playfield RAM.
 //-------------------------------------------------
 
-WRITE16_HANDLER( atarigen_playfield_dual_upper_w )
+WRITE16_MEMBER(atarigen_state::playfield_dual_upper_w)
 {
 	atarigen_state *state = space.machine().driver_data<atarigen_state>();
 	COMBINE_DATA(&state->m_playfield_upper[offset]);
@@ -1246,12 +1197,12 @@ WRITE16_HANDLER( atarigen_playfield_dual_upper_w )
 
 
 //-------------------------------------------------
-//  atarigen_playfield_latched_lsb_w: Generic write handler for
+//  playfield_latched_lsb_w: Generic write handler for
 //  lower word of playfield RAM with a latch in the LSB of the
 //  upper word.
 //-------------------------------------------------
 
-WRITE16_HANDLER( atarigen_playfield_latched_lsb_w )
+WRITE16_MEMBER(atarigen_state::playfield_latched_lsb_w)
 {
 	atarigen_state *state = space.machine().driver_data<atarigen_state>();
 
@@ -1265,12 +1216,12 @@ WRITE16_HANDLER( atarigen_playfield_latched_lsb_w )
 
 
 //-------------------------------------------------
-//  atarigen_playfield_latched_lsb_w: Generic write handler for
+//  playfield_latched_msb_w: Generic write handler for
 //  lower word of playfield RAM with a latch in the MSB of the
 //  upper word.
 //-------------------------------------------------
 
-WRITE16_HANDLER( atarigen_playfield_latched_msb_w )
+WRITE16_MEMBER(atarigen_state::playfield_latched_msb_w)
 {
 	atarigen_state *state = space.machine().driver_data<atarigen_state>();
 
@@ -1284,12 +1235,12 @@ WRITE16_HANDLER( atarigen_playfield_latched_msb_w )
 
 
 //-------------------------------------------------
-//  atarigen_playfield_latched_lsb_w: Generic write handler for
+//  playfield2_latched_msb_w: Generic write handler for
 //  lower word of second playfield RAM with a latch in the MSB
 //  of the upper word.
 //-------------------------------------------------
 
-WRITE16_HANDLER( atarigen_playfield2_latched_msb_w )
+WRITE16_MEMBER(atarigen_state::playfield2_latched_msb_w)
 {
 	atarigen_state *state = space.machine().driver_data<atarigen_state>();
 
@@ -1306,18 +1257,6 @@ WRITE16_HANDLER( atarigen_playfield2_latched_msb_w )
 /***************************************************************************
     VIDEO HELPERS
 ***************************************************************************/
-
-//-------------------------------------------------
-//  atarigen_get_hblank: Returns a guesstimate about the current
-//  HBLANK state, based on the assumption that HBLANK represents
-//  10% of the scanline period.
-//-------------------------------------------------
-
-int atarigen_get_hblank(screen_device &screen)
-{
-	return (screen.hpos() > (screen.width() * 9 / 10));
-}
-
 
 //-------------------------------------------------
 //  halt_until_hblank_0: Halts CPU 0 until the
@@ -1342,16 +1281,15 @@ void atarigen_state::halt_until_hblank_0(device_t &device, screen_device &screen
 
 
 //-------------------------------------------------
-//  atarigen_666_paletteram_w: 6-6-6 RGB palette RAM handler.
+//  paletteram_666_w: 6-6-6 RGB palette RAM handler.
 //-------------------------------------------------
 
-WRITE16_HANDLER( atarigen_666_paletteram_w )
+WRITE16_MEMBER(atarigen_state::paletteram_666_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
 	int newword, r, g, b;
 
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
-	newword = state->m_generic_paletteram_16[offset];
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	newword = m_generic_paletteram_16[offset];
 
 	r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 1);
 	g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
@@ -1362,19 +1300,18 @@ WRITE16_HANDLER( atarigen_666_paletteram_w )
 
 
 //-------------------------------------------------
-//  atarigen_expanded_666_paletteram_w: 6-6-6 RGB expanded
+//  expanded_paletteram_666_w: 6-6-6 RGB expanded
 //  palette RAM handler.
 //-------------------------------------------------
 
-WRITE16_HANDLER( atarigen_expanded_666_paletteram_w )
+WRITE16_MEMBER(atarigen_state::expanded_paletteram_666_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 
 	if (ACCESSING_BITS_8_15)
 	{
 		int palentry = offset / 2;
-		int newword = (state->m_generic_paletteram_16[palentry * 2] & 0xff00) | (state->m_generic_paletteram_16[palentry * 2 + 1] >> 8);
+		int newword = (m_generic_paletteram_16[palentry * 2] & 0xff00) | (m_generic_paletteram_16[palentry * 2 + 1] >> 8);
 
 		int r, g, b;
 
@@ -1388,19 +1325,18 @@ WRITE16_HANDLER( atarigen_expanded_666_paletteram_w )
 
 
 //-------------------------------------------------
-//  atarigen_666_paletteram32_w: 6-6-6 RGB palette RAM handler.
+//  paletteram32_666_w: 6-6-6 RGB palette RAM handler.
 //-------------------------------------------------
 
-WRITE32_HANDLER( atarigen_666_paletteram32_w )
+WRITE32_MEMBER(atarigen_state::paletteram32_666_w )
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
 	int newword, r, g, b;
 
-	COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
 	if (ACCESSING_BITS_16_31)
 	{
-		newword = state->m_generic_paletteram_32[offset] >> 16;
+		newword = m_generic_paletteram_32[offset] >> 16;
 
 		r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 1);
 		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
@@ -1411,7 +1347,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 
 	if (ACCESSING_BITS_0_15)
 	{
-		newword = state->m_generic_paletteram_32[offset] & 0xffff;
+		newword = m_generic_paletteram_32[offset] & 0xffff;
 
 		r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 1);
 		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
@@ -1428,36 +1364,19 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 ***************************************************************************/
 
 //-------------------------------------------------
-//  atarigen_swap_mem: Inverts the bits in a region.
-//-------------------------------------------------
-
-void atarigen_swap_mem(void *ptr1, void *ptr2, int bytes)
-{
-	UINT8 *p1 = (UINT8 *)ptr1;
-	UINT8 *p2 = (UINT8 *)ptr2;
-	while (bytes--)
-	{
-		int temp = *p1;
-		*p1++ = *p2;
-		*p2++ = temp;
-	}
-}
-
-
-//-------------------------------------------------
-//  atarigen_blend_gfx: Takes two GFXElements and blends their
+//  blend_gfx: Takes two GFXElements and blends their
 //  data together to form one. Then frees the second.
 //-------------------------------------------------
 
-void atarigen_blend_gfx(running_machine &machine, int gfx0, int gfx1, int mask0, int mask1)
+void atarigen_state::blend_gfx(int gfx0, int gfx1, int mask0, int mask1)
 {
-	gfx_element *gx0 = machine.gfx[gfx0];
-	gfx_element *gx1 = machine.gfx[gfx1];
+	gfx_element *gx0 = machine().gfx[gfx0];
+	gfx_element *gx1 = machine().gfx[gfx1];
 	UINT8 *srcdata, *dest;
 	int c, x, y;
 
 	// allocate memory for the assembled data
-	srcdata = auto_alloc_array(machine, UINT8, gx0->elements() * gx0->width() * gx0->height());
+	srcdata = auto_alloc_array(machine(), UINT8, gx0->elements() * gx0->width() * gx0->height());
 
 	// loop over elements
 	dest = srcdata;
@@ -1485,8 +1404,8 @@ void atarigen_blend_gfx(running_machine &machine, int gfx0, int gfx1, int mask0,
 	gx0->set_granularity(granularity);
 
 	// free the second graphics element
-	machine.gfx[gfx1] = NULL;
-	auto_free(machine, gx1);
+	machine().gfx[gfx1] = NULL;
+	auto_free(machine(), gx1);
 }
 
 

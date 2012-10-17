@@ -164,7 +164,7 @@ WRITE8_MEMBER(foodf_state::digital_w)
 	if (!(data & 0x04))
 		scanline_int_ack_w(space,0,0);
 	if (!(data & 0x08))
-		atarigen_video_int_ack_w(space,0,0,0xffff);
+		video_int_ack_w(space,0,0);
 
 	output_set_led_value(0, (data >> 4) & 1);
 	output_set_led_value(1, (data >> 5) & 1);
@@ -209,7 +209,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, foodf_state )
 	AM_RANGE(0x014000, 0x014fff) AM_MIRROR(0x3e3000) AM_RAM
 	AM_RANGE(0x018000, 0x018fff) AM_MIRROR(0x3e3000) AM_RAM
 	AM_RANGE(0x01c000, 0x01c0ff) AM_MIRROR(0x3e3f00) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x800000, 0x8007ff) AM_MIRROR(0x03f800) AM_RAM_WRITE_LEGACY(atarigen_playfield_w) AM_SHARE("playfield")
+	AM_RANGE(0x800000, 0x8007ff) AM_MIRROR(0x03f800) AM_RAM_WRITE(playfield_w) AM_SHARE("playfield")
 	AM_RANGE(0x900000, 0x9001ff) AM_MIRROR(0x03fe00) AM_DEVREADWRITE8("nvram", x2212_device, read, write, 0x00ff)
 	AM_RANGE(0x940000, 0x940007) AM_MIRROR(0x023ff8) AM_READ(analog_r)
 	AM_RANGE(0x944000, 0x944007) AM_MIRROR(0x023ff8) AM_WRITE(analog_w)
@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START( foodf, foodf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
 
 	MCFG_MACHINE_START_OVERRIDE(foodf_state,foodf)
 	MCFG_MACHINE_RESET_OVERRIDE(foodf_state,foodf)

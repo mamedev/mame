@@ -221,8 +221,9 @@ READ16_HANDLER( hd68k_port0_r )
             .....
         0x8000 = SW1 #1
     */
+	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 	int temp = (space.machine().root_device().ioport("SW1")->read() << 8) | space.machine().root_device().ioport("IN0")->read();
-	if (atarigen_get_hblank(*space.machine().primary_screen)) temp ^= 0x0002;
+	if (state->get_hblank(*space.machine().primary_screen)) temp ^= 0x0002;
 	temp ^= 0x0018;		/* both EOCs always high for now */
 	return temp;
 }

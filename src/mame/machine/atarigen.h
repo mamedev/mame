@@ -106,6 +106,17 @@ public:
 	void scanline_int_set(screen_device &screen, int scanline);
 	INTERRUPT_GEN_MEMBER(scanline_int_gen);
 	DECLARE_WRITE16_MEMBER(scanline_int_ack_w);
+	INTERRUPT_GEN_MEMBER(sound_int_gen);
+	DECLARE_WRITE16_MEMBER(sound_int_ack_w);
+	INTERRUPT_GEN_MEMBER(video_int_gen);
+	DECLARE_WRITE16_MEMBER(video_int_ack_w);
+	
+	// EEPROM helpers
+	WRITE16_MEMBER(eeprom_enable_w);
+	WRITE16_MEMBER(eeprom_w);
+	WRITE32_MEMBER(eeprom32_w);
+	READ16_MEMBER(eeprom_r);
+	READ32_MEMBER(eeprom_upper32_r);
 
 	// slapstic helpers
 	void slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, int chipnum);
@@ -145,9 +156,41 @@ public:
 
 	// video controller
 	void atarivc_eof_update(emu_timer &timer, screen_device &screen);
+	void atarivc_reset(screen_device &screen, UINT16 *eof_data, int playfields);
+	void atarivc_w(screen_device &screen, offs_t offset, UINT16 data, UINT16 mem_mask);
+	UINT16 atarivc_r(screen_device &screen, offs_t offset);
+	inline void atarivc_update_pf_xscrolls()
+	{
+		m_atarivc_state.pf0_xscroll = m_atarivc_state.pf0_xscroll_raw + ((m_atarivc_state.pf1_xscroll_raw) & 7);
+		m_atarivc_state.pf1_xscroll = m_atarivc_state.pf1_xscroll_raw + 4;
+	}
+	void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newword);
+
+	// playfield/alpha tilemap helpers
+	DECLARE_WRITE16_MEMBER( alpha_w );
+	DECLARE_WRITE32_MEMBER( alpha32_w );
+	DECLARE_WRITE16_MEMBER( alpha2_w );
+	void set_playfield_latch(int data);
+	void set_playfield2_latch(int data);
+	DECLARE_WRITE16_MEMBER( playfield_w );
+	DECLARE_WRITE32_MEMBER( playfield32_w );
+	DECLARE_WRITE16_MEMBER( playfield_large_w );
+	DECLARE_WRITE16_MEMBER( playfield_upper_w );
+	DECLARE_WRITE16_MEMBER( playfield_dual_upper_w );
+	DECLARE_WRITE16_MEMBER( playfield_latched_lsb_w );
+	DECLARE_WRITE16_MEMBER( playfield_latched_msb_w );
+	DECLARE_WRITE16_MEMBER( playfield2_w );
+	DECLARE_WRITE16_MEMBER( playfield2_latched_msb_w );
 
 	// video helpers
+	int get_hblank(screen_device &screen) const { return (screen.hpos() > (screen.width() * 9 / 10)); }
 	void halt_until_hblank_0(device_t &device, screen_device &screen);
+	DECLARE_WRITE16_HANDLER( paletteram_666_w );
+	DECLARE_WRITE16_HANDLER( expanded_paletteram_666_w );
+	DECLARE_WRITE32_HANDLER( paletteram32_666_w );
+
+	// misc helpers
+	void blend_gfx(int gfx0, int gfx1, int mask0, int mask1);
 
 	// vector and early raster EAROM interface
 	DECLARE_READ8_MEMBER( earom_r );
@@ -232,92 +275,6 @@ public:
 
 	atarigen_screen_timer	m_screen_timer[2];
 };
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-/*---------------------------------------------------------------
-    INTERRUPT HANDLING
----------------------------------------------------------------*/
-
-INTERRUPT_GEN( atarigen_sound_int_gen );
-DECLARE_WRITE16_HANDLER( atarigen_sound_int_ack_w );
-DECLARE_WRITE32_HANDLER( atarigen_sound_int_ack32_w );
-
-INTERRUPT_GEN( atarigen_video_int_gen );
-DECLARE_WRITE16_HANDLER( atarigen_video_int_ack_w );
-DECLARE_WRITE32_HANDLER( atarigen_video_int_ack32_w );
-
-
-/*---------------------------------------------------------------
-    EEPROM HANDLING
----------------------------------------------------------------*/
-
-DECLARE_WRITE16_HANDLER( atarigen_eeprom_enable_w );
-DECLARE_WRITE16_HANDLER( atarigen_eeprom_w );
-DECLARE_READ16_HANDLER( atarigen_eeprom_r );
-DECLARE_READ16_HANDLER( atarigen_eeprom_upper_r );
-
-DECLARE_WRITE32_HANDLER( atarigen_eeprom_enable32_w );
-DECLARE_WRITE32_HANDLER( atarigen_eeprom32_w );
-DECLARE_READ32_HANDLER( atarigen_eeprom_upper32_r );
-
-
-/*---------------------------------------------------------------
-    VIDEO CONTROLLER
----------------------------------------------------------------*/
-
-void atarivc_reset(screen_device &screen, UINT16 *eof_data, int playfields);
-
-void atarivc_w(screen_device &screen, offs_t offset, UINT16 data, UINT16 mem_mask);
-UINT16 atarivc_r(screen_device &screen, offs_t offset);
-
-INLINE void atarivc_update_pf_xscrolls(atarigen_state *state)
-{
-	state->m_atarivc_state.pf0_xscroll = state->m_atarivc_state.pf0_xscroll_raw + ((state->m_atarivc_state.pf1_xscroll_raw) & 7);
-	state->m_atarivc_state.pf1_xscroll = state->m_atarivc_state.pf1_xscroll_raw + 4;
-}
-
-
-/*---------------------------------------------------------------
-    PLAYFIELD/ALPHA MAP HELPERS
----------------------------------------------------------------*/
-
-DECLARE_WRITE16_HANDLER( atarigen_alpha_w );
-DECLARE_WRITE32_HANDLER( atarigen_alpha32_w );
-DECLARE_WRITE16_HANDLER( atarigen_alpha2_w );
-void atarigen_set_playfield_latch(atarigen_state *state, int data);
-void atarigen_set_playfield2_latch(atarigen_state *state, int data);
-DECLARE_WRITE16_HANDLER( atarigen_playfield_w );
-DECLARE_WRITE32_HANDLER( atarigen_playfield32_w );
-DECLARE_WRITE16_HANDLER( atarigen_playfield_large_w );
-DECLARE_WRITE16_HANDLER( atarigen_playfield_upper_w );
-DECLARE_WRITE16_HANDLER( atarigen_playfield_dual_upper_w );
-DECLARE_WRITE16_HANDLER( atarigen_playfield_latched_lsb_w );
-DECLARE_WRITE16_HANDLER( atarigen_playfield_latched_msb_w );
-DECLARE_WRITE16_HANDLER( atarigen_playfield2_w );
-DECLARE_WRITE16_HANDLER( atarigen_playfield2_latched_msb_w );
-
-
-/*---------------------------------------------------------------
-    VIDEO HELPERS
----------------------------------------------------------------*/
-
-int atarigen_get_hblank(screen_device &screen);
-DECLARE_WRITE16_HANDLER( atarigen_666_paletteram_w );
-DECLARE_WRITE16_HANDLER( atarigen_expanded_666_paletteram_w );
-DECLARE_WRITE32_HANDLER( atarigen_666_paletteram32_w );
-
-
-/*---------------------------------------------------------------
-    MISC HELPERS
----------------------------------------------------------------*/
-
-void atarigen_swap_mem(void *ptr1, void *ptr2, int bytes);
-void atarigen_blend_gfx(running_machine &machine, int gfx0, int gfx1, int mask0, int mask1);
 
 
 

@@ -44,9 +44,8 @@ TILE_GET_INFO_MEMBER(atarig1_state::get_playfield_tile_info)
 
 VIDEO_START_MEMBER(atarig1_state,atarig1)
 {
-
 	/* blend the playfields and free the temporary one */
-	atarigen_blend_gfx(machine(), 0, 2, 0x0f, 0x10);
+	blend_gfx(0, 2, 0x0f, 0x10);
 
 	/* initialize the playfield */
 	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarig1_state::get_playfield_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,64);

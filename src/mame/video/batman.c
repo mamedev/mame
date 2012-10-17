@@ -142,7 +142,7 @@ void batman_state::scanline_update(screen_device &screen, int scanline)
 						if (scanline > 0)
 							screen.update_partial(scanline - 1);
 						m_atarivc_state.pf1_xscroll_raw = (data >> 7) & 0x1ff;
-						atarivc_update_pf_xscrolls(this);
+						atarivc_update_pf_xscrolls();
 						m_playfield_tilemap->set_scrollx(0, m_atarivc_state.pf0_xscroll);
 						m_playfield2_tilemap->set_scrollx(0, m_atarivc_state.pf1_xscroll);
 						break;
@@ -151,7 +151,7 @@ void batman_state::scanline_update(screen_device &screen, int scanline)
 						if (scanline > 0)
 							screen.update_partial(scanline - 1);
 						m_atarivc_state.pf0_xscroll_raw = (data >> 7) & 0x1ff;
-						atarivc_update_pf_xscrolls(this);
+						atarivc_update_pf_xscrolls();
 						m_playfield_tilemap->set_scrollx(0, m_atarivc_state.pf0_xscroll);
 						break;
 

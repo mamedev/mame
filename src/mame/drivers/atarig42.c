@@ -343,18 +343,18 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig42_state )
 	AM_RANGE(0xe00030, 0xe00031) AM_READ8(sound_r, 0x00ff)
 	AM_RANGE(0xe00040, 0xe00041) AM_WRITE8(sound_w, 0x00ff)
 	AM_RANGE(0xe00050, 0xe00051) AM_WRITE(io_latch_w)
-	AM_RANGE(0xe00060, 0xe00061) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
-	AM_RANGE(0xe03000, 0xe03001) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
+	AM_RANGE(0xe00060, 0xe00061) AM_WRITE(eeprom_enable_w)
+	AM_RANGE(0xe03000, 0xe03001) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0xe03800, 0xe03801) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xe80000, 0xe80fff) AM_RAM
 	AM_RANGE(0xf40000, 0xf40001) AM_READ_LEGACY(asic65_io_r)
 	AM_RANGE(0xf60000, 0xf60001) AM_READ_LEGACY(asic65_r)
 	AM_RANGE(0xf80000, 0xf80003) AM_WRITE_LEGACY(asic65_data_w)
-	AM_RANGE(0xfa0000, 0xfa0fff) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
-	AM_RANGE(0xfc0000, 0xfc0fff) AM_RAM_WRITE_LEGACY(atarigen_666_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xfa0000, 0xfa0fff) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
+	AM_RANGE(0xfc0000, 0xfc0fff) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff0000, 0xff0fff) AM_DEVREADWRITE_LEGACY("rle", atarirle_spriteram_r, atarirle_spriteram_w)
-	AM_RANGE(0xff2000, 0xff5fff) AM_WRITE_LEGACY(atarigen_playfield_w) AM_SHARE("playfield")
-	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE_LEGACY(atarigen_alpha_w) AM_SHARE("alpha")
+	AM_RANGE(0xff2000, 0xff5fff) AM_WRITE(playfield_w) AM_SHARE("playfield")
+	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(alpha_w) AM_SHARE("alpha")
 	AM_RANGE(0xff7000, 0xff7001) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -548,7 +548,7 @@ static MACHINE_CONFIG_START( atarig42, atarig42_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
 
 	/* ASIC65 */
 	MCFG_FRAGMENT_ADD(asic65)

@@ -255,10 +255,9 @@ MACHINE_RESET_MEMBER(atarisy2_state,atarisy2)
 
 INTERRUPT_GEN_MEMBER(atarisy2_state::vblank_int)
 {
-
 	/* clock the VBLANK through */
 	if (m_interrupt_enable & 8)
-		atarigen_video_int_gen(&device);
+		video_int_gen(device);
 }
 
 
@@ -794,7 +793,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy2_state )
 	AM_RANGE(0x1580, 0x1581) AM_MIRROR(0x001e) AM_WRITE(int0_ack_w)
 	AM_RANGE(0x15a0, 0x15a1) AM_MIRROR(0x001e) AM_WRITE(int1_ack_w)
 	AM_RANGE(0x15c0, 0x15c1) AM_MIRROR(0x001e) AM_WRITE(scanline_int_ack_w)
-	AM_RANGE(0x15e0, 0x15e1) AM_MIRROR(0x001e) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
+	AM_RANGE(0x15e0, 0x15e1) AM_MIRROR(0x001e) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0x1600, 0x1601) AM_MIRROR(0x007e) AM_WRITE(int_enable_w)
 	AM_RANGE(0x1680, 0x1681) AM_MIRROR(0x007e) AM_WRITE8(sound_w, 0x00ff)
 	AM_RANGE(0x1700, 0x1701) AM_MIRROR(0x007e) AM_WRITE_LEGACY(atarisy2_xscroll_w) AM_SHARE("xscroll")
