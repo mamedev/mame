@@ -5,11 +5,17 @@
 	driver by Angelo Salese
 
 	TODO:
-	- RAM-based tiles color offset (perhaps there isn't a real palette bank,
-	  it's just sloppy code?)
-	- Bogus "Hole" in main screen display
+	- Bogus "Hole" in main screen display;
 	- Is the background pen really black?
-	- Lots of unmapped I/Os (game doesn't make much use of the HW)
+	- Lots of unmapped I/Os (game doesn't make much use of the HW);
+	- outputs / lamps;
+	- video / irq timings;
+
+	Notes:
+	- at POST the SW tries to write to the palette RAM in a banking fashion.
+	  I think it's just an HW left-over.
+	- there are various bogus checks to ROM region throughout the whole SW
+	  (0x0030-0x0031? O.o)
 
 ============================================================================
 	Excellent System
@@ -57,6 +63,7 @@ public:
 	UINT8 *m_vram;
 	UINT8 m_vram_bank[2];
 	UINT8 m_mux_data;
+	UINT8 m_lamps_data;
 
 	DECLARE_READ8_MEMBER(bank_r);
 	DECLARE_WRITE8_MEMBER(bank_w);
@@ -72,6 +79,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ8_MEMBER(in_mux_r);
 	DECLARE_READ8_MEMBER(in_mux_type_r);
+	DECLARE_WRITE8_MEMBER(output_w);
+	DECLARE_READ8_MEMBER(lamps_r);
+	DECLARE_WRITE8_MEMBER(lamps_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_irq_scanline);
 
@@ -106,7 +116,7 @@ UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 		for (x=0;x<32;x++)
 		{
 			UINT16 tile = ((m_vram[count])|(m_vram[count+1]<<8)) & 0xfff;
-			UINT8 col = (m_vram[count+1] >> 4) + 0x10;
+			UINT8 col = (m_vram[count+1] >> 4);
 
 			drawgfx_opaque(bitmap,cliprect,gfx_2,tile,col,0,0,x*16,y*16);
 
@@ -121,7 +131,7 @@ UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 		for (x=0;x<64;x++)
 		{
 			UINT16 tile = ((m_vram[count])|(m_vram[count+1]<<8)) & 0xfff;
-			UINT8 col = 0x10; // TODO
+			UINT8 col = (m_vram[count+1] >> 4); // ok?
 
 			drawgfx_transpen(bitmap,cliprect,gfx,tile,col,0,0,x*8,y*8,0);
 
@@ -156,8 +166,8 @@ WRITE8_MEMBER( dblcrown_state::irq_source_w)
 
 READ8_MEMBER( dblcrown_state::palette_r)
 {
-	if(m_bank & 8) /* TODO: verify this */
-		offset+=0x200;
+	//if(m_bank & 8) /* TODO: verify this */
+	//	offset+=0x200;
 
 	return m_pal_ram[offset];
 }
@@ -166,8 +176,8 @@ WRITE8_MEMBER( dblcrown_state::palette_w)
 {
 	int r,g,b,datax;
 
-	if(m_bank & 8) /* TODO: verify this */
-		offset+=0x200;
+	//if(m_bank & 8) /* TODO: verify this */
+	//	offset+=0x200;
 
 	m_pal_ram[offset] = data;
 	offset>>=1;
@@ -264,6 +274,25 @@ READ8_MEMBER( dblcrown_state::in_mux_type_r )
 	return res;
 }
 
+WRITE8_MEMBER( dblcrown_state::output_w )
+{
+	// bit 4: coin counter
+
+	//popmessage("%02x",data);
+}
+
+
+READ8_MEMBER( dblcrown_state::lamps_r )
+{
+	return m_lamps_data;
+}
+
+WRITE8_MEMBER( dblcrown_state::lamps_w )
+{
+	//popmessage("%02x",data);
+	m_lamps_data = data;
+}
+
 static ADDRESS_MAP_START( dblcrown_map, AS_PROGRAM, 8, dblcrown_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -272,11 +301,11 @@ static ADDRESS_MAP_START( dblcrown_map, AS_PROGRAM, 8, dblcrown_state )
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE(palette_r, palette_w)
-//	AM_RANGE(0xfe00, 0xfeff) AM_RAM // ???
+	AM_RANGE(0xfe00, 0xfeff) AM_RAM // ???
 	AM_RANGE(0xff00, 0xff01) AM_READWRITE(vram_bank_r, vram_bank_w)
 	AM_RANGE(0xff04, 0xff04) AM_READWRITE(irq_source_r,irq_source_w)
 
-//	AM_RANGE(0xff00, 0xffff) AM_RAM // ???, intentional fall-through
+	AM_RANGE(0xff00, 0xffff) AM_RAM // ???, intentional fall-through
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dblcrown_io, AS_IO, 8, dblcrown_state )
@@ -288,10 +317,12 @@ static ADDRESS_MAP_START( dblcrown_io, AS_IO, 8, dblcrown_state )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSWD")
 	AM_RANGE(0x04, 0x04) AM_READ(in_mux_r)
 	AM_RANGE(0x05, 0x05) AM_READ(in_mux_type_r)
+	AM_RANGE(0x10, 0x10) AM_READWRITE(lamps_r,lamps_w)
 	AM_RANGE(0x11, 0x11) AM_READWRITE(bank_r,bank_w)
 	AM_RANGE(0x12, 0x12) AM_READWRITE(mux_r,mux_w)
-//	AM_RANGE(0x20, 0x20) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x20, 0x21) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+//	AM_RANGE(0x30, 0x30) always 1?
+	AM_RANGE(0x40, 0x40) AM_WRITE(output_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dblcrown )
@@ -455,9 +486,9 @@ static const gfx_layout char_16x16_layout =
 
 static GFXDECODE_START( dblcrown )
 #ifdef DEBUG_VRAM
-	GFXDECODE_ENTRY( "vram", 0, char_8x8_layout, 0, 0x20 )
+	GFXDECODE_ENTRY( "vram", 0, char_8x8_layout, 0, 0x10 )
 #endif
-	GFXDECODE_ENTRY( "gfx1", 0, char_16x16_layout, 0, 0x20 )
+	GFXDECODE_ENTRY( "gfx1", 0, char_16x16_layout, 0, 0x10 )
 GFXDECODE_END
 
 
@@ -538,7 +569,7 @@ static MACHINE_CONFIG_START( dblcrown, dblcrown_state )
 
 	MCFG_GFXDECODE(dblcrown)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -570,4 +601,4 @@ ROM_START( dblcrown )
 	ROM_LOAD("palce16v8h.u39", 0x0000, 0x0bf1, CRC(997b0ba9) SHA1(1c121ab74f33d5162b619740b08cc7bc694c257d) )
 ROM_END
 
-GAME( 1997, dblcrown,  0,   dblcrown,  dblcrown,  driver_device, 0,       ROT0, "Cadence Technology",      "Double Crown (v1.0.3)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS ) // 1997 DYNA copyright in tile GFX
+GAME( 1997, dblcrown,  0,   dblcrown,  dblcrown,  driver_device, 0,       ROT0, "Cadence Technology",      "Double Crown (v1.0.3)", GAME_IMPERFECT_GRAPHICS ) // 1997 DYNA copyright in tile GFX
