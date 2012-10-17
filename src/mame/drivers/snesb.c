@@ -19,8 +19,10 @@ TODO:
 
  - all games : (re)add PORT_DIPLOCATION
  - kiinstb  : fix gfx glitches, missing texts
- - ffight2b : fix starting credits (RAM - mainly 0x7eadce where credits are stored - is filled with 0x55, so you are awarded 55 credits on a hard reset)
+ - ffight2b : remove hack for starting credits (RAM - mainly 0x7eadce where credits are stored - is filled with 0x55,
+   so you are awarded 55 credits on a hard reset)
  - sblast2b : dipswicthes
+ - sblast2b : pressing start during gameplay changes the character used. Intentional?
  - denseib  :  fix gfx glitches, missing texts
 
 ***************************************************************************
@@ -653,6 +655,19 @@ static MACHINE_CONFIG_START( kinstb, snesb_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
+MACHINE_RESET( ffight2b )
+{
+	address_space &cpu0space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	MACHINE_RESET_CALL( snes );
+
+	/* Hack: avoid starting with 55 credits. It's either a work RAM init fault or MCU clears it by his own, hard to tell ... */
+	cpu0space.write_byte(0x7eadce, 0x00);
+}
+
+static MACHINE_CONFIG_DERIVED( ffight2b, kinstb )
+	MCFG_MACHINE_RESET( ffight2b )
+MACHINE_CONFIG_END
+
 DRIVER_INIT_MEMBER(snesb_state,kinstb)
 {
 	INT32 i;
@@ -965,7 +980,7 @@ ROM_END
 
 
 GAME( 199?, kinstb,       0,     kinstb,	     kinstb, snesb_state,    kinstb,       ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                 GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, ffight2b,     0,     kinstb,	     ffight2b, snesb_state,  ffight2b,     ROT0, "bootleg",  "Final Fight 2 (SNES bootleg)",                   GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, ffight2b,     0,     ffight2b,	     ffight2b, snesb_state,  ffight2b,     ROT0, "bootleg",  "Final Fight 2 (SNES bootleg)",                   GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, iron,         0,     kinstb,	     iron, snesb_state,      iron,         ROT0, "bootleg",  "Iron (SNES bootleg)",                            GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, denseib,      0,     kinstb,	     denseib, snesb_state,   denseib,      ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg)",             GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sblast2b,     0,     kinstb,	     sblast2b, snesb_state,  sblast2b,     ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS)
