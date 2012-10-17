@@ -31,27 +31,18 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine &machine)
+void vindictr_state::update_interrupts()
 {
-	vindictr_state *state = machine.driver_data<vindictr_state>();
-	machine.device("maincpu")->execute().set_input_line(4, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("maincpu")->execute().set_input_line(6, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-MACHINE_START_MEMBER(vindictr_state,vindictr)
-{
-	atarigen_init(machine());
+	subdevice("maincpu")->execute().set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	subdevice("maincpu")->execute().set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 MACHINE_RESET_MEMBER(vindictr_state,vindictr)
 {
-
-	atarigen_eeprom_reset(this);
-	atarigen_interrupt_reset(this, update_interrupts);
-	atarigen_scanline_timer_reset(*machine().primary_screen, vindictr_scanline_update, 8);
-	atarijsa_reset();
+	atarigen_state::machine_reset();
+	scanline_timer_reset(*machine().primary_screen, 8);
+	atarijsa_reset(machine());
 }
 
 
@@ -88,12 +79,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vindictr_state )
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x26001f) AM_READ(port1_r)
 	AM_RANGE(0x260020, 0x26002f) AM_READ_PORT("260020")
-	AM_RANGE(0x260030, 0x260031) AM_READ_LEGACY(atarigen_sound_r)
+	AM_RANGE(0x260030, 0x260031) AM_READ8(sound_r, 0x00ff)
 	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE_LEGACY(atarigen_scanline_int_ack_w)
+	AM_RANGE(0x360000, 0x360001) AM_WRITE(scanline_int_ack_w)
 	AM_RANGE(0x360010, 0x360011) AM_WRITENOP
-	AM_RANGE(0x360020, 0x360021) AM_WRITE_LEGACY(atarigen_sound_reset_w)
-	AM_RANGE(0x360030, 0x360031) AM_WRITE_LEGACY(atarigen_sound_w)
+	AM_RANGE(0x360020, 0x360021) AM_WRITE(sound_reset_w)
+	AM_RANGE(0x360030, 0x360031) AM_WRITE8(sound_w, 0x00ff)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE_LEGACY(vindictr_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x8000) AM_RAM_WRITE_LEGACY(atarigen_playfield_w) AM_SHARE("playfield")
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_MIRROR(0x8000) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
@@ -198,7 +189,6 @@ static MACHINE_CONFIG_START( vindictr, vindictr_state )
 	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_START_OVERRIDE(vindictr_state,vindictr)
 	MCFG_MACHINE_RESET_OVERRIDE(vindictr_state,vindictr)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 

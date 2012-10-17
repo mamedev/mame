@@ -256,17 +256,16 @@ READ16_HANDLER( cyberbal_paletteram_1_r )
  *
  *************************************/
 
-void cyberbal_scanline_update(screen_device &screen, int scanline)
+void cyberbal_state::scanline_update(screen_device &screen, int scanline)
 {
-	cyberbal_state *state = screen.machine().driver_data<cyberbal_state>();
 	int i;
 	screen_device *update_screen;
 
 	/* loop over screens */
-	screen_device_iterator iter(screen.machine().root_device());
+	screen_device_iterator iter(*this);
 	for (i = 0, update_screen = iter.first(); update_screen != NULL; i++, update_screen = iter.next())
 	{
-		UINT16 *vram = i ? state->m_alpha2 : state->m_alpha;
+		UINT16 *vram = i ? m_alpha2 : m_alpha;
 		UINT16 *base = &vram[((scanline - 8) / 8) * 64 + 47];
 
 		/* keep in range */
@@ -278,44 +277,44 @@ void cyberbal_scanline_update(screen_device &screen, int scanline)
 		/* update the current parameters */
 		if (!(base[3] & 1))
 		{
-			if (((base[3] >> 1) & 7) != state->m_playfield_palette_bank[i])
+			if (((base[3] >> 1) & 7) != m_playfield_palette_bank[i])
 			{
 				if (scanline > 0)
 					update_screen->update_partial(scanline - 1);
-				state->m_playfield_palette_bank[i] = (base[3] >> 1) & 7;
-				(i ? state->m_playfield2_tilemap : state->m_playfield_tilemap)->set_palette_offset(state->m_playfield_palette_bank[i] << 8);
+				m_playfield_palette_bank[i] = (base[3] >> 1) & 7;
+				(i ? m_playfield2_tilemap : m_playfield_tilemap)->set_palette_offset(m_playfield_palette_bank[i] << 8);
 			}
 		}
 		if (!(base[4] & 1))
 		{
 			int newscroll = 2 * (((base[4] >> 7) + 4) & 0x1ff);
-			if (newscroll != state->m_playfield_xscroll[i])
+			if (newscroll != m_playfield_xscroll[i])
 			{
 				if (scanline > 0)
 					update_screen->update_partial(scanline - 1);
-				(i ? state->m_playfield2_tilemap : state->m_playfield_tilemap)->set_scrollx(0, newscroll);
-				state->m_playfield_xscroll[i] = newscroll;
+				(i ? m_playfield2_tilemap : m_playfield_tilemap)->set_scrollx(0, newscroll);
+				m_playfield_xscroll[i] = newscroll;
 			}
 		}
 		if (!(base[5] & 1))
 		{
 			/* a new vscroll latches the offset into a counter; we must adjust for this */
 			int newscroll = ((base[5] >> 7) - (scanline)) & 0x1ff;
-			if (newscroll != state->m_playfield_yscroll[i])
+			if (newscroll != m_playfield_yscroll[i])
 			{
 				if (scanline > 0)
 					update_screen->update_partial(scanline - 1);
-				(i ? state->m_playfield2_tilemap : state->m_playfield_tilemap)->set_scrolly(0, newscroll);
-				state->m_playfield_yscroll[i] = newscroll;
+				(i ? m_playfield2_tilemap : m_playfield_tilemap)->set_scrolly(0, newscroll);
+				m_playfield_yscroll[i] = newscroll;
 			}
 		}
 		if (!(base[7] & 1))
 		{
-			if (state->m_current_slip[i] != base[7])
+			if (m_current_slip[i] != base[7])
 			{
 				if (scanline > 0)
 					update_screen->update_partial(scanline - 1);
-				state->m_current_slip[i] = base[7];
+				m_current_slip[i] = base[7];
 			}
 		}
 	}

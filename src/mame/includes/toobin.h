@@ -17,6 +17,7 @@ public:
 
 	double			m_brightness;
 	bitmap_ind16 m_pfbitmap;
+	virtual void update_interrupts();
 	DECLARE_WRITE16_MEMBER(interrupt_scan_w);
 	DECLARE_READ16_MEMBER(special_port1_r);
 	DECLARE_DRIVER_INIT(toobin);

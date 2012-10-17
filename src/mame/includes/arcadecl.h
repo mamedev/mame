@@ -16,6 +16,8 @@ public:
 
 	required_shared_ptr<UINT16> m_bitmap;
 	UINT8			m_has_mo;
+	virtual void update_interrupts();
+	virtual void scanline_update(screen_device &screen, int scanline);
 	DECLARE_WRITE16_MEMBER(latch_w);
 	DECLARE_DRIVER_INIT(sparkz);
 	DECLARE_MACHINE_START(arcadecl);

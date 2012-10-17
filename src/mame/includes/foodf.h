@@ -24,6 +24,7 @@ public:
 
 	UINT8			m_whichport;
 	required_shared_ptr<UINT16> m_spriteram;
+	virtual void update_interrupts();
 	DECLARE_WRITE16_MEMBER(nvram_recall_w);
 	DECLARE_WRITE8_MEMBER(digital_w);
 	DECLARE_READ16_MEMBER(analog_r);
@@ -36,5 +37,5 @@ public:
 	DECLARE_MACHINE_RESET(foodf);
 	DECLARE_VIDEO_START(foodf);
 	UINT32 screen_update_foodf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update_timer);
 };

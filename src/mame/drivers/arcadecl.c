@@ -82,18 +82,17 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine &machine)
+void arcadecl_state::update_interrupts()
 {
-	arcadecl_state *state = machine.driver_data<arcadecl_state>();
-	machine.device("maincpu")->execute().set_input_line(4, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void scanline_update(screen_device &screen, int scanline)
+void arcadecl_state::scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0)
-		atarigen_scanline_int_gen(screen.machine().device("maincpu"));
+		scanline_int_gen(*subdevice("maincpu"));
 }
 
 
@@ -104,18 +103,10 @@ static void scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-MACHINE_START_MEMBER(arcadecl_state,arcadecl)
-{
-	atarigen_init(machine());
-}
-
-
 MACHINE_RESET_MEMBER(arcadecl_state,arcadecl)
 {
-
-	atarigen_eeprom_reset(this);
-	atarigen_interrupt_reset(this, update_interrupts);
-	atarigen_scanline_timer_reset(*machine().primary_screen, scanline_update, 32);
+	atarigen_state::machine_reset();
+	scanline_timer_reset(*machine().primary_screen, 32);
 }
 
 
@@ -139,7 +130,7 @@ WRITE16_MEMBER(arcadecl_state::latch_w)
 	{
 		okim6295_device *oki = machine().device<okim6295_device>("oki");
 		oki->set_bank_base((data & 0x80) ? 0x40000 : 0x00000);
-		atarigen_set_oki6295_vol(machine(), (data & 0x001f) * 100 / 0x1f);
+		set_oki6295_volume((data & 0x001f) * 100 / 0x1f);
 	}
 }
 
@@ -170,7 +161,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, arcadecl_state )
 	AM_RANGE(0x640060, 0x64006f) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
 	AM_RANGE(0x641000, 0x641fff) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x642000, 0x642001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
-	AM_RANGE(0x646000, 0x646fff) AM_WRITE_LEGACY(atarigen_scanline_int_ack_w)
+	AM_RANGE(0x646000, 0x646fff) AM_WRITE(scanline_int_ack_w)
 	AM_RANGE(0x647000, 0x647fff) AM_WRITE(watchdog_reset16_w)
 ADDRESS_MAP_END
 
@@ -330,7 +321,6 @@ static MACHINE_CONFIG_START( arcadecl, arcadecl_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
-	MCFG_MACHINE_START_OVERRIDE(arcadecl_state,arcadecl)
 	MCFG_MACHINE_RESET_OVERRIDE(arcadecl_state,arcadecl)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 

@@ -224,7 +224,7 @@ WRITE16_HANDLER( atarisy1_bankselect_w )
 	if (diff & 0x0080)
 	{
 		space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, (newselect & 0x0080) ? CLEAR_LINE : ASSERT_LINE);
-		if (!(newselect & 0x0080)) atarigen_sound_reset(space.machine());
+		if (!(newselect & 0x0080)) state->sound_cpu_reset();
 	}
 
 	/* if MO or playfield banks change, force a partial update */
@@ -386,7 +386,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3off_callback)
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* clear the state */
-	atarigen_scanline_int_ack_w(space, 0, 0, 0xffff);
+	scanline_int_ack_w(space, 0, 0);
 }
 
 
@@ -395,7 +395,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3_callback)
 	int scanline = param;
 
 	/* update the state */
-	atarigen_scanline_int_gen(machine().device("maincpu"));
+	scanline_int_gen(*subdevice("maincpu"));
 
 	/* set a timer to turn it off */
 	m_int3off_timer->adjust(machine().primary_screen->scan_period());

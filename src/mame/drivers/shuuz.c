@@ -31,10 +31,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine &machine)
+void shuuz_state::update_interrupts()
 {
-	shuuz_state *state = machine.driver_data<shuuz_state>();
-	machine.device("maincpu")->execute().set_input_line(4, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	subdevice("maincpu")->execute().set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -64,17 +63,9 @@ WRITE16_MEMBER(shuuz_state::shuuz_atarivc_w)
  *
  *************************************/
 
-MACHINE_START_MEMBER(shuuz_state,shuuz)
-{
-	atarigen_init(machine());
-}
-
-
 MACHINE_RESET_MEMBER(shuuz_state,shuuz)
 {
-
-	atarigen_eeprom_reset(this);
-	atarigen_interrupt_reset(this, update_interrupts);
+	atarigen_state::machine_reset();
 	atarivc_reset(*machine().primary_screen, m_atarivc_eof_data, 1);
 }
 
@@ -263,7 +254,6 @@ static MACHINE_CONFIG_START( shuuz, shuuz_state )
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_START_OVERRIDE(shuuz_state,shuuz)
 	MCFG_MACHINE_RESET_OVERRIDE(shuuz_state,shuuz)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 

@@ -64,24 +64,7 @@
     STATIC FUNCTION DECLARATIONS
 ***************************************************************************/
 
-static void slapstic_postload(running_machine &machine);
-
-static TIMER_CALLBACK( scanline_interrupt_callback );
-
-static void update_6502_irq(running_machine &machine);
-static TIMER_CALLBACK( delayed_sound_reset );
-static TIMER_CALLBACK( delayed_sound_w );
-static TIMER_CALLBACK( delayed_6502_sound_w );
-
-static void atarigen_set_vol(running_machine &machine, int volume, device_type type);
-
-static TIMER_CALLBACK( scanline_timer_callback );
-
 static void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newword);
-
-static TIMER_CALLBACK( unhalt_cpu );
-
-static TIMER_CALLBACK( atarivc_eof_update );
 
 
 
@@ -89,12 +72,12 @@ static TIMER_CALLBACK( atarivc_eof_update );
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE const atarigen_screen_timer *get_screen_timer(screen_device &screen)
+inline const atarigen_screen_timer *get_screen_timer(screen_device &screen)
 {
 	atarigen_state *state = screen.machine().driver_data<atarigen_state>();
 	int i;
 
-	/* find the index of the timer that matches the screen */
+	// find the index of the timer that matches the screen
 	for (i = 0; i < ARRAY_LENGTH(state->m_screen_timer); i++)
 		if (state->m_screen_timer[i].screen == &screen)
 			return &state->m_screen_timer[i];
@@ -109,226 +92,299 @@ INLINE const atarigen_screen_timer *get_screen_timer(screen_device &screen)
     OVERALL INIT
 ***************************************************************************/
 
-void atarigen_init(running_machine &machine)
+atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, const char *tag)
+	: driver_device(mconfig, type, tag),
+	  m_earom(*this, "earom"),
+	  m_earom_data(0),
+	  m_earom_control(0),
+	  m_eeprom(*this, "eeprom"),
+	  m_eeprom32(*this, "eeprom"),
+	  m_scanline_int_state(0),
+	  m_sound_int_state(0),
+	  m_video_int_state(0),
+	  m_eeprom_default(NULL),
+	  m_cpu_to_sound_ready(0),
+	  m_sound_to_cpu_ready(0),
+	  m_playfield(*this, "playfield"),
+	  m_playfield2(*this, "playfield2"),
+	  m_playfield_upper(*this, "playfield_up"),
+	  m_alpha(*this, "alpha"),
+	  m_alpha2(*this, "alpha2"),
+	  m_xscroll(*this, "xscroll"),
+	  m_yscroll(*this, "yscroll"),
+	  m_playfield32(*this, "playfield32"),
+	  m_alpha32(*this, "alpha32"),
+	  m_playfield_tilemap(NULL),
+	  m_playfield2_tilemap(NULL),
+	  m_alpha_tilemap(NULL),
+	  m_alpha2_tilemap(NULL),
+	  m_atarivc_data(*this, "atarivc_data"),
+	  m_atarivc_eof_data(*this, "atarivc_eof"),
+	  m_eeprom_unlocked(false),
+	  m_slapstic_num(0),
+	  m_slapstic(NULL),
+	  m_slapstic_bank(0),
+	  m_slapstic_last_pc(0),
+	  m_slapstic_last_address(0),
+	  m_slapstic_base(0),
+	  m_slapstic_mirror(0),
+	  m_sound_cpu(*this, "audiocpu"),
+	  m_cpu_to_sound(0),
+	  m_sound_to_cpu(0),
+	  m_timed_int(0),
+	  m_ym2151_int(0),
+	  m_scanlines_per_callback(0),
+	  m_actual_vc_latch0(0),
+	  m_actual_vc_latch1(0),
+	  m_atarivc_playfields(0),
+	  m_playfield_latch(0),
+	  m_playfield2_latch(0)
 {
-	atarigen_state *state = machine.driver_data<atarigen_state>();
+}
+
+void atarigen_state::machine_start()
+{
+	// find the sound CPU, until JSA is moved to be independent
+	if (m_sound_cpu == NULL)
+	{
+		device_t *device = subdevice("jsa");
+		if (device != NULL)
+			m_sound_cpu.set_target(downcast<m6502_device *>(device));
+	}
+
 	screen_device *screen;
 	int i;
 
-	/* allocate timers for all screens */
-	screen_device_iterator iter(machine.root_device());
-	assert(iter.count() <= ARRAY_LENGTH(state->m_screen_timer));
+	// allocate timers for all screens
+	screen_device_iterator iter(*this);
+	assert(iter.count() <= ARRAY_LENGTH(m_screen_timer));
 	for (i = 0, screen = iter.first(); screen != NULL; i++, screen = iter.next())
 	{
-		state->m_screen_timer[i].screen = screen;
-		state->m_screen_timer[i].scanline_interrupt_timer = machine.scheduler().timer_alloc(FUNC(scanline_interrupt_callback), (void *)screen);
-		state->m_screen_timer[i].scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_timer_callback), (void *)screen);
-		state->m_screen_timer[i].atarivc_eof_update_timer = machine.scheduler().timer_alloc(FUNC(atarivc_eof_update), (void *)screen);
+		m_screen_timer[i].screen = screen;
+		m_screen_timer[i].scanline_interrupt_timer = timer_alloc(TID_SCANLINE_INTERRUPT, (void *)screen);
+		m_screen_timer[i].scanline_timer = timer_alloc(TID_SCANLINE_TIMER, (void *)screen);
+		m_screen_timer[i].atarivc_eof_update_timer = timer_alloc(TID_ATARIVC_EOF, (void *)screen);
 	}
 
-	state->save_item(NAME(state->m_scanline_int_state));
-	state->save_item(NAME(state->m_sound_int_state));
-	state->save_item(NAME(state->m_video_int_state));
+	save_item(NAME(m_scanline_int_state));
+	save_item(NAME(m_sound_int_state));
+	save_item(NAME(m_video_int_state));
 
-	state->save_item(NAME(state->m_cpu_to_sound_ready));
-	state->save_item(NAME(state->m_sound_to_cpu_ready));
+	save_item(NAME(m_cpu_to_sound_ready));
+	save_item(NAME(m_sound_to_cpu_ready));
 
-	state->save_item(NAME(state->m_atarivc_state.latch1));				/* latch #1 value (-1 means disabled) */
-	state->save_item(NAME(state->m_atarivc_state.latch2));				/* latch #2 value (-1 means disabled) */
-	state->save_item(NAME(state->m_atarivc_state.rowscroll_enable));		/* true if row-scrolling is enabled */
-	state->save_item(NAME(state->m_atarivc_state.palette_bank));			/* which palette bank is enabled */
-	state->save_item(NAME(state->m_atarivc_state.pf0_xscroll));			/* playfield 1 xscroll */
-	state->save_item(NAME(state->m_atarivc_state.pf0_xscroll_raw));		/* playfield 1 xscroll raw value */
-	state->save_item(NAME(state->m_atarivc_state.pf0_yscroll));			/* playfield 1 yscroll */
-	state->save_item(NAME(state->m_atarivc_state.pf1_xscroll));			/* playfield 2 xscroll */
-	state->save_item(NAME(state->m_atarivc_state.pf1_xscroll_raw));		/* playfield 2 xscroll raw value */
-	state->save_item(NAME(state->m_atarivc_state.pf1_yscroll));			/* playfield 2 yscroll */
-	state->save_item(NAME(state->m_atarivc_state.mo_xscroll));			/* sprite xscroll */
-	state->save_item(NAME(state->m_atarivc_state.mo_yscroll));			/* sprite xscroll */
+	save_item(NAME(m_atarivc_state.latch1));				// latch #1 value (-1 means disabled)
+	save_item(NAME(m_atarivc_state.latch2));				// latch #2 value (-1 means disabled)
+	save_item(NAME(m_atarivc_state.rowscroll_enable));		// true if row-scrolling is enabled
+	save_item(NAME(m_atarivc_state.palette_bank));			// which palette bank is enabled
+	save_item(NAME(m_atarivc_state.pf0_xscroll));			// playfield 1 xscroll
+	save_item(NAME(m_atarivc_state.pf0_xscroll_raw));		// playfield 1 xscroll raw value
+	save_item(NAME(m_atarivc_state.pf0_yscroll));			// playfield 1 yscroll
+	save_item(NAME(m_atarivc_state.pf1_xscroll));			// playfield 2 xscroll
+	save_item(NAME(m_atarivc_state.pf1_xscroll_raw));		// playfield 2 xscroll raw value
+	save_item(NAME(m_atarivc_state.pf1_yscroll));			// playfield 2 yscroll
+	save_item(NAME(m_atarivc_state.mo_xscroll));			// sprite xscroll
+	save_item(NAME(m_atarivc_state.mo_yscroll));			// sprite xscroll
 
-	state->save_item(NAME(state->m_eeprom_unlocked));
+	save_item(NAME(m_eeprom_unlocked));
 
-	state->save_item(NAME(state->m_slapstic_num));
-	state->save_item(NAME(state->m_slapstic_bank));
-	state->save_item(NAME(state->m_slapstic_last_pc));
-	state->save_item(NAME(state->m_slapstic_last_address));
+	save_item(NAME(m_slapstic_num));
+	save_item(NAME(m_slapstic_bank));
+	save_item(NAME(m_slapstic_last_pc));
+	save_item(NAME(m_slapstic_last_address));
 
-	state->save_item(NAME(state->m_cpu_to_sound));
-	state->save_item(NAME(state->m_sound_to_cpu));
-	state->save_item(NAME(state->m_timed_int));
-	state->save_item(NAME(state->m_ym2151_int));
+	save_item(NAME(m_cpu_to_sound));
+	save_item(NAME(m_sound_to_cpu));
+	save_item(NAME(m_timed_int));
+	save_item(NAME(m_ym2151_int));
 
-	state->save_item(NAME(state->m_scanlines_per_callback));
+	save_item(NAME(m_scanlines_per_callback));
 
-	state->save_item(NAME(state->m_actual_vc_latch0));
-	state->save_item(NAME(state->m_actual_vc_latch1));
+	save_item(NAME(m_actual_vc_latch0));
+	save_item(NAME(m_actual_vc_latch1));
 
-	state->save_item(NAME(state->m_playfield_latch));
-	state->save_item(NAME(state->m_playfield2_latch));
+	save_item(NAME(m_playfield_latch));
+	save_item(NAME(m_playfield2_latch));
 
-	/* need a postload to reset the state */
-	machine.save().register_postload(save_prepost_delegate(FUNC(slapstic_postload), &machine));
+	save_item(NAME(m_earom_data));
+	save_item(NAME(m_earom_control));
 }
 
+
+void atarigen_state::machine_reset()
+{
+	// reset the interrupt states
+	m_video_int_state = m_sound_int_state = m_scanline_int_state = 0;
+
+	// reset the control latch on the EAROM, if present
+	if (m_earom != NULL)
+		m_earom->set_control(0, 1, 1, 0, 0);
+
+	// reset the EEPROM
+	m_eeprom_unlocked = false;
+	if (m_eeprom == NULL && m_eeprom32 != NULL)
+		m_eeprom.set_target(reinterpret_cast<UINT16 *>(m_eeprom32.target()), m_eeprom32.bytes());
+
+	// reset the slapstic
+	if (m_slapstic_num != 0)
+	{
+		slapstic_reset();
+		slapstic_update_bank(slapstic_bank());
+	}
+	
+	// reset sound I/O
+	sound_io_reset();
+}
+
+
+void atarigen_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case TID_SCANLINE_INTERRUPT:
+		{
+			scanline_int_gen(*machine().device("maincpu"));
+			screen_device *screen = reinterpret_cast<screen_device *>(ptr);
+			timer.adjust(screen->frame_period());
+			break;
+		}
+		
+		case TID_SCANLINE_TIMER:
+			scanline_timer(timer, *reinterpret_cast<screen_device *>(ptr), param);
+			break;
+		
+		case TID_ATARIVC_EOF:
+			atarivc_eof_update(timer, *reinterpret_cast<screen_device *>(ptr));
+			break;
+	
+		// sound I/O
+		case TID_SOUND_RESET:
+			delayed_sound_reset(param);
+			break;
+		
+		case TID_SOUND_WRITE:
+			delayed_sound_write(param);
+			break;
+		
+		case TID_6502_WRITE:
+			delayed_6502_write(param);
+			break;
+	
+		// unhalt the CPU that was passed as a pointer
+		case TID_UNHALT_CPU:
+			reinterpret_cast<device_t *>(ptr)->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			break;
+	}
+}
+
+
+void atarigen_state::scanline_update(screen_device &screen, int scanline)
+{
+}
 
 
 /***************************************************************************
     INTERRUPT HANDLING
 ***************************************************************************/
 
-/*---------------------------------------------------------------
-    atarigen_interrupt_reset: Initializes the state of all
-    the interrupt sources.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  scanline_int_set: Sets the scanline when the next
+//  scanline interrupt should be generated.
+//-------------------------------------------------
 
-void atarigen_interrupt_reset(atarigen_state *state, atarigen_int_func update_int)
+void atarigen_state::scanline_int_set(screen_device &screen, int scanline)
 {
-	/* set the callback */
-	state->m_update_int_callback = update_int;
-
-	/* reset the interrupt states */
-	state->m_video_int_state = state->m_sound_int_state = state->m_scanline_int_state = 0;
+	get_screen_timer(screen)->scanline_interrupt_timer->adjust(screen.time_until_pos(scanline));
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_update_interrupts: Forces the interrupt callback
-    to be called with the current VBLANK and sound interrupt
-    states.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  scanline_int_gen: Standard interrupt routine
+//  which sets the scanline interrupt state.
+//-------------------------------------------------
 
-void atarigen_update_interrupts(running_machine &machine)
+INTERRUPT_GEN_MEMBER(atarigen_state::scanline_int_gen)
 {
-	atarigen_state *state = machine.driver_data<atarigen_state>();
-	(*state->m_update_int_callback)(machine);
+	m_scanline_int_state = 1;
+	update_interrupts();
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_scanline_int_set: Sets the scanline when the next
-    scanline interrupt should be generated.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  scanline_int_ack_w: Resets the state of the
+//  scanline interrupt.
+//-------------------------------------------------
 
-void atarigen_scanline_int_set(screen_device &screen, int scanline)
+WRITE16_MEMBER(atarigen_state::scanline_int_ack_w)
 {
-	emu_timer *timer = get_screen_timer(screen)->scanline_interrupt_timer;
-	timer->adjust(screen.time_until_pos(scanline));
+	m_scanline_int_state = 0;
+	update_interrupts();
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_scanline_int_gen: Standard interrupt routine
-    which sets the scanline interrupt state.
----------------------------------------------------------------*/
-
-INTERRUPT_GEN( atarigen_scanline_int_gen )
-{
-	atarigen_state *state = device->machine().driver_data<atarigen_state>();
-	state->m_scanline_int_state = 1;
-	(*state->m_update_int_callback)(device->machine());
-}
-
-
-/*---------------------------------------------------------------
-    atarigen_scanline_int_ack_w: Resets the state of the
-    scanline interrupt.
----------------------------------------------------------------*/
-
-WRITE16_HANDLER( atarigen_scanline_int_ack_w )
-{
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	state->m_scanline_int_state = 0;
-	(*state->m_update_int_callback)(space.machine());
-}
-
-WRITE32_HANDLER( atarigen_scanline_int_ack32_w )
-{
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	state->m_scanline_int_state = 0;
-	(*state->m_update_int_callback)(space.machine());
-}
-
-
-/*---------------------------------------------------------------
-    atarigen_sound_int_gen: Standard interrupt routine which
-    sets the sound interrupt state.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_sound_int_gen: Standard interrupt routine which
+//  sets the sound interrupt state.
+//-------------------------------------------------
 
 INTERRUPT_GEN( atarigen_sound_int_gen )
 {
 	atarigen_state *state = device->machine().driver_data<atarigen_state>();
 	state->m_sound_int_state = 1;
-	(*state->m_update_int_callback)(device->machine());
+	state->update_interrupts();
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_sound_int_ack_w: Resets the state of the sound
-    interrupt.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_sound_int_ack_w: Resets the state of the sound
+//  interrupt.
+//-------------------------------------------------
 
 WRITE16_HANDLER( atarigen_sound_int_ack_w )
 {
 	atarigen_state *state = space.machine().driver_data<atarigen_state>();
 	state->m_sound_int_state = 0;
-	(*state->m_update_int_callback)(space.machine());
+	state->update_interrupts();
 }
 
 WRITE32_HANDLER( atarigen_sound_int_ack32_w )
 {
 	atarigen_state *state = space.machine().driver_data<atarigen_state>();
 	state->m_sound_int_state = 0;
-	(*state->m_update_int_callback)(space.machine());
+	state->update_interrupts();
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_video_int_gen: Standard interrupt routine which
-    sets the video interrupt state.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_video_int_gen: Standard interrupt routine which
+//  sets the video interrupt state.
+//-------------------------------------------------
 
 INTERRUPT_GEN( atarigen_video_int_gen )
 {
 	atarigen_state *state = device->machine().driver_data<atarigen_state>();
 	state->m_video_int_state = 1;
-	(*state->m_update_int_callback)(device->machine());
+	state->update_interrupts();
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_video_int_ack_w: Resets the state of the video
-    interrupt.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_video_int_ack_w: Resets the state of the video
+//  interrupt.
+//-------------------------------------------------
 
 WRITE16_HANDLER( atarigen_video_int_ack_w )
 {
 	atarigen_state *state = space.machine().driver_data<atarigen_state>();
 	state->m_video_int_state = 0;
-	(*state->m_update_int_callback)(space.machine());
+	state->update_interrupts();
 }
 
 WRITE32_HANDLER( atarigen_video_int_ack32_w )
 {
 	atarigen_state *state = space.machine().driver_data<atarigen_state>();
 	state->m_video_int_state = 0;
-	(*state->m_update_int_callback)(space.machine());
-}
-
-
-/*---------------------------------------------------------------
-    scanline_interrupt_callback: Signals an interrupt.
----------------------------------------------------------------*/
-
-static TIMER_CALLBACK( scanline_interrupt_callback )
-{
-	screen_device &screen = *reinterpret_cast<screen_device *>(ptr);
-	emu_timer *timer = get_screen_timer(screen)->scanline_interrupt_timer;
-
-	/* generate the interrupt */
-	atarigen_scanline_int_gen(machine.device("maincpu"));
-
-	/* set a new timer to go off at the same scan line next frame */
-	timer->adjust(screen.frame_period());
+	state->update_interrupts();
 }
 
 
@@ -337,44 +393,31 @@ static TIMER_CALLBACK( scanline_interrupt_callback )
     EEPROM HANDLING
 ***************************************************************************/
 
-/*---------------------------------------------------------------
-    atarigen_eeprom_reset: Makes sure that the unlocked state
-    is cleared when we reset.
----------------------------------------------------------------*/
-
-void atarigen_eeprom_reset(atarigen_state *state)
-{
-	state->m_eeprom_unlocked = 0;
-	if (state->m_eeprom == NULL && state->m_eeprom32 != NULL)
-		state->m_eeprom.set_target(reinterpret_cast<UINT16 *>(state->m_eeprom32.target()), state->m_eeprom32.bytes());
-}
-
-
-/*---------------------------------------------------------------
-    atarigen_eeprom_enable_w: Any write to this handler will
-    allow one byte to be written to the EEPROM data area the
-    next time.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_eeprom_enable_w: Any write to this handler will
+//  allow one byte to be written to the EEPROM data area the
+//  next time.
+//-------------------------------------------------
 
 WRITE16_HANDLER( atarigen_eeprom_enable_w )
 {
 	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	state->m_eeprom_unlocked = 1;
+	state->m_eeprom_unlocked = true;
 }
 
 WRITE32_HANDLER( atarigen_eeprom_enable32_w )
 {
 	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	state->m_eeprom_unlocked = 1;
+	state->m_eeprom_unlocked = true;
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_eeprom_w: Writes a "word" to the EEPROM, which is
-    almost always accessed via the low byte of the word only.
-    If the EEPROM hasn't been unlocked, the write attempt is
-    ignored.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_eeprom_w: Writes a "word" to the EEPROM, which is
+//  almost always accessed via the low byte of the word only.
+//  If the EEPROM hasn't been unlocked, the write attempt is
+//  ignored.
+//-------------------------------------------------
 
 WRITE16_HANDLER( atarigen_eeprom_w )
 {
@@ -384,7 +427,7 @@ WRITE16_HANDLER( atarigen_eeprom_w )
 		return;
 
 	COMBINE_DATA(&state->m_eeprom[offset]);
-	state->m_eeprom_unlocked = 0;
+	state->m_eeprom_unlocked = false;
 }
 
 WRITE32_HANDLER( atarigen_eeprom32_w )
@@ -398,14 +441,14 @@ WRITE32_HANDLER( atarigen_eeprom32_w )
 	data >>= 16;
 	mem_mask >>= 16;
 	COMBINE_DATA(&state->m_eeprom[offset * 2]);
-	state->m_eeprom_unlocked = 0;
+	state->m_eeprom_unlocked = false;
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_eeprom_r: Reads a "word" from the EEPROM, which is
-    almost always accessed via the low byte of the word only.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_eeprom_r: Reads a "word" from the EEPROM, which is
+//  almost always accessed via the low byte of the word only.
+//-------------------------------------------------
 
 READ16_HANDLER( atarigen_eeprom_r )
 {
@@ -431,35 +474,34 @@ READ32_HANDLER( atarigen_eeprom_upper32_r )
     SLAPSTIC HANDLING
 ***************************************************************************/
 
-INLINE void update_bank(atarigen_state *state, int bank)
+inline void atarigen_state::slapstic_update_bank(int bank)
 {
-	/* if the bank has changed, copy the memory; Pit Fighter needs this */
-	if (bank != state->m_slapstic_bank)
+	// if the bank has changed, copy the memory; Pit Fighter needs this
+	if (bank != m_slapstic_bank)
 	{
-		/* bank 0 comes from the copy we made earlier */
+		// bank 0 comes from the copy we made earlier
 		if (bank == 0)
-			memcpy(state->m_slapstic, state->m_slapstic_bank0, 0x2000);
+			memcpy(m_slapstic, m_slapstic_bank0, 0x2000);
 		else
-			memcpy(state->m_slapstic, &state->m_slapstic[bank * 0x1000], 0x2000);
+			memcpy(m_slapstic, &m_slapstic[bank * 0x1000], 0x2000);
 
-		/* remember the current bank */
-		state->m_slapstic_bank = bank;
+		// remember the current bank
+		m_slapstic_bank = bank;
 	}
 }
 
 
-static void slapstic_postload(running_machine &machine)
+void atarigen_state::device_post_load()
 {
-	atarigen_state *state = machine.driver_data<atarigen_state>();
-	update_bank(state, slapstic_bank());
+	slapstic_update_bank(slapstic_bank());
 }
 
 
-DIRECT_UPDATE_MEMBER(atarigen_state::atarigen_slapstic_setdirect)
+DIRECT_UPDATE_MEMBER(atarigen_state::slapstic_setdirect)
 {
-	/* if we jump to an address in the slapstic region, tweak the slapstic
-       at that address and return ~0; this will cause us to be called on
-       subsequent fetches as well */
+	// if we jump to an address in the slapstic region, tweak the slapstic
+    // at that address and return ~0; this will cause us to be called on
+    // subsequent fetches as well
 	address &= ~m_slapstic_mirror;
 	if (address >= m_slapstic_base && address < m_slapstic_base + 0x8000)
 	{
@@ -468,96 +510,75 @@ DIRECT_UPDATE_MEMBER(atarigen_state::atarigen_slapstic_setdirect)
 		{
 			m_slapstic_last_pc = pc;
 			m_slapstic_last_address = address;
-			atarigen_slapstic_r(direct.space(), (address >> 1) & 0x3fff, 0xffff);
+			slapstic_r(direct.space(), (address >> 1) & 0x3fff, 0xffff);
 		}
 		return ~0;
 	}
-
 	return address;
 }
 
 
 
-/*---------------------------------------------------------------
-    atarigen_slapstic_init: Installs memory handlers for the
-    slapstic and sets the chip number.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  slapstic_configure: Installs memory handlers for the
+//  slapstic and sets the chip number.
+//-------------------------------------------------
 
-void atarigen_slapstic_init(device_t *device, offs_t base, offs_t mirror, int chipnum)
+void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, int chipnum)
 {
-	atarigen_state *state = device->machine().driver_data<atarigen_state>();
+	// reset in case we have no state
+	m_slapstic_num = chipnum;
+	m_slapstic = NULL;
 
-	/* reset in case we have no state */
-	state->m_slapstic_num = chipnum;
-	state->m_slapstic = NULL;
-
-	/* if we have a chip, install it */
+	// if we have a chip, install it
 	if (chipnum != 0)
 	{
-		/* initialize the slapstic */
-		slapstic_init(device->machine(), chipnum);
+		// initialize the slapstic
+		slapstic_init(machine(), chipnum);
 
-		/* install the memory handlers */
-		state->m_slapstic = device->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(base, base + 0x7fff, 0, mirror, FUNC(atarigen_slapstic_r), FUNC(atarigen_slapstic_w));
+		// install the memory handlers
+		address_space &program = device.space(AS_PROGRAM);
+		m_slapstic = program.install_readwrite_handler(base, base + 0x7fff, 0, mirror, read16_delegate(FUNC(atarigen_state::slapstic_r), this), write16_delegate(FUNC(atarigen_state::slapstic_w), this));
+		program.set_direct_update_handler(direct_update_delegate(FUNC(atarigen_state::slapstic_setdirect), this));
 
-		/* allocate memory for a copy of bank 0 */
-		state->m_slapstic_bank0 = auto_alloc_array(device->machine(), UINT8, 0x2000);
-		memcpy(state->m_slapstic_bank0, state->m_slapstic, 0x2000);
+		// allocate memory for a copy of bank 0
+		m_slapstic_bank0.resize(0x2000);
+		memcpy(m_slapstic_bank0, m_slapstic, 0x2000);
 
-		/* ensure we recopy memory for the bank */
-		state->m_slapstic_bank = 0xff;
+		// ensure we recopy memory for the bank
+		m_slapstic_bank = 0xff;
 
-		/* install an opcode base handler if we are a 68000 or variant */
-		state->m_slapstic_base = base;
-		state->m_slapstic_mirror = mirror;
-
-		address_space &space = device->memory().space(AS_PROGRAM);
-		space.set_direct_update_handler(direct_update_delegate(FUNC(atarigen_state::atarigen_slapstic_setdirect), state));
+		// install an opcode base handler if we are a 68000 or variant
+		m_slapstic_base = base;
+		m_slapstic_mirror = mirror;
 	}
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_slapstic_reset: Makes the selected slapstic number
-    active and resets its state.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  slapstic_w: Assuming that the slapstic sits in
+//  ROM memory space, we just simply tweak the slapstic at this
+//  address and do nothing more.
+//-------------------------------------------------
 
-void atarigen_slapstic_reset(atarigen_state *state)
+WRITE16_MEMBER(atarigen_state::slapstic_w)
 {
-	if (state->m_slapstic_num != 0)
-	{
-		slapstic_reset();
-		update_bank(state, slapstic_bank());
-	}
+	slapstic_update_bank(slapstic_tweak(space, offset));
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_slapstic_w: Assuming that the slapstic sits in
-    ROM memory space, we just simply tweak the slapstic at this
-    address and do nothing more.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  slapstic_r: Tweaks the slapstic at the appropriate
+//  address and then reads a word from the underlying memory.
+//-------------------------------------------------
 
-WRITE16_HANDLER( atarigen_slapstic_w )
+READ16_MEMBER(atarigen_state::slapstic_r)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	update_bank(state, slapstic_tweak(space, offset));
-}
+	// fetch the result from the current bank first
+	int result = m_slapstic[offset & 0xfff];
 
-
-/*---------------------------------------------------------------
-    atarigen_slapstic_r: Tweaks the slapstic at the appropriate
-    address and then reads a word from the underlying memory.
----------------------------------------------------------------*/
-
-READ16_HANDLER( atarigen_slapstic_r )
-{
-	/* fetch the result from the current bank first */
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	int result = state->m_slapstic[offset & 0xfff];
-
-	/* then determine the new one */
-	update_bank(state, slapstic_tweak(space, offset));
+	// then determine the new one
+	slapstic_update_bank(slapstic_tweak(space, offset));
 	return result;
 }
 
@@ -567,262 +588,216 @@ READ16_HANDLER( atarigen_slapstic_r )
     SOUND I/O
 ***************************************************************************/
 
-/*---------------------------------------------------------------
-    atarigen_sound_io_reset: Resets the state of the sound I/O.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  sound_io_reset: Resets the state of the sound I/O.
+//-------------------------------------------------
 
-void atarigen_sound_io_reset(device_t *device)
+void atarigen_state::sound_io_reset()
 {
-	atarigen_state *state = device->machine().driver_data<atarigen_state>();
+	// reset the internal interrupts states
+	m_timed_int = m_ym2151_int = 0;
 
-	/* remember which CPU is the sound CPU */
-	state->m_sound_cpu = device;
-
-	/* reset the internal interrupts states */
-	state->m_timed_int = state->m_ym2151_int = 0;
-
-	/* reset the sound I/O states */
-	state->m_cpu_to_sound = state->m_sound_to_cpu = 0;
-	state->m_cpu_to_sound_ready = state->m_sound_to_cpu_ready = 0;
+	// reset the sound I/O states
+	m_cpu_to_sound = m_sound_to_cpu = 0;
+	m_cpu_to_sound_ready = m_sound_to_cpu_ready = 0;
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_6502_irq_gen: Generates an IRQ signal to the 6502
-    sound processor.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  m6502_irq_gen: Generates an IRQ signal to the 
+//  6502 sound processor.
+//-------------------------------------------------
 
-INTERRUPT_GEN( atarigen_6502_irq_gen )
+INTERRUPT_GEN_MEMBER(atarigen_state::m6502_irq_gen)
 {
-	atarigen_state *state = device->machine().driver_data<atarigen_state>();
-	state->m_timed_int = 1;
-	update_6502_irq(device->machine());
+	m_timed_int = 1;
+	update_m6502_irq();
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_6502_irq_ack_r: Resets the IRQ signal to the 6502
-    sound processor. Both reads and writes can be used.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  m6502_irq_ack_r: Resets the IRQ signal to the 6502
+//  sound processor. Both reads and writes can be used.
+//-------------------------------------------------
 
-READ8_HANDLER( atarigen_6502_irq_ack_r )
+READ8_MEMBER(atarigen_state::m6502_irq_ack_r)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	state->m_timed_int = 0;
-	update_6502_irq(space.machine());
+	m_timed_int = 0;
+	update_m6502_irq();
 	return 0;
 }
 
-WRITE8_HANDLER( atarigen_6502_irq_ack_w )
+WRITE8_MEMBER(atarigen_state::m6502_irq_ack_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	state->m_timed_int = 0;
-	update_6502_irq(space.machine());
+	m_timed_int = 0;
+	update_m6502_irq();
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_ym2151_irq_gen: Sets the state of the YM2151's
-    IRQ line.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_ym2151_irq_gen: Sets the state of the YM2151's
+//  IRQ line.
+//-------------------------------------------------
 
-WRITE_LINE_MEMBER( atarigen_state::ym2151_irq_gen )
+WRITE_LINE_MEMBER(atarigen_state::ym2151_irq_gen)
 {
 	m_ym2151_int = state;
-	update_6502_irq(machine());
+	update_m6502_irq();
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_sound_reset_w: Write handler which resets the
-    sound CPU in response.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  sound_reset_w: Write handler which resets the
+//  sound CPU in response.
+//-------------------------------------------------
 
-WRITE16_HANDLER( atarigen_sound_reset_w )
+WRITE16_MEMBER(atarigen_state::sound_reset_w)
 {
-	space.machine().scheduler().synchronize(FUNC(delayed_sound_reset));
+	synchronize(TID_SOUND_RESET);
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_sound_reset: Resets the state of the sound CPU
-    manually.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  sound_cpu_reset: Resets the state of the sound 
+//  CPU manually.
+//-------------------------------------------------
 
-void atarigen_sound_reset(running_machine &machine)
+void atarigen_state::sound_cpu_reset()
 {
-	machine.scheduler().synchronize(FUNC(delayed_sound_reset), 1);
+	synchronize(TID_SOUND_RESET, 1);
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_sound_w: Handles communication from the main CPU
-    to the sound CPU. Two versions are provided, one with the
-    data byte in the low 8 bits, and one with the data byte in
-    the upper 8 bits.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_sound_w: Handles communication from the main CPU
+//  to the sound CPU. Two versions are provided, one with the
+//  data byte in the low 8 bits, and one with the data byte in
+//  the upper 8 bits.
+//-------------------------------------------------
 
-WRITE16_HANDLER( atarigen_sound_w )
+WRITE8_MEMBER(atarigen_state::sound_w)
 {
-	if (ACCESSING_BITS_0_7)
-		space.machine().scheduler().synchronize(FUNC(delayed_sound_w), data & 0xff);
-}
-
-WRITE16_HANDLER( atarigen_sound_upper_w )
-{
-	if (ACCESSING_BITS_8_15)
-		space.machine().scheduler().synchronize(FUNC(delayed_sound_w), (data >> 8) & 0xff);
-}
-
-WRITE32_HANDLER( atarigen_sound_upper32_w )
-{
-	if (ACCESSING_BITS_24_31)
-		space.machine().scheduler().synchronize(FUNC(delayed_sound_w), (data >> 24) & 0xff);
+	synchronize(TID_SOUND_WRITE, data);
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_sound_r: Handles reading data communicated from the
-    sound CPU to the main CPU. Two versions are provided, one
-    with the data byte in the low 8 bits, and one with the data
-    byte in the upper 8 bits.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  sound_r: Handles reading data communicated from the
+//  sound CPU to the main CPU. Two versions are provided, one
+//  with the data byte in the low 8 bits, and one with the data
+//  byte in the upper 8 bits.
+//-------------------------------------------------
 
-READ16_HANDLER( atarigen_sound_r )
+READ8_MEMBER(atarigen_state::sound_r)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	state->m_sound_to_cpu_ready = 0;
+	m_sound_to_cpu_ready = 0;
 	atarigen_sound_int_ack_w(space, 0, 0, 0xffff);
-	return state->m_sound_to_cpu | 0xff00;
-}
-
-READ16_HANDLER( atarigen_sound_upper_r )
-{
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	state->m_sound_to_cpu_ready = 0;
-	atarigen_sound_int_ack_w(space, 0, 0, 0xffff);
-	return (state->m_sound_to_cpu << 8) | 0x00ff;
-}
-
-READ32_HANDLER( atarigen_sound_upper32_r )
-{
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	state->m_sound_to_cpu_ready = 0;
-	atarigen_sound_int_ack32_w(space, 0, 0, 0xffff);
-	return (state->m_sound_to_cpu << 24) | 0x00ffffff;
+	return m_sound_to_cpu;
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_6502_sound_w: Handles communication from the sound
-    CPU to the main CPU.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  m6502_sound_w: Handles communication from the 
+//  sound CPU to the main CPU.
+//-------------------------------------------------
 
-WRITE8_HANDLER( atarigen_6502_sound_w )
+WRITE8_MEMBER(atarigen_state::m6502_sound_w)
 {
-	space.machine().scheduler().synchronize(FUNC(delayed_6502_sound_w), data);
+	synchronize(TID_6502_WRITE, data);
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_6502_sound_r: Handles reading data communicated
-    from the main CPU to the sound CPU.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  m6502_sound_r: Handles reading data 
+//  communicated from the main CPU to the sound 
+//  CPU.
+//-------------------------------------------------
 
-READ8_HANDLER( atarigen_6502_sound_r )
+READ8_MEMBER(atarigen_state::m6502_sound_r)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	state->m_cpu_to_sound_ready = 0;
-	state->m_sound_cpu->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return state->m_cpu_to_sound;
+	m_cpu_to_sound_ready = 0;
+	m_sound_cpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	return m_cpu_to_sound;
 }
 
 
-/*---------------------------------------------------------------
-    update_6502_irq: Called whenever the IRQ state changes. An
-    interrupt is generated if either atarigen_6502_irq_gen()
-    was called, or if the YM2151 generated an interrupt via
-    the atarigen_ym2151_irq_gen() callback.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  update_m6502_irq: Called whenever the IRQ state changes. An
+//  interrupt is generated if either m6502_irq_gen()
+//  was called, or if the YM2151 generated an interrupt via
+//  the atarigen_ym2151_irq_gen() callback.
+//-------------------------------------------------
 
-static void update_6502_irq(running_machine &machine)
+void atarigen_state::update_m6502_irq()
 {
-	atarigen_state *state = machine.driver_data<atarigen_state>();
-	if (state->m_timed_int || state->m_ym2151_int)
-		state->m_sound_cpu->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	if (m_timed_int || m_ym2151_int)
+		m_sound_cpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 	else
-		state->m_sound_cpu->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+		m_sound_cpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
-/*---------------------------------------------------------------
-    delayed_sound_reset: Synchronizes the sound reset command
-    between the two CPUs.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  delayed_sound_reset: Synchronizes the sound reset command
+//  between the two CPUs.
+//-------------------------------------------------
 
-static TIMER_CALLBACK( delayed_sound_reset )
+void atarigen_state::delayed_sound_reset(int param)
 {
-	atarigen_state *state = machine.driver_data<atarigen_state>();
-	address_space &space = state->m_sound_cpu->memory().space(AS_PROGRAM);
-
-	/* unhalt and reset the sound CPU */
+	// unhalt and reset the sound CPU
 	if (param == 0)
 	{
-		state->m_sound_cpu->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		state->m_sound_cpu->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_sound_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_sound_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 
-	/* reset the sound write state */
-	state->m_sound_to_cpu_ready = 0;
-	atarigen_sound_int_ack_w(space, 0, 0, 0xffff);
+	// reset the sound write state
+	m_sound_to_cpu_ready = 0;
+	atarigen_sound_int_ack_w(m_sound_cpu->space(AS_PROGRAM), 0, 0, 0xffff);
 
-	/* allocate a high frequency timer until a response is generated */
-	/* the main CPU is *very* sensistive to the timing of the response */
-	machine.scheduler().boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
+	// allocate a high frequency timer until a response is generated
+	// the main CPU is *very* sensistive to the timing of the response
+	machine().scheduler().boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
 }
 
 
-/*---------------------------------------------------------------
-    delayed_sound_w: Synchronizes a data write from the main
-    CPU to the sound CPU.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  delayed_sound_write: Synchronizes a data write 
+//  from the main CPU to the sound CPU.
+//-------------------------------------------------
 
-static TIMER_CALLBACK( delayed_sound_w )
+void atarigen_state::delayed_sound_write(int data)
 {
-	atarigen_state *state = machine.driver_data<atarigen_state>();
-
-	/* warn if we missed something */
-	if (state->m_cpu_to_sound_ready)
+	// warn if we missed something
+	if (m_cpu_to_sound_ready)
 		logerror("Missed command from 68010\n");
 
-	/* set up the states and signal an NMI to the sound CPU */
-	state->m_cpu_to_sound = param;
-	state->m_cpu_to_sound_ready = 1;
-	state->m_sound_cpu->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	// set up the states and signal an NMI to the sound CPU
+	m_cpu_to_sound = data;
+	m_cpu_to_sound_ready = 1;
+	m_sound_cpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
-	/* allocate a high frequency timer until a response is generated */
-	/* the main CPU is *very* sensistive to the timing of the response */
-	machine.scheduler().boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
+	// allocate a high frequency timer until a response is generated
+	// the main CPU is *very* sensistive to the timing of the response
+	machine().scheduler().boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
 }
 
 
-/*---------------------------------------------------------------
-    delayed_6502_sound_w: Synchronizes a data write from the
-    sound CPU to the main CPU.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  delayed_6502_write: Synchronizes a data write 
+//  from the sound CPU to the main CPU.
+//-------------------------------------------------
 
-static TIMER_CALLBACK( delayed_6502_sound_w )
+void atarigen_state::delayed_6502_write(int data)
 {
-	atarigen_state *state = machine.driver_data<atarigen_state>();
-
-	/* warn if we missed something */
-	if (state->m_sound_to_cpu_ready)
+	// warn if we missed something
+	if (m_sound_to_cpu_ready)
 		logerror("Missed result from 6502\n");
 
-	/* set up the states and signal the sound interrupt to the main CPU */
-	state->m_sound_to_cpu = param;
-	state->m_sound_to_cpu_ready = 1;
-	atarigen_sound_int_gen(machine.device("maincpu"));
+	// set up the states and signal the sound interrupt to the main CPU
+	m_sound_to_cpu = data;
+	m_sound_to_cpu_ready = 1;
+	atarigen_sound_int_gen(machine().device("maincpu"));
 }
 
 
@@ -831,48 +806,49 @@ static TIMER_CALLBACK( delayed_6502_sound_w )
     SOUND HELPERS
 ***************************************************************************/
 
-/*---------------------------------------------------------------
-    atarigen_set_vol: Scans for a particular sound chip and
-    changes the volume on all channels associated with it.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  set_volume_by_type: Scans for a particular 
+//  sound chip and changes the volume on all 
+//  channels associated with it.
+//-------------------------------------------------
 
-void atarigen_set_vol(running_machine &machine, int volume, device_type type)
+void atarigen_state::set_volume_by_type(int volume, device_type type)
 {
-	sound_interface_iterator iter(machine.root_device());
+	sound_interface_iterator iter(*this);
 	for (device_sound_interface *sound = iter.first(); sound != NULL; sound = iter.next())
 		if (sound->device().type() == type)
 			sound->set_output_gain(ALL_OUTPUTS, volume / 100.0);
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_set_XXXXX_vol: Sets the volume for a given type
-    of chip.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  set_XXXXX_volume: Sets the volume for a given 
+//  type of chip.
+//-------------------------------------------------
 
-void atarigen_set_ym2151_vol(running_machine &machine, int volume)
+void atarigen_state::set_ym2151_volume(int volume)
 {
-	atarigen_set_vol(machine, volume, YM2151);
+	set_volume_by_type(volume, YM2151);
 }
 
-void atarigen_set_ym2413_vol(running_machine &machine, int volume)
+void atarigen_state::set_ym2413_volume(int volume)
 {
-	atarigen_set_vol(machine, volume, YM2413);
+	set_volume_by_type(volume, YM2413);
 }
 
-void atarigen_set_pokey_vol(running_machine &machine, int volume)
+void atarigen_state::set_pokey_volume(int volume)
 {
-	atarigen_set_vol(machine, volume, POKEY);
+	set_volume_by_type(volume, POKEY);
 }
 
-void atarigen_set_tms5220_vol(running_machine &machine, int volume)
+void atarigen_state::set_tms5220_volume(int volume)
 {
-	atarigen_set_vol(machine, volume, TMS5220);
+	set_volume_by_type(volume, TMS5220);
 }
 
-void atarigen_set_oki6295_vol(running_machine &machine, int volume)
+void atarigen_state::set_oki6295_volume(int volume)
 {
-	atarigen_set_vol(machine, volume, OKIM6295);
+	set_volume_by_type(volume, OKIM6295);
 }
 
 
@@ -881,49 +857,37 @@ void atarigen_set_oki6295_vol(running_machine &machine, int volume)
     SCANLINE TIMING
 ***************************************************************************/
 
-/*---------------------------------------------------------------
-    atarigen_scanline_timer_reset: Sets up the scanline timer.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  scanline_timer_reset: Sets up the scanline timer.
+//-------------------------------------------------
 
-void atarigen_scanline_timer_reset(screen_device &screen, atarigen_scanline_func update_graphics, int frequency)
+void atarigen_state::scanline_timer_reset(screen_device &screen, int frequency)
 {
-	atarigen_state *state = screen.machine().driver_data<atarigen_state>();
+	// set the scanline callback
+	m_scanlines_per_callback = frequency;
 
-	/* set the scanline callback */
-	state->m_scanline_callback = update_graphics;
-	state->m_scanlines_per_callback = frequency;
-
-	/* set a timer to go off at scanline 0 */
-	if (state->m_scanline_callback != NULL)
-	{
-		emu_timer *timer = get_screen_timer(screen)->scanline_timer;
-		timer->adjust(screen.time_until_pos(0));
-	}
+	// set a timer to go off at scanline 0
+	if (frequency != 0)
+		get_screen_timer(screen)->scanline_timer->adjust(screen.time_until_pos(0));
 }
 
 
-/*---------------------------------------------------------------
-    scanline_timer_callback: Called once every n scanlines
-    to generate the periodic callback to the main system.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  scanline_timer: Called once every n scanlines
+//  to generate the periodic callback to the main 
+//  system.
+//-------------------------------------------------
 
-static TIMER_CALLBACK( scanline_timer_callback )
+void atarigen_state::scanline_timer(emu_timer &timer, screen_device &screen, int scanline)
 {
-	atarigen_state *state = machine.driver_data<atarigen_state>();
-	screen_device &screen = *reinterpret_cast<screen_device *>(ptr);
-	int scanline = param;
+	// callback
+	scanline_update(screen, scanline);
 
-	/* callback */
-	if (state->m_scanline_callback != NULL)
-	{
-		(*state->m_scanline_callback)(screen, scanline);
-
-		/* generate another */
-		scanline += state->m_scanlines_per_callback;
-		if (scanline >= screen.height())
-			scanline = 0;
-		get_screen_timer(screen)->scanline_timer->adjust(screen.time_until_pos(scanline), scanline);
-	}
+	// generate another
+	scanline += m_scanlines_per_callback;
+	if (scanline >= screen.height())
+		scanline = 0;
+	timer.adjust(screen.time_until_pos(scanline), scanline);
 }
 
 
@@ -932,40 +896,35 @@ static TIMER_CALLBACK( scanline_timer_callback )
     VIDEO CONTROLLER
 ***************************************************************************/
 
-/*---------------------------------------------------------------
-    atarivc_eof_update: Callback that slurps up data and feeds
-    it into the video controller registers every refresh.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarivc_eof_update: Callback that slurps up data and feeds
+//  it into the video controller registers every refresh.
+//-------------------------------------------------
 
-static TIMER_CALLBACK( atarivc_eof_update )
+void atarigen_state::atarivc_eof_update(emu_timer &timer, screen_device &screen)
 {
-	atarigen_state *state = machine.driver_data<atarigen_state>();
-	screen_device &screen = *reinterpret_cast<screen_device *>(ptr);
-	emu_timer *timer = get_screen_timer(screen)->atarivc_eof_update_timer;
-	int i;
+	// echo all the commands to the video controller
+	for (int i = 0; i < 0x1c; i++)
+		if (m_atarivc_eof_data[i])
+			atarivc_common_w(screen, i, m_atarivc_eof_data[i]);
 
-	/* echo all the commands to the video controller */
-	for (i = 0; i < 0x1c; i++)
-		if (state->m_atarivc_eof_data[i])
-			atarivc_common_w(screen, i, state->m_atarivc_eof_data[i]);
+	// update the scroll positions
+	atarimo_set_xscroll(0, m_atarivc_state.mo_xscroll);
+	atarimo_set_yscroll(0, m_atarivc_state.mo_yscroll);
 
-	/* update the scroll positions */
-	atarimo_set_xscroll(0, state->m_atarivc_state.mo_xscroll);
-	atarimo_set_yscroll(0, state->m_atarivc_state.mo_yscroll);
+	m_playfield_tilemap->set_scrollx(0, m_atarivc_state.pf0_xscroll);
+	m_playfield_tilemap->set_scrolly(0, m_atarivc_state.pf0_yscroll);
 
-	state->m_playfield_tilemap->set_scrollx(0, state->m_atarivc_state.pf0_xscroll);
-	state->m_playfield_tilemap->set_scrolly(0, state->m_atarivc_state.pf0_yscroll);
-
-	if (state->m_atarivc_playfields > 1)
+	if (m_atarivc_playfields > 1)
 	{
-		state->m_playfield2_tilemap->set_scrollx(0, state->m_atarivc_state.pf1_xscroll);
-		state->m_playfield2_tilemap->set_scrolly(0, state->m_atarivc_state.pf1_yscroll);
+		m_playfield2_tilemap->set_scrollx(0, m_atarivc_state.pf1_xscroll);
+		m_playfield2_tilemap->set_scrolly(0, m_atarivc_state.pf1_yscroll);
 	}
-	timer->adjust(screen.time_until_pos(0));
+	timer.adjust(screen.time_until_pos(0));
 
-	/* use this for debugging the video controller values */
+	// use this for debugging the video controller values
 #if 0
-	if (machine.input().code_pressed(KEYCODE_8))
+	if (machine().input().code_pressed(KEYCODE_8))
 	{
 		static FILE *out;
 		if (!out) out = fopen("scroll.log", "w");
@@ -980,39 +939,35 @@ static TIMER_CALLBACK( atarivc_eof_update )
 }
 
 
-/*---------------------------------------------------------------
-    atarivc_reset: Initializes the video controller.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarivc_reset: Initializes the video controller.
+//-------------------------------------------------
 
 void atarivc_reset(screen_device &screen, UINT16 *eof_data, int playfields)
 {
 	atarigen_state *state = screen.machine().driver_data<atarigen_state>();
 
-	/* this allows us to manually reset eof_data to NULL if it's not used */
+	// this allows us to manually reset eof_data to NULL if it's not used
 	state->m_atarivc_eof_data.set_target(eof_data, 0x100);
 	state->m_atarivc_playfields = playfields;
 
-	/* clear the RAM we use */
+	// clear the RAM we use
 	memset(state->m_atarivc_data, 0, 0x40);
 	memset(&state->m_atarivc_state, 0, sizeof(state->m_atarivc_state));
 
-	/* reset the latches */
+	// reset the latches
 	state->m_atarivc_state.latch1 = state->m_atarivc_state.latch2 = -1;
 	state->m_actual_vc_latch0 = state->m_actual_vc_latch1 = -1;
 
-	/* start a timer to go off a little before scanline 0 */
+	// start a timer to go off a little before scanline 0
 	if (state->m_atarivc_eof_data)
-	{
-		emu_timer *timer = get_screen_timer(screen)->atarivc_eof_update_timer;
-		timer->adjust(screen.time_until_pos(0));
-	}
+		get_screen_timer(screen)->atarivc_eof_update_timer->adjust(screen.time_until_pos(0));
 }
 
 
-
-/*---------------------------------------------------------------
-    atarivc_w: Handles an I/O write to the video controller.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarivc_w: Handles an I/O write to the video controller.
+//-------------------------------------------------
 
 void atarivc_w(screen_device &screen, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
@@ -1026,10 +981,10 @@ void atarivc_w(screen_device &screen, offs_t offset, UINT16 data, UINT16 mem_mas
 
 
 
-/*---------------------------------------------------------------
-    atarivc_common_w: Does the bulk of the word for an I/O
-    write.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarivc_common_w: Does the bulk of the word for an I/O
+//  write.
+//-------------------------------------------------
 
 static void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newword)
 {
@@ -1037,33 +992,33 @@ static void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newwor
 	int oldword = state->m_atarivc_data[offset];
 	state->m_atarivc_data[offset] = newword;
 
-	/* switch off the offset */
+	// switch off the offset
 	switch (offset)
 	{
-		/*
-            additional registers:
+		//
+        //  additional registers:
+        //
+        //      01 = vertical start (for centering)
+        //      04 = horizontal start (for centering)
+        //
 
-                01 = vertical start (for centering)
-                04 = horizontal start (for centering)
-        */
-
-		/* set the scanline interrupt here */
+		// set the scanline interrupt here
 		case 0x03:
 			if (oldword != newword)
-				atarigen_scanline_int_set(screen, newword & 0x1ff);
+				state->scanline_int_set(screen, newword & 0x1ff);
 			break;
 
-		/* latch enable */
+		// latch enable
 		case 0x0a:
 
-			/* reset the latches when disabled */
+			// reset the latches when disabled
 			atarigen_set_playfield_latch(state, (newword & 0x0080) ? state->m_actual_vc_latch0 : -1);
 			atarigen_set_playfield2_latch(state, (newword & 0x0080) ? state->m_actual_vc_latch1 : -1);
 
-			/* check for rowscroll enable */
+			// check for rowscroll enable
 			state->m_atarivc_state.rowscroll_enable = (newword & 0x2000) >> 13;
 
-			/* check for palette banking */
+			// check for palette banking
 			if (state->m_atarivc_state.palette_bank != (((newword & 0x0400) >> 10) ^ 1))
 			{
 				screen.update_partial(screen.vpos());
@@ -1071,7 +1026,7 @@ static void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newwor
 			}
 			break;
 
-		/* indexed parameters */
+		// indexed parameters
 		case 0x10: case 0x11: case 0x12: case 0x13:
 		case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1a: case 0x1b:
@@ -1105,7 +1060,7 @@ static void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newwor
 			}
 			break;
 
-		/* latch 1 value */
+		// latch 1 value
 		case 0x1c:
 			state->m_actual_vc_latch0 = -1;
 			state->m_actual_vc_latch1 = newword;
@@ -1113,7 +1068,7 @@ static void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newwor
 			atarigen_set_playfield2_latch(state, (state->m_atarivc_data[0x0a] & 0x80) ? state->m_actual_vc_latch1 : -1);
 			break;
 
-		/* latch 2 value */
+		// latch 2 value
 		case 0x1d:
 			state->m_actual_vc_latch0 = newword;
 			state->m_actual_vc_latch1 = -1;
@@ -1121,13 +1076,13 @@ static void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newwor
 			atarigen_set_playfield2_latch(state, (state->m_atarivc_data[0x0a] & 0x80) ? state->m_actual_vc_latch1 : -1);
 			break;
 
-		/* scanline IRQ ack here */
+		// scanline IRQ ack here
 		case 0x1e:
-			/* hack: this should be a device */
-			atarigen_scanline_int_ack_w(screen.machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
+			// hack: this should be a device
+			state->scanline_int_ack_w(screen.machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
 			break;
 
-		/* log anything else */
+		// log anything else
 		case 0x00:
 		default:
 			if (oldword != newword)
@@ -1137,9 +1092,9 @@ static void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newwor
 }
 
 
-/*---------------------------------------------------------------
-    atarivc_r: Handles an I/O read from the video controller.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarivc_r: Handles an I/O read from the video controller.
+//-------------------------------------------------
 
 UINT16 atarivc_r(screen_device &screen, offs_t offset)
 {
@@ -1147,8 +1102,8 @@ UINT16 atarivc_r(screen_device &screen, offs_t offset)
 
 	logerror("vc_r(%02X)\n", offset);
 
-	/* a read from offset 0 returns the current scanline */
-	/* also sets bit 0x4000 if we're in VBLANK */
+	// a read from offset 0 returns the current scanline
+	// also sets bit 0x4000 if we're in VBLANK
 	if (offset == 0)
 	{
 		int result = screen.vpos();
@@ -1170,9 +1125,9 @@ UINT16 atarivc_r(screen_device &screen, offs_t offset)
     PLAYFIELD/ALPHA MAP HELPERS
 ***************************************************************************/
 
-/*---------------------------------------------------------------
-    atarigen_alpha_w: Generic write handler for alpha RAM.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_alpha_w: Generic write handler for alpha RAM.
+//-------------------------------------------------
 
 WRITE16_HANDLER( atarigen_alpha_w )
 {
@@ -1200,10 +1155,10 @@ WRITE16_HANDLER( atarigen_alpha2_w )
 
 
 
-/*---------------------------------------------------------------
-    atarigen_set_playfield_latch: Sets the latch for the latched
-    playfield handlers below.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_set_playfield_latch: Sets the latch for the latched
+//  playfield handlers below.
+//-------------------------------------------------
 
 void atarigen_set_playfield_latch(atarigen_state *state, int data)
 {
@@ -1217,9 +1172,9 @@ void atarigen_set_playfield2_latch(atarigen_state *state, int data)
 
 
 
-/*---------------------------------------------------------------
-    atarigen_playfield_w: Generic write handler for PF RAM.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_playfield_w: Generic write handler for PF RAM.
+//-------------------------------------------------
 
 WRITE16_HANDLER( atarigen_playfield_w )
 {
@@ -1247,10 +1202,10 @@ WRITE16_HANDLER( atarigen_playfield2_w )
 
 
 
-/*---------------------------------------------------------------
-    atarigen_playfield_large_w: Generic write handler for
-    large (2-word) playfield RAM.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_playfield_large_w: Generic write handler for
+//  large (2-word) playfield RAM.
+//-------------------------------------------------
 
 WRITE16_HANDLER( atarigen_playfield_large_w )
 {
@@ -1261,10 +1216,10 @@ WRITE16_HANDLER( atarigen_playfield_large_w )
 
 
 
-/*---------------------------------------------------------------
-    atarigen_playfield_upper_w: Generic write handler for
-    upper word of split playfield RAM.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_playfield_upper_w: Generic write handler for
+//  upper word of split playfield RAM.
+//-------------------------------------------------
 
 WRITE16_HANDLER( atarigen_playfield_upper_w )
 {
@@ -1275,10 +1230,10 @@ WRITE16_HANDLER( atarigen_playfield_upper_w )
 
 
 
-/*---------------------------------------------------------------
-    atarigen_playfield_dual_upper_w: Generic write handler for
-    upper word of split dual playfield RAM.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_playfield_dual_upper_w: Generic write handler for
+//  upper word of split dual playfield RAM.
+//-------------------------------------------------
 
 WRITE16_HANDLER( atarigen_playfield_dual_upper_w )
 {
@@ -1290,11 +1245,11 @@ WRITE16_HANDLER( atarigen_playfield_dual_upper_w )
 
 
 
-/*---------------------------------------------------------------
-    atarigen_playfield_latched_lsb_w: Generic write handler for
-    lower word of playfield RAM with a latch in the LSB of the
-    upper word.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_playfield_latched_lsb_w: Generic write handler for
+//  lower word of playfield RAM with a latch in the LSB of the
+//  upper word.
+//-------------------------------------------------
 
 WRITE16_HANDLER( atarigen_playfield_latched_lsb_w )
 {
@@ -1309,11 +1264,11 @@ WRITE16_HANDLER( atarigen_playfield_latched_lsb_w )
 
 
 
-/*---------------------------------------------------------------
-    atarigen_playfield_latched_lsb_w: Generic write handler for
-    lower word of playfield RAM with a latch in the MSB of the
-    upper word.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_playfield_latched_lsb_w: Generic write handler for
+//  lower word of playfield RAM with a latch in the MSB of the
+//  upper word.
+//-------------------------------------------------
 
 WRITE16_HANDLER( atarigen_playfield_latched_msb_w )
 {
@@ -1328,11 +1283,11 @@ WRITE16_HANDLER( atarigen_playfield_latched_msb_w )
 
 
 
-/*---------------------------------------------------------------
-    atarigen_playfield_latched_lsb_w: Generic write handler for
-    lower word of second playfield RAM with a latch in the MSB
-    of the upper word.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_playfield_latched_lsb_w: Generic write handler for
+//  lower word of second playfield RAM with a latch in the MSB
+//  of the upper word.
+//-------------------------------------------------
 
 WRITE16_HANDLER( atarigen_playfield2_latched_msb_w )
 {
@@ -1352,11 +1307,11 @@ WRITE16_HANDLER( atarigen_playfield2_latched_msb_w )
     VIDEO HELPERS
 ***************************************************************************/
 
-/*---------------------------------------------------------------
-    atarigen_get_hblank: Returns a guesstimate about the current
-    HBLANK state, based on the assumption that HBLANK represents
-    10% of the scanline period.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_get_hblank: Returns a guesstimate about the current
+//  HBLANK state, based on the assumption that HBLANK represents
+//  10% of the scanline period.
+//-------------------------------------------------
 
 int atarigen_get_hblank(screen_device &screen)
 {
@@ -1364,33 +1319,31 @@ int atarigen_get_hblank(screen_device &screen)
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_halt_until_hblank_0: Halts CPU 0 until the
-    next HBLANK.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  halt_until_hblank_0: Halts CPU 0 until the
+//  next HBLANK.
+//-------------------------------------------------
 
-void atarigen_halt_until_hblank_0(screen_device &screen)
+void atarigen_state::halt_until_hblank_0(device_t &device, screen_device &screen)
 {
-	device_t *cpu = screen.machine().device("maincpu");
-
-	/* halt the CPU until the next HBLANK */
+	// halt the CPU until the next HBLANK
 	int hpos = screen.hpos();
 	int width = screen.width();
 	int hblank = width * 9 / 10;
 
-	/* if we're in hblank, set up for the next one */
+	// if we're in hblank, set up for the next one
 	if (hpos >= hblank)
 		hblank += width;
 
-	/* halt and set a timer to wake up */
-	screen.machine().scheduler().timer_set(screen.scan_period() * (hblank - hpos) / width, FUNC(unhalt_cpu), 0, (void *)cpu);
-	cpu->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	// halt and set a timer to wake up
+	device.execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	timer_set(screen.scan_period() * (hblank - hpos) / width, TID_UNHALT_CPU, 0, (void *)&device);
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_666_paletteram_w: 6-6-6 RGB palette RAM handler.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_666_paletteram_w: 6-6-6 RGB palette RAM handler.
+//-------------------------------------------------
 
 WRITE16_HANDLER( atarigen_666_paletteram_w )
 {
@@ -1408,10 +1361,10 @@ WRITE16_HANDLER( atarigen_666_paletteram_w )
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_expanded_666_paletteram_w: 6-6-6 RGB expanded
-    palette RAM handler.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_expanded_666_paletteram_w: 6-6-6 RGB expanded
+//  palette RAM handler.
+//-------------------------------------------------
 
 WRITE16_HANDLER( atarigen_expanded_666_paletteram_w )
 {
@@ -1434,9 +1387,9 @@ WRITE16_HANDLER( atarigen_expanded_666_paletteram_w )
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_666_paletteram32_w: 6-6-6 RGB palette RAM handler.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_666_paletteram32_w: 6-6-6 RGB palette RAM handler.
+//-------------------------------------------------
 
 WRITE32_HANDLER( atarigen_666_paletteram32_w )
 {
@@ -1469,25 +1422,14 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 }
 
 
-/*---------------------------------------------------------------
-    unhalt_cpu: Timer callback to release the CPU from a halted state.
----------------------------------------------------------------*/
-
-static TIMER_CALLBACK( unhalt_cpu )
-{
-	device_t *cpu = (device_t *)ptr;
-	cpu->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-}
-
-
 
 /***************************************************************************
     MISC HELPERS
 ***************************************************************************/
 
-/*---------------------------------------------------------------
-    atarigen_swap_mem: Inverts the bits in a region.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_swap_mem: Inverts the bits in a region.
+//-------------------------------------------------
 
 void atarigen_swap_mem(void *ptr1, void *ptr2, int bytes)
 {
@@ -1502,10 +1444,10 @@ void atarigen_swap_mem(void *ptr1, void *ptr2, int bytes)
 }
 
 
-/*---------------------------------------------------------------
-    atarigen_blend_gfx: Takes two GFXElements and blends their
-    data together to form one. Then frees the second.
----------------------------------------------------------------*/
+//-------------------------------------------------
+//  atarigen_blend_gfx: Takes two GFXElements and blends their
+//  data together to form one. Then frees the second.
+//-------------------------------------------------
 
 void atarigen_blend_gfx(running_machine &machine, int gfx0, int gfx1, int mask0, int mask1)
 {
@@ -1514,17 +1456,17 @@ void atarigen_blend_gfx(running_machine &machine, int gfx0, int gfx1, int mask0,
 	UINT8 *srcdata, *dest;
 	int c, x, y;
 
-	/* allocate memory for the assembled data */
+	// allocate memory for the assembled data
 	srcdata = auto_alloc_array(machine, UINT8, gx0->elements() * gx0->width() * gx0->height());
 
-	/* loop over elements */
+	// loop over elements
 	dest = srcdata;
 	for (c = 0; c < gx0->elements(); c++)
 	{
 		const UINT8 *c0base = gx0->get_data(c);
 		const UINT8 *c1base = gx1->get_data(c);
 
-		/* loop over height */
+		// loop over height
 		for (y = 0; y < gx0->height(); y++)
 		{
 			const UINT8 *c0 = c0base;
@@ -1542,35 +1484,9 @@ void atarigen_blend_gfx(running_machine &machine, int gfx0, int gfx1, int mask0,
 	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
 	gx0->set_granularity(granularity);
 
-	/* free the second graphics element */
+	// free the second graphics element
 	machine.gfx[gfx1] = NULL;
 	auto_free(machine, gx1);
-}
-
-
-
-//**************************************************************************
-//  VECTOR AND EARLY RASTER EAROM INTERFACE
-//**************************************************************************
-
-void atarigen_state::machine_start()
-{
-	// until everyone is converted to modern devices, call our parent
-	driver_device::machine_start();
-
-	save_item(NAME(m_earom_data));
-	save_item(NAME(m_earom_control));
-}
-
-
-void atarigen_state::machine_reset()
-{
-	// until everyone is converted to modern devices, call our parent
-	driver_device::machine_reset();
-
-	// reset the control latch on the EAROM, if present
-	if (m_earom != NULL)
-		m_earom->set_control(0, 1, 1, 0, 0);
 }
 
 

@@ -207,19 +207,18 @@ RoadBlasters (aka Future Vette):005*
  *
  *************************************/
 
-static void update_interrupts(running_machine &machine)
+void atarisy1_state::update_interrupts()
 {
-	atarisy1_state *state = machine.driver_data<atarisy1_state>();
-	machine.device("maincpu")->execute().set_input_line(2, state->m_joystick_int && state->m_joystick_int_enable ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("maincpu")->execute().set_input_line(3, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("maincpu")->execute().set_input_line(4, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("maincpu")->execute().set_input_line(6, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(2, m_joystick_int && m_joystick_int_enable ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(3, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 MACHINE_START_MEMBER(atarisy1_state,atarisy1)
 {
-	atarigen_init(machine());
+	atarigen_state::machine_start();
 
 	save_item(NAME(m_joystick_int));
 	save_item(NAME(m_joystick_int_enable));
@@ -229,12 +228,7 @@ MACHINE_START_MEMBER(atarisy1_state,atarisy1)
 
 MACHINE_RESET_MEMBER(atarisy1_state,atarisy1)
 {
-
-	/* initialize the system */
-	atarigen_eeprom_reset(this);
-	atarigen_slapstic_reset(this);
-	atarigen_interrupt_reset(this, update_interrupts);
-	atarigen_sound_io_reset(machine().device("audiocpu"));
+	atarigen_state::machine_reset();
 
 	/* reset the joystick parameters */
 	m_joystick_value = 0;
@@ -254,7 +248,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::delayed_joystick_int)
 {
 	m_joystick_value = param;
 	m_joystick_int = 1;
-	atarigen_update_interrupts(machine());
+	update_interrupts();
 }
 
 
@@ -281,7 +275,7 @@ READ16_MEMBER(atarisy1_state::joystick_r)
 	/* clear any existing interrupt and set a timer for a new one */
 	m_joystick_int = 0;
 	m_joystick_timer->adjust(attotime::from_usec(50), newval);
-	atarigen_update_interrupts(machine());
+	update_interrupts();
 
 	return m_joystick_value;
 }
@@ -485,9 +479,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy1_state )
 	AM_RANGE(0xf20000, 0xf20007) AM_READ(trakball_r)
 	AM_RANGE(0xf40000, 0xf4001f) AM_READWRITE(joystick_r, joystick_w)
 	AM_RANGE(0xf60000, 0xf60003) AM_READ(port4_r)
-	AM_RANGE(0xf80000, 0xf80001) AM_WRITE_LEGACY(atarigen_sound_w)	/* used by roadbls2 */
-	AM_RANGE(0xfc0000, 0xfc0001) AM_READ_LEGACY(atarigen_sound_r)
-	AM_RANGE(0xfe0000, 0xfe0001) AM_WRITE_LEGACY(atarigen_sound_w)
+	AM_RANGE(0xf80000, 0xf80001) AM_WRITE8(sound_w, 0x00ff)	/* used by roadbls2 */
+	AM_RANGE(0xfc0000, 0xfc0001) AM_READ8(sound_r, 0x00ff)
+	AM_RANGE(0xfe0000, 0xfe0001) AM_WRITE8(sound_w, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -502,7 +496,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, atarisy1_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
 	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x1810, 0x1810) AM_READWRITE_LEGACY(atarigen_6502_sound_r, atarigen_6502_sound_w)
+	AM_RANGE(0x1810, 0x1810) AM_READWRITE(m6502_sound_r, m6502_sound_w)
 	AM_RANGE(0x1820, 0x1820) AM_READ(switch_6502_r)
 	AM_RANGE(0x1824, 0x1825) AM_WRITE(led_w)
 	AM_RANGE(0x1870, 0x187f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
@@ -2326,8 +2320,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(atarisy1_state,marble)
 {
-
-	atarigen_slapstic_init(machine().device("maincpu"), 0x080000, 0, 103);
+	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 103);
 
 	m_joystick_type = 0;	/* none */
 	m_trackball_type = 1;	/* rotated */
@@ -2336,8 +2329,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,marble)
 
 DRIVER_INIT_MEMBER(atarisy1_state,peterpak)
 {
-
-	atarigen_slapstic_init(machine().device("maincpu"), 0x080000, 0, 107);
+	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 107);
 
 	m_joystick_type = 1;	/* digital */
 	m_trackball_type = 0;	/* none */
@@ -2346,8 +2338,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,peterpak)
 
 DRIVER_INIT_MEMBER(atarisy1_state,indytemp)
 {
-
-	atarigen_slapstic_init(machine().device("maincpu"), 0x080000, 0, 105);
+	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 105);
 
 	m_joystick_type = 1;	/* digital */
 	m_trackball_type = 0;	/* none */
@@ -2356,8 +2347,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,indytemp)
 
 DRIVER_INIT_MEMBER(atarisy1_state,roadrunn)
 {
-
-	atarigen_slapstic_init(machine().device("maincpu"), 0x080000, 0, 108);
+	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 108);
 
 	m_joystick_type = 2;	/* analog */
 	m_trackball_type = 0;	/* none */
@@ -2366,8 +2356,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,roadrunn)
 
 DRIVER_INIT_MEMBER(atarisy1_state,roadb109)
 {
-
-	atarigen_slapstic_init(machine().device("maincpu"), 0x080000, 0, 109);
+	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 109);
 
 	m_joystick_type = 3;	/* pedal */
 	m_trackball_type = 2;	/* steering wheel */
@@ -2376,8 +2365,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,roadb109)
 
 DRIVER_INIT_MEMBER(atarisy1_state,roadb110)
 {
-
-	atarigen_slapstic_init(machine().device("maincpu"), 0x080000, 0, 110);
+	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 110);
 
 	m_joystick_type = 3;	/* pedal */
 	m_trackball_type = 2;	/* steering wheel */

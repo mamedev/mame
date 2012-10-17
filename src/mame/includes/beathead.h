@@ -53,7 +53,6 @@ public:
 		  m_ram_base(*this, "ram_base"),
 		  m_rom_base(*this, "rom_base") { }
 
-	virtual void machine_start();
 	virtual void machine_reset();
 
 	virtual void video_start();
@@ -92,7 +91,7 @@ public:
 	UINT32 *		m_movie_speedup_data;
 
 	// in drivers/beathead.c
-	void update_interrupts();
+	virtual void update_interrupts();
 	DECLARE_WRITE32_MEMBER( interrupt_control_w );
 	DECLARE_READ32_MEMBER( interrupt_control_r );
 	DECLARE_WRITE32_MEMBER( eeprom_data_w );

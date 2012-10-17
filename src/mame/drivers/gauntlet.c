@@ -135,44 +135,38 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine &machine)
+void gauntlet_state::update_interrupts()
 {
-	gauntlet_state *state = machine.driver_data<gauntlet_state>();
-	machine.device("maincpu")->execute().set_input_line(4, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("maincpu")->execute().set_input_line(6, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	subdevice("maincpu")->execute().set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	subdevice("maincpu")->execute().set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void scanline_update(screen_device &screen, int scanline)
+void gauntlet_state::scanline_update(screen_device &screen, int scanline)
 {
-	address_space &space = screen.machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &space = subdevice("audiocpu")->memory().space(AS_PROGRAM);
 
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
-		atarigen_6502_irq_gen(screen.machine().device("audiocpu"));
+		m6502_irq_gen(*subdevice("audiocpu"));
 	else
-		atarigen_6502_irq_ack_r(space, 0);
+		m6502_irq_ack_r(space, 0);
 }
 
 
 MACHINE_START_MEMBER(gauntlet_state,gauntlet)
 {
-	atarigen_init(machine());
-
+	atarigen_state::machine_start();
 	save_item(NAME(m_sound_reset_val));
 }
 
 
 MACHINE_RESET_MEMBER(gauntlet_state,gauntlet)
 {
-
 	m_sound_reset_val = 1;
 
-	atarigen_eeprom_reset(this);
-	atarigen_slapstic_reset(this);
-	atarigen_interrupt_reset(this, update_interrupts);
-	atarigen_scanline_timer_reset(*machine().primary_screen, scanline_update, 32);
-	atarigen_sound_io_reset(machine().device("audiocpu"));
+	atarigen_state::machine_reset();
+	scanline_timer_reset(*machine().primary_screen, 32);
 }
 
 
@@ -209,15 +203,15 @@ WRITE16_MEMBER(gauntlet_state::sound_reset_w)
 		if ((oldword ^ m_sound_reset_val) & 1)
 		{
 			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, (m_sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
-			atarigen_sound_reset(machine());
+			sound_cpu_reset();
 			if (m_sound_reset_val & 1)
 			{
 				machine().device("ymsnd")->reset();
 				machine().device("tms")->reset();
 				tms5220_set_frequency(machine().device("tms"), ATARI_CLOCK_14MHz/2 / 11);
-				atarigen_set_ym2151_vol(machine(), 0);
-				atarigen_set_pokey_vol(machine(), 0);
-				atarigen_set_tms5220_vol(machine(), 0);
+				set_ym2151_volume(0);
+				set_pokey_volume(0);
+				set_tms5220_volume(0);
 			}
 		}
 	}
@@ -284,9 +278,9 @@ WRITE8_MEMBER(gauntlet_state::sound_ctl_w)
 
 WRITE8_MEMBER(gauntlet_state::mixer_w)
 {
-	atarigen_set_ym2151_vol(machine(), (data & 7) * 100 / 7);
-	atarigen_set_pokey_vol(machine(), ((data >> 3) & 3) * 100 / 3);
-	atarigen_set_tms5220_vol(machine(), ((data >> 5) & 7) * 100 / 7);
+	set_ym2151_volume((data & 7) * 100 / 7);
+	set_pokey_volume(((data >> 3) & 3) * 100 / 3);
+	set_tms5220_volume(((data >> 5) & 7) * 100 / 7);
 }
 
 
@@ -312,12 +306,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gauntlet_state )
 	AM_RANGE(0x803004, 0x803005) AM_MIRROR(0x2fcef0) AM_READ_PORT("803004")
 	AM_RANGE(0x803006, 0x803007) AM_MIRROR(0x2fcef0) AM_READ_PORT("803006")
 	AM_RANGE(0x803008, 0x803009) AM_MIRROR(0x2fcef0) AM_READ(port4_r)
-	AM_RANGE(0x80300e, 0x80300f) AM_MIRROR(0x2fcef0) AM_READ_LEGACY(atarigen_sound_r)
+	AM_RANGE(0x80300e, 0x80300f) AM_MIRROR(0x2fcef0) AM_READ8(sound_r, 0x00ff)
 	AM_RANGE(0x803100, 0x803101) AM_MIRROR(0x2fce8e) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x803120, 0x803121) AM_MIRROR(0x2fce8e) AM_WRITE(sound_reset_w)
 	AM_RANGE(0x803140, 0x803141) AM_MIRROR(0x2fce8e) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
 	AM_RANGE(0x803150, 0x803151) AM_MIRROR(0x2fce8e) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
-	AM_RANGE(0x803170, 0x803171) AM_MIRROR(0x2fce8e) AM_WRITE_LEGACY(atarigen_sound_w)
+	AM_RANGE(0x803170, 0x803171) AM_MIRROR(0x2fce8e) AM_WRITE8(sound_w, 0x00ff)
 
 	/* VBUS */
 	AM_RANGE(0x900000, 0x901fff) AM_MIRROR(0x2c8000) AM_RAM_WRITE_LEGACY(atarigen_playfield_w) AM_SHARE("playfield")
@@ -342,14 +336,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gauntlet_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x1000, 0x100f) AM_MIRROR(0x27c0) AM_WRITE_LEGACY(atarigen_6502_sound_w)
-	AM_RANGE(0x1010, 0x101f) AM_MIRROR(0x27c0) AM_READ_LEGACY(atarigen_6502_sound_r)
+	AM_RANGE(0x1000, 0x100f) AM_MIRROR(0x27c0) AM_WRITE(m6502_sound_w)
+	AM_RANGE(0x1010, 0x101f) AM_MIRROR(0x27c0) AM_READ(m6502_sound_r)
 	AM_RANGE(0x1020, 0x102f) AM_MIRROR(0x27c0) AM_READ_PORT("COIN") AM_WRITE(mixer_w)
 	AM_RANGE(0x1030, 0x103f) AM_MIRROR(0x27c0) AM_READWRITE(switch_6502_r, sound_ctl_w)
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x27c0) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0x1810, 0x1811) AM_MIRROR(0x27ce) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x1820, 0x182f) AM_MIRROR(0x27c0) AM_DEVWRITE_LEGACY("tms", tms5220_data_w)
-	AM_RANGE(0x1830, 0x183f) AM_MIRROR(0x27c0) AM_READWRITE_LEGACY(atarigen_6502_irq_ack_r, atarigen_6502_irq_ack_w)
+	AM_RANGE(0x1830, 0x183f) AM_MIRROR(0x27c0) AM_READWRITE(m6502_irq_ack_r, m6502_irq_ack_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1621,7 +1615,7 @@ static void gauntlet_common_init(running_machine &machine, int slapstic, int vin
 	gauntlet_state *state = machine.driver_data<gauntlet_state>();
 	UINT8 *rom = state->memregion("maincpu")->base();
 	state->m_eeprom_default = NULL;
-	atarigen_slapstic_init(machine.device("maincpu"), 0x038000, 0, slapstic);
+	state->slapstic_configure(*machine.device<cpu_device>("maincpu"), 0x038000, 0, slapstic);
 
 	/* swap the top and bottom halves of the main CPU ROM images */
 	atarigen_swap_mem(rom + 0x000000, rom + 0x008000, 0x8000);

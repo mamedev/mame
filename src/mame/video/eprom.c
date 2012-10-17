@@ -205,17 +205,15 @@ VIDEO_START_MEMBER(eprom_state,guts)
  *
  *************************************/
 
-void eprom_scanline_update(screen_device &screen, int scanline)
+void eprom_state::scanline_update(screen_device &screen, int scanline)
 {
-	eprom_state *state = screen.machine().driver_data<eprom_state>();
-
 	/* update the playfield */
 	if (scanline == 0)
 	{
-		int xscroll = (state->m_alpha[0x780] >> 7) & 0x1ff;
-		int yscroll = (state->m_alpha[0x781] >> 7) & 0x1ff;
-		state->m_playfield_tilemap->set_scrollx(0, xscroll);
-		state->m_playfield_tilemap->set_scrolly(0, yscroll);
+		int xscroll = (m_alpha[0x780] >> 7) & 0x1ff;
+		int yscroll = (m_alpha[0x781] >> 7) & 0x1ff;
+		m_playfield_tilemap->set_scrollx(0, xscroll);
+		m_playfield_tilemap->set_scrolly(0, yscroll);
 		atarimo_set_xscroll(0, xscroll);
 		atarimo_set_yscroll(0, yscroll);
 	}

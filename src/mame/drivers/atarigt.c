@@ -47,27 +47,18 @@ static void cage_irq_callback(running_machine &machine, int reason);
  *
  *************************************/
 
-static void update_interrupts(running_machine &machine)
+void atarigt_state::update_interrupts()
 {
-	atarigt_state *state = machine.driver_data<atarigt_state>();
-	machine.device("maincpu")->execute().set_input_line(3, state->m_sound_int_state    ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("maincpu")->execute().set_input_line(4, state->m_video_int_state    ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("maincpu")->execute().set_input_line(6, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-MACHINE_START_MEMBER(atarigt_state,atarigt)
-{
-	atarigen_init(machine());
+	machine().device("maincpu")->execute().set_input_line(3, m_sound_int_state    ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(4, m_video_int_state    ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(6, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 MACHINE_RESET_MEMBER(atarigt_state,atarigt)
 {
-
-	atarigen_eeprom_reset(this);
-	atarigen_interrupt_reset(this, update_interrupts);
-	atarigen_scanline_timer_reset(*machine().primary_screen, atarigt_scanline_update, 8);
+	atarigen_state::machine_reset();
+	scanline_timer_reset(*machine().primary_screen, 8);
 }
 
 
@@ -612,7 +603,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atarigt_state )
 	AM_RANGE(0xd80000, 0xdfffff) AM_READWRITE(colorram_protection_r, colorram_protection_w) AM_SHARE("colorram")
 	AM_RANGE(0xe04000, 0xe04003) AM_WRITE(led_w)
 	AM_RANGE(0xe08000, 0xe08003) AM_WRITE(latch_w)
-	AM_RANGE(0xe0a000, 0xe0a003) AM_WRITE_LEGACY(atarigen_scanline_int_ack32_w)
+	AM_RANGE(0xe0a000, 0xe0a003) AM_WRITE16(scanline_int_ack_w, 0xffffffff)
 	AM_RANGE(0xe0c000, 0xe0c003) AM_WRITE_LEGACY(atarigen_video_int_ack32_w)
 	AM_RANGE(0xe0e000, 0xe0e003) AM_WRITENOP//watchdog_reset_w },
 	AM_RANGE(0xe80000, 0xe80003) AM_READ_PORT("P1_P2")
@@ -811,9 +802,8 @@ static MACHINE_CONFIG_START( atarigt, atarigt_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_50MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
-	MCFG_CPU_PERIODIC_INT(atarigen_scanline_int_gen, 250)
+	MCFG_CPU_PERIODIC_INT_DRIVER(atarigen_state, scanline_int_gen, 250)
 
-	MCFG_MACHINE_START_OVERRIDE(atarigt_state,atarigt)
 	MCFG_MACHINE_RESET_OVERRIDE(atarigt_state,atarigt)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 

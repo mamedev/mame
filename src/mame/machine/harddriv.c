@@ -36,10 +36,6 @@
  *************************************/
 
 
-static void hd68k_update_interrupts(running_machine &machine);
-
-
-
 #if 0
 #pragma mark * DRIVER/MULTISYNC BOARD
 #endif
@@ -53,8 +49,7 @@ static void hd68k_update_interrupts(running_machine &machine);
 
 MACHINE_START_MEMBER(harddriv_state,harddriv)
 {
-
-	atarigen_init(machine());
+	atarigen_state::machine_start();
 
 	/* predetermine memory regions */
 	m_sim_memory = (UINT16 *)memregion("user1")->base();
@@ -65,11 +60,9 @@ MACHINE_START_MEMBER(harddriv_state,harddriv)
 
 MACHINE_RESET_MEMBER(harddriv_state,harddriv)
 {
-
 	/* generic reset */
-	atarigen_eeprom_reset(this);
+	atarigen_state::machine_reset();
 	slapstic_reset();
-	atarigen_interrupt_reset(this, hd68k_update_interrupts);
 
 	/* halt several of the DSPs to start */
 	if (m_adsp != NULL) m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -78,7 +71,7 @@ MACHINE_RESET_MEMBER(harddriv_state,harddriv)
 
 	/* if we found a 6502, reset the JSA board */
 	if (m_jsacpu != NULL)
-		atarijsa_reset();
+		atarijsa_reset(machine());
 
 	m_last_gsp_shiftreg = 0;
 
@@ -101,22 +94,21 @@ MACHINE_RESET_MEMBER(harddriv_state,harddriv)
  *
  *************************************/
 
-static void hd68k_update_interrupts(running_machine &machine)
+void harddriv_state::update_interrupts()
 {
-	harddriv_state *state = machine.driver_data<harddriv_state>();
-	state->m_maincpu->set_input_line(1, state->m_msp_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	state->m_maincpu->set_input_line(2, state->m_adsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	state->m_maincpu->set_input_line(3, state->m_gsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	state->m_maincpu->set_input_line(4, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);	/* /LINKIRQ on STUN Runner */
-	state->m_maincpu->set_input_line(5, state->m_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	state->m_maincpu->set_input_line(6, state->m_duart_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(1, m_msp_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(2, m_adsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(3, m_gsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(4, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);	/* /LINKIRQ on STUN Runner */
+	m_maincpu->set_input_line(5, m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(6, m_duart_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 INTERRUPT_GEN_MEMBER(harddriv_state::hd68k_irq_gen)
 {
 	m_irq_state = 1;
-	atarigen_update_interrupts(machine());
+	update_interrupts();
 }
 
 
@@ -124,7 +116,7 @@ WRITE16_HANDLER( hd68k_irq_ack_w )
 {
 	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 	state->m_irq_state = 0;
-	atarigen_update_interrupts(space.machine());
+	state->update_interrupts();
 }
 
 
@@ -132,7 +124,7 @@ void hdgsp_irq_gen(device_t *device, int irqstate)
 {
 	harddriv_state *state = device->machine().driver_data<harddriv_state>();
 	state->m_gsp_irq_state = irqstate;
-	atarigen_update_interrupts(device->machine());
+	state->update_interrupts();
 }
 
 
@@ -140,7 +132,7 @@ void hdmsp_irq_gen(device_t *device, int irqstate)
 {
 	harddriv_state *state = device->machine().driver_data<harddriv_state>();
 	state->m_msp_irq_state = irqstate;
-	atarigen_update_interrupts(device->machine());
+	state->update_interrupts();
 }
 
 
@@ -317,7 +309,7 @@ READ16_HANDLER( hd68k_sound_reset_r )
 {
 	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 	if (state->m_jsacpu != NULL)
-		atarijsa_reset();
+		atarijsa_reset(space.machine());
 	return ~0;
 }
 
@@ -477,7 +469,7 @@ void harddriv_duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
 	harddriv_state *hd_state = device->machine().driver_data<harddriv_state>();
 	hd_state->m_duart_irq_state = state;
-	atarigen_update_interrupts(device->machine());
+	hd_state->update_interrupts();
 }
 
 
@@ -756,7 +748,7 @@ WRITE16_HANDLER( hd68k_adsp_irq_clear_w )
 	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 	logerror("%06X:68k clears ADSP interrupt\n", space.device().safe_pcbase());
 	state->m_adsp_irq_state = 0;
-	atarigen_update_interrupts(space.machine());
+	state->update_interrupts();
 }
 
 
@@ -830,7 +822,7 @@ WRITE16_HANDLER( hdadsp_special_w )
 		case 6:	/* /GINT */
 			logerror("%04X:ADSP signals interrupt\n", space.device().safe_pcbase());
 			state->m_adsp_irq_state = 1;
-			atarigen_update_interrupts(space.machine());
+			state->update_interrupts();
 			break;
 
 		case 7:	/* /MP */
@@ -1087,7 +1079,7 @@ WRITE16_HANDLER( hdds3_special_w )
 		case 1:
 			logerror("%04X:ADSP sets interrupt = %d\n", space.device().safe_pcbase(), (data >> 1) & 1);
 			state->m_adsp_irq_state = (data >> 1) & 1;
-			hd68k_update_interrupts(space.machine());
+			state->update_interrupts();
 			break;
 
 		case 2:
@@ -1180,7 +1172,7 @@ void hddsk_update_pif(dsp32c_device &device, UINT32 pins)
 {
 	atarigen_state *atarigen = device.machine().driver_data<atarigen_state>();
 	atarigen->m_sound_int_state = ((pins & DSP32_OUTPUT_PIF) != 0);
-	hd68k_update_interrupts(device.machine());
+	atarigen->update_interrupts();
 }
 
 

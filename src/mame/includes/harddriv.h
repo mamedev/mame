@@ -173,6 +173,7 @@ public:
 
 	INT8					m_gfx_finescroll;
 	UINT8					m_gfx_palettebank;
+	virtual void update_interrupts();
 	DECLARE_READ16_MEMBER(steeltal_dummy_r);
 	DECLARE_READ32_MEMBER(rddsp_unmap_r);
 	DECLARE_READ16_MEMBER(hd68k_snd_data_r);

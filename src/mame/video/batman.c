@@ -117,14 +117,12 @@ VIDEO_START_MEMBER(batman_state,batman)
  *
  *************************************/
 
-void batman_scanline_update(screen_device &screen, int scanline)
+void batman_state::scanline_update(screen_device &screen, int scanline)
 {
-	batman_state *state = screen.machine().driver_data<batman_state>();
-
 	/* update the scanline parameters */
-	if (scanline <= screen.visible_area().max_y && state->m_atarivc_state.rowscroll_enable)
+	if (scanline <= screen.visible_area().max_y && m_atarivc_state.rowscroll_enable)
 	{
-		UINT16 *base = &state->m_alpha[scanline / 8 * 64 + 48];
+		UINT16 *base = &m_alpha[scanline / 8 * 64 + 48];
 		int scan, i;
 
 		for (scan = 0; scan < 8; scan++, scanline++)
@@ -136,46 +134,46 @@ void batman_scanline_update(screen_device &screen, int scanline)
 					case 9:
 						if (scanline > 0)
 							screen.update_partial(scanline - 1);
-						state->m_atarivc_state.mo_xscroll = (data >> 7) & 0x1ff;
-						atarimo_set_xscroll(0, state->m_atarivc_state.mo_xscroll);
+						m_atarivc_state.mo_xscroll = (data >> 7) & 0x1ff;
+						atarimo_set_xscroll(0, m_atarivc_state.mo_xscroll);
 						break;
 
 					case 10:
 						if (scanline > 0)
 							screen.update_partial(scanline - 1);
-						state->m_atarivc_state.pf1_xscroll_raw = (data >> 7) & 0x1ff;
-						atarivc_update_pf_xscrolls(state);
-						state->m_playfield_tilemap->set_scrollx(0, state->m_atarivc_state.pf0_xscroll);
-						state->m_playfield2_tilemap->set_scrollx(0, state->m_atarivc_state.pf1_xscroll);
+						m_atarivc_state.pf1_xscroll_raw = (data >> 7) & 0x1ff;
+						atarivc_update_pf_xscrolls(this);
+						m_playfield_tilemap->set_scrollx(0, m_atarivc_state.pf0_xscroll);
+						m_playfield2_tilemap->set_scrollx(0, m_atarivc_state.pf1_xscroll);
 						break;
 
 					case 11:
 						if (scanline > 0)
 							screen.update_partial(scanline - 1);
-						state->m_atarivc_state.pf0_xscroll_raw = (data >> 7) & 0x1ff;
-						atarivc_update_pf_xscrolls(state);
-						state->m_playfield_tilemap->set_scrollx(0, state->m_atarivc_state.pf0_xscroll);
+						m_atarivc_state.pf0_xscroll_raw = (data >> 7) & 0x1ff;
+						atarivc_update_pf_xscrolls(this);
+						m_playfield_tilemap->set_scrollx(0, m_atarivc_state.pf0_xscroll);
 						break;
 
 					case 13:
 						if (scanline > 0)
 							screen.update_partial(scanline - 1);
-						state->m_atarivc_state.mo_yscroll = (data >> 7) & 0x1ff;
-						atarimo_set_yscroll(0, state->m_atarivc_state.mo_yscroll);
+						m_atarivc_state.mo_yscroll = (data >> 7) & 0x1ff;
+						atarimo_set_yscroll(0, m_atarivc_state.mo_yscroll);
 						break;
 
 					case 14:
 						if (scanline > 0)
 							screen.update_partial(scanline - 1);
-						state->m_atarivc_state.pf1_yscroll = (data >> 7) & 0x1ff;
-						state->m_playfield2_tilemap->set_scrolly(0, state->m_atarivc_state.pf1_yscroll);
+						m_atarivc_state.pf1_yscroll = (data >> 7) & 0x1ff;
+						m_playfield2_tilemap->set_scrolly(0, m_atarivc_state.pf1_yscroll);
 						break;
 
 					case 15:
 						if (scanline > 0)
 							screen.update_partial(scanline - 1);
-						state->m_atarivc_state.pf0_yscroll = (data >> 7) & 0x1ff;
-						state->m_playfield_tilemap->set_scrolly(0, state->m_atarivc_state.pf0_yscroll);
+						m_atarivc_state.pf0_yscroll = (data >> 7) & 0x1ff;
+						m_playfield_tilemap->set_scrolly(0, m_atarivc_state.pf0_yscroll);
 						break;
 				}
 			}

@@ -104,16 +104,15 @@ WRITE16_MEMBER(foodf_state::nvram_recall_w)
  *
  *************************************/
 
-static void update_interrupts(running_machine &machine)
+void foodf_state::update_interrupts()
 {
-	foodf_state *state = machine.driver_data<foodf_state>();
-	machine.device("maincpu")->execute().set_input_line(1, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("maincpu")->execute().set_input_line(2, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("maincpu")->execute().set_input_line(3, state->m_scanline_int_state && state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	subdevice("maincpu")->execute().set_input_line(1, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	subdevice("maincpu")->execute().set_input_line(2, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	subdevice("maincpu")->execute().set_input_line(3, m_scanline_int_state && m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update)
+TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
 {
 	int scanline = param;
 
@@ -123,7 +122,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update)
        mystery yet */
 
 	/* INT 1 is on 32V */
-	atarigen_scanline_int_gen(machine().device("maincpu"));
+	scanline_int_gen(*subdevice("maincpu"));
 
 	/* advance to the next interrupt */
 	scanline += 64;
@@ -137,14 +136,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update)
 
 MACHINE_START_MEMBER(foodf_state,foodf)
 {
-	atarigen_init(machine());
+	atarigen_state::machine_start();
 	save_item(NAME(m_whichport));
 }
 
 
 MACHINE_RESET_MEMBER(foodf_state,foodf)
 {
-	atarigen_interrupt_reset(this, update_interrupts);
 	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
 	scan_timer->adjust(machine().primary_screen->time_until_pos(0));
 }
@@ -164,7 +162,7 @@ WRITE8_MEMBER(foodf_state::digital_w)
 	m_nvram->store(data & 0x02);
 
 	if (!(data & 0x04))
-		atarigen_scanline_int_ack_w(space,0,0,0xffff);
+		scanline_int_ack_w(space,0,0);
 	if (!(data & 0x08))
 		atarigen_video_int_ack_w(space,0,0,0xffff);
 
@@ -363,7 +361,7 @@ static MACHINE_CONFIG_START( foodf, foodf_state )
 
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", foodf_state, scanline_update)
+	MCFG_TIMER_DRIVER_ADD("scan_timer", foodf_state, scanline_update_timer)
 
 	/* video hardware */
 	MCFG_GFXDECODE(foodf)

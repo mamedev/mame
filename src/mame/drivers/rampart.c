@@ -39,18 +39,17 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine &machine)
+void rampart_state::update_interrupts()
 {
-	rampart_state *state = machine.driver_data<rampart_state>();
-	machine.device("maincpu")->execute().set_input_line(4, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	subdevice("maincpu")->execute().set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void scanline_update(screen_device &screen, int scanline)
+void rampart_state::scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0)
-		atarigen_scanline_int_gen(screen.machine().device("maincpu"));
+		scanline_int_gen(*subdevice("maincpu"));
 }
 
 
@@ -61,19 +60,10 @@ static void scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-MACHINE_START_MEMBER(rampart_state,rampart)
-{
-	atarigen_init(machine());
-}
-
-
 MACHINE_RESET_MEMBER(rampart_state,rampart)
 {
-
-	atarigen_eeprom_reset(this);
-	atarigen_slapstic_reset(this);
-	atarigen_interrupt_reset(this, update_interrupts);
-	atarigen_scanline_timer_reset(*machine().primary_screen, scanline_update, 32);
+	atarigen_state::machine_reset();
+	scanline_timer_reset(*machine().primary_screen, 32);
 }
 
 
@@ -114,10 +104,10 @@ WRITE16_MEMBER(rampart_state::latch_w)
 	/* lower byte being modified? */
 	if (ACCESSING_BITS_0_7)
 	{
-		atarigen_set_oki6295_vol(machine(), (data & 0x0020) ? 100 : 0);
+		set_oki6295_volume((data & 0x0020) ? 100 : 0);
 		if (!(data & 0x0010))
 			machine().device("oki")->reset();
-		atarigen_set_ym2413_vol(machine(), ((data >> 1) & 7) * 100 / 7);
+		set_ym2413_volume(((data >> 1) & 7) * 100 / 7);
 		if (!(data & 0x0001))
 			machine().device("ymsnd")->reset();
 	}
@@ -155,7 +145,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rampart_state )
 	AM_RANGE(0x6c0004, 0x6c0005) AM_MIRROR(0x019ff8) AM_READ_PORT("TRACK2")
 	AM_RANGE(0x6c0006, 0x6c0007) AM_MIRROR(0x019ff8) AM_READ_PORT("TRACK3")
 	AM_RANGE(0x726000, 0x726001) AM_MIRROR(0x019ffe) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x7e6000, 0x7e6001) AM_MIRROR(0x019ffe) AM_WRITE_LEGACY(atarigen_scanline_int_ack_w)
+	AM_RANGE(0x7e6000, 0x7e6001) AM_MIRROR(0x019ffe) AM_WRITE(scanline_int_ack_w)
 ADDRESS_MAP_END
 
 
@@ -348,7 +338,6 @@ static MACHINE_CONFIG_START( rampart, rampart_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
-	MCFG_MACHINE_START_OVERRIDE(rampart_state,rampart)
 	MCFG_MACHINE_RESET_OVERRIDE(rampart_state,rampart)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 	MCFG_WATCHDOG_VBLANK_INIT(8)
@@ -481,7 +470,7 @@ DRIVER_INIT_MEMBER(rampart_state,rampart)
 	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 	memcpy(&rom[0x140000], &rom[0x40000], 0x8000);
-	atarigen_slapstic_init(machine().device("maincpu"), 0x140000, 0x438000, 118);
+	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x140000, 0x438000, 118);
 }
 
 

@@ -32,27 +32,17 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine &machine)
+void xybots_state::update_interrupts()
 {
-	xybots_state *state = machine.driver_data<xybots_state>();
-	machine.device("maincpu")->execute().set_input_line(1, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("maincpu")->execute().set_input_line(2, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-MACHINE_START_MEMBER(xybots_state,xybots)
-{
-	atarigen_init(machine());
+	subdevice("maincpu")->execute().set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	subdevice("maincpu")->execute().set_input_line(2, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 MACHINE_RESET_MEMBER(xybots_state,xybots)
 {
-
-	atarigen_eeprom_reset(this);
-	atarigen_slapstic_reset(this);
-	atarigen_interrupt_reset(this, update_interrupts);
-	atarijsa_reset();
+	atarigen_state::machine_reset();
+	atarijsa_reset(machine());
 }
 
 
@@ -92,14 +82,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xybots_state )
 	AM_RANGE(0xffb000, 0xffbfff) AM_MIRROR(0x7f8000) AM_RAM_WRITE_LEGACY(atarigen_playfield_w) AM_SHARE("playfield")
 	AM_RANGE(0xffc000, 0xffc7ff) AM_MIRROR(0x7f8800) AM_RAM_WRITE(paletteram_IIIIRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
-	AM_RANGE(0xffe000, 0xffe0ff) AM_MIRROR(0x7f8000) AM_READ_LEGACY(atarigen_sound_r)
+	AM_RANGE(0xffe000, 0xffe0ff) AM_MIRROR(0x7f8000) AM_READ8(sound_r, 0x00ff)
 	AM_RANGE(0xffe100, 0xffe1ff) AM_MIRROR(0x7f8000) AM_READ_PORT("FFE100")
 	AM_RANGE(0xffe200, 0xffe2ff) AM_MIRROR(0x7f8000) AM_READ(special_port1_r)
 	AM_RANGE(0xffe800, 0xffe8ff) AM_MIRROR(0x7f8000) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
-	AM_RANGE(0xffe900, 0xffe9ff) AM_MIRROR(0x7f8000) AM_WRITE_LEGACY(atarigen_sound_w)
+	AM_RANGE(0xffe900, 0xffe9ff) AM_MIRROR(0x7f8000) AM_WRITE8(sound_w, 0x00ff)
 	AM_RANGE(0xffea00, 0xffeaff) AM_MIRROR(0x7f8000) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xffeb00, 0xffebff) AM_MIRROR(0x7f8000) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
-	AM_RANGE(0xffee00, 0xffeeff) AM_MIRROR(0x7f8000) AM_WRITE_LEGACY(atarigen_sound_reset_w)
+	AM_RANGE(0xffee00, 0xffeeff) AM_MIRROR(0x7f8000) AM_WRITE(sound_reset_w)
 ADDRESS_MAP_END
 
 
@@ -197,7 +187,6 @@ static MACHINE_CONFIG_START( xybots, xybots_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
-	MCFG_MACHINE_START_OVERRIDE(xybots_state,xybots)
 	MCFG_MACHINE_RESET_OVERRIDE(xybots_state,xybots)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
@@ -391,7 +380,7 @@ ROM_END
 DRIVER_INIT_MEMBER(xybots_state,xybots)
 {
 	m_h256 = 0x0400;
-	atarigen_slapstic_init(machine().device("maincpu"), 0x008000, 0, 107);
+	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x008000, 0, 107);
 	atarijsa_init(machine(), "FFE200", 0x0100);
 }
 

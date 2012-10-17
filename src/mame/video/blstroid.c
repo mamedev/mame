@@ -89,29 +89,27 @@ VIDEO_START_MEMBER(blstroid_state,blstroid)
 
 TIMER_CALLBACK_MEMBER(blstroid_state::irq_off)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-
 	/* clear the interrupt */
-	atarigen_scanline_int_ack_w(space, 0, 0, 0xffff);
+	address_space &space = subdevice("maincpu")->memory().space(AS_PROGRAM);
+	scanline_int_ack_w(space, 0, 0);
 }
 
 
 TIMER_CALLBACK_MEMBER(blstroid_state::irq_on)
 {
 	/* generate the interrupt */
-	atarigen_scanline_int_gen(machine().device("maincpu"));
-	atarigen_update_interrupts(machine());
+	scanline_int_gen(*subdevice("maincpu"));
+	update_interrupts();
 }
 
 
-void blstroid_scanline_update(screen_device &screen, int scanline)
+void blstroid_state::scanline_update(screen_device &screen, int scanline)
 {
-	blstroid_state *state = screen.machine().driver_data<blstroid_state>();
 	int offset = (scanline / 8) * 64 + 40;
 
 	/* check for interrupts */
 	if (offset < 0x1000)
-		if (state->m_playfield[offset] & 0x8000)
+		if (m_playfield[offset] & 0x8000)
 		{
 			int width, vpos;
 			attotime period_on;
@@ -129,8 +127,8 @@ void blstroid_scanline_update(screen_device &screen, int scanline)
 			period_on  = screen.time_until_pos(vpos + 7, width * 0.9);
 			period_off = screen.time_until_pos(vpos + 8, width * 0.9);
 
-			screen.machine().scheduler().timer_set(period_on, timer_expired_delegate(FUNC(blstroid_state::irq_on),state));
-			screen.machine().scheduler().timer_set(period_off, timer_expired_delegate(FUNC(blstroid_state::irq_off),state));
+			screen.machine().scheduler().timer_set(period_on, timer_expired_delegate(FUNC(blstroid_state::irq_on), this));
+			screen.machine().scheduler().timer_set(period_off, timer_expired_delegate(FUNC(blstroid_state::irq_off), this));
 		}
 }
 

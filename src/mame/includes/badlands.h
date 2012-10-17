@@ -18,6 +18,8 @@ public:
 	UINT8 *			m_bank_source_data;
 
 	UINT8			m_playfield_tile_bank;
+	virtual void update_interrupts();
+	virtual void scanline_update(screen_device &screen, int scanline);
 	DECLARE_READ16_MEMBER(sound_busy_r);
 	DECLARE_READ16_MEMBER(pedal_0_r);
 	DECLARE_READ16_MEMBER(pedal_1_r);

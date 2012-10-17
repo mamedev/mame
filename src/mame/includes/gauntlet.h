@@ -16,6 +16,8 @@ public:
 	UINT8			m_vindctr2_screen_refresh;
 	UINT8			m_playfield_tile_bank;
 	UINT8			m_playfield_color_bank;
+	virtual void update_interrupts();
+	virtual void scanline_update(screen_device &screen, int scanline);
 	DECLARE_READ16_MEMBER(port4_r);
 	DECLARE_WRITE16_MEMBER(sound_reset_w);
 	DECLARE_READ8_MEMBER(switch_6502_r);

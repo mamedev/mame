@@ -42,6 +42,7 @@
 
 #include "machine/nvram.h"
 #include "machine/er2055.h"
+#include "cpu/m6502/m6502.h"
 
 
 /***************************************************************************
@@ -58,10 +59,6 @@
 /***************************************************************************
     TYPES & STRUCTURES
 ***************************************************************************/
-
-typedef void (*atarigen_int_func)(running_machine &machine);
-
-typedef void (*atarigen_scanline_func)(screen_device &screen, int scanline);
 
 struct atarivc_state_desc
 {
@@ -92,34 +89,82 @@ struct atarigen_screen_timer
 class atarigen_state : public driver_device
 {
 public:
-	atarigen_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		  m_earom(*this, "earom"),
-		  m_eeprom(*this, "eeprom"),
-		  m_eeprom32(*this, "eeprom"),
-		  m_playfield(*this, "playfield"),
-		  m_playfield2(*this, "playfield2"),
-		  m_playfield_upper(*this, "playfield_up"),
-		  m_alpha(*this, "alpha"),
-		  m_alpha2(*this, "alpha2"),
-		  m_xscroll(*this, "xscroll"),
-		  m_yscroll(*this, "yscroll"),
-		  m_playfield32(*this, "playfield32"),
-		  m_alpha32(*this, "alpha32"),
-		  m_atarivc_data(*this, "atarivc_data"),
-		  m_atarivc_eof_data(*this, "atarivc_eof")
-	{ }
+	// construction/destruction
+	atarigen_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	// users must call through to these
 	virtual void machine_start();
 	virtual void machine_reset();
+	virtual void device_post_load();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	// callbacks provided by the derived class
+	virtual void update_interrupts() = 0;
+	virtual void scanline_update(screen_device &screen, int scanline);
+	
+	// interrupt handling
+	void scanline_int_set(screen_device &screen, int scanline);
+	INTERRUPT_GEN_MEMBER(scanline_int_gen);
+	DECLARE_WRITE16_MEMBER(scanline_int_ack_w);
+
+	// slapstic helpers
+	void slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, int chipnum);
+	void slapstic_update_bank(int bank);
+	DECLARE_DIRECT_UPDATE_MEMBER(slapstic_setdirect);
+	DECLARE_WRITE16_MEMBER(slapstic_w);
+	DECLARE_READ16_MEMBER(slapstic_r);
+	
+	// sound I/O helpers
+	void sound_io_reset();
+	INTERRUPT_GEN_MEMBER(m6502_irq_gen);
+	DECLARE_READ8_MEMBER(m6502_irq_ack_r);
+	DECLARE_WRITE8_MEMBER(m6502_irq_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_gen);
+	DECLARE_WRITE16_MEMBER(sound_reset_w);
+	void sound_cpu_reset();
+	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_READ8_MEMBER(sound_r);
+	DECLARE_WRITE8_MEMBER(m6502_sound_w);
+	DECLARE_READ8_MEMBER(m6502_sound_r);
+	void update_m6502_irq();
+	void delayed_sound_reset(int param);
+	void delayed_sound_write(int data);
+	void delayed_6502_write(int data);
+	
+	// sound helpers
+	void set_volume_by_type(int volume, device_type type);
+	void set_ym2151_volume(int volume);
+	void set_ym2413_volume(int volume);
+	void set_pokey_volume(int volume);
+	void set_tms5220_volume(int volume);
+	void set_oki6295_volume(int volume);
+
+	// scanline timing
+	void scanline_timer_reset(screen_device &screen, int frequency);
+	void scanline_timer(emu_timer &timer, screen_device &screen, int scanline);
+
+	// video controller
+	void atarivc_eof_update(emu_timer &timer, screen_device &screen);
+
+	// video helpers
+	void halt_until_hblank_0(device_t &device, screen_device &screen);
 
 	// vector and early raster EAROM interface
 	DECLARE_READ8_MEMBER( earom_r );
 	DECLARE_WRITE8_MEMBER( earom_w );
 	DECLARE_WRITE8_MEMBER( earom_control_w );
-
-	DECLARE_WRITE_LINE_MEMBER( ym2151_irq_gen );
+	
+	// timer IDs
+	enum
+	{
+		TID_SCANLINE_INTERRUPT,
+		TID_SOUND_RESET,
+		TID_SOUND_WRITE,
+		TID_6502_WRITE,
+		TID_SCANLINE_TIMER,
+		TID_ATARIVC_EOF,
+		TID_UNHALT_CPU
+	};
 
 	// vector and early raster EAROM interface
 	optional_device<er2055_device> m_earom;
@@ -149,36 +194,33 @@ public:
 	optional_shared_ptr<UINT32> m_playfield32;
 	optional_shared_ptr<UINT32> m_alpha32;
 
-	tilemap_t *			m_playfield_tilemap;
-	tilemap_t *			m_playfield2_tilemap;
-	tilemap_t *			m_alpha_tilemap;
-	tilemap_t *			m_alpha2_tilemap;
+	tilemap_t *				m_playfield_tilemap;
+	tilemap_t *				m_playfield2_tilemap;
+	tilemap_t *				m_alpha_tilemap;
+	tilemap_t *				m_alpha2_tilemap;
 
 	optional_shared_ptr<UINT16> m_atarivc_data;
 	optional_shared_ptr<UINT16> m_atarivc_eof_data;
-	atarivc_state_desc	m_atarivc_state;
+	atarivc_state_desc		m_atarivc_state;
 
 	/* internal state */
-	atarigen_int_func		m_update_int_callback;
-
-	UINT8					m_eeprom_unlocked;
+	bool					m_eeprom_unlocked;
 
 	UINT8					m_slapstic_num;
 	UINT16 *				m_slapstic;
 	UINT8					m_slapstic_bank;
-	void *					m_slapstic_bank0;
+	dynamic_buffer			m_slapstic_bank0;
 	offs_t					m_slapstic_last_pc;
 	offs_t					m_slapstic_last_address;
 	offs_t					m_slapstic_base;
 	offs_t					m_slapstic_mirror;
 
-	device_t *		m_sound_cpu;
+	optional_device<m6502_device> m_sound_cpu;
 	UINT8					m_cpu_to_sound;
 	UINT8					m_sound_to_cpu;
 	UINT8					m_timed_int;
 	UINT8					m_ym2151_int;
 
-	atarigen_scanline_func	m_scanline_callback;
 	UINT32					m_scanlines_per_callback;
 
 	UINT32					m_actual_vc_latch0;
@@ -189,8 +231,6 @@ public:
 	UINT32					m_playfield2_latch;
 
 	atarigen_screen_timer	m_screen_timer[2];
-
-	DECLARE_DIRECT_UPDATE_MEMBER(atarigen_slapstic_setdirect);
 };
 
 
@@ -200,23 +240,8 @@ public:
 ***************************************************************************/
 
 /*---------------------------------------------------------------
-    OVERALL INIT
----------------------------------------------------------------*/
-
-void atarigen_init(running_machine &machine);
-
-
-/*---------------------------------------------------------------
     INTERRUPT HANDLING
 ---------------------------------------------------------------*/
-
-void atarigen_interrupt_reset(atarigen_state *state, atarigen_int_func update_int);
-void atarigen_update_interrupts(running_machine &machine);
-
-void atarigen_scanline_int_set(screen_device &screen, int scanline);
-INTERRUPT_GEN( atarigen_scanline_int_gen );
-DECLARE_WRITE16_HANDLER( atarigen_scanline_int_ack_w );
-DECLARE_WRITE32_HANDLER( atarigen_scanline_int_ack32_w );
 
 INTERRUPT_GEN( atarigen_sound_int_gen );
 DECLARE_WRITE16_HANDLER( atarigen_sound_int_ack_w );
@@ -231,8 +256,6 @@ DECLARE_WRITE32_HANDLER( atarigen_video_int_ack32_w );
     EEPROM HANDLING
 ---------------------------------------------------------------*/
 
-void atarigen_eeprom_reset(atarigen_state *state);
-
 DECLARE_WRITE16_HANDLER( atarigen_eeprom_enable_w );
 DECLARE_WRITE16_HANDLER( atarigen_eeprom_w );
 DECLARE_READ16_HANDLER( atarigen_eeprom_r );
@@ -241,52 +264,6 @@ DECLARE_READ16_HANDLER( atarigen_eeprom_upper_r );
 DECLARE_WRITE32_HANDLER( atarigen_eeprom_enable32_w );
 DECLARE_WRITE32_HANDLER( atarigen_eeprom32_w );
 DECLARE_READ32_HANDLER( atarigen_eeprom_upper32_r );
-
-
-/*---------------------------------------------------------------
-    SLAPSTIC HANDLING
----------------------------------------------------------------*/
-
-void atarigen_slapstic_init(device_t *device, offs_t base, offs_t mirror, int chipnum);
-void atarigen_slapstic_reset(atarigen_state *state);
-
-DECLARE_WRITE16_HANDLER( atarigen_slapstic_w );
-DECLARE_READ16_HANDLER( atarigen_slapstic_r );
-
-
-/*---------------------------------------------------------------
-    SOUND I/O
----------------------------------------------------------------*/
-
-void atarigen_sound_io_reset(device_t *device);
-
-INTERRUPT_GEN( atarigen_6502_irq_gen );
-DECLARE_READ8_HANDLER( atarigen_6502_irq_ack_r );
-DECLARE_WRITE8_HANDLER( atarigen_6502_irq_ack_w );
-
-DECLARE_WRITE16_HANDLER( atarigen_sound_w );
-DECLARE_READ16_HANDLER( atarigen_sound_r );
-DECLARE_WRITE16_HANDLER( atarigen_sound_upper_w );
-DECLARE_READ16_HANDLER( atarigen_sound_upper_r );
-
-DECLARE_WRITE32_HANDLER( atarigen_sound_upper32_w );
-DECLARE_READ32_HANDLER( atarigen_sound_upper32_r );
-
-void atarigen_sound_reset(running_machine &machine);
-DECLARE_WRITE16_HANDLER( atarigen_sound_reset_w );
-DECLARE_WRITE8_HANDLER( atarigen_6502_sound_w );
-DECLARE_READ8_HANDLER( atarigen_6502_sound_r );
-
-
-/*---------------------------------------------------------------
-    SOUND HELPERS
----------------------------------------------------------------*/
-
-void atarigen_set_ym2151_vol(running_machine &machine, int volume);
-void atarigen_set_ym2413_vol(running_machine &machine, int volume);
-void atarigen_set_pokey_vol(running_machine &machine, int volume);
-void atarigen_set_tms5220_vol(running_machine &machine, int volume);
-void atarigen_set_oki6295_vol(running_machine &machine, int volume);
 
 
 /*---------------------------------------------------------------
@@ -329,9 +306,7 @@ DECLARE_WRITE16_HANDLER( atarigen_playfield2_latched_msb_w );
     VIDEO HELPERS
 ---------------------------------------------------------------*/
 
-void atarigen_scanline_timer_reset(screen_device &screen, atarigen_scanline_func update_graphics, int frequency);
 int atarigen_get_hblank(screen_device &screen);
-void atarigen_halt_until_hblank_0(screen_device &screen);
 DECLARE_WRITE16_HANDLER( atarigen_666_paletteram_w );
 DECLARE_WRITE16_HANDLER( atarigen_expanded_666_paletteram_w );
 DECLARE_WRITE32_HANDLER( atarigen_666_paletteram32_w );

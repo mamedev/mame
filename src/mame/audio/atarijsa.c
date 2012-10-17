@@ -150,7 +150,7 @@ void atarijsa_init(running_machine &machine, const char *testport, int testmask)
 		jsacpu->space(AS_PROGRAM).install_readwrite_handler(0x2c00, 0x2c0f, read8_delegate(FUNC(pokey_device::read),pokey), write8_delegate(FUNC(pokey_device::write),pokey));
 
 	init_save_state(machine);
-	atarijsa_reset();
+	atarijsa_reset(machine);
 
 	/* initialize JSA III ADPCM */
 	{
@@ -175,10 +175,10 @@ void atarijsa_init(running_machine &machine, const char *testport, int testmask)
 }
 
 
-void atarijsa_reset(void)
+void atarijsa_reset(running_machine &machine)
 {
 	/* reset the sound I/O system */
-	atarigen_sound_io_reset(jsacpu);
+	machine.driver_data<atarigen_state>()->sound_io_reset();
 
 	/* reset the static states */
 	overall_volume = 100;
@@ -213,7 +213,7 @@ static READ8_HANDLER( jsa1_io_r )
 			break;
 
 		case 0x002:		/* /RDP */
-			result = atarigen_6502_sound_r(space, offset);
+			result = atarigen->m6502_sound_r(space, offset);
 			break;
 
 		case 0x004:		/* /RDIO */
@@ -238,7 +238,7 @@ static READ8_HANDLER( jsa1_io_r )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(space, 0);
+			atarigen->m6502_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:		/* /VOICE */
@@ -264,7 +264,7 @@ static WRITE8_HANDLER( jsa1_io_w )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(space, 0);
+			space.machine().driver_data<atarigen_state>()->m6502_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:		/* /VOICE */
@@ -273,7 +273,7 @@ static WRITE8_HANDLER( jsa1_io_w )
 			break;
 
 		case 0x202:		/* /WRP */
-			atarigen_6502_sound_w(space, offset, data);
+			space.machine().driver_data<atarigen_state>()->m6502_sound_w(space, offset, data);
 			break;
 
 		case 0x204:		/* WRIO */
@@ -346,7 +346,7 @@ static READ8_HANDLER( jsa2_io_r )
 			break;
 
 		case 0x002:		/* /RDP */
-			result = atarigen_6502_sound_r(space, offset);
+			result = atarigen->m6502_sound_r(space, offset);
 			break;
 
 		case 0x004:		/* /RDIO */
@@ -367,7 +367,7 @@ static READ8_HANDLER( jsa2_io_r )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(space, 0);
+			atarigen->m6502_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:		/* /WRV */
@@ -393,7 +393,7 @@ static WRITE8_HANDLER( jsa2_io_w )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(space, 0);
+			space.machine().driver_data<atarigen_state>()->m6502_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:		/* /WRV */
@@ -404,7 +404,7 @@ static WRITE8_HANDLER( jsa2_io_w )
 			break;
 
 		case 0x202:		/* /WRP */
-			atarigen_6502_sound_w(space, offset, data);
+			space.machine().driver_data<atarigen_state>()->m6502_sound_w(space, offset, data);
 			break;
 
 		case 0x204:		/* /WRIO */
@@ -469,7 +469,7 @@ static READ8_HANDLER( jsa3_io_r )
 			break;
 
 		case 0x002:		/* /RDP */
-			result = atarigen_6502_sound_r(space, offset);
+			result = atarigen->m6502_sound_r(space, offset);
 			break;
 
 		case 0x004:		/* /RDIO */
@@ -490,7 +490,7 @@ static READ8_HANDLER( jsa3_io_r )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(space, 0);
+			atarigen->m6502_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:		/* /WRV */
@@ -520,7 +520,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(space, 0);
+			space.machine().driver_data<atarigen_state>()->m6502_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:		/* /WRV */
@@ -529,7 +529,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 			break;
 
 		case 0x202:		/* /WRP */
-			atarigen_6502_sound_w(space, offset, data);
+			space.machine().driver_data<atarigen_state>()->m6502_sound_w(space, offset, data);
 			break;
 
 		case 0x204:		/* /WRIO */
@@ -603,7 +603,7 @@ static READ8_HANDLER( jsa3s_io_r )
 			break;
 
 		case 0x002:		/* /RDP */
-			result = atarigen_6502_sound_r(space, offset);
+			result = atarigen->m6502_sound_r(space, offset);
 			break;
 
 		case 0x004:		/* /RDIO */
@@ -624,7 +624,7 @@ static READ8_HANDLER( jsa3s_io_r )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(space, 0);
+			atarigen->m6502_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:		/* /WRV */
@@ -654,7 +654,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(space, 0);
+			space.machine().driver_data<atarigen_state>()->m6502_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:		/* /WRV */
@@ -663,7 +663,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
 			break;
 
 		case 0x202:		/* /WRP */
-			atarigen_6502_sound_w(space, offset, data);
+			space.machine().driver_data<atarigen_state>()->m6502_sound_w(space, offset, data);
 			break;
 
 		case 0x204:		/* /WRIO */
@@ -732,12 +732,13 @@ WRITE8_DEVICE_HANDLER( ym2151_ctl_w )
 
 static void update_all_volumes(running_machine &machine )
 {
-	if (pokey != NULL) atarigen_set_pokey_vol(machine, (overall_volume * pokey_volume / 100) * ym2151_ct1);
+	atarigen_state *state = machine.driver_data<atarigen_state>();
+	if (pokey != NULL) state->set_pokey_volume((overall_volume * pokey_volume / 100) * ym2151_ct1);
 	//if (pokey != NULL) atarigen_set_pokey_stereo_vol(machine, (overall_volume * pokey_volume / 100) * ym2151_ct1, (overall_volume * pokey_volume / 100) * ym2151_ct2);
-	if (ym2151 != NULL) atarigen_set_ym2151_vol(machine, overall_volume * ym2151_volume / 100);
-	if (tms5220 != NULL) atarigen_set_tms5220_vol(machine, (overall_volume * tms5220_volume / 100) * ym2151_ct1);
+	if (ym2151 != NULL) state->set_ym2151_volume(overall_volume * ym2151_volume / 100);
+	if (tms5220 != NULL) state->set_tms5220_volume((overall_volume * tms5220_volume / 100) * ym2151_ct1);
 	//if (tms5220 != NULL) atarigen_set_tms5220_stereo_vol(machine, (overall_volume * tms5220_volume / 100) * ym2151_ct1, (overall_volume * tms5220_volume / 100) * ym2151_ct2);
-	if (oki6295 != NULL || oki6295_l != NULL || oki6295_r != NULL) atarigen_set_oki6295_vol(machine, overall_volume * oki6295_volume / 100);
+	if (oki6295 != NULL || oki6295_l != NULL || oki6295_r != NULL) state->set_oki6295_volume(overall_volume * oki6295_volume / 100);
 }
 
 
@@ -794,7 +795,7 @@ MACHINE_CONFIG_FRAGMENT( jsa_i_stereo )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa1_map)
-	MCFG_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_CPU_PERIODIC_INT_DRIVER(atarigen_state, m6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -838,7 +839,7 @@ MACHINE_CONFIG_FRAGMENT( jsa_i_mono_speech )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa1_map)
-	MCFG_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_CPU_PERIODIC_INT_DRIVER(atarigen_state, m6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -860,7 +861,7 @@ MACHINE_CONFIG_FRAGMENT( jsa_ii_mono )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa2_map)
-	MCFG_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_CPU_PERIODIC_INT_DRIVER(atarigen_state, m6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -904,7 +905,7 @@ MACHINE_CONFIG_FRAGMENT( jsa_iiis_stereo )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa3s_map)
-	MCFG_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_CPU_PERIODIC_INT_DRIVER(atarigen_state, m6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

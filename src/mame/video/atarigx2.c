@@ -108,16 +108,15 @@ WRITE16_HANDLER( atarigx2_mo_control_w )
 }
 
 
-void atarigx2_scanline_update(screen_device &screen, int scanline)
+void atarigx2_state::scanline_update(screen_device &screen, int scanline)
 {
-	atarigx2_state *state = screen.machine().driver_data<atarigx2_state>();
-	UINT32 *base = &state->m_alpha32[(scanline / 8) * 32 + 24];
+	UINT32 *base = &m_alpha32[(scanline / 8) * 32 + 24];
 	int i;
 
 	if (scanline == 0) logerror("-------\n");
 
 	/* keep in range */
-	if (base >= &state->m_alpha32[0x400])
+	if (base >= &m_alpha32[0x400])
 		return;
 
 	/* update the playfield scrolls */
@@ -129,19 +128,19 @@ void atarigx2_scanline_update(screen_device &screen, int scanline)
 		{
 			int newscroll = (word >> 21) & 0x3ff;
 			int newbank = (word >> 16) & 0x1f;
-			if (newscroll != state->m_playfield_xscroll)
+			if (newscroll != m_playfield_xscroll)
 			{
 				if (scanline + i > 0)
 					screen.update_partial(scanline + i - 1);
-				state->m_playfield_tilemap->set_scrollx(0, newscroll);
-				state->m_playfield_xscroll = newscroll;
+				m_playfield_tilemap->set_scrollx(0, newscroll);
+				m_playfield_xscroll = newscroll;
 			}
-			if (newbank != state->m_playfield_color_bank)
+			if (newbank != m_playfield_color_bank)
 			{
 				if (scanline + i > 0)
 					screen.update_partial(scanline + i - 1);
-				state->m_playfield_tilemap->mark_all_dirty();
-				state->m_playfield_color_bank = newbank;
+				m_playfield_tilemap->mark_all_dirty();
+				m_playfield_color_bank = newbank;
 			}
 		}
 
@@ -149,19 +148,19 @@ void atarigx2_scanline_update(screen_device &screen, int scanline)
 		{
 			int newscroll = ((word >> 6) - (scanline + i)) & 0x1ff;
 			int newbank = word & 15;
-			if (newscroll != state->m_playfield_yscroll)
+			if (newscroll != m_playfield_yscroll)
 			{
 				if (scanline + i > 0)
 					screen.update_partial(scanline + i - 1);
-				state->m_playfield_tilemap->set_scrolly(0, newscroll);
-				state->m_playfield_yscroll = newscroll;
+				m_playfield_tilemap->set_scrolly(0, newscroll);
+				m_playfield_yscroll = newscroll;
 			}
-			if (newbank != state->m_playfield_tile_bank)
+			if (newbank != m_playfield_tile_bank)
 			{
 				if (scanline + i > 0)
 					screen.update_partial(scanline + i - 1);
-				state->m_playfield_tilemap->mark_all_dirty();
-				state->m_playfield_tile_bank = newbank;
+				m_playfield_tilemap->mark_all_dirty();
+				m_playfield_tile_bank = newbank;
 			}
 		}
 	}

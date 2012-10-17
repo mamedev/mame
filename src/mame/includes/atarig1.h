@@ -30,6 +30,8 @@ public:
 	UINT16			m_playfield_yscroll;
 
 	device_t *		m_rle;
+	virtual void update_interrupts();
+	virtual void scanline_update(screen_device &screen, int scanline);
 	DECLARE_WRITE16_MEMBER(mo_control_w);
 	DECLARE_WRITE16_MEMBER(mo_command_w);
 	DECLARE_READ16_MEMBER(special_port0_r);

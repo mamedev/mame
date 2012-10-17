@@ -32,6 +32,8 @@ public:
 
 	device_t *		m_rle;
 	UINT32			m_last_accesses[8];
+	virtual void update_interrupts();
+	virtual void scanline_update(screen_device &screen, int scanline);
 	DECLARE_READ16_MEMBER(special_port2_r);
 	DECLARE_WRITE16_MEMBER(a2d_select_w);
 	DECLARE_READ16_MEMBER(a2d_data_r);

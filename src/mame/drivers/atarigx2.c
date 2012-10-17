@@ -33,27 +33,18 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine &machine)
+void atarigx2_state::update_interrupts()
 {
-	atarigx2_state *state = machine.driver_data<atarigx2_state>();
-	machine.device("maincpu")->execute().set_input_line(4, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("maincpu")->execute().set_input_line(5, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-MACHINE_START_MEMBER(atarigx2_state,atarigx2)
-{
-	atarigen_init(machine());
+	machine().device("maincpu")->execute().set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(5, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 MACHINE_RESET_MEMBER(atarigx2_state,atarigx2)
 {
-
-	atarigen_eeprom_reset(this);
-	atarigen_interrupt_reset(this, update_interrupts);
-	atarigen_scanline_timer_reset(*machine().primary_screen, atarigx2_scanline_update, 8);
-	atarijsa_reset();
+	atarigen_state::machine_reset();
+	scanline_timer_reset(*machine().primary_screen, 8);
+	atarijsa_reset(machine());
 }
 
 
@@ -1157,14 +1148,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atarigx2_state )
 	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
 	AM_RANGE(0xd70000, 0xd7ffff) AM_RAM
 	AM_RANGE(0xd80000, 0xd9ffff) AM_WRITE_LEGACY(atarigen_eeprom_enable32_w)
-	AM_RANGE(0xe06000, 0xe06003) AM_WRITE_LEGACY(atarigen_sound_upper32_w)
+	AM_RANGE(0xe06000, 0xe06003) AM_WRITE8(sound_w, 0xff000000)
 	AM_RANGE(0xe08000, 0xe08003) AM_WRITE(latch_w)
 	AM_RANGE(0xe0c000, 0xe0c003) AM_WRITE_LEGACY(atarigen_video_int_ack32_w)
 	AM_RANGE(0xe0e000, 0xe0e003) AM_WRITENOP//watchdog_reset_w },
 	AM_RANGE(0xe80000, 0xe80003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xe82000, 0xe82003) AM_READ(special_port2_r)
 	AM_RANGE(0xe82004, 0xe82007) AM_READ(special_port3_r)
-	AM_RANGE(0xe86000, 0xe86003) AM_READ_LEGACY(atarigen_sound_upper32_r)
+	AM_RANGE(0xe86000, 0xe86003) AM_READ8(sound_r, 0xff000000)
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1433,7 +1424,6 @@ static MACHINE_CONFIG_START( atarigx2, atarigx2_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
-	MCFG_MACHINE_START_OVERRIDE(atarigx2_state,atarigx2)
 	MCFG_MACHINE_RESET_OVERRIDE(atarigx2_state,atarigx2)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 

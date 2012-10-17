@@ -31,11 +31,10 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine &machine)
+void offtwall_state::update_interrupts()
 {
-	offtwall_state *state = machine.driver_data<offtwall_state>();
-	machine.device("maincpu")->execute().set_input_line(4, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("maincpu")->execute().set_input_line(6, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	subdevice("maincpu")->execute().set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	subdevice("maincpu")->execute().set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -46,19 +45,11 @@ static void update_interrupts(running_machine &machine)
  *
  *************************************/
 
-MACHINE_START_MEMBER(offtwall_state,offtwall)
-{
-	atarigen_init(machine());
-}
-
-
 MACHINE_RESET_MEMBER(offtwall_state,offtwall)
 {
-
-	atarigen_eeprom_reset(this);
-	atarigen_interrupt_reset(this, update_interrupts);
+	atarigen_state::machine_reset();
 	atarivc_reset(*machine().primary_screen, m_atarivc_eof_data, 1);
-	atarijsa_reset();
+	atarijsa_reset(machine());
 }
 
 
@@ -103,7 +94,7 @@ WRITE16_MEMBER(offtwall_state::io_latch_w)
 	{
 		/* bit 4 resets the sound CPU */
 		machine().device("jsa")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-		if (!(data & 0x10)) atarijsa_reset();
+		if (!(data & 0x10)) atarijsa_reset(machine());
 	}
 
 	logerror("sound control = %04X\n", data);
@@ -281,8 +272,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, offtwall_state )
 	AM_RANGE(0x260020, 0x260021) AM_READ_PORT("260020")
 	AM_RANGE(0x260022, 0x260023) AM_READ_PORT("260022")
 	AM_RANGE(0x260024, 0x260025) AM_READ_PORT("260024")
-	AM_RANGE(0x260030, 0x260031) AM_READ_LEGACY(atarigen_sound_r)
-	AM_RANGE(0x260040, 0x260041) AM_WRITE_LEGACY(atarigen_sound_w)
+	AM_RANGE(0x260030, 0x260031) AM_READ8(sound_r, 0x00ff)
+	AM_RANGE(0x260040, 0x260041) AM_WRITE8(sound_w, 0x00ff)
 	AM_RANGE(0x260050, 0x260051) AM_WRITE(io_latch_w)
 	AM_RANGE(0x260060, 0x260061) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(watchdog_reset16_w)
@@ -404,7 +395,6 @@ static MACHINE_CONFIG_START( offtwall, offtwall_state )
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_START_OVERRIDE(offtwall_state,offtwall)
 	MCFG_MACHINE_RESET_OVERRIDE(offtwall_state,offtwall)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 

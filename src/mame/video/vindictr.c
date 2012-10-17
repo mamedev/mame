@@ -136,16 +136,15 @@ WRITE16_HANDLER( vindictr_paletteram_w )
  *
  *************************************/
 
-void vindictr_scanline_update(screen_device &screen, int scanline)
+void vindictr_state::scanline_update(screen_device &screen, int scanline)
 {
-	vindictr_state *state = screen.machine().driver_data<vindictr_state>();
-	UINT16 *base = &state->m_alpha[((scanline - 8) / 8) * 64 + 42];
+	UINT16 *base = &m_alpha[((scanline - 8) / 8) * 64 + 42];
 	int x;
 
 	/* keep in range */
-	if (base < state->m_alpha)
+	if (base < m_alpha)
 		base += 0x7c0;
-	else if (base >= &state->m_alpha[0x7c0])
+	else if (base >= &m_alpha[0x7c0])
 		return;
 
 	/* update the current parameters */
@@ -156,20 +155,20 @@ void vindictr_scanline_update(screen_device &screen, int scanline)
 		switch ((data >> 9) & 7)
 		{
 			case 2:		/* /PFB */
-				if (state->m_playfield_tile_bank != (data & 7))
+				if (m_playfield_tile_bank != (data & 7))
 				{
 					screen.update_partial(scanline - 1);
-					state->m_playfield_tile_bank = data & 7;
-					state->m_playfield_tilemap->mark_all_dirty();
+					m_playfield_tile_bank = data & 7;
+					m_playfield_tilemap->mark_all_dirty();
 				}
 				break;
 
 			case 3:		/* /PFHSLD */
-				if (state->m_playfield_xscroll != (data & 0x1ff))
+				if (m_playfield_xscroll != (data & 0x1ff))
 				{
 					screen.update_partial(scanline - 1);
-					state->m_playfield_tilemap->set_scrollx(0, data);
-					state->m_playfield_xscroll = data & 0x1ff;
+					m_playfield_tilemap->set_scrollx(0, data);
+					m_playfield_xscroll = data & 0x1ff;
 				}
 				break;
 
@@ -185,7 +184,7 @@ void vindictr_scanline_update(screen_device &screen, int scanline)
 				break;
 
 			case 6:		/* /VIRQ */
-				atarigen_scanline_int_gen(screen.machine().device("maincpu"));
+				scanline_int_gen(*subdevice("maincpu"));
 				break;
 
 			case 7:		/* /PFVS */
@@ -196,10 +195,10 @@ void vindictr_scanline_update(screen_device &screen, int scanline)
 				if (offset > visible_area.max_y)
 					offset -= visible_area.max_y + 1;
 
-				if (state->m_playfield_yscroll != ((data - offset) & 0x1ff))
+				if (m_playfield_yscroll != ((data - offset) & 0x1ff))
 				{
 					screen.update_partial(scanline - 1);
-					state->m_playfield_tilemap->set_scrolly(0, data - offset);
+					m_playfield_tilemap->set_scrolly(0, data - offset);
 					atarimo_set_yscroll(0, (data - offset) & 0x1ff);
 				}
 				break;

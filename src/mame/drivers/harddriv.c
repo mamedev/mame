@@ -471,7 +471,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( multisync_68k_map, AS_PROGRAM, 16, harddriv_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x600000, 0x603fff) AM_READWRITE_LEGACY(atarigen_sound_upper_r, atarigen_sound_upper_w)
+	AM_RANGE(0x600000, 0x603fff) AM_READWRITE8(sound_r, sound_w, 0xff00)
 	AM_RANGE(0x604000, 0x607fff) AM_READWRITE_LEGACY(hd68k_sound_reset_r, hd68k_nwr_w)
 	AM_RANGE(0x608000, 0x60bfff) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x60c000, 0x60ffff) AM_READWRITE_LEGACY(hd68k_port0_r, hd68k_irq_ack_w)

@@ -19,6 +19,7 @@ public:
 
 	UINT16 *m_spritecache_count;
 	UINT16 *m_unknown_verify_base;
+	virtual void update_interrupts();
 	DECLARE_READ16_MEMBER(offtwall_atarivc_r);
 	DECLARE_WRITE16_MEMBER(offtwall_atarivc_w);
 	DECLARE_READ16_MEMBER(special_port3_r);

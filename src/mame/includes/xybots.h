@@ -13,6 +13,7 @@ public:
 		: atarigen_state(mconfig, type, tag) { }
 
 	UINT16			m_h256;
+	virtual void update_interrupts();
 	DECLARE_READ16_MEMBER(special_port1_r);
 	DECLARE_DRIVER_INIT(xybots);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);

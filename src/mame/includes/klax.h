@@ -11,6 +11,8 @@ class klax_state : public atarigen_state
 public:
 	klax_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag) { }
+	virtual void update_interrupts();
+	virtual void scanline_update(screen_device &screen, int scanline);
 	DECLARE_WRITE16_MEMBER(interrupt_ack_w);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	DECLARE_MACHINE_START(klax);

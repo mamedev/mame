@@ -49,6 +49,8 @@ public:
 	UINT32			m_spin_center_count;
 
 	UINT16			m_vram[0x8000/2];
+	virtual void update_interrupts();
+	virtual void scanline_update(screen_device &screen, int scanline);
 	DECLARE_WRITE16_MEMBER(int0_ack_w);
 	DECLARE_WRITE16_MEMBER(int1_ack_w);
 	DECLARE_WRITE16_MEMBER(int_enable_w);

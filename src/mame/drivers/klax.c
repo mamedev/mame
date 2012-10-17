@@ -31,24 +31,23 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine &machine)
+void klax_state::update_interrupts()
 {
-	klax_state *state = machine.driver_data<klax_state>();
-	machine.device("maincpu")->execute().set_input_line(4, state->m_video_int_state || state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	subdevice("maincpu")->execute().set_input_line(4, m_video_int_state || m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void scanline_update(screen_device &screen, int scanline)
+void klax_state::scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
-	if ((scanline & 32) == 0 && !(screen.machine().root_device().ioport("P1")->read() & 0x800))
-		atarigen_scanline_int_gen(screen.machine().device("maincpu"));
+	if ((scanline & 32) == 0 && !(ioport("P1")->read() & 0x800))
+		scanline_int_gen(*subdevice("maincpu"));
 }
 
 
 WRITE16_MEMBER(klax_state::interrupt_ack_w)
 {
-	atarigen_scanline_int_ack_w(space, offset, data, mem_mask);
+	scanline_int_ack_w(space, offset, data, mem_mask);
 	atarigen_video_int_ack_w(space, offset, data, mem_mask);
 }
 
@@ -60,18 +59,10 @@ WRITE16_MEMBER(klax_state::interrupt_ack_w)
  *
  *************************************/
 
-MACHINE_START_MEMBER(klax_state,klax)
-{
-	atarigen_init(machine());
-}
-
-
 MACHINE_RESET_MEMBER(klax_state,klax)
 {
-
-	atarigen_eeprom_reset(this);
-	atarigen_interrupt_reset(this, update_interrupts);
-	atarigen_scanline_timer_reset(*machine().primary_screen, scanline_update, 32);
+	atarigen_state::machine_reset();
+	scanline_timer_reset(*machine().primary_screen, 32);
 }
 
 
@@ -171,7 +162,6 @@ static MACHINE_CONFIG_START( klax, klax_state )
 	MCFG_CPU_PROGRAM_MAP(klax_map)
 	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
-	MCFG_MACHINE_START_OVERRIDE(klax_state,klax)
 	MCFG_MACHINE_RESET_OVERRIDE(klax_state,klax)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 

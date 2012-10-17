@@ -32,10 +32,9 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine &machine)
+void relief_state::update_interrupts()
 {
-	relief_state *state = machine.driver_data<relief_state>();
-	machine.device("maincpu")->execute().set_input_line(4, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	subdevice("maincpu")->execute().set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -65,17 +64,9 @@ WRITE16_MEMBER(relief_state::relief_atarivc_w)
  *
  *************************************/
 
-MACHINE_START_MEMBER(relief_state,relief)
-{
-	atarigen_init(machine());
-}
-
-
 MACHINE_RESET_MEMBER(relief_state,relief)
 {
-
-	atarigen_eeprom_reset(this);
-	atarigen_interrupt_reset(this, update_interrupts);
+	atarigen_state::machine_reset();
 	atarivc_reset(*machine().primary_screen, m_atarivc_eof_data, 2);
 
 	machine().device<okim6295_device>("oki")->set_bank_base(0);
@@ -113,7 +104,7 @@ WRITE16_MEMBER(relief_state::audio_control_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_ym2413_volume = (data >> 1) & 15;
-		atarigen_set_ym2413_vol(machine(), (m_ym2413_volume * m_overall_volume * 100) / (127 * 15));
+		set_ym2413_volume((m_ym2413_volume * m_overall_volume * 100) / (127 * 15));
 		m_adpcm_bank_base = (0x040000 * ((data >> 6) & 3)) | (m_adpcm_bank_base & 0x100000);
 	}
 	if (ACCESSING_BITS_8_15)
@@ -129,8 +120,8 @@ WRITE16_MEMBER(relief_state::audio_volume_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_overall_volume = data & 127;
-		atarigen_set_ym2413_vol(machine(), (m_ym2413_volume * m_overall_volume * 100) / (127 * 15));
-		atarigen_set_oki6295_vol(machine(), m_overall_volume * 100 / 127);
+		set_ym2413_volume((m_ym2413_volume * m_overall_volume * 100) / (127 * 15));
+		set_oki6295_volume(m_overall_volume * 100 / 127);
 	}
 }
 
@@ -296,7 +287,6 @@ static MACHINE_CONFIG_START( relief, relief_state )
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_START_OVERRIDE(relief_state,relief)
 	MCFG_MACHINE_RESET_OVERRIDE(relief_state,relief)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 

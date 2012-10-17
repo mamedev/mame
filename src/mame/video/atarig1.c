@@ -87,16 +87,15 @@ WRITE16_HANDLER( atarig1_mo_control_w )
 }
 
 
-void atarig1_scanline_update(screen_device &screen, int scanline)
+void atarig1_state::scanline_update(screen_device &screen, int scanline)
 {
-	atarig1_state *state = screen.machine().driver_data<atarig1_state>();
-	UINT16 *base = &state->m_alpha[(scanline / 8) * 64 + 48];
+	UINT16 *base = &m_alpha[(scanline / 8) * 64 + 48];
 	int i;
 
 	//if (scanline == 0) logerror("-------\n");
 
 	/* keep in range */
-	if (base >= &state->m_alpha[0x800])
+	if (base >= &m_alpha[0x800])
 		return;
 	screen.update_partial(MAX(scanline - 1, 0));
 
@@ -109,12 +108,12 @@ void atarig1_scanline_update(screen_device &screen, int scanline)
 		word = *base++;
 		if (word & 0x8000)
 		{
-			int newscroll = ((word >> 6) + state->m_pfscroll_xoffset) & 0x1ff;
-			if (newscroll != state->m_playfield_xscroll)
+			int newscroll = ((word >> 6) + m_pfscroll_xoffset) & 0x1ff;
+			if (newscroll != m_playfield_xscroll)
 			{
 				screen.update_partial(MAX(scanline + i - 1, 0));
-				state->m_playfield_tilemap->set_scrollx(0, newscroll);
-				state->m_playfield_xscroll = newscroll;
+				m_playfield_tilemap->set_scrollx(0, newscroll);
+				m_playfield_xscroll = newscroll;
 			}
 		}
 
@@ -124,17 +123,17 @@ void atarig1_scanline_update(screen_device &screen, int scanline)
 		{
 			int newscroll = ((word >> 6) - (scanline + i)) & 0x1ff;
 			int newbank = word & 7;
-			if (newscroll != state->m_playfield_yscroll)
+			if (newscroll != m_playfield_yscroll)
 			{
 				screen.update_partial(MAX(scanline + i - 1, 0));
-				state->m_playfield_tilemap->set_scrolly(0, newscroll);
-				state->m_playfield_yscroll = newscroll;
+				m_playfield_tilemap->set_scrolly(0, newscroll);
+				m_playfield_yscroll = newscroll;
 			}
-			if (newbank != state->m_playfield_tile_bank)
+			if (newbank != m_playfield_tile_bank)
 			{
 				screen.update_partial(MAX(scanline + i - 1, 0));
-				state->m_playfield_tilemap->mark_all_dirty();
-				state->m_playfield_tile_bank = newbank;
+				m_playfield_tilemap->mark_all_dirty();
+				m_playfield_tile_bank = newbank;
 			}
 		}
 	}

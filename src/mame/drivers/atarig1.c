@@ -32,29 +32,25 @@
  *
  *************************************/
 
-static void update_interrupts(running_machine &machine)
+void atarig1_state::update_interrupts()
 {
-	atarig1_state *state = machine.driver_data<atarig1_state>();
-	machine.device("maincpu")->execute().set_input_line(1, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("maincpu")->execute().set_input_line(2, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(2, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 MACHINE_START_MEMBER(atarig1_state,atarig1)
 {
-	atarigen_init(machine());
+	atarigen_state::machine_start();
 	save_item(NAME(m_which_input));
 }
 
 
 MACHINE_RESET_MEMBER(atarig1_state,atarig1)
 {
-
-	atarigen_eeprom_reset(this);
-	atarigen_slapstic_reset(this);
-	atarigen_interrupt_reset(this, update_interrupts);
-	atarigen_scanline_timer_reset(*machine().primary_screen, atarig1_scanline_update, 8);
-	atarijsa_reset();
+	atarigen_state::machine_reset();
+	scanline_timer_reset(*machine().primary_screen, 8);
+	atarijsa_reset(machine());
 }
 
 
@@ -209,13 +205,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig1_state )
 	AM_RANGE(0x078000, 0x07ffff) AM_ROM	/* hydra slapstic goes here */
 	AM_RANGE(0xf80000, 0xf80001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xf88000, 0xf8ffff) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
-	AM_RANGE(0xf90000, 0xf90001) AM_WRITE_LEGACY(atarigen_sound_upper_w)
-	AM_RANGE(0xf98000, 0xf98001) AM_WRITE_LEGACY(atarigen_sound_reset_w)
+	AM_RANGE(0xf90000, 0xf90001) AM_WRITE8(sound_w, 0xff00)
+	AM_RANGE(0xf98000, 0xf98001) AM_WRITE(sound_reset_w)
 	AM_RANGE(0xfa0000, 0xfa0001) AM_WRITE(mo_control_w)
 	AM_RANGE(0xfb0000, 0xfb0001) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
 	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(special_port0_r)
 	AM_RANGE(0xfc8000, 0xfc8007) AM_READWRITE(a2d_data_r, a2d_select_w)
-	AM_RANGE(0xfd0000, 0xfd0001) AM_READ_LEGACY(atarigen_sound_upper_r)
+	AM_RANGE(0xfd0000, 0xfd0001) AM_READ8(sound_r, 0xff00)
 	AM_RANGE(0xfd8000, 0xfdffff) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ_LEGACY(from_r)*/
 	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_WRITE_LEGACY(atarigen_666_paletteram_w) AM_SHARE("paletteram")
@@ -1222,7 +1218,7 @@ static void init_g1_common(running_machine &machine, offs_t slapstic_base, int s
 		machine.save().register_postload(save_prepost_delegate(FUNC(pitfightb_state_postload), &machine));
 	}
 	else if (slapstic != 0)
-		atarigen_slapstic_init(machine.device("maincpu"), slapstic_base, 0, slapstic);
+		state->slapstic_configure(*machine.device<cpu_device>("maincpu"), slapstic_base, 0, slapstic);
 	atarijsa_init(machine, "IN0", 0x4000);
 
 	state->m_is_pitfight = is_pitfight;
