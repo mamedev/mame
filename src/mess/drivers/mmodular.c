@@ -95,7 +95,7 @@ Bit 5+6  LED 1-8 enable
 
 #include "rendlay.h"
 
-#include "machine/mboard.h"
+#include "includes/mboard.h"
 #include "machine/nvram.h"
 
 //static UINT16 unknown2_data = 0;
@@ -124,11 +124,11 @@ INPUT_PORTS_EXTERN( chessboard );
 
 UINT8 lcd32_char;
 
-class polgar_state : public driver_device
+class polgar_state : public mboard_state
 {
 public:
 	polgar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: mboard_state(mconfig, type, tag) { }
 
 	UINT8 led_status;
 	UINT8 lcd_char;
@@ -200,6 +200,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_update_irq6);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_update_irq2);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_update_irq_academy);
+	void common_chess_start();
 };
 
 static HD44780_INTERFACE( chess_display )
@@ -232,17 +233,6 @@ static UINT8 convert_imputmask(UINT8 input)
 		default:
 			return 0x00;
 		}
-}
-
-static int get_first_cleared_bit(UINT8 data)
-{
-	int i;
-
-	for (i = 0; i < 8; i++)
-		if (!BIT(data, i))
-			return i;
-
-	return NOT_VALID;
 }
 
 WRITE8_MEMBER(polgar_state::write_polgar_IO)
@@ -1024,11 +1014,10 @@ MACHINE_START_MEMBER(polgar_state,van32)
 
 MACHINE_START_MEMBER(polgar_state,risc)
 {
-
 }
 
 
-static void common_chess_start(void)
+void polgar_state::common_chess_start()
 {
 	mboard_set_border_pieces();
 	mboard_set_board();
@@ -1037,45 +1026,38 @@ static void common_chess_start(void)
 MACHINE_START_MEMBER(polgar_state,polgar)
 {
 	common_chess_start();
-	mboard_savestate_register(machine());
+	mboard_savestate_register();
 }
 
 MACHINE_START_MEMBER(polgar_state,sfortea)
 {
 	common_chess_start();
-	mboard_savestate_register(machine());
+	mboard_savestate_register();
 }
 
 MACHINE_START_MEMBER(polgar_state,diablo68)
 {
-
 	common_chess_start();
-
 }
 
 MACHINE_START_MEMBER(polgar_state,van16)
 {
-
-	mboard_savestate_register(machine());
-
+	mboard_savestate_register();
 }
 
 MACHINE_RESET_MEMBER(polgar_state,van16)
 {
 	common_chess_start();
-
 }
 
 MACHINE_RESET_MEMBER(polgar_state,polgar)
 {
 	common_chess_start();
-
 }
 
 MACHINE_RESET_MEMBER(polgar_state,sfortea)
 {
 	common_chess_start();
-
 }
 
 MACHINE_RESET_MEMBER(polgar_state,monteciv)
@@ -1119,9 +1101,9 @@ GFXDECODE_END
 
 static ADDRESS_MAP_START(polgar_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
-	AM_RANGE( 0x2400, 0x2400 ) AM_WRITE_LEGACY(mboard_write_LED_8 )		// Chessboard
-	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE_LEGACY(mboard_write_board_8)		// Chessboard
-	AM_RANGE( 0x3000, 0x3000 ) AM_READ_LEGACY(mboard_read_board_8 )		// Chessboard
+	AM_RANGE( 0x2400, 0x2400 ) AM_WRITE(mboard_write_LED_8 )		// Chessboard
+	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE(mboard_write_board_8)		// Chessboard
+	AM_RANGE( 0x3000, 0x3000 ) AM_READ(mboard_read_board_8 )		// Chessboard
 	AM_RANGE( 0x3400, 0x3405 ) AM_WRITE(polgar_write_LED)	// Function LEDs
 	AM_RANGE( 0x2c00, 0x2c07 ) AM_READ(read_keys)
 	AM_RANGE( 0x2004, 0x2004 ) AM_WRITE(write_polgar_IO )	// LCD Instr. Reg + Beeper
@@ -1144,11 +1126,11 @@ static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x00000000,  0x0003ffff )  AM_ROM
 
-	AM_RANGE( 0xc0000000 , 0xc0000003 )  AM_READ_LEGACY(mboard_read_board_32 )
-	AM_RANGE( 0xc8000000 , 0xc8000003 )  AM_WRITE_LEGACY(mboard_write_board_32 )
-	AM_RANGE( 0xc8000004 , 0xc8000007 )  AM_WRITE_LEGACY(mboard_write_board_32 )
-	AM_RANGE( 0xd0000000 , 0xd0000003 )  AM_WRITE_LEGACY(mboard_write_LED_32 )
-	AM_RANGE( 0xd0000004 , 0xd0000007 )  AM_WRITE_LEGACY(mboard_write_LED_32 )
+	AM_RANGE( 0xc0000000 , 0xc0000003 )  AM_READ(mboard_read_board_32 )
+	AM_RANGE( 0xc8000000 , 0xc8000003 )  AM_WRITE(mboard_write_board_32 )
+	AM_RANGE( 0xc8000004 , 0xc8000007 )  AM_WRITE(mboard_write_board_32 )
+	AM_RANGE( 0xd0000000 , 0xd0000003 )  AM_WRITE(mboard_write_LED_32 )
+	AM_RANGE( 0xd0000004 , 0xd0000007 )  AM_WRITE(mboard_write_LED_32 )
 	AM_RANGE( 0xf0000004 , 0xf0000013 )  AM_READ(read_buttons_gen32 )
 	AM_RANGE( 0xe0000000 , 0xe0000003 )  AM_WRITE(write_LCD_data_32 )
 	AM_RANGE( 0xe0000010 , 0xe0000013 )  AM_WRITE(write_IOenables_32 )
@@ -1179,9 +1161,9 @@ static ADDRESS_MAP_START(van32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x00000000,  0x0003ffff )  AM_ROM
 
-	AM_RANGE( 0x800000fc , 0x800000ff )  AM_READ_LEGACY(mboard_read_board_32 )
-	AM_RANGE( 0x88000000 , 0x88000007 )  AM_WRITE_LEGACY(mboard_write_board_32 )
-	AM_RANGE( 0x90000000 , 0x90000007 )  AM_WRITE_LEGACY(mboard_write_LED_32 )
+	AM_RANGE( 0x800000fc , 0x800000ff )  AM_READ(mboard_read_board_32 )
+	AM_RANGE( 0x88000000 , 0x88000007 )  AM_WRITE(mboard_write_board_32 )
+	AM_RANGE( 0x90000000 , 0x90000007 )  AM_WRITE(mboard_write_LED_32 )
 	AM_RANGE( 0x800000ec , 0x800000ff )  AM_READ(read_buttons_van32 )
 	AM_RANGE( 0xa0000000 , 0xa0000003 )  AM_WRITE(write_LCD_data_32 )
 	AM_RANGE( 0xa0000010 , 0xa0000013 )  AM_WRITE(write_IOenables_32 )
@@ -1199,9 +1181,9 @@ static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x00000000,  0x0001ffff )  AM_ROM
 
-	AM_RANGE( 0x800000fc , 0x800000ff )  AM_READ_LEGACY(mboard_read_board_32 )
-	AM_RANGE( 0x88000000 , 0x88000007 )  AM_WRITE_LEGACY(mboard_write_board_32 )
-	AM_RANGE( 0x90000000 , 0x90000007 )  AM_WRITE_LEGACY(mboard_write_LED_32 )
+	AM_RANGE( 0x800000fc , 0x800000ff )  AM_READ(mboard_read_board_32 )
+	AM_RANGE( 0x88000000 , 0x88000007 )  AM_WRITE(mboard_write_board_32 )
+	AM_RANGE( 0x90000000 , 0x90000007 )  AM_WRITE(mboard_write_LED_32 )
 	AM_RANGE( 0x800000ec , 0x800000ff )  AM_READ(read_buttons_van32 )
 	AM_RANGE( 0xa0000000 , 0xa0000003 )  AM_WRITE(write_LCD_data_32 )
 	AM_RANGE( 0xa0000010 , 0xa0000013 )  AM_WRITE(write_IOenables_32 )
@@ -1227,9 +1209,9 @@ static ADDRESS_MAP_START(van16_mem, AS_PROGRAM, 16, polgar_state )
 
 	AM_RANGE( 0x000000,  0x03ffff )  AM_ROM
 
-	AM_RANGE( 0xc00000 , 0xc00001 )  AM_READ_LEGACY(mboard_read_board_16 )
-	AM_RANGE( 0xc80000 , 0xc80001 )  AM_WRITE_LEGACY(mboard_write_board_16 )
-	AM_RANGE( 0xd00000 , 0xd00001 )  AM_WRITE_LEGACY(mboard_write_LED_16 )
+	AM_RANGE( 0xc00000 , 0xc00001 )  AM_READ(mboard_read_board_16 )
+	AM_RANGE( 0xc80000 , 0xc80001 )  AM_WRITE(mboard_write_board_16 )
+	AM_RANGE( 0xd00000 , 0xd00001 )  AM_WRITE(mboard_write_LED_16 )
 	AM_RANGE( 0xf00000 , 0xf00009 )  AM_READ(read_buttons_van16 )
 	AM_RANGE( 0xd80000 , 0xd80001 )  AM_WRITE(write_LCD_data )
 	AM_RANGE( 0xd80008 , 0xd80009 )  AM_WRITE(write_IOenables )
@@ -1246,9 +1228,9 @@ static ADDRESS_MAP_START(alm16_mem, AS_PROGRAM, 16, polgar_state )
 
 	AM_RANGE( 0x000000,  0x01ffff )  AM_ROM
 
-	AM_RANGE( 0xc00000 , 0xc00001 )  AM_READ_LEGACY(mboard_read_board_16 )
-	AM_RANGE( 0xc80000 , 0xc80001 )  AM_WRITE_LEGACY(mboard_write_board_16 )
-	AM_RANGE( 0xd00000 , 0xd00001 )  AM_WRITE_LEGACY(mboard_write_LED_16 )
+	AM_RANGE( 0xc00000 , 0xc00001 )  AM_READ(mboard_read_board_16 )
+	AM_RANGE( 0xc80000 , 0xc80001 )  AM_WRITE(mboard_write_board_16 )
+	AM_RANGE( 0xd00000 , 0xd00001 )  AM_WRITE(mboard_write_LED_16 )
 	AM_RANGE( 0xf00000 , 0xf00009 )  AM_READ(read_buttons_van16 )
 	AM_RANGE( 0xd80000 , 0xd80001 )  AM_WRITE(write_LCD_data )
 	AM_RANGE( 0xd80008 , 0xd80009 )  AM_WRITE(write_IOenables )
@@ -1278,7 +1260,7 @@ static ADDRESS_MAP_START(academy_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
 	AM_RANGE( 0x2400, 0x2400 ) AM_READ(read_keys_board_academy )
 	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE(academy_write_board )		// Chessboard
-	AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE_LEGACY(mboard_write_LED_8 )		// Chessboard
+	AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE(mboard_write_LED_8 )		// Chessboard
 	AM_RANGE( 0x3002, 0x3002 ) AM_WRITE(beep_academy )
 	AM_RANGE( 0x3001, 0x3001 ) AM_WRITE(academy_inhibitNMI )
 	AM_RANGE( 0x3400, 0x3400 ) AM_WRITE(academy_write_LED )
@@ -1290,7 +1272,7 @@ static ADDRESS_MAP_START(monteciv_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
 	AM_RANGE( 0x2400, 0x2400 ) AM_READ(read_keys_board_monteciv )
 	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE(academy_write_board )		// Chessboard
-	AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE_LEGACY(mboard_write_LED_8 )		// Chessboard
+	AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE(mboard_write_LED_8 )		// Chessboard
 	AM_RANGE( 0x3400, 0x3400 ) AM_WRITE(academy_write_LED )			// Status LEDs
 	AM_RANGE( 0x3000, 0x3001 ) AM_WRITE(monteciv_select_line )			// Select Keyline
 	AM_RANGE( 0x3002, 0x3002 ) AM_WRITE(beep_academy )
@@ -1306,7 +1288,7 @@ static ADDRESS_MAP_START(megaiv_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
 /// AM_RANGE( 0x2400, 0x2400 ) AM_READ(read_keys_board_monteciv )
 	AM_RANGE( 0x6800, 0x6800 ) AM_WRITE(academy_write_board )	// 2800 // Chessboard
-/// AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE_LEGACY(mboard_write_LED_8 )      // Chessboard
+/// AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE(mboard_write_LED_8 )      // Chessboard
 /// AM_RANGE( 0x3400, 0x3400 ) AM_WRITE(academy_write_LED )           // Status LEDs
 	AM_RANGE( 0x4400, 0x4400 ) AM_WRITE(megaiv_write_LED )	// 2400     // Select Keyline
 	AM_RANGE( 0x7000, 0x7001 ) AM_WRITE(megaiv_IO )			// Select Keyline
@@ -1567,7 +1549,7 @@ static MACHINE_CONFIG_START( polgar, polgar_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", polgar_state, cause_nmi, attotime::from_hz(600))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(60))
-	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(100))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(100))
 
 MACHINE_CONFIG_END
 
@@ -1584,7 +1566,7 @@ static MACHINE_CONFIG_START( sfortea, polgar_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", polgar_state, cause_M6502_irq, attotime::from_hz(600))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(60))
-	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(100))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(100))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( alm32, polgar_state )
@@ -1593,7 +1575,7 @@ static MACHINE_CONFIG_START( alm32, polgar_state )
 	MCFG_MACHINE_START_OVERRIDE(polgar_state,van32)
 	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq6, attotime::from_hz(750))
-	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(120))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
 
 	MCFG_FRAGMENT_ADD( chess_common )
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1626,7 +1608,7 @@ static MACHINE_CONFIG_START( monteciv, polgar_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", polgar_state, cause_nmi, attotime::from_hz(600))
-	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(100))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(100))
 
 MACHINE_CONFIG_END
 
@@ -1647,7 +1629,7 @@ static MACHINE_CONFIG_START( diablo68, polgar_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq2, attotime::from_hz(60))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(30))
-	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(120))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
 
 
 MACHINE_CONFIG_END
@@ -1659,7 +1641,7 @@ static MACHINE_CONFIG_START( van16, polgar_state )
 	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq6, attotime::from_hz(600))
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq6, attotime::from_hz(587))
-	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(120))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
 	MCFG_FRAGMENT_ADD( chess_common )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1676,7 +1658,7 @@ static MACHINE_CONFIG_START( van32, polgar_state )
 	MCFG_MACHINE_START_OVERRIDE(polgar_state,van32)
 	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq6, attotime::from_hz(750))
-	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(120))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
 
 	MCFG_FRAGMENT_ADD( chess_common )
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1688,7 +1670,7 @@ static MACHINE_CONFIG_START( risc, polgar_state )
 	MCFG_CPU_PROGRAM_MAP(risc_mem)
 	MCFG_MACHINE_START_OVERRIDE(polgar_state,risc)
 	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
-	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(120))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
 
 	MCFG_FRAGMENT_ADD( chess_common )
 //  MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1702,7 +1684,7 @@ static MACHINE_CONFIG_START( gen32, polgar_state )
 	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq6, attotime::from_hz(375))
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq6, attotime::from_hz(368.64))
-	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(120))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
 
 	MCFG_FRAGMENT_ADD( chess_common )
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1725,7 +1707,7 @@ static MACHINE_CONFIG_START( bpl32, polgar_state )
 	MCFG_MACHINE_START_OVERRIDE(polgar_state,van32)
 	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq6, attotime::from_hz(750))
-	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(100))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(100))
 
 	MCFG_FRAGMENT_ADD( chess_common )
 	MCFG_NVRAM_ADD_0FILL("nvram")

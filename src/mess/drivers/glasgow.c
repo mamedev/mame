@@ -50,14 +50,14 @@ R.Schaefer Oct 2010
 #include "cpu/m68000/m68000.h"
 #include "glasgow.lh"
 #include "sound/beep.h"
-#include "machine/mboard.h"
+#include "includes/mboard.h"
 
 
-class glasgow_state : public driver_device
+class glasgow_state : public mboard_state
 {
 public:
 	glasgow_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: mboard_state(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_beep(*this, BEEPER_TAG)
 	{ }
@@ -293,7 +293,7 @@ void glasgow_state::machine_start()
 	m_lcd_shift_counter = 3;
 	beep_set_frequency(m_beep, 44);
 
-	mboard_savestate_register(machine());
+	mboard_savestate_register();
 }
 
 
@@ -303,7 +303,7 @@ MACHINE_START_MEMBER(glasgow_state,dallas32)
 	m_lcd_shift_counter = 3;
 	beep_set_frequency(m_beep, 44);
 
-	mboard_savestate_register(machine());
+	mboard_savestate_register();
 }
 
 
@@ -321,8 +321,8 @@ static ADDRESS_MAP_START(glasgow_mem, AS_PROGRAM, 16, glasgow_state)
 	AM_RANGE(0x00010000, 0x00010001) AM_WRITE(glasgow_lcd_w)
 	AM_RANGE(0x00010002, 0x00010003) AM_READWRITE(glasgow_keys_r,glasgow_keys_w)
 	AM_RANGE(0x00010004, 0x00010005) AM_WRITE(glasgow_lcd_flag_w)
-	AM_RANGE(0x00010006, 0x00010007) AM_READWRITE_LEGACY(mboard_read_board_16,mboard_write_LED_16)
-	AM_RANGE(0x00010008, 0x00010009) AM_WRITE_LEGACY(mboard_write_board_16)
+	AM_RANGE(0x00010006, 0x00010007) AM_READWRITE(mboard_read_board_16,mboard_write_LED_16)
+	AM_RANGE(0x00010008, 0x00010009) AM_WRITE(mboard_write_board_16)
 	AM_RANGE(0x0001c000, 0x0001ffff) AM_RAM		// 16KB
 ADDRESS_MAP_END
 
@@ -333,10 +333,10 @@ static ADDRESS_MAP_START(amsterd_mem, AS_PROGRAM, 16, glasgow_state)
 	AM_RANGE(0x00800002, 0x00800003) AM_WRITE(write_lcd)
 	AM_RANGE(0x00800008, 0x00800009) AM_WRITE(write_lcd_flag)
 	AM_RANGE(0x00800004, 0x00800005) AM_WRITE(write_irq_flag)
-	AM_RANGE(0x00800010, 0x00800011) AM_WRITE_LEGACY(mboard_write_board_16)
-	AM_RANGE(0x00800020, 0x00800021) AM_READ_LEGACY(mboard_read_board_16)
+	AM_RANGE(0x00800010, 0x00800011) AM_WRITE(mboard_write_board_16)
+	AM_RANGE(0x00800020, 0x00800021) AM_READ(mboard_read_board_16)
 	AM_RANGE(0x00800040, 0x00800041) AM_READ(read_newkeys16)
-	AM_RANGE(0x00800088, 0x00800089) AM_WRITE_LEGACY(mboard_write_LED_16)
+	AM_RANGE(0x00800088, 0x00800089) AM_WRITE(mboard_write_LED_16)
 	AM_RANGE(0x00ffc000, 0x00ffffff) AM_RAM		// 16KB
 ADDRESS_MAP_END
 
@@ -348,10 +348,10 @@ static ADDRESS_MAP_START(dallas32_mem, AS_PROGRAM, 32, glasgow_state)
 	AM_RANGE(0x00800000, 0x00800003) AM_WRITE(write_lcd32)
 	AM_RANGE(0x00800004, 0x00800007) AM_WRITE(write_beeper32)
 	AM_RANGE(0x00800008, 0x0080000B) AM_WRITE(write_lcd_flag32)
-	AM_RANGE(0x00800010, 0x00800013) AM_WRITE_LEGACY(mboard_write_board_32)
-	AM_RANGE(0x00800020, 0x00800023) AM_READ_LEGACY(mboard_read_board_32)
+	AM_RANGE(0x00800010, 0x00800013) AM_WRITE(mboard_write_board_32)
+	AM_RANGE(0x00800020, 0x00800023) AM_READ(mboard_read_board_32)
 	AM_RANGE(0x00800040, 0x00800043) AM_READ(read_newkeys32)
-	AM_RANGE(0x00800088, 0x0080008b) AM_WRITE_LEGACY(mboard_write_LED_32)
+	AM_RANGE(0x00800088, 0x0080008b) AM_WRITE(mboard_write_LED_32)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( new_keyboard ) //Amsterdam, Dallas 32, Roma, Roma 32
@@ -517,7 +517,7 @@ static MACHINE_CONFIG_START( glasgow, glasgow_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", glasgow_state, update_nmi, attotime::from_hz(50))
-	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(100))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", glasgow_state, mboard_update_artwork, attotime::from_hz(100))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( amsterd, glasgow )
