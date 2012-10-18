@@ -1328,9 +1328,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( lupin3a )
 	PORT_INCLUDE( lupin3 )
 
-	//PORT_MODIFY("IN0")
-	//PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* selects color mode (dynamic vs. static) */
-	//PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* something has to do with sound */
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* selects color mode (dynamic vs. static) */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* something has to do with sound */
 
 	PORT_MODIFY("IN2")
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW1:5")
