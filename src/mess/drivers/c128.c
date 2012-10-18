@@ -1495,7 +1495,7 @@ static MACHINE_CONFIG_START( pal, c128_state )
 
 	// video hardware
 	MCFG_MOS8563_ADD(MOS8563_TAG, SCREEN_VDC_TAG, VIC6569_CLOCK*2, vdc_intf, vdc_videoram_map)
-	MCFG_MOS8564_ADD(MOS8564_TAG, SCREEN_VIC_TAG, VIC6569_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS8566_ADD(MOS8564_TAG, SCREEN_VIC_TAG, VIC6569_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
