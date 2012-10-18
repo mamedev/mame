@@ -9,41 +9,7 @@
 #include "includes/suna8.h"
 
 #define FREQ_HZ 8000
-#define NUMSAMPLES 0x1000
-
-WRITE8_MEMBER(suna8_state::suna8_play_samples_w)
-{
-	if ( data )
-	{
-		samples_device *samples = downcast<samples_device *>(machine().device("samples"));
-		if ( ~data & 0x10 )
-		{
-			samples->start_raw(0, &m_samplebuf[NUMSAMPLES * m_sample], NUMSAMPLES, FREQ_HZ);
-		}
-		else if ( ~data & 0x08 )
-		{
-			m_sample &= 3;
-			samples->start_raw(0, &m_samplebuf[NUMSAMPLES * (m_sample+7)], NUMSAMPLES, FREQ_HZ);
-		}
-	}
-}
-
-WRITE8_MEMBER(suna8_state::rranger_play_samples_w)
-{
-	if (data)
-	{
-		if (( m_sample != 0 ) && ( ~data & 0x30 ))	// don't play sample zero when those bits are active
-		{
-			samples_device *samples = downcast<samples_device *>(machine().device("samples"));
-			samples->start_raw(0, &m_samplebuf[NUMSAMPLES * m_sample], NUMSAMPLES, FREQ_HZ);
-		}
-	}
-}
-
-WRITE8_MEMBER(suna8_state::suna8_samples_number_w)
-{
-	m_sample = data & 0xf;
-}
+#define SAMPLEN 0x1000
 
 SAMPLES_START( suna8_sh_start )
 {
@@ -58,4 +24,58 @@ SAMPLES_START( suna8_sh_start )
 	// Convert 4 bit to 16 bit samples
 	for(i = 0; i < len; i++)
 		state->m_samplebuf[i] = (INT8)(((ROM[i/2] << ((i & 1)?0:4)) & 0xf0)  ^ 0x80) * 0x100;
+
+	state->m_numsamples = len / SAMPLEN;
+}
+
+WRITE8_MEMBER(suna8_state::suna8_samples_number_w)
+{
+	m_sample = data & 0xf;
+	logerror("%s: sample number = %02X\n", machine().describe_context(), data);
+}
+
+void suna8_state::play_sample(int index)
+{
+	samples_device *samples = downcast<samples_device *>(machine().device("samples"));
+
+	if (index < m_numsamples)
+	{
+		samples->start_raw(0, &m_samplebuf[SAMPLEN * index], SAMPLEN, FREQ_HZ);
+		logerror("%s: starting sample %02X\n", machine().describe_context(), index);
+	}
+	else
+	{
+		logerror("%s: warning, invalid sample %02X\n", machine().describe_context(), index);
+	}
+}
+
+WRITE8_MEMBER(suna8_state::suna8_play_samples_w)
+{
+	logerror("%s: play sample = %02X\n", machine().describe_context(), data);
+	if ( data )
+	{
+		if ( ~data & 0x10 )
+		{
+			play_sample(m_sample);
+		}
+		else if ( ~data & 0x08 )
+		{
+			play_sample((m_sample & 3) + 7);
+		}
+		else if ( ~data & 0x40 )	// sparkman, second sample rom
+		{
+			play_sample(m_sample + 0x10);
+		}
+	}
+}
+
+WRITE8_MEMBER(suna8_state::rranger_play_samples_w)
+{
+	if (data)
+	{
+		if (( m_sample != 0 ) && ( ~data & 0x30 ))	// don't play sample zero when those bits are active
+		{
+			play_sample(m_sample);
+		}
+	}
 }

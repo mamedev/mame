@@ -10,19 +10,19 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_hardhead_ip(*this, "hardhead_ip"),
 		m_spriteram(*this, "spriteram"),
-		m_wram(*this, "wram")
+		m_wram(*this, "wram"),
+		m_banked_paletteram(*this, "paletteram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT8> m_hardhead_ip;
 	optional_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_wram;
+	optional_shared_ptr<UINT8> m_banked_paletteram;
 
 	UINT8 m_rombank;
 	UINT8 m_rombank_latch;
 	UINT8 m_spritebank;
-	UINT8 m_gfxbank;		// starfigh
-	UINT8 m_use_gfxbank;	// ""
 	UINT8 m_palettebank;
 	UINT8 m_paletteram_enab;
 	UINT8 m_prot2;
@@ -31,10 +31,22 @@ public:
 	UINT8 m_protection_val;
 	UINT8 m_nmi_enable;
 	UINT8 m_spritebank_latch;
-	UINT8 m_trash_prot;
+	UINT8 m_write_disable;
 
+	enum GFXBANK_TYPE_T
+	{
+		GFXBANK_TYPE_SPARKMAN,
+		GFXBANK_TYPE_BRICKZN,
+		GFXBANK_TYPE_STARFIGH
+	}	m_gfxbank_type;
+	UINT8 m_gfxbank;
 
-	int m_text_dim; /* specifies format of text layer */
+	int m_text_dim; // vertical size of the text layer (0 = no text layer)
+
+	// samples
+	INT16 *m_samplebuf;
+	int m_sample;
+	int m_numsamples;
 
 #if TILEMAPS
 	tilemap_t *m_bg_tilemap;
@@ -44,9 +56,6 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 #endif
-
-	INT16 *m_samplebuf;
-	int m_sample;
 
 	DECLARE_READ8_MEMBER(hardhead_protection_r);
 	DECLARE_WRITE8_MEMBER(hardhead_protection_w);
@@ -65,7 +74,10 @@ public:
 	DECLARE_WRITE8_MEMBER(brickzn_rombank_w);
 	DECLARE_WRITE8_MEMBER(brickzn_enab_palram_w);
 	DECLARE_WRITE8_MEMBER(brickzn_disab_palram_w);
+	DECLARE_WRITE8_MEMBER(brickzn_pcm_w);
+	DECLARE_WRITE8_MEMBER(brickzn_banked_paletteram_w);
 
+	// hardhea2
 	DECLARE_WRITE8_MEMBER(hardhea2_nmi_w);
 	DECLARE_WRITE8_MEMBER(hardhea2_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(hardhea2_leds_w);
@@ -84,19 +96,17 @@ public:
 	DECLARE_READ8_MEMBER(starfigh_cheats_r);
 	DECLARE_WRITE8_MEMBER(starfigh_leds_w);
 
-	DECLARE_WRITE8_MEMBER(sparkman_cmd_prot_w);
-	DECLARE_WRITE8_MEMBER(suna8_wram_w);
-	DECLARE_WRITE8_MEMBER(sparkman_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(sparkman_leds_w);
-	DECLARE_WRITE8_MEMBER(sparkman_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(sparkman_spritebank_w);
+	// sparkman
+	DECLARE_WRITE8_MEMBER(sparkman_rombank_latch_w);
 	DECLARE_WRITE8_MEMBER(sparkman_rombank_w);
+	DECLARE_WRITE8_MEMBER(sparkman_spritebank_latch_w);
+	DECLARE_WRITE8_MEMBER(sparkman_spritebank_w);
+	DECLARE_WRITE8_MEMBER(sparkman_write_disable_w);
+	DECLARE_WRITE8_MEMBER(suna8_wram_w);
+	DECLARE_WRITE8_MEMBER(sparkman_coin_counter_w);
 	DECLARE_READ8_MEMBER(sparkman_c0a3_r);
-	DECLARE_WRITE8_MEMBER(sparkman_en_trash_w);
-	DECLARE_WRITE8_MEMBER(brickzn_pcm_w);
 
 	DECLARE_READ8_MEMBER(banked_paletteram_r);
-	DECLARE_WRITE8_MEMBER( brickzn_banked_paletteram_w );
 	DECLARE_READ8_MEMBER(suna8_banked_spriteram_r);
 	DECLARE_WRITE8_MEMBER(suna8_spriteram_w);
 	DECLARE_WRITE8_MEMBER(suna8_banked_spriteram_w);
@@ -108,18 +118,25 @@ public:
 	DECLARE_DRIVER_INIT(brickzn);
 	DECLARE_DRIVER_INIT(hardhead);
 	DECLARE_DRIVER_INIT(suna8);
-	DECLARE_VIDEO_START(suna8_textdim12);
+
+	void suna8_vh_start_common(int text_dim, GFXBANK_TYPE_T gfxbank_type);
 	DECLARE_VIDEO_START(suna8_textdim8);
+	DECLARE_VIDEO_START(suna8_textdim12);
+	DECLARE_VIDEO_START(suna8_sparkman);
+	DECLARE_VIDEO_START(suna8_brickzn);
+	DECLARE_VIDEO_START(suna8_starfigh);
+
 	DECLARE_MACHINE_RESET(brickzn);
-	DECLARE_VIDEO_START(suna8_textdim0);
-	DECLARE_VIDEO_START(suna8_textdim0_gfxbank);
 	DECLARE_MACHINE_RESET(hardhea2);
 	UINT32 screen_update_suna8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(brickzn_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(hardhea2_interrupt);
+
+	// samples
 	DECLARE_WRITE8_MEMBER(suna8_play_samples_w);
 	DECLARE_WRITE8_MEMBER(rranger_play_samples_w);
 	DECLARE_WRITE8_MEMBER(suna8_samples_number_w);
+	void play_sample(int index);
 };
 
 /*----------- defined in audio/suna8.c -----------*/

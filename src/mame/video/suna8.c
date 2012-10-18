@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(suna8_state::get_tile_info)
 		attr = m_spriteram[ 2 * tile_index + 1 ];
 	}
 	SET_TILE_INFO_MEMBER(
-			0,
+			m_page / 8,
 			( (attr & 0x03) << 8 ) + code + m_tiles*0x400,
 			(attr >> 2) & 0xf,
 			TILE_FLIPYX( (attr >> 6) & 3 ));
@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(suna8_state::get_tile_info)
 READ8_MEMBER( suna8_state::banked_paletteram_r )
 {
 	offset += m_palettebank * 0x200;
-	return m_generic_paletteram_8[offset];
+	return m_banked_paletteram[offset];
 }
 
 READ8_MEMBER(suna8_state::suna8_banked_spriteram_r)
@@ -140,8 +140,8 @@ WRITE8_MEMBER( suna8_state::brickzn_banked_paletteram_w )
 	UINT16 rgb;
 
 	offset += m_palettebank * 0x200;
-	m_generic_paletteram_8[offset] = data;
-	rgb = (m_generic_paletteram_8[offset&~1] << 8) + m_generic_paletteram_8[offset|1];
+	m_banked_paletteram[offset] = data;
+	rgb = (m_banked_paletteram[offset&~1] << 8) + m_banked_paletteram[offset|1];
 
 	if (m_prot2_prev == 0x3c && m_prot2 == 0x80)
 	{
@@ -179,37 +179,36 @@ WRITE8_MEMBER( suna8_state::brickzn_banked_paletteram_w )
 
 
 
-static void suna8_vh_start_common(running_machine &machine, int dim)
+void suna8_state::suna8_vh_start_common(int text_dim, GFXBANK_TYPE_T gfxbank_type)
 {
-	suna8_state *state = machine.driver_data<suna8_state>();
+	m_text_dim		=	text_dim;
+	m_spritebank	=	0;
+	m_gfxbank		=	0;
+	m_gfxbank_type	=	gfxbank_type;
+	m_palettebank	=	0;
 
-	state->m_text_dim		=	dim;
-	state->m_spritebank		=	0;
-	state->m_gfxbank		=	0;
-	state->m_use_gfxbank	=	0;
-	state->m_palettebank	=	0;
-
-	if (!state->m_text_dim)
+	if (!m_text_dim)
 	{
-		state->m_generic_paletteram_8.allocate(0x200 * 2);
-		state->m_spriteram.allocate(0x2000 * 2);
-		memset(state->m_spriteram,0,0x2000 * 2);	// helps debugging
+		m_banked_paletteram.allocate(0x200 * 2);
+
+		m_spriteram.allocate(0x2000 * 2 * 2);	// 2 RAM banks, sparkman has 2 "chips"
+		memset(m_spriteram,0,0x2000 * 2 * 2);	// helps debugging
 	}
 
 #if TILEMAPS
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(suna8_state::get_tile_info),state), TILEMAP_SCAN_COLS,
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suna8_state::get_tile_info),this), TILEMAP_SCAN_COLS,
 
-								8, 8, 0x20*(state->m_text_dim ? 4 : 8), 0x20);
+								8, 8, 0x20*(m_text_dim ? 4 : 16), 0x20);
 
-	state->m_bg_tilemap->set_transparent_pen(15);
+	m_bg_tilemap->set_transparent_pen(15);
 #endif
 }
 
-VIDEO_START_MEMBER(suna8_state,suna8_textdim0)	{ suna8_vh_start_common(machine(),  0); }
-VIDEO_START_MEMBER(suna8_state,suna8_textdim8)	{ suna8_vh_start_common(machine(),  8); }
-VIDEO_START_MEMBER(suna8_state,suna8_textdim12)	{ suna8_vh_start_common(machine(), 12); }
-
-VIDEO_START_MEMBER(suna8_state,suna8_textdim0_gfxbank)	{ suna8_vh_start_common(machine(),  0); m_use_gfxbank = 1; }
+VIDEO_START_MEMBER(suna8_state,suna8_textdim8)			{ suna8_vh_start_common(  8, GFXBANK_TYPE_SPARKMAN); }
+VIDEO_START_MEMBER(suna8_state,suna8_textdim12)			{ suna8_vh_start_common( 12, GFXBANK_TYPE_SPARKMAN); }
+VIDEO_START_MEMBER(suna8_state,suna8_sparkman)			{ suna8_vh_start_common(  0, GFXBANK_TYPE_SPARKMAN); }
+VIDEO_START_MEMBER(suna8_state,suna8_brickzn)			{ suna8_vh_start_common(  0, GFXBANK_TYPE_BRICKZN);  }
+VIDEO_START_MEMBER(suna8_state,suna8_starfigh)			{ suna8_vh_start_common(  0, GFXBANK_TYPE_STARFIGH); }
 
 /***************************************************************************
 
@@ -219,10 +218,12 @@ VIDEO_START_MEMBER(suna8_state,suna8_textdim0_gfxbank)	{ suna8_vh_start_common(m
 
 ***************************************************************************/
 
-static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int which)
 {
 	suna8_state *state = machine.driver_data<suna8_state>();
-	UINT8 *spriteram = state->m_spriteram;
+
+	UINT8 *spriteram = state->m_spriteram + which * 0x2000 * 2;
+
 	int i;
 	int mx = 0;	// multisprite x counter
 
@@ -290,22 +291,31 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 				flipy = bank & 0x10;
 				srcy  = (((bank & 0x80)>>4) + (bank & 0x04) + ((~bank >> 4)&2)) * 2;
 				srcpg = ((code >> 4) & 3) + 4;
-				gfxbank = (bank & 0x3) + 4;	// brickzn: 06,a6,a2,b2->6
-				if (state->m_use_gfxbank)
+				gfxbank = (bank & 0x3);
+				switch (state->m_gfxbank_type)
 				{
-					// starfigh: boss 2 head, should be p7 g7 x8/c y4:
-					//      67 74 88 03
-					//      67 76 ac 03
-					// starfigh: boss 2 chainguns should be p6 g7:
-					//      a8 68/a/c/e 62 23
-					//      48 68/a/c/e 62 23
-					// starfigh: player, p4 g0:
-					//      64 40 d3 20
-					// starfigh: title star, p5 g1 / p7 g0:
-					//      70 56/8/a/c 0e 01 (gfxhi=1)
-					//      6f 78/a/c/e 0f 04 ""
-					gfxbank = (bank & 0x3);
-					if (gfxbank == 3)	gfxbank += state->m_gfxbank;
+					case suna8_state::GFXBANK_TYPE_SPARKMAN:
+						break;
+
+					case suna8_state::GFXBANK_TYPE_BRICKZN:
+						gfxbank += 4;	// brickzn: 06,a6,a2,b2->6
+						break;
+
+					case suna8_state::GFXBANK_TYPE_STARFIGH:
+						// starfigh: boss 2 head, should be p7 g7 x8/c y4:
+						//      67 74 88 03
+						//      67 76 ac 03
+						// starfigh: boss 2 chainguns should be p6 g7:
+						//      a8 68/a/c/e 62 23
+						//      48 68/a/c/e 62 23
+						// starfigh: player, p4 g0:
+						//      64 40 d3 20
+						// starfigh: title star, p5 g1 / p7 g0:
+						//      70 56/8/a/c 0e 01 (gfxhi=1)
+						//      6f 78/a/c/e 0f 04 ""
+						if (gfxbank == 3)
+							gfxbank += state->m_gfxbank;
+						break;
 				}
 				colorbank = (bank & 8) >> 3;
 				break;
@@ -318,11 +328,17 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 				srcy  = (((bank & 0x80)>>4) + (bank & 0x04) + ((~bank >> 4)&3)) * 2;
 				srcpg = (code >> 4) & 3;
 				gfxbank = bank & 0x03;
-				if (state->m_use_gfxbank)
+				switch (state->m_gfxbank_type)
 				{
-					// starfigh: boss 2 tail, p2 g7:
-					//      61 20 1b 27
-					if (gfxbank == 3)	gfxbank += state->m_gfxbank;
+					case suna8_state::GFXBANK_TYPE_STARFIGH:
+						// starfigh: boss 2 tail, p2 g7:
+						//      61 20 1b 27
+						if (gfxbank == 3)
+							gfxbank += state->m_gfxbank;
+					break;
+
+					default:
+					break;
 				}
 				break;
 			}
@@ -364,11 +380,11 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 					sy = max_y - sy;	tile_flipy = !tile_flipy;
 				}
 
-				drawgfx_transpen(	bitmap,cliprect,machine.gfx[0],
+				drawgfx_transpen(	bitmap, cliprect, machine.gfx[which],
 							tile + (attr & 0x3)*0x100 + gfxbank,
 							(((attr >> 2) & 0xf) | colorbank) + 0x10 * state->m_palettebank,	// hardhea2 player2
 							tile_flipx, tile_flipy,
-							sx, sy,15);
+							sx, sy, 0xf);
 			}
 		}
 
@@ -383,9 +399,6 @@ static void draw_text_sprites(running_machine &machine, bitmap_ind16 &bitmap,con
 
 	int max_x = machine.primary_screen->width() - 8;
 	int max_y = machine.primary_screen->height() - 8;
-
-	/* Earlier games only */
-	if (!state->m_text_dim)	return;
 
 	for (i = 0x1900; i < 0x19ff; i += 4)
 	{
@@ -436,7 +449,7 @@ static void draw_text_sprites(running_machine &machine, bitmap_ind16 &bitmap,con
 							tile + (attr & 0x3)*0x100 + bank,
 							(attr >> 2) & 0xf,
 							flipx, flipy,
-							sx, sy,15);
+							sx, sy, 0xf);
 			}
 		}
 
@@ -462,16 +475,16 @@ UINT32 suna8_state::screen_update_suna8(screen_device &screen, bitmap_ind16 &bit
 	{
 		int max_tiles = memregion("gfx1")->bytes() / (0x400 * 0x20);
 
-		if (machine().input().code_pressed_once(KEYCODE_Q))	{ m_page--;	machine().tilemap().mark_all_dirty();	}
-		if (machine().input().code_pressed_once(KEYCODE_W))	{ m_page++;	machine().tilemap().mark_all_dirty();	}
+		if (machine().input().code_pressed_once(KEYCODE_Q))	{ m_page--;		machine().tilemap().mark_all_dirty();	}
+		if (machine().input().code_pressed_once(KEYCODE_W))	{ m_page++;		machine().tilemap().mark_all_dirty();	}
 		if (machine().input().code_pressed_once(KEYCODE_E))	{ m_tiles--;	machine().tilemap().mark_all_dirty();	}
 		if (machine().input().code_pressed_once(KEYCODE_R))	{ m_tiles++;	machine().tilemap().mark_all_dirty();	}
 		if (machine().input().code_pressed_once(KEYCODE_A))	{ m_trombank--;	machine().tilemap().mark_all_dirty();	}
 		if (machine().input().code_pressed_once(KEYCODE_S))	{ m_trombank++;	machine().tilemap().mark_all_dirty();	}
 
-		m_rombank  &= 0xf;
-		m_page  &= m_text_dim ? 3 : 7;
-		m_tiles %= max_tiles;
+		m_trombank	&=	0xf;
+		m_page		&=	m_text_dim ? 3 : (machine().gfx[1] ? 15 : 7);
+		m_tiles		%=	max_tiles;
 		if (m_tiles < 0) m_tiles += max_tiles;
 
 		m_bg_tilemap->set_scrollx(0, 0x100 * m_page);
@@ -487,8 +500,16 @@ UINT32 suna8_state::screen_update_suna8(screen_device &screen, bitmap_ind16 &bit
 #endif
 #endif
 	{
-		draw_normal_sprites(machine() ,bitmap,cliprect);
-		draw_text_sprites(machine(), bitmap,cliprect);
+		// Normal sprites
+		draw_normal_sprites(machine(), bitmap,cliprect, 0);
+
+		// More normal sprites (second sprite "chip" in sparkman)
+		if (machine().gfx[1])
+			draw_normal_sprites(machine(), bitmap,cliprect, 1);
+
+		// Text sprites (earlier games only)
+		if (m_text_dim)
+			draw_text_sprites(machine(), bitmap,cliprect);
 	}
 	return 0;
 }
