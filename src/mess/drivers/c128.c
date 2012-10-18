@@ -2,12 +2,9 @@
 
     TODO:
 
-	- C64 mode charrom read
     - fix fast serial
-    - K0-K2 key line read
     - clean up inputs
     - expansion DMA
-    - inherit from c64_state and use common members from there
 
 */
 
@@ -46,6 +43,9 @@ inline void c128_state::check_interrupts()
 
 	int irq = m_cia1_irq || m_vic_irq || m_exp_irq;
 	int nmi = m_cia2_irq || restore || m_exp_nmi;
+	//int aec = m_exp_dma && m_z80_busack;
+	//int rdy = m_vic_aec && m_z80en && m_vic_ba;
+	//int busreq = !m_z80en || !(m_z80_busack && !aec)
 
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, irq);
 
@@ -79,22 +79,10 @@ void c128_state::read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, 
 	m_game = m_exp->game_r(ca, ba, rw, m_hiram);
 	m_exrom = m_exp->exrom_r(ca, ba, rw, m_hiram);
 
-	UINT32 input = clk << 26 | !m_va14 << 25 | m_charen << 24 |
+	UINT32 input = clk << 26 | m_va14 << 25 | m_charen << 24 |
 		m_hiram << 23 | m_loram << 22 | ba << 21 | VMA5 << 20 | VMA4 << 19 | ms0 << 18 | ms1 << 17 | ms2 << 16 |
 		m_exrom << 15 | m_game << 14 | rw << 13 | aec << 12 | A10 << 11 | A11 << 10 | A12 << 9 | A13 << 8 |
 		A14 << 7 | A15 << 6 | z80io << 5 | m_z80en << 4 | ms3 << 3 | vicfix << 2 | dmaack << 1 | _128_256;
-
-	/*
-	000000000001111111112222222
-	012345678901234567890123456
-	--11--------0------10---0-- 000000000000000001
-	---0--------0-1----10----1- 000000000000000001
-	---0--------0--0---10----1- 000000000000000001
-	---0--1101--111-------1-0-- 000000000000000001
-	---0--1101--111--------10-- 000000000000000001
-	---0--1101--11-0-------10-- 000000000000000001
-	---11-1101--11--100-------- 000000000000000001
-	*/
 
 	UINT32 data = m_pla->read(input);
 
@@ -169,46 +157,46 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 		{
 			data = m_ram->pointer()[ma];
 		}
-		else if (!cas1)
+		if (!cas1)
 		{
 			data = m_ram->pointer()[0x10000 | ma];
 		}
 	}
-	else if (!rom1)
+	if (!rom1)
 	{
 		// CR: data = m_rom1[(ms3 << 14) | ((BIT(ta, 14) && BIT(offset, 13)) << 13) | (ta & 0x1000) | (offset & 0xfff)];
 		data = m_rom1[((BIT(ta, 14) && BIT(offset, 13)) << 13) | (ta & 0x1000) | (offset & 0xfff)];
 	}
-	else if (!rom2)
+	if (!rom2)
 	{
 		data = m_rom2[offset & 0x3fff];
 	}
-	else if (!rom3)
+	if (!rom3)
 	{
 		// CR: data = m_rom3[(BIT(offset, 15) << 14) | (offset & 0x3fff)];
 		data = m_rom3[offset & 0x3fff];
 	}
-	else if (!rom4)
+	if (!rom4)
 	{
 		data = m_rom4[(ta & 0x1000) | (offset & 0x2fff)];
 	}
-	else if (!charom)
+	if (!charom)
 	{
 		data = m_charom[(ms3 << 12) | (ta & 0xf00) | sa];
 	}
-	else if (!colorram)
+	if (!colorram && aec)
 	{
 		data = m_color_ram[(clrbank << 10) | (ta & 0x300) | sa] & 0x0f;
 	}
-	else if (!vic)
+	if (!vic)
 	{
 		data = m_vic->read(space, offset & 0x3f);
 	}
-	else if (!from1)
+	if (!from1)
 	{
 		data = m_from[offset & 0x7fff];
 	}
-	else if (!iocs && BIT(offset, 10))
+	if (!iocs && BIT(offset, 10))
 	{
 		switch ((BIT(offset, 11) << 2) | ((offset >> 8) & 0x03))
 		{
@@ -277,20 +265,20 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, U
 		{
 			m_ram->pointer()[ma] = data;
 		}
-		else if (!cas1)
+		if (!cas1)
 		{
 			m_ram->pointer()[0x10000 | ma] = data;
 		}
 	}
-	else if (!colorram && !gwe)
+	if (!colorram && !gwe)
 	{
-		m_color_ram[(clrbank << 10) | (ta & 0x300) | sa] = data | 0xf0;
+		m_color_ram[(clrbank << 10) | (ta & 0x300) | sa] = data & 0x0f;
 	}
-	else if (!vic)
+	if (!vic)
 	{
 		m_vic->write(space, offset & 0x3f, data);
 	}
-	else if (!iocs && BIT(offset, 10))
+	if (!iocs && BIT(offset, 10))
 	{
 		switch ((BIT(offset, 11) << 2) | ((offset >> 8) & 0x03))
 		{
@@ -504,7 +492,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( c128 )
 	PORT_INCLUDE( common_cbm_keyboard )		/* ROW0 -> ROW7 */
 
-	PORT_START( "KP0" )
+	PORT_START( "K0" )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1_PAD)				PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
@@ -514,7 +502,7 @@ static INPUT_PORTS_START( c128 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Help") PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(PGUP))
 
-	PORT_START( "KP1" )
+	PORT_START( "K1" )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
@@ -524,7 +512,7 @@ static INPUT_PORTS_START( c128 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) 		PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC)				PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
-	PORT_START( "KP2" )
+	PORT_START( "K2" )
 	PORT_CONFNAME( 0x80, 0x00, "No Scroll (switch)") PORT_CODE(KEYCODE_F9)
 	PORT_CONFSETTING(	0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(	0x80, DEF_STR( On ) )
@@ -751,7 +739,7 @@ WRITE_LINE_MEMBER( c128_state::mmu_z80en_w )
 		if (m_reset)
 		{
 			m_subcpu->reset();
-			//m_subcpu->set_state_int(M8502_PC, 0xff3d);
+
 			m_reset = 0;
 		}
 	}
@@ -800,25 +788,13 @@ static MOS8722_INTERFACE( mmu_intf )
 
 INTERRUPT_GEN_MEMBER( c128_state::frame_interrupt )
 {
-	static const char *const c128ports[] = { "KP0", "KP1", "KP2" };
-
 	check_interrupts();
 
-	/* common keys input ports */
 	cbm_common_interrupt(&device);
 
-	/* Fix Me! Currently, neither left Shift nor Shift Lock work in c128, but reading the correspondent input produces a bug!
-    Hence, we overwrite the actual reading as it never happens */
-	if ((ioport("SPECIAL")->read() & 0x40))	//
+	// hack in ShiftLock 
+	if ((ioport("SPECIAL")->read() & 0x40))
 		c64_keyline[1] |= 0x80;
-
-	/* c128 specific: keypad input ports */
-	for (int i = 0; i < 3; i++)
-	{
-		UINT8 value = 0xff;
-		value &= ~ioport(c128ports[i])->read();
-		m_keyline[i] = value;
-	}
 }
 
 WRITE_LINE_MEMBER( c128_state::vic_irq_w )
@@ -828,16 +804,18 @@ WRITE_LINE_MEMBER( c128_state::vic_irq_w )
 	check_interrupts();
 }
 
+WRITE8_MEMBER( c128_state::vic_k_w )
+{
+	m_vic_k = data;
+}
+
 static MOS8564_INTERFACE( vic_intf )
 {
 	SCREEN_VIC_TAG,
-	Z80A_TAG,
+	M8502_TAG,
 	DEVCB_DRIVER_LINE_MEMBER(c128_state, vic_irq_w),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DRIVER_MEMBER(c128_state, vic_k_w)
 };
 
 
@@ -953,14 +931,13 @@ READ8_MEMBER( c128_state::cia1_pb_r )
 
 	UINT8 data = 0xff;
 	UINT8 cia0porta = m_cia1->pa_r();
-	//vic2e_device_interface *intf = dynamic_cast<vic2e_device_interface*>(&m_vic);
 
 	data &= cbm_common_cia0_port_b_r(m_cia1, cia0porta);
-/*
-    if (!intf->k0_r()) data &= m_keyline[0];
-    if (!intf->k1_r()) data &= m_keyline[1];
-    if (!intf->k2_r()) data &= m_keyline[2];
-*/
+
+    if (!BIT(m_vic_k, 0)) data &= ~ioport("K0")->read();
+    if (!BIT(m_vic_k, 1)) data &= ~ioport("K1")->read();
+    if (!BIT(m_vic_k, 2)) data &= ~ioport("K2")->read();
+
 	return data;
 }
 
@@ -1242,12 +1219,18 @@ static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 
 READ8_MEMBER( c128_state::exp_dma_r )
 {
-	return m_subcpu->space(AS_PROGRAM).read_byte(offset);
+	int ba = 0, aec = 1, z80io = 1;
+	offs_t vma = 0;
+
+	return read_memory(space, offset, vma, ba, aec, z80io);
 }
 
 WRITE8_MEMBER( c128_state::exp_dma_w )
 {
-	m_subcpu->space(AS_PROGRAM).write_byte(offset, data);
+	int ba = 0, aec = 1, z80io = 1;
+	offs_t vma = 0;
+
+	return write_memory(space, offset, data, vma, ba, aec, z80io);
 }
 
 WRITE_LINE_MEMBER( c128_state::exp_irq_w )
@@ -1266,7 +1249,9 @@ WRITE_LINE_MEMBER( c128_state::exp_nmi_w )
 
 WRITE_LINE_MEMBER( c128_state::exp_dma_w )
 {
-	// TODO
+	m_exp_dma = state;
+
+	check_interrupts();
 }
 
 WRITE_LINE_MEMBER( c128_state::exp_reset_w )
@@ -1314,7 +1299,6 @@ static C64_USER_PORT_INTERFACE( user_intf )
 void c128_state::machine_start()
 {
 	cbm_common_init();
-	m_keyline[0] = m_keyline[1] = m_keyline[2] = 0xff;
 
 	// find memory regions
 	m_rom1 = memregion(M8502_TAG)->base();
@@ -1326,11 +1310,34 @@ void c128_state::machine_start()
 
 	// allocate memory
 	m_color_ram.allocate(0x800);
+
+	// state saving
+	save_item(NAME(m_z80en));
+	save_item(NAME(m_loram));
+	save_item(NAME(m_hiram));
+	save_item(NAME(m_charen));
+	save_item(NAME(m_game));
+	save_item(NAME(m_exrom));
+	save_item(NAME(m_reset));
+	save_item(NAME(m_va14));
+	save_item(NAME(m_va15));
+	save_item(NAME(m_clrbank));
+	save_item(NAME(m_cnt1));
+	save_item(NAME(m_sp1));
+	save_item(NAME(m_iec_data_out));
+	save_item(NAME(m_cia1_irq));
+	save_item(NAME(m_cia2_irq));
+	save_item(NAME(m_vic_irq));
+	save_item(NAME(m_exp_irq));
+	save_item(NAME(m_exp_nmi));
+	save_item(NAME(m_exp_dma));
+	save_item(NAME(m_cass_rd));
+	save_item(NAME(m_iec_srq));
 }
 
 
 //-------------------------------------------------
-//  MACHINE_RESET( c64 )
+//  MACHINE_RESET( c128 )
 //-------------------------------------------------
 
 void c128_state::machine_reset()
@@ -1361,15 +1368,15 @@ void c128_state::machine_reset()
 
 static MACHINE_CONFIG_START( ntsc, c128_state )
 	// basic hardware
-	MCFG_CPU_ADD(Z80A_TAG, Z80, VIC6567_CLOCK)
-	MCFG_CPU_PROGRAM_MAP( z80_mem)
-	MCFG_CPU_IO_MAP( z80_io)
+	MCFG_CPU_ADD(Z80A_TAG, Z80, VIC6567_CLOCK*2)
+	MCFG_CPU_PROGRAM_MAP(z80_mem)
+	MCFG_CPU_IO_MAP(z80_io)
 	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_VIC_TAG, c128_state, frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(Z80A_TAG)
 
 	MCFG_CPU_ADD(M8502_TAG, M8502, VIC6567_CLOCK)
-	MCFG_CPU_PROGRAM_MAP( m8502_mem)
-	MCFG_CPU_CONFIG( cpu_intf )
+	MCFG_CPU_PROGRAM_MAP(m8502_mem)
+	MCFG_CPU_CONFIG(cpu_intf)
 	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_VIC_TAG, c128_state, frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(M8502_TAG)
 
@@ -1474,15 +1481,15 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pal, c128_state )
 	// basic hardware
-	MCFG_CPU_ADD(Z80A_TAG, Z80, VIC6569_CLOCK)
-	MCFG_CPU_PROGRAM_MAP( z80_mem)
+	MCFG_CPU_ADD(Z80A_TAG, Z80, VIC6569_CLOCK*2)
+	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)
 	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_VIC_TAG, c128_state, frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(Z80A_TAG)
 
 	MCFG_CPU_ADD(M8502_TAG, M8502, VIC6569_CLOCK)
-	MCFG_CPU_PROGRAM_MAP( m8502_mem)
-	MCFG_CPU_CONFIG( cpu_intf )
+	MCFG_CPU_PROGRAM_MAP(m8502_mem)
+	MCFG_CPU_CONFIG(cpu_intf)
 	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_VIC_TAG, c128_state, frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(M8502_TAG)
 
@@ -1606,10 +1613,10 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( c128ger )
+//  ROM( c128_de )
 //-------------------------------------------------
 
-ROM_START( c128ger )
+ROM_START( c128_de )
 	ROM_REGION( 0x10000, M8502_TAG, 0 )
 	ROM_DEFAULT_BIOS("r4")
 	ROM_LOAD( "251913-01.u32", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )
@@ -1635,10 +1642,10 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( c128sfi )
+//  ROM( c128_se )
 //-------------------------------------------------
 
-ROM_START( c128sfi )
+ROM_START( c128_se )
 	ROM_REGION( 0x10000, M8502_TAG, 0 )
 	ROM_LOAD( "325182-01.u32", 0x0000, 0x4000, CRC(2aff27d3) SHA1(267654823c4fdf2167050f41faa118218d2569ce) ) // "C128 64 Sw/Fi"
 	ROM_LOAD( "318018-02.u33", 0x4000, 0x4000, CRC(2ee6e2fa) SHA1(60e1491e1d5782e3cf109f518eb73427609badc6) )
@@ -1723,10 +1730,10 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( c128drde )
+//  ROM( c128dr_de )
 //-------------------------------------------------
 
-ROM_START( c128drde )
+ROM_START( c128dr_de )
 	ROM_REGION( 0x10000, M8502_TAG, 0 )
 	ROM_LOAD( "318022-02.u34", 0x4000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )
 	ROM_LOAD( "318077-01.u32", 0x0000, 0x4000, CRC(eb6e2c8f) SHA1(6b3d891fedabb5335f388a5d2a71378472ea60f4) )
@@ -1745,10 +1752,10 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( c128drsw )
+//  ROM( c128dr_se )
 //-------------------------------------------------
 
-ROM_START( c128drsw )
+ROM_START( c128dr_se )
 	ROM_REGION( 0x10000, M8502_TAG, 0 )
 	ROM_LOAD( "318022-02.u34", 0x4000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )
 	ROM_LOAD( "318034-01.u32", 0x0000, 0x4000, CRC(cb4e1719) SHA1(9b0a0cef56d00035c611e07170f051ee5e63aa3a) )
@@ -1778,18 +1785,18 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY                        FULLNAME                                     FLAGS
-COMP( 1985, c128,      0,     0,   c128,     c128, driver_device,    0,     "Commodore Business Machines", "Commodore 128 (NTSC)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1985, c128sfi,   c128,  0,   c128pal,  c128swe, driver_device, 0,  "Commodore Business Machines", "Commodore 128 (Sweden/Finland)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-//COMP( 1985, c128fra,   c128,  0,   c128pal,  c128fra, driver_device, 0,  "Commodore Business Machines", "Commodore 128 (France)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1985, c128ger,   c128,  0,   c128pal,  c128ger, driver_device, 0,  "Commodore Business Machines", "Commodore 128 (Germany)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-//COMP( 1985, c128nor,   c128,  0,   c128pal,  c128ita, driver_device, 0,  "Commodore Business Machines", "Commodore 128 (Norway)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1985, c128dpr,   c128,  0,   c128d,    c128, driver_device,    0,   "Commodore Business Machines", "Commodore 128D (NTSC, prototype)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1985, c128d,     c128,  0,   c128dpal, c128, driver_device,    0,"Commodore Business Machines", "Commodore 128D (PAL)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT                COMPANY                        FULLNAME                                 FLAGS
+COMP( 1985, c128,		0,		0,		c128,		c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128 (NTSC)",					GAME_SUPPORTS_SAVE )
+COMP( 1985, c128_se,	c128,	0,		c128pal,	c128swe,	driver_device,	0,	"Commodore Business Machines", "Commodore 128 (Sweden/Finland)",		GAME_SUPPORTS_SAVE )
+//COMP( 1985, c128fra,   c128,  0,   c128pal,  c128fra, driver_device, 0,  "Commodore Business Machines", "Commodore 128 (France)", GAME_SUPPORTS_SAVE )
+COMP( 1985, c128_de,	c128,	0,		c128pal,	c128ger,	driver_device,	0,	"Commodore Business Machines", "Commodore 128 (Germany)",				GAME_SUPPORTS_SAVE )
+//COMP( 1985, c128nor,   c128,  0,   c128pal,  c128ita, driver_device, 0,  "Commodore Business Machines", "Commodore 128 (Norway)", GAME_SUPPORTS_SAVE )
+COMP( 1985, c128dpr,	c128,	0,		c128d,		c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128D (NTSC, prototype)",		GAME_SUPPORTS_SAVE )
+COMP( 1985, c128d,		c128,	0,		c128dpal,	c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128D (PAL)",					GAME_SUPPORTS_SAVE )
 
-COMP( 1985, c128cr,    c128,  0,   c128,     c128, driver_device,    0,     "Commodore Business Machines", "Commodore 128CR (NTSC, prototype?)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1986, c128dcr,   c128,  0,   c128dcr,  c128, driver_device,    0, "Commodore Business Machines", "Commodore 128DCR (NTSC)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1986, c128drde,  c128,  0,   c128dcrp, c128ger, driver_device, 0,"Commodore Business Machines", "Commodore 128DCR (Germany)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1985, c128cr,		c128,	0,		c128,		c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128CR (NTSC, prototype)",		GAME_SUPPORTS_SAVE )
+COMP( 1986, c128dcr,	c128,	0,		c128dcr,	c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128DCR (NTSC)",				GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1986, c128dr_de,	c128,	0,		c128dcrp,	c128ger,	driver_device,	0,	"Commodore Business Machines", "Commodore 128DCR (Germany)",			GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 //COMP( 1986, c128drit,  c128,  0,   c128dcrp, c128ita, driver_device, 0,"Commodore Business Machines", "Commodore 128DCR (Italy)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1986, c128drsw,  c128,  0,   c128dcrp, c128swe, driver_device, 0,"Commodore Business Machines", "Commodore 128DCR (Sweden/Finland)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1986, c128d81,   c128,  0,   c128d81,  c128, driver_device,    0, "Commodore Business Machines", "Commodore 128D/81 (NTSC, prototype)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1986, c128dr_se,	c128,	0,		c128dcrp,	c128swe,	driver_device,	0,	"Commodore Business Machines", "Commodore 128DCR (Sweden/Finland)",		GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1986, c128d81,	c128,	0,		c128d81,	c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128D/81 (NTSC, prototype)",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

@@ -3,7 +3,6 @@
 #ifndef __C64__
 #define __C64__
 
-
 #include "emu.h"
 #include "formats/cbm_snqk.h"
 #include "includes/cbm.h"
@@ -23,7 +22,7 @@
 #define M6510_TAG		"u7"
 #define MOS6567_TAG		"u19"
 #define MOS6569_TAG		"u19"
-#define MOS6851_TAG		"u18"
+#define MOS6581_TAG		"u18"
 #define MOS6526_1_TAG	"u1"
 #define MOS6526_2_TAG	"u2"
 #define PLA_TAG			"u17"
@@ -39,7 +38,7 @@ public:
 		  m_maincpu(*this, M6510_TAG),
 		  m_pla(*this, PLA_TAG),
 		  m_vic(*this, MOS6569_TAG),
-		  m_sid(*this, MOS6851_TAG),
+		  m_sid(*this, MOS6581_TAG),
 		  m_cia1(*this, MOS6526_1_TAG),
 		  m_cia2(*this, MOS6526_2_TAG),
 		  m_iec(*this, CBM_IEC_TAG),
@@ -82,8 +81,9 @@ public:
 	virtual void machine_reset();
 
 	void check_interrupts();
-	void bankswitch(offs_t offset, offs_t va, int rw, int aec, int ba, int cas, int *casram, int *basic, int *kernal, int *charom, int *grw, int *io, int *roml, int *romh);
-	UINT8 read_memory(address_space &space, offs_t offset, int ba, int casram, int basic, int kernal, int charom, int io, int roml, int romh);
+	void read_pla(offs_t offset, offs_t va, int rw, int aec, int ba, int cas, int *casram, int *basic, int *kernal, int *charom, int *grw, int *io, int *roml, int *romh);
+	UINT8 read_memory(address_space &space, offs_t offset, offs_t va, int rw, int aec, int ba, int cas);
+	void write_memory(address_space &space, offs_t offset, UINT8 data, int rw, int aec, int ba, int cas);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -115,6 +115,7 @@ public:
 	DECLARE_WRITE8_MEMBER( exp_dma_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_nmi_w );
+	DECLARE_WRITE_LINE_MEMBER( exp_dma_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 
 	// memory state
@@ -136,6 +137,7 @@ public:
 	int m_vic_irq;
 	int m_exp_irq;
 	int m_exp_nmi;
+	int m_exp_dma;
 	int m_cass_rd;
 	int m_iec_srq;
 };

@@ -22,7 +22,6 @@
 
     - cleanup
     - light pen
-    - remove RDY hack
     - http://hitmen.c02.at/temp/palstuff/
 
 */
@@ -86,7 +85,9 @@ enum
 	REGISTER_M4C,
 	REGISTER_M5C,
 	REGISTER_M6C,
-	REGISTER_M7C
+	REGISTER_M7C,
+	REGISTER_KCR,
+	REGISTER_FAST
 };
 
 
@@ -154,11 +155,6 @@ static const rgb_t PALETTE[] =
 #define VIC2_Y_BEGIN			(IS_PAL ? VIC6569_Y_BEGIN : VIC6567_Y_BEGIN)
 #define VIC2_X_VALUE			((LIGHTPEN_X_VALUE / 1.3) + 12)
 #define VIC2_Y_VALUE			((LIGHTPEN_Y_VALUE      ) + 10)
-
-#define VIC2E_K0_LEVEL			(m_reg[0x2f] & 0x01)
-#define VIC2E_K1_LEVEL			(m_reg[0x2f] & 0x02)
-#define VIC2E_K2_LEVEL			(m_reg[0x2f] & 0x04)
-
 
 /* sprites 0 .. 7 */
 #define SPRITEON(nr)			(m_reg[0x15] & (1 << nr))
@@ -328,7 +324,7 @@ inline void mos6566_device::vic2_suspend_cpu()
 	if (m_device_suspended == 0)
 	{
 		m_first_ba_cycle = m_cycles_counter;
-		if (m_in_rdy_workaround_func(0) != 7 )
+		//if (m_in_rdy_workaround_func(0) != 7 )
 		{
 //          machine.firstcpu->suspend(SUSPEND_REASON_SPIN, 0);
 		}
@@ -618,10 +614,7 @@ void mos6566_device::device_start()
 	// resolve callbacks
 	m_out_irq_func.resolve(m_out_irq_cb, *this);
 	m_out_rdy_func.resolve(m_out_rdy_cb, *this);
-	m_in_lightpen_x_func.resolve(m_in_x_cb, *this);
-	m_in_lightpen_y_func.resolve(m_in_y_cb, *this);
-	m_in_lightpen_button_func.resolve(m_in_button_cb, *this);
-	m_in_rdy_workaround_func.resolve(m_in_rdy_cb, *this);
+	m_out_k_func.resolve(m_out_k_cb, *this);
 
 	m_cpu = machine().device<cpu_device>(m_cpu_tag);
 
@@ -838,8 +831,8 @@ void mos6566_device::execute_run()
 
 	//          if (LIGHTPEN_BUTTON)
 				{
-					m_reg[0x13] = VIC2_X_VALUE;
-					m_reg[0x14] = VIC2_Y_VALUE;
+//					m_reg[0x13] = VIC2_X_VALUE;
+//					m_reg[0x14] = VIC2_Y_VALUE;
 				}
 				vic2_set_interrupt(8);
 			}
@@ -1459,8 +1452,8 @@ void mos6569_device::execute_run()
 
 	//          if (LIGHTPEN_BUTTON)
 				{
-					m_reg[0x13] = VIC2_X_VALUE;
-					m_reg[0x14] = VIC2_Y_VALUE;
+//					m_reg[0x13] = VIC2_X_VALUE;
+//					m_reg[0x14] = VIC2_Y_VALUE;
 				}
 				vic2_set_interrupt(8);
 			}
@@ -1650,8 +1643,8 @@ void mos6569_device::execute_run()
 
 			m_raster_x = 0xfffc;
 
-			if ((m_in_rdy_workaround_func(0) == 0 ) && (m_is_bad_line))
-				m_rdy_cycles += (43+adjust(0));
+//			if ((m_in_rdy_workaround_func(0) == 0 ) && (m_is_bad_line))
+//				m_rdy_cycles += (43+adjust(0));
 
 			m_cycle++;
 			break;
@@ -1665,8 +1658,8 @@ void mos6569_device::execute_run()
 
 			m_vc = m_vc_base;
 
-			if ((m_in_rdy_workaround_func(0) == 1 ) && (m_is_bad_line))
-				m_rdy_cycles += (42+adjust(0));
+//			if ((m_in_rdy_workaround_func(0) == 1 ) && (m_is_bad_line))
+//				m_rdy_cycles += (42+adjust(0));
 
 			m_cycle++;
 			break;
@@ -1685,8 +1678,8 @@ void mos6569_device::execute_run()
 			m_ml_index = 0;
 			vic2_matrix_access();
 
-			if ((m_in_rdy_workaround_func(0) == 2 ) && (m_is_bad_line))
-				m_rdy_cycles += (41+adjust(0));
+//			if ((m_in_rdy_workaround_func(0) == 2 ) && (m_is_bad_line))
+//				m_rdy_cycles += (41+adjust(0));
 
 			m_cycle++;
 			break;
@@ -1709,8 +1702,8 @@ void mos6569_device::execute_run()
 
 			vic2_matrix_access();
 
-			if ((m_in_rdy_workaround_func(0) == 3 ) && (m_is_bad_line))
-				m_rdy_cycles += (40+adjust(0));
+//			if ((m_in_rdy_workaround_func(0) == 3 ) && (m_is_bad_line))
+//				m_rdy_cycles += (40+adjust(0));
 
 			m_cycle++;
 			break;
@@ -1746,8 +1739,8 @@ void mos6569_device::execute_run()
 			vic2_fetch_if_bad_line();
 			vic2_matrix_access();
 
-			if ((m_in_rdy_workaround_func(0) == 4 ) && (m_is_bad_line))
-				m_rdy_cycles += (40+adjust(0));
+//			if ((m_in_rdy_workaround_func(0) == 4 ) && (m_is_bad_line))
+//				m_rdy_cycles += (40+adjust(0));
 
 			m_cycle++;
 			break;
@@ -2554,8 +2547,8 @@ READ8_MEMBER( mos6566_device::read )
 		val = m_reg[offset];
 		break;
 
-	case 0x2f:
-	case 0x30:
+	case REGISTER_KCR:
+	case REGISTER_FAST:
 		if (IS_VICIIE)
 		{
 			val = m_reg[offset];
@@ -2782,18 +2775,26 @@ WRITE8_MEMBER( mos6566_device::write )
 		}
 		break;
 
-	case 0x2f:
+	case REGISTER_KCR:
 		if (IS_VICIIE)
 		{
-			DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
-			m_reg[offset] = data;
+			m_reg[offset] = data | 0xf8;
+
+			m_out_k_func(0, data & 0x07);
 		}
 		break;
 
-	case 0x30:
+	case REGISTER_FAST:
 		if (IS_VICIIE)
 		{
-			m_reg[offset] = data;
+			if (BIT(m_reg[offset], 0) != BIT(data, 0))
+			{
+				m_cpu->set_unscaled_clock(clock() << BIT(data, 0));
+				printf("clock %u\n",clock() << BIT(data, 0));
+			}
+			
+			m_reg[offset] = data | 0xfc;
+
 			m_on = !BIT(data, 0);
 		}
 		break;
@@ -2841,12 +2842,3 @@ UINT8 mos6566_device::bus_r()
 {
 	return m_last_data;
 }
-
-
-READ_LINE_MEMBER( mos8564_device::k0_r ) { return VIC2E_K0_LEVEL; }
-READ_LINE_MEMBER( mos8564_device::k1_r ) { return VIC2E_K1_LEVEL; }
-READ_LINE_MEMBER( mos8564_device::k2_r ) { return VIC2E_K2_LEVEL; }
-
-READ_LINE_MEMBER( mos8566_device::k0_r ) { return VIC2E_K0_LEVEL; }
-READ_LINE_MEMBER( mos8566_device::k1_r ) { return VIC2E_K1_LEVEL; }
-READ_LINE_MEMBER( mos8566_device::k2_r ) { return VIC2E_K2_LEVEL; }

@@ -82,7 +82,8 @@ public:
 		  m_exp_irq(CLEAR_LINE),
 		  m_exp_nmi(CLEAR_LINE),
 		  m_cass_rd(1),
-		  m_iec_srq(1)
+		  m_iec_srq(1),
+		  m_vic_k(0x07)
 	{ }
 
 	required_device<legacy_cpu_device> m_maincpu;
@@ -129,9 +130,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( mmu_sense40_r );
 
 	INTERRUPT_GEN_MEMBER( frame_interrupt );
-	DECLARE_READ8_MEMBER( vic_dma_read );
-	DECLARE_READ8_MEMBER( vic_dma_read_color );
 	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
+	DECLARE_WRITE8_MEMBER( vic_k_w );
 	
 	DECLARE_READ8_MEMBER( sid_potx_r );
 	DECLARE_READ8_MEMBER( sid_poty_r );
@@ -194,11 +194,12 @@ public:
 	int m_vic_irq;
 	int m_exp_irq;
 	int m_exp_nmi;
+	int m_exp_dma;
 	int m_cass_rd;
 	int m_iec_srq;
 
 	// keyboard state
-	UINT8 m_keyline[3];
+	UINT8 m_vic_k;
 };
 
 

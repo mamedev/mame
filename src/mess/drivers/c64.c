@@ -7,7 +7,7 @@
     - tsuit215 test failures
         - IRQ (WRONG $DC0D)
         - NMI (WRONG $DD0D)
-        - all CIA tests
+        - some CIA tests
 
     - 64C PLA dump
     - clean up inputs
@@ -49,10 +49,16 @@ void c64_state::check_interrupts()
 {
 	int restore = BIT(ioport("SPECIAL")->read(), 7);
 
-	m_maincpu->set_input_line(M6510_IRQ_LINE, m_cia1_irq || m_vic_irq || m_exp_irq);
-	m_maincpu->set_input_line(INPUT_LINE_NMI, m_cia2_irq || restore || m_exp_nmi);
+	int irq = m_cia1_irq || m_vic_irq || m_exp_irq;
+	int nmi = m_cia2_irq || restore || m_exp_nmi;
+	//int rdy = m_exp_dma && m_vic_ba;
 
-	m_cia1->flag_w(m_cass_rd && m_iec_srq);
+	m_maincpu->set_input_line(M6510_IRQ_LINE, irq);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, nmi);
+
+	int flag = m_cass_rd && m_iec_srq;
+
+	m_cia1->flag_w(flag);
 }
 
 
@@ -62,15 +68,17 @@ void c64_state::check_interrupts()
 //**************************************************************************
 
 //-------------------------------------------------
-//  bankswitch -
+//  read_pla -
 //-------------------------------------------------
 
-void c64_state::bankswitch(offs_t offset, offs_t va, int rw, int aec, int ba, int cas, int *casram, int *basic, int *kernal, int *charom, int *grw, int *io, int *roml, int *romh)
+void c64_state::read_pla(offs_t offset, offs_t va, int rw, int aec, int ba, int cas, int *casram, int *basic, int *kernal, int *charom, int *grw, int *io, int *roml, int *romh)
 {
 	int game = m_exp->game_r(offset, ba, rw, m_hiram);
 	int exrom = m_exp->exrom_r(offset, ba, rw, m_hiram);
 
-	UINT32 input = VA12 << 15 | VA13 << 14 | game << 13 | exrom << 12 | rw << 11 | aec << 10 | ba << 9 | A12 << 8 | A13 << 7 | A14 << 6 | A15 << 5 | m_va14 << 4 | m_charen << 3 | m_hiram << 2 | m_loram << 1 | cas;
+	UINT32 input = VA12 << 15 | VA13 << 14 | game << 13 | exrom << 12 | rw << 11 | aec << 10 | ba << 9 | A12 << 8 | 
+		A13 << 7 | A14 << 6 | A15 << 5 | m_va14 << 4 | m_charen << 3 | m_hiram << 2 | m_loram << 1 | cas;
+
 	UINT32 data = m_pla->read(input);
 
 	*casram = BIT(data, 0);
@@ -88,13 +96,16 @@ void c64_state::bankswitch(offs_t offset, offs_t va, int rw, int aec, int ba, in
 //  read_memory -
 //-------------------------------------------------
 
-UINT8 c64_state::read_memory(address_space &space, offs_t offset, int ba, int casram, int basic, int kernal, int charom, int io, int roml, int romh)
+UINT8 c64_state::read_memory(address_space &space, offs_t offset, offs_t va, int rw, int aec, int ba, int cas)
 {
+	int casram, basic, kernal, charom, grw, io, roml, romh;
 	int io1 = 1, io2 = 1;
+
+	read_pla(offset, va, rw, !aec, ba, cas, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
 
 	UINT8 data = 0xff;
 
-	if (ba)
+	if (!aec)
 	{
 		data = m_vic->bus_r();
 	}
@@ -103,19 +114,19 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int ba, int ca
 	{
 		data = m_ram->pointer()[offset];
 	}
-	else if (!basic)
+	if (!basic)
 	{
 		data = m_basic[offset & 0x1fff];
 	}
-	else if (!kernal)
+	if (!kernal)
 	{
 		data = m_kernal[offset & 0x1fff];
 	}
-	else if (!charom)
+	if (!charom)
 	{
 		data = m_charom[offset & 0xfff];
 	}
-	else if (!io)
+	if (!io)
 	{
 		switch ((offset >> 10) & 0x03)
 		{
@@ -128,7 +139,7 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int ba, int ca
 			break;
 
 		case 2: // COLOR
-			data = m_color_ram[offset & 0x3ff] | 0xf0;
+			data = m_color_ram[offset & 0x3ff] & 0x0f;
 			break;
 
 		case 3: // CIAS
@@ -159,34 +170,17 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int ba, int ca
 
 
 //-------------------------------------------------
-//  read -
+//  write_memory -
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::read )
+void c64_state::write_memory(address_space &space, offs_t offset, UINT8 data, int rw, int aec, int ba, int cas)
 {
-	offs_t va = 0;
-	int rw = 1, aec = 0, ba = 1, cas = 0;
 	int casram, basic, kernal, charom, grw, io, roml, romh;
-
-	bankswitch(offset, va, rw, aec, ba, cas, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
-
-	return read_memory(space, offset, ba, casram, basic, kernal, charom, io, roml, romh);
-}
-
-
-//-------------------------------------------------
-//  write -
-//-------------------------------------------------
-
-WRITE8_MEMBER( c64_state::write )
-{
 	offs_t va = 0;
-	int rw = 0, aec = 0, ba = 1, cas = 0;
 	int io1 = 1, io2 = 1;
-	int casram, basic, kernal, charom, grw, io, roml, romh;
 
-	bankswitch(offset, va, rw, aec, ba, cas, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
-
+	read_pla(offset, va, rw, !aec, ba, cas, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
+	
 	if (offset < 0x0002)
 	{
 		// write to internal CPU register
@@ -197,7 +191,7 @@ WRITE8_MEMBER( c64_state::write )
 	{
 		m_ram->pointer()[offset] = data;
 	}
-	else if (!io)
+	if (!io)
 	{
 		switch ((offset >> 10) & 0x03)
 		{
@@ -241,18 +235,40 @@ WRITE8_MEMBER( c64_state::write )
 
 
 //-------------------------------------------------
+//  read -
+//-------------------------------------------------
+
+READ8_MEMBER( c64_state::read )
+{
+	offs_t va = 0;
+	int rw = 1, aec = 1, ba = 1, cas = 0;
+
+	return read_memory(space, offset, va, rw, aec, ba, cas);
+}
+
+
+//-------------------------------------------------
+//  write -
+//-------------------------------------------------
+
+WRITE8_MEMBER( c64_state::write )
+{
+	int rw = 0, aec = 1, ba = 1, cas = 0;
+	
+	write_memory(space, offset, data, rw, aec, ba, cas);
+}
+
+
+//-------------------------------------------------
 //  vic_videoram_r -
 //-------------------------------------------------
 
 READ8_MEMBER( c64_state::vic_videoram_r )
 {
-	offset = (!m_va15 << 15) | (!m_va14 << 14) | offset;
+	offs_t va = (!m_va15 << 15) | (!m_va14 << 14) | offset;
+	int rw = 1, aec = 0, ba = 0, cas = 0;
 
-	int rw = 1, aec = 1, ba = 0, cas = 0;
-	int casram, basic, kernal, charom, grw, io, roml, romh;
-	bankswitch(0xffff, offset, rw, aec, ba, cas, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
-
-	return read_memory(space, offset, ba, casram, basic, kernal, charom, io, roml, romh);
+	return read_memory(space, offset, va, rw, aec, ba, cas);
 }
 
 
@@ -386,9 +402,6 @@ static MOS6567_INTERFACE( vic_intf )
 	SCREEN_TAG,
 	M6510_TAG,
 	DEVCB_DRIVER_LINE_MEMBER(c64_state, vic_irq_w),
-	DEVCB_NULL, // RDY
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -844,6 +857,16 @@ WRITE_LINE_MEMBER( c64_state::exp_nmi_w )
 	check_interrupts();
 }
 
+WRITE_LINE_MEMBER( c64_state::exp_dma_w )
+{
+	if (m_exp_dma != state)
+	{
+		m_exp_dma = state;
+
+		m_maincpu->set_input_line(INPUT_LINE_HALT, m_exp_dma);
+	}
+}
+
 WRITE_LINE_MEMBER( c64_state::exp_reset_w )
 {
 	if (state == ASSERT_LINE)
@@ -858,7 +881,7 @@ static C64_EXPANSION_INTERFACE( expansion_intf )
 	DEVCB_DRIVER_MEMBER(c64_state, exp_dma_w),
 	DEVCB_DRIVER_LINE_MEMBER(c64_state, exp_irq_w),
 	DEVCB_DRIVER_LINE_MEMBER(c64_state, exp_nmi_w),
-	DEVCB_CPU_INPUT_LINE(M6510_TAG, INPUT_LINE_HALT),
+	DEVCB_DRIVER_LINE_MEMBER(c64_state, exp_dma_w),
 	DEVCB_DRIVER_LINE_MEMBER(c64_state, exp_reset_w)
 };
 
@@ -907,6 +930,7 @@ void c64_state::machine_start()
 	save_item(NAME(m_vic_irq));
 	save_item(NAME(m_exp_irq));
 	save_item(NAME(m_exp_nmi));
+	save_item(NAME(m_exp_dma));
 	save_item(NAME(m_cass_rd));
 	save_item(NAME(m_iec_srq));
 }
@@ -974,7 +998,7 @@ static MACHINE_CONFIG_START( ntsc, c64_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6851_TAG, SID6581, VIC6567_CLOCK)
+	MCFG_SOUND_ADD(MOS6581_TAG, SID6581, VIC6567_CLOCK)
 	MCFG_SOUND_CONFIG(sid_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1050,7 +1074,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED_CLASS( ntsc_c, ntsc, c64c_state )
-	MCFG_SOUND_REPLACE(MOS6851_TAG, SID8580, VIC6567_CLOCK)
+	MCFG_SOUND_REPLACE(MOS6581_TAG, SID8580, VIC6567_CLOCK)
 	MCFG_SOUND_CONFIG(sid_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -1073,7 +1097,7 @@ static MACHINE_CONFIG_START( pal, c64_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6851_TAG, SID6581, VIC6569_CLOCK)
+	MCFG_SOUND_ADD(MOS6581_TAG, SID6581, VIC6569_CLOCK)
 	MCFG_SOUND_CONFIG(sid_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1127,7 +1151,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED_CLASS( pal_c, pal, c64c_state )
-	MCFG_SOUND_REPLACE(MOS6851_TAG, SID8580, VIC6569_CLOCK)
+	MCFG_SOUND_REPLACE(MOS6581_TAG, SID8580, VIC6569_CLOCK)
 	MCFG_SOUND_CONFIG(sid_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -1150,7 +1174,7 @@ static MACHINE_CONFIG_START( pal_gs, c64gs_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6851_TAG, SID8580, VIC6569_CLOCK)
+	MCFG_SOUND_ADD(MOS6581_TAG, SID8580, VIC6569_CLOCK)
 	MCFG_SOUND_CONFIG(sid_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_ADD("dac", DAC, 0)

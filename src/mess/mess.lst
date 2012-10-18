@@ -635,16 +635,16 @@ v364
 
 c128	  // Commodore 128 - NTSC
 c128cr	// Commodore 128CR - NTSC (proto?)
-c128sfi   // Commodore 128 - PAL (Swedish / Finnish)
-//c128fra   // Commodore 128 - PAL (French)
-c128ger   // Commodore 128 - PAL (German)
-//c128nor   // Commodore 128 - PAL (Norwegian)
+c128_se   // Commodore 128 - PAL (Swedish / Finnish)
+//c128_rr   // Commodore 128 - PAL (French)
+c128_de   // Commodore 128 - PAL (German)
+//c128_no   // Commodore 128 - PAL (Norwegian)
 c128d	 // Commodore 128D - PAL
 c128dpr   // Commodore 128D - NTSC (proto)
 c128dcr   // Commodore 128DCR - NTSC
-c128drde  // Commodore 128DCR - PAL (German)
-//c128drit  // Commodore 128DCR - PAL (Italian)
-c128drsw  // Commodore 128DCR - PAL (Swedish)
+c128dr_de  // Commodore 128DCR - PAL (German)
+//c128dr_it  // Commodore 128DCR - PAL (Italian)
+c128dr_se  // Commodore 128DCR - PAL (Swedish)
 c128d81   // Commodore 128D/81
 
 

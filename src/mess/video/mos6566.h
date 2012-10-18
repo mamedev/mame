@@ -291,11 +291,7 @@ struct mos6566_interface
 	devcb_write_line	m_out_irq_cb;
 	devcb_write_line	m_out_rdy_cb;
 
-	devcb_read8			m_in_x_cb;
-	devcb_read8			m_in_y_cb;
-	devcb_read8			m_in_button_cb;
-
-	devcb_read8			m_in_rdy_cb;
+	devcb_write8		m_out_k_cb;
 };
 
 
@@ -443,17 +439,9 @@ protected:
 	UINT64 m_first_ba_cycle;
 	UINT8 m_device_suspended;
 
-	/* IRQ */
 	devcb_resolved_write_line		m_out_irq_func;
-
-	/* RDY */
 	devcb_resolved_write_line		m_out_rdy_func;
-	devcb_resolved_read8      m_in_rdy_workaround_func;
-
-	/* lightpen */
-	devcb_resolved_read8 m_in_lightpen_button_func;
-	devcb_resolved_read8 m_in_lightpen_x_func;
-	devcb_resolved_read8 m_in_lightpen_y_func;
+	devcb_resolved_write8			m_out_k_func;
 };
 
 
@@ -477,29 +465,14 @@ public:
     mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-class vic2e_device_interface
-{
-public:
-	vic2e_device_interface() {}
-	virtual ~vic2e_device_interface() {}
-
-    virtual DECLARE_READ_LINE_MEMBER( k0_r ) { return 1; }
-    virtual DECLARE_READ_LINE_MEMBER( k1_r ) { return 1; }
-    virtual DECLARE_READ_LINE_MEMBER( k2_r ) { return 1; }
-};
-
 
 // ======================> mos8564_device
 
-class mos8564_device :  public mos6567_device, public vic2e_device_interface
+class mos8564_device :  public mos6567_device
 {
 public:
     // construction/destruction
     mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-    DECLARE_READ_LINE_MEMBER( k0_r );
-    DECLARE_READ_LINE_MEMBER( k1_r );
-    DECLARE_READ_LINE_MEMBER( k2_r );
 };
 
 
@@ -529,15 +502,11 @@ public:
 
 // ======================> mos8566_device
 
-class mos8566_device :  public mos6569_device, public vic2e_device_interface
+class mos8566_device :  public mos6569_device
 {
 public:
     // construction/destruction
     mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-    DECLARE_READ_LINE_MEMBER( k0_r );
-    DECLARE_READ_LINE_MEMBER( k1_r );
-    DECLARE_READ_LINE_MEMBER( k2_r );
 };
 
 
