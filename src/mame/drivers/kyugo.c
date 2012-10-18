@@ -1374,7 +1374,6 @@ DRIVER_INIT_MEMBER(kyugo_state,gyrodine)
 
 DRIVER_INIT_MEMBER(kyugo_state,srdmissn)
 {
-
 	/* shared RAM is mapped at 0xe000 as well  */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0xe000, 0xe7ff, m_shared_ram);
 
@@ -1390,22 +1389,22 @@ DRIVER_INIT_MEMBER(kyugo_state,srdmissn)
  *
  *************************************/
 
-GAME( 1984, gyrodine,  0,        gyrodine, gyrodine, kyugo_state, gyrodine, ROT90, "Crux", "Gyrodine", GAME_SUPPORTS_SAVE )
-GAME( 1984, gyrodinet, gyrodine, gyrodine, gyrodine, kyugo_state, gyrodine, ROT90, "Crux (Taito Corporation license)", "Gyrodine (Taito Corporation license)", GAME_SUPPORTS_SAVE )
-GAME( 1984, buzzard,   gyrodine, gyrodine, gyrodine, kyugo_state, gyrodine, ROT90, "Crux", "Buzzard", GAME_SUPPORTS_SAVE )
-GAME( 1985, repulse,   0,        repulse,  repulse, driver_device,  0,        ROT90, "Sega", "Repulse", GAME_SUPPORTS_SAVE ) // by Crux?
-GAME( 1985, 99lstwar,  repulse,  repulse,  repulse, driver_device,  0,        ROT90, "Sega (Proma license)", "'99: The Last War (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, 99lstwara, repulse,  repulse,  repulse, driver_device,  0,        ROT90, "Sega (Proma license)", "'99: The Last War (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1985, 99lstwark, repulse,  repulse,  repulse, driver_device,  0,        ROT90, "Sega (Kyugo license)", "'99: The Last War (Kyugo)", GAME_SUPPORTS_SAVE )
-GAME( 1985, sonofphx,  repulse,  repulse,  repulse, driver_device,  0,        ROT90, "bootleg (Associated Overseas MFR, Inc)", "Son of Phoenix", GAME_SUPPORTS_SAVE )
-GAME( 1985, flashgal,  0,        repulse,  flashgal, driver_device, 0,        ROT0,  "Sega", "Flashgal (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, flashgala, flashgal, flashgala,flashgal, driver_device, 0,        ROT0,  "Sega", "Flashgal (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, srdmissn,  0,        srdmissn, srdmissn, kyugo_state, srdmissn, ROT90, "Taito Corporation", "S.R.D. Mission", GAME_SUPPORTS_SAVE )
-GAME( 1986, fx,        srdmissn, srdmissn, srdmissn, kyugo_state, srdmissn, ROT90, "bootleg", "F-X", GAME_SUPPORTS_SAVE )
-GAME( 1986, legend,    0,        legend,   legend, kyugo_state,   srdmissn, ROT0,  "Sega / Coreland", "Legend", GAME_SUPPORTS_SAVE ) // no copyright (maybe also a bootleg?)
-GAME( 1986, legendb,   legend,   legend,   legend, kyugo_state,   srdmissn, ROT0,  "bootleg", "Legion (bootleg of Legend)", GAME_SUPPORTS_SAVE ) // no copyright
-GAME( 1987, airwolf,   0,        srdmissn, airwolf, kyugo_state,  srdmissn, ROT0,  "Kyugo", "Airwolf", GAME_SUPPORTS_SAVE )
-GAME( 1987, airwolfa,  airwolf,  srdmissn, airwolf, kyugo_state,  srdmissn, ROT0,  "Kyugo (UA Theatre license)", "Airwolf (US)", GAME_SUPPORTS_SAVE )
-GAME( 1987, skywolf,   airwolf,  srdmissn, skywolf, kyugo_state,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, skywolf2,  airwolf,  srdmissn, airwolf, kyugo_state,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, skywolf3,  airwolf,  srdmissn, airwolf, kyugo_state,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1984, gyrodine,  0,        gyrodine,  gyrodine, kyugo_state,   gyrodine, ROT90, "Crux", "Gyrodine", GAME_SUPPORTS_SAVE )
+GAME( 1984, gyrodinet, gyrodine, gyrodine,  gyrodine, kyugo_state,   gyrodine, ROT90, "Crux (Taito Corporation license)", "Gyrodine (Taito Corporation license)", GAME_SUPPORTS_SAVE )
+GAME( 1984, buzzard,   gyrodine, gyrodine,  gyrodine, kyugo_state,   gyrodine, ROT90, "Crux", "Buzzard", GAME_SUPPORTS_SAVE )
+GAME( 1985, repulse,   0,        repulse,   repulse,  driver_device, 0,        ROT90, "Crux / Sega", "Repulse", GAME_SUPPORTS_SAVE )
+GAME( 1985, 99lstwar,  repulse,  repulse,   repulse,  driver_device, 0,        ROT90, "Crux / Proma", "'99: The Last War (set 1)", GAME_SUPPORTS_SAVE ) // Crux went bankrupt during Repulse development,
+GAME( 1985, 99lstwara, repulse,  repulse,   repulse,  driver_device, 0,        ROT90, "Crux / Proma", "'99: The Last War (set 2)", GAME_SUPPORTS_SAVE ) // some of their staff later worked on the newer games on this hardware,
+GAME( 1985, 99lstwark, repulse,  repulse,   repulse,  driver_device, 0,        ROT90, "Crux / Kyugo", "'99: The Last War (Kyugo)", GAME_SUPPORTS_SAVE ) // directly for Kyugo? (Flashgal, Legend, SRD Mission, Airwolf, Planet Probe)
+GAME( 1985, sonofphx,  repulse,  repulse,   repulse,  driver_device, 0,        ROT90, "bootleg (Associated Overseas MFR, Inc.)", "Son of Phoenix (bootleg of Repulse)", GAME_SUPPORTS_SAVE )
+GAME( 1985, flashgal,  0,        repulse,   flashgal, driver_device, 0,        ROT0,  "Kyugo / Sega", "Flashgal (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, flashgala, flashgal, flashgala, flashgal, driver_device, 0,        ROT0,  "Kyugo / Sega", "Flashgal (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, srdmissn,  0,        srdmissn,  srdmissn, kyugo_state,   srdmissn, ROT90, "Kyugo / Taito Corporation", "S.R.D. Mission", GAME_SUPPORTS_SAVE )
+GAME( 1986, fx,        srdmissn, srdmissn,  srdmissn, kyugo_state,   srdmissn, ROT90, "bootleg", "F-X (bootleg of S.R.D. Mission)", GAME_SUPPORTS_SAVE )
+GAME( 1986, legend,    0,        legend,    legend,   kyugo_state,   srdmissn, ROT0,  "Kyugo / Sega", "Legend", GAME_SUPPORTS_SAVE ) // no copyright (maybe also a bootleg?)
+GAME( 1986, legendb,   legend,   legend,    legend,   kyugo_state,   srdmissn, ROT0,  "bootleg", "Legion (bootleg of Legend)", GAME_SUPPORTS_SAVE ) // no copyright
+GAME( 1987, airwolf,   0,        srdmissn,  airwolf,  kyugo_state,   srdmissn, ROT0,  "Kyugo", "Airwolf", GAME_SUPPORTS_SAVE )
+GAME( 1987, airwolfa,  airwolf,  srdmissn,  airwolf,  kyugo_state,   srdmissn, ROT0,  "Kyugo (UA Theatre license)", "Airwolf (US)", GAME_SUPPORTS_SAVE )
+GAME( 1987, skywolf,   airwolf,  srdmissn,  skywolf,  kyugo_state,   srdmissn, ROT0,  "bootleg", "Sky Wolf (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, skywolf2,  airwolf,  srdmissn,  airwolf,  kyugo_state,   srdmissn, ROT0,  "bootleg", "Sky Wolf (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, skywolf3,  airwolf,  srdmissn,  airwolf,  kyugo_state,   srdmissn, ROT0,  "bootleg", "Sky Wolf (set 3)", GAME_SUPPORTS_SAVE )
