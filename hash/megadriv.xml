@@ -993,7 +993,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 <!-- This board contains no SRAM, despite the header reporting 16k of battery -->
-	<software name="espnnflp" cloneof="espnnfl" supported="no"> <!-- it freezes after head/tail -->
+	<software name="espnnflp" cloneof="espnnfl" supported="no"> <!-- it freezes at head/tail -->
 		<description>ESPN Sunday Night NFL (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -7778,7 +7778,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="espnnfl">
+	<software name="espnnfl" supported="no"> <!-- it freezes at head/tail -->
 		<description>ESPN Sunday Night NFL (USA)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -27136,6 +27136,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- this dump is 'double interleaved' in .smd AND .md format.. it's trash -->
 	<software name="tetris1" supported="no">
 		<description>Tetris (Pirate?)</description>
 		<year>199?</year>
