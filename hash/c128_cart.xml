@@ -42,10 +42,10 @@
 			<feature name="game" value="1" />
 			<feature name="exrom" value="1" />
 
-			<dataarea name="romh" size="0x18000">
+			<dataarea name="romh" size="0x20000">
 				<rom name="comal80.u1" size="0x8000" crc="65358f73" sha1="14b032b55d65b4c692ec4f0c0c5da07b28a5822d" offset="0x00000" />
 				<rom name="comal80.u2" size="0x8000" crc="2f9da033" sha1="8dcb465cb7b32af996d43c8a15d70e35e5c7d321" offset="0x08000" />
-				<rom name="comal80.u3" size="0x8000" crc="2f9da033" sha1="8dcb465cb7b32af996d43c8a15d70e35e5c7d321" offset="0x10000" />
+				<rom name="comal80.u3" size="0x8000" crc="2f9da033" sha1="8dcb465cb7b32af996d43c8a15d70e35e5c7d321" offset="0x18000" />
 			</dataarea>
 		</part>
 	</software>

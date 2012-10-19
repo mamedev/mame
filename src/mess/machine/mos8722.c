@@ -382,14 +382,14 @@ offs_t mos8722_device::ta_r(offs_t offset, int aec, int *ms0, int *ms1, int *ms2
 				else if (offset >= 0x8000 && offset < 0xc000)
 				{
 					// middle ROM
-					*ms0 = BIT(CR_ROM_MID, 0);
-					*ms1 = BIT(CR_ROM_MID, 1);
+					*ms0 = BIT(CR_ROM_MID, 1);
+					*ms1 = BIT(CR_ROM_MID, 0);
 				}
 				else if (offset >= 0xc000)
 				{
 					// high ROM
-					*ms0 = BIT(CR_ROM_HI, 0);
-					*ms1 = BIT(CR_ROM_HI, 1);
+					*ms0 = BIT(CR_ROM_HI, 1);
+					*ms1 = BIT(CR_ROM_HI, 0);
 				}
 
 				if (*ms0 && *ms1)
