@@ -33,44 +33,31 @@
 
 const device_type FMSCSI = &device_creator<fmscsi_device>;
 
-void fmscsi_device::device_config_complete()
-{
-    // copy static configuration if present
-	const FMSCSIinterface *intf = reinterpret_cast<const FMSCSIinterface *>(static_config());
-	if (intf != NULL)
-		*static_cast<FMSCSIinterface *>(this) = *intf;
-
-    // otherwise, initialize it to defaults
-    else
-    {
-		memset(&irq_callback,0,sizeof(irq_callback));
-		memset(&drq_callback,0,sizeof(drq_callback));
-    }
-}
-
 /*
  * Device
  */
 
 fmscsi_device::fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, FMSCSI, "FM-SCSI", tag, owner, clock)
+	: device_t(mconfig, FMSCSI, "FM-SCSI", tag, owner, clock),
+	m_irq_handler(*this),
+	m_drq_handler(*this)
 {
 }
 
 void fmscsi_device::device_start()
 {
-    m_input_lines = 0;
-    m_output_lines = 0;
-    m_data = 0;
-    m_command_index = 0;
-    m_last_id = 0;
-    m_target = 0;
-    m_phase = SCSI_PHASE_BUS_FREE;
+	m_input_lines = 0;
+	m_output_lines = 0;
+	m_data = 0;
+	m_command_index = 0;
+	m_last_id = 0;
+	m_target = 0;
+	m_phase = SCSI_PHASE_BUS_FREE;
 
-    m_irq_func.resolve(irq_callback,*this);
-    m_drq_func.resolve(drq_callback,*this);
+	m_irq_handler.resolve_safe();
+	m_drq_handler.resolve_safe();
 
-    memset(m_SCSIdevices,0,sizeof(m_SCSIdevices));
+	memset(m_SCSIdevices,0,sizeof(m_SCSIdevices));
 
 	// try to open the devices
 	for( device_t *device = owner()->first_subdevice(); device != NULL; device = device->next() )
@@ -82,23 +69,23 @@ void fmscsi_device::device_start()
 		}
 	}
 
-    // allocate read timer
-    m_transfer_timer = timer_alloc(TIMER_TRANSFER);
-    m_phase_timer = timer_alloc(TIMER_PHASE);
+	// allocate read timer
+	m_transfer_timer = timer_alloc(TIMER_TRANSFER);
+	m_phase_timer = timer_alloc(TIMER_PHASE);
 }
 
 void fmscsi_device::device_reset()
 {
-    m_input_lines = 0;
-    m_output_lines = 0;
-    m_data = 0;
-    m_command_index = 0;
-    m_last_id = 0;
-    m_target = 0;
-    m_result_length = 0;
-    m_result_index = 0;
+	m_input_lines = 0;
+	m_output_lines = 0;
+	m_data = 0;
+	m_command_index = 0;
+	m_last_id = 0;
+	m_target = 0;
+	m_result_length = 0;
+	m_result_index = 0;
 
-    m_phase = SCSI_PHASE_BUS_FREE;
+	m_phase = SCSI_PHASE_BUS_FREE;
 }
 
 // get the length of a SCSI command based on it's command byte type
@@ -126,7 +113,7 @@ void fmscsi_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		//logerror("FMSCSI: timer triggered: %i/%i\n",m_result_index,m_result_length);
 		if(m_output_lines & FMSCSI_LINE_DMAE)
 		{
-			m_drq_func(1);
+			m_drq_handler(1);
 		}
 		break;
 	case TIMER_PHASE:
@@ -156,7 +143,7 @@ UINT8 fmscsi_device::fmscsi_data_r(void)
 			m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_STATUS);
 			if(m_output_lines & FMSCSI_LINE_DMAE)
 			{
-				m_drq_func(0);
+				m_drq_handler(0);
 			}
 			logerror("FMSCSI: Stopping transfer : (%i/%i)\n",m_result_index,m_result_length);
 		}
@@ -220,7 +207,7 @@ void fmscsi_device::fmscsi_data_w(UINT8 data)
 			m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_STATUS);
 			if(m_output_lines & FMSCSI_LINE_DMAE)
 			{
-				m_drq_func(0);
+				m_drq_handler(0);
 			}
 			logerror("FMSCSI: Stopping transfer : (%i/%i)\n",m_result_index,m_result_length);
 		}
@@ -331,7 +318,7 @@ void fmscsi_device::set_input_line(UINT8 line, UINT8 state)
 			if(m_output_lines & FMSCSI_LINE_IMSK && m_phase != SCSI_PHASE_DATAIN && m_phase != SCSI_PHASE_DATAOUT)
 			{
 				set_input_line(FMSCSI_LINE_INT,1);
-				m_irq_func(1);
+				m_irq_handler(1);
 				logerror("FMSCSI: IRQ high\n");
 			}
 		}
@@ -340,7 +327,7 @@ void fmscsi_device::set_input_line(UINT8 line, UINT8 state)
 			if(m_output_lines & FMSCSI_LINE_IMSK && m_phase != SCSI_PHASE_DATAIN && m_phase != SCSI_PHASE_DATAOUT)
 			{
 				set_input_line(FMSCSI_LINE_INT,0);
-				m_irq_func(0);
+				m_irq_handler(0);
 				logerror("FMSCSI: IRQ low\n");
 			}
 		}
