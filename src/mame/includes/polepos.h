@@ -6,6 +6,7 @@
 
 #include "devlegcy.h"
 #include "sound/discrete.h"
+#include "sound/tms5220.h"
 
 
 class polepos_state : public driver_device
@@ -13,11 +14,13 @@ class polepos_state : public driver_device
 public:
 	polepos_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
+		m_tms(*this, "tms"),
 		m_sprite16_memory(*this, "sprite16_memory"),
 		m_road16_memory(*this, "road16_memory"),
 		m_alpha16_memory(*this, "alpha16_memory"),
 		m_view16_memory(*this, "view16_memory"){ }
 
+	optional_device<tms5220n_device> m_tms;
 	UINT8 m_steer_last;
 	UINT8 m_steer_delta;
 	INT16 m_steer_accum;
