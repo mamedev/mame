@@ -43,14 +43,18 @@
     - Datenshi Kyouko: gfx garbage on the right edge?
     - Final Crisis: sound stuck with OPNA?
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
+    - Game Music Library: "Disk I/O error on 3040", starting from Sorcerian item
+    - Gaudi - Barcelona no Kaze: fails PCM loading
     - GeGeGe no Kitarou: title screen text/bitmap contrast is pretty ugly (BTANB?);
     - Grobda: palette is ugly (parent pc8801 only);
     - Makaimura: after losing a life the game doesn't work properly anymore, copy protection?
     - Music Collection Vol. 2 - Final Fantasy Tokushuu: sound irq dies pretty soon
     - N-BASIC: cursor doesn't show up;
+    - The Return of Ishtar: z80 exception after entering the name
     - Star Cruiser: bad kanji data?
     - Star Cruiser: reads at i/o 0x8e?
     - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
+    - WerDragon: no BGMs
     - Xevious: game is too fast (parent pc8801 only)
 
     list of games/apps that crashes due of floppy issues (* -> denotes games fixed with current floppy code, # -> regressed with current floppy code):
@@ -73,41 +77,40 @@
     - Castle Excellent (sets sector 0xf4? Jumps to 0xa100 and it shouldn't) (REGRESSED with current floppy code)
     - Card Game Pro 8.8k Plus Unit 1 (prints Disk i/o error 135 in vram, not visible for whatever reason)
     - Championship Lode Runner (fdc CPU irq doesn't fire anymore)
-    # Change Vol. 1 (fdc CPU irq doesn't fire anymore)
+    - Change Vol. 1 (stops at PCM loading)
     - Chikyuu Boueigun (disk i/o error during "ESDF SYSTEM LOADING") (REGRESSED with current floppy code)
     * Chikyuu Senshi Rayieza (fdc CPU crashes)
     - Choplifter
     - Columns (code at 0x28c8, copy protection)
     - Corridor ("THIS SYSTEM NOT KOEI SYSTEM" printed on screen) (REGRESSED with current floppy code)
     # Craze (returns to basic after logo pops up, tries to self-modify program data via the window offset?)
-    # Crimson
+    * Crimson
     * Crimson 3
     * Cuby Panic (copy protection routine at 0x911A)
-    # Daidasso (prints "BOOT dekimasen" on screen -> can't boot)
-    - Daikoukai Jidai
-
+    - Daidasso (prints "BOOT dekimasen" on screen -> can't boot)
+    - Daikoukai Jidai (YSHELL.COM error)
     - Databox (app)
-    # Day Dream (hangs at the CrossMedia Soft logo)
+    - Day Dream ("Bad drive number at 570")
     - Demons Ring
-    - Dennou Tsuushin
+    * Dennou Tsuushin
     - Door Door MK-2 (sets up TC in the middle of execution phase read then wants status bit 6 to be low PC=0x7050 of fdc cpu)
-    - Dragon Slayer - The Legend of Heroes 2
+    * Dragon Slayer - The Legend of Heroes 2
     - Dungeon Buster
-    - El Dorado Denki
-    - Elevator Action
-    - Emerald Densetsu
+    * El Dorado Denki
+    * Elevator Action
+    - Emerald Densetsu (dies after few seconds of intro)
     - Emerald Dragon (it seems to miss a timer)
     - Emmy
     - Explosion (fails to load ADPCM data?)
-    - F-15 Strike Eagle
+    * F15 Strike Eagle
     - F2 Grand Prix ("Boot dekimasen")
-    - Fangs - The Saga of Wolf Blood (Crashes at the first random battle)
+    # Fangs - The Saga of Wolf Blood (Crashes at the first random battle)
     - Fantasian
     * Final Zone
-    - Final Zone (demo)
+    # Final Zone (demo) (REGRESSION: asserts at MESS boot)
     - Fruit Panic
     - FSD Sample Ongaku Shuu Vol. 1-7
-    - Gaia no Kiba
+    - Gaia no Kiba (Disk I/O error at 150)
     - Gaiflame
     - Gambler Jiko Chuushin ha
     - Gambler Jiko Chuushin ha 2
@@ -115,11 +118,11 @@
     - Gambler Jiko Chuushin ha 3 (demo)
     - Gambler Jiko Chuushin ha Mahjong Puzzle Collection
     - Gambler Jiko Chuushin ha Mahjong Puzzle Collection (demo)
-    - Game Music Library
-    - Gaudi - Barcelona no Kaze (bad Wolfteam logo then black screen)
+    * Game Music Library
+    * Gaudi - Barcelona no Kaze (bad Wolfteam logo then black screen)
     - GC-clusterz Music Disk Vol. 1-7
-    - Genji
-    - Gokuraku Tengoku
+    * Genji
+    * Gokuraku Tengoku
     - Grodius 3 (might not be floppy)
     - Gun Ship (at gameplay)
     (Hacker)
@@ -135,7 +138,7 @@
     - Pattern Editor 88 (app)
     - Super Shunbo II (app) (Load error)
     - Super TII (app)
-    - The Return of Ishtar
+    * The Return of Ishtar
     - Tobira wo Akete (random crashes in parent pc8801 only)
 
     list of games that doesn't like i8214_irq_level == 5 in sound irq
