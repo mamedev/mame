@@ -180,10 +180,11 @@ void debug_view_memory::enumerate_sources()
 		if (itemname == NULL)
 			break;
 
-		// if this is a single-entry global, add it
-        if (strstr(itemname, "state->"))
+		// add pretty much anything that's not a timer (we may wish to cull other items later)
+        // also, don't trim the front of the name, it's important to know which VIA6522 we're looking at, e.g.
+        if (strncmp(itemname, "timer/", 6))
 		{
-			name.cpy(strrchr(itemname, '/') + 1);
+            name.cpy(itemname);
 			m_source_list.append(*auto_alloc(machine(), debug_view_memory_source(name, base, valsize, valcount)));
 		}
 	}
