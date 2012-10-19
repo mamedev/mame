@@ -58,12 +58,12 @@ ADDRESS_MAP_END
 
 INPUT_PORTS_START( coco_analog_control )
 	PORT_START(CTRL_SEL_TAG)  /* Select Controller Type */
-	PORT_CONFNAME( 0x0f, 0x01, "Right Controller Port (P1)")			PORT_CHANGED_MEMBER(DEVICE_SELF, coco_state,  coco_state::joystick_mode_changed, 0 )
+	PORT_CONFNAME( 0x0f, 0x01, "Right Controller Port (P1)")			PORT_CHANGED_MEMBER(DEVICE_SELF, coco_state,  joystick_mode_changed, 0 )
 	PORT_CONFSETTING(  0x00, "Unconnected" )
 	PORT_CONFSETTING(  0x01, "Joystick" )
 	PORT_CONFSETTING(  0x02, "The Rat Graphics Mouse" )					PORT_CONDITION(CTRL_SEL_TAG, 0xf0, NOTEQUALS, 0x20)
 	PORT_CONFSETTING(  0x03, "Diecom Light Gun Adaptor" )				PORT_CONDITION(CTRL_SEL_TAG, 0xf0, NOTEQUALS, 0x30)
-	PORT_CONFNAME( 0xf0, 0x10, "Left Controller Port (P2)")				PORT_CHANGED_MEMBER(DEVICE_SELF, coco_state,  coco_state::joystick_mode_changed, 0 )
+	PORT_CONFNAME( 0xf0, 0x10, "Left Controller Port (P2)")				PORT_CHANGED_MEMBER(DEVICE_SELF, coco_state,  joystick_mode_changed, 0 )
 	PORT_CONFSETTING(  0x00, "Unconnected" )
 	PORT_CONFSETTING(  0x10, "Joystick" )
 	PORT_CONFSETTING(  0x20, "The Rat Graphics Mouse" )					PORT_CONDITION(CTRL_SEL_TAG, 0x0f, NOTEQUALS, 0x02)
