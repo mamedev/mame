@@ -18,6 +18,7 @@
 #include "imagedev/flopdrv.h"
 #include "machine/6532riot.h"
 #include "machine/ieee488.h"
+#include "machine/wd17xx.h"
 
 
 
@@ -45,13 +46,14 @@ public:
 	DECLARE_WRITE8_MEMBER( riot1_pa_w );
 	DECLARE_READ8_MEMBER( riot1_pb_r );
 	DECLARE_WRITE8_MEMBER( riot1_pb_w );
+	DECLARE_READ8_MEMBER( fk5_r );
+	DECLARE_WRITE8_MEMBER( fk5_w );
 
 protected:
     // device-level overrides
+    virtual void device_config_complete() { m_shortname = "c8280"; }
     virtual void device_start();
 	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-    virtual void device_config_complete();
 
 	// device_ieee488_interface overrides
 	void ieee488_atn(int state);
@@ -64,13 +66,16 @@ private:
 	required_device<cpu_device> m_fdccpu;
 	required_device<riot6532_device> m_riot0;
 	required_device<riot6532_device> m_riot1;
-	required_device<device_t> m_image0;
-	required_device<device_t> m_image1;
+	required_device<fd1797_device> m_fdc;
+	required_device<legacy_floppy_image_device> m_image0;
+	required_device<legacy_floppy_image_device> m_image1;
 
 	// IEEE-488 bus
 	int m_rfdo;							// not ready for data output
 	int m_daco;							// not data accepted output
 	int m_atna;							// attention acknowledge
+
+	UINT8 m_fk5;
 };
 
 

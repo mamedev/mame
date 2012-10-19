@@ -7,6 +7,14 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+
+	- FDC CPU ROM is line swapped/bad dump?
+
+*/
+
 #include "c8280.h"
 
 
@@ -19,6 +27,7 @@
 #define M6502_FDC_TAG	"9e"
 #define M6532_0_TAG		"9f"
 #define M6532_1_TAG		"9g"
+#define WD1797_TAG		"5e"
 
 
 enum
@@ -36,18 +45,6 @@ enum
 //**************************************************************************
 
 const device_type C8280 = &device_creator<c8280_device>;
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void c8280_device::device_config_complete()
-{
-	m_shortname = "c8280";
-}
 
 
 //-------------------------------------------------
@@ -79,14 +76,14 @@ const rom_entry *c8280_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( c8280_main_mem, AS_PROGRAM, 8, c8280_device )
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_RAM // 6532 #1
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM // 6532 #2
-	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0d60) AM_DEVREADWRITE_LEGACY(M6532_0_TAG, riot6532_r, riot6532_w)
-	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d60) AM_DEVREADWRITE_LEGACY(M6532_1_TAG, riot6532_r, riot6532_w)
-	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share4")
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x100) AM_RAM // 6532 #1
+	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x100) AM_RAM // 6532 #2
+	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0xd60) AM_DEVREADWRITE_LEGACY(M6532_0_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0xd60) AM_DEVREADWRITE_LEGACY(M6532_1_TAG, riot6532_r, riot6532_w)
+	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0xc00) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0xc00) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0xc00) AM_RAM AM_SHARE("share3")
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xc00) AM_RAM AM_SHARE("share4")
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(M6502_DOS_TAG, 0)
 ADDRESS_MAP_END
 
@@ -98,10 +95,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( c8280_fdc_mem, AS_PROGRAM, 8, c8280_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x380) AM_RAM
+	AM_RANGE(0x0080, 0x0081) AM_MIRROR(0x7e) AM_DEVREADWRITE_LEGACY(WD1797_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("share4")
+	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x3ff) AM_READWRITE(fk5_r, fk5_w)
 	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION(M6502_FDC_TAG, 0)
 ADDRESS_MAP_END
 
@@ -300,15 +299,7 @@ static const riot6532_interface riot1_intf =
 
 
 //-------------------------------------------------
-//  LEGACY_FLOPPY_OPTIONS( c8280 )
-//-------------------------------------------------
-
-static LEGACY_FLOPPY_OPTIONS_START( c8280 )
-LEGACY_FLOPPY_OPTIONS_END
-
-
-//-------------------------------------------------
-//  floppy_interface c8280_floppy_interface
+//  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
 static const floppy_interface c8280_floppy_interface =
@@ -319,9 +310,17 @@ static const floppy_interface c8280_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_8_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(c8280),
+	LEGACY_FLOPPY_OPTIONS_NAME(default),
 	"floppy_8",
 	NULL
+};
+
+static struct wd17xx_interface fdc_intf = 
+{
+	DEVCB_NULL,
+	DEVCB_CPU_INPUT_LINE(M6502_FDC_TAG, M6502_IRQ_LINE),
+	DEVCB_CPU_INPUT_LINE(M6502_FDC_TAG, M6502_SET_OVERFLOW),
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
 
@@ -330,14 +329,16 @@ static const floppy_interface c8280_floppy_interface =
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c8280 )
-	MCFG_CPU_ADD(M6502_DOS_TAG, M6502, 1000000)
+	MCFG_CPU_ADD(M6502_DOS_TAG, M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(c8280_main_mem)
 
-	MCFG_RIOT6532_ADD(M6532_0_TAG, 1000000, riot0_intf)
-	MCFG_RIOT6532_ADD(M6532_1_TAG, 1000000, riot1_intf)
+	MCFG_RIOT6532_ADD(M6532_0_TAG, XTAL_12MHz/8, riot0_intf)
+	MCFG_RIOT6532_ADD(M6532_1_TAG, XTAL_12MHz/8, riot1_intf)
 
-	MCFG_CPU_ADD(M6502_FDC_TAG, M6502, 1000000)
+	MCFG_CPU_ADD(M6502_FDC_TAG, M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(c8280_fdc_mem)
+
+	MCFG_FD1797_ADD(WD1797_TAG, fdc_intf)
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(c8280_floppy_interface)
 MACHINE_CONFIG_END
@@ -389,6 +390,7 @@ c8280_device::c8280_device(const machine_config &mconfig, const char *tag, devic
 	  m_fdccpu(*this, M6502_FDC_TAG),
 	  m_riot0(*this, M6532_0_TAG),
 	  m_riot1(*this, M6532_1_TAG),
+	  m_fdc(*this, WD1797_TAG),
 	  m_image0(*this, FLOPPY_0),
 	  m_image1(*this, FLOPPY_1),
 	  m_rfdo(1),
@@ -404,6 +406,11 @@ c8280_device::c8280_device(const machine_config &mconfig, const char *tag, devic
 
 void c8280_device::device_start()
 {
+	// state saving
+	save_item(NAME(m_rfdo));
+	save_item(NAME(m_daco));
+	save_item(NAME(m_atna));	
+	save_item(NAME(m_fk5));
 }
 
 
@@ -413,15 +420,24 @@ void c8280_device::device_start()
 
 void c8280_device::device_reset()
 {
-}
+	m_maincpu->reset();
 
+	// toggle M6502 SO
+	m_maincpu->set_input_line(M6502_SET_OVERFLOW, ASSERT_LINE);
+	m_maincpu->set_input_line(M6502_SET_OVERFLOW, CLEAR_LINE);
 
-//-------------------------------------------------
-//  device_timer - handler timer events
-//-------------------------------------------------
+	m_fdccpu->reset();
 
-void c8280_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
+	m_riot0->reset();
+	m_riot1->reset();
+
+	wd17xx_mr_w(m_fdc, 1);
+	wd17xx_mr_w(m_fdc, 0);
+
+	m_fk5 = 0;
+	wd17xx_dden_w(m_fdc, 0);
+	floppy_mon_w(m_image0, 1);
+	floppy_mon_w(m_image1, 1);
 }
 
 
@@ -448,4 +464,68 @@ void c8280_device::ieee488_ifc(int state)
 	{
 		device_reset();
 	}
+}
+
+READ8_MEMBER( c8280_device::fk5_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       DS1
+	    1       DS2
+	    2       _DDEN
+	    3       DCHG
+	    4       TSID
+	    5       MOTOR ENABLE
+	    6       0
+	    7       0
+	
+	*/
+
+	UINT8 data = m_fk5;
+
+	if (BIT(m_fk5, 0))
+	{
+		data |= floppy_dskchg_r(m_image0) << 3;
+		data |= floppy_twosid_r(m_image0) << 4;
+	}
+	else if (BIT(m_fk5, 1))
+	{
+		data |= floppy_dskchg_r(m_image1) << 3;
+		data |= floppy_twosid_r(m_image1) << 4;
+	}
+
+	return data;
+}
+
+WRITE8_MEMBER( c8280_device::fk5_w )
+{
+	/*
+	
+	    bit     description
+	
+	    0       DS1
+	    1       DS2
+	    2       _DDEN
+	    3       
+	    4       
+	    5       MOTOR ENABLE
+	    6       
+	    7       
+	
+	*/
+
+	m_fk5 = data & 0x3f;
+
+	// drive select
+	if (BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
+	if (BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
+
+	// density select
+	wd17xx_dden_w(m_fdc, BIT(data, 2));
+
+	// motor enable
+	floppy_mon_w(m_image0, !BIT(data, 5));
+	floppy_mon_w(m_image1, !BIT(data, 5));
 }
