@@ -94,6 +94,8 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(acommand_scanline);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask);
+	void draw_led(bitmap_ind16 &bitmap, int x, int y,UINT8 value);
 };
 
 
@@ -124,13 +126,12 @@ TILE_GET_INFO_MEMBER(acommand_state::ac_get_tx_tile_info)
 			0);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask)
+void acommand_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask)
 {
-	acommand_state *state = machine.driver_data<acommand_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	int offs;
 
-	for (offs = 0;offs < state->m_spriteram.bytes()/2;offs += 8)
+	for (offs = 0;offs < m_spriteram.bytes()/2;offs += 8)
 	{
 		if (!(spriteram16[offs+0] & 0x1000))
 		{
@@ -147,12 +148,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			int xx,yy,x;
 			int delta = 16;
 
-			flipx ^= state->flip_screen();
-			flipy ^= state->flip_screen();
+			flipx ^= flip_screen();
+			flipy ^= flip_screen();
 
 			if ((pri&pri_mask)!=priority) continue;
 
-			if (state->flip_screen())
+			if (flip_screen())
 			{
 				sx = 368 - sx;
 				sy = 240 - sy;
@@ -166,7 +167,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 				xx = w;
 				do
 				{
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 							code,
 							color,
 							flipx, flipy,
@@ -216,7 +217,7 @@ g & 40
 /*                                    0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f*/
 static const UINT8 led_fill[0x10] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x00,0x00,0x00,0x00,0x00,0x00};
 
-static void draw_led(bitmap_ind16 &bitmap, int x, int y,UINT8 value)
+void acommand_state::draw_led(bitmap_ind16 &bitmap, int x, int y,UINT8 value)
 {
 	bitmap.plot_box(x, y, 6, 10, 0x00000000);
 
@@ -254,7 +255,7 @@ static void draw_led(bitmap_ind16 &bitmap, int x, int y,UINT8 value)
 UINT32 acommand_state::screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(),bitmap,cliprect,0,0);
+	draw_sprites(bitmap,cliprect,0,0);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 
 	/*Order might be wrong,but these for sure are the led numbers tested*/

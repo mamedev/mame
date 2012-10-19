@@ -168,17 +168,10 @@ TIMER_CALLBACK_MEMBER(aces1_state::m_aces1_nmi_timer_callback)
 	aces1_reset_nmi_timer();
 }
 
-static void aces1_create_timers(running_machine &machine)
-{
-	aces1_state *state = machine.driver_data<aces1_state>();
-
-	state->m_aces1_irq_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(aces1_state::m_aces1_irq_timer_callback),state), 0);
-	state->m_aces1_nmi_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(aces1_state::m_aces1_nmi_timer_callback),state), 0);
-}
-
 void aces1_state::machine_start()
 {
-	aces1_create_timers(machine());
+	m_aces1_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aces1_state::m_aces1_irq_timer_callback),this), 0);
+	m_aces1_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aces1_state::m_aces1_nmi_timer_callback),this), 0);
 }
 
 void aces1_state::machine_reset()

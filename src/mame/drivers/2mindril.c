@@ -67,6 +67,7 @@ public:
 	//INTERRUPT_GEN_MEMBER(drill_device_irq);
 	TIMER_CALLBACK_MEMBER(shutter_req);
 	TIMER_CALLBACK_MEMBER(defender_req);
+	void tile_decode();
 };
 
 
@@ -494,12 +495,12 @@ ROM_START( 2mindril )
 	ROM_RELOAD(              0x600000, 0x200000 )
 ROM_END
 
-static void tile_decode(running_machine &machine)
+void _2mindril_state::tile_decode()
 {
 	UINT8 lsb,msb;
 	UINT32 offset,i;
-	UINT8 *gfx = machine.root_device().memregion("gfx2")->base();
-	int size=machine.root_device().memregion("gfx2")->bytes();
+	UINT8 *gfx = machine().root_device().memregion("gfx2")->base();
+	int size=machine().root_device().memregion("gfx2")->bytes();
 	int data;
 
 	/* Setup ROM formats:
@@ -531,8 +532,8 @@ static void tile_decode(running_machine &machine)
 		offset+=4;
 	}
 
-	gfx = machine.root_device().memregion("gfx1")->base();
-	size=machine.root_device().memregion("gfx1")->bytes();
+	gfx = machine().root_device().memregion("gfx1")->base();
+	size=machine().root_device().memregion("gfx1")->bytes();
 
 	offset = size/2;
 	for (i = size/2+size/4; i<size; i++)
@@ -557,7 +558,7 @@ static void tile_decode(running_machine &machine)
 DRIVER_INIT_MEMBER(_2mindril_state,drill)
 {
 	m_f3_game=TMDRILL;
-	tile_decode(machine());
+	tile_decode();
 }
 
 GAME( 1993, 2mindril,    0,        drill,    drill, _2mindril_state,    drill, ROT0,  "Taito", "Two Minute Drill", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_MECHANICAL)

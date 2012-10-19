@@ -42,25 +42,25 @@ public:
 	UINT32 screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(acefruit_vblank);
 	TIMER_CALLBACK_MEMBER(acefruit_refresh);
+	void acefruit_update_irq(int vpos);
 };
 
 
 
-static void acefruit_update_irq(running_machine &machine, int vpos )
+void acefruit_state::acefruit_update_irq(int vpos)
 {
-	acefruit_state *state = machine.driver_data<acefruit_state>();
 	int col;
 	int row = vpos / 8;
 
 	for( col = 0; col < 32; col++ )
 	{
 		int tile_index = ( col * 32 ) + row;
-		int color = state->m_colorram[ tile_index ];
+		int color = m_colorram[ tile_index ];
 
 		switch( color )
 		{
 		case 0x0c:
-			machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE );
+			machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE );
 			break;
 		}
 	}
@@ -72,7 +72,7 @@ TIMER_CALLBACK_MEMBER(acefruit_state::acefruit_refresh)
 	int vpos = machine().primary_screen->vpos();
 
 	machine().primary_screen->update_partial(vpos );
-	acefruit_update_irq(machine(), vpos );
+	acefruit_update_irq(vpos);
 
 	vpos = ( ( vpos / 8 ) + 1 ) * 8;
 

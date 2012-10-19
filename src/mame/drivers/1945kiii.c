@@ -77,6 +77,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_k3_bg_tile_info);
 	virtual void machine_start();
 	virtual void video_start();
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -98,12 +99,11 @@ void k3_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k3_state::get_k3_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 64);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	k3_state *state = machine.driver_data<k3_state>();
-	gfx_element *gfx = machine.gfx[0];
-	UINT16 *source = state->m_spriteram_1;
-	UINT16 *source2 = state->m_spriteram_2;
+	gfx_element *gfx = machine().gfx[0];
+	UINT16 *source = m_spriteram_1;
+	UINT16 *source2 = m_spriteram_2;
 	UINT16 *finish = source + 0x1000 / 2;
 
 	while (source < finish)
@@ -127,7 +127,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 UINT32 k3_state::screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
 

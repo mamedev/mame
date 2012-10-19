@@ -71,6 +71,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void ace_postload();
 };
 
 
@@ -319,18 +320,18 @@ static GFXDECODE_START( ace )
 	GFXDECODE_ENTRY( NULL          , 0x8000, scorelayout, 0, 2 )    /* the game dynamically modifies this */
 GFXDECODE_END
 
-static void ace_postload(running_machine &machine)
+void aceal_state::ace_postload()
 {
-	machine.gfx[1]->mark_dirty(0);
-	machine.gfx[2]->mark_dirty(0);
-	machine.gfx[3]->mark_dirty(0);
-	machine.gfx[4]->mark_dirty(0);
+	machine().gfx[1]->mark_dirty(0);
+	machine().gfx[2]->mark_dirty(0);
+	machine().gfx[3]->mark_dirty(0);
+	machine().gfx[4]->mark_dirty(0);
 }
 
 void aceal_state::machine_start()
 {
 	save_item(NAME(m_objpos));
-	machine().save().register_postload(save_prepost_delegate(FUNC(ace_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(aceal_state::ace_postload), this));
 }
 
 void aceal_state::machine_reset()

@@ -172,23 +172,21 @@ WRITE8_MEMBER(_20pacgal_state::_20pacgal_coin_counter_w)
  *
  *************************************/
 
-static void set_bankptr(running_machine &machine)
+void _20pacgal_state::set_bankptr()
 {
-	_20pacgal_state *state =  machine.driver_data<_20pacgal_state>();
-	if (state->m_game_selected == 0)
+	if (m_game_selected == 0)
 	{
-		UINT8 *rom = state->memregion("maincpu")->base();
-		state->membank("bank1")->set_base(rom + 0x08000);
+		UINT8 *rom = memregion("maincpu")->base();
+		membank("bank1")->set_base(rom + 0x08000);
 	}
 	else
-		state->membank("bank1")->set_base(state->m_ram_48000);
+		membank("bank1")->set_base(m_ram_48000);
 }
 
 WRITE8_MEMBER(_20pacgal_state::ram_bank_select_w)
 {
-
 	m_game_selected = data & 1;
-	set_bankptr(machine());
+	set_bankptr();
 }
 
 WRITE8_MEMBER(_20pacgal_state::ram_48000_w)
@@ -351,7 +349,7 @@ void _20pacgal_state::machine_start()
 	save_item(NAME(m_ram_48000));
 	save_item(NAME(m_irq_mask));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(set_bankptr), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(_20pacgal_state::set_bankptr), this));
 }
 
 void _20pacgal_state::machine_reset()

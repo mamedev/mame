@@ -56,6 +56,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void set_bankptr();
 };
 
 
