@@ -633,20 +633,18 @@ c116
 c232
 v364
 
-c128	  // Commodore 128 - NTSC
-c128cr	// Commodore 128CR - NTSC (proto?)
-c128_se   // Commodore 128 - PAL (Swedish / Finnish)
-//c128_rr   // Commodore 128 - PAL (French)
-c128_de   // Commodore 128 - PAL (German)
-//c128_no   // Commodore 128 - PAL (Norwegian)
-c128d	 // Commodore 128D - PAL
-c128dpr   // Commodore 128D - NTSC (proto)
-c128dcr   // Commodore 128DCR - NTSC
-c128dr_de  // Commodore 128DCR - PAL (German)
-//c128dr_it  // Commodore 128DCR - PAL (Italian)
-c128dr_se  // Commodore 128DCR - PAL (Swedish)
-c128d81   // Commodore 128D/81
-
+c128
+c128p
+c128_de
+c128_se
+c128d
+c128dp
+c128cr
+c128dcr
+c128dcrp
+c128dcr_de
+c128dcr_se
+c128d81
 
 ami1000	  // Commodore Amiga 1000
 ami1000n  //

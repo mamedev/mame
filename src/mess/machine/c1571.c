@@ -593,25 +593,6 @@ static const floppy_interface c1570_floppy_interface =
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( c1571 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_FRAGMENT( c1571 )
-	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
-	MCFG_CPU_PROGRAM_MAP(c1571_mem)
-	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
-
-	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, via0_intf)
-	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, via1_intf)
-	MCFG_MOS6526_ADD(M6526_TAG, XTAL_16MHz/16, 0, cia_intf)
-	MCFG_WD1770_ADD(WD1770_TAG, /* XTAL_16MHz/2, */ fdc_intf)
-
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_interface)
-	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
-MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( c1570 )
 //-------------------------------------------------
 
@@ -631,6 +612,44 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
+//  MACHINE_DRIVER( c1571 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_FRAGMENT( c1571 )
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+	MCFG_CPU_PROGRAM_MAP(c1571_mem)
+	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
+
+	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, via0_intf)
+	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, via1_intf)
+	MCFG_MOS6526_ADD(M6526_TAG, XTAL_16MHz/16, 0, cia_intf)
+	MCFG_WD1770_ADD(WD1770_TAG, /* XTAL_16MHz/2, */ fdc_intf)
+
+	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_interface)
+	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_DRIVER( c1571cr )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_FRAGMENT( c1571cr )
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+	MCFG_CPU_PROGRAM_MAP(c1571_mem)
+	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
+
+	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, via0_intf)
+	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, via1_intf)
+	MCFG_MOS5710_ADD(M6526_TAG, XTAL_16MHz/16, 0, cia_intf)
+	MCFG_WD1770_ADD(WD1770_TAG, /* XTAL_16MHz/2, */ fdc_intf)
+
+	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_interface)
+	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
@@ -643,7 +662,11 @@ machine_config_constructor base_c1571_device::device_mconfig_additions() const
 		return MACHINE_CONFIG_NAME( c1570 );
 
 	default:
+	case TYPE_1571:
 		return MACHINE_CONFIG_NAME( c1571 );
+
+	case TYPE_1571CR:
+		return MACHINE_CONFIG_NAME( c1571cr );
 	}
 }
 

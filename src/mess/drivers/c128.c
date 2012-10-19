@@ -2,8 +2,12 @@
 
     TODO:
 
+	- charom address
+	- VDC colors
+    - connect CAPS LOCK to charom A12 on international variants
+	- DCR models won't boot with 1571CR drive
     - fix fast serial
-    - clean up inputs
+    - remove frame interrupt handler
     - expansion DMA
 
 */
@@ -144,13 +148,7 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 	read_pla(offset, ca, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0,
 		&sden, &dir, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic,
 		&from1, &romh, &roml, &dwe, &ioacc, &clrbank, &iocs, &casenb);
-/*
-	if (!space.debugger_access() && !ba)
-	logerror("read %04x %04x %04x - %u %u %u %u %u %u %u %u %u %u - %u %u %u %u %u %u %u %u %u %u - %u %u %u %u %u %u %u %u\n",
-		offset, ta, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0, cas1, cas0,
-		sden, dir, gwe, rom1, rom2, rom3, rom4, charom, colorram, vic,
-		from1, romh, roml, dwe, ioacc, clrbank, iocs, casenb);
-*/
+
 	if (!casenb)
 	{
 		if (!cas0)
@@ -489,44 +487,56 @@ ADDRESS_MAP_END
 //  INPUT_PORTS( c128 )
 //-------------------------------------------------
 
+INPUT_CHANGED_MEMBER( c128_state::restore )
+{
+	check_interrupts();
+}
+
+INPUT_CHANGED_MEMBER( c128_state::caps_lock )
+{
+	m_caps_lock = newval;
+}
+
 static INPUT_PORTS_START( c128 )
-	PORT_INCLUDE( common_cbm_keyboard )		/* ROW0 -> ROW7 */
+	PORT_INCLUDE( common_cbm_keyboard )
 
 	PORT_START( "K0" )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1_PAD)				PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2_PAD)				PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F5)				PORT_CHAR('\t')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("TAB") PORT_CODE(KEYCODE_F6)				PORT_CHAR('\t')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Help") PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(PGUP))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("HELP") PORT_CODE(KEYCODE_F9) PORT_CHAR(UCHAR_MAMEKEY(PGUP))
 
 	PORT_START( "K1" )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER_PAD) 		PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Line Feed") PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(PGDN))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LINE FEED") PORT_CODE(KEYCODE_F10) PORT_CHAR(UCHAR_MAMEKEY(PGDN))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD)			PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) 		PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC)				PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_F5)				PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
 	PORT_START( "K2" )
-	PORT_CONFNAME( 0x80, 0x00, "No Scroll (switch)") PORT_CODE(KEYCODE_F9)
-	PORT_CONFSETTING(	0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(	0x80, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NO SCROLL") PORT_CODE(KEYCODE_F12) PORT_TOGGLE
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT) 			PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT)				PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN)				PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP)				PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL_PAD)			PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Alt") PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(LALT))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ALT") PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(LALT))
 
-	PORT_INCLUDE( c128_special )			/* SPECIAL */
+	PORT_START( "SPECIAL" )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RESTORE") PORT_CODE(KEYCODE_PRTSCR) PORT_CHANGED_MEMBER(DEVICE_SELF, c128_state, restore, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_F8) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, c128_state, caps_lock, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("40/80 DISPLAY") PORT_CODE(KEYCODE_F11) PORT_TOGGLE
 
-	PORT_INCLUDE( c64_controls )			/* CTRLSEL, JOY0, JOY1, PADDLE0 -> PADDLE3, TRACKX, TRACKY, LIGHTX, LIGHTY, OTHER */
+	PORT_INCLUDE( c64_controls )
 INPUT_PORTS_END
 
 
@@ -568,9 +578,7 @@ static INPUT_PORTS_START( c128ger )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("_  { <  > }") PORT_CODE(KEYCODE_TILDE)					PORT_CHAR('_')
 
 	PORT_MODIFY( "SPECIAL" )
-	PORT_CONFNAME( 0x20, 0x00, "ASCII DIN (switch)" )
-	PORT_CONFSETTING(	0x00, "ASCII" )
-	PORT_CONFSETTING(	0x20, "DIN" )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ASCII/DIN") PORT_CODE(KEYCODE_F8) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, c128_state, caps_lock, 0)
 INPUT_PORTS_END
 
 
@@ -625,9 +633,7 @@ static INPUT_PORTS_START( c128fra )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("1  !  { &  1 }") PORT_CODE(KEYCODE_1)			PORT_CHAR('1') PORT_CHAR('!')
 
 	PORT_MODIFY( "SPECIAL" )
-	PORT_CONFNAME( 0x20, 0x00, "ASCII ?French? (switch)" )
-	PORT_CONFSETTING(	0x00, "ASCII" )
-	PORT_CONFSETTING(	0x20, "?French?" )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK ASCII/CC") PORT_CODE(KEYCODE_F8) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, c128_state, caps_lock, 0)
 INPUT_PORTS_END
 #endif
 
@@ -677,11 +683,6 @@ static INPUT_PORTS_START( c128ita )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("2  \"  { \xc3\xa9  2 }") PORT_CODE(KEYCODE_2)			PORT_CHAR('2') PORT_CHAR('"')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("_  { <  > }") PORT_CODE(KEYCODE_TILDE)				PORT_CHAR('_')
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("1  !  { \xc2\xa3  1 }") PORT_CODE(KEYCODE_1)			PORT_CHAR('1') PORT_CHAR('!')
-
-	PORT_MODIFY( "SPECIAL" )
-	PORT_CONFNAME( 0x20, 0x00, "ASCII Italian (switch)" )
-	PORT_CONFSETTING( 0x00, "ASCII" )
-	PORT_CONFSETTING( 0x20, DEF_STR( Italian ) )
 INPUT_PORTS_END
 #endif
 
@@ -714,9 +715,7 @@ static INPUT_PORTS_START( c128swe )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("_  { <  > }") PORT_CODE(KEYCODE_TILDE)			PORT_CHAR('_')
 
 	PORT_MODIFY( "SPECIAL" )
-	PORT_CONFNAME( 0x20, 0x00, "ASCII Swedish/Finnish (switch)" )
-	PORT_CONFSETTING( 0x00, "ASCII" )
-	PORT_CONFSETTING( 0x20, "Swedish/Finnish" )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK ASCII/CC") PORT_CODE(KEYCODE_F8) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, c128_state, caps_lock, 0)
 INPUT_PORTS_END
 
 
@@ -769,7 +768,7 @@ READ_LINE_MEMBER( c128_state::mmu_exrom_r )
 
 READ_LINE_MEMBER( c128_state::mmu_sense40_r )
 {
-	return !BIT(ioport("SPECIAL")->read(), 4);
+	return BIT(ioport("SPECIAL")->read(), 4);
 }
 
 static MOS8722_INTERFACE( mmu_intf )
@@ -791,10 +790,6 @@ INTERRUPT_GEN_MEMBER( c128_state::frame_interrupt )
 	check_interrupts();
 
 	cbm_common_interrupt(&device);
-
-	// hack in ShiftLock 
-	if ((ioport("SPECIAL")->read() & 0x40))
-		c64_keyline[1] |= 0x80;
 }
 
 WRITE_LINE_MEMBER( c128_state::vic_irq_w )
@@ -1333,6 +1328,8 @@ void c128_state::machine_start()
 	save_item(NAME(m_exp_dma));
 	save_item(NAME(m_cass_rd));
 	save_item(NAME(m_iec_srq));
+	save_item(NAME(m_vic_k));
+	save_item(NAME(m_caps_lock));
 }
 
 
@@ -1434,15 +1431,6 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( c128, ntsc )
-	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1571")
-MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  MACHINE_CONFIG( c128d )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_DERIVED( c128d, ntsc )
 	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1571")
 MACHINE_CONFIG_END
 
@@ -1552,15 +1540,6 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( c128dpal )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_DERIVED( c128dpal, pal )
-	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1571")
-MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG( c128dcrp )
 //-------------------------------------------------
 
@@ -1613,6 +1592,13 @@ ROM_END
 
 
 //-------------------------------------------------
+//  ROM( c128p )
+//-------------------------------------------------
+
+#define rom_c128p               rom_c128
+
+
+//-------------------------------------------------
 //  ROM( c128_de )
 //-------------------------------------------------
 
@@ -1633,7 +1619,7 @@ ROM_START( c128_de )
 	ROM_CART_LOAD( "from", 0x0000, 0x8000, ROM_NOMIRROR )
 
 	ROM_REGION( 0x2000, "charom", 0 )
-	ROM_LOAD( "390059-01.u18", 0x00000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )
+	ROM_LOAD( "315079-01.u18", 0x00000, 0x2000, CRC(fe5a2db1) SHA1(638f8aff51c2ac4f99a55b12c4f8c985ef4bebd3) )
 
 	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
 	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
@@ -1668,14 +1654,21 @@ ROM_END
 //  ROM( c128d )
 //-------------------------------------------------
 
-#define rom_c128d               rom_c128
+#define rom_c128d		rom_c128
+
+
+//-------------------------------------------------
+//  ROM( c128dp )
+//-------------------------------------------------
+
+#define rom_c128dp		rom_c128
 
 
 //-------------------------------------------------
 //  ROM( c128dpr )
 //-------------------------------------------------
 
-#define rom_c128dpr             rom_c128d
+#define rom_c128dpr		rom_c128d
 
 
 //-------------------------------------------------
@@ -1730,10 +1723,17 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( c128dr_de )
+//  ROM( c128dcrp )
 //-------------------------------------------------
 
-ROM_START( c128dr_de )
+#define rom_c128dcrp	rom_c128dcr
+
+
+//-------------------------------------------------
+//  ROM( c128dcr_de )
+//-------------------------------------------------
+
+ROM_START( c128dcr_de )
 	ROM_REGION( 0x10000, M8502_TAG, 0 )
 	ROM_LOAD( "318022-02.u34", 0x4000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )
 	ROM_LOAD( "318077-01.u32", 0x0000, 0x4000, CRC(eb6e2c8f) SHA1(6b3d891fedabb5335f388a5d2a71378472ea60f4) )
@@ -1752,10 +1752,10 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( c128dr_se )
+//  ROM( c128dcr_se )
 //-------------------------------------------------
 
-ROM_START( c128dr_se )
+ROM_START( c128dcr_se )
 	ROM_REGION( 0x10000, M8502_TAG, 0 )
 	ROM_LOAD( "318022-02.u34", 0x4000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )
 	ROM_LOAD( "318034-01.u32", 0x0000, 0x4000, CRC(cb4e1719) SHA1(9b0a0cef56d00035c611e07170f051ee5e63aa3a) )
@@ -1787,16 +1787,20 @@ ROM_END
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT                COMPANY                        FULLNAME                                 FLAGS
 COMP( 1985, c128,		0,		0,		c128,		c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128 (NTSC)",					GAME_SUPPORTS_SAVE )
-COMP( 1985, c128_se,	c128,	0,		c128pal,	c128swe,	driver_device,	0,	"Commodore Business Machines", "Commodore 128 (Sweden/Finland)",		GAME_SUPPORTS_SAVE )
-//COMP( 1985, c128fra,   c128,  0,   c128pal,  c128fra, driver_device, 0,  "Commodore Business Machines", "Commodore 128 (France)", GAME_SUPPORTS_SAVE )
+COMP( 1985, c128p,		0,		0,		c128pal,	c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128 (PAL)",					GAME_SUPPORTS_SAVE )
 COMP( 1985, c128_de,	c128,	0,		c128pal,	c128ger,	driver_device,	0,	"Commodore Business Machines", "Commodore 128 (Germany)",				GAME_SUPPORTS_SAVE )
-//COMP( 1985, c128nor,   c128,  0,   c128pal,  c128ita, driver_device, 0,  "Commodore Business Machines", "Commodore 128 (Norway)", GAME_SUPPORTS_SAVE )
-COMP( 1985, c128dpr,	c128,	0,		c128d,		c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128D (NTSC, prototype)",		GAME_SUPPORTS_SAVE )
-COMP( 1985, c128d,		c128,	0,		c128dpal,	c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128D (PAL)",					GAME_SUPPORTS_SAVE )
+//COMP( 1985, c128_fr,   c128,  0,   c128pal,  c128fra, driver_device, 0,  "Commodore Business Machines", "Commodore 128 (France)", GAME_SUPPORTS_SAVE )
+//COMP( 1985, c128_no,   c128,  0,   c128pal,  c128ita, driver_device, 0,  "Commodore Business Machines", "Commodore 128 (Norway)", GAME_SUPPORTS_SAVE )
+COMP( 1985, c128_se,	c128,	0,		c128pal,	c128swe,	driver_device,	0,	"Commodore Business Machines", "Commodore 128 (Sweden/Finland)",		GAME_SUPPORTS_SAVE )
+COMP( 1986, c128d,		c128,	0,		c128,		c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128D (NTSC, prototype)",		GAME_SUPPORTS_SAVE )
+COMP( 1986, c128dp,		c128,	0,		c128pal,	c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128D (PAL)",					GAME_SUPPORTS_SAVE )
 
-COMP( 1985, c128cr,		c128,	0,		c128,		c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128CR (NTSC, prototype)",		GAME_SUPPORTS_SAVE )
-COMP( 1986, c128dcr,	c128,	0,		c128dcr,	c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128DCR (NTSC)",				GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1986, c128dr_de,	c128,	0,		c128dcrp,	c128ger,	driver_device,	0,	"Commodore Business Machines", "Commodore 128DCR (Germany)",			GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-//COMP( 1986, c128drit,  c128,  0,   c128dcrp, c128ita, driver_device, 0,"Commodore Business Machines", "Commodore 128DCR (Italy)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1986, c128dr_se,	c128,	0,		c128dcrp,	c128swe,	driver_device,	0,	"Commodore Business Machines", "Commodore 128DCR (Sweden/Finland)",		GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1986, c128d81,	c128,	0,		c128d81,	c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128D/81 (NTSC, prototype)",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1986, c128cr,		c128,	0,		c128,		c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128CR (NTSC, prototype)",		GAME_SUPPORTS_SAVE )
+
+COMP( 1987, c128dcr,	c128,	0,		c128dcr,	c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128DCR (NTSC)",				GAME_SUPPORTS_SAVE )
+COMP( 1987, c128dcrp,	c128,	0,		c128dcrp,	c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128DCR (PAL)",				GAME_SUPPORTS_SAVE )
+COMP( 1987, c128dcr_de,	c128,	0,		c128dcrp,	c128ger,	driver_device,	0,	"Commodore Business Machines", "Commodore 128DCR (Germany)",			GAME_SUPPORTS_SAVE )
+//COMP( 1986, c128dcr_it,  c128,  0,   c128dcrp, c128ita, driver_device, 0,"Commodore Business Machines", "Commodore 128DCR (Italy)", GAME_SUPPORTS_SAVE )
+COMP( 1987, c128dcr_se,	c128,	0,		c128dcrp,	c128swe,	driver_device,	0,	"Commodore Business Machines", "Commodore 128DCR (Sweden/Finland)",		GAME_SUPPORTS_SAVE )
+
+COMP( 1986, c128d81,	c128,	0,		c128d81,	c128,		driver_device,	0,	"Commodore Business Machines", "Commodore 128D/81 (NTSC, prototype)",	GAME_SUPPORTS_SAVE )

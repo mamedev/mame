@@ -83,7 +83,8 @@ public:
 		  m_exp_nmi(CLEAR_LINE),
 		  m_cass_rd(1),
 		  m_iec_srq(1),
-		  m_vic_k(0x07)
+		  m_vic_k(0x07),
+		  m_caps_lock(1)
 	{ }
 
 	required_device<legacy_cpu_device> m_maincpu;
@@ -162,6 +163,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( exp_dma_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 
+	DECLARE_INPUT_CHANGED_MEMBER( restore );
+	DECLARE_INPUT_CHANGED_MEMBER( caps_lock );
+
 	// memory state
 	int m_z80en;
 	int m_loram;
@@ -200,6 +204,7 @@ public:
 
 	// keyboard state
 	UINT8 m_vic_k;
+	int m_caps_lock;
 };
 
 

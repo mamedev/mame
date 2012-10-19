@@ -126,11 +126,6 @@ INPUT_PORTS_EXTERN( c16_controls );
 INPUT_PORTS_EXTERN( c65_special );
 
 
-/* Commodore 128 */
-
-INPUT_PORTS_EXTERN( c128_special );
-
-
 /* PET2001 */
 
 INPUT_PORTS_EXTERN( pet_keyboard );
