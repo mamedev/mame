@@ -34,6 +34,12 @@ public:
 
 	DECLARE_READ8_MEMBER(dac_r);
 	DECLARE_WRITE8_MEMBER(dac_w);
+	DECLARE_WRITE8_MEMBER(dig0_w);
+	DECLARE_WRITE8_MEMBER(dig1_w);
+	DECLARE_WRITE8_MEMBER(lamp0_w);
+	DECLARE_WRITE8_MEMBER(lamp1_w);
+	DECLARE_READ8_MEMBER(switch_r);
+	DECLARE_WRITE8_MEMBER(switch_w);
 	DECLARE_READ_LINE_MEMBER(cb1_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 protected:
@@ -52,6 +58,7 @@ protected:
 private:
 	UINT8 m_t_c;
 	UINT8 m_sound_data;
+	UINT8 m_strobe;
 	bool m_cb1;
 };
 
@@ -85,8 +92,8 @@ static const pia6821_interface pia0_intf =
 {
 	DEVCB_NULL,		/* port A in */
 	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_LINE_GND,		/* line CA1 in */
+	DEVCB_LINE_GND,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
@@ -97,21 +104,45 @@ static const pia6821_interface pia0_intf =
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
 
+WRITE8_MEMBER( s3_state::lamp0_w )
+{
+	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
+}
+
+WRITE8_MEMBER( s3_state::lamp1_w )
+{
+	//printf("1=%X ",data);
+}
+
 static const pia6821_interface pia1_intf =
 {
 	DEVCB_NULL,		/* port A in */
 	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_LINE_GND,		/* line CA1 in */
+	DEVCB_LINE_GND,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_NULL,		/* port B out */
+	DEVCB_DRIVER_MEMBER(s3_state, lamp0_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(s3_state, lamp1_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
+
+WRITE8_MEMBER( s3_state::dig0_w )
+{
+	m_strobe = data;
+}
+
+WRITE8_MEMBER( s3_state::dig1_w )
+{
+	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 }; // MC14558
+	// player 1, 2, credits, balls
+	output_set_digit_value(m_strobe, patterns[data&15]);
+	// player 3 and 4
+	output_set_digit_value(m_strobe+20, patterns[data>>4]);
+}
 
 static const pia6821_interface pia2_intf =
 {
@@ -121,24 +152,34 @@ static const pia6821_interface pia2_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_NULL,		/* port B out */
+	DEVCB_DRIVER_MEMBER(s3_state, dig0_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(s3_state, dig1_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
 
+READ8_MEMBER( s3_state::switch_r )
+{
+	return 0xff;
+}
+
+WRITE8_MEMBER( s3_state::switch_w )
+{
+
+}
+
 static const pia6821_interface pia3_intf =
 {
-	DEVCB_NULL,		/* port A in */
+	DEVCB_DRIVER_MEMBER(s3_state, switch_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_LINE_GND,		/* line CA1 in */
+	DEVCB_LINE_GND,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_NULL,		/* port B out */
+	DEVCB_DRIVER_MEMBER(s3_state, switch_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),		/* IRQA */
@@ -165,7 +206,7 @@ WRITE8_MEMBER( s3_state::dac_w )
 static const pia6821_interface pia4_intf =
 {
 	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
+	DEVCB_DRIVER_MEMBER(s3_state, dac_r),		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_DRIVER_LINE_MEMBER(s3_state, cb1_r),		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
@@ -180,11 +221,10 @@ static const pia6821_interface pia4_intf =
 
 TIMER_DEVICE_CALLBACK_MEMBER( s3_state::irq)
 {
-	if (m_t_c > 0x10)
+	if (m_t_c > 0x70)
 		m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);
 	else
 		m_t_c++;
-	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
 }
 
 static MACHINE_CONFIG_START( s3, s3_state )
