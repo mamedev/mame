@@ -1654,8 +1654,10 @@ static MACHINE_CONFIG_START( aerofgt, aerofgt_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
+	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( aerofgt_state, aerofgt_tile_callback )
+	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,aerofgt)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

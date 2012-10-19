@@ -1,6 +1,6 @@
 // Video System Sprites
 // todo:
-//  unify these functions (secondary stage lookup differs between games, use callback)
+//  update drivers which call multiple priority passes to use the pdrawgfx version (aerofgt, gstriker)
 
 //  according to gstriker this is probably the Fujitsu CG10103
 
@@ -77,6 +77,8 @@ vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char
 	m_xoffs = 0;
 	m_yoffs = 0;
 	m_pdraw = false;
+	m_gfx_region = -1;
+	m_pal_mask = 0x3f;
 
 	m_newtilecb =  vsystem_tile_indirection_delegate(FUNC(vsystem_spr_device::tile_callback_noindirect), this);
 }
@@ -88,7 +90,7 @@ UINT32 vsystem_spr_device::tile_callback_noindirect(UINT32 tile)
 
 
 // static
-void vsystem_spr_device::set_tile_indirect_callback(device_t &device,vsystem_tile_indirection_delegate newtilecb)
+void vsystem_spr_device::set_tile_indirect_cb(device_t &device,vsystem_tile_indirection_delegate newtilecb)
 {
 	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
 	dev.m_newtilecb = newtilecb;
@@ -110,9 +112,39 @@ void vsystem_spr_device::set_pdraw(device_t &device, bool pdraw)
 	dev.m_pdraw = pdraw;
 }
 
+// static
+void vsystem_spr_device::CG10103_set_gfx_region(device_t &device, int gfx_region)
+{
+	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
+	dev.m_gfx_region = gfx_region;
+}
+
+// static
+void vsystem_spr_device::CG10103_set_pal_base(device_t &device, int pal_base)
+{
+	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
+	dev.m_pal_base = pal_base;
+}
+
+// static
+void vsystem_spr_device::set_pal_mask(device_t &device, int pal_mask)
+{
+	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
+	dev.m_pal_mask = pal_mask;
+}
+
+// static
+void vsystem_spr_device::CG10103_set_transpen(device_t &device, int transpen)
+{
+	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
+	dev.m_transpen = transpen;
+}
+
+
 void vsystem_spr_device::device_start()
 {
-
+	// bind our handler
+	m_newtilecb.bind_relative_to(*owner());
 }
 
 void vsystem_spr_device::device_reset()
@@ -162,9 +194,9 @@ void vsystem_spr_device::get_sprite_attributes(UINT16* ram)
 }
 
 
-void vsystem_spr_device::common_sprite_drawgfx(int gfxrgn, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void vsystem_spr_device::common_sprite_drawgfx( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = machine.gfx[gfxrgn];
+	gfx_element *gfx = machine.gfx[m_gfx_region];
 	int priority_mask = 0x00;
 
 	curr_sprite.oy += m_yoffs;
@@ -225,18 +257,36 @@ void vsystem_spr_device::common_sprite_drawgfx(int gfxrgn, running_machine &mach
 
 
 
-void vsystem_spr_device::draw_sprites_inufuku( UINT16* spriteram, int spriteram_bytes, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void vsystem_spr_device::draw_sprites( UINT16* spriteram, int spriteram_bytes, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int prihack_mask, int prihack_val )
 {
 	int offs;
 	int end = 0;
 
+	// find the end of the list
 	for (offs = 0; offs < (spriteram_bytes / 16 ); offs++)
 	{
 		if (spriteram[offs] & 0x4000) break;
 	}
 	end = offs;
 
-	for (offs = end - 1; offs >= 0; offs--)
+	// decide our drawing order (if we're using pdrawgfx we must go in reverse)
+	int first, last, inc;
+	if (m_pdraw)
+	{
+		first = end - 1;
+		last = -1;
+		inc = -1;
+	}
+	else
+	{
+		first = 0;
+		last = end;
+		inc = 1;
+	}
+
+	// draw
+	offs = first;
+	while (offs != last)
 	{
 		if ((spriteram[offs] & 0x8000) == 0x0000)
 		{
@@ -246,195 +296,24 @@ void vsystem_spr_device::draw_sprites_inufuku( UINT16* spriteram, int spriteram_
 
 			get_sprite_attributes(&spriteram[attr_start]);
 
-			curr_sprite.map &= 0x7fff;
+			curr_sprite.color &= m_pal_mask;
 
-			common_sprite_drawgfx(2, machine, bitmap, cliprect);
+			// hack for aero fighters and other which still call us multiple times with different priorities instead of using the pdrawgfx version
+			if (prihack_mask != -1)
+			{
+				if ((curr_sprite.pri & prihack_mask) == prihack_val)
+					common_sprite_drawgfx(machine, bitmap, cliprect);
+			}
+			else
+			{
+				common_sprite_drawgfx(machine, bitmap, cliprect);
+			}
 		}
-	}
-}
 
-
-void vsystem_spr_device::draw_sprites_suprslam( UINT16* spriteram, int spriteram_bytes, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	UINT16 *source = spriteram;
-	UINT16 *source2 = spriteram;
-	UINT16 *finish = source + 0x2000/2;
-
-	while (source < finish)
-	{
-		UINT32 sprnum = source[0] & 0x03ff;
-		if (source[0] == 0x4000) break;
-		sprnum *= 4;
-		source++;
-
-
-		get_sprite_attributes(&source2[sprnum]);
-
-		curr_sprite.map &= 0x7fff;					
-
-		common_sprite_drawgfx(1, machine, bitmap, cliprect);
+		offs+=inc;
 	}
 }
 
 
 
-void vsystem_spr_device::draw_sprite_taotaido( UINT16* spriteram, int spriteram_bytes, running_machine &machine, UINT16 spriteno, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	UINT16 *source = &spriteram[spriteno*4];
 
-	get_sprite_attributes(&source[0]);
-
-	curr_sprite.map &= 0xffff;
-	curr_sprite.color &= 0x1f;
-
-	common_sprite_drawgfx(0, machine, bitmap, cliprect);
-}
-
-void vsystem_spr_device::draw_sprites_taotaido( UINT16* spriteram, int spriteram_bytes, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	UINT16 *source = spriteram;
-	UINT16 *finish = spriteram + spriteram_bytes/2;
-
-	while( source<finish )
-	{
-		if (source[0] == 0x4000) break;
-
-		draw_sprite_taotaido(spriteram, spriteram_bytes, machine, source[0]&0x3ff, bitmap, cliprect);
-
-		source++;
-	}
-}
-
-
-
-void vsystem_spr_device::draw_sprites_crshrace(UINT16* spriteram, int spriteram_bytes, running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int flipscreen)
-{
-	int offs;
-
-	offs = 0;
-	while (offs < 0x0400 && (spriteram[offs] & 0x4000) == 0)
-	{
-		int attr_start;
-
-		attr_start = 4 * (spriteram[offs++] & 0x03ff);
-
-		get_sprite_attributes(&spriteram[attr_start]);
-
-		curr_sprite.color &= 0x1f;
-		curr_sprite.map &= 0x7fff;
-
-		common_sprite_drawgfx(2, machine, bitmap, cliprect);
-	}
-}
-
-
-
-void vsystem_spr_device::draw_sprites_aerofght( UINT16* spriteram3, int spriteram_bytes, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
-{
-	int offs;
-	pri <<= 12;
-
-	offs = 0;
-	while (offs < 0x0400 && (spriteram3[offs] & 0x8000) == 0)
-	{
-		int attr_start = 4 * (spriteram3[offs] & 0x03ff);
-
-		/* is the way I handle pri correct? Or should I just check bit 13? */
-		if ((spriteram3[attr_start + 2] & 0x3000) == pri)
-		{
-			get_sprite_attributes(&spriteram3[attr_start]);
-
-			curr_sprite.color &=0x1f;
-			curr_sprite.map &= 0x3fff;
-	
-			common_sprite_drawgfx(2, machine, bitmap, cliprect);
-
-		}
-		offs++;
-	}
-}
-
-
-void vsystem_spr_device::f1gp2_draw_sprites(UINT16* spritelist, int flipscreen, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	int offs;
-
-	offs = 0;
-	while (offs < 0x0400 && (spritelist[offs] & 0x4000) == 0)
-	{
-		int attr_start;
-
-		attr_start = 4 * (spritelist[offs++] & 0x01ff);
-
-		get_sprite_attributes(&spritelist[attr_start]);
-
-		curr_sprite.color &= 0x1f;
-		curr_sprite.map &= 0x7fff;
-
-		common_sprite_drawgfx(1, machine, bitmap, cliprect);
-	}
-}
-
-
-void vsystem_spr_device::CG10103_draw_sprite(running_machine &machine, bitmap_ind16& bitmap, const rectangle &cliprect, UINT16* spr, int drawpri)
-{
-	get_sprite_attributes(&spr[0]);
-	curr_sprite.color &=0x1f;
-	curr_sprite.pri >>= 1;
-
-	// Check if we want to draw this sprite now
-	if (curr_sprite.pri != drawpri)
-		return;
-
-	common_sprite_drawgfx(m_gfx_region, machine, bitmap, cliprect);
-}
-
-
-void vsystem_spr_device::CG10103_draw(running_machine &machine, int numchip, bitmap_ind16& screen, const rectangle &cliprect, int pri)
-{
-	UINT16* splist;
-	int i;
-
-	splist = m_vram;
-
-	// Parse the sorting list
-	for (i=0;i<0x400;i++)
-	{
-		UINT16 cmd = *splist++;
-
-		// End of list
-		if (cmd & 0x4000)
-			break;
-
-		if (!(cmd & 0x8000))
-		{
-			// Extract sprite index
-			int num = cmd & 0x3FF;
-
-			// Draw the sprite
-			CG10103_draw_sprite(machine, screen, cliprect, m_vram + num*4, pri);
-		}
-	}
-}
-
-
-
-void vsystem_spr_device::CG10103_set_pal_base(int pal_base)
-{
-	m_pal_base = pal_base;
-}
-
-void vsystem_spr_device::CG10103_set_gfx_region(int gfx_region)
-{
-	m_gfx_region = gfx_region;
-}
-
-void vsystem_spr_device::CG10103_set_transpen(int transpen)
-{
-	m_transpen = transpen;
-}
-
-void vsystem_spr_device::CG10103_set_ram(UINT16* vram)
-{
-	m_vram = vram;
-}

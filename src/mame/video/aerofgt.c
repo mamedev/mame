@@ -166,20 +166,6 @@ UINT32 aerofgt_state::aerofgt_tile_callback( UINT32 code )
 }
 
 
-VIDEO_START_MEMBER(aerofgt_state,aerofgt)
-{
-	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-
-	m_bg2_tilemap->set_transparent_pen(15);
-
-	m_spritepalettebank = 0;
-	m_sprite_gfx = 2;
-
-	aerofgt_register_state_globals(machine());
-
-	vsystem_spr_device::set_tile_indirect_callback(m_spr, vsystem_tile_indirection_delegate(FUNC(aerofgt_state::aerofgt_tile_callback), this)); // can this be moved to the MACHINE_CONFIG?
-}
 
 
 
@@ -408,13 +394,13 @@ UINT32 aerofgt_state::screen_update_aerofgt(screen_device &screen, bitmap_ind16 
 
 	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	m_spr->draw_sprites_aerofght(m_spriteram3, m_spriteram3.bytes(), machine(), bitmap, cliprect, 0);
-	m_spr->draw_sprites_aerofght(m_spriteram3, m_spriteram3.bytes(), machine(), bitmap, cliprect, 1);
+	m_spr->draw_sprites(m_spriteram3, m_spriteram3.bytes(), machine(), bitmap, cliprect, 0x03, 0x00);
+	m_spr->draw_sprites(m_spriteram3, m_spriteram3.bytes(), machine(), bitmap, cliprect, 0x03, 0x01);
 
 	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	m_spr->draw_sprites_aerofght(m_spriteram3, m_spriteram3.bytes(), machine(), bitmap, cliprect, 2);
-	m_spr->draw_sprites_aerofght(m_spriteram3, m_spriteram3.bytes(), machine(), bitmap, cliprect, 3);
+	m_spr->draw_sprites(m_spriteram3, m_spriteram3.bytes(), machine(), bitmap, cliprect, 0x03, 0x02);
+	m_spr->draw_sprites(m_spriteram3, m_spriteram3.bytes(), machine(), bitmap, cliprect, 0x03, 0x03);
 	return 0;
 }
 

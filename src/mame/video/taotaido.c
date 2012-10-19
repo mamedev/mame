@@ -105,7 +105,6 @@ void taotaido_state::video_start()
 	m_spriteram2_old = auto_alloc_array(machine(), UINT16, 0x10000/2);
 	m_spriteram2_older = auto_alloc_array(machine(), UINT16, 0x10000/2);
 
-	vsystem_spr_device::set_tile_indirect_callback(m_spr, vsystem_tile_indirection_delegate(FUNC(taotaido_state::taotaido_tile_callback), this)); // can this be moved to the MACHINE_CONFIG?
 }
 
 
@@ -131,7 +130,7 @@ UINT32 taotaido_state::screen_update_taotaido(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->draw(bitmap, clip, 0,0);
 	}
 
-	m_spr->draw_sprites_taotaido(m_spriteram_older, m_spriteram.bytes(), machine(), bitmap,cliprect);
+	m_spr->draw_sprites(m_spriteram_older, m_spriteram.bytes(), machine(), bitmap,cliprect);
 	return 0;
 }
 

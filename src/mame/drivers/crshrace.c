@@ -482,6 +482,8 @@ static MACHINE_CONFIG_START( crshrace, crshrace_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
+	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( crshrace_state, crshrace_tile_callback )
+	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")

@@ -355,6 +355,8 @@ static MACHINE_CONFIG_START( taotaido, taotaido_state )
 	MCFG_PALETTE_LENGTH(0x800)
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
+	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( taotaido_state, taotaido_tile_callback )
+	MCFG_VSYSTEM_SPR_SET_GFXREGION(0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

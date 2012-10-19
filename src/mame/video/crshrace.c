@@ -46,7 +46,6 @@ void crshrace_state::video_start()
 	m_tilemap1->set_transparent_pen(0x0f);
 	m_tilemap2->set_transparent_pen(0xff);
 
-	vsystem_spr_device::set_tile_indirect_callback(m_spr, vsystem_tile_indirection_delegate(FUNC(crshrace_state::crshrace_tile_callback), this)); // can this be moved to the MACHINE_CONFIG?
 }
 
 
@@ -131,7 +130,7 @@ UINT32 crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_ind1
 	switch (m_gfxctrl & 0xfb)
 	{
 		case 0x00:	/* high score screen */
-			m_spr->draw_sprites_crshrace(m_spriteram->buffer(), 0x2000,  machine(), bitmap, cliprect, m_flipscreen);
+			m_spr->draw_sprites(m_spriteram->buffer(), 0x2000,  machine(), bitmap, cliprect);
 			draw_bg(machine(), bitmap, cliprect);
 			draw_fg(machine(), bitmap, cliprect);
 			break;
@@ -139,7 +138,7 @@ UINT32 crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_ind1
 		case 0x02:
 			draw_bg(machine(), bitmap, cliprect);
 			draw_fg(machine(), bitmap, cliprect);
-			m_spr->draw_sprites_crshrace(m_spriteram->buffer(), 0x2000,  machine(), bitmap, cliprect, m_flipscreen);
+			m_spr->draw_sprites(m_spriteram->buffer(), 0x2000,  machine(), bitmap, cliprect);
 			break;
 		default:
 			popmessage("gfxctrl = %02x", m_gfxctrl);

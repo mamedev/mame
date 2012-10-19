@@ -340,11 +340,11 @@ UINT32 gstriker_state::screen_update_gstriker(screen_device &screen, bitmap_ind1
 	//  needs sprite orthogonality
 	MB60553_draw(machine(), 0, bitmap,cliprect, 0);
 
-	m_spr->CG10103_draw(machine(), 0, bitmap, cliprect, 0);
+	m_spr->draw_sprites(m_CG10103_vram, 0x2000, machine(), bitmap, cliprect, 0x2, 0x0);
 
 	VS920A_draw(this, 0, bitmap, cliprect, 0);
 
-	m_spr->CG10103_draw(machine(), 0, bitmap, cliprect, 1);
+	m_spr->draw_sprites(m_CG10103_vram, 0x2000, machine(), bitmap, cliprect, 0x2, 0x2);
 
 #if 0
 	popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",
@@ -378,12 +378,6 @@ VIDEO_START_MEMBER(gstriker_state,gstriker)
 	MB60553_set_gfx_region(this, 0, 1);
 	MB60553_set_pal_base(this, 0, 0);
 	MB60553_get_tilemap(this, 0)->set_transparent_pen(0xf);
-
-	// Initialize the sprite generator
-	m_spr->CG10103_set_ram(m_CG10103_vram);
-	m_spr->CG10103_set_gfx_region(2);
-	m_spr->CG10103_set_pal_base(0x10);
-	m_spr->CG10103_set_transpen(0x0);
 }
 
 VIDEO_START_MEMBER(gstriker_state,twrldc94)
@@ -402,12 +396,6 @@ VIDEO_START_MEMBER(gstriker_state,twrldc94)
 	MB60553_set_gfx_region(this, 0, 1);
 	MB60553_set_pal_base(this, 0, 0x50);
 	MB60553_get_tilemap(this, 0)->set_transparent_pen(0xf);
-
-	// Initialize the sprite generator
-	m_spr->CG10103_set_ram(m_CG10103_vram);
-	m_spr->CG10103_set_gfx_region(2);
-	m_spr->CG10103_set_pal_base(0x60);
-	m_spr->CG10103_set_transpen(0x0);
 }
 
 VIDEO_START_MEMBER(gstriker_state,vgoalsoc)
@@ -426,10 +414,4 @@ VIDEO_START_MEMBER(gstriker_state,vgoalsoc)
 	MB60553_set_gfx_region(this, 0, 1);
 	MB60553_set_pal_base(this, 0, 0x20);
 	MB60553_get_tilemap(this, 0)->set_transparent_pen(0xf);
-
-	// Initialize the sprite generator
-	m_spr->CG10103_set_ram(m_CG10103_vram);
-	m_spr->CG10103_set_gfx_region(2);
-	m_spr->CG10103_set_pal_base(0x00);
-	m_spr->CG10103_set_transpen(0xf);
 }

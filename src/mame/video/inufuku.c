@@ -126,7 +126,6 @@ void inufuku_state::video_start()
 
 	m_spriteram1_old = auto_alloc_array_clear(machine(), UINT16, m_spriteram1.bytes()/2);
 
-	vsystem_spr_device::set_tile_indirect_callback(m_spr, vsystem_tile_indirection_delegate(FUNC(inufuku_state::inufuku_tile_callback), this)); // can this be moved to the MACHINE_CONFIG?
 }
 
 
@@ -161,7 +160,7 @@ UINT32 inufuku_state::screen_update_inufuku(screen_device &screen, bitmap_ind16 
 	m_tx_tilemap->set_scrolly(0, m_tx_scrolly);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
-	m_spr->draw_sprites_inufuku( m_spriteram1_old, m_spriteram1.bytes(), machine(), bitmap, cliprect );
+	m_spr->draw_sprites( m_spriteram1_old, m_spriteram1.bytes(), machine(), bitmap, cliprect );
 	return 0;
 }
 

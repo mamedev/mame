@@ -338,6 +338,8 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 	MCFG_PALETTE_LENGTH(0x800)
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
+	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( suprslam_state, suprslam_tile_callback )
+	MCFG_VSYSTEM_SPR_SET_GFXREGION(1)
 
 	MCFG_K053936_ADD("k053936", suprslam_k053936_intf)
 
