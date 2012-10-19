@@ -174,4 +174,4 @@ ROM_START( xxx )
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 )
 ROM_END
 
-GAME( 198?, xxx,  0,   xxx,  xxx,  0,       ROT0, "<template_manufacturer>",      "<template_gamename>", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 198?, xxx,  0,   xxx,  xxx, driver_device,  0,       ROT0, "<template_manufacturer>",      "<template_gamename>", GAME_IS_SKELETON )

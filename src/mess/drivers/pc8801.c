@@ -50,7 +50,7 @@
     - Makaimura: after losing a life the game doesn't work properly anymore, copy protection?
     - Music Collection Vol. 2 - Final Fantasy Tokushuu: sound irq dies pretty soon
     - N-BASIC: cursor doesn't show up;
-    - The Return of Ishtar: z80 exception after entering the name
+    - The Return of Ishtar: z80 exception after entering the name.
     - Star Cruiser: bad kanji data?
     - Star Cruiser: reads at i/o 0x8e?
     - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
