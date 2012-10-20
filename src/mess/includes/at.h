@@ -56,6 +56,7 @@
 #include "machine/isa_sblaster.h"
 #include "machine/isa_stereo_fx.h"
 #include "machine/isa_gus.h"
+#include "machine/isa_ssi2001.h"
 #include "machine/3c503.h"
 #include "machine/ne1000.h"
 #include "machine/ne2000.h"
