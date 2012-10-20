@@ -14,7 +14,7 @@
 
 ****************************************************************************
 
-  Hardware specs....
+  Hardware specs...
 
   Etched on PCB:
   "H8 Tiga Polanz grafik board"
