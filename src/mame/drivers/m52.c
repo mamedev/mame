@@ -493,6 +493,40 @@ ROM_START( mpatrolw )
 	ROM_LOAD( "mpc-2.2h",     0x0240, 0x0100, CRC(7ae4cd97) SHA1(bc0662fac82ffe65f02092d912b2c2b0c7a8ac2b) ) /* sprite lookup table */
 ROM_END
 
+ROM_START( mranger )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mpa-1.3m",      0x0000, 0x1000, CRC(5873a860) SHA1(8c03726d6e049c3edbc277440184e31679f78258) )
+	ROM_LOAD( "mra-2.3l",      0x1000, 0x1000, CRC(217dd431) SHA1(7b81f854209afc1fd3df11b7375f36de6bc4a7c3) )
+	ROM_LOAD( "mra-3.3k",      0x2000, 0x1000, CRC(9f0af7b2) SHA1(3daaec15b0d3bc30723ebb14b50f66f288f0d096) )
+	ROM_LOAD( "mra-4.3j",      0x3000, 0x1000, CRC(7fe8e2cd) SHA1(4ffad9c7a9360999b213b790c6c76cc79c8e49d5) )
+
+	ROM_REGION( 0x8000, "iremsound", 0 )
+	ROM_LOAD( "mp-s1.1a",     0x7000, 0x1000, CRC(561d3108) SHA1(4998c68a9e9a8002251fa8f07aa1082444a9dc80) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "mpe-5.3e",     0x0000, 0x1000, CRC(e3ee7f75) SHA1(b03d0d56150d3e9da4a4c871338097b4f450b649) )       /* chars */
+	ROM_LOAD( "mpe-4.3f",     0x1000, 0x1000, CRC(cca6d023) SHA1(fecb3059fb09897a096add9452b50aec55c07545) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "mpb-2.3m",     0x0000, 0x1000, CRC(707ace5e) SHA1(93c682e13e74bce29ced3a87bffb29569c114c3b) )       /* sprites */
+	ROM_LOAD( "mpb-1.3n",     0x1000, 0x1000, CRC(9b72133a) SHA1(1393ef92ae1ad58a4b62ca1660c0793d30a8b5e2) )
+
+	ROM_REGION( 0x1000, "gfx3", 0 )
+	ROM_LOAD( "mpe-1.3l",     0x0000, 0x1000, CRC(c46a7f72) SHA1(8bb7c9acaf6833fb6c0575b015991b873a305a84) )       /* background graphics */
+
+	ROM_REGION( 0x1000, "gfx4", 0 )
+	ROM_LOAD( "mpe-2.3k",     0x0000, 0x1000, CRC(c7aa1fb0) SHA1(14c6c76e1d0db2c0745e5d6d33ea6945fac8e9ee) )
+
+	ROM_REGION( 0x1000, "gfx5", 0 )
+	ROM_LOAD( "mpe-3.3h",     0x0000, 0x1000, CRC(a0919392) SHA1(8a090cb8d483a3d67c7360058e3fdd70e151cd62) )
+
+	ROM_REGION( 0x0340, "proms", 0 )
+	ROM_LOAD( "mpc-4.2a",     0x0000, 0x0200, CRC(07f99284) SHA1(dfc52958f2520e1ce4446dd4c84c91413bbacf76) )
+	ROM_LOAD( "mpc-3.1m",     0x0200, 0x0020, CRC(6a57eff2) SHA1(2d1c12dab5915da2ccd466e39436c88be434d634) ) /* background palette */
+	ROM_LOAD( "mpc-1.1f",     0x0220, 0x0020, CRC(26979b13) SHA1(8c41a8cce4f3384c392a9f7a223a50d7be0e14a5) ) /* sprite palette */
+	ROM_LOAD( "mpc-2.2h",     0x0240, 0x0100, CRC(7ae4cd97) SHA1(bc0662fac82ffe65f02092d912b2c2b0c7a8ac2b) ) /* sprite lookup table */
+ROM_END
+
 
 ROM_START( alpha1v )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -542,6 +576,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, mpatrol,  0,        m52,      mpatrol, driver_device,  0, ROT0, "Irem", "Moon Patrol", GAME_SUPPORTS_SAVE )
-GAME( 1982, mpatrolw, mpatrol,  m52,      mpatrolw, driver_device, 0, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)", GAME_SUPPORTS_SAVE )
-GAME( 1988, alpha1v,  0,        alpha1v,  alpha1v, driver_device,  0, ROT0, "Vision Electronics", "Alpha One (Vision Electronics)", GAME_NOT_WORKING| GAME_NO_SOUND| GAME_SUPPORTS_SAVE )
+GAME( 1982, mpatrol,  0,        m52,      mpatrol,  driver_device,  0, ROT0, "Irem", "Moon Patrol", GAME_SUPPORTS_SAVE )
+GAME( 1982, mpatrolw, mpatrol,  m52,      mpatrolw, driver_device,  0, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)", GAME_SUPPORTS_SAVE ) // USA
+GAME( 1982, mranger,  mpatrol,  m52,      mpatrol,  driver_device,  0, ROT0, "bootleg", "Moon Ranger (bootleg of Moon Patrol)", GAME_SUPPORTS_SAVE ) // Italy
+GAME( 1988, alpha1v,  0,        alpha1v,  alpha1v,  driver_device,  0, ROT0, "Vision Electronics", "Alpha One (Vision Electronics)", GAME_NOT_WORKING| GAME_NO_SOUND| GAME_SUPPORTS_SAVE )
