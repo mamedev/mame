@@ -905,10 +905,8 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 	MCFG_SOUND_ADD("custom", MAC_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	/* nvram */
-	MCFG_NVRAM_HANDLER(mac)
-
 	/* devices */
+    MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
@@ -989,10 +987,8 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	/* nvram */
-	MCFG_NVRAM_HANDLER(mac)
-
 	/* devices */
+    MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
@@ -1027,10 +1023,8 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	/* nvram */
-	MCFG_NVRAM_HANDLER(mac)
-
 	/* devices */
+    MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
 	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
 	MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "48gc", NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nba", mac_nubus_cards, NULL, NULL)
@@ -1079,10 +1073,8 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	/* nvram */
-	MCFG_NVRAM_HANDLER(mac)
-
 	/* devices */
+    MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
 	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
 	MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "48gc", NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nba", mac_nubus_cards, NULL, NULL)
@@ -1286,10 +1278,8 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	/* nvram */
-	MCFG_NVRAM_HANDLER(mac)
-
 	/* devices */
+    MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
@@ -1336,9 +1326,6 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, mac_asc_irq)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	/* nvram */
-	MCFG_NVRAM_HANDLER(mac)
 
 	/* devices */
 	MCFG_SCSIBUS_ADD("scsi")
@@ -1407,9 +1394,6 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, mac_asc_irq)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	/* nvram */
-	MCFG_NVRAM_HANDLER(mac)
 
 	/* devices */
 	MCFG_SCSIBUS_ADD("scsi")
@@ -1580,9 +1564,6 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	/* nvram */
-	MCFG_NVRAM_HANDLER(mac)
-
 	/* devices */
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
@@ -1628,10 +1609,8 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	/* nvram */
-	MCFG_NVRAM_HANDLER(mac)
-
 	/* devices */
+    MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
 	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, NULL, NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, NULL, NULL)

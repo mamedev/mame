@@ -18,6 +18,7 @@
 #include "machine/ncr539x.h"
 #include "machine/ncr5380.h"
 #include "machine/mackbd.h"
+#include "machine/macrtc.h"
 #include "sound/asc.h"
 #include "sound/awacs.h"
 
@@ -144,39 +145,6 @@ void mac_scsi_irq(running_machine &machine, int state);
 void mac_asc_irq(device_t *device, int state);
 void mac_fdc_set_enable_lines(device_t *device, int enable_mask);
 
-
-
-
-
-
-NVRAM_HANDLER( mac );
-
-/*----------- defined in video/mac.c -----------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*----------- defined in audio/mac.c -----------*/
 
 class mac_sound_device : public device_t,
@@ -229,6 +197,7 @@ public:
         m_539x_2(*this, MAC_539X_2_TAG),
 		m_ncr5380(*this, "scsi:ncr5380"),
         m_mackbd(*this, MACKBD_TAG),
+		m_rtc(*this,"rtc"),
 		m_vram(*this,"vram"),
 		m_vram16(*this,"vram16")
 	 { }
@@ -246,6 +215,7 @@ public:
     optional_device<ncr539x_device> m_539x_2;
     optional_device<ncr5380_device> m_ncr5380;
     optional_device<mackbd_device> m_mackbd;
+	optional_device<rtc3430042_device> m_rtc;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -289,33 +259,6 @@ public:
 	int m_screen_buffer;
 
 	int irq_count, ca1_data, ca2_data;
-
-	/* state of rTCEnb and rTCClk lines */
-	UINT8 m_rtc_rTCEnb;
-	UINT8 m_rtc_rTCClk;
-
-	/* serial transmit/receive register : bits are shifted in/out of this byte */
-	UINT8 m_rtc_data_byte;
-	/* serial transmitted/received bit count */
-	UINT8 m_rtc_bit_count;
-	/* direction of the current transfer (0 : VIA->RTC, 1 : RTC->VIA) */
-	UINT8 m_rtc_data_dir;
-	/* when rtc_data_dir == 1, state of rTCData as set by RTC (-> data bit seen by VIA) */
-	UINT8 m_rtc_data_out;
-
-	/* set to 1 when command in progress */
-	UINT8 m_rtc_cmd;
-
-	/* write protect flag */
-	UINT8 m_rtc_write_protect;
-
-	/* internal seconds register */
-	UINT8 m_rtc_seconds[/*8*/4];
-	/* 20-byte long PRAM, or 256-byte long XPRAM */
-	UINT8 m_rtc_ram[256];
-	/* current extended address and RTC state */
-	UINT8 m_rtc_xpaddr;
-	UINT8 m_rtc_state;
 
 	// Mac ADB state
 	INT32 m_adb_irq_pending, m_adb_waiting_cmd, m_adb_datasize, m_adb_buffer[257];
@@ -446,8 +389,6 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(overlay_opbaseoverride);
 private:
 	int has_adb();
-	void rtc_init();
-	void rtc_execute_cmd(int data);
 	void adb_reset();
 	void adb_vblank();
 	int adb_pollkbd(int update);
@@ -466,6 +407,9 @@ private:
 	// ADB keyboard state
 	int m_adb_keybaddr;
 	int m_adb_keybinitialized, m_adb_currentkeys[2], m_adb_modifiers;
+
+	// PRAM for ADB MCU HLEs (mostly unused now)
+	UINT8 m_adb_pram[256];
 
     UINT8 m_oss_regs[0x400];
 

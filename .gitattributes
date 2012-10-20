@@ -6937,6 +6937,7 @@ src/mess/machine/mackbd.c svneol=native#text/plain
 src/mess/machine/mackbd.h svneol=native#text/plain
 src/mess/machine/macpci.c svneol=native#text/plain
 src/mess/machine/macrtc.c svneol=native#text/plain
+src/mess/machine/macrtc.h svneol=native#text/plain
 src/mess/machine/mb8795.c svneol=native#text/plain
 src/mess/machine/mb8795.h svneol=native#text/plain
 src/mess/machine/mb89352.c svneol=native#text/plain

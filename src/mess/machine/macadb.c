@@ -857,7 +857,7 @@ void mac_state::pmu_exec()
 			{
 				for (int i = 0; i < 20; i++)
 				{
-					m_rtc_ram[i] = m_pm_cmd[1+i];
+					m_adb_pram[i] = m_pm_cmd[1+i];
 				}
 			}
 			break;
@@ -869,7 +869,7 @@ void mac_state::pmu_exec()
 
 				for (i = 0; i < m_pm_cmd[3]; i++)
 				{
-					m_rtc_ram[m_pm_cmd[2] + i] = m_pm_cmd[4+i];
+					m_adb_pram[m_pm_cmd[2] + i] = m_pm_cmd[4+i];
 				}
 			}
 			break;
@@ -877,10 +877,10 @@ void mac_state::pmu_exec()
 		case 0x38:  // read time
 			{
 				m_pm_out[0] = m_pm_out[1] = 4;
-				m_pm_out[2] = m_rtc_seconds[0];
-				m_pm_out[3] = m_rtc_seconds[1];
-				m_pm_out[4] = m_rtc_seconds[2];
-				m_pm_out[5] = m_rtc_seconds[3];
+				m_pm_out[2] = 0x63; // famous Mac RTC value of 8/27/56 8:35:00 PM
+				m_pm_out[3] = 0x0b;
+				m_pm_out[4] = 0xd1;
+				m_pm_out[5] = 0x78;
 				m_pm_slen = 6;
 				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
 			}
@@ -893,7 +893,7 @@ void mac_state::pmu_exec()
 				m_pm_out[0] = m_pm_out[1] = 20;
 				for (i = 0; i < 20; i++)
 				{
-					m_pm_out[2 + i] = m_rtc_ram[i];
+					m_pm_out[2 + i] = m_adb_pram[i];
 				}
 				m_pm_slen = 22;
 				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
@@ -908,7 +908,7 @@ void mac_state::pmu_exec()
 				m_pm_out[0] = m_pm_out[1] = m_pm_cmd[3];
 				for (i = 0; i < m_pm_cmd[3]; i++)
 				{
-					m_pm_out[2 + i] = m_rtc_ram[m_pm_cmd[2] + i];
+					m_pm_out[2 + i] = m_adb_pram[m_pm_cmd[2] + i];
 				}
 				m_pm_slen = m_pm_out[0] + 2;
 				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
