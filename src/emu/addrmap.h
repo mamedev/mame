@@ -390,7 +390,7 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, device_t &device) \
 	typedef _class drivdata_class; \
 
 #define DEVICE_ADDRESS_MAP_START(_name, _bits, _class) \
-void _class :: _name(address_map &map, device_t &device) \
+void _class :: _name(::address_map &map, device_t &device) \
 { \
 	typedef read##_bits##_delegate read_delegate; \
 	typedef write##_bits##_delegate write_delegate; \
@@ -407,8 +407,9 @@ void _class :: _name(address_map &map, device_t &device) \
 	extern void ADDRESS_MAP_NAME(_name)(address_map &map, device_t &device)
 
 // use this to declare an address map as a member of a modern device class
+// need to qualify with :: to avoid a collision with descendants of device_memory_interface
 #define DECLARE_ADDRESS_MAP(_name, _bits) \
-	void _name(address_map &map, device_t &device)
+	void _name(::address_map &map, device_t &device)
 
 
 // global controls
