@@ -488,7 +488,7 @@ bool address_map_entry::unitmask_is_appropriate(UINT8 width, UINT64 unitmask, co
 	}
 
 	// if we have a mask, we must be smaller than the default width of the map
-	if (m_map.m_databits <= width)
+	if (m_map.m_databits < width)
 		throw emu_fatalerror("Handler %s is a %d-bit handler and is too wide to be used in a %d-bit address map", string, width, m_map.m_databits);
 
 	// the mask must represent whole units of width
