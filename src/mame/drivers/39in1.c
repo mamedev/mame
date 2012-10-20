@@ -52,6 +52,7 @@ public:
 	UINT32 m_pxa255_lcd_palette[0x100];
 	UINT8 m_pxa255_lcd_framebuffer[0x100000];
 
+
 	//FILE* audio_dump;
 	UINT32 m_words[0x800];
 	INT16 m_samples[0x1000];
@@ -73,6 +74,7 @@ public:
 	DECLARE_WRITE32_MEMBER(cpld_w);
 	DECLARE_READ32_MEMBER(prot_cheater_r);
 	DECLARE_DRIVER_INIT(39in1);
+	DECLARE_MACHINE_START(60in1);
 	virtual void machine_start();
 	UINT32 screen_update_39in1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pxa255_vblank_start);
@@ -1435,7 +1437,6 @@ READ32_MEMBER(_39in1_state::prot_cheater_r)
 
 DRIVER_INIT_MEMBER(_39in1_state,39in1)
 {
-
 	m_dmadac[0] = machine().device<dmadac_sound_device>("dac1");
 	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
 	m_eeprom = machine().device<eeprom_device>("eeprom");
@@ -1443,6 +1444,8 @@ DRIVER_INIT_MEMBER(_39in1_state,39in1)
 	address_space &space = machine().device<pxa255_device>("maincpu")->space(AS_PROGRAM);
 	space.install_read_handler (0xa0151648, 0xa015164b, read32_delegate(FUNC(_39in1_state::prot_cheater_r), this));
 }
+
+
 
 static ADDRESS_MAP_START( 39in1_map, AS_PROGRAM, 32, _39in1_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
@@ -1550,12 +1553,22 @@ void _39in1_state::machine_start()
 	for (i = 0; i < 0x80000; i += 2)
 	{
 		ROM[i] = BITSWAP8(ROM[i],7,2,5,6,0,3,1,4) ^ BITSWAP8((i>>3)&0xf, 3,2,4,1,4,4,0,4) ^ 0x90;
+	}
 
-// 60-in-1 decrypt
-//          if ((i%2)==0)
-//          {
-//              ROM[i] = BITSWAP8(ROM[i],5,1,4,2,0,7,6,3)^BITSWAP8(i, 6,0,4,13,0,5,3,11);
-//          }
+	pxa255_start();
+}
+
+MACHINE_START_MEMBER(_39in1_state,60in1)
+{
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	int i;
+
+	for (i = 0; i < 0x80000; i += 2)
+	{
+		if ((i%2)==0)
+		{
+			ROM[i] = BITSWAP8(ROM[i],5,1,4,2,0,7,6,3)^BITSWAP8(i, 6,0,4,13,0,5,3,11);
+		}
 	}
 
 	pxa255_start();
@@ -1588,6 +1601,10 @@ static MACHINE_CONFIG_START( 39in1, _39in1_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( 60in1, 39in1 )
+	MCFG_MACHINE_START_OVERRIDE(_39in1_state,60in1)
+MACHINE_CONFIG_END
+
 ROM_START( 39in1 )
 	// main program, encrypted
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -1616,6 +1633,22 @@ ROM_START( 48in1 )
 	ROM_LOAD16_WORD_SWAP( "48in1_93c66_eeprom.bin", 0x000, 0x200, NO_DUMP )
 ROM_END
 
+
+ROM_START( 48in1b )
+	// main program, encrypted
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "hph_ver309",   0x000000, 0x080000, CRC(27023186) SHA1(a2b3770c4b03d6026c6a0ff2e62ab17c3b359b12) )
+
+	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
+	ROM_REGION32_LE( 0x400000, "data", 0 )
+	ROM_LOAD( "48_flash.u19", 0x000000, 0x400000, CRC(a975db44) SHA1(5be6520b2ba7728e9e2de3c62ae7c3b88b25172a) )
+
+	// EEPROM - contains security data
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "48_93c66.u32", 0x000, 0x200, CRC(cec06912) SHA1(2bc2e45602c5b1e8a3e031dd384e9f16be4e2ddb) )
+ROM_END
+
+
 ROM_START( 48in1a )
 	// main program, encrypted
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -1630,6 +1663,70 @@ ROM_START( 48in1a )
 	ROM_LOAD16_WORD_SWAP( "48in1_93c66_eeprom.bin", 0x000, 0x200, NO_DUMP )
 ROM_END
 
+
+ROM_START( 60in1 )
+	// main program, encrypted
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "hph_ver300.u8",   0x000000, 0x080000, CRC(6fba84c4) SHA1(28881e51227e94a80c8449d9c00a1a675f008d64) )
+
+	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
+	ROM_REGION32_LE( 0x400000, "data", 0 )
+	ROM_LOAD( "flash.u19", 0x000000, 0x400000, CRC(0cfed2a0) SHA1(9aac23f5267af56255e6f8aefade9f00bc106325) )
+
+	// EEPROM - contains security data
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "60in1_eeprom.u32", 0x000, 0x200, CRC(54af5973) SHA1(30aca7790458f4be906f7fa7c74206e16d9fc36f) )
+ROM_END
+
+ROM_START( 4in1a )
+	// main program, encrypted
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "plz-v014_ver300.bin", 0x000000, 0x080000, CRC(775f101d) SHA1(8a299a67b487518ba2e2cb5334347b93f8640190) )
+
+	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
+	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) ) // confirmed same flash rom as 39 in 1
+
+	// EEPROM - contains security data
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "4in1_eeprom.bin", 0x000, 0x200, CRC(df1724f7) SHA1(07814aee3622f4bb8bada938f2a93fae791d6e31) )
+ROM_END
+
+ROM_START( 4in1b )
+	// main program, encrypted
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "pzv001-4.bin", 0x000000, 0x080000, CRC(7679a95f) SHA1(56c20fa7d086560b76477b42208cb43d42adba41) )
+
+	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
+	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
+
+	// EEPROM - contains security data
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c66-4.bin", 0x000, 0x200, CRC(84d1c26a) SHA1(de823adddf949bf77d8478762720fe0b56fba8ea) )
+ROM_END
+
+// 19-in-1 is visibly different hardware, extent of differences unknown due to lack of quality pictures/scans
+// also, there is a bootleg of the 19-in-1 which may have less or different protection
+ROM_START( 19in1 )
+	// main program, encrypted
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "19in1.u8",    0x000000, 0x080000, CRC(87b0506c) SHA1(c43ae4b403864a28e56370685572fa02e7572e66) )
+
+	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
+	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) ) // assuming same flash rom
+
+	// EEPROM - contains security data
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "19in1_eeprom.bin", 0x000, 0x200, NO_DUMP )
+ROM_END
+
+GAME(2004, 4in1a,  39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "4 in 1 MAME bootleg (set 1, ver 3.00)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
+GAME(2004, 4in1b,  39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "4 in 1 MAME bootleg (set 2)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
+GAME(2004, 19in1,  39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "19 in 1 MAME bootleg", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
 GAME(2004, 39in1,  0,     39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "39 in 1 MAME bootleg", GAME_IMPERFECT_SOUND)
-GAME(2004, 48in1,  39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (ver 3.09)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
-GAME(2004, 48in1a, 39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (ver 3.02)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
+GAME(2004, 48in1,  39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (set 1, ver 3.09)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
+GAME(2004, 48in1b, 39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (set 2, ver 3.09, alt flash)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
+GAME(2004, 48in1a, 39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (set 3, ver 3.02)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
+GAME(2004, 60in1,  39in1, 60in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "60 in 1 MAME bootleg (ver 3.00)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
