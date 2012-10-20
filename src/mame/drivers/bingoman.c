@@ -3,6 +3,9 @@
   Bingo Mania.
   HP Automaten.
 
+  Multi game board with 3 different games
+  which could be selected on startup.
+
   Skeleton driver by Angelo Salese & Roberto Fresca.
 
 
