@@ -2,16 +2,17 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!-- Undumped?
-    - SV10012 MahJongg
-    - hash block, jacky lucky, challenger tank, brain power
-    - b52 battle
+    - B52 Battle (does this exist? the P52 sea battle label would be easy to mistake for this title)
     - Box Carrier
     - Devil Paradise
-    - money bee
-    - jade legend
+    - Hash Block, Jacky Lucky, Challenger Tank, Brain Power (4-in-1)
+    - Jade Legend
     - Jouney to the West
     - Lucky Jack (Jacky Lucky clone or a name mistake?)
-    - usa sea battle
+    - MahJongg (SV10012)
+    - Money Bee
+    - Pacific Bomber
+    - USA Sea Battle
 -->
 
 <softwarelist name="svision" description="Watara Supervision cartridges">
@@ -270,7 +271,7 @@
 		</part>
 	</software>
 
-	<software name="fcombat">
+	<software name="fcombat"> <!-- this might be bad dump, there are two bad tiles in the data -->
 		<description>Final Combat (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
@@ -632,7 +633,7 @@
 	<software name="recycled">
 		<description>Recycle Design</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Hartung</publisher>
 		<info name="serial" value="SV10041" />
 
 		<part name="cart" interface="svision_cart">
@@ -667,9 +668,9 @@
 	</software>
 
 	<software name="sonnyxpr">
-		<description>Sonny Xpress!</description>
+		<description>Sonny X'press</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Watera</publisher>
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sonnyxpr.bin" size="65536" crc="c99b985a" sha1="00724d0275bd4ef77514468d6d04669c93125e32" offset="000000" />
@@ -790,10 +791,10 @@
 		</part>
 	</software>
 
-	<software name="tvlink">
+	<software name="tvlink"> <!-- does anyone know if this is the PAL or NTSC version as 'Quickshot' made one in UK -->
 		<description>TV-Link</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Watara</publisher>
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="tvlink.bin" size="32768" crc="af3ea0dd" sha1="08ea89ec012034cde36919ff94af95b9d8af8aa6" offset="000000" />
