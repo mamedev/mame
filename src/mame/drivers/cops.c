@@ -103,7 +103,7 @@ UINT32 cops_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, c
 		ledtext[i] = m_maincpu->space(AS_PROGRAM).read_byte(0x64 + i);
 	}
 	ledtext[16] = 0;
-	popmessage(ledtext);
+	popmessage("%s",ledtext);
 	return 0;
 }
 
