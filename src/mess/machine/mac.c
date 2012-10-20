@@ -1322,8 +1322,11 @@ READ8_MEMBER(mac_state::mac_via_in_b)
 	else
 	{
 		/* video beam in display (! VBLANK && ! HBLANK basically) */
-		if (machine().primary_screen->vpos() >= MAC_V_VIS)
-			val |= 0x40;
+        if (machine().primary_screen)
+        {
+            if (machine().primary_screen->vpos() >= MAC_V_VIS)
+                val |= 0x40;
+        }
 
 		if (ADB_IS_BITBANG_CLASS)
 		{
@@ -1771,8 +1774,12 @@ void mac_state::machine_start()
 		}
 
 	}
-	this->m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_scanline_tick),this));
-	this->m_scanline_timer->adjust(machine().primary_screen->time_until_pos(0, 0));
+
+    if (machine().primary_screen)
+    {
+        this->m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_scanline_tick),this));
+        this->m_scanline_timer->adjust(machine().primary_screen->time_until_pos(0, 0));
+    }
 
 	m_6015_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_6015_tick),this));
 	m_6015_timer->adjust(attotime::never);
