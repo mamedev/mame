@@ -653,6 +653,8 @@ static void I386OP(mov_rm8_i8)(i386_state *cpustate)		// Opcode 0xc6
 
 static void I386OP(mov_r32_cr)(i386_state *cpustate)		// Opcode 0x0f 20
 {
+	if(PROTECTED_MODE && cpustate->CPL)
+		FAULT(FAULT_GP, 0);
 	UINT8 modrm = FETCH(cpustate);
 	UINT8 cr = (modrm >> 3) & 0x7;
 
@@ -662,6 +664,8 @@ static void I386OP(mov_r32_cr)(i386_state *cpustate)		// Opcode 0x0f 20
 
 static void I386OP(mov_r32_dr)(i386_state *cpustate)		// Opcode 0x0f 21
 {
+	if(PROTECTED_MODE && cpustate->CPL)
+		FAULT(FAULT_GP, 0);
 	UINT8 modrm = FETCH(cpustate);
 	UINT8 dr = (modrm >> 3) & 0x7;
 
@@ -683,13 +687,17 @@ static void I386OP(mov_r32_dr)(i386_state *cpustate)		// Opcode 0x0f 21
 
 static void I386OP(mov_cr_r32)(i386_state *cpustate)		// Opcode 0x0f 22
 {
+	if(PROTECTED_MODE && cpustate->CPL)
+		FAULT(FAULT_GP, 0);
 	UINT8 modrm = FETCH(cpustate);
 	UINT8 cr = (modrm >> 3) & 0x7;
-
-	cpustate->cr[cr] = LOAD_RM32(modrm);
+	UINT32 data = LOAD_RM32(modrm);
 	switch(cr)
 	{
-		case 0: CYCLES(cpustate,CYCLES_MOV_REG_CR0); break;
+		case 0:
+			data &= 0xfffeffff; // wp not supported on 386
+			CYCLES(cpustate,CYCLES_MOV_REG_CR0);
+			break;
 		case 2: CYCLES(cpustate,CYCLES_MOV_REG_CR2); break;
 		case 3: CYCLES(cpustate,CYCLES_MOV_REG_CR3); break;
 		case 4: CYCLES(cpustate,1); break; // TODO
@@ -697,10 +705,13 @@ static void I386OP(mov_cr_r32)(i386_state *cpustate)		// Opcode 0x0f 22
 			fatalerror("i386: mov_cr_r32 CR%d!\n", cr);
 			break;
 	}
+	cpustate->cr[cr] = data;
 }
 
 static void I386OP(mov_dr_r32)(i386_state *cpustate)		// Opcode 0x0f 23
 {
+	if(PROTECTED_MODE && cpustate->CPL)
+		FAULT(FAULT_GP, 0);
 	UINT8 modrm = FETCH(cpustate);
 	UINT8 dr = (modrm >> 3) & 0x7;
 

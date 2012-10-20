@@ -466,3 +466,22 @@ static void I486OP(bswap_edi)(i386_state *cpustate)		// Opcode 0x0f 3F
 	REG32(EDI) = SWITCH_ENDIAN_32(REG32(EDI));
 	CYCLES(cpustate,1);		// TODO
 }
+
+static void I486OP(mov_cr_r32)(i386_state *cpustate)		// Opcode 0x0f 22
+{
+	if(PROTECTED_MODE && cpustate->CPL)
+		FAULT(FAULT_GP, 0);
+	UINT8 modrm = FETCH(cpustate);
+	UINT8 cr = (modrm >> 3) & 0x7;
+	cpustate->cr[cr] = LOAD_RM32(modrm);
+	switch(cr)
+	{
+		case 0: CYCLES(cpustate,CYCLES_MOV_REG_CR0); break;
+		case 2: CYCLES(cpustate,CYCLES_MOV_REG_CR2); break;
+		case 3: CYCLES(cpustate,CYCLES_MOV_REG_CR3); break;
+		case 4: CYCLES(cpustate,1); break; // TODO
+		default:
+			fatalerror("i386: mov_cr_r32 CR%d !", cr);
+			break;
+	}
+}

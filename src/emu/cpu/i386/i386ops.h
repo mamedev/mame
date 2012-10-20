@@ -301,6 +301,7 @@ static const X86_OPCODE x86_opcode_table[] =
 	{ 0x20,		OP_2BYTE|OP_I386,			I386OP(mov_r32_cr),				I386OP(mov_r32_cr),			},
 	{ 0x21,		OP_2BYTE|OP_I386,			I386OP(mov_r32_dr),				I386OP(mov_r32_dr),			},
 	{ 0x22,		OP_2BYTE|OP_I386,			I386OP(mov_cr_r32),				I386OP(mov_cr_r32),			},
+	{ 0x22,		OP_2BYTE|OP_I486,			I486OP(mov_cr_r32),				I386OP(mov_cr_r32),			},
 	{ 0x23,		OP_2BYTE|OP_I386,			I386OP(mov_dr_r32),				I386OP(mov_dr_r32),			},
 	{ 0x24,		OP_2BYTE|OP_I386,			I386OP(mov_r32_tr),				I386OP(mov_r32_tr),			},
 	{ 0x26,		OP_2BYTE|OP_I386,			I386OP(mov_tr_r32),				I386OP(mov_tr_r32),			},

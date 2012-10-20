@@ -393,6 +393,7 @@ static int i386_limit_check(i386_state *cpustate, int seg, UINT32 offset);
 #define STACK_32BIT			(cpustate->sreg[SS].d)
 #define V8086_MODE			(cpustate->VM)
 #define NESTED_TASK			(cpustate->NT)
+#define WP					(cpustate->cr[0] & 0x10000)
 
 #define SetOF_Add32(r,s,d)	(cpustate->OF = (((r) ^ (s)) & ((r) ^ (d)) & 0x80000000) ? 1: 0)
 #define SetOF_Add16(r,s,d)	(cpustate->OF = (((r) ^ (s)) & ((r) ^ (d)) & 0x8000) ? 1 : 0)
@@ -487,7 +488,6 @@ INLINE int translate_address(i386_state *cpustate, int rwn, UINT32 *address, UIN
 	bool user = (cpustate->CPL == 3) && (rwn >= 0);
 	*error = 0;
 
-	// TODO: cr0 wp bit, 486 and higher
 	UINT32 page_dir = cpustate->program->read_dword(pdbr + directory * 4);
 	if((page_dir & 1) && ((page_dir & 4) || !user))
 	{
@@ -496,7 +496,7 @@ INLINE int translate_address(i386_state *cpustate, int rwn, UINT32 *address, UIN
 			page_entry = cpustate->program->read_dword((page_dir & 0xfffff000) + (table * 4));
 			if(!(page_entry & 1))
 				ret = 0;
-			else if((!(page_entry & 2) && user && (rwn == 1)) || (!(page_entry & 4) && user))
+			else if((!(page_entry & 2) && (user || WP) && (rwn == 1)) || (!(page_entry & 4) && user))
 			{
 				*error = 1;
 				ret = 0;
@@ -516,7 +516,7 @@ INLINE int translate_address(i386_state *cpustate, int rwn, UINT32 *address, UIN
 		{
 			if (page_dir & 0x80)
 			{
-				if(!(page_dir & 2) && user && (rwn == 1))
+				if(!(page_dir & 2) && (user || WP) && (rwn == 1))
 				{
 					*error = 1;
 					ret = 0;
@@ -535,7 +535,7 @@ INLINE int translate_address(i386_state *cpustate, int rwn, UINT32 *address, UIN
 				page_entry = cpustate->program->read_dword((page_dir & 0xfffff000) + (table * 4));
 				if(!(page_entry & 1))
 					ret = 0;
-				else if((!(page_entry & 2) && user && (rwn == 1)) || (!(page_entry & 4) && user))
+				else if((!(page_entry & 2) && (user || WP) && (rwn == 1)) || (!(page_entry & 4) && user))
 				{
 					*error = 1;
 					ret = 0;
@@ -562,7 +562,7 @@ INLINE int translate_address(i386_state *cpustate, int rwn, UINT32 *address, UIN
 	if(!ret)
 	{
 		if(rwn != -1)
-			*error |= ((rwn & 1)<<1) | ((cpustate->CPL == 3)<<2);
+			*error |= ((rwn == 1)<<1) | ((cpustate->CPL == 3)<<2);
 		return 0;
 	}
 	return 1;
