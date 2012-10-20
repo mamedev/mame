@@ -1,12 +1,57 @@
 /***************************************************************************
 
-	skeleton driver for Bingo Mania
+  Bingo Mania.
+  HP Automaten.
 
-	TODO:
-	- ROM loading structure
+  Skeleton driver by Angelo Salese & Roberto Fresca.
+
+
+  TODO:
+
+  - Fix ROM loading structure.
+  - Check if the H8's need to be decapped.
+
+
+****************************************************************************
+
+  Hardware specs....
+
+  Etched on PCB:
+  "H8 Tiga Polanz grafik board"
+  "KRR-A11-0002-28.11.1993"
+
+  1x TMS34010FNL-50 @ u09
+  1x H8/520 (HD6435208CP10) @ u18
+  1x H8/534 (HD6475348CP16) @ u33
+
+  1x M48T08-150PC1 Timekeeper RAM.@ u50
+  1x ADV476KN50E (CMOS Monolithic 256x18 Color Palette RAM-DAC @ 50 MHz) @ u73
+  1x MAX707 (MAXIM uP Supervisory Circuits. Watchdog + Reset > 200ms) @ u21
+
+  1x Xtal 20 MHz @ u26
+  1x Xtal 25 MHz @ u61
+  1x Xtal 40 MHz @ u04  (near TMS34010)
+
+  1x empty DIP8 socket. (Maybe for a serial EPROM) @ u03 
+  1x empty DIP32 socket. Near H8/520. @ u17
+
+  1x 2x8 edge connector.
+  1x 2x22 edge connector.
+  1x 2x5 pins male connector.
+  1x 2x7 pins male connector.
+  2x VGA type connector (can't see them well).
+
+  1x Trimmer/pot @ r34
+
+  a shitload of jumpers...
+
+  There are 3 games P03, P07 and P14 (2 roms each), plus main code.
+  Also 2 sound ROMs.
+
+  All ROMs have copyright "(c) H.Polanz GmbH"
+
 
 ***************************************************************************/
-
 
 #include "emu.h"
 #include "cpu/h83002/h8.h"
@@ -177,41 +222,29 @@ ROM_START( bingoman )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "ps.020.u51",   0x000000, 0x080000, CRC(0f40b10d) SHA1(96a24547a612ba7c2b33c84a0f3afecc9a7cc076) ) // wrong ...
 
-	ROM_REGION( 0x80000, "tms", ROMREGION_ERASE00 )
+	ROM_REGION( 0x300000, "tms", ROMREGION_ERASE00 )	// banked
+	ROM_LOAD( "p03_036.015.u1", 0x000000, 0x080000, CRC(b78b7fca) SHA1(8e4147bb8351db5b17e2bf39bb12ca31cf02f3a6) )	// seems to be for game1
+	ROM_LOAD( "p03_tms.030.u2", 0x080000, 0x080000, CRC(94f0076e) SHA1(45d0379ad232ae7c5723c87a5fed9f9cc576aea2) )	// seems to be for game1
+	ROM_LOAD( "p07_036.010.u3", 0x100000, 0x080000, CRC(dda80fab) SHA1(4fb06ca94a8a03e5ee91d4cb4a24ac35863a82a1) )	// seems to be for game2
+	ROM_LOAD( "p07_tms.025.u4", 0x180000, 0x080000, CRC(6c4a84f8) SHA1(e683753eaf54fdedd1cdc64c4dd4591e3b48dc75) )	// seems to be for game2
+	ROM_LOAD( "p14_036.012.u5", 0x200000, 0x080000, CRC(a9f2c609) SHA1(0669aba100a8263b99373d7ac997ec4f1967bb1b) )	// seems to be for game3
+	ROM_LOAD( "p14_tms.030.u6", 0x280000, 0x080000, CRC(cdf60d47) SHA1(ef7e107f1713466fb18e940e90e7f46c781d4581) )	// seems to be for game3
 
-	ROM_REGION( 0x80000, "misc", ROMREGION_ERASE00 )
-	ROM_LOAD( "snd.u10.021.u10", 0x000000, 0x080000, CRC(676f7c4f) SHA1(acdec156cb2d7b880cc1668cce50268bb2b4ec72) )
-	ROM_LOAD( "snd.u11.021.u11", 0x000000, 0x080000, CRC(d993f3b6) SHA1(ac9f21135e3b3035a007bc9fdf83d04b535e7a85) )
+	ROM_REGION( 0x100000, "snd", ROMREGION_ERASE00 )
+	ROM_LOAD( "snd.u10.021.u10", 0x00000, 0x80000, CRC(676f7c4f) SHA1(acdec156cb2d7b880cc1668cce50268bb2b4ec72) )
+	ROM_LOAD( "snd.u11.021.u11", 0x80000, 0x80000, CRC(d993f3b6) SHA1(ac9f21135e3b3035a007bc9fdf83d04b535e7a85) )
 
-	ROM_LOAD( "p03_036.015.u1", 0x000000, 0x080000, CRC(b78b7fca) SHA1(8e4147bb8351db5b17e2bf39bb12ca31cf02f3a6) )
-	ROM_LOAD( "p07_036.010.u3", 0x000000, 0x080000, CRC(dda80fab) SHA1(4fb06ca94a8a03e5ee91d4cb4a24ac35863a82a1) )
-	ROM_LOAD( "p14_036.012.u5", 0x000000, 0x080000, CRC(a9f2c609) SHA1(0669aba100a8263b99373d7ac997ec4f1967bb1b) )
-
-	ROM_LOAD( "p03_tms.030.u2", 0x000000, 0x080000, CRC(94f0076e) SHA1(45d0379ad232ae7c5723c87a5fed9f9cc576aea2) )
-	ROM_LOAD( "p07_tms.025.u4", 0x000000, 0x080000, CRC(6c4a84f8) SHA1(e683753eaf54fdedd1cdc64c4dd4591e3b48dc75) )
-	ROM_LOAD( "p14_tms.030.u6", 0x000000, 0x080000, CRC(cdf60d47) SHA1(ef7e107f1713466fb18e940e90e7f46c781d4581) )
-
-	ROM_REGION( 0x10000, "pal", ROMREGION_ERASE00 ) // TODO
-	ROM_LOAD( "102u0520.u05", 0x000000, 0x000892, CRC(3f0f57e5) SHA1(65383da38f4ad6c5ecaf84336eabea3a77db1307) )
-	ROM_LOAD( "102u0520.u05.jed", 0x000000, 0x000d9a, CRC(bfd66e33) SHA1(206ed74ac4af6179f6f0848bdc9747cfcd6e11b5) )
-	ROM_LOAD( "102u1400.u14", 0x000000, 0x000a92, CRC(7a9d0543) SHA1(bed7359c1e1f418e751956fa37499a0afb441bf5) )
-	ROM_LOAD( "102u1400.u14.jed", 0x000000, 0x00101c, CRC(fc599ebd) SHA1(358672b40d8fa4569c0a3c8c138a04e40fb26c6d) )
-	ROM_LOAD( "102u2920.u29", 0x000000, 0x000a92, CRC(3efc98b6) SHA1(791834d63d5f30aa726d42e5ce14ec0f46883e6f) )
-	ROM_LOAD( "102u2920.u29.jed", 0x000000, 0x00101e, CRC(5d77f60d) SHA1(977311d0e1eb90f75a5d1ca4a01df3e4b4fa9ed7) )
-	ROM_LOAD( "102u3010.u30", 0x000000, 0x000a92, CRC(ee5a4e08) SHA1(5ae4e853c76444062a60612c8db179c8704e09de) )
-	ROM_LOAD( "102u3010.u30.jed", 0x000000, 0x00101c, CRC(cb9d83cf) SHA1(1fecf73f136275fad35dbdc50dac6a2e181206f8) )
-	ROM_LOAD( "102u5400.u54", 0x000000, 0x000892, CRC(cfd94d14) SHA1(730a02c8741be583e03a1a487b0a0d76a99b6e71) )
-	ROM_LOAD( "102u5400.u54.jed", 0x000000, 0x000d9a, CRC(0367d5e8) SHA1(9a276c978ca9f1afb4a77225ae2d41c953434564) )
-	ROM_LOAD( "102u5500.u55", 0x000000, 0x000892, CRC(cfd94d14) SHA1(730a02c8741be583e03a1a487b0a0d76a99b6e71) )
-	ROM_LOAD( "102u5500.u55.jed", 0x000000, 0x000d9a, CRC(49b9eebf) SHA1(881096b7e0bb8ec863e2da249b17762fa30af6f2) )
-	ROM_LOAD( "103u0701.u7",  0x000000, 0x000a92, CRC(aef4ee3f) SHA1(147423b3ba93e70af8129f31411b489dafbe8db6) )
-	ROM_LOAD( "103u0701.u7.jed", 0x000000, 0x00101d, CRC(5de79208) SHA1(5d61c9ce8045395ece27a5baeee0de6fc4941ec5) )
-	ROM_LOAD( "103u0820.u8",  0x000000, 0x000892, CRC(37c1f1c1) SHA1(c08b590a18a9ef5e06352c0b8429676f02bc5765) )
-	ROM_LOAD( "103u0820.u8.jed", 0x000000, 0x000d9a, CRC(b7b6e5a0) SHA1(674cc071b93451dc24ba268aeeea2206ce40923b) )
-	ROM_LOAD( "103u0900.u9",  0x000000, 0x000892, CRC(63214d15) SHA1(c6f4f68a9bccd954fde13bef94bd28097d6bebfc) )
-	ROM_LOAD( "103u0900.u9.jed", 0x000000, 0x000d9c, CRC(be245a39) SHA1(0144ce94bd5e6066433123552dd9af8e85b6743f) )
-	ROM_LOAD( "103u1301.u13", 0x000000, 0x000892, CRC(45bffe9a) SHA1(86a61f23b2da2bc3a4b0f95826638719b925b399) )
-	ROM_LOAD( "103u1301.u13.jed", 0x000000, 0x000d9a, CRC(ecc4aa35) SHA1(8c4e57de7373c12bc0448075525483c215b913ea) )
+	ROM_REGION( 0x10000, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "102u0520_gal16v8d.u05",   0x0000, 0x0892, CRC(3f0f57e5) SHA1(65383da38f4ad6c5ecaf84336eabea3a77db1307) )
+	ROM_LOAD( "102u1400_gal20v8b.u14",   0x1000, 0x0a92, CRC(7a9d0543) SHA1(bed7359c1e1f418e751956fa37499a0afb441bf5) )
+	ROM_LOAD( "102u2920_atf20v8bql.u29", 0x2000, 0x0a92, CRC(3efc98b6) SHA1(791834d63d5f30aa726d42e5ce14ec0f46883e6f) )
+	ROM_LOAD( "102u3010_gal20v8b.u30",   0x3000, 0x0a92, CRC(ee5a4e08) SHA1(5ae4e853c76444062a60612c8db179c8704e09de) )
+	ROM_LOAD( "102u5400_gal16v8d.u54",   0x4000, 0x0892, CRC(cfd94d14) SHA1(730a02c8741be583e03a1a487b0a0d76a99b6e71) )
+	ROM_LOAD( "102u5500_gal16v8d.u55",   0x5000, 0x0892, CRC(cfd94d14) SHA1(730a02c8741be583e03a1a487b0a0d76a99b6e71) )
+	ROM_LOAD( "103u0701_atf20v8bq.u7",   0x6000, 0x0a92, CRC(aef4ee3f) SHA1(147423b3ba93e70af8129f31411b489dafbe8db6) )
+	ROM_LOAD( "103u0820_gal16v8d.u8",    0x7000, 0x0892, CRC(37c1f1c1) SHA1(c08b590a18a9ef5e06352c0b8429676f02bc5765) )
+	ROM_LOAD( "103u0900_atf16v8bql.u9",  0x8000, 0x0892, CRC(63214d15) SHA1(c6f4f68a9bccd954fde13bef94bd28097d6bebfc) )
+	ROM_LOAD( "103u1301_gal16v8d.u13",   0x9000, 0x0892, CRC(45bffe9a) SHA1(86a61f23b2da2bc3a4b0f95826638719b925b399) )
 ROM_END
 
-GAME( 199?, bingoman,  0,   bingoman,  bingoman, driver_device,  0,       ROT0, "HP Automaten",      "Bingo Mania", GAME_IS_SKELETON )
+GAME( 1993, bingoman,  0,   bingoman,  bingoman, driver_device,  0,       ROT0, "HP Automaten",      "Bingo Mania", GAME_IS_SKELETON )
