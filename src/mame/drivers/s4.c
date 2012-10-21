@@ -1,6 +1,19 @@
-/*
+/***********************************************************************************
+
+    Pinball
     Williams System 4
-*/
+
+    No schematics have been located as yet.
+
+    Phoenix and Pokerino are listed as System 4 systems, but use System 3 roms.
+    They have been moved to s3.c, and are working there.
+
+ToDo:
+- Everything
+
+
+
+************************************************************************************/
 
 
 #include "machine/genpin.h"
@@ -65,40 +78,6 @@ ROM_START(flash_t1)
 	ROM_LOAD("green2a.716", 0x7800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
 	ROM_RELOAD( 0xf800, 0x0800)
 	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_RELOAD( 0xf000, 0x0800)
-
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
-	ROM_RELOAD( 0xf800, 0x0800)
-ROM_END
-
-/*--------------------------------
-/ Phoenix - Sys.4 (Game #485)
-/-------------------------------*/
-ROM_START(phnix_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(3aba6eac) SHA1(3a9f669216b3214bc42a1501aa2b10cfbcc36315))
-	ROM_RELOAD( 0xe000, 0x0800)
-	ROM_LOAD("white2.716", 0x7800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
-	ROM_RELOAD( 0xf800, 0x0800)
-	ROM_LOAD("white1.716", 0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
-	ROM_RELOAD( 0xf000, 0x0800)
-
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
-	ROM_RELOAD( 0xf800, 0x0800)
-ROM_END
-
-/*--------------------------------
-/ Pokerino - Sys.4 (Game #488)
-/-------------------------------*/
-ROM_START(pkrno_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(9b4d01a8) SHA1(1bd51745f38381ffc66fde4b28b76aab33b573ca))
-	ROM_RELOAD( 0xe000, 0x0800)
-	ROM_LOAD("white2.716", 0x7800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
-	ROM_RELOAD( 0xf800, 0x0800)
-	ROM_LOAD("white1.716", 0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
 	ROM_RELOAD( 0xf000, 0x0800)
 
 	ROM_REGION(0x10000, "audiocpu", 0)
@@ -258,8 +237,6 @@ ROM_END
 
 GAME(1979,flash_l1, 0,        s4, s4, driver_device, 0, ROT0, "Williams", "Flash (L-1)", GAME_IS_SKELETON_MECHANICAL)
 GAME(1979,flash_t1, flash_l1, s4, s4, driver_device, 0, ROT0, "Williams", "Flash (T-1) Ted Estes", GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,phnix_l1, 0,        s4, s4, driver_device, 0, ROT0, "Williams", "Phoenix (L-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,pkrno_l1, 0,        s4, s4, driver_device, 0, ROT0, "Williams", "Pokerino (L-1)", GAME_IS_SKELETON_MECHANICAL)
 GAME(1979,stlwr_l2, 0,        s4, s4, driver_device, 0, ROT0, "Williams", "Stellar Wars (L-2)", GAME_IS_SKELETON_MECHANICAL)
 GAME(1978,pomp_l1,  0,        s4, s4, driver_device, 0, ROT0, "Williams", "Pompeii (Shuffle) (L-1)", GAME_IS_SKELETON_MECHANICAL)
 GAME(1978,arist_l1, 0,        s4, s4, driver_device, 0, ROT0, "Williams", "Aristocrat (Shuffle) (L-1)", GAME_IS_SKELETON_MECHANICAL)

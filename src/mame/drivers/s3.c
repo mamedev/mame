@@ -12,9 +12,12 @@
     When first used, the nvram gets initialised but is otherwise unusable. A reboot
     will get it going.
 
+    By pressing 9, you can select a different set of sounds. This is switch SW2 on
+    the real board.
+
 ToDo:
 - Diagnostic controls
-
+- Add 10k chime when added to samples.
 
 
 ************************************************************************************/
@@ -423,40 +426,17 @@ static MACHINE_CONFIG_DERIVED( s3a, s3 )
 MACHINE_CONFIG_END
 
 
-/*-------------------------------------
-/ Contact - Sys.3 (Game #482)
-/-------------------------------------*/
-ROM_START(cntct_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(35359b60) SHA1(ab4c3328d93bdb4c952090b327c91b0ded36152c))
-	ROM_LOAD("white1.716", 0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
-	ROM_LOAD("white2.716", 0x7800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
+//***************************************** SYSTEM 3 ******************************************************
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x0800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
-ROM_END
-
-/*-------------------------------------
-/ Disco Fever - Sys.3 (Game #483)
-/-------------------------------------*/
-ROM_START(disco_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(831d8adb) SHA1(99a9c3d5c8cbcdf3bb9c210ad9d05c34905b272e))
-	ROM_LOAD("white1.716", 0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
-	ROM_LOAD("white2.716", 0x7800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
-
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x0800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
-ROM_END
 
 /*----------------------------
 / Hot Tip - Sys.3 (Game #477) - No Sound board
 /----------------------------*/
 ROM_START(httip_l1)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(b1d4fd9b) SHA1(e55ecf1328a55979c4cf8f3fb4e6761747e0abc4))
-	ROM_LOAD("white1.716", 0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
-	ROM_LOAD("white2.716", 0x7800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
+	ROM_LOAD("gamerom.716",  0x6000, 0x0800, CRC(b1d4fd9b) SHA1(e55ecf1328a55979c4cf8f3fb4e6761747e0abc4))
+	ROM_LOAD("white1.716",   0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
+	ROM_LOAD("white2.716",   0x7800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
 ROM_END
 
 /*---------------------------------
@@ -464,9 +444,9 @@ ROM_END
 /---------------------------------*/
 ROM_START(lucky_l1)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(7cfbd4c7) SHA1(825e2245fd1615e932973f5e2b5ed5f2da9309e7))
-	ROM_LOAD("white1.716", 0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
-	ROM_LOAD("white2.716", 0x7800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
+	ROM_LOAD("gamerom.716",  0x6000, 0x0800, CRC(7cfbd4c7) SHA1(825e2245fd1615e932973f5e2b5ed5f2da9309e7))
+	ROM_LOAD("white1.716",   0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
+	ROM_LOAD("white2.716",   0x7800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
 ROM_END
 
 /*-------------------------------------
@@ -474,17 +454,70 @@ ROM_END
 /-------------------------------------*/
 ROM_START(wldcp_l1)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(c8071956) SHA1(0452aaf2ec1bcc5717fe52a6c541d79402bebb17))
-	ROM_LOAD("white1.716", 0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
+	ROM_LOAD("gamerom.716",  0x6000, 0x0800, CRC(c8071956) SHA1(0452aaf2ec1bcc5717fe52a6c541d79402bebb17))
+	ROM_LOAD("white1.716",   0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
 	ROM_LOAD("white2wc.716", 0x7800, 0x0800, CRC(618d15b5) SHA1(527387893eeb2cd4aa563a4cfb1948a15d2ed741))
 
 	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x0800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+	ROM_LOAD("sound1.716",   0x0800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
+/*-------------------------------------
+/ Contact - Sys.3 (Game #482)
+/-------------------------------------*/
+ROM_START(cntct_l1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gamerom.716",  0x6000, 0x0800, CRC(35359b60) SHA1(ab4c3328d93bdb4c952090b327c91b0ded36152c))
+	ROM_LOAD("white1.716",   0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
+	ROM_LOAD("white2.716",   0x7800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
+
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("sound1.716",   0x0800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+ROM_END
+
+/*-------------------------------------
+/ Disco Fever - Sys.3 (Game #483)
+/-------------------------------------*/
+ROM_START(disco_l1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gamerom.716",  0x6000, 0x0800, CRC(831d8adb) SHA1(99a9c3d5c8cbcdf3bb9c210ad9d05c34905b272e))
+	ROM_LOAD("white1.716",   0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
+	ROM_LOAD("white2.716",   0x7800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
+
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("sound1.716",   0x0800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+ROM_END
+
+/*--------------------------------
+/ Phoenix - Sys.4 (Game #485)
+/-------------------------------*/
+ROM_START(phnix_l1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gamerom.716",  0x6000, 0x0800, CRC(3aba6eac) SHA1(3a9f669216b3214bc42a1501aa2b10cfbcc36315))
+	ROM_LOAD("white1.716",   0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
+	ROM_LOAD("white2.716",   0x7800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
+
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("sound1.716",   0x0800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+ROM_END
+
+/*--------------------------------
+/ Pokerino - Sys.4 (Game #488)
+/-------------------------------*/
+ROM_START(pkrno_l1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gamerom.716",  0x6000, 0x0800, CRC(9b4d01a8) SHA1(1bd51745f38381ffc66fde4b28b76aab33b573ca))
+	ROM_LOAD("white1.716",   0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
+	ROM_LOAD("white2.716",   0x7800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
+
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("sound1.716",   0x0800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+ROM_END
 
 GAME( 1977, httip_l1, 0, s3,  s3, driver_device, 0, ROT0, "Williams", "Hot Tip (L-1)", GAME_MECHANICAL )
 GAME( 1977, lucky_l1, 0, s3,  s3, driver_device, 0, ROT0, "Williams", "Lucky Seven (L-1)", GAME_MECHANICAL )
 GAME( 1978, wldcp_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "World Cup Soccer (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
 GAME( 1978, cntct_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Contact (L-1)", GAME_MECHANICAL)
 GAME( 1978, disco_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Disco Fever (L-1)", GAME_MECHANICAL)
+GAME( 1978, phnix_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Phoenix (L-1)", GAME_MECHANICAL)
+GAME( 1978, pkrno_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Pokerino (L-1)", GAME_MECHANICAL)
