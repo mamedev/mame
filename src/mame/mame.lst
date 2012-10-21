@@ -2648,7 +2648,7 @@ sonofphx		// bootleg
 flashgal		// (c) 1985 Sega
 flashgala		// (c) 1985 Sega
 srdmissn		// (c) 1986 Taito Corporation
-fx			// bootleg
+fx				// bootleg
 legend			// no copyright notice [1986 Sega/Coreland] (Arcade TV Game List - P.104, Left, 14 from top)
 legendb			// no copyright notice [1986 Sega/Coreland] (Arcade TV Game List - P.104, Left, 14 from top)
 airwolf			// (c) 1987 Kyugo
@@ -2726,7 +2726,7 @@ commandoj		//  5/1985 (c) 1985 (Japan)
 commandob		// bootleg
 sinvasn			// Europe original?
 sinvasnb		// bootleg
-gng			//  9/1985 (c) 1985
+gng				//  9/1985 (c) 1985
 gnga			//  9/1985 (c) 1985
 gngbl			// bootleg
 gngblita		// bootleg
@@ -2749,6 +2749,7 @@ trojanr			//  4/1986 (c) 1986 + Romstar
 trojanj			//  4/1986 (c) 1986 (Japan)
 srumbler		//  9/1986 (c) 1986
 srumbler2		//  9/1986 (c) 1986
+srumbler3		//  9/1986 (c) 1986 + Tecfri
 rushcrsh		//  9/1986 (c) 1986
 lwings			// 11/1986 (c) 1986
 lwings2			// 11/1986 (c) 1986
@@ -2782,11 +2783,11 @@ blktigerb1		// bootleg
 blktigerb2		// bootleg
 blkdrgon		//  8/1987 (c) 1987 (Japan)
 blkdrgonb		// bootleg, hacked to say Black Tiger
-sf			//  8/1987 (c) 1987 (World)
-sfu			//  8/1987 (c) 1987 (US)
+sf				//  8/1987 (c) 1987 (World)
+sfu				//  8/1987 (c) 1987 (US)
 sfua			//  8/1987 (c) 1987 (US)
-sfj			//  8/1987 (c) 1987 (Japan)
-sfp			//  8/1987 (c) 1987
+sfj				//  8/1987 (c) 1987 (Japan)
+sfp				//  8/1987 (c) 1987
 tigeroad		// 11/1987 (c) 1987 + Romstar (US)
 toramich		// 11/1987 (c) 1987 (Japan
 tigeroadb		// bootleg
@@ -2869,7 +2870,7 @@ cawingj			// 12/10/1990 (c) 1990 (Japan)
 cawingbl		// bootleg
 nemo			// 30/11/1990 (c) 1990 (World)
 nemoj			// 20/11/1990 (c) 1990 (Japan)
-sf2			// 22/05/1991 (c) 1991 (World)
+sf2				// 22/05/1991 (c) 1991 (World)
 sf2eb			// 14/02/1991 (c) 1991 (World)
 sf2ee			// 28/02/1991 (c) 1991 (World)
 sf2ebbl			// 14/02/1991 (c) 1991 (World, bootleg)
@@ -2891,7 +2892,7 @@ sf2thndr		// hack
 3wondersu		// 20/05/1991 (c) 1991 (USA)
 wonder3			// 20/05/1991 (c) 1991 (Japan)
 3wondersh		// hack
-kod			// 05/08/1991 (c) 1991 (World)
+kod				// 05/08/1991 (c) 1991 (World)
 kodr1			// 11/07/1991 (c) 1991 (World)
 kodu			// 10/09/1991 (c) 1991 (USA)
 kodj			// 05/08/1991 (c) 1991 (Japan)
@@ -2939,9 +2940,9 @@ varth			// 14/07/1992 (c) 1992 (World)
 varthr1			// 12/06/1992 (c) 1992 (World)
 varthu			// 12/06/1992 (c) 1992 (USA)
 varthj			// 14/07/1992 (c) 1992 (Japan)
-qad			// 01/07/1992 (c) 1992 (USA)
+qad				// 01/07/1992 (c) 1992 (USA)
 qadj			// 21/09/1994 (c) 1994 (Japan)
-wof			// 31/10/1992 (c) 1992 (World) (CPS1 + QSound)
+wof				// 31/10/1992 (c) 1992 (World) (CPS1 + QSound)
 wofr1			// 02/10/1992 (c) 1992 (World) (CPS1 + QSound)
 wofu			// 31/10/1992 (c) 1992 (USA) (CPS1 + QSound)
 wofa			// 05/10/1992 (c) 1992 (Asia)  (CPS1 + QSound)
