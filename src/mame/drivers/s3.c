@@ -5,11 +5,16 @@
 
     Typical of Williams hardware: Motorola 8-bit CPUs, and lots of PIAs.
 
-    When first used, the nvram gets initialised but is otherwise unusable. It will
-    work on the next use.
+    Schematic and PinMAME used as references.
+
+    Written during October 2012 [Robbbert]
+
+    When first used, the nvram gets initialised but is otherwise unusable. A reboot
+    will get it going.
 
 ToDo:
-- Diagnostic switch
+- Diagnostic controls
+
 
 
 ************************************************************************************/
@@ -48,6 +53,7 @@ public:
 	DECLARE_WRITE8_MEMBER(switch_w);
 	DECLARE_READ_LINE_MEMBER(cb1_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	DECLARE_INPUT_CHANGED_MEMBER(nmi);
 	DECLARE_MACHINE_RESET(s3);
 	DECLARE_MACHINE_RESET(s3a);
 protected:
@@ -162,6 +168,9 @@ static INPUT_PORTS_START( s3 )
 	PORT_START("SND")
 	PORT_BIT( 0xbf, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Music") PORT_CODE(KEYCODE_9) PORT_TOGGLE
+
+	PORT_START("DIAGS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Diagnostic") PORT_CODE(KEYCODE_0) PORT_CHANGED_MEMBER(DEVICE_SELF, s3_state, nmi, 1)
 INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER( s3_state, s3 )
@@ -176,8 +185,17 @@ MACHINE_RESET_MEMBER( s3_state, s3a )
 	m_chimes = 0;
 }
 
+INPUT_CHANGED_MEMBER( s3_state::nmi )
+{
+	// Diagnostic button sends a pulse to NMI pin
+	if (newval==CLEAR_LINE)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
 WRITE8_MEMBER( s3_state::sol0_w )
 {
+	if (BIT(data, 0))
+		m_samples->start(2, 5); // outhole
 }
 
 WRITE8_MEMBER( s3_state::sol1_w )
