@@ -2412,7 +2412,7 @@ VIDEO_START_MEMBER(namcos23_state,ss23)
 	// Gorgon's tilemap offset is 0, S23/SS23's is 860
 	if ((!strcmp(machine().system().name, "rapidrvr")) ||
 	    (!strcmp(machine().system().name, "rapidrvr2")) ||
-	    (!strcmp(machine().system().name, "rapidrvr3")) ||
+	    (!strcmp(machine().system().name, "rapidrvrp")) ||
 	    (!strcmp(machine().system().name, "finlflng")))
 	{
 		m_bgtilemap->set_scrolldx(0, 0);
@@ -2744,7 +2744,7 @@ static INPUT_PORTS_START( gorgon )
 	PORT_DIPNAME( 0x04, 0x04, "Freeze?" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	// verbose debug messages in rapidrvrp
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
@@ -3065,7 +3065,7 @@ DRIVER_INIT_MEMBER(namcos23_state,ss23)
 	    (!strcmp(machine().system().name, "panicprk")) ||
 	    (!strcmp(machine().system().name, "rapidrvr")) ||
 	    (!strcmp(machine().system().name, "rapidrvr2")) ||
-	    (!strcmp(machine().system().name, "rapidrvr3")) ||
+	    (!strcmp(machine().system().name, "rapidrvrp")) ||
 	    (!strcmp(machine().system().name, "finlflng")) ||
 	    (!strcmp(machine().system().name, "gunwars")) ||
 	    (!strcmp(machine().system().name, "downhill")) ||
@@ -3410,7 +3410,7 @@ ROM_START( rapidrvr2 )
 	ROM_LOAD( "rd1ccrh.11f",  0x000000, 0x200000, CRC(fafffb86) SHA1(15b0ba0252b99d0cac29fcb374fb895643f528fe) )
 ROM_END
 
-ROM_START( rapidrvr3 )
+ROM_START( rapidrvrp ) // prototype board
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_BYTE( "29f016.ic2",  0x000000, 0x200000, CRC(9f72a7cd) SHA1(06245f1d3cc6ffb5b0123a8eea0dc8338bdfc0d6) )
 	ROM_LOAD16_BYTE( "29f016.ic1",  0x000001, 0x200000, CRC(d395a244) SHA1(7f7b7b75b4bf9ac8808a27afed87f503df28e49f) )
@@ -4283,7 +4283,7 @@ ROM_END
 //    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT, MNTR,  COMPANY, FULLNAME,                         FLAGS
 GAME( 1997, rapidrvr, 0,        gorgon,   gorgon, namcos23_state,   ss23, ROT0, "Namco", "Rapid River (RD3 Ver. C)",     GAME_FLAGS ) // 97/11/27, USA
 GAME( 1997, rapidrvr2,rapidrvr, gorgon,   gorgon, namcos23_state,   ss23, ROT0, "Namco", "Rapid River (RD2 Ver. C)",     GAME_FLAGS ) // 97/11/27, Europe
-GAME( 1997, rapidrvr3,rapidrvr, gorgon,   gorgon, namcos23_state,   ss23, ROT0, "Namco", "Rapid River (RD3 Ver. ?)",     GAME_FLAGS ) // 97/11/10, USA
+GAME( 1997, rapidrvrp,rapidrvr, gorgon,   gorgon, namcos23_state,   ss23, ROT0, "Namco", "Rapid River (prototype)",      GAME_FLAGS ) // 97/11/10, USA
 GAME( 1997, finlflng, 0,        gorgon,   gorgon, namcos23_state,   ss23, ROT0, "Namco", "Final Furlong (FF2 Ver. A)",   GAME_FLAGS )
 GAME( 1997, downhill, 0,        s23,      s23, namcos23_state,      ss23, ROT0, "Namco", "Downhill Bikers (DH3 Ver. A)", GAME_FLAGS )
 GAME( 1997, motoxgo,  0,        s23,      s23, namcos23_state,      ss23, ROT0, "Namco", "Motocross Go! (MG3 Ver. A)",   GAME_FLAGS )
