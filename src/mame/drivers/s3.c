@@ -18,6 +18,7 @@
 ToDo:
 - Diagnostic controls
 - Add 10k chime when added to samples.
+- Hot Tip and Lucky 7 should play a tune when starting a game.
 
 
 ************************************************************************************/
@@ -197,7 +198,7 @@ INPUT_CHANGED_MEMBER( s3_state::nmi )
 
 WRITE8_MEMBER( s3_state::sol0_w )
 {
-	if (BIT(data, 0))
+	if (BIT(data, 4))
 		m_samples->start(2, 5); // outhole
 }
 
