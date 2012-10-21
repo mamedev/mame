@@ -2222,6 +2222,8 @@ $(DRIVERS)/roul.o:		$(LAYOUT)/roul.lh
 
 $(DRIVERS)/rowamet.o:	$(LAYOUT)/rowamet.lh
 
+$(DRIVERS)/s3.o:	$(LAYOUT)/s3.lh
+
 $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
 
 $(DRIVERS)/sderby.o:	$(LAYOUT)/sderby.lh \

@@ -3,15 +3,15 @@
 */
 
 
-#include "emu.h"
+#include "machine/genpin.h"
 #include "cpu/m6800/m6800.h"
 
-class williams_s4_state : public driver_device
+class s4_state : public genpin_class
 {
 public:
-	williams_s4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+	s4_state(const machine_config &mconfig, device_type type, const char *tag)
+		: genpin_class(mconfig, type, tag),
+	m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -21,29 +21,24 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
-public:
-	DECLARE_DRIVER_INIT(williams_s4);
+private:
 };
 
-static ADDRESS_MAP_START( williams_s4_map, AS_PROGRAM, 8, williams_s4_state )
+static ADDRESS_MAP_START( s4_main_map, AS_PROGRAM, 8, s4_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( williams_s4 )
+static INPUT_PORTS_START( s4 )
 INPUT_PORTS_END
 
-void williams_s4_state::machine_reset()
+void s4_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(williams_s4_state,williams_s4)
-{
-}
-
-static MACHINE_CONFIG_START( williams_s4, williams_s4_state )
+static MACHINE_CONFIG_START( s4, s4_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
-	MCFG_CPU_PROGRAM_MAP(williams_s4_map)
+	MCFG_CPU_PROGRAM_MAP(s4_main_map)
 MACHINE_CONFIG_END
 
 /*--------------------------------
@@ -57,7 +52,8 @@ ROM_START(flash_l1)
 	ROM_RELOAD( 0xf800, 0x0800)
 	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
 	ROM_RELOAD( 0xf000, 0x0800)
-	ROM_REGION(0x10000, "cpu2", 0)
+
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
@@ -70,7 +66,8 @@ ROM_START(flash_t1)
 	ROM_RELOAD( 0xf800, 0x0800)
 	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
 	ROM_RELOAD( 0xf000, 0x0800)
-	ROM_REGION(0x10000, "cpu2", 0)
+
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
@@ -86,7 +83,8 @@ ROM_START(phnix_l1)
 	ROM_RELOAD( 0xf800, 0x0800)
 	ROM_LOAD("white1.716", 0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
 	ROM_RELOAD( 0xf000, 0x0800)
-	ROM_REGION(0x10000, "cpu2", 0)
+
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
@@ -102,7 +100,8 @@ ROM_START(pkrno_l1)
 	ROM_RELOAD( 0xf800, 0x0800)
 	ROM_LOAD("white1.716", 0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
 	ROM_RELOAD( 0xf000, 0x0800)
-	ROM_REGION(0x10000, "cpu2", 0)
+
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
@@ -118,7 +117,8 @@ ROM_START(stlwr_l2)
 	ROM_RELOAD( 0xf800, 0x0800)
 	ROM_LOAD("yellow1.716", 0x7000, 0x0800, CRC(d251738c) SHA1(65ddbf5c36e429243331a4c5d2339df87a8a7f64))
 	ROM_RELOAD( 0xf000, 0x0800)
-	ROM_REGION(0x10000, "cpu2", 0)
+
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
@@ -134,7 +134,8 @@ ROM_START(pomp_l1)
 	ROM_RELOAD( 0xf800, 0x0800)
 	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_RELOAD( 0xf000, 0x0800)
-	ROM_REGION(0x10000, "cpu2", 0)
+
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("soundx.716", 0x7800, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
@@ -150,7 +151,8 @@ ROM_START(arist_l1)
 	ROM_RELOAD( 0xf800, 0x0800)
 	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_RELOAD( 0xf000, 0x0800)
-	ROM_REGION(0x10000, "cpu2", 0)
+
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("soundx.716", 0x7800, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
@@ -166,7 +168,8 @@ ROM_START(topaz_l1)
 	ROM_RELOAD( 0xf800, 0x0800)
 	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_RELOAD( 0xf000, 0x0800)
-	ROM_REGION(0x10000, "cpu2", 0)
+
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
@@ -182,7 +185,8 @@ ROM_START(taurs_l1)
 	ROM_RELOAD( 0xf800, 0x0800)
 	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_RELOAD( 0xf000, 0x0800)
-	ROM_REGION(0x10000, "cpu2", 0)
+
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("soundx.716", 0x7800, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
@@ -198,7 +202,8 @@ ROM_START(kingt_l1)
 	ROM_RELOAD( 0xf800, 0x0800)
 	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_RELOAD( 0xf000, 0x0800)
-	ROM_REGION(0x10000, "cpu2", 0)
+
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("soundx.716", 0x7800, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
@@ -214,7 +219,8 @@ ROM_START(omni_l1)
 	ROM_RELOAD( 0xf800, 0x0800)
 	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_RELOAD( 0xf000, 0x0800)
-	ROM_REGION(0x10000, "cpu2", 0)
+
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("sound.716", 0x7800, 0x0800, CRC(db085cbb) SHA1(9a57abbad183ba16b3dba16d16923c3bfc46a0c3))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
@@ -230,6 +236,8 @@ ROM_START(bstrk_l1)
 	ROM_RELOAD( 0xf800, 0x0800)
 	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_RELOAD( 0xf000, 0x0800)
+
+	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
 ROM_END
 
 /*----------------------------
@@ -243,19 +251,21 @@ ROM_START(tstrk_l1)
 	ROM_RELOAD( 0xf800, 0x0800)
 	ROM_LOAD("ic20.716", 0x7000, 0x0800, CRC(f163fc88) SHA1(988b60626f3d4dc8f4a1dbd0c99282418bc53aae))
 	ROM_RELOAD( 0xf000, 0x0800)
+
+	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
 ROM_END
 
 
-GAME(1979,	flash_l1,		0,			williams_s4,	williams_s4, williams_s4_state,	williams_s4,	ROT0,	"Williams",				"Flash (L-1)",						GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,	flash_t1,		flash_l1,	williams_s4,	williams_s4, williams_s4_state,	williams_s4,	ROT0,	"Williams",				"Flash (T-1) Ted Estes",			GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,	phnix_l1,		0,			williams_s4,	williams_s4, williams_s4_state,	williams_s4,	ROT0,	"Williams",				"Phoenix (L-1)",					GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,	pkrno_l1,		0,			williams_s4,	williams_s4, williams_s4_state,	williams_s4,	ROT0,	"Williams",				"Pokerino (L-1)",					GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,	stlwr_l2,		0,			williams_s4,	williams_s4, williams_s4_state,	williams_s4,	ROT0,	"Williams",				"Stellar Wars (L-2)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,	pomp_l1,		0,			williams_s4,	williams_s4, williams_s4_state,	williams_s4,	ROT0,	"Williams",				"Pompeii (Shuffle) (L-1)",			GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,	arist_l1,		0,			williams_s4,	williams_s4, williams_s4_state,	williams_s4,	ROT0,	"Williams",				"Aristocrat (Shuffle) (L-1)",			GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,	topaz_l1,		0,			williams_s4,	williams_s4, williams_s4_state,	williams_s4,	ROT0,	"Williams",				"Topaz (Shuffle) (L-1)",			GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,	taurs_l1,		0,			williams_s4,	williams_s4, williams_s4_state,	williams_s4,	ROT0,	"Williams",				"Taurus (Shuffle) (L-1)",			GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,	kingt_l1,		0,			williams_s4,	williams_s4, williams_s4_state,	williams_s4,	ROT0,	"Williams",				"King Tut (Shuffle) (L-1)",			GAME_IS_SKELETON_MECHANICAL)
-GAME(1980,	omni_l1,		0,			williams_s4,	williams_s4, williams_s4_state,	williams_s4,	ROT0,	"Williams",				"Omni (Shuffle) (L-1)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1983,	bstrk_l1,		0,			williams_s4,	williams_s4, williams_s4_state,	williams_s4,	ROT0,	"Williams",				"Big Strike (Shuffle) (L-1)",		GAME_IS_SKELETON_MECHANICAL)
-GAME(1983,	tstrk_l1,		0,			williams_s4,	williams_s4, williams_s4_state,	williams_s4,	ROT0,	"Williams",				"Triple Strike (Shuffle) (L-1)",	GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,flash_l1, 0,        s4, s4, driver_device, 0, ROT0, "Williams", "Flash (L-1)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,flash_t1, flash_l1, s4, s4, driver_device, 0, ROT0, "Williams", "Flash (T-1) Ted Estes", GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,phnix_l1, 0,        s4, s4, driver_device, 0, ROT0, "Williams", "Phoenix (L-1)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,pkrno_l1, 0,        s4, s4, driver_device, 0, ROT0, "Williams", "Pokerino (L-1)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,stlwr_l2, 0,        s4, s4, driver_device, 0, ROT0, "Williams", "Stellar Wars (L-2)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,pomp_l1,  0,        s4, s4, driver_device, 0, ROT0, "Williams", "Pompeii (Shuffle) (L-1)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,arist_l1, 0,        s4, s4, driver_device, 0, ROT0, "Williams", "Aristocrat (Shuffle) (L-1)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,topaz_l1, 0,        s4, s4, driver_device, 0, ROT0, "Williams", "Topaz (Shuffle) (L-1)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,taurs_l1, 0,        s4, s4, driver_device, 0, ROT0, "Williams", "Taurus (Shuffle) (L-1)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,kingt_l1, 0,        s4, s4, driver_device, 0, ROT0, "Williams", "King Tut (Shuffle) (L-1)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1980,omni_l1,  0,        s4, s4, driver_device, 0, ROT0, "Williams", "Omni (Shuffle) (L-1)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1983,bstrk_l1, 0,        s4, s4, driver_device, 0, ROT0, "Williams", "Big Strike (Shuffle) (L-1)", GAME_IS_SKELETON_MECHANICAL)
+GAME(1983,tstrk_l1, 0,        s4, s4, driver_device, 0, ROT0, "Williams", "Triple Strike (Shuffle) (L-1)", GAME_IS_SKELETON_MECHANICAL)

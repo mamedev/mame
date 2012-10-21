@@ -5,8 +5,12 @@
 
     Typical of Williams hardware: Motorola 8-bit CPUs, and lots of PIAs.
 
-    Sound doesn't work because the diagram doesn't show where the sound data
-    comes from. (variable m_sound_data needs to be written to).
+    When first used, the nvram gets initialised but is otherwise unusable. It will
+    work on the next use.
+
+ToDo:
+- Diagnostic switch
+
 
 ************************************************************************************/
 
@@ -15,7 +19,7 @@
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "sound/dac.h"
-//#include "s3.lh"
+#include "s3.lh"
 
 
 class s3_state : public genpin_class
@@ -38,6 +42,8 @@ public:
 	DECLARE_WRITE8_MEMBER(dig1_w);
 	DECLARE_WRITE8_MEMBER(lamp0_w);
 	DECLARE_WRITE8_MEMBER(lamp1_w);
+	DECLARE_WRITE8_MEMBER(sol0_w);
+	DECLARE_WRITE8_MEMBER(sol1_w);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
 	DECLARE_READ_LINE_MEMBER(cb1_r);
@@ -59,12 +65,15 @@ private:
 	UINT8 m_t_c;
 	UINT8 m_sound_data;
 	UINT8 m_strobe;
+	UINT8 m_kbdrow;
 	bool m_cb1;
+	bool m_data_ok;
 };
 
 static ADDRESS_MAP_START( s3_main_map, AS_PROGRAM, 8, s3_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	AM_RANGE(0x0000, 0x00ff) AM_RAM
+	AM_RANGE(0x0100, 0x017f) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2200, 0x2203) AM_DEVREADWRITE("pia0", pia6821_device, read, write) // solenoids
 	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia1", pia6821_device, read, write) // lamps
 	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia2", pia6821_device, read, write) // display
@@ -81,11 +90,121 @@ static ADDRESS_MAP_START( s3_audio_map, AS_PROGRAM, 8, s3_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( s3 )
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )
+
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+
+	PORT_START("X8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
+
+	PORT_START("X10")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_UP)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DOWN)
+
+	PORT_START("X20")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("X40")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("X80")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SND")
+	PORT_BIT( 0xbf, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Music") PORT_CODE(KEYCODE_9) PORT_TOGGLE
 INPUT_PORTS_END
 
 void s3_state::machine_reset()
 {
 	m_t_c = 0;
+}
+
+WRITE8_MEMBER( s3_state::sol0_w )
+{
+
+}
+
+WRITE8_MEMBER( s3_state::sol1_w )
+{
+	m_sound_data = ioport("SND")->read(); // 0xff or 0xbf
+	if (BIT(data, 0))
+		m_sound_data &= 0xfe;
+	else
+	if (BIT(data, 1))
+		m_sound_data &= 0xfd;
+	else
+	if (BIT(data, 2))
+		m_sound_data &= 0xfb;
+	else
+	if (BIT(data, 3))
+		m_sound_data &= 0xf7;
+	else
+	if (BIT(data, 4))
+		m_sound_data &= 0x7f;
+	else
+	if (BIT(data, 5))
+		m_samples->start(0, 6); // knocker
+
+	if ((m_sound_data & 0xbf) == 0xbf)
+	{
+		m_cb1 = 0;
+		m_pia4->cb1_w(0);
+	}
+	else
+	{
+		m_cb1 = 1;
+		m_pia4->cb1_w(1);
+	}
 }
 
 static const pia6821_interface pia0_intf =
@@ -96,8 +215,8 @@ static const pia6821_interface pia0_intf =
 	DEVCB_LINE_GND,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_NULL,		/* port B out */
+	DEVCB_DRIVER_MEMBER(s3_state, sol0_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(s3_state, sol1_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),		/* IRQA */
@@ -111,7 +230,7 @@ WRITE8_MEMBER( s3_state::lamp0_w )
 
 WRITE8_MEMBER( s3_state::lamp1_w )
 {
-	//printf("1=%X ",data);
+
 }
 
 static const pia6821_interface pia1_intf =
@@ -133,15 +252,18 @@ static const pia6821_interface pia1_intf =
 WRITE8_MEMBER( s3_state::dig0_w )
 {
 	m_strobe = data;
+	m_data_ok = true;
 }
 
 WRITE8_MEMBER( s3_state::dig1_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 }; // MC14558
-	// player 1, 2, credits, balls
-	output_set_digit_value(m_strobe, patterns[data&15]);
-	// player 3 and 4
-	output_set_digit_value(m_strobe+20, patterns[data>>4]);
+	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
+	if (m_data_ok)
+	{
+		output_set_digit_value(m_strobe+16, patterns[data&15]);
+		output_set_digit_value(m_strobe, patterns[data>>4]);
+	}
+	m_data_ok = false;
 }
 
 static const pia6821_interface pia2_intf =
@@ -162,12 +284,14 @@ static const pia6821_interface pia2_intf =
 
 READ8_MEMBER( s3_state::switch_r )
 {
-	return 0xff;
+	char kbdrow[8];
+	sprintf(kbdrow,"X%X",m_kbdrow);
+	return ioport(kbdrow)->read();
 }
 
 WRITE8_MEMBER( s3_state::switch_w )
 {
-
+	m_kbdrow = data;
 }
 
 static const pia6821_interface pia3_intf =
@@ -193,8 +317,6 @@ READ_LINE_MEMBER( s3_state::cb1_r )
 
 READ8_MEMBER( s3_state::dac_r )
 {
-	m_cb1 = (m_sound_data < 255);
-	// add code to activate cb1
 	return m_sound_data;	
 }
 
@@ -236,13 +358,13 @@ static MACHINE_CONFIG_START( s3, s3_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s3_state, irq, attotime::from_hz(1000))
 
 	/* Video */
-	//MCFG_DEFAULT_LAYOUT(layout_s3)
+	MCFG_DEFAULT_LAYOUT(layout_s3)
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
 	MCFG_PIA6821_ADD("pia0", pia0_intf)
@@ -250,6 +372,7 @@ static MACHINE_CONFIG_START( s3, s3_state )
 	MCFG_PIA6821_ADD("pia2", pia2_intf)
 	MCFG_PIA6821_ADD("pia3", pia3_intf)
 	MCFG_PIA6821_ADD("pia4", pia4_intf)
+	MCFG_NVRAM_ADD_1FILL("nvram")
 MACHINE_CONFIG_END
 
 /*-------------------------------------
@@ -316,8 +439,8 @@ ROM_START(wldcp_l1)
 ROM_END
 
 
-GAME( 1977, httip_l1, 0, s3, s3, driver_device, 0, ROT0, "Williams", "Hot Tip (L-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1977, lucky_l1, 0, s3, s3, driver_device, 0, ROT0, "Williams", "Lucky Seven (L-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1978, wldcp_l1, 0, s3, s3, driver_device, 0, ROT0, "Williams", "World Cup Soccer (L-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1978, cntct_l1, 0, s3, s3, driver_device, 0, ROT0, "Williams", "Contact (L-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1978, disco_l1, 0, s3, s3, driver_device, 0, ROT0, "Williams", "Disco Fever (L-1)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1977, httip_l1, 0, s3, s3, driver_device, 0, ROT0, "Williams", "Hot Tip (L-1)", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME( 1977, lucky_l1, 0, s3, s3, driver_device, 0, ROT0, "Williams", "Lucky Seven (L-1)", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME( 1978, wldcp_l1, 0, s3, s3, driver_device, 0, ROT0, "Williams", "World Cup Soccer (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME( 1978, cntct_l1, 0, s3, s3, driver_device, 0, ROT0, "Williams", "Contact (L-1)", GAME_MECHANICAL)
+GAME( 1978, disco_l1, 0, s3, s3, driver_device, 0, ROT0, "Williams", "Disco Fever (L-1)", GAME_MECHANICAL)
