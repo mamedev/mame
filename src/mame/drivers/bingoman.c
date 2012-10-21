@@ -3,7 +3,8 @@
   Bingo Mania.
   HP Automaten.
 
-  Multi game board with 3 different games
+  Multi game system.
+  Can handle up to 3 different games
   which could be selected on startup.
 
   Skeleton driver by Angelo Salese & Roberto Fresca.
@@ -54,11 +55,26 @@
   All ROMs have copyright "(c) H.Polanz GmbH"
 
 
+****************************************************************************
+
+  Games:
+
+      CODE    |    DATE    |   TITLE
+  ------------+------------+-----------------------------
+  A03.037.013 | 10-08-2002 | Gold Jackpot
+  ------------+------------+-----------------------------
+  P03.036.015 | 10-08-2002 | Gold Jackpot
+  ------------+------------+-----------------------------
+  P07.036.010 | 21-09-1996 | Turbo Game
+  ------------+------------+-----------------------------
+  P14.036.012 | 18-11-1997 | Rolling Bingo - Joker Bonus
+  ------------+------------+-----------------------------
+
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/h83002/h8.h"
-//#include "sound/ay8910.h"
 
 
 class bingoman_state : public driver_device
@@ -210,14 +226,12 @@ static MACHINE_CONFIG_START( bingoman, bingoman_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 
 /***************************************************************************
 
-  Game driver(s)
+   ROM Load
 
 ***************************************************************************/
 
@@ -226,12 +240,12 @@ ROM_START( bingoman )
 	ROM_LOAD16_WORD_SWAP( "ps.020.u51",   0x000000, 0x080000, CRC(0f40b10d) SHA1(96a24547a612ba7c2b33c84a0f3afecc9a7cc076) ) // wrong ...
 
 	ROM_REGION( 0x300000, "tms", ROMREGION_ERASE00 )	// banked
-	ROM_LOAD( "p03_036.015.u1", 0x000000, 0x080000, CRC(b78b7fca) SHA1(8e4147bb8351db5b17e2bf39bb12ca31cf02f3a6) )	// seems to be for game1
-	ROM_LOAD( "p03_tms.030.u2", 0x080000, 0x080000, CRC(94f0076e) SHA1(45d0379ad232ae7c5723c87a5fed9f9cc576aea2) )	// seems to be for game1
-	ROM_LOAD( "p07_036.010.u3", 0x100000, 0x080000, CRC(dda80fab) SHA1(4fb06ca94a8a03e5ee91d4cb4a24ac35863a82a1) )	// seems to be for game2
-	ROM_LOAD( "p07_tms.025.u4", 0x180000, 0x080000, CRC(6c4a84f8) SHA1(e683753eaf54fdedd1cdc64c4dd4591e3b48dc75) )	// seems to be for game2
-	ROM_LOAD( "p14_036.012.u5", 0x200000, 0x080000, CRC(a9f2c609) SHA1(0669aba100a8263b99373d7ac997ec4f1967bb1b) )	// seems to be for game3
-	ROM_LOAD( "p14_tms.030.u6", 0x280000, 0x080000, CRC(cdf60d47) SHA1(ef7e107f1713466fb18e940e90e7f46c781d4581) )	// seems to be for game3
+	ROM_LOAD( "p03_036.015.u01", 0x000000, 0x080000, CRC(b78b7fca) SHA1(8e4147bb8351db5b17e2bf39bb12ca31cf02f3a6) )	// Game 1 (Gold Jackpot)
+	ROM_LOAD( "p03_tms.030.u02", 0x080000, 0x080000, CRC(94f0076e) SHA1(45d0379ad232ae7c5723c87a5fed9f9cc576aea2) )	// Game 1 (Gold Jackpot)
+	ROM_LOAD( "p07_036.010.u03", 0x100000, 0x080000, CRC(dda80fab) SHA1(4fb06ca94a8a03e5ee91d4cb4a24ac35863a82a1) )	// Game 2 (Turbo Game)
+	ROM_LOAD( "p07_tms.025.u04", 0x180000, 0x080000, CRC(6c4a84f8) SHA1(e683753eaf54fdedd1cdc64c4dd4591e3b48dc75) )	// Game 2 (Turbo Game)
+	ROM_LOAD( "p14_036.012.u05", 0x200000, 0x080000, CRC(a9f2c609) SHA1(0669aba100a8263b99373d7ac997ec4f1967bb1b) )	// Game 3 (Rolling Bingo - Joker Bonus)
+	ROM_LOAD( "p14_tms.030.u06", 0x280000, 0x080000, CRC(cdf60d47) SHA1(ef7e107f1713466fb18e940e90e7f46c781d4581) )	// Game 3 (Rolling Bingo - Joker Bonus)
 
 	ROM_REGION( 0x100000, "snd", ROMREGION_ERASE00 )
 	ROM_LOAD( "snd.u10.021.u10", 0x00000, 0x80000, CRC(676f7c4f) SHA1(acdec156cb2d7b880cc1668cce50268bb2b4ec72) )
@@ -244,10 +258,44 @@ ROM_START( bingoman )
 	ROM_LOAD( "102u3010_gal20v8b.u30",   0x3000, 0x0a92, CRC(ee5a4e08) SHA1(5ae4e853c76444062a60612c8db179c8704e09de) )
 	ROM_LOAD( "102u5400_gal16v8d.u54",   0x4000, 0x0892, CRC(cfd94d14) SHA1(730a02c8741be583e03a1a487b0a0d76a99b6e71) )
 	ROM_LOAD( "102u5500_gal16v8d.u55",   0x5000, 0x0892, CRC(cfd94d14) SHA1(730a02c8741be583e03a1a487b0a0d76a99b6e71) )
-	ROM_LOAD( "103u0701_atf20v8bq.u7",   0x6000, 0x0a92, CRC(aef4ee3f) SHA1(147423b3ba93e70af8129f31411b489dafbe8db6) )
-	ROM_LOAD( "103u0820_gal16v8d.u8",    0x7000, 0x0892, CRC(37c1f1c1) SHA1(c08b590a18a9ef5e06352c0b8429676f02bc5765) )
-	ROM_LOAD( "103u0900_atf16v8bql.u9",  0x8000, 0x0892, CRC(63214d15) SHA1(c6f4f68a9bccd954fde13bef94bd28097d6bebfc) )
+	ROM_LOAD( "103u0701_atf20v8bq.u07",  0x6000, 0x0a92, CRC(aef4ee3f) SHA1(147423b3ba93e70af8129f31411b489dafbe8db6) )
+	ROM_LOAD( "103u0820_gal16v8d.u08",   0x7000, 0x0892, CRC(37c1f1c1) SHA1(c08b590a18a9ef5e06352c0b8429676f02bc5765) )
+	ROM_LOAD( "103u0900_atf16v8bql.u09", 0x8000, 0x0892, CRC(63214d15) SHA1(c6f4f68a9bccd954fde13bef94bd28097d6bebfc) )
 	ROM_LOAD( "103u1301_gal16v8d.u13",   0x9000, 0x0892, CRC(45bffe9a) SHA1(86a61f23b2da2bc3a4b0f95826638719b925b399) )
 ROM_END
 
-GAME( 1993, bingoman,  0,   bingoman,  bingoman, driver_device,  0,       ROT0, "HP Automaten",      "Bingo Mania", GAME_IS_SKELETON )
+ROM_START( bingomana )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "ps.020.u51",   0x000000, 0x080000, CRC(0f40b10d) SHA1(96a24547a612ba7c2b33c84a0f3afecc9a7cc076) ) // wrong ...
+
+	ROM_REGION( 0x300000, "tms", ROMREGION_ERASE00 )	// banked
+	ROM_LOAD( "a03_037.013.u01", 0x000000, 0x080000, CRC(9c3ed8e9) SHA1(263431ed6db314bee64709bae16fa8c6d5adbd41) )	// Game 1 (Gold Jackpot)
+	ROM_LOAD( "a03_tms.010.u02", 0x080000, 0x080000, CRC(f4142b1a) SHA1(1a14865bd567d5e7bf9e0e0765f6443c8165f46b) )	// Game 1 (Gold Jackpot)
+
+	ROM_REGION( 0x100000, "snd", ROMREGION_ERASE00 )
+	ROM_LOAD( "snd_u10.022.u10", 0x00000, 0x80000, CRC(216a9c4a) SHA1(f1eb5f6517d6b579bf977b8eb4dd3f3544b75796) )	// different revision
+	ROM_LOAD( "snd_u11.022.u11", 0x80000, 0x80000, CRC(c0bb0056) SHA1(c8bc3a618eb9be940e089ec00d88c0b92d42025c) )	// different revision
+
+	ROM_REGION( 0x10000, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "102u0530_gal16v8d.u05",   0x0000, 0x0892, CRC(3f0f57e5) SHA1(65383da38f4ad6c5ecaf84336eabea3a77db1307) )
+	ROM_LOAD( "102u1400_palce20v8h.u14", 0x1000, 0x0a92, CRC(c0a0d80d) SHA1(75c3cf2a7a454d40770e31ad1d9096a1b977f786) )
+	ROM_LOAD( "102u2920_gal20v8b.u29",   0x2000, 0x0a92, CRC(a0ec643e) SHA1(280ad44a4d484326b015620a8a6307bbaf030c21) )
+	ROM_LOAD( "102u3010_gal20v8b.u30",   0x3000, 0x0a92, CRC(ee5a4e08) SHA1(5ae4e853c76444062a60612c8db179c8704e09de) )
+	ROM_LOAD( "102u5400_atf16v8b.u54",   0x4000, 0x0892, CRC(aff40999) SHA1(cf12b31d3a28b6380c65c5fd0c1db43d7378f6b2) )
+	ROM_LOAD( "102u5500_atf16v8b.u55",   0x5000, 0x0892, CRC(aff40999) SHA1(cf12b31d3a28b6380c65c5fd0c1db43d7378f6b2) )
+	ROM_LOAD( "103u0790_gal20v8b.u07",   0x6000, 0x0a92, CRC(1ed19f8d) SHA1(f2bcbe06dc575f2b894208326b9dfae2b6cac2be) )
+	ROM_LOAD( "103u0820_atf16v8bql.u08", 0x7000, 0x0892, CRC(908c2e36) SHA1(7d8be56cbcef7eeb2d1e40f528789dab58e86c95) )
+	ROM_LOAD( "103u0900_atf16v8bql.u09", 0x8000, 0x0892, CRC(63214d15) SHA1(c6f4f68a9bccd954fde13bef94bd28097d6bebfc) )
+	ROM_LOAD( "103u1301_atf16v8bql.u13", 0x9000, 0x0892, CRC(e8b65072) SHA1(b2f7d70ee228c28a19c2594fc3631b8afd4a0f5e) )
+ROM_END
+
+
+/***************************************************************************
+
+  Game driver(s)
+
+***************************************************************************/
+
+/*    YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT  ROT    COMPANY          FULLNAME                    FLAGS   */
+GAME( 1993, bingoman,  0,        bingoman,  bingoman, driver_device,  0,    ROT0, "HP Automaten",  "Bingo Mania (P03-P07-P14)", GAME_IS_SKELETON )
+GAME( 1993, bingomana, bingoman, bingoman,  bingoman, driver_device,  0,    ROT0, "HP Automaten",  "Bingo Mania (A03)",         GAME_IS_SKELETON )
