@@ -69,6 +69,7 @@
 #include "video/nubus_wsportrait.h"
 #include "machine/nubus_asntmc3b.h"
 #include "video/nubus_m2video.h"
+#include "video/pds30_cb264.h"
 #include "includes/mac.h"
 #include "mac.lh"
 
@@ -664,6 +665,7 @@ static ADDRESS_MAP_START(macse30_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)	// mirror
 
 	AM_RANGE(0xfe000000, 0xfe00ffff) AM_RAM	AM_SHARE("vram")
+    AM_RANGE(0xfee00000, 0xfee0ffff) AM_RAM AM_SHARE("vram") AM_MIRROR(0x000f0000)
 	AM_RANGE(0xfeffe000, 0xfeffffff) AM_ROM AM_REGION("se30vrom", 0x0)
 ADDRESS_MAP_END
 
@@ -855,6 +857,10 @@ static SLOT_INTERFACE_START(mac_nubus_cards)
 	SLOT_INTERFACE("asmc3nb", NUBUS_ASNTMC3NB)	/* Asante MC3NB Ethernet card */
 	SLOT_INTERFACE("portrait", NUBUS_WSPORTRAIT)	/* Apple Macintosh II Portrait video card */
 	SLOT_INTERFACE("enetnb", NUBUS_APPLEENET)	/* Apple NuBus Ethernet */
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START(mac_pds030_cards)
+    SLOT_INTERFACE("cb264", PDS030_CB264SE30)
 SLOT_INTERFACE_END
 
 /***************************************************************************
@@ -1284,6 +1290,9 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
 	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
+
+	MCFG_NUBUS_BUS_ADD("pds", "maincpu", nubus_intf)
+	MCFG_NUBUS_SLOT_ADD("pds","pds030", mac_pds030_cards, NULL, NULL)
 
 	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)

@@ -114,6 +114,7 @@ UINT32 mac_state::screen_update_macse30(screen_device &screen, bitmap_ind16 &bit
 	int y, x, b;
 
 	video_base = m_screen_buffer ? 0x8000 : 0;
+    video_base += (MAC_H_VIS/8);
 	video_ram = (const UINT16 *) &m_vram[video_base/4];
 
 	for (y = 0; y < MAC_V_VIS; y++)
