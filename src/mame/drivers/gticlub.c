@@ -31,7 +31,7 @@
     Operation Thunder Hurricane    | GX792     | GN672(A)     | GN678(B)       | extra board for gun controls(?)
     Solar Assault                  | GX680     | GN672(A)     | GN678(B)       |
 
-    Hang Pilot                     | GN685     | ??           | 2x ??          | 3dfx-based CG boards
+    Hang Pilot                     | GN685     | GN672(A)     | 2x ??          | 3dfx-based CG boards
 
 
 Konami 'GTI Club' Hardware
@@ -239,8 +239,9 @@ class gticlub_state : public driver_device
 {
 public:
 	gticlub_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_work_ram(*this, "work_ram"){ }
+		: driver_device(mconfig, type, tag),
+		m_work_ram(*this, "work_ram")
+	{ }
 
 	required_shared_ptr<UINT32> m_work_ram;
 	UINT32 *m_sharc_dataram_0;
@@ -258,7 +259,9 @@ public:
 	DECLARE_WRITE32_MEMBER(dsp_dataram0_w);
 	DECLARE_READ32_MEMBER(dsp_dataram1_r);
 	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
+	void init_hangplt_common();
 	DECLARE_DRIVER_INIT(hangplt);
+	DECLARE_DRIVER_INIT(hangpltu);
 	DECLARE_DRIVER_INIT(gticlub);
 	DECLARE_MACHINE_START(gticlub);
 	DECLARE_MACHINE_RESET(gticlub);
@@ -1206,9 +1209,35 @@ ROM_START( hangplt ) /* Japan version JAB */
 	ROM_LOAD( "hangplt.nv", 0x0000, 0x0200, CRC(35f482c8) SHA1(445918156770449dce1a010aab9d310f15670092) )
 ROM_END
 
+ROM_START( hangpltu ) /* USA version UAA */
+	ROM_REGION(0x200000, "user1", 0)	/* PowerPC program roms */
+	ROM_LOAD32_BYTE( "685uaa01.21u", 0x000003, 0x080000, CRC(c970e5d9) SHA1(cee18cc71161c138ec8150d4ba01d31912482841) )
+	ROM_LOAD32_BYTE( "685uaa02.19u", 0x000002, 0x080000, CRC(765906d6) SHA1(9085a2346756b3b628fef91b7afc131aba434654) )
+	ROM_LOAD32_BYTE( "685uaa03.21r", 0x000001, 0x080000, CRC(cb0147a3) SHA1(7bcab760c01ea7e24f4ca5793e081aafa97f68a3) )
+	ROM_LOAD32_BYTE( "685uaa04.19r", 0x000000, 0x080000, CRC(a5fda56b) SHA1(4d86f488f411ec16fa3be830206a44214941d1fe) )
+
+	ROM_REGION32_BE(0x400000, "user2", 0)	/* data roms */
+	ROM_LOAD32_WORD_SWAP( "685a05.14u", 0x000000, 0x200000, CRC(ba1c8f40) SHA1(ce4ed641c1d6d44447eaaada16f305f1d7fb9ee2) )
+	ROM_LOAD32_WORD_SWAP( "685a06.12u", 0x000002, 0x200000, CRC(2429935c) SHA1(4da9e169adcac81ea1bc135d727c2bd13ad372fa) )
+
+	ROM_REGION(0x80000, "audiocpu", 0)	/* 68k program */
+	ROM_LOAD16_WORD_SWAP( "685a07.13k", 0x000000, 0x080000, CRC(5b72fd80) SHA1(a150837fa0d66dc0c3832495a4c8ce4f9b92cd98) )
+
+	ROM_REGION(0x1000000, "rfsnd", 0)	/* sound roms */
+	ROM_LOAD( "685a09.9s", 0x000000, 0x400000, CRC(b8ae40aa) SHA1(eee27a8929e0e805f1045fd9638e661b36a1e3c7) )
+	ROM_LOAD( "685a10.7s", 0x400000, 0x400000, CRC(fef3dc36) SHA1(566c7469fc452b5965a31fa42291082ec8e48a24) )
+
+	ROM_REGION(0x800000, "user5", 0)	/* texture roms */
+	ROM_LOAD32_WORD( "685a13.4w",  0x000002, 0x400000, CRC(06329af4) SHA1(76cad9db604751ce48bb67bfd29e57bac0ee9a16) )
+	ROM_LOAD32_WORD( "685a14.12w", 0x000000, 0x400000, CRC(87437739) SHA1(0d45637af40938a54d5efd29c125b0fafd55f9a4) )
+
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD( "hangplt.nv", 0x0000, 0x0200, CRC(35f482c8) SHA1(445918156770449dce1a010aab9d310f15670092) )
+ROM_END
+
+
 DRIVER_INIT_MEMBER(gticlub_state,gticlub)
 {
-
 	init_konami_cgboard(machine(), 1, CGBOARD_TYPE_GTICLUB);
 
 	m_sharc_dataram_0 = auto_alloc_array(machine(), UINT32, 0x100000/4);
@@ -1216,15 +1245,19 @@ DRIVER_INIT_MEMBER(gticlub_state,gticlub)
 	K001005_preprocess_texture_data(memregion("gfx1")->base(), memregion("gfx1")->bytes(), 1);
 }
 
-DRIVER_INIT_MEMBER(gticlub_state,hangplt)
+void gticlub_state::init_hangplt_common()
 {
-
 	init_konami_cgboard(machine(), 2, CGBOARD_TYPE_HANGPLT);
 	set_cgboard_texture_bank(machine(), 0, "bank5", memregion("user5")->base());
 	set_cgboard_texture_bank(machine(), 1, "bank6", memregion("user5")->base());
 
 	m_sharc_dataram_0 = auto_alloc_array(machine(), UINT32, 0x100000/4);
 	m_sharc_dataram_1 = auto_alloc_array(machine(), UINT32, 0x100000/4);
+}
+
+DRIVER_INIT_MEMBER(gticlub_state,hangplt)
+{
+	init_hangplt_common();
 
 	// workaround for lock/unlock errors
 	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
@@ -1232,13 +1265,22 @@ DRIVER_INIT_MEMBER(gticlub_state,hangplt)
 	rom[(0x15428^4) / 4] = 0x4e800020;
 }
 
+DRIVER_INIT_MEMBER(gticlub_state,hangpltu)
+{
+	init_hangplt_common();
+
+	// workaround for lock/unlock errors
+	// TODO (game doesn't work yet)
+}
+
 /*************************************************************************/
 
-GAME( 1996, gticlub,  0,        gticlub,  gticlub,  gticlub_state, gticlub, ROT0, "Konami", "GTI Club (ver EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, gticlubu, gticlub,  gticlub,  gticlub,  gticlub_state, gticlub, ROT0, "Konami", "GTI Club (ver UAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, gticluba, gticlub,  gticlub,  gticlub,  gticlub_state, gticlub, ROT0, "Konami", "GTI Club (ver AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, gticlubj, gticlub,  gticlub,  gticlub,  gticlub_state, gticlub, ROT0, "Konami", "GTI Club (ver JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, thunderh, 0,        thunderh, thunderh, gticlub_state, gticlub, ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1996, thunderhu,thunderh, thunderh, thunderh, gticlub_state, gticlub, ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1997, slrasslt, 0,        slrasslt, slrasslt, gticlub_state, gticlub, ROT0, "Konami", "Solar Assault (ver UAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAMEL( 1997, hangplt, 0,        hangplt,  hangplt,  gticlub_state, hangplt, ROT0, "Konami", "Hang Pilot", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND, layout_dualhovu )
+GAME( 1996, gticlub,  0,        gticlub,  gticlub,  gticlub_state, gticlub,  ROT0, "Konami", "GTI Club (ver EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, gticlubu, gticlub,  gticlub,  gticlub,  gticlub_state, gticlub,  ROT0, "Konami", "GTI Club (ver UAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, gticluba, gticlub,  gticlub,  gticlub,  gticlub_state, gticlub,  ROT0, "Konami", "GTI Club (ver AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, gticlubj, gticlub,  gticlub,  gticlub,  gticlub_state, gticlub,  ROT0, "Konami", "GTI Club (ver JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, thunderh, 0,        thunderh, thunderh, gticlub_state, gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1996, thunderhu,thunderh, thunderh, thunderh, gticlub_state, gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1997, slrasslt, 0,        slrasslt, slrasslt, gticlub_state, gticlub,  ROT0, "Konami", "Solar Assault (ver UAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAMEL(1997, hangplt,  0,        hangplt,  hangplt,  gticlub_state, hangplt,  ROT0, "Konami", "Hang Pilot (ver JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND, layout_dualhovu )
+GAMEL(1997, hangpltu, hangplt,  hangplt,  hangplt,  gticlub_state, hangpltu, ROT0, "Konami", "Hang Pilot (ver UAA)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND, layout_dualhovu )
