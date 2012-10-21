@@ -1,20 +1,21 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
-
-<!-- NOTE: color overlay needs verification from real cabinet (or old photo) -->
-
 	<element name="overlay">
 		<rect>
-			<bounds left="0" top="0" right="224" bottom="256" />
-			<color red="1" green="0.125" blue="0.125" />
+			<bounds left="0" top="0" right="224" bottom="260" />
+			<color red="0" green="1" blue="0.4" />
 		</rect>
 		<rect>
-			<bounds left="0" top="55.5" right="224" bottom="69" />
-			<color red="0.125" green="1" blue="0.125" />
+			<bounds left="0" top="47" right="224" bottom="70" />
+			<color red="1" green="0.2" blue="0.15" />
 		</rect>
 		<rect>
-			<bounds left="0" top="69" right="224" bottom="220" />
-			<color red="1" green="1" blue="0.0625" />
+			<bounds left="0" top="70" right="224" bottom="192" />
+			<color red="1" green="1" blue="0.2" />
+		</rect>
+		<rect>
+			<bounds left="0" top="192" right="224" bottom="214" />
+			<color red="0.2" green="0.6" blue="1" />
 		</rect>
 	</element>
 
