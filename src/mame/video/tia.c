@@ -1911,6 +1911,9 @@ void tia_video_device::device_reset()
 	motclkM1 = 0;
 	motclkBL = 0;
 
+	horzP0 = 0;
+	horzP1 = 0;
+
 	for( i = 0; i < PLAYER_GFX_SLOTS; i++ )
 	{
 		p0gfx.start_pixel[i] = 8;
