@@ -70,6 +70,7 @@
 #include "machine/nubus_asntmc3b.h"
 #include "video/nubus_m2video.h"
 #include "video/pds30_cb264.h"
+#include "video/pds30_procolor816.h"
 #include "includes/mac.h"
 #include "mac.lh"
 
@@ -860,7 +861,8 @@ static SLOT_INTERFACE_START(mac_nubus_cards)
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(mac_pds030_cards)
-    SLOT_INTERFACE("cb264", PDS030_CB264SE30)
+    SLOT_INTERFACE("cb264", PDS030_CB264SE30)   // RasterOps Colorboard 264/SE30
+    SLOT_INTERFACE("pc816", PDS030_PROCOLOR816) // Lapis ProColor Server 8*16 PDS
 SLOT_INTERFACE_END
 
 /***************************************************************************
