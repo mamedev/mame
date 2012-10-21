@@ -48,19 +48,18 @@ public:
 	DECLARE_WRITE8_MEMBER(switch_w);
 	DECLARE_READ_LINE_MEMBER(cb1_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	DECLARE_MACHINE_RESET(s3);
+	DECLARE_MACHINE_RESET(s3a);
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
+	optional_device<dac_device> m_dac;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
 	required_device<pia6821_device> m_pia3;
-	required_device<pia6821_device> m_pia4;
-
-	// driver_device overrides
-	virtual void machine_reset();
+	optional_device<pia6821_device> m_pia4;
 private:
 	UINT8 m_t_c;
 	UINT8 m_sound_data;
@@ -68,6 +67,7 @@ private:
 	UINT8 m_kbdrow;
 	bool m_cb1;
 	bool m_data_ok;
+	bool m_chimes;
 };
 
 static ADDRESS_MAP_START( s3_main_map, AS_PROGRAM, 8, s3_state )
@@ -164,47 +164,71 @@ static INPUT_PORTS_START( s3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Music") PORT_CODE(KEYCODE_9) PORT_TOGGLE
 INPUT_PORTS_END
 
-void s3_state::machine_reset()
+MACHINE_RESET_MEMBER( s3_state, s3 )
 {
 	m_t_c = 0;
+	m_chimes = 1;
+}
+
+MACHINE_RESET_MEMBER( s3_state, s3a )
+{
+	m_t_c = 0;
+	m_chimes = 0;
 }
 
 WRITE8_MEMBER( s3_state::sol0_w )
 {
-
 }
 
 WRITE8_MEMBER( s3_state::sol1_w )
 {
-	m_sound_data = ioport("SND")->read(); // 0xff or 0xbf
-	if (BIT(data, 0))
-		m_sound_data &= 0xfe;
+	if (m_chimes)
+	{
+		if (BIT(data, 0))
+			m_samples->start(1, 1); // 10 chime
+		else
+		if (BIT(data, 1))
+			m_samples->start(2, 2); // 100 chime
+		else
+		if (BIT(data, 2))
+			m_samples->start(3, 3); // 1000 chime
+		// we don't have a 10k chime in samples yet
+		//else
+		//if (BIT(data, 3))
+			//m_samples->start(1, x); // 10k chime
+	}
 	else
-	if (BIT(data, 1))
-		m_sound_data &= 0xfd;
-	else
-	if (BIT(data, 2))
-		m_sound_data &= 0xfb;
-	else
-	if (BIT(data, 3))
-		m_sound_data &= 0xf7;
-	else
-	if (BIT(data, 4))
-		m_sound_data &= 0x7f;
-	else
+	{
+		m_sound_data = ioport("SND")->read(); // 0xff or 0xbf
+		if (BIT(data, 0))
+			m_sound_data &= 0xfe;
+		else
+		if (BIT(data, 1))
+			m_sound_data &= 0xfd;
+		else
+		if (BIT(data, 2))
+			m_sound_data &= 0xfb;
+		else
+		if (BIT(data, 3))
+			m_sound_data &= 0xf7;
+		else
+		if (BIT(data, 4))
+			m_sound_data &= 0x7f;
+
+		if ((m_sound_data & 0xbf) == 0xbf)
+		{
+			m_cb1 = 0;
+			m_pia4->cb1_w(0);
+		}
+		else
+		{
+			m_cb1 = 1;
+			m_pia4->cb1_w(1);
+		}
+	}
+
 	if (BIT(data, 5))
 		m_samples->start(0, 6); // knocker
-
-	if ((m_sound_data & 0xbf) == 0xbf)
-	{
-		m_cb1 = 0;
-		m_pia4->cb1_w(0);
-	}
-	else
-	{
-		m_cb1 = 1;
-		m_pia4->cb1_w(1);
-	}
 }
 
 static const pia6821_interface pia0_intf =
@@ -230,7 +254,6 @@ WRITE8_MEMBER( s3_state::lamp0_w )
 
 WRITE8_MEMBER( s3_state::lamp1_w )
 {
-
 }
 
 static const pia6821_interface pia1_intf =
@@ -353,27 +376,34 @@ static MACHINE_CONFIG_START( s3, s3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s3_main_map)
-	MCFG_CPU_ADD("audiocpu", M6802, 3580000)
-	MCFG_CPU_PROGRAM_MAP(s3_audio_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s3_state, irq, attotime::from_hz(1000))
+	MCFG_MACHINE_RESET_OVERRIDE(s3_state, s3)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_s3)
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
 	MCFG_PIA6821_ADD("pia0", pia0_intf)
 	MCFG_PIA6821_ADD("pia1", pia1_intf)
 	MCFG_PIA6821_ADD("pia2", pia2_intf)
 	MCFG_PIA6821_ADD("pia3", pia3_intf)
-	MCFG_PIA6821_ADD("pia4", pia4_intf)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( s3a, s3 )
+	/* Add the soundcard */
+	MCFG_CPU_ADD("audiocpu", M6802, 3580000)
+	MCFG_CPU_PROGRAM_MAP(s3_audio_map)
+	MCFG_MACHINE_RESET_OVERRIDE(s3_state, s3a)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_PIA6821_ADD("pia4", pia4_intf)
+MACHINE_CONFIG_END
+
 
 /*-------------------------------------
 / Contact - Sys.3 (Game #482)
@@ -409,8 +439,6 @@ ROM_START(httip_l1)
 	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(b1d4fd9b) SHA1(e55ecf1328a55979c4cf8f3fb4e6761747e0abc4))
 	ROM_LOAD("white1.716", 0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
 	ROM_LOAD("white2.716", 0x7800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
-
-	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
 ROM_END
 
 /*---------------------------------
@@ -421,8 +449,6 @@ ROM_START(lucky_l1)
 	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(7cfbd4c7) SHA1(825e2245fd1615e932973f5e2b5ed5f2da9309e7))
 	ROM_LOAD("white1.716", 0x7000, 0x0800, CRC(9bbbf14f) SHA1(b0542ffdd683fa0ea4a9819576f3789cd5a4b2eb))
 	ROM_LOAD("white2.716", 0x7800, 0x0800, CRC(4d4010dd) SHA1(11221124fef3b7bf82d353d65ce851495f6946a7))
-
-	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
 ROM_END
 
 /*-------------------------------------
@@ -439,8 +465,8 @@ ROM_START(wldcp_l1)
 ROM_END
 
 
-GAME( 1977, httip_l1, 0, s3, s3, driver_device, 0, ROT0, "Williams", "Hot Tip (L-1)", GAME_MECHANICAL | GAME_NO_SOUND)
-GAME( 1977, lucky_l1, 0, s3, s3, driver_device, 0, ROT0, "Williams", "Lucky Seven (L-1)", GAME_MECHANICAL | GAME_NO_SOUND)
-GAME( 1978, wldcp_l1, 0, s3, s3, driver_device, 0, ROT0, "Williams", "World Cup Soccer (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
-GAME( 1978, cntct_l1, 0, s3, s3, driver_device, 0, ROT0, "Williams", "Contact (L-1)", GAME_MECHANICAL)
-GAME( 1978, disco_l1, 0, s3, s3, driver_device, 0, ROT0, "Williams", "Disco Fever (L-1)", GAME_MECHANICAL)
+GAME( 1977, httip_l1, 0, s3,  s3, driver_device, 0, ROT0, "Williams", "Hot Tip (L-1)", GAME_MECHANICAL )
+GAME( 1977, lucky_l1, 0, s3,  s3, driver_device, 0, ROT0, "Williams", "Lucky Seven (L-1)", GAME_MECHANICAL )
+GAME( 1978, wldcp_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "World Cup Soccer (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME( 1978, cntct_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Contact (L-1)", GAME_MECHANICAL)
+GAME( 1978, disco_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Disco Fever (L-1)", GAME_MECHANICAL)
