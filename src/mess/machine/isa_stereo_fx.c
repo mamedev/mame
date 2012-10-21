@@ -186,7 +186,7 @@ WRITE8_MEMBER( stereo_fx_device::invalid_w )
 
 READ8_MEMBER( stereo_fx_device::invalid_r )
 {
-	logerror("stereo fx: invalid port write\n");
+	logerror("stereo fx: invalid port read\n");
 	return 0xff;
 }
 

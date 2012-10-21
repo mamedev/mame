@@ -121,7 +121,7 @@ READ8_MEMBER(el2_3c503_device::el2_3c503_loport_r) {
 	case 2:
 		return m_prom[offset + 16];
 	case 3:
-		logerror("3c503: invalid low register read, page 3");
+		logerror("3c503: invalid low register read, page 3\n");
 	}
 	return 0;
 }
@@ -133,10 +133,10 @@ WRITE8_MEMBER(el2_3c503_device::el2_3c503_loport_w) {
 		return m_dp8390->dp8390_w(space, offset, data, mem_mask);
 	case 1:
 	case 2:
-		logerror("3c503: invalid attempt to write to prom");
+		logerror("3c503: invalid attempt to write to prom\n");
 		return;
 	case 3:
-		logerror("3c503: invalid low register write, page 3");
+		logerror("3c503: invalid low register write, page 3\n");
 		return;
 	}
 }
@@ -237,7 +237,7 @@ WRITE8_MEMBER(el2_3c503_device::el2_3c503_hiport_w) {
 			m_regs.idcfr = (m_regs.idcfr & 0xf) | (data & 0xf0);
 			break;
 		default:
-			logerror("3c503: trying to set multiple irqs %X", data);
+			logerror("3c503: trying to set multiple irqs %X\n", data);
 		}
 		switch(data & 0x0f) {
 		case 0x00:
@@ -249,14 +249,14 @@ WRITE8_MEMBER(el2_3c503_device::el2_3c503_hiport_w) {
 		case 0x08:
 			break;
 		default:
-			logerror("3c503: trying to set multiple drqs %X", data);
+			logerror("3c503: trying to set multiple drqs %X\n", data);
 		}
 	case 9:
-		if(m_regs.ctrl & 0x80) logerror("3c503: changing dma address during dma is undefined");
+		if(m_regs.ctrl & 0x80) logerror("3c503: changing dma address during dma is undefined\n");
 		m_regs.da = (data << 8) | (m_regs.da & 0xff);
 		return;
 	case 10:
-		if(m_regs.ctrl & 0x80) logerror("3c503: changing dma address during dma is undefined");
+		if(m_regs.ctrl & 0x80) logerror("3c503: changing dma address during dma is undefined\n");
 		m_regs.da = (m_regs.da & 0xff00) | data;
 		return;
 	case 11:
@@ -279,7 +279,7 @@ WRITE8_MEMBER(el2_3c503_device::el2_3c503_hiport_w) {
 		el2_3c503_mem_write(space, m_regs.da++, data, mem_mask);
 		return;
 	default:
-		logerror("3c503: invalid high register write %02x", offset);
+		logerror("3c503: invalid high register write %02x\n", offset);
 	}
 }
 
