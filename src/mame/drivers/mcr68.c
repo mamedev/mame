@@ -7,7 +7,7 @@
     Games supported:
         * Zwackery (Chip Squeak Deluxe)
         * Xenopohobe (Sounds Good)
-        * Spy Hunter 2 (Sounds Good/Turbo Chip Squeak)
+        * Spy Hunter II (Sounds Good/Turbo Chip Squeak)
         * Blasted (Sounds Good)
         * Arch Rivals
         * Tri-Sports
@@ -124,7 +124,7 @@ WRITE16_MEMBER(mcr68_state::blasted_control_w)
 
 /*************************************
  *
- *  Spy Hunter 2-specific handlers
+ *  Spy Hunter II-specific handlers
  *
  *************************************/
 
@@ -940,7 +940,7 @@ GFXDECODE_END
 
         Zwackery:     7652400
         Xenophobe:    7723800
-        Spy Hunter 2: 7723800
+        Spy Hunter II:7723800
         Blasted:      7798800
         Arch Rivals:  7799100
         Pigskin:      9211200
@@ -1570,7 +1570,7 @@ DRIVER_INIT_MEMBER(mcr68_state,spyhunt2)
 {
 	mcr68_common_init(machine(), 0, -6);
 
-	/* Spy Hunter 2 doesn't care too much about this value; currently taken from Blasted */
+	/* Spy Hunter II doesn't care too much about this value; currently taken from Blasted */
 	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* analog port handling is a bit tricky */
@@ -1659,8 +1659,8 @@ DRIVER_INIT_MEMBER(mcr68_state,trisport)
 
 GAME( 1984, zwackery, 0,        zwackery, zwackery, mcr68_state, zwackery, ROT0,   "Bally Midway", "Zwackery", GAME_SUPPORTS_SAVE )
 GAME( 1987, xenophob, 0,        xenophob, xenophob, mcr68_state, xenophob, ROT0,   "Bally Midway", "Xenophobe", GAME_SUPPORTS_SAVE )
-GAME( 1987, spyhunt2, 0,        spyhunt2, spyhunt2, mcr68_state, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter 2 (rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, spyhunt2a,spyhunt2, spyhunt2, spyhunt2, mcr68_state, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter 2 (rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, spyhunt2, 0,        spyhunt2, spyhunt2, mcr68_state, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, spyhunt2a,spyhunt2, spyhunt2, spyhunt2, mcr68_state, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1988, blasted,  0,        xenophob, blasted, mcr68_state,  blasted,  ROT0,   "Bally Midway", "Blasted", GAME_SUPPORTS_SAVE )
 GAME( 1987, intlaser, blasted,  intlaser, intlaser, mcr68_state, intlaser, ROT0,   "Bally Midway", "International Team Laser (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1989, archrivl, 0,        archrivl, archrivl, mcr68_state, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0 6/29/89)", GAME_SUPPORTS_SAVE )
