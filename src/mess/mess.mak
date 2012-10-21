@@ -708,6 +708,7 @@ $(MESSOBJ)/apple.a:				\
     $(MESS_VIDEO)/nubus_m2video.o \
 	$(MESS_MACHINE)/nubus_asntmc3b.o \
 	$(MESS_VIDEO)/nubus_wsportrait.o \
+    $(MESS_VIDEO)/pds30_cb264.o \
 
 $(MESSOBJ)/applied.a:			\
 	$(MESS_VIDEO)/mbee.o		\
