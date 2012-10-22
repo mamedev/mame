@@ -50,7 +50,6 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
  - Rasterscan
  - Rescue at Rigel
  - Sherlock Holmes: Another Bow
- - Sidewinder
  - Snack Attack II
  - Solomon's Key
  - Sorcerer*
@@ -75,6 +74,19 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="3-k trivia.img" size="368640" crc="475920eb" sha1="abf2f89127d64644a8ed5768077915bb4a4ac3eb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101mazes">
+		<description>One Hundred and One Monochrome Mazes</description>
+		<year>1983</year>
+		<publisher>IBM</publisher>
+		<info name="user_notes" value="Needs a Monchrome Screen" />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="1502177.img" size="163840" crc="baa2ed6e" sha1="3633c9b344db7b091e82502464be1fc331cdbc14" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -702,7 +714,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	<software name="fpcarcad">
 		<description>Friendlyware PC Arcade (v1.1)</description>
 		<year>1983</year>
-		<publisher>FriendlySoft, Inc</publisher>
+		<publisher>FriendlySoft</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -1378,7 +1390,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	<software name="mule">
 		<description>M.U.L.E.</description>
 		<year>1985</year>
-		<publisher>Electronic Arts, Inc. / IBM</publisher>
+		<publisher>Electronic Arts / IBM</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="88908">
@@ -1390,7 +1402,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	<software name="mulecr" cloneof="mule">
 		<description>M.U.L.E. (Cracked)</description>
 		<year>1985</year>
-		<publisher>Electronic Arts, Inc. / IBM</publisher>
+		<publisher>Electronic Arts / IBM</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
@@ -1740,6 +1752,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="silent service.img" size="368640" crc="00d5f3b5" sha1="212ee9b034d09dc1df3abcc822649af3200768a9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sidwindr">
+		<description>SideWinder</description>
+		<year>1988</year>
+		<publisher>Arcadia</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="sidewinder.img" size="368640" crc="06977b96" sha1="c5b78ae793867a7597fe062b373da3a640bf858a" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2407,6 +2431,21 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="ibmdos3">
+		<description>IBM Personal Computer DOS Version 3.0</description>
+		<year>1984</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop1" size="368640">
+				<rom name="6322635.img" size="368640" crc="20a3dc1c" sha1="1e7430c57109960fd89d281d24e85a086a8284e4" offset="0" />
+			</dataarea>
+			<dataarea name="flop2" size="368640">
+				<rom name="6322640.img" size="368640" crc="eb75a4c0" sha1="bdb8528a71ea35cb1d9a0a0f13f8f0b745ca8eb6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Dos based Games -->
 
 	<software name="2400ad" supported="no"> <!-- unemulated protection, game needs cracked exe to play ATM  -->
@@ -2417,6 +2456,41 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="2400ad.img" size="368640" crc="bf246734" sha1="a9f0be5fa2a5077375dae572622926bb8aa9e28a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aaow">
+		<description>The Ancient Art of War</description>
+		<year>1984</year>
+		<publisher>Brøderbund Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the ancient art of war.img" size="368640" crc="32699e4b" sha1="f4a021d4bc5a9e61b7036cfcd41a43c2a146ab37" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aaowas">
+		<description>The Ancient Art Of War At Sea</description>
+		<year>1987</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the ancient art of war at sea.img" size="368640" crc="e9c9f3af" sha1="379376f6255d24a71dc8d156e580966d067b3a84" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aaowasa" cloneof="aaowas">
+		<description>The Ancient Art Of War At Sea (Alt)</description>
+		<year>1987</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="version" value="1.5?" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the ancient art of war at sea (alt).img" size="368640" crc="ac538af6" sha1="143b797aa13d71af042fa6f4b21679f25338c633" offset="0" />
 			</dataarea>
 		</part>
 	</software>
