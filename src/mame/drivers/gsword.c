@@ -925,6 +925,6 @@ DRIVER_INIT_MEMBER(gsword_state,gsword2)
 }
 
 
-GAME( 1983, josvolly, 0,      josvolly, josvolly, driver_device, 0,       ROT90, "Taito Corporation", "Joshi Volleyball", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gsword,   0,      gsword,   gsword, gsword_state,   gsword,  ROT0,  "Taito Corporation", "Great Swordsman (World?)", 0 )
-GAME( 1984, gsword2,  gsword, gsword,   gsword, gsword_state,   gsword2, ROT0,  "Taito Corporation", "Great Swordsman (Japan?)", 0 )
+GAME( 1983, josvolly, 0,      josvolly, josvolly, driver_device,  0,       ROT90, "Allumer / Taito Corporation", "Joshi Volleyball", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gsword,   0,      gsword,   gsword,   gsword_state,   gsword,  ROT0,  "Allumer / Taito Corporation", "Great Swordsman (World?)", 0 )
+GAME( 1984, gsword2,  gsword, gsword,   gsword,   gsword_state,   gsword2, ROT0,  "Allumer / Taito Corporation", "Great Swordsman (Japan?)", 0 )
