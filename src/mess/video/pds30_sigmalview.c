@@ -60,7 +60,7 @@ const rom_entry *nubus_lview_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_lview_device::nubus_lview_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, PDS030_LVIEW, "Lapis ProColor Server 8*16", tag, owner, clock),
+        device_t(mconfig, PDS030_LVIEW, "Sigma Designs L-View", tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "pd3_lviw";
