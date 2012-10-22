@@ -1320,12 +1320,21 @@ class namcos23_state : public driver_device
 {
 public:
 	namcos23_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
         m_rtc(*this, "rtc"),
 		m_shared_ram(*this, "shared_ram"),
 		m_charram(*this, "charram"),
 		m_textram(*this, "textram"),
-		m_gmen_sh2_shared(*this, "gmen_sh2_shared"){ }
+		m_czattr(*this, "czattr"),
+		m_gmen_sh2_shared(*this, "gmen_sh2_shared")
+	{ }
+
+    required_device<rtc4543_device> m_rtc;
+	required_shared_ptr<UINT32> m_shared_ram;
+	required_shared_ptr<UINT32> m_charram;
+	required_shared_ptr<UINT32> m_textram;
+	optional_shared_ptr<UINT32> m_czattr;
+	optional_shared_ptr<UINT32> m_gmen_sh2_shared;
 
 	c361_t m_c361;
 	c417_t m_c417;
@@ -1335,11 +1344,6 @@ public:
 	render_t m_render;
 
 	tilemap_t *m_bgtilemap;
-    required_device<rtc4543_device> m_rtc;
-	required_shared_ptr<UINT32> m_shared_ram;
-	required_shared_ptr<UINT32> m_charram;
-	required_shared_ptr<UINT32> m_textram;
-	optional_shared_ptr<UINT32> m_gmen_sh2_shared;
 	UINT8 m_jvssense;
 	INT32 m_has_jvsio;
 	bool m_ctl_vbl_active;
@@ -2408,19 +2412,7 @@ VIDEO_START_MEMBER(namcos23_state,ss23)
 	machine().gfx[0]->set_source(reinterpret_cast<UINT8 *>(m_charram.target()));
 	m_bgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_bgtilemap->set_transparent_pen(0xf);
-
-	// Gorgon's tilemap offset is 0, S23/SS23's is 860
-	if ((!strcmp(machine().system().name, "rapidrvr")) ||
-	    (!strcmp(machine().system().name, "rapidrvr2")) ||
-	    (!strcmp(machine().system().name, "rapidrvrp")) ||
-	    (!strcmp(machine().system().name, "finlflng")))
-	{
-		m_bgtilemap->set_scrolldx(0, 0);
-	}
-	else
-	{
-		m_bgtilemap->set_scrolldx(860, 860);
-	}
+	m_bgtilemap->set_scrolldx(860, 860);
 	m_render.polymgr = poly_alloc(machine(), 10000, sizeof(namcos23_render_data), 0);
 }
 
@@ -2462,28 +2454,31 @@ static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32, namcos23_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(p3d_r, p3d_w )
 	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16(s23_c417_r, s23_c417_w, 0xffffffff )
-	AM_RANGE(0x04400000, 0x0440ffff) AM_READWRITE(gorgon_sharedram_r, gorgon_sharedram_w ) AM_SHARE("shared_ram")
+	AM_RANGE(0x04400000, 0x0440ffff) AM_READWRITE(gorgon_sharedram_r, gorgon_sharedram_w ) AM_SHARE("shared_ram") // Communication RAM (C416)
 
 	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE(s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM
 
-	AM_RANGE(0x06080000, 0x06081fff) AM_RAM
+	AM_RANGE(0x06080000, 0x0608000f) AM_RAM AM_SHARE("czattr")
+	AM_RANGE(0x06080200, 0x060803ff) AM_RAM // PCZ Convert RAM (C406) (should be banked)
 
-	AM_RANGE(0x06108000, 0x061087ff) AM_RAM		// GAMMA (C404-3S)
-	AM_RANGE(0x06110000, 0x0613ffff) AM_RAM_WRITE(namcos23_paletteram_w ) AM_SHARE("paletteram")
-	AM_RANGE(0x06400000, 0x06403fff) AM_RAM_WRITE(s23_txtchar_w ) AM_SHARE("charram")	// text layer characters
-	AM_RANGE(0x06404000, 0x0641dfff) AM_RAM
-	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE(namcos23_textram_w ) AM_SHARE("textram")
+	AM_RANGE(0x06108000, 0x061087ff) AM_RAM		// Gamma RAM (C404)
+	AM_RANGE(0x06110000, 0x0613ffff) AM_RAM_WRITE(namcos23_paletteram_w ) AM_SHARE("paletteram") // Palette RAM (C404)
+	AM_RANGE(0x06400000, 0x0641dfff) AM_RAM_WRITE(s23_txtchar_w ) AM_SHARE("charram")	// Text CGRAM (C361)
+	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE(namcos23_textram_w ) AM_SHARE("textram") // Text VRAM (C361)
+	AM_RANGE(0x06420000, 0x0642000f) AM_READWRITE16(s23_c361_r, s23_c361_w, 0xffffffff ) // C361
 
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("data", 0)	// data ROMs
 
-	AM_RANGE(0x0c000000, 0x0c00ffff) AM_RAM	AM_SHARE("nvram") // BACKUP
+	AM_RANGE(0x0c000000, 0x0c00ffff) AM_RAM	AM_SHARE("nvram") // Backup RAM
 
 	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16(s23_ctl_r, s23_ctl_w, 0xffffffff ) // write for LEDs at d000000, watchdog at d000004
 
+	AM_RANGE(0x0e000000, 0x0e007fff) AM_RAM // C405 RAM
+
 	AM_RANGE(0x0f000000, 0x0f000003) AM_READ(s23_unk_status_r )
 
-	AM_RANGE(0x0f200000, 0x0f201fff) AM_RAM
+	AM_RANGE(0x0f200000, 0x0f203fff) AM_RAM // C422 RAM
 
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -2496,12 +2491,11 @@ static ADDRESS_MAP_START( ss23_map, AS_PROGRAM, 32, namcos23_state )
 	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE(s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM
-	AM_RANGE(0x06000000, 0x0600ffff) AM_RAM AM_SHARE("nvram") // Backup
-	AM_RANGE(0x06200000, 0x06203fff) AM_RAM                             // C422
+	AM_RANGE(0x06000000, 0x0600ffff) AM_RAM AM_SHARE("nvram") // Backup RAM
+	AM_RANGE(0x06200000, 0x06203fff) AM_RAM                             // C422 RAM
 	AM_RANGE(0x06400000, 0x0640000f) AM_READWRITE16(s23_c422_r, s23_c422_w, 0xffffffff ) // C422 registers
-	AM_RANGE(0x06800000, 0x06807fff) AM_RAM_WRITE(s23_txtchar_w ) AM_SHARE("charram") // text layer characters (shown as CGRAM in POST)
-	AM_RANGE(0x06804000, 0x0681dfff) AM_RAM
-	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE(namcos23_textram_w ) AM_SHARE("textram")
+	AM_RANGE(0x06800000, 0x0681dfff) AM_RAM_WRITE(s23_txtchar_w ) AM_SHARE("charram")	// Text CGRAM (C361)
+	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE(namcos23_textram_w ) AM_SHARE("textram") // Text VRAM (C361)
 	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE16(s23_c361_r, s23_c361_w, 0xffffffff ) // C361
 	AM_RANGE(0x06a08000, 0x06a087ff) AM_RAM // Blending control & GAMMA (C404)
 	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE(namcos23_paletteram_w ) AM_SHARE("paletteram")
