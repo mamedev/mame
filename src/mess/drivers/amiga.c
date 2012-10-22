@@ -435,6 +435,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a500n, ntsc )
 	MCFG_FRAGMENT_ADD(amiga_cartslot)
+	MCFG_SOFTWARE_LIST_ADD("flop_common","amiga_flop")
 MACHINE_CONFIG_END
 
 struct cdrom_interface cdtv_cdrom =
@@ -507,6 +508,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a500p, pal )
 	MCFG_FRAGMENT_ADD(amiga_cartslot)
+	MCFG_SOFTWARE_LIST_ADD("flop_common","amiga_flop")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a1000p, pal )

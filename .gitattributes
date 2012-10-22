@@ -28,6 +28,7 @@ hash/amiga1000_flop.xml svneol=native#text/xml
 hash/amiga500_flop.xml svneol=native#text/xml
 hash/amiga500plus_flop.xml svneol=native#text/xml
 hash/amiga600_flop.xml svneol=native#text/xml
+hash/amiga_flop.xml svneol=native#text/xml
 hash/apfm1000.xml svneol=native#text/xml
 hash/apple1.xml svneol=native#text/xml
 hash/apple2.xml svneol=native#text/xml

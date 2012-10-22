@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- General Purpose Amiga Floppy Software List, anything listed here may, or may not work with any specific system / configuration -->
+
+<softwarelist name="amiga_flop" description="Amiga Floppy Disks list">
+
+  <!-- SPS release -->
+  <software name="pballdrm" supported="no"> <!-- Courses fail to load, protection -->
+    <description>Pinball Dreams</description>
+    <year>1992</year>
+    <publisher>21st Century Entertainment</publisher>
+   
+    <part name="flop1" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 1" />
+      <dataarea name="flop" size="912864">
+        <rom name="pinballdreams_disk1.ipf" size="912864" crc="9f87d244" sha1="7e12a06dca8757ee40214e1cdf10586d9dc03193" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop2" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 2" />
+      <dataarea name="flop" size="912864">
+        <rom name="pinballdreams_disk2.ipf" size="912864" crc="ea23d1a4" sha1="2b6dea8b80a58c7fe202986750fefd8861d73a04" offset="0"/>
+      </dataarea>
+    </part>
+
+  </software>
+
+  <!-- From TOSEC, there are a lot of alt images, but this one appears to work fine -->
+  <software name="pballdrmflt" cloneof="pballdrm">
+    <description>Pinball Dreams (Cracked, Fairlight)</description>
+    <year>1992</year>
+    <publisher>21st Century Entertainment</publisher>
+
+    <part name="flop1" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 1" />
+      <dataarea name="flop" size="901120">
+        <rom name="pinball dreams (1992)(21st century)(disk 1 of 2)[cr flt].adf" size="901120" crc="8b73922b" sha1="0f548c3b7435a6825ee165b3aa1ccb7fb7277005" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop2" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 2" />
+      <dataarea name="flop" size="901120">
+        <rom name="pinball dreams (1992)(21st century)(disk 2 of 2)[cr flt].adf" size="901120" crc="5d15b5e0" sha1="93b618fc8aea1528880bb69f3562805a6617df8e" offset="0"/>
+      </dataarea>
+    </part>
+
+  </software>
+
+  <!-- SPS Release -->
+  <software name="pballfnt">
+  
+    <description>Pinball Fantasies</description>
+    <year>1992</year>
+    <publisher>21st Century Entertainment</publisher>
+    
+    <part name="flop1" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 1" />
+      <dataarea name="flop" size="1024172">
+        <rom name="pinballfantasies_disk1.ipf" size="1024172" crc="b1ee8487" sha1="7d82f93afcf2f2235c74d00eb34cbbb298d54641" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop2" interface="floppy_3_5">
+      <feature name="part_id" value="Course Disk 1" />
+      <dataarea name="flop" size="1024172">
+        <rom name="pinballfantasies_coursedisk1.ipf" size="1024172" crc="e74f72e9" sha1="5c4e393678c3d3bad866bf0fd09b5b2eacd6db09" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop3" interface="floppy_3_5">
+      <feature name="part_id" value="Course Disk 2" />
+      <dataarea name="flop" size="1024172">
+        <rom name="pinballfantasies_coursedisk2.ipf" size="1024172" crc="249a67d4" sha1="dee955b177a951f9bf9ff07050479c7c03f5b3cb" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop4" interface="floppy_3_5">
+      <feature name="part_id" value="Course Disk 3" />
+      <dataarea name="flop" size="1024172">
+        <rom name="pinballfantasies_coursedisk3.ipf" size="1024172" crc="b63ad767" sha1="04620de7ce3bd25ee7c4a9e0af88f3fb19ccc855" offset="0"/>
+      </dataarea>
+    </part>   
+  </software>
+
+
+  <!-- SPS Release -->
+  <software name="emotion">
+
+    <description>E-Motion</description>
+    <year>1990</year>
+    <publisher>U.S. Gold</publisher>
+
+    <part name="flop1" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 1" />
+      <dataarea name="flop" size="1036838">
+        <rom name="e-motion.ipf" size="1036838" crc="23088ad2" sha1="5c4001ebd8f03ad1e4307c8ab1776db95228c872" offset="0"/>
+      </dataarea>
+    </part>
+    
+  </software>
+
+</softwarelist>
+
