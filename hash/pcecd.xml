@@ -5934,7 +5934,7 @@
 	<software name="tecmowc">
 		<description>Tecmo World Cup Super Soccer (SCD)(Jpn)</description>
 		<year>1992</year>
-		<publisher>Media Rings</publisher>
+		<publisher>Media Rings Corporation</publisher>
 		<info name="serial" value="MRCD2001"/>
 		<info name="release" value="19921204"/>
 		<info name="alt_title" value="テクモ ワールドカップスーパーサッカー"/>
@@ -6954,7 +6954,7 @@
 	<software name="zero4c2">
 		<description>Zero 4 Champ II (SCD)(Jpn)</description>
 		<year>1993</year>
-		<publisher>Media Rings</publisher>
+		<publisher>Media Rings Corporation</publisher>
 		<info name="serial" value="MRCD2002"/>
 		<info name="release" value="19930305"/>
 		<info name="alt_title" value="ゼロヨンチャンプII"/>

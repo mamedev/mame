@@ -3550,7 +3550,7 @@
 	<software name="sokoban">
 		<description>Sokoban World</description>
 		<year>1990</year>
-		<publisher>Media Rings</publisher>
+		<publisher>Media Rings Corporation</publisher>
 		<info name="serial" value="MR90001"/>
 		<info name="release" value="19900316"/>
 		<info name="alt_title" value="倉庫番ワールド"/>
@@ -3605,7 +3605,7 @@
 	<software name="spinpair">
 		<description>Spin Pair</description>
 		<year>1990</year>
-		<publisher>Media Rings</publisher>
+		<publisher>Media Rings Corporation</publisher>
 		<info name="serial" value="MR90002"/>
 		<info name="release" value="19901214"/>
 		<info name="alt_title" value="スピンペア"/>
@@ -3619,7 +3619,7 @@
 	<software name="spirwave">
 		<description>Spiral Wave</description>
 		<year>1991</year>
-		<publisher>Media Rings</publisher>
+		<publisher>Media Rings Corporation</publisher>
 		<info name="serial" value="MR91004"/>
 		<info name="release" value="19911213"/>
 		<info name="alt_title" value="スパイラルウェーブ"/>
@@ -3947,7 +3947,7 @@
 	<software name="toiletk">
 		<description>Toilet Kids</description>
 		<year>1992</year>
-		<publisher>Media Rings</publisher>
+		<publisher>Media Rings Corporation</publisher>
 		<info name="serial" value="MR92005"/>
 		<info name="release" value="19920306"/>
 		<info name="alt_title" value="トイレキッズ"/>
@@ -4353,7 +4353,7 @@
 	<software name="zero4ca" cloneof="zero4c">
 		<description>Zero 4 Champ</description>
 		<year>1991</year>
-		<publisher>Media Rings</publisher>
+		<publisher>Media Rings Corporation</publisher>
 		<info name="serial" value="MR91003"/>
 		<info name="release" value="19910308"/>
 		<info name="alt_title" value="ゼロヨンチャンプ"/>
@@ -4367,7 +4367,7 @@
 	<software name="zero4c">
 		<description>Zero 4 Champ (v1.5)</description>
 		<year>1991</year>
-		<publisher>Media Rings</publisher>
+		<publisher>Media Rings Corporation</publisher>
 		<info name="serial" value="MR91003"/>
 		<info name="release" value="19910308"/>
 		<info name="alt_title" value="ゼロヨンチャンプ"/>

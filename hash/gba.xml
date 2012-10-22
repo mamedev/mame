@@ -19719,7 +19719,7 @@
 	<software name="lunarlegj" cloneof="lunarleg">
 		<description>Lunar Legend (Jpn)</description>
 		<year>2002</year>
-		<publisher>Media Rings</publisher>
+		<publisher>Media Rings Corporation</publisher>
 		<info name="serial" value="AGB-ALNJ-JPN"/>
 		<info name="release" value="20020412"/>
 		<info name="alt_title" value="ルナ 〜レジェンド〜"/>
@@ -28419,7 +28419,7 @@
 	<software name="saibarmj">
 		<description>Saibara Rieko no Dendou Mahjong (Jpn)</description>
 		<year>2001</year>
-		<publisher>Media Rings</publisher>
+		<publisher>Media Rings Corporation</publisher>
 		<info name="serial" value="AGB-ASMJ-JPN"/>
 		<info name="release" value="20010928"/>
 		<info name="alt_title" value="西原理恵子の殿堂麻雀"/>
@@ -36559,7 +36559,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 	<software name="wizardry">
 		<description>Wizardry Summoner (Jpn)</description>
 		<year>2001</year>
-		<publisher>Media Rings</publisher>
+		<publisher>Media Rings Corporation</publisher>
 		<info name="serial" value="AGB-AWZJ-JPN"/>
 		<info name="release" value="20011221"/>
 		<info name="alt_title" value="ウィザードリィサマナー"/>
@@ -37743,7 +37743,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 	<software name="zerotour">
 		<description>Zero-Tours (Jpn)</description>
 		<year>2001</year>
-		<publisher>Media Rings</publisher>
+		<publisher>Media Rings Corporation</publisher>
 		<info name="serial" value="AGB-AZTJ-JPN"/>
 		<info name="release" value="20010727"/>
 		<info name="alt_title" value="ゼロ・ツアーズ"/>

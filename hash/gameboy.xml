@@ -6407,7 +6407,7 @@
 		</part>
 	</software>
 
-	<software name="genjincl">
+	<software name="genjincl" supported="no">
 		<!-- Notes: SGB enhanced -->
 		<description>Genjin Collection (Jpn)</description>
 		<year>1996</year>
@@ -23177,7 +23177,7 @@
 		</part>
 	</software>
 
-	<software name="ffant4">
+	<software name="ffant4" cloneof="ffantlg3">
 		<description>Final Fantasy 4 (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
