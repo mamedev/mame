@@ -1,7 +1,7 @@
 /***************************************************************************
 
 Ping Pong King  (c) Taito 1985
-Gladiator       (c) Taito 1986
+Gladiator       (c) Taito 1986 - developed by Allumer
 
 Credits:
 - Victor Trucco: original emulation and MAME driver
@@ -1071,7 +1071,7 @@ DRIVER_INIT_MEMBER(gladiatr_state,ppking)
 
 
 GAME( 1985, ppking,   0,        ppking,   0,        gladiatr_state, ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", GAME_NOT_WORKING)
-GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Taito America Corporation", "Gladiator (US)", 0 )
-GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Taito Corporation", "Ohgon no Siro (Japan)", 0 )
-GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Taito Corporation", "Great Gurianos (Japan?)", 0 )
-GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Taito Corporation", "Golden Castle (prototype?)", 0 ) // incomplete dump
+GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)", 0 )
+GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Ougon no Shiro (Japan)", 0 )
+GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Great Gurianos (Japan?)", 0 )
+GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Golden Castle (prototype?)", 0 ) // incomplete dump
