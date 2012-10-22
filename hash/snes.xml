@@ -11,6 +11,7 @@
   - - badinsults (~350 carts)
   - - JohnDie (~180 carts)
   - - Zidanax (~130 carts)
+  - - Ecco and RedScorpion (72 carts)
   - - d4s (extremely rare material)
 -->
 
@@ -83,16 +84,14 @@ Undumped
   <Unknown region>
           ?              Plok! (Prototype 19930403)
 
-  SNES-CD (temporary, until they're moved to their own list)
-          ?              Angelique - Premium Box (Japan) (Disc 1)
-          ?              Angelique - Premium Box (Japan) (Disc 2)
-          ?              Angelique - Voice Fantasy (Japan)
-          ?              Emit Vol. 1 - Toki no Maigo (Japan) (Disc 1)
-          ?              Emit Vol. 1 - Toki no Maigo (Japan) (Disc 2)
-          ?              Emit Vol. 2 - Inochigake no Tabi (Japan) (Disc 1)
-          ?              Emit Vol. 2 - Inochigake no Tabi (Japan) (Disc 2)
-          ?              Emit Vol. 3 - Watashi ni Sayonara wo (Japan) (Disc 1)
-          ?              Emit Vol. 3 - Watashi ni Sayonara wo (Japan) (Disc 2)
+  Voice-Kun audio discs
+  The Voice-Kun, often called Voicer Kun,
+  is a device which connects to the second controller port and acts as a remote control for CD players.
+          o   WP         Angelique - Voice Fantasy (Japan)
+          o   Box pic    Emit Vol. 1 - Toki no Maigo (Japan) (2 discs?)
+          o   Box pic    Emit Vol. 2 - Inochigake no Tabi (Japan) (2 discs?)
+          o   Box pic    Emit Vol. 3 - Watashi ni Sayonara wo (Japan) (2 discs?)
+          x   WP         Emit Value Set (Vol. 1-3)
 
   Cancelled (most of these titles are probably lost forever)
 
@@ -118,7 +117,7 @@ Undumped
   - Lost Mission - USA, for 1993 or later, Vic Tokai
   - Metal Jack: Armored Police, USA, for 199?, Atlas
   - Mountain Sports - USA, for 1993 or later, DTMC
-  - Moto-X - USA, for 199?, Software Creations
+  - Moto-X - USA, for 1994, Software Creations
   - Operation Alien - USA, for 1993 or later, THQ
   - Pele! - USA, for 1993 or later, Accolade
   - Pocahontas - USA, for 1996 or later, Funcom
@@ -129,6 +128,7 @@ Undumped
   - Smurfs, The - USA, for 199?, Infogrames
   - Socks the Cat Rocks the Hill - USA, for 1994, Kaneko
   - Sound Fantasy - USA & Japan, for 1993 or later, Nintendo
+  - Spanky no Orifuru Puzzle - Japan, for 1995, Natsume
   - Spot Goes To Hollywood - Europ, for 199?, Virgin
   - Superman - USA, for 1993, Sunsoft
   - Super Baseball Simulator 1.000 2 - USA, for 199?, unknown dev
@@ -350,12 +350,12 @@ The software list will be divided in the following categories:
 	</software>
 
 	<software name="3jigen" cloneof="ballz3d">
-		<description>3-jigen Kakutou Ballz (Jpn)</description>
+		<description>3-jigen Kakutou Ballz - Ballz 3D (Jpn)</description>
 		<year>1995</year>
-		<publisher>Media Rings</publisher>
+		<publisher>Media Rings Corporation</publisher>
 		<info name="serial" value="SHVC-ABZJ-JPN" />
 		<info name="release" value="19950428" />
-		<info name="alt_title" value="3次元格闘ボールス" />
+		<info name="alt_title" value="3次元格闘ボールズ" />
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="DSP1 B" />
 			<feature name="pcb" value="SHVC-1K0N-01" />
@@ -27655,7 +27655,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="angeliqv">
+	<software name="angeliqv" supported="no"> <!-- Notes : Requires emulation of the Voice-Kun -->
 		<description>Angelique - Voice Fantasy (Jpn)</description>
 		<year>1996</year>
 		<publisher>Koei</publisher>
@@ -32572,7 +32572,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="emit1">
+	<software name="emit1" supported="no"> <!-- Notes : Requires emulation of the Voice-Kun -->
 		<description>Emit Vol. 1 - Toki no Maigo (Jpn)</description>
 		<year>1995</year>
 		<publisher>Koei</publisher>
@@ -32588,7 +32588,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="emit2">
+	<software name="emit2" supported="no"> <!-- Notes : Requires emulation of the Voice-Kun -->
 		<description>Emit Vol. 2 - Inochigake no Tabi (Jpn)</description>
 		<year>1995</year>
 		<publisher>Koei</publisher>
@@ -32604,7 +32604,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="emit3">
+	<software name="emit3" supported="no"> <!-- Notes : Requires emulation of the Voice-Kun -->
 		<description>Emit Vol. 3 - Watashi ni Sayonara o (Jpn)</description>
 		<year>1995</year>
 		<publisher>Koei</publisher>
@@ -56604,7 +56604,7 @@ Alternate board (XL-1)
 	<software name="zero4rr">
 		<description>Zero 4 Champ RR (Jpn)</description>
 		<year>1994</year>
-		<publisher>Media Rings</publisher>
+		<publisher>Media Rings Corporation</publisher>
 		<info name="serial" value="SHVC-Q4" />
 		<info name="release" value="19940721" />
 		<info name="alt_title" value="ゼロヨンチャンプ ダブルアール" />
@@ -56621,7 +56621,7 @@ Alternate board (XL-1)
 	<software name="zero4rrz">
 		<description>Zero 4 Champ RR-Z (Jpn)</description>
 		<year>1995</year>
-		<publisher>Media Rings</publisher>
+		<publisher>Media Rings Corporation</publisher>
 		<info name="serial" value="SHVC-ARZJ-JPN" />
 		<info name="release" value="19951125" />
 		<info name="alt_title" value="ゼロヨンチャンプ ダブルアール・ヅィー" />
