@@ -5,22 +5,25 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_spriteram(*this, "spriteram"),
-		m_spriteram2(*this, "spriteram2"){ }
+		m_spriteram2(*this, "spriteram2")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_spriteram2;
 
-	UINT16 m_prot;
+	UINT8 m_prot;
 	UINT16 *m_paletteram;
 	int m_color_bank;
 
 	DECLARE_WRITE16_MEMBER(suna16_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(bssoccer_leds_w);
 	DECLARE_WRITE16_MEMBER(uballoon_leds_w);
+	DECLARE_READ8_MEMBER(uballoon_prot_r);
+	DECLARE_WRITE8_MEMBER(uballoon_prot_w);
 	DECLARE_WRITE16_MEMBER(bestbest_coin_w);
-	DECLARE_READ16_MEMBER(bestbest_prot_r);
-	DECLARE_WRITE16_MEMBER(bestbest_prot_w);
+	DECLARE_READ8_MEMBER(bestbest_prot_r);
+	DECLARE_WRITE8_MEMBER(bestbest_prot_w);
 	DECLARE_WRITE8_MEMBER(bssoccer_pcm_1_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(bssoccer_pcm_2_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(uballoon_pcm_1_bankswitch_w);
