@@ -7,7 +7,7 @@ public:
 		m_spriteram(*this, "spriteram"){ }
 
 	required_shared_ptr<UINT8> m_videoram;
-	emu_timer *m_clear_irq_timer;
+	 emu_timer *m_clear_irq_timer;
 	tilemap_t *m_bg_tilemap;
 	int m_control_byte;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -16,10 +16,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mustache_scroll_w);
 	DECLARE_DRIVER_INIT(mustache);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start();
+	 virtual void machine_start();
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_mustache(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(assert_irq);
-	TIMER_CALLBACK_MEMBER(clear_irq_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(mustache_scanline);
 };
