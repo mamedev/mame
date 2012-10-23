@@ -738,27 +738,14 @@ DRIVER_INIT_MEMBER(md_boot_state,srmdb)
 {
 	UINT8* rom = machine().root_device().memregion("maincpu")->base();
 
-	/* todo, reduce bitswaps to single swap */
 	for (int x = 0x00001; x < 0x40000; x += 2)
 	{
-		rom[x] = rom[x] ^ 0xff;
-		rom[x] = BITSWAP8(rom[x], 7,6,5,4,3,2,1,0);
-		rom[x] = BITSWAP8(rom[x], 1,6,5,4,3,2,7,0);
-		rom[x] = BITSWAP8(rom[x], 7,6,5,3,4,2,1,0);
-		rom[x] = BITSWAP8(rom[x], 7,6,5,2,3,4,1,0);
-		rom[x] = BITSWAP8(rom[x], 5,6,7,4,3,2,1,0);
-		rom[x] = BITSWAP8(rom[x], 7,5,6,4,3,2,1,0);
+		rom[x] = BITSWAP8(rom[x] ^ 0xff, 5,1,6,2,4,3,7,0);
 	}
 
 	for (int x = 0x40001; x < 0x80000; x += 2)
 	{
-		rom[x] = BITSWAP8(rom[x], 7,6,5,4,3,2,1,0);
-		rom[x] = BITSWAP8(rom[x], 7,6,1,4,3,2,5,0);
-		rom[x] = BITSWAP8(rom[x], 7,6,5,4,0,2,1,3);
-		rom[x] = BITSWAP8(rom[x], 2,6,5,4,3,7,1,0);
-		rom[x] = BITSWAP8(rom[x], 7,6,5,0,3,2,1,4);
-		rom[x] = BITSWAP8(rom[x], 7,6,5,1,3,2,4,0);
-
+		rom[x] = BITSWAP8(rom[x] ^ 0x00, 2,6,1,5,0,7,3,4);
 	}
 
 	// boot vectors don't seem to be valid, so they are patched...

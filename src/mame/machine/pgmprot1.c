@@ -952,8 +952,11 @@ void command_handler_kov(pgm_arm_type1_state *state, int pc)
 		break;
 
 		case 0xcc: // Background layer offset
-			if (state->m_value0 & 0x400) state->m_value0 = -(0x400 - (state->m_value0 & 0x3ff));
-			state->m_valueresponse = 0x900000 + ((state->m_kov_cb_value + (state->m_value0 * 0x40)) * 4);
+		{
+			int y = state->m_value0;
+			if (y & 0x400) y = -(0x400 - (y & 0x3ff));
+			state->m_valueresponse = 0x900000 + ((state->m_kov_cb_value + (y * 0x40)) * 4);
+		}
 		break;
 
 		case 0xd0: // Text palette offset
@@ -1015,7 +1018,7 @@ void command_handler_kov(pgm_arm_type1_state *state, int pc)
 
 		default:
 			state->m_valueresponse = 0x880000;
-//          bprintf (PRINT_NORMAL, _T("Unknown ASIC27 command: %2.2x data: %4.4x\n"), (data ^ state->m_valuekey) & 0xff, state->m_value0);
+//          		logerror("Unknown ASIC27 command: %2.2x data: %4.4x\n", (data ^ state->m_valuekey) & 0xff, state->m_value0);
 		break;
 	}
 }
