@@ -443,6 +443,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "sound/spu.h"
 #include "sound/cdda.h"
 #include "sound/mas3507d.h"
+#include "cdrom.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -479,7 +480,8 @@ class ksys573_state : public psx_state
 {
 public:
 	ksys573_state(const machine_config &mconfig, device_type type, const char *tag)
-		: psx_state(mconfig, type, tag) { }
+		: psx_state(mconfig, type, tag),
+		  m_cr589(*this, ":cdrom") { }
 
 	int m_flash_bank;
 	fujitsu_29f016a_device *m_flash_device[5][16];
@@ -488,8 +490,8 @@ public:
 	UINT32 m_control;
 
 	emu_timer *m_atapi_timer;
-	scsihle_device *m_inserted_cdrom;
-	scsihle_device *m_available_cdroms[ 2 ];
+	required_device<scsihle_device> m_cr589;
+	cdrom_file *m_available_cdroms[ 2 ];
 	int m_atapi_data_ptr;
 	int m_atapi_data_len;
 	int m_atapi_xferlen;
@@ -710,7 +712,7 @@ TIMER_CALLBACK_MEMBER(ksys573_state::atapi_xfer_end)
 	while( m_atapi_xferlen > 0 )
 	{
 		// get a sector from the SCSI device
-		m_inserted_cdrom->ReadData( sector_buffer, 2048 );
+		m_cr589->ReadData( sector_buffer, 2048 );
 
 		m_atapi_xferlen -= 2048;
 
@@ -776,7 +778,7 @@ READ32_MEMBER(ksys573_state::atapi_r)
 			// get the data from the device
 			if( m_atapi_xferlen > 0 )
 			{
-				m_inserted_cdrom->ReadData( m_atapi_data, m_atapi_xferlen );
+				m_cr589->ReadData( m_atapi_data, m_atapi_xferlen );
 				m_atapi_data_len = m_atapi_xferlen;
 			}
 
@@ -905,7 +907,7 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 			if (m_atapi_data_ptr == m_atapi_cdata_wait)
 			{
 				// send it to the device
-				m_inserted_cdrom->WriteData( atapi_data, m_atapi_cdata_wait );
+				m_cr589->WriteData( atapi_data, m_atapi_cdata_wait );
 
 				// assert IRQ
 				psx_irq_set(machine(), 0x400);
@@ -926,9 +928,9 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 			m_atapi_data_len = 0;
 
 			// send it to the SCSI device
-			m_inserted_cdrom->SetCommand( m_atapi_data, 12 );
-			m_inserted_cdrom->ExecCommand( &m_atapi_xferlen );
-			m_inserted_cdrom->GetPhase( &phase );
+			m_cr589->SetCommand( m_atapi_data, 12 );
+			m_cr589->ExecCommand( &m_atapi_xferlen );
+			m_cr589->GetPhase( &phase );
 
 			if (m_atapi_xferlen != -1)
 			{
@@ -1134,15 +1136,8 @@ static void atapi_init(running_machine &machine)
 	state->m_atapi_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(ksys573_state::atapi_xfer_end),state));
 	state->m_atapi_timer->adjust(attotime::never);
 
-	state->m_available_cdroms[ 0 ] = machine.device<scsihle_device>( ":cdrom0" );
-	if( get_disk_handle( machine, ":cdrom1" ) != NULL )
-	{
-		state->m_available_cdroms[ 1 ] = machine.device<scsihle_device>( ":cdrom1" );
-	}
-	else
-	{
-		state->m_available_cdroms[ 1 ] = NULL;
-	}
+	state->m_available_cdroms[ 0 ] = cdrom_open( get_disk_handle( machine, ":cdrom0" ) );
+	state->m_available_cdroms[ 1 ] = cdrom_open( get_disk_handle( machine, ":cdrom1" ) );
 
 	state->save_item( NAME(state->m_atapi_regs) );
 	state->save_item( NAME(state->m_atapi_data) );
@@ -1352,20 +1347,12 @@ static void flash_init( running_machine &machine )
 	state->save_item( NAME(state->m_control) );
 }
 
-static void *atapi_get_device(running_machine &machine)
-{
-	ksys573_state *state = machine.driver_data<ksys573_state>();
-	void *ret;
-	state->m_inserted_cdrom->GetDevice( &ret );
-	return ret;
-}
-
 static void update_mode( running_machine &machine )
 {
 	ksys573_state *state = machine.driver_data<ksys573_state>();
 	int cart = state->ioport("CART")->read();
 	int cd = state->ioport( "CD" )->read();
-	scsihle_device *new_cdrom;
+	cdrom_file *new_cdrom;
 
 	if( state->machine().device<device_secure_serial_flash>("game_eeprom") )
 	{
@@ -1385,10 +1372,15 @@ static void update_mode( running_machine &machine )
 		new_cdrom = state->m_available_cdroms[ 0 ];
 	}
 
-	if( state->m_inserted_cdrom != new_cdrom )
+	void *current_cdrom;
+	state->m_cr589->GetDevice( &current_cdrom );
+
+	if( current_cdrom != new_cdrom )
 	{
-		state->m_inserted_cdrom = new_cdrom;
-		cdda_set_cdrom(machine.device("cdda"), atapi_get_device(machine));
+		current_cdrom = new_cdrom;
+
+		state->m_cr589->SetDevice( new_cdrom );
+		cdda_set_cdrom(machine.device("cdda"), new_cdrom);
 	}
 }
 
@@ -3051,9 +3043,7 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(ksys573_state, konami573 )
 
-	// multiple cd's are handled by switching drives instead of discs.
-	MCFG_DEVICE_ADD("cdrom0", CR589, 0)
-	MCFG_DEVICE_ADD("cdrom1", CR589, 0)
+	MCFG_DEVICE_ADD("cdrom", CR589, 0)
 
 	// onboard flash
 	MCFG_FUJITSU_29F016A_ADD("onboard.0")
@@ -3827,7 +3817,7 @@ ROM_START( ddrja )
 	DISK_IMAGE_READONLY( "845jaa02", 0, BAD_DUMP SHA1(37ca16be25bee39a5692dee2fa5f0fa0addfaaca) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "845jaa01", 1, NO_DUMP ) // if this even exists
+	DISK_IMAGE_READONLY( "845jaa01", 0, NO_DUMP ) // if this even exists
 ROM_END
 
 ROM_START( ddrjb )
@@ -3857,7 +3847,7 @@ ROM_START( ddrjb )
 	DISK_IMAGE_READONLY( "845jab02", 0, BAD_DUMP SHA1(7bdcef37bf376c23153dfd1580de5666cc681335) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "845jab01", 1, NO_DUMP ) // if this even exists
+	DISK_IMAGE_READONLY( "845jab01", 0, NO_DUMP ) // if this even exists
 ROM_END
 
 ROM_START( ddra )
@@ -3890,7 +3880,7 @@ ROM_START( ddr2mc )
 	DISK_IMAGE_READONLY( "896jaa01", 0, BAD_DUMP SHA1(f802a0e2ba0147eb71c54d92af409c3010a5715f) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "895jaa02", 1, BAD_DUMP SHA1(cfe3a6f3ed62ba388b07045e29e22472d17dcfe4) )
+	DISK_IMAGE_READONLY( "895jaa02", 0, BAD_DUMP SHA1(cfe3a6f3ed62ba388b07045e29e22472d17dcfe4) )
 ROM_END
 
 ROM_START( ddr2mc2 )
@@ -3903,7 +3893,7 @@ ROM_START( ddr2mc2 )
 	DISK_IMAGE_READONLY( "984jaa01", 0, BAD_DUMP SHA1(5505c28be27bfa9648060fd799bcf0c2c5f608ed) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "895jaa02", 1, BAD_DUMP SHA1(cfe3a6f3ed62ba388b07045e29e22472d17dcfe4) )
+	DISK_IMAGE_READONLY( "895jaa02", 0, BAD_DUMP SHA1(cfe3a6f3ed62ba388b07045e29e22472d17dcfe4) )
 ROM_END
 
 ROM_START( ddr2ml )
@@ -4185,7 +4175,7 @@ ROM_START( ddrbocd )
 	DISK_IMAGE_READONLY( "892jaa01", 0, BAD_DUMP SHA1(46ace0feef48a2a6643c3cb4ac9164ba0beeea94) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "895jaa02", 1, BAD_DUMP SHA1(cfe3a6f3ed62ba388b07045e29e22472d17dcfe4) )
+	DISK_IMAGE_READONLY( "895jaa02", 0, BAD_DUMP SHA1(cfe3a6f3ed62ba388b07045e29e22472d17dcfe4) )
 ROM_END
 
 ROM_START( ddrs2k )
@@ -4302,7 +4292,7 @@ ROM_START( drmn )
 	DISK_IMAGE_READONLY( "881jad01", 0, BAD_DUMP SHA1(7d9d47bef636dbaa8d578f34ea9489e349d3d6df) ) // upgrade or bootleg?
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "881jaa02", 1, NO_DUMP )
+	DISK_IMAGE_READONLY( "881jaa02", 0, NO_DUMP )
 ROM_END
 
 ROM_START( drmn2m )
@@ -4345,7 +4335,7 @@ ROM_START( drmn2mpu )
 	DISK_IMAGE_READONLY( "912jab02", 0, BAD_DUMP SHA1(19dfae94b63468d3e16d3cc4a3eeae60d5dff1d7) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "912za01",  1, BAD_DUMP SHA1(033a310006efe164cc6a8276de42a5d555f9fea9) )
+	DISK_IMAGE_READONLY( "912za01",  0, BAD_DUMP SHA1(033a310006efe164cc6a8276de42a5d555f9fea9) )
 ROM_END
 
 ROM_START( drmn3m )
@@ -4924,7 +4914,7 @@ ROM_START( gtrfrk3m )
 	DISK_IMAGE_READONLY( "949jac01", 0, BAD_DUMP SHA1(ff017dd5c0ecbdb8935d0d4656a45e9fab10ef82) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "949jab02", 1, BAD_DUMP SHA1(ad629c9bafbdc4bf6c679918a5fae2bcfdb39332) )
+	DISK_IMAGE_READONLY( "949jab02", 0, BAD_DUMP SHA1(ad629c9bafbdc4bf6c679918a5fae2bcfdb39332) )
 ROM_END
 
 ROM_START( gtfrk3ma )
@@ -5099,7 +5089,7 @@ ROM_START( gtfrk10m )
 	DISK_IMAGE_READONLY( "d10jab01", 0, BAD_DUMP SHA1(c84858b412f0798a65cf3059c743501f32ad7280) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "d10jaa02", 1, BAD_DUMP SHA1(d4e4460ca3edc1b365af593757557c6cf5b7b3ec) )
+	DISK_IMAGE_READONLY( "d10jaa02", 0, BAD_DUMP SHA1(d4e4460ca3edc1b365af593757557c6cf5b7b3ec) )
 ROM_END
 
 ROM_START( gtfrk10ma )
