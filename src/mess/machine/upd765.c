@@ -308,7 +308,10 @@ READ8_MEMBER(upd765_family_device::msr_r)
 
 WRITE8_MEMBER(upd765_family_device::dsr_w)
 {
-	dsr = data;
+	logerror("%s: dsr_w %02x\n", tag(), data);
+	if(data & 0x80)
+		soft_reset();
+	dsr = data & 0x7f;
 	cur_rate = rates[dsr & 3];
 }
 
@@ -352,8 +355,9 @@ WRITE8_MEMBER(upd765_family_device::fifo_w)
 			break;
 		if(cmd == C_INVALID) {
 			logerror("%s: Invalid on %02x\n", tag(), command[0]);
-			exit(1);
-			command_pos = 0;
+			main_phase = PHASE_RESULT;
+			result[0] = 0x80;
+			result_pos = 1;
 			return;
 		}
 		start_command(cmd);
@@ -928,16 +932,22 @@ int upd765_family_device::check_command()
 	// ...01100 read deleted data
 	// 0.001101 format track
 	// 00001110 dumpreg
+	// 00101110 save
+	// 01001110 restore
+	// 10001110 drive specification command
 	// 00001111 seek
+	// 1.001111 relative seek
 	// 00010000 version
 	// ...10001 scan equal
 	// 00010010 perpendicular mode
 	// 00010011 configure
+	// 00110011 option
 	// .0010100 lock
 	// ...10110 verify
+	// 00010111 powerdown mode
+	// 00011000 part id
 	// ...11001 scan low or equal
 	// ...11101 scan high or equal
-	// 1.001111 relative seek
 
 	// MSDOS 6.22 format uses 0xcd to format a track, which makes one
 	// think only the bottom 5 bits are decoded.
@@ -973,7 +983,7 @@ int upd765_family_device::check_command()
 		return command_pos == 6 ? C_FORMAT_TRACK       : C_INCOMPLETE;
 
 	case 0x0e:
-		return command_pos == 2 ? C_DUMP_REG           : C_INCOMPLETE;
+		return C_DUMP_REG;
 
 	case 0x0f:
 		return command_pos == 3 ? C_SEEK               : C_INCOMPLETE;
@@ -1010,6 +1020,7 @@ void upd765_family_device::start_command(int cmd)
 		break;
 
 	case C_DUMP_REG:
+		logerror("%s: command dump regs\n", tag());
 		main_phase = PHASE_RESULT;
 		result[0] = flopi[0].pcn;
 		result[1] = flopi[1].pcn;
