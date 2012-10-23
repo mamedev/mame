@@ -2687,6 +2687,8 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 
 void s3_vga_device::s3_define_video_mode()
 {
+	int divisor = 1;
+	int xtal = 1000000;
 	if((s3.ext_misc_ctrl_2) >> 4)
 	{
 		svga.rgb8_en = 0;
@@ -2695,10 +2697,63 @@ void s3_vga_device::s3_define_video_mode()
 		svga.rgb32_en = 0;
 		switch((s3.ext_misc_ctrl_2) >> 4)
 		{
-			case 0x03: svga.rgb15_en = 1; break;
-			case 0x05: svga.rgb16_en = 1; break;
-			case 0x0d: svga.rgb32_en = 1; break;
+			case 0x03: svga.rgb15_en = 1; divisor = 2; break;
+			case 0x05: svga.rgb16_en = 1; divisor = 2; break;
+			case 0x0d: svga.rgb32_en = 1; divisor = 2; break;
 			default: fatalerror("TODO: s3 video mode not implemented %02x\n",((s3.ext_misc_ctrl_2) >> 4)); break;
+		}
+		switch(s3.cr42 & 0x0f)  // TODO: confirm clock settings
+		{
+		case 0:
+			xtal = XTAL_25_1748MHz;
+			break;
+		case 1:
+			xtal = XTAL_28_63636MHz;
+			break;
+		case 2:
+			xtal = 40000000;
+			break;
+		case 3:
+			xtal = 3000000;
+			break;
+		case 4:
+			xtal = 50000000;
+			break;
+		case 5:
+			xtal = 77000000;
+			break;
+		case 6:
+			xtal = 36000000;
+			break;
+		case 7:
+			xtal = 45000000;
+			break;
+		case 8:
+			xtal = 1000000;
+			break;
+		case 9:
+			xtal = 1000000;
+			break;
+		case 10:
+			xtal = 79000000;
+			break;
+		case 11:
+			xtal = 31000000;
+			break;
+		case 12:
+			xtal = 94000000;
+			break;
+		case 13:
+			xtal = 65000000;
+			break;
+		case 14:
+			xtal = 75000000;
+			break;
+		case 15:
+			xtal = 71000000;
+			break;
+		default:
+			xtal = 1000000;
 		}
 	}
 	else
@@ -2708,6 +2763,7 @@ void s3_vga_device::s3_define_video_mode()
 		svga.rgb16_en = 0;
 		svga.rgb32_en = 0;
 	}
+	recompute_params_clock(divisor, xtal);
 }
 
 void s3_vga_device::s3_crtc_reg_write(UINT8 index, UINT8 data)
@@ -2741,6 +2797,9 @@ void s3_vga_device::s3_crtc_reg_write(UINT8 index, UINT8 data)
 				break;
 			case 0x40:
 				s3.enable_8514 = data & 0x01;  // enable 8514/A registers (x2e8, x6e8, xae8, xee8)
+				break;
+			case 0x42:
+				s3.cr42 = data;  // bit 5 = interlace, bits 0-3 = dot clock (seems to be undocumented)
 				break;
 /*
 3d4h index 45h (R/W):  CR45 Hardware Graphics Cursor Mode

@@ -541,6 +541,7 @@ protected:
 		UINT8 reg_lock1;
 		UINT8 reg_lock2;
 		UINT8 enable_8514;
+		UINT8 cr42;
 		UINT8 cr53;
 
 		// data for memory-mapped I/O
