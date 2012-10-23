@@ -782,6 +782,29 @@ static MOS8722_INTERFACE( mmu_intf )
 
 
 //-------------------------------------------------
+//  mc6845_interface vdc_intf
+//-------------------------------------------------
+
+static GFXDECODE_START( c128 )
+	GFXDECODE_ENTRY( "charom", 0x0000, gfx_8x8x1, 0, 1 )
+GFXDECODE_END
+
+static const mc6845_interface vdc_intf =
+{
+	SCREEN_VDC_TAG,
+	8,
+	NULL,
+	NULL,
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	NULL
+};
+
+
+//-------------------------------------------------
 //  MOS8564_INTERFACE( vic_intf )
 //-------------------------------------------------
 
@@ -811,25 +834,6 @@ static MOS8564_INTERFACE( vic_intf )
 	DEVCB_DRIVER_LINE_MEMBER(c128_state, vic_irq_w),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(c128_state, vic_k_w)
-};
-
-
-//-------------------------------------------------
-//  mc6845_interface vdc_intf
-//-------------------------------------------------
-
-static const mc6845_interface vdc_intf =
-{
-	SCREEN_VDC_TAG,
-	8,
-	NULL,
-	NULL,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
 };
 
 
@@ -1094,7 +1098,7 @@ READ8_MEMBER( c128_state::cpu_r)
 	data |= m_cassette->sense_r() << 4;
 
 	// CAPS LOCK
-	data |= !BIT(ioport("SPECIAL")->read(), 5) << 6;
+	data |= m_caps_lock << 6;
 
 	return data;
 }
@@ -1380,6 +1384,7 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	// video hardware
 	MCFG_MOS8563_ADD(MOS8563_TAG, SCREEN_VDC_TAG, VIC6567_CLOCK*2, vdc_intf, vdc_videoram_map)
 	MCFG_MOS8564_ADD(MOS8564_TAG, SCREEN_VIC_TAG, VIC6567_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
+	MCFG_GFXDECODE(c128)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1484,6 +1489,7 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	// video hardware
 	MCFG_MOS8563_ADD(MOS8563_TAG, SCREEN_VDC_TAG, VIC6569_CLOCK*2, vdc_intf, vdc_videoram_map)
 	MCFG_MOS8566_ADD(MOS8564_TAG, SCREEN_VIC_TAG, VIC6569_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
+	MCFG_GFXDECODE(c128)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

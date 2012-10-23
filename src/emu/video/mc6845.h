@@ -401,6 +401,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	const address_space_config		m_videoram_space_config;
 
@@ -427,8 +428,14 @@ protected:
 	UINT8	m_dram_refresh;			/* 0x24 */
 	UINT8	m_sync_polarity;		/* 0x25 */
 
+	int m_revision;
+
 	virtual void update_cursor_state();
 	virtual UINT8 draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect, void *param);
+
+	static const device_timer_id TIMER_BLOCK_COPY = 9;
+	
+	emu_timer *m_block_copy_timer;
 };
 
 class mos8568_device : public mos8563_device
