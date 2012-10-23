@@ -1408,8 +1408,6 @@ public:
 	DECLARE_READ16_MEMBER(s23_c422_r);
 	DECLARE_WRITE16_MEMBER(s23_c422_w);
 	DECLARE_WRITE32_MEMBER(s23_mcuen_w);
-	DECLARE_READ32_MEMBER(gorgon_sharedram_r);
-	DECLARE_WRITE32_MEMBER(gorgon_sharedram_w);
 	DECLARE_READ32_MEMBER(s23_unk_status_r);
 	DECLARE_READ32_MEMBER(p3d_r);
 	DECLARE_WRITE32_MEMBER(p3d_w);
@@ -1441,6 +1439,7 @@ public:
 	DECLARE_MACHINE_START(s23);
 	DECLARE_VIDEO_START(ss23);
 	DECLARE_MACHINE_RESET(gmen);
+	virtual void machine_reset();
 	UINT32 screen_update_ss23(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(s23_interrupt);
 	TIMER_CALLBACK_MEMBER(c361_timer_cb);
@@ -1864,29 +1863,6 @@ WRITE32_MEMBER(namcos23_state::s23_mcuen_w)
 			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			m_s23_subcpu_running = 0;
 		}
-	}
-}
-
-/*
-    Final Furlong has a bug: it forgets to halt the H8/3002 before it zeros out the shared RAM
-    which contains the H8's stack and other working set.  This crashes MAME due to the PC going
-    off into the weeds, so we intercept
-*/
-
-READ32_MEMBER(namcos23_state::gorgon_sharedram_r)
-{
-	return m_shared_ram[offset];
-}
-
-WRITE32_MEMBER(namcos23_state::gorgon_sharedram_w)
-{
-	COMBINE_DATA(&m_shared_ram[offset]);
-
-	// hack for final furlong
-	if ((offset == 0x6000/4) && (data == 0) && (mem_mask == 0xff000000))
-	{
-		logerror("S23: Final Furlong hack stopping H8/3002\n");
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
@@ -2454,7 +2430,7 @@ static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32, namcos23_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(p3d_r, p3d_w )
 	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16(s23_c417_r, s23_c417_w, 0xffffffff )
-	AM_RANGE(0x04400000, 0x0440ffff) AM_READWRITE(gorgon_sharedram_r, gorgon_sharedram_w ) AM_SHARE("shared_ram") // Communication RAM (C416)
+	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_SHARE("shared_ram") // Communication RAM (C416)
 
 	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE(s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM
@@ -2540,6 +2516,8 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(namcos23_state,gmen)
 {
+	machine_reset();
+
 	// halt the SH-2 until we need it
 	machine().device("gmen")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
@@ -3149,6 +3127,11 @@ DRIVER_INIT_MEMBER(namcos23_state,ss23)
 	{
 		m_has_jvsio = 0;
 	}
+}
+
+void namcos23_state::machine_reset()
+{
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 #define XOR(a) WORD2_XOR_BE(a)
