@@ -75,7 +75,6 @@ vcs_control_port_device::~vcs_control_port_device()
 void vcs_control_port_device::device_start()
 {
 	m_device = dynamic_cast<device_vcs_control_port_interface *>(get_card_device());
-printf("m_device set to %p\n", m_device);
 }
 
 
