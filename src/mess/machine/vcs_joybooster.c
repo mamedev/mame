@@ -84,7 +84,6 @@ UINT8 vcs_joystick_booster_device::vcs_joy_r()
 
 UINT8 vcs_joystick_booster_device::vcs_pot_x_r()
 {
-printf("booster return: %02x\n", ioport("POTX")->read() );
 	return ioport("POTX")->read();
 }
 
