@@ -37,6 +37,7 @@ public:
 	s3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
+	m_audiocpu(*this, "audiocpu"),
 	m_dac(*this, "dac"),
 	m_pia0(*this, "pia0"),
 	m_pia1(*this, "pia1"),
@@ -53,17 +54,30 @@ public:
 	DECLARE_WRITE8_MEMBER(lamp1_w);
 	DECLARE_WRITE8_MEMBER(sol0_w);
 	DECLARE_WRITE8_MEMBER(sol1_w);
+	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ_LINE_MEMBER(cb1_r);
+	DECLARE_READ_LINE_MEMBER(pia2_ca1_r);
+	DECLARE_READ_LINE_MEMBER(pia2_cb1_r);
+	DECLARE_READ_LINE_MEMBER(pia4_cb1_r);
+	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w) { }; //ST5
+	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w) { }; //ST-solenoids enable
+	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w) { }; //ST2
+	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w) { }; //ST1
+	DECLARE_WRITE_LINE_MEMBER(pia2_ca2_w) { }; //diag leds enable
+	DECLARE_WRITE_LINE_MEMBER(pia2_cb2_w) { }; //ST6
+	DECLARE_WRITE_LINE_MEMBER(pia3_ca2_w) { }; //ST4
+	DECLARE_WRITE_LINE_MEMBER(pia3_cb2_w) { }; //ST3
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	DECLARE_INPUT_CHANGED_MEMBER(nmi);
+	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
+	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s3);
 	DECLARE_MACHINE_RESET(s3a);
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 	optional_device<dac_device> m_dac;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
@@ -83,13 +97,12 @@ private:
 static ADDRESS_MAP_START( s3_main_map, AS_PROGRAM, 8, s3_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x017f) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2200, 0x2203) AM_DEVREADWRITE("pia0", pia6821_device, read, write) // solenoids
 	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia1", pia6821_device, read, write) // lamps
 	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia2", pia6821_device, read, write) // display
 	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pia3", pia6821_device, read, write) // inputs
-	AM_RANGE(0x6000, 0x67ff) AM_ROM
-	AM_RANGE(0x7000, 0x7fff) AM_ROM
+	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s3_audio_map, AS_PROGRAM, 8, s3_state )
@@ -145,7 +158,7 @@ static INPUT_PORTS_START( s3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
@@ -171,10 +184,66 @@ static INPUT_PORTS_START( s3 )
 
 	PORT_START("SND")
 	PORT_BIT( 0xbf, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Music") PORT_CODE(KEYCODE_9) PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Music") PORT_CODE(KEYCODE_4) PORT_TOGGLE
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Diagnostic") PORT_CODE(KEYCODE_0) PORT_CHANGED_MEMBER(DEVICE_SELF, s3_state, nmi, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, s3_state, audio_nmi, 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, s3_state, main_nmi, 1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Advance") PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Manual/Auto") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Enter") PORT_CODE(KEYCODE_8)
+
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x01, 0x01, "SW01" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x02, 0x02, "SW02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x04, 0x04, "SW03" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x08, 0x08, "SW04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x10, 0x10, "SW05" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x20, "SW06" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x40, 0x40, "SW07" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x80, 0x80, "SW08" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "SW11" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x02, 0x02, "SW12" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x04, 0x04, "SW13" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x08, 0x08, "SW14" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x10, 0x10, "SW15" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x20, "SW16" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x40, 0x40, "SW17" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x80, 0x80, "SW18" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER( s3_state, s3 )
@@ -189,11 +258,18 @@ MACHINE_RESET_MEMBER( s3_state, s3a )
 	m_chimes = 0;
 }
 
-INPUT_CHANGED_MEMBER( s3_state::nmi )
+INPUT_CHANGED_MEMBER( s3_state::main_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
+INPUT_CHANGED_MEMBER( s3_state::audio_nmi )
+{
+	// Diagnostic button sends a pulse to NMI pin
+	if ((newval==CLEAR_LINE) && !m_chimes)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER( s3_state::sol0_w )
@@ -263,8 +339,8 @@ static const pia6821_interface pia0_intf =
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DRIVER_MEMBER(s3_state, sol0_w),		/* port A out */
 	DEVCB_DRIVER_MEMBER(s3_state, sol1_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia0_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia0_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
@@ -288,16 +364,51 @@ static const pia6821_interface pia1_intf =
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DRIVER_MEMBER(s3_state, lamp0_w),		/* port A out */
 	DEVCB_DRIVER_MEMBER(s3_state, lamp1_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia1_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia1_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
 
+READ_LINE_MEMBER( s3_state::pia2_ca1_r )
+{
+	return BIT(ioport("DIAGS")->read(), 2); // advance button
+}
+
+READ_LINE_MEMBER( s3_state::pia2_cb1_r )
+{
+	return BIT(ioport("DIAGS")->read(), 3); // auto/manual switch
+}
+
+READ8_MEMBER( s3_state::dips_r )
+{
+	if (BIT(ioport("DIAGS")->read(), 4) )
+	{
+		switch (m_strobe)
+		{
+		case 0:
+			return ioport("DSW0")->read() & 15;
+			break;
+		case 1:
+			return ioport("DSW0")->read() << 4;
+			break;
+		case 2:
+			return ioport("DSW1")->read() & 15;
+			break;
+		case 3:
+			return ioport("DSW1")->read() << 4;
+			break;
+		}
+	}
+	return 0xff;
+}
+
 WRITE8_MEMBER( s3_state::dig0_w )
 {
-	m_strobe = data;
+	m_strobe = data & 15;
 	m_data_ok = true;
+	output_set_value("led0", BIT(data, 4));
+	output_set_value("led1", BIT(data, 5));
 }
 
 WRITE8_MEMBER( s3_state::dig1_w )
@@ -313,16 +424,16 @@ WRITE8_MEMBER( s3_state::dig1_w )
 
 static const pia6821_interface pia2_intf =
 {
-	DEVCB_NULL,		/* port A in */
+	DEVCB_DRIVER_MEMBER(s3_state, dips_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia2_ca1_r),		/* line CA1 in */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia2_cb1_r),		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DRIVER_MEMBER(s3_state, dig0_w),		/* port A out */
 	DEVCB_DRIVER_MEMBER(s3_state, dig1_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia2_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia2_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
@@ -349,13 +460,13 @@ static const pia6821_interface pia3_intf =
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
 	DEVCB_DRIVER_MEMBER(s3_state, switch_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia3_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia3_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
 
-READ_LINE_MEMBER( s3_state::cb1_r )
+READ_LINE_MEMBER( s3_state::pia4_cb1_r )
 {
 	return m_cb1;
 }
@@ -375,13 +486,13 @@ static const pia6821_interface pia4_intf =
 	DEVCB_NULL,		/* port A in */
 	DEVCB_DRIVER_MEMBER(s3_state, dac_r),		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_DRIVER_LINE_MEMBER(s3_state, cb1_r),		/* line CB1 in */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia4_cb1_r),		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DRIVER_MEMBER(s3_state, dac_w),		/* port A out */
 	DEVCB_NULL,		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE)		/* IRQB */
 };
