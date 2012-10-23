@@ -12,13 +12,11 @@
     When first used, the nvram gets initialised but is otherwise unusable. A reboot
     will get it going.
 
-    By pressing 9, you can select a different set of sounds. This is switch SW2 on
+    By pressing 4, you can select a different set of sounds. This is switch SW2 on
     the real board.
 
 ToDo:
-- Diagnostic controls
 - Add 10k chime when added to samples.
-- Hot Tip and Lucky 7 should play a tune when starting a game.
 
 
 ************************************************************************************/
@@ -509,7 +507,7 @@ static MACHINE_CONFIG_START( s3, s3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s3_main_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s3_state, irq, attotime::from_hz(1000))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s3_state, irq, attotime::from_hz(250))
 	MCFG_MACHINE_RESET_OVERRIDE(s3_state, s3)
 
 	/* Video */
