@@ -157,11 +157,6 @@ static GFXDECODE_START( mustache )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x80, 8 )
 GFXDECODE_END
 
-void mustache_state::machine_start()
-{
-	// do nothing, not even sure why this is here anymore.
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(mustache_state::mustache_scanline)
 {
 	int scanline = param;
@@ -172,6 +167,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mustache_state::mustache_scanline)
 	if(scanline == 0) // vblank-in irq
 		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
 }
+
 
 
 static MACHINE_CONFIG_START( mustache, mustache_state )
