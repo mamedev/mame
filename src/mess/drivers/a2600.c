@@ -51,8 +51,8 @@ public:
 	a2600_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_riot_ram(*this, "riot_ram")
-//      , m_joy1(*this, CONTROL1_TAG)
-//      , m_joy2(*this, CONTROL2_TAG)
+		, m_joy1(*this, CONTROL1_TAG)
+		, m_joy2(*this, CONTROL2_TAG)
 		{ }
 
 	dpc_t m_dpc;
@@ -61,8 +61,6 @@ public:
 	UINT8* m_ram_base;
 	required_shared_ptr<UINT8> m_riot_ram;
 	UINT8 m_banking_mode;
-	UINT8 m_keypad_left_column;
-	UINT8 m_keypad_right_column;
 	unsigned m_cart_size;
 	unsigned m_number_banks;
 	unsigned m_current_bank;
@@ -132,8 +130,8 @@ public:
 	DECLARE_READ8_MEMBER(riot_input_port_8_r);
 
 protected:
-//  required_device<vcs_control_port_device> m_joy1;
-//  required_device<vcs_control_port_device> m_joy2;
+	required_device<vcs_control_port_device> m_joy1;
+	required_device<vcs_control_port_device> m_joy2;
 	int next_bank();
 	void modeF8_switch(UINT16 offset, UINT8 data);
 	void modeFA_switch(UINT16 offset, UINT8 data);
@@ -163,19 +161,6 @@ protected:
 #define MASTER_CLOCK_NTSC	3579545
 #define MASTER_CLOCK_PAL	3546894
 #define CATEGORY_SELECT		16
-
-/* Some defines for the naming of the controller ports and the controllers */
-#define	STR_LEFT_CONTROLLER		"Left Controller"
-#define STR_RIGHT_CONTROLLER	"Right Controller"
-#define STR_PADDLES				"Paddles"
-#define STR_DRIVING				"Driving"
-#define STR_KEYPAD				"Keypad"
-#define STR_LIGHTGUN			"Lightgun"
-#define STR_BOOSTERGRIP			"Booster Grip"
-#define STR_CX22TRAKBALL		"CX-22 Trak-Ball"
-#define STR_CX80TRAKBALL		"CX-80 Trak-Ball (TB Mode) / AtariST Mouse"
-#define STR_AMIGAMOUSE			"Amiga Mouse"
-#define STR_KIDVID				"KidVid Voice Module"
 
 enum
 {
@@ -1294,72 +1279,28 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(a2600_state::switch_A_w)
 {
 	/* Left controller port */
-	if ( machine().root_device().ioport("CONTROLLERS")->read() / CATEGORY_SELECT == 0x03 )
-	{
-		m_keypad_left_column = data / 16;
-	}
+	m_joy1->joy_w( data >> 4 );
 
 	/* Right controller port */
-	switch( machine().root_device().ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
-	{
-	case 0x03:	/* Keypad */
-		m_keypad_right_column = data & 0x0F;
-		break;
-	case 0x0a:	/* KidVid voice module */
-		machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(( data & 0x02 ) ? (cassette_state)CASSETTE_MOTOR_DISABLED : (cassette_state)(CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), (cassette_state)CASSETTE_MOTOR_DISABLED );
-		break;
-	}
+	m_joy2->joy_w( data & 0x0f );
+
+//	switch( machine().root_device().ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
+//	{
+//	case 0x0a:	/* KidVid voice module */
+//		machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(( data & 0x02 ) ? (cassette_state)CASSETTE_MOTOR_DISABLED : (cassette_state)(CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), (cassette_state)CASSETTE_MOTOR_DISABLED );
+//		break;
+//	}
 }
 
 READ8_MEMBER(a2600_state::switch_A_r)
 {
-	static const UINT8 driving_lookup[4] = { 0x00, 0x02, 0x03, 0x01 };
 	UINT8 val = 0;
 
 	/* Left controller port PINs 1-4 ( 4321 ) */
-	switch( machine().root_device().ioport("CONTROLLERS")->read() / CATEGORY_SELECT )
-	{
-	case 0x00:  /* Joystick */
-	case 0x05:	/* Joystick w/Boostergrip */
-		val |= machine().root_device().ioport("SWA_JOY")->read() & 0xF0;
-//      val |= ( m_joy1->joy_r() & 0x0F ) << 4;
-		break;
-	case 0x01:  /* Paddle */
-		val |= machine().root_device().ioport("SWA_PAD")->read() & 0xF0;
-		break;
-	case 0x02:	/* Driving */
-		val |= 0xC0;
-		val |= ( driving_lookup[ ( machine().root_device().ioport("WHEEL_L")->read() & 0x18 ) >> 3 ] << 4 );
-		break;
-	case 0x06:	/* Trakball CX-22 */
-	case 0x07:	/* Trakball CX-80 / ST mouse */
-	case 0x09:	/* Amiga mouse */
-	default:
-		val |= 0xF0;
-		break;
-	}
+	val |= ( m_joy1->joy_r() & 0x0F ) << 4;
 
 	/* Right controller port PINs 1-4 ( 4321 ) */
-	switch( machine().root_device().ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
-	{
-	case 0x00:	/* Joystick */
-	case 0x05:	/* Joystick w/Boostergrip */
-		val |= machine().root_device().ioport("SWA_JOY")->read() & 0x0F;
-		break;
-	case 0x01:	/* Paddle */
-		val |= machine().root_device().ioport("SWA_PAD")->read() & 0x0F;
-		break;
-	case 0x02:	/* Driving */
-		val |= 0x0C;
-		val |= ( driving_lookup[ ( machine().root_device().ioport("WHEEL_R")->read() & 0x18 ) >> 3 ] );
-		break;
-	case 0x06:	/* Trakball CX-22 */
-	case 0x07:	/* Trakball CX-80 / ST mouse */
-	case 0x09:	/* Amiga mouse */
-	default:
-		val |= 0x0F;
-		break;
-	}
+	val |= m_joy2->joy_r() & 0x0F;
 
 	return val;
 }
@@ -1412,191 +1353,27 @@ void a2600_state::install_banks(int count, unsigned init)
 
 READ16_MEMBER(a2600_state::a2600_read_input_port)
 {
-	int i;
-
 	switch( offset )
 	{
 	case 0:	/* Left controller port PIN 5 */
-		switch ( ioport("CONTROLLERS")->read() / CATEGORY_SELECT )
-		{
-		case 0x00:	/* Joystick */
-			return TIA_INPUT_PORT_ALWAYS_OFF;
-		case 0x01:	/* Paddle */
-			return ioport("PADDLE1")->read();
-		case 0x03:	/* Keypad */
-			for ( i = 0; i < 4; i++ )
-			{
-				if ( ! ( ( m_keypad_left_column >> i ) & 0x01 ) )
-				{
-					if ( ( ioport("KEYPAD_L")->read() >> 3*i ) & 0x01 )
-					{
-						return TIA_INPUT_PORT_ALWAYS_ON;
-					}
-					else
-					{
-						return TIA_INPUT_PORT_ALWAYS_OFF;
-					}
-				}
-			}
-			return TIA_INPUT_PORT_ALWAYS_ON;
-		case 0x05:	/* Boostergrip joystick */
-			return ( ioport("BUTTONS_L")->read() & 0x40 ) ? TIA_INPUT_PORT_ALWAYS_OFF : TIA_INPUT_PORT_ALWAYS_ON;
-		default:
-			return TIA_INPUT_PORT_ALWAYS_OFF;
-		}
-		break;
-	case 1:	/* Right controller port PIN 5 */
-		switch ( ioport("CONTROLLERS")->read() / CATEGORY_SELECT )
-		{
-		case 0x00:	/* Joystick */
-			return TIA_INPUT_PORT_ALWAYS_OFF;
-		case 0x01:	/* Paddle */
-			return ioport("PADDLE3")->read();
-		case 0x03:	/* Keypad */
-			for ( i = 0; i < 4; i++ )
-			{
-				if ( ! ( ( m_keypad_left_column >> i ) & 0x01 ) )
-				{
-					if ( ( ioport("KEYPAD_L")->read() >> 3*i ) & 0x02 )
-					{
-						return TIA_INPUT_PORT_ALWAYS_ON;
-					}
-					else
-					{
-						return TIA_INPUT_PORT_ALWAYS_OFF;
-					}
-				}
-			}
-			return TIA_INPUT_PORT_ALWAYS_ON;
-		case 0x05:	/* Joystick w/Boostergrip */
-			return ( ioport("BUTTONS_L")->read() & 0x20 ) ? TIA_INPUT_PORT_ALWAYS_OFF : TIA_INPUT_PORT_ALWAYS_ON;
-		default:
-			return TIA_INPUT_PORT_ALWAYS_OFF;
-		}
-		break;
-	case 2:	/* Left controller port PIN 9 */
-		switch ( ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
-		{
-		case 0x00:	/* Joystick */
-			return TIA_INPUT_PORT_ALWAYS_OFF;
-		case 0x01:	/* Paddle */
-			return ioport("PADDLE2")->read();
-		case 0x03:	/* Keypad */
-			for ( i = 0; i < 4; i++ )
-			{
-				if ( ! ( ( m_keypad_right_column >> i ) & 0x01 ) )
-				{
-					if ( ( ioport("KEYPAD_R")->read() >> 3*i ) & 0x01 )
-					{
-						return TIA_INPUT_PORT_ALWAYS_ON;
-					}
-					else
-					{
-						return TIA_INPUT_PORT_ALWAYS_OFF;
-					}
-				}
-			}
-			return TIA_INPUT_PORT_ALWAYS_ON;
-		case 0x05:	/* Joystick w/Boostergrip */
-			return ( ioport("BUTTONS_R")->read() & 0x40 ) ? TIA_INPUT_PORT_ALWAYS_OFF : TIA_INPUT_PORT_ALWAYS_ON;
-		default:
-			return TIA_INPUT_PORT_ALWAYS_OFF;
-		}
-		break;
+		return m_joy1->pot_x_r();
+
+	case 1:	/* Left controller port PIN 9 */
+		return m_joy1->pot_y_r();
+
+	case 2:	/* Right controller port PIN 5 */
+		return m_joy2->pot_x_r();
+
 	case 3:	/* Right controller port PIN 9 */
-		switch ( ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
-		{
-		case 0x00:	/* Joystick */
-			return TIA_INPUT_PORT_ALWAYS_OFF;
-		case 0x01:	/* Paddle */
-			return ioport("PADDLE4")->read();
-		case 0x03:	/* Keypad */
-			for ( i = 0; i < 4; i++ )
-			{
-				if ( ! ( ( m_keypad_right_column >> i ) & 0x01 ) )
-				{
-					if ( ( ioport("KEYPAD_R")->read() >> 3*i ) & 0x02 )
-					{
-						return TIA_INPUT_PORT_ALWAYS_ON;
-					}
-					else
-					{
-						return TIA_INPUT_PORT_ALWAYS_OFF;
-					}
-				}
-			}
-			return TIA_INPUT_PORT_ALWAYS_ON;
-		case 0x05:	/* Joystick w/Boostergrip */
-			return ( ioport("BUTTONS_R")->read() & 0x20 ) ? TIA_INPUT_PORT_ALWAYS_OFF : TIA_INPUT_PORT_ALWAYS_ON;
-		default:
-			return TIA_INPUT_PORT_ALWAYS_OFF;
-		}
-		break;
+		return m_joy2->pot_y_r();
+
 	case 4:	/* Left controller port PIN 6 */
-		switch ( ioport("CONTROLLERS")->read() / CATEGORY_SELECT )
-		{
-		case 0x00:	/* Joystick */
-		case 0x05:	/* Joystick w/Boostergrip */
-			return ioport("BUTTONS_L")->read();
-		case 0x01:	/* Paddle */
-			return 0xff;
-		case 0x02:	/* Driving */
-			return ioport("BUTTONS_L")->read() << 3;
-		case 0x03:	/* Keypad */
-			for ( i = 0; i < 4; i++ )
-			{
-				if ( ! ( ( m_keypad_left_column >> i ) & 0x01 ) )
-				{
-					if ( ( ioport("KEYPAD_L")->read() >> 3*i ) & 0x04 )
-					{
-						return 0xff;
-					}
-					else
-					{
-						return 0x00;
-					}
-				}
-			}
-			return 0xff;
-		case 0x06:	/* Trakball CX-22 */
-			return ioport("BUTTONS_L")->read() << 4;
-		default:
-			return 0xff;
-		}
-		break;
+		return ( m_joy1->joy_r() & 0x20 ) ? 0xff : 0x7f;
+
 	case 5:	/* Right controller port PIN 6 */
-		switch ( ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
-		{
-		case 0x00:	/* Joystick */
-		case 0x05:	/* Joystick w/Boostergrip */
-			return ioport("BUTTONS_R")->read();
-		case 0x01:	/* Paddle */
-			return 0xff;
-		case 0x02:	/* Driving */
-			return ioport("BUTTONS_R")->read() << 3;
-		case 0x03:	/* Keypad */
-			for ( i = 0; i < 4; i++ )
-			{
-				if ( ! ( ( m_keypad_right_column >> i ) & 0x01 ) )
-				{
-					if ( ( ioport("KEYPAD_R")->read() >> 3*i ) & 0x04 )
-					{
-						return 0xff;
-					}
-					else
-					{
-						return 0x00;
-					}
-				}
-			}
-			return 0xff;
-		case 0x06:	/* Trakball CX-22 */
-			return ioport("BUTTONS_R")->read() << 4;
-		default:
-			return 0xff;
-		}
+		return ( m_joy2->joy_r() & 0x20 ) ? 0xff : 0x7f;
 	}
-	return TIA_INPUT_PORT_ALWAYS_OFF;
+	return 0xff;
 }
 
 /* There are a few games that do an LDA ($80-$FF),Y instruction.
@@ -1786,51 +1563,6 @@ static unsigned long detect_2600controllers(running_machine &machine)
 	if (foundkeypad) return (KEYP << 16) + KEYP;
 	return (left << 16) + right;
 }
-
-static void set_category_value( running_machine &machine, const char* cat, const char *cat_selection )
-{
-	/* NPW 22-May-2008 - FIXME */
-#if 0
-	input_port_entry	*cat_in = NULL;
-	input_port_entry	*in;
-
-	for( in = machine.input_ports; in->type != IPT_END; in++ )
-	{
-		if ( in->type == IPT_CATEGORY_NAME && ! mame_stricmp( cat, input_port_name(in) ) )
-		{
-			cat_in = in;
-		}
-		if ( cat_in && in->type == IPT_CATEGORY_SETTING && ! mame_stricmp( cat_selection, input_port_name(in) ) )
-		{
-			cat_in->default_value = in->default_value;
-			return;
-		}
-	}
-#endif
-}
-
-static void set_controller( running_machine &machine, const char *controller, unsigned int selection )
-{
-	/* Defaulting to only joystick when joysstick and paddle are set for now... */
-	if ( selection == JOYS + PADD )
-		selection = JOYS;
-
-	switch( selection )
-	{
-	case JOYS:	set_category_value( machine, controller, "Joystick" ); break;
-	case PADD:	set_category_value( machine, controller, STR_PADDLES ); break;
-	case KEYP:	set_category_value( machine, controller, STR_KEYPAD ); break;
-	case LGUN:	set_category_value( machine, controller, STR_LIGHTGUN ); break;
-	case INDY:	set_category_value( machine, controller, STR_DRIVING ); break;
-	case BOOS:	set_category_value( machine, controller, STR_BOOSTERGRIP ); break;
-	case KVID:	set_category_value( machine, controller, STR_KIDVID ); break;
-	case CMTE:	break;
-	case MLNK:	break;
-	case AMSE:	set_category_value( machine, controller, STR_AMIGAMOUSE ); break;
-	case CX22:	set_category_value( machine, controller, STR_CX22TRAKBALL ); break;
-	case CX80:	set_category_value( machine, controller, STR_CX80TRAKBALL ); break;
-	}
-}
 #endif
 
 void a2600_state::machine_reset()
@@ -1840,14 +1572,6 @@ void a2600_state::machine_reset()
 	static const unsigned char snowwhite[] = { 0x10, 0xd0, 0xff, 0xff }; // Snow White Proto
 
 	m_current_reset_bank_counter++;
-
-#ifdef UNUSED_FUNCTIONS
-	/* auto-detect special controllers */
-	unsigned long controltemp;
-	controltemp = detect_2600controllers(machine());
-	set_controller( machine(), STR_LEFT_CONTROLLER, controltemp >> 16 );
-	set_controller( machine(), STR_RIGHT_CONTROLLER, controltemp & 0xFFFF );
-#endif
 
 	/* auto-detect bank mode */
 	if (m_banking_mode == 0xff) if (detect_modeDC(machine())) m_banking_mode = modeDC;
@@ -2182,54 +1906,6 @@ void a2600_state::machine_reset()
 
 
 static INPUT_PORTS_START( a2600 )
-
-	PORT_START("PADDLE1")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_MINMAX(0,255) PORT_PLAYER(1) PORT_REVERSE PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x10)
-	PORT_START("PADDLE3")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_MINMAX(0,255) PORT_PLAYER(3) PORT_REVERSE PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x10)
-	PORT_START("PADDLE2")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_MINMAX(0,255) PORT_PLAYER(2) PORT_REVERSE PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x01)
-	PORT_START("PADDLE4")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_MINMAX(0,255) PORT_PLAYER(4) PORT_REVERSE PORT_CODE_DEC(KEYCODE_4_PAD) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x01)
-
-	PORT_START("BUTTONS_L") /* left port button(s) */
-//  PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x50)
-//  PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x50)
-	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x50)
-	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x20)
-	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x00)
-	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x00)
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x00)
-
-	PORT_START("BUTTONS_R") /* right port button(s) */
-//  PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x05)
-//  PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x05)
-	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x05)
-	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x02)
-	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x00)
-	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x00)
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x00)
-
-	PORT_START("SWA_JOY") /* SWCHA joystick */
-	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x00)
-	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x00)
-	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x00)
-	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x00)
-	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x00)
-	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x00)
-	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(1) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x00)
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x00)
-
-	PORT_START("SWA_PAD") /* SWCHA paddles */
-	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x01)
-	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x01)
-	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x10)
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x10)
-
 	PORT_START("SWB") /* SWCHB */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset Game") PORT_CODE(KEYCODE_2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Select Game")
@@ -2245,91 +1921,6 @@ static INPUT_PORTS_START( a2600 )
 	PORT_DIPNAME( 0x80, 0x00, "Right Diff. Switch" ) PORT_CODE(KEYCODE_4) PORT_TOGGLE
 	PORT_DIPSETTING(    0x80, "A" )
 	PORT_DIPSETTING(    0x00, "B" )
-
-	PORT_START("CONTROLLERS")
-	PORT_CONFNAME( 0xf0, 0x00, STR_LEFT_CONTROLLER )
-	PORT_CONFSETTING(    0x00, DEF_STR( Joystick ) )
-	PORT_CONFSETTING(    0x10, STR_PADDLES )
-	PORT_CONFSETTING(    0x20, STR_DRIVING )
-	PORT_CONFSETTING(    0x30, STR_KEYPAD )
-	//PORT_CONFSETTING(    0x40, STR_LIGHTGUN )
-	PORT_CONFSETTING(    0x50, STR_BOOSTERGRIP )
-	//PORT_CONFSETTING(    0x60, STR_CX22TRAKBALL )
-	//PORT_CONFSETTING(    0x70, STR_CX80TRAKBALL )
-	//PORT_CONFSETTING(    0x80, "CX-80 Trak-Ball (JS Mode)" )
-	//PORT_CONFSETTING(    0x90, STR_AMIGAMOUSE )
-	PORT_CONFNAME( 0x0f, 0x00, STR_RIGHT_CONTROLLER )
-	PORT_CONFSETTING(    0x00, DEF_STR( Joystick ) )
-	PORT_CONFSETTING(    0x01, STR_PADDLES )
-	PORT_CONFSETTING(    0x02, STR_DRIVING )
-	PORT_CONFSETTING(    0x03, STR_KEYPAD )
-	//PORT_CONFSETTING(    0x04, STR_LIGHTGUN )
-	PORT_CONFSETTING(    0x05, STR_BOOSTERGRIP )
-	//PORT_CONFSETTING(    0x06, STR_CX22TRAKBALL )
-	//PORT_CONFSETTING(    0x07, STR_CX80TRAKBALL )
-	//PORT_CONFSETTING(    0x08, "CX-80 Trak-Ball (JS Mode)" )
-	//PORT_CONFSETTING(    0x09, STR_AMIGAMOUSE )
-	PORT_CONFSETTING(    0x0a, STR_KIDVID )
-	//PORT_CONFSETTING(    0x0b, "Save Key" )
-
-	PORT_START("KEYPAD_L")	/* left keypad */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("left 1") PORT_CODE(KEYCODE_7_PAD) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("left 2") PORT_CODE(KEYCODE_8_PAD) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("left 3") PORT_CODE(KEYCODE_9_PAD) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("left 4") PORT_CODE(KEYCODE_4_PAD) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("left 5") PORT_CODE(KEYCODE_5_PAD) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("left 6") PORT_CODE(KEYCODE_6_PAD) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("left 7") PORT_CODE(KEYCODE_1_PAD) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("left 8") PORT_CODE(KEYCODE_2_PAD) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("left 9") PORT_CODE(KEYCODE_3_PAD) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("left *") PORT_CODE(KEYCODE_0_PAD) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("left 0") PORT_CODE(KEYCODE_DEL_PAD) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x30)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("left #") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x30)
-
-	PORT_START("KEYPAD_R")  /* right keypad */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("right 1") PORT_CODE(KEYCODE_5) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("right 2") PORT_CODE(KEYCODE_6) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("right 3") PORT_CODE(KEYCODE_7) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("right 4") PORT_CODE(KEYCODE_R) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("right 5") PORT_CODE(KEYCODE_T) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("right 6") PORT_CODE(KEYCODE_Y) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("right 7") PORT_CODE(KEYCODE_F) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("right 8") PORT_CODE(KEYCODE_G) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("right 9") PORT_CODE(KEYCODE_H) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("right *") PORT_CODE(KEYCODE_V) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("right 0") PORT_CODE(KEYCODE_B) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x03)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("right #") PORT_CODE(KEYCODE_N) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x03)
-
-	PORT_START("WHEEL_L")	/* left driving controller */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(40) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x20)
-
-	PORT_START("WHEEL_R")	/* right driving controller */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(40) PORT_KEYDELTA(5) PORT_PLAYER(2) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x02)
-
-	PORT_START("GUNX_L")	/* left light gun X */
-//  PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x40)
-
-	PORT_START("GUNY_L")	/* left light gun Y */
-//  PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x40)
-
-	PORT_START("GUNX_R")	/* right light gun X */
-//  PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x04)
-
-	PORT_START("GUNY_R")	/* right light gun Y */
-//  PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x04)
-
-	PORT_START("TRAKX_L")	/* left trak ball X */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(40) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x50)
-
-	PORT_START("TRAKY_L")	/* left trak ball Y */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(40) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_CONDITION("CONTROLLERS", 0xf0, EQUALS, 0x50)
-
-	PORT_START("TRAKX_R")	/* right trak ball X */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(40) PORT_KEYDELTA(5) PORT_PLAYER(2) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x05)
-
-	PORT_START("TRAKY_R")	/* right trak ball Y */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(40) PORT_KEYDELTA(5) PORT_PLAYER(2) PORT_CONDITION("CONTROLLERS", 0x0f, EQUALS, 0x05)
-
 INPUT_PORTS_END
 
 
@@ -2382,8 +1973,8 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 	/* devices */
 	MCFG_RIOT6532_ADD("riot", MASTER_CLOCK_NTSC / 3, r6532_interface)
 
-//  MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
-//  MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy", NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
 
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
@@ -2418,8 +2009,8 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	/* devices */
 	MCFG_RIOT6532_ADD("riot", MASTER_CLOCK_PAL / 3, r6532_interface)
 
-//  MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
-//  MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy", NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
 
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")

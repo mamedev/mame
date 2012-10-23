@@ -560,6 +560,9 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/vcs_joy.o	\
 	$(MESS_MACHINE)/vcs_lightpen.o	\
 	$(MESS_MACHINE)/vcs_paddles.o	\
+	$(MESS_MACHINE)/vcs_joybooster.o	\
+	$(MESS_MACHINE)/vcs_wheel.o	\
+	$(MESS_MACHINE)/vcs_keypad.o	\
 
 
 
