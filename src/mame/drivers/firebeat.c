@@ -1971,7 +1971,6 @@ INTERRUPT_GEN_MEMBER(firebeat_state::firebeat_interrupt)
 
 MACHINE_RESET_MEMBER(firebeat_state,firebeat)
 {
-	void *cd;
 	int i;
 	UINT8 *sound = memregion("ymz")->base();
 
@@ -1980,9 +1979,6 @@ MACHINE_RESET_MEMBER(firebeat_state,firebeat)
 		sound[i] = m_flash[1]->read(i);
 		sound[i+0x200000] = m_flash[2]->read(i);
 	}
-
-	m_atapi_device_data[1]->GetDevice( &cd );
-	cdda_set_cdrom(machine().device("cdda"), cd);
 }
 
 const rtc65271_interface firebeat_rtc =
@@ -2030,9 +2026,9 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("cdda", CDDA, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_MODIFY("scsi1:cdda")
+	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 
 MACHINE_CONFIG_END
 
@@ -2083,9 +2079,9 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("cdda", CDDA, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_MODIFY("scsi1:cdda")
+	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 
 MACHINE_CONFIG_END
 

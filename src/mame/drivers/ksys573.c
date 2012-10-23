@@ -1380,7 +1380,6 @@ static void update_mode( running_machine &machine )
 		current_cdrom = new_cdrom;
 
 		state->m_cr589->SetDevice( new_cdrom );
-		cdda_set_cdrom(machine.device("cdda"), new_cdrom);
 	}
 }
 
@@ -3066,9 +3065,9 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.0 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 
-	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.0 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.0 )
+	MCFG_SOUND_MODIFY( "cdrom:cdda" )
+	MCFG_SOUND_ROUTE( 0, "^^lspeaker", 1.0 )
+	MCFG_SOUND_ROUTE( 1, "^^rspeaker", 1.0 )
 
 	MCFG_M48T58_ADD( "m48t58" )
 

@@ -18,7 +18,6 @@
 
 #include "emu.h"
 #include "cpu/mips/mips3.h"
-#include "sound/cdda.h"
 #include "machine/8530scc.h"
 #include "machine/sgi.h"
 #include "machine/eeprom.h"
@@ -602,14 +601,14 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
 	MCFG_SCC8530_ADD("scc", 7000000, line_cb_t())
 
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_6)
 	MCFG_WD33C93_ADD("scsi:wd33c93", wd33c93_intf)
+
+	MCFG_SOUND_MODIFY( "scsi:cdrom:cdda" )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^mono", 1.0)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C56)
 MACHINE_CONFIG_END

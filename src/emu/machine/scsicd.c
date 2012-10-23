@@ -49,7 +49,7 @@ void scsicd_device::device_reset()
 {
 	scsihle_device::device_reset();
 
-	cdrom = subdevice<cdrom_image_device>("image")->get_cdrom_file();
+	SetDevice( subdevice<cdrom_image_device>("image")->get_cdrom_file() );
 	if( !cdrom )
 	{
 		logerror( "SCSICD %s: no CD found!\n", tag() );
@@ -68,6 +68,7 @@ cdrom_interface scsicd_device::cd_intf = { 0, 0 };
 
 static MACHINE_CONFIG_FRAGMENT(scsi_cdrom)
 	MCFG_CDROM_ADD("image", scsicd_device::cd_intf)
+	MCFG_SOUND_ADD("cdda", CDDA, 0)
 MACHINE_CONFIG_END
 
 machine_config_constructor scsicd_device::device_mconfig_additions() const
@@ -738,6 +739,7 @@ void scsicd_device::GetDevice( void **_cdrom )
 void scsicd_device::SetDevice( void *_cdrom )
 {
 	cdrom = (cdrom_file *)_cdrom;
+	cdda_set_cdrom(subdevice("cdda"), cdrom);
 }
 
 int scsicd_device::GetSectorBytes()

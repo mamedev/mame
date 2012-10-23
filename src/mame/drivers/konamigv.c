@@ -171,7 +171,6 @@ public:
 	DECLARE_DRIVER_INIT(konamigv);
 	DECLARE_DRIVER_INIT(btchamp);
 	DECLARE_MACHINE_START(konamigv);
-	DECLARE_MACHINE_RESET(konamigv);
 };
 
 /* EEPROM handlers */
@@ -319,15 +318,6 @@ MACHINE_START_MEMBER(konamigv_state,konamigv)
 	save_item(NAME(m_btc_trackball_data));
 }
 
-MACHINE_RESET_MEMBER(konamigv_state,konamigv)
-{
-	/* also hook up CDDA audio to the CD-ROM drive */
-	void *cdrom;
-	scsihle_device *scsidev = machine().device<scsihle_device>("scsi:cdrom");
-	scsidev->GetDevice( &cdrom );
-	cdda_set_cdrom(machine().device("cdda"), cdrom);
-}
-
 static void spu_irq(device_t *device, UINT32 data)
 {
 	if (data)
@@ -345,7 +335,6 @@ static MACHINE_CONFIG_START( konamigv, konamigv_state )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( scsi_dma_write ), (konamigv_state *) owner ) )
 
 	MCFG_MACHINE_START_OVERRIDE(konamigv_state, konamigv )
-	MCFG_MACHINE_RESET_OVERRIDE(konamigv_state, konamigv )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -363,9 +352,9 @@ static MACHINE_CONFIG_START( konamigv, konamigv_state )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.75 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.75 )
 
-	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.0 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.0 )
+	MCFG_SOUND_MODIFY( "scsi:cdrom:cdda" )
+	MCFG_SOUND_ROUTE( 0, "^^^lspeaker", 1.0 )
+	MCFG_SOUND_ROUTE( 1, "^^^rspeaker", 1.0 )
 MACHINE_CONFIG_END
 
 
