@@ -1321,19 +1321,27 @@ class namcos23_state : public driver_device
 public:
 	namcos23_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_iocpu(*this, "iocpu"),
         m_rtc(*this, "rtc"),
 		m_shared_ram(*this, "shared_ram"),
 		m_charram(*this, "charram"),
 		m_textram(*this, "textram"),
 		m_czattr(*this, "czattr"),
+        m_gmen_sh2(*this, "gmen_sh2"),
 		m_gmen_sh2_shared(*this, "gmen_sh2_shared")
 	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_iocpu;
     required_device<rtc4543_device> m_rtc;
 	required_shared_ptr<UINT32> m_shared_ram;
 	required_shared_ptr<UINT32> m_charram;
 	required_shared_ptr<UINT32> m_textram;
 	optional_shared_ptr<UINT32> m_czattr;
+	optional_device<cpu_device> m_gmen_sh2;
 	optional_shared_ptr<UINT32> m_gmen_sh2_shared;
 
 	c361_t m_c361;
@@ -1349,7 +1357,7 @@ public:
 	bool m_ctl_vbl_active;
 	UINT8 m_ctl_led;
 	UINT16 m_ctl_inp_buffer[2];
-	int m_s23_subcpu_running;
+	int m_audiocpu_running;
 	UINT32 m_p3d_address;
 	UINT32 m_p3d_size;
 	const UINT32 *m_ptrom;
@@ -1570,7 +1578,7 @@ WRITE16_MEMBER(namcos23_state::s23_c417_w)
 		break;
 	case 7:
 		logerror("c417_w: ack IRQ 2 (%x)\n", data);
-		machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ2, CLEAR_LINE);
+		m_maincpu->set_input_line(MIPS3_IRQ2, CLEAR_LINE);
 		break;
 	default:
 		logerror("c417_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
@@ -1759,7 +1767,7 @@ TIMER_CALLBACK_MEMBER(namcos23_state::c361_timer_cb)
 
 	if (c361.scanline != 511)
 	{
-		machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ1, ASSERT_LINE);
+		m_maincpu->set_input_line(MIPS3_IRQ1, ASSERT_LINE);
 		c361.timer->adjust(attotime::never);
 	}
 }
@@ -1781,7 +1789,7 @@ WRITE16_MEMBER(namcos23_state::s23_c361_w)
 		c361.scanline = data;
 		if (data == 0x1ff)
 		{
-			machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ1, CLEAR_LINE);
+			m_maincpu->set_input_line(MIPS3_IRQ1, CLEAR_LINE);
 			c361.timer->adjust(attotime::never);
 		}
 		else
@@ -1820,12 +1828,12 @@ WRITE16_MEMBER(namcos23_state::s23_c422_w)
 			if (data == 0xfffb)
 			{
 				logerror("c422_w: raise IRQ 3\n");
-				machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ3, ASSERT_LINE);
+				m_maincpu->set_input_line(MIPS3_IRQ3, ASSERT_LINE);
 			}
 			else if (data == 0x000f)
 			{
 				logerror("c422_w: ack IRQ 3\n");
-				machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ3, CLEAR_LINE);
+				m_maincpu->set_input_line(MIPS3_IRQ3, CLEAR_LINE);
 			}
 			break;
 
@@ -1849,19 +1857,19 @@ WRITE32_MEMBER(namcos23_state::s23_mcuen_w)
 			logerror("S23: booting H8/3002\n");
 
 			// Panic Park: writing 1 when it's already running means reboot?
-			if (m_s23_subcpu_running)
+			if (m_audiocpu_running)
 			{
-				machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+				m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			}
 
-			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-			m_s23_subcpu_running = 1;
+			m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			m_audiocpu_running = 1;
 		}
 		else
 		{
 			logerror("S23: stopping H8/3002\n");
-			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-			m_s23_subcpu_running = 0;
+			m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			m_audiocpu_running = 0;
 		}
 	}
 }
@@ -2187,7 +2195,7 @@ WRITE32_MEMBER(namcos23_state::p3d_w)
 			p3d_dma(space, m_p3d_address, m_p3d_size);
 		return;
 	case 0x17:
-		machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ1, CLEAR_LINE);
+		m_maincpu->set_input_line(MIPS3_IRQ1, CLEAR_LINE);
 		m_c361.timer->adjust(attotime::never);
 		return;
 	}
@@ -2450,11 +2458,11 @@ static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32, namcos23_state )
 
 	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16(s23_ctl_r, s23_ctl_w, 0xffffffff ) // write for LEDs at d000000, watchdog at d000004
 
-	AM_RANGE(0x0e000000, 0x0e007fff) AM_RAM // C405 RAM
+	AM_RANGE(0x0e000000, 0x0e007fff) AM_RAM // C405 RAM - what is this?
 
 	AM_RANGE(0x0f000000, 0x0f000003) AM_READ(s23_unk_status_r )
 
-	AM_RANGE(0x0f200000, 0x0f203fff) AM_RAM // C422 RAM
+	AM_RANGE(0x0f200000, 0x0f203fff) AM_RAM // C422 RAM (where are the C422 regs?)
 
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -2464,17 +2472,17 @@ static ADDRESS_MAP_START( ss23_map, AS_PROGRAM, 32, namcos23_state )
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(p3d_r, p3d_w )
 	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16(s23_c417_r, s23_c417_w, 0xffffffff )
-	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_SHARE("shared_ram")
+	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_SHARE("shared_ram") // Communication RAM (C416)
 	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE(s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM
 	AM_RANGE(0x06000000, 0x0600ffff) AM_RAM AM_SHARE("nvram") // Backup RAM
-	AM_RANGE(0x06200000, 0x06203fff) AM_RAM                             // C422 RAM
+	AM_RANGE(0x06200000, 0x06203fff) AM_RAM // C422 RAM
 	AM_RANGE(0x06400000, 0x0640000f) AM_READWRITE16(s23_c422_r, s23_c422_w, 0xffffffff ) // C422 registers
 	AM_RANGE(0x06800000, 0x0681dfff) AM_RAM_WRITE(s23_txtchar_w ) AM_SHARE("charram")	// Text CGRAM (C361)
 	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE(namcos23_textram_w ) AM_SHARE("textram") // Text VRAM (C361)
 	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE16(s23_c361_r, s23_c361_w, 0xffffffff ) // C361
 	AM_RANGE(0x06a08000, 0x06a087ff) AM_RAM // Blending control & GAMMA (C404)
-	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE(namcos23_paletteram_w ) AM_SHARE("paletteram")
+	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE(namcos23_paletteram_w ) AM_SHARE("paletteram") // Palette RAM (C404)
 	AM_RANGE(0x08000000, 0x08ffffff) AM_ROM AM_REGION("data", 0x0000000) AM_MIRROR(0x1000000) // data ROMs
 	AM_RANGE(0x0a000000, 0x0affffff) AM_ROM AM_REGION("data", 0x1000000) AM_MIRROR(0x1000000)
 	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE16(s23_c412_r, s23_c412_w, 0xffffffff )
@@ -2487,7 +2495,7 @@ ADDRESS_MAP_END
 READ32_MEMBER(namcos23_state::gmen_trigger_sh2)
 {
 	logerror("gmen_trigger_sh2: booting SH-2\n");
-	machine().device("gmen")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_gmen_sh2->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
 	return 0;
 }
@@ -2519,7 +2527,7 @@ MACHINE_RESET_MEMBER(namcos23_state,gmen)
 	machine_reset();
 
 	// halt the SH-2 until we need it
-	machine().device("gmen")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_gmen_sh2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE16_MEMBER(namcos23_state::sharedram_sub_w)
@@ -2549,7 +2557,7 @@ WRITE16_MEMBER(namcos23_state::sub_interrupt_main_w)
 {
 	if  ((mem_mask == 0xffff) && (data == 0x3170))
 	{
-		machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ1, ASSERT_LINE);
+		m_maincpu->set_input_line(MIPS3_IRQ1, ASSERT_LINE);
 	}
 	else
 	{
@@ -2657,12 +2665,12 @@ READ8_MEMBER(namcos23_state::s23_mcu_iob_r)
 
 	if (m_im_rd == m_im_wr)
 	{
-		machine().device("audiocpu")->execute().set_input_line(H8_SCI_0_RX, CLEAR_LINE);
+		m_audiocpu->set_input_line(H8_SCI_0_RX, CLEAR_LINE);
 	}
 	else
 	{
-		machine().device("audiocpu")->execute().set_input_line(H8_SCI_0_RX, CLEAR_LINE);
-		machine().device("audiocpu")->execute().set_input_line(H8_SCI_0_RX, ASSERT_LINE);
+		m_audiocpu->set_input_line(H8_SCI_0_RX, CLEAR_LINE);
+		m_audiocpu->set_input_line(H8_SCI_0_RX, ASSERT_LINE);
 	}
 
 	return ret;
@@ -2673,7 +2681,7 @@ WRITE8_MEMBER(namcos23_state::s23_mcu_iob_w)
 	m_maintoio[m_mi_wr++] = data;
 	m_mi_wr &= 0x7f;
 
-	machine().device("ioboard")->execute().set_input_line(H8_SCI_0_RX, ASSERT_LINE);
+	m_iocpu->set_input_line(H8_SCI_0_RX, ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( gorgon )
@@ -2975,7 +2983,7 @@ READ8_MEMBER(namcos23_state::s23_iob_mcu_r)
 
 	if (m_mi_rd == m_mi_wr)
 	{
-		machine().device("ioboard")->execute().set_input_line(H8_SCI_0_RX, CLEAR_LINE);
+		m_iocpu->set_input_line(H8_SCI_0_RX, CLEAR_LINE);
 	}
 
 	return ret;
@@ -2986,7 +2994,7 @@ WRITE8_MEMBER(namcos23_state::s23_iob_mcu_w)
 	m_iotomain[m_im_wr++] = data;
 	m_im_wr &= 0x7f;
 
-	machine().device("audiocpu")->execute().set_input_line(H8_SCI_0_RX, ASSERT_LINE);
+	m_audiocpu->set_input_line(H8_SCI_0_RX, ASSERT_LINE);
 }
 
 
@@ -3029,7 +3037,7 @@ READ8_MEMBER(namcos23_state::iob_r)
 
 /* H8/3334 (Namco C78) I/O board MCU */
 static ADDRESS_MAP_START( s23iobrdmap, AS_PROGRAM, 8, namcos23_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("iocpu", 0)
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("TC2P0")	  // 0-1 = coin 0-3 = coin connect, 0-5 = test 0-6 = down select, 0-7 = up select, 0-8 = enter
 	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("TC2P1")	  // 1-1 = gun trigger 1-2 = foot pedal
 	AM_RANGE(0x6002, 0x6003) AM_READ(iob_r )
@@ -3041,7 +3049,7 @@ static ADDRESS_MAP_START( s23iobrdmap, AS_PROGRAM, 8, namcos23_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( timecrs2iobrdmap, AS_PROGRAM, 8, namcos23_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("iocpu", 0)
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("TC2P0")
 	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("TC2P1")
 	AM_RANGE(0x6002, 0x6005) AM_WRITENOP
@@ -3052,7 +3060,7 @@ static ADDRESS_MAP_START( timecrs2iobrdmap, AS_PROGRAM, 8, namcos23_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gorgoniobrdmap, AS_PROGRAM, 8, namcos23_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("iocpu", 0)
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("RRP0")	  // 0-5 = start
 	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("RRP1")	  //
 	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("RRP2")	  // 0-4 = coin
@@ -3099,7 +3107,7 @@ DRIVER_INIT_MEMBER(namcos23_state,ss23)
 	memset(m_s23_settings, 0, sizeof(m_s23_settings));
 	m_s23_tssio_port_4 = 0;
 	m_s23_porta = 0, m_s23_rtcstate = 0;
-	m_s23_subcpu_running = 1;
+	m_audiocpu_running = 0;
 	render.count[0] = render.count[1] = 0;
 	render.cur = 0;
 
@@ -3131,7 +3139,7 @@ DRIVER_INIT_MEMBER(namcos23_state,ss23)
 
 void namcos23_state::machine_reset()
 {
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 #define XOR(a) WORD2_XOR_BE(a)
@@ -3171,7 +3179,7 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_CPU_IO_MAP( s23h8iomap )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  irq1_line_pulse)
 
-	MCFG_CPU_ADD("ioboard", H83334, S23_H8CLOCK )
+	MCFG_CPU_ADD("iocpu", H83334, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( gorgoniobrdmap )
 	MCFG_CPU_IO_MAP( s23iobrdiomap )
 
@@ -3218,7 +3226,7 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_CPU_IO_MAP( s23h8iomap )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  irq1_line_pulse)
 
-	MCFG_CPU_ADD("ioboard", H83334, S23_H8CLOCK )
+	MCFG_CPU_ADD("iocpu", H83334, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
 	MCFG_CPU_IO_MAP( s23iobrdiomap )
 
@@ -3304,14 +3312,14 @@ static MACHINE_CONFIG_DERIVED( ss23e2, ss23 )
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_IO_MAP( s23h8iomap )
 
-	MCFG_CPU_ADD("ioboard", H83334, S23_H8CLOCK )
+	MCFG_CPU_ADD("iocpu", H83334, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
 	MCFG_CPU_IO_MAP( s23iobrdiomap )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( timecrs2, s23 )
 
-	MCFG_CPU_MODIFY("ioboard")
+	MCFG_CPU_MODIFY("iocpu")
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
 MACHINE_CONFIG_END
 
@@ -3320,7 +3328,7 @@ static MACHINE_CONFIG_DERIVED( timecrs2c, ss23 )
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_IO_MAP( s23h8iomap )
 
-	MCFG_CPU_ADD("ioboard", H83334, S23_H8CLOCK )
+	MCFG_CPU_ADD("iocpu", H83334, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
 	MCFG_CPU_IO_MAP( s23iobrdiomap )
 MACHINE_CONFIG_END
@@ -3331,7 +3339,7 @@ static MACHINE_CONFIG_DERIVED( gmen, s23 )
 	MCFG_CPU_CLOCK(S23_BUSCLOCK*5)
 	MCFG_CPU_PROGRAM_MAP(gmen_mips_map)
 
-	MCFG_CPU_ADD("gmen", SH2, 28700000)
+	MCFG_CPU_ADD("gmen_sh2", SH2, 28700000)
 	MCFG_CPU_PROGRAM_MAP(gmen_sh2_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(namcos23_state,gmen)
@@ -3345,7 +3353,7 @@ ROM_START( rapidrvr )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "rd3verc.ic3",  0x000000, 0x080000, CRC(6e26fbaf) SHA1(4ab6637d22f0d26f7e1d10e9c80059c56f64303d) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "asca1_io-a.ic2", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) )
 
 	ROM_REGION32_BE( 0x800000, "data", 0 )	/* data */
@@ -3405,7 +3413,7 @@ ROM_START( rapidrvr2 )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "rd2verc.ic3",  0x000000, 0x080000, CRC(6e26fbaf) SHA1(4ab6637d22f0d26f7e1d10e9c80059c56f64303d) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "asca1_io-a.ic2", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) )
 
 	ROM_REGION32_BE( 0x800000, "data", 0 )	/* data */
@@ -3465,7 +3473,7 @@ ROM_START( rapidrvrp ) // prototype board
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "29f400.ic3",  0x000000, 0x080000, CRC(f194c942) SHA1(b581c97327dea092e30ba46ad630d10477343a39) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "asca1_io-a.ic2", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) )
 
 	ROM_REGION32_BE( 0x800000, "data", 0 )	/* data */
@@ -3525,7 +3533,7 @@ ROM_START( finlflng )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "ff2vera.ic3",  0x000000, 0x080000, CRC(ab681078) SHA1(ec8367404458a54893ab6bea29c8a2ba3272b816) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "asca1_io-a.ic2", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) )
 
 	ROM_REGION32_BE( 0x800000, "data", 0 )	/* data */
@@ -3579,7 +3587,7 @@ ROM_START( motoxgo )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "mg3vera.ic3",  0x000000, 0x080000, CRC(9e3d46a8) SHA1(9ffa5b91ea51cc0fb97def25ce47efa3441f3c6f) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
 
 	ROM_REGION( 0x20000, "exioboard", 0 )	/* "extra" I/O board (uses Fujitsu MB90611A MCU) */
@@ -3626,7 +3634,7 @@ ROM_START( motoxgoa )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "mg3vera.ic3",  0x000000, 0x080000, CRC(9e3d46a8) SHA1(9ffa5b91ea51cc0fb97def25ce47efa3441f3c6f) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
 
 	ROM_REGION( 0x20000, "exioboard", 0 )	/* "extra" I/O board (uses Fujitsu MB90611A MCU) */
@@ -3673,7 +3681,7 @@ ROM_START( timecrs2 )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "tss3verb.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "tssioprog.ic3", 0x000000, 0x040000, CRC(edad4538) SHA1(1330189184a636328d956c0e435f8d9ad2e96a80) )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
@@ -3715,7 +3723,7 @@ ROM_START( timecrs2b )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "tss3verb.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "tssioprog.ic3", 0x000000, 0x040000, CRC(edad4538) SHA1(1330189184a636328d956c0e435f8d9ad2e96a80) )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
@@ -3757,7 +3765,7 @@ ROM_START( timecrs2c )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "tss4vera.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "tssioprog.ic3", 0x000000, 0x040000, CRC(edad4538) SHA1(1330189184a636328d956c0e435f8d9ad2e96a80) )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
@@ -3845,7 +3853,7 @@ ROM_START( raceon )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "ro2vera.ic3",  0x000000, 0x080000, CRC(a763ecb7) SHA1(6b1ab63bb56342abbf7ddd7d17d413779fbafce1) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "asc5_io-a.ic14", 0x000000, 0x020000, CRC(5964767f) SHA1(320db5e78ae23c5f94e368432d51573b409995db) )
 
 	ROM_REGION( 0x80000, "ffb", 0 )	/* STR steering force-feedback board code */
@@ -3898,7 +3906,7 @@ ROM_START( finfurl2 )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "m29f400.ic3",  0x000000, 0x080000, CRC(9fd69bbd) SHA1(53a9bf505de70495dcccc43fdc722b3381aad97c) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
@@ -3942,7 +3950,7 @@ ROM_START( finfurl2j )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "m29f400.ic3",  0x000000, 0x080000, CRC(9fd69bbd) SHA1(53a9bf505de70495dcccc43fdc722b3381aad97c) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
@@ -3985,7 +3993,7 @@ ROM_START( panicprk )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "pnp2ver-a.ic3", 0x000000, 0x080000, CRC(fe4bc6f4) SHA1(2114dc4bc63d589e6c3b26a73dbc60924f3b1765) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
@@ -4031,7 +4039,7 @@ ROM_START( gunwars )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "gm1vera.ic3",  0x000000, 0x080000, CRC(5582fdd4) SHA1(8aae8bc6688d531888f2de509c07502ee355b3ab) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code. "ASCA-5;Ver 2.09;JPN,Multipurpose" */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code. "ASCA-5;Ver 2.09;JPN,Multipurpose" */
 	ROM_LOAD( "asc5_io-a.ic14", 0x000000, 0x020000, CRC(5964767f) SHA1(320db5e78ae23c5f94e368432d51573b409995db) )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
@@ -4076,7 +4084,7 @@ ROM_START( downhill )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "dh3vera.ic3",  0x000000, 0x080000, CRC(98f9fc8b) SHA1(5152b9e11773033a26da11d1f3774a261e61a2c5) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code. "ASCA-3;Ver 2.04;JPN,Multipurpose + Rotary Encoder" */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code. "ASCA-3;Ver 2.04;JPN,Multipurpose + Rotary Encoder" */
 	ROM_LOAD( "asc3_io-c.ic14", 0x000000, 0x020000, CRC(2f272a7b) SHA1(9d7ebe274c0d26f5f38747224d42d0375e2ed14c) )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
@@ -4125,7 +4133,7 @@ ROM_START( crszone )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic1", 0x000000, 0x080000, CRC(c790743b) SHA1(5fa7b83a7a1b1105a3aa0870b782cf2741b7d11c) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code. "MIU-I/O;Ver2.05;JPN,GUN-EXTENTION" */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code. "MIU-I/O;Ver2.05;JPN,GUN-EXTENTION" */
 	ROM_LOAD( "csz1prg0a.8f", 0x000000, 0x020000, CRC(8edc36b3) SHA1(b5df211988d856572fcc313480e693c8561784e4) )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
@@ -4177,7 +4185,7 @@ ROM_START( crszonea )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic1", 0x000000, 0x080000, CRC(c790743b) SHA1(5fa7b83a7a1b1105a3aa0870b782cf2741b7d11c) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code. "MIU-I/O;Ver2.05;JPN,GUN-EXTENTION" */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code. "MIU-I/O;Ver2.05;JPN,GUN-EXTENTION" */
 	ROM_LOAD( "csz1prg0a.8f", 0x000000, 0x020000, CRC(8edc36b3) SHA1(b5df211988d856572fcc313480e693c8561784e4) )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
@@ -4229,7 +4237,7 @@ ROM_START( crszoneb )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic1", 0x000000, 0x080000, CRC(c790743b) SHA1(5fa7b83a7a1b1105a3aa0870b782cf2741b7d11c) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code. "MIU-I/O;Ver2.05;JPN,GUN-EXTENTION" */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code. "MIU-I/O;Ver2.05;JPN,GUN-EXTENTION" */
 	ROM_LOAD( "csz1prg0a.8f", 0x000000, 0x020000, CRC(8edc36b3) SHA1(b5df211988d856572fcc313480e693c8561784e4) )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
@@ -4281,7 +4289,7 @@ ROM_START( crszonec )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic1", 0x000000, 0x080000, CRC(c790743b) SHA1(5fa7b83a7a1b1105a3aa0870b782cf2741b7d11c) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code. "MIU-I/O;Ver2.05;JPN,GUN-EXTENTION" */
+	ROM_REGION( 0x40000, "iocpu", 0 )	/* I/O board HD643334 H8/3334 MCU code. "MIU-I/O;Ver2.05;JPN,GUN-EXTENTION" */
 	ROM_LOAD( "csz1prg0a.8f", 0x000000, 0x020000, CRC(8edc36b3) SHA1(b5df211988d856572fcc313480e693c8561784e4) )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
