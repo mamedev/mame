@@ -157,6 +157,7 @@ protected:
 	virtual void update_cart_base(UINT8 *cart_base) = 0;
 
 	/* PIA0 */
+	DECLARE_WRITE8_MEMBER( pia0_pa_w );
 	DECLARE_WRITE8_MEMBER( pia0_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( pia0_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia0_cb2_w );

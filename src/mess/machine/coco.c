@@ -292,6 +292,17 @@ WRITE8_MEMBER( coco_state::ff00_write )
 
 
 //-------------------------------------------------
+//  pia0_pa_w
+//-------------------------------------------------
+
+WRITE8_MEMBER( coco_state::pia0_pa_w )
+{
+	poll_keyboard();
+}
+
+
+
+//-------------------------------------------------
 //  pia0_pb_w
 //-------------------------------------------------
 
@@ -360,7 +371,7 @@ const pia6821_interface coco_state::pia0_config =
 	DEVCB_NULL,													/* CB1 input */
 	DEVCB_NULL,													/* CA2 input */
 	DEVCB_NULL,													/* CB2 input */
-	DEVCB_NULL, 												/* port A output */
+	DEVCB_DRIVER_MEMBER(coco_state, pia0_pa_w),					/* port A output */
 	DEVCB_DRIVER_MEMBER(coco_state, pia0_pb_w),					/* port B output */
 	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia0_ca2_w),			/* CA2 output */
 	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia0_cb2_w),			/* CB2 output */
@@ -777,7 +788,7 @@ void coco_state::poll_joystick(bool *joyin, UINT8 *buttons)
 			{
 				/* hi-res joystick or hi-res CoCo3Max joystick */
 				attotime remaining = m_hiresjoy_transition_timer[joystick_axis]->remaining();
-				joyin_value = remaining < attotime::zero;
+				joyin_value = remaining.is_zero() || remaining.is_never();
 			}
 			else
 			{
@@ -854,6 +865,9 @@ void coco_state::poll_keyboard(void)
 		}
 	}
 
+	/* hires joystick */
+	poll_hires_joystick();
+
 	/* poll the joystick (*/
 	bool joyin;
 	UINT8 buttons;
@@ -868,9 +882,6 @@ void coco_state::poll_keyboard(void)
 
 	/* and write the result to PIA0 */
 	update_keyboard_input(pia0_pa, pia0_pa_z);
-
-	/* hires joystick */
-	poll_hires_joystick();
 }
 
 
@@ -1060,25 +1071,25 @@ void coco_state::poll_hires_joystick(void)
 	switch(hires_interface_type())
 	{
 		case HIRES_RIGHT:
-			newvalue = (m_pia_0->a_output() & 0x04);
+			newvalue = (dac_output() >= 0x20);
 			joystick_index = 0;
 			is_cocomax3 = false;
 			break;
 
 		case HIRES_RIGHT_COCOMAX3:
-			newvalue = (dac_output() >= 0x20);
+			newvalue = (m_pia_0->a_output() & 0x04);
 			joystick_index = 0;
 			is_cocomax3 = true;
 			break;
 
 		case HIRES_LEFT:
-			newvalue = (m_pia_0->a_output() & 0x08);
+			newvalue = (dac_output() >= 0x20);
 			joystick_index = 1;
 			is_cocomax3 = false;
 			break;
 
 		case HIRES_LEFT_COCOMAX3:
-			newvalue = (dac_output() >= 0x20);
+			newvalue = (m_pia_0->a_output() & 0x08);
 			joystick_index = 1;
 			is_cocomax3 = true;
 			break;
@@ -1102,7 +1113,7 @@ void coco_state::poll_hires_joystick(void)
 			double value = m_joystick.input(joystick_index, axis) / 255.0;
 			value *= is_cocomax3 ? 2500.0 : 4160.0;
 			value += is_cocomax3 ? 400.0 : 592.0;
-			attotime duration = m_maincpu->clocks_to_attotime((UINT64) value);
+			attotime duration = m_maincpu->clocks_to_attotime((UINT64) value) * 8;
 			m_hiresjoy_transition_timer[axis]->adjust(duration);
 		}
 		else if (!m_hiresjoy_ca && newvalue)
