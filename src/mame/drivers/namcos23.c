@@ -1521,7 +1521,8 @@ READ16_MEMBER(namcos23_state::s23_c417_r)
 {
 	c417_t &c417 = m_c417;
 
-	switch(offset) {
+	switch (offset)
+	{
 		/* According to timecrs2c, +0 is the status word with bits being:
            15: test mode flag (huh?)
            10: fifo data ready
@@ -1536,20 +1537,21 @@ READ16_MEMBER(namcos23_state::s23_c417_r)
            1:  1st c435 busy (inverted)
            0:  xcpreq
          */
-	case 0: return 0x8e | (machine().primary_screen->vblank() ? 0x0000 : 0x8000);
-	case 1: return c417.adr;
-	case 4:
-		//      logerror("c417_r %04x = %04x (%08x, %08x)\n", c417.adr, c417.ram[c417.adr], space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
-		return c417.ram[c417.adr];
-	case 5:
-		if(c417.pointrom_adr >= m_ptrom_limit)
-			return 0xffff;
-		return m_ptrom[c417.pointrom_adr] >> 16;
-	case 6:
-		if(c417.pointrom_adr >= m_ptrom_limit)
-			return 0xffff;
-		return m_ptrom[c417.pointrom_adr];
-
+		case 0:
+			return 0x8e | (machine().primary_screen->vblank() ? 0x0000 : 0x8000);
+		case 1:
+			return c417.adr;
+		case 4:
+			//logerror("c417_r %04x = %04x (%08x, %08x)\n", c417.adr, c417.ram[c417.adr], space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+			return c417.ram[c417.adr];
+		case 5:
+			if(c417.pointrom_adr >= m_ptrom_limit)
+				return 0xffff;
+			return m_ptrom[c417.pointrom_adr] >> 16;
+		case 6:
+			if(c417.pointrom_adr >= m_ptrom_limit)
+				return 0xffff;
+			return m_ptrom[c417.pointrom_adr];
 	}
 
 	logerror("c417_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
@@ -1560,30 +1562,31 @@ WRITE16_MEMBER(namcos23_state::s23_c417_w)
 {
 	c417_t &c417 = m_c417;
 
-	switch(offset) {
-	case 0:
-		logerror("p3d PIO %04x\n", data);
-		break;
-	case 1:
-		COMBINE_DATA(&c417.adr);
-		break;
-	case 2:
-		c417.pointrom_adr = (c417.pointrom_adr << 16) | data;
-		break;
-	case 3:
-		c417.pointrom_adr = 0;
-		break;
-	case 4:
-		//        logerror("c417_w %04x = %04x (%08x, %08x)\n", c417.adr, data, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
-		COMBINE_DATA(c417.ram + c417.adr);
-		break;
-	case 7:
-		logerror("c417_w: ack IRQ 2 (%x)\n", data);
-		m_maincpu->set_input_line(MIPS3_IRQ2, CLEAR_LINE);
-		break;
-	default:
-		logerror("c417_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
-		break;
+	switch(offset)
+	{
+		case 0:
+			logerror("p3d PIO %04x\n", data);
+			break;
+		case 1:
+			COMBINE_DATA(&c417.adr);
+			break;
+		case 2:
+			c417.pointrom_adr = (c417.pointrom_adr << 16) | data;
+			break;
+		case 3:
+			c417.pointrom_adr = 0;
+			break;
+		case 4:
+			//logerror("c417_w %04x = %04x (%08x, %08x)\n", c417.adr, data, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+			COMBINE_DATA(c417.ram + c417.adr);
+			break;
+		case 7:
+			logerror("c417_w: ack IRQ 2 (%x)\n", data);
+			m_maincpu->set_input_line(MIPS3_IRQ2, CLEAR_LINE);
+			break;
+		default:
+			logerror("c417_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+			break;
 	}
 }
 
@@ -1623,13 +1626,16 @@ READ16_MEMBER(namcos23_state::s23_c412_r)
 {
 	c412_t &c412 = m_c412;
 
-	switch(offset) {
-	case 3:
-		// 0001 = busy, 0002 = game uploads things
-		return 0x0002;
-	case 8: return c412.adr;
-	case 9: return c412.adr >> 16;
-	case 10: return s23_c412_ram_r(space, c412.adr, mem_mask);
+	switch(offset)
+	{
+		case 0x3:
+			return 0x0002; // 0001 = busy, 0002 = game uploads things
+		case 0x8:
+			return c412.adr;
+		case 0x9:
+			return c412.adr >> 16;
+		case 0xa:
+			return s23_c412_ram_r(space, c412.adr, mem_mask);
 	}
 
 	logerror("c412_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
@@ -1640,13 +1646,21 @@ WRITE16_MEMBER(namcos23_state::s23_c412_w)
 {
 	c412_t &c412 = m_c412;
 
-	switch(offset) {
-	case 8: c412.adr = (data & mem_mask) | (c412.adr & (0xffffffff ^ mem_mask)); break;
-	case 9: c412.adr = ((data & mem_mask) << 16) | (c412.adr & (0xffffffff ^ (mem_mask << 16))); break;
-	case 10: s23_c412_ram_w(space, c412.adr, data, mem_mask); c412.adr += 2; break;
-	default:
-		logerror("c412_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
-		break;
+	switch (offset)
+	{
+		case 8:
+			c412.adr = (data & mem_mask) | (c412.adr & (0xffffffff ^ mem_mask));
+			break;
+		case 9:
+			c412.adr = ((data & mem_mask) << 16) | (c412.adr & (0xffffffff ^ (mem_mask << 16)));
+			break;
+		case 10:
+			s23_c412_ram_w(space, c412.adr, data, mem_mask);
+			c412.adr += 2;
+			break;
+		default:
+			logerror("c412_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+			break;
 	}
 }
 
@@ -1682,10 +1696,15 @@ READ16_MEMBER(namcos23_state::s23_c421_r)
 {
 	c421_t &c421 = m_c421;
 
-	switch(offset) {
-	case 0: return s23_c421_ram_r(space, c421.adr & 0xfffff, mem_mask);
-	case 2: return c421.adr >> 16;
-	case 3: return c421.adr;
+	switch (offset)
+	{
+		case 0:
+			return s23_c421_ram_r(space, c421.adr & 0xfffff, mem_mask);
+
+		case 2:
+			return c421.adr >> 16;
+		case 3:
+			return c421.adr;
 	}
 
 	logerror("c421_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
@@ -1696,67 +1715,74 @@ WRITE16_MEMBER(namcos23_state::s23_c421_w)
 {
 	c421_t &c421 = m_c421;
 
-	switch(offset) {
-	case 0: s23_c421_ram_w(space, c421.adr & 0xfffff, data, mem_mask); c421.adr += 2; break;
-	case 2: c421.adr = ((data & mem_mask) << 16) | (c421.adr & (0xffffffff ^ (mem_mask << 16))); break;
-	case 3: c421.adr = (data & mem_mask) | (c421.adr & (0xffffffff ^ mem_mask)); break;
-	default:
-		logerror("c421_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
-		break;
+	switch (offset)
+	{
+		case 0:
+			s23_c421_ram_w(space, c421.adr & 0xfffff, data, mem_mask);
+			c421.adr += 2;
+			break;
+		case 2:
+			c421.adr = ((data & mem_mask) << 16) | (c421.adr & (0xffffffff ^ (mem_mask << 16)));
+			break;
+		case 3:
+			c421.adr = (data & mem_mask) | (c421.adr & (0xffffffff ^ mem_mask));
+			break;
+		default:
+			logerror("c421_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+			break;
 	}
 }
 
 WRITE16_MEMBER(namcos23_state::s23_ctl_w)
 {
-	switch(offset) {
-	case 0: {
-		if(m_ctl_led != (data & 0xff)) {
-			m_ctl_led = data;
-/*          logerror("LEDS %c%c%c%c%c%c%c%c\n",
-                     m_ctl_led & 0x80 ? '.' : '#',
-                     m_ctl_led & 0x40 ? '.' : '#',
-                     m_ctl_led & 0x20 ? '.' : '#',
-                     m_ctl_led & 0x10 ? '.' : '#',
-                     m_ctl_led & 0x08 ? '.' : '#',
-                     m_ctl_led & 0x04 ? '.' : '#',
-                     m_ctl_led & 0x02 ? '.' : '#',
-                     m_ctl_led & 0x01 ? '.' : '#');*/
-		}
-		break;
-	}
+	switch (offset)
+	{
+		case 0:
+			if (m_ctl_led != (data & 0xff))
+			{
+				m_ctl_led = data & 0xff;
+				for (int i = 0; i < 8; i++)
+					output_set_lamp_value(i, m_ctl_led>>i & 1);
+			}
+			break;
 
-	case 2: case 3:
-		// These may be coming from another CPU, in particular the I/O one
-		m_ctl_inp_buffer[offset-2] = ioport(offset == 2 ? "P1" : "P2")->read();
-		break;
-	case 5:
-		if(m_ctl_vbl_active) {
-			m_ctl_vbl_active = false;
-			space.device().execute().set_input_line(MIPS3_IRQ0, CLEAR_LINE);
-		}
-		break;
+		case 2: case 3:
+			// These may be coming from another CPU, in particular the I/O one
+			m_ctl_inp_buffer[offset-2] = ioport(offset == 2 ? "P1" : "P2")->read();
+			break;
+		case 5:
+			if(m_ctl_vbl_active)
+			{
+				m_ctl_vbl_active = false;
+				space.device().execute().set_input_line(MIPS3_IRQ0, CLEAR_LINE);
+			}
+			break;
 
-	case 6:	// gmen wars spams this heavily with 0 prior to starting the GMEN board test
-		if (data != 0)
+		case 6:	// gmen wars spams this heavily with 0 prior to starting the GMEN board test
+			if (data != 0)
+				logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+			break;
+
+		default:
 			logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
-		break;
-
-	default:
-		logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	}
 }
 
 READ16_MEMBER(namcos23_state::s23_ctl_r)
 {
-	switch(offset) {
+	switch (offset)
+	{
 		// 0100 set freezes gorgon (polygon fifo flag)
-	case 1: return 0x0000 | ioport("DSW")->read();
-	case 2: case 3: {
-		UINT16 res = m_ctl_inp_buffer[offset-2] & 0x800 ? 0xffff : 0x0000;
-		m_ctl_inp_buffer[offset-2] = (m_ctl_inp_buffer[offset-2] << 1) | 1;
-		return res;
+		case 1:
+			return 0x0000 | ioport("DSW")->read();
+		case 2: case 3:
+		{
+			UINT16 res = m_ctl_inp_buffer[offset-2] & 0x800 ? 0xffff : 0x0000;
+			m_ctl_inp_buffer[offset-2] = (m_ctl_inp_buffer[offset-2] << 1) | 1;
+			return res;
+		}
 	}
-	}
+
 	logerror("ctl_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	return 0xffff;
 }
@@ -1778,33 +1804,38 @@ WRITE16_MEMBER(namcos23_state::s23_c361_w)
 {
 	c361_t &c361 = m_c361;
 
-	switch(offset)
+	switch (offset)
 	{
-	case 0:
-		m_bgtilemap->set_scrollx(0, data&0xfff);
-		break;
+		case 0:
+			m_bgtilemap->set_scrollx(0, data&0xfff);
+			break;
 
-	case 1:
-		m_bgtilemap->set_scrolly(0, data&0xfff);
-		break;
+		case 1:
+			m_bgtilemap->set_scrolly(0, data&0xfff);
+			break;
 
-	case 4:	// interrupt control
-		c361.scanline = data & 0x1ff;
-		c361.timer->adjust(machine().primary_screen->time_until_pos(c361.scanline));
-		break;
+		case 4:	// interrupt control
+			c361.scanline = data & 0x1ff;
+			c361.timer->adjust(machine().primary_screen->time_until_pos(c361.scanline));
+			break;
 
-	default:
-		logerror("c361_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+		default:
+			logerror("c361_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+			break;
 	}
 }
 
 READ16_MEMBER(namcos23_state::s23_c361_r)
 {
-	switch(offset)
+	switch (offset)
 	{
-	case 5: m_maincpu->set_input_line(MIPS3_IRQ1, CLEAR_LINE); return machine().primary_screen->vblank() ? 0x1ff : machine().primary_screen->vpos();
-	case 6: return machine().primary_screen->vblank();
+		case 5:
+			m_maincpu->set_input_line(MIPS3_IRQ1, CLEAR_LINE);
+			return machine().primary_screen->vblank() ? 0x1ff : machine().primary_screen->vpos();
+		case 6:
+			return machine().primary_screen->vblank();
 	}
+
 	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	return 0xffff;
 }
@@ -1836,7 +1867,6 @@ WRITE16_MEMBER(namcos23_state::s23_c422_w)
 		default:
 			logerror("c422_w: %04x @ %x\n", data, offset);
 			break;
-
 	}
 
 	COMBINE_DATA(&c422.regs[offset]);
@@ -1944,7 +1974,8 @@ static void render_scanline(void *dest, INT32 scanline, const poly_extent *exten
 	bitmap_rgb32 *bitmap = (bitmap_rgb32 *)dest;
 	UINT32 *img = &bitmap->pix32(scanline, extent->startx);
 
-	for(int x = extent->startx; x < extent->stopx; x++) {
+	for(int x = extent->startx; x < extent->stopx; x++)
+	{
 		float z = w ? 1/w : 0;
 		UINT32 pcol = rd->texture_lookup(*rd->machine, rd->pens, u*z, v*z);
 		float ll = l*z;
@@ -1962,7 +1993,8 @@ static INT32 *p3d_getv(namcos23_state *state, UINT16 id)
 {
 	if(id == 0x8000)
 		return state->m_light_vector;
-	if(id >= 0x100) {
+	if(id >= 0x100)
+	{
 		memset(state->m_spv, 0, sizeof(state->m_spv));
 		return state->m_spv;
 	}
@@ -1971,7 +2003,8 @@ static INT32 *p3d_getv(namcos23_state *state, UINT16 id)
 
 static INT16 *p3d_getm(namcos23_state *state, UINT16 id)
 {
-	if(id >= 0x100) {
+	if(id >= 0x100)
+	{
 		memset(state->m_spm, 0, sizeof(state->m_spm));
 		return state->m_spm;
 	}
@@ -1980,7 +2013,8 @@ static INT16 *p3d_getm(namcos23_state *state, UINT16 id)
 
 static void p3d_matrix_set(namcos23_state *state, const UINT16 *p, int size)
 {
-	if(size != 10) {
+	if(size != 10)
+	{
 		logerror("WARNING: p3d_matrix_set with size %d\n", size);
 		return;
 	}
@@ -1991,12 +2025,14 @@ static void p3d_matrix_set(namcos23_state *state, const UINT16 *p, int size)
 
 static void p3d_vector_set(namcos23_state *state, const UINT16 *p, int size)
 {
-	if(size != 7) {
+	if(size != 7)
+	{
 		logerror("WARNING: p3d_vector_set with size %d\n", size);
 		return;
 	}
 	INT32 *t = p3d_getv(state, *p++);
-	for(int i=0; i<3; i++) {
+	for(int i=0; i<3; i++)
+	{
 		t[i] = u32_to_s24((p[0] << 16) | p[1]);
 		p += 2;
 	}
@@ -2004,7 +2040,8 @@ static void p3d_vector_set(namcos23_state *state, const UINT16 *p, int size)
 
 static void p3d_scaling_set(namcos23_state *state, const UINT16 *p, int size)
 {
-	if(size != 1) {
+	if(size != 1)
+	{
 		logerror("WARNING: p3d_scaling_set with size %d\n", size);
 		return;
 	}
@@ -2013,7 +2050,8 @@ static void p3d_scaling_set(namcos23_state *state, const UINT16 *p, int size)
 
 static void p3d_vector_matrix_mul(namcos23_state *state, const UINT16 *p, int size)
 {
-	if(size != 4) {
+	if(size != 4)
+	{
 		logerror("WARNING: p3d_vector_matrix_mul with size %d\n", size);
 		return;
 	}
@@ -2031,7 +2069,8 @@ static void p3d_vector_matrix_mul(namcos23_state *state, const UINT16 *p, int si
 
 static void p3d_matrix_vector_mul(namcos23_state *state, const UINT16 *p, int size)
 {
-	if(size != 4) {
+	if(size != 4)
+	{
 		logerror("WARNING: p3d_matrix_vector_mul with size %d\n", size);
 		return;
 	}
@@ -2050,7 +2089,8 @@ static void p3d_matrix_vector_mul(namcos23_state *state, const UINT16 *p, int si
 
 static void p3d_matrix_matrix_mul(namcos23_state *state, const UINT16 *p, int size)
 {
-	if(size != 4) {
+	if(size != 4)
+	{
 		logerror("WARNING: p3d_matrix_matrix_mul with size %d\n", size);
 		return;
 	}
@@ -2076,7 +2116,8 @@ static void p3d_render(namcos23_state *state, const UINT16 *p, int size, bool us
 {
 	render_t &render = state->m_render;
 
-	if(size != 3) {
+	if(size != 3)
+	{
 		logerror("WARNING: p3d_render with size %d\n", size);
 		return;
 	}
@@ -2087,7 +2128,8 @@ static void p3d_render(namcos23_state *state, const UINT16 *p, int size, bool us
 	if(p[0] == 0xd96)
 		return;
 
-	if(render.count[render.cur] >= RENDER_MAX_ENTRIES) {
+	if(render.count[render.cur] >= RENDER_MAX_ENTRIES)
+	{
 		logerror("WARNING: render buffer full\n");
 		return;
 	}
@@ -2118,7 +2160,8 @@ static void p3d_flush(namcos23_state *state, const UINT16 *p, int size)
 {
 	render_t &render = state->m_render;
 
-	if(size != 0) {
+	if(size != 0)
+	{
 		logerror("WARNING: p3d_flush with size %d\n", size);
 		return;
 	}
@@ -2134,58 +2177,68 @@ static void p3d_dma(address_space &space, UINT32 adr, UINT32 size)
 	UINT16 buffer[256];
 	adr &= 0x1fffffff;
 	int pos = 0;
-	while(pos < size) {
+
+	while(pos < size)
+	{
 		UINT16 h = space.read_word(adr+pos);
 
 		pos += 2;
 
 		UINT16 h1;
 		int psize;
-		if(h & 0x4000) {
+		if(h & 0x4000)
+		{
 			h1 = h & 0xff00;
 			psize = h & 0xff;
-		} else {
+		}
+		else
+		{
 			h1 = h & 0xfff0;
 			psize = h & 0xf;
 		}
 
-		if(size-pos < psize*2) {
+		if(size-pos < psize*2)
+		{
 			logerror("WARNING: short packet (header %04x, remaining %x)\n", h, (size-pos)/2);
 			return;
 		}
 
-		for(int i=0; i < psize; i++) {
+		for(int i=0; i < psize; i++)
+		{
 			buffer[i] = space.read_word(adr+pos);
 			pos += 2;
 		}
 
-		switch(h1) {
-		case 0x0040: p3d_matrix_set(state, buffer, psize); break;
-		case 0x0050: p3d_vector_set(state, buffer, psize); break;
-		case 0x0000: p3d_matrix_matrix_mul(state, buffer, psize); break;
-		case 0x0810: p3d_matrix_vector_mul(state, buffer, psize); break;
-		case 0x1010: p3d_vector_matrix_mul(state, buffer, psize); break;
-		case 0x4400: p3d_scaling_set(state, buffer, psize); break;
-		case 0x8000: p3d_render(state, buffer, psize, false); break;
-		case 0x8080: p3d_render(state, buffer, psize, true); break;
-		case 0xc000: p3d_flush(state, buffer, psize); break;
-		default: {
-			if(0) {
-				logerror("p3d - [%04x] %04x", h1, h);
-				for(int i=0; i<psize; i++)
-					logerror(" %04x", buffer[i]);
-				logerror("\n");
-			}
-			break;
-		}
+		switch(h1)
+		{
+			case 0x0040: p3d_matrix_set(state, buffer, psize); break;
+			case 0x0050: p3d_vector_set(state, buffer, psize); break;
+			case 0x0000: p3d_matrix_matrix_mul(state, buffer, psize); break;
+			case 0x0810: p3d_matrix_vector_mul(state, buffer, psize); break;
+			case 0x1010: p3d_vector_matrix_mul(state, buffer, psize); break;
+			case 0x4400: p3d_scaling_set(state, buffer, psize); break;
+			case 0x8000: p3d_render(state, buffer, psize, false); break;
+			case 0x8080: p3d_render(state, buffer, psize, true); break;
+			case 0xc000: p3d_flush(state, buffer, psize); break;
+			default:
+				if(0)
+				{
+					logerror("p3d - [%04x] %04x", h1, h);
+					for(int i=0; i<psize; i++)
+						logerror(" %04x", buffer[i]);
+					logerror("\n");
+				}
+				break;
 		}
 	}
 }
 
 READ32_MEMBER(namcos23_state::p3d_r)
 {
-	switch(offset) {
-	case 0xa: return 1; // Busy flag
+	switch (offset)
+	{
+		case 0xa:
+			return 1; // Busy flag
 	}
 
 	logerror("p3d_r %02x @ %08x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
@@ -2194,15 +2247,22 @@ READ32_MEMBER(namcos23_state::p3d_r)
 
 WRITE32_MEMBER(namcos23_state::p3d_w)
 {
-	switch(offset) {
-	case 0x7: COMBINE_DATA(&m_p3d_address); return;
-	case 0x8: COMBINE_DATA(&m_p3d_size); return;
-	case 0x9:
-		if(data & 1)
-			p3d_dma(space, m_p3d_address, m_p3d_size);
-		return;
+	switch (offset)
+	{
+		case 0x7:
+			COMBINE_DATA(&m_p3d_address);
+			break;
+		case 0x8:
+			COMBINE_DATA(&m_p3d_size);
+			break;
+		case 0x9:
+			if (data & 1)
+				p3d_dma(space, m_p3d_address, m_p3d_size);
+			break;
+		default:
+			logerror("p3d_w %02x, %08x @ %08x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+			break;
 	}
-	logerror("p3d_w %02x, %08x @ %08x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 }
 
 static void render_apply_transform(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, poly_vertex &pv)
@@ -2242,7 +2302,8 @@ static void render_one_model(running_machine &machine, const namcos23_render_ent
 		return;
 	}
 
-	while(adr < state->m_ptrom_limit) {
+	while(adr < state->m_ptrom_limit)
+	{
 		poly_vertex pv[15];
 
 		UINT32 type = state->m_ptrom[adr++];
@@ -2261,16 +2322,19 @@ static void render_one_model(running_machine &machine, const namcos23_render_ent
 		UINT32 light = 0;
 		UINT32 extptr = 0;
 
-		if(lmode == 3) {
+		if(lmode == 3)
+		{
 			extptr = adr;
 			adr += ne;
-		} else
+		}
+		else
 			light = state->m_ptrom[adr++];
 
 		float minz = FLT_MAX;
 		float maxz = FLT_MIN;
 
-		for(int i=0; i<ne; i++) {
+		for(int i=0; i<ne; i++)
+		{
 			UINT32 v1 = state->m_ptrom[adr++];
 			UINT32 v2 = state->m_ptrom[adr++];
 			UINT32 v3 = state->m_ptrom[adr++];
@@ -2284,7 +2348,8 @@ static void render_one_model(running_machine &machine, const namcos23_render_ent
 			if(pv[i].p[0] < minz)
 				minz = pv[i].p[0];
 
-			switch(lmode) {
+			switch(lmode)
+			{
 			case 0: case 1:
 				pv[i].p[3] = ((light >> (8*(3-i))) & 0xff) / 64.0;
 				break;
@@ -2314,8 +2379,10 @@ static void render_one_model(running_machine &machine, const namcos23_render_ent
 
 		p->vertex_count = poly_zclip_if_less(ne, pv, p->pv, 4, 0.001f);
 
-		if(p->vertex_count >= 3) {
-			for(int i=0; i<p->vertex_count; i++) {
+		if(p->vertex_count >= 3)
+		{
+			for(int i=0; i<p->vertex_count; i++)
+			{
 				render_project(p->pv[i]);
 				float w = p->pv[i].p[0];
 				p->pv[i].p[1] *= w;
@@ -2361,7 +2428,8 @@ static void render_flush(running_machine &machine, bitmap_rgb32 &bitmap)
 
 	const static rectangle scissor(0, 639, 0, 479);
 
-	for(int i=0; i<render.poly_count; i++) {
+	for(int i=0; i<render.poly_count; i++)
+	{
 		const namcos23_poly_entry *p = render.poly_order[i];
 		namcos23_render_data *rd = (namcos23_render_data *)poly_get_extra_data(render.polymgr);
 		*rd = p->rd;
@@ -2377,8 +2445,10 @@ static void render_run(running_machine &machine, bitmap_rgb32 &bitmap)
 	const namcos23_render_entry *re = render.entries[!render.cur];
 
 	render.poly_count = 0;
-	for(int i=0; i<render.count[!render.cur]; i++) {
-		switch(re->type) {
+	for(int i=0; i<render.count[!render.cur]; i++)
+	{
+		switch(re->type)
+		{
 		case MODEL:
 			render_one_model(machine, re);
 			break;
@@ -2420,7 +2490,8 @@ INTERRUPT_GEN_MEMBER(namcos23_state::s23_interrupt)
 {
 	render_t &render = m_render;
 
-	if(!m_ctl_vbl_active) {
+	if(!m_ctl_vbl_active)
+	{
 		m_ctl_vbl_active = true;
 		device.execute().set_input_line(MIPS3_IRQ0, ASSERT_LINE);
 	}
