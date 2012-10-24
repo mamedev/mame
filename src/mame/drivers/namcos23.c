@@ -1335,7 +1335,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_iocpu;
+	optional_device<cpu_device> m_iocpu;
     required_device<rtc4543_device> m_rtc;
 	required_shared_ptr<UINT32> m_shared_ram;
 	required_shared_ptr<UINT32> m_charram;
@@ -1357,7 +1357,7 @@ public:
 	bool m_ctl_vbl_active;
 	UINT8 m_ctl_led;
 	UINT16 m_ctl_inp_buffer[2];
-	int m_audiocpu_running;
+	bool m_audiocpu_running;
 	UINT32 m_p3d_address;
 	UINT32 m_p3d_size;
 	const UINT32 *m_ptrom;
@@ -1396,6 +1396,7 @@ public:
 	UINT8 m_im_rd;
 	UINT8 m_im_wr;
 	UINT8 m_s23_tssio_port_4;
+
 	DECLARE_WRITE32_MEMBER(namcos23_textram_w);
 	DECLARE_WRITE32_MEMBER(s23_txtchar_w);
 	DECLARE_WRITE32_MEMBER(namcos23_paletteram_w);
@@ -1415,7 +1416,7 @@ public:
 	DECLARE_READ16_MEMBER(s23_c361_r);
 	DECLARE_READ16_MEMBER(s23_c422_r);
 	DECLARE_WRITE16_MEMBER(s23_c422_w);
-	DECLARE_WRITE32_MEMBER(s23_mcuen_w);
+	DECLARE_WRITE16_MEMBER(s23_mcuen_w);
 	DECLARE_READ32_MEMBER(s23_unk_status_r);
 	DECLARE_READ32_MEMBER(p3d_r);
 	DECLARE_WRITE32_MEMBER(p3d_w);
@@ -1760,15 +1761,16 @@ READ16_MEMBER(namcos23_state::s23_ctl_r)
 	return 0xffff;
 }
 
-// raster timer.  TC2 indicates it's probably one-shot since it resets it each VBL...
 TIMER_CALLBACK_MEMBER(namcos23_state::c361_timer_cb)
 {
 	c361_t &c361 = m_c361;
 
-	if (c361.scanline != 511)
+	if (c361.scanline != 0x1ff)
 	{
 		m_maincpu->set_input_line(MIPS3_IRQ1, ASSERT_LINE);
-		c361.timer->adjust(attotime::never);
+
+		// TC2 indicates it's probably one-shot since it resets it each VBL...
+		//c361.timer->adjust(machine().primary_screen->time_until_pos(c361.scanline));
 	}
 }
 
@@ -1776,7 +1778,8 @@ WRITE16_MEMBER(namcos23_state::s23_c361_w)
 {
 	c361_t &c361 = m_c361;
 
-	switch(offset) {
+	switch(offset)
+	{
 	case 0:
 		m_bgtilemap->set_scrollx(0, data&0xfff);
 		break;
@@ -1786,16 +1789,8 @@ WRITE16_MEMBER(namcos23_state::s23_c361_w)
 		break;
 
 	case 4:	// interrupt control
-		c361.scanline = data;
-		if (data == 0x1ff)
-		{
-			m_maincpu->set_input_line(MIPS3_IRQ1, CLEAR_LINE);
-			c361.timer->adjust(attotime::never);
-		}
-		else
-		{
-			c361.timer->adjust(machine().primary_screen->time_until_pos(c361.scanline));
-		}
+		c361.scanline = data & 0x1ff;
+		c361.timer->adjust(machine().primary_screen->time_until_pos(c361.scanline));
 		break;
 
 	default:
@@ -1805,8 +1800,9 @@ WRITE16_MEMBER(namcos23_state::s23_c361_w)
 
 READ16_MEMBER(namcos23_state::s23_c361_r)
 {
-	switch(offset) {
-	case 5: return machine().primary_screen->vpos()*2 | (machine().primary_screen->vblank() ? 1 : 0);
+	switch(offset)
+	{
+	case 5: m_maincpu->set_input_line(MIPS3_IRQ1, CLEAR_LINE); return machine().primary_screen->vblank() ? 0x1ff : machine().primary_screen->vpos();
 	case 6: return machine().primary_screen->vblank();
 	}
 	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
@@ -1846,31 +1842,42 @@ WRITE16_MEMBER(namcos23_state::s23_c422_w)
 	COMBINE_DATA(&c422.regs[offset]);
 }
 
-// as with System 22, we need to halt the MCU while checking shared RAM
-WRITE32_MEMBER(namcos23_state::s23_mcuen_w)
+
+WRITE16_MEMBER(namcos23_state::s23_mcuen_w)
 {
-	logerror("mcuen_w: mask %08x, data %08x\n", mem_mask, data);
-	if (mem_mask == 0x0000ffff)
+	switch (offset)
 	{
-		if (data)
-		{
-			logerror("S23: booting H8/3002\n");
+		case 2:
+			// subcpu irq ack
+			m_maincpu->set_input_line(MIPS3_IRQ1, CLEAR_LINE);
+			break;
 
-			// Panic Park: writing 1 when it's already running means reboot?
-			if (m_audiocpu_running)
+		case 5:
+			// boot/start the audio mcu
+			if (data)
 			{
-				m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-			}
+				logerror("mcuen_w: booting H8/3002\n");
 
-			m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-			m_audiocpu_running = 1;
-		}
-		else
-		{
-			logerror("S23: stopping H8/3002\n");
-			m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-			m_audiocpu_running = 0;
-		}
+				// Panic Park: writing 1 when it's already running means reboot?
+				if (m_audiocpu_running)
+				{
+					m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+				}
+
+				m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+				m_audiocpu_running = true;
+			}
+			else
+			{
+				logerror("mcuen_w: stopping H8/3002\n");
+				m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+				m_audiocpu_running = false;
+			}
+			break;
+
+		default:
+			logerror("mcuen_w: mask %04x, data %04x @ %x\n", mem_mask, data, offset);
+			break;
 	}
 }
 
@@ -2194,10 +2201,6 @@ WRITE32_MEMBER(namcos23_state::p3d_w)
 		if(data & 1)
 			p3d_dma(space, m_p3d_address, m_p3d_size);
 		return;
-	case 0x17:
-		m_maincpu->set_input_line(MIPS3_IRQ1, CLEAR_LINE);
-		m_c361.timer->adjust(attotime::never);
-		return;
 	}
 	logerror("p3d_w %02x, %08x @ %08x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 }
@@ -2436,31 +2439,30 @@ MACHINE_START_MEMBER(namcos23_state,s23)
 static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32, namcos23_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffffff)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
-	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(p3d_r, p3d_w )
-	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16(s23_c417_r, s23_c417_w, 0xffffffff )
+	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(p3d_r, p3d_w)
+	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16(s23_c417_r, s23_c417_w, 0xffffffff)
 	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_SHARE("shared_ram") // Communication RAM (C416)
 
-	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE(s23_mcuen_w )
-	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM
+	AM_RANGE(0x04c3ff00, 0x04c3ff0f) AM_WRITE16(s23_mcuen_w, 0xffffffff)
 
 	AM_RANGE(0x06080000, 0x0608000f) AM_RAM AM_SHARE("czattr")
 	AM_RANGE(0x06080200, 0x060803ff) AM_RAM // PCZ Convert RAM (C406) (should be banked)
 
 	AM_RANGE(0x06108000, 0x061087ff) AM_RAM		// Gamma RAM (C404)
-	AM_RANGE(0x06110000, 0x0613ffff) AM_RAM_WRITE(namcos23_paletteram_w ) AM_SHARE("paletteram") // Palette RAM (C404)
-	AM_RANGE(0x06400000, 0x0641dfff) AM_RAM_WRITE(s23_txtchar_w ) AM_SHARE("charram")	// Text CGRAM (C361)
-	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE(namcos23_textram_w ) AM_SHARE("textram") // Text VRAM (C361)
-	AM_RANGE(0x06420000, 0x0642000f) AM_READWRITE16(s23_c361_r, s23_c361_w, 0xffffffff ) // C361
+	AM_RANGE(0x06110000, 0x0613ffff) AM_RAM_WRITE(namcos23_paletteram_w) AM_SHARE("paletteram") // Palette RAM (C404)
+	AM_RANGE(0x06400000, 0x0641dfff) AM_RAM_WRITE(s23_txtchar_w) AM_SHARE("charram") // Text CGRAM (C361)
+	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE(namcos23_textram_w) AM_SHARE("textram") // Text VRAM (C361)
+	AM_RANGE(0x06420000, 0x0642000f) AM_READWRITE16(s23_c361_r, s23_c361_w, 0xffffffff) // C361
 
-	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("data", 0)	// data ROMs
+	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("data", 0) // data ROMs
 
 	AM_RANGE(0x0c000000, 0x0c00ffff) AM_RAM	AM_SHARE("nvram") // Backup RAM
 
-	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16(s23_ctl_r, s23_ctl_w, 0xffffffff ) // write for LEDs at d000000, watchdog at d000004
+	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16(s23_ctl_r, s23_ctl_w, 0xffffffff) // write for LEDs at d000000, watchdog at d000004
 
 	AM_RANGE(0x0e000000, 0x0e007fff) AM_RAM // C405 RAM - what is this?
 
-	AM_RANGE(0x0f000000, 0x0f000003) AM_READ(s23_unk_status_r )
+	AM_RANGE(0x0f000000, 0x0f000003) AM_READ(s23_unk_status_r)
 
 	AM_RANGE(0x0f200000, 0x0f203fff) AM_RAM // C422 RAM (where are the C422 regs?)
 
@@ -2470,25 +2472,24 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ss23_map, AS_PROGRAM, 32, namcos23_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffffff)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM
-	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(p3d_r, p3d_w )
-	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16(s23_c417_r, s23_c417_w, 0xffffffff )
+	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(p3d_r, p3d_w)
+	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16(s23_c417_r, s23_c417_w, 0xffffffff)
 	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_SHARE("shared_ram") // Communication RAM (C416)
-	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE(s23_mcuen_w )
-	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM
+	AM_RANGE(0x04c3ff00, 0x04c3ff0f) AM_WRITE16(s23_mcuen_w, 0xffffffff)
 	AM_RANGE(0x06000000, 0x0600ffff) AM_RAM AM_SHARE("nvram") // Backup RAM
 	AM_RANGE(0x06200000, 0x06203fff) AM_RAM // C422 RAM
-	AM_RANGE(0x06400000, 0x0640000f) AM_READWRITE16(s23_c422_r, s23_c422_w, 0xffffffff ) // C422 registers
-	AM_RANGE(0x06800000, 0x0681dfff) AM_RAM_WRITE(s23_txtchar_w ) AM_SHARE("charram")	// Text CGRAM (C361)
-	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE(namcos23_textram_w ) AM_SHARE("textram") // Text VRAM (C361)
-	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE16(s23_c361_r, s23_c361_w, 0xffffffff ) // C361
+	AM_RANGE(0x06400000, 0x0640000f) AM_READWRITE16(s23_c422_r, s23_c422_w, 0xffffffff) // C422 registers
+	AM_RANGE(0x06800000, 0x0681dfff) AM_RAM_WRITE(s23_txtchar_w) AM_SHARE("charram") // Text CGRAM (C361)
+	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE(namcos23_textram_w) AM_SHARE("textram") // Text VRAM (C361)
+	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE16(s23_c361_r, s23_c361_w, 0xffffffff) // C361
 	AM_RANGE(0x06a08000, 0x06a087ff) AM_RAM // Blending control & GAMMA (C404)
-	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE(namcos23_paletteram_w ) AM_SHARE("paletteram") // Palette RAM (C404)
+	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE(namcos23_paletteram_w) AM_SHARE("paletteram") // Palette RAM (C404)
 	AM_RANGE(0x08000000, 0x08ffffff) AM_ROM AM_REGION("data", 0x0000000) AM_MIRROR(0x1000000) // data ROMs
 	AM_RANGE(0x0a000000, 0x0affffff) AM_ROM AM_REGION("data", 0x1000000) AM_MIRROR(0x1000000)
-	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE16(s23_c412_r, s23_c412_w, 0xffffffff )
-	AM_RANGE(0x0c400000, 0x0c400007) AM_READWRITE16(s23_c421_r, s23_c421_w, 0xffffffff )
-	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16(s23_ctl_r, s23_ctl_w, 0xffffffff )
-	AM_RANGE(0x0e800000, 0x0e800003) AM_READ(s23_unk_status_r )
+	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE16(s23_c412_r, s23_c412_w, 0xffffffff)
+	AM_RANGE(0x0c400000, 0x0c400007) AM_READWRITE16(s23_c421_r, s23_c421_w, 0xffffffff)
+	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16(s23_ctl_r, s23_ctl_w, 0xffffffff)
+	AM_RANGE(0x0e800000, 0x0e800003) AM_READ(s23_unk_status_r)
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -3107,7 +3108,7 @@ DRIVER_INIT_MEMBER(namcos23_state,ss23)
 	memset(m_s23_settings, 0, sizeof(m_s23_settings));
 	m_s23_tssio_port_4 = 0;
 	m_s23_porta = 0, m_s23_rtcstate = 0;
-	m_audiocpu_running = 0;
+	m_audiocpu_running = false;
 	render.count[0] = render.count[1] = 0;
 	render.cur = 0;
 
