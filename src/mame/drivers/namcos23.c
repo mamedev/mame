@@ -1238,11 +1238,13 @@ Notes:
 #define S23_HSYNC		(16666150)
 #define S23_MODECLOCK	(130205)
 
-#define MAIN_VBLANK_IRQ	1
-#define MAIN_C361_IRQ	2
-#define MAIN_SUBCPU_IRQ	4
-#define MAIN_C435_IRQ	8
-#define MAIN_C422_IRQ	16
+#define MAIN_VBLANK_IRQ	0x01
+#define MAIN_C361_IRQ	0x02
+#define MAIN_SUBCPU_IRQ	0x04
+#define MAIN_C435_IRQ	0x08
+#define MAIN_C422_IRQ	0x10
+#define MAIN_C450_IRQ	0x20
+#define MAIN_C451_IRQ	0x40
 
 enum { MODEL, FLUSH };
 
@@ -1484,6 +1486,12 @@ void namcos23_state::update_main_interrupts(UINT32 cause)
 	// level 5: C422
 	if (changed & MAIN_C422_IRQ)
 		m_maincpu->set_input_line(MIPS3_IRQ3, (cause & MAIN_C422_IRQ) ? ASSERT_LINE : CLEAR_LINE);
+
+	// crszone(sys23ev2) has a different configuration, are they hardwired or configured by software? (where?)..
+	// level 3: C422/subcpu
+	// level 4: vblank
+	// level 5: C451/C361
+	// level 6: C450
 }
 
 static UINT16 nthword( const UINT32 *pSource, int offs )
@@ -1862,12 +1870,14 @@ READ16_MEMBER(namcos23_state::s23_c361_r)
 {
 	switch (offset)
 	{
+		// current raster position
+		// how does it work exactly? it's not understood in namcos22 either (also has a c361)
 		case 5:
 			update_main_interrupts(m_main_irqcause & ~MAIN_C361_IRQ);
-			return machine().primary_screen->vblank() ? 0x1ff : machine().primary_screen->vpos();
+			return machine().primary_screen->vpos()*2 | (machine().primary_screen->vblank() ? 1 : 0);
 		case 6:
 			update_main_interrupts(m_main_irqcause & ~MAIN_C361_IRQ);
-			return machine().primary_screen->vblank() ? ~0 : 0;
+			return machine().primary_screen->vblank() ? 1 : 0;
 	}
 
 	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
