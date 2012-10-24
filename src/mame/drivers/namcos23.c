@@ -1452,6 +1452,8 @@ public:
 	DECLARE_WRITE8_MEMBER(s23_iob_mcu_w);
 	DECLARE_READ8_MEMBER(s23_iob_p4_r);
 	DECLARE_WRITE8_MEMBER(s23_iob_p4_w);
+	DECLARE_READ8_MEMBER(s23_iob_p6_r);
+	DECLARE_WRITE8_MEMBER(s23_iob_p6_w);
 	DECLARE_READ8_MEMBER(s23_gun_r);
 	DECLARE_READ8_MEMBER(iob_r);
 	DECLARE_DRIVER_INIT(ss23);
@@ -1832,6 +1834,7 @@ TIMER_CALLBACK_MEMBER(namcos23_state::c361_timer_cb)
 	if (c361.scanline != 0x1ff)
 	{
 		// need to do a partial update here, but doesn't work properly yet
+		//machine().primary_screen->update_partial(machine().primary_screen->vpos());
 		update_main_interrupts(m_main_irqcause | MAIN_C361_IRQ);
 
 		// TC2 indicates it's probably one-shot since it resets it each VBL...
@@ -2801,8 +2804,6 @@ WRITE8_MEMBER(namcos23_state::s23_mcu_iob_w)
 }
 
 static INPUT_PORTS_START( gorgon )
-	PORT_START("H8PORT")
-
 	// No idea if start is actually there, but we need buttons to pass error screens
 	PORT_START("P1")
 	PORT_BIT( 0x001, IP_ACTIVE_LOW, IPT_START1 )
@@ -2812,23 +2813,26 @@ static INPUT_PORTS_START( gorgon )
 	PORT_BIT( 0x001, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("RRP0")
+	PORT_START("IN0")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(0xef, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("RRP1")
+	PORT_START("IN1")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("RRP2")
+	PORT_START("IN2")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0xf7, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("RRP3")
+	PORT_START("IN3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -2858,11 +2862,9 @@ static INPUT_PORTS_START( gorgon )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rapidrvrp )
-	PORT_START("H8PORT")
-
-	// To get into test mode, enable both Service Mode dipswitches, and then tap [Dev A] + [Dev B]
-	// (or hold [Dev B] and then tap [Dev A]). Some of the developer menus require you to
-	// navigate with the Dev keys, but usually the User keys work fine too.
+	// To fully use test mode, both Service Mode dipswitches need to be enabled.
+	// Some of the developer menus require you to navigate with the Dev keys,
+	// but usually the User keys work fine too.
 	PORT_START("P1")
 	PORT_BIT( 0x001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // I/O Unknown Status
@@ -2880,7 +2882,7 @@ static INPUT_PORTS_START( rapidrvrp )
 	PORT_START("P2")
 	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("RRP0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("User Up")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("User Down")
@@ -2890,15 +2892,18 @@ static INPUT_PORTS_START( rapidrvrp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("RRP1")
+	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("RRP2")
+	PORT_START("IN2")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0xf7, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("RRP3")
+	PORT_START("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
@@ -2928,8 +2933,6 @@ static INPUT_PORTS_START( rapidrvrp )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( s23 )
-	PORT_START("H8PORT")
-
 	// No idea if start is actually there, but we need buttons to pass error screens
 	// You can go to the pcb test mode by pressing start, and it doesn't crash anymore somehow
 	// Use start1 to select, start1+start2 to exit, up/down to navigate
@@ -2943,7 +2946,7 @@ static INPUT_PORTS_START( s23 )
 	PORT_START("P2")
 	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )	// 0x100 = freeze?
 
-	PORT_START("TC2P0")
+	PORT_START("IN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// this is the "coin acceptor connected" signal
@@ -2953,10 +2956,19 @@ static INPUT_PORTS_START( s23 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
-	PORT_START("TC2P1")
+	PORT_START("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	// gun trigger
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	// foot pedal
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("DSW")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
@@ -2993,8 +3005,6 @@ static INPUT_PORTS_START( timecrs2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ss23 )
-	PORT_START("H8PORT")
-
 	// No idea if start is actually there, but we need buttons to pass error screens
 	// You can go to the pcb test mode by pressing start, and it doesn't crash anymore somehow
 	// Use start1 to select, start1+start2 to exit, up/down to navigate
@@ -3008,7 +3018,7 @@ static INPUT_PORTS_START( ss23 )
 	PORT_START("P2")
 	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("TC2P0")
+	PORT_START("IN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// this is the "coin acceptor connected" signal
@@ -3018,10 +3028,19 @@ static INPUT_PORTS_START( ss23 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
-	PORT_START("TC2P1")
+	PORT_START("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	// gun trigger
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	// foot pedal
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("DSW")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
@@ -3052,17 +3071,16 @@ INPUT_PORTS_END
 READ8_MEMBER(namcos23_state::s23_mcu_p6_r)
 {
 	// bit 1 = JVS cable present sense (1 = I/O board plugged in)
-		return (m_jvssense << 1) | 0xfd;
+	return (m_jvssense << 1) | 0xfd;
 }
 
 WRITE8_MEMBER(namcos23_state::s23_mcu_p6_w)
 {
-//  printf("%02x to port 6\n", data);
+	//printf("%02x to port 6\n", data);
 }
 
 static ADDRESS_MAP_START( s23h8iomap, AS_IO, 8, namcos23_state )
 	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE(s23_mcu_p6_r, s23_mcu_p6_w )
-	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_PORT( "H8PORT" )
 	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ(s23_mcu_p8_r ) AM_WRITENOP
 	AM_RANGE(H8_PORT_9, H8_PORT_9) AM_NOP	// read on Gorgon, purpose unknown
 	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE(s23_mcu_pa_r, s23_mcu_pa_w )
@@ -3078,7 +3096,6 @@ ADDRESS_MAP_END
 // version without serial hookup to I/O board for games where the PIC isn't dumped
 static ADDRESS_MAP_START( s23h8noiobmap, AS_IO, 8, namcos23_state )
 	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE(s23_mcu_p6_r, s23_mcu_p6_w )
-	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_PORT( "H8PORT" )
 	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ(s23_mcu_p8_r ) AM_WRITENOP
 	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE(s23_mcu_pa_r, s23_mcu_pa_w )
 	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE(s23_mcu_portB_r, s23_mcu_portB_w )
@@ -3126,6 +3143,20 @@ WRITE8_MEMBER(namcos23_state::s23_iob_p4_w)
 	m_jvssense = (data & 0x04) ? 0 : 1;
 }
 
+READ8_MEMBER(namcos23_state::s23_iob_p6_r)
+{
+	// d4 is service button
+	UINT8 sb = ioport("SERVICE")->read() & 1;
+	// other bits: unknown
+
+	return sb<<4;
+}
+
+WRITE8_MEMBER(namcos23_state::s23_iob_p6_w)
+{
+	//printf("iob %02x to port 6\n", data);
+}
+
 READ8_MEMBER(namcos23_state::s23_gun_r)
 {
 	UINT16 xpos = ioport("LIGHTX")->read_safe(0) * 640 / 0xff + 0x80;
@@ -3154,9 +3185,10 @@ READ8_MEMBER(namcos23_state::iob_r)
 /* H8/3334 (Namco C78) I/O board MCU */
 static ADDRESS_MAP_START( s23iobrdmap, AS_PROGRAM, 8, namcos23_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("iocpu", 0)
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("TC2P0")	  // 0-1 = coin 0-3 = coin connect, 0-5 = test 0-6 = down select, 0-7 = up select, 0-8 = enter
-	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("TC2P1")	  // 1-1 = gun trigger 1-2 = foot pedal
-	AM_RANGE(0x6002, 0x6003) AM_READ(iob_r )
+	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
+	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("IN1")
+	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("IN2")
+	AM_RANGE(0x6003, 0x6003) AM_READ_PORT("IN3")
 	AM_RANGE(0x6004, 0x6005) AM_WRITENOP
 	AM_RANGE(0x6006, 0x6007) AM_NOP
 	AM_RANGE(0x7000, 0x700f) AM_READ(iob_r )
@@ -3165,27 +3197,8 @@ static ADDRESS_MAP_START( s23iobrdmap, AS_PROGRAM, 8, namcos23_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( timecrs2iobrdmap, AS_PROGRAM, 8, namcos23_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("iocpu", 0)
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("TC2P0")
-	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("TC2P1")
-	AM_RANGE(0x6002, 0x6005) AM_WRITENOP
-	AM_RANGE(0x6006, 0x6007) AM_NOP
 	AM_RANGE(0x7000, 0x700f) AM_READ(s23_gun_r )
-
-	AM_RANGE(0xc000, 0xf7ff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gorgoniobrdmap, AS_PROGRAM, 8, namcos23_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("iocpu", 0)
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("RRP0")	  // 0-5 = start
-	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("RRP1")	  //
-	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("RRP2")	  // 0-4 = coin
-	AM_RANGE(0x6003, 0x6003) AM_READ_PORT("RRP3")	  // 1-1 = button?  1-4 = start?
-	AM_RANGE(0x6004, 0x6005) AM_WRITENOP
-	AM_RANGE(0x6006, 0x6007) AM_NOP
-	AM_RANGE(0x7000, 0x700f) AM_READ(iob_r )
-
-	AM_RANGE(0xc000, 0xf7ff) AM_RAM
+	AM_IMPORT_FROM( s23iobrdmap )
 ADDRESS_MAP_END
 
 /*
@@ -3193,13 +3206,13 @@ ADDRESS_MAP_END
     port 4 bit 2 = SENSE line back to main (0 = asserted, 1 = dropped)
 */
 static ADDRESS_MAP_START( s23iobrdiomap, AS_IO, 8, namcos23_state )
-	AM_RANGE(H8_PORT_4, H8_PORT_4) AM_READWRITE(s23_iob_p4_r, s23_iob_p4_w )
+	AM_RANGE(H8_PORT_4, H8_PORT_4) AM_READWRITE(s23_iob_p4_r, s23_iob_p4_w)
 	AM_RANGE(H8_PORT_5, H8_PORT_5) AM_NOP	// status LED in bit 2
-	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_NOP	// unknown
+	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE(s23_iob_p6_r, s23_iob_p6_w)
 	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_NOP	// unknown - used on ASCA-5 only
 	AM_RANGE(H8_PORT_9, H8_PORT_9) AM_NOP	// unknown - used on ASCA-5 only
-	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE(s23_iob_mcu_r, s23_iob_mcu_w )
-	AM_RANGE(H8_ADC_0_H, H8_ADC_3_L) AM_NOP
+	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE(s23_iob_mcu_r, s23_iob_mcu_w)
+	AM_RANGE(H8_ADC_0_H, H8_ADC_3_L) AM_NOP	// analog input
 ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(namcos23_state,ss23)
@@ -3216,7 +3229,7 @@ DRIVER_INIT_MEMBER(namcos23_state,ss23)
 
 	m_mi_rd = m_mi_wr = m_im_rd = m_im_wr = 0;
 	m_jvssense = 1;
-	m_main_irqcause = ~0;
+	m_main_irqcause = 0;
 	m_ctl_vbl_active = false;
 	m_s23_lastpB = 0x50;
 	m_s23_setstate = 0;
@@ -3297,7 +3310,7 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  irq1_line_pulse)
 
 	MCFG_CPU_ADD("iocpu", H83334, S23_H8CLOCK )
-	MCFG_CPU_PROGRAM_MAP( gorgoniobrdmap )
+	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
 	MCFG_CPU_IO_MAP( s23iobrdiomap )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
