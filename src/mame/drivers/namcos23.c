@@ -1238,6 +1238,12 @@ Notes:
 #define S23_HSYNC		(16666150)
 #define S23_MODECLOCK	(130205)
 
+#define MAIN_VBLANK_IRQ	1
+#define MAIN_C361_IRQ	2
+#define MAIN_SUBCPU_IRQ	4
+#define MAIN_C435_IRQ	8
+#define MAIN_C422_IRQ	16
+
 enum { MODEL, FLUSH };
 
 struct namcos23_render_entry {
@@ -1354,6 +1360,7 @@ public:
 	tilemap_t *m_bgtilemap;
 	UINT8 m_jvssense;
 	INT32 m_has_jvsio;
+	UINT32 m_main_irqcause;
 	bool m_ctl_vbl_active;
 	UINT8 m_ctl_led;
 	UINT16 m_ctl_inp_buffer[2];
@@ -1396,6 +1403,8 @@ public:
 	UINT8 m_im_rd;
 	UINT8 m_im_wr;
 	UINT8 m_s23_tssio_port_4;
+
+	void update_main_interrupts(UINT32 cause);
 
 	DECLARE_WRITE32_MEMBER(namcos23_textram_w);
 	DECLARE_WRITE32_MEMBER(s23_txtchar_w);
@@ -1455,6 +1464,27 @@ public:
 };
 
 
+void namcos23_state::update_main_interrupts(UINT32 cause)
+{
+	UINT32 changed = cause ^ m_main_irqcause;
+	m_main_irqcause = cause;
+	
+	// level 2: vblank
+	if (changed & MAIN_VBLANK_IRQ)
+		m_maincpu->set_input_line(MIPS3_IRQ0, (cause & MAIN_VBLANK_IRQ) ? ASSERT_LINE : CLEAR_LINE);
+
+	// level 3: C361/subcpu
+	if (changed & (MAIN_C361_IRQ | MAIN_SUBCPU_IRQ))
+		m_maincpu->set_input_line(MIPS3_IRQ1, (cause & (MAIN_C361_IRQ | MAIN_SUBCPU_IRQ)) ? ASSERT_LINE : CLEAR_LINE);
+
+	// level 4: C435
+	if (changed & MAIN_C435_IRQ)
+		m_maincpu->set_input_line(MIPS3_IRQ2, (cause & MAIN_C435_IRQ) ? ASSERT_LINE : CLEAR_LINE);
+
+	// level 5: C422
+	if (changed & MAIN_C422_IRQ)
+		m_maincpu->set_input_line(MIPS3_IRQ3, (cause & MAIN_C422_IRQ) ? ASSERT_LINE : CLEAR_LINE);
+}
 
 static UINT16 nthword( const UINT32 *pSource, int offs )
 {
@@ -1582,7 +1612,7 @@ WRITE16_MEMBER(namcos23_state::s23_c417_w)
 			break;
 		case 7:
 			logerror("c417_w: ack IRQ 2 (%x)\n", data);
-			m_maincpu->set_input_line(MIPS3_IRQ2, CLEAR_LINE);
+			update_main_interrupts(m_main_irqcause & ~MAIN_C435_IRQ);
 			break;
 		default:
 			logerror("c417_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
@@ -1754,7 +1784,7 @@ WRITE16_MEMBER(namcos23_state::s23_ctl_w)
 			if(m_ctl_vbl_active)
 			{
 				m_ctl_vbl_active = false;
-				space.device().execute().set_input_line(MIPS3_IRQ0, CLEAR_LINE);
+				update_main_interrupts(m_main_irqcause & ~MAIN_VBLANK_IRQ);
 			}
 			break;
 
@@ -1793,11 +1823,14 @@ TIMER_CALLBACK_MEMBER(namcos23_state::c361_timer_cb)
 
 	if (c361.scanline != 0x1ff)
 	{
-		m_maincpu->set_input_line(MIPS3_IRQ1, ASSERT_LINE);
+		// need to do a partial update here, but doesn't work properly yet
+		update_main_interrupts(m_main_irqcause | MAIN_C361_IRQ);
 
 		// TC2 indicates it's probably one-shot since it resets it each VBL...
 		//c361.timer->adjust(machine().primary_screen->time_until_pos(c361.scanline));
 	}
+	else
+		update_main_interrupts(m_main_irqcause & ~MAIN_C361_IRQ);
 }
 
 WRITE16_MEMBER(namcos23_state::s23_c361_w)
@@ -1830,10 +1863,11 @@ READ16_MEMBER(namcos23_state::s23_c361_r)
 	switch (offset)
 	{
 		case 5:
-			m_maincpu->set_input_line(MIPS3_IRQ1, CLEAR_LINE);
+			update_main_interrupts(m_main_irqcause & ~MAIN_C361_IRQ);
 			return machine().primary_screen->vblank() ? 0x1ff : machine().primary_screen->vpos();
 		case 6:
-			return machine().primary_screen->vblank();
+			update_main_interrupts(m_main_irqcause & ~MAIN_C361_IRQ);
+			return machine().primary_screen->vblank() ? ~0 : 0;
 	}
 
 	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
@@ -1855,12 +1889,12 @@ WRITE16_MEMBER(namcos23_state::s23_c422_w)
 			if (data == 0xfffb)
 			{
 				logerror("c422_w: raise IRQ 3\n");
-				m_maincpu->set_input_line(MIPS3_IRQ3, ASSERT_LINE);
+				update_main_interrupts(m_main_irqcause | MAIN_C422_IRQ);
 			}
 			else if (data == 0x000f)
 			{
 				logerror("c422_w: ack IRQ 3\n");
-				m_maincpu->set_input_line(MIPS3_IRQ3, CLEAR_LINE);
+				update_main_interrupts(m_main_irqcause & ~MAIN_C422_IRQ);
 			}
 			break;
 
@@ -1879,7 +1913,7 @@ WRITE16_MEMBER(namcos23_state::s23_mcuen_w)
 	{
 		case 2:
 			// subcpu irq ack
-			m_maincpu->set_input_line(MIPS3_IRQ1, CLEAR_LINE);
+			update_main_interrupts(m_main_irqcause & ~MAIN_SUBCPU_IRQ);
 			break;
 
 		case 5:
@@ -2493,7 +2527,7 @@ INTERRUPT_GEN_MEMBER(namcos23_state::s23_interrupt)
 	if(!m_ctl_vbl_active)
 	{
 		m_ctl_vbl_active = true;
-		device.execute().set_input_line(MIPS3_IRQ0, ASSERT_LINE);
+		update_main_interrupts(m_main_irqcause | MAIN_VBLANK_IRQ);
 	}
 
 	render.cur = !render.cur;
@@ -2629,7 +2663,7 @@ WRITE16_MEMBER(namcos23_state::sub_interrupt_main_w)
 {
 	if  ((mem_mask == 0xffff) && (data == 0x3170))
 	{
-		m_maincpu->set_input_line(MIPS3_IRQ1, ASSERT_LINE);
+		update_main_interrupts(m_main_irqcause | MAIN_SUBCPU_IRQ);
 	}
 	else
 	{
@@ -3172,6 +3206,7 @@ DRIVER_INIT_MEMBER(namcos23_state,ss23)
 
 	m_mi_rd = m_mi_wr = m_im_rd = m_im_wr = 0;
 	m_jvssense = 1;
+	m_main_irqcause = ~0;
 	m_ctl_vbl_active = false;
 	m_s23_lastpB = 0x50;
 	m_s23_setstate = 0;
