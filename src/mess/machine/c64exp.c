@@ -359,11 +359,11 @@ const char * c64_expansion_slot_device::get_default_card_software(const machine_
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
+UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (m_cart != NULL)
 	{
-		data = m_cart->c64_cd_r(space, offset, data, ba, roml, romh, io1, io2);
+		data = m_cart->c64_cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
 	}
 
 	return data;
@@ -374,11 +374,11 @@ UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8
 //  cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
+void c64_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (m_cart != NULL)
 	{
-		m_cart->c64_cd_w(space, offset, data, ba, roml, romh, io1, io2);
+		m_cart->c64_cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
 	}
 }
 
@@ -387,13 +387,13 @@ void c64_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 
 //  game_r - GAME read
 //-------------------------------------------------
 
-int c64_expansion_slot_device::game_r(offs_t offset, int ba, int rw, int hiram)
+int c64_expansion_slot_device::game_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
 {
 	int state = 1;
 
 	if (m_cart != NULL)
 	{
-		state = m_cart->c64_game_r(offset, ba, rw, hiram);
+		state = m_cart->c64_game_r(offset, sphi2, ba, rw, hiram);
 	}
 
 	return state;
@@ -404,13 +404,13 @@ int c64_expansion_slot_device::game_r(offs_t offset, int ba, int rw, int hiram)
 //  exrom_r - EXROM read
 //-------------------------------------------------
 
-int c64_expansion_slot_device::exrom_r(offs_t offset, int ba, int rw, int hiram)
+int c64_expansion_slot_device::exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
 {
 	int state = 1;
 
 	if (m_cart != NULL)
 	{
-		state = m_cart->c64_exrom_r(offset, ba, rw, hiram);
+		state = m_cart->c64_exrom_r(offset, sphi2, ba, rw, hiram);
 	}
 
 	return state;

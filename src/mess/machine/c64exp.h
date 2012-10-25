@@ -97,10 +97,10 @@ public:
 	virtual ~c64_expansion_slot_device();
 
 	// computer interface
-	UINT8 cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2);
-	void cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2);
-	int game_r(offs_t offset, int ba, int rw, int hiram);
-	int exrom_r(offs_t offset, int ba, int rw, int hiram);
+	UINT8 cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
+	void cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
+	int game_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
+	int exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER( port_reset_w );
 
@@ -168,10 +168,10 @@ protected:
 	virtual UINT8* c64_nvram_pointer(running_machine &machine, size_t size);
 
 	// runtime
-	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2) { return data; };
-	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2) { };
-	virtual int c64_game_r(offs_t offset, int ba, int rw, int hiram) { return m_game; }
-	virtual int c64_exrom_r(offs_t offset, int ba, int rw, int hiram) { return m_exrom; }
+	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2) { return data; };
+	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2) { };
+	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram) { return m_game; }
+	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram) { return m_exrom; }
 	virtual void c64_reset_w(int state) { };
 
 	c64_expansion_slot_device *m_slot;

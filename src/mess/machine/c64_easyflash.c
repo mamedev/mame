@@ -132,7 +132,7 @@ void c64_easyflash_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_easyflash_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
+UINT8 c64_easyflash_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
@@ -157,7 +157,7 @@ UINT8 c64_easyflash_cartridge_device::c64_cd_r(address_space &space, offs_t offs
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_easyflash_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
+void c64_easyflash_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
@@ -221,7 +221,7 @@ void c64_easyflash_cartridge_device::c64_cd_w(address_space &space, offs_t offse
 //  c64_exrom_r - EXROM read
 //-------------------------------------------------
 
-int c64_easyflash_cartridge_device::c64_exrom_r(offs_t offset, int ba, int rw, int hiram)
+int c64_easyflash_cartridge_device::c64_exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
 {
 	return !BIT(m_mode, 1);
 }
@@ -231,7 +231,7 @@ int c64_easyflash_cartridge_device::c64_exrom_r(offs_t offset, int ba, int rw, i
 //  c64_game_r - GAME read
 //-------------------------------------------------
 
-int c64_easyflash_cartridge_device::c64_game_r(offs_t offset, int ba, int rw, int hiram)
+int c64_easyflash_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
 {
 	return !(BIT(m_mode, 0) | !(BIT(m_mode, 2) | device().ioport("JP1")->read()));
 }

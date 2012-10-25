@@ -81,7 +81,7 @@ void c64_pagefox_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_pagefox_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
+UINT8 c64_pagefox_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml || !romh)
 	{
@@ -106,7 +106,7 @@ UINT8 c64_pagefox_cartridge_device::c64_cd_r(address_space &space, offs_t offset
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_pagefox_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
+void c64_pagefox_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (offset >= 0x8000 && offset < 0xc000)
 	{

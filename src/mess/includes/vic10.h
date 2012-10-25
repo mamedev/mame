@@ -38,6 +38,7 @@ public:
 		  m_exp(*this, VIC10_EXPANSION_SLOT_TAG),
 		  m_ram(*this, RAM_TAG),
 		  m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+		  m_color_ram(*this, "color_ram"),
 		  m_cia_irq(CLEAR_LINE),
 		  m_vic_irq(CLEAR_LINE),
 		  m_exp_irq(CLEAR_LINE)
@@ -84,7 +85,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
 
 	// video state
-	UINT8 *m_color_ram;
+	optional_shared_ptr<UINT8> m_color_ram;
 
 	// interrupt state
 	int m_cia_irq;

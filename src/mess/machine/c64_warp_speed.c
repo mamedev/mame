@@ -127,7 +127,7 @@ void c64_warp_speed_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_warp_speed_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
+UINT8 c64_warp_speed_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml || !romh || !io1 || !io2)
 	{
@@ -143,7 +143,7 @@ UINT8 c64_warp_speed_cartridge_device::c64_cd_r(address_space &space, offs_t off
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_warp_speed_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
+void c64_warp_speed_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{

@@ -849,6 +849,15 @@ void plus4_state::machine_start()
 	{
 		m_c2 = memregion("c2")->base();
 	}
+	
+	// initialize memory
+	UINT8 data = 0xff;
+
+	for (offs_t offset = 0; offset < m_ram->size(); offset++)
+	{
+		m_ram->pointer()[offset] = data;
+		if (!(offset % 64)) data ^= 0xff;
+	}
 
 	// state saving
 	save_item(NAME(m_addr));
@@ -1097,10 +1106,10 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( plus4n )
+//  ROM( plus4 )
 //-------------------------------------------------
 
-ROM_START( plus4n )
+ROM_START( plus4 )
 	ROM_REGION( 0x8000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r4", "Revision 4" )
@@ -1147,10 +1156,10 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( c16n )
+//  ROM( c16 )
 //-------------------------------------------------
 
-ROM_START( c16n )
+ROM_START( c16 )
 	ROM_REGION( 0x8000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r4", "Revision 4" )
@@ -1189,10 +1198,10 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( c16h )
+//  ROM( c16_hu )
 //-------------------------------------------------
 
-ROM_START( c16h )
+ROM_START( c16_hu )
 	ROM_REGION( 0x8000, "kernal", 0 )
 	ROM_LOAD( "318006-01.u3", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 
@@ -1237,9 +1246,9 @@ ROM_END
 COMP( 1984, c264,	0,		0,		ntsc,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Commodore 264 (Prototype)",	GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 COMP( 1984, c232,	c264,	0,		c232,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Commodore 232 (Prototype)",	GAME_SUPPORTS_SAVE )
 COMP( 1984, v364,	c264,	0,		v364,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Commodore V364 (Prototype)",	GAME_SUPPORTS_SAVE )
-COMP( 1984, plus4n,	c264,	0,		ntsc,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Plus/4 (NTSC)",				GAME_SUPPORTS_SAVE )
+COMP( 1984, plus4,	c264,	0,		ntsc,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Plus/4 (NTSC)",				GAME_SUPPORTS_SAVE )
 COMP( 1984, plus4p,	c264,	0,		pal,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Plus/4 (PAL)",					GAME_SUPPORTS_SAVE )
-COMP( 1984, c16n,	c264,	0,		c16n,	c16,	driver_device,	0,		"Commodore Business Machines",	"Commodore 16 (NTSC)",			GAME_SUPPORTS_SAVE )
+COMP( 1984, c16,	c264,	0,		c16n,	c16,	driver_device,	0,		"Commodore Business Machines",	"Commodore 16 (NTSC)",			GAME_SUPPORTS_SAVE )
 COMP( 1984, c16p,	c264,	0,		c16p,	c16,	driver_device,	0,		"Commodore Business Machines",	"Commodore 16 (PAL)",			GAME_SUPPORTS_SAVE )
-COMP( 1984, c16h,	c264,	0,		c16p,	c16,	driver_device,	0,		"Commodore Business Machines",	"Commodore 16 (Hungary)",		GAME_SUPPORTS_SAVE )
+COMP( 1984, c16_hu,	c264,	0,		c16p,	c16,	driver_device,	0,		"Commodore Business Machines",	"Commodore 16 (Hungary)",		GAME_SUPPORTS_SAVE )
 COMP( 1984, c116,	c264,	0,		c16p,	c16,	driver_device,	0,		"Commodore Business Machines",	"Commodore 116",				GAME_SUPPORTS_SAVE )

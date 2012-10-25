@@ -21,7 +21,6 @@
     TODO:
 
     - cleanup
-    - light pen
     - http://hitmen.c02.at/temp/palstuff/
 
 */
@@ -175,8 +174,8 @@ static const rgb_t PALETTE[] =
 
 #define GFXMODE					((m_reg[0x11] & 0x60) | (m_reg[0x16] & 0x10)) >> 4
 #define SCREENON				(m_reg[0x11] & 0x10)
-#define VERTICALPOS				(m_reg[0x11] & 0x07)
-#define HORIZONTALPOS			(m_reg[0x16] & 0x07)
+#define YSCROLL					(m_reg[0x11] & 0x07)
+#define XSCROLL					(m_reg[0x16] & 0x07)
 #define ECMON					(m_reg[0x11] & 0x40)
 #define HIRESON					(m_reg[0x11] & 0x20)
 #define COLUMNS40				(m_reg[0x16] & 0x08)		   /* else 38 Columns */
@@ -202,6 +201,10 @@ static const rgb_t PALETTE[] =
 #define VIC2_FIRSTCOLUMN		(IS_PAL ? VIC6569_FIRSTCOLUMN : VIC6567_FIRSTCOLUMN)
 #define VIC2_X_2_EMU(a)			(IS_PAL ? VIC6569_X_2_EMU(a) : VIC6567_X_2_EMU(a))
 
+#define IRQ_RST					0x01
+#define IRQ_MBC					0x02
+#define IRQ_MMC					0x04
+#define IRQ_LP					0x08
 
 
 
@@ -249,7 +252,7 @@ const address_space_config *mos6566_device::memory_space_config(address_spacenum
 //  INLINE HELPERS
 //**************************************************************************
 
-inline void mos6566_device::vic2_set_interrupt( int mask )
+inline void mos6566_device::set_interrupt( int mask )
 {
 	if (((m_reg[0x19] ^ mask) & m_reg[0x1a] & 0xf))
 	{
@@ -257,25 +260,26 @@ inline void mos6566_device::vic2_set_interrupt( int mask )
 		{
 			DBG_LOG(2, "vic2", ("irq start %.2x\n", mask));
 			m_reg[0x19] |= 0x80;
-			m_out_irq_func(1);
+			m_out_irq_func(ASSERT_LINE);
 		}
 	}
 	m_reg[0x19] |= mask;
 }
 
-inline void mos6566_device::vic2_clear_interrupt( int mask )
+inline void mos6566_device::clear_interrupt( int mask )
 {
 	m_reg[0x19] &= ~mask;
 	if ((m_reg[0x19] & 0x80) && !(m_reg[0x19] & m_reg[0x1a] & 0xf))
 	{
 		DBG_LOG(2, "vic2", ("irq end %.2x\n", mask));
 		m_reg[0x19] &= ~0x80;
-		m_out_irq_func(0);
+		m_out_irq_func(CLEAR_LINE);
 	}
 }
 
 inline UINT8 mos6566_device::read_videoram(offs_t offset)
 {
+	//logerror("cycle %u VRAM %04x BA %u AEC %u\n", m_cycle, offset & 0x3fff, m_ba, m_aec);
 	m_last_data = space(AS_0).read_byte(offset & 0x3fff);
 
 	return m_last_data;
@@ -287,19 +291,32 @@ inline UINT8 mos6566_device::read_colorram(offs_t offset)
 }
 
 // Idle access
-inline void mos6566_device::vic2_idle_access()
+inline void mos6566_device::idle_access()
 {
 	read_videoram(0x3fff);
 }
 
 // Fetch sprite data pointer
-inline void mos6566_device::vic2_spr_ptr_access( int num )
+inline void mos6566_device::spr_ptr_access( int num )
 {
 	m_spr_ptr[num] = read_videoram(SPRITE_ADDR(num)) << 6;
 }
 
+inline void mos6566_device::spr_ba(int num)
+{
+	if (BIT(m_spr_dma_on, num))
+	{
+		set_ba(CLEAR_LINE);
+		m_rdy_cycles += 2;
+	}
+	else if (num > 1 && !BIT(m_spr_dma_on, num - 1))
+	{
+		set_ba(ASSERT_LINE);
+	}
+}
+
 // Fetch sprite data, increment data counter
-inline void mos6566_device::vic2_spr_data_access( int num, int bytenum )
+inline void mos6566_device::spr_data_access( int num, int bytenum )
 {
 	if (m_spr_dma_on & (1 << num))
 	{
@@ -308,48 +325,61 @@ inline void mos6566_device::vic2_spr_data_access( int num, int bytenum )
 	}
 	else
 		if (bytenum == 1)
-			vic2_idle_access();
+			idle_access();
 }
 
 // Turn on display if Bad Line
-inline void mos6566_device::vic2_display_if_bad_line()
+inline void mos6566_device::display_if_bad_line()
 {
 	if (m_is_bad_line)
 		m_display_state = 1;
 }
 
-// Suspend CPU
-inline void mos6566_device::vic2_suspend_cpu()
+inline void mos6566_device::set_ba(int state)
 {
-	if (m_device_suspended == 0)
+	if (m_ba != state)
 	{
-		m_first_ba_cycle = m_cycles_counter;
-		//if (m_in_rdy_workaround_func(0) != 7 )
+		m_ba = state;
+
+		if (m_ba)
 		{
-//          machine.firstcpu->suspend(SUSPEND_REASON_SPIN, 0);
+			m_aec_delay = 0xff;
 		}
-		m_device_suspended = 1;
 	}
 }
 
-// Resume CPU
-inline void mos6566_device::vic2_resume_cpu()
+inline void mos6566_device::set_aec(int state)
 {
-	if (m_device_suspended == 1)
+	if (m_aec != state)
 	{
-	//  machine.firstcpu->resume(SUSPEND_REASON_SPIN);
-		m_device_suspended = 0;
+		m_aec = state;
+	}
+}
+
+inline void mos6566_device::bad_line_ba()
+{
+	if (m_is_bad_line)
+	{
+		if (m_ba)
+		{
+			set_ba(CLEAR_LINE);
+			m_rdy_cycles += 55 - m_cycle;		
+		}
+	}
+	else
+	{
+		set_ba(ASSERT_LINE);
 	}
 }
 
 // Refresh access
-inline void mos6566_device::vic2_refresh_access()
+inline void mos6566_device::refresh_access()
 {
 	read_videoram(0x3f00 | m_ref_cnt--);
 }
 
 
-inline void mos6566_device::vic2_fetch_if_bad_line()
+inline void mos6566_device::fetch_if_bad_line()
 {
 	if (m_is_bad_line)
 		m_display_state = 1;
@@ -357,7 +387,7 @@ inline void mos6566_device::vic2_fetch_if_bad_line()
 
 
 // Turn on display and matrix access and reset RC if Bad Line
-inline void mos6566_device::vic2_rc_if_bad_line()
+inline void mos6566_device::rc_if_bad_line()
 {
 	if (m_is_bad_line)
 	{
@@ -367,7 +397,7 @@ inline void mos6566_device::vic2_rc_if_bad_line()
 }
 
 // Sample border color and increment m_graphic_x
-inline void mos6566_device::vic2_sample_border()
+inline void mos6566_device::sample_border()
 {
 	if (m_draw_this_line)
 	{
@@ -379,7 +409,7 @@ inline void mos6566_device::vic2_sample_border()
 
 
 // Turn on sprite DMA if necessary
-inline void mos6566_device::vic2_check_sprite_dma()
+inline void mos6566_device::check_sprite_dma()
 {
 	int i;
 	UINT8 mask = 1;
@@ -395,23 +425,30 @@ inline void mos6566_device::vic2_check_sprite_dma()
 }
 
 // Video matrix access
-inline void mos6566_device::vic2_matrix_access()
+inline void mos6566_device::matrix_access()
 {
-//  if (m_device_suspended == 1)
+	if (!m_is_bad_line) return;
+
+	UINT16 adr = (m_vc & 0x03ff) | VIDEOADDR;
+
+	// we're in the second clock phase
+	m_phi0 = 1;
+	set_aec(BIT(m_aec_delay, 2));
+
+	if (!m_ba && m_aec)
 	{
-		if (m_cycles_counter < m_first_ba_cycle)
-			m_matrix_line[m_ml_index] = m_color_line[m_ml_index] = 0xff;
-		else
-		{
-			UINT16 adr = (m_vc & 0x03ff) | VIDEOADDR;
-			m_matrix_line[m_ml_index] = read_videoram(adr);
-			m_color_line[m_ml_index] = read_colorram((adr & 0x03ff));
-		}
+		m_matrix_line[m_ml_index] = 0xff; 
 	}
+	else
+	{
+		m_matrix_line[m_ml_index] = read_videoram(adr);
+	}
+
+	m_color_line[m_ml_index] = read_colorram(adr & 0x03ff);
 }
 
 // Graphics data access
-inline void mos6566_device::vic2_graphics_access()
+inline void mos6566_device::graphics_access()
 {
 	if (m_display_state == 1)
 	{
@@ -435,7 +472,7 @@ inline void mos6566_device::vic2_graphics_access()
 	}
 }
 
-inline void mos6566_device::vic2_draw_background()
+inline void mos6566_device::draw_background()
 {
 	if (m_draw_this_line)
 	{
@@ -471,7 +508,7 @@ inline void mos6566_device::vic2_draw_background()
 	}
 }
 
-inline void mos6566_device::vic2_draw_mono( UINT16 p, UINT8 c0, UINT8 c1 )
+inline void mos6566_device::draw_mono( UINT16 p, UINT8 c0, UINT8 c1 )
 {
 	UINT8 c[2];
 	UINT8 data = m_gfx_data;
@@ -497,7 +534,7 @@ inline void mos6566_device::vic2_draw_mono( UINT16 p, UINT8 c0, UINT8 c1 )
 	m_fore_coll_buf[p + 0] = data & 1;
 }
 
-inline void mos6566_device::vic2_draw_multi( UINT16 p, UINT8 c0, UINT8 c1, UINT8 c2, UINT8 c3 )
+inline void mos6566_device::draw_multi( UINT16 p, UINT8 c0, UINT8 c1, UINT8 c2, UINT8 c3 )
 {
 	UINT8 c[4];
 	UINT8 data = m_gfx_data;
@@ -552,7 +589,10 @@ mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, 
 	  device_execute_interface(mconfig, *this),
 	  m_icount(0),
 	  m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6566_videoram_map)),
-	  m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6566_colorram_map))
+	  m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6566_colorram_map)),
+	  m_phi0(1),
+	  m_ba(ASSERT_LINE),
+	  m_aec(ASSERT_LINE)
 {
 }
 
@@ -597,7 +637,10 @@ void mos6566_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		// TODO
+		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
+		memset(&m_out_ba_cb, 0, sizeof(m_out_ba_cb));
+		memset(&m_out_aec_cb, 0, sizeof(m_out_aec_cb));
+		memset(&m_out_k_cb, 0, sizeof(m_out_k_cb));
     }
 }
 
@@ -613,7 +656,8 @@ void mos6566_device::device_start()
 
 	// resolve callbacks
 	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_rdy_func.resolve(m_out_rdy_cb, *this);
+	m_out_ba_func.resolve(m_out_ba_cb, *this);
+	m_out_aec_func.resolve(m_out_aec_cb, *this);
 	m_out_k_func.resolve(m_out_k_cb, *this);
 
 	m_cpu = machine().device<cpu_device>(m_cpu_tag);
@@ -678,7 +722,6 @@ void mos6566_device::device_start()
 	save_item(NAME(m_spritemulti));
 
 	save_item(NAME(m_rasterline));
-	save_item(NAME(m_cycles_counter));
 	save_item(NAME(m_cycle));
 	save_item(NAME(m_raster_x));
 	save_item(NAME(m_graphic_x));
@@ -744,8 +787,8 @@ void mos6566_device::device_reset()
 	// from 0 to 311 (0 first, PAL) or from 0 to 261 (? first, NTSC 6567R56A) or from 0 to 262 (? first, NTSC 6567R8)
 	m_rasterline = 0; // VIC2_LINES - 1;
 
-	m_cycles_counter = -1;
-	m_cycle = 63;
+	m_cycle = 14;
+	m_raster_x = 0x004;
 
 	m_on = 1;
 
@@ -805,6 +848,15 @@ void mos6566_device::device_reset()
 		m_colors[i] = 0;
 		m_spritemulti[i] = 0;
 	}
+
+	m_phi0 = 1;
+	m_ba = CLEAR_LINE;
+	m_aec = CLEAR_LINE;
+	m_aec_delay = 0xff;
+	m_rdy_cycles = 0;
+
+	set_ba(ASSERT_LINE);
+	set_aec(ASSERT_LINE);
 }
 
 
@@ -816,49 +868,45 @@ void mos6566_device::execute_run()
 {
 	do
 	{
+		UINT8 cpu_cycles = m_cpu->total_cycles() & 0xff;
+		UINT8 vic_cycles = total_cycles() & 0xff;
+
+		m_phi0 = 0;
+
+		m_aec_delay <<= 1;
+		m_aec_delay |= m_ba;
+
+		set_aec(CLEAR_LINE);
+
 		int i;
 		UINT8 mask;
-		m_cycles_counter++;
+
+		if (m_rasterline == VIC2_FIRST_DMA_LINE)
+			m_bad_lines_enabled = SCREENON;
+
+		m_is_bad_line = ((m_rasterline >= VIC2_FIRST_DMA_LINE) && (m_rasterline <= VIC2_LAST_DMA_LINE) &&
+			((m_rasterline & 0x07) == YSCROLL) && m_bad_lines_enabled);
 
 		switch (m_cycle)
 		{
-
 		// Sprite 3, raster counter, raster IRQ, bad line
 		case 1:
 			if (m_rasterline == (VIC2_LINES - 1))
 			{
 				m_vblanking = 1;
-
-	//          if (LIGHTPEN_BUTTON)
-				{
-//					m_reg[0x13] = VIC2_X_VALUE;
-//					m_reg[0x14] = VIC2_Y_VALUE;
-				}
-				vic2_set_interrupt(8);
 			}
 			else
 			{
 				m_rasterline++;
-
-				if (m_rasterline == VIC2_FIRST_DMA_LINE)
-					m_bad_lines_enabled = SCREENON;
-
-				m_is_bad_line = ((m_rasterline >= VIC2_FIRST_DMA_LINE) && (m_rasterline <= VIC2_LAST_DMA_LINE) &&
-							((m_rasterline & 0x07) == VERTICALPOS) && m_bad_lines_enabled);
 
 				m_draw_this_line = ((VIC2_RASTER_2_EMU(m_rasterline) >= VIC2_RASTER_2_EMU(VIC2_FIRST_DISP_LINE)) &&
 							(VIC2_RASTER_2_EMU(m_rasterline ) <= VIC2_RASTER_2_EMU(VIC2_LAST_DISP_LINE)));
 			}
 
 			m_border_on_sample[0] = m_border_on;
-			vic2_spr_ptr_access(3);
-			vic2_spr_data_access(3, 0);
-			vic2_display_if_bad_line();
-
-			if (m_spr_dma_on & 0x08)
-				vic2_suspend_cpu();
-			else
-				vic2_resume_cpu();
+			spr_ptr_access(3);
+			spr_data_access(3, 0);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
@@ -875,152 +923,142 @@ void mos6566_device::execute_run()
 				// Trigger raster IRQ if IRQ in line 0
 				if (RASTERLINE == 0)
 				{
-					vic2_set_interrupt(1);
+					set_interrupt(IRQ_RST);
 				}
 			}
 
 			if (m_rasterline == RASTERLINE)
 			{
-				vic2_set_interrupt(1);
+				set_interrupt(IRQ_RST);
 			}
 
 			m_graphic_x = VIC2_X_2_EMU(0);
 
-			vic2_spr_data_access(3, 1);
-			vic2_spr_data_access(3, 2);
-			vic2_display_if_bad_line();
+			spr_data_access(3, 1);
+			spr_data_access(3, 2);
+			display_if_bad_line();
+
+			spr_ba(5);
 
 			m_cycle++;
 			break;
 
 		// Sprite 4
 		case 3:
-			vic2_spr_ptr_access(4);
-			vic2_spr_data_access(4, 0);
-			vic2_display_if_bad_line();
-
-			if (m_spr_dma_on & 0x10)
-				vic2_suspend_cpu();
-			else
-				vic2_resume_cpu();
+			spr_ptr_access(4);
+			spr_data_access(4, 0);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 4
 		case 4:
-			vic2_spr_data_access(4, 1);
-			vic2_spr_data_access(4, 2);
-			vic2_display_if_bad_line();
+			spr_data_access(4, 1);
+			spr_data_access(4, 2);
+			display_if_bad_line();
+
+			spr_ba(6);
 
 			m_cycle++;
 			break;
 
 		// Sprite 5
 		case 5:
-			vic2_spr_ptr_access(5);
-			vic2_spr_data_access(5, 0);
-			vic2_display_if_bad_line();
-
-			if (m_spr_dma_on & 0x20)
-				vic2_suspend_cpu();
-			else
-				vic2_resume_cpu();
+			spr_ptr_access(5);
+			spr_data_access(5, 0);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 5
 		case 6:
-			vic2_spr_data_access(5, 1);
-			vic2_spr_data_access(5, 2);
-			vic2_display_if_bad_line();
+			spr_data_access(5, 1);
+			spr_data_access(5, 2);
+			display_if_bad_line();
+
+			spr_ba(7);
 
 			m_cycle++;
 			break;
 
 		// Sprite 6
 		case 7:
-			vic2_spr_ptr_access(6);
-			vic2_spr_data_access(6, 0);
-			vic2_display_if_bad_line();
-
-			if (m_spr_dma_on & 0x40)
-				vic2_suspend_cpu();
-			else
-				vic2_resume_cpu();
+			spr_ptr_access(6);
+			spr_data_access(6, 0);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 6
 		case 8:
-			vic2_spr_data_access(6, 1);
-			vic2_spr_data_access(6, 2);
-			vic2_display_if_bad_line();
+			spr_data_access(6, 1);
+			spr_data_access(6, 2);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 7
 		case 9:
-			vic2_spr_ptr_access(7);
-			vic2_spr_data_access(7, 0);
-			vic2_display_if_bad_line();
-
-			if (m_spr_dma_on & 0x80)
-				vic2_suspend_cpu();
-			else
-				vic2_resume_cpu();
+			spr_ptr_access(7);
+			spr_data_access(7, 0);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 7
 		case 10:
-			vic2_spr_data_access(7, 1);
-			vic2_spr_data_access(7, 2);
-			vic2_display_if_bad_line();
+			spr_data_access(7, 1);
+			spr_data_access(7, 2);
+			display_if_bad_line();
+
+			set_ba(ASSERT_LINE);
 
 			m_cycle++;
 			break;
 
 		// Refresh
 		case 11:
-			vic2_refresh_access();
-			vic2_display_if_bad_line();
-
-			vic2_resume_cpu();
+			refresh_access();
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Refresh, fetch if bad line
 		case 12:
-			vic2_refresh_access();
-			vic2_fetch_if_bad_line();
+			bad_line_ba();
+
+			refresh_access();
+			fetch_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Refresh, fetch if bad line, raster_x
 		case 13:
-			vic2_draw_background();
-			vic2_sample_border();
-			vic2_refresh_access();
-			vic2_fetch_if_bad_line();
+			bad_line_ba();
 
-			m_raster_x = 0xfffc;
+			draw_background();
+			sample_border();
+			refresh_access();
+			fetch_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Refresh, fetch if bad line, RC, VC
 		case 14:
-			vic2_draw_background();
-			vic2_sample_border();
-			vic2_refresh_access();
-			vic2_rc_if_bad_line();
+			bad_line_ba();
+
+			draw_background();
+			sample_border();
+			refresh_access();
+			rc_if_bad_line();
 
 			m_vc = m_vc_base;
 
@@ -1029,30 +1067,31 @@ void mos6566_device::execute_run()
 
 		// Refresh, fetch if bad line, sprite y expansion
 		case 15:
-			vic2_draw_background();
-			vic2_sample_border();
-			vic2_refresh_access();
-			vic2_fetch_if_bad_line();
+			bad_line_ba();
+
+			draw_background();
+			sample_border();
+			refresh_access();
+			fetch_if_bad_line();
 
 			for (i = 0; i < 8; i++)
 				if (m_spr_exp_y & (1 << i))
 					m_mc_base[i] += 2;
 
-			if (m_is_bad_line)
-				vic2_suspend_cpu();
-
 			m_ml_index = 0;
-			vic2_matrix_access();
+			matrix_access();
 
 			m_cycle++;
 			break;
 
 		// Graphics, sprite y expansion, sprite DMA
 		case 16:
-			vic2_draw_background();
-			vic2_sample_border();
-			vic2_graphics_access();
-			vic2_fetch_if_bad_line();
+			bad_line_ba();
+
+			draw_background();
+			sample_border();
+			graphics_access();
+			fetch_if_bad_line();
 
 			mask = 1;
 			for (i = 0; i < 8; i++, mask <<= 1)
@@ -1063,13 +1102,15 @@ void mos6566_device::execute_run()
 					m_spr_dma_on &= ~mask;
 			}
 
-			vic2_matrix_access();
+			matrix_access();
 
 			m_cycle++;
 			break;
 
 		// Graphics, check border
 		case 17:
+			bad_line_ba();
+
 			if (COLUMNS40)
 			{
 				if (m_rasterline == m_dy_stop)
@@ -1093,18 +1134,20 @@ void mos6566_device::execute_run()
 			// Second sample of border state
 			m_border_on_sample[1] = m_border_on;
 
-			vic2_draw_background();
-			vic2_draw_graphics();
-			vic2_sample_border();
-			vic2_graphics_access();
-			vic2_fetch_if_bad_line();
-			vic2_matrix_access();
+			draw_background();
+			draw_graphics();
+			sample_border();
+			graphics_access();
+			fetch_if_bad_line();
+			matrix_access();
 
 			m_cycle++;
 			break;
 
 		// Check border
 		case 18:
+			bad_line_ba();
+
 			if (!COLUMNS40)
 			{
 				if (m_rasterline == m_dy_stop)
@@ -1166,11 +1209,11 @@ void mos6566_device::execute_run()
 		case 52:
 		case 53:
 		case 54:
-			vic2_draw_graphics();
-			vic2_sample_border();
-			vic2_graphics_access();
-			vic2_fetch_if_bad_line();
-			vic2_matrix_access();
+			draw_graphics();
+			sample_border();
+			graphics_access();
+			fetch_if_bad_line();
+			matrix_access();
 			m_last_char_data = m_char_data;
 
 			m_cycle++;
@@ -1178,10 +1221,13 @@ void mos6566_device::execute_run()
 
 		// Graphics, sprite y expansion, sprite DMA
 		case 55:
-			vic2_draw_graphics();
-			vic2_sample_border();
-			vic2_graphics_access();
-			vic2_display_if_bad_line();
+			if (m_is_bad_line)
+				set_ba(ASSERT_LINE);
+
+			draw_graphics();
+			sample_border();
+			graphics_access();
+			display_if_bad_line();
 
 			// sprite y expansion
 			mask = 1;
@@ -1189,9 +1235,7 @@ void mos6566_device::execute_run()
 				if (SPRITE_Y_EXPAND (i))
 					m_spr_exp_y ^= mask;
 
-			vic2_check_sprite_dma();
-
-			vic2_resume_cpu();
+			check_sprite_dma();
 
 			m_cycle++;
 			break;
@@ -1204,11 +1248,11 @@ void mos6566_device::execute_run()
 			// Fourth sample of border state
 			m_border_on_sample[3] = m_border_on;
 
-			vic2_draw_graphics();
-			vic2_sample_border();
-			vic2_idle_access();
-			vic2_display_if_bad_line();
-			vic2_check_sprite_dma();
+			draw_graphics();
+			sample_border();
+			idle_access();
+			display_if_bad_line();
+			check_sprite_dma();
 
 			m_cycle++;
 			break;
@@ -1231,38 +1275,42 @@ void mos6566_device::execute_run()
 				if ((m_spr_disp_on & mask) && !(m_spr_dma_on & mask))
 					m_spr_disp_on &= ~mask;
 
-			vic2_draw_background();
-			vic2_sample_border();
-			vic2_idle_access();
-			vic2_display_if_bad_line();
+			draw_background();
+			sample_border();
+			idle_access();
+			display_if_bad_line();
+
+			spr_ba(0);
 
 			m_cycle++;
 			break;
 
 		// for NTSC 6567R8
 		case 58:
-			vic2_draw_background();
-			vic2_sample_border();
-			vic2_idle_access();
-			vic2_display_if_bad_line();
+			draw_background();
+			sample_border();
+			idle_access();
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// for NTSC 6567R8
 		case 59:
-			vic2_draw_background();
-			vic2_sample_border();
-			vic2_idle_access();
-			vic2_display_if_bad_line();
+			draw_background();
+			sample_border();
+			idle_access();
+			display_if_bad_line();
+
+			spr_ba(1);
 
 			m_cycle++;
 			break;
 
 		// Sprite 0, sprite DMA, MC, RC
 		case 60:
-			vic2_draw_background();
-			vic2_sample_border();
+			draw_background();
+			sample_border();
 
 			mask = 1;
 			for (i = 0; i < 8; i++, mask <<= 1)
@@ -1272,8 +1320,8 @@ void mos6566_device::execute_run()
 					m_spr_disp_on |= mask;
 			}
 
-			vic2_spr_ptr_access(0);
-			vic2_spr_data_access(0, 0);
+			spr_ptr_access(0);
+			spr_data_access(0, 0);
 
 			if (m_rc == 7)
 			{
@@ -1287,33 +1335,30 @@ void mos6566_device::execute_run()
 				m_rc = (m_rc + 1) & 7;
 			}
 
-			if (m_spr_dma_on & 0x01)
-				vic2_suspend_cpu();
-			else
-				vic2_resume_cpu();
-
 			m_cycle++;
 			break;
 
 		// Sprite 0
 		case 61:
-			vic2_draw_background();
-			vic2_sample_border();
-			vic2_spr_data_access(0, 1);
-			vic2_spr_data_access(0, 2);
-			vic2_display_if_bad_line();
+			draw_background();
+			sample_border();
+			spr_data_access(0, 1);
+			spr_data_access(0, 2);
+			display_if_bad_line();
+
+			spr_ba(2);
 
 			m_cycle++;
 			break;
 
 		// Sprite 1, draw
 		case 62:
-			vic2_draw_background();
-			vic2_sample_border();
+			draw_background();
+			sample_border();
 
 			if (m_draw_this_line)
 			{
-				vic2_draw_sprites();
+				draw_sprites();
 
 				if (m_border_on_sample[0])
 					for (i = 0; i < 4; i++)
@@ -1338,46 +1383,38 @@ void mos6566_device::execute_run()
 				}
 			}
 
-			vic2_spr_ptr_access(1);
-			vic2_spr_data_access(1, 0);
-			vic2_display_if_bad_line();
-
-			if (m_spr_dma_on & 0x02)
-				vic2_suspend_cpu();
-			else
-				vic2_resume_cpu();
+			spr_ptr_access(1);
+			spr_data_access(1, 0);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 1
 		case 63:
-			vic2_spr_data_access(1, 1);
-			vic2_spr_data_access(1, 2);
-			vic2_display_if_bad_line();
+			spr_data_access(1, 1);
+			spr_data_access(1, 2);
+			display_if_bad_line();
+
+			spr_ba(3);
 
 			m_cycle++;
 			break;
 
 		// Sprite 2
 		case 64:
-			vic2_spr_ptr_access(2);
-			vic2_spr_data_access(2, 0);
-			vic2_display_if_bad_line();
-
-			if (m_spr_dma_on & 0x04)
-				vic2_suspend_cpu();
-			else
-				vic2_resume_cpu();
+			spr_ptr_access(2);
+			spr_data_access(2, 0);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 2
 		case 65:
-			vic2_spr_data_access(2, 1);
-			vic2_spr_data_access(2, 2);
-			vic2_display_if_bad_line();
+			spr_data_access(2, 1);
+			spr_data_access(2, 2);
+			display_if_bad_line();
 
 			if (m_rasterline == m_dy_stop)
 				m_ud_border_on = 1;
@@ -1385,11 +1422,27 @@ void mos6566_device::execute_run()
 				if (SCREENON && (m_rasterline == m_dy_start))
 					m_ud_border_on = 0;
 
+			spr_ba(4);
+
 			// Last cycle
 			m_cycle = 1;
 		}
+		
+		m_phi0 = 1;
+		set_aec(BIT(m_aec_delay, 2));
+
+		m_out_ba_func(m_ba);
+		m_out_aec_func(m_aec);
 
 		m_raster_x += 8;
+		if (m_raster_x == 0x1fc) m_raster_x = 0x004;
+
+		if ((cpu_cycles == vic_cycles) && (m_rdy_cycles > 0))
+		{
+			m_cpu->spin_until_time(m_cpu->cycles_to_attotime(m_rdy_cycles));
+			m_rdy_cycles = 0;
+		}
+
 		m_icount--;
 	} while (m_icount > 0);
 }
@@ -1403,91 +1456,53 @@ void mos6569_device::execute_run()
 {
 	do
 	{
+		UINT8 cpu_cycles = m_cpu->total_cycles() & 0xff;
+		UINT8 vic_cycles = total_cycles() & 0xff;
+
+		m_phi0 = 0;
+
+		m_aec_delay <<= 1;
+		m_aec_delay |= m_ba;
+
+		set_aec(CLEAR_LINE);
+
 		int i;
 		UINT8 mask;
-		//static int adjust[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-		UINT8 cpu_cycles = m_cpu->total_cycles() & 0xff;
-		UINT8 vic_cycles = (m_cycles_counter + 1) & 0xff;
-		m_cycles_counter++;
+		if ((m_rasterline == VIC2_FIRST_DMA_LINE) && !m_bad_lines_enabled)
+			m_bad_lines_enabled = SCREENON;
 
-	//  printf("%02x %02x %02x\n",cpu_cycles,vic_cycles,m_rdy_cycles);
-	#if 0
-	if (machine.input().code_pressed(KEYCODE_X))
-	{
-	if (machine.input().code_pressed_once(KEYCODE_Q)) adjust[1]++;
-	if (machine.input().code_pressed_once(KEYCODE_W)) adjust[2]++;
-	if (machine.input().code_pressed_once(KEYCODE_E)) adjust[3]++;
-	if (machine.input().code_pressed_once(KEYCODE_R)) adjust[4]++;
-	if (machine.input().code_pressed_once(KEYCODE_T)) adjust[5]++;
-	if (machine.input().code_pressed_once(KEYCODE_Y)) adjust[6]++;
-	if (machine.input().code_pressed_once(KEYCODE_U)) adjust[7]++;
-	if (machine.input().code_pressed_once(KEYCODE_I)) adjust[8]++;
-	if (machine.input().code_pressed_once(KEYCODE_A)) adjust[1]--;
-	if (machine.input().code_pressed_once(KEYCODE_S)) adjust[2]--;
-	if (machine.input().code_pressed_once(KEYCODE_D)) adjust[3]--;
-	if (machine.input().code_pressed_once(KEYCODE_F)) adjust[4]--;
-	if (machine.input().code_pressed_once(KEYCODE_G)) adjust[5]--;
-	if (machine.input().code_pressed_once(KEYCODE_H)) adjust[6]--;
-	if (machine.input().code_pressed_once(KEYCODE_J)) adjust[7]--;
-	if (machine.input().code_pressed_once(KEYCODE_K)) adjust[8]--;
-	if (machine.input().code_pressed_once(KEYCODE_C)) adjust[0]++;
-	if (machine.input().code_pressed_once(KEYCODE_V)) adjust[0]--;
-	if (machine.input().code_pressed_once(KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:%02x 4:%02x 5:%02x 6:%02x 7:%02x 8:%02x\n",
-	                                adjust[0],adjust[1],adjust[2],adjust[3],adjust[4],adjust[5],adjust[6],adjust[7],adjust[8]);
-	}
-	#define adjust(x) adjust[x]
-	#else
-	#define adjust(x) 0
-	#endif
+		m_is_bad_line = ((m_rasterline >= VIC2_FIRST_DMA_LINE) && (m_rasterline <= VIC2_LAST_DMA_LINE) &&
+			((m_rasterline & 0x07) == YSCROLL) && m_bad_lines_enabled);
 
-		switch(m_cycle)
+		switch (m_cycle)
 		{
-
 		// Sprite 3, raster counter, raster IRQ, bad line
 		case 1:
 			if (m_rasterline == (VIC2_LINES - 1))
 			{
 				m_vblanking = 1;
-
-	//          if (LIGHTPEN_BUTTON)
-				{
-//					m_reg[0x13] = VIC2_X_VALUE;
-//					m_reg[0x14] = VIC2_Y_VALUE;
-				}
-				vic2_set_interrupt(8);
 			}
 			else
 			{
 				m_rasterline++;
-
-				if (m_rasterline == VIC2_FIRST_DMA_LINE)
-					m_bad_lines_enabled = SCREENON;
-
-				m_is_bad_line = ((m_rasterline >= VIC2_FIRST_DMA_LINE) && (m_rasterline <= VIC2_LAST_DMA_LINE) &&
-							((m_rasterline & 0x07) == VERTICALPOS) && m_bad_lines_enabled);
 
 				m_draw_this_line =	((VIC2_RASTER_2_EMU(m_rasterline) >= VIC2_RASTER_2_EMU(VIC2_FIRST_DISP_LINE)) &&
 							(VIC2_RASTER_2_EMU(m_rasterline ) <= VIC2_RASTER_2_EMU(VIC2_LAST_DISP_LINE)));
 			}
 
 			m_border_on_sample[0] = m_border_on;
-			vic2_spr_ptr_access(3);
-			vic2_spr_data_access(3, 0);
-			vic2_display_if_bad_line();
-
-			if (m_spr_dma_on & 0x08)
-				vic2_suspend_cpu();
-			else
-				vic2_resume_cpu();
-
-			if (m_spr_dma_on & 0x08) m_rdy_cycles += (2 + adjust(1));
+			spr_ptr_access(3);
+			spr_data_access(3, 0);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 3
 		case 2:
+			spr_ba(5);
+
 			if (m_vblanking)
 			{
 				// Vertical blank, reset counters
@@ -1498,218 +1513,193 @@ void mos6569_device::execute_run()
 				// Trigger raster IRQ if IRQ in line 0
 				if (RASTERLINE == 0)
 				{
-					vic2_set_interrupt(1);
+					set_interrupt(IRQ_RST);
 				}
 			}
 
 			if (m_rasterline == RASTERLINE)
 			{
-				vic2_set_interrupt(1);
+				set_interrupt(IRQ_RST);
 			}
 
 			m_graphic_x = VIC2_X_2_EMU(0);
 
-			vic2_spr_data_access(3, 1);
-			vic2_spr_data_access(3, 2);
-			vic2_display_if_bad_line();
+			spr_data_access(3, 1);
+			spr_data_access(3, 2);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 4
 		case 3:
-			vic2_spr_ptr_access(4);
-			vic2_spr_data_access(4, 0);
-			vic2_display_if_bad_line();
-
-			if (m_spr_dma_on & 0x10)
-				vic2_suspend_cpu();
-			else
-				vic2_resume_cpu();
-
-			if (m_spr_dma_on & 0x10) m_rdy_cycles += (2 + adjust(2));
+			spr_ptr_access(4);
+			spr_data_access(4, 0);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 4
 		case 4:
-			vic2_spr_data_access(4, 1);
-			vic2_spr_data_access(4, 2);
-			vic2_display_if_bad_line();
+			spr_ba(6);
+
+			spr_data_access(4, 1);
+			spr_data_access(4, 2);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 5
 		case 5:
-			vic2_spr_ptr_access(5);
-			vic2_spr_data_access(5, 0);
-			vic2_display_if_bad_line();
-
-			if (m_spr_dma_on & 0x20)
-				vic2_suspend_cpu();
-			else
-				vic2_resume_cpu();
-
-			if (m_spr_dma_on & 0x20) m_rdy_cycles += (2 + adjust(3));
+			spr_ptr_access(5);
+			spr_data_access(5, 0);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 5
 		case 6:
-			vic2_spr_data_access(5, 1);
-			vic2_spr_data_access(5, 2);
-			vic2_display_if_bad_line();
+			spr_ba(7);
+
+			spr_data_access(5, 1);
+			spr_data_access(5, 2);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 6
 		case 7:
-			vic2_spr_ptr_access(6);
-			vic2_spr_data_access(6, 0);
-			vic2_display_if_bad_line();
-
-			if (m_spr_dma_on & 0x40)
-				vic2_suspend_cpu();
-			else
-				vic2_resume_cpu();
-
-			if (m_spr_dma_on & 0x40) m_rdy_cycles += (2 + adjust(4));
+			spr_ptr_access(6);
+			spr_data_access(6, 0);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 6
 		case 8:
-			vic2_spr_data_access(6, 1);
-			vic2_spr_data_access(6, 2);
-			vic2_display_if_bad_line();
+			spr_data_access(6, 1);
+			spr_data_access(6, 2);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 7
 		case 9:
-			vic2_spr_ptr_access(7);
-			vic2_spr_data_access(7, 0);
-			vic2_display_if_bad_line();
-
-			if (m_spr_dma_on & 0x80)
-				vic2_suspend_cpu();
-			else
-				vic2_resume_cpu();
-
-			if (m_spr_dma_on & 0x80) m_rdy_cycles += (2 + adjust(5));
+			spr_ptr_access(7);
+			spr_data_access(7, 0);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 7
 		case 10:
-			vic2_spr_data_access(7, 1);
-			vic2_spr_data_access(7, 2);
-			vic2_display_if_bad_line();
+			spr_data_access(7, 1);
+			spr_data_access(7, 2);
+			display_if_bad_line();
+
+			set_ba(ASSERT_LINE);
 
 			m_cycle++;
 			break;
 
 		// Refresh
 		case 11:
-			vic2_refresh_access();
-			vic2_display_if_bad_line();
-
-			vic2_resume_cpu();
+			refresh_access();
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Refresh, fetch if bad line
 		case 12:
-			vic2_refresh_access();
-			vic2_fetch_if_bad_line();
+			bad_line_ba();
+
+			refresh_access();
+			fetch_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Refresh, fetch if bad line, raster_x
 		case 13:
-			vic2_draw_background();
-			vic2_sample_border();
-			vic2_refresh_access();
-			vic2_fetch_if_bad_line();
+			bad_line_ba();
 
-			m_raster_x = 0xfffc;
-
-//			if ((m_in_rdy_workaround_func(0) == 0 ) && (m_is_bad_line))
-//				m_rdy_cycles += (43+adjust(0));
+			draw_background();
+			sample_border();
+			refresh_access();
+			fetch_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Refresh, fetch if bad line, RC, VC
 		case 14:
-			vic2_draw_background();
-			vic2_sample_border();
-			vic2_refresh_access();
-			vic2_rc_if_bad_line();
+			bad_line_ba();
+
+			draw_background();
+			sample_border();
+			refresh_access();
+			rc_if_bad_line();
 
 			m_vc = m_vc_base;
-
-//			if ((m_in_rdy_workaround_func(0) == 1 ) && (m_is_bad_line))
-//				m_rdy_cycles += (42+adjust(0));
 
 			m_cycle++;
 			break;
 
 		// Refresh, fetch if bad line, sprite y expansion
 		case 15:
-			vic2_draw_background();
-			vic2_sample_border();
-			vic2_refresh_access();
-			vic2_fetch_if_bad_line();
+			bad_line_ba();
+
+			draw_background();
+			sample_border();
+			refresh_access();
+			fetch_if_bad_line();
 
 			for (i = 0; i < 8; i++)
 				if (m_spr_exp_y & (1 << i))
 					m_mc_base[i] += 2;
 
 			m_ml_index = 0;
-			vic2_matrix_access();
 
-//			if ((m_in_rdy_workaround_func(0) == 2 ) && (m_is_bad_line))
-//				m_rdy_cycles += (41+adjust(0));
+			matrix_access();
 
 			m_cycle++;
 			break;
 
 		// Graphics, sprite y expansion, sprite DMA
 		case 16:
-			vic2_draw_background();
-			vic2_sample_border();
-			vic2_graphics_access();
-			vic2_fetch_if_bad_line();
+			bad_line_ba();
+
+			draw_background();
+			sample_border();
+			graphics_access();
+			fetch_if_bad_line();
 
 			mask = 1;
 			for (i = 0; i < 8; i++, mask <<= 1)
 			{
-				if (m_spr_exp_y & mask)
+				if (m_spr_exp_y & (1 << i))
 					m_mc_base[i]++;
 				if ((m_mc_base[i] & 0x3f) == 0x3f)
 					m_spr_dma_on &= ~mask;
 			}
 
-			vic2_matrix_access();
-
-//			if ((m_in_rdy_workaround_func(0) == 3 ) && (m_is_bad_line))
-//				m_rdy_cycles += (40+adjust(0));
+			matrix_access();
 
 			m_cycle++;
 			break;
 
 		// Graphics, check border
 		case 17:
+			bad_line_ba();
+
 			if (COLUMNS40)
 			{
 				if (m_rasterline == m_dy_stop)
@@ -1732,21 +1722,20 @@ void mos6569_device::execute_run()
 			// Second sample of border state
 			m_border_on_sample[1] = m_border_on;
 
-			vic2_draw_background();
-			vic2_draw_graphics();
-			vic2_sample_border();
-			vic2_graphics_access();
-			vic2_fetch_if_bad_line();
-			vic2_matrix_access();
-
-//			if ((m_in_rdy_workaround_func(0) == 4 ) && (m_is_bad_line))
-//				m_rdy_cycles += (40+adjust(0));
+			draw_background();
+			draw_graphics();
+			sample_border();
+			graphics_access();
+			fetch_if_bad_line();
+			matrix_access();
 
 			m_cycle++;
 			break;
 
 		// Check border
 		case 18:
+			bad_line_ba();
+
 			if (!COLUMNS40)
 			{
 				if (m_rasterline == m_dy_stop)
@@ -1807,11 +1796,13 @@ void mos6569_device::execute_run()
 		case 52:
 		case 53:
 		case 54:
-			vic2_draw_graphics();
-			vic2_sample_border();
-			vic2_graphics_access();
-			vic2_fetch_if_bad_line();
-			vic2_matrix_access();
+			bad_line_ba();
+
+			draw_graphics();
+			sample_border();
+			graphics_access();
+			fetch_if_bad_line();
+			matrix_access();
 			m_last_char_data = m_char_data;
 
 			m_cycle++;
@@ -1819,10 +1810,13 @@ void mos6569_device::execute_run()
 
 		// Graphics, sprite y expansion, sprite DMA
 		case 55:
-			vic2_draw_graphics();
-			vic2_sample_border();
-			vic2_graphics_access();
-			vic2_display_if_bad_line();
+			if (m_is_bad_line)
+				set_ba(ASSERT_LINE);
+
+			draw_graphics();
+			sample_border();
+			graphics_access();
+			display_if_bad_line();
 
 			// sprite y expansion
 			mask = 1;
@@ -1830,10 +1824,10 @@ void mos6569_device::execute_run()
 				if (SPRITE_Y_EXPAND (i))
 					m_spr_exp_y ^= mask;
 
-			vic2_check_sprite_dma();
+			check_sprite_dma();
 
-			vic2_resume_cpu();
-
+			spr_ba(0);
+	
 			m_cycle++;
 			break;
 
@@ -1845,17 +1839,19 @@ void mos6569_device::execute_run()
 			// Fourth sample of border state
 			m_border_on_sample[3] = m_border_on;
 
-			vic2_draw_graphics();
-			vic2_sample_border();
-			vic2_idle_access();
-			vic2_display_if_bad_line();
-			vic2_check_sprite_dma();
+			draw_graphics();
+			sample_border();
+			idle_access();
+			display_if_bad_line();
+			check_sprite_dma();
 
 			m_cycle++;
 			break;
 
 		// Check border, sprites
 		case 57:
+			spr_ba(1);
+
 			if (COLUMNS40)
 				m_border_on = 1;
 
@@ -1872,18 +1868,18 @@ void mos6569_device::execute_run()
 				if ((m_spr_disp_on & mask) && !(m_spr_dma_on & mask))
 					m_spr_disp_on &= ~mask;
 
-			vic2_draw_background();
-			vic2_sample_border();
-			vic2_idle_access();
-			vic2_display_if_bad_line();
+			draw_background();
+			sample_border();
+			idle_access();
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 0, sprite DMA, MC, RC
 		case 58:
-			vic2_draw_background();
-			vic2_sample_border();
+			draw_background();
+			sample_border();
 
 			mask = 1;
 			for (i = 0; i < 8; i++, mask <<= 1)
@@ -1893,8 +1889,8 @@ void mos6569_device::execute_run()
 					m_spr_disp_on |= mask;
 			}
 
-			vic2_spr_ptr_access(0);
-			vic2_spr_data_access(0, 0);
+			spr_ptr_access(0);
+			spr_data_access(0, 0);
 
 			if (m_rc == 7)
 			{
@@ -1908,35 +1904,30 @@ void mos6569_device::execute_run()
 				m_rc = (m_rc + 1) & 7;
 			}
 
-			if (m_spr_dma_on & 0x01)
-				vic2_suspend_cpu();
-			else
-				vic2_resume_cpu();
-
-			if (m_spr_dma_on & 0x01) m_rdy_cycles += (2 + adjust(6));
-
 			m_cycle++;
 			break;
 
 		// Sprite 0
 		case 59:
-			vic2_draw_background();
-			vic2_sample_border();
-			vic2_spr_data_access(0, 1);
-			vic2_spr_data_access(0, 2);
-			vic2_display_if_bad_line();
+			spr_ba(2);
+
+			draw_background();
+			sample_border();
+			spr_data_access(0, 1);
+			spr_data_access(0, 2);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 1, draw
 		case 60:
-			vic2_draw_background();
-			vic2_sample_border();
+			draw_background();
+			sample_border();
 
 			if (m_draw_this_line)
 			{
-				vic2_draw_sprites();
+				draw_sprites();
 
 				if (m_border_on_sample[0])
 					for (i = 0; i < 4; i++)
@@ -1961,50 +1952,40 @@ void mos6569_device::execute_run()
 				}
 			}
 
-			vic2_spr_ptr_access(1);
-			vic2_spr_data_access(1, 0);
-			vic2_display_if_bad_line();
-
-			if (m_spr_dma_on & 0x02)
-				vic2_suspend_cpu();
-			else
-				vic2_resume_cpu();
-
-			if (m_spr_dma_on & 0x02) m_rdy_cycles += (2 + adjust(7));
+			spr_ptr_access(1);
+			spr_data_access(1, 0);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 1
 		case 61:
-			vic2_spr_data_access(1, 1);
-			vic2_spr_data_access(1, 2);
-			vic2_display_if_bad_line();
+			spr_ba(3);
+
+			spr_data_access(1, 1);
+			spr_data_access(1, 2);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 2
 		case 62:
-			vic2_spr_ptr_access(2);
-			vic2_spr_data_access(2, 0);
-			vic2_display_if_bad_line();
-
-			if (m_spr_dma_on & 0x04)
-				vic2_suspend_cpu();
-			else
-				vic2_resume_cpu();
-
-			if (m_spr_dma_on & 0x04) m_rdy_cycles += (2 + adjust(8));
+			spr_ptr_access(2);
+			spr_data_access(2, 0);
+			display_if_bad_line();
 
 			m_cycle++;
 			break;
 
 		// Sprite 2
 		case 63:
-			vic2_spr_data_access(2, 1);
-			vic2_spr_data_access(2, 2);
-			vic2_display_if_bad_line();
+			spr_ba(4);
+
+			spr_data_access(2, 1);
+			spr_data_access(2, 2);
+			display_if_bad_line();
 
 			if (m_rasterline == m_dy_stop)
 				m_ud_border_on = 1;
@@ -2015,6 +1996,15 @@ void mos6569_device::execute_run()
 			// Last cycle
 			m_cycle = 1;
 		}
+		
+		m_phi0 = 1;
+		set_aec(BIT(m_aec_delay, 2));
+
+		m_out_ba_func(m_ba);
+		m_out_aec_func(m_aec);
+
+		m_raster_x += 8;
+		if (m_raster_x == 0x1fc) m_raster_x = 0x004;
 
 		if ((cpu_cycles == vic_cycles) && (m_rdy_cycles > 0))
 		{
@@ -2022,17 +2012,16 @@ void mos6569_device::execute_run()
 			m_rdy_cycles = 0;
 		}
 
-		m_raster_x += 8;
 		m_icount--;
 	} while (m_icount > 0);
 }
 
 // Graphics display (8 pixels)
-void mos6566_device::vic2_draw_graphics()
+void mos6566_device::draw_graphics()
 {
 	if (m_draw_this_line == 0)
 	{
-		UINT16 p = m_graphic_x + HORIZONTALPOS;
+		UINT16 p = m_graphic_x + XSCROLL;
 		m_fore_coll_buf[p + 7] = 0;
 		m_fore_coll_buf[p + 6] = 0;
 		m_fore_coll_buf[p + 5] = 0;
@@ -2044,7 +2033,7 @@ void mos6566_device::vic2_draw_graphics()
 	}
 	else if (m_ud_border_on)
 	{
-		UINT16 p = m_graphic_x + HORIZONTALPOS;
+		UINT16 p = m_graphic_x + XSCROLL;
 		m_fore_coll_buf[p + 7] = 0;
 		m_fore_coll_buf[p + 6] = 0;
 		m_fore_coll_buf[p + 5] = 0;
@@ -2053,28 +2042,28 @@ void mos6566_device::vic2_draw_graphics()
 		m_fore_coll_buf[p + 2] = 0;
 		m_fore_coll_buf[p + 1] = 0;
 		m_fore_coll_buf[p + 0] = 0;
-		vic2_draw_background();
+		draw_background();
 	}
 	else
 	{
 		UINT8 tmp_col;
-		UINT16 p = m_graphic_x + HORIZONTALPOS;
+		UINT16 p = m_graphic_x + XSCROLL;
 		switch (GFXMODE)
 		{
 			case 0:
-				vic2_draw_mono(p, m_colors[0], m_color_data & 0x0f);
+				draw_mono(p, m_colors[0], m_color_data & 0x0f);
 				break;
 			case 1:
 				if (m_color_data & 0x08)
-					vic2_draw_multi(p, m_colors[0], m_colors[1], m_colors[2], m_color_data & 0x07);
+					draw_multi(p, m_colors[0], m_colors[1], m_colors[2], m_color_data & 0x07);
 				else
-					vic2_draw_mono(p, m_colors[0], m_color_data & 0x0f);
+					draw_mono(p, m_colors[0], m_color_data & 0x0f);
 				break;
 			case 2:
-				vic2_draw_mono(p, m_char_data & 0x0f, m_char_data >> 4);
+				draw_mono(p, m_char_data & 0x0f, m_char_data >> 4);
 				break;
 			case 3:
-				vic2_draw_multi(p, m_colors[0], m_char_data >> 4, m_char_data & 0x0f, m_color_data & 0x0f);
+				draw_multi(p, m_colors[0], m_char_data >> 4, m_char_data & 0x0f, m_color_data & 0x0f);
 				break;
 			case 4:
 				if (m_char_data & 0x80)
@@ -2087,7 +2076,7 @@ void mos6566_device::vic2_draw_graphics()
 						tmp_col = m_colors[1];
 					else
 						tmp_col = m_colors[0];
-				vic2_draw_mono(p, tmp_col, m_color_data & 0x0f);
+				draw_mono(p, tmp_col, m_color_data & 0x0f);
 				break;
 			case 5:
 				m_bitmap.pix32(VIC2_RASTER_2_EMU(m_rasterline), p + 7) = PALETTE[0];
@@ -2147,7 +2136,7 @@ void mos6566_device::vic2_draw_graphics()
 	}
 }
 
-void mos6566_device::vic2_draw_sprites()
+void mos6566_device::draw_sprites()
 {
 	int i;
 	UINT8 snum, sbit;
@@ -2427,7 +2416,7 @@ void mos6566_device::vic2_draw_sprites()
 	{
 		SPRITE_COLL = spr_coll;
 		if (SPRITE_COLL)
-			vic2_set_interrupt(4);
+			set_interrupt(IRQ_MMC);
 	}
 
 	if (SPRITE_BG_COLL)
@@ -2436,7 +2425,7 @@ void mos6566_device::vic2_draw_sprites()
 	{
 		SPRITE_BG_COLL = gfx_coll;
 		if (SPRITE_BG_COLL)
-			vic2_set_interrupt(2);
+			set_interrupt(IRQ_MBC);
 	}
 }
 
@@ -2485,7 +2474,7 @@ READ8_MEMBER( mos6566_device::read )
 		break;
 
 	case 0x19:							/* interrupt flag register */
-		/* vic2_clear_interrupt(0xf); */
+		/* clear_interrupt(0xf); */
 		val = m_reg[offset] | 0x70;
 		break;
 
@@ -2496,13 +2485,13 @@ READ8_MEMBER( mos6566_device::read )
 	case 0x1e:							/* sprite to sprite collision detect */
 		val = m_reg[offset];
 		m_reg[offset] = 0;
-		vic2_clear_interrupt(4);
+		clear_interrupt(4);
 		break;
 
 	case 0x1f:							/* sprite to background collision detect */
 		val = m_reg[offset];
 		m_reg[offset] = 0;
-		vic2_clear_interrupt(2);
+		clear_interrupt(2);
 		break;
 
 	case 0x20:
@@ -2687,12 +2676,12 @@ WRITE8_MEMBER( mos6566_device::write )
 		break;
 
 	case 0x19:
-		vic2_clear_interrupt(data & 0x0f);
+		clear_interrupt(data & 0x0f);
 		break;
 
 	case 0x1a:							/* irq mask */
 		m_reg[offset] = data;
-		vic2_set_interrupt(0);	// beamrider needs this
+		set_interrupt(0);	// beamrider needs this
 		break;
 
 	case 0x11:
@@ -2790,7 +2779,6 @@ WRITE8_MEMBER( mos6566_device::write )
 			if (BIT(m_reg[offset], 0) != BIT(data, 0))
 			{
 				m_cpu->set_unscaled_clock(clock() << BIT(data, 0));
-				printf("clock %u\n",clock() << BIT(data, 0));
 			}
 			
 			m_reg[offset] = data | 0xfc;
@@ -2831,6 +2819,45 @@ WRITE8_MEMBER( mos6566_device::write )
 
 WRITE_LINE_MEMBER( mos6566_device::lp_w )
 {
+	if (m_lp && !state && !(m_reg[REGISTER_IRQ] & IRQ_LP))
+	{
+		m_reg[REGISTER_LPX] = m_raster_x >> 1;
+		m_reg[REGISTER_LPY] = m_rasterline;
+
+		set_interrupt(IRQ_LP);
+	}
+
+	m_lp = state;
+}
+
+
+//-------------------------------------------------
+//  phi0_r - phi 0
+//-------------------------------------------------
+
+READ_LINE_MEMBER( mos6566_device::phi0_r )
+{
+	return m_phi0;
+}
+
+
+//-------------------------------------------------
+//  ba_r - bus available
+//-------------------------------------------------
+
+READ_LINE_MEMBER( mos6566_device::ba_r )
+{
+	return m_ba;
+}
+
+
+//-------------------------------------------------
+//  aec_r - address enable control
+//-------------------------------------------------
+
+READ_LINE_MEMBER( mos6566_device::aec_r )
+{
+	return m_aec;
 }
 
 

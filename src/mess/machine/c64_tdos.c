@@ -215,9 +215,9 @@ void c64_tdos_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_tdos_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
+UINT8 c64_tdos_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	data = m_exp->cd_r(space, offset, data, ba, roml, romh, io1, io2);
+	data = m_exp->cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
 
 	// TODO
 
@@ -229,10 +229,10 @@ UINT8 c64_tdos_cartridge_device::c64_cd_r(address_space &space, offs_t offset, U
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_tdos_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
+void c64_tdos_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	// TODO
-	m_exp->cd_w(space, offset, data, ba, roml, romh, io1, io2);
+	m_exp->cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
 
@@ -240,9 +240,9 @@ void c64_tdos_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UI
 //  c64_game_r - GAME read
 //-------------------------------------------------
 
-int c64_tdos_cartridge_device::c64_game_r(offs_t offset, int ba, int rw, int hiram)
+int c64_tdos_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
 {
-	return m_exp->game_r(offset, ba, rw, hiram);
+	return m_exp->game_r(offset, sphi2, ba, rw, hiram);
 }
 
 
@@ -250,7 +250,7 @@ int c64_tdos_cartridge_device::c64_game_r(offs_t offset, int ba, int rw, int hir
 //  c64_exrom_r - EXROM read
 //-------------------------------------------------
 
-int c64_tdos_cartridge_device::c64_exrom_r(offs_t offset, int ba, int rw, int hiram)
+int c64_tdos_cartridge_device::c64_exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
 {
-	return m_exp->exrom_r(offset, ba, rw, hiram);
+	return m_exp->exrom_r(offset, sphi2, ba, rw, hiram);
 }

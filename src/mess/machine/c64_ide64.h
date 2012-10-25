@@ -46,10 +46,10 @@ protected:
 	virtual void device_reset();
 
 	// device_c64_expansion_card_interface overrides
-	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2);
-	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2);
-	virtual int c64_game_r(offs_t offset, int ba, int rw, int hiram);
-	virtual int c64_exrom_r(offs_t offset, int ba, int rw, int hiram);
+	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
+	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
+	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
+	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
 
 private:
 	required_device<atmel_29c010_device> m_flash_rom;

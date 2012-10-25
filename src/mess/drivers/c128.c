@@ -2,8 +2,7 @@
 
     TODO:
 
-	- charom address
-	- VDC colors
+	- FROM and some cartridges don't work (IDE64)
     - connect CAPS LOCK to charom A12 on international variants
 	- DCR models won't boot with 1571CR drive
     - fix fast serial
@@ -78,12 +77,12 @@ void c128_state::read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, 
 	int _128_256 = 1;
 	int dmaack = 1;
 	int vicfix = 1;
-	int clk = 1;
+	int sphi2 = m_vic->phi0_r();
 
-	m_game = m_exp->game_r(ca, ba, rw, m_hiram);
-	m_exrom = m_exp->exrom_r(ca, ba, rw, m_hiram);
+	m_game = m_exp->game_r(ca, sphi2, ba, rw, m_hiram);
+	m_exrom = m_exp->exrom_r(ca, sphi2, ba, rw, m_hiram);
 
-	UINT32 input = clk << 26 | m_va14 << 25 | m_charen << 24 |
+	UINT32 input = sphi2 << 26 | m_va14 << 25 | m_charen << 24 |
 		m_hiram << 23 | m_loram << 22 | ba << 21 | VMA5 << 20 | VMA4 << 19 | ms0 << 18 | ms1 << 17 | ms2 << 16 |
 		m_exrom << 15 | m_game << 14 | rw << 13 | aec << 12 | A10 << 11 | A11 << 10 | A12 << 9 | A13 << 8 |
 		A14 << 7 | A15 << 6 | z80io << 5 | m_z80en << 4 | ms3 << 3 | vicfix << 2 | dmaack << 1 | _128_256;
@@ -123,6 +122,7 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 	int sden = 1, dir = 1, gwe = 1, rom1 = 1, rom2 = 1, rom3 = 1, rom4 = 1, charom = 1, colorram = 1, vic = 1,
 		from1 = 1, romh = 1, roml = 1, dwe = 1, ioacc = 1, clrbank = 1, iocs = 1, casenb = 1;
 	int io1 = 1, io2 = 1;
+	int sphi2 = m_vic->phi0_r();
 
 	UINT8 data = 0xff;
 
@@ -138,12 +138,13 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 	}
 	else
 	{
+		ta &= ~0xf00;
 		ta |= (vma & 0xf00);
 		ma = (!m_va15 << 15) | (!m_va14 << 14) | vma;
 		sa = vma & 0xff;
 	}
 
-	offs_t ca = ta | (offset & 0xff);
+	offs_t ca = ta | sa;
 
 	read_pla(offset, ca, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0,
 		&sden, &dir, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic,
@@ -231,7 +232,7 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 		}
 	}
 
-	data = m_exp->cd_r(space, ca, data, ba, roml, romh, io1, io2);
+	data = m_exp->cd_r(space, ca, data, sphi2, ba, roml, romh, io1, io2);
 
 	return m_mmu->read(offset, data);
 }
@@ -247,6 +248,7 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, U
 	int sden = 1, dir = 1, gwe = 1, rom1 = 1, rom2 = 1, rom3 = 1, rom4 = 1, charom = 1, colorram = 1, vic = 1,
 		from1 = 1, romh = 1, roml = 1, dwe = 1, ioacc = 1, clrbank = 1, iocs = 1, casenb = 1;
 	int io1 = 1, io2 = 1;
+	int sphi2 = m_vic->phi0_r();
 
 	offs_t ta = m_mmu->ta_r(offset, aec, &ms0, &ms1, &ms2, &ms3, &cas0, &cas1);
 	offs_t ca = ta | (offset & 0xff);
@@ -313,7 +315,7 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, U
 		}
 	}
 
-	m_exp->cd_w(space, ca, data, ba, roml, romh, io1, io2);
+	m_exp->cd_w(space, ca, data, sphi2, ba, roml, romh, io1, io2);
 
 	m_mmu->write(space, offset, data);
 }
@@ -833,6 +835,7 @@ static MOS8564_INTERFACE( vic_intf )
 	M8502_TAG,
 	DEVCB_DRIVER_LINE_MEMBER(c128_state, vic_irq_w),
 	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(c128_state, vic_k_w)
 };
 
@@ -843,30 +846,28 @@ static MOS8564_INTERFACE( vic_intf )
 
 READ8_MEMBER( c128_state::sid_potx_r )
 {
-	UINT8 cia1_pa = m_cia1->pa_r();
+	UINT8 data = 0xff;
 
-	int sela = BIT(cia1_pa, 6);
-	int selb = BIT(cia1_pa, 7);
-
-	UINT8 data = 0;
-
-	if (sela) data = m_joy1->pot_x_r();
-	if (selb) data = m_joy2->pot_x_r();
+	switch (m_cia1->pa_r() >> 6)
+	{
+	case 1: data = m_joy1->pot_x_r(); break;
+	case 2: data = m_joy2->pot_x_r(); break;
+	case 3: break; // TODO pot1 and pot2 in series
+	}
 
 	return data;
 }
 
 READ8_MEMBER( c128_state::sid_poty_r )
 {
-	UINT8 cia1_pa = m_cia1->pa_r();
+	UINT8 data = 0xff;
 
-	int sela = BIT(cia1_pa, 6);
-	int selb = BIT(cia1_pa, 7);
-
-	UINT8 data = 0;
-
-	if (sela) data = m_joy1->pot_y_r();
-	if (selb) data = m_joy2->pot_y_r();
+	switch (m_cia1->pa_r() >> 6)
+	{
+	case 1: data = m_joy1->pot_y_r(); break;
+	case 2: data = m_joy2->pot_y_r(); break;
+	case 3: break; // TODO pot1 and pot2 in series
+	}
 
 	return data;
 }
@@ -1287,6 +1288,7 @@ static C64_USER_PORT_INTERFACE( user_intf )
 };
 
 
+
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
@@ -1309,6 +1311,15 @@ void c128_state::machine_start()
 
 	// allocate memory
 	m_color_ram.allocate(0x800);
+
+	// initialize memory
+	UINT8 data = 0xff;
+
+	for (offs_t offset = 0; offset < m_ram->size(); offset++)
+	{
+		m_ram->pointer()[offset] = data;
+		if (!(offset % 64)) data ^= 0xff;
+	}
 
 	// state saving
 	save_item(NAME(m_z80en));

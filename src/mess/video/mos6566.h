@@ -289,7 +289,8 @@ struct mos6566_interface
 	const char			*m_cpu_tag;
 
 	devcb_write_line	m_out_irq_cb;
-	devcb_write_line	m_out_rdy_cb;
+	devcb_write_line	m_out_ba_cb;
+	devcb_write_line	m_out_aec_cb;
 
 	devcb_write8		m_out_k_cb;
 };
@@ -313,6 +314,10 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	DECLARE_WRITE_LINE_MEMBER( lp_w );
+	
+	DECLARE_READ_LINE_MEMBER( phi0_r );
+	DECLARE_READ_LINE_MEMBER( ba_r );
+	DECLARE_READ_LINE_MEMBER( aec_r );
 
 	UINT8 bus_r();
 
@@ -346,33 +351,40 @@ protected:
 	const address_space_config		m_videoram_space_config;
 	const address_space_config		m_colorram_space_config;
 
-	inline void vic2_set_interrupt( int mask );
-	inline void vic2_clear_interrupt( int mask );
+	inline void set_interrupt( int mask );
+	inline void clear_interrupt( int mask );
+	inline void set_ba(int state);
+	inline void set_aec(int state);
+	inline void bad_line_ba();
 	inline UINT8 read_videoram(offs_t offset);
 	inline UINT8 read_colorram(offs_t offset);
-	inline void vic2_idle_access();
-	inline void vic2_spr_ptr_access( int num );
-	inline void vic2_spr_data_access( int num, int bytenum );
-	inline void vic2_display_if_bad_line();
-	inline void vic2_suspend_cpu();
-	inline void vic2_resume_cpu();
-	inline void vic2_refresh_access();
-	inline void vic2_fetch_if_bad_line();
-	inline void vic2_rc_if_bad_line();
-	inline void vic2_sample_border();
-	inline void vic2_check_sprite_dma();
-	inline void vic2_matrix_access();
-	inline void vic2_graphics_access();
-	inline void vic2_draw_background();
-	inline void vic2_draw_mono( UINT16 p, UINT8 c0, UINT8 c1 );
-	inline void vic2_draw_multi( UINT16 p, UINT8 c0, UINT8 c1, UINT8 c2, UINT8 c3 );
-	void vic2_draw_graphics();
-	void vic2_draw_sprites();
+	inline void idle_access();
+	inline void spr_ba(int num);
+	inline void spr_ptr_access( int num );
+	inline void spr_data_access( int num, int bytenum );
+	inline void display_if_bad_line();
+	inline void refresh_access();
+	inline void fetch_if_bad_line();
+	inline void rc_if_bad_line();
+	inline void sample_border();
+	inline void check_sprite_dma();
+	inline void matrix_access();
+	inline void graphics_access();
+	inline void draw_background();
+	inline void draw_mono( UINT16 p, UINT8 c0, UINT8 c1 );
+	inline void draw_multi( UINT16 p, UINT8 c0, UINT8 c1, UINT8 c2, UINT8 c3 );
+	void draw_graphics();
+	void draw_sprites();
 
 	screen_device *m_screen;			// screen which sets bitmap properties
 	cpu_device *m_cpu;
 
-	UINT8 m_rdy_cycles;
+	int m_phi0;
+	int m_ba;
+	int m_aec;
+	UINT8 m_aec_delay;
+	int m_rdy_cycles;
+
 	UINT8 m_reg[0x80];
 
 	int m_on;								/* rastering of the screen */
@@ -384,11 +396,11 @@ protected:
 	UINT16 m_colors[4], m_spritemulti[4];
 
 	int m_rasterline;
-	UINT64 m_cycles_counter;
 	UINT8 m_cycle;
 	UINT16 m_raster_x;
 	UINT16 m_graphic_x;
 	UINT8 m_last_data;
+	int m_lp;
 
 	/* convert multicolor byte to background/foreground for sprite collision */
 	UINT16 m_expandx[256];
@@ -440,7 +452,8 @@ protected:
 	UINT8 m_device_suspended;
 
 	devcb_resolved_write_line		m_out_irq_func;
-	devcb_resolved_write_line		m_out_rdy_func;
+	devcb_resolved_write_line		m_out_ba_func;
+	devcb_resolved_write_line		m_out_aec_func;
 	devcb_resolved_write8			m_out_k_func;
 };
 

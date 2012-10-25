@@ -201,20 +201,20 @@ public:
 	DECLARE_MACHINE_START( p500_pal );
 	DECLARE_MACHINE_RESET( p500 );
 
-	void read_pla1(offs_t offset, int bras, int busy2, int sphi2, int clrnibcsb, int procvid, int refen, int ba, int aec, int srw,
+	void read_pla1(offs_t offset, int busy2, int clrnibcsb, int procvid, int refen, int ba, int aec, int srw,
 		int *datxen, int *dramxen, int *clrniben, int *segf, int *_64kcasen, int *casenb, int *viddaten, int *viddat_tr);
 
-	void read_pla2(offs_t offset, offs_t va, int ba, int sphi2, int vicen, int ae, int segf, int bcas, int bank0,
+	void read_pla2(offs_t offset, offs_t va, int ba, int vicen, int ae, int segf, int bank0,
 		int *clrnibcsb, int *extbufcs, int *discromcs, int *buframcs, int *charomcs, int *procvid, int *viccs, int *vidmatcs);
 
-	void bankswitch(offs_t offset, offs_t va, int srw, int sphi0, int sphi1, int sphi2, int ba, int ae, int bras, int bcas, int busy2, int refen,
+	void bankswitch(offs_t offset, offs_t va, int srw, int ba, int ae, int busy2, int refen,
 		int *datxen, int *dramxen, int *clrniben, int *_64kcasen, int *casenb, int *viddaten, int *viddat_tr,
 		int *clrnibcs, int *extbufcs, int *discromcs, int *buframcs, int *charomcs, int *viccs, int *vidmatcs,
 		int *csbank1, int *csbank2, int *csbank3, int *basiclocs, int *basichics, int *kernalcs,
 		int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs, int *aec, int *vsysaden);
 
-	UINT8 read_memory(address_space &space, offs_t offset, offs_t va, int sphi0, int sphi1, int sphi2, int ba, int ae, int bras, int bcas, UINT8 *clrnib);
-	void write_memory(address_space &space, offs_t offset, UINT8 data, int sphi0, int sphi1, int sphi2, int ba, int ae, int bras, int bcas);
+	UINT8 read_memory(address_space &space, offs_t offset, offs_t va, int ba, int ae, UINT8 *clrnib);
+	void write_memory(address_space &space, offs_t offset, UINT8 data, int ba, int ae);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

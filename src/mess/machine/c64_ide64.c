@@ -148,13 +148,13 @@ void c64_ide64_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
+UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!m_enable) return data;
 
 	int rom_oe = 1, ram_oe = 1;
 
-	if (!m_game && m_exrom && ba)
+	if (!m_game && m_exrom && sphi2 && ba)
 	{
 		if (offset >= 0x1000 && offset < 0x8000)
 		{
@@ -175,7 +175,7 @@ UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 		rom_oe = 0;
 	}
 
-	if (!io1)
+	if (!io1 && sphi2 && ba)
 	{
 		// 0x20-0x2f    IDE
 		// 0x30-0x37    I/O
@@ -248,11 +248,11 @@ UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
+void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!m_enable) return;
 
-	if (!m_game && m_exrom && ba)
+	if (!m_game && m_exrom)
 	{
 		if (offset >= 0x1000 && offset < 0x8000)
 		{
@@ -335,9 +335,9 @@ void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, U
 //  c64_game_r - GAME read
 //-------------------------------------------------
 
-int c64_ide64_cartridge_device::c64_game_r(offs_t offset, int ba, int rw, int hiram)
+int c64_ide64_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
 {
-	return ba ? m_game : 1;
+	return (sphi2 && ba) ? m_game : 1;
 }
 
 
@@ -345,7 +345,7 @@ int c64_ide64_cartridge_device::c64_game_r(offs_t offset, int ba, int rw, int hi
 //  c64_exrom_r - EXROM read
 //-------------------------------------------------
 
-int c64_ide64_cartridge_device::c64_exrom_r(offs_t offset, int ba, int rw, int hiram)
+int c64_ide64_cartridge_device::c64_exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
 {
-	return ba ? m_exrom : 1;
+	return (sphi2 && ba) ? m_exrom : 1;
 }

@@ -169,7 +169,7 @@ void c64_cpm_cartridge_device::device_reset()
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_cpm_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
+void c64_cpm_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{
@@ -184,7 +184,7 @@ void c64_cpm_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UIN
 //  c64_game_r - GAME read
 //-------------------------------------------------
 
-int c64_cpm_cartridge_device::c64_game_r(offs_t offset, int ba, int rw, int hiram)
+int c64_cpm_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
 {
 	if (m_ba != ba)
 	{

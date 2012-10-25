@@ -81,15 +81,16 @@ public:
 	virtual void machine_reset();
 
 	void check_interrupts();
-	void read_pla(offs_t offset, offs_t va, int rw, int aec, int ba, int cas, int *casram, int *basic, int *kernal, int *charom, int *grw, int *io, int *roml, int *romh);
-	UINT8 read_memory(address_space &space, offs_t offset, offs_t va, int rw, int aec, int ba, int cas);
-	void write_memory(address_space &space, offs_t offset, UINT8 data, int rw, int aec, int ba, int cas);
+	void read_pla(offs_t offset, offs_t va, int rw, int aec, int ba, int *casram, int *basic, int *kernal, int *charom, int *grw, int *io, int *roml, int *romh);
+	UINT8 read_memory(address_space &space, offs_t offset, offs_t va, int aec, int ba);
+	void write_memory(address_space &space, offs_t offset, UINT8 data, int aec, int ba);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
 	INTERRUPT_GEN_MEMBER( frame_interrupt );
 	DECLARE_READ8_MEMBER( vic_videoram_r );
+	DECLARE_READ8_MEMBER( vic_colorram_r );
 	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
 
 	DECLARE_READ8_MEMBER( sid_potx_r );
@@ -127,7 +128,7 @@ public:
 	UINT8 *m_charom;
 
 	// video state
-	required_shared_ptr<UINT8> m_color_ram;
+	optional_shared_ptr<UINT8> m_color_ram;
 	int m_va14;
 	int m_va15;
 

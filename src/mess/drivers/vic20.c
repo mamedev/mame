@@ -696,6 +696,15 @@ void vic20_state::machine_start()
 	m_kernal = memregion("kernal")->base();
 	m_charom = memregion("charom")->base();
 
+	// initialize memory
+	UINT8 data = 0xff;
+
+	for (offs_t offset = 0; offset < m_ram->size(); offset++)
+	{
+		m_ram->pointer()[offset] = data;
+		if (!(offset % 64)) data ^= 0xff;
+	}
+
 	// state saving
 	save_item(NAME(m_key_col));
 }
@@ -859,10 +868,10 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( vic20s )
+//  ROM( vic20_se )
 //-------------------------------------------------
 
-ROM_START( vic20s )
+ROM_START( vic20_se )
 	ROM_REGION( 0x2000, "basic", 0 )
 	ROM_LOAD( "901486-01.ue11",	0x0000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
 
@@ -883,4 +892,4 @@ ROM_END
 COMP( 1980, vic1001,    0,          0,      ntsc,		vic1001,	driver_device,	0,          "Commodore Business Machines",      "VIC-1001 (Japan)",         GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 COMP( 1981, vic20,      vic1001,    0,      ntsc,		vic20,		driver_device,	0,          "Commodore Business Machines",      "VIC-20 (NTSC)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 COMP( 1981, vic20p,     vic1001,    0,      pal,		vic20,		driver_device,	0,          "Commodore Business Machines",      "VIC-20 / VC-20 (PAL)",     GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-COMP( 1981, vic20s,     vic1001,    0,      pal,		vic20s, 	driver_device,	0,          "Commodore Business Machines",      "VIC-20 (Sweden/Finland)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1981, vic20_se,   vic1001,    0,      pal,		vic20s, 	driver_device,	0,          "Commodore Business Machines",      "VIC-20 (Sweden/Finland)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

@@ -328,9 +328,12 @@ WRITE8_MEMBER( cbm2_state::write )
 //  read_pla1 - P500 PLA #1 read
 //-------------------------------------------------
 
-void p500_state::read_pla1(offs_t offset, int bras, int busy2, int sphi2, int clrnibcsb, int procvid, int refen, int ba, int aec, int srw,
+void p500_state::read_pla1(offs_t offset, int busy2, int clrnibcsb, int procvid, int refen, int ba, int aec, int srw,
 	int *datxen, int *dramxen, int *clrniben, int *segf, int *_64kcasen, int *casenb, int *viddaten, int *viddat_tr)
 {
+	int sphi2 = m_vic->phi0_r();
+	int bras = 1;
+	
 	UINT32 input = P0 << 15 | P2 << 14 | bras << 13 | P1 << 12 | P3 << 11 | busy2 << 10 | m_statvid << 9 | sphi2 << 8 |
 			clrnibcsb << 7 | m_dramon << 6 | procvid << 5 | refen << 4 | m_vicdotsel << 3 | ba << 2 | aec << 1 | srw;
 
@@ -351,9 +354,12 @@ void p500_state::read_pla1(offs_t offset, int bras, int busy2, int sphi2, int cl
 //  read_pla2 - P500 PLA #2 read
 //-------------------------------------------------
 
-void p500_state::read_pla2(offs_t offset, offs_t va, int ba, int sphi2, int vicen, int ae, int segf, int bcas, int bank0,
+void p500_state::read_pla2(offs_t offset, offs_t va, int ba, int vicen, int ae, int segf, int bank0,
 	int *clrnibcsb, int *extbufcs, int *discromcs, int *buframcs, int *charomcs, int *procvid, int *viccs, int *vidmatcs)
 {
+	int sphi2 = m_vic->phi0_r();
+	int bcas = 1;
+
 	UINT32 input = VA12 << 15 | ba << 14 | A13 << 13 | A15 << 12 | A14 << 11 | A11 << 10 | A10 << 9 | A12 << 8 |
 			sphi2 << 7 | vicen << 6 | m_statvid << 5 | m_vicdotsel << 4 | ae << 3 | segf << 2 | bcas << 1 | bank0;
 
@@ -374,18 +380,24 @@ void p500_state::read_pla2(offs_t offset, offs_t va, int ba, int sphi2, int vice
 //  bankswitch -
 //-------------------------------------------------
 
-void p500_state::bankswitch(offs_t offset, offs_t va, int srw, int sphi0, int sphi1, int sphi2, int ba, int ae, int bras, int bcas, int busy2, int refen,
+void p500_state::bankswitch(offs_t offset, offs_t va, int srw, int ba, int ae, int busy2, int refen,
 	int *datxen, int *dramxen, int *clrniben, int *_64kcasen, int *casenb, int *viddaten, int *viddat_tr,
 	int *clrnibcs, int *extbufcs, int *discromcs, int *buframcs, int *charomcs, int *viccs, int *vidmatcs,
 	int *csbank1, int *csbank2, int *csbank3, int *basiclocs, int *basichics, int *kernalcs,
 	int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs, int *aec, int *vsysaden)
 {
+	int sphi2 = m_vic->phi0_r();
+	int sphi1 = !sphi2;
+	//int ba = !m_vic->ba_r();
+	//int ae = m_vic->aec_r();
+	int bcas = 0;
+
 	*aec = !((m_statvid || ae) && sphi2);
 	*vsysaden = sphi1 || ba;
 
 	int clrnibcsb = 1, procvid = 1, segf = 1;
 
-	read_pla1(offset, bras, busy2, sphi2, clrnibcsb, procvid, refen, ba, *aec, srw,
+	read_pla1(offset, busy2, clrnibcsb, procvid, refen, ba, *aec, srw,
 		datxen, dramxen, clrniben, &segf, _64kcasen, casenb, viddaten, viddat_tr);
 
 	int bank0 = 1, vicen = 1;
@@ -423,13 +435,13 @@ void p500_state::bankswitch(offs_t offset, offs_t va, int srw, int sphi0, int sp
 
 	int vidmatcsb = 1;
 
-	read_pla2(offset, va, ba, sphi2, vicen, ae, segf, bcas, bank0,
+	read_pla2(offset, va, ba, vicen, ae, segf, bank0,
 		&clrnibcsb, extbufcs, discromcs, buframcs, charomcs, &procvid, viccs, &vidmatcsb);
 
 	*clrnibcs = clrnibcsb || bcas;
 	*vidmatcs = vidmatcsb || bcas;
 
-	read_pla1(offset, bras, busy2, sphi2, clrnibcsb, procvid, refen, ba, *aec, srw,
+	read_pla1(offset, busy2, clrnibcsb, procvid, refen, ba, *aec, srw,
 		datxen, dramxen, clrniben, &segf, _64kcasen, casenb, viddaten, viddat_tr);
 }
 
@@ -438,7 +450,7 @@ void p500_state::bankswitch(offs_t offset, offs_t va, int srw, int sphi0, int sp
 //  read_memory -
 //-------------------------------------------------
 
-UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, int sphi0, int sphi1, int sphi2, int ba, int ae, int bras, int bcas, UINT8 *clrnib)
+UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, int ba, int ae, UINT8 *clrnib)
 {
 	int srw = 1, busy2 = 1, refen = 0;
 
@@ -448,7 +460,7 @@ UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, in
 	int cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
 	int aec = 1, vsysaden = 1;
 
-	bankswitch(offset, va, srw, sphi0, sphi1, sphi2, ba, ae, bras, bcas, busy2, refen,
+	bankswitch(offset, va, srw, ba, ae, busy2, refen,
 		&datxen, &dramxen, &clrniben, &_64kcasen, &casenb, &viddaten, &viddat_tr,
 		&clrnibcs, &extbufcs, &discromcs, &buframcs, &charomcs, &viccs, &vidmatcs,
 		&csbank1, &csbank2, &csbank3, &basiclocs, &basichics, &kernalcs,
@@ -560,7 +572,7 @@ UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, in
 //  write_memory -
 //-------------------------------------------------
 
-void p500_state::write_memory(address_space &space, offs_t offset, UINT8 data, int sphi0, int sphi1, int sphi2, int ba, int ae, int bras, int bcas)
+void p500_state::write_memory(address_space &space, offs_t offset, UINT8 data, int ba, int ae)
 {
 	int srw = 0, busy2 = 1, refen = 0;
 	offs_t va = 0xffff;
@@ -571,7 +583,7 @@ void p500_state::write_memory(address_space &space, offs_t offset, UINT8 data, i
 	int cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
 	int aec = 1, vsysaden = 1;
 
-	bankswitch(offset, va, srw, sphi0, sphi1, sphi2, ba, ae, bras, bcas, busy2, refen,
+	bankswitch(offset, va, srw, ba, ae, busy2, refen,
 		&datxen, &dramxen, &clrniben, &_64kcasen, &casenb, &viddaten, &viddat_tr,
 		&clrnibcs, &extbufcs, &discromcs, &buframcs, &charomcs, &viccs, &vidmatcs,
 		&csbank1, &csbank2, &csbank3, &basiclocs, &basichics, &kernalcs,
@@ -648,11 +660,11 @@ void p500_state::write_memory(address_space &space, offs_t offset, UINT8 data, i
 
 READ8_MEMBER( p500_state::read )
 {
-	int sphi0 = 1, sphi1 = 0, sphi2 = 1, ba = 0, ae = 1, bras = 1, bcas = 0;
+	int ba = 0, ae = 1;
 	offs_t va = 0xffff;
 	UINT8 clrnib = 0xf;
 
-	return read_memory(space, offset, va, sphi0, sphi1, sphi2, ba, ae, bras, bcas, &clrnib);
+	return read_memory(space, offset, va, ba, ae, &clrnib);
 }
 
 
@@ -662,9 +674,9 @@ READ8_MEMBER( p500_state::read )
 
 WRITE8_MEMBER( p500_state::write )
 {
-	int sphi0 = 1, sphi1 = 0, sphi2 = 1, ba = 0, ae = 1, bras = 1, bcas = 0;
+	int ba = 0, ae = 1;
 
-	write_memory(space, offset, data, sphi0, sphi1, sphi2, ba, ae, bras, bcas);
+	write_memory(space, offset, data, ba, ae);
 }
 
 
@@ -674,26 +686,13 @@ WRITE8_MEMBER( p500_state::write )
 
 READ8_MEMBER( p500_state::vic_videoram_r )
 {
-	/*
-    int sphi0 = 0, sphi1 = 1, sphi2 = 0, ba = 1, ae = 0, bras = 0, bcas = 0;
+/*    int ba = !m_vic->ba_r(), ae = m_vic->aec_r();
     offs_t va = offset;
-
-    return read_memory(space, 0, va, sphi0, sphi1, sphi2, ba, ae, bras, bcas);
-    */
-	/*
-    int ba = 1, ae = 0, bras = 1, bcas = 0;
     UINT8 clrnib = 0xf;
+	logerror("VIC %04x phi0 %u BA %u AEC %u VICDOTSEL %u STATVID %u\n", va, m_vic->phi0_r(), !m_vic->ba_r(), m_vic->aec_r(), m_vicdotsel, m_statvid);
 
-    if (offset < 0x1000)
-    {
-        return read_memory(space, 0, offset, 0, 1, 0, ba, ae, bras, bcas, &clrnib);
-    }
-    else
-    {
-        return read_memory(space, 0, offset, 1, 0, 1, ba, ae, bras, bcas, &clrnib);
-    }
-    */
-
+    return read_memory(space, 0, va, ba, ae, &clrnib);
+*/
 	if (offset < 0x1000)
 	{
 		return m_charom[offset & 0xfff];
@@ -1040,7 +1039,8 @@ static MOS6567_INTERFACE( vic_intf )
 	SCREEN_TAG,
 	M6509_TAG,
 	DEVCB_DRIVER_LINE_MEMBER(p500_state, vic_irq_w),
-	DEVCB_NULL, // RDY
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -2116,10 +2116,10 @@ MACHINE_CONFIG_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  ROM( p500n )
+//  ROM( p500 )
 //-------------------------------------------------
 
-ROM_START( p500n )
+ROM_START( p500 )
 	ROM_REGION( 0x4000, "basic", 0 )
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
@@ -2148,7 +2148,7 @@ ROM_END
 //  ROM( p500p )
 //-------------------------------------------------
 
-#define rom_p500p	rom_p500n
+#define rom_p500p	rom_p500
 
 
 //-------------------------------------------------
@@ -2378,20 +2378,20 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY                         FULLNAME                            FLAGS
-COMP( 1983,	p500n,		0,		0,		p500_ntsc,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"P500 ~ C128-40 ~ PET-II (NTSC)",	GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // VIC 64K RAM mode is not supported
-COMP( 1983,	p500p,		p500n,	0,		p500_pal,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"P500 ~ C128-40 ~ PET-II (PAL)",	GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // VIC 64K RAM mode is not supported
+COMP( 1983,	p500,		0,		0,		p500_ntsc,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"P500 ~ C128-40 ~ PET-II (NTSC)",	GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // VIC 64K RAM mode is not supported
+COMP( 1983,	p500p,		p500,	0,		p500_pal,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"P500 ~ C128-40 ~ PET-II (PAL)",	GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // VIC 64K RAM mode is not supported
 
-COMP( 1983,	b500,		p500n,	0,		b128,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B500 (NTSC)",						GAME_SUPPORTS_SAVE )
-COMP( 1983,	b128,		p500n,	0,		b128,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B128 (NTSC)",						GAME_SUPPORTS_SAVE )
-COMP( 1983,	b256,		p500n,	0,		b256,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256 (NTSC)",						GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm610,		p500n,	0,		cbm610,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 610 (PAL)",					GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm620,		p500n,	0,		cbm620,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 620 (PAL)",					GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm620hu,	p500n,	0,		cbm620,		cbm2hu,	driver_device,		0,		"Commodore Business Machines",	"CBM 620 (Hungary)",				GAME_SUPPORTS_SAVE )
+COMP( 1983,	b500,		p500,	0,		b128,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B500 (NTSC)",						GAME_SUPPORTS_SAVE )
+COMP( 1983,	b128,		p500,	0,		b128,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B128 (NTSC)",						GAME_SUPPORTS_SAVE )
+COMP( 1983,	b256,		p500,	0,		b256,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256 (NTSC)",						GAME_SUPPORTS_SAVE )
+COMP( 1983,	cbm610,		p500,	0,		cbm610,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 610 (PAL)",					GAME_SUPPORTS_SAVE )
+COMP( 1983,	cbm620,		p500,	0,		cbm620,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 620 (PAL)",					GAME_SUPPORTS_SAVE )
+COMP( 1983,	cbm620hu,	p500,	0,		cbm620,		cbm2hu,	driver_device,		0,		"Commodore Business Machines",	"CBM 620 (Hungary)",				GAME_SUPPORTS_SAVE )
 
-COMP( 1983,	b128hp,		p500n,	0,		b128hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B128-80HP (NTSC)",					GAME_SUPPORTS_SAVE )
-COMP( 1983,	b256hp,		p500n,	0,		b256hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256-80HP (NTSC)",					GAME_SUPPORTS_SAVE )
-COMP( 1983,	bx256hp,	p500n,	0,		bx256hp,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"BX256-80HP (NTSC)",				GAME_NOT_WORKING ) // 8088 co-processor is missing
-COMP( 1983,	cbm710,		p500n,	0,		cbm710,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 710 (PAL)",					GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm720,		p500n,	0,		cbm720,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 720 (PAL)",					GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm720sw,	p500n,	0,		cbm720,		cbm2sw,	driver_device,		0,		"Commodore Business Machines",	"CBM 720 (Sweden/Finland)",			GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm730,		p500n,	0,		cbm730,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 730 (PAL)",					GAME_NOT_WORKING ) // 8088 co-processor is missing
+COMP( 1983,	b128hp,		p500,	0,		b128hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B128-80HP (NTSC)",					GAME_SUPPORTS_SAVE )
+COMP( 1983,	b256hp,		p500,	0,		b256hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256-80HP (NTSC)",					GAME_SUPPORTS_SAVE )
+COMP( 1983,	bx256hp,	p500,	0,		bx256hp,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"BX256-80HP (NTSC)",				GAME_NOT_WORKING ) // 8088 co-processor is missing
+COMP( 1983,	cbm710,		p500,	0,		cbm710,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 710 (PAL)",					GAME_SUPPORTS_SAVE )
+COMP( 1983,	cbm720,		p500,	0,		cbm720,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 720 (PAL)",					GAME_SUPPORTS_SAVE )
+COMP( 1983,	cbm720sw,	p500,	0,		cbm720,		cbm2sw,	driver_device,		0,		"Commodore Business Machines",	"CBM 720 (Sweden/Finland)",			GAME_SUPPORTS_SAVE )
+COMP( 1983,	cbm730,		p500,	0,		cbm730,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 730 (PAL)",					GAME_NOT_WORKING ) // 8088 co-processor is missing

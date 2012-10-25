@@ -583,25 +583,25 @@ mmf9000s  // MiniMainFrame 9000 (Sweden)
 vic1001   // Commodore VIC-1001 (Japan)
 vic20	 // Commodore VIC 20 (NTSC)
 vic20p	// Commodore VIC 20 (PAL)
-vic20s	// Commodore VIC 20 (Swedish Expanson Kit)
+vic20_se	// Commodore VIC 20 (Swedish Expanson Kit)
 
 vic10	   // Commodore Max Machine (Japan)
-c64n
+c64
 c64p	// Commodore 64 (PAL)
-c64j	// Commodore 64 (Japan)
-c64sw	// Commodore 64 (Sweden)
+c64_jp	// Commodore 64 (Japan)
+c64_se	// Commodore 64 (Sweden)
 pet64	 // Commodore PET 64
 edu64	 // Commodore Educator 64
 //  clipper  // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer
 //  tesa6240  //  modified SX64 with label printer
-sx64n
+sx64
 sx64p
 
 vip64	 // Commodore VIP64 (SX64, PAL, Swedish)
 dx64    // Commodore DX-64 - Prototype
-c64cn	  // Commodore 64C (NTSC)
+c64c	  // Commodore 64C (NTSC)
 c64cp   // Commodore 64C (PAL)
-c64csw
+c64c_se
 c64g	  // Commodore 64G (PAL)
 c64gs	 // Commodore 64 Games System
 c64dtv	 // Commodore 64 Direct-to-TV
@@ -620,15 +620,15 @@ cbm710	// Commodore CBM 710
 cbm720	// Commodore CBM 720
 cbm720sw  // Commodore CBM 720 (Sweden / Finland)
 cbm730
-p500n	  // Commodore P500 (proto, a.k.a. C128-40, PET-II)
+p500	  // Commodore P500 (proto, a.k.a. C128-40, PET-II)
 p500p
 
 c264
-plus4n
+plus4
 plus4p
-c16n
+c16
 c16p
-c16h
+c16_hu
 c116
 c232
 v364

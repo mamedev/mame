@@ -71,10 +71,14 @@ void c64_state::check_interrupts()
 //  read_pla -
 //-------------------------------------------------
 
-void c64_state::read_pla(offs_t offset, offs_t va, int rw, int aec, int ba, int cas, int *casram, int *basic, int *kernal, int *charom, int *grw, int *io, int *roml, int *romh)
+void c64_state::read_pla(offs_t offset, offs_t va, int rw, int aec, int ba, int *casram, int *basic, int *kernal, int *charom, int *grw, int *io, int *roml, int *romh)
 {
-	int game = m_exp->game_r(offset, ba, rw, m_hiram);
-	int exrom = m_exp->exrom_r(offset, ba, rw, m_hiram);
+	//int ba = m_vic->ba_r();
+	//int aec = !m_vic->aec_r();
+	int sphi2 = m_vic->phi0_r();
+	int game = m_exp->game_r(offset, sphi2, ba, rw, m_hiram);
+	int exrom = m_exp->exrom_r(offset, sphi2, ba, rw, m_hiram);
+	int cas = 0;
 
 	UINT32 input = VA12 << 15 | VA13 << 14 | game << 13 | exrom << 12 | rw << 11 | aec << 10 | ba << 9 | A12 << 8 | 
 		A13 << 7 | A14 << 6 | A15 << 5 | m_va14 << 4 | m_charen << 3 | m_hiram << 2 | m_loram << 1 | cas;
@@ -96,12 +100,14 @@ void c64_state::read_pla(offs_t offset, offs_t va, int rw, int aec, int ba, int 
 //  read_memory -
 //-------------------------------------------------
 
-UINT8 c64_state::read_memory(address_space &space, offs_t offset, offs_t va, int rw, int aec, int ba, int cas)
+UINT8 c64_state::read_memory(address_space &space, offs_t offset, offs_t va, int aec, int ba)
 {
+	int rw = 1;
 	int casram, basic, kernal, charom, grw, io, roml, romh;
 	int io1 = 1, io2 = 1;
+	int sphi2 = m_vic->phi0_r();
 
-	read_pla(offset, va, rw, !aec, ba, cas, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
+	read_pla(offset, va, rw, !aec, ba, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
 
 	UINT8 data = 0xff;
 
@@ -112,7 +118,14 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, offs_t va, int
 
 	if (!casram)
 	{
-		data = m_ram->pointer()[offset];
+		if (aec)
+		{
+			data = m_ram->pointer()[offset];
+		}
+		else
+		{
+			data = m_ram->pointer()[(!m_va15 << 15) | (!m_va14 << 14) | va];
+		}
 	}
 	if (!basic)
 	{
@@ -165,7 +178,7 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, offs_t va, int
 		}
 	}
 
-	return m_exp->cd_r(space, offset, data, ba, roml, romh, io1, io2);
+	return m_exp->cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
 
@@ -173,13 +186,15 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, offs_t va, int
 //  write_memory -
 //-------------------------------------------------
 
-void c64_state::write_memory(address_space &space, offs_t offset, UINT8 data, int rw, int aec, int ba, int cas)
+void c64_state::write_memory(address_space &space, offs_t offset, UINT8 data, int aec, int ba)
 {
+	int rw = 0;
 	int casram, basic, kernal, charom, grw, io, roml, romh;
 	offs_t va = 0;
 	int io1 = 1, io2 = 1;
+	int sphi2 = m_vic->phi0_r();
 
-	read_pla(offset, va, rw, !aec, ba, cas, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
+	read_pla(offset, va, rw, !aec, ba, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
 	
 	if (offset < 0x0002)
 	{
@@ -230,7 +245,7 @@ void c64_state::write_memory(address_space &space, offs_t offset, UINT8 data, in
 		}
 	}
 
-	m_exp->cd_w(space, offset, data, ba, roml, romh, io1, io2);
+	m_exp->cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
 
@@ -240,10 +255,12 @@ void c64_state::write_memory(address_space &space, offs_t offset, UINT8 data, in
 
 READ8_MEMBER( c64_state::read )
 {
-	offs_t va = 0;
-	int rw = 1, aec = 1, ba = 1, cas = 0;
+	int aec = 1, ba = 1;
 
-	return read_memory(space, offset, va, rw, aec, ba, cas);
+	// VIC address bus is floating
+	offs_t va = 0x3fff;
+	
+	return read_memory(space, offset, va, aec, ba);
 }
 
 
@@ -253,9 +270,9 @@ READ8_MEMBER( c64_state::read )
 
 WRITE8_MEMBER( c64_state::write )
 {
-	int rw = 0, aec = 1, ba = 1, cas = 0;
+	int aec = 1, ba = 1;
 	
-	write_memory(space, offset, data, rw, aec, ba, cas);
+	write_memory(space, offset, data, aec, ba);
 }
 
 
@@ -265,10 +282,35 @@ WRITE8_MEMBER( c64_state::write )
 
 READ8_MEMBER( c64_state::vic_videoram_r )
 {
-	offs_t va = (!m_va15 << 15) | (!m_va14 << 14) | offset;
-	int rw = 1, aec = 0, ba = 0, cas = 0;
+	int aec = m_vic->aec_r(), ba = m_vic->ba_r();
+	offs_t va = offset;
 
-	return read_memory(space, offset, va, rw, aec, ba, cas);
+	// A15/A14 are not connected to VIC so they are floating
+	offset |= 0xc000;
+	
+	return read_memory(space, offset, va, aec, ba);
+}
+
+
+//-------------------------------------------------
+//  vic_colorram_r -
+//-------------------------------------------------
+
+READ8_MEMBER( c64_state::vic_colorram_r )
+{
+	UINT8 data;
+
+	if (m_vic->aec_r())
+	{
+		// TODO low nibble of last opcode
+		data = 0x0f;
+	}
+	else
+	{
+		data = m_color_ram[offset] & 0x0f;
+	}
+
+	return data;
 }
 
 
@@ -300,7 +342,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( vic_colorram_map, AS_1, 8, c64_state )
-	AM_RANGE(0x000, 0x3ff) AM_RAM AM_SHARE("color_ram")
+	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
 ADDRESS_MAP_END
 
 
@@ -402,7 +444,8 @@ static MOS6567_INTERFACE( vic_intf )
 	SCREEN_TAG,
 	M6510_TAG,
 	DEVCB_DRIVER_LINE_MEMBER(c64_state, vic_irq_w),
-	DEVCB_NULL,
+	DEVCB_NULL, // BA -> 6502 RDY
+	DEVCB_NULL, // AEC -> 6502 AEC
 	DEVCB_NULL
 };
 
@@ -413,30 +456,28 @@ static MOS6567_INTERFACE( vic_intf )
 
 READ8_MEMBER( c64_state::sid_potx_r )
 {
-	UINT8 cia1_pa = m_cia1->pa_r();
+	UINT8 data = 0xff;
 
-	int sela = BIT(cia1_pa, 6);
-	int selb = BIT(cia1_pa, 7);
-
-	UINT8 data = 0;
-
-	if (sela) data = m_joy1->pot_x_r();
-	if (selb) data = m_joy2->pot_x_r();
+	switch (m_cia1->pa_r() >> 6)
+	{
+	case 1: data = m_joy1->pot_x_r(); break;
+	case 2: data = m_joy2->pot_x_r(); break;
+	case 3: break; // TODO pot1 and pot2 in series
+	}
 
 	return data;
 }
 
 READ8_MEMBER( c64_state::sid_poty_r )
 {
-	UINT8 cia1_pa = m_cia1->pa_r();
+	UINT8 data = 0xff;
 
-	int sela = BIT(cia1_pa, 6);
-	int selb = BIT(cia1_pa, 7);
-
-	UINT8 data = 0;
-
-	if (sela) data = m_joy1->pot_y_r();
-	if (selb) data = m_joy2->pot_y_r();
+	switch (m_cia1->pa_r() >> 6)
+	{
+	case 1: data = m_joy1->pot_y_r(); break;
+	case 2: data = m_joy2->pot_y_r(); break;
+	case 3: break; // TODO pot1 and pot2 in series
+	}
 
 	return data;
 }
@@ -919,6 +960,18 @@ void c64_state::machine_start()
 	m_kernal = memregion("kernal")->base();
 	m_charom = memregion("charom")->base();
 
+	// allocate memory
+	m_color_ram.allocate(0x400);
+
+	// initialize memory
+	UINT8 data = 0xff;
+
+	for (offs_t offset = 0; offset < m_ram->size(); offset++)
+	{
+		m_ram->pointer()[offset] = data;
+		if (!(offset % 64)) data ^= 0xff;
+	}
+
 	// state saving
 	save_item(NAME(m_loram));
 	save_item(NAME(m_hiram));
@@ -1208,10 +1261,10 @@ MACHINE_CONFIG_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  ROM( c64n )
+//  ROM( c64 )
 //-------------------------------------------------
 
-ROM_START( c64n )
+ROM_START( c64 )
 	ROM_REGION( 0x2000, "basic", 0 )
 	ROM_LOAD( "901226-01.u3", 0x0000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
 
@@ -1287,10 +1340,10 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( c64j )
+//  ROM( c64_jp )
 //-------------------------------------------------
 
-ROM_START( c64j )
+ROM_START( c64_jp )
 	ROM_REGION( 0x2000, "basic", 0 )
 	ROM_LOAD( "901226-01.u3", 0x0000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
 
@@ -1309,14 +1362,14 @@ ROM_END
 //  ROM( c64p )
 //-------------------------------------------------
 
-#define rom_c64p rom_c64n
+#define rom_c64p rom_c64
 
 
 //-------------------------------------------------
-//  ROM( c64sw )
+//  ROM( c64_se )
 //-------------------------------------------------
 
-ROM_START( c64sw )
+ROM_START( c64_se )
 	ROM_REGION( 0x2000, "basic", 0 )
 	ROM_LOAD( "901226-01.u3", 0x0000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
 
@@ -1357,14 +1410,14 @@ ROM_END
 //  ROM( edu64 )
 //-------------------------------------------------
 
-#define rom_edu64	rom_c64n
+#define rom_edu64	rom_c64
 
 
 //-------------------------------------------------
-//  ROM( sx64n )
+//  ROM( sx64 )
 //-------------------------------------------------
 
-ROM_START( sx64n )
+ROM_START( sx64 )
 	ROM_REGION( 0x2000, "basic", 0 )
 	ROM_LOAD( "901226-01.ud4", 0x0000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
 
@@ -1390,7 +1443,7 @@ ROM_END
 //  ROM( rom_sx64p )
 //-------------------------------------------------
 
-#define rom_sx64p	rom_sx64n
+#define rom_sx64p	rom_sx64
 
 
 //-------------------------------------------------
@@ -1417,14 +1470,14 @@ ROM_END
 //-------------------------------------------------
 
 // ROM_LOAD( "dx64kern.bin", 0x0000, 0x2000, CRC(58065128) ) TODO where is this illusive ROM?
-#define rom_dx64	rom_sx64n
+#define rom_dx64	rom_sx64
 
 
 //-------------------------------------------------
-//  ROM( c64cn )
+//  ROM( c64c )
 //-------------------------------------------------
 
-ROM_START( c64cn )
+ROM_START( c64c )
 	ROM_REGION( 0x4000, M6510_TAG, 0 )
 	ROM_LOAD( "251913-01.u4", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )
 
@@ -1440,21 +1493,21 @@ ROM_END
 //  ROM( c64cp )
 //-------------------------------------------------
 
-#define rom_c64cp		rom_c64cn
+#define rom_c64cp		rom_c64c
 
 
 //-------------------------------------------------
 //  ROM( c64g )
 //-------------------------------------------------
 
-#define rom_c64g		rom_c64cn
+#define rom_c64g		rom_c64c
 
 
 //-------------------------------------------------
-//  ROM( c64csw )
+//  ROM( c64c_se )
 //-------------------------------------------------
 
-ROM_START( c64csw )
+ROM_START( c64c_se )
 	ROM_REGION( 0x4000, M6510_TAG, 0 )
 	ROM_LOAD( "325182-01.u4", 0x0000, 0x4000, CRC(2aff27d3) SHA1(267654823c4fdf2167050f41faa118218d2569ce) ) // 128/64 FI
 
@@ -1488,20 +1541,20 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY                        FULLNAME                                     FLAGS
-COMP( 1982,	c64n,	0,  	0,		ntsc,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64 (NTSC)",						GAME_SUPPORTS_SAVE )
-COMP( 1982,	c64j,	c64n,	0,		ntsc,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64 (Japan)",						GAME_SUPPORTS_SAVE )
-COMP( 1982,	c64p,	c64n,	0,		pal,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64 (PAL)",						GAME_SUPPORTS_SAVE )
-COMP( 1982,	c64sw,	c64n,	0,		pal,		c64sw,	driver_device,		0,		"Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)",	GAME_SUPPORTS_SAVE )
-COMP( 1983, pet64,	c64n,	0,  	pet64,  	c64,	driver_device,		0,  	"Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",					GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
-COMP( 1983, edu64,  c64n,	0,  	pet64,  	c64,	driver_device,		0,  	"Commodore Business Machines", "Educator 64 (NTSC)",						GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
-COMP( 1984, sx64n,	c64n,	0,		ntsc_sx,	c64,	driver_device,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",				GAME_SUPPORTS_SAVE )
-COMP( 1984, sx64p,	c64n,	0,		pal_sx,		c64,	driver_device,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (PAL)",				GAME_SUPPORTS_SAVE )
-COMP( 1984, vip64,	c64n,	0,		pal_sx,		c64sw,	driver_device,		0,		"Commodore Business Machines", "VIP-64 (Sweden/Finland)",					GAME_SUPPORTS_SAVE )
-COMP( 1984, dx64,	c64n,	0,		ntsc_dx,	c64,	driver_device,		0,		"Commodore Business Machines", "DX-64 (NTSC)",								GAME_SUPPORTS_SAVE )
+COMP( 1982,	c64,	0,  	0,		ntsc,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64 (NTSC)",						GAME_SUPPORTS_SAVE )
+COMP( 1982,	c64_jp,	c64,	0,		ntsc,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64 (Japan)",						GAME_SUPPORTS_SAVE )
+COMP( 1982,	c64p,	c64,	0,		pal,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64 (PAL)",						GAME_SUPPORTS_SAVE )
+COMP( 1982,	c64_se,	c64,	0,		pal,		c64sw,	driver_device,		0,		"Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)",	GAME_SUPPORTS_SAVE )
+COMP( 1983, pet64,	c64,	0,  	pet64,  	c64,	driver_device,		0,  	"Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",					GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
+COMP( 1983, edu64,  c64,	0,  	pet64,  	c64,	driver_device,		0,  	"Commodore Business Machines", "Educator 64 (NTSC)",						GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
+COMP( 1984, sx64,	c64,	0,		ntsc_sx,	c64,	driver_device,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",				GAME_SUPPORTS_SAVE )
+COMP( 1984, sx64p,	c64,	0,		pal_sx,		c64,	driver_device,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (PAL)",				GAME_SUPPORTS_SAVE )
+COMP( 1984, vip64,	c64,	0,		pal_sx,		c64sw,	driver_device,		0,		"Commodore Business Machines", "VIP-64 (Sweden/Finland)",					GAME_SUPPORTS_SAVE )
+COMP( 1984, dx64,	c64,	0,		ntsc_dx,	c64,	driver_device,		0,		"Commodore Business Machines", "DX-64 (NTSC)",								GAME_SUPPORTS_SAVE )
 //COMP(1983, clipper,  c64,  0, c64pal,  clipper, XXX_CLASS, c64pal,  "PDC", "Clipper", GAME_NOT_WORKING) // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer
 //COMP(1983, tesa6240, c64,  0, c64pal,  c64, XXX_CLASS,     c64pal,  "Tesa", "6240", GAME_NOT_WORKING) // modified SX64 with label printer
-COMP( 1986, c64cn,	c64n,	0,  	ntsc_c,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64C (NTSC)",						GAME_SUPPORTS_SAVE )
-COMP( 1986, c64cp,	c64n,	0,  	pal_c,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64C (PAL)",						GAME_SUPPORTS_SAVE )
-COMP( 1986, c64csw,	c64n,	0,  	pal_c,		c64sw,	driver_device,		0,		"Commodore Business Machines", "Commodore 64C (Sweden/Finland)",			GAME_SUPPORTS_SAVE )
-COMP( 1986, c64g,	c64n,	0,		pal_c,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64G (PAL)",						GAME_SUPPORTS_SAVE )
-CONS( 1990, c64gs,	c64n,	0,		pal_gs,		c64gs,	driver_device,		0,		"Commodore Business Machines", "Commodore 64 Games System (PAL)",			GAME_SUPPORTS_SAVE )
+COMP( 1986, c64c,	c64,	0,  	ntsc_c,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64C (NTSC)",						GAME_SUPPORTS_SAVE )
+COMP( 1986, c64cp,	c64,	0,  	pal_c,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64C (PAL)",						GAME_SUPPORTS_SAVE )
+COMP( 1986, c64c_se,c64,	0,  	pal_c,		c64sw,	driver_device,		0,		"Commodore Business Machines", "Commodore 64C (Sweden/Finland)",			GAME_SUPPORTS_SAVE )
+COMP( 1986, c64g,	c64,	0,		pal_c,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64G (PAL)",						GAME_SUPPORTS_SAVE )
+CONS( 1990, c64gs,	c64,	0,		pal_gs,		c64gs,	driver_device,		0,		"Commodore Business Machines", "Commodore 64 Games System (PAL)",			GAME_SUPPORTS_SAVE )
