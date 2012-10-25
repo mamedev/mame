@@ -1454,8 +1454,8 @@ public:
 	DECLARE_WRITE8_MEMBER(s23_iob_p4_w);
 	DECLARE_READ8_MEMBER(s23_iob_p6_r);
 	DECLARE_WRITE8_MEMBER(s23_iob_p6_w);
-	DECLARE_READ8_MEMBER(s23_gun_r);
-	DECLARE_READ8_MEMBER(iob_r);
+	DECLARE_READ8_MEMBER(s23_iob_gun_r);
+	DECLARE_READ8_MEMBER(s23_iob_analog_r);
 	DECLARE_DRIVER_INIT(ss23);
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
 	DECLARE_MACHINE_START(s23);
@@ -2858,6 +2858,25 @@ static INPUT_PORTS_START( gorgon )
 	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "DIP:1" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( finlflng )
+	PORT_INCLUDE( gorgon )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+
+#if 0 // need to hook these up properly
+	PORT_START("ADC0")
+	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC0")
+	PORT_START("ADC1")
+	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC1")
+	PORT_START("ADC2")
+	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC2")
+	PORT_START("ADC3")
+	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC3")
+#endif
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( rapidrvrp )
 	PORT_INCLUDE( gorgon )
 
@@ -2890,10 +2909,23 @@ static INPUT_PORTS_START( rapidrvrp )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x08, 0x08, "Debug Messages" )	PORT_DIPLOCATION("DIP:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "Dev Service Mode" )	PORT_DIPLOCATION("DIP:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "DIP:1" ) PORT_NAME("User Service Mode")
+
+#if 0 // need to hook these up properly
+	PORT_START("ADC0")
+	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC0") // rear r
+	PORT_START("ADC1")
+	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC1") // rear l
+	PORT_START("ADC2")
+	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC2") // front r
+	PORT_START("ADC3")
+	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC3") // front l
+#endif
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( s23 )
@@ -3121,7 +3153,7 @@ WRITE8_MEMBER(namcos23_state::s23_iob_p6_w)
 	//printf("iob %02x to port 6\n", data);
 }
 
-READ8_MEMBER(namcos23_state::s23_gun_r)
+READ8_MEMBER(namcos23_state::s23_iob_gun_r)
 {
 	UINT16 xpos = ioport("LIGHTX")->read();
 	UINT16 ypos = ioport("LIGHTY")->read();
@@ -3140,9 +3172,13 @@ READ8_MEMBER(namcos23_state::s23_gun_r)
 	return 0;
 }
 
-READ8_MEMBER(namcos23_state::iob_r)
+READ8_MEMBER(namcos23_state::s23_iob_analog_r)
 {
-	return machine().rand();
+	static const char *const portnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
+	if (offset & 1)
+		return ioport(portnames[offset >> 1 & 3])->read_safe(0) >> 8 & 0xff;
+	else
+		return ioport(portnames[offset >> 1 & 3])->read_safe(0) & 0xff;
 }
 
 /* H8/3334 (Namco C78) I/O board MCU */
@@ -3154,13 +3190,12 @@ static ADDRESS_MAP_START( s23iobrdmap, AS_PROGRAM, 8, namcos23_state )
 	AM_RANGE(0x6003, 0x6003) AM_READ_PORT("IN3")
 	AM_RANGE(0x6004, 0x6005) AM_WRITENOP
 	AM_RANGE(0x6006, 0x6007) AM_NOP
-	AM_RANGE(0x7000, 0x700f) AM_READ(iob_r )
 
 	AM_RANGE(0xc000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( timecrs2iobrdmap, AS_PROGRAM, 8, namcos23_state )
-	AM_RANGE(0x7000, 0x700f) AM_READ(s23_gun_r )
+	AM_RANGE(0x7000, 0x700f) AM_READ(s23_iob_gun_r)
 	AM_IMPORT_FROM( s23iobrdmap )
 ADDRESS_MAP_END
 
@@ -3175,7 +3210,7 @@ static ADDRESS_MAP_START( s23iobrdiomap, AS_IO, 8, namcos23_state )
 	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_NOP	// unknown - used on ASCA-5 only
 	AM_RANGE(H8_PORT_9, H8_PORT_9) AM_NOP	// unknown - used on ASCA-5 only
 	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE(s23_iob_mcu_r, s23_iob_mcu_w)
-	AM_RANGE(H8_ADC_0_H, H8_ADC_3_L) AM_NOP	// analog input
+	AM_RANGE(H8_ADC_0_H, H8_ADC_3_L) AM_READ(s23_iob_analog_r)
 ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(namcos23_state,ss23)
@@ -4432,7 +4467,7 @@ ROM_END
 GAME( 1997, rapidrvr,  0,        gorgon,    gorgon,    namcos23_state, ss23, ROT0, "Namco", "Rapid River (RD3 Ver. C)",     GAME_FLAGS ) // 97/11/27, USA
 GAME( 1997, rapidrvr2, rapidrvr, gorgon,    gorgon,    namcos23_state, ss23, ROT0, "Namco", "Rapid River (RD2 Ver. C)",     GAME_FLAGS ) // 97/11/27, Europe
 GAME( 1997, rapidrvrp, rapidrvr, gorgon,    rapidrvrp, namcos23_state, ss23, ROT0, "Namco", "Rapid River (prototype)",      GAME_FLAGS ) // 97/11/10, USA
-GAME( 1997, finlflng,  0,        gorgon,    gorgon,    namcos23_state, ss23, ROT0, "Namco", "Final Furlong (FF2 Ver. A)",   GAME_FLAGS )
+GAME( 1997, finlflng,  0,        gorgon,    finlflng,  namcos23_state, ss23, ROT0, "Namco", "Final Furlong (FF2 Ver. A)",   GAME_FLAGS )
 GAME( 1997, downhill,  0,        s23,       s23,       namcos23_state, ss23, ROT0, "Namco", "Downhill Bikers (DH3 Ver. A)", GAME_FLAGS )
 GAME( 1997, motoxgo,   0,        s23,       s23,       namcos23_state, ss23, ROT0, "Namco", "Motocross Go! (MG3 Ver. A)",   GAME_FLAGS )
 GAME( 1997, motoxgoa,  motoxgo,  s23,       s23,       namcos23_state, ss23, ROT0, "Namco", "Motocross Go! (MG2 Ver. A)",   GAME_FLAGS )
