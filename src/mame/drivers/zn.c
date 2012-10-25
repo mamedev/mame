@@ -1475,8 +1475,8 @@ static void atpsx_interrupt(device_t *device, int state)
 {
 	if (state)
 	{
-		psxirq_device *psxirq = (psxirq_device *) machine.device("maincpu:irq");
-		psxirq->intin10();
+		psxirq_device *psxirq = (psxirq_device *) device->machine().device("maincpu:irq");
+		psxirq->intin10(1);
 	}
 }
 
@@ -2047,8 +2047,8 @@ static void jdredd_ide_interrupt(device_t *device, int state)
 {
 	if (state)
 	{
-		psxirq_device *psxirq = (psxirq_device *) machine.device("maincpu:irq");
-		psxirq->intin10();
+		psxirq_device *psxirq = (psxirq_device *) device->machine().device("maincpu:irq");
+		psxirq->intin10(1);
 	}
 }
 
@@ -2150,8 +2150,8 @@ WRITE32_MEMBER(zn_state::acpsx_10_w)
 WRITE32_MEMBER(zn_state::nbajamex_80_w)
 {
 	verboselog( machine(), 0, "nbajamex_80_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	psxirq_device *psxirq = (psxirq_device *) machine.device("maincpu:irq");
-	psxirq->intin10();
+	psxirq_device *psxirq = (psxirq_device *) machine().device("maincpu:irq");
+	psxirq->intin10(1);
 }
 
 READ32_MEMBER(zn_state::nbajamex_08_r)
