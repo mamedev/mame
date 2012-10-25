@@ -159,6 +159,8 @@ public:
 	DECLARE_WRITE16_MEMBER(qsound_sharedram2_w);
 	DECLARE_WRITE8_MEMBER(qsound_banksw_w);
 	DECLARE_READ16_MEMBER(sf2mdt_r);
+	DECLARE_READ16_MEMBER(sf2rb_prot_r);
+	DECLARE_READ16_MEMBER(sf2rb2_prot_r);
 	DECLARE_READ16_MEMBER(cps1_dsw_r);
 	DECLARE_WRITE16_MEMBER(cps1_coinctrl_w);
 	DECLARE_READ16_MEMBER(qsound_sharedram1_r);
@@ -173,6 +175,8 @@ public:
 	DECLARE_WRITE16_MEMBER(cps2_objram1_w);
 	DECLARE_WRITE16_MEMBER(cps2_objram2_w);
 	DECLARE_WRITE8_MEMBER(cps1_oki_pin7_w);
+	DECLARE_DRIVER_INIT(sf2rb);
+	DECLARE_DRIVER_INIT(sf2rb2);
 	DECLARE_DRIVER_INIT(sf2thndr);
 	DECLARE_DRIVER_INIT(dinohunt);
 	DECLARE_DRIVER_INIT(forgottn);

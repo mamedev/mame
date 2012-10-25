@@ -62,6 +62,8 @@ public:
 	DECLARE_WRITE16_MEMBER(dec0_paletteram_rg_w);
 	DECLARE_WRITE16_MEMBER(dec0_paletteram_b_w);
 	DECLARE_WRITE16_MEMBER(dec0_priority_w);
+	DECLARE_READ16_MEMBER(ffantasybl_242024_r);
+	DECLARE_READ16_MEMBER(ffantasybl_vblank_r);
 	DECLARE_DRIVER_INIT(robocop);
 	DECLARE_DRIVER_INIT(hippodrm);
 	DECLARE_DRIVER_INIT(hbarrel);
@@ -69,6 +71,7 @@ public:
 	DECLARE_DRIVER_INIT(birdtry);
 	DECLARE_DRIVER_INIT(baddudes);
 	DECLARE_DRIVER_INIT(midresb);
+	DECLARE_DRIVER_INIT(ffantasybl);
 	DECLARE_VIDEO_START(dec0);
 	DECLARE_MACHINE_RESET(slyspy);
 	DECLARE_VIDEO_START(dec0_nodma);

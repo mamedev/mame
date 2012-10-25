@@ -1004,7 +1004,18 @@ static INPUT_PORTS_START( ffantasy )
 	PORT_DIPNAME( 0x4000, 0x4000, "Enemy Power Decrease on Continue" ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, "2 Dots" )	// 2 Dots less
 	PORT_DIPSETTING(      0x0000, DEF_STR( None ) )	// 0 Dot less
+INPUT_PORTS_END
 
+static INPUT_PORTS_START( ffantasybl )
+	PORT_INCLUDE( hippodrm )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x4000, 0x4000, "Enemy Power Decrease on Continue" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x4000, "2 Dots" )	// 2 Dots less
+	PORT_DIPSETTING(      0x0000, DEF_STR( None ) )	// 0 Dot less
+
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Game does not want vblank here
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( slyspy )
@@ -1627,6 +1638,31 @@ static MACHINE_CONFIG_DERIVED( hippodrm, dec0_base_sound )
 	MCFG_CPU_PROGRAM_MAP(hippodrm_sub_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(300))	/* Interleave between H6280 & 68000 */
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+//  MCFG_SCREEN_REFRESH_RATE(57.41)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_hippodrm)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( ffantasybl, dec0_base_sound )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(dec0_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_assert)/* VBL */
+
+	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
+	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
+
+//	MCFG_CPU_ADD("sub", H6280, XTAL_21_4772MHz / 16)
+//	MCFG_CPU_PROGRAM_MAP(hippodrm_sub_map)
+
+//	MCFG_QUANTUM_TIME(attotime::from_hz(300))	/* Interleave between H6280 & 68000 */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3049,6 +3085,32 @@ DRIVER_INIT_MEMBER(dec0_state,midresb)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x00180014, 0x00180015, write16_delegate(FUNC(dec0_state::midres_sound_w),this));
 }
 
+READ16_MEMBER(dec0_state::ffantasybl_242024_r)
+{
+/*
+	000152: 41F9 0024 2020             lea     $242020.l, A0
+	000158: 4A68 0004                  tst.w   ($4,A0)
+	00015C: 6700 00A0                  beq     $1fe
+
+	This allows us to at insert a coin...
+*/
+
+	return 0xffff;
+}
+
+READ16_MEMBER(dec0_state::ffantasybl_vblank_r)
+{
+	return ioport("VBLANK")->read();
+}
+
+DRIVER_INIT_MEMBER(dec0_state,ffantasybl)
+{
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x24c880, 0x24cbff); // what is this? layer 3-related??
+
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00242024, 0x00242025, read16_delegate(FUNC(dec0_state::ffantasybl_242024_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00ff87ee, 0x00ff87ef, read16_delegate(FUNC(dec0_state::ffantasybl_vblank_r),this));
+}
+
 /******************************************************************************/
 
 //    YEAR, NAME,       PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
@@ -3082,7 +3144,7 @@ GAME( 1988, drgninjab,  baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0
 
 // this is a common bootleg board
 GAME( 1989, midresb,    midres,   midresb,  midresb, dec0_state,  midresb,  ROT0,   "bootleg", "Midnight Resistance (bootleg with 68705)", 0 ) // need to hook up 68705?
-GAME( 1989, ffantasybl, hippodrm, midres,   midres, driver_device,   0,        ROT0,   "bootleg", "Fighting Fantasy (bootleg with 68705)", GAME_NOT_WORKING ) // 68705 not dumped, might be the same as midresb
+GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state, ffantasybl,   ROT0,   "bootleg", "Fighting Fantasy (bootleg with 68705)", GAME_IMPERFECT_GRAPHICS ) // 68705 not dumped, might be the same as midresb
 /* A Bad Dudes bootleg with 68705 like the midres and ffantasy ones exists, but is not dumped */
 
 // these are different to the above but quite similar to each other

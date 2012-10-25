@@ -1516,20 +1516,6 @@ MACHINE_RESET_MEMBER(cps_state,cps)
 		m_game_config = pCFG;
 	}
 
-	if (strcmp(gamename, "sf2rb") == 0)
-	{
-		/* Patch out protection check */
-		UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
-		rom[0xe5464 / 2] = 0x6012;
-	}
-
-	if (strcmp(gamename, "sf2rb2") == 0)
-	{
-		/* Patch out protection check */
-		UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
-		rom[0xe5332 / 2] = 0x6014;
-	}
-
 #if 0
 	if (strcmp(gamename, "sf2accp2") == 0)
 	{

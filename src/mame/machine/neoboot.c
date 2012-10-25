@@ -130,6 +130,24 @@ void kog_px_decrypt( running_machine &machine )
 }
 
 
+/* The King of Fighters '97 Oroshi Plus 2003 (bootleg) */
+
+void kof97oro_px_decode( running_machine &machine )
+{
+	int i;
+	UINT16 *tmp = auto_alloc_array(machine, UINT16, 0x500000 );
+	UINT16 *src = (UINT16*)machine.root_device().memregion("maincpu")->base();
+
+	for (i = 0; i < 0x500000/2; i++) {
+		tmp[i] = src[i ^ 0x7ffef];
+	}
+
+	memcpy (src, tmp, 0x500000);
+
+	auto_free (machine, tmp);
+}
+
+
 /* The King of Fighters 10th Anniversary (The King of Fighters 2002 bootleg) */
 
 

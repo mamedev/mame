@@ -201,6 +201,7 @@ public:
 	DECLARE_DRIVER_INIT(jockeygp);
 	DECLARE_DRIVER_INIT(vliner);
 	DECLARE_DRIVER_INIT(kog);
+	DECLARE_DRIVER_INIT(kof97oro);
 	DECLARE_DRIVER_INIT(lans2004);
 	DECLARE_DRIVER_INIT(sbp);
 	DECLARE_DRIVER_INIT(mvs);
@@ -277,6 +278,7 @@ void install_pvc_protection(running_machine &machine);
 /*----------- defined in machine/neoboot.c -----------*/
 
 void kog_px_decrypt(running_machine &machine);
+void kof97oro_px_decode( running_machine &machine );
 void neogeo_bootleg_cx_decrypt(running_machine &machine);
 void install_kof10th_protection(running_machine &machine);
 void decrypt_kof10th(running_machine &machine);

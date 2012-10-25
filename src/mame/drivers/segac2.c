@@ -2186,13 +2186,16 @@ DRIVER_INIT_MEMBER(segac2_state,ichirj)
 	segac2_common_init(machine(), prot_func_ichirj);
 }
 
+static READ16_HANDLER( ichirjbl_prot_r )
+{
+	return 0x00f5;
+}
+
 DRIVER_INIT_MEMBER(segac2_state,ichirjbl)
 {
-	/* when did this actually work? - the protection is patched but the new check fails? */
-	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
-	rom[0x390/2] = 0x6600;
-
 	segac2_common_init(machine(), NULL);
+
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x840108, 0x840109, FUNC(ichirjbl_prot_r) );
 }
 
 DRIVER_INIT_MEMBER(segac2_state,puyopuy2)

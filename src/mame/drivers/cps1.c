@@ -10683,7 +10683,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cps_state,forgottn)
 {
-
 	/* Forgotten Worlds has a NEC uPD4701AC on the B-board handling dial inputs from the CN-MOWS connector. */
 	/* The memory mapping is handled by PAL LWIO */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x800040, 0x800041, write16_delegate(FUNC(cps_state::forgottn_dial_0_reset_w),this));
@@ -10695,6 +10694,48 @@ DRIVER_INIT_MEMBER(cps_state,forgottn)
 
 	m_dial[0] = 0;
 	m_dial[1] = 0;
+
+	DRIVER_INIT_CALL(cps1);
+}
+
+READ16_MEMBER(cps_state::sf2rb_prot_r)
+{
+	switch (offset)
+	{
+		case 0x01201/2:
+			return 0x0002;
+
+		case 0x81201/2:
+			return 0x0040;
+	}
+
+	return 0;
+}
+
+DRIVER_INIT_MEMBER(cps_state,sf2rb)
+{
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x200000, 0x2fffff, read16_delegate(FUNC(cps_state::sf2rb_prot_r),this));
+
+	DRIVER_INIT_CALL(cps1);
+}
+
+READ16_MEMBER(cps_state::sf2rb2_prot_r)
+{
+	switch (offset)
+	{
+		case 0x01201/2:
+			return 0x0000;
+
+		case 0x81201/2:
+			return 0x0040;
+	}
+
+	return 0;
+}
+
+DRIVER_INIT_MEMBER(cps_state,sf2rb2)
+{
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x200000, 0x2fffff, read16_delegate(FUNC(cps_state::sf2rb2_prot_r),this));
 
 	DRIVER_INIT_CALL(cps1);
 }
@@ -10921,8 +10962,8 @@ GAME( 1992, sf2ceuc,     sf2ce,    cps1_12MHz, sf2, cps_state,        cps1,     
 GAME( 1992, sf2ceja,     sf2ce,    cps1_12MHz, sf2, cps_state,        cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920322)", GAME_SUPPORTS_SAVE )
 GAME( 1992, sf2cejb,     sf2ce,    cps1_12MHz, sf2, cps_state,        cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920513)", GAME_SUPPORTS_SAVE )
 GAME( 1992, sf2cejc,     sf2ce,    cps1_12MHz, sf2, cps_state,        cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920803)", GAME_SUPPORTS_SAVE )
-GAME( 1992, sf2rb,       sf2ce,    cps1_12MHz, sf2, cps_state,        cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Rainbow set 1, bootleg)", GAME_SUPPORTS_SAVE )			// 920322 - based on World version
-GAME( 1992, sf2rb2,      sf2ce,    cps1_12MHz, sf2, cps_state,        cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Rainbow set 2, bootleg)", GAME_SUPPORTS_SAVE )			// 920322 - based on World version
+GAME( 1992, sf2rb,       sf2ce,    cps1_12MHz, sf2, cps_state,        sf2rb,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (Rainbow set 1, bootleg)", GAME_SUPPORTS_SAVE )			// 920322 - based on World version
+GAME( 1992, sf2rb2,      sf2ce,    cps1_12MHz, sf2, cps_state,        sf2rb2,   ROT0,   "bootleg", "Street Fighter II': Champion Edition (Rainbow set 2, bootleg)", GAME_SUPPORTS_SAVE )			// 920322 - based on World version
 GAME( 1992, sf2rb3,      sf2ce,    cps1_12MHz, sf2, cps_state,        cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Rainbow set 3, bootleg)", GAME_SUPPORTS_SAVE )			// 920322 - based on World version
 GAME( 1992, sf2red,      sf2ce,    cps1_12MHz, sf2, cps_state,        cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Red Wave, bootleg)", GAME_SUPPORTS_SAVE )			// 920313 - based on World version
 GAME( 1992, sf2v004,     sf2ce,    cps1_12MHz, sf2, cps_state,        cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (V004, bootleg)", GAME_SUPPORTS_SAVE )				// 102092 !!! - based on (heavily modified) World version
