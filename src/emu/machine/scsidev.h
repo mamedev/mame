@@ -25,21 +25,28 @@ Base class for SCSI devices.
 #define SCSI_MASK_RST   ( 0x2000000 )
 #define SCSI_MASK_ALL   ( 0x3ffffff )
 
+class scsibus_device;
+
 // base handler
 class scsidev_device : public device_t
 {
+	friend class scsibus_device;
+
 public:
 	// construction/destruction
 	scsidev_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void scsi_in( UINT32 data, UINT32 mask ) = 0;
-	void scsi_out( UINT32 data, UINT32 mask );
-
-	UINT32 data_out;
-
 protected:
 	// device-level overrides
 	virtual void device_start();
+
+	void scsi_out( UINT32 data, UINT32 mask );
+
+private:
+	virtual void scsi_in( UINT32 data, UINT32 mask ) = 0;
+
+	UINT32 data_out;
+	scsibus_device *m_scsibus;
 };
 
 #endif

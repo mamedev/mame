@@ -46,6 +46,7 @@ void scsibus_device::device_start()
 		if( scsidev != NULL )
 		{
 			devices[ deviceCount++ ] = scsidev;
+			scsidev->m_scsibus = this;
 		}
 	}
 

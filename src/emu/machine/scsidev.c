@@ -151,6 +151,5 @@ void scsidev_device::scsi_out( UINT32 data, UINT32 mask )
 
 	data_out = ( data_out & ~mask ) | ( data & mask );
 
-	scsibus_device *m_scsibus = downcast<scsibus_device *>( owner() );
 	m_scsibus->scsi_update();
 }
