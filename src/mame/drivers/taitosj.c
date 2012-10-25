@@ -2817,4 +2817,4 @@ GAME( 1983, waterski, 0,        nomcu,    waterski, taitosj_state,   taitosj, RO
 GAME( 1983, bioatack, 0,        nomcu,    bioatack, taitosj_state,   taitosj, ROT270, "Taito Corporation (Fox Video Games license)", "Bio Attack", GAME_SUPPORTS_SAVE )
 GAME( 1984, sfposeid, 0,        mcu,      sfposeid, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Sea Fighter Poseidon", GAME_SUPPORTS_SAVE )
 GAME( 1983, hwrace,   0,        nomcu,    hwrace, taitosj_state,     taitosj, ROT270, "Taito Corporation", "High Way Race", GAME_SUPPORTS_SAVE )
-GAME( 1984, kikstart, 0,        kikstart, kikstart, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Kick Start Wheelie King", GAME_SUPPORTS_SAVE )
+GAME( 1984, kikstart, 0,        kikstart, kikstart, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Kick Start - Wheelie King", GAME_SUPPORTS_SAVE )
