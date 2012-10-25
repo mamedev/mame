@@ -1471,18 +1471,12 @@ Notes:
       *2                  - Unpopulated DIP28 socket
 */
 
-/* IRQ */
-
-void psx_irq_set( running_machine &machine, UINT32 data )
-{
-	psxcpu_device::irq_set( *machine.device("maincpu^"), "maincpu", data );
-}
-
 static void atpsx_interrupt(device_t *device, int state)
 {
 	if (state)
 	{
-		psx_irq_set(device->machine(), 0x400);
+		psxirq_device *psxirq = (psxirq_device *) machine.device("maincpu:irq");
+		psxirq->intin10();
 	}
 }
 
@@ -2053,7 +2047,8 @@ static void jdredd_ide_interrupt(device_t *device, int state)
 {
 	if (state)
 	{
-		psx_irq_set(device->machine(), 0x400);
+		psxirq_device *psxirq = (psxirq_device *) machine.device("maincpu:irq");
+		psxirq->intin10();
 	}
 }
 
@@ -2155,7 +2150,8 @@ WRITE32_MEMBER(zn_state::acpsx_10_w)
 WRITE32_MEMBER(zn_state::nbajamex_80_w)
 {
 	verboselog( machine(), 0, "nbajamex_80_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	psx_irq_set(machine(), 0x400);
+	psxirq_device *psxirq = (psxirq_device *) machine.device("maincpu:irq");
+	psxirq->intin10();
 }
 
 READ32_MEMBER(zn_state::nbajamex_08_r)

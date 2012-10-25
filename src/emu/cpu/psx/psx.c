@@ -3165,12 +3165,6 @@ psxcpu_device *psxcpu_device::getcpu( device_t &device, const char *cputag )
 	return downcast<psxcpu_device *>( device.subdevice( cputag ) );
 }
 
-void psxcpu_device::irq_set( device_t &device, const char *cputag, UINT32 bitmask )
-{
-	psxirq_device *irq = getcpu( device, cputag )->subdevice<psxirq_device>("irq");
-	irq->set( bitmask );
-}
-
 void psxcpu_device::install_sio_handler( device_t &device, const char *cputag, int n_port, psx_sio_handler p_f_sio_handler )
 {
 	psxsio_device *sio = getcpu( device, cputag )->subdevice<psxsio_device>("sio");
