@@ -2434,22 +2434,22 @@ WRITE32_MEMBER(namcos22_state::namcos22_mcuram_w)
 
 READ32_MEMBER(namcos22_state::namcos22_gun_r)
 {
-	int xpos = ioport("LIGHTX")->read_safe(0) * 640 / 0xff;
-	int ypos = ioport("LIGHTY")->read_safe(0) * 240 / 0xff + 0x10;
+	UINT16 xpos = ioport("LIGHTX")->read();
+	UINT16 ypos = ioport("LIGHTY")->read();
+
 	switch( offset )
 	{
-	case 0: /* 430000 */
-		return xpos<<16;
+		case 0: /* 430000 */
+			return xpos<<16;
 
-	case 1: /* 430004 */
-	case 2: /* 430008 */
-		return ypos<<16;
+		case 1: /* 430004 */
+		case 2: /* 430008 */
+			return ypos<<16;
 
-	case 3:
-	default:
-		return 0;
+		default:
+			return 0;
 	}
-} /* namcos22_gun_r */
+}
 
 WRITE32_MEMBER(namcos22_state::namcos22_cpuleds_w)
 {
@@ -2458,14 +2458,8 @@ WRITE32_MEMBER(namcos22_state::namcos22_cpuleds_w)
 	if (ACCESSING_BITS_0_15) data &= 0xff;
 	else data = (data>>16) & 0xff;
 
-	output_set_lamp_value(0, data>>7 & 1);
-	output_set_lamp_value(1, data>>6 & 1);
-	output_set_lamp_value(2, data>>5 & 1);
-	output_set_lamp_value(3, data>>4 & 1);
-	output_set_lamp_value(4, data>>3 & 1);
-	output_set_lamp_value(5, data>>2 & 1);
-	output_set_lamp_value(6, data>>1 & 1);
-	output_set_lamp_value(7, data>>0 & 1);
+	for (int i = 0; i < 8; i++)
+		output_set_lamp_value(i, (~data<<i & 0x80) ? 0 : 1);
 }
 
 READ32_MEMBER(namcos22_state::alpinesa_prot_r)
@@ -2477,17 +2471,17 @@ WRITE32_MEMBER(namcos22_state::alpinesa_prot_w)
 {
 	switch( data )
 	{
-	case 0:
-		m_mAlpineSurferProtData = 0;
-		break;
-	case 1:
-		m_mAlpineSurferProtData = 1;
-		break;
-	case 3:
-		m_mAlpineSurferProtData = 2;
-		break;
-	default:
-		break;
+		case 0:
+			m_mAlpineSurferProtData = 0;
+			break;
+		case 1:
+			m_mAlpineSurferProtData = 1;
+			break;
+		case 3:
+			m_mAlpineSurferProtData = 2;
+			break;
+		default:
+			break;
 	}
 } /* alpinesa_prot_w */
 
@@ -2517,7 +2511,6 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32, namcos22_state )
 	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(namcos22_keycus_r, namcos22_keycus_w)
 	AM_RANGE(0x410000, 0x413fff) AM_RAM /* C139 SCI buffer */
 	AM_RANGE(0x420000, 0x42000f) AM_READ(namcos22_C139_SCI_r) AM_WRITEONLY /* C139 SCI registers */
-	AM_RANGE(0x430000, 0x43000f) AM_READ(namcos22_gun_r)
 	AM_RANGE(0x430000, 0x430003) AM_WRITE(namcos22_cpuleds_w)
 	AM_RANGE(0x440000, 0x440003) AM_READ(namcos22_dipswitch_r)
 	AM_RANGE(0x450008, 0x45000b) AM_READWRITE(namcos22_portbit_r, namcos22_portbit_w)
@@ -2539,6 +2532,11 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32, namcos22_state )
 	AM_RANGE(0xa04000, 0xa0bfff) AM_READWRITE(namcos22_mcuram_r, namcos22_mcuram_w) AM_SHARE("shareram") /* COM RAM */
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(namcos22_dspram_r, namcos22_dspram_w) AM_SHARE("polygonram")
 	AM_RANGE(0xe00000, 0xe3ffff) AM_RAM /* workram */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( timecris_am, AS_PROGRAM, 32, namcos22_state )
+	AM_RANGE(0x430000, 0x43000f) AM_READ(namcos22_gun_r)
+	AM_IMPORT_FROM( namcos22s_am )
 ADDRESS_MAP_END
 
 READ16_MEMBER(namcos22_state::s22mcu_shared_r)
@@ -2979,6 +2977,13 @@ static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( timecris, namcos22s )
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(timecris_am)
 MACHINE_CONFIG_END
 
 /*********************************************************************************/
@@ -4484,9 +4489,6 @@ ROM_START( timecris )
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "ts1wavea.2l", 0x000000, 0x400000, CRC(d1123301) SHA1(4bf1fd746fef4e6befa63c61a761971d729e1573) )
 	ROM_LOAD( "ts1waveb.1l", 0x800000, 0x200000, CRC(bf4d7272) SHA1(c7c7b3620e7b3176644b6784ee36e679c9e31cc1) )
-
-	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "timecris_defaults.nv", 0x0000, 0x4000, CRC(02eeea95) SHA1(0c3c20c9dc7c1e1d5affb99e305e671b32f8e29b) )
 ROM_END
 
 ROM_START( timecrisa )
@@ -4540,9 +4542,6 @@ ROM_START( timecrisa )
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "ts1wavea.2l", 0x000000, 0x400000, CRC(d1123301) SHA1(4bf1fd746fef4e6befa63c61a761971d729e1573) )
 	ROM_LOAD( "ts1waveb.1l", 0x800000, 0x200000, CRC(bf4d7272) SHA1(c7c7b3620e7b3176644b6784ee36e679c9e31cc1) )
-
-	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "timecris_defaults.nv", 0x0000, 0x4000, CRC(02eeea95) SHA1(0c3c20c9dc7c1e1d5affb99e305e671b32f8e29b) )
 ROM_END
 
 ROM_START( tokyowar )
@@ -5080,10 +5079,10 @@ static INPUT_PORTS_START( timecris )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START( "LIGHTX" )
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(48) PORT_KEYDELTA(4)
-	PORT_START( "LIGHTY" )
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(64) PORT_KEYDELTA(4)
+	PORT_START( "LIGHTX" ) // tuned for CRT
+	PORT_BIT( 0xfff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(68, 68+626) PORT_SENSITIVITY(48) PORT_KEYDELTA(10)
+	PORT_START( "LIGHTY" ) // tuned for CRT - can't shoot below the statusbar?
+	PORT_BIT( 0xfff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(43, 43+241) PORT_SENSITIVITY(64) PORT_KEYDELTA(4)
 
 	PORT_START("MCUP5A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -5670,8 +5669,8 @@ GAME( 1994, alpinerc, alpinerd,  namcos22s, alpiner, namcos22_state,  alpiner,  
 GAME( 1995, airco22b, 0,         namcos22s, airco22, namcos22_state,  airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)"    , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // boots but missing sprite clear DMA?
 GAME( 1995, cybrcycc, 0,         namcos22s, cybrcycc, namcos22_state, cybrcyc,  ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 95/04/04
 GAME( 1995, dirtdash, 0,         namcos22s, dirtdash, namcos22_state, dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2)"                      , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
-GAME( 1995, timecris, 0,         namcos22s, timecris, namcos22_state, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
-GAME( 1995, timecrisa,timecris,  namcos22s, timecris, namcos22_state, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
+GAME( 1995, timecris, 0,         timecris,  timecris, namcos22_state, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
+GAME( 1995, timecrisa,timecris,  timecris,  timecris, namcos22_state, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
 GAME( 1996, propcycl, 0,         namcos22s, propcycl, namcos22_state, propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A)"               , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
 GAME( 1996, alpinesa, 0,         namcos22s, alpiner, namcos22_state,  alpinesa, ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A)"            , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 96/07/01 15:19:23. major gfx problems, slave dsp?
 GAME( 1996, tokyowar, 0,         namcos22s, tokyowar, namcos22_state, tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A)"               , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 96/09/03 14:08:47. near-invincible tanks, maybe related to timecris helicopter bug?

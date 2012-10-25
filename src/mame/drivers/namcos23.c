@@ -1782,7 +1782,7 @@ WRITE16_MEMBER(namcos23_state::s23_ctl_w)
 			{
 				m_ctl_led = data & 0xff;
 				for (int i = 0; i < 8; i++)
-					output_set_lamp_value(i, m_ctl_led>>i & 1);
+					output_set_lamp_value(i, (~data<<i & 0x80) ? 0 : 1);
 			}
 			break;
 
@@ -2998,10 +2998,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( timecrs2 )
 	PORT_INCLUDE( s23 )
 
-	PORT_START("LIGHTX")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(48) PORT_KEYDELTA(4)
-	PORT_START("LIGHTY")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(64) PORT_KEYDELTA(4)
+	PORT_START("LIGHTX") // tuned for CRT
+	PORT_BIT( 0xfff, 91+733/2, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(91, 91+733) PORT_SENSITIVITY(48) PORT_KEYDELTA(12)
+	PORT_START("LIGHTY") // tuned for CRT - can't shoot below the statusbar?
+	PORT_BIT( 0xfff, 38+247/2, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(38, 38+247) PORT_SENSITIVITY(64) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ss23 )
@@ -3146,10 +3146,10 @@ WRITE8_MEMBER(namcos23_state::s23_iob_p4_w)
 READ8_MEMBER(namcos23_state::s23_iob_p6_r)
 {
 	// d4 is service button
-	UINT8 sb = ioport("SERVICE")->read() & 1;
+	UINT8 sb = (ioport("SERVICE")->read() & 1) << 4;
 	// other bits: unknown
 
-	return sb<<4;
+	return sb | 0;
 }
 
 WRITE8_MEMBER(namcos23_state::s23_iob_p6_w)
@@ -3159,10 +3159,9 @@ WRITE8_MEMBER(namcos23_state::s23_iob_p6_w)
 
 READ8_MEMBER(namcos23_state::s23_gun_r)
 {
-	UINT16 xpos = ioport("LIGHTX")->read_safe(0) * 640 / 0xff + 0x80;
-	UINT16 ypos = ioport("LIGHTY")->read_safe(0) * 240 / 0xff + 0x20;
+	UINT16 xpos = ioport("LIGHTX")->read();
+	UINT16 ypos = ioport("LIGHTY")->read();
 
-	// note: will need angle adjustments for accurate aiming at screen sides
 	switch(offset)
 	{
 		case 0: return xpos&0xff;
