@@ -282,10 +282,10 @@ WRITE8_MEMBER( s3_state::sol1_w )
 	{
 		if (BIT(data, 0))
 			m_samples->start(1, 1); // 10 chime
-		else
+		//else
 		if (BIT(data, 1))
 			m_samples->start(2, 2); // 100 chime
-		else
+		//else
 		if (BIT(data, 2))
 			m_samples->start(3, 3); // 1000 chime
 		// we don't have a 10k chime in samples yet
@@ -298,29 +298,23 @@ WRITE8_MEMBER( s3_state::sol1_w )
 		m_sound_data = ioport("SND")->read(); // 0xff or 0xbf
 		if (BIT(data, 0))
 			m_sound_data &= 0xfe;
-		else
+
 		if (BIT(data, 1))
 			m_sound_data &= 0xfd;
-		else
+
 		if (BIT(data, 2))
 			m_sound_data &= 0xfb;
-		else
+
 		if (BIT(data, 3))
 			m_sound_data &= 0xf7;
-		else
+
 		if (BIT(data, 4))
 			m_sound_data &= 0x7f;
 
-		if ((m_sound_data & 0xbf) == 0xbf)
-		{
-			m_cb1 = 0;
-			m_pia4->cb1_w(0);
-		}
-		else
-		{
-			m_cb1 = 1;
-			m_pia4->cb1_w(1);
-		}
+
+		m_cb1 = ((m_sound_data & 0x7f) != 0x7f);
+
+		m_pia4->cb1_w(!m_cb1);
 	}
 
 	if (BIT(data, 5))

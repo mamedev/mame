@@ -2224,6 +2224,12 @@ $(DRIVERS)/rowamet.o:	$(LAYOUT)/rowamet.lh
 
 $(DRIVERS)/s3.o:	$(LAYOUT)/s3.lh
 
+$(DRIVERS)/s4.o:	$(LAYOUT)/s4.lh
+
+$(DRIVERS)/s6.o:	$(LAYOUT)/s6.lh
+
+$(DRIVERS)/s6a.o:	$(LAYOUT)/s6a.lh
+
 $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
 
 $(DRIVERS)/sderby.o:	$(LAYOUT)/sderby.lh \
