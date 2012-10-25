@@ -8,7 +8,7 @@
 #include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
 
-#define VERBOSE_LEVEL	(99)
+#define VERBOSE_LEVEL	(0)
 
 #define ENABLE_VERBOSE_LOG (0)
 

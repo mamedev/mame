@@ -23,7 +23,7 @@
 
 #define VERBOSE_LEVEL	(0)
 
-#define ENABLE_VERBOSE_LOG (1)
+#define ENABLE_VERBOSE_LOG (0)
 
 #if ENABLE_VERBOSE_LOG
 INLINE void verboselog(UINT16 pc, int n_level, const char *s_fmt, ...)
@@ -240,7 +240,7 @@ static void unimplemented_opcode(avr8_state *cpustate, UINT32 op);
 // - Interrupts
 static void avr8_set_irq_line(avr8_state *cpustate, UINT16 vector, int state);
 static void avr8_update_interrupt_internal(avr8_state *cpustate, int source);
-static void avr8_poll_interrupt(avr8_state *cpustate);
+//static void avr8_poll_interrupt(avr8_state *cpustate);
 
 // - Timers
 static void avr8_timer_tick(avr8_state *cpustate, int cycles);
@@ -429,13 +429,13 @@ static void avr8_update_interrupt_internal(avr8_state *cpustate, int source)
 	}
 }
 
-static void avr8_poll_interrupt(avr8_state *cpustate)
+/*static void avr8_poll_interrupt(avr8_state *cpustate)
 {
 	for (int idx = 0; idx < AVR8_INTIDX_COUNT; idx++)
 	{
 		avr8_update_interrupt_internal(cpustate, idx);
 	}
-}
+}*/
 
 void avr8_update_interrupt(device_t *device, int source)
 {
@@ -1132,6 +1132,8 @@ static CPU_EXECUTE( avr8 )
 
     while (cpustate->icount > 0)
     {
+		opcycles = 1;
+
         cpustate->pc &= cpustate->addr_mask;
 
         debugger_instruction_hook(device, cpustate->pc << 1);
@@ -1353,8 +1355,8 @@ static CPU_EXECUTE( avr8 )
                 switch(op & 0x0208)
                 {
                     case 0x0000:    // LDD Rd,Z+q
-                        //output += sprintf( output, "LD(D)   R%d, Z+%02x", RD5(op), QCONST6(op) );
-                        unimplemented_opcode(cpustate, op);
+                        cpustate->r[RD5(op)] = READ_IO_8(cpustate, ZREG + QCONST6(op));
+                        opcycles = 2;
                         break;
                     case 0x0008:    // LDD Rd,Y+q
                         cpustate->r[RD5(op)] = READ_IO_8(cpustate, YREG + QCONST6(op));
@@ -1433,6 +1435,7 @@ static CPU_EXECUTE( avr8 )
                                 break;
                             case 0x000c:    // LD Rd,X
                             	cpustate->r[RD5(op)] = READ_IO_8(cpustate, XREG);
+                            	opcycles = 2;
                                 break;
                             case 0x000d:    // LD Rd,X+
                                 pd = XREG;
@@ -1485,6 +1488,7 @@ static CPU_EXECUTE( avr8 )
                                 pd++;
                                 cpustate->r[29] = (pd >> 8) & 0x00ff;
                                 cpustate->r[28] = pd & 0x00ff;
+                                opcycles = 2;
                                 break;
                             case 0x000a:    // ST -Z,Rd
                                 //output += sprintf( output, "ST      -Y , R%d", RD5(op) );
@@ -1499,6 +1503,7 @@ static CPU_EXECUTE( avr8 )
                                 pd++;
                                 cpustate->r[27] = (pd >> 8) & 0x00ff;
                                 cpustate->r[26] = pd & 0x00ff;
+                                opcycles = 2;
                                 break;
                             case 0x000e:    // ST -X,Rd
                                 //output += sprintf( output, "ST      -X , R%d", RD5(op) );
@@ -1742,11 +1747,11 @@ static CPU_EXECUTE( avr8 )
                                         //printf("Pop: %04x\n", cpustate->pc);
                                         cpustate->pc--;
                                         SREG_W(AVR8_SREG_I, 1);
-                                        if (cpustate->interrupt_pending)
+                                        /*if (cpustate->interrupt_pending)
                                         {
 											avr8_poll_interrupt(cpustate);
 											cpustate->interrupt_pending = false;
-										}
+										}*/
                                         opcycles = 4;
                                         break;
                                     case 0x0080:    // SLEEP
@@ -1856,7 +1861,7 @@ static CPU_EXECUTE( avr8 )
                     case 0x0900:    // SBIC A,b
                 		if(NOT(BIT(READ_IO_8(cpustate, 32 + ACONST5(op)), (1 << RR3(op)))))
                 		{
-							opcycles += avr8_is_long_opcode(op) ? 2 : 1;
+							opcycles = avr8_is_long_opcode(op) ? 3 : 2;
                             cpustate->pc += avr8_is_long_opcode(op) ? 2 : 1;
 						}
                         break;
@@ -1867,7 +1872,7 @@ static CPU_EXECUTE( avr8 )
                     case 0x0b00:    // SBIS A,b
                 		if(BIT(READ_IO_8(cpustate, 32 + ACONST5(op)), (1 << RR3(op))))
                 		{
-							opcycles += avr8_is_long_opcode(op) ? 2 : 1;
+							opcycles = avr8_is_long_opcode(op) ? 3 : 2;
                             cpustate->pc += avr8_is_long_opcode(op) ? 2 : 1;
 						}
                         break;
