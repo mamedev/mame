@@ -25,8 +25,10 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, 
 
 const device_type PSX_SIO = &device_creator<psxsio_device>;
 
-psxsio_device::psxsio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PSX_SIO, "PSX SIO", tag, owner, clock)
+psxsio_device::psxsio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, PSX_SIO, "PSX SIO", tag, owner, clock),
+	m_irq0_handler(*this),
+	m_irq1_handler(*this)
 {
 	int n;
 
@@ -53,6 +55,9 @@ void psxsio_device::device_post_load()
 void psxsio_device::device_start()
 {
 	int n;
+
+	m_irq0_handler.resolve_safe();
+	m_irq1_handler.resolve_safe();
 
 	for( n = 0; n < 2; n++ )
 	{
@@ -105,11 +110,11 @@ void psxsio_device::sio_interrupt( int n_port )
 	sio->n_status |= SIO_STATUS_IRQ;
 	if( n_port == 0 )
 	{
-		psx_irq_set( machine(), PSX_IRQ_SIO0 );
+		m_irq0_handler(1);
 	}
 	else
 	{
-		psx_irq_set( machine(), PSX_IRQ_SIO1 );
+		m_irq1_handler(1);
 	}
 }
 

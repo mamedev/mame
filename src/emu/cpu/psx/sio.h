@@ -16,6 +16,12 @@ extern const device_type PSX_SIO;
 
 typedef void ( *psx_sio_handler )( running_machine &, int );
 
+#define MCFG_PSX_SIO_IRQ0_HANDLER(_devcb) \
+	devcb = &psxsio_device::set_irq0_handler(*device, DEVCB2_##_devcb); \
+
+#define MCFG_PSX_SIO_IRQ1_HANDLER(_devcb) \
+	devcb = &psxsio_device::set_irq1_handler(*device, DEVCB2_##_devcb); \
+
 #define PSX_SIO_OUT_DATA ( 1 )	/* COMMAND */
 #define PSX_SIO_OUT_DTR ( 2 )	/* ATT */
 #define PSX_SIO_OUT_RTS ( 4 )
@@ -67,6 +73,10 @@ class psxsio_device : public device_t
 public:
 	psxsio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_irq0_handler(device_t &device, _Object object) { return downcast<psxsio_device &>(device).m_irq0_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_irq1_handler(device_t &device, _Object object) { return downcast<psxsio_device &>(device).m_irq1_handler.set_callback(object); }
+
 	void install_handler( int n_port, psx_sio_handler p_f_sio_handler );
 
 	DECLARE_WRITE32_MEMBER( write );
@@ -85,6 +95,9 @@ private:
 	TIMER_CALLBACK_MEMBER(sio_clock);
 
 	psx_sio port[2];
+
+	devcb2_write_line m_irq0_handler;
+	devcb2_write_line m_irq1_handler;
 };
 
 DECLARE_WRITE32_HANDLER( psx_sio_w );

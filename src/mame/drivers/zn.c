@@ -538,14 +538,6 @@ static void zn_driver_init( running_machine &machine )
 	state->m_dip_timer = machine.scheduler().timer_alloc( timer_expired_delegate(FUNC(zn_state::dip_timer_fired),state), NULL );
 }
 
-static void psx_spu_irq(device_t *device, UINT32 data)
-{
-	if (data)
-	{
-		psx_irq_set(device->machine(), 1<<9);
-	}
-}
-
 static void zn_machine_init( running_machine &machine )
 {
 	zn_state *state = machine.driver_data<zn_state>();
@@ -565,7 +557,7 @@ static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2, &psx_spu_irq )
+	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 
@@ -587,7 +579,7 @@ static MACHINE_CONFIG_START( zn2, zn_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2, &psx_spu_irq )
+	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 
@@ -1478,6 +1470,13 @@ Notes:
       *1                  - Unpopulated position for PLCC44 IC
       *2                  - Unpopulated DIP28 socket
 */
+
+/* IRQ */
+
+void psx_irq_set( running_machine &machine, UINT32 data )
+{
+	psxcpu_device::irq_set( *machine.device("maincpu^"), "maincpu", data );
+}
 
 static void atpsx_interrupt(device_t *device, int state)
 {

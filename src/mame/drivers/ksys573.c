@@ -479,9 +479,14 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 class ksys573_state : public psx_state
 {
 public:
-	ksys573_state(const machine_config &mconfig, device_type type, const char *tag)
-		: psx_state(mconfig, type, tag),
-		  m_cr589(*this, ":cdrom") { }
+	ksys573_state(const machine_config &mconfig, device_type type, const char *tag) :
+		psx_state(mconfig, type, tag),
+		m_psxirq(*this, ":maincpu:irq"),
+		m_cr589(*this, ":cdrom")
+	{
+	}
+
+	required_device<psxirq_device> m_psxirq;
 
 	int m_flash_bank;
 	fujitsu_29f016a_device *m_flash_device[5][16];
@@ -758,7 +763,7 @@ TIMER_CALLBACK_MEMBER(ksys573_state::atapi_xfer_end)
 		atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO | ATAPI_INTREASON_COMMAND;
 	}
 
-	psx_irq_set(machine(), 0x400);
+	m_psxirq->intin10(1);
 
 	verboselog( machine(), 2, "atapi_xfer_end: %d %d\n", m_atapi_xferlen, m_atapi_xfermod );
 }
@@ -809,7 +814,7 @@ READ32_MEMBER(ksys573_state::atapi_r)
 			atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
 			atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
 
-			psx_irq_set(machine(), 0x400);
+			m_psxirq->intin10(1);
 		}
 
 		if( m_atapi_data_ptr < m_atapi_data_len )
@@ -826,7 +831,7 @@ READ32_MEMBER(ksys573_state::atapi_r)
 				{
 					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
-					psx_irq_set(machine(), 0x400);
+					m_psxirq->intin10(1);
 				}
 			}
 		}
@@ -910,7 +915,7 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 				m_cr589->WriteData( atapi_data, m_atapi_cdata_wait );
 
 				// assert IRQ
-				psx_irq_set(machine(), 0x400);
+				m_psxirq->intin10(1);
 
 				// not sure here, but clear DRQ at least?
 				atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
@@ -983,7 +988,7 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 				}
 
 				// assert IRQ
-				psx_irq_set(machine(), 0x400);
+				m_psxirq->intin10(1);
 			}
 			else
 			{
@@ -1100,7 +1105,7 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 					atapi_regs[ATAPI_REG_COUNTLOW] = 0;
 					atapi_regs[ATAPI_REG_COUNTHIGH] = 2;
 
-					psx_irq_set(machine(), 0x400);
+					m_psxirq->intin10(1);
 					break;
 
 				case 0xef:	// SET FEATURES
@@ -1109,7 +1114,7 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 					m_atapi_data_ptr = 0;
 					m_atapi_data_len = 0;
 
-					psx_irq_set(machine(), 0x400);
+					m_psxirq->intin10(1);
 					break;
 
 				default:
@@ -1406,14 +1411,6 @@ MACHINE_RESET_MEMBER(ksys573_state,konami573)
 	m_flash_bank = -1;
 
 	update_mode(machine());
-}
-
-static void spu_irq(device_t *device, UINT32 data)
-{
-	if (data)
-	{
-		psx_irq_set(device->machine(), 1<<9);
-	}
 }
 
 void sys573_vblank(ksys573_state *state, screen_device &screen, bool vblank_state)
@@ -3061,7 +3058,7 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2, &spu_irq )
+	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.0 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 

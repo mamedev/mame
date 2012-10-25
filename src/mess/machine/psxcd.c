@@ -106,13 +106,16 @@ void psxcd_device::static_set_devname(device_t &device, const char *devname)
 	psxcd.m_devname = devname;
 }
 
-psxcd_device::psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PSXCD, "PSXCD", tag, owner, clock)
+psxcd_device::psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, PSXCD, "PSXCD", tag, owner, clock),
+	m_irq_handler(*this)
 {
 }
 
 void psxcd_device::device_start()
 {
+	m_irq_handler.resolve_safe();
+
 	unsigned int sysclk=machine().device<cpu_device>("maincpu")->clock()/2;
 	start_read_delay=(sysclk/60);
 	read_sector_cycles=(sysclk/75);
@@ -891,7 +894,7 @@ void psxcd_device::cmd_complete(command_result *res)
 
 	if (doint)
 	{
-		psx_irq_set(machine(), 0x0004);
+		m_irq_handler(1);
 	}
 
 	add_result(res);

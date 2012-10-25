@@ -26,8 +26,9 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, 
 
 const device_type PSX_DMA = &device_creator<psxdma_device>;
 
-psxdma_device::psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PSX_DMA, "PSX DMA", tag, owner, clock)
+psxdma_device::psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, PSX_DMA, "PSX DMA", tag, owner, clock),
+	m_irq_handler(*this)
 {
 }
 
@@ -56,6 +57,8 @@ void psxdma_device::device_post_load()
 
 void psxdma_device::device_start()
 {
+	m_irq_handler.resolve_safe();
+
 	for( int index = 0; index < 7; index++ )
 	{
 		psx_dma_channel *dma = &channel[ index ];
@@ -116,7 +119,7 @@ void psxdma_device::dma_interrupt_update()
 	{
 		verboselog( machine(), 2, "dma_interrupt_update( %02x, %02x ) interrupt triggered\n", n_int, n_mask );
 		n_dicr |= 0x80000000;
-		psx_irq_set( machine(), PSX_IRQ_DMA );
+		m_irq_handler(1);
 	}
 	else if( n_int != 0 )
 	{

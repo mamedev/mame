@@ -8,14 +8,11 @@
 
 #include "machine/scsihle.h"
 
-struct AM53CF96interface
-{
-	void (*irq_callback)(running_machine &machine);	/* irq callback */
-};
+#define MCFG_AM53CF96_ADD( _tag ) \
+	MCFG_DEVICE_ADD( _tag, AM53CF96, 0 )
 
-#define MCFG_AM53CF96_ADD( _tag, _config ) \
-	MCFG_DEVICE_ADD( _tag, AM53CF96, 0 ) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_AM53CF96_IRQ_HANDLER(_devcb) \
+	devcb = &am53cf96_device::set_irq_handler(*device, DEVCB2_##_devcb); \
 
 // 53CF96 register set
 enum
@@ -39,12 +36,14 @@ enum
 	REG_DATAALIGN		// data alignment (write only)
 };
 
-class am53cf96_device : public device_t,
-					   public AM53CF96interface
+class am53cf96_device : public device_t
 {
 public:
 	// construction/destruction
 	am53cf96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<am53cf96_device &>(device).m_irq_handler.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -54,7 +53,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
@@ -70,6 +68,7 @@ private:
 	UINT8 last_id;
 
 	emu_timer* m_transfer_timer;
+	devcb2_write_line m_irq_handler;
 };
 
 // device type definition

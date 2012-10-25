@@ -9,14 +9,14 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_SPU_ADD(_tag, _clock, _irqf) \
-	MCFG_DEVICE_ADD(_tag, SPU, _clock) \
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 4, psx_dma_read_delegate( FUNC( spu_device::dma_read ), (spu_device *) device ) ) \
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 4, psx_dma_write_delegate( FUNC( spu_device::dma_write ), (spu_device *) device ) ) \
-	MCFG_IRQ_FUNC(_irqf)
+#define MCFG_SPU_IRQ_HANDLER(_devcb) \
+	devcb = &spu_device::set_irq_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_IRQ_FUNC(_irqf) \
-	spu_device::static_set_irqf(*device, _irqf); \
+#define MCFG_SPU_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, SPU, _clock) \
+	MCFG_SPU_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin9)) \
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 4, psx_dma_read_delegate( FUNC( spu_device::dma_read ), (spu_device *) device ) ) \
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 4, psx_dma_write_delegate( FUNC( spu_device::dma_write ), (spu_device *) device ) )
 
 // ======================> spu_device
 
@@ -49,7 +49,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	// internal state
-	void (*m_irq_cb)(device_t *device, UINT32 state);
+	devcb2_write_line m_irq_handler;
 
 	unsigned char *spu_ram;
 	reverb *rev;
@@ -217,8 +217,8 @@ protected:
 public:
 	spu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// inline configuration helpers
-	static void static_set_irqf(device_t &device, void (*irqf)(device_t *device, UINT32 state));
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<spu_device &>(device).m_irq_handler.set_callback(object); }
 
 	void dma_read( UINT32 n_address, INT32 n_size );
 	void dma_write( UINT32 n_address, INT32 n_size );

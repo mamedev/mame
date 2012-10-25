@@ -3196,13 +3196,20 @@ WRITE32_HANDLER( psxcpu_device::gpu_w )
 static MACHINE_CONFIG_FRAGMENT( psx )
 	MCFG_DEVICE_ADD("irq", PSX_IRQ, 0)
 	MCFG_DEVICE_ADD("dma", PSX_DMA, 0)
+	MCFG_PSX_DMA_IRQ_HANDLER(DEVWRITELINE("irq", psxirq_device, intin3))
 
 	MCFG_DEVICE_ADD("mdec", PSX_MDEC, 0)
 	MCFG_PSX_DMA_CHANNEL_WRITE( DEVICE_SELF, 0, psx_dma_write_delegate( FUNC( psxmdec_device::dma_write ), (psxmdec_device *) device ) )
 	MCFG_PSX_DMA_CHANNEL_READ( DEVICE_SELF, 1, psx_dma_read_delegate( FUNC( psxmdec_device::dma_read ), (psxmdec_device *) device ) )
 
 	MCFG_DEVICE_ADD("rcnt", PSX_RCNT, 0)
+	MCFG_PSX_RCNT_IRQ0_HANDLER(DEVWRITELINE("irq", psxirq_device, intin4))
+	MCFG_PSX_RCNT_IRQ1_HANDLER(DEVWRITELINE("irq", psxirq_device, intin5))
+	MCFG_PSX_RCNT_IRQ2_HANDLER(DEVWRITELINE("irq", psxirq_device, intin6))
+
 	MCFG_DEVICE_ADD("sio", PSX_SIO, 0)
+	MCFG_PSX_SIO_IRQ0_HANDLER(DEVWRITELINE("irq", psxirq_device, intin7))
+	MCFG_PSX_SIO_IRQ1_HANDLER(DEVWRITELINE("irq", psxirq_device, intin8))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

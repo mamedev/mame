@@ -25,8 +25,11 @@ const int num_commands=0x20;
 //**************************************************************************
 
 #define MCFG_PSXCD_ADD(_devname) \
-    MCFG_DEVICE_ADD(PSXCD_TAG, PSXCD, 0) \
+	MCFG_DEVICE_ADD(PSXCD_TAG, PSXCD, 0) \
 	MCFG_PSXCD_DEVNAME(_devname)
+
+#define MCFG_PSXCD_IRQ_HANDLER(_devcb) \
+	devcb = &psxcd_device::set_irq_handler(*device, DEVCB2_##_devcb);
 
 #define MCFG_PSXCD_DEVNAME(_name) \
 	psxcd_device::static_set_devname(*device, _name); \
@@ -41,7 +44,9 @@ class psxcd_device : public device_t,
 public:
 
     psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	// inline configuration helpers
+
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxcd_device &>(device).m_irq_handler.set_callback(object); }
 	static void static_set_devname(device_t &device, const char *devname);
 private:
 	struct command_result
@@ -164,6 +169,8 @@ private:
 	bool m_timerinuse[MAX_PSXCD_TIMERS];
 
 	void add_system_event(event *ev);
+
+	devcb2_write_line m_irq_handler;
 };
 
 

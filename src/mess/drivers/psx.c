@@ -754,14 +754,6 @@ static INPUT_PORTS_START( psx )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2) PORT_NAME("P2 L2")
 INPUT_PORTS_END
 
-static void spu_irq(device_t *device, UINT32 data)
-{
-	if (data)
-	{
-		psx_irq_set(device->machine(), 1<<9);
-	}
-}
-
 struct cdrom_interface psx_cdrom =
 {
 	"psx_cdrom",
@@ -780,7 +772,7 @@ static MACHINE_CONFIG_START( psxntsc, psx1_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2, &spu_irq )
+	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
@@ -791,6 +783,7 @@ static MACHINE_CONFIG_START( psxntsc, psx1_state )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","psx")
 
 	MCFG_PSXCD_ADD("cdrom")
+	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("^maincpu:irq", psxirq_device, intin2))
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( cd_dma_read ), (psxcd_device *) device ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate( FUNC( cd_dma_write ), (psxcd_device *) device ) )
 
@@ -811,7 +804,7 @@ static MACHINE_CONFIG_START( psxpal, psx1_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2, &spu_irq )
+	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
@@ -822,6 +815,7 @@ static MACHINE_CONFIG_START( psxpal, psx1_state )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","psx")
 
 	MCFG_PSXCD_ADD("cdrom")
+	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("^maincpu:irq", psxirq_device, intin2))
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( cd_dma_read ), (psxcd_device *) device ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate( FUNC( cd_dma_write ), (psxcd_device *) device ) )
 

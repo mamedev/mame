@@ -25,8 +25,11 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, 
 
 const device_type PSX_RCNT = &device_creator<psxrcnt_device>;
 
-psxrcnt_device::psxrcnt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PSX_RCNT, "PSX RCNT", tag, owner, clock)
+psxrcnt_device::psxrcnt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, PSX_RCNT, "PSX RCNT", tag, owner, clock),
+	m_irq0_handler(*this),
+	m_irq1_handler(*this),
+	m_irq2_handler(*this)
 {
 }
 
@@ -46,6 +49,10 @@ void psxrcnt_device::device_post_load()
 void psxrcnt_device::device_start()
 {
 	int n;
+
+	m_irq0_handler.resolve_safe();
+	m_irq1_handler.resolve_safe();
+	m_irq2_handler.resolve_safe();
 
 	for( n = 0; n < 3; n++ )
 	{
@@ -232,6 +239,17 @@ TIMER_CALLBACK_MEMBER(psxrcnt_device::root_finished)
 	if( ( root->n_mode & PSX_RC_IRQOVERFLOW ) != 0 ||
 		( root->n_mode & PSX_RC_IRQTARGET ) != 0 )
 	{
-		psx_irq_set( machine(), PSX_IRQ_ROOTCOUNTER0 << n_counter );
+		switch( n_counter )
+		{
+		case 0:
+			m_irq0_handler(1);
+			break;
+		case 1:
+			m_irq1_handler(1);
+			break;
+		case 2:
+			m_irq2_handler(1);
+			break;
+		}
 	}
 }

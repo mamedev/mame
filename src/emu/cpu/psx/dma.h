@@ -14,6 +14,9 @@
 
 extern const device_type PSX_DMA;
 
+#define MCFG_PSX_DMA_IRQ_HANDLER(_devcb) \
+	devcb = &psxdma_device::set_irq_handler(*device, DEVCB2_##_devcb);
+
 typedef delegate<void (UINT32, INT32)> psx_dma_read_delegate;
 typedef delegate<void (UINT32, INT32)> psx_dma_write_delegate;
 
@@ -33,6 +36,9 @@ class psxdma_device : public device_t
 {
 public:
 	psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxdma_device &>(device).m_irq_handler.set_callback(object); }
 
 	void install_read_handler( int n_channel, psx_dma_read_delegate p_fn_dma_read );
 	void install_write_handler( int n_channel, psx_dma_read_delegate p_fn_dma_write );
@@ -58,6 +64,8 @@ private:
 	psx_dma_channel channel[7];
 	UINT32 n_dpcp;
 	UINT32 n_dicr;
+
+	devcb2_write_line m_irq_handler;
 };
 
 #endif

@@ -12,12 +12,16 @@
 
 #include "emu.h"
 
+#define MCFG_PSX_GPU_VBLANK_HANDLER(_devcb) \
+	devcb = &psxgpu_device::set_vblank_handler(*device, DEVCB2_##_devcb);
+
 #define MCFG_PSXGPU_ADD( cputag, tag, type, _vramSize, clock ) \
 	MCFG_DEVICE_MODIFY( cputag ) \
 	MCFG_PSX_GPU_READ_HANDLER(DEVREAD32(tag, psxgpu_device, read)) \
 	MCFG_PSX_GPU_WRITE_HANDLER(DEVWRITE32(tag, psxgpu_device, write)) \
 	MCFG_DEVICE_ADD( tag, type, clock ) \
 	((psxgpu_device *) device)->vramSize = _vramSize; \
+	MCFG_PSX_GPU_VBLANK_HANDLER(DEVWRITELINE(cputag ":irq", psxirq_device, intin0)) \
 	MCFG_PSX_DMA_CHANNEL_READ( cputag, 2, psx_dma_write_delegate( FUNC( psxgpu_device::dma_read ), (psxgpu_device *) device ) ) \
 	MCFG_PSX_DMA_CHANNEL_WRITE( cputag, 2, psx_dma_read_delegate( FUNC( psxgpu_device::dma_write ), (psxgpu_device *) device ) )
 
@@ -27,6 +31,7 @@
 	MCFG_PSX_GPU_WRITE_HANDLER(DEVWRITE32(tag, psxgpu_device, write)) \
 	MCFG_DEVICE_REPLACE( tag, type, clock ) \
 	((psxgpu_device *) device)->vramSize = _vramSize; \
+	MCFG_PSX_GPU_VBLANK_HANDLER(DEVWRITELINE(cputag ":irq", psxirq_device, intin0)) \
 	MCFG_PSX_DMA_CHANNEL_READ( cputag, 2, psx_dma_write_delegate( FUNC( psxgpu_device::dma_read ), (psxgpu_device *) device ) ) \
 	MCFG_PSX_DMA_CHANNEL_WRITE( cputag, 2, psx_dma_read_delegate( FUNC( psxgpu_device::dma_write ), (psxgpu_device *) device ) )
 
@@ -186,6 +191,9 @@ public:
 	psxgpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	virtual machine_config_constructor device_mconfig_additions() const;
 
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_vblank_handler(device_t &device, _Object object) { return downcast<psxgpu_device &>(device).m_vblank_handler.set_callback(object); }
+
 	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
@@ -300,6 +308,8 @@ protected:
 	UINT16 p_n_b0[ 0x10000 ];
 	UINT16 p_n_r1[ 0x10000 ];
 	UINT16 p_n_b1g1[ 0x10000 ];
+
+	devcb2_write_line m_vblank_handler;
 };
 
 class cxd8514q_device : public psxgpu_device

@@ -14,6 +14,15 @@
 
 extern const device_type PSX_RCNT;
 
+#define MCFG_PSX_RCNT_IRQ0_HANDLER(_devcb) \
+	devcb = &psxrcnt_device::set_irq0_handler(*device, DEVCB2_##_devcb); \
+
+#define MCFG_PSX_RCNT_IRQ1_HANDLER(_devcb) \
+	devcb = &psxrcnt_device::set_irq1_handler(*device, DEVCB2_##_devcb); \
+
+#define MCFG_PSX_RCNT_IRQ2_HANDLER(_devcb) \
+	devcb = &psxrcnt_device::set_irq2_handler(*device, DEVCB2_##_devcb); \
+
 #define PSX_RC_STOP ( 0x01 )
 #define PSX_RC_RESET ( 0x04 ) /* guess */
 #define PSX_RC_COUNTTARGET ( 0x08 )
@@ -37,6 +46,11 @@ class psxrcnt_device : public device_t
 public:
 	psxrcnt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_irq0_handler(device_t &device, _Object object) { return downcast<psxrcnt_device &>(device).m_irq0_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_irq1_handler(device_t &device, _Object object) { return downcast<psxrcnt_device &>(device).m_irq1_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_irq2_handler(device_t &device, _Object object) { return downcast<psxrcnt_device &>(device).m_irq2_handler.set_callback(object); }
+
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
 
@@ -54,6 +68,10 @@ private:
 	int root_target( int n_counter );
 	void root_timer_adjust( int n_counter );
 	TIMER_CALLBACK_MEMBER(root_finished);
+
+	devcb2_write_line m_irq0_handler;
+	devcb2_write_line m_irq1_handler;
+	devcb2_write_line m_irq2_handler;
 };
 
 #endif

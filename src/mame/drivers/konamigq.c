@@ -303,19 +303,8 @@ static void scsi_dma_write( konamigq_state *state, UINT32 n_address, INT32 n_siz
 {
 }
 
-static void scsi_irq(running_machine &machine)
-{
-	psx_irq_set(machine, 0x400);
-}
-
-static const struct AM53CF96interface am53cf96_intf =
-{
-	&scsi_irq,		/* command completion IRQ */
-};
-
 DRIVER_INIT_MEMBER(konamigq_state,konamigq)
 {
-
 	psx_driver_init(machine());
 
 	m_p_n_pcmram = memregion( "shared" )->base() + 0x80000;
@@ -323,7 +312,6 @@ DRIVER_INIT_MEMBER(konamigq_state,konamigq)
 
 MACHINE_START_MEMBER(konamigq_state,konamigq)
 {
-
 	save_pointer(NAME(m_p_n_pcmram), 0x380000);
 	save_item(NAME(m_sndto000));
 	save_item(NAME(m_sndtor3k));
@@ -353,7 +341,8 @@ static MACHINE_CONFIG_START( konamigq, konamigq_state )
 
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:disk", SCSIHD, SCSI_ID_0)
-	MCFG_AM53CF96_ADD("scsi:am53cf96", am53cf96_intf)
+	MCFG_AM53CF96_ADD("scsi:am53cf96")
+	MCFG_AM53CF96_IRQ_HANDLER(DEVWRITELINE("^maincpu:irq", psxirq_device, intin10))
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8538Q, 0x200000, XTAL_53_693175MHz )

@@ -10,6 +10,8 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
+#define PSX_IRQ_MASK ( 0x7fd )
+
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
@@ -109,4 +111,92 @@ READ32_MEMBER( psxirq_device::read )
 		break;
 	}
 	return 0;
+}
+
+WRITE_LINE_MEMBER( psxirq_device::intin0 )
+{
+	if( state )
+	{
+		set( 1 << 0 );
+	}
+}
+
+WRITE_LINE_MEMBER( psxirq_device::intin1 )
+{
+	if( state )
+	{
+		set( 1 << 3 );
+	}
+}
+
+WRITE_LINE_MEMBER( psxirq_device::intin2 )
+{
+	if( state )
+	{
+		set( 1 << 3 );
+	}
+}
+
+WRITE_LINE_MEMBER( psxirq_device::intin3 )
+{
+	if( state )
+	{
+		set( 1 << 3 );
+	}
+}
+
+WRITE_LINE_MEMBER( psxirq_device::intin4 )
+{
+	if( state )
+	{
+		set( 1 << 3 );
+	}
+}
+
+WRITE_LINE_MEMBER( psxirq_device::intin5 )
+{
+	if( state )
+	{
+		set( 1 << 3 );
+	}
+}
+
+WRITE_LINE_MEMBER( psxirq_device::intin6 )
+{
+	if( state )
+	{
+		set( 1 << 3 );
+	}
+}
+
+WRITE_LINE_MEMBER( psxirq_device::intin7 )
+{
+	if( state )
+	{
+		set( 1 << 7 );
+	}
+}
+
+WRITE_LINE_MEMBER( psxirq_device::intin8 )
+{
+	if( state )
+	{
+		set( 1 << 8 );
+	}
+}
+
+WRITE_LINE_MEMBER( psxirq_device::intin9 )
+{
+	if( state )
+	{
+		set( 1 << 9 );
+	}
+}
+
+WRITE_LINE_MEMBER( psxirq_device::intin10 )
+{
+	if( state )
+	{
+		set( 1 << 10 );
+	}
 }

@@ -954,16 +954,15 @@ static int shift_register15(int &shift)
 //  spu_device - constructor
 //-------------------------------------------------
 
-spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SPU, "SPU", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_irq_cb(NULL),
-      dirty_flags(-1),
+spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, SPU, "SPU", tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_irq_handler(*this),
+	dirty_flags(-1),
 	status_enabled(false),
 	xa_voll(0x8000),
 	xa_volr(0x8000),
-	  changed_xa_vol(0)
-
+	changed_xa_vol(0)
 {
 }
 
@@ -972,14 +971,10 @@ spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t 
 //  the IRQ callback
 //-------------------------------------------------
 
-void spu_device::static_set_irqf(device_t &device, void (*irqf)(device_t *device, UINT32 state))
-{
-	spu_device &spu = downcast<spu_device &>(device);
-	spu.m_irq_cb = irqf;
-}
-
 void spu_device::device_start()
 {
+	m_irq_handler.resolve_safe();
+
 	voice=new voiceinfo [24];
 	spu_ram=new unsigned char [spu_ram_size];
 
@@ -1858,7 +1853,7 @@ bool spu_device::process_voice(const unsigned int v,
 		if (hitirq)
 		{
 			// Went past IRQ address, trigger IRQ
-			m_irq_cb(this, 1);
+			m_irq_handler(1);
 
 			vi->samplestoirq=spu_infinity;
 			vi->hitirq=true;
@@ -2656,7 +2651,7 @@ void spu_device::update_irq_event()
 			{
 				if (voice[i].samplestoirq==0)
 				{
-					m_irq_cb(this, 1);
+					m_irq_handler(1);
 
 					voice[i].samplestoirq=spu_infinity;
 					voice[i].hitirq=true;

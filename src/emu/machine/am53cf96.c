@@ -50,7 +50,7 @@ void am53cf96_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 {
 	scsi_regs[REG_IRQSTATE] = 8;	// indicate success
 	scsi_regs[REG_STATUS] |= 0x80;	// indicate IRQ
-	irq_callback(machine());
+	m_irq_handler(1);
 }
 
 WRITE8_MEMBER( am53cf96_device::write )
@@ -157,23 +157,16 @@ WRITE8_MEMBER( am53cf96_device::write )
 	}
 }
 
-am53cf96_device::am53cf96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, AM53CF96, "53CF96 SCSI", tag, owner, clock)
+am53cf96_device::am53cf96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, AM53CF96, "53CF96 SCSI", tag, owner, clock),
+	m_irq_handler(*this)
 {
-}
-
-void am53cf96_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const AM53CF96interface *intf = reinterpret_cast<const AM53CF96interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<AM53CF96interface *>(this) = *intf;
-	}
 }
 
 void am53cf96_device::device_start()
 {
+	m_irq_handler.resolve_safe();
+
 	memset(scsi_regs, 0, sizeof(scsi_regs));
 	memset(devices, 0, sizeof(devices));
 

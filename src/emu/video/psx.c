@@ -19,13 +19,16 @@ const device_type CXD8561BQ = &device_creator<cxd8561bq_device>;
 const device_type CXD8561CQ = &device_creator<cxd8561cq_device>;
 const device_type CXD8654Q = &device_creator<cxd8654q_device>;
 
-psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, type, name, tag, owner, clock)
+psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, type, name, tag, owner, clock),
+	m_vblank_handler(*this)
 {
 }
 
 void psxgpu_device::device_start( void )
 {
+	m_vblank_handler.resolve_safe();
+
 	if( m_type == CXD8538Q )
 	{
 		psx_gpu_init( 1 );
@@ -3661,7 +3664,7 @@ void psxgpu_device::vblank(screen_device &screen, bool vblank_state)
 #endif
 
 		n_gpustatus ^= ( 1L << 31 );
-		psx_irq_set( machine(), 0x0001 );
+		m_vblank_handler(1);
 	}
 }
 

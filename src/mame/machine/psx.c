@@ -49,13 +49,6 @@ READ32_HANDLER( psx_com_delay_r )
 	return p_psx->n_com_delay;
 }
 
-/* IRQ */
-
-void psx_irq_set( running_machine &machine, UINT32 data )
-{
-	psxcpu_device::irq_set( *machine.device("maincpu^"), "maincpu", data );
-}
-
 /* SIO */
 
 void psx_sio_install_handler( running_machine &machine, int n_port, psx_sio_handler p_f_sio_handler )
