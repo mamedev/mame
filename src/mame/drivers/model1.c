@@ -634,6 +634,9 @@ Notes:
 #include "machine/nvram.h"
 #include "includes/model1.h"
 
+#include "vr.lh"
+
+
 READ16_MEMBER(model1_state::io_r)
 {
 	static const char *const analognames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
@@ -1270,6 +1273,9 @@ ROM_START( vr )
 	// this is the Daytona TGP program with some modifications needed for Virtua Racing
 	// the real TGP program is an internal ROM and still needs dumping
 	ROM_LOAD("vr-tgp.bin", 0x000000, 0x2000, BAD_DUMP CRC(3de33c7f) SHA1(acecc779c9d8fe39ded6c22492be5b7c25fd52db) )
+
+	ROM_REGION( 0x100, "nvram", 0 ) // default nvram
+	ROM_LOAD( "vr_defaults.nv", 0x000, 0x100, CRC(5ccdc835) SHA1(7e809de470f78fb897b938ca2aee2e12f1c8f3a4) )
 ROM_END
 
 ROM_START( vformula )
@@ -1606,7 +1612,7 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 MACHINE_CONFIG_END
 
 GAME( 1993, vf,       0,       model1,    vf, driver_device,       0, ROT0, "Sega", "Virtua Fighter", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, vr,       0,       model1_vr, vr, driver_device,       0, ROT0, "Sega", "Virtua Racing", GAME_IMPERFECT_GRAPHICS )
+GAMEL(1992, vr,       0,       model1_vr, vr, driver_device,       0, ROT0, "Sega", "Virtua Racing", GAME_IMPERFECT_GRAPHICS, layout_vr )
 GAME( 1993, vformula, vr,      model1_vr, vr, driver_device,       0, ROT0, "Sega", "Virtua Formula", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, swa,      0,       swa,       swa, driver_device,      0, ROT0, "Sega", "Star Wars Arcade", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1994, wingwar,  0,       model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (World)", GAME_NOT_WORKING )

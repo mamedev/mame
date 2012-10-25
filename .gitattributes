@@ -4512,6 +4512,7 @@ src/mame/layout/videocba.lay svneol=native#text/plain
 src/mame/layout/videodad.lay svneol=native#text/plain
 src/mame/layout/videopin.lay svneol=native#text/plain
 src/mame/layout/videopkr.lay svneol=native#text/plain
+src/mame/layout/vr.lay svneol=native#text/plain
 src/mame/layout/wecleman.lay svneol=native#text/plain
 src/mame/layout/wico.lay svneol=native#text/plain
 src/mame/layout/wildone.lay svneol=native#text/plain
