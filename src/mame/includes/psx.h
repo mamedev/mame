@@ -31,10 +31,6 @@ extern void psx_irq_set( running_machine &, UINT32 );
 extern void psx_sio_install_handler( running_machine &, int, psx_sio_handler );
 extern void psx_sio_input( running_machine &, int, int, int );
 
-DECLARE_READ32_HANDLER( psx_gpu_r );
-DECLARE_WRITE32_HANDLER( psx_gpu_w );
-extern void psx_lightgun_set( running_machine &, int, int );
-
 // emu/video/psx.c
 PALETTE_INIT( psx );
 SCREEN_UPDATE_IND16( psx );

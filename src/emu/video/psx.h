@@ -13,12 +13,18 @@
 #include "emu.h"
 
 #define MCFG_PSXGPU_ADD( cputag, tag, type, _vramSize, clock ) \
+	MCFG_DEVICE_MODIFY( cputag ) \
+	MCFG_PSX_GPU_READ_HANDLER(DEVREAD32(tag, psxgpu_device, read)) \
+	MCFG_PSX_GPU_WRITE_HANDLER(DEVWRITE32(tag, psxgpu_device, write)) \
 	MCFG_DEVICE_ADD( tag, type, clock ) \
 	((psxgpu_device *) device)->vramSize = _vramSize; \
 	MCFG_PSX_DMA_CHANNEL_READ( cputag, 2, psx_dma_write_delegate( FUNC( psxgpu_device::dma_read ), (psxgpu_device *) device ) ) \
 	MCFG_PSX_DMA_CHANNEL_WRITE( cputag, 2, psx_dma_read_delegate( FUNC( psxgpu_device::dma_write ), (psxgpu_device *) device ) )
 
 #define MCFG_PSXGPU_REPLACE( cputag, tag, type, _vramSize, clock ) \
+	MCFG_DEVICE_MODIFY( cputag ) \
+	MCFG_PSX_GPU_READ_HANDLER(DEVREAD32(tag, psxgpu_device, read)) \
+	MCFG_PSX_GPU_WRITE_HANDLER(DEVWRITE32(tag, psxgpu_device, write)) \
 	MCFG_DEVICE_REPLACE( tag, type, clock ) \
 	((psxgpu_device *) device)->vramSize = _vramSize; \
 	MCFG_PSX_DMA_CHANNEL_READ( cputag, 2, psx_dma_write_delegate( FUNC( psxgpu_device::dma_read ), (psxgpu_device *) device ) ) \

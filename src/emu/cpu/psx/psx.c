@@ -1539,7 +1539,7 @@ static ADDRESS_MAP_START( psxcpu_internal_map, AS_PROGRAM, 32, psxcpu_device )
 	AM_RANGE(0x1f801080, 0x1f8010ff) AM_DEVREADWRITE( "dma", psxdma_device, read, write )
 	AM_RANGE(0x1f801100, 0x1f80112f) AM_DEVREADWRITE( "rcnt", psxrcnt_device, read, write )
 	/* 1f801800-1f801803 cd */
-	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE_LEGACY( psx_gpu_r, psx_gpu_w )
+	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE( gpu_r, gpu_w )
 	AM_RANGE(0x1f801820, 0x1f801827) AM_DEVREADWRITE( "mdec", psxmdec_device, read, write )
 	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE16_LEGACY( spu_r, spu_w, 0xffffffff )
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
@@ -1565,7 +1565,7 @@ static ADDRESS_MAP_START( cxd8661r_internal_map, AS_PROGRAM, 32, psxcpu_device )
 	AM_RANGE(0x1f801070, 0x1f801077) AM_DEVREADWRITE( "irq", psxirq_device, read, write )
 	AM_RANGE(0x1f801080, 0x1f8010ff) AM_DEVREADWRITE( "dma", psxdma_device, read, write )
 	AM_RANGE(0x1f801100, 0x1f80112f) AM_DEVREADWRITE( "rcnt", psxrcnt_device, read, write )
-	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE_LEGACY( psx_gpu_r, psx_gpu_w )
+	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE( gpu_r, gpu_w )
 	AM_RANGE(0x1f801820, 0x1f801827) AM_DEVREADWRITE( "mdec", psxmdec_device, read, write )
 	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE16_LEGACY( spu_r, spu_w, 0xffffffff )
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
@@ -1586,9 +1586,11 @@ ADDRESS_MAP_END
 //  psxcpu_device - constructor
 //-------------------------------------------------
 
-psxcpu_device::psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map)
-	: cpu_device(mconfig, type, name, tag, owner, clock),
-	  m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, internal_map)
+psxcpu_device::psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map) :
+	cpu_device(mconfig, type, name, tag, owner, clock),
+	m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, internal_map),
+	m_gpu_read_handler(*this),
+	m_gpu_write_handler(*this)
 {
 }
 
@@ -1772,6 +1774,9 @@ void psxcpu_device::device_start()
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
+
+	m_gpu_read_handler.resolve_safe(0);
+	m_gpu_write_handler.resolve_safe();
 }
 
 
@@ -3176,6 +3181,16 @@ void psxcpu_device::sio_input( device_t &device, const char *cputag, int n_port,
 {
 	psxsio_device *sio = getcpu( device, cputag )->subdevice<psxsio_device>("sio");
 	sio->input( n_port, n_mask, n_data );
+}
+
+READ32_HANDLER( psxcpu_device::gpu_r )
+{
+	return m_gpu_read_handler( space, offset, mem_mask );
+}
+
+WRITE32_HANDLER( psxcpu_device::gpu_w )
+{
+	m_gpu_write_handler( space, offset, data, mem_mask );
 }
 
 static MACHINE_CONFIG_FRAGMENT( psx )

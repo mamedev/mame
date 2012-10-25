@@ -32,9 +32,13 @@
 class zn_state : public psx_state
 {
 public:
-	zn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: psx_state(mconfig, type, tag) { }
+	zn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		psx_state(mconfig, type, tag),
+		m_gpu(*this, "gpu")
+	{
+	}
 
+	required_device<psxgpu_device> m_gpu;
 	UINT32 m_n_znsecsel;
 	UINT32 m_b_znsecport;
 	int m_n_dip_bit;
@@ -2134,7 +2138,7 @@ void jdredd_vblank(zn_state *state, screen_device &screen, bool vblank_state)
 		if( x > 0x393 && x < 0xcb2 &&
 			y > 0x02d && y < 0x217 )
 		{
-			psx_lightgun_set( state->machine(), x, y );
+			state->m_gpu->lightgun_set( x, y );
 		}
 	}
 }
