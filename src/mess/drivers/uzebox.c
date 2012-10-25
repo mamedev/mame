@@ -1,7 +1,6 @@
 
 #include "emu.h"
 #include "cpu/avr8/avr8.h"
-#include "machine/avr8.h"
 #include "sound/dac.h"
 #include "imagedev/cartslot.h"
 

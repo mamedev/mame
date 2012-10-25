@@ -6554,7 +6554,6 @@ src/mess/machine/at_keybc.h svneol=native#text/plain
 src/mess/machine/ataricrt.c svneol=native#text/plain
 src/mess/machine/ataridev.h svneol=native#text/plain
 src/mess/machine/atarifdc.c svneol=native#text/plain
-src/mess/machine/avr8.h svneol=native#text/plain
 src/mess/machine/ay31015.c svneol=native#text/plain
 src/mess/machine/ay31015.h svneol=native#text/plain
 src/mess/machine/ay3600.c svneol=native#text/plain
