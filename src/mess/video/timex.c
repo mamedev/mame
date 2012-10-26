@@ -182,7 +182,9 @@ UINT32 spectrum_state::screen_update_ts2068(screen_device &screen, bitmap_ind16 
 {
 	/* for now TS2068 will do a full-refresh */
 	int count;
-	int full_refresh = 1;
+	
+	if (m_border_bitmap.valid())
+		copyscrollbitmap(bitmap, m_border_bitmap, 0, 0, 0, 0, cliprect);
 
 	if ((m_port_ff_data & 7) == 6)
 	{
@@ -210,11 +212,6 @@ UINT32 spectrum_state::screen_update_ts2068(screen_device &screen, bitmap_ind16 
 			ts2068_lores_scanline(machine(),bitmap, count, TS2068_TOP_BORDER, 0);
 	}
 
-	spectrum_border_draw(machine(), bitmap, full_refresh,
-		TS2068_TOP_BORDER, SPEC_DISPLAY_YSIZE, TS2068_BOTTOM_BORDER,
-		TS2068_LEFT_BORDER, TS2068_DISPLAY_XSIZE, TS2068_RIGHT_BORDER,
-		SPEC_LEFT_BORDER_CYCLES, SPEC_DISPLAY_XSIZE_CYCLES,
-		SPEC_RIGHT_BORDER_CYCLES, SPEC_RETRACE_CYCLES, 200, 0xfe);
 	return 0;
 }
 
@@ -222,7 +219,9 @@ UINT32 spectrum_state::screen_update_tc2048(screen_device &screen, bitmap_ind16 
 {
 	/* for now TS2068 will do a full-refresh */
 	int count;
-	int full_refresh = 1;
+
+	if (m_border_bitmap.valid())
+		copyscrollbitmap(bitmap, m_border_bitmap, 0, 0, 0, 0, cliprect);
 
 	if ((m_port_ff_data & 7) == 6)
 	{
@@ -250,10 +249,5 @@ UINT32 spectrum_state::screen_update_tc2048(screen_device &screen, bitmap_ind16 
 			ts2068_lores_scanline(machine(),bitmap, count, SPEC_TOP_BORDER, 0);
 	}
 
-	spectrum_border_draw(machine(), bitmap, full_refresh,
-		SPEC_TOP_BORDER, SPEC_DISPLAY_YSIZE, SPEC_BOTTOM_BORDER,
-		TS2068_LEFT_BORDER, TS2068_DISPLAY_XSIZE, TS2068_RIGHT_BORDER,
-		SPEC_LEFT_BORDER_CYCLES, SPEC_DISPLAY_XSIZE_CYCLES,
-		SPEC_RIGHT_BORDER_CYCLES, SPEC_RETRACE_CYCLES, 200, 0xfe);
 	return 0;
 }

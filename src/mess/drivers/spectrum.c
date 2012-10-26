@@ -114,6 +114,10 @@ xx/xx/2001  KS -    TS-2068 sound fixed.
 08/03/2002  KS -    #FF port emulation added.
                 Arkanoid works now, but is not playable due to
                 completly messed timings.
+25/10/2012  DH - simplified border emulation to be a (manual) partial
+                 update with bitmap
+				 Removed legacy fff4 interrupt hack, modern version of
+				 MAME can handle this just fine
 
 Initialisation values used when determining which model is being emulated:
  48K        Spectrum doesn't use either port.
@@ -302,8 +306,7 @@ WRITE8_MEMBER(spectrum_state::spectrum_port_fe_w)
 	/* border colour changed? */
 	if ((Changed & 0x07)!=0)
 	{
-		/* yes - send event */
-		spectrum_EventList_AddItemOffset(machine(), 0x0fe, data & 0x07, machine().device<cpu_device>("maincpu")->attotime_to_cycles(machine().primary_screen->scan_period() * machine().primary_screen->vpos()));
+		spectrum_UpdateBorderBitmap(machine());
 	}
 
 	if ((Changed & (1<<4))!=0)
@@ -321,17 +324,7 @@ WRITE8_MEMBER(spectrum_state::spectrum_port_fe_w)
 	m_port_fe_data = data;
 }
 
-DIRECT_UPDATE_MEMBER(spectrum_state::spectrum_direct)
-{
-    /* Hack for correct handling 0xffff interrupt vector */
-    if (address == 0x0001)
-        if (machine().device("maincpu")->safe_pcbase()==0xffff)
-        {
-            machine().device("maincpu")->state().set_state_int(Z80_PC, 0xfff4);
-            return 0xfff4;
-        }
-    return address;
-}
+
 
 /* KT: more accurate keyboard reading */
 /* DJR: Spectrum+ keys added */
@@ -633,10 +626,6 @@ DRIVER_INIT_MEMBER(spectrum_state,spectrum)
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-
-	space.set_direct_update_handler(direct_update_delegate(FUNC(spectrum_state::spectrum_direct), this));
-
 	m_port_7ffd_data = -1;
 	m_port_1ffd_data = -1;
 }
@@ -715,10 +704,9 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50.08)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
+
+	MCFG_SCREEN_RAW_PARAMS(X1 / 2, 448, 0, 352,  312, 0, 296)
+
 	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_spectrum)
 	MCFG_SCREEN_VBLANK_DRIVER(spectrum_state, screen_eof_spectrum)
 

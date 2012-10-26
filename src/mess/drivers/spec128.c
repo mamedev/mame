@@ -246,7 +246,7 @@ static ADDRESS_MAP_START (spectrum_128_io, AS_IO, 8, spectrum_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (spectrum_128_mem, AS_PROGRAM, 8, spectrum_state )
-	AM_RANGE( 0x0000, 0x3fff) AM_RAMBANK("bank1")
+	AM_RANGE( 0x0000, 0x3fff) AM_ROMBANK("bank1") // don't use RAMBANK here otherwise programs can erase the ROM(!)
 	AM_RANGE( 0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE( 0x8000, 0xbfff) AM_RAMBANK("bank3")
 	AM_RANGE( 0xc000, 0xffff) AM_RAMBANK("bank4")
@@ -294,9 +294,14 @@ GFXDECODE_END
 
 MACHINE_CONFIG_DERIVED( spectrum_128, spectrum )
 
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_REMOVE("maincpu")
+
+	MCFG_CPU_ADD("maincpu", Z80, X1_128_SINCLAIR / 5)
 	MCFG_CPU_PROGRAM_MAP(spectrum_128_mem)
 	MCFG_CPU_IO_MAP(spectrum_128_io)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spectrum_state,  spec_interrupt)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_128 )
 
@@ -304,7 +309,8 @@ MACHINE_CONFIG_DERIVED( spectrum_128, spectrum )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT_OVERRIDE(spectrum_state, spectrum )
-	MCFG_SCREEN_REFRESH_RATE(50.021)
+	MCFG_SCREEN_RAW_PARAMS(X1_128_SINCLAIR / 2.5f, 456, 0, 352,  311, 0, 296)
+
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
 	MCFG_GFXDECODE(spec128)
 

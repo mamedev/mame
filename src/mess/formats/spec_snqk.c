@@ -308,9 +308,11 @@ error:
  *******************************************************************/
 static void spectrum_border_update(running_machine &machine, int data)
 {
+#if 0
     spectrum_EventList_Reset(machine);
     spectrum_border_set_last_color(machine, data);
     spectrum_border_force_redraw(machine);
+#endif
 }
 
 void spectrum_setup_sp(running_machine &machine, UINT8 *snapdata, UINT32 snapsize)

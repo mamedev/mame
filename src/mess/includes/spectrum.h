@@ -12,7 +12,10 @@
 
 /* Spectrum crystals */
 
-#define X1 XTAL_14MHz		// Main clock
+#define X1 XTAL_14MHz		// Main clock (48k Spectrum)
+#define X1_128_AMSTRAD  35469000 // Main clock (Amstrad 128K model, +2A?)
+#define X1_128_SINCLAIR 17734475 // Main clock (Sinclair 128K model)
+
 #define X2 XTAL_4_433619MHz // PAL color subcarrier
 
 /* Spectrum screen size in pixels */
@@ -81,15 +84,11 @@ public:
 	int m_frame_invert_count;
 	int m_frame_number;    /* Used for handling FLASH 1 */
 	int m_flash_invert;
-	UINT8 m_retrace_cycles;
 	optional_shared_ptr<UINT8> m_video_ram;
 	UINT8 *m_screen_location;
 
 	int m_ROMSelection;
 
-	/* Last border colour output in the previous frame */
-	int m_CurrBorderColor;
-	int m_LastDisplayedBorderColor; /* Negative value indicates redraw */
 
 	EVENT_LIST_ITEM *m_pCurrentItem;
 	int m_NumEvents;
@@ -106,7 +105,6 @@ public:
 	DECLARE_READ8_MEMBER(spectrum_port_7f_r);
 	DECLARE_READ8_MEMBER(spectrum_port_df_r);
 	DECLARE_READ8_MEMBER(spectrum_port_ula_r);
-	DECLARE_DIRECT_UPDATE_MEMBER(spectrum_direct);
 	DECLARE_DRIVER_INIT(spectrum);
 	DECLARE_DRIVER_INIT(plus2);
 	DECLARE_DRIVER_INIT(plus3);
@@ -124,6 +122,9 @@ public:
 	UINT32 screen_update_ts2068(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_spectrum(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(spec_interrupt);
+
+	unsigned int m_previous_border_x, m_previous_border_y;
+	bitmap_ind16 m_border_bitmap;
 };
 
 
@@ -152,20 +153,8 @@ void ts2068_update_memory(running_machine &machine);
 
 /*----------- defined in video/spectrum.c -----------*/
 
+void spectrum_UpdateBorderBitmap(running_machine &machine);
 
-void spectrum_border_force_redraw (running_machine &machine);
-void spectrum_border_set_last_color (running_machine &machine, int NewColor);
-void spectrum_border_draw(running_machine &machine, bitmap_ind16 &bitmap, int full_refresh,
-                int TopBorderLines, int ScreenLines, int BottomBorderLines,
-                int LeftBorderPixels, int ScreenPixels, int RightBorderPixels,
-                int LeftBorderCycles, int ScreenCycles, int RightBorderCycles,
-                int HorizontalRetraceCycles, int VRetraceTime, int EventID);
 
-void spectrum_EventList_Initialise(running_machine &machine, int NumEntries);
-void spectrum_EventList_Reset(running_machine &machine);
-void spectrum_EventList_SetOffsetStartTime(running_machine &machine, int StartTime);
-void spectrum_EventList_AddItemOffset(running_machine &machine, int ID, int Data,int Time);
-int spectrum_EventList_NumEvents(running_machine &machine);
-EVENT_LIST_ITEM *spectrum_EventList_GetFirstItem(running_machine &machine);
 
 #endif /* __SPECTRUM_H__ */
