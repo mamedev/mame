@@ -29,13 +29,23 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 #define verboselog(x,y,z,...)
 #endif
 
-#define MASTER_CLOCK 20000000
+#define MASTER_CLOCK 	20000000
+
+#define VISIBLE_CYCLES 		480
+#define HSYNC_CYCLES 		155
+#define LINE_CYCLES 		(VISIBLE_CYCLES + HSYNC_CYCLES)
+#define VISIBLE_LINES		480
+#define VSYNC_LINES			45
+#define LINES_PER_FRAME		(VISIBLE_LINES + VSYNC_LINES)
+#define CYCLES_PER_FRAME	(LINES_PER_FRAME * LINE_CYCLES)
+#define PIXELS_PER_FRAME	(CYCLES_PER_FRAME)
 
 /****************************************************\
 * I/O defines                                        *
 \****************************************************/
 
 #define AVR8_DDRD				(state->m_regs[AVR8_REGIDX_DDRD])
+#define AVR8_PORTC				(state->m_regs[AVR8_REGIDX_PORTC])
 #define AVR8_DDRC				(state->m_regs[AVR8_REGIDX_DDRC])
 #define AVR8_PORTB				(state->m_regs[AVR8_REGIDX_PORTB])
 #define AVR8_DDRB				(state->m_regs[AVR8_REGIDX_DDRB])
@@ -72,6 +82,12 @@ public:
 
 	UINT8 m_regs[0x100];
     UINT8* m_eeprom;
+    UINT32 last_cycles;
+
+    bool spi_pending;
+    UINT32 spi_start_cycle;
+
+    UINT8 m_pixels[PIXELS_PER_FRAME + LINE_CYCLES]; // Allocate one extra line for wrapping in the video update
 
     required_device<cpu_device> m_maincpu;
 
@@ -141,6 +157,38 @@ static void avr8_change_ddr(running_machine &machine, int reg, UINT8 data)
 	}
 }
 
+static void avr8_video_update(running_machine &machine)
+{
+    craft_state *state = machine.driver_data<craft_state>();
+
+	UINT64 cycles = avr8_get_elapsed_cycles(state->m_maincpu);
+	UINT32 frame_cycles = (UINT32)(cycles % CYCLES_PER_FRAME);
+
+	if (state->last_cycles < frame_cycles)
+	{
+		for (UINT32 pixidx = state->last_cycles; pixidx < frame_cycles; pixidx++)
+		{
+			UINT8 value = AVR8_PORTC & 0x3f;
+			if (state->spi_pending)
+			{
+				if (pixidx >= state->spi_start_cycle && pixidx < (state->spi_start_cycle + 16))
+				{
+					UINT8 bitidx = 7 - ((pixidx - state->spi_start_cycle) >> 1);
+					value = ((state->m_regs[AVR8_REGIDX_SPDR] & (1 << bitidx)) ? value : 0x3f);
+					if (pixidx == (state->spi_start_cycle + 15))
+					{
+						state->spi_pending = false;
+						state->m_regs[AVR8_REGIDX_SPDR] = 0;
+					}
+				}
+			}
+			state->m_pixels[pixidx] = value;
+		}
+	}
+
+	state->last_cycles = frame_cycles;
+}
+
 static void avr8_change_port(running_machine &machine, int reg, UINT8 data)
 {
     craft_state *state = machine.driver_data<craft_state>();
@@ -156,7 +204,25 @@ static void avr8_change_port(running_machine &machine, int reg, UINT8 data)
 		//verboselog(machine, 0, "avr8_change_port: PORT%c lines %02x changed\n", avr8_reg_name[reg], changed);
 	}
 
-	if (reg == AVR8_REG_D) {
+	if (reg == AVR8_REG_C)
+	{
+		avr8_video_update(machine);
+
+		/*if (frame_cycles >= state->spi_start_cycle && frame_cycles < (state->spi_start_cycle + 16))
+		{
+			UINT8 bitidx = 7 - ((frame_cycles - state->spi_start_cycle) >> 1);
+			state->m_pixels[frame_cycles] = ((state->m_regs[AVR8_REGIDX_SPDR] & (1 << bitidx)) ? 0x3f : (data & 0x3f));
+		}
+		else
+		{
+			state->m_pixels[frame_cycles] = data & 0x3f;
+		}*/
+
+		AVR8_PORTC = data;
+	}
+
+	if (reg == AVR8_REG_D)
+	{
 		UINT8 audio_sample = (data & 0x02) | ((data & 0xf4) >> 2);
 
 		state->dac->write_unsigned8(audio_sample << 2);
@@ -289,7 +355,10 @@ WRITE8_MEMBER(craft_state::avr8_write)
 			break;
 
 		case AVR8_REGIDX_SPDR:
-			// TODO
+			avr8_video_update(machine());
+			m_regs[offset] = data;
+			spi_pending = true;
+			spi_start_cycle = (UINT32)(avr8_get_elapsed_cycles(m_maincpu) % CYCLES_PER_FRAME);
 			break;
 
 		case AVR8_REGIDX_EECR:
@@ -363,6 +432,21 @@ INPUT_PORTS_END
 
 UINT32 craft_state::screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	for(int y = 0; y < LINES_PER_FRAME; y++)
+	{
+		UINT32 *line = &bitmap.pix32(y);
+		for(int x = 0; x < LINE_CYCLES; x++)
+		{
+			UINT8 pixel = m_pixels[y * LINE_CYCLES + (x + HSYNC_CYCLES)];
+			UINT8 r = 0x55 * ((pixel & 0x30) >> 4);
+			UINT8 g = 0x55 * ((pixel & 0x0c) >> 2);
+			UINT8 b = 0x55 * (pixel & 0x03);
+			line[x] = 0xff000000 | (r << 16) | (g << 8) | b;
+
+			// Clear behind us
+			m_pixels[y * LINE_CYCLES + (x + HSYNC_CYCLES)] = 0;
+		}
+	}
     return 0;
 }
 
@@ -395,13 +479,11 @@ static MACHINE_CONFIG_START( craft, craft_state )
 
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
-    //MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK, 634, 0, 633, 525, 0, 481 )
-    MCFG_SCREEN_REFRESH_RATE(60.08)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1395)) /* accurate */
-    MCFG_SCREEN_SIZE(634, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 633, 0, 479)
+    MCFG_SCREEN_REFRESH_RATE(59.99)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1429)) /* accurate */
+    MCFG_SCREEN_SIZE(635, 525)
+    MCFG_SCREEN_VISIBLE_AREA(0, 634, 0, 524)
 	MCFG_SCREEN_UPDATE_DRIVER(craft_state, screen_update_craft)
-
     MCFG_PALETTE_LENGTH(0x1000)
 
     /* sound hardware */

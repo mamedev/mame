@@ -367,6 +367,11 @@ INLINE UINT8 POP(avr8_state *cpustate)
     return READ_IO_8(cpustate, sp);
 }
 
+UINT64 avr8_get_elapsed_cycles(device_t *device)
+{
+	return get_safe_token(device)->elapsed_cycles;
+}
+
 /*****************************************************************************/
 // Interrupts
 
@@ -428,14 +433,6 @@ static void avr8_update_interrupt_internal(avr8_state *cpustate, int source)
 		cpustate->r[condition.m_regindex] &= ~condition.m_regmask;
 	}
 }
-
-/*static void avr8_poll_interrupt(avr8_state *cpustate)
-{
-	for (int idx = 0; idx < AVR8_INTIDX_COUNT; idx++)
-	{
-		avr8_update_interrupt_internal(cpustate, idx);
-	}
-}*/
 
 void avr8_update_interrupt(device_t *device, int source)
 {
@@ -1036,6 +1033,7 @@ static bool avr8_io_reg_read(avr8_state *cpustate, UINT16 offset, UINT8 *data)
 		case AVR8_REGIDX_TCNT1L:
 		case AVR8_REGIDX_TCNT1H:
 		case AVR8_REGIDX_GPIOR0:
+		case AVR8_REGIDX_TCNT2:
 			*data = cpustate->r[offset];
 			return true;
 
@@ -1100,6 +1098,8 @@ static CPU_INIT( avr8 )
 
 	cpustate->interrupt_pending = false;
 
+	cpustate->elapsed_cycles = 0;
+
 	device->save_item(NAME(cpustate->pc));
 }
 
@@ -1113,6 +1113,7 @@ static CPU_RESET( avr8 )
 
 	cpustate->status = 0;
     cpustate->pc = 0;
+    cpustate->elapsed_cycles = 0;
 
     cpustate->interrupt_pending = false;
 }
@@ -1160,7 +1161,7 @@ static CPU_EXECUTE( avr8 )
                         opcycles = 2;
                         break;
                     case 0x0300:    // MULSU Rd,Rr
-                        sd = (INT8)cpustate->r[16 + RD4(op)] * (UINT8)cpustate->r[16 + RR4(op)];
+                        sd = (INT8)cpustate->r[16 + RD3(op)] * (UINT8)cpustate->r[16 + RR3(op)];
                         cpustate->r[1] = (sd >> 8) & 0x00ff;
                         cpustate->r[0] = sd & 0x00ff;
                         SREG_W(AVR8_SREG_C, (sd & 0x8000) ? 1 : 0);
@@ -1393,8 +1394,8 @@ static CPU_EXECUTE( avr8 )
                                 pd = ZREG;
                                 pd--;
                                 cpustate->r[RD5(op)] = READ_IO_8(cpustate, pd);
-                                cpustate->r[27] = (pd >> 8) & 0x00ff;
-                                cpustate->r[26] = pd & 0x00ff;
+                                cpustate->r[31] = (pd >> 8) & 0x00ff;
+                                cpustate->r[30] = pd & 0x00ff;
                                 opcycles = 2;
                                 break;
                             case 0x0004:    // LPM Rd,Z
@@ -1429,8 +1430,8 @@ static CPU_EXECUTE( avr8 )
                                 pd = YREG;
                                 pd--;
                                 cpustate->r[RD5(op)] = READ_IO_8(cpustate, pd);
-                                cpustate->r[27] = (pd >> 8) & 0x00ff;
-                                cpustate->r[26] = pd & 0x00ff;
+                                cpustate->r[29] = (pd >> 8) & 0x00ff;
+                                cpustate->r[28] = pd & 0x00ff;
                                 opcycles = 2;
                                 break;
                             case 0x000c:    // LD Rd,X
@@ -1970,7 +1971,7 @@ static CPU_EXECUTE( avr8 )
                         }
                         else            // SBRC Rd, b
                         {
-                            if(!BIT(cpustate->r[RD5(op)], RR3(op)))
+                            if(NOT(BIT(cpustate->r[RD5(op)], RR3(op))))
                             {
                                 op = (UINT32)READ_PRG_16(cpustate, cpustate->pc++);
                                 cpustate->pc += avr8_is_long_opcode(op) ? 1 : 0;
@@ -1985,6 +1986,8 @@ static CPU_EXECUTE( avr8 )
         cpustate->pc++;
 
         cpustate->icount -= opcycles;
+
+		cpustate->elapsed_cycles += opcycles;
 
 		avr8_timer_tick(cpustate, opcycles);
     }

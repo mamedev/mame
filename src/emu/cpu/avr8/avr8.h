@@ -41,6 +41,8 @@ struct avr8_state
 	UINT16 timer2_prescale;
 	UINT16 timer2_prescale_count;
 
+	UINT64 elapsed_cycles;
+
 	bool interrupt_pending;
 };
 
@@ -301,6 +303,7 @@ DECLARE_LEGACY_CPU_DEVICE(ATMEGA88, atmega88);
 DECLARE_LEGACY_CPU_DEVICE(ATMEGA644, atmega644);
 
 void avr8_update_interrupt(device_t *device, int source);
+UINT64 avr8_get_elapsed_cycles(device_t *device);
 
 CPU_DISASSEMBLE( avr8 );
 
