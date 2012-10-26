@@ -19,7 +19,7 @@
      The MESS emulation at the time of writing isn't very good, the following emulators are used to determine how things should work
      
       Fuse (Free Unix Spectrum Emulator) - Free, High Compatibility can run some of the trickier images, Windows port available - http://fuse-emulator.sourceforge.net/
-      Spectaculator                      - Commercial, a bit more user friendly than above, similar compatibility               - http://www.spectaculator.com/
+      Spectaculator                      - Commercial, a bit more user friendly than above, similar compatibility               - http://www.spectaculator.com/     
      
      Note, even with those emulators you'll have to turn off some of the speed cheats on loading to get good compatibilty for example, in Fuse
       Use Tape Traps
@@ -30,9 +30,14 @@
      MESS doesn't have any accelerated loading so some games which require the tricks to be disabled in other emulators work in MESS without trickery, eg Xanthius
      
      http://newton.sunderland.ac.uk/~specfreak/Schemes/schemes.html is a rather outdated guide mentioning some of the custom loaders, and showing disassemblies of them.
+  
+     legacy emulators including Real Spectrum ( http://zxm.speccy.cz/realspec/ ) appear to struggle with some of the more complex tape protections
+
+ 
+     ToDo: Find an emulator which works with the 'Gremlin 2' protected tapes 'M.A.S.K' and 'Basil The Great Mouse Detective' all TZX images I've found fail in the
+     above emulators, although RealSpectrum does load some copies of MASK but fails loading the 2nd part of the game.
      
 
-     legacy emulators including Real Spectrum ( http://zxm.speccy.cz/realspec/ ) appear to struggle with some of the more complex tape protections
 
 -->
 
@@ -344,8 +349,8 @@
 		</part>
 	</software>
 
-	<!-- loader fails before title screen, works in other emus -->
-	<software name="batmana" cloneof="batman" supported="no">
+	<!-- OK -->
+	<software name="batmana" cloneof="batman" >
 		<description>Batman (set 2)</description>
 		<year>1986</year>
 		<publisher>Ocean</publisher>
@@ -356,8 +361,9 @@
 		</part>
 	</software>
 
-	<!-- loader fails, doesn't boot after countdown completes, works in other emus -->
-	<software name="batmanb" cloneof="batman" supported="no">
+	<!-- OK -->
+  <!-- has load timer -->
+	<software name="batmanb" cloneof="batman" >
 		<description>Batman (set 3)</description>
 		<year>1986</year>
 		<publisher>Ocean</publisher>
@@ -368,7 +374,7 @@
 		</part>
 	</software>
 
-	<!-- loader fails after first block is loaded, suspect image, doesn't even run in 'realspectrum' -->
+	<!-- Unsupported block type (0x19 - Generalized Data Block) encountered -->
 	<software name="batmanc" cloneof="batman" supported ="no">
 		<description>Batman (set 4)</description>
 		<year>1986</year>
@@ -381,6 +387,7 @@
 	</software>
 
 	<!-- OK -->
+  <!-- colourful loader -->
 	<software name="batmand" cloneof="batman">
 		<description>Batman (set 5)</description>
 		<year>1986</year>
@@ -392,8 +399,8 @@
 		</part>
 	</software>
 
-	<!-- loader fails after first block is loaded, works in other emus -->
-	<software name="batmane" cloneof="batman" supported="no">
+	<!-- OK -->
+	<software name="batmane" cloneof="batman">
 		<description>Batman (set 6)</description>
 		<year>1986</year>
 		<publisher>Ocean</publisher>
@@ -404,8 +411,8 @@
 		</part>
 	</software>
 
-	<!-- loader fails before title screen -->
-	<software name="batmanf" cloneof="batman" supported="no">
+	<!-- OK -->
+	<software name="batmanf" cloneof="batman">
 		<description>Batman (set 7)</description>
 		<year>1986</year>
 		<publisher>Ocean</publisher>
@@ -416,8 +423,8 @@
 		</part>
 	</software>
 
-	<!-- MESS doesn't see full length of tape?, suspect image-->
-	<software name="batmang" cloneof="batman">
+	<!-- Unsupported block type (0x19 - Generalized Data Block) encountered -->
+	<software name="batmang" cloneof="batman" supported="no">
 		<description>Batman (set 8)</description>
 		<year>1986</year>
 		<publisher>Ocean</publisher>

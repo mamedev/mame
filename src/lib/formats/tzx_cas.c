@@ -80,7 +80,7 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen )
 {
 	int pos = sizeof(TZX_HEADER) + 2;
 	int max_block_count = INITIAL_MAX_BLOCK_COUNT;
-
+	int loopcount = 0, loopoffset = 0;
 	blocks = (UINT8**)malloc(max_block_count * sizeof(UINT8*));
 	memset(blocks,0,max_block_count);
 	block_count = 0;
@@ -134,15 +134,31 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen )
 			datasize = casdata[pos] + (casdata[pos + 1] << 8) + (casdata[pos + 2] << 16);
 			pos += 3 + datasize;
 			break;
-		case 0x20: case 0x23: case 0x24:
+		case 0x20: case 0x23:
 			pos += 2;
 			break;
+
+		case 0x24:
+			loopcount = casdata[pos] + (casdata[pos + 1] << 8);
+			pos +=2;
+			loopoffset = pos;
+			break;
+
 		case 0x21: case 0x30:
 			datasize = casdata[pos];
 			pos += 1 + datasize;
 			break;
-		case 0x22: case 0x25: case 0x27:
+		case 0x22: case 0x27:
 			break;
+
+		case 0x25:
+			if (loopcount>0)
+			{
+				pos = loopoffset;
+				loopcount--;
+			}
+			break;
+
 		case 0x26:
 			datasize = casdata[pos] + (casdata[pos + 1] << 8);
 			pos += 2 + 2 * datasize;
@@ -313,6 +329,8 @@ static int tzx_cas_do_work( INT16 **buffer )
 
 	wave_data = WAVE_LOW;
 
+	int loopcount = 0, loopoffset = 0;
+
 	while (current_block < block_count)
 	{
 		int	pause_time;
@@ -322,8 +340,9 @@ static int tzx_cas_do_work( INT16 **buffer )
 		UINT8 *cur_block = blocks[current_block];
 		UINT8 block_type = cur_block[0];
 
+
 	/* Uncomment this to include into error.log a list of the types each block */
-//      LOG_FORMATS("tzx_cas_fill_wave: block %d, block_type %02x\n", current_block, block_type);
+	LOG_FORMATS("tzx_cas_fill_wave: block %d, block_type %02x\n", current_block, block_type);
 
 		switch (block_type)
 		{
@@ -460,14 +479,29 @@ static int tzx_cas_do_work( INT16 **buffer )
 			LOG_FORMATS("Please use a .tzx handling utility to split the merged tape files.\n");
 			current_block++;
 			break;
-		case 0x15:	/* Direct Recording */
-		case 0x18:	/* CSW Recording */
-		case 0x19:	/* Generalized Data Block */
+		case 0x24:	/* Loop Start */
+			loopcount = cur_block[1] + (cur_block[2] << 8);
+			current_block++;
+			loopoffset = current_block;
+
+			LOG_FORMATS("loop start %d %d\n",  loopcount, current_block);
+			break;
+		case 0x25:	/* Loop End */
+			if (loopcount>0)
+			{
+				current_block = loopoffset;
+				loopcount--;
+				LOG_FORMATS("do loop\n");
+			}
+			else
+			{
+				current_block++;
+			}			
+			break;
+
 		case 0x21:	/* Group Start */
 		case 0x22:	/* Group End */
 		case 0x23:	/* Jump To Block */
-		case 0x24:	/* Loop Start */
-		case 0x25:	/* Loop End */
 		case 0x26:	/* Call Sequence */
 		case 0x27:	/* Return From Sequence */
 		case 0x28:	/* Select Block */
@@ -477,6 +511,25 @@ static int tzx_cas_do_work( INT16 **buffer )
 			LOG_FORMATS("Unsupported block type (%02x) encountered.\n", block_type);
 			current_block++;
 			break;
+
+		case 0x15:	/* Direct Recording */
+			// having this missing is fatal
+			printf("Unsupported block type (0x15 - Direct Recording) encountered.\n");
+			current_block++;
+			break;
+
+		case 0x18:	/* CSW Recording */
+			// having this missing is fatal
+			printf("Unsupported block type (0x15 - CSW Recording) encountered.\n");
+			current_block++;
+			break;
+
+		case 0x19:	/* Generalized Data Block */
+			// having this missing is fatal
+			printf("Unsupported block type (0x19 - Generalized Data Block) encountered.\n");
+			current_block++;
+			break;
+
 		}
 	}
 	return size;
