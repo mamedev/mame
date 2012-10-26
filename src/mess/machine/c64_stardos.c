@@ -191,5 +191,15 @@ void c64_stardos_cartridge_device::c64_cd_w(address_space &space, offs_t offset,
 
 int c64_stardos_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
 {
-	return !(ba & rw & ((offset & 0xe000) == 0xe000) & hiram);
+	return !(sphi2 && ba & rw & ((offset & 0xe000) == 0xe000) & hiram);
+}
+
+
+//-------------------------------------------------
+//  c64_exrom_r - EXROM read
+//-------------------------------------------------
+
+int c64_stardos_cartridge_device::c64_exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
+{
+	return (BIT(offset, 13)) ? 1 : m_exrom;
 }
