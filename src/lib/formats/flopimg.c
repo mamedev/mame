@@ -994,7 +994,7 @@ floppy_image::~floppy_image()
 {
 	for (int i=0;i<tracks;i++) {
 		for (int j=0;j<heads;j++) {
-			global_free(cell_data[(i<<1) + j]);
+			global_free(cell_data[i][j]);
 		}
 	}
 }
