@@ -26,7 +26,7 @@
 **
 **  - fixed LFO implementation:
 **      .added support for CH3 special mode: fixes various sound effects (birds in Warlock, bug sound in Aladdin...)
-**      .modified LFO behavior when switched off (AM/PM current level is held) and on (LFO step is reseted): fixes intro in Spider-Man & Venom : Separation Anxiety
+**      .inverted LFO AM waveform: fixes Spider-Man & Venom : Separation Anxiety (intro), California Games (surfing event)
 **      .improved LFO timing accuracy: now updated AFTER sample output, like EG/PG updates, and without any precision loss anymore.
 **  - improved internal timers emulation
 **  - adjusted lowest EG rates increment values
@@ -146,7 +146,7 @@
 
 
 #define TYPE_YM2203 (TYPE_SSG)
-#define TYPE_YM2608 (TYPE_SSG |TYPE_LFOPAN |TYPE_6CH |TYPE_ADPCM)
+#define TYPE_YM2608 (TYPE_SSG |TYPE_LFO= PAN |TYPE_6CH |TYPE_ADPCM)
 #define TYPE_YM2610 (TYPE_SSG |TYPE_LFOPAN |TYPE_6CH |TYPE_ADPCM |TYPE_2610)
 #define TYPE_YM2612 (TYPE_DAC |TYPE_LFOPAN |TYPE_6CH)
 
@@ -1144,10 +1144,10 @@ INLINE void set_ar_ksr(UINT8 type, FM_CH *CH,FM_SLOT *SLOT,int v)
 		CH->SLOT[SLOT1].Incr=-1;
 	}
 
-	/* Even if it seems unnecessary, in some odd case, KSR and KC are both modified   */
+	/* Even if it seems unnecessary, in some odd case, KSR and KC are modified   */
 	/* and could result in SLOT->kc remaining unchanged.                              */
 	/* In such case, AR values would not be recalculated despite SLOT->ar has changed */
-	/* This fixes the introduction music of Batman & Robin    (Eke-Eke)               */
+	/* This actually fixes the intro of "The Adventures of Batman & Robin" (Eke-Eke) */
 	if ((SLOT->ar + SLOT->ksr) < 94 /*32+62*/)
 	{
 		SLOT->eg_sh_ar  = eg_rate_shift [SLOT->ar  + SLOT->ksr ];
@@ -1209,12 +1209,12 @@ INLINE void advance_lfo(FM_OPN *OPN)
 			/* There are 128 LFO steps */
 			OPN->lfo_cnt = ( OPN->lfo_cnt + 1 ) & 127;
 
-			/* triangle */
-			/* AM: 0 to 126 step +2, 126 to 0 step -2 */
+            /* triangle (inverted) */
+            /* AM: from 126 to 0 step -2, 0 to 126 step +2 */
 			if (OPN->lfo_cnt<64)
-				OPN->LFO_AM = OPN->lfo_cnt * 2;
+				OPN->LFO_AM = (OPN->lfo_cnt ^ 63) << 1;
 			else
-				OPN->LFO_AM = 126 - ((OPN->lfo_cnt&63) * 2);
+				OPN->LFO_AM = (OPN->lfo_cnt & 63) << 1;
 
 			/* PM works with 4 times slower clock */
 			OPN->LFO_PM = OPN->lfo_cnt >> 2;
@@ -1592,12 +1592,12 @@ INLINE signed int op_calc1(UINT32 phase, unsigned int env, signed int pm)
 INLINE void chan_calc(YM2612 *F2612, FM_OPN *OPN, FM_CH *CH)
 {
   UINT32 AM = OPN->LFO_AM >> CH->ams;
+  unsigned int eg_out = volume_calc(&CH->SLOT[SLOT1]);
 
   OPN->m2 = OPN->c1 = OPN->c2 = OPN->mem = 0;
 
   *CH->mem_connect = CH->mem_value;  /* restore delayed sample (MEM) value to m2 or c2 */
 
-  unsigned int eg_out = volume_calc(&CH->SLOT[SLOT1]);
   {
     INT32 out = CH->op1_out[0] + CH->op1_out[1];
     CH->op1_out[0] = CH->op1_out[1];
@@ -1737,20 +1737,16 @@ static void OPNWriteMode(FM_OPN *OPN, int r, int v)
 	case 0x22:	/* LFO FREQ (YM2608/YM2610/YM2610B/YM2612) */
 		if (v&8) /* LFO enabled ? */
 		{
-			if (!OPN->lfo_timer_overflow)
-			{
-				/* restart LFO */
-				OPN->lfo_cnt   = 0;
-				OPN->lfo_timer = 0;
-				OPN->LFO_AM    = 0;
-				OPN->LFO_PM    = 0;
-			}
-
 			OPN->lfo_timer_overflow = lfo_samples_per_step[v&7] << LFO_SH;
 		}
 		else
 		{
+            /* hold LFO waveform in reset state */
 			OPN->lfo_timer_overflow = 0;
+            OPN->lfo_timer = 0;
+            OPN->lfo_cnt   = 0;
+            OPN->LFO_PM    = 0;
+            OPN->LFO_AM    = 126;
 		}
 		break;
 	case 0x24:	/* timer A High 8*/
@@ -2418,7 +2414,7 @@ void ym2612_reset_chip(void *chip)
 
 	OPN->lfo_timer = 0;
 	OPN->lfo_cnt   = 0;
-	OPN->LFO_AM    = 0;
+	OPN->LFO_AM    = 126;
 	OPN->LFO_PM    = 0;
 
 	OPN->ST.status = 0;
