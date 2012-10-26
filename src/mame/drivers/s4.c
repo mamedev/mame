@@ -6,7 +6,7 @@
     No schematics have been located as yet.
 
     Phoenix and Pokerino are listed as System 4 systems, but use System 3 roms.
-    They have been moved to s4.c, and are working there.
+    They have been moved to s3.c, and are working there.
 
     Only Flash and Stellar Wars are pinball machines. The remainder are so-called
     "Shuffle", which is a flat board with an air-driven puck and 10 bowling pins.

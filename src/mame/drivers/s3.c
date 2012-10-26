@@ -282,14 +282,14 @@ WRITE8_MEMBER( s3_state::sol1_w )
 	{
 		if (BIT(data, 0))
 			m_samples->start(1, 1); // 10 chime
-		//else
+
 		if (BIT(data, 1))
 			m_samples->start(2, 2); // 100 chime
-		//else
+
 		if (BIT(data, 2))
 			m_samples->start(3, 3); // 1000 chime
+
 		// we don't have a 10k chime in samples yet
-		//else
 		//if (BIT(data, 3))
 			//m_samples->start(1, x); // 10k chime
 	}
