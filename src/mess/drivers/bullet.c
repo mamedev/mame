@@ -1190,7 +1190,7 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
 	MCFG_SCSICB_ADD(SCSIBUS_TAG ":host")
-	MCFG_SCSICB_REQ_HANDLER(DEVWRITELINE("^", bulletf_state, req_w))
+	MCFG_SCSICB_REQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, bulletf_state, req_w))
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "wmbullet")
