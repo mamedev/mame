@@ -890,7 +890,7 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_AM53CF96_IRQ_HANDLER(DEVWRITELINE("^maincpu:irq", psxirq_device, intin10))
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, twinkle_state, ide_interrupt))
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF, twinkle_state, ide_interrupt))
 
 	MCFG_RTC65271_ADD("rtc", twinkle_rtc)
 

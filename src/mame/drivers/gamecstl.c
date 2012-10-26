@@ -708,7 +708,7 @@ static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 	MCFG_PIC8259_ADD( "pic8259_2", gamecstl_pic8259_2_config )
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, gamecstl_state, ide_interrupt))
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF, gamecstl_state, ide_interrupt))
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 

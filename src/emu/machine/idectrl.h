@@ -144,10 +144,9 @@ SLOT_INTERFACE_EXTERN(ide_image_devices);
 ***************************************************************************/
 
 #define MCFG_IDE_CONTROLLER_ADD(_tag, _slotintf, _master, _slave, _fixed) \
-	MCFG_DEVICE_ADD(_tag, IDE_CONTROLLER, 0) \
 	MCFG_IDE_SLOT_ADD("drive_0", _slotintf, _master, NULL, _fixed) \
 	MCFG_IDE_SLOT_ADD("drive_1", _slotintf, _slave, NULL, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag)
+	MCFG_DEVICE_ADD(_tag, IDE_CONTROLLER, 0)
 
 #define MCFG_IDE_SLOT_ADD(_tag, _slot_intf, _def_slot, _def_inp, _fixed) \
 	MCFG_DEVICE_ADD(_tag, IDE_SLOT, 0) \

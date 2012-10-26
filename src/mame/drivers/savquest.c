@@ -555,7 +555,7 @@ static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, savquest_state, ide_interrupt))
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF, savquest_state, ide_interrupt))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

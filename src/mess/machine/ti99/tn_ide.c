@@ -336,7 +336,7 @@ static const rtc65271_interface ide_rtc_cfg =
 MACHINE_CONFIG_FRAGMENT( tn_ide )
 	MCFG_RTC65271_ADD( "ide_rtc", ide_rtc_cfg )
 	MCFG_IDE_CONTROLLER_ADD( "ide", ide_image_devices, "hdd", NULL, false)  // see idectrl.c
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, nouspikel_ide_interface_device, ide_interrupt_callback))
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF, nouspikel_ide_interface_device, ide_interrupt_callback))
 //  MCFG_IDE_CONTROLLER_REGIONS(":peribox:idehd0:drive", NULL)
 MACHINE_CONFIG_END
 

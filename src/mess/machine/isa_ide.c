@@ -44,7 +44,7 @@ WRITE_LINE_MEMBER(isa16_ide_device::ide_interrupt)
 
 static MACHINE_CONFIG_FRAGMENT( ide )
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_image_devices, "hdd", "hdd", false)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, isa16_ide_device, ide_interrupt))
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF, isa16_ide_device, ide_interrupt))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( ide )

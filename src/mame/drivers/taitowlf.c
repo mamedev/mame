@@ -645,7 +645,7 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	MCFG_PIC8259_ADD( "pic8259_1", taitowlf_pic8259_1_config )
 	MCFG_PIC8259_ADD( "pic8259_2", taitowlf_pic8259_2_config )
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, taitowlf_state, ide_interrupt))
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF, taitowlf_state, ide_interrupt))
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	/* video hardware */

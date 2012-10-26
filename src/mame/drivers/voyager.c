@@ -774,7 +774,7 @@ static MACHINE_CONFIG_START( voyager, voyager_state )
 	MCFG_PIC8259_ADD( "pic8259_1", voyager_pic8259_1_config )
 	MCFG_PIC8259_ADD( "pic8259_2", voyager_pic8259_2_config )
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, voyager_state, ide_interrupt))
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF, voyager_state, ide_interrupt))
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)

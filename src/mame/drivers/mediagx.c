@@ -1185,7 +1185,7 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_PIC8259_ADD( "pic8259_slave", mediagx_pic8259_2_config )
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, mediagx_state, ide_interrupt))
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF, mediagx_state, ide_interrupt))
 
 	MCFG_TIMER_DRIVER_ADD("sound_timer", mediagx_state, sound_timer_callback)
 

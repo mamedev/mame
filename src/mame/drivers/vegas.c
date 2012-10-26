@@ -2246,7 +2246,7 @@ static MACHINE_CONFIG_START( vegascore, vegas_state )
 	MCFG_M48T37_ADD("timekeeper")
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, vegas_state, ide_interrupt))
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF, vegas_state, ide_interrupt))
 	MCFG_IDE_CONTROLLER_BUS_MASTER("maincpu", AS_PROGRAM)
 
 	MCFG_SMC91C94_ADD("ethernet", ethernet_intf)
