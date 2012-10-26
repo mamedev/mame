@@ -316,9 +316,9 @@ static const UINT8 cc_xy[0x100] = {
  4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4, 4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4,
  4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4, 4+4, 4+4, 4+4, 4+4, 4+4, 4+4,19  , 4+4,
  5+4,10+4,10+4,10+4,10+4,11+4, 7+4,11+4, 5+4,10+4,10+4, 0  ,10+4,17+4, 7+4,11+4,	/* cb -> cc_xycb */
- 5+4,10+4,10+4,11+4,10+4,11+4, 7+4,11+4, 5+4, 4+4,10+4,11+4,10+4, 4+4, 7+4,11+4,
- 5+4,10+4,10+4,19+4,10+4,11+4, 7+4,11+4, 5+4, 4+4,10+4, 4+4,10+4, 4+4, 7+4,11+4,
- 5+4,10+4,10+4, 4+4,10+4,11+4, 7+4,11+4, 5+4, 6+4,10+4, 4+4,10+4, 4+4, 7+4,11+4
+ 5+4,10+4,10+4,11+4,10+4,11+4, 7+4,11+4, 5+4, 4+4,10+4,11+4,10+4, 4  , 7+4,11+4,	/* dd -> cc_xy again */
+ 5+4,10+4,10+4,19+4,10+4,11+4, 7+4,11+4, 5+4, 4+4,10+4, 4+4,10+4, 4  , 7+4,11+4,	/* ed -> cc_ed */
+ 5+4,10+4,10+4, 4+4,10+4,11+4, 7+4,11+4, 5+4, 6+4,10+4, 4+4,10+4, 4  , 7+4,11+4		/* fd -> cc_xy again */
 };
 
 static const UINT8 cc_xycb[0x100] = {
@@ -780,7 +780,6 @@ INLINE UINT32 ARG16(z80_state *z80)
 #define RETI(Z) do {											\
 	POP((Z), pc);												\
 	(Z)->WZ = (Z)->PC;											\
-/* according to http://www.msxnet.org/tech/z80-documented.pdf */\
 	(Z)->iff1 = (Z)->iff2;										\
 	(Z)->daisy.call_reti_device();								\
 } while (0)
@@ -3651,10 +3650,8 @@ static CPU_EXECUTE( z80 )
 	do
 	{
 		/* check for NSC800 IRQs line RSTA, RSTB, RSTC */
-		if ((z80->nsc800_irq_state[NSC800_RSTA] != CLEAR_LINE ||
-			z80->nsc800_irq_state[NSC800_RSTB] != CLEAR_LINE ||
-			z80->nsc800_irq_state[NSC800_RSTC] != CLEAR_LINE) && z80->iff1 && !z80->after_ei)
-				take_interrupt_nsc800(z80);
+		if ((z80->nsc800_irq_state[NSC800_RSTA] != CLEAR_LINE || z80->nsc800_irq_state[NSC800_RSTB] != CLEAR_LINE || z80->nsc800_irq_state[NSC800_RSTC] != CLEAR_LINE) && z80->iff1 && !z80->after_ei)
+			take_interrupt_nsc800(z80);
 
 		/* check for IRQs before each instruction */
 		if (z80->irq_state != CLEAR_LINE && z80->iff1 && !z80->after_ei)
