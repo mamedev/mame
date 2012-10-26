@@ -62,8 +62,8 @@
 		<publisher>Handic Software</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1070662">
-				<rom name="wordresult.d80" size="533248" status="nodump" offset="0" />
+			<dataarea name="flop" size="1066496">
+				<rom name="wordresult.d80" size="1066496" status="nodump" offset="0" />
 			</dataarea>
 		</part>
 
@@ -105,14 +105,14 @@
 		<publisher>Ultra Electronic</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1070662">
-				<rom name="proxa7000d1.d82" size="1070662" crc="9cd9b57f" sha1="79358e050a8a3c0c336c8c4a579af86aefe787a3" offset="0" />
+			<dataarea name="flop" size="1066496">
+				<rom name="proxa7000d1.d82" size="1066496" crc="9cd9b57f" sha1="79358e050a8a3c0c336c8c4a579af86aefe787a3" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="1070662">
-				<rom name="proxa7000d2.d82" size="1070662" crc="6e0f7e44" sha1="4d742b82956126ff568762f8e82ad7290e6cc8a4" offset="0" />
+			<dataarea name="flop" size="1066496">
+				<rom name="proxa7000d2.d82" size="1066496" crc="6e0f7e44" sha1="4d742b82956126ff568762f8e82ad7290e6cc8a4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
