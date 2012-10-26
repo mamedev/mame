@@ -1037,13 +1037,6 @@ static MACHINE_CONFIG_DERIVED( midvunit, midvcommon )
 	MCFG_FRAGMENT_ADD(dcs_audio_2k)
 MACHINE_CONFIG_END
 
-static const ide_config ide_intf =
-{
-	NULL,
-	NULL,
-	0
-};
-
 static MACHINE_CONFIG_DERIVED( midvplus, midvcommon )
 
 	/* basic machine hardware */
@@ -1055,7 +1048,7 @@ static MACHINE_CONFIG_DERIVED( midvplus, midvcommon )
 	MCFG_DEVICE_REMOVE("nvram")
 	MCFG_NVRAM_HANDLER(midway_serial_pic2)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(dcs2_audio_2115)

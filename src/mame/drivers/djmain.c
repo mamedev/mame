@@ -411,17 +411,17 @@ INTERRUPT_GEN_MEMBER(djmain_state::vb_interrupt)
 }
 
 
-static void ide_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER( djmain_state::ide_interrupt )
 {
 	if (state != CLEAR_LINE)
 	{
 		//logerror("IDE interrupt asserted\n");
-		device->machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1, HOLD_LINE);
+		device().machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1, HOLD_LINE);
 	}
 	else
 	{
 		//logerror("IDE interrupt cleared\n");
-		device->machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1, CLEAR_LINE);
+		device().machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1, CLEAR_LINE);
 	}
 }
 
@@ -1397,12 +1397,12 @@ static const k054539_interface k054539_config =
 
 void djmain_state::machine_start()
 {
-	device_t *ide = machine().device("ide");
+	ide_controller_device *ide = (ide_controller_device *) machine().device("ide");
 
 	if (ide != NULL && m_ide_master_password != NULL)
-		ide_set_master_password(ide, m_ide_master_password);
+		ide->ide_set_master_password(m_ide_master_password);
 	if (ide != NULL && m_ide_user_password != NULL)
-		ide_set_user_password(ide, m_ide_user_password);
+		ide->ide_set_user_password(m_ide_user_password);
 
 	state_save_register_global(machine(), m_sndram_bank);
 	state_save_register_global(machine(), m_pending_vb_int);
@@ -1445,13 +1445,6 @@ static const k056832_interface djmain_k056832_intf =
 	djmain_tile_callback, "none"
 };
 
-static const ide_config ide_intf =
-{
-	ide_interrupt,
-	NULL,
-	0
-};
-
 static MACHINE_CONFIG_START( djmain, djmain_state )
 
 	/* basic machine hardware */
@@ -1462,7 +1455,8 @@ static MACHINE_CONFIG_START( djmain, djmain_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", djmain_state,  vb_interrupt)
 
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, djmain_state, ide_interrupt))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

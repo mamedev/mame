@@ -488,6 +488,7 @@ public:
 	int m_count;
 	int m_dynamic_count;
 	dynamic_address m_dynamic[MAX_DYNAMIC_ADDRESSES];
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_DRIVER_INIT(gauntleg);
 	DECLARE_DRIVER_INIT(cartfury);
 	DECLARE_DRIVER_INIT(tenthdeg);
@@ -514,7 +515,6 @@ public:
  *************************************/
 
 
-static void ide_interrupt(device_t *device, int state);
 static void remap_dynamic_addresses(running_machine &machine);
 
 
@@ -747,7 +747,7 @@ static WRITE32_HANDLER( pci_ide_w )
 
 		case 0x14:		/* interrupt pending */
 			if (data & 4)
-				ide_interrupt(space.machine().device("ide"), 0);
+				state->ide_interrupt(0);
 			break;
 	}
 	if (LOG_PCI)
@@ -1231,15 +1231,14 @@ static WRITE32_HANDLER( nile_w )
  *
  *************************************/
 
-static void ide_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(vegas_state::ide_interrupt)
 {
-	vegas_state *drvstate = device->machine().driver_data<vegas_state>();
-	drvstate->m_ide_irq_state = state;
+	m_ide_irq_state = state;
 	if (state)
-		drvstate->m_nile_irq_state |= 0x800;
+		m_nile_irq_state |= 0x800;
 	else
-		drvstate->m_nile_irq_state &= ~0x800;
-	update_nile_irqs(device->machine());
+		m_nile_irq_state &= ~0x800;
+	update_nile_irqs(machine());
 }
 
 
@@ -2221,13 +2220,6 @@ static const mips3_config r5000_config =
 	SYSTEM_CLOCK	/* system clock rate */
 };
 
-static const ide_config ide_intf =
-{
-	ide_interrupt,
-	"maincpu",
-	AS_PROGRAM
-};
-
 static const smc91c9x_config ethernet_intf =
 {
 	ethernet_interrupt
@@ -2253,7 +2245,9 @@ static MACHINE_CONFIG_START( vegascore, vegas_state )
 
 	MCFG_M48T37_ADD("timekeeper")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, vegas_state, ide_interrupt))
+	MCFG_IDE_CONTROLLER_BUS_MASTER("maincpu", AS_PROGRAM)
 
 	MCFG_SMC91C94_ADD("ethernet", ethernet_intf)
 

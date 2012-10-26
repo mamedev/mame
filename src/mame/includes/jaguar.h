@@ -209,7 +209,7 @@ public:
 
 	static void gpu_cpu_int(device_t *device);
 	static void dsp_cpu_int(device_t *device);
-	static void external_int(device_t *device, int state);
+	DECLARE_WRITE_LINE_MEMBER( external_int );
 
 	int quickload(device_image_interface &image, const char *file_type, int quickload_size);
 	void cart_start();

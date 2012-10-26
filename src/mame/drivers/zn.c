@@ -1471,15 +1471,6 @@ Notes:
       *2                  - Unpopulated DIP28 socket
 */
 
-static void atpsx_interrupt(device_t *device, int state)
-{
-	if (state)
-	{
-		psxirq_device *psxirq = (psxirq_device *) device->machine().device("maincpu:irq");
-		psxirq->intin10(1);
-	}
-}
-
 static void atpsx_dma_read( zn_state *state, UINT32 n_address, INT32 n_size )
 {
 	UINT32 *p_n_psxram = state->m_p_n_psxram;
@@ -1531,17 +1522,11 @@ MACHINE_RESET_MEMBER(zn_state,coh1000w)
 	machine().device("ide")->reset();
 }
 
-static const ide_config ide_intf =
-{
-	atpsx_interrupt,
-	NULL,
-	0
-};
-
 static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000w )
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( atpsx_dma_read ), (zn_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( atpsx_dma_write ), (zn_state *) owner ) )
 MACHINE_CONFIG_END
@@ -2043,15 +2028,6 @@ Notes:
       *         - Unpopulated DIP42 socket
 */
 
-static void jdredd_ide_interrupt(device_t *device, int state)
-{
-	if (state)
-	{
-		psxirq_device *psxirq = (psxirq_device *) device->machine().device("maincpu:irq");
-		psxirq->intin10(1);
-	}
-}
-
 READ32_MEMBER(zn_state::jdredd_idestat_r)
 {
 	device_t *device = machine().device("ide");
@@ -2214,13 +2190,6 @@ static MACHINE_CONFIG_DERIVED( coh1000a, zn1_2mb_vram )
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000a )
 MACHINE_CONFIG_END
 
-static const ide_config jdredd_ide_intf =
-{
-	jdredd_ide_interrupt,
-	NULL,
-	0
-};
-
 static MACHINE_CONFIG_DERIVED( coh1000a_ide, zn1_2mb_vram )
 
 	MCFG_DEVICE_MODIFY( "gpu" )
@@ -2228,7 +2197,8 @@ static MACHINE_CONFIG_DERIVED( coh1000a_ide, zn1_2mb_vram )
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000a )
 
-	MCFG_IDE_CONTROLLER_ADD("ide", jdredd_ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
 MACHINE_CONFIG_END
 
 /*

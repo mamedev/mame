@@ -92,6 +92,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
 	DECLARE_WRITE_LINE_MEMBER(savquest_pic8259_1_set_int_line);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	virtual void machine_start();
 	virtual void machine_reset();
 };
@@ -513,10 +514,9 @@ static IRQ_CALLBACK(irq_callback)
 	return pic8259_acknowledge( state->m_pic8259_1);
 }
 
-static void ide_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(savquest_state::ide_interrupt)
 {
-	savquest_state *drvstate = device->machine().driver_data<savquest_state>();
-	pic8259_ir6_w(drvstate->m_pic8259_2, state);
+	pic8259_ir6_w(m_pic8259_2, state);
 }
 
 void savquest_state::machine_start()
@@ -536,13 +536,6 @@ void savquest_state::machine_reset()
 	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("bios")->base() + 0x20000);
 }
 
-static const ide_config ide_intf =
-{
-	ide_interrupt,
-	NULL,
-	0
-};
-
 static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 450000000)	// actually Pentium II 450
 	MCFG_CPU_PROGRAM_MAP(savquest_map)
@@ -561,7 +554,8 @@ static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, savquest_state, ide_interrupt))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

@@ -114,6 +114,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
 	DECLARE_WRITE_LINE_MEMBER(gamecstl_pic8259_1_set_int_line);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_DRIVER_INIT(gamecstl);
 	virtual void machine_start();
@@ -121,9 +122,6 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_gamecstl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-
-static void ide_interrupt(device_t *device, int state);
 
 
 static const rgb_t cga_palette[16] =
@@ -687,13 +685,6 @@ static const struct pit8253_config gamecstl_pit8254_config =
 	}
 };
 
-static const ide_config ide_intf =
-{
-	ide_interrupt,
-	NULL,
-	0
-};
-
 static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 
 	/* basic machine hardware */
@@ -716,7 +707,8 @@ static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 
 	MCFG_PIC8259_ADD( "pic8259_2", gamecstl_pic8259_2_config )
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, gamecstl_state, ide_interrupt))
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
@@ -745,10 +737,9 @@ static void keyboard_interrupt(running_machine &machine, int state)
 	pic8259_ir1_w(drvstate->m_pic8259_1, state);
 }
 
-static void ide_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(gamecstl_state::ide_interrupt)
 {
-	gamecstl_state *drvstate = device->machine().driver_data<gamecstl_state>();
-	pic8259_ir6_w(drvstate->m_pic8259_2, state);
+	pic8259_ir6_w(m_pic8259_2, state);
 }
 
 static int gamecstl_get_out2(running_machine &machine)

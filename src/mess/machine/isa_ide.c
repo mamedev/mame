@@ -30,25 +30,21 @@ static WRITE16_DEVICE_HANDLER( ide16_alt_w )
 	ide_controller16_w(device, space, 0x3f6/2 + offset, data, 0x00ff);
 }
 
-static void ide_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(isa16_ide_device::ide_interrupt)
 {
-	isa16_ide_device *ide  = downcast<isa16_ide_device *>(device->owner());
-	if (ide->is_primary()) {
-		ide->m_isa->irq14_w(state);
-	} else {
-		ide->m_isa->irq15_w(state);
+	if (is_primary())
+	{
+		m_isa->irq14_w(state);
+	}
+	else 
+	{
+		m_isa->irq15_w(state);
 	}
 }
 
-static const ide_config ide_intf =
-{
-	ide_interrupt,
-	NULL,
-	0
-};
-
 static MACHINE_CONFIG_FRAGMENT( ide )
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_image_devices, "hdd", "hdd", false)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_image_devices, "hdd", "hdd", false)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, isa16_ide_device, ide_interrupt))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( ide )

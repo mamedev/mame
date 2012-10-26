@@ -96,6 +96,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
 	DECLARE_WRITE_LINE_MEMBER(midqslvr_pic8259_1_set_int_line);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	virtual void machine_start();
 	virtual void machine_reset();
 };
@@ -649,10 +650,9 @@ static IRQ_CALLBACK(irq_callback)
 	return pic8259_acknowledge( state->m_pic8259_1);
 }
 
-static void ide_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(midqslvr_state::ide_interrupt)
 {
-	midqslvr_state *drvstate = device->machine().driver_data<midqslvr_state>();
-	pic8259_ir6_w(drvstate->m_pic8259_2, state);
+	pic8259_ir6_w(m_pic8259_2, state);
 }
 
 void midqslvr_state::machine_start()
@@ -685,13 +685,6 @@ void midqslvr_state::machine_reset()
 	machine().root_device().membank("video_bank2")->set_base(machine().root_device().memregion("video_bios")->base() + 0x4000);
 }
 
-static const ide_config ide_intf =
-{
-	ide_interrupt,
-	NULL,
-	0
-};
-
 static MACHINE_CONFIG_START( midqslvr, midqslvr_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 333000000)	// actually Celeron 333
 	MCFG_CPU_PROGRAM_MAP(midqslvr_map)
@@ -710,7 +703,8 @@ static MACHINE_CONFIG_START( midqslvr, midqslvr_state )
 	MCFG_PCI_BUS_LEGACY_DEVICE( 0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(31, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, midqslvr_state, ide_interrupt))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

@@ -530,6 +530,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tlcs_ide0_w);
 	DECLARE_READ8_MEMBER(tlcs_ide1_r);
 	DECLARE_WRITE8_MEMBER(tlcs_ide1_w);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 };
 
 
@@ -2424,7 +2425,8 @@ INPUT_PORTS_END
 
 static void set_ide_drive_serial_number(device_t *device, int drive, const char *serial)
 {
-	UINT8 *ide_features = ide_get_features(device, drive);
+	ide_controller_device *ide = (ide_controller_device *) device;
+	UINT8 *ide_features = ide->ide_get_features(drive);
 
 	for (int i=0; i < 20; i++)
 	{
@@ -2459,9 +2461,9 @@ INTERRUPT_GEN_MEMBER(taitotz_state::taitotz_vbi)
 	machine().device("iocpu")->execute().set_input_line(TLCS900_INT3, ASSERT_LINE);
 }
 
-static void ide_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
 {
-	device->machine().device("iocpu")->execute().set_input_line(TLCS900_INT2, state);
+	machine().device("iocpu")->execute().set_input_line(TLCS900_INT2, state);
 }
 
 static const powerpc_config ppc603e_config =
@@ -2477,13 +2479,6 @@ static const tlcs900_interface taitotz_tlcs900_interface =
 	DEVCB_DRIVER_MEMBER(taitotz_state, tlcs900_to3),
 	DEVCB_DRIVER_MEMBER(taitotz_state, tlcs900_port_read),
 	DEVCB_DRIVER_MEMBER(taitotz_state, tlcs900_port_write),
-};
-
-static const ide_config ide_intf =
-{
-	ide_interrupt,
-	NULL,
-	0
 };
 
 static MACHINE_CONFIG_START( taitotz, taitotz_state )
@@ -2502,8 +2497,9 @@ static MACHINE_CONFIG_START( taitotz, taitotz_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(120))
 
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, taitotz_state, ide_interrupt))
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)

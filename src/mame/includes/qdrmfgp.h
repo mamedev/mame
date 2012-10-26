@@ -42,6 +42,8 @@ public:
 	INTERRUPT_GEN_MEMBER(qdrmfgp2_interrupt);
 	TIMER_CALLBACK_MEMBER(gp2_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(qdrmfgp_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(gp2_ide_interrupt);
 };
 
 /*----------- defined in video/qdrmfgp.c -----------*/

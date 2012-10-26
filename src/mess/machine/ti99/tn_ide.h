@@ -33,6 +33,7 @@ public:
 	int 	m_cru_register;
 
 	DECLARE_WRITE_LINE_MEMBER(clock_interrupt_callback);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt_callback);
 
 protected:
 	void device_start(void);

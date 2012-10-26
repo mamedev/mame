@@ -405,9 +405,11 @@ static void rf5c296_reg_w(ATTR_UNUSED running_machine &machine, UINT8 reg, UINT8
 			// Check for card reset
 			if (!(data & 0x40))
 			{
-				machine.device(":card")->reset();
+				ide_controller_device *card = (ide_controller_device *) machine.device(":card");
+
+				card->reset();
 				state->m_locked = 0x1ff;
-				ide_set_gnet_readlock (machine.device(":card"), 1);
+				card->ide_set_gnet_readlock(1);
 			}
 		break;
 
@@ -490,8 +492,10 @@ WRITE32_MEMBER(taitogn_state::rf5c296_mem_w)
 			m_locked &= ~(1 << pos);
 		else
 			m_locked |= 1 << pos;
-		if (!m_locked) {
-			ide_set_gnet_readlock (machine().device(":card"), 0);
+		if (!m_locked)
+		{
+			ide_controller_device *card = (ide_controller_device *) machine().device(":card");
+			card->ide_set_gnet_readlock(0);
 		}
 	}
 }
@@ -889,8 +893,10 @@ MACHINE_RESET_MEMBER(taitogn_state,coh3002t)
 	m_locked = 0x1ff;
 	install_handlers(machine(), 0);
 	m_control = 0;
-	machine().device(":card")->reset();
-	ide_set_gnet_readlock(machine().device(":card"), 1);
+
+	ide_controller_device *card = (ide_controller_device *) machine().device(":card");
+	card->reset();
+	card->ide_set_gnet_readlock(1);
 
 	// halt sound CPU since it has no valid program at start
 	machine().device("mn10200")->execute().set_input_line(INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
@@ -930,13 +936,6 @@ static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
 ADDRESS_MAP_END
 
 
-static const ide_config ide_intf =
-{
-	NULL,
-	NULL,
-	0
-};
-
 static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
@@ -955,7 +954,7 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	MCFG_MACHINE_RESET_OVERRIDE(taitogn_state, coh3002t )
 
 	MCFG_AT28C16_ADD( "at28c16", 0 )
-	MCFG_IDE_CONTROLLER_ADD( "card", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD( "card", ide_devices, "hdd", NULL, true)
 
 	MCFG_MB3773_ADD("mb3773")
 

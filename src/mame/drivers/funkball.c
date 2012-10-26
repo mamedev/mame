@@ -162,6 +162,7 @@ public:
 	DECLARE_READ8_MEMBER(io20_r);
 	DECLARE_WRITE8_MEMBER(io20_w);
 	DECLARE_WRITE_LINE_MEMBER(funkball_pic8259_1_set_int_line);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_funkball(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -1100,10 +1101,9 @@ static IRQ_CALLBACK(irq_callback)
 	return pic8259_acknowledge( state->m_pic8259_1);
 }
 
-static void ide_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(funkball_state::ide_interrupt)
 {
-	funkball_state *drvstate = device->machine().driver_data<funkball_state>();
-	pic8259_ir6_w(drvstate->m_pic8259_2, state);
+	pic8259_ir6_w(m_pic8259_2, state);
 }
 
 void funkball_state::machine_start()
@@ -1141,13 +1141,6 @@ UINT32 funkball_state::screen_update_funkball(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-static const ide_config ide_intf =
-{
-	ide_interrupt,
-	NULL,
-	0
-};
-
 static const voodoo_config voodoo_intf =
 {
 	2, //               fbmem;
@@ -1177,7 +1170,8 @@ static MACHINE_CONFIG_START( funkball, funkball_state )
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, "voodoo_0", voodoo_0_pci_r, voodoo_0_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(18, NULL, cx5510_pci_r, cx5510_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, funkball_state, ide_interrupt))
 
 	/* video hardware */
 	MCFG_3DFX_VOODOO_1_ADD("voodoo_0", STD_VOODOO_1_CLOCK, voodoo_intf)

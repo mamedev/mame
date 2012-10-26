@@ -555,12 +555,11 @@ WRITE64_MEMBER(bebox_state::bebox_800003F0_w )
 }
 
 
-void bebox_ide_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(bebox_state::bebox_ide_interrupt)
 {
-	bebox_state *drvstate = device->machine().driver_data<bebox_state>();
-	bebox_set_irq_bit(device->machine(), 7, state);
-	if ( drvstate->m_devices.pic8259_master ) {
-		pic8259_ir6_w(drvstate->m_devices.pic8259_master, state);
+	bebox_set_irq_bit(machine(), 7, state);
+	if ( m_devices.pic8259_master ) {
+		pic8259_ir6_w(m_devices.pic8259_master, state);
 	}
 }
 

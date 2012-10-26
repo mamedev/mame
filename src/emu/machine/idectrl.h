@@ -130,13 +130,11 @@ extern const device_type IDE_HARDDISK_IMAGE;
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct ide_config
-{
-	void	(*interrupt)(device_t *device, int state);
-	const char *bmcpu;		/* name of bus master CPU */
-	UINT32 bmspace;			/* address space of bus master transfer */
-};
+#define MCFG_IDE_CONTROLLER_IRQ_HANDLER(_devcb) \
+	devcb = &ide_controller_device::set_irq_handler(*device, DEVCB2_##_devcb);
 
+#define MCFG_IDE_CONTROLLER_BUS_MASTER(bmcpu, bmspace) \
+	ide_controller_device::set_bus_master(*device, bmcpu, bmspace);
 
 SLOT_INTERFACE_EXTERN(ide_devices);
 SLOT_INTERFACE_EXTERN(ide_image_devices);
@@ -145,26 +143,19 @@ SLOT_INTERFACE_EXTERN(ide_image_devices);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_IDE_CONTROLLER_ADD(_tag, _config, _slotintf, _master, _slave, _fixed) \
+#define MCFG_IDE_CONTROLLER_ADD(_tag, _slotintf, _master, _slave, _fixed) \
 	MCFG_DEVICE_ADD(_tag, IDE_CONTROLLER, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_IDE_SLOT_ADD("drive_0", _slotintf, _master, NULL, _fixed) \
 	MCFG_IDE_SLOT_ADD("drive_1", _slotintf, _slave, NULL, _fixed) \
+	MCFG_DEVICE_MODIFY(_tag)
 
 #define MCFG_IDE_SLOT_ADD(_tag, _slot_intf, _def_slot, _def_inp, _fixed) \
 	MCFG_DEVICE_ADD(_tag, IDE_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, _fixed) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, _fixed)
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-UINT8 *ide_get_features(device_t *device, int drive);
-
-void ide_set_master_password(device_t *device, const UINT8 *password);
-void ide_set_user_password(device_t *device, const UINT8 *password);
-
-void ide_set_gnet_readlock(device_t *device, const UINT8 onoff);
 
 int ide_bus_r(device_t *config, int select, int offset);
 void ide_bus_w(device_t *config, int select, int offset, int data);
@@ -182,6 +173,20 @@ DECLARE_WRITE32_DEVICE_HANDLER( ide_bus_master32_w );
 DECLARE_READ16_DEVICE_HANDLER( ide_controller16_r );
 DECLARE_WRITE16_DEVICE_HANDLER( ide_controller16_w );
 
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+struct ide_device
+{
+	UINT16			cur_cylinder;
+	UINT8			cur_sector;
+	UINT8			cur_head;
+	UINT8			cur_head_reg;
+	UINT32			cur_lba;
+	ide_slot_device *slot;
+};
+
+#define IDE_CONFIG_REGISTERS				0x10
 
 /* ----- device interface ----- */
 
@@ -189,18 +194,91 @@ class ide_controller_device : public device_t
 {
 public:
 	ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~ide_controller_device() { global_free(m_token); }
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<ide_controller_device &>(device).m_irq_handler.set_callback(object); }
+	static void set_bus_master(device_t &device, const char *bmcpu, UINT32 bmspace) {ide_controller_device &ide = downcast<ide_controller_device &>(device); ide.bmcpu = bmcpu; ide.bmspace = bmspace; }
+
+	UINT8 *ide_get_features(int drive);
+	void ide_set_gnet_readlock(const UINT8 onoff);
+	void ide_set_master_password(const UINT8 *password);
+	void ide_set_user_password(const UINT8 *password);
+
+	UINT32 ide_controller_read(int bank, offs_t offset, int size);
+	void ide_controller_write(int bank, offs_t offset, int size, UINT32 data);
+	UINT32 ide_bus_master_read(offs_t offset, int size);
+	void ide_bus_master_write(offs_t offset, int size, UINT32 data);
+	void signal_interrupt();
+	void clear_interrupt();
+	void read_sector_done();
+	void write_sector_done();
+
+	UINT8			status;
+
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+
 private:
-	// internal state
-	void *m_token;
+	void signal_delayed_interrupt(attotime time, int buffer_ready);
+	UINT32 lba_address();
+	void next_sector();
+	void security_error();
+	void continue_read();
+	void write_buffer_to_dma();
+	void read_first_sector();
+	void read_next_sector();
+	void read_buffer_from_dma();
+	void handle_command(UINT8 _command);
+	void continue_write();
+
+	UINT8			adapter_control;
+	UINT8			error;
+	UINT8			command;
+	UINT8			interrupt_pending;
+	UINT8			precomp_offset;
+
+	UINT8			buffer[IDE_DISK_SECTOR_SIZE];
+	UINT16			buffer_offset;
+	UINT16			sector_count;
+
+	UINT16			block_count;
+	UINT16			sectors_until_int;
+	UINT8			verify_only;
+
+	UINT8			dma_active;
+	address_space *dma_space;
+	UINT8			dma_address_xor;
+	UINT8			dma_last_buffer;
+	offs_t			dma_address;
+	offs_t			dma_descriptor;
+	UINT32			dma_bytes_left;
+
+	UINT8			bus_master_command;
+	UINT8			bus_master_status;
+	UINT32			bus_master_descriptor;
+
+	UINT8			config_unknown;
+	UINT8			config_register[IDE_CONFIG_REGISTERS];
+	UINT8			config_register_num;
+
+	emu_timer *		last_status_timer;
+	emu_timer *		reset_timer;
+
+	UINT8			master_password_enable;
+	UINT8			user_password_enable;
+	const UINT8 *	master_password;
+	const UINT8 *	user_password;
+
+	UINT8			gnetreadlock;
+
+	UINT8			cur_drive;
+	ide_device		drive[2];
+
+	devcb2_write_line m_irq_handler;
+	const char *bmcpu;
+	UINT32 bmspace;
 };
 
 extern const device_type IDE_CONTROLLER;

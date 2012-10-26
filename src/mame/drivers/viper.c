@@ -1996,10 +1996,6 @@ static void voodoo_vblank(device_t *device, int state)
 	mpc8240_interrupt(device->machine(), MPC8240_IRQ4);
 }
 
-static void ide_interrupt(device_t *device, int state)
-{
-}
-
 void viper_state::machine_start()
 {
 	ds2430_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::ds2430_timer_callback),this));
@@ -2017,10 +2013,12 @@ void viper_state::machine_start()
 
 void viper_state::machine_reset()
 {
-	machine().device("ide")->reset();
+	ide_controller_device *ide = (ide_controller_device *) machine().device("ide");
+
+	ide->reset();
 	mpc8240_epic_reset();
 
-	UINT8 *ide_features = ide_get_features(machine().device("ide"), 0);
+	UINT8 *ide_features = ide->ide_get_features(0);
 
 	// Viper expects these settings or the BIOS fails
 	ide_features[51*2+0] = 0;			/* 51: PIO data transfer cycle timing mode */
@@ -2028,13 +2026,6 @@ void viper_state::machine_reset()
 	ide_features[67*2+0] = 0xf0;		/* 67: minimum PIO transfer cycle time without flow control */
 	ide_features[67*2+1] = 0x00;
 }
-
-static const ide_config ide_intf =
-{
-	ide_interrupt,
-	NULL,
-	0
-};
 
 static const voodoo_config voodoo_intf =
 {
@@ -2060,7 +2051,8 @@ static MACHINE_CONFIG_START( viper, viper_state )
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, "mpc8240", mpc8240_pci_r, mpc8240_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(12, "voodoo", voodoo3_pci_r, voodoo3_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+
 	MCFG_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, voodoo_intf)
 
 	/* video hardware */

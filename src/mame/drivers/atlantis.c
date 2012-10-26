@@ -95,16 +95,6 @@ UINT32 atlantis_state::screen_update_mwskins(screen_device &screen, bitmap_ind16
 
 /*************************************
  *
- *  Interrupt handling
- *
- *************************************/
-
-static void ide_interrupt(device_t *device, int state)
-{
-}
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -142,13 +132,6 @@ static const mips3_config r4310_config =
 	16384				/* data cache size */
 };
 
-static const ide_config ide_intf =
-{
-	ide_interrupt,
-	NULL,
-	0
-};
-
 static MACHINE_CONFIG_START( mwskins, atlantis_state )
 
 	/* basic machine hardware */
@@ -157,7 +140,7 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

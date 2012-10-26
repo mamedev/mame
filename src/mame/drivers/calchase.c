@@ -171,6 +171,7 @@ public:
 	DECLARE_WRITE16_MEMBER(calchase_dac_l_w);
 	DECLARE_WRITE16_MEMBER(calchase_dac_r_w);
 	DECLARE_WRITE_LINE_MEMBER(calchase_pic8259_1_set_int_line);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_DRIVER_INIT(calchase);
 	virtual void machine_start();
@@ -178,7 +179,6 @@ public:
 };
 
 
-static void ide_interrupt(device_t *device, int state);
 
 
 READ8_MEMBER(calchase_state::at_dma8237_2_r)
@@ -896,10 +896,9 @@ static void keyboard_interrupt(running_machine &machine, int state)
 	pic8259_ir1_w(drvstate->m_pic8259_1, state);
 }
 
-static void ide_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER( calchase_state::ide_interrupt )
 {
-	calchase_state *drvstate = device->machine().driver_data<calchase_state>();
-	pic8259_ir6_w(drvstate->m_pic8259_2, state);
+	pic8259_ir6_w(m_pic8259_2, state);
 }
 
 static int calchase_get_out2(running_machine &machine)
@@ -919,13 +918,6 @@ static void calchase_set_keyb_int(running_machine &machine, int state)
 	pic8259_ir1_w(drvstate->m_pic8259_1, state);
 }
 
-static const ide_config ide_intf =
-{
-	ide_interrupt,
-	NULL,
-	0
-};
-
 static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
 	MCFG_CPU_PROGRAM_MAP(calchase_map)
@@ -937,7 +929,8 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
 	MCFG_PIC8259_ADD( "pic8259_1", calchase_pic8259_1_config )
 	MCFG_PIC8259_ADD( "pic8259_2", calchase_pic8259_2_config )
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, calchase_state, ide_interrupt))
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)

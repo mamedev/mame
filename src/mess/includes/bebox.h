@@ -82,6 +82,8 @@ public:
 	DECLARE_WRITE64_MEMBER(scsi53c810_w);
 	DECLARE_READ64_MEMBER(bb_slave_64be_r);
 
+	DECLARE_WRITE_LINE_MEMBER(bebox_ide_interrupt);
+
 	void fdc_interrupt(bool state);
 	void fdc_dma_drq(bool state);
 };
@@ -99,7 +101,6 @@ extern const ins8250_interface bebox_uart_inteface_1;
 extern const ins8250_interface bebox_uart_inteface_2;
 extern const ins8250_interface bebox_uart_inteface_3;
 
-void bebox_ide_interrupt(device_t *device, int state);
 void bebox_set_irq_bit(running_machine &machine, unsigned int interrupt_bit, int val);
 
 UINT32 scsi53c810_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask);

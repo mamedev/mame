@@ -180,6 +180,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
 	DECLARE_WRITE_LINE_MEMBER(mediagx_pic8259_1_set_int_line);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_DRIVER_INIT(a51site4);
 	virtual void machine_start();
@@ -230,7 +231,6 @@ public:
 #define DC_CFIFO_DIAG			0x7c/4
 
 
-static void ide_interrupt(device_t *device, int state);
 
 
 
@@ -1163,13 +1163,6 @@ static RAMDAC_INTERFACE( ramdac_intf )
 	0
 };
 
-static const ide_config ide_intf =
-{
-	ide_interrupt,
-	NULL,
-	0
-};
-
 static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
 	/* basic machine hardware */
@@ -1191,7 +1184,8 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
 	MCFG_PIC8259_ADD( "pic8259_slave", mediagx_pic8259_2_config )
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, mediagx_state, ide_interrupt))
 
 	MCFG_TIMER_DRIVER_ADD("sound_timer", mediagx_state, sound_timer_callback)
 
@@ -1232,11 +1226,9 @@ static void keyboard_interrupt(running_machine &machine, int _state)
 	pic8259_ir1_w(state->m_pic8259_1, _state);
 }
 
-static void ide_interrupt(device_t *device, int _state)
+WRITE_LINE_MEMBER( mediagx_state::ide_interrupt )
 {
-	mediagx_state *state = device->machine().driver_data<mediagx_state>();
-
-	pic8259_ir6_w(state->m_pic8259_2, _state);
+	pic8259_ir6_w(m_pic8259_2, state);
 }
 
 static int mediagx_get_out2(running_machine &machine)

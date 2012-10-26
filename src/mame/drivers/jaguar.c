@@ -1564,13 +1564,6 @@ static const jaguar_cpu_config dsp_config =
 	&jaguar_state::dsp_cpu_int
 };
 
-static const ide_config ide_intf =
-{
-	&jaguar_state::external_int,
-	NULL,
-	0
-};
-
 static MACHINE_CONFIG_START( cojagr3k, jaguar_state )
 
 	/* basic machine hardware */
@@ -1588,7 +1581,8 @@ static MACHINE_CONFIG_START( cojagr3k, jaguar_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, jaguar_state, external_int))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

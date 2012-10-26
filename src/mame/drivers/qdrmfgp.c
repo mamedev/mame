@@ -278,15 +278,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(qdrmfgp_state::qdrmfgp_interrupt)
 			m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-static void ide_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(qdrmfgp_state::ide_interrupt)
 {
-	qdrmfgp_state *drvstate = device->machine().driver_data<qdrmfgp_state>();
-	if (drvstate->m_control & 0x0008)
+	if (m_control & 0x0008)
 	{
 		if (state != CLEAR_LINE)
-			device->machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+			machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 		else
-			device->machine().device("maincpu")->execute().set_input_line(4, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(4, CLEAR_LINE);
 	}
 }
 
@@ -305,21 +304,20 @@ INTERRUPT_GEN_MEMBER(qdrmfgp_state::qdrmfgp2_interrupt)
 		device.execute().set_input_line(4, HOLD_LINE);
 }
 
-static void gp2_ide_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(qdrmfgp_state::gp2_ide_interrupt)
 {
-	qdrmfgp_state *drvstate = device->machine().driver_data<qdrmfgp_state>();
-	if (drvstate->m_control & 0x0010)
+	if (m_control & 0x0010)
 	{
 		if (state != CLEAR_LINE)
 		{
-			if (drvstate->m_gp2_irq_control)
-				drvstate->m_gp2_irq_control = 0;
+			if (m_gp2_irq_control)
+				m_gp2_irq_control = 0;
 			else
-				device->machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+				machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 		}
 		else
 		{
-			device->machine().device("maincpu")->execute().set_input_line(5, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(5, CLEAR_LINE);
 		}
 	}
 }
@@ -662,13 +660,6 @@ void qdrmfgp_state::machine_reset()
  *  Machine driver
  *
  *************************************/
-static const ide_config ide_intf =
-{
-	ide_interrupt,
-	NULL,
-	0
-};
-
 static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 
 	/* basic machine hardware */
@@ -679,7 +670,8 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, qdrmfgp_state, ide_interrupt))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -704,12 +696,6 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static const ide_config qdrmfgp2_ide_intf =
-{
-	gp2_ide_interrupt,
-	NULL,
-	0
-};
 static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 
 	/* basic machine hardware */
@@ -720,7 +706,8 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", qdrmfgp2_ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, qdrmfgp_state, gp2_ide_interrupt))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

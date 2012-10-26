@@ -479,6 +479,7 @@ public:
 	DECLARE_READ32_MEMBER(widget_r);
 	DECLARE_WRITE32_MEMBER(widget_w);
 	DECLARE_READ32_MEMBER(seattle_ide_r);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_DRIVER_INIT(sfrush);
 	DECLARE_DRIVER_INIT(blitz2k);
 	DECLARE_DRIVER_INIT(carnevil);
@@ -619,9 +620,9 @@ void seattle_state::machine_reset()
  *
  *************************************/
 
-static void ide_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(seattle_state::ide_interrupt)
 {
-	device->machine().device("maincpu")->execute().set_input_line(IDE_IRQ_NUM, state);
+	machine().device("maincpu")->execute().set_input_line(IDE_IRQ_NUM, state);
 }
 
 
@@ -2523,13 +2524,6 @@ static const mips3_config r5000_config =
 	SYSTEM_CLOCK	/* system clock rate */
 };
 
-static const ide_config ide_intf =
-{
-	ide_interrupt,
-	"maincpu",
-	AS_PROGRAM
-};
-
 static const voodoo_config voodoo_intf =
 {
 	2, //               fbmem;
@@ -2550,7 +2544,9 @@ static MACHINE_CONFIG_START( seattle_common, seattle_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, seattle_state, ide_interrupt))
+	MCFG_IDE_CONTROLLER_BUS_MASTER("maincpu", AS_PROGRAM)
 
 	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, voodoo_intf)
 

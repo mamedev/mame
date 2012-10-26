@@ -271,6 +271,7 @@ public:
 	DECLARE_WRITE16_MEMBER(shared_68k_w);
 	DECLARE_READ16_MEMBER(twinkle_ide_r);
 	DECLARE_WRITE16_MEMBER(twinkle_ide_w);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_DRIVER_INIT(twinkle);
 };
 
@@ -656,13 +657,11 @@ ADDRESS_MAP_END
 
 /* SPU board */
 
-static void ide_interrupt(device_t *device, int state_)
+WRITE_LINE_MEMBER(twinkle_state::ide_interrupt)
 {
-	twinkle_state *state = device->machine().driver_data<twinkle_state>();
-
-	if ((state_) && (state->m_spu_ctrl & 0x0400))
+	if ((state) && (m_spu_ctrl & 0x0400))
 	{
-		device->machine().device("audiocpu")->execute().set_input_line(M68K_IRQ_6, ASSERT_LINE);
+		machine().device("audiocpu")->execute().set_input_line(M68K_IRQ_6, ASSERT_LINE);
 	}
 }
 
@@ -870,13 +869,6 @@ static const rtc65271_interface twinkle_rtc =
 	DEVCB_NULL
 };
 
-static const ide_config ide_intf =
-{
-	ide_interrupt,
-	NULL,
-	0
-};
-
 static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
@@ -897,7 +889,9 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_AM53CF96_ADD("scsi:am53cf96")
 	MCFG_AM53CF96_IRQ_HANDLER(DEVWRITELINE("^maincpu:irq", psxirq_device, intin10))
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, twinkle_state, ide_interrupt))
+
 	MCFG_RTC65271_ADD("rtc", twinkle_rtc)
 
 	/* video hardware */

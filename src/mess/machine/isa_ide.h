@@ -12,27 +12,29 @@
 
 // ======================> isa16_ide_device
 
-class isa16_ide_device :
-		public device_t,
-		public device_isa16_card_interface
+class isa16_ide_device : public device_t,
+	public device_isa16_card_interface
 {
 public:
-		// construction/destruction
-        isa16_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	isa16_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
-		virtual ioport_constructor device_input_ports() const;
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
-		bool is_primary() { return m_is_primary; }
+	bool is_primary() { return m_is_primary; }
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+
 protected:
-        // device-level overrides
-        virtual void device_start();
-        virtual void device_reset();
-		virtual void device_config_complete() { m_shortname = "isa_ide"; }
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_config_complete() { m_shortname = "isa_ide"; }
+
 private:
-        // internal state
-		bool m_is_primary;
+	// internal state
+	bool m_is_primary;
 };
 
 

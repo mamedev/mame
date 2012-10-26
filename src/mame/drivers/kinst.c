@@ -158,6 +158,7 @@ public:
 	DECLARE_WRITE32_MEMBER(kinst_ide_w);
 	DECLARE_READ32_MEMBER(kinst_ide_extra_r);
 	DECLARE_WRITE32_MEMBER(kinst_ide_extra_w);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_DRIVER_INIT(kinst);
 	DECLARE_DRIVER_INIT(kinst2);
 	virtual void machine_start();
@@ -201,8 +202,8 @@ void kinst_state::machine_start()
 
 void kinst_state::machine_reset()
 {
-	device_t *ide = machine().device("ide");
-	UINT8 *features = ide_get_features(ide,0);
+	ide_controller_device *ide = (ide_controller_device *) machine().device("ide");
+	UINT8 *features = ide->ide_get_features(0);
 
 	if (strncmp(machine().system().name, "kinst2", 6) != 0)
 	{
@@ -290,9 +291,9 @@ INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
 }
 
 
-static void ide_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(kinst_state::ide_interrupt)
 {
-	device->machine().device("maincpu")->execute().set_input_line(1, state);
+	machine().device("maincpu")->execute().set_input_line(1, state);
 }
 
 
@@ -664,13 +665,6 @@ static const mips3_config r4600_config =
 	16384				/* data cache size */
 };
 
-static const ide_config ide_intf =
-{
-	ide_interrupt,
-	NULL,
-	0
-};
-
 static MACHINE_CONFIG_START( kinst, kinst_state )
 
 	/* basic machine hardware */
@@ -680,7 +674,8 @@ static MACHINE_CONFIG_START( kinst, kinst_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kinst_state,  irq0_start)
 
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, kinst_state, ide_interrupt))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

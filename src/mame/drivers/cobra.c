@@ -652,6 +652,8 @@ public:
 	DECLARE_READ64_MEMBER(gfx_fifo_r);
 	DECLARE_WRITE64_MEMBER(gfx_buf_w);
 
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+
 	cobra_renderer *m_renderer;
 
 	cobra_fifo *m_gfxfifo_in;
@@ -3173,17 +3175,15 @@ static const k001604_interface cobra_k001604_intf =
 };
 
 
-static void ide_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(cobra_state::ide_interrupt)
 {
-	cobra_state *cobra = device->machine().driver_data<cobra_state>();
-
 	if (state == CLEAR_LINE)
 	{
-		cobra->m_sub_interrupt |= 0x80;
+		m_sub_interrupt |= 0x80;
 	}
 	else
 	{
-		cobra->m_sub_interrupt &= ~0x80;
+		m_sub_interrupt &= ~0x80;
 	}
 }
 
@@ -3200,10 +3200,10 @@ INTERRUPT_GEN_MEMBER(cobra_state::cobra_vblank)
 
 void cobra_state::machine_reset()
 {
-
 	m_sub_interrupt = 0xff;
 
-	UINT8 *ide_features = ide_get_features(machine().device("ide"), 0);
+	ide_controller_device *ide = (ide_controller_device *) machine().device("ide");
+	UINT8 *ide_features = ide->ide_get_features(0);
 
 	// Cobra expects these settings or the BIOS fails
 	ide_features[51*2+0] = 0;			/* 51: PIO data transfer cycle timing mode */
@@ -3222,13 +3222,6 @@ void cobra_state::machine_reset()
 	dmadac_set_frequency(&m_dmadac[0], 1, 44100);
 	dmadac_set_frequency(&m_dmadac[1], 1, 44100);
 }
-
-static const ide_config ide_intf =
-{
-	ide_interrupt,
-	NULL,
-	0
-};
 
 static MACHINE_CONFIG_START( cobra, cobra_state )
 
@@ -3251,7 +3244,8 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, mpc106_pci_r, mpc106_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, cobra_state, ide_interrupt))
 
 	/* video hardware */
 

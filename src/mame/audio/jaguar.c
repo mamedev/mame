@@ -178,14 +178,13 @@ void jaguar_state::update_gpu_irq()
 }
 
 
-void jaguar_state::external_int(device_t *device, int newstate)
+WRITE_LINE_MEMBER( jaguar_state::external_int )
 {
-	jaguar_state &state = *device->machine().driver_data<jaguar_state>();
-	if (newstate != CLEAR_LINE)
-		state.m_gpu_irq_state |= 1;
+	if (state != CLEAR_LINE)
+		m_gpu_irq_state |= 1;
 	else
-		state.m_gpu_irq_state &= ~1;
-	state.update_gpu_irq();
+		m_gpu_irq_state &= ~1;
+	update_gpu_irq();
 }
 
 
