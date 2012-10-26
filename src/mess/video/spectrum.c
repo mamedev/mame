@@ -58,6 +58,15 @@ void spectrum_state::screen_eof_spectrum(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
+		m_frame_number++;
+		
+		if (m_frame_number >= m_frame_invert_count)
+		{
+			m_frame_number = 0;
+			m_flash_invert = !m_flash_invert;
+		}
+
+
 		spectrum_UpdateBorderBitmap(machine());
 	}
 }
