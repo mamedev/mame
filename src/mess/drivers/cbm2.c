@@ -678,7 +678,7 @@ READ8_MEMBER( p500_state::vic_videoram_r )
 		&cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs, &aec, &vsysaden);
 
 	UINT8 data = 0xff;
-	UINT8 clrnib = 0xf;
+//	UINT8 clrnib = 0xf;
 
 	if (vsysaden)
 	{
@@ -686,10 +686,10 @@ READ8_MEMBER( p500_state::vic_videoram_r )
 		{
 			data = m_ram->pointer()[(m_vicbnksel << 14) | offset];
 		}
-		if (!clrnibcs)
+/*		if (!clrnibcs)
 		{
 			clrnib = m_color_ram[offset & 0x3ff];
-		}
+		}*/
 		if (!vidmatcs)
 		{
 			data = m_video_ram[offset & 0x3ff];
