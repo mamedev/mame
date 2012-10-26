@@ -612,13 +612,13 @@ b128	  // Commodore B128
 b256	  // Commodore B256
 cbm610	// Commodore CBM 610
 cbm620	// Commodore CBM 620
-cbm620hu  // Commodore CBM 620 (Hungary)
+cbm620_hu  // Commodore CBM 620 (Hungary)
 b128hp	// Commodore B128HP
 b256hp	// Commodore B256HP
 bx256hp   // Commodore BX256HP
 cbm710	// Commodore CBM 710
 cbm720	// Commodore CBM 720
-cbm720sw  // Commodore CBM 720 (Sweden / Finland)
+cbm720_se  // Commodore CBM 720 (Sweden / Finland)
 cbm730
 p500	  // Commodore P500 (proto, a.k.a. C128-40, PET-II)
 p500p

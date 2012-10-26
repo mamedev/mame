@@ -213,13 +213,14 @@ public:
 		int *csbank1, int *csbank2, int *csbank3, int *basiclocs, int *basichics, int *kernalcs,
 		int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs, int *aec, int *vsysaden);
 
-	UINT8 read_memory(address_space &space, offs_t offset, offs_t va, int ba, int ae, UINT8 *clrnib);
+	UINT8 read_memory(address_space &space, offs_t offset, offs_t va, int ba, int ae);
 	void write_memory(address_space &space, offs_t offset, UINT8 data, int ba, int ae);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
 	DECLARE_READ8_MEMBER( vic_videoram_r );
+	DECLARE_READ8_MEMBER( vic_colorram_r );
 	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
 
 	DECLARE_WRITE_LINE_MEMBER( tpi1_irq_w );

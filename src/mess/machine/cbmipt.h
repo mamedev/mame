@@ -62,6 +62,7 @@
 #include "machine/c64_zaxxon.h"
 #include "machine/c128_comal80.h"
 #include "machine/cbm2_std.h"
+#include "machine/cbm2_24k.h"
 #include "machine/cbm2_graphic.h"
 #include "machine/c1541.h"
 #include "machine/c1551.h"

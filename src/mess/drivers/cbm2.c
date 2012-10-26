@@ -7,7 +7,6 @@
     - shift lock
     - Hungarian keyboard
     - cbm620hu charom banking?
-    - read VIC video/color RAM thru PLA (Sphi2 = 1, AE = 0)
     - user port
     - co-processor bus
     - 8088 co-processor board
@@ -450,7 +449,7 @@ void p500_state::bankswitch(offs_t offset, offs_t va, int srw, int ba, int ae, i
 //  read_memory -
 //-------------------------------------------------
 
-UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, int ba, int ae, UINT8 *clrnib)
+UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, int ba, int ae)
 {
 	int srw = 1, busy2 = 1, refen = 0;
 
@@ -467,27 +466,6 @@ UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, in
 		&cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs, &aec, &vsysaden);
 
 	UINT8 data = 0xff;
-	*clrnib = 0xf;
-
-	if (vsysaden)
-	{
-		if (!_64kcasen && !aec && !viddaten && !viddat_tr)
-		{
-			data = m_ram->pointer()[(m_vicbnksel << 14) | va];
-		}
-		if (!clrnibcs)
-		{
-			*clrnib = m_color_ram[va & 0x3ff];
-		}
-		if (!vidmatcs)
-		{
-			data = m_video_ram[va & 0x3ff];
-		}
-		if (!charomcs)
-		{
-			data = m_charom[va & 0xfff];
-		}
-	}
 
 	if (clrniben)
 	{
@@ -662,9 +640,8 @@ READ8_MEMBER( p500_state::read )
 {
 	int ba = 0, ae = 1;
 	offs_t va = 0xffff;
-	UINT8 clrnib = 0xf;
 
-	return read_memory(space, offset, va, ba, ae, &clrnib);
+	return read_memory(space, offset, va, ba, ae);
 }
 
 
@@ -686,21 +663,75 @@ WRITE8_MEMBER( p500_state::write )
 
 READ8_MEMBER( p500_state::vic_videoram_r )
 {
-/*    int ba = !m_vic->ba_r(), ae = m_vic->aec_r();
-    offs_t va = offset;
-    UINT8 clrnib = 0xf;
-	logerror("VIC %04x phi0 %u BA %u AEC %u VICDOTSEL %u STATVID %u\n", va, m_vic->phi0_r(), !m_vic->ba_r(), m_vic->aec_r(), m_vicdotsel, m_statvid);
+	int srw = 1, busy2 = 1, refen = 0;
+	int ba = !m_vic->ba_r(), ae = m_vic->aec_r();
+	int datxen = 1, dramxen = 1, clrniben = 1, _64kcasen = 1, casenb = 1, viddaten = 1, viddat_tr = 1;
+	int clrnibcs = 1, extbufcs = 1, discromcs = 1, buframcs = 1, charomcs = 1, viccs = 1, vidmatcs = 1;
+	int csbank1 = 1, csbank2 = 1, csbank3 = 1, basiclocs = 1, basichics = 1, kernalcs = 1;
+	int cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
+	int aec = 1, vsysaden = 1;
 
-    return read_memory(space, 0, va, ba, ae, &clrnib);
-*/
-	if (offset < 0x1000)
+	bankswitch(0, offset, srw, ba, ae, busy2, refen,
+		&datxen, &dramxen, &clrniben, &_64kcasen, &casenb, &viddaten, &viddat_tr,
+		&clrnibcs, &extbufcs, &discromcs, &buframcs, &charomcs, &viccs, &vidmatcs,
+		&csbank1, &csbank2, &csbank3, &basiclocs, &basichics, &kernalcs,
+		&cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs, &aec, &vsysaden);
+
+	UINT8 data = 0xff;
+	UINT8 clrnib = 0xf;
+
+	if (vsysaden)
 	{
-		return m_charom[offset & 0xfff];
+		if (!_64kcasen && !aec && !viddaten && !viddat_tr)
+		{
+			data = m_ram->pointer()[(m_vicbnksel << 14) | offset];
+		}
+		if (!clrnibcs)
+		{
+			clrnib = m_color_ram[offset & 0x3ff];
+		}
+		if (!vidmatcs)
+		{
+			data = m_video_ram[offset & 0x3ff];
+		}
+		if (!charomcs)
+		{
+			data = m_charom[offset & 0xfff];
+		}
 	}
-	else
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  vic_videoram_r -
+//-------------------------------------------------
+
+READ8_MEMBER( p500_state::vic_colorram_r )
+{
+	int srw = 1, busy2 = 1, refen = 0;
+	int ba = !m_vic->ba_r(), ae = m_vic->aec_r();
+	int datxen = 1, dramxen = 1, clrniben = 1, _64kcasen = 1, casenb = 1, viddaten = 1, viddat_tr = 1;
+	int clrnibcs = 1, extbufcs = 1, discromcs = 1, buframcs = 1, charomcs = 1, viccs = 1, vidmatcs = 1;
+	int csbank1 = 1, csbank2 = 1, csbank3 = 1, basiclocs = 1, basichics = 1, kernalcs = 1;
+	int cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
+	int aec = 1, vsysaden = 1;
+
+	bankswitch(0, offset, srw, ba, ae, busy2, refen,
+		&datxen, &dramxen, &clrniben, &_64kcasen, &casenb, &viddaten, &viddat_tr,
+		&clrnibcs, &extbufcs, &discromcs, &buframcs, &charomcs, &viccs, &vidmatcs,
+		&csbank1, &csbank2, &csbank3, &basiclocs, &basichics, &kernalcs,
+		&cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs, &aec, &vsysaden);
+
+	UINT8 data = 0x0f;
+
+	if (!clrnibcs)
 	{
-		return m_video_ram[offset & 0x3ff];
+		data = m_color_ram[offset & 0x3ff];
 	}
+
+	return data;
 }
 
 
@@ -741,7 +772,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( vic_colorram_map, AS_1, 8, p500_state )
-	AM_RANGE(0x000, 0x3ff) AM_RAM AM_SHARE("color_ram")
+	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
 ADDRESS_MAP_END
 
 
@@ -1708,6 +1739,9 @@ MACHINE_START_MEMBER( p500_state, p500 )
 
 	MACHINE_START_CALL_MEMBER(cbm2);
 
+	// allocate memory
+	m_color_ram.allocate(0x400);
+
 	// state saving
 	save_item(NAME(m_statvid));
 	save_item(NAME(m_vicdotsel));
@@ -2236,10 +2270,10 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( cbm620hu )
+//  ROM( cbm620_hu )
 //-------------------------------------------------
 
-ROM_START( cbm620hu )
+ROM_START( cbm620_hu )
 	ROM_REGION( 0x4000, "basic", 0 )
 	ROM_LOAD( "610.u60", 0x0000, 0x4000, CRC(8eed0d7e) SHA1(9d06c5c3c012204eaaef8b24b1801759b62bf57e) )
 
@@ -2353,10 +2387,10 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( cbm720sw )
+//  ROM( cbm720_se )
 //-------------------------------------------------
 
-ROM_START( cbm720sw )
+ROM_START( cbm720_se )
 	ROM_REGION( 0x4000, "basic", 0 )
 	ROM_LOAD( "901241-03.u59", 0x0000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42) )
 	ROM_LOAD( "901240-03.u60", 0x2000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce) )
@@ -2377,21 +2411,21 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY                         FULLNAME                            FLAGS
-COMP( 1983,	p500,		0,		0,		p500_ntsc,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"P500 ~ C128-40 ~ PET-II (NTSC)",	GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // VIC 64K RAM mode is not supported
-COMP( 1983,	p500p,		p500,	0,		p500_pal,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"P500 ~ C128-40 ~ PET-II (PAL)",	GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // VIC 64K RAM mode is not supported
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY                         FULLNAME                    FLAGS
+COMP( 1983,	p500,		0,		0,		p500_ntsc,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"P500 (NTSC)",				GAME_SUPPORTS_SAVE )
+COMP( 1983,	p500p,		p500,	0,		p500_pal,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"P500 (PAL)",				GAME_SUPPORTS_SAVE )
 
-COMP( 1983,	b500,		p500,	0,		b128,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B500 (NTSC)",						GAME_SUPPORTS_SAVE )
-COMP( 1983,	b128,		p500,	0,		b128,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B128 (NTSC)",						GAME_SUPPORTS_SAVE )
-COMP( 1983,	b256,		p500,	0,		b256,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256 (NTSC)",						GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm610,		p500,	0,		cbm610,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 610 (PAL)",					GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm620,		p500,	0,		cbm620,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 620 (PAL)",					GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm620hu,	p500,	0,		cbm620,		cbm2hu,	driver_device,		0,		"Commodore Business Machines",	"CBM 620 (Hungary)",				GAME_SUPPORTS_SAVE )
+COMP( 1983,	b500,		p500,	0,		b128,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B500",						GAME_SUPPORTS_SAVE )
+COMP( 1983,	b128,		p500,	0,		b128,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B128",						GAME_SUPPORTS_SAVE )
+COMP( 1983,	b256,		p500,	0,		b256,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256",						GAME_SUPPORTS_SAVE )
+COMP( 1983,	cbm610,		p500,	0,		cbm610,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 610",					GAME_SUPPORTS_SAVE )
+COMP( 1983,	cbm620,		p500,	0,		cbm620,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 620",					GAME_SUPPORTS_SAVE )
+COMP( 1983,	cbm620_hu,	p500,	0,		cbm620,		cbm2hu,	driver_device,		0,		"Commodore Business Machines",	"CBM 620 (Hungary)",		GAME_SUPPORTS_SAVE )
 
-COMP( 1983,	b128hp,		p500,	0,		b128hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B128-80HP (NTSC)",					GAME_SUPPORTS_SAVE )
-COMP( 1983,	b256hp,		p500,	0,		b256hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256-80HP (NTSC)",					GAME_SUPPORTS_SAVE )
-COMP( 1983,	bx256hp,	p500,	0,		bx256hp,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"BX256-80HP (NTSC)",				GAME_NOT_WORKING ) // 8088 co-processor is missing
-COMP( 1983,	cbm710,		p500,	0,		cbm710,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 710 (PAL)",					GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm720,		p500,	0,		cbm720,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 720 (PAL)",					GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm720sw,	p500,	0,		cbm720,		cbm2sw,	driver_device,		0,		"Commodore Business Machines",	"CBM 720 (Sweden/Finland)",			GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm730,		p500,	0,		cbm730,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 730 (PAL)",					GAME_NOT_WORKING ) // 8088 co-processor is missing
+COMP( 1983,	b128hp,		p500,	0,		b128hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B128-80HP",				GAME_SUPPORTS_SAVE )
+COMP( 1983,	b256hp,		p500,	0,		b256hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256-80HP",				GAME_SUPPORTS_SAVE )
+COMP( 1983,	bx256hp,	p500,	0,		bx256hp,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"BX256-80HP",				GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // 8088 co-processor is missing
+COMP( 1983,	cbm710,		p500,	0,		cbm710,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 710",					GAME_SUPPORTS_SAVE )
+COMP( 1983,	cbm720,		p500,	0,		cbm720,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 720",					GAME_SUPPORTS_SAVE )
+COMP( 1983,	cbm720_se,	p500,	0,		cbm720,		cbm2sw,	driver_device,		0,		"Commodore Business Machines",	"CBM 720 (Sweden/Finland)",	GAME_SUPPORTS_SAVE )
+COMP( 1983,	cbm730,		p500,	0,		cbm730,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 730",					GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // 8088 co-processor is missing

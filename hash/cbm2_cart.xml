@@ -2,24 +2,6 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="cbm2_cart" description="Commodore CBM-II cartridges">
 
-	<software name="calcresu">
-		<description>Calc Result</description>
-		<year>1983</year>
-		<publisher>Handic Software</publisher>
-
-		<part name="cart" interface="cbm2_cart">
-			<dataarea name="bank3" size="0x2000">
-				<rom name="calc_result-bx700.bin" size="0x2000" crc="4775ebb3" sha1="5c6928a9cd8a3ce6a1d11221292b832295d6543e" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1070662">
-				<rom name="calc_result_700_bx_single_version_v1.0.d82" size="1070662" crc="244a2122" sha1="44661ed8e3307bb967f97ce1f5a247ca3cded0b3" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="profitxt">
 		<description>ProfiText</description>
 		<year>198?</year>
@@ -98,19 +80,6 @@
 
 			<dataarea name="bank3" size="0x2000">
 				<rom name="324688-01.bin" size="0x2000" crc="863e9ef8" sha1="d75ffa97b2dd4e1baefe4acaa130daae866ab0e8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wordresu">
-		<description>Word Result</description>
-		<year>198?</year>
-		<publisher>Handic Software</publisher>
-
-		<part name="cart" interface="cbm2_cart">
-			<dataarea name="bank1" size="0x1000">
-				<!-- this is the Commodore 64 character generator ROM, used as a copy protection dongle -->
-				<rom name="901225-01.bin" size="0x1000" crc="ec4272ee" sha1="adc7c31e18c7c7413d54802ef2f4193da14711aa" offset="0" />
 			</dataarea>
 		</part>
 	</software>
