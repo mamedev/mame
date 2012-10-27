@@ -1649,7 +1649,7 @@ static void megatech_set_genz80_as_sms_standard_ports(running_machine &machine, 
 	/* INIT THE PORTS *********************************************************************************************/
 
 	address_space &io = machine.device(tag)->memory().space(AS_IO);
-	sn76496_device *sn = machine.device<sn76496_device>("snsnd");
+	sn76496_base_device *sn = machine.device<sn76496_base_device>("snsnd");
 
 	io.install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_port_r), FUNC(z80_unmapped_port_w));
 
