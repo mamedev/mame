@@ -18,6 +18,9 @@
 ** - Colours are incorrect. [fixed by R Nabet ?]
 ** - Sprites 8-31 are ghosted/cloned in mode 3 when using less than
 **   three pattern tables. Exact behaviour is not known.
+** - On TMS99xxA, the colortable mask in mode 3 acts as a nametable
+**   mask as well (does not happen on TMS91xx)
+** - Address scrambling when setting TMS99xxA to 4K (not on TMS91xx)
 */
 
 #include "emu.h"
