@@ -1,0 +1,152 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- General purpose software list for Amiga software requiring the AGA chipset (A1200 / A4000) 
+       
+     the software listed here is not designed for use on systems without the AGA chipset and
+     will not function.
+-->
+
+
+
+<softwarelist name="amigaaga_flop" description="Amiga AGA Floppy Disks list">
+
+  <!-- has manual protection -->
+  <software name="pballfna">
+    <description>Pinball Fantasies AGA</description>
+    <year>1993</year>
+    <publisher>21st Century Entertainment</publisher>
+
+    <part name="flop1" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 1" />
+      <dataarea name="flop" size="1049612">
+        <rom name="pinballfantasiesaga_pf1.ipf" size="1049612" crc="60e23065" sha1="0d401004a02c6e8af2532b0180ce42a3725c69ce" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop2" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 2" />
+      <dataarea name="flop" size="1049612">
+        <rom name="pinballfantasiesaga_pf2.ipf" size="1049612" crc="64e3b549" sha1="44d59c0660170eba8dee54d710cfec1f598a7a90" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop3" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 3" />
+      <dataarea name="flop" size="1049612">
+        <rom name="pinballfantasiesaga_pf3.ipf" size="1049612" crc="2a0d1c66" sha1="df95ae4ed9bda2d0563958c26fc23fdd5fe6f3d7" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop4" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 4" />
+      <dataarea name="flop" size="1049612">
+        <rom name="pinballfantasiesaga_pf4.ipf" size="1049612" crc="e5ab9484" sha1="83151b5738844bdc668c80b20dd2d742668063fb" offset="0"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- unprotected -->
+  <software name="pballfnapdy" cloneof="pballfna">
+    <description>Pinball Fantasies AGA (Cracked, PDY)</description>
+    <year>1993</year>
+    <publisher>21st Century Entertainment</publisher>
+
+    <part name="flop1" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 1" />
+      <dataarea name="flop" size="1049612">
+        <rom name="pinball fantasies (1993)(21st century)(aga)(disk 1 of 4)[cr pdy].adf" size="901120" crc="708fc612" sha1="99e24713096bcfc90281e8c0ae4d57c395e66069" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop2" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 2" />
+      <dataarea name="flop" size="1049612">
+        <rom name="pinball fantasies (1993)(21st century)(aga)(disk 2 of 4).adf" size="901120" crc="eced3e6c" sha1="2f4669459021e0e756975061bf38d55982975281" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop3" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 3" />
+      <dataarea name="flop" size="1049612">
+        <rom name="pinball fantasies (1993)(21st century)(aga)(disk 3 of 4).adf" size="901120" crc="ff04b00c" sha1="ad12df201dea97987d0455e24fac0459e648da1a" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop4" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 4" />
+      <dataarea name="flop" size="1049612">
+        <rom name="pinball fantasies (1993)(21st century)(aga)(disk 4 of 4).adf" size="901120" crc="912a609f" sha1="0e6818ceabd9e362a9b15bac9a551d4a017fd536" offset="0"/>
+      </dataarea>
+    </part>
+
+  </software>
+
+
+  <!-- severe gfx problems -->
+  <software name="pballill" supported="no">
+    <description>Pinball Illusions</description>
+    <year>1995</year>
+    <publisher>21st Century Entertainment</publisher>
+
+    <part name="flop1" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 1" />
+      <dataarea name="flop" size="1049612">
+        <rom name="pinballillusions_disk1.ipf" size="1049612" crc="0cf8949b" sha1="8970859b71aefdb13d47c9b16b279f52405dae4c" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop2" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 2" />
+      <dataarea name="flop" size="1049612">
+        <rom name="pinballillusions_disk2.ipf" size="1049612" crc="93ce1135" sha1="5dad662b278a45e4720043407bbf22c0a9932df5" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop3" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 3" />
+      <dataarea name="flop" size="1049612">
+        <rom name="pinballillusions_disk3.ipf" size="1049612" crc="282ea51d" sha1="39f78c077ee27f213ff3f07a991ba165212d780f" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop4" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 4" />
+      <dataarea name="flop" size="1049612">
+        <rom name="pinballillusions_disk4.ipf" size="1049612" crc="e551bc40" sha1="05757f0e6289385df204c2ced4fb0348aa4b39ee" offset="0"/>
+      </dataarea>
+    </part>
+    
+  </software>
+
+    <!-- simple 1 disk game using AGA mode -->
+  <software name="gigertet">
+    <description>Giger-Tetris</description>
+    <year>1993</year>
+    <publisher>Panic Production</publisher>
+
+    <part name="flop1" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 1" />
+      <dataarea name="flop" size="901120">
+        <rom name="giger-tetris (1993)(panic production)(aga)(sw).adf" size="901120" crc="e58911f4" sha1="90d146454db7317e02f428aa24e01296db0ea2d4" offset="0"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- various gfx issues, good test case for bugfixing? -->
+  <software name="dxpacaga" supported="partial">
+    <description>Deluxe Pac-Man v1.7 AGA (1997-04-27)</description>
+    <year>1997</year>
+    <publisher>Edgar Vigdal</publisher>
+
+    <part name="flop1" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 1" />
+      <dataarea name="flop" size="901120">
+        <rom name="deluxe pac-man v1.7 (1997-04-27)(vigdal, edgar)(aga)(sw-r).adf" size="901120" crc="0fb6d45d" sha1="378cb7c11d8f57d812469fcc8db1a1a848e8ce63" offset="0"/>
+      </dataarea>
+    </part>
+  </software>
+
+</softwarelist>
+
+

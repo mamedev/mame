@@ -154,6 +154,8 @@ static GFXDECODE_START( pentagon )
 	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
+
+
 static MACHINE_CONFIG_DERIVED_CLASS( pentagon, spectrum_128, pentagon_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pentagon_io)
@@ -161,6 +163,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( pentagon, spectrum_128, pentagon_state )
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 	MCFG_GFXDECODE(pentagon)
+
+	MCFG_SOFTWARE_LIST_ADD("cass_list_pen","pentagon_cass")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pent1024, pentagon)

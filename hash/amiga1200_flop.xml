@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- This list contains the system floppies distributed with the Amiga 1200, it is not a general purpose Software List -->
+
+<softwarelist name="amiga1200_flop" description="Amiga 1200 System Floppies">
+
+	<software name="wb30">
+		<description>Workbench v3.0 rev 39.29</description>
+		<year>1992</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install" />
+			<dataarea name="flop" size="901120">
+				<rom name="workbench v3.0 rev 39.29 (1992)(commodore)(a1200-a4000)(m10)(disk 1 of 6)(install).adf" size="901120" crc="6fa2d2b4" sha1="ba24b4172339b9198e4f724a6804d0c6eb5e394b" offset="0"/>
+			</dataarea>
+		</part>
+
+    <part name="flop2" interface="floppy_3_5">
+      <feature name="part_id" value="Workbench" />
+      <dataarea name="flop" size="901120">
+        <rom name="workbench v3.0 rev 39.29 (1992)(commodore)(a1200-a4000)(m10)(disk 2 of 6)(workbench)[!].adf" size="901120" crc="a4d9752d" sha1="e663c92a9c88fa38d02bbb299bea8ce70c56b417" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop3" interface="floppy_3_5">
+      <feature name="part_id" value="Extras" />
+      <dataarea name="flop" size="901120">
+        <rom name="workbench v3.0 rev 39.29 (1992)(commodore)(a1200-a4000)(m10)(disk 3 of 6)(extras)[!].adf" size="901120" crc="95da642d" sha1="74304711678ebd3287f816ae250b47bd4d8f5195" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop4" interface="floppy_3_5">
+      <feature name="part_id" value="Storage" />
+      <dataarea name="flop" size="901120">
+        <rom name="workbench v3.0 rev 39.29 (1992)(commodore)(a1200-a4000)(m10)(disk 4 of 6)(storage)[!].adf" size="901120" crc="0c8c24d5" sha1="93cab7cd05471e8fde63cb1d512b048cd593aebc" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop5" interface="floppy_3_5">
+      <feature name="part_id" value="Locale" />
+      <dataarea name="flop" size="901120">
+        <rom name="workbench v3.0 rev 39.29 (1992)(commodore)(a1200-a4000)(m10)(disk 5 of 6)(locale)[!].adf" size="901120" crc="67835fe5" sha1="00d0670a9060ab7805dc2fa7e2e856b33a828043" offset="0"/>
+      </dataarea>
+    </part>
+
+    <part name="flop6" interface="floppy_3_5">
+      <feature name="part_id" value="Fonts" />
+      <dataarea name="flop" size="901120">
+        <rom name="workbench v3.0 rev 39.29 (1992)(commodore)(a1200-a4000)(m10)(disk 6 of 6)(fonts).adf" size="901120" crc="d7364bb4" sha1="4531651fe34a7f0a2dc1a1523ed4c2507670f5a6" offset="0"/>
+      </dataarea>
+    </part>
+    
+  </software>
+
+</softwarelist>
+

@@ -18,6 +18,7 @@
 <!-- COMPATIBILITY
      The MESS emulation at the time of writing isn't very good, the following emulators are used to determine how things should work
      
+      EmuZWin (v2.7 release 2.8)         - Closed Source, runs some images (Gremlin 2 type*) which fail on the emulators below  - http://kolmck.net/apps/EmuZWin_Eng.htm
       Fuse (Free Unix Spectrum Emulator) - Free, High Compatibility can run some of the trickier images, Windows port available - http://fuse-emulator.sourceforge.net/
       Spectaculator                      - Commercial, a bit more user friendly than above, similar compatibility               - http://www.spectaculator.com/     
      
@@ -33,9 +34,8 @@
   
      legacy emulators including Real Spectrum ( http://zxm.speccy.cz/realspec/ ) appear to struggle with some of the more complex tape protections
 
- 
-     ToDo: Find an emulator which works with the 'Gremlin 2' protected tapes 'M.A.S.K' and 'Basil The Great Mouse Detective' all TZX images I've found fail in the
-     above emulators, although RealSpectrum does load some copies of MASK but fails loading the 2nd part of the game.
+     * Gremlin 2 type images include 'M.A.S.K' and 'Basil The Great Mouse Detective'
+     
      
 
 
