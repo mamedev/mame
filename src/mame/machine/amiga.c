@@ -239,7 +239,7 @@ void amiga_machine_config(running_machine &machine, const amiga_machine_interfac
 	state->m_intf = intf;
 
 	/* setup chipmem handlers */
-	if ( IS_AGA(intf) )
+	if ( IS_32BIT(intf) )
 	{
 		state->m_chip_ram_r = amiga_chip_ram32_r;
 		state->m_chip_ram_w = amiga_chip_ram32_w;

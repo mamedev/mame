@@ -5595,7 +5595,6 @@ src/mess/devices/sonydriv.h svneol=native#text/plain
 src/mess/drivers/4004clk.c svneol=native#text/plain
 src/mess/drivers/68ksbc.c svneol=native#text/plain
 src/mess/drivers/a2600.c svneol=native#text/plain
-src/mess/drivers/a3000.c svneol=native#text/plain
 src/mess/drivers/a310.c svneol=native#text/plain
 src/mess/drivers/a5105.c svneol=native#text/plain
 src/mess/drivers/a51xx.c svneol=native#text/plain

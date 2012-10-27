@@ -654,12 +654,11 @@ ami500pl  // Commodore Amiga 500+
 ami500pln //
 ami600    // Commodore Amiga 600
 ami600n   //
+ami3000   // Commodore Amiga 3000
+ami3000n  //
 ami1200	  // Commodore Amiga 1200
 ami1200n  // 
 cdtv	  // Commodore CDTV
-
-a3000	 // Commodore Amiga 3000
-
 cd32	  // Commodore Amiga CD32
 
 c65	   // 1991 C65 / C64DX (Prototype, NTSC)

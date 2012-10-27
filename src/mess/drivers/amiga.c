@@ -176,6 +176,15 @@ static ADDRESS_MAP_START( a1200_map, AS_PROGRAM, 32, ami1200_state )
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* Kickstart */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( amiga_mem32, AS_PROGRAM, 32, ami1200_state )
+	ADDRESS_MAP_UNMAP_HIGH
+//	ADDRESS_MAP_GLOBAL_MASK(0xffffff) // not sure
+	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
+	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16_LEGACY(amiga_cia_r, amiga_cia_w, 0xffffffff)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16_LEGACY(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_SHARE("custom_regs")
+	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE16_LEGACY(amiga_autoconfig_r, amiga_autoconfig_w, 0xffffffff)
+	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* Kickstart */
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(keyboard_mem, AS_PROGRAM, 8, amiga_state )
 	AM_RANGE(0x0000, 0x003f) AM_RAM /* internal user ram */
@@ -853,7 +862,7 @@ static MACHINE_CONFIG_START( a1200n, ami1200_state )
 	MCFG_SOFTWARE_LIST_ADD("flop_common","amiga_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga1200_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_aga","amigaaga_flop")
-
+	
 
 MACHINE_CONFIG_END
 
@@ -870,7 +879,7 @@ static MACHINE_CONFIG_DERIVED( a1200, a1200n )
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("amiga")
-	MCFG_SOUND_CLOCK(AMIGA_68EC020_PAL_CLOCK/8) /* 3.546895 MHz */
+	MCFG_SOUND_CLOCK(AMIGA_68EC020_PAL_CLOCK/4) /* 3.546895 MHz */
 
 	/* cia */
 	MCFG_DEVICE_MODIFY("cia_0")
@@ -883,6 +892,81 @@ static MACHINE_CONFIG_DERIVED( a1200, a1200n )
 	MCFG_DEVICE_CLOCK(AMIGA_68EC020_PAL_CLOCK/2)
 MACHINE_CONFIG_END
 
+
+// 16mhz and 25mhz versions were available
+// 68030 / 68040 options available
+#define A3000_XTAL	XTAL_25MHz
+
+/* ToDo: proper A3000 clocks */
+
+static MACHINE_CONFIG_START( a3000n, amiga_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68030, A3000_XTAL)
+	MCFG_CPU_PROGRAM_MAP(amiga_mem32)
+
+	MCFG_CPU_ADD("keyboard", M6502, XTAL_1MHz) /* 1 MHz? */
+	MCFG_CPU_PROGRAM_MAP(keyboard_mem)
+	MCFG_DEVICE_DISABLE()
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.997)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+
+	MCFG_MACHINE_RESET_OVERRIDE(amiga_state, amiga )
+
+    /* video hardware */
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_SIZE(228*4, 262)
+	MCFG_SCREEN_VISIBLE_AREA(214, (228*4)-1, 34, 262-1)
+	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga)
+
+	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_INIT_OVERRIDE(amiga_state, amiga )
+
+	MCFG_VIDEO_START_OVERRIDE(amiga_state,amiga)
+
+	/* devices */
+	MCFG_MSM6242_ADD("rtc",amiga_rtc_intf)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", amiga_centronics_config)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("amiga", AMIGA, 3579545)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
+	MCFG_SOUND_ROUTE(3, "lspeaker", 0.50)
+
+	/* cia */
+	MCFG_LEGACY_MOS8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, 60, cia_0_ntsc_intf)
+	MCFG_LEGACY_MOS8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK, 0, cia_1_intf)
+
+	/* fdc */
+	MCFG_AMIGA_FDC_ADD("fdc", AMIGA_68000_NTSC_CLOCK)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amiga_floppies, "35dd", 0, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amiga_floppies, 0,      0, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", amiga_floppies, 0,      0, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", amiga_floppies, 0,      0, amiga_fdc::floppy_formats)
+
+	MCFG_AMIGA_KEYBOARD_ADD("kbd")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( a3000, a3000n )
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(228*4, 312)
+	MCFG_SCREEN_VISIBLE_AREA(214, (228*4)-1, 34, 312-1)
+
+	/* cia */
+	MCFG_DEVICE_REMOVE("cia_0")
+	MCFG_LEGACY_MOS8520_ADD("cia_0", AMIGA_68000_PAL_CLOCK / 10, 50, cia_0_pal_intf)
+
+	/* fdc */
+	MCFG_DEVICE_MODIFY("fdc")
+	MCFG_DEVICE_CLOCK(AMIGA_68000_PAL_CLOCK)
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
@@ -1034,7 +1118,7 @@ DRIVER_INIT_MEMBER(ami1200_state,a1200)
 		NULL,				/* scanline0_callback */
 		NULL,				/* reset_callback */
 		NULL,				/* nmi_callback */
-		FLAGS_AGA_CHIPSET	/* flags */
+		FLAGS_AGA_CHIPSET | FLAGS_IS_32BIT	/* flags */
 	};
 
 	/* configure our Amiga setup */
@@ -1044,6 +1128,29 @@ DRIVER_INIT_MEMBER(ami1200_state,a1200)
 	membank("bank1")->configure_entry(0, m_chip_ram);
 	membank("bank1")->configure_entry(1, machine().root_device().memregion("user1")->base());
 }
+
+DRIVER_INIT_MEMBER(amiga_state,a3000)
+{
+	static const amiga_machine_interface a3000_intf =
+	{
+		ECS_CHIP_RAM_MASK,
+		amiga_read_joy0dat,	amiga_read_joy1dat,  /* joy0dat_r & joy1dat_r */
+		NULL,				/* potgo_w */
+		NULL,				/* serdat_w */
+		NULL,				/* scanline0_callback */
+		NULL,				/* reset_callback */
+		NULL,				/* nmi_callback */
+		FLAGS_IS_32BIT,	/* flags */
+	};
+
+	/* configure our Amiga setup */
+	amiga_machine_config(machine(), &a3000_intf);
+
+	/* set up memory */
+	membank("bank1")->configure_entry(0, m_chip_ram);
+	membank("bank1")->configure_entry(1, machine().root_device().memregion("user1")->base());
+}
+
 
 
 /***************************************************************************
@@ -1158,7 +1265,27 @@ ROM_END
 
 #define rom_ami1200n    rom_ami1200
 
+/* Note: I think those ROMs are correct, but they should be verified */
+ROM_START( ami3000 )
+	ROM_REGION32_BE(0x80000, "user1", 0)
+	ROM_DEFAULT_BIOS("kick14")
+	ROM_SYSTEM_BIOS(0, "kick14", "Kickstart 1.4 (36.16)")
+	/* COPYRIGHT 1990 CAI // ALL RIGHTS RESERVED // ALPHA 5 ROM 0 CS=9713 */
+	ROMX_LOAD("390629-02.u182", 0x00000, 0x40000, CRC(58327536) SHA1(d1713d7f31474a5948e6d488e33686061cf3d1e2), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(1))
+	/* COPYRIGHT 1990 CAI // ALL RIGHTS RESERVED // ALPHA 5 ROM 1 CS=9B21 */
+	ROMX_LOAD("390630-02.u183", 0x00002, 0x40000, CRC(fe2f7fb9) SHA1(c05c9c52d014c66f9019152b3f2a2adc2c678794), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "kick204", "Kickstart 2.04 (37.175)")
+	ROMX_LOAD("390629-03.u182", 0x00000, 0x40000, CRC(a245dbdf) SHA1(83bab8e95d378b55b0c6ae6561385a96f638598f), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(2))
+	ROMX_LOAD("390630-03.u183", 0x00002, 0x40000, CRC(7db1332b) SHA1(48f14b31279da6757848df6feb5318818f8f576c), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "kick31", "Kickstart 3.1 (40.68)")
+	ROMX_LOAD("kick31.u182",    0x00000, 0x40000, CRC(286b9a0d) SHA1(6763a2258ec493f7408cf663110dae9a17803ad1), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(3))
+	ROMX_LOAD("kick31.u183",    0x00002, 0x40000, CRC(0b8cde6a) SHA1(5f02e97b48ebbba87d516a56b0400c6fc3434d8d), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(3))
 
+	ROM_REGION(0x1040, "keyboard", 0)
+	ROM_LOAD("keyboard", 0x0000, 0x1040, NO_DUMP)
+ROM_END
+
+#define rom_ami3000n    rom_ami3000
 
 ROM_START( cdtv )
 	ROM_REGION16_BE(0x100000, "user1", 0)
@@ -1189,13 +1316,6 @@ COMP( 1985, ami1000,   0,        0,      ami1000,  amiga, amiga_state,  amiga,  
 COMP( 1985, ami1000n,  ami1000,  0,      ami1000n, amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 1000 (NTSC)",     GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 
 
-/* Amiga 2000 - similar to 1000 */
-/* Amiga 1500 - Amiga 2000 with two floppy drives (2nd replacing the HDD) */
-/* Amiga 2500 - Amiga 2000 with 68020 accelerator card */
-
-/* Amiga 3000 - ECS chipset, 68030 CPU - skeleton driver a3000.c */
-
-/* Amiga 4000 - AGA chipset, 68040 / 68060 CPU */
 
 /* Low-end market line */
 
@@ -1211,8 +1331,19 @@ COMP( 1992, ami600n,   ami600,   0,      ami600n,     amiga, amiga_state,  amiga
 COMP( 1992, ami1200,   0,        0,      a1200,  amiga, ami1200_state,  a1200,  "Commodore Business Machines",  "Amiga 1200 (PAL, AGA)" , GAME_NOT_WORKING  )
 COMP( 1992, ami1200n,  ami1200,  0,      a1200n, amiga, ami1200_state,  a1200,  "Commodore Business Machines",  "Amiga 1200 (NTSC, AGA)" , GAME_NOT_WORKING )
 
+COMP( 1992, ami3000,   0,        0,      a3000,  amiga, amiga_state,  a3000,  "Commodore Business Machines",  "Amiga 3000 (PAL, ECS, 68030)" , GAME_NOT_WORKING  )
+COMP( 1992, ami3000n,  ami3000,  0,      a3000n, amiga, amiga_state,  a3000,  "Commodore Business Machines",  "Amiga 3000 (NTSC, ECS, 68030)" , GAME_NOT_WORKING )
+
+
 
 COMP( 1991, cdtv,   0,      0,      cdtv,   cdtv, amiga_state,   cdtv,   "Commodore Business Machines",  "CDTV (NTSC)",           GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+
+/* other official models */
+/* Amiga 2000 - similar to 1000 */
+/* Amiga 1500 - Amiga 2000 with two floppy drives (2nd replacing the HDD) */
+/* Amiga 2500 - Amiga 2000 with 68020 accelerator card */
+/* Amiga 4000 - AGA chipset, 68040 / 68060 CPU */
+
 
 /* CD32 - see cd32.c */
 

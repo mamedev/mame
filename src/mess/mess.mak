@@ -612,7 +612,6 @@ $(MESSOBJ)/amiga.a:				\
 	$(MESS_MACHINE)/amigacd.o	\
 	$(MESS_MACHINE)/amigakbd.o	\
 	$(MESS_DRIVERS)/amiga.o		\
-	$(MESS_DRIVERS)/a3000.o		\
 
 $(MESSOBJ)/amstrad.a:			\
 	$(MESS_DRIVERS)/amstrad.o	\

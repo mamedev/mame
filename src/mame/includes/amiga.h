@@ -319,6 +319,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define AGA_CHIP_RAM_MASK		0x1ffffe
 
 #define FLAGS_AGA_CHIPSET	(1 << 0)
+#define FLAGS_IS_32BIT      (1 << 1)
 
 struct amiga_machine_interface
 {
@@ -340,6 +341,7 @@ struct amiga_machine_interface
 #define IS_AGA(intf) ( intf->chip_ram_mask == AGA_CHIP_RAM_MASK && (( intf->flags & FLAGS_AGA_CHIPSET) != 0))
 #define IS_ECS(intf) ( intf->chip_ram_mask == ECS_CHIP_RAM_MASK && (( intf->flags & FLAGS_AGA_CHIPSET) == 0))
 #define IS_ECS_OR_AGA(intf) ( intf->chip_ram_mask == ECS_CHIP_RAM_MASK)
+#define IS_32BIT(intf) (( intf->flags & FLAGS_IS_32BIT) != 0)
 
 struct amiga_autoconfig_device
 {
@@ -429,6 +431,7 @@ public:
 	DECLARE_DRIVER_INIT(mquake);
 	DECLARE_DRIVER_INIT(amiga);
 	DECLARE_DRIVER_INIT(cdtv);
+	DECLARE_DRIVER_INIT(a3000);
 	DECLARE_MACHINE_RESET(mquake);
 	DECLARE_MACHINE_RESET(amiga);
 	DECLARE_VIDEO_START(amiga);

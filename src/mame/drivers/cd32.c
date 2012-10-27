@@ -847,7 +847,7 @@ DRIVER_INIT_MEMBER(cd32_state,cd32)
 		NULL,
 		NULL, NULL,
 		NULL,
-		FLAGS_AGA_CHIPSET
+		FLAGS_AGA_CHIPSET | FLAGS_IS_32BIT
 	};
 
 	/* configure our Amiga setup */
