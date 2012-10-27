@@ -1890,12 +1890,14 @@ READ16_MEMBER(namcos23_state::s23_c361_r)
 READ16_MEMBER(namcos23_state::s23_c422_r)
 {
 	c422_t &c422 = m_c422;
+
 	return c422.regs[offset];
 }
 
 WRITE16_MEMBER(namcos23_state::s23_c422_w)
 {
 	c422_t &c422 = m_c422;
+
 	switch (offset)
 	{
 		case 1:
@@ -2170,10 +2172,6 @@ static void p3d_render(namcos23_state *state, const UINT16 *p, int size, bool us
 	}
 
 	logerror("render model %x %swith matrix %x and vector %x\n", p[0], use_scaling ? "scaled " : "", p[1], p[2]);
-
-	// Temporary gross hack for timecrs2
-	if(p[0] == 0xd96)
-		return;
 
 	if(render.count[render.cur] >= RENDER_MAX_ENTRIES)
 	{
@@ -2582,7 +2580,8 @@ static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32, namcos23_state )
 
 	AM_RANGE(0x0f000000, 0x0f000003) AM_READ(s23_unk_status_r)
 
-	AM_RANGE(0x0f200000, 0x0f203fff) AM_RAM // C422 RAM (where are the C422 regs?)
+	AM_RANGE(0x0f200000, 0x0f203fff) AM_RAM // C422 RAM
+	AM_RANGE(0x0f300000, 0x0f30000f) AM_READWRITE16(s23_c422_r, s23_c422_w, 0xffffffff) // C422 registers
 
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
