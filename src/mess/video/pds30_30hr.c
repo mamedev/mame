@@ -293,7 +293,7 @@ WRITE32_MEMBER( nubus_xceed30hr_device::xceed30hr_w )
 			break;
 
         default:
-            printf("xceed30hr_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+//            printf("xceed30hr_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
 			break;
 	}
 }
@@ -304,7 +304,7 @@ READ32_MEMBER( nubus_xceed30hr_device::xceed30hr_r )
     if (offset == 0x80008)
     {
         m_toggle ^= 0x80;
-        return m_toggle | 0x33333333;
+        return m_toggle;
     }
 
 	return 0;
