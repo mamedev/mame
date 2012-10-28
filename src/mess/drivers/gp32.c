@@ -1756,6 +1756,8 @@ static MACHINE_CONFIG_START( gp32, gp32_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_SMARTMEDIA_ADD("smartmedia")
+
+	MCFG_SOFTWARE_LIST_ADD("memc_list","gp32")
 MACHINE_CONFIG_END
 
 ROM_START( gp32 )

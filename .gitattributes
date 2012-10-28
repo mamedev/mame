@@ -78,6 +78,7 @@ hash/gamepock.xml svneol=native#text/xml
 hash/gba.xml svneol=native#text/xml
 hash/gbcolor.xml svneol=native#text/xml
 hash/gmaster.xml svneol=native#text/xml
+hash/gp32.xml svneol=native#text/xml
 hash/gx4000.xml svneol=native#text/xml
 hash/ibm5140.xml svneol=native#text/xml
 hash/ibm5150.xml svneol=native#text/xml
