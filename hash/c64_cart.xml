@@ -4212,7 +4212,7 @@
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="system3" />
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x80000">
 				<rom name="commodore 64 game system (1990)(commodore).80" size="0x80000" crc="7f018fd9" sha1="9b8481051c067fa028f81fd6a79e2edd30ca0371" offset="0x0000" />
 			</dataarea>
@@ -4317,7 +4317,7 @@
 		</part>
 	</software>
 
-	<software name="lastninj">
+	<software name="lastninj" supported="no">
 		<description>The Last Ninja Remix</description>
 		<year>1990</year>
 		<publisher>System 3</publisher>

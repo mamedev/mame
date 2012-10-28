@@ -66,6 +66,12 @@ UINT8 c64_system3_cartridge_device::c64_cd_r(address_space &space, offs_t offset
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
 		data = m_roml[addr];
 	}
+	else if (!io1)
+	{
+		m_bank = offset & 0x3f;
+		m_game = 1;
+		data = 0;
+	}
 
 	return data;
 }
@@ -80,5 +86,6 @@ void c64_system3_cartridge_device::c64_cd_w(address_space &space, offs_t offset,
 	if (!io1)
 	{
 		m_bank = offset & 0x3f;
+		m_game = 0;
 	}
 }
