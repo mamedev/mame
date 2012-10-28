@@ -41,6 +41,7 @@ device_serial_interface::device_serial_interface(const machine_config &mconfig, 
 	m_tra_clock = NULL;
 	m_tra_baud = 0;
 	m_rcv_baud = 0;
+	m_tra_flags = 0;
 }
 
 device_serial_interface::~device_serial_interface()
