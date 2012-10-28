@@ -2076,7 +2076,7 @@ $(DRIVERS)/flicker.o:	$(LAYOUT)/flicker.lh
 $(DRIVERS)/fortecar.o:	$(LAYOUT)/fortecrd.lh
 
 $(DRIVERS)/funworld.o:	$(LAYOUT)/jollycrd.lh \
-			$(LAYOUT)/bigdeal.lh \
+			$(LAYOUT)/bonuscrd.lh \
 			$(LAYOUT)/novoplay.lh \
 			$(LAYOUT)/royalcrd.lh
 

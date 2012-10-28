@@ -768,7 +768,7 @@
   - Added PCB layout.
   - GFX are properly decoded.
 
-  [2012/10/27]
+  [2012/10/27-28]
   - Added 'Bonus Card (Austrian)' from Fun World.
   - Added PCB layouts.
   - Set Big Deal sets and Jolly Card hybrid as clones
@@ -781,6 +781,9 @@
      This program is a real original Bonus Card program, and the PCB
 	 was populated with Jolly Card graphics wrongly. The other Bonus Card set
 	 was turned as clone, since has a fake copyright string (hack).
+  - Renamed the internal layout artwork: bigdeal --> bonuscrd.
+  - Default Bonus Card & Big Deal DIP switches positions, that
+    allow boot the system without errors.
   - Added technical notes.
 
 
@@ -809,7 +812,7 @@
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "jollycrd.lh"
-#include "bigdeal.lh"
+#include "bonuscrd.lh"
 #include "novoplay.lh"
 #include "royalcrd.lh"
 #include "includes/funworld.h"
@@ -1338,11 +1341,13 @@ static INPUT_PORTS_START( bonuscrd )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	/* the following one should be left ON by default to allow initialization */
+/*  DIP switch 8 should be left ON by default (all remaining ones in OFF)
+    to allow initialization. You can change settings later, after the boot.
+*/
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Bonus Type" )	    PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x00, "Bonus Type" )	    PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "Good Luck!" )
 	PORT_DIPSETTING(    0x02, "55/77/99 Bonus" )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
@@ -1400,11 +1405,13 @@ static INPUT_PORTS_START( bigdeal )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	/* the following one should be left ON by default to allow initialization */
+/*  DIP switch 8 should be left ON by default (all remaining ones in OFF)
+    to allow initialization. You can change settings later, after the boot.
+*/
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Bonus Type" )	    PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x00, "Bonus Type" )	    PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "Good Luck!" )
 	PORT_DIPSETTING(    0x02, "55/77/99 Bonus" )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
@@ -4904,10 +4911,10 @@ GAMEL( 1985, sjcd2kx3,  jollycrd, fw1stpal, funworld,  driver_device,  0,       
 GAME(  1986, jolycdab,  jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "Inter Games",     "Jolly Card (Austrian, Fun World, bootleg)",       GAME_NOT_WORKING )
 
 // Bonus Card based...
-GAMEL( 1986, bonuscrd,  0,        fw2ndpal, bonuscrd,  driver_device,  0,        ROT0, "Fun World",       "Bonus Card (Austrian)",                           GAME_IMPERFECT_COLORS,   layout_bigdeal  ) // use fw1stpal machine for green background
-GAMEL( 1986, bonuscrda, 0,        fw2ndpal, bonuscrd,  driver_device,  0,        ROT0, "Fun World",       "Bonus Card (Austrian, ATG Electronic hack)",      GAME_IMPERFECT_COLORS,   layout_bigdeal  ) // use fw1stpal machine for green background
-GAMEL( 1986, bigdeal,   bonuscrd, fw2ndpal, bigdeal,   driver_device,  0,        ROT0, "Fun World",       "Big Deal (Hungarian, set 1)",                     GAME_IMPERFECT_COLORS,   layout_bigdeal  )
-GAMEL( 1986, bigdealb,  bonuscrd, fw2ndpal, bigdeal,   driver_device,  0,        ROT0, "Fun World",       "Big Deal (Hungarian, set 2)",                     GAME_IMPERFECT_COLORS,   layout_bigdeal  )
+GAMEL( 1986, bonuscrd,  0,        fw2ndpal, bonuscrd,  driver_device,  0,        ROT0, "Fun World",       "Bonus Card (Austrian)",                           GAME_IMPERFECT_COLORS,   layout_bonuscrd ) // use fw1stpal machine for green background
+GAMEL( 1986, bonuscrda, bonuscrd, fw2ndpal, bonuscrd,  driver_device,  0,        ROT0, "Fun World",       "Bonus Card (Austrian, ATG Electronic hack)",      GAME_IMPERFECT_COLORS,   layout_bonuscrd ) // use fw1stpal machine for green background
+GAMEL( 1986, bigdeal,   bonuscrd, fw2ndpal, bigdeal,   driver_device,  0,        ROT0, "Fun World",       "Big Deal (Hungarian, set 1)",                     GAME_IMPERFECT_COLORS,   layout_bonuscrd )
+GAMEL( 1986, bigdealb,  bonuscrd, fw2ndpal, bigdeal,   driver_device,  0,        ROT0, "Fun World",       "Big Deal (Hungarian, set 2)",                     GAME_IMPERFECT_COLORS,   layout_bonuscrd )
 GAME(  1993, powercrd,  0,        fw2ndpal, funworld,  driver_device,  0,        ROT0, "Fun World",       "Power Card (Ver 0263, encrypted)",                GAME_NOT_WORKING )							// clone of Bonus Card.
 
 // CMC Italian jamma PCB's...
