@@ -2558,31 +2558,21 @@ static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32, namcos23_state )
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(p3d_r, p3d_w)
 	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16(s23_c417_r, s23_c417_w, 0xffffffff)
 	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_SHARE("shared_ram") // Communication RAM (C416)
-
 	AM_RANGE(0x04c3ff00, 0x04c3ff0f) AM_WRITE16(s23_mcuen_w, 0xffffffff)
-
 	AM_RANGE(0x06080000, 0x0608000f) AM_RAM AM_SHARE("czattr")
 	AM_RANGE(0x06080200, 0x060803ff) AM_RAM // PCZ Convert RAM (C406) (should be banked)
-
-	AM_RANGE(0x06108000, 0x061087ff) AM_RAM		// Gamma RAM (C404)
+	AM_RANGE(0x06108000, 0x061087ff) AM_RAM // Gamma RAM (C404)
 	AM_RANGE(0x06110000, 0x0613ffff) AM_RAM_WRITE(namcos23_paletteram_w) AM_SHARE("paletteram") // Palette RAM (C404)
 	AM_RANGE(0x06400000, 0x0641dfff) AM_RAM_WRITE(s23_txtchar_w) AM_SHARE("charram") // Text CGRAM (C361)
 	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE(namcos23_textram_w) AM_SHARE("textram") // Text VRAM (C361)
 	AM_RANGE(0x06420000, 0x0642000f) AM_READWRITE16(s23_c361_r, s23_c361_w, 0xffffffff) // C361
-
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("data", 0) // data ROMs
-
 	AM_RANGE(0x0c000000, 0x0c00ffff) AM_RAM	AM_SHARE("nvram") // Backup RAM
-
 	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16(s23_ctl_r, s23_ctl_w, 0xffffffff) // write for LEDs at d000000, watchdog at d000004
-
 	AM_RANGE(0x0e000000, 0x0e007fff) AM_RAM // C405 RAM - what is this?
-
 	AM_RANGE(0x0f000000, 0x0f000003) AM_READ(s23_unk_status_r)
-
 	AM_RANGE(0x0f200000, 0x0f203fff) AM_RAM // C422 RAM
 	AM_RANGE(0x0f300000, 0x0f30000f) AM_READWRITE16(s23_c422_r, s23_c422_w, 0xffffffff) // C422 registers
-
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -2857,7 +2847,7 @@ static INPUT_PORTS_START( gorgon )
 	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "DIP:1" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( finlflng )
+static INPUT_PORTS_START( finfurl )
 	PORT_INCLUDE( gorgon )
 
 	PORT_MODIFY("IN0")
@@ -3077,7 +3067,6 @@ WRITE8_MEMBER(namcos23_state::s23_mcu_p6_w)
 static ADDRESS_MAP_START( s23h8iomap, AS_IO, 8, namcos23_state )
 	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE(s23_mcu_p6_r, s23_mcu_p6_w )
 	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ(s23_mcu_p8_r ) AM_WRITENOP
-	AM_RANGE(H8_PORT_9, H8_PORT_9) AM_NOP	// read on Gorgon, purpose unknown
 	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE(s23_mcu_pa_r, s23_mcu_pa_w )
 	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE(s23_mcu_portB_r, s23_mcu_portB_w )
 	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE(s23_mcu_iob_r, s23_mcu_iob_w )
@@ -3156,6 +3145,7 @@ READ8_MEMBER(namcos23_state::s23_iob_gun_r)
 {
 	UINT16 xpos = ioport("LIGHTX")->read();
 	UINT16 ypos = ioport("LIGHTY")->read();
+	// ypos is not completely understood yet, there should be a difference between case 1/4 and 2/5
 
 	switch(offset)
 	{
@@ -3243,7 +3233,7 @@ DRIVER_INIT_MEMBER(namcos23_state,ss23)
 	    (!strcmp(machine().system().name, "rapidrvr")) ||
 	    (!strcmp(machine().system().name, "rapidrvr2")) ||
 	    (!strcmp(machine().system().name, "rapidrvrp")) ||
-	    (!strcmp(machine().system().name, "finlflng")) ||
+	    (!strcmp(machine().system().name, "finfurl")) ||
 	    (!strcmp(machine().system().name, "gunwars")) ||
 	    (!strcmp(machine().system().name, "downhill")) ||
 	    (!strcmp(machine().system().name, "finfurl2")) ||
@@ -3652,7 +3642,7 @@ ROM_START( rapidrvrp ) // prototype board
 	ROM_LOAD( "rd1ccrh.11f",  0x000000, 0x200000, CRC(fafffb86) SHA1(15b0ba0252b99d0cac29fcb374fb895643f528fe) )
 ROM_END
 
-ROM_START( finlflng )
+ROM_START( finfurl )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_BYTE( "ff2vera.ic2",  0x000000, 0x200000, CRC(e10f9dfa) SHA1(6f6989cd722fec5e3ed3ad1bb4866c5831041ae1) )
 	ROM_LOAD16_BYTE( "ff2vera.ic1",  0x000001, 0x200000, CRC(5a90ffbf) SHA1(e22dc0ae2d3c3b3a521369fe3f63412ae2ae0a12) )
@@ -4466,7 +4456,7 @@ ROM_END
 GAME( 1997, rapidrvr,  0,        gorgon,    gorgon,    namcos23_state, ss23, ROT0, "Namco", "Rapid River (RD3 Ver. C)",     GAME_FLAGS ) // 97/11/27, USA
 GAME( 1997, rapidrvr2, rapidrvr, gorgon,    gorgon,    namcos23_state, ss23, ROT0, "Namco", "Rapid River (RD2 Ver. C)",     GAME_FLAGS ) // 97/11/27, Europe
 GAME( 1997, rapidrvrp, rapidrvr, gorgon,    rapidrvrp, namcos23_state, ss23, ROT0, "Namco", "Rapid River (prototype)",      GAME_FLAGS ) // 97/11/10, USA
-GAME( 1997, finlflng,  0,        gorgon,    finlflng,  namcos23_state, ss23, ROT0, "Namco", "Final Furlong (FF2 Ver. A)",   GAME_FLAGS )
+GAME( 1997, finfurl,   0,        gorgon,    finfurl,   namcos23_state, ss23, ROT0, "Namco", "Final Furlong (FF2 Ver. A)",   GAME_FLAGS )
 GAME( 1997, downhill,  0,        s23,       s23,       namcos23_state, ss23, ROT0, "Namco", "Downhill Bikers (DH3 Ver. A)", GAME_FLAGS )
 GAME( 1997, motoxgo,   0,        s23,       s23,       namcos23_state, ss23, ROT0, "Namco", "Motocross Go! (MG3 Ver. A)",   GAME_FLAGS )
 GAME( 1997, motoxgoa,  motoxgo,  s23,       s23,       namcos23_state, ss23, ROT0, "Namco", "Motocross Go! (MG2 Ver. A)",   GAME_FLAGS )

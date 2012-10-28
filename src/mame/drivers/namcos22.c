@@ -2436,6 +2436,7 @@ READ32_MEMBER(namcos22_state::namcos22_gun_r)
 {
 	UINT16 xpos = ioport("LIGHTX")->read();
 	UINT16 ypos = ioport("LIGHTY")->read();
+	// ypos is not completely understood yet, there should be a difference between case 1 and 2
 
 	switch( offset )
 	{
