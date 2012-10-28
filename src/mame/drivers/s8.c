@@ -4,6 +4,8 @@
     Williams System 8
 
     Only 2 games used this system.
+    The very first time run, the display will show the model number (526 or 543).
+    Press F3 to clear this, then follow instructions below.
 
     - Pennant Fever, which isn't a true pinball, it is a baseball game where you aim
       for targets at the top of the playfield, and the players advance towards a
@@ -14,7 +16,7 @@
       - Player 1 is 'Visitors'; optional Player 2 is 'Home'
       - Press one of L,B,C,V to hit the ball; or comma,period,slash for a home run;
         or (F then A) for a Strike; or N,Z for Out.
-      - Wait for score to start flashing (this can take minutes, literally)
+      - Wait for score to start flashing
       - Press another key, etc
       - When you have 3 strikes, you are Out
       - When you have 3 Outs, your Innings ends (other player gets a turn)
@@ -24,10 +26,16 @@
     - Still Crazy, a novelty game where the playfield is completely vertical. It has
       4 flippers and the idea is to get the ball up to the alcohol 'still' before
       the 'revenuers' do. The idea didn't catch on, and the game was not officially
-      released. 1 player.
+      released. 1 player. The display shows Score and Batch. There is no credit
+      display.
 
 ToDo:
-- Get Still Crazy to work.
+- Get Still Crazy coin-in to register.
+  Workaround:
+  - Start in debug mode, g to run the game, go to memory view and enter credits
+    into location 0x738. (example: 90 gives 90 credits). Quit.
+  - Start in non-debug mode. Press 1 to start, it works fine, apart from the
+    knocker making a lot of noise. Keys to use: A then any key on that row.
 
 ************************************************************************************/
 
@@ -402,7 +410,7 @@ static MACHINE_CONFIG_START( s8, s8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, 4000000)
 	MCFG_CPU_PROGRAM_MAP(s8_main_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s8_state, irq, attotime::from_hz(1000))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s8_state, irq, attotime::from_hz(250))
 	MCFG_MACHINE_RESET_OVERRIDE(s8_state, s8)
 
 	/* Video */
@@ -448,7 +456,7 @@ ROM_START(pfevr_p3)
 ROM_END
 
 /*----------------------------
-/ Still Crazy (#534) 06/1984
+/ Still Crazy (#543) 06/1984
 /-----------------------------*/
 ROM_START(stillcra)
 	ROM_REGION(0x10000, "maincpu", 0)
