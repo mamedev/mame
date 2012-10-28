@@ -24,9 +24,9 @@
   * Super Joly 2000 - 3x,                             M.P.                1985.
   * Jolly Card (Austrian, Fun World, bootleg),        Inter Games,        1986.
   * Bonus Card (Austrian),                            Fun World,          1986.
+  * Bonus Card (Austrian, ATG Electronic hack),       Fun World,          1986.
   * Big Deal (Hungarian, set 1),                      Fun World,          1986.
   * Big Deal (Hungarian, set 2),                      Fun World,          1986.
-  * Jolly Card (Austrian, Fun World),                 Fun World,          1986.
   * Power Card (Ver 0263, encrypted),                 Fun World,          1993.
   * Cuore 1 (Italian),                                C.M.C.,             1996.
   * Elephant Family (Italian, new),                   C.M.C.,             1997.
@@ -216,7 +216,6 @@
 
   * Bonus Card (Austrian)
   * Big Deal (Hungarian)
-  * Jolly Card (Austrian, Fun World, bootleg)
 
   These ones seems to have normal RAM instead of NVRAM.
   Going through the code, there's not any NVRAM initialization routine through service 1 & 2.
@@ -397,8 +396,8 @@
   $0E00 - $0E00   CRTC6845 (A)    // MC6845 addressing.
   $0E01 - $0E01   CRTC6845 (R/W)  // MC6845 Read/Write.
 
-  $2000 - $2FFF   VideoRAM (Fun World/bigdeal)
-  $3000 - $3FFF   ColorRAM (Fun World/bigdeal)
+  $2000 - $2FFF   VideoRAM (bonuscrd/bigdeal)
+  $3000 - $3FFF   ColorRAM (bonuscrd/bigdeal)
 
   $4000 - $4FFF   VideoRAM (magicrd2/royalcrd)
   $5000 - $5FFF   ColorRAM (magicrd2/royalcrd)
@@ -439,7 +438,7 @@
 
   *** Hardware Info ***
 
-  Moved all tech info to the ROM load section...
+  Moved all technical info to the ROM load section...
 
 
 ***********************************************************************************
@@ -778,6 +777,10 @@
   - Changed company name 'Funworld' to 'Fun World'.
   - Changed Mega Card to Power Card after check the real hardware running.
   - Fixed Power Card graphics ROM load..
+  - Moved jolycdat program to Bonus Card, making it parent.
+     This program is a real original Bonus Card program, and the PCB
+	 was populated with Jolly Card graphics wrongly. The other Bonus Card set
+	 was turned as clone, since has a fake copyright string (hack).
   - Added technical notes.
 
 
@@ -3026,17 +3029,32 @@ ROM_END
    1 2 3 4 5 6 7 8
 
 */
+
 ROM_START( bonuscrd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bonuscard_3.bin", 0x8000, 0x8000, CRC(c4c6f7af) SHA1(3d0c5c867a9473043fb0b2cde6c6b98c4580ad81) )
+	ROM_LOAD( "bonucard.cpu", 0x8000, 0x8000, CRC(da342100) SHA1(451fa6074aad19e9efd148c3d18115a20a3d344a) )	// original program
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "bonuscard_2.bin", 0x0000, 0x8000, CRC(b026823b) SHA1(8d0c80019a9b35104a3782c4fad5c2ca07440a37) )
 	ROM_LOAD( "bonuscard_1.bin", 0x8000, 0x8000, CRC(e07f72de) SHA1(f4bd6bc7a8aabe76d09d48362e32f29932fff4e4) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "n82s147an.bin",	0x0000, 0x0200, CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) ) // from power card, original fun world encrypted bonus card clone.
-	ROM_LOAD( "74s472n.bin",    0x0200, 0x0200, CRC(e56780cb) SHA1(c06b854f21b1dcee465ac9c8c9a2934b7e99565f) ) // original dump, but doesn't match the cards colors in real board. 
+	ROM_LOAD( "n82s147an.bin",	0x0000, 0x0200, BAD_DUMP CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) ) // from power card, original fun world encrypted bonus card clone.
+	ROM_LOAD( "74s472n.bin",    0x0200, 0x0200, CRC(e56780cb) SHA1(c06b854f21b1dcee465ac9c8c9a2934b7e99565f) )			// original dump, but doesn't match the cards colors in real board. 
+ROM_END
+
+
+ROM_START( bonuscrda )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bonuscard_3.bin", 0x8000, 0x8000, CRC(c4c6f7af) SHA1(3d0c5c867a9473043fb0b2cde6c6b98c4580ad81) )	// identical to parent, but with 'ATG Electronic' string instead.
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "bonuscard_2.bin", 0x0000, 0x8000, CRC(b026823b) SHA1(8d0c80019a9b35104a3782c4fad5c2ca07440a37) )
+	ROM_LOAD( "bonuscard_1.bin", 0x8000, 0x8000, CRC(e07f72de) SHA1(f4bd6bc7a8aabe76d09d48362e32f29932fff4e4) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "n82s147an.bin",	0x0000, 0x0200, BAD_DUMP CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) ) // from power card, original fun world encrypted bonus card clone.
+	ROM_LOAD( "74s472n.bin",    0x0200, 0x0200, CRC(e56780cb) SHA1(c06b854f21b1dcee465ac9c8c9a2934b7e99565f) )			// original dump, but doesn't match the cards colors in real board. 
 ROM_END
 
 
@@ -3070,37 +3088,6 @@ ROM_START( bigdealb )
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "poker4.003", 0x0000, 0x8000, CRC(8c33a15f) SHA1(a1c8451c99a23eeffaedb21d1a1b69f54629f8ab) )
 	ROM_LOAD( "poker4.002", 0x8000, 0x8000, CRC(5f4e12d8) SHA1(014b2364879faaf4922cdb82ee07692389f20c2d) )
-
-	ROM_REGION( 0x0200, "proms", 0 )	/* using joker card palette till a correct dump appear */
-	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, BAD_DUMP CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
-ROM_END
-
-
-/*
-    Jolly Card (austrian, Fun World, bootleg)
-    ----------------------------------------
-
-    - 1x G65SC02P (CPU)
-    - 1x MC68B45P (CRTC)
-    - 1x AY3-8910 (sound)
-    - 2x MC6821P  (PIAs)
-
-    RAM:  - 1x 6116
-          - 1x KM6264AL-10
-
-    - 1x Crystal : 16.000 MHz
-
-    This set behaves like Big Deal & Bonus Card.
-*/
-
-ROM_START( jolycdat )	/* there are unused pieces of code that compare or jumps within $4000-$5000 range */
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bonucard.cpu", 0x8000, 0x4000, CRC(da342100) SHA1(451fa6074aad19e9efd148c3d18115a20a3d344a) )
-	ROM_CONTINUE(			  0xc000, 0x4000 )
-
-	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "jolycard.ch2", 0x0000, 0x8000, CRC(c512b103) SHA1(1f4e78e97855afaf0332fb75e1b5571aafd01c29) )
-	ROM_LOAD( "jolycard.ch1", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
 	ROM_REGION( 0x0200, "proms", 0 )	/* using joker card palette till a correct dump appear */
 	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, BAD_DUMP CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
@@ -4918,9 +4905,9 @@ GAME(  1986, jolycdab,  jollycrd, fw1stpal, funworld,  driver_device,  0,       
 
 // Bonus Card based...
 GAMEL( 1986, bonuscrd,  0,        fw2ndpal, bonuscrd,  driver_device,  0,        ROT0, "Fun World",       "Bonus Card (Austrian)",                           GAME_IMPERFECT_COLORS,   layout_bigdeal  ) // use fw1stpal machine for green background
+GAMEL( 1986, bonuscrda, 0,        fw2ndpal, bonuscrd,  driver_device,  0,        ROT0, "Fun World",       "Bonus Card (Austrian, ATG Electronic hack)",      GAME_IMPERFECT_COLORS,   layout_bigdeal  ) // use fw1stpal machine for green background
 GAMEL( 1986, bigdeal,   bonuscrd, fw2ndpal, bigdeal,   driver_device,  0,        ROT0, "Fun World",       "Big Deal (Hungarian, set 1)",                     GAME_IMPERFECT_COLORS,   layout_bigdeal  )
 GAMEL( 1986, bigdealb,  bonuscrd, fw2ndpal, bigdeal,   driver_device,  0,        ROT0, "Fun World",       "Big Deal (Hungarian, set 2)",                     GAME_IMPERFECT_COLORS,   layout_bigdeal  )
-GAMEL( 1986, jolycdat,  bonuscrd, fw2ndpal, bonuscrd,  driver_device,  0,        ROT0, "Fun World",       "Jolly Card (Austrian, Bonus Card hybrid)",        GAME_IMPERFECT_COLORS,   layout_bigdeal  )
 GAME(  1993, powercrd,  0,        fw2ndpal, funworld,  driver_device,  0,        ROT0, "Fun World",       "Power Card (Ver 0263, encrypted)",                GAME_NOT_WORKING )							// clone of Bonus Card.
 
 // CMC Italian jamma PCB's...
