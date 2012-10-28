@@ -26,7 +26,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 #include "formats/mfi_dsk.h"
 #include "machine/6821pia.h"
@@ -82,11 +81,8 @@ void bw12_state::bankswitch()
 
 void bw12_state::floppy_motor_off()
 {
-	floppy_mon_w(m_floppy0, ASSERT_LINE);
-	floppy_mon_w(m_floppy1, ASSERT_LINE);
-
-	floppy_drive_set_ready_state(m_floppy0, 0, 0);
-	floppy_drive_set_ready_state(m_floppy1, 0, 0);
+	m_floppy0->mon_w(true);
+	m_floppy1->mon_w(true);
 
 	m_motor_on = 0;
 }

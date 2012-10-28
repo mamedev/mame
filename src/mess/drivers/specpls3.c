@@ -156,7 +156,6 @@ http://www.z88forever.org.uk/zxplus3e/
 
 /* +3 hardware */
 #include "machine/upd765.h"
-#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 
 /****************************************************************************************************/
@@ -315,10 +314,8 @@ static WRITE8_HANDLER(spectrum_plus3_port_1ffd_w)
 
 	spectrum_state *state = space.machine().driver_data<spectrum_state>();
 
-	floppy_mon_w(floppy_get_device(space.machine(), 0), !BIT(data, 3));
-	floppy_mon_w(floppy_get_device(space.machine(), 1), !BIT(data, 3));
-	floppy_drive_set_ready_state(floppy_get_device(space.machine(), 0), 1, 1);
-	floppy_drive_set_ready_state(floppy_get_device(space.machine(), 1), 1, 1);
+	space.machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(!BIT(data, 3));
+	space.machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(!BIT(data, 3));
 
 	state->m_port_1ffd_data = data;
 

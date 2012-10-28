@@ -13,7 +13,6 @@
 #include "machine/z80sio.h"
 #include "machine/z80ctc.h"
 #include "machine/upd765.h"
-#include "imagedev/flopdrv.h"
 #include "formats/mfi_dsk.h"
 #include "formats/nanos_dsk.h"
 #include "machine/ram.h"
@@ -450,8 +449,7 @@ void nanos_state::machine_reset()
 	membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x1000);
 	membank("bank3")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 
-	floppy_mon_w(floppy_get_device(space.machine(), 0), CLEAR_LINE);
-	floppy_drive_set_ready_state(floppy_get_device(space.machine(), 0), 1,1);
+	machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(false);
 }
 
 static Z80PIO_INTERFACE( nanos_z80pio_intf )

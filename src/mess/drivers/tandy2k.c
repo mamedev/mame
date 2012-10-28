@@ -596,21 +596,6 @@ static const struct pic8259_interface pic1_intf =
 	DEVCB_NULL
 };
 
-// Floppy Configuration
-
-static const floppy_interface tandy2k_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSQD, // Mitsubishi M4853
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_5_25",
-	NULL
-};
-
 // Intel 8272 Interface
 
 void tandy2k_state::fdc_irq(bool state)
@@ -738,7 +723,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
 	MCFG_PIC8259_ADD(I8259A_0_TAG, pic0_intf)
 	MCFG_PIC8259_ADD(I8259A_1_TAG, pic1_intf)
-	MCFG_UPD765A_ADD(I8272A_TAG, true, true)
+	MCFG_I8272A_ADD(I8272A_TAG, true)
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", 0, tandy2k_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", 0, tandy2k_floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)

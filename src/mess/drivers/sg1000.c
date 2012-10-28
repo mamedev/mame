@@ -919,8 +919,7 @@ WRITE8_MEMBER( sf7000_state::ppi_pc_w )
     */
 
 	/* floppy motor */
-	floppy_mon_w(m_floppy0, BIT(data, 1));
-	floppy_drive_set_ready_state(m_floppy0, 1, 1);
+	m_floppy0->mon_w(BIT(data, 1));
 
 	/* FDC terminal count */
 	m_fdc->tc_w(BIT(data, 2));
