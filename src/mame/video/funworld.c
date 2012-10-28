@@ -25,6 +25,7 @@
   * Big Deal (Hungarian, set 1),                      Fun World,          1986.
   * Big Deal (Hungarian, set 2),                      Fun World,          1986.
   * Jolly Card (Austrian, Fun World),                 Fun World,          1986.
+  * Power Card (Ver 0263, encrypted),                 Fun World,          1993.
   * Cuore 1 (Italian),                                C.M.C.,             1996.
   * Elephant Family (Italian, new),                   C.M.C.,             1997.
   * Elephant Family (Italian, old),                   C.M.C.,             1996.
@@ -58,7 +59,6 @@
   * Jolly Joker (98bet, set 2).                       Impera,             198?.
   * Jolly Joker (40bet, croatian hack),               Impera,             198?.
   * Multi Win (Ver.0167, encrypted),                  Fun World,          1992.
-  * Mega Card (Ver 0263, encrypted),                  Fun World,          1993.
   * Joker Card (Ver.A267BC, encrypted),               Vesely Svet,        1993.
   * Mongolfier New (Italian),                         bootleg,            199?.
   * Soccer New (Italian),                             bootleg,            199?.

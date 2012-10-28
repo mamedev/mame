@@ -27,6 +27,7 @@
   * Big Deal (Hungarian, set 1),                      Fun World,          1986.
   * Big Deal (Hungarian, set 2),                      Fun World,          1986.
   * Jolly Card (Austrian, Fun World),                 Fun World,          1986.
+  * Power Card (Ver 0263, encrypted),                 Fun World,          1993.
   * Cuore 1 (Italian),                                C.M.C.,             1996.
   * Elephant Family (Italian, new),                   C.M.C.,             1997.
   * Elephant Family (Italian, old),                   C.M.C.,             1996.
@@ -60,7 +61,6 @@
   * Jolly Joker (98bet, set 2).                       Impera,             198?.
   * Jolly Joker (40bet, croatian hack),               Impera,             198?.
   * Multi Win (Ver.0167, encrypted),                  Fun World,          1992.
-  * Mega Card (Ver 0263, encrypted),                  Fun World,          1993.
   * Joker Card (Ver.A267BC, encrypted),               Vesely Svet,        1993.
   * Mongolfier New (Italian),                         bootleg,            199?.
   * Soccer New (Italian),                             bootleg,            199?.
@@ -776,12 +776,14 @@
      of Bonus Card.
   - Cleaned up the code.
   - Changed company name 'Funworld' to 'Fun World'.
+  - Changed Mega Card to Power Card after check the real hardware running.
+  - Fixed Power Card graphics ROM load..
   - Added technical notes.
 
 
   *** TO DO ***
 
-  - Figure out the royalcdc, jokercrd, multiwin and megacard encryption.
+  - Figure out the royalcdc, jokercrd, multiwin and powercrd encryption.
   - Figure out the remaining PIA connections for almost all games.
   - Fix Saloon and move it to its own driver.
   - Fix the imperfect sound in Magic Card II.
@@ -3033,8 +3035,8 @@ ROM_START( bonuscrd )
 	ROM_LOAD( "bonuscard_1.bin", 0x8000, 0x8000, CRC(e07f72de) SHA1(f4bd6bc7a8aabe76d09d48362e32f29932fff4e4) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-//	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, BAD_DUMP CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
-	ROM_LOAD( "74s472n.bin",       0x0000, 0x0200, CRC(e56780cb) SHA1(c06b854f21b1dcee465ac9c8c9a2934b7e99565f) )
+	ROM_LOAD( "n82s147an.bin",	0x0000, 0x0200, CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) ) // from power card, original fun world encrypted bonus card clone.
+	ROM_LOAD( "74s472n.bin",    0x0200, 0x0200, CRC(e56780cb) SHA1(c06b854f21b1dcee465ac9c8c9a2934b7e99565f) ) // original dump, but doesn't match the cards colors in real board. 
 ROM_END
 
 
@@ -4142,11 +4144,15 @@ ROM_END
 
 /*
 
-  Mega Card (Fun World)
+  Power Card (Fun World)
   Version 0263 / 1993-10-22
 
   Amatic encrypted CPU
   based on 65SC02 (bitwise) family
+
+  Looks like a Bonus Card / Big Deal clone.
+  Inside the program ROM there is a reference to "Mega Card",
+  but the graphics are from Power Card.
 
 
   PCB Layout...
@@ -4221,14 +4227,14 @@ ROM_END
    1 2 3 4 5 6 7 8
 
 */
-ROM_START( megacard )
+ROM_START( powercrd )
 	ROM_REGION( 0x10000, "maincpu", 0 )  /* need proper decryption */
 	ROM_LOAD( "263a1.bin",	0x8000, 0x8000, CRC(9e5e477d) SHA1(428464a64bea8cb478bc8033859baa47d7de0297) )	/* just the 2nd half */
 	ROM_LOAD( "263a2.bin",  0x4000, 0x8000, CRC(11b1a13f) SHA1(766c1a45c238467d6a292795f5a159187966ceec) )	/* just the 2nd half */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "zg1.ic10",	0x8000, 0x8000, CRC(dc9e70c6) SHA1(7ac5bdc734d9829ea6349b60817445cb88d7387c) )
-	ROM_LOAD( "zg2.ic11",	0x0000, 0x8000, CRC(108380bb) SHA1(922beffe3c06f391239125e6f4ccc86ec6980c45) )
+	ROM_LOAD( "power_c_zg2.ic11",	0x0000, 0x8000, CRC(108380bb) SHA1(922beffe3c06f391239125e6f4ccc86ec6980c45) )
+	ROM_LOAD( "power_c_zg1.ic10",	0x8000, 0x8000, CRC(dc9e70c6) SHA1(7ac5bdc734d9829ea6349b60817445cb88d7387c) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "n82s147an.bin",	0x0000, 0x0200, CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) )
@@ -4906,15 +4912,16 @@ GAMEL( 1998, jolycdev,  jollycrd, fw1stpal, funworld,  driver_device,  0,       
 GAMEL( 1985, jolyccra,  jollycrd, cuoreuno, jolycdcr,  driver_device,  0,        ROT0, "TAB Austria",     "Jolly Card (Croatian, set 1)",                    0,                       layout_jollycrd )
 GAMEL( 1993, jolyccrb,  jollycrd, cuoreuno, jolycdcr,  driver_device,  0,        ROT0, "Soft Design",     "Jolly Card (Croatian, set 2)",                    0,                       layout_jollycrd )
 GAMEL( 199?, jolycdit,  jollycrd, cuoreuno, jolycdit,  funworld_state, tabblue,  ROT0, "bootleg",         "Jolly Card (Italian, blue TAB board, encrypted)", 0,                       layout_royalcrd )
-GAMEL( 1990, jolycdib,  jollycrd, cuoreuno, jolycdib,  funworld_state, tabblue,  ROT0, "bootleg",         "Jolly Card (Italian, encrypted bootleg)",         0,                       layout_jollycrd )	/* not a real TAB blue PCB */
+GAMEL( 1990, jolycdib,  jollycrd, cuoreuno, jolycdib,  funworld_state, tabblue,  ROT0, "bootleg",         "Jolly Card (Italian, encrypted bootleg)",         0,                       layout_jollycrd )	// not a real TAB blue PCB
 GAMEL( 1985, sjcd2kx3,  jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "M.P.",            "Super Joly 2000 - 3x",                            0,                       layout_jollycrd )
 GAME(  1986, jolycdab,  jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "Inter Games",     "Jolly Card (Austrian, Fun World, bootleg)",       GAME_NOT_WORKING )
 
 // Bonus Card based...
-GAMEL( 1986, bonuscrd,  0,        fw1stpal, bonuscrd,  driver_device,  0,        ROT0, "Fun World",       "Bonus Card (Austrian)",                           GAME_IMPERFECT_COLORS,   layout_bigdeal  )
+GAMEL( 1986, bonuscrd,  0,        fw2ndpal, bonuscrd,  driver_device,  0,        ROT0, "Fun World",       "Bonus Card (Austrian)",                           GAME_IMPERFECT_COLORS,   layout_bigdeal  ) // use fw1stpal machine for green background
 GAMEL( 1986, bigdeal,   bonuscrd, fw2ndpal, bigdeal,   driver_device,  0,        ROT0, "Fun World",       "Big Deal (Hungarian, set 1)",                     GAME_IMPERFECT_COLORS,   layout_bigdeal  )
 GAMEL( 1986, bigdealb,  bonuscrd, fw2ndpal, bigdeal,   driver_device,  0,        ROT0, "Fun World",       "Big Deal (Hungarian, set 2)",                     GAME_IMPERFECT_COLORS,   layout_bigdeal  )
 GAMEL( 1986, jolycdat,  bonuscrd, fw2ndpal, bonuscrd,  driver_device,  0,        ROT0, "Fun World",       "Jolly Card (Austrian, Bonus Card hybrid)",        GAME_IMPERFECT_COLORS,   layout_bigdeal  )
+GAME(  1993, powercrd,  0,        fw2ndpal, funworld,  driver_device,  0,        ROT0, "Fun World",       "Power Card (Ver 0263, encrypted)",                GAME_NOT_WORKING )							// clone of Bonus Card.
 
 // CMC Italian jamma PCB's...
 GAMEL( 1996, cuoreuno,  0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Cuore 1 (Italian)",                               0,                       layout_jollycrd )
@@ -4963,7 +4970,6 @@ GAMEL( 198?, jolyjokrb, jolyjokr, fw1stpal, funworld,  driver_device,  0,       
 
 // Encrypted games...
 GAME(  1992, multiwin,  0,        fw1stpal, funworld,  funworld_state, multiwin, ROT0, "Fun World",       "Multi Win (Ver.0167, encrypted)",                 GAME_NOT_WORKING )
-GAME(  1993, megacard,  0,        fw2ndpal, funworld,  driver_device,  0,        ROT0, "Fun World",       "Mega Card (Ver 0263, encrypted)",                 GAME_NOT_WORKING )
 GAME(  1993, jokercrd,  0,        fw2ndpal, funworld,  driver_device,  0,        ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)",              GAME_NOT_WORKING )
 GAME(  198?, saloon,    0,        saloon,   saloon,    funworld_state, saloon,   ROT0, "<unknown>",       "Saloon (French, encrypted)",                      GAME_NOT_WORKING )
 
