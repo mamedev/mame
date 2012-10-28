@@ -72,6 +72,8 @@
 #include "video/pds30_cb264.h"
 #include "video/pds30_procolor816.h"
 #include "video/pds30_sigmalview.h"
+#include "video/pds30_30hr.h"
+#include "video/pds30_mc30.h"
 #include "includes/mac.h"
 #include "mac.lh"
 
@@ -865,6 +867,8 @@ static SLOT_INTERFACE_START(mac_pds030_cards)
     SLOT_INTERFACE("cb264", PDS030_CB264SE30)   // RasterOps Colorboard 264/SE30
     SLOT_INTERFACE("pc816", PDS030_PROCOLOR816) // Lapis ProColor Server 8*16 PDS
     SLOT_INTERFACE("lview", PDS030_LVIEW)       // Sigma Designs L-View
+    SLOT_INTERFACE("30hr",  PDS030_XCEED30HR)   // Micron/XCEED Technology Color 30HR
+    SLOT_INTERFACE("mc30",  PDS030_XCEEDMC30)   // Micron/XCEED Technology MacroColor 30
 SLOT_INTERFACE_END
 
 /***************************************************************************

@@ -712,6 +712,8 @@ $(MESSOBJ)/apple.a:				\
     $(MESS_VIDEO)/pds30_cb264.o \
     $(MESS_VIDEO)/pds30_procolor816.o \
     $(MESS_VIDEO)/pds30_sigmalview.o \
+    $(MESS_VIDEO)/pds30_30hr.o \
+    $(MESS_VIDEO)/pds30_mc30.o \
 
 $(MESSOBJ)/applied.a:			\
 	$(MESS_VIDEO)/mbee.o		\
