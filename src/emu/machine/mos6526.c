@@ -1080,6 +1080,11 @@ UINT8 mos6526_device::pa_r()
 	return m_pa;
 }
 
+READ8_MEMBER( mos6526_device::pa_r )
+{
+	return pa_r();
+}
+
 
 //-------------------------------------------------
 //  pb_r - port B read
@@ -1088,6 +1093,11 @@ UINT8 mos6526_device::pa_r()
 UINT8 mos6526_device::pb_r()
 {
 	return m_pb;
+}
+
+READ8_MEMBER( mos6526_device::pb_r )
+{
+	return pb_r();
 }
 
 

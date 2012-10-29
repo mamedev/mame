@@ -111,7 +111,9 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	UINT8 pa_r();
+	DECLARE_READ8_MEMBER( pa_r );
 	UINT8 pb_r();
+	DECLARE_READ8_MEMBER( pb_r );
 
 	DECLARE_READ_LINE_MEMBER( sp_r );
 	DECLARE_WRITE_LINE_MEMBER( sp_w );
