@@ -643,7 +643,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	},
-	DEVCB_LINE_MEMBER(sidearms_state, irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(sidearms_state, irqhandler)
 };
 
 static MACHINE_CONFIG_START( sidearms, sidearms_state )
