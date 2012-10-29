@@ -2,7 +2,6 @@
 
     TODO:
 
-	- some C64 cartridges don't work (IDE64)
     - connect CAPS LOCK to charom A12 on international variants
 	- DCR models won't boot with 1571CR drive
     - fix fast serial
