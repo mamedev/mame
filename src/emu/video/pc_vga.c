@@ -2702,7 +2702,7 @@ void s3_vga_device::s3_define_video_mode()
 			case 0x0d: svga.rgb32_en = 1; divisor = 2; break;
 			default: fatalerror("TODO: s3 video mode not implemented %02x\n",((s3.ext_misc_ctrl_2) >> 4)); break;
 		}
-		switch(s3.cr42 & 0x0f)  // TODO: confirm clock settings
+/*		switch(s3.cr42 & 0x0f)  // TODO: confirm clock settings
 		{
 		case 0:
 			xtal = XTAL_25_1748MHz;
@@ -2754,7 +2754,7 @@ void s3_vga_device::s3_define_video_mode()
 			break;
 		default:
 			xtal = 1000000;
-		}
+		}*/
 	}
 	else
 	{
@@ -2763,6 +2763,8 @@ void s3_vga_device::s3_define_video_mode()
 		svga.rgb16_en = 0;
 		svga.rgb32_en = 0;
 	}
+//	if((vga.miscellaneous_output & 0xc) != 0x0c)
+	xtal = (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz;
 	recompute_params_clock(divisor, xtal);
 }
 
@@ -3103,6 +3105,7 @@ READ8_MEMBER(ati_vga_device::port_03c0_r)
 void ibm8514a_device::ibm8514_write_fg(UINT32 offset)
 {
 	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	offset %= m_vga->vga.svga_intf.vram_size;
 	UINT8 dst = m_vga->mem_linear_r(space,offset,0xff);
 	UINT8 src = 0;
 
@@ -3185,6 +3188,7 @@ void ibm8514a_device::ibm8514_write_fg(UINT32 offset)
 void ibm8514a_device::ibm8514_write_bg(UINT32 offset)
 {
 	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	offset %= m_vga->vga.svga_intf.vram_size;
 	UINT8 dst = m_vga->mem_linear_r(space,offset,0xff);
 	UINT8 src = 0;
 
