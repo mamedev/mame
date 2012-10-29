@@ -13,6 +13,7 @@ ToDo:
 #include "machine/genpin.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "sound/hc55516.h"
 #include "sound/dac.h"
 #include "s9.lh"
 
@@ -25,6 +26,7 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_audiocpu(*this, "audiocpu"),
 	m_dac(*this, "dac"),
+	m_hc55516(*this, "hc55516"),
 	m_pia(*this, "pia"),
 	m_pia21(*this, "pia21"),
 	m_pia24(*this, "pia24"),
@@ -65,6 +67,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<dac_device> m_dac;
+	optional_device<hc55516_device> m_hc55516;
 	optional_device<pia6821_device> m_pia;
 	required_device<pia6821_device> m_pia21;
 	required_device<pia6821_device> m_pia24;
@@ -176,6 +179,8 @@ INPUT_PORTS_END
 MACHINE_RESET_MEMBER( s9_state, s9 )
 {
 	m_t_c = 0;
+	// reset the IRQ state
+	m_pia->ca1_w(1);
 }
 
 INPUT_CHANGED_MEMBER( s9_state::main_nmi )
@@ -335,11 +340,13 @@ READ_LINE_MEMBER( s9_state::pia_ca1_r )
 WRITE_LINE_MEMBER( s9_state::pia_ca2_w )
 {
 // speech clock
+	hc55516_clock_w(m_hc55516, state);
 }
 
 WRITE_LINE_MEMBER( s9_state::pia_cb2_w )
 {
 // speech data
+	hc55516_digit_w(m_hc55516, state);
 }
 
 READ8_MEMBER( s9_state::dac_r )
@@ -378,7 +385,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( s9_state::irq)
 
 static MACHINE_CONFIG_START( s9, s9_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, 4000000)
+	MCFG_CPU_ADD("maincpu", M6808, 4000000)
 	MCFG_CPU_PROGRAM_MAP(s9_main_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s9_state, irq, attotime::from_hz(250))
 	MCFG_MACHINE_RESET_OVERRIDE(s9_state, s9)
@@ -401,6 +408,9 @@ static MACHINE_CONFIG_START( s9, s9_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speech")
+	MCFG_SOUND_ADD("hc55516", HC55516, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 0.50)
 	MCFG_PIA6821_ADD("pia", pia_intf)
 MACHINE_CONFIG_END
 
