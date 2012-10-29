@@ -337,7 +337,7 @@ INLINE int RBYTE(offs_t address, UINT32 *result)
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
 	{
-		*result = (*mips3.core.memory.read_byte)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
+		*result = (*mips3.core.memory.read_byte)(*mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
 	}
 	else
 	{
@@ -361,7 +361,7 @@ INLINE int RHALF(offs_t address, UINT32 *result)
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
 	{
-		*result = (*mips3.core.memory.read_word)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
+		*result = (*mips3.core.memory.read_word)(*mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
 	}
 	else
 	{
@@ -385,7 +385,7 @@ INLINE int RWORD(offs_t address, UINT32 *result)
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
 	{
-		*result = (*mips3.core.memory.read_dword)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
+		*result = (*mips3.core.memory.read_dword)(*mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
 	}
 	else
 	{
@@ -409,7 +409,7 @@ INLINE int RWORD_MASKED(offs_t address, UINT32 *result, UINT32 mem_mask)
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
 	{
-		*result = (*mips3.core.memory.read_dword_masked)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), mem_mask);
+		*result = (*mips3.core.memory.read_dword_masked)(*mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), mem_mask);
 	}
 	else
 	{
@@ -433,7 +433,7 @@ INLINE int RDOUBLE(offs_t address, UINT64 *result)
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
 	{
-		*result = (*mips3.core.memory.read_qword)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
+		*result = (*mips3.core.memory.read_qword)(*mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
 	}
 	else
 	{
@@ -457,7 +457,7 @@ INLINE int RDOUBLE_MASKED(offs_t address, UINT64 *result, UINT64 mem_mask)
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
 	{
-		*result = (*mips3.core.memory.read_qword_masked)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), mem_mask);
+		*result = (*mips3.core.memory.read_qword_masked)(*mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), mem_mask);
 	}
 	else
 	{
@@ -481,7 +481,7 @@ INLINE void WBYTE(offs_t address, UINT8 data)
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
 	{
-		(*mips3.core.memory.write_byte)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data);
+		(*mips3.core.memory.write_byte)(*mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data);
 	}
 	else
 	{
@@ -506,7 +506,7 @@ INLINE void WHALF(offs_t address, UINT16 data)
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
 	{
-		(*mips3.core.memory.write_word)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data);
+		(*mips3.core.memory.write_word)(*mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data);
 	}
 	else
 	{
@@ -531,7 +531,7 @@ INLINE void WWORD(offs_t address, UINT32 data)
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
 	{
-		(*mips3.core.memory.write_dword)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data);
+		(*mips3.core.memory.write_dword)(*mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data);
 	}
 	else
 	{
@@ -556,7 +556,7 @@ INLINE void WWORD_MASKED(offs_t address, UINT32 data, UINT32 mem_mask)
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
 	{
-		(*mips3.core.memory.write_dword_masked)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data, mem_mask);
+		(*mips3.core.memory.write_dword_masked)(*mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data, mem_mask);
 	}
 	else
 	{
@@ -582,7 +582,7 @@ INLINE void WDOUBLE(offs_t address, UINT64 data)
 	//printf("%08x: %08x\n", (UINT32)address, (UINT32)tlbval);
 	if (tlbval & VTLB_WRITE_ALLOWED)
 	{
-		(*mips3.core.memory.write_qword)(mips3.core.program, (tlbval & ~0xfff)  | (address & 0xfff), data);
+		(*mips3.core.memory.write_qword)(*mips3.core.program, (tlbval & ~0xfff)  | (address & 0xfff), data);
 	}
 	else
 	{
@@ -607,7 +607,7 @@ INLINE void WDOUBLE_MASKED(offs_t address, UINT64 data, UINT64 mem_mask)
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
 	{
-		(*mips3.core.memory.write_qword_masked)(mips3.core.program, (tlbval & ~0xfff)  | (address & 0xfff), data, mem_mask);
+		(*mips3.core.memory.write_qword_masked)(*mips3.core.program, (tlbval & ~0xfff)  | (address & 0xfff), data, mem_mask);
 	}
 	else
 	{
