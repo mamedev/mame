@@ -783,7 +783,7 @@ static MACHINE_CONFIG_START( psxntsc, psx1_state )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","psx")
 
 	MCFG_PSXCD_ADD("cdrom")
-	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("^:maincpu:irq", psxirq_device, intin2))
+	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin2))
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( cd_dma_read ), (psxcd_device *) device ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate( FUNC( cd_dma_write ), (psxcd_device *) device ) )
 
@@ -815,7 +815,7 @@ static MACHINE_CONFIG_START( psxpal, psx1_state )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","psx")
 
 	MCFG_PSXCD_ADD("cdrom")
-	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("^:maincpu:irq", psxirq_device, intin2))
+	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin2))
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( cd_dma_read ), (psxcd_device *) device ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate( FUNC( cd_dma_write ), (psxcd_device *) device ) )
 
