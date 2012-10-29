@@ -3,9 +3,9 @@
 <softwarelist name="cbm2_cart" description="Commodore CBM-II cartridges">
 
 	<software name="profitxt">
-		<description>ProfiText</description>
+		<description>Profi-Text</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Völkner Electronic</publisher>
 
 		<part name="cart" interface="cbm2_cart">
 			<dataarea name="bank1" size="0x2000">
@@ -47,21 +47,22 @@
 	</software>
 
 	<software name="moni610">
-		<description>Moni610</description>
-		<year>2008</year>
+		<description>Moni 610</description>
+		<year>1988</year>
 		<publisher>Ullrich von Bassewitz</publisher>
 
 		<part name="cart" interface="cbm2_cart">
-			<dataarea name="bank1" size="0x2000">
-				<rom name="moni.bin" size="0x2000" crc="43b08d1f" sha1="9c0c24907e85674348dd58e81e6da64e157e9d0f" offset="0" />
+			<dataarea name="bank2" size="0x2000">
+				<rom name="moni610.bin" size="0x2000" crc="43b08d1f" sha1="9c0c24907e85674348dd58e81e6da64e157e9d0f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="vt52">
-		<description>VT52 Emulator</description>
+		<description>VT52 Emulator (Hun)</description>
 		<year>1986</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Press 'ESC-?' to run" />
 
 		<part name="cart" interface="cbm2_cart">
 			<dataarea name="bank2" size="0x2000">

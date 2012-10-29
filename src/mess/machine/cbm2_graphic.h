@@ -52,7 +52,7 @@ protected:
 	virtual void cbm2_bd_w(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3);
 
 private:
-	required_device<ef9345_device> m_gdc;
+	//required_device<ef9345_device> m_gdc;
 
 	int m_variant;
 };

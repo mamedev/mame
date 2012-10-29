@@ -38,28 +38,28 @@ const device_type CBM2_GRAPHIC = &device_creator<cbm2_graphic_cartridge_device>;
 
 
 //-------------------------------------------------
-//  ef9345_interface gdp_intf
+//  ef9365_interface gdp_intf
 //-------------------------------------------------
-
-static const ef9345_interface gdp_intf =
+/*
+static const ef9365_interface gdp_intf =
 {
 	SCREEN_TAG
 };
-
+*/
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( cbm2_graphic_a )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( cbm2_graphic_a )
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(EF9365_TAG, ef9345_device, screen_update)
+/*	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(EF9365_TAG, ef9365_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 512-1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(50)
 
-	MCFG_EF9345_ADD(EF9365_TAG, gdp_intf)
+	MCFG_EF9365_ADD(EF9365_TAG, gdp_intf)*/
 MACHINE_CONFIG_END
 
 
@@ -68,14 +68,14 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( cbm2_graphic_b )
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(EF9366_TAG, ef9345_device, screen_update)
+/*	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(EF9366_TAG, ef9366_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(50)
 
-	MCFG_EF9345_ADD(EF9366_TAG, gdp_intf)
+	MCFG_EF9366_ADD(EF9366_TAG, gdp_intf)*/
 MACHINE_CONFIG_END
 
 
@@ -106,7 +106,7 @@ machine_config_constructor cbm2_graphic_cartridge_device::device_mconfig_additio
 cbm2_graphic_cartridge_device::cbm2_graphic_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CBM2_GRAPHIC, "CBM 500/600/700 High Resolution Graphics", tag, owner, clock),
 	device_cbm2_expansion_card_interface(mconfig, *this),
-	m_gdc(*this, EF9365_TAG),
+	//m_gdc(*this, EF9365_TAG),
 	m_variant(TYPE_A)
 {
 }
@@ -127,6 +127,7 @@ void cbm2_graphic_cartridge_device::device_start()
 
 void cbm2_graphic_cartridge_device::device_reset()
 {
+	//m_gdc->reset();
 }
 
 
@@ -140,7 +141,7 @@ UINT8 cbm2_graphic_cartridge_device::cbm2_bd_r(address_space &space, offs_t offs
 	{
 		if (offset < 0x7f80)
 		{
-			data = m_bank3[offset & m_bank1_mask];
+			data = m_bank3[offset];
 		}
 		else if (offset == 0x7f90)
 		{
@@ -165,7 +166,7 @@ UINT8 cbm2_graphic_cartridge_device::cbm2_bd_r(address_space &space, offs_t offs
 		}
 		else if (offset >= 0x7ff0)
 		{
-			data = m_gdc->data_r(space, offset & 0x07);
+			//data = m_gdc->data_r(space, offset & 0x07);
 		}
 	}
 
@@ -200,7 +201,7 @@ void cbm2_graphic_cartridge_device::cbm2_bd_w(address_space &space, offs_t offse
 		}
 		else if (offset >= 0x7ff0)
 		{
-			m_gdc->data_w(space, offset & 0x07, data);
+			//m_gdc->data_w(space, offset & 0x07, data);
 		}
 	}
 }
