@@ -4452,6 +4452,7 @@ src/mame/layout/s4.lay svneol=native#text/plain
 src/mame/layout/s6.lay svneol=native#text/plain
 src/mame/layout/s6a.lay svneol=native#text/plain
 src/mame/layout/s8.lay svneol=native#text/plain
+src/mame/layout/s9.lay svneol=native#text/plain
 src/mame/layout/saiyukip.lay svneol=native#text/plain
 src/mame/layout/sbrkout.lay svneol=native#text/plain
 src/mame/layout/sc1_vfd.lay svneol=native#text/plain

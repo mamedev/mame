@@ -2234,6 +2234,8 @@ $(DRIVERS)/s6a.o:	$(LAYOUT)/s6a.lh
 
 $(DRIVERS)/s8.o:	$(LAYOUT)/s8.lh
 
+$(DRIVERS)/s9.o:	$(LAYOUT)/s9.lh
+
 $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
 
 $(DRIVERS)/sderby.o:	$(LAYOUT)/sderby.lh \

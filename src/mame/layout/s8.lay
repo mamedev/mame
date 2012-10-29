@@ -11,7 +11,7 @@
 	</element>
 	<element name="diag" defstate="0">
 		<led7seg>
-			<color red="1.0" green="0.0" blue="0.0" />
+			<color red="1.0" green="0.0" blue="1.0" />
 		</led7seg>
 	</element>
 	<element name="background">

@@ -82,6 +82,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; // dummy to stop error log filling up
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
 	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
@@ -278,7 +279,7 @@ static const pia6821_interface pia24_intf =
 	DEVCB_DRIVER_MEMBER(s8_state, lamp0_w),		/* port A out */
 	DEVCB_DRIVER_MEMBER(s8_state, lamp1_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s8_state, pia24_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
