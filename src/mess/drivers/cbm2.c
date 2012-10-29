@@ -2,14 +2,14 @@
 
     TODO:
 
+	- 8088 board
     - CIA timers fail in burn-in test
     - NTSC variants unable to load from disk
     - shift lock
     - Hungarian keyboard
     - cbm620hu charom banking?
+    - DIN roms 324866-03a / 324867-02
     - user port
-    - co-processor bus
-    - 8088 co-processor board
 
 */
 
@@ -44,10 +44,10 @@
 //  read_pla - low profile PLA read
 //-------------------------------------------------
 
-void cbm2_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas, int busy2,
+void cbm2_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
 	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4)
 {
-	UINT32 input = P0 << 15 | P1 << 14 | P2 << 13 | P3 << 12 | busy2 << 11 | eras << 10 | ecas << 9 | refen << 8 | cas << 7 | ras << 6;
+	UINT32 input = P0 << 15 | P1 << 14 | P2 << 13 | P3 << 12 | m_busy2 << 11 | eras << 10 | ecas << 9 | refen << 8 | cas << 7 | ras << 6;
 	UINT32 data = m_pla1->read(input);
 
 	*casseg1 = BIT(data, 0);
@@ -65,10 +65,10 @@ void cbm2_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, 
 //  read_pla - high profile PLA read
 //-------------------------------------------------
 
-void cbm2hp_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas, int busy2,
+void cbm2hp_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
 	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4)
 {
-	UINT32 input = ras << 13 | cas << 12 | refen << 11 | eras << 10 | ecas << 9 | busy2 << 8 | P3 << 3 | P2 << 2 | P1 << 1 | P0;
+	UINT32 input = ras << 13 | cas << 12 | refen << 11 | eras << 10 | ecas << 9 | m_busy2 << 8 | P3 << 3 | P2 << 2 | P1 << 1 | P0;
 	UINT32 data = m_pla1->read(input);
 
 	*casseg1 = BIT(data, 0);
@@ -86,19 +86,18 @@ void cbm2hp_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras
 //  bankswitch -
 //-------------------------------------------------
 
-void cbm2_state::bankswitch(offs_t offset, int busy2, int eras, int ecas, int refen, int cas, int ras, int *sysioen, int *dramen,
+void cbm2_state::bankswitch(offs_t offset, int eras, int ecas, int refen, int cas, int ras, int *sysioen, int *dramen,
 	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *buframcs, int *extbufcs, int *vidramcs,
 	int *diskromcs, int *csbank1, int *csbank2, int *csbank3, int *basiccs, int *knbcs, int *kernalcs,
 	int *crtccs, int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs)
 {
 	int rasseg1 = 1, rasseg2 = 1, rasseg3 = 1, rasseg4 = 1;
 
-	this->read_pla(offset, ras, cas, refen, eras, ecas, busy2, casseg1, casseg2, casseg3, casseg4, &rasseg1, &rasseg2, &rasseg3, &rasseg4);
+	this->read_pla(offset, ras, cas, refen, eras, ecas, casseg1, casseg2, casseg3, casseg4, &rasseg1, &rasseg2, &rasseg3, &rasseg4);
 
-	int busen1 = m_dramon;
 	int decoden = 0;
-	*sysioen = !(P0 && P1 && P2 && P3) && busen1;
-	*dramen = !((!(P0 && P1 && P2 && P3)) && busen1);
+	*sysioen = !(P0 && P1 && P2 && P3) && m_busen1;
+	*dramen = !((!(P0 && P1 && P2 && P3)) && m_busen1);
 
 	if (!decoden && !*sysioen)
 	{
@@ -151,12 +150,12 @@ void cbm2_state::bankswitch(offs_t offset, int busy2, int eras, int ecas, int re
 
 READ8_MEMBER( cbm2_state::read )
 {
-	int busy2 = 1, eras = 1, ecas = 1, refen = 0, cas = 0, ras = 1, sysioen = 1, dramen = 1;
+	int eras = 1, ecas = 0, refen = 0, cas = 0, ras = 1, sysioen = 1, dramen = 1;
 	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, buframcs = 1, extbufcs = 1, vidramcs = 1;
 	int diskromcs = 1, csbank1 = 1, csbank2 = 1, csbank3 = 1, basiccs = 1, knbcs = 1, kernalcs = 1;
 	int crtccs = 1, cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
 
-	bankswitch(offset, busy2, eras, ecas, refen, cas, ras, &sysioen, &dramen,
+	bankswitch(offset, eras, ecas, refen, cas, ras, &sysioen, &dramen,
 		&casseg1, &casseg2, &casseg3, &casseg4, &buframcs, &extbufcs, &vidramcs,
 		&diskromcs, &csbank1, &csbank2, &csbank3, &basiccs, &knbcs, &kernalcs,
 		&crtccs, &cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs);
@@ -189,6 +188,10 @@ READ8_MEMBER( cbm2_state::read )
 		{
 			data = m_buffer_ram[offset & 0x7ff];
 		}
+		if (!extbufcs && m_extbuf_ram)
+		{
+			data = m_extbuf_ram[offset & 0x7ff];
+		}
 		if (!vidramcs)
 		{
 			data = m_video_ram[offset & 0x7ff];
@@ -215,6 +218,10 @@ READ8_MEMBER( cbm2_state::read )
 		if (!sidcs)
 		{
 			data = m_sid->read(space, offset & 0x1f);
+		}
+		if (!extprtcs && m_ext_cia)
+		{
+			data = m_ext_cia->read(space, offset & 0x0f);
 		}
 		if (!ciacs)
 		{
@@ -246,12 +253,12 @@ READ8_MEMBER( cbm2_state::read )
 
 WRITE8_MEMBER( cbm2_state::write )
 {
-	int busy2 = 1, eras = 1, ecas = 1, refen = 0, cas = 0, ras = 1, sysioen = 1, dramen = 1;
+	int eras = 1, ecas = 0, refen = 0, cas = 0, ras = 1, sysioen = 1, dramen = 1;
 	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, buframcs = 1, extbufcs = 1, vidramcs = 1;
 	int diskromcs = 1, csbank1 = 1, csbank2 = 1, csbank3 = 1, basiccs = 1, knbcs = 1, kernalcs = 1;
 	int crtccs = 1, cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
 
-	bankswitch(offset, busy2, eras, ecas, refen, cas, ras, &sysioen, &dramen,
+	bankswitch(offset, eras, ecas, refen, cas, ras, &sysioen, &dramen,
 		&casseg1, &casseg2, &casseg3, &casseg4, &buframcs, &extbufcs, &vidramcs,
 		&diskromcs, &csbank1, &csbank2, &csbank3, &basiccs, &knbcs, &kernalcs,
 		&crtccs, &cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs);
@@ -282,6 +289,10 @@ WRITE8_MEMBER( cbm2_state::write )
 		{
 			m_buffer_ram[offset & 0x7ff] = data;
 		}
+		if (!extbufcs && m_extbuf_ram)
+		{
+			m_extbuf_ram[offset & 0x7ff] = data;	
+		}
 		if (!vidramcs)
 		{
 			m_video_ram[offset & 0x7ff] = data;
@@ -301,6 +312,10 @@ WRITE8_MEMBER( cbm2_state::write )
 		{
 			m_sid->write(space, offset & 0x1f, data);
 		}
+		if (!extprtcs && m_ext_cia)
+		{
+			m_ext_cia->write(space, offset & 0x0f, data);
+		}
 		if (!ciacs)
 		{
 			m_cia->write(space, offset & 0x0f, data);
@@ -319,6 +334,70 @@ WRITE8_MEMBER( cbm2_state::write )
 		}
 
 		m_exp->write(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
+	}	
+}
+
+
+//-------------------------------------------------
+//  ext_read -
+//-------------------------------------------------
+
+READ8_MEMBER( cbm2_state::ext_read )
+{
+	int ras = 1, cas = 1, refen = 1, eras = 1, ecas = 0;
+	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, rasseg1 = 1, rasseg2 = 1, rasseg3 = 1, rasseg4 = 1;
+
+	this->read_pla(offset, ras, cas, refen, eras, ecas, &casseg1, &casseg2, &casseg3, &casseg4, &rasseg1, &rasseg2, &rasseg3, &rasseg4);
+
+	UINT8 data = 0xff;
+
+	if (!casseg1)
+	{
+		data = m_ram->pointer()[offset & 0xffff];
+	}
+	if (!casseg2)
+	{
+		data = m_ram->pointer()[0x10000 | (offset & 0xffff)];
+	}
+	if (!casseg3 && (m_ram->size() > 0x20000))
+	{
+		data = m_ram->pointer()[0x20000 | (offset & 0xffff)];
+	}
+	if (!casseg4 && (m_ram->size() > 0x30000))
+	{
+		data = m_ram->pointer()[0x30000 | (offset & 0xffff)];
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  ext_write -
+//-------------------------------------------------
+
+WRITE8_MEMBER( cbm2_state::ext_write )
+{
+	int ras = 1, cas = 1, refen = 1, eras = 1, ecas = 0;
+	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, rasseg1 = 1, rasseg2 = 1, rasseg3 = 1, rasseg4 = 1;
+
+	this->read_pla(offset, ras, cas, refen, eras, ecas, &casseg1, &casseg2, &casseg3, &casseg4, &rasseg1, &rasseg2, &rasseg3, &rasseg4);
+
+	if (!casseg1)
+	{
+		m_ram->pointer()[offset & 0xffff] = data;
+	}
+	if (!casseg2)
+	{
+		m_ram->pointer()[0x10000 | (offset & 0xffff)] = data;
+	}
+	if (!casseg3 && (m_ram->size() > 0x20000))
+	{
+		m_ram->pointer()[0x20000 | (offset & 0xffff)] = data;
+	}
+	if (!casseg4 && (m_ram->size() > 0x30000))
+	{
+		m_ram->pointer()[0x30000 | (offset & 0xffff)] = data;
 	}
 }
 
@@ -750,6 +829,27 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
+//  ADDRESS_MAP( ext_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( ext_mem, AS_PROGRAM, 8, cbm2_state )
+	AM_RANGE(0x00000, 0xeffff) AM_READWRITE(ext_read, ext_write)
+	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0xf000) AM_ROM AM_REGION(EXT_I8088_TAG, 0)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( ext_io )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( ext_io, AS_IO, 8, cbm2_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x0000, 0x0001) AM_MIRROR(0x1e) AM_DEVREADWRITE_LEGACY(EXT_I8259A_TAG, pic8259_r, pic8259_w)
+	AM_RANGE(0x0020, 0x0027) AM_MIRROR(0x18) AM_DEVREADWRITE(EXT_MOS6525_TAG, tpi6525_device, read, write)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
 //  ADDRESS_MAP( p500_mem )
 //-------------------------------------------------
 
@@ -975,7 +1075,7 @@ INPUT_PORTS_END
 //  mc6845_interface crtc_intf
 //-------------------------------------------------
 
-static MC6845_UPDATE_ROW( lp_crtc_update_row )
+static MC6845_UPDATE_ROW( crtc_update_row )
 {
 	cbm2_state *state = device->machine().driver_data<cbm2_state>();
 
@@ -987,65 +1087,24 @@ static MC6845_UPDATE_ROW( lp_crtc_update_row )
 		offs_t char_rom_addr = (ma & 0x1000) | (state->m_graphics << 11) | ((code & 0x7f) << 4) | (ra & 0x0f);
 		UINT8 data = state->m_charom[char_rom_addr & 0xfff];
 
-		for (int bit = 0; bit < 8; bit++)
+		for (int bit = 0; bit < 9; bit++)
 		{
 			int color = BIT(data, 7) ^ BIT(code, 7) ^ BIT(ma, 13);
 			if (cursor_x == column) color ^= 1;
 
 			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[color];
 
-			data <<= 1;
+			if (bit < 8 || !state->m_graphics) data <<= 1;
 		}
 	}
 }
 
-static const mc6845_interface lp_crtc_intf =
-{
-	SCREEN_TAG,
-	8,
-	NULL,
-	lp_crtc_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
-
-static MC6845_UPDATE_ROW( hp_crtc_update_row )
-{
-	cbm2_state *state = device->machine().driver_data<cbm2_state>();
-
-	int x = 0;
-
-	for (int column = 0; column < x_count; column++)
-	{
-		UINT8 code = state->m_video_ram[(ma + column) & 0x7ff];
-		offs_t char_rom_addr = (ma & 0x1000) | (state->m_graphics << 11) | ((code & 0x7f) << 4) | (ra & 0x0f);
-		UINT8 data = state->m_charom[char_rom_addr & 0xfff];
-
-		for (int bit = 0; bit < 8; bit++)
-		{
-			int color = BIT(data, 7) ^ BIT(code, 7) ^ BIT(ma, 13);
-			if (cursor_x == column) color ^= 1;
-
-			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[color];
-
-			data <<= 1;
-		}
-
-		bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[BIT(code, 7) ^ BIT(ma, 13)];
-	}
-}
-
-static const mc6845_interface hp_crtc_intf =
+static const mc6845_interface crtc_intf =
 {
 	SCREEN_TAG,
 	9,
 	NULL,
-	hp_crtc_update_row,
+	crtc_update_row,
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1053,6 +1112,7 @@ static const mc6845_interface hp_crtc_intf =
 	DEVCB_NULL,
 	NULL
 };
+
 
 //-------------------------------------------------
 //  vic2_interface vic_intf
@@ -1252,6 +1312,7 @@ WRITE8_MEMBER( cbm2_state::tpi1_pb_w )
 
 	// memory
 	m_dramon = BIT(data, 4);
+	if (m_busy2) m_busen1 = m_dramon;
 
 	// cassette
 	m_cassette->write(BIT(data, 5));
@@ -1653,6 +1714,194 @@ static IEEE488_INTERFACE( ieee488_intf )
 };
 
 
+//-------------------------------------------------
+//  pic8259_interface ext_pic_intf
+//-------------------------------------------------
+
+static IRQ_CALLBACK( pic_irq_callback )
+{
+	cbm2_state *state = device->machine().driver_data<cbm2_state>();
+
+	return pic8259_acknowledge(state->m_ext_pic);
+}
+
+static pic8259_interface ext_pic_intf =
+{
+	DEVCB_CPU_INPUT_LINE(EXT_I8088_TAG, INPUT_LINE_IRQ0),
+	DEVCB_LINE_VCC,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  tpi6525_interface ext_tpi_intf
+//-------------------------------------------------
+
+READ8_MEMBER( cbm2_state::ext_tpi_pb_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       _BUSY1
+	    1       CIA PB1
+	    2       CIA PB2
+	    3       CIA PB3
+	    4       CIA PB4
+	    5       CIA PB5
+	    6       1
+	    7       1
+	
+	*/
+
+	UINT8 data = 0xc0;
+
+	// _BUSY1
+	data |= !m_busen1;
+
+	// CIA
+	data = m_ext_cia->pb_r() & 0x3e;
+
+	return data;
+}
+
+WRITE8_MEMBER( cbm2_state::ext_tpi_pb_w )
+{
+	/*
+	
+	    bit     description
+	
+	    0       U22B CL
+	    1       
+	    2       
+	    3       
+	    4       
+	    5       
+	    6       CIA FLAG
+	    7       
+	
+	*/
+
+	// _BUSY2
+	if (!BIT(data, 0))
+	{
+		m_busy2 = 1;
+		m_busen1 = m_dramon;
+	}
+
+	m_ext_cia->flag_w(BIT(data, 6));
+}
+
+WRITE8_MEMBER( cbm2_state::ext_tpi_pc_w )
+{
+	/*
+	
+	    bit     description
+	
+	    0       
+	    1       
+	    2       
+	    3       
+	    4       
+	    5       U22 CLK
+	    6       
+	    7       
+	
+	*/
+}
+
+static const tpi6525_interface ext_tpi_intf =
+{
+	DEVCB_NULL,
+	DEVCB_DEVICE_MEMBER(EXT_MOS6526_TAG, mos6526_device, pa_r),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(cbm2_state, ext_tpi_pb_r),
+	DEVCB_DRIVER_MEMBER(cbm2_state, ext_tpi_pb_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(cbm2_state, ext_tpi_pc_w),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  MOS6526_INTERFACE( ext_cia_intf )
+//-------------------------------------------------
+
+READ8_MEMBER( cbm2_state::ext_cia_pb_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       _BUSY1
+	    1       TPI PB1
+	    2       TPI PB2
+	    3       TPI PB3
+	    4       TPI PB4
+	    5       TPI PB5
+	    6       1
+	    7       1
+	
+	*/
+
+	UINT8 data = 0xc0;
+
+	// _BUSY1
+	data |= !m_busen1;
+
+	// TPI
+	data |= tpi6525_portb_r(m_ext_tpi, space, 0) & 0x3e;
+
+	return data;
+}
+
+WRITE8_MEMBER( cbm2_state::ext_cia_pb_w )
+{
+	/*
+	
+	    bit     description
+	
+	    0       U22B CL
+	    1       
+	    2       
+	    3       
+	    4       
+	    5       
+	    6       PIC IR0, U29B CL, U22B PR
+	    7       PIC IR7
+	
+	*/
+
+	// _BUSY2
+	if (!BIT(data, 0))
+	{
+		m_busy2 = 1;
+		m_busen1 = m_dramon;
+	}
+	else if (!BIT(data, 6))
+	{
+		m_busy2 = 0;
+		m_busen1 = 0;
+	}
+
+	pic8259_ir0_w(m_ext_pic, !BIT(data, 6));
+	pic8259_ir7_w(m_ext_pic, BIT(data, 7));
+}
+
+static MOS6526_INTERFACE( ext_cia_intf )
+{
+	DEVCB_DEVICE_LINE_MEMBER(MOS6525_1_TAG, tpi6525_device, i3_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER(EXT_MOS6525_TAG, tpi6525_porta_r),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(cbm2_state, ext_cia_pb_r),
+	DEVCB_DRIVER_MEMBER(cbm2_state, ext_cia_pb_w)
+};
+
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -1665,6 +1914,8 @@ static IEEE488_INTERFACE( ieee488_intf )
 void cbm2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	m_tpi1->i0_w(m_todclk);
+
+	if (m_ext_pic) pic8259_ir2_w(m_ext_pic, m_todclk);
 
 	m_todclk = !m_todclk;
 }
@@ -1693,6 +1944,8 @@ MACHINE_START_MEMBER( cbm2_state, cbm2 )
 
 	// state saving
 	save_item(NAME(m_dramon));
+	save_item(NAME(m_busen1));
+	save_item(NAME(m_busy2));
 	save_item(NAME(m_graphics));
 	save_item(NAME(m_ntsc));
 	save_item(NAME(m_todclk));
@@ -1726,6 +1979,38 @@ MACHINE_START_MEMBER( cbm2_state, cbm2_pal )
 	m_ntsc = 0;
 
 	MACHINE_START_CALL_MEMBER(cbm2);
+}
+
+
+//-------------------------------------------------
+//  MACHINE_START( cbm2x_ntsc )
+//-------------------------------------------------
+
+MACHINE_START_MEMBER( cbm2_state, cbm2x_ntsc )
+{
+	// register CPU IRQ callback
+	m_ext_cpu->set_irq_acknowledge_callback(pic_irq_callback);
+
+	// allocate memory
+	m_extbuf_ram.allocate(0x800);
+
+	MACHINE_START_CALL_MEMBER(cbm2_ntsc);
+}
+
+
+//-------------------------------------------------
+//  MACHINE_START( cbm2x_pal )
+//-------------------------------------------------
+
+MACHINE_START_MEMBER( cbm2_state, cbm2x_pal )
+{
+	// register CPU IRQ callback
+	m_ext_cpu->set_irq_acknowledge_callback(pic_irq_callback);
+
+	// allocate memory
+	m_extbuf_ram.allocate(0x800);
+
+	MACHINE_START_CALL_MEMBER(cbm2_pal);
 }
 
 
@@ -1781,6 +2066,8 @@ MACHINE_START_MEMBER( p500_state, p500_pal )
 MACHINE_RESET_MEMBER( cbm2_state, cbm2 )
 {
 	m_dramon = 1;
+	m_busen1 = 1;
+	m_busy2 = 1;
 	m_graphics = 1;
 	m_tpi1_irq = CLEAR_LINE;
 	m_cass_rd = 1;
@@ -1877,7 +2164,6 @@ static MACHINE_CONFIG_START( p500_ntsc, p500_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, VIC6567_CLOCK, cbm2_expansion_cards, NULL, NULL)
 	//MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, user_intf, cbm2_user_port_cards, NULL, NULL)
-	//MCFG_CBM2_SYSTEM_PORT_ADD(CBM2_SYSTEM_PORT_TAG, system_intf, cbm2_system_port_cards, NULL, NULL)
 
 	// internal ram
 	MCFG_FRAGMENT_ADD(128k)
@@ -1927,7 +2213,6 @@ static MACHINE_CONFIG_START( p500_pal, p500_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, VIC6569_CLOCK, cbm2_expansion_cards, NULL, NULL)
 	//MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, user_intf, cbm2_user_port_cards, NULL, NULL)
-	//MCFG_CBM2_SYSTEM_PORT_ADD(CBM2_SYSTEM_PORT_TAG, system_intf, cbm2_system_port_cards, NULL, NULL)
 
 	// internal ram
 	MCFG_FRAGMENT_ADD(128k)
@@ -1960,7 +2245,7 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	MCFG_SCREEN_SIZE(768, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 312-1)
 
-	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, XTAL_18MHz/9, lp_crtc_intf)
+	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, XTAL_18MHz/9, crtc_intf)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1984,7 +2269,6 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL_18MHz/9, cbm2_expansion_cards, NULL, NULL)
 	//MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, user_intf, cbm2_user_port_cards, NULL, NULL)
-	//MCFG_CBM2_SYSTEM_PORT_ADD(CBM2_SYSTEM_PORT_TAG, system_intf, cbm2_system_port_cards, NULL, NULL)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "cbm2_flop")
@@ -2053,9 +2337,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( cbm2hp_ntsc, cbm2hp_state )
 	MCFG_FRAGMENT_ADD(cbm2lp_ntsc)
 
-	MCFG_DEVICE_REMOVE(MC68B45_TAG)
-	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, XTAL_18MHz/9, hp_crtc_intf)
-
 	// devices
 	MCFG_DEVICE_REMOVE(MOS6525_2_TAG)
 	MCFG_TPI6525_ADD(MOS6525_2_TAG, hp_tpi2_intf)
@@ -2089,8 +2370,15 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( bx256hp, cbm2hp_state )
 	MCFG_FRAGMENT_ADD(b256hp)
 
-	//MCFG_DEVICE_REMOVE(CBM2_SYSTEM_PORT_TAG)
-	//MCFG_CBM2_SYSTEM_PORT_ADD(CBM2_SYSTEM_PORT_TAG, system_intf, cbm2_system_port_cards, "8088", NULL)
+	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_ntsc)
+
+	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL_12MHz)
+	MCFG_CPU_PROGRAM_MAP(ext_mem)
+	MCFG_CPU_IO_MAP(ext_io)
+
+	MCFG_PIC8259_ADD(EXT_I8259A_TAG, ext_pic_intf)
+	MCFG_TPI6525_ADD(EXT_MOS6525_TAG, ext_tpi_intf)
+	MCFG_MOS6526_ADD(EXT_MOS6526_TAG, XTAL_18MHz/9, 50, ext_cia_intf)
 MACHINE_CONFIG_END
 
 
@@ -2139,8 +2427,15 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( cbm730, cbm2hp_state )
 	MCFG_FRAGMENT_ADD(cbm720)
 
-	//MCFG_DEVICE_REMOVE(CBM2_SYSTEM_PORT_TAG)
-	//MCFG_CBM2_SYSTEM_PORT_ADD(CBM2_SYSTEM_PORT_TAG, system_intf, cbm2_system_port_cards, "8088", NULL)
+	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_pal)
+
+	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL_12MHz)
+	MCFG_CPU_PROGRAM_MAP(ext_mem)
+	MCFG_CPU_IO_MAP(ext_io)
+
+	MCFG_PIC8259_ADD(EXT_I8259A_TAG, ext_pic_intf)
+	MCFG_TPI6525_ADD(EXT_MOS6525_TAG, ext_tpi_intf)
+	MCFG_MOS6526_ADD(EXT_MOS6526_TAG, XTAL_18MHz/9, 60, ext_cia_intf)
 MACHINE_CONFIG_END
 
 
@@ -2347,7 +2642,7 @@ ROM_START( bx256hp )
 	ROM_LOAD( "901241-03.u59", 0x0000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42) )
 	ROM_LOAD( "901240-03.u60", 0x2000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce) )
 
-	ROM_REGION( 0x1000, "8088", 0)
+	ROM_REGION( 0x1000, EXT_I8088_TAG, 0)
 	ROM_LOAD( "8088.u14", 0x0000, 0x1000, CRC(195e0281) SHA1(ce8acd2a5fb6cbd70d837811d856d656544a1f97) )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
