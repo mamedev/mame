@@ -77,10 +77,10 @@ public:
 
 
 
-class ami1200_state : public amiga_state
+class a1200_state : public amiga_state
 {
 public:
-	ami1200_state(const machine_config &mconfig, device_type type, const char *tag)
+	a1200_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag) { }
 
 	UINT16 m_potgo_value;
@@ -166,7 +166,7 @@ static ADDRESS_MAP_START(amiga_mem, AS_PROGRAM, 16, amiga_state )
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* System ROM - mirror */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( a1200_map, AS_PROGRAM, 32, ami1200_state )
+static ADDRESS_MAP_START( a1200_map, AS_PROGRAM, 32, a1200_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
 	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( a1200_map, AS_PROGRAM, 32, ami1200_state )
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* Kickstart */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amiga_mem32, AS_PROGRAM, 32, ami1200_state )
+static ADDRESS_MAP_START( amiga_mem32, AS_PROGRAM, 32, a1200_state )
 	ADDRESS_MAP_UNMAP_HIGH
 //	ADDRESS_MAP_GLOBAL_MASK(0xffffff) // not sure
 	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
@@ -349,9 +349,9 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 
-static void handle_cd32_joystick_cia(ami1200_state *state, UINT8 pra, UINT8 dra);
+static void handle_cd32_joystick_cia(a1200_state *state, UINT8 pra, UINT8 dra);
 
-WRITE32_MEMBER(ami1200_state::aga_overlay_w)
+WRITE32_MEMBER(a1200_state::aga_overlay_w)
 {
 	if (ACCESSING_BITS_16_23)
 	{
@@ -385,7 +385,7 @@ WRITE32_MEMBER(ami1200_state::aga_overlay_w)
  *
  *************************************/
 
-WRITE8_MEMBER(ami1200_state::ami1200_cia_0_porta_w)
+WRITE8_MEMBER(a1200_state::ami1200_cia_0_porta_w)
 {
 	device_t *device = machine().device("cia_0");
 
@@ -418,7 +418,7 @@ WRITE8_MEMBER(ami1200_state::ami1200_cia_0_porta_w)
 #if 0
 static void cd32_potgo_w(running_machine &machine, UINT16 data)
 {
-	ami1200_state *state = machine.driver_data<ami1200_state>();
+	a1200_state *state = machine.driver_data<a1200_state>();
 	int i;
 
 	state->m_potgo_value = state->m_potgo_value & 0x5500;
@@ -444,7 +444,7 @@ static void cd32_potgo_w(running_machine &machine, UINT16 data)
 }
 #endif
 
-static void handle_cd32_joystick_cia(ami1200_state *state, UINT8 pra, UINT8 dra)
+static void handle_cd32_joystick_cia(a1200_state *state, UINT8 pra, UINT8 dra)
 {
 	int i;
 
@@ -471,14 +471,14 @@ static void handle_cd32_joystick_cia(ami1200_state *state, UINT8 pra, UINT8 dra)
 
 
 
-READ8_MEMBER(ami1200_state::ami1200_cia_0_portb_r)
+READ8_MEMBER(a1200_state::ami1200_cia_0_portb_r)
 {
 	/* parallel port */
 	logerror("%s:CIA0_portb_r\n", machine().describe_context());
 	return 0xff;
 }
 
-WRITE8_MEMBER(ami1200_state::ami1200_cia_0_portb_w)
+WRITE8_MEMBER(a1200_state::ami1200_cia_0_portb_w)
 {
 	/* parallel port */
 	logerror("%s:CIA0_portb_w(%02x)\n", machine().describe_context(), data);
@@ -573,7 +573,7 @@ static const tpi6525_interface cdtv_tpi_intf =
 	DEVCB_NULL
 };
 
-READ8_MEMBER(ami1200_state::a1200_cia_0_portA_r)
+READ8_MEMBER(a1200_state::a1200_cia_0_portA_r)
 {
 	UINT8 ret = machine().root_device().ioport("CIA0PORTA")->read() & 0xc0;	/* Gameport 1 and 0 buttons */
 	ret |= machine().device<amiga_fdc>("fdc")->ciaapra_r();
@@ -587,10 +587,10 @@ static const legacy_mos6526_interface a1200_cia_0_intf =
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ami1200_state,a1200_cia_0_portA_r),
-	DEVCB_DRIVER_MEMBER(ami1200_state,ami1200_cia_0_porta_w),		/* port A */
-	DEVCB_DRIVER_MEMBER(ami1200_state,ami1200_cia_0_portb_r),
-	DEVCB_DRIVER_MEMBER(ami1200_state,ami1200_cia_0_portb_w)		/* port B */
+	DEVCB_DRIVER_MEMBER(a1200_state,a1200_cia_0_portA_r),
+	DEVCB_DRIVER_MEMBER(a1200_state,ami1200_cia_0_porta_w),		/* port A */
+	DEVCB_DRIVER_MEMBER(a1200_state,ami1200_cia_0_portb_r),
+	DEVCB_DRIVER_MEMBER(a1200_state,ami1200_cia_0_portb_w)		/* port B */
 };
 
 static const legacy_mos6526_interface a1200_cia_1_intf =
@@ -674,12 +674,12 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 	MCFG_AMIGA_KEYBOARD_ADD("kbd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a1000n, ntsc )
+static MACHINE_CONFIG_DERIVED( a1000ntsc, ntsc )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(a1000_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a500n, ntsc )
+static MACHINE_CONFIG_DERIVED( a500ntsc, ntsc )
 	MCFG_FRAGMENT_ADD(amiga_cartslot)
 	MCFG_SOFTWARE_LIST_ADD("flop_common","amiga_flop")
 MACHINE_CONFIG_END
@@ -766,47 +766,47 @@ MACHINE_CONFIG_END
 
 /* Amiga 1000 */
 
-static MACHINE_CONFIG_DERIVED( ami1000, a1000p )
+static MACHINE_CONFIG_DERIVED( a1000, a1000p )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga1000_flop")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ami1000n, a1000n )
+static MACHINE_CONFIG_DERIVED( a1000n, a1000ntsc )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga1000_flop")
 MACHINE_CONFIG_END
 
 /* Amiga 500 */
 
-static MACHINE_CONFIG_DERIVED( ami500, a500p )
+static MACHINE_CONFIG_DERIVED( a500, a500p )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga500_flop")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ami500n, a500n )
+static MACHINE_CONFIG_DERIVED( a500n, a500ntsc )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga500_flop")
 MACHINE_CONFIG_END
 
 /* Amiga 500 Plus */
 
-static MACHINE_CONFIG_DERIVED( ami500pls, a500p )
+static MACHINE_CONFIG_DERIVED( a500pls, a500p )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga500plus_flop")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ami500plsn, a500n )
+static MACHINE_CONFIG_DERIVED( a500plsn, a500ntsc )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga500plus_flop")
 MACHINE_CONFIG_END
 
 /* Amiga 600 */
 
-static MACHINE_CONFIG_DERIVED( ami600, a500p )
+static MACHINE_CONFIG_DERIVED( a600, a500p )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga600_flop")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ami600n, a500n )
+static MACHINE_CONFIG_DERIVED( a600n, a500ntsc )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga600_flop")
 MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( a1200n, ami1200_state )
+static MACHINE_CONFIG_START( a1200n, a1200_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, AMIGA_68EC020_NTSC_CLOCK) /* 14.3 Mhz */
@@ -823,9 +823,9 @@ static MACHINE_CONFIG_START( a1200n, ami1200_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512*2, 312)
 	MCFG_SCREEN_VISIBLE_AREA((129-8-8)*2, (449+8-1+8)*2, 44-8, 300+8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ami1200_state, screen_update_amiga_aga)
+	MCFG_SCREEN_UPDATE_DRIVER(a1200_state, screen_update_amiga_aga)
 
-	MCFG_VIDEO_START_OVERRIDE(ami1200_state,amiga_aga)
+	MCFG_VIDEO_START_OVERRIDE(a1200_state,amiga_aga)
 
 
 	MCFG_PALETTE_LENGTH(4096)
@@ -1107,7 +1107,7 @@ DRIVER_INIT_MEMBER(amiga_state,cdtv)
 	membank("bank1")->configure_entry(1, machine().root_device().memregion("user1")->base());
 }
 
-DRIVER_INIT_MEMBER(ami1200_state,a1200)
+DRIVER_INIT_MEMBER(a1200_state,a1200)
 {
 	static const amiga_machine_interface cd32_intf =
 	{
@@ -1157,7 +1157,7 @@ DRIVER_INIT_MEMBER(amiga_state,a3000)
     ROM DEFINITIONS
 ***************************************************************************/
 
-ROM_START( ami1000 )
+ROM_START( a1000 )
 	ROM_REGION16_BE(0x080000, "user1", 0)
 	ROM_LOAD16_BYTE("252179-01.u5n", 0x000000, 0x001000, CRC(42553bc4) SHA1(8855a97f7a44e3f62d1c88d938fee1f4c606af5b))
 	ROM_LOAD16_BYTE("252180-01.u5p", 0x000001, 0x001000, CRC(8e5b9a37) SHA1(d10f1564b99f5ffe108fa042362e877f569de2c3))
@@ -1169,11 +1169,11 @@ ROM_START( ami1000 )
 	ROM_LOAD("328191-01.bin", 0x000, 0x800, NO_DUMP)
 ROM_END
 
-#define rom_ami1000n    rom_ami1000
+#define rom_a1000n    rom_a1000
 
 
 
-ROM_START( ami500 )
+ROM_START( a500 )
 	ROM_REGION16_BE(0x080000, "user1", 0)
 	ROM_DEFAULT_BIOS("kick13")
 
@@ -1197,9 +1197,9 @@ ROM_START( ami500 )
 	ROM_LOAD("328191-02.ic1", 0x000, 0x800, NO_DUMP)
 ROM_END
 
-#define rom_ami500n    rom_ami500
+#define rom_a500n    rom_a500
 
-ROM_START( ami500pl )
+ROM_START( a500pl )
 	ROM_REGION16_BE(0x080000, "user1", 0)
 	ROM_DEFAULT_BIOS("kick204")
 
@@ -1215,9 +1215,9 @@ ROM_START( ami500pl )
 	ROM_LOAD("328191-02.ic1", 0x000, 0x800, NO_DUMP)
 ROM_END
 
-#define rom_ami500pln    rom_ami500pl
+#define rom_a500pln    rom_a500pl
 
-ROM_START( ami600 )
+ROM_START( a600 )
 	ROM_REGION16_BE(0x080000, "user1", 0)
 	ROM_DEFAULT_BIOS("kick205")
 
@@ -1239,10 +1239,10 @@ ROM_START( ami600 )
 	ROM_LOAD("328191-02.ic1", 0x000, 0x800, NO_DUMP)
 ROM_END
 
-#define rom_ami600n    rom_ami600
+#define rom_a600n    rom_a600
 
 
-ROM_START( ami1200 )
+ROM_START( a1200 )
 	ROM_REGION32_BE(0x080000, "user1", 0)
 	ROM_DEFAULT_BIOS("kick31")
 	ROM_SYSTEM_BIOS(0, "kick30", "Kickstart 3.0 (39.106)")
@@ -1263,10 +1263,10 @@ ROM_START( ami1200 )
 	ROM_LOAD("391508-02.u13", 0x0000, 0x2f40, NO_DUMP)
 ROM_END
 
-#define rom_ami1200n    rom_ami1200
+#define rom_a1200n    rom_a1200
 
 /* Note: I think those ROMs are correct, but they should be verified */
-ROM_START( ami3000 )
+ROM_START( a3000 )
 	ROM_REGION32_BE(0x80000, "user1", 0)
 	ROM_DEFAULT_BIOS("kick14")
 	ROM_SYSTEM_BIOS(0, "kick14", "Kickstart 1.4 (36.16)")
@@ -1285,7 +1285,7 @@ ROM_START( ami3000 )
 	ROM_LOAD("keyboard", 0x0000, 0x1040, NO_DUMP)
 ROM_END
 
-#define rom_ami3000n    rom_ami3000
+#define rom_a3000n    rom_a3000
 
 ROM_START( cdtv )
 	ROM_REGION16_BE(0x100000, "user1", 0)
@@ -1312,31 +1312,31 @@ ROM_END
 
 /* High-end market line */
 
-COMP( 1985, ami1000,   0,        0,      ami1000,  amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 1000 (PAL)",      GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-COMP( 1985, ami1000n,  ami1000,  0,      ami1000n, amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 1000 (NTSC)",     GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+COMP( 1985, a1000,   0,      0,     a1000,  amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 1000 (PAL)",      GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+COMP( 1985, a1000n,  a1000,  0,     a1000n, amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 1000 (NTSC)",     GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 
 
 
 /* Low-end market line */
 
-COMP( 1987, ami500,    0,        0,      ami500,      amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 500 (PAL, OCS)",  GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-COMP( 1987, ami500n,   ami500,   0,      ami500n,     amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 500 (NTSC, OCS)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+COMP( 1987, a500,    0,      0,      a500,      amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 500 (PAL, OCS)",  GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+COMP( 1987, a500n,   a500,   0,      a500n,     amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 500 (NTSC, OCS)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 
-COMP( 1991, ami500pl,  0,        0,      ami500pls,   amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 500+ (PAL, ECS)",  GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-COMP( 1991, ami500pln, ami500pl, 0,      ami500plsn,  amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 500+ (NTSC, ECS)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+COMP( 1991, a500pl,  0,      0,      a500pls,   amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 500+ (PAL, ECS)",  GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+COMP( 1991, a500pln, a500pl, 0,      a500plsn,  amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 500+ (NTSC, ECS)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 
-COMP( 1992, ami600,    0,        0,      ami600,      amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 600 (PAL, ECS)",  GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-COMP( 1992, ami600n,   ami600,   0,      ami600n,     amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 600 (NTSC, ECS)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+COMP( 1992, a600,    0,      0,      a600,      amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 600 (PAL, ECS)",  GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+COMP( 1992, a600n,   a600,   0,      a600n,     amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 600 (NTSC, ECS)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 
-COMP( 1992, ami1200,   0,        0,      a1200,  amiga, ami1200_state,  a1200,  "Commodore Business Machines",  "Amiga 1200 (PAL, AGA)" , GAME_NOT_WORKING  )
-COMP( 1992, ami1200n,  ami1200,  0,      a1200n, amiga, ami1200_state,  a1200,  "Commodore Business Machines",  "Amiga 1200 (NTSC, AGA)" , GAME_NOT_WORKING )
+COMP( 1992, a1200,   0,      0,      a1200,  	amiga, a1200_state,a1200,  "Commodore Business Machines",  "Amiga 1200 (PAL, AGA)" , GAME_NOT_WORKING  )
+COMP( 1992, a1200n,  a1200,  0,      a1200n,	amiga, a1200_state,a1200,  "Commodore Business Machines",  "Amiga 1200 (NTSC, AGA)" , GAME_NOT_WORKING )
 
-COMP( 1992, ami3000,   0,        0,      a3000,  amiga, amiga_state,  a3000,  "Commodore Business Machines",  "Amiga 3000 (PAL, ECS, 68030)" , GAME_NOT_WORKING  )
-COMP( 1992, ami3000n,  ami3000,  0,      a3000n, amiga, amiga_state,  a3000,  "Commodore Business Machines",  "Amiga 3000 (NTSC, ECS, 68030)" , GAME_NOT_WORKING )
+COMP( 1992, a3000,   0,      0,      a3000,  	amiga, amiga_state,  a3000,  "Commodore Business Machines",  "Amiga 3000 (PAL, ECS, 68030)" , GAME_NOT_WORKING  )
+COMP( 1992, a3000n,  a3000,  0,      a3000n,	amiga, amiga_state,  a3000,  "Commodore Business Machines",  "Amiga 3000 (NTSC, ECS, 68030)" , GAME_NOT_WORKING )
 
 
 
-COMP( 1991, cdtv,   0,      0,      cdtv,   cdtv, amiga_state,   cdtv,   "Commodore Business Machines",  "CDTV (NTSC)",           GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+COMP( 1991, cdtv,   0,       0,      cdtv,  	cdtv,  amiga_state,   cdtv,   "Commodore Business Machines",  "CDTV (NTSC)",           GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 
 /* other official models */
 /* Amiga 2000 - similar to 1000 */

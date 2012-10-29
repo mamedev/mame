@@ -646,20 +646,20 @@ c128dcr_de
 c128dcr_se
 c128d81
 
-ami1000	  // Commodore Amiga 1000
-ami1000n  //
-ami500	  // Commodore Amiga 500
-ami500n	  //
-ami500pl  // Commodore Amiga 500+
-ami500pln //
-ami600    // Commodore Amiga 600
-ami600n   //
-ami3000   // Commodore Amiga 3000
-ami3000n  //
-ami1200	  // Commodore Amiga 1200
-ami1200n  // 
-cdtv	  // Commodore CDTV
-cd32	  // Commodore Amiga CD32
+a1000	// Commodore Amiga 1000
+a1000n  //
+a500	// Commodore Amiga 500
+a500n	//
+a500pl  // Commodore Amiga 500+
+a500pln //
+a600    // Commodore Amiga 600
+a600n   //
+a3000   // Commodore Amiga 3000
+a3000n  //
+a1200	// Commodore Amiga 1200
+a1200n  // 
+cdtv	// Commodore CDTV
+cd32	// Commodore Amiga CD32
 
 c65	   // 1991 C65 / C64DX (Prototype, NTSC)
 c64dx	 // 1991 C65 / C64DX (Prototype, German PAL)
