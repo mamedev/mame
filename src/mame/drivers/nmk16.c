@@ -900,9 +900,15 @@ static ADDRESS_MAP_START( tdragon_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_SHARE("nmk_txvideoram")
 ADDRESS_MAP_END
 
+// No sprites without this. Is it actually protection? 
+READ16_MEMBER(nmk16_state::tdragonb_prot_r)
+{
+	return 0x0003;
+}
+
 static ADDRESS_MAP_START( tdragonb_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x044022, 0x044023) AM_READNOP  /* No Idea */
+	AM_RANGE(0x044022, 0x044023) AM_READ(tdragonb_prot_r)
 	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("IN1")
@@ -4515,13 +4521,7 @@ DRIVER_INIT_MEMBER(nmk16_state,hachamf)
 
 DRIVER_INIT_MEMBER(nmk16_state,tdragonb)
 {
-	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
-
 	decode_tdragonb(machine());
-
-	/* The Following Patch is taken from Raine, Otherwise the game has no Sprites in Attract Mode or After Level 1
-       which is rather odd considering its a bootleg.. */
-	rom[0x00308/2] = 0x4e71; /* Sprite Problem */
 }
 
 DRIVER_INIT_MEMBER(nmk16_state,tdragon)

@@ -70,6 +70,7 @@ public:
 	DECLARE_WRITE8_MEMBER(okibank_w);
 	DECLARE_WRITE8_MEMBER(raphero_sound_rombank_w);
 	DECLARE_READ16_MEMBER(vandykeb_r);
+	DECLARE_READ16_HANDLER(tdragonb_prot_r);
 	DECLARE_READ16_MEMBER(afega_unknown_r);
 	DECLARE_WRITE16_MEMBER(afega_scroll0_w);
 	DECLARE_WRITE16_MEMBER(afega_scroll1_w);
