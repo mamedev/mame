@@ -2360,12 +2360,15 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("st_cart")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "st")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")  // 1040ST
 	MCFG_RAM_EXTRA_OPTIONS("512K,256K") // 520ST, 260ST
+
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "st_flop")
 MACHINE_CONFIG_END
 
 
@@ -2410,12 +2413,15 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("st_cart")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "st")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")  //  Mega ST 4
 	MCFG_RAM_EXTRA_OPTIONS("2M,1M") //  Mega ST 2 ,Mega ST 1
+
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "st_flop")
 MACHINE_CONFIG_END
 
 
@@ -2467,12 +2473,15 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("st_cart")
-//  MCFG_SOFTWARE_LIST_ADD("cart_list", "ste")
+//  MCFG_SOFTWARE_LIST_ADD("cart_list", "ste_cart")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")  // 1040STe
 	MCFG_RAM_EXTRA_OPTIONS("512K") //  520STe
+
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "st_flop")
 MACHINE_CONFIG_END
 
 
@@ -2535,7 +2544,7 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("st_cart")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "st")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

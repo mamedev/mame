@@ -15,7 +15,7 @@ Undumped cartridges:
 
 -->
 
-<softwarelist name="st" description="Atari ST cartridges">
+<softwarelist name="st_cart" description="Atari ST cartridges">
 	<software name="stdiag44">
 		<description>Atari ST Diagnostic Cartridge v4.4</description>
 		<year>198?</year>
