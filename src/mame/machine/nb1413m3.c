@@ -41,6 +41,8 @@ static int nb1413m3_outcoin_flag;
 
 
 #define NB1413M3_TIMER_BASE 20000000
+
+/* TODO: is all of this actually programmable? */
 static TIMER_CALLBACK( nb1413m3_timer_callback )
 {
 	machine.scheduler().timer_set(attotime::from_hz(NB1413M3_TIMER_BASE) * 256, FUNC(nb1413m3_timer_callback));
@@ -69,7 +71,7 @@ static TIMER_CALLBACK( nb1413m3_timer_callback )
 			case NB1413M3_PASTELG:
 				nb1413m3_74ls193_counter = 0x02;	// 96 ???
 				break;
-			case NB1413M3_HYHOO:
+			//case NB1413M3_HYHOO:
 			case NB1413M3_HYHOO2:
 				nb1413m3_74ls193_counter = 0x05;	// 128 ???
 				break;
@@ -120,6 +122,11 @@ static TIMER_CALLBACK( nb1413m3_timer_callback )
 #endif
 }
 
+MACHINE_START( nb1413m3 )
+{
+	machine.scheduler().synchronize(FUNC(nb1413m3_timer_callback));
+}
+
 MACHINE_RESET( nb1413m3 )
 {
 	nb1413m3_nmi_clock = 0;
@@ -137,9 +144,8 @@ MACHINE_RESET( nb1413m3 )
 	nb1413m3_gfxrombank = 0;
 	nb1413m3_inputport = 0xff;
 	nb1413m3_outcoin_flag = 1;
-
-	machine.scheduler().synchronize(FUNC(nb1413m3_timer_callback));
 }
+
 
 WRITE8_HANDLER( nb1413m3_nmi_clock_w )
 {

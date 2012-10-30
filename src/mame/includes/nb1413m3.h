@@ -121,6 +121,7 @@ enum {
 
 /*----------- defined in machine/nb1413m3.c -----------*/
 
+MACHINE_START( nb1413m3 );
 MACHINE_RESET( nb1413m3 );
 DECLARE_WRITE8_HANDLER( nb1413m3_nmi_clock_w );
 INTERRUPT_GEN( nb1413m3_interrupt );

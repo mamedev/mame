@@ -2604,6 +2604,7 @@ static MACHINE_CONFIG_START( gionbana, nbmj8891_state )
 	MCFG_CPU_IO_MAP(gionbana_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
+	MCFG_MACHINE_START(nb1413m3)
 	MCFG_MACHINE_RESET(nb1413m3)
 
 	/* video hardware */

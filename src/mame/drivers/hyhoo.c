@@ -246,6 +246,7 @@ static MACHINE_CONFIG_START( hyhoo, hyhoo_state )
 	MCFG_CPU_IO_MAP(hyhoo_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
+	MCFG_MACHINE_START(nb1413m3)
 	MCFG_MACHINE_RESET(nb1413m3)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

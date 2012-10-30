@@ -310,6 +310,7 @@ static MACHINE_CONFIG_START( ohpaipee, nbmj8900_state )
 	MCFG_CPU_IO_MAP(ohpaipee_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
+	MCFG_MACHINE_START(nb1413m3)
 	MCFG_MACHINE_RESET(nb1413m3)
 
 	/* video hardware */
