@@ -1257,6 +1257,8 @@ CPU_GET_INFO( tms1100 )
 
 	switch(state)
 	{
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:							info->i = 1; break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:							info->i = 1; break;
 		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8; break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 11; break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 7; break;
