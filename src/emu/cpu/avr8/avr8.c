@@ -109,6 +109,7 @@ static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
 #define QCONST6(op)     ((((op) >> 8) & 0x0020) | (((op) >> 7) & 0x0018) | ((op) & 0x0007))
 #define ACONST5(op)     (((op) >> 3) & 0x001f)
 #define ACONST6(op)     ((((op) >> 5) & 0x0030) | ((op) & 0x000f))
+#define MULCONST2(op)	((((op) >> 6) & 0x0002) | (((op) >> 3) & 0x0001))
 
 // Register Defines
 #define XREG            ((cpustate->r[27] << 8) | cpustate->r[26])
@@ -1009,7 +1010,11 @@ static bool avr8_io_reg_write(avr8_state *cpustate, UINT16 offset, UINT8 data)
 
 		case AVR8_REGIDX_SPL:
 		case AVR8_REGIDX_SPH:
+			cpustate->r[offset] = data;
+			return true;
+
 		case AVR8_REGIDX_GPIOR0:
+			verboselog(cpustate->pc, 0, "AVR8: GPIOR0 Write: %02x\n", data);
 			cpustate->r[offset] = data;
 			return true;
 
@@ -1018,7 +1023,6 @@ static bool avr8_io_reg_write(avr8_state *cpustate, UINT16 offset, UINT8 data)
 			return true;
 
         default:
-            verboselog(cpustate->pc, 0, "AVR8: Unrecognized register write: %02x = %02x\n", offset, data );
             return false;
     }
     return false;
@@ -1032,9 +1036,13 @@ static bool avr8_io_reg_read(avr8_state *cpustate, UINT16 offset, UINT8 *data)
 		case AVR8_REGIDX_SPH:
 		case AVR8_REGIDX_TCNT1L:
 		case AVR8_REGIDX_TCNT1H:
-		case AVR8_REGIDX_GPIOR0:
 		case AVR8_REGIDX_TCNT2:
 			*data = cpustate->r[offset];
+			return true;
+
+		case AVR8_REGIDX_GPIOR0:
+			*data = cpustate->r[offset];
+			verboselog(cpustate->pc, 0, "AVR8: GPIOR0 Read: %02x\n", *data);
 			return true;
 
 		case AVR8_REGIDX_SREG:
@@ -1042,7 +1050,6 @@ static bool avr8_io_reg_read(avr8_state *cpustate, UINT16 offset, UINT8 *data)
 			return true;
 
         default:
-            verboselog(cpustate->pc, 0, "AVR8: Unrecognized register read: %02x\n", offset );
             return false;
     }
 
@@ -1160,13 +1167,45 @@ static CPU_EXECUTE( avr8 )
                         SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
                         opcycles = 2;
                         break;
-                    case 0x0300:    // MULSU Rd,Rr
-                        sd = (INT8)cpustate->r[16 + RD3(op)] * (UINT8)cpustate->r[16 + RR3(op)];
-                        cpustate->r[1] = (sd >> 8) & 0x00ff;
-                        cpustate->r[0] = sd & 0x00ff;
-                        SREG_W(AVR8_SREG_C, (sd & 0x8000) ? 1 : 0);
-                        SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
-                        opcycles = 2;
+                    case 0x0300:    // Multiplicatn
+                    	switch(MULCONST2(op))
+                    	{
+							case 0x0000: // MULSU Rd,Rr
+								sd = (INT8)cpustate->r[16 + RD3(op)] * (UINT8)cpustate->r[16 + RR3(op)];
+								cpustate->r[1] = (sd >> 8) & 0x00ff;
+								cpustate->r[0] = sd & 0x00ff;
+								SREG_W(AVR8_SREG_C, (sd & 0x8000) ? 1 : 0);
+								SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
+								opcycles = 2;
+								break;
+							case 0x0001: // FMUL Rd,Rr
+								sd = (UINT8)cpustate->r[16 + RD3(op)] * (UINT8)cpustate->r[16 + RR3(op)];
+								sd <<= 1;
+								cpustate->r[1] = (sd >> 8) & 0x00ff;
+								cpustate->r[0] = sd & 0x00ff;
+								SREG_W(AVR8_SREG_C, (sd & 0x8000) ? 1 : 0);
+								SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
+								opcycles = 2;
+								break;
+							case 0x0002: // FMULS Rd,Rr
+								sd = (INT8)cpustate->r[16 + RD3(op)] * (INT8)cpustate->r[16 + RR3(op)];
+								sd <<= 1;
+								cpustate->r[1] = (sd >> 8) & 0x00ff;
+								cpustate->r[0] = sd & 0x00ff;
+								SREG_W(AVR8_SREG_C, (sd & 0x8000) ? 1 : 0);
+								SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
+								opcycles = 2;
+								break;
+							case 0x0003: // FMULSU Rd,Rr
+								sd = (INT8)cpustate->r[16 + RD3(op)] * (UINT8)cpustate->r[16 + RR3(op)];
+								sd <<= 1;
+								cpustate->r[1] = (sd >> 8) & 0x00ff;
+								cpustate->r[0] = sd & 0x00ff;
+								SREG_W(AVR8_SREG_C, (sd & 0x8000) ? 1 : 0);
+								SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
+								opcycles = 2;
+								break;
+						}
                         break;
                     case 0x0400:
                     case 0x0500:
@@ -1266,7 +1305,7 @@ static CPU_EXECUTE( avr8 )
                         rr = cpustate->r[RR5(op)];
                         rd &= rr;
                         SREG_W(AVR8_SREG_V, 0);
-                        SREG_W(AVR8_SREG_N, rd & 0x80);
+                        SREG_W(AVR8_SREG_N, BIT(rd,7));
                         SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
                         SREG_W(AVR8_SREG_Z, (rd == 0) ? 1 : 0);
                         cpustate->r[RD5(op)] = rd;
@@ -1276,7 +1315,7 @@ static CPU_EXECUTE( avr8 )
                         rr = cpustate->r[RR5(op)];
                         rd ^= rr;
                         SREG_W(AVR8_SREG_V, 0);
-                        SREG_W(AVR8_SREG_N, rd & 0x80);
+                        SREG_W(AVR8_SREG_N, BIT(rd,7));
                         SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
                         SREG_W(AVR8_SREG_Z, (rd == 0) ? 1 : 0);
                         cpustate->r[RD5(op)] = rd;
@@ -1286,7 +1325,7 @@ static CPU_EXECUTE( avr8 )
                         rr = cpustate->r[RR5(op)];
                         rd |= rr;
                         SREG_W(AVR8_SREG_V, 0);
-                        SREG_W(AVR8_SREG_N, rd & 0x80);
+                        SREG_W(AVR8_SREG_N, BIT(rd,7));
                         SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
                         SREG_W(AVR8_SREG_Z, (rd == 0) ? 1 : 0);
                         cpustate->r[RD5(op)] = rd;
@@ -1336,7 +1375,7 @@ static CPU_EXECUTE( avr8 )
                 rr = KCONST8(op);
                 rd |= rr;
                 SREG_W(AVR8_SREG_V, 0);
-                SREG_W(AVR8_SREG_N, rd & 0x80);
+                SREG_W(AVR8_SREG_N, BIT(rd,7));
                 SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
                 SREG_W(AVR8_SREG_Z, (rd == 0) ? 1 : 0);
                 cpustate->r[16 + RD4(op)] = rd;
@@ -1346,7 +1385,7 @@ static CPU_EXECUTE( avr8 )
                 rr = KCONST8(op);
                 rd &= rr;
                 SREG_W(AVR8_SREG_V, 0);
-                SREG_W(AVR8_SREG_N, rd & 0x80);
+                SREG_W(AVR8_SREG_N, BIT(rd,7));
                 SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
                 SREG_W(AVR8_SREG_Z, (rd == 0) ? 1 : 0);
                 cpustate->r[16 + RD4(op)] = rd;
@@ -1560,9 +1599,9 @@ static CPU_EXECUTE( avr8 )
                             case 0x0005:    // ASR Rd
                                 rd = cpustate->r[RD5(op)];
                                 res = (rd & 0x80) | (rd >> 1);
-                                SREG_W(AVR8_SREG_C, rd & 0x01);
+                                SREG_W(AVR8_SREG_C, BIT(rd,0));
                                 SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-                                SREG_W(AVR8_SREG_N, (rd & 0x80) ? 1 : 0);
+                                SREG_W(AVR8_SREG_N, BIT(rd,7));
                                 SREG_W(AVR8_SREG_V, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_C));
                                 SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
                                 cpustate->r[RD5(op)] = res;
@@ -1570,7 +1609,7 @@ static CPU_EXECUTE( avr8 )
                             case 0x0006:    // LSR Rd
                                 rd = cpustate->r[RD5(op)];
                                 res = rd >> 1;
-                                SREG_W(AVR8_SREG_C, rd & 0x01);
+                                SREG_W(AVR8_SREG_C, BIT(rd,0));
                                 SREG_W(AVR8_SREG_Z, (res == 0) ? 1 :0);
                                 SREG_W(AVR8_SREG_N, 0);
                                 SREG_W(AVR8_SREG_V, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_C));
@@ -1581,9 +1620,9 @@ static CPU_EXECUTE( avr8 )
                             	rd = cpustate->r[RD5(op)];
                             	res = rd >> 1;
                             	res |= (SREG_R(AVR8_SREG_C) << 7);
-                                SREG_W(AVR8_SREG_C, rd & 0x01);
+                                SREG_W(AVR8_SREG_C, BIT(rd,0));
                                 SREG_W(AVR8_SREG_Z, (res == 0) ? 1 :0);
-                                SREG_W(AVR8_SREG_N, res & 7);
+                                SREG_W(AVR8_SREG_N, BIT(res,7));
                                 SREG_W(AVR8_SREG_V, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_C));
                                 SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
                                 cpustate->r[RD5(op)] = res;
@@ -1705,9 +1744,9 @@ static CPU_EXECUTE( avr8 )
                             case 0x0005:    // ASR Rd
                                 rd = cpustate->r[RD5(op)];
                                 res = (rd & 0x80) | (rd >> 1);
-                                SREG_W(AVR8_SREG_C, rd & 0x01);
+                                SREG_W(AVR8_SREG_C, BIT(rd,0));
                                 SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-                                SREG_W(AVR8_SREG_N, (rd & 0x80) ? 1 : 0);
+                                SREG_W(AVR8_SREG_N, BIT(rd,7));
                                 SREG_W(AVR8_SREG_V, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_C));
                                 SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
                                 cpustate->r[RD5(op)] = res;
@@ -1715,7 +1754,7 @@ static CPU_EXECUTE( avr8 )
                             case 0x0006:    // LSR Rd
                                 rd = cpustate->r[RD5(op)];
                                 res = rd >> 1;
-                                SREG_W(AVR8_SREG_C, rd & 0x01);
+                                SREG_W(AVR8_SREG_C, BIT(rd,0));
                                 SREG_W(AVR8_SREG_Z, (res == 0) ? 1 :0);
                                 SREG_W(AVR8_SREG_N, 0);
                                 SREG_W(AVR8_SREG_V, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_C));
@@ -1726,9 +1765,9 @@ static CPU_EXECUTE( avr8 )
                             	rd = cpustate->r[RD5(op)];
                             	res = rd >> 1;
                             	res |= (SREG_R(AVR8_SREG_C) << 7);
-                                SREG_W(AVR8_SREG_C, rd & 0x01);
+                                SREG_W(AVR8_SREG_C, BIT(rd,0));
                                 SREG_W(AVR8_SREG_Z, (res == 0) ? 1 :0);
-                                SREG_W(AVR8_SREG_N, res & 7);
+                                SREG_W(AVR8_SREG_N, BIT(res,7));
                                 SREG_W(AVR8_SREG_V, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_C));
                                 SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
                                 cpustate->r[RD5(op)] = res;
@@ -1860,8 +1899,9 @@ static CPU_EXECUTE( avr8 )
                         opcycles = 2;
                         break;
                     case 0x0900:    // SBIC A,b
-                		if(NOT(BIT(READ_IO_8(cpustate, 32 + ACONST5(op)), (1 << RR3(op)))))
+                		if(NOT(BIT(READ_IO_8(cpustate, 32 + ACONST5(op)), RR3(op))))
                 		{
+                            op = (UINT32)READ_PRG_16(cpustate, cpustate->pc + 1);
 							opcycles = avr8_is_long_opcode(op) ? 3 : 2;
                             cpustate->pc += avr8_is_long_opcode(op) ? 2 : 1;
 						}
@@ -1871,8 +1911,9 @@ static CPU_EXECUTE( avr8 )
                         opcycles = 2;
                         break;
                     case 0x0b00:    // SBIS A,b
-                		if(BIT(READ_IO_8(cpustate, 32 + ACONST5(op)), (1 << RR3(op))))
+                		if(BIT(READ_IO_8(cpustate, 32 + ACONST5(op)), RR3(op)))
                 		{
+                            op = (UINT32)READ_PRG_16(cpustate, cpustate->pc + 1);
 							opcycles = avr8_is_long_opcode(op) ? 3 : 2;
                             cpustate->pc += avr8_is_long_opcode(op) ? 2 : 1;
 						}

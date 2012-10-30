@@ -44,6 +44,7 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 * I/O defines                                        *
 \****************************************************/
 
+#define AVR8_PORTD				(state->m_regs[AVR8_REGIDX_PORTD])
 #define AVR8_DDRD				(state->m_regs[AVR8_REGIDX_DDRD])
 #define AVR8_PORTC				(state->m_regs[AVR8_REGIDX_PORTC])
 #define AVR8_DDRC				(state->m_regs[AVR8_REGIDX_DDRC])
@@ -82,12 +83,14 @@ public:
 
 	UINT8 m_regs[0x100];
     UINT8* m_eeprom;
-    UINT32 last_cycles;
+    UINT32 m_last_cycles;
 
-    bool spi_pending;
-    UINT32 spi_start_cycle;
+    bool m_spi_pending;
+    UINT64 m_spi_start_cycle;
 
-    UINT8 m_pixels[PIXELS_PER_FRAME + LINE_CYCLES]; // Allocate one extra line for wrapping in the video update
+    UINT64 m_frame_start_cycle;
+
+    UINT8 m_pixels[PIXELS_PER_FRAME];
 
     required_device<cpu_device> m_maincpu;
 
@@ -110,6 +113,8 @@ READ8_MEMBER(craft_state::avr8_read)
     switch( offset )
     {
 		case AVR8_REGIDX_EEDR:
+		case AVR8_REGIDX_PORTC:
+		case AVR8_REGIDX_PORTD:
 			return m_regs[offset];
 
         default:
@@ -162,22 +167,22 @@ static void avr8_video_update(running_machine &machine)
     craft_state *state = machine.driver_data<craft_state>();
 
 	UINT64 cycles = avr8_get_elapsed_cycles(state->m_maincpu);
-	UINT32 frame_cycles = (UINT32)(cycles % CYCLES_PER_FRAME);
+	UINT32 frame_cycles = (UINT32)(cycles - state->m_frame_start_cycle);
 
-	if (state->last_cycles < frame_cycles)
+	if (state->m_last_cycles < frame_cycles)
 	{
-		for (UINT32 pixidx = state->last_cycles; pixidx < frame_cycles; pixidx++)
+		for (UINT32 pixidx = state->m_last_cycles; pixidx < frame_cycles; pixidx++)
 		{
 			UINT8 value = AVR8_PORTC & 0x3f;
-			if (state->spi_pending)
+			if (state->m_spi_pending)
 			{
-				if (pixidx >= state->spi_start_cycle && pixidx < (state->spi_start_cycle + 16))
+				if (pixidx >= state->m_spi_start_cycle && pixidx < (state->m_spi_start_cycle + 16))
 				{
-					UINT8 bitidx = 7 - ((pixidx - state->spi_start_cycle) >> 1);
+					UINT8 bitidx = 7 - ((pixidx - state->m_spi_start_cycle) >> 1);
 					value = ((state->m_regs[AVR8_REGIDX_SPDR] & (1 << bitidx)) ? value : 0x3f);
-					if (pixidx == (state->spi_start_cycle + 15))
+					if (pixidx == (state->m_spi_start_cycle + 15))
 					{
-						state->spi_pending = false;
+						state->m_spi_pending = false;
 						state->m_regs[AVR8_REGIDX_SPDR] = 0;
 					}
 				}
@@ -185,8 +190,13 @@ static void avr8_video_update(running_machine &machine)
 			state->m_pixels[pixidx] = value;
 		}
 	}
+	else
+	{
+		memset(state->m_pixels + state->m_last_cycles, 0, sizeof(state->m_pixels) - state->m_last_cycles);
+		memset(state->m_pixels, 0, frame_cycles);
+	}
 
-	state->last_cycles = frame_cycles;
+	state->m_last_cycles = frame_cycles;
 }
 
 static void avr8_change_port(running_machine &machine, int reg, UINT8 data)
@@ -204,28 +214,32 @@ static void avr8_change_port(running_machine &machine, int reg, UINT8 data)
 		//verboselog(machine, 0, "avr8_change_port: PORT%c lines %02x changed\n", avr8_reg_name[reg], changed);
 	}
 
-	if (reg == AVR8_REG_C)
+	switch(reg)
 	{
-		avr8_video_update(machine);
+		case AVR8_REG_A:
+			// Unhandled
+			break;
 
-		/*if (frame_cycles >= state->spi_start_cycle && frame_cycles < (state->spi_start_cycle + 16))
-        {
-            UINT8 bitidx = 7 - ((frame_cycles - state->spi_start_cycle) >> 1);
-            state->m_pixels[frame_cycles] = ((state->m_regs[AVR8_REGIDX_SPDR] & (1 << bitidx)) ? 0x3f : (data & 0x3f));
-        }
-        else
-        {
-            state->m_pixels[frame_cycles] = data & 0x3f;
-        }*/
+		case AVR8_REG_B:
+			AVR8_PORTB = data;
+			if(newport & changed & 0x02)
+			{
+				state->m_frame_start_cycle = avr8_get_elapsed_cycles(state->m_maincpu);
+			}
+			break;
 
-		AVR8_PORTC = data;
-	}
+		case AVR8_REG_C:
+			avr8_video_update(machine);
+			AVR8_PORTC = data;
+			break;
 
-	if (reg == AVR8_REG_D)
-	{
-		UINT8 audio_sample = (data & 0x02) | ((data & 0xf4) >> 2);
-
-		state->dac->write_unsigned8(audio_sample << 2);
+		case AVR8_REG_D:
+		{
+			UINT8 audio_sample = (data & 0x02) | ((data & 0xf4) >> 2);
+			state->dac->write_unsigned8(audio_sample << 2);
+			AVR8_PORTD = data;
+			break;
+		}
 	}
 }
 
@@ -357,8 +371,8 @@ WRITE8_MEMBER(craft_state::avr8_write)
 		case AVR8_REGIDX_SPDR:
 			avr8_video_update(machine());
 			m_regs[offset] = data;
-			spi_pending = true;
-			spi_start_cycle = (UINT32)(avr8_get_elapsed_cycles(m_maincpu) % CYCLES_PER_FRAME);
+			m_spi_pending = true;
+			m_spi_start_cycle = avr8_get_elapsed_cycles(m_maincpu) - m_frame_start_cycle;
 			break;
 
 		case AVR8_REGIDX_EECR:
@@ -437,14 +451,11 @@ UINT32 craft_state::screen_update_craft(screen_device &screen, bitmap_rgb32 &bit
 		UINT32 *line = &bitmap.pix32(y);
 		for(int x = 0; x < LINE_CYCLES; x++)
 		{
-			UINT8 pixel = m_pixels[y * LINE_CYCLES + (x + HSYNC_CYCLES)];
+			UINT8 pixel = m_pixels[y * LINE_CYCLES + x];
 			UINT8 r = 0x55 * ((pixel & 0x30) >> 4);
 			UINT8 g = 0x55 * ((pixel & 0x0c) >> 2);
 			UINT8 b = 0x55 * (pixel & 0x03);
 			line[x] = 0xff000000 | (r << 16) | (g << 8) | b;
-
-			// Clear behind us
-			m_pixels[y * LINE_CYCLES + (x + HSYNC_CYCLES)] = 0;
 		}
 	}
     return 0;
@@ -467,6 +478,13 @@ void craft_state::machine_reset()
     state->dac->write_unsigned8(0x00);
 
     state->m_eeprom = memregion("eeprom")->base();
+
+    state->m_frame_start_cycle = 0;
+    state->m_last_cycles = 0;
+
+    state->m_spi_pending = false;
+
+    state->m_spi_start_cycle = 0;
 }
 
 static MACHINE_CONFIG_START( craft, craft_state )
@@ -482,7 +500,7 @@ static MACHINE_CONFIG_START( craft, craft_state )
     MCFG_SCREEN_REFRESH_RATE(59.99)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1429)) /* accurate */
     MCFG_SCREEN_SIZE(635, 525)
-    MCFG_SCREEN_VISIBLE_AREA(0, 634, 0, 524)
+    MCFG_SCREEN_VISIBLE_AREA(47, 526, 36, 515)
 	MCFG_SCREEN_UPDATE_DRIVER(craft_state, screen_update_craft)
     MCFG_PALETTE_LENGTH(0x1000)
 
@@ -500,4 +518,4 @@ ROM_START( craft )
 ROM_END
 
 /*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY          FULLNAME */
-CONS(2008, craft,    0,        0,        craft,    craft, craft_state,    craft,    "Linus Akesson", "Craft", GAME_NO_SOUND | GAME_NOT_WORKING)
+CONS(2008, craft,    0,        0,        craft,    craft, craft_state,    craft,    "Linus Akesson", "Craft", GAME_IMPERFECT_GRAPHICS)

@@ -21,6 +21,7 @@
 #define QCONST6(op)     ((((op) >> 8) & 0x0020) | (((op) >> 7) & 0x0018) | ((op) & 0x0007))
 #define ACONST5(op)     (((op) >> 3) & 0x001f)
 #define ACONST6(op)     ((((op) >> 5) & 0x0030) | ((op) & 0x000f))
+#define MULCONST2(op)	((((op) >> 6) & 0x0002) | (((op) >> 3) & 0x0001))
 
 CPU_DISASSEMBLE( avr8 )
 {
@@ -44,7 +45,21 @@ CPU_DISASSEMBLE( avr8 )
                     output += sprintf( output, "MULS    R%d, R%d", 16+RD4(op), 16+RR4(op) );
                     break;
                 case 0x0300:
-                    output += sprintf( output, "MULSU   R%d, R%d", 16+RD4(op), 16+RR4(op) );
+                	switch(MULCONST2(op))
+                	{
+						case 0:
+                    		output += sprintf( output, "MULSU   R%d, R%d", 16+RD3(op), 16+RR3(op) );
+                    		break;
+						case 1:
+                    		output += sprintf( output, "FMUL    R%d, R%d", 16+RD3(op), 16+RR3(op) );
+                    		break;
+						case 2:
+                    		output += sprintf( output, "FMULS   R%d, R%d", 16+RD3(op), 16+RR3(op) );
+                    		break;
+						case 3:
+                    		output += sprintf( output, "FMULSU  R%d, R%d", 16+RD3(op), 16+RR3(op) );
+                    		break;
+					}
                     break;
                 case 0x0400:
                 case 0x0500:
