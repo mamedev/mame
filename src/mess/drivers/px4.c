@@ -16,6 +16,7 @@
 #include "machine/tf20.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
+#include "sound/speaker.h"
 #include "px4.lh"
 
 
@@ -77,7 +78,8 @@ public:
 			m_z80(*this, "maincpu"),
 			m_ram(*this, RAM_TAG),
 			m_centronics(*this, "centronics"),
-			m_ext_cas(*this, "extcas")
+			m_ext_cas(*this, "extcas"),
+			m_speaker(*this, SPEAKER_TAG)
 			{ }
 
 	// internal devices
@@ -85,6 +87,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<centronics_device> m_centronics;
 	required_device<cassette_image_device> m_ext_cas;
+	required_device<device_t> m_speaker;
 
 	/* gapnit register */
 	UINT8 m_ctrl1;
@@ -908,7 +911,7 @@ WRITE8_MEMBER(px4_state::px4_ioctlr_w)
 	output_set_value("led_1", BIT(data, 5)); // num lock
 	output_set_value("led_2", BIT(data, 6)); // "led 2"
 
-	// bit 7, sp - speaker
+	speaker_level_w(m_speaker, BIT(data, 7));
 }
 
 
@@ -1362,6 +1365,11 @@ static MACHINE_CONFIG_START( px4, px4_state )
 
 	MCFG_PALETTE_LENGTH(2)
 
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("one_sec", px4_state, upd7508_1sec_callback, attotime::from_seconds(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("frc", px4_state, frc_tick, attotime::from_hz(XTAL_7_3728MHz / 2 / 6))
 
@@ -1442,5 +1450,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT      CLASS      INIT  COMPANY  FULLNAME  FLAGS
-COMP( 1985, px4,  0,      0,      px4,     px4_h450a, px4_state, px4,  "Epson", "PX-4",   GAME_NO_SOUND_HW )
-COMP( 1985, px4p, px4,    0,      px4p,    px4_h450a, px4_state, px4p, "Epson", "PX-4+",  GAME_NO_SOUND_HW )
+COMP( 1985, px4,  0,      0,      px4,     px4_h450a, px4_state, px4,  "Epson", "PX-4",   0 )
+COMP( 1985, px4p, px4,    0,      px4p,    px4_h450a, px4_state, px4p, "Epson", "PX-4+",  0 )
