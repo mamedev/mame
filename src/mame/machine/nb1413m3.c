@@ -42,7 +42,7 @@ static int nb1413m3_outcoin_flag;
 
 #define NB1413M3_TIMER_BASE 20000000
 
-/* TODO: is all of this actually programmable? */
+/* TODO: is all of this actually programmable in some way? */
 static TIMER_CALLBACK( nb1413m3_timer_callback )
 {
 	machine.scheduler().timer_set(attotime::from_hz(NB1413M3_TIMER_BASE) * 256, FUNC(nb1413m3_timer_callback));
