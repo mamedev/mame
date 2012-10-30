@@ -363,7 +363,7 @@ inline void mos6566_device::bad_line_ba()
 		if (m_ba)
 		{
 			set_ba(CLEAR_LINE);
-			m_rdy_cycles += 55 - m_cycle;		
+			m_rdy_cycles += 55 - m_cycle;
 		}
 	}
 	else
@@ -437,7 +437,7 @@ inline void mos6566_device::matrix_access()
 
 	if (!m_ba && m_aec)
 	{
-		m_matrix_line[m_ml_index] = 0xff; 
+		m_matrix_line[m_ml_index] = 0xff;
 	}
 	else
 	{
@@ -1427,7 +1427,7 @@ void mos6566_device::execute_run()
 			// Last cycle
 			m_cycle = 1;
 		}
-		
+
 		m_phi0 = 1;
 		set_aec(BIT(m_aec_delay, 2));
 
@@ -1827,7 +1827,7 @@ void mos6569_device::execute_run()
 			check_sprite_dma();
 
 			spr_ba(0);
-	
+
 			m_cycle++;
 			break;
 
@@ -1996,7 +1996,7 @@ void mos6569_device::execute_run()
 			// Last cycle
 			m_cycle = 1;
 		}
-		
+
 		m_phi0 = 1;
 		set_aec(BIT(m_aec_delay, 2));
 
@@ -2780,7 +2780,7 @@ WRITE8_MEMBER( mos6566_device::write )
 			{
 				m_cpu->set_unscaled_clock(clock() << BIT(data, 0));
 			}
-			
+
 			m_reg[offset] = data | 0xfc;
 
 			m_on = !BIT(data, 0);

@@ -57,7 +57,7 @@ public:
 
 	/* other devices */
 	cpu_device *m_audiocpu;
-	
+
 	/* handlers */
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(turbofrc_sound_command_w);

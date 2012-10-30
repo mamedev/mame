@@ -299,7 +299,7 @@ bool upd765_format::save(io_generic *io, floppy_image *image)
 			extract_sectors(image, f, sectors, track, head);
 			io_generic_write(io, sectdata, (track*f.head_count + head)*track_size, track_size);
 		}
-			
+
 	return true;
 }
 

@@ -1284,12 +1284,12 @@ WRITE8_MEMBER(a2600_state::switch_A_w)
 	/* Right controller port */
 	m_joy2->joy_w( data & 0x0f );
 
-//	switch( machine().root_device().ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
-//	{
-//	case 0x0a:	/* KidVid voice module */
-//		machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(( data & 0x02 ) ? (cassette_state)CASSETTE_MOTOR_DISABLED : (cassette_state)(CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), (cassette_state)CASSETTE_MOTOR_DISABLED );
-//		break;
-//	}
+//  switch( machine().root_device().ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
+//  {
+//  case 0x0a:  /* KidVid voice module */
+//      machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(( data & 0x02 ) ? (cassette_state)CASSETTE_MOTOR_DISABLED : (cassette_state)(CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), (cassette_state)CASSETTE_MOTOR_DISABLED );
+//      break;
+//  }
 }
 
 READ8_MEMBER(a2600_state::switch_A_r)

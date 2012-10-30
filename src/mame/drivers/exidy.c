@@ -1019,7 +1019,7 @@ ROM_START( rallys )
 	ROM_LOAD( "targ82s.123", 0x0000, 0x0020, CRC(9eb9125c) SHA1(660ad9b2c7c28c3fda4b10c1401c03165d131c61) )	/* unknown */
 ROM_END
 
-ROM_START( rallysa )	
+ROM_START( rallysa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rallys.01",   0x1000, 0x0400, CRC(a192b22b) SHA1(aaae0b1822f934df30b354f787ffa8848c71b52f) ) // 1a
 	ROM_LOAD( "rallys.02",   0x1400, 0x0400, CRC(19e730aa) SHA1(4f4e87d26c14a9ff2be5b4173c4e5804db551e33) ) // 2a

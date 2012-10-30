@@ -199,8 +199,8 @@ INPUT_CHANGED_MEMBER( s9_state::audio_nmi )
 
 WRITE8_MEMBER( s9_state::sol3_w )
 {
-//	if (BIT(data, 1))
-//		m_samples->start(0, 6); // knocker
+//  if (BIT(data, 1))
+//      m_samples->start(0, 6); // knocker
 }
 
 WRITE8_MEMBER( s9_state::sound_w )
@@ -351,7 +351,7 @@ WRITE_LINE_MEMBER( s9_state::pia_cb2_w )
 
 READ8_MEMBER( s9_state::dac_r )
 {
-	return m_sound_data;	
+	return m_sound_data;
 }
 
 WRITE8_MEMBER( s9_state::dac_w )

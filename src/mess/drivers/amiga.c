@@ -178,7 +178,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( amiga_mem32, AS_PROGRAM, 32, a1200_state )
 	ADDRESS_MAP_UNMAP_HIGH
-//	ADDRESS_MAP_GLOBAL_MASK(0xffffff) // not sure
+//  ADDRESS_MAP_GLOBAL_MASK(0xffffff) // not sure
 	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16_LEGACY(amiga_cia_r, amiga_cia_w, 0xffffffff)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16_LEGACY(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_SHARE("custom_regs")
@@ -862,7 +862,7 @@ static MACHINE_CONFIG_START( a1200n, a1200_state )
 	MCFG_SOFTWARE_LIST_ADD("flop_common","amiga_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga1200_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_aga","amigaaga_flop")
-	
+
 
 MACHINE_CONFIG_END
 
@@ -1226,7 +1226,7 @@ ROM_START( a600 )
 
 	// from A600HD (had HDD by default)
 	ROM_SYSTEM_BIOS(1, "kick205a", "Kickstart 2.05 (37.300)")
-	ROMX_LOAD("kickstart v2.05 r37.300 (1991)(commodore)(a600hd).rom",  0x000000, 0x080000, CRC(64466c2a) SHA1(f72d89148dac39c696e30b10859ebc859226637b), ROM_GROUPWORD | ROM_BIOS(1)) 
+	ROMX_LOAD("kickstart v2.05 r37.300 (1991)(commodore)(a600hd).rom",  0x000000, 0x080000, CRC(64466c2a) SHA1(f72d89148dac39c696e30b10859ebc859226637b), ROM_GROUPWORD | ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "kick205b", "Kickstart 2.05 (37.300)")
 	ROMX_LOAD("kickstart v2.05 r37.350 (1992)(commodore)(a600hd)[!].rom", 0x000000, 0x080000, CRC(43b0df7b) SHA1(02843c4253bbd29aba535b0aa3bd9a85034ecde4), ROM_GROUPWORD | ROM_BIOS(2))
 
@@ -1248,7 +1248,7 @@ ROM_START( a1200 )
 	ROM_SYSTEM_BIOS(0, "kick30", "Kickstart 3.0 (39.106)")
 	ROMX_LOAD("391523-01.u6a", 0x000000, 0x040000, CRC(c742a412) SHA1(999eb81c65dfd07a71ee19315d99c7eb858ab186), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(1))
 	ROMX_LOAD("391524-01.u6b", 0x000002, 0x040000, CRC(d55c6ec6) SHA1(3341108d3a402882b5ef9d3b242cbf3c8ab1a3e9), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(1))
-//	ROMX_LOAD("kickstart v3.0 r39.106 (1992)(commodore)(a1200)[!].rom", 0x000000, 0x080000, CRC(6c9b07d2) SHA1(70033828182fffc7ed106e5373a8b89dda76faa5), ROM_BIOS(1))
+//  ROMX_LOAD("kickstart v3.0 r39.106 (1992)(commodore)(a1200)[!].rom", 0x000000, 0x080000, CRC(6c9b07d2) SHA1(70033828182fffc7ed106e5373a8b89dda76faa5), ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS(1, "kick31", "Kickstart 3.1 (40.068)")
 	ROMX_LOAD("391773-01.u6a", 0x000000, 0x040000, CRC(08dbf275) SHA1(b8800f5f909298109ea69690b1b8523fa22ddb37), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(2))
@@ -1328,10 +1328,10 @@ COMP( 1991, a500pln, a500pl, 0,      a500plsn,  amiga, amiga_state,  amiga,  "Co
 COMP( 1992, a600,    0,      0,      a600,      amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 600 (PAL, ECS)",  GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 COMP( 1992, a600n,   a600,   0,      a600n,     amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 600 (NTSC, ECS)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 
-COMP( 1992, a1200,   0,      0,      a1200,  	amiga, a1200_state,a1200,  "Commodore Business Machines",  "Amiga 1200 (PAL, AGA)" , GAME_NOT_WORKING  )
+COMP( 1992, a1200,   0,      0,      a1200, 	amiga, a1200_state,a1200,  "Commodore Business Machines",  "Amiga 1200 (PAL, AGA)" , GAME_NOT_WORKING  )
 COMP( 1992, a1200n,  a1200,  0,      a1200n,	amiga, a1200_state,a1200,  "Commodore Business Machines",  "Amiga 1200 (NTSC, AGA)" , GAME_NOT_WORKING )
 
-COMP( 1992, a3000,   0,      0,      a3000,  	amiga, amiga_state,  a3000,  "Commodore Business Machines",  "Amiga 3000 (PAL, ECS, 68030)" , GAME_NOT_WORKING  )
+COMP( 1992, a3000,   0,      0,      a3000, 	amiga, amiga_state,  a3000,  "Commodore Business Machines",  "Amiga 3000 (PAL, ECS, 68030)" , GAME_NOT_WORKING  )
 COMP( 1992, a3000n,  a3000,  0,      a3000n,	amiga, amiga_state,  a3000,  "Commodore Business Machines",  "Amiga 3000 (NTSC, ECS, 68030)" , GAME_NOT_WORKING )
 
 

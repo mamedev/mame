@@ -45,7 +45,7 @@
 
   PCB Layout:
 
-  .--------------------------------------------------------------------------------------. 
+  .--------------------------------------------------------------------------------------.
   |        .---------.     .---------.                                                   |
   |        |74LS174N |     |74LS174N |              .------------.                       |
   |        '---------'     '---------'              |8          1|  .------------.       |
@@ -260,11 +260,11 @@ TILE_GET_INFO_MEMBER(mpu12wbk_state::get_bg_tile_info)
     ---- ----   bank select.
     ---- ----   color code.
 */
-//	int attr = m_colorram[tile_index];
-//	int code = m_videoram[tile_index] | ((attr & 0xc0) << 2);
-//	int color = (attr & 0x0f);
+//  int attr = m_colorram[tile_index];
+//  int code = m_videoram[tile_index] | ((attr & 0xc0) << 2);
+//  int color = (attr & 0x0f);
 
-//	SET_TILE_INFO_MEMBER( 0, code, color, 0);
+//  SET_TILE_INFO_MEMBER( 0, code, color, 0);
 	SET_TILE_INFO_MEMBER( 0, 0 ,0 ,0);
 }
 
@@ -327,7 +327,7 @@ unknown writes:
 
 1800-1801 R (input?)
 1e00-1e01 RW (psg?)
- 
+
 */
 
 
@@ -437,21 +437,21 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 
 {
-//	8, 8,
-//	RGN_FRAC(3,3),
-//	1,		/* 1 bpp */
-//	{ 0 },
-//	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-//	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-//	8*8	/* every char takes 8 consecutive bytes */
+//  8, 8,
+//  RGN_FRAC(3,3),
+//  1,      /* 1 bpp */
+//  { 0 },
+//  { 0, 1, 2, 3, 4, 5, 6, 7 },
+//  { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+//  8*8 /* every char takes 8 consecutive bytes */
 
-//	8, 8,
-//	RGN_FRAC(1,3),
-//	3,
-//	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },    /* bitplanes are separated */
-//	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-//	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-//	8*8
+//  8, 8,
+//  RGN_FRAC(1,3),
+//  3,
+//  { 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },    /* bitplanes are separated */
+//  { 0, 1, 2, 3, 4, 5, 6, 7 },
+//  { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+//  8*8
 
 	4,8,
 	RGN_FRAC(1,2),
@@ -562,7 +562,7 @@ ROM_START( fruitstb )
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "fruit1.ic37",	0x00000, 0x10000, CRC(c1834a6d) SHA1(ece1e47641087be342d3c5c092d8a7233ae871f3) )
 	ROM_LOAD( "fruit2.ic38",	0x10000, 0x10000, CRC(32d282a8) SHA1(792174d75dc7ec5f1e6f145539a5ec8e3953e1dd) )
-//	ROM_LOAD( "fruit3.ic39",	0x20000, 0x10000, CRC(311a6d4e) SHA1(62cf670b605906f7f4225905118524ee30d0e85b) )  // and this one?
+//  ROM_LOAD( "fruit3.ic39",    0x20000, 0x10000, CRC(311a6d4e) SHA1(62cf670b605906f7f4225905118524ee30d0e85b) )  // and this one?
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "82s131.ic47", 0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )

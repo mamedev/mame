@@ -116,8 +116,8 @@ xx/xx/2001  KS -    TS-2068 sound fixed.
                 completly messed timings.
 25/10/2012  DH - simplified border emulation to be a (manual) partial
                  update with bitmap
-				 Removed legacy fff4 interrupt hack, modern version of
-				 MAME can handle this just fine
+                 Removed legacy fff4 interrupt hack, modern version of
+                 MAME can handle this just fine
 
 Initialisation values used when determining which model is being emulated:
  48K        Spectrum doesn't use either port.

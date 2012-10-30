@@ -43,7 +43,7 @@ public:
 		m_VS920A_vram(*this, "vs920a_vram"),
 		m_work_ram(*this, "work_ram"),
 		m_lineram(*this, "lineram"),
-		m_spr(*this, "vsystem_spr")	
+		m_spr(*this, "vsystem_spr")
 	{ }
 
 	virtual void machine_start()

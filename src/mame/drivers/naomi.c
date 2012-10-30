@@ -434,7 +434,7 @@ Mobile Suit Gundam: Federation Vs. Zeon         841-0017C  23638   10 (128Mb)  ?
 Moero Justice Gakuen / Project Justice (Rev A)  841-0015C  23548A  11 (128Mb)  315-6319A  present   317-5065-COM
 Oinori-daimyoujin Matsuri                       840-0126B  24053    5 (128Mb)  315-6319A  present   not present
 Samba de Amigo Ver. 2000                        840-0047C  23600   21  (64Mb)  315-6319A  present   317-0295-COM
-Star Horse (Rev A)  							 840-0123C  24122A   7 (128Mb)  315-6319A  present   not present   requires an additional middle board n° 837-13785
+Star Horse (Rev A)                               840-0123C  24122A   7 (128Mb)  315-6319A  present   not present   requires an additional middle board n? 837-13785
 Virtua Striker 3 (Rev B)                        840-0061C  23663B  11 (128Mb)  315-6319A  present   317-0310-COM
 Virtua Striker 3 (Rev C)                        840-0061C  23663C  11 (128Mb)  315-6319A  present   317-0310-COM
 Wave Runner GP                                  840-0064C  24059    6 (128Mb)  315-6319A  present   not present

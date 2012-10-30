@@ -244,7 +244,7 @@ static const tms52xx_config tms_intf =
 {
 	DEVCB_NULL
 };
-  
+
 
 static MACHINE_CONFIG_START( portrait, portrait_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)     /* 4 MHz ? */

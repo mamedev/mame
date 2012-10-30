@@ -258,7 +258,7 @@ WRITE8_MEMBER( mos8722_device::write )
 			int fsdir = MCR_FSDIR;
 
 			m_reg[MCR] = data;
-			
+
 			if (_8500 != MCR_8500) m_out_z80en_func(MCR_8500);
 			if (fsdir != MCR_FSDIR) m_out_fsdir_func(MCR_FSDIR);
 			break;

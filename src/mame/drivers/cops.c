@@ -1,9 +1,9 @@
 /***************************************************************************
 
-	Atari Games Cops
-	(hardware developed by Nova Productions Limited)
+    Atari Games Cops
+    (hardware developed by Nova Productions Limited)
 
-	Preliminary driver by Mariusz Wojcieszek
+    Preliminary driver by Mariusz Wojcieszek
 
 ***************************************************************************/
 
@@ -565,8 +565,8 @@ static ADDRESS_MAP_START( cops_map, AS_PROGRAM, 8, cops_state )
 	AM_RANGE(0xb000, 0xb00f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)	/* VIA 1 */
 	AM_RANGE(0xb800, 0xb80f) AM_DEVREADWRITE("via6522_2", via6522_device, read, write)	/* VIA 2 */
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(io2_r, io2_w)
-//	AM_RANGE(0xd000, 0xd003) AM_DEVREADWRITE("acia6551_1", acia6551_device, read, write )
-//	AM_RANGE(0xd004, 0xd007) AM_DEVREADWRITE("acia6551_2", acia6551_device, read, write )
+//  AM_RANGE(0xd000, 0xd003) AM_DEVREADWRITE("acia6551_1", acia6551_device, read, write )
+//  AM_RANGE(0xd004, 0xd007) AM_DEVREADWRITE("acia6551_2", acia6551_device, read, write )
 	AM_RANGE(0xd000, 0xd007) AM_READWRITE(dacia_r, dacia_w)
 	AM_RANGE(0xd800, 0xd80f) AM_DEVREADWRITE("via6522_3", via6522_device, read, write)	/* VIA 3 */
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("system", 0)
@@ -645,8 +645,8 @@ static MACHINE_CONFIG_START( cops, cops_state )
 	MCFG_VIA6522_ADD("via6522_3", 0, via_3_interface)
 
 	/* acia */
-//	MCFG_ACIA6551_ADD("acia6551_1")
-//	MCFG_ACIA6551_ADD("acia6551_2")
+//  MCFG_ACIA6551_ADD("acia6551_1")
+//  MCFG_ACIA6551_ADD("acia6551_2")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

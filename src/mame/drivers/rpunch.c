@@ -740,7 +740,7 @@ ROM_START( spikes91a )
 	ROM_LOAD16_BYTE( "3-prg.bin", 0x20001, 0x08000, CRC(b6b24910) SHA1(2e4cf80a8eb1fcd9448405ff881bb99ae4ce8909) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
- 	ROM_LOAD32_BYTE( "7.bin",        0x000000, 0x010000, CRC(9596a4c0) SHA1(1f233bb2fa662fb8cd9c0db478e392ca26d9484b) )
+	ROM_LOAD32_BYTE( "7.bin",        0x000000, 0x010000, CRC(9596a4c0) SHA1(1f233bb2fa662fb8cd9c0db478e392ca26d9484b) )
 	ROM_LOAD32_BYTE( "10.bin",       0x000001, 0x010000, CRC(a05249e6) SHA1(8671e0c980ba87ea14895176fb5c8a48bb4c932e) )
 	ROM_LOAD32_BYTE( "13.bin",       0x000002, 0x010000, CRC(429159f3) SHA1(4395413c4ab4a1fd322a1af6f2b93bb62b044223) )
 	ROM_LOAD32_BYTE( "16.bin",       0x000003, 0x010000, CRC(f5436c8d) SHA1(d29508cc5ee43d7b072112c6d95c36ee0328e5fb) )
@@ -757,7 +757,7 @@ ROM_START( spikes91a )
 
 	ROM_REGION( 0x080000, "gfx3", ROMREGION_INVERT )
 	ROM_LOAD32_BYTE( "19.bin",       0x000000, 0x010000, CRC(12a67e3f) SHA1(c77b264eae0f55af36728b6e5e5e1fec3d366eb1) )
-  	ROM_LOAD32_BYTE( "20.bin",       0x000001, 0x010000, CRC(31828996) SHA1(b324902b9fff0bab1daa3af5136b96d50d12956f) )
+	ROM_LOAD32_BYTE( "20.bin",       0x000001, 0x010000, CRC(31828996) SHA1(b324902b9fff0bab1daa3af5136b96d50d12956f) )
 	ROM_LOAD32_BYTE( "21.bin",       0x000002, 0x010000, CRC(51cbe0d6) SHA1(d60b2a297d7e994c60db28e8ba60b0664e01f61d) )
 	ROM_LOAD32_BYTE( "22.bin",       0x000003, 0x010000, CRC(c289bfc0) SHA1(4a8929c5f304a1d203cad04c72fc6e96764dc858) )
 
@@ -804,6 +804,6 @@ GAME( 1989, svolley,  0,        rpunch,   svolley, rpunch_state,  svolley,  ROT0
 GAME( 1989, svolleyk, svolley,  rpunch,   svolley, rpunch_state,  svolley,  ROT0, "V-System Co.", "Super Volleyball (Korea)", GAME_NO_COCKTAIL )
 GAME( 1989, svolleyu, svolley,  rpunch,   svolley, rpunch_state,  svolley,  ROT0, "V-System Co. (Data East license)", "Super Volleyball (US)", GAME_NO_COCKTAIL )
 
-// video registers are changed, and there's some kind of RAM at 090xxx, possible a different sprite scheme for the bootleg (even if the original is intact) 
+// video registers are changed, and there's some kind of RAM at 090xxx, possible a different sprite scheme for the bootleg (even if the original is intact)
 // the sound system seems to be ripped from the later Power Spikes (see aerofgt.c)
 GAME( 1991, spikes91a,svolley,  spikes91a,svolley, rpunch_state,  svolley,  ROT0, "bootleg",  "Super Volleyball (bootleg)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING | GAME_NO_SOUND | GAME_NO_COCKTAIL ) // aka 1991 Spikes?

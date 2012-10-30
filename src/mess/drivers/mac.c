@@ -33,13 +33,13 @@
         SCC:
             PB_EXT  from mouse Y circuitry
             PA_EXT  from mouse X circuitry
- 
+
     NOTES:
         - pmac6100: with recent PPC fixes now gets into the 68000 emulator and executes part of the 680x0 startup code.
           'g 6802c73c' to get to the interesting part (wait past the boot chime).  PPC register r24 is the 68000 PC.
           when the PC hits GetCPUID, the move.l (a2), d0 at PC = 0x10000 will cause an MMU fault (jump to 0xFFF00300).  why?
           a2 = 0x5ffffffc (the CPU ID register).  MMU is unable to resolve this; defect in the MMU emulation probable.
- 
+
 ****************************************************************************/
 
 

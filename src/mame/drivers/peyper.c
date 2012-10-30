@@ -652,7 +652,7 @@ ROM_START(wolfman)
 ROM_END
 
 
-GAME( 1985, odin, 	  0, peyper,   odin_dlx, peyper_state, peyper,   ROT0, "Sonic",  "Odin",          		  GAME_IS_SKELETON_MECHANICAL)
+GAME( 1985, odin,	  0, peyper,   odin_dlx, peyper_state, peyper,   ROT0, "Sonic",  "Odin",        		  GAME_IS_SKELETON_MECHANICAL)
 GAME( 1985, odin_dlx, 0, peyper,   odin_dlx, peyper_state, peyper,   ROT0, "Sonic",  "Odin De Luxe",          GAME_IS_SKELETON_MECHANICAL)
 GAME( 1986, solarwap, 0, peyper,   solarwap, peyper_state, peyper,   ROT0, "Sonic",  "Solar Wars (Sonic)",    GAME_IS_SKELETON_MECHANICAL)
 GAME( 1986, gamatros, 0, peyper,   solarwap, peyper_state, peyper,   ROT0, "Sonic",  "Gamatron (Sonic)",    GAME_IS_SKELETON_MECHANICAL)

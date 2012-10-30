@@ -444,7 +444,7 @@ void upd765_family_device::fifo_push(UINT8 data, bool internal)
 	}
 	fifo[fifo_pos++] = data;
 	fifo_expected--;
-	
+
 	int thr = (fifocfg & FIF_THR)+1;
 	if(!fifo_write && (!fifo_expected || fifo_pos >= thr || (fifocfg & FIF_DIS)))
 		enable_transfer();
@@ -674,7 +674,7 @@ void upd765_family_device::live_run(attotime limit)
 			if(cur_live.bit_counter & 15)
 				break;
 			int slot = (cur_live.bit_counter >> 4)-1;
-		   
+
 			if(0)
 				fprintf(stderr, "%s: slot=%d data=%02x crc=%04x\n", tts(cur_live.tm).cstr(), slot, cur_live.data_reg, cur_live.crc);
 			cur_live.idbuf[slot] = cur_live.data_reg;
@@ -910,7 +910,7 @@ void upd765_family_device::live_run(attotime limit)
 				return;
 			}
 			break;
-			
+
 		default:
 			logerror("%s: Unknown live state %d\n", tts(cur_live.tm).cstr(), cur_live.state);
 			return;
@@ -1623,7 +1623,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 
 		case SCAN_ID_FAILED:
 			fprintf(stderr, "RNF\n");
-			//			command_end(fi, true, 1);
+			//          command_end(fi, true, 1);
 			return;
 
 		case SECTOR_READ:
@@ -1645,7 +1645,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			result[5] = command[4];
 			result[6] = command[5];
 			result_pos = 7;
-			//			command_end(fi, true, 0);
+			//          command_end(fi, true, 0);
 			return;
 
 		default:
@@ -1992,7 +1992,7 @@ bool upd765_family_device::write_one_bit(attotime limit)
 
 void upd765_family_device::live_write_raw(UINT16 raw)
 {
-	//	logerror("write %04x %04x\n", raw, cur_live.crc);
+	//  logerror("write %04x %04x\n", raw, cur_live.crc);
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = raw & 1;
 }
@@ -2012,7 +2012,7 @@ void upd765_family_device::live_write_mfm(UINT8 mfm)
 	cur_live.data_reg = mfm;
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = context;
-	//	logerror("write %02x   %04x %04x\n", mfm, cur_live.crc, raw);
+	//  logerror("write %02x   %04x %04x\n", mfm, cur_live.crc, raw);
 }
 
 bool upd765_family_device::sector_matches() const

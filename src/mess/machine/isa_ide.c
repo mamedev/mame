@@ -36,7 +36,7 @@ WRITE_LINE_MEMBER(isa16_ide_device::ide_interrupt)
 	{
 		m_isa->irq14_w(state);
 	}
-	else 
+	else
 	{
 		m_isa->irq15_w(state);
 	}

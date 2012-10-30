@@ -496,7 +496,7 @@ static int tzx_cas_do_work( INT16 **buffer )
 			else
 			{
 				current_block++;
-			}			
+			}
 			break;
 
 		case 0x21:	/* Group Start */

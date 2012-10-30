@@ -223,7 +223,7 @@ void atarigen_state::machine_reset()
 		slapstic_reset();
 		slapstic_update_bank(slapstic_bank());
 	}
-	
+
 	// reset sound I/O
 	sound_io_reset();
 }
@@ -240,28 +240,28 @@ void atarigen_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			timer.adjust(screen->frame_period());
 			break;
 		}
-		
+
 		case TID_SCANLINE_TIMER:
 			scanline_timer(timer, *reinterpret_cast<screen_device *>(ptr), param);
 			break;
-		
+
 		case TID_ATARIVC_EOF:
 			atarivc_eof_update(timer, *reinterpret_cast<screen_device *>(ptr));
 			break;
-	
+
 		// sound I/O
 		case TID_SOUND_RESET:
 			delayed_sound_reset(param);
 			break;
-		
+
 		case TID_SOUND_WRITE:
 			delayed_sound_write(param);
 			break;
-		
+
 		case TID_6502_WRITE:
 			delayed_6502_write(param);
 			break;
-	
+
 		// unhalt the CPU that was passed as a pointer
 		case TID_UNHALT_CPU:
 			reinterpret_cast<device_t *>(ptr)->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
@@ -559,7 +559,7 @@ void atarigen_state::sound_io_reset()
 
 
 //-------------------------------------------------
-//  m6502_irq_gen: Generates an IRQ signal to the 
+//  m6502_irq_gen: Generates an IRQ signal to the
 //  6502 sound processor.
 //-------------------------------------------------
 
@@ -613,7 +613,7 @@ WRITE16_MEMBER(atarigen_state::sound_reset_w)
 
 
 //-------------------------------------------------
-//  sound_cpu_reset: Resets the state of the sound 
+//  sound_cpu_reset: Resets the state of the sound
 //  CPU manually.
 //-------------------------------------------------
 
@@ -652,7 +652,7 @@ READ8_MEMBER(atarigen_state::sound_r)
 
 
 //-------------------------------------------------
-//  m6502_sound_w: Handles communication from the 
+//  m6502_sound_w: Handles communication from the
 //  sound CPU to the main CPU.
 //-------------------------------------------------
 
@@ -663,8 +663,8 @@ WRITE8_MEMBER(atarigen_state::m6502_sound_w)
 
 
 //-------------------------------------------------
-//  m6502_sound_r: Handles reading data 
-//  communicated from the main CPU to the sound 
+//  m6502_sound_r: Handles reading data
+//  communicated from the main CPU to the sound
 //  CPU.
 //-------------------------------------------------
 
@@ -717,7 +717,7 @@ void atarigen_state::delayed_sound_reset(int param)
 
 
 //-------------------------------------------------
-//  delayed_sound_write: Synchronizes a data write 
+//  delayed_sound_write: Synchronizes a data write
 //  from the main CPU to the sound CPU.
 //-------------------------------------------------
 
@@ -739,7 +739,7 @@ void atarigen_state::delayed_sound_write(int data)
 
 
 //-------------------------------------------------
-//  delayed_6502_write: Synchronizes a data write 
+//  delayed_6502_write: Synchronizes a data write
 //  from the sound CPU to the main CPU.
 //-------------------------------------------------
 
@@ -762,8 +762,8 @@ void atarigen_state::delayed_6502_write(int data)
 ***************************************************************************/
 
 //-------------------------------------------------
-//  set_volume_by_type: Scans for a particular 
-//  sound chip and changes the volume on all 
+//  set_volume_by_type: Scans for a particular
+//  sound chip and changes the volume on all
 //  channels associated with it.
 //-------------------------------------------------
 
@@ -777,7 +777,7 @@ void atarigen_state::set_volume_by_type(int volume, device_type type)
 
 
 //-------------------------------------------------
-//  set_XXXXX_volume: Sets the volume for a given 
+//  set_XXXXX_volume: Sets the volume for a given
 //  type of chip.
 //-------------------------------------------------
 
@@ -829,7 +829,7 @@ void atarigen_state::scanline_timer_reset(screen_device &screen, int frequency)
 
 //-------------------------------------------------
 //  scanline_timer: Called once every n scanlines
-//  to generate the periodic callback to the main 
+//  to generate the periodic callback to the main
 //  system.
 //-------------------------------------------------
 

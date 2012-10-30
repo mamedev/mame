@@ -207,7 +207,7 @@ static ADDRESS_MAP_START( hustlerb3_map, AS_PROGRAM, 8, scobra_state )
 
 	// NOTE: hardware does not have any 8255 chip. Is this handled through TTL, or a leftover?
 	// Is b800 the actual sound comms? The soundroms are not dumped, so we can't know...
-//	AM_RANGE(0xb800, 0xb800) AM_WRITENOP
+//  AM_RANGE(0xb800, 0xb800) AM_WRITENOP
 	AM_RANGE(0xc200, 0xc203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 ADDRESS_MAP_END
 
@@ -625,7 +625,7 @@ static INPUT_PORTS_START( hustlerb3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	
+
 	// 6-pos dipswitch on mainboard K4
 	PORT_DIPNAME( 0x40, 0x00, "Half Coinage" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )

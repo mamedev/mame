@@ -1,7 +1,7 @@
 /***************************************************************************
 
   macadb.c - handles various aspects of ADB on the Mac.
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -1254,14 +1254,14 @@ void mac_state::adb_linechange(int state, int dtime)
             }
             break;
 
-        case LST_BIT0: 
-        case LST_BIT1: 
-        case LST_BIT2: 
-        case LST_BIT3: 
-        case LST_BIT4: 
-        case LST_BIT5: 
-        case LST_BIT6: 
-        case LST_BIT7: 
+        case LST_BIT0:
+        case LST_BIT1:
+        case LST_BIT2:
+        case LST_BIT3:
+        case LST_BIT4:
+        case LST_BIT5:
+        case LST_BIT6:
+        case LST_BIT7:
             if (!state)
             {
                 if (dtime >= 90)    // "1" bit

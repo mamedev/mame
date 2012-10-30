@@ -15,7 +15,7 @@
 			<dataarea name="flop" size="901120">
 				<rom name="workbench v2.04 rev 37.67 (1991)(commodore)(disk 1 of 4)(workbench).adf" size="901120" crc="57714d34" sha1="8d5c0310a86f14fb3e6a1da001ceb50b9a592c51" offset="0"/>
 			</dataarea>
-		</part> 
+		</part>
 
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Extras" />

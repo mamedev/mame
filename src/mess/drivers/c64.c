@@ -80,7 +80,7 @@ void c64_state::read_pla(offs_t offset, offs_t va, int rw, int aec, int ba, int 
 	int exrom = m_exp->exrom_r(offset, sphi2, ba, rw, m_hiram);
 	int cas = 0;
 
-	UINT32 input = VA12 << 15 | VA13 << 14 | game << 13 | exrom << 12 | rw << 11 | aec << 10 | ba << 9 | A12 << 8 | 
+	UINT32 input = VA12 << 15 | VA13 << 14 | game << 13 | exrom << 12 | rw << 11 | aec << 10 | ba << 9 | A12 << 8 |
 		A13 << 7 | A14 << 6 | A15 << 5 | m_va14 << 4 | m_charen << 3 | m_hiram << 2 | m_loram << 1 | cas;
 
 	UINT32 data = m_pla->read(input);
@@ -195,7 +195,7 @@ void c64_state::write_memory(address_space &space, offs_t offset, UINT8 data, in
 	int sphi2 = m_vic->phi0_r();
 
 	read_pla(offset, va, rw, !aec, ba, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
-	
+
 	if (offset < 0x0002)
 	{
 		// write to internal CPU register
@@ -259,7 +259,7 @@ READ8_MEMBER( c64_state::read )
 
 	// VIC address bus is floating
 	offs_t va = 0x3fff;
-	
+
 	return read_memory(space, offset, va, aec, ba);
 }
 
@@ -271,7 +271,7 @@ READ8_MEMBER( c64_state::read )
 WRITE8_MEMBER( c64_state::write )
 {
 	int aec = 1, ba = 1;
-	
+
 	write_memory(space, offset, data, aec, ba);
 }
 
@@ -287,7 +287,7 @@ READ8_MEMBER( c64_state::vic_videoram_r )
 
 	// A15/A14 are not connected to VIC so they are floating
 	offset |= 0xc000;
-	
+
 	return read_memory(space, offset, va, aec, ba);
 }
 

@@ -299,7 +299,7 @@ MACHINE_CONFIG_END
 void gottlieb_state::qbert_knocker(UINT8 knock)
 {
 	output_set_value("knocker0", knock);
-	
+
 	// start sound on rising edge
 	if (knock & ~m_knocker_prev)
 		m_knocker_sample->start(0, 0);

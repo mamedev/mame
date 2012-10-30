@@ -73,7 +73,7 @@
 			<color red="0.25" green="0.05" blue="0.0" />
 			<bounds x="1.5" y="0" width="1" height="1" />
 		</disk>
-		
+
 		<rect state="1">
 			<color red="1.0" green="0.25" blue="0.10" />
 			<bounds x="0.5" y="0" width="1.5" height="1" />
@@ -107,7 +107,7 @@
 			<color red="0.25" green="0.05" blue="0.0" />
 			<bounds x="1.5" y="0" width="1" height="1" />
 		</disk>
-		
+
 		<rect state="1">
 			<color red="1.0" green="0.25" blue="0.10" />
 			<bounds x="0.5" y="0" width="1.5" height="1" />

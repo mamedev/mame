@@ -592,7 +592,7 @@ static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_ac
 	rsp->sp_reg_r_func.resolve(config->sp_reg_r_cb, *device);
 	rsp->sp_reg_w_func.resolve(config->sp_reg_w_cb, *device);
 	rsp->sp_set_status_func.resolve(config->sp_set_status_cb, *device);
-	
+
 	rsp->irq_callback = irqcallback;
 	rsp->device = device;
 	rsp->program = &device->space(AS_PROGRAM);

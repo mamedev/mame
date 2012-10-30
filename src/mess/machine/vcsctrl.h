@@ -47,16 +47,16 @@ public:
 
 	// computer interface
 
-	// Data returned by the joy_r methods: 
+	// Data returned by the joy_r methods:
 	// bit 0 - pin 1 - Up
 	// bit 1 - pin 2 - Down
 	// bit 2 - pin 3 - Left
 	// bit 3 - pin 4 - Right
-	// bit 4 - pin 5 - 
+	// bit 4 - pin 5 -
 	// bit 5 - pin 6 - Button
 	//         pin 7 - +5V
 	//         pin 8 - GND
-	// bit 6 - pin 9 - 
+	// bit 6 - pin 9 -
 	//
 	UINT8 joy_r();
 	DECLARE_READ8_MEMBER( joy_r );

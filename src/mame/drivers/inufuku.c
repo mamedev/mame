@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16, inufuku_state )
 
 	AM_RANGE(0x780000, 0x780013) AM_WRITE(inufuku_palettereg_w)	// bg & text palettebank register
 	AM_RANGE(0x7a0000, 0x7a0023) AM_WRITE(inufuku_scrollreg_w)	// bg & text scroll register
-//	AM_RANGE(0x7e0000, 0x7e0001) AM_WRITENOP					// ?
+//  AM_RANGE(0x7e0000, 0x7e0001) AM_WRITENOP                    // ?
 
 	AM_RANGE(0x800000, 0xbfffff) AM_ROM	// data rom
 	AM_RANGE(0xfd0000, 0xfdffff) AM_RAM // work ram

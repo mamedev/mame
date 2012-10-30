@@ -434,7 +434,7 @@ protected:
 	virtual UINT8 draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect, void *param);
 
 	static const device_timer_id TIMER_BLOCK_COPY = 9;
-	
+
 	emu_timer *m_block_copy_timer;
 };
 

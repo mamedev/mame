@@ -29,10 +29,10 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 #define verboselog(x,y,z,...)
 #endif
 
-#define MASTER_CLOCK 	20000000
+#define MASTER_CLOCK	20000000
 
-#define VISIBLE_CYCLES 		480
-#define HSYNC_CYCLES 		155
+#define VISIBLE_CYCLES		480
+#define HSYNC_CYCLES		155
 #define LINE_CYCLES 		(VISIBLE_CYCLES + HSYNC_CYCLES)
 #define VISIBLE_LINES		480
 #define VSYNC_LINES			45
@@ -209,14 +209,14 @@ static void avr8_change_port(running_machine &machine, int reg, UINT8 data)
 		avr8_video_update(machine);
 
 		/*if (frame_cycles >= state->spi_start_cycle && frame_cycles < (state->spi_start_cycle + 16))
-		{
-			UINT8 bitidx = 7 - ((frame_cycles - state->spi_start_cycle) >> 1);
-			state->m_pixels[frame_cycles] = ((state->m_regs[AVR8_REGIDX_SPDR] & (1 << bitidx)) ? 0x3f : (data & 0x3f));
-		}
-		else
-		{
-			state->m_pixels[frame_cycles] = data & 0x3f;
-		}*/
+        {
+            UINT8 bitidx = 7 - ((frame_cycles - state->spi_start_cycle) >> 1);
+            state->m_pixels[frame_cycles] = ((state->m_regs[AVR8_REGIDX_SPDR] & (1 << bitidx)) ? 0x3f : (data & 0x3f));
+        }
+        else
+        {
+            state->m_pixels[frame_cycles] = data & 0x3f;
+        }*/
 
 		AVR8_PORTC = data;
 	}

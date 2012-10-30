@@ -17,26 +17,26 @@
 
 <!-- COMPATIBILITY
      The MESS emulation at the time of writing isn't very good, the following emulators are used to determine how things should work
-     
+
       EmuZWin (v2.7 release 2.8)         - Closed Source, runs some images (Gremlin 2 type*) which fail on the emulators below  - http://kolmck.net/apps/EmuZWin_Eng.htm
       Fuse (Free Unix Spectrum Emulator) - Free, High Compatibility can run some of the trickier images, Windows port available - http://fuse-emulator.sourceforge.net/
-      Spectaculator                      - Commercial, a bit more user friendly than above, similar compatibility               - http://www.spectaculator.com/     
-     
+      Spectaculator                      - Commercial, a bit more user friendly than above, similar compatibility               - http://www.spectaculator.com/
+
      Note, even with those emulators you'll have to turn off some of the speed cheats on loading to get good compatibilty for example, in Fuse
       Use Tape Traps
       Fastloading
       Detect Loaders
       Accelerate Loaders
-     
+
      MESS doesn't have any accelerated loading so some games which require the tricks to be disabled in other emulators work in MESS without trickery, eg Xanthius
-     
+
      http://newton.sunderland.ac.uk/~specfreak/Schemes/schemes.html is a rather outdated guide mentioning some of the custom loaders, and showing disassemblies of them.
-  
+
      legacy emulators including Real Spectrum ( http://zxm.speccy.cz/realspec/ ) appear to struggle with some of the more complex tape protections
 
      * Gremlin 2 type images include 'M.A.S.K' and 'Basil The Great Mouse Detective'
-     
-     
+
+
 
 
 -->
@@ -457,7 +457,7 @@
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="42011">
 				<rom name="snare - alternate - side a.tzx" size="42011" crc="48239344" sha1="eeaab4c697e35e2f7bd452906314948134933cfc" offset="0"/>
-      	<!-- side B is for the Sam Coupe, see samcoupe_cass.xml -->
+    	<!-- side B is for the Sam Coupe, see samcoupe_cass.xml -->
 			</dataarea>
 		</part>
 	</software>

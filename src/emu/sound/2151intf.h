@@ -34,7 +34,7 @@
 
 // ======================> ym2151_device
 
-class ym2151_device : 	public device_t,
+class ym2151_device :	public device_t,
 						public device_sound_interface
 {
 public:
@@ -48,7 +48,7 @@ public:
 	// read/write
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	
+
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( register_w );
 	DECLARE_WRITE8_MEMBER( data_w );

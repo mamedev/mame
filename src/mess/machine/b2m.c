@@ -206,7 +206,7 @@ WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
 {
 	UINT8 drive = ((data >> 1) & 1) ^ 1;
 	UINT8 side  = (data  & 1) ^ 1;
-	
+
 	static const char *names[] = { "fd0", "fd1"};
 	floppy_image_device *floppy = NULL;
 	floppy_connector *con = machine().device<floppy_connector>(names[drive]);
@@ -219,7 +219,7 @@ WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
 		m_b2m_drive = drive;
 	}
 	floppy->ss_w(side);
-	if (m_b2m_side!=side) {	
+	if (m_b2m_side!=side) {
 		m_b2m_side = side;
 	}
 }

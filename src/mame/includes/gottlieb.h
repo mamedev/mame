@@ -281,7 +281,7 @@ public:
 	double m_weights[4];
 
 	void qbert_knocker(UINT8 knock);
-	
+
 	DECLARE_WRITE8_MEMBER(gottlieb_analog_reset_w);
 	DECLARE_WRITE8_MEMBER(general_output_w);
 	DECLARE_WRITE8_MEMBER(reactor_output_w);

@@ -27,11 +27,11 @@
 			<dataarea name="flop" size="901120">
 				<rom name="kickstart-disk v1.3 r34.5 (1987)(commodore)(a1000).adf" size="901120" crc="5fd0ef3b" sha1="a80b001b98a997969bf709cecd07f8578f861148" offset="0"/>
 			</dataarea>
-		</part> 
+		</part>
 	</software>
-  
+
 	<!-- Todo, other Kickstart disks, and appropriate Workbench disks -->
-  
+
 </softwarelist>
 
 

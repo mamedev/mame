@@ -59,28 +59,28 @@
 #define DEVCB2_LOGGER(_string, _value) devcb2_base::logger_desc(_string, _value)
 #define DEVCB2_INPUTLINE(_tag, _line) devcb2_base::inputline_desc(_tag, _line)
 
-// wrappers for read callbacks into the owner device 
+// wrappers for read callbacks into the owner device
 #define DEVCB2_READLINE(_class, _func) read_line_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
 #define DEVCB2_READ8(_class, _func) read8_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
 #define DEVCB2_READ16(_class, _func) read16_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
 #define DEVCB2_READ32(_class, _func) read32_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
 #define DEVCB2_READ64(_class, _func) read64_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
- 
-// wrappers for read callbacks into any tagged device 
+
+// wrappers for read callbacks into any tagged device
 #define DEVCB2_DEVREADLINE(tag, _class, _func) read_line_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
 #define DEVCB2_DEVREAD8(tag, _class, _func) read8_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
 #define DEVCB2_DEVREAD16(tag, _class, _func) read16_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
 #define DEVCB2_DEVREAD32(tag, _class, _func) read32_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
 #define DEVCB2_DEVREAD64(tag, _class, _func) read64_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
- 
-// wrappers for write callbacks into the owner device 
+
+// wrappers for write callbacks into the owner device
 #define DEVCB2_WRITELINE(_class, _func) write_line_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
 #define DEVCB2_WRITE8(_class, _func) write8_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
 #define DEVCB2_WRITE16(_class, _func) write16_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
 #define DEVCB2_WRITE32(_class, _func) write32_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
 #define DEVCB2_WRITE64(_class, _func) write64_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)
- 
-// wrappers for write callbacks into any tagged device 
+
+// wrappers for write callbacks into any tagged device
 #define DEVCB2_DEVWRITELINE(tag, _class, _func) write_line_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
 #define DEVCB2_DEVWRITE8(tag, _class, _func) write8_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
 #define DEVCB2_DEVWRITE16(tag, _class, _func) write16_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
@@ -137,28 +137,28 @@ public:
 	devcb2_base &set_rshift(int rshift) { m_rshift = rshift; return *this; }
 	devcb2_base &set_mask(UINT64 mask) { m_mask = mask; return *this; }
 	devcb2_base &set_xor(UINT64 xorval) { m_xor = xorval; return *this; }
-	
+
 	// construction helper classes
 	class null_desc
 	{
 	public:
 		null_desc() { }
 	};
-	
+
 	class ioport_desc
 	{
 	public:
 		ioport_desc(const char *tag) { m_tag = tag; }
 		const char *m_tag;
 	};
-	
+
 	class constant_desc
 	{
 	public:
 		constant_desc(UINT64 value) { m_value = value; }
 		UINT64 m_value;
 	};
-	
+
 	class logger_desc
 	{
 	public:
@@ -191,7 +191,7 @@ protected:
 	void resolve_ioport();
 	void resolve_inputline();
 	void resolve_space();
-	
+
 	// the callback target is going to be one of these
 	union callback_target
 	{
@@ -199,7 +199,7 @@ protected:
 		device_t *			device;
 		ioport_port *		ioport;
 	};
-	
+
 	// configuration
 	device_t &			m_device;				// reference to our owning device
 	callback_type		m_type;					// type of callback registered
@@ -212,8 +212,8 @@ protected:
 	address_space *		m_space;				// target address space
 	callback_target		m_target;				// resolved pointer to target object
 	int 				m_rshift;				// right shift to apply to data read
-	UINT64 				m_mask;					// mask to apply to data read
-	UINT64 				m_xor;					// XOR to apply to data read
+	UINT64				m_mask;					// mask to apply to data read
+	UINT64				m_xor;					// XOR to apply to data read
 };
 
 
@@ -224,7 +224,7 @@ class devcb2_read_base : public devcb2_base
 protected:
 	// construction/destruction
 	devcb2_read_base(device_t &device, UINT64 defmask);
-	
+
 public:
 	// callback configuration
 	using devcb2_base::set_callback;
@@ -233,7 +233,7 @@ public:
 	devcb2_base &set_callback(read16_delegate func) { reset(CALLBACK_16); m_read16 = func; return *this; }
 	devcb2_base &set_callback(read32_delegate func) { reset(CALLBACK_32); m_read32 = func; return *this; }
 	devcb2_base &set_callback(read64_delegate func) { reset(CALLBACK_64); m_read64 = func; return *this; }
-	
+
 	// resolution
 	void resolve();
 	void resolve_safe(UINT64 none_constant_value);
@@ -273,7 +273,7 @@ class devcb2_write_base : public devcb2_base
 protected:
 	// construction/destruction
 	devcb2_write_base(device_t &device, UINT64 defmask);
-	
+
 public:
 	// callback configuration
 	using devcb2_base::set_callback;

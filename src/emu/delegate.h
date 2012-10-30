@@ -256,9 +256,9 @@ public:
 		: m_rawdata(s_null_mfp),
 		  m_realobject(NULL),
 		  m_stubfunction(NULL) { }
-	
+
 	// copy constructor
-	delegate_mfp(const delegate_mfp &src) 
+	delegate_mfp(const delegate_mfp &src)
 		: m_rawdata(src.m_rawdata),
 		  m_realobject(src.m_realobject),
 		  m_stubfunction(src.m_stubfunction) { }
@@ -277,10 +277,10 @@ public:
 	// comparison helpers
 	bool operator==(const delegate_mfp &rhs) const { return (m_rawdata == rhs.m_rawdata); }
 	bool isnull() const { return (m_rawdata == s_null_mfp); }
-	
+
 	// getters
 	delegate_generic_class *real_object(delegate_generic_class *original) const { return m_realobject; }
-	
+
 	// binding helper
 	template<typename _FunctionType>
 	void update_after_bind(_FunctionType &funcptr, delegate_generic_class *&object)
@@ -345,7 +345,7 @@ private:
     	mfptype &mfp = *reinterpret_cast<mfptype *>(&_this->m_rawdata);
     	return (reinterpret_cast<_FunctionClass *>(_this->m_realobject)->*mfp)(p1, p2, p3, p4, p5);
     }
-    
+
 	// helper to convert a function of a given type to a generic function, forcing template
 	// instantiation to match the source type
 	template <typename _SourceType>
@@ -362,7 +362,7 @@ private:
 	};
 
 	// internal state
-	raw_mfp_data		 		m_rawdata;			// raw buffer to hold the copy of the function pointer
+	raw_mfp_data				m_rawdata;			// raw buffer to hold the copy of the function pointer
 	delegate_generic_class *	m_realobject;		// pointer to the object used for calling
 	delegate_generic_function	m_stubfunction;		// pointer to our matching stub function
 	static raw_mfp_data			s_null_mfp;			// NULL mfp
@@ -400,7 +400,7 @@ public:
 
 	// getters
 	delegate_generic_class *real_object(delegate_generic_class *original) const { return original; }
-	
+
 	// binding helper
 	template<typename _FunctionType>
 	void update_after_bind(_FunctionType &funcptr, delegate_generic_class *&object)
@@ -546,7 +546,7 @@ public:
 	// getters
 	bool has_object() const { return (object() != NULL); }
 	const char *name() const { return m_name; }
-	
+
 	// helpers
 	bool isnull() const { return (m_raw_function == NULL && m_raw_mfp.isnull()); }
 	bool is_mfp() const { return !m_raw_mfp.isnull(); }
@@ -575,7 +575,7 @@ protected:
 	void bind(delegate_generic_class *object)
 	{
 		m_object = object;
-		
+
 		// if we're wrapping a member function pointer, handle special stuff
 		if (m_object != NULL && is_mfp())
 			m_raw_mfp.update_after_bind(m_function, m_object);

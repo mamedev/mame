@@ -175,12 +175,12 @@ static INPUT_PORTS_START( b2m )
 INPUT_PORTS_END
 /*
 static LEGACY_FLOPPY_OPTIONS_START(b2m)
-	LEGACY_FLOPPY_OPTION(b2m, "cpm", "Bashkiria-2M disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([5])
-		SECTOR_LENGTH([1024])
-		FIRST_SECTOR_ID([1]))
+    LEGACY_FLOPPY_OPTION(b2m, "cpm", "Bashkiria-2M disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+        HEADS([2])
+        TRACKS([80])
+        SECTORS([5])
+        SECTOR_LENGTH([1024])
+        FIRST_SECTOR_ID([1]))
 LEGACY_FLOPPY_OPTIONS_END
 */
 

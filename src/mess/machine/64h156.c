@@ -658,7 +658,7 @@ void c64h156_device::stp_w(int data)
 	{
 		int track = floppy_drive_get_current_track(m_image);
 		int tracks = (data - track) & 0x03;
-		
+
 		if (tracks == 3)
 		{
 			tracks = -1;

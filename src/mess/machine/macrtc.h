@@ -29,7 +29,7 @@
 // ======================> rtc3430042_device
 
 class rtc3430042_device :  public device_t,
-                        public device_rtc_interface, 
+                        public device_rtc_interface,
                         public device_nvram_interface
 {
 public:

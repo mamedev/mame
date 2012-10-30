@@ -1018,7 +1018,7 @@ void command_handler_kov(pgm_arm_type1_state *state, int pc)
 
 		default:
 			state->m_valueresponse = 0x880000;
-//          		logerror("Unknown ASIC27 command: %2.2x data: %4.4x\n", (data ^ state->m_valuekey) & 0xff, state->m_value0);
+//                  logerror("Unknown ASIC27 command: %2.2x data: %4.4x\n", (data ^ state->m_valuekey) & 0xff, state->m_value0);
 		break;
 	}
 }

@@ -3,7 +3,7 @@
     TODO:
 
     - connect CAPS LOCK to charom A12 on international variants
-	- DCR models won't boot with 1571CR drive
+    - DCR models won't boot with 1571CR drive
     - fix fast serial
     - remove frame interrupt handler
     - expansion DMA
@@ -957,7 +957,7 @@ WRITE8_MEMBER( c128_state::cia1_pb_w )
 
     */
 
-   	m_vic->lp_w(BIT(data, 4));
+	m_vic->lp_w(BIT(data, 4));
 }
 
 WRITE_LINE_MEMBER( c128_state::cia1_cnt_w )
@@ -1055,7 +1055,7 @@ WRITE8_MEMBER( c128_state::cia2_pa_w )
 	m_iec->atn_w(!BIT(data, 3));
 	m_iec->clk_w(!BIT(data, 4));
 	m_iec_data_out = BIT(data, 5);
-	
+
 	update_iec();
 }
 
@@ -1085,10 +1085,10 @@ READ8_MEMBER( c128_state::cpu_r)
         P0      1
         P1      1
         P2      1
-        P3      
-        P4		CASS SENSE
-        P5      
-        P6		CAPS LOCK
+        P3
+        P4      CASS SENSE
+        P5
+        P6      CAPS LOCK
 
     */
 
@@ -1693,12 +1693,12 @@ ROM_END
 
 ROM_START( c128cr )
 	/* C128CR prototype, owned by Bo Zimmers
-	PCB markings: "COMMODORE 128CR REV.3 // PCB NO.252270" and "PCB	ASSY NO.250783"
-	Sticker on rom cart shield: "C128CR  No.2 // ENG. SAMPLE //	Jun/9/'86   KNT"
-	3 ROMs (combined basic, combined c64/kernal, plain character rom)
-	6526A-1 CIAs
-	?prototype? 2568R1X VDC w/ 1186 datecode
-	*/
+    PCB markings: "COMMODORE 128CR REV.3 // PCB NO.252270" and "PCB ASSY NO.250783"
+    Sticker on rom cart shield: "C128CR  No.2 // ENG. SAMPLE // Jun/9/'86   KNT"
+    3 ROMs (combined basic, combined c64/kernal, plain character rom)
+    6526A-1 CIAs
+    ?prototype? 2568R1X VDC w/ 1186 datecode
+    */
 	ROM_REGION( 0x10000, M8502_TAG, 0 )
 	ROM_LOAD( "252343-03.u34", 0x4000, 0x8000, CRC(bc07ed87) SHA1(0eec437994a3f2212343a712847213a8a39f4a7b) ) // "252343-03 // U34"
 	ROM_LOAD( "252343-04.u32", 0x0000, 0x4000, CRC(cc6bdb69) SHA1(36286b2e8bea79f7767639fd85e12c5447c7041b) ) // "252343-04 // US // U32"

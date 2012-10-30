@@ -49,7 +49,7 @@ public:
 	// static configuration helpers
 	template<class _Object> static devcb2_base &set_read_handler(device_t &device, _Object object) { return downcast<i8243_device &>(device).m_readhandler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_write_handler(device_t &device, _Object object) { return downcast<i8243_device &>(device).m_writehandler.set_callback(object); }
- 
+
 	DECLARE_READ8_MEMBER(i8243_p2_r);
 	DECLARE_WRITE8_MEMBER(i8243_p2_w);
 

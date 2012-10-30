@@ -849,7 +849,7 @@ void plus4_state::machine_start()
 	{
 		m_c2 = memregion("c2")->base();
 	}
-	
+
 	// initialize memory
 	UINT8 data = 0xff;
 

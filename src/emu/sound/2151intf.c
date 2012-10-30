@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	2151intf.c
+    2151intf.c
 
-	Support interface YM2151(OPM)
+    Support interface YM2151(OPM)
 
 ***************************************************************************/
 
@@ -75,7 +75,7 @@ void ym2151_device::device_start()
 {
 	m_irqhandler.resolve_safe();
 	m_portwritehandler.resolve_safe();
-	
+
 	// stream setup
 	int rate = clock() / 64;
 	m_stream = stream_alloc(0, 2, rate);

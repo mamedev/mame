@@ -56,7 +56,7 @@ Games on this system include....
 |*|Quest Of D (Ver.1.01C)                             | Sega, 2004      | CDROM  CDV-10005C |              |
 |*|Sangokushi Taisen (Ver.1.002)                      | Sega, 2005      | DVDROM CDV-10009D |              |
 |*|Sangokushi Taisen 2 (Ver.2.007)                    | Sega, 2006      | DVDROM CDV-10019A |              |
-|*|Sangokushi Taisen            	                   | Sega, 2005      | DVDROM CDV-10022  |              |
+|*|Sangokushi Taisen                                   | Sega, 2005      | DVDROM CDV-10022  |              |
 |*|Sangokushi Taisen 2 Firmware Update                | Sega, 2006      | DVDROM CDV-10023  |              |
 |*|Sangokushi Taisen 2                                | Sega, 2006      | DVDROM CDV-10029  |              |
 |*|Sangokushi Taisen 3                                | Sega, 2008      | DVDROM CDV-10036  |              |

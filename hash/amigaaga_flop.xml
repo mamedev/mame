@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- General purpose software list for Amiga software requiring the AGA chipset (A1200 / A4000) 
-       
+<!-- General purpose software list for Amiga software requiring the AGA chipset (A1200 / A4000)
+
      the software listed here is not designed for use on systems without the AGA chipset and
      will not function.
 -->
@@ -116,7 +116,7 @@
         <rom name="pinballillusions_disk4.ipf" size="1049612" crc="e551bc40" sha1="05757f0e6289385df204c2ced4fb0348aa4b39ee" offset="0"/>
       </dataarea>
     </part>
-    
+
   </software>
 
     <!-- simple 1 disk game using AGA mode -->

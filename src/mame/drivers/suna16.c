@@ -121,7 +121,7 @@ READ8_MEMBER(suna16_state::uballoon_prot_r)
 		case 0x0311/2:
 			ret = 0x03;
 			break;
-		
+
 		default:
 			//logerror("uballoon_prot_r %04X\n", offset);
 			break;
@@ -137,7 +137,7 @@ WRITE8_MEMBER(suna16_state::uballoon_prot_w)
 		case 0x0001/2:
 			m_prot = data;
 			break;
-		
+
 		default:
 			//logerror("uballoon_prot_w %04X=%02X\n", offset, data);
 			break;

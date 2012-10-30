@@ -465,7 +465,7 @@ READ_LINE_MEMBER( s3_state::pia4_cb1_r )
 
 READ8_MEMBER( s3_state::dac_r )
 {
-	return m_sound_data;	
+	return m_sound_data;
 }
 
 WRITE8_MEMBER( s3_state::dac_w )

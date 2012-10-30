@@ -44,7 +44,7 @@ public:
 		sam_bank_read_ptr[2] = NULL;
 		sam_bank_write_ptr[2] = NULL;
 		sam_bank_read_ptr[3] = NULL;
-		sam_bank_write_ptr[3] = NULL;	
+		sam_bank_write_ptr[3] = NULL;
 	}
 
 	virtual void video_start();

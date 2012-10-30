@@ -1,7 +1,7 @@
 /***************************************************************************
 
   Apple Macintosh II Video Card (630-0153) emulation
- 
+
   Video ASIC is "TFB" 344-0001
   RAMDAC is Bt453: control at Fs09001C, data at Fs090018
   Fs08000x is general framebuffer control (video mode at 0)

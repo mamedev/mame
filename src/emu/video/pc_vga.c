@@ -2702,59 +2702,59 @@ void s3_vga_device::s3_define_video_mode()
 			case 0x0d: svga.rgb32_en = 1; divisor = 2; break;
 			default: fatalerror("TODO: s3 video mode not implemented %02x\n",((s3.ext_misc_ctrl_2) >> 4)); break;
 		}
-/*		switch(s3.cr42 & 0x0f)  // TODO: confirm clock settings
-		{
-		case 0:
-			xtal = XTAL_25_1748MHz;
-			break;
-		case 1:
-			xtal = XTAL_28_63636MHz;
-			break;
-		case 2:
-			xtal = 40000000;
-			break;
-		case 3:
-			xtal = 3000000;
-			break;
-		case 4:
-			xtal = 50000000;
-			break;
-		case 5:
-			xtal = 77000000;
-			break;
-		case 6:
-			xtal = 36000000;
-			break;
-		case 7:
-			xtal = 45000000;
-			break;
-		case 8:
-			xtal = 1000000;
-			break;
-		case 9:
-			xtal = 1000000;
-			break;
-		case 10:
-			xtal = 79000000;
-			break;
-		case 11:
-			xtal = 31000000;
-			break;
-		case 12:
-			xtal = 94000000;
-			break;
-		case 13:
-			xtal = 65000000;
-			break;
-		case 14:
-			xtal = 75000000;
-			break;
-		case 15:
-			xtal = 71000000;
-			break;
-		default:
-			xtal = 1000000;
-		}*/
+/*      switch(s3.cr42 & 0x0f)  // TODO: confirm clock settings
+        {
+        case 0:
+            xtal = XTAL_25_1748MHz;
+            break;
+        case 1:
+            xtal = XTAL_28_63636MHz;
+            break;
+        case 2:
+            xtal = 40000000;
+            break;
+        case 3:
+            xtal = 3000000;
+            break;
+        case 4:
+            xtal = 50000000;
+            break;
+        case 5:
+            xtal = 77000000;
+            break;
+        case 6:
+            xtal = 36000000;
+            break;
+        case 7:
+            xtal = 45000000;
+            break;
+        case 8:
+            xtal = 1000000;
+            break;
+        case 9:
+            xtal = 1000000;
+            break;
+        case 10:
+            xtal = 79000000;
+            break;
+        case 11:
+            xtal = 31000000;
+            break;
+        case 12:
+            xtal = 94000000;
+            break;
+        case 13:
+            xtal = 65000000;
+            break;
+        case 14:
+            xtal = 75000000;
+            break;
+        case 15:
+            xtal = 71000000;
+            break;
+        default:
+            xtal = 1000000;
+        }*/
 	}
 	else
 	{
@@ -2763,7 +2763,7 @@ void s3_vga_device::s3_define_video_mode()
 		svga.rgb16_en = 0;
 		svga.rgb32_en = 0;
 	}
-//	if((vga.miscellaneous_output & 0xc) != 0x0c)
+//  if((vga.miscellaneous_output & 0xc) != 0x0c)
 	xtal = (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz;
 	recompute_params_clock(divisor, xtal);
 }

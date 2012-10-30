@@ -128,14 +128,14 @@ UINT8 scsicb_device::get_scsi_line( UINT32 mask )
 		state = 0;
 	}
 
-	verboselog( 1, machine(), "%s get_scsi_line %s %d\n", tag(), get_line_name( mask ), state ); 
+	verboselog( 1, machine(), "%s get_scsi_line %s %d\n", tag(), get_line_name( mask ), state );
 
 	return state;
 }
 
 void scsicb_device::set_scsi_line( UINT32 mask, UINT8 state )
 {
-	verboselog( 1, machine(), "%s set_scsi_line %s %d\n", tag(), get_line_name( mask ), state ); 
+	verboselog( 1, machine(), "%s set_scsi_line %s %d\n", tag(), get_line_name( mask ), state );
 
 	if( state )
 	{

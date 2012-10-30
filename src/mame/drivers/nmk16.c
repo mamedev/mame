@@ -900,7 +900,7 @@ static ADDRESS_MAP_START( tdragon_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_SHARE("nmk_txvideoram")
 ADDRESS_MAP_END
 
-// No sprites without this. Is it actually protection? 
+// No sprites without this. Is it actually protection?
 READ16_MEMBER(nmk16_state::tdragonb_prot_r)
 {
 	return 0x0003;

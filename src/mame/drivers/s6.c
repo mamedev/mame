@@ -323,7 +323,7 @@ READ_LINE_MEMBER( s6_state::cb1_r )
 
 READ8_MEMBER( s6_state::dac_r )
 {
-	return m_sound_data;	
+	return m_sound_data;
 }
 
 WRITE8_MEMBER( s6_state::dac_w )

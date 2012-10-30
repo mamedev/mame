@@ -109,7 +109,7 @@ public:
 
 	inline void check_interrupts();
 	void read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0,
-		int *sden, int *dir, int *gwe, int *rom1, int *rom2, int *rom3, int *rom4, int *charom, int *colorram, int *vic, 
+		int *sden, int *dir, int *gwe, int *rom1, int *rom2, int *rom3, int *rom4, int *charom, int *colorram, int *vic,
 		int *from1, int *romh, int *roml, int *dwe, int *ioacc, int *clrbank, int *iocs, int *casenb);
 	UINT8 read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io);
 	void write_memory(address_space &space, offs_t offset, offs_t vma, UINT8 data, int ba, int aec, int z80io);
@@ -133,7 +133,7 @@ public:
 	INTERRUPT_GEN_MEMBER( frame_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
 	DECLARE_WRITE8_MEMBER( vic_k_w );
-	
+
 	DECLARE_READ8_MEMBER( sid_potx_r );
 	DECLARE_READ8_MEMBER( sid_poty_r );
 

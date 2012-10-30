@@ -79,7 +79,7 @@ void devcb2_base::reset(callback_type type)
 
 //-------------------------------------------------
 //  resolve_ioport - resolve an I/O port or fatal
-//	error if we can't find it
+//  error if we can't find it
 //-------------------------------------------------
 
 void devcb2_base::resolve_ioport()
@@ -93,7 +93,7 @@ void devcb2_base::resolve_ioport()
 
 //-------------------------------------------------
 //  resolve_inputline - resolve a device and input
-//	number or fatal error if we can't find it
+//  number or fatal error if we can't find it
 //-------------------------------------------------
 
 void devcb2_base::resolve_inputline()
@@ -111,8 +111,8 @@ void devcb2_base::resolve_inputline()
 
 
 //-------------------------------------------------
-//  resolve_space - resolve an address space or 
-//	fatal error if we can't find it
+//  resolve_space - resolve an address space or
+//  fatal error if we can't find it
 //-------------------------------------------------
 
 void devcb2_base::resolve_space()
@@ -150,7 +150,7 @@ void devcb2_read_base::reset(callback_type type)
 {
 	// parent first
 	devcb2_base::reset(type);
-	
+
 	// local stuff
 	m_readline = read_line_delegate();
 	m_read8 = read8_delegate();
@@ -163,7 +163,7 @@ void devcb2_read_base::reset(callback_type type)
 
 //-------------------------------------------------
 //  resolve - resolve the specified callback to
-//	its final form
+//  its final form
 //-------------------------------------------------
 
 void devcb2_read_base::resolve()
@@ -181,7 +181,7 @@ void devcb2_read_base::resolve()
 		{
 			case CALLBACK_NONE:
 				break;
-		
+
 			case CALLBACK_LINE:
 				m_readline.bind_relative_to(*m_device.owner());
 				m_target_int = 0;
@@ -211,21 +211,21 @@ void devcb2_read_base::resolve()
 				m_target_int = 0;
 				m_adapter = m_read64.isnull() ? &devcb2_read_base::read_constant_adapter : &devcb2_read_base::read64_adapter;
 				break;
-			
+
 			case CALLBACK_IOPORT:
 				resolve_ioport();
 				m_target_int = 0;
 				m_adapter = (m_target.ioport == NULL) ? &devcb2_read_base::read_constant_adapter : &devcb2_read_base::read_ioport_adapter;
 				break;
-			
+
 			case CALLBACK_LOG:
 				m_adapter = &devcb2_read_base::read_logged_adapter;
 				break;
-			
+
 			case CALLBACK_CONSTANT:
 				m_adapter = &devcb2_read_base::read_constant_adapter;
 				break;
-			
+
 			case CALLBACK_INPUTLINE:
 				throw emu_fatalerror("Device read callbacks can't be connected to input lines\n");
 		}
@@ -239,8 +239,8 @@ void devcb2_read_base::resolve()
 
 //-------------------------------------------------
 //  resolve_safe - resolve the callback; if not
-//	specified, resolve to a constant callback with
-//	the given value
+//  specified, resolve to a constant callback with
+//  the given value
 //-------------------------------------------------
 
 void devcb2_read_base::resolve_safe(UINT64 none_constant_value)
@@ -256,8 +256,8 @@ void devcb2_read_base::resolve_safe(UINT64 none_constant_value)
 
 
 //-------------------------------------------------
-//  read_unresolved_adapter - error-generating 
-//	unresolved adapter
+//  read_unresolved_adapter - error-generating
+//  unresolved adapter
 //-------------------------------------------------
 
 UINT64 devcb2_read_base::read_unresolved_adapter(address_space &space, offs_t offset, UINT64 mask)
@@ -328,7 +328,7 @@ UINT64 devcb2_read_base::read_ioport_adapter(address_space &space, offs_t offset
 
 //-------------------------------------------------
 //  read_logged_adapter - log a read and return a
-//	constant
+//  constant
 //-------------------------------------------------
 
 UINT64 devcb2_read_base::read_logged_adapter(address_space &space, offs_t offset, UINT64 mask)
@@ -371,7 +371,7 @@ void devcb2_write_base::reset(callback_type type)
 {
 	// parent first
 	devcb2_base::reset(type);
-	
+
 	// local stuff
 	m_writeline = write_line_delegate();
 	m_write8 = write8_delegate();
@@ -384,7 +384,7 @@ void devcb2_write_base::reset(callback_type type)
 
 //-------------------------------------------------
 //  resolve - resolve the specified callback to
-//	its final form
+//  its final form
 //-------------------------------------------------
 
 void devcb2_write_base::resolve()
@@ -402,7 +402,7 @@ void devcb2_write_base::resolve()
 		{
 			case CALLBACK_NONE:
 				break;
-		
+
 			case CALLBACK_LINE:
 				m_writeline.bind_relative_to(*m_device.owner());
 				m_adapter = m_writeline.isnull() ? &devcb2_write_base::write_noop_adapter : &devcb2_write_base::write_line_adapter;
@@ -427,20 +427,20 @@ void devcb2_write_base::resolve()
 				m_write64.bind_relative_to(*m_device.owner());
 				m_adapter = m_write64.isnull() ? &devcb2_write_base::write_noop_adapter : &devcb2_write_base::write64_adapter;
 				break;
-			
+
 			case CALLBACK_IOPORT:
 				resolve_ioport();
 				m_adapter = (m_target.ioport == NULL) ? &devcb2_write_base::write_noop_adapter : &devcb2_write_base::write_ioport_adapter;
 				break;
-			
+
 			case CALLBACK_LOG:
 				m_adapter = &devcb2_write_base::write_logged_adapter;
 				break;
-			
+
 			case CALLBACK_CONSTANT:
 				m_adapter = &devcb2_write_base::write_noop_adapter;
 				break;
-			
+
 			case CALLBACK_INPUTLINE:
 				resolve_inputline();
 				m_adapter = &devcb2_write_base::write_inputline_adapter;
@@ -456,7 +456,7 @@ void devcb2_write_base::resolve()
 
 //-------------------------------------------------
 //  resolve_safe - resolve the callback; if not
-//	specified, resolve to a no-op
+//  specified, resolve to a no-op
 //-------------------------------------------------
 
 void devcb2_write_base::resolve_safe()
@@ -469,8 +469,8 @@ void devcb2_write_base::resolve_safe()
 
 
 //-------------------------------------------------
-//  write_unresolved_adapter - error-generating 
-//	unresolved adapter
+//  write_unresolved_adapter - error-generating
+//  unresolved adapter
 //-------------------------------------------------
 
 void devcb2_write_base::write_unresolved_adapter(address_space &space, offs_t offset, UINT64 data, UINT64 mask)
@@ -540,8 +540,8 @@ void devcb2_write_base::write_ioport_adapter(address_space &space, offs_t offset
 
 
 //-------------------------------------------------
-//  write_logged_adapter - logging unresolved 
-//	adapter
+//  write_logged_adapter - logging unresolved
+//  adapter
 //-------------------------------------------------
 
 void devcb2_write_base::write_logged_adapter(address_space &space, offs_t offset, UINT64 data, UINT64 mask)
@@ -562,7 +562,7 @@ void devcb2_write_base::write_noop_adapter(address_space &space, offs_t offset, 
 
 //-------------------------------------------------
 //  write_inputline_adapter - write to an device's
-//	input line
+//  input line
 //-------------------------------------------------
 
 void devcb2_write_base::write_inputline_adapter(address_space &space, offs_t offset, UINT64 data, UINT64 mask)

@@ -1,37 +1,37 @@
 /***************************************************************************
 
-	Double Crown (c) 1997 Cadence Technology / Dyna
+    Double Crown (c) 1997 Cadence Technology / Dyna
 
-	driver by Angelo Salese
+    driver by Angelo Salese
 
-	TODO:
-	- Bogus "Hole" in main screen display;
-	- Is the background pen really black?
-	- Lots of unmapped I/Os (game doesn't make much use of the HW);
-	- outputs / lamps;
-	- video / irq timings;
+    TODO:
+    - Bogus "Hole" in main screen display;
+    - Is the background pen really black?
+    - Lots of unmapped I/Os (game doesn't make much use of the HW);
+    - outputs / lamps;
+    - video / irq timings;
 
-	Notes:
-	- at POST the SW tries to write to the palette RAM in a banking fashion.
-	  I think it's just an HW left-over.
-	- there are various bogus checks to ROM region throughout the whole SW
-	  (0x0030-0x0033? O.o), trying to change the values of these ones changes
-	  the functionality of the game, almost like that the DSWs are tied to
-	  these ...
+    Notes:
+    - at POST the SW tries to write to the palette RAM in a banking fashion.
+      I think it's just an HW left-over.
+    - there are various bogus checks to ROM region throughout the whole SW
+      (0x0030-0x0033? O.o), trying to change the values of these ones changes
+      the functionality of the game, almost like that the DSWs are tied to
+      these ...
 
 ============================================================================
-	Excellent System
-	boardlabel: ES-9411B
+    Excellent System
+    boardlabel: ES-9411B
 
-	28.6363 xtal
-	ES-9409 QFP is 208 pins.. for graphics only?
-	Z0840006PSC Zilog z80, is rated 6.17 MHz
-	OKI M82C55A-2
-	65764H-5 .. 64kbit ram CMOS
-	2 * N341256P-25 - CMOS SRAM 256K-BIT(32KX8)
-	4 * dipsw 8pos
-	YMZ284-D (ay8910, but without i/o ports)
-	MAXIM MAX693ACPE is a "Microprocessor Supervisory Circuit", for watchdog? and for keeping nvram stable?
+    28.6363 xtal
+    ES-9409 QFP is 208 pins.. for graphics only?
+    Z0840006PSC Zilog z80, is rated 6.17 MHz
+    OKI M82C55A-2
+    65764H-5 .. 64kbit ram CMOS
+    2 * N341256P-25 - CMOS SRAM 256K-BIT(32KX8)
+    4 * dipsw 8pos
+    YMZ284-D (ay8910, but without i/o ports)
+    MAXIM MAX693ACPE is a "Microprocessor Supervisory Circuit", for watchdog? and for keeping nvram stable?
 
 ***************************************************************************/
 
@@ -169,7 +169,7 @@ WRITE8_MEMBER( dblcrown_state::irq_source_w)
 READ8_MEMBER( dblcrown_state::palette_r)
 {
 	//if(m_bank & 8) /* TODO: verify this */
-	//	offset+=0x200;
+	//  offset+=0x200;
 
 	return m_pal_ram[offset];
 }
@@ -179,7 +179,7 @@ WRITE8_MEMBER( dblcrown_state::palette_w)
 	int r,g,b,datax;
 
 	//if(m_bank & 8) /* TODO: verify this */
-	//	offset+=0x200;
+	//  offset+=0x200;
 
 	m_pal_ram[offset] = data;
 	offset>>=1;
@@ -323,7 +323,7 @@ static ADDRESS_MAP_START( dblcrown_io, AS_IO, 8, dblcrown_state )
 	AM_RANGE(0x11, 0x11) AM_READWRITE(bank_r,bank_w)
 	AM_RANGE(0x12, 0x12) AM_READWRITE(mux_r,mux_w)
 	AM_RANGE(0x20, 0x21) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-//	AM_RANGE(0x30, 0x30) always 1?
+//  AM_RANGE(0x30, 0x30) always 1?
 	AM_RANGE(0x40, 0x40) AM_WRITE(output_w)
 ADDRESS_MAP_END
 
@@ -591,7 +591,7 @@ MACHINE_CONFIG_END
 ROM_START( dblcrown )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD("1.u33", 0x00000, 0x40000, CRC(5df95a9c) SHA1(799333206089989c25ff9f167363073d4cf64bd2) )
-//	ROM_FILL( 0x0030, 4, 0xff )
+//  ROM_FILL( 0x0030, 4, 0xff )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD("2.u43", 0x00000, 0x80000, CRC(58200bd4) SHA1(2795cfc41056111f66bfb82916343d1c733baa83) )

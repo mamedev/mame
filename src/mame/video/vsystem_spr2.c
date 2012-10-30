@@ -122,7 +122,7 @@ void vsystem_spr2_device::turbofrc_draw_sprites_common( UINT16* spriteram3,  int
 					sx = ((curr_sprite.ox + curr_sprite.zoomx * x / 2 + 16) & 0x1ff) - 16;
 
 				curr = spriteram1[curr_sprite.map % (spriteram1_bytes/2)];
-	
+
 				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[sprite_gfx],
 							 curr,
 							 curr_sprite.color,
@@ -200,7 +200,7 @@ void vsystem_spr2_device::spinlbrk_draw_sprites_common( UINT16* spriteram3,  int
 					sx = ((curr_sprite.ox + curr_sprite.zoomx * x / 2 + 16) & 0x1ff) - 16;
 
 				curr = spriteram1[curr_sprite.map % (spriteram1_bytes/2)];
-	
+
 				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[sprite_gfx],
 							 curr,
 							 curr_sprite.color,
@@ -399,7 +399,7 @@ void vsystem_spr2_device::draw_sprites_pipedrm( UINT8* spriteram, int spriteram_
 {
 	static const UINT8 zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 	const rectangle &visarea = screen.visible_area();
-//	UINT8 *spriteram = spriteram;
+//  UINT8 *spriteram = spriteram;
 	int offs;
 
 	/* draw the sprites */
@@ -413,14 +413,14 @@ void vsystem_spr2_device::draw_sprites_pipedrm( UINT8* spriteram, int spriteram_
 		{
 			if (!get_sprite_attributes((UINT16*)&spriteram[offs]))
 				continue;
-			
+
 			curr_sprite.ysize++;
 			curr_sprite.xsize++;
 			curr_sprite.oy -= 6;
 			curr_sprite.ox -= 13;
 
 
-			
+
 			int xt, yt;
 
 

@@ -182,7 +182,7 @@ UINT32 spectrum_state::screen_update_ts2068(screen_device &screen, bitmap_ind16 
 {
 	/* for now TS2068 will do a full-refresh */
 	int count;
-	
+
 	if (m_border_bitmap.valid())
 		copyscrollbitmap(bitmap, m_border_bitmap, 0, 0, 0, 0, cliprect);
 

@@ -2,11 +2,11 @@
 
   macrtc.c - the real-time clock & NVRAM chip used in early 680x0 Macs,
   Apple part numbers 343-0040 (original) and 343-0042 (with extended PRAM)
- 
+
   The IIgs has this chip also, but the VGC contains a relatively
   sophisticated logic block that offloads the low-level serial comms
   from the CPU, which makes it look quite different to software.
- 
+
 ***************************************************************************/
 
 #include "emu.h"

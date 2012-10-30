@@ -1,7 +1,7 @@
 /***************************************************************************
 
   Micron/XCEED Technologies MacroColor 30
- 
+
   Similar to the 30HR, but registers are rearranged and 24bpp support
   was added.
 
@@ -25,7 +25,7 @@ MACHINE_CONFIG_END
 
 ROM_START( xceedmc30 )
     ROM_REGION(0x8000, XCEEDMC30_ROM_REGION, 0)
-	ROM_LOAD( "0390.bin", 0x000000, 0x008000, CRC(adea7a18) SHA1(9141eb1a0e5061e0409d65a89b4eaeb119ee4ffb) ) 
+	ROM_LOAD( "0390.bin", 0x000000, 0x008000, CRC(adea7a18) SHA1(9141eb1a0e5061e0409d65a89b4eaeb119ee4ffb) )
 ROM_END
 
 //**************************************************************************

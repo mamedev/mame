@@ -5,7 +5,7 @@ class vsystem_spr2_device : public device_t
 {
 public:
 	vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	struct vsystem_sprite_attributes
 	{
 		int ox;
@@ -26,13 +26,13 @@ public:
 
 	template<class _BitmapClass>
 	void turbofrc_draw_sprites_common( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, int chip_disabled_pri );
-	
+
 	void turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip_disabled_pri );
 	void turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int chip_disabled_pri );
 
 	template<class _BitmapClass>
 	void spinlbrk_draw_sprites_common( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, int chip_disabled_pri );
-	
+
 	void spinlbrk_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip_disabled_pri );
 	void spinlbrk_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int chip_disabled_pri );
 

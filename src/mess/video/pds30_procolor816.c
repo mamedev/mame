@@ -1,13 +1,13 @@
 /***************************************************************************
 
   Lapis ProColor Server 8*16 video card
- 
+
   FsFF6001: DAC color # (seems to have the data bits perfectly reversed)
   FsFF6003: DAC color write (not bitswapped)
   FsFF6017: Mode (13 = 1bpp, 17 = 2bpp, 1b = 4bpp, 1e = 8bpp, 0a = 15bpp)
   FsFF7000: Bit 2 is VBL IRQ enable/ack
   FsFF7001: Bit 0 is VBL status
- 
+
 ***************************************************************************/
 
 #include "emu.h"

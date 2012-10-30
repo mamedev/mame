@@ -780,8 +780,8 @@
   - Fixed Power Card graphics ROM load..
   - Moved jolycdat program to Bonus Card, making it parent.
      This program is a real original Bonus Card program, and the PCB
-	 was populated with Jolly Card graphics wrongly. The other Bonus Card set
-	 was turned as clone, since has a fake copyright string (hack).
+     was populated with Jolly Card graphics wrongly. The other Bonus Card set
+     was turned as clone, since has a fake copyright string (hack).
   - Renamed the internal layout artwork: bigdeal --> bonuscrd.
   - Default Bonus Card & Big Deal DIP switches positions, that
     allow boot the system without errors.
@@ -2292,7 +2292,7 @@ static const gfx_layout charlayout =
    The game could have 2 different palettes, located
    in the first and second half of the bipolar PROM.
 */
-   
+
 static GFXDECODE_START( fw1stpal )	/* Adressing the first half of the palette */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
@@ -3051,7 +3051,7 @@ ROM_START( bonuscrd )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "n82s147an.bin",	0x0000, 0x0200, BAD_DUMP CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) ) // from power card, original fun world encrypted bonus card clone.
-	ROM_LOAD( "74s472n.bin",    0x0200, 0x0200, CRC(e56780cb) SHA1(c06b854f21b1dcee465ac9c8c9a2934b7e99565f) )			// original dump, but doesn't match the cards colors in real board. 
+	ROM_LOAD( "74s472n.bin",    0x0200, 0x0200, CRC(e56780cb) SHA1(c06b854f21b1dcee465ac9c8c9a2934b7e99565f) )			// original dump, but doesn't match the cards colors in real board.
 ROM_END
 
 
@@ -3065,7 +3065,7 @@ ROM_START( bonuscrda )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "n82s147an.bin",	0x0000, 0x0200, BAD_DUMP CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) ) // from power card, original fun world encrypted bonus card clone.
-	ROM_LOAD( "74s472n.bin",    0x0200, 0x0200, CRC(e56780cb) SHA1(c06b854f21b1dcee465ac9c8c9a2934b7e99565f) )			// original dump, but doesn't match the cards colors in real board. 
+	ROM_LOAD( "74s472n.bin",    0x0200, 0x0200, CRC(e56780cb) SHA1(c06b854f21b1dcee465ac9c8c9a2934b7e99565f) )			// original dump, but doesn't match the cards colors in real board.
 ROM_END
 
 
@@ -3843,10 +3843,10 @@ ROM_END
     the encrypted graphics set.
 
     All these games have some weird things...
-	1) Some CPU instructions seems wrong (see below, in driver init)
-	2) The CRTC is injected with some wrong register values (fact),
-	   that place the game wrongly, and screw up the input test screen.
-	   
+    1) Some CPU instructions seems wrong (see below, in driver init)
+    2) The CRTC is injected with some wrong register values (fact),
+       that place the game wrongly, and screw up the input test screen.
+
 */
 
 ROM_START( magicrd2 )	/* Impera... but seems Bulgarian hack, just for copyright */
@@ -3866,7 +3866,7 @@ ROM_START( magicrd2 )	/* Impera... but seems Bulgarian hack, just for copyright 
 	ROM_LOAD( "mc2-82s147.bin",	0x0000, 0x0200, CRC(aa91cc35) SHA1(79f9a755441500e618c4183f524f969fffd44100) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "gal16v8uni.bin", 0x0000, 0x0117, CRC(b81d7e0a) SHA1(7fef0b2bcea931a830d38ae0f1102434cf281d2d) )	/* Universal GAL */ 
+	ROM_LOAD( "gal16v8uni.bin", 0x0000, 0x0117, CRC(b81d7e0a) SHA1(7fef0b2bcea931a830d38ae0f1102434cf281d2d) )	/* Universal GAL */
 ROM_END
 
 
@@ -3892,7 +3892,7 @@ ROM_END
 ROM_START( magicrd2b )	/* Imatic Yugoslavian hack for green TAB or Impera boards */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mc2prgv1.bin", 0x8000, 0x8000,  CRC(7f759b70) SHA1(23a1a6e8eda57c4a90c51a970302f9a7bf590083) )
-//	ROM_LOAD( "mc2prgv2.bin", 0x8000, 0x8000,  CRC(b0ed6b40) SHA1(7167e67608f1b0b1cd956c838dacc1310861cb4a) )	// there are also pcbs with this program
+//  ROM_LOAD( "mc2prgv2.bin", 0x8000, 0x8000,  CRC(b0ed6b40) SHA1(7167e67608f1b0b1cd956c838dacc1310861cb4a) )   // there are also pcbs with this program
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "mc2gr2.bin",   0x0000, 0x8000, CRC(733da697) SHA1(45122c64d5a371ec91cecc67b7faf179078e714d) )
@@ -3909,7 +3909,7 @@ ROM_END
 ROM_START( magicrd2c )	/* Imatic Yugoslavian hack for blue TAB board (encrypted)*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mc2prgv2.bin", 0x8000, 0x8000,  CRC(b0ed6b40) SHA1(7167e67608f1b0b1cd956c838dacc1310861cb4a) )
-//	ROM_LOAD( "mc2prgv1.bin", 0x8000, 0x8000,  CRC(7f759b70) SHA1(23a1a6e8eda57c4a90c51a970302f9a7bf590083) )	// there are also pcbs with this program
+//  ROM_LOAD( "mc2prgv1.bin", 0x8000, 0x8000,  CRC(7f759b70) SHA1(23a1a6e8eda57c4a90c51a970302f9a7bf590083) )   // there are also pcbs with this program
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "mc2gr1b.bin",  0x0000, 0x8000, CRC(ce2629a7) SHA1(84767ed5da8dcee44a210255537e10372bcc264b) )
@@ -4242,7 +4242,7 @@ ROM_END
   |                                                                                                                      |
   '----------------------------------------------------------------------------------------------------------------------'
 
-   DIP SW Bank 
+   DIP SW Bank
   .---------------.
   |#| |#|#|#|#|#|#|
   |---------------|

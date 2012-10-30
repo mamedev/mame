@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- Preliminary list. 
+<!-- Preliminary list.
 
      This list contains software for the Russian 'Pentagon 128' systems.
-     
+
      These systems are Spectrum clones, but offer various extended features.
-     
+
      The software listed here will not function correctly (if at all) on a regular Spectrum
 -->
 
@@ -22,7 +22,7 @@
 			</dataarea>
 		</part>
 	</software>
-  
+
 </softwarelist>
 
 

@@ -14,7 +14,7 @@ typedef device_delegate<UINT32 (UINT32)> vsystem_tile_indirection_delegate;
 
 #define MCFG_VSYSTEM_SPR_SET_PALMASK( _palmask ) \
 	vsystem_spr_device::set_pal_mask(*device, _palmask); \
-	
+
 #define MCFG_VSYSTEM_SPR_SET_TRANSPEN( _transpen ) \
 	vsystem_spr_device::CG10103_set_transpen(*device, _transpen); \
 

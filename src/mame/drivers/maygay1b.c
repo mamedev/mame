@@ -113,8 +113,8 @@ public:
 	maygay1b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_vfd(*this, "vfd")
-	{ 
-	
+	{
+
 		m_NMIENABLE = 0;
 	}
 
@@ -376,7 +376,7 @@ WRITE8_MEMBER(maygay1b_state::m1_8279_w)
 			m1_draw_lamps(chip->ram[chip->disp_address],chip->disp_address, 0);
 		}
 		chip->ram[chip->disp_address] = data;
-		
+
 		if ( chip->disp_auto_inc )
 			chip->disp_address ++;
 	}
@@ -575,7 +575,7 @@ READ8_MEMBER( maygay1b_state::m1_firq_trg_r )
 	return i;
 }
 
-// NMI is periodic? or triggered by a write? 
+// NMI is periodic? or triggered by a write?
 TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_state::maygay1b_nmitimer_callback )
 {
 	if (m_NMIENABLE)
@@ -594,7 +594,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_state::maygay1b_nmitimer_callback )
 // some games might differ..
 WRITE8_MEMBER(maygay1b_state::m1_pia_porta_w)
 {
-//	printf("m1_pia_porta_w %02x\n",data);
+//  printf("m1_pia_porta_w %02x\n",data);
 
 	if((data & 0x40))
 	{
@@ -882,7 +882,7 @@ READ8_MEMBER(maygay1b_state::m1_meter_r)
 	device_t *ay8910 = machine().device("aysnd");
 	return ~ay8910_read_ym(ay8910);
 }
- 
+
 static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 
@@ -893,7 +893,7 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	// there is actually an 8279 and an 8051..
 	AM_RANGE(0x2030, 0x2031) AM_READWRITE(m1_8279_r,m1_8279_w)
 	AM_RANGE(0x2040, 0x2041) AM_READWRITE(m1_8279_2_r,m1_8279_2_w)
-//	AM_RANGE(0x2050, 0x2050)// SCAN on M1B
+//  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
 
 	AM_RANGE(0x2070, 0x207f) AM_DEVREADWRITE_LEGACY("duart68681", duart68681_r, duart68681_w )
 
@@ -911,7 +911,7 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 
 	AM_RANGE(0x2412, 0x2412) AM_READ(m1_firq_trg_r) // firq, sample playback?
 
-	
+
 
 	AM_RANGE(0x2420, 0x2421) AM_WRITE(latch_ch2_w ) // oki
 

@@ -1233,7 +1233,7 @@ static void generate_product_terms(const pal_data* pal, const jed_data* jed, UIN
 
     if (pal->is_product_term_enabled && !pal->is_product_term_enabled(pal, jed, fuserow))
     {
-        return;        
+        return;
     }
 
     for (index = 0; index < inputpinscount; ++index)

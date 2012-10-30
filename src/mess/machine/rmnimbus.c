@@ -2987,18 +2987,18 @@ READ8_MEMBER(rmnimbus_state::nimbus_mouse_js_r)
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0       JOY 0-Up    or mouse XB
-	    1       JOY 0-Down  or mouse XA
-	    2       JOY 0-Left  or mouse YA
-	    3       JOY 0-Right or mouse YB
-	    4       JOY 0-b0    or mouse rbutton
-	    5       JOY 0-b1    or mouse lbutton
-	    6       ?? always reads 1
-	    7       ?? always reads 1
+        0       JOY 0-Up    or mouse XB
+        1       JOY 0-Down  or mouse XA
+        2       JOY 0-Left  or mouse YA
+        3       JOY 0-Right or mouse YB
+        4       JOY 0-b0    or mouse rbutton
+        5       JOY 0-b1    or mouse lbutton
+        6       ?? always reads 1
+        7       ?? always reads 1
 
-	*/
+    */
 	UINT8 result;
 	//int pc=machine().device(MAINCPU_TAG)->safe_pc();
 	mouse_joy_state *state = &m_nimbus_mouse;

@@ -77,7 +77,7 @@ void pla_device::parse_fusemap()
 {
 	memory_region *region = machine().root_device().memregion(tag());
 	jed_data jed;
-	
+
 	jedbin_parse(region->base(), region->bytes(), &jed);
 
 	UINT32 fusenum = 0;

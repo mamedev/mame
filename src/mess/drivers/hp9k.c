@@ -31,7 +31,7 @@ xxxxxx-ffffff - system RAM
 
 ===
 
-TODO: boot tests fail 
+TODO: boot tests fail
 
 ****************************************************************************/
 
@@ -53,12 +53,12 @@ static UINT8 prom16a[256] = {
 	0x00,			// 256 bytes idprom
 	 '2', '0', '1', '0', 'A', '0', '0', '0', '0', '0', '0',		// serial in ascii DDDDCSSSSSS date code, country, serial number
 	 '9', '8', '1', '6', 'A', ' ', ' ',							// product number
-	0xff,			// 8 bits processor board config														
+	0xff,			// 8 bits processor board config
 	0x01,			// keyboard 98203B
 	0x02,			// CRT alpha see crtid for monitor
 	0x03,			// HP-IB
 	0x04,			// Graphics
-	0xff,			// end 
+	0xff,			// end
 	0xff,
 	0xff,
 	0xff,
@@ -113,10 +113,10 @@ private:
 	int crtc_curreg;
 	int crtc_addrStartHi;
 	int crtc_addrStartLow;
-	
+
 	void calc_prom_crc(UINT8* prom);
 	void putChar(UINT8 thec,int x,int y,bitmap_ind16 &bitmap);
-	
+
 public:
 	hp9k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
@@ -136,7 +136,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	//required_device<device_t> m_terminal;
 	required_device<mc6845_device> m_6845;
-	
+
 	UINT8 m_videoram[0x4000];
 	UINT8 m_screen[0x800];
 
@@ -168,18 +168,18 @@ void hp9k_state::calc_prom_crc(UINT8* prom)
 {
 	int chksum;
 	int i;
-	
+
 	chksum = 0;
-	for (i=0; i < 256; i+=2) 
+	for (i=0; i < 256; i+=2)
 	{
 		chksum += ((prom[i] << 8) | prom[i+1]);
 		if (chksum&0x10000) chksum++;
 		chksum&=0xffff;
 	}
-	
+
 	chksum=(chksum+1)&0xffff;
-	
-	if (chksum!=0) 
+
+	if (chksum!=0)
 	{
 		chksum=(0x10000-chksum);
 		prom[0]=(UINT8)(chksum>>8);
@@ -268,7 +268,7 @@ WRITE16_MEMBER( hp9k_state::hp9k_videoram_w )
 	else
 	{
 		//printf("videoram write [%x] at [%x]\n",data,offset);
-		
+
 		if (mem_mask==0xff00)
 			{
 				m_screen[offset&0x7ff]=data>>8;
@@ -346,7 +346,7 @@ GFXDECODE_END
 void hp9k_state::putChar(UINT8 thec,int x,int y,bitmap_ind16 &bitmap)
 {
 	const UINT8* pchar=machine().gfx[0]->get_data(thec);
-	
+
 	for (int py=0;py<HP9816_CHDIMY;py++)
 	{
 		for (int px=0;px<HP9816_CHDIMX;px++)
@@ -375,7 +375,7 @@ UINT32 hp9k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 			chStart++;
 		}
 	}
-	
+
 	//putChar(0x44,0,0,pscr);
 	return 0;
 }
@@ -416,7 +416,7 @@ static MACHINE_CONFIG_START( hp9k, hp9k_state )
 	MCFG_GFXDECODE(hp9k)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-	
+
 	MCFG_MC6845_ADD( "mc6845", MC6845, XTAL_16MHz / 16, hp9k_mc6845_intf )
 MACHINE_CONFIG_END
 
@@ -429,7 +429,7 @@ ROM_START( hp9816 )
 	ROMX_LOAD( "rom40.bin", 0x0000, 0x10000, CRC(36005480) SHA1(645a077ffd95e4c31f05cd8bbd6e4554b12813f1), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "bios30",  "Bios v3.0")
 	ROMX_LOAD( "rom30.bin", 0x0000, 0x10000, CRC(05c07e75) SHA1(3066a65e6137482041f9a77d09ee2289fe0974aa), ROM_BIOS(2) )
-	
+
 ROM_END
 
 /* Driver */

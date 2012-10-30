@@ -59,7 +59,7 @@ void spectrum_state::screen_eof_spectrum(screen_device &screen, bool state)
 	if (state)
 	{
 		m_frame_number++;
-		
+
 		if (m_frame_number >= m_frame_invert_count)
 		{
 			m_frame_number = 0;
@@ -110,7 +110,7 @@ UINT32 spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 	int x, y, b, scrx, scry;
 	unsigned short ink, pap;
 	unsigned char *attr, *scr;
-	//	int full_refresh = 1;
+	//  int full_refresh = 1;
 
 	if (m_border_bitmap.valid())
 		copyscrollbitmap(bitmap, m_border_bitmap, 0, 0, 0, 0, cliprect);
@@ -224,7 +224,7 @@ void spectrum_UpdateBorderBitmap(running_machine &machine)
 				UINT16* bm = &state->m_border_bitmap.pix16(state->m_previous_border_y);
 
 				if (state->m_previous_border_x < width)
-					bm[state->m_previous_border_x] = colour;	
+					bm[state->m_previous_border_x] = colour;
 			}
 
 			spectrum_GetNextPos(machine, state->m_previous_border_x, state->m_previous_border_y);

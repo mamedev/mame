@@ -101,7 +101,7 @@ public:
 	// callbacks provided by the derived class
 	virtual void update_interrupts() = 0;
 	virtual void scanline_update(screen_device &screen, int scanline);
-	
+
 	// interrupt handling
 	void scanline_int_set(screen_device &screen, int scanline);
 	INTERRUPT_GEN_MEMBER(scanline_int_gen);
@@ -110,7 +110,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_int_ack_w);
 	INTERRUPT_GEN_MEMBER(video_int_gen);
 	DECLARE_WRITE16_MEMBER(video_int_ack_w);
-	
+
 	// EEPROM helpers
 	WRITE16_MEMBER(eeprom_enable_w);
 	WRITE16_MEMBER(eeprom_w);
@@ -124,7 +124,7 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(slapstic_setdirect);
 	DECLARE_WRITE16_MEMBER(slapstic_w);
 	DECLARE_READ16_MEMBER(slapstic_r);
-	
+
 	// sound I/O helpers
 	void sound_io_reset();
 	INTERRUPT_GEN_MEMBER(m6502_irq_gen);
@@ -141,7 +141,7 @@ public:
 	void delayed_sound_reset(int param);
 	void delayed_sound_write(int data);
 	void delayed_6502_write(int data);
-	
+
 	// sound helpers
 	void set_volume_by_type(int volume, device_type type);
 	void set_ym2151_volume(int volume);
@@ -196,7 +196,7 @@ public:
 	DECLARE_READ8_MEMBER( earom_r );
 	DECLARE_WRITE8_MEMBER( earom_w );
 	DECLARE_WRITE8_MEMBER( earom_control_w );
-	
+
 	// timer IDs
 	enum
 	{

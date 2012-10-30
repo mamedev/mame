@@ -36,7 +36,7 @@ public:
 protected:
 	virtual void machine_start();
 	virtual void video_start();
-	
+
 	virtual void update_interrupts() { }
 
 	struct planet;

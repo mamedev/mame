@@ -798,7 +798,7 @@ void mos8563_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		UINT8 data = VSS_COPY ? read_videoram(m_block_addr++) : m_data;
 
 		write_videoram(m_update_addr++, data);
-		
+
 		if (--m_word_count)
 		{
 			m_block_copy_timer->adjust( attotime::from_ticks( 1, m_clock ) );
@@ -1238,12 +1238,12 @@ void mos8563_device::device_start()
 	m_de_begin = 0;
 	m_dram_refresh = 0;
 	m_sync_polarity = 0;
-	
+
 	m_revision = 1;
 
 	// initialize video RAM
 	UINT8 data = 0xff;
-	
+
 	for (offs_t offset = 0; offset < 0x10000; offset++)
 	{
 		write_videoram(offset, data);
@@ -1527,13 +1527,13 @@ void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 
 			if (m_max_ras_addr < 16)
 			{
-				font_addr = ((m_char_base_addr & 0xe0) << 8) | (ATTR_ALTERNATE_CHARSET << 12) | (code << 4) | (ra & 0x0f);	
+				font_addr = ((m_char_base_addr & 0xe0) << 8) | (ATTR_ALTERNATE_CHARSET << 12) | (code << 4) | (ra & 0x0f);
 			}
 			else
 			{
-				font_addr = ((m_char_base_addr & 0xc0) << 8) | (ATTR_ALTERNATE_CHARSET << 13) | (code << 5) | (ra & 0x1f);	
+				font_addr = ((m_char_base_addr & 0xc0) << 8) | (ATTR_ALTERNATE_CHARSET << 13) | (code << 5) | (ra & 0x1f);
 			}
-			
+
 			UINT8 data = read_videoram(font_addr);
 
 			if (ra >= cdv) data = 0;

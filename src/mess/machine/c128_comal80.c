@@ -94,7 +94,7 @@ void c128_comal80_cartridge_device::c64_cd_w(address_space &space, offs_t offset
             4       A14
             5       A15
             6       A16
-            7		A17
+            7       A17
 
         */
 

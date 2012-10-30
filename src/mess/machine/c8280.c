@@ -313,7 +313,7 @@ static const floppy_interface c8280_floppy_interface =
 	NULL
 };
 
-static struct wd17xx_interface fdc_intf = 
+static struct wd17xx_interface fdc_intf =
 {
 	DEVCB_NULL,
 	DEVCB_CPU_INPUT_LINE(M6502_FDC_TAG, M6502_IRQ_LINE),
@@ -407,7 +407,7 @@ void c8280_device::device_start()
 	// state saving
 	save_item(NAME(m_rfdo));
 	save_item(NAME(m_daco));
-	save_item(NAME(m_atna));	
+	save_item(NAME(m_atna));
 	save_item(NAME(m_fk5));
 }
 
@@ -467,19 +467,19 @@ void c8280_device::ieee488_ifc(int state)
 READ8_MEMBER( c8280_device::fk5_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       DS1
-	    1       DS2
-	    2       _DDEN
-	    3       DCHG
-	    4       TSID
-	    5       MOTOR ENABLE
-	    6       0
-	    7       0
-	
-	*/
+
+        bit     description
+
+        0       DS1
+        1       DS2
+        2       _DDEN
+        3       DCHG
+        4       TSID
+        5       MOTOR ENABLE
+        6       0
+        7       0
+
+    */
 
 	UINT8 data = m_fk5;
 
@@ -500,19 +500,19 @@ READ8_MEMBER( c8280_device::fk5_r )
 WRITE8_MEMBER( c8280_device::fk5_w )
 {
 	/*
-	
-	    bit     description
-	
-	    0       DS1
-	    1       DS2
-	    2       _DDEN
-	    3       
-	    4       
-	    5       MOTOR ENABLE
-	    6       
-	    7       
-	
-	*/
+
+        bit     description
+
+        0       DS1
+        1       DS2
+        2       _DDEN
+        3
+        4
+        5       MOTOR ENABLE
+        6
+        7
+
+    */
 
 	m_fk5 = data & 0x3f;
 

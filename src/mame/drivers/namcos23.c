@@ -1472,7 +1472,7 @@ void namcos23_state::update_main_interrupts(UINT32 cause)
 {
 	UINT32 changed = cause ^ m_main_irqcause;
 	m_main_irqcause = cause;
-	
+
 	// level 2: vblank
 	if (changed & MAIN_VBLANK_IRQ)
 		m_maincpu->set_input_line(MIPS3_IRQ0, (cause & MAIN_VBLANK_IRQ) ? ASSERT_LINE : CLEAR_LINE);

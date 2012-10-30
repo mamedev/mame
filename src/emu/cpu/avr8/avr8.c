@@ -1750,9 +1750,9 @@ static CPU_EXECUTE( avr8 )
                                         SREG_W(AVR8_SREG_I, 1);
                                         /*if (cpustate->interrupt_pending)
                                         {
-											avr8_poll_interrupt(cpustate);
-											cpustate->interrupt_pending = false;
-										}*/
+                                            avr8_poll_interrupt(cpustate);
+                                            cpustate->interrupt_pending = false;
+                                        }*/
                                         opcycles = 4;
                                         break;
                                     case 0x0080:    // SLEEP
@@ -2032,7 +2032,7 @@ static CPU_SET_INFO( avr8 )
         /* --- the following bits of info are set as 64-bit signed integers --- */
         case CPUINFO_INT_PC:    /* intentional fallthrough */
         case CPUINFO_INT_REGISTER + AVR8_PC:            cpustate->pc = info->i;                 break;
-        case CPUINFO_INT_REGISTER + AVR8_SREG:          cpustate->status = info->i;    			break;
+        case CPUINFO_INT_REGISTER + AVR8_SREG:          cpustate->status = info->i; 			break;
         case CPUINFO_INT_REGISTER + AVR8_R0:            cpustate->r[ 0] = info->i;              break;
         case CPUINFO_INT_REGISTER + AVR8_R1:            cpustate->r[ 1] = info->i;              break;
         case CPUINFO_INT_REGISTER + AVR8_R2:            cpustate->r[ 2] = info->i;              break;
@@ -2098,7 +2098,7 @@ CPU_GET_INFO( avr8 )
 
         case CPUINFO_INT_PC:    /* intentional fallthrough */
         case CPUINFO_INT_REGISTER + AVR8_PC:    info->i = cpustate->pc << 1;	break;
-        case CPUINFO_INT_REGISTER + AVR8_SREG:  info->i = cpustate->status;    	break;
+        case CPUINFO_INT_REGISTER + AVR8_SREG:  info->i = cpustate->status; 	break;
 
         /* --- the following bits of info are returned as pointers to data or functions --- */
         case CPUINFO_FCT_SET_INFO:              info->setinfo = CPU_SET_INFO_NAME(avr8);        break;

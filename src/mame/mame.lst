@@ -11569,7 +11569,7 @@ pongf			// (c) 1972 Atari - no subcycles
 
 // JPM SRU?
 j_ewnud		// Each Way Nudger
-j_ewnda	
+j_ewnda
 j_ewnd20
 j_ews		// Each Way Shifter
 j_ews8a

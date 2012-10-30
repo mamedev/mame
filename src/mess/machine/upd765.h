@@ -52,9 +52,9 @@ public:
 	virtual void setup_drq_cb(line_cb cb) = 0;
 
 	/* Note that the address map must cover and handle the whole 0-7
-	 * range.  The upd765, while conforming to the rest of the
-	 * interface, is not eligible as a result.
-	 */
+     * range.  The upd765, while conforming to the rest of the
+     * interface, is not eligible as a result.
+     */
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) = 0;
 
@@ -168,7 +168,7 @@ protected:
 		SPEC_ND  = 0x0001,
 	};
 
-	
+
 	enum {
 		// General "doing nothing" state
 		IDLE,

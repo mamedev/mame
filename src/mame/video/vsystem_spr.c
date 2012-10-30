@@ -218,7 +218,7 @@ void vsystem_spr_device::common_sprite_drawgfx( running_machine &machine, bitmap
 	curr_sprite.zoomy = 32 - curr_sprite.zoomy;
 
 	int ystart, yend, yinc;
-	
+
 	if (!curr_sprite.flipy)	{ ystart = 0; yend = curr_sprite.ysize+1; yinc = 1; }
 	else                    { ystart = curr_sprite.ysize; yend = -1; yinc = -1; }
 
@@ -237,22 +237,22 @@ void vsystem_spr_device::common_sprite_drawgfx( running_machine &machine, bitmap
 			if (m_pdraw)
 			{
 				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, curr_sprite.ox + xcnt * curr_sprite.zoomx/2,        curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_transpen);
-				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_transpen);		
+				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_transpen);
 				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, curr_sprite.ox + xcnt * curr_sprite.zoomx/2,        -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_transpen);
-				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_transpen);		
+				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_transpen);
 			}
 			else
 			{
 				drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, curr_sprite.ox + xcnt * curr_sprite.zoomx/2,        curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, m_transpen);
-				drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, m_transpen);		
+				drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, m_transpen);
 				drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, curr_sprite.ox + xcnt * curr_sprite.zoomx/2,        -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, m_transpen);
-				drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, m_transpen);		
+				drawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, m_transpen);
 			}
 			xcnt+=xinc;
 		}
 		ycnt+=yinc;
 	}
-	
+
 }
 
 

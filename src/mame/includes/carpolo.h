@@ -82,7 +82,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(carpolo_7474_2s_2_q_cb);
 	DECLARE_WRITE_LINE_MEMBER(carpolo_7474_2u_1_q_cb);
 	DECLARE_WRITE_LINE_MEMBER(carpolo_7474_2u_2_q_cb);
-	
+
 };
 
 

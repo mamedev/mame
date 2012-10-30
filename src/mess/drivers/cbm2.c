@@ -2,7 +2,7 @@
 
     TODO:
 
-	- 8088 board
+    - 8088 board
     - CIA timers fail in burn-in test
     - NTSC variants unable to load from disk
     - shift lock
@@ -291,7 +291,7 @@ WRITE8_MEMBER( cbm2_state::write )
 		}
 		if (!extbufcs && m_extbuf_ram)
 		{
-			m_extbuf_ram[offset & 0x7ff] = data;	
+			m_extbuf_ram[offset & 0x7ff] = data;
 		}
 		if (!vidramcs)
 		{
@@ -334,7 +334,7 @@ WRITE8_MEMBER( cbm2_state::write )
 		}
 
 		m_exp->write(space, offset & 0x1fff, data, csbank1, csbank2, csbank3);
-	}	
+	}
 }
 
 
@@ -411,7 +411,7 @@ void p500_state::read_pla1(offs_t offset, int busy2, int clrnibcsb, int procvid,
 {
 	int sphi2 = m_vic->phi0_r();
 	int bras = 1;
-	
+
 	UINT32 input = P0 << 15 | P2 << 14 | bras << 13 | P1 << 12 | P3 << 11 | busy2 << 10 | m_statvid << 9 | sphi2 << 8 |
 			clrnibcsb << 7 | m_dramon << 6 | procvid << 5 | refen << 4 | m_vicdotsel << 3 | ba << 2 | aec << 1 | srw;
 
@@ -757,7 +757,7 @@ READ8_MEMBER( p500_state::vic_videoram_r )
 		&cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs, &aec, &vsysaden);
 
 	UINT8 data = 0xff;
-//	UINT8 clrnib = 0xf;
+//  UINT8 clrnib = 0xf;
 
 	if (vsysaden)
 	{
@@ -765,10 +765,10 @@ READ8_MEMBER( p500_state::vic_videoram_r )
 		{
 			data = m_ram->pointer()[(m_vicbnksel << 14) | offset];
 		}
-/*		if (!clrnibcs)
-		{
-			clrnib = m_color_ram[offset & 0x3ff];
-		}*/
+/*      if (!clrnibcs)
+        {
+            clrnib = m_color_ram[offset & 0x3ff];
+        }*/
 		if (!vidmatcs)
 		{
 			data = m_video_ram[offset & 0x3ff];
@@ -1740,19 +1740,19 @@ static pic8259_interface ext_pic_intf =
 READ8_MEMBER( cbm2_state::ext_tpi_pb_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       _BUSY1
-	    1       CIA PB1
-	    2       CIA PB2
-	    3       CIA PB3
-	    4       CIA PB4
-	    5       CIA PB5
-	    6       1
-	    7       1
-	
-	*/
+
+        bit     description
+
+        0       _BUSY1
+        1       CIA PB1
+        2       CIA PB2
+        3       CIA PB3
+        4       CIA PB4
+        5       CIA PB5
+        6       1
+        7       1
+
+    */
 
 	UINT8 data = 0xc0;
 
@@ -1768,19 +1768,19 @@ READ8_MEMBER( cbm2_state::ext_tpi_pb_r )
 WRITE8_MEMBER( cbm2_state::ext_tpi_pb_w )
 {
 	/*
-	
-	    bit     description
-	
-	    0       U22B CL
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       CIA FLAG
-	    7       
-	
-	*/
+
+        bit     description
+
+        0       U22B CL
+        1
+        2
+        3
+        4
+        5
+        6       CIA FLAG
+        7
+
+    */
 
 	// _BUSY2
 	if (!BIT(data, 0))
@@ -1795,19 +1795,19 @@ WRITE8_MEMBER( cbm2_state::ext_tpi_pb_w )
 WRITE8_MEMBER( cbm2_state::ext_tpi_pc_w )
 {
 	/*
-	
-	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       U22 CLK
-	    6       
-	    7       
-	
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3
+        4
+        5       U22 CLK
+        6
+        7
+
+    */
 }
 
 static const tpi6525_interface ext_tpi_intf =
@@ -1831,19 +1831,19 @@ static const tpi6525_interface ext_tpi_intf =
 READ8_MEMBER( cbm2_state::ext_cia_pb_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       _BUSY1
-	    1       TPI PB1
-	    2       TPI PB2
-	    3       TPI PB3
-	    4       TPI PB4
-	    5       TPI PB5
-	    6       1
-	    7       1
-	
-	*/
+
+        bit     description
+
+        0       _BUSY1
+        1       TPI PB1
+        2       TPI PB2
+        3       TPI PB3
+        4       TPI PB4
+        5       TPI PB5
+        6       1
+        7       1
+
+    */
 
 	UINT8 data = 0xc0;
 
@@ -1859,19 +1859,19 @@ READ8_MEMBER( cbm2_state::ext_cia_pb_r )
 WRITE8_MEMBER( cbm2_state::ext_cia_pb_w )
 {
 	/*
-	
-	    bit     description
-	
-	    0       U22B CL
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       PIC IR0, U29B CL, U22B PR
-	    7       PIC IR7
-	
-	*/
+
+        bit     description
+
+        0       U22B CL
+        1
+        2
+        3
+        4
+        5
+        6       PIC IR0, U29B CL, U22B PR
+        7       PIC IR7
+
+    */
 
 	// _BUSY2
 	if (!BIT(data, 0))

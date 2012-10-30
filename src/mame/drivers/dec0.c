@@ -1659,10 +1659,10 @@ static MACHINE_CONFIG_DERIVED( ffantasybl, dec0_base_sound )
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
 
-//	MCFG_CPU_ADD("sub", H6280, XTAL_21_4772MHz / 16)
-//	MCFG_CPU_PROGRAM_MAP(hippodrm_sub_map)
+//  MCFG_CPU_ADD("sub", H6280, XTAL_21_4772MHz / 16)
+//  MCFG_CPU_PROGRAM_MAP(hippodrm_sub_map)
 
-//	MCFG_QUANTUM_TIME(attotime::from_hz(300))	/* Interleave between H6280 & 68000 */
+//  MCFG_QUANTUM_TIME(attotime::from_hz(300))   /* Interleave between H6280 & 68000 */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3088,11 +3088,11 @@ DRIVER_INIT_MEMBER(dec0_state,midresb)
 READ16_MEMBER(dec0_state::ffantasybl_242024_r)
 {
 /*
-	000152: 41F9 0024 2020             lea     $242020.l, A0
-	000158: 4A68 0004                  tst.w   ($4,A0)
-	00015C: 6700 00A0                  beq     $1fe
+    000152: 41F9 0024 2020             lea     $242020.l, A0
+    000158: 4A68 0004                  tst.w   ($4,A0)
+    00015C: 6700 00A0                  beq     $1fe
 
-	This allows us to at insert a coin...
+    This allows us to at insert a coin...
 */
 
 	return 0xffff;

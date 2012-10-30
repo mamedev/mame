@@ -21,7 +21,7 @@
       - When you have 3 strikes, you are Out
       - When you have 3 Outs, your Innings ends (other player gets a turn)
       - After 3 Innings, it's game over.
-      - Match digit appears in Outs digit.      
+      - Match digit appears in Outs digit.
 
     - Still Crazy, a novelty game where the playfield is completely vertical. It has
       4 flippers and the idea is to get the ball up to the alcohol 'still' before
@@ -375,7 +375,7 @@ WRITE_LINE_MEMBER( s8_state::pia_cb2_w )
 
 READ8_MEMBER( s8_state::dac_r )
 {
-	return m_sound_data;	
+	return m_sound_data;
 }
 
 WRITE8_MEMBER( s8_state::dac_w )

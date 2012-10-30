@@ -34,7 +34,7 @@ public:
 	UINT16      m_screen_bank;
 	UINT16      m_bg_bank;
 	UINT32	suprslam_tile_callback( UINT32 code );
-			
+
 	/* misc */
 	int         m_pending_command;
 

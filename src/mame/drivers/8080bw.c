@@ -683,7 +683,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( invrvnge, mw8080bw_root, _8080bw_state )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(invrvnge_io_map)
-	
+
 	MCFG_CPU_ADD("audiocpu", M6808, XTAL_4MHz/2) // MC6808P
 	MCFG_CPU_PROGRAM_MAP(invrvnge_sound_map)
 

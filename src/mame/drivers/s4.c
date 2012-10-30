@@ -466,7 +466,7 @@ READ_LINE_MEMBER( s4_state::pia4_cb1_r )
 
 READ8_MEMBER( s4_state::dac_r )
 {printf("%X ",m_sound_data);
-	return m_sound_data;	
+	return m_sound_data;
 }
 
 WRITE8_MEMBER( s4_state::dac_w )

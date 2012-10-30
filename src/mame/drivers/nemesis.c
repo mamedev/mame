@@ -1751,7 +1751,7 @@ static MACHINE_CONFIG_START( salamand, nemesis_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.08)
 
 	MCFG_YM2151_ADD("ymsnd", 3579545)
-//	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
+//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2) // reversed according to MT #4565
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.2)
 MACHINE_CONFIG_END
@@ -1793,7 +1793,7 @@ static MACHINE_CONFIG_START( blkpnthr, nemesis_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
 
 	MCFG_YM2151_ADD("ymsnd", 3579545)
-//	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
+//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1929,7 +1929,7 @@ static MACHINE_CONFIG_START( hcrash, nemesis_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
 
 	MCFG_YM2151_ADD("ymsnd", 3579545)
-//	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
+//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

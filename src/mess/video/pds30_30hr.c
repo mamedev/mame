@@ -1,14 +1,14 @@
 /***************************************************************************
 
-  Micron/XCEED Technologies Color 30HR 
- 
+  Micron/XCEED Technologies Color 30HR
+
   Fs800000 - Mode A
   FsA00000 - Mode B
   FsC00000 - RAMDAC write offset
   FsC00004 - RAMDAC write data
   FsC00008 - RAMDAC write mask
   FsC0000C - RAMDAC read offset
- 
+
 ***************************************************************************/
 
 #include "emu.h"
