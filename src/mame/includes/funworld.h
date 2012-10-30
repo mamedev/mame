@@ -19,6 +19,7 @@ public:
 	DECLARE_READ8_MEMBER(funquiz_ay8910_a_r);
 	DECLARE_READ8_MEMBER(funquiz_ay8910_b_r);
 	DECLARE_DRIVER_INIT(magicd2b);
+	DECLARE_DRIVER_INIT(magicd2c);
 	DECLARE_DRIVER_INIT(saloon);
 	DECLARE_DRIVER_INIT(royalcdc);
 	DECLARE_DRIVER_INIT(multiwin);
