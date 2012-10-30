@@ -19,64 +19,72 @@
 #include "px4.lh"
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
-#define VERBOSE 0
+#define VERBOSE 1
 
-/* interrupt sources */
-#define INT0_7508	0x01
-#define INT1_ART	0x02
-#define INT2_ICF	0x04
-#define INT3_OVF	0x08
-#define INT4_EXT	0x10
+// interrupt sources
+#define INT0_7508   0x01
+#define INT1_ART    0x02
+#define INT2_ICF    0x04
+#define INT3_OVF    0x08
+#define INT4_EXT    0x10
 
-/* 7508 interrupt sources */
-#define UPD7508_INT_ALARM		0x02
-#define UPD7508_INT_POWER_FAIL	0x04
-#define UPD7508_INT_7508_RESET	0x08
-#define UPD7508_INT_Z80_RESET	0x10
-#define UPD7508_INT_ONE_SECOND	0x20
+// 7508 interrupt sources
+#define UPD7508_INT_ALARM       0x02
+#define UPD7508_INT_POWER_FAIL  0x04
+#define UPD7508_INT_7508_RESET  0x08
+#define UPD7508_INT_Z80_RESET   0x10
+#define UPD7508_INT_ONE_SECOND  0x20
 
-/* art (asynchronous receiver transmitter) */
-#define ART_TXRDY	0x01	/* output buffer empty */
-#define ART_RXRDY	0x02	/* data byte received */
-#define ART_TXEMPTY	0x04	/* transmit buffer empty */
-#define ART_PE		0x08	/* parity error */
-#define ART_OE		0x10	/* overrun error */
-#define ART_FE		0x20	/* framing error */
+// art (asynchronous receiver transmitter)
+#define ART_TXRDY   0x01    // output buffer empty
+#define ART_RXRDY   0x02    // data byte received
+#define ART_TXEMPTY 0x04    // transmit buffer empty
+#define ART_PE      0x08    // parity error
+#define ART_OE      0x10    // overrun error
+#define ART_FE      0x20    // framing error
 
-/* art baud rates */
+// art baud rates
 static const int transmit_rate[] = { 2112, 1536, 768, 384, 192, 96, 48, 24, 192, 3072, 12, 6, 1152 };
 static const int receive_rate[] = { 2112, 1536, 768, 384, 192, 96, 48, 24, 3072, 192, 12, 6, 1152 };
 
 
-/***************************************************************************
-    MACROS
-***************************************************************************/
+//**************************************************************************
+//  MACROS
+//**************************************************************************
 
-#define ART_TX_ENABLED	(BIT(m_artcr, 0))
-#define ART_RX_ENABLED	(BIT(px4->m_artcr, 2))
+#define ART_TX_ENABLED  (BIT(m_artcr, 0))
+#define ART_RX_ENABLED  (BIT(m_artcr, 2))
 
-#define ART_DATA		(BIT(px4->m_artmr, 2))	/* number of data bits, 7 or 8 */
-#define ART_PEN			(BIT(px4->m_artmr, 4))	/* parity enabled */
-#define ART_EVEN		(BIT(px4->m_artmr, 5))	/* even or odd parity */
-#define ART_STOP		(BIT(px4->m_artmr, 7))	/* number of stop bits, 1 or 2 */
+#define ART_DATA        (BIT(m_artmr, 2))   // number of data bits, 7 or 8
+#define ART_PEN         (BIT(m_artmr, 4))   // parity enabled
+#define ART_EVEN        (BIT(m_artmr, 5))   // even or odd parity
+#define ART_STOP        (BIT(m_artmr, 7))   // number of stop bits, 1 or 2
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 class px4_state : public driver_device
 {
 public:
 	px4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+			m_z80(*this, "maincpu"),
+			m_ram(*this, RAM_TAG),
+			m_centronics(*this, "centronics"),
+			m_ext_cas(*this, "extcas")
+			{ }
 
-	/* internal ram */
-	ram_device *m_ram;
+	// internal devices
+	required_device<cpu_device> m_z80;
+	required_device<ram_device> m_ram;
+	required_device<centronics_device> m_centronics;
+	required_device<cassette_image_device> m_ext_cas;
 
 	/* gapnit register */
 	UINT8 m_ctrl1;
@@ -95,6 +103,8 @@ public:
 	UINT8 m_vadr;
 	UINT8 m_yoff;
 
+	void gapnit_interrupt();
+
 	/* gapnio */
 	emu_timer *m_receive_timer;
 	emu_timer *m_transmit_timer;
@@ -106,28 +116,27 @@ public:
 	UINT8 m_swr;
 
 	/* 7508 internal */
-	int m_one_sec_int_enabled;
-	int m_alarm_int_enabled;
-	int m_key_int_enabled;
+	bool m_one_sec_int_enabled;
+	bool m_alarm_int_enabled;
+	bool m_key_int_enabled;
 
 	UINT8 m_key_status;
 	UINT8 m_interrupt_status;
-
-	/* centronics printer */
-	centronics_device *m_centronics;
 
 	/* external ramdisk */
 	offs_t m_ramdisk_address;
 	UINT8 *m_ramdisk;
 
 	/* external cassette/barcode reader */
-	cassette_image_device *m_ext_cas;
 	emu_timer *m_ext_cas_timer;
 	int m_ear_last_state;
 
 	/* external devices */
 	device_t *m_sio_device;
 	device_t *m_rs232c_device;
+
+	void install_rom_capsule(address_space &space, int size, const char *region);
+
 	DECLARE_READ8_MEMBER(px4_icrlc_r);
 	DECLARE_WRITE8_MEMBER(px4_ctrl1_w);
 	DECLARE_READ8_MEMBER(px4_icrhc_r);
@@ -172,6 +181,7 @@ public:
 	TIMER_CALLBACK_MEMBER(receive_data);
 	TIMER_DEVICE_CALLBACK_MEMBER(frc_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(upd7508_1sec_callback);
+
 	void px4_sio_txd(device_t *device,int state);
 	int px4_sio_rxd(device_t *device);
 	int px4_sio_pin(device_t *device);
@@ -186,11 +196,11 @@ public:
 };
 
 
-/***************************************************************************
-    SERIAL PORT
-***************************************************************************/
+//**************************************************************************
+//  SERIAL PORT
+//**************************************************************************
 
-/* The floppy is connected to this port */
+// The floppy is connected to this port
 
 void px4_state::px4_sio_txd(device_t *device,int state)
 {
@@ -233,11 +243,11 @@ void px4_state::px4_sio_pout(device_t *device,int state)
 }
 
 
-/***************************************************************************
-    RS232C PORT
-***************************************************************************/
+//**************************************************************************
+//  RS232C PORT
+//**************************************************************************
 
-/* Currently nothing is connected to this port */
+// Currently nothing is connected to this port
 
 void px4_state::px4_rs232c_txd(device_t *device,int state)
 {
@@ -291,72 +301,70 @@ int px4_state::px4_rs232c_dcd(device_t *device)
 }
 
 
-/***************************************************************************
-    GAPNIT
-***************************************************************************/
+//**************************************************************************
+//  GAPNIT
+//**************************************************************************
 
-/* process interrupts */
-static void gapnit_interrupt(running_machine &machine)
+// process interrupts
+void px4_state::gapnit_interrupt()
 {
-	px4_state *px4 = machine.driver_data<px4_state>();
-
-	/* any interrupts enabled and pending? */
-	if (px4->m_ier & px4->m_isr & INT0_7508)
+	// any interrupts enabled and pending?
+	if (m_ier & m_isr & INT0_7508)
 	{
-		px4->m_isr &= ~INT0_7508;
-		machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 0xf0);
+		m_isr &= ~INT0_7508;
+		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf0);
 	}
-	else if (px4->m_ier & px4->m_isr & INT1_ART)
-		machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 0xf2);
-	else if (px4->m_ier & px4->m_isr & INT2_ICF)
-		machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 0xf4);
-	else if (px4->m_ier & px4->m_isr & INT3_OVF)
-		machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 0xf6);
-	else if (px4->m_ier & px4->m_isr & INT4_EXT)
-		machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 0xf8);
+	else if (m_ier & m_isr & INT1_ART)
+		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf2);
+	else if (m_ier & m_isr & INT2_ICF)
+		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf4);
+	else if (m_ier & m_isr & INT3_OVF)
+		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf6);
+	else if (m_ier & m_isr & INT4_EXT)
+		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf8);
 	else
-		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+		m_z80->set_input_line(0, CLEAR_LINE);
 }
 
-/* external cassette or barcode reader input */
+// external cassette or barcode reader input
 TIMER_CALLBACK_MEMBER(px4_state::ext_cassette_read)
 {
 	UINT8 result;
 	int trigger = 0;
 
-	/* sample input state */
+	// sample input state
 	result = (m_ext_cas->input() > 0) ? 1 : 0;
 
-	/* detect transition */
+	// detect transition
 	switch ((m_ctrl1 >> 1) & 0x03)
 	{
-	case 0: /* trigger inhibit */
+	case 0: // trigger inhibit
 		trigger = 0;
 		break;
-	case 1: /* falling edge trigger */
+	case 1: // falling edge trigger
 		trigger = m_ear_last_state == 1 && result == 0;
 		break;
-	case 2: /* rising edge trigger */
+	case 2: // rising edge trigger
 		trigger = m_ear_last_state == 0 && result == 1;
 		break;
-	case 3: /* rising/falling edge trigger */
+	case 3: // rising/falling edge trigger
 		trigger = m_ear_last_state != result;
 		break;
 	}
 
-	/* generate an interrupt if we need to trigger */
+	// generate an interrupt if we need to trigger
 	if (trigger)
 	{
 		m_icrb = m_frc_value;
 		m_isr |= INT2_ICF;
-		gapnit_interrupt(machine());
+		gapnit_interrupt();
 	}
 
-	/* save last state */
+	// save last state
 	m_ear_last_state = result;
 }
 
-/* free running counter */
+// free running counter
 TIMER_DEVICE_CALLBACK_MEMBER(px4_state::frc_tick)
 {
 
@@ -365,24 +373,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(px4_state::frc_tick)
 	if (m_frc_value == 0)
 	{
 		m_isr |= INT3_OVF;
-		gapnit_interrupt(machine());
+		gapnit_interrupt();
 	}
 }
 
-/* input capture register low command trigger */
+// input capture register low command trigger
 READ8_MEMBER(px4_state::px4_icrlc_r)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_icrlc_r\n", machine().describe_context());
 
-	/* latch value */
+	// latch value
 	m_frc_latch = m_frc_value;
 
 	return m_frc_latch & 0xff;
 }
 
-/* control register 1 */
+// control register 1
 WRITE8_MEMBER(px4_state::px4_ctrl1_w)
 {
 	int baud;
@@ -390,7 +397,7 @@ WRITE8_MEMBER(px4_state::px4_ctrl1_w)
 	if (VERBOSE)
 		logerror("%s: px4_ctrl1_w (0x%02x)\n", machine().describe_context(), data);
 
-	/* baudrate generator */
+	// baudrate generator
 	baud = data >> 4;
 
 	if (baud <= 12)
@@ -402,100 +409,93 @@ WRITE8_MEMBER(px4_state::px4_ctrl1_w)
 	m_ctrl1 = data;
 }
 
-/* input capture register high command trigger */
+// input capture register high command trigger
 READ8_MEMBER(px4_state::px4_icrhc_r)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_icrhc_r\n", machine().describe_context());
 
 	return (m_frc_latch >> 8) & 0xff;
 }
 
-/* command register */
+// command register
 WRITE8_MEMBER(px4_state::px4_cmdr_w)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_cmdr_w (0x%02x)\n", machine().describe_context(), data);
 
-	/* clear overflow interrupt? */
+	// clear overflow interrupt?
 	if (BIT(data, 2))
 	{
 		m_isr &= ~INT3_OVF;
-		gapnit_interrupt(machine());
+		gapnit_interrupt();
 	}
 }
 
-/* input capture register low barcode trigger */
+// input capture register low barcode trigger
 READ8_MEMBER(px4_state::px4_icrlb_r)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_icrlb_r\n", machine().describe_context());
 
 	return m_icrb & 0xff;
 }
 
-/* control register 2 */
+// control register 2
 WRITE8_MEMBER(px4_state::px4_ctrl2_w)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_ctrl2_w (0x%02x)\n", machine().describe_context(), data);
 
-	/* bit 0, MIC, cassette output */
+	// bit 0, MIC, cassette output
 	m_ext_cas->output( BIT(data, 0) ? -1.0 : +1.0);
 
-	/* bit 1, RMT, cassette motor */
+	// bit 1, RMT, cassette motor
 	if (BIT(data, 1))
 	{
-		m_ext_cas->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		m_ext_cas->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		m_ext_cas_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
 	}
 	else
 	{
-		m_ext_cas->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+		m_ext_cas->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		m_ext_cas_timer->adjust(attotime::zero);
 	}
 }
 
-/* input capture register high barcode trigger */
+// input capture register high barcode trigger
 READ8_MEMBER(px4_state::px4_icrhb_r)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_icrhb_r\n", machine().describe_context());
 
-	/* clear icf interrupt */
+	// clear icf interrupt
 	m_isr &= ~INT2_ICF;
-	gapnit_interrupt(machine());
+	gapnit_interrupt();
 
 	return (m_icrb >> 8) & 0xff;
 }
 
-/* interrupt status register */
+// interrupt status register
 READ8_MEMBER(px4_state::px4_isr_r)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_isr_r\n", machine().describe_context());
 
 	return m_isr;
 }
 
-/* interrupt enable register */
+// interrupt enable register
 WRITE8_MEMBER(px4_state::px4_ier_w)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_ier_w (0x%02x)\n", machine().describe_context(), data);
 
 	m_ier = data;
-	gapnit_interrupt(machine());
+	gapnit_interrupt();
 }
 
-/* status register */
+// status register
 READ8_MEMBER(px4_state::px4_str_r)
 {
 	UINT8 result = 0;
@@ -504,45 +504,43 @@ READ8_MEMBER(px4_state::px4_str_r)
 		logerror("%s: px4_str_r\n", machine().describe_context());
 
 	result |= (m_ext_cas)->input() > 0 ? 1 : 0;
-	result |= 1 << 1;	/* BCRD, barcode reader input */
-	result |= 1 << 2;	/* RDY signal from 7805 */
-	result |= 1 << 3;	/* RDYSIO, enable access to the 7805 */
-	result |= m_bankr & 0xf0;	/* bit 4-7, BANK - memory bank */
+	result |= 1 << 1;   // BCRD, barcode reader input
+	result |= 1 << 2;   // RDY signal from 7805
+	result |= 1 << 3;   // RDYSIO, enable access to the 7805
+	result |= m_bankr & 0xf0;   // bit 4-7, BANK - memory bank
 
 	return result;
 }
 
-/* helper function to map rom capsules */
-static void install_rom_capsule(address_space &space, int size, const char *region)
+// helper function to map rom capsules
+void px4_state::install_rom_capsule(address_space &space, int size, const char *region)
 {
-	px4_state *state = space.machine().driver_data<px4_state>();
-
-	/* ram, part 1 */
+	// ram, part 1
 	space.install_readwrite_bank(0x0000, 0xdfff - size, "bank1");
-	state->membank("bank1")->set_base(state->m_ram->pointer());
+	membank("bank1")->set_base(m_ram->pointer());
 
-	/* actual rom data, part 1 */
+	// actual rom data, part 1
 	space.install_read_bank(0xe000 - size, 0xffff - size, "bank2");
 	space.nop_write(0xe000 - size, 0xffff - size);
-	state->membank("bank2")->set_base(space.machine().root_device().memregion(region)->base() + (size - 0x2000));
+	membank("bank2")->set_base(memregion(region)->base() + (size - 0x2000));
 
-	/* rom data, part 2 */
+	// rom data, part 2
 	if (size != 0x2000)
 	{
 		space.install_read_bank(0x10000 - size, 0xdfff, "bank3");
 		space.nop_write(0x10000 - size, 0xdfff);
-		state->membank("bank3")->set_base(state->memregion(region)->base());
+		membank("bank3")->set_base(memregion(region)->base());
 	}
 
-	/* ram, continued */
+	// ram, continued
 	space.install_readwrite_bank(0xe000, 0xffff, "bank4");
-	state->membank("bank4")->set_base(state->m_ram->pointer() + 0xe000);
+	membank("bank4")->set_base(m_ram->pointer() + 0xe000);
 }
 
-/* bank register */
+// bank register
 WRITE8_MEMBER(px4_state::px4_bankr_w)
 {
-	address_space &space_program = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space_program = m_z80->space(AS_PROGRAM);
 
 	if (VERBOSE)
 		logerror("%s: px4_bankr_w (0x%02x)\n", machine().describe_context(), data);
@@ -556,7 +554,7 @@ WRITE8_MEMBER(px4_state::px4_bankr_w)
 		/* system bank */
 		space_program.install_read_bank(0x0000, 0x7fff, "bank1");
 		space_program.nop_write(0x0000, 0x7fff);
-		membank("bank1")->set_base(machine().root_device().memregion("os")->base());
+		membank("bank1")->set_base(memregion("os")->base());
 		space_program.install_readwrite_bank(0x8000, 0xffff, "bank2");
 		membank("bank2")->set_base(m_ram->pointer() + 0x8000);
 		break;
@@ -581,20 +579,18 @@ WRITE8_MEMBER(px4_state::px4_bankr_w)
 	}
 }
 
-/* serial io register */
+// serial io register
 READ8_MEMBER(px4_state::px4_sior_r)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_sior_r 0x%02x\n", machine().describe_context(), m_sior);
 
 	return m_sior;
 }
 
-/* serial io register */
+// serial io register
 WRITE8_MEMBER(px4_state::px4_sior_w)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_sior_w (0x%02x)\n", machine().describe_context(), data);
 
@@ -619,7 +615,7 @@ WRITE8_MEMBER(px4_state::px4_sior_w)
 			if (VERBOSE)
 				logerror("> 7508 has interrupts pending: 0x%02x\n", m_interrupt_status);
 
-			/* signal the interrupt(s) */
+			// signal the interrupt(s)
 			m_sior = 0xc1 | m_interrupt_status;
 			m_interrupt_status = 0x00;
 		}
@@ -630,7 +626,7 @@ WRITE8_MEMBER(px4_state::px4_sior_w)
 		}
 		else
 		{
-			/* nothing happenend */
+			// nothing happenend
 			m_sior = 0xbf;
 		}
 
@@ -649,7 +645,7 @@ WRITE8_MEMBER(px4_state::px4_sior_w)
 		if (VERBOSE)
 			logerror("7508 cmd: KB Interrupt OFF\n");
 
-		m_key_int_enabled = FALSE;
+		m_key_int_enabled = false;
 		break;
 
 	case 0x16:
@@ -657,7 +653,7 @@ WRITE8_MEMBER(px4_state::px4_sior_w)
 		if (VERBOSE)
 			logerror("7508 cmd: KB Interrupt ON\n");
 
-		m_key_int_enabled = TRUE;
+		m_key_int_enabled = true;
 		break;
 
 	case 0x07: if (VERBOSE) logerror("7508 cmd: Clock Read\n"); break;
@@ -668,7 +664,7 @@ WRITE8_MEMBER(px4_state::px4_sior_w)
 		if (VERBOSE)
 			logerror("7508 cmd: Power Switch Read\n");
 
-		/* indicate that the power switch is in the "ON" position */
+		// indicate that the power switch is in the "ON" position
 		m_sior = 0x01;
 		break;
 
@@ -694,7 +690,7 @@ WRITE8_MEMBER(px4_state::px4_sior_w)
 		if (VERBOSE)
 			logerror("7508 cmd: 1 sec. Interrupt OFF\n");
 
-		m_one_sec_int_enabled = FALSE;
+		m_one_sec_int_enabled = false;
 		break;
 
 	case 0x1d:
@@ -702,7 +698,7 @@ WRITE8_MEMBER(px4_state::px4_sior_w)
 		if (VERBOSE)
 			logerror("7508 cmd: 1 sec. Interrupt ON\n");
 
-		m_one_sec_int_enabled = TRUE;
+		m_one_sec_int_enabled = true;
 		break;
 
 	case 0x0e:
@@ -718,38 +714,36 @@ WRITE8_MEMBER(px4_state::px4_sior_w)
 }
 
 
-/***************************************************************************
-    GAPNDL
-***************************************************************************/
+//**************************************************************************
+//  GAPNDL
+//**************************************************************************
 
-/* vram start address register */
+// vram start address register
 WRITE8_MEMBER(px4_state::px4_vadr_w)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_vadr_w (0x%02x)\n", machine().describe_context(), data);
 
 	m_vadr = data;
 }
 
-/* y offset register */
+// y offset register
 WRITE8_MEMBER(px4_state::px4_yoff_w)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_yoff_w (0x%02x)\n", machine().describe_context(), data);
 
 	m_yoff = data;
 }
 
-/* frame register */
+// frame register
 WRITE8_MEMBER(px4_state::px4_fr_w)
 {
 	if (VERBOSE)
 		logerror("%s: px4_fr_w (0x%02x)\n", machine().describe_context(), data);
 }
 
-/* speed-up register */
+// speed-up register
 WRITE8_MEMBER(px4_state::px4_spur_w)
 {
 	if (VERBOSE)
@@ -757,14 +751,13 @@ WRITE8_MEMBER(px4_state::px4_spur_w)
 }
 
 
-/***************************************************************************
-    GAPNIO
-***************************************************************************/
+//**************************************************************************
+//  GAPNIO
+//**************************************************************************
 
 TIMER_CALLBACK_MEMBER(px4_state::transmit_data)
 {
-
-	if (BIT(m_artcr, 0))// ART_TX_ENABLED
+	if (ART_TX_ENABLED)
 	{
 
 	}
@@ -772,15 +765,13 @@ TIMER_CALLBACK_MEMBER(px4_state::transmit_data)
 
 TIMER_CALLBACK_MEMBER(px4_state::receive_data)
 {
-	px4_state *px4 = machine().driver_data<px4_state>();
-
 	if (ART_RX_ENABLED)
 	{
 
 	}
 }
 
-/* cartridge interface */
+// cartridge interface
 READ8_MEMBER(px4_state::px4_ctgif_r)
 {
 	if (VERBOSE)
@@ -789,37 +780,35 @@ READ8_MEMBER(px4_state::px4_ctgif_r)
 	return 0xff;
 }
 
-/* cartridge interface */
+// cartridge interface
 WRITE8_MEMBER(px4_state::px4_ctgif_w)
 {
 	if (VERBOSE)
 		logerror("%s: px4_ctgif_w (0x%02x @ 0x%02x)\n", machine().describe_context(), data, offset);
 }
 
-/* art data input register */
+// art data input register
 READ8_MEMBER(px4_state::px4_artdir_r)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_artdir_r\n", machine().describe_context());
 
 	return m_artdir;
 }
 
-/* art data output register */
+// art data output register
 WRITE8_MEMBER(px4_state::px4_artdor_w)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_artdor_w (0x%02x)\n", machine().describe_context(), data);
 
-	/* clear ready */
+	// clear ready
 	m_artsr &= ~ART_TXRDY;
 
 	m_artdor = data;
 }
 
-/* art status register */
+// art status register
 READ8_MEMBER(px4_state::px4_artsr_r)
 {
 	UINT8 result = 0;
@@ -832,17 +821,16 @@ READ8_MEMBER(px4_state::px4_artsr_r)
 	return result | m_artsr;
 }
 
-/* art mode register */
+// art mode register
 WRITE8_MEMBER(px4_state::px4_artmr_w)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_artmr_w (0x%02x)\n", machine().describe_context(), data);
 
 	m_artmr = data;
 }
 
-/* io status register */
+// io status register
 READ8_MEMBER(px4_state::px4_iostr_r)
 {
 	UINT8 result = 0;
@@ -856,38 +844,37 @@ READ8_MEMBER(px4_state::px4_iostr_r)
 	result |= px4_sio_rxd(m_sio_device) << 3;
 	result |= px4_rs232c_dcd(m_rs232c_device) << 4;
 	result |= px4_rs232c_cts(m_rs232c_device) << 5;
-	result |= 1 << 6;	/* bit 6, csel, cartridge option select signal, set to 'other mode' */
-	result |= 0 << 7;	/* bit 7, caud - audio input from cartridge */
+	result |= 1 << 6;   // bit 6, csel, cartridge option select signal, set to 'other mode'
+	result |= 0 << 7;   // bit 7, caud - audio input from cartridge
 
 	return result;
 }
 
-/* art command register */
+// art command register
 WRITE8_MEMBER(px4_state::px4_artcr_w)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_artcr_w (0x%02x)\n", machine().describe_context(), data);
 
 	m_artcr = data;
 
-	/* bit 0, txe - transmit enable */
+	// bit 0, txe - transmit enable
 	if (!ART_TX_ENABLED)
 	{
-		/* force high when disabled */
+		// force high when disabled
 		px4_sio_txd(m_sio_device, ASSERT_LINE);
 		px4_rs232c_txd(m_rs232c_device, ASSERT_LINE);
 	}
 
-	/* bit 3, sbrk - break output */
+	// bit 3, sbrk - break output
 	if (ART_TX_ENABLED && BIT(data, 3))
 	{
-		/* force low when enabled and transmit enabled */
+		// force low when enabled and transmit enabled
 		px4_sio_txd(m_sio_device, CLEAR_LINE);
 		px4_rs232c_txd(m_rs232c_device, CLEAR_LINE);
 	}
 
-	/* error reset */
+	// error reset
 	if (BIT(data, 4))
 		m_artsr &= ~(ART_PE | ART_OE | ART_FE);
 
@@ -895,20 +882,18 @@ WRITE8_MEMBER(px4_state::px4_artcr_w)
 	px4_rs232c_rts(m_rs232c_device, BIT(data, 5));
 }
 
-/* switch register */
+// switch register
 WRITE8_MEMBER(px4_state::px4_swr_w)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_swr_w (0x%02x)\n", machine().describe_context(), data);
 
 	m_swr = data;
 }
 
-/* io control register */
+// io control register
 WRITE8_MEMBER(px4_state::px4_ioctlr_w)
 {
-
 	if (VERBOSE)
 		logerror("%s: px4_ioctlr_w (0x%02x)\n", machine().describe_context(), data);
 
@@ -917,31 +902,31 @@ WRITE8_MEMBER(px4_state::px4_ioctlr_w)
 
 	px4_sio_pout(m_sio_device, BIT(data, 2));
 
-	/* bit 3, cartridge reset */
+	// bit 3, cartridge reset
 
-	output_set_value("led_0", BIT(data, 4)); /* caps lock */
-	output_set_value("led_1", BIT(data, 5)); /* num lock */
-	output_set_value("led_2", BIT(data, 6)); /* "led 2" */
+	output_set_value("led_0", BIT(data, 4)); // caps lock
+	output_set_value("led_1", BIT(data, 5)); // num lock
+	output_set_value("led_2", BIT(data, 6)); // "led 2"
 
-	/* bit 7, sp - speaker */
+	// bit 7, sp - speaker
 }
 
 
-/***************************************************************************
-    7508 RELATED
-***************************************************************************/
+//**************************************************************************
+//  7508 RELATED
+//**************************************************************************
 
 TIMER_DEVICE_CALLBACK_MEMBER(px4_state::upd7508_1sec_callback)
 {
 
-	/* adjust interrupt status */
+	// adjust interrupt status
 	m_interrupt_status |= UPD7508_INT_ONE_SECOND;
 
-	/* are interrupts enabled? */
+	// are interrupts enabled?
 	if (m_one_sec_int_enabled)
 	{
 		m_isr |= INT0_7508;
-		gapnit_interrupt(machine());
+		gapnit_interrupt();
 	}
 }
 
@@ -958,7 +943,7 @@ INPUT_CHANGED_MEMBER(px4_state::key_callback)
 			down = (newvalue & (1 << i)) ? 0x10 : 0x00;
 			scancode = (FPTR)param * 32 + i;
 
-			/* control keys */
+			// control keys
 			if ((scancode & 0xa0) == 0xa0)
 				scancode |= down;
 
@@ -979,23 +964,22 @@ INPUT_CHANGED_MEMBER(px4_state::key_callback)
 				logerror("upd7508: key interrupt\n");
 
 			m_isr |= INT0_7508;
-			gapnit_interrupt(machine());
+			gapnit_interrupt();
 		}
 	}
 }
 
 
-/***************************************************************************
-    EXTERNAL RAM-DISK
-***************************************************************************/
+//**************************************************************************
+//  EXTERNAL RAM-DISK
+//**************************************************************************
 
 WRITE8_MEMBER(px4_state::px4_ramdisk_address_w)
 {
-
 	switch (offset)
 	{
-	case 0x00: m_ramdisk_address = (m_ramdisk_address & 0xffff00) | data; break;
-	case 0x01: m_ramdisk_address = (m_ramdisk_address & 0xff00ff) | (data << 8); break;
+	case 0x00: m_ramdisk_address = (m_ramdisk_address & 0xffff00) | ((data & 0xff) <<  0); break;
+	case 0x01: m_ramdisk_address = (m_ramdisk_address & 0xff00ff) | ((data & 0xff) <<  8); break;
 	case 0x02: m_ramdisk_address = (m_ramdisk_address & 0x00ffff) | ((data & 0x07) << 16); break;
 	}
 }
@@ -1006,12 +990,12 @@ READ8_MEMBER(px4_state::px4_ramdisk_data_r)
 
 	if (m_ramdisk_address < 0x20000)
 	{
-		/* read from ram */
+		// read from ram
 		ret = m_ramdisk[m_ramdisk_address];
 	}
 	else if (m_ramdisk_address < 0x40000)
 	{
-		/* read from rom */
+		// read from rom
 		ret = memregion("ramdisk")->base()[m_ramdisk_address];
 	}
 
@@ -1031,28 +1015,27 @@ WRITE8_MEMBER(px4_state::px4_ramdisk_data_w)
 
 READ8_MEMBER(px4_state::px4_ramdisk_control_r)
 {
-	/* bit 7 determines the presence of a ram-disk */
+	// bit 7 determines the presence of a ram-disk
 	return 0x7f;
 }
 
-/***************************************************************************
-    VIDEO EMULATION
-***************************************************************************/
+//**************************************************************************
+//  VIDEO EMULATION
+//**************************************************************************
 
 UINT32 px4_state::screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
-	/* display enabled? */
+	// display enabled?
 	if (BIT(m_yoff, 7))
 	{
 		int y, x;
 
-		/* get vram start address */
+		// get vram start address
 		UINT8 *vram = &m_ram->pointer()[(m_vadr & 0xf8) << 8];
 
 		for (y = 0; y < 64; y++)
 		{
-			/* adjust against y-offset */
+			// adjust against y-offset
 			UINT8 row = (y - (m_yoff & 0x3f)) & 0x3f;
 
 			for (x = 0; x < 240/8; x++)
@@ -1069,13 +1052,13 @@ UINT32 px4_state::screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap,
 				vram++;
 			}
 
-			/* skip the last 2 unused bytes */
+			// skip the last 2 unused bytes
 			vram += 2;
 		}
 	}
 	else
 	{
-		/* display is disabled, draw an empty screen */
+		// display is disabled, draw an empty screen
 		bitmap.fill(0, cliprect);
 	}
 
@@ -1083,48 +1066,39 @@ UINT32 px4_state::screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-/***************************************************************************
-    DRIVER INIT
-***************************************************************************/
+//**************************************************************************
+//  DRIVER INIT
+//**************************************************************************
 
 DRIVER_INIT_MEMBER(px4_state,px4)
 {
+	// init 7508
+	m_one_sec_int_enabled = true;
+	m_key_int_enabled = true;
+	m_alarm_int_enabled = true;
 
-	/* find devices */
-	m_ram = machine().device<ram_device>(RAM_TAG);
+	// art
+	m_receive_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(px4_state::receive_data), this));
+	m_transmit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(px4_state::transmit_data), this));
 
-	/* init 7508 */
-	m_one_sec_int_enabled = TRUE;
-	m_key_int_enabled = TRUE;
-	m_alarm_int_enabled = TRUE;
-
-	/* art */
-	m_receive_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(px4_state::receive_data),this));
-	m_transmit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(px4_state::transmit_data),this));
-
-	/* printer */
-	m_centronics = machine().device<centronics_device>("centronics");
-
-	/* external cassette or barcode reader */
-	m_ext_cas_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(px4_state::ext_cassette_read),this));
-	m_ext_cas = machine().device<cassette_image_device>("extcas");
+	// external cassette or barcode reader
+	m_ext_cas_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(px4_state::ext_cassette_read), this));
 	m_ear_last_state = 0;
 
-	/* external devices */
+	// external devices
 	m_sio_device = machine().device("floppy");
 	m_rs232c_device = NULL;
 
-	/* map os rom and last half of memory */
-	membank("bank1")->set_base(machine().root_device().memregion("os")->base());
+	// map os rom and last half of memory
+	membank("bank1")->set_base(memregion("os")->base());
 	membank("bank2")->set_base(m_ram->pointer() + 0x8000);
 }
 
-DRIVER_INIT_MEMBER(px4_state,px4p)
+DRIVER_INIT_MEMBER(px4_state, px4p)
 {
-
 	DRIVER_INIT_CALL(px4);
 
-	/* reserve memory for external ram-disk */
+	// reserve memory for external ram-disk
 	m_ramdisk = auto_alloc_array(machine(), UINT8, 0x20000);
 }
 
@@ -1133,14 +1107,14 @@ void px4_state::machine_reset()
 	m_artsr = ART_TXRDY | ART_TXEMPTY;
 }
 
-MACHINE_START_MEMBER(px4_state,px4_ramdisk)
+MACHINE_START_MEMBER(px4_state, px4_ramdisk)
 {
 	machine().device<nvram_device>("nvram")->set_base(m_ramdisk, 0x20000);
 }
 
-/***************************************************************************
-    ADDRESS MAPS
-***************************************************************************/
+//**************************************************************************
+//  ADDRESS MAPS
+//**************************************************************************
 
 static ADDRESS_MAP_START( px4_mem, AS_PROGRAM, 8, px4_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
@@ -1150,7 +1124,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( px4_io, AS_IO, 8, px4_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	/* gapnit, 0x00-0x07 */
+	// gapnit, 0x00-0x07
 	AM_RANGE(0x00, 0x00) AM_READWRITE(px4_icrlc_r, px4_ctrl1_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(px4_icrhc_r, px4_cmdr_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(px4_icrlb_r, px4_ctrl2_w)
@@ -1159,13 +1133,13 @@ static ADDRESS_MAP_START( px4_io, AS_IO, 8, px4_state )
 	AM_RANGE(0x05, 0x05) AM_READWRITE(px4_str_r, px4_bankr_w)
 	AM_RANGE(0x06, 0x06) AM_READWRITE(px4_sior_r, px4_sior_w)
 	AM_RANGE(0x07, 0x07) AM_NOP
-	/* gapndl, 0x08-0x0f */
+	// gapndl, 0x08-0x0f
 	AM_RANGE(0x08, 0x08) AM_WRITE(px4_vadr_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(px4_yoff_w)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(px4_fr_w)
 	AM_RANGE(0x0b, 0x0b) AM_WRITE(px4_spur_w)
 	AM_RANGE(0x0c, 0x0f) AM_NOP
-	/* gapnio, 0x10-0x1f */
+	// gapnio, 0x10-0x1f
 	AM_RANGE(0x10, 0x13) AM_READWRITE(px4_ctgif_r, px4_ctgif_w)
 	AM_RANGE(0x14, 0x14) AM_READWRITE(px4_artdir_r, px4_artdor_w)
 	AM_RANGE(0x15, 0x15) AM_READWRITE(px4_artsr_r, px4_artmr_w)
@@ -1184,16 +1158,16 @@ static ADDRESS_MAP_START( px4p_io, AS_IO, 8, px4_state )
 ADDRESS_MAP_END
 
 
-/***************************************************************************
-    INPUT PORTS
-***************************************************************************/
+//**************************************************************************
+//  INPUT PORTS
+//**************************************************************************
 
 /* The PX-4 has an exchangeable keyboard. Available is a standard ASCII
  * keyboard and an "item" keyboard, as well as regional variants for
  * UK, France, Germany, Denmark, Sweden, Norway, Italy and Spain.
  */
 
-/* configuration dip switch found on the rom capsule board */
+// configuration dip switch found on the rom capsule board
 static INPUT_PORTS_START( px4_dips )
 	PORT_START("dips")
 
@@ -1217,130 +1191,133 @@ static INPUT_PORTS_START( px4_dips )
 	PORT_DIPSETTING(0x20, "RS-232C")
 	PORT_DIPSETTING(0x30, "Centronics printer")
 
-	/* available for user applications */
+	// available for user applications
 	PORT_DIPNAME(0x40, 0x40, "Not used")
 	PORT_DIPLOCATION("DIP:2")
 	PORT_DIPSETTING(0x40, "Enable")
 	PORT_DIPSETTING(0x00, "Disable")
 
-	/* this is automatically selected by the os, the switch has no effect */
+	// this is automatically selected by the os, the switch has no effect
 	PORT_DIPNAME(0x80, 0x00, "Keyboard type")
 	PORT_DIPLOCATION("DIP:1")
 	PORT_DIPSETTING(0x80, "Item keyboard")
 	PORT_DIPSETTING(0x00, "Standard keyboard")
 INPUT_PORTS_END
 
-/* US ASCII keyboard */
+// US ASCII keyboard
 static INPUT_PORTS_START( px4_h450a )
 	PORT_INCLUDE(px4_dips)
 	PORT_INCLUDE(tf20)
 
 	PORT_START("keyboard_0")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(ESC))	// 00
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(PAUSE))	// 01
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F6))    PORT_NAME("Help")	// 02
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F1))    PORT_NAME("PF1")	// 03
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F2))    PORT_NAME("PF2")	// 04
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(F3))    PORT_NAME("PF3")	// 05
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(F4))    PORT_NAME("PF4")	// 06
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F5))    PORT_NAME("PF5")	// 07
-	PORT_BIT(0x0000ff00, IP_ACTIVE_HIGH, IPT_UNUSED)	// 08-0f
-	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_ESC)	PORT_CHAR(UCHAR_MAMEKEY(CANCEL)) PORT_NAME("Stop")	// 10
-	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_1)   PORT_CHAR('1') PORT_CHAR('!')	// 11
-	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_2)   PORT_CHAR('2') PORT_CHAR('"')	// 12
-	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_3)   PORT_CHAR('3') PORT_CHAR('#')	// 13
-	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_4)   PORT_CHAR('4') PORT_CHAR('$')	// 14
-	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_5)   PORT_CHAR('5') PORT_CHAR('%')	// 15
-	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_6)   PORT_CHAR('6') PORT_CHAR('&')	// 16
-	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_7)   PORT_CHAR('7') PORT_CHAR('\'')	// 17
-	PORT_BIT(0xff000000, IP_ACTIVE_HIGH, IPT_UNUSED)	// 18-1f
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(ESC)) // 00
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(PAUSE))   // 01
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F6))    PORT_NAME("Help") // 02
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F1))    PORT_NAME("PF1")  // 03
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F2))    PORT_NAME("PF2")  // 04
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(F3))    PORT_NAME("PF3")  // 05
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(F4))    PORT_NAME("PF4")  // 06
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F5))    PORT_NAME("PF5")  // 07
+	PORT_BIT(0x0000ff00, IP_ACTIVE_HIGH, IPT_UNUSED)    // 08-0f
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_ESC)  PORT_CHAR(UCHAR_MAMEKEY(CANCEL)) PORT_NAME("Stop")  // 10
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_1)   PORT_CHAR('1') PORT_CHAR('!')    // 11
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_2)   PORT_CHAR('2') PORT_CHAR('"')    // 12
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_3)   PORT_CHAR('3') PORT_CHAR('#')    // 13
+	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_4)   PORT_CHAR('4') PORT_CHAR('$')    // 14
+	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_5)   PORT_CHAR('5') PORT_CHAR('%')    // 15
+	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_6)   PORT_CHAR('6') PORT_CHAR('&')    // 16
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_7)   PORT_CHAR('7') PORT_CHAR('\'')   // 17
+	PORT_BIT(0xff000000, IP_ACTIVE_HIGH, IPT_UNUSED)    // 18-1f
 
 	PORT_START("keyboard_1")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')	// 20
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')	// 21
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')	// 22
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')	// 23
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')	// 24
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')	// 25
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')	// 26
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')	// 27
-	PORT_BIT(0x0000ff00, IP_ACTIVE_HIGH, IPT_UNUSED)	// 28-2f
-	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_D)     PORT_CHAR('d') PORT_CHAR('D')	// 30
-	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_F)     PORT_CHAR('f') PORT_CHAR('F')	// 31
-	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_G)     PORT_CHAR('g') PORT_CHAR('G')	// 32
-	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_H)     PORT_CHAR('h') PORT_CHAR('H')	// 33
-	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_J)     PORT_CHAR('j') PORT_CHAR('J')	// 34
-	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_K)     PORT_CHAR('k') PORT_CHAR('K')	// 35
-	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_L)     PORT_CHAR('l') PORT_CHAR('L')	// 36
-	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')	// 37
-	PORT_BIT(0xff000000, IP_ACTIVE_HIGH, IPT_UNUSED)	// 38-3f
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')  // 20
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')  // 21
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')  // 22
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')  // 23
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')  // 24
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')  // 25
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')  // 26
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')  // 27
+	PORT_BIT(0x0000ff00, IP_ACTIVE_HIGH, IPT_UNUSED)    // 28-2f
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_D)     PORT_CHAR('d') PORT_CHAR('D')  // 30
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_F)     PORT_CHAR('f') PORT_CHAR('F')  // 31
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_G)     PORT_CHAR('g') PORT_CHAR('G')  // 32
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_H)     PORT_CHAR('h') PORT_CHAR('H')  // 33
+	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_J)     PORT_CHAR('j') PORT_CHAR('J')  // 34
+	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_K)     PORT_CHAR('k') PORT_CHAR('K')  // 35
+	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_L)     PORT_CHAR('l') PORT_CHAR('L')  // 36
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)1) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')  // 37
+	PORT_BIT(0xff000000, IP_ACTIVE_HIGH, IPT_UNUSED)    // 38-3f
 
 	PORT_START("keyboard_2")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_B)     PORT_CHAR('b') PORT_CHAR('B')	// 40
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_N)     PORT_CHAR('n') PORT_CHAR('N')	// 41
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_M)     PORT_CHAR('m') PORT_CHAR('M')	// 42
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')	// 43
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_STOP)  PORT_CHAR('.') PORT_CHAR('>')	// 44
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')	// 45
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_F9)    PORT_CHAR('[') PORT_CHAR('{')	// 46
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_F10)   PORT_CHAR(']') PORT_CHAR('}')	// 47
-	PORT_BIT(0x0000ff00, IP_ACTIVE_HIGH, IPT_UNUSED)	// 48-4f
-	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_8)         PORT_CHAR('8') PORT_CHAR('(')	// 50
-	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_9)         PORT_CHAR('9') PORT_CHAR(')')	// 51
-	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_0)         PORT_CHAR('0') PORT_CHAR('_')	// 52
-	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_MINUS)     PORT_CHAR('-') PORT_CHAR('=')	// 53
-	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_EQUALS)    PORT_CHAR('^') PORT_CHAR('~')	// 54
-	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_UP)        PORT_CHAR(UCHAR_MAMEKEY(UP))	// 55
-	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)   PORT_CHAR(UCHAR_MAMEKEY(HOME))	// 56
-	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_TAB)       PORT_CHAR('\t')	// 57
-	PORT_BIT(0xff000000, IP_ACTIVE_HIGH, IPT_UNUSED)	// 58-5f
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_B)     PORT_CHAR('b') PORT_CHAR('B')  // 40
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_N)     PORT_CHAR('n') PORT_CHAR('N')  // 41
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_M)     PORT_CHAR('m') PORT_CHAR('M')  // 42
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')  // 43
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_STOP)  PORT_CHAR('.') PORT_CHAR('>')  // 44
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')  // 45
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_F9)    PORT_CHAR('[') PORT_CHAR('{')  // 46
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_F10)   PORT_CHAR(']') PORT_CHAR('}')  // 47
+	PORT_BIT(0x0000ff00, IP_ACTIVE_HIGH, IPT_UNUSED)    // 48-4f
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_8)         PORT_CHAR('8') PORT_CHAR('(')  // 50
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_9)         PORT_CHAR('9') PORT_CHAR(')')  // 51
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_0)         PORT_CHAR('0') PORT_CHAR('_')  // 52
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_MINUS)     PORT_CHAR('-') PORT_CHAR('=')  // 53
+	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_EQUALS)    PORT_CHAR('^') PORT_CHAR('~')  // 54
+	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_UP)        PORT_CHAR(UCHAR_MAMEKEY(UP))   // 55
+	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)   PORT_CHAR(UCHAR_MAMEKEY(HOME))  // 56
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)2) PORT_CODE(KEYCODE_TAB)       PORT_CHAR('\t')    // 57
+	PORT_BIT(0xff000000, IP_ACTIVE_HIGH, IPT_UNUSED)    // 58-5f
 
 	PORT_START("keyboard_3")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_O)         PORT_CHAR('o') PORT_CHAR('O')	// 60
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_P)         PORT_CHAR('p') PORT_CHAR('P')	// 61
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@') PORT_CHAR(96)	// 62
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_LEFT)      PORT_CHAR(UCHAR_MAMEKEY(LEFT))	// 63
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_DOWN)      PORT_CHAR(UCHAR_MAMEKEY(DOWN))	// 64
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_RIGHT)     PORT_CHAR(UCHAR_MAMEKEY(RIGHT))	// 65
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_A)         PORT_CHAR('a') PORT_CHAR('A')	// 66
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_S)         PORT_CHAR('s') PORT_CHAR('S')	// 67
-	PORT_BIT(0x0000ff00, IP_ACTIVE_HIGH, IPT_UNUSED)	// 48-4f
-	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_QUOTE)	  PORT_CHAR(':') PORT_CHAR('*')	// 70
-	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_ENTER)     PORT_CHAR(13)	// 71
-	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')	// 72
-	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_SPACE)     PORT_CHAR(' ')	// 73
-	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_Z)         PORT_CHAR('z') PORT_CHAR('Z')	// 74
-	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_X)         PORT_CHAR('x') PORT_CHAR('X')	// 75
-	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_C)         PORT_CHAR('c') PORT_CHAR('C')	// 76
-	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_V)         PORT_CHAR('v') PORT_CHAR('V')	// 77
-	PORT_BIT(0xff000000, IP_ACTIVE_HIGH, IPT_UNUSED)	// 58-5f
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_O)         PORT_CHAR('o') PORT_CHAR('O')  // 60
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_P)         PORT_CHAR('p') PORT_CHAR('P')  // 61
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@') PORT_CHAR(96)   // 62
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_LEFT)      PORT_CHAR(UCHAR_MAMEKEY(LEFT)) // 63
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_DOWN)      PORT_CHAR(UCHAR_MAMEKEY(DOWN)) // 64
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_RIGHT)     PORT_CHAR(UCHAR_MAMEKEY(RIGHT))    // 65
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_A)         PORT_CHAR('a') PORT_CHAR('A')  // 66
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_S)         PORT_CHAR('s') PORT_CHAR('S')  // 67
+	PORT_BIT(0x0000ff00, IP_ACTIVE_HIGH, IPT_UNUSED)    // 48-4f
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_QUOTE)     PORT_CHAR(':')  PORT_CHAR('*') // 70
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_ENTER)     PORT_CHAR(13)  // 71
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|') // 72
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_SPACE)     PORT_CHAR(' ') // 73
+	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_Z)         PORT_CHAR('z') PORT_CHAR('Z')  // 74
+	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_X)         PORT_CHAR('x') PORT_CHAR('X')  // 75
+	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_C)         PORT_CHAR('c') PORT_CHAR('C')  // 76
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)3) PORT_CODE(KEYCODE_V)         PORT_CHAR('v') PORT_CHAR('V')  // 77
+	PORT_BIT(0xff000000, IP_ACTIVE_HIGH, IPT_UNUSED)    // 58-5f
 
 	PORT_START("keyboard_4")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)4) PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT)) PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))	// 80
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)4) PORT_CODE(KEYCODE_DEL)	   PORT_CHAR(UCHAR_MAMEKEY(DEL))    PORT_CHAR(12)	// 81
-	PORT_BIT(0xfffffffc, IP_ACTIVE_HIGH, IPT_UNUSED)	// 82-9f
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)4) PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT)) PORT_CHAR(UCHAR_MAMEKEY(PRTSCR)) // 80
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)4) PORT_CODE(KEYCODE_DEL)    PORT_CHAR(UCHAR_MAMEKEY(DEL))    PORT_CHAR(12)   // 81
+	PORT_BIT(0xfffffffc, IP_ACTIVE_HIGH, IPT_UNUSED)    // 82-9f
 
 	PORT_START("keyboard_5")
-	PORT_BIT(0x00000003, IP_ACTIVE_HIGH, IPT_UNUSED)	// a0-a1
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)5) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)	// a2
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)5) PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)	// a3
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)5) PORT_CODE(KEYCODE_LALT)     PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))	// a4
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)5) PORT_CODE(KEYCODE_RALT)     PORT_NAME("Graph")	// a5
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)5) PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)	// a6
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)5) PORT_CODE(KEYCODE_NUMLOCK)  PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))	// a7
-	PORT_BIT(0xffffff00, IP_ACTIVE_HIGH, IPT_UNUSED)	// a8-bf /* b2-b7 are the 'make' codes for the above keys */
+	PORT_BIT(0x00000003, IP_ACTIVE_HIGH, IPT_UNUSED)    // a0-a1
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)5) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)    // a2
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)5) PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)    // a3
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)5) PORT_CODE(KEYCODE_LALT)     PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))  // a4
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)5) PORT_CODE(KEYCODE_RALT)     PORT_NAME("Graph")  // a5
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)5) PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)    // a6
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)5) PORT_CODE(KEYCODE_NUMLOCK)  PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))   // a7
+	PORT_BIT(0xffffff00, IP_ACTIVE_HIGH, IPT_UNUSED)    // a8-bf /* b2-b7 are the 'make' codes for the above keys */
 INPUT_PORTS_END
+
+#if 0
 
 /* item keyboard */
-/*static INPUT_PORTS_START( px4_h421a )
-    PORT_INCLUDE(px4_dips)
-    PORT_INCLUDE(tf20)
+static INPUT_PORTS_START( px4_h421a )
+	PORT_INCLUDE(px4_dips)
+	PORT_INCLUDE(tf20)
 INPUT_PORTS_END
-*/
 
-/***************************************************************************
-    PALETTE
-***************************************************************************/
+#endif
+
+//**************************************************************************
+//  PALETTE
+//**************************************************************************
 
 void px4_state::palette_init()
 {
@@ -1348,16 +1325,16 @@ void px4_state::palette_init()
 	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
 }
 
-PALETTE_INIT_MEMBER(px4_state,px4p)
+PALETTE_INIT_MEMBER(px4_state, px4p)
 {
 	palette_set_color(machine(), 0, MAKE_RGB(149, 157, 130));
 	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
 }
 
 
-/***************************************************************************
-    MACHINE DRIVERS
-***************************************************************************/
+//**************************************************************************
+//  MACHINE DRIVERS
+//**************************************************************************
 
 static const cassette_interface px4_cassette_interface =
 {
@@ -1369,14 +1346,12 @@ static const cassette_interface px4_cassette_interface =
 };
 
 static MACHINE_CONFIG_START( px4, px4_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_3728MHz / 2)	/* uPD70008 */
+	// basic machine hardware
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_3728MHz / 2)    // uPD70008
 	MCFG_CPU_PROGRAM_MAP(px4_mem)
 	MCFG_CPU_IO_MAP(px4_io)
 
-
-	/* video hardware */
+	// video hardware
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(72)
 	MCFG_SCREEN_SIZE(240, 64)
@@ -1390,53 +1365,52 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("one_sec", px4_state, upd7508_1sec_callback, attotime::from_seconds(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("frc", px4_state, frc_tick, attotime::from_hz(XTAL_7_3728MHz / 2 / 6))
 
-	/* internal ram */
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64k")
 
-	/* centronics printer */
+	// centronics printer
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
-	/* external cassette */
+	// external cassette
 	MCFG_CASSETTE_ADD("extcas", px4_cassette_interface)
 
-	/* rom capsules */
+	// rom capsules
 	MCFG_CARTSLOT_ADD("capsule1")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_ADD("capsule2")
 	MCFG_CARTSLOT_NOT_MANDATORY
 
-	/* tf20 floppy drive */
-  MCFG_TF20_ADD("floppy")
+	// tf20 floppy drive
+	MCFG_TF20_ADD("floppy")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( px4p, px4 )
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(px4p_io)
 
-	MCFG_MACHINE_START_OVERRIDE(px4_state,px4_ramdisk)
+	MCFG_MACHINE_START_OVERRIDE(px4_state, px4_ramdisk)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PALETTE_INIT_OVERRIDE(px4_state,px4p)
+	MCFG_PALETTE_INIT_OVERRIDE(px4_state, px4p)
 
 	MCFG_CARTSLOT_ADD("ramdisk")
 	MCFG_CARTSLOT_NOT_MANDATORY
 MACHINE_CONFIG_END
 
 
-/***************************************************************************
-    ROM DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  ROM DEFINITIONS
+//**************************************************************************
 
-/* Note: We are missing "Kana OS V1.0" and "Kana OS V2.0" (Japanese version) */
+// Note: We are missing "Kana OS V1.0" and "Kana OS V2.0" (Japanese version)
 
 ROM_START( px4 )
-    ROM_REGION(0x8000, "os", 0)
-    ROM_LOAD("m25122aa_po_px4.10c", 0x0000, 0x8000, CRC(62d60dc6) SHA1(3d32ec79a317de7c84c378302e95f48d56505502))
+	ROM_REGION(0x8000, "os", 0)
+	ROM_LOAD("m25122aa_po_px4.10c", 0x0000, 0x8000, CRC(62d60dc6) SHA1(3d32ec79a317de7c84c378302e95f48d56505502))
 
-    ROM_REGION(0x1000, "slave", 0)
-    ROM_LOAD("upd7508.bin", 0x0000, 0x1000, NO_DUMP)
+	ROM_REGION(0x1000, "slave", 0)
+	ROM_LOAD("upd7508.bin", 0x0000, 0x1000, NO_DUMP)
 
 	ROM_REGION(0x8000, "capsule1", 0)
 	ROM_CART_LOAD("capsule1", 0x0000, 0x8000, ROM_OPTIONAL)
@@ -1446,27 +1420,27 @@ ROM_START( px4 )
 ROM_END
 
 ROM_START( px4p )
-    ROM_REGION(0x8000, "os", 0)
-    ROM_LOAD("b0_pxa.10c", 0x0000, 0x8000, CRC(d74b9ef5) SHA1(baceee076c12f5a16f7a26000e9bc395d021c455))
+	ROM_REGION(0x8000, "os", 0)
+	ROM_LOAD("b0_pxa.10c", 0x0000, 0x8000, CRC(d74b9ef5) SHA1(baceee076c12f5a16f7a26000e9bc395d021c455))
 
-    ROM_REGION(0x1000, "slave", 0)
-    ROM_LOAD("upd7508.bin", 0x0000, 0x1000, NO_DUMP)
+	ROM_REGION(0x1000, "slave", 0)
+	ROM_LOAD("upd7508.bin", 0x0000, 0x1000, NO_DUMP)
 
-    ROM_REGION(0x8000, "capsule1", 0)
-    ROM_CART_LOAD("capsule1", 0x0000, 0x8000, ROM_OPTIONAL)
+	ROM_REGION(0x8000, "capsule1", 0)
+	ROM_CART_LOAD("capsule1", 0x0000, 0x8000, ROM_OPTIONAL)
 
-    ROM_REGION(0x8000, "capsule2", 0)
-    ROM_CART_LOAD("capsule2", 0x0000, 0x8000, ROM_OPTIONAL)
+	ROM_REGION(0x8000, "capsule2", 0)
+	ROM_CART_LOAD("capsule2", 0x0000, 0x8000, ROM_OPTIONAL)
 
-    ROM_REGION(0x20000, "ramdisk", 0)
-    ROM_CART_LOAD("ramdisk", 0x0000, 0x20000, ROM_OPTIONAL | ROM_MIRROR)
+	ROM_REGION(0x20000, "ramdisk", 0)
+	ROM_CART_LOAD("ramdisk", 0x0000, 0x20000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 
-/***************************************************************************
-    GAME DRIVERS
-***************************************************************************/
+//**************************************************************************
+//  GAME DRIVERS
+//**************************************************************************
 
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT      INIT  COMPANY  FULLNAME  FLAGS */
-COMP( 1985, px4,  0,      0,      px4,     px4_h450a, px4_state, px4,  "Epson", "PX-4",   GAME_NO_SOUND )
-COMP( 1985, px4p, px4,    0,      px4p,    px4_h450a, px4_state, px4p, "Epson", "PX-4+",  GAME_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT      CLASS      INIT  COMPANY  FULLNAME  FLAGS
+COMP( 1985, px4,  0,      0,      px4,     px4_h450a, px4_state, px4,  "Epson", "PX-4",   GAME_NO_SOUND_HW )
+COMP( 1985, px4p, px4,    0,      px4p,    px4_h450a, px4_state, px4p, "Epson", "PX-4+",  GAME_NO_SOUND_HW )
