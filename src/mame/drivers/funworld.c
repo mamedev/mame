@@ -50,9 +50,10 @@
   * Royal Card Professional 2.0,                      Digital Dreams,     1993.
   * Lucky Lady (3x3 deal),                            TAB Austria,        1991.
   * Lucky Lady (4x1 aces),                            TAB Austria,        1991.
-  * Magic Card II (Bulgarian),                        Impera,             1996.
-  * Magic Card II (Green TAB or Impera board),        Impera,             1996.
-  * Magic Card II (Blue TAB board, encrypted),        Impera,             1996.
+  * Magic Card II (Bulgarian hack),                   Impera,             1996.
+  * Magic Card II (Nov, Yugoslavian hack),            Impera,             1996.
+  * Magic Card II (hack, green TAB or Impera board),  Impera,             1996.
+  * Magic Card II (hack, blue TAB board, encrypted),  Impera,             1996.
   * Royal Vegas Joker Card (Slow deal),               Fun World,          1993.
   * Royal Vegas Joker Card (Fast deal),               Soft Design,        1993.
   * Royal Vegas Joker Card (Fast deal, english gfx),  Soft Design,        1993.
@@ -768,7 +769,7 @@
   - Added PCB layout.
   - GFX are properly decoded.
 
-  [2012/10/27-28]
+  [2012/10/27-29]
   - Added 'Bonus Card (Austrian)' from Fun World.
   - Added PCB layouts.
   - Set Big Deal sets and Jolly Card hybrid as clones
@@ -784,6 +785,9 @@
   - Renamed the internal layout artwork: bigdeal --> bonuscrd.
   - Default Bonus Card & Big Deal DIP switches positions, that
     allow boot the system without errors.
+  - Added new Yugoslavian set of Magic Card 2 (Nov/New).
+  - Added default NVRAM, needed to boot properly.
+  - Rearrange the whole Magic Card 2 sets, and improved descriptions.
   - Added technical notes.
 
 
@@ -3819,10 +3823,10 @@ ROM_END
 /******************************** Magic Card II sets ************************************/
 
 /*
-    Magic Card II (bulgarian)
-    ---------------------------------
+    Magic Card II (Impera)
+    ----------------------
 
-    - 1x Special CPU with CM602 (??) on it
+    - 1x Special CPU with CM602 (??) on it  <--- dumper notes.
     - 1x MC6845P
     - 1x YM2149F
     - 2x MC6821P
@@ -3837,9 +3841,15 @@ ROM_END
 
     TAB blue boards can run the same programs, but needs
     the encrypted graphics set.
+
+    All these games have some weird things...
+	1) Some CPU instructions seems wrong (see below, in driver init)
+	2) The CRTC is injected with some wrong register values (fact),
+	   that place the game wrongly, and screw up the input test screen.
+	   
 */
 
-ROM_START( magicrd2 )	/* Impera */
+ROM_START( magicrd2 )	/* Impera... but seems Bulgarian hack, just for copyright */
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* magicard.004 has extra code, and 2 different NVRAM contents harcoded */
 	ROM_LOAD( "magicard.004", 0x0000, 0x8000,  CRC(f6e948b8) SHA1(7d5983015a508ab135ccbf69b7f3c526c229e3ef) )
 	ROM_LOAD( "magicard.01",  0x8000, 0x8000,  CRC(c94767d4) SHA1(171ac946bdf2575f9e4a31e534a8e641597af519) ) /* 1st and 2nd half identical */
@@ -3856,14 +3866,33 @@ ROM_START( magicrd2 )	/* Impera */
 	ROM_LOAD( "mc2-82s147.bin",	0x0000, 0x0200, CRC(aa91cc35) SHA1(79f9a755441500e618c4183f524f969fffd44100) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "gal16v8uni.bin", 0x0000, 0x0117, CRC(b81d7e0a) SHA1(7fef0b2bcea931a830d38ae0f1102434cf281d2d) )	/* Universal GAL */ 
+ROM_END
+
+
+ROM_START( magicrd2a )	/* Nov (new). Imatic Yugoslavian hack for green TAB or Impera boards */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "m3_nov.bin", 0x8000, 0x8000,  CRC(ee5468e6) SHA1(f859adbad30e561fca86e60ff5b2e666d8bf4071) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "m2_nov.bin",   0x0000, 0x8000, CRC(684d71f2) SHA1(e4522844a0406b3e83fa723508a7c05dd21e7fb6) )
+	ROM_LOAD( "m1_nov.bin",   0x8000, 0x8000, CRC(96151034) SHA1(3107d353705c6240a71faf308e11c45a87d95cf4) )
+
+	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM (passed protection) */
+	ROM_LOAD( "mc2_nvram.bin", 0x0000, 0x0800, CRC(2070d63d) SHA1(86c72a2e81651b0138d8551a0cfcd07176f8e7d2) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "mc2_82s147.bin",	0x0000, 0x0200, CRC(aa91cc35) SHA1(79f9a755441500e618c4183f524f969fffd44100) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "gal16v8uni.bin", 0x0000, 0x0117, CRC(b81d7e0a) SHA1(7fef0b2bcea931a830d38ae0f1102434cf281d2d) )
 ROM_END
 
 
-ROM_START( magicd2a )	/* for green TAB or Impera boards */
+ROM_START( magicrd2b )	/* Imatic Yugoslavian hack for green TAB or Impera boards */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mc2prgv1.bin", 0x8000, 0x8000,  CRC(7f759b70) SHA1(23a1a6e8eda57c4a90c51a970302f9a7bf590083) )
-//    ROM_LOAD( "mc2prgv2.bin", 0x8000, 0x8000,  CRC(b0ed6b40) SHA1(7167e67608f1b0b1cd956c838dacc1310861cb4a) )
+//	ROM_LOAD( "mc2prgv2.bin", 0x8000, 0x8000,  CRC(b0ed6b40) SHA1(7167e67608f1b0b1cd956c838dacc1310861cb4a) )	// there are also pcbs with this program
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "mc2gr2.bin",   0x0000, 0x8000, CRC(733da697) SHA1(45122c64d5a371ec91cecc67b7faf179078e714d) )
@@ -3877,10 +3906,10 @@ ROM_START( magicd2a )	/* for green TAB or Impera boards */
 ROM_END
 
 
-ROM_START( magicd2b )	/* for blue TAB board (encrypted)*/
+ROM_START( magicrd2c )	/* Imatic Yugoslavian hack for blue TAB board (encrypted)*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
-//    ROM_LOAD( "mc2prgv1.bin", 0x8000, 0x8000,  CRC(7f759b70) SHA1(23a1a6e8eda57c4a90c51a970302f9a7bf590083) )
 	ROM_LOAD( "mc2prgv2.bin", 0x8000, 0x8000,  CRC(b0ed6b40) SHA1(7167e67608f1b0b1cd956c838dacc1310861cb4a) )
+//	ROM_LOAD( "mc2prgv1.bin", 0x8000, 0x8000,  CRC(7f759b70) SHA1(23a1a6e8eda57c4a90c51a970302f9a7bf590083) )	// there are also pcbs with this program
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "mc2gr1b.bin",  0x0000, 0x8000, CRC(ce2629a7) SHA1(84767ed5da8dcee44a210255537e10372bcc264b) )
@@ -3892,6 +3921,7 @@ ROM_START( magicd2b )	/* for blue TAB board (encrypted)*/
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "gal16v8uni.bin", 0x0000, 0x0117, CRC(b81d7e0a) SHA1(7fef0b2bcea931a830d38ae0f1102434cf281d2d) )
 ROM_END
+
 
 
 /******************************** Royal Vegas Joker Card sets ************************************/
@@ -4642,7 +4672,7 @@ DRIVER_INIT_MEMBER(funworld_state, tabblue)
 	}
 }
 
-DRIVER_INIT_MEMBER(funworld_state, magicd2a)
+DRIVER_INIT_MEMBER(funworld_state, magicd2b)
 /*****************************************************************
 
   For a serie of Mexican Rockwell's 65c02
@@ -4662,7 +4692,7 @@ DRIVER_INIT_MEMBER(funworld_state, magicd2a)
 	ROM[0xc1c6] = 0x92;
 }
 
-DRIVER_INIT_MEMBER(funworld_state, magicd2b)
+DRIVER_INIT_MEMBER(funworld_state, magicd2c)
 /*** same as blue TAB PCB, with the magicd2a patch ***/
 {
 	int x, na, nb, nad, nbd;
@@ -4947,9 +4977,10 @@ GAMEL( 1991, lluck3x3,  royalcrd, cuoreuno, royalcrd,  driver_device,  0,       
 GAMEL( 1991, lluck4x1,  royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Lucky Lady (4x1 aces)",                           0,                       layout_jollycrd )
 
 // Magic Card 2 based...
-GAMEL( 1996, magicrd2,  0,        magicrd2, magicrd2,  driver_device,  0,        ROT0, "Impera",          "Magic Card II (Bulgarian)",                       GAME_IMPERFECT_SOUND,    layout_jollycrd )
-GAME(  1996, magicd2a,  magicrd2, magicrd2, magicrd2,  funworld_state, magicd2a, ROT0, "Impera",          "Magic Card II (green TAB or Impera board)",       GAME_NOT_WORKING )
-GAME(  1996, magicd2b,  magicrd2, magicrd2, magicrd2,  funworld_state, magicd2b, ROT0, "Impera",          "Magic Card II (blue TAB board, encrypted)",       GAME_NOT_WORKING )
+GAMEL( 1996, magicrd2,  0,        magicrd2, magicrd2,  driver_device,  0,        ROT0, "Impera",          "Magic Card II (Bulgarian hack)",                  0,                       layout_jollycrd )
+GAMEL( 1996, magicrd2a, magicrd2, magicrd2, magicrd2,  driver_device,  0,        ROT0, "Impera",          "Magic Card II (Nov, Yugoslavian hack)",           0,                       layout_jollycrd )
+GAME(  1996, magicrd2b, magicrd2, magicrd2, magicrd2,  funworld_state, magicd2b, ROT0, "Impera",          "Magic Card II (hack, green TAB or Impera board)", GAME_NOT_WORKING )
+GAME(  1996, magicrd2c, magicrd2, magicrd2, magicrd2,  funworld_state, magicd2c, ROT0, "Impera",          "Magic Card II (hack, blue TAB board, encrypted)", GAME_NOT_WORKING )
 
 // Joker Card based...
 GAMEL( 1993, vegasslw,  0,        fw2ndpal, vegasslw,  driver_device,  0,        ROT0, "Fun World",       "Royal Vegas Joker Card (slow deal)",              0,                       layout_jollycrd )

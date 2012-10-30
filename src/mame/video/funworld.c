@@ -48,9 +48,10 @@
   * Royal Card Professional 2.0,                      Digital Dreams,     1993.
   * Lucky Lady (3x3 deal),                            TAB Austria,        1991.
   * Lucky Lady (4x1 aces),                            TAB Austria,        1991.
-  * Magic Card II (Bulgarian),                        Impera,             1996.
-  * Magic Card II (Green TAB or Impera board),        Impera,             1996.
-  * Magic Card II (Blue TAB board, encrypted),        Impera,             1996.
+  * Magic Card II (Bulgarian hack),                   Impera,             1996.
+  * Magic Card II (Nov, Yugoslavian hack),            Impera,             1996.
+  * Magic Card II (hack, green TAB or Impera board),  Impera,             1996.
+  * Magic Card II (hack, blue TAB board, encrypted),  Impera,             1996.
   * Royal Vegas Joker Card (Slow deal),               Fun World,          1993.
   * Royal Vegas Joker Card (Fast deal),               Soft Design,        1993.
   * Royal Vegas Joker Card (Fast deal, english gfx),  Soft Design,        1993.
