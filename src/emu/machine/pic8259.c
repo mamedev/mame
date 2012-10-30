@@ -156,6 +156,15 @@ WRITE_LINE_DEVICE_HANDLER( pic8259_ir5_w ) { pic8259_set_irq_line(device, 5, sta
 WRITE_LINE_DEVICE_HANDLER( pic8259_ir6_w ) { pic8259_set_irq_line(device, 6, state); }
 WRITE_LINE_DEVICE_HANDLER( pic8259_ir7_w ) { pic8259_set_irq_line(device, 7, state); }
 
+WRITE_LINE_MEMBER( pic8259_device::ir0_w ) { pic8259_set_irq_line(this, 0, state); }
+WRITE_LINE_MEMBER( pic8259_device::ir1_w ) { pic8259_set_irq_line(this, 1, state); }
+WRITE_LINE_MEMBER( pic8259_device::ir2_w ) { pic8259_set_irq_line(this, 2, state); }
+WRITE_LINE_MEMBER( pic8259_device::ir3_w ) { pic8259_set_irq_line(this, 3, state); }
+WRITE_LINE_MEMBER( pic8259_device::ir4_w ) { pic8259_set_irq_line(this, 4, state); }
+WRITE_LINE_MEMBER( pic8259_device::ir5_w ) { pic8259_set_irq_line(this, 5, state); }
+WRITE_LINE_MEMBER( pic8259_device::ir6_w ) { pic8259_set_irq_line(this, 6, state); }
+WRITE_LINE_MEMBER( pic8259_device::ir7_w ) { pic8259_set_irq_line(this, 7, state); }
+
 int pic8259_acknowledge(device_t *device)
 {
 	pic8259_t	*pic8259 = get_safe_token(device);
@@ -251,6 +260,11 @@ READ8_DEVICE_HANDLER( pic8259_r )
 	return data;
 }
 
+
+READ8_MEMBER( pic8259_device::read )
+{
+	return pic8259_r(this, space, offset);
+}
 
 
 WRITE8_DEVICE_HANDLER( pic8259_w )
@@ -401,6 +415,11 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 	pic8259_set_timer(pic8259);
 }
 
+
+WRITE8_MEMBER( pic8259_device::write )
+{
+	pic8259_w(this, space, offset, data);
+}
 
 
 static DEVICE_START( pic8259 )

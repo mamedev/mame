@@ -34,6 +34,18 @@ public:
 	pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~pic8259_device() { global_free(m_token); }
 
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	DECLARE_WRITE_LINE_MEMBER( ir0_w );
+	DECLARE_WRITE_LINE_MEMBER( ir1_w );
+	DECLARE_WRITE_LINE_MEMBER( ir2_w );
+	DECLARE_WRITE_LINE_MEMBER( ir3_w );
+	DECLARE_WRITE_LINE_MEMBER( ir4_w );
+	DECLARE_WRITE_LINE_MEMBER( ir5_w );
+	DECLARE_WRITE_LINE_MEMBER( ir6_w );
+	DECLARE_WRITE_LINE_MEMBER( ir7_w );
+
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
 protected:

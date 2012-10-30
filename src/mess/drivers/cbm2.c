@@ -844,7 +844,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ext_io, AS_IO, 8, cbm2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0001) AM_MIRROR(0x1e) AM_DEVREADWRITE_LEGACY(EXT_I8259A_TAG, pic8259_r, pic8259_w)
+	AM_RANGE(0x0000, 0x0001) AM_MIRROR(0x1e) AM_DEVREADWRITE(EXT_I8259A_TAG, pic8259_device, read, write)
 	AM_RANGE(0x0020, 0x0027) AM_MIRROR(0x18) AM_DEVREADWRITE(EXT_MOS6525_TAG, tpi6525_device, read, write)
 ADDRESS_MAP_END
 
@@ -1142,26 +1142,28 @@ static MOS6567_INTERFACE( vic_intf )
 
 READ8_MEMBER( cbm2_state::sid_potx_r )
 {
-	int sela = BIT(m_cia_pa, 6);
-	int selb = BIT(m_cia_pa, 7);
+	UINT8 data = 0xff;
 
-	UINT8 data = 0;
-
-	if (sela) data = m_joy1->pot_x_r();
-	if (selb) data = m_joy2->pot_x_r();
+	switch (m_cia_pa >> 6)
+	{
+	case 1: data = m_joy1->pot_x_r(); break;
+	case 2: data = m_joy2->pot_x_r(); break;
+	case 3: break; // TODO pot1 and pot2 in series
+	}
 
 	return data;
 }
 
 READ8_MEMBER( cbm2_state::sid_poty_r )
 {
-	int sela = BIT(m_cia_pa, 6);
-	int selb = BIT(m_cia_pa, 7);
+	UINT8 data = 0xff;
 
-	UINT8 data = 0;
-
-	if (sela) data = m_joy1->pot_y_r();
-	if (selb) data = m_joy2->pot_y_r();
+	switch (m_cia_pa >> 6)
+	{
+	case 1: data = m_joy1->pot_y_r(); break;
+	case 2: data = m_joy2->pot_y_r(); break;
+	case 3: break; // TODO pot1 and pot2 in series
+	}
 
 	return data;
 }
@@ -1885,8 +1887,8 @@ WRITE8_MEMBER( cbm2_state::ext_cia_pb_w )
 		m_busen1 = 0;
 	}
 
-	pic8259_ir0_w(m_ext_pic, !BIT(data, 6));
-	pic8259_ir7_w(m_ext_pic, BIT(data, 7));
+	m_ext_pic->ir0_w(!BIT(data, 6));
+	m_ext_pic->ir7_w(BIT(data, 7));
 }
 
 static MOS6526_INTERFACE( ext_cia_intf )
@@ -1915,7 +1917,7 @@ void cbm2_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 {
 	m_tpi1->i0_w(m_todclk);
 
-	if (m_ext_pic) pic8259_ir2_w(m_ext_pic, m_todclk);
+	if (m_ext_pic) m_ext_pic->ir2_w(m_todclk);
 
 	m_todclk = !m_todclk;
 }
