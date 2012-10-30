@@ -1,13 +1,19 @@
-/***********************************************************************************
+/****************************************************************************************
 
     Pinball
     Williams System 9
 
+    Status of games:
+    - Sorcerer: seems to work, but START button doesn't do anything
+    - Space Shuttle: seems to work, but START button doesn't do anything
+    - Comet: Works
+    - Strike Zone: not a pinball machine; seems to work; display to be fixed
+    - Alley Cats: not a pinball machine; seems to work; soundboard is not supported yet
 
 
 ToDo:
 
-************************************************************************************/
+*****************************************************************************************/
 
 
 #include "machine/genpin.h"
@@ -525,6 +531,6 @@ GAME( 1985, sorcr_l2, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Sor
 GAME( 1984, sshtl_l7, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Space Shuttle (L-7)", GAME_MECHANICAL | GAME_NOT_WORKING)
 GAME( 1985, comet_l4, comet_l5, s9, s9, driver_device, 0, ROT0, "Williams", "Comet (L-4)", GAME_MECHANICAL)
 GAME( 1985, comet_l5, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Comet (L-5)", GAME_MECHANICAL)
-GAME( 1985, alcat_l7, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Alley Cats (Shuffle) (L-7)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1984, szone_l5, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Strike Zone (Shuffle) (L-5)", GAME_MECHANICAL | GAME_NOT_WORKING)
 GAME( 1984, szone_l2, szone_l5, s9, s9, driver_device, 0, ROT0, "Williams", "Strike Zone (Shuffle) (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME( 1985, alcat_l7, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Alley Cats (Shuffle) (L-7)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)

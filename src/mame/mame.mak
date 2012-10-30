@@ -2232,6 +2232,8 @@ $(DRIVERS)/s6.o:	$(LAYOUT)/s6.lh
 
 $(DRIVERS)/s6a.o:	$(LAYOUT)/s6a.lh
 
+$(DRIVERS)/s7.o:	$(LAYOUT)/s7.lh
+
 $(DRIVERS)/s8.o:	$(LAYOUT)/s8.lh
 
 $(DRIVERS)/s9.o:	$(LAYOUT)/s9.lh
