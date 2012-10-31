@@ -5621,6 +5621,7 @@ src/mess/drivers/alesis.c svneol=native#text/plain
 src/mess/drivers/alphasma.c svneol=native#text/plain
 src/mess/drivers/alphatro.c svneol=native#text/plain
 src/mess/drivers/altair.c svneol=native#text/plain
+src/mess/drivers/altos5.c svneol=native#text/plain
 src/mess/drivers/amico2k.c svneol=native#text/plain
 src/mess/drivers/amiga.c svneol=native#text/plain
 src/mess/drivers/amstr_pc.c svneol=native#text/plain

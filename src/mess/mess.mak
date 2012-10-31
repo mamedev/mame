@@ -1952,6 +1952,7 @@ $(MESSOBJ)/test.a:				\
 	$(MESS_DRIVERS)/zexall.o	\
 
 $(MESSOBJ)/skeleton.a:			\
+	$(MESS_DRIVERS)/altos5.o	\
 	$(MESS_DRIVERS)/alphasma.o	\
 	$(MESS_DRIVERS)/alphatro.o	\
 	$(MESS_DRIVERS)/amico2k.o	\
