@@ -1333,6 +1333,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_iocpu(*this, "iocpu"),
         m_rtc(*this, "rtc"),
+		m_mainram(*this, "mainram"),
 		m_shared_ram(*this, "shared_ram"),
 		m_charram(*this, "charram"),
 		m_textram(*this, "textram"),
@@ -1345,6 +1346,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_iocpu;
     required_device<rtc4543_device> m_rtc;
+	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_shared_ram;
 	required_shared_ptr<UINT32> m_charram;
 	required_shared_ptr<UINT32> m_textram;
@@ -1458,9 +1460,9 @@ public:
 	DECLARE_READ8_MEMBER(s23_iob_analog_r);
 	DECLARE_DRIVER_INIT(ss23);
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
-	DECLARE_MACHINE_START(s23);
 	DECLARE_VIDEO_START(ss23);
 	DECLARE_MACHINE_RESET(gmen);
+	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_ss23(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(s23_interrupt);
@@ -1506,7 +1508,6 @@ TILE_GET_INFO_MEMBER(namcos23_state::TextTilemapGetInfo)
 {
 	UINT16 data = nthword( m_textram,tile_index );
   /**
-    * x---.----.----.---- blend
     * xxxx.----.----.---- palette select
     * ----.xx--.----.---- flip
     * ----.--xx.xxxx.xxxx code
@@ -2545,16 +2546,18 @@ INTERRUPT_GEN_MEMBER(namcos23_state::s23_interrupt)
 	render.count[render.cur] = 0;
 }
 
-MACHINE_START_MEMBER(namcos23_state,s23)
+void namcos23_state::machine_start()
 {
 	c361_t &c361 = m_c361;
 	c361.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos23_state::c361_timer_cb),this));
 	c361.timer->adjust(attotime::never);
+
+	mips3drc_add_fastram(m_maincpu, 0, m_mainram.bytes()-1, FALSE, reinterpret_cast<UINT32 *>(machine().root_device().memshare("mainram")->ptr()));
 }
 
 static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32, namcos23_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffffff)
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(p3d_r, p3d_w)
 	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16(s23_c417_r, s23_c417_w, 0xffffffff)
 	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_SHARE("shared_ram") // Communication RAM (C416)
@@ -2578,7 +2581,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ss23_map, AS_PROGRAM, 32, namcos23_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffffff)
-	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM
+	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(p3d_r, p3d_w)
 	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16(s23_c417_r, s23_c417_w, 0xffffffff)
 	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_SHARE("shared_ram") // Communication RAM (C416)
@@ -3319,8 +3322,6 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 
 	MCFG_VIDEO_START_OVERRIDE(namcos23_state,ss23)
 
-	MCFG_MACHINE_START_OVERRIDE(namcos23_state,s23)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -3366,8 +3367,6 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 
 	MCFG_VIDEO_START_OVERRIDE(namcos23_state,ss23)
 
-	MCFG_MACHINE_START_OVERRIDE(namcos23_state,s23)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -3408,8 +3407,6 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(namcos23_state,ss23)
-
-	MCFG_MACHINE_START_OVERRIDE(namcos23_state,s23)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
