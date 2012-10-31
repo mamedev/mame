@@ -2688,7 +2688,65 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 void s3_vga_device::s3_define_video_mode()
 {
 	int divisor = 1;
-	int xtal = 1000000;
+	int xtal = (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz;
+
+	if((vga.miscellaneous_output & 0xc) == 0x0c)
+	{
+		switch(s3.cr42 & 0x0f)  // TODO: confirm clock settings
+		{
+		case 0:
+			xtal = XTAL_25_1748MHz;
+			break;
+		case 1:
+			xtal = XTAL_28_63636MHz;
+			break;
+		case 2:
+			xtal = 40000000;
+			break;
+		case 3:
+			xtal = 3000000;
+			break;
+		case 4:
+			xtal = 50000000;
+			break;
+		case 5:
+			xtal = 77000000;
+			break;
+		case 6:
+			xtal = 36000000;
+			break;
+		case 7:
+			xtal = 45000000;
+			break;
+		case 8:
+			xtal = 1000000;
+			break;
+		case 9:
+			xtal = 1000000;
+			break;
+		case 10:
+			xtal = 79000000;
+			break;
+		case 11:
+			xtal = 31000000;
+			break;
+		case 12:
+			xtal = 94000000;
+			break;
+		case 13:
+			xtal = 65000000;
+			break;
+		case 14:
+			xtal = 75000000;
+			break;
+		case 15:
+			xtal = 71000000;
+			break;
+		default:
+			xtal = 1000000;
+		}
+	}
+
 	if((s3.ext_misc_ctrl_2) >> 4)
 	{
 		svga.rgb8_en = 0;
@@ -2702,59 +2760,6 @@ void s3_vga_device::s3_define_video_mode()
 			case 0x0d: svga.rgb32_en = 1; divisor = 2; break;
 			default: fatalerror("TODO: s3 video mode not implemented %02x\n",((s3.ext_misc_ctrl_2) >> 4)); break;
 		}
-/*      switch(s3.cr42 & 0x0f)  // TODO: confirm clock settings
-        {
-        case 0:
-            xtal = XTAL_25_1748MHz;
-            break;
-        case 1:
-            xtal = XTAL_28_63636MHz;
-            break;
-        case 2:
-            xtal = 40000000;
-            break;
-        case 3:
-            xtal = 3000000;
-            break;
-        case 4:
-            xtal = 50000000;
-            break;
-        case 5:
-            xtal = 77000000;
-            break;
-        case 6:
-            xtal = 36000000;
-            break;
-        case 7:
-            xtal = 45000000;
-            break;
-        case 8:
-            xtal = 1000000;
-            break;
-        case 9:
-            xtal = 1000000;
-            break;
-        case 10:
-            xtal = 79000000;
-            break;
-        case 11:
-            xtal = 31000000;
-            break;
-        case 12:
-            xtal = 94000000;
-            break;
-        case 13:
-            xtal = 65000000;
-            break;
-        case 14:
-            xtal = 75000000;
-            break;
-        case 15:
-            xtal = 71000000;
-            break;
-        default:
-            xtal = 1000000;
-        }*/
 	}
 	else
 	{
@@ -2763,8 +2768,6 @@ void s3_vga_device::s3_define_video_mode()
 		svga.rgb16_en = 0;
 		svga.rgb32_en = 0;
 	}
-//  if((vga.miscellaneous_output & 0xc) != 0x0c)
-	xtal = (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz;
 	recompute_params_clock(divisor, xtal);
 }
 
@@ -2959,6 +2962,59 @@ bit 0-1  DAC Register Select Bits. Passed to the RS2 and RS3 pins on the
  */
 			case 0x55:
 				s3.extended_dac_ctrl = data;
+				break;
+/*
+3d4h index 5Dh (R/W):  Extended Horizontal Overflow Register           (80x +)
+bit    0  Horizontal Total bit 8. Bit 8 of the Horizontal Total register (3d4h
+          index 0)
+       1  Horizontal Display End bit 8. Bit 8 of the Horizontal Display End
+          register (3d4h index 1)
+       2  Start Horizontal Blank bit 8. Bit 8 of the Horizontal Start Blanking
+          register (3d4h index 2).
+       3  (864,964) EHB+64. End Horizontal Blank +64. If set the /BLANK pulse
+           is extended by 64 DCLKs. Note: Is this bit 6 of 3d4h index 3 or
+           does it really extend by 64 ?
+       4  Start Horizontal Sync Position bit 8. Bit 8 of the Horizontal Start
+          Retrace register (3d4h index 4).
+       5  (864,964) EHS+32. End Horizontal Sync +32. If set the HSYNC pulse
+           is extended by 32 DCLKs. Note: Is this bit 5 of 3d4h index 5 or
+           does it really extend by 32 ?
+       6  (928,964) Data Transfer Position bit 8. Bit 8 of the Data Transfer
+            Position register (3d4h index 3Bh)
+       7  (928,964) Bus-Grant Terminate Position bit 8. Bit 8 of the Bus Grant
+            Termination register (3d4h index 5Fh).
+*/
+			case 0x5d:
+				vga.crtc.horz_total = (vga.crtc.horz_total & 0xfeff) | ((data & 0x01) << 8);
+				vga.crtc.horz_disp_end = (vga.crtc.horz_disp_end & 0xfeff) | ((data & 0x02) << 7);
+				vga.crtc.horz_blank_start = (vga.crtc.horz_blank_start & 0xfeff) | ((data & 0x04) << 6);
+				vga.crtc.horz_retrace_start = (vga.crtc.horz_retrace_start & 0xfeff) | ((data & 0x10) << 4);
+				s3_define_video_mode();
+				break;
+/*
+3d4h index 5Eh (R/W):  Extended Vertical Overflow Register             (80x +)
+bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
+		  index 6). Bits 8 and 9 are in 3d4h index 7 bit 0 and 5.
+	   1  Vertical Display End bit 10. Bit 10 of the Vertical Display End
+		  register (3d4h index 12h). Bits 8 and 9 are in 3d4h index 7 bit 1
+		  and 6
+	   2  Start Vertical Blank bit 10. Bit 10 of the Vertical Start Blanking
+		  register (3d4h index 15h). Bit 8 is in 3d4h index 7 bit 3 and bit 9
+		  in 3d4h index 9 bit 5
+	   4  Vertical Retrace Start bit 10. Bit 10 of the Vertical Start Retrace
+		  register (3d4h index 10h). Bits 8 and 9 are in 3d4h index 7 bit 2
+		  and 7.
+	   6  Line Compare Position bit 10. Bit 10 of the Line Compare register
+		  (3d4h index 18h). Bit 8 is in 3d4h index 7 bit 4 and bit 9 in 3d4h
+		  index 9 bit 6.
+ */
+			case 0x5e:
+				vga.crtc.vert_total = (vga.crtc.vert_total & 0xfbff) | ((data & 0x01) << 10);
+				vga.crtc.vert_disp_end = (vga.crtc.vert_disp_end & 0xfbff) | ((data & 0x02) << 9);
+				vga.crtc.vert_blank_start = (vga.crtc.vert_blank_start & 0xfbff) | ((data & 0x04) << 8);
+				vga.crtc.vert_retrace_start = (vga.crtc.vert_retrace_start & 0xfbff) | ((data & 0x10) << 6);
+				vga.crtc.line_compare = (vga.crtc.line_compare & 0xfbff) | ((data & 0x40) << 4);
+				s3_define_video_mode();
 				break;
 			case 0x67:
 				s3.ext_misc_ctrl_2 = data;
