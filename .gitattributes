@@ -3377,6 +3377,7 @@ src/mame/drivers/suna8.c svneol=native#text/plain
 src/mame/drivers/supbtime.c svneol=native#text/plain
 src/mame/drivers/supdrapo.c svneol=native#text/plain
 src/mame/drivers/superchs.c svneol=native#text/plain
+src/mame/drivers/supercrd.c svneol=native#text/plain
 src/mame/drivers/superdq.c svneol=native#text/plain
 src/mame/drivers/superqix.c svneol=native#text/plain
 src/mame/drivers/supertnk.c svneol=native#text/plain

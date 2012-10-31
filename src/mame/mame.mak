@@ -1895,6 +1895,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/su2000.o \
 	$(DRIVERS)/summit.o \
 	$(DRIVERS)/sumt8035.o \
+	$(DRIVERS)/supercrd.o \
 	$(DRIVERS)/supertnk.o \
 	$(DRIVERS)/superwng.o \
 	$(DRIVERS)/tapatune.o \
