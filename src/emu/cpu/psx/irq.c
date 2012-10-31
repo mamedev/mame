@@ -125,7 +125,7 @@ WRITE_LINE_MEMBER( psxirq_device::intin1 )
 {
 	if( state )
 	{
-		set( 1 << 3 );
+		set( 1 << 1 );
 	}
 }
 
@@ -133,7 +133,7 @@ WRITE_LINE_MEMBER( psxirq_device::intin2 )
 {
 	if( state )
 	{
-		set( 1 << 3 );
+		set( 1 << 2 );
 	}
 }
 
@@ -149,7 +149,7 @@ WRITE_LINE_MEMBER( psxirq_device::intin4 )
 {
 	if( state )
 	{
-		set( 1 << 3 );
+		set( 1 << 4 );
 	}
 }
 
@@ -157,7 +157,7 @@ WRITE_LINE_MEMBER( psxirq_device::intin5 )
 {
 	if( state )
 	{
-		set( 1 << 3 );
+		set( 1 << 5 );
 	}
 }
 
@@ -165,7 +165,7 @@ WRITE_LINE_MEMBER( psxirq_device::intin6 )
 {
 	if( state )
 	{
-		set( 1 << 3 );
+		set( 1 << 6 );
 	}
 }
 

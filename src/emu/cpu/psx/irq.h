@@ -34,8 +34,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( intin9 );
 	DECLARE_WRITE_LINE_MEMBER( intin10 );
 
-	void set( UINT32 bitmask );
-
 protected:
 	virtual void device_start();
 	virtual void device_reset();
@@ -43,6 +41,7 @@ protected:
 
 private:
 	void psx_irq_update( void );
+	void set( UINT32 bitmask );
 
 	UINT32 n_irqdata;
 	UINT32 n_irqmask;
