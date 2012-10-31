@@ -235,7 +235,7 @@ struct tms0980_state
 	UINT8	sr;				/* subroutine return register is a 7 bit register */
 	UINT8	pb;				/* page buffer register is a 4 bit register */
 	UINT8	a;				/* Accumulator is a 4 bit register (?) */
-	UINT8	x;				/* X-register is a 2 bit register */
+	UINT8	x;				/* X-register is a 2, 3, or 4 bit register */
 	UINT8	y;				/* Y-register is a 4 bit register */
 	UINT8	dam;			/* DAM register is a 4 bit register */
 	UINT8	ca;				/* Chapter address bit */
@@ -265,6 +265,7 @@ struct tms0980_state
 	UINT16	r_mask;			/* mask to determine the number of R outputs */
 	UINT8	pc_size;		/* how bits in the PC register */
 	UINT8	byte_size;		/* 8 or 9 bit bytes */
+	UINT8	m_x_bits;		/* determine the number of bits in the X register */
 	const UINT32 *decode_table;
 	const tms0980_config	*config;
 	address_space *program;
@@ -279,6 +280,10 @@ struct tms0980_state
 static const UINT8 tms0980_c2_value[4] =
 {
 	0x00, 0x02, 0x01, 0x03
+};
+static const UINT8 tms0980_c3_value[8] =
+{
+	0x00, 0x04, 0x02, 0x06, 0x01, 0x05, 0x03, 0x07
 };
 static const UINT8 tms0980_c4_value[16] =
 {
@@ -493,7 +498,7 @@ static ADDRESS_MAP_START(data_7bit, AS_DATA, 8, legacy_cpu_device)
 ADDRESS_MAP_END
 
 
-static void cpu_init_tms_common( legacy_cpu_device *device, const UINT32* decode_table, UINT16 o_mask, UINT16 r_mask, UINT8 pc_size, UINT8 byte_size )
+static void cpu_init_tms_common( legacy_cpu_device *device, const UINT32* decode_table, UINT16 o_mask, UINT16 r_mask, UINT8 pc_size, UINT8 byte_size, UINT8 x_bits )
 {
 	tms0980_state *cpustate = get_safe_token( device );
 
@@ -506,9 +511,10 @@ static void cpu_init_tms_common( legacy_cpu_device *device, const UINT32* decode
 	cpustate->r_mask = r_mask;
 	cpustate->pc_size = pc_size;
 	cpustate->byte_size = byte_size;
+	cpustate->m_x_bits = x_bits;
 
 	cpustate->program = &device->space( AS_PROGRAM );
-	cpustate->data = &device->space( AS_PROGRAM );
+	cpustate->data = &device->space( AS_DATA );
 
 	cpustate->m_read_k.resolve(cpustate->config->read_k, *device);
 	cpustate->m_write_o.resolve(cpustate->config->write_o, *device);
@@ -552,43 +558,43 @@ static void cpu_init_tms_common( legacy_cpu_device *device, const UINT32* decode
 
 static CPU_INIT( tms0980 )
 {
-	cpu_init_tms_common( device, tms0980_decode, 0x00ff, 0x07ff, 7, 9 );
+	cpu_init_tms_common( device, tms0980_decode, 0x00ff, 0x07ff, 7, 9, 4 );
 }
 
 
 static CPU_INIT( tms1000 )
 {
-	cpu_init_tms_common( device, tms1000_default_decode, 0x00ff, 0x07ff, 6, 8 );
+	cpu_init_tms_common( device, tms1000_default_decode, 0x00ff, 0x07ff, 6, 8, 2 );
 }
 
 
 static CPU_INIT( tms1070 )
 {
-	cpu_init_tms_common( device, tms1000_default_decode, 0x00ff, 0x07ff, 6, 8 );
+	cpu_init_tms_common( device, tms1000_default_decode, 0x00ff, 0x07ff, 6, 8, 2 );
 }
 
 
 static CPU_INIT( tms1200 )
 {
-	cpu_init_tms_common( device, tms1000_default_decode, 0x00ff, 0x1fff, 6, 8 );
+	cpu_init_tms_common( device, tms1000_default_decode, 0x00ff, 0x1fff, 6, 8, 2 );
 }
 
 
 static CPU_INIT( tms1270 )
 {
-	cpu_init_tms_common( device, tms1000_default_decode, 0x03ff, 0x1fff, 6, 8 );
+	cpu_init_tms_common( device, tms1000_default_decode, 0x03ff, 0x1fff, 6, 8, 2 );
 }
 
 
 static CPU_INIT( tms1100 )
 {
-	cpu_init_tms_common( device, tms1100_default_decode, 0x00ff, 0x07ff, 6, 8 );
+	cpu_init_tms_common( device, tms1100_default_decode, 0x00ff, 0x07ff, 6, 8, 3 );
 }
 
 
 static CPU_INIT( tms1300 )
 {
-	cpu_init_tms_common( device, tms1100_default_decode, 0x00ff, 0xffff, 6, 8 );
+	cpu_init_tms_common( device, tms1100_default_decode, 0x00ff, 0xffff, 6, 8, 3 );
 }
 
 
@@ -831,7 +837,8 @@ static CPU_EXECUTE( tms0980 )
 		case 1:
 			/* fetch: rom address 1 */
 			if ( cpustate->pc_size == 6 )
-				cpustate->rom_address = ( cpustate->pa << 6 ) | tms1000_pc_decode[ cpustate->pc ];
+//				cpustate->rom_address = ( cpustate->pa << 6 ) | tms1000_pc_decode[ cpustate->pc ];
+				cpustate->rom_address = ( cpustate->pa << 6 ) | cpustate->pc;
 			else
 				cpustate->rom_address = ( cpustate->pa << 7 ) | cpustate->pc;
 			/* execute: k input valid */
@@ -979,7 +986,18 @@ static CPU_EXECUTE( tms0980 )
 				}
 				if ( cpustate->decode & F_LDX )
 				{
-					cpustate->x = tms0980_c2_value[ cpustate->opcode & 0x03 ];
+					switch( cpustate->m_x_bits )
+					{
+						case 2:
+							cpustate->x = tms0980_c2_value[ cpustate->opcode & 0x03 ];
+							break;
+						case 3:
+							cpustate->x = tms0980_c3_value[ cpustate->opcode & 0x07 ];
+							break;
+						case 4:
+							cpustate->x = tms0980_c4_value[ cpustate->opcode & 0x0f ];
+							break;
+					}
 				}
 				if ( cpustate->decode & F_COMX )
 				{
@@ -1041,7 +1059,7 @@ static CPU_EXECUTE( tms0980 )
 			else
 			{
 				debugger_instruction_hook( device, cpustate->rom_address );
-				cpustate->opcode = cpustate->program->read_word( cpustate->rom_address ) & 0xFF;
+				cpustate->opcode = cpustate->program->read_byte( cpustate->rom_address );
 			}
 			tms0980_next_pc( cpustate );
 			if (LOG)
@@ -1263,7 +1281,7 @@ CPU_GET_INFO( tms1100 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 11; break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 7; break;
 		case CPUINFO_INT_PREVIOUSPC:									info->i = ( cpustate->prev_pa << 6 ) | tms1000_pc_decode[ cpustate->prev_pc ]; break;
-		case CPUINFO_INT_PC:											info->i = ( cpustate->pa << 6 ) | tms1000_pc_decode[ cpustate->pc ]; break;
+		case CPUINFO_INT_PC:											info->i = ( cpustate->pa << 6 ) | cpustate->pc; break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:					info->internal_map8 = ADDRESS_MAP_NAME( program_11bit_8 ); break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:						info->internal_map8 = ADDRESS_MAP_NAME( data_7bit ); break;
 		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME( tms1100 ); break;

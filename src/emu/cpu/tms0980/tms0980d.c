@@ -17,7 +17,7 @@ TMS0980 disassembly
 enum e_mnemonics {
 	zA10AAC=0, zA6AAC, zA8AAC, zAC1AC, zACACC, zACNAA, zALEC, zALEM, zAMAAC, zBRANCH, zCALL, zCCLA,
 	zCLA, zCLO, zCOMC, zCOMX, zCOMX8, zCPAIZ, zCTMDYN, zDAN, zDMAN, zDMEA, zDNAA,
-	zDYN, zIA, zIMAC, zIYC, zKNE, zKNEZ, zLDP, zLDX, zLDX4, zMNEA, zMNEZ,
+	zDYN, zIA, zIMAC, zIYC, zKNE, zKNEZ, zLDP, zLDX, zLDX3, zLDX4, zMNEA, zMNEZ,
 	zNDMEA, zOFF, zRBIT, zREAC, zRETN, zRSTR, zSAL, zSAMAN, zSBIT,
 	zSBL, zSEAC, zSETR, zTAM, zTAMACS, zTAMDYN, zTAMIY, zTAMIYC, zTAMZA,
 	zTAY, zTBIT, zTCMIY, zTCY, zTDO, zTKA, zTKM, zTMA,
@@ -27,14 +27,14 @@ enum e_mnemonics {
 
 
 enum e_addressing {
-	zB0=0, zB2, zI2, zI4, zB7
+	zB0=0, zB2, zI2, zI3, zI4, zB7
 };
 
 
 static const char *const s_mnemonic[] = {
 	"a10aac", "a6aac", "a8aac", "ac1ac", "acacc", "acnaa", "alec", "alem", "amaac", "branch", "call", "ccla",
 	"cla", "clo", "comc", "comx", "comx8", "cpaiz", "ctmdyn", "dan", "dman", "dmea", "dnaa",
-	"dyn", "ia", "imac", "iyc", "kne", "knez", "ldp", "ldx", "ldx", "mnea", "mnez",
+	"dyn", "ia", "imac", "iyc", "kne", "knez", "ldp", "ldx", "ldx", "ldx", "mnea", "mnez",
 	"ndmea", "off", "rbit", "reac", "retn", "rstr", "sal", "saman", "sbit",
 	"sbl", "seac", "setr", "tam", "tamacs", "tamdyn", "tamiy", "tamiyc", "tamza",
 	"tay", "tbit", "tcmiy", "tcy", "tdo", "tka", "tkm", "tma",
@@ -58,7 +58,7 @@ static const UINT32 s_flags[] = {
 static const UINT8 s_addressing[] = {
 	zB0, zB0, zB0, zI4, zI4, zI4, zI4, zB0, zB0, zB7, zB7, zB0,
 	zB0, zB0, zB0, zB0, zB0, zB0, zB0, zB0, zB0, zB0, zB0,
-	zB0, zB0, zB0, zB0, zB0, zB0, zI4, zI2, zI4, zB0, zB0,
+	zB0, zB0, zB0, zB0, zB0, zB0, zI4, zI2, zI3, zI4, zB0, zB0,
 	zB0, zB0, zB0, zB0, zB0, zB0, zB0, zB0, zB0,
 	zB0, zB0, zB0, zB0, zI4, zB0, zB0, zB0, zB2,
 	zB0, zB2, zI4, zI4, zB0, zB0, zB0, zB0,
@@ -201,7 +201,7 @@ static const UINT8 tms1100_mnemonic[256] = {
 	zLDP, zLDP, zLDP, zLDP, zLDP, zLDP, zLDP, zLDP,
 	/* 0x20 */
 	zTAY, zTMA, zTMY, zTYA, zTAMDYN, zTAMIYC, zTAMZA, zTAM,
-	zLDX, zLDX, zLDX, zLDX, zLDX, zLDX, zLDX, zLDX,
+	zLDX3, zLDX3, zLDX3, zLDX3, zLDX3, zLDX3, zLDX3, zLDX3,
 	zSBIT, zSBIT, zSBIT, zSBIT, zRBIT, zRBIT, zRBIT, zRBIT,
 	zTBIT, zTBIT, zTBIT, zTBIT, zSAMAN, zCPAIZ, zIMAC, zMNEZ,
 	/* 0x40 */
@@ -237,6 +237,10 @@ static const UINT8 tms1100_mnemonic[256] = {
 static const UINT8 tms0980_i2_value[4] =
 {
 	0x00, 0x02, 0x01, 0x03
+};
+static const UINT8 tms0980_i3_value[8] =
+{
+	0x00, 0x04, 0x02, 0x06, 0x01, 0x05, 0x03, 0x07
 };
 static const UINT8 tms0980_i4_value[16] =
 {
@@ -331,6 +335,9 @@ CPU_DISASSEMBLE( tms1100 ) {
 		break;
 	case zI2:
 		dst += sprintf( dst, "#$%01X", tms0980_i2_value[ op & 0x03 ] );
+		break;
+	case zI3:
+		dst += sprintf( dst, "#$%01X", tms0980_i3_value[ op & 0x07 ] );
 		break;
 	case zI4:
 		dst += sprintf( dst, "#$%01X", tms0980_i4_value[ op & 0x0F ] );
