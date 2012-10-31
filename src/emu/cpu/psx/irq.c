@@ -27,8 +27,9 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, 
 
 const device_type PSX_IRQ = &device_creator<psxirq_device>;
 
-psxirq_device::psxirq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PSX_IRQ, "PSX IRQ", tag, owner, clock)
+psxirq_device::psxirq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, PSX_IRQ, "PSX IRQ", tag, owner, clock),
+	m_irq_handler(*this)
 {
 }
 
@@ -47,6 +48,8 @@ void psxirq_device::device_post_load()
 
 void psxirq_device::device_start()
 {
+	m_irq_handler.resolve_safe();
+
 	save_item( NAME( n_irqdata ) );
 	save_item( NAME( n_irqmask ) );
 }
@@ -63,12 +66,12 @@ void psxirq_device::psx_irq_update( void )
 	if( ( n_irqdata & n_irqmask ) != 0 )
 	{
 		verboselog( machine(), 2, "psx irq assert\n" );
-		machine().device("maincpu")->execute().set_input_line(PSXCPU_IRQ0, ASSERT_LINE );
+		m_irq_handler( ASSERT_LINE );
 	}
 	else
 	{
 		verboselog( machine(), 2, "psx irq clear\n" );
-		machine().device("maincpu")->execute().set_input_line(PSXCPU_IRQ0, CLEAR_LINE );
+		m_irq_handler( CLEAR_LINE );
 	}
 }
 
