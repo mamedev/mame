@@ -65,7 +65,6 @@ public:
 	DECLARE_READ32_MEMBER(fdc_r);
 	DECLARE_WRITE32_MEMBER(fdc_w);
 	DECLARE_WRITE_LINE_MEMBER(voyager_pic8259_1_set_int_line);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_DRIVER_INIT(voyager);
 	virtual void machine_start();
@@ -740,11 +739,6 @@ static void keyboard_interrupt(running_machine &machine, int state)
 	pic8259_ir1_w(drvstate->m_pic8259_1, state);
 }
 
-WRITE_LINE_MEMBER(voyager_state::ide_interrupt)
-{
-	pic8259_ir6_w(m_pic8259_2, state);
-}
-
 static int voyager_get_out2(running_machine &machine)
 {
 	voyager_state *state = machine.driver_data<voyager_state>();
@@ -774,7 +768,7 @@ static MACHINE_CONFIG_START( voyager, voyager_state )
 	MCFG_PIC8259_ADD( "pic8259_1", voyager_pic8259_1_config )
 	MCFG_PIC8259_ADD( "pic8259_2", voyager_pic8259_2_config )
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF, voyager_state, ide_interrupt))
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)

@@ -418,7 +418,6 @@ public:
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(chihiro_pit8254_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(chihiro_pit8254_out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 };
 
 /*
@@ -1472,11 +1471,6 @@ WRITE32_MEMBER( chihiro_state::ide_w )
 	ide_controller_w(chihiro_devs.ide, offset+0x01f0, size, data);
 }
 
-WRITE_LINE_MEMBER(chihiro_state::ide_interrupt)
-{
-	pic8259_ir6_w(chihiro_devs.pic8259_2, state); // IRQ 14
-}
-
 // ======================> ide_baseboard_device
 
 class ide_baseboard_device : public ide_hdd_device
@@ -1845,7 +1839,7 @@ static MACHINE_CONFIG_START( chihiro_base, chihiro_state )
 	MCFG_PIC8259_ADD( "pic8259_2", chihiro_pic8259_2_config )
 	MCFG_PIT8254_ADD( "pit8254", chihiro_pit8254_config )
 	MCFG_IDE_CONTROLLER_ADD( "ide", ide_baseboard, NULL, "bb", true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF, chihiro_state, ide_interrupt))
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 	MCFG_IDE_CONTROLLER_BUS_MASTER("maincpu", AS_PROGRAM)
 
 	/* video hardware */

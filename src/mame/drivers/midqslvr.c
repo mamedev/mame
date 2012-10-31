@@ -96,7 +96,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
 	DECLARE_WRITE_LINE_MEMBER(midqslvr_pic8259_1_set_int_line);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	virtual void machine_start();
 	virtual void machine_reset();
 };
@@ -650,11 +649,6 @@ static IRQ_CALLBACK(irq_callback)
 	return pic8259_acknowledge( state->m_pic8259_1);
 }
 
-WRITE_LINE_MEMBER(midqslvr_state::ide_interrupt)
-{
-	pic8259_ir6_w(m_pic8259_2, state);
-}
-
 void midqslvr_state::machine_start()
 {
 
@@ -704,7 +698,7 @@ static MACHINE_CONFIG_START( midqslvr, midqslvr_state )
 	MCFG_PCI_BUS_LEGACY_DEVICE(31, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF, midqslvr_state, ide_interrupt))
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
