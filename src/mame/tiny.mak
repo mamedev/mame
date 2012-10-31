@@ -98,6 +98,8 @@ DRVLIBS = \
 #-------------------------------------------------
 
 $(DRIVERS)/astrocde.o:	$(LAYOUT)/gorf.lh \
+						$(LAYOUT)/seawolf2.lh \
+						$(LAYOUT)/spacezap.lh \
 						$(LAYOUT)/tenpindx.lh
 $(DRIVERS)/circus.o:	$(LAYOUT)/circus.lh \
 						$(LAYOUT)/crash.lh
