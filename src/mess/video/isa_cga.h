@@ -48,7 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER( char_ram_write );
 	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
 	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 public:
 	int		m_framecnt;
@@ -70,6 +70,7 @@ public:
 	bool	m_superimpose;
 	UINT8	m_p3df;	/* This should be moved into the appropriate subclass */
 	UINT8	m_plantronics; /* This should be moved into the appropriate subclass */
+	offs_t	m_start_offset;
 };
 
 // device type definition
@@ -182,6 +183,36 @@ public:
 // device type definition
 extern const device_type ISA8_CGA_PC1512;
 
+// ======================> isa8_wyse700_device
+
+class isa8_wyse700_device :
+        public isa8_cga_device
+{
+public:
+    // construction/destruction
+    isa8_wyse700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+    // optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual void device_config_complete() { m_shortname = "wyse700"; }
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+public:
+	virtual DECLARE_READ8_MEMBER( io_read );
+	virtual DECLARE_WRITE8_MEMBER( io_write );
+	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void change_resolution(UINT8 mode);
+	
+	UINT8 m_bank_offset;
+	UINT8 m_bank_base;
+	UINT8 m_control;
+};
+
+// device type definition
+extern const device_type ISA8_WYSE700;
 
 #endif  /* __ISA_CGA_H__ */
 
