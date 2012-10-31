@@ -1428,6 +1428,7 @@ $(MESSOBJ)/palm.a:				\
 	$(MESS_DRIVERS)/palmz22.o	\
 
 $(MESSOBJ)/parker.a:			\
+	$(MESS_DRIVERS)/merlin.o	\
 	$(MESS_DRIVERS)/stopthie.o	\
 
 $(MESSOBJ)/pitronic.a:			\
@@ -2171,6 +2172,7 @@ $(MAME_MACHINE)/megadriv.o:	$(MAME_LAYOUT)/megacd.lh
 $(MESS_DRIVERS)/megadriv.o:	$(MAME_LAYOUT)/megacd.lh
 $(MESS_DRIVERS)/mekd2.o:	$(MESS_LAYOUT)/mekd2.lh
 $(MESS_DRIVERS)/mephisto.o:	$(MESS_LAYOUT)/mephisto.lh
+$(MESS_DRIVERS)/merlin.o:	$(MESS_LAYOUT)/merlin.lh
 $(MESS_DRIVERS)/mikrolab.o:	$(MESS_LAYOUT)/mikrolab.lh
 $(MESS_DRIVERS)/mk1.o:		$(MESS_LAYOUT)/mk1.lh
 $(MESS_DRIVERS)/mk14.o:		$(MESS_LAYOUT)/mk14.lh
