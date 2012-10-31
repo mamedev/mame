@@ -92,7 +92,7 @@ public:
 
     UINT8 m_pixels[PIXELS_PER_FRAME];
 
-    required_device<cpu_device> m_maincpu;
+    required_device<avr8_device> m_maincpu;
 
 	DECLARE_READ8_MEMBER(avr8_read);
 	DECLARE_WRITE8_MEMBER(avr8_write);
@@ -113,8 +113,6 @@ READ8_MEMBER(craft_state::avr8_read)
     switch( offset )
     {
 		case AVR8_REGIDX_EEDR:
-		case AVR8_REGIDX_PORTC:
-		case AVR8_REGIDX_PORTD:
 			return m_regs[offset];
 
         default:
@@ -166,7 +164,7 @@ static void avr8_video_update(running_machine &machine)
 {
     craft_state *state = machine.driver_data<craft_state>();
 
-	UINT64 cycles = avr8_get_elapsed_cycles(state->m_maincpu);
+	UINT64 cycles = state->m_maincpu->get_elapsed_cycles();
 	UINT32 frame_cycles = (UINT32)(cycles - state->m_frame_start_cycle);
 
 	if (state->m_last_cycles < frame_cycles)
@@ -199,48 +197,27 @@ static void avr8_video_update(running_machine &machine)
 	state->m_last_cycles = frame_cycles;
 }
 
-static void avr8_change_port(running_machine &machine, int reg, UINT8 data)
+static void portb_write(avr8_device &device, UINT8 pins, UINT8 changed)
 {
-    craft_state *state = machine.driver_data<craft_state>();
-
-	UINT8 oldport = avr8_get_ddr(machine, reg);
-	UINT8 newport = data;
-	UINT8 changed = newport ^ oldport;
-
-	// TODO: When AVR8 is converted to emu/machine, this should be factored out to 8 single-bit callbacks per port
-	if(changed)
+    craft_state *state = device.machine().driver_data<craft_state>();
+	if(pins & changed & 0x02)
 	{
-		// TODO
-		//verboselog(machine, 0, "avr8_change_port: PORT%c lines %02x changed\n", avr8_reg_name[reg], changed);
+		state->m_frame_start_cycle = device.get_elapsed_cycles();
 	}
+}
 
-	switch(reg)
-	{
-		case AVR8_REG_A:
-			// Unhandled
-			break;
+static void portc_write(avr8_device &device, UINT8 pins, UINT8 changed)
+{
+    craft_state *state = device.machine().driver_data<craft_state>();
+	avr8_video_update(device.machine());
+	AVR8_PORTC = pins;
+}
 
-		case AVR8_REG_B:
-			AVR8_PORTB = data;
-			if(newport & changed & 0x02)
-			{
-				state->m_frame_start_cycle = avr8_get_elapsed_cycles(state->m_maincpu);
-			}
-			break;
-
-		case AVR8_REG_C:
-			avr8_video_update(machine);
-			AVR8_PORTC = data;
-			break;
-
-		case AVR8_REG_D:
-		{
-			UINT8 audio_sample = (data & 0x02) | ((data & 0xf4) >> 2);
-			state->dac->write_unsigned8(audio_sample << 2);
-			AVR8_PORTD = data;
-			break;
-		}
-	}
+static void portd_write(avr8_device &device, UINT8 pins, UINT8 changed)
+{
+    craft_state *state = device.machine().driver_data<craft_state>();
+	UINT8 audio_sample = (pins & 0x02) | ((pins & 0xf4) >> 2);
+	state->dac->write_unsigned8(audio_sample << 1);
 }
 
 /****************/
@@ -304,7 +281,7 @@ static void avr8_change_spcr(running_machine &machine, UINT8 data)
 	if(changed & AVR8_SPCR_SPIE_MASK)
 	{
 		// Check for SPI interrupt condition
-		avr8_update_interrupt(state->m_maincpu, AVR8_INTIDX_SPI);
+		state->m_maincpu->update_interrupt(AVR8_INTIDX_SPI);
 	}
 
 	if(low_to_high & AVR8_SPCR_SPE_MASK)
@@ -369,11 +346,13 @@ WRITE8_MEMBER(craft_state::avr8_write)
 			break;
 
 		case AVR8_REGIDX_SPDR:
+		{
 			avr8_video_update(machine());
 			m_regs[offset] = data;
 			m_spi_pending = true;
-			m_spi_start_cycle = avr8_get_elapsed_cycles(m_maincpu) - m_frame_start_cycle;
+			m_spi_start_cycle = m_maincpu->get_elapsed_cycles() - m_frame_start_cycle;
 			break;
+		}
 
 		case AVR8_REGIDX_EECR:
 			if (data & AVR8_EECR_EERE)
@@ -389,24 +368,12 @@ WRITE8_MEMBER(craft_state::avr8_write)
 			m_regs[offset] = data;
 			break;
 
-        case AVR8_REGIDX_PORTD:
-            avr8_change_port(machine(), AVR8_REG_D, data);
-            break;
-
 		case AVR8_REGIDX_DDRD:
 			avr8_change_ddr(machine(), AVR8_REG_D, data);
 			break;
 
-		case AVR8_REGIDX_PORTC:
-			avr8_change_port(machine(), AVR8_REG_C, data);
-			break;
-
 		case AVR8_REGIDX_DDRC:
 			avr8_change_ddr(machine(), AVR8_REG_C, data);
-			break;
-
-		case AVR8_REGIDX_PORTB:
-			avr8_change_port(machine(), AVR8_REG_B, data);
 			break;
 
 		case AVR8_REGIDX_DDRB:
@@ -487,13 +454,20 @@ void craft_state::machine_reset()
     state->m_spi_start_cycle = 0;
 }
 
+const avr8_config atmega88_config =
+{
+	&portb_write,	// Video timing signals
+	&portc_write,	// Video color signals
+	&portd_write	// Audio DAC
+};
+
 static MACHINE_CONFIG_START( craft, craft_state )
 
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu", ATMEGA88, MASTER_CLOCK)
+    MCFG_CPU_AVR8_CONFIG(atmega88_config)
     MCFG_CPU_PROGRAM_MAP(craft_prg_map)
     MCFG_CPU_IO_MAP(craft_io_map)
-
 
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
