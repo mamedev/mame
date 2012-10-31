@@ -421,6 +421,19 @@ static MACHINE_CONFIG_START( s9, s9_state )
 MACHINE_CONFIG_END
 
 /*-----------------------------
+/ Rat Race - Sys.7 (Game #527)- Prototype (displays as #500)
+/-----------------------------*/
+ROM_START(ratrc_l1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("ic20.532", 0x5000, 0x1000, CRC(0c5c7c09) SHA1(c93b39ba1460feee5850fcd3ca7cacb72c4c8ff3))
+	ROM_LOAD("ic14.532", 0x6000, 0x1000, CRC(c6f4bcf4) SHA1(d71c86299139abe3dd376a324315a039be82875c))
+	ROM_LOAD("ic17.532", 0x7000, 0x1000, CRC(0800c214) SHA1(3343c07fd550bb0759032628e01bb750135dab15))
+
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("b486.bin", 0xe000, 0x2000, CRC(c54b9402) SHA1(c56fc5f105fc2c1166e3b22bb09b72af79e0aec1))
+ROM_END
+
+/*-----------------------------
 / Sorcerer (S9) 03/85 (#532)
 /------------------------------*/
 ROM_START(sorcr_l1)
@@ -526,6 +539,7 @@ ROM_START(alcat_l7)
 	ROM_LOAD("acs_u22.bin", 0x8000, 0x8000, CRC(56c1011a) SHA1(c817a3410c643617f3643897b8f529ae78546b0d))
 ROM_END
 
+GAME( 1983, ratrc_l1, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Rat Race (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
 GAME( 1985, sorcr_l1, sorcr_l2, s9, s9, driver_device, 0, ROT0, "Williams", "Sorcerer (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
 GAME( 1985, sorcr_l2, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Sorcerer (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING)
 GAME( 1984, sshtl_l7, 0,        s9, s9, driver_device, 0, ROT0, "Williams", "Space Shuttle (L-7)", GAME_MECHANICAL | GAME_NOT_WORKING)
