@@ -1313,6 +1313,13 @@ struct c361_t
 	int scanline;
 };
 
+struct c404_t
+{
+	rgb_t bgcolor;
+	UINT16 palbase;
+	UINT8 layer;
+};
+
 struct render_t
 {
 	poly_manager *polymgr;
@@ -1335,6 +1342,7 @@ public:
         m_rtc(*this, "rtc"),
 		m_mainram(*this, "mainram"),
 		m_shared_ram(*this, "shared_ram"),
+		m_gammaram(*this, "gammaram"),
 		m_charram(*this, "charram"),
 		m_textram(*this, "textram"),
 		m_czattr(*this, "czattr"),
@@ -1348,12 +1356,14 @@ public:
     required_device<rtc4543_device> m_rtc;
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_shared_ram;
+	required_shared_ptr<UINT32> m_gammaram;
 	required_shared_ptr<UINT32> m_charram;
 	required_shared_ptr<UINT32> m_textram;
 	optional_shared_ptr<UINT32> m_czattr;
 	optional_device<cpu_device> m_gmen_sh2;
 	optional_shared_ptr<UINT32> m_gmen_sh2_shared;
 
+	c404_t m_c404;
 	c361_t m_c361;
 	c417_t m_c417;
 	c412_t m_c412;
@@ -1409,6 +1419,7 @@ public:
 	UINT8 m_s23_tssio_port_4;
 
 	void update_main_interrupts(UINT32 cause);
+	void update_mixer();
 
 	DECLARE_WRITE32_MEMBER(namcos23_textram_w);
 	DECLARE_WRITE32_MEMBER(s23_txtchar_w);
@@ -1470,6 +1481,19 @@ public:
 };
 
 
+static UINT8 nthbyte(const UINT32 *pSource, int offs)
+{
+	pSource += offs/4;
+	return (pSource[0]<<((offs&3)*8))>>24;
+}
+
+static UINT16 nthword(const UINT32 *pSource, int offs)
+{
+	pSource += offs/2;
+	return (pSource[0]<<((offs&1)*16))>>16;
+}
+
+
 void namcos23_state::update_main_interrupts(UINT32 cause)
 {
 	UINT32 changed = cause ^ m_main_irqcause;
@@ -1498,11 +1522,6 @@ void namcos23_state::update_main_interrupts(UINT32 cause)
 	// level 6: C450
 }
 
-static UINT16 nthword( const UINT32 *pSource, int offs )
-{
-	pSource += offs/2;
-	return (pSource[0]<<((offs&1)*16))>>16;
-}
 
 TILE_GET_INFO_MEMBER(namcos23_state::TextTilemapGetInfo)
 {
@@ -1512,8 +1531,8 @@ TILE_GET_INFO_MEMBER(namcos23_state::TextTilemapGetInfo)
     * ----.xx--.----.---- flip
     * ----.--xx.xxxx.xxxx code
     */
-	SET_TILE_INFO_MEMBER( 0, data&0x03ff, data>>12, TILE_FLIPYX((data&0x0c00)>>10) );
-} /* TextTilemapGetInfo */
+	SET_TILE_INFO_MEMBER(0, data&0x03ff, data>>12, TILE_FLIPYX((data&0x0c00)>>10));
+}
 
 WRITE32_MEMBER(namcos23_state::namcos23_textram_w)
 {
@@ -1528,40 +1547,23 @@ WRITE32_MEMBER(namcos23_state::s23_txtchar_w)
 	machine().gfx[0]->mark_dirty(offset/32);
 }
 
-static UINT8 nthbyte( const UINT32 *pSource, int offs )
-{
-	pSource += offs/4;
-	return (pSource[0]<<((offs&3)*8))>>24;
-}
-
-INLINE void UpdatePalette( running_machine &machine, int entry )
-{
-	namcos23_state *state = machine.driver_data<namcos23_state>();
-	int j;
-
-	for( j=0; j<2; j++ )
-	{
-		int which = (entry*2)+(j*2);
-		int r = nthbyte(state->m_generic_paletteram_32, which+0x00001);
-		int g = nthbyte(state->m_generic_paletteram_32, which+0x10001);
-		int b = nthbyte(state->m_generic_paletteram_32, which+0x20001);
-		palette_set_color( machine, which/2, MAKE_RGB(r,g,b) );
-	}
-}
-
-/* each LONGWORD is 2 colors.  each OFFSET is 2 colors */
-
 WRITE32_MEMBER(namcos23_state::namcos23_paletteram_w)
 {
-	COMBINE_DATA( &m_generic_paletteram_32[offset] );
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	UpdatePalette(machine(), (offset % (0x10000/4))*2);
+	// each LONGWORD is 2 colors, each OFFSET is 2 colors
+	for (int i = 0; i < 2; i++)
+	{
+		int which = (offset << 2 | i << 1) & 0xfffe;
+		int r = nthbyte(m_generic_paletteram_32, which|0x00001);
+		int g = nthbyte(m_generic_paletteram_32, which|0x10001);
+		int b = nthbyte(m_generic_paletteram_32, which|0x20001);
+		palette_set_color(machine(), which/2, MAKE_RGB(r,g,b));
+	}
 }
 
 READ16_MEMBER(namcos23_state::s23_c417_r)
 {
-	c417_t &c417 = m_c417;
-
 	switch (offset)
 	{
 		/* According to timecrs2c, +0 is the status word with bits being:
@@ -1581,18 +1583,18 @@ READ16_MEMBER(namcos23_state::s23_c417_r)
 		case 0:
 			return 0x8e | (machine().primary_screen->vblank() ? 0x0000 : 0x8000);
 		case 1:
-			return c417.adr;
+			return m_c417.adr;
 		case 4:
 			//logerror("c417_r %04x = %04x (%08x, %08x)\n", c417.adr, c417.ram[c417.adr], space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
-			return c417.ram[c417.adr];
+			return m_c417.ram[m_c417.adr];
 		case 5:
-			if(c417.pointrom_adr >= m_ptrom_limit)
+			if (m_c417.pointrom_adr >= m_ptrom_limit)
 				return 0xffff;
-			return m_ptrom[c417.pointrom_adr] >> 16;
+			return m_ptrom[m_c417.pointrom_adr] >> 16;
 		case 6:
-			if(c417.pointrom_adr >= m_ptrom_limit)
+			if (m_c417.pointrom_adr >= m_ptrom_limit)
 				return 0xffff;
-			return m_ptrom[c417.pointrom_adr];
+			return m_ptrom[m_c417.pointrom_adr];
 	}
 
 	logerror("c417_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
@@ -1601,25 +1603,23 @@ READ16_MEMBER(namcos23_state::s23_c417_r)
 
 WRITE16_MEMBER(namcos23_state::s23_c417_w)
 {
-	c417_t &c417 = m_c417;
-
-	switch(offset)
+	switch (offset)
 	{
 		case 0:
 			logerror("p3d PIO %04x\n", data);
 			break;
 		case 1:
-			COMBINE_DATA(&c417.adr);
+			COMBINE_DATA(&m_c417.adr);
 			break;
 		case 2:
-			c417.pointrom_adr = (c417.pointrom_adr << 16) | data;
+			m_c417.pointrom_adr = (m_c417.pointrom_adr << 16) | data;
 			break;
 		case 3:
-			c417.pointrom_adr = 0;
+			m_c417.pointrom_adr = 0;
 			break;
 		case 4:
 			//logerror("c417_w %04x = %04x (%08x, %08x)\n", c417.adr, data, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
-			COMBINE_DATA(c417.ram + c417.adr);
+			COMBINE_DATA(m_c417.ram + m_c417.adr);
 			break;
 		case 7:
 			logerror("c417_w: ack IRQ 2 (%x)\n", data);
@@ -1633,50 +1633,44 @@ WRITE16_MEMBER(namcos23_state::s23_c417_w)
 
 READ16_MEMBER(namcos23_state::s23_c412_ram_r)
 {
-	c412_t &c412 = m_c412;
-
 	//  logerror("c412_ram_r %06x (%08x, %08x)\n", offset, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	if(offset < 0x100000)
-		return c412.sdram_a[offset & 0xfffff];
+		return m_c412.sdram_a[offset & 0xfffff];
 	else if(offset < 0x200000)
-		return c412.sdram_b[offset & 0xfffff];
+		return m_c412.sdram_b[offset & 0xfffff];
 	else if(offset < 0x220000)
-		return c412.sram   [offset & 0x1ffff];
+		return m_c412.sram   [offset & 0x1ffff];
 	else if(offset < 0x220200)
-		return c412.pczram [offset & 0x001ff];
+		return m_c412.pczram [offset & 0x001ff];
 
 	return 0xffff;
 }
 
 WRITE16_MEMBER(namcos23_state::s23_c412_ram_w)
 {
-	c412_t &c412 = m_c412;
-
 	//  logerror("c412_ram_w %06x = %04x (%08x, %08x)\n", offset, data, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	if(offset < 0x100000)
-		COMBINE_DATA(c412.sdram_a + (offset & 0xfffff));
+		COMBINE_DATA(m_c412.sdram_a + (offset & 0xfffff));
 	else if(offset < 0x200000)
-		COMBINE_DATA(c412.sdram_b + (offset & 0xfffff));
+		COMBINE_DATA(m_c412.sdram_b + (offset & 0xfffff));
 	else if(offset < 0x220000)
-		COMBINE_DATA(c412.sram    + (offset & 0x1ffff));
+		COMBINE_DATA(m_c412.sram    + (offset & 0x1ffff));
 	else if(offset < 0x220200)
-		COMBINE_DATA(c412.pczram  + (offset & 0x001ff));
+		COMBINE_DATA(m_c412.pczram  + (offset & 0x001ff));
 }
 
 READ16_MEMBER(namcos23_state::s23_c412_r)
 {
-	c412_t &c412 = m_c412;
-
-	switch(offset)
+	switch (offset)
 	{
 		case 0x3:
 			return 0x0002; // 0001 = busy, 0002 = game uploads things
 		case 0x8:
-			return c412.adr;
+			return m_c412.adr;
 		case 0x9:
-			return c412.adr >> 16;
+			return m_c412.adr >> 16;
 		case 0xa:
-			return s23_c412_ram_r(space, c412.adr, mem_mask);
+			return s23_c412_ram_r(space, m_c412.adr, mem_mask);
 	}
 
 	logerror("c412_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
@@ -1685,19 +1679,17 @@ READ16_MEMBER(namcos23_state::s23_c412_r)
 
 WRITE16_MEMBER(namcos23_state::s23_c412_w)
 {
-	c412_t &c412 = m_c412;
-
 	switch (offset)
 	{
 		case 8:
-			c412.adr = (data & mem_mask) | (c412.adr & (0xffffffff ^ mem_mask));
+			m_c412.adr = (data & mem_mask) | (m_c412.adr & (0xffffffff ^ mem_mask));
 			break;
 		case 9:
-			c412.adr = ((data & mem_mask) << 16) | (c412.adr & (0xffffffff ^ (mem_mask << 16)));
+			m_c412.adr = ((data & mem_mask) << 16) | (m_c412.adr & (0xffffffff ^ (mem_mask << 16)));
 			break;
 		case 10:
-			s23_c412_ram_w(space, c412.adr, data, mem_mask);
-			c412.adr += 2;
+			s23_c412_ram_w(space, m_c412.adr, data, mem_mask);
+			m_c412.adr += 2;
 			break;
 		default:
 			logerror("c412_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
@@ -1707,45 +1699,39 @@ WRITE16_MEMBER(namcos23_state::s23_c412_w)
 
 READ16_MEMBER(namcos23_state::s23_c421_ram_r)
 {
-	c421_t &c421 = m_c421;
-
 	//  logerror("c421_ram_r %06x (%08x, %08x)\n", offset, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	if(offset < 0x40000)
-		return c421.dram_a[offset & 0x3ffff];
+		return m_c421.dram_a[offset & 0x3ffff];
 	else if(offset < 0x80000)
-		return c421.dram_b[offset & 0x3ffff];
+		return m_c421.dram_b[offset & 0x3ffff];
 	else if(offset < 0x88000)
-		return c421.sram  [offset & 0x07fff];
+		return m_c421.sram  [offset & 0x07fff];
 
 	return 0xffff;
 }
 
 WRITE16_MEMBER(namcos23_state::s23_c421_ram_w)
 {
-	c421_t &c421 = m_c421;
-
 	//  logerror("c421_ram_w %06x = %04x (%08x, %08x)\n", offset, data, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	if(offset < 0x40000)
-		COMBINE_DATA(c421.dram_a + (offset & 0x3ffff));
+		COMBINE_DATA(m_c421.dram_a + (offset & 0x3ffff));
 	else if(offset < 0x80000)
-		COMBINE_DATA(c421.dram_b + (offset & 0x3ffff));
+		COMBINE_DATA(m_c421.dram_b + (offset & 0x3ffff));
 	else if(offset < 0x88000)
-		COMBINE_DATA(c421.sram   + (offset & 0x07fff));
+		COMBINE_DATA(m_c421.sram   + (offset & 0x07fff));
 }
 
 READ16_MEMBER(namcos23_state::s23_c421_r)
 {
-	c421_t &c421 = m_c421;
-
 	switch (offset)
 	{
 		case 0:
-			return s23_c421_ram_r(space, c421.adr & 0xfffff, mem_mask);
+			return s23_c421_ram_r(space, m_c421.adr & 0xfffff, mem_mask);
 
 		case 2:
-			return c421.adr >> 16;
+			return m_c421.adr >> 16;
 		case 3:
-			return c421.adr;
+			return m_c421.adr;
 	}
 
 	logerror("c421_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
@@ -1754,19 +1740,17 @@ READ16_MEMBER(namcos23_state::s23_c421_r)
 
 WRITE16_MEMBER(namcos23_state::s23_c421_w)
 {
-	c421_t &c421 = m_c421;
-
 	switch (offset)
 	{
 		case 0:
-			s23_c421_ram_w(space, c421.adr & 0xfffff, data, mem_mask);
-			c421.adr += 2;
+			s23_c421_ram_w(space, m_c421.adr & 0xfffff, data, mem_mask);
+			m_c421.adr += 2;
 			break;
 		case 2:
-			c421.adr = ((data & mem_mask) << 16) | (c421.adr & (0xffffffff ^ (mem_mask << 16)));
+			m_c421.adr = ((data & mem_mask) << 16) | (m_c421.adr & (0xffffffff ^ (mem_mask << 16)));
 			break;
 		case 3:
-			c421.adr = (data & mem_mask) | (c421.adr & (0xffffffff ^ mem_mask));
+			m_c421.adr = (data & mem_mask) | (m_c421.adr & (0xffffffff ^ mem_mask));
 			break;
 		default:
 			logerror("c421_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
@@ -1806,6 +1790,7 @@ WRITE16_MEMBER(namcos23_state::s23_ctl_w)
 
 		default:
 			logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+			break;
 	}
 }
 
@@ -1830,9 +1815,7 @@ READ16_MEMBER(namcos23_state::s23_ctl_r)
 
 TIMER_CALLBACK_MEMBER(namcos23_state::c361_timer_cb)
 {
-	c361_t &c361 = m_c361;
-
-	if (c361.scanline != 0x1ff)
+	if (m_c361.scanline != 0x1ff)
 	{
 		// need to do a partial update here, but doesn't work properly yet
 		//machine().primary_screen->update_partial(machine().primary_screen->vpos());
@@ -1847,8 +1830,6 @@ TIMER_CALLBACK_MEMBER(namcos23_state::c361_timer_cb)
 
 WRITE16_MEMBER(namcos23_state::s23_c361_w)
 {
-	c361_t &c361 = m_c361;
-
 	switch (offset)
 	{
 		case 0:
@@ -1860,8 +1841,8 @@ WRITE16_MEMBER(namcos23_state::s23_c361_w)
 			break;
 
 		case 4:	// interrupt control
-			c361.scanline = data & 0x1ff;
-			c361.timer->adjust(machine().primary_screen->time_until_pos(c361.scanline));
+			m_c361.scanline = data & 0x1ff;
+			m_c361.timer->adjust(machine().primary_screen->time_until_pos(m_c361.scanline));
 			break;
 
 		default:
@@ -1890,15 +1871,11 @@ READ16_MEMBER(namcos23_state::s23_c361_r)
 
 READ16_MEMBER(namcos23_state::s23_c422_r)
 {
-	c422_t &c422 = m_c422;
-
-	return c422.regs[offset];
+	return m_c422.regs[offset];
 }
 
 WRITE16_MEMBER(namcos23_state::s23_c422_w)
 {
-	c422_t &c422 = m_c422;
-
 	switch (offset)
 	{
 		case 1:
@@ -1919,7 +1896,7 @@ WRITE16_MEMBER(namcos23_state::s23_c422_w)
 			break;
 	}
 
-	COMBINE_DATA(&c422.regs[offset]);
+	COMBINE_DATA(&m_c422.regs[offset]);
 }
 
 
@@ -1961,7 +1938,8 @@ WRITE16_MEMBER(namcos23_state::s23_mcuen_w)
 	}
 }
 
-// Panic Park sits in a tight loop waiting for this AND 0002 to be non-zero (at PC=BFC02F00)
+// panicprk sits in a tight loop waiting for this AND 0002 to be non-zero (at PC=BFC02F00)
+// timecrs2 locks up in a similar way as panicprk, at the beginning of the 2nd level, by reading/writing to this register a couple of times
 READ32_MEMBER(namcos23_state::s23_unk_status_r)
 {
 	return 0x00020002;
@@ -2519,38 +2497,49 @@ VIDEO_START_MEMBER(namcos23_state,ss23)
 	m_render.polymgr = poly_alloc(machine(), 10000, sizeof(namcos23_render_data), 0);
 }
 
+
+void namcos23_state::update_mixer()
+{
+	// should be similar to Super System 22 C404
+	// 08 - background color red
+	// 09 - background color green
+	// 0a - background color blue
+	// 1b - text layer palette base
+	// 1f - layer enable (d0: polygons, d1: sprites, d2: text)
+	m_c404.bgcolor = MAKE_RGB(nthword(m_gammaram,0x08), nthword(m_gammaram,0x09), nthword(m_gammaram,0x0a));
+	m_c404.palbase = nthword(m_gammaram, 0x1b) << 8 & 0x7f00;
+	m_c404.layer = nthword(m_gammaram, 0x1f) & 0xff;
+}
+
 UINT32 namcos23_state::screen_update_ss23(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	update_mixer();
+	bitmap.fill(m_c404.bgcolor, cliprect);
 
-	render_run( machine(), bitmap );
+	render_run(machine(), bitmap);
 
-	gfx_element *gfx = machine().gfx[0];
-	gfx->mark_all_dirty();
-
-	m_bgtilemap->draw(bitmap, cliprect, 0/*flags*/, 0/*priority*/ ); /* opaque */
+	m_bgtilemap->set_palette_offset(m_c404.palbase);
+	if (m_c404.layer & 4)
+		m_bgtilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 INTERRUPT_GEN_MEMBER(namcos23_state::s23_interrupt)
 {
-	render_t &render = m_render;
-
-	if(!m_ctl_vbl_active)
+	if (!m_ctl_vbl_active)
 	{
 		m_ctl_vbl_active = true;
 		update_main_interrupts(m_main_irqcause | MAIN_VBLANK_IRQ);
 	}
 
-	render.cur = !render.cur;
-	render.count[render.cur] = 0;
+	m_render.cur = !m_render.cur;
+	m_render.count[m_render.cur] = 0;
 }
 
 void namcos23_state::machine_start()
 {
-	c361_t &c361 = m_c361;
-	c361.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos23_state::c361_timer_cb),this));
-	c361.timer->adjust(attotime::never);
+	m_c361.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos23_state::c361_timer_cb),this));
+	m_c361.timer->adjust(attotime::never);
 
 	mips3drc_add_fastram(m_maincpu, 0, m_mainram.bytes()-1, FALSE, reinterpret_cast<UINT32 *>(machine().root_device().memshare("mainram")->ptr()));
 }
@@ -2564,7 +2553,7 @@ static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32, namcos23_state )
 	AM_RANGE(0x04c3ff00, 0x04c3ff0f) AM_WRITE16(s23_mcuen_w, 0xffffffff)
 	AM_RANGE(0x06080000, 0x0608000f) AM_RAM AM_SHARE("czattr")
 	AM_RANGE(0x06080200, 0x060803ff) AM_RAM // PCZ Convert RAM (C406) (should be banked)
-	AM_RANGE(0x06108000, 0x061087ff) AM_RAM // Gamma RAM (C404)
+	AM_RANGE(0x06108000, 0x061087ff) AM_RAM AM_SHARE("gammaram") // Gamma RAM (C404)
 	AM_RANGE(0x06110000, 0x0613ffff) AM_RAM_WRITE(namcos23_paletteram_w) AM_SHARE("paletteram") // Palette RAM (C404)
 	AM_RANGE(0x06400000, 0x0641dfff) AM_RAM_WRITE(s23_txtchar_w) AM_SHARE("charram") // Text CGRAM (C361)
 	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE(namcos23_textram_w) AM_SHARE("textram") // Text VRAM (C361)
@@ -2573,7 +2562,7 @@ static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32, namcos23_state )
 	AM_RANGE(0x0c000000, 0x0c00ffff) AM_RAM	AM_SHARE("nvram") // Backup RAM
 	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16(s23_ctl_r, s23_ctl_w, 0xffffffff) // write for LEDs at d000000, watchdog at d000004
 	AM_RANGE(0x0e000000, 0x0e007fff) AM_RAM // C405 RAM - what is this?
-	AM_RANGE(0x0f000000, 0x0f000003) AM_READ(s23_unk_status_r)
+	AM_RANGE(0x0f000000, 0x0f000003) AM_READ(s23_unk_status_r) // error status, or protection? (also gets written to)
 	AM_RANGE(0x0f200000, 0x0f203fff) AM_RAM // C422 RAM
 	AM_RANGE(0x0f300000, 0x0f30000f) AM_READWRITE16(s23_c422_r, s23_c422_w, 0xffffffff) // C422 registers
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
@@ -2592,14 +2581,14 @@ static ADDRESS_MAP_START( ss23_map, AS_PROGRAM, 32, namcos23_state )
 	AM_RANGE(0x06800000, 0x0681dfff) AM_RAM_WRITE(s23_txtchar_w) AM_SHARE("charram") // Text CGRAM (C361)
 	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE(namcos23_textram_w) AM_SHARE("textram") // Text VRAM (C361)
 	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE16(s23_c361_r, s23_c361_w, 0xffffffff) // C361
-	AM_RANGE(0x06a08000, 0x06a087ff) AM_RAM // Blending control & GAMMA (C404)
+	AM_RANGE(0x06a08000, 0x06a087ff) AM_RAM AM_SHARE("gammaram") // Gamma RAM (C404)
 	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE(namcos23_paletteram_w) AM_SHARE("paletteram") // Palette RAM (C404)
 	AM_RANGE(0x08000000, 0x08ffffff) AM_ROM AM_REGION("data", 0x0000000) AM_MIRROR(0x1000000) // data ROMs
 	AM_RANGE(0x0a000000, 0x0affffff) AM_ROM AM_REGION("data", 0x1000000) AM_MIRROR(0x1000000)
 	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE16(s23_c412_r, s23_c412_w, 0xffffffff)
 	AM_RANGE(0x0c400000, 0x0c400007) AM_READWRITE16(s23_c421_r, s23_c421_w, 0xffffffff)
 	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16(s23_ctl_r, s23_ctl_w, 0xffffffff)
-	AM_RANGE(0x0e800000, 0x0e800003) AM_READ(s23_unk_status_r)
+	AM_RANGE(0x0e800000, 0x0e800003) AM_READ(s23_unk_status_r) // error status, or protection? (also gets written to)
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -2629,8 +2618,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gmen_sh2_map, AS_PROGRAM, 32, namcos23_state )
-	AM_RANGE( 0x00000000, 0x00007fff ) AM_RAM AM_SHARE("gmen_sh2_shared")
-	AM_RANGE( 0x04000000, 0x043fffff ) AM_RAM	// SH-2 main work RAM
+	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_SHARE("gmen_sh2_shared")
+	AM_RANGE(0x04000000, 0x043fffff) AM_RAM	// SH-2 main work RAM
 ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(namcos23_state,gmen)
@@ -3207,7 +3196,6 @@ ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(namcos23_state,ss23)
 {
-	render_t &render = m_render;
 	m_ptrom  = (const UINT32 *)memregion("pointrom")->base();
 	m_tmlrom = (const UINT16 *)memregion("textilemapl")->base();
 	m_tmhrom = memregion("textilemaph")->base();
@@ -3228,8 +3216,8 @@ DRIVER_INIT_MEMBER(namcos23_state,ss23)
 	m_s23_tssio_port_4 = 0;
 	m_s23_porta = 0, m_s23_rtcstate = 0;
 	m_audiocpu_running = false;
-	render.count[0] = render.count[1] = 0;
-	render.cur = 0;
+	m_render.count[0] = m_render.count[1] = 0;
+	m_render.cur = 0;
 
 	if ((!strcmp(machine().system().name, "motoxgo")) ||
 	    (!strcmp(machine().system().name, "panicprk")) ||
@@ -3277,7 +3265,7 @@ static const gfx_layout namcos23_cg_layout =
 }; /* cg_layout */
 
 static GFXDECODE_START( namcos23 )
-	GFXDECODE_ENTRY( NULL, 0, namcos23_cg_layout, 0x7f00, 0x80 )
+	GFXDECODE_ENTRY( NULL, 0, namcos23_cg_layout, 0, 0x800 )
 GFXDECODE_END
 
 static const mips3_config r4650_config =
