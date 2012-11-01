@@ -1532,7 +1532,8 @@ static ADDRESS_MAP_START( psxcpu_internal_map, AS_PROGRAM, 32, psxcpu_device )
 	/* 1f801018 dv delay */
 	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE_LEGACY( psx_com_delay_r, psx_com_delay_w )
 	AM_RANGE(0x1f801024, 0x1f80102f) AM_RAM
-	AM_RANGE(0x1f801040, 0x1f80105f) AM_DEVREADWRITE( "sio", psxsio_device, read, write )
+	AM_RANGE(0x1f801040, 0x1f80104f) AM_DEVREADWRITE( "sio0", psxsio_device, read, write )
+	AM_RANGE(0x1f801050, 0x1f80105f) AM_DEVREADWRITE( "sio1", psxsio_device, read, write )
 	/* 1f801060 ram config */
 	AM_RANGE(0x1f801060, 0x1f80106f) AM_RAM
 	AM_RANGE(0x1f801070, 0x1f801077) AM_DEVREADWRITE( "irq", psxirq_device, read, write )
@@ -1560,7 +1561,8 @@ static ADDRESS_MAP_START( cxd8661r_internal_map, AS_PROGRAM, 32, psxcpu_device )
 	AM_RANGE(0x1f801000, 0x1f80101f) AM_RAM
 	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE_LEGACY( psx_com_delay_r, psx_com_delay_w )
 	AM_RANGE(0x1f801024, 0x1f80102f) AM_RAM
-	AM_RANGE(0x1f801040, 0x1f80105f) AM_DEVREADWRITE( "sio", psxsio_device, read, write )
+	AM_RANGE(0x1f801040, 0x1f80104f) AM_DEVREADWRITE( "sio0", psxsio_device, read, write )
+	AM_RANGE(0x1f801050, 0x1f80105f) AM_DEVREADWRITE( "sio1", psxsio_device, read, write )
 	AM_RANGE(0x1f801060, 0x1f80106f) AM_RAM
 	AM_RANGE(0x1f801070, 0x1f801077) AM_DEVREADWRITE( "irq", psxirq_device, read, write )
 	AM_RANGE(0x1f801080, 0x1f8010ff) AM_DEVREADWRITE( "dma", psxdma_device, read, write )
@@ -3167,14 +3169,40 @@ psxcpu_device *psxcpu_device::getcpu( device_t &device, const char *cputag )
 
 void psxcpu_device::install_sio_handler( device_t &device, const char *cputag, int n_port, psx_sio_handler p_f_sio_handler )
 {
-	psxsio_device *sio = getcpu( device, cputag )->subdevice<psxsio_device>("sio");
-	sio->install_handler( n_port, p_f_sio_handler );
+	psxsio_device *sio;
+
+	switch( n_port )
+	{
+	case 0:
+		sio = getcpu( device, cputag )->subdevice<psxsio_device>("sio0");
+		break;
+	case 1:
+		sio = getcpu( device, cputag )->subdevice<psxsio_device>("sio1");
+		break;
+	default:
+		return;
+	}
+
+	sio->install_handler( p_f_sio_handler );
 }
 
 void psxcpu_device::sio_input( device_t &device, const char *cputag, int n_port, int n_mask, int n_data )
 {
-	psxsio_device *sio = getcpu( device, cputag )->subdevice<psxsio_device>("sio");
-	sio->input( n_port, n_mask, n_data );
+	psxsio_device *sio;
+
+	switch( n_port )
+	{
+	case 0:
+		sio = getcpu( device, cputag )->subdevice<psxsio_device>("sio0");
+		break;
+	case 1:
+		sio = getcpu( device, cputag )->subdevice<psxsio_device>("sio1");
+		break;
+	default:
+		return;
+	}
+
+	sio->input( n_mask, n_data );
 }
 
 READ32_HANDLER( psxcpu_device::gpu_r )
@@ -3203,9 +3231,11 @@ static MACHINE_CONFIG_FRAGMENT( psx )
 	MCFG_PSX_RCNT_IRQ1_HANDLER(DEVWRITELINE("irq", psxirq_device, intin5))
 	MCFG_PSX_RCNT_IRQ2_HANDLER(DEVWRITELINE("irq", psxirq_device, intin6))
 
-	MCFG_DEVICE_ADD("sio", PSX_SIO, 0)
-	MCFG_PSX_SIO_IRQ0_HANDLER(DEVWRITELINE("irq", psxirq_device, intin7))
-	MCFG_PSX_SIO_IRQ1_HANDLER(DEVWRITELINE("irq", psxirq_device, intin8))
+	MCFG_DEVICE_ADD("sio0", PSX_SIO0, 0)
+	MCFG_PSX_SIO_IRQ_HANDLER(DEVWRITELINE("irq", psxirq_device, intin7))
+
+	MCFG_DEVICE_ADD("sio1", PSX_SIO1, 0)
+	MCFG_PSX_SIO_IRQ_HANDLER(DEVWRITELINE("irq", psxirq_device, intin8))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
