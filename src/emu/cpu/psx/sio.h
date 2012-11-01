@@ -100,7 +100,4 @@ private:
 	devcb2_write_line m_irq1_handler;
 };
 
-DECLARE_WRITE32_HANDLER( psx_sio_w );
-DECLARE_READ32_HANDLER( psx_sio_r );
-
 #endif

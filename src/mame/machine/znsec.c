@@ -82,17 +82,21 @@
                       = Shift(c[n-1, 6])^Shift(c[n-1, 7])
 */
 
-#include "emu.h"
 #include "znsec.h"
 
-struct znsec_state {
-	const UINT8 *transform;
-	UINT8 state;
-	UINT8 bit;
-};
+const device_type ZNSEC = &device_creator<znsec_device>;
 
-static znsec_state zns[2];
+znsec_device::znsec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, ZNSEC, "ZNSEC", tag, owner, clock)
+{
+}
 
+void znsec_device::device_start()
+{
+	save_item(NAME(m_select));
+	save_item(NAME(m_state));
+	save_item(NAME(m_bit));
+}
 
 // Given the value for x7..x0 and linear transform coefficients a7..a0
 // compute the value of the transform
@@ -111,71 +115,76 @@ static int c_linear(UINT8 x, UINT8 a)
 #endif
 
 // Derive the sbox xor mask for a given input and select bit
-static UINT8 compute_sbox_coef(int chip, int sel, int bit)
+UINT8 znsec_device::compute_sbox_coef(int sel, int bit)
 {
-	UINT8 r;
 	if(!sel)
-		return zns[chip].transform[bit];
-	r = compute_sbox_coef(chip, (sel-1) & 7, (bit-1) & 7);
+		return m_transform[bit];
+
+	UINT8 r = compute_sbox_coef((sel-1) & 7, (bit-1) & 7);
 	r = (r << 1)|(((r >> 7)^(r >> 6)) & 1);
 	if(bit != 7)
 		return r;
 
-	return r ^ compute_sbox_coef(chip, sel, 0);
+	return r ^ compute_sbox_coef(sel, 0);
 }
 
 // Apply the sbox for a input 0 bit
-static UINT8 apply_bit_sbox(int chip, UINT8 state, int sel)
+void znsec_device::apply_bit_sbox(int sel)
 {
 	int i;
 	UINT8 r = 0;
 	for(i=0; i<8; i++)
-		if(state & (1<<i))
-			r ^= compute_sbox_coef(chip, sel, i);
-	return r;
+		if(m_state & (1<<i))
+			r ^= compute_sbox_coef(sel, i);
+
+	m_state = r;
 }
 
 // Apply a sbox
-static UINT8 apply_sbox(UINT8 state, const UINT8 *sbox)
+void znsec_device::apply_sbox(const UINT8 *sbox)
 {
 	int i;
 	UINT8 r = 0;
 	for(i=0; i<8; i++)
-		if(state & (1<<i))
+		if(m_state & (1<<i))
 			r ^= sbox[i];
-	return r;
+
+	m_state = r;
 }
 
-void znsec_init(int chip, const UINT8 *transform)
+void znsec_device::init(const UINT8 *transform)
 {
-	zns[chip].transform = transform;
-	zns[chip].state = 0xfc;
-	zns[chip].bit = 0;
+	m_transform = transform;
 }
 
-void znsec_start(int chip)
+void znsec_device::select(int select)
 {
-	zns[chip].state = 0xfc;
-	zns[chip].bit = 0;
+	if (m_select && !select)
+	{
+		m_state = 0xfc;
+		m_bit = 0;
+	}
+	
+	m_select = select;
 }
 
-UINT8 znsec_step(int chip, UINT8 input)
+UINT8 znsec_device::step(UINT8 input)
 {
 	UINT8 res;
 	static const UINT8 initial_sbox[8] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x7f };
 
-	if (zns[chip].bit==0)
+	if (m_bit==0)
 	{
-		// Apply the initial xbox
-		zns[chip].state = apply_sbox(zns[chip].state, initial_sbox);
+		// Apply the initial sbox
+		apply_sbox(initial_sbox);
 	}
 
 	// Compute the output and change the state
-	res = (zns[chip].state>>zns[chip].bit) & 1;
+	res = (m_state >> m_bit) & 1;
 	if((input & 1)==0)
-		zns[chip].state = apply_bit_sbox(chip, zns[chip].state, zns[chip].bit);
+		apply_bit_sbox(m_bit);
 
-	zns[chip].bit++;
-	zns[chip].bit&=7;
+	m_bit++;
+	m_bit&=7;
 	return res;
 }

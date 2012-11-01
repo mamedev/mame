@@ -34,11 +34,15 @@ class zn_state : public psx_state
 public:
 	zn_state(const machine_config &mconfig, device_type type, const char *tag) :
 		psx_state(mconfig, type, tag),
-		m_gpu(*this, "gpu")
+		m_gpu(*this, "gpu"),
+		m_znsec0(*this,"znsec0"),
+		m_znsec1(*this,"znsec1")
 	{
 	}
 
 	required_device<psxgpu_device> m_gpu;
+	required_device<znsec_device> m_znsec0;
+	required_device<znsec_device> m_znsec1;
 	UINT32 m_n_znsecsel;
 	UINT32 m_b_znsecport;
 	int m_n_dip_bit;
@@ -323,8 +327,9 @@ static void sio_znsec0_handler( running_machine &machine, int n_data )
 	{
 		if( state->m_b_lastclock )
 		{
-			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, ( znsec_step( 0, ( n_data & PSX_SIO_OUT_DATA ) != 0 ) != 0 ) * PSX_SIO_IN_DATA );
+			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, ( state->m_znsec0->step( ( n_data & PSX_SIO_OUT_DATA ) != 0 ) != 0 ) * PSX_SIO_IN_DATA );
 		}
+
 		state->m_b_lastclock = 0;
 	}
 	else
@@ -341,8 +346,9 @@ static void sio_znsec1_handler( running_machine &machine, int n_data )
 	{
 		if( state->m_b_lastclock )
 		{
-			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, ( znsec_step( 1, ( n_data & PSX_SIO_OUT_DATA ) != 0 ) != 0 ) * PSX_SIO_IN_DATA );
+			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, ( state->m_znsec1->step( ( n_data & PSX_SIO_OUT_DATA ) != 0 ) != 0 ) * PSX_SIO_IN_DATA );
 		}
+
 		state->m_b_lastclock = 0;
 	}
 	else
@@ -394,6 +400,9 @@ WRITE32_MEMBER(zn_state::znsecsel_w)
 {
 	COMBINE_DATA( &m_n_znsecsel );
 
+	m_znsec0->select( ( m_n_znsecsel >> 2 ) & 1 );
+	m_znsec1->select( ( m_n_znsecsel >> 3 ) & 1 );
+
 	if( ( m_n_znsecsel & 0x80 ) == 0 )
 	{
 		psx_sio_install_handler( machine(), 0, sio_pad_handler );
@@ -401,13 +410,11 @@ WRITE32_MEMBER(zn_state::znsecsel_w)
 	}
 	else if( ( m_n_znsecsel & 0x08 ) == 0 )
 	{
-		znsec_start( 1 );
 		psx_sio_install_handler( machine(), 0, sio_znsec1_handler );
 		psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, 0 );
 	}
 	else if( ( m_n_znsecsel & 0x04 ) == 0 )
 	{
-		znsec_start( 0 );
 		psx_sio_install_handler( machine(), 0, sio_znsec0_handler );
 		psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, 0 );
 	}
@@ -527,8 +534,8 @@ static void zn_driver_init( running_machine &machine )
 	{
 		if( strcmp( machine.system().name, zn_config_table[ n_game ].s_name ) == 0 )
 		{
-			znsec_init( 0, zn_config_table[ n_game ].p_n_mainsec );
-			znsec_init( 1, zn_config_table[ n_game ].p_n_gamesec );
+			state->m_znsec0->init( zn_config_table[ n_game ].p_n_mainsec );
+			state->m_znsec1->init( zn_config_table[ n_game ].p_n_gamesec );
 			psx_sio_install_handler( machine, 0, sio_pad_handler );
 			break;
 		}
@@ -551,6 +558,9 @@ static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
 
+	MCFG_DEVICE_ADD("znsec0", ZNSEC, 0)
+	MCFG_DEVICE_ADD("znsec1", ZNSEC, 0)
+
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL_53_693175MHz )
 
@@ -572,6 +582,9 @@ static MACHINE_CONFIG_START( zn2, zn_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
+
+	MCFG_DEVICE_ADD("znsec0", ZNSEC, 0)
+	MCFG_DEVICE_ADD("znsec1", ZNSEC, 0)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
