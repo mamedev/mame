@@ -187,10 +187,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(frc_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(upd7508_1sec_callback);
 
-	void px4_sio_txd(device_t *device,int state);
-	int px4_sio_rxd(device_t *device);
-	int px4_sio_pin(device_t *device);
-	void px4_sio_pout(device_t *device,int state);
 	void px4_rs232c_txd(device_t *device,int state);
 	int px4_rs232c_rxd(device_t *device);
 	void px4_rs232c_rts(device_t *device,int state);
@@ -474,25 +470,19 @@ READ8_MEMBER(px4_state::px4_str_r)
 void px4_state::install_rom_capsule(address_space &space, int size, const char *region)
 {
 	// ram, part 1
-	space.install_readwrite_bank(0x0000, 0xdfff - size, "bank1");
-	membank("bank1")->set_base(m_ram->pointer());
+	space.install_ram(0x0000, 0xdfff - size, 0, 0, m_ram->pointer());
 
 	// actual rom data, part 1
-	space.install_read_bank(0xe000 - size, 0xffff - size, "bank2");
-	space.nop_write(0xe000 - size, 0xffff - size);
-	membank("bank2")->set_base(memregion(region)->base() + (size - 0x2000));
+	space.install_rom(0xe000 - size, 0xffff, 0, 0, memregion(region)->base() + (size - 0x2000));
 
 	// rom data, part 2
 	if (size != 0x2000)
 	{
-		space.install_read_bank(0x10000 - size, 0xdfff, "bank3");
-		space.nop_write(0x10000 - size, 0xdfff);
-		membank("bank3")->set_base(memregion(region)->base());
+		space.install_rom(0x10000 - size, 0xdfff, 0, 0, memregion(region)->base());
 	}
 
 	// ram, continued
-	space.install_readwrite_bank(0xe000, 0xffff, "bank4");
-	membank("bank4")->set_base(m_ram->pointer() + 0xe000);
+	space.install_ram(0xe000, 0xffff, 0, 0, m_ram->pointer() + 0xe000);
 }
 
 // bank register
@@ -505,22 +495,18 @@ WRITE8_MEMBER(px4_state::px4_bankr_w)
 
 	m_bankr = data;
 
-	/* bank switch */
+	// bank switch
 	switch (data >> 4)
 	{
 	case 0x00:
-		/* system bank */
-		space_program.install_read_bank(0x0000, 0x7fff, "bank1");
-		space_program.nop_write(0x0000, 0x7fff);
-		membank("bank1")->set_base(memregion("os")->base());
-		space_program.install_readwrite_bank(0x8000, 0xffff, "bank2");
-		membank("bank2")->set_base(m_ram->pointer() + 0x8000);
+		// system bank
+		space_program.install_rom(0x0000, 0x7fff, 0, 0, memregion("os")->base());
+		space_program.install_ram(0x8000, 0xffff, 0, 0, m_ram->pointer() + 0x8000);
 		break;
 
 	case 0x04:
-		/* memory */
-		space_program.install_readwrite_bank(0x0000, 0xffff, "bank1");
-		membank("bank1")->set_base(m_ram->pointer());
+		// memory
+		space_program.install_ram(0x0000, 0xffff, 0, 0, m_ram->pointer());
 		break;
 
 	case 0x08: install_rom_capsule(space_program, 0x2000, "capsule1"); break;
@@ -584,7 +570,7 @@ WRITE8_MEMBER(px4_state::px4_sior_w)
 		}
 		else
 		{
-			// nothing happenend
+			// nothing happened
 			m_sior = 0xbf;
 		}
 
@@ -751,6 +737,9 @@ READ8_MEMBER(px4_state::px4_artdir_r)
 	if (VERBOSE)
 		logerror("%s: px4_artdir_r\n", machine().describe_context());
 
+	// clear ready
+	m_artsr &= ~ART_RXRDY;
+
 	return m_artdir;
 }
 
@@ -798,7 +787,7 @@ READ8_MEMBER(px4_state::px4_iostr_r)
 
 	result |= m_centronics->busy_r() << 0;
 	result |= !m_centronics->pe_r() << 1;
-	result |= m_sio->pin_r() << 2;
+	result |= !m_sio->pin_r() << 2;
 	result |= m_sio->rx_r() << 3;
 	result |= px4_rs232c_dcd(m_rs232c_device) << 4;
 	result |= px4_rs232c_cts(m_rs232c_device) << 5;
@@ -858,7 +847,7 @@ WRITE8_MEMBER(px4_state::px4_ioctlr_w)
 	m_centronics->strobe_w(!BIT(data, 0));
 	m_centronics->init_prime_w(BIT(data, 1));
 
-	m_sio->pout_w(BIT(data, 2));
+	m_sio->pout_w(!BIT(data, 2));
 
 	// bit 3, cartridge reset
 
