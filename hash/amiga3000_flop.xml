@@ -51,8 +51,31 @@
 
 		<part name="cass1" interface="a3000_cass">
 			<feature name="part_id" value="Installation Tape"/>
-			<dataarea name="cass" size="0">
-				<rom name="cass" size="0" status="nodump" offset="0" />
+			<dataarea name="cass" size="22318592">
+				<rom name="amigasrc.cpio.gz" size="630784" crc="4816b6e2" sha1="f86326d58992d3df849d5fcfebbbd45e0292e07e" offset="0" />
+				<rom name="bsd.cpio" size="1642496" crc="386e3bdd" sha1="19ea29f7d735a44699bc6275b7c291fe8ba57c5e" offset="0" />
+				<rom name="cdev.cpio" size="10433536" crc="277daad2" sha1="f6249ee0f0a0dfe23a05f4cdacc2f4a7ec79da47" offset="0" />
+				<rom name="conf.cpio" size="2986496" crc="3238d20e" sha1="cd0e8fd7eed52ed86798f1125a2bec3f04822d24" offset="0" />
+				<rom name="core.cpio" size="10873344" crc="fb24e4cb" sha1="1af119254d491bb8203cdc4f8ae1e5e354665036" offset="0" />
+				<rom name="emacs.cpio" size="5836800" crc="b2077fef" sha1="8079b21cd6778b551668d1876694259058830a9a" offset="0" />
+				<rom name="games.cpio" size="2351104" crc="24533148" sha1="7a54bb2aae5302fdf94000a08ca11c2846c5621b" offset="0" />
+				<rom name="list.cpio" size="2560" crc="0bfaeae5" sha1="17442f6e82211efd3ecc3fb1ad09dba93d0763d1" offset="0" />
+				<rom name="lp.cpio" size="2176512" crc="b0d81866" sha1="46165630d21dc8d3964b6688881e3dbfc86406fb" offset="0" />
+				<rom name="man.cpio" size="6392320" crc="65aaf80b" sha1="bde2814a97cc9b68bf0bf2a8b075764e789b0212" offset="0" />
+				<rom name="net.cpio" size="3036160" crc="0b7425fd" sha1="abe8be0ead917223652e6dcc87afbfedddbf3f9e" offset="0" />
+				<rom name="olcore.cpio" size="4186624" crc="82e0d554" sha1="728fd97b7bc6962aceef23ce744a6d48e3bf5845" offset="0" />
+				<rom name="oldev.cpio" size="1667072" crc="37afbf43" sha1="2886b4f689137e2a539c1432b44326dff46d1953" offset="0" />
+				<rom name="public.cpio" size="4919296" crc="00eb4c0e" sha1="3323b0ea0bb7135ee8578452f25e32b4cba1e548" offset="0" />
+				<rom name="pubsrc.cpio.gz" size="22318592" crc="688da398" sha1="506032e128793851916e5f509381b25957ca155c" offset="0" />
+				<rom name="readme.txt" size="751" crc="bbf68fe6" sha1="993c1648ffaf8225a2db3e543934dba6429ce7ad" offset="0" />
+				<rom name="sysadm.cpio" size="5967872" crc="e1a4058e" sha1="8331030f4302ac687387d2140ee1326ac0c5a2e4" offset="0" />
+				<rom name="terminfo.cpio" size="2167296" crc="220a2d66" sha1="0a3dc2977f7a15a59026e9e7695c3cf57a4fee2a" offset="0" />
+				<rom name="text.cpio" size="1487360" crc="6abbb700" sha1="c37608892f29ad35a43e1641b491ee687373df2b" offset="0" />
+				<rom name="uucp.cpio" size="732160" crc="9794db77" sha1="c6c193f34d6f1dadde8ed5fedbef2dc2758d6563" offset="0" />
+				<rom name="xbasic.cpio" size="5563392" crc="bd675103" sha1="6d695ccb7c4f3af89463650a764177f948172444" offset="0" />
+				<rom name="xcore.cpio" size="8308224" crc="d1f68397" sha1="d25bd392efa15c8d426669aed2e2a0eea882a4b9" offset="0" />
+				<rom name="xdev.cpio" size="2469888" crc="72602df9" sha1="c564ec3c32bf3bf77ffe4db70e1f66f1094c5f91" offset="0" />
+				<rom name="xtras.cpio" size="7218688" crc="8e1a7717" sha1="c6eb3fbcf4b8923369c6ff7e1f2f3cdf83cb82e0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -78,8 +101,34 @@
 
 		<part name="cass1" interface="a3000_cass">
 			<feature name="part_id" value="Installation Tape"/>
-			<dataarea name="cass" size="0">
-				<rom name="cass" size="0" status="nodump" offset="0" />
+			<dataarea name="cass" size="14672384">
+				<rom name="i_01.cpio" size="5120" crc="157c1406" sha1="49ead2e4eb32b2609f865bdba4ff5d132e37c029" offset="0" />
+				<rom name="i_02.cpio" size="1701888" crc="b2eb927d" sha1="5c2ea020f965d74661b899b8224ab94688866d52" offset="0" />
+				<rom name="i_03.cpio" size="10807296" crc="67d656b4" sha1="d3b5d698d5ea43585fab07d862a746dc8900c911" offset="0" />
+				<rom name="i_04.cpio" size="1635840" crc="89463e3e" sha1="28c94b723d0d95bf01bc0f39442dc3831e3a91f1" offset="0" />
+				<rom name="i_05.cpio" size="9800704" crc="8b69e4a5" sha1="8cee970ae33ded852ed62661f9272d3bca35b7a6" offset="0" />
+				<rom name="i_06.cpio" size="2167296" crc="b23affbe" sha1="b5408c98ca69adebb1e47aace59710e526eb1e57" offset="0" />
+				<rom name="i_07.cpio" size="5971968" crc="88734063" sha1="f85ae1ee0a2f420868966a7fbc6628169d4e6c5d" offset="0" />
+				<rom name="i_08.cpio" size="3024384" crc="adb2cf8d" sha1="25a8348844be00682c058bafa60bb02ba08c60f2" offset="0" />
+				<rom name="i_09.cpio" size="5656576" crc="36cd566b" sha1="1f8c799e9ff023ec52c0a0a22c67355e52c27b64" offset="0" />
+				<rom name="i_10.cpio" size="2517504" crc="08cd2b7f" sha1="64a93dad159cb3501bc4a586e581569dd10f0e88" offset="0" />
+				<rom name="i_11.cpio" size="2019328" crc="93b21768" sha1="fd4ca23a91d87c19d3ce124080ec6a78f2a98066" offset="0" />
+				<rom name="i_12.cpio" size="1458688" crc="a8d37c4b" sha1="3dff26db02375817a204eba0e4c0748113fd7150" offset="0" />
+				<rom name="i_13.cpio" size="727040" crc="b7551d86" sha1="e9e674b5a7ac1434557135708c69dd41ff85a829" offset="0" />
+				<rom name="i_14.cpio" size="7406592" crc="9041d0c9" sha1="346ef10affc155171d6b807cc513bb7208702c1f" offset="0" />
+				<rom name="i_15.cpio" size="766464" crc="204e57b2" sha1="9939f46977d2b98badb7a3b704161b4da5af6fc9" offset="0" />
+				<rom name="i_16.cpio" size="2192896" crc="c3699f24" sha1="e72060d43f9de4af3bf8c402a333b8bb24ca4291" offset="0" />
+				<rom name="i_17.cpio" size="4090880" crc="3e3d1b95" sha1="1119e8b05359407f2138c0da989a2fd4307d3e2b" offset="0" />
+				<rom name="i_18.cpio" size="2863616" crc="3cd301af" sha1="e3d3f9352b76aae03cae5d3a8481fca78d7ce20f" offset="0" />
+				<rom name="i_19.cpio" size="2064384" crc="171cdc35" sha1="d833ee67772e50c51837707a8d357652e4d275f7" offset="0" />
+				<rom name="i_20.cpio" size="3016704" crc="9c948157" sha1="719975a216f82bf4566a5dc8ae2f454c1f2b5b5f" offset="0" />
+				<rom name="i_21.cpio" size="3335680" crc="da58478a" sha1="3b779f9fb1ca0f1271e5d1f566654b46529c8c0e" offset="0" />
+				<rom name="i_22.cpio" size="2347520" crc="36f325a3" sha1="079fdb599d0b0cb8f7294e52f838a1f0a7630e1b" offset="0" />
+				<rom name="i_23.cpio" size="595968" crc="63f45a29" sha1="9c0675359a5630352ab863ab3e6f0e05afad1050" offset="0" />
+				<rom name="i_24.cpio" size="4452864" crc="a2be6aa6" sha1="07828b3c5d779402e5c9dbe91529c635a32e96eb" offset="0" />
+				<rom name="i_25.cpio" size="8244224" crc="f159024c" sha1="23216d168244a97cc80cf40251373ec5ea1d11e4" offset="0" />
+				<rom name="i_26.cpio" size="7247360" crc="211808b0" sha1="5384209ad2135da9e93360f8c3be6e5efcaeb279" offset="0" />
+				<rom name="i_27.cpio" size="14672384" crc="38e406a9" sha1="480c23909579fd7d38339611c9c0693845017e65" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -112,16 +161,37 @@
 
 		<part name="cass1" interface="a3000_cass">
 			<feature name="part_id" value="Installation Tape"/>
-			<dataarea name="cass" size="77600256">
+			<dataarea name="cass" size="19743744">
+				<rom name="seglist" size="186" crc="82c4f5b4" sha1="6b4d9bff86e6d1b46de1fe494da621c193e12485" offset="0" />
+				<rom name="00" size="5120" crc="d4183326" sha1="acbadc8f66f89f1669cc1277d4d84f6589509a7b" offset="0" />
+				<rom name="01" size="2333184" crc="402a3a64" sha1="1d36d52211b118aee2c5c54c51ca371c46ddb4c8" offset="0" />
+				<rom name="02" size="11183104" crc="c178e51c" sha1="42e303807318843b838baf66f018f2d915886487" offset="0" />
+				<rom name="03" size="1635840" crc="89463e3e" sha1="28c94b723d0d95bf01bc0f39442dc3831e3a91f1" offset="0" />
+				<rom name="04" size="10272768" crc="b177f91e" sha1="9491d9bd039ac61ba2f686e4866e2253b6234021" offset="0" />
+				<rom name="05" size="2168832" crc="b4c04e5c" sha1="609b022bbc3558568e99ad34c4d579bf2f62cfbd" offset="0" />
+				<rom name="06" size="6034944" crc="92a21446" sha1="347620ee9fd0a93d7a1159dd8de361c134fd2639" offset="0" />
+				<rom name="07" size="3025408" crc="79a3e885" sha1="0734eee243159f8f80687a438957841bace14881" offset="0" />
+				<rom name="08" size="7468544" crc="5eb7828c" sha1="d8c64aa3f1b54b03f0e32912c62dfca353a48aa4" offset="0" />
+				<rom name="09" size="2512384" crc="24ac151e" sha1="60c00073f5bcb65dd05edba4ff927bc2671a7112" offset="0" />
+				<rom name="10" size="2023424" crc="bf58376a" sha1="78827cb35b9f42d88e3f7236489b4b28dec4ceb4" offset="0" />
+				<rom name="11" size="1458688" crc="a8d37c4b" sha1="3dff26db02375817a204eba0e4c0748113fd7150" offset="0" />
+				<rom name="12" size="882176" crc="e0fef1b7" sha1="64a9b425246f65f74a3ef2cd6fce641e3a898801" offset="0" />
+				<rom name="13" size="8095744" crc="1378c80f" sha1="b9b3626c07657ce94d3feb7573de47e8867cd7cb" offset="0" />
+				<rom name="14" size="766976" crc="6a63247c" sha1="16a56d8a5432aa45f93e83e8ff24f60f514dd8db" offset="0" />
+				<rom name="15" size="2192896" crc="6a96900d" sha1="e7cf7aed6e7c2ad255a0c8077ca952cc3d27d1ca" offset="0" />
+				<rom name="16" size="4470784" crc="e5976d39" sha1="5c90fa3a75f41532c5bf00a3e339236a8dd506cd" offset="0" />
+				<rom name="17" size="2863616" crc="3cd301af" sha1="e3d3f9352b76aae03cae5d3a8481fca78d7ce20f" offset="0" />
+				<rom name="18" size="2064384" crc="171cdc35" sha1="d833ee67772e50c51837707a8d357652e4d275f7" offset="0" />
+				<rom name="19" size="2776576" crc="17d977e5" sha1="354fa14d6d97db7e58ea7e5e97fd723bf363ce19" offset="0" />
 				<rom name="20" size="3334656" crc="abf8c717" sha1="b6b4648b1cb5f247190689a97b00e0a05ed27116" offset="0" />
-				<rom name="21" size="2347520" crc="36f325a3" sha1="079fdb599d0b0cb8f7294e52f838a1f0a7630e1b" offset="3334656" />
-				<rom name="22" size="591360" crc="c2e1b81a" sha1="6a53fd724b807b7b24fa29c9881acc573de78f9d" offset="5682176" />
-				<rom name="23" size="4467712" crc="3fb92f7f" sha1="b3e2c41fadd5df7e6c6bc0a203b8c83f44bedf9d" offset="6273536" />
-				<rom name="24" size="8239616" crc="0f664a16" sha1="3014e685c45f7970d2beed7142d30cbc214922a5" offset="10741248" />
-				<rom name="25" size="13987328" crc="036ba7e3" sha1="31967c7fdd5a48e7487fd5576cd405153513c059" offset="18980864" />
-				<rom name="26" size="8051200" crc="01698c66" sha1="f445d485a25ff60f3cb6fba40a4668ad500bcafe" offset="32968192" />
-				<rom name="27" size="16837120" crc="5b6874e8" sha1="d34fff3232bb5a7bb20d64923503ba86e5a1798d" offset="41019392" />
-				<rom name="28" size="19743744" crc="01639d6e" sha1="147b570edd59719dd32ad51b4c022d8c85b42fa6" offset="57856512" />
+				<rom name="21" size="2347520" crc="36f325a3" sha1="079fdb599d0b0cb8f7294e52f838a1f0a7630e1b" offset="0" />
+				<rom name="22" size="591360" crc="c2e1b81a" sha1="6a53fd724b807b7b24fa29c9881acc573de78f9d" offset="0" />
+				<rom name="23" size="4467712" crc="3fb92f7f" sha1="b3e2c41fadd5df7e6c6bc0a203b8c83f44bedf9d" offset="0" />
+				<rom name="24" size="8239616" crc="0f664a16" sha1="3014e685c45f7970d2beed7142d30cbc214922a5" offset="0" />
+				<rom name="25" size="13987328" crc="036ba7e3" sha1="31967c7fdd5a48e7487fd5576cd405153513c059" offset="0" />
+				<rom name="26" size="8051200" crc="01698c66" sha1="f445d485a25ff60f3cb6fba40a4668ad500bcafe" offset="0" />
+				<rom name="27" size="16837120" crc="5b6874e8" sha1="d34fff3232bb5a7bb20d64923503ba86e5a1798d" offset="0" />
+				<rom name="28" size="19743744" crc="01639d6e" sha1="147b570edd59719dd32ad51b4c022d8c85b42fa6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
