@@ -152,6 +152,7 @@ hash/psion.xml svneol=native#text/xml
 hash/psx.xml svneol=native#text/xml
 hash/pv1000.xml svneol=native#text/xml
 hash/pv2000.xml svneol=native#text/xml
+hash/px4_cart.xml svneol=native#text/xml
 hash/ql.xml svneol=native#text/xml
 hash/ql_cass.xml svneol=native#text/xml
 hash/rainbow.xml svneol=native#text/xml

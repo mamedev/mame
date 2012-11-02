@@ -1325,14 +1325,22 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	// external cassette
 	MCFG_CASSETTE_ADD("extcas", px4_cassette_interface)
 
-	// rom capsules
-	MCFG_CARTSLOT_ADD("capsule1")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_ADD("capsule2")
-	MCFG_CARTSLOT_NOT_MANDATORY
-
 	// sio port
 	MCFG_EPSON_SIO_ADD("sio")
+
+	// rom capsules
+	MCFG_CARTSLOT_ADD("capsule1")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_INTERFACE("px4_cart")
+	MCFG_CARTSLOT_NOT_MANDATORY
+
+	MCFG_CARTSLOT_ADD("capsule2")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_INTERFACE("px4_cart")
+	MCFG_CARTSLOT_NOT_MANDATORY
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "px4_cart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( px4p, px4 )
