@@ -1198,13 +1198,12 @@ CPU_GET_INFO( m37710 )
 // 37702 is identical except with an internal ROM, so just change the name
 CPU_GET_INFO( m37702 )
 {
-	if (state == CPUINFO_STR_NAME)
+	switch (state)
 	{
-		strcpy(info->s, "M37702");
-		return;
+		case CPUINFO_STR_NAME: strcpy(info->s, "M37702"); break;
+		default: CPU_GET_INFO_CALL(m37710); break;
 	}
 
-	CPU_GET_INFO_CALL(m37710);
 }
 
 DEFINE_LEGACY_CPU_DEVICE(M37710, m37710);
