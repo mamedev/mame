@@ -228,8 +228,6 @@ INLINE ssp1601_state_t *get_safe_token(device_t *device)
 #define CHECK_ST(d)
 #endif
 
-#define CHIP_NAME "SSP1601"
-
 // -----------------------------------------------------
 // register i/o handlers
 
@@ -873,7 +871,7 @@ CPU_GET_INFO( ssp1601 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_IO:      info->internal_map16 = NULL;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:						strcpy(info->s, CHIP_NAME);									break;
+		case CPUINFO_STR_NAME:						strcpy(info->s, "SSP1601");									break;
 		case CPUINFO_STR_FAMILY:				strcpy(info->s, "SSP1601 DSP");								break;
 		case CPUINFO_STR_VERSION:				strcpy(info->s, "1.0");										break;
 		case CPUINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
