@@ -1292,6 +1292,7 @@ struct c412_t
 	UINT16 sram[0x20000];     // Ram-based tiles for rendering
 	UINT16 pczram[0x200];     // Ram-based tilemap for rendering, or something else
 	UINT32 adr;
+	UINT16 status_c;
 };
 
 struct c421_t
@@ -1671,6 +1672,11 @@ READ16_MEMBER(namcos23_state::s23_c412_r)
 			return m_c412.adr >> 16;
 		case 0xa:
 			return s23_c412_ram_r(space, m_c412.adr, mem_mask);
+		case 0xc:
+			// unknown status, 500gp reads it and waits for a transition
+			// no other games use it?
+			m_c412.status_c ^= 1;
+			return m_c412.status_c;
 	}
 
 	logerror("c412_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
@@ -1681,13 +1687,17 @@ WRITE16_MEMBER(namcos23_state::s23_c412_w)
 {
 	switch (offset)
 	{
-		case 8:
+		case 0x2:
+			// d0: cz on
+			// other bits: no function?
+			break;
+		case 0x8:
 			m_c412.adr = (data & mem_mask) | (m_c412.adr & (0xffffffff ^ mem_mask));
 			break;
-		case 9:
+		case 0x9:
 			m_c412.adr = ((data & mem_mask) << 16) | (m_c412.adr & (0xffffffff ^ (mem_mask << 16)));
 			break;
-		case 10:
+		case 0xa:
 			s23_c412_ram_w(space, m_c412.adr, data, mem_mask);
 			m_c412.adr += 2;
 			break;
