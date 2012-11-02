@@ -213,14 +213,22 @@ const fd1089_base_device::decrypt_parameters fd1089_base_device::s_data_params_a
 //  fd1089_base_device - constructor
 //-------------------------------------------------
 
-fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, char cputype)
-	: m68000_device(mconfig, M68000, tag, owner, clock),
-	  m_cputype(cputype)
+fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: m68000_device(mconfig, M68000, tag, owner, clock)
 {
 	// override the name after the m68000 initializes
-	m_name.printf("FD1089%c", m_cputype);
+	m_name.cpy(name);
 }
 
+fd1089a_device::fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: fd1089_base_device(mconfig, FD1089A, "FD1089A", tag, owner, clock)
+{
+}
+
+fd1089b_device::fd1089b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: fd1089_base_device(mconfig, FD1089B, "FD1089B", tag, owner, clock)
+{
+}
 
 //-------------------------------------------------
 //  device_start - one-time device initialization
@@ -327,7 +335,7 @@ UINT8 fd1089_base_device::rearrange_key(UINT8 table, bool opcode)
 //  according to FD1089A rules
 //-------------------------------------------------
 
-UINT8 fd1089_base_device::decode_fd1089a(UINT8 val, UINT8 key, bool opcode)
+UINT8 fd1089a_device::decode(UINT8 val, UINT8 key, bool opcode)
 {
 	// special case - don't decrypt
 	if (key == 0x40)
@@ -387,7 +395,7 @@ UINT8 fd1089_base_device::decode_fd1089a(UINT8 val, UINT8 key, bool opcode)
 //  according to FD1089B rules
 //-------------------------------------------------
 
-UINT8 fd1089_base_device::decode_fd1089b(UINT8 val, UINT8 key, bool opcode)
+UINT8 fd1089b_device::decode(UINT8 val, UINT8 key, bool opcode)
 {
 	// special case - don't decrypt
 	if (key == 0x40)
@@ -446,7 +454,7 @@ UINT8 fd1089_base_device::decode_fd1089b(UINT8 val, UINT8 key, bool opcode)
 //  as either an opcode or as data
 //-------------------------------------------------
 
-UINT16 fd1089_base_device::decrypt_one(offs_t addr, UINT16 val, const UINT8 *key, bool opcode, char cputype)
+UINT16 fd1089_base_device::decrypt_one(offs_t addr, UINT16 val, const UINT8 *key, bool opcode)
 {
 	// pick the translation table from bits ff022a of the address
 	int tbl_num =	((addr & 0x000002) >> 1) |
@@ -459,11 +467,7 @@ UINT16 fd1089_base_device::decrypt_one(offs_t addr, UINT16 val, const UINT8 *key
 					((val & 0x0040) >> 5) |
 					((val & 0xfc00) >> 8);
 
-	switch (cputype)
-	{
-		case 'A': src = decode_fd1089a(src, key[tbl_num + (opcode ? 0 : 1) * 0x1000], opcode); break;
-		case 'B': src = decode_fd1089b(src, key[tbl_num + (opcode ? 0 : 1) * 0x1000], opcode); break;
-	}
+	src = decode(src, key[tbl_num + (opcode ? 0 : 1) * 0x1000], opcode);
 
 	src =	((src & 0x01) << 3) |
 			((src & 0x02) << 5) |
@@ -483,7 +487,7 @@ void fd1089_base_device::decrypt(offs_t baseaddr, UINT32 size, const UINT16 *src
 	for (offs_t offset = 0; offset < size; offset += 2)
 	{
 		UINT16 src = srcptr[offset / 2];
-		opcodesptr[offset / 2] = decrypt_one(baseaddr + offset, src, m_key, true, m_cputype);
-		dataptr[offset / 2] = decrypt_one(baseaddr + offset, src, m_key, false, m_cputype);
+		opcodesptr[offset / 2] = decrypt_one(baseaddr + offset, src, m_key, true);
+		dataptr[offset / 2] = decrypt_one(baseaddr + offset, src, m_key, false);
 	}
 }
