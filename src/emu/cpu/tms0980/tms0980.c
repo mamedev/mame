@@ -228,48 +228,48 @@ unknown cycle: CME, SSE, SSS
 
 struct tms0980_state
 {
-	UINT8	prev_pc;		/* previous program counter */
-	UINT8	prev_pa;		/* previous page address register */
-	UINT8	pc;				/* program counter is a 7 bit register on tms0980, 6 bit register on tms1000/1070/1200/1270/1100/1300 */
-	UINT8	pa;				/* page address register is a 4 bit register */
-	UINT8	sr;				/* subroutine return register is a 7 bit register */
-	UINT8	pb;				/* page buffer register is a 4 bit register */
-	UINT8	a;				/* Accumulator is a 4 bit register (?) */
-	UINT8	x;				/* X-register is a 2, 3, or 4 bit register */
-	UINT8	y;				/* Y-register is a 4 bit register */
-	UINT8	dam;			/* DAM register is a 4 bit register */
-	UINT8	ca;				/* Chapter address bit */
-	UINT8	cb;				/* Chapter buffer bit */
-	UINT8	cs;				/* Chapter subroutine bit */
-	UINT16	r;
-	UINT8	o;
-	UINT8	cki_bus;		/* CKI bus */
-	UINT8	p;				/* adder p-input */
-	UINT8	n;				/* adder n-input */
-	UINT8	adder_result;	/* adder result */
-	UINT8	carry_in;		/* carry in */
-	UINT8	status;
-	UINT8	status_latch;
-	UINT8	special_status;
-	UINT8	call_latch;
-	UINT8	add_latch;
-	UINT8	branch_latch;
-	int	subcycle;
-	UINT8	ram_address;
-	UINT16	ram_data;
-	UINT16	rom_address;
-	UINT16	opcode;
-	UINT32	decode;
-	int		icount;
-	UINT16	o_mask;			/* mask to determine the number of O outputs */
-	UINT16	r_mask;			/* mask to determine the number of R outputs */
-	UINT8	pc_size;		/* how bits in the PC register */
-	UINT8	byte_size;		/* 8 or 9 bit bytes */
+	UINT8	m_prev_pc;		/* previous program counter */
+	UINT8	m_prev_pa;		/* previous page address register */
+	UINT8	m_pc;			/* program counter is a 7 bit register on tms0980, 6 bit register on tms1000/1070/1200/1270/1100/1300 */
+	UINT8	m_pa;			/* page address register is a 4 bit register */
+	UINT8	m_sr;			/* subroutine return register is a 7 bit register */
+	UINT8	m_pb;			/* page buffer register is a 4 bit register */
+	UINT8	m_a;			/* Accumulator is a 4 bit register (?) */
+	UINT8	m_x;			/* X-register is a 2, 3, or 4 bit register */
+	UINT8	m_y;			/* Y-register is a 4 bit register */
+	UINT8	m_dam;			/* DAM register is a 4 bit register */
+	UINT8	m_ca;			/* Chapter address bit */
+	UINT8	m_cb;			/* Chapter buffer bit */
+	UINT8	m_cs;			/* Chapter subroutine bit */
+	UINT16	m_r;
+	UINT8	m_o;
+	UINT8	m_cki_bus;		/* CKI bus */
+	UINT8	m_p;			/* adder p-input */
+	UINT8	m_n;			/* adder n-input */
+	UINT8	m_adder_result;	/* adder result */
+	UINT8	m_carry_in;		/* carry in */
+	UINT8	m_status;
+	UINT8	m_status_latch;
+	UINT8	m_special_status;
+	UINT8	m_call_latch;
+	UINT8	m_add_latch;
+	UINT8	m_branch_latch;
+	int		m_subcycle;
+	UINT8	m_ram_address;
+	UINT16	m_ram_data;
+	UINT16	m_rom_address;
+	UINT16	m_opcode;
+	UINT32	m_decode;
+	int		m_icount;
+	UINT16	m_o_mask;		/* mask to determine the number of O outputs */
+	UINT16	m_r_mask;		/* mask to determine the number of R outputs */
+	UINT8	m_pc_size;		/* how bits in the PC register */
+	UINT8	m_byte_size;	/* 8 or 9 bit bytes */
 	UINT8	m_x_bits;		/* determine the number of bits in the X register */
-	const UINT32 *decode_table;
+	const UINT32 *m_decode_table;
 	const tms0980_config	*config;
-	address_space *program;
-	address_space *data;
+	address_space *m_program;
+	address_space *m_data;
 
 	devcb_resolved_read8 m_read_k;
 	devcb_resolved_write16 m_write_o;
@@ -506,53 +506,53 @@ static void cpu_init_tms_common( legacy_cpu_device *device, const UINT32* decode
 
 	assert( cpustate->config != NULL );
 
-	cpustate->decode_table = decode_table;
-	cpustate->o_mask = o_mask;
-	cpustate->r_mask = r_mask;
-	cpustate->pc_size = pc_size;
-	cpustate->byte_size = byte_size;
+	cpustate->m_decode_table = decode_table;
+	cpustate->m_o_mask = o_mask;
+	cpustate->m_r_mask = r_mask;
+	cpustate->m_pc_size = pc_size;
+	cpustate->m_byte_size = byte_size;
 	cpustate->m_x_bits = x_bits;
 
-	cpustate->program = &device->space( AS_PROGRAM );
-	cpustate->data = &device->space( AS_DATA );
+	cpustate->m_program = &device->space( AS_PROGRAM );
+	cpustate->m_data = &device->space( AS_DATA );
 
 	cpustate->m_read_k.resolve(cpustate->config->read_k, *device);
 	cpustate->m_write_o.resolve(cpustate->config->write_o, *device);
 	cpustate->m_write_r.resolve(cpustate->config->write_r, *device);
 
 
-	device->save_item( NAME(cpustate->prev_pc) );
-	device->save_item( NAME(cpustate->prev_pa) );
-	device->save_item( NAME(cpustate->pc) );
-	device->save_item( NAME(cpustate->pa) );
-	device->save_item( NAME(cpustate->sr) );
-	device->save_item( NAME(cpustate->pb) );
-	device->save_item( NAME(cpustate->a) );
-	device->save_item( NAME(cpustate->x) );
-	device->save_item( NAME(cpustate->y) );
-	device->save_item( NAME(cpustate->dam) );
-	device->save_item( NAME(cpustate->ca) );
-	device->save_item( NAME(cpustate->cb) );
-	device->save_item( NAME(cpustate->cs) );
-	device->save_item( NAME(cpustate->r) );
-	device->save_item( NAME(cpustate->o) );
-	device->save_item( NAME(cpustate->cki_bus) );
-	device->save_item( NAME(cpustate->p) );
-	device->save_item( NAME(cpustate->n) );
-	device->save_item( NAME(cpustate->adder_result) );
-	device->save_item( NAME(cpustate->carry_in) );
-	device->save_item( NAME(cpustate->status) );
-	device->save_item( NAME(cpustate->status_latch) );
-	device->save_item( NAME(cpustate->special_status) );
-	device->save_item( NAME(cpustate->call_latch) );
-	device->save_item( NAME(cpustate->add_latch) );
-	device->save_item( NAME(cpustate->branch_latch) );
-	device->save_item( NAME(cpustate->subcycle) );
-	device->save_item( NAME(cpustate->ram_address) );
-	device->save_item( NAME(cpustate->ram_data) );
-	device->save_item( NAME(cpustate->rom_address) );
-	device->save_item( NAME(cpustate->opcode) );
-	device->save_item( NAME(cpustate->decode) );
+	device->save_item( NAME(cpustate->m_prev_pc) );
+	device->save_item( NAME(cpustate->m_prev_pa) );
+	device->save_item( NAME(cpustate->m_pc) );
+	device->save_item( NAME(cpustate->m_pa) );
+	device->save_item( NAME(cpustate->m_sr) );
+	device->save_item( NAME(cpustate->m_pb) );
+	device->save_item( NAME(cpustate->m_a) );
+	device->save_item( NAME(cpustate->m_x) );
+	device->save_item( NAME(cpustate->m_y) );
+	device->save_item( NAME(cpustate->m_dam) );
+	device->save_item( NAME(cpustate->m_ca) );
+	device->save_item( NAME(cpustate->m_cb) );
+	device->save_item( NAME(cpustate->m_cs) );
+	device->save_item( NAME(cpustate->m_r) );
+	device->save_item( NAME(cpustate->m_o) );
+	device->save_item( NAME(cpustate->m_cki_bus) );
+	device->save_item( NAME(cpustate->m_p) );
+	device->save_item( NAME(cpustate->m_n) );
+	device->save_item( NAME(cpustate->m_adder_result) );
+	device->save_item( NAME(cpustate->m_carry_in) );
+	device->save_item( NAME(cpustate->m_status) );
+	device->save_item( NAME(cpustate->m_status_latch) );
+	device->save_item( NAME(cpustate->m_special_status) );
+	device->save_item( NAME(cpustate->m_call_latch) );
+	device->save_item( NAME(cpustate->m_add_latch) );
+	device->save_item( NAME(cpustate->m_branch_latch) );
+	device->save_item( NAME(cpustate->m_subcycle) );
+	device->save_item( NAME(cpustate->m_ram_address) );
+	device->save_item( NAME(cpustate->m_ram_data) );
+	device->save_item( NAME(cpustate->m_rom_address) );
+	device->save_item( NAME(cpustate->m_opcode) );
+	device->save_item( NAME(cpustate->m_decode) );
 }
 
 
@@ -602,24 +602,24 @@ static CPU_RESET( tms0980 )
 {
 	tms0980_state *cpustate = get_safe_token( device );
 
-	cpustate->pa = 0x0F;
-	cpustate->pb = 0x0F;
-	cpustate->pc = 0;
-	cpustate->dam = 0;
-	cpustate->ca = 0;
-	cpustate->cb = 0;
-	cpustate->cs = 0;
-	cpustate->subcycle = 0;
-	cpustate->status = 1;
-	cpustate->status_latch = 0;
-	cpustate->call_latch = 0;
-	cpustate->add_latch = 0;
-	cpustate->branch_latch = 0;
-	cpustate->r = 0;
-	cpustate->o = 0;
-	cpustate->ram_address = 0;
-	cpustate->decode = F_ILL;
-	cpustate->opcode = 0;
+	cpustate->m_pa = 0x0F;
+	cpustate->m_pb = 0x0F;
+	cpustate->m_pc = 0;
+	cpustate->m_dam = 0;
+	cpustate->m_ca = 0;
+	cpustate->m_cb = 0;
+	cpustate->m_cs = 0;
+	cpustate->m_subcycle = 0;
+	cpustate->m_status = 1;
+	cpustate->m_status_latch = 0;
+	cpustate->m_call_latch = 0;
+	cpustate->m_add_latch = 0;
+	cpustate->m_branch_latch = 0;
+	cpustate->m_r = 0;
+	cpustate->m_o = 0;
+	cpustate->m_ram_address = 0;
+	cpustate->m_decode = F_ILL;
+	cpustate->m_opcode = 0;
 }
 
 
@@ -745,16 +745,16 @@ static const UINT8 tms1000_next_pc[64] = {
 */
 INLINE void tms0980_next_pc( tms0980_state *cpustate )
 {
-	if ( cpustate->byte_size > 8 )
+	if ( cpustate->m_byte_size > 8 )
 	{
-		UINT8	xorval = ( cpustate->pc & 0x3F ) == 0x3F ? 1 : 0;
-		UINT8	new_bit = ( ( cpustate->pc ^ ( cpustate->pc << 1 ) ) & 0x40 ) ? xorval : 1 - xorval;
+		UINT8	xorval = ( cpustate->m_pc & 0x3F ) == 0x3F ? 1 : 0;
+		UINT8	new_bit = ( ( cpustate->m_pc ^ ( cpustate->m_pc << 1 ) ) & 0x40 ) ? xorval : 1 - xorval;
 
-		cpustate->pc = ( cpustate->pc << 1 ) | new_bit;
+		cpustate->m_pc = ( cpustate->m_pc << 1 ) | new_bit;
 	}
 	else
 	{
-		cpustate->pc = tms1000_next_pc[ cpustate->pc & 0x3f ];
+		cpustate->m_pc = tms1000_next_pc[ cpustate->m_pc & 0x3f ];
 	}
 }
 
@@ -776,23 +776,23 @@ static void tms0980_set_cki_bus( device_t *device )
 {
 	tms0980_state *cpustate = get_safe_token( device );
 
-	switch( cpustate->opcode & 0x1F8 )
+	switch( cpustate->m_opcode & 0x1F8 )
 	{
 	case 0x008:
 		if ( !cpustate->m_read_k.isnull() )
 		{
-			cpustate->cki_bus = cpustate->m_read_k( 0, 0xff );
+			cpustate->m_cki_bus = cpustate->m_read_k( 0, 0xff );
 		}
 		else
 		{
-			cpustate->cki_bus = 0x0F;
+			cpustate->m_cki_bus = 0x0F;
 		}
 		break;
 	case 0x020: case 0x028:
-		cpustate->cki_bus = 0;
+		cpustate->m_cki_bus = 0;
 		break;
 	case 0x030: case 0x038:
-		cpustate->cki_bus = tms0980_nbit_value[ cpustate->opcode & 0x03 ];
+		cpustate->m_cki_bus = tms0980_nbit_value[ cpustate->m_opcode & 0x03 ];
 		break;
 	case 0x000:
 	case 0x040: case 0x048:
@@ -805,10 +805,10 @@ static void tms0980_set_cki_bus( device_t *device )
 	case 0x0d0: case 0x0d8:
 	case 0x0e0: case 0x0e8:
 	case 0x0f0: case 0x0f8:
-		cpustate->cki_bus = tms0980_c4_value[ cpustate->opcode & 0x0F ];
+		cpustate->m_cki_bus = tms0980_c4_value[ cpustate->m_opcode & 0x0F ];
 		break;
 	default:
-		cpustate->cki_bus = 0x0F;
+		cpustate->m_cki_bus = 0x0F;
 		break;
 	}
 }
@@ -820,87 +820,83 @@ static CPU_EXECUTE( tms0980 )
 
 	do
 	{
-//      debugger_instruction_hook( device, ( ( cpustate->pa << cpustate->pc_size ) | cpustate->pc ) << 1 );
-		cpustate->icount--;
-		switch( cpustate->subcycle )
+//      debugger_instruction_hook( device, ( ( cpustate->m_pa << cpustate->m_pc_size ) | cpustate->m_pc ) << 1 );
+		cpustate->m_icount--;
+		switch( cpustate->m_subcycle )
 		{
 		case 0:
 			/* fetch: rom address 0 */
 			/* execute: read ram, alu input, execute br/call, k input valid */
 			tms0980_set_cki_bus( device );
-			cpustate->ram_data = cpustate->data->read_byte( cpustate->ram_address );
-			cpustate->status = 1;
-			cpustate->p = 0;
-			cpustate->n = 0;
-			cpustate->carry_in = 0;
+			cpustate->m_ram_data = cpustate->m_data->read_byte( cpustate->m_ram_address );
+			cpustate->m_status = 1;
+			cpustate->m_p = 0;
+			cpustate->m_n = 0;
+			cpustate->m_carry_in = 0;
 			break;
 		case 1:
 			/* fetch: rom address 1 */
-			if ( cpustate->pc_size == 6 )
-//				cpustate->rom_address = ( cpustate->pa << 6 ) | tms1000_pc_decode[ cpustate->pc ];
-				cpustate->rom_address = ( cpustate->pa << 6 ) | cpustate->pc;
-			else
-				cpustate->rom_address = ( cpustate->pa << 7 ) | cpustate->pc;
+			cpustate->m_rom_address = ( cpustate->m_ca << ( cpustate->m_pc_size + 4 ) ) | ( cpustate->m_pa << cpustate->m_pc_size ) | cpustate->m_pc;
 			/* execute: k input valid */
-			if ( cpustate->decode & MICRO_MASK )
+			if ( cpustate->m_decode & MICRO_MASK )
 			{
 				/* Check N inputs */
-				if ( cpustate->decode & ( M_15TN | M_ATN | M_CKN | M_MTN | M_NATN ) )
+				if ( cpustate->m_decode & ( M_15TN | M_ATN | M_CKN | M_MTN | M_NATN ) )
 				{
-					cpustate->n = 0;
-					if ( cpustate->decode & M_15TN )
+					cpustate->m_n = 0;
+					if ( cpustate->m_decode & M_15TN )
 					{
-						cpustate->n |= 0x0F;
+						cpustate->m_n |= 0x0F;
 					}
-					if ( cpustate->decode & M_ATN )
+					if ( cpustate->m_decode & M_ATN )
 					{
-						cpustate->n |= cpustate->a;
+						cpustate->m_n |= cpustate->m_a;
 					}
-					if ( cpustate->decode & M_CKN )
+					if ( cpustate->m_decode & M_CKN )
 					{
-						cpustate->n |= cpustate->cki_bus;
+						cpustate->m_n |= cpustate->m_cki_bus;
 					}
-					if ( cpustate->decode & M_MTN )
+					if ( cpustate->m_decode & M_MTN )
 					{
-						cpustate->n |= cpustate->ram_data;
+						cpustate->m_n |= cpustate->m_ram_data;
 					}
-					if ( cpustate->decode & M_NATN )
+					if ( cpustate->m_decode & M_NATN )
 					{
-						cpustate->n |= ( ( ~cpustate->a ) & 0x0F );
+						cpustate->m_n |= ( ( ~cpustate->m_a ) & 0x0F );
 					}
 				}
 
 
 				/* Check P inputs */
-				if ( cpustate->decode & ( M_CKP | M_DMTP | M_MTP | M_NDMTP | M_YTP ) )
+				if ( cpustate->m_decode & ( M_CKP | M_DMTP | M_MTP | M_NDMTP | M_YTP ) )
 				{
-					cpustate->p = 0;
-					if ( cpustate->decode & M_CKP )
+					cpustate->m_p = 0;
+					if ( cpustate->m_decode & M_CKP )
 					{
-						cpustate->p |= cpustate->cki_bus;
+						cpustate->m_p |= cpustate->m_cki_bus;
 					}
-					if ( cpustate->decode & M_DMTP )
+					if ( cpustate->m_decode & M_DMTP )
 					{
-						cpustate->p |= cpustate->dam;
+						cpustate->m_p |= cpustate->m_dam;
 					}
-					if ( cpustate->decode & M_MTP )
+					if ( cpustate->m_decode & M_MTP )
 					{
-						cpustate->p |= cpustate->ram_data;
+						cpustate->m_p |= cpustate->m_ram_data;
 					}
-					if ( cpustate->decode & M_NDMTP )
+					if ( cpustate->m_decode & M_NDMTP )
 					{
-						cpustate->p |= ( ( ~cpustate->dam ) & 0x0F );
+						cpustate->m_p |= ( ( ~cpustate->m_dam ) & 0x0F );
 					}
-					if ( cpustate->decode & M_YTP )
+					if ( cpustate->m_decode & M_YTP )
 					{
-						cpustate->p |= cpustate->y;
+						cpustate->m_p |= cpustate->m_y;
 					}
 				}
 
 				/* Carry In input */
-				if ( cpustate->decode & M_CIN )
+				if ( cpustate->m_decode & M_CIN )
 				{
-					cpustate->carry_in = 1;
+					cpustate->m_carry_in = 1;
 				}
 			}
 			break;
@@ -908,124 +904,135 @@ static CPU_EXECUTE( tms0980 )
 			/* fetch: nothing */
 			/* execute: write ram */
 			/* perform adder logic */
-			cpustate->adder_result = cpustate->p + cpustate->n + cpustate->carry_in;
-			if ( cpustate->decode & MICRO_MASK )
+			cpustate->m_adder_result = cpustate->m_p + cpustate->m_n + cpustate->m_carry_in;
+			if ( cpustate->m_decode & MICRO_MASK )
 			{
-				if ( cpustate->decode & M_NE )
+				if ( cpustate->m_decode & M_NE )
 				{
-					if ( cpustate->n == cpustate->p )
+					if ( cpustate->m_n == cpustate->m_p )
 					{
-						cpustate->status = 0;
+						cpustate->m_status = 0;
 					}
 				}
-				if ( cpustate->decode & M_C8 )
+				if ( cpustate->m_decode & M_C8 )
 				{
-					cpustate->status = cpustate->adder_result >> 4;
+					cpustate->m_status = cpustate->m_adder_result >> 4;
 				}
-				if ( cpustate->decode & M_STO )
+				if ( cpustate->m_decode & M_STO )
 				{
-					cpustate->data->write_byte( cpustate->ram_address, cpustate->a );
+//printf("write ram %02x data %01x\n", cpustate->m_ram_address, cpustate->m_a );
+					cpustate->m_data->write_byte( cpustate->m_ram_address, cpustate->m_a );
 				}
-				if ( cpustate->decode & M_CKM )
+				if ( cpustate->m_decode & M_CKM )
 				{
-					cpustate->data->write_byte( cpustate->ram_address, cpustate->cki_bus );
+//printf("write ram %02x data %01x\n", cpustate->m_ram_address, cpustate->m_cki_bus );
+					cpustate->m_data->write_byte( cpustate->m_ram_address, cpustate->m_cki_bus );
 				}
 			}
 			else
 			{
-				if ( cpustate->decode & F_SBIT )
+				if ( cpustate->m_decode & F_SBIT )
 				{
-					cpustate->data->write_byte( cpustate->ram_address, cpustate->ram_data | tms0980_bit_value[ cpustate->opcode & 0x03 ] );
+//printf("write ram %02x data %01x\n", cpustate->m_ram_address, cpustate->m_ram_data | tms0980_bit_value[ cpustate->m_opcode & 0x03 ] );
+					cpustate->m_data->write_byte( cpustate->m_ram_address, cpustate->m_ram_data | tms0980_bit_value[ cpustate->m_opcode & 0x03 ] );
 				}
-				if ( cpustate->decode & F_RBIT )
+				if ( cpustate->m_decode & F_RBIT )
 				{
-					cpustate->data->write_byte( cpustate->ram_address, cpustate->ram_data & tms0980_nbit_value[ cpustate->opcode & 0x03 ] );
+//printf("write ram %02x data %01x\n", cpustate->m_ram_address, cpustate->m_ram_data & tms0980_nbit_value[ cpustate->m_opcode & 0x03 ] );
+					cpustate->m_data->write_byte( cpustate->m_ram_address, cpustate->m_ram_data & tms0980_nbit_value[ cpustate->m_opcode & 0x03 ] );
 				}
-				if ( cpustate->decode & F_SETR )
+				if ( cpustate->m_decode & F_SETR )
 				{
-					cpustate->r = cpustate->r | ( 1 << cpustate->y );
+					cpustate->m_r = cpustate->m_r | ( 1 << cpustate->m_y );
 					if ( !cpustate->m_write_r.isnull() )
 					{
-						cpustate->m_write_r( 0, cpustate->r & cpustate->r_mask, 0xffff );
+						cpustate->m_write_r( 0, cpustate->m_r & cpustate->m_r_mask, 0xffff );
 					}
 				}
-				if ( cpustate->decode & F_RSTR )
+				if ( cpustate->m_decode & F_RSTR )
 				{
-					cpustate->r = cpustate->r & ( ~( 1 << cpustate->y ) );
+					cpustate->m_r = cpustate->m_r & ( ~( 1 << cpustate->m_y ) );
 					if ( !cpustate->m_write_r.isnull() )
 					{
-						cpustate->m_write_r( 0, cpustate->r & cpustate->r_mask, 0xffff );
+						cpustate->m_write_r( 0, cpustate->m_r & cpustate->m_r_mask, 0xffff );
 					}
 				}
-				if ( cpustate->decode & F_TDO )
+				if ( cpustate->m_decode & F_TDO )
 				{
-					int i = 0;
-
 					/* Calculate O-outputs based on status latch, A, and the output PLA configuration */
-					cpustate->o = 0;
-					for ( i = 0; i < 20; i++ )
-					{
-						if ( ( ( cpustate->status_latch << 4 ) | cpustate->a ) == cpustate->config->o_pla[i].value )
-						{
-							cpustate->o = cpustate->config->o_pla[i].output;
-						}
-					}
+//printf("o output m_status_latch = %X, m_a = %X\n", cpustate->m_status_latch, cpustate->m_a);
+					cpustate->m_o = cpustate->config->o_pla[ ( cpustate->m_status_latch << 4 ) | cpustate->m_a ];
+//if ( cpustate->m_o == 0 )
+//printf("****** o output m_status_latch = %X, m_a = %X\n", cpustate->m_status_latch, cpustate->m_a);
+//else
+//printf("o output m_status_latch = %X, m_a = %X\n", cpustate->m_status_latch, cpustate->m_a);
 
 					if ( !cpustate->m_write_o.isnull() )
 					{
-						cpustate->m_write_o( 0, cpustate->o & cpustate->o_mask, 0xffff );
+						cpustate->m_write_o( 0, cpustate->m_o & cpustate->m_o_mask, 0xffff );
 					}
 				}
-				if ( cpustate->decode & F_CLO )
+				if ( cpustate->m_decode & F_CLO )
 				{
-					cpustate->o = 0;
+					cpustate->m_o = 0;
 					if ( !cpustate->m_write_o.isnull() )
 					{
-						cpustate->m_write_o( 0, cpustate->o & cpustate->o_mask, 0xffff );
+						cpustate->m_write_o( 0, cpustate->m_o & cpustate->m_o_mask, 0xffff );
 					}
 				}
-				if ( cpustate->decode & F_LDX )
+				if ( cpustate->m_decode & F_LDX )
 				{
 					switch( cpustate->m_x_bits )
 					{
 						case 2:
-							cpustate->x = tms0980_c2_value[ cpustate->opcode & 0x03 ];
+							cpustate->m_x = tms0980_c2_value[ cpustate->m_opcode & 0x03 ];
 							break;
 						case 3:
-							cpustate->x = tms0980_c3_value[ cpustate->opcode & 0x07 ];
+							cpustate->m_x = tms0980_c3_value[ cpustate->m_opcode & 0x07 ];
 							break;
 						case 4:
-							cpustate->x = tms0980_c4_value[ cpustate->opcode & 0x0f ];
+							cpustate->m_x = tms0980_c4_value[ cpustate->m_opcode & 0x0f ];
 							break;
 					}
 				}
-				if ( cpustate->decode & F_COMX )
+				if ( cpustate->m_decode & F_COMX )
 				{
-					cpustate->x = cpustate->x ^ 0x03;
+					switch ( cpustate->m_x_bits )
+					{
+						case 2:
+							cpustate->m_x = cpustate->m_x ^ 0x03;
+							break;
+						case 3:
+							cpustate->m_x = cpustate->m_x ^ 0x07;
+							break;
+						case 4:
+							cpustate->m_x = cpustate->m_x ^ 0x0f;
+							break;
+					}
 				}
-				if ( cpustate->decode & F_COMC )
+				if ( cpustate->m_decode & F_COMC )
 				{
-					cpustate->cb = cpustate->cb ^ 0x01;
+					cpustate->m_cb = cpustate->m_cb ^ 0x01;
 				}
-				if ( cpustate->decode & F_LDP )
+				if ( cpustate->m_decode & F_LDP )
 				{
-					cpustate->pb = tms0980_c4_value[ cpustate->opcode & 0x0F ];
+					cpustate->m_pb = tms0980_c4_value[ cpustate->m_opcode & 0x0F ];
 				}
-				if ( cpustate->decode & F_REAC )
+				if ( cpustate->m_decode & F_REAC )
 				{
-					cpustate->special_status = 0;
+					cpustate->m_special_status = 0;
 				}
-				if ( cpustate->decode & F_SEAC )
+				if ( cpustate->m_decode & F_SEAC )
 				{
-					cpustate->special_status = 1;
+					cpustate->m_special_status = 1;
 				}
-				if ( cpustate->decode == F_SAL )
+				if ( cpustate->m_decode == F_SAL )
 				{
-					cpustate->add_latch = 1;
+					cpustate->m_add_latch = 1;
 				}
-				if ( cpustate->decode == F_SBL )
+				if ( cpustate->m_decode == F_SBL )
 				{
-					cpustate->branch_latch = 1;
+					cpustate->m_branch_latch = 1;
 				}
 			}
 			break;
@@ -1035,82 +1042,86 @@ static CPU_EXECUTE( tms0980 )
 			break;
 		case 4:
 			/* execute: register store */
-			if ( cpustate->decode & MICRO_MASK )
+			if ( cpustate->m_decode & MICRO_MASK )
 			{
-				if ( cpustate->decode & M_AUTA )
+				if ( cpustate->m_decode & M_AUTA )
 				{
-					cpustate->a = cpustate->adder_result & 0x0F;
+					cpustate->m_a = cpustate->m_adder_result & 0x0F;
 				}
-				if ( cpustate->decode & M_AUTY )
+				if ( cpustate->m_decode & M_AUTY )
 				{
-					cpustate->y = cpustate->adder_result & 0x0F;
+					cpustate->m_y = cpustate->m_adder_result & 0x0F;
 				}
-				if ( cpustate->decode & M_STSL )
+				if ( cpustate->m_decode & M_STSL )
 				{
-					cpustate->status_latch = cpustate->status;
+					cpustate->m_status_latch = cpustate->m_status;
 				}
 			}
 			/* fetch: fetch, update pc, ram address */
-			if ( cpustate->byte_size > 8 )
+			if ( cpustate->m_byte_size > 8 )
 			{
-				debugger_instruction_hook( device, cpustate->rom_address << 1 );
-				cpustate->opcode = cpustate->program->read_word( cpustate->rom_address << 1 ) & 0x1FF;
+				debugger_instruction_hook( device, cpustate->m_rom_address << 1 );
+				cpustate->m_opcode = cpustate->m_program->read_word( cpustate->m_rom_address << 1 ) & 0x1FF;
 			}
 			else
 			{
-				debugger_instruction_hook( device, cpustate->rom_address );
-				cpustate->opcode = cpustate->program->read_byte( cpustate->rom_address );
+				debugger_instruction_hook( device, cpustate->m_rom_address );
+				cpustate->m_opcode = cpustate->m_program->read_byte( cpustate->m_rom_address );
 			}
 			tms0980_next_pc( cpustate );
 			if (LOG)
-				logerror( "tms0980: read opcode %04x from %04x. Set pc to %04x\n", cpustate->opcode, cpustate->rom_address, cpustate->pc );
+				logerror( "tms0980: read opcode %04x from %04x. Set pc to %04x\n", cpustate->m_opcode, cpustate->m_rom_address, cpustate->m_pc );
 
 			/* ram address */
-			cpustate->ram_address = ( cpustate->x << 4 ) | cpustate->y;
+			cpustate->m_ram_address = ( cpustate->m_x << 4 ) | cpustate->m_y;
 			break;
 		case 5:
 			/* fetch: instruction decode */
-			cpustate->decode = cpustate->decode_table[ cpustate->opcode ];
+			cpustate->m_decode = cpustate->m_decode_table[ cpustate->m_opcode ];
 			/* execute: execute br/call */
-			if ( cpustate->status )
+			if ( cpustate->m_status )
 			{
-				if ( cpustate->decode == F_BR )
+				if ( cpustate->m_decode == F_BR )
 				{
-					if ( cpustate->call_latch == 0 )
+					cpustate->m_ca = cpustate->m_cb;
+					if ( cpustate->m_call_latch == 0 )
 					{
-						cpustate->pa = cpustate->pb;
+						cpustate->m_pa = cpustate->m_pb;
 					}
-					cpustate->pc = cpustate->opcode & ( ( 1 << cpustate->pc_size ) - 1 );
+					cpustate->m_pc = cpustate->m_opcode & ( ( 1 << cpustate->m_pc_size ) - 1 );
 				}
-				if ( cpustate->decode == F_CALL )
+				if ( cpustate->m_decode == F_CALL )
 				{
-					UINT8 t = cpustate->pa;
-					if ( cpustate->call_latch == 0 )
+					UINT8 t = cpustate->m_pa;
+					if ( cpustate->m_call_latch == 0 )
 					{
-						cpustate->sr = cpustate->pc;
-						cpustate->call_latch = 1;
-						cpustate->pa = cpustate->pb;
+						cpustate->m_sr = cpustate->m_pc;
+						cpustate->m_call_latch = 1;
+						cpustate->m_pa = cpustate->m_pb;
+						cpustate->m_cs = cpustate->m_ca;
 					}
-					cpustate->pb = t;
-					cpustate->pc = cpustate->opcode & ( ( 1 << cpustate->pc_size ) - 1 );
+					cpustate->m_ca = cpustate->m_cb;
+					cpustate->m_pb = t;
+					cpustate->m_pc = cpustate->m_opcode & ( ( 1 << cpustate->m_pc_size ) - 1 );
 				}
 			}
-			if ( cpustate->decode == F_RETN )
+			if ( cpustate->m_decode == F_RETN )
 			{
-				if ( cpustate->call_latch == 1 )
+				if ( cpustate->m_call_latch == 1 )
 				{
-					cpustate->pc = cpustate->sr;
-					cpustate->call_latch = 0;
+					cpustate->m_pc = cpustate->m_sr;
+					cpustate->m_call_latch = 0;
+					cpustate->m_ca = cpustate->m_cs;
 				}
-				cpustate->add_latch = 0;
-				cpustate->pa = cpustate->pb;
+				cpustate->m_add_latch = 0;
+				cpustate->m_pa = cpustate->m_pb;
 			} else {
-				cpustate->branch_latch = 0;
+				cpustate->m_branch_latch = 0;
 			}
 			break;
 		}
-		cpustate->subcycle = ( cpustate->subcycle + 1 ) % 6;
-	} while( cpustate->icount > 0 );
+		cpustate->m_subcycle = ( cpustate->m_subcycle + 1 ) % 6;
+	} while( cpustate->m_icount > 0 );
 }
 
 
@@ -1120,15 +1131,15 @@ static CPU_SET_INFO( tms0980 )
 
 	switch( state )
 	{
-		case CPUINFO_INT_PC:										cpustate->pc = ( info->i >> 1 ) & 0x7f; cpustate->pa = info->i >> 8; break;
-		case CPUINFO_INT_REGISTER + TMS0980_PC:						cpustate->pc = info->i; break;
-		case CPUINFO_INT_REGISTER + TMS0980_SR:						cpustate->sr = info->i; break;
-		case CPUINFO_INT_REGISTER + TMS0980_PA:						cpustate->pa = info->i; break;
-		case CPUINFO_INT_REGISTER + TMS0980_PB:						cpustate->pb = info->i; break;
-		case CPUINFO_INT_REGISTER + TMS0980_A:						cpustate->a = info->i; break;
-		case CPUINFO_INT_REGISTER + TMS0980_X:						cpustate->x = info->i; break;
-		case CPUINFO_INT_REGISTER + TMS0980_Y:						cpustate->y = info->i; break;
-		case CPUINFO_INT_REGISTER + TMS0980_STATUS:					cpustate->status = info->i; break;
+		case CPUINFO_INT_PC:										cpustate->m_pc = ( info->i >> 1 ) & 0x7f; cpustate->m_pa = ( info->i >> 8 ) & 0x0F; cpustate->m_cb = ( info->i >> 12 ) & 0x01; break;
+		case CPUINFO_INT_REGISTER + TMS0980_PC:						cpustate->m_pc = info->i; break;
+		case CPUINFO_INT_REGISTER + TMS0980_SR:						cpustate->m_sr = info->i; break;
+		case CPUINFO_INT_REGISTER + TMS0980_PA:						cpustate->m_pa = info->i; break;
+		case CPUINFO_INT_REGISTER + TMS0980_PB:						cpustate->m_pb = info->i; break;
+		case CPUINFO_INT_REGISTER + TMS0980_A:						cpustate->m_a = info->i; break;
+		case CPUINFO_INT_REGISTER + TMS0980_X:						cpustate->m_x = info->i; break;
+		case CPUINFO_INT_REGISTER + TMS0980_Y:						cpustate->m_y = info->i; break;
+		case CPUINFO_INT_REGISTER + TMS0980_STATUS:					cpustate->m_status = info->i; break;
 	}
 }
 
@@ -1151,23 +1162,23 @@ static CPU_GET_INFO( tms_generic )
 		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:			info->i = 8 /* 4 */; break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:			info->i = 0; break;
 
-		case CPUINFO_INT_PREVIOUSPC:									info->i = ( ( cpustate->prev_pa << 7 ) | cpustate->prev_pc ) << 1; break;
-		case CPUINFO_INT_PC:											info->i = ( ( cpustate->pa << 7 ) | cpustate->pc ) << 1; break;
+		case CPUINFO_INT_PREVIOUSPC:									info->i = ( ( cpustate->m_prev_pa << 7 ) | cpustate->m_prev_pc ) << 1; break;
+		case CPUINFO_INT_PC:											info->i = ( ( cpustate->m_pa << 7 ) | cpustate->m_pc ) << 1; break;
 		case CPUINFO_INT_SP:											info->i = 0xFFFF; break;
-		case CPUINFO_INT_REGISTER + TMS0980_PC:							info->i = cpustate->pc; break;
-		case CPUINFO_INT_REGISTER + TMS0980_SR:							info->i = cpustate->sr; break;
-		case CPUINFO_INT_REGISTER + TMS0980_PA:							info->i = cpustate->pa; break;
-		case CPUINFO_INT_REGISTER + TMS0980_PB:							info->i = cpustate->pb; break;
-		case CPUINFO_INT_REGISTER + TMS0980_A:							info->i = cpustate->a; break;
-		case CPUINFO_INT_REGISTER + TMS0980_X:							info->i = cpustate->x; break;
-		case CPUINFO_INT_REGISTER + TMS0980_Y:							info->i = cpustate->y; break;
-		case CPUINFO_INT_REGISTER + TMS0980_STATUS:						info->i = cpustate->status; break;
+		case CPUINFO_INT_REGISTER + TMS0980_PC:							info->i = cpustate->m_pc; break;
+		case CPUINFO_INT_REGISTER + TMS0980_SR:							info->i = cpustate->m_sr; break;
+		case CPUINFO_INT_REGISTER + TMS0980_PA:							info->i = cpustate->m_pa; break;
+		case CPUINFO_INT_REGISTER + TMS0980_PB:							info->i = cpustate->m_pb; break;
+		case CPUINFO_INT_REGISTER + TMS0980_A:							info->i = cpustate->m_a; break;
+		case CPUINFO_INT_REGISTER + TMS0980_X:							info->i = cpustate->m_x; break;
+		case CPUINFO_INT_REGISTER + TMS0980_Y:							info->i = cpustate->m_y; break;
+		case CPUINFO_INT_REGISTER + TMS0980_STATUS:						info->i = cpustate->m_status; break;
 
 		case CPUINFO_FCT_SET_INFO:										info->setinfo = CPU_SET_INFO_NAME( tms0980 ); break;
 		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME( tms0980 ); break;
 		case CPUINFO_FCT_RESET:											info->reset = CPU_RESET_NAME( tms0980 ); break;
 		case CPUINFO_FCT_EXECUTE:										info->execute = CPU_EXECUTE_NAME( tms0980 ); break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:							info->icount = &cpustate->icount; break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:							info->icount = &cpustate->m_icount; break;
 
 		case CPUINFO_STR_FAMILY:										strcpy( info->s, "Texas Instruments TMS0980/TMS1000" ); break;
 		case CPUINFO_STR_VERSION:										strcpy( info->s, "0.2" ); break;
@@ -1176,14 +1187,14 @@ static CPU_GET_INFO( tms_generic )
 
 		case CPUINFO_STR_FLAGS:											strcpy( info->s, "N/A" ); break;
 
-		case CPUINFO_STR_REGISTER + TMS0980_PC:							sprintf( info->s, "PC:%02X", cpustate->pc ); break;
-		case CPUINFO_STR_REGISTER + TMS0980_SR:							sprintf( info->s, "SR:%01X", cpustate->sr ); break;
-		case CPUINFO_STR_REGISTER + TMS0980_PA:							sprintf( info->s, "PA:%01X", cpustate->pa ); break;
-		case CPUINFO_STR_REGISTER + TMS0980_PB:							sprintf( info->s, "PB:%01X", cpustate->pb ); break;
-		case CPUINFO_STR_REGISTER + TMS0980_A:							sprintf( info->s, "A:%01X", cpustate->a ); break;
-		case CPUINFO_STR_REGISTER + TMS0980_X:							sprintf( info->s, "X:%01X", cpustate->x ); break;
-		case CPUINFO_STR_REGISTER + TMS0980_Y:							sprintf( info->s, "Y:%01X", cpustate->y ); break;
-		case CPUINFO_STR_REGISTER + TMS0980_STATUS:						sprintf( info->s, "STATUS:%01X", cpustate->status ); break;
+		case CPUINFO_STR_REGISTER + TMS0980_PC:							sprintf( info->s, "PC:%02X", cpustate->m_pc ); break;
+		case CPUINFO_STR_REGISTER + TMS0980_SR:							sprintf( info->s, "SR:%01X", cpustate->m_sr ); break;
+		case CPUINFO_STR_REGISTER + TMS0980_PA:							sprintf( info->s, "PA:%01X", cpustate->m_pa ); break;
+		case CPUINFO_STR_REGISTER + TMS0980_PB:							sprintf( info->s, "PB:%01X", cpustate->m_pb ); break;
+		case CPUINFO_STR_REGISTER + TMS0980_A:							sprintf( info->s, "A:%01X", cpustate->m_a ); break;
+		case CPUINFO_STR_REGISTER + TMS0980_X:							sprintf( info->s, "X:%01X", cpustate->m_x ); break;
+		case CPUINFO_STR_REGISTER + TMS0980_Y:							sprintf( info->s, "Y:%01X", cpustate->m_y ); break;
+		case CPUINFO_STR_REGISTER + TMS0980_STATUS:						sprintf( info->s, "STATUS:%01X", cpustate->m_status ); break;
 
 	}
 }
@@ -1200,8 +1211,8 @@ CPU_GET_INFO( tms0980 )
 		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 16 /* 9 */; break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 12; break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 7; break;
-		case CPUINFO_INT_PREVIOUSPC:									info->i = ( ( cpustate->prev_pa << 7 ) | cpustate->prev_pc ) << 1; break;
-		case CPUINFO_INT_PC:											info->i = ( ( cpustate->pa << 7 ) | cpustate->pc ) << 1; break;
+		case CPUINFO_INT_PREVIOUSPC:									info->i = ( ( cpustate->m_prev_pa << 7 ) | cpustate->m_prev_pc ) << 1; break;
+		case CPUINFO_INT_PC:											info->i = ( ( cpustate->m_pa << 7 ) | cpustate->m_pc ) << 1; break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:					info->internal_map16 = ADDRESS_MAP_NAME( tms0980_internal_rom ); break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:						info->internal_map8 = ADDRESS_MAP_NAME( tms0980_internal_ram ); break;
 		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME( tms0980 ); break;
@@ -1223,8 +1234,8 @@ CPU_GET_INFO( tms1000 )
 		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8; break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 10; break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 6; break;
-		case CPUINFO_INT_PREVIOUSPC:									info->i = ( cpustate->prev_pa << 6 ) | tms1000_pc_decode[ cpustate->prev_pc ]; break;
-		case CPUINFO_INT_PC:											info->i = ( cpustate->pa << 6 ) | tms1000_pc_decode[ cpustate->pc ]; break;
+		case CPUINFO_INT_PREVIOUSPC:									info->i = ( cpustate->m_prev_pa << 6 ) | tms1000_pc_decode[ cpustate->m_prev_pc ]; break;
+		case CPUINFO_INT_PC:											info->i = ( cpustate->m_pa << 6 ) | tms1000_pc_decode[ cpustate->m_pc ]; break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:					info->internal_map8 = ADDRESS_MAP_NAME( program_10bit_8 ); break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:						info->internal_map8 = ADDRESS_MAP_NAME( data_6bit ); break;
 		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME( tms1000 ); break;
@@ -1280,8 +1291,8 @@ CPU_GET_INFO( tms1100 )
 		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8; break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 11; break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 7; break;
-		case CPUINFO_INT_PREVIOUSPC:									info->i = ( cpustate->prev_pa << 6 ) | tms1000_pc_decode[ cpustate->prev_pc ]; break;
-		case CPUINFO_INT_PC:											info->i = ( cpustate->pa << 6 ) | cpustate->pc; break;
+		case CPUINFO_INT_PREVIOUSPC:									info->i = ( cpustate->m_prev_pa << 6 ) | cpustate->m_prev_pc; break;
+		case CPUINFO_INT_PC:											info->i = ( cpustate->m_ca << 10 ) | ( cpustate->m_pa << 6 ) | cpustate->m_pc; break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:					info->internal_map8 = ADDRESS_MAP_NAME( program_11bit_8 ); break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:						info->internal_map8 = ADDRESS_MAP_NAME( data_7bit ); break;
 		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME( tms1100 ); break;
