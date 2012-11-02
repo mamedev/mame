@@ -32,7 +32,7 @@ public:
 	m_audiocpu(*this, "audiocpu"),
 	m_dac(*this, "dac"),
 	m_hc55516(*this, "hc55516"),
-	m_pia(*this, "pia"),
+	m_pias(*this, "pias"),
 	m_pia22(*this, "pia22"),
 	m_pia24(*this, "pia24"),
 	m_pia28(*this, "pia28"),
@@ -52,9 +52,9 @@ public:
 	DECLARE_WRITE8_MEMBER(switch_w);
 	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
-	DECLARE_READ_LINE_MEMBER(pia_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
+	DECLARE_READ_LINE_MEMBER(pias_cb1_r);
+	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
 	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { }; //ST-solenoids enable
 	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { }; //ST2
@@ -74,7 +74,7 @@ protected:
 	required_device<cpu_device> m_audiocpu;
 	required_device<dac_device> m_dac;
 	required_device<hc55516_device> m_hc55516;
-	required_device<pia6821_device> m_pia;
+	required_device<pia6821_device> m_pias;
 	required_device<pia6821_device> m_pia22;
 	required_device<pia6821_device> m_pia24;
 	required_device<pia6821_device> m_pia28;
@@ -101,7 +101,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s6a_audio_map, AS_PROGRAM, 8, s6a_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pia", pia6821_device, read, write) // sounds
+	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pias", pia6821_device, read, write)
 	AM_RANGE(0xA000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -283,9 +283,9 @@ WRITE8_MEMBER( s6a_state::sol1_w )
 	if (BIT(data, 4))
 		m_sound_data &= 0x7f;
 
-	m_cb1 = ((m_sound_data & 0x7f) != 0x7f);
+	m_cb1 = ((m_sound_data & 0x9f) != 0x9f);
 
-	m_pia->cb1_w(m_cb1);
+	m_pias->cb1_w(m_cb1);
 
 //	if (BIT(data, 5))
 //		m_samples->start(0, 6); // knocker
@@ -428,18 +428,18 @@ static const pia6821_interface pia30_intf =
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
 
-READ_LINE_MEMBER( s6a_state::pia_cb1_r )
+READ_LINE_MEMBER( s6a_state::pias_cb1_r )
 {
 	return m_cb1;
 }
 
-WRITE_LINE_MEMBER( s6a_state::pia_cb2_w )
+WRITE_LINE_MEMBER( s6a_state::pias_cb2_w )
 {
 // speech clock
 	hc55516_clock_w(m_hc55516, state);
 }
 
-WRITE_LINE_MEMBER( s6a_state::pia_ca2_w )
+WRITE_LINE_MEMBER( s6a_state::pias_ca2_w )
 {
 // speech data
 	hc55516_digit_w(m_hc55516, state);
@@ -455,18 +455,18 @@ WRITE8_MEMBER( s6a_state::dac_w )
 	m_dac->write_unsigned8(data);
 }
 
-static const pia6821_interface pia_intf =
+static const pia6821_interface pias_intf =
 {
 	DEVCB_NULL,		/* port A in */
 	DEVCB_DRIVER_MEMBER(s6a_state, dac_r),		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_DRIVER_LINE_MEMBER(s6a_state, pia_cb1_r),		/* line CB1 in */
+	DEVCB_DRIVER_LINE_MEMBER(s6a_state, pias_cb1_r),		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DRIVER_MEMBER(s6a_state, dac_w),		/* port A out */
 	DEVCB_NULL,		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s6a_state, pia_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s6a_state, pia_cb2_w),		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s6a_state, pias_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s6a_state, pias_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE)		/* IRQB */
 };
@@ -503,11 +503,11 @@ static MACHINE_CONFIG_START( s6a, s6a_state )
 	MCFG_CPU_PROGRAM_MAP(s6a_audio_map)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SPEAKER_STANDARD_MONO("speech")
 	MCFG_SOUND_ADD("hc55516", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 0.50)
-	MCFG_PIA6821_ADD("pia", pia_intf)
+	MCFG_PIA6821_ADD("pias", pias_intf)
 MACHINE_CONFIG_END
 
 
@@ -568,7 +568,7 @@ ROM_START(alpok_f6)
 ROM_END
 
 
-GAME(1980,algar_l1, 0,       s6a, s6a, driver_device, 0, ROT0, "Williams", "Algar (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
-GAME(1980,alpok_l6, 0,       s6a, s6a, driver_device, 0, ROT0, "Williams", "Alien Poker (L-6)", GAME_MECHANICAL | GAME_NOT_WORKING)
-GAME(1980,alpok_l2, alpok_l6,s6a, s6a, driver_device, 0, ROT0, "Williams", "Alien Poker (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING)
-GAME(1980,alpok_f6, alpok_l6,s6a, s6a, driver_device, 0, ROT0, "Williams", "Alien Poker (L-6 French speech)", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME(1980,algar_l1, 0,       s6a, s6a, driver_device, 0, ROT0, "Williams", "Algar (L-1)", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME(1980,alpok_l6, 0,       s6a, s6a, driver_device, 0, ROT0, "Williams", "Alien Poker (L-6)", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME(1980,alpok_l2, alpok_l6,s6a, s6a, driver_device, 0, ROT0, "Williams", "Alien Poker (L-2)", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME(1980,alpok_f6, alpok_l6,s6a, s6a, driver_device, 0, ROT0, "Williams", "Alien Poker (L-6 French speech)", GAME_MECHANICAL | GAME_NO_SOUND)

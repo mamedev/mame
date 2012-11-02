@@ -33,7 +33,7 @@ public:
 	m_audiocpu(*this, "audiocpu"),
 	m_dac(*this, "dac"),
 	m_hc55516(*this, "hc55516"),
-	m_pia(*this, "pia"),
+	m_pias(*this, "pias"),
 	m_pia21(*this, "pia21"),
 	m_pia24(*this, "pia24"),
 	m_pia28(*this, "pia28"),
@@ -52,12 +52,12 @@ public:
 	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ_LINE_MEMBER(pia_ca1_r);
+	DECLARE_READ_LINE_MEMBER(pias_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
+	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
 	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; // dummy to stop error log filling up
@@ -71,10 +71,10 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
-	optional_device<dac_device> m_dac;
-	optional_device<hc55516_device> m_hc55516;
-	optional_device<pia6821_device> m_pia;
+	required_device<cpu_device> m_audiocpu;
+	required_device<dac_device> m_dac;
+	required_device<hc55516_device> m_hc55516;
+	required_device<pia6821_device> m_pias;
 	required_device<pia6821_device> m_pia21;
 	required_device<pia6821_device> m_pia24;
 	required_device<pia6821_device> m_pia28;
@@ -101,7 +101,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s9_audio_map, AS_PROGRAM, 8, s9_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pia", pia6821_device, read, write)
+	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pias", pia6821_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -185,8 +185,6 @@ INPUT_PORTS_END
 MACHINE_RESET_MEMBER( s9_state, s9 )
 {
 	m_t_c = 0;
-	// reset the IRQ state
-	m_pia->ca1_w(1);
 }
 
 INPUT_CHANGED_MEMBER( s9_state::main_nmi )
@@ -224,7 +222,7 @@ WRITE_LINE_MEMBER( s9_state::pia21_ca2_w )
 {
 // sound ns
 	m_ca1 = state;
-	m_pia->ca1_w(m_ca1);
+	m_pias->ca1_w(m_ca1);
 }
 
 static const pia6821_interface pia21_intf =
@@ -338,18 +336,18 @@ static const pia6821_interface pia30_intf =
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
 
-READ_LINE_MEMBER( s9_state::pia_ca1_r )
+READ_LINE_MEMBER( s9_state::pias_ca1_r )
 {
 	return m_ca1;
 }
 
-WRITE_LINE_MEMBER( s9_state::pia_ca2_w )
+WRITE_LINE_MEMBER( s9_state::pias_ca2_w )
 {
 // speech clock
 	hc55516_clock_w(m_hc55516, state);
 }
 
-WRITE_LINE_MEMBER( s9_state::pia_cb2_w )
+WRITE_LINE_MEMBER( s9_state::pias_cb2_w )
 {
 // speech data
 	hc55516_digit_w(m_hc55516, state);
@@ -365,18 +363,18 @@ WRITE8_MEMBER( s9_state::dac_w )
 	m_dac->write_unsigned8(data);
 }
 
-static const pia6821_interface pia_intf =
+static const pia6821_interface pias_intf =
 {
 	DEVCB_DRIVER_MEMBER(s9_state, dac_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
-	DEVCB_DRIVER_LINE_MEMBER(s9_state, pia_ca1_r),		/* line CA1 in */
+	DEVCB_DRIVER_LINE_MEMBER(s9_state, pias_ca1_r),		/* line CA1 in */
 	DEVCB_LINE_GND,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DRIVER_MEMBER(s9_state, sound_w),		/* port A out */
 	DEVCB_DRIVER_MEMBER(s9_state, dac_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s9_state, pia_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s9_state, pia_cb2_w),		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s9_state, pias_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s9_state, pias_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE)		/* IRQB */
 };
@@ -417,7 +415,7 @@ static MACHINE_CONFIG_START( s9, s9_state )
 	MCFG_SPEAKER_STANDARD_MONO("speech")
 	MCFG_SOUND_ADD("hc55516", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 0.50)
-	MCFG_PIA6821_ADD("pia", pia_intf)
+	MCFG_PIA6821_ADD("pias", pias_intf)
 MACHINE_CONFIG_END
 
 /*-----------------------------

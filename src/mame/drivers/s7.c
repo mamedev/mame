@@ -4,7 +4,9 @@
     Williams System 7
 
     Status of games:
-
+    - Inputs don't work so unable to play.
+    - Display works.
+    - Sound test works.
 
 ToDo:
 
@@ -28,7 +30,7 @@ public:
 	m_audiocpu(*this, "audiocpu"),
 	m_dac(*this, "dac"),
 	m_hc55516(*this, "hc55516"),
-	m_pia(*this, "pia"),
+	m_pias(*this, "pias"),
 	m_pia21(*this, "pia21"),
 	m_pia22(*this, "pia22"),
 	m_pia24(*this, "pia24"),
@@ -50,12 +52,12 @@ public:
 	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ_LINE_MEMBER(pia_ca1_r);
+	DECLARE_READ_LINE_MEMBER(pias_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
+	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w) { };
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
@@ -74,10 +76,10 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
-	optional_device<dac_device> m_dac;
-	optional_device<hc55516_device> m_hc55516;
-	optional_device<pia6821_device> m_pia;
+	required_device<cpu_device> m_audiocpu;
+	required_device<dac_device> m_dac;
+	required_device<hc55516_device> m_hc55516;
+	required_device<pia6821_device> m_pias;
 	required_device<pia6821_device> m_pia21;
 	required_device<pia6821_device> m_pia22;
 	required_device<pia6821_device> m_pia24;
@@ -106,7 +108,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s7_audio_map, AS_PROGRAM, 8, s7_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pia", pia6821_device, read, write)
+	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pias", pia6821_device, read, write)
 	AM_RANGE(0xA000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -242,8 +244,6 @@ INPUT_PORTS_END
 MACHINE_RESET_MEMBER( s7_state, s7 )
 {
 	m_t_c = 0;
-	// reset the IRQ state
-	m_pia->cb1_w(1);
 }
 
 INPUT_CHANGED_MEMBER( s7_state::main_nmi )
@@ -275,7 +275,7 @@ WRITE8_MEMBER( s7_state::sound_w )
 {
 	m_sound_data = data;
 	m_cb1 = ((m_sound_data & 0x8f) != 0x8f);
-	m_pia->cb1_w(m_cb1);
+	m_pias->cb1_w(m_cb1);
 }
 
 static const pia6821_interface pia21_intf =
@@ -403,7 +403,7 @@ READ8_MEMBER( s7_state::switch_r )
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"X%X",m_kbdrow);
-	return ioport(kbdrow)->read();
+	return ~ioport(kbdrow)->read();
 }
 
 WRITE8_MEMBER( s7_state::switch_w )
@@ -427,13 +427,13 @@ static const pia6821_interface pia30_intf =
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
 
-WRITE_LINE_MEMBER( s7_state::pia_cb2_w )
+WRITE_LINE_MEMBER( s7_state::pias_cb2_w )
 {
 // speech clock
 	hc55516_clock_w(m_hc55516, state);
 }
 
-WRITE_LINE_MEMBER( s7_state::pia_ca2_w )
+WRITE_LINE_MEMBER( s7_state::pias_ca2_w )
 {
 // speech data
 	hc55516_digit_w(m_hc55516, state);
@@ -449,7 +449,7 @@ WRITE8_MEMBER( s7_state::dac_w )
 	m_dac->write_unsigned8(data);
 }
 
-static const pia6821_interface pia_intf =
+static const pia6821_interface pias_intf =
 {
 	DEVCB_NULL,		/* port A in */
 	DEVCB_DRIVER_MEMBER(s7_state, dac_r),		/* port B in */
@@ -459,8 +459,8 @@ static const pia6821_interface pia_intf =
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DRIVER_MEMBER(s7_state, dac_w),		/* port A out */
 	DEVCB_NULL,		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s7_state, pia_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s7_state, pia_cb2_w),		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s7_state, pias_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s7_state, pias_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE)		/* IRQB */
 };
@@ -502,7 +502,7 @@ static MACHINE_CONFIG_START( s7, s7_state )
 	MCFG_SPEAKER_STANDARD_MONO("speech")
 	MCFG_SOUND_ADD("hc55516", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 0.50)
-	MCFG_PIA6821_ADD("pia", pia_intf)
+	MCFG_PIA6821_ADD("pias", pias_intf)
 MACHINE_CONFIG_END
 
 
@@ -615,8 +615,7 @@ ROM_START(solar_l2)
 	ROM_LOAD("ic17.532", 0x7000, 0x1000, CRC(bb571a17) SHA1(fb0b7f247673dae0744d4188e1a03749a2237165) )
 
 	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound12.716", 0x7800, 0x0800, CRC(05a2230c) SHA1(c57cd7628310aa8f68ca24217aad1ead066a1a82))
-	ROM_RELOAD( 0xf800, 0x0800)
+	ROM_LOAD("sound12.716", 0xf800, 0x0800, CRC(05a2230c) SHA1(c57cd7628310aa8f68ca24217aad1ead066a1a82))
 ROM_END
 
 /*-----------------------------------
@@ -776,21 +775,21 @@ ROM_END
 
 
 
-GAME( 1982, vrkon_l1, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Varkon (L-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1981, barra_l1, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Barracora (L-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, bk_l4,    0,     s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-4)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, bk_f4,    bk_l4, s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-4, French speech)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, bk_l3,    bk_l4, s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-3)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, csmic_l1, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Cosmic Gunfight (L-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1982, dfndr_l4, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Defender (L-4)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1983, fpwr2_l2, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Firepower II (L-2)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1981, hypbl_l4, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "HyperBall (L-4)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1983, jst_l2,   0,     s7, s7, driver_device, 0, ROT0, "Williams", "Joust (L-2)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1981, jngld_l2, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Jungle Lord (L-2)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1983, lsrcu_l2, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Laser Cue (L-2)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1981, pharo_l2, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Pharaoh (L-2)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1981, solar_l2, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Solar Fire (L-2)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1984, strlt_l1, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Star Light (L-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1982, tmfnt_l5, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Time Fantasy (L-5)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1982, wrlok_l3, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Warlok (L-3)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1982, thund_p1, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Thunderball (P-1)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1982, vrkon_l1, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Varkon (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1981, barra_l1, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Barracora (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1980, bk_l4,    0,     s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1980, bk_f4,    bk_l4, s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-4, French speech)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1980, bk_l3,    bk_l4, s7, s7, driver_device, 0, ROT0, "Williams", "Black Knight (L-3)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1980, csmic_l1, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Cosmic Gunfight (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1982, dfndr_l4, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Defender (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1983, fpwr2_l2, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Firepower II (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1981, hypbl_l4, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "HyperBall (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1983, jst_l2,   0,     s7, s7, driver_device, 0, ROT0, "Williams", "Joust (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1981, jngld_l2, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Jungle Lord (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1983, lsrcu_l2, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Laser Cue (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1981, pharo_l2, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Pharaoh (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1981, solar_l2, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Solar Fire (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1984, strlt_l1, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Star Light (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1982, tmfnt_l5, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Time Fantasy (L-5)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1982, wrlok_l3, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Warlok (L-3)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1982, thund_p1, 0,     s7, s7, driver_device, 0, ROT0, "Williams", "Thunderball (P-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)

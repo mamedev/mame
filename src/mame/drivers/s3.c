@@ -37,11 +37,11 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_audiocpu(*this, "audiocpu"),
 	m_dac(*this, "dac"),
-	m_pia0(*this, "pia0"),
-	m_pia1(*this, "pia1"),
-	m_pia2(*this, "pia2"),
-	m_pia3(*this, "pia3"),
-	m_pia4(*this, "pia4")
+	m_pia22(*this, "pia22"),
+	m_pia24(*this, "pia24"),
+	m_pia28(*this, "pia28"),
+	m_pia30(*this, "pia30"),
+	m_pias(*this, "pias")
 	{ }
 
 	DECLARE_READ8_MEMBER(dac_r);
@@ -55,17 +55,17 @@ public:
 	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ_LINE_MEMBER(pia2_ca1_r);
-	DECLARE_READ_LINE_MEMBER(pia2_cb1_r);
-	DECLARE_READ_LINE_MEMBER(pia4_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w) { }; //ST5
-	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w) { }; //ST-solenoids enable
-	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w) { }; //ST2
-	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w) { }; //ST1
-	DECLARE_WRITE_LINE_MEMBER(pia2_ca2_w) { }; //diag leds enable
-	DECLARE_WRITE_LINE_MEMBER(pia2_cb2_w) { }; //ST6
-	DECLARE_WRITE_LINE_MEMBER(pia3_ca2_w) { }; //ST4
-	DECLARE_WRITE_LINE_MEMBER(pia3_cb2_w) { }; //ST3
+	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
+	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
+	DECLARE_READ_LINE_MEMBER(pias_cb1_r);
+	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
+	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { }; //ST-solenoids enable
+	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { }; //ST2
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; //ST1
+	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; //diag leds enable
+	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; //ST6
+	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { }; //ST4
+	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; //ST3
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
@@ -77,11 +77,11 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<dac_device> m_dac;
-	required_device<pia6821_device> m_pia0;
-	required_device<pia6821_device> m_pia1;
-	required_device<pia6821_device> m_pia2;
-	required_device<pia6821_device> m_pia3;
-	optional_device<pia6821_device> m_pia4;
+	required_device<pia6821_device> m_pia22;
+	required_device<pia6821_device> m_pia24;
+	required_device<pia6821_device> m_pia28;
+	required_device<pia6821_device> m_pia30;
+	optional_device<pia6821_device> m_pias;
 private:
 	UINT8 m_t_c;
 	UINT8 m_sound_data;
@@ -96,17 +96,17 @@ static ADDRESS_MAP_START( s3_main_map, AS_PROGRAM, 8, s3_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2200, 0x2203) AM_DEVREADWRITE("pia0", pia6821_device, read, write) // solenoids
-	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia1", pia6821_device, read, write) // lamps
-	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia2", pia6821_device, read, write) // display
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pia3", pia6821_device, read, write) // inputs
+	AM_RANGE(0x2200, 0x2203) AM_DEVREADWRITE("pia22", pia6821_device, read, write) // solenoids
+	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia24", pia6821_device, read, write) // lamps
+	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia28", pia6821_device, read, write) // display
+	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pia30", pia6821_device, read, write) // inputs
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s3_audio_map, AS_PROGRAM, 8, s3_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0400, 0x0403) AM_DEVREADWRITE("pia4", pia6821_device, read, write) // sounds
+	AM_RANGE(0x0400, 0x0403) AM_DEVREADWRITE("pias", pia6821_device, read, write) // sounds
 	AM_RANGE(0x0800, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -312,16 +312,16 @@ WRITE8_MEMBER( s3_state::sol1_w )
 			m_sound_data &= 0x7f;
 
 
-		m_cb1 = ((m_sound_data & 0x7f) != 0x7f);
+		m_cb1 = ((m_sound_data & 0x9f) != 0x9f);
 
-		m_pia4->cb1_w(!m_cb1);
+		m_pias->cb1_w(m_cb1);
 	}
 
 	if (BIT(data, 5))
 		m_samples->start(0, 6); // knocker
 }
 
-static const pia6821_interface pia0_intf =
+static const pia6821_interface pia22_intf =
 {
 	DEVCB_NULL,		/* port A in */
 	DEVCB_NULL,		/* port B in */
@@ -331,8 +331,8 @@ static const pia6821_interface pia0_intf =
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DRIVER_MEMBER(s3_state, sol0_w),		/* port A out */
 	DEVCB_DRIVER_MEMBER(s3_state, sol1_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia0_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia0_cb2_w),		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia22_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia22_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
@@ -346,7 +346,7 @@ WRITE8_MEMBER( s3_state::lamp1_w )
 {
 }
 
-static const pia6821_interface pia1_intf =
+static const pia6821_interface pia24_intf =
 {
 	DEVCB_NULL,		/* port A in */
 	DEVCB_NULL,		/* port B in */
@@ -356,18 +356,18 @@ static const pia6821_interface pia1_intf =
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DRIVER_MEMBER(s3_state, lamp0_w),		/* port A out */
 	DEVCB_DRIVER_MEMBER(s3_state, lamp1_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia1_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia1_cb2_w),		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia24_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia24_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
 
-READ_LINE_MEMBER( s3_state::pia2_ca1_r )
+READ_LINE_MEMBER( s3_state::pia28_ca1_r )
 {
 	return BIT(ioport("DIAGS")->read(), 2); // advance button
 }
 
-READ_LINE_MEMBER( s3_state::pia2_cb1_r )
+READ_LINE_MEMBER( s3_state::pia28_cb1_r )
 {
 	return BIT(ioport("DIAGS")->read(), 3); // auto/manual switch
 }
@@ -414,18 +414,18 @@ WRITE8_MEMBER( s3_state::dig1_w )
 	m_data_ok = false;
 }
 
-static const pia6821_interface pia2_intf =
+static const pia6821_interface pia28_intf =
 {
 	DEVCB_DRIVER_MEMBER(s3_state, dips_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
-	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia2_ca1_r),		/* line CA1 in */
-	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia2_cb1_r),		/* line CB1 in */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia28_ca1_r),		/* line CA1 in */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia28_cb1_r),		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DRIVER_MEMBER(s3_state, dig0_w),		/* port A out */
 	DEVCB_DRIVER_MEMBER(s3_state, dig1_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia2_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia2_cb2_w),		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia28_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia28_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
@@ -442,7 +442,7 @@ WRITE8_MEMBER( s3_state::switch_w )
 	m_kbdrow = data;
 }
 
-static const pia6821_interface pia3_intf =
+static const pia6821_interface pia30_intf =
 {
 	DEVCB_DRIVER_MEMBER(s3_state, switch_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
@@ -452,13 +452,13 @@ static const pia6821_interface pia3_intf =
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
 	DEVCB_DRIVER_MEMBER(s3_state, switch_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia3_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia3_cb2_w),		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia30_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia30_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
 
-READ_LINE_MEMBER( s3_state::pia4_cb1_r )
+READ_LINE_MEMBER( s3_state::pias_cb1_r )
 {
 	return m_cb1;
 }
@@ -473,12 +473,12 @@ WRITE8_MEMBER( s3_state::dac_w )
 	m_dac->write_unsigned8(data);
 }
 
-static const pia6821_interface pia4_intf =
+static const pia6821_interface pias_intf =
 {
 	DEVCB_NULL,		/* port A in */
 	DEVCB_DRIVER_MEMBER(s3_state, dac_r),		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_DRIVER_LINE_MEMBER(s3_state, pia4_cb1_r),		/* line CB1 in */
+	DEVCB_DRIVER_LINE_MEMBER(s3_state, pias_cb1_r),		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DRIVER_MEMBER(s3_state, dac_w),		/* port A out */
@@ -511,10 +511,10 @@ static MACHINE_CONFIG_START( s3, s3_state )
 	MCFG_FRAGMENT_ADD( genpin_audio )
 
 	/* Devices */
-	MCFG_PIA6821_ADD("pia0", pia0_intf)
-	MCFG_PIA6821_ADD("pia1", pia1_intf)
-	MCFG_PIA6821_ADD("pia2", pia2_intf)
-	MCFG_PIA6821_ADD("pia3", pia3_intf)
+	MCFG_PIA6821_ADD("pia22", pia22_intf)
+	MCFG_PIA6821_ADD("pia24", pia24_intf)
+	MCFG_PIA6821_ADD("pia28", pia28_intf)
+	MCFG_PIA6821_ADD("pia30", pia30_intf)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 MACHINE_CONFIG_END
 
@@ -526,7 +526,7 @@ static MACHINE_CONFIG_DERIVED( s3a, s3 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_PIA6821_ADD("pia4", pia4_intf)
+	MCFG_PIA6821_ADD("pias", pias_intf)
 MACHINE_CONFIG_END
 
 
@@ -620,8 +620,8 @@ ROM_END
 
 GAME( 1977, httip_l1, 0, s3,  s3, driver_device, 0, ROT0, "Williams", "Hot Tip (L-1)", GAME_MECHANICAL )
 GAME( 1977, lucky_l1, 0, s3,  s3, driver_device, 0, ROT0, "Williams", "Lucky Seven (L-1)", GAME_MECHANICAL )
-GAME( 1978, wldcp_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "World Cup Soccer (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
-GAME( 1978, cntct_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Contact (L-1)", GAME_MECHANICAL)
-GAME( 1978, disco_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Disco Fever (L-1)", GAME_MECHANICAL)
-GAME( 1978, phnix_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Phoenix (L-1)", GAME_MECHANICAL)
-GAME( 1978, pkrno_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Pokerino (L-1)", GAME_MECHANICAL)
+GAME( 1978, wldcp_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "World Cup Soccer (L-1)", GAME_MECHANICAL )
+GAME( 1978, cntct_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Contact (L-1)", GAME_MECHANICAL )
+GAME( 1978, disco_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Disco Fever (L-1)", GAME_MECHANICAL )
+GAME( 1978, phnix_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Phoenix (L-1)", GAME_MECHANICAL )
+GAME( 1978, pkrno_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Pokerino (L-1)", GAME_MECHANICAL )

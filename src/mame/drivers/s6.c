@@ -16,6 +16,7 @@ ToDo:
 #include "machine/genpin.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "sound/hc55516.h"
 #include "sound/dac.h"
 #include "s6.lh"
 
@@ -26,12 +27,14 @@ public:
 	s6_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
+	m_audiocpu(*this, "audiocpu"),
 	m_dac(*this, "dac"),
-	m_pia0(*this, "pia0"),
-	m_pia1(*this, "pia1"),
-	m_pia2(*this, "pia2"),
-	m_pia3(*this, "pia3"),
-	m_pia4(*this, "pia4")
+	m_hc55516(*this, "hc55516"),
+	m_pias(*this, "pias"),
+	m_pia22(*this, "pia22"),
+	m_pia24(*this, "pia24"),
+	m_pia28(*this, "pia28"),
+	m_pia30(*this, "pia30")
 	{ }
 
 	DECLARE_READ8_MEMBER(dac_r);
@@ -40,24 +43,41 @@ public:
 	DECLARE_WRITE8_MEMBER(dig1_w);
 	DECLARE_WRITE8_MEMBER(lamp0_w);
 	DECLARE_WRITE8_MEMBER(lamp1_w);
+	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_WRITE8_MEMBER(sol0_w);
 	DECLARE_WRITE8_MEMBER(sol1_w);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ_LINE_MEMBER(cb1_r);
+	DECLARE_WRITE8_MEMBER(pias_pb_w) { }; // dummy to stop log filling up
+	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
+	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
+	DECLARE_READ_LINE_MEMBER(pias_cb1_r);
+	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
+	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { }; //ST-solenoids enable
+	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { }; //ST2
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; //ST1
+	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; //diag leds enable
+	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; //ST6
+	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { }; //ST4
+	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; //ST3
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	DECLARE_INPUT_CHANGED_MEMBER(nmi);
+	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
+	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s6);
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_device<dac_device> m_dac;
-	required_device<pia6821_device> m_pia0;
-	required_device<pia6821_device> m_pia1;
-	required_device<pia6821_device> m_pia2;
-	required_device<pia6821_device> m_pia3;
-	optional_device<pia6821_device> m_pia4;
+	required_device<cpu_device> m_audiocpu;
+	required_device<dac_device> m_dac;
+	required_device<hc55516_device> m_hc55516;
+	required_device<pia6821_device> m_pias;
+	required_device<pia6821_device> m_pia22;
+	required_device<pia6821_device> m_pia24;
+	required_device<pia6821_device> m_pia28;
+	required_device<pia6821_device> m_pia30;
 private:
 	UINT8 m_t_c;
 	UINT8 m_sound_data;
@@ -71,18 +91,17 @@ static ADDRESS_MAP_START( s6_main_map, AS_PROGRAM, 8, s6_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2200, 0x2203) AM_DEVREADWRITE("pia0", pia6821_device, read, write) // solenoids
-	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia1", pia6821_device, read, write) // lamps
-	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia2", pia6821_device, read, write) // display
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pia3", pia6821_device, read, write) // inputs
+	AM_RANGE(0x2200, 0x2203) AM_DEVREADWRITE("pia22", pia6821_device, read, write) // solenoids
+	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia24", pia6821_device, read, write) // lamps
+	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia28", pia6821_device, read, write) // display
+	AM_RANGE(0xb000, 0x3003) AM_DEVREADWRITE("pia30", pia6821_device, read, write) // inputs
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s6_audio_map, AS_PROGRAM, 8, s6_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0400, 0x0403) AM_DEVREADWRITE("pia4", pia6821_device, read, write) // sounds
-	AM_RANGE(0x0800, 0x7fff) AM_ROM
+	AM_RANGE(0x0000, 0x00ff) AM_RAM
+	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pias", pia6821_device, read, write)
+	AM_RANGE(0xA000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( s6 )
@@ -160,7 +179,63 @@ static INPUT_PORTS_START( s6 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Music") PORT_CODE(KEYCODE_9) PORT_TOGGLE
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Diagnostic") PORT_CODE(KEYCODE_0) PORT_CHANGED_MEMBER(DEVICE_SELF, s6_state, nmi, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, s6_state, audio_nmi, 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, s6_state, main_nmi, 1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Advance") PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Manual/Auto") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Enter") PORT_CODE(KEYCODE_8)
+
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x01, 0x01, "SW01" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x02, 0x02, "SW02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x04, 0x04, "SW03" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x08, 0x08, "SW04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x10, 0x10, "SW05" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x20, "SW06" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x40, 0x40, "SW07" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x80, 0x80, "SW08" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "SW11" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x02, 0x02, "SW12" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x04, 0x04, "SW13" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x08, 0x08, "SW14" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x10, 0x10, "SW15" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x20, "SW16" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x40, 0x40, "SW17" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x80, 0x80, "SW18" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER( s6_state, s6 )
@@ -168,11 +243,18 @@ MACHINE_RESET_MEMBER( s6_state, s6 )
 	m_t_c = 0;
 }
 
-INPUT_CHANGED_MEMBER( s6_state::nmi )
+INPUT_CHANGED_MEMBER( s6_state::main_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
+INPUT_CHANGED_MEMBER( s6_state::audio_nmi )
+{
+	// Diagnostic button sends a pulse to NMI pin
+	if (newval==CLEAR_LINE)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER( s6_state::sol0_w )
@@ -184,37 +266,31 @@ WRITE8_MEMBER( s6_state::sol0_w )
 WRITE8_MEMBER( s6_state::sol1_w )
 {
 	m_sound_data = ioport("SND")->read(); // 0xff or 0xbf
+
 	if (BIT(data, 0))
 		m_sound_data &= 0xfe;
-	else
+
 	if (BIT(data, 1))
 		m_sound_data &= 0xfd;
-	else
+
 	if (BIT(data, 2))
 		m_sound_data &= 0xfb;
-	else
+
 	if (BIT(data, 3))
 		m_sound_data &= 0xf7;
-	else
-	if (BIT(data, 4))
-		m_sound_data &= 0x7f;
 
-	if ((m_sound_data & 0xbf) == 0xbf)
-	{
-		m_cb1 = 0;
-		m_pia4->cb1_w(0);
-	}
-	else
-	{
-		m_cb1 = 1;
-		m_pia4->cb1_w(1);
-	}
+	if (BIT(data, 4))
+		m_sound_data &= 0xef;
+
+	m_cb1 = ((m_sound_data & 0x9f) != 0x9f);
+
+	m_pias->cb1_w(m_cb1);
 
 	if (BIT(data, 5))
 		m_samples->start(0, 6); // knocker
 }
 
-static const pia6821_interface pia0_intf =
+static const pia6821_interface pia22_intf =
 {
 	DEVCB_NULL,		/* port A in */
 	DEVCB_NULL,		/* port B in */
@@ -224,8 +300,8 @@ static const pia6821_interface pia0_intf =
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DRIVER_MEMBER(s6_state, sol0_w),		/* port A out */
 	DEVCB_DRIVER_MEMBER(s6_state, sol1_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia22_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia22_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
@@ -239,7 +315,7 @@ WRITE8_MEMBER( s6_state::lamp1_w )
 {
 }
 
-static const pia6821_interface pia1_intf =
+static const pia6821_interface pia24_intf =
 {
 	DEVCB_NULL,		/* port A in */
 	DEVCB_NULL,		/* port B in */
@@ -249,11 +325,44 @@ static const pia6821_interface pia1_intf =
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DRIVER_MEMBER(s6_state, lamp0_w),		/* port A out */
 	DEVCB_DRIVER_MEMBER(s6_state, lamp1_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia24_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia24_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
+
+READ_LINE_MEMBER( s6_state::pia28_ca1_r )
+{
+	return BIT(ioport("DIAGS")->read(), 2); // advance button
+}
+
+READ_LINE_MEMBER( s6_state::pia28_cb1_r )
+{
+	return BIT(ioport("DIAGS")->read(), 3); // auto/manual switch
+}
+
+READ8_MEMBER( s6_state::dips_r )
+{
+	if (BIT(ioport("DIAGS")->read(), 4) )
+	{
+		switch (m_strobe)
+		{
+		case 0:
+			return ioport("DSW0")->read() & 15;
+			break;
+		case 1:
+			return ioport("DSW0")->read() << 4;
+			break;
+		case 2:
+			return ioport("DSW1")->read() & 15;
+			break;
+		case 3:
+			return ioport("DSW1")->read() << 4;
+			break;
+		}
+	}
+	return 0xff;
+}
 
 WRITE8_MEMBER( s6_state::dig0_w )
 {
@@ -272,18 +381,18 @@ WRITE8_MEMBER( s6_state::dig1_w )
 	m_data_ok = false;
 }
 
-static const pia6821_interface pia2_intf =
+static const pia6821_interface pia28_intf =
 {
-	DEVCB_NULL,		/* port A in */
+	DEVCB_DRIVER_MEMBER(s6_state, dips_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia28_ca1_r),		/* line CA1 in */
+	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia28_cb1_r),		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DRIVER_MEMBER(s6_state, dig0_w),		/* port A out */
 	DEVCB_DRIVER_MEMBER(s6_state, dig1_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia28_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia28_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
@@ -292,7 +401,7 @@ READ8_MEMBER( s6_state::switch_r )
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"X%X",m_kbdrow);
-	return ioport(kbdrow)->read();
+	return ~ioport(kbdrow)->read();
 }
 
 WRITE8_MEMBER( s6_state::switch_w )
@@ -300,7 +409,7 @@ WRITE8_MEMBER( s6_state::switch_w )
 	m_kbdrow = data;
 }
 
-static const pia6821_interface pia3_intf =
+static const pia6821_interface pia30_intf =
 {
 	DEVCB_DRIVER_MEMBER(s6_state, switch_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
@@ -310,15 +419,27 @@ static const pia6821_interface pia3_intf =
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
 	DEVCB_DRIVER_MEMBER(s6_state, switch_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia30_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia30_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
 
-READ_LINE_MEMBER( s6_state::cb1_r )
+READ_LINE_MEMBER( s6_state::pias_cb1_r )
 {
 	return m_cb1;
+}
+
+WRITE_LINE_MEMBER( s6_state::pias_cb2_w )
+{
+// speech clock
+	hc55516_clock_w(m_hc55516, state);
+}
+
+WRITE_LINE_MEMBER( s6_state::pias_ca2_w )
+{
+// speech data
+	hc55516_digit_w(m_hc55516, state);
 }
 
 READ8_MEMBER( s6_state::dac_r )
@@ -331,18 +452,18 @@ WRITE8_MEMBER( s6_state::dac_w )
 	m_dac->write_unsigned8(data);
 }
 
-static const pia6821_interface pia4_intf =
+static const pia6821_interface pias_intf =
 {
 	DEVCB_NULL,		/* port A in */
 	DEVCB_DRIVER_MEMBER(s6_state, dac_r),		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_DRIVER_LINE_MEMBER(s6_state, cb1_r),		/* line CB1 in */
+	DEVCB_DRIVER_LINE_MEMBER(s6_state, pias_cb1_r),		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DRIVER_MEMBER(s6_state, dac_w),		/* port A out */
-	DEVCB_NULL,		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_DRIVER_MEMBER(s6_state, pias_pb_w),		/* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(s6_state, pias_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s6_state, pias_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE)		/* IRQB */
 };
@@ -359,7 +480,7 @@ static MACHINE_CONFIG_START( s6, s6_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, 3580000) // 6802 or 6808 could be used here
 	MCFG_CPU_PROGRAM_MAP(s6_main_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s6_state, irq, attotime::from_hz(1000))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s6_state, irq, attotime::from_hz(250))
 	MCFG_MACHINE_RESET_OVERRIDE(s6_state, s6)
 
 	/* Video */
@@ -369,10 +490,10 @@ static MACHINE_CONFIG_START( s6, s6_state )
 	MCFG_FRAGMENT_ADD( genpin_audio )
 
 	/* Devices */
-	MCFG_PIA6821_ADD("pia0", pia0_intf)
-	MCFG_PIA6821_ADD("pia1", pia1_intf)
-	MCFG_PIA6821_ADD("pia2", pia2_intf)
-	MCFG_PIA6821_ADD("pia3", pia3_intf)
+	MCFG_PIA6821_ADD("pia22", pia22_intf)
+	MCFG_PIA6821_ADD("pia24", pia24_intf)
+	MCFG_PIA6821_ADD("pia28", pia28_intf)
+	MCFG_PIA6821_ADD("pia30", pia30_intf)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* Add the soundcard */
@@ -380,55 +501,13 @@ static MACHINE_CONFIG_START( s6, s6_state )
 	MCFG_CPU_PROGRAM_MAP(s6_audio_map)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_PIA6821_ADD("pia4", pia4_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speech")
+	MCFG_SOUND_ADD("hc55516", HC55516, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 0.50)
+	MCFG_PIA6821_ADD("pias", pias_intf)
 MACHINE_CONFIG_END
 
-/*--------------------------------
-/ Tri Zone - Sys.4 (Game #487)
-/-------------------------------*/
-ROM_START(trizn_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(757091c5) SHA1(00dac6c19b08d2528ea293619c4a39499a1a02c2))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2.716", 0x7800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
-
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
-ROM_END
-
-ROM_START(trizn_t1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(757091c5) SHA1(00dac6c19b08d2528ea293619c4a39499a1a02c2))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2a.716", 0x7800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
-
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
-ROM_END
-
-/*--------------------------------
-/ Time Warp - Sys.4 (Game #489)
-/-------------------------------*/
-ROM_START(tmwrp_l2)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(b168df09) SHA1(d4c97714636ce51be2e5f8cc5af89e10a2f82ac7))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2.716", 0x7800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
-
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
-ROM_END
-
-ROM_START(tmwrp_t2)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(b168df09) SHA1(d4c97714636ce51be2e5f8cc5af89e10a2f82ac7))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2a.716", 0x7800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
-
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
-ROM_END
 
 /*--------------------------------
 / Laser Ball - Sys.6 (Game #493)
@@ -440,7 +519,7 @@ ROM_START(lzbal_l2)
 	ROM_LOAD("green2.716", 0x7800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
 
 	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound2.716", 0x7800, 0x0800, CRC(c9103a68) SHA1(cc77af54fdb192f0b334d9d1028210618c3f1d95))
+	ROM_LOAD("sound2.716", 0xf800, 0x0800, CRC(c9103a68) SHA1(cc77af54fdb192f0b334d9d1028210618c3f1d95))
 ROM_END
 
 ROM_START(lzbal_t2)
@@ -450,31 +529,9 @@ ROM_START(lzbal_t2)
 	ROM_LOAD("green2a.716", 0x7800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
 
 	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound2.716", 0x7800, 0x0800, CRC(c9103a68) SHA1(cc77af54fdb192f0b334d9d1028210618c3f1d95))
+	ROM_LOAD("sound2.716", 0xf800, 0x0800, CRC(c9103a68) SHA1(cc77af54fdb192f0b334d9d1028210618c3f1d95))
 ROM_END
 
-/*-----------------------------
-/ Scorpion - Sys.6 (Game #494)
-/----------------------------*/
-ROM_START(scrpn_l1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(881109a9) SHA1(53d4275c76b47b68a74209fe660d943a51e90eca))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2.716", 0x7800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
-
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
-ROM_END
-
-ROM_START(scrpn_t1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(881109a9) SHA1(53d4275c76b47b68a74209fe660d943a51e90eca))
-	ROM_LOAD("green1.716", 0x7000, 0x0800, CRC(2145f8ab) SHA1(ddf63208559a3a08d4e88327c55426b0eed27654))
-	ROM_LOAD("green2a.716", 0x7800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
-
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
-ROM_END
 
 /*----------------------------
 / Blackout - Sys.6 (Game #495)
@@ -486,10 +543,10 @@ ROM_START(blkou_l1)
 	ROM_LOAD("green2.716", 0x7800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
 
 	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("v_ic7.532", 0x3000, 0x1000, CRC(87864071) SHA1(d03c71efc0431f30a07c8194c0614c96fb683710))
-	ROM_LOAD("v_ic5.532", 0x4000, 0x1000, CRC(046a96d8) SHA1(879127a88b3640bbb202c64cbf8678869c964177))
-	ROM_LOAD("v_ic6.532", 0x5000, 0x1000, CRC(0104e5c4) SHA1(c073cb4bdea189085ae074e9c16872752b6ffba0))
-	ROM_LOAD("sound2.716", 0x7800, 0x0800, CRC(c9103a68) SHA1(cc77af54fdb192f0b334d9d1028210618c3f1d95))
+	ROM_LOAD("v_ic7.532", 0xb000, 0x1000, CRC(87864071) SHA1(d03c71efc0431f30a07c8194c0614c96fb683710))
+	ROM_LOAD("v_ic5.532", 0xc000, 0x1000, CRC(046a96d8) SHA1(879127a88b3640bbb202c64cbf8678869c964177))
+	ROM_LOAD("v_ic6.532", 0xd000, 0x1000, CRC(0104e5c4) SHA1(c073cb4bdea189085ae074e9c16872752b6ffba0))
+	ROM_LOAD("sound2.716", 0xf800, 0x0800, CRC(c9103a68) SHA1(cc77af54fdb192f0b334d9d1028210618c3f1d95))
 ROM_END
 
 ROM_START(blkou_t1)
@@ -499,10 +556,10 @@ ROM_START(blkou_t1)
 	ROM_LOAD("green2a.716", 0x7800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
 
 	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("v_ic7.532", 0x3000, 0x1000, CRC(87864071) SHA1(d03c71efc0431f30a07c8194c0614c96fb683710))
-	ROM_LOAD("v_ic5.532", 0x4000, 0x1000, CRC(046a96d8) SHA1(879127a88b3640bbb202c64cbf8678869c964177))
-	ROM_LOAD("v_ic6.532", 0x5000, 0x1000, CRC(0104e5c4) SHA1(c073cb4bdea189085ae074e9c16872752b6ffba0))
-	ROM_LOAD("sound2.716", 0x7800, 0x0800, CRC(c9103a68) SHA1(cc77af54fdb192f0b334d9d1028210618c3f1d95))
+	ROM_LOAD("v_ic7.532", 0xb000, 0x1000, CRC(87864071) SHA1(d03c71efc0431f30a07c8194c0614c96fb683710))
+	ROM_LOAD("v_ic5.532", 0xc000, 0x1000, CRC(046a96d8) SHA1(879127a88b3640bbb202c64cbf8678869c964177))
+	ROM_LOAD("v_ic6.532", 0xd000, 0x1000, CRC(0104e5c4) SHA1(c073cb4bdea189085ae074e9c16872752b6ffba0))
+	ROM_LOAD("sound2.716", 0xf800, 0x0800, CRC(c9103a68) SHA1(cc77af54fdb192f0b334d9d1028210618c3f1d95))
 ROM_END
 
 ROM_START(blkou_f1)
@@ -512,11 +569,11 @@ ROM_START(blkou_f1)
 	ROM_LOAD("green2.716", 0x7800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
 
 	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("speech7f.532", 0x3000, 0x1000, CRC(bdc1b0b1) SHA1(c78f8653dfe3ec58722a8a17da7924e4a76cf692))
-	ROM_LOAD("speech6f.532", 0x4000, 0x1000, CRC(9b7e4ae9) SHA1(137b5ec871162329cb7ca3a62da3193382223d8a))
-	ROM_LOAD("speech5f.532", 0x5000, 0x1000, CRC(9040f34a) SHA1(529eae0b58f3300f2b9bdf40c5ca7f4b29425dff))
-	ROM_LOAD("speech4f.532", 0x6000, 0x1000, CRC(29c4abde) SHA1(b3af7b8d0c2548f5c0bb240aa1dc5cc59bb2af9a))
-	ROM_LOAD("sound2.716", 0x7800, 0x0800, CRC(c9103a68) SHA1(cc77af54fdb192f0b334d9d1028210618c3f1d95))
+	ROM_LOAD("speech7f.532", 0xb000, 0x1000, CRC(bdc1b0b1) SHA1(c78f8653dfe3ec58722a8a17da7924e4a76cf692))
+	ROM_LOAD("speech6f.532", 0xc000, 0x1000, CRC(9b7e4ae9) SHA1(137b5ec871162329cb7ca3a62da3193382223d8a))
+	ROM_LOAD("speech5f.532", 0xd000, 0x1000, CRC(9040f34a) SHA1(529eae0b58f3300f2b9bdf40c5ca7f4b29425dff))
+	ROM_LOAD("speech4f.532", 0xe000, 0x1000, CRC(29c4abde) SHA1(b3af7b8d0c2548f5c0bb240aa1dc5cc59bb2af9a))
+	ROM_LOAD("sound2.716", 0xf800, 0x0800, CRC(c9103a68) SHA1(cc77af54fdb192f0b334d9d1028210618c3f1d95))
 ROM_END
 
 /*--------------------------
@@ -529,10 +586,10 @@ ROM_START(grgar_l1)
 	ROM_LOAD("green2.716", 0x7800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
 
 	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("v_ic7.532", 0x3000, 0x1000, CRC(0b1879e3) SHA1(2c34a815f598b4413e9229e8eb1322ec9e7cc9d6))
-	ROM_LOAD("v_ic5.532", 0x4000, 0x1000, CRC(0ceaef37) SHA1(33b5f5286b8588162d56dbc5c9a8ccb70d3b9090))
-	ROM_LOAD("v_ic6.532", 0x5000, 0x1000, CRC(218290b9) SHA1(6afeff1413895489e92a4bb1c05f6de5773dbb6a))
-	ROM_LOAD("sound2.716", 0x7800, 0x0800, CRC(c9103a68) SHA1(cc77af54fdb192f0b334d9d1028210618c3f1d95))
+	ROM_LOAD("v_ic7.532", 0xb000, 0x1000, CRC(0b1879e3) SHA1(2c34a815f598b4413e9229e8eb1322ec9e7cc9d6))
+	ROM_LOAD("v_ic5.532", 0xc000, 0x1000, CRC(0ceaef37) SHA1(33b5f5286b8588162d56dbc5c9a8ccb70d3b9090))
+	ROM_LOAD("v_ic6.532", 0xd000, 0x1000, CRC(218290b9) SHA1(6afeff1413895489e92a4bb1c05f6de5773dbb6a))
+	ROM_LOAD("sound2.716", 0xf800, 0x0800, CRC(c9103a68) SHA1(cc77af54fdb192f0b334d9d1028210618c3f1d95))
 ROM_END
 
 ROM_START(grgar_t1)
@@ -542,10 +599,10 @@ ROM_START(grgar_t1)
 	ROM_LOAD("green2a.716", 0x7800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
 
 	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("v_ic7.532", 0x3000, 0x1000, CRC(0b1879e3) SHA1(2c34a815f598b4413e9229e8eb1322ec9e7cc9d6))
-	ROM_LOAD("v_ic5.532", 0x4000, 0x1000, CRC(0ceaef37) SHA1(33b5f5286b8588162d56dbc5c9a8ccb70d3b9090))
-	ROM_LOAD("v_ic6.532", 0x5000, 0x1000, CRC(218290b9) SHA1(6afeff1413895489e92a4bb1c05f6de5773dbb6a))
-	ROM_LOAD("sound2.716", 0x7800, 0x0800, CRC(c9103a68) SHA1(cc77af54fdb192f0b334d9d1028210618c3f1d95))
+	ROM_LOAD("v_ic7.532", 0xb000, 0x1000, CRC(0b1879e3) SHA1(2c34a815f598b4413e9229e8eb1322ec9e7cc9d6))
+	ROM_LOAD("v_ic5.532", 0xc000, 0x1000, CRC(0ceaef37) SHA1(33b5f5286b8588162d56dbc5c9a8ccb70d3b9090))
+	ROM_LOAD("v_ic6.532", 0xd000, 0x1000, CRC(218290b9) SHA1(6afeff1413895489e92a4bb1c05f6de5773dbb6a))
+	ROM_LOAD("sound2.716", 0xf800, 0x0800, CRC(c9103a68) SHA1(cc77af54fdb192f0b334d9d1028210618c3f1d95))
 ROM_END
 
 /*-------------------------------
@@ -561,10 +618,10 @@ ROM_START(frpwr_l6)
 	ROM_LOAD("prom1_6.474", 0x6000, 0x0200, CRC(af6eb0b9) SHA1(28f8366737e09ffd60cb5ea55a5734143cdb9663))
 
 	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("v_ic7.532", 0x3000, 0x1000, CRC(94c5c0a7) SHA1(ff7c618d1666c1d5c3319fdd72c1af2846659290))
-	ROM_LOAD("v_ic5.532", 0x4000, 0x1000, CRC(1737fdd2) SHA1(6307e0ae715e97294ee8aaaeb2e2bebb0cb590c2))
-	ROM_LOAD("v_ic6.532", 0x5000, 0x1000, CRC(e56f7aa2) SHA1(cb922c3f4d91285dda4ccae880c2d798a82fd51b))
-	ROM_LOAD("sound3.716", 0x7800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
+	ROM_LOAD("v_ic7.532", 0xb000, 0x1000, CRC(94c5c0a7) SHA1(ff7c618d1666c1d5c3319fdd72c1af2846659290))
+	ROM_LOAD("v_ic5.532", 0xc000, 0x1000, CRC(1737fdd2) SHA1(6307e0ae715e97294ee8aaaeb2e2bebb0cb590c2))
+	ROM_LOAD("v_ic6.532", 0xd000, 0x1000, CRC(e56f7aa2) SHA1(cb922c3f4d91285dda4ccae880c2d798a82fd51b))
+	ROM_LOAD("sound3.716", 0xf800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
 ROM_END
 
 ROM_START(frpwr_t6)
@@ -577,10 +634,10 @@ ROM_START(frpwr_t6)
 	ROM_LOAD("green2a.716", 0x7800, 0x0800, CRC(16621eec) SHA1(14e1cf5f7227860a3219b2b79fa66dcf252dce98))
 
 	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("v_ic7.532", 0x3000, 0x1000, CRC(94c5c0a7) SHA1(ff7c618d1666c1d5c3319fdd72c1af2846659290))
-	ROM_LOAD("v_ic5.532", 0x4000, 0x1000, CRC(1737fdd2) SHA1(6307e0ae715e97294ee8aaaeb2e2bebb0cb590c2))
-	ROM_LOAD("v_ic6.532", 0x5000, 0x1000, CRC(e56f7aa2) SHA1(cb922c3f4d91285dda4ccae880c2d798a82fd51b))
-	ROM_LOAD("sound3.716", 0x7800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
+	ROM_LOAD("v_ic7.532", 0xb000, 0x1000, CRC(94c5c0a7) SHA1(ff7c618d1666c1d5c3319fdd72c1af2846659290))
+	ROM_LOAD("v_ic5.532", 0xc000, 0x1000, CRC(1737fdd2) SHA1(6307e0ae715e97294ee8aaaeb2e2bebb0cb590c2))
+	ROM_LOAD("v_ic6.532", 0xd000, 0x1000, CRC(e56f7aa2) SHA1(cb922c3f4d91285dda4ccae880c2d798a82fd51b))
+	ROM_LOAD("sound3.716", 0xf800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
 ROM_END
 
 ROM_START(frpwr_l2)
@@ -593,26 +650,20 @@ ROM_START(frpwr_l2)
 	ROM_LOAD("green2.716", 0x7800, 0x0800, CRC(1c978a4a) SHA1(1959184764643d58f1740c54bb74c2aad7d667d2))
 
 	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("v_ic7.532", 0x3000, 0x1000, CRC(94c5c0a7) SHA1(ff7c618d1666c1d5c3319fdd72c1af2846659290))
-	ROM_LOAD("v_ic5.532", 0x4000, 0x1000, CRC(1737fdd2) SHA1(6307e0ae715e97294ee8aaaeb2e2bebb0cb590c2))
-	ROM_LOAD("v_ic6.532", 0x5000, 0x1000, CRC(e56f7aa2) SHA1(cb922c3f4d91285dda4ccae880c2d798a82fd51b))
-	ROM_LOAD("sound3.716", 0x7800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
+	ROM_LOAD("v_ic7.532", 0xb000, 0x1000, CRC(94c5c0a7) SHA1(ff7c618d1666c1d5c3319fdd72c1af2846659290))
+	ROM_LOAD("v_ic5.532", 0xc000, 0x1000, CRC(1737fdd2) SHA1(6307e0ae715e97294ee8aaaeb2e2bebb0cb590c2))
+	ROM_LOAD("v_ic6.532", 0xd000, 0x1000, CRC(e56f7aa2) SHA1(cb922c3f4d91285dda4ccae880c2d798a82fd51b))
+	ROM_LOAD("sound3.716", 0xf800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
 ROM_END
 
 
-GAME( 1978, trizn_l1, 0,        s6, s6, driver_device, 0,ROT0, "Williams", "Tri Zone (L-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1978, trizn_t1, trizn_l1, s6, s6, driver_device, 0,ROT0, "Williams", "Tri Zone (T-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1979, tmwrp_l2, 0,        s6, s6, driver_device, 0,ROT0, "Williams", "Time Warp (L-2)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1979, tmwrp_t2, tmwrp_l2, s6, s6, driver_device, 0,ROT0, "Williams", "Time Warp (T-2)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1979, lzbal_l2, 0,        s6, s6, driver_device, 0,ROT0, "Williams", "Laser Ball (L-2)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, lzbal_t2, lzbal_l2, s6, s6, driver_device, 0,ROT0, "Williams", "Laser Ball (T-2)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, scrpn_l1, 0,        s6, s6, driver_device, 0,ROT0, "Williams", "Scorpion (L-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, scrpn_t1, scrpn_l1, s6, s6, driver_device, 0,ROT0, "Williams", "Scorpion (T-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1979, blkou_l1, 0,        s6, s6, driver_device, 0,ROT0, "Williams", "Blackout (L-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1979, blkou_t1, blkou_l1, s6, s6, driver_device, 0,ROT0, "Williams", "Blackout (T-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1979, blkou_f1, blkou_l1, s6, s6, driver_device, 0,ROT0, "Williams", "Blackout (L-1, French Speech)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1979, grgar_l1, 0,        s6, s6, driver_device, 0,ROT0, "Williams", "Gorgar (L-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1979, grgar_t1, grgar_l1, s6, s6, driver_device, 0,ROT0, "Williams", "Gorgar (T-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, frpwr_l6, 0,        s6, s6, driver_device, 0,ROT0, "Williams", "Firepower (L-6)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, frpwr_t6, frpwr_l6, s6, s6, driver_device, 0,ROT0, "Williams", "Firepower (T-6)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1980, frpwr_l2, frpwr_l6, s6, s6, driver_device, 0,ROT0, "Williams", "Firepower (L-2)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1979, lzbal_l2, 0,        s6, s6, driver_device, 0, ROT0, "Williams", "Laser Ball (L-2)", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME( 1980, lzbal_t2, lzbal_l2, s6, s6, driver_device, 0, ROT0, "Williams", "Laser Ball (T-2)", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME( 1979, blkou_l1, 0,        s6, s6, driver_device, 0, ROT0, "Williams", "Blackout (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1979, blkou_t1, blkou_l1, s6, s6, driver_device, 0, ROT0, "Williams", "Blackout (T-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1979, blkou_f1, blkou_l1, s6, s6, driver_device, 0, ROT0, "Williams", "Blackout (L-1, French Speech)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1979, grgar_l1, 0,        s6, s6, driver_device, 0, ROT0, "Williams", "Gorgar (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1979, grgar_t1, grgar_l1, s6, s6, driver_device, 0, ROT0, "Williams", "Gorgar (T-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1980, frpwr_l6, 0,        s6, s6, driver_device, 0, ROT0, "Williams", "Firepower (L-6)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1980, frpwr_t6, frpwr_l6, s6, s6, driver_device, 0, ROT0, "Williams", "Firepower (T-6)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1980, frpwr_l2, frpwr_l6, s6, s6, driver_device, 0, ROT0, "Williams", "Firepower (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
