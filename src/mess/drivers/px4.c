@@ -10,10 +10,10 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
+#include "machine/epson_sio.h"
 #include "machine/ctronics.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
-#include "machine/tf20.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
 #include "sound/speaker.h"
@@ -24,7 +24,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define VERBOSE 1
+#define VERBOSE 0
 
 // interrupt sources
 #define INT0_7508   0x01
@@ -79,7 +79,8 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_centronics(*this, "centronics"),
 			m_ext_cas(*this, "extcas"),
-			m_speaker(*this, SPEAKER_TAG)
+			m_speaker(*this, SPEAKER_TAG),
+			m_sio(*this, "sio")
 			{ }
 
 	// internal devices
@@ -88,6 +89,7 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<cassette_image_device> m_ext_cas;
 	required_device<device_t> m_speaker;
+	required_device<epson_sio_device> m_sio;
 
 	/* gapnit register */
 	UINT8 m_ctrl1;
@@ -197,53 +199,6 @@ public:
 	void px4_rs232c_dtr(device_t *device,int state);
 	int px4_rs232c_dcd(device_t *device);
 };
-
-
-//**************************************************************************
-//  SERIAL PORT
-//**************************************************************************
-
-// The floppy is connected to this port
-
-void px4_state::px4_sio_txd(device_t *device,int state)
-{
-	if (VERBOSE)
-		logerror("px4_sio_txd: %d\n", state);
-
-	if (device != NULL)
-		tf20_txs_w(device, state);
-}
-
-int px4_state::px4_sio_rxd(device_t *device)
-{
-	if (VERBOSE)
-		logerror("px4_sio_rxd\n");
-
-	if (device != NULL)
-		return tf20_rxs_r(device);
-	else
-		return ASSERT_LINE;
-}
-
-int px4_state::px4_sio_pin(device_t *device)
-{
-	if (VERBOSE)
-		logerror("px4_sio_pin\n");
-
-	if (device != NULL)
-		return tf20_pins_r(device);
-	else
-		return ASSERT_LINE;
-}
-
-void px4_state::px4_sio_pout(device_t *device,int state)
-{
-	if (VERBOSE)
-		logerror("px4_sio_pout: %d\n", state);
-
-	if (device != NULL)
-		tf20_pouts_w(device, state);
-}
 
 
 //**************************************************************************
@@ -843,8 +798,8 @@ READ8_MEMBER(px4_state::px4_iostr_r)
 
 	result |= m_centronics->busy_r() << 0;
 	result |= !m_centronics->pe_r() << 1;
-	result |= px4_sio_pin(m_sio_device) << 2;
-	result |= px4_sio_rxd(m_sio_device) << 3;
+	result |= m_sio->pin_r() << 2;
+	result |= m_sio->rx_r() << 3;
 	result |= px4_rs232c_dcd(m_rs232c_device) << 4;
 	result |= px4_rs232c_cts(m_rs232c_device) << 5;
 	result |= 1 << 6;   // bit 6, csel, cartridge option select signal, set to 'other mode'
@@ -865,7 +820,7 @@ WRITE8_MEMBER(px4_state::px4_artcr_w)
 	if (!ART_TX_ENABLED)
 	{
 		// force high when disabled
-		px4_sio_txd(m_sio_device, ASSERT_LINE);
+		m_sio->tx_w(1);
 		px4_rs232c_txd(m_rs232c_device, ASSERT_LINE);
 	}
 
@@ -873,7 +828,7 @@ WRITE8_MEMBER(px4_state::px4_artcr_w)
 	if (ART_TX_ENABLED && BIT(data, 3))
 	{
 		// force low when enabled and transmit enabled
-		px4_sio_txd(m_sio_device, CLEAR_LINE);
+		m_sio->tx_w(0);
 		px4_rs232c_txd(m_rs232c_device, CLEAR_LINE);
 	}
 
@@ -903,7 +858,7 @@ WRITE8_MEMBER(px4_state::px4_ioctlr_w)
 	m_centronics->strobe_w(!BIT(data, 0));
 	m_centronics->init_prime_w(BIT(data, 1));
 
-	px4_sio_pout(m_sio_device, BIT(data, 2));
+	m_sio->pout_w(BIT(data, 2));
 
 	// bit 3, cartridge reset
 
@@ -1210,7 +1165,6 @@ INPUT_PORTS_END
 // US ASCII keyboard
 static INPUT_PORTS_START( px4_h450a )
 	PORT_INCLUDE(px4_dips)
-	PORT_INCLUDE(tf20)
 
 	PORT_START("keyboard_0")
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, px4_state, key_callback, (void *)0) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(ESC)) // 00
@@ -1313,7 +1267,6 @@ INPUT_PORTS_END
 /* item keyboard */
 static INPUT_PORTS_START( px4_h421a )
 	PORT_INCLUDE(px4_dips)
-	PORT_INCLUDE(tf20)
 INPUT_PORTS_END
 
 #endif
@@ -1389,8 +1342,8 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_CARTSLOT_ADD("capsule2")
 	MCFG_CARTSLOT_NOT_MANDATORY
 
-	// tf20 floppy drive
-	MCFG_TF20_ADD("floppy")
+	// sio port
+	MCFG_EPSON_SIO_ADD("sio")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( px4p, px4 )

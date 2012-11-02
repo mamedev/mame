@@ -1108,6 +1108,7 @@ $(MESSOBJ)/epson.a:				\
 	$(MESS_DRIVERS)/hx20.o		\
 	$(MESS_DRIVERS)/lx800.o		\
 	$(MESS_MACHINE)/e05a03.o	\
+	$(MESS_MACHINE)/epson_sio.o	\
 	$(MESS_MACHINE)/pf10.o		\
 	$(MESS_MACHINE)/tf20.o		\
 	$(MESS_DRIVERS)/px4.o		\
