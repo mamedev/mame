@@ -950,6 +950,9 @@ static MACHINE_CONFIG_START( a3000n, amiga_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", amiga_floppies, 0,      0, amiga_fdc::floppy_formats)
 
 	MCFG_AMIGA_KEYBOARD_ADD("kbd")
+
+	MCFG_SOFTWARE_LIST_ADD("flop_common","amiga_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga3000_flop")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a3000, a3000n )

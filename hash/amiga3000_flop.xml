@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="amiga3000_flop" description="Amiga 3000 System Floppies">
+
+	<software name="amix11">
+		<description>UNIX System V Release 4 Amiga (v1.1)</description>
+		<year>1990</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 1 (Boot)"/>
+			<dataarea name="flop" size="901120">
+				<rom name="amix_1.1_boot.adf" size="901120" crc="83a9c798" sha1="7b530cb8ff39933c7cef2ee6349a9b2d147e6a6d" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 2 (Root file system)"/>
+			<dataarea name="flop" size="901120">
+				<rom name="amix_1.1_root.adf" size="901120" crc="9ac8c76e" sha1="61f06cf47c12930ff9677c57a8464c549c5fb839" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="cass1" interface="a3000_cass">
+			<feature name="part_id" value="Installation Tape"/>
+			<dataarea name="cass" size="0">
+				<rom name="cass" size="0" status="nodump" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amix201" cloneof="amix11">
+		<description>UNIX System V Release 4 Amiga (v2.01)</description>
+		<year>199?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 1 (Boot)"/>
+			<dataarea name="flop" size="901120">
+				<rom name="amix_2.01_boot.adf" size="901120" crc="7e3ecc6b" sha1="63d0144296e63b8ea09e4c1b2a85d1e09dc111e5" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 2 (Root file system)"/>
+			<dataarea name="flop" size="901120">
+				<rom name="amix_2.01_root.adf" size="901120" crc="c8fef4fd" sha1="840a23a93329b4f68113515f9bf466bb15af1bc7" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="cass1" interface="a3000_cass">
+			<feature name="part_id" value="Installation Tape"/>
+			<dataarea name="cass" size="0">
+				<rom name="cass" size="0" status="nodump" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amix203" cloneof="amix11">
+		<description>UNIX System V Release 4 Amiga (v2.03)</description>
+		<year>199?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 1 (Boot)"/>
+			<dataarea name="flop" size="901120">
+				<rom name="amix_2.03_boot.adf" size="901120" crc="a10249c1" sha1="5c62519528d92a6e8a7b88d9879d9d0903e90ad2" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 2 (Root file system)"/>
+			<dataarea name="flop" size="901120">
+				<rom name="amix_2.03_root.adf" size="901120" crc="6859ae85" sha1="ed38709d4f9b7a1cfc42112038e74b75587de73f" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="cass1" interface="a3000_cass">
+			<feature name="part_id" value="Installation Tape"/>
+			<dataarea name="cass" size="0">
+				<rom name="cass" size="0" status="nodump" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amix21" cloneof="amix11">
+		<description>UNIX System V Release 4 Amiga (v2.1)</description>
+		<year>199?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 1 (Boot)"/>
+			<dataarea name="flop" size="901120">
+				<rom name="amix_2.1_boot.adf" size="901120" crc="99a92138" sha1="c3c444fdf00275b8a1d57d3da8556267977d940a" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 2 (Root file system)"/>
+			<dataarea name="flop" size="901120">
+				<rom name="amix_2.1_root.adf" size="901120" crc="7c134fcd" sha1="586cba2c40e007d09f634647e15e33a5ac4ba069" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Patch Disk"/>
+			<dataarea name="flop" size="901120">
+				<rom name="amix_patch_2.1.adf" size="901120" crc="6b401165" sha1="325df79e3ca52709d47512227d187c87ed4c9472" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="cass1" interface="a3000_cass">
+			<feature name="part_id" value="Installation Tape"/>
+			<dataarea name="cass" size="77600256">
+				<rom name="20" size="3334656" crc="abf8c717" sha1="b6b4648b1cb5f247190689a97b00e0a05ed27116" offset="0" />
+				<rom name="21" size="2347520" crc="36f325a3" sha1="079fdb599d0b0cb8f7294e52f838a1f0a7630e1b" offset="3334656" />
+				<rom name="22" size="591360" crc="c2e1b81a" sha1="6a53fd724b807b7b24fa29c9881acc573de78f9d" offset="5682176" />
+				<rom name="23" size="4467712" crc="3fb92f7f" sha1="b3e2c41fadd5df7e6c6bc0a203b8c83f44bedf9d" offset="6273536" />
+				<rom name="24" size="8239616" crc="0f664a16" sha1="3014e685c45f7970d2beed7142d30cbc214922a5" offset="10741248" />
+				<rom name="25" size="13987328" crc="036ba7e3" sha1="31967c7fdd5a48e7487fd5576cd405153513c059" offset="18980864" />
+				<rom name="26" size="8051200" crc="01698c66" sha1="f445d485a25ff60f3cb6fba40a4668ad500bcafe" offset="32968192" />
+				<rom name="27" size="16837120" crc="5b6874e8" sha1="d34fff3232bb5a7bb20d64923503ba86e5a1798d" offset="41019392" />
+				<rom name="28" size="19743744" crc="01639d6e" sha1="147b570edd59719dd32ad51b4c022d8c85b42fa6" offset="57856512" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

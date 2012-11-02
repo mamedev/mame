@@ -26,6 +26,7 @@ hash/alice32.xml svneol=native#text/xml
 hash/alice90.xml svneol=native#text/xml
 hash/amiga1000_flop.xml svneol=native#text/xml
 hash/amiga1200_flop.xml svneol=native#text/xml
+hash/amiga3000_flop.xml svneol=native#text/xml
 hash/amiga500_flop.xml svneol=native#text/xml
 hash/amiga500plus_flop.xml svneol=native#text/xml
 hash/amiga600_flop.xml svneol=native#text/xml
