@@ -30,7 +30,8 @@ public:
 		  m_rxd(1),
 		  m_reset(0),
 		  m_dma(1),
-		  m_bwr(1)
+		  m_bwr(1),
+		  m_fdc_ram(*this, "fdc_ram")
 	{
 		for (int i = 0; i < 6; i++)
 			m_txd[i] = 1;
@@ -38,11 +39,11 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_netcpu;
-	required_device<device_t> m_fdc;
+	required_device<wd2793_device> m_fdc;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_ddp0;
 	required_device<cassette_image_device> m_ddp1;
-	required_device<device_t> m_floppy0;
+	required_device<legacy_floppy_image_device> m_floppy0;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -128,6 +129,9 @@ public:
 	int m_track;
 	TIMER_DEVICE_CALLBACK_MEMBER(paddle_tick);
 	DECLARE_WRITE_LINE_MEMBER(adam_vdp_interrupt);
+
+	// floppy state
+	required_shared_ptr<UINT8> m_fdc_ram;
 };
 
 #endif

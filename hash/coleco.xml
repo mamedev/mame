@@ -2438,33 +2438,6 @@
 		</part>
 	</software>
 
-	<software name="ard" supported="no">
-		<description>ADAM Resident Debugger (Prototype Rev20)</description>
-		<year>198?</year>
-		<publisher>Coleco?</publisher>
-		<part name="cart" interface="coleco_cart">
-			<dataarea name="rom" size="24576">
-				<rom name="ardrev20-chip1-10-31-6a1a.bin" size="8192" crc="4667ea7e" sha1="99543b5fc1b85fa1e543f9a8f96681988d96c4cc" offset="0x0000" />
-				<rom name="ardrev20-chip2-10-31-f5f6.bin" size="8192" crc="e6e2dcad" sha1="1ce45aeba3eba6cb8b277d8ba02b98c82f94e59e" offset="0x2000" />
-				<rom name="ardrev20-chip3-10-31-4ede.bin" size="8192" crc="f8dd08eb" sha1="16a6c0c66f5bcb8bb67989c951342e691adfd240" offset="0x4000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!--software name="adamdev" supported="no">
-		<description>ADAM Dev (Prototype)</description>
-		<year>198?</year>
-		<publisher>Coleco?</publisher>
-		<part name="cart" interface="coleco_cart">
-			<dataarea name="rom" size="24576">
-				<rom name="51c9-chip1-12-6-84.bin" size="8192" crc="148c7b1d" sha1="fd32bd9bc6053b263cfc51267e0ef3f7305df121" offset="0x0000" />
-				<rom name="51c9-chip2-12-6-84.bin" size="8192" crc="4fbea31a" sha1="e17f817f1ab89a8b2c6d8dc2790ffb042da47df3" offset="0x2000" />
-				<rom name="51c9-chip3-12-6-84.bin" size="8192" crc="0b418ba1" sha1="6cc84dd6dbe9e3e4f3be35695d89ef3d6e1c1244" offset="0x4000" />
-				<rom name="51c9-chip4-12-6-84.bin" size="8192" crc="653ff925" sha1="0df057b7b1dcd969411abb1f084cb8354013103a" offset="0x6000" />
-			</dataarea>
-		</part>
-	</software-->
-
 	<software name="bbears">
 		<!-- Berenstain Bears, The (1984)(Coleco)(proto).bin -->
 		<description>The Berenstain Bears (Prototype)</description>

@@ -1,0 +1,1085 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="adam_flop" description="Coleco Adam diskettes">
+
+	<software name="bestbc">
+		<description>Best of B.C. Featuring B.C's Quest For Tires and B.C. II: Grog's Revenge</description>
+		<year>1985</year>
+		<publisher>Sydney Development</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="best of b.c. featuring b.c's quest for tires and b.c. ii - gog's revenge (1985)(sydney development).dsk" size="163840" crc="f910c3ef" sha1="a3ddd5a0c32559cb01f295f51d0ec7ace4de3e16" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bestofea">
+		<description>The Best of Electronic Arts</description>
+		<year>19??</year>
+		<publisher>Electronic Arts</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="best of electronic arts, the (19xx)(electronic arts).dsk" size="163840" crc="51035849" sha1="e8014dec2502755b914afb1c95b3f0bc59c118f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cartso01">
+		<description>Cartsoft #01</description>
+		<year>198?</year>
+		<publisher>U.K. ADAM Subscribers</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="cartsoft #01 (198x)(u.k. adam subscribers).dsk" size="163840" crc="f0fcf6d3" sha1="468ba543f3a87f30f30722c897ab730c10f19cc2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cartso04">
+		<description>Cartsoft #04</description>
+		<year>198?</year>
+		<publisher>U.K. ADAM Subscribers</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="cartsoft #04 (198x)(u.k. adam subscribers).dsk" size="163840" crc="9af2d861" sha1="c12242f794be21448a8510f3578cde8125a27c7b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cartso05">
+		<description>Cartsoft #05</description>
+		<year>198?</year>
+		<publisher>U.K. ADAM Subscribers</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="cartsoft #05 (198x)(u.k. adam subscribers).dsk" size="163840" crc="980ebc44" sha1="ec785f31012d6cfc4142570f01d32774069e8f42" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cartso07">
+		<description>Cartsoft #07</description>
+		<year>198?</year>
+		<publisher>U.K. ADAM Subscribers</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="cartsoft #07 (198x)(u.k. adam subscribers).dsk" size="163840" crc="1deb05c3" sha1="6b848727db4280c9938bc5435522a197ea7b4535" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cartso08">
+		<description>Cartsoft #08</description>
+		<year>198?</year>
+		<publisher>U.K. ADAM Subscribers</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="cartsoft #08 (198x)(u.k. adam subscribers).dsk" size="163840" crc="e24c0c71" sha1="7ca1a998edc05142bedbb97872e818fe5c60937d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cartso14">
+		<description>Cartsoft #14</description>
+		<year>198?</year>
+		<publisher>U.K. ADAM Subscribers</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="cartsoft #14 (198x)(u.k. adam subscribers).dsk" size="163840" crc="f27fca74" sha1="7d40a8a70470ca9d5a67ab1ab2026fe5cb3e143e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cartso16">
+		<description>Cartsoft #16</description>
+		<year>198?</year>
+		<publisher>U.K. ADAM Subscribers</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="cartsoft #16 (198x)(u.k. adam subscribers).dsk" size="163840" crc="794fe7ed" sha1="0b22ba56110486a6dcd972796b38bb60def9dab1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cartso19">
+		<description>Cartsoft #19</description>
+		<year>198?</year>
+		<publisher>U.K. ADAM Subscribers</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="cartsoft #19 (198x)(u.k. adam subscribers).dsk" size="163840" crc="746e54d5" sha1="8e3fbaadeed6cc366b98a273ad42389e246ac125" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megadisk">
+		<description>Megadisk #1</description>
+		<year>19??</year>
+		<publisher>Coleco &amp; LMI</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="megadisk #1 (19xx)(coleco - lmi).dsk" size="163840" crc="15375699" sha1="23da53ea216620b545bc492842deafad2667211e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="niadpd36">
+		<description>NIAD Public Domain Volume 36</description>
+		<year>1989</year>
+		<publisher>NIAD</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="niad public domain volume 36 (1989)(niad)(pd).dsk" size="163840" crc="04a60417" sha1="a4999e0d1811cf1d835b789b668be672f511d7df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adamcalc">
+		<description>Adam Calc</description>
+		<year>1984</year>
+		<publisher>Lazer MicroSystems</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="adam calc (1984)(lazer microsystems).dsk" size="163840" crc="955cf8ae" sha1="db7b231f855e2120f6b8e936e175377ac3a3cd45" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adlink2p">
+		<description>Adam Link II Patches</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="adam link ii patches (1984)(coleco).dsk" size="163840" crc="0c98ad0c" sha1="1f447a204eb183aef36da9435ebde0235b76d144" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adamlnk2">
+		<description>Adam Link II Telecommunicator</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="adam link ii telecommunicator (1984)(coleco).dsk" size="163840" crc="64f9486b" sha1="c84b97fcc45e11af6fa8f3256653a0534d1d621f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adamutil">
+		<description>ADAM Utilities (v1.50)</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="adam utilities v1.50 (1984)(coleco).dsk" size="163840" crc="4809359b" sha1="b395fcb52109d0821ea14810253e3b022f2d7ef8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adcalcop">
+		<description>ADAMCALC Orphanware Patch</description>
+		<year>1987</year>
+		<publisher>Thomas E. Clary</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="adamcalc orphanware patch (1987)(clary, thomas e.).dsk" size="163840" crc="08baf589" sha1="c7c70bc82a18fa571625de9c42e0f51868edec5d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bootpixd">
+		<description>Boot Pix Deluxe</description>
+		<year>1988</year>
+		<publisher>Metro Orlando Adam User's Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="boot pix deluxe (1988)(metro orlando adam user's group).dsk" size="163840" crc="7b413c16" sha1="b5574dd660f0014c6894d6735bc78fc424483e9b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="catalog">
+		<description>Catalog Program</description>
+		<year>198?</year>
+		<publisher>Coleco</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="catalog program (198x)(coleco).dsk" size="163840" crc="eca7a295" sha1="b3749dccc72f67401118b384927fa5397f3ae9ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpycrt01">
+		<description>Copycart+ 01</description>
+		<year>1985</year>
+		<publisher>MMSG</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="copycart+ 01 (1985)(mmsg).dsk" size="163840" crc="a683eda1" sha1="8ab57313774326d62189acf2264b32a711dd4085" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpycrt02">
+		<description>Copycart+ 02</description>
+		<year>1985</year>
+		<publisher>MMSG</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="copycart+ 02 (1985)(mmsg).dsk" size="163840" crc="006bd4df" sha1="3b0201cb698fcf60ad02e0ce09ab40d2256b61ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpycrt02a" cloneof="cpycrt02">
+		<description>Copycart+ 02 (Alt)</description>
+		<year>1985</year>
+		<publisher>MMSG</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="123797">
+				<rom name="copycart+ 02 (1985)(mmsg)[a].dsk" size="123797" crc="100ea5de" sha1="603f3a87eeddfeea7a9dd1b3cc153409c39870ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpycrt03">
+		<description>Copycart+ 03</description>
+		<year>1985</year>
+		<publisher>MMSG</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="copycart+ 03 (1985)(mmsg).dsk" size="163840" crc="6cd153e4" sha1="087bc30c0ca21ca6a7f9eac2d5de243839c9fd25" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpycrt04">
+		<description>Copycart+ 04</description>
+		<year>1985</year>
+		<publisher>MMSG</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="copycart+ 04 (1985)(mmsg).dsk" size="163840" crc="19b107a0" sha1="8fa282676e7eaaad0c6cf28e9ac3d509d81a393f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpycrt05">
+		<description>Copycart+ 05</description>
+		<year>1985</year>
+		<publisher>MMSG</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="copycart+ 05 (1985)(mmsg).dsk" size="163840" crc="e6140d26" sha1="f13ffd1ef177e957851ccca84ee9c37b78ded1f6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpycrt06">
+		<description>Copycart+ 06</description>
+		<year>1985</year>
+		<publisher>MMSG</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="copycart+ 06 (1985)(mmsg).dsk" size="163840" crc="15a5634c" sha1="4d894d5890bc034765121f6f6559c17b52e637d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmfrmat">
+		<description>EOS CPM Format Utilites</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="eos cpm format utilites (19xx)(-).dsk" size="163840" crc="4c7c787c" sha1="045fe7efb3c63b68f16c6768885a4ac9a7fa4441" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copyutil">
+		<description>GJMG: Copy Utilities</description>
+		<year>1987</year>
+		<publisher>GJMG Enterprises</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="gjmg - copy utilities (1987)(gjmg enterprises).dsk" size="163840" crc="abc91485" sha1="80bce31056d3abd6ecbf71f2fa1166481bb21ced" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quickopy">
+		<description>GJMG: Quickopy (v1.0)</description>
+		<year>1987</year>
+		<publisher>GJMG Enterprises</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="gjmg - quickopy v1.0 (1987)(gjmg enterprises).dsk" size="163840" crc="ad1bb0aa" sha1="8413929fd1e154e5c9a339f071efc0a6eb4790cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quickopy11" cloneof="quickopy">
+		<description>GJMG: Quickopy (v1.1)</description>
+		<year>1987</year>
+		<publisher>GJMG Enterprises</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="gjmg - quickopy v1.1 (1987)(gjmg enterprises).dsk" size="163840" crc="f575c388" sha1="87280f257fa4a947039163ef554d69b5f6d0e051" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrketmon">
+		<description>Market Monitor</description>
+		<year>1986</year>
+		<publisher>Coleco</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="market monitor (1986)(coleco).dsk" size="163840" crc="6fa8b760" sha1="133a7749e7d5d261adec050cda07af629235dcc5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcartbk">
+		<description>Multicart Backup</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="multicart backup (19xx)(-).dsk" size="163840" crc="dfe485f4" sha1="5315e411ef91f0708648a160a4221145e6259fde" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="orphanfp">
+		<description>Orphanware Fastpatch (v2.0)</description>
+		<year>1987</year>
+		<publisher>Orhan</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="orphanware fastpatch v2.0 (1987)(orhan).dsk" size="163840" crc="0b430a63" sha1="ac539245d90b453bbd4d8dc77a59ea1934d82f45" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pwrpaint">
+		<description>PowerPAINT</description>
+		<year>1987</year>
+		<publisher>Digital Express</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="powerpaint (1987)(digital express).dsk" size="163840" crc="bebc4f2a" sha1="5de501cf5d7083384c69b396643aa6864f6a3833" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaintfx">
+		<description>Simple Painter &amp; Simple FX</description>
+		<year>1990</year>
+		<publisher>THE softWORKS FACTORY</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="">
+				<rom name="simple painter &amp; simple fx (1990)(the softworks factory)(pd).dsk" size="" crc="" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smrtfile">
+		<description>Smart Filer</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="smart filer (1984)(coleco).dsk" size="163840" crc="73bd32c6" sha1="d86af4cc4e2d30d7956d695c83be1b6dccf154c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbasic">
+		<description>SmartBasic (v1.0)</description>
+		<year>1983</year>
+		<publisher>Coleco &amp; LMI</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="smartbasic v1.0 (1983)(coleco - lmi).dsk" size="163840" crc="c3755733" sha1="016b7544983bc1ccc26154729a52c6212b58e33c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbasic12" cloneof="sbasic">
+		<description>SmartBasic v1.2</description>
+		<year>1983</year>
+		<publisher>Coleco &amp; LMI</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="smartbasic v1.2 (1983)(coleco - lmi).dsk" size="163840" crc="cf0002f1" sha1="606766d55b9d08ec7f89e1f1cf3dd2f3714c5749" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smrtlogo">
+		<description>SmartLOGO</description>
+		<year>1984</year>
+		<publisher>LOGO Computer Systems</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="smartlogo (1984)(logo computer systems).dsk" size="163840" crc="4f952a9b" sha1="12de3c958bbe306f1cdf3bf717b9054a3b5267b8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smrtprnt">
+		<description>SmartPrint Plus</description>
+		<year>1992</year>
+		<publisher>M.A.L. &amp; Swift</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="smartprint plus (1992)(m.a.l. - swift).dsk" size="163840" crc="6caf53dc" sha1="f7bfce3f18d37562474c48c5198d5a57658a58d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swiftdsk">
+		<description>Swift Disk</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="swift disk (19xx)(-).dsk" size="163840" crc="785dfc16" sha1="d376d0828d7e1f4a321be88f3908514f735b0e68" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordstar">
+		<description>Wordstar (v3.3)</description>
+		<year>1983</year>
+		<publisher>MicroPro International Corporation</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="wordstar v3.3 (1983)(micropro international corporation).dsk" size="163840" crc="6960f011" sha1="4195ecc32de2a65018ae98abedc7a8544465fe1e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rsbewbe">
+		<description>Richard Scarry's Best Electronic Word Book Ever!</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="richard scarry's best electronic word book ever! (1984)(coleco).dsk" size="163840" crc="2a24d3c0" sha1="77fdaae2cf28bd398101dc2ca1fb569a3fe0d206" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2010">
+		<description>2010: The Ultimate Text Adventure</description>
+		<year>1985</year>
+		<publisher>MGM &amp; United Artists Entertainment</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278528">
+				<rom name="2010 - the ultimate text adventure (1985)(mgm - united artists entertainment).dsk" size="278528" crc="45c9a236" sha1="189ff1bcb2fcaa43e1b80e3dff96ff06900caba7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="linksglf">
+		<description>Adam Links Golf</description>
+		<year>1986</year>
+		<publisher>Superior Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="adam links golf (1986)(superior software).dsk" size="163840" crc="21edd14a" sha1="f46e0c48beb1c2fdaa205c86a2e2bbec86af5057" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="addictus">
+		<description>Addictus</description>
+		<year>1989</year>
+		<publisher>Reedy Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="addictus (1989)(reedy software).dsk" size="163840" crc="f9f0bb1c" sha1="cc841747365013c10ac033ecad6be4867f4ad49e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buckrogr">
+		<description>Buck Rogers: Planet of Zoom</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="164352">
+				<rom name="buck rogers - planet of zoom (1983)(sega).dsk" size="164352" crc="2762850b" sha1="cc1548145b04da92c8dcb73d4bed062bc8bdc7d1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="capakidpa" cloneof="capakidp">
+		<description>Cabbage Patch Kids: Adventures in the Park (Alt)</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="cabbage patch kids - adventures in the park (1984)(coleco)[a][req 128k].dsk" size="163840" crc="6b8c7ce4" sha1="4c71462049a4238d6afe8b3caab0744ad1ac9c68" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="capakidp">
+		<description>Cabbage Patch Kids: Adventures in the Park</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="cabbage patch kids - adventures in the park (1984)(coleco)[req 128k].dsk" size="163840" crc="3f3756c6" sha1="705459378ac92f1d142aefb6638b7cc3f9c4a8ae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="campaign">
+		<description>Campaign '84</description>
+		<year>1983</year>
+		<publisher>Sunrise Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="campaign '84 (1983)(sunrise software).dsk" size="163840" crc="96964213" sha1="efe5bc0b59642abdf5dcb6200d55c5519f5060e4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chschamp">
+		<description>Chess Champ</description>
+		<year>1988</year>
+		<publisher>Digital Express</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="chess champ (1988)(digital express).dsk" size="163840" crc="96bc9818" sha1="16576a2003b9810901a500f51ea0d0aa744a4c2d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dambustr">
+		<description>The Dam Busters</description>
+		<year>1984</year>
+		<publisher>Sydney Development</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="dam busters, the (1984)(sydney development).dsk" size="163840" crc="90863018" sha1="195033710c0a6484c99ff304eefa7f3d62bc2fd9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diablo">
+		<description>Diablo</description>
+		<year>1984</year>
+		<publisher>Image Microcorp &amp; Extended Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="diablo (1984)(image microcorp - extended software).dsk" size="163840" crc="cc958a59" sha1="a619722840abab6a5f865f60c475cea1f5192f18" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkongjr">
+		<description>Donkey Kong Jr (Rev 13)</description>
+		<year>1983</year>
+		<publisher>Coleco &amp; Nintendo</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="164352">
+				<rom name="donkey kong jr rev 13 (1983)(coleco - nintendo).dsk" size="164352" crc="2773985e" sha1="eb4f40e409aa497a9678c57f4b26905734e98f3f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragonlr">
+		<description>Dragon's Lair</description>
+		<year>1983</year>
+		<publisher>Magicom</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="dragon's lair (1983)(magicom).dsk" size="163840" crc="ee955e8b" sha1="a2255aea8a48ae73f0c781e78e20625ee8ed3cde" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="evolutio">
+		<description>Evolution</description>
+		<year>1983</year>
+		<publisher>Sydney Development</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="evolution (1983)(sydney development)[b].dsk" status="baddump" size="163840" crc="f824a8d8" sha1="751d3b10cf9f91227d735cd4f3b41ce0af47baf3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ffeudqp">
+		<description>Family Feud: Questions Pack</description>
+		<year>1986</year>
+		<publisher>The Family Company</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="family feud - questions pack (1986)(the family company).dsk" size="163840" crc="e077ce42" sha1="7bba208ff61a0a27833055a6ac4a385ed0b95833" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ffeudqpa" cloneof="ffeudqp">
+		<description>Family Feud: Questions Pack (Alt)</description>
+		<year>1986</year>
+		<publisher>The Family Company</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="family feud - questions pack (1986)(the family company)[a].dsk" size="163840" crc="86a71eec" sha1="b2c7d3a9c8f138936e16e05c439731729b719ed1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ffeudwrt">
+		<description>Family Feud: Writer</description>
+		<year>1986</year>
+		<publisher>Walters Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="family feud - writer (1986)(walters software)[b].dsk" status="baddump" size="163840" crc="45b7261c" sha1="a3005954009b13dd3ff87e7086b34fe7f45279f6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeopardy">
+		<description>Jeopardy (Proto)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="164352">
+				<rom name="jeopardy (19xx)(-)(proto).dsk" size="164352" crc="e11d7417" sha1="2cc156ef659078c509c31b7586f04a54be7ba36e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeopardya" cloneof="jeopardy">
+		<description>Jeopardy (Proto) (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="164352">
+				<rom name="jeopardy (19xx)(-)(proto)[a].dsk" size="164352" crc="208c8e21" sha1="2ca57de2d62474c6d6ae4a1969a9329a56b18bcf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="modemchs">
+		<description>Modem Chess</description>
+		<year>1993</year>
+		<publisher>Bonafide Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="53248">
+				<rom name="modem chess (1993)(bonafide software).dsk" size="53248" crc="ff81fb6b" sha1="9b8dd0a703b32e8a347ae892521a18dd98f683dd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phcraze">
+		<description>Phrase Craze</description>
+		<year>1988</year>
+		<publisher>Reedy Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="phrase craze (1988)(reedy software).dsk" size="163840" crc="7ee050ff" sha1="cd58c5f5dbc2c6971fb6a6f3310da07d6461e8d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quatris">
+		<description>Quatris</description>
+		<year>1989</year>
+		<publisher>Steven B. Perkins</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="quatris (1989)(perkins, steven b.)[b].dsk" status="baddump" size="163840" crc="e8df317c" sha1="f43f90e440302a05d268622ebf032452bc73e3ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scosmofg">
+		<description>Super Cosmo Fighter</description>
+		<year>1997</year>
+		<publisher>Marcel de Kogel</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="super cosmo fighter (1997)(kogel, marcel de)(pd).dsk" size="163840" crc="15e921c7" sha1="ab78414eda21468f500d462101bd172e4128490a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssubroc">
+		<description>Super Subroc</description>
+		<year>1984</year>
+		<publisher>Sega &amp; Coleco</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="super subroc (1984)(sega - coleco).dsk" size="163840" crc="72b86fe5" sha1="4a9d28541d9fabcfae2bbe5a88f3bf0475943f9b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="szaxxon">
+		<description>Super Zaxxon</description>
+		<year>1984</year>
+		<publisher>Sega &amp; Coleco</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="164352">
+				<rom name="super zaxxon (1984)(sega - coleco).dsk" size="164352" crc="1715bcce" sha1="1e61a2c5bded1e1e870fd29b6a1bd2bd767de8ab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toapshai">
+		<description>Temple of Apshai</description>
+		<year>1985</year>
+		<publisher>Epyx</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="temple of apshai (1985)(epyx)[h].dsk" status="baddump" size="163840" crc="db157a7c" sha1="f67b93a0dd4df724dc73d95ae9f6d2b31820c46f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm22">
+		<description>CP/M 2.2 (v1.50)</description>
+		<year>1984</year>
+		<publisher>Digital Research &amp; Coleco</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="cp-m 2.2 v1.50 (1984)(digital research - coleco).dsk" size="163840" crc="ef284baf" sha1="4d2082b324000c8dd0424767c7db22d646080b75" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm22a" cloneof="cpm22">
+		<description>CP/M 2.2 (v1.50) (Alt)</description>
+		<year>1984</year>
+		<publisher>Digital Research &amp; Coleco</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="cp-m 2.2 v1.50 (1984)(digital research - coleco)[a].dsk" size="163840" crc="da81665c" sha1="594c80a96091ae724feb0ef25018c01de86b5575" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tdoscpm">
+		<description>TDOS CPM 2.2 System</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="tdos cpm 2.2 system (19xx)(-)[720k disk].dsk" size="1474560" crc="cf5cb6dd" sha1="99600747a4e0e4677c5a4e85c470bd7cfbb594af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tdos45">
+		<description>TDOS (v4.5)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="tdos v4.5 (19xx)(-).dsk" size="163840" crc="6060a2d4" sha1="440bbcbf52f0d6cfe395694bdbeffb227984db0e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="tdos v4.5 docs (19xx)(-).dsk" size="163840" crc="68ead706" sha1="4e12b345f67adbfc45d9a2060544296d7ebfa77f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tdos458" clonef="tdos45">
+		<description>TDOS (v4.58)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="tdos v4.58 (19xx)(-).dsk" size="163840" crc="68fe0d06" sha1="242ff2b827c10548545420d5c2f7b4e3b1c3810c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas01">
+		<description>ANN XMAS 2001</description>
+		<year>2001</year>
+		<publisher>ADAM News Network</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="ann disk - december 2001.dsk" size="163840" crc="94c6dde9" sha1="30d66e187bead40d61e146454570c4636a2f3c6d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas08">
+		<description>ANN XMAS 2008</description>
+		<year>2008</year>
+		<publisher>ADAM News Network</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="ann disk - december 2008.dsk" size="163840" crc="c69508bb" sha1="b2d569e47a5c14db2fa1c75ebf7b20c2638ede5a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas09">
+		<description>ANN XMAS 2009</description>
+		<year>2009</year>
+		<publisher>ADAM News Network</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="ann disk - december 2009.dsk" size="163840" crc="1a1ef13b" sha1="08d249526d90f9ec65b024f6bbc24fcaafe8b190" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas10">
+		<description>ANN XMAS 2010</description>
+		<year>2010</year>
+		<publisher>ADAM News Network</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="ann disk - december 2010-1.dsk" size="163840" crc="b9d3ca0e" sha1="6475ceab542a9a919e0f33907405af8f66be2cab" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="ann disk - december 2010-2.dsk" size="327680" crc="85e501fe" sha1="faa082fa756b7f27845962b700fd1d666a39f143" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas11">
+		<description>ANN XMAS 2011</description>
+		<year>2011</year>
+		<publisher>ADAM News Network</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="ann disk - december 2011-1.dsk" size="163840" crc="a90cda9f" sha1="4f0ebaa650466e11d41e7292ae4e57d1a46a318e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="ann disk - december 2011-2.dsk" size="163840" crc="776345b6" sha1="135e07dde8816c2219a2995c115e4313cedaa5fc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas02">
+		<description>ANN XMAS 2002</description>
+		<year>2002</year>
+		<publisher>ADAM News Network</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="ann xmas card 2002.dsk" size="163840" crc="43ddf685" sha1="07b32dd07efdd1f48a4e62180f8ebdb2d2a74816" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas03">
+		<description>ANN XMAS 2003</description>
+		<year>2003</year>
+		<publisher>ADAM News Network</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="ann xmas card 2003.dsk" size="163840" crc="3ee32a91" sha1="fd9c3b93028b2c8430717ca8da8a515fa5a1be11" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas00">
+		<description>ANN XMAS 2000</description>
+		<year>2000</year>
+		<publisher>ADAM News Network</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="dec00ann.dsk" size="163840" crc="99d1cd06" sha1="549d7c896f297f9e3c9577f9cf88222ad857a881" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas05">
+		<description>ANN XMAS 2005</description>
+		<year>2005</year>
+		<publisher>ADAM News Network</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="dec05ann.dsk" size="163840" crc="3445d1fc" sha1="992e947ee1408f306faa569ca14334fea8d8567f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas">
+		<description>ANN XMAS 2004</description>
+		<year>2004</year>
+		<publisher>ADAM News Network</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="xmas2004.dsk" size="163840" crc="484c9384" sha1="eace306d5aced8e3f8dce2408fcd038b65564554" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas06">
+		<description>ANN XMAS 2006</description>
+		<year>2006</year>
+		<publisher>ADAM News Network</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="xmas2006-1.dsk" size="163840" crc="90f48e32" sha1="bdbd6255d657313fdab2d1f1512fef77cfe5ea1c" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="xmas2006-2.dsk" size="163840" crc="d87a18f3" sha1="62a24bac7e144cfb6af1067cabd136a01c7b59e5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas07">
+		<description>ANN XMAS 2007</description>
+		<year>2007</year>
+		<publisher>ADAM News Network</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="xmas2007.dsk" size="163840" crc="3d3aab48" sha1="124a918b14b2b1276c83fde698d87efa2f8df50a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zork">
+		<description>Zork I: The Great Underground Empire</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="zork1.dsk" size="163840" crc="8dac567c" sha1="6c9571f03c490b6a07d5194f30ee0f0ee3b7c1d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zork2">
+		<description>Zork II: The Wizard of Frobozz</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="zork2.dsk" size="163840" crc="3daf5073" sha1="8e3126c1cead16fda4d2a72397a570c47a734e02" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zork3">
+		<description>Zork III: The Dungeon Master</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="zork3.dsk" size="163840" crc="d890aad7" sha1="16804811cde81d8cdc0de51202eda98ba5008915" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

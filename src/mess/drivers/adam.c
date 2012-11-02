@@ -161,6 +161,131 @@
 
                 E0-FF (W) = Sound Chip (SN76489A)
                 E0-FF (R) = Read Controller data, A1=0 -> read controller 1, A1=1 -> read controller 2
+*/
+
+/*
+                       Detailed Coleco ADAM Computer I/O Address Map
+
+Port #    Device                        Input                    Output
+__________________________________________________________________________________________
+
+00        Powermate SASI Hard Drive     Input Data               Output Data
+01        Powermate SASI Hard Drive     Status Register          Command Register
+01        MIB2 RESET line               * Not Used on MIB2 *     Bit 3 = 1 for MIB2 RESET
+01        Powermate IDE Hard Drive      Error Register           * Not Used on IDE HD *
+02        Powermate IDE Hard Drive      Sector Count Register    Sector Count Register
+03        Powermate IDE Hard Drive      Sector Number Register   Sector Number Register
+04        Powermate IDE Hard Drive      Cylinder Low Register    Cylinder Low Register
+05        Powermate IDE Hard Drive      Cylinder High Register   Cylinder High Register
+06        Powermate IDE Hard Drive      SDH Register             SDH Register
+07        Powermate IDE Hard Drive      Status Register          Command Register
+08        Bonafide Sys MIDI Interface
+09        Bonafide Sys MIDI Interface
+0A        Bonafide Sys MIDI Interface
+0B        Bonafide Sys MIDI Interface
+0C        Bonafide Sys MIDI Interface
+0D        Bonafide Sys MIDI Interface
+0E        Bonafide Sys MIDI Interface
+0F        Bonafide Sys MIDI Interface
+10        Powermate Serial ports        Mode Register A          Mode Register A
+11        Powermate Serial ports        Status Register A        Clock Select Reg A
+12        Powermate Serial ports        * DO NOT USE *           Command Register A
+13        Powermate Serial ports        RX Holding Register A    TX Holding Reg A
+14        Powermate Serial ports        Input Port Change Reg    Aux Control Register
+15        Powermate Serial ports        Interrupt Status Reg     Interrupt Mask Reg
+16        Powermate Serial ports        Read Counter Upper       Set C/T Upper Register
+17        Powermate Serial ports        Read Counter Lower       Set C/T Lower Register
+18        Powermate Serial ports        Mode Register B          Mode Register B
+19        Powermate Serial ports        Status Register B        Clock Select Reg B
+1A        Powermate Serial ports        * DO NOT USE *           Command Register B
+1B        Powermate Serial ports        RX Holding Register B    TX Holding Register B
+1C        Powermate Serial ports        * Reserved (note 5) *    MIB3 Serial Port RESET
+1D        Powermate Serial ports        Read Input Port Bits     Output Port Config Reg
+1E        Coleco AutoDialer             ??                       ??
+1E        Powermate Serial ports        Start Counter Cmd Port   Set Output Port Bits
+1F        Powermate Serial ports        Stop Counter Cmd Port    Reset Output Port Bits
+20-3F     AdamNet Reset                 Input MAY be available   Output is NOT available
+40        Parallel Printer interface    Printer status           Output Data
+41        May be unused (see note 1)    Input may NOT be avail   Output MAY be available
+42        Expansion Memory              * Not Used *             Bank Number
+43        May be unused (see note 1)    Input may NOT be avail   Output MAY be available
+44-47     Eve/Orphanware Serial Port
+48-4B     Eve Speech Synth/Clock Card
+4C-4F     Orphanware Serial Port 2      (Standard Eve 80 column terminal ports)
+4F        Coleco Steering controller    (Listed in Hackers guide as Expansion conn #2)
+50-53     Super Game Module
+54-57     Orphanware Serial Port 3      (Standard Orphanware 80 column terminal ports)
+58        Powermate IDE Hard Disk       Input Data Lower 8 bits  Output Data Lower 8 bits
+59        Powermate IDE Hard Disk       Input Data Upper 8 bits  Output Data Upper 8 bits
+5A        Powermate IDE Hard Disk       Alternate Status Reg     Fixed Disk Control Reg
+5B        Powermate IDE Hard Disk       Digital Input Register   ** Not Used by IDE HD **
+5C-5F     Orphanware Serial Port 4
+5E        Adamlink Modem                Input Data               Output Data
+5F        Adamlink Modem                Status                   Control
+60-7F     Memory Bank Switch Port       Input MAY be available   Output is NOT available
+80-8F     *** Unused ***                (see note 2)             STA (?)
+90-9F     Orphanware Hard Drive                                  STA (?)
+A0-BF     Video Display Processor
+C0        Strobe Reset                                           STB (?)
+C1-DF     *** Unused ***                (see note 2)             STB (?)
+EO-FF     Sound Chip (Out only)
+FC        Joystick #1 (In only)
+FE        Joystick #2 (In only)
+
+
+Notes:
+
+1)   Port 41 or port 43 is used by the Eve 80 column unit as a keyboard input port.
+2)   Not useable from expansion card slots (can't read or write data to or from ports) - 
+     may be available on side port.
+3)   Powermate IDE hard disk drive will not interfere with Powermate serial ports.
+4)   Powermate serial ports will probably interfere with autodialer.
+5)   Reserved ports in Powermate serial port map:  Input ports 12 and 1A - screw up serial 
+     ports if used; Input port 1C doesn't bother anything but the 2681 drives the bus; 
+6)   Orphanware serial port number 4 probably interferes with the ADAMlink modem.
+     7)   According to my analysis of circuit U6 in the ADAM computer, all of upper I/O address 
+     space is decoded (by an LS138).  However, not all outputs appear to be used.  The 
+     circuit description follows.  Please correct any misassumptions I've made.  Note that 
+     if my analysis is correct, then the Orphanware hard disk should be interfering with 
+     the signal STA\ (which is associated with the joysticks in some way).
+
+
+
+                      U6
+                    74LS138             A6   A5   WR\
+               |--------------|
+   WR\    -----|A           Y0|o----    0    0    0    80-9F Write    (STA\)
+               |              |
+    A5    -----|B           Y1|o----    0    0    1    80-9F Read     (Not Used)
+               |              |
+    A6    -----|C           Y2|o----    0    1    0    A0-BF Write    (VDP CSW\)
+               |              |
+    A7    -----|G1          Y3|o----    0    1    1    A0-BF Read     (VDP CSR\)
+               |              |
+IORQ\    ----o|G2A         Y4|o----    1    0    0    C0-DF Write    (STB\)
+               |              |
+WAIT\    ----o|G2B         Y5|o----    1    0    1    C0-DF Read     (Not Used)
+               |              |
+               |            Y6|o----    1    1    0    E0-FF Write    (Sound CE\)
+               |              |
+               |            Y7|o----    1    1    1    E0-FF Read     (Joystick Enables)
+               |--------------|
+
+Conventions:
+
+1)   The "o" symbol next to an input or an output implies that the pin requires an active 
+     low signal.
+2)   The "\" symbol following a signal mnemonic indicates that the signal is active low.
+
+
+Rev. 3
+8/30/92
+Mark Gordon
+*/
+
+/*
+
+    TODO:
 
     http://drushel.cwru.edu/atm/atm.html
     http://rich.dirocco.org/Coleco/adam/ADAM.htm
@@ -1351,8 +1476,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fdc6801_mem, AS_PROGRAM, 8, adam_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6801_FDC_TAG, 0)
+    AM_RANGE(0x0080, 0x00ff) AM_RAM
+    AM_RANGE(0x0400, 0x07ff) AM_RAM AM_WRITEONLY AM_SHARE("fdc_ram")
+    AM_RANGE(0x0800, 0x0800) AM_MIRROR(0xff) AM_DEVREAD_LEGACY(WD2793_TAG, wd17xx_status_r)
+    AM_RANGE(0x1400, 0x17ff) AM_RAM AM_READONLY AM_SHARE("fdc_ram")
+    AM_RANGE(0x1800, 0x1800) AM_MIRROR(0xff) AM_DEVWRITE_LEGACY(WD2793_TAG, wd17xx_command_w)
+    AM_RANGE(0x2800, 0x2800) AM_MIRROR(0xff) AM_DEVREAD_LEGACY(WD2793_TAG, wd17xx_track_r)
+    AM_RANGE(0x3800, 0x3800) AM_MIRROR(0xff) AM_DEVWRITE_LEGACY(WD2793_TAG, wd17xx_track_w)
+    AM_RANGE(0x4800, 0x4800) AM_MIRROR(0xff) AM_DEVREAD_LEGACY(WD2793_TAG, wd17xx_sector_r)
+    AM_RANGE(0x5800, 0x5800) AM_MIRROR(0xff) AM_DEVWRITE_LEGACY(WD2793_TAG, wd17xx_sector_w)
+    AM_RANGE(0x6800, 0x6800) AM_MIRROR(0xff) AM_DEVREAD_LEGACY(WD2793_TAG, wd17xx_data_r)
+    AM_RANGE(0x7800, 0x7800) AM_MIRROR(0xff) AM_DEVWRITE_LEGACY(WD2793_TAG, wd17xx_data_w)
+	AM_RANGE(0x8000, 0x8fff) AM_MIRROR(0x7000) AM_ROM AM_REGION(M6801_FDC_TAG, 0)
 ADDRESS_MAP_END
 
 
@@ -1530,7 +1665,7 @@ static const cassette_interface adam_cassette_interface =
 	coleco_adam_cassette_formats,
 	&adam_cassette_options,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
-	NULL,
+	"adam_cass",
 	NULL
 };
 
@@ -1557,7 +1692,7 @@ static const floppy_interface adam_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(adam),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 
@@ -1738,6 +1873,7 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom,col,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
+    MCFG_CARTSLOT_INTERFACE("coleco_cart")
 
 	// ROM expansion
 	MCFG_CARTSLOT_ADD("xrom")
@@ -1748,6 +1884,12 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("128K")
+
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("colec_cart_list", "coleco")
+	MCFG_SOFTWARE_LIST_ADD("adam_cart_list", "adam_cart")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "adam_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "adam_flop")
 MACHINE_CONFIG_END
 
 
@@ -1790,8 +1932,8 @@ ROM_START( adam )
 	ROM_REGION( 0x800, M6801_PRN_TAG, 0 )
 	ROM_LOAD( "printer.u2", 0x000, 0x800, CRC(e8db783b) SHA1(32b40679749ad0317c2c9ee9ca619fad6d850ce7) )
 
-	ROM_REGION( 0x800, M6801_FDC_TAG, 0 )
-	ROM_LOAD( "floppy disk drive", 0x000, 0x800, NO_DUMP )
+	ROM_REGION( 0x1000, M6801_FDC_TAG, 0 )
+	ROM_LOAD( "floppy disk drive", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x800, M6801_SPI_TAG, 0 )
 	ROM_LOAD( "spi.bin", 0x000, 0x800, CRC(4ba30352) SHA1(99fe5aebd505a208bea6beec5d7322b15426e9c1) )
