@@ -16,7 +16,8 @@ public:
 	cd32_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag),
 		  m_microtouch(*this, "microtouch")
-		{ }
+	{
+	}
 
 	required_device<microtouch_device> m_microtouch;
 
@@ -26,6 +27,8 @@ public:
 	void (*m_input_hack)(running_machine &machine);
 	int m_oldstate[2];
 	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
+	DECLARE_CUSTOM_INPUT_MEMBER(cd32_sel_mirror_input);
+
 	DECLARE_WRITE32_MEMBER(aga_overlay_w);
 	DECLARE_WRITE8_MEMBER(cd32_cia_0_porta_w);
 	DECLARE_READ8_MEMBER(cd32_cia_0_portb_r);
