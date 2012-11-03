@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="coleco" description="Coleco Adam cartridges">
+<softwarelist name="adam_cart" description="Coleco Adam cartridges">
 
 	<!--software name="adamdev" supported="no">
 		<description>ADAM Dev (Prototype)</description>
