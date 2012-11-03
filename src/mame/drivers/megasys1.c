@@ -3375,6 +3375,28 @@ ROM_START( stdragon )
 	ROM_LOAD( "prom.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
+/***************************************************************************
+
+Saint Dragon alternate set
+
+This romset comes from an original pcb. Game differences are: none.
+
+Hardware info:
+Jaleco Mega System 1-A
+
+Rom definition:
+jsda-01,jsda-02 main program
+E71-14 (jsd-11,jsd-12,jsd-13,jsd-14)* background
+E72-18 (jsd-15,jsd-16,jsd-17,jsd-18)* foreground
+E73-23 (jsd-20,jsd-21,jsd-22,jsd-23)* sprites
+
+*The 128k gfx roms were merged into 512k roms.
+Rest of roms are identical to existing set
+Roms are 27c101,62304
+
+Dumped by tirino73
+
+***************************************************************************/
 
 ROM_START( stdragona )
 	ROM_REGION( 0x60000, "maincpu", 0 )		/* Main CPU Code */
@@ -3411,6 +3433,7 @@ ROM_START( stdragona )
 	ROM_REGION( 0x0200, "proms", 0 )		/* Priority PROM */
 	ROM_LOAD( "prom.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
+
 
 /***************************************************************************
 
@@ -3647,7 +3670,29 @@ static void jitsupro_gfx_unmangle(running_machine &machine, const char *region)
 
 static void stdragona_gfx_unmangle(running_machine &machine, const char *region)
 {
-	/* todo */
+	UINT8 *rom = machine.root_device().memregion(region)->base();
+	int size = machine.root_device().memregion(region)->bytes();
+	UINT8 *buffer;
+	int i;
+
+	/* data lines swap: 76543210 -> 37564210 */
+	for (i = 0;i < size;i++)
+		rom[i] =   BITSWAP8(rom[i],3,7,5,6,4,2,1,0);
+
+	buffer = auto_alloc_array(machine, UINT8, size);
+
+	memcpy(buffer,rom,size);
+
+	/* address lines swap: fedcba9876543210 -> fe3cbd9a76548210 */
+	for (i = 0;i < size;i++)
+	{
+		int a = (i & ~0xffff) |
+	BITSWAP16(i,0xf,0xe,0x3,0xc,0xb,0xd,0x9,0xa,0x7,0x6,0x5,0x4,0x8,0x2,0x1,0x0);
+
+		rom[i] = buffer[a];
+	}
+
+	auto_free(machine, buffer);
 }
 
 /*************************************
@@ -3658,9 +3703,10 @@ static void stdragona_gfx_unmangle(running_machine &machine, const char *region)
 
 /*
     MCU handshake sequence:
-    the M50747 MCU can overlay 0x20 bytes of data inside the ROM space.
+    the M50747 MCU can overlay 0x40 bytes of data inside the ROM space.
     The offset where this happens is given by m68k to MCU write [0x8/2] << 6.
     For example stdragon writes 0x33e -> maps at 0xcf80-0xcfbf while stdragona writes 0x33f -> maps at 0xcfc0-0xcfff.
+    Note: stdragona forgets to turn off the overlay before the ROM check in service mode (hence it reports an error).
 */
 
 #define MCU_HS_LOG 0
@@ -3983,6 +4029,7 @@ DRIVER_INIT_MEMBER(megasys1_state,stdragona)
 
 	stdragona_gfx_unmangle(machine(), "gfx1");
 	stdragona_gfx_unmangle(machine(), "gfx4");
+
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),this));
 }
@@ -4022,35 +4069,35 @@ DRIVER_INIT_MEMBER(megasys1_state,monkelf)
  *
  *************************************/
 
-GAME( 1988, lomakai,  0,        system_Z,          lomakai, driver_device,  0,        ROT0,   "Jaleco", "Legend of Makai (World)", 0 )
-GAME( 1988, makaiden, lomakai,  system_Z,          lomakai, driver_device,  0,        ROT0,   "Jaleco", "Makai Densetsu (Japan)", 0 )
-GAME( 1988, p47,      0,        system_A,          p47, driver_device,      0,        ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", 0 )
-GAME( 1988, p47j,     p47,      system_A,          p47, driver_device,      0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", 0 )
-GAME( 1988, kickoff,  0,        system_A,          kickoff, driver_device,  0,        ROT0,   "Jaleco", "Kick Off (Japan)", 0 )
+GAME( 1988, lomakai,  0,        system_Z,          lomakai,  driver_device,  0,        ROT0,   "Jaleco", "Legend of Makai (World)", 0 )
+GAME( 1988, makaiden, lomakai,  system_Z,          lomakai,  driver_device,  0,        ROT0,   "Jaleco", "Makai Densetsu (Japan)", 0 )
+GAME( 1988, p47,      0,        system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", 0 )
+GAME( 1988, p47j,     p47,      system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", 0 )
+GAME( 1988, kickoff,  0,        system_A,          kickoff,  driver_device,  0,        ROT0,   "Jaleco", "Kick Off (Japan)", 0 )
 GAME( 1988, tshingen, 0,        system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", 0 )
 GAME( 1988, tshingena,tshingen, system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", 0 )
-GAME( 1988, kazan,    0,        system_A,          kazan, megasys1_state,    iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", 0 )
-GAME( 1988, iganinju, kazan,    system_A,          kazan, megasys1_state,    iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", 0 )
+GAME( 1988, kazan,    0,        system_A,          kazan,    megasys1_state, iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", 0 )
+GAME( 1988, iganinju, kazan,    system_A,          kazan,    megasys1_state, iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", 0 )
 GAME( 1989, astyanax, 0,        system_A,          astyanax, megasys1_state, astyanax, ROT0,   "Jaleco", "The Astyanax", 0 )
 GAME( 1989, lordofk,  astyanax, system_A,          astyanax, megasys1_state, astyanax, ROT0,   "Jaleco", "The Lord of King (Japan)", 0 )
-GAME( 1989, hachoo,   0,        system_A_hachoo,   hachoo, megasys1_state,   astyanax, ROT0,   "Jaleco", "Hachoo!", 0 )
+GAME( 1989, hachoo,   0,        system_A_hachoo,   hachoo,   megasys1_state, astyanax, ROT0,   "Jaleco", "Hachoo!", 0 )
 GAME( 1989, jitsupro, 0,        system_A,          jitsupro, megasys1_state, jitsupro, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", 0 )
 GAME( 1989, plusalph, 0,        system_A,          plusalph, megasys1_state, astyanax, ROT270, "Jaleco", "Plus Alpha", 0 )
 GAME( 1989, stdragon, 0,        system_A,          stdragon, megasys1_state, stdragon, ROT0,   "Jaleco", "Saint Dragon (set 1)", 0 )
-GAME( 1989, stdragona,stdragon, system_A,          stdragon, megasys1_state, stdragona,ROT0,   "Jaleco", "Saint Dragon (set 2)", GAME_NOT_WORKING ) // gfx scramble
-GAME( 1990, rodland,  0,        system_A,          rodland, megasys1_state,  rodland,  ROT0,   "Jaleco", "Rod-Land (World)", 0 )
-GAME( 1990, rodlandj, rodland,  system_A,          rodland, megasys1_state,  rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", 0 )
-GAME( 1990, rodlandjb,rodland,  system_A,          rodland, driver_device,  0,        ROT0,   "bootleg","Rod-Land (Japan bootleg)", 0 )
+GAME( 1989, stdragona,stdragon, system_A,          stdragon, megasys1_state, stdragona,ROT0,   "Jaleco", "Saint Dragon (set 2)", 0 )
+GAME( 1990, rodland,  0,        system_A,          rodland,  megasys1_state, rodland,  ROT0,   "Jaleco", "Rod-Land (World)", 0 )
+GAME( 1990, rodlandj, rodland,  system_A,          rodland,  megasys1_state, rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", 0 )
+GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  driver_device,  0,        ROT0,   "bootleg","Rod-Land (Japan bootleg)", 0 )
 GAME( 1991, avspirit, 0,        system_B,          avspirit, megasys1_state, avspirit, ROT0,   "Jaleco", "Avenging Spirit", 0 )
 GAME( 1990, phantasm, avspirit, system_A,          phantasm, megasys1_state, phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", 0 )
 GAME( 1990, monkelf,  avspirit, system_B,          avspirit, megasys1_state, monkelf,  ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", GAME_NOT_WORKING )
-GAME( 1991, edf,      0,        system_B,          edf, megasys1_state,      edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force", 0 )
-GAME( 1991, edfu,     edf,      system_B,          edf, megasys1_state,      edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", 0 )
-GAME( 1991, edfbl,    edf,      system_Bbl,        edf, megasys1_state,      edfbl,    ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", GAME_NO_SOUND )
+GAME( 1991, edf,      0,        system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force", 0 )
+GAME( 1991, edfu,     edf,      system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", 0 )
+GAME( 1991, edfbl,    edf,      system_Bbl,        edf,      megasys1_state, edfbl,    ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", GAME_NO_SOUND )
 GAME( 1991, 64street, 0,        system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", 0 )
 GAME( 1991, 64streetj,64street, system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan)", 0 )
-GAME( 1992, soldam,   0,        system_A,          soldam, megasys1_state,   soldam,   ROT0,   "Jaleco", "Soldam", 0 )
-GAME( 1992, soldamj,  soldam,   system_A,          soldam, megasys1_state,   soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", 0 )
+GAME( 1992, soldam,   0,        system_A,          soldam,   megasys1_state, soldam,   ROT0,   "Jaleco", "Soldam", 0 )
+GAME( 1992, soldamj,  soldam,   system_A,          soldam,   megasys1_state, soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", 0 )
 GAME( 1992, bigstrik, 0,        system_C,          bigstrik, megasys1_state, bigstrik, ROT0,   "Jaleco", "Big Striker", 0 )
 GAME( 1993, chimerab, 0,        system_C,          chimerab, megasys1_state, chimerab, ROT0,   "Jaleco", "Chimera Beast (prototype)", 0 )
 GAME( 1993, cybattlr, 0,        system_C,          cybattlr, megasys1_state, cybattlr, ROT90,  "Jaleco", "Cybattler", 0 )
