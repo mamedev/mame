@@ -196,7 +196,11 @@ MACHINE_CONFIG_END
 
 ROM_START( merlin )
 	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "mp3404", 0x0000, 0x800, CRC(9362d9f9) SHA1(266d2a4a98cc33944a4fc7ed073ba9321bba8e05) )
+	// This rom needs verification, that's why it is marked as a bad dump
+	// We had to change one byte in the original dump at offset 0x096 from
+	// 0x5E to 0x1E to make 'Music Machine' working.
+	// The hashes below are from the manually changed dump
+	ROM_LOAD( "mp3404", 0x0000, 0x800, BAD_DUMP CRC(7515a75d) SHA1(76ca3605d3fde1df62f79b9bb1f534c2a2ae0229) )
 ROM_END
 
 /***************************************************************************
