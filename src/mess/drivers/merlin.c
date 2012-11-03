@@ -62,23 +62,23 @@ INPUT_PORTS_END
 The keypad is a 4*4 matrix, connected like so:
 
        +----+  +----+  +----+  +----+
-K1 o---| R0 |--| R1 |--| R2 |--| R3 |
+O0 o---| R0 |--| R1 |--| R2 |--| R3 |
        +----+  +----+  +----+  +----+
           |       |       |       |
        +----+  +----+  +----+  +----+
-K2 o---| R4 |--| R5 |--| R6 |--| R7 |
+O1 o---| R4 |--| R5 |--| R6 |--| R7 |
        +----+  +----+  +----+  +----+
           |       |       |       |
        +----+  +----+  +----+  +----+
-K4 o---| R8 |--| R9 |--|R10 |--| SG |
+O2 o---| R8 |--| R9 |--|R10 |--| SG |
        +----+  +----+  +----+  +----+
           |       |       |       |
           |    +----+  +----+  +----+
-K8 o------+----| CT |--| NG |--| HM |
+O3 o------+----| CT |--| NG |--| HM |
           |    +----+  +----+  +----+
           |       |       |       |
           o       o       o       o
-         O0      O1      O3      O2
+         K1      K2      K8      K4
 
 SG = same game, CT = comp turn, NG = new game, HM = hit me
 */
@@ -183,7 +183,7 @@ static const tms0980_config merlin_tms0980_config =
 
 
 static MACHINE_CONFIG_START( merlin, merlin_state )
-	MCFG_CPU_ADD( "maincpu", TMS1100, 500000 )	/* Clock is wrong */
+	MCFG_CPU_ADD( "maincpu", TMS1100, 500000 )	/* Clock may be wrong */
 	MCFG_CPU_CONFIG( merlin_tms0980_config )
 
 	MCFG_DEFAULT_LAYOUT(layout_merlin)
