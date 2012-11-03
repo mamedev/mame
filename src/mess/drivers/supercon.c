@@ -394,9 +394,9 @@ READ8_MEMBER( supercon_state::supercon_port4_r )
 	{
 		LOG(("%s key_data: %02x \n",board_lines[i_18],key_data));
 
-/* Only if valid data and mouse button is pressed */
+/* Only if valid data */
 
-		if (key_data && ioport("BUTTON_L")->read())
+		if (key_data)
 		{
 
 /* Set or remove pieces */
@@ -508,11 +508,7 @@ WRITE8_MEMBER( supercon_state::supercon_port4_w )
 
 TIMER_CALLBACK_MEMBER(supercon_state::mouse_click)
 {
-
-	if (ioport("BUTTON_L")->read_safe(0) )				/* wait for mouse release */
-		m_timer_mouse_click->adjust(m_wait_time, 0);
-	else
-		m_selecting=FALSE;
+	m_selecting=FALSE;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(supercon_state::update_artwork)
@@ -584,17 +580,6 @@ ADDRESS_MAP_END
 /* Input ports */
 
 static INPUT_PORTS_START( supercon )
-	PORT_START("MOUSE_X")
-	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100)
-
-	PORT_START("MOUSE_Y")
-	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100)
-
-	PORT_START("BUTTON_L")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("left button")
-
-	PORT_START("BUTTON_R")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("right button")
 
 	PORT_START("BOARD_1")
 	PORT_BIT(0x01,  IP_ACTIVE_LOW, IPT_KEYBOARD)
@@ -726,6 +711,7 @@ static INPUT_PORTS_START( supercon )
 
 	PORT_START("B_CLR")
 	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
+
 INPUT_PORTS_END
 
 /* Machine driver */
