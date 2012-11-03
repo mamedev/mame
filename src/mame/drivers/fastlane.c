@@ -30,7 +30,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::fastlane_scanline)
 
 WRITE8_MEMBER(fastlane_state::k007121_registers_w)
 {
-
 	if (offset < 8)
 		k007121_ctrl_w(m_k007121, space, offset, data);
 	else	/* scroll registers */
@@ -133,7 +132,7 @@ static INPUT_PORTS_START( fastlane )
 	PORT_DIPSETTING(	0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(	0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:8") // seems it doesn't work (same on pcb)
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
@@ -216,14 +215,13 @@ void fastlane_state::machine_start()
 static MACHINE_CONFIG_START( fastlane, fastlane_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)		/* 24MHz/8? */
+	MCFG_CPU_ADD("maincpu", HD6309, XTAL_24MHz/2) // 3MHz(XTAL_24MHz/8) internally
 	MCFG_CPU_PROGRAM_MAP(fastlane_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastlane_state, fastlane_scanline, "screen", 0, 1)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(59.17) // measured
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(37*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
@@ -232,19 +230,18 @@ static MACHINE_CONFIG_START( fastlane, fastlane_state )
 	MCFG_GFXDECODE(fastlane)
 	MCFG_PALETTE_LENGTH(1024*16)
 
-
 	MCFG_K007121_ADD("k007121")
 	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("konami1", K007232, 3579545)
+	MCFG_SOUND_ADD("konami1", K007232, XTAL_3_579545MHz)
 	MCFG_SOUND_CONFIG(k007232_interface_1)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_SOUND_ADD("konami2", K007232, 3579545)
+	MCFG_SOUND_ADD("konami2", K007232, XTAL_3_579545MHz)
 	MCFG_SOUND_CONFIG(k007232_interface_2)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
