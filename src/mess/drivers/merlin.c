@@ -224,6 +224,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY            FULLNAME      FLAGS */
-CONS( 1978, merlin,     0,      0,      merlin,     merlin, driver_device,  0,      "Parker Brothers", "Merlin", GAME_IS_SKELETON )
-
+CONS( 1978, merlin,     0,      0,      merlin,     merlin, driver_device,  0,      "Parker Brothers", "Merlin", 0 )
 
