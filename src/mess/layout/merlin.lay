@@ -380,21 +380,21 @@
 		<bezel name="led_1" element="led">
 			<bounds x="50" y="50" width="20" height="10" />
 		</bezel>
-		<bezel element="1" inputtag="O1" inputmask="0x01">
+		<bezel element="1" inputtag="O0" inputmask="0x02">
 			<bounds x="50" y="62" width="20" height="10" />
 		</bezel>
 
 		<bezel name="led_2" element="led">
 			<bounds x="100" y="50" width="20" height="10" />
 		</bezel>
-		<bezel element="2" inputtag="O3" inputmask="0x01">
+		<bezel element="2" inputtag="O0" inputmask="0x08">
 			<bounds x="100" y="62" width="20" height="10" />
 		</bezel>
 
 		<bezel name="led_3" element="led">
 			<bounds x="150" y="50" width="20" height="10" />
 		</bezel>
-		<bezel element="3" inputtag="O2" inputmask="0x01">
+		<bezel element="3" inputtag="O0" inputmask="0x04">
 			<bounds x="150" y="62" width="20" height="10" />
 		</bezel>
 
@@ -402,7 +402,7 @@
 		<bezel name="led_4" element="led">
 			<bounds x="50" y="80" width="20" height="10" />
 		</bezel>
-		<bezel element="4" inputtag="O0" inputmask="0x02">
+		<bezel element="4" inputtag="O1" inputmask="0x01">
 			<bounds x="50" y="92" width="20" height="10" />
 		</bezel>
 
@@ -416,7 +416,7 @@
 		<bezel name="led_6" element="led">
 			<bounds x="150" y="80" width="20" height="10" />
 		</bezel>
-		<bezel element="6" inputtag="O3" inputmask="0x02">
+		<bezel element="6" inputtag="O1" inputmask="0x08">
 			<bounds x="150" y="92" width="20" height="10" />
 		</bezel>
 
@@ -424,19 +424,19 @@
 		<bezel name="led_7" element="led">
 			<bounds x="50" y="110" width="20" height="10" />
 		</bezel>
-		<bezel element="7" inputtag="O2" inputmask="0x02">
+		<bezel element="7" inputtag="O1" inputmask="0x04">
 			<bounds x="50" y="122" width="20" height="10" />
 		</bezel>
 		<bezel name="led_8" element="led">
 			<bounds x="100" y="110" width="20" height="10" />
 		</bezel>
-		<bezel element="8" inputtag="O0" inputmask="0x04">
+		<bezel element="8" inputtag="O2" inputmask="0x01">
 			<bounds x="100" y="122" width="20" height="10" />
 		</bezel>
 		<bezel name="led_9" element="led">
 			<bounds x="150" y="110" width="20" height="10" />
 		</bezel>
-		<bezel element="9" inputtag="O1" inputmask="0x04">
+		<bezel element="9" inputtag="O2" inputmask="0x02">
 			<bounds x="150" y="122" width="20" height="10" />
 		</bezel>
 
@@ -444,7 +444,7 @@
 		<bezel name="led_10" element="led">
 			<bounds x="100" y="140" width="20" height="10" />
 		</bezel>
-		<bezel element="10" inputtag="O3" inputmask="0x04">
+		<bezel element="10" inputtag="O2" inputmask="0x08">
 			<bounds x="100" y="152" width="20" height="10" />
 		</bezel>
 
@@ -458,10 +458,10 @@
 			<bounds x="125" y="170" width="30" height="30" />
 		</bezel>
 
-		<bezel element="hit_me" inputtag="O2" inputmask="0x08">
+		<bezel element="hit_me" inputtag="O3" inputmask="0x04">
 			<bounds x="75" y="210" width="30" height="30" />
 		</bezel>
-		<bezel element="comp_turn" inputtag="O1" inputmask="0x08">
+		<bezel element="comp_turn" inputtag="O3" inputmask="0x02">
 			<bounds x="125" y="210" width="30" height="30" />
 		</bezel>
 	</view>
