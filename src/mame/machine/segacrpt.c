@@ -106,7 +106,7 @@
   ???-????      Buck Rogers            unencrypted version available
   315-5010      Pengo                  unencrypted version available
   315-5013      Super Zaxxon           used Zaxxon for known plaintext attack
-  ???-????      Super Locomotive
+  315-5015      Super Locomotive
   315-5018      Yamato
   ???-????      Top Roller             same key as Yamato
   315-5028      Sindbad Mystery
